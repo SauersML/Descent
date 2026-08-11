@@ -844,7 +844,7 @@ law below.
 formulae and not about the direction of travel. Three of the four conclusions are
 transport of a hypothesis, not a discovery:
 
-- `targetMetrics.auc < sourceMetrics.auc` and `sourceMetrics.brier < targetMetrics.brier`
+- `targetMetrics.auc < sourceMetrics.auc`
   both come from `h_r2_drop`, which *assumes* the target R² is lower. Nothing here shows
   that cross-ancestry transport lowers R². What is proved is that a drop in R² propagates
   to AUC and to calibrated Brier through the monotone charts — a real and reusable step,
@@ -872,10 +872,7 @@ theorem source_to_target_exact_metric_profile_from_shift_budget
       cal.observedMeanShift - cal.predictedMeanShift ≠ 0) :
     AucDropsAndCitlWorsens cal
         (sourceMetricProfileFromSourceWeightsAtPrevalence metric (cal.observedMean Pop.target))
-        (targetMetricProfileFromSourceWeights metric) ∧
-      (sourceMetricProfileFromSourceWeightsAtPrevalence metric
-          (cal.observedMean Pop.target)).brier <
-        (targetMetricProfileFromSourceWeights metric).brier := by
+        (targetMetricProfileFromSourceWeights metric) := by
   unfold AucDropsAndCitlWorsens
   have h_auc :
       (targetMetricProfileFromSourceWeights metric).auc <
@@ -887,19 +884,7 @@ theorem source_to_target_exact_metric_profile_from_shift_budget
       h_source_r2_unit h_target_r2_unit h_r2_drop
   obtain ⟨h_citl_eq, h_abs_eq, h_abs_worse⟩ :=
     source_calibrated_target_citl_facts cal h_src_cal h_shift_nonzero
-  have h_brier :
-      (sourceMetricProfileFromSourceWeightsAtPrevalence
-        metric (cal.observedMean Pop.target)).brier <
-        (targetMetricProfileFromSourceWeights metric).brier := by
-    rw [sourceMetricProfileFromSourceWeightsAtPrevalence_brier,
-      targetMetricProfileFromSourceWeights_brier,
-      sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explainedR2_chart,
-      targetCalibratedBrierFromSourceWeights_eq_explainedR2_chart,
-      h_target_mean_eq_prevalence]
-    simpa [brierFromR2, sourceBrierFromR2, PopGen.TransportedMetrics.calibratedBrier] using
-      brierFromR2_strictAnti metric.targetPrevalence
-        metric.targetPrevalence_pos metric.targetPrevalence_lt_one h_r2_drop
-  exact ⟨⟨h_auc, h_citl_eq, h_abs_eq, h_abs_worse⟩, h_brier⟩
+  exact ⟨h_auc, h_citl_eq, h_abs_eq, h_abs_worse⟩
 
 /-- **Exact cross-ancestry metric portability law from the mechanistic
 SNP-level transport model and mechanistic calibration state.**
@@ -912,15 +897,16 @@ This is the headline law surface for deployed metrics:
   `observed drift - source-weighted score-mean drift - deployment intercept drift`;
 - calibration slope is the literal transported `Cov/Var` ratio on the same
   score equation; and
-- Brier is the mechanistic source-vs-target calibrated Brier comparison on the
-  target-population observed prevalence scale.
+- calibration slope is the literal transported `Cov/Var` ratio on the same score equation.
 
 The same reading applies as for `source_to_target_exact_metric_profile_from_shift_budget`,
-which this theorem is a mechanistic instance of: the AUC drop and the Brier worsening are
-carried by the hypothesis `h_r2_drop`, and the calibration worsening by `h_src_cal`
-together with `h_shift_nonzero`. "Exact" qualifies the formulae for CITL and slope, which
-are computed from the SNP-level state, not the direction of the metric changes, which are
-assumed. -/
+which this theorem is a mechanistic instance of: the AUC drop is carried by the hypothesis
+`h_r2_drop`, and the calibration worsening by `h_src_cal` together with `h_shift_nonzero`.
+"Exact" qualifies the formulae for CITL and slope, which are computed from the SNP-level
+state, not the direction of the metric changes, which are assumed.
+
+The profile's `brier` coordinate is not ordered here: `liabilityBrierExact` needs Slepian-type
+monotonicity of the bivariate normal orthant, which Mathlib does not carry. -/
 theorem source_to_target_exact_metric_profile
     {p q : ℕ}
     (cal : CrossPopulationMechanisticCalibrationModel p q)
@@ -943,8 +929,7 @@ theorem source_to_target_exact_metric_profile
       cal.observedMeanShift - (cal.scoreMeanShift + cal.deploymentInterceptShift) ∧
     |targetProfile.citl| =
       |cal.observedMeanShift - (cal.scoreMeanShift + cal.deploymentInterceptShift)| ∧
-    |sourceProfile.citl| < |targetProfile.citl| ∧
-    sourceMetrics.brier < targetMetrics.brier := by
+    |sourceProfile.citl| < |targetProfile.citl| := by
   have h_target_mean_eq_prevalence_shift :
       (cal.toShiftModel.observedMean Pop.target) = cal.metric.targetPrevalence := by
     simpa [CrossPopulationMechanisticCalibrationModel.toShiftModel,
@@ -969,8 +954,8 @@ theorem source_to_target_exact_metric_profile
       h_src_cal_shift h_shift_nonzero_shift
   unfold AucDropsAndCitlWorsens at h_main
   dsimp at h_main ⊢
-  rcases h_main with ⟨⟨h_auc, h_citl, h_abs, h_worse⟩, h_brier⟩
-  refine ⟨h_auc, ?_, ?_, ?_, ?_⟩
+  obtain ⟨h_auc, h_citl, h_abs, h_worse⟩ := h_main
+  refine ⟨h_auc, ?_, ?_, ?_⟩
   · mechanistic_shift_budget
       CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile,
       CrossPopulationMechanisticCalibrationModel.calibrationProfile using h_citl
@@ -978,13 +963,6 @@ theorem source_to_target_exact_metric_profile
       CrossPopulationMechanisticCalibrationModel.identityCalibrationProfile,
       CrossPopulationMechanisticCalibrationModel.calibrationProfile using h_abs
   · exact h_worse
-  · simpa [CrossPopulationMechanisticCalibrationModel.toShiftModel,
-      CrossPopulationMechanisticCalibrationModel.observedMean,
-      CrossPopulationMechanisticCalibrationModel.observedMeanShift,
-      CrossPopulationCalibrationShiftModel.observedMean,
-      CrossPopulationCalibrationShiftModel.observedMeanShift, add_assoc,
-      totalObservedMeanShift, shiftedObservedMean,
-      Descent.Core.sum3] using h_brier
 
 /-- Generation-indexed mechanistic calibration state tied directly to the
 generation-indexed SNP/popgen transport model. -/
@@ -1209,13 +1187,9 @@ theorem targetMetricAndCalibrationProfilesAtGeneration_exact_mechanistic_popgen_
               (predictiveCovarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target) ^ 2 /
                 scoreVarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target)
       , brier :=
-          PopGen.TransportedMetrics.calibratedBrierFromVariances
+          PopGen.TransportedMetrics.liabilityBrierExact
             (m.metric.outcome.targetPrevalenceAt t)
-            ((predictiveCovarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target) ^ 2 /
-              scoreVarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target)
-            (effectiveOutcomeVariance (m.metric.toMetricModelAt t) Pop.target -
-              (predictiveCovarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target) ^ 2 /
-                scoreVarianceFromSourceWeights (m.metric.toMetricModelAt t) Pop.target) } ∧
+            (r2FromSourceWeights (m.metric.toMetricModelAt t) Pop.target) } ∧
     targetCalibrationProfileAtGeneration m t link =
       targetCalibrationProfileAtGenerationClosedForm m t link := by
   constructor

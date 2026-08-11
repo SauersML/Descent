@@ -391,22 +391,6 @@ noncomputable def targetContextShiftMetricModel : CrossPopulationMetricModel 1 1
 { baselineMetricModel with
       contextCross := Pop.withTarget baselineMetricModel.contextCross ![-(1 / 2)] }
 
-/-- Irreducible target mismatch witness.
-
-    Empirical status: NOT AN EMPIRICAL CLAIM. This is a witness -- a
-    literal configuration exhibited so that a theorem can be stated about it --
-    not a statement about any population. There is no measurement that could
-    agree or disagree with `![1, 1]`; what carries empirical content is the
-    theorem the witness appears in, and that theorem's own status is where it
-    belongs. An UNTESTED marker here reads as an unpaid debt and is not one,
-    which is worse than no marker: it inflates the count of things owed a
-    measurement with items that can never receive one. -/
-noncomputable def targetPrevalenceShiftMetricModel : CrossPopulationMetricModel 1 1 :=
-  { baselineMetricModel with
-      targetPrevalence := 1 / 4
-      targetPrevalence_pos := by norm_num
-      targetPrevalence_lt_one := by norm_num }
-
 /-- Novel target-only proxy-tagging witness: source fit is unchanged, but
 target portability changes because new post-split tagging links appear. -/
 noncomputable def novelTargetOnlyTaggingMetricModel : CrossPopulationMetricModel 1 1 :=
@@ -432,7 +416,7 @@ evaluating a different one.  The list is the tactic; the witnesses just invoke i
 macro "metric_witness_simp" : tactic =>
   `(tactic| simp [baselineMetricModel, baselineProxyTagMetricModel,
       targetTaggingShiftMetricModel, targetLDShiftMetricModel, targetEffectShiftMetricModel,
-      targetContextShiftMetricModel, targetPrevalenceShiftMetricModel,
+      targetContextShiftMetricModel,
       novelTargetOnlyTaggingMetricModel, novelUntaggablePhenotypeMetricModel,
       mechanisticPortabilityRatio,
       brokenTaggingResidual, ancestrySpecificLDResidual, sourceSpecificOverfitResidual,
@@ -446,8 +430,7 @@ macro "metric_witness_simp" : tactic =>
       sourceWeightsFromExplicitDrivers, sourceERMWeights,
       crossCovariance,
       effectiveOutcomeVariance,
-      targetCalibratedBrierFromSourceWeights,
-      PopGen.TransportedMetrics.calibratedBrier, PopGen.TransportedMetrics.r2FromSignalVariance,
+      PopGen.TransportedMetrics.r2FromSignalVariance,
       Matrix.mulVec, dotProduct, Matrix.cons_val', Matrix.cons_val_fin_one,
       Descent.Core.scaledMutationRate, Descent.Core.scaledMigrationRate, Descent.Core.ploidy,
       Descent.Core.Theta.ofRate, Descent.Core.BigM.ofRate, Descent.Core.Tau.ofGenerations,
@@ -464,10 +447,8 @@ theorem baseline_mechanistic_metrics :
     novelUntaggablePhenotypeResidual baselineMetricModel = 0 ∧
     r2FromSourceWeights baselineMetricModel Pop.source = 1 / 2 ∧
     r2FromSourceWeights baselineMetricModel Pop.target = 1 / 2 ∧
-    mechanisticPortabilityRatio baselineMetricModel = 1 ∧
-    targetCalibratedBrierFromSourceWeights baselineMetricModel = 1 / 8 := by
+    mechanisticPortabilityRatio baselineMetricModel = 1 := by
   metric_witness_simp
-  norm_num
 
 /-- A score built on the directly causal SNP and a score built on a perfect
 proxy tag can have the same source `R²`, but once proxy tagging degrades in the
@@ -528,16 +509,6 @@ theorem target_context_shift_creates_additive_overfit_loss_and_changes_target_r2
       r2FromSourceWeights baselineMetricModel Pop.source ∧
     r2FromSourceWeights targetContextShiftMetricModel Pop.target = 1 / 9 ∧
     mechanisticPortabilityRatio targetContextShiftMetricModel = 2 / 9 := by
-  metric_witness_simp
-  norm_num
-
-/-- Target prevalence changes the calibrated Brier score even when the score
-moments and target `R²` are unchanged. -/
-theorem target_prevalence_shift_changes_brier_without_changing_target_r2 :
-    r2FromSourceWeights targetPrevalenceShiftMetricModel Pop.target =
-      r2FromSourceWeights baselineMetricModel Pop.target ∧
-    targetCalibratedBrierFromSourceWeights targetPrevalenceShiftMetricModel = 3 / 32 ∧
-    targetCalibratedBrierFromSourceWeights baselineMetricModel = 1 / 8 := by
   metric_witness_simp
   norm_num
 

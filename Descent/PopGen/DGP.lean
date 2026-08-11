@@ -4367,6 +4367,41 @@ noncomputable def liabilityBrierExact (π r2 : ℝ) : ℝ :=
   π - bivariateNormalOrthant (Function.invFun Foundations.Phi π)
         (Function.invFun Foundations.Phi π) r2
 
+/-- **At zero correlation the orthant factorises**, because the map that correlates the pair is
+the identity there and a product measure gives a rectangle the product of its sides. -/
+theorem bivariateNormalOrthant_zero_correlation (a b : ℝ) :
+    bivariateNormalOrthant a b 0 = Foundations.Phi a * Foundations.Phi b := by
+  unfold bivariateNormalOrthant
+  have hmap :
+      (fun z : ℝ × ℝ ↦ (z.1, (0 : ℝ) * z.1 + Real.sqrt (1 - (0 : ℝ) ^ 2) * z.2)) = id := by
+    funext z
+    simp
+  have hIic : ∀ x : ℝ, (ProbabilityTheory.gaussianReal 0 1) (Set.Iic x)
+      = ENNReal.ofReal (Foundations.Phi x) :=
+    fun x ↦ (ProbabilityTheory.ofReal_cdf _ x).symm
+  rw [hmap, MeasureTheory.Measure.map_id, MeasureTheory.Measure.prod_prod, hIic, hIic,
+    ← ENNReal.ofReal_mul (Foundations.Phi_pos a).le,
+    ENNReal.toReal_ofReal
+      (mul_nonneg (Foundations.Phi_pos a).le (Foundations.Phi_pos b).le)]
+
+/-- **A score explaining nothing returns the prevalence variance**, which is the value a
+predictor knowing only the prevalence achieves. This is one of the two points at which the
+exact body and the linear chart agree, and it is why two anchors could not tell them apart:
+`calibratedBrier π 0` is `π (1 - π)` as well. -/
+theorem liabilityBrierExact_no_signal (π : ℝ) (h0 : 0 < π) (h1 : π < 1) :
+    liabilityBrierExact π 0 = π * (1 - π) := by
+  unfold liabilityBrierExact
+  rw [bivariateNormalOrthant_zero_correlation, Foundations.Phi_invFun_eq π h0 h1]
+  ring
+
+/-- **The class is inhabited with a number.** At a prevalence of one half and a score explaining
+nothing the exact risk is `1/4`, evaluated on the body itself rather than on a chart standing in
+for it. -/
+theorem liabilityBrierExact_no_signal_at_half :
+    liabilityBrierExact (1 / 2) 0 = 1 / 4 := by
+  rw [liabilityBrierExact_no_signal (1 / 2) (by norm_num) (by norm_num)]
+  norm_num
+
 /-- **The calibrated Brier closed form is the Brier risk at the process's own `R²`.**
 
 Nothing new is assumed here beyond `r2FromSignalVariance_eq_rsquared`: the same

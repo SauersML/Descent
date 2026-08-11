@@ -270,20 +270,20 @@ theorem clinical_utility_threshold
   linarith
 
 /-- **The exact mechanistic deployed metric profile can record joint loss in
-`R²`, AUC, and Brier.**
+`R²` and AUC.**
 
 This theorem is stated on the explicit SNP-level transport model rather than on
 a drift benchmark. If the transported source weights lose explained
-signal in the target population, then:
-
-- target `R²` is strictly lower;
-- exact target liability-threshold AUC is strictly lower; and
-- exact target calibrated Brier is strictly worse when source and target are
-  compared on the same target prevalence scale.
+signal in the target population, then target `R²` is strictly lower and exact
+target liability-threshold AUC is strictly lower.
 
 The point is that the repository's deployed metric profile can report joint
-deterioration across discrimination- and calibration-sensitive metrics from the
-same mechanistic target state. -/
+deterioration across discrimination-sensitive metrics from the same mechanistic
+target state.
+
+The profile's `brier` coordinate is not ordered here. It is `liabilityBrierExact`, and
+ordering two of its values in the explained fraction needs monotonicity of the bivariate
+normal orthant in its correlation -- Slepian's inequality, which Mathlib does not carry. -/
 theorem target_metrics_worse_of_r2_drop
     {p q : ℕ} (m : CrossPopulationMetricModel p q)
     (h_source_r2_unit : r2FromSourceWeights m Pop.source ∈ Set.Ico 0 1)
@@ -292,8 +292,7 @@ theorem target_metrics_worse_of_r2_drop
     let sourceMetrics := sourceMetricProfileFromSourceWeightsAtTargetPrevalence m
     let targetMetrics := targetMetricProfileFromSourceWeights m
     targetMetrics.r2 < sourceMetrics.r2 ∧
-    targetMetrics.auc < sourceMetrics.auc ∧
-    sourceMetrics.brier < targetMetrics.brier := by
+    targetMetrics.auc < sourceMetrics.auc := by
   dsimp
   have h_auc :
       (targetMetricProfileFromSourceWeights m).auc <
@@ -306,17 +305,7 @@ theorem target_metrics_worse_of_r2_drop
         m h_source_r2_unit.2]
     exact equalVarianceGaussianAUCFromExplainedR2_strictMonoOn_unitInterval
       h_target_r2_unit h_source_r2_unit h_r2_drop
-  have h_brier :
-      (sourceMetricProfileFromSourceWeightsAtTargetPrevalence m).brier <
-        (targetMetricProfileFromSourceWeights m).brier := by
-    rw [sourceMetricProfileFromSourceWeightsAtTargetPrevalence_brier,
-      targetMetricProfileFromSourceWeights_brier,
-      sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explainedR2_chart,
-      targetCalibratedBrierFromSourceWeights_eq_explainedR2_chart]
-    simpa [brierFromR2, sourceBrierFromR2, PopGen.TransportedMetrics.calibratedBrier] using
-      brierFromR2_strictAnti m.targetPrevalence
-        m.targetPrevalence_pos m.targetPrevalence_lt_one h_r2_drop
-  exact ⟨h_r2_drop, h_auc, h_brier⟩
+  exact ⟨h_r2_drop, h_auc⟩
 
 end MetricAndClinicalDecisions
 

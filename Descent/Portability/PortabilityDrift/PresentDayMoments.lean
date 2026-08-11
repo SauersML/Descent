@@ -1732,8 +1732,11 @@ The exported target metric profile is determined exactly by:
 - the additive biological loss budget entering the effective target outcome
   variance.
 
-This packages the exact `R²`, liability-AUC, and Brier laws on the explicit
-SNP-level transport state. -/
+This packages the exact `R²` and liability-AUC laws on the explicit SNP-level transport
+state. The Brier coordinate is named rather than expanded: it is `liabilityBrierExact` at
+the target prevalence and the transported explained fraction, and that body has no
+elementary closed form to expand into -- expanding it into variance coordinates is exactly
+the observed-scale substitution the liability body exists to avoid. -/
 theorem targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law
     {p q : ℕ} (m : CrossPopulationMetricModel p q) :
     targetMetricProfileFromSourceWeights m =
@@ -1748,20 +1751,14 @@ theorem targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law
               (predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
                 scoreVarianceFromSourceWeights m Pop.target)
       , brier :=
-          PopGen.TransportedMetrics.calibratedBrierFromVariances
-            m.targetPrevalence
-            ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
-              scoreVarianceFromSourceWeights m Pop.target)
-            (effectiveOutcomeVariance m Pop.target -
-              (predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
-                scoreVarianceFromSourceWeights m Pop.target) } := by
+          PopGen.TransportedMetrics.liabilityBrierExact
+            m.targetPrevalence (r2FromSourceWeights m Pop.target) } := by
   ext
   · rw [targetMetricProfileFromSourceWeights_r2,
       targetR2FromSourceWeights_exact_metric_portability_law]
   · rw [targetMetricProfileFromSourceWeights_auc,
       targetEqualVarianceGaussianAUCFromSourceWeights_exact_metric_portability_law]
-  · rw [targetMetricProfileFromSourceWeights_brier,
-      targetCalibratedBrierFromSourceWeights_exact_metric_portability_law]
+  · rfl
 
 /-- Canonical mechanistic deployed metric profile after `t` generations. -/
 noncomputable def targetMetricProfileAtGeneration {p q : ℕ}
@@ -1822,13 +1819,9 @@ theorem targetMetricProfileAtGeneration_exact_mechanistic_popgen_portability_law
               (predictiveCovarianceFromSourceWeights (m.toMetricModelAt t) Pop.target) ^ 2 /
                 scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target)
       , brier :=
-          PopGen.TransportedMetrics.calibratedBrierFromVariances
+          PopGen.TransportedMetrics.liabilityBrierExact
             (m.outcome.targetPrevalenceAt t)
-            ((predictiveCovarianceFromSourceWeights (m.toMetricModelAt t) Pop.target) ^ 2 /
-              scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target)
-            (effectiveOutcomeVariance (m.toMetricModelAt t) Pop.target -
-              (predictiveCovarianceFromSourceWeights (m.toMetricModelAt t) Pop.target) ^ 2 /
-                scoreVarianceFromSourceWeights (m.toMetricModelAt t) Pop.target) } := by
+            (r2FromSourceWeights (m.toMetricModelAt t) Pop.target) } := by
   ext
   · rw [targetMetricProfileAtGeneration_eq_slice,
       targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law]
@@ -1836,9 +1829,7 @@ theorem targetMetricProfileAtGeneration_exact_mechanistic_popgen_portability_law
       targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law]
   · rw [targetMetricProfileAtGeneration_eq_slice,
       targetMetricProfileFromSourceWeights_exact_mechanistic_portability_law]
-    simp [predictiveCovarianceFromSourceWeights, scoreVarianceFromSourceWeights,
-      effectiveOutcomeVariance,
-      CrossPopulationGenerationalModel.toMetricModelAt]
+    simp [CrossPopulationGenerationalModel.toMetricModelAt]
 
 /-- The direct `R²`-chart liability AUC agrees with the literal present-day
 liability AUC when the deployed `R²` comes from the same neutral benchmark

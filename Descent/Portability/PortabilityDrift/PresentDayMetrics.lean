@@ -1991,68 +1991,25 @@ noncomputable def residualVarianceFromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (P : Pop) : ℝ :=
   effectiveOutcomeVariance m P - explainedSignalVarianceFromSourceWeights m P
 
-/-- Closed-form source calibrated Brier coordinate from the full explicit
-source-state score equation, evaluated at an arbitrary observed prevalence
-coordinate `π`. This lets downstream theory compare source and target Brier on
-the same target-population outcome scale without falling back to a benchmark
-`R²` surrogate.
+/-- Source calibrated Brier coordinate from the full explicit source-state score equation,
+evaluated at an arbitrary observed prevalence coordinate `π`. This lets downstream theory
+compare source and target Brier on the same target-population outcome scale without falling
+back to a benchmark `R²` surrogate.
 
-    Empirical status: **FALSIFIED under the liability-threshold model,
-    inherited.** The body is `DGP.TransportedMetrics.calibratedBrierFromVariances`
-    at the source population, and that definition is itself recorded FALSIFIED
-    under the liability-threshold reading -- its docstring names THIS declaration
-    as the consumer that inherits the error, and tabulates the sizes. The
-    inheritance is exact and not approximate: this body adds no arithmetic, it
-    only chooses which two variances to supply.
+    **THE SCALE OF THE EXPLAINED FRACTION IS THE WHOLE OF WHAT THIS BODY HAS TO GET RIGHT.**
+    `r2FromSourceWeights` is a LIABILITY-scale fraction and a prevalence argument announces a
+    dichotomised outcome, so the Brier body it is fed to must be the liability-threshold one.
+    `calibratedBrierFromVariances` is not: it is exact on the OBSERVED scale and measured
+    wrong by 9% to 47%, at up to 299 sems, on a truncated liability tail.
 
-    The regime the parent is exact in transfers too: `calibratedBrierFromVariances`
-    is exact where the outcome is Gaussian on the scale it is scored on, and
-    wrong where cases are a truncated liability tail, which is the setting a
-    prevalence argument `π` announces. So the fault is worst exactly where this
-    definition is meant to be used.
+    Empirical status: UNTESTED, inherited. `liabilityBrierExact` carries the head and the
+    queued battery; this body adds no arithmetic, it only chooses which prevalence and which
+    explained fraction to supply.
 
     argument_source: model, inherited. -/
 noncomputable def sourceCalibratedBrierFromSourceWeightsAtPrevalence {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (π : ℝ) : ℝ :=
-  PopGen.TransportedMetrics.calibratedBrierFromVariances
-    π
-    (explainedSignalVarianceFromSourceWeights m Pop.source)
-    (residualVarianceFromSourceWeights m Pop.source)
-
-/-- The mechanistic source calibrated Brier coordinate is built directly from
-source explained signal variance and source residual variance. -/
-theorem sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explicit_source_variances
-    {p q : ℕ} (m : CrossPopulationMetricModel p q) (π : ℝ) :
-    sourceCalibratedBrierFromSourceWeightsAtPrevalence m π =
-      PopGen.TransportedMetrics.calibratedBrierFromVariances
-        π
-        (explainedSignalVarianceFromSourceWeights m Pop.source)
-        (residualVarianceFromSourceWeights m Pop.source) := by
-  rfl
-
-/-- The direct mechanistic source calibrated Brier coordinate agrees with the
-`R²` chart induced by the same explicit source explained-signal and
-total-variance decomposition. This is a derived identity, not the defining
-construction of source Brier. -/
-@[simp] theorem sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explainedR2_chart
-    {p q : ℕ} (m : CrossPopulationMetricModel p q) (π : ℝ) :
-    sourceCalibratedBrierFromSourceWeightsAtPrevalence m π =
-      PopGen.TransportedMetrics.calibratedBrier π (r2FromSourceWeights m Pop.source) := by
-  rw [sourceCalibratedBrierFromSourceWeightsAtPrevalence_eq_explicit_source_variances]
-  rw [PopGen.TransportedMetrics.calibratedBrierFromVariances_eq_chart]
-  have h_source_ne : (m.outcomeVariance Pop.source) ≠ 0 :=
-    ne_of_gt (m.outcomeVariance_pos Pop.source)
-  have hr2 :
-      PopGen.TransportedMetrics.r2FromSignalVariance
-          (explainedSignalVarianceFromSourceWeights m Pop.source)
-          (residualVarianceFromSourceWeights m Pop.source) =
-        r2FromSourceWeights m Pop.source := by
-    unfold PopGen.TransportedMetrics.r2FromSignalVariance residualVarianceFromSourceWeights
-      r2FromSourceWeights Descent.Core.share
-    field_simp [h_source_ne]
-    ring
-  rw [hr2]
-
+  PopGen.TransportedMetrics.liabilityBrierExact π (r2FromSourceWeights m Pop.source)
 
 /-- Exact target `R²` under transported source weights and the full target-side
 driver state.
@@ -2093,91 +2050,22 @@ copy and delete this — at the cost of losing the general form. -/
     residualVarianceFromSourceWeights m P =
       effectiveOutcomeVariance m P - explainedSignalVarianceFromSourceWeights m P := rfl
 
-/-- Exact target calibrated Brier coordinate from the full explicit driver
-state. Prevalence enters here, so Brier can change even when the score moments
-are held fixed. -/
+/-- Target calibrated Brier coordinate from the full explicit driver state. Prevalence enters
+here, so Brier can change even when the score moments are held fixed.
+
+    It is the target-side twin of `sourceCalibratedBrierFromSourceWeightsAtPrevalence` and
+    carries the same requirement for the same reason: the explained fraction is on the
+    liability scale, the prevalence announces a dichotomised outcome, so the Brier body is the
+    liability-threshold one. A twin that took the observed-scale chart while its partner took
+    the liability one would put the two coordinates on different scales and let a comparison
+    between them read as a portability loss.
+
+    Empirical status: UNTESTED, inherited from `liabilityBrierExact`, which carries the head
+    and the queued battery. -/
 noncomputable def targetCalibratedBrierFromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
-  PopGen.TransportedMetrics.calibratedBrierFromVariances
-    m.targetPrevalence
-    (explainedSignalVarianceFromSourceWeights m Pop.target)
-    (residualVarianceFromSourceWeights m Pop.target)
-
-/-- The mechanistic target calibrated Brier coordinate is built directly from
-target explained signal variance and target residual variance. -/
-theorem targetCalibratedBrierFromSourceWeights_eq_explicit_target_variances {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) :
-    targetCalibratedBrierFromSourceWeights m =
-      PopGen.TransportedMetrics.calibratedBrierFromVariances
-        m.targetPrevalence
-        (explainedSignalVarianceFromSourceWeights m Pop.target)
-        (residualVarianceFromSourceWeights m Pop.target) := by
-  rfl
-
-/-- Exact mechanistic target Brier portability law from transported score
-moments and target prevalence. This is the direct variance law, not a theorem
-about a benchmark `R²` chart. -/
-theorem targetCalibratedBrierFromSourceWeights_exact_metric_portability_law
-    {p q : ℕ} (m : CrossPopulationMetricModel p q) :
-    targetCalibratedBrierFromSourceWeights m =
-      PopGen.TransportedMetrics.calibratedBrierFromVariances
-        m.targetPrevalence
-        ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
-          scoreVarianceFromSourceWeights m Pop.target)
-        (effectiveOutcomeVariance m Pop.target -
-          (predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
-            scoreVarianceFromSourceWeights m Pop.target) := by
-  rw [targetCalibratedBrierFromSourceWeights_eq_explicit_target_variances]
-  simp [explainedSignalVarianceFromSourceWeights,
-    residualVarianceFromSourceWeights]
-
-/-- Exact mechanistic target Brier portability law with the additive biological
-loss budget made explicit in the residual term. -/
-theorem targetCalibratedBrierFromSourceWeights_exact_loss_budget_law
-    {p q : ℕ} (m : CrossPopulationMetricModel p q) :
-    targetCalibratedBrierFromSourceWeights m =
-      PopGen.TransportedMetrics.calibratedBrierFromVariances
-        m.targetPrevalence
-        ((predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
-          scoreVarianceFromSourceWeights m Pop.target)
-        ((m.outcomeVariance Pop.target) + irreducibleTargetResidualBurden m -
-          (predictiveCovarianceFromSourceWeights m Pop.target) ^ 2 /
-            scoreVarianceFromSourceWeights m Pop.target) := by
-  rw [targetCalibratedBrierFromSourceWeights_exact_metric_portability_law,
-    effectiveOutcomeVariance_target]
-
-/-- The direct mechanistic target calibrated Brier coordinate agrees with the
-`R²` chart induced by the same explicit target explained-signal and
-total-variance decomposition. This is a derived identity, not the defining
-construction of transported Brier. -/
-@[simp] theorem targetCalibratedBrierFromSourceWeights_eq_explainedR2_chart {p q : ℕ}
-    (m : CrossPopulationMetricModel p q) :
-    targetCalibratedBrierFromSourceWeights m =
-      PopGen.TransportedMetrics.calibratedBrier
-        m.targetPrevalence (r2FromSourceWeights m Pop.target) := by
-  rw [targetCalibratedBrierFromSourceWeights_eq_explicit_target_variances]
-  rw [PopGen.TransportedMetrics.calibratedBrierFromVariances_eq_chart]
-  have h_eff_ne : effectiveOutcomeVariance m Pop.target ≠ 0 :=
-    ne_of_gt (effectiveTargetOutcomeVariance_pos m)
-  have hr2 :
-      PopGen.TransportedMetrics.r2FromSignalVariance
-          (explainedSignalVarianceFromSourceWeights m Pop.target)
-          (residualVarianceFromSourceWeights m Pop.target) =
-        r2FromSourceWeights m Pop.target := by
-    unfold PopGen.TransportedMetrics.r2FromSignalVariance residualVarianceFromSourceWeights
-      r2FromSourceWeights Descent.Core.share
-    field_simp [h_eff_ne]
-    -- The residual variance is `Y - X`, so the denominator is `X + (Y - X)`.
-    -- `ring` alone cannot finish: after collapsing that to `Y` the goal is
-    -- `X * Y / Y = X`, and cancelling needs `Y ≠ 0`, which `ring` never
-    -- consults. Collapse with `ring`, then cancel explicitly.
-    have hden :
-        explainedSignalVarianceFromSourceWeights m Pop.target +
-            (effectiveOutcomeVariance m Pop.target -
-              explainedSignalVarianceFromSourceWeights m Pop.target)
-          = effectiveOutcomeVariance m Pop.target := by ring
-    rw [hden, mul_div_assoc, div_self h_eff_ne, mul_one]
-  rw [hr2]
+  PopGen.TransportedMetrics.liabilityBrierExact
+    m.targetPrevalence (r2FromSourceWeights m Pop.target)
 
 /-- The target score variance is exactly the target quadratic form
 `w_Sᵀ Σ_T w_S`. -/
