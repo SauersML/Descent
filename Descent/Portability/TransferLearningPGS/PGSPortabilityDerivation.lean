@@ -79,7 +79,10 @@ theorem sharedLDHeritability_zero_vary_is_junk {m : ℕ} (β : Fin m → ℝ)
     (`validation/empirical/simcov/battery_transfer.py`,
     `test_transfer_chain`). Against the squared correlation of score with phenotype, source and
     transported: 0.02 and 1.35 sems over a prediction
-    spanning 0.11581 to 0.23227, a factor of two. -/
+    spanning 0.11581 to 0.23227, a factor of two.
+
+    Power: the prediction spans 0.11581 to 0.23227 across the design, a factor of
+    two. -/
 noncomputable def pgsR2 (cov_pgs_y : ℝ) (var_pgs var_y : ℝ) : ℝ :=
   Descent.Core.squaredShare cov_pgs_y var_pgs var_y
 
@@ -144,7 +147,12 @@ noncomputable def transportedTargetR2SharedLD {m : ℕ}
 
     Under LD only the LD-weighted contraction is the genetic correlation. The
     plain cosine between effect vectors is a different quantity and differs by
-    3.1 sems on a panel with realistic coalescent LD. -/
+    3.1 sems on a panel with realistic coalescent LD.
+
+    Power: one design point, and what it moves is the sibling rather than the
+    prediction. The LD-free `effectGeneticCorrelation` predicts 0.69792 on the
+    same panel where this body predicts 0.67104, and the realised
+    0.67104±0.00869 rejects it at 3.09 sems while this body sits at 0.00. -/
 noncomputable def ldEffectGeneticCorrelation {m : ℕ}
     (β_source β_target : Fin m → ℝ) (ld : Fin m → Fin m → ℝ) : ℝ :=
   pgsPhenoCov β_source β_target ld /
@@ -180,7 +188,13 @@ noncomputable def ldEffectGeneticCorrelation {m : ℕ}
 
     THE REGIME IS A CONDITION. Under real LD the sibling
     `ldEffectGeneticCorrelation` is the genetic correlation and this body is
-    3.1 sems away from it; that separation is measured at that definition. -/
+    3.1 sems away from it; that separation is measured at that definition.
+
+    Power: the prediction spans 0.18449 to 0.90778 across the five cells, and the
+    natural rival -- the CENTRED Pearson correlation between the same two effect
+    vectors, which equals this body whenever the effects have mean zero -- is
+    rejected at 72.8 and 225.2 sems on the two cells where the effect
+    distribution has a nonzero mean. -/
 noncomputable def effectGeneticCorrelation {m : ℕ} (β_source β_target : Fin m → ℝ) : ℝ :=
   (∑ i : Fin m, β_source i * β_target i) /
     Real.sqrt ((∑ i : Fin m, β_source i ^ 2) * (∑ i : Fin m, β_target i ^ 2))
@@ -235,7 +249,11 @@ def standardizedDiagonalLD {m : ℕ} : Fin m → Fin m → ℝ :=
     exchangeable LD at pairwise correlation 0.5 leaves this body 9.2% off the realised
     variance, because outside linkage equilibrium the variance is `βᵀΣβ` and the cross terms
     do not vanish. `standardizedDiagonalLD` is what makes `Σ = I` here; a caller who
-    substitutes a real LD matrix and keeps this body has changed the claim. -/
+    substitutes a real LD matrix and keeps this body has changed the claim.
+
+    Power: the prediction spans 0.47943 to 0.61262 across the three cells, and two
+    rivals ride those same cells and die there -- `∑|βᵢ|` at 7040 sems and the
+    per-variant mean `(∑βᵢ²)/m` at 445 sems. -/
 noncomputable def additiveGeneticVariance {m : ℕ} (β : Fin m → ℝ) : ℝ :=
   ∑ i : Fin m, β i ^ 2
 
@@ -255,7 +273,10 @@ noncomputable def additiveGeneticVariance {m : ℕ} (β : Fin m → ℝ) : ℝ :
     0.48808 and 0.76970 against measured 0.20023 ± 0.00142, 0.48524 ± 0.00343
     and 0.76912 ± 0.00544, worst cell 0.83 sems at 0.59% relative, over a
     prediction spanning 74%. The companion `additiveGeneticVariance` is measured
-    on the same runs at worst 0.83 sems. -/
+    on the same runs at worst 0.83 sems.
+
+    Power: the prediction spans 0.19968 to 0.76970 across the three
+    architectures, a span of 74 percent. -/
 noncomputable def additiveHeritability {m : ℕ} (β : Fin m → ℝ) (var_y : ℝ) : ℝ :=
   additiveGeneticVariance β / var_y
 
@@ -301,8 +322,8 @@ noncomputable def sourceSelfR2DiagonalLD {m : ℕ}
     target phenotype. Worst cell 4.06 sems at 1.38% relative -- the
     finite-sample bias of a realised `R²`, below the two-percent floor.
 
-    Power, and why this is a measurement and not a restatement: two wrong forms
-    of the `pgsR2` shape ride on the SAME cells and are rejected decisively --
+    Power: this is a measurement and not a restatement, and here is why. Two
+    wrong forms of the `pgsR2` shape ride on the SAME cells and are rejected --
     the covariance left unsquared, `cov / (var_pgs · var_y)`, misses by up to
     1364 sems (468% relative), and the score variance omitted,
     `cov² / var_y`, by up to 212 sems (73%). An oracle algebraically pinned to

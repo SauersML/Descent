@@ -146,7 +146,11 @@ keeps failing: `β²·p(1-p)` misses by up to 236 sems (50% low) and `β²·4p(1
 
 The Hardy-Weinberg assumption is what was SIMULATED, not what was checked: the design draws
 two independent alleles per individual, so it establishes the variance formula GIVEN
-Hardy-Weinberg and says nothing about whether a real population is in it. -/
+Hardy-Weinberg and says nothing about whether a real population is in it.
+
+Power: the prediction spans 0.00480 to 0.06125 across the five frequencies, and the
+factor-of-two gate rides those same cells -- `β²·p(1-p)` rejected at up to 236 sems (50%
+low) and `β²·4p(1-p)` at 472 sems (100% high). -/
 noncomputable def variantGeneticVarianceContribution (β p : ℝ) : ℝ :=
   β ^ 2 * (2 * p * (1 - p))
 
@@ -419,7 +423,14 @@ and is valid only while `h * s` dominates `mu` — see
     linearisation valid at small `s` and small `p`; at `s = 0.1`, `p = 0.2` it is
     already about one percent per generation, which compounds over a run. Both
     sides are deterministic, so this is exact arithmetic and the gap is the
-    approximation rather than sampling noise. -/
+    approximation rather than sampling noise.
+
+    Power: the prediction is nearly flat here -- 0.19008 to 0.19880 -- and saying
+    so is the point: what this design moves is the LINEARISATION GAP. `s` is swept
+    fivefold from 0.02 to 0.10 and the relative error grows with it from -0.19 to
+    -0.95 percent, then turns to +0.39 percent when `mu` is raised tenfold at
+    lower `h`. A gap that tracks `s` and `mu` and changes sign is the dropped
+    mean-fitness denominator and `p²` term identified, not a constant bias. -/
 noncomputable def mutationSelectionStepRare (mu s h p : ℝ) : ℝ :=
   p * (1 - h * s) + mu * (1 - p)
 
@@ -475,10 +486,14 @@ admissible parameter, including the weak-constraint regime `s < mu` where
     The two engines agree with EACH OTHER on every cell, which is what
     distinguishes a corpus error from a harness error.
 
-    Power, and the competitor that earns the match: on the same cells the
-    per-diploid form `2 mu / (h s)` is rejected at 13 to 59 sems and the halved
-    form `mu / (2 h s)` at 7.2 to 30, so the agreement in the top three rows is
-    a measurement rather than a tautology.
+    Power: `4 Nₑ h s` is the swept input and it runs from 1 to 200 while this
+    body predicts 0.003984 at every cell, having no `Nₑ` in it to move; the
+    measurement runs from 0.004040 to 0.9270 over that sweep, which is how the
+    regime boundary was found rather than assumed. On the cells where the body
+    holds, the competitors that earn the match are carried too: the per-diploid
+    form `2 mu / (h s)` is rejected at 13 to 59 sems and the halved form
+    `mu / (2 h s)` at 7.2 to 30, so the agreement in the top three rows is a
+    measurement rather than a tautology.
 
     **The `+ mu` in the denominator is FALSIFIED.** The cells above cannot see
     it -- `mu / (h s + mu)` and the classical `mu / (h s)` differ by 0.4 percent
@@ -701,7 +716,12 @@ mutation replenishes as before.
     The step omits the mean-fitness denominator, so it is a linearisation valid
     at small `s`; at `s = 0.2` it is already a third of a percent per
     generation, which compounds. This is the same qualifier
-    `mutationSelectionStepRare` carries, and for the same reason. -/
+    `mutationSelectionStepRare` carries, and for the same reason.
+
+    Power: the prediction spans 0.14635 to 0.29911 across the three cells, and
+    the linearisation gap moves with `s` -- -0.09 percent at `s = 0.01` against
+    -0.35 percent at `s = 0.20` -- so the dropped mean-fitness denominator is
+    identified by its `s` dependence rather than assumed. -/
 noncomputable def mutationSelectionStepRecessive (mu s p : ℝ) : ℝ :=
   p - s * p ^ 2 + mu * (1 - p)
 
@@ -764,12 +784,16 @@ by `1` for every positive `s`.
     regime, and `mutationSelectionBalance_at_zero_dominance` records that they
     do not share a formula either.
 
-    Power, and the competitor that earns the match: on the same cells the
-    dominant scaling `mu / s` is rejected at 15 to 83 sems and `√(mu / (2 s))`
-    at 3.3 to 39, and a deliberately planted body 40 percent above this one is
-    rejected at 40 sems on the one cell that MATCHES -- so the agreement at
-    large `Nₑ` is a measurement and not a tautology. The square-root scaling
-    itself survives; only its `Nₑ`-independence does not.
+    Power: `2 Nₑ √(mu s)` is the swept input and it runs from 0.7 to 226 while
+    this body predicts 0.014042 at every cell, having no `Nₑ` in it to move; the
+    measurement falls from 0.013362 to 0.002941 across that sweep, which is how
+    the regime boundary was found rather than assumed. The competitors that earn
+    the match at large `Nₑ` are carried on the same cells: the dominant scaling
+    `mu / s` is rejected at 15 to 83 sems and `√(mu / (2 s))` at 3.3 to 39, and a
+    deliberately planted body 40 percent above this one is rejected at 40 sems on
+    the one cell that MATCHES -- so the agreement at large `Nₑ` is a measurement
+    and not a tautology. The square-root scaling itself survives; only its
+    `Nₑ`-independence does not.
 
     Measured on ONE engine by necessity. A recessive claim cannot be put to an
     infinite-sites simulator at all: two distinct mutations at one position make
