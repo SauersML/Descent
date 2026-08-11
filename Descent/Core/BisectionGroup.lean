@@ -1,8 +1,13 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Core.GroupoidBisection
+import Descent.Layer
 import Mathlib.GroupTheory.Perm.Basic
-import PartialSymmetry.FiniteGroupoidBisection
+
+assert_below Descent.Meta Descent.Foundations Descent.Coalescent Descent.Pangenome Descent.PopGen
+assert_below Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability
+assert_below Descent.Decision Descent.Program
 
 /-!
 # Bisections of a groupoid form a group
@@ -25,7 +30,7 @@ discharged through it, and for all of them except `inv_mul_cancel` the permutati
 agree definitionally, so the transport is the identity.
 -/
 
-namespace PartialSymmetry
+namespace Descent.Core
 namespace FiniteGroupoid
 
 open CategoryTheory
@@ -126,4 +131,4 @@ def objEquivHom : Bisection C →* Equiv.Perm C where
 
 end Bisection
 end FiniteGroupoid
-end PartialSymmetry
+end Descent.Core

@@ -1,13 +1,12 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
-
-Extracted from github.com/SauersML/nonsofic_existence (Apache 2.0, same
-owner). Original path: `NonsoficGroupsExist/Matching/FiniteGroupoidPresentation.lean`.
-The namespace `NonsoficGroupsExist` is renamed `PartialSymmetry` and the
-imports repointed; the mathematics is unchanged except where a repair is
-noted at the declaration it applies to.
 -/
-import PartialSymmetry.FiniteGroupoidCounting
+import Descent.Core.GroupoidCounting
+import Descent.Layer
+
+assert_below Descent.Meta Descent.Foundations Descent.Coalescent Descent.Pangenome Descent.PopGen
+assert_below Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability
+assert_below Descent.Decision Descent.Program
 
 /-!
 # Groupoids presented by finite representatives
@@ -19,7 +18,7 @@ representative system whose laws hold modulo its stated setoids produces an
 actual Mathlib `Groupoid`.
 -/
 
-namespace PartialSymmetry
+namespace Descent.Core
 
 universe u v
 
@@ -125,7 +124,15 @@ instance : CategoryTheory.Groupoid P.Obj where
     induction f using Quotient.inductionOn with
     | _ f => exact @Quotient.sound _ (P.rel X.val X.val) _ _ (P.comp_inv f)
 
-/-- A representative determines an arrow in the presented groupoid. -/
+/-- A representative determines an arrow in the presented groupoid. 
+## Provenance
+
+Extracted from github.com/SauersML/nonsofic_existence (Apache 2.0, same
+owner). Original path: `NonsoficGroupsExist/Matching/FiniteGroupoidPresentation.lean`.
+The namespace `NonsoficGroupsExist` is renamed `Descent.Core` and the
+imports repointed; the mathematics is unchanged except where a repair is
+noted at the declaration it applies to.
+-/
 def ofRep {X Y : P.Obj} (f : P.Rep X.val Y.val) : X ⟶ Y :=
   @Quotient.mk _ (P.rel X.val Y.val) f
 
@@ -134,4 +141,4 @@ theorem ofRep_eq_ofRep_iff {X Y : P.Obj} (f g : P.Rep X.val Y.val) :
   exact Quotient.eq
 
 end GroupoidPresentation
-end PartialSymmetry
+end Descent.Core

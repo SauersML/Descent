@@ -30,13 +30,12 @@ export COPYFILE_DISABLE=1
 # loop (working-tree content of TRACKED files still ships, committed or not) while
 # untracked files stay home. A NEW file must be `git add -N`ed (intent-to-add) before it
 # syncs — that is the declaration that it belongs to the build.
-UNTRACKED=$(git ls-files --others --exclude-standard Descent Counterexamples PartialSymmetry validation | grep '\.lean$' || true)
+UNTRACKED=$(git ls-files --others --exclude-standard Descent Counterexamples validation | grep '\.lean$' || true)
 if [ -n "$UNTRACKED" ]; then
   echo "msi-sync: NOT shipping untracked files (git add -N to include):" >&2
   echo "$UNTRACKED" | sed 's/^/  /' >&2
 fi
 git ls-files -z Descent Descent.lean Counterexamples Counterexamples.lean \
-  PartialSymmetry PartialSymmetry.lean \
   lakefile.lean lean-toolchain lake-manifest.json validation | tar czf "$TAR" --null -T -
 "$MSI" put "$TAR" "$REMOTE/.src-sync.tar.gz" >/dev/null
 rm -f "$TAR"

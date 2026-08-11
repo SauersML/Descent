@@ -2,7 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.HomologyGroupoid
-import PartialSymmetry.BisectionWreath
+import Descent.Core.BisectionWreath
 
 assert_below Descent.Coalescent Descent.PopGen Descent.Spectral Descent.Blindness
 assert_below Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
@@ -33,7 +33,7 @@ universe u
 
 /-- Global structural symmetries of the exact groupoid presented by a chart system. -/
 abbrev ChartSymmetry {I : Type u} (P : ChartGroupoidRelation I) :=
-  PartialSymmetry.FiniteGroupoid.Bisection P.Obj
+  Descent.Core.FiniteGroupoid.Bisection P.Obj
 
 /-- Local structural symmetry at one object of the exact chart groupoid. -/
 abbrev ChartIsotropy {I : Type u} (P : ChartGroupoidRelation I) (X : P.Obj) :=
@@ -44,14 +44,14 @@ abbrev ChartIsotropy {I : Type u} (P : ChartGroupoidRelation I) (X : P.Obj) :=
 isotropy states together with permutations of the equivalent objects. -/
 noncomputable def chartSymmetryEquivWreath {I : Type u} (P : ChartGroupoidRelation I)
     (X : P.Obj) (transport : ∀ Y : P.Obj, X ⟶ Y) :
-    ChartSymmetry P ≃* PartialSymmetry.Wreath (ChartIsotropy P X) P.Obj :=
-  PartialSymmetry.FiniteGroupoid.Bisection.mulEquivWreath X transport
+    ChartSymmetry P ≃* Descent.Core.Wreath (ChartIsotropy P X) P.Obj :=
+  Descent.Core.FiniteGroupoid.Bisection.mulEquivWreath X transport
 
 /-- Connectedness is exactly the hypothesis needed for a chart symmetry wreath
 decomposition; the transports can then be chosen noncomputably. -/
 theorem nonempty_chartSymmetryEquivWreath {I : Type u} (P : ChartGroupoidRelation I)
     (X : P.Obj) (connected : ∀ Y : P.Obj, Nonempty (X ⟶ Y)) :
-    Nonempty (ChartSymmetry P ≃* PartialSymmetry.Wreath (ChartIsotropy P X) P.Obj) :=
-  PartialSymmetry.FiniteGroupoid.nonempty_bisection_mulEquiv_wreath X connected
+    Nonempty (ChartSymmetry P ≃* Descent.Core.Wreath (ChartIsotropy P X) P.Obj) :=
+  Descent.Core.FiniteGroupoid.nonempty_bisection_mulEquiv_wreath X connected
 
 end Descent.Pangenome

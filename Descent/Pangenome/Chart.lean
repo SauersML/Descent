@@ -1,8 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import PartialSymmetry.FiniteGroupoidFunctor
-import PartialSymmetry.PartialBijectionSandwich
+import Descent.Core.GroupoidFunctor
+import Descent.Core.PartialBijectionSandwich
 import Descent.Layer
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Data.Real.Basic
@@ -37,7 +37,7 @@ the relation gives faithfulness.
 namespace Descent.Pangenome
 
 open CategoryTheory
-open PartialSymmetry
+open Descent.Core
 
 universe u
 
@@ -151,7 +151,7 @@ def unitChartGroupoidRelation : ChartGroupoidRelation Unit where
   chart _ := PangenomeChart.counting unitFiniteModel
   rel _ _ :=
     { r := fun _ _ ↦ True
-      iseqv := ⟨fun _ ↦ trivial, fun _ _ _ ↦ trivial, fun _ _ _ _ _ ↦ trivial⟩ }
+      iseqv := ⟨fun _ ↦ trivial, fun _ ↦ trivial, fun _ _ ↦ trivial⟩ }
   comp_respects := by intros; trivial
   inv_respects := by intros; trivial
   one_comp := by intros; trivial

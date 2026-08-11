@@ -1,10 +1,12 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
-
-Adapted from SauersML/nonsofic_existence,
-`NonsoficGroupsExist/Matching/PartialBijectionSandwich.lean`.
 -/
-import PartialSymmetry.FinitePartialBijection
+import Descent.Core.PartialBijection
+import Descent.Layer
+
+assert_below Descent.Meta Descent.Foundations Descent.Coalescent Descent.Pangenome Descent.PopGen
+assert_below Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability
+assert_below Descent.Decision Descent.Program
 
 /-!
 # Transporting partial arrows through co-large partial bridges
@@ -22,7 +24,7 @@ bridges, and it respects composition up to the missing mass of the bridges
 and the two arrows.  Every error below is an explicit finite cardinality.
 -/
 
-namespace PartialSymmetry
+namespace Descent.Core
 namespace FinitePartialBijection
 
 variable {X X' Y Y' Z Z' : FiniteModel}
@@ -125,7 +127,12 @@ theorem twoSidedDisagreement_sandwich_trans_le
 
 /-- Transporting an arrow across two partial bridges and then back changes it
 only by the missing source mass of those bridges, together with the arrow's
-own self-defect. -/
+own self-defect. 
+## Provenance
+
+Adapted from SauersML/nonsofic_existence,
+`NonsoficGroupsExist/Matching/PartialBijectionSandwich.lean`.
+-/
 theorem twoSidedDisagreement_sandwich_roundtrip_le
     (u : FinitePartialBijection X X')
     (v : FinitePartialBijection Y Y')
@@ -158,4 +165,4 @@ theorem twoSidedDisagreement_sandwich_roundtrip_le
   omega
 
 end FinitePartialBijection
-end PartialSymmetry
+end Descent.Core

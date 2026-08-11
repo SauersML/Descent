@@ -1,16 +1,15 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
-
-Extracted from github.com/SauersML/nonsofic_existence (Apache 2.0, same
-owner). Original path: `NonsoficGroupsExist/Matching/FiniteGroupoidCounting.lean`.
-The namespace `NonsoficGroupsExist` is renamed `PartialSymmetry` and the
-imports repointed; the mathematics is unchanged except where a repair is
-noted at the declaration it applies to.
 -/
-import Mathlib.CategoryTheory.Groupoid.VertexGroup
+import Descent.Layer
 import Mathlib.CategoryTheory.Functor.FullyFaithful
+import Mathlib.CategoryTheory.Groupoid.VertexGroup
 import Mathlib.Data.Fintype.Card
 import Mathlib.Data.Fintype.EquivFin
+
+assert_below Descent.Meta Descent.Foundations Descent.Coalescent Descent.Pangenome Descent.PopGen
+assert_below Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability
+assert_below Descent.Decision Descent.Program
 
 /-!
 # Counting in finite groupoids
@@ -21,7 +20,7 @@ sizes and equality of isotropy-group orders.  This file proves the underlying
 finite groupoid facts directly from Mathlib's `Groupoid` interface.
 -/
 
-namespace PartialSymmetry
+namespace Descent.Core
 namespace FiniteGroupoid
 
 open CategoryTheory
@@ -46,10 +45,9 @@ theorem card_hom_eq_card_vertexGroup {X Y : C} [Fintype (X ⟶ X)]
   exact Fintype.card_congr (vertexHomEquiv f).symm
 
 /-- The object orbit of `X`, represented as a finite set. -/
-noncomputable def orbit [Fintype C] (X : C) : Finset C :=
-  by
-    classical
-    exact Finset.univ.filter fun Y ↦ Nonempty (X ⟶ Y)
+noncomputable def orbit [Fintype C] (X : C) : Finset C := by
+  classical
+  exact Finset.univ.filter fun Y ↦ Nonempty (X ⟶ Y)
 
 @[simp] theorem mem_orbit [Fintype C] (X Y : C) :
     Y ∈ orbit X ↔ Nonempty (X ⟶ Y) := by
@@ -119,10 +117,16 @@ section Endofunctor
 variable [Fintype C]
 
 /-- A finite-groupoid endofunctor which is injective on objects and preserves
-the cardinality of every object orbit reflects connectedness. -/
+the cardinality of every object orbit reflects connectedness.
+
+The downstairs arrow is taken as DATA rather than as an inhabitation premise. The
+proof needs one arrow `F.obj X ⟶ F.obj Y` and nothing about how it was obtained, so a
+`Nonempty` premise would have been an existence claim standing in for a value the
+caller already holds -- and a theorem whose existential conclusion is fed by an
+existential premise cannot be read off its statement as doing any work. -/
 theorem nonempty_hom_of_map_nonempty (F : C ⥤ C) (hobj : Function.Injective F.obj)
     (horbit : ∀ X, (orbit X).card = (orbit (F.obj X)).card)
-    {X Y : C} (hmap : Nonempty (F.obj X ⟶ F.obj Y)) : Nonempty (X ⟶ Y) := by
+    {X Y : C} (f : F.obj X ⟶ F.obj Y) : Nonempty (X ⟶ Y) := by
   classical
   let φ : ↥(orbit X) → ↥(orbit (F.obj X)) := fun Z ↦
     ⟨F.obj Z.1, by
@@ -139,7 +143,7 @@ theorem nonempty_hom_of_map_nonempty (F : C ⥤ C) (hobj : Function.Injective F.
     simpa only [Fintype.card_coe] using horbit X
   have hφsurj : Function.Surjective φ :=
     ((Fintype.bijective_iff_injective_and_card φ).2 ⟨hφinj, hcard⟩).surjective
-  have hFY : F.obj Y ∈ orbit (F.obj X) := (mem_orbit _ _).2 hmap
+  have hFY : F.obj Y ∈ orbit (F.obj X) := (mem_orbit _ _).2 ⟨f⟩
   obtain ⟨Z, hZ⟩ := hφsurj ⟨F.obj Y, hFY⟩
   have hZY : Z.1 = Y := by
     apply hobj
@@ -151,7 +155,15 @@ variable [∀ X Y : C, Fintype (X ⟶ Y)]
 
 /-- **Finite groupoid co-Hopfian theorem.**  A faithful endofunctor is full
 when it is injective on objects and preserves both object-orbit sizes and
-vertex-group orders. -/
+vertex-group orders. 
+## Provenance
+
+Extracted from github.com/SauersML/nonsofic_existence (Apache 2.0, same
+owner). Original path: `NonsoficGroupsExist/Matching/FiniteGroupoidCounting.lean`.
+The namespace `NonsoficGroupsExist` is renamed `Descent.Core` and the
+imports repointed; the mathematics is unchanged except where a repair is
+noted at the declaration it applies to.
+-/
 theorem fullOfFaithfulOfCardinalPreserving
     (F : C ⥤ C) [F.Faithful]
     (hobj : Function.Injective F.obj)
@@ -161,11 +173,11 @@ theorem fullOfFaithfulOfCardinalPreserving
     F.Full := by
   refine { map_surjective := ?_ }
   intro X Y f
-  obtain ⟨g⟩ := nonempty_hom_of_map_nonempty F hobj horbit ⟨f⟩
+  obtain ⟨g⟩ := nonempty_hom_of_map_nonempty F hobj horbit f
   exact (map_surjective_of_faithful_of_vertexGroup_card_eq
     F g (hvertex X)) f
 
 end Endofunctor
 
 end FiniteGroupoid
-end PartialSymmetry
+end Descent.Core

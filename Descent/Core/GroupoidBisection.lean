@@ -1,13 +1,12 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
-
-Extracted from github.com/SauersML/nonsofic_existence (Apache 2.0, same
-owner). Original path: `NonsoficGroupsExist/Matching/FiniteGroupoidBisection.lean`.
-The namespace `NonsoficGroupsExist` is renamed `PartialSymmetry` and the
-imports repointed; the mathematics is unchanged except where a repair is
-noted at the declaration it applies to.
 -/
-import PartialSymmetry.FiniteGroupoidCounting
+import Descent.Core.GroupoidCounting
+import Descent.Layer
+
+assert_below Descent.Meta Descent.Foundations Descent.Coalescent Descent.Pangenome Descent.PopGen
+assert_below Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability
+assert_below Descent.Decision Descent.Program
 
 /-!
 # Bisections of finite groupoids
@@ -18,7 +17,7 @@ bisections back across its object permutation.  This is the categorical
 normalization step used after the finite counting argument proves fullness.
 -/
 
-namespace PartialSymmetry
+namespace Descent.Core
 namespace FiniteGroupoid
 
 open CategoryTheory
@@ -32,6 +31,22 @@ at every object. -/
 structure Bisection (C : Type u) [Groupoid.{v} C] where
   objEquiv : C ≃ C
   hom : ∀ X, X ⟶ objEquiv X
+
+/-- **A bisection never leaves a connected component.** The object a bisection sends
+`X` to lies in `X`'s own orbit, and the arrow the bisection carries at `X` is the
+witness that puts it there.
+
+This is what makes the two halves of a bisection independent in the way the wreath
+decomposition needs: the permutation half can shuffle objects arbitrarily WITHIN a
+component and not at all between components, so the arrow half is never asked for an
+arrow that does not exist.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A statement about which objects a matching can reach asserts nothing about a
+    population, so no measurement can bear on it. -/
+theorem objEquiv_mem_orbit [Fintype C] (β : Bisection C) (X : C) :
+    β.objEquiv X ∈ orbit X :=
+  (mem_orbit X (β.objEquiv X)).2 ⟨β.hom X⟩
 
 /-- An injective self-map of a finite type, bundled as a permutation. -/
 noncomputable def objectEquivOfInjective [Fintype C]
@@ -75,7 +90,15 @@ theorem map_pullbackBisection_hom [Fintype C]
 
 /-- The complete finite counting step: cardinal preservation first upgrades
 a faithful object-injective endofunctor to a full functor, after which every
-bisection pulls back.  No fullness hypothesis remains in the interface. -/
+bisection pulls back.  No fullness hypothesis remains in the interface. 
+## Provenance
+
+Extracted from github.com/SauersML/nonsofic_existence (Apache 2.0, same
+owner). Original path: `NonsoficGroupsExist/Matching/FiniteGroupoidBisection.lean`.
+The namespace `NonsoficGroupsExist` is renamed `Descent.Core` and the
+imports repointed; the mathematics is unchanged except where a repair is
+noted at the declaration it applies to.
+-/
 noncomputable def pullbackBisectionOfCardinalPreserving [Fintype C]
     [∀ X Y : C, Fintype (X ⟶ Y)]
     (F : C ⥤ C) [F.Faithful]
@@ -89,4 +112,4 @@ noncomputable def pullbackBisectionOfCardinalPreserving [Fintype C]
   exact pullbackBisection F hobj β
 
 end FiniteGroupoid
-end PartialSymmetry
+end Descent.Core

@@ -1,17 +1,16 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
-
-Extracted from github.com/SauersML/nonsofic_existence (Apache 2.0, same
-owner). Original path: `NonsoficGroupsExist/Matching/FinitePartialBijection.lean`.
-The namespace `NonsoficGroupsExist` is renamed `PartialSymmetry`; the single
-import of the soficity development is repointed at `PartialSymmetry.FiniteModel`,
-which carries the only definition this file used from it.
 -/
+import Descent.Core.FiniteModel
+import Descent.Core.PermExtension
+import Descent.Layer
 import Mathlib.Data.Fintype.Powerset
 import Mathlib.Data.Fintype.Prod
 import Mathlib.Logic.Equiv.Fintype
-import PartialSymmetry.FiniteModel
-import PartialSymmetry.PermExtension
+
+assert_below Descent.Meta Descent.Foundations Descent.Coalescent Descent.Pangenome Descent.PopGen
+assert_below Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability
+assert_below Descent.Decision Descent.Program
 
 /-!
 # Partial bijections of finite models
@@ -22,7 +21,7 @@ graph, extension, and defect sets.  No quotient or asymptotic premise is
 involved here.
 -/
 
-namespace PartialSymmetry
+namespace Descent.Core
 
 /-- A bijection between two explicitly specified finite subsets. -/
 structure FinitePartialBijection (Y Z : FiniteModel) where
@@ -776,7 +775,15 @@ theorem twoSidedDisagreement_trans_le
   omega
 
 /-- Failures of equivariance, counting a missing source endpoint as a
-failure, for a finite family of labels. -/
+failure, for a finite family of labels. 
+## Provenance
+
+Extracted from github.com/SauersML/nonsofic_existence (Apache 2.0, same
+owner). Original path: `NonsoficGroupsExist/Matching/FinitePartialBijection.lean`.
+The namespace `NonsoficGroupsExist` is renamed `Descent.Core`; the single
+import of the soficity development is repointed at `Descent.Core.FiniteModel`,
+which carries the only definition this file used from it.
+-/
 noncomputable def equivarianceDefect {L : Type*} [Fintype L]
     (b : FinitePartialBijection Y Z)
     (actY : L → Equiv.Perm Y) (actZ : L → Equiv.Perm Z) : Finset (L × Y) :=
@@ -785,4 +792,4 @@ noncomputable def equivarianceDefect {L : Type*} [Fintype L]
       b.apply (actY p.1 p.2) hsx ≠ actZ p.1 (b.apply p.2 hx)
 
 end FinitePartialBijection
-end PartialSymmetry
+end Descent.Core

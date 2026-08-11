@@ -1,18 +1,13 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
-
-Extracted from github.com/SauersML/nonsofic_existence (Apache 2.0, same
-owner). Original path: `NonsoficGroupsExist/Matching/FiniteGroupoidPartialBisection.lean`,
-the completion half only. The namespace is renamed `PartialSymmetry` and the imports
-repointed; the repairs are noted at the declarations they apply to.
-
-The source repo holds no olean for this module, so none of its defects had been
-caught there. Two declarations that followed the completion theorem --
-`finsetImageEquiv` and the two cardinal-preserving partial pullbacks -- are NOT
-extracted: see the note at the end of this file.
 -/
-import PartialSymmetry.FiniteGroupoidBisection
-import PartialSymmetry.PermExtension
+import Descent.Core.GroupoidBisection
+import Descent.Core.PermExtension
+import Descent.Layer
+
+assert_below Descent.Meta Descent.Foundations Descent.Coalescent Descent.Pangenome Descent.PopGen
+assert_below Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability
+assert_below Descent.Decision Descent.Program
 
 /-!
 # Completing partial bisections of finite groupoids
@@ -37,7 +32,7 @@ unambiguous -- and completion says the ambiguous remainder can always be filled 
 though never uniquely, and only within a connected component.
 -/
 
-namespace PartialSymmetry
+namespace Descent.Core
 namespace FiniteGroupoid
 
 open CategoryTheory
@@ -65,6 +60,21 @@ structure PartialBisection (C : Type u) [Groupoid.{v} C] where
   objEquiv : ↑source ≃ ↑target
   /-- The arrow realizing each match. -/
   hom : ∀ X : ↑source, X.1 ⟶ (objEquiv X).1
+
+/-- **The partial bisection is inhabited.** A theorem quantified over an uninhabited
+structure is true and empty, and the completion theorem below is quantified over this
+one. The empty matching selects no object and so owes no arrow; completing it is the
+statement that some permutation of the objects exists, which is the weakest true case
+of the theorem rather than a degenerate exception to it.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A matching of objects asserts nothing about a population, so no measurement can
+    bear on it. -/
+def PartialBisection.empty : PartialBisection C where
+  source := (∅ : Finset C)
+  target := (∅ : Finset C)
+  objEquiv := Equiv.refl _
+  hom X := absurd X.2 (Finset.notMem_empty _)
 
 namespace PartialBisection
 
@@ -106,6 +116,7 @@ private def sourceFiberTarget (q : Component (C := C)) :
   rw [h]
   exact X.2
 
+omit [Fintype C] in
 /-- REPAIR ON EXTRACTION: `congrArg Subtype.val` left the subtype ambiguous and
 unified it at the wrong level; the projection is written out here. -/
 private theorem sourceFiberInclusion_injective (q : Component (C := C)) :
@@ -115,6 +126,7 @@ private theorem sourceFiberInclusion_injective (q : Component (C := C)) :
   apply Subtype.ext
   exact congrArg (fun z : ComponentFiber (C := C) q ↦ z.1) hXY
 
+omit [Fintype C] in
 /-- REPAIR ON EXTRACTION: as for `sourceFiberInclusion_injective`. -/
 private theorem sourceFiberTarget_injective (q : Component (C := C)) :
     Function.Injective (sourceFiberTarget a q) := by
@@ -205,7 +217,19 @@ None of this is partial-symmetry mathematics -- it is the bookkeeping of the
 compressor argument the source repo was building, and it belongs with that argument.
 The completion theorem above is the part that is about partial bisections, and it
 stands on its own.
+
+## Provenance
+
+Extracted from github.com/SauersML/nonsofic_existence (Apache 2.0, same
+owner). Original path: `NonsoficGroupsExist/Matching/FiniteGroupoidPartialBisection.lean`,
+the completion half only. The namespace is renamed `Descent.Core` and the imports
+repointed; the repairs are noted at the declarations they apply to.
+
+The source repo holds no olean for this module, so none of its defects had been
+caught there. Two declarations that followed the completion theorem --
+`finsetImageEquiv` and the two cardinal-preserving partial pullbacks -- are NOT
+extracted: see the note at the end of this file.
 -/
 
 end FiniteGroupoid
-end PartialSymmetry
+end Descent.Core

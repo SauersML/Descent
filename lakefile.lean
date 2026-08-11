@@ -51,29 +51,6 @@ lean_lib Counterexamples where
   srcDir := "."
   leanOptions := #[⟨`autoImplicit, false⟩, ⟨`relaxedAutoImplicit, false⟩]
 
--- General mathematics about partial bijections, finite groupoids, and wreath products,
--- extracted from `nonsofic_existence` (github.com/SauersML/nonsofic_existence, Apache 2.0).
--- A separate library for the same reason `Counterexamples` is one: what belongs in
--- `Descent/` is a law that answers to a measurement, and none of this does -- a groupoid
--- either has the claimed decomposition or it does not, and no simulation is entitled to a
--- view. These modules do NOT `import Descent`; they depend on Mathlib alone, so they build
--- whether or not the corpus does.
--- A build that names its targets must name this one too:
---   lake build Descent Counterexamples PartialSymmetry
--- `globs`, unlike the two libraries above, so that EVERY module under `PartialSymmetry/`
--- is a build target whether or not the root file imports it. With the default globs a
--- library builds its root plus whatever the root transitively imports, which makes the
--- root's import list load-bearing for what gets type-checked -- and this repository is
--- edited by several sessions at once. Twice already an agent editing `PartialSymmetry.lean`
--- to add its own import silently dropped another's line, after which `lake build` reported
--- success while never compiling the missing module: a green build that had not read the
--- file. Globbing the directory makes the claim "this library builds" mean what it says.
-@[default_target]
-lean_lib PartialSymmetry where
-  srcDir := "."
-  globs := #[.andSubmodules `PartialSymmetry]
-  leanOptions := #[⟨`autoImplicit, false⟩, ⟨`relaxedAutoImplicit, false⟩]
-
 -- The generated-declaration filter and the results writer that the detectors
 -- under `validation/` share.  A separate library, and deliberately not
 -- part of `Descent`:

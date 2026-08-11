@@ -1,15 +1,13 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
-
-Generalized from github.com/SauersML/nonsofic_existence (Apache 2.0, same
-owner). Original path: `NonsoficGroupsExist/Sofic/MonomialModel.lean`, the
-`wreathModel`/`wreathPerm` construction only. There the fibre group was `ZMod m`
-written additively, because the monomial matrices being untwisted carried `m`-th
-roots of unity; here it is an arbitrary group written multiplicatively, which is
-what the bisection decomposition needs and what the argument always used.
 -/
+import Descent.Layer
 import Mathlib.Algebra.Group.Pi.Basic
 import Mathlib.GroupTheory.Perm.Basic
+
+assert_below Descent.Meta Descent.Foundations Descent.Coalescent Descent.Pangenome Descent.PopGen
+assert_below Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability
+assert_below Descent.Decision Descent.Program
 
 /-!
 # The permutation wreath product `A ≀ Sym Ω`
@@ -38,7 +36,7 @@ disagreements; the group law and the embedding need no such hypothesis, so none 
 imposed.
 -/
 
-namespace PartialSymmetry
+namespace Descent.Core
 
 universe u v
 
@@ -124,7 +122,16 @@ def toPermHom : Wreath A Ω →* Equiv.Perm (Ω × A) where
 @[simp] theorem toPermHom_apply (w : Wreath A Ω) : toPermHom w = w.toPerm := rfl
 
 /-- The embedding is injective: testing the permutation on the identity fibre
-element recovers both the permutation and every coordinate. -/
+element recovers both the permutation and every coordinate. 
+## Provenance
+
+Generalized from github.com/SauersML/nonsofic_existence (Apache 2.0, same
+owner). Original path: `NonsoficGroupsExist/Sofic/MonomialModel.lean`, the
+`wreathModel`/`wreathPerm` construction only. There the fibre group was `ZMod m`
+written additively, because the monomial matrices being untwisted carried `m`-th
+roots of unity; here it is an arbitrary group written multiplicatively, which is
+what the bisection decomposition needs and what the argument always used.
+-/
 theorem toPerm_injective :
     Function.Injective (toPerm : Wreath A Ω → Equiv.Perm (Ω × A)) := by
   intro a b hab
@@ -139,4 +146,4 @@ theorem toPermHom_injective :
   toPerm_injective
 
 end Wreath
-end PartialSymmetry
+end Descent.Core

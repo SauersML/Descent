@@ -1,11 +1,12 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
-
-Extracted from github.com/SauersML/nonsofic_existence (Apache 2.0, same
-owner). Original path: `NonsoficGroupsExist/Sofic/Sofic.lean`, the `FiniteModel`
-bundle only.
 -/
+import Descent.Layer
 import Mathlib.Data.Fintype.Card
+
+assert_below Descent.Meta Descent.Foundations Descent.Coalescent Descent.Pangenome Descent.PopGen
+assert_below Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability
+assert_below Descent.Decision Descent.Program
 
 /-!
 # Finite carriers
@@ -22,7 +23,7 @@ leaving the rest is the whole reason this library does not import a theory of so
 groups to talk about partial matchings.
 -/
 
-namespace PartialSymmetry
+namespace Descent.Core
 
 /-- A type equipped with the finiteness and decidability its counting arguments
 need. -/
@@ -31,7 +32,13 @@ structure FiniteModel where
   carrier : Type
   /-- Finiteness of the carrier. -/
   fintype : Fintype carrier
-  /-- Decidable equality on the carrier. -/
+  /-- Decidable equality on the carrier. 
+## Provenance
+
+Extracted from github.com/SauersML/nonsofic_existence (Apache 2.0, same
+owner). Original path: `NonsoficGroupsExist/Sofic/Sofic.lean`, the `FiniteModel`
+bundle only.
+-/
   decidableEq : DecidableEq carrier
 
 instance finiteModelCoeSort : CoeSort FiniteModel Type := ⟨FiniteModel.carrier⟩
@@ -42,4 +49,4 @@ instance finiteModelCoeSort : CoeSort FiniteModel Type := ⟨FiniteModel.carrier
 @[reducible, instance] def finiteModelDecidableEq (Y : FiniteModel) : DecidableEq Y :=
   Y.decidableEq
 
-end PartialSymmetry
+end Descent.Core

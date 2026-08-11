@@ -1,15 +1,27 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Core.BisectionGroup
+import Descent.Core.BisectionWreath
 import Descent.Core.Decision
+import Descent.Core.FiniteModel
 import Descent.Core.Fst
 import Descent.Core.Genome
+import Descent.Core.GroupoidBisection
+import Descent.Core.GroupoidCounting
+import Descent.Core.GroupoidFunctor
+import Descent.Core.GroupoidPartialBisection
+import Descent.Core.GroupoidPresentation
 import Descent.Core.Heterozygosity
 import Descent.Core.Moments
 import Descent.Core.Parameters
+import Descent.Core.PartialBijection
+import Descent.Core.PartialBijectionSandwich
+import Descent.Core.PermExtension
 import Descent.Core.Population
 import Descent.Core.Ratios
 import Descent.Core.Scaling
+import Descent.Core.Wreath
 
 /-!
 # `Descent.Core` -- the layer head

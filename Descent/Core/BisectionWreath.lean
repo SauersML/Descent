@@ -1,8 +1,13 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import PartialSymmetry.BisectionGroup
-import PartialSymmetry.Wreath
+import Descent.Core.BisectionGroup
+import Descent.Core.Wreath
+import Descent.Layer
+
+assert_below Descent.Meta Descent.Foundations Descent.Coalescent Descent.Pangenome Descent.PopGen
+assert_below Descent.Spectral Descent.Blindness Descent.Conditionals Descent.Portability
+assert_below Descent.Decision Descent.Program
 
 /-!
 # Bisections of a connected groupoid are a wreath product
@@ -20,7 +25,7 @@ coordinates are the conjugates `s_y ≫ β.hom y ≫ (s_{σ y})⁻¹`.
 The twist in the wreath law is not imposed; it is measured. Composing bisections
 reads the left factor's arrow at the object the right factor has already moved to, so
 the coordinate function of a product is `fun y ↦ c y * b (τ y)` -- which is the law
-`PartialSymmetry.Wreath` was given, and the reason that file states it with the `τ`
+`Descent.Core.Wreath` was given, and the reason that file states it with the `τ`
 inside.
 
 Connectedness enters only to supply the transports, and it is the whole of what is
@@ -47,7 +52,7 @@ direct product, is what the biology gives: permuting the copies transports the
 internal states with them, so the two factors do not commute.
 -/
 
-namespace PartialSymmetry
+namespace Descent.Core
 namespace FiniteGroupoid
 
 open CategoryTheory
@@ -58,46 +63,44 @@ variable {C : Type u} [Groupoid.{v} C]
 
 namespace Bisection
 
-variable (x : C) (s : ∀ Y : C, x ⟶ Y)
-
 /-- The coordinate of a bisection at an object: its arrow out of that object,
 conjugated back to the base point along the chosen transports. -/
-noncomputable def coordAt (β : Bisection C) (Y : C) : x ⟶ x :=
+noncomputable def coordAt (x : C) (s : ∀ Y : C, x ⟶ Y) (β : Bisection C) (Y : C) : x ⟶ x :=
   s Y ≫ β.hom Y ≫ CategoryTheory.inv (s (β.objEquiv Y))
 
 /-- A bisection, read in the coordinates the transports provide. -/
-noncomputable def toWreath (β : Bisection C) : Wreath (x ⟶ x) C where
+noncomputable def toWreath (x : C) (s : ∀ Y : C, x ⟶ Y) (β : Bisection C) : Wreath (x ⟶ x) C where
   coord := coordAt x s β
   perm := β.objEquiv
 
-@[simp] theorem toWreath_coord (β : Bisection C) (Y : C) :
+@[simp] theorem toWreath_coord (x : C) (s : ∀ Y : C, x ⟶ Y) (β : Bisection C) (Y : C) :
     (toWreath x s β).coord Y = s Y ≫ β.hom Y ≫ CategoryTheory.inv (s (β.objEquiv Y)) :=
   rfl
 
-@[simp] theorem toWreath_perm (β : Bisection C) :
+@[simp] theorem toWreath_perm (x : C) (s : ∀ Y : C, x ⟶ Y) (β : Bisection C) :
     (toWreath x s β).perm = β.objEquiv := rfl
 
 /-- The inverse reading: a permutation together with one base-point automorphism per
 object assembles into a bisection, by transporting out to the base point, applying
 the automorphism there, and transporting back. -/
-noncomputable def ofWreath (w : Wreath (x ⟶ x) C) : Bisection C where
+noncomputable def ofWreath (x : C) (s : ∀ Y : C, x ⟶ Y) (w : Wreath (x ⟶ x) C) : Bisection C where
   objEquiv := w.perm
   hom Y := CategoryTheory.inv (s Y) ≫ w.coord Y ≫ s (w.perm Y)
 
-@[simp] theorem ofWreath_objEquiv (w : Wreath (x ⟶ x) C) :
+@[simp] theorem ofWreath_objEquiv (x : C) (s : ∀ Y : C, x ⟶ Y) (w : Wreath (x ⟶ x) C) :
     (ofWreath x s w).objEquiv = w.perm := rfl
 
-@[simp] theorem ofWreath_hom (w : Wreath (x ⟶ x) C) (Y : C) :
+@[simp] theorem ofWreath_hom (x : C) (s : ∀ Y : C, x ⟶ Y) (w : Wreath (x ⟶ x) C) (Y : C) :
     (ofWreath x s w).hom Y = CategoryTheory.inv (s Y) ≫ w.coord Y ≫ s (w.perm Y) :=
   rfl
 
-theorem toWreath_ofWreath (w : Wreath (x ⟶ x) C) :
+theorem toWreath_ofWreath (x : C) (s : ∀ Y : C, x ⟶ Y) (w : Wreath (x ⟶ x) C) :
     toWreath x s (ofWreath x s w) = w := by
   ext Y
   · simp
   · simp
 
-theorem ofWreath_toWreath (β : Bisection C) :
+theorem ofWreath_toWreath (x : C) (s : ∀ Y : C, x ⟶ Y) (β : Bisection C) :
     ofWreath x s (toWreath x s β) = β := by
   refine ext' (fun _ ↦ rfl) ?_
   intro Y
@@ -106,7 +109,7 @@ theorem ofWreath_toWreath (β : Bisection C) :
 /-- Reading a product in coordinates multiplies the readings, in the wreath product
 and not the direct product: the left factor's coordinate is read at the object the
 right factor's permutation has already moved to. -/
-theorem toWreath_mul (β γ : Bisection C) :
+theorem toWreath_mul (x : C) (s : ∀ Y : C, x ⟶ Y) (β γ : Bisection C) :
     toWreath x s (β * γ) = toWreath x s β * toWreath x s γ := by
   ext Y
   · simp [Groupoid.vertexGroup, Category.assoc]
@@ -115,18 +118,33 @@ theorem toWreath_mul (β γ : Bisection C) :
 /-- **Bisections of a connected groupoid are a wreath product.**
 
 `Bis(C) ≅ Aut_C(x) ≀ Sym Ω`, given a base object `x` and a transport `s y : x ⟶ y`
-at every object -- which is exactly what connectedness supplies. -/
-noncomputable def mulEquivWreath : Bisection C ≃* Wreath (x ⟶ x) C where
+at every object -- which is exactly what connectedness supplies.
+
+THE EXCHANGEABILITY IS A HYPOTHESIS, NOT A FINDING. `Sym Ω` appears because the
+objects of `C` were declared interchangeable when `C` was built -- the caller chose
+which copies are objects of one groupoid and which arrows count as homologies. It is
+never inferred from similarity between them. If copy identity carries function, so
+that two copies are not substitutable, then the honest object is a groupoid with
+fewer arrows and a proper subgroup of `Sym Ω`, and this theorem still applies -- to
+that smaller object, returning the smaller group. The machinery computes the
+consequences of an equivalence the caller asserts; it does not discover one.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a SHAPE, not a quantity.
+    A decomposition of a symmetry group asserts nothing about a population, so no
+    measurement can bear on it. What can be measured is a claim that some named
+    family of copies is exchangeable, and that claim is this theorem's input. -/
+noncomputable def mulEquivWreath (x : C) (s : ∀ Y : C, x ⟶ Y) :
+    Bisection C ≃* Wreath (x ⟶ x) C where
   toFun := toWreath x s
   invFun := ofWreath x s
   left_inv := ofWreath_toWreath x s
   right_inv := toWreath_ofWreath x s
   map_mul' := toWreath_mul x s
 
-@[simp] theorem mulEquivWreath_apply (β : Bisection C) :
+@[simp] theorem mulEquivWreath_apply (x : C) (s : ∀ Y : C, x ⟶ Y) (β : Bisection C) :
     mulEquivWreath x s β = toWreath x s β := rfl
 
-@[simp] theorem mulEquivWreath_symm_apply (w : Wreath (x ⟶ x) C) :
+@[simp] theorem mulEquivWreath_symm_apply (x : C) (s : ∀ Y : C, x ⟶ Y) (w : Wreath (x ⟶ x) C) :
     (mulEquivWreath x s).symm w = ofWreath x s w := rfl
 
 end Bisection
@@ -146,4 +164,4 @@ theorem nonempty_bisection_mulEquiv_wreath (x : C)
   ⟨Bisection.mulEquivWreath x fun Y ↦ (hconn Y).some⟩
 
 end FiniteGroupoid
-end PartialSymmetry
+end Descent.Core
