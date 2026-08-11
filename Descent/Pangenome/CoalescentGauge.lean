@@ -96,20 +96,38 @@ takes a reference tree, because `S` does.  Naming it separately is the point: th
 about the first, the gauge dependence is about the second, and conflating them is what let
 the dependence go unstated. -/
 
-/-- The realized numerator of Tajima's `D` on a pangenome sample under reference tree `t`:
-sequence-level `π` minus Watterson's estimator at `n = 3`, both as reals.
+/-- The realized numerator of Tajima's `D` on the witness's THREE-HAPLOTYPE subsample under
+reference tree `t`: sequence-level `π` minus Watterson's estimator, both as reals.
+
+**`n = 3` IS PINNED IN TWO PLACES, AND THE NAME CARRIES THE SCOPE BECAUSE THE SIGNATURE
+CANNOT.** The `3` handed to `wattersonEstimator` is one of them. The `/ 6` is the other:
+`π` is the MEAN pairwise difference and `piSeq6` counts each of the `C(3,2) = 3` pairs
+twice, so the normaliser is `2 · C(3,2) = 6`. Both constants move with the sample size and
+only one of them looks like a sample size, which is how a body that computes a
+three-haplotype statistic came to advertise a `List Hap` of any length.
+
+WHY `sample.length` IS NOT A DROP-IN, recorded because it is the repair a reader reaches for
+first. It fixes the Watterson argument and leaves the normaliser wrong, since that one needs
+`2 · C(n,2) = n · (n-1)` rather than `n`. Generalising properly would also need `piSeq6`
+generalised, and `piSeq6` is the witness's own integer-scaled pair count at three
+haplotypes. So the honest move is to scope this body by its name rather than to write a
+general one whose two constants agree only at three.
+
+Passing a longer list returns a number computed as though it had three elements. That is a
+silent wrong answer rather than an error, which is the whole reason the scope is in the name.
 
 Empirical status: DERIVED.  `π` is `GaugeCounterexample.piSeq6` unscaled and `θ_W` is
 `Coalescent.wattersonEstimator`; this file introduces neither and subtracts them. -/
-noncomputable def tajimaNumerator (t : RefTree) (sample : List Hap) : ℝ :=
+noncomputable def subsampleTajimaNumerator (t : RefTree) (sample : List Hap) : ℝ :=
   (piSeq6 sample : ℝ) / 6 - Coalescent.wattersonEstimator (S t sample : ℝ) 3
 
 /-- The witness's integer-scaled numerator is six times the real one, so every value
-`GaugeCounterexample` computes by `decide` is a statement about `tajimaNumerator`. -/
+`GaugeCounterexample` computes by `decide` is a statement about
+`subsampleTajimaNumerator`. -/
 theorem tajimaNum6_eq_six_mul (t : RefTree) (sample : List Hap) :
-    (tajimaNum6 t sample : ℝ) = 6 * tajimaNumerator t sample := by
+    (tajimaNum6 t sample : ℝ) = 6 * subsampleTajimaNumerator t sample := by
   have hW := thetaW6_eq_watterson t sample
-  unfold tajimaNum6 tajimaNumerator
+  unfold tajimaNum6 subsampleTajimaNumerator
   push_cast
   linarith
 
@@ -185,17 +203,17 @@ theorem wattersonEstimator_gauge_invariant_of_allPolymorphic {E : Type u} (edges
 
 /-- Under the tree keeping the majority allele the realized numerator is exactly zero:
 `π = 2/3` and `θ_W = (2/3) · 1 = 2/3`.  This is the value the coalescent null predicts. -/
-theorem tajimaNumerator_subsample_A : tajimaNumerator Allele.A subsample = 0 := by
+theorem subsampleTajimaNumerator_A : subsampleTajimaNumerator Allele.A subsample = 0 := by
   have hS : S Allele.A subsample = 1 := subsample_S_not_invariant.1
-  unfold tajimaNumerator
+  unfold subsampleTajimaNumerator
   rw [wattersonEstimator_three, subsample_piSeq_value, hS]
   norm_num
 
 /-- Under the tree keeping the allele no sampled walk carries, the SAME data give
 `θ_W = (2/3) · 2 = 4/3` against the same `π = 2/3`, and the numerator is `-2/3`. -/
-theorem tajimaNumerator_subsample_G : tajimaNumerator Allele.G subsample = -(2 / 3) := by
+theorem subsampleTajimaNumerator_G : subsampleTajimaNumerator Allele.G subsample = -(2 / 3) := by
   have hS : S Allele.G subsample = 2 := subsample_S_not_invariant.2
-  unfold tajimaNumerator
+  unfold subsampleTajimaNumerator
   rw [wattersonEstimator_three, subsample_piSeq_value, hS]
   norm_num
 
@@ -236,17 +254,18 @@ a data quantity that has one. -/
 theorem referenceTree_is_gauge_for_tajima :
     (∀ (θ : Descent.Core.Theta) (n : ℕ), 2 ≤ n → Coalescent.expectedTajimaNumerator θ n = 0)
       ∧ IsSpanningTree [Allele.A] ∧ IsSpanningTree [Allele.G]
-      ∧ tajimaNumerator Allele.A subsample = 0
-      ∧ tajimaNumerator Allele.G subsample < 0
-      ∧ (∀ t₁ t₂ : RefTree, tajimaNumerator t₁ subsample - tajimaNumerator t₂ subsample
+      ∧ subsampleTajimaNumerator Allele.A subsample = 0
+      ∧ subsampleTajimaNumerator Allele.G subsample < 0
+      ∧ (∀ t₁ t₂ : RefTree,
+          subsampleTajimaNumerator t₁ subsample - subsampleTajimaNumerator t₂ subsample
           = Coalescent.wattersonEstimator (S t₂ subsample : ℝ) 3
               - Coalescent.wattersonEstimator (S t₁ subsample : ℝ) 3) := by
   refine ⟨fun θ n hn ↦ Coalescent.expectedTajimaNumerator_eq_zero hn θ,
-    treeA_spanning, treeG_spanning, tajimaNumerator_subsample_A, ?_, ?_⟩
-  · rw [tajimaNumerator_subsample_G]
+    treeA_spanning, treeG_spanning, subsampleTajimaNumerator_A, ?_, ?_⟩
+  · rw [subsampleTajimaNumerator_G]
     norm_num
   · intro t₁ t₂
-    unfold tajimaNumerator
+    unfold subsampleTajimaNumerator
     ring
 
 /-- **And the panel case, for contrast.**  Over the full panel every edge is polymorphic,
