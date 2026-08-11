@@ -45,6 +45,27 @@ these states into itself.  There is no larger system any of this approximates.  
 is a statement about THIS object, and says nothing about any other package's
 implementation.)
 
+THE LINEAGE-COUNT GRADING, and what it does and does not buy at two loci.  Grade a
+state by its number of lineages.  Measured on the enumeration itself, at n = 2 and
+n = 3 demes: migration changes the count by 0, coalescence by -1 (or leaks), and
+recombination by +1.  Two consequences, and the second is the one that matters.
+
+  * The generator is NOT block-triangular in the lineage count.  At ONE locus it is
+    -- migration preserves the count, coalescence lowers it, nothing raises it -- so
+    a one-locus system solves by back-substitution down the strata.  At two loci
+    RECOMBINATION RAISES IT, and recombination is the operator that makes it a
+    two-locus problem at all.  The triangularity is lost to the very term that
+    defines the object, so that solution route does not transfer.
+  * It IS block-TRIDIAGONAL: every operator moves the count by at most one, so the
+    strata couple only to their neighbours (2 <-> 3 <-> 4 lineages, of sizes
+    2n^2, 4n^3, n^4).  A block-Thomas recursion therefore applies at the level of
+    strata, and the cost is dominated by the top stratum -- where the only internal
+    transitions are migration, acting on four independently labelled lineages, i.e.
+    a Kronecker sum of four copies of the single-lineage migration operator.  On a
+    lattice that operator has analytic eigenmodes, which is the direction a large
+    instance should be attacked from rather than by a bigger dense solve.  Stated as
+    structure, not as an implemented method: nothing here exploits it yet.
+
 ARITHMETIC-AGNOSTIC BY CONSTRUCTION.  A generator is a list of dicts: `Q[i][j]` is the
 rate from state i to state j, and rates may be `Fraction`, `float`, or sympy
 expressions -- nothing here does anything to a rate but add and multiply it.  Use
@@ -151,11 +172,22 @@ def pair_states(n: int):
 
 
 def pair_rows(n, neighbours, mu, coal=1):
-    """Generator rows for two lineages under migration and coalescence.
+    """Generator rows for exactly TWO lineages under migration and coalescence.
 
     `neighbours[i]` lists the demes reachable from `i`; a lineage hops to each at
-    rate `mu`; two lineages in one deme coalesce at rate `coal`, which LEAKS (the
-    pair is absorbed) rather than moving to another tracked state.
+    rate `mu`; two lineages in one deme coalesce at rate `coal`, which LEAKS -- the
+    pair is absorbed, not moved to a tracked state.
+
+    THIS IS NOT A GENERAL CONFIGURATION CHAIN, and the difference is not a flag.
+    Absorbing coalescence is right for the second-moment problems here, where the
+    reward stops accruing the moment the pair coalesces. A block-counting chain --
+    the distribution of the number of lineages through time, `(i,j) -> (i-1,j)` at
+    rate `C(i,2)` -- needs coalescence to MOVE between tracked states, and a leak
+    destroys exactly the information it is after. That is a different object, not a
+    special case of this one, and it wants its own constructor: two honest
+    constructors beat one with a flag deciding which absorption semantics apply,
+    because such a flag eventually gets passed wrong. The verification half of this
+    module (`orbits`, `lump`, `verify_*`) is shared by both and cares about neither.
     """
     idx, key = pair_states(n)
     Q = [dict() for _ in idx]
@@ -337,10 +369,11 @@ def _selftest():
 
     # (4) the numpy/scipy original must enumerate the same space, or the duplication
     # between this module and argcore.py has drifted.
+    skipped = None
     try:
         import argcore
     except ImportError as e:
-        print("  argcore cross-check SKIPPED (%s)" % e)
+        skipped = str(e)
     else:
         for n in (1, 2, 3):
             a, b = argcore.TwoLocus(n), TwoLocusSpace(n)
@@ -349,8 +382,20 @@ def _selftest():
         assert list(argcore.SHAPES) == SHAPES
         print("  argcore cross-check: identical enumeration at n = 1, 2, 3")
 
-    print("SELF TEST PASSED")
+    # A SKIPPED CHECK MUST NOT READ AS A PASSED ONE.  The cross-enumeration check is
+    # the one that stops this module and argcore.py drifting apart, and it is exactly
+    # the check that silently does not run on a machine without scipy.  Printing the
+    # skip is not enough: a printed skip still exits 0, and anything reading an exit
+    # status -- or a human reading the last line -- sees green.  So the skip travels
+    # in the FINAL STATUS LINE and in a distinct exit code.
+    if skipped is None:
+        print("SELF TEST PASSED (complete)")
+        return 0
+    print("SELF TEST PASSED BUT INCOMPLETE -- argcore cross-check SKIPPED (%s). "
+          "The enumeration-drift check did NOT run; re-run where scipy is importable "
+          "before trusting any change to either enumeration." % skipped)
+    return 2
 
 
 if __name__ == "__main__":
-    _selftest()
+    raise SystemExit(_selftest())
