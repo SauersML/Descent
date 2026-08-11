@@ -1436,6 +1436,96 @@ def run_identifications() -> int:
                    f"{len(overclaim)}")
         bad.extend("    " + x for x in overclaim)
 
+    # 3d-ter. DECLARED DEPENDENCE THAT DOES NOT EXIST. A REVIEW FLAG, NEVER A
+    #     FAILURE, and the reason is that the two instances adjudicated on
+    #     2026-08-11 went opposite ways.
+    #
+    #     An explicit argument bound with a leading underscore is one Lean knows
+    #     the body never reads, so the signature announces a dependence the
+    #     definition does not have. A caller reads the arity and supplies a
+    #     number that changes nothing.
+    #
+    #       `partialOverlapR2`'s `_n_gwas` was DROPPED. The divisor that created
+    #       the sample-size dependence was falsified by three orders of magnitude,
+    #       and the docstring's own reason for keeping the argument was that call
+    #       sites would otherwise change arity -- a convenience with nothing
+    #       behind it.
+    #
+    #       `alleleFreqDivergenceRate`'s `_mu` and `_m_rate` STAY. Their absence
+    #       from the body is a MEASURED CLAIM: the superseded form that carried
+    #       them stands falsified at up to 1620 sems, and the inertness is stated
+    #       as a theorem quantifying over two different (mu, m_rate) pairs. Drop
+    #       the arguments and that theorem goes with them -- at signature
+    #       `(Ne : ℝ)` there is no way left to SAY "it does not depend on mu".
+    #
+    #     So an inertness THEOREM counts as documentation, and a flag that
+    #     demanded deletion would demand the deletion of validated claims. A
+    #     definition is exempt when some theorem states an equality between two
+    #     applications of it.
+    #
+    #     WHAT THE EXEMPTION DOES NOT CHECK, written here rather than discovered
+    #     later: that the invariance is in THIS argument's position. A definition
+    #     with two inert arguments and an invariance theorem about one of them is
+    #     exempt for both. Comparing the two argument lists is the repair when
+    #     that appears; it has not appeared yet.
+    #
+    #     PROP-TYPED BINDERS ARE A DIFFERENT FINDING and are excluded here. An
+    #     unused `(_h : 0 < lam)` is an unused HYPOTHESIS, which belongs to the
+    #     hypothesis-minimality sweep -- drop it, or justify it with a
+    #     counterexample -- and reporting it here would file it under a repair
+    #     that does not fit it. Implicit and instance binders are excluded for
+    #     the same kind of reason: nobody passes them by hand.
+    def explicit_binders(sig: str):
+        """(names, type) for each top-level `(...)` group, brackets balanced."""
+        groups, depth, start = [], 0, None
+        for i, ch in enumerate(sig):
+            if ch in "([{":
+                if depth == 0:
+                    start = i
+                depth += 1
+            elif ch in ")]}":
+                depth -= 1
+                if depth == 0 and start is not None:
+                    groups.append(sig[start:i + 1])
+                    start = None
+        for g in groups:
+            if not g.startswith("("):
+                continue          # implicit `{}` and instance `[]` are not passed by hand
+            inner = g[1:-1]
+            head, sep, ty = inner.partition(":")
+            if not sep:
+                continue
+            yield head.split(), ty.strip()
+
+    PROP_SHAPED = re.compile(r"[<>≤≥≠∈∉]|(?<![:<>≤≥≠])=(?!=)|\bProp\b|¬|∀|∃")
+    inert = {}
+    for f in ident_lean_files():
+        src = ident_strip_comments(open(f).read())
+        for dm in re.finditer(r"^(?:noncomputable\s+|private\s+|protected\s+)*def\s+"
+                              r"([A-Za-z_][A-Za-z_0-9'.]*)"
+                              r"((?:(?!:=|\bwhere\b)[\s\S])*?)(?::=|\bwhere\b)", src, re.M):
+            name, sig = dm.group(1).split(".")[-1], dm.group(2)
+            dead = [n for names, ty in explicit_binders(sig) for n in names
+                    if n.startswith("_") and len(n) > 1 and not PROP_SHAPED.search(ty)]
+            if dead:
+                inert[name] = (os.path.relpath(f, IDENT_ROOT), dead)
+    invariance = {}
+    for f in ident_lean_files():
+        src = ident_strip_comments(open(f).read())
+        for tm in re.finditer(r"^(?:@\[[^\]]*\]\s*)?(?:theorem|lemma)\s+"
+                              r"([A-Za-z_][A-Za-z_0-9'.]*)((?:(?!:=)[\s\S])*?):=", src, re.M):
+            tname, stmt = tm.group(1).split(".")[-1], tm.group(2)
+            if "=" not in stmt.split(":", 1)[-1]:
+                continue
+            for name in inert:
+                if name in invariance:
+                    continue
+                if len(re.findall(r"\b" + re.escape(name) + r"\b", stmt)) >= 2:
+                    invariance[name] = tname
+    dead_args = sorted(
+        f"{path}: `{name}` binds {sorted(dead)} and never reads {'them' if len(dead) > 1 else 'it'}"
+        for name, (path, dead) in inert.items() if name not in invariance)
+
     # 3f. Convention declarations on composable quantities. A definition
     #     producing a quantity and another consuming it can disagree about its
     #     convention while both remain defensible alone, and Lean cannot object
@@ -2681,6 +2771,15 @@ def run_identifications() -> int:
         for admission in admissions:
             print("  " + admission)
         print()
+    # Printed for the same reason and in the same place as the admissions above:
+    # a review flag that only appears on green runs is not enumerable debt. It
+    # does not touch the exit code, because two of these were adjudicated in
+    # opposite directions and neither answer can be reached by a rule.
+    if dead_args:
+        print("DECLARED DEPENDENCE THAT DOES NOT EXIST (review, not a failure)\n")
+        for entry in dead_args:
+            print("  " + entry)
+        print()
     if bad:
         print("STRUCTURAL GUARD FAILURES\n")
         for b in bad:
@@ -2692,7 +2791,8 @@ def run_identifications() -> int:
           f"stipulated equilibria {len(stipulated)}, "
           f"duplicate bodies {len(duplicates)}, "
           f"isolated modules {len(isolated)}, "
-          f"admissions {len(admissions)} (reported, not trusted)")
+          f"admissions {len(admissions)} (reported, not trusted), "
+          f"inert arguments {len(dead_args)} (reported, not failed)")
     return 0
 
 

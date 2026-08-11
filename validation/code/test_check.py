@@ -1750,6 +1750,49 @@ def calibrate_others() -> list:
                 "MISREPORTED     field-proofs failed with no `origin/main`, but did "
                 "not say it CANNOT RUN, which is what tells a reader it is not a finding")
 
+    # The inert-argument review flag, asserted in three directions plus its
+    # contract.  It cannot go in CASES because CASES demands a nonzero exit and
+    # THIS FLAG MUST NOT CHANGE THE EXIT CODE -- the two instances that defined it
+    # were adjudicated in opposite directions, so no rule can decide them and a
+    # gate would force one answer.  The last assertion is that contract.
+    inert_plain = clean_plus("Descent/Sub.lean", CLEAN_SUB + """
+noncomputable def inertCarrier (rate _unused : ℝ) : ℝ :=
+  rate + 1
+""")
+    inert_exempt = clean_plus("Descent/Sub.lean", CLEAN_SUB + """
+noncomputable def inertCarrier (rate _unused : ℝ) : ℝ :=
+  rate + 1
+
+theorem inertCarrier_independent_of_second (rate a b : ℝ) :
+    inertCarrier rate a = inertCarrier rate b := rfl
+""")
+    inert_prop = clean_plus("Descent/Sub.lean", CLEAN_SUB + """
+noncomputable def propBinderCarrier (rate : ℝ) (_hrate : 0 < rate) : ℝ :=
+  rate + 1
+""")
+    base_code, _ = run_guard("identifications", CLEAN)
+    plain_code, plain_out = run_guard("identifications", inert_plain)
+    _, exempt_out = run_guard("identifications", inert_exempt)
+    _, prop_out = run_guard("identifications", inert_prop)
+    if "`inertCarrier` binds" not in plain_out:
+        failures.append(
+            "FALSE NEGATIVE  identifications: an argument the body never reads, with no "
+            "theorem stating the inertness, was not flagged for review")
+    if "`inertCarrier` binds" in exempt_out:
+        failures.append(
+            "FALSE POSITIVE  identifications: an inert argument whose inertness IS stated "
+            "as a theorem was flagged; the flag would demand deleting a validated claim")
+    if "`propBinderCarrier` binds" in prop_out:
+        failures.append(
+            "MISREPORTED     identifications: an unused Prop binder was reported as an "
+            "inert ARGUMENT; an unused hypothesis is a different defect with a different "
+            "repair, and filing it here sends the reader to the wrong one")
+    if plain_code != base_code:
+        failures.append(
+            "CONTRACT        identifications: the inert-argument flag moved the exit code "
+            f"({base_code} -> {plain_code}); it is a review flag, and gating it would force "
+            "one answer onto a question adjudicated both ways")
+
     return failures
 
 
@@ -1815,6 +1858,9 @@ def main() -> int:
     print("  field-proofs: it reported the number of files it read and that "
           "number is not zero, and a repository with no `origin/main` is "
           "reported as CANNOT RUN rather than as a clean zero")
+    print("  identifications: an argument the body never reads is flagged for "
+          "review, an inertness THEOREM exempts it, an unused Prop binder is not "
+          "filed under it, and none of the three moves the exit code")
     return 0
 
 
