@@ -321,7 +321,7 @@ noncomputable def PiecewiseTwoDemeMomentDemography.fixedDifference
 noncomputable def PiecewiseTwoDemeMomentDemography.targetErosionGivenSourcePolymorphic
     (ns nt : ℕ) (demography : PiecewiseTwoDemeMomentDemography (ns + nt)) : Option ℝ :=
   let numerator := ∑ i ∈ Finset.Icc 1 (ns - 1),
-    demography.jointSampleCount ns nt i 0 + demography.jointSampleCount ns nt i nt
+    (demography.jointSampleCount ns nt i 0 + demography.jointSampleCount ns nt i nt)
   let denominator := ∑ i ∈ Finset.Icc 1 (ns - 1),
     ∑ j ∈ Finset.range (nt + 1), demography.jointSampleCount ns nt i j
   if 0 < denominator then some (numerator / denominator) else none
@@ -340,6 +340,7 @@ noncomputable def PiecewiseTwoDemeMomentDemography.conditionalTargetSpectrum
 theorem matrixExponential_zero {ι : Type*} [Fintype ι] [DecidableEq ι]
     (A : Matrix ι ι ℝ) : matrixExponential A 0 = 1 := by
   unfold matrixExponential
+  rw [tsum_eq_single 0 (by intro n hn; simp [zero_pow hn])]
   simp
 
 /-- Fixed difference under the directly solved joint law. -/
@@ -353,8 +354,8 @@ same directly solved joint law. -/
 noncomputable def solvedTwoDemeTargetErosionGivenSourcePolymorphic
     (ns nt : ℕ) (system : NonsingularTwoDemeMomentSystem (ns + nt)) : Option ℝ :=
   let numerator := ∑ i ∈ Finset.Icc 1 (ns - 1),
-    solvedTwoDemeJointSampleCount ns nt system i 0 +
-      solvedTwoDemeJointSampleCount ns nt system i nt
+    (solvedTwoDemeJointSampleCount ns nt system i 0 +
+      solvedTwoDemeJointSampleCount ns nt system i nt)
   let denominator := ∑ i ∈ Finset.Icc 1 (ns - 1),
     ∑ j ∈ Finset.range (nt + 1), solvedTwoDemeJointSampleCount ns nt system i j
   if 0 < denominator then some (numerator / denominator) else none
@@ -426,8 +427,8 @@ noncomputable def twoDemeTargetErosionGivenSourcePolymorphic
     (law : TwoDemePresentDayLaw) (ns nt : ℕ) : Option ℝ :=
   let sourcePolyTargetMono :=
     ∑ i ∈ Finset.Icc 1 (ns - 1),
-      twoDemeJointSampleCount law ns nt i 0 +
-        twoDemeJointSampleCount law ns nt i nt
+      (twoDemeJointSampleCount law ns nt i 0 +
+        twoDemeJointSampleCount law ns nt i nt)
   let sourcePoly :=
     ∑ i ∈ Finset.Icc 1 (ns - 1),
       ∑ j ∈ Finset.range (nt + 1), twoDemeJointSampleCount law ns nt i j
@@ -461,7 +462,7 @@ structure TwoDemeLDSystem (n : ℕ) where
   withinSource : Fin n
   crossSourceTarget : Fin n
   withinTarget : Fin n
-  symmetricWithin : ∀ rho M,
+  symmetricWithin : ∀ (rho M : ℝ),
     cramerCoordinate (operator rho M) (fun i ↦ -forcing M i) withinSource =
       cramerCoordinate (operator rho M) (fun i ↦ -forcing M i) withinTarget
 
@@ -477,7 +478,7 @@ structure AffineTwoDemeLDSystem (n : ℕ) where
   withinSource : Fin n
   crossSourceTarget : Fin n
   withinTarget : Fin n
-  symmetricWithin : ∀ rho M,
+  symmetricWithin : ∀ (rho M : ℝ),
     cramerCoordinate (drift + rho • recombination + M • migration)
         (fun i ↦ -(forcingBase i + M * forcingMigration i)) withinSource =
       cramerCoordinate (drift + rho • recombination + M • migration)
@@ -492,6 +493,29 @@ noncomputable def AffineTwoDemeLDSystem.toSystem {n : ℕ}
   crossSourceTarget := sys.crossSourceTarget
   withinTarget := sys.withinTarget
   symmetricWithin := sys.symmetricWithin
+
+/-- A stationary two-locus coordinate, exactly `-(D+R+M)^{-1}Uh` in the published moment
+system, expressed by Cramer's rule. -/
+noncomputable def TwoDemeLDSystem.stationaryCoordinate {n : ℕ}
+    (sys : TwoDemeLDSystem n) (rho M : ℝ) (k : Fin n) : ℝ :=
+  cramerCoordinate (sys.operator rho M) (fun i ↦ -sys.forcing M i) k
+
+/-- The `E[D_source D_target]` member of the stationary family. -/
+noncomputable def TwoDemeLDSystem.crossD {n : ℕ}
+    (sys : TwoDemeLDSystem n) (rho M : ℝ) : ℝ :=
+  sys.stationaryCoordinate rho M sys.crossSourceTarget
+
+/-- The source `E[D^2]` member of the same solve. -/
+noncomputable def TwoDemeLDSystem.withinD {n : ℕ}
+    (sys : TwoDemeLDSystem n) (rho M : ℝ) : ℝ :=
+  sys.stationaryCoordinate rho M sys.withinSource
+
+/-- Cross-deme correlation of `D`.  Equal sizes and symmetric migration make the two
+within-deme second moments equal, so the square-root denominator reduces to `E[D^2]`.
+This name is introduced only after both numerator and denominator exist in the solved law. -/
+noncomputable def TwoDemeLDSystem.crossDCorrelation {n : ℕ}
+    (sys : TwoDemeLDSystem n) (rho M : ℝ) : ℝ :=
+  sys.crossD rho M / sys.withinD rho M
 
 /-- A2's closed form for an arbitrary published affine moment system. -/
 noncomputable def AffineTwoDemeLDSystem.crossDCorrelation {n : ℕ}
@@ -529,28 +553,6 @@ theorem AffineTwoDemeLDSystem.crossD_eq_det_ratio {n : ℕ}
         sys.crossSourceTarget).det /
       (sys.drift + rho • sys.recombination + M • sys.migration).det := rfl
 
-/-- A stationary two-locus coordinate, exactly `-(D+R+M)^{-1}Uh` in the published moment
-system, expressed by Cramer's rule. -/
-noncomputable def TwoDemeLDSystem.stationaryCoordinate {n : ℕ}
-    (sys : TwoDemeLDSystem n) (rho M : ℝ) (k : Fin n) : ℝ :=
-  cramerCoordinate (sys.operator rho M) (fun i ↦ -sys.forcing M i) k
-
-/-- The `E[D_source D_target]` member of the stationary family. -/
-noncomputable def TwoDemeLDSystem.crossD {n : ℕ}
-    (sys : TwoDemeLDSystem n) (rho M : ℝ) : ℝ :=
-  sys.stationaryCoordinate rho M sys.crossSourceTarget
-
-/-- The source `E[D^2]` member of the same solve. -/
-noncomputable def TwoDemeLDSystem.withinD {n : ℕ}
-    (sys : TwoDemeLDSystem n) (rho M : ℝ) : ℝ :=
-  sys.stationaryCoordinate rho M sys.withinSource
-
-/-- Cross-deme correlation of `D`.  Equal sizes and symmetric migration make the two
-within-deme second moments equal, so the square-root denominator reduces to `E[D^2]`.
-This name is introduced only after both numerator and denominator exist in the solved law. -/
-noncomputable def TwoDemeLDSystem.crossDCorrelation {n : ℕ}
-    (sys : TwoDemeLDSystem n) (rho M : ℝ) : ℝ :=
-  sys.crossD rho M / sys.withinD rho M
 
 /-- **The migration--LD law is rational in `(rho,M)`.**  Expanded determinants are not a
 different result: this quotient is exactly the quotient of two Cramer numerators, because
@@ -600,8 +602,8 @@ def decrementExponent {D : ℕ} (exponent : Fin D → ℕ) (deme : Fin D) : Fin 
 
 /-- Move one ancestral lineage from one deme label to another. -/
 def migrateExponent {D : ℕ} (exponent : Fin D → ℕ)
-    (from to : Fin D) : Fin D → ℕ :=
-  fun d ↦ if d = from then exponent d - 1 else if d = to then exponent d + 1 else exponent d
+    (src dst : Fin D) : Fin D → ℕ :=
+  fun d ↦ if d = src then exponent d - 1 else if d = dst then exponent d + 1 else exponent d
 
 /-- The arbitrary-deme structured moment generator.  This is the direct many-deme extension
 of `twoDemeMomentGenerator`; a serial chain, grid, island model, or typed external demography
@@ -610,11 +612,11 @@ noncomputable def manyDemeMomentGenerator {D : ℕ} (rates : ManyDemeRates D)
     (moment : (Fin D → ℕ) → ℝ) (exponent : Fin D → ℕ) : ℝ :=
   (∑ d, rates.coalescence d * ((exponent d * (exponent d - 1) : ℕ) : ℝ) / 2 *
       (moment (decrementExponent exponent d) - moment exponent)) +
-  (∑ from, ∑ to, rates.migration from to * exponent from *
-      (moment (migrateExponent exponent from to) - moment exponent)) +
-  (∑ d, rates.forwardMutation d * exponent d *
+  (∑ src, ∑ dst, rates.migration src dst * exponent src *
+      (moment (migrateExponent exponent src dst) - moment exponent)) +
+  (∑ d, (rates.forwardMutation d * exponent d *
       (moment (decrementExponent exponent d) - moment exponent) -
-    rates.backwardMutation d * exponent d * moment exponent)
+    rates.backwardMutation d * exponent d * moment exponent))
 
 /-- Embed a bivariate train-target exponent into the full deme index without enumerating a
 full sample-count cell. -/
@@ -684,7 +686,7 @@ noncomputable def TrainVsAllMomentProjection.targetErosion {D : ℕ}
   let ns := projection.trainSampleSize
   let nt := projection.targetSampleSize target
   let numerator := ∑ i ∈ Finset.Icc 1 (ns - 1),
-    projection.jointSampleCount target i 0 + projection.jointSampleCount target i nt
+    (projection.jointSampleCount target i 0 + projection.jointSampleCount target i nt)
   let denominator := ∑ i ∈ Finset.Icc 1 (ns - 1),
     ∑ j ∈ Finset.range (nt + 1), projection.jointSampleCount target i j
   if 0 < denominator then some (numerator / denominator) else none

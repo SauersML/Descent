@@ -57,7 +57,7 @@ structure PTProtocol (thresholdCount m : ℕ) where
   sourceR2 : Fin m → Fin m → ℝ
   sourceR2_nonnegative : ∀ i j, 0 ≤ sourceR2 i j
   sourceR2_le_one : ∀ i j, sourceR2 i j ≤ 1
-  sourceR2_symmetric : sourceR2.IsSymm
+  sourceR2_symmetric : ∀ i j, sourceR2 i j = sourceR2 j i
   pThreshold : Fin thresholdCount → ℝ
   pThreshold_nonnegative : ∀ q, 0 ≤ pThreshold q
   pThreshold_le_one : ∀ q, pThreshold q ≤ 1
@@ -65,9 +65,9 @@ structure PTProtocol (thresholdCount m : ℕ) where
 /-- Two markers conflict when they lie inside the supplied clumping window and their source
 LD reaches the supplied exclusion cutoff.  Equality is excluded, matching retention by a
 strict `r² < cutoff` rule. -/
-def ptConflict {m : ℕ} (parameters : PTParameters) (positionBp : Fin m → ℕ)
+noncomputable def ptConflict {m : ℕ} (parameters : PTParameters) (positionBp : Fin m → ℕ)
     (sourceR2 : Fin m → Fin m → ℝ) (i j : Fin m) : Bool :=
-  decide (Nat.dist (positionBp i) (positionBp j) ≤ parameters.clumpWindowBp ∧
+  decide (((positionBp i : ℤ) - (positionBp j : ℤ)).natAbs ≤ parameters.clumpWindowBp ∧
     parameters.clumpR2Cutoff ≤ sourceR2 i j)
 
 /-- Greedy clumping in the supplied significance order.  A marker is kept exactly when no
@@ -97,12 +97,12 @@ structure PTDesign (thresholdCount m : ℕ) where
   coversMarkers : ∀ i, i ∈ orderedMarkers
 
 /-- Ordered threshold-eligible markers. -/
-def PTDesign.eligible {thresholdCount m : ℕ} (d : PTDesign thresholdCount m)
+noncomputable def PTDesign.eligible {thresholdCount m : ℕ} (d : PTDesign thresholdCount m)
     (q : Fin thresholdCount) : List (Fin m) :=
   d.orderedMarkers.filter fun i ↦ decide (d.pValue i ≤ d.protocol.pThreshold q)
 
 /-- The exact retained marker list at threshold `q`. -/
-def PTDesign.selected {thresholdCount m : ℕ} (d : PTDesign thresholdCount m)
+noncomputable def PTDesign.selected {thresholdCount m : ℕ} (d : PTDesign thresholdCount m)
     (q : Fin thresholdCount) : List (Fin m) :=
   greedyClump
     (ptConflict d.protocol.parameters d.protocol.positionBp d.protocol.sourceR2) (d.eligible q)
@@ -238,7 +238,7 @@ structure DemeGeneticMomentPrimitive (markerCount : ℕ) where
   outcomeCrossCovariance : Fin markerCount → ℝ
   outcomeVariance : ℝ
   prevalence : ℝ
-  covariance_symmetric : genotypeCovariance.IsSymm
+  covariance_symmetric : ∀ i j, genotypeCovariance i j = genotypeCovariance j i
   outcomeVariance_pos : 0 < outcomeVariance
   prevalence_pos : 0 < prevalence
   prevalence_lt_one : prevalence < 1
@@ -520,7 +520,7 @@ noncomputable def DemeScoreLaw.orPerSD
 
 /-- C3: exact liability Brier chart. -/
 noncomputable def DemeScoreLaw.brier (law : DemeScoreLaw) : ℝ :=
-  PopGen.liabilityBrierExact law.prevalence law.r2True
+  PopGen.TransportedMetrics.liabilityBrierExact law.prevalence law.r2True
 
 /-- A strictly positive reference Brier risk. -/
 structure ReferenceBrier where
