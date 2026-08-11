@@ -1009,12 +1009,13 @@ theorem cleanSplitFst_lt_one_iff (NeS NeT : ℝ) (t : ℕ) :
 /-- **The causal variance ratio across a split**, `1/(1 - F)`, taking the SUMMED per-branch
     drift index — which is what `cleanSplitFst` computes and is the reason that body survives.
 
-    WHERE IT COMES FROM. Conditioning on the source frequency, the target's expected
-    heterozygosity is `E[h_T | p_S] = h_S · (1 - F)`, the same cancellation family that makes
-    `sourcePolymorphicSignalFraction` independent of the target's effective size. The causal
-    genetic variance therefore rises across the split by the reciprocal of the retained
-    fraction, and `F` here accumulates along BOTH branches from their common ancestor, which is
-    why the index is summed rather than pairwise.
+    WHERE IT COMES FROM, AND HOW FAR THAT CARRIES. Conditioning on the source frequency, the
+    target's expected heterozygosity is `E[h_T | p_S] = h_S · (1 - F)`, the same cancellation
+    family that makes `sourcePolymorphicSignalFraction` independent of the target's effective
+    size, and `F` accumulates along BOTH branches from their common ancestor, which is why the
+    index is summed rather than pairwise. That argument fixes the SHAPE and the small-`F`
+    behaviour of the variance ratio. It does not deliver the ratio at large `F`, and the
+    measurement below is what settles how far it reaches.
 
     **A HUDSON-DERIVED STAND-IN IS NOT ADMISSIBLE AS THE INPUT, and that refusal is measured.**
     Reading the argument as `2 · F_hudson` fits at 1.6%, 3.1% and 1.7% where `F_hudson` alone
@@ -1023,14 +1024,29 @@ theorem cleanSplitFst_lt_one_iff (NeS NeT : ℝ) (t : ℕ) :
     2.23 to 2.40, not the folkloric 2. Substituting a doubled Hudson value flatters the fit at
     depth in one direction, so a caller must supply a genuine summed per-branch index.
 
-    Empirical status: **CONDITIONALLY VALID**, and the regime has two independent edges.
+    Empirical status: **CONDITIONALLY VALID** — a SMALL-DIVERGENCE FIRST-ORDER law whose
+    validity bound is measured rather than assumed, with two independent edges.
 
-    INSIDE THE REGIME the relation is a clean-split identity and was confirmed against
-    ancient-sample per-branch `F` at `t = 200` to 0.0004 relative, with zero fitted parameters.
+    A CLEAN SPLIT DOES NOT MAKE IT AN IDENTITY, and any reading of this body that treats the
+    clean-split case as one is FALSIFIED. With no chain present at all, measured over
+    predicted:
 
-    THE FIRST EDGE IS DEPTH. Beyond `F ≈ 0.2` the agreement degrades one-signed, reaching a
-    ratio of 0.665 by `F = 0.79`. So this is a first-order law in the drift index and the
-    correction at depth is OWED, not merely unmeasured.
+      F_summed   0.08     0.21     0.45     0.79
+      ratio      1.0005   0.906    0.853    0.665
+
+    One-signed and growing: the body OVER-predicts, by 33% at the deepest cell. Only the
+    shallowest cell agrees, and it agrees to 0.05%. So the safe range is `F_summed ≲ 0.2`, and
+    beyond it the deficit is a fact about this form rather than about any demography.
+
+    THE CORRECTION AT DEPTH IS OWED AS A DERIVATION, and it must NOT be supplied as a fit to
+    the table above. Fitting a correction to the very cells that refuted the form is the move
+    this corpus exists to forbid: it would produce a body that agrees with these four numbers
+    and predicts nothing.
+
+    THE CHAIN ARGUMENT IS WITHDRAWN, and a one-signed chain residual is no longer evidence
+    about the chain. The clean split shows the SAME one-signed deficit with no chain present,
+    so a residual of that sign on a stepping-stone chain is this body's depth behaviour showing
+    through and says nothing about regression toward the ancestral mean.
 
     THE SECOND EDGE IS CAUSAL ASCERTAINMENT, and it is a fired pre-registration rather than a
     caveat added afterwards. Drawing causal variants from all segregating sites rather than
@@ -1042,14 +1058,11 @@ theorem cleanSplitFst_lt_one_iff (NeS NeT : ℝ) (t : ℕ) :
     polymorphic in the SOURCE enriches for source-rare variants and depresses the source
     variance, while the target carries no matching condition — is flagged and NOT adopted.
 
-    ON A STEPPING-STONE CHAIN the relation is approximate with a known sign: the target
-    regresses toward the ancestral mean, so the truth sits BELOW this body. The sign is
-    reported rather than predicted, because the chain approximation has no derivation here and
-    retrofitting a sign argument to a one-signed residual is how a finding becomes an excuse.
-
-    NO `record()` NAMES THIS BODY. The numbers above come from the derivation's own runs, which
-    are not in this repository, so a reader cannot check them; a battery under this name is
-    owed and is what would move the head.
+    NO `record()` NAMES THIS BODY, and no battery is cited here because none carries it yet.
+    The numbers above come from the scoring runs behind the four-factor decomposition, which
+    are not in this repository, so a reader cannot check them. A battery under this name is
+    owed; it is what would move the head, and it is also what the depth correction has to be
+    derived against rather than fitted to.
 
     argument_source: model. -/
 noncomputable def causalVarianceRatio (fstSummed : ℝ) : ℝ := 1 / (1 - fstSummed)
