@@ -1265,7 +1265,13 @@ noncomputable def ThresholdTreatmentModel.witness : ThresholdTreatmentModel wher
 /-- One-step longitudinal model corresponding to a single threshold-based
     treatment decision.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM -- a structure constructor carrying no
+    decision content. It sets `discount ≡ 1` over a single period, and
+    `thresholdLongitudinalModel_eq_screeningLongitudinalModel` below proves by `rfl` that
+    at horizon 1 it IS the screening embedding: the same object, so it cannot distinguish
+    the two decision rules and nothing about a population could make it wrong. Everything
+    that separates them lives in the clinical pathway, which is where a measurement of a
+    decision rule belongs. -/
 noncomputable def thresholdLongitudinalModel
     (_model : ThresholdTreatmentModel) : LongitudinalTreatmentModel 1 where
   discount := fun _ ↦ 1
@@ -1288,7 +1294,12 @@ theorem thresholdLongitudinalModel_eq_screeningLongitudinalModel
 /-- One-step clinical pathway induced by a scalar risk under the threshold
     treatment model.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM -- a structure constructor that repackages the
+    arguments it is handed. The benefit and the harm are the model's own fields and the
+    event probability is the supplied risk; nothing is combined, so no population could
+    disagree with it. The empirical questions are upstream, about whether the model's
+    benefit and harm are the right constants for a real pathway, and downstream, in the
+    quantities that integrate this over a score law. -/
 noncomputable def thresholdClinicalPathway
     (model : ThresholdTreatmentModel) (risk : ℝ) : ClinicalPathway 1 where
   followupWeight := fun _ ↦ 1
@@ -1326,7 +1337,13 @@ theorem receivesTreatment_thresholdClinicalPathway_iff
     The deployed system treats when the risk used for decision-making exceeds
     the clinical treatment threshold.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM -- an accounting identity inside a declared
+    decision model. Given the model's benefit, harm and threshold, and given the two risks,
+    this IS the gain by definition: `benefit · trueRisk - harm` when treated and zero when
+    not. The empirical content is entirely in the model it is evaluated against -- whether
+    clinical decisions really follow a threshold rule, and whether benefit and harm are
+    constants rather than functions of the patient -- and a simulation that disagreed with
+    this arithmetic would have found a bug, not a fact. -/
 noncomputable def thresholdQalyGainUnderDecision
     (model : ThresholdTreatmentModel) (trueRisk decisionRisk : ℝ) : ℝ :=
   if _ : model.threshold < decisionRisk then
@@ -1346,7 +1363,11 @@ theorem thresholdQalyGainUnderDecision_at_no_treatment (model : ThresholdTreatme
 /-- **Per-individual one-step QALY loss from using predicted instead of true
     risk.** This is the threshold-rule specialization of `qalyLoss`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM -- a difference of two accounting identities,
+    both `thresholdQalyGainUnderDecision`, and it inherits that standing exactly. What IS
+    measurable is its EXPECTATION over a population of true and predicted risks, which is
+    `expectedThresholdQalyLoss`; that one keeps its UNTESTED head and its queued cell,
+    because the joint law of the two risks is what miscalibration changes. -/
 noncomputable def thresholdQalyLoss
     (model : ThresholdTreatmentModel) (trueRisk predictedRisk : ℝ) : ℝ :=
   thresholdQalyGainUnderDecision model trueRisk trueRisk -
@@ -1359,7 +1380,12 @@ noncomputable def thresholdQalyLoss
     - false negatives pay `trueRisk - threshold`,
     - correct decisions pay `0`.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM -- this DEFINES the margin rather than
+    measuring it. The three branches are a case split on the deployed decision, and each
+    returns a distance between the true risk and the threshold that the case split itself
+    fixes. What a simulation could test is how large this margin gets under a real score
+    law, which is a question about the distribution it is evaluated on and not about the
+    definition. -/
 noncomputable def thresholdDecisionRegretMargin
     (model : ThresholdTreatmentModel) (trueRisk predictedRisk : ℝ) : ℝ := by
     classical

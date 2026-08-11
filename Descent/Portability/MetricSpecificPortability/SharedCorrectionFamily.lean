@@ -119,7 +119,12 @@ theorem targetCorrectionOptimum_apply (B : ι → Matrix J J ℝ) (beta theta : 
 /-- The curvature-weighted mean of the per-target optimal corrections: the
 shared correction that a weighted-least-squares compromise selects.
 
-Empirical status: UNTESTED. -/
+Empirical status: NOT AN EMPIRICAL CLAIM -- a weighted mean of two ARBITRARY functions
+`ι → ℝ`. No population enters: given the numbers, this is their curvature-weighted average
+by definition. The empirical content sits in `targetCorrectionCurvature` and
+`targetCorrectionOptimum`, which say WHICH functions the section is about, and those keep
+their UNTESTED heads because identifying the abstract slots with specific spectral
+quantities is a claim a simulation can refuse. -/
 noncomputable def sharedCorrectionConsensus (curvature optimum : ι → ℝ) : ℝ :=
   (∑ i, curvature i * optimum i) / ∑ i, curvature i
 
@@ -136,7 +141,11 @@ theorem sharedCorrectionConsensus_no_curvature_is_junk (curvature optimum : Fin 
 /-- **The spread law's right-hand side**: the curvature-weighted variance of the
 per-target optimal corrections.
 
-Empirical status: UNTESTED. -/
+Empirical status: NOT AN EMPIRICAL CLAIM -- a weighted variance of arbitrary functions,
+with the same standing as `sharedCorrectionConsensus` it is written around. The spread LAW
+relating this to the cost is the bias-variance decomposition, which is algebra and could not
+have come out otherwise; what could be wrong is the identification of the weights, and that
+lives in `targetCorrectionCurvature`. -/
 noncomputable def sharedCorrectionSpread (curvature optimum : ι → ℝ) : ℝ :=
   ∑ i, curvature i *
     (optimum i - sharedCorrectionConsensus curvature optimum) ^ 2
@@ -144,7 +153,10 @@ noncomputable def sharedCorrectionSpread (curvature optimum : ι → ℝ) : ℝ 
 /-- Total excess risk incurred across the family by applying the single
 correction `correction` instead of each target's own optimum.
 
-Empirical status: UNTESTED. -/
+Empirical status: NOT AN EMPIRICAL CLAIM -- a weighted squared loss over arbitrary
+functions. Calling it "excess risk" is a reading of the weights, not a measurement: whether
+this sum IS the excess risk a family of targets pays depends on `targetCorrectionCurvature`
+being the right curvature, which is the claim that carries the section and the head. -/
 def sharedCorrectionCost (curvature optimum : ι → ℝ) (correction : ℝ) : ℝ :=
   ∑ i, curvature i * (correction - optimum i) ^ 2
 

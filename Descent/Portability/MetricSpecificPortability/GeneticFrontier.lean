@@ -69,7 +69,12 @@ survive; this is the rank budget in the units a clumping tool reports. Carrying
 the validity facts as data keeps division by zero and fractions above one out of
 the LD-frontier interface.
 
-Empirical status: UNTESTED. -/
+Empirical status: NOT AN EMPIRICAL CLAIM -- this is a TYPE, not a quantity. It bundles two
+validity facts, `retainedMarkers ≤ totalMarkers` and `0 < totalMarkers`, so that division by
+zero and fractions above one cannot enter the LD-frontier interface. A structure carrying
+facts about its own fields asserts nothing about any population, and no simulation could
+return a panel that contradicts it. The empirical content is in the bodies that CONSUME a
+retention -- what a real pruning rule retains, and what that costs a score. -/
 structure LDPanelRetention where
   retainedMarkers : ℕ
   totalMarkers : ℕ
