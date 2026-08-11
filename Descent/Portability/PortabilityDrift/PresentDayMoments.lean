@@ -131,9 +131,38 @@ noncomputable def CrossPopulationGenerationalModel.witness (p q : ℕ) :
     separated by intervening ones can arrive at the same one-locus `F_ST` along different
     histories, and the two-locus moments are not determined by the one-locus moment. A pair
     at separation `0` or `1` is inside this demography; anything beyond it needs its own
-    integration, not this row rescaled. How far wrong the `F_ST`-matched reduction goes has
-    been measured outside the corpus and the numbers are owed here — until they are cited
-    from a committed run, the prohibition rests on the scope argument above and not on them.
+    integration, not this row rescaled.
+
+    AND THE PROHIBITION IS NOW MEASURED, not only argued
+    (`validation/empirical/momentsld/ldchain_reduction.json`, exact rational arithmetic on
+    the two-locus ancestral-configuration system for linear chains of 2, 3 and 4 demes; not a
+    battery, so it carries no ledger row and must not be cited as one). The surrogate under
+    test is exactly the substitution forbidden above: take the pair's own exact Hudson
+    `F_ST`, invert the two-deme relation for an effective `M`, and read this table. At
+    `rho = 20` in a four-deme chain it is biased HIGH at every separation —
+
+      cell                    d = 1     d = 2      d = 3
+      grid2d per-edge rate    +5.6%    +314.7%   +1682.8%
+      serial1d per-edge rate  +10.8%   +123.9%    +379.0%
+
+    — and +1682.8% is the worst over the whole design (exact 0.00494 against a surrogate
+    0.08806). The bias grows with separation and with `rho`, which is the signature of the
+    mechanism named above rather than of a broken calculation; and the control that settles
+    that is in the file too, computed through the identical code path: at TWO demes the
+    surrogate IS the exact answer, error exactly `0.00000000` in all twelve cells.
+
+    WHAT THIS DOES AND DOES NOT LICENSE, because the two axes are different questions and
+    conflating them is how a two-deme law ends up on a thirty-six-deme lattice. TIME: the
+    equilibrium FORM is adequate for grid2d's split age, the transient sitting 1.2% to 3.8%
+    above equilibrium, one-signed, shrinking as `rho` grows
+    (`validation/empirical/momentsld/derivation/ldtransient.log`, which gates itself at both
+    ends — `rD = 1` at zero age and the equilibrium rational function at infinite age).
+    STRUCTURE: whether a TWO-deme law describes a thirty-six-deme lattice at all is the
+    multi-deme reduction, it is OPEN, and no transient calculation touches it. The table
+    above is what the structure axis looks like when the question is answered by
+    substitution. Nor does the chain file supply a replacement: it is linear chains at
+    equilibrium, and the geometric law `rD(0,1)^d` that holds there to within 6.94% is a
+    one-dimensional statement that must not be carried onto a lattice either.
 
     Empirical status: NOT AN EMPIRICAL CLAIM. It is a witness — an instance
     exhibited so that statements about the structure have something to be about.
