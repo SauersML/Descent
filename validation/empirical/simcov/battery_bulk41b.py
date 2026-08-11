@@ -31,6 +31,45 @@ quantity and a competing form differing by 1% matched too. The harm-to-benefit
 ratio here puts the crossing between 0.1 and 0.5 and the grid is refined there,
 so the competing readings separate.
 
+WHICH RIVAL COULD HAVE DISAGREED, AND WHY ITS REJECTION IS WORTH SOMETHING --
+added 2026-08-11, when both corpus rows here turned out to be reading
+UNINFORMATIVE in the ledger while the rivals beside them were missing by hundreds
+of sems.
+
+  Nothing was wrong with those measurements. A FALSIFIED verdict in this harness
+  requires `realised_inputs` to be declared, an undeclared one is booked LEAD, and
+  LEAD is in the NULL set -- so a rival that dies is not a rival that was
+  rejected, and the corpus row is gated as though no rival had been run. Both
+  groups now declare, and the declaration had to be EARNED rather than added.
+
+  GROUP G. The screening group drew its test outcomes at a nominal sensitivity
+  and specificity and evaluated its predictions there too, so the declaration
+  would have been false. Every prediction now uses the REALISED operating point,
+  pooled over the whole prevalence grid the crossing is read from. That moves the
+  four predictions by 3.5e-5 to 7.5e-4 relative -- far below the bars -- and the
+  corpus row goes from 0.05 to 0.56 sems, still a match and now an earned one.
+  The rival that carries the weight is the ODDS FORM, `(1-spec)*harm/(sens*b)`,
+  because it is the one a reader would actually write and it differs from the
+  body only by the term in the denominator: it is refuted at 140 sems here and
+  MATCHED in `battery_bulk40`, where the harm-to-benefit ratios put every
+  crossing near 0.005 on a grid of spacing 0.0068. The numerator swap and the
+  uncomplemented specificity are corpses beside it.
+
+  GROUP A. This group already evaluated at the realised genetic correlation, so
+  its declaration is simply true. But its one carried rival was the NOMINAL-rho
+  reading, and A RIVAL WHOSE DEFECT IS PROVENANCE CAN NEVER BE CREDITED: it
+  misses by 35 sems precisely because it evaluates at a nominal input, so
+  declaring `realised_inputs=True` for it would be a lie and `False` leaves it a
+  LEAD however far it misses. It keeps its honest `False`, and three rivals that
+  differ in FORM at the SAME realised rho are carried beside it -- the
+  correlation left unsquared (205 sems), the correlation alone with `r2Source`
+  dropped (291), and a reading in which the target genotype scale enters
+  R-squared (467). The third is the informative one and its rejection is narrow:
+  it agrees at 1.06 to 1.70 sems in the three `alpha = 1` cells, as it must, and
+  dies only at `alpha = 1.6` and `alpha = 0.6`. That is the threefold alpha sweep
+  earning its place, and it should be read as two cells of evidence rather than
+  five.
+
 FRESHNESS: prints FRESHNESS=OK only if its own source carries the token below.
 """
 import json
