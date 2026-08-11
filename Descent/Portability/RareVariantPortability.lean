@@ -791,8 +791,13 @@ per copy, only through homozygotes -- with the drift rate `1/(2 Nₑ)`. It is th
 argument `mutationSelectionBalanceRecessive` does not take.
 
 This is data, not a packaged claim that the deterministic approximation is
-adequate. Measurement puts that balance within 5 percent at `2 Nₑ √(mu s) = 226`,
-11 percent high at `57`, and 63 to 79 percent high below `2 Nₑ √(mu s) ≤ 2.8`.
+adequate, and NO MEASURED VALUE OF IT MAKES THAT APPROXIMATION ADEQUATE. The
+highest cell the sweep reaches, `2 Nₑ √(mu s) = 226`, still has the balance 4.8
+percent high and REJECTS it at 4.3 sems; below that it is 11 percent high at
+`57` and 63 to 79 percent high at `2 Nₑ √(mu s) ≤ 2.8`. The approach is
+monotone from below, so the deterministic value is a limit the sweep never
+attains rather than a plateau it enters, and there is no threshold in this data
+above which the balance holds.
 
 Note it is a WEAKER condition on `Nₑ` than the dominant case needs to be safe,
 in the sense that it involves `√(mu s)` rather than `h s`: at `mu = 1e-04` and
@@ -804,26 +809,6 @@ until `Nₑ` is in the thousands.
     fixes where it matters is recorded on `mutationSelectionBalanceRecessive`. -/
 noncomputable def recessiveMutationSelectionDriftParameter (Ne mu s : ℝ) : ℝ :=
   2 * Ne * Real.sqrt (mu * s)
-
-/-- **The regime in which the recessive deterministic balance was validated.**
-
-Stated as a `Prop` rather than left in prose so that a consumer can be made to
-carry it. The threshold is the conservative end of the measured bracket: the
-claim is within 5 percent at `2 Nₑ √(mu s) = 226` and is rejected already at
-`57`, so the bound is set at the value that was actually measured to hold.
-
-    Empirical status: NOT AN EMPIRICAL CLAIM -- this is a hypothesis a consumer
-    discharges, not a prediction about data. -/
-def DeterministicRecessiveBalanceRegime (Ne mu s : ℝ) : Prop :=
-  200 ≤ recessiveMutationSelectionDriftParameter Ne mu s
-
-/-- **The recessive regime is exactly a lower bound on the compound parameter.**
-It constrains `Nₑ`, `mu` and `s` only jointly, which is why the restriction
-cannot be stated as a bound on the effective size alone. -/
-theorem deterministicRecessiveBalanceRegime_iff (Ne mu s : ℝ) :
-    DeterministicRecessiveBalanceRegime Ne mu s ↔ 200 ≤ 2 * Ne * Real.sqrt (mu * s) := by
-  unfold DeterministicRecessiveBalanceRegime recessiveMutationSelectionDriftParameter
-  exact Iff.rfl
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem recessiveMutationSelectionDriftParameter_at_reference_point :
