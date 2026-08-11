@@ -1090,7 +1090,7 @@
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
-    "Descent/Portability/PortabilityDrift/PresentDayMoments.lean::targetExactCalibratedBrierRisk": {
+    "Descent/Portability/PortabilityDrift/PresentDayMoments.lean::targetCalibratedBrierRisk": {
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",

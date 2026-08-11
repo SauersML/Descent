@@ -1058,9 +1058,24 @@ theorem sourceBrierFromR2_eq_transportedMetrics
       PopGen.TransportedMetrics.calibratedBrier π r2Source := by
   rfl
 
-/-- Exact target calibrated Brier risk under the Bernoulli-mixing model from
-explicit target state. -/
-noncomputable def targetExactCalibratedBrierRisk
+/-- Target calibrated Brier risk on the OBSERVED scale, from explicit target state.
+
+**The name carries no claim of exactness, deliberately.** This computes
+`PopGen.TransportedMetrics.calibratedBrier`, the linear chart. A name promising an exact
+risk here reads, to anyone auditing by name rather than by body, as a target Brier route
+that needs no attention -- and that is how the dichotomised profile kept a Gaussian risk
+coordinate for as long as it did.
+
+WHAT IS AND IS NOT EXACT HERE. Under the Bernoulli-mixing model -- a true conditional risk
+with mean `π` and variance `π(1-π)·r2` -- the linear chart IS the exact calibrated Brier
+risk, and `exactBrierRiskOfCalibrated_eq_exactCalibratedBrierRiskFromR2` below proves it
+from the integral. That model reads `r2` on the OBSERVED scale. It is not the
+liability-threshold model, where the explained fraction is a liability-scale one and the
+exact risk is `PopGen.TransportedMetrics.liabilityBrierExact`'s `Φ₂` curve; for a
+dichotomised trait the body to call is `targetLiabilityBrierFromNeutralAFBenchmark`. The
+two agree at `r2 = 0` and `r2 = 1` and nowhere between, which is why two anchor theorems
+could not tell them apart. -/
+noncomputable def targetCalibratedBrierRisk
     (π V_A V_E fstTarget : ℝ) : ℝ :=
   PopGen.TransportedMetrics.calibratedBrier π
     (targetR2FromNeutralAFBenchmark V_A V_E fstTarget)
@@ -1069,7 +1084,7 @@ noncomputable def targetExactCalibratedBrierRisk
 (`Brier(R²_target)`). -/
 noncomputable def targetBrierFromNeutralAFBenchmark
     (π V_A V_E fstTarget : ℝ) : ℝ :=
-  targetExactCalibratedBrierRisk π V_A V_E fstTarget
+  targetCalibratedBrierRisk π V_A V_E fstTarget
 
 /-- Canonical bundled deployed metrics under the neutral allele-frequency
 benchmark state.
@@ -1114,7 +1129,7 @@ theorem neutralAFBenchmarkMetricProfile_eq
     -- first occurrence unfolds it; the second then fails, because by that
     -- point the constant is gone from the goal. `unfold` is not idempotent --
     -- it errors when a name is already absent rather than succeeding vacuously.
-    unfold targetBrierFromNeutralAFBenchmark targetExactCalibratedBrierRisk
+    unfold targetBrierFromNeutralAFBenchmark targetCalibratedBrierRisk
       PopGen.TransportedMetrics.calibratedBrier targetR2FromNeutralAFBenchmark
       PopGen.TransportedMetrics.r2FromSignalVariance
       presentDayR2
@@ -1905,11 +1920,14 @@ proof, and its name claimed the liability-threshold model -- which
 `presentDayEqualVarianceGaussianAUC`'s own docstring records as the misidentification that
 understates AUC by 3% to 26%.  One theorem, under the name that says which model it is. -/
 
-/-- The exact target calibrated Brier risk is `TransportedMetrics.calibratedBrier`
-evaluated at the explicit target `R²` by definition. -/
+/-- The observed-scale target calibrated Brier risk is `TransportedMetrics.calibratedBrier`
+evaluated at the explicit target `R²`, by definition.  The word "exact" stood in this
+sentence and has been removed for the reason `targetCalibratedBrierRisk`'s own docstring
+gives: the chart on the right is exact under the Bernoulli-mixing reading of `R²` and is
+not the liability-threshold risk. -/
 @[simp] theorem targetBrierFromNeutralAFBenchmark_eq
     (π V_A V_E fstTarget : ℝ) :
-    targetExactCalibratedBrierRisk π V_A V_E fstTarget =
+    targetCalibratedBrierRisk π V_A V_E fstTarget =
       PopGen.TransportedMetrics.calibratedBrier π
         (targetR2FromNeutralAFBenchmark V_A V_E fstTarget) := by
   rfl
@@ -1917,7 +1935,15 @@ evaluated at the explicit target `R²` by definition. -/
 /-- Exact calibrated Bernoulli Brier risk from prevalence and explained-risk
 moments. If the true conditional risk `η(Z)` has mean `π` and variance
 `π(1-π) r2`, then the exact calibrated population Brier risk is
-`π(1-π)(1-r2)`. -/
+`π(1-π)(1-r2)`.
+
+**THE EXACTNESS IS REAL AND IT IS SCOPED BY `hvar`.** The hypothesis is what makes `r2` the
+OBSERVED-scale explained fraction -- the variance of the conditional risk itself, in units
+of `π(1-π)` -- and on that reading the linear chart is not an approximation to anything.
+A liability-scale explained fraction does not satisfy `hvar`, which is why feeding one to
+this chart is a scale error rather than a rounding one, and why
+`PopGen.TransportedMetrics.liabilityBrierExact` exists beside it. The two agree exactly at
+`r2 = 0` and `r2 = 1`. -/
 theorem exactBrierRiskOfCalibrated_eq_exactCalibratedBrierRiskFromR2
     {Z : Type*} [MeasurableSpace Z]
     (μ : Measure Z) [IsProbabilityMeasure μ]
@@ -1978,7 +2004,7 @@ theorem targetBrier_ge_source_of_neutralAF_benchmark
       hVA hVE h_fst h_fst_bounds
   have hcoef_nonneg : 0 ≤ π * (1 - π) := by nlinarith
   unfold sourceBrierFromR2 targetBrierFromNeutralAFBenchmark
-    targetExactCalibratedBrierRisk PopGen.TransportedMetrics.calibratedBrier
+    targetCalibratedBrierRisk PopGen.TransportedMetrics.calibratedBrier
   have hbase :
       1 - presentDayR2 V_A V_E fstSource ≤
         1 - targetR2FromNeutralAFBenchmark V_A V_E fstTarget := by

@@ -613,7 +613,7 @@ RELATIONS = {
     "Descent.targetR2FromNeutralAFBenchmark": [
         jointly_scales(["V_A", "V_E"], 0),
     ],
-    "Descent.targetExactCalibratedBrierRisk": [
+    "Descent.targetCalibratedBrierRisk": [
         jointly_scales(["V_A", "V_E"], 0),
     ],
     "Descent.targetBrierFromNeutralAFBenchmark": [

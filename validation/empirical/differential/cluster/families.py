@@ -1020,7 +1020,7 @@ FAMILIES = [
                     "profileFromSignalVariance",
                     "profileFromSignalVarianceWithPenalty",
                     "metricProfileFromTargetSignalWithPenalty",
-                    "targetExactCalibratedBrierRisk",
+                    "targetCalibratedBrierRisk",
                     "targetCalibratedBrierFromSourceWeights",
                     "targetMetricProfileFromSourceWeights",
                     "sourceCalibratedBrierFromSourceWeightsAtPrevalence",

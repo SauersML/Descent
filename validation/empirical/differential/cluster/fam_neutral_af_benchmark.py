@@ -414,10 +414,10 @@ def corpus_targetR2FromNeutralAFBenchmark(V_A, V_E, fstTarget):
         corpus_presentDayPGSVariance(V_A, fstTarget), V_E)
 
 
-def corpus_targetExactCalibratedBrierRisk(pi, V_A, V_E, fstTarget):
-    """Descent/Portability/PortabilityDrift.lean, decl `targetExactCalibratedBrierRisk`
+def corpus_targetCalibratedBrierRisk(pi, V_A, V_E, fstTarget):
+    """Descent/Portability/PortabilityDrift.lean, decl `targetCalibratedBrierRisk`
 
-        noncomputable def targetExactCalibratedBrierRisk
+        noncomputable def targetCalibratedBrierRisk
             (π V_A V_E fstTarget : ℝ) : ℝ :=
           TransportedMetrics.calibratedBrier π
             (targetR2FromNeutralAFBenchmark V_A V_E fstTarget)
@@ -431,9 +431,9 @@ def corpus_targetBrierFromNeutralAFBenchmark(pi, V_A, V_E, fstTarget):
 
         noncomputable def targetBrierFromNeutralAFBenchmark
             (π V_A V_E fstTarget : ℝ) : ℝ :=
-          targetExactCalibratedBrierRisk π V_A V_E fstTarget
+          targetCalibratedBrierRisk π V_A V_E fstTarget
     """
-    return corpus_targetExactCalibratedBrierRisk(pi, V_A, V_E, fstTarget)
+    return corpus_targetCalibratedBrierRisk(pi, V_A, V_E, fstTarget)
 
 
 # ===========================================================================

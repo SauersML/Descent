@@ -37,7 +37,7 @@ MEASURED, and what each settles
        presentDayEqualVarianceGaussianAUC.
     B. Brier risk of the calibrated probability P(case | G).
        Settles calibratedBrier, calibratedBrierFromVariances, brierFromR2,
-       sourceBrierFromR2, targetExactCalibratedBrierRisk.
+       sourceBrierFromR2, targetCalibratedBrierRisk.
     C. Brier and log-loss REGRET of a miscalibrated probability q against the
        true eta. Settles brierRegretPoint/Ratio, logLossRegretPoint/Ratio.
     D. R^2 on the liability scale. Settles r2FromSignalVariance and the profile
