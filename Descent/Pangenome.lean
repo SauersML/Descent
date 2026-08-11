@@ -37,8 +37,8 @@ import Descent.Pangenome.PanelGraph
 import Descent.Pangenome.Presentation
 import Descent.Pangenome.Register
 import Descent.Pangenome.Strand
-import Descent.Pangenome.TripleGluing
 import Descent.Pangenome.Symmetry
+import Descent.Pangenome.TripleGluing
 
 /-!
 # `Descent.Pangenome` -- the layer head
