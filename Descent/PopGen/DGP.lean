@@ -3576,7 +3576,23 @@ theorem fst_ordering (p : EvolutionaryParameters) (h_theta : 0 < p.theta) :
     against `(1-r)^(2t)` requires. At `r = 0.05` it is eleven percent, which is
     not a rounding difference. Use the exact form where `r` is not small.
 
-    Power: the prediction spans 0.01832 to 0.67032 across the design. -/
+    Power: the prediction spans 0.01832 to 0.67032 across the design.
+
+    **WHAT THE ORACLE WAS, AND IT IS NARROWER THAN THE NAME.** `battery_sld03` draws a
+    Bernoulli recombination count over `t` meioses WITH NO POPULATION ANYWHERE — no effective
+    size, no drift, no sampling of haplotypes from a finite pool. So the 0.31 sems certify the
+    combinatorics: that the probability of two lineages both avoiding recombination is
+    `(1-r)^(2·t)`. They do NOT certify the sentence this docstring opens with, that the
+    fraction of LD SHARED BETWEEN POPULATIONS is that probability. Those are the same number
+    only in the infinite-population limit, and this body is that limit.
+
+    In a population of finite size the expected LD covariance is eroded per generation by drift
+    as well as by recombination, `E[D_{t+1}] = (1-r)·(1 - 1/(2·Nₑ))·E[D_t]`, so the shared
+    fraction carries a second factor this body omits. `ldRetentionWithDrift` below is the form
+    that carries it, and the omission is not small at the divergence depths the corpus works
+    at: at `Nₑ = 2000` it runs from 4.9% at `t = 100` to 42.3% at `t = 1100`, and at
+    `Nₑ = 500` from 18.1% to 88.9%. A consumer reading this body as a between-population LD
+    retention at those depths is reading a number that is high by those amounts. -/
 noncomputable def sharedLDRetention (p : EvolutionaryParameters) : ℝ :=
   (1 - p.recomb) ^ (2 * p.t_div)
 
@@ -3616,6 +3632,83 @@ theorem sharedLDRetention_decreasing_in_time
     (by linarith [p₂.recomb_le_half])
     (by linarith [h_same ▸ h_r_pos])
     (by linarith)
+
+/-- **Shared-LD retention with the drift factor carried, over `branches` diverging lineages.**
+
+    TWO FORCES ERODE AN ANCESTRAL ASSOCIATION AND `sharedLDRetention` CHARGES ONLY ONE.
+    Recombination breaks the association between the two loci at rate `r` per meiosis. Drift
+    erodes the expected covariance itself at rate `1/(2·Nₑ)` per generation, because a finite
+    pool resamples haplotypes and the expected `D` shrinks toward zero whether or not any
+    crossover falls between the loci. The per-lineage recursion is therefore
+    `E[D_{t+1}] = (1-r)·(1 - 1/(2·Nₑ))·E[D_t]`, and the base below is that product.
+
+    `branches` COUNTS THE DIVERGING LINEAGES, which is the same convention
+    `sharedLDRetention_uses_ploidy` records for the exponent: a clean split charges BOTH
+    branches and takes `branches = 2`; a pair connected by migration, where one lineage stays
+    effectively resident in the source deme, charges one. The count is a property of the
+    demography and not of the genome, which is why it is an argument rather than a constant.
+
+    Empirical status: UNTESTED. What the corpus has measured is the RECOMBINATION half alone,
+    at 0.31 sems (`simcov/battery_sld03.py`), on a design whose oracle is a Bernoulli
+    recombination count with no population in it — so that run bears on the base's first factor
+    and on the exponent, and on the drift factor not at all. The recursion supplying the second
+    factor is the standard finite-population one; what has no measurement here is the
+    COMPOSITION — that the two forces multiply per generation and that the per-lineage factor
+    is then raised to `branches · t` for lineages diverging independently. A battery separating
+    this body from `sharedLDRetention` needs divergence deep enough in `t/Nₑ` for the drift
+    factor to bite, which is what that design lacked:
+
+      Nₑ      t = 100   t = 250   t = 500   t = 1100
+      500     0.81865   0.60638   0.36770   0.11068
+      2000    0.95122   0.88248   0.77878   0.57691
+      10000   0.99005   0.97531   0.95123   0.89583
+
+    Those are the drift factor `(1 - 1/(2·Nₑ))^(2·t)` this body carries and the other omits, so
+    they are also the design's separation: any cell in the top-left of that table tells the two
+    bodies apart, and every cell of `battery_sld03` sits at a drift factor of one by
+    construction. -/
+noncomputable def ldRetentionWithDrift (p : EvolutionaryParameters) (branches : ℝ) : ℝ :=
+  ((1 - p.recomb) * (1 - 1 / (2 * p.Ne))) ^ (branches * p.t_div)
+
+/-- **The two bodies differ by the drift factor and by nothing else.** Stated at
+    `branches = 2`, where `sharedLDRetention` lives, so that the omission has a name and a
+    size rather than being a discrepancy a reader has to derive. The effective size must be at
+    least one for the per-generation drift base to be a retention rather than a negative
+    number. -/
+theorem ldRetentionWithDrift_eq_sharedLDRetention_mul_drift (p : EvolutionaryParameters)
+    (hNe : 1 ≤ p.Ne) :
+    ldRetentionWithDrift p 2 = sharedLDRetention p * (1 - 1 / (2 * p.Ne)) ^ (2 * p.t_div) := by
+  have hhalf : 1 / (2 * p.Ne) ≤ 1 / 2 :=
+    one_div_le_one_div_of_le (by norm_num) (by linarith)
+  have hnn : (0 : ℝ) ≤ 1 / (2 * p.Ne) := by positivity
+  unfold ldRetentionWithDrift sharedLDRetention
+  exact Real.mul_rpow (by linarith [p.recomb_le_half]) (by linarith)
+
+/-- **Charging drift as well as recombination can only retain less.** The bound a consumer
+    needs before substituting: wherever `sharedLDRetention` was read as a between-population
+    retention, the finite-population value sits at or below it, so the omission is a
+    one-directional overstatement and never a shortfall. -/
+theorem ldRetentionWithDrift_le_sharedLDRetention (p : EvolutionaryParameters)
+    (hNe : 1 ≤ p.Ne) :
+    ldRetentionWithDrift p 2 ≤ sharedLDRetention p := by
+  have hhalf : 1 / (2 * p.Ne) ≤ 1 / 2 :=
+    one_div_le_one_div_of_le (by norm_num) (by linarith)
+  have hnn : (0 : ℝ) ≤ 1 / (2 * p.Ne) := by positivity
+  have hdrift : (1 - 1 / (2 * p.Ne)) ^ (2 * p.t_div) ≤ 1 :=
+    Real.rpow_le_one (by linarith) (by linarith) (by linarith [p.t_div_nonneg])
+  rw [ldRetentionWithDrift_eq_sharedLDRetention_mul_drift p hNe]
+  calc sharedLDRetention p * (1 - 1 / (2 * p.Ne)) ^ (2 * p.t_div)
+      ≤ sharedLDRetention p * 1 :=
+        mul_le_mul_of_nonneg_left hdrift (sharedLDRetention_pos p).le
+    _ = sharedLDRetention p := mul_one _
+
+/-- **At the split itself nothing has been lost**, whatever the branch count and whatever the
+    effective size. The control cell any battery separating the two bodies is gated on. -/
+theorem ldRetentionWithDrift_at_zero_time (p : EvolutionaryParameters) (branches : ℝ)
+    (ht : p.t_div = 0) :
+    ldRetentionWithDrift p branches = 1 := by
+  unfold ldRetentionWithDrift
+  rw [ht, mul_zero, Real.rpow_zero]
 
 /-- **Mutation-induced LD erosion**: new mutations create population-specific LD
     that is not shared. The fraction of LD that remains "ancestral" (shared)
