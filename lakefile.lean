@@ -60,9 +60,18 @@ lean_lib Counterexamples where
 -- whether or not the corpus does.
 -- A build that names its targets must name this one too:
 --   lake build Descent Counterexamples PartialSymmetry
+-- `globs`, unlike the two libraries above, so that EVERY module under `PartialSymmetry/`
+-- is a build target whether or not the root file imports it. With the default globs a
+-- library builds its root plus whatever the root transitively imports, which makes the
+-- root's import list load-bearing for what gets type-checked -- and this repository is
+-- edited by several sessions at once. Twice already an agent editing `PartialSymmetry.lean`
+-- to add its own import silently dropped another's line, after which `lake build` reported
+-- success while never compiling the missing module: a green build that had not read the
+-- file. Globbing the directory makes the claim "this library builds" mean what it says.
 @[default_target]
 lean_lib PartialSymmetry where
   srcDir := "."
+  globs := #[.andSubmodules `PartialSymmetry]
   leanOptions := #[⟨`autoImplicit, false⟩, ⟨`relaxedAutoImplicit, false⟩]
 
 -- The generated-declaration filter and the results writer that the detectors
