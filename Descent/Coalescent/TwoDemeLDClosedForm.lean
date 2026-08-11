@@ -257,6 +257,23 @@ noncomputable def publishedTwoDemeTargetWithinD (rho M : ℝ) : ℝ :=
 noncomputable def publishedTwoDemeDCorrelation (rho M : ℝ) : ℝ :=
   publishedTwoDemeCrossD rho M / publishedTwoDemeWithinD rho M
 
+/-- The admissible domain of the concrete law.  Physical rate constraints and both algebraic
+poles are carried by the point supplied to downstream consumers. -/
+structure PublishedTwoDemeLDPoint where
+  rho : ℝ
+  migration : ℝ
+  rho_nonneg : 0 ≤ rho
+  migration_nonneg : 0 ≤ migration
+  operator_nonsingular : (publishedTwoDemeLDOperator rho migration).det ≠ 0
+  within_numerator_nonzero :
+    (replaceColumn (publishedTwoDemeLDOperator rho migration)
+      (fun row ↦ -publishedTwoDemeLDForcing row) (.y .dd00)).det ≠ 0
+
+/-- The concrete law evaluated on its typed domain. -/
+noncomputable def PublishedTwoDemeLDPoint.correlation
+    (point : PublishedTwoDemeLDPoint) : ℝ :=
+  publishedTwoDemeDCorrelation point.rho point.migration
+
 /-- The concrete `E[D₀D₁]` family is a rational determinant quotient in `(rho,M)`. -/
 theorem publishedTwoDemeCrossD_eq_rational (rho M : ℝ) :
     publishedTwoDemeCrossD rho M =

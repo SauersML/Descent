@@ -34,10 +34,13 @@ structure PTParameters where
   clumpR2Cutoff : ℝ
   clumpWindowBp : ℕ
   discoverySampleSize : ℕ
+  clumpR2Cutoff_nonneg : 0 ≤ clumpR2Cutoff
+  clumpR2Cutoff_lt_one : clumpR2Cutoff < 1
+  discoverySampleSize_pos : 0 < discoverySampleSize
 
-/-- Two markers conflict when they lie inside the clumping window and their source LD reaches
-the exclusion cutoff.  Equality is excluded, matching the pipeline's retained condition
-`r^2 < 0.1`. -/
+/-- Two markers conflict when they lie inside the supplied clumping window and their source
+LD reaches the supplied exclusion cutoff.  Equality is excluded, matching retention by a
+strict `r² < cutoff` rule. -/
 def ptConflict {m : ℕ} (parameters : PTParameters) (positionBp : Fin m → ℕ)
     (sourceR2 : Fin m → Fin m → ℝ) (i j : Fin m) : Bool :=
   decide (Nat.dist (positionBp i) (positionBp j) ≤ parameters.clumpWindowBp ∧
@@ -66,6 +69,8 @@ structure PTDesign (thresholdCount m : ℕ) where
   pThreshold : Fin thresholdCount → ℝ
   orderedMarkers : List (Fin m)
   orderedMarkers_nodup : orderedMarkers.Nodup
+  orderedMarkers_by_significance :
+    orderedMarkers.Pairwise (fun earlier later ↦ pValue earlier ≤ pValue later)
   coversMarkers : ∀ i, i ∈ orderedMarkers
 
 /-- Ordered threshold-eligible markers. -/
@@ -172,20 +177,177 @@ theorem expectedSelectedFunctional_eq {omega thresholdCount m : ℕ}
 
 /-! ## C. Within-deme accuracy from the selected score moments -/
 
+/-- Exact genotype/outcome primitives in one deme.  Allele-frequency moments from A1 supply
+`genotypeMean`; one- and two-locus moments from A1/A2 supply `genotypeCovariance`; the genetic
+architecture supplies the score/outcome cross-covariance. -/
+structure DemeGeneticMomentPrimitive (markerCount : ℕ) where
+  genotypeMean : Fin markerCount → ℝ
+  genotypeCovariance : Matrix (Fin markerCount) (Fin markerCount) ℝ
+  outcomeCrossCovariance : Fin markerCount → ℝ
+  outcomeVariance : ℝ
+  prevalence : ℝ
+  covariance_symmetric : genotypeCovariance.IsSymm
+  outcomeVariance_pos : 0 < outcomeVariance
+  prevalence_pos : 0 < prevalence
+  prevalence_lt_one : prevalence < 1
+  cauchy_schwarz : ∀ weight : Fin markerCount → ℝ,
+    (∑ i, weight i * outcomeCrossCovariance i) ^ 2 ≤
+      (∑ i, ∑ j, weight i * genotypeCovariance i j * weight j) * outcomeVariance
+
+/-- Score mean from weights and genotype means. -/
+noncomputable def DemeGeneticMomentPrimitive.scoreMean {markerCount : ℕ}
+    (primitive : DemeGeneticMomentPrimitive markerCount)
+    (weight : Fin markerCount → ℝ) : ℝ :=
+  ∑ i, weight i * primitive.genotypeMean i
+
+/-- Exact quadratic score variance `w' Sigma w`. -/
+noncomputable def DemeGeneticMomentPrimitive.scoreVariance {markerCount : ℕ}
+    (primitive : DemeGeneticMomentPrimitive markerCount)
+    (weight : Fin markerCount → ℝ) : ℝ :=
+  ∑ i, ∑ j, weight i * primitive.genotypeCovariance i j * weight j
+
+/-- Exact score/outcome covariance `w' Cov(G,Y)`. -/
+noncomputable def DemeGeneticMomentPrimitive.predictiveCovariance {markerCount : ℕ}
+    (primitive : DemeGeneticMomentPrimitive markerCount)
+    (weight : Fin markerCount → ℝ) : ℝ :=
+  ∑ i, weight i * primitive.outcomeCrossCovariance i
+
+/-- A selected score whose variance is genuinely positive.  Cauchy--Schwarz is inherited
+from the primitive for this weight vector. -/
+structure AdmissibleScoreWeights {markerCount : ℕ}
+    (primitive : DemeGeneticMomentPrimitive markerCount) where
+  weight : Fin markerCount → ℝ
+  scoreVariance_pos : 0 < primitive.scoreVariance weight
+
+/-- Zero unselected weights and retain the realised GWAS effect at selected markers. -/
+noncomputable def PTDesign.selectedWeight {thresholdCount markerCount : ℕ}
+    (design : PTDesign thresholdCount markerCount) (threshold : Fin thresholdCount)
+    (estimatedEffect : Fin markerCount → ℝ) : Fin markerCount → ℝ :=
+  fun marker ↦ if marker ∈ design.selected threshold then estimatedEffect marker else 0
+
 /-- The per-deme output of A+B.  `scoreMean` is required for calibration and pooling;
 second moments alone are insufficient for either. -/
 structure DemeScoreLaw where
   scoreMean : ℝ
   moments : Descent.Core.ScoreMoments
+  moments_admissible : Descent.Core.ScoreMoments.Admissible moments
   prevalence : ℝ
+  prevalence_pos : 0 < prevalence
+  prevalence_lt_one : prevalence < 1
+
+/-- The exact A+B-to-C constructor. -/
+noncomputable def AdmissibleScoreWeights.toDemeScoreLaw {markerCount : ℕ}
+    {primitive : DemeGeneticMomentPrimitive markerCount}
+    (score : AdmissibleScoreWeights primitive) : DemeScoreLaw where
+  scoreMean := primitive.scoreMean score.weight
+  moments :=
+    { scoreVariance := primitive.scoreVariance score.weight
+      predictiveCovariance := primitive.predictiveCovariance score.weight
+      outcomeVariance := primitive.outcomeVariance }
+  moments_admissible :=
+    { scoreVariance_pos := score.scoreVariance_pos
+      outcomeVariance_pos := primitive.outcomeVariance_pos
+      cauchy_schwarz := primitive.cauchy_schwarz score.weight }
+  prevalence := primitive.prevalence
+  prevalence_pos := primitive.prevalence_pos
+  prevalence_lt_one := primitive.prevalence_lt_one
 
 /-- Distance-resolved output for a train deme and every target deme. -/
 structure DistanceResolvedScoreLaw (D : ℕ) where
   train : Fin D
   atDeme : Fin D → DemeScoreLaw
 
+/-! ### B1+B2 composed into the distance-resolved moment law -/
+
+/-- A complete family of candidate score laws under the joint GWAS sampling distribution.
+Each realised GWAS atom performs its own clumping and threshold comparison; selection never
+uses mean p-values or a mean retained set. -/
+structure PTGWASDistanceLaw (omega thresholdCount markerCount D : ℕ) where
+  sampling : PTGWASSamplingLaw omega markerCount
+  designAt : Fin omega → PTDesign thresholdCount markerCount
+  scoreLawAt : Fin omega → Fin thresholdCount → DistanceResolvedScoreLaw D
+  validationDeme : Fin D
+  winnerAt : ∀ draw,
+    PTWinner (designAt draw)
+      (fun threshold ↦ ((scoreLawAt draw threshold).atDeme validationDeme).moments.r2)
+
+/-- Candidate selected in one realised GWAS draw. -/
+noncomputable def PTGWASDistanceLaw.winningScoreLaw
+    {omega thresholdCount markerCount D : ℕ}
+    (law : PTGWASDistanceLaw omega thresholdCount markerCount D)
+    (draw : Fin omega) : DistanceResolvedScoreLaw D :=
+  law.scoreLawAt draw (law.winnerAt draw).index
+
+/-- Exact expected downstream metric after GWAS noise, clumping, and threshold choice. -/
+noncomputable def PTGWASDistanceLaw.expectedWinningMetric
+    {omega thresholdCount markerCount D : ℕ}
+    (law : PTGWASDistanceLaw omega thresholdCount markerCount D)
+    (target : Fin D) (metric : DemeScoreLaw → ℝ) : ℝ :=
+  law.sampling.expectation fun draw ↦ metric ((law.winningScoreLaw draw).atDeme target)
+
+/-- Threshold uncertainty marginalized inside each GWAS draw. -/
+noncomputable def PTGWASDistanceLaw.expectedMarginalMetric
+    {omega thresholdCount markerCount D : ℕ}
+    (law : PTGWASDistanceLaw omega thresholdCount markerCount D)
+    (thresholdLaw : Fin omega → PTThresholdMixture thresholdCount)
+    (target : Fin D) (metric : DemeScoreLaw → ℝ) : ℝ :=
+  law.sampling.expectation fun draw ↦
+    (thresholdLaw draw).expectation fun threshold ↦
+      metric ((law.scoreLawAt draw threshold).atDeme target)
+
+/-- Concrete composition of realised GWAS weights with per-deme genetic moment primitives. -/
+structure PTGWASMomentComposition (omega thresholdCount markerCount D : ℕ) where
+  sampling : PTGWASSamplingLaw omega markerCount
+  designAt : Fin omega → PTDesign thresholdCount markerCount
+  primitiveAt : Fin omega → Fin D → DemeGeneticMomentPrimitive markerCount
+  train : Fin D
+  validationDeme : Fin D
+  selectedScoreAt : ∀ draw threshold deme,
+    AdmissibleScoreWeights (primitiveAt draw deme)
+  selectedWeight_eq : ∀ draw threshold deme,
+    (selectedScoreAt draw threshold deme).weight =
+      (designAt draw).selectedWeight threshold (sampling.estimatedEffect draw)
+  winnerAt : ∀ draw,
+    PTWinner (designAt draw) (fun threshold ↦
+      ((selectedScoreAt draw threshold validationDeme).toDemeScoreLaw).moments.r2)
+
+/-- Distance-resolved score law generated by one GWAS draw and threshold. -/
+noncomputable def PTGWASMomentComposition.distanceLawAt
+    {omega thresholdCount markerCount D : ℕ}
+    (composition : PTGWASMomentComposition omega thresholdCount markerCount D)
+    (draw : Fin omega) (threshold : Fin thresholdCount) : DistanceResolvedScoreLaw D where
+  train := composition.train
+  atDeme := fun deme ↦ (composition.selectedScoreAt draw threshold deme).toDemeScoreLaw
+
+/-- Forget the construction details only after the exact quadratic moment law has built every
+candidate score. -/
+noncomputable def PTGWASMomentComposition.toDistanceLaw
+    {omega thresholdCount markerCount D : ℕ}
+    (composition : PTGWASMomentComposition omega thresholdCount markerCount D) :
+    PTGWASDistanceLaw omega thresholdCount markerCount D where
+  sampling := composition.sampling
+  designAt := composition.designAt
+  scoreLawAt := composition.distanceLawAt
+  validationDeme := composition.validationDeme
+  winnerAt := composition.winnerAt
+
 /-- C1: true within-deme squared accuracy. -/
 noncomputable def DemeScoreLaw.r2True (law : DemeScoreLaw) : ℝ := law.moments.r2
+
+/-- Certificate that an A+B moment construction composes with the validated clean-split
+portability law.  The score moments remain the primary object; this equality is the independent
+clean-split reduction they must satisfy. -/
+structure CleanSplitMomentCertificate (law : DemeScoreLaw) (markerCount : ℕ) where
+  ancestralR2 : ℝ
+  effectMass : Fin markerCount → ℝ
+  sourceFrequency : Fin markerCount → ℝ
+  sourceEffectiveSize : ℝ
+  targetEffectiveSize : ℝ
+  generations : ℕ
+  ldFactor : ℝ
+  r2_reduction : law.r2True =
+    cleanSplitTargetR2' ancestralR2 effectMass sourceFrequency
+      sourceEffectiveSize targetEffectiveSize generations ldFactor
 
 /-- C2: calibration slope from the same two score moments. -/
 noncomputable def DemeScoreLaw.calibrationSlope (law : DemeScoreLaw) : ℝ :=
@@ -220,29 +382,53 @@ noncomputable def DemeScoreLaw.mae (law : DemeScoreLaw) : ℝ :=
 noncomputable def standardNormalDensity (z : ℝ) : ℝ :=
   Real.exp (-(z ^ 2) / 2) / Real.sqrt (2 * Real.pi)
 
-/-- Conditional RMSE above a standardized Gaussian tail threshold `a`.  The second moment
-of a standard normal truncated above `a` is `1 + a phi(a)/(1-Phi(a))`. -/
-noncomputable def gaussianTailRMSE (errorVariance a : ℝ) : ℝ :=
-  Real.sqrt (errorVariance *
-    (1 + a * standardNormalDensity a / (1 - Foundations.Phi a)))
+/-- A standardized Gaussian upper tail with its probability tied to its boundary. -/
+structure GaussianUpperTail where
+  boundary : ℝ
+  mass : ℝ
+  mass_pos : 0 < mass
+  mass_eq : mass = 1 - Foundations.Phi boundary
 
-/-- C3: top-decile tail RMSE, with the top-decile boundary supplied explicitly so its
-quantile convention cannot change inside the chart. -/
+/-- A top-decile Gaussian tail. -/
+structure GaussianTopDecile extends GaussianUpperTail where
+  is_decile : mass = 1 / 10
+
+/-- Conditional RMSE when `(error,Z)` is jointly Gaussian and `Z` is standardized.  The
+conditional second moment is
+`Var(error) + Cov(error,Z)^2 * a*phi(a)/P(Z>=a)`. -/
+noncomputable def gaussianTailRMSE
+    (errorVariance errorTailCovariance : ℝ) (tail : GaussianUpperTail) : ℝ :=
+  Real.sqrt (errorVariance + errorTailCovariance ^ 2 *
+    tail.boundary * standardNormalDensity tail.boundary / tail.mass)
+
+/-- C3: general Gaussian tail-RMSE chart with error/tail covariance explicit. -/
+noncomputable def DemeScoreLaw.tailRMSE (law : DemeScoreLaw)
+    (errorTailCovariance : ℝ) (tail : GaussianUpperTail) : ℝ :=
+  gaussianTailRMSE law.linearErrorVariance errorTailCovariance tail
+
+/-- C3: top-score-decile RMSE after optimal linear rescaling.  The Gaussian residual is
+orthogonal, hence independent, of the score, so selecting on the score leaves RMSE unchanged. -/
 noncomputable def DemeScoreLaw.topDecileRMSE (law : DemeScoreLaw)
-    (topDecileBoundary : ℝ) : ℝ :=
-  gaussianTailRMSE law.linearErrorVariance topDecileBoundary
+    (tail : GaussianTopDecile) : ℝ :=
+  law.tailRMSE 0 tail.toGaussianUpperTail
+
+theorem DemeScoreLaw.topDecileRMSE_eq_residualRMSE (law : DemeScoreLaw)
+    (tail : GaussianTopDecile) :
+    law.topDecileRMSE tail = Real.sqrt law.linearErrorVariance := by
+  simp [DemeScoreLaw.topDecileRMSE, DemeScoreLaw.tailRMSE, gaussianTailRMSE]
 
 /-- Mean liability-model risk in the score tail `z >= q`, divided by prevalence.  This is
 the exact Gaussian integral chart for the top-decile risk ratio. -/
-noncomputable def topTailRiskRatio (r2 prevalence q tailMass : ℝ) : ℝ :=
-  ((∫ z in Set.Ici q,
-      liabilityRiskAtScore r2 prevalence z * standardNormalDensity z) / tailMass) /
+noncomputable def topTailRiskRatio
+    (r2 prevalence : ℝ) (tail : GaussianUpperTail) : ℝ :=
+  ((∫ z in Set.Ici tail.boundary,
+      liabilityRiskAtScore r2 prevalence z * standardNormalDensity z) / tail.mass) /
     prevalence
 
 /-- C3: top-decile risk ratio at the law's own `R^2` and prevalence. -/
 noncomputable def DemeScoreLaw.topDecileRiskRatio (law : DemeScoreLaw)
-    (topDecileBoundary : ℝ) : ℝ :=
-  topTailRiskRatio law.r2True law.prevalence topDecileBoundary (1 / 10)
+    (tail : GaussianTopDecile) : ℝ :=
+  topTailRiskRatio law.r2True law.prevalence tail.toGaussianUpperTail
 
 /-- C3: OR per SD, using the already validated liability chart. -/
 noncomputable def DemeScoreLaw.orPerSD (law : DemeScoreLaw) : ℝ :=
@@ -252,11 +438,15 @@ noncomputable def DemeScoreLaw.orPerSD (law : DemeScoreLaw) : ℝ :=
 noncomputable def DemeScoreLaw.brier (law : DemeScoreLaw) : ℝ :=
   PopGen.liabilityBrierExact law.prevalence law.r2True
 
-/-- C3: Brier skill against an explicitly supplied reference risk.  The reference is an
-argument because its definition belongs to the comparison instance, not to the metric law. -/
+/-- A strictly positive reference Brier risk. -/
+structure ReferenceBrier where
+  value : ℝ
+  value_pos : 0 < value
+
+/-- C3: Brier skill against an explicitly supplied reference risk. -/
 noncomputable def DemeScoreLaw.brierSkill
-    (law : DemeScoreLaw) (referenceBrier : ℝ) : ℝ :=
-  1 - law.brier / referenceBrier
+    (law : DemeScoreLaw) (referenceBrier : ReferenceBrier) : ℝ :=
+  1 - law.brier / referenceBrier.value
 
 /-! ## D. Calibration and the phenotype ladder -/
 
