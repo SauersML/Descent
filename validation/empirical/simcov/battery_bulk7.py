@@ -86,6 +86,27 @@ def test_selected_drift_factor():
         cells_f.append(dict(design="Ne=%d s=%.4f t=%d" % (Ne, s_corr, t),
                             lean=1 - lean, truth=1 - obs,
                             sem=(1 - obs) * 0.006))
+    # WHAT THESE TWO ROWS ACTUALLY MEASURE, added 2026-08-11 after they were
+    # adjudicated. They are kept as measurement history rather than deleted, and
+    # they are SUPERSEDED by battery_bulk47 -- see adjudications.json under both
+    # declaration names.
+    #
+    # The `s_corr` branch above applies `p <- 0.5 - (0.5 - p) sqrt(1 - s)` after
+    # each generation. With `H = 2p(1-p) = 0.5 - 2d^2` that map sends
+    # `H -> H + s(0.5 - H)`: AFFINE toward a fixed point, where both bodies below
+    # are a CONSTANT MULTIPLIER. The two coincide only at `s = 0`. Solving the
+    # simulator's own recurrence independently of the bodies
+    # (`probe_bulk7a.py`), the measurement tracks that affine model at 0.10 and
+    # 1.03 sems and misses the bodies by 312 and 385 -- on a bar taken from the
+    # 400 replicates, which is 32x smaller than the `obs * 0.006` asserted below
+    # and is why the ledger carries 9.50 and 79.25 instead.
+    #
+    # At `s = 0` the body matches at 1.06 sems, agreeing with bulk47's 1.42 over
+    # four cells. Do not "repair" this arm: nothing produces a constant
+    # multiplicative boost to heterozygosity except a simulator applying the
+    # formula, so any design pinning `s_correction` this way is a generative
+    # self-test, which is why the body's own head records the parameter as
+    # unpinned.
     record("selectedDriftFactor", "PhenomeWidePortability.lean",
            "(1 - 1/(2*Ne) + s_correction)^t", cells_d,
            regime="realised heterozygosity retention under Wright-Fisher drift "

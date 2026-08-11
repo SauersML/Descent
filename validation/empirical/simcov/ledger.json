@@ -205,6 +205,49 @@
     ]
    }
   },
+  "fstFromDriftFactor": {
+   "authoritative": "bulk47",
+   "reason": [
+    "NOT A DISAGREEMENT ABOUT THE BODY: the two designs simulate DIFFERENT",
+    "PROCESSES, and only one of them is the one this definition describes.",
+    "battery_bulk7's s_correction branch applies, after each Wright-Fisher",
+    "generation, p <- 0.5 - (0.5 - p) sqrt(1 - s). With H = 2p(1-p) =",
+    "0.5 - 2d^2 that map sends H -> H + s(0.5 - H): AFFINE toward a fixed",
+    "point, where this body is a CONSTANT MULTIPLIER (1 - 1/(2Ne) + s)^t.",
+    "The two coincide only at s = 0.",
+    "",
+    "Measured on bulk7's own seed, with the simulator's own recurrence",
+    "solved independently of the body (probe_bulk7a.py, committed beside the",
+    "batteries): the measurement tracks the affine model at 0.10 and 1.03",
+    "sems and misses this body by 312 and 385 sems. At s = 0, where",
+    "the two coincide, the body matches at 1.06 sems -- consistent with",
+    "bulk47's independent 1.42 over four cells.",
+    "",
+    "bulk7's bar compounded it. That group asserts sem = obs * 0.006, a flat",
+    "0.6 percent written rather than measured, while holding 400 replicates",
+    "whose block sem is 32x smaller. On a bar taken from the data the",
+    "mismatch is the figure above, not the 9.50 and 79.25 the ledger",
+    "carries: the invented bar hid the SIZE of a design fault, not the fault.",
+    "",
+    "NO REPAIR IS AVAILABLE FOR bulk7's ARM and none should be attempted.",
+    "Nothing produces a constant multiplicative boost to heterozygosity",
+    "except a simulator applying the formula, so a design pinning",
+    "s_correction that way would be a generative self-test -- which is why",
+    "this body's own head already records s_correction as unpinned and says",
+    "so in as many words. bulk47 measures the s = 0 content correctly over",
+    "four cells with the haploid slip refuted at 532 sems, and that is the",
+    "whole of what the corpus knows about this law."
+   ],
+   "superseded": {
+    "bulk7": [
+     "Measures an affine restoration toward one half, which is not the",
+     "process this body describes; see the reason above. Its rows are",
+     "kept as measurement history rather than deleted, and battery_bulk7",
+     "carries a note at the record() calls saying what they measure."
+    ]
+   },
+   "with": "bulk47"
+  },
   "fstMigrationMutationEquilibriumManyDemes": {
    "authoritative": "falsrepair_c2",
    "reason": [
@@ -552,6 +595,49 @@
     ]
    },
    "with": "rival01"
+  },
+  "selectedDriftFactor": {
+   "authoritative": "bulk47",
+   "reason": [
+    "NOT A DISAGREEMENT ABOUT THE BODY: the two designs simulate DIFFERENT",
+    "PROCESSES, and only one of them is the one this definition describes.",
+    "battery_bulk7's s_correction branch applies, after each Wright-Fisher",
+    "generation, p <- 0.5 - (0.5 - p) sqrt(1 - s). With H = 2p(1-p) =",
+    "0.5 - 2d^2 that map sends H -> H + s(0.5 - H): AFFINE toward a fixed",
+    "point, where this body is a CONSTANT MULTIPLIER (1 - 1/(2Ne) + s)^t.",
+    "The two coincide only at s = 0.",
+    "",
+    "Measured on bulk7's own seed, with the simulator's own recurrence",
+    "solved independently of the body (probe_bulk7a.py, committed beside the",
+    "batteries): the measurement tracks the affine model at 0.10 and 1.03",
+    "sems and misses this body by 312 and 385 sems. At s = 0, where",
+    "the two coincide, the body matches at 1.06 sems -- consistent with",
+    "bulk47's independent 1.42 over four cells.",
+    "",
+    "bulk7's bar compounded it. That group asserts sem = obs * 0.006, a flat",
+    "0.6 percent written rather than measured, while holding 400 replicates",
+    "whose block sem is 32x smaller. On a bar taken from the data the",
+    "mismatch is the figure above, not the 9.50 and 79.25 the ledger",
+    "carries: the invented bar hid the SIZE of a design fault, not the fault.",
+    "",
+    "NO REPAIR IS AVAILABLE FOR bulk7's ARM and none should be attempted.",
+    "Nothing produces a constant multiplicative boost to heterozygosity",
+    "except a simulator applying the formula, so a design pinning",
+    "s_correction that way would be a generative self-test -- which is why",
+    "this body's own head already records s_correction as unpinned and says",
+    "so in as many words. bulk47 measures the s = 0 content correctly over",
+    "four cells with the haploid slip refuted at 532 sems, and that is the",
+    "whole of what the corpus knows about this law."
+   ],
+   "superseded": {
+    "bulk7": [
+     "Measures an affine restoration toward one half, which is not the",
+     "process this body describes; see the reason above. Its rows are",
+     "kept as measurement history rather than deleted, and battery_bulk7",
+     "carries a note at the record() calls saying what they measure."
+    ]
+   },
+   "with": "bulk47"
   },
   "sharedLDRetention": {
    "authoritative": "sld03",
@@ -7306,7 +7392,7 @@
   {
    "against": null,
    "battery": "bulk7",
-   "battery_sha": "b1bc018d9d560c00",
+   "battery_sha": "be754784a487c3f6",
    "cells": 3,
    "competitors_carried": 0,
    "competitors_rejected": 0,
@@ -7327,7 +7413,7 @@
   {
    "against": null,
    "battery": "bulk7",
-   "battery_sha": "b1bc018d9d560c00",
+   "battery_sha": "be754784a487c3f6",
    "cells": 3,
    "competitors_carried": 0,
    "competitors_rejected": 0,
@@ -7348,7 +7434,7 @@
   {
    "against": null,
    "battery": "bulk7",
-   "battery_sha": "b1bc018d9d560c00",
+   "battery_sha": "be754784a487c3f6",
    "cells": 3,
    "competitors_carried": 0,
    "competitors_rejected": 0,
@@ -7369,7 +7455,7 @@
   {
    "against": null,
    "battery": "bulk7",
-   "battery_sha": "b1bc018d9d560c00",
+   "battery_sha": "be754784a487c3f6",
    "cells": 3,
    "competitors_carried": 0,
    "competitors_rejected": 0,
