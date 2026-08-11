@@ -650,16 +650,6 @@
       ],
       "note": "Built on `coalFst`, hence Hudson.  The 4 is the scaled migration rate 4*Ne*m; the superseded quadratic sibling squares both m and sigma."
     },
-    "Descent/PopGen/DemographicHistory.lean::steppingStoneFstQuadratic": {
-      "quantity": "fst",
-      "convention": "hudson",
-      "constants": [
-        "2",
-        "2",
-        "4"
-      ],
-      "note": "A superseded candidate kept as a discriminand: quadratic in m and in sigma where the surviving form is linear."
-    },
     "Descent/PopGen/DriftRegime.lean::benchmarkRatio": {
       "quantity": "fst",
       "convention": "undetermined",

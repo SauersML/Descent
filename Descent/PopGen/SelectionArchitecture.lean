@@ -14,15 +14,33 @@ open MeasureTheory
 
 This file formalizes how different modes of natural selection shape
 trait genetic architecture and consequently affect PGS portability.
-The key insight from Wang et al. is that trait-specific portability
-patterns are explained by selection regime differences.
+The reading from Wang et al. is that trait-specific portability patterns are
+explained by selection regime differences; what this file can state formally is
+narrower than that reading, and the difference is recorded rather than elided.
 
 Key results:
-1. Stabilizing selection maintains genetic architecture → better portability
-2. Diversifying/balancing selection changes architecture → worse portability
-3. Polygenic adaptation creates coordinated allele frequency shifts
-4. Rapidly varying selection regimes have fastest portability decay
-5. Relationship between GWAS effect sizes and selection coefficients
+1. Mutation-selection balance pins the standing effect variance at `v_mut / s`,
+   and the one-generation recurrence has that equilibrium as its unique fixed
+   point
+2. Fluctuating selection decorrelates effects with divergence time, at a rate
+   set by the optimum's autocorrelation time, and that map inverts exactly
+3. A fluctuating regime's selected-architecture variance exceeds the
+   stabilizing mutation-selection baseline, and an observed pair of summaries
+   is matched exactly by one such regime
+4. Balancing selection maintains intermediate frequencies, raising score
+   variance
+5. The selection coefficient's sign convention, fixed once, as a proportional
+   reduction in fitness
+
+WHAT THIS FILE NO LONGER CLAIMS. There is no law here for the cross-population
+effect correlation a stabilizing regime produces. The formula that stood in that
+place rose with selection strength, and forward Wright-Fisher on a shared
+optimum measured the correlation FALLING with it — a shared optimum is reachable
+by different allelic routes, and stronger selection lets two populations take
+different ones faster. So "stabilizing selection maintains architecture, hence
+better portability" is not a result of this file, and the regime claim at 3 is a
+MATCH by a fluctuating regime rather than an exclusion of a stabilizing one:
+excluding one would need the correlation law that no longer exists.
 
 Reference: Wang et al. (2026), Nature Communications 17:942.
 -/

@@ -19,7 +19,11 @@ cd "$ROOT"
 # Both ends are fixed: the guard no longer sees them and the tar no longer
 # makes them.
 export COPYFILE_DISABLE=1
-tar czf "$TAR" Descent Descent.lean lakefile.lean lean-toolchain lake-manifest.json validation
+# `Counterexamples` is a second lean_lib target and ships with the rest: a library that
+# is not synced is not built, and a deliberately-wrong body that nothing type-checks is
+# worse than one inside the corpus, because it rots silently.
+tar czf "$TAR" Descent Descent.lean Counterexamples Counterexamples.lean \
+  lakefile.lean lean-toolchain lake-manifest.json validation
 "$MSI" put "$TAR" "$REMOTE/.src-sync.tar.gz" >/dev/null
 rm -f "$TAR"
 # Overlay, never delete: the remote checkout is shared with other sessions, and a

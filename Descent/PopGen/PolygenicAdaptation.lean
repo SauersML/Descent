@@ -24,7 +24,7 @@ Key results:
 1. QST-FST test for polygenic selection
 2. Polygenic score overdispersion under selection
 3. Directional selection on PGS-relevant traits
-4. Stabilizing vs directional selection effects
+4. The weak and strong selection-strength regimes are disjoint
 5. Detecting adaptation from GWAS summary statistics
 
 Provenance: derived here, not imported. Wang et al. (2026), Nature Communications 17:942,
@@ -390,10 +390,19 @@ theorem corrections_reduce_signal
 end PGSOverdispersion
 
 /-!
-## Directional vs Stabilizing Selection
+## Directional Selection and the Selection-Strength Regimes
 
-The type of selection determines how genetic architecture
-changes across populations.
+Directional selection moves the score's mean; the two regimes a selection
+coefficient can sit in, weak and strong relative to drift, are disjoint.
+
+There is no cross-population effect-correlation law here for any selection
+regime. The bodies that stood in this section returned a correlation rising
+with selection strength, and forward Wright-Fisher measured it falling —
+stabilizing selection toward a SHARED optimum decorrelates two populations
+faster, not slower, because a shared optimum is reachable by different allelic
+routes. The ordering those bodies were kept for, fluctuating decorrelating
+further than stabilizing at matched strength, is real in the measurements and
+has no body left to state it on.
 -/
 
 section SelectionTypes

@@ -36,6 +36,21 @@ lean_lib Descent where
   -- `Descent/Foundations/CausalInference.lean` is a record of.
   leanOptions := #[⟨`autoImplicit, false⟩, ⟨`relaxedAutoImplicit, false⟩]
 
+-- Deliberately-wrong declarations, kept out of the corpus proper.  A body that
+-- asserts nothing about the world is not a law, and a reader who meets one inside
+-- `Descent/` has to be warned off it every time; Mathlib keeps `Counterexamples`
+-- separate for the same reason.  These modules `import Descent`, so they are built
+-- and type-checked with everything else, and they sit outside the reach of
+-- `validation/code/check.py`, which scans `Descent/` only -- which is the point:
+-- the guards enforce properties of production laws, and none of them should be
+-- asked to hold of a body kept precisely because it is false.
+-- A build that names its targets must name this one too:
+--   lake build Descent Counterexamples ValidationShared
+@[default_target]
+lean_lib Counterexamples where
+  srcDir := "."
+  leanOptions := #[⟨`autoImplicit, false⟩, ⟨`relaxedAutoImplicit, false⟩]
+
 -- The generated-declaration filter and the results writer that the detectors
 -- under `validation/` share.  A separate library, and deliberately not
 -- part of `Descent`:
