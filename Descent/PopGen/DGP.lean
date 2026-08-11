@@ -3670,6 +3670,21 @@ theorem sharedLDRetention_decreasing_in_time
 noncomputable def ldRetentionWithDrift (p : EvolutionaryParameters) (branches : ℝ) : ℝ :=
   ((1 - p.recomb) * (1 - 1 / (2 * p.Ne))) ^ (branches * p.t_div)
 
+/-- **The two in the drift base is the PLOIDY**, stated beside the definition rather than
+    inlined, in the same way `sharedLDRetention_uses_ploidy` states it for the exponent.
+
+    The two are different twos and both are the ploidy. In the EXPONENT it counts lineages —
+    two of them must independently avoid recombination on a clean split, which is what
+    `branches` generalises. In the BASE it counts GENE COPIES: `Nₑ` diploid individuals carry
+    `2·Nₑ` of them, so a pair coalesces in the previous generation with probability
+    `1/(2·Nₑ)`. Writing either as a literal is how a measured coefficient turns into a magic
+    one, and it is why this theorem exists rather than a comment. -/
+theorem ldRetentionWithDrift_uses_ploidy (p : EvolutionaryParameters) (branches : ℝ) :
+    ldRetentionWithDrift p branches =
+      ((1 - p.recomb) * (1 - 1 / (Descent.Core.ploidy * p.Ne))) ^ (branches * p.t_div) := by
+  unfold ldRetentionWithDrift Descent.Core.ploidy
+  ring_nf
+
 /-- **The two bodies differ by the drift factor and by nothing else.** Stated at
     `branches = 2`, where `sharedLDRetention` lives, so that the omission has a name and a
     size rather than being a discrepancy a reader has to derive. The effective size must be at
