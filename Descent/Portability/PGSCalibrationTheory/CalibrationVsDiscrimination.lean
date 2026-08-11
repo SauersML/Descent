@@ -66,9 +66,10 @@ scopes `variable`s and this file declares none at that level, so the reopening i
     sems. A deployment reading this as the intercept of a model with a
     non-degenerate score is outside what the body was measured to do.
 
-    Power: the prediction spans -3.89182 to -0.61904 across the design, and the
-    regime boundary itself is swept -- score spread from 0, where the claim is
-    exact, upward to where it fails at 611.05 sems. -/
+    Power: the prediction spans -3.88683 to -0.62016 over the three
+    constant-predictor cells, and the regime boundary itself is swept -- score
+    spread from 0, where the claim is exact, upward to where it fails at 611.05
+    sems. -/
 noncomputable def prevalenceLogit (pi : ℝ) : ℝ :=
   Real.log (pi / (1 - pi))
 
@@ -137,19 +138,28 @@ theorem prevalenceLogit_reflect (pi : ℝ) :
     direction is proved, and together they say this is an UNDER-correction
     rather than a noisy one.
 
-    A SECOND DESIGN MEASURES THIS BODY AND AGREES THAT IT UNDER-CORRECTS.
-    `simcov/battery_pgscal01.py` transcribes this expression verbatim and
-    rejects it at 374.03 sems against the intercept a deployment actually needs,
-    with the identity-link reading rejected at 877.65 on the same cells -- two
-    million individuals per arm, the oracle the `a` solving
+    WHAT THIS BODY IS NOT, and a declaration was deleted to settle it. Reading
+    this difference AS the intercept correction a deployment needs is a separate
+    claim, it was a separate definition, and it is refuted:
+    `simcov/battery_pgscal01.py` measures that packaging against the `a` solving
     `Σᵢ (yᵢ - expit(ηᵢ + a)) = 0` with the source linear predictor held as an
-    offset. That run and `battery_rival01.py` reach the same verdict from
-    different oracles, which is what makes the regime boundary a property of the
-    body rather than of one design.
+    offset, two million individuals per arm, and rejects it at 374.03 sems with
+    the identity-link reading rejected at 877.65 on the same cells. The
+    definition that made that claim was deleted for it (09b6562b); its ledger row
+    keys to no live declaration, and that is the repair having run to completion
+    rather than a loose end.
 
-    Power: the prediction spans -3.27278 to 1.69460 across the design, and the
-    regime boundary is swept in its own right -- score spread from 0, where the
-    claim is exact at 1.16 sems, upward to where it fails at 616.96. -/
+    THIS BODY SURVIVES BECAUSE IT IS THE DIFFERENCE ITSELF AND NOT THAT CLAIM
+    ABOUT IT -- the same distinction the regime qualifier above draws, arrived at
+    from the deployment side. The two runs agree from different oracles about
+    where the difference stops being the correction, which is what makes the
+    boundary a property of the quantity rather than of one design.
+
+    Power: the prediction spans -1.50362 to 1.99941 over the nine
+    constant-predictor cells, three shift sizes at each of three baseline
+    prevalences and one of the shifts negative, and the regime boundary is swept
+    in its own right -- score spread from 0, where the claim is exact at 1.16
+    sems, upward to where it fails at 616.96. -/
 noncomputable def prevalenceCITLShift (pi_source pi_target : ℝ) : ℝ :=
   prevalenceLogit pi_target - prevalenceLogit pi_source
 
