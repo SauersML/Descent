@@ -137,6 +137,28 @@ structure ChartGroupoidRelation (I : Type u) where
   comp_inv : ∀ {X Y} (f : ChartMap (chart X) (chart Y)),
     rel X X (f.trans f.symm) (FinitePartialBijection.refl (chart X).carrier)
 
+/-- The concrete one-point finite model used by the terminal chart system. -/
+def unitFiniteModel : FiniteModel where
+  carrier := Unit
+  fintype := inferInstance
+  decidableEq := inferInstance
+
+/-- A concrete one-chart groupoid relation.  Its representative relation is indiscrete, so
+every partial self-correspondence represents the unique biological arrow.  Besides being the
+terminal test object, this witnesses that `ChartGroupoidRelation`'s laws are jointly inhabited;
+the symmetry theorems below are therefore not implications from an unrealized certificate. -/
+def unitChartGroupoidRelation : ChartGroupoidRelation Unit where
+  chart _ := PangenomeChart.counting unitFiniteModel
+  rel _ _ :=
+    { r := fun _ _ ↦ True
+      iseqv := ⟨fun _ ↦ trivial, fun _ _ _ ↦ trivial, fun _ _ _ _ _ ↦ trivial⟩ }
+  comp_respects := by intros; trivial
+  inv_respects := by intros; trivial
+  one_comp := by intros; trivial
+  comp_one := by intros; trivial
+  inv_comp := by intros; trivial
+  comp_inv := by intros; trivial
+
 namespace ChartGroupoidRelation
 
 variable {I : Type u}
