@@ -238,18 +238,71 @@ a two-neighbour deme and for no other.
     This is the same kind of hypothesis the stepping-stone range lemmas carry when they require
     a separation of at least one.
 
-    Empirical status: UNTESTED as stated here. The level is the quantity under test and its
-    battery is queued; what is quoted below is the comparison against an exact structured
-    coalescent that motivated the form, not a validation of this declaration.
+    Empirical status: **FALSIFIED** (`validation/empirical/simcov/battery_transient01.py`),
+    AND THE REPAIR THIS BODY CARRIES IS NONETHELESS VINDICATED. Those are two findings and the
+    order matters: the `mTot` accounting is right and is a fourteenfold improvement on the
+    spelling it replaced, and what remains after it is a different fault, in a place this
+    body has no coordinate for.
 
-      design                    mTot   exact     this body   superseded `1/(1+θ+2·bigM)`
-      serial1d chain, interior   2m    0.03662   0.04000     0.04000
-      grid2d lattice, interior   4m    0.06558   0.06494     0.12195
+    msprime structured coalescent, `Nₑ = 1000` per deme, every deme derived from one ancestral
+    population 8000 generations ago so the pair starts undifferentiated, 30 diploids from each
+    of two ADJACENT INTERIOR demes, 4 Mb, 150 replicates, Hudson's `F_ST`. The split is far
+    enough back that the transient factor is within 0.03% of one, so what is measured is the
+    LEVEL. Writing `u = 4·Nₑ·m` for the per-neighbour scaled rate:
 
-    On the chain the two spellings coincide, which is why the superseded one survived; on the
-    lattice this body is within 1.0% and the superseded one is 86% high. The per-neighbour
-    reading `1/(1 + 4·Nₑ·m)` is wrong in the other direction, by 2.1x on the chain and 3.3x on
-    the lattice, so `mTot` is chosen by measurement rather than by argument.
+      geometry   u     this body   measured Hudson F_ST   superseded   naive per-neighbour
+      chain      1.0    0.33322    0.27517 ± 0.00413      0.33322      0.49982
+      chain      3.0    0.14286    0.12491 ± 0.00244      0.14286      0.25000
+      chain      6.0    0.07692    0.07254 ± 0.00137      0.07692      0.14286
+      chain     12.0    0.04000    0.03925 ± 0.00083      0.04000      0.07692
+      lattice    1.0    0.20000    0.18980 ± 0.00246      0.33322      0.49999
+      lattice    3.0    0.07692    0.07824 ± 0.00118      0.14286      0.25000
+      lattice    6.0    0.04000    0.04237 ± 0.00070      0.07692      0.14286
+      lattice   12.0    0.02041    0.02069 ± 0.00038      0.04000      0.07692
+
+    Worst cell 14.05 sems and 21.1% relative, on the chain at the weakest migration. Taken by
+    geometry: the chain cells alone are FALSIFIED at 14.05 sems and 21.1%, the lattice cells
+    alone at 4.14 sems and 5.4%. Power: the prediction spans 0.333 to 0.020, a factor of 16.
+
+    WHAT THE REPAIR BOUGHT, which is the reason to keep it. On the lattice the superseded
+    hardcoded two-neighbour level is FALSIFIED at 58.18 sems and 75.6%, against this body's
+    4.14 sems and 5.4% on the identical replicates — the `mTot` accounting removes fourteen
+    fifteenths of the error. On the chain the two are THE SAME NUMBER, cell for cell in the
+    table above, which is the coincidence that let the superseded spelling survive; both are
+    rejected there together, at the same 14.05 sems, and that is the check that the chain
+    cells are measuring the level and not the spelling. The naive per-neighbour reading is
+    FALSIFIED at 54.38 sems on the chain and 148.43 on the lattice, wrong by different factors
+    on the two, so `mTot` is chosen against both rivals by measurement and not by argument.
+
+    WHAT REMAINS IS ISOLATION BY DISTANCE, and this body has no parameter for it. The miss is
+    not a constant: it is 21.1% at `u = 1` and 1.9% at `u = 12` on the chain, and it shrinks
+    the same way on the lattice. The level is an island-model mean field, and a mean field is
+    worst where migration is weakest and neighbours are most strongly correlated with each
+    other — worse in one dimension than in two, which is what the two geometries show.
+
+    THE AGREEMENT IS ALSO A FUNCTION OF HABITAT SIZE, which this signature cannot see: it
+    takes `Nₑ`, `θ`, `mTot` and `t`, and so predicts one number for a neighbouring pair in a
+    habitat of any extent. Measured at `u = 3` (measured / predicted):
+
+      chain, 9 demes    0.858      lattice, 5x5    0.9967
+      chain, 25 demes   0.877      lattice, 9x9    0.9500
+
+    So the 1.0% lattice agreement the motivating table reports is a property of a SMALL
+    lattice, and at 9x9 the same body is 5.0% low. A replacement that is right in a habitat of
+    any size will need a coordinate for the habitat, or an explicit restriction to one.
+
+    THE CONVENTION IS PINNED, and not by assumption. Read against Nei's `G_ST` on the same
+    replicates the body is off by 97.5% at 58.89 sems, so this level is the
+    identity-by-descent `F_ST` that Hudson's estimator targets and is not a heterozygosity
+    ratio. A battery that had reached for `G_ST` would have reported a catastrophe about a
+    convention.
+
+    argument_source: model. `Nₑ`, `m` and `t` are the simulation's own parameters, and `mTot`
+    is READ BACK as the row sum of the migration matrix each run was built with rather than
+    assumed from the geometry — an interior row sums to `2m` on the chain and `4m` on the
+    lattice, a boundary row to half that, and no boundary deme is sampled. The control is the
+    `m = 0` isolation cell, where Hudson `F_ST` must be `coalFst = t/(t + 2·Nₑ)`, run on the
+    identical builder, sampler and estimator: predicted 0.800000, measured 0.798650 ± 0.001402.
 
     THE CLOCK IS THE VALIDATED ONE AND IS NOT RESTATED HERE. `fstTransientDecayFromScaled` is
     `hetDecayFromScaled Nₑ θ · (1 - mTot)`, carrying mutation as well as drift and migration.

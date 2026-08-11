@@ -1,0 +1,477 @@
+{
+ "_battery_sha": "796a6b88ed63dd57",
+ "results": [
+  {
+   "name": "fstConnectedPairAt",
+   "file": "DGP.lean",
+   "source": "(1 / (1 + \u03b8 + 4*Ne*mTot)) * (1 - (hetDecayFromScaled Ne \u03b8 * (1 - mTot))^t)",
+   "note": "Hudson's estimator, the corpus's pairwise convention and the one the identity-by-descent level 1/(1+4*Ne*mTot) targets; positive control 'm=0 isolation [Hudson F_ST must be coalFst = t/(t + 2*Ne)]' passed at 0.96 sems",
+   "regime": "msprime structured coalescent, Ne=1000 per deme, all demes derived from one ancestral population of the same size 8000 generations ago so the pair starts undifferentiated; 30 diploids from each of TWO ADJACENT INTERIOR demes, 4 Mb at r=1e-08 and mu=1e-08, 150 replicates. The chain has 9 demes and the lattice 5x5, and mTot is READ BACK as the row sum of the migration matrix the run was built with rather than assumed from the geometry. The split is far enough back that the transient factor is within 0.03% of one in every cell, so the observable is the PLATEAU and not the approach -- the approach has its own body and its own half-life measurement. Boundary demes are outside the law's stated reach and none is sampled",
+   "span": 0.9387542425390161,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "chain k=2 u=1.0 (mTot=5.00e-04)",
+    "lean": 0.3332173109067254,
+    "truth": 0.27516513598948855,
+    "sem": 0.0041313592948372954,
+    "sems_off": 14.051591927572378,
+    "rel_err": 0.21097213027545203
+   },
+   "cells": [
+    {
+     "design": "chain k=2 u=1.0 (mTot=5.00e-04)",
+     "lean": 0.3332173109067254,
+     "truth": 0.27516513598948855,
+     "sem": 0.0041313592948372954,
+     "sems_off": 14.051591927572378,
+     "rel_err": 0.21097213027545203
+    },
+    {
+     "design": "chain k=2 u=3.0 (mTot=1.50e-03)",
+     "lean": 0.14285631062157286,
+     "truth": 0.12490562846211915,
+     "sem": 0.002436785648729899,
+     "sems_off": 7.3665413159380515,
+     "rel_err": 0.14371395733297732
+    },
+    {
+     "design": "chain k=2 u=6.0 (mTot=3.00e-03)",
+     "lean": 0.07692284023736341,
+     "truth": 0.07254354149545125,
+     "sem": 0.00137213864602868,
+     "sems_off": 3.1915861816056057,
+     "rel_err": 0.06036786530730318
+    },
+    {
+     "design": "chain k=2 u=12.0 (mTot=6.00e-03)",
+     "lean": 0.039999936000102404,
+     "truth": 0.03924525574579237,
+     "sem": 0.0008273719829371533,
+     "sems_off": 0.9121414187013354,
+     "rel_err": 0.019229846766661573
+    },
+    {
+     "design": "lattice k=4 u=1.0 (mTot=1.00e-03)",
+     "lean": 0.19999717750827534,
+     "truth": 0.18979571775013301,
+     "sem": 0.0024649366477241226,
+     "sems_off": 4.138629594217497,
+     "rel_err": 0.05374968349693007
+    },
+    {
+     "design": "lattice k=4 u=3.0 (mTot=3.00e-03)",
+     "lean": 0.07692284023736341,
+     "truth": 0.078236832408643,
+     "sem": 0.0011840732692214148,
+     "sems_off": 1.1097220125099192,
+     "rel_err": 0.016795058424865728
+    },
+    {
+     "design": "lattice k=4 u=6.0 (mTot=6.00e-03)",
+     "lean": 0.039999936000102404,
+     "truth": 0.042370753024062596,
+     "sem": 0.0007034330753556635,
+     "sems_off": 3.3703519311506374,
+     "rel_err": 0.055954092262976575
+    },
+    {
+     "design": "lattice k=4 u=12.0 (mTot=1.20e-02)",
+     "lean": 0.020408146605594608,
+     "truth": 0.02068949288687078,
+     "sem": 0.0003788652218741571,
+     "sems_off": 0.7426025537113619,
+     "rel_err": 0.013598510259026631
+    }
+   ]
+  },
+  {
+   "name": "fstConnectedPairAt [chain interiors alone]",
+   "file": "DGP.lean",
+   "source": "same body, restricted to the chain cells",
+   "note": "split out because the repair is invisible on the chain, where this body and the superseded spelling are the same number, and is the whole claim on the lattice; positive control 'm=0 isolation [Hudson F_ST must be coalFst = t/(t + 2*Ne)]' passed at 0.96 sems",
+   "regime": "msprime structured coalescent, Ne=1000 per deme, all demes derived from one ancestral population of the same size 8000 generations ago so the pair starts undifferentiated; 30 diploids from each of TWO ADJACENT INTERIOR demes, 4 Mb at r=1e-08 and mu=1e-08, 150 replicates. The chain has 9 demes and the lattice 5x5, and mTot is READ BACK as the row sum of the migration matrix the run was built with rather than assumed from the geometry. The split is far enough back that the transient factor is within 0.03% of one in every cell, so the observable is the PLATEAU and not the approach -- the approach has its own body and its own half-life measurement. Boundary demes are outside the law's stated reach and none is sampled",
+   "span": 0.8799584094498043,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "chain k=2 u=1.0 (mTot=5.00e-04)",
+    "lean": 0.3332173109067254,
+    "truth": 0.27516513598948855,
+    "sem": 0.0041313592948372954,
+    "sems_off": 14.051591927572378,
+    "rel_err": 0.21097213027545203
+   },
+   "cells": [
+    {
+     "design": "chain k=2 u=1.0 (mTot=5.00e-04)",
+     "lean": 0.3332173109067254,
+     "truth": 0.27516513598948855,
+     "sem": 0.0041313592948372954,
+     "sems_off": 14.051591927572378,
+     "rel_err": 0.21097213027545203
+    },
+    {
+     "design": "chain k=2 u=3.0 (mTot=1.50e-03)",
+     "lean": 0.14285631062157286,
+     "truth": 0.12490562846211915,
+     "sem": 0.002436785648729899,
+     "sems_off": 7.3665413159380515,
+     "rel_err": 0.14371395733297732
+    },
+    {
+     "design": "chain k=2 u=6.0 (mTot=3.00e-03)",
+     "lean": 0.07692284023736341,
+     "truth": 0.07254354149545125,
+     "sem": 0.00137213864602868,
+     "sems_off": 3.1915861816056057,
+     "rel_err": 0.06036786530730318
+    },
+    {
+     "design": "chain k=2 u=12.0 (mTot=6.00e-03)",
+     "lean": 0.039999936000102404,
+     "truth": 0.03924525574579237,
+     "sem": 0.0008273719829371533,
+     "sems_off": 0.9121414187013354,
+     "rel_err": 0.019229846766661573
+    }
+   ]
+  },
+  {
+   "name": "fstConnectedPairAt [the SUPERSEDED hardcoded two-neighbour level 1/(1 + \u03b8 + 2*bigM), chain, competing]",
+   "file": "DGP.lean",
+   "source": "1 / (1 + \u03b8 + 2*(4*Ne*m))",
+   "note": "MUST pass on the chain and fail on the lattice: on a two-neighbour deme it IS this body, and a design in which it failed on both would be measuring something other than the geometry; positive control 'm=0 isolation [Hudson F_ST must be coalFst = t/(t + 2*Ne)]' passed at 0.96 sems",
+   "regime": "msprime structured coalescent, Ne=1000 per deme, all demes derived from one ancestral population of the same size 8000 generations ago so the pair starts undifferentiated; 30 diploids from each of TWO ADJACENT INTERIOR demes, 4 Mb at r=1e-08 and mu=1e-08, 150 replicates. The chain has 9 demes and the lattice 5x5, and mTot is READ BACK as the row sum of the migration matrix the run was built with rather than assumed from the geometry. The split is far enough back that the transient factor is within 0.03% of one in every cell, so the observable is the PLATEAU and not the approach -- the approach has its own body and its own half-life measurement. Boundary demes are outside the law's stated reach and none is sampled",
+   "span": 0.8799584094498043,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "chain k=2 u=1.0 (mTot=5.00e-04)",
+    "lean": 0.3332173109067254,
+    "truth": 0.27516513598948855,
+    "sem": 0.0041313592948372954,
+    "sems_off": 14.051591927572378,
+    "rel_err": 0.21097213027545203
+   },
+   "cells": [
+    {
+     "design": "chain k=2 u=1.0 (mTot=5.00e-04)",
+     "lean": 0.3332173109067254,
+     "truth": 0.27516513598948855,
+     "sem": 0.0041313592948372954,
+     "sems_off": 14.051591927572378,
+     "rel_err": 0.21097213027545203
+    },
+    {
+     "design": "chain k=2 u=3.0 (mTot=1.50e-03)",
+     "lean": 0.14285631062157286,
+     "truth": 0.12490562846211915,
+     "sem": 0.002436785648729899,
+     "sems_off": 7.3665413159380515,
+     "rel_err": 0.14371395733297732
+    },
+    {
+     "design": "chain k=2 u=6.0 (mTot=3.00e-03)",
+     "lean": 0.07692284023736341,
+     "truth": 0.07254354149545125,
+     "sem": 0.00137213864602868,
+     "sems_off": 3.1915861816056057,
+     "rel_err": 0.06036786530730318
+    },
+    {
+     "design": "chain k=2 u=12.0 (mTot=6.00e-03)",
+     "lean": 0.039999936000102404,
+     "truth": 0.03924525574579237,
+     "sem": 0.0008273719829371533,
+     "sems_off": 0.9121414187013354,
+     "rel_err": 0.019229846766661573
+    }
+   ]
+  },
+  {
+   "name": "fstConnectedPairAt [the NAIVE per-neighbour level 1/(1 + \u03b8 + 4*Ne*m), chain, competing]",
+   "file": "DGP.lean",
+   "source": "1 / (1 + \u03b8 + 4*Ne*m)",
+   "note": "wrong on both geometries and by different factors, so it cannot be right by accident on either; positive control 'm=0 isolation [Hudson F_ST must be coalFst = t/(t + 2*Ne)]' passed at 0.96 sems",
+   "regime": "msprime structured coalescent, Ne=1000 per deme, all demes derived from one ancestral population of the same size 8000 generations ago so the pair starts undifferentiated; 30 diploids from each of TWO ADJACENT INTERIOR demes, 4 Mb at r=1e-08 and mu=1e-08, 150 replicates. The chain has 9 demes and the lattice 5x5, and mTot is READ BACK as the row sum of the migration matrix the run was built with rather than assumed from the geometry. The split is far enough back that the transient factor is within 0.03% of one in every cell, so the observable is the PLATEAU and not the approach -- the approach has its own body and its own half-life measurement. Boundary demes are outside the law's stated reach and none is sampled",
+   "span": 0.846099726251328,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "chain k=2 u=1.0 (mTot=5.00e-04)",
+    "lean": 0.49982263425362117,
+    "truth": 0.27516513598948855,
+    "sem": 0.0041313592948372954,
+    "sems_off": 54.37859121690849,
+    "rel_err": 0.8164460859340649
+   },
+   "cells": [
+    {
+     "design": "chain k=2 u=1.0 (mTot=5.00e-04)",
+     "lean": 0.49982263425362117,
+     "truth": 0.27516513598948855,
+     "sem": 0.0041313592948372954,
+     "sems_off": 54.37859121690849,
+     "rel_err": 0.8164460859340649
+    },
+    {
+     "design": "chain k=2 u=3.0 (mTot=1.50e-03)",
+     "lean": 0.24999747217613696,
+     "truth": 0.12490562846211915,
+     "sem": 0.002436785648729899,
+     "sems_off": 51.334775292696825,
+     "rel_err": 1.001490847563808
+    },
+    {
+     "design": "chain k=2 u=6.0 (mTot=3.00e-03)",
+     "lean": 0.14285632653518177,
+     "truth": 0.07254354149545125,
+     "sem": 0.00137213864602868,
+     "sems_off": 51.24320726861946,
+     "rel_err": 0.9692494133904309
+    },
+    {
+     "design": "chain k=2 u=12.0 (mTot=6.00e-03)",
+     "lean": 0.07692284023741465,
+     "truth": 0.03924525574579237,
+     "sem": 0.0008273719829371533,
+     "sems_off": 45.53886917691803,
+     "rel_err": 0.9600545027830996
+    }
+   ]
+  },
+  {
+   "name": "fstConnectedPairAt [lattice interiors alone]",
+   "file": "DGP.lean",
+   "source": "same body, restricted to the lattice cells",
+   "note": "split out because the repair is invisible on the chain, where this body and the superseded spelling are the same number, and is the whole claim on the lattice; positive control 'm=0 isolation [Hudson F_ST must be coalFst = t/(t + 2*Ne)]' passed at 0.96 sems",
+   "regime": "msprime structured coalescent, Ne=1000 per deme, all demes derived from one ancestral population of the same size 8000 generations ago so the pair starts undifferentiated; 30 diploids from each of TWO ADJACENT INTERIOR demes, 4 Mb at r=1e-08 and mu=1e-08, 150 replicates. The chain has 9 demes and the lattice 5x5, and mTot is READ BACK as the row sum of the migration matrix the run was built with rather than assumed from the geometry. The split is far enough back that the transient factor is within 0.03% of one in every cell, so the observable is the PLATEAU and not the approach -- the approach has its own body and its own half-life measurement. Boundary demes are outside the law's stated reach and none is sampled",
+   "span": 0.8979578269060813,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "lattice k=4 u=1.0 (mTot=1.00e-03)",
+    "lean": 0.19999717750827534,
+    "truth": 0.18979571775013301,
+    "sem": 0.0024649366477241226,
+    "sems_off": 4.138629594217497,
+    "rel_err": 0.05374968349693007
+   },
+   "cells": [
+    {
+     "design": "lattice k=4 u=1.0 (mTot=1.00e-03)",
+     "lean": 0.19999717750827534,
+     "truth": 0.18979571775013301,
+     "sem": 0.0024649366477241226,
+     "sems_off": 4.138629594217497,
+     "rel_err": 0.05374968349693007
+    },
+    {
+     "design": "lattice k=4 u=3.0 (mTot=3.00e-03)",
+     "lean": 0.07692284023736341,
+     "truth": 0.078236832408643,
+     "sem": 0.0011840732692214148,
+     "sems_off": 1.1097220125099192,
+     "rel_err": 0.016795058424865728
+    },
+    {
+     "design": "lattice k=4 u=6.0 (mTot=6.00e-03)",
+     "lean": 0.039999936000102404,
+     "truth": 0.042370753024062596,
+     "sem": 0.0007034330753556635,
+     "sems_off": 3.3703519311506374,
+     "rel_err": 0.055954092262976575
+    },
+    {
+     "design": "lattice k=4 u=12.0 (mTot=1.20e-02)",
+     "lean": 0.020408146605594608,
+     "truth": 0.02068949288687078,
+     "sem": 0.0003788652218741571,
+     "sems_off": 0.7426025537113619,
+     "rel_err": 0.013598510259026631
+    }
+   ]
+  },
+  {
+   "name": "fstConnectedPairAt [the SUPERSEDED hardcoded two-neighbour level 1/(1 + \u03b8 + 2*bigM), lattice, competing]",
+   "file": "DGP.lean",
+   "source": "1 / (1 + \u03b8 + 2*(4*Ne*m))",
+   "note": "MUST pass on the chain and fail on the lattice: on a two-neighbour deme it IS this body, and a design in which it failed on both would be measuring something other than the geometry; positive control 'm=0 isolation [Hudson F_ST must be coalFst = t/(t + 2*Ne)]' passed at 0.96 sems",
+   "regime": "msprime structured coalescent, Ne=1000 per deme, all demes derived from one ancestral population of the same size 8000 generations ago so the pair starts undifferentiated; 30 diploids from each of TWO ADJACENT INTERIOR demes, 4 Mb at r=1e-08 and mu=1e-08, 150 replicates. The chain has 9 demes and the lattice 5x5, and mTot is READ BACK as the row sum of the migration matrix the run was built with rather than assumed from the geometry. The split is far enough back that the transient factor is within 0.03% of one in every cell, so the observable is the PLATEAU and not the approach -- the approach has its own body and its own half-life measurement. Boundary demes are outside the law's stated reach and none is sampled",
+   "span": 0.8799584094498043,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "lattice k=4 u=1.0 (mTot=1.00e-03)",
+    "lean": 0.3332173109067254,
+    "truth": 0.18979571775013301,
+    "sem": 0.0024649366477241226,
+    "sems_off": 58.18469748056756,
+    "rel_err": 0.7556629562391266
+   },
+   "cells": [
+    {
+     "design": "lattice k=4 u=1.0 (mTot=1.00e-03)",
+     "lean": 0.3332173109067254,
+     "truth": 0.18979571775013301,
+     "sem": 0.0024649366477241226,
+     "sems_off": 58.18469748056756,
+     "rel_err": 0.7556629562391266
+    },
+    {
+     "design": "lattice k=4 u=3.0 (mTot=3.00e-03)",
+     "lean": 0.14285631062157286,
+     "truth": 0.078236832408643,
+     "sem": 0.0011840732692214148,
+     "sems_off": 54.57388481999959,
+     "rel_err": 0.825947015280634
+    },
+    {
+     "design": "lattice k=4 u=6.0 (mTot=6.00e-03)",
+     "lean": 0.07692284023736341,
+     "truth": 0.042370753024062596,
+     "sem": 0.0007034330753556635,
+     "sems_off": 49.119224591239046,
+     "rel_err": 0.8154702181874957
+    },
+    {
+     "design": "lattice k=4 u=12.0 (mTot=1.20e-02)",
+     "lean": 0.039999936000102404,
+     "truth": 0.02068949288687078,
+     "sem": 0.0003788652218741571,
+     "sems_off": 50.96916264234391,
+     "rel_err": 0.933345404782044
+    }
+   ]
+  },
+  {
+   "name": "fstConnectedPairAt [the NAIVE per-neighbour level 1/(1 + \u03b8 + 4*Ne*m), lattice, competing]",
+   "file": "DGP.lean",
+   "source": "1 / (1 + \u03b8 + 4*Ne*m)",
+   "note": "wrong on both geometries and by different factors, so it cannot be right by accident on either; positive control 'm=0 isolation [Hudson F_ST must be coalFst = t/(t + 2*Ne)]' passed at 0.96 sems",
+   "regime": "msprime structured coalescent, Ne=1000 per deme, all demes derived from one ancestral population of the same size 8000 generations ago so the pair starts undifferentiated; 30 diploids from each of TWO ADJACENT INTERIOR demes, 4 Mb at r=1e-08 and mu=1e-08, 150 replicates. The chain has 9 demes and the lattice 5x5, and mTot is READ BACK as the row sum of the migration matrix the run was built with rather than assumed from the geometry. The split is far enough back that the transient factor is within 0.03% of one in every cell, so the observable is the PLATEAU and not the approach -- the approach has its own body and its own half-life measurement. Boundary demes are outside the law's stated reach and none is sampled",
+   "span": 0.8461503021942796,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "lattice k=4 u=12.0 (mTot=1.20e-02)",
+    "lean": 0.07692284023741465,
+    "truth": 0.02068949288687078,
+    "sem": 0.0003788652218741571,
+    "sems_off": 148.42573058664698,
+    "rel_err": 2.7179664411315105
+   },
+   "cells": [
+    {
+     "design": "lattice k=4 u=1.0 (mTot=1.00e-03)",
+     "lean": 0.499986943975359,
+     "truth": 0.18979571775013301,
+     "sem": 0.0024649366477241226,
+     "sems_off": 125.84145986535829,
+     "rel_err": 1.6343425968840575
+    },
+    {
+     "design": "lattice k=4 u=3.0 (mTot=3.00e-03)",
+     "lean": 0.2499975000248332,
+     "truth": 0.078236832408643,
+     "sem": 0.0011840732692214148,
+     "sems_off": 145.05915476761933,
+     "rel_err": 2.1953939382292194
+    },
+    {
+     "design": "lattice k=4 u=6.0 (mTot=6.00e-03)",
+     "lean": 0.14285632653527694,
+     "truth": 0.042370753024062596,
+     "sem": 0.0007034330753556635,
+     "sems_off": 142.85022560306498,
+     "rel_err": 2.3715786560165215
+    },
+    {
+     "design": "lattice k=4 u=12.0 (mTot=1.20e-02)",
+     "lean": 0.07692284023741465,
+     "truth": 0.02068949288687078,
+     "sem": 0.0003788652218741571,
+     "sems_off": 148.42573058664698,
+     "rel_err": 2.7179664411315105
+    }
+   ]
+  },
+  {
+   "name": "fstConnectedPairAt [read against Nei's G_ST instead of Hudson, competing]",
+   "file": "DGP.lean",
+   "source": "same body, oracle replaced by 1 - H_S/H_T on the same replicates",
+   "note": "carried so that a disagreement can be charged to the formula or to the F_ST convention rather than to whichever one this battery happened to pick; positive control 'm=0 isolation [Hudson F_ST must be coalFst = t/(t + 2*Ne)]' passed at 0.96 sems",
+   "regime": "msprime structured coalescent, Ne=1000 per deme, all demes derived from one ancestral population of the same size 8000 generations ago so the pair starts undifferentiated; 30 diploids from each of TWO ADJACENT INTERIOR demes, 4 Mb at r=1e-08 and mu=1e-08, 150 replicates. The chain has 9 demes and the lattice 5x5, and mTot is READ BACK as the row sum of the migration matrix the run was built with rather than assumed from the geometry. The split is far enough back that the transient factor is within 0.03% of one in every cell, so the observable is the PLATEAU and not the approach -- the approach has its own body and its own half-life measurement. Boundary demes are outside the law's stated reach and none is sampled",
+   "span": 0.9387542425390161,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "chain k=2 u=1.0 (mTot=5.00e-04)",
+    "lean": 0.3332173109067254,
+    "truth": 0.16868526678324766,
+    "sem": 0.0027938367880156923,
+    "sems_off": 58.89107224489508,
+    "rel_err": 0.9753788653925146
+   },
+   "cells": [
+    {
+     "design": "chain k=2 u=1.0 (mTot=5.00e-04)",
+     "lean": 0.3332173109067254,
+     "truth": 0.16868526678324766,
+     "sem": 0.0027938367880156923,
+     "sems_off": 58.89107224489508,
+     "rel_err": 0.9753788653925146
+    },
+    {
+     "design": "chain k=2 u=3.0 (mTot=1.50e-03)",
+     "lean": 0.14285631062157286,
+     "truth": 0.07524198977629938,
+     "sem": 0.0013949111313563101,
+     "sems_off": 48.47213512414245,
+     "rel_err": 0.8986248376245287
+    },
+    {
+     "design": "chain k=2 u=6.0 (mTot=3.00e-03)",
+     "lean": 0.07692284023736341,
+     "truth": 0.04610348364418443,
+     "sem": 0.0007394829821051019,
+     "sems_off": 41.67689769606985,
+     "rel_err": 0.6684821657086772
+    },
+    {
+     "design": "chain k=2 u=12.0 (mTot=6.00e-03)",
+     "lean": 0.039999936000102404,
+     "truth": 0.028440827288524907,
+     "sem": 0.00043105602186199136,
+     "sems_off": 26.815792206420696,
+     "rel_err": 0.40642659913909324
+    },
+    {
+     "design": "lattice k=4 u=1.0 (mTot=1.00e-03)",
+     "lean": 0.19999717750827534,
+     "truth": 0.11345326840105606,
+     "sem": 0.0015025021033071586,
+     "sems_off": 57.59985887322714,
+     "rel_err": 0.7628154774817726
+    },
+    {
+     "design": "lattice k=4 u=3.0 (mTot=3.00e-03)",
+     "lean": 0.07692284023736341,
+     "truth": 0.04915566571002506,
+     "sem": 0.00064230627498929,
+     "sems_off": 43.23042699186047,
+     "rel_err": 0.5648824835602902
+    },
+    {
+     "design": "lattice k=4 u=6.0 (mTot=6.00e-03)",
+     "lean": 0.039999936000102404,
+     "truth": 0.030061205088193824,
+     "sem": 0.0003672394675014208,
+     "sems_off": 27.063351821982824,
+     "rel_err": 0.3306165166283336
+    },
+    {
+     "design": "lattice k=4 u=12.0 (mTot=1.20e-02)",
+     "lean": 0.020408146605594608,
+     "truth": 0.018860059868504538,
+     "sem": 0.00019364298669112472,
+     "sems_off": 7.994540693381197,
+     "rel_err": 0.08208281139527591
+    }
+   ]
+  }
+ ]
+}

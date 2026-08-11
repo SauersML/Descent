@@ -1,0 +1,118 @@
+FRESHNESS=OK (token SIMCOV-BATTERY-TRANSIENT01-LAPWING-20260811)
+FRESHNESS token literal: SIMCOV-BATTERY-TRANSIENT01-LAPWING-20260811
+
+theta = 4*Ne*mu = 4.00e-05 (the runs are effectively neutral, which is the regime the body's own motivating table is in)
+  chain    k=2 u= 1.0  mTot=5.00e-04 (realised)  body 0.33322  superseded 0.33322  naive 0.49982 | Hudson 0.27517 +/- 0.00413  Nei 0.16869 +/- 0.00279  [transient factor 0.99967]
+  chain    k=2 u= 3.0  mTot=1.50e-03 (realised)  body 0.14286  superseded 0.14286  naive 0.25000 | Hudson 0.12491 +/- 0.00244  Nei 0.07524 +/- 0.00139  [transient factor 1.00000]
+  chain    k=2 u= 6.0  mTot=3.00e-03 (realised)  body 0.07692  superseded 0.07692  naive 0.14286 | Hudson 0.07254 +/- 0.00137  Nei 0.04610 +/- 0.00074  [transient factor 1.00000]
+  chain    k=2 u=12.0  mTot=6.00e-03 (realised)  body 0.04000  superseded 0.04000  naive 0.07692 | Hudson 0.03925 +/- 0.00083  Nei 0.02844 +/- 0.00043  [transient factor 1.00000]
+  lattice  k=4 u= 1.0  mTot=1.00e-03 (realised)  body 0.20000  superseded 0.33322  naive 0.49999 | Hudson 0.18980 +/- 0.00246  Nei 0.11345 +/- 0.00150  [transient factor 0.99999]
+  lattice  k=4 u= 3.0  mTot=3.00e-03 (realised)  body 0.07692  superseded 0.14286  naive 0.25000 | Hudson 0.07824 +/- 0.00118  Nei 0.04916 +/- 0.00064  [transient factor 1.00000]
+  lattice  k=4 u= 6.0  mTot=6.00e-03 (realised)  body 0.04000  superseded 0.07692  naive 0.14286 | Hudson 0.04237 +/- 0.00070  Nei 0.03006 +/- 0.00037  [transient factor 1.00000]
+  lattice  k=4 u=12.0  mTot=1.20e-02 (realised)  body 0.02041  superseded 0.04000  naive 0.07692 | Hudson 0.02069 +/- 0.00038  Nei 0.01886 +/- 0.00019  [transient factor 1.00000]
+
+HABITAT SIZE at u=3.0, which the body has no parameter for (it predicts the same number for every size):
+  chain D=9      body 0.14286   Hudson 0.12260 +/- 0.00246   measured/body 0.8582
+  chain D=25     body 0.14286   Hudson 0.12530 +/- 0.00297   measured/body 0.8771
+  lattice 5x5    body 0.07692   Hudson 0.07667 +/- 0.00186   measured/body 0.9967
+  lattice 9x9    body 0.07692   Hudson 0.07308 +/- 0.00193   measured/body 0.9500
+
+  CONTROL m=0 isolation [Hudson F_ST must be coalFst = t/(t + 2*Ne)]: predicted 0.800000 measured 0.798650 +/- 0.001402
+
+fstConnectedPairAt                       FALSIFIED   (pred span 94%)
+  lean: (1 / (1 + θ + 4*Ne*mTot)) * (1 - (hetDecayFromScaled Ne θ * (1 - mTot))^t)
+  regime: msprime structured coalescent, Ne=1000 per deme, all demes derived from one ancestral population of the same size 8000 generations ago so the pair starts undifferentiated; 30 diploids from each of TWO ADJACENT INTERIOR demes, 4 Mb at r=1e-08 and mu=1e-08, 150 replicates. The chain has 9 demes and the lattice 5x5, and mTot is READ BACK as the row sum of the migration matrix the run was built with rather than assumed from the geometry. The split is far enough back that the transient factor is within 0.03% of one in every cell, so the observable is the PLATEAU and not the approach -- the approach has its own body and its own half-life measurement. Boundary demes are outside the law's stated reach and none is sampled
+  NOTE: Hudson's estimator, the corpus's pairwise convention and the one the identity-by-descent level 1/(1+4*Ne*mTot) targets; positive control 'm=0 isolation [Hudson F_ST must be coalFst = t/(t + 2*Ne)]' passed at 0.96 sems
+  design                                   lean        sim      sem     sems
+  chain k=2 u=1.0 (mTot=5.00e-04)       0.33322    0.27517  0.00413    14.05
+  chain k=2 u=3.0 (mTot=1.50e-03)       0.14286    0.12491  0.00244     7.37
+  chain k=2 u=6.0 (mTot=3.00e-03)       0.07692    0.07254  0.00137     3.19
+  chain k=2 u=12.0 (mTot=6.00e-03)      0.04000    0.03925  0.00083     0.91
+  lattice k=4 u=1.0 (mTot=1.00e-03)     0.20000    0.18980  0.00246     4.14
+  lattice k=4 u=3.0 (mTot=3.00e-03)     0.07692    0.07824  0.00118     1.11
+  lattice k=4 u=6.0 (mTot=6.00e-03)     0.04000    0.04237  0.00070     3.37
+  lattice k=4 u=12.0 (mTot=1.20e-02)    0.02041    0.02069  0.00038     0.74
+
+fstConnectedPairAt [chain interiors alone] FALSIFIED   (pred span 88%)
+  lean: same body, restricted to the chain cells
+  regime: msprime structured coalescent, Ne=1000 per deme, all demes derived from one ancestral population of the same size 8000 generations ago so the pair starts undifferentiated; 30 diploids from each of TWO ADJACENT INTERIOR demes, 4 Mb at r=1e-08 and mu=1e-08, 150 replicates. The chain has 9 demes and the lattice 5x5, and mTot is READ BACK as the row sum of the migration matrix the run was built with rather than assumed from the geometry. The split is far enough back that the transient factor is within 0.03% of one in every cell, so the observable is the PLATEAU and not the approach -- the approach has its own body and its own half-life measurement. Boundary demes are outside the law's stated reach and none is sampled
+  NOTE: split out because the repair is invisible on the chain, where this body and the superseded spelling are the same number, and is the whole claim on the lattice; positive control 'm=0 isolation [Hudson F_ST must be coalFst = t/(t + 2*Ne)]' passed at 0.96 sems
+  design                                   lean        sim      sem     sems
+  chain k=2 u=1.0 (mTot=5.00e-04)       0.33322    0.27517  0.00413    14.05
+  chain k=2 u=3.0 (mTot=1.50e-03)       0.14286    0.12491  0.00244     7.37
+  chain k=2 u=6.0 (mTot=3.00e-03)       0.07692    0.07254  0.00137     3.19
+  chain k=2 u=12.0 (mTot=6.00e-03)      0.04000    0.03925  0.00083     0.91
+
+fstConnectedPairAt [the SUPERSEDED hardcoded two-neighbour level 1/(1 + θ + 2*bigM), chain, competing] FALSIFIED   (pred span 88%)
+  lean: 1 / (1 + θ + 2*(4*Ne*m))
+  regime: msprime structured coalescent, Ne=1000 per deme, all demes derived from one ancestral population of the same size 8000 generations ago so the pair starts undifferentiated; 30 diploids from each of TWO ADJACENT INTERIOR demes, 4 Mb at r=1e-08 and mu=1e-08, 150 replicates. The chain has 9 demes and the lattice 5x5, and mTot is READ BACK as the row sum of the migration matrix the run was built with rather than assumed from the geometry. The split is far enough back that the transient factor is within 0.03% of one in every cell, so the observable is the PLATEAU and not the approach -- the approach has its own body and its own half-life measurement. Boundary demes are outside the law's stated reach and none is sampled
+  NOTE: MUST pass on the chain and fail on the lattice: on a two-neighbour deme it IS this body, and a design in which it failed on both would be measuring something other than the geometry; positive control 'm=0 isolation [Hudson F_ST must be coalFst = t/(t + 2*Ne)]' passed at 0.96 sems
+  design                                   lean        sim      sem     sems
+  chain k=2 u=1.0 (mTot=5.00e-04)       0.33322    0.27517  0.00413    14.05
+  chain k=2 u=3.0 (mTot=1.50e-03)       0.14286    0.12491  0.00244     7.37
+  chain k=2 u=6.0 (mTot=3.00e-03)       0.07692    0.07254  0.00137     3.19
+  chain k=2 u=12.0 (mTot=6.00e-03)      0.04000    0.03925  0.00083     0.91
+
+fstConnectedPairAt [the NAIVE per-neighbour level 1/(1 + θ + 4*Ne*m), chain, competing] FALSIFIED   (pred span 85%)
+  lean: 1 / (1 + θ + 4*Ne*m)
+  regime: msprime structured coalescent, Ne=1000 per deme, all demes derived from one ancestral population of the same size 8000 generations ago so the pair starts undifferentiated; 30 diploids from each of TWO ADJACENT INTERIOR demes, 4 Mb at r=1e-08 and mu=1e-08, 150 replicates. The chain has 9 demes and the lattice 5x5, and mTot is READ BACK as the row sum of the migration matrix the run was built with rather than assumed from the geometry. The split is far enough back that the transient factor is within 0.03% of one in every cell, so the observable is the PLATEAU and not the approach -- the approach has its own body and its own half-life measurement. Boundary demes are outside the law's stated reach and none is sampled
+  NOTE: wrong on both geometries and by different factors, so it cannot be right by accident on either; positive control 'm=0 isolation [Hudson F_ST must be coalFst = t/(t + 2*Ne)]' passed at 0.96 sems
+  design                                   lean        sim      sem     sems
+  chain k=2 u=1.0 (mTot=5.00e-04)       0.49982    0.27517  0.00413    54.38
+  chain k=2 u=3.0 (mTot=1.50e-03)       0.25000    0.12491  0.00244    51.33
+  chain k=2 u=6.0 (mTot=3.00e-03)       0.14286    0.07254  0.00137    51.24
+  chain k=2 u=12.0 (mTot=6.00e-03)      0.07692    0.03925  0.00083    45.54
+
+fstConnectedPairAt [lattice interiors alone] FALSIFIED   (pred span 90%)
+  lean: same body, restricted to the lattice cells
+  regime: msprime structured coalescent, Ne=1000 per deme, all demes derived from one ancestral population of the same size 8000 generations ago so the pair starts undifferentiated; 30 diploids from each of TWO ADJACENT INTERIOR demes, 4 Mb at r=1e-08 and mu=1e-08, 150 replicates. The chain has 9 demes and the lattice 5x5, and mTot is READ BACK as the row sum of the migration matrix the run was built with rather than assumed from the geometry. The split is far enough back that the transient factor is within 0.03% of one in every cell, so the observable is the PLATEAU and not the approach -- the approach has its own body and its own half-life measurement. Boundary demes are outside the law's stated reach and none is sampled
+  NOTE: split out because the repair is invisible on the chain, where this body and the superseded spelling are the same number, and is the whole claim on the lattice; positive control 'm=0 isolation [Hudson F_ST must be coalFst = t/(t + 2*Ne)]' passed at 0.96 sems
+  design                                   lean        sim      sem     sems
+  lattice k=4 u=1.0 (mTot=1.00e-03)     0.20000    0.18980  0.00246     4.14
+  lattice k=4 u=3.0 (mTot=3.00e-03)     0.07692    0.07824  0.00118     1.11
+  lattice k=4 u=6.0 (mTot=6.00e-03)     0.04000    0.04237  0.00070     3.37
+  lattice k=4 u=12.0 (mTot=1.20e-02)    0.02041    0.02069  0.00038     0.74
+
+fstConnectedPairAt [the SUPERSEDED hardcoded two-neighbour level 1/(1 + θ + 2*bigM), lattice, competing] FALSIFIED   (pred span 88%)
+  lean: 1 / (1 + θ + 2*(4*Ne*m))
+  regime: msprime structured coalescent, Ne=1000 per deme, all demes derived from one ancestral population of the same size 8000 generations ago so the pair starts undifferentiated; 30 diploids from each of TWO ADJACENT INTERIOR demes, 4 Mb at r=1e-08 and mu=1e-08, 150 replicates. The chain has 9 demes and the lattice 5x5, and mTot is READ BACK as the row sum of the migration matrix the run was built with rather than assumed from the geometry. The split is far enough back that the transient factor is within 0.03% of one in every cell, so the observable is the PLATEAU and not the approach -- the approach has its own body and its own half-life measurement. Boundary demes are outside the law's stated reach and none is sampled
+  NOTE: MUST pass on the chain and fail on the lattice: on a two-neighbour deme it IS this body, and a design in which it failed on both would be measuring something other than the geometry; positive control 'm=0 isolation [Hudson F_ST must be coalFst = t/(t + 2*Ne)]' passed at 0.96 sems
+  design                                   lean        sim      sem     sems
+  lattice k=4 u=1.0 (mTot=1.00e-03)     0.33322    0.18980  0.00246    58.18
+  lattice k=4 u=3.0 (mTot=3.00e-03)     0.14286    0.07824  0.00118    54.57
+  lattice k=4 u=6.0 (mTot=6.00e-03)     0.07692    0.04237  0.00070    49.12
+  lattice k=4 u=12.0 (mTot=1.20e-02)    0.04000    0.02069  0.00038    50.97
+
+fstConnectedPairAt [the NAIVE per-neighbour level 1/(1 + θ + 4*Ne*m), lattice, competing] FALSIFIED   (pred span 85%)
+  lean: 1 / (1 + θ + 4*Ne*m)
+  regime: msprime structured coalescent, Ne=1000 per deme, all demes derived from one ancestral population of the same size 8000 generations ago so the pair starts undifferentiated; 30 diploids from each of TWO ADJACENT INTERIOR demes, 4 Mb at r=1e-08 and mu=1e-08, 150 replicates. The chain has 9 demes and the lattice 5x5, and mTot is READ BACK as the row sum of the migration matrix the run was built with rather than assumed from the geometry. The split is far enough back that the transient factor is within 0.03% of one in every cell, so the observable is the PLATEAU and not the approach -- the approach has its own body and its own half-life measurement. Boundary demes are outside the law's stated reach and none is sampled
+  NOTE: wrong on both geometries and by different factors, so it cannot be right by accident on either; positive control 'm=0 isolation [Hudson F_ST must be coalFst = t/(t + 2*Ne)]' passed at 0.96 sems
+  design                                   lean        sim      sem     sems
+  lattice k=4 u=1.0 (mTot=1.00e-03)     0.49999    0.18980  0.00246   125.84
+  lattice k=4 u=3.0 (mTot=3.00e-03)     0.25000    0.07824  0.00118   145.06
+  lattice k=4 u=6.0 (mTot=6.00e-03)     0.14286    0.04237  0.00070   142.85
+  lattice k=4 u=12.0 (mTot=1.20e-02)    0.07692    0.02069  0.00038   148.43
+
+fstConnectedPairAt [read against Nei's G_ST instead of Hudson, competing] FALSIFIED   (pred span 94%)
+  lean: same body, oracle replaced by 1 - H_S/H_T on the same replicates
+  regime: msprime structured coalescent, Ne=1000 per deme, all demes derived from one ancestral population of the same size 8000 generations ago so the pair starts undifferentiated; 30 diploids from each of TWO ADJACENT INTERIOR demes, 4 Mb at r=1e-08 and mu=1e-08, 150 replicates. The chain has 9 demes and the lattice 5x5, and mTot is READ BACK as the row sum of the migration matrix the run was built with rather than assumed from the geometry. The split is far enough back that the transient factor is within 0.03% of one in every cell, so the observable is the PLATEAU and not the approach -- the approach has its own body and its own half-life measurement. Boundary demes are outside the law's stated reach and none is sampled
+  NOTE: carried so that a disagreement can be charged to the formula or to the F_ST convention rather than to whichever one this battery happened to pick; positive control 'm=0 isolation [Hudson F_ST must be coalFst = t/(t + 2*Ne)]' passed at 0.96 sems
+  design                                   lean        sim      sem     sems
+  chain k=2 u=1.0 (mTot=5.00e-04)       0.33322    0.16869  0.00279    58.89
+  chain k=2 u=3.0 (mTot=1.50e-03)       0.14286    0.07524  0.00139    48.47
+  chain k=2 u=6.0 (mTot=3.00e-03)       0.07692    0.04610  0.00074    41.68
+  chain k=2 u=12.0 (mTot=6.00e-03)      0.04000    0.02844  0.00043    26.82
+  lattice k=4 u=1.0 (mTot=1.00e-03)     0.20000    0.11345  0.00150    57.60
+  lattice k=4 u=3.0 (mTot=3.00e-03)     0.07692    0.04916  0.00064    43.23
+  lattice k=4 u=6.0 (mTot=6.00e-03)     0.04000    0.03006  0.00037    27.06
+  lattice k=4 u=12.0 (mTot=1.20e-02)    0.02041    0.01886  0.00019     7.99
+
+================ SUMMARY ================
+FALSIFIED                          fstConnectedPairAt                                             worst     14.05 sems,    21.10% rel
+FALSIFIED                          fstConnectedPairAt [chain interiors alone]                     worst     14.05 sems,    21.10% rel
+FALSIFIED                          fstConnectedPairAt [the SUPERSEDED hardcoded two-neighbour lev worst     14.05 sems,    21.10% rel
+FALSIFIED                          fstConnectedPairAt [the NAIVE per-neighbour level 1/(1 + θ + 4 worst     54.38 sems,    81.64% rel
+FALSIFIED                          fstConnectedPairAt [lattice interiors alone]                   worst      4.14 sems,     5.37% rel
+FALSIFIED                          fstConnectedPairAt [the SUPERSEDED hardcoded two-neighbour lev worst     58.18 sems,    75.57% rel
+FALSIFIED                          fstConnectedPairAt [the NAIVE per-neighbour level 1/(1 + θ + 4 worst    148.43 sems,   271.80% rel
+FALSIFIED                          fstConnectedPairAt [read against Nei's G_ST instead of Hudson, worst     58.89 sems,    97.54% rel
