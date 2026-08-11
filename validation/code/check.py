@@ -1527,14 +1527,50 @@ def run_identifications() -> int:
         (r"\bmaf\b|\bmaf_causal\b|\bmaf_tag\b",
          "allele frequency: of the causal variant or of the tag, which differ once r < 1"),
     ]
+    #
+    #     WHAT THE ARGUMENT TEXT WAS, AND WHY IT MADE THIS SCREEN FIRE ON DEME
+    #     COUNTS. The scan matched `([^:]*)` -- everything between the definition's
+    #     name and the FIRST colon -- so on `def hudsonFst {D : ℕ} ...` it saw the
+    #     four characters ` {D ` and stopped before the type. `\bD\b` matched, and
+    #     the finding read "linkage disequilibrium: haplotype D or dosage
+    #     covariance" about a NATURAL NUMBER OF DEMES. Every one of the 20 findings
+    #     this screen carried was that: `{D : ℕ}` in the many-deme files, none of
+    #     them an LD quantity, none of them repairable by a `Convention:` line that
+    #     would have had to name a convention the argument does not have. A screen
+    #     that misfires is a screen that gets ignored -- 3l says so in this file
+    #     about this same trap -- and twenty false positives is how a real one
+    #     later gets waved through.
+    #
+    #     TWO RESTRICTIONS, EACH FROM A PRINCIPLE THE FILE ALREADY HOLDS. The
+    #     binder must be EXPLICIT, because `explicit_binders` above records that
+    #     implicit `{}` and instance `[]` arguments "are not passed by hand" and a
+    #     convention is a thing a CALLER has to get right. And its type must be
+    #     exactly `ℝ`, because the ambiguity being screened for is between two real
+    #     scalars -- haplotype `D` against dosage covariance, allelic against
+    #     genotypic variance -- so a `D : ℕ` deme count and a `D : Pair → ℝ`
+    #     degradation map are not two readings of one quantity, they are other
+    #     quantities that share a letter.
+    #
+    #     MEASURED BEFORE AND AFTER, over the whole corpus: 20 findings become 0,
+    #     and all 20 were the deme count. Nothing that passed starts failing, since
+    #     the rule only ever narrows. The motivating case is retained and checked in
+    #     `test_check.py`: `def ldCorrelationSq (D p q : ℝ)` with no `Convention:`
+    #     still fires, which is the shape of the incident in the paragraph above.
     undeclared_conv = []
     for f in ident_lean_files():
         raw = open(f).read()
-        for m in re.finditer(r"/--((?:(?!-/).)*)-/\s*\n(?:noncomputable )?def ([A-Za-z_0-9'.]+)([^:]*):",
+        for m in re.finditer(r"/--((?:(?!-/).)*)-/\s*\n"
+                             r"(?:noncomputable\s+|private\s+|protected\s+)*"
+                             r"def\s+([A-Za-z_][A-Za-z_0-9'.]*)"
+                             r"((?:(?!:=|\bwhere\b)[\s\S])*?)(?::=|\bwhere\b)",
                              raw, re.S):
-            doc, name, args = m.group(1), m.group(2).split(".")[-1], m.group(3)
+            doc, name, sig = m.group(1), m.group(2).split(".")[-1], m.group(3)
+            if "Convention:" in doc:
+                continue
+            passed = " ".join(n for names, ty in explicit_binders(sig) for n in names
+                              if ty == "ℝ")
             for pat, why in AMBIGUOUS:
-                if re.search(pat, args) and "Convention:" not in doc:
+                if re.search(pat, passed):
                     undeclared_conv.append(
                         f"{os.path.relpath(f, IDENT_ROOT)}: `{name}` takes an ambiguity-prone "
                         f"argument and declares no Convention; {why}")

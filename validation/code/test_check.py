@@ -926,6 +926,21 @@ noncomputable def gwasDetectionPower (beta sampleSize : ℝ) : ℝ :=
   beta * sampleSize
 """),
      "takes no alpha-like argument"),
+    # The ambiguity-prone-argument screen, planted on the shape of the incident it
+    # exists for: `ldCorrelationSq` returned r-squared over four when fed the `D`
+    # that `admixtureLDTwoLocus` produces. An explicit real-valued `D` with no
+    # `Convention:` line is that shape, and it must still fire after the screen was
+    # narrowed to explicit real binders -- narrowing a screen until it catches
+    # nothing is the failure mode of fixing a false positive.
+    ("identifications", "an explicit real D with no declared convention",
+     clean_plus("Descent/Sub.lean", CLEAN_SUB + """
+/-- Squared LD correlation built from the haplotype coefficient.
+
+    Empirical status: UNTESTED. -/
+noncomputable def ldCorrelationSqProbe (D p q : ℝ) : ℝ :=
+  D * p * q
+"""),
+     "ambiguity-prone"),
     # A macro at TERM level rewrites the statement a reader thinks they read.
     ("identifications", "a term-level macro",
      clean_plus("Descent/Sub.lean", CLEAN_SUB + """
@@ -1253,6 +1268,22 @@ NEGATIVE_CASES = [
                 CLEAN_SUB.replace("namespace Descent",
                                   "set_option maxHeartbeats 2000000\n\nnamespace Descent")),
      "set_option"),
+    # THE DEME COUNT, which is what this screen actually reported for a long time.
+    # It matched the text between the definition's name and the FIRST colon, so on
+    # `def f {D : ℕ} ...` it saw ` {D ` and never the type, and announced "linkage
+    # disequilibrium: haplotype D or dosage covariance" about a natural number of
+    # demes -- twenty times, every one of them false. The trap is the exact shape:
+    # an IMPLICIT `D` that is a count, alongside an explicit binder that is not a
+    # real, so both halves of the narrowing are exercised at once.
+    ("identifications", "an implicit deme count named D, which is not an LD quantity",
+     clean_plus("Descent/Sub.lean", CLEAN_SUB + """
+/-- A projection index over a habitat of `D` demes.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM -- an index into a deme list. -/
+noncomputable def demeIndexProbe {D : ℕ} (i : Fin D) : ℕ :=
+  i.val
+"""),
+     "ambiguity-prone"),
     # The other two markup shapes, in the accepting direction: a bolded head that
     # DOES carry a clause must not be reported, or the tolerance would just move the
     # evasion rather than close it.
