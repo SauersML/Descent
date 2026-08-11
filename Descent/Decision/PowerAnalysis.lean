@@ -472,7 +472,13 @@ section OptimalAllocation
     `C` is fitted at the SMALLEST sample size and then used to predict the other
     three. That is what makes this a test of the shape `n/(n + C)` rather than
     of a constant fitted to the curve it is being checked against -- a fit to
-    all four points would agree with almost any monotone saturating form. -/
+    all four points would agree with almost any monotone saturating form.
+
+    Power: the prediction spans 0.89372 to 0.98057 across the `n` sweep, which is
+    narrow because the curve is already near saturation there; what carries the
+    test is that `C` is fitted at the smallest `n` and then used to predict the
+    rest, so the SHAPE is on trial rather than a constant fitted to the very
+    curve it is checked against. -/
 noncomputable def heritabilityFractionFromN (n C : ℝ) : ℝ :=
   Descent.Core.share n C
 

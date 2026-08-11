@@ -263,7 +263,9 @@ and specificity as free reals, in that order and in the reverse order respective
     Empirical status: **VALIDATED** (`simcov/battery_clinical.py`). Worst cell
     1.57 sems at 0.5 percent relative across the prevalence sweep.
 
-    Power, and it is the point of the design: the prevalence-free reading
+    Power: the prevalence is swept 0.01 / 0.05 / 0.20 / 0.50, a factor of fifty,
+    which is what puts the PREVALENCE DEPENDENCE on trial rather than a value at
+    one point. The prevalence-free reading
     `sens / (sens + (1 - spec))` -- the number a balanced test set gives, and the
     commonest error in this family -- is carried as a named competitor on the
     same cells and is FALSIFIED at 1568.79 sems and 1741 percent relative. It is

@@ -427,7 +427,14 @@ tests on genotyped loci. What needed narrowing was this gloss, not the constant.
 Empirical status: **VALIDATED** (`validation/empirical/blind_maf/`). Scope caveat: HWE,
 unlinked
 loci, no LD or structure, and not every statistic that could be called fourth-cumulant-based
-was constructed. -/
+was constructed.
+
+Power: MAF is swept over 36 points, each statistic calibrated against its own null at its own
+frequency so size is exactly 0.05 everywhere, and the latent-locus channel's power falls to
+that nominal 0.050 at MAF 0.210 -- the bias-corrected zero-crossing landing at
+`q = 0.21149 ± 0.00068` against the derived `(3-√3)/6 = 0.21132`, within 0.25 standard errors.
+The control arm with both loci measured holds power 0.981 to 0.997 at all 36 points including
+`q*`, so the dip is a property of the channel and not of the instrument. -/
 noncomputable def gaussianKurtosisMaf : ℝ := (3 - Real.sqrt 3) / 6
 
 /-- Reference evaluation in closed surd form. -/

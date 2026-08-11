@@ -341,7 +341,13 @@ noncomputable def OneLocusArchitecture.witness : OneLocusArchitecture where
     degenerate -- a control that cannot fail gates nothing -- and downgraded every competitor
     to a lead. The worst cell here, 5.1 sems at `p = 0.85`, is 0.24% relative and sits inside
     the 2% floor the harness applies for exactly this reason: with 4×10⁶ individuals
-    everything is significantly something. -/
+    everything is significantly something.
+
+    Power: the prediction spans 0.44005 to 1.47991 across the five frequencies,
+    with `p` swept ACROSS one half so the factor `1 - 2p` changes sign -- which is
+    what separates this body from every competitor on the same cells:
+    `a + d(1-p)` misses by up to 3357 sems, `a + d·p` by 6125, and a doubled
+    dominance factor by 2773. -/
 noncomputable def OneLocusArchitecture.averageEffect (m : OneLocusArchitecture) : ℝ :=
   m.a + m.d * (1 - 2 * m.p)
 

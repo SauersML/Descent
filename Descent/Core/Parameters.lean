@@ -408,7 +408,11 @@ the `nDemes = 2` member, and that theorem is what carries the measurement across
     `4 Nₑ m` sixteenfold at `d = 2` and `d = 20`, so a candidate cannot pass by
     absorbing the correction into the rate.
 
-    POWER, and it is why a single deme count could never have done this. Three
+    Power: a single deme count could never have done this. `d` is swept over 2,
+    3, 5 and 20 at fixed `4 Nₑ m = 4`, where `d/(d-1)` runs 2.000, 1.500, 1.250,
+    1.053 -- a factor of two, so the FORM of the correction is on trial and not
+    its value at one point -- and `4 Nₑ m` is swept sixteenfold besides, so a
+    candidate cannot pass by absorbing the correction into the rate. Three
     rivals are carried on the same cells and all three are rejected:
 
       many-deme limit, correction dropped     FALSIFIED at 18.03 sems (89.9%)

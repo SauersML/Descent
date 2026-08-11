@@ -75,6 +75,13 @@ section GxEInteraction
     have rejected nothing, which is what happened on the first attempt. The positive control
     is the realised mean of `E` against the `E_mean` fed in.
 
+    Power: the prediction spans 0.02506 to 1.02471 across the design -- 98 percent
+    -- with `E_mean` swept through zero and into the negative, so BOTH competitors
+    move with the design rather than sitting constant: reading the environment's
+    second moment in as well, `β_G + β_GxE(E_mean + Var E)`, misses by 330 sems and
+    halving the interaction by 413. A constant competitor would have been reported
+    NO POWER and rejected nothing, which is what happened on the first attempt.
+
     What is NOT established is the model: that real gene-environment interplay is linear in
     `G·E` with `E` independent of `G`. The simulation enacts that model, so it establishes
     the marginal slope GIVEN it. -/

@@ -450,7 +450,16 @@ gets both of these backwards.
 
 Empirical status: **VALIDATED** on the population half, with **two claims corrected and one
 practical caveat added**. Exact rational sweep and finite-sample arm in
-`validation/empirical/ld_coverage_boundary/`. -/
+`validation/empirical/ld_coverage_boundary/`.
+
+Power: the population half is swept in exact rational arithmetic over 8 allele-frequency
+pairs by 10 values of `D`, and charged cells equal product cells at EVERY `r² < 1`, down to a
+smallest genotype-cell mass of 6.25e-20 at `r² = 1 - 2e-9`. What that sweep refutes is the
+`r²` reading of the boundary, in both directions: of the 72 configurations carrying a
+vanishing haplotype at `r² < 1`, 56 lose coverage strictly, the worst at
+`r² = 1/81 ≈ 0.0123`; and at `p = 1/20` raising `r²` from 0 to 0.81 INCREASES the rarest cell
+probability, from 6.25e-6 to 2.26e-5. No `r²` threshold implies the positive floor the
+theorem needs, which is the claim the sweep was built to test. -/
 
 /-- The witness family: two atoms, values `1` and `0`, hence moduli `0` and `1`. -/
 noncomputable def copyWitnessFamily : Blindness.BundleFamily 2 where
