@@ -117,10 +117,14 @@ theorem pgsR2_eq_explainedR2FromTransportMoments (cov_pgs_y var_pgs var_y : ℝ)
     Empirical status: **VALIDATED** through `pgsR2`, measured on the
     same runs (`battery_transfer.py`, `test_transfer_chain`) at 0.02 sems.
 
-    Power: this is the SOURCE end of the span `pgsR2` records for those runs --
-    0.23227 here at 0.02 sems against 0.11581 transported at 1.35 -- so the
-    design moves the prediction by a factor of two between the two ends, and the
-    source end is the one where the weights were fitted. -/
+    Power: the prediction spans 0.11581 to 0.23227 across the design, a factor of
+    two, and this head is the SOURCE end of it -- the end where the weights were
+    fitted. PROVENANCE, since the span is not tabulated on this head: it is
+    recorded once for the chain at `pgsR2`, whose note reads "source and
+    transported: 0.02 and 1.35 sems over a prediction spanning 0.11581 to
+    0.23227"; this head's own record is the 0.02-sems one, and
+    `transportedTargetR2SharedLD` independently states 0.11581 at 1.35, which
+    fixes which end is which without arithmetic. -/
 noncomputable def sourceTruthR2SharedLD {m : ℕ}
     (β_source : Fin m → ℝ) (ld : Fin m → Fin m → ℝ) (var_y : ℝ) : ℝ :=
   pgsR2 (sharedLDGeneticVariance β_source ld)
@@ -135,10 +139,14 @@ noncomputable def sourceTruthR2SharedLD {m : ℕ}
     the source weights were not fitted there: 1.35 sems, predicted 0.11581
     against a measured 0.12099.
 
-    Power: this is the TRANSPORTED end of the span `pgsR2` records for those runs
-    -- 0.11581 here against 0.23227 in the source -- so the design moves the
-    prediction by a factor of two between the two ends, and this end is the one
-    the source weights were not fitted for. -/
+    Power: the prediction spans 0.11581 to 0.23227 across the design, a factor of
+    two, and this head is the TRANSPORTED end of it -- the end the source weights
+    were not fitted for, which is the one that matters. PROVENANCE, since the
+    span is not tabulated on this head: it is recorded once for the chain at
+    `pgsR2`, whose note reads "source and transported: 0.02 and 1.35 sems over a
+    prediction spanning 0.11581 to 0.23227"; this head states 0.11581 at 1.35 in
+    its own paragraph above, which fixes it as the transported end without
+    arithmetic. -/
 noncomputable def transportedTargetR2SharedLD {m : ℕ}
     (β_source β_target : Fin m → ℝ) (ld : Fin m → Fin m → ℝ) (var_y : ℝ) : ℝ :=
   pgsR2 (pgsPhenoCov β_source β_target ld)

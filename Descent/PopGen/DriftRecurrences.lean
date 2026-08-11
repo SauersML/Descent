@@ -210,7 +210,6 @@ noncomputable def hetMutationFloor (Ne mu : ℝ) : ℝ :=
     against it. Changing the body to a harmonic mean would falsify both. Which of the two
     means is the right effective rate for asymmetric migration is not settled anywhere in
     this corpus, and nothing here should be read as settling it.
-    nothing about the harmonic mean.
 
     Empirical status: **VALIDATED as a constancy claim**
     (`validation/empirical/simcov/battery_bulk13.py`). The claim is that
@@ -233,7 +232,7 @@ noncomputable def hetMutationFloor (Ne mu : ℝ) : ℝ :=
     Fed to the deme-corrected two-deme form. The uncorrected
     `1/(1 + 4 Ne m_eff)` would miss every row by 14 sems, which is the separate
     defect recorded on `asymmetricFst`. A test of this quantity tests the arithmetic
-    mean and says
+    mean and says nothing about the harmonic mean.
 
     Power: the asymmetry ratio is the swept input and it runs from 1 to 9 while
     the mean rate is held at 1.0e-3 and the prediction at 0.11111 by the claim
