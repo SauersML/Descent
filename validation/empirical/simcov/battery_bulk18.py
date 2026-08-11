@@ -75,9 +75,9 @@ def test_fst_drift_migration_deme_sweep():
            "runs 2, 4, 10, 40; F_ST read as 1 - E[T_within]/E[T_between] from "
            "coalescence times, so no estimator convention and no mutation "
            "model enters")
-    record("fstDriftMigration", "DGP.lean", "1 / (1 + bigM)", cells,
+    record("fstDriftMigrationManyDemes", "DGP.lean", "1 / (1 + bigM)", cells,
            regime=reg)
-    record("fstDriftMigration [CANDIDATE: with islandDemeCorrection n/(n-1)]",
+    record("fstDriftMigrationManyDemes [CANDIDATE: with islandDemeCorrection n/(n-1)]",
            "DGP.lean", "1 / (1 + bigM * n/(n-1))", cells_corr, regime=reg)
 
 
