@@ -1026,6 +1026,29 @@ noncomputable def gwasDetectionPower (beta sampleSize : ℝ) : ℝ :=
 macro "myRate" x:term : term => `(cleanRate $x)
 """),
      "non-tactic macro"),
+    # The Power screen's MARKUP shapes. Written as literal `Empirical status: VALIDATED`
+    # the match never saw a bolded head, so the requirement was evaded by two
+    # asterisks and 224 notes had never been checked. Both spellings are planted, in
+    # both directions, because a tolerance that is only tested on the spelling it was
+    # written for is the bug it replaced.
+    ("identifications", "a BOLDED VALIDATED head with no Power clause",
+     clean_plus("Descent/Sub.lean", CLEAN_SUB + """
+/-- A chart validated in the corpus's bolded spelling.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bold.py`). -/
+noncomputable def boldedNoSpan (x : ℝ) : ℝ :=
+  x + 1
+"""),
+     "declares no Power"),
+    ("identifications", "a PLAIN VALIDATED head with no Power clause",
+     clean_plus("Descent/Sub.lean", CLEAN_SUB + """
+/-- A chart validated in the plain spelling.
+
+    Empirical status: VALIDATED (`simcov/battery_plain.py`). -/
+noncomputable def plainNoSpan (x : ℝ) : ℝ :=
+  x + 1
+"""),
+     "declares no Power"),
     # The Power screen, which had no calibration at all until the scale rule changed.
     # A VALIDATED note whose prediction barely moves cannot have rejected a wrong
     # functional form, whatever its sems say.
@@ -1329,6 +1352,34 @@ NEGATIVE_CASES = [
                 CLEAN_SUB.replace("namespace Descent",
                                   "set_option maxHeartbeats 2000000\n\nnamespace Descent")),
      "set_option"),
+    # The other two markup shapes, in the accepting direction: a bolded head that
+    # DOES carry a clause must not be reported, or the tolerance would just move the
+    # evasion rather than close it.
+    ("identifications", "a BOLDED VALIDATED head that carries a Power clause",
+     clean_plus("Descent/Sub.lean", CLEAN_SUB + """
+/-- A chart validated in the bolded spelling, with its span declared.
+
+    Empirical status: **VALIDATED** (`simcov/battery_bold2.py`).
+
+    Power: the prediction spans 0.11 to 0.80 across the design. -/
+noncomputable def boldedWithSpan (x : ℝ) : ℝ :=
+  x + 1
+"""),
+     "declares no Power"),
+    # THE BURN-DOWN BUDGET, in the direction that makes it a ratchet rather than a
+    # suppression file: arrears pinned in the corpus's own budget file are absorbed,
+    # so the tolerance can land before the clauses are written. The POSITIVE direction
+    # is already covered -- every case above runs against a fixture with NO budget
+    # file, which means a pin of zero, which is why they are reported at all.
+    ("identifications", "a powerless head inside the pinned burn-down budget",
+     dict(clean_plus("Descent/Sub.lean", CLEAN_SUB + """
+/-- A chart whose Power clause has not been written yet.
+
+    Empirical status: **VALIDATED** (`simcov/battery_arrears.py`). -/
+noncomputable def arrearsHead (x : ℝ) : ℝ :=
+  x + 1
+"""), **{"validation/code/results/power_budget.json": '{"powerless": 1}\n'}),
+     "declares no Power"),
     # The Power screen's two boundaries after the scale rule changed. The first is the
     # case that forced the change: a quantity whose natural scale is 1e-3 whose
     # prediction nonetheless moves by 88% of its own magnitude. The second is the

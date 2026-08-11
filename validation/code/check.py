@@ -2203,10 +2203,26 @@ def run_identifications() -> int:
     #     ignored, and inferring intent from numbers is exactly the move that
     #     produced the incident. The author states the span; the guard checks the
     #     span is stated and is not degenerate.
+    #
+    #     WHAT THE CLAUSE IS ACTUALLY FOR, restated because the first wording invited
+    #     the wrong reading: it answers "WHAT VARIED ACROSS THE DESIGN, AND WHAT COULD
+    #     HAVE MOVED BUT DID NOT" -- not "how much does the prediction move". The two
+    #     come apart on a CONSTANCY CLAIM, whose whole content is that a quantity does
+    #     NOT depend on something. There the prediction is flat BY THE CLAIM and a wide
+    #     span would be a defect rather than a virtue, so the clause names the swept
+    #     INPUT instead: "the asymmetry ratio runs from 1 to 9 while the prediction is
+    #     held at 0.11111 by the claim itself". That satisfies this screen honestly and
+    #     needs no exception, because the numbers it reads are then the input's.
+    #
+    #     THE MATCH IS MARKUP-TOLERANT, and it was not. Written as literal
+    #     `Empirical status: VALIDATED`, it never matched a bolded `**VALIDATED**` head
+    #     -- so the requirement was evaded by two asterisks, and 224 notes had never
+    #     been checked at all. That is the same defect as a bold-keyed grep returning
+    #     zero on plain heads, from the other side.
     powerless = []
     for f in ident_lean_files():
         raw = open(f).read()
-        for m in re.finditer(r"Empirical status: VALIDATED(.*?)-/", raw, re.S):
+        for m in re.finditer(r"Empirical status:\s*\*{0,2}VALIDATED\*{0,2}(.*?)-/", raw, re.S):
             note = m.group(1)
             power = re.search(r"Power:(.*?)(?:\n\s*\n|$)", note, re.S)
             if not power:
@@ -2250,11 +2266,50 @@ def run_identifications() -> int:
                 powerless.append(f"{os.path.relpath(f, IDENT_ROOT)}: a Power clause declares a span of "
                                  f"only {max(nums) - min(nums):.4f}; a near-constant prediction "
                                  f"cannot reject a wrong functional form")
-    if powerless:
-        bad.append(f"VALIDATED tags whose design had no recorded power: {len(powerless)}; "
-                   f"record the spread of the prediction "
-                   f"across the design, see Descent.DriftRegime")
+    # THE BURN-DOWN BUDGET, AND IT IS BUILT TO DELETE ITSELF.
+    #
+    # Making the match markup-tolerant lit 130 heads that had been invisible. Landing
+    # the tolerance without a budget turns the tree red for every agent; landing the
+    # 130 clauses first leaves the evasion open for the whole sweep, which is
+    # protection exactly when it is not needed. So the tolerance takes effect NOW and
+    # the arrears are pinned.
+    #
+    # This is `LAYER_PENDING`'s device, which burned to empty and was deleted. It is a
+    # RATCHET WITH TEETH IN BOTH DIRECTIONS, not a suppression ledger: an INCREASE is a
+    # hard failure that names the offending heads, so a new VALIDATED note without a
+    # Power clause fails on arrival at budget zero; a DECREASE re-pins automatically, so
+    # nobody maintains a list by hand. WHEN THE PIN REACHES 0 THIS BLOCK AND ITS FILE
+    # SHOULD BE DELETED -- a budget that has burned down is a comment pretending to be
+    # a check.
+    #
+    # THE PIN LIVES UNDER THE CORPUS ROOT, not beside this script, so a fixture corpus
+    # carries its own and the calibration suite cannot ratchet the real one down. An
+    # absent pin means ZERO, which is the right default for anything that is not this
+    # corpus mid-burn-down.
+    #
+    # KNOWN HAZARD, stated rather than discovered: the re-pin trusts the scan. A run
+    # over a partial or broken checkout counts fewer heads and would ratchet the pin
+    # down, after which a correct tree reads as an increase and fails. The pin is
+    # tracked in git for exactly that reason -- the ratchet shows up as a diff, and a
+    # path-scoped commit is where it gets caught.
+    budget_path = CORPUS / "validation" / "code" / "results" / "power_budget.json"
+    try:
+        pinned = int(json.loads(budget_path.read_text())["powerless"])
+    except (OSError, ValueError, KeyError, TypeError):
+        pinned = 0
+    if len(powerless) > pinned:
+        bad.append(f"VALIDATED tags whose design had no recorded power: {len(powerless)}, "
+                   f"budget {pinned}; record the spread of the prediction across the "
+                   f"design, see Descent.DriftRegime")
         bad.extend("    " + x for x in powerless)
+    elif len(powerless) < pinned:
+        try:
+            budget_path.parent.mkdir(parents=True, exist_ok=True)
+            budget_path.write_text(json.dumps({"powerless": len(powerless)}, indent=2) + "\n")
+            print(f"power budget ratcheted {pinned} -> {len(powerless)}; "
+                  f"commit {os.path.relpath(budget_path, CORPUS)}")
+        except OSError:
+            pass
 
     # 3m. Assumptions laundered into hypotheses. A proposition the corpus cannot
     #     prove can be made to look proved in five moves, none of which is a
