@@ -121,7 +121,18 @@ theorem down_reclassified_after_downward_shift_iff_mem_band
     a class-specific score law lying in the band `(threshold, threshold + δ]`.
     It is under this model the reclassification rate for that class.
 
-    Empirical status: UNTESTED. -/
+    Empirical status: NOT AN EMPIRICAL CLAIM -- the measure of an interval under a given
+    score law. Hold `μ`, the threshold and the shift, and no measurement can come out
+    otherwise; the value depends on a distribution, but depending on a distribution is not
+    the test, since every definition taking `μ` does that.
+
+    The one thing here that COULD have been empirical is the naming claim -- that this band
+    mass IS the downward reclassification rate -- and it is discharged by
+    `downReclassificationRate_eq_thresholdBandRate` below, by set equality through
+    `down_reclassified_after_downward_shift_iff_mem_band`. A claim with a proof behind it is
+    not awaiting a simulation. Contrast `expectedThresholdQalyLoss`, whose naming claim is
+    NOT proved anywhere and which therefore keeps a measured head: that one asserts an
+    integral of accounting equals a realised loss, and a drawn outcome can say otherwise. -/
 noncomputable def thresholdBandRate
     (μ : Measure ℝ) [IsProbabilityMeasure μ] (threshold δ : ℝ) : ℝ :=
   (μ (Set.Ioc threshold (threshold + δ))).toReal
