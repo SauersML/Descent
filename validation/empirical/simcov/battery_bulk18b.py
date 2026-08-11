@@ -61,7 +61,7 @@ def main():
            "4*Ne*m = 2.0 -- the pairwise rate is set to m_total/(n-1) because "
            "msprime's migration_rate is per ordered pair -- while the deme "
            "count runs 2, 3, 5, 10, 25; F_ST from coalescence times")
-    record("fstDriftMigration [no deme correction]", "DGP.lean",
+    record("fstDriftMigrationManyDemes [no deme correction]", "DGP.lean",
            "1 / (1 + bigM)", c_none, regime=reg)
     record("islandDemeCorrection [linear n/(n-1)]",
            "PopulationGeneticsFoundations.lean",

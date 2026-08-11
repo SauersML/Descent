@@ -1,12 +1,12 @@
 [
  {
-  "name": "fstDriftMigration [no deme correction]",
+  "name": "fstDriftMigrationManyDemes [no deme correction]",
   "file": "DGP.lean",
   "source": "1 / (1 + bigM)",
-  "note": "the prediction moves by 0.0% across the design, so it could not have rejected a wrong functional form",
+  "note": "a disagreement without a positive control is a lead: the design has not shown it can reproduce a known result",
   "regime": "island model with the TOTAL emigration rate held fixed at 4*Ne*m = 2.0 -- the pairwise rate is set to m_total/(n-1) because msprime's migration_rate is per ordered pair -- while the deme count runs 2, 3, 5, 10, 25; F_ST from coalescence times",
   "span": 0.0,
-  "verdict": "NO POWER",
+  "verdict": "LEAD (no control)",
   "worst": {
    "design": "2 demes (4 Ne m_total = 2.0 held fixed)",
    "lean": 0.3333333333333333,
