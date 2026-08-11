@@ -81,9 +81,9 @@ by migration.  It is not a stipulated closed form: substitute any other
 constant and this fails. -/
 theorem fstMigrationDriftEquilibrium_isFixedPoint (Ne m : ℝ)
     (hNe : 0 < Ne) (hm : 0 ≤ m) :
-    ibdFlowStep Ne m (fstMigrationDriftEquilibrium Ne m) =
+    PopGen.ibdFlowStep Ne m (fstMigrationDriftEquilibrium Ne m) =
       fstMigrationDriftEquilibrium Ne m :=
-  ibdFlowStep_fixedPoint Ne m hNe hm
+  PopGen.ibdFlowStep_fixedPoint Ne m hNe hm
 
 /-- **ibdRecurrenceStep at its junk point, named.** At `Ne = 0` the identity-by-descent input
 term is junk-zero and the retained term keeps full weight, so an empty population is reported as

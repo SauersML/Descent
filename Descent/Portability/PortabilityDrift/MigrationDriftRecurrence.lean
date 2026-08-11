@@ -91,7 +91,7 @@ noncomputable def fstMigDriftNext (Ne m Fst : ℝ) : ℝ :=
 
 Two names for one map, in two modules, which the duplicate-body gate could not see because
 the bodies are written differently: this one collects the coefficient of `F_ST` and
-`MutationDrift.ibdFlowStep` writes `F + (1-F)/(2Nₑ) - 2·rate·F`. Expand either and both are
+`PopGen.ibdFlowStep` writes `F + (1-F)/(2Nₑ) - 2·rate·F`. Expand either and both are
 `1/(2Nₑ) + (1 - 2m - 1/(2Nₑ))·F` -- affine in the current `F_ST`, with the drift input as
 the intercept and the migration-and-drift loss as the slope. Checked numerically to 2.2e-16
 over 200k points before it was proved, because "these look like the same recursion" is
@@ -107,8 +107,8 @@ theorem fstMigDriftNext_eq_affineStep (Ne m Fst : ℝ) :
 
 /-- **And the two recursions agree at every state.** -/
 theorem fstMigDriftNext_eq_ibdFlowStep (Ne m Fst : ℝ) :
-    fstMigDriftNext Ne m Fst = ibdFlowStep Ne m Fst := by
-  unfold fstMigDriftNext ibdFlowStep
+    fstMigDriftNext Ne m Fst = PopGen.ibdFlowStep Ne m Fst := by
+  unfold fstMigDriftNext PopGen.ibdFlowStep
   ring
 
 /-- **The migration-drift step at zero effective size, named.** Both `1 / (2 * Ne)` terms are

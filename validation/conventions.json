@@ -500,7 +500,7 @@
       "convention": "snp",
       "note": "h2_true * mean tagging r-squared is the tagged share, which is what h2_SNP measures."
     },
-    "Descent/PopGen/AncestrySpecificArchitecture.lean::portabilityFromArchitecture": {
+    "Descent/Portability/PortabilityDrift/MutationDrift.lean::portabilityFromArchitecture": {
       "quantity": "fst",
       "convention": "undetermined",
       "role": "consumer",

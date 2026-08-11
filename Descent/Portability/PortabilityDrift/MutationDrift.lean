@@ -36,8 +36,6 @@ opened `section PortabilityDrift` and closed it 8,000 lines later. A section sco
 `variable`s, and this file declares none at that level, so the reopening is exact.
 -/
 
-
-
 /-!
 ## Mutation-Drift Balance and Portability
 
@@ -97,74 +95,6 @@ theorem MutationDriftModelAssumptions.theta_pos (m : MutationDriftModelAssumptio
     0 < m.theta := by
   unfold MutationDriftModelAssumptions.theta Descent.Core.scaledMutationRate Descent.Core.ploidy
   nlinarith [m.Ne_pos, m.mu_pos]
-
-/-- **One generation of the identity-by-descent balance.**
-
-`F` is the probability that two gene copies drawn from the same subpopulation
-are identical by descent (equivalently, `F_ST` measured against a total
-population in which that probability is zero).  In one generation:
-
-* drift makes a pair identical with probability `1/(2 Nₑ)` among the pairs that
-  are not already identical, contributing `+(1 - F)/(2 Nₑ)`;
-* each of the two lineages independently escapes the local identity class at
-  rate `rate` -- by mutating away from its ancestral allelic state, or by being
-  replaced by a migrant -- contributing `-2 · rate · F`.
-
-`rate` is therefore whichever homogenising force is in play: `μ` for
-mutation-drift balance, `m` for migration-drift balance, `μ + m` for both.
-That the two forces enter identically is the whole content of
-`islandModelFst_eq_mutationForm`.
-
-Composition convention: this is the first-order (weak-force, large-`Nₑ`)
-recursion, in which drift and the homogenising force are *added*, so their
-within-generation ordering does not matter.  The unlinearised discrete-generation
-recursion multiplies them instead -- see `islandFstMultiplicativeStep` -- and its fixed
-point differs from this one at O(rate², rate/Nₑ).
-
-    Empirical status: **VALIDATED**
-    (`validation/empirical/simcov/battery_max.py`, `test_ibd_flow_step`).
-    Wright-Fisher forward simulation, 4000 loci, 300 replicate populations, one
-    generation of drift plus gene flow from a fixed source pool, `F` read as
-    `1 - H/H_ancestral`:
-
-      Ne     rate     this def   simulated            sems
-      200    0.000     0.07459   0.07452±0.00030      0.22
-      200    0.002     0.07018   0.07015±0.00028      0.09
-      500    0.005     0.02596   0.02592±0.00010      0.43
-
-    Power: the prediction spans 0.02596 to 0.07459 across the design. -/
-noncomputable def ibdFlowStep (Ne rate F : ℝ) : ℝ :=
-  F + (1 - F) / (2 * Ne) - 2 * rate * F
-
-/-- **ibdFlowStep where its denominator vanishes, named.** The guard `2 * Ne` is zero at `Ne = 0`.
-Lean returns `F - 2 * rate * F` there rather than the value the modelled quantity takes, and no
-type error marks the point. Consumers must require `2 * Ne ≠ 0`. -/
-theorem ibdFlowStep_at_ne0_is_junk (rate : ℝ) (F : ℝ) :
-    ibdFlowStep 0 rate F = F - 2 * rate * F := by
-  unfold ibdFlowStep
-  norm_num
-
-/-- **`1/(1 + 4 Nₑ · rate)` is the fixed point of the identity balance.**
-Setting `(1 - F)/(2 Nₑ) = 2 · rate · F` gives `1 - F = 4 Nₑ · rate · F`, hence
-`F = 1/(1 + 4 Nₑ · rate)`.  This single lemma is what pins every `1/(1 + θ)`
-and `1/(1 + 4 N m)` in the development; none of them is stipulated. -/
-theorem ibdFlowStep_fixedPoint (Ne rate : ℝ) (hNe : 0 < Ne) (hrate : 0 ≤ rate) :
-    ibdFlowStep Ne rate (1 / (1 + 4 * Ne * rate)) = 1 / (1 + 4 * Ne * rate) := by
-  have hprod : (0 : ℝ) ≤ 4 * Ne * rate := by positivity
-  have hd : (0 : ℝ) < 1 + 4 * Ne * rate := by linarith
-  have hd' : (1 : ℝ) + 4 * Ne * rate ≠ 0 := ne_of_gt hd
-  have hNe' : Ne ≠ 0 := ne_of_gt hNe
-  unfold ibdFlowStep
-  field_simp
-  ring
-
-/-- **Complete fixation is a boundary the balance attains.**  With no
-homogenising force the only fixed point is `F = 1`: drift runs to completion.
-The closed form takes that value exactly, rather than approaching it. -/
-@[simp] theorem ibdFlowStep_one_of_no_flow (Ne : ℝ) :
-    ibdFlowStep Ne 0 1 = 1 := by
-  unfold ibdFlowStep
-  simp
 
 /-- **Equilibrium identity probability under mutation-drift balance,
 `F = 1/(1 + θ)` with `θ = 4·Nₑ·μ`.**
@@ -226,7 +156,7 @@ theorem MutationDriftModelAssumptions.fstEquilibrium_mul_denom
 balance** driven by mutation alone. -/
 theorem MutationDriftModelAssumptions.fstEquilibrium_isFixedPoint
     (m : MutationDriftModelAssumptions) :
-    ibdFlowStep m.Ne m.μ m.fstEquilibrium = m.fstEquilibrium := by
+    PopGen.ibdFlowStep m.Ne m.μ m.fstEquilibrium = m.fstEquilibrium := by
   have hθ : m.fstEquilibrium = 1 / (1 + 4 * m.Ne * m.μ) := by
     unfold MutationDriftModelAssumptions.fstEquilibrium MutationDriftModelAssumptions.theta
       PopGen.fstMutationDriftEquilibrium Descent.Core.scaledMutationRate Descent.Core.fstFromFlow
@@ -234,7 +164,7 @@ theorem MutationDriftModelAssumptions.fstEquilibrium_isFixedPoint
     simp only [Descent.Core.Theta.value_ofScaled]
     ring_nf
   rw [hθ]
-  exact ibdFlowStep_fixedPoint m.Ne m.μ m.Ne_pos (le_of_lt m.mu_pos)
+  exact PopGen.ibdFlowStep_fixedPoint m.Ne m.μ m.Ne_pos (le_of_lt m.mu_pos)
 
 /-- Equilibrium Fst is positive. -/
 theorem MutationDriftModelAssumptions.fstEquilibrium_pos
@@ -522,7 +452,6 @@ theorem alleleFreqCorrelation_at_zero_denominator_is_junk (fst varAncestral mean
     alleleFreqCorrelation fst varAncestral meanHetAncestral = 0 := by
   unfold alleleFreqCorrelation
   rw [hzero, div_zero]
-
 
 /-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
 theorem alleleFreqCorrelation_at_reference_point :
@@ -834,8 +763,6 @@ theorem presentDayR2MutationDrift_at_zero_total_variance_is_junk
     (presentDayPGSVarianceMutationDrift V_A fst_drift shared_ld + V_E) = 0
   rw [hzero, div_zero]
 
-
-
 /-- **Mutation-drift R² is below drift-only R².**
     When shared LD is imperfect, R² under mutation-drift is strictly below
     drift-only R². This is the key portability result: ignoring mutation
@@ -920,7 +847,6 @@ theorem neutralAFSharedLDBenchmarkRatio_lt_pure_drift_form
     mul_lt_mul_of_pos_left h_ld_ratio (mul_pos h1 (by linarith))
   simpa [mul_assoc, mul_left_comm, mul_comm] using hnum_lt
 
-
 /-- **At equilibrium, larger θ means lower Fst and thus the drift component
     of portability improves.**
     If we compare two populations at equilibrium with θ₁ < θ₂, the population
@@ -1004,14 +930,135 @@ theorem MutationDriftModelAssumptions_fstTransient_uses_timeScale
   unfold Portability.MutationDriftModelAssumptions.fstTransient
   rw [Descent.Core.coalescentTimeScale_eq]
 
-/-- **Both twos in the identity-flow step are the ploidy.** Identity is created at
-`1 / (ploidy · Nₑ)` per generation, and destroyed at `ploidy · rate` because either of the
-two lineages of a sampled pair can be hit by the homogenising force. That second two is
-what makes the fixed point `1 / (1 + 4 Nₑ · rate)` rather than `1 / (1 + 2 Nₑ · rate)`, so
-it is the one a reader most needs pinned. -/
-theorem ibdFlowStep_uses_coalescentTimeScale (Ne rate F : ℝ) :
-    Portability.ibdFlowStep Ne rate F
-      = F + (1 - F) / Descent.Core.coalescentTimeScale Ne - Descent.Core.ploidy * rate * F := by
-  unfold Portability.ibdFlowStep Descent.Core.ploidy; rw [Descent.Core.coalescentTimeScale_eq]
+/-!
+### Derivation: portabilityFromArchitecture = rg² × (1 - Fst) × tagging_ratio
+
+The portability ratio R²_target / R²_source decomposes into three multiplicative
+factors. This decomposition follows from the covariance model of PGS transfer:
+
+**Step 1: Cross-population covariance decomposition.**
+  R²_target = [Cov(PGS, Y_target)]² / [Var(PGS) × Var(Y_target)]
+
+The cross-population covariance Cov(PGS, Y_target) factorizes because PGS weights
+are fixed from the source GWAS while genotype-phenotype associations in the target
+depend on allele frequencies and LD:
+
+  Cov(PGS, Y_target) = rg × Cov_source × freq_correlation × ld_overlap
+
+where:
+- **rg** (genetic correlation): bounds the cross-population genetic covariance
+  via Cauchy-Schwarz. If Cov_g(source, target) = rg × √(Vg_s × Vg_t), then
+  the transferable signal is scaled by rg. (See GeneticArchitectureDiscovery.lean:
+  `genetic_correlation_bounded` for the Cauchy-Schwarz bound.)
+
+- **freq_correlation ≈ (1 - Fst)**: allele frequency divergence reduces the
+  covariance between source PGS weights and target genotypes. The per-locus
+  contribution is E[β × G_target] ∝ β × 2p_target, and the correlation between
+  source and target allele frequencies is (1 - Fst). (See PortabilityDrift.lean:
+  `covarianceRetentionFactorFromFst`.)
+
+- **ld_overlap ≈ tagging_ratio**: the fraction of causal-variant LD captured
+  by GWAS tag SNPs in the target population. Different LD patterns mean the
+  tag SNP may not proxy the causal variant as well. (See PortabilityDrift.lean:
+  `ldOverlapFromSharedLD`.)
+
+**Step 2: Why the factors multiply.**
+Frequency divergence and LD decay are independent processes:
+- Frequency changes are driven by per-locus drift (a function of Fst).
+- LD differences are driven by recombination and demographic history.
+
+Because they act on orthogonal aspects of the covariance (per-locus variance
+scaling vs. tag-causal correlation), their effects multiply. This is formalized
+in PortabilityDrift.lean as `covarianceRetention`:
+  covarianceRetention freq_corr ld_overlap = freq_corr × ld_overlap
+                                           = (1 - Fst) × shared_LD
+
+**Step 3: Squaring gives the R² ratio.**
+Since R² ∝ Cov², the rg factor enters squared:
+  R²_target / R²_source = rg² × (1 - Fst) × tagging_ratio
+
+(The (1 - Fst) and tagging_ratio terms are already ratios of variance components,
+so they enter linearly rather than squared in the R² ratio.)
+
+This matches the already-derived `covarianceDivergenceFromRetention` in
+PortabilityDrift.lean, which shows divergence = 1 - (1 - Fst) × shared_LD,
+so retention = (1 - Fst) × shared_LD = (1 - Fst) × tagging_ratio.
+-/
+
+/-- **Portability prediction from architecture parameters.**
+    Given M_eff, r_g, FST, and tagging efficiency,
+    we can predict R²_target / R²_source. -/
+noncomputable def portabilityFromArchitecture
+    (rg fst tagging_ratio : ℝ) : ℝ :=
+  rg^2 * (1 - fst) * tagging_ratio
+
+/-- Reference evaluation; see `Descent.Core.Ratios` for what these pin and why. -/
+theorem portabilityFromArchitecture_at_reference_point :
+    portabilityFromArchitecture (1 / 2) (1 / 2) (1 / 2) = 1 / 16 := by
+  unfold portabilityFromArchitecture
+  norm_num
+
+/-- **portabilityFromArchitecture factors through covarianceRetention.**
+    The (1 - Fst) × tagging_ratio component equals the covariance retention
+    derived in PortabilityDrift.lean from the independence of allele frequency
+    drift and LD decay. This connects the architecture-level formula to the
+    derivation chain: covarianceRetention → covarianceDivergenceFromRetention. -/
+theorem portabilityFromArchitecture_eq_rg_sq_mul_retention
+    (rg fst tagging_ratio : ℝ) :
+    portabilityFromArchitecture rg fst tagging_ratio =
+      rg ^ 2 * Portability.covarianceRetention (Portability.covarianceRetentionFactorFromFst fst)
+        (Portability.ldOverlapFromSharedLD tagging_ratio) := by
+  unfold portabilityFromArchitecture Portability.covarianceRetention
+    Portability.covarianceRetentionFactorFromFst
+    Portability.ldOverlapFromSharedLD Descent.Core.product Descent.Core.complement
+      Descent.Core.identifiedWith
+  ring
+
+/-- **Portability equals rg² × (1 - divergence), where divergence is derived.**
+    covarianceDivergenceFromRetention fst tagging = 1 - (1-fst)×tagging,
+    so retention = 1 - divergence = (1-fst)×tagging. This shows portability
+    is rg² × (1 - covarianceDivergenceFromRetention). -/
+theorem portabilityFromArchitecture_from_divergence
+    (rg fst tagging_ratio : ℝ) :
+    portabilityFromArchitecture rg fst tagging_ratio =
+      rg^2 * (1 - Portability.covarianceDivergenceFromRetention fst tagging_ratio) := by
+  unfold portabilityFromArchitecture Portability.covarianceDivergenceFromRetention
+    Portability.covarianceRetention Portability.covarianceRetentionFactorFromFst
+      Portability.ldOverlapFromSharedLD Descent.Core.product Descent.Core.complement
+      Descent.Core.identifiedWith
+  ring
+
+/-- Architecture portability is zero exactly when cross-population effect correlation
+vanishes, differentiation is complete, or the target tags none of the signal. -/
+theorem portabilityFromArchitecture_eq_zero_iff (rg fst tagging_ratio : ℝ) :
+    portabilityFromArchitecture rg fst tagging_ratio = 0 ↔
+      rg = 0 ∨ fst = 1 ∨ tagging_ratio = 0 := by
+  unfold portabilityFromArchitecture
+  constructor
+  · intro h
+    rcases mul_eq_zero.mp h with h | h
+    · rcases mul_eq_zero.mp h with h | h
+      · exact Or.inl (sq_eq_zero_iff.mp h)
+      · exact Or.inr (Or.inl (by linarith))
+    · exact Or.inr (Or.inr h)
+  · rintro (rfl | rfl | rfl) <;> norm_num
+
+/-- With no differentiation and perfect tagging, portability is exactly the squared
+cross-population genetic correlation. -/
+@[simp] theorem portabilityFromArchitecture_perfect_tagging (rg : ℝ) :
+    portabilityFromArchitecture rg 0 1 = rg ^ 2 := by
+  unfold portabilityFromArchitecture
+  ring
+
+/-- Portability is bounded by rg². -/
+theorem portability_bounded_by_rg_sq
+    (rg fst tagging_ratio : ℝ)
+    (h_fst : 0 ≤ fst)
+    (h_tag : 0 ≤ tagging_ratio) (h_tag_le : tagging_ratio ≤ 1) :
+    portabilityFromArchitecture rg fst tagging_ratio ≤ rg^2 := by
+  unfold portabilityFromArchitecture
+  have h1 : (1 - fst) * tagging_ratio ≤ 1 := by
+    nlinarith [mul_nonneg h_fst h_tag]
+  simpa [mul_assoc] using mul_le_mul_of_nonneg_left h1 (sq_nonneg rg)
 
 end Descent.Portability

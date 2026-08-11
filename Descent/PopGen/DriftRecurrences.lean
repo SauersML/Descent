@@ -438,4 +438,82 @@ theorem fstMigrationDriftEquilibrium_decreases_with_m (Ne m₁ m₂ : ℝ)
   fstMigrationDriftEquilibrium_strictAnti_product Ne m₁ Ne m₂
     (by positivity) (by nlinarith)
 
+/-- **One generation of the identity-by-descent balance.**
+
+`F` is the probability that two gene copies drawn from the same subpopulation
+are identical by descent (equivalently, `F_ST` measured against a total
+population in which that probability is zero).  In one generation:
+
+* drift makes a pair identical with probability `1/(2 Nₑ)` among the pairs that
+  are not already identical, contributing `+(1 - F)/(2 Nₑ)`;
+* each of the two lineages independently escapes the local identity class at
+  rate `rate` -- by mutating away from its ancestral allelic state, or by being
+  replaced by a migrant -- contributing `-2 · rate · F`.
+
+`rate` is therefore whichever homogenising force is in play: `μ` for
+mutation-drift balance, `m` for migration-drift balance, `μ + m` for both.
+That the two forces enter identically is the whole content of
+`islandModelFst_eq_mutationForm`.
+
+Composition convention: this is the first-order (weak-force, large-`Nₑ`)
+recursion, in which drift and the homogenising force are *added*, so their
+within-generation ordering does not matter.  The unlinearised discrete-generation
+recursion multiplies them instead -- see `islandFstMultiplicativeStep` -- and its fixed
+point differs from this one at O(rate², rate/Nₑ).
+
+    Empirical status: **VALIDATED**
+    (`validation/empirical/simcov/battery_max.py`, `test_ibd_flow_step`).
+    Wright-Fisher forward simulation, 4000 loci, 300 replicate populations, one
+    generation of drift plus gene flow from a fixed source pool, `F` read as
+    `1 - H/H_ancestral`:
+
+      Ne     rate     this def   simulated            sems
+      200    0.000     0.07459   0.07452±0.00030      0.22
+      200    0.002     0.07018   0.07015±0.00028      0.09
+      500    0.005     0.02596   0.02592±0.00010      0.43
+
+    Power: the prediction spans 0.02596 to 0.07459 across the design. -/
+noncomputable def ibdFlowStep (Ne rate F : ℝ) : ℝ :=
+  F + (1 - F) / (2 * Ne) - 2 * rate * F
+
+/-- **ibdFlowStep where its denominator vanishes, named.** The guard `2 * Ne` is zero at `Ne = 0`.
+Lean returns `F - 2 * rate * F` there rather than the value the modelled quantity takes, and no
+type error marks the point. Consumers must require `2 * Ne ≠ 0`. -/
+theorem ibdFlowStep_at_ne0_is_junk (rate : ℝ) (F : ℝ) :
+    ibdFlowStep 0 rate F = F - 2 * rate * F := by
+  unfold ibdFlowStep
+  norm_num
+
+/-- **`1/(1 + 4 Nₑ · rate)` is the fixed point of the identity balance.**
+Setting `(1 - F)/(2 Nₑ) = 2 · rate · F` gives `1 - F = 4 Nₑ · rate · F`, hence
+`F = 1/(1 + 4 Nₑ · rate)`.  This single lemma is what pins every `1/(1 + θ)`
+and `1/(1 + 4 N m)` in the development; none of them is stipulated. -/
+theorem ibdFlowStep_fixedPoint (Ne rate : ℝ) (hNe : 0 < Ne) (hrate : 0 ≤ rate) :
+    ibdFlowStep Ne rate (1 / (1 + 4 * Ne * rate)) = 1 / (1 + 4 * Ne * rate) := by
+  have hprod : (0 : ℝ) ≤ 4 * Ne * rate := by positivity
+  have hd : (0 : ℝ) < 1 + 4 * Ne * rate := by linarith
+  have hd' : (1 : ℝ) + 4 * Ne * rate ≠ 0 := ne_of_gt hd
+  have hNe' : Ne ≠ 0 := ne_of_gt hNe
+  unfold ibdFlowStep
+  field_simp
+  ring
+
+/-- **Complete fixation is a boundary the balance attains.**  With no
+homogenising force the only fixed point is `F = 1`: drift runs to completion.
+The closed form takes that value exactly, rather than approaching it. -/
+@[simp] theorem ibdFlowStep_one_of_no_flow (Ne : ℝ) :
+    ibdFlowStep Ne 0 1 = 1 := by
+  unfold ibdFlowStep
+  simp
+
+/-- **Both twos in the identity-flow step are the ploidy.** Identity is created at
+`1 / (ploidy · Nₑ)` per generation, and destroyed at `ploidy · rate` because either of the
+two lineages of a sampled pair can be hit by the homogenising force. That second two is
+what makes the fixed point `1 / (1 + 4 Nₑ · rate)` rather than `1 / (1 + 2 Nₑ · rate)`, so
+it is the one a reader most needs pinned. -/
+theorem ibdFlowStep_uses_coalescentTimeScale (Ne rate F : ℝ) :
+    ibdFlowStep Ne rate F
+      = F + (1 - F) / Descent.Core.coalescentTimeScale Ne - Descent.Core.ploidy * rate * F := by
+  unfold ibdFlowStep Descent.Core.ploidy; rw [Descent.Core.coalescentTimeScale_eq]
+
 end Descent.PopGen
