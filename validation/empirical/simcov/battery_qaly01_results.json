@@ -1,0 +1,278 @@
+{
+ "_battery_sha": "3a285fd95d6993a9",
+ "results": [
+  {
+   "name": "expectedThresholdQalyLoss",
+   "file": "PGSCalibrationTheory/DecisionImplications.lean",
+   "source": "integral of thresholdQalyLoss over the deployed population",
+   "note": "the predicted side integrates the analytic accounting; the measured side draws events and books realised QALYs, so the two are different computations rather than the same one twice",
+   "regime": "liability-threshold DGP: standard normal liability, score explaining 0.30 of it on the liability scale, disease when the liability clears the prevalence threshold; 400000 individuals per block, 8 blocks. The deployed model is miscalibrated by an intercept SHIFT on the log-odds scale. Treatment when the decision risk exceeds 0.10; benefit 0.35 QALYs on an event, harm 0.02 QALYs on everyone treated. THE MEASURED SIDE DRAWS THE ACTUAL EVENT and books realised QALYs under the oracle and deployed rules; it never evaluates the analytic loss. The estimand is the MEAN OVER INDIVIDUALS of the realised QALY difference, unweighted, matched by an unweighted mean of the predicted per-individual losses -- not a per-decision or per-event mean, which differ. Cells admitted only where the predicted loss clears three Monte-Carlo floors; excluded cells are printed",
+   "span": 7.290774977165376,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "prev=0.05 shift=1.00",
+    "lean": -0.0005146641881734351,
+    "truth": -0.0005433281249999991,
+    "sem": 1.6610578759631168e-05,
+    "sems_off": 1.7256434734367105,
+    "rel_err": 0.052756217666008035
+   },
+   "cells": [
+    {
+     "design": "prev=0.02 shift=0.25",
+     "lean": -0.00020466080393896538,
+     "truth": -0.00021546874999999987,
+     "sem": 7.879019311595822e-06,
+     "sems_off": 1.3717374756434557,
+     "rel_err": 0.05016015575824568
+    },
+    {
+     "design": "prev=0.02 shift=0.50",
+     "lean": -0.00031725898295494287,
+     "truth": -0.00030906874999999984,
+     "sem": 1.2316596263854132e-05,
+     "sems_off": 0.6649753535381476,
+     "rel_err": 0.026499712296836977
+    },
+    {
+     "design": "prev=0.02 shift=1.00",
+     "lean": -0.0001436696821033623,
+     "truth": -0.00013157187499999957,
+     "sem": 1.622526581714622e-05,
+     "sems_off": 0.7456153408949536,
+     "rel_err": 0.09194827620540298
+    },
+    {
+     "design": "prev=0.05 shift=0.25",
+     "lean": -0.0005494634384782671,
+     "truth": -0.0005499124999999996,
+     "sem": 1.4372723422212934e-05,
+     "sems_off": 0.03124401051497864,
+     "rel_err": 0.0008166054085559085
+    },
+    {
+     "design": "prev=0.05 shift=0.50",
+     "lean": -0.0008178384400147588,
+     "truth": -0.0008296281249999993,
+     "sem": 1.5697385500500993e-05,
+     "sems_off": 0.7510604224419565,
+     "rel_err": 0.014210806781942847
+    },
+    {
+     "design": "prev=0.05 shift=1.00",
+     "lean": -0.0005146641881734351,
+     "truth": -0.0005433281249999991,
+     "sem": 1.6610578759631168e-05,
+     "sems_off": 1.7256434734367105,
+     "rel_err": 0.052756217666008035
+    },
+    {
+     "design": "prev=0.10 shift=0.25",
+     "lean": -0.0008312810738046825,
+     "truth": -0.0008364062499999995,
+     "sem": 2.1720192911986934e-05,
+     "sems_off": 0.2359636590745222,
+     "rel_err": 0.0061276158509300255
+    },
+    {
+     "design": "prev=0.10 shift=0.50",
+     "lean": -0.0011911330053598602,
+     "truth": -0.0011643749999999992,
+     "sem": 1.6462548812163266e-05,
+     "sems_off": 1.625386546467882,
+     "rel_err": 0.022980573577980463
+    },
+    {
+     "design": "prev=0.10 shift=1.00",
+     "lean": -0.0008739870239102435,
+     "truth": -0.0008862312499999989,
+     "sem": 3.600511705634451e-05,
+     "sems_off": 0.34006905381239044,
+     "rel_err": 0.013816062218247724
+    }
+   ]
+  },
+  {
+   "name": "expectedThresholdQalyLoss [benefit priced at the PREDICTED risk rather than the true one, competing]",
+   "file": "PGSCalibrationTheory/DecisionImplications.lean",
+   "source": "same integral with benefit * predictedRisk in the gain",
+   "note": "the quantity a deployer actually holds, and the natural confusion; it prices the benefit at the number that is wrong; positive control 'event rate vs mean p_true at prev=0.05 shift=0.50' passed at 0.60 sems",
+   "regime": "liability-threshold DGP: standard normal liability, score explaining 0.30 of it on the liability scale, disease when the liability clears the prevalence threshold; 400000 individuals per block, 8 blocks. The deployed model is miscalibrated by an intercept SHIFT on the log-odds scale. Treatment when the decision risk exceeds 0.10; benefit 0.35 QALYs on an event, harm 0.02 QALYs on everyone treated. THE MEASURED SIDE DRAWS THE ACTUAL EVENT and books realised QALYs under the oracle and deployed rules; it never evaluates the analytic loss. The estimand is the MEAN OVER INDIVIDUALS of the realised QALY difference, unweighted, matched by an unweighted mean of the predicted per-individual losses -- not a per-decision or per-event mean, which differ. Cells admitted only where the predicted loss clears three Monte-Carlo floors; excluded cells are printed",
+   "span": 41.33666875320009,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "prev=0.05 shift=1.00",
+    "truth": -0.0005433281249999991,
+    "sem": 1.6610578759631168e-05,
+    "lean": -0.017242952187697058,
+    "sems_off": 1005.3607586077794,
+    "rel_err": 30.735799039847397
+   },
+   "cells": [
+    {
+     "design": "prev=0.02 shift=0.25",
+     "truth": -0.00021546874999999987,
+     "sem": 7.879019311595822e-06,
+     "lean": -0.0007988382884106132,
+     "sems_off": 74.04088190925594,
+     "rel_err": 2.707443833087692
+    },
+    {
+     "design": "prev=0.02 shift=0.50",
+     "truth": -0.00030906874999999984,
+     "sem": 1.2316596263854132e-05,
+     "lean": -0.001943638036900629,
+     "sems_off": 132.71274399873337,
+     "rel_err": 5.28869155131546
+    },
+    {
+     "design": "prev=0.02 shift=1.00",
+     "truth": -0.00013157187499999957,
+     "sem": 1.622526581714622e-05,
+     "lean": -0.005679381475158625,
+     "sems_off": 341.9241116096797,
+     "rel_err": 42.16561936324646
+    },
+    {
+     "design": "prev=0.05 shift=0.25",
+     "truth": -0.0005499124999999996,
+     "sem": 1.4372723422212934e-05,
+     "lean": -0.0029051861633041685,
+     "sems_off": 163.8710767692163,
+     "rel_err": 4.282997137370347
+    },
+    {
+     "design": "prev=0.05 shift=0.50",
+     "truth": -0.0008296281249999993,
+     "sem": 1.5697385500500993e-05,
+     "lean": -0.0066599222368387435,
+     "sems_off": 371.4181646142707,
+     "rel_err": 7.027599398029991
+    },
+    {
+     "design": "prev=0.05 shift=1.00",
+     "truth": -0.0005433281249999991,
+     "sem": 1.6610578759631168e-05,
+     "lean": -0.017242952187697058,
+     "sems_off": 1005.3607586077794,
+     "rel_err": 30.735799039847397
+    },
+    {
+     "design": "prev=0.10 shift=0.25",
+     "truth": -0.0008364062499999995,
+     "sem": 2.1720192911986934e-05,
+     "lean": -0.0064916236201453675,
+     "sems_off": 260.36681133823487,
+     "rel_err": 6.761328445531548
+    },
+    {
+     "design": "prev=0.10 shift=0.50",
+     "truth": -0.0011643749999999992,
+     "sem": 1.6462548812163266e-05,
+     "lean": -0.014289034246836316,
+     "sems_off": 797.2434521888392,
+     "rel_err": 11.2718490579378
+    },
+    {
+     "design": "prev=0.10 shift=1.00",
+     "truth": -0.0008862312499999989,
+     "sem": 3.600511705634451e-05,
+     "lean": -0.03382015200381344,
+     "sems_off": 914.7011160184553,
+     "rel_err": 37.161768730016554
+    }
+   ]
+  },
+  {
+   "name": "expectedThresholdQalyLoss [benefit and harm booked together only on events, competing]",
+   "file": "PGSCalibrationTheory/DecisionImplications.lean",
+   "source": "same integral with (benefit - harm) * trueRisk in the gain",
+   "note": "charges the harm only to treated cases rather than to everyone treated, which is the other available mis-accounting; positive control 'event rate vs mean p_true at prev=0.05 shift=0.50' passed at 0.60 sems",
+   "regime": "liability-threshold DGP: standard normal liability, score explaining 0.30 of it on the liability scale, disease when the liability clears the prevalence threshold; 400000 individuals per block, 8 blocks. The deployed model is miscalibrated by an intercept SHIFT on the log-odds scale. Treatment when the decision risk exceeds 0.10; benefit 0.35 QALYs on an event, harm 0.02 QALYs on everyone treated. THE MEASURED SIDE DRAWS THE ACTUAL EVENT and books realised QALYs under the oracle and deployed rules; it never evaluates the analytic loss. The estimand is the MEAN OVER INDIVIDUALS of the realised QALY difference, unweighted, matched by an unweighted mean of the predicted per-individual losses -- not a per-decision or per-event mean, which differ. Cells admitted only where the predicted loss clears three Monte-Carlo floors; excluded cells are printed",
+   "span": 10.477716541748258,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "prev=0.05 shift=1.00",
+    "truth": -0.0005433281249999991,
+    "sem": 1.6610578759631168e-05,
+    "lean": -0.004783445877420667,
+    "sems_off": 255.2661056413918,
+    "rel_err": 7.803972511860444
+   },
+   "cells": [
+    {
+     "design": "prev=0.02 shift=0.25",
+     "truth": -0.00021546874999999987,
+     "sem": 7.879019311595822e-06,
+     "lean": -0.0005394659008567386,
+     "sems_off": 41.12150739114208,
+     "rel_err": 1.503685109124822
+    },
+    {
+     "design": "prev=0.02 shift=0.50",
+     "truth": -0.00030906874999999984,
+     "sem": 1.2316596263854132e-05,
+     "lean": -0.0010915659696432317,
+     "sems_off": 63.531937142378275,
+     "rel_err": 2.531790158801989
+    },
+    {
+     "design": "prev=0.02 shift=1.00",
+     "truth": -0.00013157187499999957,
+     "sem": 1.622526581714622e-05,
+     "lean": -0.002165172128840313,
+     "sems_off": 125.33540447092614,
+     "rel_err": 15.456192699544033
+    },
+    {
+     "design": "prev=0.05 shift=0.25",
+     "truth": -0.0005499124999999996,
+     "sem": 1.4372723422212934e-05,
+     "lean": -0.0014414703491366517,
+     "sems_off": 62.031239518514376,
+     "rel_err": 1.6212722008258638
+    },
+    {
+     "design": "prev=0.05 shift=0.50",
+     "truth": -0.0008296281249999993,
+     "sem": 1.5697385500500993e-05,
+     "lean": -0.0027422183862996297,
+     "sems_off": 121.84132582069726,
+     "rel_err": 2.305358513851772
+    },
+    {
+     "design": "prev=0.05 shift=1.00",
+     "truth": -0.0005433281249999991,
+     "sem": 1.6610578759631168e-05,
+     "lean": -0.004783445877420667,
+     "sems_off": 255.2661056413918,
+     "rel_err": 7.803972511860444
+    },
+    {
+     "design": "prev=0.10 shift=0.25",
+     "truth": -0.0008364062499999995,
+     "sem": 2.1720192911986934e-05,
+     "lean": -0.0021708989410158435,
+     "sems_off": 61.44018593312606,
+     "rel_err": 1.5955077942277989
+    },
+    {
+     "design": "prev=0.10 shift=0.50",
+     "truth": -0.0011643749999999992,
+     "sem": 1.6462548812163266e-05,
+     "lean": -0.0038975727264821537,
+     "sems_off": 166.02518587296436,
+     "rel_err": 2.3473517779771607
+    },
+    {
+     "design": "prev=0.10 shift=1.00",
+     "truth": -0.0008862312499999989,
+     "sem": 3.600511705634451e-05,
+     "lean": -0.006191836693972514,
+     "sems_off": 147.35698361068395,
+     "rel_err": 5.986705438306899
+    }
+   ]
+  }
+ ]
+}
