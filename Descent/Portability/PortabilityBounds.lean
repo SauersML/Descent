@@ -184,6 +184,40 @@ section EvolutionaryModels
     (`simcov/battery_bulk56.py`). The body is now the deployed chart written in
     this signature, and it needs no regime restriction.
 
+    **WHAT THE `fst` SLOT IS, AND WHICH RUN PINS IT.** The chart is validated with this
+    argument read as the TARGET-BRANCH HETEROZYGOSITY LOSS `1 - H_T/H_0`, on
+    `simcov/battery_clean02.py`'s source-off cells. There the source effective size is large
+    enough that nothing fixes on the source branch, so the composed body reduces to this
+    chart alone, and a drift index computed from forward Wright-Fisher frequencies is fed to
+    it against a realised score-phenotype correlation: worst 1.58 sems over five cells.
+
+    Power: the prediction runs from 0.47464 down to 0.24985 across those cells, and the
+    measured values track it -- 0.47457, 0.43609, 0.37544, 0.31412, 0.24769.
+
+    **NO COMMITTED CELL VALIDATES THIS SLOT READ AS A BETWEEN-DEME `F_ST`.** That matters
+    because this body has ten call sites and they do not agree: nine feed a per-branch drift
+    factor, which is the reading above, and one -- `steppingStonePortability` -- feeds a
+    stepping-stone `F_ST`, which is the reading with no cell behind it. The conventions
+    ledger's `undetermined` entry is correct and this paragraph is why.
+
+    **`battery_bulk56` PINS NO CURRENCY, and its MATCH should not be read as though it did.**
+    That run computes no `F_ST` of any kind: its `fst` is a Bernoulli probability that a
+    causal effect stops being shared, and its score is the same vector that built its
+    outcome, so under its data-generating process this body follows by algebra. What it
+    establishes is real and is about the SHAPE -- the superseded linear form fails at 101
+    sems with a cell placed as far inside its own claimed range as `fst = 0.05`. It is
+    `clean02` that supplies a currency, and only for the per-branch reading.
+
+    **TWO LIMITS ON WHAT `clean02` PINS.** Its score is the true effect vector masked to the
+    variants still polymorphic in the source, so no GWAS estimation error enters and nothing
+    here says the chart survives an estimated score. And the body reaches the realised `R²`
+    through an UNWEIGHTED mean heterozygosity ratio while the realised genetic variance is a
+    `β²`-weighted sum; those agree in expectation because `β` is drawn independently of the
+    ancestral frequency, but that is an assumption in the COMPARISON rather than a property
+    of the body, so a rival using a `β²`-weighted drift index would not be separated by these
+    cells. `clean02`'s engine also carries no linkage and no migration, so what is pinned is
+    the CURRENCY and not the REGIME.
+
     THE SUPERSEDED LINEAR FORM was `r2_0 * max 0 (1 - 2*fst)`, and it is
     falsified at 136 sems (86% relative) -- including INSIDE the `fst ≪ 0.5`
     range its own note claimed for it. 3000 variants, 400000 individuals per
