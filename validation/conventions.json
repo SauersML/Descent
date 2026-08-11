@@ -413,6 +413,15 @@
       "constants": [],
       "note": "Hudson. The corpus's standing rule: an F_ST in tau/(1+tau) coordinates is a Hudson F_ST, and Nei's G_ST is FALSIFIED against the split law at up to 18.59 sems where Hudson's matches at 0.03. The structured-coalescent migration equilibrium, in the same coordinates as Core.fstIslandEquilibrium."
     },
+    "Descent/Coalescent/StructuredPresentDay.lean::PairwiseCoalescenceTimes.hudsonFst": {
+      "quantity": "fst",
+      "convention": "hudson",
+      "constants": [
+        "1",
+        "2"
+      ],
+      "note": "Hudson, and by construction rather than by assertion: the body is 1 - ((within i + within j)/2) / between i j, a ratio of pairwise coalescence TIMES, which is Hudson's definition rather than an estimator of it -- the same shape the corpus already ledgers at Coalescent/StateSpace.lean::pairFst. The corpus's standing rule applies unchanged: Nei's G_ST is FALSIFIED against the split law at up to 18.59 sems where Hudson's matches at 0.03. Two things this entry records that the name alone does not. First, the mutation rate is not absent by approximation but by cancellation, and the file proves it beside the definition: PairwiseCoalescenceTimes.slatkin_identity shows that if within and between heterozygosities are a common mu times their coalescence times, the heterozygosity ratio IS the time ratio, so no mu appears and none is being neglected. Second, the within-deme time it divides by is the AVERAGE of the two demes' own within-times, (T_i + T_j)/2, not either one alone; the two readings coincide only when the pair is exchangeable, and on a habitat whose demes differ in size they do not, so a caller comparing this against an F_ST built on a single deme's within-time is comparing two different quantities. Constants: the 1 is the complement and the 2 is that average, neither a fitted parameter."
+    },
     "Descent/Core/Fst.lean::fstFromFlow": {
       "quantity": "fst",
       "convention": "hudson",
