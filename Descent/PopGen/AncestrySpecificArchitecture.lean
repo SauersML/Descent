@@ -145,7 +145,13 @@ drift variances.
     sems, 47% low, which is the promised factor of two. The Hudson pairwise `F_ST` misses by
     7.8 sems, 2.3% -- the first-order agreement the note predicts, and small enough to
     explain why that substitution has gone unnoticed elsewhere in the corpus. The positive
-    control, drift is unbiased so `E[p_t] = p₀`, passes at 0.95 sems. -/
+    control, drift is unbiased so `E[p_t] = p₀`, passes at 0.95 sems.
+
+    Power: the prediction spans 0.01999 to 0.06574 across the four cells, `F`
+    running from 0.0952 to 0.3130, and both convention substitutions ride those
+    same replicates rather than being converted -- Nei's `G_ST` missing by up to
+    157 sems and 47 percent low, the Hudson pairwise `F_ST` by 7.8 sems and 2.3
+    percent. -/
 noncomputable def driftVariance (p0 fst : ℝ) : ℝ :=
   p0 * (1 - p0) * fst
 
@@ -205,7 +211,11 @@ theorem driftVariance_eq_zero_iff (p0 fst : ℝ) :
 
     Dropping the factor of two on the SAME cells misses by up to 168 sems, 50% low, so the
     two is now carried by data rather than by the estimator's definition. Feeding the
-    measured Hudson `F_ST` instead misses by 7.6 sems, 2.3%. -/
+    measured Hudson `F_ST` instead misses by 7.6 sems, 2.3%.
+
+    Power: the prediction spans 0.03999 to 0.13147 across the four cells, `F`
+    running from 0.0952 to 0.3130, and dropping the factor of two on those same
+    cells misses by up to 168 sems and 50 percent low. -/
 noncomputable def twoPopDriftVariance (p0 fst : ℝ) : ℝ :=
   2 * driftVariance p0 fst
 
@@ -270,7 +280,13 @@ theorem twoPopDriftVariance_eq_zero_iff (p0 fst : ℝ) :
     factor of two is confirmed, since halving misses by 168 sems, and the Nei reading is
     refuted at 157 sems and 47% low -- the promised halving. The Hudson reading misses by
     only 2.3%, which is the first-order agreement and the reason it is a trap rather than an
-    obvious error. -/
+    obvious error.
+
+    Power: the prediction spans 0.03999 to 0.13147 across the four cells, `F`
+    running from 0.0952 to 0.3130, and all three conventions are numbers this run
+    produced rather than one convention evaluated twice: halving misses by 168
+    sems, the Nei reading is refuted at 157 sems and 47 percent low, and the
+    Hudson reading is out by 2.3 percent. -/
 noncomputable def expectedFreqDiffSq (fst p0 : ℝ) : ℝ :=
   2 * fst * p0 * (1 - p0)
 
@@ -454,7 +470,12 @@ causal variant.
     the superseded formula. A reader who greps for the name and not for the
     source reached the opposite conclusion. The roles in that battery are now
     the right way round, so the ledger states the verdict directly and this
-    docstring no longer has to translate it. -/
+    docstring no longer has to translate it.
+
+    Power: the prediction spans 0.060000 to 0.350000 across the four cells, with
+    `r` swept from 0.3 to 0.9 so that `r` and `r²` separate threefold, and the
+    squared form `β_c · r²` runs on those same cells and misses by 39 to 159
+    sems. -/
 noncomputable def taggedEffect (causalEffect tagR : ℝ) : ℝ :=
   Descent.Core.product causalEffect tagR
 

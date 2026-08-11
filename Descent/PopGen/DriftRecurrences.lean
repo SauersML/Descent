@@ -80,7 +80,10 @@ of the within-population time to the total time.
     gives 0.11571, 0.19622, 0.49809, 0.66453 and 0.79992 against the
     frequency-based 0.11708 ± 0.00372, 0.19851 ± 0.00711, 0.50095 ± 0.01057,
     0.66607 ± 0.00875 and 0.80065 ± 0.00447, worst cell 0.37 sems over a
-    prediction spanning 86%. -/
+    prediction spanning 86%.
+
+    Power: the prediction spans 0.11571 to 0.79992 over `τ` from 0.125 to 4, a
+    span of 86 percent. -/
 noncomputable def hudsonFstFromCoalescenceTimes (ETss ETst : ℝ) : ℝ :=
   Descent.Core.proportionalReduction ETss ETst
 
@@ -171,7 +174,12 @@ This is the number the closed-population model sets to zero.
     `battery_bulk20.py` `group_b` once, and correct numbers only when
     `sequence_length = 1` is used with msprime's default discrete genome. The
     Ewens control is what caught it every time, because `∑ᵢ θ/(θ+i-1)` cannot
-    return 2 for every `θ`. Do not drop that control. -/
+    return 2 for every `θ`. Do not drop that control.
+
+    Power: the prediction spans 0.09091 to 0.90909 over `θ` from 0.1 to 10, a
+    span of 90 percent, and two competing readings are carried on the same cells
+    -- `θ/(1+2θ)` missing by up to 182 sems and `2θ/(1+2θ)` by 18 -- while the
+    body sits at worst 0.68 sems. -/
 noncomputable def hetMutationFloor (Ne mu : ℝ) : ℝ :=
   4 * Ne * mu / (1 + 4 * Ne * mu)
 
@@ -225,7 +233,13 @@ noncomputable def hetMutationFloor (Ne mu : ℝ) : ℝ :=
     Fed to the deme-corrected two-deme form. The uncorrected
     `1/(1 + 4 Ne m_eff)` would miss every row by 14 sems, which is the separate
     defect recorded on `asymmetricFst`. A test of this quantity tests the arithmetic
-    mean and says -/
+    mean and says
+
+    Power: the asymmetry ratio is the swept input and it runs from 1 to 9 while
+    the mean rate is held at 1.0e-3 and the prediction at 0.11111 by the claim
+    itself; the measurement moves by 0.006 across those rows, inside its own
+    error. Dependence on anything beyond the mean would have moved it. The
+    uncorrected `1/(1 + 4 Ne m_eff)` misses every row by 14 sems. -/
 noncomputable def effectiveSymmetricMigration (m₁₂ m₂₁ : ℝ) : ℝ :=
   Descent.Core.midpoint m₁₂ m₂₁
 
@@ -323,6 +337,14 @@ it is the island-model equilibrium `F_ST`, with `rate = c` it is Sved's `E[r²]`
     high). Neither is a code fault; both are the size of the diffusion
     approximation at `2 Nₑ = 50`.
 
+    Power: the prediction spans 0.04000 to 0.32999 across the design. `m` is
+    swept 50-fold at fixed `4 Nₑ m` by shrinking `Nₑ`, which is what separates
+    this body from `1/(1 + 4 Nₑ m)` at all -- the two differ in `m` and not in
+    the compound parameter, so the sweeps that moved only the compound could
+    pass both -- and `4 Nₑ m` is swept 4-fold besides, so the rival has a span
+    of its own to be wrong over. It misses by 1.7, 1.9, 26, 182 and 39 percent
+    on those cells.
+
     argument_source: model. `Nₑ` and `m` are the simulation's own setup
     parameters, written into the update rule, never estimated from the
     replicates the oracle measures. -/
@@ -394,6 +416,12 @@ witnesses at a point.
     the factor its own regime paragraph records, and `battery_bulk40` measured
     exactly that -- 0.199 predicted against 0.104 simulated -- on a two-deme
     design that had no business testing a many-deme law.
+
+    Power: the design is the one written out at `ibdRecurrenceFixedPoint` -- `m`
+    swept 50-fold at fixed `4 Nₑ m` over 200 demes -- and the rival
+    `1/(1 + 4 Nₑ m)` misses by up to 182 percent on those same cells while this
+    body agrees within 1.6 percent, with the panmictic control 0.05 sems from
+    zero.
 
     argument_source: model. -/
 noncomputable def fstIslandMultiplicativeEquilibrium (Ne m : ℝ) : ℝ :=
