@@ -99,6 +99,82 @@ theorem steppingStoneCoalescenceTime_indistinguishable_through_coalFst
   rw [steppingStoneFst_from_coalescence_time d Ne m σ_sq hd hNe hm hσ]
   exact demoSteppingStoneFst_indistinguishable_from_quadratic d Ne m σ_sq hm (le_of_lt hσ)
 
+/-! ## The same fact as a symmetry, in the corpus's general vocabulary
+
+The two theorems above say the quadratic form is unreachable by `F_ST` data. The reason is
+older and simpler than either form: inside the surviving linear law, migration and dispersal
+variance enter only through their product, so rescaling one and inversely rescaling the other
+leaves every `F_ST` unmoved and moves the dispersal variance. That is an
+`Descent.Blindness.ObservationalSymmetry`, and the general law
+`Descent.Blindness.ObservationalSymmetry.no_target_criterion` then supplies the impossibility
+with no further argument.
+
+Stating it this way buys two things the pair of identities above do not. It names the
+transformation, so the regime — hold `σ²` at an independently measured dispersal scale — is
+read off the symmetry rather than off a proof. And it puts the result in the same shape as
+every other non-identifiability in the corpus, so a new proposal is refuted by exhibiting a
+transformation rather than by finding a second functional form.
+-/
+
+/-- The **dispersal reparameterization**: migration scaled by `scale`, dispersal variance
+scaled by its inverse. The product `m·σ²` — the only combination the `F_ST` sees — is
+fixed. -/
+noncomputable def dispersalReparameterization (scale : ℝ) : ℝ × ℝ → ℝ × ℝ :=
+  fun parameter ↦ (scale * parameter.1, parameter.2 / scale)
+
+/-- **The reparameterization is an observational symmetry of the stepping-stone `F_ST`.**
+The observation is the `F_ST` at every migration rate and dispersal variance; the target is
+the dispersal variance itself. A nonzero scale leaves the observation fixed everywhere, and
+any scale other than one moves the target wherever the variance is nonzero. -/
+noncomputable def dispersalSymmetry (d Ne scale migration variance : ℝ) (hscale : scale ≠ 0)
+    (hscaleNeOne : scale ≠ 1) (hvariance : variance ≠ 0) :
+    Descent.Blindness.ObservationalSymmetry
+      (fun parameter : ℝ × ℝ ↦ demoSteppingStoneFst d Ne parameter.1 parameter.2)
+      (fun parameter : ℝ × ℝ ↦ parameter.2) where
+  transform := dispersalReparameterization scale
+  observation_invariant := by
+    intro parameter
+    show demoSteppingStoneFst d Ne (scale * parameter.1) (parameter.2 / scale)
+      = demoSteppingStoneFst d Ne parameter.1 parameter.2
+    unfold demoSteppingStoneFst
+    have hproduct : 4 * Ne * (scale * parameter.1) * (parameter.2 / scale)
+        = 4 * Ne * parameter.1 * parameter.2 := by
+      field_simp
+    rw [hproduct]
+  moved := (migration, variance)
+  target_moved := by
+    intro hcontra
+    simp only [dispersalReparameterization] at hcontra
+    have hequation : variance = variance * scale := (div_eq_iff hscale).mp hcontra
+    have hzero : variance * (scale - 1) = 0 := by
+      rw [mul_sub, mul_one, ← hequation, sub_self]
+    rcases mul_eq_zero.mp hzero with hzeroVariance | hzeroScale
+    · exact hvariance hzeroVariance
+    · exact hscaleNeOne (by linarith)
+
+/-- **The dispersal variance is not identified by the stepping-stone `F_ST`.** Not poorly
+estimated by it: not a function of it, at any migration rate and any nonzero variance. -/
+theorem dispersalVariance_not_identifiedBy_fst (d Ne migration variance : ℝ)
+    (hvariance : variance ≠ 0) :
+    ¬ Descent.Blindness.IdentifiedBy
+      (fun parameter : ℝ × ℝ ↦ demoSteppingStoneFst d Ne parameter.1 parameter.2)
+      (fun parameter : ℝ × ℝ ↦ parameter.2) :=
+  Descent.Blindness.not_identifiedBy_of_observationalSymmetry
+    (dispersalSymmetry d Ne 2 migration variance (by norm_num) (by norm_num) hvariance)
+
+/-- **No procedure reading `F_ST` decides the dispersal variance.** The halving
+transformation is one witness among a continuum; it is enough, because a criterion is a
+function and functions respect equality. This is the general law applied to
+`dispersalSymmetry`, and it is the enforceable form of the regime the note on
+`demoSteppingStoneFst` states in words. -/
+theorem no_criterion_for_dispersalVariance_from_fst (d Ne migration variance : ℝ)
+    (hvariance : variance ≠ 0) :
+    ¬ ∃ decideValue : ℝ → Prop, ∀ parameter : ℝ × ℝ,
+      parameter.2 = variance / 2
+        ↔ decideValue (demoSteppingStoneFst d Ne parameter.1 parameter.2) :=
+  (dispersalSymmetry d Ne 2 migration variance (by norm_num) (by norm_num)
+    hvariance).no_target_criterion
+
 /-- **The four in the quadratic stepping-stone form is twice the ploidy**, the same
 `4 Nₑ` scaling as every other migration-drift denominator in the corpus. Only the powers of
 `m` and `σ²` distinguish this form from `demoSteppingStoneFst`; the constant does not. -/
