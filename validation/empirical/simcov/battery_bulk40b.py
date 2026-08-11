@@ -106,16 +106,16 @@ def group_a():
            "p is swept across 1/2 so 1-2p changes sign, and every prediction "
            "uses the REALISED allele frequency")
     record("averageEffect", "BlindnessRegistry.lean", "a + d * (1 - 2 * p)",
-           cells, regime=reg, control=control)
+           cells, regime=reg, control=control, realised_inputs=True)
     record("averageEffect [dominance factor 1-p, competing]",
            "BlindnessRegistry.lean", "a + d * (1 - p)", c_1mp, regime=reg,
-           control=control)
+           control=control, realised_inputs=True)
     record("averageEffect [dominance factor p, competing]",
            "BlindnessRegistry.lean", "a + d * p", c_p, regime=reg,
-           control=control)
+           control=control, realised_inputs=True)
     record("averageEffect [dominance factor doubled, competing]",
            "BlindnessRegistry.lean", "a + 2*d*(1 - 2*p)", c_a2, regime=reg,
-           control=control)
+           control=control, realised_inputs=True)
 
 
 def group_c():
@@ -154,14 +154,15 @@ def group_c():
            "on G. E_mean is swept through zero and negative, and both "
            "competitors MOVE across the design so a rejection is of a form")
     record("effectiveGeneticEffect", "GeneEnvironmentInterplay.lean",
-           "beta_G + beta_GxE * E_mean", cells, regime=reg, control=control)
+           "beta_G + beta_GxE * E_mean", cells, regime=reg, control=control,
+           realised_inputs=True)
     record("effectiveGeneticEffect [environment second moment too, competing]",
            "GeneEnvironmentInterplay.lean",
            "beta_G + beta_GxE * (E_mean + Var E)", c_second, regime=reg,
-           control=control)
+           control=control, realised_inputs=True)
     record("effectiveGeneticEffect [half the interaction, competing]",
            "GeneEnvironmentInterplay.lean", "beta_G + beta_GxE * E_mean / 2",
-           c_half, regime=reg, control=control)
+           c_half, regime=reg, control=control, realised_inputs=True)
 
 
 def group_e():
@@ -237,6 +238,19 @@ def group_e():
            "variance across studies of the causal effect estimated through the "
            "tag with realised moments. n is swept SIXTEENFOLD at fixed r so an "
            "order-1/n estimator bias is separated from a defect in the body")
+    # NO `realised_inputs` DECLARATION HERE, DELIBERATELY, and the reason is a
+    # real one rather than an oversight. Groups A and B evaluate every argument
+    # at the value their sample realised and now say so, which is what lets
+    # their competitors count as rejected rather than as LEADs. This group is
+    # MIXED: `r2_hat` is remeasured from the drawn dosages, but the
+    # heterozygosity `H = 2p(1-p)` is the nominal table frequency, not the
+    # realised one. Declaring True would assert something about the whole
+    # prediction that is true of one factor of it. The repair is to remeasure
+    # `H` from the drawn causal dosages -- a change to the prediction, not to a
+    # keyword -- and it belongs with whoever owns this body, because the two
+    # competitors it would unlock miss by only 38 and 35 sems and the group's
+    # own docstring warns that the estimator carries an order-1/n bias at the
+    # small-n end.
     record("effectiveFisherInformation", "AncestrySpecificPower.lean",
            "n * (2*p*(1-p)) * r2_ld", cells, regime=reg, control=control)
     record("effectiveFisherInformation [r^1 attenuation, competing]",

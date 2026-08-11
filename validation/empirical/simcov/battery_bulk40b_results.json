@@ -1,5 +1,5 @@
 {
- "_battery_sha": "5a62c31c79f63a70",
+ "_battery_sha": "6e0d0d3070e134a5",
  "results": [
   {
    "name": "averageEffect",
@@ -64,10 +64,10 @@
    "name": "averageEffect [dominance factor 1-p, competing]",
    "file": "BlindnessRegistry.lean",
    "source": "a + d * (1 - p)",
-   "note": "positive control 'p=0.35 [Hardy-Weinberg mean dosage = 2p]' passed at 1.41 sems; a falsification requires `realised_inputs=True/False`: the nominal parameter that generated the data and the value the sample realised differ by O(1/sqrt(m)), which is the size of this finding",
+   "note": "positive control 'p=0.35 [Hardy-Weinberg mean dosage = 2p]' passed at 1.41 sems",
    "regime": "one diploid locus in Hardy-Weinberg proportions, 4e6 individuals, genotypic values -a / d / a on the three genotypes; the observable is the realised OLS slope of genotypic value on alt-allele dosage. p is swept across 1/2 so 1-2p changes sign, and every prediction uses the REALISED allele frequency",
    "span": 0.3170406311733778,
-   "verdict": "LEAD (undeclared input provenance)",
+   "verdict": "FALSIFIED",
    "worst": {
     "design": "p=0.85 (realised 0.8500)",
     "lean": 1.1200227,
@@ -123,10 +123,10 @@
    "name": "averageEffect [dominance factor p, competing]",
    "file": "BlindnessRegistry.lean",
    "source": "a + d * p",
-   "note": "positive control 'p=0.35 [Hardy-Weinberg mean dosage = 2p]' passed at 1.41 sems; a falsification requires `realised_inputs=True/False`: the nominal parameter that generated the data and the value the sample realised differ by O(1/sqrt(m)), which is the size of this finding",
+   "note": "positive control 'p=0.35 [Hardy-Weinberg mean dosage = 2p]' passed at 1.41 sems",
    "regime": "one diploid locus in Hardy-Weinberg proportions, 4e6 individuals, genotypic values -a / d / a on the three genotypes; the observable is the realised OLS slope of genotypic value on alt-allele dosage. p is swept across 1/2 so 1-2p changes sign, and every prediction uses the REALISED allele frequency",
    "span": 0.3094877531976177,
-   "verdict": "LEAD (undeclared input provenance)",
+   "verdict": "FALSIFIED",
    "worst": {
     "design": "p=0.85 (realised 0.8500)",
     "lean": 1.6799773,
@@ -182,10 +182,10 @@
    "name": "averageEffect [dominance factor doubled, competing]",
    "file": "BlindnessRegistry.lean",
    "source": "a + 2*d*(1 - 2*p)",
-   "note": "positive control 'p=0.35 [Hardy-Weinberg mean dosage = 2p]' passed at 1.41 sems; a falsification requires `realised_inputs=True/False`: the nominal parameter that generated the data and the value the sample realised differ by O(1/sqrt(m)), which is the size of this finding",
+   "note": "positive control 'p=0.35 [Hardy-Weinberg mean dosage = 2p]' passed at 1.41 sems",
    "regime": "one diploid locus in Hardy-Weinberg proportions, 4e6 individuals, genotypic values -a / d / a on the three genotypes; the observable is the realised OLS slope of genotypic value on alt-allele dosage. p is swept across 1/2 so 1-2p changes sign, and every prediction uses the REALISED allele frequency",
    "span": 1.061183769696448,
-   "verdict": "LEAD (undeclared input provenance)",
+   "verdict": "FALSIFIED",
    "worst": {
     "design": "p=0.85 (realised 0.8500)",
     "lean": -0.11990920000000016,
@@ -300,10 +300,10 @@
    "name": "effectiveGeneticEffect [environment second moment too, competing]",
    "file": "GeneEnvironmentInterplay.lean",
    "source": "beta_G + beta_GxE * (E_mean + Var E)",
-   "note": "positive control 'E_mean=+1.0 [realised mean of E]' passed at 0.95 sems; a falsification requires `realised_inputs=True/False`: the nominal parameter that generated the data and the value the sample realised differ by O(1/sqrt(m)), which is the size of this finding",
+   "note": "positive control 'E_mean=+1.0 [realised mean of E]' passed at 0.95 sems",
    "regime": "the file's own linear GxE model Y = bG G + bE E + bGxE G E + eps, 2e6 individuals, G standardized and E independent of G with unit variance; the observable is the realised marginal OLS slope of Y on G. E_mean is swept through zero and negative, and both competitors MOVE across the design so a rejection is of a form",
    "span": 0.7843613615381289,
-   "verdict": "LEAD (undeclared input provenance)",
+   "verdict": "FALSIFIED",
    "worst": {
     "design": "E_mean=+0.0 (realised +0.0003)",
     "lean": 0.6500193141957009,
@@ -359,10 +359,10 @@
    "name": "effectiveGeneticEffect [half the interaction, competing]",
    "file": "GeneEnvironmentInterplay.lean",
    "source": "beta_G + beta_GxE * E_mean / 2",
-   "note": "positive control 'E_mean=+1.0 [realised mean of E]' passed at 0.95 sems; a falsification requires `realised_inputs=True/False`: the nominal parameter that generated the data and the value the sample realised differ by O(1/sqrt(m)), which is the size of this finding",
+   "note": "positive control 'E_mean=+1.0 [realised mean of E]' passed at 0.95 sems",
    "regime": "the file's own linear GxE model Y = bG G + bE E + bGxE G E + eps, 2e6 individuals, G standardized and E independent of G with unit variance; the observable is the realised marginal OLS slope of Y on G. E_mean is swept through zero and negative, and both competitors MOVE across the design so a rejection is of a form",
    "span": 0.7016540239117044,
-   "verdict": "LEAD (undeclared input provenance)",
+   "verdict": "FALSIFIED",
    "worst": {
     "design": "E_mean=+2.5 (realised +2.4988)",
     "lean": 0.7123543507396826,
