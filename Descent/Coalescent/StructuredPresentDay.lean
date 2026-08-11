@@ -46,28 +46,28 @@ rule is a closed form even when expanding its determinants would obscure the res
 
 section SymbolicLinearSystem
 
-variable {n : ℕ}
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- Replace column `k` of a square matrix by a forcing vector. -/
-noncomputable def replaceColumn (A : Matrix (Fin n) (Fin n) ℝ) (b : Fin n → ℝ)
-    (k : Fin n) : Matrix (Fin n) (Fin n) ℝ :=
+noncomputable def replaceColumn (A : Matrix ι ι ℝ) (b : ι → ℝ)
+    (k : ι) : Matrix ι ι ℝ :=
   fun i j ↦ if j = k then b i else A i j
 
 /-- One coordinate of the exact symbolic solution of `A x = b`, by Cramer's rule. -/
-noncomputable def cramerCoordinate (A : Matrix (Fin n) (Fin n) ℝ)
-    (b : Fin n → ℝ) (k : Fin n) : ℝ :=
+noncomputable def cramerCoordinate (A : Matrix ι ι ℝ)
+    (b : ι → ℝ) (k : ι) : ℝ :=
   (replaceColumn A b k).det / A.det
 
 /-- The symbolic coordinate is explicitly a determinant quotient.  If the matrix and forcing
 entries are polynomial in model parameters, this is a rational function of those parameters;
 no numerical inverse or fitted rate enters. -/
-theorem cramerCoordinate_eq_det_ratio (A : Matrix (Fin n) (Fin n) ℝ)
-    (b : Fin n → ℝ) (k : Fin n) :
+theorem cramerCoordinate_eq_det_ratio (A : Matrix ι ι ℝ)
+    (b : ι → ℝ) (k : ι) :
     cramerCoordinate A b k = (replaceColumn A b k).det / A.det := rfl
 
 /-- A singular symbolic system is named rather than silently interpreted as a zero law. -/
-theorem cramerCoordinate_at_singular_is_junk (A : Matrix (Fin n) (Fin n) ℝ)
-    (b : Fin n → ℝ) (k : Fin n) (h : A.det = 0) :
+theorem cramerCoordinate_at_singular_is_junk (A : Matrix ι ι ℝ)
+    (b : ι → ℝ) (k : ι) (h : A.det = 0) :
     cramerCoordinate A b k = 0 := by
   unfold cramerCoordinate
   rw [h, div_zero]
@@ -112,6 +112,127 @@ noncomputable def twoDemeMomentGenerator
   r.sourceBackwardMutation * i * m i j +
   r.targetForwardMutation * j * (m i (j - 1) - m i j) -
   r.targetBackwardMutation * j * m i j
+
+/-- Rectangular coordinate carrier for all moments required through total degree `K`.
+Coordinates above total degree `K` are pinned by identity rows and do not enter valid rows. -/
+abbrev MomentCoordinate (K : ℕ) := Fin (K + 1) × Fin (K + 1)
+
+/-- Read a coordinate vector as a moment table, returning zero outside the finite rectangle. -/
+noncomputable def momentVectorTable (K : ℕ)
+    (v : MomentCoordinate K → ℝ) (i j : ℕ) : ℝ :=
+  if hi : i < K + 1 then
+    if hj : j < K + 1 then v (⟨i, hi⟩, ⟨j, hj⟩) else 0
+  else 0
+
+/-- Basis table for one unknown nonconstant moment. -/
+noncomputable def momentBasisTable (K : ℕ) (column : MomentCoordinate K) : ℕ → ℕ → ℝ :=
+  momentVectorTable K (fun coordinate ↦ if coordinate = column then 1 else 0)
+
+/-- The fixed affine part `m₀₀=1`; every other coordinate is zero. -/
+noncomputable def momentConstantTable : ℕ → ℕ → ℝ :=
+  fun i j ↦ if i = 0 ∧ j = 0 then 1 else 0
+
+/-- Exact finite coefficient matrix of the stationary structured moment system.  Valid
+nonconstant moments receive generator rows.  The unused rectangle receives identity rows,
+which makes the enclosing square representation harmless rather than singular by padding. -/
+noncomputable def twoDemeMomentMatrix (r : TwoDemeRates) (K : ℕ) :
+    Matrix (MomentCoordinate K) (MomentCoordinate K) ℝ :=
+  fun row column ↦
+    let i := row.1.val
+    let j := row.2.val
+    if 0 < i + j ∧ i + j ≤ K then
+      twoDemeMomentGenerator r (momentBasisTable K column) i j
+    else if row = column then 1 else 0
+
+/-- Affine forcing created solely by the normalized constant moment `m₀₀=1`. -/
+noncomputable def twoDemeMomentForcing (r : TwoDemeRates) (K : ℕ) :
+    MomentCoordinate K → ℝ :=
+  fun row ↦
+    let i := row.1.val
+    let j := row.2.val
+    if 0 < i + j ∧ i + j ≤ K then
+      -twoDemeMomentGenerator r momentConstantTable i j
+    else 0
+
+/-- The symbolic mixed moment obtained by solving the finite structured system with Cramer's
+rule.  Moments beyond degree `K` are deliberately unavailable, not extrapolated. -/
+noncomputable def solvedTwoDemeMixedMoment
+    (r : TwoDemeRates) (K i j : ℕ) : ℝ :=
+  if hzero : i = 0 ∧ j = 0 then 1
+  else if hi : i < K + 1 then
+    if hj : j < K + 1 then
+      if hdegree : i + j ≤ K then
+        cramerCoordinate (twoDemeMomentMatrix r K) (twoDemeMomentForcing r K)
+          (⟨i, hi⟩, ⟨j, hj⟩)
+      else 0
+    else 0
+  else 0
+
+/-- The solved moment is literally a rational determinant expression in the demographic
+rates. -/
+theorem solvedTwoDemeMixedMoment_eq_cramer (r : TwoDemeRates) (K i j : ℕ)
+    (hnotzero : ¬ (i = 0 ∧ j = 0)) (hi : i < K + 1) (hj : j < K + 1)
+    (hdegree : i + j ≤ K) :
+    solvedTwoDemeMixedMoment r K i j =
+      cramerCoordinate (twoDemeMomentMatrix r K) (twoDemeMomentForcing r K)
+        (⟨i, hi⟩, ⟨j, hj⟩) := by
+  simp [solvedTwoDemeMixedMoment, hnotzero, hi, hj, hdegree]
+
+/-- Bernstein core evaluated directly from a specified demography's symbolic moment solve. -/
+noncomputable def solvedJointBernsteinCore (r : TwoDemeRates) (K : ℕ)
+    (i j remainingSource remainingTarget : ℕ) : ℝ :=
+  ∑ a ∈ Finset.range (remainingSource + 1),
+    ∑ b ∈ Finset.range (remainingTarget + 1),
+      (Nat.choose remainingSource a : ℝ) * (Nat.choose remainingTarget b : ℝ) *
+        (-1 : ℝ) ^ (a + b) * solvedTwoDemeMixedMoment r K (i + a) (j + b)
+
+/-- A finite structured moment system on its genuine domain.  Nonsingularity is carried by
+the value consumed downstream rather than left as a prose side condition. -/
+structure NonsingularTwoDemeMomentSystem (K : ℕ) where
+  rates : TwoDemeRates
+  nonsingular : (twoDemeMomentMatrix rates K).det ≠ 0
+
+/-- A1 without a hand-supplied moment table: the exact joint sample-count probability is the
+Bernstein transform of the Cramer solution at total degree `ns+nt`. -/
+noncomputable def solvedTwoDemeJointSampleCount
+    (ns nt : ℕ) (system : NonsingularTwoDemeMomentSystem (ns + nt))
+    (i j : ℕ) : ℝ :=
+  if i ≤ ns ∧ j ≤ nt then
+    (Nat.choose ns i : ℝ) * (Nat.choose nt j : ℝ) *
+      solvedJointBernsteinCore system.rates (ns + nt) i j (ns - i) (nt - j)
+  else 0
+
+/-- The directly solved law is zero outside its sample rectangle. -/
+theorem solvedTwoDemeJointSampleCount_outside
+    (ns nt : ℕ) (system : NonsingularTwoDemeMomentSystem (ns + nt))
+    (i j : ℕ) (h : ¬ (i ≤ ns ∧ j ≤ nt)) :
+    solvedTwoDemeJointSampleCount ns nt system i j = 0 := by
+  simp [solvedTwoDemeJointSampleCount, h]
+
+/-- Fixed difference under the directly solved joint law. -/
+noncomputable def solvedTwoDemeFixedDifference
+    (ns nt : ℕ) (system : NonsingularTwoDemeMomentSystem (ns + nt)) : ℝ :=
+  solvedTwoDemeJointSampleCount ns nt system ns 0 +
+    solvedTwoDemeJointSampleCount ns nt system 0 nt
+
+/-- Target erosion conditional on source polymorphism, with both masses evaluated from the
+same directly solved joint law. -/
+noncomputable def solvedTwoDemeTargetErosionGivenSourcePolymorphic
+    (ns nt : ℕ) (system : NonsingularTwoDemeMomentSystem (ns + nt)) : ℝ :=
+  (∑ i ∈ Finset.Icc 1 (ns - 1),
+      solvedTwoDemeJointSampleCount ns nt system i 0 +
+        solvedTwoDemeJointSampleCount ns nt system i nt) /
+    (∑ i ∈ Finset.Icc 1 (ns - 1),
+      ∑ j ∈ Finset.range (nt + 1), solvedTwoDemeJointSampleCount ns nt system i j)
+
+/-- Conditional target spectrum at a given source count, directly from the symbolic joint
+law. -/
+noncomputable def solvedTwoDemeConditionalTargetSpectrum
+    (ns nt : ℕ) (system : NonsingularTwoDemeMomentSystem (ns + nt))
+    (sourceCount targetCount : ℕ) : ℝ :=
+  solvedTwoDemeJointSampleCount ns nt system sourceCount targetCount /
+    (∑ j ∈ Finset.range (nt + 1),
+      solvedTwoDemeJointSampleCount ns nt system sourceCount j)
 
 /-- A solved present-day mixed-moment law for a specified two-deme demography.
 
@@ -204,6 +325,68 @@ structure TwoDemeLDSystem (n : ℕ) where
   symmetricWithin : ∀ rho M,
     cramerCoordinate (operator rho M) (fun i ↦ -forcing M i) withinSource =
       cramerCoordinate (operator rho M) (fun i ↦ -forcing M i) withinTarget
+
+/-- An affine stationary two-locus system.  Published drift, recombination and migration
+matrices plug into separate fields, making every entry polynomial of degree at most one in
+`rho` and `M`; determinant coordinates are therefore rational functions of those parameters. -/
+structure AffineTwoDemeLDSystem (n : ℕ) where
+  drift : Matrix (Fin n) (Fin n) ℝ
+  recombination : Matrix (Fin n) (Fin n) ℝ
+  migration : Matrix (Fin n) (Fin n) ℝ
+  forcingBase : Fin n → ℝ
+  forcingMigration : Fin n → ℝ
+  withinSource : Fin n
+  crossSourceTarget : Fin n
+  withinTarget : Fin n
+  symmetricWithin : ∀ rho M,
+    cramerCoordinate (drift + rho • recombination + M • migration)
+        (fun i ↦ -(forcingBase i + M * forcingMigration i)) withinSource =
+      cramerCoordinate (drift + rho • recombination + M • migration)
+        (fun i ↦ -(forcingBase i + M * forcingMigration i)) withinTarget
+
+/-- Forget only the affine decomposition, preserving the exact operator and moment indices. -/
+noncomputable def AffineTwoDemeLDSystem.toSystem {n : ℕ}
+    (sys : AffineTwoDemeLDSystem n) : TwoDemeLDSystem n where
+  operator := fun rho M ↦ sys.drift + rho • sys.recombination + M • sys.migration
+  forcing := fun M i ↦ sys.forcingBase i + M * sys.forcingMigration i
+  withinSource := sys.withinSource
+  crossSourceTarget := sys.crossSourceTarget
+  withinTarget := sys.withinTarget
+  symmetricWithin := sys.symmetricWithin
+
+/-- A2's closed form for an arbitrary published affine moment system. -/
+noncomputable def AffineTwoDemeLDSystem.crossDCorrelation {n : ℕ}
+    (sys : AffineTwoDemeLDSystem n) (rho M : ℝ) : ℝ :=
+  sys.toSystem.crossDCorrelation rho M
+
+/-- A parameter point on which the affine stationary solution and its correlation denominator
+exist.  Both counterexample-producing poles are excluded by the value's type. -/
+structure NonsingularAffineLDPoint {n : ℕ} (sys : AffineTwoDemeLDSystem n) where
+  rho : ℝ
+  migration : ℝ
+  operator_nonsingular :
+    (sys.drift + rho • sys.recombination + migration • sys.migration).det ≠ 0
+  within_numerator_nonzero :
+    (replaceColumn
+      (sys.drift + rho • sys.recombination + migration • sys.migration)
+      (fun i ↦ -(sys.forcingBase i + migration * sys.forcingMigration i))
+      sys.withinSource).det ≠ 0
+
+/-- Correlation evaluated only at a typed nonsingular parameter point. -/
+noncomputable def NonsingularAffineLDPoint.crossDCorrelation {n : ℕ}
+    {sys : AffineTwoDemeLDSystem n} (point : NonsingularAffineLDPoint sys) : ℝ :=
+  sys.crossDCorrelation point.rho point.migration
+
+/-- The affine system's cross moment is visibly the Cramer quotient of a matrix affine in
+recombination and migration. -/
+theorem AffineTwoDemeLDSystem.crossD_eq_det_ratio {n : ℕ}
+    (sys : AffineTwoDemeLDSystem n) (rho M : ℝ) :
+    sys.toSystem.crossD rho M =
+      (replaceColumn
+        (sys.drift + rho • sys.recombination + M • sys.migration)
+        (fun i ↦ -(sys.forcingBase i + M * sys.forcingMigration i))
+        sys.crossSourceTarget).det /
+      (sys.drift + rho • sys.recombination + M • sys.migration).det := rfl
 
 /-- A stationary two-locus coordinate, exactly `-(D+R+M)^{-1}Uh` in the published moment
 system, expressed by Cramer's rule. -/

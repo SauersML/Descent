@@ -266,12 +266,13 @@ structure PhenotypeLadderInput where
 /-- Build the phenotype ladder from the demographic score law.  This is the A1-to-phenoB
 edge: the emergent rung receives the genetic-liability mean and no target prevalence. -/
 noncomputable def PhenotypeLadderInput.ofScoreLaw (sourcePrevalence residualSD
-    affineBaseline randomBaseline : ℝ) (law : DemeScoreLaw) : PhenotypeLadderInput where
+    affineBaseline randomBaseline : ℝ) (scoreMeanToLiabilityMean : ℝ → ℝ)
+    (law : DemeScoreLaw) : PhenotypeLadderInput where
   sourcePrevalence := sourcePrevalence
   residualSD := residualSD
   affineBaseline := affineBaseline
   randomBaseline := randomBaseline
-  geneticLiabilityMean := law.scoreMean
+  geneticLiabilityMean := scoreMeanToLiabilityMean law.scoreMean
 
 /-- D3: per-rung prevalence.  phenoC is the clean floor; phenoA/R apply their imposed
 baselines; phenoB obtains its prevalence from the upstream genetic-liability mean and is not

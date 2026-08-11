@@ -102,45 +102,60 @@ noncomputable def DemeMixture.pooledAUC {D : ℕ} (mix : DemeMixture D) : ℝ :=
 /-- The pooled formula exposes its diagonal and off-diagonal pieces exactly. -/
 theorem DemeMixture.pooledAUC_diagonal_offDiagonal {D : ℕ} (mix : DemeMixture D) :
     mix.pooledAUC =
-      (∑ i, mix.caseWeight i * mix.controlWeight i *
-        crossDemeCaseControlAUC (mix.law i) (mix.law i)) +
-      ∑ i, ∑ j, if i = j then 0 else
+      (∑ i, ∑ j, if i = j then
         mix.caseWeight i * mix.controlWeight j *
-          crossDemeCaseControlAUC (mix.law i) (mix.law j) := by
+          crossDemeCaseControlAUC (mix.law i) (mix.law j) else 0) +
+      (∑ i, ∑ j, if i = j then 0 else
+        mix.caseWeight i * mix.controlWeight j *
+          crossDemeCaseControlAUC (mix.law i) (mix.law j)) := by
   classical
   unfold DemeMixture.pooledAUC
-  rw [Finset.sum_add_distrib]
-  congr 1
-  · simp
-  · apply Finset.sum_congr rfl
-    intro i _
-    rw [← Finset.sum_ite_irrel i]
-    simp [Finset.sum_ite]
+  rw [← Finset.sum_add_distrib]
+  apply Finset.sum_congr rfl
+  intro i _
+  rw [← Finset.sum_add_distrib]
+  apply Finset.sum_congr rfl
+  intro j _
+  by_cases h : i = j <;> simp [h]
 
 /-! ## E3. Harrell C under an administrative horizon -/
 
-/-- The simulation-relevant proportional-hazards generator.  The baseline rate, score log
-hazard ratio, and administrative horizon are explicit; no unrecorded censoring distribution
-is introduced. -/
+/-- A proportional-hazards generator with an arbitrary baseline hazard and administrative
+horizon.  The cumulative-hazard identity is carried by the type; constant, piecewise,
+spline, and generator-native baselines are instances of this same law. -/
 structure AdministrativePHGenerator where
-  baselineRate : ℝ
+  baselineHazard : ℝ → ℝ
+  baselineCumulativeHazard : ℝ → ℝ
   logHazardRatio : ℝ
   horizon : ℝ
+  baselineHazard_nonneg : ∀ t, 0 ≤ baselineHazard t
+  horizon_nonneg : 0 ≤ horizon
+  cumulative_zero : baselineCumulativeHazard 0 = 0
+  cumulative_spec : ∀ t, 0 ≤ t →
+    baselineCumulativeHazard t = ∫ u in (0 : ℝ)..t, baselineHazard u
 
-/-- Individual event rate under the generator. -/
-noncomputable def AdministrativePHGenerator.eventRate
-    (g : AdministrativePHGenerator) (score : ℝ) : ℝ :=
-  g.baselineRate * Real.exp (g.logHazardRatio * score)
+/-- Individual event hazard at a time and score. -/
+noncomputable def AdministrativePHGenerator.eventHazard
+    (g : AdministrativePHGenerator) (time score : ℝ) : ℝ :=
+  g.baselineHazard time * Real.exp (g.logHazardRatio * score)
+
+/-- Individual cumulative hazard. -/
+noncomputable def AdministrativePHGenerator.eventCumulativeHazard
+    (g : AdministrativePHGenerator) (time score : ℝ) : ℝ :=
+  g.baselineCumulativeHazard time * Real.exp (g.logHazardRatio * score)
+
+/-- Individual survival probability through a time. -/
+noncomputable def AdministrativePHGenerator.eventSurvival
+    (g : AdministrativePHGenerator) (time score : ℝ) : ℝ :=
+  Real.exp (-g.eventCumulativeHazard time score)
 
 /-- Exact probability that individual 1 fails before individual 2 and before the
-administrative horizon, conditional on their scores.  It is the integral of
-`lambda1 exp(-(lambda1+lambda2)t)` from zero to the horizon. -/
+administrative horizon, conditional on their scores. -/
 noncomputable def AdministrativePHGenerator.firstObserved
     (g : AdministrativePHGenerator) (score1 score2 : ℝ) : ℝ :=
-  let lambda1 := g.eventRate score1
-  let lambda2 := g.eventRate score2
-  lambda1 / (lambda1 + lambda2) *
-    (1 - Real.exp (-(lambda1 + lambda2) * g.horizon))
+  ∫ time in (0 : ℝ)..g.horizon,
+    g.eventHazard time score1 * g.eventSurvival time score1 *
+      g.eventSurvival time score2
 
 /-- A Gaussian marginal score law for the survival chart. -/
 structure SurvivalScoreLaw where
@@ -182,15 +197,18 @@ theorem AdministrativePHGenerator.firstObserved_zero_horizon
     g.firstObserved s1 s2 = 0 := by
   simp [AdministrativePHGenerator.firstObserved, h]
 
-/-- The conditional first-event law is invariant to a common shift of the scores when the
-baseline rate is transformed by the reciprocal hazard multiplier.  This is an exact analytic
-check of the survival chart, independent of simulation. -/
-theorem firstObserved_common_shift (g : AdministrativePHGenerator) (c s1 s2 : ℝ) :
-    ({ g with baselineRate := g.baselineRate * Real.exp (-g.logHazardRatio * c) }).firstObserved
-        (s1 + c) (s2 + c) = g.firstObserved s1 s2 := by
-  unfold AdministrativePHGenerator.firstObserved AdministrativePHGenerator.eventRate
-  simp only [neg_mul, add_mul, Real.exp_add, Real.exp_neg]
-  field_simp
-  ring
+/-- First-observed probabilities depend only on the two individual hazard and survival
+curves.  This pins the chart independently of how a generator represents its baseline. -/
+theorem firstObserved_ext (g₁ g₂ : AdministrativePHGenerator) (s1 s2 : ℝ)
+    (hhazard : ∀ t, g₁.eventHazard t s1 = g₂.eventHazard t s1)
+    (hsurv1 : ∀ t, g₁.eventSurvival t s1 = g₂.eventSurvival t s1)
+    (hsurv2 : ∀ t, g₁.eventSurvival t s2 = g₂.eventSurvival t s2)
+    (hhorizon : g₁.horizon = g₂.horizon) :
+    g₁.firstObserved s1 s2 = g₂.firstObserved s1 s2 := by
+  unfold AdministrativePHGenerator.firstObserved
+  rw [hhorizon]
+  apply intervalIntegral.integral_congr
+  intro t _
+  rw [hhazard, hsurv1, hsurv2]
 
 end Descent.Portability
