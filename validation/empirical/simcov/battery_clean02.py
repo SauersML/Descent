@@ -162,6 +162,55 @@ def source_polymorphic_signal_fraction(w, p, ne_s, t):
     return float(np.sum(w * still_segregating_prob(ne_s, p, t)) / np.sum(w))
 
 
+RIVAL_PHI = (
+    ("unweighted still-segregating fraction, competing",
+     "mean_j stillSegregatingProb NeS (p j) t"),
+    ("1 - F_S, the heterozygosity-retention reading, competing",
+     "(1 - 1/(2 NeS))^t"),
+    ("the diffusion at the weighted mean frequency, competing",
+     "stillSegregatingProb NeS (sum_j w_j p_j / sum_j w_j) t"),
+    ("leading eigenfunction only, competing",
+     "sum_j w_j * 6 p_j (1-p_j) exp(-t/(2 NeS)) / sum_j w_j"),
+)
+
+
+def source_polymorphic_rivals(w, p, ne_s, t):
+    """The four competing readings of `sourcePolymorphicSignalFraction`.
+
+    The body's own docstring names the first two as what it OWES: "the UNWEIGHTED
+    still-segregating fraction, which tests whether the `w` weighting earns its
+    place, and `1 - F_S`, the heterozygosity-retention proxy a reader would
+    otherwise assume. Until one of those is run and rejected, this body is
+    measured and not validated." They are run here, on the cells the body was
+    already measured on.
+
+    The other two separate the remaining structural choices the transcription
+    makes. The THIRD collapses the spectrum: it evaluates the same diffusion
+    solution at one frequency, the weighted mean, instead of averaging the
+    solution over the spectrum -- a Jensen rival, and the one that says whether
+    the ancestral frequency distribution has to be carried at all. The FOURTH
+    keeps the whole spectrum and truncates the SERIES, retaining Kimura's leading
+    eigenfunction alone; it is what a reader who knows the large-`t` asymptotic
+    would write, and it says at what depth the 400-term sum stops mattering.
+
+    THE FOURTH RIVAL'S REJECTION IS PARTLY FORCED and is labelled so rather than
+    counted. `6 p (1-p) exp(-t/(2 NeS))` exceeds one at shallow `t` on a spectrum
+    with no rare variants, which `sourcePolymorphicSignalFraction_mem_Icc` forbids
+    a priori, so its failure there is arithmetic and not measurement. What the row
+    measures is the DEPTH at which the approximation becomes adequate. The first
+    three are genuine alternative readings, false in no cell a priori, and they
+    are what makes the corpus row's agreement informative.
+    """
+    tot = float(np.sum(w))
+    seg = still_segregating_prob(ne_s, p, t)
+    pbar = float(np.sum(w * p) / tot)
+    lead = p * (1.0 - p) * 6.0 * math.exp(-t / (2.0 * ne_s))
+    return (float(np.mean(seg)),
+            float(neutral_drift_factor(ne_s, t)),
+            float(still_segregating_prob(ne_s, np.array([pbar]), t)[0]),
+            float(np.sum(w * lead) / tot))
+
+
 def clean_split_target_r2_prime(r2_0, fst_t, phi, ld):
     """`cleanSplitTargetR2'` -- the body under test."""
     return neutral_portability(r2_0, fst_t) * phi * ld
@@ -243,6 +292,10 @@ def one_block(t, ne_s, ne_t_list, lo_hi, rng, want_r2=True):
     # The body's weights: effect sizes and ANCESTRAL heterozygosities.
     w_body = beta ** 2 * h0
     phi_pred = source_polymorphic_signal_fraction(w_body, p0, ne_s, t)
+    # THE COMPETING FORMS, on this same block. Every one of them is a function of
+    # `p0`, `beta` and the pair `(ne_s, t)` alone, so none of them draws from
+    # `rng`: adding them cannot move any number this battery already recorded.
+    phi_rivals = source_polymorphic_rivals(w_body, p0, ne_s, t)
 
     per = {}
     for ne_t in ne_t_list:
@@ -259,7 +312,8 @@ def one_block(t, ne_s, ne_t_list, lo_hi, rng, want_r2=True):
                  if want_r2 else float("nan"))
         per[ne_t] = dict(f_t=f_t, phi_meas=phi_meas, r2_pa=r2_pa,
                          ret_t=1.0 - f_t)
-    return dict(f_s=f_s, ret_s=ret_s, phi_pred=phi_pred, per=per)
+    return dict(f_s=f_s, ret_s=ret_s, phi_pred=phi_pred,
+                phi_rivals=phi_rivals, per=per)
 
 
 def blocked(vals):
@@ -391,11 +445,16 @@ def group_phi():
     # separates the chart from the source-branch factor and the measurement has
     # real variance; they earn nothing here.
     cells = []
+    rival_cells = [[] for _ in RIVAL_PHI]
     for lab, b, ne_t, source_off in designs():
         if source_off:
             continue
-        cells.append(cell("Phi " + lab, [x["phi_pred"] for x in b],
-                          [x["per"][ne_t]["phi_meas"] for x in b]))
+        meas = [x["per"][ne_t]["phi_meas"] for x in b]
+        cells.append(cell("Phi " + lab, [x["phi_pred"] for x in b], meas))
+        for k in range(len(RIVAL_PHI)):
+            rival_cells[k].append(
+                cell("Phi " + lab + " [rival %d]" % (k + 1),
+                     [x["phi_rivals"][k] for x in b], meas))
     record("sourcePolymorphicSignalFraction", LEAN_FILE,
            "(sum_j w_j * stillSegregatingProb NeS (p j) t) / sum_j w_j, "
            "w_j = beta_j^2 * h_0,j",
@@ -415,7 +474,31 @@ def group_phi():
            realised_inputs=True, argument_source="model",
            note="the NeT cells carry a single prediction against four target "
                 "sizes; the oracle's weighting drifts with NeT even though the "
-                "prediction has no NeT argument")
+                "prediction has no NeT argument. The two competing forms this "
+                "body's docstring said it OWED are now carried on these same "
+                "fourteen cells -- the unweighted still-segregating fraction and "
+                "the heterozygosity-retention reading 1 - F_S -- together with "
+                "the spectrum-collapsed and series-truncated readings, so the "
+                "agreement above is scored against designs that could have "
+                "disagreed rather than against nothing")
+    reg_rival = ("the fourteen cells of the corpus row above, same blocks, same "
+                 "oracle: the realised fraction of the TARGET's signal carried "
+                 "by variants still polymorphic in the source")
+    ctrl = drift_control(T_GRID[-1], SPECTRA["1/p on [0.01,0.99]"])
+    for k, (tag, src) in enumerate(RIVAL_PHI):
+        record("sourcePolymorphicSignalFraction [%s]" % tag, LEAN_FILE, src,
+               rival_cells[k], regime=reg_rival, control=ctrl,
+               realised_inputs=True, argument_source="model",
+               note=("this rival's rejection is PARTLY FORCED and is labelled "
+                     "so rather than counted: 6 p (1-p) exp(-t/(2 NeS)) exceeds "
+                     "one at shallow t on the spectrum with no rare variants, "
+                     "which sourcePolymorphicSignalFraction_mem_Icc forbids a "
+                     "priori, so its failure there is arithmetic and not "
+                     "measurement. What the row measures is the depth at which "
+                     "the leading-eigenfunction approximation becomes adequate. "
+                     "The other three rivals are false in no cell a priori and "
+                     "are the ones that make the corpus row informative"
+                     if k == 3 else ""))
 
 
 def group_r2():
