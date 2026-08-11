@@ -1632,7 +1632,43 @@ theorem effectiveDriftGenerations_strictMono_index (Ne F₁ F₂ : ℝ)
     verdict at all; it is recorded as the reason a battery is being commissioned and not as
     evidence. A bracket is also a weak thing to pass: an interval wide enough to hold every
     plausible model is not confirmed by holding the data, and the battery owed here must
-    measure the WIDTH against the restoration gap, not merely report containment. -/
+    measure the WIDTH against the restoration gap, not merely report containment.
+
+    THE WIDTH MEASUREMENT IS NOW DELIVERED, and it is about the bracket's LOWER end
+    (`validation/empirical/simcov/battery_ldwidth01.py`). Two demes of `Nₑ = 1000` split 250
+    generations ago, 20 Mb, 200 diploids each, 30 replicates; the observable is
+    `battery_bulk55`'s split-half cross-deme correlation of signed `r`, so no `E[noise²]`
+    term survives. Pairs binned by map distance, and an ISOLATION arm where — there being no
+    migration — the floor is the whole prediction rather than a bound:
+
+      separation        floor   unascertained   MAF-only   score SNPs
+      25-80 kb         0.6024   0.8188          0.8396     0.8968
+      80-320 kb        0.3073   0.4972          0.5321     0.6510
+      320-1000 kb      0.0471   0.0978          0.1119     0.1500
+
+    THE ASCERTAINMENT FACTOR IS 1.1-1.5x AND NOT 1.8-5.9x, which is the finding. The
+    derivation that corrected this floor modelled `MAF > 0.05` and NOT the clumping and
+    p-thresholding a score applies, and it quantified that gap as needing a factor between
+    1.8x and 5.9x for the corpus's inferred `λ` to be an LD quantity at all. Measured on the
+    same replicates, the p-thresholded-and-clumped SNPs a per-allele score actually carries
+    give 1.10x, 1.31x and 1.53x against unascertained pairs, and 1.07x, 1.22x and 1.34x
+    against MAF-only. Every one of those is BELOW the band, so score ascertainment alone does
+    not close it and the remaining mis-attribution is elsewhere. This ratio is the robust
+    part of the run: it is taken across ascertainments ON THE SAME PAIRS, so any attenuation
+    common to the estimator cancels out of it.
+
+    THE FLOOR IS EXCEEDED EVEN UNASCERTAINED, by 1.36x, 1.63x and 2.09x, and that part is
+    NOT yet a verdict on the floor. The floor is written for `E[D_a D_b]` normalised, and
+    this estimator correlates `r`; the two are different normalisations and no closed form
+    carries one to the other, so the level gap is charged to the convention until a `D`-based
+    reading is measured on the same replicates. What the isolation arm does settle without
+    that caveat is the DIRECTION and the drift term: the superseded floor `(1-c)^(2t)`,
+    carried as a competitor, is a uniform 1.28x above the corrected one — exactly
+    `exp(t/Nₑ)` — and is FALSIFIED at 13.63 sems, so omitting drift from the lower end was a
+    real error of a size now on the record.
+
+    The control is a split at `t = 1`, one population, where the cross-deme LD correlation
+    must be 1: measured 0.995290 ± 0.002158. -/
 noncomputable def steppingStonePortability (r2_0 f1 α : ℝ) (d : ℕ) : ℝ :=
   neutralPortability r2_0 (steppingStoneFst f1 α d)
 

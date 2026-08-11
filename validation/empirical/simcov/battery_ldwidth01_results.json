@@ -1,0 +1,177 @@
+{
+ "_battery_sha": "f83222d58e1e174a",
+ "results": [
+  {
+   "name": "migrationLDBracket [CORRECTED FLOOR exp(-2(c+1/(2Ne))t) under isolation, unascertained]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "exp(-2*(c + 1/(2*Ne))*t)",
+   "note": "with no migration there is no restoration, so the floor is the whole prediction and any excess is ascertainment or an error in the floor; positive control 'split at t=1 [one population: the cross-deme LD correlation is 1]' passed at 2.18 sems",
+   "regime": "msprime, two demes of Ne=1000 split 250 generations ago, 20 Mb at r=1e-08 and mu=1e-08, 200 diploids per deme, 30 independent replicates. The observable is battery_bulk55's SPLIT-HALF cross-deme correlation of signed r, every product taken between DISJOINT halves of a deme so no E[noise^2] term survives the attenuation battery_bulk51 detected at twelve sems. Pairs are binned by map distance, which is where the design gets its span: the corrected floor runs 0.665 to 0.052 across the bins. Three ascertainments are measured ON THE SAME REPLICATES -- every segregating pair, both loci common in both demes, and the p-thresholded-then-clumped SNPs a per-allele PGS actually carries -- because the derivation that corrected the floor modelled the second and not the third, and quantified that gap as a factor between 1.8x and 5.9x",
+   "span": 0.9220712429453264,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "isolation, 25000-80000 bp, unascertained",
+    "lean": 0.6019128482480418,
+    "truth": 0.8188317539480694,
+    "sem": 0.004951968834734081,
+    "sems_off": 43.80457812628299,
+    "rel_err": 0.264912669366001
+   },
+   "cells": [
+    {
+     "design": "isolation, 25000-80000 bp, unascertained",
+     "lean": 0.6019128482480418,
+     "truth": 0.8188317539480694,
+     "sem": 0.004951968834734081,
+     "sems_off": 43.80457812628299,
+     "rel_err": 0.264912669366001
+    },
+    {
+     "design": "isolation, 80000-320000 bp, unascertained",
+     "lean": 0.3047350697381763,
+     "truth": 0.49716435033648115,
+     "sem": 0.010770370249113608,
+     "sems_off": 17.86654276013785,
+     "rel_err": 0.3870536583487303
+    },
+    {
+     "design": "isolation, 320000-1000000 bp, unascertained",
+     "lean": 0.046906320119208214,
+     "truth": 0.09780421011558058,
+     "sem": 0.017135333596756955,
+     "sems_off": 2.9703471898560134,
+     "rel_err": 0.5204059205245208
+    }
+   ]
+  },
+  {
+   "name": "migrationLDBracket [CORRECTED FLOOR exp(-2(c+1/(2Ne))t) under isolation, MAF-only]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "exp(-2*(c + 1/(2*Ne))*t)",
+   "note": "with no migration there is no restoration, so the floor is the whole prediction and any excess is ascertainment or an error in the floor; positive control 'split at t=1 [one population: the cross-deme LD correlation is 1]' passed at 2.18 sems",
+   "regime": "msprime, two demes of Ne=1000 split 250 generations ago, 20 Mb at r=1e-08 and mu=1e-08, 200 diploids per deme, 30 independent replicates. The observable is battery_bulk55's SPLIT-HALF cross-deme correlation of signed r, every product taken between DISJOINT halves of a deme so no E[noise^2] term survives the attenuation battery_bulk51 detected at twelve sems. Pairs are binned by map distance, which is where the design gets its span: the corrected floor runs 0.665 to 0.052 across the bins. Three ascertainments are measured ON THE SAME REPLICATES -- every segregating pair, both loci common in both demes, and the p-thresholded-then-clumped SNPs a per-allele PGS actually carries -- because the derivation that corrected the floor modelled the second and not the third, and quantified that gap as a factor between 1.8x and 5.9x",
+   "span": 0.9217812067715099,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "isolation, 25000-80000 bp, MAF-only",
+    "lean": 0.6024155859089291,
+    "truth": 0.8396210436993183,
+    "sem": 0.00485046796406413,
+    "sems_off": 48.90362322723982,
+    "rel_err": 0.28251490308684585
+   },
+   "cells": [
+    {
+     "design": "isolation, 25000-80000 bp, MAF-only",
+     "lean": 0.6024155859089291,
+     "truth": 0.8396210436993183,
+     "sem": 0.00485046796406413,
+     "sems_off": 48.90362322723982,
+     "rel_err": 0.28251490308684585
+    },
+    {
+     "design": "isolation, 80000-320000 bp, MAF-only",
+     "lean": 0.30734124132118235,
+     "truth": 0.5321366358040784,
+     "sem": 0.011319481322518874,
+     "sems_off": 19.859160334112673,
+     "rel_err": 0.4224392371392017
+    },
+    {
+     "design": "isolation, 320000-1000000 bp, MAF-only",
+     "lean": 0.04712022015183027,
+     "truth": 0.11189465087905998,
+     "sem": 0.018225857893324284,
+     "sems_off": 3.553985283236248,
+     "rel_err": 0.5788876431389057
+    }
+   ]
+  },
+  {
+   "name": "migrationLDBracket [CORRECTED FLOOR exp(-2(c+1/(2Ne))t) under isolation, score SNPs]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "exp(-2*(c + 1/(2*Ne))*t)",
+   "note": "with no migration there is no restoration, so the floor is the whole prediction and any excess is ascertainment or an error in the floor; positive control 'split at t=1 [one population: the cross-deme LD correlation is 1]' passed at 2.18 sems",
+   "regime": "msprime, two demes of Ne=1000 split 250 generations ago, 20 Mb at r=1e-08 and mu=1e-08, 200 diploids per deme, 30 independent replicates. The observable is battery_bulk55's SPLIT-HALF cross-deme correlation of signed r, every product taken between DISJOINT halves of a deme so no E[noise^2] term survives the attenuation battery_bulk51 detected at twelve sems. Pairs are binned by map distance, which is where the design gets its span: the corrected floor runs 0.665 to 0.052 across the bins. Three ascertainments are measured ON THE SAME REPLICATES -- every segregating pair, both loci common in both demes, and the p-thresholded-then-clumped SNPs a per-allele PGS actually carries -- because the derivation that corrected the floor modelled the second and not the third, and quantified that gap as a factor between 1.8x and 5.9x",
+   "span": 0.9229288409939055,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "isolation, 25000-80000 bp, score SNPs",
+    "lean": 0.6118807427392545,
+    "truth": 0.8967661307811903,
+    "sem": 0.006062486421657659,
+    "sems_off": 46.99150946123519,
+    "rel_err": 0.3176808069164773
+   },
+   "cells": [
+    {
+     "design": "isolation, 25000-80000 bp, score SNPs",
+     "lean": 0.6118807427392545,
+     "truth": 0.8967661307811903,
+     "sem": 0.006062486421657659,
+     "sems_off": 46.99150946123519,
+     "rel_err": 0.3176808069164773
+    },
+    {
+     "design": "isolation, 80000-320000 bp, score SNPs",
+     "lean": 0.315086217210614,
+     "truth": 0.6509519964327457,
+     "sem": 0.01981455861140529,
+     "sems_off": 16.95045475445549,
+     "rel_err": 0.5159609019754076
+    },
+    {
+     "design": "isolation, 320000-1000000 bp, score SNPs",
+     "lean": 0.047158358016424304,
+     "truth": 0.1499673919945577,
+     "sem": 0.03555959159415817,
+     "sems_off": 2.891175892892514,
+     "rel_err": 0.685542587697093
+    }
+   ]
+  },
+  {
+   "name": "migrationLDBracket [the SUPERSEDED floor (1-c)^(2t), no drift term, competing]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "(1 - c)^(2*t)",
+   "note": "carried so the size of the omitted drift factor is on the record rather than argued; positive control 'split at t=1 [one population: the cross-deme LD correlation is 1]' passed at 2.18 sems",
+   "regime": "msprime, two demes of Ne=1000 split 250 generations ago, 20 Mb at r=1e-08 and mu=1e-08, 200 diploids per deme, 30 independent replicates. The observable is battery_bulk55's SPLIT-HALF cross-deme correlation of signed r, every product taken between DISJOINT halves of a deme so no E[noise^2] term survives the attenuation battery_bulk51 detected at twelve sems. Pairs are binned by map distance, which is where the design gets its span: the corrected floor runs 0.665 to 0.052 across the bins. Three ascertainments are measured ON THE SAME REPLICATES -- every segregating pair, both loci common in both demes, and the p-thresholded-then-clumped SNPs a per-allele PGS actually carries -- because the derivation that corrected the floor modelled the second and not the third, and quantified that gap as a factor between 1.8x and 5.9x",
+   "span": 0.9217812067715099,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "isolation, 25000-80000 bp, MAF-only",
+    "lean": 0.7735169237159025,
+    "truth": 0.8396210436993183,
+    "sem": 0.00485046796406413,
+    "sems_off": 13.62840049107926,
+    "rel_err": 0.0787308994688427
+   },
+   "cells": [
+    {
+     "design": "isolation, 25000-80000 bp, MAF-only",
+     "lean": 0.7735169237159025,
+     "truth": 0.8396210436993183,
+     "sem": 0.00485046796406413,
+     "sems_off": 13.62840049107926,
+     "rel_err": 0.0787308994688427
+    },
+    {
+     "design": "isolation, 80000-320000 bp, MAF-only",
+     "lean": 0.39463396545275886,
+     "truth": 0.5321366358040784,
+     "sem": 0.011319481322518874,
+     "sems_off": 12.14743559652093,
+     "rel_err": 0.2583973008051736
+    },
+    {
+     "design": "isolation, 320000-1000000 bp, MAF-only",
+     "lean": 0.06050356031487197,
+     "truth": 0.11189465087905998,
+     "sem": 0.018225857893324284,
+     "sems_off": 2.819680196398952,
+     "rel_err": 0.4592810305090765
+    }
+   ]
+  }
+ ]
+}
