@@ -934,6 +934,31 @@ condition on a composition, since no composition here reads it.
 
 section CleanSplit
 
+/-- **A SUMMED per-branch drift index, carried as its own type so that it cannot be handed to a
+    slot expecting a different convention.** The first of the five `F` conventions the corpus
+    registers to be given a type; the other four follow with their own components, and no cast
+    between any two of them exists or should be written.
+
+    WHAT THE TYPE PREVENTS, AND WHAT IT DELIBERATELY DOES NOT. It prevents CROSS-CONVENTION
+    FEEDING: a pairwise Hudson value, or a single branch's Wright `F`, can no longer reach a
+    slot that wants the sum, which is the substitution that produced a factor-of-four false
+    falsification twice. It does NOT prevent reading the number. `value` is a projection, and a
+    theorem stating a numeric fact about the index — an ordering, a bound, a limit — reads it
+    and should. The line is the direction of travel: reading `.value` to say something about
+    this index is the type working, and reading `.value` to satisfy a slot typed for another
+    convention is the coercion the corpus forbids, wearing a projection's clothes.
+
+    WHY THE SUM AND NOT THE BRANCH is `cleanSplitFst`'s own docstring below, and the ledger
+    entry `per-branch-summed` records the measurement: the factor relating this to a pairwise
+    Hudson reading was measured at 2.23 to 2.40 on a symmetric split, not the folkloric 2, so
+    any conversion is design-specific and belongs at a call site that states its design.
+
+    Empirical status: NOT AN EMPIRICAL CLAIM. A type distinguishes two quantities; which one a
+    population exhibits is measured by the bodies that produce and consume it. -/
+structure FstPerBranchSummed where
+  /-- The index itself, as a real. -/
+  value : ℝ
+
 /-- The drift index a clean two-branch split accumulates, as the SUM of the two per-branch
     coefficients.
 
@@ -983,9 +1008,9 @@ section CleanSplit
     can carry one factor of each kind, so a reader deriving such a factor should not read the
     paragraph above as putting this body out of reach: what is rejected is this index in a
     chart's `fst` slot, not this index. -/
-noncomputable def cleanSplitFst (NeS NeT : ℝ) (t : ℕ) : ℝ :=
-  fstFromDriftFactor (neutralDriftFactor NeS t) +
-    fstFromDriftFactor (neutralDriftFactor NeT t)
+noncomputable def cleanSplitFst (NeS NeT : ℝ) (t : ℕ) : FstPerBranchSummed :=
+  ⟨fstFromDriftFactor (neutralDriftFactor NeS t) +
+    fstFromDriftFactor (neutralDriftFactor NeT t)⟩
 
 /-- **When the summed index stays below one, exactly.** The sum of two per-branch coefficients
     is not confined to the unit interval — each reaches toward one, so the sum reaches toward
@@ -994,7 +1019,7 @@ noncomputable def cleanSplitFst (NeS NeT : ℝ) (t : ℕ) : ℝ :=
     needs that condition. The composed prediction below does not, because it never puts this
     sum in a chart's `fst` slot. -/
 theorem cleanSplitFst_lt_one_iff (NeS NeT : ℝ) (t : ℕ) :
-    cleanSplitFst NeS NeT t < 1 ↔
+    (cleanSplitFst NeS NeT t).value < 1 ↔
       1 < neutralDriftFactor NeS t + neutralDriftFactor NeT t := by
   unfold cleanSplitFst fstFromDriftFactor Descent.Core.complement
   constructor <;> intro h <;> linarith
@@ -1002,7 +1027,7 @@ theorem cleanSplitFst_lt_one_iff (NeS NeT : ℝ) (t : ℕ) :
 /-- **No time, no differentiation.** Both branches retain everything at generation zero, so the
     split has accumulated no drift index. -/
 @[simp] theorem cleanSplitFst_at_zero_time (NeS NeT : ℝ) :
-    cleanSplitFst NeS NeT 0 = 0 := by
+    (cleanSplitFst NeS NeT 0).value = 0 := by
   unfold cleanSplitFst neutralDriftFactor fstFromDriftFactor Descent.Core.complement
   norm_num
 
@@ -1065,11 +1090,12 @@ theorem cleanSplitFst_lt_one_iff (NeS NeT : ℝ) (t : ℕ) :
     derived against rather than fitted to.
 
     argument_source: model. -/
-noncomputable def causalVarianceRatio (fstSummed : ℝ) : ℝ := 1 / (1 - fstSummed)
+noncomputable def causalVarianceRatio (fstSummed : FstPerBranchSummed) : ℝ :=
+  1 / (1 - fstSummed.value)
 
 /-- **No differentiation, no inflation.** At the split itself the causal variance is the
     ancestral one, which is the control cell any battery for this body is gated on. -/
-@[simp] theorem causalVarianceRatio_at_zero : causalVarianceRatio 0 = 1 := by
+@[simp] theorem causalVarianceRatio_at_zero : causalVarianceRatio ⟨0⟩ = 1 := by
   unfold causalVarianceRatio
   norm_num
 
@@ -1077,8 +1103,8 @@ noncomputable def causalVarianceRatio (fstSummed : ℝ) : ℝ := 1 / (1 - fstSum
     the observed sub-one regime outside the body rather than merely far from it: no argument in
     `[0,1)` produces a value below one, so a measurement below one refutes the SCOPE and not
     the constant. -/
-theorem causalVarianceRatio_one_le (fstSummed : ℝ)
-    (h0 : 0 ≤ fstSummed) (h1 : fstSummed < 1) :
+theorem causalVarianceRatio_one_le (fstSummed : FstPerBranchSummed)
+    (h0 : 0 ≤ fstSummed.value) (h1 : fstSummed.value < 1) :
     1 ≤ causalVarianceRatio fstSummed := by
   unfold causalVarianceRatio
   rw [le_div_iff₀ (by linarith)]
@@ -1086,8 +1112,8 @@ theorem causalVarianceRatio_one_le (fstSummed : ℝ)
 
 /-- **Deeper splits inflate the causal variance further.** Monotone in the summed index across
     the admissible range. -/
-theorem causalVarianceRatio_monotone (f₁ f₂ : ℝ)
-    (h₁₂ : f₁ ≤ f₂) (h1 : f₂ < 1) :
+theorem causalVarianceRatio_monotone (f₁ f₂ : FstPerBranchSummed)
+    (h₁₂ : f₁.value ≤ f₂.value) (h1 : f₂.value < 1) :
     causalVarianceRatio f₁ ≤ causalVarianceRatio f₂ := by
   unfold causalVarianceRatio
   exact one_div_le_one_div_of_le (by linarith) (by linarith)
@@ -1096,7 +1122,7 @@ theorem causalVarianceRatio_monotone (f₁ f₂ : ℝ)
     `F = 1`, where no ancestral variation is retained and the ratio is unbounded. Lean returns
     `0` there — the smallest possible inflation for a split that has retained nothing — and no
     type error marks the point. Consumers must exclude it. -/
-theorem causalVarianceRatio_at_one_is_junk : causalVarianceRatio 1 = 0 := by
+theorem causalVarianceRatio_at_one_is_junk : causalVarianceRatio ⟨1⟩ = 0 := by
   unfold causalVarianceRatio
   norm_num
 
@@ -1124,7 +1150,7 @@ theorem neutralDriftFactor_antitone_time (Ne : ℝ) (t₁ t₂ : ℕ)
     per-branch indices rise and so does their sum. -/
 theorem cleanSplitFst_monotone_time (NeS NeT : ℝ) (t₁ t₂ : ℕ)
     (hS : 1 ≤ NeS) (hT : 1 ≤ NeT) (ht : t₁ ≤ t₂) :
-    cleanSplitFst NeS NeT t₁ ≤ cleanSplitFst NeS NeT t₂ := by
+    (cleanSplitFst NeS NeT t₁).value ≤ (cleanSplitFst NeS NeT t₂).value := by
   have hdS := neutralDriftFactor_antitone_time NeS t₁ t₂ hS ht
   have hdT := neutralDriftFactor_antitone_time NeT t₁ t₂ hT ht
   unfold cleanSplitFst fstFromDriftFactor Descent.Core.complement
