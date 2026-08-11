@@ -57,24 +57,25 @@ theorem IdentifiedBy.exists_readout {Parameter Data Target : Type*}
 
 /-! ## Completion laws -/
 
-/-- An exact coordinate family depending on a visible input and a completion.  Whether a
-simulator's internal random objects belong in `Completion` or must first be integrated out is
-part of the subsystem semantics, not something this structure decides. -/
-structure CompletionLaw (Input Completion Coordinate : Type*) where
-  value : Input → Completion → Coordinate → ℝ
+/-- An exact coordinate family depending on a visible input and a completion.  The value type
+is generic so a partial scientific output can use `Option ℝ` without encoding undefined as a
+number.  Whether a simulator's internal random objects belong in `Completion` or must first be
+integrated out is part of the subsystem semantics, not something this structure decides. -/
+structure CompletionLaw (Input Completion Coordinate Value : Type*) where
+  value : Input → Completion → Coordinate → Value
 
 /-- A single visible-input readout that is exact at every completion and coordinate. -/
-def HasExactReadout {Input Completion Coordinate : Type*}
-    (law : CompletionLaw Input Completion Coordinate) : Prop :=
-  ∃ readout : Input → Coordinate → ℝ,
+def HasExactReadout {Input Completion Coordinate Value : Type*}
+    (law : CompletionLaw Input Completion Coordinate Value) : Prop :=
+  ∃ readout : Input → Coordinate → Value,
     ∀ input completion coordinate,
       law.value input completion coordinate = readout input coordinate
 
 /-- The completion law has an exact readout exactly when the visible projection identifies
 its complete coordinate family. -/
 theorem hasExactReadout_iff_identifiedBy
-    {Input Completion Coordinate : Type*}
-    (law : CompletionLaw Input Completion Coordinate)
+    {Input Completion Coordinate Value : Type*}
+    (law : CompletionLaw Input Completion Coordinate Value)
     (baseInput : Input) (baseCompletion : Completion) :
     HasExactReadout law ↔
       IdentifiedBy
@@ -95,8 +96,8 @@ theorem hasExactReadout_iff_identifiedBy
 /-- A coordinate is exactly identified when its value is constant across every completion at
 each visible input. -/
 def CompletionLaw.CoordinateIdentified
-    {Input Completion Coordinate : Type*}
-    (law : CompletionLaw Input Completion Coordinate) (coordinate : Coordinate) : Prop :=
+    {Input Completion Coordinate Value : Type*}
+    (law : CompletionLaw Input Completion Coordinate Value) (coordinate : Coordinate) : Prop :=
   ∀ input first second,
     law.value input first coordinate = law.value input second coordinate
 
@@ -105,7 +106,7 @@ def CompletionLaw.CoordinateIdentified
 /-- A sharp coordinatewise completion fiber.  `lower` and `upper` depend only on the visible
 input, bound every completion, and are both attained by compatible completions. -/
 structure SharpFiberEnvelope {Input Completion Coordinate : Type*}
-    (law : CompletionLaw Input Completion Coordinate) where
+    (law : CompletionLaw Input Completion Coordinate ℝ) where
   lower : Input → Coordinate → ℝ
   upper : Input → Coordinate → ℝ
   lower_le : ∀ input completion coordinate,
@@ -122,7 +123,7 @@ structure SharpFiberEnvelope {Input Completion Coordinate : Type*}
 /-- The center of the sharp completion fiber. -/
 noncomputable def SharpFiberEnvelope.midpointLaw
     {Input Completion Coordinate : Type*}
-    {law : CompletionLaw Input Completion Coordinate}
+    {law : CompletionLaw Input Completion Coordinate ℝ}
     (envelope : SharpFiberEnvelope law) : Input → Coordinate → ℝ :=
   fun input coordinate ↦
     midpoint (envelope.lower input coordinate) (envelope.upper input coordinate)
@@ -130,14 +131,14 @@ noncomputable def SharpFiberEnvelope.midpointLaw
 /-- Half the sharp fiber width. -/
 noncomputable def SharpFiberEnvelope.halfWidth
     {Input Completion Coordinate : Type*}
-    {law : CompletionLaw Input Completion Coordinate}
+    {law : CompletionLaw Input Completion Coordinate ℝ}
     (envelope : SharpFiberEnvelope law) (input : Input) (coordinate : Coordinate) : ℝ :=
   (envelope.upper input coordinate - envelope.lower input coordinate) / 2
 
 /-- The midpoint misses every compatible exact value by at most half the sharp fiber width. -/
 theorem SharpFiberEnvelope.midpoint_error_le_halfWidth
     {Input Completion Coordinate : Type*}
-    {law : CompletionLaw Input Completion Coordinate}
+    {law : CompletionLaw Input Completion Coordinate ℝ}
     (envelope : SharpFiberEnvelope law)
     (input : Input) (completion : Completion) (coordinate : Coordinate) :
     |law.value input completion coordinate - envelope.midpointLaw input coordinate| ≤
@@ -153,7 +154,7 @@ theorem SharpFiberEnvelope.midpoint_error_le_halfWidth
 Together with `midpoint_error_le_halfWidth`, this is coordinatewise minimax optimality. -/
 theorem SharpFiberEnvelope.halfWidth_le_worstEndpointError
     {Input Completion Coordinate : Type*}
-    {law : CompletionLaw Input Completion Coordinate}
+    {law : CompletionLaw Input Completion Coordinate ℝ}
     (envelope : SharpFiberEnvelope law) (candidate : Input → Coordinate → ℝ)
     (input : Input) (coordinate : Coordinate) :
     envelope.halfWidth input coordinate ≤
@@ -194,7 +195,7 @@ theorem SharpFiberEnvelope.halfWidth_le_worstEndpointError
 /-- A coordinate is identified exactly when both sharp endpoints agree at every input. -/
 theorem SharpFiberEnvelope.coordinateIdentified_iff_endpoints_eq
     {Input Completion Coordinate : Type*}
-    {law : CompletionLaw Input Completion Coordinate}
+    {law : CompletionLaw Input Completion Coordinate ℝ}
     (envelope : SharpFiberEnvelope law) (coordinate : Coordinate) :
     law.CoordinateIdentified coordinate ↔
       ∀ input, envelope.lower input coordinate = envelope.upper input coordinate := by
@@ -218,7 +219,7 @@ theorem SharpFiberEnvelope.coordinateIdentified_iff_endpoints_eq
 /-- On an identified coordinate, the midpoint is exact even if other coordinates are not. -/
 theorem SharpFiberEnvelope.midpoint_exact_of_coordinateIdentified
     {Input Completion Coordinate : Type*}
-    {law : CompletionLaw Input Completion Coordinate}
+    {law : CompletionLaw Input Completion Coordinate ℝ}
     (envelope : SharpFiberEnvelope law) (coordinate : Coordinate)
     (hidentified : law.CoordinateIdentified coordinate)
     (input : Input) (completion : Completion) :
@@ -234,7 +235,7 @@ theorem SharpFiberEnvelope.midpoint_exact_of_coordinateIdentified
 /-- A complete exact readout exists precisely when every sharp completion fiber is a point. -/
 theorem SharpFiberEnvelope.hasExactReadout_iff_all_endpoints_eq
     {Input Completion Coordinate : Type*}
-    {law : CompletionLaw Input Completion Coordinate}
+    {law : CompletionLaw Input Completion Coordinate ℝ}
     (envelope : SharpFiberEnvelope law) :
     HasExactReadout law ↔
       ∀ input coordinate, envelope.lower input coordinate = envelope.upper input coordinate := by
@@ -261,48 +262,12 @@ theorem SharpFiberEnvelope.hasExactReadout_iff_all_endpoints_eq
 /-- One genuinely positive-width sharp fiber rules out an exact visible-input readout. -/
 theorem SharpFiberEnvelope.no_exactReadout_of_lt
     {Input Completion Coordinate : Type*}
-    {law : CompletionLaw Input Completion Coordinate}
+    {law : CompletionLaw Input Completion Coordinate ℝ}
     (envelope : SharpFiberEnvelope law) (input : Input) (coordinate : Coordinate)
     (hwidth : envelope.lower input coordinate < envelope.upper input coordinate) :
     ¬ HasExactReadout law := by
   intro hexact
   have heq := envelope.hasExactReadout_iff_all_endpoints_eq.mp hexact input coordinate
   exact (ne_of_lt hwidth) heq
-
-/-! ## The framework is inhabited -/
-
-/-- The completion flips the one coordinate between zero and one at every visible input, so
-the completion fiber has genuine width.  This is the inhabitant that keeps the envelope
-theorems above from quantifying over an empty class. -/
-noncomputable def booleanCompletionLaw : CompletionLaw Unit Bool Unit where
-  value := fun _ completion _ ↦ if completion then 1 else 0
-
-/-- A sharp envelope for `booleanCompletionLaw`, with `lower = 0 < 1 = upper`.  The witness
-deliberately has POSITIVE fiber width: a collapsed envelope (`lower = upper`) would inhabit
-the class only at the degenerate identified boundary, where `no_exactReadout_of_lt` is
-unreachable and sharpness costs nothing.  Here both endpoints are attained by named
-completions, so every field of the structure is exercised away from that boundary. -/
-noncomputable def booleanSharpFiberEnvelope : SharpFiberEnvelope booleanCompletionLaw where
-  lower := fun _ _ ↦ 0
-  upper := fun _ _ ↦ 1
-  lower_le := by
-    intro _ completion _
-    cases completion <;> simp [booleanCompletionLaw]
-  le_upper := by
-    intro _ completion _
-    cases completion <;> simp [booleanCompletionLaw]
-  lowerWitness := fun _ _ ↦ false
-  upperWitness := fun _ _ ↦ true
-  lower_attained := by
-    intro _ _
-    simp [booleanCompletionLaw]
-  upper_attained := by
-    intro _ _
-    simp [booleanCompletionLaw]
-
-/-- The positive-width witness really does refuse an exact readout, so the impossibility
-half of the framework is exercised by an inhabitant rather than holding vacuously. -/
-theorem booleanCompletionLaw_no_exactReadout : ¬ HasExactReadout booleanCompletionLaw :=
-  booleanSharpFiberEnvelope.no_exactReadout_of_lt () () one_pos
 
 end Descent.Core

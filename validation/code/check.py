@@ -1321,7 +1321,12 @@ def run_identifications() -> int:
             nm = dm.group(1).split(".")[-1]
             all_defs.append(nm)
             doc = ident_preceding_docstring(raw_lines, i)
-            def_status[nm] = status_is_measured(doc)
+            # Aggregate, do not overwrite: several namespaced declarations share a short
+            # name (Core.Fst.hudsonFst is MEASURED while later-parsed derived readings of
+            # the same convention are not), and the fork screen asks whether the NAME has
+            # a measured side anywhere -- a plain assignment let the last file parsed
+            # erase an earlier measured status and re-fire a settled fork.
+            def_status[nm] = def_status.get(nm, False) or status_is_measured(doc)
     forks = set()
     for _label, pat in OBSERVABLE_GROUPS:
         # DEDUPLICATED. `all_defs` is a list of short names over the whole corpus, so a name
