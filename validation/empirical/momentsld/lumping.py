@@ -59,12 +59,41 @@ recombination by +1.  Two consequences, and the second is the one that matters.
   * It IS block-TRIDIAGONAL: every operator moves the count by at most one, so the
     strata couple only to their neighbours (2 <-> 3 <-> 4 lineages, of sizes
     2n^2, 4n^3, n^4).  A block-Thomas recursion therefore applies at the level of
-    strata, and the cost is dominated by the top stratum -- where the only internal
-    transitions are migration, acting on four independently labelled lineages, i.e.
-    a Kronecker sum of four copies of the single-lineage migration operator.  On a
-    lattice that operator has analytic eigenmodes, which is the direction a large
-    instance should be attacked from rather than by a bigger dense solve.  Stated as
-    structure, not as an implemented method: nothing here exploits it yet.
+    strata, and the cost is dominated by the top stratum.
+
+AND A CORRECTION TO A CLAIM THIS DOCSTRING PREVIOUSLY MADE, because it was wrong and
+the wrong version is the kind that gets built on.  It said the top stratum "has
+analytic eigenmodes" and was the direction to attack a large instance from, reasoning
+that its only internal TRANSITIONS are migration -- four independently labelled
+lineages, hence a Kronecker sum of four copies of the single-lineage migration
+operator, which on a lattice diagonalises in cosine modes.  The premise is true and
+was verified: in the 4-lineage stratum every lineage is a singleton, so no lineage
+carries units of both loci and the recombination rate really is zero there.  THE
+CONCLUSION DOES NOT FOLLOW.  A diagonal block is not only its internal transitions --
+it also carries the OUTFLOW leaving the stratum, and that outflow is state-dependent:
+measured on the 4x4 lattice's 65536 four-lineage states, the number of coalescing
+pairs takes the values 0, 1, 2, 3 and 6, and (because reflecting boundaries give
+boundary demes fewer neighbours) the migration outflow ranges over 8..16.  The
+coalescence term is the indicator that two lineages occupy the same deme, which is
+diagonal in DEME space and therefore a convolution in mode space.  So the block is a
+Kronecker sum MINUS a term the mode basis does not diagonalise, and the mode basis
+does not solve it.
+
+WHY THAT OBSTRUCTION IS EXACTLY WHAT SEPARATES ONE LOCUS FROM TWO, which is worth
+recording because it also explains the shape of the published literature.  At one
+locus with two lineages, translation invariance leaves a single difference
+coordinate and coalescence acts only where it vanishes -- a RANK-ONE perturbation of
+a translation-invariant operator, invertible in closed form by the lattice Green's
+function at the origin.  That is the Kimura-Weiss / Maruyama result.  At two loci
+with four lineages there are three difference coordinates and coalescence is
+supported wherever ANY of the six pairwise differences vanishes: a union of
+codimension-two subspaces, not a finite-rank perturbation, with no elementary
+Green's-function inversion.  A reflecting lattice does not even supply the
+translation invariance to begin from.  This is consistent with what the literature
+does and does not contain -- one-locus lattice models solved spectrally since the
+1960s, and the nearest two-locus stepping-stone study (De & Durrett, Genetics 176:969,
+2007) reaching its conclusions by simulation on a torus with no closed form for LD
+against distance.
 
 ARITHMETIC-AGNOSTIC BY CONSTRUCTION.  A generator is a list of dicts: `Q[i][j]` is the
 rate from state i to state j, and rates may be `Fraction`, `float`, or sympy
