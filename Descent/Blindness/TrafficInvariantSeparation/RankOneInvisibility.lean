@@ -24,6 +24,7 @@ import Mathlib.Topology.MetricSpace.UniformConvergence
 import Mathlib.Topology.Order.LeftRight
 import Mathlib.Tactic
 import Descent.Layer
+import Descent.Blindness.NormVisibility
 
 assert_below Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
 
@@ -570,6 +571,91 @@ theorem rankOne_groundState_certificate
     exact rankOneEnergyDensity_ge_baseline baseline spikeStrength population (alignment spin)
       hspike
   · rw [horthogonal, rankOneEnergyDensity_orthogonal]
+
+/-! ### What this invisibility is not: the norm reading
+
+`Descent.Blindness.NormVisibility` proves the other way a perturbation can escape a probe:
+a perturbation on a vanishing fraction of the coordinates has mean-square size at most
+`√(fraction)` times its worst-case size, so a localized spike disappears from every
+population average. It is worth saying explicitly that the rank-one invisibility above is
+NOT that phenomenon, because the two look alike from a distance and have nothing in
+common underneath.
+
+The balanced hidden direction is dense, not localized. Its coordinates are `±1` at every
+site, so its worst-case size and its mean-square size are both exactly one: it SATURATES
+`NormVisibility.rootMeanSquare_le_supremumNorm`, which is the extreme opposite of the
+localized family that norm invisibility rests on. No norm-counting argument can hide it.
+What hides it from the traffic coordinates is the graph exponent count `|V| ≤ |E|`,
+proved above from handshaking — a statement about which contracted graphs can contribute,
+not about how much of the vector is nonzero. Traffic invisibility is therefore strictly
+finer than norm invisibility: it conceals a perturbation that every norm probe sees in
+full.
+-/
+
+/-- Every coordinate of the balanced hidden sign vector has absolute value one. -/
+theorem balancedRankOneSign_abs (population : ℕ)
+    (coordinate : BalancedRankOneCoordinate population) :
+    |balancedRankOneSign population coordinate| = 1 := by
+  cases coordinate <;> simp [balancedRankOneSign]
+
+/-- The worst-case size of the balanced hidden direction is exactly one. -/
+theorem balancedRankOneSign_supremumNorm (population : ℕ) (hpopulation : 0 < population) :
+    NormVisibility.supremumNorm (balancedRankOneSign population) = 1 := by
+  refine le_antisymm (NormVisibility.supremumNorm_le _ 1 zero_le_one ?_) ?_
+  · intro coordinate
+    exact le_of_eq (balancedRankOneSign_abs population coordinate)
+  · calc (1 : ℝ) = |balancedRankOneSign population (Sum.inl ⟨0, hpopulation⟩)| :=
+        (balancedRankOneSign_abs population _).symm
+      _ ≤ NormVisibility.supremumNorm (balancedRankOneSign population) :=
+        NormVisibility.le_supremumNorm _ _
+
+/-- The mean-square size of the balanced hidden direction is also exactly one: the spike is
+dense, and a population average of it loses nothing. -/
+theorem balancedRankOneSign_rootMeanSquare (population : ℕ) (hpopulation : 0 < population) :
+    NormVisibility.rootMeanSquare (balancedRankOneSign population) = 1 := by
+  have hcard : Fintype.card (BalancedRankOneCoordinate population) = 2 * population := by
+    simp [BalancedRankOneCoordinate, two_mul]
+  have hsum : ∑ coordinate, balancedRankOneSign population coordinate ^ 2
+      = ((2 * population : ℕ) : ℝ) := by
+    simpa [dotProduct, pow_two] using balancedRankOneSign_dot_self population
+  have hne : ((2 * population : ℕ) : ℝ) ≠ 0 := by
+    have hpositive : 0 < 2 * population := by omega
+    exact_mod_cast hpositive.ne'
+  rw [NormVisibility.rootMeanSquare, hsum, hcard, div_self hne, Real.sqrt_one]
+
+/-- **The spike saturates the norm inequality.**  Equality in
+`NormVisibility.rootMeanSquare_le_supremumNorm` is the signature of a dense perturbation,
+and it is what rules out reading the rank-one result as a support-counting effect. -/
+theorem balancedRankOneSign_rootMeanSquare_eq_supremumNorm (population : ℕ)
+    (hpopulation : 0 < population) :
+    NormVisibility.rootMeanSquare (balancedRankOneSign population)
+      = NormVisibility.supremumNorm (balancedRankOneSign population) := by
+  rw [balancedRankOneSign_rootMeanSquare population hpopulation,
+    balancedRankOneSign_supremumNorm population hpopulation]
+
+/-- **Both statements at once: fully visible to every norm probe, invisible to every fixed
+traffic coordinate.**  The left conjunct is the saturation above; the right is the finite
+expansion's vanishing correction under the same graph hypothesis as
+`finiteRankOneTrafficCorrection_tendsto_zero`.  A single object separates the two notions
+of invisibility, which is why neither development subsumes the other. -/
+theorem balancedRankOneSign_normVisible_while_trafficCorrection_vanishes
+    {Term : Type*} [Fintype Term]
+    (coefficient : Term → ℝ) (hasOddDegree : Term → Bool)
+    (vertices edges : Term → ℕ)
+    (hconnected : ∀ term, hasOddDegree term = false → vertices term ≤ edges term) :
+    (∀ population : ℕ, 0 < population →
+        NormVisibility.rootMeanSquare (balancedRankOneSign population) = 1 ∧
+          NormVisibility.supremumNorm (balancedRankOneSign population) = 1) ∧
+      Filter.Tendsto
+        (fun population : ℕ ↦
+          finiteRankOneTrafficCorrection coefficient hasOddDegree vertices edges
+            (population + 1))
+        Filter.atTop (nhds 0) :=
+  ⟨fun population hpopulation ↦
+      ⟨balancedRankOneSign_rootMeanSquare population hpopulation,
+        balancedRankOneSign_supremumNorm population hpopulation⟩,
+    finiteRankOneTrafficCorrection_tendsto_zero coefficient hasOddDegree vertices edges
+      hconnected⟩
 
 end RankOneInvisibility
 

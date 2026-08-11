@@ -31,6 +31,7 @@ import Descent.Blindness.LandscapeSuperposition
 import Descent.Blindness.LumpedRateBlindness
 import Descent.Blindness.MarkedBreakoutUniversality
 import Descent.Blindness.MultipleMergerBlindness
+import Descent.Blindness.NormVisibility
 import Descent.Blindness.ObservationalCeiling
 import Descent.Blindness.SpectralUniversalityFailure
 import Descent.Blindness.SpectrumIdentifiability
