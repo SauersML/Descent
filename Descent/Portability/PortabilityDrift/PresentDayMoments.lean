@@ -1065,22 +1065,34 @@ theorem liabilityCaseVariance_at_zero_r2 (K : ℝ) : liabilityCaseVariance 0 K =
 
 /-- Score variance among controls, `v₀ = 1 - R²·i_c·(i_c - T)`.
 
-    Empirical status: **VALIDATED**
-    (`validation/empirical/simcov/battery_max.py`,
-    `test_liability_control_variance`). Four million explicit normal
-    liabilities, the variance read on the STANDARDISED score among controls:
+    Empirical status: **VALIDATED** (`validation/empirical/simcov/battery_rival01.py`).
+    Explicit normal liabilities `g + e` with realised `r2 = Var(g)/Var(l)`, dichotomised at
+    the threshold for prevalence `K`; the observable is the variance of the STANDARDISED score
+    among controls, `Var(g | l ≤ T)/Var(g)`, with the control mean evaluated at the block's
+    realised case fraction. 8 blocks of 500000 individuals:
 
       K       r2     this def   simulated            sems
-      0.05    0.3     0.94289   0.94167±0.00068      1.79
-      0.20    0.3     0.87490   0.87428±0.00069      0.90
-      0.05    0.6     0.88579   0.88614±0.00064      0.56
+      0.05    0.3     0.94293   0.94293±0.00021      0.01
+      0.20    0.3     0.87490   0.87449±0.00031      1.32
+      0.05    0.6     0.88586   0.88588±0.00016      0.10
+      0.40    0.5     0.71145   0.71098±0.00060      0.77
+      0.02    0.2     0.97926   0.97916±0.00020      0.47
 
-    The reading is pinned the same way `liabilityCaseVariance`'s was: the
-    variance is of the standardised PGS among controls, not of the liability.
+    THE READING IS NOW PINNED BY MEASUREMENT, NOT BY ANALOGY. This docstring used to say the
+    reading "is pinned the same way `liabilityCaseVariance`'s was" -- but that body was pinned
+    by CARRYING its rival, and this one had inherited the sentence without the measurement.
+    The rival is carried here: the variance of the LIABILITY among controls rather than of the
+    standardised score, which is the same expression with `r2` set to one and is what a reader
+    who took the other reading of the name would compute. It is rejected at 938.86 sems. Two
+    further readings die on the same cells: the CASE formula applied to controls at 2466.89
+    sems, and dropping the `-T` term at 654.08. The positive control -- the realised total
+    liability variance, which the construction fixes at 1 -- passes at 0.92 sems. An earlier
+    record (`validation/empirical/simcov/battery_max.py`, three cells) competed nothing and
+    the ledger gates it UNINFORMATIVE.
 
-    Power: the prediction spans 0.87490 to 0.94289 across the design, which is
-    narrow, and it is narrow because the two inputs are swept against each other:
-    `K` fourfold from 0.05 to 0.20 and `r2` doubling from 0.3 to 0.6. -/
+    Power: the prediction spans 0.71145 to 0.97926 across the design, `K` swept twentyfold
+    from 0.02 to 0.40 and `r2` threefold from 0.2 to 0.6, and three competing readings are
+    rejected on those same cells at 654.08 to 2466.89 sems. -/
 noncomputable def liabilityControlVariance (r2 K : ℝ) : ℝ :=
   1 - r2 * liabilityControlMean K * (liabilityControlMean K - liabilityThreshold K)
 

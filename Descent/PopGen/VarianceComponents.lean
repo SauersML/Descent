@@ -513,26 +513,37 @@ section LiabilityScale
     is far in the tail, z = φ(T) is small, and z² << K(1-K), so
     h²_liab >> h²_obs.
 
-    Empirical status: **VALIDATED**
-    (`validation/empirical/simcov/battery_bulk8.py`,
-    `test_liability_scale_h2`). The test is whether the transform RECOVERS the
-    liability heritability the simulation was built with. Three million
-    individuals per cell: a liability with known `h2` is dichotomised at
-    prevalence `K`, the observed-scale heritability is fitted by regression on
-    the 0/1 outcome, and the transform is applied to it.
+    Empirical status: **VALIDATED** (`validation/empirical/simcov/battery_rival01.py`). The
+    test is whether the transform RECOVERS the liability heritability the simulation was built
+    with: a normal liability of declared `h2` is dichotomised at the threshold for prevalence
+    `K`, the observed-scale heritability is fitted by least squares of the 0/1 outcome on the
+    genetic value, and the transform is applied to it. The TRUTH of each cell is the `h2` the
+    simulation was built with, a construction constant that never touches the prediction side;
+    prevalence and threshold height are taken at the block's REALISED case fraction. 8 blocks
+    of 500000 individuals:
 
-      h2_liab   K       recovered   built with sems
-      0.5       0.05      0.50157     0.50000     1.92
-      0.5       0.20      0.49912     0.50000     1.07
-      0.3       0.10      0.29998     0.30000     0.04
+      h2_liab   K       recovered   built with   sems
+      0.5       0.05     0.49919     0.50000     0.40
+      0.5       0.20     0.49944     0.50000     0.28
+      0.3       0.10     0.30068     0.30000     0.56
+      0.2       0.02     0.20118     0.20000     1.48
+      0.6       0.40     0.59966     0.60000     0.14
 
-    The control is that the same regression recovers `h2` when the outcome is
-    the liability itself rather than its dichotomy; it passes, so the
-    observed-scale fit is sound before the transform is asked to correct it.
+    WHAT THE PREVALENCE SWEEP BUYS. The competing form that could have disagreed is the
+    transform with the `(1-K)` factor dropped: it is a 2% error at `K = 0.02` and a 67% error
+    at `K = 0.40`, so it is the twentyfold prevalence sweep and NOT the sample size that
+    rejects it, at 165.96 sems. On a grid that stayed rare it would have matched, which is why
+    the earlier three-cell design (`validation/empirical/simcov/battery_bulk8.py`, `K` from
+    0.05 to 0.20) could not have carried it -- that row agreed with nothing run against it and
+    the ledger gates it UNINFORMATIVE. Two further readings die here too: leaving `z`
+    unsquared at 237.81 sems, and applying no transform at all at 219.89. The control is that
+    the same regression recovers `h2` when the outcome is the LIABILITY rather than its
+    dichotomy; it passes at 0.13 sems, so the observed-scale fit is sound before the transform
+    is asked to correct it.
 
-    Power: `K` is swept from 0.05 to 0.20, a factor of four, and `z^2` with it,
-    while `h2_liab` moves from 0.3 to 0.5, so a transform missing the prevalence
-    factor would separate. -/
+    Power: the recovered heritability spans 0.20118 to 0.59966 across the design while `K` is
+    swept twentyfold from 0.02 to 0.40, and `z^2` with it; three competing transforms are
+    rejected on those same cells at 165.96 to 237.81 sems. -/
 noncomputable def liabilityScaleH2
     (h2_observed prevalence z_height : ℝ) : ℝ :=
   h2_observed * prevalence * (1 - prevalence) / z_height ^ 2

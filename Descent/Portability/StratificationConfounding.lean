@@ -629,17 +629,35 @@ noncomputable def AttenuationModel.witness : AttenuationModel where
 
 /-- Reliability ratio in a population
 
-    Empirical status: **VALIDATED**
-    (`validation/empirical/simcov/battery_bulk5.py`,
-    `test_attenuation`). Measured as the ratio of the slope fitted on a NOISY
-    predictor to the slope fitted on the clean one, two million individuals:
+    Empirical status: **VALIDATED** (`validation/empirical/simcov/battery_rival01.py`). The
+    observable is the ratio of the least-squares slope of `y` on a NOISY predictor to the
+    slope of `y` on the clean one, where a signal of realised variance `v_sig` carries
+    independent noise of realised variance `v_noi` and `y = signal + N(0,1)`. The prediction
+    is evaluated at each block's REALISED variances, never at the nominal pair. 8 blocks of
+    500000 individuals; error bars are the block sem:
 
       r2    sigma2   this def   measured             sems
-      0.5   0.5       0.50000   0.49997±0.00106      0.03
-      0.2   0.8       0.20000   0.20016±0.00042      0.39
-      0.8   0.2       0.80000   0.80028±0.00170      0.16
+      0.5   0.5       0.49988   0.49969±0.00041      0.47
+      0.2   0.8       0.19994   0.20046±0.00040      1.29
+      0.8   0.2       0.80001   0.80049±0.00038      1.25
+      0.9   0.1       0.90002   0.90020±0.00011      1.64
+      0.1   0.9       0.09978   0.09964±0.00060      0.23
 
-    Power: the prediction spans 0.20000 to 0.80000. -/
+    WHAT THE RIVALS ESTABLISH. The competing form that could have disagreed is the SQUARE
+    ROOT of the same expression -- the factor by which reliability attenuates a CORRELATION
+    rather than a slope. The oracle here is a slope ratio, so rejecting the square root at
+    612.46 sems is what says which of the two this body is; the corpus swept for
+    correlation-where-slope-belongs and had never asked this body. Two further readings die on
+    the same cells: the noise share `σ2_noise/(r2 + σ2_noise)` at 7219.78 sems, and forcing
+    the total variance to one, `r2/(1 + σ2_noise)`, at 736.70. The positive control -- the
+    slope on the CLEAN predictor, which the construction fixes at 1 -- passes at 1.55 sems.
+
+    An earlier record (`validation/empirical/simcov/battery_bulk5.py`, three cells, worst 0.39
+    sems) agreed with nothing run against it; the ledger gates such a row UNINFORMATIVE, and
+    this head no longer rests on it.
+
+    Power: the prediction spans 0.09978 to 0.90002 across the design, a factor of nine, and
+    three competing forms are rejected on those same cells at 612.46 to 7219.78 sems. -/
 noncomputable def reliabilityRatio (r2 σ2_noise : ℝ) : ℝ :=
   Descent.Core.share r2 σ2_noise
 
