@@ -63,7 +63,11 @@ section PortabilityDrift
     (`battery_bulk1.py`, `test_coalescent_hazard`) is against a piecewise-constant
     hazard whose integral is exact and which crosses an epoch boundary, so a
     wrong integral would move the survival. Worst cell 1.42 sems over a
-    prediction spanning 0.31140 to 0.81873. -/
+    prediction spanning 0.31140 to 0.81873.
+
+    Power: the prediction spans 0.31140 to 0.81873 across the design, on a hazard
+    that crosses an epoch boundary so a wrong integral would move the
+    survival. -/
 noncomputable def integratedCoalescentHazard (hazard : ℝ → ℝ) (t : ℝ) : ℝ :=
   ∫ s in (0)..t, hazard s
 
@@ -114,7 +118,9 @@ survival function.
     Empirical status: **VALIDATED** on the same runs as
     `coalescenceSurvivalFromHazard` (`battery_bulk1.py`,
     `test_coalescent_hazard`), worst cell 1.42 sems over a prediction spanning
-    0.18127 to 0.68860. -/
+    0.18127 to 0.68860.
+
+    Power: the prediction spans 0.18127 to 0.68860 across the design. -/
 noncomputable def coalescenceCdfFromHazard (hazard : ℝ → ℝ) (t : ℝ) : ℝ :=
   1 - coalescenceSurvivalFromHazard hazard t
 
@@ -132,7 +138,12 @@ coalescent timescale.
     odds are 0.2477 ± 0.0080, 1.0038 ± 0.0309, 0.1326 ± 0.0034, 1.9946 ±
     0.0559 and 4.0164 ± 0.0799, worst cell 2.24 sems. `Nₑ` and `t` are moved
     separately, so the two appear at the same `τ` by different routes and a
-    body that scaled by only one of them would separate. -/
+    body that scaled by only one of them would separate.
+
+    Power: `τ` is swept over 0.125, 0.25, 1, 2 and 4 -- a thirtytwofold range,
+    the prediction spanning 97 percent -- and the divisor is what the design
+    decides: `t / Nₑ` or `t / (4·Nₑ)` would miss the measured odds by exactly the
+    factor in it. Worst cell 2.24 sems. -/
 noncomputable def coalescentTau (t Ne : ℝ) : ℝ :=
   t / (2 * Ne)
 

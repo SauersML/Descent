@@ -82,7 +82,14 @@ opened `section PortabilityDrift` and closed it 8,000 lines later. A section sco
     checked against something that consumes it, and the table above is the
     check. Halving or doubling this factor moves `exp(-theta * tau)` from 0.135
     to 0.368 or 0.018 in the bottom rows, which the measurement excludes by
-    hundreds of sems. -/
+    hundreds of sems.
+
+    Power: the composed prediction spans 0.13534 to 0.77880 across the design,
+    `theta*tau` running over a factor of eight while `Ne` runs independently over
+    a factor of eight, so the form and the `Ne` cancellation are on trial at
+    once. Halving or doubling this time scale moves the bottom rows to 0.368 or
+    0.018, and the competing one-lineage reading `exp(-mu t)` misses by up to
+    433 sems and 174 percent. -/
 noncomputable def _root_.Descent.Core.PopGenParameters.tauAt (g : Descent.Core.PopGenParameters)
     (t : ℕ) : Descent.Core.Tau :=
   Descent.Core.Tau.ofGenerations (t : ℝ) g.Ne
@@ -221,7 +228,12 @@ generations.
     that the cancellation would be visible, and the verdict gate called NO POWER
     on it -- correctly, since a prediction that never moves cannot reject a
     wrong functional form no matter what else the design shows. The numbers
-    above are from the redone design. -/
+    above are from the redone design.
+
+    Power: the prediction spans 0.13534 to 0.77880 across the design, with
+    `theta*tau` running over a factor of eight and `Ne` independently over a
+    factor of eight, and the competing one-lineage reading `exp(-mu t)` misses by
+    up to 433 sems and 174 percent on the same measurement. -/
 noncomputable def _root_.Descent.Core.PopGenParameters.mutationSharedRetentionAt
     (g : Descent.Core.PopGenParameters) (t : ℕ) : ℝ :=
   Real.exp (-g.theta.value * (g.tauAt t).value)
@@ -418,6 +430,12 @@ score itself is unchanged.
     MATCH at worst 1.77 sems (0.44% relative) on the three cells that share |dp| = 0.2;
     the superseded exponential is FALSIFIED at 237 sems and the square root -- what a
     STANDARDIZED score would give -- at 137 sems.
+
+    Power: measured retention runs from 0.4278 to 1.1926 -- one cell above one --
+    across three cells that all share `|Δp| = 0.2`, which is exactly the set any
+    gap-only shape must give a single number to. On the committed re-run this
+    body MATCHES at worst 1.77 sems while the superseded exponential is
+    FALSIFIED at 237 sems and its square root at 137.
     -/
 noncomputable def alleleFreqMismatchPenalty (pSource pTarget : ℝ) : ℝ :=
   (2 * pTarget * (1 - pTarget)) / (2 * pSource * (1 - pSource))

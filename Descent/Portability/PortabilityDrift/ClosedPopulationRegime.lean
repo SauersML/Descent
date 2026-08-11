@@ -83,6 +83,12 @@ recursion multiplies `(1 - mu)²` against the drift factor and differs at
     over nine cells spanning `theta` 0.80 to 1.00 and `Ne` 50 to 200. The status
     stands, but it now stands on an oracle that matches the model the body
     describes, rather than on one that agreed with it to first order in `mu`.
+
+    Power: on that oracle `theta` is swept over 0.80 to 1.00 and `Ne` over 50 to
+    200, nine cells, and the body holds at worst 0.71 sems. What the design had
+    to do to see anything at all is ITERATE: the biallelic input term
+    `2 mu (1 - 2 H)` differs from this body's `2 mu (1 - H)` by `2 mu H`, which
+    hides under one generation's noise and reaches 632 sems over fifteen.
 -/
 noncomputable def hetStepWithMutation (Ne mu H : ℝ) : ℝ :=
   (1 - 1 / (2 * Ne)) * H + 2 * mu * (1 - H)
@@ -310,7 +316,14 @@ noncomputable def ClosedPopulationNoMutation.witness : ClosedPopulationNoMutatio
     omits rather than an error in the term it keeps.
 
     The body is unchanged. What settled the verdict was running the test the
-    old one had not: the table above is that run, and it agrees. -/
+    old one had not: the table above is that run, and it agrees.
+
+    Power: the prediction spans 0.36696 to 0.88327 over the eight cells, and two
+    neighbouring readings ride those same cells and are excluded at 142 to 238
+    sems -- the haploid `(1 - 1/Nₑ)^t` and the doubled exponent
+    `(1 - 1/(2 Nₑ))^(2t)`. NOT separated: the diffusion form `exp(-t/(2 Nₑ))`
+    sits within 1.7 sems everywhere, differing from this body by `O(1/Nₑ)` at
+    these `Nₑ`, so discrete against continuous is not decided here. -/
 noncomputable def ClosedPopulationNoMutation.retention
     (r : ClosedPopulationNoMutation) : ℝ :=
   (1 - 1 / (2 * r.Ne)) ^ r.horizon
@@ -323,7 +336,11 @@ noncomputable def ClosedPopulationNoMutation.retention
     `ClosedPopulationNoMutation.retention`, which this multiplies by `H₀`. The
     earlier FALSIFIED verdict came from a run outside the regime the structure
     enforces; see there for the in-regime table, the rejected competitors and
-    the segregating-sites control. -/
+    the segregating-sites control.
+
+    Power: the retention this multiplies spans 0.36696 to 0.88327 over the eight
+    in-regime cells, where the haploid and doubled-exponent readings are excluded
+    at 142 to 238 sems. -/
 noncomputable def ClosedPopulationNoMutation.targetHet
     (r : ClosedPopulationNoMutation) : ℝ :=
   r.H₀ * r.retention

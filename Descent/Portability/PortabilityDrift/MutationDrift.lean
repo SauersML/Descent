@@ -136,7 +136,13 @@ theorem MutationDriftModelAssumptions.theta_pos (m : MutationDriftModelAssumptio
     differentiation. The measurement above is of that within-population
     quantity. A consumer wanting differentiation wants
     `DGP.EvolutionaryParameters.fstEquilibrium`, which is separately FALSIFIED
-    -- so the two must not be substituted for one another. -/
+    -- so the two must not be substituted for one another.
+
+    Power: the projected design sweeps `Nₑ` and `μ` by a factor of four
+    INDEPENDENTLY, so each `θ` is reached twice by different routes and the `Nₑ`
+    dependence is separately on trial, worst cell 2.40 sems. The complementary
+    run measures `θ/(1+θ)` over a hundredfold `θ` sweep at worst 2.17 sems, with
+    an Ewens allele-count control passing at 1.10. -/
 noncomputable def MutationDriftModelAssumptions.fstEquilibrium
     (m : MutationDriftModelAssumptions) : ℝ :=
   PopGen.fstMutationDriftEquilibrium (Descent.Core.Theta.ofScaled m.theta)
@@ -213,7 +219,9 @@ theorem MutationDriftModelAssumptions.fstEquilibrium_lt_one
     are separately falsifiable; holding `θ = 0.5` and doubling `Nₑ` moves `τ` by
     a factor of 1.996 against 2.000 predicted.
 
-    Power, and why this is a measurement rather than an identity: the drift-only
+    Power: the predicted time constant spans 500 to 1818 generations across the
+    design, with `Nₑ` and `θ` swept separately so the two scalings are separately
+    falsifiable. This is a measurement rather than an identity: the drift-only
     rate `τ = 2·Nₑ`, which drops the mutation term, is carried on the SAME cells
     and is FALSIFIED at up to 9.96 sems (50% relative). An oracle algebraically
     pinned to the body could not reject a competing form -- the "measurement"
@@ -400,6 +408,12 @@ noncomputable def covarianceRetention (freq_corr ld_overlap : ℝ) : ℝ :=
     definitions, not two independent ones, and what it adds over the heterozygosity statement
     is the identification of that ratio with a COVARIANCE retention -- which holds because the
     effects are fixed and is exactly what would fail if they were not.
+
+    Power: against the MODEL's `fst` over four `(Nₑ, t)` cells and 300000 loci
+    this body holds at worst 0.58 sems and 0.03 percent relative, while
+    `(1-fst)²` is refuted at up to 259 sems on the same draws. (The clause above
+    about holding `F_ST` fixed belongs to the REFUTED identification with the
+    allele-frequency correlation, not to this retention claim.)
 
     Denotes: the covariance-retention factor, not the allele-frequency
     correlation. The same body `1 - fst` appears under names from 'correlation',
