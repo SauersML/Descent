@@ -71,8 +71,10 @@ noncomputable def pgsMean {m : ℕ} (β : Fin m → ℝ) (p : Fin m → ℝ) : �
     load-bearing for the same reason: the unconditional reading is wrong
     wherever the scored variants are in LD, which is the usual case.
 
-    Power: the two panels are the design, and they separate the linkage-
-    equilibrium reading from the unconditional one at 39 sems. -/
+    Power: the two panels are the design -- linkage equilibrium at 0.1 sems and
+    0.26 percent, a recombining coalescent panel at 39.3 sems and 71.8 percent --
+    and they separate the linkage-equilibrium reading from the unconditional
+    one. -/
 noncomputable def pgsVariance {m : ℕ} (β : Fin m → ℝ) (p : Fin m → ℝ) : ℝ :=
   ∑ i, β i ^ 2 * (2 * p i * (1 - p i))
 

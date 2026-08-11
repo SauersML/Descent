@@ -1579,8 +1579,9 @@ section LDDecayDerivation
     definition names only the first factor, which is what a recurrence called
     `ldRecurrence` should name.
 
-    Power: the design spans a factor of twenty in `r`, and the fitted decay
-    tracks it across that whole range. -/
+    Power: `r` is swept from 0.005 to 0.100, a factor of twenty, and the fitted
+    `log D` slope tracks `log (1 - r)` from -0.005038 to -0.105338 across that
+    whole range. -/
 def ldRecurrence (r D₀ : ℝ) : ℕ → ℝ
   | 0 => D₀
   | t + 1 => (1 - r) * ldRecurrence r D₀ t

@@ -272,8 +272,9 @@ theorem fstEquilibrium_gt_half_of_small_theta (θ : Descent.Core.Theta)
     not discriminate continuous from discrete time. That limit is stated rather
     than papered over.
 
-    Power: the prediction rises from a quarter of the plateau to within 2% of
-    it across the time points, so a wrong rate constant would separate. -/
+    Power: `t/Ne` is swept from 0.25 to 4, over which the prediction rises from a
+    quarter of the plateau to within 2% of it, so a wrong rate constant would
+    separate. -/
 noncomputable def fstMutationDriftTransient (θ : Descent.Core.Theta) (t Ne : ℝ) : ℝ :=
   fstMutationDriftEquilibrium θ * (1 - Real.exp (-(1 + θ.value) * t / (2 * Ne)))
 

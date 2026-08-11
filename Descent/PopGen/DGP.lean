@@ -4928,8 +4928,11 @@ they are not added or multiplied into a single portability law. -/
     The positive control is that row, against the textbook drift variance
     `p(1-p)/(2 Nₑ)`, and it passes at 0.36 sems.
 
-    Power: the superseded prediction spans a factor of nine across the design
-    while the measurement is flat, which is the whole finding.
+    Power: the superseded prediction spans 0.000278 to 0.002500 across the
+    design, a factor of nine, while this body and the measurement stay together
+    at 0.002500 through all four `Ne = 200` rows and move to 0.001000 only when
+    `Nₑ` does. That the swept `θ` and `M` move one prediction and not the other
+    is the whole finding.
 
     Denotes: a per-generation RATE. Other definitions share this formula under
     names from the timescale family -- `1/(2 Nₑ)` is also the reciprocal

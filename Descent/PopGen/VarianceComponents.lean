@@ -523,8 +523,9 @@ section LiabilityScale
     the liability itself rather than its dichotomy; it passes, so the
     observed-scale fit is sound before the transform is asked to correct it.
 
-    Power: `K` moves by a factor of four across the design, and `z^2` with it,
-    so a transform missing the prevalence factor would separate. -/
+    Power: `K` is swept from 0.05 to 0.20, a factor of four, and `z^2` with it,
+    while `h2_liab` moves from 0.3 to 0.5, so a transform missing the prevalence
+    factor would separate. -/
 noncomputable def liabilityScaleH2
     (h2_observed prevalence z_height : ℝ) : ℝ :=
   h2_observed * prevalence * (1 - prevalence) / z_height ^ 2
