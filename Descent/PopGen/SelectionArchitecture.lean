@@ -161,70 +161,6 @@ theorem equilibriumEffectVariance_lt_of_selection_lt
   unfold equilibriumEffectVariance Descent.Core.ratio
   exact div_lt_div_of_pos_left h_vm h_s₁ h_stronger
 
-/-- **Effect correlation under stabilizing selection.**
-    When both populations are under the same stabilizing selection,
-    effect sizes are pulled toward the same optimum.
-    ρ(effects) ≈ 1 - O(1/2Ns) where Ns is selection × drift balance.
-
-    Empirical status: **FALSIFIED** on two independent axes
-    (`validation/empirical/popgensel/`, cell E). Forward, individual-based
-    Wright-Fisher with Gaussian stabilizing selection toward a SHARED optimum --
-    the setting this docstring describes -- two populations split from one
-    ancestor and evolved independently. Cross-population correlation of allele
-    frequencies at the causal loci:
-
-    1. **The body has no divergence time and the quantity does.** At `Ns` held
-       fixed at 4.8 (`N = 60`, `s = 0.08`) the measured correlation is
-       `0.839 ± 0.006` at `t = 5`, `0.550 ± 0.008` at `t = 20` and
-       `0.163 ± 0.013` at `t = 60`, against the single number `0.896` this body
-       returns for all three. That is 57 sems at `t = 60`. No time-free function
-       of `Ns` can be this quantity, whatever constant replaces the `1/2`.
-
-    2. **The `Ns` dependence has the wrong SIGN.** This body is strictly
-       increasing in `Ns` (`effectCorrelationStabilizing_lt_of_Ns_lt`): stronger
-       selection, better-preserved effects. Measured, stronger stabilizing
-       selection makes the two populations LESS alike, because a shared optimum
-       is reachable by different allelic routes. At `N = 60`, `t = 20`, over
-       `s = 0, 0.1, 0.5, 2.0` the correlation falls monotonically
-       `0.548 ± 0.008`, `0.539 ± 0.009`, `0.477 ± 0.011`, `0.373 ± 0.014`, while
-       this body rises `undefined`, `0.917`, `0.983`, `0.996`.
-
-    The positive control is that same sweep: the design moves 12 sems along the
-    selection axis, so the flatness reported at weak selection is the
-    measurement and not the instrument's blindness. The competitor carried on
-    the same cells is the neutral arm `s = 0`, which this body cannot express at
-    all (it returns the junk `1` there, see
-    `effectCorrelationStabilizing_zero_selection_is_junk`).
-
-    What survives is the ORDERING interface: downstream results
-    (`fluctuatingEffectCorrelation_lt_stabilizing`,
-    `stabilizingNsFromObservedCorrelation_leftInverse`) use this only as a
-    parametrisation of an observed correlation `rho_obs` by a single number, and
-    those are algebra. What does not survive is reading `Ns` off an observed
-    correlation and calling it a selection-drift balance. -/
-noncomputable def effectCorrelationStabilizing (Ns : ℝ) : ℝ :=
-  1 - 1 / (2 * Ns)
-
-/-- **The stabilizing effect correlation at zero selection, named.** With `Ns = 0` the effect
-sizes are governed by drift alone and the cross-population correlation decays to zero. Lean
-returns `1`: PERFECTLY preserved effects, the strongest portability claim the corpus can make,
-produced exactly where portability is weakest. Its inverse map
-`stabilizingNsFromObservedCorrelation` is junk at the same value from the other side. Consumers
-must require `Ns ≠ 0`. -/
-theorem effectCorrelationStabilizing_zero_selection_is_junk :
-    effectCorrelationStabilizing 0 = 1 := by
-  unfold effectCorrelationStabilizing
-  simp
-
-/-- Effect correlation increases with stronger selection (relative to drift). -/
-theorem effectCorrelationStabilizing_lt_of_Ns_lt
-    (Ns₁ Ns₂ : ℝ)
-    (h₁ : 0 < Ns₁) (h_more : Ns₁ < Ns₂) :
-    effectCorrelationStabilizing Ns₁ < effectCorrelationStabilizing Ns₂ := by
-  unfold effectCorrelationStabilizing
-  rw [sub_lt_sub_iff_left]
-  exact div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
-
 /-- Per-locus contribution obtained by spreading a positive architecture-scale variance
 equally over `locusCount` causal loci.
 
@@ -453,20 +389,6 @@ theorem fluctuatingSelectedArchitectureVariance_at_reference_point :
   norm_num [fluctuatingSelectedArchitectureVariance, equilibriumEffectVariance, optimumOUVariance,
       Descent.Core.ratio]
 
-theorem effectCorrelationStabilizing_pos_iff
-    (Ns : ℝ) (hNs : 0 < Ns) :
-    0 < effectCorrelationStabilizing Ns ↔ 1 / 2 < Ns := by
-  unfold effectCorrelationStabilizing
-  have hden_pos : 0 < 2 * Ns := by linarith
-  rw [sub_pos, div_lt_one hden_pos]
-  constructor <;> intro h <;> linarith
-
-theorem effectCorrelationStabilizing_lt_one_iff (Ns : ℝ) :
-    effectCorrelationStabilizing Ns < 1 ↔ 0 < Ns := by
-  unfold effectCorrelationStabilizing
-  rw [sub_lt_self_iff, one_div_pos]
-  constructor <;> intro h <;> nlinarith
-
 theorem fluctuatingSelectedArchitectureVariance_gt_stabilizing
     (v_mutation s sigmaTheta autocorrTime : ℝ)
     (h_sigma : 0 < sigmaTheta) (h_tau : 0 < autocorrTime) :
@@ -479,71 +401,6 @@ theorem fluctuatingSelectedArchitectureVariance_gt_stabilizing
     have hsq : 0 < sigmaTheta ^ 2 := sq_pos_of_pos h_sigma
     nlinarith
   linarith
-
-/-- The fluctuating correlation drops below the stabilizing correlation once the
-    fluctuating autocorrelation time is below the exact threshold obtained by
-    matching `exp(-t/τ)` to `1 - 1/(2Ns)`. -/
-theorem fluctuatingCorrelation_lt_stabilizing_of_tau_lt_threshold
-    (t autocorrTime Ns : ℝ)
-    (h_tau : 0 < autocorrTime) (hNs : 1 / 2 < Ns)
-    (h_tau_lt : autocorrTime < t / (-Real.log (effectCorrelationStabilizing Ns))) :
-    fluctuatingEffectCorrelation t autocorrTime < effectCorrelationStabilizing Ns := by
-  have h_rho_pos : 0 < effectCorrelationStabilizing Ns :=
-    (effectCorrelationStabilizing_pos_iff Ns (by linarith)).2 hNs
-  have h_rho_lt_one : effectCorrelationStabilizing Ns < 1 :=
-    (effectCorrelationStabilizing_lt_one_iff Ns).2 (by linarith)
-  have h_log_neg : Real.log (effectCorrelationStabilizing Ns) < 0 := by
-    have h_log_lt : Real.log (effectCorrelationStabilizing Ns) < Real.log 1 :=
-      Real.log_lt_log h_rho_pos h_rho_lt_one
-    simpa using h_log_lt
-  have h_neglog_pos : 0 < -Real.log (effectCorrelationStabilizing Ns) := by
-    linarith
-  have h_mul_lt : autocorrTime * (-Real.log (effectCorrelationStabilizing Ns)) < t :=
-    (lt_div_iff₀ h_neglog_pos).mp h_tau_lt
-  have h_neglog_lt_div : -Real.log (effectCorrelationStabilizing Ns) < t / autocorrTime :=
-    (lt_div_iff₀ h_tau).2 (by simpa [mul_comm] using h_mul_lt)
-  have h_exp_lt_log' : -(t / autocorrTime) < Real.log (effectCorrelationStabilizing Ns) := by
-    linarith
-  have h_exp_lt_log : -t / autocorrTime < Real.log (effectCorrelationStabilizing Ns) := by
-    simpa [neg_div] using h_exp_lt_log'
-  unfold fluctuatingEffectCorrelation
-  have h_exp_lt := Real.exp_lt_exp.mpr h_exp_lt_log
-  simpa [Real.exp_log h_rho_pos] using h_exp_lt
-
-/-- Recover the stabilizing `Ns` parameter from an observed cross-population
-    effect correlation.
-
-    Empirical status: UNTESTED. -/
-noncomputable def stabilizingNsFromObservedCorrelation (effectCorr : ℝ) : ℝ :=
-  1 / (2 * (1 - effectCorr))
-
-/-- **The recovered selection strength's junk branch, named.** At a perfectly preserved
-correlation the implied `Ns` diverges and Lean returns `0`, reporting no selection where the
-data imply unbounded selection. Consumers must require `rho ≠ 1`. -/
-theorem stabilizingNsFromObservedCorrelation_perfect_is_junk :
-    stabilizingNsFromObservedCorrelation 1 = 0 := by
-  unfold stabilizingNsFromObservedCorrelation; norm_num
-
-/-- Below perfect correlation, the recovered stabilizing-selection scale lies in the
-positive-correlation regime `Ns > 1/2` exactly when the observation itself is positive. -/
-theorem stabilizingNsFromObservedCorrelation_gt_half_iff
-    (effectCorr : ℝ) (h_rho_lt : effectCorr < 1) :
-    1 / 2 < stabilizingNsFromObservedCorrelation effectCorr ↔ 0 < effectCorr := by
-  unfold stabilizingNsFromObservedCorrelation
-  have h_denom : 0 < 2 * (1 - effectCorr) := by linarith
-  rw [div_lt_div_iff₀ (by norm_num : (0 : ℝ) < 2) h_denom]
-  constructor <;> intro h <;> nlinarith
-
-/-- The inverse map for the stabilizing effect-correlation formula is exact on
-    the biologically relevant region `ρ < 1`. -/
-theorem effectCorrelationStabilizing_eq_observedCorrelation_of_recoveredNs
-    (effectCorr : ℝ) (h_rho_lt : effectCorr < 1) :
-    effectCorrelationStabilizing (stabilizingNsFromObservedCorrelation effectCorr) = effectCorr
-      := by
-  unfold effectCorrelationStabilizing stabilizingNsFromObservedCorrelation
-  have h_one_minus_ne : 1 - effectCorr ≠ 0 := by linarith
-  field_simp [h_one_minus_ne]
-  ring
 
 /-- Recover the fluctuating-selection autocorrelation time `τ` from an observed
     cross-population effect correlation measured at divergence time `t`.
@@ -686,8 +543,7 @@ theorem fluctuatingSelectedArchitectureVariance_eq_observed_of_recoveredSigmaThe
   unfold stabilizingSelectedArchitectureVariance
   ring_nf
 
-/-- **Observed summary statistics identify a fluctuating regime and exclude all
-    stabilizing regimes.**
+/-- **Observed summary statistics are matched exactly by a fluctuating regime.**
 
     If an observed trait-level summary exhibits:
     1. a cross-population effect correlation `ρ_obs` strictly between `0` and `1`,
@@ -697,10 +553,13 @@ theorem fluctuatingSelectedArchitectureVariance_eq_observed_of_recoveredSigmaThe
 
     then there is an exact fluctuating-selection regime matching both observed
     summaries, obtained by recovering `τ` from `ρ_obs` and `σ_θ` from the
-    selected-variance excess. At the same time, no stabilizing regime can match
-    the same joint summary, because under stabilizing selection the selected
-    variance is fixed at the baseline `v_mutation / s` independently of `Ns`. -/
-theorem observedSummary_identifies_fluctuating_not_stabilizing
+    selected-variance excess.
+
+    This is a MATCH, not an identification: the corpus carries no law giving the
+    cross-population effect correlation of a stabilizing regime, so it cannot
+    say what correlation a stabilizing regime would have produced and cannot
+    exclude one on that coordinate. -/
+theorem observedSummary_matched_by_fluctuating_regime
     (v_mutation s t rho_obs v_selected_obs : ℝ)
     (h_t : 0 < t)
     (h_rho : 0 < rho_obs) (h_rho_lt : rho_obs < 1)
@@ -708,14 +567,11 @@ theorem observedSummary_identifies_fluctuating_not_stabilizing
     let tau_hat := tauFromObservedEffectCorrelation t rho_obs
     let sigma_hat :=
       sigmaThetaFromObservedSelectedVariance v_selected_obs v_mutation s t rho_obs
-    (0 < tau_hat ∧
+    0 < tau_hat ∧
       0 < sigma_hat ∧
       fluctuatingEffectCorrelation t tau_hat = rho_obs ∧
       fluctuatingSelectedArchitectureVariance v_mutation s sigma_hat tau_hat =
-        v_selected_obs) ∧
-    ¬ ∃ Ns,
-        effectCorrelationStabilizing Ns = rho_obs ∧
-          stabilizingSelectedArchitectureVariance v_mutation s = v_selected_obs := by
+        v_selected_obs := by
   dsimp
   have h_tau_pos : 0 < tauFromObservedEffectCorrelation t rho_obs :=
     tauFromObservedEffectCorrelation_pos t rho_obs h_t h_rho h_rho_lt
@@ -725,15 +581,11 @@ theorem observedSummary_identifies_fluctuating_not_stabilizing
           v_selected_obs v_mutation s t rho_obs :=
     sigmaThetaFromObservedSelectedVariance_pos
       v_selected_obs v_mutation s t rho_obs h_t h_rho h_rho_lt h_var_gap
-  constructor
-  · exact ⟨h_tau_pos, h_sigma_pos,
-      fluctuatingEffectCorrelation_eq_observedCorrelation_of_recoveredTau
-        t rho_obs h_t h_rho h_rho_lt,
-      fluctuatingSelectedArchitectureVariance_eq_observed_of_recoveredSigmaTheta
-        v_selected_obs v_mutation s t rho_obs h_t h_rho h_rho_lt h_var_gap⟩
-  · intro h_stab
-    rcases h_stab with ⟨Ns, _, h_var_eq⟩
-    linarith
+  exact ⟨h_tau_pos, h_sigma_pos,
+    fluctuatingEffectCorrelation_eq_observedCorrelation_of_recoveredTau
+      t rho_obs h_t h_rho h_rho_lt,
+    fluctuatingSelectedArchitectureVariance_eq_observed_of_recoveredSigmaTheta
+      v_selected_obs v_mutation s t rho_obs h_t h_rho h_rho_lt h_var_gap⟩
 
 /-- **Balancing selection maintains intermediate allele frequencies.**
     Under balancing selection (e.g., heterozygote advantage in HLA),
@@ -1008,9 +860,7 @@ variant leaving proportionally fewer offspring, and `s < 0` is advantageous. The
 convention writes `w = 1 + s` and makes positive `s` advantageous. The two differ by a sign,
 no correction converts a body written in one into a body written in the other, and a corpus
 that takes `s` in twenty hypotheses while defining it in none cannot say which of them any
-hypothesis meant. `selectionPortabilityTimescale` below is one of those hypotheses, and its
-own docstring already has to spend a paragraph on which `s` it means and what the factor of
-two costs.
+hypothesis meant.
 
 This is `Core.proportionalReduction` at fitnesses -- a selection coefficient IS a
 proportional reduction -- so it sits under the same kernel as every other proportional
@@ -1067,61 +917,6 @@ theorem selectionCoefficient_complement_mul_reference
     Descent.Core.complement
   field_simp
   ring
-
-/-- Characteristic generation timescale `1/(2s)` for selection-driven portability decay.
-
-Empirical status: **FALSIFIED by a factor of two as a selection timescale**
-(`validation/empirical/popgensel/`, cell D), and the "modelling convention" defence
-this docstring used to offer is what the measurement removes.
-
-The deterministic viability-selection recursion `p' = p(1+s)/(1+s p)` has e-folding time
-`1/log(1+s)` generations for a rare allele. Measured against it, over `s = 0.001, 0.005,
-0.02`:
-
-| `s` | e-folding time | this body `1/(2s)` | ratio | competitor `1/s` | ratio |
-|---|---|---|---|---|---|
-| 0.001 | 1000.50 | 500 | 0.4998 | 1000 | 0.9995 |
-| 0.005 | 200.50 | 100 | 0.4988 | 200 | 0.9975 |
-| 0.02 | 50.50 | 25 | 0.4951 | 50 | 0.9901 |
-
-The competitor `1/s` is right to within one percent everywhere; this body is exactly half
-of it. The other carried competitor, `2/s` -- the `h = 1/2` diploid convention, where the
-per-allele coefficient is `s/2` -- is off by a factor of two the other way, so no reading
-of `s` recovers `1/(2s)`. The `PLANTED` control `1.4/(2s)` is rejected at ratio 0.70 on all
-three rows, so the instrument does reject.
-
-The factor of two is inherited from the body: this is `driftLDCreationRate` applied to a
-selection coefficient, and `1/(2 Nₑ)` carries a two that counts GAMETES
-(`driftRatePerGen_unit_population`). A selection coefficient has no gametes to count. That
-is the type pun the "declared rather than inferred" note below records; the measurement
-says the pun costs a factor of two, which is not a convention.
-
-Denotes: a characteristic timescale indexed by selection strength. Its numerical formula
-matches a drift-rate chart, and the coincidence is not benign. -/
-noncomputable def selectionPortabilityTimescale (s : ℝ) : ℝ :=
-  driftLDCreationRate s
-
-/-- The selection-decay timescale is pinned at `s = 1/2`. -/
-theorem selectionPortabilityTimescale_at_reference_point :
-    selectionPortabilityTimescale (1 / 2) = 1 := by
-  norm_num [selectionPortabilityTimescale, driftLDCreationRate, driftRatePerGen,
-    alleleFreqDivergenceRate]
-
-/-- **Selection coefficient orders the portability timescale.**
-    Smaller `s` gives slower change; larger `s` gives faster change.
-
-    The MONOTONICITY is all this states, and it is all that survives: the
-    magnitude `1/(2s)` is FALSIFIED at a factor of two against the deterministic
-    selection recursion, whose e-folding time is `1/log(1+s)` (see
-    `selectionPortabilityTimescale`). Any positive multiple of `1/s` orders the
-    same way, so this theorem does not bear on which multiple is right. -/
-theorem selectionPortabilityTimescale_lt_of_selection_lt
-    (s₁ s₂ : ℝ) (h₁ : 0 < s₁)
-    (h_stronger : s₁ < s₂) :
-    selectionPortabilityTimescale s₂ < selectionPortabilityTimescale s₁ := by
-  unfold selectionPortabilityTimescale
-  unfold driftLDCreationRate driftRatePerGen alleleFreqDivergenceRate
-  apply div_lt_div_of_pos_left one_pos (by linarith) (by linarith)
 
 /-- **Number of independent loci matters more than heritability for portability.**
     Two traits with the same h² but different architecture have different portability:

@@ -621,15 +621,19 @@ theorem better_than_neutral_implies_stabilizing_selection
       sourceSquaredEffect fstCausal fst_neutral h_nonneg h_weight_pos h_no
   linarith
 
-/-- **Below-neutral portability plus selected-variance excess identifies a
+/-- **Below-neutral portability plus selected-variance excess is matched by a
 fluctuating/diversifying selection regime.**
     A subunit observed cross-population effect correlation by itself is not yet
     a regime label. But if the same trait also has selected-architecture
     variance above the stabilizing mutation-selection baseline, then the
-    observed summary is matched by a fluctuating-selection regime and by no
-    stabilizing regime. For fixed drift coordinates, that same observed effect
-    correlation forces the portability ratio below the neutral drift baseline. -/
-theorem worse_than_neutral_implies_fluctuating_regime
+    observed summary is matched exactly by a fluctuating-selection regime. For
+    fixed drift coordinates, that same observed effect correlation forces the
+    portability ratio below the neutral drift baseline.
+
+    A MATCH, not an identification: excluding a stabilizing regime on the
+    correlation coordinate would need a law for the cross-population effect
+    correlation a stabilizing regime produces, and the corpus carries none. -/
+theorem worse_than_neutral_matched_by_fluctuating_regime
     (v_mutation s t rho_obs v_selected_obs V_A V_E fstS fstT : ℝ)
     (h_t : 0 < t)
     (h_rho : 0 < rho_obs) (h_rho_lt : rho_obs < 1)
@@ -650,13 +654,10 @@ theorem worse_than_neutral_implies_fluctuating_regime
       PopGen.fluctuatingEffectCorrelation t tau_hat = rho_obs ∧
       PopGen.fluctuatingSelectedArchitectureVariance v_mutation s sigma_hat tau_hat =
         v_selected_obs) ∧
-      observed_ratio < neutral_ratio ∧
-      ¬ ∃ Ns,
-        PopGen.effectCorrelationStabilizing Ns = rho_obs ∧
-          PopGen.stabilizingSelectedArchitectureVariance v_mutation s = v_selected_obs := by
+      observed_ratio < neutral_ratio := by
   dsimp
-  have h_selection :
-      (0 < PopGen.tauFromObservedEffectCorrelation t rho_obs ∧
+  have h_match :
+      0 < PopGen.tauFromObservedEffectCorrelation t rho_obs ∧
         0 <
           PopGen.sigmaThetaFromObservedSelectedVariance
             v_selected_obs v_mutation s t rho_obs ∧
@@ -665,13 +666,9 @@ theorem worse_than_neutral_implies_fluctuating_regime
         PopGen.fluctuatingSelectedArchitectureVariance v_mutation s
             (PopGen.sigmaThetaFromObservedSelectedVariance
               v_selected_obs v_mutation s t rho_obs)
-            (PopGen.tauFromObservedEffectCorrelation t rho_obs) = v_selected_obs) ∧
-      ¬ ∃ Ns,
-        PopGen.effectCorrelationStabilizing Ns = rho_obs ∧
-          PopGen.stabilizingSelectedArchitectureVariance v_mutation s = v_selected_obs := by
-    exact PopGen.observedSummary_identifies_fluctuating_not_stabilizing
+            (PopGen.tauFromObservedEffectCorrelation t rho_obs) = v_selected_obs := by
+    exact PopGen.observedSummary_matched_by_fluctuating_regime
       v_mutation s t rho_obs v_selected_obs h_t h_rho h_rho_lt h_var_gap
-  rcases h_selection with ⟨h_match, h_not_stab⟩
   have h_port :
       PopGen.TransportedMetrics.r2FromSignalVariance (realWorldPGSVariance V_A fstT rho_obs) V_E /
           PopGen.TransportedMetrics.r2FromSignalVariance (presentDayPGSVariance V_A fstS) V_E <
@@ -681,7 +678,7 @@ theorem worse_than_neutral_implies_fluctuating_regime
       mul_comm] using
       portability_ratio_with_ld_decay V_A V_E fstS fstT 1 rho_obs
         hVA hVE hfst hfstT_lt_one rfl ⟨h_rho, h_rho_lt⟩
-  exact ⟨h_match, h_port, h_not_stab⟩
+  exact ⟨h_match, h_port⟩
 
 /-- **Scalar three-factor portability upper bound.**
     This is only the coarse scalar inequality
