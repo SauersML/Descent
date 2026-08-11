@@ -113,7 +113,8 @@ noncomputable def PTDesign.selectedEffectMass {thresholdCount m : ℕ}
 /-- Fraction of total additive effect mass retained by P+T. -/
 noncomputable def PTDesign.selectedEffectMassFraction {thresholdCount m : ℕ}
     (d : PTDesign thresholdCount m) (q : Fin thresholdCount)
-    (alleleFrequency effect : Fin m → ℝ) : ℝ :=
+    (alleleFrequency effect : Fin m → ℝ)
+    (_ : (∑ i, 2 * alleleFrequency i * (1 - alleleFrequency i) * effect i ^ 2) ≠ 0) : ℝ :=
   d.selectedEffectMass q alleleFrequency effect /
     (∑ i, 2 * alleleFrequency i * (1 - alleleFrequency i) * effect i ^ 2)
 
@@ -218,6 +219,7 @@ structure AdmissibleScoreWeights {markerCount : ℕ}
     (primitive : DemeGeneticMomentPrimitive markerCount) where
   weight : Fin markerCount → ℝ
   scoreVariance_pos : 0 < primitive.scoreVariance weight
+  predictiveCovariance_nonneg : 0 ≤ primitive.predictiveCovariance weight
 
 /-- Zero unselected weights and retain the realised GWAS effect at selected markers. -/
 noncomputable def PTDesign.selectedWeight {thresholdCount markerCount : ℕ}
@@ -231,6 +233,7 @@ structure DemeScoreLaw where
   scoreMean : ℝ
   moments : Descent.Core.ScoreMoments
   moments_admissible : Descent.Core.ScoreMoments.Admissible moments
+  predictiveCovariance_nonneg : 0 ≤ moments.predictiveCovariance
   prevalence : ℝ
   prevalence_pos : 0 < prevalence
   prevalence_lt_one : prevalence < 1
@@ -248,6 +251,7 @@ noncomputable def AdmissibleScoreWeights.toDemeScoreLaw {markerCount : ℕ}
     { scoreVariance_pos := score.scoreVariance_pos
       outcomeVariance_pos := primitive.outcomeVariance_pos
       cauchy_schwarz := primitive.cauchy_schwarz score.weight }
+  predictiveCovariance_nonneg := score.predictiveCovariance_nonneg
   prevalence := primitive.prevalence
   prevalence_pos := primitive.prevalence_pos
   prevalence_lt_one := primitive.prevalence_lt_one
@@ -353,18 +357,28 @@ structure CleanSplitMomentCertificate (law : DemeScoreLaw) (markerCount : ℕ) w
 noncomputable def DemeScoreLaw.calibrationSlope (law : DemeScoreLaw) : ℝ :=
   law.moments.calibrationSlope
 
+/-- Domain for charts that divide by unexplained variance. -/
+structure DemeScoreLaw.ResidualVariation (law : DemeScoreLaw) : Prop where
+  r2_lt_one : law.r2True < 1
+
 /-- C2: probit index spread relative to residual spread,
 `sqrt(R^2/(1-R^2))`. -/
-noncomputable def DemeScoreLaw.probitRiskSpreadRatio (law : DemeScoreLaw) : ℝ :=
+noncomputable def DemeScoreLaw.probitRiskSpreadRatio
+    (law : DemeScoreLaw) (_ : law.ResidualVariation) : ℝ :=
   Real.sqrt (law.r2True / (1 - law.r2True))
 
 /-- Spearman correlation for a bivariate Gaussian with Pearson correlation `r`. -/
 noncomputable def gaussianSpearman (r : ℝ) : ℝ :=
   6 / Real.pi * Real.arcsin (r / 2)
 
+/-- Oriented Pearson correlation, retaining information that `R²` squares away. -/
+noncomputable def DemeScoreLaw.pearson (law : DemeScoreLaw) : ℝ :=
+  law.moments.predictiveCovariance /
+    (Real.sqrt law.moments.scoreVariance * Real.sqrt law.moments.outcomeVariance)
+
 /-- C3: within-deme Spearman accuracy under the bivariate-normal score/liability chart. -/
 noncomputable def DemeScoreLaw.spearman (law : DemeScoreLaw) : ℝ :=
-  gaussianSpearman (Real.sqrt law.r2True)
+  gaussianSpearman law.pearson
 
 /-- Gaussian mean absolute error from its error variance. -/
 noncomputable def gaussianMAE (errorVariance : ℝ) : ℝ :=
