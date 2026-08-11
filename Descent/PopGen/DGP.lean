@@ -4485,12 +4485,24 @@ a bivariate normal orthant at correlation `r²`. So the nonlinearity in `r²` th
 chart misses is `Φ₂`'s, and the two agree at `r² = 0` and `r² = 1`, which is why the chart's
 two anchor theorems could not tell a line from a curve through the same two points.
 
-    Empirical status: UNTESTED. The FORM reproduces the four cells tabulated at
-    `calibratedBrierFromVariances` to between 5e-05 and 2.5e-03 relative, and at `π = 1/2` it
-    closes in elementary terms -- `Φ₂(0,0;ρ) = 1/4 + arcsin ρ / (2π)` gives `0.1666667`
-    against a realised `0.166658` -- but that was quadrature run by hand against a stored
-    table, not a battery, and no battery has yet put THIS DECLARATION on trial. Queued for the
-    simcov harness.
+    Empirical status: VALIDATED (`simcov/battery_brier01.py`). Sixteen cells over prevalence
+    and explained fraction, 2×10⁶ individuals per block and six blocks, with the measured side
+    DRAWING THE OUTCOME and averaging `(p - y)²` -- a different computation from the orthant
+    rather than the same one twice. MATCH at worst 2.93 sems, 0.24% relative, at `π = 0.05`
+    and `r² = 0.80`; the prediction spans 0.974 across the design.
+
+    Power, which is the whole reason this cell was worth a run: the linear chart
+    `calibratedBrier` -- correct on the OBSERVED scale and the body this one replaced on the
+    liability scale -- is FALSIFIED on the same cells at 1961 sems and 51% relative. The two
+    agree at `r² = 0` and `r² = 1`, which is exactly where the chart's two anchor theorems
+    pinned it, so the cells that separate a line from a curve through those anchors are the
+    ones the anchors could not see. The run's positive control, the realised prevalence,
+    passed at 0.32 sems.
+
+    Superseded by the above: the head here read UNTESTED, on the ground that the four cells
+    tabulated at `calibratedBrierFromVariances` were reproduced to between 5e-05 and 2.5e-03
+    relative by quadrature run by hand against a stored table rather than by a battery. That
+    is now history; a battery has put this declaration on trial.
 
 Junk branches, both inherited and both real: `Function.invFun Foundations.Phi` is junk outside
 `(0,1)`, where no threshold exists, and `bivariateNormalOrthant` is junk outside `|r²| ≤ 1`.

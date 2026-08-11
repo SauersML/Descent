@@ -1395,10 +1395,14 @@ continuous outcome and measured wrong on a truncated liability tail, at the size
 on `PopGen.TransportedMetrics.calibratedBrierFromVariances`. The two bodies differ in
 nothing but which chart they call, which is the whole of the defect this one repairs.
 
-    Empirical status: UNTESTED, inherited.
-    `PopGen.TransportedMetrics.liabilityBrierExact` carries the head and the queued battery;
-    this body adds no arithmetic, it only chooses which prevalence and which explained
-    fraction to hand it.
+    Empirical status: VALIDATED, inherited.
+    `PopGen.TransportedMetrics.liabilityBrierExact` carries the head and the battery
+    (`simcov/battery_brier01.py`, MATCH at worst 2.93 sems over sixteen cells, with the
+    linear chart FALSIFIED on the same cells at 1961 sems); this body adds no arithmetic, it
+    only chooses which prevalence and which explained fraction to hand it. What the
+    inheritance does NOT cover is that choice: the battery drew `r²` on the liability scale
+    directly, and that the benchmark `R²` this body supplies is the same fraction is a
+    reading, checked by inspection and not by that measurement.
 
     argument_source: model, inherited. -/
 noncomputable def targetLiabilityBrierFromNeutralAFBenchmark
@@ -1420,8 +1424,9 @@ it replaces. The old record simply declined to use it for the discrimination met
 is how a `-0.068` AUC bias survived beside a Brier risk computed correctly at the same
 prevalence.
 
-    Empirical status: MIXED -- three coordinates, three verdicts, and a single head would
-    be wrong for two of them.
+    Empirical status: VALIDATED, inherited on all three coordinates -- and the head is a
+    single one only because the Brier battery has now run; it read MIXED while that
+    coordinate was untested.
 
       r2     `targetR2FromNeutralAFBenchmark`, which is `presentDayR2`; that runs
              through `presentDayPGSVariance`, VALIDATED at worst 0.94 sems on
@@ -1430,9 +1435,10 @@ prevalence.
              `liabilityThresholdAUCFromExplainedR2` at pooled RMSE 0.0121
              against a 0.0120 noise floor, with prevalence swept. The whole
              point of this record is that this field spends the `π` it was given.
-      brier  `targetLiabilityBrierFromNeutralAFBenchmark`, UNTESTED: it is
-             `PopGen.TransportedMetrics.liabilityBrierExact` at the benchmark `R²`, and
-             that body has a form and no battery yet.
+      brier  `targetLiabilityBrierFromNeutralAFBenchmark`, VALIDATED through
+             `PopGen.TransportedMetrics.liabilityBrierExact` at the benchmark `R²`:
+             MATCH at worst 2.93 sems over sixteen cells, against the linear chart
+             it replaced FALSIFIED on the same cells at 1961 sems.
 
     So the defect this record was written to repair -- one field treating the trait as
     binary and another as continuous -- is repaired on both readout coordinates: the AUC
@@ -1674,8 +1680,9 @@ prevalence scale.
              EQUAL-VARIANCE Gaussian chart and not the liability-threshold one,
              so at a prevalence far from one half it is the wrong chart for a
              dichotomised outcome and it takes no `π` to be right with.
-      brier  `sourceCalibratedBrierFromSourceWeightsAtPrevalence`, UNTESTED,
-             inherited from `PopGen.TransportedMetrics.liabilityBrierExact`.
+      brier  `sourceCalibratedBrierFromSourceWeightsAtPrevalence`, VALIDATED,
+             inherited from `PopGen.TransportedMetrics.liabilityBrierExact`,
+             which matches at worst 2.93 sems over sixteen cells.
 
     THE INTERNAL INCONSISTENCY IS THE FINDING, and it is the same one
     `neutralAFBenchmarkMetricProfile` is documented for -- but it now sits on the OTHER

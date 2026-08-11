@@ -2002,9 +2002,10 @@ back to a benchmark `R²` surrogate.
     `calibratedBrierFromVariances` is not: it is the OBSERVED-scale body, right on that scale
     and measured wrong by 9% to 47%, at up to 299 sems, on a truncated liability tail.
 
-    Empirical status: UNTESTED, inherited. `liabilityBrierExact` carries the head and the
-    queued battery; this body adds no arithmetic, it only chooses which prevalence and which
-    explained fraction to supply.
+    Empirical status: VALIDATED, inherited. `liabilityBrierExact` carries the head and the
+    battery (`simcov/battery_brier01.py`, MATCH at worst 2.93 sems over sixteen cells against
+    the linear chart FALSIFIED at 1961 sems on the same cells); this body adds no arithmetic,
+    it only chooses which prevalence and which explained fraction to supply.
 
     argument_source: model, inherited. -/
 noncomputable def sourceCalibratedBrierFromSourceWeightsAtPrevalence {p q : ℕ}
@@ -2060,8 +2061,9 @@ here, so Brier can change even when the score moments are held fixed.
     the liability one would put the two coordinates on different scales and let a comparison
     between them read as a portability loss.
 
-    Empirical status: UNTESTED, inherited from `liabilityBrierExact`, which carries the head
-    and the queued battery. -/
+    Empirical status: VALIDATED, inherited from `liabilityBrierExact`, which carries the head
+    and the battery: MATCH at worst 2.93 sems over sixteen cells, with the linear chart it
+    replaced FALSIFIED on the same cells at 1961 sems. -/
 noncomputable def targetCalibratedBrierFromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
   PopGen.TransportedMetrics.liabilityBrierExact
