@@ -154,7 +154,7 @@ def EstimatorGate.rejectsRivals {Input : Type} (gate : EstimatorGate Input)
 
 /-- The typed constructor for Bhatia's finite-sample Hudson ratio of sums. -/
 noncomputable def bhatiaHudsonEstimator {L : ℕ} :
-    EstimatorConstructor (Fin L → Descent.Core.BhatiaHudsonLocus) where
+    EstimatorConstructor (Descent.Core.BhatiaHudsonPanel L) where
   value := Descent.Core.bhatiaHudsonRatioOfSums
   name := "Bhatia-Hudson finite-sample ratio of sums"
   exactForm := "sum corrected numerators / sum between-population denominators"
@@ -163,9 +163,9 @@ noncomputable def bhatiaHudsonEstimator {L : ℕ} :
 functions on the same locus panel; none can be selected as a fallback. -/
 noncomputable def bhatiaHudsonGate {L : ℕ}
     (parametricHudson meanPerLocusHudson neiGST weirCockerhamTheta :
-      (Fin L → Descent.Core.BhatiaHudsonLocus) → ℝ)
+      Descent.Core.BhatiaHudsonPanel L → ℝ)
     (tolerance : ℝ) (tolerance_nonnegative : 0 ≤ tolerance) :
-    EstimatorGate (Fin L → Descent.Core.BhatiaHudsonLocus) where
+    EstimatorGate (Descent.Core.BhatiaHudsonPanel L) where
   estimator := bhatiaHudsonEstimator
   rivals :=
     [("parametric Hudson F", parametricHudson),

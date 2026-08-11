@@ -8,7 +8,7 @@ are one correspondence instance and are not parameters embedded in those laws.
 
 | Reported column | Corpus declaration | Exact estimator form | Committed-source quotation or pin |
 |---|---|---|---|
-| finite-sample F | `Core.bhatiaHudsonRatioOfSums` | sum of sample-corrected Hudson numerators divided by sum of between-population denominators | `refs.py`: “Hudson's ratio-of-averages estimator at finite haploid sample size.” |
+| finite-sample F | `Core.bhatiaHudsonRatioOfSums` on `BhatiaHudsonPanel` | sum of sample-corrected Hudson numerators divided by a positive sum of between-population denominators; locus frequencies are typed in `[0,1]` and both haploid sample sizes exceed one | `refs.py`: “Hudson's ratio-of-averages estimator at finite haploid sample size.” |
 | `r2_true` / `liability_r2` | `DemeScoreLaw.r2True` | `Cov(S,Y)^2/(Var(S) Var(Y))` | `fam_serial_founder.py` reads `metric == "liability_r2"` keyed by demography, phenotype, method, and seed. |
 | calibration slope | `DemeScoreLaw.calibrationSlope` | `Cov(S,Y)/Var(S)` | `calibration_binary.csv`; the same per-run key is used. |
 | CITL/intercept | `phenotypeCITL` | `logit(K_observed)-logit(K_predicted)` | `fam_serial_founder.py`: the generator solves one intercept per phenotype and splits every deme 50/50. |

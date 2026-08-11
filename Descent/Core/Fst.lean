@@ -820,6 +820,10 @@ carry `1 < n` in their type because the unbiased corrections divide by `n - 1`. 
 structure BhatiaHudsonLocus where
   pSource : ℝ
   pTarget : ℝ
+  pSource_nonnegative : 0 ≤ pSource
+  pSource_le_one : pSource ≤ 1
+  pTarget_nonnegative : 0 ≤ pTarget
+  pTarget_le_one : pTarget ≤ 1
   sourceHaplotypes : ℕ
   targetHaplotypes : ℕ
   sourceHaplotypes_gt_one : 1 < sourceHaplotypes
@@ -835,15 +839,21 @@ noncomputable def BhatiaHudsonLocus.numerator (locus : BhatiaHudsonLocus) : ℝ 
 noncomputable def BhatiaHudsonLocus.denominator (locus : BhatiaHudsonLocus) : ℝ :=
   locus.pSource * (1 - locus.pTarget) + locus.pTarget * (1 - locus.pSource)
 
+/-- A multilocus panel on which the ratio-of-sums denominator is genuinely positive. -/
+structure BhatiaHudsonPanel (L : ℕ) where
+  locus : Fin L → BhatiaHudsonLocus
+  denominator_sum_pos : 0 < ∑ ell, (locus ell).denominator
+
 /-- The Bhatia/Hudson multilocus estimator is a ratio of sums, never a mean of per-locus
 ratios.  It is a distinct typed estimator, not another spelling of parametric Hudson `F_ST`. -/
 noncomputable def bhatiaHudsonRatioOfSums {L : ℕ}
-    (locus : Fin L → BhatiaHudsonLocus) : ℝ :=
-  (∑ ell, (locus ell).numerator) / (∑ ell, (locus ell).denominator)
+    (panel : BhatiaHudsonPanel L) : ℝ :=
+  (∑ ell, (panel.locus ell).numerator) / (∑ ell, (panel.locus ell).denominator)
 
 /-- At a single locus the aggregate constructor is exactly numerator over denominator. -/
-theorem bhatiaHudsonRatioOfSums_one (locus : Fin 1 → BhatiaHudsonLocus) :
-    bhatiaHudsonRatioOfSums locus = (locus 0).numerator / (locus 0).denominator := by
+theorem bhatiaHudsonRatioOfSums_one (panel : BhatiaHudsonPanel 1) :
+    bhatiaHudsonRatioOfSums panel =
+      (panel.locus 0).numerator / (panel.locus 0).denominator := by
   simp [bhatiaHudsonRatioOfSums]
 
 /-- **hudsonFst where its denominator vanishes, named.** The guard `p₁ * (1 - p₂) + p₂ * (1 - p₁)`

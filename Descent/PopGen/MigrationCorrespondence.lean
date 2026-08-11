@@ -20,6 +20,16 @@ structure DirectionalMigrationRate where
   value : ℝ
   nonneg : 0 ≤ value
 
+/-- A strictly positive population-size scale. -/
+structure PositivePopulationSize where
+  value : ℝ
+  value_pos : 0 < value
+
+/-- A finite island system has at least two demes. -/
+structure FiniteDemeCount where
+  value : ℕ
+  value_gt_one : 1 < value
+
 /-- Complete two-deme migration decomposition. -/
 structure TwoDemeMigrationComponents where
   sourceToTarget : DirectionalMigrationRate
@@ -42,13 +52,13 @@ noncomputable def TwoDemeMigrationComponents.net
 
 /-- Diploid-scaled total mixing rate. -/
 noncomputable def TwoDemeMigrationComponents.scaledTotal
-    (m : TwoDemeMigrationComponents) (effectiveSize : ℝ) : ℝ :=
-  4 * effectiveSize * m.total
+    (m : TwoDemeMigrationComponents) (effectiveSize : PositivePopulationSize) : ℝ :=
+  4 * effectiveSize.value * m.total
 
 /-- Finite-island correction applied to the symmetric component, kept separate from scaling. -/
 noncomputable def TwoDemeMigrationComponents.finiteDemeEffective
-    (m : TwoDemeMigrationComponents) (demeCount : ℝ) : ℝ :=
-  m.symmetric * Descent.Core.islandDemeCorrection demeCount
+    (m : TwoDemeMigrationComponents) (demeCount : FiniteDemeCount) : ℝ :=
+  m.symmetric * Descent.Core.islandDemeCorrection demeCount.value
 
 /-- Relabelling demes preserves total mixing. -/
 theorem TwoDemeMigrationComponents.total_swap (m : TwoDemeMigrationComponents) :
