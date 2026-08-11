@@ -1,0 +1,788 @@
+{
+ "_battery_sha": "ce69ffd98c3a8fc9",
+ "results": [
+  {
+   "name": "cleanSplitFst",
+   "file": "PhenomeWidePortability.lean",
+   "source": "fstFromDriftFactor (neutralDriftFactor NeS t) + fstFromDriftFactor (neutralDriftFactor NeT t)",
+   "note": "",
+   "regime": "clean two-branch split, forward Wright-Fisher on allele frequencies, 20000 loci from a neutral 1/p spectrum, NeS=2000 and NeT=500 closed, no mutation and no migration, 10 independent blocks. The oracle is the realised PER-BRANCH heterozygosity loss 1 - H_branch/H_ancestor summed over the two lineages, which is the reading fstFromDriftFactor was validated at; the prediction is evaluated at the model's Ne and t, which the simulation realises exactly. Every cell stays inside cleanSplitFst_lt_one_iff's admissible range, asserted in the run",
+   "span": 0.8679164217104081,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "t=500 NeS=2000 NeT=500",
+    "lean": 0.5111379437591486,
+    "truth": 0.5142034788639454,
+    "sem": 0.0015836350495779343,
+    "sems_off": 1.9357585610483978,
+    "rel_err": 0.0059617159953285915
+   },
+   "cells": [
+    {
+     "design": "t=100 NeS=2000 NeT=500",
+     "lean": 0.11990098920473613,
+     "truth": 0.1194393466347606,
+     "sem": 0.0006271223443856117,
+     "sems_off": 0.7361284031871099,
+     "rel_err": 0.0038650794983600884
+    },
+    {
+     "design": "t=250 NeS=2000 NeT=500",
+     "lean": 0.2818909034288265,
+     "truth": 0.28158222130198557,
+     "sem": 0.0014813075530507147,
+     "sems_off": 0.20838490035726095,
+     "rel_err": 0.0010962415361795235
+    },
+    {
+     "design": "t=500 NeS=2000 NeT=500",
+     "lean": 0.5111379437591486,
+     "truth": 0.5142034788639454,
+     "sem": 0.0015836350495779343,
+     "sems_off": 1.9357585610483978,
+     "rel_err": 0.0059617159953285915
+    },
+    {
+     "design": "t=800 NeS=2000 NeT=500",
+     "lean": 0.7321405697368333,
+     "truth": 0.7327861054607804,
+     "sem": 0.0017262000395369547,
+     "sems_off": 0.373963451026372,
+     "rel_err": 0.0008809333571372543
+    },
+    {
+     "design": "t=1100 NeS=2000 NeT=500",
+     "lean": 0.9077660581079532,
+     "truth": 0.9074772542880275,
+     "sem": 0.0019085773099161568,
+     "sems_off": 0.1513189004318479,
+     "rel_err": 0.0003182491005267913
+    }
+   ]
+  },
+  {
+   "name": "cleanSplitFst [read as the PAIRWISE Hudson F_ST between the two branches, the convention the docstrings forbid, competing]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "same body, oracle replaced by the pairwise Hudson estimator",
+   "note": "carried so the two conventions can be seen to be different numbers rather than assumed to be; positive control 'source branch retention at t=1100 must be neutralDriftFactor (1-1/(2*NeS))^t' passed at 0.29 sems",
+   "regime": "clean two-branch split, forward Wright-Fisher on allele frequencies, 20000 loci from a neutral 1/p spectrum, NeS=2000 and NeT=500 closed, no mutation and no migration, 10 independent blocks. The oracle is the realised PER-BRANCH heterozygosity loss 1 - H_branch/H_ancestor summed over the two lineages, which is the reading fstFromDriftFactor was validated at; the prediction is evaluated at the model's Ne and t, which the simulation realises exactly. Every cell stays inside cleanSplitFst_lt_one_iff's admissible range, asserted in the run",
+   "span": 0.8679164217104081,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "t=250 NeS=2000 NeT=500",
+    "lean": 0.2818909034288265,
+    "truth": 0.1416055984937099,
+    "sem": 0.00030570047665137896,
+    "sems_off": 458.89789401636443,
+    "rel_err": 0.9906762615840223
+   },
+   "cells": [
+    {
+     "design": "t=100 NeS=2000 NeT=500",
+     "lean": 0.11990098920473613,
+     "truth": 0.05979505483193197,
+     "sem": 0.0002549045680012362,
+     "sems_off": 235.79779226440803,
+     "rel_err": 1.00519908446854
+    },
+    {
+     "design": "t=250 NeS=2000 NeT=500",
+     "lean": 0.2818909034288265,
+     "truth": 0.1416055984937099,
+     "sem": 0.00030570047665137896,
+     "sems_off": 458.89789401636443,
+     "rel_err": 0.9906762615840223
+    },
+    {
+     "design": "t=500 NeS=2000 NeT=500",
+     "lean": 0.5111379437591486,
+     "truth": 0.25715719213498606,
+     "sem": 0.0007502066186183016,
+     "sems_off": 338.5477351451969,
+     "rel_err": 0.9876478643881125
+    },
+    {
+     "design": "t=800 NeS=2000 NeT=500",
+     "lean": 0.7321405697368333,
+     "truth": 0.36705346573255854,
+     "sem": 0.0012484734709600823,
+     "sems_off": 292.4268016071827,
+     "rel_err": 0.9946428465826923
+    },
+    {
+     "design": "t=1100 NeS=2000 NeT=500",
+     "lean": 0.9077660581079532,
+     "truth": 0.45585735834951235,
+     "sem": 0.0017963414226802581,
+     "sems_off": 251.57171908008652,
+     "rel_err": 0.9913379514035529
+    }
+   ]
+  },
+  {
+   "name": "cleanSplitTargetR2",
+   "file": "PhenomeWidePortability.lean",
+   "source": "neutralPortability r2_0 (cleanSplitFst NeS NeT t) * ldFactor",
+   "note": "PER-ALLELE score over the variants still polymorphic in the source, which is what a real PGS is: the source branch enters only by removing source-fixed variants from the score, and their signal remains in the target phenotype as unexplained heritable variance; positive control 't=0 [target R2 must be the constructed r2_0 = V_A/(V_A+V_E)]' passed at 1.06 sems",
+   "regime": "same engine and same blocks, 40000 target individuals each. TRUE causal effects with no estimation noise, so no GWAS-inefficiency confound is present and r2_0 is fixed by construction at V_A/(V_A+V_E) = 0.50, realised exactly in every block because the environmental variance is set from that block's own realised ancestral V_A. ldFactor = 1: the frequency engine carries no linkage, so the score is perfectly tagging by construction and the LD slot is exercised, not measured, here. The prediction is re-evaluated in each block at that block's own realised summed per-branch F, and the error bar is the sem of the PAIRED difference across blocks. The observable is the realised squared correlation between the source-built score and the target phenotype",
+   "span": 0.8191918079989484,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "t=1100 (summed F 0.907)",
+    "lean": 0.08466219818542785,
+    "truth": 0.19399911993828312,
+    "sem": 0.0016439883938631742,
+    "sems_off": 66.50711292184168,
+    "rel_err": 0.5635949368617682
+   },
+   "cells": [
+    {
+     "design": "t=100 (summed F 0.119)",
+     "lean": 0.46824315451888066,
+     "truth": 0.4708179811546452,
+     "sem": 0.0007148178745459548,
+     "sems_off": 3.602073657433414,
+     "rel_err": 0.005468836660507232
+    },
+    {
+     "design": "t=250 (summed F 0.282)",
+     "lean": 0.41806543946884905,
+     "truth": 0.4199455855978595,
+     "sem": 0.0009879431853728198,
+     "sems_off": 1.9030913486193342,
+     "rel_err": 0.004477118449367083
+    },
+    {
+     "design": "t=500 (summed F 0.514)",
+     "lean": 0.3269534548702836,
+     "truth": 0.33816917336582536,
+     "sem": 0.0016671244295819404,
+     "sems_off": 6.7275833144345984,
+     "rel_err": 0.03316599908829891
+    },
+    {
+     "design": "t=800 (summed F 0.733)",
+     "lean": 0.2108540279864853,
+     "truth": 0.25825939875229875,
+     "sem": 0.0015445683208224216,
+     "sems_off": 30.691663247742873,
+     "rel_err": 0.1835571948004138
+    },
+    {
+     "design": "t=1100 (summed F 0.907)",
+     "lean": 0.08466219818542785,
+     "truth": 0.19399911993828312,
+     "sem": 0.0016439883938631742,
+     "sems_off": 66.50711292184168,
+     "rel_err": 0.5635949368617682
+    }
+   ]
+  },
+  {
+   "name": "cleanSplitTargetR2 [the SUPERSEDED linear retention r2_0*max 0 (1-2*fst) in neutralPortability's place, competing]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "r2_0 * max 0 (1 - 2 * cleanSplitFst) * ldFactor",
+   "note": "FALSIFIED at 101 sems by battery_bulk56; carried so that a design in which it passed would be known to be broken; positive control 't=0 [target R2 must be the constructed r2_0 = V_A/(V_A+V_E)]' passed at 1.06 sems",
+   "regime": "same engine and same blocks, 40000 target individuals each. TRUE causal effects with no estimation noise, so no GWAS-inefficiency confound is present and r2_0 is fixed by construction at V_A/(V_A+V_E) = 0.50, realised exactly in every block because the environmental variance is set from that block's own realised ancestral V_A. ldFactor = 1: the frequency engine carries no linkage, so the score is perfectly tagging by construction and the LD slot is exercised, not measured, here. The prediction is re-evaluated in each block at that block's own realised summed per-branch F, and the error bar is the sem of the PAIRED difference across blocks. The observable is the realised squared correlation between the source-built score and the target phenotype",
+   "span": 1.0,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "t=800 (summed F 0.733)",
+    "lean": 0.0,
+    "truth": 0.25825939875229875,
+    "sem": 0.0011262268519615327,
+    "sems_off": 229.31383522111213,
+    "rel_err": 1.0
+   },
+   "cells": [
+    {
+     "design": "t=100 (summed F 0.119)",
+     "lean": 0.38056065336523937,
+     "truth": 0.4708179811546452,
+     "sem": 0.0009726126544390495,
+     "sems_off": 92.79884173567676,
+     "rel_err": 0.19170323012739787
+    },
+    {
+     "design": "t=250 (summed F 0.282)",
+     "lean": 0.21841777869801443,
+     "truth": 0.4199455855978595,
+     "sem": 0.0012304088366946121,
+     "sems_off": 163.78930392050194,
+     "rel_err": 0.4798902853400354
+    },
+    {
+     "design": "t=500 (summed F 0.514)",
+     "lean": 0.0,
+     "truth": 0.33816917336582536,
+     "sem": 0.0016113397658840413,
+     "sems_off": 209.8683223275962,
+     "rel_err": 1.0
+    },
+    {
+     "design": "t=800 (summed F 0.733)",
+     "lean": 0.0,
+     "truth": 0.25825939875229875,
+     "sem": 0.0011262268519615327,
+     "sems_off": 229.31383522111213,
+     "rel_err": 1.0
+    },
+    {
+     "design": "t=1100 (summed F 0.907)",
+     "lean": 0.0,
+     "truth": 0.19399911993828312,
+     "sem": 0.0013178892645296966,
+     "sems_off": 147.2044163039099,
+     "rel_err": 1.0
+    }
+   ]
+  },
+  {
+   "name": "cleanSplitTargetR2 [SOURCE-STANDARDISED score, the construction under which a summed index has a mechanism]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "neutralPortability r2_0 (cleanSplitFst NeS NeT t) * ldFactor",
+   "note": "the GWAS reports effects per source-genotype SD and the target restandardises by target frequencies, so the weight carries sqrt(h_S/h_T). This construction is SYMMETRIC in the two branches and is the body's best case; it is recorded so that a falsification cannot be a report about the score construction; positive control 't=0 [target R2 must be the constructed r2_0 = V_A/(V_A+V_E)]' passed at 1.06 sems",
+   "regime": "same engine and same blocks, 40000 target individuals each. TRUE causal effects with no estimation noise, so no GWAS-inefficiency confound is present and r2_0 is fixed by construction at V_A/(V_A+V_E) = 0.50, realised exactly in every block because the environmental variance is set from that block's own realised ancestral V_A. ldFactor = 1: the frequency engine carries no linkage, so the score is perfectly tagging by construction and the LD slot is exercised, not measured, here. The prediction is re-evaluated in each block at that block's own realised summed per-branch F, and the error bar is the sem of the PAIRED difference across blocks. The observable is the realised squared correlation between the source-built score and the target phenotype",
+   "span": 0.8191918079989484,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "t=100 (summed F 0.119)",
+    "lean": 0.46824315451888066,
+    "truth": 0.4311716838726383,
+    "sem": 0.0005415817288500314,
+    "sems_off": 68.4503717009769,
+    "rel_err": 0.08597844439430465
+   },
+   "cells": [
+    {
+     "design": "t=100 (summed F 0.119)",
+     "lean": 0.46824315451888066,
+     "truth": 0.4311716838726383,
+     "sem": 0.0005415817288500314,
+     "sems_off": 68.4503717009769,
+     "rel_err": 0.08597844439430465
+    },
+    {
+     "design": "t=250 (summed F 0.282)",
+     "lean": 0.41806543946884905,
+     "truth": 0.36894721736907704,
+     "sem": 0.0011336047189700626,
+     "sems_off": 43.32923220750035,
+     "rel_err": 0.13313075634511834
+    },
+    {
+     "design": "t=500 (summed F 0.514)",
+     "lean": 0.3269534548702836,
+     "truth": 0.29143711939686695,
+     "sem": 0.0017626756337525455,
+     "sems_off": 20.14910445990918,
+     "rel_err": 0.12186620409547756
+    },
+    {
+     "design": "t=800 (summed F 0.733)",
+     "lean": 0.2108540279864853,
+     "truth": 0.22066141505625012,
+     "sem": 0.0012823891554021073,
+     "sems_off": 7.647746418043898,
+     "rel_err": 0.0444454100290472
+    },
+    {
+     "design": "t=1100 (summed F 0.907)",
+     "lean": 0.08466219818542785,
+     "truth": 0.16620827523469728,
+     "sem": 0.0015158287165703485,
+     "sems_off": 53.796366408582244,
+     "rel_err": 0.49062585442343876
+    }
+   ]
+  },
+  {
+   "name": "cleanSplitTargetR2 [the SUPERSEDED linear retention r2_0*max 0 (1-2*fst) in neutralPortability's place, competing, standardised score]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "r2_0 * max 0 (1 - 2 * cleanSplitFst) * ldFactor",
+   "note": "FALSIFIED at 101 sems by battery_bulk56; carried so that a design in which it passed would be known to be broken; positive control 't=0 [target R2 must be the constructed r2_0 = V_A/(V_A+V_E)]' passed at 1.06 sems",
+   "regime": "same engine and same blocks, 40000 target individuals each. TRUE causal effects with no estimation noise, so no GWAS-inefficiency confound is present and r2_0 is fixed by construction at V_A/(V_A+V_E) = 0.50, realised exactly in every block because the environmental variance is set from that block's own realised ancestral V_A. ldFactor = 1: the frequency engine carries no linkage, so the score is perfectly tagging by construction and the LD slot is exercised, not measured, here. The prediction is re-evaluated in each block at that block's own realised summed per-branch F, and the error bar is the sem of the PAIRED difference across blocks. The observable is the realised squared correlation between the source-built score and the target phenotype",
+   "span": 1.0,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "t=800 (summed F 0.733)",
+    "lean": 0.0,
+    "truth": 0.22066141505625012,
+    "sem": 0.0010115497424062119,
+    "sems_off": 218.14193193441423,
+    "rel_err": 1.0
+   },
+   "cells": [
+    {
+     "design": "t=100 (summed F 0.119)",
+     "lean": 0.38056065336523937,
+     "truth": 0.4311716838726383,
+     "sem": 0.000833727890206479,
+     "sems_off": 60.70449495801892,
+     "rel_err": 0.11738022787773954
+    },
+    {
+     "design": "t=250 (summed F 0.282)",
+     "lean": 0.21841777869801443,
+     "truth": 0.36894721736907704,
+     "sem": 0.0012041473687374178,
+     "sems_off": 125.00914969311185,
+     "rel_err": 0.4079972190723428
+    },
+    {
+     "design": "t=500 (summed F 0.514)",
+     "lean": 0.0,
+     "truth": 0.29143711939686695,
+     "sem": 0.00173694471139437,
+     "sems_off": 167.78721710889087,
+     "rel_err": 1.0
+    },
+    {
+     "design": "t=800 (summed F 0.733)",
+     "lean": 0.0,
+     "truth": 0.22066141505625012,
+     "sem": 0.0010115497424062119,
+     "sems_off": 218.14193193441423,
+     "rel_err": 1.0
+    },
+    {
+     "design": "t=1100 (summed F 0.907)",
+     "lean": 0.0,
+     "truth": 0.16620827523469728,
+     "sem": 0.001331830909218909,
+     "sems_off": 124.796829750839,
+     "rel_err": 1.0
+    }
+   ]
+  },
+  {
+   "name": "cleanSplitTargetR2 [the TARGET-BRANCH-ONLY index in the fst slot, not the sum, competing]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "neutralPortability r2_0 (fstFromDriftFactor (neutralDriftFactor NeT t)) * ldFactor",
+   "note": "the alternative reading of the composition's fst slot; positive control 't=0 [target R2 must be the constructed r2_0 = V_A/(V_A+V_E)]' passed at 1.06 sems",
+   "regime": "same engine and same blocks, 40000 target individuals each. TRUE causal effects with no estimation noise, so no GWAS-inefficiency confound is present and r2_0 is fixed by construction at V_A/(V_A+V_E) = 0.50, realised exactly in every block because the environmental variance is set from that block's own realised ancestral V_A. ldFactor = 1: the frequency engine carries no linkage, so the score is perfectly tagging by construction and the LD slot is exercised, not measured, here. The prediction is re-evaluated in each block at that block's own realised summed per-branch F, and the error bar is the sem of the PAIRED difference across blocks. The observable is the realised squared correlation between the source-built score and the target phenotype",
+   "span": 0.47371758380608797,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "t=800 (target-branch F 0.551)",
+    "lean": 0.3100556030907245,
+    "truth": 0.25825939875229875,
+    "sem": 0.001095151219197917,
+    "sems_off": 47.29593815944525,
+    "rel_err": 0.20055883576227335
+   },
+   "cells": [
+    {
+     "design": "t=100 (target-branch F 0.095)",
+     "lean": 0.47517224473442293,
+     "truth": 0.4708179811546452,
+     "sem": 0.0006053086169404164,
+     "sems_off": 7.193460423191634,
+     "rel_err": 0.009248294997355988
+    },
+    {
+     "design": "t=250 (target-branch F 0.222)",
+     "lean": 0.4375791556396383,
+     "truth": 0.4199455855978595,
+     "sem": 0.0010928537157749879,
+     "sems_off": 16.13534344738362,
+     "rel_err": 0.0419901307372349
+    },
+    {
+     "design": "t=500 (target-branch F 0.396)",
+     "lean": 0.376569211529616,
+     "truth": 0.33816917336582536,
+     "sem": 0.0013652322693234074,
+     "sems_off": 28.127109962630175,
+     "rel_err": 0.11355274575027613
+    },
+    {
+     "design": "t=800 (target-branch F 0.551)",
+     "lean": 0.3100556030907245,
+     "truth": 0.25825939875229875,
+     "sem": 0.001095151219197917,
+     "sems_off": 47.29593815944525,
+     "rel_err": 0.20055883576227335
+    },
+    {
+     "design": "t=1100 (target-branch F 0.667)",
+     "lean": 0.250074797067117,
+     "truth": 0.19399911993828312,
+     "sem": 0.0012387610291342754,
+     "sems_off": 45.26755024576702,
+     "rel_err": 0.28905119335939883
+    }
+   ]
+  },
+  {
+   "name": "cleanSplitTargetR2 [the TARGET-BRANCH-ONLY index in the fst slot, not the sum, competing, standardised score]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "neutralPortability r2_0 (fstFromDriftFactor (neutralDriftFactor NeT t)) * ldFactor",
+   "note": "the alternative reading of the composition's fst slot; positive control 't=0 [target R2 must be the constructed r2_0 = V_A/(V_A+V_E)]' passed at 1.06 sems",
+   "regime": "same engine and same blocks, 40000 target individuals each. TRUE causal effects with no estimation noise, so no GWAS-inefficiency confound is present and r2_0 is fixed by construction at V_A/(V_A+V_E) = 0.50, realised exactly in every block because the environmental variance is set from that block's own realised ancestral V_A. ldFactor = 1: the frequency engine carries no linkage, so the score is perfectly tagging by construction and the LD slot is exercised, not measured, here. The prediction is re-evaluated in each block at that block's own realised summed per-branch F, and the error bar is the sem of the PAIRED difference across blocks. The observable is the realised squared correlation between the source-built score and the target phenotype",
+   "span": 0.47371758380608797,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "t=800 (target-branch F 0.551)",
+    "lean": 0.3100556030907245,
+    "truth": 0.22066141505625012,
+    "sem": 0.0009963069615973412,
+    "sems_off": 89.72554792867457,
+    "rel_err": 0.4051192548170978
+   },
+   "cells": [
+    {
+     "design": "t=100 (target-branch F 0.095)",
+     "lean": 0.47517224473442293,
+     "truth": 0.4311716838726383,
+     "sem": 0.000524735975723919,
+     "sems_off": 83.85276195534716,
+     "rel_err": 0.10204881838850466
+    },
+    {
+     "design": "t=250 (target-branch F 0.222)",
+     "lean": 0.4375791556396383,
+     "truth": 0.36894721736907704,
+     "sem": 0.0012675688403410736,
+     "sems_off": 54.14454512158406,
+     "rel_err": 0.18602102154332054
+    },
+    {
+     "design": "t=500 (target-branch F 0.396)",
+     "lean": 0.376569211529616,
+     "truth": 0.29143711939686695,
+     "sem": 0.0015411068054965405,
+     "sems_off": 55.240877419472355,
+     "rel_err": 0.29211135598969357
+    },
+    {
+     "design": "t=800 (target-branch F 0.551)",
+     "lean": 0.3100556030907245,
+     "truth": 0.22066141505625012,
+     "sem": 0.0009963069615973412,
+     "sems_off": 89.72554792867457,
+     "rel_err": 0.4051192548170978
+    },
+    {
+     "design": "t=1100 (target-branch F 0.667)",
+     "lean": 0.250074797067117,
+     "truth": 0.16620827523469728,
+     "sem": 0.0011506113536907565,
+     "sems_off": 72.88866180870318,
+     "rel_err": 0.5045869209219248
+    }
+   ]
+  },
+  {
+   "name": "cleanSplitTargetR2 [DECOMPOSITION, both factors measured: the target-branch index through the chart, times the fraction of the target's signal still polymorphic in the source, competing]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "neutralPortability r2_0 (fstFromDriftFactor (neutralDriftFactor NeT t)) * (measured source-polymorphic signal fraction)",
+   "note": "NOT A CANDIDATE BODY -- it carries a measured factor and so cannot be evaluated from a law's arguments. It is here to name the two effects the summed reading conflates: the target branch's own heterozygosity loss, which the chart handles, and the source branch's fixation, which removes variants from the score without removing their variance from the target phenotype",
+   "regime": "same engine and same blocks, 40000 target individuals each. TRUE causal effects with no estimation noise, so no GWAS-inefficiency confound is present and r2_0 is fixed by construction at V_A/(V_A+V_E) = 0.50, realised exactly in every block because the environmental variance is set from that block's own realised ancestral V_A. ldFactor = 1: the frequency engine carries no linkage, so the score is perfectly tagging by construction and the LD slot is exercised, not measured, here. The prediction is re-evaluated in each block at that block's own realised summed per-branch F, and the error bar is the sem of the PAIRED difference across blocks. The observable is the realised squared correlation between the source-built score and the target phenotype",
+   "span": 0.5880293650243769,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "t=100 (target-branch F 0.095, source-polymorphic signal 0.987)",
+    "lean": 0.4692069655164846,
+    "truth": 0.4708179811546452,
+    "sem": 0.0006053247564892443,
+    "sems_off": 2.661407155233703,
+    "rel_err": 0.003421737704685111
+   },
+   "cells": [
+    {
+     "design": "t=100 (target-branch F 0.095, source-polymorphic signal 0.987)",
+     "lean": 0.4692069655164846,
+     "truth": 0.4708179811546452,
+     "sem": 0.0006053247564892443,
+     "sems_off": 2.661407155233703,
+     "rel_err": 0.003421737704685111
+    },
+    {
+     "design": "t=250 (target-branch F 0.222, source-polymorphic signal 0.955)",
+     "lean": 0.4177550412670684,
+     "truth": 0.4199455855978595,
+     "sem": 0.0010957456353361858,
+     "sems_off": 1.9991358031912185,
+     "rel_err": 0.005216257548397583
+    },
+    {
+     "design": "t=500 (target-branch F 0.396, source-polymorphic signal 0.899)",
+     "lean": 0.33867330265726464,
+     "truth": 0.33816917336582536,
+     "sem": 0.0018050802274798335,
+     "sems_off": 0.2792835929199239,
+     "rel_err": 0.0014907606344529913
+    },
+    {
+     "design": "t=800 (target-branch F 0.551, source-polymorphic signal 0.835)",
+     "lean": 0.2588686285126071,
+     "truth": 0.25825939875229875,
+     "sem": 0.0011492381492030812,
+     "sems_off": 0.5301161997892433,
+     "rel_err": 0.0023589838869433905
+    },
+    {
+     "design": "t=1100 (target-branch F 0.667, source-polymorphic signal 0.773)",
+     "lean": 0.1932994915188115,
+     "truth": 0.19399911993828312,
+     "sem": 0.0013853567228623942,
+     "sems_off": 0.5050168003126638,
+     "rel_err": 0.00360634841897312
+    }
+   ]
+  },
+  {
+   "name": "cleanSplitTargetR2 [LD stage MULTIPLICATIVE, drift stage measured, competing]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "(measured no-LD target R2) * ldFactor",
+   "note": "",
+   "regime": "the LD stage isolated: the drift stage is the MEASURED no-LD target R-squared on the same replicates, so only the combination rule is under test. The score carries independent tagging noise and the realised LD factor is MEASURED as its squared correlation with the untagged score, not assumed. The multiplicative reading follows from the tag affecting the phenotype only through the causal score, which this design instantiates, so the group's content is the REJECTION of the additive reading and the check that the drift penalty is not applied a second time inside the LD stage",
+   "span": 0.6265622369706529,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "t=500 ldFactor=0.70",
+    "lean": 0.23653941563172806,
+    "truth": 0.23743982169425487,
+    "sem": 0.00045497463085546327,
+    "sems_off": 1.9790247663563714,
+    "rel_err": 0.0037921442835576217
+   },
+   "cells": [
+    {
+     "design": "t=0 ldFactor=0.50",
+     "lean": 0.2502398177713494,
+     "truth": 0.24940914640562584,
+     "sem": 0.0005418505372578932,
+     "sems_off": 1.5330267455806,
+     "rel_err": 0.00333055694907278
+    },
+    {
+     "design": "t=0 ldFactor=0.70",
+     "lean": 0.35137918126959605,
+     "truth": 0.35111045683891834,
+     "sem": 0.0005897203949648154,
+     "sems_off": 0.4556810871256142,
+     "rel_err": 0.0007653558173603427
+    },
+    {
+     "design": "t=0 ldFactor=0.90",
+     "lean": 0.4511201254578466,
+     "truth": 0.4512788782578789,
+     "sem": 0.0005160906570919748,
+     "sems_off": 0.30760642117962306,
+     "rel_err": 0.000351784246240713
+    },
+    {
+     "design": "t=500 ldFactor=0.50",
+     "lean": 0.1684652905084966,
+     "truth": 0.16844768819017553,
+     "sem": 0.000746355316656153,
+     "sems_off": 0.02358436783157373,
+     "rel_err": 0.00010449723893626003
+    },
+    {
+     "design": "t=500 ldFactor=0.70",
+     "lean": 0.23653941563172806,
+     "truth": 0.23743982169425487,
+     "sem": 0.00045497463085546327,
+     "sems_off": 1.9790247663563714,
+     "rel_err": 0.0037921442835576217
+    },
+    {
+     "design": "t=500 ldFactor=0.90",
+     "lean": 0.304405656908647,
+     "truth": 0.3038184474253361,
+     "sem": 0.0005951844794120366,
+     "sems_off": 0.9866007996226808,
+     "rel_err": 0.0019327644133762879
+    }
+   ]
+  },
+  {
+   "name": "cleanSplitTargetR2 [LD stage ADDITIVE, the reading FALSIFIED at 41 sems by battery_bulk48, competing]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "(measured no-LD target R2) + ldFactor - 1",
+   "note": "positive control 't=0 [target R2 must be the constructed r2_0 = V_A/(V_A+V_E)]' passed at 1.06 sems",
+   "regime": "the LD stage isolated: the drift stage is the MEASURED no-LD target R-squared on the same replicates, so only the combination rule is under test. The score carries independent tagging noise and the realised LD factor is MEASURED as its squared correlation with the untagged score, not assumed. The multiplicative reading follows from the tag affecting the phenotype only through the causal score, which this design instantiates, so the group's content is the REJECTION of the additive reading and the check that the drift penalty is not applied a second time inside the LD stage",
+   "span": 1.0,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "t=0 ldFactor=0.50",
+    "lean": 0.0025565857627315447,
+    "truth": 0.24940914640562584,
+    "sem": 0.0005326569969983981,
+    "sems_off": 463.4362489067926,
+    "rel_err": 0.9897494306059905
+   },
+   "cells": [
+    {
+     "design": "t=0 ldFactor=0.50",
+     "lean": 0.0025565857627315447,
+     "truth": 0.24940914640562584,
+     "sem": 0.0005326569969983981,
+     "sems_off": 463.4362489067926,
+     "rel_err": 0.9897494306059905
+    },
+    {
+     "design": "t=0 ldFactor=0.70",
+     "lean": 0.2022897948193334,
+     "truth": 0.35111045683891834,
+     "sem": 0.0006201568120292857,
+     "sems_off": 239.97263132950505,
+     "rel_err": 0.4238571057080779
+    },
+    {
+     "design": "t=0 ldFactor=0.90",
+     "lean": 0.4012948341592352,
+     "truth": 0.4512788782578789,
+     "sem": 0.0005953286502536694,
+     "sems_off": 83.96042098317537,
+     "rel_err": 0.11076087649305129
+    },
+    {
+     "design": "t=500 ldFactor=0.50",
+     "lean": 0.0,
+     "truth": 0.16844768819017553,
+     "sem": 0.0012745366555508657,
+     "sems_off": 132.1638632020128,
+     "rel_err": 1.0
+    },
+    {
+     "design": "t=500 ldFactor=0.70",
+     "lean": 0.037626776602805515,
+     "truth": 0.23743982169425487,
+     "sem": 0.0009750211713765535,
+     "sems_off": 204.9320065628416,
+     "rel_err": 0.8415313137690251
+    },
+    {
+     "design": "t=500 ldFactor=0.90",
+     "lean": 0.238322826698922,
+     "truth": 0.3038184474253361,
+     "sem": 0.0005932248913824019,
+     "sems_off": 110.4060562492389,
+     "rel_err": 0.21557486479654847
+    }
+   ]
+  },
+  {
+   "name": "cleanSplitTargetAUC",
+   "file": "PhenomeWidePortability.lean",
+   "source": "liabilityThresholdAUCFromExplainedR2 (cleanSplitTargetR2 r2_0 NeS NeT t ldFactor) K",
+   "note": "positive control 't=0 [AUC must be the already-VALIDATED chart at r2_0]' passed at 2.37 sems",
+   "regime": "same replicates and the same per-allele score. Cases are the upper 5% of the realised target liability and the observable is the Mann-Whitney AUC of the score between cases and controls. Prevalence is supplied to the chart as the body requires it to be; the chart itself is separately VALIDATED at pooled RMSE 0.0121, so what this group adds is whether the R-squared the clean-split law computes is the explained-variance fraction that chart's argument expects",
+   "span": 0.2376787951988057,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "t=1100 K=0.05 (summed F 0.907)",
+    "lean": 0.6761006636721004,
+    "truth": 0.7621965565789474,
+    "sem": 0.0025480088209238203,
+    "sems_off": 33.78947992638092,
+    "rel_err": 0.11295759888142348
+   },
+   "cells": [
+    {
+     "design": "t=100 K=0.05 (summed F 0.119)",
+     "lean": 0.8868973595564886,
+     "truth": 0.8901659960526317,
+     "sem": 0.0008129474771016372,
+     "sems_off": 4.020722848906027,
+     "rel_err": 0.0036719404140773335
+    },
+    {
+     "design": "t=250 K=0.05 (summed F 0.282)",
+     "lean": 0.8694914438001302,
+     "truth": 0.8712636802631579,
+     "sem": 0.0015189084977169532,
+     "sems_off": 1.166782900807738,
+     "rel_err": 0.0020340988648722517
+    },
+    {
+     "design": "t=500 K=0.05 (summed F 0.514)",
+     "lean": 0.8326733679441205,
+     "truth": 0.8380125342105262,
+     "sem": 0.0014079659728989705,
+     "sems_off": 3.7921131399308696,
+     "rel_err": 0.00637122483070692
+    },
+    {
+     "design": "t=800 K=0.05 (summed F 0.733)",
+     "lean": 0.7726689646543209,
+     "truth": 0.8002860855263159,
+     "sem": 0.0012445839643126953,
+     "sems_off": 22.189841476260828,
+     "rel_err": 0.03450906041160556
+    },
+    {
+     "design": "t=1100 K=0.05 (summed F 0.907)",
+     "lean": 0.6761006636721004,
+     "truth": 0.7621965565789474,
+     "sem": 0.0025480088209238203,
+     "sems_off": 33.78947992638092,
+     "rel_err": 0.11295759888142348
+    }
+   ]
+  },
+  {
+   "name": "cleanSplitTargetAUC [the SUPERSEDED linear retention carried through the same chart, competing]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "liabilityThresholdAUCFromExplainedR2 (r2_0 * max 0 (1 - 2*fst)) K",
+   "note": "positive control 't=0 [AUC must be the already-VALIDATED chart at r2_0]' passed at 2.37 sems",
+   "regime": "same replicates and the same per-allele score. Cases are the upper 5% of the realised target liability and the observable is the Mann-Whitney AUC of the score between cases and controls. Prevalence is supplied to the chart as the body requires it to be; the chart itself is separately VALIDATED at pooled RMSE 0.0121, so what this group adds is whether the R-squared the clean-split law computes is the explained-variance fraction that chart's argument expects",
+   "span": 0.41533041442479907,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "t=500 K=0.05 (summed F 0.514)",
+    "lean": 0.5000193691350743,
+    "truth": 0.8380125342105262,
+    "sem": 0.001436964809639952,
+    "sems_off": 235.21325143664444,
+    "rel_err": 0.4033270998671495
+   },
+   "cells": [
+    {
+     "design": "t=100 K=0.05 (summed F 0.119)",
+     "lean": 0.855217000287697,
+     "truth": 0.8901659960526317,
+     "sem": 0.0008120662828380254,
+     "sems_off": 43.03712209647993,
+     "rel_err": 0.03926121186375706
+    },
+    {
+     "design": "t=250 K=0.05 (summed F 0.282)",
+     "lean": 0.7771612622366973,
+     "truth": 0.8712636802631579,
+     "sem": 0.0015633647818182731,
+     "sems_off": 60.19223352147837,
+     "rel_err": 0.10800681832397481
+    },
+    {
+     "design": "t=500 K=0.05 (summed F 0.514)",
+     "lean": 0.5000193691350743,
+     "truth": 0.8380125342105262,
+     "sem": 0.001436964809639952,
+     "sems_off": 235.21325143664444,
+     "rel_err": 0.4033270998671495
+    },
+    {
+     "design": "t=800 K=0.05 (summed F 0.733)",
+     "lean": 0.5000193691350743,
+     "truth": 0.8002860855263159,
+     "sem": 0.0013451424435934876,
+     "sems_off": 223.22298862943654,
+     "rel_err": 0.3751992216555512
+    },
+    {
+     "design": "t=1100 K=0.05 (summed F 0.907)",
+     "lean": 0.5000193691350743,
+     "truth": 0.7621965565789474,
+     "sem": 0.002294652237257523,
+     "sems_off": 114.25573914294604,
+     "rel_err": 0.343975822484206
+    }
+   ]
+  }
+ ]
+}

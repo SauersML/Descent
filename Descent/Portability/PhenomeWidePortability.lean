@@ -919,15 +919,40 @@ section CleanSplit
 /-- The drift index a clean two-branch split accumulates, as the SUM of the two per-branch
     coefficients.
 
-    Empirical status: UNTESTED. A battery is being commissioned against this name and the two
-    that compose it. What the battery must respect is the convention rather than the
-    arithmetic: this is the sum of two PER-BRANCH Wright `F` values, the reading
-    `fstFromDriftFactor` is validated at, and NOT a pairwise Hudson `F_ST`. Feeding a pairwise
-    value here is the error `Var_Delta_Mu`'s docstring records as having produced a
-    factor-of-four false falsification twice. The components carry their own measurements:
-    `neutralDriftFactor` is CONDITIONALLY VALID inside the closed-population, no-mutation
-    regime this definition also assumes, and `fstFromDriftFactor` is VALIDATED at worst 1.42
-    sems on the same Wright-Fisher runs. -/
+    Empirical status: **VALIDATED** (`validation/empirical/simcov/battery_clean01.py`).
+    Forward Wright-Fisher on allele frequencies, 20000 loci from a neutral `1/p` spectrum,
+    `NeS = 2000` and `NeT = 500` closed, no mutation and no migration, 10 independent blocks.
+    The oracle is the realised PER-BRANCH heterozygosity loss `1 - H_branch/H_ancestor` summed
+    over the two lineages, which is the reading `fstFromDriftFactor` was validated at:
+
+      t      this body   summed per-branch F   pairwise Hudson F_ST
+      100    0.11990     0.11944 ± 0.00063     0.0598
+      250    0.28189     0.28158 ± 0.00148     0.1416
+      500    0.51114     0.51420 ± 0.00158     0.2572
+      800    0.73214     0.73279 ± 0.00173     0.3671
+      1100   0.90777     0.90748 ± 0.00191     0.4559
+
+    Worst cell 1.94 sems, 0.60% relative. Every cell stays inside
+    `cleanSplitFst_lt_one_iff`'s admissible range, which the battery asserts rather than
+    assumes. Power: the prediction spans 0.120 to 0.908, a factor of 7.6.
+
+    THE SUMMATION CONVENTION IS WHAT WAS MEASURED, and the third column is why the warning
+    below is kept rather than retired. The pairwise Hudson reading of the same two branches,
+    carried as a competitor on the same replicates, is FALSIFIED at 459 sems and 99%
+    relative — it runs almost exactly half the summed index, which is the factor-of-two-per-
+    branch shape `Var_Delta_Mu`'s docstring records as having produced a factor-of-four false
+    falsification twice. So the convention is now measured and not merely asserted: this is
+    the sum of two PER-BRANCH Wright `F` values and NOT a pairwise Hudson `F_ST`, and a
+    consumer feeding a pairwise value gets a number the design has separated from this one.
+
+    argument_source: model. `Ne` and `t` are the simulation's own parameters, never estimated
+    from the replicates the heterozygosity loss is measured on. The control is one branch's
+    realised retention against `neutralDriftFactor`, a separately measured body, on the same
+    resampling path: predicted 0.759546, measured 0.759042 ± 0.001733.
+
+    WHAT THIS DOES NOT CARRY. `cleanSplitTargetR2` composes this index into
+    `neutralPortability` and that composition is FALSIFIED by the same run. The index is
+    right; feeding it to the chart is not. -/
 noncomputable def cleanSplitFst (NeS NeT : ℝ) (t : ℕ) : ℝ :=
   fstFromDriftFactor (neutralDriftFactor NeS t) +
     fstFromDriftFactor (neutralDriftFactor NeT t)
@@ -935,36 +960,102 @@ noncomputable def cleanSplitFst (NeS NeT : ℝ) (t : ℕ) : ℝ :=
 /-- **The composed target `R²` for a clean two-branch split.** The drift index of the split
     transported through the neutral portability chart, then scaled by the LD factor.
 
-    Empirical status: UNTESTED, and a battery is being commissioned against this name.
-    The composition is what is untested; every stage carries a measurement of its own.
-    `neutralPortability` is VALIDATED at worst 1.70 sems with the superseded linear
-    `1 - 2·fst` form FALSIFIED at 101 sems on the same cells. That the drift penalty and the
-    LD penalty MULTIPLY rather than add is the validated content of
-    `neutralPortabilityRatioLD`, where the additive reading is FALSIFIED at 41 sems, and
-    `cleanSplitTargetR2_eq_ratioLD_scaling` below states that this body uses that combination
-    and does not double-count the drift penalty inside it.
+    Empirical status: **FALSIFIED** (`validation/empirical/simcov/battery_clean01.py`). THE
+    JOIN IS THE FAULT, and both stages it joins survive the same run: `cleanSplitFst` is
+    VALIDATED above at 1.94 sems on these very replicates, and the multiplicative LD
+    combination this body uses matches at 1.98 sems with the additive reading FALSIFIED at
+    463. What fails is feeding a SUMMED per-branch index to `neutralPortability`'s `fst` slot.
 
-    WHAT A BATTERY MUST NOT INHERIT AS SETTLED. The join is the claim: that a summed
-    per-branch drift index is the argument `neutralPortability`'s `fst` slot wants, and that
-    an LD retention measured on tagging may multiply an `R²` measured on transport. Neither
-    battery behind the two stages feeds the other's output, which is the same gap
-    `targetLiabilityAUCFromNeutralAFBenchmark` records for its own composition. The regime is
-    inherited whole from `neutralDriftFactor`: closed populations, no mutation, no migration.
-    At demographic equilibrium the retention is stationary and this prediction is wrong for
-    that reason and not for any reason about transport. -/
+    Same engine as `cleanSplitFst`, 40000 target individuals per block, TRUE causal effects so
+    no GWAS-inefficiency confound is present, `r2_0 = V_A/(V_A+V_E) = 0.5` realised exactly in
+    every block, `ldFactor = 1`:
+
+      t      summed F   this body   measured target R²    sems
+      100    0.119      0.46824     0.47082 ± 0.00071      3.6
+      250    0.282      0.41807     0.41995 ± 0.00099      1.9
+      500    0.514      0.32695     0.33817 ± 0.00167      6.7
+      800    0.733      0.21085     0.25826 ± 0.00154     30.7
+      1100   0.907      0.08466     0.19400 ± 0.00164     66.5
+
+    The body is right at shallow splits and fails as the index grows: 0.55% out at
+    `t = 100` and 56% LOW at `t = 1100`, where it predicts 0.085 against a measured 0.194.
+    A miss that grows monotonically with the argument is a wrong functional form and not a
+    wrong constant, so no rescaling of `lambda` or of `r2_0` repairs it.
+
+    IT IS NOT THE SCORE CONSTRUCTION. Two constructions are carried on the same replicates.
+    The PER-ALLELE score, which is what a real PGS is — weights on the variants still
+    polymorphic in the source — gives the table above. The SOURCE-STANDARDISED score, where
+    the weight carries `√(h_S/h_T)` and the construction is symmetric in the two branches, is
+    the body's best case and is the reason it was run; it is FALSIFIED too, at 68.45 sems and
+    8.6% relative. A falsification holding in the construction most favourable to the body is
+    not a report about the design.
+
+    NOR IS IT THE TARGET-BRANCH READING. The alternative that only the TARGET branch's index
+    enters the `fst` slot is also FALSIFIED, at 47.30 sems and 20% relative, and it errs the
+    other way — 0.250 against a measured 0.194 at the deepest cell. The truth lies between the
+    two readings, which is what the decomposition below says.
+
+    WHERE THE RESIDUAL LIVES, recorded so the replacement has somewhere to start. The
+    target-branch index through the chart, times the fraction of the target's genetic signal
+    still POLYMORPHIC IN THE SOURCE, matches at worst 2.66 sems and 0.34% relative across the
+    whole sweep. Those are two effects the summed reading conflates into one index: the target
+    branch's own heterozygosity loss, which the chart handles correctly, and the source
+    branch's FIXATION, which removes variants from the score without removing their variance
+    from the target phenotype — 47% of loci and 22.7% of the target's signal at `t = 1100`. It
+    is a DECOMPOSITION and not a candidate body: one of its factors is measured rather than
+    computed from arguments, so it cannot be written at this signature as it stands.
+
+    Power: the prediction spans 0.468 to 0.085, a factor of 5.5, and the two readings of the
+    `fst` slot that could be meant are 0.085 and 0.250 at the far cell, so the design
+    separates them by a factor of three and cannot validate both.
+
+    argument_source: model. The control is the `t = 0` cell, where no drift has happened and
+    the measured target `R²` must be the constructed `V_A/(V_A+V_E)`: predicted 0.500000,
+    measured 0.501181 ± 0.001110. Both already-falsified rivals fail here as they must — the
+    superseded linear retention at 229 sems and the additive LD combination at 463 — so a
+    design in which they had passed would have been known to be broken.
+
+    The regime is inherited whole from `neutralDriftFactor`: closed populations, no mutation,
+    no migration. At demographic equilibrium the retention is stationary and this prediction
+    is wrong for that reason as well, and separately from the fault measured here. -/
 noncomputable def cleanSplitTargetR2 (r2_0 NeS NeT : ℝ) (t : ℕ) (ldFactor : ℝ) : ℝ :=
   neutralPortability r2_0 (cleanSplitFst NeS NeT t) * ldFactor
 
 /-- **The composed target AUC for a clean two-branch split**, at a required prevalence.
 
-    Empirical status: UNTESTED, with the same battery commissioned against it. Prevalence is a
-    required argument for the reason `targetLiabilityAUCFromNeutralAFBenchmark` gives at
-    length: converting a drift-induced `R²` drop to AUC through a prevalence-free chart is the
-    fault that carried a `-0.068` bias, and making `K` mandatory is what prevents it.
-    `liabilityThresholdAUCFromExplainedR2` is VALIDATED against 400 simulated PGS studies at
-    pooled RMSE 0.0121 against a 0.0120 noise floor, with its prevalence axis swept; what is
-    untested here is that the `R²` this file computes is the explained-variance fraction that
-    chart's argument expects. -/
+    Empirical status: **FALSIFIED, inherited** (`validation/empirical/simcov/battery_clean01.py`).
+    The fault is `cleanSplitTargetR2`'s and arrives here through it; the chart this body wraps
+    around it is not implicated. Same replicates and the same per-allele score, cases the upper
+    5% of the realised target liability, the observable the Mann-Whitney AUC between cases and
+    controls:
+
+      t      summed F   this body   measured AUC          sems
+      100    0.119      0.88690     0.89017 ± 0.00081      4.0
+      250    0.282      0.86949     0.87126 ± 0.00152      1.2
+      500    0.514      0.83267     0.83801 ± 0.00141      3.8
+      800    0.733      0.77267     0.80029 ± 0.00124     22.2
+      1100   0.907      0.67610     0.76220 ± 0.00255     33.8
+
+    Worst cell 33.79 sems, 11.3% relative, and it tracks the `R²` failure cell for cell: the
+    AUC prediction is low exactly where the `R²` prediction is low, and by the amount the
+    chart carries that shortfall.
+
+    THE CHART IS NOT THE FAULT and the control says so. `liabilityThresholdAUCFromExplainedR2`
+    is VALIDATED against 400 simulated PGS studies at pooled RMSE 0.0121 against a 0.0120 noise
+    floor, and on THESE replicates the `t = 0` cell — where no drift has happened, so the chart
+    is being read at the constructed `r2_0` — predicts 0.897003 against a measured
+    0.900097 ± 0.001305. So the `R²` this file computes is not the explained-variance fraction
+    the chart's argument expects, which is what was untested; the chart's own conversion is
+    fine. Repairing `cleanSplitTargetR2` repairs this body without touching it.
+
+    Power: the prediction spans 0.887 to 0.676. The superseded linear retention carried
+    through the same chart is FALSIFIED at 235 sems on the same cells, so the design's power to
+    reject a wrong `R²` through this conversion is demonstrated and not assumed.
+
+    Prevalence stays a required argument for the reason `targetLiabilityAUCFromNeutralAFBenchmark`
+    gives at length: converting a drift-induced `R²` drop to AUC through a prevalence-free
+    chart is the fault that carried a `-0.068` bias, and making `K` mandatory is what prevents
+    it. Nothing in this record touches that. -/
 noncomputable def cleanSplitTargetAUC (r2_0 NeS NeT : ℝ) (t : ℕ) (ldFactor K : ℝ) : ℝ :=
   liabilityThresholdAUCFromExplainedR2 (cleanSplitTargetR2 r2_0 NeS NeT t ldFactor) K
 
@@ -1120,8 +1211,32 @@ them. Both are UNTESTED and both name honestly what they do NOT cover.
     same computation returns `1 - K`, so the check separates the two conventions at every
     prevalence but `K = 1/2`.
 
-    Empirical status: UNTESTED. A battery is being commissioned against this name and against
-    `orPerSDFromLiability`, which is built from it. -/
+    Empirical status: **VALIDATED** (`validation/empirical/simcov/battery_liab01.py`). Direct
+    liability-threshold simulation, `liability = √r2·z + √(1-r2)·e` with `e` an independent
+    standard normal and a case a liability above `liabilityThreshold K`, 20 million
+    individuals per block at each score and 8 independent blocks, across `r2 ∈ {0.10, 0.30,
+    0.60}` and `K ∈ {0.05, 0.10, 0.20}` at `z = 0` and `z = 1`. Worst cell 2.97 sems and 0.29%
+    relative over all 18 cells. Power: the predicted risk spans 0.0047 to 0.4578, a factor
+    of 97.
+
+    THE SCORE IS HELD AT EXACTLY `z` rather than binned near it, and that is what the body
+    claims — the risk AT a score, not the risk averaged over a neighbourhood of it. An earlier
+    version of the design binned at half-width 0.05 and carried the bin's curvature smear,
+    0.42% relative, which is inside the harness's 2% floor but showed at 5.7 sems. A floor
+    covering for a known estimator bias is not a design that is right, so the estimator was
+    replaced rather than the tolerance widened.
+
+    THE SIGN IS MEASURED AND NOT ASSUMED. The `+T` reading, carried as a competitor in the same
+    cells, is FALSIFIED at 222024 sems — at `r2 = 0.60, K = 0.05` it returns 0.9999 where the
+    simulation gives 0.0047. The two readings coincide at `K = 1/2` and at no other prevalence,
+    so a design that never ran it could not have said which one it had confirmed.
+
+    argument_source: model. `r2` and `K` are the simulation's own parameters. The control is
+    the marginal prevalence at `r2 = 0.30, K = 0.05`, which must be `K` itself and is
+    independent of every body in the file: predicted 0.050000, measured 0.049997 ± 0.000023.
+    The `r2 = 0` case, `liabilityRiskAtScore_at_zero_r2_eq_prevalence` below, is measured
+    beside it at 0.049982 ± 0.000015 and is reported as a diagnostic rather than as a second
+    gate, since taking whichever of two controls looks worse is a worst-of-N selection. -/
 noncomputable def liabilityRiskAtScore (r2 K z : ℝ) : ℝ :=
   Foundations.Phi ((Real.sqrt r2 * z - liabilityThreshold K) / Real.sqrt (1 - r2))
 
@@ -1134,18 +1249,45 @@ noncomputable def liabilityRiskAtScore (r2 K z : ℝ) : ℝ :=
     only in the rare-disease limit, and a battery reading one against the other would be
     measuring the gap between them rather than this body.
 
-    Empirical status: UNTESTED, and a battery is being commissioned against this name. The
-    components are in different states and the composition is what is untested.
-    `liabilityThreshold` is VALIDATED at worst 0.91 sems with the sign slip `Φ⁻¹(K)`
-    FALSIFIED at 3390 sems, so the threshold convention this body inherits is measured. What
-    is not measured is that the odds ratio a fitted logistic reports on simulated data is
-    this function of the explained-variance fraction — which is the join, and joins are where
-    this corpus has hidden errors before. Note also that the model is probit and the metric
-    is logistic: an odds ratio is constant per SD only under a logistic link, and
-    under this probit model it is not, so `orPerSDFromLiability` is the odds ratio for the
-    FIRST standard deviation specifically and not a slope that may be extrapolated. A battery
-    fitting a logistic regression over a wide score range will recover something between this
-    and the odds ratio at other points. -/
+    Empirical status: **VALIDATED** (`validation/empirical/simcov/battery_liab01.py`), and the
+    join it was written to test holds. Same design as `liabilityRiskAtScore` above and the same
+    replicates:
+
+      r2     K      this body   measured odds ratio    sems
+      0.10   0.05    2.02833     2.02848 ± 0.00065      0.2
+      0.10   0.20    1.76869     1.76806 ± 0.00050      1.3
+      0.30   0.05    4.14736     4.14601 ± 0.00328      0.4
+      0.30   0.20    3.05054     3.05139 ± 0.00096      0.9
+      0.60   0.05   19.72958    19.78990 ± 0.01813      3.3
+      0.60   0.20    8.36928     8.36576 ± 0.00179      2.0
+
+    Worst cell 3.33 sems and 0.30% relative over all nine. Power: the prediction spans 1.77 to
+    19.73, a factor of 11.
+
+    THE ODDS RATIO IS THE FIRST STANDARD DEVIATION'S, AND THE MEASUREMENT RESPECTS THAT. The
+    caveat below is now measured rather than expected: a logistic regression fitted over the
+    WHOLE score range, carried as a competitor on the same replicates, disagrees at 279 sems
+    and 83% relative — at `r2 = 0.60, K = 0.05` it returns 10.75 against this body's 19.73. So
+    a battery reading a wide-range logistic slope against this declaration would be measuring
+    the probit-versus-logistic gap and not this body, exactly as the note says.
+
+    THE RISK RATIO IS NOT THIS QUANTITY, and the design decides it rather than assuming it.
+    `risk(1)/risk(0)` measured on the same draws agrees with its own prediction at 3.30 sems,
+    and it is a different number: 18.15 against this body's 19.73 at `r2 = 0.60, K = 0.05`,
+    converging on it only as prevalence falls. The prevalence sweep runs 0.05 to 0.20 and
+    stops there deliberately — below 0.05 the odds ratio's denominator is the case rate at
+    `z = 0`, which at `K = 0.01, r2 = 0.60` is 1.2e-4 and cannot be measured to inside the
+    harness's 2% relative floor by any affordable sample, so a rarer cell could contribute a
+    spurious falsification and nothing else.
+
+    The `+T` sign slip carried through the same odds ratio is FALSIFIED at 5889 sems.
+
+    argument_source: model. Control as for `liabilityRiskAtScore`: the marginal prevalence at
+    `r2 = 0.30, K = 0.05`, predicted 0.050000 and measured 0.049997 ± 0.000023.
+
+    The model is probit and the metric is logistic: an odds ratio is constant per SD only under
+    a logistic link, and under this probit model it is not, so this is the odds ratio for the
+    FIRST standard deviation specifically and not a slope that may be extrapolated. -/
 noncomputable def orPerSDFromLiability (r2 K : ℝ) : ℝ :=
   (liabilityRiskAtScore r2 K 1 / (1 - liabilityRiskAtScore r2 K 1)) /
     (liabilityRiskAtScore r2 K 0 / (1 - liabilityRiskAtScore r2 K 0))
@@ -1262,10 +1404,44 @@ theorem one_lt_orPerSDFromLiability (r2 K : ℝ) (h0 : 0 < r2) (h1 : r2 < 1) :
     measuring the warp, not this identity. Testing THIS declaration means correlating the
     indices, which a simulation can do because it knows the latent liability it drew.
 
-    Empirical status: UNTESTED on the index scale. NOT TESTED BY THE DESIGN THAT LOOKED LIKE
-    IT WAS would be the wrong head, since no design has been pointed at this body yet; the
-    paragraph above is a warning about the design a battery would reach for first, not a
-    record of one that ran. -/
+    Empirical status: **VALIDATED** on the index scale
+    (`validation/empirical/simcov/battery_liab01.py`). Standard normal `z` and independent
+    standard normal `ε`, `ẑ = rho·z + s·ε`, the true-liability index `a + b·z` and the score
+    index `a + b·ẑ`, 5 million draws per block and 8 blocks. Worst cell 2.81 sems and 0.03%
+    relative. Power: the prediction spans 0.160 to 0.719, a factor of 4.5.
+
+    HALF THE CELLS CARRY `s² ≠ 1 - rho²` AND A NONZERO INTERCEPT WITH A SLOPE OTHER THAN ONE,
+    which is the whole reason the design decides anything. A run confined to standardised
+    scores would have validated all three candidates at once:
+
+      cell                              this body   measured   rho² alone   rho/(rho+s)
+      rho=0.4, s=0.917, standardised      0.16000    0.15998     0.16000       0.30383
+      rho=0.4, s=0.500, a=-1.64, b=0.65   0.39024    0.39017     0.16000       0.44444
+      rho=0.6, s=0.500, a=-1.64, b=0.65   0.59016    0.59031     0.36000       0.54545
+      rho=0.8, s=0.500, a=-1.64, b=0.65   0.71910    0.71900     0.64000       0.61538
+
+    `rho²` alone — the standardised-score special case mistaken for the general body — is
+    FALSIFIED at 2541 sems, and the unsquared reading `rho/(rho+s)` at 1938 sems. The affine
+    cells are also what make `indexScaleTrueIndexR2_slope_invariant` a measured claim rather
+    than a tautology: the intercept and slope are carried through the simulation and cancel.
+
+    THE WARNING ABOVE IS NOW MEASURED. The risk-scale reading — correlating `Φ` of the two
+    indices, which is what a simulation reports most easily — is FALSIFIED against this body
+    at 497.81 sems and 11.2% relative, running 0.530 where the index scale gives 0.590. So the
+    gap between the two scales is real and this body is the index-scale one; a design reaching
+    for the risk scale would have measured the `Φ` warp.
+
+    WHAT THIS DOES NOT ESTABLISH. The projection identity is a closed derivation, so agreement
+    on the ratio itself is close to a construction check and is not claimed as more. What the
+    run decides is carried by the three rivals and by the affine cells.
+
+    argument_source: model. The control is the variance decomposition
+    `Var(rho·z + s·ε) = rho² + s²`, which is not this body's ratio and fails on a draw slip,
+    designated a priori as the design's largest-variance cell: predicted 1.000000, measured
+    0.999602 ± 0.000219. It is designated rather than selected as the worst of the six because
+    an earlier version took the worst and declared a failure at exactly 3.0 sems, voiding all
+    three rivals — the worst-of-N false positive, arrived at in the control rather than in
+    the cells. -/
 noncomputable def indexScaleTrueIndexR2 (rho s : ℝ) : ℝ :=
   rho ^ 2 / (rho ^ 2 + s ^ 2)
 

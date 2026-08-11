@@ -1,0 +1,192 @@
+FRESHNESS=OK (token SIMCOV-BATTERY-LIAB01-AVOCET-20260810)
+FRESHNESS token literal: SIMCOV-BATTERY-LIAB01-AVOCET-20260810
+
+  cell               risk z=1   risk z=0    OR meas    OR lean   logistic
+  r2=0.10 K=0.05    0.08069    0.04148     2.0285     2.0283     2.0228
+  r2=0.10 K=0.10    0.15443    0.08835     1.8845     1.8844     1.8988
+  r2=0.10 K=0.20    0.28980    0.18752     1.7681     1.7687     1.7900
+  r2=0.30 K=0.05    0.09485    0.02465     4.1460     4.1474     3.7880
+  r2=0.30 K=0.10    0.19021    0.06282     3.5043     3.5060     3.4432
+  r2=0.30 K=0.20    0.36267    0.15718     3.0514     3.0505     3.1665
+  r2=0.60 K=0.05    0.08443    0.00464    19.7899    19.7296    10.7882
+  r2=0.60 K=0.10    0.21143    0.02136    12.2852    12.2784     9.7321
+  r2=0.60 K=0.20    0.45773    0.09165     8.3658     8.3693     8.8522
+
+  CONTROL r2=0.30 [the marginal case rate must be the prevalence K=0.05]: predicted 0.050000 measured 0.049997 +/- 0.000023
+  DIAGNOSTIC r2=0: risk at z=1 measured 0.049982 +/- 0.000015 (must be K=0.05)
+
+liabilityRiskAtScore                     MATCH   (pred span 99%)
+  lean: Phi((sqrt r2 * z - liabilityThreshold K) / sqrt (1 - r2))
+  regime: direct liability-threshold simulation: liability = sqrt(r2)*z + sqrt(1-r2)*e with z the standardised score and e independent standard normal, a case being a liability above liabilityThreshold K. 20000000 individuals per block at each score, 8 independent blocks. The risk at a score is measured with the score HELD AT EXACTLY that value and only the residual drawn, so the observable is the risk AT the score and not the risk averaged over a neighbourhood of it: an earlier binned version of this design carried a curvature smear of 0.42%, which is inside the harness's relative floor but was visible at 5.7 sems, and a floor covering for a known estimator bias is not a design that is right. The prediction is evaluated at the model's own r2 and K, which the simulation realises exactly
+  design                                   lean        sim      sem     sems
+  r2=0.10 K=0.05 z=1                    0.08068    0.08069  0.00001     0.64
+  r2=0.10 K=0.05 z=0                    0.04147    0.04148  0.00001     0.26
+  r2=0.10 K=0.10 z=1                    0.15445    0.15443  0.00003     0.75
+  r2=0.10 K=0.10 z=0                    0.08837    0.08835  0.00002     1.06
+  r2=0.10 K=0.20 z=1                    0.28985    0.28980  0.00002     2.87
+  r2=0.10 K=0.20 z=0                    0.18750    0.18752  0.00004     0.38
+  r2=0.30 K=0.05 z=1                    0.09487    0.09485  0.00004     0.65
+  r2=0.30 K=0.05 z=0                    0.02465    0.02465  0.00001     0.05
+  r2=0.30 K=0.10 z=1                    0.19022    0.19021  0.00002     0.18
+  r2=0.30 K=0.10 z=0                    0.06279    0.06282  0.00002     1.31
+  r2=0.30 K=0.20 z=1                    0.36269    0.36267  0.00003     0.62
+  r2=0.30 K=0.20 z=0                    0.15722    0.15718  0.00004     1.29
+  r2=0.60 K=0.05 z=1                    0.08441    0.08443  0.00001     1.37
+  r2=0.60 K=0.05 z=0                    0.00465    0.00464  0.00000     2.97
+  r2=0.60 K=0.10 z=1                    0.21140    0.21143  0.00004     0.73
+  r2=0.60 K=0.10 z=0                    0.02137    0.02136  0.00001     0.79
+  r2=0.60 K=0.20 z=1                    0.45780    0.45773  0.00004     1.75
+  r2=0.60 K=0.20 z=0                    0.09164    0.09165  0.00002     0.62
+
+liabilityRiskAtScore [the +T sign slip, FALSIFIED at 3390 sems in liabilityThreshold's record, competing] FALSIFIED   (pred span 19%)
+  lean: Phi((sqrt r2 * z + liabilityThreshold K) / sqrt (1 - r2))
+  regime: direct liability-threshold simulation: liability = sqrt(r2)*z + sqrt(1-r2)*e with z the standardised score and e independent standard normal, a case being a liability above liabilityThreshold K. 20000000 individuals per block at each score, 8 independent blocks. The risk at a score is measured with the score HELD AT EXACTLY that value and only the residual drawn, so the observable is the risk AT the score and not the risk averaged over a neighbourhood of it: an earlier binned version of this design carried a curvature smear of 0.42%, which is inside the harness's relative floor but was visible at 5.7 sems, and a floor covering for a known estimator bias is not a design that is right. The prediction is evaluated at the model's own r2 and K, which the simulation realises exactly
+  NOTE: the two readings coincide at K = 1/2 and nowhere else, so a design that never ran it could not say which it confirmed; positive control 'r2=0.30 [the marginal case rate must be the prevalence K=0.05]' passed at 0.11 sems
+  design                                   lean        sim      sem     sems
+  r2=0.10 K=0.05 z=1                    0.98064    0.08069  0.00001 60364.08
+  r2=0.10 K=0.05 z=0                    0.95853    0.04148  0.00001 105387.01
+  r2=0.10 K=0.10 z=1                    0.95393    0.15443  0.00003 29984.48
+  r2=0.10 K=0.10 z=0                    0.91163    0.08835  0.00002 45322.25
+  r2=0.10 K=0.20 z=1                    0.88886    0.28980  0.00002 33304.34
+  r2=0.10 K=0.20 z=0                    0.81250    0.18752  0.00004 14638.77
+  r2=0.30 K=0.05 z=1                    0.99561    0.09485  0.00004 22981.33
+  r2=0.30 K=0.05 z=0                    0.97535    0.02465  0.00001 64874.99
+  r2=0.30 K=0.10 z=1                    0.98561    0.19021  0.00002 34783.34
+  r2=0.30 K=0.10 z=0                    0.93721    0.06282  0.00002 42138.97
+  r2=0.30 K=0.20 z=1                    0.95160    0.36267  0.00003 17033.70
+  r2=0.30 K=0.20 z=0                    0.84278    0.15718  0.00004 18123.77
+  r2=0.60 K=0.05 z=1                    0.99993    0.08443  0.00001 87967.24
+  r2=0.60 K=0.05 z=0                    0.99535    0.00464  0.00000 222024.49
+  r2=0.60 K=0.10 z=1                    0.99943    0.21143  0.00004 20956.66
+  r2=0.60 K=0.10 z=0                    0.97863    0.02136  0.00001 93095.75
+  r2=0.60 K=0.20 z=1                    0.99470    0.45773  0.00004 13273.86
+  r2=0.60 K=0.20 z=0                    0.90836    0.09165  0.00002 44900.69
+
+orPerSDFromLiability                     MATCH   (pred span 91%)
+  lean: (risk(1)/(1-risk(1))) / (risk(0)/(1-risk(0))), risk = liabilityRiskAtScore r2 K
+  regime: direct liability-threshold simulation: liability = sqrt(r2)*z + sqrt(1-r2)*e with z the standardised score and e independent standard normal, a case being a liability above liabilityThreshold K. 20000000 individuals per block at each score, 8 independent blocks. The risk at a score is measured with the score HELD AT EXACTLY that value and only the residual drawn, so the observable is the risk AT the score and not the risk averaged over a neighbourhood of it: an earlier binned version of this design carried a curvature smear of 0.42%, which is inside the harness's relative floor but was visible at 5.7 sems, and a floor covering for a known estimator bias is not a design that is right. The prediction is evaluated at the model's own r2 and K, which the simulation realises exactly. The odds ratio is the FIRST standard deviation's specifically: it is the ratio of the odds inside the z=1 bin to the odds inside the z=0 bin, and no slope is fitted, because under a probit model the odds ratio per SD is not constant and a fitted slope is a different quantity
+  design                                   lean        sim      sem     sems
+  r2=0.10 K=0.05                        2.02833    2.02848  0.00065     0.22
+  r2=0.10 K=0.10                        1.88438    1.88454  0.00061     0.27
+  r2=0.10 K=0.20                        1.76869    1.76806  0.00050     1.27
+  r2=0.30 K=0.05                        4.14736    4.14601  0.00328     0.41
+  r2=0.30 K=0.10                        3.50600    3.50429  0.00155     1.11
+  r2=0.30 K=0.20                        3.05054    3.05139  0.00096     0.88
+  r2=0.60 K=0.05                       19.72958   19.78990  0.01813     3.33
+  r2=0.60 K=0.10                       12.27837   12.28521  0.00626     1.09
+  r2=0.60 K=0.20                        8.36928    8.36576  0.00179     1.96
+
+orPerSDFromLiability [the +T sign slip carried through the same odds ratio, competing] FALSIFIED   (pred span 97%)
+  lean: same ratio built from Phi((sqrt r2 * z + T)/sqrt(1-r2))
+  regime: direct liability-threshold simulation: liability = sqrt(r2)*z + sqrt(1-r2)*e with z the standardised score and e independent standard normal, a case being a liability above liabilityThreshold K. 20000000 individuals per block at each score, 8 independent blocks. The risk at a score is measured with the score HELD AT EXACTLY that value and only the residual drawn, so the observable is the risk AT the score and not the risk averaged over a neighbourhood of it: an earlier binned version of this design carried a curvature smear of 0.42%, which is inside the harness's relative floor but was visible at 5.7 sems, and a floor covering for a known estimator bias is not a design that is right. The prediction is evaluated at the model's own r2 and K, which the simulation realises exactly. The odds ratio is the FIRST standard deviation's specifically: it is the ratio of the odds inside the z=1 bin to the odds inside the z=0 bin, and no slope is fitted, because under a probit model the odds ratio per SD is not constant and a fitted slope is a different quantity
+  NOTE: positive control 'r2=0.30 [the marginal case rate must be the prevalence K=0.05]' passed at 0.11 sems
+  design                                   lean        sim      sem     sems
+  r2=0.10 K=0.05                        2.19175    2.02848  0.00065   250.34
+  r2=0.10 K=0.10                        2.00708    1.88454  0.00061   202.46
+  r2=0.10 K=0.20                        1.84559    1.76806  0.00050   155.16
+  r2=0.30 K=0.05                        5.73396    4.14601  0.00328   483.74
+  r2=0.30 K=0.10                        4.58796    3.50429  0.00155   699.88
+  r2=0.30 K=0.20                        3.66802    3.05139  0.00096   642.58
+  r2=0.60 K=0.05                       71.60231   19.78990  0.01813  2857.47
+  r2=0.60 K=0.10                       37.95603   12.28521  0.00626  4103.81
+  r2=0.60 K=0.20                       18.92591    8.36576  0.00179  5888.72
+
+orPerSDFromLiability [the RISK ratio in the odds ratio's place, competing] MATCH   (pred span 91%)
+  lean: risk(1) / risk(0)
+  regime: direct liability-threshold simulation: liability = sqrt(r2)*z + sqrt(1-r2)*e with z the standardised score and e independent standard normal, a case being a liability above liabilityThreshold K. 20000000 individuals per block at each score, 8 independent blocks. The risk at a score is measured with the score HELD AT EXACTLY that value and only the residual drawn, so the observable is the risk AT the score and not the risk averaged over a neighbourhood of it: an earlier binned version of this design carried a curvature smear of 0.42%, which is inside the harness's relative floor but was visible at 5.7 sems, and a floor covering for a known estimator bias is not a design that is right. The prediction is evaluated at the model's own r2 and K, which the simulation realises exactly. The odds ratio is the FIRST standard deviation's specifically: it is the ratio of the odds inside the z=1 bin to the odds inside the z=0 bin, and no slope is fitted, because under a probit model the odds ratio per SD is not constant and a fitted slope is a different quantity
+  NOTE: the docstring says the two agree only in the rare-disease limit; the design sweeps prevalence from 0.05 to 0.20 so the claim is decided rather than assumed
+  design                                   lean        sim      sem     sems
+  r2=0.10 K=0.05                        1.94536    1.94549  0.00059     0.21
+  r2=0.10 K=0.10                        1.74779    1.74794  0.00050     0.31
+  r2=0.10 K=0.20                        1.54588    1.54547  0.00035     1.16
+  r2=0.30 K=0.05                        3.84875    3.84762  0.00289     0.39
+  r2=0.30 K=0.10                        3.02931    3.02794  0.00121     1.13
+  r2=0.30 K=0.20                        2.30683    2.30741  0.00059     1.00
+  r2=0.60 K=0.05                       18.14859   18.20355  0.01666     3.30
+  r2=0.60 K=0.10                        9.89410    9.89919  0.00482     1.05
+  r2=0.60 K=0.20                        4.99561    4.99423  0.00091     1.53
+
+orPerSDFromLiability [against a LOGISTIC slope fitted over the whole score range, competing] FALSIFIED   (pred span 91%)
+  lean: same body, oracle replaced by exp(beta) from a fitted logistic
+  regime: direct liability-threshold simulation: liability = sqrt(r2)*z + sqrt(1-r2)*e with z the standardised score and e independent standard normal, a case being a liability above liabilityThreshold K. 20000000 individuals per block at each score, 8 independent blocks. The risk at a score is measured with the score HELD AT EXACTLY that value and only the residual drawn, so the observable is the risk AT the score and not the risk averaged over a neighbourhood of it: an earlier binned version of this design carried a curvature smear of 0.42%, which is inside the harness's relative floor but was visible at 5.7 sems, and a floor covering for a known estimator bias is not a design that is right. The prediction is evaluated at the model's own r2 and K, which the simulation realises exactly. The odds ratio is the FIRST standard deviation's specifically: it is the ratio of the odds inside the z=1 bin to the odds inside the z=0 bin, and no slope is fitted, because under a probit model the odds ratio per SD is not constant and a fitted slope is a different quantity
+  NOTE: the docstring's caveat measured: a wide-range logistic fit recovers something between the first-SD odds ratio and the odds ratio at other points, so this row is EXPECTED to disagree and its disagreement is the caveat's evidence, not a defect in the body; positive control 'r2=0.30 [the marginal case rate must be the prevalence K=0.05]' passed at 0.11 sems
+  design                                   lean        sim      sem     sems
+  r2=0.10 K=0.05                        2.02833    2.02283  0.00369     1.49
+  r2=0.10 K=0.10                        1.88438    1.89881  0.00357     4.04
+  r2=0.10 K=0.20                        1.76869    1.78996  0.00157    13.58
+  r2=0.30 K=0.05                        4.14736    3.78803  0.00331   108.72
+  r2=0.30 K=0.10                        3.50600    3.44320  0.00513    12.25
+  r2=0.30 K=0.20                        3.05054    3.16651  0.00356    32.54
+  r2=0.60 K=0.05                       19.72958   10.78823  0.03199   279.47
+  r2=0.60 K=0.10                       12.27837    9.73212  0.01463   174.02
+  r2=0.60 K=0.20                        8.36928    8.85217  0.01346    35.88
+
+  cell                                     lean   index r2    risk r2
+  rho=0.4 s=0.917 [standardised]        0.16000    0.15998    0.14780
+  rho=0.4 s=0.500 [s free, affine wrapper]    0.39024    0.39017    0.33169
+  rho=0.6 s=0.800 [standardised]        0.36000    0.35977    0.33841
+  rho=0.6 s=0.500 [s free, affine wrapper]    0.59016    0.59031    0.53073
+  rho=0.8 s=0.600 [standardised]        0.64000    0.64018    0.61785
+  rho=0.8 s=0.500 [s free, affine wrapper]    0.71910    0.71900    0.66750
+
+  CONTROL Var(rho*z + s*eps) must be rho^2 + s^2 [the design's largest-variance cell, designated a priori]: predicted 1.000000 measured 0.999602 +/- 0.000219
+
+indexScaleTrueIndexR2                    MATCH   (pred span 78%)
+  lean: rho^2 / (rho^2 + s^2)
+  regime: standard normal z and independent standard normal eps, zhat = rho*z + s*eps, with the true-liability index a + b*z and the score index a + b*zhat; 5000000 draws per block and 8 blocks. Half the cells carry s^2 != 1 - rho^2 and a nonzero intercept with a slope other than one, because that is where the standardised-score special case and the unsquared reading part company from the body and where the affine cancellation is a claim rather than a tautology. The INDEX-scale row correlates the two indices, which is what the body claims; the RISK-scale row correlates Phi of them, which is what a simulation reports most easily and what the docstring warns a battery would reach for first
+  NOTE: the projection identity is a closed derivation, so agreement on the ratio is close to a construction check and is not claimed as more; what this group decides is carried by the rivals and by the affine cells
+  design                                   lean        sim      sem     sems
+  rho=0.4 s=0.917 a=0.00 b=1.00 [standardised]    0.16000    0.15998  0.00007     0.34
+  rho=0.4 s=0.500 a=-1.64 b=0.65 [s free, affine wrapper]    0.39024    0.39017  0.00012     0.59
+  rho=0.6 s=0.800 a=0.00 b=1.00 [standardised]    0.36000    0.35977  0.00009     2.52
+  rho=0.6 s=0.500 a=-1.64 b=0.65 [s free, affine wrapper]    0.59016    0.59031  0.00009     1.60
+  rho=0.8 s=0.600 a=0.00 b=1.00 [standardised]    0.64000    0.64018  0.00006     2.81
+  rho=0.8 s=0.500 a=-1.64 b=0.65 [s free, affine wrapper]    0.71910    0.71900  0.00006     1.56
+
+indexScaleTrueIndexR2 [measured on the RISK scale instead, the design the docstring warns a battery would reach for first, competing] FALSIFIED   (pred span 78%)
+  lean: same body, oracle replaced by corr^2 between Phi of the indices
+  regime: standard normal z and independent standard normal eps, zhat = rho*z + s*eps, with the true-liability index a + b*z and the score index a + b*zhat; 5000000 draws per block and 8 blocks. Half the cells carry s^2 != 1 - rho^2 and a nonzero intercept with a slope other than one, because that is where the standardised-score special case and the unsquared reading part company from the body and where the affine cancellation is a claim rather than a tautology. The INDEX-scale row correlates the two indices, which is what the body claims; the RISK-scale row correlates Phi of them, which is what a simulation reports most easily and what the docstring warns a battery would reach for first
+  NOTE: Phi is not affine, so the two scales are different numbers and no closed form carries one to the other; this row puts the size of the gap on the record; positive control 'Var(rho*z + s*eps) must be rho^2 + s^2 [the design's largest-variance cell, designated a priori]' passed at 1.82 sems
+  design                                   lean        sim      sem     sems
+  rho=0.4 s=0.917 a=0.00 b=1.00 [standardised]    0.16000    0.14780  0.00008   161.41
+  rho=0.4 s=0.500 a=-1.64 b=0.65 [s free, affine wrapper]    0.39024    0.33169  0.00016   356.26
+  rho=0.6 s=0.800 a=0.00 b=1.00 [standardised]    0.36000    0.33841  0.00012   174.72
+  rho=0.6 s=0.500 a=-1.64 b=0.65 [s free, affine wrapper]    0.59016    0.53073  0.00012   497.81
+  rho=0.8 s=0.600 a=0.00 b=1.00 [standardised]    0.64000    0.61785  0.00007   313.72
+  rho=0.8 s=0.500 a=-1.64 b=0.65 [s free, affine wrapper]    0.71910    0.66750  0.00018   289.35
+
+indexScaleTrueIndexR2 [rho^2 alone, the standardised-score special case mistaken for the general body, competing] FALSIFIED   (pred span 75%)
+  lean: rho^2
+  regime: standard normal z and independent standard normal eps, zhat = rho*z + s*eps, with the true-liability index a + b*z and the score index a + b*zhat; 5000000 draws per block and 8 blocks. Half the cells carry s^2 != 1 - rho^2 and a nonzero intercept with a slope other than one, because that is where the standardised-score special case and the unsquared reading part company from the body and where the affine cancellation is a claim rather than a tautology. The INDEX-scale row correlates the two indices, which is what the body claims; the RISK-scale row correlates Phi of them, which is what a simulation reports most easily and what the docstring warns a battery would reach for first
+  NOTE: positive control 'Var(rho*z + s*eps) must be rho^2 + s^2 [the design's largest-variance cell, designated a priori]' passed at 1.82 sems
+  design                                   lean        sim      sem     sems
+  rho=0.4 s=0.917 a=0.00 b=1.00 [standardised]    0.16000    0.15998  0.00007     0.34
+  rho=0.4 s=0.500 a=-1.64 b=0.65 [s free, affine wrapper]    0.16000    0.39017  0.00012  1967.56
+  rho=0.6 s=0.800 a=0.00 b=1.00 [standardised]    0.36000    0.35977  0.00009     2.52
+  rho=0.6 s=0.500 a=-1.64 b=0.65 [s free, affine wrapper]    0.36000    0.59031  0.00009  2541.46
+  rho=0.8 s=0.600 a=0.00 b=1.00 [standardised]    0.64000    0.64018  0.00006     2.81
+  rho=0.8 s=0.500 a=-1.64 b=0.65 [s free, affine wrapper]    0.64000    0.71900  0.00006  1245.48
+
+indexScaleTrueIndexR2 [the unsquared reading rho/(rho+s), competing] FALSIFIED   (pred span 51%)
+  lean: rho / (rho + s)
+  regime: standard normal z and independent standard normal eps, zhat = rho*z + s*eps, with the true-liability index a + b*z and the score index a + b*zhat; 5000000 draws per block and 8 blocks. Half the cells carry s^2 != 1 - rho^2 and a nonzero intercept with a slope other than one, because that is where the standardised-score special case and the unsquared reading part company from the body and where the affine cancellation is a claim rather than a tautology. The INDEX-scale row correlates the two indices, which is what the body claims; the RISK-scale row correlates Phi of them, which is what a simulation reports most easily and what the docstring warns a battery would reach for first
+  NOTE: positive control 'Var(rho*z + s*eps) must be rho^2 + s^2 [the design's largest-variance cell, designated a priori]' passed at 1.82 sems
+  design                                   lean        sim      sem     sems
+  rho=0.4 s=0.917 a=0.00 b=1.00 [standardised]    0.30383    0.15998  0.00007  1937.82
+  rho=0.4 s=0.500 a=-1.64 b=0.65 [s free, affine wrapper]    0.44444    0.39017  0.00012   463.91
+  rho=0.6 s=0.800 a=0.00 b=1.00 [standardised]    0.42857    0.35977  0.00009   768.30
+  rho=0.6 s=0.500 a=-1.64 b=0.65 [s free, affine wrapper]    0.54545    0.59031  0.00009   494.97
+  rho=0.8 s=0.600 a=0.00 b=1.00 [standardised]    0.57143    0.64018  0.00006  1096.18
+  rho=0.8 s=0.500 a=-1.64 b=0.65 [s free, affine wrapper]    0.61538    0.71900  0.00006  1633.54
+
+================ SUMMARY ================
+MATCH                              liabilityRiskAtScore                                             worst      2.97 sems,     0.29% rel
+FALSIFIED                          liabilityRiskAtScore [the +T sign slip, FALSIFIED at 3390 sems i worst 222024.49 sems, 21361.26% rel
+MATCH                              orPerSDFromLiability                                             worst      3.33 sems,     0.30% rel
+FALSIFIED                          orPerSDFromLiability [the +T sign slip carried through the same  worst   5888.72 sems,   126.23% rel
+MATCH                              orPerSDFromLiability [the RISK ratio in the odds ratio's place,  worst      3.30 sems,     0.30% rel
+FALSIFIED                          orPerSDFromLiability [against a LOGISTIC slope fitted over the w worst    279.47 sems,    82.88% rel
+MATCH                              indexScaleTrueIndexR2                                            worst      2.81 sems,     0.03% rel
+FALSIFIED                          indexScaleTrueIndexR2 [measured on the RISK scale instead, the d worst    497.81 sems,    11.20% rel
+FALSIFIED                          indexScaleTrueIndexR2 [rho^2 alone, the standardised-score speci worst   2541.46 sems,    39.01% rel
+FALSIFIED                          indexScaleTrueIndexR2 [the unsquared reading rho/(rho+s), compet worst   1937.82 sems,    89.92% rel

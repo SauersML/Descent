@@ -1,0 +1,195 @@
+FRESHNESS=OK (token SIMCOV-BATTERY-CLEAN01-KESTREL-20260810)
+FRESHNESS token literal: SIMCOV-BATTERY-CLEAN01-KESTREL-20260810
+
+admissibility (cleanSplitFst_lt_one_iff: retentions must sum above 1):
+  t=100   retention sum 1.8801   cleanSplitFst 0.1199  ADMISSIBLE
+  t=250   retention sum 1.7181   cleanSplitFst 0.2819  ADMISSIBLE
+  t=500   retention sum 1.4889   cleanSplitFst 0.5111  ADMISSIBLE
+  t=800   retention sum 1.2679   cleanSplitFst 0.7321  ADMISSIBLE
+  t=1100  retention sum 1.0922   cleanSplitFst 0.9078  ADMISSIBLE
+
+  t=0     F_S 0.0000  F_T 0.0000  sum 0.0000   Hudson pairwise 0.0000
+          target R2 per-allele 0.5012 (implied fst -0.0047)   standardised 0.5012 (implied fst -0.0047)
+          source-fixed loci 0.000, of the target's signal 0.0000; measured AUC 0.9001
+
+  t=100   F_S 0.0248  F_T 0.0946  sum 0.1194   Hudson pairwise 0.0598
+          target R2 per-allele 0.4708 (implied fst 0.1103)   standardised 0.4312 (implied fst 0.2420)
+          source-fixed loci 0.071, of the target's signal 0.0126; measured AUC 0.8902
+
+  t=250   F_S 0.0596  F_T 0.2220  sum 0.2816   Hudson pairwise 0.1416
+          target R2 per-allele 0.4199 (implied fst 0.2760)   standardised 0.3689 (implied fst 0.4153)
+          source-fixed loci 0.188, of the target's signal 0.0453; measured AUC 0.8713
+
+  t=500   F_S 0.1182  F_T 0.3960  sum 0.5142   Hudson pairwise 0.2572
+          target R2 per-allele 0.3382 (implied fst 0.4890)   standardised 0.2914 (implied fst 0.5887)
+          source-fixed loci 0.311, of the target's signal 0.1006; measured AUC 0.8380
+
+  t=800   F_S 0.1822  F_T 0.5506  sum 0.7328   Hudson pairwise 0.3671
+          target R2 per-allele 0.2583 (implied fst 0.6518)   standardised 0.2207 (implied fst 0.7169)
+          source-fixed loci 0.404, of the target's signal 0.1651; measured AUC 0.8003
+
+  t=1100  F_S 0.2410  F_T 0.6665  sum 0.9075   Hudson pairwise 0.4559
+          target R2 per-allele 0.1940 (implied fst 0.7593)   standardised 0.1662 (implied fst 0.8007)
+          source-fixed loci 0.470, of the target's signal 0.2270; measured AUC 0.7622
+
+  CONTROL source branch retention at t=1100 must be neutralDriftFactor (1-1/(2*NeS))^t: predicted 0.759546 measured 0.759042 +/- 0.001733
+  CONTROL t=0 [target R2 must be the constructed r2_0 = V_A/(V_A+V_E)]: predicted 0.500000 measured 0.501181 +/- 0.001110
+  CONTROL t=0 [AUC must be the already-VALIDATED chart at r2_0]: predicted 0.897003 measured 0.900097 +/- 0.001305
+
+cleanSplitFst                            MATCH   (pred span 87%)
+  lean: fstFromDriftFactor (neutralDriftFactor NeS t) + fstFromDriftFactor (neutralDriftFactor NeT t)
+  regime: clean two-branch split, forward Wright-Fisher on allele frequencies, 20000 loci from a neutral 1/p spectrum, NeS=2000 and NeT=500 closed, no mutation and no migration, 10 independent blocks. The oracle is the realised PER-BRANCH heterozygosity loss 1 - H_branch/H_ancestor summed over the two lineages, which is the reading fstFromDriftFactor was validated at; the prediction is evaluated at the model's Ne and t, which the simulation realises exactly. Every cell stays inside cleanSplitFst_lt_one_iff's admissible range, asserted in the run
+  design                                   lean        sim      sem     sems
+  t=100 NeS=2000 NeT=500                0.11990    0.11944  0.00063     0.74
+  t=250 NeS=2000 NeT=500                0.28189    0.28158  0.00148     0.21
+  t=500 NeS=2000 NeT=500                0.51114    0.51420  0.00158     1.94
+  t=800 NeS=2000 NeT=500                0.73214    0.73279  0.00173     0.37
+  t=1100 NeS=2000 NeT=500               0.90777    0.90748  0.00191     0.15
+
+cleanSplitFst [read as the PAIRWISE Hudson F_ST between the two branches, the convention the docstrings forbid, competing] FALSIFIED   (pred span 87%)
+  lean: same body, oracle replaced by the pairwise Hudson estimator
+  regime: clean two-branch split, forward Wright-Fisher on allele frequencies, 20000 loci from a neutral 1/p spectrum, NeS=2000 and NeT=500 closed, no mutation and no migration, 10 independent blocks. The oracle is the realised PER-BRANCH heterozygosity loss 1 - H_branch/H_ancestor summed over the two lineages, which is the reading fstFromDriftFactor was validated at; the prediction is evaluated at the model's Ne and t, which the simulation realises exactly. Every cell stays inside cleanSplitFst_lt_one_iff's admissible range, asserted in the run
+  NOTE: carried so the two conventions can be seen to be different numbers rather than assumed to be; positive control 'source branch retention at t=1100 must be neutralDriftFactor (1-1/(2*NeS))^t' passed at 0.29 sems
+  design                                   lean        sim      sem     sems
+  t=100 NeS=2000 NeT=500                0.11990    0.05980  0.00025   235.80
+  t=250 NeS=2000 NeT=500                0.28189    0.14161  0.00031   458.90
+  t=500 NeS=2000 NeT=500                0.51114    0.25716  0.00075   338.55
+  t=800 NeS=2000 NeT=500                0.73214    0.36705  0.00125   292.43
+  t=1100 NeS=2000 NeT=500               0.90777    0.45586  0.00180   251.57
+
+cleanSplitTargetR2                       FALSIFIED   (pred span 82%)
+  lean: neutralPortability r2_0 (cleanSplitFst NeS NeT t) * ldFactor
+  regime: same engine and same blocks, 40000 target individuals each. TRUE causal effects with no estimation noise, so no GWAS-inefficiency confound is present and r2_0 is fixed by construction at V_A/(V_A+V_E) = 0.50, realised exactly in every block because the environmental variance is set from that block's own realised ancestral V_A. ldFactor = 1: the frequency engine carries no linkage, so the score is perfectly tagging by construction and the LD slot is exercised, not measured, here. The prediction is re-evaluated in each block at that block's own realised summed per-branch F, and the error bar is the sem of the PAIRED difference across blocks. The observable is the realised squared correlation between the source-built score and the target phenotype
+  NOTE: PER-ALLELE score over the variants still polymorphic in the source, which is what a real PGS is: the source branch enters only by removing source-fixed variants from the score, and their signal remains in the target phenotype as unexplained heritable variance; positive control 't=0 [target R2 must be the constructed r2_0 = V_A/(V_A+V_E)]' passed at 1.06 sems
+  design                                   lean        sim      sem     sems
+  t=100 (summed F 0.119)                0.46824    0.47082  0.00071     3.60
+  t=250 (summed F 0.282)                0.41807    0.41995  0.00099     1.90
+  t=500 (summed F 0.514)                0.32695    0.33817  0.00167     6.73
+  t=800 (summed F 0.733)                0.21085    0.25826  0.00154    30.69
+  t=1100 (summed F 0.907)               0.08466    0.19400  0.00164    66.51
+
+cleanSplitTargetR2 [the SUPERSEDED linear retention r2_0*max 0 (1-2*fst) in neutralPortability's place, competing] FALSIFIED   (pred span 100%)
+  lean: r2_0 * max 0 (1 - 2 * cleanSplitFst) * ldFactor
+  regime: same engine and same blocks, 40000 target individuals each. TRUE causal effects with no estimation noise, so no GWAS-inefficiency confound is present and r2_0 is fixed by construction at V_A/(V_A+V_E) = 0.50, realised exactly in every block because the environmental variance is set from that block's own realised ancestral V_A. ldFactor = 1: the frequency engine carries no linkage, so the score is perfectly tagging by construction and the LD slot is exercised, not measured, here. The prediction is re-evaluated in each block at that block's own realised summed per-branch F, and the error bar is the sem of the PAIRED difference across blocks. The observable is the realised squared correlation between the source-built score and the target phenotype
+  NOTE: FALSIFIED at 101 sems by battery_bulk56; carried so that a design in which it passed would be known to be broken; positive control 't=0 [target R2 must be the constructed r2_0 = V_A/(V_A+V_E)]' passed at 1.06 sems
+  design                                   lean        sim      sem     sems
+  t=100 (summed F 0.119)                0.38056    0.47082  0.00097    92.80
+  t=250 (summed F 0.282)                0.21842    0.41995  0.00123   163.79
+  t=500 (summed F 0.514)                0.00000    0.33817  0.00161   209.87
+  t=800 (summed F 0.733)                0.00000    0.25826  0.00113   229.31
+  t=1100 (summed F 0.907)               0.00000    0.19400  0.00132   147.20
+
+cleanSplitTargetR2 [SOURCE-STANDARDISED score, the construction under which a summed index has a mechanism] FALSIFIED   (pred span 82%)
+  lean: neutralPortability r2_0 (cleanSplitFst NeS NeT t) * ldFactor
+  regime: same engine and same blocks, 40000 target individuals each. TRUE causal effects with no estimation noise, so no GWAS-inefficiency confound is present and r2_0 is fixed by construction at V_A/(V_A+V_E) = 0.50, realised exactly in every block because the environmental variance is set from that block's own realised ancestral V_A. ldFactor = 1: the frequency engine carries no linkage, so the score is perfectly tagging by construction and the LD slot is exercised, not measured, here. The prediction is re-evaluated in each block at that block's own realised summed per-branch F, and the error bar is the sem of the PAIRED difference across blocks. The observable is the realised squared correlation between the source-built score and the target phenotype
+  NOTE: the GWAS reports effects per source-genotype SD and the target restandardises by target frequencies, so the weight carries sqrt(h_S/h_T). This construction is SYMMETRIC in the two branches and is the body's best case; it is recorded so that a falsification cannot be a report about the score construction; positive control 't=0 [target R2 must be the constructed r2_0 = V_A/(V_A+V_E)]' passed at 1.06 sems
+  design                                   lean        sim      sem     sems
+  t=100 (summed F 0.119)                0.46824    0.43117  0.00054    68.45
+  t=250 (summed F 0.282)                0.41807    0.36895  0.00113    43.33
+  t=500 (summed F 0.514)                0.32695    0.29144  0.00176    20.15
+  t=800 (summed F 0.733)                0.21085    0.22066  0.00128     7.65
+  t=1100 (summed F 0.907)               0.08466    0.16621  0.00152    53.80
+
+cleanSplitTargetR2 [the SUPERSEDED linear retention r2_0*max 0 (1-2*fst) in neutralPortability's place, competing, standardised score] FALSIFIED   (pred span 100%)
+  lean: r2_0 * max 0 (1 - 2 * cleanSplitFst) * ldFactor
+  regime: same engine and same blocks, 40000 target individuals each. TRUE causal effects with no estimation noise, so no GWAS-inefficiency confound is present and r2_0 is fixed by construction at V_A/(V_A+V_E) = 0.50, realised exactly in every block because the environmental variance is set from that block's own realised ancestral V_A. ldFactor = 1: the frequency engine carries no linkage, so the score is perfectly tagging by construction and the LD slot is exercised, not measured, here. The prediction is re-evaluated in each block at that block's own realised summed per-branch F, and the error bar is the sem of the PAIRED difference across blocks. The observable is the realised squared correlation between the source-built score and the target phenotype
+  NOTE: FALSIFIED at 101 sems by battery_bulk56; carried so that a design in which it passed would be known to be broken; positive control 't=0 [target R2 must be the constructed r2_0 = V_A/(V_A+V_E)]' passed at 1.06 sems
+  design                                   lean        sim      sem     sems
+  t=100 (summed F 0.119)                0.38056    0.43117  0.00083    60.70
+  t=250 (summed F 0.282)                0.21842    0.36895  0.00120   125.01
+  t=500 (summed F 0.514)                0.00000    0.29144  0.00174   167.79
+  t=800 (summed F 0.733)                0.00000    0.22066  0.00101   218.14
+  t=1100 (summed F 0.907)               0.00000    0.16621  0.00133   124.80
+
+cleanSplitTargetR2 [the TARGET-BRANCH-ONLY index in the fst slot, not the sum, competing] FALSIFIED   (pred span 47%)
+  lean: neutralPortability r2_0 (fstFromDriftFactor (neutralDriftFactor NeT t)) * ldFactor
+  regime: same engine and same blocks, 40000 target individuals each. TRUE causal effects with no estimation noise, so no GWAS-inefficiency confound is present and r2_0 is fixed by construction at V_A/(V_A+V_E) = 0.50, realised exactly in every block because the environmental variance is set from that block's own realised ancestral V_A. ldFactor = 1: the frequency engine carries no linkage, so the score is perfectly tagging by construction and the LD slot is exercised, not measured, here. The prediction is re-evaluated in each block at that block's own realised summed per-branch F, and the error bar is the sem of the PAIRED difference across blocks. The observable is the realised squared correlation between the source-built score and the target phenotype
+  NOTE: the alternative reading of the composition's fst slot; positive control 't=0 [target R2 must be the constructed r2_0 = V_A/(V_A+V_E)]' passed at 1.06 sems
+  design                                   lean        sim      sem     sems
+  t=100 (target-branch F 0.095)         0.47517    0.47082  0.00061     7.19
+  t=250 (target-branch F 0.222)         0.43758    0.41995  0.00109    16.14
+  t=500 (target-branch F 0.396)         0.37657    0.33817  0.00137    28.13
+  t=800 (target-branch F 0.551)         0.31006    0.25826  0.00110    47.30
+  t=1100 (target-branch F 0.667)        0.25007    0.19400  0.00124    45.27
+
+cleanSplitTargetR2 [the TARGET-BRANCH-ONLY index in the fst slot, not the sum, competing, standardised score] FALSIFIED   (pred span 47%)
+  lean: neutralPortability r2_0 (fstFromDriftFactor (neutralDriftFactor NeT t)) * ldFactor
+  regime: same engine and same blocks, 40000 target individuals each. TRUE causal effects with no estimation noise, so no GWAS-inefficiency confound is present and r2_0 is fixed by construction at V_A/(V_A+V_E) = 0.50, realised exactly in every block because the environmental variance is set from that block's own realised ancestral V_A. ldFactor = 1: the frequency engine carries no linkage, so the score is perfectly tagging by construction and the LD slot is exercised, not measured, here. The prediction is re-evaluated in each block at that block's own realised summed per-branch F, and the error bar is the sem of the PAIRED difference across blocks. The observable is the realised squared correlation between the source-built score and the target phenotype
+  NOTE: the alternative reading of the composition's fst slot; positive control 't=0 [target R2 must be the constructed r2_0 = V_A/(V_A+V_E)]' passed at 1.06 sems
+  design                                   lean        sim      sem     sems
+  t=100 (target-branch F 0.095)         0.47517    0.43117  0.00052    83.85
+  t=250 (target-branch F 0.222)         0.43758    0.36895  0.00127    54.14
+  t=500 (target-branch F 0.396)         0.37657    0.29144  0.00154    55.24
+  t=800 (target-branch F 0.551)         0.31006    0.22066  0.00100    89.73
+  t=1100 (target-branch F 0.667)        0.25007    0.16621  0.00115    72.89
+
+cleanSplitTargetR2 [DECOMPOSITION, both factors measured: the target-branch index through the chart, times the fraction of the target's signal still polymorphic in the source, competing] MATCH   (pred span 59%)
+  lean: neutralPortability r2_0 (fstFromDriftFactor (neutralDriftFactor NeT t)) * (measured source-polymorphic signal fraction)
+  regime: same engine and same blocks, 40000 target individuals each. TRUE causal effects with no estimation noise, so no GWAS-inefficiency confound is present and r2_0 is fixed by construction at V_A/(V_A+V_E) = 0.50, realised exactly in every block because the environmental variance is set from that block's own realised ancestral V_A. ldFactor = 1: the frequency engine carries no linkage, so the score is perfectly tagging by construction and the LD slot is exercised, not measured, here. The prediction is re-evaluated in each block at that block's own realised summed per-branch F, and the error bar is the sem of the PAIRED difference across blocks. The observable is the realised squared correlation between the source-built score and the target phenotype
+  NOTE: NOT A CANDIDATE BODY -- it carries a measured factor and so cannot be evaluated from a law's arguments. It is here to name the two effects the summed reading conflates: the target branch's own heterozygosity loss, which the chart handles, and the source branch's fixation, which removes variants from the score without removing their variance from the target phenotype
+  design                                   lean        sim      sem     sems
+  t=100 (target-branch F 0.095, source-polymorphic signal 0.987)    0.46921    0.47082  0.00061     2.66
+  t=250 (target-branch F 0.222, source-polymorphic signal 0.955)    0.41776    0.41995  0.00110     2.00
+  t=500 (target-branch F 0.396, source-polymorphic signal 0.899)    0.33867    0.33817  0.00181     0.28
+  t=800 (target-branch F 0.551, source-polymorphic signal 0.835)    0.25887    0.25826  0.00115     0.53
+  t=1100 (target-branch F 0.667, source-polymorphic signal 0.773)    0.19330    0.19400  0.00139     0.51
+
+cleanSplitTargetR2 [LD stage MULTIPLICATIVE, drift stage measured, competing] MATCH   (pred span 63%)
+  lean: (measured no-LD target R2) * ldFactor
+  regime: the LD stage isolated: the drift stage is the MEASURED no-LD target R-squared on the same replicates, so only the combination rule is under test. The score carries independent tagging noise and the realised LD factor is MEASURED as its squared correlation with the untagged score, not assumed. The multiplicative reading follows from the tag affecting the phenotype only through the causal score, which this design instantiates, so the group's content is the REJECTION of the additive reading and the check that the drift penalty is not applied a second time inside the LD stage
+  design                                   lean        sim      sem     sems
+  t=0 ldFactor=0.50                     0.25024    0.24941  0.00054     1.53
+  t=0 ldFactor=0.70                     0.35138    0.35111  0.00059     0.46
+  t=0 ldFactor=0.90                     0.45112    0.45128  0.00052     0.31
+  t=500 ldFactor=0.50                   0.16847    0.16845  0.00075     0.02
+  t=500 ldFactor=0.70                   0.23654    0.23744  0.00045     1.98
+  t=500 ldFactor=0.90                   0.30441    0.30382  0.00060     0.99
+
+cleanSplitTargetR2 [LD stage ADDITIVE, the reading FALSIFIED at 41 sems by battery_bulk48, competing] FALSIFIED   (pred span 100%)
+  lean: (measured no-LD target R2) + ldFactor - 1
+  regime: the LD stage isolated: the drift stage is the MEASURED no-LD target R-squared on the same replicates, so only the combination rule is under test. The score carries independent tagging noise and the realised LD factor is MEASURED as its squared correlation with the untagged score, not assumed. The multiplicative reading follows from the tag affecting the phenotype only through the causal score, which this design instantiates, so the group's content is the REJECTION of the additive reading and the check that the drift penalty is not applied a second time inside the LD stage
+  NOTE: positive control 't=0 [target R2 must be the constructed r2_0 = V_A/(V_A+V_E)]' passed at 1.06 sems
+  design                                   lean        sim      sem     sems
+  t=0 ldFactor=0.50                     0.00256    0.24941  0.00053   463.44
+  t=0 ldFactor=0.70                     0.20229    0.35111  0.00062   239.97
+  t=0 ldFactor=0.90                     0.40129    0.45128  0.00060    83.96
+  t=500 ldFactor=0.50                   0.00000    0.16845  0.00127   132.16
+  t=500 ldFactor=0.70                   0.03763    0.23744  0.00098   204.93
+  t=500 ldFactor=0.90                   0.23832    0.30382  0.00059   110.41
+
+cleanSplitTargetAUC                      FALSIFIED   (pred span 24%)
+  lean: liabilityThresholdAUCFromExplainedR2 (cleanSplitTargetR2 r2_0 NeS NeT t ldFactor) K
+  regime: same replicates and the same per-allele score. Cases are the upper 5% of the realised target liability and the observable is the Mann-Whitney AUC of the score between cases and controls. Prevalence is supplied to the chart as the body requires it to be; the chart itself is separately VALIDATED at pooled RMSE 0.0121, so what this group adds is whether the R-squared the clean-split law computes is the explained-variance fraction that chart's argument expects
+  NOTE: positive control 't=0 [AUC must be the already-VALIDATED chart at r2_0]' passed at 2.37 sems
+  design                                   lean        sim      sem     sems
+  t=100 K=0.05 (summed F 0.119)         0.88690    0.89017  0.00081     4.02
+  t=250 K=0.05 (summed F 0.282)         0.86949    0.87126  0.00152     1.17
+  t=500 K=0.05 (summed F 0.514)         0.83267    0.83801  0.00141     3.79
+  t=800 K=0.05 (summed F 0.733)         0.77267    0.80029  0.00124    22.19
+  t=1100 K=0.05 (summed F 0.907)        0.67610    0.76220  0.00255    33.79
+
+cleanSplitTargetAUC [the SUPERSEDED linear retention carried through the same chart, competing] FALSIFIED   (pred span 42%)
+  lean: liabilityThresholdAUCFromExplainedR2 (r2_0 * max 0 (1 - 2*fst)) K
+  regime: same replicates and the same per-allele score. Cases are the upper 5% of the realised target liability and the observable is the Mann-Whitney AUC of the score between cases and controls. Prevalence is supplied to the chart as the body requires it to be; the chart itself is separately VALIDATED at pooled RMSE 0.0121, so what this group adds is whether the R-squared the clean-split law computes is the explained-variance fraction that chart's argument expects
+  NOTE: positive control 't=0 [AUC must be the already-VALIDATED chart at r2_0]' passed at 2.37 sems
+  design                                   lean        sim      sem     sems
+  t=100 K=0.05 (summed F 0.119)         0.85522    0.89017  0.00081    43.04
+  t=250 K=0.05 (summed F 0.282)         0.77716    0.87126  0.00156    60.19
+  t=500 K=0.05 (summed F 0.514)         0.50002    0.83801  0.00144   235.21
+  t=800 K=0.05 (summed F 0.733)         0.50002    0.80029  0.00135   223.22
+  t=1100 K=0.05 (summed F 0.907)        0.50002    0.76220  0.00229   114.26
+
+================ SUMMARY ================
+MATCH                              cleanSplitFst                                                    worst      1.94 sems,     0.60% rel
+FALSIFIED                          cleanSplitFst [read as the PAIRWISE Hudson F_ST between the two  worst    458.90 sems,    99.07% rel
+FALSIFIED                          cleanSplitTargetR2                                               worst     66.51 sems,    56.36% rel
+FALSIFIED                          cleanSplitTargetR2 [the SUPERSEDED linear retention r2_0*max 0 ( worst    229.31 sems,   100.00% rel
+FALSIFIED                          cleanSplitTargetR2 [SOURCE-STANDARDISED score, the construction  worst     68.45 sems,     8.60% rel
+FALSIFIED                          cleanSplitTargetR2 [the SUPERSEDED linear retention r2_0*max 0 ( worst    218.14 sems,   100.00% rel
+FALSIFIED                          cleanSplitTargetR2 [the TARGET-BRANCH-ONLY index in the fst slot worst     47.30 sems,    20.06% rel
+FALSIFIED                          cleanSplitTargetR2 [the TARGET-BRANCH-ONLY index in the fst slot worst     89.73 sems,    40.51% rel
+MATCH                              cleanSplitTargetR2 [DECOMPOSITION, both factors measured: the ta worst      2.66 sems,     0.34% rel
+MATCH                              cleanSplitTargetR2 [LD stage MULTIPLICATIVE, drift stage measure worst      1.98 sems,     0.38% rel
+FALSIFIED                          cleanSplitTargetR2 [LD stage ADDITIVE, the reading FALSIFIED at  worst    463.44 sems,    98.97% rel
+FALSIFIED                          cleanSplitTargetAUC                                              worst     33.79 sems,    11.30% rel
+FALSIFIED                          cleanSplitTargetAUC [the SUPERSEDED linear retention carried thr worst    235.21 sems,    40.33% rel

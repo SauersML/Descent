@@ -1,0 +1,963 @@
+{
+ "_battery_sha": "08f227fbc663ab4d",
+ "results": [
+  {
+   "name": "liabilityRiskAtScore",
+   "file": "PhenomeWidePortability.lean",
+   "source": "Phi((sqrt r2 * z - liabilityThreshold K) / sqrt (1 - r2))",
+   "note": "",
+   "regime": "direct liability-threshold simulation: liability = sqrt(r2)*z + sqrt(1-r2)*e with z the standardised score and e independent standard normal, a case being a liability above liabilityThreshold K. 20000000 individuals per block at each score, 8 independent blocks. The risk at a score is measured with the score HELD AT EXACTLY that value and only the residual drawn, so the observable is the risk AT the score and not the risk averaged over a neighbourhood of it: an earlier binned version of this design carried a curvature smear of 0.42%, which is inside the harness's relative floor but was visible at 5.7 sems, and a floor covering for a known estimator bias is not a design that is right. The prediction is evaluated at the model's own r2 and K, which the simulation realises exactly",
+   "span": 0.9898403026310363,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "r2=0.60 K=0.05 z=0",
+    "lean": 0.004651119998846598,
+    "truth": 0.0046378875,
+    "sem": 4.462169855734842e-06,
+    "sems_off": 2.965485240233806,
+    "rel_err": 0.002853130621775083
+   },
+   "cells": [
+    {
+     "design": "r2=0.10 K=0.05 z=1",
+     "lean": 0.08068262573785862,
+     "truth": 0.08069215,
+     "sem": 1.4908674368587064e-05,
+     "sems_off": 0.6388403090657507,
+     "rel_err": 0.00011803207798266367
+    },
+    {
+     "design": "r2=0.10 K=0.05 z=0",
+     "lean": 0.041474306575256525,
+     "truth": 0.0414766125,
+     "sem": 8.70172781488169e-06,
+     "sems_off": 0.26499619300131444,
+     "rel_err": 5.559578288794183e-05
+    },
+    {
+     "design": "r2=0.10 K=0.10 z=1",
+     "lean": 0.15444815740491596,
+     "truth": 0.15442814375,
+     "sem": 2.6663832241012544e-05,
+     "sems_off": 0.7505918404776144,
+     "rel_err": 0.00012959849435454968
+    },
+    {
+     "design": "r2=0.10 K=0.10 z=0",
+     "lean": 0.08836790517422427,
+     "truth": 0.0883486,
+     "sem": 1.8165105874410957e-05,
+     "sems_off": 1.0627614481160932,
+     "rel_err": 0.0002185113767990793
+    },
+    {
+     "design": "r2=0.10 K=0.20 z=1",
+     "lean": 0.2898532982837848,
+     "truth": 0.28980171875,
+     "sem": 1.798735155180336e-05,
+     "sems_off": 2.867544654157089,
+     "rel_err": 0.00017798215278810503
+    },
+    {
+     "design": "r2=0.10 K=0.20 z=0",
+     "lean": 0.18749996876012182,
+     "truth": 0.18751635625000002,
+     "sem": 4.269373326954638e-05,
+     "sems_off": 0.383838297174387,
+     "rel_err": 8.739232249346865e-05
+    },
+    {
+     "design": "r2=0.30 K=0.05 z=1",
+     "lean": 0.09487442465894541,
+     "truth": 0.09484883124999999,
+     "sem": 3.9195418073941324e-05,
+     "sems_off": 0.6529694082390467,
+     "rel_err": 0.00026983367752803495
+    },
+    {
+     "design": "r2=0.30 K=0.05 z=0",
+     "lean": 0.024650684965667247,
+     "truth": 0.02465138125,
+     "sem": 1.4654305003442923e-05,
+     "sems_off": 0.047513978492300955,
+     "rel_err": 2.824524620717573e-05
+    },
+    {
+     "design": "r2=0.30 K=0.10 z=1",
+     "lean": 0.1902179478919534,
+     "truth": 0.19021373749999998,
+     "sem": 2.286706878507703e-05,
+     "sems_off": 0.1841246900943572,
+     "rel_err": 2.2135057166513318e-05
+    },
+    {
+     "design": "r2=0.30 K=0.10 z=0",
+     "lean": 0.06279242789806189,
+     "truth": 0.06281966250000001,
+     "sem": 2.0750100580651033e-05,
+     "sems_off": 1.3125045747258175,
+     "rel_err": 0.00043353626642176436
+    },
+    {
+     "design": "r2=0.30 K=0.20 z=1",
+     "lean": 0.36269060945991605,
+     "truth": 0.362669075,
+     "sem": 3.457454549850977e-05,
+     "sems_off": 0.6228414460854618,
+     "rel_err": 5.937771208101881e-05
+    },
+    {
+     "design": "r2=0.30 K=0.20 z=0",
+     "lean": 0.15722467568652432,
+     "truth": 0.1571757125,
+     "sem": 3.782875152531903e-05,
+     "sems_off": 1.2943378924767739,
+     "rel_err": 0.000311518782040253
+    },
+    {
+     "design": "r2=0.60 K=0.05 z=1",
+     "lean": 0.08441127050807551,
+     "truth": 0.0844255125,
+     "sem": 1.040738812952398e-05,
+     "sems_off": 1.3684501574495016,
+     "rel_err": 0.0001686929874957545
+    },
+    {
+     "design": "r2=0.60 K=0.05 z=0",
+     "lean": 0.004651119998846598,
+     "truth": 0.0046378875,
+     "sem": 4.462169855734842e-06,
+     "sems_off": 2.965485240233806,
+     "rel_err": 0.002853130621775083
+    },
+    {
+     "design": "r2=0.60 K=0.10 z=1",
+     "lean": 0.21140200511983792,
+     "truth": 0.21142958750000002,
+     "sem": 3.760119886719148e-05,
+     "sems_off": 0.7335505513937529,
+     "rel_err": 0.0001304565765285545
+    },
+    {
+     "design": "r2=0.60 K=0.10 z=0",
+     "lean": 0.021366465283136793,
+     "truth": 0.021358312500000004,
+     "sem": 1.0282695024374009e-05,
+     "sems_off": 0.7928644307220651,
+     "rel_err": 0.0003817147603205501
+    },
+    {
+     "design": "r2=0.60 K=0.20 z=1",
+     "lean": 0.4578010377607345,
+     "truth": 0.45773027499999996,
+     "sem": 4.04530018310517e-05,
+     "sems_off": 1.7492585848157123,
+     "rel_err": 0.0001545948882986447
+    },
+    {
+     "design": "r2=0.60 K=0.20 z=0",
+     "lean": 0.09164057776111162,
+     "truth": 0.09165191875,
+     "sem": 1.818919895722028e-05,
+     "sems_off": 0.6235012830999115,
+     "rel_err": 0.00012373978682673695
+    }
+   ]
+  },
+  {
+   "name": "liabilityRiskAtScore [the +T sign slip, FALSIFIED at 3390 sems in liabilityThreshold's record, competing]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "Phi((sqrt r2 * z + liabilityThreshold K) / sqrt (1 - r2))",
+   "note": "the two readings coincide at K = 1/2 and nowhere else, so a design that never ran it could not say which it confirmed; positive control 'r2=0.30 [the marginal case rate must be the prevalence K=0.05]' passed at 0.11 sems",
+   "regime": "direct liability-threshold simulation: liability = sqrt(r2)*z + sqrt(1-r2)*e with z the standardised score and e independent standard normal, a case being a liability above liabilityThreshold K. 20000000 individuals per block at each score, 8 independent blocks. The risk at a score is measured with the score HELD AT EXACTLY that value and only the residual drawn, so the observable is the risk AT the score and not the risk averaged over a neighbourhood of it: an earlier binned version of this design carried a curvature smear of 0.42%, which is inside the harness's relative floor but was visible at 5.7 sems, and a floor covering for a known estimator bias is not a design that is right. The prediction is evaluated at the model's own r2 and K, which the simulation realises exactly",
+   "span": 0.18744694401693923,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "r2=0.60 K=0.05 z=0",
+    "lean": 0.9953488800011534,
+    "truth": 0.0046378875,
+    "sem": 4.462169855734842e-06,
+    "sems_off": 222024.4913420044,
+    "rel_err": 213.61255366827103
+   },
+   "cells": [
+    {
+     "design": "r2=0.10 K=0.05 z=1",
+     "lean": 0.9806405209247365,
+     "truth": 0.08069215,
+     "sem": 1.4908674368587064e-05,
+     "sems_off": 60364.07722613819,
+     "rel_err": 11.152861473200758
+    },
+    {
+     "design": "r2=0.10 K=0.05 z=0",
+     "lean": 0.9585256934247435,
+     "truth": 0.0414766125,
+     "sem": 8.70172781488169e-06,
+     "sems_off": 105387.01053788498,
+     "rel_err": 22.11002841480228
+    },
+    {
+     "design": "r2=0.10 K=0.10 z=1",
+     "lean": 0.9539291930756348,
+     "truth": 0.15442814375,
+     "sem": 2.6663832241012544e-05,
+     "sems_off": 29984.476428556853,
+     "rel_err": 5.177171918998961
+    },
+    {
+     "design": "r2=0.10 K=0.10 z=0",
+     "lean": 0.9116320948257757,
+     "truth": 0.0883486,
+     "sem": 1.8165105874410957e-05,
+     "sems_off": 45322.251382279515,
+     "rel_err": 9.31857997552622
+    },
+    {
+     "design": "r2=0.10 K=0.20 z=1",
+     "lean": 0.8888585182250521,
+     "truth": 0.28980171875,
+     "sem": 1.798735155180336e-05,
+     "sems_off": 33304.33598019006,
+     "rel_err": 2.0671264548014423
+    },
+    {
+     "design": "r2=0.10 K=0.20 z=0",
+     "lean": 0.8125000312398782,
+     "truth": 0.18751635625000002,
+     "sem": 4.269373326954638e-05,
+     "sems_off": 14638.768435733911,
+     "rel_err": 3.332955521792666
+    },
+    {
+     "design": "r2=0.30 K=0.05 z=1",
+     "lean": 0.995611624208777,
+     "truth": 0.09484883124999999,
+     "sem": 3.9195418073941324e-05,
+     "sems_off": 22981.32887011199,
+     "rel_err": 9.496825433563549
+    },
+    {
+     "design": "r2=0.30 K=0.05 z=0",
+     "lean": 0.9753493150343328,
+     "truth": 0.02465138125,
+     "sem": 1.4654305003442923e-05,
+     "sems_off": 64874.99294991971,
+     "rel_err": 38.5657064869066
+    },
+    {
+     "design": "r2=0.30 K=0.10 z=1",
+     "lean": 0.9856068511934206,
+     "truth": 0.19021373749999998,
+     "sem": 2.286706878507703e-05,
+     "sems_off": 34783.34373194747,
+     "rel_err": 4.181575548366588
+    },
+    {
+     "design": "r2=0.30 K=0.10 z=0",
+     "lean": 0.9372075721019382,
+     "truth": 0.06281966250000001,
+     "sem": 2.0750100580651033e-05,
+     "sems_off": 42138.97210779227,
+     "rel_err": 13.91901635259403
+    },
+    {
+     "design": "r2=0.30 K=0.20 z=1",
+     "lean": 0.951601432164195,
+     "truth": 0.362669075,
+     "sem": 3.457454549850977e-05,
+     "sems_off": 17033.69772972371,
+     "rel_err": 1.6238835835787626
+    },
+    {
+     "design": "r2=0.30 K=0.20 z=0",
+     "lean": 0.8427753243134757,
+     "truth": 0.1571757125,
+     "sem": 3.782875152531903e-05,
+     "sems_off": 18123.77052292089,
+     "rel_err": 4.361994616779458
+    },
+    {
+     "design": "r2=0.60 K=0.05 z=1",
+     "lean": 0.9999347430388796,
+     "truth": 0.0844255125,
+     "sem": 1.040738812952398e-05,
+     "sems_off": 87967.24203469808,
+     "rel_err": 10.843987835298954
+    },
+    {
+     "design": "r2=0.60 K=0.05 z=0",
+     "lean": 0.9953488800011534,
+     "truth": 0.0046378875,
+     "sem": 4.462169855734842e-06,
+     "sems_off": 222024.4913420044,
+     "rel_err": 213.61255366827103
+    },
+    {
+     "design": "r2=0.60 K=0.10 z=1",
+     "lean": 0.9994251135840917,
+     "truth": 0.21142958750000002,
+     "sem": 3.760119886719148e-05,
+     "sems_off": 20956.659623202828,
+     "rel_err": 3.726987955666761
+    },
+    {
+     "design": "r2=0.60 K=0.10 z=0",
+     "lean": 0.9786335347168632,
+     "truth": 0.021358312500000004,
+     "sem": 1.0282695024374009e-05,
+     "sems_off": 93095.75164368354,
+     "rel_err": 44.81979661159387
+    },
+    {
+     "design": "r2=0.60 K=0.20 z=1",
+     "lean": 0.9946976969659638,
+     "truth": 0.45773027499999996,
+     "sem": 4.04530018310517e-05,
+     "sems_off": 13273.85849407566,
+     "rel_err": 1.173108818213879
+    },
+    {
+     "design": "r2=0.60 K=0.20 z=0",
+     "lean": 0.9083594222388884,
+     "truth": 0.09165191875,
+     "sem": 1.818919895722028e-05,
+     "sems_off": 44900.68558872368,
+     "rel_err": 8.91097005526563
+    }
+   ]
+  },
+  {
+   "name": "orPerSDFromLiability",
+   "file": "PhenomeWidePortability.lean",
+   "source": "(risk(1)/(1-risk(1))) / (risk(0)/(1-risk(0))), risk = liabilityRiskAtScore r2 K",
+   "note": "",
+   "regime": "direct liability-threshold simulation: liability = sqrt(r2)*z + sqrt(1-r2)*e with z the standardised score and e independent standard normal, a case being a liability above liabilityThreshold K. 20000000 individuals per block at each score, 8 independent blocks. The risk at a score is measured with the score HELD AT EXACTLY that value and only the residual drawn, so the observable is the risk AT the score and not the risk averaged over a neighbourhood of it: an earlier binned version of this design carried a curvature smear of 0.42%, which is inside the harness's relative floor but was visible at 5.7 sems, and a floor covering for a known estimator bias is not a design that is right. The prediction is evaluated at the model's own r2 and K, which the simulation realises exactly. The odds ratio is the FIRST standard deviation's specifically: it is the ratio of the odds inside the z=1 bin to the odds inside the z=0 bin, and no slope is fitted, because under a probit model the odds ratio per SD is not constant and a fitted slope is a different quantity",
+   "span": 0.9103532452962716,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "r2=0.60 K=0.05",
+    "lean": 19.7295775694858,
+    "truth": 19.789899092550307,
+    "sem": 0.018132256454513232,
+    "sems_off": 3.3267521455936144,
+    "rel_err": 0.003048096545737969
+   },
+   "cells": [
+    {
+     "design": "r2=0.10 K=0.05",
+     "lean": 2.028332645517536,
+     "truth": 2.028476242859206,
+     "sem": 0.0006522184905625871,
+     "sems_off": 0.22016754162557778,
+     "rel_err": 7.079074363104424e-05
+    },
+    {
+     "design": "r2=0.10 K=0.10",
+     "lean": 1.8843758852135324,
+     "truth": 1.8845394776730935,
+     "sem": 0.0006052711936721752,
+     "sems_off": 0.27027960568978593,
+     "rel_err": 8.680765858144552e-05
+    },
+    {
+     "design": "r2=0.10 K=0.20",
+     "lean": 1.7686926007798738,
+     "truth": 1.7680600145695156,
+     "sem": 0.000499636079367008,
+     "sems_off": 1.26609393612977,
+     "rel_err": 0.00035778548530336087
+    },
+    {
+     "design": "r2=0.30 K=0.05",
+     "lean": 4.147357859168833,
+     "truth": 4.14601353545673,
+     "sem": 0.0032826777519358854,
+     "sems_off": 0.409520462771899,
+     "rel_err": 0.0003242448922578611
+    },
+    {
+     "design": "r2=0.30 K=0.10",
+     "lean": 3.505999569440311,
+     "truth": 3.504285525446867,
+     "sem": 0.0015483618923358442,
+     "sems_off": 1.1070047654417687,
+     "rel_err": 0.0004891279494771304
+    },
+    {
+     "design": "r2=0.30 K=0.20",
+     "lean": 3.050542622440309,
+     "truth": 3.0513875000621553,
+     "sem": 0.0009596097197808597,
+     "sems_off": 0.8804387913443513,
+     "rel_err": 0.0002768830972234572
+    },
+    {
+     "design": "r2=0.60 K=0.05",
+     "lean": 19.7295775694858,
+     "truth": 19.789899092550307,
+     "sem": 0.018132256454513232,
+     "sems_off": 3.3267521455936144,
+     "rel_err": 0.003048096545737969
+    },
+    {
+     "design": "r2=0.60 K=0.10",
+     "lean": 12.278373659207757,
+     "truth": 12.28521499488683,
+     "sem": 0.006255366295007904,
+     "sems_off": 1.093674671702799,
+     "rel_err": 0.0005568755355051517
+    },
+    {
+     "design": "r2=0.60 K=0.20",
+     "lean": 8.369278070724954,
+     "truth": 8.365755108583322,
+     "sem": 0.0017932856646973713,
+     "sems_off": 1.9645292498487203,
+     "rel_err": 0.0004211170535003837
+    }
+   ]
+  },
+  {
+   "name": "orPerSDFromLiability [the +T sign slip carried through the same odds ratio, competing]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "same ratio built from Phi((sqrt r2 * z + T)/sqrt(1-r2))",
+   "note": "positive control 'r2=0.30 [the marginal case rate must be the prevalence K=0.05]' passed at 0.11 sems",
+   "regime": "direct liability-threshold simulation: liability = sqrt(r2)*z + sqrt(1-r2)*e with z the standardised score and e independent standard normal, a case being a liability above liabilityThreshold K. 20000000 individuals per block at each score, 8 independent blocks. The risk at a score is measured with the score HELD AT EXACTLY that value and only the residual drawn, so the observable is the risk AT the score and not the risk averaged over a neighbourhood of it: an earlier binned version of this design carried a curvature smear of 0.42%, which is inside the harness's relative floor but was visible at 5.7 sems, and a floor covering for a known estimator bias is not a design that is right. The prediction is evaluated at the model's own r2 and K, which the simulation realises exactly. The odds ratio is the FIRST standard deviation's specifically: it is the ratio of the odds inside the z=1 bin to the odds inside the z=0 bin, and no slope is fitted, because under a probit model the odds ratio per SD is not constant and a fitted slope is a different quantity",
+   "span": 0.9742244913388162,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "r2=0.60 K=0.20",
+    "lean": 18.925905225752672,
+    "truth": 8.365755108583322,
+    "sem": 0.0017932856646973713,
+    "sems_off": 5888.716072991887,
+    "rel_err": 1.2623068665175918
+   },
+   "cells": [
+    {
+     "design": "r2=0.10 K=0.05",
+     "lean": 2.1917526609680635,
+     "truth": 2.028476242859206,
+     "sem": 0.0006522184905625871,
+     "sems_off": 250.34006314052738,
+     "rel_err": 0.08049215201984021
+    },
+    {
+     "design": "r2=0.10 K=0.10",
+     "lean": 2.007082730248125,
+     "truth": 1.8845394776730935,
+     "sem": 0.0006052711936721752,
+     "sems_off": 202.46007716237534,
+     "rel_err": 0.06502556939074582
+    },
+    {
+     "design": "r2=0.10 K=0.20",
+     "lean": 1.8455859250312467,
+     "truth": 1.7680600145695156,
+     "sem": 0.000499636079367008,
+     "sems_off": 155.16475623607732,
+     "rel_err": 0.043848008451572315
+    },
+    {
+     "design": "r2=0.30 K=0.05",
+     "lean": 5.7339639231066055,
+     "truth": 4.14601353545673,
+     "sem": 0.0032826777519358854,
+     "sems_off": 483.7362993408104,
+     "rel_err": 0.38300656137991734
+    },
+    {
+     "design": "r2=0.30 K=0.10",
+     "lean": 4.587957487671866,
+     "truth": 3.504285525446867,
+     "sem": 0.0015483618923358442,
+     "sems_off": 699.8828682034933,
+     "rel_err": 0.30924191375267834
+    },
+    {
+     "design": "r2=0.30 K=0.20",
+     "lean": 3.6680181212080214,
+     "truth": 3.0513875000621553,
+     "sem": 0.0009596097197808597,
+     "sems_off": 642.584801336404,
+     "rel_err": 0.20208204337643304
+    },
+    {
+     "design": "r2=0.60 K=0.05",
+     "lean": 71.6023085825876,
+     "truth": 19.789899092550307,
+     "sem": 0.018132256454513232,
+     "sems_off": 2857.471689748843,
+     "rel_err": 2.6181239857630962
+    },
+    {
+     "design": "r2=0.60 K=0.10",
+     "lean": 37.95603158546447,
+     "truth": 12.28521499488683,
+     "sem": 0.006255366295007904,
+     "sems_off": 4103.807096167054,
+     "rel_err": 2.0895699913482972
+    },
+    {
+     "design": "r2=0.60 K=0.20",
+     "lean": 18.925905225752672,
+     "truth": 8.365755108583322,
+     "sem": 0.0017932856646973713,
+     "sems_off": 5888.716072991887,
+     "rel_err": 1.2623068665175918
+    }
+   ]
+  },
+  {
+   "name": "orPerSDFromLiability [the RISK ratio in the odds ratio's place, competing]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "risk(1) / risk(0)",
+   "note": "the docstring says the two agree only in the rare-disease limit; the design sweeps prevalence from 0.05 to 0.20 so the claim is decided rather than assumed",
+   "regime": "direct liability-threshold simulation: liability = sqrt(r2)*z + sqrt(1-r2)*e with z the standardised score and e independent standard normal, a case being a liability above liabilityThreshold K. 20000000 individuals per block at each score, 8 independent blocks. The risk at a score is measured with the score HELD AT EXACTLY that value and only the residual drawn, so the observable is the risk AT the score and not the risk averaged over a neighbourhood of it: an earlier binned version of this design carried a curvature smear of 0.42%, which is inside the harness's relative floor but was visible at 5.7 sems, and a floor covering for a known estimator bias is not a design that is right. The prediction is evaluated at the model's own r2 and K, which the simulation realises exactly. The odds ratio is the FIRST standard deviation's specifically: it is the ratio of the odds inside the z=1 bin to the odds inside the z=0 bin, and no slope is fitted, because under a probit model the odds ratio per SD is not constant and a fitted slope is a different quantity",
+   "span": 0.9148206828222506,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "r2=0.60 K=0.05",
+    "lean": 18.14859013076595,
+    "truth": 18.20355264683098,
+    "sem": 0.01666425384836726,
+    "sems_off": 3.29822844545865,
+    "rel_err": 0.0030193290909396736
+   },
+   "cells": [
+    {
+     "design": "r2=0.10 K=0.05",
+     "lean": 1.9453640675452228,
+     "truth": 1.9454862331020255,
+     "sem": 0.0005883003991668026,
+     "sems_off": 0.20765846321995945,
+     "rel_err": 6.279435686773134e-05
+    },
+    {
+     "design": "r2=0.10 K=0.10",
+     "lean": 1.7477856592889611,
+     "truth": 1.7479416070643359,
+     "sem": 0.0004951602644964895,
+     "sems_off": 0.314944042477503,
+     "rel_err": 8.921795484728347e-05
+    },
+    {
+     "design": "r2=0.10 K=0.20",
+     "lean": 1.5458845150774867,
+     "truth": 1.54547489088624,
+     "sem": 0.0003526010065119254,
+     "sems_off": 1.1617215597282746,
+     "rel_err": 0.00026504745800942636
+    },
+    {
+     "design": "r2=0.30 K=0.05",
+     "lean": 3.84875409308438,
+     "truth": 3.8476172516801395,
+     "sem": 0.002893940981618535,
+     "sems_off": 0.3928350341149439,
+     "rel_err": 0.00029546634446145256
+    },
+    {
+     "design": "r2=0.30 K=0.10",
+     "lean": 3.0293134739232555,
+     "truth": 3.027935839781385,
+     "sem": 0.0012138533689511535,
+     "sems_off": 1.1349263239765717,
+     "rel_err": 0.00045497468069527323
+    },
+    {
+     "design": "r2=0.30 K=0.20",
+     "lean": 2.306830068983899,
+     "truth": 2.307412594945267,
+     "sem": 0.0005852140896084007,
+     "sems_off": 0.9954065900184924,
+     "rel_err": 0.0002524585168010199
+    },
+    {
+     "design": "r2=0.60 K=0.05",
+     "lean": 18.14859013076595,
+     "truth": 18.20355264683098,
+     "sem": 0.01666425384836726,
+     "sems_off": 3.29822844545865,
+     "rel_err": 0.0030193290909396736
+    },
+    {
+     "design": "r2=0.60 K=0.10",
+     "lean": 9.894102853160472,
+     "truth": 9.8991861540039,
+     "sem": 0.004823848614986234,
+     "sems_off": 1.053785317315966,
+     "rel_err": 0.000513506945353424
+    },
+    {
+     "design": "r2=0.60 K=0.20",
+     "lean": 4.995614922399648,
+     "truth": 4.994225816745538,
+     "sem": 0.0009101282568383404,
+     "sems_off": 1.5262746142346473,
+     "rel_err": 0.0002781423397901526
+    }
+   ]
+  },
+  {
+   "name": "orPerSDFromLiability [against a LOGISTIC slope fitted over the whole score range, competing]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "same body, oracle replaced by exp(beta) from a fitted logistic",
+   "note": "the docstring's caveat measured: a wide-range logistic fit recovers something between the first-SD odds ratio and the odds ratio at other points, so this row is EXPECTED to disagree and its disagreement is the caveat's evidence, not a defect in the body; positive control 'r2=0.30 [the marginal case rate must be the prevalence K=0.05]' passed at 0.11 sems",
+   "regime": "direct liability-threshold simulation: liability = sqrt(r2)*z + sqrt(1-r2)*e with z the standardised score and e independent standard normal, a case being a liability above liabilityThreshold K. 20000000 individuals per block at each score, 8 independent blocks. The risk at a score is measured with the score HELD AT EXACTLY that value and only the residual drawn, so the observable is the risk AT the score and not the risk averaged over a neighbourhood of it: an earlier binned version of this design carried a curvature smear of 0.42%, which is inside the harness's relative floor but was visible at 5.7 sems, and a floor covering for a known estimator bias is not a design that is right. The prediction is evaluated at the model's own r2 and K, which the simulation realises exactly. The odds ratio is the FIRST standard deviation's specifically: it is the ratio of the odds inside the z=1 bin to the odds inside the z=0 bin, and no slope is fitted, because under a probit model the odds ratio per SD is not constant and a fitted slope is a different quantity",
+   "span": 0.9103532452962716,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "r2=0.60 K=0.05",
+    "lean": 19.7295775694858,
+    "truth": 10.788228914486528,
+    "sem": 0.031994376461146605,
+    "sems_off": 279.4662576361657,
+    "rel_err": 0.8288059815817176
+   },
+   "cells": [
+    {
+     "design": "r2=0.10 K=0.05",
+     "lean": 2.028332645517536,
+     "truth": 2.0228252385977976,
+     "sem": 0.003689945767466525,
+     "sems_off": 1.49254413663641,
+     "rel_err": 0.0027226311075474715
+    },
+    {
+     "design": "r2=0.10 K=0.10",
+     "lean": 1.8843758852135324,
+     "truth": 1.8988091881199822,
+     "sem": 0.0035700747996800703,
+     "sems_off": 4.042857283478562,
+     "rel_err": 0.007601239238124977
+    },
+    {
+     "design": "r2=0.10 K=0.20",
+     "lean": 1.7686926007798738,
+     "truth": 1.789960978972319,
+     "sem": 0.0015657314732417985,
+     "sems_off": 13.583669074754999,
+     "rel_err": 0.011882034548404594
+    },
+    {
+     "design": "r2=0.30 K=0.05",
+     "lean": 4.147357859168833,
+     "truth": 3.7880265876752737,
+     "sem": 0.0033050242926174526,
+     "sems_off": 108.72273232490619,
+     "rel_err": 0.0948597543276703
+    },
+    {
+     "design": "r2=0.30 K=0.10",
+     "lean": 3.505999569440311,
+     "truth": 3.443195778127769,
+     "sem": 0.0051265172553158385,
+     "sems_off": 12.250771466226658,
+     "rel_err": 0.018239971050002655
+    },
+    {
+     "design": "r2=0.30 K=0.20",
+     "lean": 3.050542622440309,
+     "truth": 3.166508037927194,
+     "sem": 0.0035634118549689254,
+     "sems_off": 32.5433657984775,
+     "rel_err": 0.036622492063148625
+    },
+    {
+     "design": "r2=0.60 K=0.05",
+     "lean": 19.7295775694858,
+     "truth": 10.788228914486528,
+     "sem": 0.031994376461146605,
+     "sems_off": 279.4662576361657,
+     "rel_err": 0.8288059815817176
+    },
+    {
+     "design": "r2=0.60 K=0.10",
+     "lean": 12.278373659207757,
+     "truth": 9.732121553125126,
+     "sem": 0.014631965555418978,
+     "sems_off": 174.01982641625492,
+     "rel_err": 0.26163381665377916
+    },
+    {
+     "design": "r2=0.60 K=0.20",
+     "lean": 8.369278070724954,
+     "truth": 8.852169617036079,
+     "sem": 0.013460170111114332,
+     "sems_off": 35.8755901541238,
+     "rel_err": 0.05455064319845337
+    }
+   ]
+  },
+  {
+   "name": "indexScaleTrueIndexR2",
+   "file": "PhenomeWidePortability.lean",
+   "source": "rho^2 / (rho^2 + s^2)",
+   "note": "the projection identity is a closed derivation, so agreement on the ratio is close to a construction check and is not claimed as more; what this group decides is carried by the rivals and by the affine cells",
+   "regime": "standard normal z and independent standard normal eps, zhat = rho*z + s*eps, with the true-liability index a + b*z and the score index a + b*zhat; 5000000 draws per block and 8 blocks. Half the cells carry s^2 != 1 - rho^2 and a nonzero intercept with a slope other than one, because that is where the standardised-score special case and the unsquared reading part company from the body and where the affine cancellation is a claim rather than a tautology. The INDEX-scale row correlates the two indices, which is what the body claims; the RISK-scale row correlates Phi of them, which is what a simulation reports most easily and what the docstring warns a battery would reach for first",
+   "span": 0.7775,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "rho=0.8 s=0.600 a=0.00 b=1.00 [standardised]",
+    "lean": 0.6400000000000001,
+    "truth": 0.6401760392017888,
+    "sem": 6.271556487200252e-05,
+    "sems_off": 2.8069459654543505,
+    "rel_err": 0.0002749856149070413
+   },
+   "cells": [
+    {
+     "design": "rho=0.4 s=0.917 a=0.00 b=1.00 [standardised]",
+     "lean": 0.16000000000000003,
+     "truth": 0.15997511553599447,
+     "sem": 7.423658773458e-05,
+     "sems_off": 0.33520484662534683,
+     "rel_err": 0.0001555520927250712
+    },
+    {
+     "design": "rho=0.4 s=0.500 a=-1.64 b=0.65 [s free, affine wrapper]",
+     "lean": 0.39024390243902446,
+     "truth": 0.3901745425615525,
+     "sem": 0.00011698493146138726,
+     "sems_off": 0.5928958251761541,
+     "rel_err": 0.00017776628125612033
+    },
+    {
+     "design": "rho=0.6 s=0.800 a=0.00 b=1.00 [standardised]",
+     "lean": 0.36,
+     "truth": 0.35977454283491217,
+     "sem": 8.954475616821293e-05,
+     "sems_off": 2.517815389036156,
+     "rel_err": 0.0006266623627988907
+    },
+    {
+     "design": "rho=0.6 s=0.500 a=-1.64 b=0.65 [s free, affine wrapper]",
+     "lean": 0.5901639344262295,
+     "truth": 0.5903089126227105,
+     "sem": 9.062082311934861e-05,
+     "sems_off": 1.599833145302847,
+     "rel_err": 0.0002455971668068337
+    },
+    {
+     "design": "rho=0.8 s=0.600 a=0.00 b=1.00 [standardised]",
+     "lean": 0.6400000000000001,
+     "truth": 0.6401760392017888,
+     "sem": 6.271556487200252e-05,
+     "sems_off": 2.8069459654543505,
+     "rel_err": 0.0002749856149070413
+    },
+    {
+     "design": "rho=0.8 s=0.500 a=-1.64 b=0.65 [s free, affine wrapper]",
+     "lean": 0.7191011235955057,
+     "truth": 0.7190023488592052,
+     "sem": 6.343146590313435e-05,
+     "sems_off": 1.5571882959685464,
+     "rel_err": 0.00013737748764966934
+    }
+   ]
+  },
+  {
+   "name": "indexScaleTrueIndexR2 [measured on the RISK scale instead, the design the docstring warns a battery would reach for first, competing]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "same body, oracle replaced by corr^2 between Phi of the indices",
+   "note": "Phi is not affine, so the two scales are different numbers and no closed form carries one to the other; this row puts the size of the gap on the record; positive control 'Var(rho*z + s*eps) must be rho^2 + s^2 [the design's largest-variance cell, designated a priori]' passed at 1.82 sems",
+   "regime": "standard normal z and independent standard normal eps, zhat = rho*z + s*eps, with the true-liability index a + b*z and the score index a + b*zhat; 5000000 draws per block and 8 blocks. Half the cells carry s^2 != 1 - rho^2 and a nonzero intercept with a slope other than one, because that is where the standardised-score special case and the unsquared reading part company from the body and where the affine cancellation is a claim rather than a tautology. The INDEX-scale row correlates the two indices, which is what the body claims; the RISK-scale row correlates Phi of them, which is what a simulation reports most easily and what the docstring warns a battery would reach for first",
+   "span": 0.7775,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "rho=0.6 s=0.500 a=-1.64 b=0.65 [s free, affine wrapper]",
+    "lean": 0.5901639344262295,
+    "truth": 0.5307295570769726,
+    "sem": 0.00011939215668915704,
+    "sems_off": 497.80805538170375,
+    "rel_err": 0.11198618308841819
+   },
+   "cells": [
+    {
+     "design": "rho=0.4 s=0.917 a=0.00 b=1.00 [standardised]",
+     "lean": 0.16000000000000003,
+     "truth": 0.14780462037061426,
+     "sem": 7.555333198862805e-05,
+     "sems_off": 161.41418662013962,
+     "rel_err": 0.08251013803767662
+    },
+    {
+     "design": "rho=0.4 s=0.500 a=-1.64 b=0.65 [s free, affine wrapper]",
+     "lean": 0.39024390243902446,
+     "truth": 0.33169289534138535,
+     "sem": 0.0001643506526626371,
+     "sems_off": 356.25661443418096,
+     "rel_err": 0.17652174020000388
+    },
+    {
+     "design": "rho=0.6 s=0.800 a=0.00 b=1.00 [standardised]",
+     "lean": 0.36,
+     "truth": 0.33840909622324333,
+     "sem": 0.00012357427735671287,
+     "sems_off": 174.72004885314252,
+     "rel_err": 0.06380119215978007
+    },
+    {
+     "design": "rho=0.6 s=0.500 a=-1.64 b=0.65 [s free, affine wrapper]",
+     "lean": 0.5901639344262295,
+     "truth": 0.5307295570769726,
+     "sem": 0.00011939215668915704,
+     "sems_off": 497.80805538170375,
+     "rel_err": 0.11198618308841819
+    },
+    {
+     "design": "rho=0.8 s=0.600 a=0.00 b=1.00 [standardised]",
+     "lean": 0.6400000000000001,
+     "truth": 0.6178469644417055,
+     "sem": 7.061511776961795e-05,
+     "sems_off": 313.7151966604229,
+     "rel_err": 0.03585521469432546
+    },
+    {
+     "design": "rho=0.8 s=0.500 a=-1.64 b=0.65 [s free, affine wrapper]",
+     "lean": 0.7191011235955057,
+     "truth": 0.6674987534166397,
+     "sem": 0.0001783365372414093,
+     "sems_off": 289.3538866295992,
+     "rel_err": 0.07730706599036426
+    }
+   ]
+  },
+  {
+   "name": "indexScaleTrueIndexR2 [rho^2 alone, the standardised-score special case mistaken for the general body, competing]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "rho^2",
+   "note": "positive control 'Var(rho*z + s*eps) must be rho^2 + s^2 [the design's largest-variance cell, designated a priori]' passed at 1.82 sems",
+   "regime": "standard normal z and independent standard normal eps, zhat = rho*z + s*eps, with the true-liability index a + b*z and the score index a + b*zhat; 5000000 draws per block and 8 blocks. Half the cells carry s^2 != 1 - rho^2 and a nonzero intercept with a slope other than one, because that is where the standardised-score special case and the unsquared reading part company from the body and where the affine cancellation is a claim rather than a tautology. The INDEX-scale row correlates the two indices, which is what the body claims; the RISK-scale row correlates Phi of them, which is what a simulation reports most easily and what the docstring warns a battery would reach for first",
+   "span": 0.75,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "rho=0.6 s=0.500 a=-1.64 b=0.65 [s free, affine wrapper]",
+    "lean": 0.36,
+    "truth": 0.5903089126227105,
+    "sem": 9.062082311934861e-05,
+    "sems_off": 2541.4568605208,
+    "rel_err": 0.39014981427175216
+   },
+   "cells": [
+    {
+     "design": "rho=0.4 s=0.917 a=0.00 b=1.00 [standardised]",
+     "lean": 0.16000000000000003,
+     "truth": 0.15997511553599447,
+     "sem": 7.423658773458e-05,
+     "sems_off": 0.33520484662534683,
+     "rel_err": 0.0001555520927250712
+    },
+    {
+     "design": "rho=0.4 s=0.500 a=-1.64 b=0.65 [s free, affine wrapper]",
+     "lean": 0.16000000000000003,
+     "truth": 0.3901745425615525,
+     "sem": 0.00011698493146138726,
+     "sems_off": 1967.5571860938794,
+     "rel_err": 0.5899271158246849
+    },
+    {
+     "design": "rho=0.6 s=0.800 a=0.00 b=1.00 [standardised]",
+     "lean": 0.36,
+     "truth": 0.35977454283491217,
+     "sem": 8.954475616821293e-05,
+     "sems_off": 2.517815389036156,
+     "rel_err": 0.0006266623627988907
+    },
+    {
+     "design": "rho=0.6 s=0.500 a=-1.64 b=0.65 [s free, affine wrapper]",
+     "lean": 0.36,
+     "truth": 0.5903089126227105,
+     "sem": 9.062082311934861e-05,
+     "sems_off": 2541.4568605208,
+     "rel_err": 0.39014981427175216
+    },
+    {
+     "design": "rho=0.8 s=0.600 a=0.00 b=1.00 [standardised]",
+     "lean": 0.6400000000000001,
+     "truth": 0.6401760392017888,
+     "sem": 6.271556487200252e-05,
+     "sems_off": 2.8069459654543505,
+     "rel_err": 0.0002749856149070413
+    },
+    {
+     "design": "rho=0.8 s=0.500 a=-1.64 b=0.65 [s free, affine wrapper]",
+     "lean": 0.6400000000000001,
+     "truth": 0.7190023488592052,
+     "sem": 6.343146590313435e-05,
+     "sems_off": 1245.4756915100925,
+     "rel_err": 0.10987773403599173
+    }
+   ]
+  },
+  {
+   "name": "indexScaleTrueIndexR2 [the unsquared reading rho/(rho+s), competing]",
+   "file": "PhenomeWidePortability.lean",
+   "source": "rho / (rho + s)",
+   "note": "positive control 'Var(rho*z + s*eps) must be rho^2 + s^2 [the design's largest-variance cell, designated a priori]' passed at 1.82 sems",
+   "regime": "standard normal z and independent standard normal eps, zhat = rho*z + s*eps, with the true-liability index a + b*z and the score index a + b*zhat; 5000000 draws per block and 8 blocks. Half the cells carry s^2 != 1 - rho^2 and a nonzero intercept with a slope other than one, because that is where the standardised-score special case and the unsquared reading part company from the body and where the affine cancellation is a claim rather than a tautology. The INDEX-scale row correlates the two indices, which is what the body claims; the RISK-scale row correlates Phi of them, which is what a simulation reports most easily and what the docstring warns a battery would reach for first",
+   "span": 0.5062722936113836,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "rho=0.4 s=0.917 a=0.00 b=1.00 [standardised]",
+    "lean": 0.30383243470068705,
+    "truth": 0.15997511553599447,
+    "sem": 7.423658773458e-05,
+    "sems_off": 1937.822353568154,
+    "rel_err": 0.8992481029483902
+   },
+   "cells": [
+    {
+     "design": "rho=0.4 s=0.917 a=0.00 b=1.00 [standardised]",
+     "lean": 0.30383243470068705,
+     "truth": 0.15997511553599447,
+     "sem": 7.423658773458e-05,
+     "sems_off": 1937.822353568154,
+     "rel_err": 0.8992481029483902
+    },
+    {
+     "design": "rho=0.4 s=0.500 a=-1.64 b=0.65 [s free, affine wrapper]",
+     "lean": 0.4444444444444445,
+     "truth": 0.3901745425615525,
+     "sem": 0.00011698493146138726,
+     "sems_off": 463.9050620019779,
+     "rel_err": 0.13909134493143047
+    },
+    {
+     "design": "rho=0.6 s=0.800 a=0.00 b=1.00 [standardised]",
+     "lean": 0.4285714285714286,
+     "truth": 0.35977454283491217,
+     "sem": 8.954475616821293e-05,
+     "sems_off": 768.2960865656845,
+     "rel_err": 0.19122221709857024
+    },
+    {
+     "design": "rho=0.6 s=0.500 a=-1.64 b=0.65 [s free, affine wrapper]",
+     "lean": 0.5454545454545454,
+     "truth": 0.5903089126227105,
+     "sem": 9.062082311934861e-05,
+     "sems_off": 494.9675540807145,
+     "rel_err": 0.07598456707841243
+    },
+    {
+     "design": "rho=0.8 s=0.600 a=0.00 b=1.00 [standardised]",
+     "lean": 0.5714285714285715,
+     "truth": 0.6401760392017888,
+     "sem": 6.271556487200252e-05,
+     "sems_off": 1096.178722355852,
+     "rel_err": 0.10738838001330991
+    },
+    {
+     "design": "rho=0.8 s=0.500 a=-1.64 b=0.65 [s free, affine wrapper]",
+     "lean": 0.6153846153846154,
+     "truth": 0.7190023488592052,
+     "sem": 6.343146590313435e-05,
+     "sems_off": 1633.5383708903016,
+     "rel_err": 0.14411320580383832
+    }
+   ]
+  }
+ ]
+}
