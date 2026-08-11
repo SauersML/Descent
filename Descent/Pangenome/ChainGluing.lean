@@ -31,20 +31,19 @@ which is the case `r = 1`, and it is proved by the same mechanism made inductive
 injective interface has singleton fibers, so a derivation reaching a donor has nowhere to
 switch to, and the only derivations are the constant ones.
 
-## Both directions, and a correction
+## Both directions
 
 `phantoms_eq_empty_iff_forall_injective` is the biconditional: a chain admits no phantom
 exactly when every one of its interfaces preserves donor identity. So the per-interface
 check is not merely sufficient, it is the whole criterion, and `HaplotypeGluing`'s
 `interfacePanel_hasGluing_iff_injective` is its `r = 1` case.
 
-An earlier draft of this file claimed the converse required a decomposition lemma for
-`mosaicsFrom` along a list append, and said so in this docstring. That was wrong, and the
-error is worth recording because it is the kind that quietly parks work: `mosaicsFrom` is
-defined by recursion on the chain, so the induction follows its own recursion and never
-needs to split a chain in the middle. The witness is built directly — switch donors at the
-offending interface and travel diagonally thereafter — and an injective head interface has
-a singleton fiber, which lifts a phantom of the tail to a phantom of the whole chain.
+Neither direction needs to split a chain in the middle, and so neither needs a
+decomposition lemma for `mosaicsFrom` along a list append. `mosaicsFrom` is defined by
+recursion on the chain, so both inductions follow that recursion: for the converse the
+witness is built directly — switch donors at the offending interface, travel diagonally
+after it — and an injective head interface has a singleton fiber, which lifts a phantom of
+the tail to a phantom of the whole chain.
 -/
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -159,7 +158,8 @@ theorem phantoms_nonempty_of_exists_not_injective :
       · rw [mosaics, Finset.mem_biUnion]
         refine ⟨left, Finset.mem_univ _, ?_⟩
         rw [mosaicsFrom, Finset.mem_biUnion]
-        exact ⟨right, by simp [hstate], Finset.mem_image_of_mem _ (replicate_mem_mosaicsFrom rest right)⟩
+        exact ⟨right, by simp [hstate],
+          Finset.mem_image_of_mem _ (replicate_mem_mosaicsFrom rest right)⟩
       · intro hdiagonal
         obtain ⟨witness, hwitness⟩ := mem_diagonals_iff.mp hdiagonal
         rw [List.length_cons, List.replicate_succ] at hwitness
