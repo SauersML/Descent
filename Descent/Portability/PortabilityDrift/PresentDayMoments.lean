@@ -1404,6 +1404,9 @@ nothing but which chart they call, which is the whole of the defect this one rep
     directly, and that the benchmark `R²` this body supplies is the same fraction is a
     reading, checked by inspection and not by that measurement.
 
+    Power: inherited with the verdict -- the underlying prediction spans 0.006231 to
+    0.242039 across the sixteen cells that carry it.
+
     argument_source: model, inherited. -/
 noncomputable def targetLiabilityBrierFromNeutralAFBenchmark
     (π V_A V_E fstTarget : ℝ) : ℝ :=
@@ -1435,6 +1438,9 @@ prevalence.
              `liabilityThresholdAUCFromExplainedR2` at pooled RMSE 0.0121
              against a 0.0120 noise floor, with prevalence swept. The whole
              point of this record is that this field spends the `π` it was given.
+    Power: inherited per coordinate -- the `R²` prediction spans 0.00162 to 0.05367, a
+    factor of thirty-three, and the Brier prediction spans 0.006231 to 0.242039.
+
       brier  `targetLiabilityBrierFromNeutralAFBenchmark`, VALIDATED through
              `PopGen.TransportedMetrics.liabilityBrierExact` at the benchmark `R²`:
              MATCH at worst 2.93 sems over sixteen cells, against the linear chart

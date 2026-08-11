@@ -4499,6 +4499,11 @@ two anchor theorems could not tell a line from a curve through the same two poin
     ones the anchors could not see. The run's positive control, the realised prevalence,
     passed at 0.32 sems.
 
+    Power: the prediction spans 0.006231 to 0.242039 across the sixteen cells, a factor of
+    thirty-nine, and the separation from the linear chart grows monotonically with the
+    explained fraction -- 0.000454 at the design's least separated cell and 0.052416 at its
+    most. The design deliberately does not sit at the anchors, where the two agree exactly.
+
     Superseded by the above: the head here read UNTESTED, on the ground that the four cells
     tabulated at `calibratedBrierFromVariances` were reproduced to between 5e-05 and 2.5e-03
     relative by quadrature run by hand against a stored table rather than by a battery. That

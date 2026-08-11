@@ -2007,6 +2007,9 @@ back to a benchmark `R²` surrogate.
     the linear chart FALSIFIED at 1961 sems on the same cells); this body adds no arithmetic,
     it only chooses which prevalence and which explained fraction to supply.
 
+    Power: inherited with the verdict -- the underlying prediction spans 0.006231 to
+    0.242039 across the sixteen cells that carry it.
+
     argument_source: model, inherited. -/
 noncomputable def sourceCalibratedBrierFromSourceWeightsAtPrevalence {p q : ℕ}
     (m : CrossPopulationMetricModel p q) (π : ℝ) : ℝ :=
@@ -2063,7 +2066,10 @@ here, so Brier can change even when the score moments are held fixed.
 
     Empirical status: VALIDATED, inherited from `liabilityBrierExact`, which carries the head
     and the battery: MATCH at worst 2.93 sems over sixteen cells, with the linear chart it
-    replaced FALSIFIED on the same cells at 1961 sems. -/
+    replaced FALSIFIED on the same cells at 1961 sems.
+
+    Power: inherited with the verdict -- the underlying prediction spans 0.006231 to
+    0.242039 across the sixteen cells that carry it. -/
 noncomputable def targetCalibratedBrierFromSourceWeights {p q : ℕ}
     (m : CrossPopulationMetricModel p q) : ℝ :=
   PopGen.TransportedMetrics.liabilityBrierExact
