@@ -116,41 +116,35 @@ every other non-identifiability in the corpus, so a new proposal is refuted by e
 transformation rather than by finding a second functional form.
 -/
 
-/-- The **dispersal reparameterization**: migration scaled by `scale`, dispersal variance
-scaled by its inverse. The product `m·σ²` — the only combination the `F_ST` sees — is
-fixed. -/
-noncomputable def dispersalReparameterization (scale : ℝ) : ℝ × ℝ → ℝ × ℝ :=
-  fun parameter ↦ (scale * parameter.1, parameter.2 / scale)
+/-- **What the two parameters reach the `F_ST` through**: the report that reads their
+product and nothing else. -/
+noncomputable def dispersalProductReport (d Ne product : ℝ) : ℝ :=
+  d / (d + 4 * Ne * product)
+
+/-- **The law reads migration and dispersal variance only through their product.** This is
+the factorization hypothesis of `Descent.Blindness.factorizedLaw_pins_product_only`, and it
+is the entire input that rule needs; everything below is that rule instantiated. -/
+theorem demoSteppingStoneFst_eq_dispersalProductReport (d Ne : ℝ) (parameter : ℝ × ℝ) :
+    demoSteppingStoneFst d Ne parameter.1 parameter.2
+      = dispersalProductReport d Ne (parameter.1 * parameter.2) := by
+  unfold demoSteppingStoneFst dispersalProductReport
+  have hdenominator : d + 4 * Ne * parameter.1 * parameter.2
+      = d + 4 * Ne * (parameter.1 * parameter.2) := by ring
+  rw [hdenominator]
 
 /-- **The reparameterization is an observational symmetry of the stepping-stone `F_ST`.**
 The observation is the `F_ST` at every migration rate and dispersal variance; the target is
-the dispersal variance itself. A nonzero scale leaves the observation fixed everywhere, and
-any scale other than one moves the target wherever the variance is nonzero. -/
+the dispersal variance itself. This is `Descent.Blindness.productSymmetrySecondFactor` at `m · σ²`:
+the rescaling and the two-line argument that it fixes the product live in the general rule,
+not here, and what this file supplies is the factorization. -/
 noncomputable def dispersalSymmetry (d Ne scale migration variance : ℝ) (hscale : scale ≠ 0)
     (hscaleNeOne : scale ≠ 1) (hvariance : variance ≠ 0) :
     Descent.Blindness.ObservationalSymmetry
       (fun parameter : ℝ × ℝ ↦ demoSteppingStoneFst d Ne parameter.1 parameter.2)
-      (fun parameter : ℝ × ℝ ↦ parameter.2) where
-  transform := dispersalReparameterization scale
-  observation_invariant := by
-    intro parameter
-    show demoSteppingStoneFst d Ne (scale * parameter.1) (parameter.2 / scale)
-      = demoSteppingStoneFst d Ne parameter.1 parameter.2
-    unfold demoSteppingStoneFst
-    have hproduct : 4 * Ne * (scale * parameter.1) * (parameter.2 / scale)
-        = 4 * Ne * parameter.1 * parameter.2 := by
-      field_simp
-    rw [hproduct]
-  moved := (migration, variance)
-  target_moved := by
-    intro hcontra
-    simp only [dispersalReparameterization] at hcontra
-    have hequation : variance = variance * scale := (div_eq_iff hscale).mp hcontra
-    have hzero : variance * (scale - 1) = 0 := by
-      rw [mul_sub, mul_one, ← hequation, sub_self]
-    rcases mul_eq_zero.mp hzero with hzeroVariance | hzeroScale
-    · exact hvariance hzeroVariance
-    · exact hscaleNeOne (by linarith)
+      (fun parameter : ℝ × ℝ ↦ parameter.2) :=
+  Descent.Blindness.productSymmetrySecondFactor _ (dispersalProductReport d Ne)
+    (demoSteppingStoneFst_eq_dispersalProductReport d Ne) scale hscale hscaleNeOne
+    (migration, variance) hvariance
 
 /-- **The dispersal variance is not identified by the stepping-stone `F_ST`.** Not poorly
 estimated by it: not a function of it, at any migration rate and any nonzero variance. -/
@@ -174,6 +168,31 @@ theorem no_criterion_for_dispersalVariance_from_fst (d Ne migration variance : �
         ↔ decideValue (demoSteppingStoneFst d Ne parameter.1 parameter.2) :=
   (dispersalSymmetry d Ne 2 migration variance (by norm_num) (by norm_num)
     hvariance).no_target_criterion
+
+/-- **The admissibility rule at `m · σ²`.** The product is pinned, neither factor is, and
+the rescalings are why. The injectivity premise is not decoration: at `Nₑ = 0` the report is
+constant and the `F_ST` pins nothing at all, so the positive half genuinely has a condition
+and the negative half does not. Read as a rule about study design, evidence for `σ²`
+gathered with `m` free is evidence about `m · σ²`, whatever the fit quality. -/
+theorem steppingStoneFst_pins_product_only (d Ne migration variance : ℝ)
+    (hinjective : Function.Injective (dispersalProductReport d Ne))
+    (hmigration : migration ≠ 0) (hvariance : variance ≠ 0) :
+    Descent.Blindness.IdentifiedBy
+        (fun parameter : ℝ × ℝ ↦ demoSteppingStoneFst d Ne parameter.1 parameter.2)
+        (fun parameter ↦ parameter.1 * parameter.2)
+      ∧ ¬ Descent.Blindness.IdentifiedBy
+        (fun parameter : ℝ × ℝ ↦ demoSteppingStoneFst d Ne parameter.1 parameter.2)
+        (fun parameter ↦ parameter.1)
+      ∧ ¬ Descent.Blindness.IdentifiedBy
+        (fun parameter : ℝ × ℝ ↦ demoSteppingStoneFst d Ne parameter.1 parameter.2)
+        (fun parameter ↦ parameter.2)
+      ∧ ∀ scale : ℝ, scale ≠ 0 → ∀ parameter : ℝ × ℝ,
+          demoSteppingStoneFst d Ne (Descent.Blindness.productRescaling scale parameter).1
+              (Descent.Blindness.productRescaling scale parameter).2
+            = demoSteppingStoneFst d Ne parameter.1 parameter.2 :=
+  Descent.Blindness.factorizedLaw_pins_product_only _ (dispersalProductReport d Ne)
+    (demoSteppingStoneFst_eq_dispersalProductReport d Ne) hinjective
+    (migration, variance) hmigration hvariance
 
 /-- **The four in the quadratic stepping-stone form is twice the ploidy**, the same
 `4 Nₑ` scaling as every other migration-drift denominator in the corpus. Only the powers of
