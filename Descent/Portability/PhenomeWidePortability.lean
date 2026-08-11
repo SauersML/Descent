@@ -1314,13 +1314,13 @@ theorem stillSegregatingProb_symm (Ne p : ℝ) (t : ℕ) :
     contribution is a functional of the spectrum, so a body taking one number where this takes
     `w` and `p` cannot be repaired by rescaling that number.
 
-    Empirical status: **MEASURED** — not VALIDATED, because no competing form has ever been
-    run against this body and the ledger gates its MATCH to UNINFORMATIVE for exactly that
-    reason; see the note below. (`simcov/battery_clean01.py`.) Evaluated at the battery's
-    own instantiation — 20000 loci from a neutral `1/p` spectrum on `[0.01, 0.99]`,
-    `NeS = 2000` closed, no mutation and no migration, 10 independent blocks — against the
-    realised fraction of the target's signal carried by variants still polymorphic in the
-    source, which `clean01.log` prints per cell as "of the target's signal":
+    Empirical status: **VALIDATED** (`simcov/battery_clean02.py`), and the paragraphs below
+    record what discharged the debt this head used to carry. The earlier instantiation
+    (`simcov/battery_clean01.py`) is kept because its five depths read cleanly — 20000 loci
+    from a neutral `1/p` spectrum on `[0.01, 0.99]`, `NeS = 2000` closed, no mutation and no
+    migration, 10 independent blocks — against the realised fraction of the target's signal
+    carried by variants still polymorphic in the source, which `clean01.log` prints per cell
+    as "of the target's signal":
 
       t      this body   realised fraction   relative
       100    0.98882     0.98740             +0.144%
@@ -1333,10 +1333,13 @@ theorem stillSegregatingProb_symm (Ne p : ℝ) (t : ℕ) :
     is a simulation parameter, and nothing is estimated from the replicates the fraction is
     measured on.
 
-    Power: the prediction spans 0.989 to 0.774 across the design, and the composition it feeds
-    separated three rival readings of the same slot on these very cells — the summed index
-    FALSIFIED at 66.51 sems, the target-branch-only reading at 47.30, the superseded linear
-    retention at 229.
+    Power: the prediction spans 0.775 to 0.9996 across the fourteen cells that score it — two
+    spectra at five depths each, plus four target sizes at fixed `(NeS, t)` — and three rivals
+    that are false in no cell a priori are rejected on those same cells: the unweighted
+    fraction at 114.18 sems, `1 - F_S` at 126.36, and the diffusion at the weighted mean
+    frequency at 54.98. The composition this body feeds separates three further readings of
+    the same slot on these very cells — the summed index at 66.51 sems, the target-branch-only
+    reading at 47.30, the superseded linear retention at 229.
 
     A `record()` NOW NAMES THIS BODY (`simcov/battery_clean02.py`): 14 cells, worst 2.86
     sems and 0.69% relative, residuals of mixed sign, zero fitted constants, error bars
@@ -1344,16 +1347,36 @@ theorem stillSegregatingProb_symm (Ne p : ℝ) (t : ℕ) :
     at `[0.01,0.99]` and at `[0.05,0.95]` — plus four target sizes at fixed `(NeS, t)`. The
     prediction spans 0.775 to 0.9996 across the design.
 
-    THE RAW VERDICT IS A MATCH AND THE LEDGER GATES IT TO **UNINFORMATIVE**, which is the
-    honest standing and is quoted here rather than the raw word: `no competing formula was
-    rejected on these cells, so the design never showed it could reject anything`. The group
-    runs NO rival for `Φ` — the rivals in that battery are all in the composed `R²` group —
-    so agreement here is agreement with nothing to lose to. A reader grepping the ledger by
-    declaration name will see UNINFORMATIVE, and a docstring claiming a MATCH would be the
-    relabelling this corpus polices. What is owed is a competing form on these same cells:
-    the UNWEIGHTED still-segregating fraction, which tests whether the `w` weighting earns
-    its place, and `1 - F_S`, the heterozygosity-retention proxy a reader would otherwise
-    assume. Until one of those is run and rejected, this body is measured and not validated.
+    THE DEBT THIS PARAGRAPH USED TO RECORD IS DISCHARGED, and it is written out rather than
+    deleted because the shape of it is the lesson. It said the raw MATCH was gated to
+    UNINFORMATIVE since no competing formula had ever been run on these cells, and it named
+    the two the body owed: the UNWEIGHTED still-segregating fraction, which tests whether the
+    `w` weighting earns its place, and `1 - F_S`, the heterozygosity-retention proxy a reader
+    would otherwise assume. Both were run on the same fourteen cells and both fail — the
+    unweighted fraction at 114.18 sems, `1 - F_S` at 126.36 — together with a third the
+    docstring had not thought to ask for: the diffusion evaluated at the weighted MEAN
+    frequency, which tests whether the average may be taken before the nonlinearity instead of
+    after, rejected at 54.98 sems. The positive control, `H_S/H_0` after `t = 1100` at
+    `NeS = 2000`, passes at 1.17 sems.
+
+    THREE OF THE FOUR RIVALS ARE INFORMATIVE AND THE FOURTH IS LABELLED RATHER THAN COUNTED.
+    The battery also carries a leading-eigenfunction reading that misses by 366.14 sems, and
+    its rejection is PARTLY FORCED: `6·p(1-p)·exp(-t/(2·NeS))` exceeds one at shallow `t` on
+    the spectrum with no rare variants, which `sourcePolymorphicSignalFraction_mem_Icc`
+    forbids a priori, so its failure there is arithmetic and not measurement. What that row
+    measures is the depth at which the leading-eigenfunction approximation becomes adequate.
+    The three above are false in no cell a priori and are the ones that earn the corpus row
+    its verdict, which is why this head says three and not four.
+
+    THIS IS A POPULATION-SCALE QUANTITY, and the oracle fixes that rather than the name.
+    `battery_clean02.py` builds its mask as `poly_s = (p_s > 0.0) & (p_s < 1.0)` on the
+    source's allele-FREQUENCY array; the engine is forward Wright-Fisher on frequencies and
+    draws no cohort for it. So `stillSegregatingProb`, which carries no sample size, is the
+    estimator that matches this functional. The probability that a SAMPLE of `n` chromosomes
+    is monomorphic at a variant still segregating in the population is a DIFFERENT object with
+    its own validated body (`Coalescent/SampleMonomorphism.lean`), and its place is where this
+    chain meets a finite cohort — not inside this one, which would then condition on an `n`
+    its oracle does not have.
 
     THE FOUR `NeT` CELLS ARE THE INFORMATIVE ONES, and they are not a restatement of the
     argument list. This body has no `NeT` argument, but its ORACLE — the realised fraction of
