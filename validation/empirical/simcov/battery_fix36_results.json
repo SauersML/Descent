@@ -1,0 +1,542 @@
+{
+ "_battery_sha": "2b60da7e773c42a1",
+ "results": [
+  {
+   "name": "tagSampleMonomorphicProb",
+   "file": "Coalescent/Duality.lean",
+   "source": "sum_k P(N_tau = k | n) * (p^k + (1-p)^k)",
+   "note": "Tavare (1984); block-counting pmf by uniformization rather than the cancellation-prone closed form. Zero fitted quantities.",
+   "regime": "exact Wright-Fisher binomial drift on 2Ne=3000 gene copies from a KNOWN initial frequency, 12000 independent trajectories per group, sample of n=200 haplotypes drawn binomially at each time; the estimand is the POOLED fraction of trajectories whose sample is monomorphic, matched by a pooled mean of the predicted per-trajectory probabilities. Cells admitted only where the predicted probability clears 5/12000 expected events, and the excluded cells are printed with their predictions.",
+   "span": 0.9973172687528672,
+   "verdict": "MATCH",
+   "worst": {
+    "design": "p=0.25, t=250 (tau=0.0833), n=2 pair coalescent",
+    "lean": 0.6549833445140039,
+    "truth": 0.6454166666666666,
+    "sem": 0.004367054623881291,
+    "sems_off": 2.190647626668494,
+    "rel_err": 0.014822483430348185
+   },
+   "cells": [
+    {
+     "design": "p=0.05, t=250 (tau=0.0833)",
+     "lean": 0.3305492314600107,
+     "truth": 0.32458333333333333,
+     "sem": 0.004274234756611952,
+     "sems_off": 1.3957815764444195,
+     "rel_err": 0.01838017394611767
+    },
+    {
+     "design": "p=0.05, t=750 (tau=0.2500)",
+     "lean": 0.6644930966750777,
+     "truth": 0.6641666666666667,
+     "sem": 0.004311315591513759,
+     "sems_off": 0.07571470969408309,
+     "rel_err": 0.0004914880929651769
+    },
+    {
+     "design": "p=0.05, t=2000 (tau=0.6667)",
+     "lean": 0.8463682257509684,
+     "truth": 0.8455833333333334,
+     "sem": 0.0032986380993048,
+     "sems_off": 0.23794438613937008,
+     "rel_err": 0.000928225979266801
+    },
+    {
+     "design": "p=0.10, t=250 (tau=0.0833)",
+     "lean": 0.10501005836927929,
+     "truth": 0.10591666666666667,
+     "sem": 0.0028091862165178856,
+     "sems_off": 0.3227298681933461,
+     "rel_err": 0.008559637740872211
+    },
+    {
+     "design": "p=0.10, t=750 (tau=0.2500)",
+     "lean": 0.4350551937999313,
+     "truth": 0.431,
+     "sem": 0.004520683945304442,
+     "sems_off": 0.8970310353466231,
+     "rel_err": 0.00940880232002622
+    },
+    {
+     "design": "p=0.10, t=2000 (tau=0.6667)",
+     "lean": 0.7135536776950503,
+     "truth": 0.7115,
+     "sem": 0.004135897222288452,
+     "sems_off": 0.4965494993403007,
+     "rel_err": 0.0028864057555168954
+    },
+    {
+     "design": "p=0.25, t=250 (tau=0.0833)",
+     "lean": 0.0025518820330689114,
+     "truth": 0.002416666666666667,
+     "sem": 0.00044822114973980655,
+     "sems_off": 0.301671098029929,
+     "rel_err": 0.05595118609748054
+    },
+    {
+     "design": "p=0.25, t=750 (tau=0.2500)",
+     "lean": 0.11021123511195553,
+     "truth": 0.11208333333333333,
+     "sem": 0.002879824354050987,
+     "sems_off": 0.6500737514579157,
+     "rel_err": 0.01670273506061972
+    },
+    {
+     "design": "p=0.25, t=2000 (tau=0.6667)",
+     "lean": 0.4253469626106856,
+     "truth": 0.42233333333333334,
+     "sem": 0.004508953027855514,
+     "sems_off": 0.6683656402571952,
+     "rel_err": 0.007135665218671515
+    },
+    {
+     "design": "p=0.50, t=750 (tau=0.2500)",
+     "lean": 0.01377467690482024,
+     "truth": 0.012,
+     "sem": 0.0009939818911831341,
+     "sems_off": 1.7854217672998505,
+     "rel_err": 0.14788974206835323
+    },
+    {
+     "design": "p=0.50, t=2000 (tau=0.6667)",
+     "lean": 0.25260324912851,
+     "truth": 0.2539166666666667,
+     "sem": 0.0039732752343580435,
+     "sems_off": 0.3305629388065477,
+     "rel_err": 0.005172632247417141
+    },
+    {
+     "design": "neutral 1/p spectrum on [0.05, 0.95], t=250 (tau=0.0833)",
+     "lean": 0.06623049080053481,
+     "truth": 0.06333333333333334,
+     "sem": 0.0022234024643591897,
+     "sems_off": 1.303028809962421,
+     "rel_err": 0.045744591587391616
+    },
+    {
+     "design": "neutral 1/p spectrum on [0.05, 0.95], t=750 (tau=0.2500)",
+     "lean": 0.2548521470654711,
+     "truth": 0.25225,
+     "sem": 0.003964634677369404,
+     "sems_off": 0.6563396825247193,
+     "rel_err": 0.010315746542997533
+    },
+    {
+     "design": "neutral 1/p spectrum on [0.05, 0.95], t=2000 (tau=0.6667)",
+     "lean": 0.5317593666011597,
+     "truth": 0.52925,
+     "sem": 0.004556537770976263,
+     "sems_off": 0.5507178316711507,
+     "rel_err": 0.004741363441019832
+    },
+    {
+     "design": "p=0.005, t=0 pure sampling",
+     "lean": 0.36695782172616703,
+     "truth": 0.36741666666666667,
+     "sem": 0.004400962581472208,
+     "sems_off": 0.10426013218820503,
+     "rel_err": 0.0012488408450886
+    },
+    {
+     "design": "p=0.010, t=0 pure sampling",
+     "lean": 0.13397967485796172,
+     "truth": 0.13608333333333333,
+     "sem": 0.003130024756587694,
+     "sems_off": 0.6720900436790757,
+     "rel_err": 0.015458604840452748
+    },
+    {
+     "design": "p=0.020, t=0 pure sampling",
+     "lean": 0.0175879466057215,
+     "truth": 0.016666666666666666,
+     "sem": 0.001168649109331257,
+     "sems_off": 0.7883289617890727,
+     "rel_err": 0.055276796343290066
+    },
+    {
+     "design": "p=0.05, t=250 (tau=0.0833), n=2 pair coalescent",
+     "lean": 0.9125957806102142,
+     "truth": 0.91525,
+     "sem": 0.002542430554607146,
+     "sems_off": 1.043969277735476,
+     "rel_err": 0.0028999938702931743
+    },
+    {
+     "design": "p=0.05, t=750 (tau=0.2500), n=2 pair coalescent",
+     "lean": 0.9260139256082169,
+     "truth": 0.9261666666666667,
+     "sem": 0.0023871526313131264,
+     "sems_off": 0.06398462186548036,
+     "rel_err": 0.0001649174645849453
+    },
+    {
+     "design": "p=0.05, t=2000 (tau=0.6667), n=2 pair coalescent",
+     "lean": 0.9512253736919035,
+     "truth": 0.9518333333333333,
+     "sem": 0.001954623554739056,
+     "sems_off": 0.3110366903927711,
+     "rel_err": 0.000638724890313209
+    },
+    {
+     "design": "p=0.10, t=250 (tau=0.0833), n=2 pair coalescent",
+     "lean": 0.8343920053667216,
+     "truth": 0.833,
+     "sem": 0.0034047882949360207,
+     "sems_off": 0.40883756819536404,
+     "rel_err": 0.0016710748700140246
+    },
+    {
+     "design": "p=0.10, t=750 (tau=0.2500), n=2 pair coalescent",
+     "lean": 0.8598158590471473,
+     "truth": 0.8621666666666666,
+     "sem": 0.003146894044868628,
+     "sems_off": 0.74702471262183,
+     "rel_err": 0.0027266278208227354
+    },
+    {
+     "design": "p=0.10, t=2000 (tau=0.6667), n=2 pair coalescent",
+     "lean": 0.9075849185741336,
+     "truth": 0.9055833333333333,
+     "sem": 0.0026693032755481074,
+     "sems_off": 0.7498530643316641,
+     "rel_err": 0.0022102717299718007
+    },
+    {
+     "design": "p=0.25, t=250 (tau=0.0833), n=2 pair coalescent",
+     "lean": 0.6549833445140039,
+     "truth": 0.6454166666666666,
+     "sem": 0.004367054623881291,
+     "sems_off": 2.190647626668494,
+     "rel_err": 0.014822483430348185
+    },
+    {
+     "design": "p=0.25, t=750 (tau=0.2500), n=2 pair coalescent",
+     "lean": 0.7079497063482234,
+     "truth": 0.7024166666666667,
+     "sem": 0.004173602491209438,
+     "sems_off": 1.3257227283169792,
+     "rel_err": 0.00787714748827626
+    },
+    {
+     "design": "p=0.25, t=2000 (tau=0.6667), n=2 pair coalescent",
+     "lean": 0.8074685803627782,
+     "truth": 0.8050833333333334,
+     "sem": 0.0036162153296208986,
+     "sems_off": 0.6595976212774156,
+     "rel_err": 0.0029627330869825526
+    },
+    {
+     "design": "p=0.50, t=250 (tau=0.0833), n=2 pair coalescent",
+     "lean": 0.5399777926853383,
+     "truth": 0.5346666666666666,
+     "sem": 0.004553370749805597,
+     "sems_off": 1.166416334294419,
+     "rel_err": 0.009933527466343533
+    },
+    {
+     "design": "p=0.50, t=750 (tau=0.2500), n=2 pair coalescent",
+     "lean": 0.6105996084642975,
+     "truth": 0.6095,
+     "sem": 0.004453554292173088,
+     "sems_off": 0.24690581772629866,
+     "rel_err": 0.0018041156100040417
+    },
+    {
+     "design": "p=0.50, t=2000 (tau=0.6667), n=2 pair coalescent",
+     "lean": 0.743291440483704,
+     "truth": 0.74525,
+     "sem": 0.0039775666503948535,
+     "sems_off": 0.4924014324440171,
+     "rel_err": 0.0026280570497094623
+    },
+    {
+     "design": "neutral 1/p spectrum on [0.05, 0.95], t=250 (tau=0.0833), n=2 pair coalescent",
+     "lean": 0.7194807558857639,
+     "truth": 0.7200833333333333,
+     "sem": 0.004098407479221746,
+     "sems_off": 0.1470272174312554,
+     "rel_err": 0.0008368162678894837
+    },
+    {
+     "design": "neutral 1/p spectrum on [0.05, 0.95], t=750 (tau=0.2500), n=2 pair coalescent",
+     "lean": 0.7625455863771702,
+     "truth": 0.76175,
+     "sem": 0.003888947345790803,
+     "sems_off": 0.20457627898491482,
+     "rel_err": 0.0010444192676995643
+    },
+    {
+     "design": "neutral 1/p spectrum on [0.05, 0.95], t=2000 (tau=0.6667), n=2 pair coalescent",
+     "lean": 0.8434604027194088,
+     "truth": 0.8443333333333334,
+     "sem": 0.0033095135034668806,
+     "sems_off": 0.2637640284622297,
+     "rel_err": 0.0010338696572339975
+    }
+   ]
+  },
+  {
+   "name": "tagSampleMonomorphicProb [beta closure, competing]",
+   "file": "Coalescent/Duality.lean",
+   "source": "E[X^n]+E[(1-X)^n] for X ~ Beta(mean p, var p(1-p)(1-exp(-tau)))",
+   "note": "matches the first two moments exactly and has no atoms at 0 and 1, which is where the entire monomorphic probability lives; positive control 'pure sampling at t=0, computed from the observable's definition with no coalescent content' passed at 0.67 sems",
+   "regime": "exact Wright-Fisher binomial drift on 2Ne=3000 gene copies from a KNOWN initial frequency, 12000 independent trajectories per group, sample of n=200 haplotypes drawn binomially at each time; the estimand is the POOLED fraction of trajectories whose sample is monomorphic, matched by a pooled mean of the predicted per-trajectory probabilities. Cells admitted only where the predicted probability clears 5/12000 expected events, and the excluded cells are printed with their predictions.",
+   "span": 0.9998124485286388,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "p=0.25, t=2000 (tau=0.6667)",
+    "lean": 0.20859898778328745,
+    "truth": 0.42233333333333334,
+    "sem": 0.004508953027855514,
+    "sems_off": 47.40221160647115,
+    "rel_err": 0.5060797447909532
+   },
+   "cells": [
+    {
+     "design": "p=0.05, t=250 (tau=0.0833)",
+     "lean": 0.1802296907746935,
+     "truth": 0.32458333333333333,
+     "sem": 0.004274234756611952,
+     "sems_off": 33.772979440433055,
+     "rel_err": 0.4447352273950393
+    },
+    {
+     "design": "p=0.05, t=750 (tau=0.2500)",
+     "lean": 0.47470611388616213,
+     "truth": 0.6641666666666667,
+     "sem": 0.004311315591513759,
+     "sems_off": 43.944951084868855,
+     "rel_err": 0.28526055625671953
+    },
+    {
+     "design": "p=0.05, t=2000 (tau=0.6667)",
+     "lean": 0.7354066507828172,
+     "truth": 0.8455833333333334,
+     "sem": 0.0032986380993048,
+     "sems_off": 33.40065785747648,
+     "rel_err": 0.13029665818529554
+    },
+    {
+     "design": "p=0.10, t=250 (tau=0.0833)",
+     "lean": 0.031517952938771174,
+     "truth": 0.10591666666666667,
+     "sem": 0.0028091862165178856,
+     "sems_off": 26.484080439536008,
+     "rel_err": 0.7024268802004295
+    },
+    {
+     "design": "p=0.10, t=750 (tau=0.2500)",
+     "lean": 0.2229610171208113,
+     "truth": 0.431,
+     "sem": 0.004520683945304442,
+     "sems_off": 46.019360211030744,
+     "rel_err": 0.48268905540415014
+    },
+    {
+     "design": "p=0.10, t=2000 (tau=0.6667)",
+     "lean": 0.5386901157771085,
+     "truth": 0.7115,
+     "sem": 0.004135897222288452,
+     "sems_off": 41.78292518769926,
+     "rel_err": 0.24288107410104223
+    },
+    {
+     "design": "p=0.25, t=250 (tau=0.0833)",
+     "lean": 0.00013792659940310893,
+     "truth": 0.002416666666666667,
+     "sem": 0.00044822114973980655,
+     "sems_off": 5.0839637276964105,
+     "rel_err": 0.9429269243849205
+    },
+    {
+     "design": "p=0.25, t=750 (tau=0.2500)",
+     "lean": 0.02151401010167365,
+     "truth": 0.11208333333333333,
+     "sem": 0.002879824354050987,
+     "sems_off": 31.44959973140645,
+     "rel_err": 0.8080534414720566
+    },
+    {
+     "design": "p=0.25, t=2000 (tau=0.6667)",
+     "lean": 0.20859898778328745,
+     "truth": 0.42233333333333334,
+     "sem": 0.004508953027855514,
+     "sems_off": 47.40221160647115,
+     "rel_err": 0.5060797447909532
+    },
+    {
+     "design": "p=0.50, t=750 (tau=0.2500)",
+     "lean": 0.0006445286928949653,
+     "truth": 0.012,
+     "sem": 0.0009939818911831341,
+     "sems_off": 11.424223527441375,
+     "rel_err": 0.9462892755920862
+    },
+    {
+     "design": "p=0.50, t=2000 (tau=0.6667)",
+     "lean": 0.07048786003545338,
+     "truth": 0.2539166666666667,
+     "sem": 0.0039732752343580435,
+     "sems_off": 46.16564315631903,
+     "rel_err": 0.7223976631357268
+    },
+    {
+     "design": "neutral 1/p spectrum on [0.05, 0.95], t=250 (tau=0.0833)",
+     "lean": 0.026500707495004407,
+     "truth": 0.06333333333333334,
+     "sem": 0.0022234024643591897,
+     "sems_off": 16.56588333814972,
+     "rel_err": 0.5815677763946673
+    },
+    {
+     "design": "neutral 1/p spectrum on [0.05, 0.95], t=750 (tau=0.2500)",
+     "lean": 0.12753881436490314,
+     "truth": 0.25225,
+     "sem": 0.003964634677369404,
+     "sems_off": 31.455908496932338,
+     "rel_err": 0.4943951858675792
+    },
+    {
+     "design": "neutral 1/p spectrum on [0.05, 0.95], t=2000 (tau=0.6667)",
+     "lean": 0.34516572314463617,
+     "truth": 0.52925,
+     "sem": 0.004556537770976263,
+     "sems_off": 40.40003311898867,
+     "rel_err": 0.3478210238174092
+    }
+   ]
+  },
+  {
+   "name": "tagSampleMonomorphicProb [tau/2 convention, competing]",
+   "file": "Coalescent/Duality.lean",
+   "source": "the same law with tau = t/(4 Ne), reading Tavare's N as the diploid size",
+   "note": "one wrong constant in an otherwise correct law; cells that cannot see a factor-of-2 timescale error are not testing the timescale; positive control 'pure sampling at t=0, computed from the observable's definition with no coalescent content' passed at 0.67 sems",
+   "regime": "exact Wright-Fisher binomial drift on 2Ne=3000 gene copies from a KNOWN initial frequency, 12000 independent trajectories per group, sample of n=200 haplotypes drawn binomially at each time; the estimand is the POOLED fraction of trajectories whose sample is monomorphic, matched by a pooled mean of the predicted per-trajectory probabilities. Cells admitted only where the predicted probability clears 5/12000 expected events, and the excluded cells are printed with their predictions.",
+   "span": 0.9999694735526377,
+   "verdict": "FALSIFIED",
+   "worst": {
+    "design": "p=0.50, t=2000 (tau=0.6667)",
+    "lean": 0.04347145977245296,
+    "truth": 0.2539166666666667,
+    "sem": 0.0039732752343580435,
+    "sems_off": 52.965172176957196,
+    "rel_err": 0.8287963514048456
+   },
+   "cells": [
+    {
+     "design": "p=0.05, t=250 (tau=0.0833)",
+     "lean": 0.13727250410613642,
+     "truth": 0.32458333333333333,
+     "sem": 0.004274234756611952,
+     "sems_off": 43.823243198666084,
+     "rel_err": 0.5770808602635078
+    },
+    {
+     "design": "p=0.05, t=750 (tau=0.2500)",
+     "lean": 0.46267640920438696,
+     "truth": 0.6641666666666667,
+     "sem": 0.004311315591513759,
+     "sems_off": 46.73521415571758,
+     "rel_err": 0.3033730350749506
+    },
+    {
+     "design": "p=0.05, t=2000 (tau=0.6667)",
+     "lean": 0.7305778886944599,
+     "truth": 0.8455833333333334,
+     "sem": 0.0032986380993048,
+     "sems_off": 34.86452322948408,
+     "rel_err": 0.136007227324971
+    },
+    {
+     "design": "p=0.10, t=250 (tau=0.0833)",
+     "lean": 0.017548391003427942,
+     "truth": 0.10591666666666667,
+     "sem": 0.0028091862165178856,
+     "sems_off": 31.456894934069286,
+     "rel_err": 0.8343188890313649
+    },
+    {
+     "design": "p=0.10, t=750 (tau=0.2500)",
+     "lean": 0.20821882354863475,
+     "truth": 0.431,
+     "sem": 0.004520683945304442,
+     "sems_off": 49.28041401407066,
+     "rel_err": 0.5168936808616363
+    },
+    {
+     "design": "p=0.10, t=2000 (tau=0.6667)",
+     "lean": 0.5277020016236162,
+     "truth": 0.7115,
+     "sem": 0.004135897222288452,
+     "sems_off": 44.4396919212334,
+     "rel_err": 0.2583246639162105
+    },
+    {
+     "design": "p=0.25, t=250 (tau=0.0833)",
+     "lean": 2.2301947463366832e-05,
+     "truth": 0.002416666666666667,
+     "sem": 0.00044822114973980655,
+     "sems_off": 5.341927128144744,
+     "rel_err": 0.9907716079461931
+    },
+    {
+     "design": "p=0.25, t=750 (tau=0.2500)",
+     "lean": 0.015639141497700352,
+     "truth": 0.11208333333333333,
+     "sem": 0.002879824354050987,
+     "sems_off": 33.48960907979232,
+     "rel_err": 0.8604686260428221
+    },
+    {
+     "design": "p=0.25, t=2000 (tau=0.6667)",
+     "lean": 0.1845371856016018,
+     "truth": 0.42233333333333334,
+     "sem": 0.004508953027855514,
+     "sems_off": 52.738661561269105,
+     "rel_err": 0.5630532306197275
+    },
+    {
+     "design": "p=0.50, t=750 (tau=0.2500)",
+     "lean": 0.00017077361481072583,
+     "truth": 0.012,
+     "sem": 0.0009939818911831341,
+     "sems_off": 11.900846977311605,
+     "rel_err": 0.9857688654324396
+    },
+    {
+     "design": "p=0.50, t=2000 (tau=0.6667)",
+     "lean": 0.04347145977245296,
+     "truth": 0.2539166666666667,
+     "sem": 0.0039732752343580435,
+     "sems_off": 52.965172176957196,
+     "rel_err": 0.8287963514048456
+    },
+    {
+     "design": "neutral 1/p spectrum on [0.05, 0.95], t=250 (tau=0.0833)",
+     "lean": 0.01777344717821424,
+     "truth": 0.06333333333333334,
+     "sem": 0.0022234024643591897,
+     "sems_off": 20.491065781133774,
+     "rel_err": 0.7193666235018804
+    },
+    {
+     "design": "neutral 1/p spectrum on [0.05, 0.95], t=750 (tau=0.2500)",
+     "lean": 0.11896974541987432,
+     "truth": 0.25225,
+     "sem": 0.003964634677369404,
+     "sems_off": 33.61728517911243,
+     "rel_err": 0.5283657267794873
+    },
+    {
+     "design": "neutral 1/p spectrum on [0.05, 0.95], t=2000 (tau=0.6667)",
+     "lean": 0.32683619453685736,
+     "truth": 0.52925,
+     "sem": 0.004556537770976263,
+     "sems_off": 44.422720854517216,
+     "rel_err": 0.3824540490564811
+    }
+   ]
+  }
+ ]
+}
