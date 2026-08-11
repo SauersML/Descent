@@ -2608,8 +2608,35 @@ theorem ldCorrelationDecay_strictAnti_fst
     moved. Three things the run does not deliver:
 
     * The naive amplitude-1 hyperbola `1/(1 + ρ)` matches at 2.58 sems — indistinguishable
-      from this body's 2.57. The data decide hyperbolic against exponential and do not decide
-      WHICH hyperbolic, so nothing here says this normalisation rather than that one.
+      from this body's 2.57. THESE CURVES CANNOT CHOOSE BETWEEN THE TWO HYPERBOLAS, and the
+      margin was measured three ways rather than asserted. On the anchor-normalised cells it
+      is 2.57 against 2.58. On cell `I`'s own statistic — each shape given a free amplitude
+      AND a free rate, χ² per point against the measurement sems with no anchor anywhere —
+      it is 3.687 against 4.160 on one curve and 1.975 against 1.948 on the other, so the two
+      shapes SPLIT one curve each at 1.1x, against the 7x and 40x that statistic returned when
+      it rejected the exponential. A free rate reparametrises one hyperbola into the other
+      across this range, which is why.
+
+      Pinning the rate at its theoretical `4·Nₑ` — no free parameter left in either shape —
+      does separate them, 14.0 against 286.7 and 140.3 against 901.7 in χ² per point. That
+      comparison is NOT admissible here and is recorded so no one re-derives it as though it
+      were: `ldCorrelationDecay`'s own record already established that this estimator's `Nₑ`
+      recovery carries a large known downward bias, 563 against a true 1000, so the pinned
+      rate is known to be wrong for BOTH shapes and the contest is between two handicapped
+      curves. The implied `Nₑ_eff` bears that out — a consistent 70% and 72% of truth for this
+      body and a consistent 33% for the naive one, each internally consistent across a
+      2.5-fold change in `Nₑ`, which is what a reparametrisation looks like and not what a
+      discrimination looks like.
+
+      WHAT DOES BREAK THE TIE IS ALREADY IN THE CORPUS, on the estimator where `ρ` is exact by
+      construction rather than fitted: `battery_sved01` measures `σ_d²` on a forward two-locus
+      Wright-Fisher engine at known `ρ = 4·Nₑ·c` with no free constant, and there
+      `ohtaKimuraSigmaDSq` matches at 1.85 sems while Sved's `1/(1 + ρ)` — the naive hyperbola
+      — is FALSIFIED at 17.6 sems and 86% relative. So the shape this body is built from is
+      preferred to its rival by a measurement, and by one this file's curves are too biased to
+      make. The inference is CROSS-BATTERY and is flagged as such: it carries the assumption
+      that the shape settled in `σ_d²` is the shape a normalised `E[r²]` decay follows, which
+      is the same scale mismatch the third bullet below declines to discharge.
     * The residuals are large in absolute terms, 27% relative at the worst cell, because the
       anchor's own 6% uncertainty is carried into every bar. A match at that width is a weak
       constraint even where it holds.
@@ -2625,6 +2652,26 @@ theorem ldCorrelationDecay_strictAnti_fst
     1.0400 ± 0.0031, a 4% bias at 12.8 sems — larger than the effect being reported. Corrected,
     it returns 0.998814 ± 0.002886. The bias was found by the control and not by a reading of
     the verdict.
+
+    WHAT THIS RECORD RECOMMENDS, since the re-analysis it discharges was commissioned to
+    decide replace-versus-delete for `ldCorrelationDecay`. The obstruction that record names
+    is an amplitude obstruction and only that, and it is cleared: the amplitude-1 curve is the
+    curve that was fitted. On those stated terms the exponential should be REPLACED by this
+    shape rather than deleted, and the evidence for the replacement is four separate
+    measurements — the exponential refuted here at 12.05 sems and by 8x to 270x in χ² per
+    point, the amplitude-1 normalisation covered at 0.380 against free amplitudes of 0.316 and
+    0.373, the Ohta-Kimura shape preferred to Sved's at 1.85 against 17.6 sems in
+    `battery_sved01`, and the `√fstGap` exponent at 2.42 against 4.73 sems in
+    `battery_bulk54`.
+
+    TWO THINGS A SUBSTITUTION MUST HANDLE, neither of them an argument against it. The
+    monotonicity theorems on the falsified body are proved through `Real.exp_lt_exp` and hold
+    for every real distance; this shape has a pole at `ρ = -2`, so both need a nonnegativity
+    hypothesis on the distance, which is a signature change consumers must absorb. And the
+    composition — that `ρ` may be read as `λ·√fstGap·distance` in a CROSS-population setting —
+    stays untested either way: these curves are within-population `r²` against genetic
+    distance, so `fstGap` is never exercised. That gap is not a reason to keep the exponential,
+    which carries the identical untested composition on top of a refuted shape.
 
     The `√fstGap` factor is the one part carried over already measured, at 2.42 sems against
     4.73 for the un-rooted rival, and nothing in this run bears on it: these curves are

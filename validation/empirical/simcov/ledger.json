@@ -10846,7 +10846,7 @@
   {
    "against": null,
    "battery": "ldshape01",
-   "battery_sha": "25c1d1b21a63f579",
+   "battery_sha": "f714ed031d646717",
    "cells": 26,
    "competitors_carried": 2,
    "competitors_rejected": 1,
@@ -10867,7 +10867,7 @@
   {
    "against": "ldCorrelationDecayHyperbolic",
    "battery": "ldshape01",
-   "battery_sha": "25c1d1b21a63f579",
+   "battery_sha": "f714ed031d646717",
    "cells": 26,
    "competitors_carried": 2,
    "competitors_rejected": 1,
@@ -10888,7 +10888,7 @@
   {
    "against": "ldCorrelationDecayHyperbolic",
    "battery": "ldshape01",
-   "battery_sha": "25c1d1b21a63f579",
+   "battery_sha": "f714ed031d646717",
    "cells": 26,
    "competitors_carried": 2,
    "competitors_rejected": 1,

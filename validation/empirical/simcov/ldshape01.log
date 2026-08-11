@@ -6,6 +6,20 @@ zero-distance anchors, from the 3 shortest bins with the candidate's own droop a
   Ne=5000 over 2 Mb      A0 = 0.3803 +/- 0.0243 (6.4%)   cell I's free-amplitude naive-hyperbolic fit wanted A = 0.3732
   DIAGNOSTIC: under the theory the plateau is set by the shared sample size and MAF filter, not by Ne, and the two agree to 0.1% across a 2.5-fold change in Ne
 
+DISCRIMINATION: chi-squared per point, no anchor, each shape given a free amplitude AND a free rate (the statistic cell I used):
+  curve                     Ohta-Kimura  naive 1/(1+r)    exponential
+  Ne=2000 over 4 Mb               3.687          4.160         28.489
+  Ne=5000 over 2 Mb               1.975          1.948         79.656
+  and with the amplitude PINNED at 1 against each curve's own anchor, which is the claim under test:
+  curve                     Ohta-Kimura  naive 1/(1+r)    exponential
+  Ne=2000 over 4 Mb               7.760          8.984        149.915
+  Ne=5000 over 2 Mb               1.981          2.003        541.228
+
+THE RATE PINNED AT ITS THEORETICAL 4*Ne, no free parameter left in either shape:
+  curve                        4*Ne Ohta-Kimura chi2/pt (Ne_eff) naive 1/(1+r) chi2/pt (Ne_eff)
+  Ne=2000 over 4 Mb            8000         14.007 (Ne_eff   1395)        286.710 (Ne_eff    653)
+  Ne=5000 over 2 Mb           20000        140.341 (Ne_eff   3605)        901.660 (Ne_eff   1644)
+
   CONTROL synthetic amplitude-1 candidate at the stored x and sems: the amplitude the WHOLE curve wants, divided by the one the three shortest bins want, must be 1: predicted 1.000000 measured 0.998814 +/- 0.002886
 
 amplitude the WHOLE curve wants, against the one the shortest bins want (the body commits to their ratio being 1):

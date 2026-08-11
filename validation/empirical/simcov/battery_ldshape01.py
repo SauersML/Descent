@@ -256,6 +256,88 @@ def main():
           % (100 * abs(curves[0]["a0"] - curves[1]["a0"])
              / max(curves[0]["a0"], curves[1]["a0"]), 5000 / 2000))
 
+    # ---- DISCRIMINATION, on the statistic the anchor cannot reach ----------
+    #
+    # The recorded rows below normalise by the anchor and so carry its ~6%
+    # uncertainty in every bar. That is the right bar for the AMPLITUDE claim
+    # and it is the wrong one for telling two hyperbolas apart: the anchor term
+    # is COMMON to both candidates, so it inflates both residuals equally and
+    # buries the difference between the shapes under an error that cancels.
+    #
+    # So the shapes are also compared the way cell `I` compared its own two --
+    # each fitted with a FREE amplitude and a free rate, chi-squared per point
+    # against the measurement sems alone, no anchor anywhere. That statistic is
+    # what gave cell `I` its 7x and 40x margins for hyperbolic over
+    # exponential, and it is the one that can say whether the corpus's
+    # Ohta-Kimura normalisation is preferred to the naive hyperbola or merely
+    # tied with it.
+    print("\nDISCRIMINATION: chi-squared per point, no anchor, each shape given "
+          "a free amplitude AND a free rate (the statistic cell I used):")
+    print("  %-22s %14s %14s %14s" % ("curve", "Ohta-Kimura", "naive 1/(1+r)",
+                                      "exponential"))
+    for c in curves:
+        w = 1.0 / np.asarray(c["sem"], float) ** 2
+        row = []
+        for _, shape, _, _ in SHAPES:
+            _, _, sse = fit_rate_and_amplitude(c["x"], c["y"], w, shape)
+            row.append(sse / len(c["x"]))
+        print("  %-22s %14.3f %14.3f %14.3f" % (c["label"], row[0], row[1],
+                                                row[2]))
+    print("  and with the amplitude PINNED at 1 against each curve's own "
+          "anchor, which is the claim under test:")
+    print("  %-22s %14s %14s %14s" % ("curve", "Ohta-Kimura", "naive 1/(1+r)",
+                                      "exponential"))
+    for c in curves:
+        row = []
+        for _, shape, _, _ in SHAPES:
+            a0, _, _ = anchored(c, shape)
+            yn = np.asarray(c["y"], float) / a0
+            sn = np.asarray(c["sem"], float) / a0
+            _, sse = fit_rate(c["x"], yn, 1.0 / sn ** 2, shape)
+            row.append(sse / len(c["x"]))
+        print("  %-22s %14.3f %14.3f %14.3f" % (c["label"], row[0], row[1],
+                                                row[2]))
+
+    # ---- THE RATE IS NOT FREE, AND THAT IS WHAT SEPARATES THE TWO HYPERBOLAS
+    #
+    # Everything above lets each shape choose its own rate, and with a free rate
+    # the two hyperbolas are nearly degenerate over the measured range: one wins
+    # on one curve, the other on the other, by 1.1x in chi-squared per point
+    # against a precedent that called 7x and 40x decisive. A free rate is also
+    # not what the theory offers. `rho = 4*Ne*c`, and both `Ne` and the genetic
+    # distance are the simulation's OWN parameters -- these curves were run at
+    # Ne = 2000 and 5000 with x already in Morgans -- so `rho = 4*Ne*x` is
+    # computable and neither shape is entitled to a fitted constant.
+    #
+    # Pinned there, each candidate has ZERO free parameters: the amplitude comes
+    # from its own three shortest bins and the rate from the simulation. The
+    # ratio of the FITTED rate to `4*Ne` is reported beside it, because that
+    # ratio is the effective Ne each shape implies and it is a physical quantity
+    # a reader can check. Cell `I`'s record warns that this recovery carries a
+    # known downward bias for r-squared off a finite sample -- it saw Ne_eff 563
+    # against a true 1000 -- so the ABSOLUTE ratio is not a pass/fail; the two
+    # shapes' ratios against each other, on the same curves and the same
+    # estimator, are the comparison that bias is common to.
+    print("\nTHE RATE PINNED AT ITS THEORETICAL 4*Ne, no free parameter left in "
+          "either shape:")
+    print("  %-22s %10s %24s %24s"
+          % ("curve", "4*Ne", "Ohta-Kimura chi2/pt (Ne_eff)",
+             "naive 1/(1+r) chi2/pt (Ne_eff)"))
+    for c, ne in zip(curves, (2000.0, 5000.0)):
+        x = np.asarray(c["x"], float)
+        rho_true = 4.0 * ne * x
+        out = []
+        for _, shape, _, _ in SHAPES[:2]:
+            a0, _, fitted = anchored(c, shape)
+            yn = np.asarray(c["y"], float) / a0
+            sn = np.asarray(c["sem"], float) / a0
+            resid = (yn - shape(rho_true)) / sn
+            chi2 = float((resid ** 2).sum() / len(x))
+            out.append((chi2, fitted / 4.0))
+        print("  %-22s %10.0f %14.3f (Ne_eff %6.0f) %14.3f (Ne_eff %6.0f)"
+              % (c["label"], 4 * ne, out[0][0], out[0][1], out[1][0],
+                 out[1][1]))
+
     # ---- CONTROL ---------------------------------------------------------
     # Synthetic curves of KNOWN amplitude 1, through this file's own anchor
     # recipe and fitter. The record's own control doctrine: feed the fitter a
