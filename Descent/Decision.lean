@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Decision.BlindnessMinimaxFloors
 import Descent.Decision.CertificateGrading
 import Descent.Decision.FiniteMinimax
+import Descent.Decision.PolygenicNonsmoothSummaries
 import Descent.Decision.PowerAnalysis
 import Descent.Decision.SelectionValidation
 import Descent.Decision.TransportedMinimax

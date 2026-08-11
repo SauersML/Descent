@@ -7815,14 +7815,6 @@ LAYER_PENDING = {
         "at the module that actually declares them. The repair is the extraction the "
         "`LDDecayTheory` and `PopulationGeneticsFoundations` entries name: move the drift "
         "recurrences down into PopGen and this edge goes with theirs.",
-    ("Descent.PopGen.PolygenicArchitecture", "Descent.Decision.CertificateGrading"):
-        "Reads `FinitePrior.mean` and the atom-modulus lemmas. The certificate "
-        "machinery is decision-theoretic and correctly placed; the polygenic INSTANCE "
-        "of it is what sits in the wrong layer, so this repair moves a theorem up.",
-    ("Descent.PopGen.PolygenicArchitecture", "Descent.Decision.TransportedMinimax"):
-        "Same file and same repair: the minimax entropy exponents it names are "
-        "Decision's, and the architecture statement consuming them is the thing in "
-        "the wrong place.",
 }
 
 # The self-auditing directory.  See META in the header.
