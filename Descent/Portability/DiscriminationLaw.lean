@@ -304,4 +304,31 @@ theorem firstObserved_ext (g₁ g₂ : AdministrativePHGenerator) (s1 s2 : ℝ)
   intro t _
   simp only [hhazard, hsurv1, hsurv2]
 
+/-! ## Inhabitation
+
+A theorem quantified over an uninhabited structure is true and empty, so the survival classes
+carry exhibited inhabitants.  The values sit off the boundaries their own hypotheses exclude:
+a zero log hazard ratio would make the hazard score-independent and every discrimination
+statement below it trivially true, which inhabits the class while testing nothing. -/
+
+/-- Inhabitation for the Gaussian marginal score law, standardized. -/
+noncomputable def SurvivalScoreLaw.witness : SurvivalScoreLaw where
+  mean := 0
+  variance := 1
+  variance_pos := by norm_num
+
+/-- Inhabitation for the administrative proportional-hazards generator, at the EXPONENTIAL
+baseline: constant unit hazard, whose cumulative hazard is the identity.  This is the one
+baseline for which `cumulative_spec` is an integral the corpus can discharge outright rather
+than assume, so the witness proves the cumulative-hazard identity instead of carrying it. -/
+noncomputable def AdministrativePHGenerator.witness : AdministrativePHGenerator where
+  baselineHazard := fun _ ↦ 1
+  baselineCumulativeHazard := fun t ↦ t
+  logHazardRatio := 1 / 2
+  horizon := 1
+  baselineHazard_nonneg := by intro t; norm_num
+  horizon_nonneg := by norm_num
+  cumulative_zero := rfl
+  cumulative_spec := by intro t _; simp
+
 end Descent.Portability
