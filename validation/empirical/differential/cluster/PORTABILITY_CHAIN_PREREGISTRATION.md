@@ -36,7 +36,7 @@ Thus the factor from 125 diploids to 250 gene copies is a ploidy conversion in t
 correspondence instance. These numbers belong here, not in the general Lean types.
 
 Serial distance-quintile rows are mixture strata. They must be represented by
-`Program.PopulationRow.mixture` with their actual deme weights and evaluated as a weighted
+`Validation.PopulationRow.mixture` with their actual deme weights and evaluated as a weighted
 functional. They are not atomic deme rows and may not be assigned the midpoint deme's law.
 The primary generator/sidecar containing the quintile weights is absent from this checkout;
 that missing correspondence input is recorded as a blocker, not replaced by equal weights.
@@ -58,7 +58,7 @@ The finite-sample F gate owns `Core.bhatiaHudsonRatioOfSums`. Its required rival
 No rival is a fallback. A mismatch is `bad-correspondence` unless the exact constructor's
 algebra is wrong, in which case it is `bad-math`.
 
-`Program.bhatiaHudsonGate` requires all four rival functions and a nonnegative tolerance;
+`Validation.bhatiaHudsonGate` requires all four rival functions and a nonnegative tolerance;
 its rival list cannot be empty. `EstimatorGate.accepts` and `rejectsRivals` are separate
 obligations, so agreement of the preferred constructor cannot silently count as rejection of
 the other conventions.
