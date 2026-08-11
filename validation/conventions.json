@@ -610,6 +610,18 @@
       ],
       "note": "The 2 multiplies bigM and nothing else: it is islandDemeCorrection at the two demes this body's regime declares, measured on battery_falsrepair group_a, where the uncorrected 1/(1 + theta + bigM) is excluded at 7.58 sems and the squared correction 1/(1 + theta + 4 bigM) at 5.37."
     },
+    "Descent/PopGen/DGP.lean::fstConnectedPairAt": {
+      "quantity": "fst",
+      "convention": "identity-probability",
+      "constants": [
+        "1",
+        "1",
+        "1",
+        "1",
+        "4"
+      ],
+      "note": "The 4 is scaledMigrationRate's 2*ploidy read at the deme's TOTAL emigration rate mTot, so the level is 1/(1 + theta + 4 Ne mTot) and NO deme count appears: geometry enters only through mTot at the call site, which is what the superseded hardcoded 1/(1 + theta + 2 bigM) could not express. The four 1s are the unit numerator and the three complements (1 - mTot inside the clock, 1 - decay^t, and the level's numerator); the coalescent 2 lives in hetDecayFromScaled, which this body calls rather than restates. Against an exact structured coalescent the total-flow reading is within 1.0 percent on a square lattice, where the per-neighbour reading is 3.3x low and the hardcoded level 86 percent high."
+    },
     "Descent/PopGen/DGP.lean::fstMutationDriftEquilibrium": {
       "quantity": "fst",
       "convention": "identity-probability",
@@ -888,12 +900,10 @@
       "quantity": "fst",
       "convention": "identity-probability",
       "constants": [
-        "1",
-        "1",
-        "1",
         "2"
       ],
-      "note": "The 2 on bigM is the same islandDemeCorrection at d = 2 that DGP::fstEquilibrium carries; this body spells the equilibrium level out because it cannot reach an EvolutionaryParameters, and toGenerationalPopGenParameters_fstTransientAt_floor is what forces the two spellings to move together."
+      "role": "consumer",
+      "note": "No longer spells a level out. The body is DGP::fstConnectedPairAt evaluated at mTot = bigM/(2 Ne), and the 2 is that divisor: it converts a per-neighbour scaled rate into the total emigration of a deme with TWO neighbours. The old spelling carried islandDemeCorrection at d = 2 on bigM, which is the same number by the coincidence 4 Ne (2m) = 2 bigM and only at that degree; the general body carries the level and the geometry now lives at the call site."
     },
     "Descent/Portability/PortabilityDrift/MigrationDrift.lean::SplitMigrationModel.fstMigDriftEq": {
       "quantity": "fst",

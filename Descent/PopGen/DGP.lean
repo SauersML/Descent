@@ -220,6 +220,96 @@ theorem fstTransientDecayFromScaled_no_migration (Ne : ℝ) (θ : Descent.Core.T
     fstTransientDecayFromScaled Ne θ ⟨0⟩ = hetDecayFromScaled Ne θ := by
   unfold fstTransientDecayFromScaled; ring
 
+/-- **Differentiation of a migration-connected pair after `t` generations.**
+
+`mTot` is the deme's TOTAL per-generation emigration rate -- the row sum of its migration
+matrix, the sum of its rates to ALL neighbours -- and NOT the per-neighbour rate. The level is
+the migration-drift balance read at the total flow `4 · Nₑ · mTot`; the approach to it is on
+the compounded drift-mutation-migration clock `fstTransientDecayFromScaled` already carries.
+
+GEOMETRY IS NOT A PARAMETER OF THIS LAW. Chain, lattice and island differ only in what `mTot`
+is at the call site: `2m` for a deme with two neighbours, `4m` for one with four. That is the
+whole of the generalisation, and it is what the superseded spelling got wrong -- a hardcoded
+`1/(1 + θ + 2 · bigM)` is this body at `mTot = bigM/(2 Nₑ)`, which is `2m`, which is right for
+a two-neighbour deme and for no other.
+
+    Assumes: `mTot` is the row sum for an INTERIOR deme. A boundary deme has fewer neighbours
+    and a reflecting edge, and is outside this law's reach -- measured up to 16% high there.
+    This is the same kind of hypothesis the stepping-stone range lemmas carry when they require
+    a separation of at least one.
+
+    Empirical status: UNTESTED as stated here. The level is the quantity under test and its
+    battery is queued; what is quoted below is the comparison against an exact structured
+    coalescent that motivated the form, not a validation of this declaration.
+
+      design                    mTot   exact     this body   superseded `1/(1+θ+2·bigM)`
+      serial1d chain, interior   2m    0.03662   0.04000     0.04000
+      grid2d lattice, interior   4m    0.06558   0.06494     0.12195
+
+    On the chain the two spellings coincide, which is why the superseded one survived; on the
+    lattice this body is within 1.0% and the superseded one is 86% high. The per-neighbour
+    reading `1/(1 + 4·Nₑ·m)` is wrong in the other direction, by 2.1x on the chain and 3.3x on
+    the lattice, so `mTot` is chosen by measurement rather than by argument.
+
+    THE CLOCK IS THE VALIDATED ONE AND IS NOT RESTATED HERE. `fstTransientDecayFromScaled` is
+    `hetDecayFromScaled Nₑ θ · (1 - mTot)`, carrying mutation as well as drift and migration.
+    The structured-coalescent comparisons above are NEUTRAL runs, `θ = 0`, where the mutation
+    factor is one; they therefore bear on the level and say nothing about the mutation channel,
+    which the decay body's own battery covers. -/
+noncomputable def fstConnectedPairAt (Ne : ℝ) (θ : Descent.Core.Theta) (mTot : ℝ) (t : ℕ) : ℝ :=
+  (1 / (1 + θ.value + 4 * Ne * mTot)) *
+    (1 - (hetDecayFromScaled Ne θ * (1 - mTot)) ^ t)
+
+/-- **The clock is the corpus's transient decay body**, read at the total emigration rate. This
+is what makes `fstConnectedPairAt` a generalisation of the existing coordinate rather than a
+second law wearing the same shape. -/
+theorem fstConnectedPairAt_eq_decayBody (Ne : ℝ) (θ : Descent.Core.Theta) (mTot : ℝ)
+    (hNe : Ne ≠ 0) (t : ℕ) :
+    fstConnectedPairAt Ne θ mTot t =
+      (1 / (1 + θ.value + 4 * Ne * mTot)) *
+        (1 - fstTransientDecayFromScaled Ne θ ⟨2 * Ne * mTot⟩ ^ t) := by
+  have hdecay : fstTransientDecayFromScaled Ne θ ⟨2 * Ne * mTot⟩
+      = hetDecayFromScaled Ne θ * (1 - mTot) := by
+    unfold fstTransientDecayFromScaled
+    congr 2
+    field_simp
+  unfold fstConnectedPairAt
+  rw [hdecay]
+
+/-- **A pair that has not diverged is not differentiated**, at every migration rate. -/
+@[simp] theorem fstConnectedPairAt_zero (Ne : ℝ) (θ : Descent.Core.Theta) (mTot : ℝ) :
+    fstConnectedPairAt Ne θ mTot 0 = 0 := by
+  unfold fstConnectedPairAt; norm_num
+
+/-- **The chain instantiation.** A deme with two neighbours, each receiving `m`, emigrates at
+`2m`; this is the serial-1D interior case, and it is the one the superseded spelling agreed
+with. -/
+theorem fstConnectedPairAt_chain_interior (Ne : ℝ) (θ : Descent.Core.Theta) (m : ℝ) (t : ℕ) :
+    fstConnectedPairAt Ne θ (2 * m) t =
+      (1 / (1 + θ.value + 8 * Ne * m)) *
+        (1 - (hetDecayFromScaled Ne θ * (1 - 2 * m)) ^ t) := by
+  unfold fstConnectedPairAt; ring_nf
+
+/-- **The lattice instantiation.** Four neighbours, so twice the chain's total flow at the same
+per-neighbour rate, and a level half the chain's -- which is the discrepancy the superseded
+spelling could not express, because it had no way to be told how many neighbours there were. -/
+theorem fstConnectedPairAt_lattice_interior (Ne : ℝ) (θ : Descent.Core.Theta) (m : ℝ) (t : ℕ) :
+    fstConnectedPairAt Ne θ (4 * m) t =
+      (1 / (1 + θ.value + 16 * Ne * m)) *
+        (1 - (hetDecayFromScaled Ne θ * (1 - 4 * m)) ^ t) := by
+  unfold fstConnectedPairAt; ring_nf
+
+/-- **Counting all the neighbours lowers the differentiation.** At the same per-neighbour rate,
+a deme with more neighbours exchanges more and differentiates less, so reading a total flow as
+though it were a per-neighbour one overstates `F_ST` -- which is the direction the lattice
+measurement found the superseded spelling wrong in. -/
+theorem fstConnectedPairAt_level_antitone_in_mTot
+    {Ne θv m₁ m₂ : ℝ} (hNe : 0 < Ne) (hθ : 0 ≤ θv) (hm : m₁ < m₂) (hm₁ : 0 ≤ m₁) :
+    1 / (1 + θv + 4 * Ne * m₂) < 1 / (1 + θv + 4 * Ne * m₁) := by
+  have h₁ : 0 < 1 + θv + 4 * Ne * m₁ := by nlinarith
+  have h₂ : 0 < 1 + θv + 4 * Ne * m₂ := by nlinarith
+  exact one_div_lt_one_div_of_lt h₁ (by nlinarith)
+
 
 open scoped InnerProductSpace
 open InnerProductSpace

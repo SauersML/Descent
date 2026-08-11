@@ -125,21 +125,26 @@ layer, but now exposed directly to the mechanistic SNP/LD state.
     half-life, the superseded base overstates the time to half the plateau by a
     factor of seventeen at `4 Nₑ m = 16`.
 
-    **The LEVEL now carries the two-deme correction as well**, and is
-    `1/(1 + θ + 2 M)` rather than `1/(1 + θ + M)`. It is the same quantity as
-    `DGP.fstEquilibrium`, spelled out here because this record cannot reach an
-    `EvolutionaryParameters`, and it moved when that one did: the migration term
-    carries `islandDemeCorrection`, which at the two populations this transport
-    layer is about equals 2. The theorem
-    `PGSEvolutionaryModel.toGenerationalPopGenParameters_fstTransientAt_floor`
-    forces the two spellings to agree, and is what would have caught it had only
-    one of them moved.
+    **THE LEVEL IS NOT THIS RECORD'S OWN, and the record is not general.** This
+    body is `PopGen.fstConnectedPairAt` evaluated at `mTot = bigM / (2 Nₑ)`,
+    which is `2m`: the total emigration rate of a deme with exactly TWO
+    neighbours. That is the geometry this transport layer is about, and it is
+    the only one this record can express -- `bigM` carries a per-neighbour rate
+    and a `PopGenParameters` has no field saying how many neighbours there are.
+    The level it produces, `1/(1 + θ + 2·bigM)`, agrees with the general law on
+    a chain interior and is 86% high on a square lattice, where `mTot` is `4m`.
+    A caller whose demes have some other degree must use `fstConnectedPairAt`
+    with its own row sum; reading this coordinate there is a scope error, not a
+    numerical approximation.
+
+    Assumes: an interior deme with two neighbours. Boundary demes are outside
+    the general law's reach as well, measured up to 16% high.
 
     The half-life design that validated the decay base does NOT bear on the
     level: it reads `F(t)` against `F(t)`'s own plateau by interpolation, which
-    is a shape property with the level divided out. So the level correction is
-    carried entirely by `fstEquilibrium`'s measurement and this record does not
-    claim it twice.
+    is a shape property with the level divided out. So the level is carried
+    entirely by `fstConnectedPairAt`'s record and this one does not claim it
+    twice.
 
     Note that `Descent.Core.PopGenParameters.hetDecayFactor` itself is untouched and remains correct
     for what
@@ -154,8 +159,23 @@ layer, but now exposed directly to the mechanistic SNP/LD state.
     superseded base spans 69.31 to 554.52. -/
 noncomputable def _root_.Descent.Core.PopGenParameters.fstTransientAt (g :
   Descent.Core.PopGenParameters) (t : ℕ) : ℝ :=
-  (1 / (1 + g.theta.value + 2 * g.bigM.value)) *
-    (1 - PopGen.fstTransientDecayFromScaled g.Ne g.theta g.bigM ^ t)
+  PopGen.fstConnectedPairAt g.Ne g.theta (g.bigM.value / (2 * g.Ne)) t
+
+/-- **The record's own spelling of the coordinate**, recovered from the general law at the
+two-neighbour total emigration rate. `4 · Nₑ · (bigM / (2 Nₑ))` is `2 · bigM` whenever the
+effective size is nonzero, which is where the superseded hardcoded level came from; at
+`Nₑ = 0` the record's `bigM` is junk and the two spellings part, so the hypothesis is real. -/
+theorem _root_.Descent.Core.PopGenParameters.fstTransientAt_eq_explicit
+    (g : Descent.Core.PopGenParameters) (hNe : g.Ne ≠ 0) (t : ℕ) :
+    g.fstTransientAt t =
+      (1 / (1 + g.theta.value + 2 * g.bigM.value)) *
+        (1 - PopGen.fstTransientDecayFromScaled g.Ne g.theta g.bigM ^ t) := by
+  unfold Descent.Core.PopGenParameters.fstTransientAt PopGen.fstConnectedPairAt
+    PopGen.fstTransientDecayFromScaled
+  have hlevel : 4 * g.Ne * (g.bigM.value / (2 * g.Ne)) = 2 * g.bigM.value := by
+    field_simp
+    ring
+  rw [hlevel]
 
 /-- Mutation-driven retention of shared ancestral variation after `t`
 generations.
@@ -273,7 +293,9 @@ theorem constrained them jointly and could not have caught the decay base. -/
     (m : PopGen.PGSEvolutionaryModel) :
     (m.toGenerationalPopGenParameters).fstTransientAt (Nat.floor m.t_div) =
       m.fstTransient := by
-  unfold Descent.Core.PopGenParameters.fstTransientAt PopGen.PGSEvolutionaryModel.fstTransient
+  rw [Descent.Core.PopGenParameters.fstTransientAt_eq_explicit _
+    (by simp [PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters]; exact ne_of_gt m.Ne_pos)]
+  unfold PopGen.PGSEvolutionaryModel.fstTransient
     PopGen.fstTransientDecayFromScaled PopGen.hetDecayFromScaled
   simp [PopGen.PGSEvolutionaryModel.toGenerationalPopGenParameters,
     -- BOTH bearers of the name: the record's own equilibrium and the
