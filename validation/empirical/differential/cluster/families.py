@@ -1271,8 +1271,14 @@ FAMILIES = [
                     # above. targetLiabilityAUCFromNeutralAFBenchmark is
                     # liabilityThresholdAUCFromExplainedR2 (presentDayR2 ...) K
                     # and the profile is neutralAFBenchmarkMetricProfile with
-                    # the AUC field swapped for it -- same benchmark, binary
-                    # readout. They sit HERE and not in
+                    # BOTH readout fields swapped for their liability-threshold
+                    # counterparts -- same benchmark, binary readout. The Brier
+                    # coordinate is targetLiabilityBrierFromNeutralAFBenchmark,
+                    # which routes through liabilityBrierExact and so needs a
+                    # bivariate-normal orthant this cluster has no mirror for;
+                    # it is deliberately absent from the members below rather
+                    # than listed against a mirror that does not exist. They sit
+                    # HERE and not in
                     # liability_threshold_metrics because their empirical
                     # content is the benchmark R^2 they are composed with, and
                     # that is the quantity this family has no simulator for.

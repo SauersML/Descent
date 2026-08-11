@@ -1368,6 +1368,35 @@ theorem targetLiabilityAUCFromNeutralAFBenchmark_eq (V_A V_E fstTarget K : ℝ) 
     targetLiabilityAUCFromNeutralAFBenchmark V_A V_E fstTarget K =
       liabilityThresholdAUCFromExplainedR2 (presentDayR2 V_A V_E fstTarget) K := rfl
 
+/-- **Benchmark target Brier risk for a DICHOTOMISED trait**, the Brier twin of
+`targetLiabilityAUCFromNeutralAFBenchmark`.
+
+The explained fraction supplied is `targetR2FromNeutralAFBenchmark`, which is a
+LIABILITY-scale fraction, and a prevalence argument announces a dichotomised outcome, so the
+chart consuming the pair is the liability-threshold one.
+`targetBrierFromNeutralAFBenchmark` is the same two arguments through
+`PopGen.TransportedMetrics.calibratedBrier`, the OBSERVED-scale chart: correct for a
+continuous outcome and measured wrong on a truncated liability tail, at the sizes tabulated
+on `PopGen.TransportedMetrics.calibratedBrierFromVariances`. The two bodies differ in
+nothing but which chart they call, which is the whole of the defect this one repairs.
+
+    Empirical status: UNTESTED, inherited.
+    `PopGen.TransportedMetrics.liabilityBrierExact` carries the head and the queued battery;
+    this body adds no arithmetic, it only chooses which prevalence and which explained
+    fraction to hand it.
+
+    argument_source: model, inherited. -/
+noncomputable def targetLiabilityBrierFromNeutralAFBenchmark
+    (π V_A V_E fstTarget : ℝ) : ℝ :=
+  PopGen.TransportedMetrics.liabilityBrierExact π
+    (targetR2FromNeutralAFBenchmark V_A V_E fstTarget)
+
+/-- The same quantity written through the explicit benchmark `R²`, so the coordinate and the
+chart it is read on cannot drift apart. -/
+theorem targetLiabilityBrierFromNeutralAFBenchmark_eq (π V_A V_E fstTarget : ℝ) :
+    targetLiabilityBrierFromNeutralAFBenchmark π V_A V_E fstTarget =
+      PopGen.TransportedMetrics.liabilityBrierExact π (presentDayR2 V_A V_E fstTarget) := rfl
+
 /-- **Bundled deployed metrics for a DICHOTOMISED trait**, with the prevalence used for the
 AUC as well as for the Brier risk.
 
@@ -1376,46 +1405,56 @@ it replaces. The old record simply declined to use it for the discrimination met
 is how a `-0.068` AUC bias survived beside a Brier risk computed correctly at the same
 prevalence.
 
-    Empirical status: **FALSIFIED on the `brier` coordinate, for the very trait
-    this record is built for**; the other two coordinates inherit validations.
+    Empirical status: MIXED -- three coordinates, three verdicts, and a single head would
+    be wrong for two of them.
 
       r2     `targetR2FromNeutralAFBenchmark`, which is `presentDayR2`; that runs
-             through `presentDayPGSVariance`, validated at worst 0.94 sems on
+             through `presentDayPGSVariance`, VALIDATED at worst 0.94 sems on
              the heterozygosity-retention reading of `fst`.
-      auc    `targetLiabilityAUCFromNeutralAFBenchmark`, validated through
+      auc    `targetLiabilityAUCFromNeutralAFBenchmark`, VALIDATED through
              `liabilityThresholdAUCFromExplainedR2` at pooled RMSE 0.0121
              against a 0.0120 noise floor, with prevalence swept. The whole
              point of this record is that this field spends the `π` it was given.
-      brier  `targetBrierFromNeutralAFBenchmark`, which is
-             `DGP.TransportedMetrics.calibratedBrier` at the benchmark `R²`.
-             That chart is recorded FALSIFIED under the liability-threshold
-             model and exact only for a Gaussian outcome.
+      brier  `targetLiabilityBrierFromNeutralAFBenchmark`, UNTESTED: it is
+             `PopGen.TransportedMetrics.liabilityBrierExact` at the benchmark `R²`, and
+             that body has a form and no battery yet.
 
-    So the defect this record was written to repair -- one field treating the
-    trait as binary and another as continuous -- has been repaired on the AUC
-    side and NOT on the Brier side. The record is now consistent in taking `π`
-    everywhere and inconsistent in what it does with it: the AUC uses the
-    liability-threshold chart and the Brier still uses the Gaussian one. Naming
-    that here rather than leaving the marker undeclared is the point of writing
-    the status per-field.
+    So the defect this record was written to repair -- one field treating the trait as
+    binary and another as continuous -- is repaired on both readout coordinates: the AUC
+    and the Brier risk are now the liability-threshold charts, and the `π` this record takes
+    is spent on both of them. The Brier coordinate previously read
+    `targetBrierFromNeutralAFBenchmark`, the Gaussian chart, which is what made this record
+    FALSIFIED on that field; the exchange is the same observable on the scale its arguments
+    are actually on, and it trades a measured error for an unmeasured body.
 
     argument_source: model, inherited. -/
 noncomputable def neutralAFBenchmarkLiabilityMetricProfile
     (π V_A V_E fstTarget : ℝ) : PopGen.TransportedMetrics.Profile :=
   { r2 := targetR2FromNeutralAFBenchmark V_A V_E fstTarget
   , auc := targetLiabilityAUCFromNeutralAFBenchmark V_A V_E fstTarget π
-  , brier := targetBrierFromNeutralAFBenchmark π V_A V_E fstTarget }
+  , brier := targetLiabilityBrierFromNeutralAFBenchmark π V_A V_E fstTarget }
 
-/-- The two profiles agree on `R²` and Brier and differ **only** in the AUC field, which
-localises the defect to one coordinate rather than leaving it diffuse. -/
-theorem liabilityProfile_differs_only_in_auc (π V_A V_E fstTarget : ℝ) :
+/-- **The dichotomised profile shares the continuous one's `R²` coordinate and reads both
+readouts off the liability-threshold charts.**
+
+The first conjunct relates the two records; the other two name what the dichotomised record
+puts in the coordinates the continuous one fills from the Gaussian charts, which
+`neutralAFBenchmarkMetricProfile_eq` states on the other side. Two coordinates move under
+dichotomisation, not one -- the AUC has moved since this family was written and the Brier
+coordinate moved with the rebinding onto `PopGen.TransportedMetrics.liabilityBrierExact`. -/
+theorem liabilityProfile_differs_in_auc_and_brier (π V_A V_E fstTarget : ℝ) :
     (neutralAFBenchmarkLiabilityMetricProfile π V_A V_E fstTarget).r2 =
-      targetR2FromNeutralAFBenchmark V_A V_E fstTarget ∧
-    (neutralAFBenchmarkLiabilityMetricProfile π V_A V_E fstTarget).brier =
-      targetBrierFromNeutralAFBenchmark π V_A V_E fstTarget ∧
+      (neutralAFBenchmarkMetricProfile π V_A V_E fstTarget).r2 ∧
     (neutralAFBenchmarkLiabilityMetricProfile π V_A V_E fstTarget).auc =
-      liabilityThresholdAUCFromExplainedR2 (presentDayR2 V_A V_E fstTarget) π :=
-  ⟨rfl, rfl, rfl⟩
+      liabilityThresholdAUCFromExplainedR2 (presentDayR2 V_A V_E fstTarget) π ∧
+    (neutralAFBenchmarkLiabilityMetricProfile π V_A V_E fstTarget).brier =
+      PopGen.TransportedMetrics.liabilityBrierExact π (presentDayR2 V_A V_E fstTarget) := by
+  refine ⟨?_, rfl, rfl⟩
+  -- `rw` closes a goal only by the `rfl` it tries at reducible transparency, and the
+  -- rewritten right-hand side is a PROJECTION OF A STRUCTURE LITERAL, whose reduction is
+  -- iota rather than delta. The explicit `rfl` is what performs it.
+  rw [neutralAFBenchmarkMetricProfile_eq]
+  rfl
 
 /-- **The `R²` and variance readings of the equal-variance Gaussian chart agree.**
 
@@ -1610,27 +1649,26 @@ of `targetMetricProfileFromSourceWeights`, and it lets downstream calibration
 theory compare source and target Brier on the same target-population
 prevalence scale.
 
-    Empirical status: **FALSIFIED on the `brier` coordinate under the
-    liability-threshold reading**; the record carries one verdict per field and
-    they are not the same verdict.
+    Empirical status: MIXED -- the record carries one verdict per field and they are not
+    the same verdict.
 
-      r2     `r2FromSourceWeights` at the source, validated at 0.06 sems in
+      r2     `r2FromSourceWeights` at the source, VALIDATED at 0.06 sems in
              `simcov/battery_transport.py`.
       auc    `equalVarianceGaussianAUCFromSourceWeights`, which has no
              measurement; its own docstring is explicit that it is the
              EQUAL-VARIANCE Gaussian chart and not the liability-threshold one,
              so at a prevalence far from one half it is the wrong chart for a
              dichotomised outcome and it takes no `π` to be right with.
-      brier  `sourceCalibratedBrierFromSourceWeightsAtPrevalence`, which
-             inherits the falsification recorded at
-             `DGP.TransportedMetrics.calibratedBrierFromVariances`.
+      brier  `sourceCalibratedBrierFromSourceWeightsAtPrevalence`, UNTESTED,
+             inherited from `PopGen.TransportedMetrics.liabilityBrierExact`.
 
     THE INTERNAL INCONSISTENCY IS THE FINDING, and it is the same one
-    `neutralAFBenchmarkMetricProfile` is documented for: this record takes a
-    prevalence `π`, spends it on the Brier coordinate, and computes the AUC with a chart that has
-    nowhere to put one. So a profile assembled to compare
-    source and target Brier "on the same prevalence scale" is binary in one
-    field and continuous in another.
+    `neutralAFBenchmarkMetricProfile` is documented for -- but it now sits on the OTHER
+    side of the record. This record takes a prevalence `π`, spends it on a Brier coordinate
+    that is on the liability-threshold scale its arguments are actually on, and computes the
+    AUC with a chart that has nowhere to put one. So a profile assembled to compare source
+    and target Brier "on the same prevalence scale" is still binary in one field and
+    continuous in another; what changed is which field is which.
 
     argument_source: model, inherited. -/
 noncomputable def sourceMetricProfileFromSourceWeightsAtPrevalence {p q : ℕ}
@@ -2240,18 +2278,21 @@ theorem targetLiabilityAUCFromNeutralAFBenchmark_eq_of_params
       liabilityThresholdAUCFromExplainedR2 (presentDayR2 p.V_A V_E p.fstEquilibrium) K :=
   targetLiabilityAUCFromNeutralAFBenchmark_eq p.V_A V_E p.fstEquilibrium K
 
-/-- **Dichotomising a demography's trait moves the AUC coordinate and nothing else.**  At
-this record's own differentiation the liability profile agrees with the benchmark profile on
-`R²` and on Brier risk, and differs on the discrimination coordinate alone -- which is where
-the misidentification this module records would land. -/
-theorem liabilityProfile_differs_only_in_auc_of_params (p : PopGenParameters) (π V_E : ℝ) :
+/-- **Dichotomising a demography's trait moves both readout coordinates and leaves `R²`
+alone.**  At this record's own differentiation the liability profile agrees with the
+benchmark profile on `R²`, and reads discrimination and risk off the liability-threshold
+charts rather than the Gaussian ones -- two coordinates, which is where the
+misidentification this module records would land. -/
+theorem liabilityProfile_differs_in_auc_and_brier_of_params
+    (p : PopGenParameters) (π V_E : ℝ) :
     (neutralAFBenchmarkLiabilityMetricProfile π p.V_A V_E p.fstEquilibrium).r2 =
-      targetR2FromNeutralAFBenchmark p.V_A V_E p.fstEquilibrium ∧
-    (neutralAFBenchmarkLiabilityMetricProfile π p.V_A V_E p.fstEquilibrium).brier =
-      targetBrierFromNeutralAFBenchmark π p.V_A V_E p.fstEquilibrium ∧
+      (neutralAFBenchmarkMetricProfile π p.V_A V_E p.fstEquilibrium).r2 ∧
     (neutralAFBenchmarkLiabilityMetricProfile π p.V_A V_E p.fstEquilibrium).auc =
-      liabilityThresholdAUCFromExplainedR2 (presentDayR2 p.V_A V_E p.fstEquilibrium) π :=
-  liabilityProfile_differs_only_in_auc π p.V_A V_E p.fstEquilibrium
+      liabilityThresholdAUCFromExplainedR2 (presentDayR2 p.V_A V_E p.fstEquilibrium) π ∧
+    (neutralAFBenchmarkLiabilityMetricProfile π p.V_A V_E p.fstEquilibrium).brier =
+      PopGen.TransportedMetrics.liabilityBrierExact π
+        (presentDayR2 p.V_A V_E p.fstEquilibrium) :=
+  liabilityProfile_differs_in_auc_and_brier π p.V_A V_E p.fstEquilibrium
 
 /-- **A connected demography's equal-variance AUC is its present-day AUC.**  The chart read
 at the `R²` this record deploys and the closed form in the record's own coordinates are one

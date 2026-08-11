@@ -1102,6 +1102,12 @@
       "role": "consumer",
       "note": "No reading is declared on the definition and none is derivable from its callees."
     },
+    "Descent/Portability/PortabilityDrift/PresentDayMoments.lean::targetLiabilityBrierFromNeutralAFBenchmark": {
+      "quantity": "fst",
+      "convention": "undetermined",
+      "role": "consumer",
+      "note": "No reading is declared on the definition and none is derivable from its callees; it is the Brier twin of targetLiabilityAUCFromNeutralAFBenchmark and carries that entry's reading."
+    },
     "Descent/Portability/PortabilityDrift/PresentDayMoments.lean::targetR2FromNeutralAFBenchmark": {
       "quantity": "fst",
       "convention": "undetermined",
