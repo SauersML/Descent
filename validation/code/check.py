@@ -6078,6 +6078,43 @@ def convention_body(src: str, name: str) -> str | None:
 CONVENTION_BINDER = re.compile(r"\(([^()]*?):")
 
 
+def convention_slot_names(src: str, name: str) -> list:
+    """The EXPLICIT binder names of `def name`, in the order a call site supplies them.
+
+    Positional, because a literal at a call site is identified by its position and
+    by nothing else.  Implicit `{}` and instance `[]` binders are skipped for the
+    same reason -- nobody writes them at a call site, so they do not consume a
+    position.  Stops at the first depth-zero `:`, which is where the binders end
+    and the result type begins.
+    """
+    m = re.search(r"^(?:noncomputable\s+)?def\s+" + re.escape(name) + r"(?![A-Za-z_0-9'])",
+                  src, re.M)
+    if not m:
+        return []
+    tail = src[m.end():]
+    cut = tail.find(":=")
+    sig = tail[:cut] if cut >= 0 else tail[:400]
+    names: list = []
+    depth, start = 0, None
+    for i, ch in enumerate(sig):
+        if ch in "([{":
+            if depth == 0:
+                start = i
+            depth += 1
+        elif ch in ")]}":
+            depth -= 1
+            if depth == 0 and start is not None:
+                group = sig[start:i + 1]
+                if group.startswith("("):
+                    head, sep, _ = group[1:-1].partition(":")
+                    if sep:
+                        names.extend(head.split())
+                start = None
+        elif ch == ":" and depth == 0:
+            break
+    return names
+
+
 def convention_corpus() -> tuple[dict, dict, set, dict]:
     """(defs by `module::name`, source by module, theorem short names, binder words).
 
@@ -6166,6 +6203,7 @@ def run_conventions() -> int:
                 if not k.startswith("$")}
 
     stale, unledgered, unbridged, constants, malformed, statuses = [], [], [], [], [], []
+    literals: list = []
     multistatus = []
 
     # MULTIPLICITY.  At most ONE `Empirical status:` marker per docstring.
@@ -6324,6 +6362,60 @@ def run_conventions() -> int:
                         f"is stated nowhere a machine can read")
                 break
 
+    # LITERAL IN A LEDGERED SLOT.  A numeric literal handed to a parameter the
+    # ledger calls a modelling quantity is a free parameter wearing a call site's
+    # clothes: the caller fixes a number where the model owes an input, and no
+    # signature anywhere records that the number was chosen rather than measured.
+    # DEF BODIES ONLY -- a literal in a theorem STATEMENT is an instance being
+    # named, which is what a theorem about a specific case is for.
+    #
+    # WHY THE LEDGER DEFINES "SYSTEM INPUT" HERE, AND THIS GUARD DOES NOT DEFINE
+    # ITS OWN.  The hand audit that motivated this lint measured its threshold
+    # against a method document that is no longer in the repository, so the count
+    # it reported cannot be reproduced: a naive reading -- any literal into any
+    # corpus definition -- reports 78 sites, and nearly all of them are matrix
+    # indices, moment orders and `Phi 0`.  `quantities[*].words` is the corpus's
+    # own machine-readable answer to the same question, it is maintained by
+    # whoever maintains the conventions, and it extends this guard for free on the
+    # day a quantity is added.  A second, private definition of "system input"
+    # would be exactly the unauditable source of truth the ledger exists to prevent.
+    #
+    # WHAT IT THEREFORE DOES NOT SEE, said here so a green run is not read as more
+    # than it is: `Ne` is NOT a ledgered quantity, so an effective-size literal
+    # passes this screen.  Making it visible means adding `Ne` to `quantities`,
+    # which under `argument_scope: complete` obliges a ledger entry for every
+    # Ne-taking definition in the corpus.  That is a migration-sized obligation and
+    # it is deferred to the convention migration deliberately, not overlooked.
+    LITERAL_ARG = re.compile(r"^\(?\s*[0-9]+(?:\.[0-9]+)?"
+                             r"(?:\s*/\s*[0-9]+(?:\.[0-9]+)?)?\s*\)?$")
+    APPLICATION = re.compile(r"\b([A-Za-z_][A-Za-z_0-9']*)((?:\s+(?:\([^()]*\)|[^\s()]+))+)")
+    quantity_of_word = {w: q for q, spec in quantities.items()
+                        for w in spec.get("words", [])}
+    slots = {name: convention_slot_names(sources[key.partition("::")[0]], name)
+             for key, name in defs.items()}
+    for key, name in sorted(defs.items()):
+        body = convention_body(sources[key.partition("::")[0]], name)
+        if not body:
+            continue
+        for am in APPLICATION.finditer(body):
+            callee, argtext = am.group(1), am.group(2)
+            if callee == name or not slots.get(callee):
+                continue
+            args = re.findall(r"\([^()]*\)|[^\s()]+", argtext)
+            for pos, arg in enumerate(args):
+                if pos >= len(slots[callee]):
+                    break
+                if not LITERAL_ARG.match(arg.strip()):
+                    continue
+                slot = slots[callee][pos]
+                hit = sorted(convention_words(slot) & set(quantity_of_word))
+                if hit:
+                    literals.append(
+                        f"{key}: hands {arg.strip()} to `{callee}` in its "
+                        f"`{quantity_of_word[hit[0]]}` slot `{slot}`; a modelling "
+                        f"quantity fixed at a call site is a free parameter that no "
+                        f"signature records and no measurement reached")
+
     # UNBRIDGED.  `inherited` commits to no convention and is excluded: a body
     # that returns whatever it was handed cannot disagree with anything.
     by_module: dict = {}
@@ -6382,6 +6474,11 @@ def run_conventions() -> int:
         ("modules mixing incompatible conventions with nothing relating them", unbridged,
          "prove a bridge theorem and name it in `bridges`, or move one of the "
          "declarations"),
+        ("numeric literals handed to a ledgered quantity's slot", literals,
+         "make the number an argument of the CALLER, so the model owes it rather "
+         "than the call site choosing it; if this call site really is where the "
+         "quantity is fixed, say so in the ledger entry, because a fixed input is "
+         "a modelling decision and not an implementation detail"),
         ("ledgered constants the body no longer carries", constants,
          "if the body is right the ledger is stale and the SOURCE should be "
          "re-read before updating it; that re-reading is the point"),

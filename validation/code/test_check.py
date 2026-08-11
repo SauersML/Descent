@@ -1272,6 +1272,17 @@ theorem clean_rate_at_one_second : cleanRate 1 = 1 := by
          lean=CONVENTION_LEAN.replace("Empirical status: UNTESTED",
                                       "Empirical status: PROBABLY FINE")),
      "is not in the vocabulary"),
+    # A modelling quantity fixed at a call site. The two traps below are the
+    # positions this must NOT reach: a literal in a slot the ledger says nothing
+    # about, and a literal in a THEOREM, where naming a case is the point.
+    ("conventions", "a numeric literal handed to a ledgered quantity's slot",
+     convention_corpus_files(lean=CONVENTION_LEAN.replace("end Descent", """
+/-- Fixes the divergence at a number nobody supplied. -/
+noncomputable def deployedAtOneSeventh (v : ℝ) : ℝ :=
+  portabilityFromDivergence v (1 / 7)
+
+end Descent""")),
+     "in its `fst` slot"),
 ]
 
 # Duplication traps: mathematics that LOOKS repeated to a careless screen and is
@@ -1630,6 +1641,27 @@ end Descent
              "Empirical status: UNTESTED",
              "Empirical status: VALIDATED against measured 0.53 and derived 0.51")),
      "status head"),
+    # The literal screen's two boundaries. A literal in a slot the ledger says
+    # nothing about is an index, a moment order or a chart argument -- a naive
+    # reading of "a literal in an argument slot" reports 78 of those in the real
+    # corpus and nearly none is a defect. A literal in a THEOREM is a case being
+    # named, which is what a theorem about a specific value is for; only a
+    # definition can silently carry a modelling input nobody supplied.
+    ("conventions", "a literal in a slot no ledgered quantity names",
+     convention_corpus_files(lean=CONVENTION_LEAN.replace("end Descent", """
+/-- The literal lands in `v`, which the ledger says nothing about. -/
+noncomputable def deployedAtUnitSignal (f : ℝ) : ℝ :=
+  portabilityFromDivergence 1 f
+
+end Descent""")),
+     "slot"),
+    ("conventions", "a literal in a ledgered slot inside a THEOREM statement",
+     convention_corpus_files(lean=CONVENTION_LEAN.replace("end Descent", """
+theorem portability_at_one_seventh (v : ℝ) :
+    portabilityFromDivergence v (1 / 7) = v * (1 - 1 / 7) := rfl
+
+end Descent""")),
+     "slot"),
     ("conventions", "an `inherited` entry beside a committed one",
      convention_corpus_files(
          entries={k: v for k, v in CONVENTION_ENTRIES.items()
@@ -1845,12 +1877,13 @@ def main() -> int:
           f"by name and by ARGUMENT, staleness in an entry and in a bridge, "
           f"contradiction, a drifted constant in each table, a convention the "
           f"ledger never defines, one definition recorded twice, a record "
-          f"pinning nothing, an absent ledger, and a status head both "
-          f"miscased and unknown")
+          f"pinning nothing, an absent ledger, a status head both "
+          f"miscased and unknown, and a modelling quantity fixed at a call site")
     print(f"  conventions: {conv_neg} traps accepted -- a bridged module, an "
           f"`inherited` neighbour, a name that merely CONTAINS the quantity's "
-          f"letters, a status term carrying its own qualifier, and a vocabulary "
-          f"word used as ordinary prose inside an evidence table")
+          f"letters, a status term carrying its own qualifier, a vocabulary "
+          f"word used as ordinary prose inside an evidence table, a literal in "
+          f"a slot no quantity names, and a literal inside a THEOREM")
     print("  wiring --json keys asserted by name; --list names all nine guards")
     print("  mathlib: a planted name collision reported and named, a corpus "
           "declaring only its own names accepted, and an absent Mathlib "
