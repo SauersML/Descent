@@ -7,6 +7,9 @@ import PartialSymmetry.FiniteGroupoidBisection
 import PartialSymmetry.FiniteGroupoidCounting
 import PartialSymmetry.FiniteGroupoidFunctor
 import PartialSymmetry.FiniteGroupoidPresentation
+import PartialSymmetry.FiniteModel
+import PartialSymmetry.FinitePartialBijection
+import PartialSymmetry.PermExtension
 import PartialSymmetry.Wreath
 
 /-!
