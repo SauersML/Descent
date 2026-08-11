@@ -1,9 +1,11 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Pangenome.FiniteGroupoidFunctor
-import Descent.Pangenome.PartialBijectionSandwich
+import PartialSymmetry.FiniteGroupoidFunctor
+import PartialSymmetry.PartialBijectionSandwich
+import Descent.Layer
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
+import Mathlib.Data.Real.Basic
 
 assert_below Descent.Coalescent Descent.PopGen Descent.Spectral Descent.Blindness
 assert_below Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
@@ -35,6 +37,7 @@ the relation gives faithfulness.
 namespace Descent.Pangenome
 
 open CategoryTheory
+open PartialSymmetry
 
 universe u
 

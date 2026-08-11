@@ -10,6 +10,7 @@ import PartialSymmetry.FiniteGroupoidPresentation
 import PartialSymmetry.FiniteModel
 import PartialSymmetry.FinitePartialBijection
 import PartialSymmetry.PermExtension
+import PartialSymmetry.PartialBijectionSandwich
 import PartialSymmetry.Wreath
 
 /-!

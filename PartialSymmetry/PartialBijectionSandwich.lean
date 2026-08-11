@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Adapted from SauersML/nonsofic_existence,
 `NonsoficGroupsExist/Matching/PartialBijectionSandwich.lean`.
 -/
-import Descent.Pangenome.FinitePartialBijection
+import PartialSymmetry.FinitePartialBijection
 
 /-!
 # Transporting partial arrows through co-large partial bridges
@@ -22,7 +22,7 @@ bridges, and it respects composition up to the missing mass of the bridges
 and the two arrows.  Every error below is an explicit finite cardinality.
 -/
 
-namespace Descent.Pangenome
+namespace PartialSymmetry
 namespace FinitePartialBijection
 
 variable {X X' Y Y' Z Z' : FiniteModel}
@@ -158,4 +158,4 @@ theorem twoSidedDisagreement_sandwich_roundtrip_le
   omega
 
 end FinitePartialBijection
-end Descent.Pangenome
+end PartialSymmetry
