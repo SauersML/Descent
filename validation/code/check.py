@@ -393,8 +393,8 @@ def run_style() -> int:
 #
 # 2. Convention drift. Every numeric literal 2 or 4 used as a multiplier inside
 #    a definition is a restatement of a ploidy or coalescent-scaling convention.
-#    The count is pinned; adding new inline restatements without relating them
-#    to `ploidy` in Conventions.lean fails, so the number can only go down.
+#    Adding an inline restatement without relating it to `ploidy` in
+#    Conventions.lean fails.
 #
 # 3. Equilibria with no dynamic. A definition named for a rest point or a limit
 #    must be derived as the fixed point of a process defined in the same file,
@@ -1252,9 +1252,8 @@ def run_identifications() -> int:
     #     that one lies below the other. Guard 3c screens same-BODY duplicates;
     #     a fork has different bodies by construction and walks straight through.
     #
-    #     ENFORCED, at zero, like everything else here -- the "advisory until
-    #     the count is measured once and pinned" this used to promise was never
-    #     what the code did, which appends to `bad` below.
+    #     ENFORCED like everything else here: the code appends every finding to
+    #     `bad` below.
     OBSERVABLE_GROUPS = [
         ("F_ST", re.compile(r"fst|gst", re.I)),
         ("heterozygosity", re.compile(r"^het|heterozyg", re.I)),
@@ -2511,7 +2510,7 @@ def run_identifications() -> int:
     #     docstrings that already admitted the content was trivial, which
     #     reached nobody reading a theorem list.
     #
-    #     Every finding fails; no survivor is grandfathered.
+    #     Every finding fails; there are no exceptions.
     DOMAIN_WORD = re.compile(
         # `variant` must not fire inside `invariant`: an invariant measure, an
         # invariant subspace and an invariant average are mathematics, not genetics,
@@ -5471,8 +5470,7 @@ def run_duplication() -> int:
 # is a FAILURE with the path it looked for, not a pass.  Point it elsewhere
 # with DESCENT_MATHLIB.
 
-# Nothing is grandfathered: the four known collisions were removed before the
-# guard landed.
+# The four known collisions were removed before the guard landed.
 
 MATHLIB_DECL = re.compile(
     r"^(?:@\[[^\]]*\][ \t]*)?"
@@ -7114,7 +7112,7 @@ def _shape_is_toc(mod: str, graph, decls) -> bool:
     directory, and its edges therefore carry no dependency: they are what `lake
     build` needs to reach the tree, not what a proof rests on.  Counting them
     breaks every measurement below in the same way.  Depth gains rungs no proof
-    rests on.  The weak-component count is pinned at one forever, because a head is
+    rests on. The weak-component count is always one, because a head is
     adjacent to every module in its directory whether or not anything in that
     directory is connected to anything else -- `Pangenome`'s two modules are joined
     to the corpus by `Descent/Pangenome.lean` and by nothing else, and with heads

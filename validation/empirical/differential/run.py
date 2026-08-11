@@ -428,8 +428,7 @@ def main() -> int:
     # them, which is zero both when the two translators agree everywhere and
     # when there was nothing to translate: with the extraction table emptied,
     # the cross-check compares 0 definitions and the totality audit visits 0
-    # points, and neither said so. Floors at "did anything at all", not budgets
-    # pinned to today's counts.
+    # points, and neither said so. Each instrument must do some work.
     empty_instruments = []
     if not cv["n_definitions_compared"]:
         empty_instruments.append(

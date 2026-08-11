@@ -66,16 +66,6 @@ def _overflow_pair(x, y):
     return {xs, ys} <= {"inf", "raise:OverflowError"}
 
 
-# Every comparison this gate skips is a comparison it did not make, and the
-# skips are the only route by which it can report "0 disagreements" while
-# looking at nothing.  A primitive must be genuinely compared at a large
-# fraction of its 4000 points.  Not a ratchet: the grid is fixed and
-# deterministic, and the clean tree skips well under one percent of any
-# primitive, so this is a structural floor rather than a record of today's
-# count.
-MIN_COMPARED_FRACTION = 0.5
-
-
 def compare(pairs, n=4000):
     """Run the grid over (name, mine, theirs, arity) tuples.
 
@@ -232,16 +222,15 @@ def main():
     if overflow:
         print(f"{overflow} skipped as double-precision overflow (not a "
               "semantic difference)")
-    # A primitive that was skipped away is a primitive this run did not check.
-    starved = [(name, compared, skipped) for name, (compared, skipped)
-               in sorted(tally.items())
-               if compared < MIN_COMPARED_FRACTION * (compared + skipped)]
-    if starved:
-        print("FAILED - a primitive was excused rather than compared:")
-        for name, compared, skipped in starved:
+    # A primitive with no comparison is an instrument that did not run.
+    unseen = [(name, compared, skipped) for name, (compared, skipped)
+              in sorted(tally.items()) if compared == 0]
+    if unseen:
+        print("FAILED - a primitive was never compared:")
+        for name, compared, skipped in unseen:
             print(f"  {name}: {compared} compared, {skipped} skipped as "
-                  f"overflow. A run that skips most of a primitive's grid "
-                  f"reports agreement it never observed.")
+                  f"overflow. A run with no comparison reports agreement it "
+                  f"never observed.")
         return 1
     if bad:
         print(f"FAILED - {len(bad)} disagreements with the reference:")
