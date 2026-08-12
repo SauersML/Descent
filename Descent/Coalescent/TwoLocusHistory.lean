@@ -624,6 +624,27 @@ theorem lowOrderLDSplitTransform_mulVec {D : ℕ} (parent child : Fin D)
   | some row =>
       simp [Matrix.mulVec, dotProduct, lowOrderLDSplitTransform]
 
+/-- The instantaneous split map on the full joint state commutes exactly with selection of
+the closed `H` subsystem.  The affine coordinate is fixed at one on reachable states, while
+every deme label in `H(i,j)` is pulled back through the same child-to-parent relabeling as the
+one-locus pair-divergence state. -/
+theorem lowOrderLDHProjection_split {D : ℕ} (parent child : Fin D)
+    (state : AffineLowOrderLDCoordinate D → ℝ) (hconstant : state none = 1) :
+    (lowOrderLDHProjection D).mulVec
+        ((lowOrderLDSplitTransform parent child).mulVec state) =
+      splitPairDivergenceState parent child
+        ((lowOrderLDHProjection D).mulVec state) := by
+  rw [lowOrderLDSplitTransform_mulVec, lowOrderLDHProjection_mulVec,
+    lowOrderLDHProjection_mulVec]
+  funext coordinate
+  cases coordinate with
+  | none =>
+      simp [lowOrderLDHProjectionLinearMap, splitPairDivergenceState, hconstant]
+  | some pair =>
+      rcases pair with ⟨first, second⟩
+      simp [lowOrderLDHProjectionLinearMap, splitPairDivergenceState,
+        LowOrderLDCoordinate.mergeSplit, mergeSplitDemeLabel]
+
 /-- Concrete split instruction for the arbitrary-deme history compiler. -/
 def LowOrderLDInstruction.split {D : ℕ} (parent child : Fin D) :
     LowOrderLDInstruction D :=

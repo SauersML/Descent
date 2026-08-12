@@ -1712,6 +1712,137 @@ theorem manyDemePairDivergenceProjection_propagator_intertwines {D : ℕ}
     (manyDemePairDivergenceProjection_generator_intertwines epoch.rates hsymmetric)
     epoch.duration
 
+/-- Pull one deme label back across a split. -/
+def mergeSplitDemeLabel {D : ℕ} (parent child label : Fin D) : Fin D :=
+  if label = child then parent else label
+
+/-- The induced split action on the affine ordered-pair divergence subsystem. -/
+def splitPairDivergenceState {D : ℕ} (parent child : Fin D)
+    (state : AffinePairDivergenceCoordinate D → ℝ) :
+    AffinePairDivergenceCoordinate D → ℝ
+  | none => 1
+  | some (first, second) =>
+      state (some (mergeSplitDemeLabel parent child first,
+        mergeSplitDemeLabel parent child second))
+
+private theorem mergeSplitExponent_zero {D : ℕ} (parent child : Fin D) :
+    mergeSplitExponent parent child (fun _ ↦ 0) = fun _ ↦ 0 := by
+  funext d
+  simp [mergeSplitExponent]
+
+private theorem mergeSplitExponent_oneDeme {D : ℕ} (parent child deme : Fin D)
+    (hne : parent ≠ child) :
+    mergeSplitExponent parent child (oneDemeExponent deme 1) =
+      oneDemeExponent (mergeSplitDemeLabel parent child deme) 1 := by
+  funext d
+  have hreverse : child ≠ parent := fun h ↦ hne h.symm
+  by_cases hdParent : d = parent
+  · subst d
+    by_cases hdemeParent : deme = parent
+    · subst deme
+      simp [mergeSplitExponent, oneDemeExponent, mergeSplitDemeLabel, hne]
+    · by_cases hdemeChild : deme = child
+      · subst deme
+        simp [mergeSplitExponent, oneDemeExponent, mergeSplitDemeLabel, hne]
+      · have hparentDeme : parent ≠ deme := fun h ↦ hdemeParent h.symm
+        have hchildDeme : child ≠ deme := fun h ↦ hdemeChild h.symm
+        simp [mergeSplitExponent, oneDemeExponent, mergeSplitDemeLabel, hne, hreverse,
+          hdemeChild, hparentDeme, hchildDeme]
+  · by_cases hdChild : d = child
+    · subst d
+      by_cases hdemeChild : deme = child
+      · subst deme
+        simp [mergeSplitExponent, oneDemeExponent, mergeSplitDemeLabel, hne]
+      · have hchildDeme : child ≠ deme := fun h ↦ hdemeChild h.symm
+        simp [mergeSplitExponent, oneDemeExponent, mergeSplitDemeLabel, hreverse,
+          hdemeChild, hchildDeme]
+    · by_cases hdemeChild : deme = child
+      · subst deme
+        simp [mergeSplitExponent, oneDemeExponent, mergeSplitDemeLabel, hne,
+          hdParent, hdChild]
+      · simp [mergeSplitExponent, oneDemeExponent, mergeSplitDemeLabel, hdParent,
+          hdChild, hdemeChild]
+
+private theorem pairExponent_eq_oneDeme_add {D : ℕ} (first second : Fin D) :
+    pairExponent first second 1 1 =
+      oneDemeExponent first 1 + oneDemeExponent second 1 := by
+  funext d
+  by_cases hsame : first = second
+  · subst second
+    by_cases hd : d = first <;> simp [pairExponent, oneDemeExponent, hd]
+  · by_cases hdFirst : d = first <;> by_cases hdSecond : d = second <;>
+      have hreverse : second ≠ first := fun h ↦ hsame h.symm
+      simp [pairExponent, oneDemeExponent, hsame, hreverse, hdFirst, hdSecond]
+
+private theorem mergeSplitExponent_add {D : ℕ} (parent child : Fin D)
+    (hne : parent ≠ child) (left right : Fin D → ℕ) :
+    mergeSplitExponent parent child (left + right) =
+      mergeSplitExponent parent child left + mergeSplitExponent parent child right := by
+  funext d
+  have hreverse : child ≠ parent := fun h ↦ hne h.symm
+  by_cases hdParent : d = parent
+  · subst d
+    simp [mergeSplitExponent, hne]
+  · by_cases hdChild : d = child
+    · subst d
+      simp [mergeSplitExponent, hreverse]
+    · simp [mergeSplitExponent, hdParent, hdChild]
+
+private theorem mergeSplitExponent_pair {D : ℕ} (parent child first second : Fin D)
+    (hne : parent ≠ child) :
+    mergeSplitExponent parent child (pairExponent first second 1 1) =
+      pairExponent (mergeSplitDemeLabel parent child first)
+        (mergeSplitDemeLabel parent child second) 1 1 := by
+  rw [pairExponent_eq_oneDeme_add, mergeSplitExponent_add parent child hne,
+    mergeSplitExponent_oneDeme parent child first hne,
+    mergeSplitExponent_oneDeme parent child second hne,
+    pairExponent_eq_oneDeme_add]
+
+/-- The exact marginal split transform commutes with the pair-divergence projection on the
+reachable affine subspace: the explicit constant is one and the padded degree-zero
+coordinate is zero. -/
+theorem manyDemePairDivergenceProjection_split {D : ℕ} (parent child : Fin D)
+    (hne : parent ≠ child)
+    (state : AffineManyDemeMomentCoordinate D 2 → ℝ)
+    (hzero : manyDemeMomentVectorTable 2 (fun coordinate ↦ state (some coordinate))
+      (fun _ ↦ 0) = 0) :
+    (manyDemePairDivergenceProjection D).mulVec
+        (splitManyDemeMomentState parent child state) =
+      splitPairDivergenceState parent child
+        ((manyDemePairDivergenceProjection D).mulVec state) := by
+  rw [manyDemePairDivergenceProjection_mulVec,
+    manyDemePairDivergenceProjection_mulVec]
+  funext coordinate
+  cases coordinate with
+  | none =>
+      simp only [splitPairDivergenceState, splitManyDemeMomentState]
+      rw [manyDemeMomentVectorTable]
+      simp only [Nat.reduceAdd, Nat.reduceLT, forall_const, ↓reduceDIte]
+      rw [mergeSplitExponent_zero parent child]
+      rw [dif_pos (by intro; trivial), hzero]
+      norm_num
+  | some pair =>
+      rcases pair with ⟨first, second⟩
+      simp only [splitPairDivergenceState, momentPairDivergence]
+      have hfirst : ∀ d, oneDemeExponent first 1 d < 3 := by
+        intro d
+        by_cases hd : d = first <;> simp [oneDemeExponent, hd]
+      have hsecond : ∀ d, oneDemeExponent second 1 d < 3 := by
+        intro d
+        by_cases hd : d = second <;> simp [oneDemeExponent, hd]
+      have hpair : ∀ d, pairExponent first second 1 1 d < 3 := by
+        intro d
+        by_cases hsame : first = second
+        · subst second
+          by_cases hd : d = first <;> simp [pairExponent, hd]
+        · by_cases hdFirst : d = first <;> by_cases hdSecond : d = second <;>
+            simp [pairExponent, hsame, hdFirst, hdSecond]
+      simp only [splitManyDemeMomentState, manyDemeMomentVectorTable]
+      rw [dif_pos hfirst, dif_pos hsecond, dif_pos hpair]
+      rw [mergeSplitExponent_oneDeme parent child first hne,
+        mergeSplitExponent_oneDeme parent child second hne,
+        mergeSplitExponent_pair parent child first second hne]
+
 /-- A many-deme mixed-moment oracle.  Implementations may be a sparse moment solver, the
 published JSFS dynamic program, or an exact external demography constructor; consumers see
 one typed mathematical object. -/
