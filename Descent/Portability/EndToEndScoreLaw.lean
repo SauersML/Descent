@@ -145,10 +145,13 @@ prevent that construction:
   `pooledMAFKilledDualTerminalVector` maps every accepted pooled count cell to its unique
   full-degree lineage configuration with exact binomial multiplicity; its coefficients are
   proved nonnegative, and `pooledMAFKilledDualTerminalVector_dot_bernstein` identifies its
-  pairing with the exact positive Bernstein event polynomial.  What remains is to identify
-  the coefficient functionals with the two finite matrices, lift that matrix intertwining
-  through exponentials, and prove split intertwining with the existing moment law so the
-  alternating evaluator is replaced end to end,
+  pairing with the exact positive Bernstein event polynomial.
+  `pooledMAFAlternatingPolynomial_eq_positiveBernstein` additionally proves that the complete
+  Cartesian alternating terminal expansion already used by the moment evaluator is exactly
+  that positive polynomial, coefficient-for-coefficient.  What remains is to identify the
+  coefficient functionals with the two finite generator matrices, lift that matrix
+  intertwining through exponentials, and prove split intertwining with the existing moment
+  law so the alternating evaluator is replaced end to end,
   implement its sparse action without materializing either Cartesian carrier, add certified
   floating-point/interval roundoff control, and run at the executable's 13,750-individual /
   27,500-haplotype grid2d scale, followed by the filed end-to-end cohort validation gate;
@@ -1019,6 +1022,116 @@ theorem ManyDemeSampleCount.total_le_totalSampleSize
 def manyDemeExponentDegree {demeCount : ℕ} (exponent : Fin demeCount → ℕ) : ℕ :=
   ∑ deme, exponent deme
 
+/-- Finite binomial complement expansion in the exact indexing used by a sample-count cell. -/
+theorem sum_choose_neg_pow_eq_one_sub_pow (n : ℕ) (x : ℝ) :
+    (∑ remainder : Fin (n + 1),
+      (-1 : ℝ) ^ (remainder : ℕ) * Nat.choose n remainder * x ^ (remainder : ℕ)) =
+      (1 - x) ^ n := by
+  rw [Fin.sum_univ_eq_sum_range]
+  rw [show 1 - x = -x + 1 by ring, add_pow]
+  apply Finset.sum_congr rfl
+  intro remainder membership
+  have remainder_le : remainder ≤ n := by
+    simpa using Nat.le_of_lt_succ (Finset.mem_range.mp membership)
+  simp only [one_pow, mul_one]
+  rw [neg_pow]
+  push_cast
+  ring
+
+/-- The alternating monomial expansion of one many-deme count cell is exactly its positive
+product-Bernstein weight. -/
+theorem manyDemeSampleCountAlternating_eq_bernstein
+    {demeCount : ℕ} (sampleSize : Fin demeCount → ℕ)
+    (count : ManyDemeSampleCount sampleSize) (probeExponent : Fin demeCount → ℕ)
+    (frequency : Fin demeCount → ℝ) :
+    (∑ remainder : ManyDemeBernsteinRemainder sampleSize count,
+      (-1 : ℝ) ^ (∑ deme, (remainder deme : ℕ)) *
+        (∏ deme,
+          (Nat.choose (sampleSize deme - count deme) (remainder deme) : ℝ)) *
+        ∏ deme, frequency deme ^
+          ((count deme : ℕ) + (remainder deme : ℕ) + probeExponent deme)) =
+      Coalescent.manyDemeBernsteinWeight frequency
+        (fun deme ↦ (count deme : ℕ) + probeExponent deme)
+        (fun deme ↦ sampleSize deme - count deme) := by
+  classical
+  let base := ∏ deme, frequency deme ^ ((count deme : ℕ) + probeExponent deme)
+  have term_factorization (remainder : ManyDemeBernsteinRemainder sampleSize count) :
+      (-1 : ℝ) ^ (∑ deme, (remainder deme : ℕ)) *
+          (∏ deme,
+            (Nat.choose (sampleSize deme - count deme) (remainder deme) : ℝ)) *
+          ∏ deme, frequency deme ^
+            ((count deme : ℕ) + (remainder deme : ℕ) + probeExponent deme) =
+        base * ∏ deme,
+          ((-1 : ℝ) ^ (remainder deme : ℕ) *
+            Nat.choose (sampleSize deme - count deme) (remainder deme) *
+            frequency deme ^ (remainder deme : ℕ)) := by
+    rw [← Finset.prod_pow_eq_pow_sum Finset.univ
+      (fun deme ↦ (remainder deme : ℕ)) (-1 : ℝ)]
+    unfold base
+    simp only [← Finset.prod_mul_distrib]
+    apply Finset.prod_congr rfl
+    intro deme _
+    rw [show (count deme : ℕ) + (remainder deme : ℕ) + probeExponent deme =
+      ((count deme : ℕ) + probeExponent deme) + (remainder deme : ℕ) by omega, pow_add]
+    ring
+  calc
+    _ = base * ∑ remainder : ManyDemeBernsteinRemainder sampleSize count,
+        ∏ deme, ((-1 : ℝ) ^ (remainder deme : ℕ) *
+          Nat.choose (sampleSize deme - count deme) (remainder deme) *
+          frequency deme ^ (remainder deme : ℕ)) := by
+      rw [Finset.mul_sum]
+      apply Finset.sum_congr rfl
+      intro remainder _
+      exact term_factorization remainder
+    _ = base * ∏ deme, ∑ remainder : Fin (sampleSize deme - count deme + 1),
+        ((-1 : ℝ) ^ (remainder : ℕ) *
+          Nat.choose (sampleSize deme - count deme) remainder *
+          frequency deme ^ (remainder : ℕ)) := by
+      rw [Fintype.prod_sum]
+    _ = base * ∏ deme, (1 - frequency deme) ^ (sampleSize deme - count deme) := by
+      congr 1
+      apply Finset.prod_congr rfl
+      intro deme _
+      exact sum_choose_neg_pow_eq_one_sub_pow _ _
+    _ = _ := by
+      unfold base Coalescent.manyDemeBernsteinWeight
+      rw [← Finset.prod_mul_distrib]
+      apply Finset.prod_congr rfl
+      intro deme _
+      ring
+
+/-- Polynomial represented by the existing alternating moment expansion for one count cell. -/
+noncomputable def manyDemeSampleCountAlternatingPolynomial
+    {demeCount : ℕ} (sampleSize : Fin demeCount → ℕ)
+    (count : ManyDemeSampleCount sampleSize) (probeExponent : Fin demeCount → ℕ) :
+    MvPolynomial (Fin demeCount) ℝ := by
+  classical
+  exact MvPolynomial.C (∏ deme,
+      (Nat.choose (sampleSize deme) (count deme) : ℝ)) *
+    ∑ remainder : ManyDemeBernsteinRemainder sampleSize count,
+      MvPolynomial.C ((-1 : ℝ) ^ (∑ deme, (remainder deme : ℕ)) *
+        ∏ deme, (Nat.choose (sampleSize deme - count deme) (remainder deme) : ℝ)) *
+      ∏ deme, MvPolynomial.X deme ^
+        ((count deme : ℕ) + (remainder deme : ℕ) + probeExponent deme)
+
+/-- The alternating count-cell polynomial is identically the positive Bernstein polynomial,
+coefficient-for-coefficient rather than only at a chosen frequency vector. -/
+theorem manyDemeSampleCountAlternatingPolynomial_eq_bernstein
+    {demeCount : ℕ} (sampleSize : Fin demeCount → ℕ)
+    (count : ManyDemeSampleCount sampleSize) (probeExponent : Fin demeCount → ℕ) :
+    manyDemeSampleCountAlternatingPolynomial sampleSize count probeExponent =
+      MvPolynomial.C (∏ deme,
+        (Nat.choose (sampleSize deme) (count deme) : ℝ)) *
+        Coalescent.manyDemeBernsteinPolynomial
+          (fun deme ↦ (count deme : ℕ) + probeExponent deme)
+          (fun deme ↦ sampleSize deme - count deme) := by
+  apply MvPolynomial.funext
+  intro frequency
+  simp only [manyDemeSampleCountAlternatingPolynomial, map_mul, MvPolynomial.eval_C,
+    map_sum, map_prod, MvPolynomial.eval_X, map_pow]
+  rw [manyDemeSampleCountAlternating_eq_bernstein sampleSize count probeExponent frequency,
+    Coalescent.eval_manyDemeBernsteinPolynomial]
+
 /-- Exact joint count-cell mass multiplied by an arbitrary latent-frequency monomial.
 
 For count cell `c`, sample layout `n`, and probe exponent `q`, this is
@@ -1234,6 +1347,37 @@ noncomputable def pooledMAFPositiveBernsteinPolynomial
           (fun deme ↦ (count deme : ℕ) + probeExponent deme)
           (fun deme ↦ sampleSize deme - count deme)
     else 0
+
+/-- Polynomial obtained by summing the existing alternating moment expansion over the same
+accepted pooled count cells. -/
+noncomputable def pooledMAFAlternatingPolynomial
+    {demeCount : ℕ} (sampleSize : Fin demeCount → ℕ)
+    (threshold : PooledMAFThreshold) (probeExponent : Fin demeCount → ℕ) :
+    MvPolynomial (Fin demeCount) ℝ := by
+  classical
+  exact ∑ count : ManyDemeSampleCount sampleSize,
+    if threshold.Accepts (manyDemeTotalSampleSize sampleSize) count.total then
+      manyDemeSampleCountAlternatingPolynomial sampleSize count probeExponent
+    else 0
+
+/-- The complete Cartesian alternating terminal polynomial and the sparse positive Bernstein
+terminal polynomial are exactly identical.  This is the algebraic endpoint bridge, before any
+demographic propagation or numerical approximation. -/
+theorem pooledMAFAlternatingPolynomial_eq_positiveBernstein
+    {demeCount : ℕ} (sampleSize : Fin demeCount → ℕ)
+    (threshold : PooledMAFThreshold) (probeExponent : Fin demeCount → ℕ) :
+    pooledMAFAlternatingPolynomial sampleSize threshold probeExponent =
+      pooledMAFPositiveBernsteinPolynomial sampleSize threshold probeExponent := by
+  classical
+  unfold pooledMAFAlternatingPolynomial pooledMAFPositiveBernsteinPolynomial
+  apply Finset.sum_congr rfl
+  intro count _
+  by_cases accepted :
+      threshold.Accepts (manyDemeTotalSampleSize sampleSize) count.total
+  · simp only [accepted, if_true]
+    exact manyDemeSampleCountAlternatingPolynomial_eq_bernstein
+      sampleSize count probeExponent
+  · simp [accepted]
 
 /-- Pairing the sparse positive vector with Bernstein basis weights evaluates exactly the
 pooled event polynomial. -/
