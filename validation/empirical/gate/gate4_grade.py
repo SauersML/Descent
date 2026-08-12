@@ -23,7 +23,7 @@ sys.path.insert(0, "/projects/standard/hsiehph/sauer354/descent/validation/empir
 import gate_predictor_v32_serial1d as GP
 
 TO = "/projects/standard/hsiehph/sauer354/theory-out"
-SEED_GLOB = f"{TO}/gate4_l3/grid2d_{{pheno}}_realpt_g4s*.parquet"
+SEED_GLOB = f"{TO}/gate4_l3/serial1d_{{pheno}}_realpt_g4s*.parquet"
 
 
 def auc_mw(score, y):
