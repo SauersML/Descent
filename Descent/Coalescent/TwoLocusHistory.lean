@@ -1439,6 +1439,29 @@ theorem twoLocusPi2Jet_driftAt {D : ℕ}
   rw [twoLocusHaplotypeCovariance_scaled_left_right]
   split_ifs <;> ring
 
+/-- The exact diffusion jet selected by any coordinate of the closed low-order family. -/
+noncomputable def twoLocusCoordinateJet {D : ℕ} :
+    LowOrderLDCoordinate D → TwoLocusDiffusionJet D
+  | .H first second => twoLocusHJet first second
+  | .DD first second => twoLocusDDJet first second
+  | .Dz first second third => twoLocusDzJet first second third
+  | .pi2 first second third fourth => twoLocusPi2Jet first second third fourth
+
+/-- Concrete low-order moment vector read from one multi-deme haplotype-simplex state. -/
+noncomputable def twoLocusJetMoment {D : ℕ}
+    (state : Fin D → TwoLocusHaplotypeFrequencies) :
+    LowOrderLDCoordinate D → ℝ :=
+  fun coordinate ↦ (twoLocusCoordinateJet coordinate).value state
+
+/-- Total neutral-drift velocity constructed from the exact local simplex generators and
+arbitrary deme-specific coalescence rates. -/
+noncomputable def twoLocusWeightedJetDrift {D : ℕ}
+    (coalescence : Fin D → ℝ)
+    (state : Fin D → TwoLocusHaplotypeFrequencies)
+    (coordinate : LowOrderLDCoordinate D) : ℝ :=
+  ∑ deme, coalescence deme *
+    (twoLocusCoordinateJet coordinate).driftAt deme state
+
 /-- The generalized four-deme `pi2` observable in centered contrast form. -/
 theorem twoLocusJointHeterozygosity_eq_contrasts
     (leftFirst leftSecond rightFirst rightSecond : TwoLocusHaplotypeFrequencies) :
@@ -2612,6 +2635,61 @@ noncomputable def lowOrderLDDrift {D : ℕ} (rates : ManyDemeLDRates D)
       else if third = fourth then
         -rates.coalescence third * moment (.pi2 first second third fourth)
       else 0
+
+/-- The `H` row of the abstract low-order drift generator is exactly the weighted sum of
+the local haplotype-simplex diffusion jets. -/
+theorem twoLocusWeightedJetDrift_H_eq_lowOrderLDDrift {D : ℕ}
+    (rates : ManyDemeLDRates D)
+    (state : Fin D → TwoLocusHaplotypeFrequencies)
+    (first second : Fin D) :
+    twoLocusWeightedJetDrift rates.coalescence state (.H first second) =
+      lowOrderLDDrift rates (twoLocusJetMoment state) (.H first second) := by
+  classical
+  by_cases hsame : first = second
+  · subst second
+    simp [twoLocusWeightedJetDrift, twoLocusCoordinateJet,
+      twoLocusHJet_driftAt, lowOrderLDDrift, twoLocusJetMoment]
+  · have hnever : ∀ deme, ¬(first = deme ∧ second = deme) := by
+      intro deme hboth
+      exact hsame (hboth.1.trans hboth.2.symm)
+    simp [twoLocusWeightedJetDrift, twoLocusCoordinateJet,
+      twoLocusHJet_driftAt, lowOrderLDDrift, hsame, hnever]
+
+/-- The `DD` row, including both the same-deme quadratic-variation source and the two
+distinct-deme loss channels, is exactly the weighted local simplex drift. -/
+theorem twoLocusWeightedJetDrift_DD_eq_lowOrderLDDrift {D : ℕ}
+    (rates : ManyDemeLDRates D)
+    (state : Fin D → TwoLocusHaplotypeFrequencies)
+    (first second : Fin D) :
+    twoLocusWeightedJetDrift rates.coalescence state (.DD first second) =
+      lowOrderLDDrift rates (twoLocusJetMoment state) (.DD first second) := by
+  classical
+  by_cases hsame : first = second
+  · subst second
+    simp only [twoLocusWeightedJetDrift, twoLocusCoordinateJet]
+    rw [Finset.sum_eq_single first]
+    · simp [twoLocusDDJet_driftAt, lowOrderLDDrift,
+        twoLocusJetMoment, twoLocusCoordinateJet]
+    · intro other _ hother
+      simp [twoLocusDDJet_driftAt, hother, Ne.symm hother]
+    · simp
+  · have hnever : ∀ deme, ¬(first = deme ∧ second = deme) := by
+      intro deme hboth
+      exact hsame (hboth.1.trans hboth.2.symm)
+    have hdrift : ∀ deme,
+        (twoLocusDDJet first second).driftAt deme state =
+          (if first = deme then -(twoLocusDDJet first second).value state else 0) +
+          (if second = deme then -(twoLocusDDJet first second).value state else 0) := by
+      intro deme
+      rw [twoLocusDDJet_driftAt]
+      simp only [hnever deme, ↓reduceIte]
+      by_cases hfirst : first = deme <;> by_cases hsecond : second = deme <;>
+        simp [hfirst, hsecond]
+      exact False.elim (hsame (hfirst.trans hsecond.symm))
+    simp only [twoLocusWeightedJetDrift, twoLocusCoordinateJet, hdrift, mul_add,
+      Finset.sum_add_distrib]
+    simp [lowOrderLDDrift, twoLocusJetMoment, twoLocusCoordinateJet, hsame]
+    ring
 
 /-- Continuous migration contribution.  Each lineage index migrates separately.  The extra
 `Dz` and `pi2` differences are exactly the terms created because `D` is nonlinear in
