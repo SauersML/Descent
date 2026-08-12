@@ -122,12 +122,13 @@ prevent that construction:
   terminal Bernstein vector, and `pooledMAFProbeMass_samplingDual` proves that its backward
   propagation through every transposed epoch and sparse split equals the direct Cartesian
   law.  The exact operator specialization is therefore formalized.
-  `Coalescent.matrixExponential_partialSum_mulVec_error_le` also supplies a rigorous convergent
-  Taylor-tail certificate for finite backward propagation.  What remains is a sparse
-  executable implementation that exploits the operator without materializing the Cartesian
-  carrier, adds certified floating-point/interval roundoff control, and runs at the
-  executable's 13,750-individual / 27,500-haplotype grid2d scale, followed by the filed
-  end-to-end cohort validation gate;
+  `Coalescent.certifiedManyDemeMomentHistory_pairing_error_le` accumulates rigorous convergent
+  Taylor-tail certificates over the whole backward history, and
+  `pooledMAFProbeMassCertified_error_le` specializes the result to a finite scalar prediction
+  and certified absolute-error radius.  What remains is a sparse executable representation
+  that exploits the operator without materializing the Cartesian carrier, adds certified
+  floating-point/interval roundoff control, and runs at the executable's 13,750-individual /
+  27,500-haplotype grid2d scale, followed by the filed end-to-end cohort validation gate;
 * the executable protocol is not yet a function of exactly this visible input type.
   `gnomon/sims/ancestry_calibration/gen_real_pt.py` accepts only its hard-coded `serial1d` and
   `grid2d` constructors rather than an arbitrary event history, hard-codes 250 evaluation
@@ -1177,6 +1178,58 @@ theorem PipelineDemographicHistory.pooledMAFProbeMassViaDual_eq
     history.pooledMAFProbeMassViaDual sampleSize threshold probeExponent =
       history.pooledMAFProbeMass sampleSize threshold probeExponent :=
   (history.pooledMAFProbeMass_samplingDual sampleSize threshold probeExponent).symm
+
+/-- Finite certified approximation to one pooled-MAF probe mass.  The caller may assign a
+different Taylor order to every demographic epoch; splits remain exact sparse maps. -/
+noncomputable def PipelineDemographicHistory.pooledMAFProbeMassCertifiedApproximation
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (sampleSize : Fin demeCount → ℕ) (threshold : PooledMAFThreshold)
+    (probeExponent : Fin demeCount → ℕ)
+    (termOrder : Coalescent.ManyDemeMomentEpoch demeCount
+      (manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent) → ℕ) : ℝ :=
+  let K := manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent
+  let certified := Coalescent.certifyManyDemeMomentHistory termOrder
+    (history.oneLocusMomentInstructions K)
+  (Coalescent.certifiedManyDemeMomentHistoryApproximation certified).mulVec
+      (pooledMAFTerminalProbe sampleSize threshold probeExponent) ⬝ᵥ
+    Coalescent.commonAncestorManyDemeMomentState history.ancestralMoment
+
+/-- Proven absolute-error radius for the finite pooled-MAF probe evaluation. -/
+noncomputable def PipelineDemographicHistory.pooledMAFProbeMassCertifiedError
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (sampleSize : Fin demeCount → ℕ) (threshold : PooledMAFThreshold)
+    (probeExponent : Fin demeCount → ℕ)
+    (termOrder : Coalescent.ManyDemeMomentEpoch demeCount
+      (manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent) → ℕ) : ℝ :=
+  let K := manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent
+  let certified := Coalescent.certifyManyDemeMomentHistory termOrder
+    (history.oneLocusMomentInstructions K)
+  Coalescent.certifiedManyDemeMomentHistoryErrorBound certified *
+      ‖pooledMAFTerminalProbe sampleSize threshold probeExponent‖ *
+    ∑ coordinate : Coalescent.AffineManyDemeMomentCoordinate demeCount K,
+      |Coalescent.commonAncestorManyDemeMomentState history.ancestralMoment coordinate|
+
+/-- The exact pooled-MAF probe mass lies in the closed interval centered at the finite
+scheduled evaluation with the displayed certified radius. -/
+theorem PipelineDemographicHistory.pooledMAFProbeMassCertified_error_le
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (sampleSize : Fin demeCount → ℕ) (threshold : PooledMAFThreshold)
+    (probeExponent : Fin demeCount → ℕ)
+    (termOrder : Coalescent.ManyDemeMomentEpoch demeCount
+      (manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent) → ℕ) :
+    |history.pooledMAFProbeMass sampleSize threshold probeExponent -
+        history.pooledMAFProbeMassCertifiedApproximation sampleSize threshold probeExponent
+          termOrder| ≤
+      history.pooledMAFProbeMassCertifiedError sampleSize threshold probeExponent termOrder := by
+  let K := manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent
+  let instructions := history.oneLocusMomentInstructions K
+  let certified := Coalescent.certifyManyDemeMomentHistory termOrder instructions
+  have hbound := Coalescent.certifiedManyDemeMomentHistory_pairing_error_le certified
+    (pooledMAFTerminalProbe sampleSize threshold probeExponent)
+    (Coalescent.commonAncestorManyDemeMomentState history.ancestralMoment)
+  rw [Coalescent.certifiedScheduledHistoryExact_eq_dualPropagator] at hbound
+  rw [history.pooledMAFProbeMass_samplingDual]
+  exact hbound
 
 /-- Exact arbitrary-order many-deme frequency moment conditional on a pooled sample passing
 the MAF window.  `none` means the ascertainment event has zero mass.  This operator is finite

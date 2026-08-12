@@ -514,6 +514,27 @@ theorem matrixExponential_partialSum_mulVec_error_le
       mul_le_mul_of_nonneg_right
         (matrixExponential_partialSum_error_le_tailBound A time terms) (norm_nonneg _)
 
+/-- Hölder's finite `L∞ × L1` bound in the exact norms used by the matrix evaluator. -/
+theorem abs_dotProduct_le_norm_mul_sum_abs
+    {ι : Type*} [Fintype ι] (left right : ι → ℝ) :
+    |left ⬝ᵥ right| ≤ ‖left‖ * ∑ coordinate, |right coordinate| := by
+  rw [dotProduct]
+  calc
+    |∑ coordinate, left coordinate * right coordinate| ≤
+        ∑ coordinate, |left coordinate * right coordinate| :=
+      Finset.abs_sum_le_sum_abs _ _
+    _ = ∑ coordinate, |left coordinate| * |right coordinate| := by
+      apply Finset.sum_congr rfl
+      intro coordinate _
+      rw [abs_mul]
+    _ ≤ ∑ coordinate, ‖left‖ * |right coordinate| := by
+      apply Finset.sum_le_sum
+      intro coordinate _
+      exact mul_le_mul_of_nonneg_right
+        (norm_le_pi_norm left coordinate) (abs_nonneg _)
+    _ = ‖left‖ * ∑ coordinate, |right coordinate| := by
+      rw [Finset.mul_sum]
+
 /-- Generator intertwining propagates through every finite power.  The following theorem
 passes this identity through the absolutely convergent exponential series. -/
 theorem matrix_pow_intertwines
@@ -1323,6 +1344,267 @@ noncomputable def ManyDemeMomentInstruction.dualPropagator {D K : ℕ}
     Matrix (AffineManyDemeMomentCoordinate D K) (AffineManyDemeMomentCoordinate D K) ℝ :=
   instruction.propagator.transpose
 
+/-- An instruction annotated with exactly the finite work used to evaluate its backward
+operator.  Splits are exact sparse maps and therefore carry no meaningless Taylor order. -/
+inductive CertifiedDualMomentInstruction (D K : ℕ) where
+  | evolve (epoch : ManyDemeMomentEpoch D K) (terms : ℕ)
+  | split (parent child : Fin D)
+
+/-- Drop the evaluation certificate and recover the exact demographic instruction. -/
+def CertifiedDualMomentInstruction.exactInstruction {D K : ℕ}
+    (instruction : CertifiedDualMomentInstruction D K) :
+    ManyDemeMomentInstruction D K :=
+  match instruction with
+  | .evolve epoch _ => .evolve epoch
+  | .split parent child => .split parent child
+
+/-- Attach an epoch-specific finite Taylor schedule to one exact instruction. -/
+def ManyDemeMomentInstruction.certify {D K : ℕ}
+    (termOrder : ManyDemeMomentEpoch D K → ℕ)
+    (instruction : ManyDemeMomentInstruction D K) :
+    CertifiedDualMomentInstruction D K :=
+  match instruction with
+  | .evolve epoch => .evolve epoch (termOrder epoch)
+  | .split parent child => .split parent child
+
+/-- Attach a finite Taylor schedule to every epoch of an exact history; splits remain exact. -/
+def certifyManyDemeMomentHistory {D K : ℕ}
+    (termOrder : ManyDemeMomentEpoch D K → ℕ)
+    (instructions : List (ManyDemeMomentInstruction D K)) :
+    List (CertifiedDualMomentInstruction D K) :=
+  instructions.map (ManyDemeMomentInstruction.certify termOrder)
+
+/-- Attaching and then erasing an epoch schedule preserves the exact instruction history. -/
+theorem certifyManyDemeMomentHistory_exactInstructions {D K : ℕ}
+    (termOrder : ManyDemeMomentEpoch D K → ℕ)
+    (instructions : List (ManyDemeMomentInstruction D K)) :
+    (certifyManyDemeMomentHistory termOrder instructions).map
+        CertifiedDualMomentInstruction.exactInstruction = instructions := by
+  induction instructions with
+  | nil => rfl
+  | cons instruction remaining ih =>
+      unfold certifyManyDemeMomentHistory at ih ⊢
+      simp only [List.map_cons, List.map_map] at ih ⊢
+      cases instruction <;>
+        simp [ManyDemeMomentInstruction.certify,
+          CertifiedDualMomentInstruction.exactInstruction, ih]
+
+/-- Finite backward matrix used by a certified instruction evaluation. -/
+noncomputable def CertifiedDualMomentInstruction.approximatePropagator {D K : ℕ}
+    (instruction : CertifiedDualMomentInstruction D K) :
+    Matrix (AffineManyDemeMomentCoordinate D K) (AffineManyDemeMomentCoordinate D K) ℝ :=
+  match instruction with
+  | .evolve epoch terms =>
+      matrixExponentialPartialSum
+        (augmentedManyDemeMomentGenerator epoch.rates K).transpose epoch.duration terms
+  | .split parent child =>
+      (splitManyDemeMomentPropagator parent child).transpose
+
+/-- Certified one-instruction operator error. -/
+noncomputable def CertifiedDualMomentInstruction.errorBound {D K : ℕ}
+    (instruction : CertifiedDualMomentInstruction D K) : ℝ :=
+  match instruction with
+  | .evolve epoch terms =>
+      matrixExponentialTailBound
+        (augmentedManyDemeMomentGenerator epoch.rates K).transpose epoch.duration terms
+  | .split _ _ => 0
+
+/-- Certified norm bound for the exact one-instruction dual. -/
+noncomputable def CertifiedDualMomentInstruction.normBound {D K : ℕ}
+    (instruction : CertifiedDualMomentInstruction D K) : ℝ :=
+  instruction.errorBound + ‖instruction.approximatePropagator‖
+
+/-- Each annotated instruction's exact dual lies within its stated finite-evaluation error. -/
+theorem CertifiedDualMomentInstruction.error_le {D K : ℕ}
+    (instruction : CertifiedDualMomentInstruction D K) :
+    ‖instruction.exactInstruction.dualPropagator - instruction.approximatePropagator‖ ≤
+      instruction.errorBound := by
+  cases instruction with
+  | evolve epoch terms =>
+      simp only [CertifiedDualMomentInstruction.exactInstruction,
+        ManyDemeMomentInstruction.dualPropagator,
+        ManyDemeMomentInstruction.propagator, ManyDemeMomentEpoch.propagator,
+        CertifiedDualMomentInstruction.approximatePropagator,
+        CertifiedDualMomentInstruction.errorBound]
+      rw [← matrixExponential_transpose]
+      exact matrixExponential_partialSum_error_le_tailBound _ _ _
+  | split parent child =>
+      simp only [CertifiedDualMomentInstruction.exactInstruction,
+        ManyDemeMomentInstruction.dualPropagator,
+        ManyDemeMomentInstruction.propagator,
+        CertifiedDualMomentInstruction.approximatePropagator,
+        CertifiedDualMomentInstruction.errorBound]
+      simp
+
+/-- The exact dual norm is bounded by approximation norm plus certified error. -/
+theorem CertifiedDualMomentInstruction.exact_norm_le {D K : ℕ}
+    (instruction : CertifiedDualMomentInstruction D K) :
+    ‖instruction.exactInstruction.dualPropagator‖ ≤ instruction.normBound := by
+  calc
+    _ ≤ ‖instruction.exactInstruction.dualPropagator -
+          instruction.approximatePropagator‖ +
+        ‖instruction.approximatePropagator‖ := by
+      have := norm_add_le
+        (instruction.exactInstruction.dualPropagator -
+          instruction.approximatePropagator)
+        instruction.approximatePropagator
+      simpa using this
+    _ ≤ instruction.errorBound + ‖instruction.approximatePropagator‖ :=
+      add_le_add_right instruction.error_le _
+    _ = instruction.normBound := rfl
+
+/-- Each instruction error bound is nonnegative. -/
+theorem CertifiedDualMomentInstruction.errorBound_nonneg {D K : ℕ}
+    (instruction : CertifiedDualMomentInstruction D K) :
+    0 ≤ instruction.errorBound := by
+  cases instruction with
+  | evolve epoch terms => exact matrixExponentialTailBound_nonneg _ _ _
+  | split => rfl
+
+/-- Each instruction norm bound is nonnegative. -/
+theorem CertifiedDualMomentInstruction.normBound_nonneg {D K : ℕ}
+    (instruction : CertifiedDualMomentInstruction D K) :
+    0 ≤ instruction.normBound :=
+  add_nonneg instruction.errorBound_nonneg (norm_nonneg _)
+
+/-- Finite backward product for a completely annotated history. -/
+noncomputable def certifiedManyDemeMomentHistoryApproximation {D K : ℕ} :
+    List (CertifiedDualMomentInstruction D K) →
+      Matrix (AffineManyDemeMomentCoordinate D K)
+        (AffineManyDemeMomentCoordinate D K) ℝ
+  | [] => 1
+  | instruction :: remaining =>
+      instruction.approximatePropagator *
+        certifiedManyDemeMomentHistoryApproximation remaining
+
+/-- Multiplicative norm certificate for the exact annotated history product. -/
+noncomputable def certifiedManyDemeMomentHistoryNormBound {D K : ℕ} :
+    List (CertifiedDualMomentInstruction D K) → ℝ
+  | [] => 1
+  | instruction :: remaining =>
+      instruction.normBound * certifiedManyDemeMomentHistoryNormBound remaining
+
+/-- Recursive total error certificate for the annotated history product. -/
+noncomputable def certifiedManyDemeMomentHistoryErrorBound {D K : ℕ} :
+    List (CertifiedDualMomentInstruction D K) → ℝ
+  | [] => 0
+  | instruction :: remaining =>
+      instruction.errorBound * certifiedManyDemeMomentHistoryNormBound remaining +
+        ‖instruction.approximatePropagator‖ *
+          certifiedManyDemeMomentHistoryErrorBound remaining
+
+/-- Exact backward product represented by an annotated instruction history. -/
+noncomputable def certifiedManyDemeMomentHistoryExact {D K : ℕ} :
+    List (CertifiedDualMomentInstruction D K) →
+      Matrix (AffineManyDemeMomentCoordinate D K)
+        (AffineManyDemeMomentCoordinate D K) ℝ
+  | [] => 1
+  | instruction :: remaining =>
+      instruction.exactInstruction.dualPropagator *
+        certifiedManyDemeMomentHistoryExact remaining
+
+/-- The exact annotated history norm obeys its multiplicative certificate. -/
+theorem certifiedManyDemeMomentHistoryExact_norm_le {D K : ℕ}
+    (instructions : List (CertifiedDualMomentInstruction D K)) :
+    ‖certifiedManyDemeMomentHistoryExact instructions‖ ≤
+      certifiedManyDemeMomentHistoryNormBound instructions := by
+  induction instructions with
+  | nil => simp [certifiedManyDemeMomentHistoryExact,
+      certifiedManyDemeMomentHistoryNormBound]
+  | cons instruction remaining ih =>
+      simp only [certifiedManyDemeMomentHistoryExact,
+        certifiedManyDemeMomentHistoryNormBound]
+      exact (norm_mul_le _ _).trans
+        (mul_le_mul instruction.exact_norm_le ih (norm_nonneg _)
+          instruction.normBound_nonneg)
+
+/-- The multiplicative exact-history norm certificate is nonnegative. -/
+theorem certifiedManyDemeMomentHistoryNormBound_nonneg {D K : ℕ}
+    (instructions : List (CertifiedDualMomentInstruction D K)) :
+    0 ≤ certifiedManyDemeMomentHistoryNormBound instructions := by
+  induction instructions with
+  | nil => norm_num [certifiedManyDemeMomentHistoryNormBound]
+  | cons instruction remaining ih =>
+      exact mul_nonneg instruction.normBound_nonneg ih
+
+/-- The recursively accumulated history error is nonnegative. -/
+theorem certifiedManyDemeMomentHistoryErrorBound_nonneg {D K : ℕ}
+    (instructions : List (CertifiedDualMomentInstruction D K)) :
+    0 ≤ certifiedManyDemeMomentHistoryErrorBound instructions := by
+  induction instructions with
+  | nil => rfl
+  | cons instruction remaining ih =>
+      exact add_nonneg
+        (mul_nonneg instruction.errorBound_nonneg
+          (certifiedManyDemeMomentHistoryNormBound_nonneg remaining))
+        (mul_nonneg (norm_nonneg _) ih)
+
+/-- The finite annotated history product is within the recursive error certificate of the
+exact history dual.  This is the rigorous stopping law for arbitrary sequences of epochs and
+splits. -/
+theorem certifiedManyDemeMomentHistory_error_le {D K : ℕ}
+    (instructions : List (CertifiedDualMomentInstruction D K)) :
+    ‖certifiedManyDemeMomentHistoryExact instructions -
+        certifiedManyDemeMomentHistoryApproximation instructions‖ ≤
+      certifiedManyDemeMomentHistoryErrorBound instructions := by
+  induction instructions with
+  | nil => simp [certifiedManyDemeMomentHistoryExact,
+      certifiedManyDemeMomentHistoryApproximation,
+      certifiedManyDemeMomentHistoryErrorBound]
+  | cons instruction remaining ih =>
+      let exactHead := instruction.exactInstruction.dualPropagator
+      let approximateHead := instruction.approximatePropagator
+      let exactTail := certifiedManyDemeMomentHistoryExact remaining
+      let approximateTail := certifiedManyDemeMomentHistoryApproximation remaining
+      have hdecompose :
+          exactHead * exactTail - approximateHead * approximateTail =
+            (exactHead - approximateHead) * exactTail +
+              approximateHead * (exactTail - approximateTail) := by
+        noncomm_ring
+      change ‖exactHead * exactTail - approximateHead * approximateTail‖ ≤ _
+      rw [hdecompose]
+      calc
+        _ ≤ ‖(exactHead - approximateHead) * exactTail‖ +
+            ‖approximateHead * (exactTail - approximateTail)‖ := norm_add_le _ _
+        _ ≤ ‖exactHead - approximateHead‖ * ‖exactTail‖ +
+            ‖approximateHead‖ * ‖exactTail - approximateTail‖ :=
+          add_le_add (norm_mul_le _ _) (norm_mul_le _ _)
+        _ ≤ instruction.errorBound * certifiedManyDemeMomentHistoryNormBound remaining +
+            ‖instruction.approximatePropagator‖ *
+              certifiedManyDemeMomentHistoryErrorBound remaining := by
+          exact add_le_add
+            (mul_le_mul instruction.error_le
+              (certifiedManyDemeMomentHistoryExact_norm_le remaining)
+              (norm_nonneg _) instruction.errorBound_nonneg)
+            (mul_le_mul_of_nonneg_left ih (norm_nonneg _))
+        _ = certifiedManyDemeMomentHistoryErrorBound (instruction :: remaining) := rfl
+
+/-- Applying the finite annotated history to a probe inherits the total operator certificate. -/
+theorem certifiedManyDemeMomentHistory_mulVec_error_le {D K : ℕ}
+    (instructions : List (CertifiedDualMomentInstruction D K))
+    (probe : AffineManyDemeMomentCoordinate D K → ℝ) :
+    ‖(certifiedManyDemeMomentHistoryExact instructions).mulVec probe -
+        (certifiedManyDemeMomentHistoryApproximation instructions).mulVec probe‖ ≤
+      certifiedManyDemeMomentHistoryErrorBound instructions * ‖probe‖ := by
+  rw [← Matrix.sub_mulVec]
+  exact (Matrix.linfty_opNorm_mulVec _ _).trans
+    (mul_le_mul_of_nonneg_right
+      (certifiedManyDemeMomentHistory_error_le instructions) (norm_nonneg _))
+
+/-- Scalar pairing error after the certified backward history evaluation. -/
+theorem certifiedManyDemeMomentHistory_pairing_error_le {D K : ℕ}
+    (instructions : List (CertifiedDualMomentInstruction D K))
+    (probe initial : AffineManyDemeMomentCoordinate D K → ℝ) :
+    |(certifiedManyDemeMomentHistoryExact instructions).mulVec probe ⬝ᵥ initial -
+        (certifiedManyDemeMomentHistoryApproximation instructions).mulVec probe ⬝ᵥ initial| ≤
+      certifiedManyDemeMomentHistoryErrorBound instructions * ‖probe‖ *
+        ∑ coordinate, |initial coordinate| := by
+  rw [← sub_dotProduct]
+  exact (abs_dotProduct_le_norm_mul_sum_abs _ _).trans
+    (mul_le_mul_of_nonneg_right
+      (certifiedManyDemeMomentHistory_mulVec_error_le instructions probe)
+      (Finset.sum_nonneg fun _ _ ↦ abs_nonneg _))
+
 /-- Exact backward product for an instruction history.  It traverses the list structurally
 in reverse operator order without ever constructing the dense forward state. -/
 noncomputable def manyDemeMomentHistoryDualPropagator {D K : ℕ} :
@@ -1332,6 +1614,31 @@ noncomputable def manyDemeMomentHistoryDualPropagator {D K : ℕ} :
   | [] => 1
   | instruction :: remaining =>
       instruction.dualPropagator * manyDemeMomentHistoryDualPropagator remaining
+
+/-- Erasing Taylor orders from an annotated history recovers exactly the ordinary history
+dual; the annotations affect only its finite approximation and certificate. -/
+theorem certifiedManyDemeMomentHistoryExact_eq_dualPropagator {D K : ℕ}
+    (instructions : List (CertifiedDualMomentInstruction D K)) :
+    certifiedManyDemeMomentHistoryExact instructions =
+      manyDemeMomentHistoryDualPropagator
+        (instructions.map CertifiedDualMomentInstruction.exactInstruction) := by
+  induction instructions with
+  | nil => rfl
+  | cons instruction remaining ih =>
+      simp only [certifiedManyDemeMomentHistoryExact, List.map_cons,
+        manyDemeMomentHistoryDualPropagator]
+      rw [ih]
+
+/-- Any epoch-specific finite schedule certifies an approximation to the exact unannotated
+history dual, with no change to the demographic semantics. -/
+theorem certifiedScheduledHistoryExact_eq_dualPropagator {D K : ℕ}
+    (termOrder : ManyDemeMomentEpoch D K → ℕ)
+    (instructions : List (ManyDemeMomentInstruction D K)) :
+    certifiedManyDemeMomentHistoryExact
+        (certifyManyDemeMomentHistory termOrder instructions) =
+      manyDemeMomentHistoryDualPropagator instructions := by
+  rw [certifiedManyDemeMomentHistoryExact_eq_dualPropagator,
+    certifyManyDemeMomentHistory_exactInstructions]
 
 /-- The structural backward product is exactly the transpose of the complete forward
 history product, including every epoch and instantaneous split. -/
