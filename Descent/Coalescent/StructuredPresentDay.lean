@@ -1014,6 +1014,47 @@ def decrementExponent {D : ℕ} (exponent : Fin D → ℕ) (deme : Fin D) : Fin 
 def incrementExponent {D : ℕ} (exponent : Fin D → ℕ) (deme : Fin D) : Fin D → ℕ :=
   fun d ↦ if d = deme then exponent d + 1 else exponent d
 
+/-- Raising one exponent raises its total degree by exactly one. -/
+theorem sum_incrementExponent {D : ℕ} (exponent : Fin D → ℕ) (deme : Fin D) :
+    ∑ d, incrementExponent exponent deme d = (∑ d, exponent d) + 1 := by
+  rw [Finset.sum_eq_add_sum_diff_singleton (Finset.mem_univ deme),
+    Finset.sum_eq_add_sum_diff_singleton (Finset.mem_univ deme)]
+  simp only [incrementExponent, if_pos]
+  congr 1
+  apply Finset.sum_congr rfl
+  intro d member
+  have distinct : d ≠ deme :=
+    Finset.notMem_singleton.mp (Finset.mem_sdiff.mp member).2
+  simp [incrementExponent, distinct]
+
+/-- Removing a positive exponent lowers its total degree by exactly one. -/
+theorem sum_decrementExponent {D : ℕ} (exponent : Fin D → ℕ) (deme : Fin D)
+    (positive : 0 < exponent deme) :
+    ∑ d, decrementExponent exponent deme d = (∑ d, exponent d) - 1 := by
+  rw [Finset.sum_eq_add_sum_diff_singleton (Finset.mem_univ deme),
+    Finset.sum_eq_add_sum_diff_singleton (Finset.mem_univ deme)]
+  simp only [decrementExponent, if_pos]
+  have rest_equal :
+      (∑ x ∈ Finset.univ \ {deme}, decrementExponent exponent deme x) =
+        ∑ x ∈ Finset.univ \ {deme}, exponent x := by
+    apply Finset.sum_congr rfl
+    intro d member
+    have distinct : d ≠ deme :=
+      Finset.notMem_singleton.mp (Finset.mem_sdiff.mp member).2
+    simp [decrementExponent, distinct]
+  rw [rest_equal]
+  omega
+
+/-- Truncated decrement never increases total degree, including at a zero exponent. -/
+theorem sum_decrementExponent_le {D : ℕ} (exponent : Fin D → ℕ) (deme : Fin D) :
+    (∑ d, decrementExponent exponent deme d) ≤ ∑ d, exponent d := by
+  apply Finset.sum_le_sum
+  intro d _
+  by_cases equal : d = deme
+  · subst d
+    simp [decrementExponent]
+  · simp [decrementExponent, equal]
+
 /-- Move one ancestral lineage from one deme label to another.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- index bookkeeping for the moment generator.
@@ -1066,6 +1107,40 @@ theorem manyDemeBernsteinPolynomial_zeroAncestral_eq_monomial {D : ℕ}
   classical
   simp [manyDemeBernsteinPolynomial, manyDemeBernsteinPolynomialFactor,
     MvPolynomial.monomial_eq, Finsupp.prod]
+
+/-- One Bernstein factor has total degree at most the number of its two lineage labels. -/
+theorem manyDemeBernsteinPolynomialFactor_totalDegree_le {D : ℕ} (deme : Fin D)
+    (derived ancestral : ℕ) :
+    (manyDemeBernsteinPolynomialFactor deme derived ancestral).totalDegree ≤
+      derived + ancestral := by
+  unfold manyDemeBernsteinPolynomialFactor
+  calc
+    _ ≤ (MvPolynomial.X deme ^ derived : MvPolynomial (Fin D) ℝ).totalDegree +
+        ((1 - MvPolynomial.X deme) ^ ancestral : MvPolynomial (Fin D) ℝ).totalDegree :=
+      MvPolynomial.totalDegree_mul _ _
+    _ ≤ derived + ancestral := by
+      apply Nat.add_le_add
+      · simp
+      · exact (MvPolynomial.totalDegree_pow _ _).trans (by
+          have hbase : (1 - MvPolynomial.X deme : MvPolynomial (Fin D) ℝ).totalDegree ≤ 1 :=
+            (MvPolynomial.totalDegree_sub _ _).trans (by simp)
+          nlinarith)
+
+/-- A product Bernstein polynomial never exceeds its total lineage degree. -/
+theorem manyDemeBernsteinPolynomial_totalDegree_le {D : ℕ}
+    (derived ancestral : Fin D → ℕ) :
+    (manyDemeBernsteinPolynomial derived ancestral).totalDegree ≤
+      (∑ deme, derived deme) + ∑ deme, ancestral deme := by
+  unfold manyDemeBernsteinPolynomial
+  calc
+    _ ≤ ∑ deme, (manyDemeBernsteinPolynomialFactor deme
+        (derived deme) (ancestral deme)).totalDegree :=
+      MvPolynomial.totalDegree_finset_prod _ _
+    _ ≤ ∑ deme, (derived deme + ancestral deme) := by
+      apply Finset.sum_le_sum
+      intro deme _
+      exact manyDemeBernsteinPolynomialFactor_totalDegree_le deme _ _
+    _ = _ := by rw [Finset.sum_add_distrib]
 
 /-- A partial derivative annihilates a product of factors whose indices exclude its deme. -/
 theorem pderiv_manyDemeBernsteinPolynomial_prod_of_not_mem {D : ℕ}
@@ -1222,6 +1297,14 @@ theorem migrateExponent_eq_increment_decrement {D : ℕ}
       have hreverse : dst ≠ src := fun h ↦ distinct h.symm
       simp [migrateExponent, decrementExponent, incrementExponent, distinct, hreverse]
     · simp [migrateExponent, decrementExponent, incrementExponent, hsrc, hdst]
+
+/-- Moving one positive lineage along a genuine edge preserves total lineage degree. -/
+theorem sum_migrateExponent {D : ℕ} (exponent : Fin D → ℕ) (src dst : Fin D)
+    (distinct : src ≠ dst) (positive : 0 < exponent src) :
+    ∑ d, migrateExponent exponent src dst d = ∑ d, exponent d := by
+  rw [migrateExponent_eq_increment_decrement exponent src dst distinct,
+    sum_incrementExponent, sum_decrementExponent _ src positive]
+  omega
 
 /-- Positive derived-lineage migration has an exact Bernstein weight identity. -/
 theorem frequency_mul_manyDemeBernsteinWeight_decrementDerived_eq_migrate {D : ℕ}
@@ -1880,6 +1963,22 @@ theorem manyDemePolynomialMomentFunctional_eq_sum {D : ℕ}
   simp [manyDemePolynomialMomentFunctional, manyDemePolynomialMomentLinearMap,
     Finsupp.lsum_apply, LinearMap.mulRight_apply]
 
+/-- A degree-`K` polynomial moment depends only on mixed moments of total degree at most `K`. -/
+theorem manyDemePolynomialMomentFunctional_congr_of_totalDegree_le {D K : ℕ}
+    (left right : (Fin D → ℕ) → ℝ) (polynomial : MvPolynomial (Fin D) ℝ)
+    (degree_le : polynomial.totalDegree ≤ K)
+    (agree : ∀ exponent, (∑ deme, exponent deme) ≤ K → left exponent = right exponent) :
+    manyDemePolynomialMomentFunctional left polynomial =
+      manyDemePolynomialMomentFunctional right polynomial := by
+  rw [manyDemePolynomialMomentFunctional_eq_sum,
+    manyDemePolynomialMomentFunctional_eq_sum]
+  apply Finset.sum_congr rfl
+  intro exponent member
+  congr 1
+  apply agree
+  have support_degree := (MvPolynomial.le_totalDegree member).trans degree_le
+  simpa [Finsupp.sum_fintype] using support_degree
+
 /-- The coefficient-level duality survives every mixed-moment functional.  This is the exact
 scalar generator equality needed by each row of the forthcoming Bernstein projection matrix. -/
 theorem manyDemeBernsteinGenerator_momentFunctional_eq_killedDual {D : ℕ}
@@ -2244,6 +2343,83 @@ theorem manyDemeKilledDualGenerator_smul {D : ℕ} (rates : ManyDemeRates D)
   simp only [← Finset.mul_sum]
   ring
 
+/-- Two value tables agreeing through the current lineage degree give the same killed
+generator at that configuration.  All active transitions either lower or preserve degree. -/
+theorem manyDemeKilledDualGenerator_congr_of_degree_le {D : ℕ}
+    (rates : ManyDemeRates D)
+    (left right : (Fin D → ℕ) → (Fin D → ℕ) → ℝ)
+    (derived ancestral : Fin D → ℕ)
+    (agree : ∀ a b,
+      (∑ deme, a deme) + ∑ deme, b deme ≤
+        (∑ deme, derived deme) + ∑ deme, ancestral deme → left a b = right a b) :
+    manyDemeKilledDualGenerator rates left derived ancestral =
+      manyDemeKilledDualGenerator rates right derived ancestral := by
+  have original := agree derived ancestral (by omega)
+  have derivedCoal (deme : Fin D) :
+      left (decrementExponent derived deme) ancestral =
+        right (decrementExponent derived deme) ancestral :=
+    agree _ _ (by
+      have := sum_decrementExponent_le derived deme
+      omega)
+  have ancestralCoal (deme : Fin D) :
+      left derived (decrementExponent ancestral deme) =
+        right derived (decrementExponent ancestral deme) :=
+    agree _ _ (by
+      have := sum_decrementExponent_le ancestral deme
+      omega)
+  have derivedMigration (src dst : Fin D) (positive : 0 < derived src)
+      (distinct : src ≠ dst) :
+      left (migrateExponent derived src dst) ancestral =
+        right (migrateExponent derived src dst) ancestral :=
+    agree _ _ (by rw [sum_migrateExponent derived src dst distinct positive])
+  have ancestralMigration (src dst : Fin D) (positive : 0 < ancestral src)
+      (distinct : src ≠ dst) :
+      left derived (migrateExponent ancestral src dst) =
+        right derived (migrateExponent ancestral src dst) :=
+    agree _ _ (by rw [sum_migrateExponent ancestral src dst distinct positive])
+  have derivedFlip (deme : Fin D) (positive : 0 < derived deme) :
+      left (decrementExponent derived deme) (incrementExponent ancestral deme) =
+        right (decrementExponent derived deme) (incrementExponent ancestral deme) :=
+    agree _ _ (by
+      rw [sum_decrementExponent derived deme positive, sum_incrementExponent]
+      omega)
+  have ancestralFlip (deme : Fin D) (positive : 0 < ancestral deme) :
+      left (incrementExponent derived deme) (decrementExponent ancestral deme) =
+        right (incrementExponent derived deme) (decrementExponent ancestral deme) :=
+    agree _ _ (by
+      rw [sum_incrementExponent, sum_decrementExponent ancestral deme positive]
+      omega)
+  unfold manyDemeKilledDualGenerator
+  congr 1
+  · apply Finset.sum_congr rfl
+    intro deme _
+    rw [derivedCoal, ancestralCoal, original]
+  · apply Finset.sum_congr rfl
+    intro src _
+    apply Finset.sum_congr rfl
+    intro dst _
+    by_cases same : src = dst
+    · subst dst
+      simp [rates.migration_self]
+    · by_cases derivedPositive : 0 < derived src
+      · rw [derivedMigration src dst derivedPositive same]
+      · have derivedZero : derived src = 0 := by omega
+        simp only [derivedZero, Nat.cast_zero, mul_zero, zero_mul, zero_add]
+      by_cases ancestralPositive : 0 < ancestral src
+      · rw [ancestralMigration src dst ancestralPositive same, original]
+      · have ancestralZero : ancestral src = 0 := by omega
+        simp [ancestralZero, original]
+  · apply Finset.sum_congr rfl
+    intro deme _
+    by_cases derivedPositive : 0 < derived deme
+    · rw [derivedFlip deme derivedPositive]
+    · have derivedZero : derived deme = 0 := by omega
+      simp only [derivedZero, Nat.cast_zero, mul_zero, zero_mul, zero_add]
+    by_cases ancestralPositive : 0 < ancestral deme
+    · rw [ancestralFlip deme ancestralPositive, original]
+    · have ancestralZero : ancestral deme = 0 := by omega
+      simp [ancestralZero, original]
+
 /-- Finite linear operator obtained directly from the proved positive killed-dual law. -/
 noncomputable def manyDemeKilledDualGeneratorLinearMap {D K : ℕ}
     (rates : ManyDemeRates D) :
@@ -2292,6 +2468,138 @@ theorem manyDemeKilledDualDynamicsMatrix_mulVec {D K : ℕ}
     (manyDemeKilledDualDynamicsMatrix (K := K) rates).mulVec vector =
       manyDemeKilledDualGeneratorLinearMap rates vector := by
   exact LinearMap.toMatrix'_mulVec _ _
+
+/-- Biological killed-dual coordinates are exactly the lineage configurations whose total
+degree is at most `K`; rectangular padding is excluded by construction. -/
+structure BiologicalManyDemeKilledDualCoordinate (D K : ℕ) where
+  coordinate : ManyDemeKilledDualCoordinate D K
+  degree_le : coordinate.degree ≤ K
+
+/-- Read a compact killed-dual vector as an unrestricted lineage-configuration table. -/
+noncomputable def biologicalManyDemeKilledDualVectorTable {D K : ℕ}
+    (state : BiologicalManyDemeKilledDualCoordinate D K → ℝ)
+    (derived ancestral : Fin D → ℕ) : ℝ :=
+  if hderived : ∀ deme, derived deme < K + 1 then
+    if hancestral : ∀ deme, ancestral deme < K + 1 then
+      let coordinate : ManyDemeKilledDualCoordinate D K :=
+        (fun deme ↦ ⟨derived deme, hderived deme⟩,
+          fun deme ↦ ⟨ancestral deme, hancestral deme⟩)
+      if hdegree : coordinate.degree ≤ K then
+        state ⟨coordinate, hdegree⟩
+      else 0
+    else 0
+  else 0
+
+/-- Compact killed-dual table construction commutes with addition. -/
+theorem biologicalManyDemeKilledDualVectorTable_add {D K : ℕ}
+    (left right : BiologicalManyDemeKilledDualCoordinate D K → ℝ)
+    (derived ancestral : Fin D → ℕ) :
+    biologicalManyDemeKilledDualVectorTable (left + right) derived ancestral =
+      biologicalManyDemeKilledDualVectorTable left derived ancestral +
+        biologicalManyDemeKilledDualVectorTable right derived ancestral := by
+  unfold biologicalManyDemeKilledDualVectorTable
+  split_ifs <;> simp
+
+/-- Compact killed-dual table construction commutes with scalar multiplication. -/
+theorem biologicalManyDemeKilledDualVectorTable_smul {D K : ℕ} (scalar : ℝ)
+    (state : BiologicalManyDemeKilledDualCoordinate D K → ℝ)
+    (derived ancestral : Fin D → ℕ) :
+    biologicalManyDemeKilledDualVectorTable (scalar • state) derived ancestral =
+      scalar * biologicalManyDemeKilledDualVectorTable state derived ancestral := by
+  unfold biologicalManyDemeKilledDualVectorTable
+  split_ifs <;> simp
+
+/-- Compact table lookup succeeds for every unrestricted configuration of total degree at
+most `K`. -/
+theorem biologicalManyDemeKilledDualVectorTable_of_degree_le {D K : ℕ}
+    (state : BiologicalManyDemeKilledDualCoordinate D K → ℝ)
+    (derived ancestral : Fin D → ℕ)
+    (degree_le : (∑ deme, derived deme) + ∑ deme, ancestral deme ≤ K) :
+    biologicalManyDemeKilledDualVectorTable state derived ancestral =
+      state {
+        coordinate :=
+          (fun deme ↦ ⟨derived deme, by
+              have coordinate_le : derived deme ≤ ∑ d, derived d :=
+                Finset.single_le_sum (fun d _ ↦ Nat.zero_le (derived d))
+                  (Finset.mem_univ deme)
+              omega⟩,
+            fun deme ↦ ⟨ancestral deme, by
+              have coordinate_le : ancestral deme ≤ ∑ d, ancestral d :=
+                Finset.single_le_sum (fun d _ ↦ Nat.zero_le (ancestral d))
+                  (Finset.mem_univ deme)
+              omega⟩)
+        degree_le := by
+          simpa [ManyDemeKilledDualCoordinate.degree] } := by
+  unfold biologicalManyDemeKilledDualVectorTable
+  simp only [dif_pos]
+
+/-- Exact killed-dual linear operator on its closed biological carrier. -/
+noncomputable def biologicalManyDemeKilledDualGeneratorLinearMap {D K : ℕ}
+    (rates : ManyDemeRates D) :
+    (BiologicalManyDemeKilledDualCoordinate D K → ℝ) →ₗ[ℝ]
+      (BiologicalManyDemeKilledDualCoordinate D K → ℝ) where
+  toFun state coordinate :=
+    manyDemeKilledDualGenerator rates
+      (biologicalManyDemeKilledDualVectorTable state)
+      (fun deme ↦ (coordinate.coordinate.1 deme).val)
+      (fun deme ↦ (coordinate.coordinate.2 deme).val)
+  map_add' := by
+    intro left right
+    funext coordinate
+    rw [← manyDemeKilledDualGenerator_add rates
+      (biologicalManyDemeKilledDualVectorTable left)
+      (biologicalManyDemeKilledDualVectorTable right)]
+    apply congrArg₂ (manyDemeKilledDualGenerator rates)
+    funext derived ancestral
+    exact biologicalManyDemeKilledDualVectorTable_add left right derived ancestral
+  map_smul' := by
+    intro scalar state
+    funext coordinate
+    simp only [Pi.smul_apply, smul_eq_mul]
+    rw [← manyDemeKilledDualGenerator_smul rates scalar
+      (biologicalManyDemeKilledDualVectorTable state)]
+    apply congrArg₂ (manyDemeKilledDualGenerator rates)
+    funext derived ancestral
+    exact biologicalManyDemeKilledDualVectorTable_smul scalar state derived ancestral
+
+/-- Exact finite killed-dual generator matrix with no padding rows or columns. -/
+noncomputable def biologicalManyDemeKilledDualGenerator {D K : ℕ}
+    (rates : ManyDemeRates D) :
+    Matrix (BiologicalManyDemeKilledDualCoordinate D K)
+      (BiologicalManyDemeKilledDualCoordinate D K) ℝ :=
+  LinearMap.toMatrix' (biologicalManyDemeKilledDualGeneratorLinearMap rates)
+
+/-- Applying the compact matrix evaluates the unrestricted killed generator through the
+compact configuration table. -/
+theorem biologicalManyDemeKilledDualGenerator_mulVec {D K : ℕ}
+    (rates : ManyDemeRates D)
+    (state : BiologicalManyDemeKilledDualCoordinate D K → ℝ) :
+    (biologicalManyDemeKilledDualGenerator rates).mulVec state =
+      biologicalManyDemeKilledDualGeneratorLinearMap rates state := by
+  exact LinearMap.toMatrix'_mulVec _ _
+
+/-- Every transition consulted by a biological killed-generator row stays inside its finite
+carrier. -/
+theorem BiologicalManyDemeKilledDualCoordinate.transitions_closed {D K : ℕ}
+    (coordinate : BiologicalManyDemeKilledDualCoordinate D K) :
+    (∀ deme,
+      (∀ target, decrementExponent
+          (fun d ↦ (coordinate.coordinate.1 d).val) deme target < K + 1) ∧
+      (∀ target, decrementExponent
+          (fun d ↦ (coordinate.coordinate.2 d).val) deme target < K + 1)) ∧
+    (∀ src dst, 0 < (coordinate.coordinate.1 src).val →
+      ∀ deme, migrateExponent
+        (fun d ↦ (coordinate.coordinate.1 d).val) src dst deme < K + 1) ∧
+    (∀ src dst, 0 < (coordinate.coordinate.2 src).val →
+      ∀ deme, migrateExponent
+        (fun d ↦ (coordinate.coordinate.2 d).val) src dst deme < K + 1) ∧
+    (∀ deme, 0 < (coordinate.coordinate.1 deme).val →
+      ∀ target, incrementExponent
+        (fun d ↦ (coordinate.coordinate.2 d).val) deme target < K + 1) ∧
+    (∀ deme, 0 < (coordinate.coordinate.2 deme).val →
+      ∀ target, incrementExponent
+        (fun d ↦ (coordinate.coordinate.1 d).val) deme target < K + 1) :=
+  coordinate.coordinate.allTransitions_closed coordinate.degree_le
 
 /-- One piecewise-constant epoch for direct positive killed-dual propagation. -/
 structure ManyDemeKilledDualEpoch (D K : ℕ) where
@@ -2444,6 +2752,27 @@ noncomputable def manyDemeMomentGenerator {D : ℕ} (rates : ManyDemeRates D)
       (moment (decrementExponent exponent d) - moment exponent) -
     rates.backwardMutation d * exponent d * moment exponent))
 
+/-- The structured moment generator at one exponent, bundled as a linear functional of the
+moment table. -/
+noncomputable def manyDemeMomentGeneratorLinearMapAt {D : ℕ}
+    (rates : ManyDemeRates D) (exponent : Fin D → ℕ) :
+    ((Fin D → ℕ) → ℝ) →ₗ[ℝ] ℝ where
+  toFun moment := manyDemeMomentGenerator rates moment exponent
+  map_add' := by
+    intro left right
+    unfold manyDemeMomentGenerator
+    simp only [Pi.add_apply]
+    simp_rw [add_sub_add_comm, mul_add]
+    simp only [Finset.sum_add_distrib]
+    ring
+  map_smul' := by
+    intro scalar moment
+    unfold manyDemeMomentGenerator
+    simp only [Pi.smul_apply, smul_eq_mul]
+    simp_rw [mul_sub, ← mul_assoc]
+    simp only [← Finset.mul_sum]
+    ring
+
 /-! ### Exact finite propagation for arbitrary deme count -/
 
 /-- Finite rectangular carrier for every exponent through coordinatewise degree `K`.
@@ -2532,6 +2861,353 @@ noncomputable def manyDemeMomentForcing {D : ℕ}
 abbrev AffineManyDemeMomentCoordinate (D K : ℕ) :=
   Option (ManyDemeMomentCoordinate D K)
 
+/-- A genuinely biological nonconstant moment coordinate.  Unlike the rectangular carrier,
+this type cannot represent the duplicated all-zero coordinate or any total degree above `K`. -/
+structure PositiveManyDemeMomentCoordinate (D K : ℕ) where
+  coordinate : ManyDemeMomentCoordinate D K
+  degree_pos : 0 < coordinate.degree
+  degree_le : coordinate.degree ≤ K
+
+/-- Minimal normalized moment carrier: one constant plus exactly the positive mixed moments
+of total degree at most `K`. -/
+abbrev BiologicalManyDemeMomentCoordinate (D K : ℕ) :=
+  Option (PositiveManyDemeMomentCoordinate D K)
+
+/-- Forget the biological proof and embed the minimal carrier in the old rectangular affine
+carrier. -/
+def BiologicalManyDemeMomentCoordinate.toAffine {D K : ℕ} :
+    BiologicalManyDemeMomentCoordinate D K → AffineManyDemeMomentCoordinate D K
+  | none => none
+  | some coordinate => some coordinate.coordinate
+
+/-- The biological embedding is injective, so no two normalized coordinates are identified. -/
+theorem BiologicalManyDemeMomentCoordinate.toAffine_injective {D K : ℕ} :
+    Function.Injective
+      (BiologicalManyDemeMomentCoordinate.toAffine :
+        BiologicalManyDemeMomentCoordinate D K → AffineManyDemeMomentCoordinate D K) := by
+  intro left right equal
+  cases left with
+  | none => cases right <;> simp_all [BiologicalManyDemeMomentCoordinate.toAffine]
+  | some left =>
+      cases right with
+      | none => simp_all [BiologicalManyDemeMomentCoordinate.toAffine]
+      | some right =>
+          simp only [BiologicalManyDemeMomentCoordinate.toAffine, Option.some.injEq] at equal
+          subst equal
+          rfl
+
+/-- Moment table represented by one minimal biological basis column. -/
+noncomputable def biologicalManyDemeMomentColumnTable {D K : ℕ}
+    (column : BiologicalManyDemeMomentCoordinate D K) : (Fin D → ℕ) → ℝ :=
+  match column with
+  | none => manyDemeMomentConstantTable
+  | some coordinate => manyDemeMomentBasisTable K coordinate.coordinate
+
+/-- Synthesize the unrestricted mixed-moment table represented by a vector on the minimal
+biological carrier. -/
+noncomputable def biologicalManyDemeMomentSynthesis {D K : ℕ}
+    (state : BiologicalManyDemeMomentCoordinate D K → ℝ) : (Fin D → ℕ) → ℝ :=
+  fun exponent ↦ ∑ column,
+    state column * biologicalManyDemeMomentColumnTable column exponent
+
+/-- Synthesis reads the explicit constant coordinate at the zero exponent. -/
+theorem biologicalManyDemeMomentSynthesis_zero {D K : ℕ}
+    (state : BiologicalManyDemeMomentCoordinate D K → ℝ) :
+    biologicalManyDemeMomentSynthesis state (fun _ ↦ 0) = state none := by
+  classical
+  unfold biologicalManyDemeMomentSynthesis
+  rw [Fintype.sum_option]
+  simp [biologicalManyDemeMomentColumnTable, manyDemeMomentConstantTable,
+    manyDemeMomentBasisTable, manyDemeMomentVectorTable]
+
+/-- Synthesis reads the unique positive biological coordinate at every in-range exponent. -/
+theorem biologicalManyDemeMomentSynthesis_positive {D K : ℕ}
+    (state : BiologicalManyDemeMomentCoordinate D K → ℝ)
+    (exponent : Fin D → ℕ) (degree_pos : 0 < ∑ deme, exponent deme)
+    (degree_le : (∑ deme, exponent deme) ≤ K) :
+    biologicalManyDemeMomentSynthesis state exponent =
+      state (some {
+        coordinate := fun deme ↦ ⟨exponent deme, by
+          have coordinate_le : exponent deme ≤ ∑ d, exponent d :=
+            Finset.single_le_sum (fun d _ ↦ Nat.zero_le (exponent d))
+              (Finset.mem_univ deme)
+          omega⟩
+        degree_pos := by simpa [ManyDemeMomentCoordinate.degree]
+        degree_le := by simpa [ManyDemeMomentCoordinate.degree] }) := by
+  classical
+  let coordinate : ManyDemeMomentCoordinate D K := fun deme ↦
+    ⟨exponent deme, by
+      have coordinate_le : exponent deme ≤ ∑ d, exponent d :=
+        Finset.single_le_sum (fun d _ ↦ Nat.zero_le (exponent d))
+          (Finset.mem_univ deme)
+      omega⟩
+  let positive : PositiveManyDemeMomentCoordinate D K := {
+    coordinate := coordinate
+    degree_pos := by simpa [coordinate, ManyDemeMomentCoordinate.degree]
+    degree_le := by simpa [coordinate, ManyDemeMomentCoordinate.degree] }
+  have bound : ∀ deme, exponent deme < K + 1 := by
+    intro deme
+    have coordinate_le : exponent deme ≤ ∑ d, exponent d :=
+      Finset.single_le_sum (fun d _ ↦ Nat.zero_le (exponent d))
+        (Finset.mem_univ deme)
+    omega
+  unfold biologicalManyDemeMomentSynthesis
+  rw [Fintype.sum_option]
+  simp only [biologicalManyDemeMomentColumnTable, manyDemeMomentConstantTable,
+    manyDemeMomentBasisTable, manyDemeMomentVectorTable, bound, dif_pos]
+  have nonzero : ¬∀ d, exponent d = 0 := by
+    intro zero
+    have : (∑ d, exponent d) = 0 := by simp [zero]
+    omega
+  simp only [nonzero, if_false, zero_mul, zero_add]
+  rw [Finset.sum_eq_single positive]
+  · simp [positive, coordinate]
+  · intro other _ distinct
+    simp only [mul_eq_zero]
+    right
+    simp only [if_false]
+    intro equal
+    apply distinct
+    apply PositiveManyDemeMomentCoordinate.ext
+    exact funext fun deme ↦ Fin.ext (congrFun equal deme)
+  · intro absent
+    exact (absent (Finset.mem_univ positive)).elim
+
+/-- A polynomial moment of a synthesized state is the same finite linear combination of its
+basis-column polynomial moments. -/
+theorem manyDemePolynomialMomentFunctional_biologicalSynthesis {D K : ℕ}
+    (state : BiologicalManyDemeMomentCoordinate D K → ℝ)
+    (polynomial : MvPolynomial (Fin D) ℝ) :
+    manyDemePolynomialMomentFunctional
+        (biologicalManyDemeMomentSynthesis state) polynomial =
+      ∑ column, state column *
+        manyDemePolynomialMomentFunctional
+          (biologicalManyDemeMomentColumnTable column) polynomial := by
+  rw [manyDemePolynomialMomentFunctional_eq_sum]
+  unfold biologicalManyDemeMomentSynthesis
+  simp_rw [Finset.mul_sum]
+  rw [Finset.sum_comm]
+  apply Finset.sum_congr rfl
+  intro column _
+  rw [← Finset.mul_sum, ← manyDemePolynomialMomentFunctional_eq_sum]
+
+/-- The moment generator commutes with finite synthesis on the biological carrier. -/
+theorem manyDemeMomentGenerator_biologicalSynthesis {D K : ℕ}
+    (rates : ManyDemeRates D)
+    (state : BiologicalManyDemeMomentCoordinate D K → ℝ)
+    (exponent : Fin D → ℕ) :
+    manyDemeMomentGenerator rates (biologicalManyDemeMomentSynthesis state) exponent =
+      ∑ column, state column *
+        manyDemeMomentGenerator rates
+          (biologicalManyDemeMomentColumnTable column) exponent := by
+  let generator := manyDemeMomentGeneratorLinearMapAt rates exponent
+  have synthesis_eq : biologicalManyDemeMomentSynthesis state =
+      ∑ column, state column • biologicalManyDemeMomentColumnTable column := by
+    funext requested
+    simp [biologicalManyDemeMomentSynthesis]
+  change generator (biologicalManyDemeMomentSynthesis state) = _
+  rw [synthesis_eq, map_sum]
+  apply Finset.sum_congr rfl
+  intro column _
+  simp [generator, manyDemeMomentGeneratorLinearMapAt]
+
+/-- Exact normalized generator without rectangular padding or an affine forcing convention. -/
+noncomputable def biologicalManyDemeMomentGenerator {D K : ℕ}
+    (rates : ManyDemeRates D) :
+    Matrix (BiologicalManyDemeMomentCoordinate D K)
+      (BiologicalManyDemeMomentCoordinate D K) ℝ
+  | none, _ => 0
+  | some row, column =>
+      manyDemeMomentGenerator rates (biologicalManyDemeMomentColumnTable column)
+        (fun deme ↦ (row.coordinate deme).val)
+
+/-- Matrix application of the compact moment generator is the unrestricted generator of the
+synthesized table at every biological coordinate. -/
+theorem biologicalManyDemeMomentGenerator_mulVec {D K : ℕ}
+    (rates : ManyDemeRates D)
+    (state : BiologicalManyDemeMomentCoordinate D K → ℝ) :
+    (biologicalManyDemeMomentGenerator rates).mulVec state =
+      fun coordinate ↦ match coordinate with
+        | none => 0
+        | some row => manyDemeMomentGenerator rates
+            (biologicalManyDemeMomentSynthesis state)
+            (fun deme ↦ (row.coordinate deme).val) := by
+  funext coordinate
+  cases coordinate with
+  | none => simp [Matrix.mulVec, biologicalManyDemeMomentGenerator]
+  | some row =>
+      rw [manyDemeMomentGenerator_biologicalSynthesis]
+      rfl
+
+/-- Synthesizing one generator column recovers the unrestricted moment-generator column at
+every exponent through degree `K`. -/
+theorem biologicalManyDemeMomentSynthesis_generatorColumn {D K : ℕ}
+    (rates : ManyDemeRates D) (column : BiologicalManyDemeMomentCoordinate D K)
+    (exponent : Fin D → ℕ) (degree_le : (∑ deme, exponent deme) ≤ K) :
+    biologicalManyDemeMomentSynthesis
+        (fun row ↦ biologicalManyDemeMomentGenerator rates row column) exponent =
+      manyDemeMomentGenerator rates
+        (biologicalManyDemeMomentColumnTable column) exponent := by
+  by_cases degree_pos : 0 < ∑ deme, exponent deme
+  · rw [biologicalManyDemeMomentSynthesis_positive _ exponent degree_pos degree_le]
+    rfl
+  · have degree_zero : (∑ deme, exponent deme) = 0 := by omega
+    have exponent_zero : exponent = fun _ ↦ 0 := by
+      funext deme
+      have coordinate_le : exponent deme ≤ ∑ d, exponent d :=
+        Finset.single_le_sum (fun d _ ↦ Nat.zero_le (exponent d))
+          (Finset.mem_univ deme)
+      omega
+    subst exponent
+    rw [biologicalManyDemeMomentSynthesis_zero]
+    simp [biologicalManyDemeMomentGenerator, manyDemeMomentGenerator]
+
+/-- Compact positive-dual Bernstein coefficient projection from the normalized moment
+carrier.  Neither side contains a padding coordinate. -/
+noncomputable def biologicalManyDemeBernsteinMomentProjection (D K : ℕ) :
+    Matrix (BiologicalManyDemeKilledDualCoordinate D K)
+      (BiologicalManyDemeMomentCoordinate D K) ℝ :=
+  fun row column ↦
+    manyDemePolynomialMomentFunctional (biologicalManyDemeMomentColumnTable column)
+      (manyDemeBernsteinPolynomial
+        (fun deme ↦ (row.coordinate.1 deme).val)
+        (fun deme ↦ (row.coordinate.2 deme).val))
+
+/-- Matrix multiplication by the compact projection is exactly Bernstein evaluation of the
+synthesized moment table. -/
+theorem biologicalManyDemeBernsteinMomentProjection_mulVec {D K : ℕ}
+    (state : BiologicalManyDemeMomentCoordinate D K → ℝ) :
+    (biologicalManyDemeBernsteinMomentProjection D K).mulVec state =
+      fun row ↦ manyDemePolynomialMomentFunctional
+        (biologicalManyDemeMomentSynthesis state)
+        (manyDemeBernsteinPolynomial
+          (fun deme ↦ (row.coordinate.1 deme).val)
+          (fun deme ↦ (row.coordinate.2 deme).val)) := by
+  funext row
+  rw [manyDemePolynomialMomentFunctional_biologicalSynthesis]
+  rfl
+
+/-- Looking up a projected compact vector is exactly applying the synthesized moment
+functional to that Bernstein polynomial. -/
+theorem biologicalManyDemeKilledDualVectorTable_projection_mulVec {D K : ℕ}
+    (state : BiologicalManyDemeMomentCoordinate D K → ℝ)
+    (derived ancestral : Fin D → ℕ)
+    (degree_le : (∑ deme, derived deme) + ∑ deme, ancestral deme ≤ K) :
+    biologicalManyDemeKilledDualVectorTable
+        ((biologicalManyDemeBernsteinMomentProjection D K).mulVec state)
+        derived ancestral =
+      manyDemePolynomialMomentFunctional (biologicalManyDemeMomentSynthesis state)
+        (manyDemeBernsteinPolynomial derived ancestral) := by
+  rw [biologicalManyDemeKilledDualVectorTable_of_degree_le _ derived ancestral degree_le,
+    biologicalManyDemeBernsteinMomentProjection_mulVec]
+
+/-- Looking up one compact projection column gives its Bernstein moment functional. -/
+theorem biologicalManyDemeKilledDualVectorTable_projectionColumn {D K : ℕ}
+    (column : BiologicalManyDemeMomentCoordinate D K)
+    (derived ancestral : Fin D → ℕ)
+    (degree_le : (∑ deme, derived deme) + ∑ deme, ancestral deme ≤ K) :
+    biologicalManyDemeKilledDualVectorTable
+        (fun row ↦ biologicalManyDemeBernsteinMomentProjection D K row column)
+        derived ancestral =
+      manyDemePolynomialMomentFunctional
+        (biologicalManyDemeMomentColumnTable column)
+        (manyDemeBernsteinPolynomial derived ancestral) := by
+  rw [biologicalManyDemeKilledDualVectorTable_of_degree_le _ derived ancestral degree_le]
+  rfl
+
+/-- One compact moment-generator column projected into Bernstein coordinates is exactly the
+unrestricted killed generator applied to that column's Bernstein coefficients.  This theorem
+contains the finite degree restriction explicitly and has no padding hypothesis. -/
+theorem biologicalManyDemeBernsteinMomentProjection_momentGeneratorColumn {D K : ℕ}
+    (rates : ManyDemeRates D)
+    (symmetric : ∀ deme,
+      rates.backwardMutation deme = rates.forwardMutation deme)
+    (row : BiologicalManyDemeKilledDualCoordinate D K)
+    (column : BiologicalManyDemeMomentCoordinate D K) :
+    (biologicalManyDemeBernsteinMomentProjection D K).mulVec
+        (fun source ↦ biologicalManyDemeMomentGenerator rates source column) row =
+      manyDemeKilledDualGenerator rates
+        (fun derived ancestral ↦
+          manyDemePolynomialMomentFunctional
+            (biologicalManyDemeMomentColumnTable column)
+            (manyDemeBernsteinPolynomial derived ancestral))
+        (fun deme ↦ (row.coordinate.1 deme).val)
+        (fun deme ↦ (row.coordinate.2 deme).val) := by
+  rw [biologicalManyDemeBernsteinMomentProjection_mulVec]
+  let derived : Fin D → ℕ := fun deme ↦ (row.coordinate.1 deme).val
+  let ancestral : Fin D → ℕ := fun deme ↦ (row.coordinate.2 deme).val
+  have polynomialDegree :
+      (manyDemeBernsteinPolynomial derived ancestral).totalDegree ≤ K :=
+    (manyDemeBernsteinPolynomial_totalDegree_le derived ancestral).trans (by
+      simpa [derived, ancestral, ManyDemeKilledDualCoordinate.degree] using row.degree_le)
+  rw [manyDemePolynomialMomentFunctional_congr_of_totalDegree_le
+    (biologicalManyDemeMomentSynthesis
+      (fun source ↦ biologicalManyDemeMomentGenerator rates source column))
+    (manyDemeMomentGenerator rates (biologicalManyDemeMomentColumnTable column))
+    (manyDemeBernsteinPolynomial derived ancestral) polynomialDegree]
+  · exact manyDemeMomentGenerator_bernstein_intertwines rates
+      (biologicalManyDemeMomentColumnTable column) derived ancestral symmetric
+  · intro exponent degree_le
+    exact biologicalManyDemeMomentSynthesis_generatorColumn rates column exponent degree_le
+
+/-- One compact killed-generator column action on Bernstein coefficients is exactly the same
+unrestricted killed generator appearing on the moment side. -/
+theorem biologicalManyDemeKilledDualGenerator_projectionColumn {D K : ℕ}
+    (rates : ManyDemeRates D)
+    (row : BiologicalManyDemeKilledDualCoordinate D K)
+    (column : BiologicalManyDemeMomentCoordinate D K) :
+    (biologicalManyDemeKilledDualGenerator rates).mulVec
+        (fun target ↦ biologicalManyDemeBernsteinMomentProjection D K target column) row =
+      manyDemeKilledDualGenerator rates
+        (fun derived ancestral ↦
+          manyDemePolynomialMomentFunctional
+            (biologicalManyDemeMomentColumnTable column)
+            (manyDemeBernsteinPolynomial derived ancestral))
+        (fun deme ↦ (row.coordinate.1 deme).val)
+        (fun deme ↦ (row.coordinate.2 deme).val) := by
+  rw [biologicalManyDemeKilledDualGenerator_mulVec]
+  apply manyDemeKilledDualGenerator_congr_of_degree_le
+  intro derived ancestral degree_le
+  exact biologicalManyDemeKilledDualVectorTable_projectionColumn
+    column derived ancestral (degree_le.trans row.degree_le)
+
+/-- **Exact compact finite generator intertwining.**  On carriers containing exactly the
+normalized degree-`K` moments and exactly the degree-`K` killed configurations, the Bernstein
+coefficient matrix intertwines the two generators with no padding qualification. -/
+theorem biologicalManyDemeBernsteinMomentProjection_generator_intertwines {D K : ℕ}
+    (rates : ManyDemeRates D)
+    (symmetric : ∀ deme,
+      rates.backwardMutation deme = rates.forwardMutation deme) :
+    biologicalManyDemeBernsteinMomentProjection D K *
+        biologicalManyDemeMomentGenerator rates =
+      biologicalManyDemeKilledDualGenerator rates *
+        biologicalManyDemeBernsteinMomentProjection D K := by
+  apply Matrix.ext
+  intro row column
+  change (biologicalManyDemeBernsteinMomentProjection D K).mulVec
+      (fun source ↦ biologicalManyDemeMomentGenerator rates source column) row =
+    (biologicalManyDemeKilledDualGenerator rates).mulVec
+      (fun target ↦ biologicalManyDemeBernsteinMomentProjection D K target column) row
+  rw [biologicalManyDemeBernsteinMomentProjection_momentGeneratorColumn rates symmetric,
+    biologicalManyDemeKilledDualGenerator_projectionColumn]
+
+/-- **Exact finite-time compact epoch intertwining.**  Generator duality lifts through the
+absolutely convergent matrix exponential at every real duration.  Thus positive killed-dual
+propagation and normalized moment propagation give identical Bernstein coordinates for a
+whole epoch, not only to first order. -/
+theorem biologicalManyDemeBernsteinMomentProjection_exponential_intertwines {D K : ℕ}
+    (rates : ManyDemeRates D)
+    (symmetric : ∀ deme,
+      rates.backwardMutation deme = rates.forwardMutation deme)
+    (duration : ℝ) :
+    biologicalManyDemeBernsteinMomentProjection D K *
+        matrixExponential (biologicalManyDemeMomentGenerator rates) duration =
+      matrixExponential (biologicalManyDemeKilledDualGenerator rates) duration *
+        biologicalManyDemeBernsteinMomentProjection D K := by
+  exact matrixExponential_intertwines _ _ _
+    (biologicalManyDemeBernsteinMomentProjection_generator_intertwines rates symmetric)
+    duration
+
 /-- Moment-basis table represented by one biological affine column.  The explicit `none`
 column carries the constant monomial; degree-zero and above-`K` rectangular coordinates are
 padding and therefore represent the zero polynomial here. -/
@@ -2572,6 +3248,28 @@ theorem manyDemeBernsteinMomentProjection_of_padding_column {D K : ℕ}
   split_ifs
   simp [manyDemePolynomialMomentFunctional]
 
+/-- The compact Bernstein projection is precisely the biological submatrix of the earlier
+rectangular projection. -/
+theorem biologicalManyDemeBernsteinMomentProjection_eq_submatrix (D K : ℕ) :
+    biologicalManyDemeBernsteinMomentProjection D K =
+      (manyDemeBernsteinMomentProjection D K).submatrix
+        BiologicalManyDemeKilledDualCoordinate.coordinate
+        BiologicalManyDemeMomentCoordinate.toAffine := by
+  apply Matrix.ext
+  intro row column
+  cases column with
+  | none =>
+      simp [biologicalManyDemeBernsteinMomentProjection,
+        manyDemeBernsteinMomentProjection, biologicalManyDemeMomentColumnTable,
+        manyDemeBiologicalAffineColumnTable,
+        BiologicalManyDemeMomentCoordinate.toAffine, row.degree_le]
+  | some column =>
+      simp [biologicalManyDemeBernsteinMomentProjection,
+        manyDemeBernsteinMomentProjection, biologicalManyDemeMomentColumnTable,
+        manyDemeBiologicalAffineColumnTable,
+        BiologicalManyDemeMomentCoordinate.toAffine, row.degree_le,
+        column.degree_pos, column.degree_le]
+
 /-- Exact affine generator `[A,-b;0,0]` for arbitrary finite deme count. -/
 noncomputable def augmentedManyDemeMomentGenerator {D : ℕ}
     (rates : ManyDemeRates D) (K : ℕ) :
@@ -2579,6 +3277,33 @@ noncomputable def augmentedManyDemeMomentGenerator {D : ℕ}
   | some row, some column => manyDemeMomentDynamicsMatrix rates K row column
   | some row, none => -manyDemeMomentForcing rates K row
   | none, _ => 0
+
+/-- The compact generator is exactly the biological submatrix of the existing augmented
+rectangular generator. -/
+theorem biologicalManyDemeMomentGenerator_eq_submatrix {D K : ℕ}
+    (rates : ManyDemeRates D) :
+    biologicalManyDemeMomentGenerator rates =
+      (augmentedManyDemeMomentGenerator rates K).submatrix
+        BiologicalManyDemeMomentCoordinate.toAffine
+        BiologicalManyDemeMomentCoordinate.toAffine := by
+  apply Matrix.ext
+  intro row column
+  cases row with
+  | none => simp [biologicalManyDemeMomentGenerator,
+      augmentedManyDemeMomentGenerator,
+      BiologicalManyDemeMomentCoordinate.toAffine]
+  | some row =>
+      cases column with
+      | none =>
+          simp [biologicalManyDemeMomentGenerator, biologicalManyDemeMomentColumnTable,
+            augmentedManyDemeMomentGenerator, manyDemeMomentForcing,
+            BiologicalManyDemeMomentCoordinate.toAffine, ManyDemeMomentCoordinate.degree,
+            row.degree_pos, row.degree_le]
+      | some column =>
+          simp [biologicalManyDemeMomentGenerator, biologicalManyDemeMomentColumnTable,
+            augmentedManyDemeMomentGenerator, manyDemeMomentDynamicsMatrix,
+            BiologicalManyDemeMomentCoordinate.toAffine, ManyDemeMomentCoordinate.degree,
+            row.degree_pos, row.degree_le]
 
 /-- One arbitrary-deme piecewise-constant diffusion epoch in raw time units. -/
 structure ManyDemeMomentEpoch (D K : ℕ) where

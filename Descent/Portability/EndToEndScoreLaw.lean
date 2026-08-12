@@ -156,9 +156,14 @@ prevent that construction:
   the displayed division-free derivatives are genuine partial derivatives, while
   `manyDemePolynomialMomentFunctional_diffusion` proves the full polynomial/moment adjoint
   identity.  Consequently `manyDemeMomentGenerator_bernstein_intertwines` is the exact
-  unrestricted generator intertwining law.  What remains is to restrict it correctly across
-  the existing duplicated degree-zero padding coordinate, lift it through matrix exponentials,
-  and prove split intertwining, so the alternating evaluator is replaced end to end,
+  unrestricted generator intertwining law.  The former duplicated degree-zero obstruction is
+  now removed at the type level: `BiologicalManyDemeMomentCoordinate` has one constant and
+  only positive moments through degree `K`, while
+  `BiologicalManyDemeKilledDualCoordinate` contains only configurations through that degree.
+  `biologicalManyDemeBernsteinMomentProjection_generator_intertwines` proves the literal
+  compact finite matrix identity, and its exponential theorem lifts it to every exact epoch
+  duration.  What remains is split intertwining and history induction, followed by replacing
+  the alternating evaluator end to end,
   implement its sparse action without materializing either Cartesian carrier, add certified
   floating-point/interval roundoff control, and run at the executable's 13,750-individual /
   27,500-haplotype grid2d scale, followed by the filed end-to-end cohort validation gate;
