@@ -1143,6 +1143,79 @@ theorem DemographicTwoLocusMoments.panelTransportRatio_eq_linkageFactor {D : ℕ
   congr 1
   linear_combination moments.DD rho source source * hDD
 
+/-- Domain for the selection-weighted transport ratio: positive within-source linkage at
+every panel separation, and a nonzero reference regression at the tightest separation. -/
+structure DemographicTwoLocusMoments.SelectionPanelDomain {D n : ℕ}
+    (moments : DemographicTwoLocusMoments D) (panel : Fin (n + 1) → MarkerSeparationBp)
+    (source target : Fin D) : Prop where
+  within_pos : ∀ k, 0 < moments.DD (panel k) source source
+  ref_ne : moments.DD (panel 0) source target ≠ 0
+
+/-- **The selection-weighted transport ratio: the winner-location integral law.**
+
+The clump index of a GWAS region is a random location on the linkage profile, and the
+transported accuracy channel it carries is the selection-conditioned REGRESSION retention
+`DD_tj/DD_tt` at that location, scaled to the self channel at the tightest separation.
+Given winner-location weights `w` (a probability vector over the panel, supplied by the
+correlated-significance-field computation) and the self-channel amplitude `selfAmp`
+(the square root of the ascertained drift-heterogeneity ratio), the law is
+
+  `ratio = (Σ_k w k · selfAmp · reg k / reg 0)²,  reg k = DD_tj(panel k)/DD_tt(panel k)`.
+
+Its limits recover the corpus's earlier transport bodies: a point mass at the tightest
+separation gives the pure self-channel law, and degenerate flat weights with unit self
+amplitude give the unconditioned `panelTransportRatio` family.
+
+Empirical status: MEASURED, blind, three times, on the grid2d demography with the real
+plink P+T pipeline and hash-pinned predictors (validation/empirical/gate/): the
+unconditioned family misses +0.261 ± 0.101 (gate 1, seeds 101-108) and the pure
+self-channel endpoint misses -0.272 ± 0.047 (gate 2, seeds 109-116), while THIS law
+passes every pre-filed bar at gate 3 (seeds 117-124): transport ratio +0.032 ± 0.052 and
+chart AUC -0.002 ± 0.009, zero fitted constants in the chain.  The governing complete
+derivation, with the frozen list of terms measured to lie below gate power at this
+design (multi-causal regions, panel winner's curse, the LD-field closure bound), is
+validation/empirical/gate/EXACT_TRANSPORT_DERIVATION.md. -/
+noncomputable def DemographicTwoLocusMoments.selectionWeightedTransportRatio {D n : ℕ}
+    (moments : DemographicTwoLocusMoments D) (panel : Fin (n + 1) → MarkerSeparationBp)
+    (winner : Fin (n + 1) → ℝ) (selfAmp : ℝ) (source target : Fin D)
+    (_ : moments.SelectionPanelDomain panel source target) : ℝ :=
+  ((∑ k, winner k * (selfAmp *
+      ((moments.DD (panel k) source target / moments.DD (panel k) source source) /
+        (moments.DD (panel 0) source target / moments.DD (panel 0) source source)))) ^ 2)
+
+/-- **A point mass at the tightest separation recovers the self-channel law exactly.** -/
+theorem DemographicTwoLocusMoments.selectionWeightedTransportRatio_pointMass {D n : ℕ}
+    (moments : DemographicTwoLocusMoments D) (panel : Fin (n + 1) → MarkerSeparationBp)
+    (selfAmp : ℝ) (source target : Fin D)
+    (domain : moments.SelectionPanelDomain panel source target) :
+    moments.selectionWeightedTransportRatio panel
+      (fun k ↦ if k = 0 then 1 else 0) selfAmp source target domain = selfAmp ^ 2 := by
+  classical
+  unfold DemographicTwoLocusMoments.selectionWeightedTransportRatio
+  have hden : (moments.DD (panel 0) source target / moments.DD (panel 0) source source) ≠ 0 :=
+    div_ne_zero domain.ref_ne (domain.within_pos 0).ne'
+  have hsum : (∑ k, (if k = 0 then (1 : ℝ) else 0) *
+      (selfAmp * ((moments.DD (panel k) source target / moments.DD (panel k) source source) /
+        (moments.DD (panel 0) source target / moments.DD (panel 0) source source)))) =
+      selfAmp * ((moments.DD (panel 0) source target / moments.DD (panel 0) source source) /
+        (moments.DD (panel 0) source target / moments.DD (panel 0) source source)) := by
+    rw [Finset.sum_eq_single (0 : Fin (n + 1))]
+    · simp
+    · intro b _ hb
+      simp [hb]
+    · intro h
+      exact absurd (Finset.mem_univ _) h
+  rw [hsum, div_self hden]
+  ring
+
+/-- The selection-weighted ratio is a square, hence nonnegative with no hypotheses. -/
+theorem DemographicTwoLocusMoments.selectionWeightedTransportRatio_nonneg {D n : ℕ}
+    (moments : DemographicTwoLocusMoments D) (panel : Fin (n + 1) → MarkerSeparationBp)
+    (winner : Fin (n + 1) → ℝ) (selfAmp : ℝ) (source target : Fin D)
+    (domain : moments.SelectionPanelDomain panel source target) :
+    0 ≤ moments.selectionWeightedTransportRatio panel winner selfAmp source target domain :=
+  sq_nonneg _
+
 /-- Concrete three-deme moment table for the transport-domain witness.  Three demes rather
 than two so that two-deme degeneracies cannot hide; every within-deme heterozygosity and
 linkage value is distinct so the size-correction factor and the normalization are both
@@ -1188,6 +1261,21 @@ noncomputable def panelTransportDomainWitness :
   targetHet_pos := by
     simp [panelTransportWitnessMoments]
     norm_num
+
+/-- The selection-panel domain has a named off-boundary inhabitant on the witness table:
+within-deme linkage 2 and 3 (positive, distinct) and cross linkage 1 (nonzero), so the
+reference regression is exercised away from every degenerate value.
+
+Empirical status: NOT AN EMPIRICAL CLAIM -- an inhabitation witness. -/
+noncomputable def selectionPanelDomainWitness :
+    panelTransportWitnessMoments.SelectionPanelDomain
+      (fun _ : Fin 2 ↦ clumpWindowSeparation) 0 1 where
+  within_pos := by
+    intro k
+    simp [panelTransportWitnessMoments]
+  ref_ne := by
+    have h01 : (0 : Fin 3) ≠ 1 := by decide
+    simp [panelTransportWitnessMoments, h01]
 
 /-- The bare normalization domain inherits the pair witness's inhabitant by projection.
 
