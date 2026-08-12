@@ -1085,7 +1085,14 @@ prediction of that variance sits `0.60` below measurement because the causal pan
 COMMON-VARIANT ASCERTAINED and ascertainment flattens per-deme heterozygosity -- worth
 about `0.05` of AUC if ignored.  The ascertained-spectrum heterozygosity is therefore the
 one named factor separating this transport law from full metric-level prediction; it is the
-finite-cohort ascertainment law's object, not a free parameter. -/
+finite-cohort ascertainment law's object, not a free parameter.  The classical
+common-variant decomposition `v_j = (1 - F*_j)/(1 + F̄)` -- both divergences read from this
+interface's `H` as coalescence times, deme-versus-pool and pooled -- is the current best
+closed-form candidate: it grades `+0.028 ± 0.030` on the six-deme stress history and misses
+`+0.113` on the eight-deme cube (cell scatter consistent with the 150-locus panel's own
+sampling noise, so the miss is seed-clustered and its significance is below its nominal
+sems).  The residual gap is the pooled-sample MAF conditioning beyond the time-ratio
+reading, which only the sample-count spectrum machinery expresses. -/
 noncomputable def DemographicTwoLocusMoments.panelTransportRatio {D n : ℕ}
     (moments : DemographicTwoLocusMoments D) (panel : Fin n → MarkerSeparationBp)
     (hetRho : MarkerSeparationBp) (source target : Fin D)
