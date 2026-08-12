@@ -75,6 +75,15 @@ inductive LowOrderLDCoordinate (D : ℕ) where
   | pi2 (first second third fourth : Fin D)
 deriving DecidableEq, Fintype, Repr
 
+/-- The four allelic states at a pair of biallelic loci, used as coordinates of the
+haplotype-frequency Wright--Fisher simplex. -/
+inductive TwoLocusHaplotype where
+  | AB
+  | Ab
+  | aB
+  | ab
+deriving DecidableEq, Fintype, Repr
+
 /-- Add a constant coordinate so mutation influx and other affine source terms evolve in the
 same matrix exponential as the homogeneous moments. -/
 abbrev AffineLowOrderLDCoordinate (D : ℕ) := Option (LowOrderLDCoordinate D)
@@ -656,6 +665,142 @@ theorem maximalCoupling_linkage : maximalCoupling.linkage = 1 / 4 := by
   norm_num [maximalCoupling, linkage]
 
 end TwoLocusHaplotypeFrequencies
+
+/-! ## Primitive multinomial covariance laws -/
+
+/-- Mean of a score on the four haplotypes under one haplotype-frequency simplex point. -/
+def twoLocusHaplotypeMean (frequency : TwoLocusHaplotypeFrequencies)
+    (score : TwoLocusHaplotype → ℝ) : ℝ :=
+  frequency.AB * score .AB + frequency.Ab * score .Ab +
+    frequency.aB * score .aB + frequency.ab * score .ab
+
+/-- Exact covariance of two haplotype scores under one multinomial draw. -/
+def twoLocusHaplotypeCovariance (frequency : TwoLocusHaplotypeFrequencies)
+    (firstScore secondScore : TwoLocusHaplotype → ℝ) : ℝ :=
+  twoLocusHaplotypeMean frequency (fun haplotype ↦
+      firstScore haplotype * secondScore haplotype) -
+    twoLocusHaplotypeMean frequency firstScore *
+      twoLocusHaplotypeMean frequency secondScore
+
+/-- Indicator that a haplotype carries `A` at the left locus. -/
+def twoLocusLeftAlleleIndicator : TwoLocusHaplotype → ℝ
+  | .AB | .Ab => 1
+  | .aB | .ab => 0
+
+/-- Indicator that a haplotype carries `B` at the right locus. -/
+def twoLocusRightAlleleIndicator : TwoLocusHaplotype → ℝ
+  | .AB | .aB => 1
+  | .Ab | .ab => 0
+
+/-- Gradient of the haplotype determinant `AB*ab - Ab*aB`. -/
+def twoLocusLinkageGradient (frequency : TwoLocusHaplotypeFrequencies) :
+    TwoLocusHaplotype → ℝ
+  | .AB => frequency.ab
+  | .Ab => -frequency.aB
+  | .aB => -frequency.Ab
+  | .ab => frequency.AB
+
+/-- The multinomial mean of the left indicator is the left marginal frequency. -/
+theorem twoLocusHaplotypeMean_leftIndicator
+    (frequency : TwoLocusHaplotypeFrequencies) :
+    twoLocusHaplotypeMean frequency twoLocusLeftAlleleIndicator =
+      frequency.leftFrequency := by
+  simp [twoLocusHaplotypeMean, twoLocusLeftAlleleIndicator,
+    TwoLocusHaplotypeFrequencies.leftFrequency]
+
+/-- The multinomial mean of the right indicator is the right marginal frequency. -/
+theorem twoLocusHaplotypeMean_rightIndicator
+    (frequency : TwoLocusHaplotypeFrequencies) :
+    twoLocusHaplotypeMean frequency twoLocusRightAlleleIndicator =
+      frequency.rightFrequency := by
+  simp [twoLocusHaplotypeMean, twoLocusRightAlleleIndicator,
+    TwoLocusHaplotypeFrequencies.rightFrequency]
+
+/-- Left marginal quadratic variation is the Bernoulli variance. -/
+theorem twoLocusHaplotypeCovariance_left_left
+    (frequency : TwoLocusHaplotypeFrequencies) :
+    twoLocusHaplotypeCovariance frequency twoLocusLeftAlleleIndicator
+        twoLocusLeftAlleleIndicator =
+      frequency.leftFrequency * (1 - frequency.leftFrequency) := by
+  simp [twoLocusHaplotypeCovariance, twoLocusHaplotypeMean,
+    twoLocusLeftAlleleIndicator, TwoLocusHaplotypeFrequencies.leftFrequency]
+  ring
+
+/-- Right marginal quadratic variation is the Bernoulli variance. -/
+theorem twoLocusHaplotypeCovariance_right_right
+    (frequency : TwoLocusHaplotypeFrequencies) :
+    twoLocusHaplotypeCovariance frequency twoLocusRightAlleleIndicator
+        twoLocusRightAlleleIndicator =
+      frequency.rightFrequency * (1 - frequency.rightFrequency) := by
+  simp [twoLocusHaplotypeCovariance, twoLocusHaplotypeMean,
+    twoLocusRightAlleleIndicator, TwoLocusHaplotypeFrequencies.rightFrequency]
+  ring
+
+/-- Cross-locus marginal quadratic covariation is exactly linkage disequilibrium `D`. -/
+theorem twoLocusHaplotypeCovariance_left_right
+    (frequency : TwoLocusHaplotypeFrequencies) :
+    twoLocusHaplotypeCovariance frequency twoLocusLeftAlleleIndicator
+        twoLocusRightAlleleIndicator = frequency.linkage := by
+  have hab : frequency.ab = 1 - frequency.AB - frequency.Ab - frequency.aB := by
+    linarith [frequency.total_eq_one]
+  simp [twoLocusHaplotypeCovariance, twoLocusHaplotypeMean,
+    twoLocusLeftAlleleIndicator, twoLocusRightAlleleIndicator,
+    TwoLocusHaplotypeFrequencies.linkage]
+  rw [hab]
+  ring
+
+/-- Linkage/marginal covariation at the left locus is `D (1-2p)`. -/
+theorem twoLocusHaplotypeCovariance_linkage_left
+    (frequency : TwoLocusHaplotypeFrequencies) :
+    twoLocusHaplotypeCovariance frequency (twoLocusLinkageGradient frequency)
+        twoLocusLeftAlleleIndicator =
+      frequency.linkage * frequency.leftContrast := by
+  have hab : frequency.ab = 1 - frequency.AB - frequency.Ab - frequency.aB := by
+    linarith [frequency.total_eq_one]
+  simp [twoLocusHaplotypeCovariance, twoLocusHaplotypeMean,
+    twoLocusLinkageGradient, twoLocusLeftAlleleIndicator,
+    TwoLocusHaplotypeFrequencies.linkage,
+    TwoLocusHaplotypeFrequencies.leftContrast,
+    TwoLocusHaplotypeFrequencies.leftFrequency]
+  rw [hab]
+  ring
+
+/-- Linkage/marginal covariation at the right locus is `D (1-2q)`. -/
+theorem twoLocusHaplotypeCovariance_linkage_right
+    (frequency : TwoLocusHaplotypeFrequencies) :
+    twoLocusHaplotypeCovariance frequency (twoLocusLinkageGradient frequency)
+        twoLocusRightAlleleIndicator =
+      frequency.linkage * frequency.rightContrast := by
+  have hab : frequency.ab = 1 - frequency.AB - frequency.Ab - frequency.aB := by
+    linarith [frequency.total_eq_one]
+  simp [twoLocusHaplotypeCovariance, twoLocusHaplotypeMean,
+    twoLocusLinkageGradient, twoLocusRightAlleleIndicator,
+    TwoLocusHaplotypeFrequencies.linkage,
+    TwoLocusHaplotypeFrequencies.rightContrast,
+    TwoLocusHaplotypeFrequencies.rightFrequency]
+  rw [hab]
+  ring
+
+/-- Exact linkage quadratic variation.  This single identity produces the three terms in
+the same-deme `DD` drift row: `-D² + D z w + p(1-p)q(1-q)`. -/
+theorem twoLocusHaplotypeCovariance_linkage_linkage
+    (frequency : TwoLocusHaplotypeFrequencies) :
+    twoLocusHaplotypeCovariance frequency (twoLocusLinkageGradient frequency)
+        (twoLocusLinkageGradient frequency) =
+      -frequency.linkage ^ 2 +
+        frequency.linkage * frequency.leftContrast * frequency.rightContrast +
+        frequency.leftFrequency * (1 - frequency.leftFrequency) *
+          (frequency.rightFrequency * (1 - frequency.rightFrequency)) := by
+  have hab : frequency.ab = 1 - frequency.AB - frequency.Ab - frequency.aB := by
+    linarith [frequency.total_eq_one]
+  simp [twoLocusHaplotypeCovariance, twoLocusHaplotypeMean,
+    twoLocusLinkageGradient, TwoLocusHaplotypeFrequencies.linkage,
+    TwoLocusHaplotypeFrequencies.leftContrast,
+    TwoLocusHaplotypeFrequencies.rightContrast,
+    TwoLocusHaplotypeFrequencies.leftFrequency,
+    TwoLocusHaplotypeFrequencies.rightFrequency]
+  rw [hab]
+  ring
 
 /-- Pointwise observable whose expectation is `Dz(i,j,k)`. -/
 def twoLocusDzObservable
