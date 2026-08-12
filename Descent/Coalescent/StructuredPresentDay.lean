@@ -6,6 +6,7 @@ import Descent.Core.Moments
 import Mathlib.Analysis.Matrix
 import Mathlib.Analysis.Normed.Algebra.Exponential
 import Mathlib.Algebra.MvPolynomial.Funext
+import Mathlib.Algebra.MvPolynomial.PDeriv
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import Mathlib.LinearAlgebra.Finsupp.LSum
 import Mathlib.Topology.Algebra.InfiniteSum.Basic
@@ -1030,13 +1031,17 @@ noncomputable def manyDemeBernsteinWeight {D : ℕ} (frequency : Fin D → ℝ)
     (derived ancestral : Fin D → ℕ) : ℝ :=
   ∏ deme, frequency deme ^ derived deme * (1 - frequency deme) ^ ancestral deme
 
+/-- One deme's factor in a product Bernstein polynomial. -/
+noncomputable def manyDemeBernsteinPolynomialFactor {D : ℕ} (deme : Fin D)
+    (derived ancestral : ℕ) : MvPolynomial (Fin D) ℝ :=
+  MvPolynomial.X deme ^ derived * (1 - MvPolynomial.X deme) ^ ancestral
+
 /-- The same product Bernstein basis element as a multivariate real polynomial.  This lift
 lets a pointwise generator identity become a coefficient-level identity by polynomial
 extensionality, which is the bridge needed for finite moment-matrix intertwining. -/
 noncomputable def manyDemeBernsteinPolynomial {D : ℕ}
     (derived ancestral : Fin D → ℕ) : MvPolynomial (Fin D) ℝ :=
-  ∏ deme, MvPolynomial.X deme ^ derived deme *
-    (1 - MvPolynomial.X deme) ^ ancestral deme
+  ∏ deme, manyDemeBernsteinPolynomialFactor deme (derived deme) (ancestral deme)
 
 /-- Evaluating the polynomial lift recovers exactly the numerical Bernstein weight. -/
 theorem eval_manyDemeBernsteinPolynomial {D : ℕ} (frequency : Fin D → ℝ)
@@ -1044,6 +1049,60 @@ theorem eval_manyDemeBernsteinPolynomial {D : ℕ} (frequency : Fin D → ℝ)
     MvPolynomial.eval frequency (manyDemeBernsteinPolynomial derived ancestral) =
       manyDemeBernsteinWeight frequency derived ancestral := by
   simp [manyDemeBernsteinPolynomial, manyDemeBernsteinWeight]
+
+/-- A partial derivative in one deme annihilates every different deme's Bernstein factor. -/
+theorem pderiv_manyDemeBernsteinPolynomialFactor_of_ne {D : ℕ}
+    (different deme : Fin D) (derived ancestral : ℕ) (distinct : different ≠ deme) :
+    MvPolynomial.pderiv deme
+        (manyDemeBernsteinPolynomialFactor different derived ancestral) = 0 := by
+  simp [manyDemeBernsteinPolynomialFactor, MvPolynomial.pderiv_mul,
+    MvPolynomial.pderiv_pow, MvPolynomial.pderiv_X_of_ne distinct]
+
+/-- A Bernstein polynomial with no ancestral labels is exactly the corresponding monomial. -/
+theorem manyDemeBernsteinPolynomial_zeroAncestral_eq_monomial {D : ℕ}
+    (exponent : Fin D → ℕ) :
+    manyDemeBernsteinPolynomial exponent (fun _ ↦ 0) =
+      MvPolynomial.monomial (Finsupp.equivFunOnFinite.symm exponent) 1 := by
+  classical
+  simp [manyDemeBernsteinPolynomial, manyDemeBernsteinPolynomialFactor,
+    MvPolynomial.monomial_eq, Finsupp.prod]
+
+/-- A partial derivative annihilates a product of factors whose indices exclude its deme. -/
+theorem pderiv_manyDemeBernsteinPolynomial_prod_of_not_mem {D : ℕ}
+    (deme : Fin D) (derived ancestral : Fin D → ℕ) (demes : Finset (Fin D))
+    (absent : deme ∉ demes) :
+    MvPolynomial.pderiv deme
+        (∏ different ∈ demes,
+          manyDemeBernsteinPolynomialFactor different
+            (derived different) (ancestral different)) = 0 := by
+  classical
+  induction demes using Finset.induction_on with
+  | empty => simp [MvPolynomial.pderiv_one]
+  | @insert different demes fresh ih =>
+      have different_ne : different ≠ deme := by
+        intro equal
+        subst different
+        exact absent (Finset.mem_insert_self deme demes)
+      have deme_absent : deme ∉ demes := by
+        exact fun member ↦ absent (Finset.mem_insert_of_mem member)
+      rw [Finset.prod_insert fresh, MvPolynomial.pderiv_mul,
+        pderiv_manyDemeBernsteinPolynomialFactor_of_ne different deme
+          (derived different) (ancestral different) different_ne,
+        ih deme_absent]
+      simp
+
+/-- Exact derivative of the one-deme Bernstein factor, including zero boundary exponents. -/
+theorem pderiv_manyDemeBernsteinPolynomialFactor_self {D : ℕ}
+    (deme : Fin D) (derived ancestral : ℕ) :
+    MvPolynomial.pderiv deme
+        (manyDemeBernsteinPolynomialFactor deme derived ancestral) =
+      MvPolynomial.C (derived : ℝ) *
+          manyDemeBernsteinPolynomialFactor deme (derived - 1) ancestral -
+        MvPolynomial.C (ancestral : ℝ) *
+          manyDemeBernsteinPolynomialFactor deme derived (ancestral - 1) := by
+  simp [manyDemeBernsteinPolynomialFactor, MvPolynomial.pderiv_mul,
+    MvPolynomial.pderiv_pow]
+  ring
 
 /-- Multiplying after removing one positive derived exponent restores the original
 Bernstein weight. -/
@@ -1226,6 +1285,68 @@ noncomputable def manyDemeBernsteinSecondDerivativePolynomial {D : ℕ}
     MvPolynomial.C (((ancestral deme * (ancestral deme - 1) : ℕ) : ℝ)) *
       manyDemeBernsteinPolynomial derived
         (decrementExponent (decrementExponent ancestral deme) deme)
+
+/-- The explicit first-derivative polynomial is the genuine partial derivative of the product
+Bernstein polynomial. -/
+theorem pderiv_manyDemeBernsteinPolynomial {D : ℕ}
+    (derived ancestral : Fin D → ℕ) (deme : Fin D) :
+    MvPolynomial.pderiv deme (manyDemeBernsteinPolynomial derived ancestral) =
+      manyDemeBernsteinFirstDerivativePolynomial derived ancestral deme := by
+  classical
+  let rest := ∏ different ∈ Finset.univ \ {deme},
+    manyDemeBernsteinPolynomialFactor different
+      (derived different) (ancestral different)
+  have original_split : manyDemeBernsteinPolynomial derived ancestral =
+      manyDemeBernsteinPolynomialFactor deme (derived deme) (ancestral deme) * rest := by
+    unfold manyDemeBernsteinPolynomial rest
+    rw [Finset.prod_eq_mul_prod_diff_singleton (Finset.mem_univ deme)]
+  have rest_derivative : MvPolynomial.pderiv deme rest = 0 := by
+    apply pderiv_manyDemeBernsteinPolynomial_prod_of_not_mem
+    simp
+  have derived_split :
+      manyDemeBernsteinPolynomial (decrementExponent derived deme) ancestral =
+        manyDemeBernsteinPolynomialFactor deme (derived deme - 1) (ancestral deme) * rest := by
+    unfold manyDemeBernsteinPolynomial rest
+    rw [Finset.prod_eq_mul_prod_diff_singleton (Finset.mem_univ deme)]
+    simp only [decrementExponent, if_pos]
+    congr 1
+    apply Finset.prod_congr rfl
+    intro different member
+    have distinct : different ≠ deme :=
+      Finset.notMem_singleton.mp (Finset.mem_sdiff.mp member).2
+    simp [decrementExponent, distinct]
+  have ancestral_split :
+      manyDemeBernsteinPolynomial derived (decrementExponent ancestral deme) =
+        manyDemeBernsteinPolynomialFactor deme (derived deme) (ancestral deme - 1) * rest := by
+    unfold manyDemeBernsteinPolynomial rest
+    rw [Finset.prod_eq_mul_prod_diff_singleton (Finset.mem_univ deme)]
+    simp only [decrementExponent, if_pos]
+    congr 1
+    apply Finset.prod_congr rfl
+    intro different member
+    have distinct : different ≠ deme :=
+      Finset.notMem_singleton.mp (Finset.mem_sdiff.mp member).2
+    simp [decrementExponent, distinct]
+  rw [original_split, MvPolynomial.pderiv_mul,
+    pderiv_manyDemeBernsteinPolynomialFactor_self, rest_derivative]
+  unfold manyDemeBernsteinFirstDerivativePolynomial
+  rw [derived_split, ancestral_split]
+  ring
+
+/-- The explicit second-derivative polynomial is the iterated genuine partial derivative. -/
+theorem pderiv_pderiv_manyDemeBernsteinPolynomial {D : ℕ}
+    (derived ancestral : Fin D → ℕ) (deme : Fin D) :
+    MvPolynomial.pderiv deme
+        (MvPolynomial.pderiv deme (manyDemeBernsteinPolynomial derived ancestral)) =
+      manyDemeBernsteinSecondDerivativePolynomial derived ancestral deme := by
+  rw [pderiv_manyDemeBernsteinPolynomial]
+  unfold manyDemeBernsteinFirstDerivativePolynomial
+  rw [map_sub, MvPolynomial.pderiv_C_mul, MvPolynomial.pderiv_C_mul,
+    pderiv_manyDemeBernsteinPolynomial, pderiv_manyDemeBernsteinPolynomial]
+  unfold manyDemeBernsteinFirstDerivativePolynomial
+    manyDemeBernsteinSecondDerivativePolynomial
+  simp only [decrementExponent, if_pos, Nat.cast_mul]
+  ring
 
 /-- Polynomial evaluation commutes with the explicit first-derivative lift. -/
 theorem eval_manyDemeBernsteinFirstDerivativePolynomial {D : ℕ}
@@ -1630,6 +1751,42 @@ noncomputable def manyDemeBernsteinAnalyticGeneratorPolynomial {D : ℕ}
       MvPolynomial.C (rates.backwardMutation deme) * MvPolynomial.X deme) *
       manyDemeBernsteinFirstDerivativePolynomial derived ancestral deme
 
+/-- The structured Wright--Fisher diffusion generator as a linear operator on arbitrary
+multivariate polynomials. -/
+noncomputable def manyDemeDiffusionPolynomialGenerator {D : ℕ}
+    (rates : ManyDemeRates D) :
+    MvPolynomial (Fin D) ℝ →ₗ[ℝ] MvPolynomial (Fin D) ℝ where
+  toFun polynomial :=
+    (∑ deme, MvPolynomial.C (rates.coalescence deme / 2) *
+        MvPolynomial.X deme * (1 - MvPolynomial.X deme) *
+        MvPolynomial.pderiv deme (MvPolynomial.pderiv deme polynomial)) +
+    (∑ src, ∑ dst, MvPolynomial.C (rates.migration src dst) *
+        (MvPolynomial.X dst - MvPolynomial.X src) *
+        MvPolynomial.pderiv src polynomial) +
+    ∑ deme, (MvPolynomial.C (rates.forwardMutation deme) *
+          (1 - MvPolynomial.X deme) -
+        MvPolynomial.C (rates.backwardMutation deme) * MvPolynomial.X deme) *
+        MvPolynomial.pderiv deme polynomial
+  map_add' := by
+    intro left right
+    simp only [map_add, mul_add, Finset.sum_add_distrib]
+    ring
+  map_smul' := by
+    intro scalar polynomial
+    simp only [map_smul, mul_smul, Finset.sum_smul]
+    ring
+
+/-- On a Bernstein basis element, the general polynomial diffusion operator is exactly the
+explicit analytic generator polynomial. -/
+theorem manyDemeDiffusionPolynomialGenerator_bernstein {D : ℕ}
+    (rates : ManyDemeRates D) (derived ancestral : Fin D → ℕ) :
+    manyDemeDiffusionPolynomialGenerator rates
+        (manyDemeBernsteinPolynomial derived ancestral) =
+      manyDemeBernsteinAnalyticGeneratorPolynomial rates derived ancestral := by
+  unfold manyDemeDiffusionPolynomialGenerator manyDemeBernsteinAnalyticGeneratorPolynomial
+  simp_rw [pderiv_manyDemeBernsteinPolynomial,
+    pderiv_pderiv_manyDemeBernsteinPolynomial]
+
 /-- Polynomial lift of the positive killed-coalescent generator applied to the Bernstein
 basis family. -/
 noncomputable def manyDemeKilledDualGeneratorPolynomial {D : ℕ}
@@ -1751,6 +1908,99 @@ theorem manyDemePolynomialMomentFunctional_killedGenerator {D : ℕ}
   simp only [map_add, map_sub, map_sum, ← Algebra.smul_def, map_smul,
     manyDemePolynomialMomentFunctional]
   ring
+
+/-- The mixed-moment functional reads a unit monomial as the corresponding table entry. -/
+theorem manyDemePolynomialMomentFunctional_monomial_one {D : ℕ}
+    (moment : (Fin D → ℕ) → ℝ) (exponent : Fin D → ℕ) :
+    manyDemePolynomialMomentFunctional moment
+        (MvPolynomial.monomial (Finsupp.equivFunOnFinite.symm exponent) 1) =
+      moment exponent := by
+  rw [manyDemePolynomialMomentFunctional_eq_sum, MvPolynomial.sum_monomial_eq]
+  simp
+
+/-- The moment functional of a zero-ancestral Bernstein polynomial is the ordinary mixed
+moment at its derived exponent. -/
+theorem manyDemePolynomialMomentFunctional_zeroAncestral {D : ℕ}
+    (moment : (Fin D → ℕ) → ℝ) (exponent : Fin D → ℕ) :
+    manyDemePolynomialMomentFunctional moment
+        (manyDemeBernsteinPolynomial exponent (fun _ ↦ 0)) = moment exponent := by
+  rw [manyDemeBernsteinPolynomial_zeroAncestral_eq_monomial,
+    manyDemePolynomialMomentFunctional_monomial_one]
+
+/-- **Polynomial/moment generator adjoint on monomials.**  Applying the diffusion polynomial
+operator to a monomial and then the mixed-moment functional is exactly the existing
+arbitrary-deme moment generator.  This is derived through the already-proved Bernstein dual,
+including mutation forcing and every migration edge. -/
+theorem manyDemePolynomialMomentFunctional_diffusion_monomial {D : ℕ}
+    (rates : ManyDemeRates D) (moment : (Fin D → ℕ) → ℝ)
+    (exponent : Fin D → ℕ)
+    (symmetric : ∀ deme,
+      rates.backwardMutation deme = rates.forwardMutation deme) :
+    manyDemePolynomialMomentFunctional moment
+        (manyDemeDiffusionPolynomialGenerator rates
+          (MvPolynomial.monomial (Finsupp.equivFunOnFinite.symm exponent) 1)) =
+      manyDemeMomentGenerator rates moment exponent := by
+  rw [← manyDemeBernsteinPolynomial_zeroAncestral_eq_monomial exponent,
+    manyDemeDiffusionPolynomialGenerator_bernstein,
+    manyDemeBernsteinGenerator_momentFunctional_eq_killedDual rates moment exponent
+      (fun _ ↦ 0) symmetric,
+    manyDemePolynomialMomentFunctional_killedGenerator]
+  unfold manyDemeKilledDualGenerator manyDemeMomentGenerator
+  simp_rw [manyDemePolynomialMomentFunctional_zeroAncestral]
+  simp
+
+/-- **Full polynomial/moment adjoint identity.**  The existing moment generator is the exact
+linear adjoint of the structured diffusion operator on every multivariate polynomial. -/
+theorem manyDemePolynomialMomentFunctional_diffusion {D : ℕ}
+    (rates : ManyDemeRates D) (moment : (Fin D → ℕ) → ℝ)
+    (polynomial : MvPolynomial (Fin D) ℝ)
+    (symmetric : ∀ deme,
+      rates.backwardMutation deme = rates.forwardMutation deme) :
+    manyDemePolynomialMomentFunctional
+        (manyDemeMomentGenerator rates moment) polynomial =
+      manyDemePolynomialMomentFunctional moment
+        (manyDemeDiffusionPolynomialGenerator rates polynomial) := by
+  let left := manyDemePolynomialMomentLinearMap
+    (manyDemeMomentGenerator rates moment)
+  let right := (manyDemePolynomialMomentLinearMap moment).comp
+    (manyDemeDiffusionPolynomialGenerator rates)
+  have maps_equal : left = right := by
+    apply MvPolynomial.linearMap_ext
+    intro exponent
+    apply LinearMap.ext
+    intro coefficient
+    change manyDemePolynomialMomentFunctional (manyDemeMomentGenerator rates moment)
+        (MvPolynomial.monomial exponent coefficient) =
+      manyDemePolynomialMomentFunctional moment
+        (manyDemeDiffusionPolynomialGenerator rates
+          (MvPolynomial.monomial exponent coefficient))
+    rw [← show coefficient • MvPolynomial.monomial exponent (1 : ℝ) =
+        MvPolynomial.monomial exponent coefficient by
+          simp [MvPolynomial.smul_monomial]]
+    simp only [map_smul, smul_eq_mul]
+    congr 1
+    exact manyDemePolynomialMomentFunctional_diffusion_monomial rates moment
+      (fun deme ↦ exponent deme) symmetric
+  exact LinearMap.congr_fun maps_equal polynomial
+
+/-- **Exact unrestricted moment/killed-dual generator intertwining.**  Projecting an arbitrary
+mixed-moment table onto any product Bernstein coordinate after one infinitesimal diffusion
+step is exactly the positive killed generator applied to all its Bernstein projections. -/
+theorem manyDemeMomentGenerator_bernstein_intertwines {D : ℕ}
+    (rates : ManyDemeRates D) (moment : (Fin D → ℕ) → ℝ)
+    (derived ancestral : Fin D → ℕ)
+    (symmetric : ∀ deme,
+      rates.backwardMutation deme = rates.forwardMutation deme) :
+    manyDemePolynomialMomentFunctional (manyDemeMomentGenerator rates moment)
+        (manyDemeBernsteinPolynomial derived ancestral) =
+      manyDemeKilledDualGenerator rates
+        (fun a b ↦ manyDemePolynomialMomentFunctional moment
+          (manyDemeBernsteinPolynomial a b)) derived ancestral := by
+  rw [manyDemePolynomialMomentFunctional_diffusion rates moment _ symmetric,
+    manyDemeDiffusionPolynomialGenerator_bernstein,
+    manyDemeBernsteinGenerator_momentFunctional_eq_killedDual rates moment
+      derived ancestral symmetric,
+    manyDemePolynomialMomentFunctional_killedGenerator]
 
 /-- Total absorption rate of the positive Bernstein dual.  Absorption occurs exactly when a
 derived and an ancestral lineage choose the same coalescing parental lineage in one deme. -/

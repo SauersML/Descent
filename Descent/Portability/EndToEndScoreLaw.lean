@@ -151,10 +151,14 @@ prevent that construction:
   that positive polynomial, coefficient-for-coefficient.  The finite matrix bridge now has
   an explicit coefficient map, `manyDemeBernsteinMomentProjection`; it ignores both kinds of
   padding by theorem, and `manyDemePolynomialMomentFunctional_killedGenerator` proves that
-  each projected polynomial column evolves by the killed generator.  What remains is the
-  adjoint identity identifying diffusion evolution of monomial coefficients with the
-  analytic polynomial generator, followed by matrix-exponential and split intertwining, so
-  the alternating evaluator is replaced end to end,
+  each projected polynomial column evolves by the killed generator.  The diffusion side is
+  now derived as well: `pderiv_manyDemeBernsteinPolynomial` and its iterated counterpart prove
+  the displayed division-free derivatives are genuine partial derivatives, while
+  `manyDemePolynomialMomentFunctional_diffusion` proves the full polynomial/moment adjoint
+  identity.  Consequently `manyDemeMomentGenerator_bernstein_intertwines` is the exact
+  unrestricted generator intertwining law.  What remains is to restrict it correctly across
+  the existing duplicated degree-zero padding coordinate, lift it through matrix exponentials,
+  and prove split intertwining, so the alternating evaluator is replaced end to end,
   implement its sparse action without materializing either Cartesian carrier, add certified
   floating-point/interval roundoff control, and run at the executable's 13,750-individual /
   27,500-haplotype grid2d scale, followed by the filed end-to-end cohort validation gate;
