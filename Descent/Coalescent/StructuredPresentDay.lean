@@ -1627,6 +1627,121 @@ def ManyDemeKilledDualCoordinate.degree {D K : ℕ}
     (coordinate : ManyDemeKilledDualCoordinate D K) : ℕ :=
   (∑ deme, (coordinate.1 deme).val) + ∑ deme, (coordinate.2 deme).val
 
+/-- Removing one lineage never leaves the finite coordinate rectangle. -/
+theorem decrementExponent_lt_of_fin {D K : ℕ} (exponent : Fin D → Fin (K + 1))
+    (deme : Fin D) :
+    ∀ other, decrementExponent (fun d ↦ (exponent d).val) deme other < K + 1 := by
+  intro other
+  by_cases equal : other = deme
+  · subst other
+    simp [decrementExponent]
+    omega
+  · simp [decrementExponent, equal, (exponent other).isLt]
+
+/-- Moving a positive lineage preserves the degree bound and hence stays inside the finite
+rectangle.  This is the key closure fact for every migration edge. -/
+theorem migrateExponent_lt_of_sum_le {D K : ℕ}
+    (exponent other : Fin D → Fin (K + 1)) (src dst : Fin D)
+    (degree_le : (∑ deme, (exponent deme).val) +
+      ∑ deme, (other deme).val ≤ K)
+    (positive : 0 < (exponent src).val) :
+    ∀ deme, migrateExponent (fun d ↦ (exponent d).val) src dst deme < K + 1 := by
+  intro deme
+  by_cases at_source : deme = src
+  · subst deme
+    simp [migrateExponent]
+    omega
+  · by_cases at_target : deme = dst
+    · subst deme
+      have distinct : src ≠ dst := by exact fun equal ↦ at_source equal.symm
+      have pair_le : (exponent src).val + (exponent dst).val ≤
+          ∑ d, (exponent d).val :=
+        Finset.add_le_sum (fun d _ ↦ Nat.zero_le (exponent d).val)
+          (Finset.mem_univ src) (Finset.mem_univ dst) distinct
+      simp [migrateExponent, at_source]
+      omega
+    · simp [migrateExponent, at_source, at_target, (exponent deme).isLt]
+
+/-- Flipping one positive lineage into the opposite label preserves total degree, so the
+incremented label also remains in the finite rectangle. -/
+theorem incrementExponent_lt_of_other_positive_sum_le {D K : ℕ}
+    (incremented other : Fin D → Fin (K + 1)) (deme : Fin D)
+    (degree_le : (∑ d, (other d).val) + ∑ d, (incremented d).val ≤ K)
+    (positive : 0 < (other deme).val) :
+    ∀ target, incrementExponent (fun d ↦ (incremented d).val) deme target < K + 1 := by
+  intro target
+  by_cases equal : target = deme
+  · subst target
+    have other_le : (other deme).val ≤ ∑ d, (other d).val :=
+      Finset.single_le_sum (fun d _ ↦ Nat.zero_le (other d).val)
+        (Finset.mem_univ deme)
+    have incremented_le : (incremented deme).val ≤ ∑ d, (incremented d).val :=
+      Finset.single_le_sum (fun d _ ↦ Nat.zero_le (incremented d).val)
+        (Finset.mem_univ deme)
+    simp [incrementExponent]
+    omega
+  · simp [incrementExponent, equal, (incremented target).isLt]
+
+/-- Every active derived-lineage migration target lies in the degree-`K` carrier. -/
+theorem ManyDemeKilledDualCoordinate.derivedMigration_closed {D K : ℕ}
+    (coordinate : ManyDemeKilledDualCoordinate D K) (src dst : Fin D)
+    (degree_le : coordinate.degree ≤ K) (positive : 0 < (coordinate.1 src).val) :
+    ∀ deme, migrateExponent (fun d ↦ (coordinate.1 d).val) src dst deme < K + 1 := by
+  exact migrateExponent_lt_of_sum_le coordinate.1 coordinate.2 src dst degree_le positive
+
+/-- Every active ancestral-lineage migration target lies in the degree-`K` carrier. -/
+theorem ManyDemeKilledDualCoordinate.ancestralMigration_closed {D K : ℕ}
+    (coordinate : ManyDemeKilledDualCoordinate D K) (src dst : Fin D)
+    (degree_le : coordinate.degree ≤ K) (positive : 0 < (coordinate.2 src).val) :
+    ∀ deme, migrateExponent (fun d ↦ (coordinate.2 d).val) src dst deme < K + 1 := by
+  apply migrateExponent_lt_of_sum_le coordinate.2 coordinate.1 src dst
+  · unfold ManyDemeKilledDualCoordinate.degree at degree_le
+    omega
+  · exact positive
+
+/-- Every active derived-to-ancestral mutation flip lies in the degree-`K` carrier. -/
+theorem ManyDemeKilledDualCoordinate.derivedFlip_closed {D K : ℕ}
+    (coordinate : ManyDemeKilledDualCoordinate D K) (deme : Fin D)
+    (degree_le : coordinate.degree ≤ K) (positive : 0 < (coordinate.1 deme).val) :
+    ∀ target,
+      incrementExponent (fun d ↦ (coordinate.2 d).val) deme target < K + 1 := by
+  exact incrementExponent_lt_of_other_positive_sum_le coordinate.2 coordinate.1 deme
+    degree_le positive
+
+/-- Every active ancestral-to-derived mutation flip lies in the degree-`K` carrier. -/
+theorem ManyDemeKilledDualCoordinate.ancestralFlip_closed {D K : ℕ}
+    (coordinate : ManyDemeKilledDualCoordinate D K) (deme : Fin D)
+    (degree_le : coordinate.degree ≤ K) (positive : 0 < (coordinate.2 deme).val) :
+    ∀ target,
+      incrementExponent (fun d ↦ (coordinate.1 d).val) deme target < K + 1 := by
+  apply incrementExponent_lt_of_other_positive_sum_le coordinate.1 coordinate.2 deme
+  · unfold ManyDemeKilledDualCoordinate.degree at degree_le
+    omega
+  · exact positive
+
+/-- **Finite-carrier closure.**  Every configuration consulted by a nonzero-rate transition
+from a degree-`K` biological row remains coordinatewise below `K + 1`.  Coalescence only
+decrements; migration conserves lineage count; and mutation transfers one lineage between
+labels.  Opposite-type collision is absorption and therefore needs no destination coordinate. -/
+theorem ManyDemeKilledDualCoordinate.allTransitions_closed {D K : ℕ}
+    (coordinate : ManyDemeKilledDualCoordinate D K) (degree_le : coordinate.degree ≤ K) :
+    (∀ deme,
+      (∀ target, decrementExponent (fun d ↦ (coordinate.1 d).val) deme target < K + 1) ∧
+      (∀ target, decrementExponent (fun d ↦ (coordinate.2 d).val) deme target < K + 1)) ∧
+    (∀ src dst, 0 < (coordinate.1 src).val →
+      ∀ deme, migrateExponent (fun d ↦ (coordinate.1 d).val) src dst deme < K + 1) ∧
+    (∀ src dst, 0 < (coordinate.2 src).val →
+      ∀ deme, migrateExponent (fun d ↦ (coordinate.2 d).val) src dst deme < K + 1) ∧
+    (∀ deme, 0 < (coordinate.1 deme).val →
+      ∀ target, incrementExponent (fun d ↦ (coordinate.2 d).val) deme target < K + 1) ∧
+    (∀ deme, 0 < (coordinate.2 deme).val →
+      ∀ target, incrementExponent (fun d ↦ (coordinate.1 d).val) deme target < K + 1) := by
+  refine ⟨?_, coordinate.derivedMigration_closed, coordinate.ancestralMigration_closed,
+    coordinate.derivedFlip_closed, coordinate.ancestralFlip_closed⟩
+  intro deme
+  exact ⟨decrementExponent_lt_of_fin coordinate.1 deme,
+    decrementExponent_lt_of_fin coordinate.2 deme⟩
+
 /-- Read a finite vector as a lineage-configuration table, returning zero outside its
 coordinate rectangle. -/
 noncomputable def manyDemeKilledDualVectorTable {D : ℕ} (K : ℕ)

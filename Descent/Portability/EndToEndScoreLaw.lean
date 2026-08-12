@@ -132,7 +132,9 @@ prevent that construction:
   coalescence, lineage migration and symmetric-mutation label flips, plus explicit
   opposite-type killing.  `manyDemeKilledDualGenerator_eq_jump_sub_killing` isolates that
   nonnegative absorption rate, and `manyDemeKilledDualDynamicsMatrix` encodes its finite
-  zero-extended restriction.  What remains is to prove the finite-carrier closure and
+  zero-extended restriction.  `ManyDemeKilledDualCoordinate.allTransitions_closed` proves
+  that every active coalescence, migration, or label-flip destination from a degree-bounded
+  row remains in that finite carrier; killing has no destination.  What remains is the
   semigroup/split intertwining needed to replace the alternating moment evaluator end to end,
   implement its sparse action without materializing either Cartesian carrier, add certified
   floating-point/interval roundoff control, and run at the executable's 13,750-individual /
