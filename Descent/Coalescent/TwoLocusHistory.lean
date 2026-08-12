@@ -1039,6 +1039,91 @@ theorem twoLocusPi2Jet_value {D : ℕ}
     twoLocusLeftHeterozygosity, twoLocusRightHeterozygosity]
   ring
 
+/-- Exact local drift of cross-deme heterozygosity.  It is affected only when both sampled
+lineages occupy the drifting deme, in which case it decays at unit coalescence rate. -/
+theorem twoLocusHJet_driftAt {D : ℕ}
+    (state : Fin D → TwoLocusHaplotypeFrequencies)
+    (deme first second : Fin D) :
+    (twoLocusHJet first second).driftAt deme state =
+      if first = deme ∧ second = deme then
+        -(twoLocusHJet first second).value state
+      else 0 := by
+  by_cases hfirst : deme = first
+  · subst first
+    by_cases hsecond : deme = second
+    · subst second
+      simp [twoLocusHJet, TwoLocusDiffusionJet.add, TwoLocusDiffusionJet.mul,
+        TwoLocusDiffusionJet.const, TwoLocusDiffusionJet.smul,
+        twoLocusLeftFrequencyJet, twoLocusHaplotypeCovariance,
+        twoLocusHaplotypeMean, twoLocusLeftAlleleIndicator,
+        TwoLocusHaplotypeFrequencies.leftFrequency]
+      ring
+    · simp [twoLocusHJet, TwoLocusDiffusionJet.add, TwoLocusDiffusionJet.mul,
+        TwoLocusDiffusionJet.const, TwoLocusDiffusionJet.smul,
+        twoLocusLeftFrequencyJet, twoLocusHaplotypeCovariance,
+        twoLocusHaplotypeMean, twoLocusLeftAlleleIndicator, hsecond,
+        Ne.symm hsecond]
+  · by_cases hsecond : deme = second
+    · subst second
+      simp [twoLocusHJet, TwoLocusDiffusionJet.add, TwoLocusDiffusionJet.mul,
+        TwoLocusDiffusionJet.const, TwoLocusDiffusionJet.smul,
+        twoLocusLeftFrequencyJet, twoLocusHaplotypeCovariance,
+        twoLocusHaplotypeMean, twoLocusLeftAlleleIndicator, hfirst,
+        Ne.symm hfirst]
+    · simp [twoLocusHJet, TwoLocusDiffusionJet.add, TwoLocusDiffusionJet.mul,
+        TwoLocusDiffusionJet.const, TwoLocusDiffusionJet.smul,
+        twoLocusLeftFrequencyJet, twoLocusHaplotypeCovariance,
+        twoLocusHaplotypeMean, twoLocusLeftAlleleIndicator, hfirst, hsecond,
+        Ne.symm hfirst, Ne.symm hsecond]
+
+/-- Exact local drift of a cross-deme linkage product.  The same-deme branch is the
+Hill--Robertson `-3 DD + Dz + pi2` row, derived from the exact linkage drift and linkage
+quadratic variation.  A single matching index contributes `-DD`; no matching index
+contributes zero. -/
+theorem twoLocusDDJet_driftAt {D : ℕ}
+    (state : Fin D → TwoLocusHaplotypeFrequencies)
+    (deme first second : Fin D) :
+    (twoLocusDDJet first second).driftAt deme state =
+      if first = deme ∧ second = deme then
+        -3 * (twoLocusDDJet first second).value state +
+          (twoLocusDzJet deme deme deme).value state +
+          (twoLocusPi2Jet deme deme deme deme).value state
+      else if first = deme ∨ second = deme then
+        -(twoLocusDDJet first second).value state
+      else 0 := by
+  by_cases hfirst : deme = first
+  · subst first
+    by_cases hsecond : deme = second
+    · subst second
+      simp [twoLocusDDJet, twoLocusDzJet, twoLocusPi2Jet, twoLocusHJet,
+        TwoLocusDiffusionJet.mul, TwoLocusDiffusionJet.add,
+        TwoLocusDiffusionJet.smul, TwoLocusDiffusionJet.const,
+        twoLocusLinkageJet, twoLocusLeftContrastJet,
+        twoLocusRightContrastJet, twoLocusLeftFrequencyJet,
+        twoLocusRightFrequencyJet,
+        twoLocusLinkageDrift_eq_neg_linkage,
+        twoLocusHaplotypeCovariance_linkage_linkage,
+        TwoLocusHaplotypeFrequencies.leftContrast,
+        TwoLocusHaplotypeFrequencies.rightContrast,
+        TwoLocusHaplotypeFrequencies.leftFrequency,
+        TwoLocusHaplotypeFrequencies.rightFrequency]
+      ring
+    · simp [twoLocusDDJet, TwoLocusDiffusionJet.mul, twoLocusLinkageJet,
+        twoLocusLinkageDrift_eq_neg_linkage, twoLocusHaplotypeCovariance,
+        twoLocusHaplotypeMean, twoLocusLinkageGradient, hsecond,
+        Ne.symm hsecond]
+      ring
+  · by_cases hsecond : deme = second
+    · subst second
+      simp [twoLocusDDJet, TwoLocusDiffusionJet.mul, twoLocusLinkageJet,
+        twoLocusLinkageDrift_eq_neg_linkage, twoLocusHaplotypeCovariance,
+        twoLocusHaplotypeMean, twoLocusLinkageGradient, hfirst,
+        Ne.symm hfirst]
+    · simp [twoLocusDDJet, TwoLocusDiffusionJet.mul, twoLocusLinkageJet,
+        twoLocusHaplotypeCovariance, twoLocusHaplotypeMean,
+        twoLocusLinkageGradient, hfirst, hsecond,
+        Ne.symm hfirst, Ne.symm hsecond]
+
 /-- The generalized four-deme `pi2` observable in centered contrast form. -/
 theorem twoLocusJointHeterozygosity_eq_contrasts
     (leftFirst leftSecond rightFirst rightSecond : TwoLocusHaplotypeFrequencies) :
