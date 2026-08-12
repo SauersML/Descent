@@ -134,8 +134,11 @@ prevent that construction:
   nonnegative absorption rate, and `manyDemeKilledDualDynamicsMatrix` encodes its finite
   zero-extended restriction.  `ManyDemeKilledDualCoordinate.allTransitions_closed` proves
   that every active coalescence, migration, or label-flip destination from a degree-bounded
-  row remains in that finite carrier; killing has no destination.  What remains is the
-  semigroup/split intertwining needed to replace the alternating moment evaluator end to end,
+  row remains in that finite carrier; killing has no destination.  The distinct-parent split
+  merge is closed as well, `splitManyDemeKilledDualPropagator_mulVec` proves its sparse matrix
+  is the deterministic lineage merge, and `manyDemeKilledDualHistoryPropagator` composes any
+  finite epoch/split sequence.  What remains is the generator-to-semigroup and split
+  intertwining with the existing moment law needed to replace that alternating evaluator end to end,
   implement its sparse action without materializing either Cartesian carrier, add certified
   floating-point/interval roundoff control, and run at the executable's 13,750-individual /
   27,500-haplotype grid2d scale, followed by the filed end-to-end cohort validation gate;

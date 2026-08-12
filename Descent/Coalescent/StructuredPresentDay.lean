@@ -1870,6 +1870,123 @@ theorem ManyDemeKilledDualEpoch.propagator_zero {D K : ℕ}
       ManyDemeKilledDualEpoch D K).propagator = 1 := by
   exact matrixExponential_zero_time _
 
+/-- Merge a newly split child's exponent back into its parent.  This is the pullback of the
+instantaneous constraint `X_child = X_parent`. -/
+def mergeSplitExponent {D : ℕ} (parent child : Fin D)
+    (exponent : Fin D → ℕ) : Fin D → ℕ :=
+  fun d ↦ if d = parent then exponent parent + exponent child
+    else if d = child then 0 else exponent d
+
+/-- Merging distinct child and parent lineage counts across a split preserves a global degree
+bound and therefore remains inside the coordinate rectangle. -/
+theorem mergeSplitExponent_lt_of_sum_le {D K : ℕ} (exponent : Fin D → Fin (K + 1))
+    (parent child : Fin D) (distinct : parent ≠ child)
+    (degree_le : ∑ deme, (exponent deme).val ≤ K) :
+    ∀ deme,
+      mergeSplitExponent parent child (fun d ↦ (exponent d).val) deme < K + 1 := by
+  intro deme
+  by_cases at_parent : deme = parent
+  · subst deme
+    have pair_le : (exponent parent).val + (exponent child).val ≤
+        ∑ d, (exponent d).val :=
+      Finset.add_le_sum (fun d _ ↦ Nat.zero_le (exponent d).val)
+        (Finset.mem_univ parent) (Finset.mem_univ child) distinct
+    simp [mergeSplitExponent]
+    omega
+  · by_cases at_child : deme = child
+    · simp [mergeSplitExponent, at_parent, at_child]
+    · simp [mergeSplitExponent, at_parent, at_child, (exponent deme).isLt]
+
+/-- Both allele-label coordinates remain finite when a genuine split is pulled back. -/
+theorem ManyDemeKilledDualCoordinate.mergeSplit_closed {D K : ℕ}
+    (coordinate : ManyDemeKilledDualCoordinate D K) (parent child : Fin D)
+    (distinct : parent ≠ child) (degree_le : coordinate.degree ≤ K) :
+    (∀ deme, mergeSplitExponent parent child
+        (fun d ↦ (coordinate.1 d).val) deme < K + 1) ∧
+      ∀ deme, mergeSplitExponent parent child
+        (fun d ↦ (coordinate.2 d).val) deme < K + 1 := by
+  constructor
+  · apply mergeSplitExponent_lt_of_sum_le coordinate.1 parent child distinct
+    unfold ManyDemeKilledDualCoordinate.degree at degree_le
+    omega
+  · apply mergeSplitExponent_lt_of_sum_le coordinate.2 parent child distinct
+    unfold ManyDemeKilledDualCoordinate.degree at degree_le
+    omega
+
+/-- Sparse deterministic pullback of a positive dual configuration across a population split.
+Each row has at most one nonzero entry, at the configuration formed by merging child counts
+into the parent. -/
+noncomputable def splitManyDemeKilledDualPropagator {D K : ℕ}
+    (parent child : Fin D) :
+    Matrix (ManyDemeKilledDualCoordinate D K) (ManyDemeKilledDualCoordinate D K) ℝ :=
+  fun row column ↦
+    if hderived : ∀ deme, mergeSplitExponent parent child
+        (fun d ↦ (row.1 d).val) deme < K + 1 then
+      if hancestral : ∀ deme, mergeSplitExponent parent child
+          (fun d ↦ (row.2 d).val) deme < K + 1 then
+        let merged : ManyDemeKilledDualCoordinate D K :=
+          (fun deme ↦ ⟨mergeSplitExponent parent child
+              (fun d ↦ (row.1 d).val) deme, hderived deme⟩,
+            fun deme ↦ ⟨mergeSplitExponent parent child
+              (fun d ↦ (row.2 d).val) deme, hancestral deme⟩)
+        if column = merged then 1 else 0
+      else 0
+    else 0
+
+/-- Direct deterministic split action on a finite killed-dual value vector. -/
+noncomputable def splitManyDemeKilledDualState {D K : ℕ}
+    (parent child : Fin D) (state : ManyDemeKilledDualCoordinate D K → ℝ)
+    (row : ManyDemeKilledDualCoordinate D K) : ℝ :=
+  manyDemeKilledDualVectorTable K state
+    (mergeSplitExponent parent child (fun d ↦ (row.1 d).val))
+    (mergeSplitExponent parent child (fun d ↦ (row.2 d).val))
+
+/-- The sparse split matrix is exactly its deterministic merge action. -/
+theorem splitManyDemeKilledDualPropagator_mulVec {D K : ℕ}
+    (parent child : Fin D) (state : ManyDemeKilledDualCoordinate D K → ℝ) :
+    (splitManyDemeKilledDualPropagator parent child).mulVec state =
+      splitManyDemeKilledDualState parent child state := by
+  funext row
+  by_cases hderived : ∀ deme, mergeSplitExponent parent child
+      (fun d ↦ (row.1 d).val) deme < K + 1
+  · by_cases hancestral : ∀ deme, mergeSplitExponent parent child
+        (fun d ↦ (row.2 d).val) deme < K + 1
+    · let merged : ManyDemeKilledDualCoordinate D K :=
+        (fun deme ↦ ⟨mergeSplitExponent parent child
+            (fun d ↦ (row.1 d).val) deme, hderived deme⟩,
+          fun deme ↦ ⟨mergeSplitExponent parent child
+            (fun d ↦ (row.2 d).val) deme, hancestral deme⟩)
+      simp [Matrix.mulVec, dotProduct, splitManyDemeKilledDualPropagator,
+        splitManyDemeKilledDualState, manyDemeKilledDualVectorTable,
+        hderived, hancestral, merged]
+    · simp [Matrix.mulVec, dotProduct, splitManyDemeKilledDualPropagator,
+        splitManyDemeKilledDualState, manyDemeKilledDualVectorTable,
+        hderived, hancestral]
+  · simp [Matrix.mulVec, dotProduct, splitManyDemeKilledDualPropagator,
+      splitManyDemeKilledDualState, manyDemeKilledDualVectorTable, hderived]
+
+/-- One finite positive-dual demographic instruction: continuous killed propagation or a
+deterministic pullback across a split. -/
+inductive ManyDemeKilledDualInstruction (D K : ℕ) where
+  | evolve (epoch : ManyDemeKilledDualEpoch D K)
+  | split (parent child : Fin D)
+
+/-- Matrix for one finite positive-dual instruction. -/
+noncomputable def ManyDemeKilledDualInstruction.propagator {D K : ℕ}
+    (instruction : ManyDemeKilledDualInstruction D K) :
+    Matrix (ManyDemeKilledDualCoordinate D K) (ManyDemeKilledDualCoordinate D K) ℝ :=
+  match instruction with
+  | .evolve epoch => epoch.propagator
+  | .split parent child => splitManyDemeKilledDualPropagator parent child
+
+/-- Ordered product for an arbitrary finite positive-dual epoch/split history. -/
+noncomputable def manyDemeKilledDualHistoryPropagator {D K : ℕ} :
+    List (ManyDemeKilledDualInstruction D K) →
+      Matrix (ManyDemeKilledDualCoordinate D K) (ManyDemeKilledDualCoordinate D K) ℝ
+  | [] => 1
+  | instruction :: remaining =>
+      instruction.propagator * manyDemeKilledDualHistoryPropagator remaining
+
 /-- The arbitrary-deme structured moment generator.  This is the direct many-deme extension
 of `twoDemeMomentGenerator`; a serial chain, grid, island model, or typed external demography
 differs only in the supplied rate matrix and epoch schedule. -/
@@ -2035,13 +2152,6 @@ theorem ManyDemeMomentEpoch.propagator_zeroCoordinate {D K : ℕ}
   cases column <;>
     simp [augmentedManyDemeMomentGenerator, manyDemeMomentDynamicsMatrix,
       manyDemeMomentForcing, ManyDemeMomentCoordinate.degree]
-
-/-- Merge a newly split child's exponent back into its parent.  This is the pullback of the
-instantaneous constraint `X_child = X_parent`. -/
-def mergeSplitExponent {D : ℕ} (parent child : Fin D)
-    (exponent : Fin D → ℕ) : Fin D → ℕ :=
-  fun d ↦ if d = parent then exponent parent + exponent child
-    else if d = child then 0 else exponent d
 
 /-- Sparse linear split operator on the constant-augmented moment carrier.  Every biological
 row has at most one nonzero entry: the pre-split coordinate obtained by merging the child's
