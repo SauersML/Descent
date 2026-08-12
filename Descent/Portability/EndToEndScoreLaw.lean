@@ -56,9 +56,15 @@ particular, if gnomon draws causal positions, effects, and haplotypes from condi
 fixed by the visible input, those draws belong inside the expectation; they are not residual
 fiber coordinates and cannot be used to manufacture a non-identifiability witness.
 
+`DiscriminationLaw` derives the finite liability prevalence root, the bounded CITL root, the
+complete finite Bernoulli outcome sum, and now existence and uniqueness of the exact
+ridge-logistic calibration fit directly from the executable case/control guards: continuity
+and an explicit bounded-sublevel theorem give existence, while strict convexity gives
+uniqueness.  Thus no optimizer proof is hidden in the metric domain.
+
 No `Core.SharpFiberEnvelope` for the real pipeline is declared here.  Such a declaration must
-supply derived, attained endpoints for the actual expected semantics.  Five links
-currently prevent that construction:
+supply derived, attained endpoints for the actual expected semantics.  Four links currently
+prevent that construction:
 
 * `PipelineDemographicHistory.twoLocusMoments` now maps an arbitrary finite event history to
   the complete transient many-deme `H/DD/Dz/pi2` operator product.  This supplies a concrete
@@ -107,11 +113,6 @@ currently prevent that construction:
   `PipelineDemographicHistory.targetErosion`.  It includes the missing mechanism—
   the sampled polymorphic/monomorphic events themselves change with `n`—but its connection to
   the end-to-end cohort evaluation still awaits the filed validation verdict;
-* `DiscriminationLaw` now derives the finite liability prevalence root, the bounded CITL root,
-  and the complete finite Bernoulli outcome sum.  Its ridge-logistic calibration slope is
-  exactly characterized by the sklearn objective, but existence and uniqueness of that
-  two-parameter minimizer are still carried as a proof obligation rather than derived from the
-  executable guards.  That convex-analysis theorem remains part of the exact metric segment;
 * the executable protocol is not yet a function of exactly this visible input type.
   `gnomon/sims/ancestry_calibration/gen_real_pt.py` accepts only its hard-coded `serial1d` and
   `grid2d` constructors rather than an arbitrary event history, hard-codes 250 evaluation

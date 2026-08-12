@@ -6,6 +6,7 @@ import Descent.Portability.PopulationAUC
 import Mathlib.Analysis.Convex.Deriv
 import Mathlib.Analysis.SpecialFunctions.Sigmoid
 import Mathlib.MeasureTheory.Integral.IntervalIntegral.Basic
+import Mathlib.Topology.MetricSpace.Bounded
 
 assert_below Descent.Decision Descent.Program
 
@@ -310,6 +311,81 @@ theorem strictConvexOn_binaryLogisticLoss (outcome : ℝ) :
   simpa only [binaryLogisticLoss, sub_eq_add_neg] using
     strictConvexOn_logisticSoftplus.add_convexOn haffine
 
+/-- Softplus dominates zero. -/
+theorem logisticSoftplus_nonneg (linearPredictor : ℝ) :
+    0 ≤ logisticSoftplus linearPredictor := by
+  rw [logisticSoftplus, ← Real.log_one]
+  exact Real.log_le_log zero_lt_one (by linarith [Real.exp_pos linearPredictor])
+
+/-- Softplus also dominates its linear argument. -/
+theorem linearPredictor_le_logisticSoftplus (linearPredictor : ℝ) :
+    linearPredictor ≤ logisticSoftplus linearPredictor := by
+  calc
+    linearPredictor = Real.log (Real.exp linearPredictor) := (Real.log_exp _).symm
+    _ ≤ Real.log (1 + Real.exp linearPredictor) :=
+      Real.log_le_log (Real.exp_pos _) (by linarith [Real.exp_pos linearPredictor])
+    _ = logisticSoftplus linearPredictor := rfl
+
+/-- Every realized Bernoulli contribution is nonnegative. -/
+theorem BinaryRiskCohort.binaryLogisticLoss_outcomeValue_nonneg
+    {Individual : Type*} [Fintype Individual]
+    (cohort : BinaryRiskCohort Individual) (individual : Individual)
+    (linearPredictor : ℝ) :
+    0 ≤ binaryLogisticLoss (cohort.outcomeValue individual) linearPredictor := by
+  cases h : cohort.outcome individual
+  · simpa [BinaryRiskCohort.outcomeValue, h, binaryLogisticLoss] using
+      logisticSoftplus_nonneg linearPredictor
+  · simp only [BinaryRiskCohort.outcomeValue, h, ↓reduceIte, binaryLogisticLoss, one_mul]
+    linarith [linearPredictor_le_logisticSoftplus linearPredictor]
+
+/-- A realized control contribution dominates its linear predictor. -/
+theorem BinaryRiskCohort.linearPredictor_le_controlLoss
+    {Individual : Type*} [Fintype Individual]
+    (cohort : BinaryRiskCohort Individual) (individual : Individual)
+    (hcontrol : cohort.outcome individual = false) (linearPredictor : ℝ) :
+    linearPredictor ≤ binaryLogisticLoss (cohort.outcomeValue individual) linearPredictor := by
+  simpa [BinaryRiskCohort.outcomeValue, hcontrol, binaryLogisticLoss] using
+    linearPredictor_le_logisticSoftplus linearPredictor
+
+/-- A realized case contribution dominates the negative linear predictor. -/
+theorem BinaryRiskCohort.neg_linearPredictor_le_caseLoss
+    {Individual : Type*} [Fintype Individual]
+    (cohort : BinaryRiskCohort Individual) (individual : Individual)
+    (hcase : cohort.outcome individual = true) (linearPredictor : ℝ) :
+    -linearPredictor ≤ binaryLogisticLoss (cohort.outcomeValue individual) linearPredictor := by
+  simp only [BinaryRiskCohort.outcomeValue, hcase, ↓reduceIte, binaryLogisticLoss, one_mul]
+  linarith [logisticSoftplus_nonneg linearPredictor]
+
+/-- One exact finite-cohort likelihood contribution as a function of both fit parameters. -/
+noncomputable def BinaryRiskCohort.calibrationIndividualLoss
+    {Individual : Type*} [Fintype Individual]
+    (cohort : BinaryRiskCohort Individual) (individual : Individual)
+    (parameter : ℝ × ℝ) : ℝ :=
+  binaryLogisticLoss (cohort.outcomeValue individual)
+    (parameter.1 + parameter.2 * prevalenceLogit (cohort.predictedRisk individual))
+
+/-- Every finite-cohort likelihood contribution is nonnegative. -/
+theorem BinaryRiskCohort.calibrationIndividualLoss_nonneg
+    {Individual : Type*} [Fintype Individual]
+    (cohort : BinaryRiskCohort Individual) (individual : Individual)
+    (parameter : ℝ × ℝ) :
+    0 ≤ cohort.calibrationIndividualLoss individual parameter :=
+  cohort.binaryLogisticLoss_outcomeValue_nonneg individual _
+
+/-- Every individual contribution is continuous in intercept and slope. -/
+theorem BinaryRiskCohort.continuous_calibrationIndividualLoss
+    {Individual : Type*} [Fintype Individual]
+    (cohort : BinaryRiskCohort Individual) (individual : Individual) :
+    Continuous (cohort.calibrationIndividualLoss individual) := by
+  have hsoftplus : Continuous logisticSoftplus :=
+    continuous_iff_continuousAt.mpr fun point ↦
+      (hasDerivAt_logisticSoftplus point).continuousAt
+  have hloss : Continuous (binaryLogisticLoss (cohort.outcomeValue individual)) := by
+    exact hsoftplus.sub
+      (continuous_const.mul continuous_id)
+  exact hloss.comp
+    (continuous_fst.add (continuous_snd.mul continuous_const))
+
 /-- Empirical variance of the clipped-risk logits used by the executable calibration guard. -/
 noncomputable def BinaryRiskCohort.logitRiskVariance
     {Individual : Type*} [Fintype Individual]
@@ -325,18 +401,380 @@ cohort size, adds `b²/(2C)` to the summed Bernoulli loss. -/
 noncomputable def BinaryRiskCohort.logisticCalibrationObjective
     {Individual : Type*} [Fintype Individual]
     (cohort : BinaryRiskCohort Individual) (parameter : ℝ × ℝ) : ℝ :=
-  ∑ individual,
-    let linearPredictor := parameter.1 + parameter.2 *
-      prevalenceLogit (cohort.predictedRisk individual)
-    Real.log (1 + Real.exp linearPredictor) -
-      cohort.outcomeValue individual * linearPredictor
+  ∑ individual, cohort.calibrationIndividualLoss individual parameter
   + parameter.2 ^ 2 / (2 * binaryCalibrationC)
 
-/-- Domain of the logistic recalibration fit.  The first four fields are gnomon's explicit
-`outcome_metrics` and standard-deviation guards.  The final field exactly identifies the ideal
-optimizer target, but is still a proof obligation: unlike CITL below, the corpus has not yet
-derived existence and uniqueness of the two-parameter ridge-logistic minimizer from the guards
-alone. -/
+/-- The exact finite ridge-logistic objective is continuous. -/
+theorem BinaryRiskCohort.continuous_logisticCalibrationObjective
+    {Individual : Type*} [Fintype Individual]
+    (cohort : BinaryRiskCohort Individual) :
+    Continuous cohort.logisticCalibrationObjective := by
+  unfold BinaryRiskCohort.logisticCalibrationObjective
+  apply Continuous.add
+  · exact continuous_finset_sum Finset.univ fun individual _ ↦
+      cohort.continuous_calibrationIndividualLoss individual
+  · exact (continuous_snd.pow 2).div_const _
+
+/-- The exact finite ridge-logistic objective is nonnegative. -/
+theorem BinaryRiskCohort.logisticCalibrationObjective_nonneg
+    {Individual : Type*} [Fintype Individual]
+    (cohort : BinaryRiskCohort Individual) (parameter : ℝ × ℝ) :
+    0 ≤ cohort.logisticCalibrationObjective parameter := by
+  unfold BinaryRiskCohort.logisticCalibrationObjective
+  apply add_nonneg
+  · exact Finset.sum_nonneg fun individual _ ↦
+      cohort.calibrationIndividualLoss_nonneg individual parameter
+  · exact div_nonneg (sq_nonneg _) (by norm_num [binaryCalibrationC])
+
+/-- Any one likelihood contribution is bounded above by the complete objective. -/
+theorem BinaryRiskCohort.calibrationIndividualLoss_le_objective
+    {Individual : Type*} [Fintype Individual]
+    (cohort : BinaryRiskCohort Individual) (individual : Individual)
+    (parameter : ℝ × ℝ) :
+    cohort.calibrationIndividualLoss individual parameter ≤
+      cohort.logisticCalibrationObjective parameter := by
+  unfold BinaryRiskCohort.logisticCalibrationObjective
+  calc
+    cohort.calibrationIndividualLoss individual parameter ≤
+        ∑ other, cohort.calibrationIndividualLoss other parameter :=
+      Finset.single_le_sum
+        (fun other _ ↦ cohort.calibrationIndividualLoss_nonneg other parameter)
+        (Finset.mem_univ individual)
+    _ ≤ _ := le_add_of_nonneg_right
+      (div_nonneg (sq_nonneg _) (by norm_num [binaryCalibrationC]))
+
+/-- The ridge term is bounded above by the complete objective. -/
+theorem BinaryRiskCohort.ridgePenalty_le_objective
+    {Individual : Type*} [Fintype Individual]
+    (cohort : BinaryRiskCohort Individual) (parameter : ℝ × ℝ) :
+    parameter.2 ^ 2 / (2 * binaryCalibrationC) ≤
+      cohort.logisticCalibrationObjective parameter := by
+  unfold BinaryRiskCohort.logisticCalibrationObjective
+  exact le_add_of_nonneg_left (Finset.sum_nonneg fun individual _ ↦
+    cohort.calibrationIndividualLoss_nonneg individual parameter)
+
+/-- Positive case mass is equivalent to the occurrence of an actual case. -/
+theorem BinaryRiskCohort.exists_case_of_caseMass_pos
+    {Individual : Type*} [Fintype Individual]
+    (cohort : BinaryRiskCohort Individual) (hcaseMass : 0 < cohort.caseMass) :
+    ∃ individual, cohort.outcome individual = true := by
+  by_contra hnone
+  push_neg at hnone
+  have houtcome : ∀ individual, cohort.outcome individual = false := by
+    intro individual
+    cases h : cohort.outcome individual
+    · rfl
+    · exact (hnone individual h).elim
+  have hzero : cohort.caseMass = 0 := by
+    simp [BinaryRiskCohort.caseMass, houtcome]
+  linarith
+
+/-- Positive control mass is equivalent to the occurrence of an actual control. -/
+theorem BinaryRiskCohort.exists_control_of_controlMass_pos
+    {Individual : Type*} [Fintype Individual]
+    (cohort : BinaryRiskCohort Individual) (hcontrolMass : 0 < cohort.controlMass) :
+    ∃ individual, cohort.outcome individual = false := by
+  by_contra hnone
+  push_neg at hnone
+  have houtcome : ∀ individual, cohort.outcome individual = true := by
+    intro individual
+    cases h : cohort.outcome individual
+    · exact (hnone individual h).elim
+    · rfl
+  have hzero : cohort.controlMass = 0 := by
+    simp [BinaryRiskCohort.controlMass, houtcome]
+  linarith
+
+/-- The baseline sublevel is bounded.  The ridge term bounds the slope; one realized control
+bounds the intercept above and one realized case bounds it below. -/
+theorem BinaryRiskCohort.isBounded_logisticCalibration_baselineSublevel
+    {Individual : Type*} [Fintype Individual]
+    (cohort : BinaryRiskCohort Individual)
+    (caseIndividual controlIndividual : Individual)
+    (hcase : cohort.outcome caseIndividual = true)
+    (hcontrol : cohort.outcome controlIndividual = false) :
+    Bornology.IsBounded {parameter : ℝ × ℝ |
+      cohort.logisticCalibrationObjective parameter ≤
+        cohort.logisticCalibrationObjective (0, 0)} := by
+  let baseline := cohort.logisticCalibrationObjective (0, 0)
+  let slopeBound := baseline * (2 * binaryCalibrationC) + 1
+  let caseLogit := prevalenceLogit (cohort.predictedRisk caseIndividual)
+  let controlLogit := prevalenceLogit (cohort.predictedRisk controlIndividual)
+  let interceptBound := baseline + slopeBound * |caseLogit| + slopeBound * |controlLogit|
+  apply isBounded_iff_forall_norm_le.mpr
+  refine ⟨max interceptBound slopeBound, ?_⟩
+  intro parameter hsublevel
+  have hbaseline_nonneg : 0 ≤ baseline := by
+    exact cohort.logisticCalibrationObjective_nonneg (0, 0)
+  have hdenominator : 0 < 2 * binaryCalibrationC := by
+    norm_num [binaryCalibrationC]
+  have hpenalty : parameter.2 ^ 2 / (2 * binaryCalibrationC) ≤ baseline :=
+    (cohort.ridgePenalty_le_objective parameter).trans hsublevel
+  have hsquare : parameter.2 ^ 2 ≤ baseline * (2 * binaryCalibrationC) :=
+    (div_le_iff₀ hdenominator).mp hpenalty
+  have habs_le_square_add_one : |parameter.2| ≤ parameter.2 ^ 2 + 1 := by
+    nlinarith [sq_nonneg (|parameter.2| - 1), sq_abs parameter.2,
+      abs_nonneg parameter.2]
+  have hslope : |parameter.2| ≤ slopeBound := by
+    exact habs_le_square_add_one.trans (add_le_add_right hsquare 1)
+  have hslopeBound_nonneg : 0 ≤ slopeBound :=
+    (abs_nonneg parameter.2).trans hslope
+  have hcontrolLinear :
+      parameter.1 + parameter.2 * controlLogit ≤
+        cohort.calibrationIndividualLoss controlIndividual parameter := by
+    simpa only [BinaryRiskCohort.calibrationIndividualLoss, controlLogit] using
+      cohort.linearPredictor_le_controlLoss controlIndividual hcontrol
+        (parameter.1 + parameter.2 * controlLogit)
+  have hcontrolAtMostBaseline :
+      parameter.1 + parameter.2 * controlLogit ≤ baseline :=
+    hcontrolLinear.trans <|
+      (cohort.calibrationIndividualLoss_le_objective controlIndividual parameter).trans hsublevel
+  have hparameterUpper : parameter.1 ≤ baseline + slopeBound * |controlLogit| := by
+    calc
+      parameter.1 ≤ baseline - parameter.2 * controlLogit := by linarith
+      _ ≤ baseline + |parameter.2| * |controlLogit| := by
+        rw [← abs_mul]
+        linarith [neg_le_abs (parameter.2 * controlLogit)]
+      _ ≤ baseline + slopeBound * |controlLogit| := by
+        exact add_le_add_left
+          (mul_le_mul_of_nonneg_right hslope (abs_nonneg controlLogit)) baseline
+  have hcaseLinear :
+      -(parameter.1 + parameter.2 * caseLogit) ≤
+        cohort.calibrationIndividualLoss caseIndividual parameter := by
+    simpa only [BinaryRiskCohort.calibrationIndividualLoss, caseLogit] using
+      cohort.neg_linearPredictor_le_caseLoss caseIndividual hcase
+        (parameter.1 + parameter.2 * caseLogit)
+  have hcaseAtMostBaseline :
+      -(parameter.1 + parameter.2 * caseLogit) ≤ baseline :=
+    hcaseLinear.trans <|
+      (cohort.calibrationIndividualLoss_le_objective caseIndividual parameter).trans hsublevel
+  have hnegativeParameterUpper : -parameter.1 ≤ baseline + slopeBound * |caseLogit| := by
+    calc
+      -parameter.1 ≤ baseline + parameter.2 * caseLogit := by linarith
+      _ ≤ baseline + |parameter.2| * |caseLogit| := by
+        rw [← abs_mul]
+        exact add_le_add_left (le_abs_self _) baseline
+      _ ≤ baseline + slopeBound * |caseLogit| := by
+        exact add_le_add_left
+          (mul_le_mul_of_nonneg_right hslope (abs_nonneg caseLogit)) baseline
+  have hintercept : |parameter.1| ≤ interceptBound := by
+    apply abs_le.mpr
+    constructor
+    · have : -parameter.1 ≤ interceptBound := by
+        exact hnegativeParameterUpper.trans <|
+          le_add_of_nonneg_right (mul_nonneg hslopeBound_nonneg (abs_nonneg controlLogit))
+      linarith
+    · exact hparameterUpper.trans <|
+        (by
+          dsimp only [interceptBound]
+          linarith [mul_nonneg hslopeBound_nonneg (abs_nonneg caseLogit)])
+  rw [Prod.norm_def, Real.norm_eq_abs, Real.norm_eq_abs]
+  exact max_le (hintercept.trans (le_max_left _ _))
+    (hslope.trans (le_max_right _ _))
+
+/-- A case and a control make the unpenalized intercept coercive, while the positive ridge
+makes the slope coercive; hence the exact finite objective attains a global minimum. -/
+theorem BinaryRiskCohort.exists_logisticCalibrationMinimizer
+    {Individual : Type*} [Fintype Individual]
+    (cohort : BinaryRiskCohort Individual)
+    (hcaseMass : 0 < cohort.caseMass) (hcontrolMass : 0 < cohort.controlMass) :
+    ∃ parameter : ℝ × ℝ, ∀ candidate,
+      cohort.logisticCalibrationObjective parameter ≤
+        cohort.logisticCalibrationObjective candidate := by
+  obtain ⟨caseIndividual, hcase⟩ := cohort.exists_case_of_caseMass_pos hcaseMass
+  obtain ⟨controlIndividual, hcontrol⟩ :=
+    cohort.exists_control_of_controlMass_pos hcontrolMass
+  exact cohort.continuous_logisticCalibrationObjective.exists_forall_le_of_isBounded
+    (0, 0) (cohort.isBounded_logisticCalibration_baselineSublevel
+      caseIndividual controlIndividual hcase hcontrol)
+
+/-- Each observation's loss is convex in the two calibration parameters.  It is the strictly
+convex scalar Bernoulli loss precomposed with an affine predictor. -/
+theorem BinaryRiskCohort.convexOn_calibrationIndividualLoss
+    {Individual : Type*} [Fintype Individual]
+    (cohort : BinaryRiskCohort Individual) (individual : Individual) :
+    ConvexOn ℝ Set.univ (cohort.calibrationIndividualLoss individual) := by
+  refine ⟨convex_univ, ?_⟩
+  intro first _ second _ firstWeight secondWeight hfirstWeight hsecondWeight hweightSum
+  let firstPredictor := first.1 + first.2 * prevalenceLogit (cohort.predictedRisk individual)
+  let secondPredictor := second.1 + second.2 * prevalenceLogit (cohort.predictedRisk individual)
+  have hconvex := (strictConvexOn_binaryLogisticLoss
+    (cohort.outcomeValue individual)).convexOn.2
+      (Set.mem_univ firstPredictor) (Set.mem_univ secondPredictor)
+      hfirstWeight hsecondWeight hweightSum
+  have hpredictor :
+      (firstWeight • first + secondWeight • second).1 +
+          (firstWeight • first + secondWeight • second).2 *
+            prevalenceLogit (cohort.predictedRisk individual) =
+        firstWeight • firstPredictor + secondWeight • secondPredictor := by
+    simp only [firstPredictor, secondPredictor, Prod.smul_fst, Prod.smul_snd,
+      Prod.fst_add, Prod.snd_add, smul_eq_mul]
+    ring
+  change binaryLogisticLoss (cohort.outcomeValue individual)
+      ((firstWeight • first + secondWeight • second).1 +
+        (firstWeight • first + secondWeight • second).2 *
+          prevalenceLogit (cohort.predictedRisk individual)) ≤
+    firstWeight • binaryLogisticLoss (cohort.outcomeValue individual) firstPredictor +
+      secondWeight • binaryLogisticLoss (cohort.outcomeValue individual) secondPredictor
+  rw [hpredictor]
+  exact hconvex
+
+/-- The individual parameter loss is strictly Jensen-convex whenever the two affine predictors
+differ. -/
+theorem BinaryRiskCohort.calibrationIndividualLoss_strict_of_predictor_ne
+    {Individual : Type*} [Fintype Individual]
+    (cohort : BinaryRiskCohort Individual) (individual : Individual)
+    (first second : ℝ × ℝ) (firstWeight secondWeight : ℝ)
+    (hfirstWeight : 0 < firstWeight) (hsecondWeight : 0 < secondWeight)
+    (hweightSum : firstWeight + secondWeight = 1)
+    (hpredictor :
+      first.1 + first.2 * prevalenceLogit (cohort.predictedRisk individual) ≠
+        second.1 + second.2 * prevalenceLogit (cohort.predictedRisk individual)) :
+    cohort.calibrationIndividualLoss individual
+        (firstWeight • first + secondWeight • second) <
+      firstWeight • cohort.calibrationIndividualLoss individual first +
+        secondWeight • cohort.calibrationIndividualLoss individual second := by
+  let firstPredictor := first.1 + first.2 * prevalenceLogit (cohort.predictedRisk individual)
+  let secondPredictor := second.1 + second.2 * prevalenceLogit (cohort.predictedRisk individual)
+  have hstrict := (strictConvexOn_binaryLogisticLoss
+    (cohort.outcomeValue individual)).2
+      (Set.mem_univ firstPredictor) (Set.mem_univ secondPredictor)
+      (by exact hpredictor) hfirstWeight hsecondWeight hweightSum
+  have hcombinedPredictor :
+      (firstWeight • first + secondWeight • second).1 +
+          (firstWeight • first + secondWeight • second).2 *
+            prevalenceLogit (cohort.predictedRisk individual) =
+        firstWeight • firstPredictor + secondWeight • secondPredictor := by
+    simp only [firstPredictor, secondPredictor, Prod.smul_fst, Prod.smul_snd,
+      Prod.fst_add, Prod.snd_add, smul_eq_mul]
+    ring
+  change binaryLogisticLoss (cohort.outcomeValue individual)
+      ((firstWeight • first + secondWeight • second).1 +
+        (firstWeight • first + secondWeight • second).2 *
+          prevalenceLogit (cohort.predictedRisk individual)) <
+    firstWeight • binaryLogisticLoss (cohort.outcomeValue individual) firstPredictor +
+      secondWeight • binaryLogisticLoss (cohort.outcomeValue individual) secondPredictor
+  rw [hcombinedPredictor]
+  exact hstrict
+
+/-- Jensen's inequality for the exact scalar ridge penalty. -/
+theorem ridgePenalty_convex (first second firstWeight secondWeight : ℝ)
+    (hfirstWeight : 0 ≤ firstWeight) (hsecondWeight : 0 ≤ secondWeight)
+    (hweightSum : firstWeight + secondWeight = 1) :
+    (firstWeight * first + secondWeight * second) ^ 2 / (2 * binaryCalibrationC) ≤
+      firstWeight * (first ^ 2 / (2 * binaryCalibrationC)) +
+        secondWeight * (second ^ 2 / (2 * binaryCalibrationC)) := by
+  have hweightProduct : 0 ≤ firstWeight * secondWeight :=
+    mul_nonneg hfirstWeight hsecondWeight
+  have hsquare : 0 ≤ (first - second) ^ 2 := sq_nonneg _
+  norm_num [binaryCalibrationC]
+  nlinarith
+
+/-- The ridge Jensen inequality is strict when both weights are positive and slopes differ. -/
+theorem ridgePenalty_strict (first second firstWeight secondWeight : ℝ)
+    (hfirstWeight : 0 < firstWeight) (hsecondWeight : 0 < secondWeight)
+    (hweightSum : firstWeight + secondWeight = 1) (hne : first ≠ second) :
+    (firstWeight * first + secondWeight * second) ^ 2 / (2 * binaryCalibrationC) <
+      firstWeight * (first ^ 2 / (2 * binaryCalibrationC)) +
+        secondWeight * (second ^ 2 / (2 * binaryCalibrationC)) := by
+  have hweightProduct : 0 < firstWeight * secondWeight :=
+    mul_pos hfirstWeight hsecondWeight
+  have hsquare : 0 < (first - second) ^ 2 :=
+    sq_pos_of_ne_zero (sub_ne_zero.mpr hne)
+  norm_num [binaryCalibrationC]
+  nlinarith
+
+/-- The full finite ridge-logistic objective is strictly convex in intercept and slope.  If
+slopes differ, the ridge term supplies strictness.  If slopes agree, distinct parameter pairs
+have distinct intercepts, so every observation's Bernoulli contribution supplies strictness. -/
+theorem BinaryRiskCohort.strictConvexOn_logisticCalibrationObjective
+    {Individual : Type*} [Fintype Individual]
+    (cohort : BinaryRiskCohort Individual) :
+    StrictConvexOn ℝ Set.univ cohort.logisticCalibrationObjective := by
+  haveI : Nonempty Individual := Fintype.card_pos_iff.mp cohort.card_pos
+  refine ⟨convex_univ, ?_⟩
+  intro first _ second _ hparameters firstWeight secondWeight
+    hfirstWeight hsecondWeight hweightSum
+  let combined := firstWeight • first + secondWeight • second
+  have hsum_le :
+      (∑ individual, cohort.calibrationIndividualLoss individual combined) ≤
+        firstWeight • (∑ individual, cohort.calibrationIndividualLoss individual first) +
+          secondWeight • (∑ individual, cohort.calibrationIndividualLoss individual second) := by
+    calc
+      (∑ individual, cohort.calibrationIndividualLoss individual combined) ≤
+          ∑ individual,
+            (firstWeight • cohort.calibrationIndividualLoss individual first +
+              secondWeight • cohort.calibrationIndividualLoss individual second) := by
+        exact Finset.sum_le_sum fun individual _ ↦
+          (cohort.convexOn_calibrationIndividualLoss individual).2
+            (Set.mem_univ first) (Set.mem_univ second)
+            hfirstWeight.le hsecondWeight.le hweightSum
+      _ = _ := by
+        rw [Finset.sum_add_distrib, ← Finset.smul_sum, ← Finset.smul_sum]
+  by_cases hslope : first.2 = second.2
+  · have hintercept : first.1 ≠ second.1 := by
+      intro hinterceptEqual
+      apply hparameters
+      exact Prod.ext hinterceptEqual hslope
+    have hsum_strict :
+        (∑ individual, cohort.calibrationIndividualLoss individual combined) <
+          firstWeight • (∑ individual, cohort.calibrationIndividualLoss individual first) +
+            secondWeight • (∑ individual, cohort.calibrationIndividualLoss individual second) := by
+      calc
+        (∑ individual, cohort.calibrationIndividualLoss individual combined) <
+            ∑ individual,
+              (firstWeight • cohort.calibrationIndividualLoss individual first +
+                secondWeight • cohort.calibrationIndividualLoss individual second) := by
+          apply Finset.sum_lt_sum_of_nonempty Finset.univ_nonempty
+          intro individual _
+          apply cohort.calibrationIndividualLoss_strict_of_predictor_ne
+            individual first second firstWeight secondWeight
+            hfirstWeight hsecondWeight hweightSum
+          intro hpredictor
+          apply hintercept
+          rw [hslope] at hpredictor
+          linarith
+        _ = _ := by
+          rw [Finset.sum_add_distrib, ← Finset.smul_sum, ← Finset.smul_sum]
+    have hpenalty_le := ridgePenalty_convex first.2 second.2 firstWeight secondWeight
+      hfirstWeight.le hsecondWeight.le hweightSum
+    have htotal := add_lt_add_of_lt_of_le hsum_strict hpenalty_le
+    unfold BinaryRiskCohort.logisticCalibrationObjective
+    dsimp only [combined] at htotal ⊢
+    simp only [Prod.smul_snd, Prod.snd_add, smul_eq_mul] at htotal ⊢
+    convert htotal using 1 <;> ring
+  · have hpenalty_strict := ridgePenalty_strict first.2 second.2
+      firstWeight secondWeight hfirstWeight hsecondWeight hweightSum hslope
+    have htotal := add_lt_add_of_le_of_lt hsum_le hpenalty_strict
+    unfold BinaryRiskCohort.logisticCalibrationObjective
+    dsimp only [combined] at htotal ⊢
+    simp only [Prod.smul_snd, Prod.snd_add, smul_eq_mul] at htotal ⊢
+    convert htotal using 1 <;> ring
+
+/-- A finite ridge-logistic calibration objective with both outcome classes has exactly one
+global minimizer.  Existence is coercivity plus continuity; uniqueness is strict convexity. -/
+theorem BinaryRiskCohort.existsUnique_logisticCalibrationMinimizer
+    {Individual : Type*} [Fintype Individual]
+    (cohort : BinaryRiskCohort Individual)
+    (hcaseMass : 0 < cohort.caseMass) (hcontrolMass : 0 < cohort.controlMass) :
+    ∃! parameter : ℝ × ℝ, ∀ candidate,
+      cohort.logisticCalibrationObjective parameter ≤
+        cohort.logisticCalibrationObjective candidate := by
+  obtain ⟨parameter, hparameter⟩ :=
+    cohort.exists_logisticCalibrationMinimizer hcaseMass hcontrolMass
+  refine ⟨parameter, hparameter, ?_⟩
+  intro other hother
+  have hparameterMin : IsMinOn cohort.logisticCalibrationObjective Set.univ parameter :=
+    fun candidate _ ↦ hparameter candidate
+  have hotherMin : IsMinOn cohort.logisticCalibrationObjective Set.univ other :=
+    fun candidate _ ↦ hother candidate
+  exact cohort.strictConvexOn_logisticCalibrationObjective.eq_of_isMinOn
+    hotherMin hparameterMin
+    (Set.mem_univ other) (Set.mem_univ parameter)
+
+/-- Domain of the logistic recalibration fit: exactly gnomon's executable outcome-metric,
+cohort-size, and standard-deviation guards.  Existence and uniqueness of the ideal optimizer
+are theorems above, not an assumption stored in this domain. -/
 structure BinaryRiskCohort.LogisticCalibrationDomain
     {Individual : Type*} [Fintype Individual]
     (cohort : BinaryRiskCohort Individual) : Prop where
@@ -344,9 +782,6 @@ structure BinaryRiskCohort.LogisticCalibrationDomain
   caseMass_pos : 0 < cohort.caseMass
   controlMass_pos : 0 < cohort.controlMass
   logitSD_above_guard : (1 / 1000000000 : ℝ) < Real.sqrt cohort.logitRiskVariance
-  existsUniqueMinimizer : ∃! parameter : ℝ × ℝ, ∀ candidate,
-    cohort.logisticCalibrationObjective parameter ≤
-      cohort.logisticCalibrationObjective candidate
 
 /-- Exactly characterized ridge-logistic recalibration parameters: the unique objective
 minimizer, not a covariance-ratio surrogate.  Floating-point stopping tolerance is numerical
@@ -355,7 +790,8 @@ noncomputable def BinaryRiskCohort.logisticCalibrationFit
     {Individual : Type*} [Fintype Individual]
     (cohort : BinaryRiskCohort Individual) (domain : cohort.LogisticCalibrationDomain) :
     ℝ × ℝ :=
-  domain.existsUniqueMinimizer.exists.choose
+  (cohort.existsUnique_logisticCalibrationMinimizer
+    domain.caseMass_pos domain.controlMass_pos).exists.choose
 
 /-- The selected calibration pair satisfies the defining global optimum law. -/
 theorem BinaryRiskCohort.logisticCalibrationFit_spec
@@ -363,7 +799,8 @@ theorem BinaryRiskCohort.logisticCalibrationFit_spec
     (cohort : BinaryRiskCohort Individual) (domain : cohort.LogisticCalibrationDomain) :
     ∀ candidate, cohort.logisticCalibrationObjective (cohort.logisticCalibrationFit domain) ≤
       cohort.logisticCalibrationObjective candidate :=
-  domain.existsUniqueMinimizer.exists.choose_spec
+  (cohort.existsUnique_logisticCalibrationMinimizer
+    domain.caseMass_pos domain.controlMass_pos).exists.choose_spec
 
 /-- Pipeline calibration slope `b` from `y ~ a + b logit(p)`. -/
 noncomputable def BinaryRiskCohort.calibrationSlope
