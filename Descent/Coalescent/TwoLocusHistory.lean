@@ -124,6 +124,50 @@ theorem rightFrequency_le_one (frequency : TwoLocusHaplotypeFrequencies) :
   dsimp [rightFrequency]
   linarith [frequency.Ab_nonneg, frequency.ab_nonneg, frequency.total_eq_one]
 
+/-- The determinant definition and the probability simplex give the sharp universal
+linkage bound `|D| ≤ 1/4`.  Equality is attained by a half-`AB`, half-`ab` population (or
+the corresponding repulsion-phase population). -/
+theorem linkage_abs_le_quarter (frequency : TwoLocusHaplotypeFrequencies) :
+    |frequency.linkage| ≤ 1 / 4 := by
+  have hABab_sum_nonneg : 0 ≤ frequency.AB + frequency.ab :=
+    add_nonneg frequency.AB_nonneg frequency.ab_nonneg
+  have hABab_sum_le_one : frequency.AB + frequency.ab ≤ 1 := by
+    linarith [frequency.Ab_nonneg, frequency.aB_nonneg, frequency.total_eq_one]
+  have hABab_product_le : frequency.AB * frequency.ab ≤ 1 / 4 := by
+    have hinside : 0 ≤ (frequency.AB + frequency.ab) *
+        (1 - (frequency.AB + frequency.ab)) :=
+      mul_nonneg hABab_sum_nonneg (sub_nonneg.mpr hABab_sum_le_one)
+    nlinarith [sq_nonneg (frequency.AB - frequency.ab)]
+  have hAbaB_sum_nonneg : 0 ≤ frequency.Ab + frequency.aB :=
+    add_nonneg frequency.Ab_nonneg frequency.aB_nonneg
+  have hAbaB_sum_le_one : frequency.Ab + frequency.aB ≤ 1 := by
+    linarith [frequency.AB_nonneg, frequency.ab_nonneg, frequency.total_eq_one]
+  have hAbaB_product_le : frequency.Ab * frequency.aB ≤ 1 / 4 := by
+    have hinside : 0 ≤ (frequency.Ab + frequency.aB) *
+        (1 - (frequency.Ab + frequency.aB)) :=
+      mul_nonneg hAbaB_sum_nonneg (sub_nonneg.mpr hAbaB_sum_le_one)
+    nlinarith [sq_nonneg (frequency.Ab - frequency.aB)]
+  rw [abs_le]
+  constructor <;> dsimp [linkage] <;>
+    nlinarith [mul_nonneg frequency.AB_nonneg frequency.ab_nonneg,
+      mul_nonneg frequency.Ab_nonneg frequency.aB_nonneg]
+
+/-- A simplex point attaining the positive endpoint of the universal linkage interval. -/
+noncomputable def maximalCoupling : TwoLocusHaplotypeFrequencies where
+  AB := 1 / 2
+  Ab := 0
+  aB := 0
+  ab := 1 / 2
+  AB_nonneg := by norm_num
+  Ab_nonneg := by norm_num
+  aB_nonneg := by norm_num
+  ab_nonneg := by norm_num
+  total_eq_one := by norm_num
+
+/-- The `1/4` linkage bound is attained, so it cannot be uniformly improved. -/
+theorem maximalCoupling_linkage : maximalCoupling.linkage = 1 / 4 := by
+  norm_num [maximalCoupling, linkage]
+
 end TwoLocusHaplotypeFrequencies
 
 /-- Symmetric cross-deme heterozygosity at the left locus.  At one deme this is
@@ -176,6 +220,41 @@ structure LowOrderLDHaplotypeRealization {D : ℕ}
     state (some (.pi2 first second third fourth)) = expectation (fun outcome ↦
       twoLocusJointHeterozygosity (haplotype outcome first) (haplotype outcome second)
         (haplotype outcome third) (haplotype outcome fourth))
+
+/-- Evaluate the complete low-order polynomial family under a positive normalized
+expectation.  This is the forward semantic map from an actual haplotype law to the finite
+moment vector used by the demographic operator. -/
+noncomputable def haplotypeLowOrderLDState {D : ℕ} {sampleSpace : Type}
+    (expectation : Foundations.ExpFunctional sampleSpace)
+    (haplotype : sampleSpace → Fin D → TwoLocusHaplotypeFrequencies) :
+    AffineLowOrderLDCoordinate D → ℝ
+  | none => 1
+  | some (.H first second) => expectation (fun outcome ↦
+      twoLocusLeftHeterozygosity (haplotype outcome first) (haplotype outcome second))
+  | some (.DD first second) => expectation (fun outcome ↦
+      (haplotype outcome first).linkage * (haplotype outcome second).linkage)
+  | some (.Dz first second third) => expectation (fun outcome ↦
+      (haplotype outcome first).linkage *
+        (1 - 2 * (haplotype outcome second).leftFrequency) *
+        (1 - 2 * (haplotype outcome third).rightFrequency))
+  | some (.pi2 first second third fourth) => expectation (fun outcome ↦
+      twoLocusJointHeterozygosity (haplotype outcome first) (haplotype outcome second)
+        (haplotype outcome third) (haplotype outcome fourth))
+
+/-- The semantic moment map is realizable by construction, so the cone is inhabited by
+every genuine law rather than merely constrained by a list of equations. -/
+def haplotypeLowOrderLDState_realization {D : ℕ} {sampleSpace : Type}
+    (expectation : Foundations.ExpFunctional sampleSpace)
+    (haplotype : sampleSpace → Fin D → TwoLocusHaplotypeFrequencies) :
+    LowOrderLDHaplotypeRealization (haplotypeLowOrderLDState expectation haplotype) where
+  sampleSpace := sampleSpace
+  expectation := expectation
+  haplotype := haplotype
+  constant_eq := rfl
+  H_eq _ _ := rfl
+  DD_eq _ _ := rfl
+  Dz_eq _ _ _ := rfl
+  pi2_eq _ _ _ _ := rfl
 
 /-- A low-order state is `DD`-realizable when its complete `DD(i,j)` block is the Gram
 kernel of actual linkage observables under one positive normalized linear expectation.
@@ -252,6 +331,62 @@ theorem pi2_nonneg {D : ℕ} {state : AffineLowOrderLDCoordinate D → ℝ}
       · exact mul_nonneg (realization.haplotype outcome fourth).rightFrequency_nonneg
           (sub_nonneg.mpr (realization.haplotype outcome third).rightFrequency_le_one)
   · norm_num
+
+/-- Every cross-deme `DD(i,j)=E[DᵢDⱼ]` coordinate obeys the sharp simplex scale
+`|DD(i,j)| ≤ 1/16`.  This is independent of demography: history changes the law on the
+simplex, while positivity of expectation preserves the pathwise determinant bound. -/
+theorem DD_abs_le_sixteenth {D : ℕ}
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state) (first second : Fin D) :
+    |state (some (.DD first second))| ≤ 1 / 16 := by
+  rw [realization.DD_eq first second, abs_le]
+  constructor
+  · calc
+      -(1 / 16 : ℝ) = realization.expectation (fun _ ↦ -(1 / 16 : ℝ)) := by
+        rw [realization.expectation.eval_const]
+      _ ≤ realization.expectation (fun outcome ↦
+          (realization.haplotype outcome first).linkage *
+            (realization.haplotype outcome second).linkage) := by
+        apply realization.expectation.eval_mono
+        intro outcome
+        have hfirst := (realization.haplotype outcome first).linkage_abs_le_quarter
+        have hsecond := (realization.haplotype outcome second).linkage_abs_le_quarter
+        have habs : |(realization.haplotype outcome first).linkage *
+            (realization.haplotype outcome second).linkage| ≤ 1 / 16 := by
+          rw [abs_mul]
+          nlinarith [mul_nonneg (abs_nonneg
+            (realization.haplotype outcome first).linkage)
+            (sub_nonneg.mpr hsecond),
+            mul_nonneg (sub_nonneg.mpr hfirst) (by norm_num : (0 : ℝ) ≤ 1 / 4)]
+        exact (neg_le_of_abs_le habs)
+  · calc
+      realization.expectation (fun outcome ↦
+          (realization.haplotype outcome first).linkage *
+            (realization.haplotype outcome second).linkage) ≤
+          realization.expectation (fun _ ↦ (1 / 16 : ℝ)) := by
+        apply realization.expectation.eval_mono
+        intro outcome
+        have hfirst := (realization.haplotype outcome first).linkage_abs_le_quarter
+        have hsecond := (realization.haplotype outcome second).linkage_abs_le_quarter
+        have habs : |(realization.haplotype outcome first).linkage *
+            (realization.haplotype outcome second).linkage| ≤ 1 / 16 := by
+          rw [abs_mul]
+          nlinarith [mul_nonneg (abs_nonneg
+            (realization.haplotype outcome first).linkage)
+            (sub_nonneg.mpr hsecond),
+            mul_nonneg (sub_nonneg.mpr hfirst) (by norm_num : (0 : ℝ) ≤ 1 / 4)]
+        exact (le_of_abs_le habs)
+      _ = 1 / 16 := realization.expectation.eval_const _
+
+/-- The `1/16` cross-moment bound is attained when all requested demes share the maximal
+coupling simplex point. -/
+theorem DD_sixteenth_attained {D : ℕ} (first second : Fin D) :
+    haplotypeLowOrderLDState (Foundations.ExpFunctional.evalAt ())
+        (fun _ (_ : Fin D) ↦ TwoLocusHaplotypeFrequencies.maximalCoupling)
+        (some (.DD first second)) = 1 / 16 := by
+  simp only [haplotypeLowOrderLDState, Foundations.ExpFunctional.evalAt]
+  rw [TwoLocusHaplotypeFrequencies.maximalCoupling_linkage]
+  norm_num
 
 end LowOrderLDHaplotypeRealization
 
