@@ -11,7 +11,7 @@ GATE=/projects/standard/hsiehph/sauer354/descent/validation/empirical/gate
 PY=/projects/standard/hsiehph/sauer354/simcov-venv/bin/python
 SIMS=/projects/standard/hsiehph/sauer354/gnomon/sims/ancestry_calibration
 
-$PY "$GATE/gate_tables.py  # tables already exist; rebuild is idempotent" > "$TO/gate_tables.log" 2>&1 || exit 1
+$PY "$GATE/gate_tables.py" > "$TO/gate_tables.log" 2>&1 || exit 1
 mkdir -p "$TO/gate2_l3"
 cd "$SIMS" || exit 1
 for seed in 109 110 111 112 113 114 115 116; do
