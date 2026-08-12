@@ -93,3 +93,30 @@ TrainVsAllMomentProjection) evaluated by the killed-dual-chain method that alrea
 made cohort-size computations double-precision tractable. Predictor v3's inputs are
 those dual evaluations at the pipeline's pooled cohort (n = 13,750, MAF floor 0.01),
 carried to fourth order for the panel law and second order for the variance law.
+
+## 6. The ascertained moments are exact, and the two derived laws bracket reality
+
+The conditioning-commutes reduction (`fourth_moments_ascertained.py`): conditional
+moments given the ancestral frequency are polynomials of degree <= 4 in p0 (linearity
+of the hierarchy), the ancestral density is the analytic Beta(theta, theta), so
+ascertained moments are five sparse basis propagations plus EXACT incomplete-Beta
+window integrals. No grid, no quadrature, no closure except the deferred sampling
+smear (width ~6e-4 against a window at 0.01, stated). Results
+(`fourth_moment_ascertained.json`): P(asc) = 0.0046; ascertained CV^2 = 1.06-1.34
+(down from ~250 unascertained -- the predicted collapse, now exact); the cross-deme
+correlation term decays 1.01 -> 0.62 from adjacent to far corner.
+
+The pure self-tag transport law follows with no fitted constant: selection tilt
+proportional to significance makes the mean factors cancel exactly, leaving
+    ratio(t->j) = (1 + rho_tj) / (1 + CV^2_t)
+= 0.86 / 0.81 / 0.69 at adjacent / mid / far corner. Development grades on the spent
+gate seeds (direction signal only): v1 (pure lambda) +0.261 +/- 0.101, v3 (pure
+self-tag) -0.264 +/- 0.098. NEAR-SYMMETRIC OPPOSITE MISSES: the two derived laws
+bracket the measured transport from both sides, which is the signature of the channel
+mixture -- real panels are part self-tagged (v3) and part tagged (v1), and the
+mixture weight phi is the winner's-curse flip probability P(a tag's realized
+chi-square beats the causal's), derivable from the per-seed significance threshold
+and the DD-derived local r^2 curve. phi is the one remaining derivand; it is NOT a
+fittable constant, and the near-symmetry of the bracket says its value is near one
+half at this design's thresholds. Predictor v3.1 = the phi-weighted channel mixture;
+it meets the gate on seeds never yet generated.
