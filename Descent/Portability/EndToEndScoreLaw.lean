@@ -137,8 +137,13 @@ prevent that construction:
   row remains in that finite carrier; killing has no destination.  The distinct-parent split
   merge is closed as well, `splitManyDemeKilledDualPropagator_mulVec` proves its sparse matrix
   is the deterministic lineage merge, and `manyDemeKilledDualHistoryPropagator` composes any
-  finite epoch/split sequence.  What remains is the generator-to-semigroup and split
-  intertwining with the existing moment law needed to replace that alternating evaluator end to end,
+  finite epoch/split sequence.  The generator bridge is stronger than pointwise evaluation:
+  `manyDemeBernsteinAnalyticGeneratorPolynomial_eq_killedDual` proves equality as a
+  multivariate polynomial, and
+  `manyDemeBernsteinGenerator_momentFunctional_eq_killedDual` transports it through every
+  mixed-moment functional.  What remains is to identify those coefficient functionals with
+  the two finite matrices, lift that matrix intertwining through exponentials, and prove split
+  intertwining with the existing moment law so the alternating evaluator is replaced end to end,
   implement its sparse action without materializing either Cartesian carrier, add certified
   floating-point/interval roundoff control, and run at the executable's 13,750-individual /
   27,500-haplotype grid2d scale, followed by the filed end-to-end cohort validation gate;

@@ -5,6 +5,7 @@ import Descent.Coalescent.Structured
 import Descent.Core.Moments
 import Mathlib.Analysis.Matrix
 import Mathlib.Analysis.Normed.Algebra.Exponential
+import Mathlib.Algebra.MvPolynomial.Funext
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import Mathlib.Topology.Algebra.InfiniteSum.Basic
 import Mathlib.Tactic
@@ -1028,6 +1029,21 @@ noncomputable def manyDemeBernsteinWeight {D : ℕ} (frequency : Fin D → ℝ)
     (derived ancestral : Fin D → ℕ) : ℝ :=
   ∏ deme, frequency deme ^ derived deme * (1 - frequency deme) ^ ancestral deme
 
+/-- The same product Bernstein basis element as a multivariate real polynomial.  This lift
+lets a pointwise generator identity become a coefficient-level identity by polynomial
+extensionality, which is the bridge needed for finite moment-matrix intertwining. -/
+noncomputable def manyDemeBernsteinPolynomial {D : ℕ}
+    (derived ancestral : Fin D → ℕ) : MvPolynomial (Fin D) ℝ :=
+  ∏ deme, MvPolynomial.X deme ^ derived deme *
+    (1 - MvPolynomial.X deme) ^ ancestral deme
+
+/-- Evaluating the polynomial lift recovers exactly the numerical Bernstein weight. -/
+theorem eval_manyDemeBernsteinPolynomial {D : ℕ} (frequency : Fin D → ℝ)
+    (derived ancestral : Fin D → ℕ) :
+    MvPolynomial.eval frequency (manyDemeBernsteinPolynomial derived ancestral) =
+      manyDemeBernsteinWeight frequency derived ancestral := by
+  simp [manyDemeBernsteinPolynomial, manyDemeBernsteinWeight]
+
 /-- Multiplying after removing one positive derived exponent restores the original
 Bernstein weight. -/
 theorem frequency_mul_manyDemeBernsteinWeight_decrementDerived {D : ℕ}
@@ -1188,6 +1204,45 @@ noncomputable def manyDemeBernsteinSecondDerivative {D : ℕ}
     ((ancestral deme * (ancestral deme - 1) : ℕ) : ℝ) *
       manyDemeBernsteinWeight frequency derived
         (decrementExponent (decrementExponent ancestral deme) deme)
+
+/-- Division-free first derivative formula lifted into the multivariate polynomial ring. -/
+noncomputable def manyDemeBernsteinFirstDerivativePolynomial {D : ℕ}
+    (derived ancestral : Fin D → ℕ) (deme : Fin D) : MvPolynomial (Fin D) ℝ :=
+  MvPolynomial.C (derived deme : ℝ) *
+      manyDemeBernsteinPolynomial (decrementExponent derived deme) ancestral -
+    MvPolynomial.C (ancestral deme : ℝ) *
+      manyDemeBernsteinPolynomial derived (decrementExponent ancestral deme)
+
+/-- Division-free second derivative formula lifted into the polynomial ring. -/
+noncomputable def manyDemeBernsteinSecondDerivativePolynomial {D : ℕ}
+    (derived ancestral : Fin D → ℕ) (deme : Fin D) : MvPolynomial (Fin D) ℝ :=
+  MvPolynomial.C (((derived deme * (derived deme - 1) : ℕ) : ℝ)) *
+      manyDemeBernsteinPolynomial
+        (decrementExponent (decrementExponent derived deme) deme) ancestral -
+    MvPolynomial.C (2 * derived deme * ancestral deme : ℝ) *
+      manyDemeBernsteinPolynomial (decrementExponent derived deme)
+        (decrementExponent ancestral deme) +
+    MvPolynomial.C (((ancestral deme * (ancestral deme - 1) : ℕ) : ℝ)) *
+      manyDemeBernsteinPolynomial derived
+        (decrementExponent (decrementExponent ancestral deme) deme)
+
+/-- Polynomial evaluation commutes with the explicit first-derivative lift. -/
+theorem eval_manyDemeBernsteinFirstDerivativePolynomial {D : ℕ}
+    (frequency : Fin D → ℝ) (derived ancestral : Fin D → ℕ) (deme : Fin D) :
+    MvPolynomial.eval frequency
+        (manyDemeBernsteinFirstDerivativePolynomial derived ancestral deme) =
+      manyDemeBernsteinFirstDerivative frequency derived ancestral deme := by
+  simp [manyDemeBernsteinFirstDerivativePolynomial, manyDemeBernsteinFirstDerivative,
+    eval_manyDemeBernsteinPolynomial]
+
+/-- Polynomial evaluation commutes with the explicit second-derivative lift. -/
+theorem eval_manyDemeBernsteinSecondDerivativePolynomial {D : ℕ}
+    (frequency : Fin D → ℝ) (derived ancestral : Fin D → ℕ) (deme : Fin D) :
+    MvPolynomial.eval frequency
+        (manyDemeBernsteinSecondDerivativePolynomial derived ancestral deme) =
+      manyDemeBernsteinSecondDerivative frequency derived ancestral deme := by
+  simp [manyDemeBernsteinSecondDerivativePolynomial, manyDemeBernsteinSecondDerivative,
+    eval_manyDemeBernsteinPolynomial]
 
 /-- Two like-type derived lineages coalesce, while the complementary factor supplies the
 diagonal subtraction. -/
@@ -1557,6 +1612,115 @@ theorem manyDemeBernsteinAnalyticGenerator_eq_killedDual {D : ℕ}
     intro deme _
     exact bernsteinWeight_symmetricMutationChannel_identity rates frequency
       derived ancestral deme (symmetric deme)
+
+/-- Polynomial lift of the analytic diffusion generator applied to one Bernstein basis
+element.  All derivatives are the already-derived division-free polynomials above. -/
+noncomputable def manyDemeBernsteinAnalyticGeneratorPolynomial {D : ℕ}
+    (rates : ManyDemeRates D) (derived ancestral : Fin D → ℕ) :
+    MvPolynomial (Fin D) ℝ :=
+  (∑ deme, MvPolynomial.C (rates.coalescence deme / 2) *
+      MvPolynomial.X deme * (1 - MvPolynomial.X deme) *
+      manyDemeBernsteinSecondDerivativePolynomial derived ancestral deme) +
+  (∑ src, ∑ dst, MvPolynomial.C (rates.migration src dst) *
+      (MvPolynomial.X dst - MvPolynomial.X src) *
+      manyDemeBernsteinFirstDerivativePolynomial derived ancestral src) +
+  ∑ deme, (MvPolynomial.C (rates.forwardMutation deme) *
+        (1 - MvPolynomial.X deme) -
+      MvPolynomial.C (rates.backwardMutation deme) * MvPolynomial.X deme) *
+      manyDemeBernsteinFirstDerivativePolynomial derived ancestral deme
+
+/-- Polynomial lift of the positive killed-coalescent generator applied to the Bernstein
+basis family. -/
+noncomputable def manyDemeKilledDualGeneratorPolynomial {D : ℕ}
+    (rates : ManyDemeRates D) (derived ancestral : Fin D → ℕ) :
+    MvPolynomial (Fin D) ℝ :=
+  (∑ deme, (
+      MvPolynomial.C (rates.coalescence deme *
+          ((derived deme * (derived deme - 1) : ℕ) : ℝ) / 2) *
+          (manyDemeBernsteinPolynomial (decrementExponent derived deme) ancestral -
+            manyDemeBernsteinPolynomial derived ancestral) +
+      MvPolynomial.C (rates.coalescence deme *
+          ((ancestral deme * (ancestral deme - 1) : ℕ) : ℝ) / 2) *
+          (manyDemeBernsteinPolynomial derived (decrementExponent ancestral deme) -
+            manyDemeBernsteinPolynomial derived ancestral) -
+      MvPolynomial.C (rates.coalescence deme * derived deme * ancestral deme) *
+        manyDemeBernsteinPolynomial derived ancestral)) +
+  (∑ src, ∑ dst, (
+      MvPolynomial.C (rates.migration src dst * derived src) *
+          (manyDemeBernsteinPolynomial (migrateExponent derived src dst) ancestral -
+            manyDemeBernsteinPolynomial derived ancestral) +
+      MvPolynomial.C (rates.migration src dst * ancestral src) *
+          (manyDemeBernsteinPolynomial derived (migrateExponent ancestral src dst) -
+            manyDemeBernsteinPolynomial derived ancestral))) +
+  ∑ deme, (
+      MvPolynomial.C (rates.forwardMutation deme * derived deme) *
+          (manyDemeBernsteinPolynomial (decrementExponent derived deme)
+              (incrementExponent ancestral deme) -
+            manyDemeBernsteinPolynomial derived ancestral) +
+      MvPolynomial.C (rates.forwardMutation deme * ancestral deme) *
+          (manyDemeBernsteinPolynomial (incrementExponent derived deme)
+              (decrementExponent ancestral deme) -
+            manyDemeBernsteinPolynomial derived ancestral))
+
+/-- Evaluation of the analytic generator polynomial is the numerical analytic generator. -/
+theorem eval_manyDemeBernsteinAnalyticGeneratorPolynomial {D : ℕ}
+    (rates : ManyDemeRates D) (frequency : Fin D → ℝ)
+    (derived ancestral : Fin D → ℕ) :
+    MvPolynomial.eval frequency
+        (manyDemeBernsteinAnalyticGeneratorPolynomial rates derived ancestral) =
+      manyDemeBernsteinAnalyticGenerator rates frequency derived ancestral := by
+  simp [manyDemeBernsteinAnalyticGeneratorPolynomial,
+    manyDemeBernsteinAnalyticGenerator,
+    eval_manyDemeBernsteinFirstDerivativePolynomial,
+    eval_manyDemeBernsteinSecondDerivativePolynomial]
+
+/-- Evaluation of the killed-dual polynomial is the numerical killed generator. -/
+theorem eval_manyDemeKilledDualGeneratorPolynomial {D : ℕ}
+    (rates : ManyDemeRates D) (frequency : Fin D → ℝ)
+    (derived ancestral : Fin D → ℕ) :
+    MvPolynomial.eval frequency
+        (manyDemeKilledDualGeneratorPolynomial rates derived ancestral) =
+      manyDemeKilledDualGenerator rates (manyDemeBernsteinWeight frequency)
+        derived ancestral := by
+  simp [manyDemeKilledDualGeneratorPolynomial, manyDemeKilledDualGenerator,
+    eval_manyDemeBernsteinPolynomial]
+
+/-- **Coefficient-level arbitrary-deme duality.**  The analytic diffusion generator and the
+positive killed-coalescent generator are the same multivariate polynomial, not merely equal at
+chosen frequencies.  Consequently every linear moment functional sees the same generator. -/
+theorem manyDemeBernsteinAnalyticGeneratorPolynomial_eq_killedDual {D : ℕ}
+    (rates : ManyDemeRates D) (derived ancestral : Fin D → ℕ)
+    (symmetric : ∀ deme,
+      rates.backwardMutation deme = rates.forwardMutation deme) :
+    manyDemeBernsteinAnalyticGeneratorPolynomial rates derived ancestral =
+      manyDemeKilledDualGeneratorPolynomial rates derived ancestral := by
+  apply MvPolynomial.funext
+  intro frequency
+  rw [eval_manyDemeBernsteinAnalyticGeneratorPolynomial,
+    eval_manyDemeKilledDualGeneratorPolynomial]
+  exact manyDemeBernsteinAnalyticGenerator_eq_killedDual rates frequency
+    derived ancestral symmetric
+
+/-- Apply a multivariate polynomial to an arbitrary mixed-moment table by replacing each
+monomial coefficient with the corresponding table entry. -/
+noncomputable def manyDemePolynomialMomentFunctional {D : ℕ}
+    (moment : (Fin D → ℕ) → ℝ) (polynomial : MvPolynomial (Fin D) ℝ) : ℝ :=
+  polynomial.sum fun exponent coefficient ↦
+    coefficient * moment (fun deme ↦ exponent deme)
+
+/-- The coefficient-level duality survives every mixed-moment functional.  This is the exact
+scalar generator equality needed by each row of the forthcoming Bernstein projection matrix. -/
+theorem manyDemeBernsteinGenerator_momentFunctional_eq_killedDual {D : ℕ}
+    (rates : ManyDemeRates D) (moment : (Fin D → ℕ) → ℝ)
+    (derived ancestral : Fin D → ℕ)
+    (symmetric : ∀ deme,
+      rates.backwardMutation deme = rates.forwardMutation deme) :
+    manyDemePolynomialMomentFunctional moment
+        (manyDemeBernsteinAnalyticGeneratorPolynomial rates derived ancestral) =
+      manyDemePolynomialMomentFunctional moment
+        (manyDemeKilledDualGeneratorPolynomial rates derived ancestral) := by
+  rw [manyDemeBernsteinAnalyticGeneratorPolynomial_eq_killedDual rates derived ancestral
+    symmetric]
 
 /-- Total absorption rate of the positive Bernstein dual.  Absorption occurs exactly when a
 derived and an ancestral lineage choose the same coalescing parental lineage in one deme. -/
