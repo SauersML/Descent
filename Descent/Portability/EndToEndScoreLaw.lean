@@ -70,8 +70,8 @@ supply derived, attained endpoints for the actual expected semantics.  Four link
 prevent that construction:
 
 * `PipelineDemographicHistory.twoLocusMoments` now maps an arbitrary finite event history to
-  the complete transient many-deme `H/DD/Dz/pi2` operator product.  This supplies a concrete
-  candidate for the linkage factor that was previously bracketed.  The tracked exact-rational
+  the complete transient many-deme `H/DD/Dz/pi2` operator product.  This supplies exact
+  unascertained two-locus moments, not the selected score's linkage factor.  The tracked exact-rational
   ancestral-configuration reference in `validation/empirical/momentsld/ldchain_reduction.py`
   solves 2-, 3-, and 4-deme chains with verified lumpability and zero full-system residual.  It
   shows that an `F_ST`-matched two-deme surrogate is biased high and that a geometric scalar
@@ -89,8 +89,8 @@ prevent that construction:
   mutation model on that graph, reservoir-selects multi-marker genotype columns, computes
   PCs, and then runs logistic/Firth GWAS plus PLINK clumping and held-out threshold selection.
   Identifying that full joint kernel is strictly stronger than identifying `F_ST` and the
-  low-order `DD` coordinate.  The latter collapses the linkage bracket but does not by itself
-  construct the deployed score law.  The low-order operator now includes the exact recurrent
+  low-order `DD` coordinate.  The latter evaluates an unascertained linkage moment but does
+  not collapse the selected-score bracket or construct the deployed score law.  The low-order operator now includes the exact recurrent
   symmetric-biallelic damping and its recurrent one-deme stationary boundary, so it uses the
   same mutation mechanism as the marginal ascertainment propagator.
   `PipelineDemographicHistory.commonDiffusionProjection_exact` now proves that the joint
@@ -231,7 +231,7 @@ fiber width, or claim an exact endpoint law.
   the shared pair-divergence derivative, and the exact matrix-exponential intertwining law.
 * `Descent/Coalescent/TwoLocusHistory.lean` contains the arbitrary-deme recurrent
   `H/DD/Dz/pi2` generator, split transforms, epoch semigroups, and ordered composition that
-  evaluates the proposed migration-restored linkage factor.
+  evaluates the unascertained two-locus moment field.
 * This file defines the visible history/study contract, compiles both demographic operators,
   proves `commonDiffusionProjection_exact` for arbitrary event histories, specifies the exact
   P+T selection objective on a realized variable-marker draw, and builds the
@@ -240,8 +240,8 @@ fiber width, or claim an exact endpoint law.
   `R²`, AUC, calibration, Brier, and score variance, preserving undefined coordinates as
   `Option` values.
 * `Descent/Portability/PhenomeWidePortability.lean` retains the historical migration-chain
-  bracket and now inserts the operator point into it, with exact identities showing that its
-  two gaps differ only by the linkage factor.
+  bracket and the unascertained operator quotient as a separately named diagnostic.  It does
+  not insert that quotient as the selected score's interior point.
 * `validation/empirical/momentsld/ldchain_reduction.py` and
   `validation/empirical/momentsld/derivation/ld2d_iter.log` are the independent exact-chain
   and preregistered 2-D evidence.  They refute scalar reductions; they are not a simulator
@@ -2526,80 +2526,83 @@ theorem VisiblePipelineInput.sourcePolymorphicTargetHeterozygosity_eq_factorialM
     (input.studyDesign.evaluationHaplotypeCount target)
     (input.studyDesign.two_le_evaluationHaplotypeCount target)
 
-/-- Migration-restored linkage factor on its mathematical correlation domain.  It is the
-squared normalized cross-deme `DD` read after the complete demographic operator product.
+/-- Squared normalized cross-deme `DD` for the unascertained two-locus moment field, read
+after the complete demographic operator product.
 
-Empirical status: DERIVED -- `accuracyLinkageFactor_eq` proves this quotient is the squared
-normalized correlation, so this inherits the status of `StructuredPresentDay`'s
-`accuracyLinkageFactor` applied to the composed history; no battery has compared the composed
-factor against simulation yet. -/
-noncomputable def VisiblePipelineInput.accuracyLinkageFactorOn
+This quantity is intentionally named for what it is.  It is not the linkage factor of the
+deployed GWAS score: the latter conditions on marker ascertainment, association estimates,
+threshold selection, and clumping.  Those operations live in `RealizedPTGWASDraw` and are
+marginalized only through `VariableMarkerPTGWASKernel`.
+
+Empirical status: DERIVED -- `unascertainedLDCorrelationSqOn_eq` proves this quotient is the
+squared normalized `DD` correlation. -/
+noncomputable def VisiblePipelineInput.unascertainedLDCorrelationSqOn
     {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
     (separation : Coalescent.MarkerSeparationBp) (target : Fin demeCount)
     (domain : input.demography.twoLocusMoments.LDNormalizationDomain separation
       input.studyDesign.gwasDeme target) : ℝ :=
-  input.demography.twoLocusMoments.accuracyLinkageFactor separation
+  input.demography.twoLocusMoments.unascertainedLDCorrelationSq separation
     input.studyDesign.gwasDeme target domain
 
-/-- The visible linkage factor is literally the squared `DD` correlation; migration
-restoration is already inside the history generator and is not an added fitted term. -/
-theorem VisiblePipelineInput.accuracyLinkageFactor_eq
+/-- The unascertained quotient is literally the squared `DD` correlation; migration is
+already inside the history generator.  This theorem makes no selected-score claim. -/
+theorem VisiblePipelineInput.unascertainedLDCorrelationSqOn_eq
     {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
     (separation : Coalescent.MarkerSeparationBp) (target : Fin demeCount)
     (domain : input.demography.twoLocusMoments.LDNormalizationDomain separation
       input.studyDesign.gwasDeme target) :
-    input.accuracyLinkageFactorOn separation target domain =
+    input.unascertainedLDCorrelationSqOn separation target domain =
       (input.demography.twoLocusMoments.crossDemeLDCorrelation separation
         input.studyDesign.gwasDeme target domain) ^ 2 :=
-  input.demography.twoLocusMoments.accuracyLinkageFactor_eq_correlation_sq
+  input.demography.twoLocusMoments.unascertainedLDCorrelationSq_eq
     separation input.studyDesign.gwasDeme target domain
 
-/-- Exact input-only linkage readout.  The normalization domain is decided from the composed
+/-- Exact input-only unascertained `DD` readout.  The normalization domain is decided from the composed
 moments rather than supplied as an extra argument.  `none` covers a zero within-deme `DD`
 denominator; failure of a separate Cauchy--Schwarz certificate no longer suppresses an
 otherwise exactly evaluable operator quotient. -/
-noncomputable def VisiblePipelineInput.accuracyLinkageFactor
+noncomputable def VisiblePipelineInput.unascertainedLDCorrelationSq
     {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
     (separation : Coalescent.MarkerSeparationBp) (target : Fin demeCount) : Option ℝ := by
   classical
   exact if domain : input.demography.twoLocusMoments.LDNormalizationDomain separation
         input.studyDesign.gwasDeme target then
-      some (input.accuracyLinkageFactorOn separation target domain)
+      some (input.unascertainedLDCorrelationSqOn separation target domain)
     else none
 
 /-- On a certified nondegenerate moment pair, the input-only readout returns exactly the
 squared normalized `DD` correlation. -/
-theorem VisiblePipelineInput.accuracyLinkageFactor_eq_some
+theorem VisiblePipelineInput.unascertainedLDCorrelationSq_eq_some
     {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
     (separation : Coalescent.MarkerSeparationBp) (target : Fin demeCount)
     (domain : input.demography.twoLocusMoments.LDNormalizationDomain separation
       input.studyDesign.gwasDeme target) :
-    input.accuracyLinkageFactor separation target =
+    input.unascertainedLDCorrelationSq separation target =
       some ((input.demography.twoLocusMoments.crossDemeLDCorrelation separation
         input.studyDesign.gwasDeme target domain) ^ 2) := by
   classical
-  simp [VisiblePipelineInput.accuracyLinkageFactor, domain,
-    VisiblePipelineInput.accuracyLinkageFactorOn,
-    Coalescent.DemographicTwoLocusMoments.accuracyLinkageFactor_eq_correlation_sq]
+  simp [VisiblePipelineInput.unascertainedLDCorrelationSq, domain,
+    VisiblePipelineInput.unascertainedLDCorrelationSqOn,
+    Coalescent.DemographicTwoLocusMoments.unascertainedLDCorrelationSq_eq]
 
-/-- A defined input-only linkage factor with a realizable covariance certificate lies in
+/-- A defined input-only unascertained squared correlation with a realizable covariance certificate lies in
 `[0,1]`.  Evaluation itself requires only positive normalization denominators. -/
-theorem VisiblePipelineInput.accuracyLinkageFactor_mem_unitInterval
+theorem VisiblePipelineInput.unascertainedLDCorrelationSq_mem_unitInterval
     {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
     (separation : Coalescent.MarkerSeparationBp) (target : Fin demeCount)
     (domain : input.demography.twoLocusMoments.LDPairDomain separation
       input.studyDesign.gwasDeme target)
-    {value : ℝ} (hvalue : input.accuracyLinkageFactor separation target = some value) :
+    {value : ℝ} (hvalue : input.unascertainedLDCorrelationSq separation target = some value) :
     value ∈ Set.Icc (0 : ℝ) 1 := by
-  rw [input.accuracyLinkageFactor_eq_some separation target
+  rw [input.unascertainedLDCorrelationSq_eq_some separation target
     domain.toLDNormalizationDomain] at hvalue
   have heq := Option.some.inj hvalue
   subst value
-  rw [← input.accuracyLinkageFactor_eq separation target
+  rw [← input.unascertainedLDCorrelationSqOn_eq separation target
     domain.toLDNormalizationDomain]
-  exact ⟨input.demography.twoLocusMoments.accuracyLinkageFactor_nonneg
+  exact ⟨input.demography.twoLocusMoments.unascertainedLDCorrelationSq_nonneg
       separation input.studyDesign.gwasDeme target domain.toLDNormalizationDomain,
-    input.demography.twoLocusMoments.accuracyLinkageFactor_le_one
+    input.demography.twoLocusMoments.unascertainedLDCorrelationSq_le_one
       separation input.studyDesign.gwasDeme target domain⟩
 
 /-- Expected within-deme heterozygosity from the exact propagated first two moments. -/
@@ -3641,6 +3644,36 @@ structure VariableMarkerPTGWASKernel (Sample : Type*) [MeasurableSpace Sample] (
 
 /-- C1: true within-deme squared accuracy. -/
 noncomputable def DemeScoreLaw.r2True (law : DemeScoreLaw) : ℝ := law.moments.r2
+
+/-- The exact selected-score `R²` for one realized genome/GWAS draw, expanded into the
+objects on which selection actually acts.  The numerator uses the selected weight vector
+against every marker--causal covariance; the first denominator factor is the complete
+selected-marker covariance quadratic form; and the second is total liability variance.
+
+This is the correct replacement for treating an unascertained pairwise `DD` correlation as
+the score's linkage factor.  Ascertainment, noisy effect estimation, thresholding, and
+clumping all change `selectedScoreAt`; no scalar demographic quotient is substituted for it.
+-/
+theorem RealizedPTGWASDraw.winningR2True_eq_full_selected_moments
+    {D : ℕ} {input : VisiblePipelineInput D} (draw : RealizedPTGWASDraw input)
+    (deme : Fin D) :
+    (draw.winningScoreLaw.atDeme deme).r2True =
+      (∑ marker,
+        (draw.selectedScoreAt draw.winner.index deme).weight marker *
+          (draw.primitiveAt deme).markerLiabilityCovariance
+            draw.causalMarker draw.causalEffect marker) ^ 2 /
+      ((∑ first, ∑ second,
+          (draw.selectedScoreAt draw.winner.index deme).weight first *
+            (draw.primitiveAt deme).genotypeCovariance first second *
+              (draw.selectedScoreAt draw.winner.index deme).weight second) *
+        ((draw.primitiveAt deme).causalGeneticVariance
+          draw.causalMarker draw.causalEffect + input.studyDesign.residualVariance)) := by
+  unfold RealizedPTGWASDraw.winningScoreLaw RealizedPTGWASDraw.distanceLawAt
+    AdmissibleScoreWeights.toDemeScoreLaw DemeScoreLaw.r2True
+    Descent.Core.ScoreMoments.r2 DemeGeneticMomentPrimitive.predictiveCovariance
+    DemeGeneticMomentPrimitive.scoreVariance
+  simp_rw [draw.outcomeCrossCovariance_eq]
+  rw [draw.outcomeVariance_eq]
 
 /-- C1 on the observed binary-risk scale.  The score moments first determine explained
 liability variance; thresholding at prevalence `K` contributes the exact density/Jacobian

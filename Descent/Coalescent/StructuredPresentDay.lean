@@ -6966,17 +6966,18 @@ noncomputable def DemographicTwoLocusMoments.crossDemeLDCorrelation {D : ℕ}
   moments.DD rho first second /
     Real.sqrt (moments.DD rho first first * moments.DD rho second second)
 
-/-- The joint-channel factor on the `R²` scale.  Score accuracy is quadratic in the
-tag--causal correlation, so this is the exact quotient `DD(i,j)²/(DD(i,i)DD(j,j))`, not an
-independently fitted retention coefficient.  The next theorem identifies the quotient with
-the squared normalized correlation.
+/-- The squared normalized cross-deme `DD` correlation.
+
+This is an exact property of the **unascertained two-locus moment field**.  It is not an
+accuracy factor for a GWAS score: ascertainment, noisy association estimates, thresholding,
+and clumping condition which marker--causal pairs receive nonzero score weights.  The exact
+selected-score `R²` instead uses the full selected weight vector and genotype covariance
+matrix in `RealizedPTGWASDraw.winningR2True_eq_full_selected_moments`.
 
 Empirical status: DERIVED -- the quotient of the composed `DD` coordinates, whose status it
-inherits; `accuracyLinkageFactor_nonneg` is its arithmetic consequence.  That score accuracy
-is quadratic in the tag--causal correlation is the standard result assumed by the consumer
-in `PhenomeWidePortability`; whether a composed history's factor matches simulation is the
-untested composite claim named in `TwoLocusHistory`'s module status. -/
-noncomputable def DemographicTwoLocusMoments.accuracyLinkageFactor {D : ℕ}
+inherits.  No equality between this quotient and an ascertained score-portability factor is
+asserted. -/
+noncomputable def DemographicTwoLocusMoments.unascertainedLDCorrelationSq {D : ℕ}
     (moments : DemographicTwoLocusMoments D) (rho : MarkerSeparationBp)
     (first second : Fin D)
     (_ : moments.LDNormalizationDomain rho first second) : ℝ :=
@@ -6986,136 +6987,99 @@ noncomputable def DemographicTwoLocusMoments.accuracyLinkageFactor {D : ℕ}
 /-- On the nondegenerate normalization domain, the determinant quotient is exactly the
 square of the normalized `DD` correlation.  The quotient form evaluates without first
 assuming Cauchy--Schwarz; the correlation form explains its statistical meaning. -/
-theorem DemographicTwoLocusMoments.accuracyLinkageFactor_eq_correlation_sq {D : ℕ}
+theorem DemographicTwoLocusMoments.unascertainedLDCorrelationSq_eq {D : ℕ}
     (moments : DemographicTwoLocusMoments D) (rho : MarkerSeparationBp)
     (first second : Fin D)
     (domain : moments.LDNormalizationDomain rho first second) :
-    moments.accuracyLinkageFactor rho first second domain =
+    moments.unascertainedLDCorrelationSq rho first second domain =
       (moments.crossDemeLDCorrelation rho first second domain) ^ 2 := by
-  unfold DemographicTwoLocusMoments.accuracyLinkageFactor
+  unfold DemographicTwoLocusMoments.unascertainedLDCorrelationSq
     DemographicTwoLocusMoments.crossDemeLDCorrelation
   rw [div_pow, Real.sq_sqrt
     (mul_nonneg domain.firstWithin_pos.le domain.secondWithin_pos.le)]
 
-/-- The exact joint-channel factor is nonnegative on its typed domain. -/
-theorem DemographicTwoLocusMoments.accuracyLinkageFactor_nonneg {D : ℕ}
+/-- The squared unascertained `DD` correlation is nonnegative on its typed domain. -/
+theorem DemographicTwoLocusMoments.unascertainedLDCorrelationSq_nonneg {D : ℕ}
     (moments : DemographicTwoLocusMoments D) (rho : MarkerSeparationBp)
     (first second : Fin D)
     (domain : moments.LDNormalizationDomain rho first second) :
-    0 ≤ moments.accuracyLinkageFactor rho first second domain :=
+    0 ≤ moments.unascertainedLDCorrelationSq rho first second domain :=
   div_nonneg (sq_nonneg _) (mul_nonneg domain.firstWithin_pos.le domain.secondWithin_pos.le)
 
-/-- A genuine normalized `DD` correlation cannot contribute more than one unit of
-accuracy.  The Cauchy--Schwarz fact is part of `LDPairDomain`, rather than silently assumed
+/-- A genuine squared normalized `DD` correlation cannot exceed one.  The Cauchy--Schwarz
+fact is part of `LDPairDomain`, rather than silently assumed
 from arbitrary real-valued moment fields. -/
-theorem DemographicTwoLocusMoments.accuracyLinkageFactor_le_one {D : ℕ}
+theorem DemographicTwoLocusMoments.unascertainedLDCorrelationSq_le_one {D : ℕ}
     (moments : DemographicTwoLocusMoments D) (rho : MarkerSeparationBp)
     (first second : Fin D)
     (domain : moments.LDPairDomain rho first second) :
-    moments.accuracyLinkageFactor rho first second domain.toLDNormalizationDomain ≤ 1 := by
-  unfold DemographicTwoLocusMoments.accuracyLinkageFactor
+    moments.unascertainedLDCorrelationSq rho first second domain.toLDNormalizationDomain ≤ 1 := by
+  unfold DemographicTwoLocusMoments.unascertainedLDCorrelationSq
   exact (div_le_one (mul_pos domain.firstWithin_pos domain.secondWithin_pos)).2
     domain.cross_sq_le
 
-/-- Evaluability-and-meaning domain for the panel transport ratio: the panel's within-source
-linkage mass and both heterozygosity readouts are positive.  Positivity of the within-source
-`DD` sum is what makes the learned-weight normalization meaningful; the two heterozygosity
-readouts are the per-deme score and liability variance scales. -/
-structure DemographicTwoLocusMoments.PanelTransportDomain {D n : ℕ}
+/-- Evaluability domain for an unascertained panel-moment quotient: the panel's within-source
+linkage mass and both heterozygosity readouts are positive. -/
+structure DemographicTwoLocusMoments.UnascertainedPanelMomentDomain {D n : ℕ}
     (moments : DemographicTwoLocusMoments D) (panel : Fin n → MarkerSeparationBp)
     (hetRho : MarkerSeparationBp) (source target : Fin D) : Prop where
   panelWithin_pos : 0 < ∑ k, moments.DD (panel k) source source
   sourceHet_pos : 0 < moments.H hetRho source source
   targetHet_pos : 0 < moments.H hetRho target target
 
-/-- **The transport ratio `r²(target)/r²(source)` of a linear score trained in `source`,
-from the propagated moments alone, with no marginal divergence factor.**
+/-- **An unascertained low-order panel-moment quotient.**
 
-Derivation, and the reason there is no `(1 - F)` anywhere in the body.  Write the score as
-tag dosages weighted by effects learned in the source deme.  Per tag--causal channel the
-learned weight scales with the source-deme linkage moment `DD(source, source)`, and the
-covariance the same weight delivers in the target deme scales with the cross-deme moment
-`DD(source, target)`; channels at every panel separation sum coherently before squaring.
-The score and liability variances in the target deme each scale with that deme's
-heterozygosity.  Assembling the correlation ratio therefore gives
+The expression is
 
   `((Σ DD_st) / (Σ DD_ss))² · (H_ss / H_tt)²`
 
-and the frequency-divergence loss is already inside `DD(source, target)`, which decays with
-divergence; a composition that additionally multiplies a marginal `(1 - F)` factor charges
-the same loss twice.  Under equal deme sizes and a single separation the ratio reduces to
-`accuracyLinkageFactor` exactly (`panelTransportRatio_eq_linkageFactor`), which is why the
-product composition looked correct on symmetric demographies and failed on asymmetric ones.
+Under equal deme sizes and a single separation the quotient reduces to
+`unascertainedLDCorrelationSq` exactly
+(`unascertainedPanelMomentRatio_eq_unascertainedLDCorrelationSq`).
 
-Empirical status: DERIVED, with the composition SHAPE measured on hostile demographies and
-a committed battery still owed.  On the frozen eight-deme unequal-size asymmetric-migration
-stress cube and the six-deme three-epoch split history (specs, predictions and grades in
-`theory-out/stress_spec.json`, `stress_predict.json`, `stress_l3_grade2.json`, real plink
-P+T pipeline, eight seeds each): this ratio grades at mean residual `+0.075 ± 0.038` and
-`+0.0001 ± 0.058` respectively against measured per-deme transported `r²`, while the
-superseded product form `marginal × linkage` graded `+0.144 ± 0.042`, pair-structured, on
-the same cells.  The `hetRho` argument names the separation at which the one-locus
-heterozygosity coordinate is read; histories propagate `H` identically across separations,
-and no claim here depends on which is supplied.
-
-Downstream metric charts are exact GIVEN the per-deme index variance and are not exact from
-raw `H`: on the same stress cells the Gaussian liability AUC chart reproduces measured AUC
-at `0.006 ± 0.006` when fed the measured per-deme latent-index variance, but the raw-`H`
-prediction of that variance sits `0.60` below measurement because the causal panel is
-COMMON-VARIANT ASCERTAINED and ascertainment flattens per-deme heterozygosity -- worth
-about `0.05` of AUC if ignored.  The ascertained-spectrum heterozygosity is therefore the
-one named factor separating this transport law from full metric-level prediction; it is the
-finite-cohort ascertainment law's object, not a free parameter.  The classical
-common-variant decomposition `v_j = (1 - F*_j)/(1 + F̄)` -- both divergences read from this
-interface's `H` as coalescence times, deme-versus-pool and pooled -- is the current best
-closed-form candidate: at honest seed-level clustering it grades `+0.028 ± 0.030` on the
-six-deme stress history and `+0.113 ± 0.056` (2.0 sems, within the house 3-sem bar) on the
-eight-deme cube, where per-seed residuals swing `-0.07` to `+0.45` because each seed draws
-its own 150-locus causal panel.  The tension on the cube is real but unresolved at this
-power; whatever residual survives more seeds is the pooled-sample MAF conditioning beyond
-the time-ratio reading, which only the sample-count spectrum machinery expresses. -/
-noncomputable def DemographicTwoLocusMoments.panelTransportRatio {D n : ℕ}
+It is not a selected-score transport law.  It discards marker-specific ascertainment,
+estimated weights, clumping, cross-marker covariance, and the causal architecture.  Earlier
+empirical agreement of this quotient with some stress cells does not establish the missing
+identity; the unascertained scalar projection fails the gnomon linkage gate and must not be
+used as an end-to-end predictor. -/
+noncomputable def DemographicTwoLocusMoments.unascertainedPanelMomentRatio {D n : ℕ}
     (moments : DemographicTwoLocusMoments D) (panel : Fin n → MarkerSeparationBp)
     (hetRho : MarkerSeparationBp) (source target : Fin D)
-    (_ : moments.PanelTransportDomain panel hetRho source target) : ℝ :=
+    (_ : moments.UnascertainedPanelMomentDomain panel hetRho source target) : ℝ :=
   (((∑ k, moments.DD (panel k) source target) /
       (∑ k, moments.DD (panel k) source source)) ^ 2) *
     ((moments.H hetRho source source / moments.H hetRho target target) ^ 2)
 
-/-- **A score transported to its own training deme keeps its accuracy exactly.**  Both
-quotients collapse to one on the domain, with no hypotheses beyond evaluability.  A body
-that returned anything else would charge a transport penalty for not transporting. -/
-theorem DemographicTwoLocusMoments.panelTransportRatio_self {D n : ℕ}
+/-- The unascertained panel-moment quotient is normalized to one at its source. -/
+theorem DemographicTwoLocusMoments.unascertainedPanelMomentRatio_self {D n : ℕ}
     (moments : DemographicTwoLocusMoments D) (panel : Fin n → MarkerSeparationBp)
     (hetRho : MarkerSeparationBp) (source : Fin D)
-    (domain : moments.PanelTransportDomain panel hetRho source source) :
-    moments.panelTransportRatio panel hetRho source source domain = 1 := by
-  unfold DemographicTwoLocusMoments.panelTransportRatio
+    (domain : moments.UnascertainedPanelMomentDomain panel hetRho source source) :
+    moments.unascertainedPanelMomentRatio panel hetRho source source domain = 1 := by
+  unfold DemographicTwoLocusMoments.unascertainedPanelMomentRatio
   rw [div_self domain.panelWithin_pos.ne', div_self domain.sourceHet_pos.ne']
   norm_num
 
-/-- The transport ratio is a product of squares, hence nonnegative with no hypotheses. -/
-theorem DemographicTwoLocusMoments.panelTransportRatio_nonneg {D n : ℕ}
+/-- The unascertained panel-moment quotient is a product of squares, hence nonnegative. -/
+theorem DemographicTwoLocusMoments.unascertainedPanelMomentRatio_nonneg {D n : ℕ}
     (moments : DemographicTwoLocusMoments D) (panel : Fin n → MarkerSeparationBp)
     (hetRho : MarkerSeparationBp) (source target : Fin D)
-    (domain : moments.PanelTransportDomain panel hetRho source target) :
-    0 ≤ moments.panelTransportRatio panel hetRho source target domain := by
-  unfold DemographicTwoLocusMoments.panelTransportRatio
+    (domain : moments.UnascertainedPanelMomentDomain panel hetRho source target) :
+    0 ≤ moments.unascertainedPanelMomentRatio panel hetRho source target domain := by
+  unfold DemographicTwoLocusMoments.unascertainedPanelMomentRatio
   exact mul_nonneg (sq_nonneg _) (sq_nonneg _)
 
-/-- Realizability domain for a panel-wide portability bound.  In addition to evaluability of
-the transport ratio, every marker separation carries its exact two-deme covariance
-certificate. -/
-structure DemographicTwoLocusMoments.PanelTransportCauchyDomain {D n : ℕ}
+/-- Realizability domain for a Cauchy bound on the unascertained panel-moment quotient. -/
+structure DemographicTwoLocusMoments.UnascertainedPanelMomentCauchyDomain {D n : ℕ}
     (moments : DemographicTwoLocusMoments D) (panel : Fin n → MarkerSeparationBp)
     (hetRho : MarkerSeparationBp) (source target : Fin D) : Prop extends
-      moments.PanelTransportDomain panel hetRho source target where
+      moments.UnascertainedPanelMomentDomain panel hetRho source target where
   pairDomain : ∀ k, moments.LDPairDomain (panel k) source target
 
 /-- The panel-wide Cauchy upper envelope.  The linkage contribution is the ratio of total
 target to total source within-deme `DD`; the heterozygosity scale is the same exact factor as
-in `panelTransportRatio`. -/
-noncomputable def DemographicTwoLocusMoments.panelTransportCauchyBound {D n : ℕ}
+in `unascertainedPanelMomentRatio`. -/
+noncomputable def DemographicTwoLocusMoments.unascertainedPanelMomentCauchyBound {D n : ℕ}
     (moments : DemographicTwoLocusMoments D) (panel : Fin n → MarkerSeparationBp)
     (hetRho : MarkerSeparationBp) (source target : Fin D) : ℝ :=
   ((∑ k, moments.DD (panel k) target target) /
@@ -7123,12 +7087,12 @@ noncomputable def DemographicTwoLocusMoments.panelTransportCauchyBound {D n : �
     (moments.H hetRho source source / moments.H hetRho target target) ^ 2
 
 /-- The Cauchy envelope is normalized exactly at the training deme. -/
-theorem DemographicTwoLocusMoments.panelTransportCauchyBound_self {D n : ℕ}
+theorem DemographicTwoLocusMoments.unascertainedPanelMomentCauchyBound_self {D n : ℕ}
     (moments : DemographicTwoLocusMoments D) (panel : Fin n → MarkerSeparationBp)
     (hetRho : MarkerSeparationBp) (source : Fin D)
-    (domain : moments.PanelTransportDomain panel hetRho source source) :
-    moments.panelTransportCauchyBound panel hetRho source source = 1 := by
-  unfold DemographicTwoLocusMoments.panelTransportCauchyBound
+    (domain : moments.UnascertainedPanelMomentDomain panel hetRho source source) :
+    moments.unascertainedPanelMomentCauchyBound panel hetRho source source = 1 := by
+  unfold DemographicTwoLocusMoments.unascertainedPanelMomentCauchyBound
   rw [div_self domain.panelWithin_pos.ne', div_self domain.sourceHet_pos.ne']
   norm_num
 
@@ -7179,19 +7143,16 @@ theorem DemographicTwoLocusMoments.panelCrossSum_sq_le {D n : ℕ}
         (∑ k, moments.DD (panel k) target target) := by
       rw [mul_pow, Real.sq_sqrt hsourceSum, Real.sq_sqrt htargetSum]
 
-/-- **Certified portability bound for every finite panel and every finite demography.**
-
-The exact transported accuracy ratio cannot exceed the panel-wide Cauchy envelope.  Because
-the demographic history is already inside every `H` and `DD` entry, this theorem applies
-unchanged to chains, two-dimensional grids, three-dimensional grids, arbitrary migration
-graphs, and arbitrary split/rate-change histories. -/
-theorem DemographicTwoLocusMoments.panelTransportRatio_le_cauchyBound {D n : ℕ}
+/-- Cauchy--Schwarz bounds the unascertained panel-moment quotient for every finite moment
+field satisfying the pairwise covariance certificates.  This is not a bound on the
+ascertained score's `R²`. -/
+theorem DemographicTwoLocusMoments.unascertainedPanelMomentRatio_le_cauchyBound {D n : ℕ}
     (moments : DemographicTwoLocusMoments D) (panel : Fin n → MarkerSeparationBp)
     (hetRho : MarkerSeparationBp) (source target : Fin D)
-    (domain : moments.PanelTransportCauchyDomain panel hetRho source target) :
-    moments.panelTransportRatio panel hetRho source target
-        domain.toPanelTransportDomain ≤
-      moments.panelTransportCauchyBound panel hetRho source target := by
+    (domain : moments.UnascertainedPanelMomentCauchyDomain panel hetRho source target) :
+    moments.unascertainedPanelMomentRatio panel hetRho source target
+        domain.toUnascertainedPanelMomentDomain ≤
+      moments.unascertainedPanelMomentCauchyBound panel hetRho source target := by
   let sourceSum := ∑ k, moments.DD (panel k) source source
   let targetSum := ∑ k, moments.DD (panel k) target target
   let crossSum := ∑ k, moments.DD (panel k) source target
@@ -7207,92 +7168,90 @@ theorem DemographicTwoLocusMoments.panelTransportRatio_le_cauchyBound {D n : ℕ
         (div_le_div_iff_of_pos_right (sq_pos_of_pos hsource)).2 hcross
       _ = targetSum / sourceSum := by
         field_simp [hsource.ne']
-  unfold DemographicTwoLocusMoments.panelTransportRatio
-    DemographicTwoLocusMoments.panelTransportCauchyBound
+  unfold DemographicTwoLocusMoments.unascertainedPanelMomentRatio
+    DemographicTwoLocusMoments.unascertainedPanelMomentCauchyBound
   dsimp only [sourceSum, targetSum, crossSum, heterozygosityFactor] at hlinkage ⊢
   exact mul_le_mul_of_nonneg_right hlinkage (sq_nonneg _)
 
-/-- The panel portability bound is attained at the source population, so it is not a purely
-formal loose envelope. -/
-theorem DemographicTwoLocusMoments.panelTransportRatio_eq_cauchyBound_self {D n : ℕ}
+/-- The moment-quotient Cauchy envelope is attained at the source population. -/
+theorem DemographicTwoLocusMoments.unascertainedPanelMomentRatio_eq_cauchyBound_self {D n : ℕ}
     (moments : DemographicTwoLocusMoments D) (panel : Fin n → MarkerSeparationBp)
     (hetRho : MarkerSeparationBp) (source : Fin D)
-    (domain : moments.PanelTransportCauchyDomain panel hetRho source source) :
-    moments.panelTransportRatio panel hetRho source source
-        domain.toPanelTransportDomain =
-      moments.panelTransportCauchyBound panel hetRho source source := by
-  rw [moments.panelTransportRatio_self panel hetRho source domain.toPanelTransportDomain,
-    moments.panelTransportCauchyBound_self panel hetRho source domain.toPanelTransportDomain]
+    (domain : moments.UnascertainedPanelMomentCauchyDomain panel hetRho source source) :
+    moments.unascertainedPanelMomentRatio panel hetRho source source
+        domain.toUnascertainedPanelMomentDomain =
+      moments.unascertainedPanelMomentCauchyBound panel hetRho source source := by
+  rw [moments.unascertainedPanelMomentRatio_self panel hetRho source domain.toUnascertainedPanelMomentDomain,
+    moments.unascertainedPanelMomentCauchyBound_self panel hetRho source domain.toUnascertainedPanelMomentDomain]
 
-/-- **On a symmetric pair the transport ratio IS the joint-channel linkage factor.**  With a
-single panel separation, equal within-deme linkage and equal heterozygosity, the ratio
-reduces to `accuracyLinkageFactor` -- the equal-size specialization that made the superseded
-product composition look correct on tame demographies. -/
-theorem DemographicTwoLocusMoments.panelTransportRatio_eq_linkageFactor {D : ℕ}
+/-- On a symmetric pair the panel quotient is the squared unascertained `DD` correlation.  With a
+single panel separation, equal within-deme linkage and equal heterozygosity, this moment
+quotient reduces to `unascertainedLDCorrelationSq`.  This is an identity between
+unascertained moment summaries, not an identification with selected-score portability. -/
+theorem DemographicTwoLocusMoments.unascertainedPanelMomentRatio_eq_unascertainedLDCorrelationSq {D : ℕ}
     (moments : DemographicTwoLocusMoments D) (rho hetRho : MarkerSeparationBp)
     (source target : Fin D)
-    (domain : moments.PanelTransportDomain (fun _ : Fin 1 ↦ rho) hetRho source target)
+    (domain : moments.UnascertainedPanelMomentDomain (fun _ : Fin 1 ↦ rho) hetRho source target)
     (ndom : moments.LDNormalizationDomain rho source target)
     (hDD : moments.DD rho source source = moments.DD rho target target)
     (hH : moments.H hetRho source source = moments.H hetRho target target) :
-    moments.panelTransportRatio (fun _ : Fin 1 ↦ rho) hetRho source target domain =
-      moments.accuracyLinkageFactor rho source target ndom := by
-  unfold DemographicTwoLocusMoments.panelTransportRatio
-    DemographicTwoLocusMoments.accuracyLinkageFactor
+    moments.unascertainedPanelMomentRatio (fun _ : Fin 1 ↦ rho) hetRho source target domain =
+      moments.unascertainedLDCorrelationSq rho source target ndom := by
+  unfold DemographicTwoLocusMoments.unascertainedPanelMomentRatio
+    DemographicTwoLocusMoments.unascertainedLDCorrelationSq
   rw [Fin.sum_univ_one, Fin.sum_univ_one, hH, div_self domain.targetHet_pos.ne',
     one_pow, mul_one, div_pow]
   congr 1
   linear_combination moments.DD rho source source * hDD
 
-/-- Domain for the selection-weighted transport ratio: positive within-source linkage at
+/-- Domain for the selection-weighted `DD` proxy: positive within-source linkage at
 every panel separation, and a nonzero reference regression at the tightest separation. -/
-structure DemographicTwoLocusMoments.SelectionPanelDomain {D n : ℕ}
+structure DemographicTwoLocusMoments.SelectionWeightedDDProxyDomain {D n : ℕ}
     (moments : DemographicTwoLocusMoments D) (panel : Fin (n + 1) → MarkerSeparationBp)
     (source target : Fin D) : Prop where
   within_pos : ∀ k, 0 < moments.DD (panel k) source source
   ref_ne : moments.DD (panel 0) source target ≠ 0
 
-/-- **The selection-weighted transport ratio: the winner-location integral law.**
+/-- **A selection-weighted `DD` proxy, not a selected-score law.**
 
 The clump index of a GWAS region is a random location on the linkage profile, and the
 transported accuracy channel it carries is the selection-conditioned REGRESSION retention
 `DD_tj/DD_tt` at that location, scaled to the self channel at the tightest separation.
-Given winner-location weights `w` (a probability vector over the panel, supplied by the
-correlated-significance-field computation) and the self-channel amplitude `selfAmp`
-(the square root of the ascertained drift-heterogeneity ratio), the law is
+Given winner-location weights `w` and a self-channel amplitude `selfAmp`, the proxy is
 
   `ratio = (Σ_k w k · selfAmp · reg k / reg 0)²,  reg k = DD_tj(panel k)/DD_tt(panel k)`.
 
-Its limits recover the corpus's earlier transport bodies: a point mass at the tightest
+Its limits recover earlier proxy bodies: a point mass at the tightest
 separation gives the pure self-channel law, and degenerate flat weights with unit self
-amplitude give the unconditioned `panelTransportRatio` family.
+amplitude give the unconditioned `unascertainedPanelMomentRatio` family.
 
 Empirical status: MEASURED, blind, three times, on the grid2d demography with the real
 plink P+T pipeline and hash-pinned predictors (validation/empirical/gate/): the
 unconditioned family misses +0.261 ± 0.101 (gate 1, seeds 101-108) and the pure
-self-channel endpoint misses -0.272 ± 0.047 (gate 2, seeds 109-116), while THIS law
+self-channel endpoint misses -0.272 ± 0.047 (gate 2, seeds 109-116), while this proxy
 passes every pre-filed bar at gate 3 (seeds 117-124): transport ratio +0.032 ± 0.052 and
 chart AUC -0.002 ± 0.009, zero fitted constants in the chain.  The governing complete
 derivation, with the frozen list of terms measured to lie below gate power at this
 design (multi-causal regions, panel winner's curse, the LD-field closure bound), is
-validation/empirical/gate/EXACT_TRANSPORT_DERIVATION.md. -/
-noncomputable def DemographicTwoLocusMoments.selectionWeightedTransportRatio {D n : ℕ}
+validation/empirical/gate/EXACT_TRANSPORT_DERIVATION.md.  Passing those cells does not
+upgrade the proxy to an exact law. -/
+noncomputable def DemographicTwoLocusMoments.selectionWeightedDDProxy {D n : ℕ}
     (moments : DemographicTwoLocusMoments D) (panel : Fin (n + 1) → MarkerSeparationBp)
     (winner : Fin (n + 1) → ℝ) (selfAmp : ℝ) (source target : Fin D)
-    (_ : moments.SelectionPanelDomain panel source target) : ℝ :=
+    (_ : moments.SelectionWeightedDDProxyDomain panel source target) : ℝ :=
   ((∑ k, winner k * (selfAmp *
       ((moments.DD (panel k) source target / moments.DD (panel k) source source) /
         (moments.DD (panel 0) source target / moments.DD (panel 0) source source)))) ^ 2)
 
 /-- **A point mass at the tightest separation recovers the self-channel law exactly.** -/
-theorem DemographicTwoLocusMoments.selectionWeightedTransportRatio_pointMass {D n : ℕ}
+theorem DemographicTwoLocusMoments.selectionWeightedDDProxy_pointMass {D n : ℕ}
     (moments : DemographicTwoLocusMoments D) (panel : Fin (n + 1) → MarkerSeparationBp)
     (selfAmp : ℝ) (source target : Fin D)
-    (domain : moments.SelectionPanelDomain panel source target) :
-    moments.selectionWeightedTransportRatio panel
+    (domain : moments.SelectionWeightedDDProxyDomain panel source target) :
+    moments.selectionWeightedDDProxy panel
       (fun k ↦ if k = 0 then 1 else 0) selfAmp source target domain = selfAmp ^ 2 := by
   classical
-  unfold DemographicTwoLocusMoments.selectionWeightedTransportRatio
+  unfold DemographicTwoLocusMoments.selectionWeightedDDProxy
   have hden : (moments.DD (panel 0) source target / moments.DD (panel 0) source source) ≠ 0 :=
     div_ne_zero domain.ref_ne (domain.within_pos 0).ne'
   have hsum : (∑ k, (if k = 0 then (1 : ℝ) else 0) *
@@ -7309,12 +7268,12 @@ theorem DemographicTwoLocusMoments.selectionWeightedTransportRatio_pointMass {D 
   rw [hsum, div_self hden]
   ring
 
-/-- The selection-weighted ratio is a square, hence nonnegative with no hypotheses. -/
-theorem DemographicTwoLocusMoments.selectionWeightedTransportRatio_nonneg {D n : ℕ}
+/-- The selection-weighted proxy is a square, hence nonnegative. -/
+theorem DemographicTwoLocusMoments.selectionWeightedDDProxy_nonneg {D n : ℕ}
     (moments : DemographicTwoLocusMoments D) (panel : Fin (n + 1) → MarkerSeparationBp)
     (winner : Fin (n + 1) → ℝ) (selfAmp : ℝ) (source target : Fin D)
-    (domain : moments.SelectionPanelDomain panel source target) :
-    0 ≤ moments.selectionWeightedTransportRatio panel winner selfAmp source target domain :=
+    (domain : moments.SelectionWeightedDDProxyDomain panel source target) :
+    0 ≤ moments.selectionWeightedDDProxy panel winner selfAmp source target domain :=
   sq_nonneg _
 
 /-- Concrete three-deme moment table for the transport-domain witness.  Three demes rather
@@ -7323,7 +7282,7 @@ linkage value is distinct so the size-correction factor and the normalization ar
 exercised rather than silently equal to one.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- a concrete table inhabiting the interface. -/
-noncomputable def panelTransportWitnessMoments : DemographicTwoLocusMoments 3 where
+noncomputable def panelMomentWitnessMoments : DemographicTwoLocusMoments 3 where
   H := fun _ i j ↦ (i.val + j.val + 2 : ℝ)
   DD := fun _ i j ↦ if i = j then (i.val + 2 : ℝ) else 1
   Dz := fun _ _ _ _ ↦ 0
@@ -7335,16 +7294,16 @@ cross moment is 1 against within-deme moments 2 and 3, so the certificate inequa
 and hide a body that only works on the degenerate boundary.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- an inhabitation witness. -/
-noncomputable def panelTransportPairDomainWitness :
-    panelTransportWitnessMoments.LDPairDomain clumpWindowSeparation 0 1 where
+noncomputable def panelMomentPairDomainWitness :
+    panelMomentWitnessMoments.LDPairDomain clumpWindowSeparation 0 1 where
   firstWithin_pos := by
-    simp [panelTransportWitnessMoments]
+    simp [panelMomentWitnessMoments]
   secondWithin_pos := by
-    simp [panelTransportWitnessMoments]
+    simp [panelMomentWitnessMoments]
     norm_num
   cross_sq_le := by
     have h01 : (0 : Fin 3) ≠ 1 := by decide
-    simp [panelTransportWitnessMoments, h01]
+    simp [panelMomentWitnessMoments, h01]
     norm_num
 
 /-- The transport domain has an off-boundary inhabitant: a one-window panel at the 250 kb
@@ -7353,14 +7312,14 @@ detect a body that dropped the size-correction factor rather than only certifyin
 quotients evaluate.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- an inhabitation witness. -/
-noncomputable def panelTransportDomainWitness :
-    panelTransportWitnessMoments.PanelTransportDomain
+noncomputable def panelMomentDomainWitness :
+    panelMomentWitnessMoments.UnascertainedPanelMomentDomain
       (fun _ : Fin 1 ↦ clumpWindowSeparation) clumpWindowSeparation 0 1 where
   panelWithin_pos := by
-    simp [panelTransportWitnessMoments]
-  sourceHet_pos := by simp [panelTransportWitnessMoments]
+    simp [panelMomentWitnessMoments]
+  sourceHet_pos := by simp [panelMomentWitnessMoments]
   targetHet_pos := by
-    simp [panelTransportWitnessMoments]
+    simp [panelMomentWitnessMoments]
     norm_num
 
 /-- The selection-panel domain has a named off-boundary inhabitant on the witness table:
@@ -7369,21 +7328,21 @@ reference regression is exercised away from every degenerate value.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- an inhabitation witness. -/
 noncomputable def selectionPanelDomainWitness :
-    panelTransportWitnessMoments.SelectionPanelDomain
+    panelMomentWitnessMoments.SelectionWeightedDDProxyDomain
       (fun _ : Fin 2 ↦ clumpWindowSeparation) 0 1 where
   within_pos := by
     intro k
-    simp [panelTransportWitnessMoments]
+    simp [panelMomentWitnessMoments]
   ref_ne := by
     have h01 : (0 : Fin 3) ≠ 1 := by decide
-    simp [panelTransportWitnessMoments, h01]
+    simp [panelMomentWitnessMoments, h01]
 
 /-- The bare normalization domain inherits the pair witness's inhabitant by projection.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- an inhabitation witness by projection. -/
-noncomputable def panelTransportNormalizationDomainWitness :
-    panelTransportWitnessMoments.LDNormalizationDomain clumpWindowSeparation 0 1 :=
-  panelTransportPairDomainWitness.toLDNormalizationDomain
+noncomputable def panelMomentNormalizationDomainWitness :
+    panelMomentWitnessMoments.LDNormalizationDomain clumpWindowSeparation 0 1 :=
+  panelMomentPairDomainWitness.toLDNormalizationDomain
 
 /-- The complete typed output of a demography.  Serial-founder, grid and `stdpopsim` histories
 are constructors of this interface, not new metric derivations. -/

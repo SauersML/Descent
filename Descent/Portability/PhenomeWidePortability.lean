@@ -2053,7 +2053,7 @@ theorem cleanSplitTargetR2'_eq_indexScaleTrueIndexR2 (r2_0 : ℝ) {M : ℕ} (w p
 end CleanSplit
 
 /-!
-## The migration-connected chain: historical bracket and operator candidate
+## The migration-connected chain: historical bracket and unascertained diagnostic
 
 The clean split above is the easy demography — two closed branches, nothing crossing between
 them — and the corpus can write a single composed number for it. A MIGRATION-CONNECTED CHAIN
@@ -2070,13 +2070,11 @@ law now lives at `Coalescent.publishedTwoDemeDCorrelation`, but applying it here
 already-refuted reduction of a many-deme transient history to a two-deme scalar surface.  So
 restoration is real and no point formula in the old scalar family survives.
 
-The corpus now has a derived law rather than another scalar guess: the arbitrary-deme
-transient `H/DD/Dz/pi2` generator in `Coalescent.TwoLocusHistory`, composed across every split,
-migration, size, mutation, and recombination epoch, read out through
-`Coalescent.DemographicTwoLocusMoments.panelTransportRatio` -- summed cross-deme `DD` over the
-panel, squared against the within-source sum, times a squared heterozygosity ratio, with NO
-separate marginal factor (a product with the marginal factor was measured to charge drift
-twice; its record is at `steppingStonePortability_interior_is_panelTransportRatio` below).
+The corpus now has the exact arbitrary-deme transient `H/DD/Dz/pi2` generator in
+`Coalescent.TwoLocusHistory`, composed across every split, migration, size, mutation, and
+recombination epoch.  `unascertainedPanelMomentRatio` is a diagnostic quotient of that field.
+It is not an interior point for the selected score: it omits ascertainment, GWAS estimation,
+thresholding, clumping, and the full selected-marker covariance matrix.
 The operator contains recurrent symmetric-biallelic mutation
 damping and the matching stationary boundary rather than the former infinite-sites mutation
 slice.  The common-diffusion projection tying it to the marginal ascertainment diffusion is
@@ -2211,22 +2209,17 @@ theorem effectiveDriftGenerations_strictMono_index (Ne F₁ F₂ : ℝ)
     than a prediction: it is the transported `R²` a chain would retain if ongoing migration
     restored every bit of the linkage disequilibrium that divergence costs.
 
-    Historically the LOWER end of the bracket was this quantity times an unspecified LD
+    The LOWER end of the bracket is this quantity times a no-restoration LD retention.
+    Historically its interior was parameterized by an unspecified LD
     retention, because `DGP.migrationLDBoost` was the only restoration candidate and
-    `simcov/battery_bulk55.py` falsified it in magnitude.  The derived interior point now
-    lives at `Coalescent.DemographicTwoLocusMoments.panelTransportRatio`, which is NOT this
-    quantity times a linkage factor: the product shape was measured to charge drift twice
-    and to miss the unequal-size heterozygosity correction
-    (`steppingStonePortability_interior_is_panelTransportRatio` carries the record).
-    Migration restoration is inside the epoch-product generator rather than a fitted scalar,
-    and recurrent symmetric-biallelic mutation and its stationary boundary are shared at the
-    model level.  A second measured caveat now scopes THIS upper end itself: on demes of
+    `simcov/battery_bulk55.py` falsified it in magnitude.  The exact moment operator now
+    describes unascertained LD without a fitted scalar, but no theorem identifies its quotient
+    with the ascertained score's interior point.  A second measured caveat scopes THIS upper end itself: on demes of
     unequal size the transported `r²` can EXCEED this bound, because a lower-heterozygosity
     target deme concentrates score and liability variance (the squared heterozygosity ratio
-    in the transport law is greater than one in that direction); the ceiling claim is
-    regime-scoped to equal deme sizes.  The interior law is not yet promoted
-    to the exact simulator law: the common-diffusion projection is proved, but it still owes
-    independent simulator validation, and the executable must
+    in the unascertained diagnostic is greater than one in that direction); the ceiling claim
+    is regime-scoped to equal deme sizes.  The common-diffusion projection is proved, but the
+    selected-score kernel still owes independent construction and validation, and the executable must
     explicitly choose this binary mutation protocol instead of its present default JC69.
     The pre-filed 4x4/5x5 two-dimensional test has completed and rejected the proposed scalar
     Bessel reduction; that negative result supports retaining the operator but does not itself
@@ -2301,10 +2294,13 @@ theorem effectiveDriftGenerations_strictMono_index (Ne F₁ F₂ : ℝ)
     level shift so the gradient can be read cleanly. The prediction it would test is that the
     gradient SURVIVES the change of normalisation.
 
-    A CONSEQUENCE FOR THE BRACKET ITSELF: a lower end that ignores regeneration is not a
-    lower bound at large separation, so the interior positions computed against it — the
-    pooled 0.546 among them — should not be quoted until they are redone against a floor
-    that carries the regenerated share.
+    A CONSEQUENCE FOR THE BRACKET ITSELF: the measured accuracy exceeding a
+    no-regeneration floor is consistent with that quantity being a lower bound; the previous
+    text had this inequality backwards.  What the result refutes is equality with the floor,
+    not the floor property.  A proof that the omitted regenerated contribution is
+    nonnegative after the pipeline's ascertainment and clumping remains required before the
+    conditional hypothesis in `steppingStonePortability_mem_bracket` is discharged for the
+    executable score.
 
     What the isolation arm settles without any caveat is the drift term: the superseded floor
     `(1-c)^(2t)`, carried as a competitor, is a uniform 1.28x above the corrected one —
@@ -2372,29 +2368,21 @@ theorem steppingStonePortability_antitone_distance (r2_0 f1 : ℝ) (d₁ d₂ : 
     predicts lies between the bracket's two ends.
 
     This is the theorem that makes the bracket a claim rather than two unrelated numbers. It
-    does not identify the interior point by itself.  The derived interior point is NOT of the
-    product form this theorem parameterizes: the measured law is
-    `Coalescent.DemographicTwoLocusMoments.panelTransportRatio`, which replaces
-    `marginal × ldFactor` entirely (the product shape double-charges drift and misses the
-    unequal-size correction; the record lives at
-    `steppingStonePortability_interior_is_panelTransportRatio`).  This bracket theorem
+    does not identify the interior point by itself.  The unascertained moment quotient is a
+    separate diagnostic and cannot be substituted for `ldFactor`.  This bracket theorem
     remains algebra over its own hypotheses and still requires `ldLoss ≤ ldFactor ≤ 1` from
     its caller.
 
-    **THE HYPOTHESIS IS NOT CURRENTLY DISCHARGED AT LARGE SEPARATION, AND THAT IS A FACT
-    ABOUT THE FLOOR AND NOT ABOUT THIS THEOREM.** The implication below is algebra and holds
-    whatever the two ends are. What is measured, on the isolation arm recorded at
-    `steppingStonePortability`, is that a floor built from ancestral `D` surviving
-    recombination is EXCEEDED by an excess that grows with separation, because LD is
-    continuously regenerated by drift after the split and the floor carries none of it. A
-    quantity the truth exceeds is not a lower bound, so `ldLoss ≤ ldFactor` is a hypothesis a
-    caller must not assume from the no-restoration construction at large `c`.
+    **THE HYPOTHESIS IS NOT YET DERIVED FOR THE SELECTED SCORE.** The implication below is
+    algebra and holds whatever the two ends are.  The isolation arm recorded at
+    `steppingStonePortability` measures the truth above the ancestral-`D` floor, increasingly
+    with separation, exactly as a lower bound may be.  It rejects identifying the floor with
+    the truth.  It does not prove the required inequality for every ascertained and clumped
+    panel; that needs a nonnegativity theorem for the omitted regenerated selected-score
+    contribution.
 
-    Two consequences for consumers. Interior positions computed against that floor are not
-    quotable until it carries the regenerated share -- the pooled figure among them
-    especially. And the width being open is not the same defect as the floor being wrong:
-    the width was always open, whereas the lower end failing to bound is new, and only the
-    second one makes the bracket unsound rather than uninformative. -/
+    Consequently no interior point, including a pooled value, is quotable from this theorem
+    until the selected-score retention itself is derived. -/
 theorem steppingStonePortability_mem_bracket (r2_0 f1 : ℝ) (d : ℕ) (ldLoss ldFactor : ℝ)
     (hr2 : 0 ≤ r2_0) (hr2' : r2_0 ≤ 1) (hf : 0 < f1) (hf' : f1 < 1)
     (hlow : ldLoss ≤ ldFactor) (hhigh : ldFactor ≤ 1) :
@@ -2405,29 +2393,27 @@ theorem steppingStonePortability_mem_bracket (r2_0 f1 : ℝ) (d : ℕ) (ldLoss l
   have hnn := steppingStonePortability_nonneg r2_0 f1 d hr2 hr2' hf hf'
   exact ⟨mul_le_mul_of_nonneg_left hlow hnn, mul_le_of_le_one_right hnn hhigh⟩
 
-/-- **The interior point of the migration bracket is not a product of a marginal factor and
-a linkage factor, and the corpus no longer offers one.**  The deleted composition
-multiplied `steppingStonePortability × accuracyLinkageFactor` -- a marginal `(1 - F)`-style factor
+/-- Expansion of the unascertained panel diagnostic.  The deleted score composition
+multiplied `steppingStonePortability × unascertainedLDCorrelationSq` -- a marginal `(1 - F)`-style factor
 times the squared cross-deme `DD` correlation.  That composition SHAPE is falsified by
 measurement: cross-deme `DD` already decays with frequency divergence, so the product
 charges drift twice, and it carries no correction for unequal deme sizes.  On the frozen
 eight-deme unequal-size asymmetric-migration stress cube (real plink P+T pipeline, eight
 seeds, `theory-out/stress_l3_grade2.json`) the product form under-predicted measured
 per-deme transported `r²` by `+0.144 ± 0.042`, pair-structured; the moment-native
-replacement `Coalescent.DemographicTwoLocusMoments.panelTransportRatio` -- divergence
+diagnostic `Coalescent.DemographicTwoLocusMoments.unascertainedPanelMomentRatio` -- divergence
 inside the summed cross-deme `DD`, size asymmetry as a squared heterozygosity ratio, no
 separate marginal factor -- graded `+0.075 ± 0.038` on the same cells and
-`+0.0001 ± 0.058` on the six-deme three-epoch stress history, and reduces to
-`accuracyLinkageFactor` exactly in the equal-size symmetric case, which is why the product
-looked right on tame demographies.  Consumers wanting the derived interior point take
-`panelTransportRatio` times the source-deme anchor; the bracket theorems above remain valid
-algebra about the bracket's own ends. -/
-theorem steppingStonePortability_interior_is_panelTransportRatio {D n : ℕ}
+`+0.0001 ± 0.058` on the six-deme three-epoch stress history.  It reduces to
+`unascertainedLDCorrelationSq` exactly in the equal-size symmetric case, which is why the product
+looked right on tame demographies.  These observations do not identify this diagnostic with
+the selected-score portability ratio. -/
+theorem unascertainedPanelMomentRatio_expansion {D n : ℕ}
     (r2_0 : ℝ) (moments : Coalescent.DemographicTwoLocusMoments D)
     (panel : Fin n → Coalescent.MarkerSeparationBp)
     (hetRho : Coalescent.MarkerSeparationBp) (source target : Fin D)
-    (domain : moments.PanelTransportDomain panel hetRho source target) :
-    r2_0 * moments.panelTransportRatio panel hetRho source target domain =
+    (domain : moments.UnascertainedPanelMomentDomain panel hetRho source target) :
+    r2_0 * moments.unascertainedPanelMomentRatio panel hetRho source target domain =
       r2_0 *
         ((((∑ k, moments.DD (panel k) source target) /
             (∑ k, moments.DD (panel k) source source)) ^ 2) *
