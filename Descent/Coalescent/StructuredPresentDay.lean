@@ -7,6 +7,7 @@ import Mathlib.Analysis.Matrix
 import Mathlib.Analysis.Normed.Algebra.Exponential
 import Mathlib.Algebra.MvPolynomial.Funext
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
+import Mathlib.LinearAlgebra.Finsupp.LSum
 import Mathlib.Topology.Algebra.InfiniteSum.Basic
 import Mathlib.Tactic
 
@@ -1701,12 +1702,26 @@ theorem manyDemeBernsteinAnalyticGeneratorPolynomial_eq_killedDual {D : ℕ}
   exact manyDemeBernsteinAnalyticGenerator_eq_killedDual rates frequency
     derived ancestral symmetric
 
+/-- Linear mixed-moment functional on multivariate polynomials. -/
+noncomputable def manyDemePolynomialMomentLinearMap {D : ℕ}
+    (moment : (Fin D → ℕ) → ℝ) : MvPolynomial (Fin D) ℝ →ₗ[ℝ] ℝ :=
+  Finsupp.lsum ℝ fun exponent ↦
+    LinearMap.mulRight ℝ (moment (fun deme ↦ exponent deme))
+
 /-- Apply a multivariate polynomial to an arbitrary mixed-moment table by replacing each
 monomial coefficient with the corresponding table entry. -/
 noncomputable def manyDemePolynomialMomentFunctional {D : ℕ}
     (moment : (Fin D → ℕ) → ℝ) (polynomial : MvPolynomial (Fin D) ℝ) : ℝ :=
-  polynomial.sum fun exponent coefficient ↦
-    coefficient * moment (fun deme ↦ exponent deme)
+  manyDemePolynomialMomentLinearMap moment polynomial
+
+/-- The bundled functional is the expected finite coefficient sum. -/
+theorem manyDemePolynomialMomentFunctional_eq_sum {D : ℕ}
+    (moment : (Fin D → ℕ) → ℝ) (polynomial : MvPolynomial (Fin D) ℝ) :
+    manyDemePolynomialMomentFunctional moment polynomial =
+      polynomial.sum fun exponent coefficient ↦
+        coefficient * moment (fun deme ↦ exponent deme) := by
+  simp [manyDemePolynomialMomentFunctional, manyDemePolynomialMomentLinearMap,
+    Finsupp.lsum_apply, LinearMap.mulRight_apply]
 
 /-- The coefficient-level duality survives every mixed-moment functional.  This is the exact
 scalar generator equality needed by each row of the forthcoming Bernstein projection matrix. -/
@@ -1721,6 +1736,21 @@ theorem manyDemeBernsteinGenerator_momentFunctional_eq_killedDual {D : ℕ}
         (manyDemeKilledDualGeneratorPolynomial rates derived ancestral) := by
   rw [manyDemeBernsteinAnalyticGeneratorPolynomial_eq_killedDual rates derived ancestral
     symmetric]
+
+/-- Applying any moment functional to the killed polynomial is definitionally the killed
+generator applied to the family of Bernstein moment functionals. -/
+theorem manyDemePolynomialMomentFunctional_killedGenerator {D : ℕ}
+    (rates : ManyDemeRates D) (moment : (Fin D → ℕ) → ℝ)
+    (derived ancestral : Fin D → ℕ) :
+    manyDemePolynomialMomentFunctional moment
+        (manyDemeKilledDualGeneratorPolynomial rates derived ancestral) =
+      manyDemeKilledDualGenerator rates
+        (fun a b ↦ manyDemePolynomialMomentFunctional moment
+          (manyDemeBernsteinPolynomial a b)) derived ancestral := by
+  unfold manyDemeKilledDualGeneratorPolynomial manyDemeKilledDualGenerator
+  simp only [map_add, map_sub, map_sum, ← Algebra.smul_def, map_smul,
+    manyDemePolynomialMomentFunctional]
+  ring
 
 /-- Total absorption rate of the positive Bernstein dual.  Absorption occurs exactly when a
 derived and an ancestral lineage choose the same coalescing parental lineage in one deme. -/
@@ -2251,6 +2281,46 @@ noncomputable def manyDemeMomentForcing {D : ℕ}
 /-- Constant-augmented coordinate for affine many-deme moment propagation. -/
 abbrev AffineManyDemeMomentCoordinate (D K : ℕ) :=
   Option (ManyDemeMomentCoordinate D K)
+
+/-- Moment-basis table represented by one biological affine column.  The explicit `none`
+column carries the constant monomial; degree-zero and above-`K` rectangular coordinates are
+padding and therefore represent the zero polynomial here. -/
+noncomputable def manyDemeBiologicalAffineColumnTable {D K : ℕ}
+    (column : AffineManyDemeMomentCoordinate D K) : (Fin D → ℕ) → ℝ :=
+  match column with
+  | none => manyDemeMomentConstantTable
+  | some coordinate =>
+      if 0 < coordinate.degree ∧ coordinate.degree ≤ K then
+        manyDemeMomentBasisTable K coordinate
+      else 0
+
+/-- Bernstein coefficient projection from the affine monomial carrier to the positive
+killed-dual carrier.  Each entry applies the corresponding monomial-basis column functional
+to the exact Bernstein polynomial.  Padding killed rows are set to zero. -/
+noncomputable def manyDemeBernsteinMomentProjection (D K : ℕ) :
+    Matrix (ManyDemeKilledDualCoordinate D K) (AffineManyDemeMomentCoordinate D K) ℝ :=
+  fun row column ↦
+    if row.degree ≤ K then
+      manyDemePolynomialMomentFunctional (manyDemeBiologicalAffineColumnTable column)
+        (manyDemeBernsteinPolynomial
+          (fun deme ↦ (row.1 deme).val) (fun deme ↦ (row.2 deme).val))
+    else 0
+
+/-- Padding killed-dual rows have a zero Bernstein projection row. -/
+theorem manyDemeBernsteinMomentProjection_of_degree_gt {D K : ℕ}
+    (row : ManyDemeKilledDualCoordinate D K) (degree_gt : K < row.degree)
+    (column : AffineManyDemeMomentCoordinate D K) :
+    manyDemeBernsteinMomentProjection D K row column = 0 := by
+  simp [manyDemeBernsteinMomentProjection, Nat.not_le.mpr degree_gt]
+
+/-- Padding monomial coordinates have a zero Bernstein projection column. -/
+theorem manyDemeBernsteinMomentProjection_of_padding_column {D K : ℕ}
+    (row : ManyDemeKilledDualCoordinate D K) (coordinate : ManyDemeMomentCoordinate D K)
+    (padding : ¬(0 < coordinate.degree ∧ coordinate.degree ≤ K)) :
+    manyDemeBernsteinMomentProjection D K row (some coordinate) = 0 := by
+  unfold manyDemeBernsteinMomentProjection manyDemeBiologicalAffineColumnTable
+  split_ifs
+  simp [manyDemePolynomialMomentFunctional]
 
 /-- Exact affine generator `[A,-b;0,0]` for arbitrary finite deme count. -/
 noncomputable def augmentedManyDemeMomentGenerator {D : ℕ}

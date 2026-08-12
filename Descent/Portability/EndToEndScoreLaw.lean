@@ -148,10 +148,13 @@ prevent that construction:
   pairing with the exact positive Bernstein event polynomial.
   `pooledMAFAlternatingPolynomial_eq_positiveBernstein` additionally proves that the complete
   Cartesian alternating terminal expansion already used by the moment evaluator is exactly
-  that positive polynomial, coefficient-for-coefficient.  What remains is to identify the
-  coefficient functionals with the two finite generator matrices, lift that matrix
-  intertwining through exponentials, and prove split intertwining with the existing moment
-  law so the alternating evaluator is replaced end to end,
+  that positive polynomial, coefficient-for-coefficient.  The finite matrix bridge now has
+  an explicit coefficient map, `manyDemeBernsteinMomentProjection`; it ignores both kinds of
+  padding by theorem, and `manyDemePolynomialMomentFunctional_killedGenerator` proves that
+  each projected polynomial column evolves by the killed generator.  What remains is the
+  adjoint identity identifying diffusion evolution of monomial coefficients with the
+  analytic polynomial generator, followed by matrix-exponential and split intertwining, so
+  the alternating evaluator is replaced end to end,
   implement its sparse action without materializing either Cartesian carrier, add certified
   floating-point/interval roundoff control, and run at the executable's 13,750-individual /
   27,500-haplotype grid2d scale, followed by the filed end-to-end cohort validation gate;
