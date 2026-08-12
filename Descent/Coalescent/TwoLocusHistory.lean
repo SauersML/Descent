@@ -169,6 +169,25 @@ theorem mixture_rightFrequency (alpha : ℝ) (alpha_nonneg : 0 ≤ alpha)
   simp only [mixture, rightFrequency]
   ring
 
+/-- Centered left contrasts mix linearly, so their migration velocity is simply source
+minus recipient contrast. -/
+theorem mixture_leftContrast (alpha : ℝ) (alpha_nonneg : 0 ≤ alpha)
+    (alpha_le_one : alpha ≤ 1) (source recipient : TwoLocusHaplotypeFrequencies) :
+    (mixture alpha alpha_nonneg alpha_le_one source recipient).leftContrast =
+      alpha * source.leftContrast + (1 - alpha) * recipient.leftContrast := by
+  rw [leftContrast, mixture_leftFrequency]
+  simp only [leftContrast]
+  ring
+
+/-- Centered right contrasts obey the same exact mixture law. -/
+theorem mixture_rightContrast (alpha : ℝ) (alpha_nonneg : 0 ≤ alpha)
+    (alpha_le_one : alpha ≤ 1) (source recipient : TwoLocusHaplotypeFrequencies) :
+    (mixture alpha alpha_nonneg alpha_le_one source recipient).rightContrast =
+      alpha * source.rightContrast + (1 - alpha) * recipient.rightContrast := by
+  rw [rightContrast, mixture_rightFrequency]
+  simp only [rightContrast]
+  ring
+
 /-- **Exact migration-restoration identity.**  Mixing retains the two parental linkage
 terms and creates an additional joint channel from simultaneous differentiation at the two
 loci.  No linkage-equilibrium assumption or fitted restoration coefficient is present. -/
@@ -321,6 +340,22 @@ def twoLocusRightHeterozygosity
   first.rightFrequency * (1 - second.rightFrequency) +
     second.rightFrequency * (1 - first.rightFrequency)
 
+/-- Cross-deme left heterozygosity in centered contrast coordinates. -/
+theorem twoLocusLeftHeterozygosity_eq_contrasts
+    (first second : TwoLocusHaplotypeFrequencies) :
+    twoLocusLeftHeterozygosity first second =
+      (1 - first.leftContrast * second.leftContrast) / 2 := by
+  simp only [twoLocusLeftHeterozygosity, TwoLocusHaplotypeFrequencies.leftContrast]
+  ring
+
+/-- Cross-deme right heterozygosity in centered contrast coordinates. -/
+theorem twoLocusRightHeterozygosity_eq_contrasts
+    (first second : TwoLocusHaplotypeFrequencies) :
+    twoLocusRightHeterozygosity first second =
+      (1 - first.rightContrast * second.rightContrast) / 2 := by
+  simp only [twoLocusRightHeterozygosity, TwoLocusHaplotypeFrequencies.rightContrast]
+  ring
+
 /-- The exact generalized joint-heterozygosity coordinate of the multi-population
 Hill--Robertson system:
 
@@ -332,6 +367,155 @@ noncomputable def twoLocusJointHeterozygosity
     (leftFirst leftSecond rightFirst rightSecond : TwoLocusHaplotypeFrequencies) : ℝ :=
   twoLocusLeftHeterozygosity leftFirst leftSecond *
     twoLocusRightHeterozygosity rightFirst rightSecond / 4
+
+/-- The generalized four-deme `pi2` observable in centered contrast form. -/
+theorem twoLocusJointHeterozygosity_eq_contrasts
+    (leftFirst leftSecond rightFirst rightSecond : TwoLocusHaplotypeFrequencies) :
+    twoLocusJointHeterozygosity leftFirst leftSecond rightFirst rightSecond =
+      (1 - leftFirst.leftContrast * leftSecond.leftContrast) *
+        (1 - rightFirst.rightContrast * rightSecond.rightContrast) / 16 := by
+  rw [twoLocusJointHeterozygosity,
+    twoLocusLeftHeterozygosity_eq_contrasts,
+    twoLocusRightHeterozygosity_eq_contrasts]
+  ring
+
+/-- Left-locus heterozygosity is affine in its first haplotype argument under an exact
+migration pulse.  Consequently its infinitesimal migration coefficient is the source-minus-
+recipient coordinate replacement, with no closure assumption. -/
+theorem twoLocusLeftHeterozygosity_mixture_first
+    (alpha : ℝ) (alpha_nonneg : 0 ≤ alpha) (alpha_le_one : alpha ≤ 1)
+    (source recipient other : TwoLocusHaplotypeFrequencies) :
+    twoLocusLeftHeterozygosity
+        (TwoLocusHaplotypeFrequencies.mixture alpha alpha_nonneg alpha_le_one
+          source recipient) other =
+      alpha * twoLocusLeftHeterozygosity source other +
+        (1 - alpha) * twoLocusLeftHeterozygosity recipient other := by
+  simp only [twoLocusLeftHeterozygosity,
+    TwoLocusHaplotypeFrequencies.mixture_leftFrequency]
+  ring
+
+/-- Right-locus heterozygosity is likewise affine in its first haplotype argument. -/
+theorem twoLocusRightHeterozygosity_mixture_first
+    (alpha : ℝ) (alpha_nonneg : 0 ≤ alpha) (alpha_le_one : alpha ≤ 1)
+    (source recipient other : TwoLocusHaplotypeFrequencies) :
+    twoLocusRightHeterozygosity
+        (TwoLocusHaplotypeFrequencies.mixture alpha alpha_nonneg alpha_le_one
+          source recipient) other =
+      alpha * twoLocusRightHeterozygosity source other +
+        (1 - alpha) * twoLocusRightHeterozygosity recipient other := by
+  simp only [twoLocusRightHeterozygosity,
+    TwoLocusHaplotypeFrequencies.mixture_rightFrequency]
+  ring
+
+/-- Generalized `pi2` is affine under a pulse in its first left-locus index. -/
+theorem twoLocusJointHeterozygosity_mixture_leftFirst
+    (alpha : ℝ) (alpha_nonneg : 0 ≤ alpha) (alpha_le_one : alpha ≤ 1)
+    (source recipient leftSecond rightFirst rightSecond :
+      TwoLocusHaplotypeFrequencies) :
+    twoLocusJointHeterozygosity
+        (TwoLocusHaplotypeFrequencies.mixture alpha alpha_nonneg alpha_le_one
+          source recipient) leftSecond rightFirst rightSecond =
+      alpha * twoLocusJointHeterozygosity source leftSecond rightFirst rightSecond +
+        (1 - alpha) *
+          twoLocusJointHeterozygosity recipient leftSecond rightFirst rightSecond := by
+  rw [twoLocusJointHeterozygosity, twoLocusLeftHeterozygosity_mixture_first]
+  simp only [twoLocusJointHeterozygosity]
+  ring
+
+/-- Generalized `pi2` is affine under a pulse in its second left-locus index. -/
+theorem twoLocusJointHeterozygosity_mixture_leftSecond
+    (alpha : ℝ) (alpha_nonneg : 0 ≤ alpha) (alpha_le_one : alpha ≤ 1)
+    (leftFirst source recipient rightFirst rightSecond :
+      TwoLocusHaplotypeFrequencies) :
+    twoLocusJointHeterozygosity leftFirst
+        (TwoLocusHaplotypeFrequencies.mixture alpha alpha_nonneg alpha_le_one
+          source recipient) rightFirst rightSecond =
+      alpha * twoLocusJointHeterozygosity leftFirst source rightFirst rightSecond +
+        (1 - alpha) *
+          twoLocusJointHeterozygosity leftFirst recipient rightFirst rightSecond := by
+  rw [twoLocusJointHeterozygosity]
+  have symmetry : ∀ first second,
+      twoLocusLeftHeterozygosity first second =
+        twoLocusLeftHeterozygosity second first := by
+    intro first second
+    simp only [twoLocusLeftHeterozygosity]
+    ring
+  rw [symmetry leftFirst, twoLocusLeftHeterozygosity_mixture_first]
+  simp only [twoLocusJointHeterozygosity]
+  rw [symmetry source leftFirst, symmetry recipient leftFirst]
+  ring
+
+/-- Generalized `pi2` is affine under a pulse in its first right-locus index. -/
+theorem twoLocusJointHeterozygosity_mixture_rightFirst
+    (alpha : ℝ) (alpha_nonneg : 0 ≤ alpha) (alpha_le_one : alpha ≤ 1)
+    (leftFirst leftSecond source recipient rightSecond :
+      TwoLocusHaplotypeFrequencies) :
+    twoLocusJointHeterozygosity leftFirst leftSecond
+        (TwoLocusHaplotypeFrequencies.mixture alpha alpha_nonneg alpha_le_one
+          source recipient) rightSecond =
+      alpha * twoLocusJointHeterozygosity leftFirst leftSecond source rightSecond +
+        (1 - alpha) *
+          twoLocusJointHeterozygosity leftFirst leftSecond recipient rightSecond := by
+  rw [twoLocusJointHeterozygosity, twoLocusRightHeterozygosity_mixture_first]
+  simp only [twoLocusJointHeterozygosity]
+  ring
+
+/-- Generalized `pi2` is affine under a pulse in its second right-locus index. -/
+theorem twoLocusJointHeterozygosity_mixture_rightSecond
+    (alpha : ℝ) (alpha_nonneg : 0 ≤ alpha) (alpha_le_one : alpha ≤ 1)
+    (leftFirst leftSecond rightFirst source recipient :
+      TwoLocusHaplotypeFrequencies) :
+    twoLocusJointHeterozygosity leftFirst leftSecond rightFirst
+        (TwoLocusHaplotypeFrequencies.mixture alpha alpha_nonneg alpha_le_one
+          source recipient) =
+      alpha * twoLocusJointHeterozygosity leftFirst leftSecond rightFirst source +
+        (1 - alpha) *
+          twoLocusJointHeterozygosity leftFirst leftSecond rightFirst recipient := by
+  rw [twoLocusJointHeterozygosity]
+  have symmetry : ∀ first second,
+      twoLocusRightHeterozygosity first second =
+        twoLocusRightHeterozygosity second first := by
+    intro first second
+    simp only [twoLocusRightHeterozygosity]
+    ring
+  rw [symmetry rightFirst, twoLocusRightHeterozygosity_mixture_first]
+  simp only [twoLocusJointHeterozygosity]
+  rw [symmetry source rightFirst, symmetry recipient rightFirst]
+  ring
+
+/-- Multiplying linkage migration velocity by the two contrasts in `Dz` produces exactly
+the `Dz` replacement difference plus the four-`pi2` restoration stencil. -/
+theorem migrationLinkageVelocity_mul_contrasts_eq_Dz_pi2
+    (source recipient left right : TwoLocusHaplotypeFrequencies) :
+    source.migrationLinkageVelocity recipient * left.leftContrast * right.rightContrast =
+      twoLocusDzObservable source left right - twoLocusDzObservable recipient left right +
+        4 * (twoLocusJointHeterozygosity recipient left recipient right -
+          twoLocusJointHeterozygosity recipient left right source -
+          twoLocusJointHeterozygosity left source recipient right +
+          twoLocusJointHeterozygosity left source right source) := by
+  rw [TwoLocusHaplotypeFrequencies.migrationLinkageVelocity_eq_contrasts]
+  simp only [twoLocusDzObservable, twoLocusJointHeterozygosity_eq_contrasts]
+  ring
+
+/-- Migration of the left contrast index in `Dz` is a pure coordinate replacement. -/
+theorem linkage_mul_leftContrastVelocity_mul_rightContrast
+    (linkageDeme source recipient right : TwoLocusHaplotypeFrequencies) :
+    linkageDeme.linkage * (source.leftContrast - recipient.leftContrast) *
+        right.rightContrast =
+      twoLocusDzObservable linkageDeme source right -
+        twoLocusDzObservable linkageDeme recipient right := by
+  simp only [twoLocusDzObservable]
+  ring
+
+/-- Migration of the right contrast index in `Dz` is also a pure replacement. -/
+theorem linkage_mul_leftContrast_mul_rightContrastVelocity
+    (linkageDeme left source recipient : TwoLocusHaplotypeFrequencies) :
+    linkageDeme.linkage * left.leftContrast *
+        (source.rightContrast - recipient.rightContrast) =
+      twoLocusDzObservable linkageDeme left source -
+        twoLocusDzObservable linkageDeme left recipient := by
+  simp only [twoLocusDzObservable]
+  ring
 
 /-- A full low-order state is haplotype-realizable when all of its coordinates are
 expectations of the defining polynomials under one common probability law on the
@@ -605,6 +789,261 @@ theorem secondEndpointDDMigrationStencil_eq_expectation {D : ℕ}
       congr 1
       funext outcome
       ring
+
+/-- The linkage-index migration stencil of `Dz(first,second,third)` is the expected linkage
+velocity at `first` multiplied by the two unchanged centered contrasts. -/
+theorem linkageIndexDzMigrationStencil_eq_expectation {D : ℕ}
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state)
+    (target first second third : Fin D) :
+    state (some (.Dz target second third)) - state (some (.Dz first second third)) +
+        4 * (state (some (.pi2 first second first third)) -
+          state (some (.pi2 first second third target)) -
+          state (some (.pi2 second target first third)) +
+          state (some (.pi2 second target third target))) =
+      realization.expectation (fun outcome ↦
+        (realization.haplotype outcome target).migrationLinkageVelocity
+            (realization.haplotype outcome first) *
+          (realization.haplotype outcome second).leftContrast *
+          (realization.haplotype outcome third).rightContrast) := by
+  have pointwise := migrationLinkageVelocity_mul_contrasts_eq_Dz_pi2
+  symm
+  calc
+    _ = realization.expectation (fun outcome ↦
+        twoLocusDzObservable (realization.haplotype outcome target)
+            (realization.haplotype outcome second) (realization.haplotype outcome third) -
+          twoLocusDzObservable (realization.haplotype outcome first)
+            (realization.haplotype outcome second) (realization.haplotype outcome third) +
+          4 * (twoLocusJointHeterozygosity (realization.haplotype outcome first)
+              (realization.haplotype outcome second) (realization.haplotype outcome first)
+              (realization.haplotype outcome third) -
+            twoLocusJointHeterozygosity (realization.haplotype outcome first)
+              (realization.haplotype outcome second) (realization.haplotype outcome third)
+              (realization.haplotype outcome target) -
+            twoLocusJointHeterozygosity (realization.haplotype outcome second)
+              (realization.haplotype outcome target) (realization.haplotype outcome first)
+              (realization.haplotype outcome third) +
+            twoLocusJointHeterozygosity (realization.haplotype outcome second)
+              (realization.haplotype outcome target) (realization.haplotype outcome third)
+              (realization.haplotype outcome target))) := by
+      congr 1
+      funext outcome
+      exact pointwise (realization.haplotype outcome target)
+        (realization.haplotype outcome first) (realization.haplotype outcome second)
+        (realization.haplotype outcome third)
+    _ = _ := by
+      have split_four : (fun outcome ↦
+          4 * (twoLocusJointHeterozygosity (realization.haplotype outcome first)
+              (realization.haplotype outcome second) (realization.haplotype outcome first)
+              (realization.haplotype outcome third) -
+            twoLocusJointHeterozygosity (realization.haplotype outcome first)
+              (realization.haplotype outcome second) (realization.haplotype outcome third)
+              (realization.haplotype outcome target) -
+            twoLocusJointHeterozygosity (realization.haplotype outcome second)
+              (realization.haplotype outcome target) (realization.haplotype outcome first)
+              (realization.haplotype outcome third) +
+            twoLocusJointHeterozygosity (realization.haplotype outcome second)
+              (realization.haplotype outcome target) (realization.haplotype outcome third)
+              (realization.haplotype outcome target))) =
+          (4 : ℝ) • ((fun outcome ↦ twoLocusJointHeterozygosity
+              (realization.haplotype outcome first) (realization.haplotype outcome second)
+              (realization.haplotype outcome first) (realization.haplotype outcome third)) -
+            (fun outcome ↦ twoLocusJointHeterozygosity
+              (realization.haplotype outcome first) (realization.haplotype outcome second)
+              (realization.haplotype outcome third) (realization.haplotype outcome target)) -
+            (fun outcome ↦ twoLocusJointHeterozygosity
+              (realization.haplotype outcome second) (realization.haplotype outcome target)
+              (realization.haplotype outcome first) (realization.haplotype outcome third)) +
+            (fun outcome ↦ twoLocusJointHeterozygosity
+              (realization.haplotype outcome second) (realization.haplotype outcome target)
+              (realization.haplotype outcome third) (realization.haplotype outcome target))) := by
+        funext outcome
+        simp only [Pi.sub_apply, Pi.add_apply, Pi.smul_apply, smul_eq_mul]
+      rw [show (fun outcome ↦
+          twoLocusDzObservable (realization.haplotype outcome target)
+              (realization.haplotype outcome second) (realization.haplotype outcome third) -
+            twoLocusDzObservable (realization.haplotype outcome first)
+              (realization.haplotype outcome second) (realization.haplotype outcome third) +
+            4 * (twoLocusJointHeterozygosity (realization.haplotype outcome first)
+                (realization.haplotype outcome second) (realization.haplotype outcome first)
+                (realization.haplotype outcome third) -
+              twoLocusJointHeterozygosity (realization.haplotype outcome first)
+                (realization.haplotype outcome second) (realization.haplotype outcome third)
+                (realization.haplotype outcome target) -
+              twoLocusJointHeterozygosity (realization.haplotype outcome second)
+                (realization.haplotype outcome target) (realization.haplotype outcome first)
+                (realization.haplotype outcome third) +
+              twoLocusJointHeterozygosity (realization.haplotype outcome second)
+                (realization.haplotype outcome target) (realization.haplotype outcome third)
+                (realization.haplotype outcome target))) =
+          (fun outcome ↦ twoLocusDzObservable (realization.haplotype outcome target)
+              (realization.haplotype outcome second) (realization.haplotype outcome third)) -
+            (fun outcome ↦ twoLocusDzObservable (realization.haplotype outcome first)
+              (realization.haplotype outcome second) (realization.haplotype outcome third)) +
+            (fun outcome ↦ 4 * (twoLocusJointHeterozygosity
+              (realization.haplotype outcome first) (realization.haplotype outcome second)
+              (realization.haplotype outcome first) (realization.haplotype outcome third) -
+              twoLocusJointHeterozygosity (realization.haplotype outcome first)
+                (realization.haplotype outcome second) (realization.haplotype outcome third)
+                (realization.haplotype outcome target) -
+              twoLocusJointHeterozygosity (realization.haplotype outcome second)
+                (realization.haplotype outcome target) (realization.haplotype outcome first)
+                (realization.haplotype outcome third) +
+              twoLocusJointHeterozygosity (realization.haplotype outcome second)
+                (realization.haplotype outcome target) (realization.haplotype outcome third)
+                (realization.haplotype outcome target))) by rfl]
+      rw [realization.expectation.add_eval, realization.expectation.eval_sub, split_four,
+        realization.expectation.smul_eval, realization.expectation.add_eval,
+        realization.expectation.eval_sub, realization.expectation.eval_sub]
+      rw [← realization.Dz_eq target second third, ← realization.Dz_eq first second third,
+        ← realization.pi2_eq first second first third,
+        ← realization.pi2_eq first second third target,
+        ← realization.pi2_eq second target first third,
+        ← realization.pi2_eq second target third target]
+
+/-- The left-contrast index migration stencil is the expected left-contrast velocity. -/
+theorem leftIndexDzMigrationStencil_eq_expectation {D : ℕ}
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state)
+    (target first second third : Fin D) :
+    state (some (.Dz first target third)) - state (some (.Dz first second third)) =
+      realization.expectation (fun outcome ↦
+        (realization.haplotype outcome first).linkage *
+          ((realization.haplotype outcome target).leftContrast -
+            (realization.haplotype outcome second).leftContrast) *
+          (realization.haplotype outcome third).rightContrast) := by
+  symm
+  calc
+    _ = realization.expectation (fun outcome ↦
+        twoLocusDzObservable (realization.haplotype outcome first)
+            (realization.haplotype outcome target) (realization.haplotype outcome third) -
+          twoLocusDzObservable (realization.haplotype outcome first)
+            (realization.haplotype outcome second) (realization.haplotype outcome third)) := by
+      congr 1
+      funext outcome
+      exact linkage_mul_leftContrastVelocity_mul_rightContrast _ _ _ _
+    _ = _ := by
+      rw [show (fun outcome ↦
+          twoLocusDzObservable (realization.haplotype outcome first)
+              (realization.haplotype outcome target) (realization.haplotype outcome third) -
+            twoLocusDzObservable (realization.haplotype outcome first)
+              (realization.haplotype outcome second) (realization.haplotype outcome third)) =
+          (fun outcome ↦ twoLocusDzObservable (realization.haplotype outcome first)
+            (realization.haplotype outcome target) (realization.haplotype outcome third)) -
+          (fun outcome ↦ twoLocusDzObservable (realization.haplotype outcome first)
+            (realization.haplotype outcome second) (realization.haplotype outcome third)) by rfl]
+      rw [realization.expectation.eval_sub, ← realization.Dz_eq first target third,
+        ← realization.Dz_eq first second third]
+
+/-- The right-contrast index migration stencil is the expected right-contrast velocity. -/
+theorem rightIndexDzMigrationStencil_eq_expectation {D : ℕ}
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state)
+    (target first second third : Fin D) :
+    state (some (.Dz first second target)) - state (some (.Dz first second third)) =
+      realization.expectation (fun outcome ↦
+        (realization.haplotype outcome first).linkage *
+          (realization.haplotype outcome second).leftContrast *
+          ((realization.haplotype outcome target).rightContrast -
+            (realization.haplotype outcome third).rightContrast)) := by
+  symm
+  calc
+    _ = realization.expectation (fun outcome ↦
+        twoLocusDzObservable (realization.haplotype outcome first)
+            (realization.haplotype outcome second) (realization.haplotype outcome target) -
+          twoLocusDzObservable (realization.haplotype outcome first)
+            (realization.haplotype outcome second) (realization.haplotype outcome third)) := by
+      congr 1
+      funext outcome
+      exact linkage_mul_leftContrast_mul_rightContrastVelocity _ _ _ _
+    _ = _ := by
+      rw [show (fun outcome ↦
+          twoLocusDzObservable (realization.haplotype outcome first)
+              (realization.haplotype outcome second) (realization.haplotype outcome target) -
+            twoLocusDzObservable (realization.haplotype outcome first)
+              (realization.haplotype outcome second) (realization.haplotype outcome third)) =
+          (fun outcome ↦ twoLocusDzObservable (realization.haplotype outcome first)
+            (realization.haplotype outcome second) (realization.haplotype outcome target)) -
+          (fun outcome ↦ twoLocusDzObservable (realization.haplotype outcome first)
+            (realization.haplotype outcome second) (realization.haplotype outcome third)) by rfl]
+      rw [realization.expectation.eval_sub, ← realization.Dz_eq first second target,
+        ← realization.Dz_eq first second third]
+
+/-- Any `H` coordinate replacement is the expectation of the corresponding exact
+cross-deme heterozygosity replacement. -/
+theorem HReplacementStencil_eq_expectation {D : ℕ}
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state)
+    (first second newFirst newSecond : Fin D) :
+    state (some (.H newFirst newSecond)) - state (some (.H first second)) =
+      realization.expectation (fun outcome ↦
+        twoLocusLeftHeterozygosity
+            (realization.haplotype outcome newFirst)
+            (realization.haplotype outcome newSecond) -
+          twoLocusLeftHeterozygosity
+            (realization.haplotype outcome first)
+            (realization.haplotype outcome second)) := by
+  rw [show (fun outcome ↦
+      twoLocusLeftHeterozygosity
+          (realization.haplotype outcome newFirst)
+          (realization.haplotype outcome newSecond) -
+        twoLocusLeftHeterozygosity
+          (realization.haplotype outcome first)
+          (realization.haplotype outcome second)) =
+      (fun outcome ↦ twoLocusLeftHeterozygosity
+        (realization.haplotype outcome newFirst)
+        (realization.haplotype outcome newSecond)) -
+      (fun outcome ↦ twoLocusLeftHeterozygosity
+        (realization.haplotype outcome first)
+        (realization.haplotype outcome second)) by rfl]
+  rw [realization.expectation.eval_sub,
+    ← realization.H_eq newFirst newSecond, ← realization.H_eq first second]
+
+/-- Any generalized-`pi2` coordinate-replacement stencil is the expectation of the
+corresponding haplotype-observable replacement.  The four migration channels below are its
+one-index specializations, whose exact finite-pulse laws were proved above. -/
+theorem pi2ReplacementStencil_eq_expectation {D : ℕ}
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state)
+    (leftFirst leftSecond rightFirst rightSecond
+      newLeftFirst newLeftSecond newRightFirst newRightSecond : Fin D) :
+    state (some (.pi2 newLeftFirst newLeftSecond newRightFirst newRightSecond)) -
+        state (some (.pi2 leftFirst leftSecond rightFirst rightSecond)) =
+      realization.expectation (fun outcome ↦
+        twoLocusJointHeterozygosity
+            (realization.haplotype outcome newLeftFirst)
+            (realization.haplotype outcome newLeftSecond)
+            (realization.haplotype outcome newRightFirst)
+            (realization.haplotype outcome newRightSecond) -
+          twoLocusJointHeterozygosity
+            (realization.haplotype outcome leftFirst)
+            (realization.haplotype outcome leftSecond)
+            (realization.haplotype outcome rightFirst)
+            (realization.haplotype outcome rightSecond)) := by
+  rw [show (fun outcome ↦
+      twoLocusJointHeterozygosity
+          (realization.haplotype outcome newLeftFirst)
+          (realization.haplotype outcome newLeftSecond)
+          (realization.haplotype outcome newRightFirst)
+          (realization.haplotype outcome newRightSecond) -
+        twoLocusJointHeterozygosity
+          (realization.haplotype outcome leftFirst)
+          (realization.haplotype outcome leftSecond)
+          (realization.haplotype outcome rightFirst)
+          (realization.haplotype outcome rightSecond)) =
+      (fun outcome ↦ twoLocusJointHeterozygosity
+        (realization.haplotype outcome newLeftFirst)
+        (realization.haplotype outcome newLeftSecond)
+        (realization.haplotype outcome newRightFirst)
+        (realization.haplotype outcome newRightSecond)) -
+      (fun outcome ↦ twoLocusJointHeterozygosity
+        (realization.haplotype outcome leftFirst)
+        (realization.haplotype outcome leftSecond)
+        (realization.haplotype outcome rightFirst)
+        (realization.haplotype outcome rightSecond)) by rfl]
+  rw [realization.expectation.eval_sub,
+    ← realization.pi2_eq newLeftFirst newLeftSecond newRightFirst newRightSecond,
+    ← realization.pi2_eq leftFirst leftSecond rightFirst rightSecond]
 
 /-- `H(i,j)` is symmetric because its defining cross-deme heterozygosity polynomial is. -/
 theorem H_symm {D : ℕ} {state : AffineLowOrderLDCoordinate D → ℝ}
@@ -923,6 +1362,41 @@ noncomputable def lowOrderLDMigration {D : ℕ} (rates : ManyDemeLDRates D)
         (moment (.pi2 first second third target) -
           moment (.pi2 first second third fourth)))
 
+/-- **The complete `H` migration row is the two-factor product rule.**  Each lineage
+channel is the derivative of the exact affine heterozygosity pulse law. -/
+theorem lowOrderLDMigration_H_eq_haplotypeVelocity {D : ℕ}
+    (rates : ManyDemeLDRates D)
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state)
+    (first second : Fin D) :
+    lowOrderLDMigration rates (fun coordinate ↦ state (some coordinate)) (.H first second) =
+      (∑ target, rates.migration first target *
+        realization.expectation (fun outcome ↦
+          twoLocusLeftHeterozygosity
+              (realization.haplotype outcome target)
+              (realization.haplotype outcome second) -
+            twoLocusLeftHeterozygosity
+              (realization.haplotype outcome first)
+              (realization.haplotype outcome second))) +
+      (∑ target, rates.migration second target *
+        realization.expectation (fun outcome ↦
+          twoLocusLeftHeterozygosity
+              (realization.haplotype outcome first)
+              (realization.haplotype outcome target) -
+            twoLocusLeftHeterozygosity
+              (realization.haplotype outcome first)
+              (realization.haplotype outcome second))) := by
+  simp only [lowOrderLDMigration]
+  congr 1
+  · apply Finset.sum_congr rfl
+    intro target _
+    rw [realization.HReplacementStencil_eq_expectation
+      first second target second]
+  · apply Finset.sum_congr rfl
+    intro target _
+    rw [realization.HReplacementStencil_eq_expectation
+      first second first target]
+
 /-- **The complete `DD` migration row is the expectation-level product rule for the exact
 haplotype-mixture velocity.**  Each directed channel acts at one endpoint, and the two
 endpoint sums are exactly the two terms obtained by differentiating `E[D_first D_second]`.
@@ -951,6 +1425,128 @@ theorem lowOrderLDMigration_DD_eq_haplotypeVelocity {D : ℕ}
   · apply Finset.sum_congr rfl
     intro target _
     rw [realization.secondEndpointDDMigrationStencil_eq_expectation target first second]
+
+/-- **The complete `Dz` migration row is the three-factor product rule.**  Migration at
+the linkage index uses the exact restored-linkage velocity, including its differentiation
+term; migration at either marginal index replaces the corresponding centered contrast.
+Thus every correction in the generator's `Dz` row is forced by haplotype mixture. -/
+theorem lowOrderLDMigration_Dz_eq_haplotypeVelocity {D : ℕ}
+    (rates : ManyDemeLDRates D)
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state)
+    (first second third : Fin D) :
+    lowOrderLDMigration rates (fun coordinate ↦ state (some coordinate))
+        (.Dz first second third) =
+      (∑ target, rates.migration first target *
+        realization.expectation (fun outcome ↦
+          (realization.haplotype outcome target).migrationLinkageVelocity
+              (realization.haplotype outcome first) *
+            (realization.haplotype outcome second).leftContrast *
+            (realization.haplotype outcome third).rightContrast)) +
+      (∑ target, rates.migration second target *
+        realization.expectation (fun outcome ↦
+          (realization.haplotype outcome first).linkage *
+            ((realization.haplotype outcome target).leftContrast -
+              (realization.haplotype outcome second).leftContrast) *
+            (realization.haplotype outcome third).rightContrast)) +
+      (∑ target, rates.migration third target *
+        realization.expectation (fun outcome ↦
+          (realization.haplotype outcome first).linkage *
+            (realization.haplotype outcome second).leftContrast *
+            ((realization.haplotype outcome target).rightContrast -
+              (realization.haplotype outcome third).rightContrast))) := by
+  simp only [lowOrderLDMigration]
+  congr 1
+  · congr 1
+    · apply Finset.sum_congr rfl
+      intro target _
+      rw [realization.linkageIndexDzMigrationStencil_eq_expectation target first second third]
+    · apply Finset.sum_congr rfl
+      intro target _
+      rw [realization.leftIndexDzMigrationStencil_eq_expectation target first second third]
+  · apply Finset.sum_congr rfl
+    intro target _
+    rw [realization.rightIndexDzMigrationStencil_eq_expectation target first second third]
+
+/-- **The complete generalized-`pi2` migration row is the four-factor product rule.**
+Each lineage channel is the source-minus-recipient derivative of the exact affine pulse law
+for that haplotype argument.  This closes the migration correspondence for all four
+low-order coordinate families. -/
+theorem lowOrderLDMigration_pi2_eq_haplotypeVelocity {D : ℕ}
+    (rates : ManyDemeLDRates D)
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state)
+    (first second third fourth : Fin D) :
+    lowOrderLDMigration rates (fun coordinate ↦ state (some coordinate))
+        (.pi2 first second third fourth) =
+      (∑ target, rates.migration first target *
+        realization.expectation (fun outcome ↦
+          twoLocusJointHeterozygosity
+              (realization.haplotype outcome target)
+              (realization.haplotype outcome second)
+              (realization.haplotype outcome third)
+              (realization.haplotype outcome fourth) -
+            twoLocusJointHeterozygosity
+              (realization.haplotype outcome first)
+              (realization.haplotype outcome second)
+              (realization.haplotype outcome third)
+              (realization.haplotype outcome fourth))) +
+      (∑ target, rates.migration second target *
+        realization.expectation (fun outcome ↦
+          twoLocusJointHeterozygosity
+              (realization.haplotype outcome first)
+              (realization.haplotype outcome target)
+              (realization.haplotype outcome third)
+              (realization.haplotype outcome fourth) -
+            twoLocusJointHeterozygosity
+              (realization.haplotype outcome first)
+              (realization.haplotype outcome second)
+              (realization.haplotype outcome third)
+              (realization.haplotype outcome fourth))) +
+      (∑ target, rates.migration third target *
+        realization.expectation (fun outcome ↦
+          twoLocusJointHeterozygosity
+              (realization.haplotype outcome first)
+              (realization.haplotype outcome second)
+              (realization.haplotype outcome target)
+              (realization.haplotype outcome fourth) -
+            twoLocusJointHeterozygosity
+              (realization.haplotype outcome first)
+              (realization.haplotype outcome second)
+              (realization.haplotype outcome third)
+              (realization.haplotype outcome fourth))) +
+      (∑ target, rates.migration fourth target *
+        realization.expectation (fun outcome ↦
+          twoLocusJointHeterozygosity
+              (realization.haplotype outcome first)
+              (realization.haplotype outcome second)
+              (realization.haplotype outcome third)
+              (realization.haplotype outcome target) -
+            twoLocusJointHeterozygosity
+              (realization.haplotype outcome first)
+              (realization.haplotype outcome second)
+              (realization.haplotype outcome third)
+              (realization.haplotype outcome fourth))) := by
+  simp only [lowOrderLDMigration]
+  congr 1
+  · congr 1
+    · congr 1
+      · apply Finset.sum_congr rfl
+        intro target _
+        rw [realization.pi2ReplacementStencil_eq_expectation
+          first second third fourth target second third fourth]
+      · apply Finset.sum_congr rfl
+        intro target _
+        rw [realization.pi2ReplacementStencil_eq_expectation
+          first second third fourth first target third fourth]
+    · apply Finset.sum_congr rfl
+      intro target _
+      rw [realization.pi2ReplacementStencil_eq_expectation
+        first second third fourth first second target fourth]
+  · apply Finset.sum_congr rfl
+    intro target _
+    rw [realization.pi2ReplacementStencil_eq_expectation
+      first second third fourth first second third target]
 
 /-- Recombination damps each `D` factor at half its deme-specific scaled rate. -/
 noncomputable def lowOrderLDRecombination {D : ℕ} (rates : ManyDemeLDRates D)
