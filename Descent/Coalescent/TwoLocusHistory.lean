@@ -749,6 +749,22 @@ theorem twoLocusHaplotypeCovariance_left_right
   rw [hab]
   ring
 
+/-- Bilinear scaling of the cross-locus marginal covariance.  This is the exact quadratic
+covariation used when composite heterozygosity gradients share a drifting deme. -/
+theorem twoLocusHaplotypeCovariance_scaled_left_right
+    (frequency : TwoLocusHaplotypeFrequencies) (leftScale rightScale : ℝ) :
+    twoLocusHaplotypeCovariance frequency
+        (fun haplotype ↦ leftScale * twoLocusLeftAlleleIndicator haplotype)
+        (fun haplotype ↦ rightScale * twoLocusRightAlleleIndicator haplotype) =
+      leftScale * rightScale * frequency.linkage := by
+  have hab : frequency.ab = 1 - frequency.AB - frequency.Ab - frequency.aB := by
+    linarith [frequency.total_eq_one]
+  simp [twoLocusHaplotypeCovariance, twoLocusHaplotypeMean,
+    twoLocusLeftAlleleIndicator, twoLocusRightAlleleIndicator,
+    TwoLocusHaplotypeFrequencies.linkage]
+  rw [hab]
+  ring
+
 /-- Linkage/marginal covariation at the left locus is `D (1-2p)`. -/
 theorem twoLocusHaplotypeCovariance_linkage_left
     (frequency : TwoLocusHaplotypeFrequencies) :
@@ -973,6 +989,14 @@ def twoLocusHJet {D : ℕ} (first second : Fin D) : TwoLocusDiffusionJet D :=
     (.mul (twoLocusLeftFrequencyJet second)
       (.add (.const 1) (.smul (-1) (twoLocusLeftFrequencyJet first))))
 
+/-- Cross-deme right-locus heterozygosity. -/
+def twoLocusRightHJet {D : ℕ} (first second : Fin D) : TwoLocusDiffusionJet D :=
+  .add
+    (.mul (twoLocusRightFrequencyJet first)
+      (.add (.const 1) (.smul (-1) (twoLocusRightFrequencyJet second))))
+    (.mul (twoLocusRightFrequencyJet second)
+      (.add (.const 1) (.smul (-1) (twoLocusRightFrequencyJet first))))
+
 /-- Cross-deme product of linkage determinants. -/
 def twoLocusDDJet {D : ℕ} (first second : Fin D) : TwoLocusDiffusionJet D :=
   .mul (twoLocusLinkageJet first) (twoLocusLinkageJet second)
@@ -986,12 +1010,7 @@ def twoLocusDzJet {D : ℕ} (first second third : Fin D) : TwoLocusDiffusionJet 
 noncomputable def twoLocusPi2Jet {D : ℕ} (first second third fourth : Fin D) :
     TwoLocusDiffusionJet D :=
   .smul (1 / 4)
-    (.mul (twoLocusHJet first second)
-      (.add
-        (.mul (twoLocusRightFrequencyJet third)
-          (.add (.const 1) (.smul (-1) (twoLocusRightFrequencyJet fourth))))
-        (.mul (twoLocusRightFrequencyJet fourth)
-          (.add (.const 1) (.smul (-1) (twoLocusRightFrequencyJet third))))))
+    (.mul (twoLocusHJet first second) (twoLocusRightHJet third fourth))
 
 /-- The `H` jet reads exactly the biological heterozygosity observable. -/
 theorem twoLocusHJet_value {D : ℕ}
@@ -1001,6 +1020,16 @@ theorem twoLocusHJet_value {D : ℕ}
   simp [twoLocusHJet, TwoLocusDiffusionJet.add, TwoLocusDiffusionJet.mul,
     TwoLocusDiffusionJet.const, TwoLocusDiffusionJet.smul,
     twoLocusLeftFrequencyJet, twoLocusLeftHeterozygosity]
+  ring
+
+/-- The right-locus heterozygosity jet reads its biological observable. -/
+theorem twoLocusRightHJet_value {D : ℕ}
+    (state : Fin D → TwoLocusHaplotypeFrequencies) (first second : Fin D) :
+    (twoLocusRightHJet first second).value state =
+      twoLocusRightHeterozygosity (state first) (state second) := by
+  simp [twoLocusRightHJet, TwoLocusDiffusionJet.add, TwoLocusDiffusionJet.mul,
+    TwoLocusDiffusionJet.const, TwoLocusDiffusionJet.smul,
+    twoLocusRightFrequencyJet, twoLocusRightHeterozygosity]
   ring
 
 /-- The `DD` jet reads exactly the linkage product. -/
@@ -1032,7 +1061,8 @@ theorem twoLocusPi2Jet_value {D : ℕ}
     (twoLocusPi2Jet first second third fourth).value state =
       twoLocusJointHeterozygosity
         (state first) (state second) (state third) (state fourth) := by
-  simp [twoLocusPi2Jet, twoLocusHJet, TwoLocusDiffusionJet.mul,
+  simp [twoLocusPi2Jet, twoLocusHJet, twoLocusRightHJet,
+    TwoLocusDiffusionJet.mul,
     TwoLocusDiffusionJet.add, TwoLocusDiffusionJet.smul,
     TwoLocusDiffusionJet.const, twoLocusLeftFrequencyJet,
     twoLocusRightFrequencyJet, twoLocusJointHeterozygosity,
@@ -1076,6 +1106,112 @@ theorem twoLocusHJet_driftAt {D : ℕ}
         twoLocusHaplotypeMean, twoLocusLeftAlleleIndicator, hfirst, hsecond,
         Ne.symm hfirst, Ne.symm hsecond]
 
+/-- The exact left-heterozygosity gradient in one deme.  Each matching lineage contributes
+the centered allele-frequency contrast of the other lineage. -/
+theorem twoLocusHJet_gradientAt {D : ℕ}
+    (state : Fin D → TwoLocusHaplotypeFrequencies)
+    (deme first second : Fin D) (haplotype : TwoLocusHaplotype) :
+    (twoLocusHJet first second).gradientAt deme state haplotype =
+      ((if deme = first then (state second).leftContrast else 0) +
+        (if deme = second then (state first).leftContrast else 0)) *
+          twoLocusLeftAlleleIndicator haplotype := by
+  by_cases hfirst : deme = first
+  · subst first
+    by_cases hsecond : deme = second
+    · subst second
+      simp [twoLocusHJet, TwoLocusDiffusionJet.add, TwoLocusDiffusionJet.mul,
+        TwoLocusDiffusionJet.const, TwoLocusDiffusionJet.smul,
+        twoLocusLeftFrequencyJet,
+        TwoLocusHaplotypeFrequencies.leftContrast]
+      ring
+    · simp [twoLocusHJet, TwoLocusDiffusionJet.add, TwoLocusDiffusionJet.mul,
+        TwoLocusDiffusionJet.const, TwoLocusDiffusionJet.smul,
+        twoLocusLeftFrequencyJet,
+        TwoLocusHaplotypeFrequencies.leftContrast, hsecond]
+      ring
+  · by_cases hsecond : deme = second
+    · subst second
+      simp [twoLocusHJet, TwoLocusDiffusionJet.add, TwoLocusDiffusionJet.mul,
+        TwoLocusDiffusionJet.const, TwoLocusDiffusionJet.smul,
+        twoLocusLeftFrequencyJet,
+        TwoLocusHaplotypeFrequencies.leftContrast, hfirst]
+      ring
+    · simp [twoLocusHJet, TwoLocusDiffusionJet.add, TwoLocusDiffusionJet.mul,
+        TwoLocusDiffusionJet.const, TwoLocusDiffusionJet.smul,
+        twoLocusLeftFrequencyJet, hfirst, hsecond]
+
+/-- Exact local drift of right-locus cross-deme heterozygosity. -/
+theorem twoLocusRightHJet_driftAt {D : ℕ}
+    (state : Fin D → TwoLocusHaplotypeFrequencies)
+    (deme first second : Fin D) :
+    (twoLocusRightHJet first second).driftAt deme state =
+      if first = deme ∧ second = deme then
+        -(twoLocusRightHJet first second).value state
+      else 0 := by
+  by_cases hfirst : deme = first
+  · subst first
+    by_cases hsecond : deme = second
+    · subst second
+      simp [twoLocusRightHJet, TwoLocusDiffusionJet.add,
+        TwoLocusDiffusionJet.mul, TwoLocusDiffusionJet.const,
+        TwoLocusDiffusionJet.smul, twoLocusRightFrequencyJet,
+        twoLocusHaplotypeCovariance, twoLocusHaplotypeMean,
+        twoLocusRightAlleleIndicator,
+        TwoLocusHaplotypeFrequencies.rightFrequency]
+      ring
+    · simp [twoLocusRightHJet, TwoLocusDiffusionJet.add,
+        TwoLocusDiffusionJet.mul, TwoLocusDiffusionJet.const,
+        TwoLocusDiffusionJet.smul, twoLocusRightFrequencyJet,
+        twoLocusHaplotypeCovariance, twoLocusHaplotypeMean,
+        twoLocusRightAlleleIndicator, hsecond, Ne.symm hsecond]
+  · by_cases hsecond : deme = second
+    · subst second
+      simp [twoLocusRightHJet, TwoLocusDiffusionJet.add,
+        TwoLocusDiffusionJet.mul, TwoLocusDiffusionJet.const,
+        TwoLocusDiffusionJet.smul, twoLocusRightFrequencyJet,
+        twoLocusHaplotypeCovariance, twoLocusHaplotypeMean,
+        twoLocusRightAlleleIndicator, hfirst, Ne.symm hfirst]
+    · simp [twoLocusRightHJet, TwoLocusDiffusionJet.add,
+        TwoLocusDiffusionJet.mul, TwoLocusDiffusionJet.const,
+        TwoLocusDiffusionJet.smul, twoLocusRightFrequencyJet,
+        twoLocusHaplotypeCovariance, twoLocusHaplotypeMean,
+        twoLocusRightAlleleIndicator, hfirst, hsecond,
+        Ne.symm hfirst, Ne.symm hsecond]
+
+/-- The right-heterozygosity gradient has the symmetric contrast-coefficient law. -/
+theorem twoLocusRightHJet_gradientAt {D : ℕ}
+    (state : Fin D → TwoLocusHaplotypeFrequencies)
+    (deme first second : Fin D) (haplotype : TwoLocusHaplotype) :
+    (twoLocusRightHJet first second).gradientAt deme state haplotype =
+      ((if deme = first then (state second).rightContrast else 0) +
+        (if deme = second then (state first).rightContrast else 0)) *
+          twoLocusRightAlleleIndicator haplotype := by
+  by_cases hfirst : deme = first
+  · subst first
+    by_cases hsecond : deme = second
+    · subst second
+      simp [twoLocusRightHJet, TwoLocusDiffusionJet.add,
+        TwoLocusDiffusionJet.mul, TwoLocusDiffusionJet.const,
+        TwoLocusDiffusionJet.smul, twoLocusRightFrequencyJet,
+        TwoLocusHaplotypeFrequencies.rightContrast]
+      ring
+    · simp [twoLocusRightHJet, TwoLocusDiffusionJet.add,
+        TwoLocusDiffusionJet.mul, TwoLocusDiffusionJet.const,
+        TwoLocusDiffusionJet.smul, twoLocusRightFrequencyJet,
+        TwoLocusHaplotypeFrequencies.rightContrast, hsecond]
+      ring
+  · by_cases hsecond : deme = second
+    · subst second
+      simp [twoLocusRightHJet, TwoLocusDiffusionJet.add,
+        TwoLocusDiffusionJet.mul, TwoLocusDiffusionJet.const,
+        TwoLocusDiffusionJet.smul, twoLocusRightFrequencyJet,
+        TwoLocusHaplotypeFrequencies.rightContrast, hfirst]
+      ring
+    · simp [twoLocusRightHJet, TwoLocusDiffusionJet.add,
+        TwoLocusDiffusionJet.mul, TwoLocusDiffusionJet.const,
+        TwoLocusDiffusionJet.smul, twoLocusRightFrequencyJet,
+        hfirst, hsecond]
+
 /-- Exact local drift of a cross-deme linkage product.  The same-deme branch is the
 Hill--Robertson `-3 DD + Dz + pi2` row, derived from the exact linkage drift and linkage
 quadratic variation.  A single matching index contributes `-DD`; no matching index
@@ -1096,6 +1232,7 @@ theorem twoLocusDDJet_driftAt {D : ℕ}
     by_cases hsecond : deme = second
     · subst second
       simp [twoLocusDDJet, twoLocusDzJet, twoLocusPi2Jet, twoLocusHJet,
+        twoLocusRightHJet,
         TwoLocusDiffusionJet.mul, TwoLocusDiffusionJet.add,
         TwoLocusDiffusionJet.smul, TwoLocusDiffusionJet.const,
         twoLocusLinkageJet, twoLocusLeftContrastJet,
@@ -1261,6 +1398,46 @@ theorem twoLocusDzJet_driftAt {D : ℕ}
           twoLocusHaplotypeCovariance, twoLocusHaplotypeMean,
           hfirst, hsecond, hthird,
           Ne.symm hfirst, Ne.symm hsecond, Ne.symm hthird]
+
+/-- Exact local drift of generalized joint heterozygosity.  This factorized statement
+contains every equality-pattern branch of the `pi2` Hill--Robertson row: within-locus
+coalescence supplies the two loss terms, while shared-deme cross-locus quadratic variation
+is local linkage times the two exact heterozygosity-gradient coefficients. -/
+theorem twoLocusPi2Jet_driftAt {D : ℕ}
+    (state : Fin D → TwoLocusHaplotypeFrequencies)
+    (deme first second third fourth : Fin D) :
+    (twoLocusPi2Jet first second third fourth).driftAt deme state =
+      -(if first = deme ∧ second = deme then
+          (twoLocusPi2Jet first second third fourth).value state else 0) -
+        (if third = deme ∧ fourth = deme then
+          (twoLocusPi2Jet first second third fourth).value state else 0) +
+        (state deme).linkage *
+          ((if deme = first then (state second).leftContrast else 0) +
+            (if deme = second then (state first).leftContrast else 0)) *
+          ((if deme = third then (state fourth).rightContrast else 0) +
+            (if deme = fourth then (state third).rightContrast else 0)) / 4 := by
+  have hleftGradient :
+      (twoLocusHJet first second).gradientAt deme state =
+        fun haplotype ↦
+          ((if deme = first then (state second).leftContrast else 0) +
+            (if deme = second then (state first).leftContrast else 0)) *
+              twoLocusLeftAlleleIndicator haplotype := by
+    funext haplotype
+    exact twoLocusHJet_gradientAt state deme first second haplotype
+  have hrightGradient :
+      (twoLocusRightHJet third fourth).gradientAt deme state =
+        fun haplotype ↦
+          ((if deme = third then (state fourth).rightContrast else 0) +
+            (if deme = fourth then (state third).rightContrast else 0)) *
+              twoLocusRightAlleleIndicator haplotype := by
+    funext haplotype
+    exact twoLocusRightHJet_gradientAt state deme third fourth haplotype
+  simp only [twoLocusPi2Jet, TwoLocusDiffusionJet.smul,
+    TwoLocusDiffusionJet.mul]
+  rw [twoLocusHJet_driftAt, twoLocusRightHJet_driftAt]
+  rw [hleftGradient, hrightGradient]
+  rw [twoLocusHaplotypeCovariance_scaled_left_right]
+  split_ifs <;> ring
 
 /-- The generalized four-deme `pi2` observable in centered contrast form. -/
 theorem twoLocusJointHeterozygosity_eq_contrasts
