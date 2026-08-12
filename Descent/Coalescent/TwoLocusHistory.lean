@@ -2946,6 +2946,95 @@ theorem twoLocusWeightedJetDrift_pi2_sparse {D : ℕ}
     sum_mul_conditionalDemeIndicator, sum_mul_conditionalDemeIndicator]
   split_ifs <;> ring
 
+/-- The equality-patterned `pi2` row in `lowOrderLDDrift` is precisely the sparse
+six-channel law derived from the haplotype-simplex diffusion. -/
+theorem twoLocusWeightedJetDrift_pi2_eq_lowOrderLDDrift {D : ℕ}
+    (rates : ManyDemeLDRates D)
+    (state : Fin D → TwoLocusHaplotypeFrequencies)
+    (first second third fourth : Fin D) :
+    twoLocusWeightedJetDrift rates.coalescence state
+        (.pi2 first second third fourth) =
+      lowOrderLDDrift rates (twoLocusJetMoment state)
+        (.pi2 first second third fourth) := by
+  rw [twoLocusWeightedJetDrift_pi2_sparse]
+  by_cases hall : first = second ∧ second = third ∧ third = fourth
+  · rcases hall with ⟨h12, h23, h34⟩
+    subst second
+    subst third
+    subst fourth
+    simp [eq_comm, lowOrderLDDrift, twoLocusJetMoment,
+      twoLocusCoordinateJet] <;> ring
+  · by_cases h123 : first = second ∧ second = third
+    · rcases h123 with ⟨h12, h23⟩
+      subst second
+      subst third
+      simp_all [eq_comm, lowOrderLDDrift, twoLocusJetMoment,
+        twoLocusCoordinateJet] <;> ring
+    · by_cases h124 : first = second ∧ second = fourth
+      · rcases h124 with ⟨h12, h24⟩
+        subst second
+        subst fourth
+        simp_all [eq_comm, lowOrderLDDrift, twoLocusJetMoment,
+          twoLocusCoordinateJet] <;> ring
+      · by_cases h134 : first = third ∧ third = fourth
+        · rcases h134 with ⟨h13, h34⟩
+          subst third
+          subst fourth
+          simp_all [eq_comm, lowOrderLDDrift, twoLocusJetMoment,
+            twoLocusCoordinateJet] <;> ring
+        · by_cases h234 : second = third ∧ third = fourth
+          · rcases h234 with ⟨h23, h34⟩
+            subst third
+            subst fourth
+            simp_all [eq_comm, lowOrderLDDrift, twoLocusJetMoment,
+              twoLocusCoordinateJet] <;> ring
+          · by_cases hpairs : first = second ∧ third = fourth
+            · rcases hpairs with ⟨h12, h34⟩
+              subst second
+              subst fourth
+              simp_all [eq_comm, lowOrderLDDrift, twoLocusJetMoment,
+                twoLocusCoordinateJet] <;> ring
+            · by_cases hcross :
+                (first = third ∧ second = fourth) ∨
+                  (first = fourth ∧ second = third)
+              · rcases hcross with h13_24 | h14_23
+                · rcases h13_24 with ⟨h13, h24⟩
+                  subst third
+                  subst fourth
+                  simp_all [eq_comm, lowOrderLDDrift, twoLocusJetMoment,
+                    twoLocusCoordinateJet] <;> ring
+                · rcases h14_23 with ⟨h14, h23⟩
+                  subst fourth
+                  subst third
+                  simp_all [eq_comm, lowOrderLDDrift, twoLocusJetMoment,
+                    twoLocusCoordinateJet] <;> ring
+              · by_cases h12 : first = second
+                · subst second
+                  simp_all [eq_comm, lowOrderLDDrift, twoLocusJetMoment,
+                    twoLocusCoordinateJet] <;> ring
+                · by_cases h13 : first = third
+                  · subst third
+                    simp_all [eq_comm, lowOrderLDDrift, twoLocusJetMoment,
+                      twoLocusCoordinateJet] <;> ring
+                  · by_cases h14 : first = fourth
+                    · subst fourth
+                      simp_all [eq_comm, lowOrderLDDrift, twoLocusJetMoment,
+                        twoLocusCoordinateJet] <;> ring
+                    · by_cases h23 : second = third
+                      · subst third
+                        simp_all [eq_comm, lowOrderLDDrift, twoLocusJetMoment,
+                          twoLocusCoordinateJet] <;> ring
+                      · by_cases h24 : second = fourth
+                        · subst fourth
+                          simp_all [eq_comm, lowOrderLDDrift, twoLocusJetMoment,
+                            twoLocusCoordinateJet] <;> ring
+                        · by_cases h34 : third = fourth
+                          · subst fourth
+                            simp_all [eq_comm, lowOrderLDDrift, twoLocusJetMoment,
+                              twoLocusCoordinateJet] <;> ring
+                          · simp_all [eq_comm, lowOrderLDDrift, twoLocusJetMoment,
+                              twoLocusCoordinateJet]
+
 /-- Continuous migration contribution.  Each lineage index migrates separately.  The extra
 `Dz` and `pi2` differences are exactly the terms created because `D` is nonlinear in
 haplotype frequencies; this is where migration restores shared linkage. -/
