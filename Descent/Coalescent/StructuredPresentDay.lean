@@ -2266,6 +2266,127 @@ theorem DemographicTwoLocusMoments.panelTransportRatio_nonneg {D n : ℕ}
   unfold DemographicTwoLocusMoments.panelTransportRatio
   exact mul_nonneg (sq_nonneg _) (sq_nonneg _)
 
+/-- Realizability domain for a panel-wide portability bound.  In addition to evaluability of
+the transport ratio, every marker separation carries its exact two-deme covariance
+certificate. -/
+structure DemographicTwoLocusMoments.PanelTransportCauchyDomain {D n : ℕ}
+    (moments : DemographicTwoLocusMoments D) (panel : Fin n → MarkerSeparationBp)
+    (hetRho : MarkerSeparationBp) (source target : Fin D) : Prop extends
+      moments.PanelTransportDomain panel hetRho source target where
+  pairDomain : ∀ k, moments.LDPairDomain (panel k) source target
+
+/-- The panel-wide Cauchy upper envelope.  The linkage contribution is the ratio of total
+target to total source within-deme `DD`; the heterozygosity scale is the same exact factor as
+in `panelTransportRatio`. -/
+noncomputable def DemographicTwoLocusMoments.panelTransportCauchyBound {D n : ℕ}
+    (moments : DemographicTwoLocusMoments D) (panel : Fin n → MarkerSeparationBp)
+    (hetRho : MarkerSeparationBp) (source target : Fin D) : ℝ :=
+  ((∑ k, moments.DD (panel k) target target) /
+      (∑ k, moments.DD (panel k) source source)) *
+    (moments.H hetRho source source / moments.H hetRho target target) ^ 2
+
+/-- The Cauchy envelope is normalized exactly at the training deme. -/
+theorem DemographicTwoLocusMoments.panelTransportCauchyBound_self {D n : ℕ}
+    (moments : DemographicTwoLocusMoments D) (panel : Fin n → MarkerSeparationBp)
+    (hetRho : MarkerSeparationBp) (source : Fin D)
+    (domain : moments.PanelTransportDomain panel hetRho source source) :
+    moments.panelTransportCauchyBound panel hetRho source source = 1 := by
+  unfold DemographicTwoLocusMoments.panelTransportCauchyBound
+  rw [div_self domain.panelWithin_pos.ne', div_self domain.sourceHet_pos.ne']
+  norm_num
+
+/-- The coherent cross-deme panel linkage is bounded by the product of the two within-deme
+panel linkage masses.  This is derived from each propagated `DD` covariance certificate and
+finite Cauchy--Schwarz; no panel-level fitted constant or bound is assumed. -/
+theorem DemographicTwoLocusMoments.panelCrossSum_sq_le {D n : ℕ}
+    (moments : DemographicTwoLocusMoments D) (panel : Fin n → MarkerSeparationBp)
+    (source target : Fin D)
+    (pairDomain : ∀ k, moments.LDPairDomain (panel k) source target) :
+    (∑ k, moments.DD (panel k) source target) ^ 2 ≤
+      (∑ k, moments.DD (panel k) source source) *
+        (∑ k, moments.DD (panel k) target target) := by
+  let sourceWithin : Fin n → ℝ := fun k ↦ moments.DD (panel k) source source
+  let targetWithin : Fin n → ℝ := fun k ↦ moments.DD (panel k) target target
+  let cross : Fin n → ℝ := fun k ↦ moments.DD (panel k) source target
+  have hsource (k : Fin n) : 0 ≤ sourceWithin k :=
+    (pairDomain k).firstWithin_pos.le
+  have htarget (k : Fin n) : 0 ≤ targetWithin k :=
+    (pairDomain k).secondWithin_pos.le
+  have hterm (k : Fin n) :
+      |cross k| ≤ Real.sqrt (sourceWithin k) * Real.sqrt (targetWithin k) := by
+    calc
+      |cross k| ≤ Real.sqrt (sourceWithin k * targetWithin k) :=
+        Real.abs_le_sqrt (pairDomain k).cross_sq_le
+      _ = Real.sqrt (sourceWithin k) * Real.sqrt (targetWithin k) := by
+        rw [Real.sqrt_mul (hsource k)]
+  have habs :
+      |∑ k, cross k| ≤
+        Real.sqrt (∑ k, sourceWithin k) * Real.sqrt (∑ k, targetWithin k) := by
+    calc
+      |∑ k, cross k| ≤ ∑ k, |cross k| := Finset.abs_sum_le_sum_abs _ _
+      _ ≤ ∑ k, Real.sqrt (sourceWithin k) * Real.sqrt (targetWithin k) :=
+        Finset.sum_le_sum fun k _ ↦ hterm k
+      _ ≤ Real.sqrt (∑ k, sourceWithin k) * Real.sqrt (∑ k, targetWithin k) :=
+        Real.sum_sqrt_mul_sqrt_le Finset.univ hsource htarget
+  have hsourceSum : 0 ≤ ∑ k, sourceWithin k :=
+    Finset.sum_nonneg fun k _ ↦ hsource k
+  have htargetSum : 0 ≤ ∑ k, targetWithin k :=
+    Finset.sum_nonneg fun k _ ↦ htarget k
+  calc
+    (∑ k, moments.DD (panel k) source target) ^ 2 = |∑ k, cross k| ^ 2 := by
+      simp only [cross, sq_abs]
+    _ ≤ (Real.sqrt (∑ k, sourceWithin k) *
+        Real.sqrt (∑ k, targetWithin k)) ^ 2 :=
+      (sq_le_sq₀ (abs_nonneg _) (mul_nonneg (Real.sqrt_nonneg _) (Real.sqrt_nonneg _))).2 habs
+    _ = (∑ k, moments.DD (panel k) source source) *
+        (∑ k, moments.DD (panel k) target target) := by
+      rw [mul_pow, Real.sq_sqrt hsourceSum, Real.sq_sqrt htargetSum]
+
+/-- **Certified portability bound for every finite panel and every finite demography.**
+
+The exact transported accuracy ratio cannot exceed the panel-wide Cauchy envelope.  Because
+the demographic history is already inside every `H` and `DD` entry, this theorem applies
+unchanged to chains, two-dimensional grids, three-dimensional grids, arbitrary migration
+graphs, and arbitrary split/rate-change histories. -/
+theorem DemographicTwoLocusMoments.panelTransportRatio_le_cauchyBound {D n : ℕ}
+    (moments : DemographicTwoLocusMoments D) (panel : Fin n → MarkerSeparationBp)
+    (hetRho : MarkerSeparationBp) (source target : Fin D)
+    (domain : moments.PanelTransportCauchyDomain panel hetRho source target) :
+    moments.panelTransportRatio panel hetRho source target
+        domain.toPanelTransportDomain ≤
+      moments.panelTransportCauchyBound panel hetRho source target := by
+  let sourceSum := ∑ k, moments.DD (panel k) source source
+  let targetSum := ∑ k, moments.DD (panel k) target target
+  let crossSum := ∑ k, moments.DD (panel k) source target
+  let heterozygosityFactor :=
+    (moments.H hetRho source source / moments.H hetRho target target) ^ 2
+  have hsource : 0 < sourceSum := domain.panelWithin_pos
+  have hcross : crossSum ^ 2 ≤ sourceSum * targetSum :=
+    moments.panelCrossSum_sq_le panel source target domain.pairDomain
+  have hlinkage : (crossSum / sourceSum) ^ 2 ≤ targetSum / sourceSum := by
+    rw [div_pow]
+    calc
+      crossSum ^ 2 / sourceSum ^ 2 ≤ (sourceSum * targetSum) / sourceSum ^ 2 :=
+        (div_le_div_iff_of_pos_right (sq_pos_of_pos hsource)).2 hcross
+      _ = targetSum / sourceSum := by
+        field_simp [hsource.ne']
+  unfold DemographicTwoLocusMoments.panelTransportRatio
+    DemographicTwoLocusMoments.panelTransportCauchyBound
+  dsimp only [sourceSum, targetSum, crossSum, heterozygosityFactor] at hlinkage ⊢
+  exact mul_le_mul_of_nonneg_right hlinkage (sq_nonneg _)
+
+/-- The panel portability bound is attained at the source population, so it is not a purely
+formal loose envelope. -/
+theorem DemographicTwoLocusMoments.panelTransportRatio_eq_cauchyBound_self {D n : ℕ}
+    (moments : DemographicTwoLocusMoments D) (panel : Fin n → MarkerSeparationBp)
+    (hetRho : MarkerSeparationBp) (source : Fin D)
+    (domain : moments.PanelTransportCauchyDomain panel hetRho source source) :
+    moments.panelTransportRatio panel hetRho source source
+        domain.toPanelTransportDomain =
+      moments.panelTransportCauchyBound panel hetRho source source := by
+  rw [moments.panelTransportRatio_self panel hetRho source domain.toPanelTransportDomain,
+    moments.panelTransportCauchyBound_self panel hetRho source domain.toPanelTransportDomain]
+
 /-- **On a symmetric pair the transport ratio IS the joint-channel linkage factor.**  With a
 single panel separation, equal within-deme linkage and equal heterozygosity, the ratio
 reduces to `accuracyLinkageFactor` -- the equal-size specialization that made the superseded
