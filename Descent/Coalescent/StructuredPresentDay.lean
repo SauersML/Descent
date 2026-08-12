@@ -385,6 +385,29 @@ noncomputable def matrixExponential {ι : Type*} [Fintype ι] [DecidableEq ι]
     (A : Matrix ι ι ℝ) (time : ℝ) : Matrix ι ι ℝ :=
   ∑' power : ℕ, ((power.factorial : ℝ)⁻¹) • ((time • A) ^ power)
 
+/-- Transposition commutes exactly with the custom matrix exponential.  This is the
+algebraic step that turns forward moment propagation into the backward sampling dual; it
+uses the complete convergent series, not a time discretization or a truncated ladder. -/
+theorem matrixExponential_transpose {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : Matrix ι ι ℝ) (time : ℝ) :
+    matrixExponential A.transpose time = (matrixExponential A time).transpose := by
+  unfold matrixExponential
+  rw [Matrix.transpose_tsum]
+  apply tsum_congr
+  intro power
+  rw [Matrix.transpose_smul, Matrix.transpose_pow, Matrix.transpose_smul]
+
+/-- Exact forward/backward pairing for a finite moment generator.  A requested terminal
+functional `probe` may be propagated through the transposed generator and paired with the
+initial state instead of constructing the full forward moment vector.  This identity is the
+finite-dimensional sampling-dual law used by sparse uniformization and Krylov evaluators. -/
+theorem matrixExponential_samplingDual {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : Matrix ι ι ℝ) (time : ℝ) (probe state : ι → ℝ) :
+    probe ⬝ᵥ (matrixExponential A time).mulVec state =
+      (matrixExponential A.transpose time).mulVec probe ⬝ᵥ state := by
+  rw [Matrix.dotProduct_mulVec, ← Matrix.mulVec_transpose,
+    ← matrixExponential_transpose]
+
 /-- The series used by `matrixExponential` is summable for every finite real matrix and
 every real time.  The operator norm is introduced only inside the proof; the exponential's
 definition and all downstream demographic objects remain independent of a chosen matrix
@@ -963,6 +986,29 @@ noncomputable def ManyDemeMomentEpoch.propagator {D K : ℕ}
     Matrix (AffineManyDemeMomentCoordinate D K) (AffineManyDemeMomentCoordinate D K) ℝ :=
   matrixExponential (augmentedManyDemeMomentGenerator epoch.rates K) epoch.duration
 
+/-- Backward sampling-dual propagator for one arbitrary-deme epoch.  Its carrier is the same
+finite degree-`K` coordinate space as the forward law, but it evolves only the requested
+terminal functional. -/
+noncomputable def ManyDemeMomentEpoch.dualPropagator {D K : ℕ}
+    (epoch : ManyDemeMomentEpoch D K) :
+    Matrix (AffineManyDemeMomentCoordinate D K) (AffineManyDemeMomentCoordinate D K) ℝ :=
+  matrixExponential (augmentedManyDemeMomentGenerator epoch.rates K).transpose epoch.duration
+
+/-- The epoch dual is exactly the transpose of the forward propagator. -/
+theorem ManyDemeMomentEpoch.dualPropagator_eq_transpose {D K : ℕ}
+    (epoch : ManyDemeMomentEpoch D K) :
+    epoch.dualPropagator = epoch.propagator.transpose := by
+  exact matrixExponential_transpose _ _
+
+/-- One-epoch sampling duality for every arbitrary migration matrix, mutation vector,
+coalescence vector, truncation degree, terminal probe, and initial moment state. -/
+theorem ManyDemeMomentEpoch.samplingDual {D K : ℕ}
+    (epoch : ManyDemeMomentEpoch D K)
+    (probe state : AffineManyDemeMomentCoordinate D K → ℝ) :
+    probe ⬝ᵥ epoch.propagator.mulVec state =
+      epoch.dualPropagator.mulVec probe ⬝ᵥ state := by
+  exact matrixExponential_samplingDual _ _ _ _
+
 /-- The explicit affine constant is conserved by every arbitrary-deme moment epoch. -/
 theorem ManyDemeMomentEpoch.propagator_none {D K : ℕ}
     (epoch : ManyDemeMomentEpoch D K)
@@ -992,20 +1038,61 @@ def mergeSplitExponent {D : ℕ} (parent child : Fin D)
   fun d ↦ if d = parent then exponent parent + exponent child
     else if d = child then 0 else exponent d
 
+/-- Sparse linear split operator on the constant-augmented moment carrier.  Every biological
+row has at most one nonzero entry: the pre-split coordinate obtained by merging the child's
+exponent into its parent.  Coordinates whose merged exponent leaves the degree rectangle
+have a zero row, exactly as in `manyDemeMomentVectorTable`. -/
+noncomputable def splitManyDemeMomentPropagator {D K : ℕ}
+    (parent child : Fin D) :
+    Matrix (AffineManyDemeMomentCoordinate D K) (AffineManyDemeMomentCoordinate D K) ℝ
+  | none, none => 1
+  | none, some _ => 0
+  | some _, none => 0
+  | some row, some column =>
+      if hbound : ∀ d,
+          mergeSplitExponent parent child (fun d ↦ (row d).val) d < K + 1 then
+        if column = fun d ↦
+            ⟨mergeSplitExponent parent child (fun d ↦ (row d).val) d, hbound d⟩
+          then 1 else 0
+      else 0
+
 /-- Exact instantaneous split transform on a finite moment state. -/
 noncomputable def splitManyDemeMomentState {D K : ℕ}
     (parent child : Fin D)
     (state : AffineManyDemeMomentCoordinate D K → ℝ) :
     AffineManyDemeMomentCoordinate D K → ℝ
-  | none => 1
+  | none => state none
   | some coordinate =>
       manyDemeMomentVectorTable K (fun oldCoordinate ↦ state (some oldCoordinate))
         (mergeSplitExponent parent child (fun d ↦ (coordinate d).val))
 
-/-- A split resets the affine constant to its normalized value. -/
+/-- The split function is exactly multiplication by its sparse matrix on every augmented
+state.  In particular, normalization is a proved invariant of reachable states rather than a
+literal silently injected by the instantaneous operator. -/
+theorem splitManyDemeMomentPropagator_mulVec {D K : ℕ}
+    (parent child : Fin D)
+    (state : AffineManyDemeMomentCoordinate D K → ℝ) :
+    (splitManyDemeMomentPropagator parent child).mulVec state =
+      splitManyDemeMomentState parent child state := by
+  funext row
+  cases row with
+  | none =>
+      simp [Matrix.mulVec, dotProduct, splitManyDemeMomentPropagator,
+        splitManyDemeMomentState]
+  | some row =>
+      let merged := mergeSplitExponent parent child (fun d ↦ (row d).val)
+      by_cases hbound : ∀ d, merged d < K + 1
+      · let column : ManyDemeMomentCoordinate D K := fun d ↦ ⟨merged d, hbound d⟩
+        simp [Matrix.mulVec, dotProduct, splitManyDemeMomentPropagator,
+          splitManyDemeMomentState, manyDemeMomentVectorTable, merged, hbound,
+          column]
+      · simp [Matrix.mulVec, dotProduct, splitManyDemeMomentPropagator,
+          splitManyDemeMomentState, manyDemeMomentVectorTable, merged, hbound]
+
+/-- A split preserves the explicit affine constant coordinate. -/
 theorem splitManyDemeMomentState_none {D K : ℕ} (parent child : Fin D)
     (state : AffineManyDemeMomentCoordinate D K → ℝ) :
-    splitManyDemeMomentState parent child state none = 1 :=
+    splitManyDemeMomentState parent child state none = state none :=
   rfl
 
 /-- A split preserves the rectangular degree-zero padding coordinate. -/
@@ -1020,14 +1107,105 @@ inductive ManyDemeMomentInstruction (D K : ℕ) where
   | evolve (epoch : ManyDemeMomentEpoch D K)
   | split (parent child : Fin D)
 
+/-- Exact forward matrix associated with either kind of demographic instruction. -/
+noncomputable def ManyDemeMomentInstruction.propagator {D K : ℕ}
+    (instruction : ManyDemeMomentInstruction D K) :
+    Matrix (AffineManyDemeMomentCoordinate D K) (AffineManyDemeMomentCoordinate D K) ℝ :=
+  match instruction with
+  | .evolve epoch => epoch.propagator
+  | .split parent child => splitManyDemeMomentPropagator parent child
+
+/-- Apply one instruction in the original state-space presentation. -/
+noncomputable def ManyDemeMomentInstruction.apply {D K : ℕ}
+    (instruction : ManyDemeMomentInstruction D K)
+    (state : AffineManyDemeMomentCoordinate D K → ℝ) :
+    AffineManyDemeMomentCoordinate D K → ℝ :=
+  match instruction with
+  | .evolve epoch => epoch.propagator.mulVec state
+  | .split parent child => splitManyDemeMomentState parent child state
+
+/-- Matrix multiplication and direct application of one instruction coincide on every
+augmented state. -/
+theorem ManyDemeMomentInstruction.propagator_mulVec {D K : ℕ}
+    (instruction : ManyDemeMomentInstruction D K)
+    (state : AffineManyDemeMomentCoordinate D K → ℝ) :
+    instruction.propagator.mulVec state = instruction.apply state := by
+  cases instruction with
+  | evolve => rfl
+  | split parent child =>
+      exact splitManyDemeMomentPropagator_mulVec parent child state
+
 /-- Execute an arbitrary finite sequence of exact demographic moment instructions. -/
 noncomputable def propagateManyDemeMomentInstructions {D K : ℕ}
     (instructions : List (ManyDemeMomentInstruction D K))
     (initial : AffineManyDemeMomentCoordinate D K → ℝ) :
     AffineManyDemeMomentCoordinate D K → ℝ :=
-  instructions.foldl (fun state instruction ↦ match instruction with
-    | .evolve epoch => epoch.propagator.mulVec state
-    | .split parent child => splitManyDemeMomentState parent child state) initial
+  instructions.foldl (fun state instruction ↦ instruction.apply state) initial
+
+/-- Ordered forward product for a complete arbitrary-deme instruction history.  For
+`[M₁, M₂, ...]`, this is `... * M₂ * M₁`, the matrix acting on a column initial state. -/
+noncomputable def manyDemeMomentHistoryPropagator {D K : ℕ} :
+    List (ManyDemeMomentInstruction D K) →
+      Matrix (AffineManyDemeMomentCoordinate D K)
+        (AffineManyDemeMomentCoordinate D K) ℝ
+  | [] => 1
+  | instruction :: remaining =>
+      manyDemeMomentHistoryPropagator remaining * instruction.propagator
+
+/-- Direct instruction execution equals multiplication by the ordered history product. -/
+theorem manyDemeMomentHistoryPropagator_mulVec {D K : ℕ}
+    (instructions : List (ManyDemeMomentInstruction D K))
+    (initial : AffineManyDemeMomentCoordinate D K → ℝ) :
+    (manyDemeMomentHistoryPropagator instructions).mulVec initial =
+      propagateManyDemeMomentInstructions instructions initial := by
+  induction instructions generalizing initial with
+  | nil => simp [manyDemeMomentHistoryPropagator,
+      propagateManyDemeMomentInstructions]
+  | cons instruction remaining ih =>
+      rw [manyDemeMomentHistoryPropagator, ← Matrix.mulVec_mulVec,
+        instruction.propagator_mulVec, ih]
+      rfl
+
+/-- Transposed matrix for one backward sampling-dual instruction. -/
+noncomputable def ManyDemeMomentInstruction.dualPropagator {D K : ℕ}
+    (instruction : ManyDemeMomentInstruction D K) :
+    Matrix (AffineManyDemeMomentCoordinate D K) (AffineManyDemeMomentCoordinate D K) ℝ :=
+  instruction.propagator.transpose
+
+/-- Exact backward product for an instruction history.  It traverses the list structurally
+in reverse operator order without ever constructing the dense forward state. -/
+noncomputable def manyDemeMomentHistoryDualPropagator {D K : ℕ} :
+    List (ManyDemeMomentInstruction D K) →
+      Matrix (AffineManyDemeMomentCoordinate D K)
+        (AffineManyDemeMomentCoordinate D K) ℝ
+  | [] => 1
+  | instruction :: remaining =>
+      instruction.dualPropagator * manyDemeMomentHistoryDualPropagator remaining
+
+/-- The structural backward product is exactly the transpose of the complete forward
+history product, including every epoch and instantaneous split. -/
+theorem manyDemeMomentHistoryDualPropagator_eq_transpose {D K : ℕ}
+    (instructions : List (ManyDemeMomentInstruction D K)) :
+    manyDemeMomentHistoryDualPropagator instructions =
+      (manyDemeMomentHistoryPropagator instructions).transpose := by
+  induction instructions with
+  | nil => simp [manyDemeMomentHistoryDualPropagator,
+      manyDemeMomentHistoryPropagator]
+  | cons instruction remaining ih =>
+      simp [manyDemeMomentHistoryDualPropagator, manyDemeMomentHistoryPropagator,
+        ManyDemeMomentInstruction.dualPropagator, Matrix.transpose_mul, ih]
+
+/-- History-wide sampling-dual law for arbitrary finite deme count, migration matrix, rate
+changes, sizes, mutation rates, and split sequence.  A terminal statistic is evaluated by
+propagating its probe backward and taking one initial-state dot product. -/
+theorem propagateManyDemeMomentInstructions_samplingDual {D K : ℕ}
+    (instructions : List (ManyDemeMomentInstruction D K))
+    (probe initial : AffineManyDemeMomentCoordinate D K → ℝ) :
+    probe ⬝ᵥ propagateManyDemeMomentInstructions instructions initial =
+      (manyDemeMomentHistoryDualPropagator instructions).mulVec probe ⬝ᵥ initial := by
+  rw [← manyDemeMomentHistoryPropagator_mulVec,
+    Matrix.dotProduct_mulVec, ← Matrix.mulVec_transpose,
+    ← manyDemeMomentHistoryDualPropagator_eq_transpose]
 
 /-- At a common ancestor all deme frequencies coincide, so a mixed moment depends only on
 the total exponent. -/
@@ -1986,7 +2164,7 @@ def mergeSplitDemeLabel {D : ℕ} (parent child label : Fin D) : Fin D :=
 def splitPairDivergenceState {D : ℕ} (parent child : Fin D)
     (state : AffinePairDivergenceCoordinate D → ℝ) :
     AffinePairDivergenceCoordinate D → ℝ
-  | none => 1
+  | none => state none
   | some (first, second) =>
       state (some (mergeSplitDemeLabel parent child first,
         mergeSplitDemeLabel parent child second))
@@ -2091,7 +2269,6 @@ theorem manyDemePairDivergenceProjection_split {D : ℕ} (parent child : Fin D)
       simp only [Nat.reduceAdd, Nat.reduceLT, forall_const, ↓reduceDIte]
       rw [mergeSplitExponent_zero parent child]
       rw [dif_pos (by intro; trivial), hzero]
-      norm_num
   | some pair =>
       rcases pair with ⟨first, second⟩
       simp only [splitPairDivergenceState, momentPairDivergence]

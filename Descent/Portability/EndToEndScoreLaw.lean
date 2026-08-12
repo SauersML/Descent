@@ -517,7 +517,8 @@ noncomputable def CommonDiffusionState.split {demeCount : ℕ}
               common.marginal_zeroCoordinate),
         Coalescent.lowOrderLDHProjection_split parent child common.joint common.joint_constant,
         common.projection_eq]
-    marginal_constant := Coalescent.splitManyDemeMomentState_none parent child common.marginal
+    marginal_constant := by
+      rw [Coalescent.splitManyDemeMomentState_none, common.marginal_constant]
     marginal_zeroCoordinate := by
       rw [Coalescent.splitManyDemeMomentState_zeroCoordinate,
         common.marginal_zeroCoordinate]
@@ -658,6 +659,7 @@ theorem runCommonDiffusionEvents_marginal {demeCount : ℕ}
       cases event <;>
         simp [runCommonDiffusionEvents, compileMomentEvents,
           Coalescent.propagateManyDemeMomentInstructions, List.foldl_append,
+          Coalescent.ManyDemeMomentInstruction.apply,
           CommonDiffusionState.evolve, CommonDiffusionState.split, ih]
 
 /-- The joint component of synchronized execution is exactly the existing low-order two-locus
@@ -826,7 +828,8 @@ theorem PipelineDemographicHistory.presentCommonDiffusionState_marginal
   simp [CommonDiffusionState.evolve,
     PipelineDemographicHistory.oneLocusMomentInstructions,
     PipelineDemographicHistory.initialCommonDiffusionState,
-    Coalescent.propagateManyDemeMomentInstructions, List.foldl_append, compiled, initial]
+    Coalescent.propagateManyDemeMomentInstructions,
+    Coalescent.ManyDemeMomentInstruction.apply, List.foldl_append, compiled, initial]
 
 /-- Complete concrete two-locus history at one physical marker separation.
 
