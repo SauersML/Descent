@@ -686,6 +686,27 @@ structure ManyDemeRates (D : ℕ) where
   forwardMutation_nonneg : ∀ d, 0 ≤ forwardMutation d
   backwardMutation_nonneg : ∀ d, 0 ≤ backwardMutation d
 
+/-- The homogeneous augmentation of the expected allelic-divergence evolution law.
+
+The final argument is the degree-zero moment carried as an explicit affine coordinate.  A
+probability moment table supplies `constant = 1`; matrix columns supply either zero or one.
+Making that coordinate explicit is what permits the generator identity below to lift through
+matrix multiplication without pretending that individual basis columns are probability
+laws. -/
+noncomputable def symmetricPairDivergenceAffineDerivative {D : ℕ}
+    (coalescence : Fin D → ℝ) (migration : Fin D → Fin D → ℝ)
+    (mutation : Fin D → ℝ) (divergence : Fin D → Fin D → ℝ)
+    (constant : ℝ) (first second : Fin D) : ℝ :=
+  (if first = second then
+      -coalescence first * divergence first second
+    else 0) +
+    (∑ target, migration first target *
+      (divergence target second - divergence first second)) +
+    (∑ target, migration second target *
+      (divergence first target - divergence first second)) -
+    (mutation first + mutation second) * divergence first second +
+    (mutation first + mutation second) / 2 * constant
+
 /-- The closed affine evolution law for expected allelic divergence
 `H(i,j) = E[X_i] + E[X_j] - 2 E[X_i X_j]` under symmetric recurrent mutation.
 
@@ -696,15 +717,7 @@ noncomputable def symmetricPairDivergenceDerivative {D : ℕ}
     (coalescence : Fin D → ℝ) (migration : Fin D → Fin D → ℝ)
     (mutation : Fin D → ℝ) (divergence : Fin D → Fin D → ℝ)
     (first second : Fin D) : ℝ :=
-  (if first = second then
-      -coalescence first * divergence first second
-    else 0) +
-    (∑ target, migration first target *
-      (divergence target second - divergence first second)) +
-    (∑ target, migration second target *
-      (divergence first target - divergence first second)) -
-    (mutation first + mutation second) * divergence first second +
-    (mutation first + mutation second) / 2
+  symmetricPairDivergenceAffineDerivative coalescence migration mutation divergence 1 first second
 
 /-- Lower one exponent, using truncated subtraction only at the coordinate whose coefficient
 already guarantees a positive exponent. -/
@@ -972,25 +985,25 @@ private theorem migrate_oneDemeExponent_two_weighted {D : ℕ} (rates : ManyDeme
     simp only [migrateExponent, pairExponent, oneDemeExponent]
     split_ifs <;> simp_all
 
-/-- The arbitrary-deme one-locus generator projects exactly to the shared pair-divergence
-generator when forward and backward mutation rates agree.
+/-- The arbitrary-deme one-locus generator projects exactly to the homogeneous affine
+pair-divergence generator when forward and backward mutation rates agree.
 
 The diagonal branch contains coalescence and two copies of lineage migration; the
 off-diagonal branch contains one migration sum for each lineage.  In both branches the total
 mutation coordinate is `forward + backward`, exactly the convention consumed by the
-two-locus `H` row.  This is an identity of generators for every normalized moment table,
-not a closure or equilibrium calculation. -/
-theorem manyDemeMomentGenerator_pairDivergence {D : ℕ} (rates : ManyDemeRates D)
+two-locus `H` row.  The degree-zero moment is retained explicitly, so this identity applies
+both to normalized probability moments and to every column of the augmented generator
+matrix.  It is not a closure or equilibrium calculation. -/
+theorem manyDemeMomentGenerator_pairDivergence_affine {D : ℕ} (rates : ManyDemeRates D)
     (moment : (Fin D → ℕ) → ℝ)
-    (hnormalized : moment (fun _ ↦ 0) = 1)
     (hsymmetric : ∀ deme, rates.backwardMutation deme = rates.forwardMutation deme)
     (first second : Fin D) :
     manyDemeMomentGenerator rates moment (oneDemeExponent first 1) +
         manyDemeMomentGenerator rates moment (oneDemeExponent second 1) -
         2 * manyDemeMomentGenerator rates moment (pairExponent first second 1 1) =
-      symmetricPairDivergenceDerivative rates.coalescence rates.migration
+      symmetricPairDivergenceAffineDerivative rates.coalescence rates.migration
         (fun deme ↦ rates.forwardMutation deme + rates.backwardMutation deme)
-        (momentPairDivergence moment) first second := by
+        (momentPairDivergence moment) (moment (fun _ ↦ 0)) first second := by
   classical
   have hsingle (deme : Fin D) :
       manyDemeMomentGenerator rates moment (oneDemeExponent deme 1) =
@@ -1155,8 +1168,8 @@ theorem manyDemeMomentGenerator_pairDivergence {D : ℕ} (rates : ManyDemeRates 
       congr 1 <;> apply Finset.sum_congr rfl <;> intro target _ <;> ring
     rw [hdivergenceSums] at hmigrationIdentity
     rw [hpairSelf, hsingle first, hdouble]
-    simp only [symmetricPairDivergenceDerivative, if_pos, momentPairDivergence]
-    rw [hsymmetric first, hnormalized]
+    simp only [symmetricPairDivergenceAffineDerivative, if_pos, momentPairDivergence]
+    rw [hsymmetric first]
     simp [hpairSelf]
     simp_rw [hpairComm]
     linear_combination hmigrationIdentity
@@ -1328,10 +1341,376 @@ theorem manyDemeMomentGenerator_pairDivergence {D : ℕ} (rates : ManyDemeRates 
       intro target _
       ring
     rw [hsingle first, hsingle second, hpair]
-    simp only [symmetricPairDivergenceDerivative, if_neg hsame, zero_add,
+    simp only [symmetricPairDivergenceAffineDerivative, if_neg hsame, zero_add,
       momentPairDivergence]
-    rw [hsymmetric first, hsymmetric second, hnormalized]
+    rw [hsymmetric first, hsymmetric second]
     linear_combination hmigrationFirst + hmigrationSecond
+
+/-- The probability-law specialization of
+`manyDemeMomentGenerator_pairDivergence_affine`: normalized moment tables have affine
+coordinate one and therefore obey the shared closed divergence law. -/
+theorem manyDemeMomentGenerator_pairDivergence {D : ℕ} (rates : ManyDemeRates D)
+    (moment : (Fin D → ℕ) → ℝ)
+    (hnormalized : moment (fun _ ↦ 0) = 1)
+    (hsymmetric : ∀ deme, rates.backwardMutation deme = rates.forwardMutation deme)
+    (first second : Fin D) :
+    manyDemeMomentGenerator rates moment (oneDemeExponent first 1) +
+        manyDemeMomentGenerator rates moment (oneDemeExponent second 1) -
+        2 * manyDemeMomentGenerator rates moment (pairExponent first second 1 1) =
+      symmetricPairDivergenceDerivative rates.coalescence rates.migration
+        (fun deme ↦ rates.forwardMutation deme + rates.backwardMutation deme)
+        (momentPairDivergence moment) first second := by
+  rw [manyDemeMomentGenerator_pairDivergence_affine rates moment hsymmetric first second,
+    symmetricPairDivergenceDerivative, hnormalized]
+
+/-! ### Finite affine projection onto pairwise divergence -/
+
+/-- Ordered deme pairs carrying the closed allelic-divergence subsystem. -/
+abbrev PairDivergenceCoordinate (D : ℕ) := Fin D × Fin D
+
+/-- Constant-augmented carrier for the closed pair-divergence subsystem. -/
+abbrev AffinePairDivergenceCoordinate (D : ℕ) := Option (PairDivergenceCoordinate D)
+
+/-- Read an affine pair-divergence vector as its pair-indexed table. -/
+def pairDivergenceVectorTable {D : ℕ}
+    (state : AffinePairDivergenceCoordinate D → ℝ) (first second : Fin D) : ℝ :=
+  state (some (first, second))
+
+/-- Linear operator of the constant-augmented closed pair-divergence system. -/
+noncomputable def pairDivergenceGeneratorLinearMap {D : ℕ}
+    (coalescence : Fin D → ℝ) (migration : Fin D → Fin D → ℝ)
+    (mutation : Fin D → ℝ) :
+    (AffinePairDivergenceCoordinate D → ℝ) →ₗ[ℝ]
+      (AffinePairDivergenceCoordinate D → ℝ) where
+  toFun state coordinate := match coordinate with
+    | none => 0
+    | some (first, second) =>
+        symmetricPairDivergenceAffineDerivative coalescence migration mutation
+          (pairDivergenceVectorTable state) (state none) first second
+  map_add' := by
+    intro left right
+    funext coordinate
+    cases coordinate with
+    | none => simp
+    | some pair =>
+        rcases pair with ⟨first, second⟩
+        have hfirst :
+            (∑ target, migration first target *
+              (pairDivergenceVectorTable (left + right) target second -
+                pairDivergenceVectorTable (left + right) first second)) =
+              (∑ target, migration first target *
+                (pairDivergenceVectorTable left target second -
+                  pairDivergenceVectorTable left first second)) +
+              (∑ target, migration first target *
+                (pairDivergenceVectorTable right target second -
+                  pairDivergenceVectorTable right first second)) := by
+          rw [← Finset.sum_add_distrib]
+          apply Finset.sum_congr rfl
+          intro target _
+          simp [pairDivergenceVectorTable]
+          ring
+        have hsecond :
+            (∑ target, migration second target *
+              (pairDivergenceVectorTable (left + right) first target -
+                pairDivergenceVectorTable (left + right) first second)) =
+              (∑ target, migration second target *
+                (pairDivergenceVectorTable left first target -
+                  pairDivergenceVectorTable left first second)) +
+              (∑ target, migration second target *
+                (pairDivergenceVectorTable right first target -
+                  pairDivergenceVectorTable right first second)) := by
+          rw [← Finset.sum_add_distrib]
+          apply Finset.sum_congr rfl
+          intro target _
+          simp [pairDivergenceVectorTable]
+          ring
+        simp only [symmetricPairDivergenceAffineDerivative]
+        rw [hfirst, hsecond]
+        simp only [pairDivergenceVectorTable, Pi.add_apply]
+        by_cases hsame : first = second <;> simp [hsame] <;> ring
+  map_smul' := by
+    intro scalar state
+    funext coordinate
+    cases coordinate with
+    | none => simp
+    | some pair =>
+        rcases pair with ⟨first, second⟩
+        have hfirst :
+            (∑ target, migration first target *
+              (pairDivergenceVectorTable (scalar • state) target second -
+                pairDivergenceVectorTable (scalar • state) first second)) =
+              scalar * ∑ target, migration first target *
+                (pairDivergenceVectorTable state target second -
+                  pairDivergenceVectorTable state first second) := by
+          rw [Finset.mul_sum]
+          apply Finset.sum_congr rfl
+          intro target _
+          simp [pairDivergenceVectorTable]
+          ring
+        have hsecond :
+            (∑ target, migration second target *
+              (pairDivergenceVectorTable (scalar • state) first target -
+                pairDivergenceVectorTable (scalar • state) first second)) =
+              scalar * ∑ target, migration second target *
+                (pairDivergenceVectorTable state first target -
+                  pairDivergenceVectorTable state first second) := by
+          rw [Finset.mul_sum]
+          apply Finset.sum_congr rfl
+          intro target _
+          simp [pairDivergenceVectorTable]
+          ring
+        simp only [symmetricPairDivergenceAffineDerivative]
+        rw [hfirst, hsecond]
+        simp only [pairDivergenceVectorTable, Pi.smul_apply, smul_eq_mul]
+        by_cases hsame : first = second <;> simp [hsame] <;> ring
+
+/-- Constant-augmented matrix of the closed pair-divergence generator. -/
+noncomputable def augmentedPairDivergenceGenerator {D : ℕ}
+    (coalescence : Fin D → ℝ) (migration : Fin D → Fin D → ℝ)
+    (mutation : Fin D → ℝ) :
+    Matrix (AffinePairDivergenceCoordinate D) (AffinePairDivergenceCoordinate D) ℝ :=
+  LinearMap.toMatrix' (pairDivergenceGeneratorLinearMap coalescence migration mutation)
+
+/-- Matrix application is definitionally the closed affine divergence derivative. -/
+theorem augmentedPairDivergenceGenerator_mulVec {D : ℕ}
+    (coalescence : Fin D → ℝ) (migration : Fin D → Fin D → ℝ)
+    (mutation : Fin D → ℝ) (state : AffinePairDivergenceCoordinate D → ℝ) :
+    (augmentedPairDivergenceGenerator coalescence migration mutation).mulVec state =
+      pairDivergenceGeneratorLinearMap coalescence migration mutation state := by
+  exact LinearMap.toMatrix'_mulVec _ _
+
+/-- Rectangular linear projection from degree-two mixed moments to the affine pairwise
+divergence subsystem.  Its coefficient on a moment basis column is exactly the defining
+three-term divergence functional; the affine constant passes through unchanged. -/
+noncomputable def manyDemePairDivergenceProjection (D : ℕ) :
+    Matrix (AffinePairDivergenceCoordinate D) (AffineManyDemeMomentCoordinate D 2) ℝ
+  | none, none => 1
+  | none, some column => manyDemeMomentBasisTable 2 column (fun _ ↦ 0)
+  | some _, none => 0
+  | some (first, second), some column =>
+      momentPairDivergence (manyDemeMomentBasisTable 2 column) first second
+
+/-- The rectangular matrix above evaluates to the advertised three-term divergence of the
+finite moment vector. -/
+theorem manyDemePairDivergenceProjection_mulVec {D : ℕ}
+    (state : AffineManyDemeMomentCoordinate D 2 → ℝ) :
+    (manyDemePairDivergenceProjection D).mulVec state =
+      fun coordinate ↦ match coordinate with
+        | none => state none +
+            manyDemeMomentVectorTable 2 (fun column ↦ state (some column)) (fun _ ↦ 0)
+        | some (first, second) =>
+            momentPairDivergence
+              (manyDemeMomentVectorTable 2 (fun column ↦ state (some column))) first second := by
+  funext coordinate
+  cases coordinate with
+  | none =>
+      simp only [Matrix.mulVec, dotProduct, manyDemePairDivergenceProjection]
+      rw [Fintype.sum_option]
+      simp [manyDemeMomentBasisTable, manyDemeMomentVectorTable]
+  | some pair =>
+      rcases pair with ⟨first, second⟩
+      simp only [Matrix.mulVec, dotProduct, manyDemePairDivergenceProjection,
+        momentPairDivergence]
+      rw [Fintype.sum_option]
+      simp only [zero_mul, zero_add]
+      have hvector (exponent : Fin D → ℕ) (hbound : ∀ d, exponent d < 3) :
+          (∑ column, manyDemeMomentBasisTable 2 column exponent * state (some column)) =
+            manyDemeMomentVectorTable 2 (fun column ↦ state (some column)) exponent := by
+        simp [manyDemeMomentBasisTable, manyDemeMomentVectorTable, hbound]
+      have hfirst : ∀ d, oneDemeExponent first 1 d < 3 := by
+        intro d
+        by_cases hd : d = first <;> simp [oneDemeExponent, hd]
+      have hsecond : ∀ d, oneDemeExponent second 1 d < 3 := by
+        intro d
+        by_cases hd : d = second <;> simp [oneDemeExponent, hd]
+      have hpair : ∀ d, pairExponent first second 1 1 d < 3 := by
+        intro d
+        by_cases hsame : first = second
+        · subst second
+          by_cases hd : d = first <;> simp [pairExponent, hd]
+        · by_cases hfirstD : d = first <;> by_cases hsecondD : d = second <;>
+            simp [pairExponent, hsame, hfirstD, hsecondD]
+      calc
+        _ = (∑ column, manyDemeMomentBasisTable 2 column
+              (oneDemeExponent first 1) * state (some column)) +
+            (∑ column, manyDemeMomentBasisTable 2 column
+              (oneDemeExponent second 1) * state (some column)) -
+            2 * (∑ column, manyDemeMomentBasisTable 2 column
+              (pairExponent first second 1 1) * state (some column)) := by
+          calc
+            _ = ∑ column,
+                (manyDemeMomentBasisTable 2 column (oneDemeExponent first 1) *
+                    state (some column) +
+                  manyDemeMomentBasisTable 2 column (oneDemeExponent second 1) *
+                    state (some column) -
+                  2 * (manyDemeMomentBasisTable 2 column
+                    (pairExponent first second 1 1) * state (some column))) := by
+                apply Finset.sum_congr rfl
+                intro column _
+                ring
+            _ = _ := by
+              rw [Finset.sum_sub_distrib, Finset.sum_add_distrib, Finset.mul_sum]
+        _ = _ := by rw [hvector _ hfirst, hvector _ hsecond, hvector _ hpair]
+
+/-- Moment table represented by one column of the constant-augmented degree-`K` system. -/
+noncomputable def manyDemeMomentAffineColumnTable {D K : ℕ}
+    (column : AffineManyDemeMomentCoordinate D K) : (Fin D → ℕ) → ℝ :=
+  match column with
+  | none => manyDemeMomentConstantTable
+  | some coordinate => manyDemeMomentBasisTable K coordinate
+
+/-- Degree-zero coefficient represented by one affine moment column. -/
+noncomputable def manyDemeMomentAffineColumnConstant {D K : ℕ}
+    (column : AffineManyDemeMomentCoordinate D K) : ℝ :=
+  manyDemeMomentAffineColumnTable column (fun _ ↦ 0)
+
+private theorem manyDemeMomentGenerator_column_read {D K : ℕ}
+    (rates : ManyDemeRates D) (column : AffineManyDemeMomentCoordinate D K)
+    (exponent : Fin D → ℕ) (hbound : ∀ d, exponent d < K + 1)
+    (hdegree : 0 < ∑ d, exponent d ∧ ∑ d, exponent d ≤ K) :
+    manyDemeMomentVectorTable K
+        (fun row ↦ augmentedManyDemeMomentGenerator rates K (some row) column) exponent =
+      manyDemeMomentGenerator rates (manyDemeMomentAffineColumnTable column) exponent := by
+  unfold manyDemeMomentVectorTable
+  rw [dif_pos hbound]
+  cases column with
+  | none =>
+      simp [augmentedManyDemeMomentGenerator, manyDemeMomentForcing,
+        manyDemeMomentAffineColumnTable, ManyDemeMomentCoordinate.degree, hdegree]
+  | some column =>
+      simp [augmentedManyDemeMomentGenerator, manyDemeMomentDynamicsMatrix,
+        manyDemeMomentAffineColumnTable, ManyDemeMomentCoordinate.degree, hdegree]
+
+/-- Each column of the rectangular projection is the divergence of the corresponding affine
+moment basis table. -/
+theorem manyDemePairDivergenceProjection_apply {D : ℕ}
+    (first second : Fin D) (column : AffineManyDemeMomentCoordinate D 2) :
+    manyDemePairDivergenceProjection D (some (first, second)) column =
+      momentPairDivergence (manyDemeMomentAffineColumnTable column) first second := by
+  cases column with
+  | none =>
+      have hfirst : ¬∀ d, oneDemeExponent first 1 d = 0 := by
+        intro h
+        simpa [oneDemeExponent] using h first
+      have hsecond : ¬∀ d, oneDemeExponent second 1 d = 0 := by
+        intro h
+        simpa [oneDemeExponent] using h second
+      have hpair : ¬∀ d, pairExponent first second 1 1 d = 0 := by
+        intro h
+        have hvalue := h first
+        by_cases hsame : first = second <;> simp [pairExponent, hsame] at hvalue
+      simp [manyDemePairDivergenceProjection, manyDemeMomentAffineColumnTable,
+        momentPairDivergence, manyDemeMomentConstantTable, hfirst, hsecond, hpair]
+  | some column =>
+      rfl
+
+/-- The projection passes exactly the affine degree-zero column. -/
+theorem manyDemePairDivergenceProjection_none {D : ℕ}
+    (column : AffineManyDemeMomentCoordinate D 2) :
+    manyDemePairDivergenceProjection D none column =
+      manyDemeMomentAffineColumnConstant column := by
+  cases column <;>
+    simp [manyDemePairDivergenceProjection, manyDemeMomentAffineColumnConstant,
+      manyDemeMomentAffineColumnTable, manyDemeMomentConstantTable]
+
+/-- The degree-two one-locus affine generator intertwines with the closed pair-divergence
+generator for every symmetric-biallelic arbitrary-deme rate matrix. -/
+theorem manyDemePairDivergenceProjection_generator_intertwines {D : ℕ}
+    (rates : ManyDemeRates D)
+    (hsymmetric : ∀ deme, rates.backwardMutation deme = rates.forwardMutation deme) :
+    manyDemePairDivergenceProjection D * augmentedManyDemeMomentGenerator rates 2 =
+      augmentedPairDivergenceGenerator rates.coalescence rates.migration
+        (fun deme ↦ rates.forwardMutation deme + rates.backwardMutation deme) *
+          manyDemePairDivergenceProjection D := by
+  apply Matrix.ext
+  intro row column
+  change (manyDemePairDivergenceProjection D).mulVec
+      (fun source ↦ augmentedManyDemeMomentGenerator rates 2 source column) row =
+    (augmentedPairDivergenceGenerator rates.coalescence rates.migration
+      (fun deme ↦ rates.forwardMutation deme + rates.backwardMutation deme)).mulVec
+        (fun target ↦ manyDemePairDivergenceProjection D target column) row
+  rw [manyDemePairDivergenceProjection_mulVec,
+    augmentedPairDivergenceGenerator_mulVec]
+  cases row with
+  | none =>
+      cases column <;>
+        simp [pairDivergenceGeneratorLinearMap, augmentedManyDemeMomentGenerator,
+          manyDemeMomentVectorTable, manyDemeMomentDynamicsMatrix,
+          manyDemeMomentForcing, ManyDemeMomentCoordinate.degree]
+  | some pair =>
+      rcases pair with ⟨first, second⟩
+      have hfirstBound : ∀ d, oneDemeExponent first 1 d < 3 := by
+        intro d
+        by_cases hd : d = first <;> simp [oneDemeExponent, hd]
+      have hsecondBound : ∀ d, oneDemeExponent second 1 d < 3 := by
+        intro d
+        by_cases hd : d = second <;> simp [oneDemeExponent, hd]
+      have hpairBound : ∀ d, pairExponent first second 1 1 d < 3 := by
+        intro d
+        by_cases hsame : first = second
+        · subst second
+          by_cases hd : d = first <;> simp [pairExponent, hd]
+        · by_cases hdFirst : d = first <;> by_cases hdSecond : d = second <;>
+            simp [pairExponent, hsame, hdFirst, hdSecond]
+      have hfirstDegree :
+          0 < ∑ d, oneDemeExponent first 1 d ∧
+            ∑ d, oneDemeExponent first 1 d ≤ 2 := by
+        simp [oneDemeExponent]
+      have hsecondDegree :
+          0 < ∑ d, oneDemeExponent second 1 d ∧
+            ∑ d, oneDemeExponent second 1 d ≤ 2 := by
+        simp [oneDemeExponent]
+      have hpairDegree :
+          0 < ∑ d, pairExponent first second 1 1 d ∧
+            ∑ d, pairExponent first second 1 1 d ≤ 2 := by
+        by_cases hsame : first = second
+        · subst second
+          simp [pairExponent]
+        · have hsum :
+              (∑ d, if d = first then 1 else if d = second then 1 else 0) = 2 := by
+            calc
+              _ = (∑ d, if d = first then 1 else 0) +
+                  ∑ d, if d = second then 1 else 0 := by
+                    rw [← Finset.sum_add_distrib]
+                    apply Finset.sum_congr rfl
+                    intro d _
+                    by_cases hdFirst : d = first
+                    · subst d
+                      simp [hsame]
+                    · by_cases hdSecond : d = second
+                      · subst d
+                        simp [hdFirst]
+                      · simp [hdFirst, hdSecond]
+              _ = 2 := by simp
+          simp [pairExponent, hsame, hsum]
+      simp only [momentPairDivergence, pairDivergenceGeneratorLinearMap]
+      rw [manyDemeMomentGenerator_column_read rates column _ hfirstBound hfirstDegree,
+        manyDemeMomentGenerator_column_read rates column _ hsecondBound hsecondDegree,
+        manyDemeMomentGenerator_column_read rates column _ hpairBound hpairDegree]
+      change _ = symmetricPairDivergenceAffineDerivative rates.coalescence rates.migration
+        (fun deme ↦ rates.forwardMutation deme + rates.backwardMutation deme)
+        (fun source target ↦ manyDemePairDivergenceProjection D
+          (some (source, target)) column)
+        (manyDemePairDivergenceProjection D none column) first second
+      rw [manyDemePairDivergenceProjection_none]
+      simp_rw [manyDemePairDivergenceProjection_apply]
+      exact manyDemeMomentGenerator_pairDivergence_affine rates
+        (manyDemeMomentAffineColumnTable column) hsymmetric first second
+
+/-- Generator intertwining lifts to every exact one-locus epoch matrix exponential. -/
+theorem manyDemePairDivergenceProjection_propagator_intertwines {D : ℕ}
+    (epoch : ManyDemeMomentEpoch D 2)
+    (hsymmetric : ∀ deme,
+      epoch.rates.backwardMutation deme = epoch.rates.forwardMutation deme) :
+    manyDemePairDivergenceProjection D * epoch.propagator =
+      matrixExponential
+          (augmentedPairDivergenceGenerator epoch.rates.coalescence epoch.rates.migration
+            (fun deme ↦ epoch.rates.forwardMutation deme +
+              epoch.rates.backwardMutation deme)) epoch.duration *
+        manyDemePairDivergenceProjection D := by
+  exact matrixExponential_intertwines _ _ _
+    (manyDemePairDivergenceProjection_generator_intertwines epoch.rates hsymmetric)
+    epoch.duration
 
 /-- A many-deme mixed-moment oracle.  Implementations may be a sparse moment solver, the
 published JSFS dynamic program, or an exact external demography constructor; consumers see

@@ -258,11 +258,23 @@ noncomputable def lowOrderLDHomogeneousGenerator {D : ℕ} (rates : ManyDemeLDRa
     lowOrderLDMutationCoupling rates moment coordinate +
     lowOrderLDRecurrentMutationDamping rates moment coordinate
 
-/-- The `H` coordinate of the complete two-locus generator is exactly the shared
-single-locus divergence law.  Recombination and the higher joint coordinates disappear
-algebraically; migration acts on both lineage labels, and recurrent mutation supplies its
-own affine return term.  This is the row-level generator identity needed by the history-wide
-projection theorem, not a closure approximation. -/
+/-- The homogeneous affine `H` row of the complete two-locus generator is exactly the shared
+pair-divergence law, with its constant coordinate kept explicit.  Recombination and all
+higher joint coordinates disappear algebraically. -/
+theorem lowOrderLDAffine_H_eq_symmetricPairDivergence_affine {D : ℕ}
+    (rates : ManyDemeLDRates D) (moment : LowOrderLDCoordinate D → ℝ)
+    (constant : ℝ)
+    (first second : Fin D) :
+    lowOrderLDHomogeneousGenerator rates moment (.H first second) +
+        lowOrderLDMutationForcing rates (.H first second) * constant =
+      symmetricPairDivergenceAffineDerivative rates.coalescence rates.migration rates.mutation
+        (fun source target ↦ moment (.H source target)) constant first second := by
+  simp [lowOrderLDHomogeneousGenerator, lowOrderLDDrift, lowOrderLDMigration,
+    lowOrderLDRecombination, lowOrderLDMutationCoupling,
+    lowOrderLDRecurrentMutationDamping, lowOrderLDMutationForcing,
+    symmetricPairDivergenceAffineDerivative] <;> ring
+
+/-- The probability-law specialization of the affine `H`-row identity. -/
 theorem lowOrderLDAffine_H_eq_symmetricPairDivergence {D : ℕ}
     (rates : ManyDemeLDRates D) (moment : LowOrderLDCoordinate D → ℝ)
     (first second : Fin D) :
@@ -270,10 +282,8 @@ theorem lowOrderLDAffine_H_eq_symmetricPairDivergence {D : ℕ}
         lowOrderLDMutationForcing rates (.H first second) =
       symmetricPairDivergenceDerivative rates.coalescence rates.migration rates.mutation
         (fun source target ↦ moment (.H source target)) first second := by
-  simp [lowOrderLDHomogeneousGenerator, lowOrderLDDrift, lowOrderLDMigration,
-    lowOrderLDRecombination, lowOrderLDMutationCoupling,
-    lowOrderLDRecurrentMutationDamping, lowOrderLDMutationForcing,
-    symmetricPairDivergenceDerivative] <;> ring
+  simpa [symmetricPairDivergenceDerivative] using
+    lowOrderLDAffine_H_eq_symmetricPairDivergence_affine rates moment 1 first second
 
 /-- Concrete constant-augmented matrix of the arbitrary-deme moment ODE. -/
 noncomputable def augmentedLowOrderLDGenerator {D : ℕ} (rates : ManyDemeLDRates D) :
@@ -281,6 +291,119 @@ noncomputable def augmentedLowOrderLDGenerator {D : ℕ} (rates : ManyDemeLDRate
   | some row, some column => lowOrderLDHomogeneousGenerator rates (lowOrderLDBasis column) row
   | some row, none => lowOrderLDMutationForcing rates row
   | none, _ => 0
+
+/-- Linear readout retaining only the affine constant and all ordered `H` coordinates from
+the complete low-order two-locus state. -/
+def lowOrderLDHProjectionLinearMap {D : ℕ} :
+    (AffineLowOrderLDCoordinate D → ℝ) →ₗ[ℝ]
+      (AffinePairDivergenceCoordinate D → ℝ) where
+  toFun state coordinate := match coordinate with
+    | none => state none
+    | some (first, second) => state (some (.H first second))
+  map_add' := by
+    intro left right
+    funext coordinate
+    cases coordinate <;> simp
+  map_smul' := by
+    intro scalar state
+    funext coordinate
+    cases coordinate <;> simp
+
+/-- Rectangular matrix selecting the closed `H` subsystem from the joint state. -/
+noncomputable def lowOrderLDHProjection (D : ℕ) :
+    Matrix (AffinePairDivergenceCoordinate D) (AffineLowOrderLDCoordinate D) ℝ :=
+  LinearMap.toMatrix' lowOrderLDHProjectionLinearMap
+
+/-- Applying the `H` projection matrix is exact coordinate selection. -/
+theorem lowOrderLDHProjection_mulVec {D : ℕ}
+    (state : AffineLowOrderLDCoordinate D → ℝ) :
+    (lowOrderLDHProjection D).mulVec state = lowOrderLDHProjectionLinearMap state := by
+  exact LinearMap.toMatrix'_mulVec _ _
+
+/-- Joint moment table represented by one column of the augmented low-order system. -/
+def lowOrderLDAffineColumnMoment {D : ℕ}
+    (column : AffineLowOrderLDCoordinate D) : LowOrderLDCoordinate D → ℝ :=
+  match column with
+  | none => fun _ ↦ 0
+  | some coordinate => lowOrderLDBasis coordinate
+
+/-- Constant coefficient represented by one augmented low-order column. -/
+def lowOrderLDAffineColumnConstant {D : ℕ}
+    (column : AffineLowOrderLDCoordinate D) : ℝ :=
+  match column with
+  | none => 1
+  | some _ => 0
+
+/-- A projection entry at `H(i,j)` is the `H(i,j)` value of the represented joint basis. -/
+theorem lowOrderLDHProjection_apply {D : ℕ} (first second : Fin D)
+    (column : AffineLowOrderLDCoordinate D) :
+    lowOrderLDHProjection D (some (first, second)) column =
+      lowOrderLDAffineColumnMoment column (.H first second) := by
+  cases column <;>
+    simp [lowOrderLDHProjection, lowOrderLDHProjectionLinearMap,
+      lowOrderLDAffineColumnMoment, lowOrderLDBasis]
+
+/-- The `H` projection passes the augmented constant coordinate. -/
+theorem lowOrderLDHProjection_none {D : ℕ}
+    (column : AffineLowOrderLDCoordinate D) :
+    lowOrderLDHProjection D none column = lowOrderLDAffineColumnConstant column := by
+  cases column <;>
+    simp [lowOrderLDHProjection, lowOrderLDHProjectionLinearMap,
+      lowOrderLDAffineColumnConstant]
+
+/-- The full joint generator and its closed `H` subsystem commute exactly. -/
+theorem lowOrderLDHProjection_generator_intertwines {D : ℕ}
+    (rates : ManyDemeLDRates D) :
+    lowOrderLDHProjection D * augmentedLowOrderLDGenerator rates =
+      augmentedPairDivergenceGenerator rates.coalescence rates.migration rates.mutation *
+        lowOrderLDHProjection D := by
+  apply Matrix.ext
+  intro row column
+  change (lowOrderLDHProjection D).mulVec
+      (fun source ↦ augmentedLowOrderLDGenerator rates source column) row =
+    (augmentedPairDivergenceGenerator rates.coalescence rates.migration
+      rates.mutation).mulVec (fun target ↦ lowOrderLDHProjection D target column) row
+  rw [lowOrderLDHProjection_mulVec, augmentedPairDivergenceGenerator_mulVec]
+  cases row with
+  | none =>
+      simp [lowOrderLDHProjectionLinearMap, pairDivergenceGeneratorLinearMap,
+        augmentedLowOrderLDGenerator]
+  | some pair =>
+      rcases pair with ⟨first, second⟩
+      change augmentedLowOrderLDGenerator rates (some (.H first second)) column =
+        symmetricPairDivergenceAffineDerivative rates.coalescence rates.migration
+          rates.mutation
+          (fun source target ↦ lowOrderLDHProjection D (some (source, target)) column)
+          (lowOrderLDHProjection D none column) first second
+      rw [lowOrderLDHProjection_none]
+      simp_rw [lowOrderLDHProjection_apply]
+      cases column with
+      | none =>
+          have hzero : lowOrderLDHomogeneousGenerator rates (fun _ ↦ 0)
+              (.H first second) = 0 := by
+            simp [lowOrderLDHomogeneousGenerator, lowOrderLDDrift,
+              lowOrderLDMigration, lowOrderLDRecombination,
+              lowOrderLDMutationCoupling, lowOrderLDRecurrentMutationDamping]
+          simpa [augmentedLowOrderLDGenerator, lowOrderLDAffineColumnMoment,
+            lowOrderLDAffineColumnConstant, hzero] using
+              lowOrderLDAffine_H_eq_symmetricPairDivergence_affine rates (fun _ ↦ 0)
+                1 first second
+      | some column =>
+          simpa [augmentedLowOrderLDGenerator, lowOrderLDAffineColumnMoment,
+            lowOrderLDAffineColumnConstant] using
+            lowOrderLDAffine_H_eq_symmetricPairDivergence_affine rates
+              (lowOrderLDBasis column) 0 first second
+
+/-- The full joint epoch and the closed `H` epoch commute through their exact matrix
+exponentials. -/
+theorem lowOrderLDHProjection_propagator_intertwines {D : ℕ}
+    (rates : ManyDemeLDRates D) (duration : ℝ) :
+    lowOrderLDHProjection D * matrixExponential (augmentedLowOrderLDGenerator rates) duration =
+      matrixExponential
+          (augmentedPairDivergenceGenerator rates.coalescence rates.migration rates.mutation)
+          duration * lowOrderLDHProjection D := by
+  exact matrixExponential_intertwines _ _ _
+    (lowOrderLDHProjection_generator_intertwines rates) duration
 
 /-- Positive denominator of the recurrent-biallelic one-deme stationary `DD/Dz/pi2` solve.
 It is written as an expanded positive polynomial so the physical rate domain excludes a
