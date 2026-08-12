@@ -450,7 +450,7 @@ return `none` because they are not empirical risk-cohort metrics. -/
 noncomputable def DemeBinaryRiskCohorts.evaluate {D : ℕ} {design : PipelineStudyDesign D}
     (cohorts : DemeBinaryRiskCohorts design) : PipelineQuantity D → Option ℝ := by
   classical
-  exact fun
+  exact fun quantity ↦ match quantity with
   | .observedRiskR2 (some deme) =>
       if domain : (cohorts.atDeme deme).R2Domain then
         some ((cohorts.atDeme deme).observedRiskR2 domain) else none

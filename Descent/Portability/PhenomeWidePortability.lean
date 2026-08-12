@@ -2070,11 +2070,14 @@ law now lives at `Coalescent.publishedTwoDemeDCorrelation`, but applying it here
 already-refuted reduction of a many-deme transient history to a two-deme scalar surface.  So
 restoration is real and no point formula in the old scalar family survives.
 
-The corpus now has a different candidate rather than another scalar guess: the arbitrary-deme
+The corpus now has a derived law rather than another scalar guess: the arbitrary-deme
 transient `H/DD/Dz/pi2` generator in `Coalescent.TwoLocusHistory`, composed across every split,
-migration, size, mutation, and recombination epoch.  The point defined below by
-`steppingStonePortabilityFromTwoLocusMomentsCandidate` reads squared normalized cross-deme
-`DD` from that operator.  The operator now contains recurrent symmetric-biallelic mutation
+migration, size, mutation, and recombination epoch, read out through
+`Coalescent.DemographicTwoLocusMoments.panelTransportRatio` -- summed cross-deme `DD` over the
+panel, squared against the within-source sum, times a squared heterozygosity ratio, with NO
+separate marginal factor (a product with the marginal factor was measured to charge drift
+twice; its record is at `steppingStonePortability_interior_is_panelTransportRatio` below).
+The operator contains recurrent symmetric-biallelic mutation
 damping and the matching stationary boundary rather than the former infinite-sites mutation
 slice.  It is derived, but it is not yet the exact simulator endpoint: the projection theorem
 tying it to the marginal ascertainment diffusion remains open, and gnomon's implicit JC69
@@ -2083,7 +2086,8 @@ completed: it rejects the shared-one-dimensional-length Bessel reduction at `rho
 fails it at `rho = 5, 20`, while the full operator is not replaced by that scalar form.  An
 independent simulator gate for the operator remains open.
 
-That historical failure forced the bracket below. The UPPER end applies the drift-and-migration penalty and no LD
+That historical failure forced the bracket below. The UPPER end applies the
+drift-and-migration penalty and no LD
 penalty at all, which is the limit of complete restoration. The LOWER end multiplies the upper
 by the LD retention a model with no restoration would predict. Any multiplicative-LD model
 whose restoration lies between none and full lies between the two, which
@@ -2207,12 +2211,18 @@ theorem effectiveDriftGenerations_strictMono_index (Ne F₁ F₂ : ℝ)
 
     Historically the LOWER end of the bracket was this quantity times an unspecified LD
     retention, because `DGP.migrationLDBoost` was the only restoration candidate and
-    `simcov/battery_bulk55.py` falsified it in magnitude.  That historical gap now has a
-    derived operator candidate: `steppingStonePortabilityFromTwoLocusMomentsCandidate` below
-    reads the squared normalized cross-deme `DD` coordinate after the full arbitrary-deme
-    `H/DD/Dz/pi2` epoch product.  Migration restoration is inside that generator rather than
-    a fitted scalar.  Recurrent symmetric-biallelic mutation and its stationary boundary are
-    now shared at the model level with the marginal factor.  The candidate is not yet promoted
+    `simcov/battery_bulk55.py` falsified it in magnitude.  The derived interior point now
+    lives at `Coalescent.DemographicTwoLocusMoments.panelTransportRatio`, which is NOT this
+    quantity times a linkage factor: the product shape was measured to charge drift twice
+    and to miss the unequal-size heterozygosity correction
+    (`steppingStonePortability_interior_is_panelTransportRatio` carries the record).
+    Migration restoration is inside the epoch-product generator rather than a fitted scalar,
+    and recurrent symmetric-biallelic mutation and its stationary boundary are shared at the
+    model level.  A second measured caveat now scopes THIS upper end itself: on demes of
+    unequal size the transported `r²` can EXCEED this bound, because a lower-heterozygosity
+    target deme concentrates score and liability variance (the squared heterozygosity ratio
+    in the transport law is greater than one in that direction); the ceiling claim is
+    regime-scoped to equal deme sizes.  The interior law is not yet promoted
     to the exact simulator law: it still owes the common-diffusion projection and independent
     simulator validation, and the executable must
     explicitly choose this binary mutation protocol instead of its present default JC69.
@@ -2360,11 +2370,14 @@ theorem steppingStonePortability_antitone_distance (r2_0 f1 : ℝ) (d₁ d₂ : 
     predicts lies between the bracket's two ends.
 
     This is the theorem that makes the bracket a claim rather than two unrelated numbers. It
-    does not identify the interior point by itself.  The operator candidate
-    `steppingStonePortabilityFromTwoLocusMomentsCandidate` below now supplies a derived point
-    by taking `ldFactor` to be squared normalized cross-deme `DD`; until its cross-model
-    coherence and validation obligations are discharged, this bracket theorem still requires
-    `ldLoss ≤ ldFactor ≤ 1` from its caller.
+    does not identify the interior point by itself.  The derived interior point is NOT of the
+    product form this theorem parameterizes: the measured law is
+    `Coalescent.DemographicTwoLocusMoments.panelTransportRatio`, which replaces
+    `marginal × ldFactor` entirely (the product shape double-charges drift and misses the
+    unequal-size correction; the record lives at
+    `steppingStonePortability_interior_is_panelTransportRatio`).  This bracket theorem
+    remains algebra over its own hypotheses and still requires `ldLoss ≤ ldFactor ≤ 1` from
+    its caller.
 
     **THE HYPOTHESIS IS NOT CURRENTLY DISCHARGED AT LARGE SEPARATION, AND THAT IS A FACT
     ABOUT THE FLOOR AND NOT ABOUT THIS THEOREM.** The implication below is algebra and holds
@@ -2390,80 +2403,34 @@ theorem steppingStonePortability_mem_bracket (r2_0 f1 : ℝ) (d : ℕ) (ldLoss l
   have hnn := steppingStonePortability_nonneg r2_0 f1 d hr2 hr2' hf hf'
   exact ⟨mul_le_mul_of_nonneg_left hlow hnn, mul_le_of_le_one_right hnn hhigh⟩
 
-/-- Candidate point inside the former shaded band after replacing the free restoration scalar
-by the derived squared `DD` correlation.  Exact endpoint status additionally requires a
-coherence theorem showing that the separately supplied stepping-stone marginal factor and
-two-locus moment family arise from the same demographic/mutation/ascertainment model. -/
-noncomputable def steppingStonePortabilityFromTwoLocusMomentsCandidate {D : ℕ}
-    (r2_0 f1 : ℝ) (d : ℕ) (moments : Coalescent.DemographicTwoLocusMoments D)
-    (rho : Coalescent.MarkerSeparationBp) (source target : Fin D)
-    (domain : moments.LDNormalizationDomain rho source target) : ℝ :=
-  steppingStonePortability r2_0 f1 d *
-    moments.accuracyLinkageFactor rho source target domain
-
-/-- The candidate is definitionally the marginal factor times derived `lambda`; this removes
-the fitted linkage coordinate but does not supply the missing cross-model coherence proof. -/
-theorem steppingStonePortabilityFromTwoLocusMomentsCandidate_eq {D : ℕ}
-    (r2_0 f1 : ℝ) (d : ℕ) (moments : Coalescent.DemographicTwoLocusMoments D)
-    (rho : Coalescent.MarkerSeparationBp) (source target : Fin D)
-    (domain : moments.LDNormalizationDomain rho source target) :
-    steppingStonePortabilityFromTwoLocusMomentsCandidate
-      r2_0 f1 d moments rho source target domain =
-      steppingStonePortability r2_0 f1 d *
-        (moments.crossDemeLDCorrelation rho source target domain) ^ 2 := by
-  unfold steppingStonePortabilityFromTwoLocusMomentsCandidate
-  rw [moments.accuracyLinkageFactor_eq_correlation_sq rho source target domain]
-
-/-- The operator point is inside the historical band whenever the old no-restoration floor
-does not exceed the derived linkage factor.  The upper inequality is now discharged from the
-typed Cauchy--Schwarz law of `DD`, so callers no longer supply a free `lambda ≤ 1` premise. -/
-theorem steppingStonePortabilityFromTwoLocusMomentsCandidate_mem_bracket {D : ℕ}
-    (r2_0 f1 : ℝ) (d : ℕ) (moments : Coalescent.DemographicTwoLocusMoments D)
-    (rho : Coalescent.MarkerSeparationBp) (source target : Fin D)
-    (domain : moments.LDPairDomain rho source target)
-    (hr2 : 0 ≤ r2_0) (hr2' : r2_0 ≤ 1) (hf : 0 < f1) (hf' : f1 < 1)
-    (ldLoss : ℝ)
-    (hlow : ldLoss ≤ moments.accuracyLinkageFactor rho source target
-      domain.toLDNormalizationDomain) :
-    steppingStonePortability r2_0 f1 d * ldLoss ≤
-        steppingStonePortabilityFromTwoLocusMomentsCandidate
-          r2_0 f1 d moments rho source target domain.toLDNormalizationDomain ∧
-      steppingStonePortabilityFromTwoLocusMomentsCandidate
-          r2_0 f1 d moments rho source target domain.toLDNormalizationDomain ≤
-        steppingStonePortability r2_0 f1 d := by
-  exact steppingStonePortability_mem_bracket r2_0 f1 d ldLoss
-    (moments.accuracyLinkageFactor rho source target domain.toLDNormalizationDomain)
-    hr2 hr2' hf hf' hlow
-    (moments.accuracyLinkageFactor_le_one rho source target domain)
-
-/-- The upper gap is exactly one missing linkage factor.  No second demographic correction
-is hidden in the band: once `lambda` is supplied, the residual width above the point is the
-common marginal factor times `1 - lambda`. -/
-theorem steppingStonePortability_upper_sub_candidate {D : ℕ}
-    (r2_0 f1 : ℝ) (d : ℕ) (moments : Coalescent.DemographicTwoLocusMoments D)
-    (rho : Coalescent.MarkerSeparationBp) (source target : Fin D)
-    (domain : moments.LDNormalizationDomain rho source target) :
-    steppingStonePortability r2_0 f1 d -
-        steppingStonePortabilityFromTwoLocusMomentsCandidate
-          r2_0 f1 d moments rho source target domain =
-      steppingStonePortability r2_0 f1 d *
-        (1 - moments.accuracyLinkageFactor rho source target domain) := by
-  unfold steppingStonePortabilityFromTwoLocusMomentsCandidate
-  ring
-
-/-- The distance above the historical no-restoration floor is likewise exactly the common
-marginal factor times the linkage restored beyond that floor. -/
-theorem steppingStonePortability_candidate_sub_floor {D : ℕ}
-    (r2_0 f1 : ℝ) (d : ℕ) (moments : Coalescent.DemographicTwoLocusMoments D)
-    (rho : Coalescent.MarkerSeparationBp) (source target : Fin D)
-    (domain : moments.LDNormalizationDomain rho source target) (ldLoss : ℝ) :
-    steppingStonePortabilityFromTwoLocusMomentsCandidate
-          r2_0 f1 d moments rho source target domain -
-        steppingStonePortability r2_0 f1 d * ldLoss =
-      steppingStonePortability r2_0 f1 d *
-        (moments.accuracyLinkageFactor rho source target domain - ldLoss) := by
-  unfold steppingStonePortabilityFromTwoLocusMomentsCandidate
-  ring
+/-- **The interior point of the migration bracket is not a product of a marginal factor and
+a linkage factor, and the corpus no longer offers one.**  The deleted composition
+multiplied `steppingStonePortability × accuracyLinkageFactor` -- a marginal `(1 - F)`-style factor
+times the squared cross-deme `DD` correlation.  That composition SHAPE is falsified by
+measurement: cross-deme `DD` already decays with frequency divergence, so the product
+charges drift twice, and it carries no correction for unequal deme sizes.  On the frozen
+eight-deme unequal-size asymmetric-migration stress cube (real plink P+T pipeline, eight
+seeds, `theory-out/stress_l3_grade2.json`) the product form under-predicted measured
+per-deme transported `r²` by `+0.144 ± 0.042`, pair-structured; the moment-native
+replacement `Coalescent.DemographicTwoLocusMoments.panelTransportRatio` -- divergence
+inside the summed cross-deme `DD`, size asymmetry as a squared heterozygosity ratio, no
+separate marginal factor -- graded `+0.075 ± 0.038` on the same cells and
+`+0.0001 ± 0.058` on the six-deme three-epoch stress history, and reduces to
+`accuracyLinkageFactor` exactly in the equal-size symmetric case, which is why the product
+looked right on tame demographies.  Consumers wanting the derived interior point take
+`panelTransportRatio` times the source-deme anchor; the bracket theorems above remain valid
+algebra about the bracket's own ends. -/
+theorem steppingStonePortability_interior_is_panelTransportRatio {D n : ℕ}
+    (r2_0 : ℝ) (moments : Coalescent.DemographicTwoLocusMoments D)
+    (panel : Fin n → Coalescent.MarkerSeparationBp)
+    (hetRho : Coalescent.MarkerSeparationBp) (source target : Fin D)
+    (domain : moments.PanelTransportDomain panel hetRho source target) :
+    r2_0 * moments.panelTransportRatio panel hetRho source target domain =
+      r2_0 *
+        ((((∑ k, moments.DD (panel k) source target) /
+            (∑ k, moments.DD (panel k) source source)) ^ 2) *
+          ((moments.H hetRho source source / moments.H hetRho target target) ^ 2)) := by
+  rfl
 
 /-- **The bracket is a nonempty interval of nonnegative `R²`.** The lower end is at or above
     zero and at or below the upper end, for any LD retention in `[0, 1]`. Stated separately
