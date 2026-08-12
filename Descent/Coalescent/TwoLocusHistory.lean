@@ -1124,6 +1124,144 @@ theorem twoLocusDDJet_driftAt {D : ℕ}
         twoLocusLinkageGradient, hfirst, hsecond,
         Ne.symm hfirst, Ne.symm hsecond]
 
+/-- Exact local drift of the generalized `Dz(first,second,third)` observable.  The five
+branches are forced by which of its linkage, left-contrast, and right-contrast arguments
+occupy the drifting deme.  In particular the same-deme branch is the Hill--Robertson
+`4 DD - 5 Dz` row, and joint drift of the two contrast arguments restores `4 DD` even
+when their linkage argument lies in another deme. -/
+theorem twoLocusDzJet_driftAt {D : ℕ}
+    (state : Fin D → TwoLocusHaplotypeFrequencies)
+    (deme first second third : Fin D) :
+    (twoLocusDzJet first second third).driftAt deme state =
+      if first = deme ∧ second = deme ∧ third = deme then
+        4 * (twoLocusDDJet deme deme).value state -
+          5 * (twoLocusDzJet first second third).value state
+      else if first = deme ∧ second = deme then
+        -3 * (twoLocusDzJet first second third).value state
+      else if first = deme ∧ third = deme then
+        -3 * (twoLocusDzJet first second third).value state
+      else if second = deme ∧ third = deme then
+        4 * (twoLocusDDJet first deme).value state
+      else if first = deme then
+        -(twoLocusDzJet first second third).value state
+      else 0 := by
+  have hab : (state deme).ab =
+      1 - (state deme).AB - (state deme).Ab - (state deme).aB := by
+    linarith [(state deme).total_eq_one]
+  by_cases hfirst : deme = first
+  · subst first
+    by_cases hsecond : deme = second
+    · subst second
+      by_cases hthird : deme = third
+      · subst third
+        simp [twoLocusDzJet, twoLocusDDJet, TwoLocusDiffusionJet.mul,
+          TwoLocusDiffusionJet.add, TwoLocusDiffusionJet.smul,
+          TwoLocusDiffusionJet.const, twoLocusLinkageJet,
+          twoLocusLeftContrastJet, twoLocusRightContrastJet,
+          twoLocusLeftFrequencyJet, twoLocusRightFrequencyJet,
+          twoLocusLinkageDrift_eq_neg_linkage,
+          twoLocusHaplotypeCovariance_linkage_left,
+          twoLocusHaplotypeCovariance_linkage_right,
+          twoLocusHaplotypeCovariance_left_right,
+          twoLocusHaplotypeCovariance, twoLocusHaplotypeMean,
+          twoLocusLinkageGradient, twoLocusLeftAlleleIndicator,
+          twoLocusRightAlleleIndicator,
+          TwoLocusHaplotypeFrequencies.linkage,
+          TwoLocusHaplotypeFrequencies.leftFrequency,
+          TwoLocusHaplotypeFrequencies.rightFrequency,
+          TwoLocusHaplotypeFrequencies.leftContrast,
+          TwoLocusHaplotypeFrequencies.rightContrast]
+        rw [hab]
+        ring
+      · simp [twoLocusDzJet, TwoLocusDiffusionJet.mul,
+          TwoLocusDiffusionJet.add, TwoLocusDiffusionJet.smul,
+          TwoLocusDiffusionJet.const, twoLocusLinkageJet,
+          twoLocusLeftContrastJet, twoLocusRightContrastJet,
+          twoLocusLeftFrequencyJet, twoLocusRightFrequencyJet,
+          twoLocusLinkageDrift_eq_neg_linkage,
+          twoLocusHaplotypeCovariance_linkage_left,
+          twoLocusHaplotypeCovariance, twoLocusHaplotypeMean,
+          twoLocusLinkageGradient, twoLocusLeftAlleleIndicator,
+          TwoLocusHaplotypeFrequencies.linkage,
+          TwoLocusHaplotypeFrequencies.leftFrequency,
+          TwoLocusHaplotypeFrequencies.leftContrast,
+          hthird, Ne.symm hthird]
+        rw [hab]
+        ring
+    · by_cases hthird : deme = third
+      · subst third
+        simp [twoLocusDzJet, TwoLocusDiffusionJet.mul,
+          TwoLocusDiffusionJet.add, TwoLocusDiffusionJet.smul,
+          TwoLocusDiffusionJet.const, twoLocusLinkageJet,
+          twoLocusLeftContrastJet, twoLocusRightContrastJet,
+          twoLocusLeftFrequencyJet, twoLocusRightFrequencyJet,
+          twoLocusLinkageDrift_eq_neg_linkage,
+          twoLocusHaplotypeCovariance_linkage_right,
+          twoLocusHaplotypeCovariance, twoLocusHaplotypeMean,
+          twoLocusLinkageGradient, twoLocusRightAlleleIndicator,
+          TwoLocusHaplotypeFrequencies.linkage,
+          TwoLocusHaplotypeFrequencies.rightFrequency,
+          TwoLocusHaplotypeFrequencies.rightContrast,
+          hsecond, Ne.symm hsecond]
+        rw [hab]
+        ring
+      · simp [twoLocusDzJet, TwoLocusDiffusionJet.mul,
+          TwoLocusDiffusionJet.add, TwoLocusDiffusionJet.smul,
+          TwoLocusDiffusionJet.const, twoLocusLinkageJet,
+          twoLocusLeftContrastJet, twoLocusRightContrastJet,
+          twoLocusLeftFrequencyJet, twoLocusRightFrequencyJet,
+          twoLocusLinkageDrift_eq_neg_linkage,
+          twoLocusHaplotypeCovariance, twoLocusHaplotypeMean,
+          twoLocusLinkageGradient,
+          TwoLocusHaplotypeFrequencies.linkage,
+          hsecond, hthird, Ne.symm hsecond, Ne.symm hthird]
+        rw [hab]
+        ring
+  · by_cases hsecond : deme = second
+    · subst second
+      by_cases hthird : deme = third
+      · subst third
+        simp [twoLocusDzJet, twoLocusDDJet, TwoLocusDiffusionJet.mul,
+          TwoLocusDiffusionJet.add, TwoLocusDiffusionJet.smul,
+          TwoLocusDiffusionJet.const, twoLocusLinkageJet,
+          twoLocusLeftContrastJet, twoLocusRightContrastJet,
+          twoLocusLeftFrequencyJet, twoLocusRightFrequencyJet,
+          twoLocusHaplotypeCovariance_left_right,
+          twoLocusHaplotypeCovariance, twoLocusHaplotypeMean,
+          twoLocusLeftAlleleIndicator, twoLocusRightAlleleIndicator,
+          TwoLocusHaplotypeFrequencies.linkage,
+          TwoLocusHaplotypeFrequencies.leftFrequency,
+          TwoLocusHaplotypeFrequencies.rightFrequency,
+          hfirst, Ne.symm hfirst]
+        rw [hab]
+        ring
+      · simp [twoLocusDzJet, TwoLocusDiffusionJet.mul,
+          TwoLocusDiffusionJet.add, TwoLocusDiffusionJet.smul,
+          TwoLocusDiffusionJet.const, twoLocusLinkageJet,
+          twoLocusLeftContrastJet, twoLocusRightContrastJet,
+          twoLocusLeftFrequencyJet, twoLocusRightFrequencyJet,
+          twoLocusHaplotypeCovariance, twoLocusHaplotypeMean,
+          twoLocusLeftAlleleIndicator,
+          hfirst, hthird, Ne.symm hfirst, Ne.symm hthird]
+    · by_cases hthird : deme = third
+      · subst third
+        simp [twoLocusDzJet, TwoLocusDiffusionJet.mul,
+          TwoLocusDiffusionJet.add, TwoLocusDiffusionJet.smul,
+          TwoLocusDiffusionJet.const, twoLocusLinkageJet,
+          twoLocusLeftContrastJet, twoLocusRightContrastJet,
+          twoLocusLeftFrequencyJet, twoLocusRightFrequencyJet,
+          twoLocusHaplotypeCovariance, twoLocusHaplotypeMean,
+          twoLocusRightAlleleIndicator,
+          hfirst, hsecond, Ne.symm hfirst, Ne.symm hsecond]
+      · simp [twoLocusDzJet, TwoLocusDiffusionJet.mul,
+          TwoLocusDiffusionJet.add, TwoLocusDiffusionJet.smul,
+          TwoLocusDiffusionJet.const, twoLocusLinkageJet,
+          twoLocusLeftContrastJet, twoLocusRightContrastJet,
+          twoLocusLeftFrequencyJet, twoLocusRightFrequencyJet,
+          twoLocusHaplotypeCovariance, twoLocusHaplotypeMean,
+          hfirst, hsecond, hthird,
+          Ne.symm hfirst, Ne.symm hsecond, Ne.symm hthird]
+
 /-- The generalized four-deme `pi2` observable in centered contrast form. -/
 theorem twoLocusJointHeterozygosity_eq_contrasts
     (leftFirst leftSecond rightFirst rightSecond : TwoLocusHaplotypeFrequencies) :
