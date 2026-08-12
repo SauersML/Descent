@@ -857,6 +857,482 @@ all consumers use the same coordinate embedding. -/
 def oneDemeExponent {D : ℕ} (deme : Fin D) (degree : ℕ) : Fin D → ℕ :=
   fun other ↦ if other = deme then degree else 0
 
+/-- Pairwise allelic divergence read directly from a full mixed-moment table.
+
+This is the linear projection used by both the finite ascertainment system and the `H`
+coordinate of the two-locus system.  Naming it at the generator layer avoids duplicating the
+same three-term expression in the epoch and history intertwining proofs. -/
+noncomputable def momentPairDivergence {D : ℕ}
+    (moment : (Fin D → ℕ) → ℝ) (first second : Fin D) : ℝ :=
+  moment (oneDemeExponent first 1) + moment (oneDemeExponent second 1) -
+    2 * moment (pairExponent first second 1 1)
+
+private theorem decrement_oneDemeExponent_one {D : ℕ} (deme : Fin D) :
+    decrementExponent (oneDemeExponent deme 1) deme = fun _ ↦ 0 := by
+  funext other
+  simp only [decrementExponent, oneDemeExponent]
+  split_ifs <;> simp_all
+
+private theorem decrement_oneDemeExponent_two {D : ℕ} (deme : Fin D) :
+    decrementExponent (oneDemeExponent deme 2) deme = oneDemeExponent deme 1 := by
+  funext other
+  simp only [decrementExponent, oneDemeExponent]
+  split_ifs <;> simp_all
+
+private theorem decrement_pairExponent_left {D : ℕ} (first second : Fin D)
+    (hne : first ≠ second) :
+    decrementExponent (pairExponent first second 1 1) first =
+      oneDemeExponent second 1 := by
+  funext other
+  simp only [decrementExponent, pairExponent, oneDemeExponent]
+  split_ifs <;> simp_all
+
+private theorem decrement_pairExponent_right {D : ℕ} (first second : Fin D)
+    (hne : first ≠ second) :
+    decrementExponent (pairExponent first second 1 1) second =
+      oneDemeExponent first 1 := by
+  funext other
+  simp only [decrementExponent, pairExponent, oneDemeExponent]
+  split_ifs <;> simp_all
+
+private theorem migrate_oneDemeExponent_weighted {D : ℕ} (rates : ManyDemeRates D)
+    (moment : (Fin D → ℕ) → ℝ) (source target : Fin D) :
+    rates.migration source target *
+        (moment (migrateExponent (oneDemeExponent source 1) source target) -
+          moment (oneDemeExponent source 1)) =
+      rates.migration source target *
+        (moment (oneDemeExponent target 1) - moment (oneDemeExponent source 1)) := by
+  by_cases hsame : source = target
+  · subst target
+    simp [rates.migration_self]
+  · congr 2
+    apply congrArg moment
+    funext deme
+    simp only [migrateExponent, oneDemeExponent]
+    split_ifs <;> simp_all
+
+private theorem migrate_pairExponent_left_weighted {D : ℕ} (rates : ManyDemeRates D)
+    (moment : (Fin D → ℕ) → ℝ) (first second target : Fin D)
+    (hne : first ≠ second) :
+    rates.migration first target *
+        (moment (migrateExponent (pairExponent first second 1 1) first target) -
+          moment (pairExponent first second 1 1)) =
+      rates.migration first target *
+        (moment (pairExponent target second 1 1) -
+          moment (pairExponent first second 1 1)) := by
+  by_cases hself : first = target
+  · subst target
+    simp [rates.migration_self]
+  · congr 2
+    apply congrArg moment
+    funext deme
+    simp only [migrateExponent, pairExponent]
+    split_ifs <;> simp_all
+
+private theorem migrate_pairExponent_right_weighted {D : ℕ} (rates : ManyDemeRates D)
+    (moment : (Fin D → ℕ) → ℝ) (first second target : Fin D)
+    (hne : first ≠ second) :
+    rates.migration second target *
+        (moment (migrateExponent (pairExponent first second 1 1) second target) -
+          moment (pairExponent first second 1 1)) =
+      rates.migration second target *
+        (moment (pairExponent first target 1 1) -
+          moment (pairExponent first second 1 1)) := by
+  by_cases hself : second = target
+  · subst target
+    simp [rates.migration_self]
+  · by_cases htargetFirst : target = first
+    · subst target
+      congr 2
+      apply congrArg moment
+      funext deme
+      simp only [migrateExponent, pairExponent]
+      split_ifs <;> simp_all
+    · congr 2
+      apply congrArg moment
+      funext deme
+      have hreverse : second ≠ first := fun h ↦ hne h.symm
+      simp only [migrateExponent, pairExponent]
+      (split_ifs <;> simp_all)
+
+private theorem migrate_oneDemeExponent_two_weighted {D : ℕ} (rates : ManyDemeRates D)
+    (moment : (Fin D → ℕ) → ℝ) (source target : Fin D) :
+    rates.migration source target * 2 *
+        (moment (migrateExponent (oneDemeExponent source 2) source target) -
+          moment (oneDemeExponent source 2)) =
+      rates.migration source target * 2 *
+        (moment (pairExponent source target 1 1) -
+          moment (oneDemeExponent source 2)) := by
+  by_cases hself : source = target
+  · subst target
+    simp [rates.migration_self]
+  · congr 2
+    apply congrArg moment
+    funext deme
+    simp only [migrateExponent, pairExponent, oneDemeExponent]
+    split_ifs <;> simp_all
+
+/-- The arbitrary-deme one-locus generator projects exactly to the shared pair-divergence
+generator when forward and backward mutation rates agree.
+
+The diagonal branch contains coalescence and two copies of lineage migration; the
+off-diagonal branch contains one migration sum for each lineage.  In both branches the total
+mutation coordinate is `forward + backward`, exactly the convention consumed by the
+two-locus `H` row.  This is an identity of generators for every normalized moment table,
+not a closure or equilibrium calculation. -/
+theorem manyDemeMomentGenerator_pairDivergence {D : ℕ} (rates : ManyDemeRates D)
+    (moment : (Fin D → ℕ) → ℝ)
+    (hnormalized : moment (fun _ ↦ 0) = 1)
+    (hsymmetric : ∀ deme, rates.backwardMutation deme = rates.forwardMutation deme)
+    (first second : Fin D) :
+    manyDemeMomentGenerator rates moment (oneDemeExponent first 1) +
+        manyDemeMomentGenerator rates moment (oneDemeExponent second 1) -
+        2 * manyDemeMomentGenerator rates moment (pairExponent first second 1 1) =
+      symmetricPairDivergenceDerivative rates.coalescence rates.migration
+        (fun deme ↦ rates.forwardMutation deme + rates.backwardMutation deme)
+        (momentPairDivergence moment) first second := by
+  classical
+  have hsingle (deme : Fin D) :
+      manyDemeMomentGenerator rates moment (oneDemeExponent deme 1) =
+        (∑ target, rates.migration deme target *
+          (moment (oneDemeExponent target 1) - moment (oneDemeExponent deme 1))) +
+        rates.forwardMutation deme *
+            (moment (fun _ ↦ 0) - moment (oneDemeExponent deme 1)) -
+          rates.backwardMutation deme * moment (oneDemeExponent deme 1) := by
+    unfold manyDemeMomentGenerator
+    have hcoal :
+        (∑ d, rates.coalescence d *
+          (((oneDemeExponent deme 1 d) * (oneDemeExponent deme 1 d - 1) : ℕ) : ℝ) / 2 *
+          (moment (decrementExponent (oneDemeExponent deme 1) d) -
+            moment (oneDemeExponent deme 1))) = 0 := by
+      apply Finset.sum_eq_zero
+      intro d _
+      by_cases hd : d = deme <;> simp [oneDemeExponent, hd]
+    have hmigration :
+        (∑ src, ∑ target, rates.migration src target * oneDemeExponent deme 1 src *
+          (moment (migrateExponent (oneDemeExponent deme 1) src target) -
+            moment (oneDemeExponent deme 1))) =
+          ∑ target, rates.migration deme target *
+            (moment (oneDemeExponent target 1) - moment (oneDemeExponent deme 1)) := by
+      rw [Finset.sum_eq_single deme]
+      · apply Finset.sum_congr rfl
+        intro target _
+        simpa [oneDemeExponent] using
+          migrate_oneDemeExponent_weighted rates moment deme target
+      · intro source _ hsource
+        simp [oneDemeExponent, hsource]
+      · simp
+    have hmutation :
+        (∑ d, (rates.forwardMutation d * oneDemeExponent deme 1 d *
+              (moment (decrementExponent (oneDemeExponent deme 1) d) -
+                moment (oneDemeExponent deme 1)) -
+            rates.backwardMutation d * oneDemeExponent deme 1 d *
+              moment (oneDemeExponent deme 1))) =
+          rates.forwardMutation deme *
+              (moment (fun _ ↦ 0) - moment (oneDemeExponent deme 1)) -
+            rates.backwardMutation deme * moment (oneDemeExponent deme 1) := by
+      rw [Finset.sum_eq_single deme]
+      · rw [decrement_oneDemeExponent_one]
+        simp [oneDemeExponent]
+      · intro d _ hd
+        simp [oneDemeExponent, hd]
+      · simp
+    rw [hcoal, hmigration, hmutation]
+    ring
+  by_cases hsame : first = second
+  · subst second
+    have hpairSelf : pairExponent first first 1 1 = oneDemeExponent first 2 := by
+      funext d
+      simp [pairExponent, oneDemeExponent]
+    have hpairComm (target : Fin D) :
+        pairExponent target first 1 1 = pairExponent first target 1 1 := by
+      funext d
+      by_cases htarget : target = first
+      · simp [pairExponent, htarget]
+      · by_cases hdTarget : d = target <;> by_cases hdFirst : d = first <;>
+          simp [pairExponent, htarget, hdTarget, hdFirst] <;> aesop
+    have hdouble :
+        manyDemeMomentGenerator rates moment (oneDemeExponent first 2) =
+          rates.coalescence first *
+              (moment (oneDemeExponent first 1) - moment (oneDemeExponent first 2)) +
+            (∑ target, rates.migration first target * 2 *
+              (moment (pairExponent first target 1 1) -
+                moment (oneDemeExponent first 2))) +
+            rates.forwardMutation first * 2 *
+              (moment (oneDemeExponent first 1) - moment (oneDemeExponent first 2)) -
+            rates.backwardMutation first * 2 * moment (oneDemeExponent first 2) := by
+      unfold manyDemeMomentGenerator
+      have hcoal :
+          (∑ d, rates.coalescence d *
+            (((oneDemeExponent first 2 d) * (oneDemeExponent first 2 d - 1) : ℕ) : ℝ) /
+              2 *
+            (moment (decrementExponent (oneDemeExponent first 2) d) -
+              moment (oneDemeExponent first 2))) =
+            rates.coalescence first *
+              (moment (oneDemeExponent first 1) - moment (oneDemeExponent first 2)) := by
+        rw [Finset.sum_eq_single first]
+        · rw [decrement_oneDemeExponent_two]
+          norm_num [oneDemeExponent]
+        · intro d _ hd
+          simp [oneDemeExponent, hd]
+        · simp
+      have hmigration :
+          (∑ src, ∑ target, rates.migration src target * oneDemeExponent first 2 src *
+            (moment (migrateExponent (oneDemeExponent first 2) src target) -
+              moment (oneDemeExponent first 2))) =
+            ∑ target, rates.migration first target * 2 *
+              (moment (pairExponent first target 1 1) -
+                moment (oneDemeExponent first 2)) := by
+        rw [Finset.sum_eq_single first]
+        · apply Finset.sum_congr rfl
+          intro target _
+          simpa [oneDemeExponent] using
+            migrate_oneDemeExponent_two_weighted rates moment first target
+        · intro source _ hsource
+          simp [oneDemeExponent, hsource]
+        · simp
+      have hmutation :
+          (∑ d, (rates.forwardMutation d * oneDemeExponent first 2 d *
+                (moment (decrementExponent (oneDemeExponent first 2) d) -
+                  moment (oneDemeExponent first 2)) -
+              rates.backwardMutation d * oneDemeExponent first 2 d *
+                moment (oneDemeExponent first 2))) =
+            rates.forwardMutation first * 2 *
+                (moment (oneDemeExponent first 1) - moment (oneDemeExponent first 2)) -
+              rates.backwardMutation first * 2 * moment (oneDemeExponent first 2) := by
+        rw [Finset.sum_eq_single first]
+        · rw [decrement_oneDemeExponent_two]
+          norm_num [oneDemeExponent]
+        · intro d _ hd
+          simp [oneDemeExponent, hd]
+        · simp
+      rw [hcoal, hmigration, hmutation]
+      abel
+    have hmigrationIdentity :
+        (∑ target, rates.migration first target *
+            (moment (oneDemeExponent target 1) - moment (oneDemeExponent first 1))) +
+          (∑ target, rates.migration first target *
+            (moment (oneDemeExponent target 1) - moment (oneDemeExponent first 1))) -
+          2 * (∑ target, rates.migration first target * 2 *
+            (moment (pairExponent first target 1 1) -
+              moment (oneDemeExponent first 2))) =
+        (∑ target, rates.migration first target *
+            ((moment (oneDemeExponent target 1) + moment (oneDemeExponent first 1) -
+                2 * moment (pairExponent first target 1 1)) -
+              (2 * moment (oneDemeExponent first 1) -
+                2 * moment (oneDemeExponent first 2)))) +
+          (∑ target, rates.migration first target *
+            ((moment (oneDemeExponent first 1) + moment (oneDemeExponent target 1) -
+                2 * moment (pairExponent first target 1 1)) -
+              (2 * moment (oneDemeExponent first 1) -
+                2 * moment (oneDemeExponent first 2)))) := by
+      rw [Finset.mul_sum, ← Finset.sum_add_distrib, ← Finset.sum_sub_distrib,
+        ← Finset.sum_add_distrib]
+      apply Finset.sum_congr rfl
+      intro target _
+      ring
+    have hdivergenceSums :
+        (∑ target, rates.migration first target *
+            ((moment (oneDemeExponent target 1) + moment (oneDemeExponent first 1) -
+                2 * moment (pairExponent first target 1 1)) -
+              (2 * moment (oneDemeExponent first 1) -
+                2 * moment (oneDemeExponent first 2)))) +
+          (∑ target, rates.migration first target *
+            ((moment (oneDemeExponent first 1) + moment (oneDemeExponent target 1) -
+                2 * moment (pairExponent first target 1 1)) -
+              (2 * moment (oneDemeExponent first 1) -
+                2 * moment (oneDemeExponent first 2)))) =
+        (∑ target, rates.migration first target *
+            ((moment (oneDemeExponent target 1) + moment (oneDemeExponent first 1) -
+                2 * moment (pairExponent first target 1 1)) -
+              (moment (oneDemeExponent first 1) + moment (oneDemeExponent first 1) -
+                2 * moment (oneDemeExponent first 2)))) +
+          (∑ target, rates.migration first target *
+            ((moment (oneDemeExponent first 1) + moment (oneDemeExponent target 1) -
+                2 * moment (pairExponent first target 1 1)) -
+              (moment (oneDemeExponent first 1) + moment (oneDemeExponent first 1) -
+                2 * moment (oneDemeExponent first 2)))) := by
+      congr 1 <;> apply Finset.sum_congr rfl <;> intro target _ <;> ring
+    rw [hdivergenceSums] at hmigrationIdentity
+    rw [hpairSelf, hsingle first, hdouble]
+    simp only [symmetricPairDivergenceDerivative, if_pos, momentPairDivergence]
+    rw [hsymmetric first, hnormalized]
+    simp [hpairSelf]
+    simp_rw [hpairComm]
+    linear_combination hmigrationIdentity
+  · have hreverse : second ≠ first := fun h ↦ hsame h.symm
+    have hpair :
+        manyDemeMomentGenerator rates moment (pairExponent first second 1 1) =
+          (∑ target, rates.migration first target *
+              (moment (pairExponent target second 1 1) -
+                moment (pairExponent first second 1 1))) +
+            (∑ target, rates.migration second target *
+              (moment (pairExponent first target 1 1) -
+                moment (pairExponent first second 1 1))) +
+            rates.forwardMutation first *
+              (moment (oneDemeExponent second 1) -
+                moment (pairExponent first second 1 1)) -
+            rates.backwardMutation first * moment (pairExponent first second 1 1) +
+            (rates.forwardMutation second *
+              (moment (oneDemeExponent first 1) -
+                moment (pairExponent first second 1 1)) -
+            rates.backwardMutation second * moment (pairExponent first second 1 1)) := by
+      unfold manyDemeMomentGenerator
+      have hcoal :
+          (∑ d, rates.coalescence d *
+            (((pairExponent first second 1 1 d) *
+              (pairExponent first second 1 1 d - 1) : ℕ) : ℝ) / 2 *
+            (moment (decrementExponent (pairExponent first second 1 1) d) -
+              moment (pairExponent first second 1 1))) = 0 := by
+        apply Finset.sum_eq_zero
+        intro d _
+        by_cases hdFirst : d = first
+        · subst d
+          simp [pairExponent, hsame]
+        · by_cases hdSecond : d = second
+          · subst d
+            simp [pairExponent, hsame, hreverse]
+          · simp [pairExponent, hsame, hdFirst, hdSecond]
+      let firstRow := ∑ target, rates.migration first target *
+        (moment (pairExponent target second 1 1) -
+          moment (pairExponent first second 1 1))
+      let secondRow := ∑ target, rates.migration second target *
+        (moment (pairExponent first target 1 1) -
+          moment (pairExponent first second 1 1))
+      have hmigrationRow (source : Fin D) :
+          (∑ target, rates.migration source target *
+            pairExponent first second 1 1 source *
+            (moment (migrateExponent (pairExponent first second 1 1) source target) -
+              moment (pairExponent first second 1 1))) =
+            if source = first then firstRow else if source = second then secondRow else 0 := by
+        by_cases hsourceFirst : source = first
+        · subst source
+          simp only [if_pos]
+          apply Finset.sum_congr rfl
+          intro target _
+          simpa [firstRow, pairExponent, hsame] using
+            migrate_pairExponent_left_weighted rates moment first second target hsame
+        · by_cases hsourceSecond : source = second
+          · subst source
+            simp only [hreverse, if_false, if_pos]
+            apply Finset.sum_congr rfl
+            intro target _
+            simpa [secondRow, pairExponent, hsame, hreverse] using
+              migrate_pairExponent_right_weighted rates moment first second target hsame
+          · simp [pairExponent, hsame, hsourceFirst, hsourceSecond]
+      have hmigration :
+          (∑ source, ∑ target, rates.migration source target *
+            pairExponent first second 1 1 source *
+            (moment (migrateExponent (pairExponent first second 1 1) source target) -
+              moment (pairExponent first second 1 1))) = firstRow + secondRow := by
+        simp_rw [hmigrationRow]
+        have hsplit (source : Fin D) :
+            (if source = first then firstRow else if source = second then secondRow else 0) =
+              (if source = first then firstRow else 0) +
+                (if source = second then secondRow else 0) := by
+          by_cases hsourceFirst : source = first
+          · have hsourceSecond : source ≠ second := fun h ↦ hsame (hsourceFirst.symm.trans h)
+            rw [if_pos hsourceFirst, if_pos hsourceFirst, if_neg hsourceSecond]
+            ring
+          · by_cases hsourceSecond : source = second
+            · have hsecondFirst : second ≠ first := hreverse
+              rw [if_neg hsourceFirst, if_pos hsourceSecond]
+              have hnot : ¬source = first := hsourceFirst
+              rw [if_neg hnot]
+              ring
+            · rw [if_neg hsourceFirst, if_neg hsourceSecond, if_neg hsourceFirst]
+              ring
+        simp_rw [hsplit, Finset.sum_add_distrib, Finset.sum_ite_eq',
+          Finset.mem_univ, if_true]
+      let firstMutation := rates.forwardMutation first *
+          (moment (oneDemeExponent second 1) -
+            moment (pairExponent first second 1 1)) -
+        rates.backwardMutation first * moment (pairExponent first second 1 1)
+      let secondMutation := rates.forwardMutation second *
+          (moment (oneDemeExponent first 1) -
+            moment (pairExponent first second 1 1)) -
+        rates.backwardMutation second * moment (pairExponent first second 1 1)
+      have hmutationRow (d : Fin D) :
+          rates.forwardMutation d * pairExponent first second 1 1 d *
+              (moment (decrementExponent (pairExponent first second 1 1) d) -
+                moment (pairExponent first second 1 1)) -
+            rates.backwardMutation d * pairExponent first second 1 1 d *
+              moment (pairExponent first second 1 1) =
+            if d = first then firstMutation else if d = second then secondMutation else 0 := by
+        by_cases hdFirst : d = first
+        · subst d
+          rw [decrement_pairExponent_left first second hsame]
+          simp [pairExponent, hsame, firstMutation]
+        · by_cases hdSecond : d = second
+          · subst d
+            rw [decrement_pairExponent_right first second hsame]
+            simp [pairExponent, hsame, hreverse, secondMutation]
+          · simp [pairExponent, hsame, hdFirst, hdSecond]
+      have hmutation :
+          (∑ d, (rates.forwardMutation d * pairExponent first second 1 1 d *
+                (moment (decrementExponent (pairExponent first second 1 1) d) -
+                  moment (pairExponent first second 1 1)) -
+              rates.backwardMutation d * pairExponent first second 1 1 d *
+                moment (pairExponent first second 1 1))) =
+            firstMutation + secondMutation := by
+        simp_rw [hmutationRow]
+        have hsplit (d : Fin D) :
+            (if d = first then firstMutation else if d = second then secondMutation else 0) =
+              (if d = first then firstMutation else 0) +
+                (if d = second then secondMutation else 0) := by
+          by_cases hdFirst : d = first
+          · have hdSecond : d ≠ second := fun h ↦ hsame (hdFirst.symm.trans h)
+            rw [if_pos hdFirst, if_pos hdFirst, if_neg hdSecond]
+            ring
+          · by_cases hdSecond : d = second
+            · have hsecondFirst : second ≠ first := hreverse
+              rw [if_neg hdFirst, if_pos hdSecond]
+              have hnot : ¬d = first := hdFirst
+              rw [if_neg hnot]
+              ring
+            · rw [if_neg hdFirst, if_neg hdSecond, if_neg hdFirst]
+              ring
+        simp_rw [hsplit, Finset.sum_add_distrib, Finset.sum_ite_eq',
+          Finset.mem_univ, if_true]
+      rw [hcoal, hmigration, hmutation]
+      simp only [firstRow, secondRow, firstMutation, secondMutation]
+      abel
+    have hmigrationFirst :
+        (∑ target, rates.migration first target *
+            (moment (oneDemeExponent target 1) - moment (oneDemeExponent first 1))) -
+          2 * (∑ target, rates.migration first target *
+            (moment (pairExponent target second 1 1) -
+              moment (pairExponent first second 1 1))) =
+        ∑ target, rates.migration first target *
+          ((moment (oneDemeExponent target 1) + moment (oneDemeExponent second 1) -
+              2 * moment (pairExponent target second 1 1)) -
+            (moment (oneDemeExponent first 1) + moment (oneDemeExponent second 1) -
+              2 * moment (pairExponent first second 1 1))) := by
+      rw [Finset.mul_sum, ← Finset.sum_sub_distrib]
+      apply Finset.sum_congr rfl
+      intro target _
+      ring
+    have hmigrationSecond :
+        (∑ target, rates.migration second target *
+            (moment (oneDemeExponent target 1) - moment (oneDemeExponent second 1))) -
+          2 * (∑ target, rates.migration second target *
+            (moment (pairExponent first target 1 1) -
+              moment (pairExponent first second 1 1))) =
+        ∑ target, rates.migration second target *
+          ((moment (oneDemeExponent first 1) + moment (oneDemeExponent target 1) -
+              2 * moment (pairExponent first target 1 1)) -
+            (moment (oneDemeExponent first 1) + moment (oneDemeExponent second 1) -
+              2 * moment (pairExponent first second 1 1))) := by
+      rw [Finset.mul_sum, ← Finset.sum_sub_distrib]
+      apply Finset.sum_congr rfl
+      intro target _
+      ring
+    rw [hsingle first, hsingle second, hpair]
+    simp only [symmetricPairDivergenceDerivative, if_neg hsame, zero_add,
+      momentPairDivergence]
+    rw [hsymmetric first, hsymmetric second, hnormalized]
+    linear_combination hmigrationFirst + hmigrationSecond
+
 /-- A many-deme mixed-moment oracle.  Implementations may be a sparse moment solver, the
 published JSFS dynamic program, or an exact external demography constructor; consumers see
 one typed mathematical object. -/
