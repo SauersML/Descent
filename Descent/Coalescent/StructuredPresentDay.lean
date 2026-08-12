@@ -1007,6 +1007,10 @@ already guarantees a positive exponent. -/
 def decrementExponent {D : ℕ} (exponent : Fin D → ℕ) (deme : Fin D) : Fin D → ℕ :=
   fun d ↦ if d = deme then exponent d - 1 else exponent d
 
+/-- Raise one lineage-count coordinate. -/
+def incrementExponent {D : ℕ} (exponent : Fin D → ℕ) (deme : Fin D) : Fin D → ℕ :=
+  fun d ↦ if d = deme then exponent d + 1 else exponent d
+
 /-- Move one ancestral lineage from one deme label to another.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- index bookkeeping for the moment generator.
@@ -1016,6 +1020,740 @@ bear. -/
 def migrateExponent {D : ℕ} (exponent : Fin D → ℕ)
     (src dst : Fin D) : Fin D → ℕ :=
   fun d ↦ if d = src then exponent d - 1 else if d = dst then exponent d + 1 else exponent d
+
+/-- Product Bernstein basis weight for derived and ancestral lineage counts.  This is the
+positive basis used by the killed structured-coalescent dual: no alternating monomial
+expansion appears in the state value itself. -/
+noncomputable def manyDemeBernsteinWeight {D : ℕ} (frequency : Fin D → ℝ)
+    (derived ancestral : Fin D → ℕ) : ℝ :=
+  ∏ deme, frequency deme ^ derived deme * (1 - frequency deme) ^ ancestral deme
+
+/-- Multiplying after removing one positive derived exponent restores the original
+Bernstein weight. -/
+theorem frequency_mul_manyDemeBernsteinWeight_decrementDerived {D : ℕ}
+    (frequency : Fin D → ℝ) (derived ancestral : Fin D → ℕ) (deme : Fin D)
+    (positive : 0 < derived deme) :
+    frequency deme * manyDemeBernsteinWeight frequency
+        (decrementExponent derived deme) ancestral =
+      manyDemeBernsteinWeight frequency derived ancestral := by
+  unfold manyDemeBernsteinWeight
+  rw [Finset.prod_eq_mul_prod_diff_singleton (Finset.mem_univ deme),
+    Finset.prod_eq_mul_prod_diff_singleton (Finset.mem_univ deme)]
+  have hrest :
+      (∏ x ∈ Finset.univ \ {deme},
+        frequency x ^ decrementExponent derived deme x *
+          (1 - frequency x) ^ ancestral x) =
+      ∏ x ∈ Finset.univ \ {deme},
+        frequency x ^ derived x * (1 - frequency x) ^ ancestral x := by
+    apply Finset.prod_congr rfl
+    intro x hx
+    have hne : x ≠ deme := Finset.notMem_singleton.mp (Finset.mem_sdiff.mp hx).2
+    simp [decrementExponent, hne]
+  rw [hrest]
+  simp only [decrementExponent, if_pos]
+  have hpow : frequency deme ^ derived deme =
+      frequency deme ^ (derived deme - 1) * frequency deme := by
+    conv_lhs => rw [show derived deme = derived deme - 1 + 1 by omega]
+    rw [pow_succ]
+  rw [hpow]
+  ring
+
+/-- Multiplying by the complement after removing one positive ancestral exponent restores
+the original Bernstein weight. -/
+theorem complement_mul_manyDemeBernsteinWeight_decrementAncestral {D : ℕ}
+    (frequency : Fin D → ℝ) (derived ancestral : Fin D → ℕ) (deme : Fin D)
+    (positive : 0 < ancestral deme) :
+    (1 - frequency deme) * manyDemeBernsteinWeight frequency derived
+        (decrementExponent ancestral deme) =
+      manyDemeBernsteinWeight frequency derived ancestral := by
+  unfold manyDemeBernsteinWeight
+  rw [Finset.prod_eq_mul_prod_diff_singleton (Finset.mem_univ deme),
+    Finset.prod_eq_mul_prod_diff_singleton (Finset.mem_univ deme)]
+  have hrest :
+      (∏ x ∈ Finset.univ \ {deme},
+        frequency x ^ derived x *
+          (1 - frequency x) ^ decrementExponent ancestral deme x) =
+      ∏ x ∈ Finset.univ \ {deme},
+        frequency x ^ derived x * (1 - frequency x) ^ ancestral x := by
+    apply Finset.prod_congr rfl
+    intro x hx
+    have hne : x ≠ deme := Finset.notMem_singleton.mp (Finset.mem_sdiff.mp hx).2
+    simp [decrementExponent, hne]
+  rw [hrest]
+  simp only [decrementExponent, if_pos]
+  have hpow : (1 - frequency deme) ^ ancestral deme =
+      (1 - frequency deme) ^ (ancestral deme - 1) * (1 - frequency deme) := by
+    conv_lhs => rw [show ancestral deme = ancestral deme - 1 + 1 by omega]
+    rw [pow_succ]
+  rw [hpow]
+  ring
+
+/-- Multiplication by one deme frequency raises its derived-lineage exponent. -/
+theorem frequency_mul_manyDemeBernsteinWeight_eq_incrementDerived {D : ℕ}
+    (frequency : Fin D → ℝ) (derived ancestral : Fin D → ℕ) (deme : Fin D) :
+    frequency deme * manyDemeBernsteinWeight frequency derived ancestral =
+      manyDemeBernsteinWeight frequency (incrementExponent derived deme) ancestral := by
+  unfold manyDemeBernsteinWeight
+  rw [Finset.prod_eq_mul_prod_diff_singleton (Finset.mem_univ deme),
+    Finset.prod_eq_mul_prod_diff_singleton (Finset.mem_univ deme)]
+  have hrest :
+      (∏ x ∈ Finset.univ \ {deme},
+        frequency x ^ incrementExponent derived deme x *
+          (1 - frequency x) ^ ancestral x) =
+      ∏ x ∈ Finset.univ \ {deme},
+        frequency x ^ derived x * (1 - frequency x) ^ ancestral x := by
+    apply Finset.prod_congr rfl
+    intro x hx
+    have hne : x ≠ deme := Finset.notMem_singleton.mp (Finset.mem_sdiff.mp hx).2
+    simp [incrementExponent, hne]
+  rw [hrest]
+  simp only [incrementExponent, if_pos, pow_succ]
+  ring
+
+/-- Multiplication by one deme complement raises its ancestral-lineage exponent. -/
+theorem complement_mul_manyDemeBernsteinWeight_eq_incrementAncestral {D : ℕ}
+    (frequency : Fin D → ℝ) (derived ancestral : Fin D → ℕ) (deme : Fin D) :
+    (1 - frequency deme) * manyDemeBernsteinWeight frequency derived ancestral =
+      manyDemeBernsteinWeight frequency derived (incrementExponent ancestral deme) := by
+  unfold manyDemeBernsteinWeight
+  rw [Finset.prod_eq_mul_prod_diff_singleton (Finset.mem_univ deme),
+    Finset.prod_eq_mul_prod_diff_singleton (Finset.mem_univ deme)]
+  have hrest :
+      (∏ x ∈ Finset.univ \ {deme},
+        frequency x ^ derived x *
+          (1 - frequency x) ^ incrementExponent ancestral deme x) =
+      ∏ x ∈ Finset.univ \ {deme},
+        frequency x ^ derived x * (1 - frequency x) ^ ancestral x := by
+    apply Finset.prod_congr rfl
+    intro x hx
+    have hne : x ≠ deme := Finset.notMem_singleton.mp (Finset.mem_sdiff.mp hx).2
+    simp [incrementExponent, hne]
+  rw [hrest]
+  simp only [incrementExponent, if_pos, pow_succ]
+  ring
+
+/-- Moving one positive count between distinct demes is decrement followed by increment. -/
+theorem migrateExponent_eq_increment_decrement {D : ℕ}
+    (exponent : Fin D → ℕ) (src dst : Fin D) (distinct : src ≠ dst) :
+    migrateExponent exponent src dst =
+      incrementExponent (decrementExponent exponent src) dst := by
+  funext deme
+  by_cases hsrc : deme = src
+  · subst deme
+    simp [migrateExponent, decrementExponent, incrementExponent, distinct]
+  · by_cases hdst : deme = dst
+    · subst deme
+      have hreverse : dst ≠ src := fun h ↦ distinct h.symm
+      simp [migrateExponent, decrementExponent, incrementExponent, distinct, hreverse]
+    · simp [migrateExponent, decrementExponent, incrementExponent, hsrc, hdst]
+
+/-- Positive derived-lineage migration has an exact Bernstein weight identity. -/
+theorem frequency_mul_manyDemeBernsteinWeight_decrementDerived_eq_migrate {D : ℕ}
+    (frequency : Fin D → ℝ) (derived ancestral : Fin D → ℕ) (src dst : Fin D)
+    (distinct : src ≠ dst) :
+    frequency dst * manyDemeBernsteinWeight frequency
+        (decrementExponent derived src) ancestral =
+      manyDemeBernsteinWeight frequency (migrateExponent derived src dst) ancestral := by
+  rw [migrateExponent_eq_increment_decrement derived src dst distinct,
+    frequency_mul_manyDemeBernsteinWeight_eq_incrementDerived]
+
+/-- Positive ancestral-lineage migration has the complementary weight identity. -/
+theorem complement_mul_manyDemeBernsteinWeight_decrementAncestral_eq_migrate {D : ℕ}
+    (frequency : Fin D → ℝ) (derived ancestral : Fin D → ℕ) (src dst : Fin D)
+    (distinct : src ≠ dst) :
+    (1 - frequency dst) * manyDemeBernsteinWeight frequency derived
+        (decrementExponent ancestral src) =
+      manyDemeBernsteinWeight frequency derived (migrateExponent ancestral src dst) := by
+  rw [migrateExponent_eq_increment_decrement ancestral src dst distinct,
+    complement_mul_manyDemeBernsteinWeight_eq_incrementAncestral]
+
+/-- First partial derivative of a Bernstein weight, written without division or negative
+exponents. -/
+noncomputable def manyDemeBernsteinFirstDerivative {D : ℕ}
+    (frequency : Fin D → ℝ) (derived ancestral : Fin D → ℕ) (deme : Fin D) : ℝ :=
+  derived deme * manyDemeBernsteinWeight frequency
+      (decrementExponent derived deme) ancestral -
+    ancestral deme * manyDemeBernsteinWeight frequency derived
+      (decrementExponent ancestral deme)
+
+/-- Second partial derivative of a Bernstein weight. -/
+noncomputable def manyDemeBernsteinSecondDerivative {D : ℕ}
+    (frequency : Fin D → ℝ) (derived ancestral : Fin D → ℕ) (deme : Fin D) : ℝ :=
+  ((derived deme * (derived deme - 1) : ℕ) : ℝ) *
+      manyDemeBernsteinWeight frequency
+        (decrementExponent (decrementExponent derived deme) deme) ancestral -
+    2 * derived deme * ancestral deme *
+      manyDemeBernsteinWeight frequency (decrementExponent derived deme)
+        (decrementExponent ancestral deme) +
+    ((ancestral deme * (ancestral deme - 1) : ℕ) : ℝ) *
+      manyDemeBernsteinWeight frequency derived
+        (decrementExponent (decrementExponent ancestral deme) deme)
+
+/-- Two like-type derived lineages coalesce, while the complementary factor supplies the
+diagonal subtraction. -/
+theorem bernsteinWeight_derivedCoalescence_identity {D : ℕ}
+    (frequency : Fin D → ℝ) (derived ancestral : Fin D → ℕ) (deme : Fin D) :
+    ((derived deme * (derived deme - 1) : ℕ) : ℝ) * frequency deme *
+        (1 - frequency deme) *
+        manyDemeBernsteinWeight frequency
+          (decrementExponent (decrementExponent derived deme) deme) ancestral =
+      ((derived deme * (derived deme - 1) : ℕ) : ℝ) *
+        (manyDemeBernsteinWeight frequency (decrementExponent derived deme) ancestral -
+          manyDemeBernsteinWeight frequency derived ancestral) := by
+  by_cases htwo : 2 ≤ derived deme
+  · have hone : 0 < derived deme := by omega
+    have hdecrement : 0 < decrementExponent derived deme deme := by
+      simp [decrementExponent]
+      omega
+    have hfirst := frequency_mul_manyDemeBernsteinWeight_decrementDerived frequency
+      (decrementExponent derived deme) ancestral deme hdecrement
+    have hsecond := frequency_mul_manyDemeBernsteinWeight_decrementDerived frequency
+      derived ancestral deme hone
+    calc
+      _ = ((derived deme * (derived deme - 1) : ℕ) : ℝ) *
+          (1 - frequency deme) *
+          (frequency deme * manyDemeBernsteinWeight frequency
+            (decrementExponent (decrementExponent derived deme) deme) ancestral) := by ring
+      _ = ((derived deme * (derived deme - 1) : ℕ) : ℝ) *
+          (1 - frequency deme) *
+          manyDemeBernsteinWeight frequency (decrementExponent derived deme) ancestral := by
+            rw [hfirst]
+      _ = ((derived deme * (derived deme - 1) : ℕ) : ℝ) *
+          (manyDemeBernsteinWeight frequency (decrementExponent derived deme) ancestral -
+            frequency deme * manyDemeBernsteinWeight frequency
+              (decrementExponent derived deme) ancestral) := by ring
+      _ = _ := by rw [hsecond]
+  · have hsmall : derived deme = 0 ∨ derived deme = 1 := by omega
+    rcases hsmall with hzero | hone
+    · simp [hzero]
+    · simp [hone]
+
+/-- The analogous coalescence identity for ancestral lineages. -/
+theorem bernsteinWeight_ancestralCoalescence_identity {D : ℕ}
+    (frequency : Fin D → ℝ) (derived ancestral : Fin D → ℕ) (deme : Fin D) :
+    ((ancestral deme * (ancestral deme - 1) : ℕ) : ℝ) * frequency deme *
+        (1 - frequency deme) *
+        manyDemeBernsteinWeight frequency derived
+          (decrementExponent (decrementExponent ancestral deme) deme) =
+      ((ancestral deme * (ancestral deme - 1) : ℕ) : ℝ) *
+        (manyDemeBernsteinWeight frequency derived (decrementExponent ancestral deme) -
+          manyDemeBernsteinWeight frequency derived ancestral) := by
+  by_cases htwo : 2 ≤ ancestral deme
+  · have hone : 0 < ancestral deme := by omega
+    have hdecrement : 0 < decrementExponent ancestral deme deme := by
+      simp [decrementExponent]
+      omega
+    have hfirst := complement_mul_manyDemeBernsteinWeight_decrementAncestral frequency
+      derived (decrementExponent ancestral deme) deme hdecrement
+    have hsecond := complement_mul_manyDemeBernsteinWeight_decrementAncestral frequency
+      derived ancestral deme hone
+    calc
+      _ = ((ancestral deme * (ancestral deme - 1) : ℕ) : ℝ) * frequency deme *
+          ((1 - frequency deme) * manyDemeBernsteinWeight frequency derived
+            (decrementExponent (decrementExponent ancestral deme) deme)) := by ring
+      _ = ((ancestral deme * (ancestral deme - 1) : ℕ) : ℝ) * frequency deme *
+          manyDemeBernsteinWeight frequency derived
+            (decrementExponent ancestral deme) := by rw [hfirst]
+      _ = ((ancestral deme * (ancestral deme - 1) : ℕ) : ℝ) *
+          (manyDemeBernsteinWeight frequency derived (decrementExponent ancestral deme) -
+            (1 - frequency deme) * manyDemeBernsteinWeight frequency derived
+              (decrementExponent ancestral deme)) := by ring
+      _ = _ := by rw [hsecond]
+  · have hsmall : ancestral deme = 0 ∨ ancestral deme = 1 := by omega
+    rcases hsmall with hzero | hone
+    · simp [hzero]
+    · simp [hone]
+
+/-- A derived/ancestral pair in the same deme is incompatible after coalescence; its rate is
+therefore killing rather than a transition to another Bernstein state. -/
+theorem bernsteinWeight_oppositeCoalescence_identity {D : ℕ}
+    (frequency : Fin D → ℝ) (derived ancestral : Fin D → ℕ) (deme : Fin D) :
+    (derived deme * ancestral deme : ℕ) * frequency deme * (1 - frequency deme) *
+        manyDemeBernsteinWeight frequency (decrementExponent derived deme)
+          (decrementExponent ancestral deme) =
+      (derived deme * ancestral deme : ℕ) *
+        manyDemeBernsteinWeight frequency derived ancestral := by
+  by_cases hderived : 0 < derived deme
+  · by_cases hancestral : 0 < ancestral deme
+    · have hfirst := frequency_mul_manyDemeBernsteinWeight_decrementDerived frequency
+        derived (decrementExponent ancestral deme) deme hderived
+      have hsecond := complement_mul_manyDemeBernsteinWeight_decrementAncestral frequency
+        derived ancestral deme hancestral
+      calc
+        _ = (derived deme * ancestral deme : ℕ) * (1 - frequency deme) *
+            (frequency deme * manyDemeBernsteinWeight frequency
+              (decrementExponent derived deme) (decrementExponent ancestral deme)) := by ring
+        _ = (derived deme * ancestral deme : ℕ) * (1 - frequency deme) *
+            manyDemeBernsteinWeight frequency derived
+              (decrementExponent ancestral deme) := by rw [hfirst]
+        _ = (derived deme * ancestral deme : ℕ) *
+            ((1 - frequency deme) * manyDemeBernsteinWeight frequency derived
+              (decrementExponent ancestral deme)) := by ring
+        _ = _ := by rw [hsecond]
+    · have : ancestral deme = 0 := Nat.eq_zero_of_not_pos hancestral
+      simp [this]
+  · have : derived deme = 0 := Nat.eq_zero_of_not_pos hderived
+    simp [this]
+
+/-- The analytic migration drift of derived lineages is exactly the positive lineage-label
+transition in the Bernstein basis. -/
+theorem bernsteinWeight_derivedMigration_identity {D : ℕ}
+    (rates : ManyDemeRates D) (frequency : Fin D → ℝ)
+    (derived ancestral : Fin D → ℕ) (src dst : Fin D) :
+    rates.migration src dst * derived src * (frequency dst - frequency src) *
+        manyDemeBernsteinWeight frequency (decrementExponent derived src) ancestral =
+      rates.migration src dst * derived src *
+        (manyDemeBernsteinWeight frequency (migrateExponent derived src dst) ancestral -
+          manyDemeBernsteinWeight frequency derived ancestral) := by
+  by_cases distinct : src ≠ dst
+  · by_cases positive : 0 < derived src
+    · have hmoved :=
+        frequency_mul_manyDemeBernsteinWeight_decrementDerived_eq_migrate frequency
+          derived ancestral src dst distinct
+      have horiginal := frequency_mul_manyDemeBernsteinWeight_decrementDerived frequency
+        derived ancestral src positive
+      calc
+        _ = rates.migration src dst * derived src *
+            (frequency dst * manyDemeBernsteinWeight frequency
+                (decrementExponent derived src) ancestral -
+              frequency src * manyDemeBernsteinWeight frequency
+                (decrementExponent derived src) ancestral) := by ring
+        _ = _ := by rw [hmoved, horiginal]
+    · have hzero : derived src = 0 := Nat.eq_zero_of_not_pos positive
+      simp [hzero]
+  · have heq : src = dst := not_ne_iff.mp distinct
+    subst dst
+    simp [rates.migration_self]
+
+/-- The analytic migration drift of ancestral lineages is the same positive label transition,
+with allele complements reversing the frequency difference. -/
+theorem bernsteinWeight_ancestralMigration_identity {D : ℕ}
+    (rates : ManyDemeRates D) (frequency : Fin D → ℝ)
+    (derived ancestral : Fin D → ℕ) (src dst : Fin D) :
+    -(rates.migration src dst * ancestral src * (frequency dst - frequency src) *
+        manyDemeBernsteinWeight frequency derived (decrementExponent ancestral src)) =
+      rates.migration src dst * ancestral src *
+        (manyDemeBernsteinWeight frequency derived (migrateExponent ancestral src dst) -
+          manyDemeBernsteinWeight frequency derived ancestral) := by
+  by_cases distinct : src ≠ dst
+  · by_cases positive : 0 < ancestral src
+    · have hmoved :=
+        complement_mul_manyDemeBernsteinWeight_decrementAncestral_eq_migrate frequency
+          derived ancestral src dst distinct
+      have horiginal := complement_mul_manyDemeBernsteinWeight_decrementAncestral frequency
+        derived ancestral src positive
+      calc
+        _ = rates.migration src dst * ancestral src *
+            ((1 - frequency dst) * manyDemeBernsteinWeight frequency derived
+                (decrementExponent ancestral src) -
+              (1 - frequency src) * manyDemeBernsteinWeight frequency derived
+                (decrementExponent ancestral src)) := by ring
+        _ = _ := by rw [hmoved, horiginal]
+    · have hzero : ancestral src = 0 := Nat.eq_zero_of_not_pos positive
+      simp [hzero]
+  · have heq : src = dst := not_ne_iff.mp distinct
+    subst dst
+    simp [rates.migration_self]
+
+/-- Under symmetric recurrent mutation, a derived dual lineage flips to ancestral with a
+positive rate. -/
+theorem bernsteinWeight_derivedMutation_identity {D : ℕ}
+    (frequency : Fin D → ℝ) (derived ancestral : Fin D → ℕ) (deme : Fin D) :
+    derived deme * (1 - 2 * frequency deme) *
+        manyDemeBernsteinWeight frequency (decrementExponent derived deme) ancestral =
+      derived deme *
+        (manyDemeBernsteinWeight frequency (decrementExponent derived deme)
+            (incrementExponent ancestral deme) -
+          manyDemeBernsteinWeight frequency derived ancestral) := by
+  by_cases positive : 0 < derived deme
+  · have hflip := complement_mul_manyDemeBernsteinWeight_eq_incrementAncestral frequency
+      (decrementExponent derived deme) ancestral deme
+    have horiginal := frequency_mul_manyDemeBernsteinWeight_decrementDerived frequency
+      derived ancestral deme positive
+    calc
+      _ = derived deme *
+          ((1 - frequency deme) * manyDemeBernsteinWeight frequency
+              (decrementExponent derived deme) ancestral -
+            frequency deme * manyDemeBernsteinWeight frequency
+              (decrementExponent derived deme) ancestral) := by ring
+      _ = _ := by rw [hflip, horiginal]
+  · have hzero : derived deme = 0 := Nat.eq_zero_of_not_pos positive
+    simp [hzero]
+
+/-- Under symmetric recurrent mutation, an ancestral dual lineage flips to derived with a
+positive rate. -/
+theorem bernsteinWeight_ancestralMutation_identity {D : ℕ}
+    (frequency : Fin D → ℝ) (derived ancestral : Fin D → ℕ) (deme : Fin D) :
+    -(ancestral deme * (1 - 2 * frequency deme) *
+        manyDemeBernsteinWeight frequency derived (decrementExponent ancestral deme)) =
+      ancestral deme *
+        (manyDemeBernsteinWeight frequency (incrementExponent derived deme)
+            (decrementExponent ancestral deme) -
+          manyDemeBernsteinWeight frequency derived ancestral) := by
+  by_cases positive : 0 < ancestral deme
+  · have hflip := frequency_mul_manyDemeBernsteinWeight_eq_incrementDerived frequency
+      derived (decrementExponent ancestral deme) deme
+    have horiginal := complement_mul_manyDemeBernsteinWeight_decrementAncestral frequency
+      derived ancestral deme positive
+    calc
+      _ = ancestral deme *
+          (frequency deme * manyDemeBernsteinWeight frequency derived
+              (decrementExponent ancestral deme) -
+            (1 - frequency deme) * manyDemeBernsteinWeight frequency derived
+              (decrementExponent ancestral deme)) := by ring
+      _ = _ := by rw [hflip, horiginal]
+  · have hzero : ancestral deme = 0 := Nat.eq_zero_of_not_pos positive
+    simp [hzero]
+
+/-- The diffusion channel at one deme is exactly two positive like-type coalescence
+transitions plus killing at the opposite-type collision rate. -/
+theorem bernsteinWeight_coalescenceChannel_identity {D : ℕ}
+    (rates : ManyDemeRates D) (frequency : Fin D → ℝ)
+    (derived ancestral : Fin D → ℕ) (deme : Fin D) :
+    rates.coalescence deme / 2 * frequency deme * (1 - frequency deme) *
+        manyDemeBernsteinSecondDerivative frequency derived ancestral deme =
+      rates.coalescence deme *
+          ((derived deme * (derived deme - 1) : ℕ) : ℝ) / 2 *
+          (manyDemeBernsteinWeight frequency (decrementExponent derived deme) ancestral -
+            manyDemeBernsteinWeight frequency derived ancestral) +
+        rates.coalescence deme *
+          ((ancestral deme * (ancestral deme - 1) : ℕ) : ℝ) / 2 *
+          (manyDemeBernsteinWeight frequency derived (decrementExponent ancestral deme) -
+            manyDemeBernsteinWeight frequency derived ancestral) -
+        rates.coalescence deme * derived deme * ancestral deme *
+          manyDemeBernsteinWeight frequency derived ancestral := by
+  have hderived := bernsteinWeight_derivedCoalescence_identity frequency
+    derived ancestral deme
+  have hancestral := bernsteinWeight_ancestralCoalescence_identity frequency
+    derived ancestral deme
+  have hopposite := bernsteinWeight_oppositeCoalescence_identity frequency
+    derived ancestral deme
+  unfold manyDemeBernsteinSecondDerivative
+  simp only [Nat.cast_mul] at hderived hancestral hopposite ⊢
+  linear_combination
+    (rates.coalescence deme / 2) * hderived +
+    (rates.coalescence deme / 2) * hancestral -
+    rates.coalescence deme * hopposite
+
+/-- The diffusion migration channel at one ordered edge is exactly independent positive
+migration of derived and ancestral dual lineages. -/
+theorem bernsteinWeight_migrationChannel_identity {D : ℕ}
+    (rates : ManyDemeRates D) (frequency : Fin D → ℝ)
+    (derived ancestral : Fin D → ℕ) (src dst : Fin D) :
+    rates.migration src dst * (frequency dst - frequency src) *
+        manyDemeBernsteinFirstDerivative frequency derived ancestral src =
+      rates.migration src dst * derived src *
+          (manyDemeBernsteinWeight frequency (migrateExponent derived src dst) ancestral -
+            manyDemeBernsteinWeight frequency derived ancestral) +
+        rates.migration src dst * ancestral src *
+          (manyDemeBernsteinWeight frequency derived (migrateExponent ancestral src dst) -
+            manyDemeBernsteinWeight frequency derived ancestral) := by
+  have hderived := bernsteinWeight_derivedMigration_identity rates frequency
+    derived ancestral src dst
+  have hancestral := bernsteinWeight_ancestralMigration_identity rates frequency
+    derived ancestral src dst
+  unfold manyDemeBernsteinFirstDerivative
+  rw [← hderived, ← hancestral]
+  ring
+
+/-- With equal forward and backward mutation rates, the analytic mutation drift is exactly
+positive label flipping in both directions. -/
+theorem bernsteinWeight_symmetricMutationChannel_identity {D : ℕ}
+    (rates : ManyDemeRates D) (frequency : Fin D → ℝ)
+    (derived ancestral : Fin D → ℕ) (deme : Fin D)
+    (symmetric : rates.backwardMutation deme = rates.forwardMutation deme) :
+    (rates.forwardMutation deme * (1 - frequency deme) -
+        rates.backwardMutation deme * frequency deme) *
+        manyDemeBernsteinFirstDerivative frequency derived ancestral deme =
+      rates.forwardMutation deme * derived deme *
+          (manyDemeBernsteinWeight frequency (decrementExponent derived deme)
+              (incrementExponent ancestral deme) -
+            manyDemeBernsteinWeight frequency derived ancestral) +
+        rates.forwardMutation deme * ancestral deme *
+          (manyDemeBernsteinWeight frequency (incrementExponent derived deme)
+              (decrementExponent ancestral deme) -
+            manyDemeBernsteinWeight frequency derived ancestral) := by
+  have hderived := bernsteinWeight_derivedMutation_identity frequency
+    derived ancestral deme
+  have hancestral := bernsteinWeight_ancestralMutation_identity frequency
+    derived ancestral deme
+  unfold manyDemeBernsteinFirstDerivative
+  rw [symmetric]
+  linear_combination
+    rates.forwardMutation deme * hderived +
+    rates.forwardMutation deme * hancestral
+
+/-- The structured Wright--Fisher diffusion generator applied analytically to one Bernstein
+basis weight.  The displayed first and second derivatives contain no division and remain
+valid at boundary exponents. -/
+noncomputable def manyDemeBernsteinAnalyticGenerator {D : ℕ}
+    (rates : ManyDemeRates D) (frequency : Fin D → ℝ)
+    (derived ancestral : Fin D → ℕ) : ℝ :=
+  (∑ deme, rates.coalescence deme / 2 * frequency deme * (1 - frequency deme) *
+      manyDemeBernsteinSecondDerivative frequency derived ancestral deme) +
+  (∑ src, ∑ dst, rates.migration src dst * (frequency dst - frequency src) *
+      manyDemeBernsteinFirstDerivative frequency derived ancestral src) +
+  ∑ deme, (rates.forwardMutation deme * (1 - frequency deme) -
+      rates.backwardMutation deme * frequency deme) *
+      manyDemeBernsteinFirstDerivative frequency derived ancestral deme
+
+/-- Positive killed structured-coalescent generator on derived/ancestral lineage counts.
+
+Like-type pairs coalesce; individual labels migrate; symmetric recurrent mutation flips a
+lineage's allele label; and an opposite-type pair in one deme is killed at rate
+`coalescence * derived * ancestral`.  Every off-diagonal coefficient is nonnegative under the
+typed rate assumptions. -/
+noncomputable def manyDemeKilledDualGenerator {D : ℕ}
+    (rates : ManyDemeRates D)
+    (value : (Fin D → ℕ) → (Fin D → ℕ) → ℝ)
+    (derived ancestral : Fin D → ℕ) : ℝ :=
+  (∑ deme, (
+      rates.coalescence deme *
+          ((derived deme * (derived deme - 1) : ℕ) : ℝ) / 2 *
+          (value (decrementExponent derived deme) ancestral - value derived ancestral) +
+      rates.coalescence deme *
+          ((ancestral deme * (ancestral deme - 1) : ℕ) : ℝ) / 2 *
+          (value derived (decrementExponent ancestral deme) - value derived ancestral) -
+      rates.coalescence deme * derived deme * ancestral deme * value derived ancestral)) +
+  (∑ src, ∑ dst, (
+      rates.migration src dst * derived src *
+          (value (migrateExponent derived src dst) ancestral - value derived ancestral) +
+      rates.migration src dst * ancestral src *
+          (value derived (migrateExponent ancestral src dst) - value derived ancestral))) +
+  ∑ deme, (
+      rates.forwardMutation deme * derived deme *
+          (value (decrementExponent derived deme) (incrementExponent ancestral deme) -
+            value derived ancestral) +
+      rates.forwardMutation deme * ancestral deme *
+          (value (incrementExponent derived deme) (decrementExponent ancestral deme) -
+            value derived ancestral))
+
+/-- **Arbitrary-deme positive killed-dual identity.**  For every frequency vector and every
+derived/ancestral lineage configuration, the existing structured diffusion generator on the
+Bernstein basis is exactly the killed coalescent generator.  This proves—not stipulates—the
+sparse positive law used by the MSI two-deme evaluator, and extends it to every finite deme
+count and migration matrix. -/
+theorem manyDemeBernsteinAnalyticGenerator_eq_killedDual {D : ℕ}
+    (rates : ManyDemeRates D) (frequency : Fin D → ℝ)
+    (derived ancestral : Fin D → ℕ)
+    (symmetric : ∀ deme,
+      rates.backwardMutation deme = rates.forwardMutation deme) :
+    manyDemeBernsteinAnalyticGenerator rates frequency derived ancestral =
+      manyDemeKilledDualGenerator rates
+        (manyDemeBernsteinWeight frequency) derived ancestral := by
+  unfold manyDemeBernsteinAnalyticGenerator manyDemeKilledDualGenerator
+  congr 1
+  · apply Finset.sum_congr rfl
+    intro deme _
+    exact bernsteinWeight_coalescenceChannel_identity rates frequency
+      derived ancestral deme
+  · apply Finset.sum_congr rfl
+    intro src _
+    apply Finset.sum_congr rfl
+    intro dst _
+    exact bernsteinWeight_migrationChannel_identity rates frequency
+      derived ancestral src dst
+  · apply Finset.sum_congr rfl
+    intro deme _
+    exact bernsteinWeight_symmetricMutationChannel_identity rates frequency
+      derived ancestral deme (symmetric deme)
+
+/-- Total absorption rate of the positive Bernstein dual.  Absorption occurs exactly when a
+derived and an ancestral lineage choose the same coalescing parental lineage in one deme. -/
+noncomputable def manyDemeKilledDualKillingRate {D : ℕ} (rates : ManyDemeRates D)
+    (derived ancestral : Fin D → ℕ) : ℝ :=
+  ∑ deme, rates.coalescence deme * derived deme * ancestral deme
+
+/-- The absorption rate is nonnegative for every lineage configuration. -/
+theorem manyDemeKilledDualKillingRate_nonneg {D : ℕ} (rates : ManyDemeRates D)
+    (derived ancestral : Fin D → ℕ) :
+    0 ≤ manyDemeKilledDualKillingRate rates derived ancestral := by
+  unfold manyDemeKilledDualKillingRate
+  apply Finset.sum_nonneg
+  intro deme _
+  positivity
+
+/-- Conservative jump part of the positive Bernstein dual.  The killed generator is this
+Markov jump generator minus the explicit absorption rate. -/
+noncomputable def manyDemeKilledDualJumpGenerator {D : ℕ}
+    (rates : ManyDemeRates D)
+    (value : (Fin D → ℕ) → (Fin D → ℕ) → ℝ)
+    (derived ancestral : Fin D → ℕ) : ℝ :=
+  (∑ deme, (
+      rates.coalescence deme *
+          ((derived deme * (derived deme - 1) : ℕ) : ℝ) / 2 *
+          (value (decrementExponent derived deme) ancestral - value derived ancestral) +
+      rates.coalescence deme *
+          ((ancestral deme * (ancestral deme - 1) : ℕ) : ℝ) / 2 *
+          (value derived (decrementExponent ancestral deme) - value derived ancestral))) +
+  (∑ src, ∑ dst, (
+      rates.migration src dst * derived src *
+          (value (migrateExponent derived src dst) ancestral - value derived ancestral) +
+      rates.migration src dst * ancestral src *
+          (value derived (migrateExponent ancestral src dst) - value derived ancestral))) +
+  ∑ deme, (
+      rates.forwardMutation deme * derived deme *
+          (value (decrementExponent derived deme) (incrementExponent ancestral deme) -
+            value derived ancestral) +
+      rates.forwardMutation deme * ancestral deme *
+          (value (incrementExponent derived deme) (decrementExponent ancestral deme) -
+            value derived ancestral))
+
+/-- Exact conservative-plus-killing decomposition of the arbitrary-deme dual generator. -/
+theorem manyDemeKilledDualGenerator_eq_jump_sub_killing {D : ℕ}
+    (rates : ManyDemeRates D)
+    (value : (Fin D → ℕ) → (Fin D → ℕ) → ℝ)
+    (derived ancestral : Fin D → ℕ) :
+    manyDemeKilledDualGenerator rates value derived ancestral =
+      manyDemeKilledDualJumpGenerator rates value derived ancestral -
+        manyDemeKilledDualKillingRate rates derived ancestral * value derived ancestral := by
+  unfold manyDemeKilledDualGenerator manyDemeKilledDualJumpGenerator
+    manyDemeKilledDualKillingRate
+  rw [Finset.sum_sub_distrib]
+  congr 1
+  · apply Finset.sum_congr rfl
+    intro deme _
+    ring
+  · rw [Finset.sum_mul]
+
+/-- Finite rectangular carrier for derived/ancestral lineage configurations.  Rows of total
+lineage count above `K` are padding; every transition from a biological row of degree at most
+`K` remains in the rectangle or is absorbed. -/
+abbrev ManyDemeKilledDualCoordinate (D K : ℕ) :=
+  (Fin D → Fin (K + 1)) × (Fin D → Fin (K + 1))
+
+/-- Total number of labelled dual lineages in a finite coordinate. -/
+def ManyDemeKilledDualCoordinate.degree {D K : ℕ}
+    (coordinate : ManyDemeKilledDualCoordinate D K) : ℕ :=
+  (∑ deme, (coordinate.1 deme).val) + ∑ deme, (coordinate.2 deme).val
+
+/-- Read a finite vector as a lineage-configuration table, returning zero outside its
+coordinate rectangle. -/
+noncomputable def manyDemeKilledDualVectorTable {D : ℕ} (K : ℕ)
+    (vector : ManyDemeKilledDualCoordinate D K → ℝ)
+    (derived ancestral : Fin D → ℕ) : ℝ :=
+  if hderived : ∀ deme, derived deme < K + 1 then
+    if hancestral : ∀ deme, ancestral deme < K + 1 then
+      vector (fun deme ↦ ⟨derived deme, hderived deme⟩,
+        fun deme ↦ ⟨ancestral deme, hancestral deme⟩)
+    else 0
+  else 0
+
+/-- Finite table construction commutes with vector addition. -/
+theorem manyDemeKilledDualVectorTable_add {D K : ℕ}
+    (left right : ManyDemeKilledDualCoordinate D K → ℝ)
+    (derived ancestral : Fin D → ℕ) :
+    manyDemeKilledDualVectorTable K (left + right) derived ancestral =
+      manyDemeKilledDualVectorTable K left derived ancestral +
+        manyDemeKilledDualVectorTable K right derived ancestral := by
+  unfold manyDemeKilledDualVectorTable
+  split_ifs <;> simp
+
+/-- Finite table construction commutes with scalar multiplication. -/
+theorem manyDemeKilledDualVectorTable_smul {D K : ℕ} (scalar : ℝ)
+    (vector : ManyDemeKilledDualCoordinate D K → ℝ)
+    (derived ancestral : Fin D → ℕ) :
+    manyDemeKilledDualVectorTable K (scalar • vector) derived ancestral =
+      scalar * manyDemeKilledDualVectorTable K vector derived ancestral := by
+  unfold manyDemeKilledDualVectorTable
+  split_ifs <;> simp
+
+/-- The killed generator is linear in the configuration value table. -/
+theorem manyDemeKilledDualGenerator_add {D : ℕ} (rates : ManyDemeRates D)
+    (left right : (Fin D → ℕ) → (Fin D → ℕ) → ℝ)
+    (derived ancestral : Fin D → ℕ) :
+    manyDemeKilledDualGenerator rates (fun a b ↦ left a b + right a b)
+        derived ancestral =
+      manyDemeKilledDualGenerator rates left derived ancestral +
+        manyDemeKilledDualGenerator rates right derived ancestral := by
+  unfold manyDemeKilledDualGenerator
+  simp only [add_sub_add_comm]
+  simp_rw [mul_add]
+  simp only [Finset.sum_add_distrib]
+  ring
+
+/-- The killed generator commutes with scalar multiplication of its value table. -/
+theorem manyDemeKilledDualGenerator_smul {D : ℕ} (rates : ManyDemeRates D)
+    (scalar : ℝ) (value : (Fin D → ℕ) → (Fin D → ℕ) → ℝ)
+    (derived ancestral : Fin D → ℕ) :
+    manyDemeKilledDualGenerator rates (fun a b ↦ scalar * value a b)
+        derived ancestral =
+      scalar * manyDemeKilledDualGenerator rates value derived ancestral := by
+  unfold manyDemeKilledDualGenerator
+  simp only [mul_sub]
+  simp_rw [← mul_assoc]
+  simp only [← Finset.mul_sum]
+  ring
+
+/-- Finite linear operator obtained directly from the proved positive killed-dual law. -/
+noncomputable def manyDemeKilledDualGeneratorLinearMap {D K : ℕ}
+    (rates : ManyDemeRates D) :
+    (ManyDemeKilledDualCoordinate D K → ℝ) →ₗ[ℝ]
+      (ManyDemeKilledDualCoordinate D K → ℝ) where
+  toFun vector coordinate :=
+    if coordinate.degree ≤ K then
+      manyDemeKilledDualGenerator rates (manyDemeKilledDualVectorTable K vector)
+        (fun deme ↦ (coordinate.1 deme).val)
+        (fun deme ↦ (coordinate.2 deme).val)
+    else 0
+  map_add' := by
+    intro left right
+    funext coordinate
+    by_cases hdegree : coordinate.degree ≤ K
+    · simp only [hdegree, if_true]
+      rw [← manyDemeKilledDualGenerator_add rates
+        (manyDemeKilledDualVectorTable K left)
+        (manyDemeKilledDualVectorTable K right)]
+      apply congrArg₂ (manyDemeKilledDualGenerator rates)
+      funext derived ancestral
+      exact manyDemeKilledDualVectorTable_add left right derived ancestral
+    · simp [hdegree]
+  map_smul' := by
+    intro scalar vector
+    funext coordinate
+    by_cases hdegree : coordinate.degree ≤ K
+    · simp only [hdegree, if_true, Pi.smul_apply, smul_eq_mul]
+      rw [← manyDemeKilledDualGenerator_smul rates scalar
+        (manyDemeKilledDualVectorTable K vector)]
+      apply congrArg₂ (manyDemeKilledDualGenerator rates)
+      funext derived ancestral
+      exact manyDemeKilledDualVectorTable_smul scalar vector derived ancestral
+    · simp [hdegree]
+
+/-- Finite zero-extended matrix encoding the arbitrary-deme positive killed dual.  A separate
+closure theorem is required before identifying its exponential with the unrestricted process. -/
+noncomputable def manyDemeKilledDualDynamicsMatrix {D K : ℕ}
+    (rates : ManyDemeRates D) :
+    Matrix (ManyDemeKilledDualCoordinate D K) (ManyDemeKilledDualCoordinate D K) ℝ :=
+  LinearMap.toMatrix' (manyDemeKilledDualGeneratorLinearMap (K := K) rates)
+
+/-- Matrix application evaluates exactly the finite zero-extended killed-dual generator. -/
+theorem manyDemeKilledDualDynamicsMatrix_mulVec {D K : ℕ}
+    (rates : ManyDemeRates D) (vector : ManyDemeKilledDualCoordinate D K → ℝ) :
+    (manyDemeKilledDualDynamicsMatrix (K := K) rates).mulVec vector =
+      manyDemeKilledDualGeneratorLinearMap rates vector := by
+  exact LinearMap.toMatrix'_mulVec _ _
+
+/-- One piecewise-constant epoch for direct positive killed-dual propagation. -/
+structure ManyDemeKilledDualEpoch (D K : ℕ) where
+  rates : ManyDemeRates D
+  duration : ℝ
+  duration_nonneg : 0 ≤ duration
+
+/-- Exactly evaluable finite positive-basis candidate epoch operator.  It is the exponential
+of the zero-extended matrix whose unrestricted generator law was derived above; no equivalence
+to the unrestricted semigroup is claimed before the carrier-closure proof. -/
+noncomputable def ManyDemeKilledDualEpoch.propagator {D K : ℕ}
+    (epoch : ManyDemeKilledDualEpoch D K) :
+    Matrix (ManyDemeKilledDualCoordinate D K) (ManyDemeKilledDualCoordinate D K) ℝ :=
+  matrixExponential (manyDemeKilledDualDynamicsMatrix epoch.rates) epoch.duration
+
+/-- A zero-duration killed-dual epoch is exactly the identity operator. -/
+theorem ManyDemeKilledDualEpoch.propagator_zero {D K : ℕ}
+    (rates : ManyDemeRates D) (nonnegative : 0 ≤ (0 : ℝ)) :
+    (ManyDemeKilledDualEpoch.mk rates 0 nonnegative :
+      ManyDemeKilledDualEpoch D K).propagator = 1 := by
+  exact matrixExponential_zero_time _
 
 /-- The arbitrary-deme structured moment generator.  This is the direct many-deme extension
 of `twoDemeMomentGenerator`; a serial chain, grid, island model, or typed external demography

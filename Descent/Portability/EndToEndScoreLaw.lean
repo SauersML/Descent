@@ -125,9 +125,17 @@ prevent that construction:
   `Coalescent.certifiedManyDemeMomentHistory_pairing_error_le` accumulates rigorous convergent
   Taylor-tail certificates over the whole backward history, and
   `pooledMAFProbeMassCertified_error_le` specializes the result to a finite scalar prediction
-  and certified absolute-error radius.  What remains is a sparse executable representation
-  that exploits the operator without materializing the Cartesian carrier, adds certified
-  floating-point/interval roundoff control, and runs at the executable's 13,750-individual /
+  and certified absolute-error radius.  The positive representation has now been derived at
+  generator level rather than guessed: `manyDemeBernsteinAnalyticGenerator_eq_killedDual`
+  proves for every finite deme count and migration matrix that the diffusion generator on a
+  product Bernstein weight is exactly a structured coalescent with positive like-type
+  coalescence, lineage migration and symmetric-mutation label flips, plus explicit
+  opposite-type killing.  `manyDemeKilledDualGenerator_eq_jump_sub_killing` isolates that
+  nonnegative absorption rate, and `manyDemeKilledDualDynamicsMatrix` encodes its finite
+  zero-extended restriction.  What remains is to prove the finite-carrier closure and
+  semigroup/split intertwining needed to replace the alternating moment evaluator end to end,
+  implement its sparse action without materializing either Cartesian carrier, add certified
+  floating-point/interval roundoff control, and run at the executable's 13,750-individual /
   27,500-haplotype grid2d scale, followed by the filed end-to-end cohort validation gate;
 * the executable protocol is not yet a function of exactly this visible input type.
   `gnomon/sims/ancestry_calibration/gen_real_pt.py` accepts only its hard-coded `serial1d` and
