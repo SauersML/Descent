@@ -120,3 +120,32 @@ and the DD-derived local r^2 curve. phi is the one remaining derivand; it is NOT
 fittable constant, and the near-symmetry of the bracket says its value is near one
 half at this design's thresholds. Predictor v3.1 = the phi-weighted channel mixture;
 it meets the gate on seeds never yet generated.
+
+## 7. Gate 2 verdict: the AUC bar closes; phi's independence discretization is indicted
+
+Second blind gate (seeds 109-116, pin ea51577f/8e272719, verdict committed untouched
+at gate2_verdict_seeds109-116.json):
+
+  P2 AUC: PASS, essentially dead-on -- phenoC -0.009 +/- 0.012, phenoA -0.005 +/-
+  0.012, versus +0.077/+0.086 FAIL at gate 1.  The metric-level chart chain
+  (transport ratio -> variance law -> Gaussian liability chart) now grades clean on
+  fresh data.  Stated caveat: the ratio bar failed in the opposite direction, so
+  partial error cancellation inside the AUC chain cannot be excluded and the pass is
+  claimed for the chain, not for each link separately.
+
+  P1 ratio: FAIL at -0.272 +/- 0.047, every seed negative.  The pre-filed
+  interpretation binds: a negative miss indicts the phi derivation's independence
+  discretization -- too much self-tag weight.  The per-seed pattern confirms it
+  precisely: the miss is worst (-0.39 to -0.44) for the tight-threshold seeds
+  (p ~ 5e-8, panels of 4-5 SNPs, where the formula's phi saturates toward 1) and
+  mildest (-0.09 to -0.17) for the loose-threshold seeds (p ~ 1e-4, panels of 27-38
+  SNPs, phi lower).  Real phi saturates below the independent-tag product because
+  correlated tags and multi-causal windows keep the flip probability finite as
+  z grows.
+
+Next derivand, pre-named: the correlated-field flip probability -- P(clump index is
+the causal) under the actual correlated tag field (extreme values of a correlated
+Gaussian field with the DD-profile covariance, plus multi-causal windows), replacing
+the independent-block product.  Its limiting behavior at z -> infinity must stay
+strictly below one, which the seed pattern demands and the independent product
+violates.
