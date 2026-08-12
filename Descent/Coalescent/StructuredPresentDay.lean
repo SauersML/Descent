@@ -1076,7 +1076,16 @@ P+T pipeline, eight seeds each): this ratio grades at mean residual `+0.075 ± 0
 superseded product form `marginal × linkage` graded `+0.144 ± 0.042`, pair-structured, on
 the same cells.  The `hetRho` argument names the separation at which the one-locus
 heterozygosity coordinate is read; histories propagate `H` identically across separations,
-and no claim here depends on which is supplied. -/
+and no claim here depends on which is supplied.
+
+Downstream metric charts are exact GIVEN the per-deme index variance and are not exact from
+raw `H`: on the same stress cells the Gaussian liability AUC chart reproduces measured AUC
+at `0.006 ± 0.006` when fed the measured per-deme latent-index variance, but the raw-`H`
+prediction of that variance sits `0.60` below measurement because the causal panel is
+COMMON-VARIANT ASCERTAINED and ascertainment flattens per-deme heterozygosity -- worth
+about `0.05` of AUC if ignored.  The ascertained-spectrum heterozygosity is therefore the
+one named factor separating this transport law from full metric-level prediction; it is the
+finite-cohort ascertainment law's object, not a free parameter. -/
 noncomputable def DemographicTwoLocusMoments.panelTransportRatio {D n : ℕ}
     (moments : DemographicTwoLocusMoments D) (panel : Fin n → MarkerSeparationBp)
     (hetRho : MarkerSeparationBp) (source target : Fin D)
