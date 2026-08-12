@@ -3,14 +3,22 @@ VALIDATED is checked against all three record systems (simcov ledger, differenti
 refs, in-head artifact citations).  This is the AFFIRMATIVE audit -- it does not
 start from known candidates; it starts from every claim in the corpus.
 
-First full run (2026-08-12, main abce9453): 959 status heads scanned; 22 strict
-survivors with no ledger entry, no differential reference, and no recognizable
-artifact citation.  Sample reading classified the survivors: quantified inline
-validation records in the pre-ledger head convention (specific retention values,
-RMSE figures, power spans, scoped mixed statuses) -- a PROVENANCE-CITATION gap,
-not unsupported claims; zero fabricated VALIDATED statuses found.  The 22 are
-mechanical debt: each owes a cite-the-producing-artifact line, trackable by
-re-running this sweep, which should trend to zero.
+The record systems checked, in full (the first run of this sweep found only the
+first and part of the last, reported 22 survivors, and both "gaps" were the
+sweep's own blind spots -- the corpus was clean):
+  1. the simcov ledger (declaration-keyed battery records);
+  2. the differential tree at validation/empirical/differential/ -- NOT
+     validation/differential/, the path bug that hid the whole tree from the
+     first run;
+  3. the extract registry (validation/empirical/extract/simulated_names.py and
+     friends) and conventions.json, which key validations by declaration name
+     outside the ledger;
+  4. artifact citations inside the head itself (battery/simcov/validation
+     paths, gate files, differential refs).
+Result on main at b41137bd: 959 status heads scanned, 0 survivors -- every
+MEASURED/VALIDATED claim in the corpus traces to at least one record system.
+The exit condition is zero and stays zero: a new head claiming validation
+without a traceable record turns this sweep red.
 """
 import json, re, glob, sys
 
@@ -23,7 +31,9 @@ def main():
         if isinstance(r, dict) and r.get("declaration"):
             led.add(r["declaration"].split(" ")[0].split("[")[0].strip())
     diff_blob = ""
-    for f in glob.glob(f"{ROOT}/validation/differential/**/*", recursive=True):
+    for f in (glob.glob(f"{ROOT}/validation/empirical/differential/**/*", recursive=True)
+              + glob.glob(f"{ROOT}/validation/empirical/extract/*")
+              + [f"{ROOT}/validation/conventions.json"]):
         if f.endswith((".py", ".json", ".txt", ".lean")):
             try:
                 diff_blob += open(f, errors="ignore").read()
@@ -55,7 +65,7 @@ def main():
     print(f"strict survivors (provenance-citation debt): {len(claims)}")
     for c in claims:
         print("  ", c["file"], c["name"])
-    return 0 if len(claims) <= 22 else 1
+    return 0 if len(claims) == 0 else 1
 
 if __name__ == "__main__":
     sys.exit(main())
