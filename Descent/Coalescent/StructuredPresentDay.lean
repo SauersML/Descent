@@ -934,6 +934,43 @@ noncomputable def manyDemeMomentVectorTable {D : ℕ} (K : ℕ)
     vector (fun d ↦ ⟨exponent d, h d⟩)
   else 0
 
+/-- Read one monomial from a constant-augmented moment state.  The all-zero exponent uses the
+unique affine constant rather than the rectangular degree-zero padding coordinate. -/
+noncomputable def manyDemeMomentStateReadout {D : ℕ} (K : ℕ)
+    (state : Option (ManyDemeMomentCoordinate D K) → ℝ)
+    (exponent : Fin D → ℕ) : ℝ :=
+  if ∀ d, exponent d = 0 then state none
+  else manyDemeMomentVectorTable K (fun coordinate ↦ state (some coordinate)) exponent
+
+/-- One-hot terminal probe representing a requested mixed monomial on the augmented moment
+carrier.  Out-of-rectangle exponents produce the zero probe, matching the state readout. -/
+noncomputable def manyDemeMomentReadoutProbe {D : ℕ} (K : ℕ)
+    (exponent : Fin D → ℕ) : Option (ManyDemeMomentCoordinate D K) → ℝ := by
+  classical
+  exact if hzero : ∀ d, exponent d = 0 then
+      fun coordinate ↦ if coordinate = none then 1 else 0
+    else if hbound : ∀ d, exponent d < K + 1 then
+      let coordinate : ManyDemeMomentCoordinate D K :=
+        fun d ↦ ⟨exponent d, hbound d⟩
+      fun candidate ↦ if candidate = some coordinate then 1 else 0
+    else 0
+
+/-- Pairing the monomial probe with any augmented state gives exactly the corresponding
+mixed-moment readout. -/
+theorem manyDemeMomentReadoutProbe_dotProduct {D : ℕ} (K : ℕ)
+    (exponent : Fin D → ℕ)
+    (state : Option (ManyDemeMomentCoordinate D K) → ℝ) :
+    manyDemeMomentReadoutProbe K exponent ⬝ᵥ state =
+      manyDemeMomentStateReadout K state exponent := by
+  classical
+  by_cases hzero : ∀ d, exponent d = 0
+  · simp [manyDemeMomentReadoutProbe, manyDemeMomentStateReadout, hzero, dotProduct]
+  · by_cases hbound : ∀ d, exponent d < K + 1
+    · simp [manyDemeMomentReadoutProbe, manyDemeMomentStateReadout,
+        manyDemeMomentVectorTable, hzero, hbound, dotProduct]
+    · simp [manyDemeMomentReadoutProbe, manyDemeMomentStateReadout,
+        manyDemeMomentVectorTable, hzero, hbound]
+
 /-- Basis table for one many-deme moment coordinate. -/
 noncomputable def manyDemeMomentBasisTable {D : ℕ} (K : ℕ)
     (column : ManyDemeMomentCoordinate D K) : (Fin D → ℕ) → ℝ :=
@@ -1135,12 +1172,33 @@ theorem ManyDemeMomentInstruction.propagator_mulVec {D K : ℕ}
   | split parent child =>
       exact splitManyDemeMomentPropagator_mulVec parent child state
 
+/-- Every exact demographic instruction preserves the explicit affine constant. -/
+theorem ManyDemeMomentInstruction.apply_none {D K : ℕ}
+    (instruction : ManyDemeMomentInstruction D K)
+    (state : AffineManyDemeMomentCoordinate D K → ℝ) :
+    instruction.apply state none = state none := by
+  cases instruction with
+  | evolve epoch => exact epoch.propagator_none state
+  | split => rfl
+
 /-- Execute an arbitrary finite sequence of exact demographic moment instructions. -/
 noncomputable def propagateManyDemeMomentInstructions {D K : ℕ}
     (instructions : List (ManyDemeMomentInstruction D K))
     (initial : AffineManyDemeMomentCoordinate D K → ℝ) :
     AffineManyDemeMomentCoordinate D K → ℝ :=
   instructions.foldl (fun state instruction ↦ instruction.apply state) initial
+
+/-- A complete instruction sequence preserves the affine constant exactly. -/
+theorem propagateManyDemeMomentInstructions_none {D K : ℕ}
+    (instructions : List (ManyDemeMomentInstruction D K))
+    (initial : AffineManyDemeMomentCoordinate D K → ℝ) :
+    propagateManyDemeMomentInstructions instructions initial none = initial none := by
+  induction instructions generalizing initial with
+  | nil => rfl
+  | cons instruction remaining ih =>
+      change propagateManyDemeMomentInstructions remaining
+        (instruction.apply initial) none = initial none
+      rw [ih, instruction.apply_none]
 
 /-- Ordered forward product for a complete arbitrary-deme instruction history.  For
 `[M₁, M₂, ...]`, this is `... * M₂ * M₁`, the matrix acting on a column initial state. -/

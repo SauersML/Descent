@@ -118,10 +118,13 @@ prevent that construction:
   `manyDemeSampleCountMomentMass` expands the complete count-cell likelihood and adds arbitrary
   latent probe exponents before conditioning, while `pooledCommonVariantHeterozygosityProduct`
   and its normalized `CV²`/cross-deme excess coordinates expose the required fourth-order
-  finite-panel inputs.  Direct Cartesian evaluation is exact but not yet the tractable
-  sampling-dual implementation needed at the executable's 13,750-individual / 27,500-haplotype
-  grid2d scale, and its
-  connection to end-to-end cohort evaluation still awaits the filed validation verdict;
+  finite-panel inputs.  `pooledMAFTerminalProbe` now combines those count cells into one
+  terminal Bernstein vector, and `pooledMAFProbeMass_samplingDual` proves that its backward
+  propagation through every transposed epoch and sparse split equals the direct Cartesian
+  law.  The exact operator specialization is therefore formalized.  What remains is a sparse
+  certified numerical implementation with proved truncation/roundoff control that can exploit
+  it at the executable's 13,750-individual / 27,500-haplotype grid2d scale, followed by the
+  filed end-to-end cohort validation gate;
 * the executable protocol is not yet a function of exactly this visible input type.
   `gnomon/sims/ancestry_calibration/gen_real_pt.py` accepts only its hard-coded `serial1d` and
   `grid2d` constructors rather than an arbitrary event history, hard-codes 250 evaluation
@@ -896,6 +899,15 @@ noncomputable def PipelineDemographicHistory.presentMomentState
     (history.oneLocusMomentInstructions K)
     (Coalescent.commonAncestorManyDemeMomentState history.ancestralMoment)
 
+/-- The visible history preserves the normalized affine constant through every epoch and
+split. -/
+theorem PipelineDemographicHistory.presentMomentState_none
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) (K : ℕ) :
+    history.presentMomentState K none = 1 := by
+  rw [PipelineDemographicHistory.presentMomentState,
+    Coalescent.propagateManyDemeMomentInstructions_none]
+  rfl
+
 /-- Exact present-day mixed one-locus moment produced by the visible event history.  The
 matrix dimension is finite for every requested degree, and every epoch is a matrix
 exponential; no closure or fitted attenuation enters. -/
@@ -906,6 +918,20 @@ noncomputable def PipelineDemographicHistory.oneLocusMoment
   else
     Coalescent.manyDemeMomentVectorTable K
       (fun coordinate ↦ history.presentMomentState K (some coordinate)) exponent
+
+/-- The public one-locus moment is exactly the augmented-state readout for every exponent,
+including the normalized degree-zero monomial. -/
+theorem PipelineDemographicHistory.oneLocusMoment_eq_stateReadout
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) (K : ℕ)
+    (exponent : Fin demeCount → ℕ) :
+    history.oneLocusMoment K exponent =
+      Coalescent.manyDemeMomentStateReadout K (history.presentMomentState K) exponent := by
+  by_cases hzero : ∀ deme, exponent deme = 0
+  · simp [PipelineDemographicHistory.oneLocusMoment,
+      Coalescent.manyDemeMomentStateReadout, hzero,
+      history.presentMomentState_none]
+  · simp [PipelineDemographicHistory.oneLocusMoment,
+      Coalescent.manyDemeMomentStateReadout, hzero]
 
 /-- Exact train-target mixed frequency moment from the arbitrary-deme history. -/
 noncomputable def PipelineDemographicHistory.pairMoment
@@ -991,6 +1017,44 @@ noncomputable def PipelineDemographicHistory.manyDemeSampleCountMomentMass
             (manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent)
             (fun deme ↦ (count deme : ℕ) + (remainder deme : ℕ) + probeExponent deme)
 
+/-- Terminal coefficient vector for one many-deme sample-count cell with an additional
+frequency monomial.  It is the exact Bernstein polynomial expressed in the augmented moment
+basis, before any demographic propagation is performed. -/
+noncomputable def manyDemeSampleCountMomentProbe
+    {demeCount : ℕ} (sampleSize : Fin demeCount → ℕ)
+    (count : ManyDemeSampleCount sampleSize)
+    (probeExponent : Fin demeCount → ℕ) :
+    Coalescent.AffineManyDemeMomentCoordinate demeCount
+      (manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent) → ℝ := by
+  classical
+  let K := manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent
+  exact (∏ deme, (Nat.choose (sampleSize deme) (count deme) : ℝ)) •
+    ∑ remainder : ManyDemeBernsteinRemainder sampleSize count,
+      ((-1 : ℝ) ^ (∑ deme, (remainder deme : ℕ)) *
+        (∏ deme,
+          (Nat.choose (sampleSize deme - count deme) (remainder deme) : ℝ))) •
+        Coalescent.manyDemeMomentReadoutProbe K
+          (fun deme ↦ (count deme : ℕ) + (remainder deme : ℕ) + probeExponent deme)
+
+/-- Pairing the cell probe with the propagated moment state reproduces the original exact
+Bernstein count-cell mass.  Thus the cell law needs one propagated vector, not one separate
+history solve for every complement term. -/
+theorem manyDemeSampleCountMomentProbe_dot_present
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (sampleSize : Fin demeCount → ℕ) (count : ManyDemeSampleCount sampleSize)
+    (probeExponent : Fin demeCount → ℕ) :
+    manyDemeSampleCountMomentProbe sampleSize count probeExponent ⬝ᵥ
+        history.presentMomentState
+          (manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent) =
+      history.manyDemeSampleCountMomentMass sampleSize count probeExponent := by
+  classical
+  unfold manyDemeSampleCountMomentProbe
+  rw [smul_dotProduct]
+  simp_rw [sum_dotProduct, smul_dotProduct,
+    Coalescent.manyDemeMomentReadoutProbe_dotProduct,
+    ← history.oneLocusMoment_eq_stateReadout]
+  simp [PipelineDemographicHistory.manyDemeSampleCountMomentMass, smul_eq_mul]
+
 /-- An exact rational minor-allele-frequency threshold.  The field
 `2 * numerator ≤ denominator` pins the conventional minor-frequency range `[0,1/2]`; the
 positive denominator forbids a vacuous ratio. -/
@@ -1039,6 +1103,78 @@ noncomputable def PipelineDemographicHistory.pooledMAFProbeMass
       history.manyDemeSampleCountMomentMass sampleSize count probeExponent
     else 0
 
+/-- One terminal vector for the complete pooled-MAF event and requested probe monomial.
+All accepted count cells are combined before demographic propagation. -/
+noncomputable def pooledMAFTerminalProbe
+    {demeCount : ℕ} (sampleSize : Fin demeCount → ℕ)
+    (threshold : PooledMAFThreshold) (probeExponent : Fin demeCount → ℕ) :
+    Coalescent.AffineManyDemeMomentCoordinate demeCount
+      (manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent) → ℝ := by
+  classical
+  exact ∑ count : ManyDemeSampleCount sampleSize,
+    if threshold.Accepts (manyDemeTotalSampleSize sampleSize) count.total then
+      manyDemeSampleCountMomentProbe sampleSize count probeExponent
+    else 0
+
+/-- The complete ascertainment polynomial paired with the present moment state is exactly
+the pooled-MAF probe mass. -/
+theorem pooledMAFTerminalProbe_dot_present
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (sampleSize : Fin demeCount → ℕ) (threshold : PooledMAFThreshold)
+    (probeExponent : Fin demeCount → ℕ) :
+    pooledMAFTerminalProbe sampleSize threshold probeExponent ⬝ᵥ
+        history.presentMomentState
+          (manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent) =
+      history.pooledMAFProbeMass sampleSize threshold probeExponent := by
+  classical
+  unfold pooledMAFTerminalProbe PipelineDemographicHistory.pooledMAFProbeMass
+  rw [sum_dotProduct]
+  apply Finset.sum_congr rfl
+  intro count _
+  by_cases accepted :
+      threshold.Accepts (manyDemeTotalSampleSize sampleSize) count.total
+  · simp [accepted, manyDemeSampleCountMomentProbe_dot_present]
+  · simp [accepted]
+
+/-- Exact sampling-dual evaluation of the finite pooled-MAF ascertainment object.  The
+terminal Bernstein probe is propagated backward through the transposed epoch generators and
+sparse split matrices, then paired once with the common-ancestor moment state. -/
+theorem PipelineDemographicHistory.pooledMAFProbeMass_samplingDual
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (sampleSize : Fin demeCount → ℕ) (threshold : PooledMAFThreshold)
+    (probeExponent : Fin demeCount → ℕ) :
+    history.pooledMAFProbeMass sampleSize threshold probeExponent =
+      (Coalescent.manyDemeMomentHistoryDualPropagator
+        (history.oneLocusMomentInstructions
+          (manyDemeTotalSampleSize sampleSize +
+            manyDemeExponentDegree probeExponent))).mulVec
+          (pooledMAFTerminalProbe sampleSize threshold probeExponent) ⬝ᵥ
+        Coalescent.commonAncestorManyDemeMomentState history.ancestralMoment := by
+  rw [← Coalescent.propagateManyDemeMomentInstructions_samplingDual]
+  exact (pooledMAFTerminalProbe_dot_present history sampleSize threshold probeExponent).symm
+
+/-- Backward-operator presentation of one pooled-MAF probe mass. -/
+noncomputable def PipelineDemographicHistory.pooledMAFProbeMassViaDual
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (sampleSize : Fin demeCount → ℕ) (threshold : PooledMAFThreshold)
+    (probeExponent : Fin demeCount → ℕ) : ℝ :=
+  (Coalescent.manyDemeMomentHistoryDualPropagator
+    (history.oneLocusMomentInstructions
+      (manyDemeTotalSampleSize sampleSize +
+        manyDemeExponentDegree probeExponent))).mulVec
+      (pooledMAFTerminalProbe sampleSize threshold probeExponent) ⬝ᵥ
+    Coalescent.commonAncestorManyDemeMomentState history.ancestralMoment
+
+/-- Direct finite Cartesian summation and backward sampling-dual evaluation are the same
+scalar, for every finite panel and arbitrary visible demographic history. -/
+theorem PipelineDemographicHistory.pooledMAFProbeMassViaDual_eq
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (sampleSize : Fin demeCount → ℕ) (threshold : PooledMAFThreshold)
+    (probeExponent : Fin demeCount → ℕ) :
+    history.pooledMAFProbeMassViaDual sampleSize threshold probeExponent =
+      history.pooledMAFProbeMass sampleSize threshold probeExponent :=
+  (history.pooledMAFProbeMass_samplingDual sampleSize threshold probeExponent).symm
+
 /-- Exact arbitrary-order many-deme frequency moment conditional on a pooled sample passing
 the MAF window.  `none` means the ascertainment event has zero mass.  This operator is finite
 for every finite sample layout and exponent and is therefore exactly evaluable without a
@@ -1051,6 +1187,24 @@ noncomputable def PipelineDemographicHistory.momentGivenPooledMAF
   if 0 < denominator then
     some (history.pooledMAFProbeMass sampleSize threshold probeExponent / denominator)
   else none
+
+/-- The conditional pooled-MAF moment is exactly the ratio of two history-wide backward
+operator evaluations.  This is the single positive law replacing repeated forward solves;
+the zero-event branch remains explicitly undefined. -/
+theorem PipelineDemographicHistory.momentGivenPooledMAF_eq_samplingDual
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (sampleSize : Fin demeCount → ℕ) (threshold : PooledMAFThreshold)
+    (probeExponent : Fin demeCount → ℕ) :
+    history.momentGivenPooledMAF sampleSize threshold probeExponent =
+      let denominator :=
+        history.pooledMAFProbeMassViaDual sampleSize threshold (fun _ ↦ 0)
+      if 0 < denominator then
+        some (history.pooledMAFProbeMassViaDual sampleSize threshold probeExponent /
+          denominator)
+      else none := by
+  simp only [PipelineDemographicHistory.momentGivenPooledMAF]
+  rw [history.pooledMAFProbeMassViaDual_eq sampleSize threshold (fun _ ↦ 0),
+    history.pooledMAFProbeMassViaDual_eq sampleSize threshold probeExponent]
 
 /-- The conditional zeroth moment is exactly one whenever the ascertainment event has
 positive mass. -/
