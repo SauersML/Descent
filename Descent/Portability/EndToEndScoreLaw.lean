@@ -114,9 +114,14 @@ prevent that construction:
   the sampled polymorphic/monomorphic events themselves change with `n`.  The same joint law
   now yields every identifiable source-polymorphism-conditioned target factorial moment and
   exact conditional heterozygosity, proving that boundary fixation alone is insufficient.
-  This is not yet the executable's pooled-MAF ascertainment: that event couples every deme's
-  count, must be evaluated to fourth order for finite-panel Jensen terms, and its connection
-  to end-to-end cohort evaluation still awaits the filed validation verdict;
+  The distinct pooled-MAF event is now also constructed without pairwise reduction:
+  `manyDemeSampleCountMomentMass` expands the complete count-cell likelihood and adds arbitrary
+  latent probe exponents before conditioning, while `pooledCommonVariantHeterozygosityProduct`
+  and its normalized `CV²`/cross-deme excess coordinates expose the required fourth-order
+  finite-panel inputs.  Direct Cartesian evaluation is exact but not yet the tractable
+  sampling-dual implementation needed at the executable's 13,750-individual / 27,500-haplotype
+  grid2d scale, and its
+  connection to end-to-end cohort evaluation still awaits the filed validation verdict;
 * the executable protocol is not yet a function of exactly this visible input type.
   `gnomon/sims/ancestry_calibration/gen_real_pt.py` accepts only its hard-coded `serial1d` and
   `grid2d` constructors rather than an arbitrary event history, hard-codes 250 evaluation
@@ -921,6 +926,138 @@ noncomputable def PipelineDemographicHistory.jointSampleCount
             (sourceCount + a) (targetCount + b))
   else 0
 
+/-! ### Exact pooled-panel ascertainment over every deme -/
+
+/-- One allele-count cell for a many-deme sample layout.  The dependent finite type makes an
+out-of-range count unrepresentable. -/
+abbrev ManyDemeSampleCount {demeCount : ℕ} (sampleSize : Fin demeCount → ℕ) :=
+  ∀ deme, Fin (sampleSize deme + 1)
+
+/-- The number of complement factors remaining after fixing a many-deme count cell. -/
+abbrev ManyDemeBernsteinRemainder {demeCount : ℕ}
+    (sampleSize : Fin demeCount → ℕ) (count : ManyDemeSampleCount sampleSize) :=
+  ∀ deme, Fin (sampleSize deme - count deme + 1)
+
+/-- Total haplotype count in a many-deme panel. -/
+def manyDemeTotalSampleSize {demeCount : ℕ} (sampleSize : Fin demeCount → ℕ) : ℕ :=
+  ∑ deme, sampleSize deme
+
+/-- Total derived-allele count in one many-deme sample cell. -/
+def ManyDemeSampleCount.total {demeCount : ℕ} {sampleSize : Fin demeCount → ℕ}
+    (count : ManyDemeSampleCount sampleSize) : ℕ :=
+  ∑ deme, (count deme : ℕ)
+
+/-- A typed count cell cannot contain more derived alleles than the panel contains
+haplotypes. -/
+theorem ManyDemeSampleCount.total_le_totalSampleSize
+    {demeCount : ℕ} {sampleSize : Fin demeCount → ℕ}
+    (count : ManyDemeSampleCount sampleSize) :
+    count.total ≤ manyDemeTotalSampleSize sampleSize := by
+  unfold ManyDemeSampleCount.total manyDemeTotalSampleSize
+  apply Finset.sum_le_sum
+  intro deme _
+  have := (count deme).isLt
+  omega
+
+/-- Total degree of a many-deme probe monomial. -/
+def manyDemeExponentDegree {demeCount : ℕ} (exponent : Fin demeCount → ℕ) : ℕ :=
+  ∑ deme, exponent deme
+
+/-- Exact joint count-cell mass multiplied by an arbitrary latent-frequency monomial.
+
+For count cell `c`, sample layout `n`, and probe exponent `q`, this is
+
+`E[(∏ p_d^(q_d)) (∏ choose(n_d,c_d) p_d^(c_d) (1-p_d)^(n_d-c_d))]`.
+
+Every complement power is expanded by the finite binomial theorem, so the result is one
+finite sum of propagated moments at degree `Σ n_d + Σ q_d`.  Adding probe lineages before
+conditioning is essential: reusing the ascertaining sample's empirical frequency would
+compute a different, selection-biased statistic. -/
+noncomputable def PipelineDemographicHistory.manyDemeSampleCountMomentMass
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (sampleSize : Fin demeCount → ℕ) (count : ManyDemeSampleCount sampleSize)
+    (probeExponent : Fin demeCount → ℕ) : ℝ := by
+  classical
+  exact
+    (∏ deme, (Nat.choose (sampleSize deme) (count deme) : ℝ)) *
+      ∑ remainder : ManyDemeBernsteinRemainder sampleSize count,
+        (-1 : ℝ) ^ (∑ deme, (remainder deme : ℕ)) *
+          (∏ deme,
+            (Nat.choose (sampleSize deme - count deme) (remainder deme) : ℝ)) *
+          history.oneLocusMoment
+            (manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent)
+            (fun deme ↦ (count deme : ℕ) + (remainder deme : ℕ) + probeExponent deme)
+
+/-- An exact rational minor-allele-frequency threshold.  The field
+`2 * numerator ≤ denominator` pins the conventional minor-frequency range `[0,1/2]`; the
+positive denominator forbids a vacuous ratio. -/
+structure PooledMAFThreshold where
+  numerator : ℕ
+  denominator : ℕ
+  denominator_pos : 0 < denominator
+  twice_numerator_le_denominator : 2 * numerator ≤ denominator
+
+/-- Whether a pooled derived count passes a rational MAF threshold.  Cross multiplication
+avoids floating-point rounding and treats either allele orientation identically. -/
+def PooledMAFThreshold.Accepts (threshold : PooledMAFThreshold)
+    (totalCount derivedCount : ℕ) : Prop :=
+  threshold.numerator * totalCount ≤
+    threshold.denominator * min derivedCount (totalCount - derivedCount)
+
+/-- The pooled MAF event is invariant to which allele is called derived.  The count-domain
+hypothesis is supplied automatically by `ManyDemeSampleCount.total_le_totalSampleSize` for
+every cell summed by the ascertainment law. -/
+theorem PooledMAFThreshold.accepts_alleleComplement
+    (threshold : PooledMAFThreshold) (totalCount derivedCount : ℕ)
+    (derived_le : derivedCount ≤ totalCount) :
+    threshold.Accepts totalCount (totalCount - derivedCount) ↔
+      threshold.Accepts totalCount derivedCount := by
+  unfold PooledMAFThreshold.Accepts
+  rw [Nat.sub_sub_self derived_le, min_comm]
+
+/-- The executable causal reservoir's declared one-percent pooled-MAF threshold, represented
+exactly as `1/100`. -/
+def gnomonCausalMAFThreshold : PooledMAFThreshold where
+  numerator := 1
+  denominator := 100
+  denominator_pos := by norm_num
+  twice_numerator_le_denominator := by norm_num
+
+/-- Unnormalized probe-moment mass of a pooled-MAF ascertainment event.  The sum ranges over
+the complete Cartesian sample-count grid for every finite number of demes; no pairwise
+projection can replace this event because the acceptance predicate couples all coordinates. -/
+noncomputable def PipelineDemographicHistory.pooledMAFProbeMass
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (sampleSize : Fin demeCount → ℕ) (threshold : PooledMAFThreshold)
+    (probeExponent : Fin demeCount → ℕ) : ℝ := by
+  classical
+  exact ∑ count : ManyDemeSampleCount sampleSize,
+    if threshold.Accepts (manyDemeTotalSampleSize sampleSize) count.total then
+      history.manyDemeSampleCountMomentMass sampleSize count probeExponent
+    else 0
+
+/-- Exact arbitrary-order many-deme frequency moment conditional on a pooled sample passing
+the MAF window.  `none` means the ascertainment event has zero mass.  This operator is finite
+for every finite sample layout and exponent and is therefore exactly evaluable without a
+frequency grid, density closure, fitted constant, or large-cohort limit. -/
+noncomputable def PipelineDemographicHistory.momentGivenPooledMAF
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (sampleSize : Fin demeCount → ℕ) (threshold : PooledMAFThreshold)
+    (probeExponent : Fin demeCount → ℕ) : Option ℝ :=
+  let denominator := history.pooledMAFProbeMass sampleSize threshold (fun _ ↦ 0)
+  if 0 < denominator then
+    some (history.pooledMAFProbeMass sampleSize threshold probeExponent / denominator)
+  else none
+
+/-- The conditional zeroth moment is exactly one whenever the ascertainment event has
+positive mass. -/
+theorem PipelineDemographicHistory.momentGivenPooledMAF_zero
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (sampleSize : Fin demeCount → ℕ) (threshold : PooledMAFThreshold)
+    (positive : 0 < history.pooledMAFProbeMass sampleSize threshold (fun _ ↦ 0)) :
+    history.momentGivenPooledMAF sampleSize threshold (fun _ ↦ 0) = some 1 := by
+  simp [PipelineDemographicHistory.momentGivenPooledMAF, positive, div_self positive.ne']
+
 /-- Exact cohort-size-aware target erosion derived directly from the visible demographic
 history, rather than from a time-shift surrogate. -/
 noncomputable def PipelineDemographicHistory.targetErosion
@@ -1020,6 +1157,91 @@ theorem PipelineStudyDesign.pooledCohortSize_pos {demeCount : ℕ}
     unfold PipelineStudyDesign.pooledCohortSize
     exact Finset.single_le_sum (fun _ _ ↦ Nat.zero_le _) (Finset.mem_univ design.gwasDeme)
   exact lt_of_lt_of_le (design.cohortSize_pos design.gwasDeme) hle
+
+/-- Haplotype layout used by the visible contract's pooled marker ascertainment.  It is
+derived from the named per-deme cohort sizes rather than introduced as another free panel. -/
+def PipelineStudyDesign.panelAscertainmentHaplotypeCount {demeCount : ℕ}
+    (design : PipelineStudyDesign demeCount) : Fin demeCount → ℕ :=
+  design.evaluationHaplotypeCount
+
+/-- Every deme contributes a positive haplotype pair to pooled marker ascertainment. -/
+theorem PipelineStudyDesign.two_le_panelAscertainmentHaplotypeCount {demeCount : ℕ}
+    (design : PipelineStudyDesign demeCount) (deme : Fin demeCount) :
+    2 ≤ design.panelAscertainmentHaplotypeCount deme :=
+  design.two_le_evaluationHaplotypeCount deme
+
+/-- Exact arbitrary-order joint frequency moment in the visible contract's causal-marker
+reservoir, conditional on the pooled one-percent MAF event.  In particular, exponents through
+degree four feed the ascertained variance and finite-panel Jensen laws. -/
+noncomputable def VisiblePipelineInput.pooledCommonVariantMoment
+    {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
+    (exponent : Fin demeCount → ℕ) : Option ℝ :=
+  input.demography.momentGivenPooledMAF
+    input.studyDesign.panelAscertainmentHaplotypeCount gnomonCausalMAFThreshold exponent
+
+/-- One-deme marginal moment in the pooled common-variant reservoir. -/
+noncomputable def VisiblePipelineInput.pooledCommonVariantAlleleMoment
+    {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
+    (deme : Fin demeCount) (order : ℕ) : Option ℝ :=
+  input.pooledCommonVariantMoment (Coalescent.oneDemeExponent deme order)
+
+/-- Two-deme joint moment in the pooled common-variant reservoir.  This single definition
+supplies every degree-two through degree-four cross-deme coordinate required by the
+drift-heterogeneity law. -/
+noncomputable def VisiblePipelineInput.pooledCommonVariantPairMoment
+    {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
+    (first second : Fin demeCount) (firstOrder secondOrder : ℕ) : Option ℝ :=
+  input.pooledCommonVariantMoment
+    (Coalescent.pairExponent first second firstOrder secondOrder)
+
+/-- Exact common-variant heterozygosity in one deme after the pooled sample-MAF event. -/
+noncomputable def VisiblePipelineInput.pooledCommonVariantHeterozygosity
+    {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
+    (deme : Fin demeCount) : Option ℝ :=
+  (input.pooledCommonVariantAlleleMoment deme 1).bind fun first ↦
+    (input.pooledCommonVariantAlleleMoment deme 2).map fun second ↦
+      2 * (first - second)
+
+/-- Exact fourth-order product of per-locus heterozygosities in two demes after pooled-MAF
+ascertainment:
+
+`E[H_i H_j | A] = 4(E[p_i p_j|A] - E[p_i² p_j|A]
+                         - E[p_i p_j²|A] + E[p_i² p_j²|A])`.
+
+At `i = j` this is the heterozygosity second moment used in the ascertained `CV²`; off the
+diagonal it is the cross-deme moment used in the finite-panel correlation correction. -/
+noncomputable def VisiblePipelineInput.pooledCommonVariantHeterozygosityProduct
+    {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
+    (first second : Fin demeCount) : Option ℝ :=
+  (input.pooledCommonVariantPairMoment first second 1 1).bind fun moment11 ↦
+    (input.pooledCommonVariantPairMoment first second 2 1).bind fun moment21 ↦
+      (input.pooledCommonVariantPairMoment first second 1 2).bind fun moment12 ↦
+        (input.pooledCommonVariantPairMoment first second 2 2).map fun moment22 ↦
+          4 * (moment11 - moment21 - moment12 + moment22)
+
+/-- Exact ascertained per-locus heterozygosity coefficient of variation squared,
+`E[H_d²|A] / E[H_d|A]² - 1`.  A zero conditional mean has no normalized scatter and is
+reported as `none`. -/
+noncomputable def VisiblePipelineInput.pooledCommonVariantHeterozygosityCV2
+    {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
+    (deme : Fin demeCount) : Option ℝ :=
+  (input.pooledCommonVariantHeterozygosity deme).bind fun mean ↦
+    (input.pooledCommonVariantHeterozygosityProduct deme deme).bind fun secondMoment ↦
+      if mean ≠ 0 then some (secondMoment / mean ^ 2 - 1) else none
+
+/-- Exact excess cross-deme heterozygosity product,
+`E[H_i H_j|A] / (E[H_i|A] E[H_j|A]) - 1`.  This is the `rho_ij` coordinate in the
+finite-panel Jensen law, derived from degree-four pooled-ascertained moments rather than
+fitted from portability measurements. -/
+noncomputable def VisiblePipelineInput.pooledCommonVariantHeterozygosityExcessCorrelation
+    {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
+    (first second : Fin demeCount) : Option ℝ :=
+  (input.pooledCommonVariantHeterozygosity first).bind fun firstMean ↦
+    (input.pooledCommonVariantHeterozygosity second).bind fun secondMean ↦
+      (input.pooledCommonVariantHeterozygosityProduct first second).bind fun productMoment ↦
+        if firstMean * secondMean ≠ 0 then
+          some (productMoment / (firstMean * secondMean) - 1)
+        else none
 
 /-- Exact ascertained-tag erosion at the study's actual source and target cohort sizes.  The
 result is `none` exactly when the source-polymorphic conditioning event has zero mass. -/
