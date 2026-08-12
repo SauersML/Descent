@@ -111,8 +111,12 @@ prevent that construction:
   replacement is now the sample-size-specific Bernstein conditional event
   `Coalescent.targetErosionEvent`, composed directly from a visible history by
   `PipelineDemographicHistory.targetErosion`.  It includes the missing mechanism—
-  the sampled polymorphic/monomorphic events themselves change with `n`—but its connection to
-  the end-to-end cohort evaluation still awaits the filed validation verdict;
+  the sampled polymorphic/monomorphic events themselves change with `n`.  The same joint law
+  now yields every identifiable source-polymorphism-conditioned target factorial moment and
+  exact conditional heterozygosity, proving that boundary fixation alone is insufficient.
+  This is not yet the executable's pooled-MAF ascertainment: that event couples every deme's
+  count, must be evaluated to fourth order for finite-panel Jensen terms, and its connection
+  to end-to-end cohort evaluation still awaits the filed validation verdict;
 * the executable protocol is not yet a function of exactly this visible input type.
   `gnomon/sims/ancestry_calibration/gen_real_pt.py` accepts only its hard-coded `serial1d` and
   `grid2d` constructors rather than an arbitrary event history, hard-codes 250 evaluation
@@ -924,6 +928,25 @@ noncomputable def PipelineDemographicHistory.targetErosion
     (train target : Fin demeCount) (ns nt : ℕ) : Option ℝ :=
   Coalescent.targetErosionEvent (history.jointSampleCount train target ns nt) ns nt
 
+/-- Exact factorial moment of the target allele frequency after source-sample ascertainment.
+Both the ascertainment cohort and target evaluation cohort are compiled into the joint
+Bernstein law.  No population-frequency plug-in or large-sample limit appears. -/
+noncomputable def PipelineDemographicHistory.sourcePolymorphicTargetFactorialMoment
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (train target : Fin demeCount) (ns nt order : ℕ) : Option ℝ :=
+  Coalescent.targetFactorialMomentGivenSourcePolymorphic
+    (history.jointSampleCount train target ns nt) ns nt order
+
+/-- Exact target heterozygosity conditional on the source sample being polymorphic.  This is
+the source-polymorphic tag-spectrum coordinate needed to construct target genotype variance;
+target fixation probability is only one boundary event of the same joint law.  The distinct
+pooled-MAF causal-panel event is constructed separately. -/
+noncomputable def PipelineDemographicHistory.sourcePolymorphicTargetHeterozygosity
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (train target : Fin demeCount) (ns nt : ℕ) : Option ℝ :=
+  Coalescent.targetHeterozygosityGivenSourcePolymorphic
+    (history.jointSampleCount train target ns nt) ns nt
+
 /-- Study-design constants named by the requested endpoint. -/
 structure PipelineStudyDesign (demeCount : ℕ) where
   gwasDeme : Fin demeCount
@@ -961,6 +984,13 @@ def PipelineStudyDesign.gwasHaplotypeCount {demeCount : ℕ}
     (design : PipelineStudyDesign demeCount) : ℕ :=
   2 * design.gwasSampleSize
 
+/-- A positive diploid GWAS cohort contains at least one haplotype pair. -/
+theorem PipelineStudyDesign.two_le_gwasHaplotypeCount {demeCount : ℕ}
+    (design : PipelineStudyDesign demeCount) : 2 ≤ design.gwasHaplotypeCount := by
+  unfold PipelineStudyDesign.gwasHaplotypeCount
+  have := design.gwasSampleSize_pos
+  omega
+
 /-- Haploid count corresponding to one diploid evaluation cohort.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- the same ploidy convention as
@@ -968,6 +998,14 @@ Empirical status: NOT AN EMPIRICAL CLAIM -- the same ploidy convention as
 def PipelineStudyDesign.evaluationHaplotypeCount {demeCount : ℕ}
     (design : PipelineStudyDesign demeCount) (deme : Fin demeCount) : ℕ :=
   2 * design.cohortSize deme
+
+/-- Every positive diploid evaluation cohort contains at least one haplotype pair. -/
+theorem PipelineStudyDesign.two_le_evaluationHaplotypeCount {demeCount : ℕ}
+    (design : PipelineStudyDesign demeCount) (deme : Fin demeCount) :
+    2 ≤ design.evaluationHaplotypeCount deme := by
+  unfold PipelineStudyDesign.evaluationHaplotypeCount
+  have := design.cohortSize_pos deme
+  omega
 
 /-- The pooled evaluation cohort is concatenation of the deme cohorts.  Its size is derived,
 not an independently supplied constant that could disagree with the evaluator. -/
@@ -992,12 +1030,43 @@ noncomputable def VisiblePipelineInput.ascertainedTagErosion
     input.studyDesign.gwasHaplotypeCount
     (input.studyDesign.evaluationHaplotypeCount target)
 
-/-- Conditional probability that a source-ascertained tag remains segregating in the target
-cohort.  Both the Bernstein law and its event boundary use the actual two cohort sizes. -/
-noncomputable def VisiblePipelineInput.ascertainedTagSegregationRetention
+/-- Exact target frequency factorial moment after source-polymorphism ascertainment at the
+study's actual cohort sizes.  Orders one and two supply the tag-spectrum coordinates used by
+heterozygosity and genotype variance. -/
+noncomputable def VisiblePipelineInput.sourcePolymorphicTargetFactorialMoment
+    {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
+    (target : Fin demeCount) (order : ℕ) : Option ℝ :=
+  input.demography.sourcePolymorphicTargetFactorialMoment input.studyDesign.gwasDeme target
+    input.studyDesign.gwasHaplotypeCount
+    (input.studyDesign.evaluationHaplotypeCount target) order
+
+/-- Exact source-polymorphism-conditioned target heterozygosity for every deme.  Unlike
+segregation retention, this retains the entire interior count spectrum and therefore
+determines the marginal tag-genotype variance scale required upstream of a `DemeScoreLaw`. -/
+noncomputable def VisiblePipelineInput.sourcePolymorphicTargetHeterozygosity
     {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
     (target : Fin demeCount) : Option ℝ :=
-  (input.ascertainedTagErosion target).map fun erosion ↦ 1 - erosion
+  input.demography.sourcePolymorphicTargetHeterozygosity input.studyDesign.gwasDeme target
+    input.studyDesign.gwasHaplotypeCount
+    (input.studyDesign.evaluationHaplotypeCount target)
+
+/-- At every visible target deme, source-polymorphism-conditioned heterozygosity is exactly
+`2(m₁-m₂)` for the first two conditional factorial moments.  The cohort-size domain is
+discharged from the study design's positive diploid cohort field. -/
+theorem VisiblePipelineInput.sourcePolymorphicTargetHeterozygosity_eq_factorialMoments
+    {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
+    (target : Fin demeCount) :
+    input.sourcePolymorphicTargetHeterozygosity target =
+      (input.sourcePolymorphicTargetFactorialMoment target 1).bind fun first ↦
+        (input.sourcePolymorphicTargetFactorialMoment target 2).map fun second ↦
+          2 * (first - second) := by
+  exact Coalescent.targetHeterozygosityGivenSourcePolymorphic_eq_factorialMoments
+    (input.demography.jointSampleCount input.studyDesign.gwasDeme target
+      input.studyDesign.gwasHaplotypeCount
+      (input.studyDesign.evaluationHaplotypeCount target))
+    input.studyDesign.gwasHaplotypeCount
+    (input.studyDesign.evaluationHaplotypeCount target)
+    (input.studyDesign.two_le_evaluationHaplotypeCount target)
 
 /-- Migration-restored linkage factor on its mathematical correlation domain.  It is the
 squared normalized cross-deme `DD` read after the complete demographic operator product.
@@ -1167,44 +1236,6 @@ theorem PipelineDemographicHistory.commonDiffusionProjection_exact
       rfl
     _ = history.betweenDivergence first second :=
       (history.betweenDivergence_eq_pairProjection first second).symm
-
-/-- One-tag/one-causal portability channel after cohort ascertainment.  The marginal factor
-and low-order LD factor share recurrent symmetric-biallelic mutation rates and boundary law;
-`commonDiffusionProjection_exact` proves their common-kernel join for every input history.
-`none` records a zero-mass ascertainment event. -/
-noncomputable def VisiblePipelineInput.singlePairAccuracyRetentionCandidate
-    {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
-    (separation : Coalescent.MarkerSeparationBp) (target : Fin demeCount) : Option ℝ :=
-  (input.ascertainedTagSegregationRetention target).bind fun marginal ↦
-    (input.accuracyLinkageFactor separation target).map fun linkage ↦
-      marginal * linkage
-
-/-- Once the common projection is proved, the curve has exactly the advertised marginal and
-joint factors and no fitted restoration coordinate. -/
-theorem VisiblePipelineInput.singlePairAccuracyRetentionCandidate_eq
-    {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
-    (separation : Coalescent.MarkerSeparationBp) (target : Fin demeCount)
-    (domain : input.demography.twoLocusMoments.LDPairDomain separation
-      input.studyDesign.gwasDeme target) :
-    input.singlePairAccuracyRetentionCandidate separation target =
-      (input.ascertainedTagErosion target).map fun erosion ↦
-        (1 - erosion) *
-          (input.demography.twoLocusMoments.crossDemeLDCorrelation separation
-            input.studyDesign.gwasDeme target domain.toLDNormalizationDomain) ^ 2 := by
-  classical
-  cases hErosion : input.ascertainedTagErosion target with
-  | none =>
-      simp [VisiblePipelineInput.singlePairAccuracyRetentionCandidate,
-        VisiblePipelineInput.ascertainedTagSegregationRetention,
-        VisiblePipelineInput.accuracyLinkageFactor,
-        domain.toLDNormalizationDomain, hErosion]
-  | some erosion =>
-      simp [VisiblePipelineInput.singlePairAccuracyRetentionCandidate,
-        VisiblePipelineInput.ascertainedTagSegregationRetention,
-        VisiblePipelineInput.accuracyLinkageFactor,
-        VisiblePipelineInput.accuracyLinkageFactorOn,
-        Coalescent.DemographicTwoLocusMoments.accuracyLinkageFactor_eq_correlation_sq,
-        domain.toLDNormalizationDomain, hErosion]
 
 /-- Domain on which Hudson differentiation is defined. -/
 structure PipelineDemographicHistory.HudsonFstDomain

@@ -253,6 +253,120 @@ noncomputable def targetErosionEvent
     some (sourcePolymorphicTargetMonomorphicEventMass jointCount ns nt / denominator)
   else none
 
+/-- The normalized descending-factorial statistic carried by a count `j` from a sample of
+size `n`: `(j)_order / (n)_order`.  Its domain proof forbids requesting a frequency moment
+whose order exceeds the sample size. -/
+noncomputable def normalizedCountFactorialMoment
+    (sampleSize order count : ℕ) (_ : order ≤ sampleSize) : ℝ :=
+  (count.descFactorial order : ℝ) / (sampleSize.descFactorial order : ℝ)
+
+/-- Exact finite-sample heterozygosity statistic.  For at least two haplotypes this is
+`2 ((J)_1/(n)_1 - (J)_2/(n)_2)`, the unbiased pairwise-difference readout of the target
+frequency.  A sample with fewer than two haplotypes contains no pair and therefore has no
+inhabitant of this statistic's domain. -/
+noncomputable def targetCountHeterozygosity
+    (sampleSize count : ℕ) (domain : 2 ≤ sampleSize) : ℝ :=
+  2 * (normalizedCountFactorialMoment sampleSize 1 count (by omega) -
+    normalizedCountFactorialMoment sampleSize 2 count domain)
+
+/-- Joint mass of source-sample ascertainment weighted by an arbitrary statistic of the
+target count.  This is the finite conditional-expectation numerator; both cohort sizes occur
+in the event and the target statistic, so changing a cohort size changes the law itself. -/
+noncomputable def sourcePolymorphicTargetStatisticMass
+    (jointCount : ℕ → ℕ → ℝ) (ns nt : ℕ) (statistic : ℕ → ℝ) : ℝ :=
+  ∑ i ∈ Finset.Icc 1 (ns - 1),
+    ∑ j ∈ Finset.range (nt + 1), statistic j * jointCount i j
+
+/-- Exact conditional expectation of a target-count statistic given observed source
+polymorphism.  `none` is the genuine zero-mass conditioning case, never a numerical fallback. -/
+noncomputable def targetStatisticGivenSourcePolymorphic
+    (jointCount : ℕ → ℕ → ℝ) (ns nt : ℕ) (statistic : ℕ → ℝ) : Option ℝ :=
+  let denominator := sourcePolymorphicEventMass jointCount ns nt
+  if 0 < denominator then
+    some (sourcePolymorphicTargetStatisticMass jointCount ns nt statistic / denominator)
+  else none
+
+/-- Every target frequency moment identifiable from `nt` haplotypes, conditional on the
+actual source ascertainment event.  The descending-factorial statistic makes this a direct
+Bernstein readout rather than a plug-in frequency approximation. -/
+noncomputable def targetFactorialMomentGivenSourcePolymorphic
+    (jointCount : ℕ → ℕ → ℝ) (ns nt order : ℕ) : Option ℝ :=
+  if domain : order ≤ nt then
+    targetStatisticGivenSourcePolymorphic jointCount ns nt
+      (fun count ↦ normalizedCountFactorialMoment nt order count domain)
+  else none
+
+/-- Exact expected target heterozygosity after source-sample ascertainment, evaluated at both
+actual cohort sizes.  This is the missing common-variant spectrum coordinate needed by score
+variance; fixation probability alone does not determine it. -/
+noncomputable def targetHeterozygosityGivenSourcePolymorphic
+    (jointCount : ℕ → ℕ → ℝ) (ns nt : ℕ) : Option ℝ :=
+  if domain : 2 ≤ nt then
+    targetStatisticGivenSourcePolymorphic jointCount ns nt
+      (fun count ↦ targetCountHeterozygosity nt count domain)
+  else none
+
+/-- Monomorphic target counts contribute exactly zero to the finite-sample heterozygosity
+readout. -/
+theorem targetCountHeterozygosity_zero (sampleSize : ℕ) (domain : 2 ≤ sampleSize) :
+    targetCountHeterozygosity sampleSize 0 domain = 0 := by
+  simp [targetCountHeterozygosity, normalizedCountFactorialMoment]
+
+/-- The all-derived target count also contributes exactly zero. -/
+theorem targetCountHeterozygosity_self (sampleSize : ℕ) (domain : 2 ≤ sampleSize) :
+    targetCountHeterozygosity sampleSize sampleSize domain = 0 := by
+  unfold targetCountHeterozygosity normalizedCountFactorialMoment
+  rw [Nat.descFactorial_one]
+  have hn : (sampleSize : ℝ) ≠ 0 := by positivity
+  have hdf : (sampleSize.descFactorial 2 : ℝ) ≠ 0 := by
+    exact_mod_cast (Nat.descFactorial_pos.mpr domain).ne'
+  rw [div_self hn, div_self hdf]
+  ring
+
+/-- Weighting and summing over the finite ascertainment event is linear.  This elementary
+identity is the algebraic step that turns the first two exact factorial moments into exact
+heterozygosity after conditioning. -/
+theorem sourcePolymorphicTargetStatisticMass_scaledSub
+    (jointCount : ℕ → ℕ → ℝ) (ns nt : ℕ) (scale : ℝ)
+    (first second : ℕ → ℝ) :
+    sourcePolymorphicTargetStatisticMass jointCount ns nt
+        (fun count ↦ scale * (first count - second count)) =
+      scale * (sourcePolymorphicTargetStatisticMass jointCount ns nt first -
+        sourcePolymorphicTargetStatisticMass jointCount ns nt second) := by
+  classical
+  unfold sourcePolymorphicTargetStatisticMass
+  simp only [mul_sub, sub_mul, Finset.sum_sub_distrib, Finset.mul_sum]
+  ring
+
+/-- The conditional heterozygosity law is exactly twice the difference between the first and
+second conditional descending-factorial moments.  This theorem rules out treating fixation
+retention as a substitute for the interior spectrum: both moments are required. -/
+theorem targetHeterozygosityGivenSourcePolymorphic_eq_factorialMoments
+    (jointCount : ℕ → ℕ → ℝ) (ns nt : ℕ) (hnt : 2 ≤ nt) :
+    targetHeterozygosityGivenSourcePolymorphic jointCount ns nt =
+      (targetFactorialMomentGivenSourcePolymorphic jointCount ns nt 1).bind fun first ↦
+        (targetFactorialMomentGivenSourcePolymorphic jointCount ns nt 2).map fun second ↦
+          2 * (first - second) := by
+  let denominator := sourcePolymorphicEventMass jointCount ns nt
+  have hntOne : 1 ≤ nt := by omega
+  by_cases hdenominator : 0 < denominator
+  · simp only [targetHeterozygosityGivenSourcePolymorphic, dif_pos hnt,
+      targetFactorialMomentGivenSourcePolymorphic,
+      dif_pos hntOne, dif_pos hnt,
+      targetStatisticGivenSourcePolymorphic, denominator, hdenominator, if_pos,
+      Option.bind_some, Option.map_some]
+    have hstatistic : (fun count ↦ targetCountHeterozygosity nt count hnt) = fun count ↦
+        2 * (normalizedCountFactorialMoment nt 1 count hntOne -
+          normalizedCountFactorialMoment nt 2 count hnt) := by
+      funext count
+      rfl
+    rw [hstatistic]
+    rw [sourcePolymorphicTargetStatisticMass_scaledSub]
+    ring
+  · simp [targetHeterozygosityGivenSourcePolymorphic, hnt,
+      targetFactorialMomentGivenSourcePolymorphic,
+      hntOne, targetStatisticGivenSourcePolymorphic, denominator, hdenominator]
+
 /-! ### Transient piecewise demographies -/
 
 /-- Homogeneous generator for the nonconstant moment coordinates.  Unlike the stationary
