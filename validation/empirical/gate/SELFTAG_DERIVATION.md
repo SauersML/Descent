@@ -178,3 +178,27 @@ correlated-extremes computation with the DD-profile covariance.  This unifies
 sections 1-7: v1 was a_tj with no conditioning and no winner weighting; v3 was the
 x = 0 endpoint only; v3.1 was a two-point quadrature of the true integral.  v3.2 is
 the integral itself.  It meets gate 3 on seeds never yet generated.
+
+## 9. Gate 3: the winner-location integral passes every bar blind
+
+Third blind gate (seeds 117-124, pin 1863cc05, verdict untouched at
+gate3_verdict_seeds117-124.json):
+
+  P1 transport ratio: PASS on both phenotypes -- phenoC +0.032 +/- 0.052 (0.6 sems
+  from zero), residuals mixed-sign across seeds with no systematic structure.
+  Against +0.261 (gate 1) and -0.272 (gate 2), the law's blind trajectory closes at
+  a residual indistinguishable from zero at this power.
+
+  P2 AUC: PASS on both phenotypes -- phenoC -0.0025 +/- 0.009, phenoA -0.007 +/-
+  0.009 -- the second consecutive blind pass of the metric chain.
+
+STATUS OF THE LAW: the selection-conditioned winner-location integral, with the
+exact ascertained fourth moments, the regression-conditional amplitudes, and zero
+fitted constants, is now blind-validated on this demography class within a power of
+about one twentieth of the transported ratio. The complete-law derivation
+(EXACT_TRANSPORT_DERIVATION.md) remains the governing theory: the passing law is a
+truncation whose known omitted terms (multi-causal regions, panel winner's curse,
+closure cumulant bound) are hereby measured to lie below current gate power at this
+design; the assembled law with its internal error budget is the object that carries
+the program to other designs and higher power, and any future residual already has
+its term list frozen.
