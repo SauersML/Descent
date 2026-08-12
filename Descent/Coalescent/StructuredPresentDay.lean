@@ -5,6 +5,7 @@ import Descent.Coalescent.Structured
 import Descent.Core.Moments
 import Mathlib.Analysis.Matrix
 import Mathlib.Analysis.Normed.Algebra.Exponential
+import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 import Mathlib.Algebra.MvPolynomial.Funext
 import Mathlib.Algebra.MvPolynomial.PDeriv
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
@@ -390,6 +391,134 @@ noncomputable def twoDemeMomentDynamicsMatrix (r : TwoDemeRates) (K : ℕ) :
 noncomputable def matrixExponential {ι : Type*} [Fintype ι] [DecidableEq ι]
     (A : Matrix ι ι ℝ) (time : ℝ) : Matrix ι ι ℝ :=
   ∑' power : ℕ, ((power.factorial : ℝ)⁻¹) • ((time • A) ^ power)
+
+/-- A finite real generator is Metzler when every off-diagonal entry is nonnegative.  This
+is the exact infinitesimal condition for a positive finite-dimensional semigroup; diagonal
+entries may be negative because they contain total exit and killing rates. -/
+def Matrix.IsMetzler {ι : Type*} (A : Matrix ι ι ℝ) : Prop :=
+  ∀ row column, row ≠ column → 0 ≤ A row column
+
+/-- Finite diagonal shift used to turn a Metzler matrix into an entrywise-nonnegative
+matrix.  The sum of absolute diagonal entries is deliberately nonminimal but exact and
+requires no choice of a maximizing coordinate. -/
+noncomputable def matrixMetzlerShift {ι : Type*} [Fintype ι]
+    (A : Matrix ι ι ℝ) : ℝ :=
+  ∑ coordinate, |A coordinate coordinate|
+
+/-- Adding the exact finite diagonal shift makes every entry of a Metzler matrix
+nonnegative. -/
+theorem matrix_add_metzlerShift_nonneg {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : Matrix ι ι ℝ) (hA : Matrix.IsMetzler A) (row column : ι) :
+    0 ≤ (A + matrixMetzlerShift A • (1 : Matrix ι ι ℝ)) row column := by
+  by_cases equal : row = column
+  · subst column
+    have diagonal_le : |A row row| ≤ matrixMetzlerShift A := by
+      unfold matrixMetzlerShift
+      exact Finset.single_le_sum (fun coordinate _ ↦ abs_nonneg (A coordinate coordinate))
+        (Finset.mem_univ row)
+    have neg_diagonal_le : -A row row ≤ |A row row| := neg_le_abs (A row row)
+    have shiftedDiagonal : 0 ≤ A row row + matrixMetzlerShift A := by linarith
+    simpa [Matrix.one_apply] using shiftedDiagonal
+  · simp [Matrix.add_apply, equal, hA row column equal]
+
+/-- Every power of an entrywise-nonnegative finite matrix is entrywise nonnegative. -/
+theorem matrix_pow_apply_nonneg_of_nonneg {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : Matrix ι ι ℝ) (hA : ∀ row column, 0 ≤ A row column) :
+    ∀ power row column, 0 ≤ (A ^ power) row column := by
+  intro power
+  induction power with
+  | zero =>
+      intro row column
+      by_cases equal : row = column <;> simp [equal]
+  | succ power induction =>
+      intro row column
+      rw [pow_succ, Matrix.mul_apply]
+      exact Finset.sum_nonneg fun middle _ ↦
+        mul_nonneg (induction row middle) (hA middle column)
+
+/-- The exact exponential series of an entrywise-nonnegative matrix at nonnegative time is
+entrywise nonnegative. -/
+theorem matrixExponential_apply_nonneg_of_nonneg {ι : Type*}
+    [Fintype ι] [DecidableEq ι] (A : Matrix ι ι ℝ)
+    (hA : ∀ row column, 0 ≤ A row column) (time : ℝ) (time_nonneg : 0 ≤ time)
+    (row column : ι) :
+    0 ≤ matrixExponential A time row column := by
+  unfold matrixExponential
+  have summableMatrix : Summable (fun power : ℕ ↦
+      ((power.factorial : ℝ)⁻¹) • ((time • A) ^ power)) :=
+    NormedSpace.expSeries_summable' (time • A)
+  have summableRow : Summable (fun power : ℕ ↦
+      (((power.factorial : ℝ)⁻¹) • ((time • A) ^ power)) row) :=
+    Pi.summable.mp summableMatrix row
+  rw [tsum_apply summableMatrix, tsum_apply summableRow]
+  apply tsum_nonneg
+  intro power
+  apply mul_nonneg
+  · exact inv_nonneg.mpr (Nat.cast_nonneg power.factorial)
+  · apply matrix_pow_apply_nonneg_of_nonneg
+    intro source target
+    change 0 ≤ time * A source target
+    exact mul_nonneg time_nonneg (hA source target)
+
+/-- The corpus matrix exponential is definitionally the Banach-algebra exponential of the
+time-scaled matrix.  This bridge permits exact commuting-shift identities while retaining
+the explicit series definition used by certified evaluators. -/
+theorem matrixExponential_eq_normedSpace_exp {ι : Type*}
+    [Fintype ι] [DecidableEq ι] (A : Matrix ι ι ℝ) (time : ℝ) :
+    matrixExponential A time = NormedSpace.exp ℝ (time • A) := by
+  rw [NormedSpace.exp_eq_tsum]
+  rfl
+
+/-- **A finite Metzler generator has an entrywise-nonnegative exact semigroup.**
+
+The proof adds the finite scalar diagonal shift `c = Σᵢ |Aᵢᵢ|`, making
+`B = A + cI` entrywise nonnegative.  Since the scalar matrix commutes with `B`,
+`exp(tA) = exp(-tc I) exp(tB)`.  The second factor is nonnegative term-by-term in its
+convergent series and the first is a positive scalar diagonal.  No Euler discretization,
+closure, or limiting Markov-chain assertion is assumed. -/
+theorem matrixExponential_apply_nonneg_of_metzler {ι : Type*}
+    [Fintype ι] [DecidableEq ι] (A : Matrix ι ι ℝ) (hA : Matrix.IsMetzler A)
+    (time : ℝ) (time_nonneg : 0 ≤ time) (row column : ι) :
+    0 ≤ matrixExponential A time row column := by
+  let shift := matrixMetzlerShift A
+  let shifted := A + shift • (1 : Matrix ι ι ℝ)
+  have shifted_nonneg : ∀ source target, 0 ≤ shifted source target := by
+    intro source target
+    exact matrix_add_metzlerShift_nonneg A hA source target
+  have decomposition : time • A =
+      (-time * shift) • (1 : Matrix ι ι ℝ) + time • shifted := by
+    ext source target
+    by_cases equal : source = target
+    · subst target
+      simp [shifted]
+    · simp [shifted, equal]
+  have commute : Commute ((-time * shift) • (1 : Matrix ι ι ℝ)) (time • shifted) :=
+    (Commute.one_left (time • shifted)).smul_left (-time * shift)
+  have exponentialDecomposition :
+      NormedSpace.exp ℝ
+          ((-time * shift) • (1 : Matrix ι ι ℝ) + time • shifted) =
+        NormedSpace.exp ℝ ((-time * shift) • (1 : Matrix ι ι ℝ)) *
+          NormedSpace.exp ℝ (time • shifted) :=
+    Matrix.exp_add_of_commute ℝ _ _ commute
+  rw [matrixExponential_eq_normedSpace_exp, decomposition, exponentialDecomposition]
+  rw [show (-time * shift) • (1 : Matrix ι ι ℝ) =
+      Matrix.diagonal (fun _ : ι ↦ -time * shift) by
+        ext source target
+        by_cases equal : source = target <;> simp [equal]]
+  rw [Matrix.exp_diagonal]
+  rw [Matrix.mul_apply]
+  apply Finset.sum_nonneg
+  intro middle _
+  apply mul_nonneg
+  · by_cases equal : row = middle
+    · subst middle
+      have exponential_nonneg : 0 ≤ Real.exp (-(time * shift)) := (Real.exp_pos _).le
+      rw [Real.exp_eq_exp_ℝ] at exponential_nonneg
+      simpa using exponential_nonneg
+    · simp [equal]
+  · rw [← matrixExponential_eq_normedSpace_exp]
+    exact matrixExponential_apply_nonneg_of_nonneg shifted shifted_nonneg time time_nonneg
+      middle column
 
 /-- Finite Taylor evaluation of the exact matrix exponential, through powers
 `0, ..., terms - 1`. -/
@@ -2279,6 +2408,57 @@ theorem manyDemeKilledDualGenerator_eq_jump_sub_killing {D : ℕ}
   simp only [Finset.sum_sub_distrib, Finset.sum_add_distrib, Finset.sum_mul]
   ring
 
+/-- A nonnegative value table that vanishes at the current configuration has a
+nonnegative killed-generator derivative there.  This is the coefficient-level positivity
+statement behind the Metzler property: killing and all diagonal exit charges disappear at
+the zero current value, while every possible destination is charged at a typed
+nonnegative rate. -/
+theorem manyDemeKilledDualGenerator_nonneg_of_nonneg_of_current_eq_zero {D : ℕ}
+    (rates : ManyDemeRates D)
+    (value : (Fin D → ℕ) → (Fin D → ℕ) → ℝ)
+    (derived ancestral : Fin D → ℕ)
+    (value_nonneg : ∀ a b, 0 ≤ value a b)
+    (current_zero : value derived ancestral = 0) :
+    0 ≤ manyDemeKilledDualGenerator rates value derived ancestral := by
+  rw [manyDemeKilledDualGenerator_eq_jump_sub_killing, current_zero]
+  simp only [mul_zero, sub_zero]
+  unfold manyDemeKilledDualJumpGenerator
+  rw [current_zero]
+  simp only [sub_zero]
+  apply add_nonneg
+  · apply add_nonneg
+    · apply Finset.sum_nonneg
+      intro deme _
+      apply add_nonneg
+      · exact mul_nonneg
+          (div_nonneg
+            (mul_nonneg (rates.coalescence_pos deme).le (Nat.cast_nonneg _)) (by norm_num))
+          (value_nonneg _ _)
+      · exact mul_nonneg
+          (div_nonneg
+            (mul_nonneg (rates.coalescence_pos deme).le (Nat.cast_nonneg _)) (by norm_num))
+          (value_nonneg _ _)
+    · apply Finset.sum_nonneg
+      intro source _
+      apply Finset.sum_nonneg
+      intro target _
+      apply add_nonneg
+      · exact mul_nonneg
+          (mul_nonneg (rates.migration_nonneg source target) (Nat.cast_nonneg _))
+          (value_nonneg _ _)
+      · exact mul_nonneg
+          (mul_nonneg (rates.migration_nonneg source target) (Nat.cast_nonneg _))
+          (value_nonneg _ _)
+  · apply Finset.sum_nonneg
+    intro deme _
+    apply add_nonneg
+    · exact mul_nonneg
+        (mul_nonneg (rates.forwardMutation_nonneg deme) (Nat.cast_nonneg _))
+        (value_nonneg _ _)
+    · exact mul_nonneg
+        (mul_nonneg (rates.forwardMutation_nonneg deme) (Nat.cast_nonneg _))
+        (value_nonneg _ _)
+
 /-- Finite rectangular carrier for derived/ancestral lineage configurations.  Rows of total
 lineage count above `K` are padding; every transition from a biological row of degree at most
 `K` remains in the rectangle or is absorbed. -/
@@ -2802,6 +2982,25 @@ noncomputable def biologicalManyDemeKilledDualVectorTable {D K : ℕ}
     else 0
   else 0
 
+/-- Zero extension from the compact biological carrier preserves pointwise
+nonnegativity. -/
+theorem biologicalManyDemeKilledDualVectorTable_nonneg {D K : ℕ}
+    (state : BiologicalManyDemeKilledDualCoordinate D K → ℝ)
+    (state_nonneg : ∀ coordinate, 0 ≤ state coordinate)
+    (derived ancestral : Fin D → ℕ) :
+    0 ≤ biologicalManyDemeKilledDualVectorTable state derived ancestral := by
+  unfold biologicalManyDemeKilledDualVectorTable
+  by_cases hderived : ∀ deme, derived deme < K + 1
+  · rw [dif_pos hderived]
+    by_cases hancestral : ∀ deme, ancestral deme < K + 1
+    · rw [dif_pos hancestral]
+      dsimp only
+      split_ifs
+      · exact state_nonneg _
+      · exact le_rfl
+    · rw [dif_neg hancestral]
+  · rw [dif_neg hderived]
+
 /-- Compact killed-dual table construction commutes with addition. -/
 theorem biologicalManyDemeKilledDualVectorTable_add {D K : ℕ}
     (left right : BiologicalManyDemeKilledDualCoordinate D K → ℝ)
@@ -2872,6 +3071,18 @@ theorem biologicalManyDemeKilledDualVectorTable_of_degree_le {D K : ℕ}
   simp only [ManyDemeKilledDualCoordinate.degree]
   rw [dif_pos (by simpa using degree_le)]
 
+/-- Reading the unrestricted table at the configuration represented by a compact
+coordinate returns that coordinate's entry exactly. -/
+theorem biologicalManyDemeKilledDualVectorTable_at_coordinate {D K : ℕ}
+    (state : BiologicalManyDemeKilledDualCoordinate D K → ℝ)
+    (coordinate : BiologicalManyDemeKilledDualCoordinate D K) :
+    biologicalManyDemeKilledDualVectorTable state
+        (fun deme ↦ (coordinate.coordinate.1 deme).val)
+        (fun deme ↦ (coordinate.coordinate.2 deme).val) =
+      state coordinate := by
+  rw [biologicalManyDemeKilledDualVectorTable_of_degree_le _ _ _ (by
+    simpa [ManyDemeKilledDualCoordinate.degree] using coordinate.degree_le)]
+
 /-- Exact killed-dual linear operator on its closed biological carrier. -/
 noncomputable def biologicalManyDemeKilledDualGeneratorLinearMap {D K : ℕ}
     (rates : ManyDemeRates D) :
@@ -2921,6 +3132,29 @@ theorem biologicalManyDemeKilledDualGenerator_mulVec {D K : ℕ}
     (biologicalManyDemeKilledDualGenerator rates).mulVec state =
       biologicalManyDemeKilledDualGeneratorLinearMap rates state := by
   exact LinearMap.toMatrix'_mulVec _ _
+
+/-- **The exact compact biological killed-dual generator is Metzler.**  Every
+off-diagonal matrix entry is a sum of coalescence, migration, and mutation jump rates into
+the indicated destination.  The proof works for every finite deme count and every typed
+migration matrix; the absorption channel changes only the diagonal. -/
+theorem biologicalManyDemeKilledDualGenerator_isMetzler {D K : ℕ}
+    (rates : ManyDemeRates D) :
+    Matrix.IsMetzler (biologicalManyDemeKilledDualGenerator (K := K) rates) := by
+  intro row column distinct
+  unfold biologicalManyDemeKilledDualGenerator
+  rw [LinearMap.toMatrix'_apply]
+  change 0 ≤ manyDemeKilledDualGenerator rates
+      (biologicalManyDemeKilledDualVectorTable
+        (fun candidate ↦ if candidate = column then 1 else 0))
+      (fun deme ↦ (row.coordinate.1 deme).val)
+      (fun deme ↦ (row.coordinate.2 deme).val)
+  apply manyDemeKilledDualGenerator_nonneg_of_nonneg_of_current_eq_zero
+  · intro derived ancestral
+    apply biologicalManyDemeKilledDualVectorTable_nonneg
+    intro candidate
+    split_ifs <;> norm_num
+  · rw [biologicalManyDemeKilledDualVectorTable_at_coordinate]
+    simp [distinct]
 
 /-- Every transition consulted by a biological killed-generator row stays inside its finite
 carrier. -/
@@ -4392,6 +4626,24 @@ noncomputable def BiologicalManyDemeInstruction.killedPropagator {D K : ℕ}
   | .split parent child distinct =>
       biologicalManyDemeKilledDualSplitPropagator parent child distinct
 
+/-- Every exact compact killed-dual demographic instruction is entrywise nonnegative.
+Epoch positivity follows from the derived Metzler semigroup theorem; split positivity is
+the deterministic zero-one merge kernel. -/
+theorem BiologicalManyDemeInstruction.killedPropagator_nonneg {D K : ℕ}
+    (instruction : BiologicalManyDemeInstruction D K)
+    (row column : BiologicalManyDemeKilledDualCoordinate D K) :
+    0 ≤ instruction.killedPropagator row column := by
+  cases instruction with
+  | evolve rates duration duration_nonneg symmetric =>
+      exact matrixExponential_apply_nonneg_of_metzler
+        (biologicalManyDemeKilledDualGenerator rates)
+        (biologicalManyDemeKilledDualGenerator_isMetzler rates)
+        duration duration_nonneg row column
+  | split parent child distinct =>
+      simp only [BiologicalManyDemeInstruction.killedPropagator,
+        biologicalManyDemeKilledDualSplitPropagator]
+      split_ifs <;> norm_num
+
 /-- Every compact demographic instruction intertwines through the same Bernstein projection. -/
 theorem BiologicalManyDemeInstruction.intertwines {D K : ℕ}
     (instruction : BiologicalManyDemeInstruction D K) :
@@ -4446,6 +4698,36 @@ noncomputable def biologicalManyDemeKilledDualHistoryPropagator {D K : ℕ} :
   | [] => 1
   | instruction :: remaining =>
       biologicalManyDemeKilledDualHistoryPropagator remaining * instruction.killedPropagator
+
+/-- **Every arbitrary finite demographic history has a positive exact killed-dual
+operator.**  This covers any finite deme count, every typed migration graph, every sequence
+of rate epochs, and every genuine split. -/
+theorem biologicalManyDemeKilledDualHistoryPropagator_nonneg {D K : ℕ}
+    (instructions : List (BiologicalManyDemeInstruction D K))
+    (row column : BiologicalManyDemeKilledDualCoordinate D K) :
+    0 ≤ biologicalManyDemeKilledDualHistoryPropagator instructions row column := by
+  induction instructions generalizing row column with
+  | nil =>
+      rw [biologicalManyDemeKilledDualHistoryPropagator]
+      change 0 ≤ if row = column then 1 else 0
+      split_ifs <;> norm_num
+  | cons instruction remaining induction =>
+      rw [biologicalManyDemeKilledDualHistoryPropagator, Matrix.mul_apply]
+      exact Finset.sum_nonneg fun middle _ ↦
+        mul_nonneg (induction row middle) (instruction.killedPropagator_nonneg middle column)
+
+/-- A nonnegative compact killed-dual boundary remains nonnegative after any arbitrary
+finite demographic history. -/
+theorem biologicalManyDemeKilledDualHistoryPropagator_mulVec_nonneg {D K : ℕ}
+    (instructions : List (BiologicalManyDemeInstruction D K))
+    (initial : BiologicalManyDemeKilledDualCoordinate D K → ℝ)
+    (initial_nonneg : ∀ coordinate, 0 ≤ initial coordinate)
+    (row : BiologicalManyDemeKilledDualCoordinate D K) :
+    0 ≤ (biologicalManyDemeKilledDualHistoryPropagator instructions).mulVec initial row := by
+  rw [Matrix.mulVec, dotProduct]
+  exact Finset.sum_nonneg fun column _ ↦
+    mul_nonneg (biologicalManyDemeKilledDualHistoryPropagator_nonneg
+      instructions row column) (initial_nonneg column)
 
 /-- **Exact history-wide positive duality.**  The single compact Bernstein projection
 intertwines every finite ordered sequence of arbitrary migration epochs and population splits. -/

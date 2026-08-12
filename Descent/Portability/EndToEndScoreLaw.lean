@@ -170,14 +170,20 @@ prevent that construction:
   same projection intertwines every finite epoch/split sequence.
   `PipelineDemographicHistory.biologicalMomentInstructions` compiles the actual visible event
   history into that language and `biologicalMomentHistory_intertwines` instantiates the exact
-  history-wide theorem.  The compact ancestral boundary and present positive state are now
-  wired by `presentBiologicalKilledDualState_eq_projection`; the pooled terminal is embedded
-  without padding and remains coefficientwise nonnegative; and
+  history-wide theorem.  Positivity is now proved rather than inferred from the generator's
+  prose: `biologicalManyDemeKilledDualGenerator_isMetzler` derives every off-diagonal entry
+  from typed nonnegative coalescence, migration, and mutation rates;
+  `matrixExponential_apply_nonneg_of_metzler` proves the exact matrix exponential is
+  entrywise nonnegative; and
+  `biologicalManyDemeKilledDualHistoryPropagator_nonneg` composes this with every deterministic
+  split.  The compact ancestral boundary and present positive representation are wired by
+  `presentBiologicalKilledDualState_eq_projection`; the pooled terminal is embedded without
+  padding and remains coefficientwise nonnegative; and
   `pooledMAFProbeMassViaPositiveDual` is the resulting public scalar evaluator for that whole
-  compact path.  What remains is the final equality between this compact moment history and
-  the older rectangular `pooledMAFProbeMass` evaluator, followed by certified sparse numerical
-  action,
-  implement its sparse action without materializing either Cartesian carrier, add certified
+  compact path.  `pooledMAFProbeMassViaPositiveDual_eq` now proves this compact evaluator is
+  exactly the older complete Cartesian `pooledMAFProbeMass` evaluator for every visible
+  history, cohort layout, rational threshold, and probe monomial.  What remains numerically is
+  to implement sparse action without materializing either Cartesian carrier, add certified
   floating-point/interval roundoff control, and run at the executable's 13,750-individual /
   27,500-haplotype grid2d scale, followed by the filed end-to-end cohort validation gate;
 * the executable protocol is not yet a function of exactly this visible input type.
@@ -914,6 +920,21 @@ noncomputable def PipelineDemographicHistory.presentBiologicalKilledDualState
     (history.biologicalMomentInstructions K)).mulVec
       ((Coalescent.biologicalManyDemeBernsteinMomentProjection demeCount K).mulVec
         (history.biologicalAncestralMomentState K))
+
+/-- Once the stationary ancestral Bernstein boundary is shown nonnegative, exact positivity
+of the compact arbitrary-history state follows from the derived killed-dual semigroup.  The
+hypothesis isolates the ancestral boundary obligation; no per-epoch or per-split positivity
+assumption remains. -/
+theorem PipelineDemographicHistory.presentBiologicalKilledDualState_nonneg
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) (K : ℕ)
+    (ancestral_nonneg : ∀ coordinate, 0 ≤
+      (Coalescent.biologicalManyDemeBernsteinMomentProjection demeCount K).mulVec
+        (history.biologicalAncestralMomentState K) coordinate)
+    (coordinate : Coalescent.BiologicalManyDemeKilledDualCoordinate demeCount K) :
+    0 ≤ history.presentBiologicalKilledDualState K coordinate := by
+  unfold PipelineDemographicHistory.presentBiologicalKilledDualState
+  exact Coalescent.biologicalManyDemeKilledDualHistoryPropagator_mulVec_nonneg
+    (history.biologicalMomentInstructions K) _ ancestral_nonneg coordinate
 
 /-- The compact positive-dual present state is exactly the Bernstein projection of the compact
 forward moment state for every visible history and degree. -/
@@ -1775,6 +1796,28 @@ noncomputable def PipelineDemographicHistory.pooledMAFProbeMassViaPositiveDual
   let K := manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent
   pooledMAFBiologicalKilledDualTerminalVector sampleSize threshold probeExponent ⬝ᵥ
     history.presentBiologicalKilledDualState K
+
+/-- The exact compact pooled-MAF evaluator is nonnegative whenever its single ancestral
+Bernstein boundary is nonnegative.  All demographic propagation and terminal sampling
+coefficients have already been proved nonnegative. -/
+theorem PipelineDemographicHistory.pooledMAFProbeMassViaPositiveDual_nonneg
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (sampleSize : Fin demeCount → ℕ) (threshold : PooledMAFThreshold)
+    (probeExponent : Fin demeCount → ℕ)
+    (ancestral_nonneg : ∀ coordinate, 0 ≤
+      (Coalescent.biologicalManyDemeBernsteinMomentProjection demeCount
+        (manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent)).mulVec
+          (history.biologicalAncestralMomentState
+            (manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent))
+          coordinate) :
+    0 ≤ history.pooledMAFProbeMassViaPositiveDual sampleSize threshold probeExponent := by
+  unfold PipelineDemographicHistory.pooledMAFProbeMassViaPositiveDual
+  dsimp only
+  rw [dotProduct]
+  exact Finset.sum_nonneg fun coordinate _ ↦ mul_nonneg
+    (pooledMAFBiologicalKilledDualTerminalVector_nonneg
+      sampleSize threshold probeExponent coordinate)
+    (history.presentBiologicalKilledDualState_nonneg _ ancestral_nonneg coordinate)
 
 /-- The compact positive-dual pooled evaluator is exactly the Bernstein projection of the
 compact present moment state. -/
