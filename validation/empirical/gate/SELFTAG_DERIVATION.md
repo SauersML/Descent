@@ -67,3 +67,29 @@ landed in the corpus, evaluated at the pipeline's ascertainment events and taken
 fourth order. When that evaluation exists, predictor v3 is: self-tagged mixture with
 ascertained-moment Jensen terms plus the tagged remainder, and it meets the gate on
 seeds that have never been generated.
+
+## 5. The grid-density route is refuted; the exact route is the sampling dual
+
+A pair-level Fokker-Planck solver (`pair_fp.py`, implicit ADI, edge-refined grid,
+neighbor-mean closure with pre-filed BAR A) was built to compute the ascertained
+moments by conditioning the joint density directly. BAR A FAILED at 52-80% relative
+on the unconditioned moments, and the cause is structural, not tunable: at
+theta = 0.001 the stationary spectrum (pq)^(theta-1) carries 98.9% of its mass below
+p = 1e-5 (mass below p_min scales as p_min^theta), so no representable grid holds the
+distribution. The route is refuted for low-mutation spectra. Two things survive the
+wreck: the conditioning MECHANISM behaved exactly as the theory requires -- the
+solver's raw CV^2 of ~800-1100 collapsed to 0.81-0.88 after the pooled-MAF window,
+the three-order-of-magnitude collapse predicted in section 3 -- and the failure
+arithmetic itself proves that ascertained quantities are O(1) objects living on the
+polymorphic sliver, which is why unconditioned moments (section 3) can never grade
+the law.
+
+The exact route, now the only one standing and fully specified: the SAMPLING DUAL.
+The ascertainment event is a statement about pooled SAMPLE counts, and
+P(count = c | p_1..p_D) is a polynomial in the frequencies, so every ascertained
+moment E[poly(p_t, p_j) * 1(asc)] is a finite combination of joint sampling moments
+-- computable exactly by the corpus's sample-count machinery (jointSampleCount /
+TrainVsAllMomentProjection) evaluated by the killed-dual-chain method that already
+made cohort-size computations double-precision tractable. Predictor v3's inputs are
+those dual evaluations at the pipeline's pooled cohort (n = 13,750, MAF floor 0.01),
+carried to fourth order for the panel law and second order for the variance law.
