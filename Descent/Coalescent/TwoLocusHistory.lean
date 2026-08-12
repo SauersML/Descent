@@ -2636,6 +2636,18 @@ noncomputable def lowOrderLDDrift {D : ℕ} (rates : ManyDemeLDRates D)
         -rates.coalescence third * moment (.pi2 first second third fourth)
       else 0
 
+/-- A weighted local contribution supported at one named deme evaluates at that deme. -/
+private theorem sum_mul_demeIndicator {D : ℕ}
+    (weight : Fin D → ℝ) (index : Fin D) (value : ℝ) :
+    (∑ deme, weight deme * (if index = deme then value else 0)) =
+      weight index * value := by
+  classical
+  rw [Finset.sum_eq_single index]
+  · simp
+  · intro other _ hother
+    simp [Ne.symm hother]
+  · simp
+
 /-- The `H` row of the abstract low-order drift generator is exactly the weighted sum of
 the local haplotype-simplex diffusion jets. -/
 theorem twoLocusWeightedJetDrift_H_eq_lowOrderLDDrift {D : ℕ}
@@ -2690,6 +2702,97 @@ theorem twoLocusWeightedJetDrift_DD_eq_lowOrderLDDrift {D : ℕ}
       Finset.sum_add_distrib]
     simp [lowOrderLDDrift, twoLocusJetMoment, twoLocusCoordinateJet, hsame]
     ring
+
+/-- The complete equality-patterned `Dz` row is exactly the weighted local simplex drift. -/
+theorem twoLocusWeightedJetDrift_Dz_eq_lowOrderLDDrift {D : ℕ}
+    (rates : ManyDemeLDRates D)
+    (state : Fin D → TwoLocusHaplotypeFrequencies)
+    (first second third : Fin D) :
+    twoLocusWeightedJetDrift rates.coalescence state (.Dz first second third) =
+      lowOrderLDDrift rates (twoLocusJetMoment state) (.Dz first second third) := by
+  classical
+  by_cases h12 : first = second
+  · subst second
+    by_cases h13 : first = third
+    · subst third
+      have hdrift : ∀ deme,
+          (twoLocusDzJet first first first).driftAt deme state =
+            if first = deme then
+              4 * (twoLocusDDJet first first).value state -
+                5 * (twoLocusDzJet first first first).value state
+            else 0 := by
+        intro deme
+        rw [twoLocusDzJet_driftAt]
+        by_cases hfirst : first = deme <;> simp [hfirst]
+      simp only [twoLocusWeightedJetDrift, twoLocusCoordinateJet, hdrift]
+      rw [sum_mul_demeIndicator]
+      simp [lowOrderLDDrift, twoLocusJetMoment, twoLocusCoordinateJet]
+    · have hdrift : ∀ deme,
+          (twoLocusDzJet first first third).driftAt deme state =
+            if first = deme then
+              -3 * (twoLocusDzJet first first third).value state
+            else 0 := by
+        intro deme
+        rw [twoLocusDzJet_driftAt]
+        by_cases hfirst : first = deme
+        · have hthird : ¬third = deme := by
+            intro hthird
+            exact h13 (hfirst.trans hthird.symm)
+          simp [hfirst, hthird, Ne.symm hthird]
+        · simp [hfirst]
+      simp only [twoLocusWeightedJetDrift, twoLocusCoordinateJet, hdrift]
+      rw [sum_mul_demeIndicator]
+      simp [lowOrderLDDrift, twoLocusJetMoment, twoLocusCoordinateJet, h13]
+      ring
+  · by_cases h13 : first = third
+    · subst third
+      have hdrift : ∀ deme,
+          (twoLocusDzJet first second first).driftAt deme state =
+            if first = deme then
+              -3 * (twoLocusDzJet first second first).value state
+            else 0 := by
+        intro deme
+        rw [twoLocusDzJet_driftAt]
+        by_cases hfirst : first = deme
+        · have hsecond : ¬second = deme := by
+            intro hsecond
+            exact h12 (hfirst.trans hsecond.symm)
+          simp [hfirst, hsecond, Ne.symm hsecond]
+        · simp [hfirst]
+      simp only [twoLocusWeightedJetDrift, twoLocusCoordinateJet, hdrift]
+      rw [sum_mul_demeIndicator]
+      simp [lowOrderLDDrift, twoLocusJetMoment, twoLocusCoordinateJet, h12]
+      ring
+    · by_cases h23 : second = third
+      · subst third
+        have hdrift : ∀ deme,
+            (twoLocusDzJet first second second).driftAt deme state =
+              (if first = deme then
+                -(twoLocusDzJet first second second).value state else 0) +
+              (if second = deme then
+                4 * (twoLocusDDJet first second).value state else 0) := by
+          intro deme
+          rw [twoLocusDzJet_driftAt]
+          by_cases hfirst : first = deme <;> by_cases hsecond : second = deme <;>
+            simp_all
+        simp only [twoLocusWeightedJetDrift, twoLocusCoordinateJet, hdrift,
+          mul_add, Finset.sum_add_distrib]
+        rw [sum_mul_demeIndicator, sum_mul_demeIndicator]
+        simp [lowOrderLDDrift, twoLocusJetMoment, twoLocusCoordinateJet,
+          h12, h13]
+        ring
+      · have hdrift : ∀ deme,
+            (twoLocusDzJet first second third).driftAt deme state =
+              if first = deme then
+                -(twoLocusDzJet first second third).value state else 0 := by
+          intro deme
+          rw [twoLocusDzJet_driftAt]
+          by_cases hfirst : first = deme <;> by_cases hsecond : second = deme <;>
+            by_cases hthird : third = deme <;> simp_all
+        simp only [twoLocusWeightedJetDrift, twoLocusCoordinateJet, hdrift]
+        rw [sum_mul_demeIndicator]
+        simp [lowOrderLDDrift, twoLocusJetMoment, twoLocusCoordinateJet,
+          h12, h13, h23]
 
 /-- Continuous migration contribution.  Each lineage index migrates separately.  The extra
 `Dz` and `pi2` differences are exactly the terms created because `D` is nonlinear in
