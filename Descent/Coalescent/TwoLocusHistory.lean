@@ -102,6 +102,14 @@ def leftFrequency (frequency : TwoLocusHaplotypeFrequencies) : ℝ :=
 def rightFrequency (frequency : TwoLocusHaplotypeFrequencies) : ℝ :=
   frequency.AB + frequency.aB
 
+/-- Centered left-locus allele-frequency contrast used by the Hill--Robertson `Dz` basis. -/
+def leftContrast (frequency : TwoLocusHaplotypeFrequencies) : ℝ :=
+  1 - 2 * frequency.leftFrequency
+
+/-- Centered right-locus allele-frequency contrast used by the Hill--Robertson `Dz` basis. -/
+def rightContrast (frequency : TwoLocusHaplotypeFrequencies) : ℝ :=
+  1 - 2 * frequency.rightFrequency
+
 /-- Linkage disequilibrium in determinant form. -/
 def linkage (frequency : TwoLocusHaplotypeFrequencies) : ℝ :=
   frequency.AB * frequency.ab - frequency.Ab * frequency.aB
@@ -123,6 +131,116 @@ theorem rightFrequency_le_one (frequency : TwoLocusHaplotypeFrequencies) :
     frequency.rightFrequency ≤ 1 := by
   dsimp [rightFrequency]
   linarith [frequency.Ab_nonneg, frequency.ab_nonneg, frequency.total_eq_one]
+
+/-- Haplotype-wise migration/admixture with source fraction `alpha`.  Unlike a formula
+written only for marginal allele frequencies, this operation retains arbitrary linkage in
+both the source and recipient populations. -/
+noncomputable def mixture (alpha : ℝ) (alpha_nonneg : 0 ≤ alpha) (alpha_le_one : alpha ≤ 1)
+    (source recipient : TwoLocusHaplotypeFrequencies) : TwoLocusHaplotypeFrequencies where
+  AB := alpha * source.AB + (1 - alpha) * recipient.AB
+  Ab := alpha * source.Ab + (1 - alpha) * recipient.Ab
+  aB := alpha * source.aB + (1 - alpha) * recipient.aB
+  ab := alpha * source.ab + (1 - alpha) * recipient.ab
+  AB_nonneg := add_nonneg (mul_nonneg alpha_nonneg source.AB_nonneg)
+    (mul_nonneg (sub_nonneg.mpr alpha_le_one) recipient.AB_nonneg)
+  Ab_nonneg := add_nonneg (mul_nonneg alpha_nonneg source.Ab_nonneg)
+    (mul_nonneg (sub_nonneg.mpr alpha_le_one) recipient.Ab_nonneg)
+  aB_nonneg := add_nonneg (mul_nonneg alpha_nonneg source.aB_nonneg)
+    (mul_nonneg (sub_nonneg.mpr alpha_le_one) recipient.aB_nonneg)
+  ab_nonneg := add_nonneg (mul_nonneg alpha_nonneg source.ab_nonneg)
+    (mul_nonneg (sub_nonneg.mpr alpha_le_one) recipient.ab_nonneg)
+  total_eq_one := by
+    linear_combination
+      alpha * source.total_eq_one + (1 - alpha) * recipient.total_eq_one
+
+/-- Marginalization commutes exactly with haplotype mixture at the left locus. -/
+theorem mixture_leftFrequency (alpha : ℝ) (alpha_nonneg : 0 ≤ alpha)
+    (alpha_le_one : alpha ≤ 1) (source recipient : TwoLocusHaplotypeFrequencies) :
+    (mixture alpha alpha_nonneg alpha_le_one source recipient).leftFrequency =
+      alpha * source.leftFrequency + (1 - alpha) * recipient.leftFrequency := by
+  simp only [mixture, leftFrequency]
+  ring
+
+/-- Marginalization commutes exactly with haplotype mixture at the right locus. -/
+theorem mixture_rightFrequency (alpha : ℝ) (alpha_nonneg : 0 ≤ alpha)
+    (alpha_le_one : alpha ≤ 1) (source recipient : TwoLocusHaplotypeFrequencies) :
+    (mixture alpha alpha_nonneg alpha_le_one source recipient).rightFrequency =
+      alpha * source.rightFrequency + (1 - alpha) * recipient.rightFrequency := by
+  simp only [mixture, rightFrequency]
+  ring
+
+/-- **Exact migration-restoration identity.**  Mixing retains the two parental linkage
+terms and creates an additional joint channel from simultaneous differentiation at the two
+loci.  No linkage-equilibrium assumption or fitted restoration coefficient is present. -/
+theorem mixture_linkage (alpha : ℝ) (alpha_nonneg : 0 ≤ alpha)
+    (alpha_le_one : alpha ≤ 1) (source recipient : TwoLocusHaplotypeFrequencies) :
+    (mixture alpha alpha_nonneg alpha_le_one source recipient).linkage =
+      alpha * source.linkage + (1 - alpha) * recipient.linkage +
+        alpha * (1 - alpha) * (source.leftFrequency - recipient.leftFrequency) *
+          (source.rightFrequency - recipient.rightFrequency) := by
+  have source_ab : source.ab = 1 - source.AB - source.Ab - source.aB := by
+    linarith [source.total_eq_one]
+  have recipient_ab : recipient.ab = 1 - recipient.AB - recipient.Ab - recipient.aB := by
+    linarith [recipient.total_eq_one]
+  simp only [mixture, linkage, leftFrequency, rightFrequency]
+  rw [source_ab, recipient_ab]
+  ring
+
+/-- The same law separated into its exact first-order migration term and quadratic pulse
+correction.  The coefficient of `alpha` is the infinitesimal restoration term consumed by
+the continuous migration generator. -/
+theorem mixture_linkage_firstOrder (alpha : ℝ) (alpha_nonneg : 0 ≤ alpha)
+    (alpha_le_one : alpha ≤ 1) (source recipient : TwoLocusHaplotypeFrequencies) :
+    (mixture alpha alpha_nonneg alpha_le_one source recipient).linkage =
+      recipient.linkage + alpha *
+        (source.linkage - recipient.linkage +
+          (source.leftFrequency - recipient.leftFrequency) *
+            (source.rightFrequency - recipient.rightFrequency)) -
+        alpha ^ 2 * (source.leftFrequency - recipient.leftFrequency) *
+          (source.rightFrequency - recipient.rightFrequency) := by
+  rw [mixture_linkage]
+  ring
+
+/-- Infinitesimal change of recipient linkage under haplotype migration from `source`. -/
+def migrationLinkageVelocity
+    (source recipient : TwoLocusHaplotypeFrequencies) : ℝ :=
+  source.linkage - recipient.linkage +
+    (source.leftFrequency - recipient.leftFrequency) *
+      (source.rightFrequency - recipient.rightFrequency)
+
+/-- The infinitesimal restoration term in the centered contrast coordinates used by the
+closed low-order moment system. -/
+theorem migrationLinkageVelocity_eq_contrasts
+    (source recipient : TwoLocusHaplotypeFrequencies) :
+    migrationLinkageVelocity source recipient =
+      source.linkage - recipient.linkage +
+        (recipient.leftContrast - source.leftContrast) *
+          (recipient.rightContrast - source.rightContrast) / 4 := by
+  simp only [migrationLinkageVelocity, leftContrast, rightContrast]
+  ring
+
+/-- The exact pulse law is recipient linkage plus a first-order migration velocity and the
+finite-pulse quadratic correction. -/
+theorem mixture_linkage_eq_velocity (alpha : ℝ) (alpha_nonneg : 0 ≤ alpha)
+    (alpha_le_one : alpha ≤ 1) (source recipient : TwoLocusHaplotypeFrequencies) :
+    (mixture alpha alpha_nonneg alpha_le_one source recipient).linkage =
+      recipient.linkage + alpha * migrationLinkageVelocity source recipient -
+        alpha ^ 2 * (source.leftFrequency - recipient.leftFrequency) *
+          (source.rightFrequency - recipient.rightFrequency) := by
+  rw [mixture_linkage_firstOrder]
+  rfl
+
+/-- The older linkage-equilibrium admixture law is the zero-parental-linkage specialization
+of the general identity, rather than a separate mechanism. -/
+theorem mixture_linkage_of_parental_linkage_zero (alpha : ℝ)
+    (alpha_nonneg : 0 ≤ alpha) (alpha_le_one : alpha ≤ 1)
+    (source recipient : TwoLocusHaplotypeFrequencies)
+    (source_unlinked : source.linkage = 0) (recipient_unlinked : recipient.linkage = 0) :
+    (mixture alpha alpha_nonneg alpha_le_one source recipient).linkage =
+      alpha * (1 - alpha) * (source.leftFrequency - recipient.leftFrequency) *
+        (source.rightFrequency - recipient.rightFrequency) := by
+  rw [mixture_linkage, source_unlinked, recipient_unlinked]
+  ring
 
 /-- The determinant definition and the probability simplex give the sharp universal
 linkage bound `|D| ≤ 1/4`.  Equality is attained by a half-`AB`, half-`ab` population (or
@@ -170,6 +288,26 @@ theorem maximalCoupling_linkage : maximalCoupling.linkage = 1 / 4 := by
 
 end TwoLocusHaplotypeFrequencies
 
+/-- Pointwise observable whose expectation is `Dz(i,j,k)`. -/
+def twoLocusDzObservable
+    (linkageDeme leftDeme rightDeme : TwoLocusHaplotypeFrequencies) : ℝ :=
+  linkageDeme.linkage * leftDeme.leftContrast * rightDeme.rightContrast
+
+/-- Multiplying the exact linkage migration velocity by any other deme's linkage produces
+exactly the `DD` difference plus the four-`Dz` stencil used by the arbitrary-deme migration
+generator. -/
+theorem migrationLinkageVelocity_mul_linkage_eq_DD_Dz
+    (source recipient other : TwoLocusHaplotypeFrequencies) :
+    source.migrationLinkageVelocity recipient * other.linkage =
+      source.linkage * other.linkage - recipient.linkage * other.linkage +
+        (twoLocusDzObservable other recipient recipient -
+          twoLocusDzObservable other recipient source -
+          twoLocusDzObservable other source recipient +
+          twoLocusDzObservable other source source) / 4 := by
+  rw [TwoLocusHaplotypeFrequencies.migrationLinkageVelocity_eq_contrasts]
+  simp only [twoLocusDzObservable]
+  ring
+
 /-- Symmetric cross-deme heterozygosity at the left locus.  At one deme this is
 `2 p (1-p)`, the usual haploid heterozygosity. -/
 def twoLocusLeftHeterozygosity
@@ -213,9 +351,8 @@ structure LowOrderLDHaplotypeRealization {D : ℕ}
       (haplotype outcome first).linkage * (haplotype outcome second).linkage)
   Dz_eq : ∀ first second third,
     state (some (.Dz first second third)) = expectation (fun outcome ↦
-      (haplotype outcome first).linkage *
-        (1 - 2 * (haplotype outcome second).leftFrequency) *
-        (1 - 2 * (haplotype outcome third).rightFrequency))
+      twoLocusDzObservable (haplotype outcome first) (haplotype outcome second)
+        (haplotype outcome third))
   pi2_eq : ∀ first second third fourth,
     state (some (.pi2 first second third fourth)) = expectation (fun outcome ↦
       twoLocusJointHeterozygosity (haplotype outcome first) (haplotype outcome second)
@@ -234,9 +371,8 @@ noncomputable def haplotypeLowOrderLDState {D : ℕ} {sampleSpace : Type}
   | some (.DD first second) => expectation (fun outcome ↦
       (haplotype outcome first).linkage * (haplotype outcome second).linkage)
   | some (.Dz first second third) => expectation (fun outcome ↦
-      (haplotype outcome first).linkage *
-        (1 - 2 * (haplotype outcome second).leftFrequency) *
-        (1 - 2 * (haplotype outcome third).rightFrequency))
+      twoLocusDzObservable (haplotype outcome first) (haplotype outcome second)
+        (haplotype outcome third))
   | some (.pi2 first second third fourth) => expectation (fun outcome ↦
       twoLocusJointHeterozygosity (haplotype outcome first) (haplotype outcome second)
         (haplotype outcome third) (haplotype outcome fourth))
@@ -255,6 +391,74 @@ def haplotypeLowOrderLDState_realization {D : ℕ} {sampleSpace : Type}
   DD_eq _ _ := rfl
   Dz_eq _ _ _ := rfl
   pi2_eq _ _ _ _ := rfl
+
+/-- Apply one exact deterministic migration pulse to the underlying haplotype random
+variables.  Only the recipient changes; its four haplotype frequencies are mixed before any
+moment is read. -/
+noncomputable def LowOrderLDHaplotypeRealization.pulseHaplotype {D : ℕ}
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state)
+    (alpha : ℝ) (alpha_nonneg : 0 ≤ alpha) (alpha_le_one : alpha ≤ 1)
+    (source recipient : Fin D) :
+    realization.sampleSpace → Fin D → TwoLocusHaplotypeFrequencies :=
+  fun outcome deme ↦
+    if deme = recipient then
+      TwoLocusHaplotypeFrequencies.mixture alpha alpha_nonneg alpha_le_one
+        (realization.haplotype outcome source) (realization.haplotype outcome recipient)
+    else
+      realization.haplotype outcome deme
+
+/-- The complete low-order moment vector immediately after a migration pulse, evaluated
+from the transformed haplotype law rather than from an assumed scalar retention factor. -/
+noncomputable def LowOrderLDHaplotypeRealization.pulseState {D : ℕ}
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state)
+    (alpha : ℝ) (alpha_nonneg : 0 ≤ alpha) (alpha_le_one : alpha ≤ 1)
+    (source recipient : Fin D) : AffineLowOrderLDCoordinate D → ℝ :=
+  haplotypeLowOrderLDState realization.expectation
+    (realization.pulseHaplotype alpha alpha_nonneg alpha_le_one source recipient)
+
+/-- A deterministic migration pulse preserves the full haplotype-realizable cone by an
+explicit transformed witness. -/
+noncomputable def LowOrderLDHaplotypeRealization.pulse {D : ℕ}
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state)
+    (alpha : ℝ) (alpha_nonneg : 0 ≤ alpha) (alpha_le_one : alpha ≤ 1)
+    (source recipient : Fin D) :
+    LowOrderLDHaplotypeRealization
+      (realization.pulseState alpha alpha_nonneg alpha_le_one source recipient) :=
+  haplotypeLowOrderLDState_realization realization.expectation
+    (realization.pulseHaplotype alpha alpha_nonneg alpha_le_one source recipient)
+
+/-- At the recipient, the pulse witness obeys the exact restoration identity pointwise. -/
+theorem LowOrderLDHaplotypeRealization.pulseHaplotype_recipient_linkage {D : ℕ}
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state)
+    (alpha : ℝ) (alpha_nonneg : 0 ≤ alpha) (alpha_le_one : alpha ≤ 1)
+    (source recipient : Fin D) (outcome : realization.sampleSpace) :
+    (realization.pulseHaplotype alpha alpha_nonneg alpha_le_one source recipient
+        outcome recipient).linkage =
+      alpha * (realization.haplotype outcome source).linkage +
+        (1 - alpha) * (realization.haplotype outcome recipient).linkage +
+        alpha * (1 - alpha) *
+          ((realization.haplotype outcome source).leftFrequency -
+            (realization.haplotype outcome recipient).leftFrequency) *
+          ((realization.haplotype outcome source).rightFrequency -
+            (realization.haplotype outcome recipient).rightFrequency) := by
+  rw [LowOrderLDHaplotypeRealization.pulseHaplotype]
+  simp only [if_pos]
+  exact TwoLocusHaplotypeFrequencies.mixture_linkage _ _ _ _ _
+
+/-- Every non-recipient deme is unchanged by the pulse witness. -/
+theorem LowOrderLDHaplotypeRealization.pulseHaplotype_of_ne {D : ℕ}
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state)
+    (alpha : ℝ) (alpha_nonneg : 0 ≤ alpha) (alpha_le_one : alpha ≤ 1)
+    (source recipient deme : Fin D) (distinct : deme ≠ recipient)
+    (outcome : realization.sampleSpace) :
+    realization.pulseHaplotype alpha alpha_nonneg alpha_le_one source recipient outcome deme =
+      realization.haplotype outcome deme := by
+  simp [LowOrderLDHaplotypeRealization.pulseHaplotype, distinct]
 
 /-- A low-order state is `DD`-realizable when its complete `DD(i,j)` block is the Gram
 kernel of actual linkage observables under one positive normalized linear expectation.
@@ -285,6 +489,122 @@ def toDDDRealization {D : ℕ} {state : AffineLowOrderLDCoordinate D → ℝ}
   expectation := realization.expectation
   linkage := fun outcome deme ↦ (realization.haplotype outcome deme).linkage
   dd_eq := realization.DD_eq
+
+/-- Expected infinitesimal change of `DD(recipient,other)` under one directed migration
+channel is exactly the `DD/Dz` stencil appearing in `lowOrderLDMigration`.  This derives the
+row from the haplotype mixture law and the common expectation, rather than postulating its
+four `Dz` signs. -/
+theorem migrationLinkageVelocity_mul_linkage_expectation {D : ℕ}
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state)
+    (source recipient other : Fin D) :
+    realization.expectation (fun outcome ↦
+      (realization.haplotype outcome source).migrationLinkageVelocity
+          (realization.haplotype outcome recipient) *
+        (realization.haplotype outcome other).linkage) =
+      state (some (.DD source other)) - state (some (.DD recipient other)) +
+        (state (some (.Dz other recipient recipient)) -
+          state (some (.Dz other recipient source)) -
+          state (some (.Dz other source recipient)) +
+          state (some (.Dz other source source))) / 4 := by
+  have pointwise :
+      (fun outcome ↦
+        (realization.haplotype outcome source).migrationLinkageVelocity
+            (realization.haplotype outcome recipient) *
+          (realization.haplotype outcome other).linkage) =
+        (fun outcome ↦
+          (realization.haplotype outcome source).linkage *
+            (realization.haplotype outcome other).linkage) -
+        (fun outcome ↦
+          (realization.haplotype outcome recipient).linkage *
+            (realization.haplotype outcome other).linkage) +
+        (1 / 4 : ℝ) •
+          ((fun outcome ↦ twoLocusDzObservable
+              (realization.haplotype outcome other)
+              (realization.haplotype outcome recipient)
+              (realization.haplotype outcome recipient)) -
+            (fun outcome ↦ twoLocusDzObservable
+              (realization.haplotype outcome other)
+              (realization.haplotype outcome recipient)
+              (realization.haplotype outcome source)) -
+            (fun outcome ↦ twoLocusDzObservable
+              (realization.haplotype outcome other)
+              (realization.haplotype outcome source)
+              (realization.haplotype outcome recipient)) +
+            (fun outcome ↦ twoLocusDzObservable
+              (realization.haplotype outcome other)
+              (realization.haplotype outcome source)
+              (realization.haplotype outcome source))) := by
+    funext outcome
+    simp only [Pi.sub_apply, Pi.add_apply, Pi.smul_apply, smul_eq_mul]
+    rw [migrationLinkageVelocity_mul_linkage_eq_DD_Dz]
+    ring
+  rw [pointwise, realization.expectation.add_eval, realization.expectation.eval_sub,
+    realization.expectation.smul_eval, realization.expectation.add_eval,
+    realization.expectation.eval_sub, realization.expectation.eval_sub]
+  rw [← realization.DD_eq source other, ← realization.DD_eq recipient other,
+    ← realization.Dz_eq other recipient recipient,
+    ← realization.Dz_eq other recipient source,
+    ← realization.Dz_eq other source recipient,
+    ← realization.Dz_eq other source source]
+  ring
+
+/-- The first endpoint stencil of a `DD(first,second)` migration row is precisely the
+expected linkage velocity at `first` times the unchanged linkage at `second`. -/
+theorem firstEndpointDDMigrationStencil_eq_expectation {D : ℕ}
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state)
+    (target first second : Fin D) :
+    state (some (.DD target second)) - state (some (.DD first second)) +
+        (state (some (.Dz second first first)) -
+          state (some (.Dz second first target)) -
+          state (some (.Dz second target first)) +
+          state (some (.Dz second target target))) / 4 =
+      realization.expectation (fun outcome ↦
+        (realization.haplotype outcome target).migrationLinkageVelocity
+            (realization.haplotype outcome first) *
+          (realization.haplotype outcome second).linkage) := by
+  symm
+  exact realization.migrationLinkageVelocity_mul_linkage_expectation target first second
+
+/-- The second endpoint stencil is the same product-rule term with the two `DD` factors
+interchanged. -/
+theorem secondEndpointDDMigrationStencil_eq_expectation {D : ℕ}
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state)
+    (target first second : Fin D) :
+    state (some (.DD first target)) - state (some (.DD first second)) +
+        (state (some (.Dz first second second)) -
+          state (some (.Dz first second target)) -
+          state (some (.Dz first target second)) +
+          state (some (.Dz first target target))) / 4 =
+      realization.expectation (fun outcome ↦
+        (realization.haplotype outcome first).linkage *
+          (realization.haplotype outcome target).migrationLinkageVelocity
+            (realization.haplotype outcome second)) := by
+  have target_symm :
+      state (some (.DD first target)) = state (some (.DD target first)) := by
+    rw [realization.DD_eq first target, realization.DD_eq target first]
+    congr 1
+    funext outcome
+    ring
+  have second_symm :
+      state (some (.DD first second)) = state (some (.DD second first)) := by
+    rw [realization.DD_eq first second, realization.DD_eq second first]
+    congr 1
+    funext outcome
+    ring
+  calc
+    _ = realization.expectation (fun outcome ↦
+        (realization.haplotype outcome target).migrationLinkageVelocity
+            (realization.haplotype outcome second) *
+          (realization.haplotype outcome first).linkage) := by
+      rw [realization.migrationLinkageVelocity_mul_linkage_expectation target second first]
+      rw [target_symm, second_symm]
+    _ = _ := by
+      congr 1
+      funext outcome
+      ring
 
 /-- `H(i,j)` is symmetric because its defining cross-deme heterozygosity polynomial is. -/
 theorem H_symm {D : ℕ} {state : AffineLowOrderLDCoordinate D → ℝ}
@@ -602,6 +922,35 @@ noncomputable def lowOrderLDMigration {D : ℕ} (rates : ManyDemeLDRates D)
       (∑ target, rates.migration fourth target *
         (moment (.pi2 first second third target) -
           moment (.pi2 first second third fourth)))
+
+/-- **The complete `DD` migration row is the expectation-level product rule for the exact
+haplotype-mixture velocity.**  Each directed channel acts at one endpoint, and the two
+endpoint sums are exactly the two terms obtained by differentiating `E[D_first D_second]`.
+This is the formal migration-restoration bridge for the linkage covariance block. -/
+theorem lowOrderLDMigration_DD_eq_haplotypeVelocity {D : ℕ}
+    (rates : ManyDemeLDRates D)
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state)
+    (first second : Fin D) :
+    lowOrderLDMigration rates (fun coordinate ↦ state (some coordinate)) (.DD first second) =
+      (∑ target, rates.migration first target *
+        realization.expectation (fun outcome ↦
+          (realization.haplotype outcome target).migrationLinkageVelocity
+              (realization.haplotype outcome first) *
+            (realization.haplotype outcome second).linkage)) +
+      (∑ target, rates.migration second target *
+        realization.expectation (fun outcome ↦
+          (realization.haplotype outcome first).linkage *
+            (realization.haplotype outcome target).migrationLinkageVelocity
+              (realization.haplotype outcome second))) := by
+  simp only [lowOrderLDMigration]
+  congr 1
+  · apply Finset.sum_congr rfl
+    intro target _
+    rw [realization.firstEndpointDDMigrationStencil_eq_expectation target first second]
+  · apply Finset.sum_congr rfl
+    intro target _
+    rw [realization.secondEndpointDDMigrationStencil_eq_expectation target first second]
 
 /-- Recombination damps each `D` factor at half its deme-specific scaled rate. -/
 noncomputable def lowOrderLDRecombination {D : ℕ} (rates : ManyDemeLDRates D)
