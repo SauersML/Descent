@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.TwoDemeLDClosedForm
+import Descent.Coalescent.StructuredPresentDay
 import Descent.Coalescent.TwoLocusHistory
 import Descent.Core.Identifiability
 import Descent.PopGen.GeneticArchitectureDiscovery
@@ -14,6 +15,8 @@ import Mathlib.MeasureTheory.Integral.IntervalIntegral.Basic
 import Mathlib.Tactic
 
 assert_below Descent.Decision Descent.Program
+
+set_option autoImplicit false
 
 namespace Descent.Portability
 
@@ -673,6 +676,25 @@ noncomputable def compileBiologicalMomentEvents {demeCount : ℕ} (K : ℕ) :
         finalRateState := tail.finalRateState
         finalActive := tail.finalActive }
 
+/-- The compact and rectangular event compilers have identical demographic semantics.  After
+erasing only the compact proof refinements, their instruction lists, terminal rate state, and
+terminal active-deme state agree exactly for every visible event sequence. -/
+theorem compileBiologicalMomentEvents_agrees {demeCount : ℕ} (K : ℕ)
+    (events : List (DemographicEvent demeCount)) (state : PipelineRateState demeCount)
+    (active : Fin demeCount → Bool) :
+    let compact := compileBiologicalMomentEvents K events state active
+    let rectangular := compileMomentEvents K events state active
+    compact.instructions.map Coalescent.BiologicalManyDemeInstruction.toAffine =
+        rectangular.instructions ∧
+      compact.finalRateState = rectangular.finalRateState ∧
+      compact.finalActive = rectangular.finalActive := by
+  induction events generalizing state active with
+  | nil => simp [compileBiologicalMomentEvents, compileMomentEvents]
+  | cons event remaining induction =>
+      cases event <;>
+        simp [compileBiologicalMomentEvents, compileMomentEvents,
+          Coalescent.BiologicalManyDemeInstruction.toAffine, induction]
+
 /-- Compile the same ordered history into the derived arbitrary-deme two-locus
 generator.  Unlike a scalar distance recurrence, every epoch propagates the complete closed
 moment state and every split applies the exact label pullback.
@@ -812,6 +834,32 @@ noncomputable def PipelineDemographicHistory.biologicalMomentInstructions
   compiled.instructions ++ [.evolve rates history.finalElapsed history.finalElapsed_nonneg
     (fun _ ↦ rfl)]
 
+/-- Erasing compact proof refinements from the complete visible-history compiler recovers the
+established rectangular instruction history exactly. -/
+theorem PipelineDemographicHistory.biologicalMomentInstructions_toAffine
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) (K : ℕ) :
+    (history.biologicalMomentInstructions K).map
+        Coalescent.BiologicalManyDemeInstruction.toAffine =
+      history.oneLocusMomentInstructions K := by
+  let compact := compileBiologicalMomentEvents K history.events history.initialRateState
+    (initialDemeActive history.events)
+  let rectangular := compileMomentEvents K history.events history.initialRateState
+    (initialDemeActive history.events)
+  have agreement := compileBiologicalMomentEvents_agrees K history.events
+    history.initialRateState (initialDemeActive history.events)
+  change (compact.instructions ++ [Coalescent.BiologicalManyDemeInstruction.evolve
+      (compact.finalRateState.toManyDemeRates compact.finalActive)
+      history.finalElapsed history.finalElapsed_nonneg (fun _ ↦ rfl)]).map
+        Coalescent.BiologicalManyDemeInstruction.toAffine =
+    rectangular.instructions ++
+      [Coalescent.ManyDemeMomentInstruction.evolve {
+        rates := rectangular.finalRateState.toManyDemeRates rectangular.finalActive
+        duration := history.finalElapsed
+        duration_nonneg := history.finalElapsed_nonneg }]
+  rw [List.map_append]
+  simp only [List.map_singleton, Coalescent.BiologicalManyDemeInstruction.toAffine]
+  rw [agreement.1, agreement.2.1, agreement.2.2]
+
 /-- The complete visible demographic history satisfies the exact compact positive-dual
 intertwining law. -/
 theorem PipelineDemographicHistory.biologicalMomentHistory_intertwines
@@ -830,6 +878,24 @@ noncomputable def PipelineDemographicHistory.biologicalAncestralMomentState
     Coalescent.BiologicalManyDemeMomentCoordinate demeCount K → ℝ
   | none => 1
   | some coordinate => history.ancestralMoment coordinate.coordinate.degree
+
+/-- The compact ancestral boundary zero-pads to exactly the established rectangular ancestral
+boundary, including its explicit constant and all nonbiological padding coordinates. -/
+theorem PipelineDemographicHistory.extend_biologicalAncestralMomentState
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) (K : ℕ) :
+    Coalescent.extendBiologicalManyDemeMomentState
+        (history.biologicalAncestralMomentState K) =
+      Coalescent.commonAncestorManyDemeMomentState history.ancestralMoment := by
+  funext coordinate
+  cases coordinate with
+  | none => rfl
+  | some coordinate =>
+      by_cases biological : 0 < coordinate.degree ∧ coordinate.degree ≤ K
+      · simp [Coalescent.extendBiologicalManyDemeMomentState,
+          Coalescent.commonAncestorManyDemeMomentState,
+          PipelineDemographicHistory.biologicalAncestralMomentState, biological]
+      · simp [Coalescent.extendBiologicalManyDemeMomentState,
+          Coalescent.commonAncestorManyDemeMomentState, biological]
 
 /-- Exact present compact moment state for the complete visible history. -/
 noncomputable def PipelineDemographicHistory.presentBiologicalMomentState
@@ -1077,6 +1143,35 @@ theorem PipelineDemographicHistory.oneLocusMoment_eq_stateReadout
   · simp [PipelineDemographicHistory.oneLocusMoment,
       Coalescent.manyDemeMomentStateReadout, hzero]
 
+/-- The compact present moment state is representation-equivalent to the established
+rectangular present state for every visible history and truncation degree. -/
+theorem PipelineDemographicHistory.extend_presentBiologicalMomentState
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) (K : ℕ) :
+    Coalescent.extendBiologicalManyDemeMomentState
+        (history.presentBiologicalMomentState K) =
+      history.presentMomentState K := by
+  unfold PipelineDemographicHistory.presentBiologicalMomentState
+    PipelineDemographicHistory.presentMomentState
+  rw [Coalescent.extendBiologicalManyDemeMomentState_history_mulVec,
+    history.biologicalMomentInstructions_toAffine,
+    history.extend_biologicalAncestralMomentState,
+    Coalescent.manyDemeMomentHistoryPropagator_mulVec]
+
+/-- Every public one-locus moment through degree `K` is exactly the compact biological
+synthesis readout.  Thus downstream ascertainment may change basis without changing the
+demographic law. -/
+theorem PipelineDemographicHistory.oneLocusMoment_eq_biologicalSynthesis
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) (K : ℕ)
+    (exponent : Fin demeCount → ℕ)
+    (degree_le : (∑ deme, exponent deme) ≤ K) :
+    history.oneLocusMoment K exponent =
+      Coalescent.biologicalManyDemeMomentSynthesis
+        (history.presentBiologicalMomentState K) exponent := by
+  rw [history.oneLocusMoment_eq_stateReadout,
+    ← history.extend_presentBiologicalMomentState]
+  exact (Coalescent.biologicalManyDemeMomentSynthesis_eq_stateReadout
+    (history.presentBiologicalMomentState K) exponent degree_le).symm
+
 /-- Exact train-target mixed frequency moment from the arbitrary-deme history. -/
 noncomputable def PipelineDemographicHistory.pairMoment
     {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) (K : ℕ)
@@ -1141,7 +1236,8 @@ theorem sum_choose_neg_pow_eq_one_sub_pow (n : ℕ) (x : ℝ) :
     (∑ remainder : Fin (n + 1),
       (-1 : ℝ) ^ (remainder : ℕ) * Nat.choose n remainder * x ^ (remainder : ℕ)) =
       (1 - x) ^ n := by
-  rw [Fin.sum_univ_eq_sum_range]
+  rw [Fin.sum_univ_eq_sum_range (fun remainder : ℕ ↦
+    (-1 : ℝ) ^ remainder * Nat.choose n remainder * x ^ remainder)]
   rw [show 1 - x = -x + 1 by ring, add_pow]
   apply Finset.sum_congr rfl
   intro remainder membership
@@ -1149,7 +1245,6 @@ theorem sum_choose_neg_pow_eq_one_sub_pow (n : ℕ) (x : ℝ) :
     simpa using Nat.le_of_lt_succ (Finset.mem_range.mp membership)
   simp only [one_pow, mul_one]
   rw [neg_pow]
-  push_cast
   ring
 
 /-- The alternating monomial expansion of one many-deme count cell is exactly its positive
@@ -1210,9 +1305,6 @@ theorem manyDemeSampleCountAlternating_eq_bernstein
     _ = _ := by
       unfold base Coalescent.manyDemeBernsteinWeight
       rw [← Finset.prod_mul_distrib]
-      apply Finset.prod_congr rfl
-      intro deme _
-      ring
 
 /-- Polynomial represented by the existing alternating moment expansion for one count cell. -/
 noncomputable def manyDemeSampleCountAlternatingPolynomial
@@ -1271,6 +1363,31 @@ noncomputable def PipelineDemographicHistory.manyDemeSampleCountMomentMass
             (manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent)
             (fun deme ↦ (count deme : ℕ) + (remainder deme : ℕ) + probeExponent deme)
 
+/-- The existing alternating count-cell formula is exactly the mixed-moment functional of its
+polynomial, before invoking the positive Bernstein identity. -/
+theorem PipelineDemographicHistory.manyDemeSampleCountMomentMass_eq_functional
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (sampleSize : Fin demeCount → ℕ) (count : ManyDemeSampleCount sampleSize)
+    (probeExponent : Fin demeCount → ℕ) :
+    history.manyDemeSampleCountMomentMass sampleSize count probeExponent =
+      Coalescent.manyDemePolynomialMomentFunctional
+        (history.oneLocusMoment
+          (manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent))
+        (manyDemeSampleCountAlternatingPolynomial sampleSize count probeExponent) := by
+  classical
+  unfold PipelineDemographicHistory.manyDemeSampleCountMomentMass
+    manyDemeSampleCountAlternatingPolynomial
+    Coalescent.manyDemePolynomialMomentFunctional
+  rw [← MvPolynomial.smul_eq_C_mul, map_smul, map_sum]
+  simp only [smul_eq_mul]
+  congr 1
+  apply Finset.sum_congr rfl
+  intro remainder _
+  rw [← MvPolynomial.smul_eq_C_mul, map_smul]
+  simp only [smul_eq_mul]
+  congr 1
+  exact (Coalescent.manyDemePolynomialMomentFunctional_prod_X_pow _ _).symm
+
 /-- Terminal coefficient vector for one many-deme sample-count cell with an additional
 frequency monomial.  It is the exact Bernstein polynomial expressed in the augmented moment
 basis, before any demographic propagation is performed. -/
@@ -1324,6 +1441,13 @@ def PooledMAFThreshold.Accepts (threshold : PooledMAFThreshold)
     (totalCount derivedCount : ℕ) : Prop :=
   threshold.numerator * totalCount ≤
     threshold.denominator * min derivedCount (totalCount - derivedCount)
+
+/-- Passing an exact rational pooled-MAF threshold is decidable by integer comparison. -/
+instance PooledMAFThreshold.decidableAccepts (threshold : PooledMAFThreshold)
+    (totalCount derivedCount : ℕ) :
+    Decidable (threshold.Accepts totalCount derivedCount) := by
+  unfold PooledMAFThreshold.Accepts
+  infer_instance
 
 /-- The pooled MAF event is invariant to which allele is called derived.  The count-domain
 hypothesis is supplied automatically by `ManyDemeSampleCount.total_le_totalSampleSize` for
@@ -1391,7 +1515,10 @@ def manyDemeSampleCountKilledDualCoordinate
     have probe_le : probeExponent deme ≤ manyDemeExponentDegree probeExponent :=
       Finset.single_le_sum (fun other _ ↦ Nat.zero_le (probeExponent other))
         (Finset.mem_univ deme)
-    dsimp only [K]
+    omega
+  · have sample_le : sampleSize deme ≤ manyDemeTotalSampleSize sampleSize :=
+      Finset.single_le_sum (fun other _ ↦ Nat.zero_le (sampleSize other))
+        (Finset.mem_univ deme)
     omega
 
 /-- The count-cell configuration uses the whole degree budget: sampled derived plus sampled
@@ -1403,16 +1530,22 @@ theorem manyDemeSampleCountKilledDualCoordinate_degree
       manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent := by
   unfold manyDemeSampleCountKilledDualCoordinate
     Coalescent.ManyDemeKilledDualCoordinate.degree
-    manyDemeTotalSampleSize manyDemeExponentDegree ManyDemeSampleCount.total
-  simp only [Fin.val_mk, Finset.sum_add_distrib, Finset.sum_sub_distrib]
-  have count_le := count.total_le_totalSampleSize
-  unfold ManyDemeSampleCount.total manyDemeTotalSampleSize at count_le
-  omega
-  · have sample_le : sampleSize deme ≤ manyDemeTotalSampleSize sampleSize :=
-      Finset.single_le_sum (fun other _ ↦ Nat.zero_le (sampleSize other))
-        (Finset.mem_univ deme)
-    dsimp only [K]
-    omega
+    manyDemeTotalSampleSize manyDemeExponentDegree
+  calc
+    (∑ deme, ((count deme : ℕ) + probeExponent deme)) +
+          (∑ deme, (sampleSize deme - (count deme : ℕ))) =
+        ∑ deme, (((count deme : ℕ) + probeExponent deme) +
+          (sampleSize deme - (count deme : ℕ))) := by
+      simp only [Finset.sum_add_distrib]
+    _ = ∑ deme, (sampleSize deme + probeExponent deme) := by
+      apply Finset.sum_congr rfl
+      intro deme _
+      have count_le : (count deme : ℕ) ≤ sampleSize deme := by
+        have := (count deme).isLt
+        omega
+      omega
+    _ = (∑ deme, sampleSize deme) + (∑ deme, probeExponent deme) := by
+      rw [Finset.sum_add_distrib]
 
 /-- Sparse nonnegative terminal vector for the complete pooled-MAF event in the positive
 killed-dual basis.  Each accepted count cell contributes one configuration with its exact
@@ -1425,8 +1558,8 @@ noncomputable def pooledMAFKilledDualTerminalVector
   classical
   exact ∑ count : ManyDemeSampleCount sampleSize,
     if threshold.Accepts (manyDemeTotalSampleSize sampleSize) count.total then
-      (∏ deme, (Nat.choose (sampleSize deme) (count deme) : ℝ)) •
-        fun coordinate ↦
+      fun coordinate ↦
+        (∏ deme, (Nat.choose (sampleSize deme) (count deme) : ℝ)) *
           if coordinate = manyDemeSampleCountKilledDualCoordinate sampleSize count probeExponent
             then 1 else 0
     else 0
@@ -1441,6 +1574,57 @@ def manyDemeSampleCountBiologicalKilledDualCoordinate
     degree_le := by
       rw [manyDemeSampleCountKilledDualCoordinate_degree] }
 
+/-- One sparse positive-dual count coordinate, paired with the compact present moment state,
+is exactly the established alternating count-cell mass.  This is the per-cell semantic bridge
+between the two representations. -/
+theorem PipelineDemographicHistory.manyDemeSampleCountProjection_eq_momentMass
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (sampleSize : Fin demeCount → ℕ) (count : ManyDemeSampleCount sampleSize)
+    (probeExponent : Fin demeCount → ℕ) :
+    (∏ deme, (Nat.choose (sampleSize deme) (count deme) : ℝ)) *
+        (Coalescent.biologicalManyDemeBernsteinMomentProjection demeCount
+          (manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent)).mulVec
+            (history.presentBiologicalMomentState
+              (manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent))
+            (manyDemeSampleCountBiologicalKilledDualCoordinate
+              sampleSize count probeExponent) =
+      history.manyDemeSampleCountMomentMass sampleSize count probeExponent := by
+  let K := manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent
+  let derived : Fin demeCount → ℕ :=
+    fun deme ↦ (count deme : ℕ) + probeExponent deme
+  let ancestral : Fin demeCount → ℕ :=
+    fun deme ↦ sampleSize deme - count deme
+  rw [history.manyDemeSampleCountMomentMass_eq_functional,
+    manyDemeSampleCountAlternatingPolynomial_eq_bernstein]
+  let multiplicity : ℝ := ∏ deme,
+    (Nat.choose (sampleSize deme) (count deme) : ℝ)
+  have functional_scale :
+      Coalescent.manyDemePolynomialMomentFunctional
+          (history.oneLocusMoment K)
+          (MvPolynomial.C multiplicity *
+            Coalescent.manyDemeBernsteinPolynomial derived ancestral) =
+        multiplicity * Coalescent.manyDemePolynomialMomentFunctional
+          (history.oneLocusMoment K)
+          (Coalescent.manyDemeBernsteinPolynomial derived ancestral) := by
+    rw [← MvPolynomial.smul_eq_C_mul]
+    change (Coalescent.manyDemePolynomialMomentLinearMap
+      (history.oneLocusMoment K))
+        (multiplicity • Coalescent.manyDemeBernsteinPolynomial derived ancestral) = _
+    rw [map_smul]
+    rfl
+  rw [functional_scale]
+  congr 1
+  rw [Coalescent.biologicalManyDemeBernsteinMomentProjection_mulVec]
+  apply Coalescent.manyDemePolynomialMomentFunctional_congr_of_totalDegree_le
+      (K := K)
+  · exact (Coalescent.manyDemeBernsteinPolynomial_totalDegree_le derived ancestral).trans (by
+      rw [show (∑ deme, derived deme) + ∑ deme, ancestral deme = K by
+        simpa [derived, ancestral, K, manyDemeTotalSampleSize, manyDemeExponentDegree,
+          ManyDemeSampleCount.total] using
+            manyDemeSampleCountKilledDualCoordinate_degree sampleSize count probeExponent])
+  · intro exponent degree_le
+    exact (history.oneLocusMoment_eq_biologicalSynthesis K exponent degree_le).symm
+
 /-- Sparse nonnegative pooled-MAF terminal vector directly on the compact biological carrier. -/
 noncomputable def pooledMAFBiologicalKilledDualTerminalVector
     {demeCount : ℕ} (sampleSize : Fin demeCount → ℕ)
@@ -1450,8 +1634,8 @@ noncomputable def pooledMAFBiologicalKilledDualTerminalVector
   classical
   exact ∑ count : ManyDemeSampleCount sampleSize,
     if threshold.Accepts (manyDemeTotalSampleSize sampleSize) count.total then
-      (∏ deme, (Nat.choose (sampleSize deme) (count deme) : ℝ)) •
-        fun coordinate ↦
+      fun coordinate ↦
+        (∏ deme, (Nat.choose (sampleSize deme) (count deme) : ℝ)) *
           if coordinate = manyDemeSampleCountBiologicalKilledDualCoordinate
               sampleSize count probeExponent then 1 else 0
     else 0
@@ -1466,11 +1650,11 @@ theorem pooledMAFBiologicalKilledDualTerminalVector_nonneg
       sampleSize threshold probeExponent coordinate := by
   classical
   unfold pooledMAFBiologicalKilledDualTerminalVector
+  simp only [Finset.sum_apply]
   apply Finset.sum_nonneg
   intro count _
   split_ifs
-  · simp only [Pi.smul_apply, smul_eq_mul]
-    positivity
+  · positivity
   · rfl
 
 /-- Every coefficient of the pooled-MAF killed-dual terminal vector is nonnegative. -/
@@ -1482,11 +1666,11 @@ theorem pooledMAFKilledDualTerminalVector_nonneg
     0 ≤ pooledMAFKilledDualTerminalVector sampleSize threshold probeExponent coordinate := by
   classical
   unfold pooledMAFKilledDualTerminalVector
+  simp only [Finset.sum_apply]
   apply Finset.sum_nonneg
   intro count _
   split_ifs
-  · simp only [Pi.smul_apply, smul_eq_mul]
-    positivity
+  · positivity
   · rfl
 
 /-- Positive Bernstein polynomial for the pooled-MAF event and latent probe. -/
@@ -1549,12 +1733,12 @@ theorem pooledMAFKilledDualTerminalVector_dot_bernstein
         (pooledMAFPositiveBernsteinPolynomial sampleSize threshold probeExponent) := by
   classical
   unfold pooledMAFKilledDualTerminalVector pooledMAFPositiveBernsteinPolynomial
-  rw [sum_dotProduct]
+  rw [sum_dotProduct, map_sum]
   apply Finset.sum_congr rfl
   intro count _
   by_cases accepted :
       threshold.Accepts (manyDemeTotalSampleSize sampleSize) count.total
-  · simp [accepted, smul_dotProduct, dotProduct,
+  · simp [accepted, dotProduct,
       manyDemeSampleCountKilledDualCoordinate,
       Coalescent.eval_manyDemeBernsteinPolynomial]
   · simp [accepted]
@@ -1580,7 +1764,7 @@ theorem pooledMAFBiologicalKilledDualTerminalVector_dot
   intro count _
   by_cases accepted :
       threshold.Accepts (manyDemeTotalSampleSize sampleSize) count.total
-  · simp [accepted, smul_dotProduct, dotProduct]
+  · simp [accepted, dotProduct]
   · simp [accepted]
 
 /-- Exact pooled-MAF mass evaluated wholly on the compact positive-dual state. -/
@@ -1606,7 +1790,30 @@ theorem PipelineDemographicHistory.pooledMAFProbeMassViaPositiveDual_eq_projecti
               (manyDemeTotalSampleSize sampleSize +
                 manyDemeExponentDegree probeExponent)) := by
   unfold PipelineDemographicHistory.pooledMAFProbeMassViaPositiveDual
+  dsimp only
   rw [history.presentBiologicalKilledDualState_eq_projection]
+
+/-- **Exact public evaluator equivalence.**  For every visible demographic history, arbitrary
+deme count, cohort layout, rational pooled-MAF threshold, and probe monomial, the compact
+positive-dual evaluator returns exactly the same scalar as the original complete Cartesian
+moment sum.  No approximation, padding convention, or fitted attenuation is involved. -/
+theorem PipelineDemographicHistory.pooledMAFProbeMassViaPositiveDual_eq
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (sampleSize : Fin demeCount → ℕ) (threshold : PooledMAFThreshold)
+    (probeExponent : Fin demeCount → ℕ) :
+    history.pooledMAFProbeMassViaPositiveDual sampleSize threshold probeExponent =
+      history.pooledMAFProbeMass sampleSize threshold probeExponent := by
+  rw [history.pooledMAFProbeMassViaPositiveDual_eq_projection,
+    pooledMAFBiologicalKilledDualTerminalVector_dot]
+  unfold PipelineDemographicHistory.pooledMAFProbeMass
+  apply Finset.sum_congr rfl
+  intro count _
+  by_cases accepted :
+      threshold.Accepts (manyDemeTotalSampleSize sampleSize) count.total
+  · simp only [accepted, if_true]
+    exact history.manyDemeSampleCountProjection_eq_momentMass
+      sampleSize count probeExponent
+  · simp [accepted]
 
 /-- The complete ascertainment polynomial paired with the present moment state is exactly
 the pooled-MAF probe mass. -/
