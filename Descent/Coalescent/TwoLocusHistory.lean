@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.StructuredPresentDay
+import Descent.Foundations.TransportIdentities
 
 assert_below Descent.Pangenome Descent.PopGen Descent.Spectral Descent.Blindness
 assert_below Descent.Conditionals Descent.Portability Descent.Decision Descent.Program
@@ -77,6 +78,270 @@ deriving DecidableEq, Fintype, Repr
 /-- Add a constant coordinate so mutation influx and other affine source terms evolve in the
 same matrix exponential as the homogeneous moments. -/
 abbrev AffineLowOrderLDCoordinate (D : ℕ) := Option (LowOrderLDCoordinate D)
+
+/-- Four nonnegative two-locus haplotype frequencies on the probability simplex.
+The names record alleles at the left (`A/a`) and right (`B/b`) loci. -/
+structure TwoLocusHaplotypeFrequencies where
+  AB : ℝ
+  Ab : ℝ
+  aB : ℝ
+  ab : ℝ
+  AB_nonneg : 0 ≤ AB
+  Ab_nonneg : 0 ≤ Ab
+  aB_nonneg : 0 ≤ aB
+  ab_nonneg : 0 ≤ ab
+  total_eq_one : AB + Ab + aB + ab = 1
+
+namespace TwoLocusHaplotypeFrequencies
+
+/-- Frequency of allele `A` at the left locus. -/
+def leftFrequency (frequency : TwoLocusHaplotypeFrequencies) : ℝ :=
+  frequency.AB + frequency.Ab
+
+/-- Frequency of allele `B` at the right locus. -/
+def rightFrequency (frequency : TwoLocusHaplotypeFrequencies) : ℝ :=
+  frequency.AB + frequency.aB
+
+/-- Linkage disequilibrium in determinant form. -/
+def linkage (frequency : TwoLocusHaplotypeFrequencies) : ℝ :=
+  frequency.AB * frequency.ab - frequency.Ab * frequency.aB
+
+theorem leftFrequency_nonneg (frequency : TwoLocusHaplotypeFrequencies) :
+    0 ≤ frequency.leftFrequency := by
+  exact add_nonneg frequency.AB_nonneg frequency.Ab_nonneg
+
+theorem leftFrequency_le_one (frequency : TwoLocusHaplotypeFrequencies) :
+    frequency.leftFrequency ≤ 1 := by
+  dsimp [leftFrequency]
+  linarith [frequency.aB_nonneg, frequency.ab_nonneg, frequency.total_eq_one]
+
+theorem rightFrequency_nonneg (frequency : TwoLocusHaplotypeFrequencies) :
+    0 ≤ frequency.rightFrequency := by
+  exact add_nonneg frequency.AB_nonneg frequency.aB_nonneg
+
+theorem rightFrequency_le_one (frequency : TwoLocusHaplotypeFrequencies) :
+    frequency.rightFrequency ≤ 1 := by
+  dsimp [rightFrequency]
+  linarith [frequency.Ab_nonneg, frequency.ab_nonneg, frequency.total_eq_one]
+
+end TwoLocusHaplotypeFrequencies
+
+/-- Symmetric cross-deme heterozygosity at the left locus.  At one deme this is
+`2 p (1-p)`, the usual haploid heterozygosity. -/
+def twoLocusLeftHeterozygosity
+    (first second : TwoLocusHaplotypeFrequencies) : ℝ :=
+  first.leftFrequency * (1 - second.leftFrequency) +
+    second.leftFrequency * (1 - first.leftFrequency)
+
+/-- Symmetric cross-deme heterozygosity at the right locus. -/
+def twoLocusRightHeterozygosity
+    (first second : TwoLocusHaplotypeFrequencies) : ℝ :=
+  first.rightFrequency * (1 - second.rightFrequency) +
+    second.rightFrequency * (1 - first.rightFrequency)
+
+/-- The exact generalized joint-heterozygosity coordinate of the multi-population
+Hill--Robertson system:
+
+`pi2(i,j;k,l) = H_left(i,j) H_right(k,l) / 4`.
+
+The factor `1/4` is forced by the four-lineage sampling definition and makes the
+within-deme specialization exactly `p(1-p)q(1-q)`. -/
+noncomputable def twoLocusJointHeterozygosity
+    (leftFirst leftSecond rightFirst rightSecond : TwoLocusHaplotypeFrequencies) : ℝ :=
+  twoLocusLeftHeterozygosity leftFirst leftSecond *
+    twoLocusRightHeterozygosity rightFirst rightSecond / 4
+
+/-- A full low-order state is haplotype-realizable when all of its coordinates are
+expectations of the defining polynomials under one common probability law on the
+multi-deme haplotype-frequency simplex.  This is the semantic cone whose preservation by
+the continuous Wright--Fisher semigroup remains to be proved. -/
+structure LowOrderLDHaplotypeRealization {D : ℕ}
+    (state : AffineLowOrderLDCoordinate D → ℝ) where
+  sampleSpace : Type
+  expectation : Foundations.ExpFunctional sampleSpace
+  haplotype : sampleSpace → Fin D → TwoLocusHaplotypeFrequencies
+  constant_eq : state none = 1
+  H_eq : ∀ first second,
+    state (some (.H first second)) = expectation (fun outcome ↦
+      twoLocusLeftHeterozygosity (haplotype outcome first) (haplotype outcome second))
+  DD_eq : ∀ first second,
+    state (some (.DD first second)) = expectation (fun outcome ↦
+      (haplotype outcome first).linkage * (haplotype outcome second).linkage)
+  Dz_eq : ∀ first second third,
+    state (some (.Dz first second third)) = expectation (fun outcome ↦
+      (haplotype outcome first).linkage *
+        (1 - 2 * (haplotype outcome second).leftFrequency) *
+        (1 - 2 * (haplotype outcome third).rightFrequency))
+  pi2_eq : ∀ first second third fourth,
+    state (some (.pi2 first second third fourth)) = expectation (fun outcome ↦
+      twoLocusJointHeterozygosity (haplotype outcome first) (haplotype outcome second)
+        (haplotype outcome third) (haplotype outcome fourth))
+
+/-- A low-order state is `DD`-realizable when its complete `DD(i,j)` block is the Gram
+kernel of actual linkage observables under one positive normalized linear expectation.
+
+This is stronger than storing pairwise Cauchy--Schwarz inequalities: one common witness
+simultaneously realizes every deme pair and therefore supplies symmetry, diagonal
+nonnegativity, all finite quadratic-form inequalities, and Cauchy--Schwarz from the same law.
+The remaining epoch theorem must show that the two-locus diffusion semigroup preserves this
+witness class; deterministic split preservation is proved below. -/
+structure LowOrderLDDDRealization {D : ℕ}
+    (state : AffineLowOrderLDCoordinate D → ℝ) where
+  sampleSpace : Type
+  expectation : Foundations.ExpFunctional sampleSpace
+  linkage : sampleSpace → Fin D → ℝ
+  dd_eq : ∀ first second,
+    state (some (.DD first second)) =
+      expectation (fun outcome ↦ linkage outcome first * linkage outcome second)
+
+namespace LowOrderLDHaplotypeRealization
+
+/-- Forgetting allele frequencies retains a single Gram witness for the complete `DD`
+block.  Thus every haplotype-realizable state automatically satisfies all PSD consequences
+proved below. -/
+def toDDDRealization {D : ℕ} {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state) :
+    LowOrderLDDDRealization state where
+  sampleSpace := realization.sampleSpace
+  expectation := realization.expectation
+  linkage := fun outcome deme ↦ (realization.haplotype outcome deme).linkage
+  dd_eq := realization.DD_eq
+
+/-- `H(i,j)` is symmetric because its defining cross-deme heterozygosity polynomial is. -/
+theorem H_symm {D : ℕ} {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state) (first second : Fin D) :
+    state (some (.H first second)) = state (some (.H second first)) := by
+  rw [realization.H_eq first second, realization.H_eq second first]
+  congr 1
+  funext outcome
+  simp only [twoLocusLeftHeterozygosity]
+  ring
+
+/-- Cross-deme heterozygosity is nonnegative on the haplotype simplex. -/
+theorem H_nonneg {D : ℕ} {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state) (first second : Fin D) :
+    0 ≤ state (some (.H first second)) := by
+  rw [realization.H_eq first second]
+  apply realization.expectation.nonneg_eval
+  intro outcome
+  apply add_nonneg
+  · exact mul_nonneg (realization.haplotype outcome first).leftFrequency_nonneg
+      (sub_nonneg.mpr (realization.haplotype outcome second).leftFrequency_le_one)
+  · exact mul_nonneg (realization.haplotype outcome second).leftFrequency_nonneg
+      (sub_nonneg.mpr (realization.haplotype outcome first).leftFrequency_le_one)
+
+/-- Generalized `pi2` is nonnegative because it is one quarter of a product of two
+nonnegative cross-deme heterozygosities. -/
+theorem pi2_nonneg {D : ℕ} {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state)
+    (first second third fourth : Fin D) :
+    0 ≤ state (some (.pi2 first second third fourth)) := by
+  rw [realization.pi2_eq first second third fourth]
+  apply realization.expectation.nonneg_eval
+  intro outcome
+  apply div_nonneg
+  · apply mul_nonneg
+    · apply add_nonneg
+      · exact mul_nonneg (realization.haplotype outcome first).leftFrequency_nonneg
+          (sub_nonneg.mpr (realization.haplotype outcome second).leftFrequency_le_one)
+      · exact mul_nonneg (realization.haplotype outcome second).leftFrequency_nonneg
+          (sub_nonneg.mpr (realization.haplotype outcome first).leftFrequency_le_one)
+    · apply add_nonneg
+      · exact mul_nonneg (realization.haplotype outcome third).rightFrequency_nonneg
+          (sub_nonneg.mpr (realization.haplotype outcome fourth).rightFrequency_le_one)
+      · exact mul_nonneg (realization.haplotype outcome fourth).rightFrequency_nonneg
+          (sub_nonneg.mpr (realization.haplotype outcome third).rightFrequency_le_one)
+  · norm_num
+
+end LowOrderLDHaplotypeRealization
+
+/-- The four-term generalized definition has exactly the classical within-deme
+specialization; the normalization contains no fitted or conventional scale factor. -/
+theorem twoLocusJointHeterozygosity_self
+    (frequency : TwoLocusHaplotypeFrequencies) :
+    twoLocusJointHeterozygosity frequency frequency frequency frequency =
+      frequency.leftFrequency * (1 - frequency.leftFrequency) *
+        frequency.rightFrequency * (1 - frequency.rightFrequency) := by
+  simp only [twoLocusJointHeterozygosity, twoLocusLeftHeterozygosity,
+    twoLocusRightHeterozygosity]
+  ring
+
+namespace LowOrderLDDDRealization
+
+/-- Every realizable `DD` block is symmetric. -/
+theorem dd_symm {D : ℕ} {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDDDRealization state) (first second : Fin D) :
+    state (some (.DD first second)) = state (some (.DD second first)) := by
+  rw [realization.dd_eq first second, realization.dd_eq second first]
+  congr 1
+  funext outcome
+  ring
+
+/-- Every diagonal `DD(i,i) = E[Dᵢ²]` of a realizable state is nonnegative. -/
+theorem dd_diagonal_nonneg {D : ℕ}
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDDDRealization state) (deme : Fin D) :
+    0 ≤ state (some (.DD deme deme)) := by
+  rw [realization.dd_eq deme deme]
+  exact realization.expectation.nonneg_eval _ fun outcome ↦
+    mul_self_nonneg (realization.linkage outcome deme)
+
+/-- A realizable `DD` block is positive semidefinite in the population-genetic form: every
+finite linear combination of deme-specific linkage disequilibria has nonnegative second
+moment. -/
+theorem dd_quadraticForm_nonneg {D : ℕ}
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDDDRealization state) (weight : Fin D → ℝ) :
+    0 ≤ ∑ first, ∑ second,
+      weight first * state (some (.DD first second)) * weight second := by
+  simp_rw [realization.dd_eq]
+  have square_nonneg : 0 ≤ realization.expectation (fun outcome ↦
+      (∑ deme, weight deme * realization.linkage outcome deme) ^ 2) :=
+    realization.expectation.nonneg_eval _ fun outcome ↦ sq_nonneg _
+  have expectation_expand :
+      realization.expectation (fun outcome ↦
+          (∑ deme, weight deme * realization.linkage outcome deme) ^ 2) =
+        ∑ first, ∑ second,
+          weight first * realization.expectation (fun outcome ↦
+            realization.linkage outcome first * realization.linkage outcome second) *
+              weight second := by
+    have pointwise : (fun outcome ↦
+        (∑ deme, weight deme * realization.linkage outcome deme) ^ 2) =
+      ∑ first, ∑ second, (weight first * weight second) •
+        (fun outcome ↦ realization.linkage outcome first *
+          realization.linkage outcome second) := by
+      funext outcome
+      simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
+      rw [pow_two, Finset.sum_mul_sum]
+      apply Finset.sum_congr rfl
+      intro first _
+      apply Finset.sum_congr rfl
+      intro second _
+      ring
+    rw [pointwise]
+    simp_rw [Foundations.ExpFunctional.eval_sum, realization.expectation.smul_eval]
+    apply Finset.sum_congr rfl
+    intro first _
+    apply Finset.sum_congr rfl
+    intro second _
+    ring
+  rw [expectation_expand] at square_nonneg
+  exact square_nonneg
+
+/-- Pairwise Cauchy--Schwarz is a consequence of the common realization, not an independent
+field attached to each requested pair. -/
+theorem dd_cauchySchwarz {D : ℕ}
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDDDRealization state) (first second : Fin D) :
+    state (some (.DD first second)) ^ 2 ≤
+      state (some (.DD first first)) * state (some (.DD second second)) := by
+  rw [realization.dd_eq first second, realization.dd_eq first first,
+    realization.dd_eq second second]
+  simpa [pow_two] using realization.expectation.cauchy_schwarz
+    (fun outcome ↦ realization.linkage outcome first)
+    (fun outcome ↦ realization.linkage outcome second)
+
+end LowOrderLDDDRealization
 
 /-! ## The concrete arbitrary-deme generator -/
 
@@ -523,6 +788,16 @@ theorem oneDemeStationaryLowOrderLDState_DD_pos (rates : ManyDemeLDRates 1)
   have hden := oneDemeLDStationaryDenominator_pos rates
   positivity
 
+/-- The stationary ancestral `DD` is nonnegative even on the zero-mutation boundary. -/
+theorem oneDemeStationaryLowOrderLDState_DD_nonneg (rates : ManyDemeLDRates 1) :
+    0 ≤ oneDemeStationaryLowOrderLDState rates (some (.DD 0 0)) := by
+  unfold oneDemeStationaryLowOrderLDState
+  have hc := rates.coalescence_pos 0
+  have ht := rates.mutation_nonneg 0
+  have hr := rates.recombination_nonneg 0
+  have hden := oneDemeLDStationaryDenominator_pos rates
+  positivity
+
 /-- Collapse an arbitrary-deme coordinate to the unique coordinate of a single common
 ancestral deme. -/
 def LowOrderLDCoordinate.collapseToOneDeme {D : ℕ} :
@@ -564,6 +839,23 @@ theorem commonAncestralLowOrderLDState_DD_pos {D : ℕ}
     0 < commonAncestralLowOrderLDState ancestralRates (some (.DD first second)) := by
   exact oneDemeStationaryLowOrderLDState_DD_pos ancestralRates mutation_pos
 
+/-- The entire unsplit ancestral `DD` block has one explicit Gram realization: every deme
+label reads the same constant linkage observable whose square is the stationary `DD` value.
+This includes the zero-mutation boundary, where that observable is zero. -/
+noncomputable def commonAncestralLowOrderLDDDRealization {D : ℕ}
+    (ancestralRates : ManyDemeLDRates 1) :
+    LowOrderLDDDRealization (commonAncestralLowOrderLDState (D := D) ancestralRates) where
+  sampleSpace := Unit
+  expectation := Foundations.ExpFunctional.evalAt ()
+  linkage := fun _ _ ↦
+    Real.sqrt (oneDemeStationaryLowOrderLDState ancestralRates (some (.DD 0 0)))
+  dd_eq := by
+    intro first second
+    change oneDemeStationaryLowOrderLDState ancestralRates (some (.DD 0 0)) =
+      Real.sqrt (oneDemeStationaryLowOrderLDState ancestralRates (some (.DD 0 0))) *
+        Real.sqrt (oneDemeStationaryLowOrderLDState ancestralRates (some (.DD 0 0)))
+    rw [← pow_two, Real.sq_sqrt (oneDemeStationaryLowOrderLDState_DD_nonneg ancestralRates)]
+
 /-- The ancestral `DD` kernel saturates Cauchy--Schwarz because every descendant label still
 denotes the same unsplit population. -/
 theorem commonAncestralLowOrderLDState_DD_cauchySchwarz {D : ℕ}
@@ -571,7 +863,8 @@ theorem commonAncestralLowOrderLDState_DD_cauchySchwarz {D : ℕ}
     commonAncestralLowOrderLDState ancestralRates (some (.DD first second)) ^ 2 ≤
       commonAncestralLowOrderLDState ancestralRates (some (.DD first first)) *
         commonAncestralLowOrderLDState ancestralRates (some (.DD second second)) := by
-  simp [commonAncestralLowOrderLDState, LowOrderLDCoordinate.collapseToOneDeme, pow_two]
+  exact (commonAncestralLowOrderLDDDRealization (D := D) ancestralRates).dd_cauchySchwarz
+    first second
 
 /-- One piecewise-constant epoch of a derived low-order two-locus moment system. -/
 structure LowOrderLDEpoch (D : ℕ) where
@@ -647,6 +940,67 @@ theorem lowOrderLDSplitTransform_mulVec {D : ℕ} (parent child : Fin D)
       simp [Matrix.mulVec, dotProduct, lowOrderLDSplitTransform]
   | some row =>
       simp [Matrix.mulVec, dotProduct, lowOrderLDSplitTransform]
+
+/-- Deterministic population splitting preserves one common Gram realization of the entire
+`DD` block: the child's linkage observable is exactly the parent's pre-split observable and
+every other observable is unchanged. -/
+noncomputable def LowOrderLDDDRealization.split {D : ℕ}
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDDDRealization state) (parent child : Fin D) :
+    LowOrderLDDDRealization ((lowOrderLDSplitTransform parent child).mulVec state) where
+  sampleSpace := realization.sampleSpace
+  expectation := realization.expectation
+  linkage := fun outcome deme ↦
+    realization.linkage outcome (if deme = child then parent else deme)
+  dd_eq := by
+    intro first second
+    rw [lowOrderLDSplitTransform_mulVec]
+    change state (some (.DD (if first = child then parent else first)
+      (if second = child then parent else second))) = _
+    exact realization.dd_eq _ _
+
+/-- A deterministic split preserves the full haplotype semantic cone, not only its `DD`
+projection: every coordinate is obtained by replacing the child haplotype-frequency random
+variable with the parent's random variable. -/
+noncomputable def LowOrderLDHaplotypeRealization.split {D : ℕ}
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state) (parent child : Fin D) :
+    LowOrderLDHaplotypeRealization
+      ((lowOrderLDSplitTransform parent child).mulVec state) where
+  sampleSpace := realization.sampleSpace
+  expectation := realization.expectation
+  haplotype := fun outcome deme ↦
+    realization.haplotype outcome (if deme = child then parent else deme)
+  constant_eq := by
+    rw [lowOrderLDSplitTransform_mulVec]
+    exact realization.constant_eq
+  H_eq := by
+    intro first second
+    rw [lowOrderLDSplitTransform_mulVec]
+    change state (some (.H (if first = child then parent else first)
+      (if second = child then parent else second))) = _
+    exact realization.H_eq _ _
+  DD_eq := by
+    intro first second
+    rw [lowOrderLDSplitTransform_mulVec]
+    change state (some (.DD (if first = child then parent else first)
+      (if second = child then parent else second))) = _
+    exact realization.DD_eq _ _
+  Dz_eq := by
+    intro first second third
+    rw [lowOrderLDSplitTransform_mulVec]
+    change state (some (.Dz (if first = child then parent else first)
+      (if second = child then parent else second)
+      (if third = child then parent else third))) = _
+    exact realization.Dz_eq _ _ _
+  pi2_eq := by
+    intro first second third fourth
+    rw [lowOrderLDSplitTransform_mulVec]
+    change state (some (.pi2 (if first = child then parent else first)
+      (if second = child then parent else second)
+      (if third = child then parent else third)
+      (if fourth = child then parent else fourth))) = _
+    exact realization.pi2_eq _ _ _ _
 
 /-- The exact split transform preserves the joint state's affine constant. -/
 theorem lowOrderLDSplitTransform_none {D : ℕ} (parent child : Fin D)
@@ -742,6 +1096,33 @@ theorem LowOrderLDHistory.toDemographicTwoLocusMoments_DD {D : ℕ}
         rho first second =
     (historyAt rho).present (some (.DD first second)) :=
   rfl
+
+/-- A common Gram realization of the composed present state supplies the exact
+`LDPairDomain` consumed by the normalized portability law.  Only strict positivity of the
+two normalization diagonals remains separate; Cauchy--Schwarz is derived from the witness. -/
+def LowOrderLDDDRealization.toLDPairDomain {D : ℕ}
+    (historyAt : MarkerSeparationBp → LowOrderLDHistory D)
+    (rho : MarkerSeparationBp) (first second : Fin D)
+    (realization : LowOrderLDDDRealization (historyAt rho).present)
+    (first_pos : 0 < (historyAt rho).present (some (.DD first first)))
+    (second_pos : 0 < (historyAt rho).present (some (.DD second second))) :
+    (LowOrderLDHistory.toDemographicTwoLocusMoments historyAt).LDPairDomain
+      rho first second where
+  firstWithin_pos := first_pos
+  secondWithin_pos := second_pos
+  cross_sq_le := realization.dd_cauchySchwarz first second
+
+/-- A full haplotype realization reaches the portability domain through its derived Gram
+witness; no pairwise linkage inequality is supplied independently. -/
+def LowOrderLDHaplotypeRealization.toLDPairDomain {D : ℕ}
+    (historyAt : MarkerSeparationBp → LowOrderLDHistory D)
+    (rho : MarkerSeparationBp) (first second : Fin D)
+    (realization : LowOrderLDHaplotypeRealization (historyAt rho).present)
+    (first_pos : 0 < (historyAt rho).present (some (.DD first first)))
+    (second_pos : 0 < (historyAt rho).present (some (.DD second second))) :
+    (LowOrderLDHistory.toDemographicTwoLocusMoments historyAt).LDPairDomain
+      rho first second :=
+  realization.toDDDRealization.toLDPairDomain historyAt rho first second first_pos second_pos
 
 /-- The same interface exposes the marginal heterozygosity coordinate carried inside the
 joint operator.  This is the coordinate that an eventual intertwining theorem identifies
