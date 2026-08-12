@@ -141,9 +141,14 @@ prevent that construction:
   `manyDemeBernsteinAnalyticGeneratorPolynomial_eq_killedDual` proves equality as a
   multivariate polynomial, and
   `manyDemeBernsteinGenerator_momentFunctional_eq_killedDual` transports it through every
-  mixed-moment functional.  What remains is to identify those coefficient functionals with
-  the two finite matrices, lift that matrix intertwining through exponentials, and prove split
-  intertwining with the existing moment law so the alternating evaluator is replaced end to end,
+  mixed-moment functional.  At the terminal end,
+  `pooledMAFKilledDualTerminalVector` maps every accepted pooled count cell to its unique
+  full-degree lineage configuration with exact binomial multiplicity; its coefficients are
+  proved nonnegative, and `pooledMAFKilledDualTerminalVector_dot_bernstein` identifies its
+  pairing with the exact positive Bernstein event polynomial.  What remains is to identify
+  the coefficient functionals with the two finite matrices, lift that matrix intertwining
+  through exponentials, and prove split intertwining with the existing moment law so the
+  alternating evaluator is replaced end to end,
   implement its sparse action without materializing either Cartesian carrier, add certified
   floating-point/interval roundoff control, and run at the executable's 13,750-individual /
   27,500-haplotype grid2d scale, followed by the filed end-to-end cohort validation gate;
@@ -1137,6 +1142,122 @@ noncomputable def pooledMAFTerminalProbe
     if threshold.Accepts (manyDemeTotalSampleSize sampleSize) count.total then
       manyDemeSampleCountMomentProbe sampleSize count probeExponent
     else 0
+
+/-- The unique positive-dual lineage configuration for one pooled sample-count cell and an
+additional latent-frequency probe.  Its total lineage degree is exactly the panel size plus
+the probe degree, so every coordinate is constructively inside the finite carrier. -/
+def manyDemeSampleCountKilledDualCoordinate
+    {demeCount : ℕ} (sampleSize : Fin demeCount → ℕ)
+    (count : ManyDemeSampleCount sampleSize) (probeExponent : Fin demeCount → ℕ) :
+    Coalescent.ManyDemeKilledDualCoordinate demeCount
+      (manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent) := by
+  classical
+  let K := manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent
+  refine (fun deme ↦ ⟨(count deme : ℕ) + probeExponent deme, ?_⟩,
+    fun deme ↦ ⟨sampleSize deme - count deme, ?_⟩)
+  · have count_le : (count deme : ℕ) ≤ sampleSize deme := by
+      have := (count deme).isLt
+      omega
+    have sample_le : sampleSize deme ≤ manyDemeTotalSampleSize sampleSize :=
+      Finset.single_le_sum (fun other _ ↦ Nat.zero_le (sampleSize other))
+        (Finset.mem_univ deme)
+    have probe_le : probeExponent deme ≤ manyDemeExponentDegree probeExponent :=
+      Finset.single_le_sum (fun other _ ↦ Nat.zero_le (probeExponent other))
+        (Finset.mem_univ deme)
+    dsimp only [K]
+    omega
+
+/-- The count-cell configuration uses the whole degree budget: sampled derived plus sampled
+ancestral lineages contribute the panel size, and the latent probe contributes its degree. -/
+theorem manyDemeSampleCountKilledDualCoordinate_degree
+    {demeCount : ℕ} (sampleSize : Fin demeCount → ℕ)
+    (count : ManyDemeSampleCount sampleSize) (probeExponent : Fin demeCount → ℕ) :
+    (manyDemeSampleCountKilledDualCoordinate sampleSize count probeExponent).degree =
+      manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent := by
+  unfold manyDemeSampleCountKilledDualCoordinate
+    Coalescent.ManyDemeKilledDualCoordinate.degree
+    manyDemeTotalSampleSize manyDemeExponentDegree ManyDemeSampleCount.total
+  simp only [Fin.val_mk, Finset.sum_add_distrib, Finset.sum_sub_distrib]
+  have count_le := count.total_le_totalSampleSize
+  unfold ManyDemeSampleCount.total manyDemeTotalSampleSize at count_le
+  omega
+  · have sample_le : sampleSize deme ≤ manyDemeTotalSampleSize sampleSize :=
+      Finset.single_le_sum (fun other _ ↦ Nat.zero_le (sampleSize other))
+        (Finset.mem_univ deme)
+    dsimp only [K]
+    omega
+
+/-- Sparse nonnegative terminal vector for the complete pooled-MAF event in the positive
+killed-dual basis.  Each accepted count cell contributes one configuration with its exact
+multinomial multiplicity; no alternating complement expansion occurs. -/
+noncomputable def pooledMAFKilledDualTerminalVector
+    {demeCount : ℕ} (sampleSize : Fin demeCount → ℕ)
+    (threshold : PooledMAFThreshold) (probeExponent : Fin demeCount → ℕ) :
+    Coalescent.ManyDemeKilledDualCoordinate demeCount
+      (manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent) → ℝ := by
+  classical
+  exact ∑ count : ManyDemeSampleCount sampleSize,
+    if threshold.Accepts (manyDemeTotalSampleSize sampleSize) count.total then
+      (∏ deme, (Nat.choose (sampleSize deme) (count deme) : ℝ)) •
+        fun coordinate ↦
+          if coordinate = manyDemeSampleCountKilledDualCoordinate sampleSize count probeExponent
+            then 1 else 0
+    else 0
+
+/-- Every coefficient of the pooled-MAF killed-dual terminal vector is nonnegative. -/
+theorem pooledMAFKilledDualTerminalVector_nonneg
+    {demeCount : ℕ} (sampleSize : Fin demeCount → ℕ)
+    (threshold : PooledMAFThreshold) (probeExponent : Fin demeCount → ℕ)
+    (coordinate : Coalescent.ManyDemeKilledDualCoordinate demeCount
+      (manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent)) :
+    0 ≤ pooledMAFKilledDualTerminalVector sampleSize threshold probeExponent coordinate := by
+  classical
+  unfold pooledMAFKilledDualTerminalVector
+  apply Finset.sum_nonneg
+  intro count _
+  split_ifs
+  · simp only [Pi.smul_apply, smul_eq_mul]
+    positivity
+  · rfl
+
+/-- Positive Bernstein polynomial for the pooled-MAF event and latent probe. -/
+noncomputable def pooledMAFPositiveBernsteinPolynomial
+    {demeCount : ℕ} (sampleSize : Fin demeCount → ℕ)
+    (threshold : PooledMAFThreshold) (probeExponent : Fin demeCount → ℕ) :
+    MvPolynomial (Fin demeCount) ℝ := by
+  classical
+  exact ∑ count : ManyDemeSampleCount sampleSize,
+    if threshold.Accepts (manyDemeTotalSampleSize sampleSize) count.total then
+      MvPolynomial.C (∏ deme,
+        (Nat.choose (sampleSize deme) (count deme) : ℝ)) *
+        Coalescent.manyDemeBernsteinPolynomial
+          (fun deme ↦ (count deme : ℕ) + probeExponent deme)
+          (fun deme ↦ sampleSize deme - count deme)
+    else 0
+
+/-- Pairing the sparse positive vector with Bernstein basis weights evaluates exactly the
+pooled event polynomial. -/
+theorem pooledMAFKilledDualTerminalVector_dot_bernstein
+    {demeCount : ℕ} (sampleSize : Fin demeCount → ℕ)
+    (threshold : PooledMAFThreshold) (probeExponent : Fin demeCount → ℕ)
+    (frequency : Fin demeCount → ℝ) :
+    pooledMAFKilledDualTerminalVector sampleSize threshold probeExponent ⬝ᵥ
+        (fun coordinate ↦ Coalescent.manyDemeBernsteinWeight frequency
+          (fun deme ↦ (coordinate.1 deme).val)
+          (fun deme ↦ (coordinate.2 deme).val)) =
+      MvPolynomial.eval frequency
+        (pooledMAFPositiveBernsteinPolynomial sampleSize threshold probeExponent) := by
+  classical
+  unfold pooledMAFKilledDualTerminalVector pooledMAFPositiveBernsteinPolynomial
+  rw [sum_dotProduct]
+  apply Finset.sum_congr rfl
+  intro count _
+  by_cases accepted :
+      threshold.Accepts (manyDemeTotalSampleSize sampleSize) count.total
+  · simp [accepted, smul_dotProduct, dotProduct,
+      manyDemeSampleCountKilledDualCoordinate,
+      Coalescent.eval_manyDemeBernsteinPolynomial]
+  · simp [accepted]
 
 /-- The complete ascertainment polynomial paired with the present moment state is exactly
 the pooled-MAF probe mass. -/
