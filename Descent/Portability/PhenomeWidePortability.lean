@@ -2079,9 +2079,11 @@ separate marginal factor (a product with the marginal factor was measured to cha
 twice; its record is at `steppingStonePortability_interior_is_panelTransportRatio` below).
 The operator contains recurrent symmetric-biallelic mutation
 damping and the matching stationary boundary rather than the former infinite-sites mutation
-slice.  It is derived, but it is not yet the exact simulator endpoint: the projection theorem
-tying it to the marginal ascertainment diffusion remains open, and gnomon's implicit JC69
-mutation protocol is a separate executable mismatch.  The pre-filed 2-D comparison has now
+slice.  The common-diffusion projection tying it to the marginal ascertainment diffusion is
+now proved for every typed event history in
+`PipelineDemographicHistory.commonDiffusionProjection_exact`.  It is still not the exact
+simulator endpoint because gnomon's implicit JC69 mutation protocol is a separate executable
+mismatch.  The pre-filed 2-D comparison has now
 completed: it rejects the shared-one-dimensional-length Bessel reduction at `rho = 1` and
 fails it at `rho = 5, 20`, while the full operator is not replaced by that scalar form.  An
 independent simulator gate for the operator remains open.
@@ -2223,8 +2225,8 @@ theorem effectiveDriftGenerations_strictMono_index (Ne F₁ F₂ : ℝ)
     target deme concentrates score and liability variance (the squared heterozygosity ratio
     in the transport law is greater than one in that direction); the ceiling claim is
     regime-scoped to equal deme sizes.  The interior law is not yet promoted
-    to the exact simulator law: it still owes the common-diffusion projection and independent
-    simulator validation, and the executable must
+    to the exact simulator law: the common-diffusion projection is proved, but it still owes
+    independent simulator validation, and the executable must
     explicitly choose this binary mutation protocol instead of its present default JC69.
     The pre-filed 4x4/5x5 two-dimensional test has completed and rejected the proposed scalar
     Bessel reduction; that negative result supports retaining the operator but does not itself

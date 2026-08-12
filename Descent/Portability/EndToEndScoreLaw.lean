@@ -83,17 +83,13 @@ currently prevent that construction:
   low-order `DD` coordinate.  The latter collapses the linkage bracket but does not by itself
   construct the deployed score law.  The low-order operator now includes the exact recurrent
   symmetric-biallelic damping and its recurrent one-deme stationary boundary, so it uses the
-  same mutation mechanism as the marginal ascertainment propagator.  A projection theorem
-  from one common two-locus diffusion to both coordinate systems is still owed before their
-  product is promoted to an exact joint endpoint.  The exact remaining proposition is named
-  `PipelineDemographicHistory.CommonDiffusionProjection`: the joint operator's exposed `H`
-  coordinate must equal the marginal divergence moment after every compiled history.  Rate
-  coherence, equality of the recurrent ancestral `H` boundary, the exact `H`-row reduction to
-  the shared divergence derivative, and passage of a generator intertwining through the
-  matrix exponential are now proved.  What remains formal is the one-locus projection-matrix
-  identity and its lift through paired split/event lists, not another fitted biological
-  factor.  A
-  realizability corollary must also show that the propagated `DD` kernel stays positive
+  same mutation mechanism as the marginal ascertainment propagator.
+  `PipelineDemographicHistory.commonDiffusionProjection_exact` now proves that the joint
+  operator's exposed `H` coordinate equals the marginal divergence moment after every
+  arbitrary compiled history: it includes the ancestral boundary, generator and exponential
+  intertwinings, split commutation, reachable-state invariants, paired event induction, and
+  terminal readouts.  No fitted biological factor remains in that join.  A realizability
+  corollary must still show that the propagated `DD` kernel stays positive
   semidefinite, thereby constructing `LDPairDomain` (and its Cauchy--Schwarz field) whenever
   within-deme `DD` is nonzero.  The input-only linkage function returns `none` rather than
   accepting that proof from its caller, so this formal obligation cannot be hidden;
@@ -160,9 +156,9 @@ fiber width, or claim an exact endpoint law.
   `H/DD/Dz/pi2` generator, split transforms, epoch semigroups, and ordered composition that
   evaluates the proposed migration-restored linkage factor.
 * This file defines the visible history/study contract, compiles both demographic operators,
-  specifies the exact P+T selection objective on a realized variable-marker draw, and builds
-  the total-liability/phenotype layer.  `CommonDiffusionProjection` is the precise missing
-  mathematical join between its marginal and linkage compilers.
+  proves `commonDiffusionProjection_exact` for arbitrary event histories, specifies the exact
+  P+T selection objective on a realized variable-marker draw, and builds the
+  total-liability/phenotype layer.
 * `Descent/Portability/DiscriminationLaw.lean` evaluates realized and expected finite-cohort
   `R²`, AUC, calibration, Brier, and score variance, preserving undefined coordinates as
   `Option` values.
@@ -412,6 +408,97 @@ theorem PipelineRateState.oneLocus_twoLocus_rate_coherence {demeCount : ℕ}
   refine ⟨rfl, fun _ ↦ rfl, ?_⟩
   simp [PipelineRateState.toManyDemeLDRates, PipelineRateState.toManyDemeRates] <;> ring
 
+/-- The common affine pair-divergence generator exposed by both demographic compilers. -/
+noncomputable def PipelineRateState.pairDivergenceGenerator {demeCount : ℕ}
+    (state : PipelineRateState demeCount) (active : Fin demeCount → Bool) :
+    Matrix (Coalescent.AffinePairDivergenceCoordinate demeCount)
+      (Coalescent.AffinePairDivergenceCoordinate demeCount) ℝ :=
+  let rates := state.toManyDemeRates active
+  Coalescent.augmentedPairDivergenceGenerator rates.coalescence rates.migration
+    (fun deme ↦ rates.forwardMutation deme + rates.backwardMutation deme)
+
+/-- The `H` subsystem of the two-locus compiler uses exactly the common pair-divergence
+generator, including the factor of two converting symmetric forward/back mutation to the
+heterozygosity damping rate. -/
+theorem PipelineRateState.twoLocus_pairDivergenceGenerator_eq {demeCount : ℕ}
+    (state : PipelineRateState demeCount) (active : Fin demeCount → Bool)
+    (separationBp : ℝ) (separationBp_nonneg : 0 ≤ separationBp) :
+    Coalescent.augmentedPairDivergenceGenerator
+        (state.toManyDemeLDRates separationBp separationBp_nonneg active).coalescence
+        (state.toManyDemeLDRates separationBp separationBp_nonneg active).migration
+        (state.toManyDemeLDRates separationBp separationBp_nonneg active).mutation =
+      state.pairDivergenceGenerator active := by
+  unfold PipelineRateState.pairDivergenceGenerator
+  congr 1
+  funext deme
+  simp [PipelineRateState.toManyDemeLDRates, PipelineRateState.toManyDemeRates]
+  ring
+
+/-- A synchronized reachable state of the marginal degree-two diffusion and the complete
+two-locus diffusion.  Equality is asserted only after the two exact linear projections; the
+full state spaces retain their distinct higher-order coordinates. -/
+structure CommonDiffusionState (demeCount : ℕ) where
+  marginal : Coalescent.AffineManyDemeMomentCoordinate demeCount 2 → ℝ
+  joint : Coalescent.AffineLowOrderLDCoordinate demeCount → ℝ
+  projection_eq :
+    (Coalescent.manyDemePairDivergenceProjection demeCount).mulVec marginal =
+      (Coalescent.lowOrderLDHProjection demeCount).mulVec joint
+  marginal_constant : marginal none = 1
+  marginal_zeroCoordinate : marginal (some (fun _ ↦ 0)) = 0
+  joint_constant : joint none = 1
+
+/-- Evolve both sides of a common-diffusion state through one visible epoch.  The proof field
+uses the two matrix-exponential intertwining theorems and the rate compiler's exact generator
+identity, so no step-size or closure approximation enters. -/
+noncomputable def CommonDiffusionState.evolve {demeCount : ℕ}
+    (common : CommonDiffusionState demeCount) (rates : PipelineRateState demeCount)
+    (active : Fin demeCount → Bool) (separationBp : ℝ)
+    (separationBp_nonneg : 0 ≤ separationBp) (duration : ℝ)
+    (duration_nonneg : 0 ≤ duration) : CommonDiffusionState demeCount :=
+  let marginalEpoch : Coalescent.ManyDemeMomentEpoch demeCount 2 :=
+    { rates := rates.toManyDemeRates active
+      duration := duration
+      duration_nonneg := duration_nonneg }
+  let jointEpoch := (rates.toManyDemeLDRates separationBp separationBp_nonneg active).epoch
+    duration duration_nonneg
+  { marginal := marginalEpoch.propagator.mulVec common.marginal
+    joint := jointEpoch.propagator.mulVec common.joint
+    projection_eq := by
+      rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec,
+        Coalescent.manyDemePairDivergenceProjection_propagator_intertwines marginalEpoch
+          (fun _ ↦ rfl),
+        Coalescent.lowOrderLDHProjection_propagator_intertwines jointEpoch.rates duration,
+        rates.twoLocus_pairDivergenceGenerator_eq active separationBp separationBp_nonneg,
+        Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, common.projection_eq]
+    marginal_constant := by
+      rw [marginalEpoch.propagator_none, common.marginal_constant]
+    marginal_zeroCoordinate := by
+      rw [marginalEpoch.propagator_zeroCoordinate, common.marginal_zeroCoordinate]
+    joint_constant := by
+      rw [jointEpoch.propagator_none, common.joint_constant] }
+
+/-- Apply one valid split to both sides of a common-diffusion state.  Exact relabeling commutes
+with both projections, while the reachability fields discharge the affine/padding side
+conditions that a raw rectangular vector need not satisfy. -/
+noncomputable def CommonDiffusionState.split {demeCount : ℕ}
+    (common : CommonDiffusionState demeCount) (parent child : Fin demeCount)
+    (parent_ne_child : parent ≠ child) : CommonDiffusionState demeCount :=
+  { marginal := Coalescent.splitManyDemeMomentState parent child common.marginal
+    joint := (Coalescent.lowOrderLDSplitTransform parent child).mulVec common.joint
+    projection_eq := by
+      rw [Coalescent.manyDemePairDivergenceProjection_split parent child parent_ne_child
+          common.marginal (by
+            simpa [Coalescent.manyDemeMomentVectorTable] using
+              common.marginal_zeroCoordinate),
+        Coalescent.lowOrderLDHProjection_split parent child common.joint common.joint_constant,
+        common.projection_eq]
+    marginal_constant := Coalescent.splitManyDemeMomentState_none parent child common.marginal
+    marginal_zeroCoordinate := by
+      rw [Coalescent.splitManyDemeMomentState_zeroCoordinate,
+        common.marginal_zeroCoordinate]
+    joint_constant := by
+      rw [Coalescent.lowOrderLDSplitTransform_none, common.joint_constant] }
+
 /-- Apply the parameter update carried by an event.  A split changes the moment state, not
 the rate state; its instantaneous transform is emitted separately by the compiler below. -/
 def DemographicEvent.updateRateState {demeCount : ℕ}
@@ -503,6 +590,89 @@ noncomputable def compileLowOrderLDEvents {demeCount : ℕ}
         finalRateState := tail.finalRateState
         finalActive := tail.finalActive }
 
+/-- Result of executing the two synchronized diffusion states directly over a visible event
+list.  The final rate and active-deme states are retained so the terminal epoch can be applied
+without reinterpreting the event sequence. -/
+structure CommonDiffusionEventRun (demeCount : ℕ) where
+  state : CommonDiffusionState demeCount
+  finalRateState : PipelineRateState demeCount
+  finalActive : Fin demeCount → Bool
+
+/-- Direct synchronized execution of an arbitrary finite event list.  Each event evolves both
+states under the preceding rates, applies the exact split pullback when present, and then
+updates the rate/active carriers for the recursive suffix. -/
+noncomputable def runCommonDiffusionEvents {demeCount : ℕ}
+    (separationBp : ℝ) (separationBp_nonneg : 0 ≤ separationBp) :
+    List (DemographicEvent demeCount) → PipelineRateState demeCount →
+      (Fin demeCount → Bool) → CommonDiffusionState demeCount →
+        CommonDiffusionEventRun demeCount
+  | [], rates, active, common =>
+      { state := common, finalRateState := rates, finalActive := active }
+  | event :: remaining, rates, active, common =>
+      let evolved := common.evolve rates active separationBp separationBp_nonneg
+        event.elapsed event.elapsed_nonneg
+      let afterEvent := match event with
+        | .split _ _ parent child parent_ne_child =>
+            evolved.split parent child parent_ne_child
+        | _ => evolved
+      runCommonDiffusionEvents separationBp separationBp_nonneg remaining
+        (event.updateRateState rates) (event.updateActive active) afterEvent
+
+/-- The marginal component of synchronized execution is exactly the existing degree-two
+one-locus instruction compiler followed by its fold, for every event list and starting state. -/
+theorem runCommonDiffusionEvents_marginal {demeCount : ℕ}
+    (separationBp : ℝ) (separationBp_nonneg : 0 ≤ separationBp)
+    (events : List (DemographicEvent demeCount)) (rates : PipelineRateState demeCount)
+    (active : Fin demeCount → Bool) (common : CommonDiffusionState demeCount) :
+    (runCommonDiffusionEvents separationBp separationBp_nonneg events rates active common).state.marginal =
+      Coalescent.propagateManyDemeMomentInstructions
+        (compileMomentEvents 2 events rates active).instructions common.marginal := by
+  induction events generalizing rates active common with
+  | nil => rfl
+  | cons event remaining ih =>
+      cases event <;>
+        simp [runCommonDiffusionEvents, compileMomentEvents,
+          Coalescent.propagateManyDemeMomentInstructions, List.foldl_append,
+          CommonDiffusionState.evolve, CommonDiffusionState.split, ih]
+
+/-- The joint component of synchronized execution is exactly the existing low-order two-locus
+instruction compiler followed by its fold. -/
+theorem runCommonDiffusionEvents_joint {demeCount : ℕ}
+    (separationBp : ℝ) (separationBp_nonneg : 0 ≤ separationBp)
+    (events : List (DemographicEvent demeCount)) (rates : PipelineRateState demeCount)
+    (active : Fin demeCount → Bool) (common : CommonDiffusionState demeCount) :
+    (runCommonDiffusionEvents separationBp separationBp_nonneg events rates active common).state.joint =
+      Coalescent.propagateLowOrderLDInstructions
+        (compileLowOrderLDEvents separationBp separationBp_nonneg events rates active).instructions
+        common.joint := by
+  induction events generalizing rates active common with
+  | nil => rfl
+  | cons event remaining ih =>
+      cases event <;>
+        simp [runCommonDiffusionEvents, compileLowOrderLDEvents,
+          Coalescent.propagateLowOrderLDInstructions, List.foldl_append,
+          Coalescent.LowOrderLDInstruction.apply, Coalescent.LowOrderLDInstruction.split,
+          CommonDiffusionState.evolve, CommonDiffusionState.split, ih]
+
+/-- Direct synchronized execution and both independent instruction compilers finish with the
+same rate and active-deme carriers. -/
+theorem runCommonDiffusionEvents_finalCarriers {demeCount : ℕ}
+    (separationBp : ℝ) (separationBp_nonneg : 0 ≤ separationBp)
+    (events : List (DemographicEvent demeCount)) (rates : PipelineRateState demeCount)
+    (active : Fin demeCount → Bool) (common : CommonDiffusionState demeCount) :
+    let run := runCommonDiffusionEvents separationBp separationBp_nonneg events rates active common
+    let marginalCompiled := compileMomentEvents 2 events rates active
+    let jointCompiled := compileLowOrderLDEvents separationBp separationBp_nonneg events rates active
+    run.finalRateState = marginalCompiled.finalRateState ∧
+      run.finalActive = marginalCompiled.finalActive ∧
+      run.finalRateState = jointCompiled.finalRateState ∧
+      run.finalActive = jointCompiled.finalActive := by
+  induction events generalizing rates active common with
+  | nil => simp [runCommonDiffusionEvents, compileMomentEvents, compileLowOrderLDEvents]
+  | cons event remaining ih =>
+      cases event <;>
+        simp [runCommonDiffusionEvents, compileMomentEvents, compileLowOrderLDEvents, ih]
+
 /-- Exact one-locus moment instructions for the whole visible event history.  Recombination
 updates are retained in the rate state for the two-locus compiler; they correctly have no
 effect on this one-locus generator. -/
@@ -566,6 +736,70 @@ theorem PipelineDemographicHistory.ancestralHeterozygosity_eq_lowOrderH
       (history.initialEffectiveSize_pos history.ancestralDeme)
       history.initialMutationRate_nonneg
 
+/-- The two concrete compilers begin in one common projected state.  This packages the
+symmetric-beta/recurrent-two-locus boundary identity together with the affine reachability
+invariants required by every later split. -/
+noncomputable def PipelineDemographicHistory.initialCommonDiffusionState
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (separationBp : ℝ) (separationBp_nonneg : 0 ≤ separationBp) :
+    CommonDiffusionState demeCount :=
+  { marginal := Coalescent.commonAncestorManyDemeMomentState history.ancestralMoment
+    joint := Coalescent.commonAncestralLowOrderLDState
+      (history.ancestralLDRates separationBp separationBp_nonneg)
+    projection_eq := by
+      rw [Coalescent.manyDemePairDivergenceProjection_commonAncestor,
+        Coalescent.lowOrderLDHProjection_commonAncestral]
+      funext coordinate
+      cases coordinate with
+      | none => rfl
+      | some pair =>
+          exact history.ancestralHeterozygosity_eq_lowOrderH separationBp
+            separationBp_nonneg
+    marginal_constant := rfl
+    marginal_zeroCoordinate := by
+      simp [Coalescent.commonAncestorManyDemeMomentState,
+        Coalescent.ManyDemeMomentCoordinate.degree]
+    joint_constant := rfl }
+
+/-- Synchronized present-day state after the complete event list and terminal epoch. -/
+noncomputable def PipelineDemographicHistory.presentCommonDiffusionState
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (separationBp : ℝ) (separationBp_nonneg : 0 ≤ separationBp) :
+    CommonDiffusionState demeCount :=
+  let run := runCommonDiffusionEvents separationBp separationBp_nonneg history.events
+    history.initialRateState (initialDemeActive history.events)
+    (history.initialCommonDiffusionState separationBp separationBp_nonneg)
+  run.state.evolve run.finalRateState run.finalActive separationBp separationBp_nonneg
+    history.finalElapsed history.finalElapsed_nonneg
+
+/-- The synchronized present marginal is exactly the public degree-two one-locus history
+evaluation, including the terminal epoch. -/
+theorem PipelineDemographicHistory.presentCommonDiffusionState_marginal
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (separationBp : ℝ) (separationBp_nonneg : 0 ≤ separationBp) :
+    (history.presentCommonDiffusionState separationBp separationBp_nonneg).marginal =
+      Coalescent.propagateManyDemeMomentInstructions
+        (history.oneLocusMomentInstructions 2)
+        (Coalescent.commonAncestorManyDemeMomentState history.ancestralMoment) := by
+  let initial := history.initialCommonDiffusionState separationBp separationBp_nonneg
+  let run := runCommonDiffusionEvents separationBp separationBp_nonneg history.events
+    history.initialRateState (initialDemeActive history.events) initial
+  let compiled := compileMomentEvents 2 history.events history.initialRateState
+    (initialDemeActive history.events)
+  have hstate := runCommonDiffusionEvents_marginal separationBp separationBp_nonneg
+    history.events history.initialRateState (initialDemeActive history.events) initial
+  have hcarriers := runCommonDiffusionEvents_finalCarriers separationBp separationBp_nonneg
+    history.events history.initialRateState (initialDemeActive history.events) initial
+  change (run.state.evolve run.finalRateState run.finalActive separationBp separationBp_nonneg
+      history.finalElapsed history.finalElapsed_nonneg).marginal = _
+  change run.state.marginal = _ at hstate
+  change run.finalRateState = compiled.finalRateState ∧
+    run.finalActive = compiled.finalActive ∧ _ at hcarriers
+  rw [hstate, hcarriers.1, hcarriers.2.1]
+  simp [CommonDiffusionState.evolve,
+    PipelineDemographicHistory.oneLocusMomentInstructions,
+    Coalescent.propagateManyDemeMomentInstructions, List.foldl_append, compiled]
+
 /-- Complete concrete two-locus history at one physical marker separation.
 
 Empirical status: DERIVED -- the ancestral boundary, the compiled instruction list, and the
@@ -586,6 +820,32 @@ noncomputable def PipelineDemographicHistory.lowOrderLDHistory
     initial_constant := rfl
     instructions := compiled.instructions ++ [.evolve finalEpoch] }
 
+/-- The synchronized present joint state is exactly the public low-order two-locus history
+evaluation, including the same terminal epoch. -/
+theorem PipelineDemographicHistory.presentCommonDiffusionState_joint
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (separationBp : ℝ) (separationBp_nonneg : 0 ≤ separationBp) :
+    (history.presentCommonDiffusionState separationBp separationBp_nonneg).joint =
+      (history.lowOrderLDHistory separationBp separationBp_nonneg).present := by
+  let initial := history.initialCommonDiffusionState separationBp separationBp_nonneg
+  let run := runCommonDiffusionEvents separationBp separationBp_nonneg history.events
+    history.initialRateState (initialDemeActive history.events) initial
+  let compiled := compileLowOrderLDEvents separationBp separationBp_nonneg history.events
+    history.initialRateState (initialDemeActive history.events)
+  have hstate := runCommonDiffusionEvents_joint separationBp separationBp_nonneg
+    history.events history.initialRateState (initialDemeActive history.events) initial
+  have hcarriers := runCommonDiffusionEvents_finalCarriers separationBp separationBp_nonneg
+    history.events history.initialRateState (initialDemeActive history.events) initial
+  change (run.state.evolve run.finalRateState run.finalActive separationBp separationBp_nonneg
+      history.finalElapsed history.finalElapsed_nonneg).joint = _
+  change run.state.joint = _ at hstate
+  change _ ∧ _ ∧ run.finalRateState = compiled.finalRateState ∧
+    run.finalActive = compiled.finalActive at hcarriers
+  rw [hstate, hcarriers.2.2.1, hcarriers.2.2.2]
+  simp [CommonDiffusionState.evolve, PipelineDemographicHistory.lowOrderLDHistory,
+    Coalescent.LowOrderLDHistory.present, Coalescent.propagateLowOrderLDInstructions,
+    Coalescent.LowOrderLDInstruction.apply, List.foldl_append, compiled]
+
 /-- The arbitrary-deme, arbitrary-event two-locus moment family constructed from the visible
 demographic history.  This is the concrete missing bridge from history to `DD/Dz/pi2`; marker
 separation is typed nonnegative and all rate changes are compiled into the epoch product. -/
@@ -595,6 +855,14 @@ noncomputable def PipelineDemographicHistory.twoLocusMoments
   Coalescent.LowOrderLDHistory.toDemographicTwoLocusMoments fun separation ↦
     history.lowOrderLDHistory separation.value separation.value_nonneg
 
+/-- Complete present-day finite one-locus moment state at a requested truncation degree. -/
+noncomputable def PipelineDemographicHistory.presentMomentState
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) (K : ℕ) :
+    Coalescent.AffineManyDemeMomentCoordinate demeCount K → ℝ :=
+  Coalescent.propagateManyDemeMomentInstructions
+    (history.oneLocusMomentInstructions K)
+    (Coalescent.commonAncestorManyDemeMomentState history.ancestralMoment)
+
 /-- Exact present-day mixed one-locus moment produced by the visible event history.  The
 matrix dimension is finite for every requested degree, and every epoch is a matrix
 exponential; no closure or fitted attenuation enters. -/
@@ -603,11 +871,8 @@ noncomputable def PipelineDemographicHistory.oneLocusMoment
     (exponent : Fin demeCount → ℕ) : ℝ :=
   if hzero : ∀ deme, exponent deme = 0 then 1
   else
-    let presentState := Coalescent.propagateManyDemeMomentInstructions
-      (history.oneLocusMomentInstructions K)
-      (Coalescent.commonAncestorManyDemeMomentState history.ancestralMoment)
     Coalescent.manyDemeMomentVectorTable K
-      (fun coordinate ↦ presentState (some coordinate)) exponent
+      (fun coordinate ↦ history.presentMomentState K (some coordinate)) exponent
 
 /-- Exact train-target mixed frequency moment from the arbitrary-deme history. -/
 noncomputable def PipelineDemographicHistory.pairMoment
@@ -804,27 +1069,90 @@ noncomputable def PipelineDemographicHistory.betweenDivergence
   history.oneLocusMoment 2 (Coalescent.oneDemeExponent second 1) -
     2 * history.pairMoment 2 first second 1 1
 
-/-- The exact remaining common-diffusion obligation.  The right side is the marginal
-frequency-divergence coordinate used by finite ascertainment; the left side is the `H`
-coordinate propagated inside the joint linkage operator.  Rates, the ancestral boundary,
-the joint generator's `H` row, and passage from generators to epoch exponentials are already
-proved coherent above and in `Coalescent`.  Proving this statement now amounts to the
-one-locus projection-matrix calculation followed by induction over the paired split/event
-lists; it introduces no new empirical constant. -/
+/-- Every nonconstant exponent is read directly from the propagated rectangular moment state;
+the separate normalized-zero branch of `oneLocusMoment` is irrelevant on this domain. -/
+theorem PipelineDemographicHistory.oneLocusMoment_eq_presentMomentState
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) (K : ℕ)
+    (exponent : Fin demeCount → ℕ) (hnonzero : ¬∀ deme, exponent deme = 0) :
+    history.oneLocusMoment K exponent =
+      Coalescent.manyDemeMomentVectorTable K
+        (fun coordinate ↦ history.presentMomentState K (some coordinate)) exponent := by
+  simp [PipelineDemographicHistory.oneLocusMoment, hnonzero]
+
+/-- The public marginal divergence readout is exactly the corresponding coordinate of the
+degree-two pair-divergence projection matrix. -/
+theorem PipelineDemographicHistory.betweenDivergence_eq_pairProjection
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
+    (first second : Fin demeCount) :
+    history.betweenDivergence first second =
+      (Coalescent.manyDemePairDivergenceProjection demeCount).mulVec
+        (history.presentMomentState 2) (some (first, second)) := by
+  have hfirst : ¬∀ deme, Coalescent.oneDemeExponent first 1 deme = 0 := by
+    intro h
+    simpa [Coalescent.oneDemeExponent] using h first
+  have hsecond : ¬∀ deme, Coalescent.oneDemeExponent second 1 deme = 0 := by
+    intro h
+    simpa [Coalescent.oneDemeExponent] using h second
+  have hpair : ¬∀ deme, Coalescent.pairExponent first second 1 1 deme = 0 := by
+    intro h
+    have hvalue := h first
+    by_cases hsame : first = second <;>
+      simp [Coalescent.pairExponent, hsame] at hvalue
+  rw [Coalescent.manyDemePairDivergenceProjection_mulVec]
+  simp only [Coalescent.momentPairDivergence]
+  unfold PipelineDemographicHistory.betweenDivergence PipelineDemographicHistory.pairMoment
+  rw [history.oneLocusMoment_eq_presentMomentState 2 _ hfirst,
+    history.oneLocusMoment_eq_presentMomentState 2 _ hsecond,
+    history.oneLocusMoment_eq_presentMomentState 2 _ hpair]
+
+/-- Equality proposition between the marginal frequency-divergence coordinate used by finite
+ascertainment and the `H` coordinate propagated inside the joint linkage operator.  The
+theorem immediately below proves it for every typed visible history. -/
 def PipelineDemographicHistory.CommonDiffusionProjection
     {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) : Prop :=
   ∀ separation first second,
     history.twoLocusMoments.H separation first second =
       history.betweenDivergence first second
 
-/-- Candidate one-tag/one-causal portability channel after cohort ascertainment.  The
-marginal factor and low-order LD factor share recurrent symmetric-biallelic mutation rates
-and boundary law.  Requiring `CommonDiffusionProjection` in the type prevents their product
-from being used as a shared-kernel curve until the epoch/split intertwining proof is supplied.
+/-- The common-diffusion obligation is discharged for every typed visible history.  The proof
+starts from the shared ancestral boundary, intertwines both exact matrix exponentials through
+every epoch, commutes both projections through every split, and identifies the public
+one-locus and two-locus readouts after the terminal epoch. -/
+theorem PipelineDemographicHistory.commonDiffusionProjection_exact
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) :
+    history.CommonDiffusionProjection := by
+  intro separation first second
+  let common := history.presentCommonDiffusionState separation.value separation.value_nonneg
+  have hprojection := congrFun common.projection_eq (some (first, second))
+  have hmarginal := history.presentCommonDiffusionState_marginal
+    separation.value separation.value_nonneg
+  have hjoint := history.presentCommonDiffusionState_joint
+    separation.value separation.value_nonneg
+  calc
+    history.twoLocusMoments.H separation first second =
+        (history.lowOrderLDHistory separation.value separation.value_nonneg).present
+          (some (.H first second)) := rfl
+    _ = common.joint (some (.H first second)) := by
+      exact congrFun hjoint (some (.H first second)) |>.symm
+    _ = (Coalescent.lowOrderLDHProjection demeCount).mulVec common.joint
+          (some (first, second)) := by
+      rw [Coalescent.lowOrderLDHProjection_mulVec]
+      rfl
+    _ = (Coalescent.manyDemePairDivergenceProjection demeCount).mulVec common.marginal
+          (some (first, second)) := hprojection.symm
+    _ = (Coalescent.manyDemePairDivergenceProjection demeCount).mulVec
+          (history.presentMomentState 2) (some (first, second)) := by
+      rw [hmarginal]
+      rfl
+    _ = history.betweenDivergence first second :=
+      (history.betweenDivergence_eq_pairProjection first second).symm
+
+/-- One-tag/one-causal portability channel after cohort ascertainment.  The marginal factor
+and low-order LD factor share recurrent symmetric-biallelic mutation rates and boundary law;
+`commonDiffusionProjection_exact` proves their common-kernel join for every input history.
 `none` records a zero-mass ascertainment event. -/
 noncomputable def VisiblePipelineInput.singlePairAccuracyRetentionCandidate
     {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
-    (_projection : input.demography.CommonDiffusionProjection)
     (separation : Coalescent.MarkerSeparationBp) (target : Fin demeCount) : Option ℝ :=
   (input.ascertainedTagSegregationRetention target).bind fun marginal ↦
     (input.accuracyLinkageFactor separation target).map fun linkage ↦
@@ -834,11 +1162,10 @@ noncomputable def VisiblePipelineInput.singlePairAccuracyRetentionCandidate
 joint factors and no fitted restoration coordinate. -/
 theorem VisiblePipelineInput.singlePairAccuracyRetentionCandidate_eq
     {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
-    (projection : input.demography.CommonDiffusionProjection)
     (separation : Coalescent.MarkerSeparationBp) (target : Fin demeCount)
     (domain : input.demography.twoLocusMoments.LDPairDomain separation
       input.studyDesign.gwasDeme target) :
-    input.singlePairAccuracyRetentionCandidate projection separation target =
+    input.singlePairAccuracyRetentionCandidate separation target =
       (input.ascertainedTagErosion target).map fun erosion ↦
         (1 - erosion) *
           (input.demography.twoLocusMoments.crossDemeLDCorrelation separation

@@ -446,6 +446,28 @@ theorem matrixExponential_zero {ι : Type*} [Fintype ι] [DecidableEq ι]
   rw [tsum_eq_single 0 (by intro n hn; simp [zero_pow hn])]
   simp
 
+/-- A zero generator row is an exactly conserved coordinate of every matrix-exponential
+trajectory.  This is the finite-dimensional conservation law used below for augmented affine
+constants and for rectangular padding coordinates; it follows from a one-row intertwining,
+not from a numerical ODE approximation. -/
+theorem matrixExponential_mulVec_apply_of_row_zero
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : Matrix ι ι ℝ) (time : ℝ) (state : ι → ℝ) (coordinate : ι)
+    (hrow : ∀ column, A coordinate column = 0) :
+    (matrixExponential A time).mulVec state coordinate = state coordinate := by
+  let select : Matrix Unit ι ℝ := fun _ column ↦ if column = coordinate then 1 else 0
+  have hgenerator : select * A = (0 : Matrix Unit Unit ℝ) * select := by
+    apply Matrix.ext
+    intro row column
+    simp [Matrix.mul_apply, select, hrow]
+  have hsemigroup := matrixExponential_intertwines select A
+    (0 : Matrix Unit Unit ℝ) hgenerator time
+  rw [matrixExponential_zero] at hsemigroup
+  have happ := congrArg (fun matrix ↦ matrix.mulVec state) hsemigroup
+  rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, Matrix.one_mulVec] at happ
+  have hcoordinate := congrFun happ ()
+  simpa [Matrix.mulVec, dotProduct, select] using hcoordinate
+
 /-- Fixed difference under the directly solved joint law. -/
 noncomputable def solvedTwoDemeFixedDifference
     (ns nt : ℕ) (system : NonsingularTwoDemeMomentSystem (ns + nt)) : ℝ :=
@@ -818,6 +840,28 @@ noncomputable def ManyDemeMomentEpoch.propagator {D K : ℕ}
     Matrix (AffineManyDemeMomentCoordinate D K) (AffineManyDemeMomentCoordinate D K) ℝ :=
   matrixExponential (augmentedManyDemeMomentGenerator epoch.rates K) epoch.duration
 
+/-- The explicit affine constant is conserved by every arbitrary-deme moment epoch. -/
+theorem ManyDemeMomentEpoch.propagator_none {D K : ℕ}
+    (epoch : ManyDemeMomentEpoch D K)
+    (state : AffineManyDemeMomentCoordinate D K → ℝ) :
+    epoch.propagator.mulVec state none = state none := by
+  apply matrixExponential_mulVec_apply_of_row_zero
+  intro column
+  rfl
+
+/-- The duplicated degree-zero coordinate in the rectangular carrier is padding and remains
+exactly fixed under every epoch.  Reachable states initialize it at zero, so it can never
+contaminate the affine constant or a biological moment. -/
+theorem ManyDemeMomentEpoch.propagator_zeroCoordinate {D K : ℕ}
+    (epoch : ManyDemeMomentEpoch D K)
+    (state : AffineManyDemeMomentCoordinate D K → ℝ) :
+    epoch.propagator.mulVec state (some (fun _ ↦ 0)) = state (some (fun _ ↦ 0)) := by
+  apply matrixExponential_mulVec_apply_of_row_zero
+  intro column
+  cases column <;>
+    simp [augmentedManyDemeMomentGenerator, manyDemeMomentDynamicsMatrix,
+      manyDemeMomentForcing, ManyDemeMomentCoordinate.degree]
+
 /-- Merge a newly split child's exponent back into its parent.  This is the pullback of the
 instantaneous constraint `X_child = X_parent`. -/
 def mergeSplitExponent {D : ℕ} (parent child : Fin D)
@@ -834,6 +878,19 @@ noncomputable def splitManyDemeMomentState {D K : ℕ}
   | some coordinate =>
       manyDemeMomentVectorTable K (fun oldCoordinate ↦ state (some oldCoordinate))
         (mergeSplitExponent parent child (fun d ↦ (coordinate d).val))
+
+/-- A split resets the affine constant to its normalized value. -/
+theorem splitManyDemeMomentState_none {D K : ℕ} (parent child : Fin D)
+    (state : AffineManyDemeMomentCoordinate D K → ℝ) :
+    splitManyDemeMomentState parent child state none = 1 :=
+  rfl
+
+/-- A split preserves the rectangular degree-zero padding coordinate. -/
+theorem splitManyDemeMomentState_zeroCoordinate {D K : ℕ} (parent child : Fin D)
+    (state : AffineManyDemeMomentCoordinate D K → ℝ) :
+    splitManyDemeMomentState parent child state (some (fun _ ↦ 0)) =
+      state (some (fun _ ↦ 0)) := by
+  simp [splitManyDemeMomentState, manyDemeMomentVectorTable, mergeSplitExponent]
 
 /-- An exact instruction is either continuous propagation or an instantaneous split. -/
 inductive ManyDemeMomentInstruction (D K : ℕ) where
@@ -1551,6 +1608,35 @@ theorem manyDemePairDivergenceProjection_mulVec {D : ℕ}
             _ = _ := by
               rw [Finset.sum_sub_distrib, Finset.sum_add_distrib, Finset.mul_sum]
         _ = _ := by rw [hvector _ hfirst, hvector _ hsecond, hvector _ hpair]
+
+/-- At the common ancestral boundary every ordered pair has the same divergence, namely the
+within-population heterozygosity `2(E[p] - E[p²])`; the affine coordinate is normalized to
+one. -/
+theorem manyDemePairDivergenceProjection_commonAncestor {D : ℕ}
+    (ancestralMoment : ℕ → ℝ) :
+    (manyDemePairDivergenceProjection D).mulVec
+        (commonAncestorManyDemeMomentState (K := 2) ancestralMoment) =
+      fun coordinate ↦ match coordinate with
+        | none => 1
+        | some _ => 2 * (ancestralMoment 1 - ancestralMoment 2) := by
+  rw [manyDemePairDivergenceProjection_mulVec]
+  funext coordinate
+  cases coordinate with
+  | none =>
+      simp [commonAncestorManyDemeMomentState, manyDemeMomentVectorTable,
+        ManyDemeMomentCoordinate.degree]
+  | some pair =>
+      rcases pair with ⟨first, second⟩
+      by_cases hsame : first = second
+      · subst second
+        simp [momentPairDivergence, manyDemeMomentVectorTable,
+          commonAncestorManyDemeMomentState, ManyDemeMomentCoordinate.degree,
+          oneDemeExponent, pairExponent]
+        ring
+      · simp [momentPairDivergence, manyDemeMomentVectorTable,
+          commonAncestorManyDemeMomentState, ManyDemeMomentCoordinate.degree,
+          oneDemeExponent, pairExponent, hsame]
+        ring
 
 /-- Moment table represented by one column of the constant-augmented degree-`K` system. -/
 noncomputable def manyDemeMomentAffineColumnTable {D K : ℕ}

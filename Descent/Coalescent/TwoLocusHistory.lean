@@ -540,6 +540,22 @@ noncomputable def commonAncestralLowOrderLDState {D : ℕ}
   | some coordinate =>
       oneDemeStationaryLowOrderLDState ancestralRates (some coordinate.collapseToOneDeme)
 
+/-- Selecting the ancestral `H` subsystem yields one normalized affine coordinate and the
+same one-deme stationary heterozygosity for every ordered descendant pair. -/
+theorem lowOrderLDHProjection_commonAncestral {D : ℕ}
+    (ancestralRates : ManyDemeLDRates 1) :
+    (lowOrderLDHProjection D).mulVec (commonAncestralLowOrderLDState ancestralRates) =
+      fun coordinate ↦ match coordinate with
+        | none => 1
+        | some _ => oneDemeStationaryLowOrderLDState ancestralRates (some (.H 0 0)) := by
+  rw [lowOrderLDHProjection_mulVec]
+  funext coordinate
+  cases coordinate with
+  | none => rfl
+  | some pair =>
+      rcases pair with ⟨first, second⟩
+      rfl
+
 /-- Every ancestral `DD(i,j)` is the same positive one-deme second moment when recurrent
 mutation is positive. -/
 theorem commonAncestralLowOrderLDState_DD_pos {D : ℕ}
@@ -576,6 +592,14 @@ noncomputable def ManyDemeLDRates.epoch {D : ℕ} (rates : ManyDemeLDRates D)
 noncomputable def LowOrderLDEpoch.propagator {D : ℕ} (epoch : LowOrderLDEpoch D) :
     Matrix (AffineLowOrderLDCoordinate D) (AffineLowOrderLDCoordinate D) ℝ :=
   matrixExponential epoch.generator epoch.duration
+
+/-- The homogeneous affine coordinate remains exactly constant through every joint epoch. -/
+theorem LowOrderLDEpoch.propagator_none {D : ℕ} (epoch : LowOrderLDEpoch D)
+    (state : AffineLowOrderLDCoordinate D → ℝ) :
+    epoch.propagator.mulVec state none = state none := by
+  apply matrixExponential_mulVec_apply_of_row_zero
+  intro column
+  rfl
 
 /-- A demographic instruction is continuous evolution or a derived instantaneous linear map.
 Splits, pulses, and admixture events are instances of `instantaneous`; none is replaced by a
@@ -623,6 +647,12 @@ theorem lowOrderLDSplitTransform_mulVec {D : ℕ} (parent child : Fin D)
       simp [Matrix.mulVec, dotProduct, lowOrderLDSplitTransform]
   | some row =>
       simp [Matrix.mulVec, dotProduct, lowOrderLDSplitTransform]
+
+/-- The exact split transform preserves the joint state's affine constant. -/
+theorem lowOrderLDSplitTransform_none {D : ℕ} (parent child : Fin D)
+    (state : AffineLowOrderLDCoordinate D → ℝ) :
+    (lowOrderLDSplitTransform parent child).mulVec state none = state none := by
+  rw [lowOrderLDSplitTransform_mulVec]
 
 /-- The instantaneous split map on the full joint state commutes exactly with selection of
 the closed `H` subsystem.  The affine coordinate is fixed at one on reachable states, while
