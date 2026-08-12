@@ -162,8 +162,14 @@ prevent that construction:
   `BiologicalManyDemeKilledDualCoordinate` contains only configurations through that degree.
   `biologicalManyDemeBernsteinMomentProjection_generator_intertwines` proves the literal
   compact finite matrix identity, and its exponential theorem lifts it to every exact epoch
-  duration.  What remains is split intertwining and history induction, followed by replacing
-  the alternating evaluator end to end,
+  duration.  Split substitution is also derived coefficient-by-coefficient, giving
+  `biologicalManyDemeBernsteinMomentProjection_split_intertwines`; induction then proves the
+  same projection intertwines every finite epoch/split sequence.
+  `PipelineDemographicHistory.biologicalMomentInstructions` compiles the actual visible event
+  history into that language and `biologicalMomentHistory_intertwines` instantiates the exact
+  history-wide theorem.  What remains is to connect the compact ancestral boundary and
+  positive pooled terminal vector to this history product as one public scalar evaluator,
+  then implement its sparse certified numerical action,
   implement its sparse action without materializing either Cartesian carrier, add certified
   floating-point/interval roundoff control, and run at the executable's 13,750-individual /
   27,500-haplotype grid2d scale, followed by the filed end-to-end cohort validation gate;
@@ -633,6 +639,36 @@ noncomputable def compileMomentEvents {demeCount : ℕ} (K : ℕ) :
         finalRateState := tail.finalRateState
         finalActive := tail.finalActive }
 
+/-- Result of compiling a visible event prefix into the compact moment/positive-dual
+instruction language. -/
+structure CompiledBiologicalMomentEvents (demeCount K : ℕ) where
+  instructions : List (Coalescent.BiologicalManyDemeInstruction demeCount K)
+  finalRateState : PipelineRateState demeCount
+  finalActive : Fin demeCount → Bool
+
+/-- Compile an arbitrary visible history directly into the exact compact positive-dual
+language.  Symmetric mutation and distinct split labels are carried as proofs in every
+instruction, so the history-wide intertwining theorem applies without an external premise. -/
+noncomputable def compileBiologicalMomentEvents {demeCount : ℕ} (K : ℕ) :
+    List (DemographicEvent demeCount) → PipelineRateState demeCount →
+      (Fin demeCount → Bool) → CompiledBiologicalMomentEvents demeCount K
+  | [], state, active =>
+      { instructions := [], finalRateState := state, finalActive := active }
+  | event :: remaining, state, active =>
+      let rates := state.toManyDemeRates active
+      let evolve : Coalescent.BiologicalManyDemeInstruction demeCount K :=
+        .evolve rates event.elapsed event.elapsed_nonneg (fun _ ↦ rfl)
+      let front : List (Coalescent.BiologicalManyDemeInstruction demeCount K) :=
+        match event with
+        | .split _ _ parent child distinct => [.evolve rates event.elapsed
+            event.elapsed_nonneg (fun _ ↦ rfl), .split parent child distinct]
+        | _ => [evolve]
+      let tail := compileBiologicalMomentEvents K remaining
+        (event.updateRateState state) (event.updateActive active)
+      { instructions := front ++ tail.instructions
+        finalRateState := tail.finalRateState
+        finalActive := tail.finalActive }
+
 /-- Compile the same ordered history into the derived arbitrary-deme two-locus
 generator.  Unlike a scalar distance recurrence, every epoch propagates the complete closed
 moment state and every split applies the exact label pullback.
@@ -759,6 +795,30 @@ noncomputable def PipelineDemographicHistory.oneLocusMomentInstructions
       duration := history.finalElapsed
       duration_nonneg := history.finalElapsed_nonneg }
   compiled.instructions ++ [.evolve finalEpoch]
+
+/-- Exact compact instructions for the whole visible history.  This is the same event/rate
+compilation as `oneLocusMomentInstructions`, but its carrier has no rectangular padding and
+each epoch is paired with the positive killed dual proved in `StructuredPresentDay`. -/
+noncomputable def PipelineDemographicHistory.biologicalMomentInstructions
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) (K : ℕ) :
+    List (Coalescent.BiologicalManyDemeInstruction demeCount K) :=
+  let compiled := compileBiologicalMomentEvents K history.events history.initialRateState
+    (initialDemeActive history.events)
+  let rates := compiled.finalRateState.toManyDemeRates compiled.finalActive
+  compiled.instructions ++ [.evolve rates history.finalElapsed history.finalElapsed_nonneg
+    (fun _ ↦ rfl)]
+
+/-- The complete visible demographic history satisfies the exact compact positive-dual
+intertwining law. -/
+theorem PipelineDemographicHistory.biologicalMomentHistory_intertwines
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) (K : ℕ) :
+    Coalescent.biologicalManyDemeBernsteinMomentProjection demeCount K *
+        Coalescent.biologicalManyDemeMomentHistoryPropagator
+          (history.biologicalMomentInstructions K) =
+      Coalescent.biologicalManyDemeKilledDualHistoryPropagator
+          (history.biologicalMomentInstructions K) *
+        Coalescent.biologicalManyDemeBernsteinMomentProjection demeCount K :=
+  Coalescent.biologicalManyDemeBernsteinMomentProjection_history_intertwines _
 
 /-- Constant ancestral one-deme rates implied by the visible history.  The ancestral
 population is assumed to have occupied its initial epoch long enough to reach the stationary

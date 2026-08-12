@@ -2629,6 +2629,73 @@ def mergeSplitExponent {D : ℕ} (parent child : Fin D)
   fun d ↦ if d = parent then exponent parent + exponent child
     else if d = child then 0 else exponent d
 
+/-- Pulling a coordinate back across a genuine parent/child split preserves total degree. -/
+theorem sum_mergeSplitExponent {D : ℕ} (parent child : Fin D)
+    (distinct : parent ≠ child) (exponent : Fin D → ℕ) :
+    ∑ deme, mergeSplitExponent parent child exponent deme = ∑ deme, exponent deme := by
+  rw [Finset.sum_eq_add_sum_diff_singleton (Finset.mem_univ parent),
+    Finset.sum_eq_add_sum_diff_singleton (Finset.mem_univ parent)]
+  have child_mem : child ∈ Finset.univ \ {parent} := by simp [distinct.symm]
+  rw [Finset.sum_eq_add_sum_diff_singleton child_mem,
+    Finset.sum_eq_add_sum_diff_singleton child_mem]
+  simp only [mergeSplitExponent, if_pos, distinct.symm, if_false, zero_add]
+  congr 1
+  apply Finset.sum_congr rfl
+  intro deme member
+  have parent_ne : deme ≠ parent :=
+    Finset.notMem_singleton.mp (Finset.mem_sdiff.mp
+      (Finset.mem_sdiff.mp member).1).2
+  have child_ne : deme ≠ child :=
+    Finset.notMem_singleton.mp (Finset.mem_sdiff.mp member).2
+  simp [mergeSplitExponent, parent_ne, child_ne]
+
+/-- Polynomial substitution induced by the instantaneous split constraint
+`X_child = X_parent`. -/
+noncomputable def splitManyDemePolynomial {D : ℕ} (parent child : Fin D) :
+    MvPolynomial (Fin D) ℝ →ₐ[ℝ] MvPolynomial (Fin D) ℝ :=
+  MvPolynomial.aeval fun deme ↦ if deme = child then MvPolynomial.X parent
+    else MvPolynomial.X deme
+
+/-- Split substitution sends each product Bernstein polynomial to the merged lineage
+configuration. -/
+theorem splitManyDemePolynomial_bernstein {D : ℕ} (parent child : Fin D)
+    (distinct : parent ≠ child) (derived ancestral : Fin D → ℕ) :
+    splitManyDemePolynomial parent child
+        (manyDemeBernsteinPolynomial derived ancestral) =
+      manyDemeBernsteinPolynomial
+        (mergeSplitExponent parent child derived)
+        (mergeSplitExponent parent child ancestral) := by
+  apply MvPolynomial.funext
+  intro frequency
+  simp only [splitManyDemePolynomial, map_prod, manyDemeBernsteinPolynomial,
+    manyDemeBernsteinPolynomialFactor, map_mul, map_pow, map_sub, map_one,
+    MvPolynomial.aeval_X, eval_manyDemeBernsteinPolynomial]
+  unfold manyDemeBernsteinWeight
+  rw [Finset.prod_eq_mul_prod_diff_singleton (Finset.mem_univ parent),
+    Finset.prod_eq_mul_prod_diff_singleton (Finset.mem_univ parent)]
+  have child_mem : child ∈ Finset.univ \ {parent} := by simp [distinct.symm]
+  rw [Finset.prod_eq_mul_prod_diff_singleton child_mem,
+    Finset.prod_eq_mul_prod_diff_singleton child_mem]
+  simp only [mergeSplitExponent, if_pos, distinct.symm, if_false, pow_zero, mul_one]
+  have rest_equal :
+      (∏ x ∈ (Finset.univ \ {parent}) \ {child},
+        (if x = child then MvPolynomial.X parent else MvPolynomial.X x) ^ derived x *
+          (1 - if x = child then MvPolynomial.X parent else MvPolynomial.X x) ^ ancestral x) =
+        ∏ x ∈ (Finset.univ \ {parent}) \ {child},
+          MvPolynomial.X x ^ mergeSplitExponent parent child derived x *
+            (1 - MvPolynomial.X x) ^ mergeSplitExponent parent child ancestral x := by
+    apply Finset.prod_congr rfl
+    intro x member
+    have parent_ne : x ≠ parent :=
+      Finset.notMem_singleton.mp (Finset.mem_sdiff.mp
+        (Finset.mem_sdiff.mp member).1).2
+    have child_ne : x ≠ child :=
+      Finset.notMem_singleton.mp (Finset.mem_sdiff.mp member).2
+    simp [mergeSplitExponent, parent_ne, child_ne]
+  rw [rest_equal]
+  simp only [if_pos, if_neg distinct, MvPolynomial.eval_X, pow_add]
+  ring
+
 /-- Merging distinct child and parent lineage counts across a split preserves a global degree
 bound and therefore remains inside the coordinate rectangle. -/
 theorem mergeSplitExponent_lt_of_sum_le {D K : ℕ} (exponent : Fin D → Fin (K + 1))
@@ -2661,6 +2728,65 @@ theorem ManyDemeKilledDualCoordinate.mergeSplit_closed {D K : ℕ}
   · apply mergeSplitExponent_lt_of_sum_le coordinate.1 parent child distinct
     unfold ManyDemeKilledDualCoordinate.degree at degree_le
     omega
+
+/-- Merge both label-count vectors of a biological killed-dual coordinate across a genuine
+split. -/
+def BiologicalManyDemeKilledDualCoordinate.mergeSplit {D K : ℕ}
+    (coordinate : BiologicalManyDemeKilledDualCoordinate D K)
+    (parent child : Fin D) (distinct : parent ≠ child) :
+    BiologicalManyDemeKilledDualCoordinate D K := by
+  have closed := coordinate.coordinate.mergeSplit_closed parent child distinct
+    coordinate.degree_le
+  exact {
+    coordinate :=
+      (fun deme ↦ ⟨mergeSplitExponent parent child
+          (fun d ↦ (coordinate.coordinate.1 d).val) deme, closed.1 deme⟩,
+        fun deme ↦ ⟨mergeSplitExponent parent child
+          (fun d ↦ (coordinate.coordinate.2 d).val) deme, closed.2 deme⟩)
+    degree_le := by
+      unfold ManyDemeKilledDualCoordinate.degree
+      rw [show (∑ deme, (⟨mergeSplitExponent parent child
+            (fun d ↦ (coordinate.coordinate.1 d).val) deme, closed.1 deme⟩ : Fin (K + 1)).val) =
+          ∑ deme, mergeSplitExponent parent child
+            (fun d ↦ (coordinate.coordinate.1 d).val) deme by rfl,
+        show (∑ deme, (⟨mergeSplitExponent parent child
+            (fun d ↦ (coordinate.coordinate.2 d).val) deme, closed.2 deme⟩ : Fin (K + 1)).val) =
+          ∑ deme, mergeSplitExponent parent child
+            (fun d ↦ (coordinate.coordinate.2 d).val) deme by rfl,
+        sum_mergeSplitExponent parent child distinct,
+        sum_mergeSplitExponent parent child distinct]
+      exact coordinate.degree_le }
+
+/-- Sparse compact killed-dual split matrix. -/
+noncomputable def biologicalManyDemeKilledDualSplitPropagator {D K : ℕ}
+    (parent child : Fin D) (distinct : parent ≠ child) :
+    Matrix (BiologicalManyDemeKilledDualCoordinate D K)
+      (BiologicalManyDemeKilledDualCoordinate D K) ℝ :=
+  fun row column ↦ if column = row.mergeSplit parent child distinct then 1 else 0
+
+/-- The compact killed-dual split matrix performs exactly deterministic lineage merging. -/
+theorem biologicalManyDemeKilledDualSplitPropagator_mulVec {D K : ℕ}
+    (parent child : Fin D) (distinct : parent ≠ child)
+    (state : BiologicalManyDemeKilledDualCoordinate D K → ℝ) :
+    (biologicalManyDemeKilledDualSplitPropagator parent child distinct).mulVec state =
+      fun row ↦ state (row.mergeSplit parent child distinct) := by
+  funext row
+  simp [biologicalManyDemeKilledDualSplitPropagator, Matrix.mulVec, dotProduct]
+
+/-- Split-merging a killed coordinate simply merges both exponents in its Bernstein
+polynomial. -/
+theorem biologicalKilledDual_mergeSplit_bernsteinPolynomial {D K : ℕ}
+    (row : BiologicalManyDemeKilledDualCoordinate D K)
+    (parent child : Fin D) (distinct : parent ≠ child) :
+    manyDemeBernsteinPolynomial
+        (fun deme ↦ ((row.mergeSplit parent child distinct).coordinate.1 deme).val)
+        (fun deme ↦ ((row.mergeSplit parent child distinct).coordinate.2 deme).val) =
+      manyDemeBernsteinPolynomial
+        (mergeSplitExponent parent child
+          (fun deme ↦ (row.coordinate.1 deme).val))
+        (mergeSplitExponent parent child
+          (fun deme ↦ (row.coordinate.2 deme).val)) := by
+  rfl
   · apply mergeSplitExponent_lt_of_sum_le coordinate.2 parent child distinct
     unfold ManyDemeKilledDualCoordinate.degree at degree_le
     omega
@@ -2868,10 +2994,53 @@ structure PositiveManyDemeMomentCoordinate (D K : ℕ) where
   degree_pos : 0 < coordinate.degree
   degree_le : coordinate.degree ≤ K
 
+/-- Merge a positive moment coordinate across a genuine split. -/
+def PositiveManyDemeMomentCoordinate.mergeSplit {D K : ℕ}
+    (coordinate : PositiveManyDemeMomentCoordinate D K)
+    (parent child : Fin D) (distinct : parent ≠ child) :
+    PositiveManyDemeMomentCoordinate D K :=
+  { coordinate := fun deme ↦
+      ⟨mergeSplitExponent parent child
+          (fun d ↦ (coordinate.coordinate d).val) deme,
+        mergeSplitExponent_lt_of_sum_le coordinate.coordinate parent child distinct
+          coordinate.degree_le deme⟩
+    degree_pos := by
+      unfold ManyDemeMomentCoordinate.degree
+      simpa [sum_mergeSplitExponent parent child distinct]
+        using coordinate.degree_pos
+    degree_le := by
+      unfold ManyDemeMomentCoordinate.degree
+      simpa [sum_mergeSplitExponent parent child distinct]
+        using coordinate.degree_le }
+
 /-- Minimal normalized moment carrier: one constant plus exactly the positive mixed moments
 of total degree at most `K`. -/
 abbrev BiologicalManyDemeMomentCoordinate (D K : ℕ) :=
   Option (PositiveManyDemeMomentCoordinate D K)
+
+/-- Merge a normalized moment coordinate across a split; the unique constant stays constant. -/
+def BiologicalManyDemeMomentCoordinate.mergeSplit {D K : ℕ}
+    (coordinate : BiologicalManyDemeMomentCoordinate D K)
+    (parent child : Fin D) (distinct : parent ≠ child) :
+    BiologicalManyDemeMomentCoordinate D K :=
+  coordinate.map fun positive ↦ positive.mergeSplit parent child distinct
+
+/-- Sparse compact moment split matrix.  A post-split moment reads the unique pre-split
+moment obtained by merging child exponents into the parent. -/
+noncomputable def biologicalManyDemeMomentSplitPropagator {D K : ℕ}
+    (parent child : Fin D) (distinct : parent ≠ child) :
+    Matrix (BiologicalManyDemeMomentCoordinate D K)
+      (BiologicalManyDemeMomentCoordinate D K) ℝ :=
+  fun row column ↦ if column = row.mergeSplit parent child distinct then 1 else 0
+
+/-- The compact moment split matrix performs exactly its deterministic merge lookup. -/
+theorem biologicalManyDemeMomentSplitPropagator_mulVec {D K : ℕ}
+    (parent child : Fin D) (distinct : parent ≠ child)
+    (state : BiologicalManyDemeMomentCoordinate D K → ℝ) :
+    (biologicalManyDemeMomentSplitPropagator parent child distinct).mulVec state =
+      fun row ↦ state (row.mergeSplit parent child distinct) := by
+  funext row
+  simp [biologicalManyDemeMomentSplitPropagator, Matrix.mulVec, dotProduct]
 
 /-- Forget the biological proof and embed the minimal carrier in the old rectangular affine
 carrier. -/
@@ -2902,6 +3071,406 @@ noncomputable def biologicalManyDemeMomentColumnTable {D K : ℕ}
   match column with
   | none => manyDemeMomentConstantTable
   | some coordinate => manyDemeMomentBasisTable K coordinate.coordinate
+
+/-- Exponent represented by a minimal biological moment coordinate. -/
+def BiologicalManyDemeMomentCoordinate.exponent {D K : ℕ}
+    (coordinate : BiologicalManyDemeMomentCoordinate D K) : Fin D → ℕ :=
+  match coordinate with
+  | none => fun _ ↦ 0
+  | some positive => fun deme ↦ (positive.coordinate deme).val
+
+/-- Monomial represented by a minimal biological moment coordinate. -/
+noncomputable def biologicalManyDemeMomentColumnPolynomial {D K : ℕ}
+    (coordinate : BiologicalManyDemeMomentCoordinate D K) :
+    MvPolynomial (Fin D) ℝ :=
+  MvPolynomial.monomial
+    (Finsupp.equivFunOnFinite.symm coordinate.exponent) 1
+
+/-- The biological moment tables and monomial polynomials are exactly biorthogonal. -/
+theorem biologicalManyDemeMomentColumn_biorthogonal {D K : ℕ}
+    (row column : BiologicalManyDemeMomentCoordinate D K) :
+    manyDemePolynomialMomentFunctional (biologicalManyDemeMomentColumnTable column)
+        (biologicalManyDemeMomentColumnPolynomial row) =
+      if column = row then 1 else 0 := by
+  rw [biologicalManyDemeMomentColumnPolynomial,
+    manyDemePolynomialMomentFunctional_monomial_one]
+  cases row with
+  | none =>
+      cases column with
+      | none => simp [BiologicalManyDemeMomentCoordinate.exponent,
+          biologicalManyDemeMomentColumnTable, manyDemeMomentConstantTable]
+      | some column =>
+          have nonzero : ¬∀ deme, (fun _ : Fin D ↦ 0) deme =
+              (column.coordinate deme).val := by
+            intro equal
+            have degree_zero : column.coordinate.degree = 0 := by
+              unfold ManyDemeMomentCoordinate.degree
+              simp [← equal]
+            omega
+          simp [BiologicalManyDemeMomentCoordinate.exponent,
+            biologicalManyDemeMomentColumnTable, manyDemeMomentBasisTable,
+            manyDemeMomentVectorTable, nonzero]
+  | some row =>
+      cases column with
+      | none =>
+          have nonzero : ¬∀ deme, (row.coordinate deme).val = 0 := by
+            intro equal
+            have degree_zero : row.coordinate.degree = 0 := by
+              unfold ManyDemeMomentCoordinate.degree
+              simp [equal]
+            omega
+          simp [BiologicalManyDemeMomentCoordinate.exponent,
+            biologicalManyDemeMomentColumnTable, manyDemeMomentConstantTable, nonzero]
+      | some column =>
+          simp [BiologicalManyDemeMomentCoordinate.exponent,
+            biologicalManyDemeMomentColumnTable, manyDemeMomentBasisTable,
+            manyDemeMomentVectorTable]
+
+/-- A biological column functional is exactly coefficient extraction at its monomial. -/
+theorem biologicalManyDemeMomentColumnFunctional_eq_coeff {D K : ℕ}
+    (column : BiologicalManyDemeMomentCoordinate D K)
+    (polynomial : MvPolynomial (Fin D) ℝ) :
+    manyDemePolynomialMomentFunctional (biologicalManyDemeMomentColumnTable column)
+        polynomial =
+      polynomial.coeff (Finsupp.equivFunOnFinite.symm column.exponent) := by
+  classical
+  rw [manyDemePolynomialMomentFunctional_eq_sum]
+  let selected := Finsupp.equivFunOnFinite.symm column.exponent
+  change (∑ exponent ∈ polynomial.support,
+      polynomial.coeff exponent *
+        biologicalManyDemeMomentColumnTable column (fun deme ↦ exponent deme)) =
+    polynomial.coeff selected
+  by_cases member : selected ∈ polynomial.support
+  · rw [Finset.sum_eq_single selected]
+    · cases column with
+      | none => simp [selected, BiologicalManyDemeMomentCoordinate.exponent,
+          biologicalManyDemeMomentColumnTable, manyDemeMomentConstantTable]
+      | some column =>
+          simp [selected, BiologicalManyDemeMomentCoordinate.exponent,
+            biologicalManyDemeMomentColumnTable, manyDemeMomentBasisTable,
+            manyDemeMomentVectorTable]
+    · intro exponent exponentMember distinct
+      have functionDistinct : (fun deme ↦ exponent deme) ≠ column.exponent := by
+        intro equal
+        apply distinct
+        apply Finsupp.ext
+        intro deme
+        simpa [selected] using congrFun equal deme
+      cases column with
+      | none =>
+          simp [BiologicalManyDemeMomentCoordinate.exponent,
+            biologicalManyDemeMomentColumnTable, manyDemeMomentConstantTable] at functionDistinct ⊢
+      | some column =>
+          simp [BiologicalManyDemeMomentCoordinate.exponent,
+            biologicalManyDemeMomentColumnTable, manyDemeMomentBasisTable,
+            manyDemeMomentVectorTable, functionDistinct]
+    · exact fun absent ↦ (absent member).elim
+  · have coefficient_zero : polynomial.coeff selected = 0 := by
+      simpa [MvPolynomial.mem_support_iff] using member
+    rw [coefficient_zero]
+    apply Finset.sum_eq_zero
+    intro exponent exponentMember
+    have distinct : exponent ≠ selected := fun equal ↦ member (equal ▸ exponentMember)
+    have functionDistinct : (fun deme ↦ exponent deme) ≠ column.exponent := by
+      intro equal
+      apply distinct
+      apply Finsupp.ext
+      intro deme
+      simpa [selected] using congrFun equal deme
+    cases column with
+    | none =>
+        simp [BiologicalManyDemeMomentCoordinate.exponent,
+          biologicalManyDemeMomentColumnTable, manyDemeMomentConstantTable] at functionDistinct ⊢
+    | some column =>
+        simp [BiologicalManyDemeMomentCoordinate.exponent,
+          biologicalManyDemeMomentColumnTable, manyDemeMomentBasisTable,
+          manyDemeMomentVectorTable, functionDistinct]
+
+/-- Reconstruct a polynomial from its coefficients on the compact biological monomial basis. -/
+noncomputable def biologicalManyDemePolynomialSynthesis {D K : ℕ}
+    (coefficient : BiologicalManyDemeMomentCoordinate D K → ℝ) :
+    MvPolynomial (Fin D) ℝ :=
+  ∑ coordinate, coefficient coordinate •
+    biologicalManyDemeMomentColumnPolynomial coordinate
+
+/-- The compact biological basis reconstructs every polynomial of total degree at most `K`
+exactly. -/
+theorem biologicalManyDemePolynomialSynthesis_coefficients {D K : ℕ}
+    (polynomial : MvPolynomial (Fin D) ℝ) (degree_le : polynomial.totalDegree ≤ K) :
+    biologicalManyDemePolynomialSynthesis
+        (fun coordinate ↦ manyDemePolynomialMomentFunctional
+          (biologicalManyDemeMomentColumnTable coordinate) polynomial) = polynomial := by
+  classical
+  apply MvPolynomial.ext
+  intro exponent
+  simp only [biologicalManyDemePolynomialSynthesis, map_sum, map_smul,
+    biologicalManyDemeMomentColumnFunctional_eq_coeff,
+    biologicalManyDemeMomentColumnPolynomial, MvPolynomial.coeff_monomial,
+    smul_eq_mul]
+  let exponentFunction : Fin D → ℕ := fun deme ↦ exponent deme
+  have exponentSum : (∑ deme, exponentFunction deme) = exponent.sum fun _ power ↦ power := by
+    simp [exponentFunction, Finsupp.sum_fintype]
+  by_cases exponentDegree : (∑ deme, exponentFunction deme) ≤ K
+  · by_cases exponentPositive : 0 < ∑ deme, exponentFunction deme
+    · let coordinate : ManyDemeMomentCoordinate D K := fun deme ↦
+        ⟨exponentFunction deme, by
+          have coordinate_le : exponentFunction deme ≤ ∑ d, exponentFunction d :=
+            Finset.single_le_sum (fun d _ ↦ Nat.zero_le (exponentFunction d))
+              (Finset.mem_univ deme)
+          omega⟩
+      let positive : PositiveManyDemeMomentCoordinate D K := {
+        coordinate := coordinate
+        degree_pos := by simpa [coordinate, ManyDemeMomentCoordinate.degree]
+        degree_le := by simpa [coordinate, ManyDemeMomentCoordinate.degree] }
+      rw [Finset.sum_eq_single (some positive)]
+      · simp [positive, coordinate, exponentFunction]
+      · intro other _ distinct
+        have exponent_ne :
+            Finsupp.equivFunOnFinite.symm other.exponent ≠ exponent := by
+          intro equal
+          apply distinct
+          cases other with
+          | none =>
+              have zero : ∀ deme, exponentFunction deme = 0 := by
+                intro deme
+                have := congrArg (fun e : Fin D →₀ ℕ ↦ e deme) equal
+                simpa [BiologicalManyDemeMomentCoordinate.exponent, exponentFunction] using this
+              have : (∑ deme, exponentFunction deme) = 0 := by simp [zero]
+              omega
+          | some other =>
+              apply congrArg some
+              apply PositiveManyDemeMomentCoordinate.ext
+              apply funext
+              intro deme
+              apply Fin.ext
+              have := congrArg (fun e : Fin D →₀ ℕ ↦ e deme) equal
+              simpa [BiologicalManyDemeMomentCoordinate.exponent, exponentFunction,
+                positive, coordinate] using this
+        simp [exponent_ne]
+      · simp
+    · have exponentZero : exponent = 0 := by
+        apply Finsupp.ext
+        intro deme
+        have coordinate_le : exponentFunction deme ≤ ∑ d, exponentFunction d :=
+          Finset.single_le_sum (fun d _ ↦ Nat.zero_le (exponentFunction d))
+            (Finset.mem_univ deme)
+        have : exponentFunction deme = 0 := by omega
+        simpa [exponentFunction] using this
+      subst exponent
+      rw [Finset.sum_eq_single none]
+      · simp [BiologicalManyDemeMomentCoordinate.exponent]
+      · intro other _ distinct
+        cases other with
+        | none => exact (distinct rfl).elim
+        | some other =>
+            have nonzero : Finsupp.equivFunOnFinite.symm
+                (some other : BiologicalManyDemeMomentCoordinate D K).exponent ≠ 0 := by
+              intro equal
+              have degree_zero : other.coordinate.degree = 0 := by
+                unfold ManyDemeMomentCoordinate.degree
+                apply Nat.eq_zero_of_le_zero
+                apply Finset.sum_le_zero
+                intro deme _
+                have := congrArg (fun e : Fin D →₀ ℕ ↦ e deme) equal
+                simpa [BiologicalManyDemeMomentCoordinate.exponent] using this
+              omega
+            simp [nonzero]
+      · simp
+  · have coefficientZero : polynomial.coeff exponent = 0 := by
+      by_contra nonzero
+      have member : exponent ∈ polynomial.support := by
+        exact MvPolynomial.mem_support_iff.mpr nonzero
+      have supportDegree := (MvPolynomial.le_totalDegree member).trans degree_le
+      rw [← exponentSum] at supportDegree
+      omega
+    rw [coefficientZero]
+    apply Finset.sum_eq_zero
+    intro coordinate _
+    have exponent_ne : Finsupp.equivFunOnFinite.symm coordinate.exponent ≠ exponent := by
+      intro equal
+      have coordinateDegree : (∑ deme, coordinate.exponent deme) ≤ K := by
+        cases coordinate with
+        | none => simp [BiologicalManyDemeMomentCoordinate.exponent]
+        | some coordinate =>
+            simpa [BiologicalManyDemeMomentCoordinate.exponent,
+              ManyDemeMomentCoordinate.degree] using coordinate.degree_le
+      have functionEqual : coordinate.exponent = exponentFunction := by
+        funext deme
+        have := congrArg (fun e : Fin D →₀ ℕ ↦ e deme) equal
+        simpa [exponentFunction] using this
+      rw [functionEqual] at coordinateDegree
+      exact exponentDegree coordinateDegree
+    simp [exponent_ne]
+
+/-- Substituting the split constraint into a compact moment column monomial gives the monomial
+of its merged biological coordinate. -/
+theorem splitManyDemePolynomial_biologicalColumn {D K : ℕ}
+    (row : BiologicalManyDemeMomentCoordinate D K)
+    (parent child : Fin D) (distinct : parent ≠ child) :
+    splitManyDemePolynomial parent child
+        (biologicalManyDemeMomentColumnPolynomial row) =
+      biologicalManyDemeMomentColumnPolynomial
+        (row.mergeSplit parent child distinct) := by
+  rw [biologicalManyDemeMomentColumnPolynomial,
+    ← manyDemeBernsteinPolynomial_zeroAncestral_eq_monomial row.exponent,
+    splitManyDemePolynomial_bernstein parent child distinct,
+    biologicalManyDemeMomentColumnPolynomial,
+    ← manyDemeBernsteinPolynomial_zeroAncestral_eq_monomial]
+  congr 1
+  · cases row <;> rfl
+  · funext deme
+    simp [BiologicalManyDemeMomentCoordinate.mergeSplit,
+      PositiveManyDemeMomentCoordinate.mergeSplit,
+      BiologicalManyDemeMomentCoordinate.exponent, mergeSplitExponent]
+
+/-- Splitting a degree-bounded polynomial is the sum of the split images of its compact
+monomial coefficients. -/
+theorem splitManyDemePolynomial_eq_compactSum {D K : ℕ}
+    (parent child : Fin D) (distinct : parent ≠ child)
+    (polynomial : MvPolynomial (Fin D) ℝ) (degree_le : polynomial.totalDegree ≤ K) :
+    splitManyDemePolynomial parent child polynomial =
+      ∑ row : BiologicalManyDemeMomentCoordinate D K,
+        manyDemePolynomialMomentFunctional (biologicalManyDemeMomentColumnTable row)
+            polynomial •
+          biologicalManyDemeMomentColumnPolynomial
+            (row.mergeSplit parent child distinct) := by
+  conv_lhs => rw [← biologicalManyDemePolynomialSynthesis_coefficients polynomial degree_le]
+  unfold biologicalManyDemePolynomialSynthesis
+  rw [map_sum]
+  apply Finset.sum_congr rfl
+  intro row _
+  rw [map_smul, splitManyDemePolynomial_biologicalColumn row parent child distinct]
+
+/-- Coefficient extraction after split substitution is exactly multiplication by the compact
+moment split matrix. -/
+theorem biologicalMomentSplit_coefficients {D K : ℕ}
+    (parent child : Fin D) (distinct : parent ≠ child)
+    (polynomial : MvPolynomial (Fin D) ℝ) (degree_le : polynomial.totalDegree ≤ K)
+    (column : BiologicalManyDemeMomentCoordinate D K) :
+    manyDemePolynomialMomentFunctional (biologicalManyDemeMomentColumnTable column)
+        (splitManyDemePolynomial parent child polynomial) =
+      (biologicalManyDemeMomentSplitPropagator parent child distinct).mulVec
+        (fun row ↦ manyDemePolynomialMomentFunctional
+          (biologicalManyDemeMomentColumnTable row) polynomial) column := by
+  rw [splitManyDemePolynomial_eq_compactSum parent child distinct polynomial degree_le,
+    biologicalManyDemeMomentColumnFunctional_eq_coeff,
+    biologicalManyDemeMomentSplitPropagator_mulVec]
+  simp only [map_sum, map_smul, biologicalManyDemeMomentColumnFunctional_eq_coeff,
+    biologicalManyDemeMomentColumnPolynomial, MvPolynomial.coeff_monomial,
+    smul_eq_mul]
+  rfl
+
+/-- **Exact compact split intertwining.**  Bernstein projection commutes with an
+instantaneous population split: either merge monomial exponents first or merge positive dual
+lineages first. -/
+theorem biologicalManyDemeBernsteinMomentProjection_split_intertwines {D K : ℕ}
+    (parent child : Fin D) (distinct : parent ≠ child) :
+    biologicalManyDemeBernsteinMomentProjection D K *
+        biologicalManyDemeMomentSplitPropagator parent child distinct =
+      biologicalManyDemeKilledDualSplitPropagator parent child distinct *
+        biologicalManyDemeBernsteinMomentProjection D K := by
+  apply Matrix.ext
+  intro row column
+  change (biologicalManyDemeBernsteinMomentProjection D K).mulVec
+      (fun source ↦ biologicalManyDemeMomentSplitPropagator parent child distinct source column)
+        row =
+    (biologicalManyDemeKilledDualSplitPropagator parent child distinct).mulVec
+      (fun target ↦ biologicalManyDemeBernsteinMomentProjection D K target column) row
+  rw [biologicalManyDemeKilledDualSplitPropagator_mulVec]
+  let polynomial := manyDemeBernsteinPolynomial
+    (fun deme ↦ (row.coordinate.1 deme).val)
+    (fun deme ↦ (row.coordinate.2 deme).val)
+  have degree_le : polynomial.totalDegree ≤ K :=
+    (manyDemeBernsteinPolynomial_totalDegree_le _ _).trans (by
+      simpa [polynomial, ManyDemeKilledDualCoordinate.degree] using row.degree_le)
+  have coefficient_identity := biologicalMomentSplit_coefficients
+    parent child distinct polynomial degree_le column
+  rw [← coefficient_identity]
+  have splitPolynomial := splitManyDemePolynomial_bernstein parent child distinct
+    (fun deme ↦ (row.coordinate.1 deme).val)
+    (fun deme ↦ (row.coordinate.2 deme).val)
+  rw [splitPolynomial, ← biologicalKilledDual_mergeSplit_bernsteinPolynomial]
+  unfold biologicalManyDemeBernsteinMomentProjection Matrix.mulVec dotProduct
+  apply Finset.sum_congr rfl
+  intro source _
+  rw [mul_comm]
+
+/-- One compact demographic instruction, with symmetric biallelic mutation made explicit in
+the epoch constructor and genuine parent/child distinction made explicit in the split. -/
+inductive BiologicalManyDemeInstruction (D K : ℕ) where
+  | evolve (rates : ManyDemeRates D) (duration : ℝ) (duration_nonneg : 0 ≤ duration)
+      (symmetric : ∀ deme, rates.backwardMutation deme = rates.forwardMutation deme)
+  | split (parent child : Fin D) (distinct : parent ≠ child)
+
+/-- Exact compact forward moment matrix for one demographic instruction. -/
+noncomputable def BiologicalManyDemeInstruction.momentPropagator {D K : ℕ}
+    (instruction : BiologicalManyDemeInstruction D K) :
+    Matrix (BiologicalManyDemeMomentCoordinate D K)
+      (BiologicalManyDemeMomentCoordinate D K) ℝ :=
+  match instruction with
+  | .evolve rates duration _ _ =>
+      matrixExponential (biologicalManyDemeMomentGenerator rates) duration
+  | .split parent child distinct =>
+      biologicalManyDemeMomentSplitPropagator parent child distinct
+
+/-- Exact compact positive killed-dual matrix for the same instruction. -/
+noncomputable def BiologicalManyDemeInstruction.killedPropagator {D K : ℕ}
+    (instruction : BiologicalManyDemeInstruction D K) :
+    Matrix (BiologicalManyDemeKilledDualCoordinate D K)
+      (BiologicalManyDemeKilledDualCoordinate D K) ℝ :=
+  match instruction with
+  | .evolve rates duration _ _ =>
+      matrixExponential (biologicalManyDemeKilledDualGenerator rates) duration
+  | .split parent child distinct =>
+      biologicalManyDemeKilledDualSplitPropagator parent child distinct
+
+/-- Every compact demographic instruction intertwines through the same Bernstein projection. -/
+theorem BiologicalManyDemeInstruction.intertwines {D K : ℕ}
+    (instruction : BiologicalManyDemeInstruction D K) :
+    biologicalManyDemeBernsteinMomentProjection D K * instruction.momentPropagator =
+      instruction.killedPropagator * biologicalManyDemeBernsteinMomentProjection D K := by
+  cases instruction with
+  | evolve rates duration duration_nonneg symmetric =>
+      exact biologicalManyDemeBernsteinMomentProjection_exponential_intertwines
+        rates symmetric duration
+  | split parent child distinct =>
+      exact biologicalManyDemeBernsteinMomentProjection_split_intertwines
+        parent child distinct
+
+/-- Ordered compact forward moment product for an arbitrary demographic history. -/
+noncomputable def biologicalManyDemeMomentHistoryPropagator {D K : ℕ} :
+    List (BiologicalManyDemeInstruction D K) →
+      Matrix (BiologicalManyDemeMomentCoordinate D K)
+        (BiologicalManyDemeMomentCoordinate D K) ℝ
+  | [] => 1
+  | instruction :: remaining =>
+      biologicalManyDemeMomentHistoryPropagator remaining * instruction.momentPropagator
+
+/-- Ordered compact killed-dual product corresponding to the same forward history. -/
+noncomputable def biologicalManyDemeKilledDualHistoryPropagator {D K : ℕ} :
+    List (BiologicalManyDemeInstruction D K) →
+      Matrix (BiologicalManyDemeKilledDualCoordinate D K)
+        (BiologicalManyDemeKilledDualCoordinate D K) ℝ
+  | [] => 1
+  | instruction :: remaining =>
+      biologicalManyDemeKilledDualHistoryPropagator remaining * instruction.killedPropagator
+
+/-- **Exact history-wide positive duality.**  The single compact Bernstein projection
+intertwines every finite ordered sequence of arbitrary migration epochs and population splits. -/
+theorem biologicalManyDemeBernsteinMomentProjection_history_intertwines {D K : ℕ}
+    (instructions : List (BiologicalManyDemeInstruction D K)) :
+    biologicalManyDemeBernsteinMomentProjection D K *
+        biologicalManyDemeMomentHistoryPropagator instructions =
+      biologicalManyDemeKilledDualHistoryPropagator instructions *
+        biologicalManyDemeBernsteinMomentProjection D K := by
+  induction instructions with
+  | nil => simp [biologicalManyDemeMomentHistoryPropagator,
+      biologicalManyDemeKilledDualHistoryPropagator]
+  | cons instruction remaining induction =>
+      simp only [biologicalManyDemeMomentHistoryPropagator,
+        biologicalManyDemeKilledDualHistoryPropagator]
+      rw [Matrix.mul_assoc, induction, ← Matrix.mul_assoc,
+        instruction.intertwines, Matrix.mul_assoc]
 
 /-- Synthesize the unrestricted mixed-moment table represented by a vector on the minimal
 biological carrier. -/
