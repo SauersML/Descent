@@ -354,6 +354,251 @@ theorem recombinationPulse_linkage_eq_velocity
   simp only [recombinationLinkageVelocity]
   ring
 
+/-- Complement the allele at the left locus while leaving the right allele unchanged. -/
+def leftAlleleFlip
+    (frequency : TwoLocusHaplotypeFrequencies) : TwoLocusHaplotypeFrequencies where
+  AB := frequency.aB
+  Ab := frequency.ab
+  aB := frequency.AB
+  ab := frequency.Ab
+  AB_nonneg := frequency.aB_nonneg
+  Ab_nonneg := frequency.ab_nonneg
+  aB_nonneg := frequency.AB_nonneg
+  ab_nonneg := frequency.Ab_nonneg
+  total_eq_one := by linarith [frequency.total_eq_one]
+
+/-- Complementing the left allele sends its marginal frequency to `1-p`. -/
+theorem leftAlleleFlip_leftFrequency (frequency : TwoLocusHaplotypeFrequencies) :
+    (leftAlleleFlip frequency).leftFrequency = 1 - frequency.leftFrequency := by
+  simp only [leftAlleleFlip, leftFrequency]
+  linarith [frequency.total_eq_one]
+
+/-- Complementing the left allele preserves the right marginal. -/
+theorem leftAlleleFlip_rightFrequency (frequency : TwoLocusHaplotypeFrequencies) :
+    (leftAlleleFlip frequency).rightFrequency = frequency.rightFrequency := by
+  simp only [leftAlleleFlip, rightFrequency]
+  ring
+
+/-- Complementing either allele reverses linkage phase. -/
+theorem leftAlleleFlip_linkage (frequency : TwoLocusHaplotypeFrequencies) :
+    (leftAlleleFlip frequency).linkage = -frequency.linkage := by
+  simp only [leftAlleleFlip, linkage]
+  ring
+
+/-- Complement the allele at the right locus while leaving the left allele unchanged. -/
+def rightAlleleFlip
+    (frequency : TwoLocusHaplotypeFrequencies) : TwoLocusHaplotypeFrequencies where
+  AB := frequency.Ab
+  Ab := frequency.AB
+  aB := frequency.ab
+  ab := frequency.aB
+  AB_nonneg := frequency.Ab_nonneg
+  Ab_nonneg := frequency.AB_nonneg
+  aB_nonneg := frequency.ab_nonneg
+  ab_nonneg := frequency.aB_nonneg
+  total_eq_one := by linarith [frequency.total_eq_one]
+
+/-- Complementing the right allele preserves the left marginal. -/
+theorem rightAlleleFlip_leftFrequency (frequency : TwoLocusHaplotypeFrequencies) :
+    (rightAlleleFlip frequency).leftFrequency = frequency.leftFrequency := by
+  simp only [rightAlleleFlip, leftFrequency]
+  ring
+
+/-- Complementing the right allele sends its marginal frequency to `1-q`. -/
+theorem rightAlleleFlip_rightFrequency (frequency : TwoLocusHaplotypeFrequencies) :
+    (rightAlleleFlip frequency).rightFrequency = 1 - frequency.rightFrequency := by
+  simp only [rightAlleleFlip, rightFrequency]
+  linarith [frequency.total_eq_one]
+
+/-- Complementing the right allele also reverses linkage phase. -/
+theorem rightAlleleFlip_linkage (frequency : TwoLocusHaplotypeFrequencies) :
+    (rightAlleleFlip frequency).linkage = -frequency.linkage := by
+  simp only [rightAlleleFlip, linkage]
+  ring
+
+/-- Exact symmetric-biallelic mutation pulse at the left locus: flip the left allele of an
+`epsilon` fraction of haplotypes. -/
+noncomputable def leftMutationPulse
+    (epsilon : ℝ) (epsilon_nonneg : 0 ≤ epsilon) (epsilon_le_one : epsilon ≤ 1)
+    (frequency : TwoLocusHaplotypeFrequencies) : TwoLocusHaplotypeFrequencies :=
+  mixture epsilon epsilon_nonneg epsilon_le_one (leftAlleleFlip frequency) frequency
+
+/-- A left-locus mutation pulse multiplies the centered left contrast by `1-2 epsilon`. -/
+theorem leftMutationPulse_leftContrast
+    (epsilon : ℝ) (epsilon_nonneg : 0 ≤ epsilon) (epsilon_le_one : epsilon ≤ 1)
+    (frequency : TwoLocusHaplotypeFrequencies) :
+    (leftMutationPulse epsilon epsilon_nonneg epsilon_le_one frequency).leftContrast =
+      (1 - 2 * epsilon) * frequency.leftContrast := by
+  rw [leftContrast, leftMutationPulse, mixture_leftFrequency,
+    leftAlleleFlip_leftFrequency]
+  simp only [leftContrast]
+  ring
+
+/-- A left-locus mutation pulse preserves the right contrast. -/
+theorem leftMutationPulse_rightContrast
+    (epsilon : ℝ) (epsilon_nonneg : 0 ≤ epsilon) (epsilon_le_one : epsilon ≤ 1)
+    (frequency : TwoLocusHaplotypeFrequencies) :
+    (leftMutationPulse epsilon epsilon_nonneg epsilon_le_one frequency).rightContrast =
+      frequency.rightContrast := by
+  rw [rightContrast, leftMutationPulse, mixture_rightFrequency,
+    leftAlleleFlip_rightFrequency]
+  simp only [rightContrast]
+  ring
+
+/-- A left-locus mutation pulse retains exactly `1-2 epsilon` of linkage. -/
+theorem leftMutationPulse_linkage
+    (epsilon : ℝ) (epsilon_nonneg : 0 ≤ epsilon) (epsilon_le_one : epsilon ≤ 1)
+    (frequency : TwoLocusHaplotypeFrequencies) :
+    (leftMutationPulse epsilon epsilon_nonneg epsilon_le_one frequency).linkage =
+      (1 - 2 * epsilon) * frequency.linkage := by
+  rw [leftMutationPulse, mixture_linkage, leftAlleleFlip_linkage,
+    leftAlleleFlip_leftFrequency, leftAlleleFlip_rightFrequency]
+  ring
+
+/-- Exact symmetric-biallelic mutation pulse at the right locus. -/
+noncomputable def rightMutationPulse
+    (epsilon : ℝ) (epsilon_nonneg : 0 ≤ epsilon) (epsilon_le_one : epsilon ≤ 1)
+    (frequency : TwoLocusHaplotypeFrequencies) : TwoLocusHaplotypeFrequencies :=
+  mixture epsilon epsilon_nonneg epsilon_le_one (rightAlleleFlip frequency) frequency
+
+/-- A right-locus mutation pulse preserves the left contrast. -/
+theorem rightMutationPulse_leftContrast
+    (epsilon : ℝ) (epsilon_nonneg : 0 ≤ epsilon) (epsilon_le_one : epsilon ≤ 1)
+    (frequency : TwoLocusHaplotypeFrequencies) :
+    (rightMutationPulse epsilon epsilon_nonneg epsilon_le_one frequency).leftContrast =
+      frequency.leftContrast := by
+  rw [leftContrast, rightMutationPulse, mixture_leftFrequency,
+    rightAlleleFlip_leftFrequency]
+  simp only [leftContrast]
+  ring
+
+/-- A right-locus mutation pulse multiplies the centered right contrast by `1-2 epsilon`. -/
+theorem rightMutationPulse_rightContrast
+    (epsilon : ℝ) (epsilon_nonneg : 0 ≤ epsilon) (epsilon_le_one : epsilon ≤ 1)
+    (frequency : TwoLocusHaplotypeFrequencies) :
+    (rightMutationPulse epsilon epsilon_nonneg epsilon_le_one frequency).rightContrast =
+      (1 - 2 * epsilon) * frequency.rightContrast := by
+  rw [rightContrast, rightMutationPulse, mixture_rightFrequency,
+    rightAlleleFlip_rightFrequency]
+  simp only [rightContrast]
+  ring
+
+/-- A right-locus mutation pulse retains exactly `1-2 epsilon` of linkage. -/
+theorem rightMutationPulse_linkage
+    (epsilon : ℝ) (epsilon_nonneg : 0 ≤ epsilon) (epsilon_le_one : epsilon ≤ 1)
+    (frequency : TwoLocusHaplotypeFrequencies) :
+    (rightMutationPulse epsilon epsilon_nonneg epsilon_le_one frequency).linkage =
+      (1 - 2 * epsilon) * frequency.linkage := by
+  rw [rightMutationPulse, mixture_linkage, rightAlleleFlip_linkage,
+    rightAlleleFlip_leftFrequency, rightAlleleFlip_rightFrequency]
+  ring
+
+/-- Independent symmetric mutation pulses at both loci, implemented as the composition of
+the two exact simplex-preserving allele-flip channels. -/
+noncomputable def twoLocusMutationPulse
+    (epsilonLeft : ℝ) (epsilonLeft_nonneg : 0 ≤ epsilonLeft)
+    (epsilonLeft_le_one : epsilonLeft ≤ 1)
+    (epsilonRight : ℝ) (epsilonRight_nonneg : 0 ≤ epsilonRight)
+    (epsilonRight_le_one : epsilonRight ≤ 1)
+    (frequency : TwoLocusHaplotypeFrequencies) : TwoLocusHaplotypeFrequencies :=
+  rightMutationPulse epsilonRight epsilonRight_nonneg epsilonRight_le_one
+    (leftMutationPulse epsilonLeft epsilonLeft_nonneg epsilonLeft_le_one frequency)
+
+/-- The two-locus mutation pulse scales the left contrast only by its left-channel
+retention. -/
+theorem twoLocusMutationPulse_leftContrast
+    (epsilonLeft : ℝ) (epsilonLeft_nonneg : 0 ≤ epsilonLeft)
+    (epsilonLeft_le_one : epsilonLeft ≤ 1)
+    (epsilonRight : ℝ) (epsilonRight_nonneg : 0 ≤ epsilonRight)
+    (epsilonRight_le_one : epsilonRight ≤ 1)
+    (frequency : TwoLocusHaplotypeFrequencies) :
+    (twoLocusMutationPulse epsilonLeft epsilonLeft_nonneg epsilonLeft_le_one
+      epsilonRight epsilonRight_nonneg epsilonRight_le_one frequency).leftContrast =
+      (1 - 2 * epsilonLeft) * frequency.leftContrast := by
+  rw [twoLocusMutationPulse, rightMutationPulse_leftContrast,
+    leftMutationPulse_leftContrast]
+
+/-- The two-locus mutation pulse scales the right contrast only by its right-channel
+retention. -/
+theorem twoLocusMutationPulse_rightContrast
+    (epsilonLeft : ℝ) (epsilonLeft_nonneg : 0 ≤ epsilonLeft)
+    (epsilonLeft_le_one : epsilonLeft ≤ 1)
+    (epsilonRight : ℝ) (epsilonRight_nonneg : 0 ≤ epsilonRight)
+    (epsilonRight_le_one : epsilonRight ≤ 1)
+    (frequency : TwoLocusHaplotypeFrequencies) :
+    (twoLocusMutationPulse epsilonLeft epsilonLeft_nonneg epsilonLeft_le_one
+      epsilonRight epsilonRight_nonneg epsilonRight_le_one frequency).rightContrast =
+      (1 - 2 * epsilonRight) * frequency.rightContrast := by
+  rw [twoLocusMutationPulse, rightMutationPulse_rightContrast,
+    leftMutationPulse_rightContrast]
+
+/-- **Exact two-locus symmetric-mutation linkage law.**  The linkage retention is the
+product of the two single-locus contrast retentions. -/
+theorem twoLocusMutationPulse_linkage
+    (epsilonLeft : ℝ) (epsilonLeft_nonneg : 0 ≤ epsilonLeft)
+    (epsilonLeft_le_one : epsilonLeft ≤ 1)
+    (epsilonRight : ℝ) (epsilonRight_nonneg : 0 ≤ epsilonRight)
+    (epsilonRight_le_one : epsilonRight ≤ 1)
+    (frequency : TwoLocusHaplotypeFrequencies) :
+    (twoLocusMutationPulse epsilonLeft epsilonLeft_nonneg epsilonLeft_le_one
+      epsilonRight epsilonRight_nonneg epsilonRight_le_one frequency).linkage =
+      (1 - 2 * epsilonLeft) * (1 - 2 * epsilonRight) * frequency.linkage := by
+  rw [twoLocusMutationPulse, rightMutationPulse_linkage, leftMutationPulse_linkage]
+  ring
+
+/-- Scaled symmetric-mutation velocity of the left centered contrast when the rate
+coordinate is `theta = 2u`. -/
+def scaledMutationLeftContrastVelocity
+    (frequency : TwoLocusHaplotypeFrequencies) : ℝ :=
+  -frequency.leftContrast
+
+/-- Scaled symmetric-mutation velocity of the right centered contrast. -/
+def scaledMutationRightContrastVelocity
+    (frequency : TwoLocusHaplotypeFrequencies) : ℝ :=
+  -frequency.rightContrast
+
+/-- Scaled symmetric-mutation velocity of linkage.  Both loci mutate, so the two contrast
+decay channels add and give `-2D`. -/
+def scaledMutationLinkageVelocity
+    (frequency : TwoLocusHaplotypeFrequencies) : ℝ :=
+  -2 * frequency.linkage
+
+/-- The exact one-locus mutation pulse exposes the scaled left-contrast velocity with pulse
+coordinate `2 epsilon`. -/
+theorem leftMutationPulse_leftContrast_eq_velocity
+    (epsilon : ℝ) (epsilon_nonneg : 0 ≤ epsilon) (epsilon_le_one : epsilon ≤ 1)
+    (frequency : TwoLocusHaplotypeFrequencies) :
+    (leftMutationPulse epsilon epsilon_nonneg epsilon_le_one frequency).leftContrast =
+      frequency.leftContrast +
+        (2 * epsilon) * frequency.scaledMutationLeftContrastVelocity := by
+  rw [leftMutationPulse_leftContrast]
+  simp only [scaledMutationLeftContrastVelocity]
+  ring
+
+/-- The exact right-locus pulse exposes the analogous scaled velocity. -/
+theorem rightMutationPulse_rightContrast_eq_velocity
+    (epsilon : ℝ) (epsilon_nonneg : 0 ≤ epsilon) (epsilon_le_one : epsilon ≤ 1)
+    (frequency : TwoLocusHaplotypeFrequencies) :
+    (rightMutationPulse epsilon epsilon_nonneg epsilon_le_one frequency).rightContrast =
+      frequency.rightContrast +
+        (2 * epsilon) * frequency.scaledMutationRightContrastVelocity := by
+  rw [rightMutationPulse_rightContrast]
+  simp only [scaledMutationRightContrastVelocity]
+  ring
+
+/-- With equal mutation at both loci, the exact finite pulse is its first-order scaled
+linkage velocity plus the explicit second-order two-mutation correction. -/
+theorem twoLocusMutationPulse_linkage_eq_velocity
+    (epsilon : ℝ) (epsilon_nonneg : 0 ≤ epsilon) (epsilon_le_one : epsilon ≤ 1)
+    (frequency : TwoLocusHaplotypeFrequencies) :
+    (twoLocusMutationPulse epsilon epsilon_nonneg epsilon_le_one
+      epsilon epsilon_nonneg epsilon_le_one frequency).linkage =
+      frequency.linkage + (2 * epsilon) * frequency.scaledMutationLinkageVelocity +
+        (2 * epsilon) ^ 2 * frequency.linkage := by
+  rw [twoLocusMutationPulse_linkage]
+  simp only [scaledMutationLinkageVelocity]
+  ring
+
 /-- The older linkage-equilibrium admixture law is the zero-parental-linkage specialization
 of the general identity, rather than a separate mechanism. -/
 theorem mixture_linkage_of_parental_linkage_zero (alpha : ℝ)
@@ -482,6 +727,58 @@ theorem twoLocusJointHeterozygosity_eq_contrasts
   rw [twoLocusJointHeterozygosity,
     twoLocusLeftHeterozygosity_eq_contrasts,
     twoLocusRightHeterozygosity_eq_contrasts]
+  ring
+
+/-- Per-unit-scaled-mutation velocity of cross-deme left heterozygosity when mutation acts
+on either one of its two lineage arguments. -/
+noncomputable def twoLocusHMutationVelocity
+    (first second : TwoLocusHaplotypeFrequencies) : ℝ :=
+  first.leftContrast * second.leftContrast / 2
+
+/-- The heterozygosity mutation velocity is exactly the affine forcing `1/2` minus the
+current heterozygosity. -/
+theorem twoLocusHMutationVelocity_eq
+    (first second : TwoLocusHaplotypeFrequencies) :
+    twoLocusHMutationVelocity first second =
+      1 / 2 - twoLocusLeftHeterozygosity first second := by
+  rw [twoLocusHMutationVelocity, twoLocusLeftHeterozygosity_eq_contrasts]
+  ring
+
+/-- Per-unit-scaled-mutation velocity of generalized `pi2` when mutation acts on either
+left-locus lineage argument. -/
+noncomputable def twoLocusPi2LeftMutationVelocity
+    (leftFirst leftSecond rightFirst rightSecond : TwoLocusHaplotypeFrequencies) : ℝ :=
+  leftFirst.leftContrast * leftSecond.leftContrast *
+    (1 - rightFirst.rightContrast * rightSecond.rightContrast) / 16
+
+/-- The left-channel `pi2` velocity is the exact `H/8 - pi2` coupling appearing in the
+closed moment system. -/
+theorem twoLocusPi2LeftMutationVelocity_eq
+    (leftFirst leftSecond rightFirst rightSecond : TwoLocusHaplotypeFrequencies) :
+    twoLocusPi2LeftMutationVelocity leftFirst leftSecond rightFirst rightSecond =
+      twoLocusRightHeterozygosity rightFirst rightSecond / 8 -
+        twoLocusJointHeterozygosity leftFirst leftSecond rightFirst rightSecond := by
+  rw [twoLocusPi2LeftMutationVelocity,
+    twoLocusRightHeterozygosity_eq_contrasts,
+    twoLocusJointHeterozygosity_eq_contrasts]
+  ring
+
+/-- Per-unit-scaled-mutation velocity of generalized `pi2` when mutation acts on either
+right-locus lineage argument. -/
+noncomputable def twoLocusPi2RightMutationVelocity
+    (leftFirst leftSecond rightFirst rightSecond : TwoLocusHaplotypeFrequencies) : ℝ :=
+  (1 - leftFirst.leftContrast * leftSecond.leftContrast) *
+    rightFirst.rightContrast * rightSecond.rightContrast / 16
+
+/-- The right-channel velocity is the symmetric `H/8 - pi2` coupling. -/
+theorem twoLocusPi2RightMutationVelocity_eq
+    (leftFirst leftSecond rightFirst rightSecond : TwoLocusHaplotypeFrequencies) :
+    twoLocusPi2RightMutationVelocity leftFirst leftSecond rightFirst rightSecond =
+      twoLocusLeftHeterozygosity leftFirst leftSecond / 8 -
+        twoLocusJointHeterozygosity leftFirst leftSecond rightFirst rightSecond := by
+  rw [twoLocusPi2RightMutationVelocity,
+    twoLocusLeftHeterozygosity_eq_contrasts,
+    twoLocusJointHeterozygosity_eq_contrasts]
   ring
 
 /-- Left-locus heterozygosity is affine in its first haplotype argument under an exact
@@ -678,8 +975,12 @@ theorem linkage_mul_leftContrast_mul_rightContrastVelocity
 
 /-- A full low-order state is haplotype-realizable when all of its coordinates are
 expectations of the defining polynomials under one common probability law on the
-multi-deme haplotype-frequency simplex.  This is the semantic cone whose preservation by
-the continuous Wright--Fisher semigroup remains to be proved. -/
+multi-deme haplotype-frequency simplex.  `H` is represented at the left locus here.  The
+closed mutation row additionally identifies the analogous right-locus expectation; that
+scientifically substantive locus-exchangeability condition is carried by the extension
+`LocusExchangeableLowOrderLDHaplotypeRealization` below rather than silently assumed here.
+This is the semantic cone whose preservation by the continuous Wright--Fisher semigroup
+remains to be proved. -/
 structure LowOrderLDHaplotypeRealization {D : ℕ}
     (state : AffineLowOrderLDCoordinate D → ℝ) where
   sampleSpace : Type
@@ -700,6 +1001,16 @@ structure LowOrderLDHaplotypeRealization {D : ℕ}
     state (some (.pi2 first second third fourth)) = expectation (fun outcome ↦
       twoLocusJointHeterozygosity (haplotype outcome first) (haplotype outcome second)
         (haplotype outcome third) (haplotype outcome fourth))
+
+/-- Haplotype realization in the locus-exchangeable model used by the closed mutation
+system.  The extra field is exactly what licenses the same `H(i,j)` coordinate to appear as
+either a left- or right-locus marginal in the `pi2` mutation row. -/
+structure LocusExchangeableLowOrderLDHaplotypeRealization {D : ℕ}
+    (state : AffineLowOrderLDCoordinate D → ℝ)
+    extends LowOrderLDHaplotypeRealization state where
+  H_right_eq : ∀ first second,
+    state (some (.H first second)) = expectation (fun outcome ↦
+      twoLocusRightHeterozygosity (haplotype outcome first) (haplotype outcome second))
 
 /-- Evaluate the complete low-order polynomial family under a positive normalized
 expectation.  This is the forward semantic map from an actual haplotype law to the finite
@@ -734,6 +1045,23 @@ def haplotypeLowOrderLDState_realization {D : ℕ} {sampleSpace : Type}
   DD_eq _ _ := rfl
   Dz_eq _ _ _ := rfl
   pi2_eq _ _ _ _ := rfl
+
+/-- A concrete haplotype law whose expected left and right heterozygosities agree supplies
+the stronger locus-exchangeable realization required by the mutation generator. -/
+def haplotypeLowOrderLDState_locusExchangeableRealization
+    {D : ℕ} {sampleSpace : Type}
+    (expectation : Foundations.ExpFunctional sampleSpace)
+    (haplotype : sampleSpace → Fin D → TwoLocusHaplotypeFrequencies)
+    (locus_exchangeable : ∀ first second,
+      expectation (fun outcome ↦
+        twoLocusLeftHeterozygosity (haplotype outcome first) (haplotype outcome second)) =
+      expectation (fun outcome ↦
+        twoLocusRightHeterozygosity (haplotype outcome first) (haplotype outcome second))) :
+    LocusExchangeableLowOrderLDHaplotypeRealization
+      (haplotypeLowOrderLDState expectation haplotype) where
+  toLowOrderLDHaplotypeRealization :=
+    haplotypeLowOrderLDState_realization expectation haplotype
+  H_right_eq first second := locus_exchangeable first second
 
 /-- Apply one exact deterministic migration pulse to the underlying haplotype random
 variables.  Only the recipient changes; its four haplotype frequencies are mixed before any
@@ -1306,7 +1634,94 @@ theorem DD_sixteenth_attained {D : ℕ} (first second : Fin D) :
   rw [TwoLocusHaplotypeFrequencies.maximalCoupling_linkage]
   norm_num
 
+/-- Expected per-index mutation velocity of `H` is exactly its affine pull toward `1/2`. -/
+theorem HMutationVelocity_expectation {D : ℕ}
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state) (first second : Fin D) :
+    realization.expectation (fun outcome ↦
+      twoLocusHMutationVelocity (realization.haplotype outcome first)
+        (realization.haplotype outcome second)) =
+      1 / 2 - state (some (.H first second)) := by
+  have pointwise : (fun outcome ↦
+      twoLocusHMutationVelocity (realization.haplotype outcome first)
+        (realization.haplotype outcome second)) =
+      (fun _ ↦ (1 / 2 : ℝ)) - (fun outcome ↦
+        twoLocusLeftHeterozygosity (realization.haplotype outcome first)
+          (realization.haplotype outcome second)) := by
+    funext outcome
+    simp only [Pi.sub_apply]
+    exact twoLocusHMutationVelocity_eq _ _
+  rw [pointwise, realization.expectation.eval_sub,
+    realization.expectation.eval_const, ← realization.H_eq first second]
+
 end LowOrderLDHaplotypeRealization
+
+namespace LocusExchangeableLowOrderLDHaplotypeRealization
+
+/-- Expected left-channel `pi2` mutation velocity is exactly `H_right/8 - pi2`; locus
+exchangeability identifies that right marginal with the stored `H` coordinate. -/
+theorem pi2LeftMutationVelocity_expectation {D : ℕ}
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LocusExchangeableLowOrderLDHaplotypeRealization state)
+    (first second third fourth : Fin D) :
+    realization.expectation (fun outcome ↦
+      twoLocusPi2LeftMutationVelocity
+        (realization.haplotype outcome first) (realization.haplotype outcome second)
+        (realization.haplotype outcome third) (realization.haplotype outcome fourth)) =
+      state (some (.H third fourth)) / 8 -
+        state (some (.pi2 first second third fourth)) := by
+  have pointwise : (fun outcome ↦
+      twoLocusPi2LeftMutationVelocity
+        (realization.haplotype outcome first) (realization.haplotype outcome second)
+        (realization.haplotype outcome third) (realization.haplotype outcome fourth)) =
+      (1 / 8 : ℝ) • (fun outcome ↦
+        twoLocusRightHeterozygosity (realization.haplotype outcome third)
+          (realization.haplotype outcome fourth)) -
+      (fun outcome ↦ twoLocusJointHeterozygosity
+        (realization.haplotype outcome first) (realization.haplotype outcome second)
+        (realization.haplotype outcome third) (realization.haplotype outcome fourth)) := by
+    funext outcome
+    simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul]
+    rw [twoLocusPi2LeftMutationVelocity_eq]
+    ring
+  rw [pointwise, realization.expectation.eval_sub,
+    realization.expectation.smul_eval,
+    ← realization.H_right_eq third fourth,
+    ← realization.pi2_eq first second third fourth]
+  ring
+
+/-- Expected right-channel `pi2` mutation velocity is exactly `H_left/8 - pi2`. -/
+theorem pi2RightMutationVelocity_expectation {D : ℕ}
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LocusExchangeableLowOrderLDHaplotypeRealization state)
+    (first second third fourth : Fin D) :
+    realization.expectation (fun outcome ↦
+      twoLocusPi2RightMutationVelocity
+        (realization.haplotype outcome first) (realization.haplotype outcome second)
+        (realization.haplotype outcome third) (realization.haplotype outcome fourth)) =
+      state (some (.H first second)) / 8 -
+        state (some (.pi2 first second third fourth)) := by
+  have pointwise : (fun outcome ↦
+      twoLocusPi2RightMutationVelocity
+        (realization.haplotype outcome first) (realization.haplotype outcome second)
+        (realization.haplotype outcome third) (realization.haplotype outcome fourth)) =
+      (1 / 8 : ℝ) • (fun outcome ↦
+        twoLocusLeftHeterozygosity (realization.haplotype outcome first)
+          (realization.haplotype outcome second)) -
+      (fun outcome ↦ twoLocusJointHeterozygosity
+        (realization.haplotype outcome first) (realization.haplotype outcome second)
+        (realization.haplotype outcome third) (realization.haplotype outcome fourth)) := by
+    funext outcome
+    simp only [Pi.sub_apply, Pi.smul_apply, smul_eq_mul]
+    rw [twoLocusPi2RightMutationVelocity_eq]
+    ring
+  rw [pointwise, realization.expectation.eval_sub,
+    realization.expectation.smul_eval,
+    ← realization.H_eq first second,
+    ← realization.pi2_eq first second third fourth]
+  ring
+
+end LocusExchangeableLowOrderLDHaplotypeRealization
 
 /-- The four-term generalized definition has exactly the classical within-deme
 specialization; the normalization contains no fitted or conventional scale factor. -/
@@ -1844,6 +2259,178 @@ noncomputable def lowOrderLDMutationForcing {D : ℕ} (rates : ManyDemeLDRates D
     LowOrderLDCoordinate D → ℝ
   | .H first second => (rates.mutation first + rates.mutation second) / 2
   | _ => 0
+
+/-- **The complete affine `H` mutation row is the expected contrast-decay velocity.**
+The apparently separate constant forcing and recurrent damping are the expansion of the
+single exact law `theta * E[z_first z_second / 2]` at each lineage index. -/
+theorem lowOrderLDMutation_H_eq_haplotypeVelocity {D : ℕ}
+    (rates : ManyDemeLDRates D)
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state)
+    (first second : Fin D) :
+    lowOrderLDMutationCoupling rates (fun coordinate ↦ state (some coordinate))
+          (.H first second) +
+        lowOrderLDRecurrentMutationDamping rates
+          (fun coordinate ↦ state (some coordinate)) (.H first second) +
+        lowOrderLDMutationForcing rates (.H first second) * state none =
+      rates.mutation first * realization.expectation (fun outcome ↦
+        twoLocusHMutationVelocity (realization.haplotype outcome first)
+          (realization.haplotype outcome second)) +
+      rates.mutation second * realization.expectation (fun outcome ↦
+        twoLocusHMutationVelocity (realization.haplotype outcome first)
+          (realization.haplotype outcome second)) := by
+  simp only [lowOrderLDMutationCoupling, lowOrderLDRecurrentMutationDamping,
+    lowOrderLDMutationForcing]
+  rw [realization.constant_eq,
+    realization.HMutationVelocity_expectation first second]
+  ring
+
+/-- **The complete `DD` mutation row is the two-factor product rule for the exact scaled
+linkage velocity `-2D`.** -/
+theorem lowOrderLDMutation_DD_eq_haplotypeVelocity {D : ℕ}
+    (rates : ManyDemeLDRates D)
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state)
+    (first second : Fin D) :
+    lowOrderLDMutationCoupling rates (fun coordinate ↦ state (some coordinate))
+          (.DD first second) +
+        lowOrderLDRecurrentMutationDamping rates
+          (fun coordinate ↦ state (some coordinate)) (.DD first second) +
+        lowOrderLDMutationForcing rates (.DD first second) * state none =
+      rates.mutation first * realization.expectation (fun outcome ↦
+        (realization.haplotype outcome first).scaledMutationLinkageVelocity *
+          (realization.haplotype outcome second).linkage) +
+      rates.mutation second * realization.expectation (fun outcome ↦
+        (realization.haplotype outcome first).linkage *
+          (realization.haplotype outcome second).scaledMutationLinkageVelocity) := by
+  have first_velocity : (fun outcome ↦
+      (realization.haplotype outcome first).scaledMutationLinkageVelocity *
+        (realization.haplotype outcome second).linkage) =
+      (-2 : ℝ) • (fun outcome ↦
+        (realization.haplotype outcome first).linkage *
+          (realization.haplotype outcome second).linkage) := by
+    funext outcome
+    simp only [TwoLocusHaplotypeFrequencies.scaledMutationLinkageVelocity,
+      Pi.smul_apply, smul_eq_mul]
+    ring
+  have second_velocity : (fun outcome ↦
+      (realization.haplotype outcome first).linkage *
+        (realization.haplotype outcome second).scaledMutationLinkageVelocity) =
+      (-2 : ℝ) • (fun outcome ↦
+        (realization.haplotype outcome first).linkage *
+          (realization.haplotype outcome second).linkage) := by
+    funext outcome
+    simp only [TwoLocusHaplotypeFrequencies.scaledMutationLinkageVelocity,
+      Pi.smul_apply, smul_eq_mul]
+    ring
+  simp only [lowOrderLDMutationCoupling, lowOrderLDRecurrentMutationDamping,
+    lowOrderLDMutationForcing]
+  rw [first_velocity, second_velocity, realization.expectation.smul_eval,
+    ← realization.DD_eq first second]
+  ring
+
+/-- **The complete `Dz` mutation row is the three-factor product rule.**  Its linkage
+factor contributes two contrast-decay channels and its two marginal contrasts contribute
+one each. -/
+theorem lowOrderLDMutation_Dz_eq_haplotypeVelocity {D : ℕ}
+    (rates : ManyDemeLDRates D)
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization state)
+    (first second third : Fin D) :
+    lowOrderLDMutationCoupling rates (fun coordinate ↦ state (some coordinate))
+          (.Dz first second third) +
+        lowOrderLDRecurrentMutationDamping rates
+          (fun coordinate ↦ state (some coordinate)) (.Dz first second third) +
+        lowOrderLDMutationForcing rates (.Dz first second third) * state none =
+      rates.mutation first * realization.expectation (fun outcome ↦
+        (realization.haplotype outcome first).scaledMutationLinkageVelocity *
+          (realization.haplotype outcome second).leftContrast *
+          (realization.haplotype outcome third).rightContrast) +
+      rates.mutation second * realization.expectation (fun outcome ↦
+        (realization.haplotype outcome first).linkage *
+          (realization.haplotype outcome second).scaledMutationLeftContrastVelocity *
+          (realization.haplotype outcome third).rightContrast) +
+      rates.mutation third * realization.expectation (fun outcome ↦
+        (realization.haplotype outcome first).linkage *
+          (realization.haplotype outcome second).leftContrast *
+          (realization.haplotype outcome third).scaledMutationRightContrastVelocity) := by
+  have linkage_velocity : (fun outcome ↦
+      (realization.haplotype outcome first).scaledMutationLinkageVelocity *
+        (realization.haplotype outcome second).leftContrast *
+        (realization.haplotype outcome third).rightContrast) =
+      (-2 : ℝ) • (fun outcome ↦
+        twoLocusDzObservable (realization.haplotype outcome first)
+          (realization.haplotype outcome second)
+          (realization.haplotype outcome third)) := by
+    funext outcome
+    simp only [TwoLocusHaplotypeFrequencies.scaledMutationLinkageVelocity,
+      twoLocusDzObservable, Pi.smul_apply, smul_eq_mul]
+    ring
+  have left_velocity : (fun outcome ↦
+      (realization.haplotype outcome first).linkage *
+        (realization.haplotype outcome second).scaledMutationLeftContrastVelocity *
+        (realization.haplotype outcome third).rightContrast) =
+      (-1 : ℝ) • (fun outcome ↦
+        twoLocusDzObservable (realization.haplotype outcome first)
+          (realization.haplotype outcome second)
+          (realization.haplotype outcome third)) := by
+    funext outcome
+    simp only [TwoLocusHaplotypeFrequencies.scaledMutationLeftContrastVelocity,
+      twoLocusDzObservable, Pi.smul_apply, smul_eq_mul]
+    ring
+  have right_velocity : (fun outcome ↦
+      (realization.haplotype outcome first).linkage *
+        (realization.haplotype outcome second).leftContrast *
+        (realization.haplotype outcome third).scaledMutationRightContrastVelocity) =
+      (-1 : ℝ) • (fun outcome ↦
+        twoLocusDzObservable (realization.haplotype outcome first)
+          (realization.haplotype outcome second)
+          (realization.haplotype outcome third)) := by
+    funext outcome
+    simp only [TwoLocusHaplotypeFrequencies.scaledMutationRightContrastVelocity,
+      twoLocusDzObservable, Pi.smul_apply, smul_eq_mul]
+    ring
+  simp only [lowOrderLDMutationCoupling, lowOrderLDRecurrentMutationDamping,
+    lowOrderLDMutationForcing]
+  rw [linkage_velocity, left_velocity, right_velocity]
+  simp only [realization.expectation.smul_eval]
+  rw [← realization.Dz_eq first second third]
+  ring
+
+/-- **The complete generalized-`pi2` mutation row is the four-factor product rule.**
+Its two `H/8` coupling terms and four damping terms are therefore derived consequences of
+the exact symmetric allele-flip channel.  Locus exchangeability is explicit in the type. -/
+theorem lowOrderLDMutation_pi2_eq_haplotypeVelocity {D : ℕ}
+    (rates : ManyDemeLDRates D)
+    {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LocusExchangeableLowOrderLDHaplotypeRealization state)
+    (first second third fourth : Fin D) :
+    lowOrderLDMutationCoupling rates (fun coordinate ↦ state (some coordinate))
+          (.pi2 first second third fourth) +
+        lowOrderLDRecurrentMutationDamping rates
+          (fun coordinate ↦ state (some coordinate)) (.pi2 first second third fourth) +
+        lowOrderLDMutationForcing rates (.pi2 first second third fourth) * state none =
+      rates.mutation first * realization.expectation (fun outcome ↦
+        twoLocusPi2LeftMutationVelocity
+          (realization.haplotype outcome first) (realization.haplotype outcome second)
+          (realization.haplotype outcome third) (realization.haplotype outcome fourth)) +
+      rates.mutation second * realization.expectation (fun outcome ↦
+        twoLocusPi2LeftMutationVelocity
+          (realization.haplotype outcome first) (realization.haplotype outcome second)
+          (realization.haplotype outcome third) (realization.haplotype outcome fourth)) +
+      rates.mutation third * realization.expectation (fun outcome ↦
+        twoLocusPi2RightMutationVelocity
+          (realization.haplotype outcome first) (realization.haplotype outcome second)
+          (realization.haplotype outcome third) (realization.haplotype outcome fourth)) +
+      rates.mutation fourth * realization.expectation (fun outcome ↦
+        twoLocusPi2RightMutationVelocity
+          (realization.haplotype outcome first) (realization.haplotype outcome second)
+          (realization.haplotype outcome third) (realization.haplotype outcome fourth)) := by
+  simp only [lowOrderLDMutationCoupling, lowOrderLDRecurrentMutationDamping,
+    lowOrderLDMutationForcing]
+  rw [realization.pi2LeftMutationVelocity_expectation first second third fourth,
+    realization.pi2RightMutationVelocity_expectation first second third fourth]
+  ring
 
 /-- The derived homogeneous generator for arbitrary deme count. -/
 noncomputable def lowOrderLDHomogeneousGenerator {D : ℕ} (rates : ManyDemeLDRates D)
