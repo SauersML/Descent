@@ -149,3 +149,32 @@ Gaussian field with the DD-profile covariance, plus multi-causal windows), repla
 the independent-block product.  Its limiting behavior at z -> infinity must stay
 strictly below one, which the seed pattern demands and the independent product
 violates.
+
+## 8. v3.2 specification: one conditioned channel law, no binary mixture
+
+Gate 2's indictment goes deeper than the discretization: the self/tagged DICHOTOMY is
+itself the approximation. The clump index is a location x on the LD profile (x = 0
+being the causal), and the law should integrate over the winner-location distribution
+rather than mix two endpoint laws:
+
+    ratio(t->j) = [ INT  P_win(x; z) * a_tj(x) dx ]^2 * (drift-het factor)
+
+with BOTH ingredients conditioned on selection:
+  P_win(x; z): the winner-location density of the correlated Gaussian significance
+      field (covariance from the DD rho-profile), whose z -> infinity limit
+      concentrates at x = 0 but with finite mass at x > 0 -- the saturation the
+      independent product violated;
+  a_tj(x): the SELECTION-CONDITIONED channel amplitude at location x, which is the
+      regression retention E[D_j | D_t]/D_t = DD_tj(rho(x))/DD_tt(rho(x)) rather
+      than the unconditional correlation sqrt(lambda) -- selection excludes the
+      sign-flipped and shrunken-D histories that the unconditional second-moment
+      ratio averages in.  As x -> 0 this amplitude approaches the self-channel
+      value continuously (a permanently linked pair drifts as a unit), repairing
+      the discontinuity that forced the binary mixture in v3.1.
+
+Both objects are computable from tables already in hand (the DD rho-sweep and the
+ascertained fourth moments); the winner-location density is a one-dimensional
+correlated-extremes computation with the DD-profile covariance.  This unifies
+sections 1-7: v1 was a_tj with no conditioning and no winner weighting; v3 was the
+x = 0 endpoint only; v3.1 was a two-point quadrature of the true integral.  v3.2 is
+the integral itself.  It meets gate 3 on seeds never yet generated.
