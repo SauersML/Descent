@@ -1439,6 +1439,112 @@ theorem twoLocusPi2Jet_driftAt {D : ℕ}
   rw [twoLocusHaplotypeCovariance_scaled_left_right]
   split_ifs <;> ring
 
+/-- The local `pi2` drift expanded into its two coalescence-loss channels and four possible
+cross-locus `Dz/4` channels.  This is the sparse indicator form used to sum arbitrary
+deme-specific coalescence rates exactly. -/
+theorem twoLocusPi2Jet_driftAt_sparse {D : ℕ}
+    (state : Fin D → TwoLocusHaplotypeFrequencies)
+    (deme first second third fourth : Fin D) :
+    (twoLocusPi2Jet first second third fourth).driftAt deme state =
+      (if first = second then
+        if first = deme then
+          -(twoLocusPi2Jet first second third fourth).value state else 0
+        else 0) +
+      (if third = fourth then
+        if third = deme then
+          -(twoLocusPi2Jet first second third fourth).value state else 0
+        else 0) +
+      (if first = third then
+        if first = deme then (twoLocusDzJet first second fourth).value state / 4 else 0
+        else 0) +
+      (if first = fourth then
+        if first = deme then (twoLocusDzJet first second third).value state / 4 else 0
+        else 0) +
+      (if second = third then
+        if second = deme then (twoLocusDzJet second first fourth).value state / 4 else 0
+        else 0) +
+      (if second = fourth then
+        if second = deme then (twoLocusDzJet second first third).value state / 4 else 0
+        else 0) := by
+  have hleftLoss :
+      -(if first = deme ∧ second = deme then
+          (twoLocusPi2Jet first second third fourth).value state else 0) =
+        (if first = second then
+          if first = deme then
+            -(twoLocusPi2Jet first second third fourth).value state else 0
+          else 0) := by
+    by_cases hfirst : first = deme <;> by_cases hsecond : second = deme <;>
+      simp_all [eq_comm]
+  have hrightLoss :
+      -(if third = deme ∧ fourth = deme then
+          (twoLocusPi2Jet first second third fourth).value state else 0) =
+        (if third = fourth then
+          if third = deme then
+            -(twoLocusPi2Jet first second third fourth).value state else 0
+          else 0) := by
+    by_cases hthird : third = deme <;> by_cases hfourth : fourth = deme <;>
+      simp_all [eq_comm]
+  have h13 :
+      (state deme).linkage *
+          (if deme = first then (state second).leftContrast else 0) *
+          (if deme = third then (state fourth).rightContrast else 0) / 4 =
+        (if first = third then
+          if first = deme then (twoLocusDzJet first second fourth).value state / 4 else 0
+          else 0) := by
+    by_cases hfirst : deme = first <;> by_cases hthird : deme = third <;>
+      simp_all [eq_comm, twoLocusDzJet_value, twoLocusDzObservable] <;> ring
+  have h14 :
+      (state deme).linkage *
+          (if deme = first then (state second).leftContrast else 0) *
+          (if deme = fourth then (state third).rightContrast else 0) / 4 =
+        (if first = fourth then
+          if first = deme then (twoLocusDzJet first second third).value state / 4 else 0
+          else 0) := by
+    by_cases hfirst : deme = first <;> by_cases hfourth : deme = fourth <;>
+      simp_all [eq_comm, twoLocusDzJet_value, twoLocusDzObservable] <;> ring
+  have h23 :
+      (state deme).linkage *
+          (if deme = second then (state first).leftContrast else 0) *
+          (if deme = third then (state fourth).rightContrast else 0) / 4 =
+        (if second = third then
+          if second = deme then (twoLocusDzJet second first fourth).value state / 4 else 0
+          else 0) := by
+    by_cases hsecond : deme = second <;> by_cases hthird : deme = third <;>
+      simp_all [eq_comm, twoLocusDzJet_value, twoLocusDzObservable] <;> ring
+  have h24 :
+      (state deme).linkage *
+          (if deme = second then (state first).leftContrast else 0) *
+          (if deme = fourth then (state third).rightContrast else 0) / 4 =
+        (if second = fourth then
+          if second = deme then (twoLocusDzJet second first third).value state / 4 else 0
+          else 0) := by
+    by_cases hsecond : deme = second <;> by_cases hfourth : deme = fourth <;>
+      simp_all [eq_comm, twoLocusDzJet_value, twoLocusDzObservable] <;> ring
+  have hcross :
+      (state deme).linkage *
+          ((if deme = first then (state second).leftContrast else 0) +
+            (if deme = second then (state first).leftContrast else 0)) *
+          ((if deme = third then (state fourth).rightContrast else 0) +
+            (if deme = fourth then (state third).rightContrast else 0)) / 4 =
+        (if first = third then
+          if first = deme then (twoLocusDzJet first second fourth).value state / 4 else 0
+          else 0) +
+        (if first = fourth then
+          if first = deme then (twoLocusDzJet first second third).value state / 4 else 0
+          else 0) +
+        (if second = third then
+          if second = deme then (twoLocusDzJet second first fourth).value state / 4 else 0
+          else 0) +
+        (if second = fourth then
+          if second = deme then (twoLocusDzJet second first third).value state / 4 else 0
+          else 0) := by
+    rw [← h13, ← h14, ← h23, ← h24]
+    ring
+  rw [twoLocusPi2Jet_driftAt]
+  simp only [sub_eq_add_neg]
+  rw [hleftLoss, hrightLoss, hcross]
+  ring
+
 /-- The exact diffusion jet selected by any coordinate of the closed low-order family. -/
 noncomputable def twoLocusCoordinateJet {D : ℕ} :
     LowOrderLDCoordinate D → TwoLocusDiffusionJet D
@@ -2648,6 +2754,18 @@ private theorem sum_mul_demeIndicator {D : ℕ}
     simp [Ne.symm hother]
   · simp
 
+/-- Conditional version of `sum_mul_demeIndicator`. -/
+private theorem sum_mul_conditionalDemeIndicator {D : ℕ}
+    (weight : Fin D → ℝ) (condition : Prop) [Decidable condition]
+    (index : Fin D) (value : ℝ) :
+    (∑ deme, weight deme *
+      (if condition then if index = deme then value else 0 else 0)) =
+      if condition then weight index * value else 0 := by
+  by_cases hcondition : condition
+  · simp only [hcondition, if_true]
+    exact sum_mul_demeIndicator weight index value
+  · simp [hcondition]
+
 /-- The `H` row of the abstract low-order drift generator is exactly the weighted sum of
 the local haplotype-simplex diffusion jets. -/
 theorem twoLocusWeightedJetDrift_H_eq_lowOrderLDDrift {D : ℕ}
@@ -2793,6 +2911,40 @@ theorem twoLocusWeightedJetDrift_Dz_eq_lowOrderLDDrift {D : ℕ}
         rw [sum_mul_demeIndicator]
         simp [lowOrderLDDrift, twoLocusJetMoment, twoLocusCoordinateJet,
           h12, h13, h23]
+
+/-- Sparse six-channel form of the total `pi2` drift at arbitrary deme-specific
+coalescence rates. -/
+theorem twoLocusWeightedJetDrift_pi2_sparse {D : ℕ}
+    (rates : ManyDemeLDRates D)
+    (state : Fin D → TwoLocusHaplotypeFrequencies)
+    (first second third fourth : Fin D) :
+    twoLocusWeightedJetDrift rates.coalescence state
+        (.pi2 first second third fourth) =
+      (if first = second then
+        -rates.coalescence first *
+          (twoLocusPi2Jet first second third fourth).value state else 0) +
+      (if third = fourth then
+        -rates.coalescence third *
+          (twoLocusPi2Jet first second third fourth).value state else 0) +
+      (if first = third then
+        rates.coalescence first * (twoLocusDzJet first second fourth).value state / 4
+        else 0) +
+      (if first = fourth then
+        rates.coalescence first * (twoLocusDzJet first second third).value state / 4
+        else 0) +
+      (if second = third then
+        rates.coalescence second * (twoLocusDzJet second first fourth).value state / 4
+        else 0) +
+      (if second = fourth then
+        rates.coalescence second * (twoLocusDzJet second first third).value state / 4
+        else 0) := by
+  classical
+  simp only [twoLocusWeightedJetDrift, twoLocusCoordinateJet,
+    twoLocusPi2Jet_driftAt_sparse, mul_add, Finset.sum_add_distrib]
+  rw [sum_mul_conditionalDemeIndicator, sum_mul_conditionalDemeIndicator,
+    sum_mul_conditionalDemeIndicator, sum_mul_conditionalDemeIndicator,
+    sum_mul_conditionalDemeIndicator, sum_mul_conditionalDemeIndicator]
+  split_ifs <;> ring
 
 /-- Continuous migration contribution.  Each lineage index migrates separately.  The extra
 `Dz` and `pi2` differences are exactly the terms created because `D` is nonlinear in
