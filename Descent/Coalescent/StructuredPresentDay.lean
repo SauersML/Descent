@@ -1145,6 +1145,18 @@ def decrementExponent {D : ℕ} (exponent : Fin D → ℕ) (deme : Fin D) : Fin 
 def incrementExponent {D : ℕ} (exponent : Fin D → ℕ) (deme : Fin D) : Fin D → ℕ :=
   fun d ↦ if d = deme then exponent d + 1 else exponent d
 
+/-- Raising the coordinate just lowered recovers the original exponent whenever that
+coordinate was positive. -/
+theorem incrementExponent_decrementExponent {D : ℕ} (exponent : Fin D → ℕ)
+    (deme : Fin D) (positive : 0 < exponent deme) :
+    incrementExponent (decrementExponent exponent deme) deme = exponent := by
+  funext d
+  by_cases equal : d = deme
+  · subst d
+    simp [incrementExponent, decrementExponent]
+    omega
+  · simp [incrementExponent, decrementExponent, equal]
+
 /-- Raising one exponent raises its total degree by exactly one. -/
 theorem sum_incrementExponent {D : ℕ} (exponent : Fin D → ℕ) (deme : Fin D) :
     ∑ d, incrementExponent exponent deme d = (∑ d, exponent d) + 1 := by
@@ -1436,6 +1448,23 @@ theorem complement_mul_manyDemeBernsteinWeight_eq_incrementAncestral {D : ℕ}
     simp [incrementExponent, hne]
   rw [hrest]
   simp only [incrementExponent, if_pos, pow_succ]
+  ring
+
+/-- Adding one ancestral label is exactly subtraction of the same basis element with one
+additional derived label.  This is the multivariate polynomial identity
+`B(d,a+eᵢ) = B(d,a) - B(d+eᵢ,a)` and does not require a frequency-domain assumption. -/
+theorem manyDemeBernsteinPolynomial_incrementAncestral {D : ℕ}
+    (derived ancestral : Fin D → ℕ) (deme : Fin D) :
+    manyDemeBernsteinPolynomial derived (incrementExponent ancestral deme) =
+      manyDemeBernsteinPolynomial derived ancestral -
+        manyDemeBernsteinPolynomial (incrementExponent derived deme) ancestral := by
+  apply MvPolynomial.funext
+  intro frequency
+  simp only [map_sub, eval_manyDemeBernsteinPolynomial]
+  rw [← complement_mul_manyDemeBernsteinWeight_eq_incrementAncestral frequency
+    derived ancestral deme,
+    ← frequency_mul_manyDemeBernsteinWeight_eq_incrementDerived frequency
+      derived ancestral deme]
   ring
 
 /-- Moving one positive count between distinct demes is decrement followed by increment. -/

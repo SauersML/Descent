@@ -176,9 +176,12 @@ prevent that construction:
   `matrixExponential_apply_nonneg_of_metzler` proves the exact matrix exponential is
   entrywise nonnegative; and
   `biologicalManyDemeKilledDualHistoryPropagator_nonneg` composes this with every deterministic
-  split.  The compact ancestral boundary and present positive representation are wired by
-  `presentBiologicalKilledDualState_eq_projection`; the pooled terminal is embedded without
-  padding and remains coefficientwise nonnegative; and
+  split.  `commonAncestorManyDemeBernsteinMoment` proves that the arbitrary-deme common-root
+  boundary collapses exactly to a one-dimensional beta--Bernstein moment;
+  `biologicalAncestralBernsteinProjection_nonneg` then proves its compact projection is
+  nonnegative, including the zero-mutation boundary.  The present positive representation is
+  wired by `presentBiologicalKilledDualState_eq_projection`; the pooled terminal is embedded
+  without padding and remains coefficientwise nonnegative; and
   `pooledMAFProbeMassViaPositiveDual` is the resulting public scalar evaluator for that whole
   compact path.  `pooledMAFProbeMassViaPositiveDual_eq` now proves this compact evaluator is
   exactly the older complete Cartesian `pooledMAFProbeMass` evaluator for every visible
@@ -335,6 +338,228 @@ noncomputable def symmetricBetaMoment (shape : ℝ) : ℕ → ℝ
       symmetricBetaMoment shape degree *
         (shape + degree) / (2 * shape + degree)
 
+/-- Real rising factorial `(shape)ₙ`, written as a finite product so its positivity and
+recurrences are available without a Gamma-function continuation. -/
+noncomputable def realRisingFactorial (shape : ℝ) (degree : ℕ) : ℝ :=
+  ∏ index ∈ Finset.range degree, (shape + index)
+
+@[simp] theorem realRisingFactorial_zero (shape : ℝ) :
+    realRisingFactorial shape 0 = 1 := by
+  simp [realRisingFactorial]
+
+theorem realRisingFactorial_succ (shape : ℝ) (degree : ℕ) :
+    realRisingFactorial shape (degree + 1) =
+      realRisingFactorial shape degree * (shape + degree) := by
+  simp [realRisingFactorial, Finset.prod_range_succ]
+
+theorem realRisingFactorial_pos {shape : ℝ} (shape_pos : 0 < shape) (degree : ℕ) :
+    0 < realRisingFactorial shape degree := by
+  unfold realRisingFactorial
+  positivity
+
+/-- For positive mutation shape, the recurrence defining the stationary beta moments is
+exactly the usual quotient `(shape)ₙ/(2 shape)ₙ`. -/
+theorem symmetricBetaMoment_eq_risingFactorialRatio {shape : ℝ}
+    (shape_pos : 0 < shape) (degree : ℕ) :
+    symmetricBetaMoment shape degree =
+      realRisingFactorial shape degree / realRisingFactorial (2 * shape) degree := by
+  induction degree with
+  | zero => simp [symmetricBetaMoment]
+  | succ degree induction =>
+      rw [symmetricBetaMoment, induction,
+        realRisingFactorial_succ, realRisingFactorial_succ]
+      have denominator_pos : 0 < realRisingFactorial (2 * shape) degree :=
+        realRisingFactorial_pos (by positivity) degree
+      have next_pos : 0 < 2 * shape + degree := by positivity
+      field_simp [ne_of_gt denominator_pos, ne_of_gt next_pos]
+
+/-- One-dimensional Bernstein moment induced by the stationary moment recurrence.  The
+ancestral exponent recursion is the polynomial identity
+`x^d(1-x)^(a+1) = x^d(1-x)^a - x^(d+1)(1-x)^a`. -/
+noncomputable def symmetricBetaBernsteinMoment (shape : ℝ) (derived : ℕ) : ℕ → ℝ
+  | 0 => symmetricBetaMoment shape derived
+  | ancestral + 1 =>
+      symmetricBetaBernsteinMoment shape derived ancestral -
+        symmetricBetaBernsteinMoment shape (derived + 1) ancestral
+
+@[simp] theorem symmetricBetaBernsteinMoment_succ (shape : ℝ)
+    (derived ancestral : ℕ) :
+    symmetricBetaBernsteinMoment shape derived (ancestral + 1) =
+      symmetricBetaBernsteinMoment shape derived ancestral -
+        symmetricBetaBernsteinMoment shape (derived + 1) ancestral := rfl
+
+/-- Closed positive quotient for a stationary beta Bernstein moment. -/
+noncomputable def symmetricBetaBernsteinClosedForm
+    (shape : ℝ) (derived ancestral : ℕ) : ℝ :=
+  realRisingFactorial shape derived * realRisingFactorial shape ancestral /
+    realRisingFactorial (2 * shape) (derived + ancestral)
+
+/-- The closed beta-Bernstein quotient obeys the same complement recursion as the
+Bernstein polynomial itself. -/
+theorem symmetricBetaBernsteinClosedForm_succ {shape : ℝ} (shape_pos : 0 < shape)
+    (derived ancestral : ℕ) :
+    symmetricBetaBernsteinClosedForm shape derived (ancestral + 1) =
+      symmetricBetaBernsteinClosedForm shape derived ancestral -
+        symmetricBetaBernsteinClosedForm shape (derived + 1) ancestral := by
+  unfold symmetricBetaBernsteinClosedForm
+  rw [realRisingFactorial_succ shape ancestral,
+    realRisingFactorial_succ shape derived]
+  rw [show derived + (ancestral + 1) = derived + ancestral + 1 by omega,
+    show derived + 1 + ancestral = derived + ancestral + 1 by omega,
+    realRisingFactorial_succ (2 * shape) (derived + ancestral)]
+  have denominator_pos : 0 < realRisingFactorial (2 * shape) (derived + ancestral) :=
+    realRisingFactorial_pos (by positivity) _
+  have next_pos : 0 < 2 * shape + (derived + ancestral) := by positivity
+  field_simp [ne_of_gt denominator_pos, ne_of_gt next_pos]
+  norm_num [Nat.cast_add]
+  ring
+
+/-- Exact positive-shape beta-Bernstein law. -/
+theorem symmetricBetaBernsteinMoment_eq_closedForm {shape : ℝ}
+    (shape_pos : 0 < shape) (derived ancestral : ℕ) :
+    symmetricBetaBernsteinMoment shape derived ancestral =
+      symmetricBetaBernsteinClosedForm shape derived ancestral := by
+  induction ancestral generalizing derived with
+  | zero =>
+      rw [symmetricBetaBernsteinMoment,
+        symmetricBetaMoment_eq_risingFactorialRatio shape_pos]
+      simp [symmetricBetaBernsteinClosedForm]
+  | succ ancestral induction =>
+      rw [symmetricBetaBernsteinMoment, induction derived, induction (derived + 1),
+        ← symmetricBetaBernsteinClosedForm_succ shape_pos]
+
+/-- At zero mutation the recurrence is exactly the point mass at ancestral frequency zero. -/
+theorem symmetricBetaMoment_zero_shape (degree : ℕ) :
+    symmetricBetaMoment 0 degree = if degree = 0 then 1 else 0 := by
+  induction degree with
+  | zero => simp [symmetricBetaMoment]
+  | succ degree induction => simp [symmetricBetaMoment, induction]
+
+/-- Consequently, every zero-mutation Bernstein moment is one precisely when no derived
+lineage is requested, and zero otherwise. -/
+theorem symmetricBetaBernsteinMoment_zero_shape (derived ancestral : ℕ) :
+    symmetricBetaBernsteinMoment 0 derived ancestral = if derived = 0 then 1 else 0 := by
+  induction ancestral generalizing derived with
+  | zero => simp [symmetricBetaBernsteinMoment, symmetricBetaMoment_zero_shape]
+  | succ ancestral induction =>
+      rw [symmetricBetaBernsteinMoment, induction derived, induction (derived + 1)]
+      by_cases derived_zero : derived = 0
+      · subst derived
+        norm_num
+      · simp [derived_zero]
+
+/-- Every stationary beta Bernstein moment is nonnegative throughout the visible physical
+domain, including the zero-mutation boundary. -/
+theorem symmetricBetaBernsteinMoment_nonneg {shape : ℝ} (shape_nonneg : 0 ≤ shape)
+    (derived ancestral : ℕ) :
+    0 ≤ symmetricBetaBernsteinMoment shape derived ancestral := by
+  rcases eq_or_lt_of_le shape_nonneg with shape_zero | shape_pos
+  · subst shape
+    rw [symmetricBetaBernsteinMoment_zero_shape]
+    split_ifs <;> norm_num
+  · rw [symmetricBetaBernsteinMoment_eq_closedForm shape_pos]
+    unfold symmetricBetaBernsteinClosedForm
+    exact div_nonneg
+      (mul_nonneg (realRisingFactorial_pos shape_pos _).le
+        (realRisingFactorial_pos shape_pos _).le)
+      (realRisingFactorial_pos (by positivity) _).le
+
+/-- If every deme shares one ancestral frequency, applying its mixed-moment table to a
+multivariate Bernstein polynomial depends only on the two total lineage counts.  Thus the
+arbitrary-deme ancestral boundary is exactly the one-dimensional beta-Bernstein law, rather
+than a product or closure approximation. -/
+theorem commonAncestorManyDemeBernsteinMoment {D : ℕ} (shape : ℝ)
+    (derived ancestral : Fin D → ℕ) :
+    Coalescent.manyDemePolynomialMomentFunctional
+        (fun exponent ↦ symmetricBetaMoment shape (∑ deme, exponent deme))
+        (Coalescent.manyDemeBernsteinPolynomial derived ancestral) =
+      symmetricBetaBernsteinMoment shape (∑ deme, derived deme)
+        (∑ deme, ancestral deme) := by
+  classical
+  let P : ℕ → Prop := fun total ↦
+    ∀ (derived ancestral : Fin D → ℕ), (∑ deme, ancestral deme) = total →
+      Coalescent.manyDemePolynomialMomentFunctional
+          (fun exponent ↦ symmetricBetaMoment shape (∑ deme, exponent deme))
+          (Coalescent.manyDemeBernsteinPolynomial derived ancestral) =
+        symmetricBetaBernsteinMoment shape (∑ deme, derived deme)
+          (∑ deme, ancestral deme)
+  have allTotals : ∀ total, P total := by
+    intro total
+    induction total using Nat.strong_induction_on with
+    | h total induction =>
+        dsimp only [P]
+        intro currentDerived currentAncestral total_eq
+        by_cases total_zero : total = 0
+        · have ancestral_zero : currentAncestral = fun _ ↦ 0 := by
+            funext deme
+            have component_le : currentAncestral deme ≤ ∑ d, currentAncestral d :=
+              Finset.single_le_sum (fun d _ ↦ Nat.zero_le (currentAncestral d))
+                (Finset.mem_univ deme)
+            omega
+          subst currentAncestral
+          simp [Coalescent.manyDemePolynomialMomentFunctional_zeroAncestral,
+            symmetricBetaBernsteinMoment]
+        · have total_pos : 0 < total := Nat.pos_of_ne_zero total_zero
+          have exists_positive : ∃ deme, 0 < currentAncestral deme := by
+            by_contra none_positive
+            push_neg at none_positive
+            have all_zero : ∀ deme, currentAncestral deme = 0 := fun deme ↦
+              Nat.eq_zero_of_le_zero (none_positive deme)
+            have : (∑ deme, currentAncestral deme) = 0 := by simp [all_zero]
+            omega
+          obtain ⟨deme, positive⟩ := exists_positive
+          let previousAncestral := Coalescent.decrementExponent currentAncestral deme
+          have restored : Coalescent.incrementExponent previousAncestral deme =
+              currentAncestral := by
+            exact Coalescent.incrementExponent_decrementExponent currentAncestral deme positive
+          have previous_sum : (∑ d, previousAncestral d) =
+              (∑ d, currentAncestral d) - 1 := by
+            exact Coalescent.sum_decrementExponent currentAncestral deme positive
+          have previous_lt : (∑ d, previousAncestral d) < total := by omega
+          have left_induction := induction _ previous_lt currentDerived previousAncestral rfl
+          have right_induction := induction _ previous_lt
+            (Coalescent.incrementExponent currentDerived deme) previousAncestral rfl
+          calc
+            Coalescent.manyDemePolynomialMomentFunctional
+                (fun exponent ↦ symmetricBetaMoment shape (∑ d, exponent d))
+                (Coalescent.manyDemeBernsteinPolynomial currentDerived currentAncestral) =
+              Coalescent.manyDemePolynomialMomentFunctional
+                (fun exponent ↦ symmetricBetaMoment shape (∑ d, exponent d))
+                (Coalescent.manyDemeBernsteinPolynomial currentDerived previousAncestral -
+                  Coalescent.manyDemeBernsteinPolynomial
+                    (Coalescent.incrementExponent currentDerived deme)
+                    previousAncestral) := by
+                      rw [← restored,
+                        Coalescent.manyDemeBernsteinPolynomial_incrementAncestral]
+            _ = Coalescent.manyDemePolynomialMomentFunctional
+                  (fun exponent ↦ symmetricBetaMoment shape (∑ d, exponent d))
+                  (Coalescent.manyDemeBernsteinPolynomial currentDerived previousAncestral) -
+                Coalescent.manyDemePolynomialMomentFunctional
+                  (fun exponent ↦ symmetricBetaMoment shape (∑ d, exponent d))
+                  (Coalescent.manyDemeBernsteinPolynomial
+                    (Coalescent.incrementExponent currentDerived deme)
+                    previousAncestral) := by
+                      change Coalescent.manyDemePolynomialMomentLinearMap _ (_ - _) =
+                        Coalescent.manyDemePolynomialMomentLinearMap _ _ -
+                          Coalescent.manyDemePolynomialMomentLinearMap _ _
+                      rw [map_sub]
+            _ = symmetricBetaBernsteinMoment shape (∑ d, currentDerived d)
+                  (∑ d, previousAncestral d) -
+                symmetricBetaBernsteinMoment shape
+                  (∑ d, Coalescent.incrementExponent currentDerived deme d)
+                  (∑ d, previousAncestral d) := by
+                      rw [left_induction, right_induction]
+            _ = symmetricBetaBernsteinMoment shape (∑ d, currentDerived d)
+                  ((∑ d, previousAncestral d) + 1) := by
+                      rw [Coalescent.sum_incrementExponent]
+                      exact (symmetricBetaBernsteinMoment_succ shape
+                        (∑ d, currentDerived d) (∑ d, previousAncestral d)).symm
+            _ = symmetricBetaBernsteinMoment shape (∑ d, currentDerived d)
+                  (∑ d, currentAncestral d) := by
+                      congr 2
+                      omega
+  exact allTotals _ derived ancestral rfl
+
 /-- The heterozygosity of the symmetric-beta boundary is exactly the recurrent-biallelic
 one-deme `H` boundary used by the two-locus operator.  This is a first-principles bridge
 between the marginal ascertainment and linkage systems, including the zero-mutation edge. -/
@@ -368,6 +593,16 @@ symmetric-beta stationary law is the boundary assumption named at `ancestralLDRa
 noncomputable def PipelineDemographicHistory.ancestralMutationShape
     {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) : ℝ :=
   4 * history.initialEffectiveSize history.ancestralDeme * history.initialMutationRate
+
+/-- The ancestral beta shape lies in its physical nonnegative domain for every typed visible
+history. -/
+theorem PipelineDemographicHistory.ancestralMutationShape_nonneg
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) :
+    0 ≤ history.ancestralMutationShape := by
+  unfold PipelineDemographicHistory.ancestralMutationShape
+  exact mul_nonneg
+    (mul_nonneg (by norm_num) (history.initialEffectiveSize_pos history.ancestralDeme).le)
+    history.initialMutationRate_nonneg
 
 /-- The ancestral one-locus moments are derived from the history's own root size and mutation
 rate; they are not an additional caller-supplied completion.
@@ -885,6 +1120,65 @@ noncomputable def PipelineDemographicHistory.biologicalAncestralMomentState
   | none => 1
   | some coordinate => history.ancestralMoment coordinate.coordinate.degree
 
+/-- Synthesizing the compact common-ancestor state recovers the mixed moment determined only
+by total degree, throughout the represented degree range. -/
+theorem PipelineDemographicHistory.biologicalAncestralMomentSynthesis
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) (K : ℕ)
+    (exponent : Fin demeCount → ℕ) (degree_le : (∑ deme, exponent deme) ≤ K) :
+    Coalescent.biologicalManyDemeMomentSynthesis
+        (history.biologicalAncestralMomentState K) exponent =
+      history.ancestralMoment (∑ deme, exponent deme) := by
+  classical
+  by_cases degree_zero : (∑ deme, exponent deme) = 0
+  · have exponent_zero : exponent = fun _ ↦ 0 := by
+      funext deme
+      have component_le : exponent deme ≤ ∑ d, exponent d :=
+        Finset.single_le_sum (fun d _ ↦ Nat.zero_le (exponent d))
+          (Finset.mem_univ deme)
+      omega
+    subst exponent
+    rw [Coalescent.biologicalManyDemeMomentSynthesis_zero]
+    simp [PipelineDemographicHistory.biologicalAncestralMomentState,
+      PipelineDemographicHistory.ancestralMoment_zero]
+  · have degree_pos : 0 < ∑ deme, exponent deme := Nat.pos_of_ne_zero degree_zero
+    rw [Coalescent.biologicalManyDemeMomentSynthesis_positive _ exponent degree_pos degree_le]
+    rfl
+
+/-- The projected common-ancestor state is a genuine nonnegative Bernstein measure for every
+compact arbitrary-deme lineage coordinate.  This discharges the final hypothesis previously
+required by the positive killed-dual history theorem. -/
+theorem PipelineDemographicHistory.biologicalAncestralBernsteinProjection_nonneg
+    {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) (K : ℕ)
+    (coordinate : Coalescent.BiologicalManyDemeKilledDualCoordinate demeCount K) :
+    0 ≤ (Coalescent.biologicalManyDemeBernsteinMomentProjection demeCount K).mulVec
+      (history.biologicalAncestralMomentState K) coordinate := by
+  let derived : Fin demeCount → ℕ :=
+    fun deme ↦ (coordinate.coordinate.1 deme).val
+  let ancestral : Fin demeCount → ℕ :=
+    fun deme ↦ (coordinate.coordinate.2 deme).val
+  rw [Coalescent.biologicalManyDemeBernsteinMomentProjection_mulVec]
+  change 0 ≤ Coalescent.manyDemePolynomialMomentFunctional
+    (Coalescent.biologicalManyDemeMomentSynthesis
+      (history.biologicalAncestralMomentState K))
+    (Coalescent.manyDemeBernsteinPolynomial derived ancestral)
+  have polynomial_degree :
+      (Coalescent.manyDemeBernsteinPolynomial derived ancestral).totalDegree ≤ K :=
+    (Coalescent.manyDemeBernsteinPolynomial_totalDegree_le derived ancestral).trans (by
+      exact coordinate.degree_le)
+  rw [Coalescent.manyDemePolynomialMomentFunctional_congr_of_totalDegree_le
+    (Coalescent.biologicalManyDemeMomentSynthesis
+      (history.biologicalAncestralMomentState K))
+    (fun exponent ↦ history.ancestralMoment (∑ deme, exponent deme))
+    (Coalescent.manyDemeBernsteinPolynomial derived ancestral) polynomial_degree
+    (fun exponent degree_le ↦ history.biologicalAncestralMomentSynthesis K exponent degree_le)]
+  change 0 ≤ Coalescent.manyDemePolynomialMomentFunctional
+    (fun exponent ↦ symmetricBetaMoment history.ancestralMutationShape
+      (∑ deme, exponent deme))
+    (Coalescent.manyDemeBernsteinPolynomial derived ancestral)
+  rw [commonAncestorManyDemeBernsteinMoment]
+  exact symmetricBetaBernsteinMoment_nonneg
+    history.ancestralMutationShape_nonneg _ _
+
 /-- The compact ancestral boundary zero-pads to exactly the established rectangular ancestral
 boundary, including its explicit constant and all nonbiological padding coordinates. -/
 theorem PipelineDemographicHistory.extend_biologicalAncestralMomentState
@@ -921,20 +1215,17 @@ noncomputable def PipelineDemographicHistory.presentBiologicalKilledDualState
       ((Coalescent.biologicalManyDemeBernsteinMomentProjection demeCount K).mulVec
         (history.biologicalAncestralMomentState K))
 
-/-- Once the stationary ancestral Bernstein boundary is shown nonnegative, exact positivity
-of the compact arbitrary-history state follows from the derived killed-dual semigroup.  The
-hypothesis isolates the ancestral boundary obligation; no per-epoch or per-split positivity
-assumption remains. -/
+/-- Exact positivity of the compact arbitrary-history state.  The stationary ancestral
+Bernstein boundary and every demographic epoch and split are all proved nonnegative from the
+typed visible history, so this theorem has no residual analytic hypothesis. -/
 theorem PipelineDemographicHistory.presentBiologicalKilledDualState_nonneg
     {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) (K : ℕ)
-    (ancestral_nonneg : ∀ coordinate, 0 ≤
-      (Coalescent.biologicalManyDemeBernsteinMomentProjection demeCount K).mulVec
-        (history.biologicalAncestralMomentState K) coordinate)
     (coordinate : Coalescent.BiologicalManyDemeKilledDualCoordinate demeCount K) :
     0 ≤ history.presentBiologicalKilledDualState K coordinate := by
   unfold PipelineDemographicHistory.presentBiologicalKilledDualState
   exact Coalescent.biologicalManyDemeKilledDualHistoryPropagator_mulVec_nonneg
-    (history.biologicalMomentInstructions K) _ ancestral_nonneg coordinate
+    (history.biologicalMomentInstructions K) _
+      (history.biologicalAncestralBernsteinProjection_nonneg K) coordinate
 
 /-- The compact positive-dual present state is exactly the Bernstein projection of the compact
 forward moment state for every visible history and degree. -/
@@ -1797,19 +2088,13 @@ noncomputable def PipelineDemographicHistory.pooledMAFProbeMassViaPositiveDual
   pooledMAFBiologicalKilledDualTerminalVector sampleSize threshold probeExponent ⬝ᵥ
     history.presentBiologicalKilledDualState K
 
-/-- The exact compact pooled-MAF evaluator is nonnegative whenever its single ancestral
-Bernstein boundary is nonnegative.  All demographic propagation and terminal sampling
-coefficients have already been proved nonnegative. -/
+/-- The exact compact pooled-MAF evaluator is unconditionally nonnegative on every typed
+visible history.  Ancestral projection, demographic propagation, and terminal sampling
+coefficients are each proved nonnegative. -/
 theorem PipelineDemographicHistory.pooledMAFProbeMassViaPositiveDual_nonneg
     {demeCount : ℕ} (history : PipelineDemographicHistory demeCount)
     (sampleSize : Fin demeCount → ℕ) (threshold : PooledMAFThreshold)
-    (probeExponent : Fin demeCount → ℕ)
-    (ancestral_nonneg : ∀ coordinate, 0 ≤
-      (Coalescent.biologicalManyDemeBernsteinMomentProjection demeCount
-        (manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent)).mulVec
-          (history.biologicalAncestralMomentState
-            (manyDemeTotalSampleSize sampleSize + manyDemeExponentDegree probeExponent))
-          coordinate) :
+    (probeExponent : Fin demeCount → ℕ) :
     0 ≤ history.pooledMAFProbeMassViaPositiveDual sampleSize threshold probeExponent := by
   unfold PipelineDemographicHistory.pooledMAFProbeMassViaPositiveDual
   dsimp only
@@ -1817,7 +2102,7 @@ theorem PipelineDemographicHistory.pooledMAFProbeMassViaPositiveDual_nonneg
   exact Finset.sum_nonneg fun coordinate _ ↦ mul_nonneg
     (pooledMAFBiologicalKilledDualTerminalVector_nonneg
       sampleSize threshold probeExponent coordinate)
-    (history.presentBiologicalKilledDualState_nonneg _ ancestral_nonneg coordinate)
+    (history.presentBiologicalKilledDualState_nonneg _ coordinate)
 
 /-- The compact positive-dual pooled evaluator is exactly the Bernstein projection of the
 compact present moment state. -/
