@@ -3446,6 +3446,30 @@ noncomputable def biologicalManyDemeMomentHistoryPropagator {D K : ℕ} :
   | instruction :: remaining =>
       biologicalManyDemeMomentHistoryPropagator remaining * instruction.momentPropagator
 
+/-- Execute a compact moment history directly in forward order. -/
+noncomputable def propagateBiologicalManyDemeMomentInstructions {D K : ℕ} :
+    List (BiologicalManyDemeInstruction D K) →
+      (BiologicalManyDemeMomentCoordinate D K → ℝ) →
+        BiologicalManyDemeMomentCoordinate D K → ℝ
+  | [], initial => initial
+  | instruction :: remaining, initial =>
+      propagateBiologicalManyDemeMomentInstructions remaining
+        (instruction.momentPropagator.mulVec initial)
+
+/-- Direct compact forward execution equals the ordered compact moment matrix product. -/
+theorem biologicalManyDemeMomentHistoryPropagator_mulVec {D K : ℕ}
+    (instructions : List (BiologicalManyDemeInstruction D K))
+    (initial : BiologicalManyDemeMomentCoordinate D K → ℝ) :
+    (biologicalManyDemeMomentHistoryPropagator instructions).mulVec initial =
+      propagateBiologicalManyDemeMomentInstructions instructions initial := by
+  induction instructions generalizing initial with
+  | nil => simp [biologicalManyDemeMomentHistoryPropagator,
+      propagateBiologicalManyDemeMomentInstructions]
+  | cons instruction remaining induction =>
+      rw [biologicalManyDemeMomentHistoryPropagator, ← Matrix.mulVec_mulVec,
+        induction]
+      rfl
+
 /-- Ordered compact killed-dual product corresponding to the same forward history. -/
 noncomputable def biologicalManyDemeKilledDualHistoryPropagator {D K : ℕ} :
     List (BiologicalManyDemeInstruction D K) →
@@ -3454,6 +3478,18 @@ noncomputable def biologicalManyDemeKilledDualHistoryPropagator {D K : ℕ} :
   | [] => 1
   | instruction :: remaining =>
       biologicalManyDemeKilledDualHistoryPropagator remaining * instruction.killedPropagator
+
+/-- Complete compact positive-dual history applied to a projected ancestral moment state is
+identical to projecting the exact forward compact moment history. -/
+theorem biologicalManyDemeHistory_projectedState {D K : ℕ}
+    (instructions : List (BiologicalManyDemeInstruction D K))
+    (initial : BiologicalManyDemeMomentCoordinate D K → ℝ) :
+    (biologicalManyDemeBernsteinMomentProjection D K).mulVec
+        ((biologicalManyDemeMomentHistoryPropagator instructions).mulVec initial) =
+      (biologicalManyDemeKilledDualHistoryPropagator instructions).mulVec
+        ((biologicalManyDemeBernsteinMomentProjection D K).mulVec initial) := by
+  rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec,
+    biologicalManyDemeBernsteinMomentProjection_history_intertwines]
 
 /-- **Exact history-wide positive duality.**  The single compact Bernstein projection
 intertwines every finite ordered sequence of arbitrary migration epochs and population splits. -/
