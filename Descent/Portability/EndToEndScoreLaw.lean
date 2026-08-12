@@ -121,10 +121,13 @@ prevent that construction:
   finite-panel inputs.  `pooledMAFTerminalProbe` now combines those count cells into one
   terminal Bernstein vector, and `pooledMAFProbeMass_samplingDual` proves that its backward
   propagation through every transposed epoch and sparse split equals the direct Cartesian
-  law.  The exact operator specialization is therefore formalized.  What remains is a sparse
-  certified numerical implementation with proved truncation/roundoff control that can exploit
-  it at the executable's 13,750-individual / 27,500-haplotype grid2d scale, followed by the
-  filed end-to-end cohort validation gate;
+  law.  The exact operator specialization is therefore formalized.
+  `Coalescent.matrixExponential_partialSum_mulVec_error_le` also supplies a rigorous convergent
+  Taylor-tail certificate for finite backward propagation.  What remains is a sparse
+  executable implementation that exploits the operator without materializing the Cartesian
+  carrier, adds certified floating-point/interval roundoff control, and runs at the
+  executable's 13,750-individual / 27,500-haplotype grid2d scale, followed by the filed
+  end-to-end cohort validation gate;
 * the executable protocol is not yet a function of exactly this visible input type.
   `gnomon/sims/ancestry_calibration/gen_real_pt.py` accepts only its hard-coded `serial1d` and
   `grid2d` constructors rather than an arbitrary event history, hard-codes 250 evaluation
@@ -914,7 +917,7 @@ exponential; no closure or fitted attenuation enters. -/
 noncomputable def PipelineDemographicHistory.oneLocusMoment
     {demeCount : ℕ} (history : PipelineDemographicHistory demeCount) (K : ℕ)
     (exponent : Fin demeCount → ℕ) : ℝ :=
-  if hzero : ∀ deme, exponent deme = 0 then 1
+  if ∀ deme, exponent deme = 0 then 1
   else
     Coalescent.manyDemeMomentVectorTable K
       (fun coordinate ↦ history.presentMomentState K (some coordinate)) exponent

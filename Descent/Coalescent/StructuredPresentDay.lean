@@ -16,7 +16,8 @@ namespace Descent
 
 namespace Coalescent
 
-open MeasureTheory
+open MeasureTheory Filter Topology
+open scoped Matrix.Norms.Operator
 
 /-!
 # The structured present-day law
@@ -385,6 +386,21 @@ noncomputable def matrixExponential {ι : Type*} [Fintype ι] [DecidableEq ι]
     (A : Matrix ι ι ℝ) (time : ℝ) : Matrix ι ι ℝ :=
   ∑' power : ℕ, ((power.factorial : ℝ)⁻¹) • ((time • A) ^ power)
 
+/-- Finite Taylor evaluation of the exact matrix exponential, through powers
+`0, ..., terms - 1`. -/
+noncomputable def matrixExponentialPartialSum {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : Matrix ι ι ℝ) (time : ℝ) (terms : ℕ) : Matrix ι ι ℝ :=
+  ∑ power ∈ Finset.range terms,
+    ((power.factorial : ℝ)⁻¹) • ((time • A) ^ power)
+
+/-- Exact operator-norm tail certificate for a finite Taylor evaluation.  It is a convergent
+nonnegative scalar series and can itself be enclosed to any desired precision. -/
+noncomputable def matrixExponentialTailBound {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : Matrix ι ι ℝ) (time : ℝ) (terms : ℕ) : ℝ :=
+  ∑' offset : ℕ,
+    ‖(((offset + terms).factorial : ℝ)⁻¹) •
+      ((time • A) ^ (offset + terms))‖
+
 /-- Transposition commutes exactly with the custom matrix exponential.  This is the
 algebraic step that turns forward moment propagation into the backward sampling dual; it
 uses the complete convergent series, not a time discretization or a truncated ladder. -/
@@ -419,6 +435,84 @@ private theorem matrixExponentialSeries_summable
       ((power.factorial : ℝ)⁻¹) • ((time • A) ^ power)) := by
   open scoped Matrix.Norms.Operator in
     exact NormedSpace.expSeries_summable' (𝕂 := ℝ) (time • A)
+
+/-- Absolute summability of the norm series used by the certified Taylor tail. -/
+private theorem matrixExponentialSeries_norm_summable
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : Matrix ι ι ℝ) (time : ℝ) :
+    Summable (fun power : ℕ ↦
+      ‖((power.factorial : ℝ)⁻¹) • ((time • A) ^ power)‖) := by
+  exact NormedSpace.norm_expSeries_summable' (𝕂 := ℝ) (time • A)
+
+/-- Exact decomposition into the finite Taylor approximation plus its matrix-valued tail. -/
+theorem matrixExponential_eq_partialSum_add_tail
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : Matrix ι ι ℝ) (time : ℝ) (terms : ℕ) :
+    matrixExponential A time = matrixExponentialPartialSum A time terms +
+      ∑' offset : ℕ,
+        (((offset + terms).factorial : ℝ)⁻¹) •
+          ((time • A) ^ (offset + terms)) := by
+  exact (matrixExponentialSeries_summable A time).sum_add_tsum_nat_add terms |>.symm
+
+/-- The certified scalar tail is nonnegative. -/
+theorem matrixExponentialTailBound_nonneg
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : Matrix ι ι ℝ) (time : ℝ) (terms : ℕ) :
+    0 ≤ matrixExponentialTailBound A time terms := by
+  exact tsum_nonneg fun _ ↦ norm_nonneg _
+
+/-- The certified tail bound vanishes as the number of retained terms tends to infinity. -/
+theorem matrixExponentialTailBound_tendsto_zero
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : Matrix ι ι ℝ) (time : ℝ) :
+    Tendsto (fun terms ↦ matrixExponentialTailBound A time terms)
+      atTop (𝓝 0) := by
+  exact tendsto_sum_nat_add (fun power : ℕ ↦
+    ‖((power.factorial : ℝ)⁻¹) • ((time • A) ^ power)‖)
+
+/-- Finite Taylor matrices converge to the exact operator. -/
+theorem matrixExponentialPartialSum_tendsto
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : Matrix ι ι ℝ) (time : ℝ) :
+    Tendsto (fun terms ↦ matrixExponentialPartialSum A time terms)
+      atTop (𝓝 (matrixExponential A time)) := by
+  exact (matrixExponentialSeries_summable A time).hasSum.tendsto_sum_nat
+
+/-- Rigorous operator-norm error certificate for every finite Taylor evaluation.  Increasing
+`terms` changes only an explicit finite sum and the tail index; no unproved numerical
+tolerance or fitted stopping rule enters. -/
+theorem matrixExponential_partialSum_error_le_tailBound
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : Matrix ι ι ℝ) (time : ℝ) (terms : ℕ) :
+    ‖matrixExponential A time - matrixExponentialPartialSum A time terms‖ ≤
+      matrixExponentialTailBound A time terms := by
+  calc
+    _ = ‖∑' offset : ℕ,
+          (((offset + terms).factorial : ℝ)⁻¹) •
+            ((time • A) ^ (offset + terms))‖ := by
+      rw [matrixExponential_eq_partialSum_add_tail A time terms,
+        add_sub_cancel_left]
+    _ ≤ matrixExponentialTailBound A time terms := by
+      unfold matrixExponentialTailBound
+      apply norm_tsum_le_tsum_norm
+      exact (summable_nat_add_iff terms).2
+        (matrixExponentialSeries_norm_summable A time)
+
+/-- Certified error after applying the finite Taylor matrix to a probe or state vector.  This
+is the directly usable stopping bound for backward sparse propagation. -/
+theorem matrixExponential_partialSum_mulVec_error_le
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : Matrix ι ι ℝ) (time : ℝ) (terms : ℕ) (vector : ι → ℝ) :
+    ‖(matrixExponential A time).mulVec vector -
+        (matrixExponentialPartialSum A time terms).mulVec vector‖ ≤
+      matrixExponentialTailBound A time terms * ‖vector‖ := by
+  rw [← Matrix.sub_mulVec]
+  calc
+    _ ≤ ‖matrixExponential A time - matrixExponentialPartialSum A time terms‖ *
+        ‖vector‖ := Matrix.linfty_opNorm_mulVec _ _
+    _ ≤ matrixExponentialTailBound A time terms * ‖vector‖ :=
+      mul_le_mul_of_nonneg_right
+        (matrixExponential_partialSum_error_le_tailBound A time terms) (norm_nonneg _)
 
 /-- Generator intertwining propagates through every finite power.  The following theorem
 passes this identity through the absolutely convergent exponential series. -/
@@ -1121,8 +1215,7 @@ theorem splitManyDemeMomentPropagator_mulVec {D K : ℕ}
       by_cases hbound : ∀ d, merged d < K + 1
       · let column : ManyDemeMomentCoordinate D K := fun d ↦ ⟨merged d, hbound d⟩
         simp [Matrix.mulVec, dotProduct, splitManyDemeMomentPropagator,
-          splitManyDemeMomentState, manyDemeMomentVectorTable, merged, hbound,
-          column]
+          splitManyDemeMomentState, manyDemeMomentVectorTable, merged, hbound]
       · simp [Matrix.mulVec, dotProduct, splitManyDemeMomentPropagator,
           splitManyDemeMomentState, manyDemeMomentVectorTable, merged, hbound]
 
