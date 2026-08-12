@@ -599,7 +599,7 @@ theorem LowOrderLDEpoch.propagator_none {D : ℕ} (epoch : LowOrderLDEpoch D)
     epoch.propagator.mulVec state none = state none := by
   apply matrixExponential_mulVec_apply_of_row_zero
   intro column
-  rfl
+  exact epoch.constant_row column
 
 /-- A demographic instruction is continuous evolution or a derived instantaneous linear map.
 Splits, pulses, and admixture events are instances of `instantaneous`; none is replaced by a

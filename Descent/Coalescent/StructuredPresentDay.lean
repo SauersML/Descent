@@ -446,6 +446,13 @@ theorem matrixExponential_zero {ι : Type*} [Fintype ι] [DecidableEq ι]
   rw [tsum_eq_single 0 (by intro n hn; simp [zero_pow hn])]
   simp
 
+/-- The exponential of the zero generator is the identity at every elapsed time. -/
+theorem matrixExponential_zero_matrix {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (time : ℝ) : matrixExponential (0 : Matrix ι ι ℝ) time = 1 := by
+  unfold matrixExponential
+  rw [tsum_eq_single 0 (by intro n hn; simp [zero_pow hn])]
+  simp
+
 /-- A zero generator row is an exactly conserved coordinate of every matrix-exponential
 trajectory.  This is the finite-dimensional conservation law used below for augmented affine
 constants and for rectangular padding coordinates; it follows from a one-row intertwining,
@@ -462,9 +469,11 @@ theorem matrixExponential_mulVec_apply_of_row_zero
     simp [Matrix.mul_apply, select, hrow]
   have hsemigroup := matrixExponential_intertwines select A
     (0 : Matrix Unit Unit ℝ) hgenerator time
-  rw [matrixExponential_zero] at hsemigroup
+  rw [matrixExponential_zero_matrix] at hsemigroup
   have happ := congrArg (fun matrix ↦ matrix.mulVec state) hsemigroup
-  rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, Matrix.one_mulVec] at happ
+  change (select * matrixExponential A time).mulVec state =
+    ((1 : Matrix Unit Unit ℝ) * select).mulVec state at happ
+  rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, Matrix.one_mulVec] at happ
   have hcoordinate := congrFun happ ()
   simpa [Matrix.mulVec, dotProduct, select] using hcoordinate
 
@@ -926,6 +935,59 @@ def pairExponent {D : ℕ} (train target : Fin D) (i j : ℕ) : Fin D → ℕ :=
 all consumers use the same coordinate embedding. -/
 def oneDemeExponent {D : ℕ} (deme : Fin D) (degree : ℕ) : Fin D → ℕ :=
   fun other ↦ if other = deme then degree else 0
+
+private theorem sum_oneDemeExponent {D : ℕ} (deme : Fin D) (degree : ℕ) :
+    ∑ d, oneDemeExponent deme degree d = degree := by
+  classical
+  simp [oneDemeExponent]
+
+private theorem sum_pairExponent {D : ℕ} (first second : Fin D) (i j : ℕ) :
+    ∑ d, pairExponent first second i j d = i + j := by
+  classical
+  by_cases hsame : first = second
+  · subst second
+    simp [pairExponent]
+  · simp only [pairExponent, if_neg hsame]
+    calc
+      (∑ d, if d = first then i else if d = second then j else 0) =
+          (∑ d, if d = first then i else 0) +
+            ∑ d, if d = second then j else 0 := by
+        rw [← Finset.sum_add_distrib]
+        apply Finset.sum_congr rfl
+        intro d _
+        by_cases hfirst : d = first
+        · subst d
+          simp [hsame]
+        · simp [hfirst]
+      _ = i + j := by simp
+
+private theorem oneDemeExponent_lt_three {D : ℕ} (deme : Fin D) (degree : ℕ)
+    (hdegree : degree < 3) : ∀ d, oneDemeExponent deme degree d < 3 := by
+  intro d
+  simp only [oneDemeExponent]
+  split <;> omega
+
+private theorem pairExponent_one_one_lt_three {D : ℕ} (first second : Fin D) :
+    ∀ d, pairExponent first second 1 1 d < 3 := by
+  intro d
+  by_cases hsame : first = second
+  · subst second
+    by_cases hd : d = first <;> simp [pairExponent, hd]
+  · by_cases hfirst : d = first
+    · simp [pairExponent, hsame, hfirst]
+    · by_cases hsecond : d = second
+      · simp [pairExponent, hsame, hfirst, hsecond]
+      · simp [pairExponent, hsame, hfirst, hsecond]
+
+private theorem commonAncestorManyDemeMomentState_vectorTable
+    {D : ℕ} (ancestralMoment : ℕ → ℝ) (exponent : Fin D → ℕ)
+    (hrect : ∀ d, exponent d < 3) (hdegree_pos : 0 < ∑ d, exponent d)
+    (hdegree_le : ∑ d, exponent d ≤ 2) :
+    manyDemeMomentVectorTable 2
+        (fun coordinate ↦ commonAncestorManyDemeMomentState ancestralMoment (some coordinate))
+        exponent = ancestralMoment (∑ d, exponent d) := by
+  simp [manyDemeMomentVectorTable, hrect, commonAncestorManyDemeMomentState,
+    ManyDemeMomentCoordinate.degree, hdegree_pos, hdegree_le]
 
 /-- Pairwise allelic divergence read directly from a full mixed-moment table.
 
@@ -1627,16 +1689,20 @@ theorem manyDemePairDivergenceProjection_commonAncestor {D : ℕ}
         ManyDemeMomentCoordinate.degree]
   | some pair =>
       rcases pair with ⟨first, second⟩
-      by_cases hsame : first = second
-      · subst second
-        simp [momentPairDivergence, manyDemeMomentVectorTable,
-          commonAncestorManyDemeMomentState, ManyDemeMomentCoordinate.degree,
-          oneDemeExponent, pairExponent]
-        ring
-      · simp [momentPairDivergence, manyDemeMomentVectorTable,
-          commonAncestorManyDemeMomentState, ManyDemeMomentCoordinate.degree,
-          oneDemeExponent, pairExponent, hsame]
-        ring
+      have hfirst := commonAncestorManyDemeMomentState_vectorTable ancestralMoment
+        (oneDemeExponent first 1) (oneDemeExponent_lt_three first 1 (by omega))
+        (by simp [sum_oneDemeExponent]) (by simp [sum_oneDemeExponent])
+      have hsecond := commonAncestorManyDemeMomentState_vectorTable ancestralMoment
+        (oneDemeExponent second 1) (oneDemeExponent_lt_three second 1 (by omega))
+        (by simp [sum_oneDemeExponent]) (by simp [sum_oneDemeExponent])
+      have hpair := commonAncestorManyDemeMomentState_vectorTable ancestralMoment
+        (pairExponent first second 1 1) (pairExponent_one_one_lt_three first second)
+        (by simp [sum_pairExponent]) (by simp [sum_pairExponent])
+      simp only
+      unfold momentPairDivergence
+      rw [hfirst, hsecond, hpair]
+      simp only [sum_oneDemeExponent, sum_pairExponent]
+      ring
 
 /-- Moment table represented by one column of the constant-augmented degree-`K` system. -/
 noncomputable def manyDemeMomentAffineColumnTable {D K : ℕ}
@@ -1826,7 +1892,7 @@ private theorem mergeSplitExponent_oneDeme {D : ℕ} (parent child deme : Fin D)
   · subst d
     by_cases hdemeParent : deme = parent
     · subst deme
-      simp [mergeSplitExponent, oneDemeExponent, mergeSplitDemeLabel, hne]
+      simp [mergeSplitExponent, oneDemeExponent, mergeSplitDemeLabel, hne, hreverse]
     · by_cases hdemeChild : deme = child
       · subst deme
         simp [mergeSplitExponent, oneDemeExponent, mergeSplitDemeLabel, hne]
@@ -1856,9 +1922,14 @@ private theorem pairExponent_eq_oneDeme_add {D : ℕ} (first second : Fin D) :
   by_cases hsame : first = second
   · subst second
     by_cases hd : d = first <;> simp [pairExponent, oneDemeExponent, hd]
-  · by_cases hdFirst : d = first <;> by_cases hdSecond : d = second <;>
-      have hreverse : second ≠ first := fun h ↦ hsame h.symm
-      simp [pairExponent, oneDemeExponent, hsame, hreverse, hdFirst, hdSecond]
+  · have hreverse : second ≠ first := fun h ↦ hsame h.symm
+    by_cases hdFirst : d = first
+    · subst d
+      simp [pairExponent, oneDemeExponent, hsame, hreverse]
+    · by_cases hdSecond : d = second
+      · subst d
+        simp [pairExponent, oneDemeExponent, hsame, hreverse]
+      · simp [pairExponent, oneDemeExponent, hsame, hdFirst, hdSecond]
 
 private theorem mergeSplitExponent_add {D : ℕ} (parent child : Fin D)
     (hne : parent ≠ child) (left right : Fin D → ℕ) :
@@ -1868,7 +1939,7 @@ private theorem mergeSplitExponent_add {D : ℕ} (parent child : Fin D)
   have hreverse : child ≠ parent := fun h ↦ hne h.symm
   by_cases hdParent : d = parent
   · subst d
-    simp [mergeSplitExponent, hne]
+    simp [mergeSplitExponent, hne] <;> omega
   · by_cases hdChild : d = child
     · subst d
       simp [mergeSplitExponent, hreverse]

@@ -417,6 +417,17 @@ noncomputable def PipelineRateState.pairDivergenceGenerator {demeCount : ℕ}
   Coalescent.augmentedPairDivergenceGenerator rates.coalescence rates.migration
     (fun deme ↦ rates.forwardMutation deme + rates.backwardMutation deme)
 
+/-- The degree-two marginal compiler exposes the common pair-divergence generator by
+definition.  Naming the identity prevents downstream proofs from depending on reducibility
+of the rate carrier. -/
+theorem PipelineRateState.oneLocus_pairDivergenceGenerator_eq {demeCount : ℕ}
+    (state : PipelineRateState demeCount) (active : Fin demeCount → Bool) :
+    let rates := state.toManyDemeRates active
+    Coalescent.augmentedPairDivergenceGenerator rates.coalescence rates.migration
+        (fun deme ↦ rates.forwardMutation deme + rates.backwardMutation deme) =
+      state.pairDivergenceGenerator active := by
+  rfl
+
 /-- The `H` subsystem of the two-locus compiler uses exactly the common pair-divergence
 generator, including the factor of two converting symmetric forward/back mutation to the
 heterozygosity damping rate. -/
@@ -464,12 +475,16 @@ noncomputable def CommonDiffusionState.evolve {demeCount : ℕ}
   { marginal := marginalEpoch.propagator.mulVec common.marginal
     joint := jointEpoch.propagator.mulVec common.joint
     projection_eq := by
-      rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec,
+      dsimp only [jointEpoch, Coalescent.LowOrderLDEpoch.propagator,
+        Coalescent.ManyDemeLDRates.epoch]
+      rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec,
         Coalescent.manyDemePairDivergenceProjection_propagator_intertwines marginalEpoch
           (fun _ ↦ rfl),
-        Coalescent.lowOrderLDHProjection_propagator_intertwines jointEpoch.rates duration,
+        Coalescent.lowOrderLDHProjection_propagator_intertwines
+          (rates.toManyDemeLDRates separationBp separationBp_nonneg active) duration,
+        rates.oneLocus_pairDivergenceGenerator_eq active,
         rates.twoLocus_pairDivergenceGenerator_eq active separationBp separationBp_nonneg,
-        Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, common.projection_eq]
+        ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, common.projection_eq]
     marginal_constant := by
       rw [marginalEpoch.propagator_none, common.marginal_constant]
     marginal_zeroCoordinate := by
@@ -671,7 +686,8 @@ theorem runCommonDiffusionEvents_finalCarriers {demeCount : ℕ}
   | nil => simp [runCommonDiffusionEvents, compileMomentEvents, compileLowOrderLDEvents]
   | cons event remaining ih =>
       cases event <;>
-        simp [runCommonDiffusionEvents, compileMomentEvents, compileLowOrderLDEvents, ih]
+        simp only [runCommonDiffusionEvents, compileMomentEvents, compileLowOrderLDEvents]
+      all_goals exact ih _ _ _
 
 /-- Exact one-locus moment instructions for the whole visible event history.  Recombination
 updates are retained in the rate state for the two-locus compiler; they correctly have no
@@ -795,10 +811,12 @@ theorem PipelineDemographicHistory.presentCommonDiffusionState_marginal
   change run.state.marginal = _ at hstate
   change run.finalRateState = compiled.finalRateState ∧
     run.finalActive = compiled.finalActive ∧ _ at hcarriers
+  simp only [CommonDiffusionState.evolve]
   rw [hstate, hcarriers.1, hcarriers.2.1]
   simp [CommonDiffusionState.evolve,
     PipelineDemographicHistory.oneLocusMomentInstructions,
-    Coalescent.propagateManyDemeMomentInstructions, List.foldl_append, compiled]
+    PipelineDemographicHistory.initialCommonDiffusionState,
+    Coalescent.propagateManyDemeMomentInstructions, List.foldl_append, compiled, initial]
 
 /-- Complete concrete two-locus history at one physical marker separation.
 
@@ -841,10 +859,12 @@ theorem PipelineDemographicHistory.presentCommonDiffusionState_joint
   change run.state.joint = _ at hstate
   change _ ∧ _ ∧ run.finalRateState = compiled.finalRateState ∧
     run.finalActive = compiled.finalActive at hcarriers
+  simp only [CommonDiffusionState.evolve]
   rw [hstate, hcarriers.2.2.1, hcarriers.2.2.2]
   simp [CommonDiffusionState.evolve, PipelineDemographicHistory.lowOrderLDHistory,
+    PipelineDemographicHistory.initialCommonDiffusionState,
     Coalescent.LowOrderLDHistory.present, Coalescent.propagateLowOrderLDInstructions,
-    Coalescent.LowOrderLDInstruction.apply, List.foldl_append, compiled]
+    Coalescent.LowOrderLDInstruction.apply, List.foldl_append, compiled, initial]
 
 /-- The arbitrary-deme, arbitrary-event two-locus moment family constructed from the visible
 demographic history.  This is the concrete missing bridge from history to `DD/Dz/pi2`; marker

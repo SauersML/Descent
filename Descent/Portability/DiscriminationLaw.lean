@@ -3,6 +3,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.EndToEndScoreLaw
 import Descent.Portability.PopulationAUC
+import Mathlib.Analysis.Convex.Deriv
+import Mathlib.Analysis.SpecialFunctions.Sigmoid
 import Mathlib.MeasureTheory.Integral.IntervalIntegral.Basic
 
 assert_below Descent.Decision Descent.Program
@@ -253,6 +255,60 @@ noncomputable def BinaryRiskCohort.auc {Individual : Type*} [Fintype Individual]
 
 /-- Fixed inverse L2 strength used by gnomon's binary calibration refit. -/
 def binaryCalibrationC : ℝ := 1000000
+
+/-- The Bernoulli log-partition function.  Naming it separately exposes the strict
+convexity that makes the finite ridge-logistic calibration fit identifiable. -/
+noncomputable def logisticSoftplus (linearPredictor : ℝ) : ℝ :=
+  Real.log (1 + Real.exp linearPredictor)
+
+/-- The derivative of `log (1 + exp z)` is the logistic sigmoid. -/
+theorem hasDerivAt_logisticSoftplus (linearPredictor : ℝ) :
+    HasDerivAt logisticSoftplus (Real.sigmoid linearPredictor) linearPredictor := by
+  have hpositive : 0 < 1 + Real.exp linearPredictor := by positivity
+  have hsigmoid : Real.sigmoid linearPredictor =
+      Real.exp linearPredictor / (1 + Real.exp linearPredictor) := by
+    rw [Real.sigmoid_def]
+    have hexp : Real.exp linearPredictor ≠ 0 := (Real.exp_pos _).ne'
+    field_simp [Real.exp_neg, hexp]
+    rw [add_mul, one_mul]
+    rw [← Real.exp_add]
+    simp [add_comm]
+  have hderiv := ((hasDerivAt_const linearPredictor (1 : ℝ)).add
+    (Real.hasDerivAt_exp linearPredictor)).log hpositive.ne'
+  simpa only [logisticSoftplus, hsigmoid, Pi.add_apply, zero_add] using hderiv
+
+/-- The derivative identity used by the strict-convexity proof and the score equations. -/
+theorem deriv_logisticSoftplus (linearPredictor : ℝ) :
+    deriv logisticSoftplus linearPredictor = Real.sigmoid linearPredictor :=
+  (hasDerivAt_logisticSoftplus linearPredictor).deriv
+
+/-- Softplus is strictly convex on the complete real line. -/
+theorem strictConvexOn_logisticSoftplus :
+    StrictConvexOn ℝ Set.univ logisticSoftplus := by
+  have hderivative : StrictMonoOn (deriv logisticSoftplus) (interior Set.univ) := by
+    intro first _ second _ hlt
+    simpa only [deriv_logisticSoftplus] using Real.sigmoid_strictMono hlt
+  have hcontinuous : Continuous logisticSoftplus :=
+    continuous_iff_continuousAt.mpr fun point ↦
+      (hasDerivAt_logisticSoftplus point).continuousAt
+  exact hderivative.strictConvexOn_of_deriv convex_univ
+    hcontinuous.continuousOn
+
+/-- One exact Bernoulli negative-log-likelihood contribution. -/
+noncomputable def binaryLogisticLoss (outcome linearPredictor : ℝ) : ℝ :=
+  logisticSoftplus linearPredictor - outcome * linearPredictor
+
+/-- Subtracting the affine outcome term does not change strict convexity. -/
+theorem strictConvexOn_binaryLogisticLoss (outcome : ℝ) :
+    StrictConvexOn ℝ Set.univ (binaryLogisticLoss outcome) := by
+  have haffine : ConvexOn ℝ Set.univ (fun z : ℝ ↦ -(outcome * z)) := by
+    refine ⟨convex_univ, ?_⟩
+    intro first _ second _ firstWeight secondWeight _ _ _
+    apply le_of_eq
+    simp only [smul_eq_mul]
+    ring
+  simpa only [binaryLogisticLoss, sub_eq_add_neg] using
+    strictConvexOn_logisticSoftplus.add_convexOn haffine
 
 /-- Empirical variance of the clipped-risk logits used by the executable calibration guard. -/
 noncomputable def BinaryRiskCohort.logitRiskVariance
