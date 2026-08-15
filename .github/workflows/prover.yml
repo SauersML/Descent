@@ -2,7 +2,7 @@ name: Descent CI
 
 on:
   schedule:
-    - cron: '*/140 * * * *'
+    - cron: '29 */6 * * *'
   push:
     branches: [ "main" ]
     paths:
