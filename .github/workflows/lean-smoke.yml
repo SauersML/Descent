@@ -1,4 +1,4 @@
-name: Lean Regression Smoke
+name: Lean Supplemental Smoke
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: lean-regression-smoke-main
+  group: lean-supplemental-smoke-main
   cancel-in-progress: true
 
 permissions:
@@ -16,7 +16,7 @@ permissions:
   issues: write
 
 jobs:
-  recent-modules:
+  supplemental-targets:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -43,12 +43,12 @@ jobs:
       - name: Fetch dependency cache
         if: steps.deps.outputs.cache-hit != 'true'
         run: lake exe cache get
-      - name: Build recent Lean regression window
+      - name: Build supplemental default targets
         id: build
         shell: bash
         run: |
           set +e
-          lake build Descent.Coalescent.TwoLocusHistory Descent.Coalescent.StructuredPresentDay 2>&1 | tee /tmp/smoke.log
+          lake build Counterexamples ValidationShared 2>&1 | tee /tmp/smoke.log
           status=${PIPESTATUS[0]}
           echo "status=$status" >> "$GITHUB_OUTPUT"
           exit 0
@@ -61,7 +61,7 @@ jobs:
         shell: bash
         run: |
           {
-            echo "### Lean recent-module smoke"
+            echo "### Lean supplemental-target smoke"
             echo
             echo "Commit: \`$SHA\`"
             echo "Exit status: \`$STATUS\`"
