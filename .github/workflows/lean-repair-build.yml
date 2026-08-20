@@ -53,11 +53,7 @@ jobs:
         shell: bash
         run: |
           set +e
-          lake build \
-            Descent.Coalescent.SampleMonomorphism \
-            Descent.Coalescent.StructuredPresentDay \
-            Descent.Coalescent.TwoDemeLDClosedForm \
-            2>&1 | tee /tmp/repair-build.log
+          lake build Descent.Coalescent.TwoDemeLDClosedForm 2>&1 | tee /tmp/repair-build.log
           status=${PIPESTATUS[0]}
           echo "status=$status" >> "$GITHUB_OUTPUT"
           exit 0
