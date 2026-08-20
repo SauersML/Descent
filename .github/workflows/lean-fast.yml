@@ -9,6 +9,8 @@ on:
       - 'lake-manifest.json'
       - 'lean-toolchain'
       - '.github/workflows/lean-fast.yml'
+  pull_request:
+    branches: ["main"]
   workflow_dispatch:
 
 concurrency:
