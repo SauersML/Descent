@@ -20,17 +20,19 @@ rep('noncomputable def publishedTwoDemeLDOperator (rho M : ℝ) :',
 rep('  publishedTwoDemeLDOperatorAtMutation 1 rho M',
     '  publishedTwoDemeLDOperatorAtMutation (Descent.Core.Theta.ofScaled 1) rho M')
 
+rep('noncomputable def publishedTwoDemeLDCoordinateValueAtMutation\n    (theta rho M : ℝ)',
+    'noncomputable def publishedTwoDemeLDCoordinateValueAtMutation\n    (theta : Descent.Core.Theta) (rho : Descent.Core.Rho) (M : ℝ)')
 for name in [
-    'publishedTwoDemeLDCoordinateValueAtMutation',
     'publishedTwoDemeWithinDAtMutation',
     'publishedTwoDemeCrossDAtMutation',
     'publishedTwoDemeDCorrelationAtMutation',
 ]:
-    rep(f'noncomputable def {name}\n    (theta rho M : ℝ)',
-        f'noncomputable def {name}\n    (theta : Descent.Core.Theta) (rho : Descent.Core.Rho) (M : ℝ)')
+    rep(f'noncomputable def {name} (theta rho M : ℝ)',
+        f'noncomputable def {name} (theta : Descent.Core.Theta) (rho : Descent.Core.Rho) (M : ℝ)')
 
+rep('noncomputable def publishedTwoDemeLDCoordinateValue\n    (rho M : ℝ)',
+    'noncomputable def publishedTwoDemeLDCoordinateValue\n    (rho : Descent.Core.Rho) (M : ℝ)')
 for name in [
-    'publishedTwoDemeLDCoordinateValue',
     'publishedTwoDemeWithinD',
     'publishedTwoDemeCrossD',
     'publishedTwoDemeTargetWithinD',
