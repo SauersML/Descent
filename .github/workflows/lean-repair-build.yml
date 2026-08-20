@@ -10,10 +10,12 @@ on:
       - 'Counterexamples.lean'
       - 'validation/**'
       - '.github/workflows/lean-repair-build.yml'
+  pull_request:
+    branches: ["main"]
   workflow_dispatch:
 
 concurrency:
-  group: lean-repair-build-main
+  group: lean-repair-build-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
