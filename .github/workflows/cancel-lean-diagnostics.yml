@@ -1,0 +1,25 @@
+name: Cancel obsolete Lean diagnostics
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - '.github/workflows/cancel-lean-diagnostics.yml'
+
+jobs:
+  cancel:
+    strategy:
+      fail-fast: false
+      matrix:
+        group:
+          - 'Descent CI-refs/heads/main'
+          - 'lean-head-matrix-main'
+          - 'lean-supplemental-smoke-main'
+          - 'fix-lean-ci-coverage-main'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ matrix.group }}
+      cancel-in-progress: true
+    timeout-minutes: 2
+    steps:
+      - run: echo "Cancelled obsolete concurrency group ${{ matrix.group }}"
