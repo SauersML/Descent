@@ -1,0 +1,96 @@
+name: Lean Audit Smoke
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - '.github/workflows/lean-audit-smoke.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: lean-audit-smoke-main
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache Lean toolchain
+        id: elan-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.elan
+          key: ${{ runner.os }}-elan-${{ hashFiles('lean-toolchain') }}
+      - name: Install elan
+        if: steps.elan-cache.outputs.cache-hit != 'true'
+        run: curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+      - name: Add elan to PATH
+        run: echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Cache Lake dependencies
+        id: deps
+        uses: actions/cache@v4
+        with:
+          path: .lake/packages
+          key: ${{ runner.os }}-lake-deps-v1-${{ hashFiles('lean-toolchain', 'lake-manifest.json') }}
+          restore-keys: |
+            ${{ runner.os }}-lake-deps-v1-
+      - name: Fetch precompiled dependencies
+        if: steps.deps.outputs.cache-hit != 'true'
+        run: lake exe cache get
+      - name: Restore compiled project
+        uses: actions/cache@v4
+        with:
+          path: .lake/build
+          key: ${{ runner.os }}-descent-v1-${{ hashFiles('lean-toolchain', 'lake-manifest.json', 'lakefile.lean', 'Descent.lean', 'Descent/**/*.lean', 'validation/**/*.lean') }}
+          restore-keys: |
+            ${{ runner.os }}-descent-v1-
+      - name: Build audit dependencies
+        run: lake build Descent ValidationShared
+      - name: Run Lean audit entrypoints
+        id: audit
+        shell: bash
+        run: |
+          set +e
+          {
+            echo '=== validation/code/Check.lean ==='
+            lake env lean validation/code/Check.lean
+            check_status=$?
+            echo
+            echo '=== validation/code/Lint.lean ==='
+            lake env lean validation/code/Lint.lean
+            lint_status=$?
+            echo
+            echo "Check status: $check_status"
+            echo "Lint status: $lint_status"
+          } 2>&1 | tee /tmp/audit.log
+          status=${PIPESTATUS[0]}
+          # The grouped command ends with echo, so derive the actual status again from markers.
+          if grep -q 'Check status: 0' /tmp/audit.log && grep -q 'Lint status: 0' /tmp/audit.log; then status=0; else status=1; fi
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Report audit result
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+          STATUS: ${{ steps.audit.outputs.status }}
+        shell: bash
+        run: |
+          {
+            echo "### Lean audit smoke"
+            echo
+            echo "Commit: \`$SHA\`"
+            echo "Exit status: \`$STATUS\`"
+            echo
+            echo '```text'
+            tail -n 350 /tmp/audit.log
+            echo '```'
+          } > /tmp/report.md
+          gh issue comment 1 --repo "$REPO" --body-file /tmp/report.md
+          test "$STATUS" -eq 0
