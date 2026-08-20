@@ -21,16 +21,25 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - name: Make normal CI build every default Lean target
+      - name: Make normal CI cover every Lean target
         shell: python
         run: |
           from pathlib import Path
           p = Path('.github/workflows/prover.yml')
           text = p.read_text()
-          old = '        run: lake build Descent ValidationShared\n'
-          new = '        run: lake build\n'
-          assert text.count(old) == 1, f'expected exactly one build command, found {text.count(old)}'
-          p.write_text(text.replace(old, new))
+
+          old_build = '        run: lake build Descent ValidationShared\n'
+          assert text.count(old_build) == 1, f'expected exactly one named build command, found {text.count(old_build)}'
+          text = text.replace(old_build, '        run: lake build\n')
+
+          # Counterexamples is a default Lean library too. Its sources must both
+          # trigger CI and be included in the default-target build.
+          anchor = "      - 'Descent.lean'\n"
+          addition = "      - 'Descent.lean'\n      - 'Counterexamples/**'\n      - 'Counterexamples.lean'\n"
+          assert text.count(anchor) == 2, f'expected push+PR Descent.lean path anchors, found {text.count(anchor)}'
+          text = text.replace(anchor, addition)
+
+          p.write_text(text)
           Path('.github/workflows/fix-lean-ci-coverage.yml').unlink()
       - name: Commit directly to main
         shell: bash
@@ -38,5 +47,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add .github/workflows/prover.yml .github/workflows/fix-lean-ci-coverage.yml
-          git commit -m 'Build every default Lean target in CI'
+          git commit -m 'Cover every Lean target in CI'
           git push origin HEAD:main
