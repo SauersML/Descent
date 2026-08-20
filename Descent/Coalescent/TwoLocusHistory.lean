@@ -4160,7 +4160,7 @@ theorem LowOrderLDHistory.toDemographicTwoLocusMoments_DD {D : ℕ}
 /-- A common Gram realization of the composed present state supplies the exact
 `LDPairDomain` consumed by the normalized portability law.  Only strict positivity of the
 two normalization diagonals remains separate; Cauchy--Schwarz is derived from the witness. -/
-def LowOrderLDDDRealization.toLDPairDomain {D : ℕ}
+theorem LowOrderLDDDRealization.toLDPairDomain {D : ℕ}
     (historyAt : MarkerSeparationBp → LowOrderLDHistory D)
     (rho : MarkerSeparationBp) (first second : Fin D)
     (realization : LowOrderLDDDRealization (historyAt rho).present)
@@ -4174,7 +4174,7 @@ def LowOrderLDDDRealization.toLDPairDomain {D : ℕ}
 
 /-- A full haplotype realization reaches the portability domain through its derived Gram
 witness; no pairwise linkage inequality is supplied independently. -/
-def LowOrderLDHaplotypeRealization.toLDPairDomain {D : ℕ}
+theorem LowOrderLDHaplotypeRealization.toLDPairDomain {D : ℕ}
     (historyAt : MarkerSeparationBp → LowOrderLDHistory D)
     (rho : MarkerSeparationBp) (first second : Fin D)
     (realization : LowOrderLDHaplotypeRealization (historyAt rho).present)

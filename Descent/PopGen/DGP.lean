@@ -4517,10 +4517,10 @@ distribution function.
 
 Outside `|ρ| ≤ 1` the radicand is negative, `Real.sqrt` returns Mathlib's junk `0`, and the
 "correlated" pair degenerates to `(x, ρ·x)`; consumers must supply `|ρ| ≤ 1`. -/
-noncomputable def bivariateNormalOrthant (a b ρ : ℝ) : ℝ :=
+noncomputable def bivariateNormalOrthant (a b corr : ℝ) : ℝ :=
   ((((ProbabilityTheory.gaussianReal 0 1).prod
         (ProbabilityTheory.gaussianReal 0 1)).map
-      (fun z : ℝ × ℝ ↦ (z.1, ρ * z.1 + Real.sqrt (1 - ρ ^ 2) * z.2)))
+      (fun z : ℝ × ℝ ↦ (z.1, corr * z.1 + Real.sqrt (1 - corr ^ 2) * z.2)))
     (Set.Iic a ×ˢ Set.Iic b)).toReal
 
 /-- **The calibrated Brier risk of a liability-threshold trait, in closed form.**

@@ -235,7 +235,7 @@ noncomputable def toFunctor (bridgeData : BridgeFunctorData P Q) : P.Obj ⥤ Q.O
 
 /-- If sandwich transport also reflects biological equivalence, the induced pangenome
 functor is faithful. -/
-noncomputable def faithful (bridgeData : BridgeFunctorData P Q)
+theorem faithful (bridgeData : BridgeFunctorData P Q)
     (hreflects : ∀ {X Y} {f g : ChartMap (P.chart X) (P.chart Y)},
       Q.rel (bridgeData.obj X) (bridgeData.obj Y)
         (FinitePartialBijection.sandwich (bridgeData.bridge X) (bridgeData.bridge Y) f)

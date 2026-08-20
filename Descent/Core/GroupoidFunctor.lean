@@ -78,7 +78,7 @@ The namespace `NonsoficGroupsExist` is renamed `Descent.Core` and the
 imports repointed; the mathematics is unchanged except where a repair is
 noted at the declaration it applies to.
 -/
-def FunctorData.faithful (data : FunctorData P Q)
+theorem FunctorData.faithful (data : FunctorData P Q)
     (hreflects : ∀ {X Y} {f g : P.Rep X Y},
       Q.rel (data.obj X) (data.obj Y) (data.map f) (data.map g) →
         P.rel X Y f g) : data.toFunctor.Faithful where

@@ -7294,7 +7294,7 @@ cross moment is 1 against within-deme moments 2 and 3, so the certificate inequa
 and hide a body that only works on the degenerate boundary.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- an inhabitation witness. -/
-noncomputable def panelMomentPairDomainWitness :
+theorem panelMomentPairDomainWitness :
     panelMomentWitnessMoments.LDPairDomain clumpWindowSeparation 0 1 where
   firstWithin_pos := by
     simp [panelMomentWitnessMoments]
@@ -7312,7 +7312,7 @@ detect a body that dropped the size-correction factor rather than only certifyin
 quotients evaluate.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- an inhabitation witness. -/
-noncomputable def panelMomentDomainWitness :
+theorem panelMomentDomainWitness :
     panelMomentWitnessMoments.UnascertainedPanelMomentDomain
       (fun _ : Fin 1 ↦ clumpWindowSeparation) clumpWindowSeparation 0 1 where
   panelWithin_pos := by
@@ -7327,7 +7327,7 @@ within-deme linkage 2 and 3 (positive, distinct) and cross linkage 1 (nonzero), 
 reference regression is exercised away from every degenerate value.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- an inhabitation witness. -/
-noncomputable def selectionPanelDomainWitness :
+theorem selectionPanelDomainWitness :
     panelMomentWitnessMoments.SelectionWeightedDDProxyDomain
       (fun _ : Fin 2 ↦ clumpWindowSeparation) 0 1 where
   within_pos := by
@@ -7340,7 +7340,7 @@ noncomputable def selectionPanelDomainWitness :
 /-- The bare normalization domain inherits the pair witness's inhabitant by projection.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- an inhabitation witness by projection. -/
-noncomputable def panelMomentNormalizationDomainWitness :
+theorem panelMomentNormalizationDomainWitness :
     panelMomentWitnessMoments.LDNormalizationDomain clumpWindowSeparation 0 1 :=
   panelMomentPairDomainWitness.toLDNormalizationDomain
 
