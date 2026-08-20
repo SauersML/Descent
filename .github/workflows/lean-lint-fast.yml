@@ -4,6 +4,14 @@ on:
   push:
     branches: ["main"]
     paths:
+      - 'Descent/**'
+      - 'Descent.lean'
+      - 'Counterexamples/**'
+      - 'Counterexamples.lean'
+      - 'validation/**'
+      - 'lakefile.lean'
+      - 'lake-manifest.json'
+      - 'lean-toolchain'
       - '.github/workflows/lean-lint-fast.yml'
   workflow_dispatch:
 
