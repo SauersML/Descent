@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 concurrency:
   group: Descent CI-refs/heads/main
@@ -22,8 +23,11 @@ jobs:
         with:
           ref: main
       - name: Type mutation and recombination coordinates
-        shell: python
+        id: patch
+        shell: bash
         run: |
+          set +e
+          python - <<'PY' 2>&1 | tee /tmp/type-two-deme.log
           from pathlib import Path
           p = Path('Descent/Coalescent/TwoDemeLDClosedForm.lean')
           s = p.read_text()
@@ -95,7 +99,26 @@ jobs:
 
           p.write_text(s)
           Path('.github/workflows/type-two-deme-ld.yml').unlink()
+          PY
+          status=${PIPESTATUS[0]}
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Report patch failure
+        if: steps.patch.outputs.status != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo '### Two-deme type patch failed'
+            echo
+            echo '```text'
+            cat /tmp/type-two-deme.log
+            echo '```'
+          } > /tmp/type-two-report.md
+          gh issue comment 1 --repo "$GITHUB_REPOSITORY" --body-file /tmp/type-two-report.md
+          exit 1
       - name: Commit directly to main
+        if: steps.patch.outputs.status == '0'
         shell: bash
         run: |
           git config user.name 'github-actions[bot]'
