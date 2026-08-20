@@ -1,0 +1,80 @@
+name: Type scaled Lean core APIs
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - '.github/workflows/type-scaled-lean-core.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: type-scaled-lean-core-main
+  cancel-in-progress: true
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Type Tau and generic Rho entrypoints
+        shell: python
+        run: |
+          from pathlib import Path
+
+          def rep(path, old, new, n=1):
+              p = Path(path); s = p.read_text(); c = s.count(old)
+              assert c == n, f'{path}: expected {n} matches, got {c} for {old!r}'
+              p.write_text(s.replace(old, new, n))
+
+          p = 'Descent/Coalescent/SampleMonomorphism.lean'
+          rep(p,
+              'noncomputable def blockCountLaw (n k : ℕ) (tau : ℝ) : ℝ :=\n  ∑ j ∈ Finset.Icc k n,\n    Real.exp (-(deathRate j * tau))',
+              'noncomputable def blockCountLaw (n k : ℕ) (tau : Descent.Core.Tau) : ℝ :=\n  ∑ j ∈ Finset.Icc k n,\n    Real.exp (-(deathRate j * tau.value))')
+          rep(p,
+              'noncomputable def tagSampleMonomorphicProb (p : ℝ) (n : ℕ) (tau : ℝ) : ℝ :=\n  ∑ k ∈ Finset.Icc 1 n, blockCountLaw n k tau * sampleMonomorphismEvent p k',
+              'noncomputable def tagSampleMonomorphicProb (p : ℝ) (n : ℕ)\n    (tau : Descent.Core.Tau) : ℝ :=\n  ∑ k ∈ Finset.Icc 1 n, blockCountLaw n k tau * sampleMonomorphismEvent p k')
+
+          # Keep theorem statements convenient over a raw numeric scaled value, but make
+          # the boundary conversion explicit at every call into the typed definitions.
+          s = Path(p).read_text()
+          s = s.replace('blockCountLaw 1 1 tau = 1',
+                        'blockCountLaw 1 1 (Descent.Core.Tau.ofScaled tau) = 1')
+          s = s.replace('blockCountLaw 2 2 tau = Real.exp (-tau)',
+                        'blockCountLaw 2 2 (Descent.Core.Tau.ofScaled tau) = Real.exp (-tau)')
+          s = s.replace('blockCountLaw 2 1 tau = 1 - Real.exp (-tau)',
+                        'blockCountLaw 2 1 (Descent.Core.Tau.ofScaled tau) = 1 - Real.exp (-tau)')
+          s = s.replace('tagSampleMonomorphicProb (1 - p) n tau = tagSampleMonomorphicProb p n tau',
+                        'tagSampleMonomorphicProb (1 - p) n (Descent.Core.Tau.ofScaled tau) =\n      tagSampleMonomorphicProb p n (Descent.Core.Tau.ofScaled tau)')
+          s = s.replace('tagSampleMonomorphicProb p 1 tau = 1',
+                        'tagSampleMonomorphicProb p 1 (Descent.Core.Tau.ofScaled tau) = 1')
+          Path(p).write_text(s)
+
+          p = 'Descent/Coalescent/StructuredPresentDay.lean'
+          rep(p,
+              '(sys : TwoDemeLDSystem n) (rho M : ℝ) (k : Fin n) : ℝ :=\n  cramerCoordinate (sys.operator rho M)',
+              '(sys : TwoDemeLDSystem n) (rho : Descent.Core.Rho) (M : ℝ) (k : Fin n) : ℝ :=\n  cramerCoordinate (sys.operator rho.value M)')
+          for name in ['crossD', 'withinD', 'crossDCorrelation']:
+              rep(p,
+                  f'(sys : TwoDemeLDSystem n) (rho M : ℝ) : ℝ :=',
+                  f'(sys : TwoDemeLDSystem n) (rho : Descent.Core.Rho) (M : ℝ) : ℝ :=')
+          rep(p,
+              '(sys : AffineTwoDemeLDSystem n) (rho M : ℝ) : ℝ :=\n  sys.toSystem.crossDCorrelation rho M',
+              '(sys : AffineTwoDemeLDSystem n) (rho : Descent.Core.Rho) (M : ℝ) : ℝ :=\n  sys.toSystem.crossDCorrelation rho M')
+
+          Path('.github/workflows/type-scaled-lean-core.yml').unlink()
+      - name: Commit directly to main
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add Descent/Coalescent/SampleMonomorphism.lean \
+            Descent/Coalescent/StructuredPresentDay.lean \
+            .github/workflows/type-scaled-lean-core.yml
+          git commit -m 'Type scaled Tau and Rho Lean APIs'
+          git pull --rebase origin main
+          git push origin HEAD:main
