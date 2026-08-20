@@ -32,12 +32,28 @@ jobs:
           assert text.count(old_build) == 1, f'expected exactly one named build command, found {text.count(old_build)}'
           text = text.replace(old_build, '        run: lake build\n')
 
-          # Counterexamples is a default Lean library too. Its sources must both
-          # trigger CI and be included in the default-target build.
+          # Counterexamples is a default Lean library too. Its sources must
+          # trigger CI, invalidate compiled-project caches, and count as proof
+          # changes for PR enforcement.
           anchor = "      - 'Descent.lean'\n"
           addition = "      - 'Descent.lean'\n      - 'Counterexamples/**'\n      - 'Counterexamples.lean'\n"
           assert text.count(anchor) == 2, f'expected push+PR Descent.lean path anchors, found {text.count(anchor)}'
           text = text.replace(anchor, addition)
+
+          lake_anchor = "      - 'lakefile.lean'\n"
+          lake_addition = "      - 'lakefile.lean'\n      - 'lake-manifest.json'\n"
+          assert text.count(lake_anchor) == 2, f'expected push+PR lakefile path anchors, found {text.count(lake_anchor)}'
+          text = text.replace(lake_anchor, lake_addition)
+
+          old_cache = "hashFiles('lean-toolchain', 'lake-manifest.json', 'lakefile.lean', 'Descent.lean', 'Descent/**/*.lean', 'validation/**/*.lean')"
+          new_cache = "hashFiles('lean-toolchain', 'lake-manifest.json', 'lakefile.lean', 'Descent.lean', 'Descent/**/*.lean', 'Counterexamples.lean', 'Counterexamples/**/*.lean', 'validation/**/*.lean')"
+          assert text.count(old_cache) == 1, f'expected exactly one project cache key, found {text.count(old_cache)}'
+          text = text.replace(old_cache, new_cache)
+
+          old_corpus = "const CORPUS = (name) => name.startsWith('Descent/') || name === 'Descent.lean' || name.startsWith('validation/');"
+          new_corpus = "const CORPUS = (name) => name.startsWith('Descent/') || name === 'Descent.lean' || name.startsWith('Counterexamples/') || name === 'Counterexamples.lean' || name.startsWith('validation/');"
+          assert text.count(old_corpus) == 1, f'expected exactly one CORPUS predicate, found {text.count(old_corpus)}'
+          text = text.replace(old_corpus, new_corpus)
 
           p.write_text(text)
           Path('.github/workflows/fix-lean-ci-coverage.yml').unlink()
@@ -48,4 +64,5 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add .github/workflows/prover.yml .github/workflows/fix-lean-ci-coverage.yml
           git commit -m 'Cover every Lean target in CI'
+          git pull --rebase origin main
           git push origin HEAD:main
