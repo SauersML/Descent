@@ -25,7 +25,7 @@ permissions:
 jobs:
   compile:
     runs-on: ubuntu-latest
-    timeout-minutes: 18
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - name: Cache Lean toolchain
@@ -48,15 +48,12 @@ jobs:
           key: ${{ runner.os }}-descent-fast-v1-${{ hashFiles('lean-toolchain', 'lake-manifest.json', 'lakefile.lean', 'Descent.lean', 'Counterexamples.lean', 'Descent/**/*.lean', 'Counterexamples/**/*.lean', 'validation/**/*.lean') }}
           restore-keys: |
             ${{ runner.os }}-descent-fast-v1-
-      - name: Compile active repair surface
+      - name: Compile every default Lean target
         id: compile
         shell: bash
         run: |
           set +e
-          lake build \
-            Descent.Coalescent.SampleMonomorphism \
-            Descent.Coalescent.StructuredPresentDay \
-            2>&1 | tee /tmp/repair-build.log
+          lake build 2>&1 | tee /tmp/repair-build.log
           status=${PIPESTATUS[0]}
           echo "status=$status" >> "$GITHUB_OUTPUT"
           exit 0
@@ -69,13 +66,13 @@ jobs:
         shell: bash
         run: |
           {
-            echo "### Lean repair build"
+            echo "### Lean full repair build"
             echo
             echo "Commit: \`$SHA\`"
             echo "Exit status: \`$STATUS\`"
             echo
             echo '```text'
-            tail -n 400 /tmp/repair-build.log
+            tail -n 500 /tmp/repair-build.log
             echo '```'
           } > /tmp/report.md
           gh issue comment 1 --repo "$REPO" --body-file /tmp/report.md
