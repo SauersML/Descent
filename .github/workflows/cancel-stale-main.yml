@@ -1,0 +1,23 @@
+name: Cancel stale Descent CI main
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - '.github/workflows/cancel-stale-main.yml'
+  workflow_dispatch:
+
+# Deliberately matches the concurrency group produced by prover.yml on main:
+#   ${{ github.workflow }}-${{ github.ref }}
+# where github.workflow = "Descent CI" and github.ref = "refs/heads/main".
+# Queueing this short run cancels an older in-flight/pending main Descent CI run.
+concurrency:
+  group: Descent CI-refs/heads/main
+  cancel-in-progress: true
+
+jobs:
+  cancel-stale:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: echo "Stale Descent CI main run cancelled; runner slot may be reused."
