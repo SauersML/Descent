@@ -34,16 +34,7 @@ jobs:
         run: curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
       - name: Add elan to PATH
         run: echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
-      - name: Cache Lake dependencies
-        id: deps
-        uses: actions/cache@v4
-        with:
-          path: .lake/packages
-          key: ${{ runner.os }}-lake-deps-v1-${{ hashFiles('lean-toolchain', 'lake-manifest.json') }}
-          restore-keys: |
-            ${{ runner.os }}-lake-deps-v1-
       - name: Fetch precompiled dependencies
-        if: steps.deps.outputs.cache-hit != 'true'
         run: lake exe cache get
       - name: Restore successful full-build cache
         id: project-cache
