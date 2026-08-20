@@ -5,6 +5,8 @@ on:
     branches: ["main"]
     paths:
       - '.github/workflows/lean-audit-smoke.yml'
+  pull_request:
+    branches: ["main"]
   workflow_dispatch:
 
 concurrency:
@@ -69,8 +71,6 @@ jobs:
             echo "Check status: $check_status"
             echo "Lint status: $lint_status"
           } 2>&1 | tee /tmp/audit.log
-          status=${PIPESTATUS[0]}
-          # The grouped command ends with echo, so derive the actual status again from markers.
           if grep -q 'Check status: 0' /tmp/audit.log && grep -q 'Lint status: 0' /tmp/audit.log; then status=0; else status=1; fi
           echo "status=$status" >> "$GITHUB_OUTPUT"
           exit 0
