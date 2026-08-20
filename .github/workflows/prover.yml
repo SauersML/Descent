@@ -8,8 +8,11 @@ on:
     paths:
       - 'Descent/**'
       - 'Descent.lean'
+      - 'Counterexamples/**'
+      - 'Counterexamples.lean'
       - 'validation/**'
       - 'lakefile.lean'
+      - 'lake-manifest.json'
       - 'lean-toolchain'
       - '.github/workflows/prover.yml'
   pull_request:
@@ -17,8 +20,11 @@ on:
     paths:
       - 'Descent/**'
       - 'Descent.lean'
+      - 'Counterexamples/**'
+      - 'Counterexamples.lean'
       - 'validation/**'
       - 'lakefile.lean'
+      - 'lake-manifest.json'
       - 'lean-toolchain'
       - '.github/workflows/prover.yml'
   workflow_dispatch:
@@ -104,7 +110,7 @@ jobs:
         id: lake-deps-cache
         uses: actions/cache@v4
         with:
-          path: .lake/packages
+          path: ~/.elan
           key: ${{ runner.os }}-lake-deps-v1-${{ hashFiles('lean-toolchain', 'lake-manifest.json') }}
           restore-keys: |
             ${{ runner.os }}-lake-deps-v1-
@@ -113,7 +119,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .lake/build
-          key: ${{ runner.os }}-descent-v1-${{ hashFiles('lean-toolchain', 'lake-manifest.json', 'lakefile.lean', 'Descent.lean', 'Descent/**/*.lean', 'validation/**/*.lean') }}
+          key: ${{ runner.os }}-descent-v1-${{ hashFiles('lean-toolchain', 'lake-manifest.json', 'lakefile.lean', 'Descent.lean', 'Descent/**/*.lean', 'Counterexamples.lean', 'Counterexamples/**/*.lean', 'validation/**/*.lean') }}
           restore-keys: |
             ${{ runner.os }}-descent-v1-
 
@@ -123,14 +129,10 @@ jobs:
 
       # Compile first so syntax/elaboration/axiom failures are never hidden by
       # an independent provenance or source-validation failure below. Every
-      # gate remains mandatory; this ordering maximizes diagnostic signal from
-      # a single remote run.
-      # `ValidationShared` carries the generated-declaration filter and the
-      # results writer that the detectors below import.  Naming only
-      # `Descent` leaves those oleans unbuilt and every detector step fails
-      # on an unknown module.
+      # default Lake target is built here; ValidationShared provides the
+      # generated-declaration filter and results writer imported below.
       - name: Build project
-        run: lake build Descent ValidationShared
+        run: lake build
 
       # CODE VALIDATION, in two steps because there are exactly two instruments.
       #
@@ -453,11 +455,12 @@ jobs:
               }
             );
 
-            const CORPUS = (name) => name.startsWith('Descent/') || name === 'Descent.lean' || name.startsWith('validation/');
+            const CORPUS = (name) => name.startsWith('Descent/') || name === 'Descent.lean' || name.startsWith('Counterexamples/') || name === 'Counterexamples.lean' || name.startsWith('validation/');
             const touchesProofs = files.some((file) => CORPUS(file.filename));
             const touchesLean = files.some((file) =>
               CORPUS(file.filename) ||
               file.filename === 'lakefile.lean' ||
+              file.filename === 'lake-manifest.json' ||
               file.filename === 'lean-toolchain' ||
               file.filename === '.github/workflows/prover.yml'
             );
