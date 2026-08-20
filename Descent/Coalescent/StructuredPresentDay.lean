@@ -1005,29 +1005,29 @@ noncomputable def AffineTwoDemeLDSystem.toSystem {n : ℕ}
 /-- A stationary two-locus coordinate, exactly `-(D+R+M)^{-1}Uh` in the published moment
 system, expressed by Cramer's rule. -/
 noncomputable def TwoDemeLDSystem.stationaryCoordinate {n : ℕ}
-    (sys : TwoDemeLDSystem n) (rho M : ℝ) (k : Fin n) : ℝ :=
-  cramerCoordinate (sys.operator rho M) (fun i ↦ -sys.forcing M i) k
+    (sys : TwoDemeLDSystem n) (rho : Descent.Core.Rho) (M : ℝ) (k : Fin n) : ℝ :=
+  cramerCoordinate (sys.operator rho.value M) (fun i ↦ -sys.forcing M i) k
 
 /-- The `E[D_source D_target]` member of the stationary family. -/
 noncomputable def TwoDemeLDSystem.crossD {n : ℕ}
-    (sys : TwoDemeLDSystem n) (rho M : ℝ) : ℝ :=
+    (sys : TwoDemeLDSystem n) (rho : Descent.Core.Rho) (M : ℝ) : ℝ :=
   sys.stationaryCoordinate rho M sys.crossSourceTarget
 
 /-- The source `E[D^2]` member of the same solve. -/
 noncomputable def TwoDemeLDSystem.withinD {n : ℕ}
-    (sys : TwoDemeLDSystem n) (rho M : ℝ) : ℝ :=
+    (sys : TwoDemeLDSystem n) (rho : Descent.Core.Rho) (M : ℝ) : ℝ :=
   sys.stationaryCoordinate rho M sys.withinSource
 
 /-- Cross-deme correlation of `D`.  Equal sizes and symmetric migration make the two
 within-deme second moments equal, so the square-root denominator reduces to `E[D^2]`.
 This name is introduced only after both numerator and denominator exist in the solved law. -/
 noncomputable def TwoDemeLDSystem.crossDCorrelation {n : ℕ}
-    (sys : TwoDemeLDSystem n) (rho M : ℝ) : ℝ :=
+    (sys : TwoDemeLDSystem n) (rho : Descent.Core.Rho) (M : ℝ) : ℝ :=
   sys.crossD rho M / sys.withinD rho M
 
 /-- A2's closed form for an arbitrary published affine moment system. -/
 noncomputable def AffineTwoDemeLDSystem.crossDCorrelation {n : ℕ}
-    (sys : AffineTwoDemeLDSystem n) (rho M : ℝ) : ℝ :=
+    (sys : AffineTwoDemeLDSystem n) (rho : Descent.Core.Rho) (M : ℝ) : ℝ :=
   sys.toSystem.crossDCorrelation rho M
 
 /-- A parameter point on which the affine stationary solution and its correlation denominator

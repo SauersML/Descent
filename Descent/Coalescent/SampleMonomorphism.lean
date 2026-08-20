@@ -90,9 +90,9 @@ Junk outside its domain, and stated rather than left to be discovered: for `k > 
 set is empty and the sum is `0`, which is the right value, since a sample of `n` cannot have
 more than `n` ancestors. At `k = 0` the formula is evaluated outside the range the derivation
 covers and no consumer here supplies it. -/
-noncomputable def blockCountLaw (n k : ℕ) (tau : ℝ) : ℝ :=
+noncomputable def blockCountLaw (n k : ℕ) (tau : Descent.Core.Tau) : ℝ :=
   ∑ j ∈ Finset.Icc k n,
-    Real.exp (-(deathRate j * tau)) * (2 * (j : ℝ) - 1) * (-1 : ℝ) ^ (j - k) *
+    Real.exp (-(deathRate j * tau.value)) * (2 * (j : ℝ) - 1) * (-1 : ℝ) ^ (j - k) *
         ((k.ascFactorial (j - 1) : ℝ) * (n.descFactorial j : ℝ)) /
       ((k.factorial : ℝ) * ((j - k).factorial : ℝ) * (n.ascFactorial j : ℝ))
 
@@ -196,7 +196,8 @@ and it is what an analysis pricing tag loss off a population-level quantity is a
     was filed before the counts existed.
 
     argument_source: derived. -/
-noncomputable def tagSampleMonomorphicProb (p : ℝ) (n : ℕ) (tau : ℝ) : ℝ :=
+noncomputable def tagSampleMonomorphicProb (p : ℝ) (n : ℕ)
+    (tau : Descent.Core.Tau) : ℝ :=
   ∑ k ∈ Finset.Icc 1 n, blockCountLaw n k tau * sampleMonomorphismEvent p k
 
 /-- **A variant and its complement are the same variant.** Reading the sample from the other
@@ -205,7 +206,8 @@ allele exchanges `p` and `1 - p` and cannot change whether it is monomorphic. Th
 quantity; that the two symmetries hold separately is one check that the objects are the pair
 they are claimed to be. -/
 theorem tagSampleMonomorphicProb_symm (p : ℝ) (n : ℕ) (tau : ℝ) :
-    tagSampleMonomorphicProb (1 - p) n tau = tagSampleMonomorphicProb p n tau := by
+    tagSampleMonomorphicProb (1 - p) n (Descent.Core.Tau.ofScaled tau) =
+      tagSampleMonomorphicProb p n (Descent.Core.Tau.ofScaled tau) := by
   unfold tagSampleMonomorphicProb
   refine Finset.sum_congr rfl fun k _ ↦ ?_
   unfold sampleMonomorphismEvent
@@ -214,7 +216,7 @@ theorem tagSampleMonomorphicProb_symm (p : ℝ) (n : ℕ) (tau : ℝ) :
 
 /-- **One lineage, all the time.** A sample of one has a single ancestor at every time, so
 the closed form must collapse to `1` -- and it does, through `deathRate_one`. -/
-@[simp] theorem blockCountLaw_one_one (tau : ℝ) : blockCountLaw 1 1 tau = 1 := by
+@[simp] theorem blockCountLaw_one_one (tau : ℝ) : blockCountLaw 1 1 (Descent.Core.Tau.ofScaled tau) = 1 := by
   rw [blockCountLaw, Finset.Icc_self, Finset.sum_singleton, deathRate_one]
   norm_num [Nat.ascFactorial_succ, Nat.ascFactorial_zero, Nat.descFactorial_succ,
     Nat.descFactorial_zero, Nat.factorial]
@@ -223,7 +225,7 @@ the closed form must collapse to `1` -- and it does, through `deathRate_one`. -/
 than by any property of drift. The body returning anything else would be a defect in the
 sum's index set, and this is the statement that would catch it. -/
 theorem tagSampleMonomorphicProb_sample_one (p tau : ℝ) :
-    tagSampleMonomorphicProb p 1 tau = 1 := by
+    tagSampleMonomorphicProb p 1 (Descent.Core.Tau.ofScaled tau) = 1 := by
   rw [tagSampleMonomorphicProb, Finset.Icc_self, Finset.sum_singleton, blockCountLaw_one_one]
   unfold sampleMonomorphismEvent
   ring
@@ -231,7 +233,7 @@ theorem tagSampleMonomorphicProb_sample_one (p tau : ℝ) :
 /-- **Two lineages survive with probability `exp (-τ)`.** The pair coalesces at rate one --
 `deathRate_two` -- so this is the exponential holding time and nothing else. -/
 @[simp] theorem blockCountLaw_two_two (tau : ℝ) :
-    blockCountLaw 2 2 tau = Real.exp (-tau) := by
+    blockCountLaw 2 2 (Descent.Core.Tau.ofScaled tau) = Real.exp (-tau) := by
   rw [blockCountLaw, Finset.Icc_self, Finset.sum_singleton, deathRate_two]
   -- `norm_num` evaluates the factorials and the index arithmetic but leaves
   -- `exp (-tau) * 3 * 4 / 12`: it does not cancel a numeral division against a
@@ -245,7 +247,7 @@ because it is where the closed form's alternating sum actually does something: t
 and `j = 2` terms are `1` and `-exp (-τ)`, and the cancellation between them is the whole
 mechanism the formula's factorial coefficients exist to arrange. -/
 @[simp] theorem blockCountLaw_two_one (tau : ℝ) :
-    blockCountLaw 2 1 tau = 1 - Real.exp (-tau) := by
+    blockCountLaw 2 1 (Descent.Core.Tau.ofScaled tau) = 1 - Real.exp (-tau) := by
   have hIcc : Finset.Icc 1 2 = ({1, 2} : Finset ℕ) := by decide
   rw [blockCountLaw, hIcc, Finset.sum_pair (by norm_num : (1 : ℕ) ≠ 2), deathRate_one,
     deathRate_two]
