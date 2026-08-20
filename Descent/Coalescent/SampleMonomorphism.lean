@@ -265,7 +265,8 @@ distinct lineages disagree with probability `2p(1-p)` -- so the closed form's fa
 coefficients are being checked against a quantity that did not come from them. It is the
 second control the battery runs. -/
 theorem tagSampleMonomorphicProb_pair (p tau : ℝ) :
-    tagSampleMonomorphicProb p 2 tau = 1 - 2 * p * (1 - p) * Real.exp (-tau) := by
+    tagSampleMonomorphicProb p 2 (Descent.Core.Tau.ofScaled tau) =
+      1 - 2 * p * (1 - p) * Real.exp (-tau) := by
   have hIcc : Finset.Icc 1 2 = ({1, 2} : Finset ℕ) := by decide
   rw [tagSampleMonomorphicProb, hIcc, Finset.sum_pair (by norm_num : (1 : ℕ) ≠ 2),
     blockCountLaw_two_one, blockCountLaw_two_two]
@@ -277,7 +278,8 @@ pair probability is `p² + (1-p)²`, which is the chance two independent draws a
 the battery's first control, at `n = 2`, and it is what a body that had accidentally kept a
 drift term at zero time would fail. -/
 theorem tagSampleMonomorphicProb_pair_at_zero (p : ℝ) :
-    tagSampleMonomorphicProb p 2 0 = p ^ 2 + (1 - p) ^ 2 := by
+    tagSampleMonomorphicProb p 2 (Descent.Core.Tau.ofScaled 0) =
+      p ^ 2 + (1 - p) ^ 2 := by
   rw [tagSampleMonomorphicProb_pair]
   norm_num
   ring
