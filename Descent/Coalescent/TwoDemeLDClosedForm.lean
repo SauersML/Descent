@@ -283,27 +283,31 @@ noncomputable def publishedTwoDemeLDForcing : TwoDemeLDCoordinate → ℝ
 the coupling that carries that influx into `pi2`; omitting either occurrence changes the
 stationary floor. -/
 noncomputable def publishedTwoDemeLDForcingAtMutation
-    (theta : ℝ) (coordinate : TwoDemeLDCoordinate) : ℝ :=
-  theta * publishedTwoDemeLDForcing coordinate
+    (theta : Descent.Core.Theta) (coordinate : TwoDemeLDCoordinate) : ℝ :=
+  theta.value * publishedTwoDemeLDForcing coordinate
 
 /-- Concrete two-deme operator with mutation influx exposed as a genuine rate coordinate.
 This is the operator form of the small floor term: it is part of the same solve as drift,
 recombination, and migration, not an attenuation multiplier applied afterward. -/
-noncomputable def publishedTwoDemeLDOperatorAtMutation (theta rho M : ℝ) :
+noncomputable def publishedTwoDemeLDOperatorAtMutation
+    (theta : Descent.Core.Theta) (rho : Descent.Core.Rho) (M : ℝ) :
     Matrix TwoDemeLDCoordinate TwoDemeLDCoordinate ℝ :=
-  publishedTwoDemeLDDrift + theta • publishedTwoDemeLDMutation +
-    rho • publishedTwoDemeLDRecombination + M • publishedTwoDemeLDMigration
+  publishedTwoDemeLDDrift + theta.value • publishedTwoDemeLDMutation +
+    rho.value • publishedTwoDemeLDRecombination + M • publishedTwoDemeLDMigration
 
 /-- The concrete 18-state stationary operator. -/
-noncomputable def publishedTwoDemeLDOperator (rho M : ℝ) :
+noncomputable def publishedTwoDemeLDOperator (rho : Descent.Core.Rho) (M : ℝ) :
     Matrix TwoDemeLDCoordinate TwoDemeLDCoordinate ℝ :=
-  publishedTwoDemeLDOperatorAtMutation 1 rho M
+  publishedTwoDemeLDOperatorAtMutation (Descent.Core.Theta.ofScaled 1) rho M
 
 /-- The historical normalized system is exactly the mutation-rate-one slice of the exposed
 operator and forcing. -/
-theorem publishedTwoDemeLD_normalized_mutation (rho M : ℝ) :
-    publishedTwoDemeLDOperator rho M = publishedTwoDemeLDOperatorAtMutation 1 rho M ∧
-      publishedTwoDemeLDForcing = publishedTwoDemeLDForcingAtMutation 1 := by
+theorem publishedTwoDemeLD_normalized_mutation
+    (rho : Descent.Core.Rho) (M : ℝ) :
+    publishedTwoDemeLDOperator rho M =
+      publishedTwoDemeLDOperatorAtMutation (Descent.Core.Theta.ofScaled 1) rho M ∧
+      publishedTwoDemeLDForcing =
+        publishedTwoDemeLDForcingAtMutation (Descent.Core.Theta.ofScaled 1) := by
   constructor
   · rfl
   · funext coordinate
@@ -311,34 +315,35 @@ theorem publishedTwoDemeLD_normalized_mutation (rho M : ℝ) :
 
 /-- One exact stationary coordinate with mutation influx retained in the coupled solve. -/
 noncomputable def publishedTwoDemeLDCoordinateValueAtMutation
-    (theta rho M : ℝ) (coordinate : TwoDemeLDCoordinate) : ℝ :=
+    (theta : Descent.Core.Theta) (rho : Descent.Core.Rho) (M : ℝ) (coordinate : TwoDemeLDCoordinate) : ℝ :=
   cramerCoordinate (publishedTwoDemeLDOperatorAtMutation theta rho M)
     (fun row ↦ -publishedTwoDemeLDForcingAtMutation theta row) coordinate
 
 /-- One exact stationary coordinate. -/
 noncomputable def publishedTwoDemeLDCoordinateValue
-    (rho M : ℝ) (coordinate : TwoDemeLDCoordinate) : ℝ :=
+    (rho : Descent.Core.Rho) (M : ℝ) (coordinate : TwoDemeLDCoordinate) : ℝ :=
   cramerCoordinate (publishedTwoDemeLDOperator rho M)
     (fun row ↦ -publishedTwoDemeLDForcing row) coordinate
 
 /-- Within-source `E[D₀²]` with mutation influx retained. -/
-noncomputable def publishedTwoDemeWithinDAtMutation (theta rho M : ℝ) : ℝ :=
+noncomputable def publishedTwoDemeWithinDAtMutation (theta : Descent.Core.Theta) (rho : Descent.Core.Rho) (M : ℝ) : ℝ :=
   publishedTwoDemeLDCoordinateValueAtMutation theta rho M (.y .dd00)
 
 /-- Cross-deme `E[D₀D₁]` with mutation influx retained. -/
-noncomputable def publishedTwoDemeCrossDAtMutation (theta rho M : ℝ) : ℝ :=
+noncomputable def publishedTwoDemeCrossDAtMutation (theta : Descent.Core.Theta) (rho : Descent.Core.Rho) (M : ℝ) : ℝ :=
   publishedTwoDemeLDCoordinateValueAtMutation theta rho M (.y .dd01)
 
 /-- Mutation-aware stationary cross-deme correlation.  The mutation term is allowed to
 cancel if the coupled equations imply cancellation; it is not deleted before the solve. -/
-noncomputable def publishedTwoDemeDCorrelationAtMutation (theta rho M : ℝ) : ℝ :=
+noncomputable def publishedTwoDemeDCorrelationAtMutation (theta : Descent.Core.Theta) (rho : Descent.Core.Rho) (M : ℝ) : ℝ :=
   publishedTwoDemeCrossDAtMutation theta rho M /
     publishedTwoDemeWithinDAtMutation theta rho M
 
 /-- The mutation-aware stationary correlation is still an exactly evaluable determinant
 ratio.  Mutation is present in both determinants, so any cancellation is a theorem of the
 coupled system rather than an omitted floor term. -/
-theorem publishedTwoDemeDCorrelationAtMutation_eq_rational (theta rho M : ℝ)
+theorem publishedTwoDemeDCorrelationAtMutation_eq_rational
+    (theta : Descent.Core.Theta) (rho : Descent.Core.Rho) (M : ℝ)
     (hoperator : (publishedTwoDemeLDOperatorAtMutation theta rho M).det ≠ 0)
     (hwithin : (replaceColumn (publishedTwoDemeLDOperatorAtMutation theta rho M)
       (fun row ↦ -publishedTwoDemeLDForcingAtMutation theta row) (.y .dd00)).det ≠ 0) :
@@ -355,27 +360,29 @@ theorem publishedTwoDemeDCorrelationAtMutation_eq_rational (theta rho M : ℝ)
     hoperator hwithin
 
 /-- Within-source `E[D₀²]`. -/
-noncomputable def publishedTwoDemeWithinD (rho M : ℝ) : ℝ :=
+noncomputable def publishedTwoDemeWithinD (rho : Descent.Core.Rho) (M : ℝ) : ℝ :=
   publishedTwoDemeLDCoordinateValue rho M (.y .dd00)
 
 /-- Cross-deme `E[D₀D₁]`. -/
-noncomputable def publishedTwoDemeCrossD (rho M : ℝ) : ℝ :=
+noncomputable def publishedTwoDemeCrossD (rho : Descent.Core.Rho) (M : ℝ) : ℝ :=
   publishedTwoDemeLDCoordinateValue rho M (.y .dd01)
 
 /-- Within-target `E[D₁²]`. -/
-noncomputable def publishedTwoDemeTargetWithinD (rho M : ℝ) : ℝ :=
+noncomputable def publishedTwoDemeTargetWithinD (rho : Descent.Core.Rho) (M : ℝ) : ℝ :=
   publishedTwoDemeLDCoordinateValue rho M (.y .dd11)
 
 /-- The exact stationary two-deme migration--LD prediction available to downstream
 constructions.  It is not a law for transient histories or multi-deme lattices. -/
-noncomputable def publishedTwoDemeDCorrelation (rho M : ℝ) : ℝ :=
+noncomputable def publishedTwoDemeDCorrelation (rho : Descent.Core.Rho) (M : ℝ) : ℝ :=
   publishedTwoDemeCrossD rho M / publishedTwoDemeWithinD rho M
 
 /-- The normalized correlation is the mutation-rate-one member of the mutation-aware family. -/
-theorem publishedTwoDemeDCorrelation_eq_at_normalized_mutation (rho M : ℝ) :
+theorem publishedTwoDemeDCorrelation_eq_at_normalized_mutation
+    (rho : Descent.Core.Rho) (M : ℝ) :
     publishedTwoDemeDCorrelation rho M =
-      publishedTwoDemeDCorrelationAtMutation 1 rho M := by
-  have hforcing : (fun row ↦ -publishedTwoDemeLDForcingAtMutation 1 row) =
+      publishedTwoDemeDCorrelationAtMutation (Descent.Core.Theta.ofScaled 1) rho M := by
+  have hforcing : (fun row ↦ -publishedTwoDemeLDForcingAtMutation
+        (Descent.Core.Theta.ofScaled 1) row) =
       (fun row ↦ -publishedTwoDemeLDForcing row) := by
     funext row
     simp [publishedTwoDemeLDForcingAtMutation]
@@ -390,11 +397,13 @@ load-bearing for the kernel: a structure whose field types carry the concrete de
 inline exceeds the kernel's recursion budget when the structure is checked (the standing
 KERNEL-PENDING failure of the c9b30da3 workstream), while a field typed by this constant is
 checked without unfolding it. -/
-def PublishedTwoDemeOperatorNonsingular (rho migration : ℝ) : Prop :=
+def PublishedTwoDemeOperatorNonsingular
+    (rho : Descent.Core.Rho) (migration : ℝ) : Prop :=
   (publishedTwoDemeLDOperator rho migration).det ≠ 0
 
 /-- Nonvanishing of the within-source Cramer numerator, named for the same kernel reason. -/
-def PublishedTwoDemeWithinNumeratorNonzero (rho migration : ℝ) : Prop :=
+def PublishedTwoDemeWithinNumeratorNonzero
+    (rho : Descent.Core.Rho) (migration : ℝ) : Prop :=
   (replaceColumn (publishedTwoDemeLDOperator rho migration)
     (fun row ↦ -publishedTwoDemeLDForcing row) (.y .dd00)).det ≠ 0
 
@@ -406,9 +415,9 @@ typed by the named propositions above rather than by inline determinants, and th
 `set_option` lines keep the auto-generated congruence lemmas from re-expanding them; both
 are what lets the kernel check this structure at all. -/
 structure PublishedTwoDemeLDPoint where
-  rho : ℝ
+  rho : Descent.Core.Rho
   migration : ℝ
-  rho_nonneg : 0 ≤ rho
+  rho_nonneg : 0 ≤ rho.value
   migration_nonneg : 0 ≤ migration
   operator_nonsingular : PublishedTwoDemeOperatorNonsingular rho migration
   within_numerator_nonzero : PublishedTwoDemeWithinNumeratorNonzero rho migration
@@ -419,7 +428,8 @@ noncomputable def PublishedTwoDemeLDPoint.correlation
   publishedTwoDemeDCorrelation point.rho point.migration
 
 /-- The concrete `E[D₀D₁]` family is a rational determinant quotient in `(rho,M)`. -/
-theorem publishedTwoDemeCrossD_eq_rational (rho M : ℝ) :
+theorem publishedTwoDemeCrossD_eq_rational
+    (rho : Descent.Core.Rho) (M : ℝ) :
     publishedTwoDemeCrossD rho M =
       (replaceColumn (publishedTwoDemeLDOperator rho M)
         (fun row ↦ -publishedTwoDemeLDForcing row) (.y .dd01)).det /
@@ -427,7 +437,8 @@ theorem publishedTwoDemeCrossD_eq_rational (rho M : ℝ) :
 
 /-- The correlation is the ratio of the cross and within Cramer numerators whenever both
 poles are excluded; the common operator determinant cancels exactly. -/
-theorem publishedTwoDemeDCorrelation_eq_rational (rho M : ℝ)
+theorem publishedTwoDemeDCorrelation_eq_rational
+    (rho : Descent.Core.Rho) (M : ℝ)
     (hoperator : (publishedTwoDemeLDOperator rho M).det ≠ 0)
     (hwithin : (replaceColumn (publishedTwoDemeLDOperator rho M)
       (fun row ↦ -publishedTwoDemeLDForcing row) (.y .dd00)).det ≠ 0) :
@@ -456,16 +467,16 @@ theorem PublishedTwoDemeLDPoint.correlation_eq_rational
 
 /-- At zero recombination the recombination block vanishes literally. -/
 theorem publishedTwoDemeLDOperator_zero_recombination (M : ℝ) :
-    publishedTwoDemeLDOperator 0 M =
+    publishedTwoDemeLDOperator (Descent.Core.Rho.ofScaled 0) M =
       publishedTwoDemeLDBase + M • publishedTwoDemeLDMigration := by
   unfold publishedTwoDemeLDOperator publishedTwoDemeLDOperatorAtMutation
     publishedTwoDemeLDBase
   simp
 
 /-- At zero migration the migration block vanishes literally. -/
-theorem publishedTwoDemeLDOperator_zero_migration (rho : ℝ) :
+theorem publishedTwoDemeLDOperator_zero_migration (rho : Descent.Core.Rho) :
     publishedTwoDemeLDOperator rho 0 =
-      publishedTwoDemeLDBase + rho • publishedTwoDemeLDRecombination := by
+      publishedTwoDemeLDBase + rho.value • publishedTwoDemeLDRecombination := by
   unfold publishedTwoDemeLDOperator publishedTwoDemeLDOperatorAtMutation
     publishedTwoDemeLDBase
   simp
