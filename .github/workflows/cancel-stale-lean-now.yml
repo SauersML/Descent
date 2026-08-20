@@ -13,6 +13,7 @@ jobs:
       matrix:
         group:
           - 'Descent CI-refs/heads/main'
+          - 'lean-repair-build-refs/heads/main'
           - 'lean-lint-fast-main'
           - 'lean-audit-smoke-main'
     runs-on: ubuntu-latest
@@ -21,4 +22,4 @@ jobs:
       cancel-in-progress: true
     timeout-minutes: 2
     steps:
-      - run: echo "Cancelled stale group ${{ matrix.group }} to prioritize final source compilation."
+      - run: echo "Cancelled stale group ${{ matrix.group }} to prioritize the inspectable PR full build."
