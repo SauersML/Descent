@@ -1033,15 +1033,15 @@ noncomputable def AffineTwoDemeLDSystem.crossDCorrelation {n : ℕ}
 /-- A parameter point on which the affine stationary solution and its correlation denominator
 exist.  Both counterexample-producing poles are excluded by the value's type. -/
 structure NonsingularAffineLDPoint {n : ℕ} (sys : AffineTwoDemeLDSystem n) where
-  rho : ℝ
+  rho : Descent.Core.Rho
   migration : ℝ
-  rho_nonnegative : 0 ≤ rho
+  rho_nonnegative : 0 ≤ rho.value
   migration_nonnegative : 0 ≤ migration
   operator_nonsingular :
-    (sys.drift + rho • sys.recombination + migration • sys.migration).det ≠ 0
+    (sys.drift + rho.value • sys.recombination + migration • sys.migration).det ≠ 0
   within_numerator_nonzero :
     (replaceColumn
-      (sys.drift + rho • sys.recombination + migration • sys.migration)
+      (sys.drift + rho.value • sys.recombination + migration • sys.migration)
       (fun i ↦ -(sys.forcingBase i + migration * sys.forcingMigration i))
       sys.withinSource).det ≠ 0
 
@@ -1053,27 +1053,27 @@ noncomputable def NonsingularAffineLDPoint.crossDCorrelation {n : ℕ}
 /-- The affine system's cross moment is visibly the Cramer quotient of a matrix affine in
 recombination and migration. -/
 theorem AffineTwoDemeLDSystem.crossD_eq_det_ratio {n : ℕ}
-    (sys : AffineTwoDemeLDSystem n) (rho M : ℝ) :
+    (sys : AffineTwoDemeLDSystem n) (rho : Descent.Core.Rho) (M : ℝ) :
     sys.toSystem.crossD rho M =
       (replaceColumn
-        (sys.drift + rho • sys.recombination + M • sys.migration)
+        (sys.drift + rho.value • sys.recombination + M • sys.migration)
         (fun i ↦ -(sys.forcingBase i + M * sys.forcingMigration i))
         sys.crossSourceTarget).det /
-      (sys.drift + rho • sys.recombination + M • sys.migration).det := rfl
+      (sys.drift + rho.value • sys.recombination + M • sys.migration).det := rfl
 
 
 /-- **The migration--LD law is rational in `(rho,M)`.**  Expanded determinants are not a
 different result: this quotient is exactly the quotient of two Cramer numerators, because
 the common system determinant cancels. -/
 theorem TwoDemeLDSystem.crossDCorrelation_eq_cramer_numerator_ratio {n : ℕ}
-    (sys : TwoDemeLDSystem n) (rho M : ℝ)
-    (hdet : (sys.operator rho M).det ≠ 0)
-    (hwithin : (replaceColumn (sys.operator rho M) (fun i ↦ -sys.forcing M i)
+    (sys : TwoDemeLDSystem n) (rho : Descent.Core.Rho) (M : ℝ)
+    (hdet : (sys.operator rho.value M).det ≠ 0)
+    (hwithin : (replaceColumn (sys.operator rho.value M) (fun i ↦ -sys.forcing M i)
       sys.withinSource).det ≠ 0) :
     sys.crossDCorrelation rho M =
-      (replaceColumn (sys.operator rho M) (fun i ↦ -sys.forcing M i)
+      (replaceColumn (sys.operator rho.value M) (fun i ↦ -sys.forcing M i)
         sys.crossSourceTarget).det /
-      (replaceColumn (sys.operator rho M) (fun i ↦ -sys.forcing M i)
+      (replaceColumn (sys.operator rho.value M) (fun i ↦ -sys.forcing M i)
         sys.withinSource).det := by
   unfold TwoDemeLDSystem.crossDCorrelation TwoDemeLDSystem.crossD
     TwoDemeLDSystem.withinD TwoDemeLDSystem.stationaryCoordinate cramerCoordinate
@@ -1082,7 +1082,7 @@ theorem TwoDemeLDSystem.crossDCorrelation_eq_cramer_numerator_ratio {n : ℕ}
 /-- The panmictic check: once migration makes the cross and within Cramer numerators equal,
 the correlation is exactly one.  This is an analytic limit check, not a numerical validator. -/
 theorem TwoDemeLDSystem.crossDCorrelation_panmixia {n : ℕ}
-    (sys : TwoDemeLDSystem n) (rho M : ℝ)
+    (sys : TwoDemeLDSystem n) (rho : Descent.Core.Rho) (M : ℝ)
     (hwithin : sys.withinD rho M ≠ 0)
     (hpan : sys.crossD rho M = sys.withinD rho M) :
     sys.crossDCorrelation rho M = 1 := by
