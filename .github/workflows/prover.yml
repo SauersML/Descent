@@ -110,7 +110,7 @@ jobs:
         id: lake-deps-cache
         uses: actions/cache@v4
         with:
-          path: ~/.elan
+          path: .lake/packages
           key: ${{ runner.os }}-lake-deps-v1-${{ hashFiles('lean-toolchain', 'lake-manifest.json') }}
           restore-keys: |
             ${{ runner.os }}-lake-deps-v1-
