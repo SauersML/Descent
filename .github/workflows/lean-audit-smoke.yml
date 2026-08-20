@@ -45,14 +45,16 @@ jobs:
       - name: Fetch precompiled dependencies
         if: steps.deps.outputs.cache-hit != 'true'
         run: lake exe cache get
-      - name: Restore compiled project
+      - name: Restore successful full-build cache
+        id: project-cache
         uses: actions/cache@v4
         with:
           path: .lake/build
-          key: ${{ runner.os }}-descent-v1-${{ hashFiles('lean-toolchain', 'lake-manifest.json', 'lakefile.lean', 'Descent.lean', 'Descent/**/*.lean', 'validation/**/*.lean') }}
+          key: ${{ runner.os }}-descent-fast-v1-${{ hashFiles('lean-toolchain', 'lake-manifest.json', 'lakefile.lean', 'Descent.lean', 'Counterexamples.lean', 'Descent/**/*.lean', 'Counterexamples/**/*.lean', 'validation/**/*.lean') }}
           restore-keys: |
-            ${{ runner.os }}-descent-v1-
-      - name: Build audit dependencies
+            ${{ runner.os }}-descent-fast-v1-
+      - name: Build audit dependencies only on cache miss
+        if: steps.project-cache.outputs.cache-hit != 'true'
         run: lake build Descent ValidationShared
       - name: Run Lean audit entrypoints
         id: audit
