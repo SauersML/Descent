@@ -55,6 +55,14 @@ jobs:
         if: steps.lake-deps-cache.outputs.cache-hit != 'true'
         run: lake exe cache get
 
+      - name: Cache compiled project
+        uses: actions/cache@v4
+        with:
+          path: .lake/build
+          key: ${{ runner.os }}-descent-fast-v1-${{ hashFiles('lean-toolchain', 'lake-manifest.json', 'lakefile.lean', 'Descent.lean', 'Counterexamples.lean', 'Descent/**/*.lean', 'Counterexamples/**/*.lean', 'validation/**/*.lean') }}
+          restore-keys: |
+            ${{ runner.os }}-descent-fast-v1-
+
       - name: Compile every default Lean target
         id: compile
         shell: bash
