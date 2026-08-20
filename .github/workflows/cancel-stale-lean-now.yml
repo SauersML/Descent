@@ -21,4 +21,4 @@ jobs:
       cancel-in-progress: true
     timeout-minutes: 2
     steps:
-      - run: echo "Cancelled stale group ${{ matrix.group }} to prioritize the current repair build."
+      - run: echo "Cancelled stale group ${{ matrix.group }} to prioritize final source compilation."
