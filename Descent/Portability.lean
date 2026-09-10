@@ -181,6 +181,9 @@ import Descent.Portability.ObservationAsymptotics
 import Descent.Portability.ContinuousObservabilityGramian
 import Descent.Portability.MarkovSeparatorLaw
 import Descent.Portability.BalancedHWEVanishingLaw
+import Descent.Portability.ThreeLocusInformation
+import Descent.Portability.GaussianEvenMoments
+import Descent.Portability.GraphColoringLaw
 
 assert_below Descent.Program
 

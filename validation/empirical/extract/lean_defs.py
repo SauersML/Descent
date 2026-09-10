@@ -3933,6 +3933,9 @@ def innerValue(effects):
 def clippedInner(cap, effects):
     return sum((_rt.mul(_rt._proj((labelKernel(Descent_Portability_SimulationDesignDecoder_design())), 'weight')(effects, outcome), _rt._proj((clippedReport(Descent_Portability_SimulationDesignDecoder_design(), cap, effects, outcome)), 'getD')(0.0))) for outcome in range(int(len(effects))))
 
+def evenConstant(k):
+    return _rt._proj((momentPolynomial(1.0, ((2.0 * k)))), 'eval')(0.0)
+
 def hermitePolynomial(order):
     return (1.0 if (order == 0.0) else (X if (order == 1.0) else (_rt.lpow(X, 2.0) - 1.0)))
 
@@ -3977,6 +3980,9 @@ def historyDegradation(h, h_p):
 
 def historyMarginalAmplitude(h):
     return _rt._proj(h, 'amplitude')
+
+def classWeight(color, w, c):
+    return sum(((w[int(v)] if (color(v) == c) else 0.0)) for v in range(int(len(w))))
 
 def Descent_Portability_GuardedMetricOptimization_recover(problem):
     return ((_rt.rdiv(1.0, _rt._proj(problem, 'scale'))) * _rt._proj(problem, 'weights'))
@@ -5582,6 +5588,24 @@ def fStat(m, p):
 
 def r2EstimatorVariance(r2, n):
     return _rt.rdiv(((4.0 * r2) * _rt.lpow(((1.0 - r2)), 2.0)), n)
+
+def direction():
+    return _rt.VecFn([_rt.VecFn([0.0, 1.0, (-2.0)]), _rt.VecFn([1.0, 0.0, 1.0]), _rt.VecFn([(-2.0), 1.0, 0.0])])
+
+def degrees():
+    return _rt.VecFn([_rt.VecFn([2.0, 2.0, 0.0]), _rt.VecFn([2.0, 0.0, 2.0]), _rt.VecFn([0.0, 2.0, 2.0]), _rt.VecFn([2.0, 1.0, 1.0]), _rt.VecFn([1.0, 2.0, 1.0]), _rt.VecFn([1.0, 1.0, 2.0])])
+
+def coefficients():
+    return _rt.VecFn([1.0, 1.0, 1.0, (-1.0), (-1.0), (-1.0)])
+
+def statistic(x):
+    return tensorCombination(degrees(), coefficients(), x)
+
+def permuted(A, π):
+    return (lambda i, j: A[int((π(i)))][int((π(j)))])
+
+def densitySecondCoefficient(x):
+    return _rt.mul((_rt.rdiv(1.0, 6.0)), sum(((_rt.add(_rt.sub(_rt.rdiv(_rt.trace((_rt.mul(direction(), direction()))), 4.0), _rt.rdiv(quadraticValue((permuted((_rt.mul(direction(), direction())), π)), x), 2.0)), _rt.rdiv(_rt.lpow(quadraticValue((permuted(direction(), π)), x), 2.0), 8.0)))) for π in range(int(len(x)))))
 
 def orderedTimes(duration, values):
     return (lambda i: _rt.mul((duration), sortedValues(values, i)))

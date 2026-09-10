@@ -1,7 +1,7 @@
 {
  "_NOT_AUTHORITATIVE": "The committed copy of this file is STALE BY CONSTRUCTION: the Lean corpus moves every few minutes and this is a cache of it. Do not consume a committed copy -- run validation/extract/emit.py in your own worktree immediately before use, and call api.require_fresh(), which raises if the table does not describe the Lean on disk.",
- "source_digest": "sha256:95cd9e6f93dd5d0c2e66131a8544eebe",
- "source_files": 467,
+ "source_digest": "sha256:b1d5b668bbb5fb615b6fe60740689b67",
+ "source_files": 470,
  "collisions": {
   "Descent.Portability.empiricalAUCComparison": [
    {
@@ -8395,7 +8395,8 @@
    "line": 141,
    "statement": "{Sample Observable Report : Type*} [MeasurableSpace Sample] [MeasurableSpace Observable] [MeasurableSpace Report] (source target : MeasureTheory.Measure Sample) (observe : Sample → Observable) (statistic : Observable → Report) (hobserve : Measurable observe) (hstatistic : Measurable statistic) (hsame : MeasureTheory.Measure.map observe source = MeasureTheory.Measure.map observe target) : MeasureTheory.Measure.map (statistic ∘ observe) source = MeasureTheory.Measure.map (statistic ∘ observe) target",
    "mentions": [
-    "Observable"
+    "Observable",
+    "statistic"
    ]
   },
   {
@@ -8611,7 +8612,8 @@
     "IdentifiedBy",
     "IsGraphInvariant",
     "classOf",
-    "graph"
+    "graph",
+    "statistic"
    ]
   },
   {
@@ -8624,7 +8626,8 @@
     "FactorsThroughSemantic",
     "IdentifiedBy",
     "classOf",
-    "graph"
+    "graph",
+    "statistic"
    ]
   },
   {
@@ -28583,6 +28586,7 @@
    "statement": ": Summable (fun k : ℕ ↦ 1 / Coalescent.deathRate (k + 2)) ∧ ∀ n : ℕ, ∀ observation : (Fin (n + 1) → ℝ) →ₗ[ℝ] (Fin n → ℝ), ∃ direction : Fin (n + 1) → ℝ, direction ≠ 0 ∧ observation direction = 0",
    "mentions": [
     "deathRate",
+    "direction",
     "observation"
    ]
   },
@@ -62990,6 +62994,7 @@
    "statement": "(readout : Matrix I S ℝ) (generator : Matrix S S ℝ) (direction : S → ℝ) (time : ℝ) : informationDensity readout generator direction time = direction ⬝ᵥ gramianIntegrand readout generator time *ᵥ direction",
    "mentions": [
     "S",
+    "direction",
     "generator",
     "gramianIntegrand",
     "informationDensity"
@@ -63004,6 +63009,7 @@
    "mentions": [
     "S",
     "continuousGramian",
+    "direction",
     "generator",
     "informationDensity"
    ]
@@ -63017,6 +63023,7 @@
    "mentions": [
     "S",
     "continuousGramian",
+    "direction",
     "generator",
     "visibleCoefficient"
    ]
@@ -63029,6 +63036,7 @@
    "statement": "(readout : Matrix I S ℝ) (generator : Matrix S S ℝ) (direction : S → ℝ) (order : ℕ) (hvisible : readout *ᵥ (generator ^ order) *ᵥ direction ≠ 0) : 0 < visibleCoefficient readout generator direction order / ((order.factorial : ℝ) ^ 2 * (2 * order + 1 : ℕ))",
    "mentions": [
     "S",
+    "direction",
     "generator",
     "visibleCoefficient"
    ]
@@ -63682,6 +63690,7 @@
    "statement": "(covariateWeight : Covariate → ℝ) (posterior : Covariate → Index → ℝ) (conditional : Index → Covariate → ℝ) (stratify : Index → Stratum) (predictor direction : Stratum → Covariate → ℝ) (step : ℝ) (hcalibrated : IsStratumCalibrated posterior conditional stratify predictor) : stratifiedCalibrationEnergy covariateWeight posterior conditional stratify (fun s x ↦ predictor s x + step * direction s x) = stratifiedCalibrationEnergy covariateWeight posterior conditional stratify predictor + step ^ 2 * ∑ x, covariateWeight x * ∑ t, posterior x t * direction (stratify t) x ^ 2",
    "mentions": [
     "IsStratumCalibrated",
+    "direction",
     "posterior",
     "stratifiedCalibrationEnergy"
    ]
@@ -64983,7 +64992,8 @@
    "line": 619,
    "statement": "(A : H →L[ℝ] Y) (hdeep : HasUnitApproxKernel A) {κ : Type*} [Fintype κ] (T : κ → Y →L[ℝ] H) (ε : ℝ) (hε : 0 < ε) : ∃ β : H, ‖β‖ = 1 ∧ ∀ coefficients : κ → ℝ, ‖∑ j, coefficients j • (T j) (A β)‖ ≤ ε * ∑ j, |coefficients j|",
    "mentions": [
-    "HasUnitApproxKernel"
+    "HasUnitApproxKernel",
+    "coefficients"
    ]
   },
   {
@@ -64993,7 +65003,8 @@
    "line": 647,
    "statement": "(A : H →L[ℝ] Y) (hdeep : HasUnitApproxKernel A) {κ : Type*} [Fintype κ] (T : κ → Y →L[ℝ] H) (ε Λ : ℝ) (hε : 0 < ε) : ∃ β : H, ‖β‖ = 1 ∧ ∀ coefficients : κ → ℝ, (∑ j, |coefficients j|) ≤ Λ → 1 - Λ * ε ≤ ‖β - ∑ j, coefficients j • (T j) (A β)‖",
    "mentions": [
-    "HasUnitApproxKernel"
+    "HasUnitApproxKernel",
+    "coefficients"
    ]
   },
   {
@@ -65003,7 +65014,8 @@
    "line": 672,
    "statement": "(A : H →L[ℝ] Y) (hdeep : HasUnitApproxKernel A) {κ : Type*} [Fintype κ] (T : κ → Y →L[ℝ] H) (Λ η : ℝ) (hΛ : 0 ≤ Λ) (hη : 0 < η) : ∃ β : H, ‖β‖ = 1 ∧ ∀ coefficients : κ → ℝ, (∑ j, |coefficients j|) ≤ Λ → 1 - η ≤ ‖β - ∑ j, coefficients j • (T j) (A β)‖",
    "mentions": [
-    "HasUnitApproxKernel"
+    "HasUnitApproxKernel",
+    "coefficients"
    ]
   },
   {
@@ -65129,6 +65141,7 @@
    "line": 111,
    "statement": "(coefficients : (D → Fin 3) → ℝ) : phenotypeMean (realizingMap coefficients) = tensorQuadratic coefficients",
    "mentions": [
+    "coefficients",
     "phenotypeMean",
     "realizingMap",
     "tensorQuadratic"
@@ -65141,6 +65154,7 @@
    "line": 135,
    "statement": "(coefficients : (D → Fin 3) → ℝ) (f : (D → Fin 3) → ℝ) (hf : phenotypeMean f = tensorQuadratic coefficients) : f = realizingMap coefficients",
    "mentions": [
+    "coefficients",
     "phenotypeMean",
     "realizingMap",
     "tensorQuadratic"
@@ -65177,6 +65191,7 @@
    "line": 174,
    "statement": "(F : (D → ℝ) → ℝ) : (∃ f, phenotypeMean f = F) ↔ ∃ coefficients, tensorQuadratic coefficients = F",
    "mentions": [
+    "coefficients",
     "phenotypeMean",
     "tensorQuadratic"
    ]
@@ -65685,6 +65700,7 @@
    "statement": "(kernel : S → FiniteReportLaw S) (reports : Matrix S I ℝ) (discount : ℝ) (direction : S → ℝ) (time : ℕ) : quadraticLinear direction (discountedTerm kernel (reports * reports.transpose) discount time) = discount ^ time * ∑ report, ((evolvedReports kernel reports time).transpose *ᵥ direction) report ^ 2",
    "mentions": [
     "S",
+    "direction",
     "discountedTerm",
     "evolvedReports",
     "kernel",
@@ -65700,6 +65716,7 @@
    "statement": "(kernel : S → FiniteReportLaw S) (reports : Matrix S I ℝ) (discount : ℝ) (hnonneg : 0 ≤ discount) (hlt : discount < 1) (direction : S → ℝ) : Summable (fun time : ℕ ↦ discount ^ time * ∑ report, ((evolvedReports kernel reports time).transpose *ᵥ direction) report ^ 2)",
    "mentions": [
     "S",
+    "direction",
     "evolvedReports",
     "kernel",
     "report"
@@ -65713,6 +65730,7 @@
    "statement": "(kernel : S → FiniteReportLaw S) (reports : Matrix S I ℝ) (discount : ℝ) (hnonneg : 0 ≤ discount) (hlt : discount < 1) (direction : S → ℝ) : (∑' time : ℕ, discount ^ time * ∑ report, ((evolvedReports kernel reports time).transpose *ᵥ direction) report ^ 2) = direction ⬝ᵥ discountedGramian kernel reports discount *ᵥ direction",
    "mentions": [
     "S",
+    "direction",
     "discountedGramian",
     "evolvedReports",
     "kernel",
@@ -66521,6 +66539,7 @@
    "statement": "(readout : Matrix I S ℝ) (generator : Matrix S S ℝ) (direction : S → ℝ) (time : ℝ) : HasDerivAt (observation readout generator direction) (observation readout generator (generator *ᵥ direction) time) time",
    "mentions": [
     "S",
+    "direction",
     "generator",
     "observation"
    ]
@@ -66533,6 +66552,7 @@
    "statement": "(readout : Matrix I S ℝ) (generator : Matrix S S ℝ) (direction : S → ℝ) : (∀ time < Fintype.card S, readout *ᵥ (generator ^ time) *ᵥ direction = 0) ↔ ∀ time : ℕ, readout *ᵥ (generator ^ time) *ᵥ direction = 0",
    "mentions": [
     "S",
+    "direction",
     "generator"
    ]
   },
@@ -66544,6 +66564,7 @@
    "statement": "(readout : Matrix I S ℝ) (generator : Matrix S S ℝ) (direction : S → ℝ) (hblind : ∀ order : ℕ, readout *ᵥ (generator ^ order) *ᵥ direction = 0) (time : ℝ) : observation readout generator direction time = 0",
    "mentions": [
     "S",
+    "direction",
     "generator",
     "observation"
    ]
@@ -66556,6 +66577,7 @@
    "statement": "(readout : Matrix I S ℝ) (generator : Matrix S S ℝ) (direction : S → ℝ) (hblind : ∀ time : ℝ, observation readout generator direction time = 0) : ∀ order : ℕ, readout *ᵥ (generator ^ order) *ᵥ direction = 0",
    "mentions": [
     "S",
+    "direction",
     "generator",
     "observation"
    ]
@@ -66568,6 +66590,7 @@
    "statement": "(readout : Matrix I S ℝ) (generator : Matrix S S ℝ) (direction : S → ℝ) : (∀ time : ℝ, observation readout generator direction time = 0) ↔ ∀ order < Fintype.card S, readout *ᵥ (generator ^ order) *ᵥ direction = 0",
    "mentions": [
     "S",
+    "direction",
     "generator",
     "observation"
    ]
@@ -69975,6 +69998,37 @@
    ]
   },
   {
+   "name": "Descent.Portability.GaussianEvenMoments.evenConstant_pos",
+   "kind": "theorem",
+   "file": "Descent/Portability/GaussianEvenMoments.lean",
+   "line": 22,
+   "statement": "(k : ℕ) : 0 < evenConstant k",
+   "mentions": [
+    "evenConstant"
+   ]
+  },
+  {
+   "name": "Descent.Portability.GaussianEvenMoments.gaussian_sqrt_scale",
+   "kind": "theorem",
+   "file": "Descent/Portability/GaussianEvenMoments.lean",
+   "line": 39,
+   "statement": "(variance : NNReal) : (gaussianReal 0 1).map (fun x : ℝ ↦ Real.sqrt variance * x) = gaussianReal 0 variance",
+   "mentions": [
+    "variance"
+   ]
+  },
+  {
+   "name": "Descent.Portability.GaussianEvenMoments.even_power_moment",
+   "kind": "theorem",
+   "file": "Descent/Portability/GaussianEvenMoments.lean",
+   "line": 46,
+   "statement": "(variance : NNReal) (k : ℕ) : (∫ x : ℝ, x ^ (2 * k) ∂gaussianReal 0 variance) = evenConstant k * (variance : ℝ) ^ k",
+   "mentions": [
+    "evenConstant",
+    "variance"
+   ]
+  },
+  {
    "name": "Descent.Portability.GaussianHermiteLaw.integrable_power",
    "kind": "theorem",
    "file": "Descent/Portability/GaussianHermiteLaw.lean",
@@ -70569,6 +70623,7 @@
    "line": 288,
    "statement": "(a x₀ : K → ℝ) (hnontrivial : ∃ direction, linearForm a direction ≠ 0) (hzero : linearForm a x₀ = 0) (U : Set (K → ℝ)) (hU : IsOpen U) (hx₀ : x₀ ∈ U) : ∃ mass : ℝ, 0 < mass ∧ ∀ n : ℕ, ENNReal.ofReal (mass / (n + 1 : ℝ)) ≤ effectLaw K (linearSlab a U n)",
    "mentions": [
+    "direction",
     "effectLaw",
     "linearForm",
     "linearSlab"
@@ -70583,6 +70638,7 @@
    "mentions": [
     "S",
     "crossForm",
+    "direction",
     "effectLaw",
     "poleSlab"
    ]
@@ -70849,6 +70905,81 @@
     "historyMarginalAmplitude",
     "independentHistory",
     "report"
+   ]
+  },
+  {
+   "name": "Descent.Portability.GraphColoringLaw.assemble_update",
+   "kind": "theorem",
+   "file": "Descent/Portability/GraphColoringLaw.lean",
+   "line": 36,
+   "statement": "(e : D ⊕ C ≃ V) (y : C → X) (x : D → X) (i : D) (a : X) : assembleEquiv e (y, Function.update x i a) = Function.update (assembleEquiv e (y, x)) (e (Sum.inl i)) a",
+   "mentions": [
+    "assembleEquiv"
+   ]
+  },
+  {
+   "name": "Descent.Portability.GraphColoringLaw.partition_phase",
+   "kind": "theorem",
+   "file": "Descent/Portability/GraphColoringLaw.lean",
+   "line": 57,
+   "statement": "(p : FiniteReportLaw (V → X)) (e : D ⊕ C ≃ V) (z : V → X → ℂ) : phaseMean (partitionLaw p e) (fun yx ↦ ∏ w, z (e w) (Sum.elim yx.2 yx.1 w)) = phaseMean p (fun f ↦ ∏ v, z v (f v))",
+   "mentions": [
+    "partitionLaw",
+    "phaseMean"
+   ]
+  },
+  {
+   "name": "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation",
+   "kind": "theorem",
+   "file": "Descent/Portability/GraphColoringLaw.lean",
+   "line": 81,
+   "statement": "[Nonempty X] (p : FiniteReportLaw (V → X)) (hp : ∀ f, 0 < p.mass f) (adj : V → V → Prop) (K : V → (V → X) → FiniteReportLaw X) (hn : FullNeighborLocal adj K) (hl : FullLocalCondition p K) (e : D ⊕ C ≃ V) (hind : ∀ i j, ¬ adj (e (Sum.inl i)) (e (Sum.inl j))) (ν : V → FiniteReportLaw X) (η : V → ℝ) (hη : ∀ v, 0 ≤ η v) (hηone : ∀ v, η v ≤ 1) (hminor : ∀ f v a, η v * (ν v).mass a ≤ (K v f).mass a) (z : V → X → ℂ) (hz : ∀ v a, ‖z v a‖ ≤ 1) : ‖phaseMean p (fun f ↦ ∏ v, z v (f v))‖ ≤ Real.exp (-∑ i : D, η (e (Sum.inl i)) * (1 - ‖phaseMean (ν (e (Sum.inl i))) (z (e (Sum.inl i)))‖))",
+   "mentions": [
+    "FullLocalCondition",
+    "FullNeighborLocal",
+    "phaseMean"
+   ]
+  },
+  {
+   "name": "Descent.Portability.GraphColoringLaw.classWeight_subtype",
+   "kind": "theorem",
+   "file": "Descent/Portability/GraphColoringLaw.lean",
+   "line": 129,
+   "statement": "(color : V → Color) (w : V → ℝ) (c : Color) : classWeight color w c = ∑ v : {v // color v = c}, w v",
+   "mentions": [
+    "classWeight"
+   ]
+  },
+  {
+   "name": "Descent.Portability.GraphColoringLaw.classWeight_sum",
+   "kind": "theorem",
+   "file": "Descent/Portability/GraphColoringLaw.lean",
+   "line": 136,
+   "statement": "(color : V → Color) (w : V → ℝ) : (∑ c, classWeight color w c) = ∑ v, w v",
+   "mentions": [
+    "classWeight"
+   ]
+  },
+  {
+   "name": "Descent.Portability.GraphColoringLaw.exists_average_color",
+   "kind": "theorem",
+   "file": "Descent/Portability/GraphColoringLaw.lean",
+   "line": 144,
+   "statement": "(color : V → Color) (w : V → ℝ) : ∃ c, (∑ v, w v) / Fintype.card Color ≤ classWeight color w c",
+   "mentions": [
+    "classWeight"
+   ]
+  },
+  {
+   "name": "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation",
+   "kind": "theorem",
+   "file": "Descent/Portability/GraphColoringLaw.lean",
+   "line": 160,
+   "statement": "[Nonempty X] (p : FiniteReportLaw (V → X)) (hp : ∀ f, 0 < p.mass f) (adj : V → V → Prop) (K : V → (V → X) → FiniteReportLaw X) (hn : FullNeighborLocal adj K) (hl : FullLocalCondition p K) (color : V → Color) (hproper : ∀ v w, adj v w → color v ≠ color w) (ν : V → FiniteReportLaw X) (η : V → ℝ) (hη : ∀ v, 0 ≤ η v) (hηone : ∀ v, η v ≤ 1) (hminor : ∀ f v a, η v * (ν v).mass a ≤ (K v f).mass a) (z : V → X → ℂ) (hz : ∀ v a, ‖z v a‖ ≤ 1) : ‖phaseMean p (fun f ↦ ∏ v, z v (f v))‖ ≤ Real.exp (-(∑ v, η v * (1 - ‖phaseMean (ν v) (z v)‖)) / Fintype.card Color)",
+   "mentions": [
+    "FullLocalCondition",
+    "FullNeighborLocal",
+    "phaseMean"
    ]
   },
   {
@@ -76599,6 +76730,7 @@
    "statement": "(direction : S → ℝ) (hzero : ∑ state, direction state = 0) : ∃ (first second : FiniteReportLaw S) (scale : ℝ), 0 < scale ∧ direction = scale • (first.mass - second.mass)",
    "mentions": [
     "S",
+    "direction",
     "scale"
    ]
   },
@@ -76621,7 +76753,8 @@
    "mentions": [
     "AutonomousOnLaws",
     "S",
-    "comp"
+    "comp",
+    "direction"
    ]
   },
   {
@@ -76632,7 +76765,8 @@
    "statement": "(transition : Matrix S S ℝ) (features : Matrix S I ℝ) (hconstant : ∃ coefficients : I → ℝ, features *ᵥ coefficients = fun _ ↦ 1) : AutonomousOnLaws features.transpose.toLin' ((transition * features).transpose.toLin') ↔ ∃ update : Matrix I I ℝ, transition * features = features * update",
    "mentions": [
     "AutonomousOnLaws",
-    "S"
+    "S",
+    "coefficients"
    ]
   },
   {
@@ -76661,6 +76795,7 @@
    "statement": "(readout : Matrix I S ℝ) (generator : Matrix S S ℝ) (direction : S → ℝ) (report : I) (order : ℕ) (time : ℝ) : HasDerivAt (observationJet readout generator direction report order) (observationJet readout generator direction report (order + 1) time) time",
    "mentions": [
     "S",
+    "direction",
     "generator",
     "observationJet",
     "report"
@@ -76674,6 +76809,7 @@
    "statement": "(readout : Matrix I S ℝ) (generator : Matrix S S ℝ) (direction : S → ℝ) (order : ℕ) (hzero : ∀ earlier < order, readout *ᵥ (generator ^ earlier) *ᵥ direction = 0) (report : I) : Tendsto (fun time : ℝ ↦ observation readout generator direction time report / time ^ order) (nhdsWithin 0 (Set.Ioi 0)) (nhds ((readout *ᵥ (generator ^ order) *ᵥ direction) report / (order.factorial : ℝ)))",
    "mentions": [
     "S",
+    "direction",
     "generator",
     "observation",
     "report"
@@ -76687,6 +76823,7 @@
    "statement": "(readout : Matrix I S ℝ) (generator : Matrix S S ℝ) (direction : S → ℝ) (order : ℕ) (hzero : ∀ earlier < order, readout *ᵥ (generator ^ earlier) *ᵥ direction = 0) : Tendsto (fun time : ℝ ↦ informationDensity readout generator direction time / time ^ (2 * order)) (nhdsWithin 0 (Set.Ioi 0)) (nhds (visibleCoefficient readout generator direction order / (order.factorial : ℝ) ^ 2))",
    "mentions": [
     "S",
+    "direction",
     "generator",
     "informationDensity",
     "visibleCoefficient"
@@ -76700,6 +76837,7 @@
    "statement": "(readout : Matrix I S ℝ) (generator : Matrix S S ℝ) (direction : S → ℝ) : Continuous (informationDensity readout generator direction)",
    "mentions": [
     "S",
+    "direction",
     "generator",
     "informationDensity"
    ]
@@ -76712,6 +76850,7 @@
    "statement": "(readout : Matrix I S ℝ) (generator : Matrix S S ℝ) (direction : S → ℝ) (order : ℕ) (hzero : ∀ earlier < order, readout *ᵥ (generator ^ earlier) *ᵥ direction = 0) : Tendsto (fun horizon : ℝ ↦ (∫ time in 0..horizon, informationDensity readout generator direction time) / horizon ^ (2 * order + 1)) (nhdsWithin 0 (Set.Ioi 0)) (nhds (visibleCoefficient readout generator direction order / ((order.factorial : ℝ) ^ 2 * (2 * order + 1 : ℕ))))",
    "mentions": [
     "S",
+    "direction",
     "generator",
     "informationDensity",
     "visibleCoefficient"
@@ -76725,6 +76864,7 @@
    "statement": "(readout : Matrix I S ℝ) (generator : Matrix S S ℝ) (direction : S → ℝ) (order : ℕ) (hvisible : readout *ᵥ (generator ^ order) *ᵥ direction ≠ 0) : 0 < visibleCoefficient readout generator direction order",
    "mentions": [
     "S",
+    "direction",
     "generator",
     "visibleCoefficient"
    ]
@@ -77253,6 +77393,7 @@
    "line": 214,
    "statement": "(m : RecentFineScaleConfounding) : m.direction ∉ m.pc.topPCSpan",
    "mentions": [
+    "direction",
     "topPCSpan"
    ]
   },
@@ -77263,6 +77404,7 @@
    "line": 232,
    "statement": "(m : RecentFineScaleConfounding) : m.pc.removeTopPCs m.direction = m.direction ∧ m.minLoading ^ 2 ≤ m.pc.residualBiasEnergy m.direction",
    "mentions": [
+    "direction",
     "removeTopPCs",
     "residualBiasEnergy"
    ]
@@ -88303,6 +88445,7 @@
    "statement": "(p : FiniteReportLaw S) (genotype : S → J → ℝ) (coefficients : J → ℝ) : 0 ≤ varianceForm p genotype coefficients",
    "mentions": [
     "S",
+    "coefficients",
     "varianceForm"
    ]
   },
@@ -89297,6 +89440,7 @@
    "statement": "(effects direction : K → ℝ) (t : ℝ) : crossForm source sourceScore sourceCausal weights (fun k ↦ effects k + t * direction k) = crossForm source sourceScore sourceCausal weights effects + t * crossForm source sourceScore sourceCausal weights direction",
    "mentions": [
     "crossForm",
+    "direction",
     "effects"
    ]
   },
@@ -89308,6 +89452,7 @@
    "statement": "{effects₀ : K → ℝ} (h : PoleWitness source target sourceScore targetScore sourceCausal targetCausal weights effects₀) (direction : K → ℝ) (hd : crossForm source sourceScore sourceCausal weights direction ≠ 0) : Tendsto (fun t : ℝ ↦ t ^ 2 * (formRatio source target sourceScore targetScore sourceCausal targetCausal weights (fun k ↦ effects₀ k + t * direction k)).getD 0) (𝓝[≠] 0) (𝓝 (numeratorFactor source target sourceScore targetScore sourceCausal targetCausal weights effects₀ / crossForm source sourceScore sourceCausal weights direction ^ 2))",
    "mentions": [
     "crossForm",
+    "direction",
     "formRatio",
     "numeratorFactor"
    ]
@@ -89330,6 +89475,7 @@
    "line": 204,
    "statement": "{effects₀ : K → ℝ} (h : PoleWitness source target sourceScore targetScore sourceCausal targetCausal weights effects₀) : ∃ (direction : K → ℝ) (coefficient : ℝ), 0 < coefficient ∧ Tendsto (fun t : ℝ ↦ t ^ 2 * (formRatio source target sourceScore targetScore sourceCausal targetCausal weights (fun k ↦ effects₀ k + t * direction k)).getD 0) (𝓝[≠] 0) (𝓝 coefficient)",
    "mentions": [
+    "direction",
     "formRatio"
    ]
   },
@@ -89468,7 +89614,8 @@
    "statement": "(p : FiniteReportLaw S) (causal : S → K → ℝ) (x direction y : K → ℝ) (t : ℝ) : crossForm p causal causal (fun k ↦ x k + t * direction k) y = crossForm p causal causal x y + t * crossForm p causal causal direction y",
    "mentions": [
     "S",
-    "crossForm"
+    "crossForm",
+    "direction"
    ]
   },
   {
@@ -89493,6 +89640,7 @@
     "S",
     "SourceKernelDegenerate",
     "crossForm",
+    "direction",
     "effects",
     "score",
     "varianceForm"
@@ -89508,6 +89656,7 @@
     "S",
     "SourceKernelDegenerate",
     "crossForm",
+    "direction",
     "effects",
     "factor",
     "score",
@@ -89555,6 +89704,7 @@
     "S",
     "SourceKernelDegenerate",
     "crossForm",
+    "direction",
     "effects",
     "formRatio"
    ]
@@ -89569,6 +89719,7 @@
     "S",
     "covarianceVector",
     "crossForm",
+    "direction",
     "effects",
     "factor"
    ]
@@ -89584,6 +89735,7 @@
     "SourceKernelDegenerate",
     "covarianceVector",
     "crossForm",
+    "direction",
     "factor",
     "varianceForm"
    ]
@@ -89599,6 +89751,7 @@
     "SourceKernelDegenerate",
     "covarianceVector",
     "crossForm",
+    "direction",
     "factor",
     "varianceForm"
    ]
@@ -89614,6 +89767,7 @@
     "SourceKernelDegenerate",
     "covarianceVector",
     "crossForm",
+    "direction",
     "effectLaw",
     "effects",
     "factor",
@@ -89633,6 +89787,7 @@
     "covarianceVector",
     "crossForm",
     "design",
+    "direction",
     "effectLaw",
     "effects",
     "factor",
@@ -89651,6 +89806,7 @@
     "SourceKernelDegenerate",
     "crossForm",
     "design",
+    "direction",
     "effectLaw",
     "innerValue"
    ]
@@ -89667,6 +89823,7 @@
     "covarianceVector",
     "crossForm",
     "design",
+    "direction",
     "effectLaw",
     "factor",
     "innerValue",
@@ -94011,6 +94168,130 @@
    "statement": "(L : E →L[ℝ] F) (center : F) (radius : ℝ) (hr : 0 ≤ radius) : IsLeast {risk : ℝ | ∃ prediction : F, ∀ v : E, ‖v‖ ≤ radius → ‖center + L v - prediction‖ ^ 2 ≤ risk} (radius ^ 2 * ‖L‖ ^ 2)",
    "mentions": [
     "risk"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ThreeLocusInformation.degrees_injective",
+   "kind": "theorem",
+   "file": "Descent/Portability/ThreeLocusInformation.lean",
+   "line": 31,
+   "statement": ": Function.Injective degrees",
+   "mentions": [
+    "degrees"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ThreeLocusInformation.statistic_second_moment",
+   "kind": "theorem",
+   "file": "Descent/Portability/ThreeLocusInformation.lean",
+   "line": 35,
+   "statement": ": (∫ x, statistic x ^ 2 ∂productGaussian (Fin 3)) = 18",
+   "mentions": [
+    "productGaussian",
+    "statistic"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ThreeLocusInformation.statistic_mean",
+   "kind": "theorem",
+   "file": "Descent/Portability/ThreeLocusInformation.lean",
+   "line": 42,
+   "statement": ": (∫ x, statistic x ∂productGaussian (Fin 3)) = 0",
+   "mentions": [
+    "productGaussian",
+    "statistic"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ThreeLocusInformation.permutations_three",
+   "kind": "theorem",
+   "file": "Descent/Portability/ThreeLocusInformation.lean",
+   "line": 63,
+   "statement": "(f : Equiv.Perm (Fin 3) → ℝ) : (∑ π, f π) = f 1 + f (Equiv.swap 0 1) + f (Equiv.swap 0 2) + f (Equiv.swap 1 2) + f (Equiv.swap 0 1 * Equiv.swap 1 2) + f (Equiv.swap 1 2 * Equiv.swap 0 1)",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Portability.ThreeLocusInformation.direction_square",
+   "kind": "theorem",
+   "file": "Descent/Portability/ThreeLocusInformation.lean",
+   "line": 75,
+   "statement": ": direction * direction = ![![5, -2, 1], ![-2, 2, -2], ![1, -2, 5]]",
+   "mentions": [
+    "direction"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ThreeLocusInformation.direction_trace_square",
+   "kind": "theorem",
+   "file": "Descent/Portability/ThreeLocusInformation.lean",
+   "line": 79,
+   "statement": ": Matrix.trace (direction * direction) = 12",
+   "mentions": [
+    "direction"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ThreeLocusInformation.direction_symmetric",
+   "kind": "theorem",
+   "file": "Descent/Portability/ThreeLocusInformation.lean",
+   "line": 82,
+   "statement": "(i j : Fin 3) : direction i j = direction j i",
+   "mentions": [
+    "direction"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ThreeLocusInformation.direction_nonzero",
+   "kind": "theorem",
+   "file": "Descent/Portability/ThreeLocusInformation.lean",
+   "line": 85,
+   "statement": ": direction ≠ 0",
+   "mentions": [
+    "direction"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ThreeLocusInformation.direction_permutation_average",
+   "kind": "theorem",
+   "file": "Descent/Portability/ThreeLocusInformation.lean",
+   "line": 90,
+   "statement": "(i j : Fin 3) : (1 / 6 : ℝ) * ∑ π : Equiv.Perm (Fin 3), permuted direction π i j = 0",
+   "mentions": [
+    "direction",
+    "permuted"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ThreeLocusInformation.densitySecondCoefficient_eq_statistic",
+   "kind": "theorem",
+   "file": "Descent/Portability/ThreeLocusInformation.lean",
+   "line": 102,
+   "statement": "(x : Fin 3 → ℝ) : densitySecondCoefficient x = statistic x",
+   "mentions": [
+    "densitySecondCoefficient",
+    "statistic"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ThreeLocusInformation.density_coefficient_mean",
+   "kind": "theorem",
+   "file": "Descent/Portability/ThreeLocusInformation.lean",
+   "line": 115,
+   "statement": ": (∫ x, densitySecondCoefficient x ∂productGaussian (Fin 3)) = 0",
+   "mentions": [
+    "densitySecondCoefficient",
+    "productGaussian"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ThreeLocusInformation.density_coefficient_second_moment",
+   "kind": "theorem",
+   "file": "Descent/Portability/ThreeLocusInformation.lean",
+   "line": 119,
+   "statement": ": (∫ x, densitySecondCoefficient x ^ 2 ∂productGaussian (Fin 3)) = 18",
+   "mentions": [
+    "densitySecondCoefficient",
+    "productGaussian"
    ]
   },
   {
@@ -98723,7 +99004,8 @@
    "line": 135,
    "statement": "{α β : Type*} {statistic : List α → β} (hstatistic : IsOrderFreeStatistic statistic) (xs : List α) : statistic xs.reverse = statistic xs",
    "mentions": [
-    "IsOrderFreeStatistic"
+    "IsOrderFreeStatistic",
+    "statistic"
    ]
   },
   {
@@ -98753,7 +99035,8 @@
    "line": 161,
    "statement": "{α β : Type*} {statistic : List α → β} (hstatistic : IsOrderFreeStatistic statistic) (x₀ x₁ : α) : statistic [x₀, x₁] = statistic [x₁, x₀]",
    "mentions": [
-    "IsOrderFreeStatistic"
+    "IsOrderFreeStatistic",
+    "statistic"
    ]
   },
   {
@@ -98828,7 +99111,8 @@
    "statement": "{statistic : List Bool → ℝ} (hstatistic : IsOrderFreeStatistic statistic) (θ : ℝ) : binaryOrientationStatisticMean statistic θ = statistic [false, true]",
    "mentions": [
     "IsOrderFreeStatistic",
-    "binaryOrientationStatisticMean"
+    "binaryOrientationStatisticMean",
+    "statistic"
    ]
   },
   {
@@ -101624,6 +101908,7 @@
    "line": 54,
    "statement": "(P : Foundations.ExpFunctional Ω) (densityRatio : Ω → ℝ) (X : Ω → ι → ℝ) (residual : Ω → ℝ) (direction : ι → ℝ) : Foundations.dot direction (weightedResidualMoment P densityRatio X residual) = P (fun ω ↦ (densityRatio ω - 1) * (Foundations.dot direction (X ω) * residual ω))",
    "mentions": [
+    "direction",
     "dot",
     "residual",
     "weightedResidualMoment"
@@ -101637,6 +101922,7 @@
    "statement": "(P : Foundations.ExpFunctional Ω) (densityRatio : Ω → ℝ) (X : Ω → ι → ℝ) (residual : Ω → ℝ) (direction : ι → ℝ) : Foundations.dot direction (weightedResidualMoment P densityRatio X residual) ^ 2 ≤ chiSquareBudget P densityRatio * directionalResidualCurvature P X residual direction",
    "mentions": [
     "chiSquareBudget",
+    "direction",
     "directionalResidualCurvature",
     "dot",
     "residual",
@@ -151125,6 +151411,8 @@
      "∀ state, 0 < law.mass state → |f state| ≤ bound",
      "∀ state, 0 < p.mass state → (first state",
      "∀ time < horizon, ∀ state, 0 < (propagate second secondKernel time",
+     "FullNeighborLocal adj K",
+     "FullLocalCondition p K",
      "Covered state",
      "∀ state, Measurable (fun input ↦ (law input",
      "∀ state target, Measurable (fun input ↦ (kernel input state",
@@ -151890,6 +152178,8 @@
      "Descent.Portability.GaussianEffectPortabilityLaw.innerValue_eq_iSup_clipped": [],
      "Descent.Portability.GaussianEffectPortabilityLaw.successProbability_bounds": [],
      "Descent.Portability.GaussianEffectPortabilityLaw.weighted_report_integrable": [],
+     "Descent.Portability.GaussianEvenMoments.evenConstant_pos": [],
+     "Descent.Portability.GaussianEvenMoments.gaussian_sqrt_scale": [],
      "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral": [],
      "Descent.Portability.GaussianInverseQuadratic.abs_rpow_exp_integrable": [],
      "Descent.Portability.GaussianInverseQuadratic.ae_coordinates_nonzero": [],
@@ -151912,6 +152202,14 @@
      "Descent.Portability.GaussianSlabLaw.witnessed_ratio_gaussian_integral_top": [],
      "Descent.Portability.GaussianSlabLaw.witnessed_gaussian_label_numerator_top": [],
      "Descent.Portability.GenealogyGenotypeLaw.branchKernel_commute": [],
+     "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation": [
+      "FullNeighborLocal adj K",
+      "FullLocalCondition p K"
+     ],
+     "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation": [
+      "FullNeighborLocal adj K",
+      "FullLocalCondition p K"
+     ],
      "Descent.Portability.GuardedMetricOptimization.scale_pos": [],
      "Descent.Portability.GuardedMetricOptimization.recover_guard": [],
      "Descent.Portability.attenuatedVariance_eq_true_iff": [],
@@ -152932,6 +153230,8 @@
     "Descent.Portability.GaussianEffectPortabilityLaw.weighted_defined_integrable",
     "Descent.Portability.GaussianEffectPortabilityLaw.weighted_observable_integrable",
     "Descent.Portability.GaussianEffectPortabilityLaw.weighted_report_integrable",
+    "Descent.Portability.GaussianEvenMoments.evenConstant_pos",
+    "Descent.Portability.GaussianEvenMoments.gaussian_sqrt_scale",
     "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral",
     "Descent.Portability.GaussianInverseQuadratic.abs_rpow_exp_integrable",
     "Descent.Portability.GaussianInverseQuadratic.ae_coordinates_nonzero",
@@ -152954,6 +153254,8 @@
     "Descent.Portability.GaussianSlabLaw.witnessed_gaussian_label_numerator_top",
     "Descent.Portability.GaussianSlabLaw.witnessed_ratio_gaussian_integral_top",
     "Descent.Portability.GenealogyGenotypeLaw.branchKernel_commute",
+    "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation",
+    "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation",
     "Descent.Portability.GuardedMetricOptimization.recover_guard",
     "Descent.Portability.GuardedMetricOptimization.scale_pos",
     "Descent.Portability.IndependentShiftOperator.independent_sum_succ",
@@ -165378,6 +165680,8 @@
      "Descent.Portability.GaussianEffectPortabilityLaw.innerValue_eq_iSup_clipped": [],
      "Descent.Portability.GaussianEffectPortabilityLaw.successProbability_bounds": [],
      "Descent.Portability.GaussianEffectPortabilityLaw.weighted_report_integrable": [],
+     "Descent.Portability.GaussianEvenMoments.evenConstant_pos": [],
+     "Descent.Portability.GaussianEvenMoments.gaussian_sqrt_scale": [],
      "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral": [],
      "Descent.Portability.GaussianInverseQuadratic.abs_rpow_exp_integrable": [],
      "Descent.Portability.GaussianInverseQuadratic.ae_coordinates_nonzero": [],
@@ -165400,6 +165704,8 @@
      "Descent.Portability.GaussianSlabLaw.witnessed_ratio_gaussian_integral_top": [],
      "Descent.Portability.GaussianSlabLaw.witnessed_gaussian_label_numerator_top": [],
      "Descent.Portability.GenealogyGenotypeLaw.branchKernel_commute": [],
+     "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation": [],
+     "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation": [],
      "Descent.Portability.GuardedMetricOptimization.scale_pos": [],
      "Descent.Portability.GuardedMetricOptimization.recover_guard": [],
      "Descent.Portability.attenuatedVariance_eq_true_iff": [],
@@ -166410,6 +166716,8 @@
     "Descent.Portability.GaussianEffectPortabilityLaw.weighted_defined_integrable",
     "Descent.Portability.GaussianEffectPortabilityLaw.weighted_observable_integrable",
     "Descent.Portability.GaussianEffectPortabilityLaw.weighted_report_integrable",
+    "Descent.Portability.GaussianEvenMoments.evenConstant_pos",
+    "Descent.Portability.GaussianEvenMoments.gaussian_sqrt_scale",
     "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral",
     "Descent.Portability.GaussianInverseQuadratic.abs_rpow_exp_integrable",
     "Descent.Portability.GaussianInverseQuadratic.ae_coordinates_nonzero",
@@ -166432,6 +166740,8 @@
     "Descent.Portability.GaussianSlabLaw.witnessed_gaussian_label_numerator_top",
     "Descent.Portability.GaussianSlabLaw.witnessed_ratio_gaussian_integral_top",
     "Descent.Portability.GenealogyGenotypeLaw.branchKernel_commute",
+    "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation",
+    "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation",
     "Descent.Portability.GuardedMetricOptimization.recover_guard",
     "Descent.Portability.GuardedMetricOptimization.scale_pos",
     "Descent.Portability.IndependentShiftOperator.independent_sum_succ",
@@ -187138,6 +187448,8 @@
      "Descent.Portability.GaussianEffectPortabilityLaw.innerValue_eq_iSup_clipped": [],
      "Descent.Portability.GaussianEffectPortabilityLaw.successProbability_bounds": [],
      "Descent.Portability.GaussianEffectPortabilityLaw.weighted_report_integrable": [],
+     "Descent.Portability.GaussianEvenMoments.evenConstant_pos": [],
+     "Descent.Portability.GaussianEvenMoments.gaussian_sqrt_scale": [],
      "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral": [],
      "Descent.Portability.GaussianInverseQuadratic.abs_rpow_exp_integrable": [
       "0 < b"
@@ -187162,6 +187474,8 @@
      "Descent.Portability.GaussianSlabLaw.witnessed_ratio_gaussian_integral_top": [],
      "Descent.Portability.GaussianSlabLaw.witnessed_gaussian_label_numerator_top": [],
      "Descent.Portability.GenealogyGenotypeLaw.branchKernel_commute": [],
+     "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation": [],
+     "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation": [],
      "Descent.Portability.GuardedMetricOptimization.scale_pos": [],
      "Descent.Portability.GuardedMetricOptimization.recover_guard": [],
      "Descent.Portability.attenuatedVariance_eq_true_iff": [],
@@ -188160,6 +188474,8 @@
     "Descent.Portability.GaussianEffectPortabilityLaw.weighted_defined_integrable",
     "Descent.Portability.GaussianEffectPortabilityLaw.weighted_observable_integrable",
     "Descent.Portability.GaussianEffectPortabilityLaw.weighted_report_integrable",
+    "Descent.Portability.GaussianEvenMoments.evenConstant_pos",
+    "Descent.Portability.GaussianEvenMoments.gaussian_sqrt_scale",
     "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral",
     "Descent.Portability.GaussianInverseQuadratic.abs_rpow_exp_integrable",
     "Descent.Portability.GaussianInverseQuadratic.ae_coordinates_nonzero",
@@ -188182,6 +188498,8 @@
     "Descent.Portability.GaussianSlabLaw.witnessed_gaussian_label_numerator_top",
     "Descent.Portability.GaussianSlabLaw.witnessed_ratio_gaussian_integral_top",
     "Descent.Portability.GenealogyGenotypeLaw.branchKernel_commute",
+    "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation",
+    "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation",
     "Descent.Portability.GuardedMetricOptimization.recover_guard",
     "Descent.Portability.GuardedMetricOptimization.scale_pos",
     "Descent.Portability.IndependentShiftOperator.independent_sum_succ",
@@ -189127,9 +189445,12 @@
      "Descent.Portability.GaussianEffectPortabilityLaw.extendedNumerator_eq_iSup_clipped": [],
      "Descent.Portability.GaussianEffectPortabilityLaw.successProbability_eq_joint_defined": [],
      "Descent.Portability.GaussianEffectPortabilityLaw.extendedNumerator_toReal": [],
+     "Descent.Portability.GaussianEvenMoments.evenConstant_pos": [],
      "Descent.Portability.GaussianPanelLaw.bag_relabel": [],
      "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff": [],
      "Descent.Portability.GaussianSlabLaw.section_lower": [],
+     "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation": [],
+     "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation": [],
      "Descent.Portability.HWEInteractionLaw.expectation_independent_product": [],
      "Descent.Portability.HWEInteractionLaw.complexExpectation_independent_product": [],
      "Descent.Portability.attenuatedVariance_eq_true_iff": [],
@@ -189466,9 +189787,12 @@
     "Descent.Portability.GaussianEffectPortabilityLaw.extendedNumerator_toReal",
     "Descent.Portability.GaussianEffectPortabilityLaw.innerValue_eq_iSup_clipped",
     "Descent.Portability.GaussianEffectPortabilityLaw.successProbability_eq_joint_defined",
+    "Descent.Portability.GaussianEvenMoments.evenConstant_pos",
     "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff",
     "Descent.Portability.GaussianPanelLaw.bag_relabel",
     "Descent.Portability.GaussianSlabLaw.section_lower",
+    "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation",
+    "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation",
     "Descent.Portability.HWEInteractionLaw.complexExpectation_independent_product",
     "Descent.Portability.HWEInteractionLaw.expectation_independent_product",
     "Descent.Portability.LowMomentObstruction.mean_fitness_one",
@@ -189871,6 +190195,7 @@
      "Descent.Portability.FirthFiniteIterationLaw.maxAbs_nonneg": [],
      "Descent.Portability.FirthFiniteIterationLaw.clippedStep_coordinate_bound": [],
      "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff": [],
+     "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation": [],
      "Descent.Portability.GuardedMetricOptimization.scale_pos": [],
      "Descent.Portability.MarkovCoarseGraining.bounded_report_error": [],
      "Descent.Portability.OptimalMeasurementAllocation.allocation_lower_bound": [],
@@ -190048,6 +190373,7 @@
     "Descent.Portability.FirthFiniteIterationLaw.clippedStep_coordinate_bound",
     "Descent.Portability.FirthFiniteIterationLaw.maxAbs_nonneg",
     "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff",
+    "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation",
     "Descent.Portability.GuardedMetricOptimization.scale_pos",
     "Descent.Portability.MarkovCoarseGraining.bounded_report_error",
     "Descent.Portability.OptimalMeasurementAllocation.allocation_lower_bound",
@@ -206411,6 +206737,8 @@
      "Descent.Portability.FiniteReportLaw.variance_eq_rawMoments": [],
      "Descent.Portability.FiniteReportLaw.variance_nonneg": [],
      "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul": [],
+     "Descent.Portability.GaussianEvenMoments.gaussian_sqrt_scale": [],
+     "Descent.Portability.GaussianEvenMoments.even_power_moment": [],
      "Descent.Portability.GaussianHermiteLaw.integrable_power": [],
      "Descent.Portability.GaussianHermiteLaw.integrable_polynomial": [],
      "Descent.Portability.GaussianHermiteLaw.integratePolynomial_X_pow": [],
@@ -206528,6 +206856,8 @@
     "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul",
     "Descent.Portability.FiniteReportLaw.variance_eq_rawMoments",
     "Descent.Portability.FiniteReportLaw.variance_nonneg",
+    "Descent.Portability.GaussianEvenMoments.even_power_moment",
+    "Descent.Portability.GaussianEvenMoments.gaussian_sqrt_scale",
     "Descent.Portability.GaussianHermiteLaw.integrable_polynomial",
     "Descent.Portability.GaussianHermiteLaw.integrable_power",
     "Descent.Portability.GaussianHermiteLaw.integratePolynomial_C",
@@ -260632,6 +260962,9 @@
      "∀ x, ‖z x‖ ≤ 1",
      "∀ x, η * ν.mass x ≤ p.mass x",
      "∀ i x, ‖z i x‖ ≤ 1",
+     "∀ f, 0 < p.mass f",
+     "FullLocalCondition p K",
+     "∀ v a, ‖z v a‖ ≤ 1",
      "∀ y x, 0 < p.mass (y, x",
      "LocalSeparatorCondition p k",
      "GraphLocalCondition p K",
@@ -260655,6 +260988,17 @@
      "Descent.Portability.ConditionalSeparatorLaw.gibbs_separator_exp_bound": [
       "∀ i x, ‖z i x‖ ≤ 1"
      ],
+     "Descent.Portability.GraphColoringLaw.partition_phase": [],
+     "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation": [
+      "∀ f, 0 < p.mass f",
+      "FullLocalCondition p K",
+      "∀ v a, ‖z v a‖ ≤ 1"
+     ],
+     "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation": [
+      "∀ f, 0 < p.mass f",
+      "FullLocalCondition p K",
+      "∀ v a, ‖z v a‖ ≤ 1"
+     ],
      "Descent.Portability.MarkovSeparatorLaw.local_markov_attenuation": [
       "∀ y x, 0 < p.mass (y, x",
       "LocalSeparatorCondition p k",
@@ -260674,6 +261018,9 @@
     "Descent.Portability.ConditionalSeparatorLaw.separator_phase_bound",
     "Descent.Portability.ConditionalSeparatorLaw.separator_phase_exp_bound",
     "Descent.Portability.ConditionalSeparatorLaw.separator_phase_identity",
+    "Descent.Portability.GraphColoringLaw.partition_phase",
+    "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation",
+    "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation",
     "Descent.Portability.MarkovSeparatorLaw.independent_set_attenuation",
     "Descent.Portability.MarkovSeparatorLaw.local_markov_attenuation"
    ]
@@ -284545,6 +284892,8 @@
      "Descent.Portability.FiniteReportLaw.variance_eq_rawMoments": [],
      "Descent.Portability.FiniteReportLaw.variance_nonneg": [],
      "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul": [],
+     "Descent.Portability.GaussianEvenMoments.gaussian_sqrt_scale": [],
+     "Descent.Portability.GaussianEvenMoments.even_power_moment": [],
      "Descent.Portability.GaussianHermiteLaw.integrable_power": [],
      "Descent.Portability.GaussianHermiteLaw.integrable_polynomial": [],
      "Descent.Portability.GaussianHermiteLaw.integratePolynomial_X_pow": [],
@@ -284665,6 +285014,8 @@
     "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul",
     "Descent.Portability.FiniteReportLaw.variance_eq_rawMoments",
     "Descent.Portability.FiniteReportLaw.variance_nonneg",
+    "Descent.Portability.GaussianEvenMoments.even_power_moment",
+    "Descent.Portability.GaussianEvenMoments.gaussian_sqrt_scale",
     "Descent.Portability.GaussianHermiteLaw.integrable_polynomial",
     "Descent.Portability.GaussianHermiteLaw.integrable_power",
     "Descent.Portability.GaussianHermiteLaw.integratePolynomial_C",
@@ -287707,7 +288058,8 @@
       "∀ k i j, A k i j = A k j i",
       "Function.Injective A"
      ],
-     "Descent.Portability.GaussianPanelLaw.projection_variance": []
+     "Descent.Portability.GaussianPanelLaw.projection_variance": [],
+     "Descent.Portability.ThreeLocusInformation.densitySecondCoefficient_eq_statistic": []
     }
    },
    "mentioned_by": [
@@ -287718,7 +288070,8 @@
     "Descent.Portability.GaussianCovarianceSeparation.quadraticValue_pair",
     "Descent.Portability.GaussianCovarianceSeparation.quadraticValue_single",
     "Descent.Portability.GaussianCovarianceSeparation.quadraticValue_smul",
-    "Descent.Portability.GaussianPanelLaw.projection_variance"
+    "Descent.Portability.GaussianPanelLaw.projection_variance",
+    "Descent.Portability.ThreeLocusInformation.densitySecondCoefficient_eq_statistic"
    ]
   },
   {
@@ -288964,6 +289317,49 @@
    "mentioned_by": []
   },
   {
+   "name": "Descent.Portability.GaussianEvenMoments.evenConstant",
+   "decl_name": "evenConstant",
+   "short": "evenConstant",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/GaussianEvenMoments.lean",
+   "line": 20,
+   "signature": "(k : ℕ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "k"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": " (momentPolynomial 1 (2 * k)).eval 0",
+   "docstring": "",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.GaussianEvenMoments",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "range_lo_thm": [
+     "Descent.Portability.GaussianEvenMoments.evenConstant_pos",
+     0
+    ],
+    "range_lo": 0,
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.GaussianEvenMoments.evenConstant_pos": [],
+     "Descent.Portability.GaussianEvenMoments.even_power_moment": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.GaussianEvenMoments.evenConstant_pos",
+    "Descent.Portability.GaussianEvenMoments.even_power_moment"
+   ]
+  },
+  {
    "name": "Descent.Portability.GaussianHermiteLaw.integratePolynomial",
    "decl_name": "integratePolynomial",
    "short": "integratePolynomial",
@@ -289039,12 +289435,16 @@
     "hypotheses": [],
     "hypotheses_by_theorem": {
      "Descent.Portability.GaussianHermiteLaw.hermite_polynomial_inner": [],
-     "Descent.Portability.GaussianHermiteLaw.tensor_pair_integrable": []
+     "Descent.Portability.GaussianHermiteLaw.tensor_pair_integrable": [],
+     "Descent.Portability.ThreeLocusInformation.statistic_mean": [],
+     "Descent.Portability.ThreeLocusInformation.densitySecondCoefficient_eq_statistic": []
     }
    },
    "mentioned_by": [
     "Descent.Portability.GaussianHermiteLaw.hermite_polynomial_inner",
-    "Descent.Portability.GaussianHermiteLaw.tensor_pair_integrable"
+    "Descent.Portability.GaussianHermiteLaw.tensor_pair_integrable",
+    "Descent.Portability.ThreeLocusInformation.densitySecondCoefficient_eq_statistic",
+    "Descent.Portability.ThreeLocusInformation.statistic_mean"
    ]
   },
   {
@@ -289086,13 +289486,17 @@
     "hypotheses_by_theorem": {
      "Descent.Portability.GaussianHermiteLaw.hermite_inner": [],
      "Descent.Portability.GaussianHermiteLaw.tensor_pair_integrable": [],
-     "Descent.Portability.GaussianHermiteLaw.tensor_inner": []
+     "Descent.Portability.GaussianHermiteLaw.tensor_inner": [],
+     "Descent.Portability.ThreeLocusInformation.statistic_mean": [],
+     "Descent.Portability.ThreeLocusInformation.densitySecondCoefficient_eq_statistic": []
     }
    },
    "mentioned_by": [
     "Descent.Portability.GaussianHermiteLaw.hermite_inner",
     "Descent.Portability.GaussianHermiteLaw.tensor_inner",
-    "Descent.Portability.GaussianHermiteLaw.tensor_pair_integrable"
+    "Descent.Portability.GaussianHermiteLaw.tensor_pair_integrable",
+    "Descent.Portability.ThreeLocusInformation.densitySecondCoefficient_eq_statistic",
+    "Descent.Portability.ThreeLocusInformation.statistic_mean"
    ]
   },
   {
@@ -289127,14 +289531,16 @@
      "Descent.Portability.GaussianHermiteLaw.hermite_polynomial_inner": [],
      "Descent.Portability.GaussianHermiteLaw.hermite_inner": [],
      "Descent.Portability.GaussianHermiteLaw.tensor_inner": [],
-     "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral": []
+     "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral": [],
+     "Descent.Portability.ThreeLocusInformation.statistic_second_moment": []
     }
    },
    "mentioned_by": [
     "Descent.Portability.GaussianHermiteLaw.hermite_inner",
     "Descent.Portability.GaussianHermiteLaw.hermite_polynomial_inner",
     "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral",
-    "Descent.Portability.GaussianHermiteLaw.tensor_inner"
+    "Descent.Portability.GaussianHermiteLaw.tensor_inner",
+    "Descent.Portability.ThreeLocusInformation.statistic_second_moment"
    ]
   },
   {
@@ -289180,13 +289586,17 @@
      "Descent.Portability.GaussianHermiteLaw.tensor_inner": [],
      "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral": [
       "Function.Injective degree"
-     ]
+     ],
+     "Descent.Portability.ThreeLocusInformation.statistic_mean": [],
+     "Descent.Portability.ThreeLocusInformation.densitySecondCoefficient_eq_statistic": []
     }
    },
    "mentioned_by": [
     "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral",
     "Descent.Portability.GaussianHermiteLaw.tensor_inner",
-    "Descent.Portability.GaussianHermiteLaw.tensor_pair_integrable"
+    "Descent.Portability.GaussianHermiteLaw.tensor_pair_integrable",
+    "Descent.Portability.ThreeLocusInformation.densitySecondCoefficient_eq_statistic",
+    "Descent.Portability.ThreeLocusInformation.statistic_mean"
    ]
   },
   {
@@ -289229,13 +289639,21 @@
     "hypotheses_by_theorem": {
      "Descent.Portability.GaussianHermiteLaw.tensor_pair_integrable": [],
      "Descent.Portability.GaussianHermiteLaw.tensor_inner": [],
-     "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral": []
+     "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral": [],
+     "Descent.Portability.ThreeLocusInformation.statistic_second_moment": [],
+     "Descent.Portability.ThreeLocusInformation.statistic_mean": [],
+     "Descent.Portability.ThreeLocusInformation.density_coefficient_mean": [],
+     "Descent.Portability.ThreeLocusInformation.density_coefficient_second_moment": []
     }
    },
    "mentioned_by": [
     "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral",
     "Descent.Portability.GaussianHermiteLaw.tensor_inner",
-    "Descent.Portability.GaussianHermiteLaw.tensor_pair_integrable"
+    "Descent.Portability.GaussianHermiteLaw.tensor_pair_integrable",
+    "Descent.Portability.ThreeLocusInformation.density_coefficient_mean",
+    "Descent.Portability.ThreeLocusInformation.density_coefficient_second_moment",
+    "Descent.Portability.ThreeLocusInformation.statistic_mean",
+    "Descent.Portability.ThreeLocusInformation.statistic_second_moment"
    ]
   },
   {
@@ -289287,11 +289705,15 @@
     "hypotheses_by_theorem": {
      "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral": [
       "Function.Injective degree"
-     ]
+     ],
+     "Descent.Portability.ThreeLocusInformation.statistic_mean": [],
+     "Descent.Portability.ThreeLocusInformation.densitySecondCoefficient_eq_statistic": []
     }
    },
    "mentioned_by": [
-    "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral"
+    "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral",
+    "Descent.Portability.ThreeLocusInformation.densitySecondCoefficient_eq_statistic",
+    "Descent.Portability.ThreeLocusInformation.statistic_mean"
    ]
   },
   {
@@ -291100,6 +291522,286 @@
     "declared_hi": 1.0
    },
    "mentioned_by": []
+  },
+  {
+   "name": "Descent.Portability.GraphColoringLaw.assembleEquiv",
+   "decl_name": "assembleEquiv",
+   "short": "assembleEquiv",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Descent/Portability/GraphColoringLaw.lean",
+   "line": 25,
+   "signature": "(e : D ⊕ C ≃ V) : ((C → X) × (D → X)) ≃ (V → X) where toFun yx v",
+   "args": [
+    {
+     "names": [
+      "e"
+     ],
+     "type": "D ⊕ C ≃ V",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "((C → X) × (D → X)) ≃ (V → X) where toFun yx v",
+   "body": " Sum.elim yx.2 yx.1 (e.symm v)\n  invFun f := (fun j ↦ f (e (Sum.inr j)), fun i ↦ f (e (Sum.inl i)))\n  left_inv yx := by ext <;> simp\n  right_inv f := by\n    funext v\n    obtain ⟨w, rfl⟩ := e.surjective v\n    cases w <;> simp",
+   "docstring": "Assemble the same genotype configuration after partitioning and reindexing vertices.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.GraphColoringLaw",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "∀ i j, ¬ adj (e (Sum.inl i"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.GraphColoringLaw.assemble_update": [],
+     "Descent.Portability.GraphColoringLaw.partition_phase": [],
+     "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation": [
+      "∀ i j, ¬ adj (e (Sum.inl i"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.GraphColoringLaw.assemble_update",
+    "Descent.Portability.GraphColoringLaw.partition_phase",
+    "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation"
+   ]
+  },
+  {
+   "name": "Descent.Portability.GraphColoringLaw.partitionLaw",
+   "decl_name": "partitionLaw",
+   "short": "partitionLaw",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/GraphColoringLaw.lean",
+   "line": 50,
+   "signature": "(p : FiniteReportLaw (V → X)) (e : D ⊕ C ≃ V) : FiniteReportLaw ((C → X) × (D → X)) where mass yx",
+   "args": [
+    {
+     "names": [
+      "p"
+     ],
+     "type": "FiniteReportLaw (V → X)",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "e"
+     ],
+     "type": "D ⊕ C ≃ V",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "FiniteReportLaw ((C → X) × (D → X)) where mass yx",
+   "body": " p.mass (assembleEquiv e yx)\n  mass_nonneg yx := p.mass_nonneg _\n  mass_sum := by rw [Equiv.sum_comp (assembleEquiv e), p.mass_sum]",
+   "docstring": "Pullback along a configuration equivalence preserves the full probability law.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.GraphColoringLaw",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "probability",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0,
+    "hypotheses": [
+     "∀ f, 0 < p.mass f",
+     "FullLocalCondition p K",
+     "∀ i j, ¬ adj (e (Sum.inl i"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.GraphColoringLaw.partition_phase": [],
+     "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation": [
+      "∀ f, 0 < p.mass f",
+      "FullLocalCondition p K",
+      "∀ i j, ¬ adj (e (Sum.inl i"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.GraphColoringLaw.partition_phase",
+    "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation"
+   ]
+  },
+  {
+   "name": "Descent.Portability.GraphColoringLaw.FullNeighborLocal",
+   "decl_name": "FullNeighborLocal",
+   "short": "FullNeighborLocal",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Descent/Portability/GraphColoringLaw.lean",
+   "line": 71,
+   "signature": "(adj : V → V → Prop) (K : V → (V → X) → FiniteReportLaw X) : Prop",
+   "args": [
+    {
+     "names": [
+      "adj"
+     ],
+     "type": "V → V → Prop",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "K"
+     ],
+     "type": "V → (V → X) → FiniteReportLaw X",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "Prop",
+   "body": "  ∀ v f g, (∀ w, adj v w → f w = g w) → K v f = K v g",
+   "docstring": "Finite graph locality is a statement about the actual single-site conditional kernels.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.GraphColoringLaw",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "FullNeighborLocal adj K",
+     "FullLocalCondition p K",
+     "∀ i j, ¬ adj (e (Sum.inl i",
+     "∀ v w, adj v w → color v ≠ color w"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation": [
+      "FullNeighborLocal adj K",
+      "FullLocalCondition p K",
+      "∀ i j, ¬ adj (e (Sum.inl i"
+     ],
+     "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation": [
+      "FullNeighborLocal adj K",
+      "FullLocalCondition p K",
+      "∀ v w, adj v w → color v ≠ color w"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation",
+    "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation"
+   ]
+  },
+  {
+   "name": "Descent.Portability.GraphColoringLaw.FullLocalCondition",
+   "decl_name": "FullLocalCondition",
+   "short": "FullLocalCondition",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Descent/Portability/GraphColoringLaw.lean",
+   "line": 76,
+   "signature": "(p : FiniteReportLaw (V → X)) (K : V → (V → X) → FiniteReportLaw X) : Prop",
+   "args": [
+    {
+     "names": [
+      "p"
+     ],
+     "type": "FiniteReportLaw (V → X)",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "K"
+     ],
+     "type": "V → (V → X) → FiniteReportLaw X",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "Prop",
+   "body": "  ∀ f v, p.mass f = (K v f).mass (f v) * ∑ a : X, p.mass (Function.update f v a)",
+   "docstring": "The full one-site conditional equation of a finite Markov random field.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.GraphColoringLaw",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "∀ f, 0 < p.mass f",
+     "FullNeighborLocal adj K",
+     "FullLocalCondition p K"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation": [
+      "∀ f, 0 < p.mass f",
+      "FullNeighborLocal adj K",
+      "FullLocalCondition p K"
+     ],
+     "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation": [
+      "∀ f, 0 < p.mass f",
+      "FullNeighborLocal adj K",
+      "FullLocalCondition p K"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation",
+    "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation"
+   ]
+  },
+  {
+   "name": "Descent.Portability.GraphColoringLaw.classWeight",
+   "decl_name": "classWeight",
+   "short": "classWeight",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/GraphColoringLaw.lean",
+   "line": 125,
+   "signature": "(color : V → Color) (w : V → ℝ) (c : Color) : ℝ",
+   "args": [
+    {
+     "names": [
+      "color"
+     ],
+     "type": "V → Color",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "w"
+     ],
+     "type": "V → ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "c"
+     ],
+     "type": "Color",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  ∑ v, if color v = c then w v else 0",
+   "docstring": "Total weight carried by one color class.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.GraphColoringLaw",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "∀ v w, adj v w → color v ≠ color w"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.GraphColoringLaw.classWeight_subtype": [],
+     "Descent.Portability.GraphColoringLaw.classWeight_sum": [],
+     "Descent.Portability.GraphColoringLaw.exists_average_color": [],
+     "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation": [
+      "∀ v w, adj v w → color v ≠ color w"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.GraphColoringLaw.classWeight_subtype",
+    "Descent.Portability.GraphColoringLaw.classWeight_sum",
+    "Descent.Portability.GraphColoringLaw.exists_average_color",
+    "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation"
+   ]
   },
   {
    "name": "Descent.Portability.GuardedMetricOptimization.linearize",
@@ -296187,11 +296889,19 @@
    "equations": [],
    "constraints": {
     "hypotheses": [
+     "FullNeighborLocal adj K",
+     "FullLocalCondition p K",
+     "∀ i j, ¬ adj (e (Sum.inl i",
      "∀ i j, ¬ adj (Sum.inl i",
      "NeighborLocal adj K",
      "GraphLocalCondition p K"
     ],
     "hypotheses_by_theorem": {
+     "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation": [
+      "FullNeighborLocal adj K",
+      "FullLocalCondition p K",
+      "∀ i j, ¬ adj (e (Sum.inl i"
+     ],
      "Descent.Portability.MarkovSeparatorLaw.independent_set_local_condition": [
       "∀ i j, ¬ adj (Sum.inl i",
       "NeighborLocal adj K",
@@ -296210,6 +296920,7 @@
     }
    },
    "mentioned_by": [
+    "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation",
     "Descent.Portability.MarkovSeparatorLaw.independent_set_attenuation",
     "Descent.Portability.MarkovSeparatorLaw.independent_set_factorization",
     "Descent.Portability.MarkovSeparatorLaw.independent_set_local_condition"
@@ -296254,11 +296965,19 @@
     "declared_lo": 0.0,
     "declared_hi": 1.0,
     "hypotheses": [
+     "∀ f, 0 < p.mass f",
+     "FullNeighborLocal adj K",
+     "FullLocalCondition p K",
      "NeighborLocal adj K",
      "GraphLocalCondition p K",
      "∀ y x, 0 < p.mass (y, x"
     ],
     "hypotheses_by_theorem": {
+     "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation": [
+      "∀ f, 0 < p.mass f",
+      "FullNeighborLocal adj K",
+      "FullLocalCondition p K"
+     ],
      "Descent.Portability.MarkovSeparatorLaw.independent_set_local_condition": [
       "NeighborLocal adj K",
       "GraphLocalCondition p K"
@@ -296276,6 +296995,7 @@
     }
    },
    "mentioned_by": [
+    "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation",
     "Descent.Portability.MarkovSeparatorLaw.independent_set_attenuation",
     "Descent.Portability.MarkovSeparatorLaw.independent_set_factorization",
     "Descent.Portability.MarkovSeparatorLaw.independent_set_local_condition"
@@ -302251,6 +302971,8 @@
      "Descent.Portability.FiniteReportLaw.variance_eq_rawMoments": [],
      "Descent.Portability.FiniteReportLaw.variance_nonneg": [],
      "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul": [],
+     "Descent.Portability.GaussianEvenMoments.gaussian_sqrt_scale": [],
+     "Descent.Portability.GaussianEvenMoments.even_power_moment": [],
      "Descent.Portability.GaussianHermiteLaw.integrable_power": [],
      "Descent.Portability.GaussianHermiteLaw.integrable_polynomial": [],
      "Descent.Portability.GaussianHermiteLaw.integratePolynomial_X_pow": [],
@@ -302379,6 +303101,8 @@
     "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul",
     "Descent.Portability.FiniteReportLaw.variance_eq_rawMoments",
     "Descent.Portability.FiniteReportLaw.variance_nonneg",
+    "Descent.Portability.GaussianEvenMoments.even_power_moment",
+    "Descent.Portability.GaussianEvenMoments.gaussian_sqrt_scale",
     "Descent.Portability.GaussianHermiteLaw.integrable_polynomial",
     "Descent.Portability.GaussianHermiteLaw.integrable_power",
     "Descent.Portability.GaussianHermiteLaw.integratePolynomial_C",
@@ -335065,6 +335789,7 @@
     "hypotheses_by_theorem": {
      "Descent.Conditionals.descendsOn_iff_pairwiseCompatibleOn_of_nonempty": [],
      "Descent.Conditionals.finiteSectionDiameter_nonneg": [],
+     "Descent.Portability.GraphColoringLaw.exists_average_color": [],
      "Descent.Portability.MarkovSeparatorLaw.local_implies_separator": [],
      "Descent.Portability.MarkovSeparatorLaw.independent_set_attenuation": [],
      "Descent.Portability.ReservoirSamplingLaw.choice_eq_some_iff": [],
@@ -335076,6 +335801,7 @@
    "mentioned_by": [
     "Descent.Conditionals.descendsOn_iff_pairwiseCompatibleOn_of_nonempty",
     "Descent.Conditionals.finiteSectionDiameter_nonneg",
+    "Descent.Portability.GraphColoringLaw.exists_average_color",
     "Descent.Portability.MarkovSeparatorLaw.independent_set_attenuation",
     "Descent.Portability.MarkovSeparatorLaw.local_implies_separator",
     "Descent.Portability.ReservoirSamplingLaw.choiceLaw_some_mass",
@@ -346805,6 +347531,353 @@
     "Descent.Portability.TargetUncertainty.minimax_radius",
     "Descent.Portability.TargetUncertainty.opposite_points_lower",
     "Descent.Portability.TargetUncertainty.uniform_bound_lower"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ThreeLocusInformation.direction",
+   "decl_name": "direction",
+   "short": "direction",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Descent/Portability/ThreeLocusInformation.lean",
+   "line": 24,
+   "signature": ": Matrix (Fin 3) (Fin 3) ℝ",
+   "args": [],
+   "ret_type": "Matrix (Fin 3) (Fin 3) ℝ",
+   "body": " ![![0, 1, -2], ![1, 0, 1], ![-2, 1, 0]]",
+   "docstring": "",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.ThreeLocusInformation",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Blindness.SpectrumIdentifiability.linearTargetDeterminedByObservation_iff_ker_le": [],
+     "Descent.Conditionals.kingmanSpectrum_identifiabilityBoundary": [],
+     "Descent.Portability.ContinuousObservabilityGramian.density_eq_quadratic": [],
+     "Descent.Portability.ContinuousObservabilityGramian.continuousGramian_quadratic": [],
+     "Descent.Portability.ContinuousObservabilityGramian.gramian_directional_leading_limit": [],
+     "Descent.Portability.ContinuousObservabilityGramian.leading_constant_pos": [],
+     "Descent.Portability.stratifiedCalibrationEnergy_perturbed_eq": [],
+     "Descent.Portability.DiscountedObservability.discountedTerm_quadratic": [],
+     "Descent.Portability.DiscountedObservability.discounted_loss_summable": [],
+     "Descent.Portability.DiscountedObservability.discounted_loss_eq_quadratic": [],
+     "Descent.Portability.DynamicBlindness.observation_hasDerivAt": [],
+     "Descent.Portability.DynamicBlindness.finite_powers_iff_all": [],
+     "Descent.Portability.DynamicBlindness.observation_zero_of_powers": [],
+     "Descent.Portability.DynamicBlindness.powers_zero_of_observation": [],
+     "Descent.Portability.DynamicBlindness.permanent_blindness_iff": [],
+     "Descent.Portability.GaussianSlabLaw.nontrivial_local_slab_mass": [],
+     "Descent.Portability.GaussianSlabLaw.crossForm_local_slab_mass": [],
+     "Descent.Portability.ObservableClosureLaw.zero_sum_probability_difference": [],
+     "Descent.Portability.ObservableClosureLaw.linear_factorization_iff": [],
+     "Descent.Portability.ObservableClosureLaw.autonomy_iff_linear_update": [],
+     "Descent.Portability.ObservableClosureLaw.matrix_autonomy_iff": [],
+     "Descent.Portability.ObservationAsymptotics.observationJet_derivative": [],
+     "Descent.Portability.ObservationAsymptotics.observation_leading_limit": [],
+     "Descent.Portability.ObservationAsymptotics.density_leading_limit": [],
+     "Descent.Portability.ObservationAsymptotics.informationDensity_continuous": [],
+     "Descent.Portability.ObservationAsymptotics.integrated_information_leading_limit": [],
+     "Descent.Portability.ObservationAsymptotics.visibleCoefficient_pos": [],
+     "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan": [],
+     "Descent.Portability.pc_correction_recent_structure_lower_bound": [],
+     "Descent.Portability.RatioPoleLaw.crossForm_affine_line": [],
+     "Descent.Portability.RatioPoleLaw.transverse_scaled_limit": [],
+     "Descent.Portability.RatioPoleLaw.witness_inverse_square_limit": [],
+     "Descent.Portability.RatioSourceDegeneracy.traitCross_affine_left": [],
+     "Descent.Portability.RatioSourceDegeneracy.kernel_factorization": [],
+     "Descent.Portability.RatioSourceDegeneracy.kernel_iff_positive_factorization": [],
+     "Descent.Portability.RatioSourceDegeneracy.kernel_ratio_integrable": [],
+     "Descent.Portability.RatioSourceDegeneracy.nonalignment_kernel_direction": [],
+     "Descent.Portability.RatioSourceDegeneracy.nondegenerate_nonaligned_witness": [],
+     "Descent.Portability.RatioSourceDegeneracy.witness_exists_iff_not_kernel": [],
+     "Descent.Portability.RatioSourceDegeneracy.nonaligned_integrable_iff_kernel": [],
+     "Descent.Portability.RatioSourceDegeneracy.nondegenerate_nonaligned_label_numerator_top": [],
+     "Descent.Portability.RatioSourceDegeneracy.kernel_label_numerator_integrable": [],
+     "Descent.Portability.RatioSourceDegeneracy.nonaligned_label_integrable_iff_kernels": [],
+     "Descent.Portability.ThreeLocusInformation.direction_square": [],
+     "Descent.Portability.ThreeLocusInformation.direction_trace_square": [],
+     "Descent.Portability.ThreeLocusInformation.direction_symmetric": [],
+     "Descent.Portability.ThreeLocusInformation.direction_nonzero": [],
+     "Descent.Portability.ThreeLocusInformation.direction_permutation_average": [],
+     "Descent.Portability.ThreeLocusInformation.densitySecondCoefficient_eq_statistic": [],
+     "Descent.Spectral.dot_weightedResidualMoment": [],
+     "Descent.Spectral.weighted_residual_moment_directional_bound": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Blindness.SpectrumIdentifiability.linearTargetDeterminedByObservation_iff_ker_le",
+    "Descent.Conditionals.kingmanSpectrum_identifiabilityBoundary",
+    "Descent.Portability.ContinuousObservabilityGramian.continuousGramian_quadratic",
+    "Descent.Portability.ContinuousObservabilityGramian.density_eq_quadratic",
+    "Descent.Portability.ContinuousObservabilityGramian.gramian_directional_leading_limit",
+    "Descent.Portability.ContinuousObservabilityGramian.leading_constant_pos",
+    "Descent.Portability.DiscountedObservability.discountedTerm_quadratic",
+    "Descent.Portability.DiscountedObservability.discounted_loss_eq_quadratic",
+    "Descent.Portability.DiscountedObservability.discounted_loss_summable",
+    "Descent.Portability.DynamicBlindness.finite_powers_iff_all",
+    "Descent.Portability.DynamicBlindness.observation_hasDerivAt",
+    "Descent.Portability.DynamicBlindness.observation_zero_of_powers",
+    "Descent.Portability.DynamicBlindness.permanent_blindness_iff",
+    "Descent.Portability.DynamicBlindness.powers_zero_of_observation",
+    "Descent.Portability.GaussianSlabLaw.crossForm_local_slab_mass",
+    "Descent.Portability.GaussianSlabLaw.nontrivial_local_slab_mass",
+    "Descent.Portability.ObservableClosureLaw.autonomy_iff_linear_update",
+    "Descent.Portability.ObservableClosureLaw.linear_factorization_iff",
+    "Descent.Portability.ObservableClosureLaw.matrix_autonomy_iff",
+    "Descent.Portability.ObservableClosureLaw.zero_sum_probability_difference",
+    "Descent.Portability.ObservationAsymptotics.density_leading_limit",
+    "Descent.Portability.ObservationAsymptotics.informationDensity_continuous",
+    "Descent.Portability.ObservationAsymptotics.integrated_information_leading_limit",
+    "Descent.Portability.ObservationAsymptotics.observationJet_derivative",
+    "Descent.Portability.ObservationAsymptotics.observation_leading_limit",
+    "Descent.Portability.ObservationAsymptotics.visibleCoefficient_pos",
+    "Descent.Portability.RatioPoleLaw.crossForm_affine_line",
+    "Descent.Portability.RatioPoleLaw.transverse_scaled_limit",
+    "Descent.Portability.RatioPoleLaw.witness_inverse_square_limit",
+    "Descent.Portability.RatioSourceDegeneracy.kernel_factorization",
+    "Descent.Portability.RatioSourceDegeneracy.kernel_iff_positive_factorization",
+    "Descent.Portability.RatioSourceDegeneracy.kernel_label_numerator_integrable",
+    "Descent.Portability.RatioSourceDegeneracy.kernel_ratio_integrable",
+    "Descent.Portability.RatioSourceDegeneracy.nonaligned_integrable_iff_kernel",
+    "Descent.Portability.RatioSourceDegeneracy.nonaligned_label_integrable_iff_kernels",
+    "Descent.Portability.RatioSourceDegeneracy.nonalignment_kernel_direction",
+    "Descent.Portability.RatioSourceDegeneracy.nondegenerate_nonaligned_label_numerator_top",
+    "Descent.Portability.RatioSourceDegeneracy.nondegenerate_nonaligned_witness",
+    "Descent.Portability.RatioSourceDegeneracy.traitCross_affine_left",
+    "Descent.Portability.RatioSourceDegeneracy.witness_exists_iff_not_kernel",
+    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
+    "Descent.Portability.ThreeLocusInformation.densitySecondCoefficient_eq_statistic",
+    "Descent.Portability.ThreeLocusInformation.direction_nonzero",
+    "Descent.Portability.ThreeLocusInformation.direction_permutation_average",
+    "Descent.Portability.ThreeLocusInformation.direction_square",
+    "Descent.Portability.ThreeLocusInformation.direction_symmetric",
+    "Descent.Portability.ThreeLocusInformation.direction_trace_square",
+    "Descent.Portability.pc_correction_recent_structure_lower_bound",
+    "Descent.Portability.stratifiedCalibrationEnergy_perturbed_eq",
+    "Descent.Spectral.dot_weightedResidualMoment",
+    "Descent.Spectral.weighted_residual_moment_directional_bound"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ThreeLocusInformation.degrees",
+   "decl_name": "degrees",
+   "short": "degrees",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Descent/Portability/ThreeLocusInformation.lean",
+   "line": 26,
+   "signature": ": Fin 6 → Fin 3 → Fin 3",
+   "args": [],
+   "ret_type": "Fin 6 → Fin 3 → Fin 3",
+   "body": "  ![![2, 2, 0], ![2, 0, 2], ![0, 2, 2], ![2, 1, 1], ![1, 2, 1], ![1, 1, 2]]",
+   "docstring": "",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.ThreeLocusInformation",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.ThreeLocusInformation.degrees_injective": [],
+     "Descent.Portability.ThreeLocusInformation.statistic_second_moment": [],
+     "Descent.Portability.ThreeLocusInformation.statistic_mean": [],
+     "Descent.Portability.ThreeLocusInformation.densitySecondCoefficient_eq_statistic": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.ThreeLocusInformation.degrees_injective",
+    "Descent.Portability.ThreeLocusInformation.densitySecondCoefficient_eq_statistic",
+    "Descent.Portability.ThreeLocusInformation.statistic_mean",
+    "Descent.Portability.ThreeLocusInformation.statistic_second_moment"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ThreeLocusInformation.coefficients",
+   "decl_name": "coefficients",
+   "short": "coefficients",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Descent/Portability/ThreeLocusInformation.lean",
+   "line": 29,
+   "signature": ": Fin 6 → ℝ",
+   "args": [],
+   "ret_type": "Fin 6 → ℝ",
+   "body": " ![1, 1, 1, -1, -1, -1]",
+   "docstring": "",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.ThreeLocusInformation",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.finite_postprocessors_adaptive_span_small": [],
+     "Descent.Portability.finite_postprocessors_budgeted_adaptive_residual": [],
+     "Descent.Portability.finite_postprocessors_budgeted_adaptive_arbitrarily_close_to_one": [],
+     "Descent.Portability.DiploidBernsteinLaw.realizingMap_mean": [],
+     "Descent.Portability.DiploidBernsteinLaw.realizingMap_unique": [],
+     "Descent.Portability.DiploidBernsteinLaw.mean_surface_iff_tensor_quadratic": [],
+     "Descent.Portability.GaussianCovarianceSeparation.gaussianFourier_independent": [],
+     "Descent.Portability.ObservableClosureLaw.matrix_autonomy_iff": [],
+     "Descent.Portability.PortabilityRatioGeometry.varianceForm_nonneg": [],
+     "Descent.Portability.ThreeLocusInformation.statistic_second_moment": [],
+     "Descent.Portability.ThreeLocusInformation.statistic_mean": [],
+     "Descent.Portability.ThreeLocusInformation.densitySecondCoefficient_eq_statistic": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.DiploidBernsteinLaw.mean_surface_iff_tensor_quadratic",
+    "Descent.Portability.DiploidBernsteinLaw.realizingMap_mean",
+    "Descent.Portability.DiploidBernsteinLaw.realizingMap_unique",
+    "Descent.Portability.GaussianCovarianceSeparation.gaussianFourier_independent",
+    "Descent.Portability.ObservableClosureLaw.matrix_autonomy_iff",
+    "Descent.Portability.PortabilityRatioGeometry.varianceForm_nonneg",
+    "Descent.Portability.ThreeLocusInformation.densitySecondCoefficient_eq_statistic",
+    "Descent.Portability.ThreeLocusInformation.statistic_mean",
+    "Descent.Portability.ThreeLocusInformation.statistic_second_moment",
+    "Descent.Portability.finite_postprocessors_adaptive_span_small",
+    "Descent.Portability.finite_postprocessors_budgeted_adaptive_arbitrarily_close_to_one",
+    "Descent.Portability.finite_postprocessors_budgeted_adaptive_residual"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ThreeLocusInformation.statistic",
+   "decl_name": "statistic",
+   "short": "statistic",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/ThreeLocusInformation.lean",
+   "line": 33,
+   "signature": "(x : Fin 3 → ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "x"
+     ],
+     "type": "Fin 3 → ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": " tensorCombination degrees coefficients x",
+   "docstring": "",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.ThreeLocusInformation",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Blindness.identical_observable_law_implies_identical_statistic_law": [],
+     "Descent.Blindness.identifiedBy_classOf_iff_isGraphInvariant": [],
+     "Descent.Blindness.identifiedBy_classOf_iff_factorsThroughSemantic": [],
+     "Descent.Portability.ThreeLocusInformation.statistic_second_moment": [],
+     "Descent.Portability.ThreeLocusInformation.statistic_mean": [],
+     "Descent.Portability.ThreeLocusInformation.densitySecondCoefficient_eq_statistic": [],
+     "Descent.Spectral.orderFreeStatistic_reverse": [],
+     "Descent.Spectral.orderFreeStatistic_pair_swap": [],
+     "Descent.Spectral.binaryOrientation_orderFree_mean": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Blindness.identical_observable_law_implies_identical_statistic_law",
+    "Descent.Blindness.identifiedBy_classOf_iff_factorsThroughSemantic",
+    "Descent.Blindness.identifiedBy_classOf_iff_isGraphInvariant",
+    "Descent.Portability.ThreeLocusInformation.densitySecondCoefficient_eq_statistic",
+    "Descent.Portability.ThreeLocusInformation.statistic_mean",
+    "Descent.Portability.ThreeLocusInformation.statistic_second_moment",
+    "Descent.Spectral.binaryOrientation_orderFree_mean",
+    "Descent.Spectral.orderFreeStatistic_pair_swap",
+    "Descent.Spectral.orderFreeStatistic_reverse"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ThreeLocusInformation.permuted",
+   "decl_name": "permuted",
+   "short": "permuted",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Descent/Portability/ThreeLocusInformation.lean",
+   "line": 54,
+   "signature": "(A : Matrix (Fin 3) (Fin 3) ℝ) (π : Equiv.Perm (Fin 3)) : Matrix (Fin 3) (Fin 3) ℝ",
+   "args": [
+    {
+     "names": [
+      "A"
+     ],
+     "type": "Matrix (Fin 3) (Fin 3) ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "π"
+     ],
+     "type": "Equiv.Perm (Fin 3)",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "Matrix (Fin 3) (Fin 3) ℝ",
+   "body": " fun i j ↦ A (π i) (π j)",
+   "docstring": "",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.ThreeLocusInformation",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.ThreeLocusInformation.direction_permutation_average": [],
+     "Descent.Portability.ThreeLocusInformation.densitySecondCoefficient_eq_statistic": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.ThreeLocusInformation.densitySecondCoefficient_eq_statistic",
+    "Descent.Portability.ThreeLocusInformation.direction_permutation_average"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ThreeLocusInformation.densitySecondCoefficient",
+   "decl_name": "densitySecondCoefficient",
+   "short": "densitySecondCoefficient",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/ThreeLocusInformation.lean",
+   "line": 57,
+   "signature": "(x : Fin 3 → ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "x"
+     ],
+     "type": "Fin 3 → ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  (1 / 6 : ℝ) * ∑ π : Equiv.Perm (Fin 3),\n    (Matrix.trace (direction * direction) / 4 -\n      quadraticValue (permuted (direction * direction) π) x / 2 +\n      quadraticValue (permuted direction π) x ^ 2 / 8)",
+   "docstring": "",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.ThreeLocusInformation",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.ThreeLocusInformation.densitySecondCoefficient_eq_statistic": [],
+     "Descent.Portability.ThreeLocusInformation.density_coefficient_mean": [],
+     "Descent.Portability.ThreeLocusInformation.density_coefficient_second_moment": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.ThreeLocusInformation.densitySecondCoefficient_eq_statistic",
+    "Descent.Portability.ThreeLocusInformation.density_coefficient_mean",
+    "Descent.Portability.ThreeLocusInformation.density_coefficient_second_moment"
    ]
   },
   {
