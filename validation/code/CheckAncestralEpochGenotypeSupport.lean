@@ -1,0 +1,19 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.AncestralEpochGenotypeSupport
+
+/-! Kernel axiom audit for branch homogeneity and catalogue support through finite demography. -/
+
+#print axioms Descent.Portability.AncestralEpochGenotypeSupport.intervalGenome_excludes
+#print axioms Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes
+#print axioms Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_good
+#print axioms Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous
+#print axioms Descent.Portability.AncestralEpochGenotypeSupport.epochGenome_good
+#print axioms Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good
+#print axioms Descent.Portability.AncestralEpochGenotypeSupport.stoppedGenome_excludes_good
+#print axioms Descent.Portability.AncestralEpochGenotypeSupport.mergingTail_good
+#print axioms Descent.Portability.AncestralEpochGenotypeSupport.historyGenome_good
+#print axioms Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_good
+#print axioms Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_covered
+#print axioms Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_rawDosage_le_six

@@ -3062,6 +3062,9 @@ def mergingTailContinuation(rates, ancestor, hisolated, mutationRate):
 def completeDemographyLaw(instructions, finalRates, ancestor, hisolated, mutationRate, start, hs):
     return historyGenomeLaw(mutationRate, instructions, (mergingTailContinuation(finalRates, ancestor, hisolated, mutationRate)), start, hs)
 
+def GenomeGood(earlier, genome):
+    return all(((StateReady(earlier, locus, (genome(locus))) and Covered((genome(locus))))) for locus in range(int(_rt.sumdim('locus', len(genome)))))
+
 def jumpStateLaw(rates, s, h):
     return _rt._proj((Descent_Portability_AncestralEventLaw_jumpLaw(rates, s, h)), 'pushforward')((nextState(s)))
 

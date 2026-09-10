@@ -129,6 +129,8 @@ import Descent.Portability.FirthFiniteIterationLaw
 import Descent.Portability.SimulationBaselineLaw
 import Descent.Portability.SimulationCohortLaw
 import Descent.Portability.SimulationDesignDecoder
+import Descent.Portability.AncestralEpochGenotypeSupport
+import Descent.Portability.MutationChannelBridge
 
 assert_below Descent.Program
 

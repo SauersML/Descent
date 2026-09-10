@@ -23981,7 +23981,10 @@
    "Descent.Portability.AncestralCladePartition.same_state_relation",
    "Descent.Portability.AncestralGenealogyLaw.intervalBranchesAux_exposure",
    "Descent.Portability.AncestralGenealogyOrdering.mem_intervalBranchesAux",
-   "Descent.Portability.AncestralGenealogyOrdering.traceBranches_extends"
+   "Descent.Portability.AncestralGenealogyOrdering.traceBranches_extends",
+   "Descent.Portability.MutationChannelBridge.channel_sum",
+   "Descent.Portability.MutationChannelBridge.compiler_sum",
+   "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels"
   ],
   "constraints": {
    "hypotheses": [],
@@ -24002,7 +24005,10 @@
     "Descent.Portability.AncestralCladePartition.extends_coalesce": [],
     "Descent.Portability.AncestralGenealogyLaw.intervalBranchesAux_exposure": [],
     "Descent.Portability.AncestralGenealogyOrdering.mem_intervalBranchesAux": [],
-    "Descent.Portability.AncestralGenealogyOrdering.traceBranches_extends": []
+    "Descent.Portability.AncestralGenealogyOrdering.traceBranches_extends": [],
+    "Descent.Portability.MutationChannelBridge.compiler_sum": [],
+    "Descent.Portability.MutationChannelBridge.channel_sum": [],
+    "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels": []
    }
   }
  },
@@ -24138,6 +24144,15 @@
    "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation",
    "Descent.Portability.AncestralEpochGenotypeLaw.intervalGenome_mass_measurable",
    "Descent.Portability.AncestralEpochGenotypeLaw.mergingTail_expectation",
+   "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_covered",
+   "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_rawDosage_le_six",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.intervalGenome_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous",
+   "Descent.Portability.AncestralEpochGenotypeSupport.stoppedGenome_excludes_good",
    "Descent.Portability.AncestralEpochLaw.coordinate_summable",
    "Descent.Portability.AncestralEpochLaw.epoch_expectation",
    "Descent.Portability.AncestralEpochLaw.epoch_expectation_bounds",
@@ -24265,6 +24280,11 @@
    "Descent.Portability.MarkedAncestralLaw.trace_expectation_succ",
    "Descent.Portability.MarkedAncestralLaw.trace_terminal_expectation",
    "Descent.Portability.MarkedAncestralLaw.trace_terminal_iterate",
+   "Descent.Portability.MutationChannelBridge.channel_sum",
+   "Descent.Portability.MutationChannelBridge.generator_template_sum",
+   "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels",
+   "Descent.Portability.MutationChannelBridge.stoppedGenome_eq_limit",
+   "Descent.Portability.MutationChannelBridge.template_sum",
    "Descent.Portability.SignedTransferIdentification.arrayTransfer_generator",
    "Descent.Portability.SignedTransferIdentification.balance_identifies_limit",
    "Descent.Portability.SignedTransferIdentification.mutation_generator_row",
@@ -24409,6 +24429,15 @@
     "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.mergingTail_expectation": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.intervalGenome_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_good": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.stoppedGenome_excludes_good": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_good": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_covered": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_rawDosage_le_six": [],
     "Descent.Portability.AncestralEpochLaw.coordinate_summable": [],
     "Descent.Portability.AncestralEpochLaw.epoch_expectation": [],
     "Descent.Portability.AncestralEpochLaw.epoch_expectation_bounds": [],
@@ -24536,6 +24565,11 @@
     "Descent.Portability.MarkedAncestralLaw.trace_terminal_iterate": [],
     "Descent.Portability.MarkedAncestralLaw.trace_terminal_expectation": [],
     "Descent.Portability.MarkedAncestralLaw.marked_epoch_mass_sum": [],
+    "Descent.Portability.MutationChannelBridge.template_sum": [],
+    "Descent.Portability.MutationChannelBridge.channel_sum": [],
+    "Descent.Portability.MutationChannelBridge.generator_template_sum": [],
+    "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels": [],
+    "Descent.Portability.MutationChannelBridge.stoppedGenome_eq_limit": [],
     "Descent.Portability.SignedTransferIdentification.arrayTransfer_generator": [],
     "Descent.Portability.SignedTransferIdentification.row_boundary_extension": [],
     "Descent.Portability.SignedTransferIdentification.balance_identifies_limit": [],
@@ -27667,7 +27701,11 @@
    "Descent.Coalescent.ancestralRel_rel",
    "Descent.Coalescent.ancestralRel_succ_eq",
    "Descent.Coalescent.ancestralRel_zero",
-   "Descent.Portability.AncestralEpochGenotypeLaw.mergingTail_expectation"
+   "Descent.Portability.AncestralEpochGenotypeLaw.mergingTail_expectation",
+   "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_covered",
+   "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_rawDosage_le_six",
+   "Descent.Portability.AncestralEpochGenotypeSupport.mergingTail_good"
   ],
   "constraints": {
    "declared_kind": "nonnegative",
@@ -27684,7 +27722,11 @@
     "Descent.Coalescent.ancestralRel_le_succ": [],
     "Descent.Coalescent.ancestralRel_eq_top_iff": [],
     "Descent.Coalescent.ancestralRel_succ_eq": [],
-    "Descent.Portability.AncestralEpochGenotypeLaw.mergingTail_expectation": []
+    "Descent.Portability.AncestralEpochGenotypeLaw.mergingTail_expectation": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.mergingTail_good": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_good": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_covered": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_rawDosage_le_six": []
    }
   }
  },
@@ -38147,6 +38189,11 @@
    "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation",
    "Descent.Portability.AncestralEpochGenotypeLaw.epoch_coordinate_summable",
    "Descent.Portability.AncestralEpochGenotypeLaw.intervalGenome_mass_measurable",
+   "Descent.Portability.AncestralEpochGenotypeSupport.bind_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.intervalGenome_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.intervalKernel_excludes",
    "Descent.Portability.AncestralEpochLaw.coordinate_summable",
    "Descent.Portability.AncestralEpochLaw.epoch_expectation",
    "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation",
@@ -38295,6 +38342,10 @@
    "Descent.Portability.InterleavedMutationMeasurability.measurable_real_tsum",
    "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable",
    "Descent.Portability.ManyDemeSampleCount.total_le_totalSampleSize",
+   "Descent.Portability.MutationChannelBridge.channel_sum",
+   "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward",
+   "Descent.Portability.MutationChannelBridge.generator_template_sum",
+   "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels",
    "Descent.Portability.MutationDriftModelAssumptions.fstTransient_nonneg",
    "Descent.Portability.NucleotideMutationLaw.branch_compose",
    "Descent.Portability.NucleotideMutationLaw.branch_expectation",
@@ -39116,6 +39167,11 @@
     "Descent.Portability.AncestralEpochGenotypeLaw.epochCountMass_expectation": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.epoch_coordinate_summable": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.bind_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.intervalKernel_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.intervalGenome_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good": [],
     "Descent.Portability.AncestralEpochLaw.coordinate_summable": [],
     "Descent.Portability.AncestralEpochLaw.epoch_expectation": [],
     "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation": [],
@@ -39365,6 +39421,10 @@
     "Descent.Portability.transportedTargetR2DiagonalLD_eq_sharedHeritability_of_orthogonal_private": [],
     "Descent.Portability.portabilityNoiseVariance_strictAnti": [],
     "Descent.Portability.sq_mul_le_sq_mul_of_abs_le": [],
+    "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward": [],
+    "Descent.Portability.MutationChannelBridge.channel_sum": [],
+    "Descent.Portability.MutationChannelBridge.generator_template_sum": [],
+    "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels": [],
     "Descent.Portability.NucleotideMutationLaw.coordinate_summable": [],
     "Descent.Portability.NucleotideMutationLaw.eigen_summable": [],
     "Descent.Portability.NucleotideMutationLaw.branch_expectation": [],
@@ -46577,6 +46637,7 @@
    "Descent.Coalescent.ManyDemeMomentInstruction.apply_none",
    "Descent.Coalescent.manyDemePairDivergenceProjection_propagator_intertwines",
    "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation",
+   "Descent.Portability.AncestralEpochGenotypeSupport.historyGenome_good",
    "Descent.Portability.AncestralEpochLaw.history_expectation"
   ],
   "constraints": {
@@ -46596,6 +46657,7 @@
     ],
     "Descent.Coalescent.LowOrderLDEpoch.propagator_none": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.historyGenome_good": [],
     "Descent.Portability.AncestralEpochLaw.history_expectation": []
    }
   }
@@ -47402,6 +47464,11 @@
    "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation",
    "Descent.Portability.AncestralEpochGenotypeLaw.epoch_coordinate_summable",
    "Descent.Portability.AncestralEpochGenotypeLaw.intervalGenome_mass_measurable",
+   "Descent.Portability.AncestralEpochGenotypeSupport.bind_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.intervalGenome_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.intervalKernel_excludes",
    "Descent.Portability.AncestralEpochLaw.coordinate_summable",
    "Descent.Portability.AncestralEpochLaw.epoch_expectation",
    "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation",
@@ -47550,6 +47617,10 @@
    "Descent.Portability.InterleavedMutationMeasurability.measurable_real_tsum",
    "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable",
    "Descent.Portability.ManyDemeSampleCount.total_le_totalSampleSize",
+   "Descent.Portability.MutationChannelBridge.channel_sum",
+   "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward",
+   "Descent.Portability.MutationChannelBridge.generator_template_sum",
+   "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels",
    "Descent.Portability.MutationDriftModelAssumptions.fstTransient_nonneg",
    "Descent.Portability.NucleotideMutationLaw.branch_compose",
    "Descent.Portability.NucleotideMutationLaw.branch_expectation",
@@ -48352,6 +48423,11 @@
     "Descent.Portability.AncestralEpochGenotypeLaw.epochCountMass_expectation": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.epoch_coordinate_summable": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.bind_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.intervalKernel_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.intervalGenome_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good": [],
     "Descent.Portability.AncestralEpochLaw.coordinate_summable": [],
     "Descent.Portability.AncestralEpochLaw.epoch_expectation": [],
     "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation": [],
@@ -48601,6 +48677,10 @@
     "Descent.Portability.transportedTargetR2DiagonalLD_eq_sharedHeritability_of_orthogonal_private": [],
     "Descent.Portability.portabilityNoiseVariance_strictAnti": [],
     "Descent.Portability.sq_mul_le_sq_mul_of_abs_le": [],
+    "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward": [],
+    "Descent.Portability.MutationChannelBridge.channel_sum": [],
+    "Descent.Portability.MutationChannelBridge.generator_template_sum": [],
+    "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels": [],
     "Descent.Portability.NucleotideMutationLaw.coordinate_summable": [],
     "Descent.Portability.NucleotideMutationLaw.eigen_summable": [],
     "Descent.Portability.NucleotideMutationLaw.branch_expectation": [],
@@ -53473,6 +53553,8 @@
    "Descent.Portability.AncestralBranchExposure.occupation_one",
    "Descent.Portability.AncestralCladePartition.extends_terminal",
    "Descent.Portability.AncestralEpochGenotypeLaw.conditionalEpoch_mass_measurable",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.count_excludes",
    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg",
    "Descent.Portability.AncestralGenealogyLaw.traceBranches_exposure",
    "Descent.Portability.AncestralGenealogyOrdering.traceBranches_extends",
@@ -53616,6 +53698,8 @@
     "Descent.Portability.AncestralBranchExposure.occupation_bounds": [],
     "Descent.Portability.AncestralCladePartition.extends_terminal": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.conditionalEpoch_mass_measurable": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.count_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes": [],
     "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg": [],
     "Descent.Portability.AncestralGenealogyLaw.traceBranches_exposure": [],
     "Descent.Portability.AncestralGenealogyOrdering.traceBranches_extends": [],
@@ -65795,6 +65879,11 @@
    "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation",
    "Descent.Portability.AncestralEpochGenotypeLaw.epoch_coordinate_summable",
    "Descent.Portability.AncestralEpochGenotypeLaw.intervalGenome_mass_measurable",
+   "Descent.Portability.AncestralEpochGenotypeSupport.bind_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.intervalGenome_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.intervalKernel_excludes",
    "Descent.Portability.AncestralEpochLaw.coordinate_summable",
    "Descent.Portability.AncestralEpochLaw.epoch_expectation",
    "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation",
@@ -65943,6 +66032,10 @@
    "Descent.Portability.InterleavedMutationMeasurability.measurable_real_tsum",
    "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable",
    "Descent.Portability.ManyDemeSampleCount.total_le_totalSampleSize",
+   "Descent.Portability.MutationChannelBridge.channel_sum",
+   "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward",
+   "Descent.Portability.MutationChannelBridge.generator_template_sum",
+   "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels",
    "Descent.Portability.MutationDriftModelAssumptions.fstTransient_nonneg",
    "Descent.Portability.NucleotideMutationLaw.branch_compose",
    "Descent.Portability.NucleotideMutationLaw.branch_expectation",
@@ -66811,6 +66904,11 @@
     "Descent.Portability.AncestralEpochGenotypeLaw.epochCountMass_expectation": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.epoch_coordinate_summable": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.bind_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.intervalKernel_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.intervalGenome_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good": [],
     "Descent.Portability.AncestralEpochLaw.coordinate_summable": [],
     "Descent.Portability.AncestralEpochLaw.epoch_expectation": [],
     "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation": [],
@@ -67053,6 +67151,10 @@
     "Descent.Portability.transportedTargetR2DiagonalLD_eq_sharedHeritability_of_orthogonal_private": [],
     "Descent.Portability.portabilityNoiseVariance_strictAnti": [],
     "Descent.Portability.sq_mul_le_sq_mul_of_abs_le": [],
+    "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward": [],
+    "Descent.Portability.MutationChannelBridge.channel_sum": [],
+    "Descent.Portability.MutationChannelBridge.generator_template_sum": [],
+    "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels": [],
     "Descent.Portability.NucleotideMutationLaw.coordinate_summable": [],
     "Descent.Portability.NucleotideMutationLaw.eigen_summable": [],
     "Descent.Portability.NucleotideMutationLaw.branch_expectation": [],
@@ -67353,6 +67455,7 @@
    "Descent.Portability.AncestralCladePartition.Extends.refl",
    "Descent.Portability.AncestralCladePartition.extends_proposal",
    "Descent.Portability.AncestralCladePartition.extends_terminal",
+   "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_good",
    "Descent.Portability.AncestralGenealogyOrdering.intervalBranches_ordered",
    "Descent.Portability.FiniteProductExponential.productEvolution_add",
    "Descent.Portability.FiniteProductExponential.semigroup_eq_exponential",
@@ -67397,6 +67500,7 @@
     "Descent.Portability.AncestralCladePartition.Extends.refl": [],
     "Descent.Portability.AncestralCladePartition.extends_proposal": [],
     "Descent.Portability.AncestralCladePartition.extends_terminal": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_good": [],
     "Descent.Portability.AncestralGenealogyOrdering.intervalBranches_ordered": [],
     "Descent.Portability.FiniteProductExponential.semigroup_eq_exponential": [],
     "Descent.Portability.FiniteProductExponential.productEvolution_add": [],
@@ -67719,6 +67823,7 @@
    "Descent.Portability.GaussianEffectPortabilityLaw.successProbability_eq_joint_defined",
    "Descent.Portability.GaussianSlabLaw.section_lower",
    "Descent.Portability.MarkedAncestralLaw.trace_terminal_iterate",
+   "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward",
    "Descent.Portability.PThresholdTrainingLaw.linearScoreFiles_values",
    "Descent.Portability.PThresholdTrainingLaw.scan_mem",
    "Descent.Portability.PipelineDemographicHistory.commonDiffusionProjection_exact",
@@ -68110,6 +68215,7 @@
     "Descent.Portability.panelAdjustedImputationQuality_eq_ld_iff": [],
     "Descent.Portability.ldDecayPerGeneration_eq_one_iff": [],
     "Descent.Portability.MarkedAncestralLaw.trace_terminal_iterate": [],
+    "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward": [],
     "Descent.Portability.signal_exceeds_threshold_iff_confounding_exceeds_critical": [],
     "Descent.Portability.no_exact_estimator_of_two_point_collision": [],
     "Descent.Portability.decisionCurveScreeningModel_harm_eq_threshold_scale": [],
@@ -68332,6 +68438,9 @@
    "Descent.Portability.AncestralAbsorptionLaw.survival_bound",
    "Descent.Portability.AncestralCladePartition.Extends.trans",
    "Descent.Portability.AncestralCladePartition.extends_terminal",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.historyGenome_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.mergingTail_good",
    "Descent.Portability.AncestralGenealogyOrdering.traceBranches_extends",
    "Descent.Portability.AncestralMutationAbsorption.exists_completion_trace",
    "Descent.Portability.AncestralMutationAbsorption.iterate_distance_geometric",
@@ -68521,6 +68630,9 @@
     "Descent.Portability.AncestralAbsorptionLaw.survival_bound": [],
     "Descent.Portability.AncestralCladePartition.Extends.trans": [],
     "Descent.Portability.AncestralCladePartition.extends_terminal": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.mergingTail_good": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.historyGenome_good": [],
     "Descent.Portability.AncestralGenealogyOrdering.traceBranches_extends": [],
     "Descent.Portability.AncestralMutationAbsorption.exists_completion_trace": [],
     "Descent.Portability.AncestralMutationAbsorption.survival_bound": [],
@@ -69115,6 +69227,7 @@
    "Descent.Portability.GaussianEffectPortabilityLaw.finite_reportedExpectation_formula",
    "Descent.Portability.GaussianEffectPortabilityLaw.successProbability_bounds",
    "Descent.Portability.GaussianEffectPortabilityLaw.successProbability_eq_joint_defined",
+   "Descent.Portability.MutationChannelBridge.channel_sum",
    "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integral_branchMeasure",
    "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integral_constant_kernel",
    "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integral_deterministic_kernel",
@@ -69150,6 +69263,7 @@
     "Descent.Portability.GaussianEffectPortabilityLaw.successProbability_eq_joint_defined": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.successProbability_bounds": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.finite_reportedExpectation_formula": [],
+    "Descent.Portability.MutationChannelBridge.channel_sum": [],
     "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integral_branchMeasure": [],
     "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integral_jointMeasure": [],
     "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integral_constant_kernel": [],
@@ -70142,6 +70256,8 @@
    "Descent.PopGen.snpH2_add_tagged",
    "Descent.PopGen.twoLocusCoalescentCovarianceMatrix_diff_lower_bound",
    "Descent.Portability.AncestralGenealogyLaw.intervalBranchesAux_exposure",
+   "Descent.Portability.MutationChannelBridge.compiler_sum",
+   "Descent.Portability.MutationChannelBridge.template_sum",
    "Descent.Portability.SimulationDemographyLaw.gridInstructions_duration",
    "Descent.Portability.SimulationDemographyLaw.serialInstructions_duration",
    "Descent.Portability.abs_treatmentMargin_error_le_componentwise_calibration_bound",
@@ -70240,6 +70356,8 @@
     "Descent.Portability.total_portability_loss_at_reference_point": [],
     "Descent.Portability.apparent_portability_loss_eq_total_of_ideal": [],
     "Descent.Portability.portability_loss_decomposition": [],
+    "Descent.Portability.MutationChannelBridge.compiler_sum": [],
+    "Descent.Portability.MutationChannelBridge.template_sum": [],
     "Descent.Portability.calibrationInTheLarge_predicted_shift": [],
     "Descent.Portability.abs_treatmentMargin_error_le_componentwise_calibration_bound": [],
     "Descent.Portability.qalyLoss_le_componentwise_calibration_bound": [],
@@ -75715,6 +75833,8 @@
    "Descent.Portability.AncestralBranchExposure.occupation_one",
    "Descent.Portability.AncestralCladePartition.extends_terminal",
    "Descent.Portability.AncestralEpochGenotypeLaw.conditionalEpoch_mass_measurable",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.count_excludes",
    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg",
    "Descent.Portability.AncestralGenealogyLaw.traceBranches_exposure",
    "Descent.Portability.AncestralGenealogyOrdering.traceBranches_extends",
@@ -75858,6 +75978,8 @@
     "Descent.Portability.AncestralBranchExposure.occupation_bounds": [],
     "Descent.Portability.AncestralCladePartition.extends_terminal": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.conditionalEpoch_mass_measurable": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.count_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes": [],
     "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg": [],
     "Descent.Portability.AncestralGenealogyLaw.traceBranches_exposure": [],
     "Descent.Portability.AncestralGenealogyOrdering.traceBranches_extends": [],
@@ -86822,6 +86944,8 @@
    "Descent.Portability.InterleavedMutationExponential.poisson_matrix_series",
    "Descent.Portability.InterleavedMutationExponential.propagate_mass",
    "Descent.Portability.InterleavedMutationExponential.scalar_identity_exp",
+   "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward",
+   "Descent.Portability.MutationChannelBridge.coordinate_identity",
    "Descent.Portability.PortabilityRatioGeometry.crossForm_eq_dot",
    "Descent.Portability.PortabilityRatioGeometry.varianceForm_nonneg",
    "Descent.Portability.ProbitTrainingLaw.fixedData_reportedRatio_bounded",
@@ -87086,6 +87210,8 @@
     "Descent.Portability.InterleavedMutationExponential.poisson_matrix_exponential": [],
     "Descent.Portability.clumping_minimizes_detection_on_ld_kernel": [],
     "Descent.Portability.clumping_maximizes_reconstruction_on_ld_kernel": [],
+    "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward": [],
+    "Descent.Portability.MutationChannelBridge.coordinate_identity": [],
     "Descent.Portability.BackgroundClass.isNull_convex": [],
     "Descent.Portability.frobeniusForm_tendsto": [],
     "Descent.Portability.EquiExit.certificateTest_null_control": [
@@ -87801,6 +87927,12 @@
    "Descent.Portability.AncestralEpochGenotypeLaw.epochCountMass_sum",
    "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation",
    "Descent.Portability.AncestralEpochGenotypeLaw.epoch_coordinate_summable",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.epochGenome_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous",
+   "Descent.Portability.AncestralEpochGenotypeSupport.stoppedGenome_excludes_good",
    "Descent.Portability.AncestralEpochLaw.coordinate_summable",
    "Descent.Portability.AncestralEpochLaw.epoch_expectation",
    "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation",
@@ -88043,6 +88175,12 @@
     "Descent.Portability.AncestralEpochGenotypeLaw.epochCountMass_sum": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.epoch_coordinate_summable": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_good": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.epochGenome_good": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.stoppedGenome_excludes_good": [],
     "Descent.Portability.AncestralEpochLaw.coordinate_summable": [],
     "Descent.Portability.AncestralEpochLaw.epoch_expectation": [],
     "Descent.Portability.AncestralEpochLaw.readout_summable": [],
@@ -88301,6 +88439,8 @@
    "Descent.PopGen.snpH2_add_tagged",
    "Descent.PopGen.twoLocusCoalescentCovarianceMatrix_diff_lower_bound",
    "Descent.Portability.AncestralGenealogyLaw.intervalBranchesAux_exposure",
+   "Descent.Portability.MutationChannelBridge.compiler_sum",
+   "Descent.Portability.MutationChannelBridge.template_sum",
    "Descent.Portability.SimulationDemographyLaw.gridInstructions_duration",
    "Descent.Portability.SimulationDemographyLaw.serialInstructions_duration",
    "Descent.Portability.abs_treatmentMargin_error_le_componentwise_calibration_bound",
@@ -88400,6 +88540,8 @@
     "Descent.Portability.total_portability_loss_at_reference_point": [],
     "Descent.Portability.apparent_portability_loss_eq_total_of_ideal": [],
     "Descent.Portability.portability_loss_decomposition": [],
+    "Descent.Portability.MutationChannelBridge.compiler_sum": [],
+    "Descent.Portability.MutationChannelBridge.template_sum": [],
     "Descent.Portability.calibrationInTheLarge_predicted_shift": [],
     "Descent.Portability.abs_treatmentMargin_error_le_componentwise_calibration_bound": [],
     "Descent.Portability.qalyLoss_le_componentwise_calibration_bound": [],
@@ -93638,6 +93780,7 @@
    "Descent.Pangenome.Presentation.support_eq_of_iso",
    "Descent.Pangenome.Register.kernel_registerPresentation",
    "Descent.Pangenome.Strand.frustrated_iff_encode_eq",
+   "Descent.Portability.AncestralEpochGenotypeSupport.bind_excludes",
    "Descent.Portability.AncestralMutationTransfer.rowDistance_bind",
    "Descent.Portability.ChunkedGenotypeLaw.dependentJoint_expectation",
    "Descent.Portability.ExactFiniteHistoryLaw.expectation_propagate",
@@ -93656,6 +93799,7 @@
    "Descent.Portability.FiniteReportLaw.weightedDefinedMetric_joint",
    "Descent.Portability.InterleavedMutationExponential.propagate_mass",
    "Descent.Portability.InterleavedMutationMeasurability.bind_mass_measurable",
+   "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward",
    "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.branchMeasure_univ",
    "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integrable_branchMeasure",
    "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integrable_jointMeasure",
@@ -93704,6 +93848,7 @@
     "Descent.Pangenome.Presentation.coordinateCount_eq_kernel": [],
     "Descent.Pangenome.Register.kernel_registerPresentation": [],
     "Descent.Pangenome.Strand.frustrated_iff_encode_eq": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.bind_excludes": [],
     "Descent.Portability.AncestralMutationTransfer.rowDistance_bind": [],
     "Descent.Portability.ChunkedGenotypeLaw.dependentJoint_expectation": [],
     "Descent.Portability.indexWiseCalibrationMoment_at_zero_weight": [],
@@ -93724,6 +93869,7 @@
     "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure": [],
     "Descent.Portability.InterleavedMutationExponential.propagate_mass": [],
     "Descent.Portability.InterleavedMutationMeasurability.bind_mass_measurable": [],
+    "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward": [],
     "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.branchMeasure_univ": [],
     "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integrable_branchMeasure": [],
     "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integral_branchMeasure": [],
@@ -116949,6 +117095,13 @@
    "Descent.Portability.AncestralEpochGenotypeLaw.epoch_coordinate_summable",
    "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation",
    "Descent.Portability.AncestralEpochGenotypeLaw.mergingTail_expectation",
+   "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_covered",
+   "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_rawDosage_le_six",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous",
+   "Descent.Portability.AncestralEpochGenotypeSupport.stoppedGenome_excludes_good",
    "Descent.Portability.AncestralMutationAbsorption.exists_completion_trace",
    "Descent.Portability.AncestralMutationAbsorption.fixed_point_unique",
    "Descent.Portability.AncestralMutationAbsorption.historySampleComplete",
@@ -116974,6 +117127,7 @@
    "Descent.Portability.AncestralMutationResolvent.next_admissible",
    "Descent.Portability.AncestralMutationResolvent.solution_boundary_row",
    "Descent.Portability.AncestralMutationResolvent.subharmonic_zero",
+   "Descent.Portability.MutationChannelBridge.stoppedGenome_eq_limit",
    "Descent.Portability.SignedTransferIdentification.balance_identifies_limit",
    "Descent.Portability.SignedTransferIdentification.positive_next_admissible",
    "Descent.Portability.SignedTransferIdentification.row_boundary_extension",
@@ -117080,6 +117234,13 @@
     "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.mergingTail_expectation": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_good": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.stoppedGenome_excludes_good": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_good": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_covered": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_rawDosage_le_six": [],
     "Descent.Portability.AncestralMutationAbsorption.sampleComplete_scan": [
      "SampleComplete s"
     ],
@@ -117178,6 +117339,7 @@
      "SupportedAt deme s"
     ],
     "Descent.Portability.AncestralMutationResolvent.next_admissible": [],
+    "Descent.Portability.MutationChannelBridge.stoppedGenome_eq_limit": [],
     "Descent.Portability.SignedTransferIdentification.row_boundary_extension": [],
     "Descent.Portability.SignedTransferIdentification.positive_next_admissible": [],
     "Descent.Portability.SignedTransferIdentification.balance_identifies_limit": [],
@@ -117317,6 +117479,7 @@
    "Descent.Portability.AncestralAbsorptionLaw.survival_bound",
    "Descent.Portability.AncestralAbsorptionLaw.survival_geometric",
    "Descent.Portability.AncestralAbsorptionLaw.survival_tendsto_zero",
+   "Descent.Portability.AncestralEpochGenotypeSupport.stoppedGenome_excludes_good",
    "Descent.Portability.AncestralMutationAbsorption.coalescenceFloor_le_mass",
    "Descent.Portability.AncestralMutationAbsorption.exists_completion_trace",
    "Descent.Portability.AncestralMutationAbsorption.fixed_point_unique",
@@ -117344,6 +117507,7 @@
    "Descent.Portability.AncestralMutationResolvent.next_admissible",
    "Descent.Portability.AncestralMutationResolvent.solution_boundary_row",
    "Descent.Portability.AncestralMutationResolvent.subharmonic_zero",
+   "Descent.Portability.MutationChannelBridge.stoppedGenome_eq_limit",
    "Descent.Portability.SignedTransferIdentification.balance_identifies_limit",
    "Descent.Portability.SignedTransferIdentification.positive_next_admissible",
    "Descent.Portability.SignedTransferIdentification.row_boundary_extension",
@@ -117367,6 +117531,7 @@
     "0 < traceMass rates s trace",
     "SampleComplete s",
     "s.val.card ≤ count",
+    "SupportedAt deme start",
     "0 < (markLaw rates mutationRate s",
     "History count s",
     "0 < historyMass rates mutationRate s history",
@@ -117376,7 +117541,6 @@
     "∀ s, reward s ≤ (markLaw rates mutationRate s",
     "SupportedAt deme state",
     "∀ state, Interior deme state → ∀ target, (∑ event : Channel state, eventRate rates state event * (rows (nextState state event",
-    "SupportedAt deme start",
     "0 < FiniteReportLaw.mass (stoppedGenomeLaw rates deme start hs hsupported hisolated mutationRate"
    ],
    "hypotheses_by_theorem": {
@@ -117434,6 +117598,10 @@
     "Descent.Portability.AncestralAbsorptionLaw.stoppingTraceMass_hasSum": [
      "SampleComplete s",
      "SupportedAt deme s",
+     "∀ destination, rates.migration deme destination = 0"
+    ],
+    "Descent.Portability.AncestralEpochGenotypeSupport.stoppedGenome_excludes_good": [
+     "SupportedAt deme start",
      "∀ destination, rates.migration deme destination = 0"
     ],
     "Descent.Portability.AncestralMutationAbsorption.supportedAt_coalesce": [
@@ -117567,6 +117735,10 @@
     ],
     "Descent.Portability.AncestralMutationResolvent.next_admissible": [
      "∀ destination, rates.migration deme destination = 0"
+    ],
+    "Descent.Portability.MutationChannelBridge.stoppedGenome_eq_limit": [
+     "∀ destination, rates.migration deme destination = 0",
+     "SupportedAt deme state"
     ],
     "Descent.Portability.SignedTransferIdentification.row_boundary_extension": [
      "SupportedAt deme state"
@@ -118307,7 +118479,11 @@
    "Descent.Portability.AncestralGenealogyLaw.intervalBranches_exposure",
    "Descent.Portability.AncestralGenealogyOrdering.mem_intervalBranches",
    "Descent.Portability.AncestralGenealogyOrdering.mem_intervalBranchesAux",
-   "Descent.Portability.AncestralGenealogyOrdering.traceBranches_extends"
+   "Descent.Portability.AncestralGenealogyOrdering.traceBranches_extends",
+   "Descent.Portability.MutationChannelBridge.channel_sum",
+   "Descent.Portability.MutationChannelBridge.compiler_sum",
+   "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels",
+   "Descent.Portability.MutationChannelBridge.template_sum"
   ],
   "constraints": {
    "hypotheses": [
@@ -118344,7 +118520,11 @@
     ],
     "Descent.Portability.AncestralGenealogyOrdering.traceBranches_extends": [
      "branch ∈ traceBranches locus mutationRate trace duration times"
-    ]
+    ],
+    "Descent.Portability.MutationChannelBridge.compiler_sum": [],
+    "Descent.Portability.MutationChannelBridge.template_sum": [],
+    "Descent.Portability.MutationChannelBridge.channel_sum": [],
+    "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels": []
    }
   }
  },
@@ -118529,6 +118709,11 @@
    "Descent.Portability.AncestralCladePartition.extends_recombine",
    "Descent.Portability.AncestralCladePartition.extends_relabel",
    "Descent.Portability.AncestralCladePartition.extends_terminal",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.intervalGenome_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.stoppedGenome_excludes_good",
    "Descent.Portability.AncestralGenealogyOrdering.traceBranches_extends",
    "Descent.Portability.StoppedGenotypeReadiness.conditionalSiteLaw_ready",
    "Descent.Portability.StoppedGenotypeReadiness.conditionalSite_unsupported_ready",
@@ -118547,6 +118732,13 @@
     "Descent.Portability.AncestralCladePartition.extends_coalesce": [],
     "Descent.Portability.AncestralCladePartition.extends_proposal": [],
     "Descent.Portability.AncestralCladePartition.extends_terminal": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.intervalGenome_excludes": [
+     "Extends earlier older"
+    ],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_good": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.stoppedGenome_excludes_good": [],
     "Descent.Portability.AncestralGenealogyOrdering.traceBranches_extends": [],
     "Descent.Portability.StoppedGenotypeReadiness.recordMutation_ready": [
      "Extends earlier older"
@@ -118592,7 +118784,12 @@
    "Descent.Portability.AncestralEpochGenotypeLaw.epochCountMass_sum",
    "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation",
    "Descent.Portability.AncestralEpochGenotypeLaw.epoch_coordinate_summable",
-   "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation"
+   "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.epochGenome_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.historyGenome_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous"
   ],
   "constraints": {
    "hypotheses": [],
@@ -118605,7 +118802,12 @@
     "Descent.Portability.AncestralEpochGenotypeLaw.epochCountMass_sum": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.epoch_coordinate_summable": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation": [],
-    "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation": []
+    "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_good": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.epochGenome_good": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.historyGenome_good": []
    }
   }
  },
@@ -118630,6 +118832,7 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Portability.AncestralEpochGenotypeLaw.intervalGenome_mass_measurable",
+   "Descent.Portability.AncestralEpochGenotypeSupport.intervalGenome_excludes",
    "Descent.Portability.FiniteProductExponential.intervalGenome_exponential",
    "Descent.Portability.StoppedGenotypeRenewal.conditionalGenome_integral_succ",
    "Descent.Portability.StoppedGenotypeRenewal.conditionalGenome_succ",
@@ -118641,6 +118844,7 @@
    "hypotheses": [],
    "hypotheses_by_theorem": {
     "Descent.Portability.AncestralEpochGenotypeLaw.intervalGenome_mass_measurable": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.intervalGenome_excludes": [],
     "Descent.Portability.FiniteProductExponential.intervalGenome_exponential": [],
     "Descent.Portability.StoppedGenotypeRenewal.conditionalGenome_succ": [],
     "Descent.Portability.StoppedGenotypeRenewal.conditionalGenome_integral_succ": [],
@@ -118671,10 +118875,17 @@
    "Descent.Portability.AncestralEpochGenotypeLaw.epochCountMass_bounds",
    "Descent.Portability.AncestralEpochGenotypeLaw.epochCountMass_expectation",
    "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation",
-   "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation"
+   "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous"
   ],
   "constraints": {
-   "hypotheses": [],
+   "hypotheses": [
+    "ContinuationGood continuation",
+    "0 < (conditionalEpochLaw continuation rate trace hs duration times",
+    "0 < (conditionalEpochLaw continuation rate rest (sampleComplete_proposal start hs event"
+   ],
    "hypotheses_by_theorem": {
     "Descent.Portability.AncestralEpochGenotypeLaw.conditionalEpoch_mass_measurable": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.conditionalEpoch_times_measurable": [],
@@ -118682,7 +118893,18 @@
     "Descent.Portability.AncestralEpochGenotypeLaw.epochCountMass_bounds": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.epochCountMass_expectation": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation": [],
-    "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation": []
+    "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes": [
+     "ContinuationGood continuation"
+    ],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_good": [
+     "ContinuationGood continuation",
+     "0 < (conditionalEpochLaw continuation rate trace hs duration times"
+    ],
+    "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous": [
+     "ContinuationGood continuation",
+     "0 < (conditionalEpochLaw continuation rate rest (sampleComplete_proposal start hs event"
+    ]
    }
   }
  },
@@ -118710,7 +118932,8 @@
    "Descent.Portability.AncestralEpochGenotypeLaw.epochCountMass_expectation",
    "Descent.Portability.AncestralEpochGenotypeLaw.epochCountMass_sum",
    "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation",
-   "Descent.Portability.AncestralEpochGenotypeLaw.epoch_coordinate_summable"
+   "Descent.Portability.AncestralEpochGenotypeLaw.epoch_coordinate_summable",
+   "Descent.Portability.AncestralEpochGenotypeSupport.epochGenome_good"
   ],
   "constraints": {
    "range_lo_thm": [
@@ -118724,7 +118947,8 @@
    "range_lo": 0,
    "range_hi": 1,
    "hypotheses": [
-    "SampleComplete start"
+    "SampleComplete start",
+    "ContinuationGood continuation"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.AncestralEpochGenotypeLaw.epochCountMass_bounds": [
@@ -118741,6 +118965,9 @@
     ],
     "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation": [
      "SampleComplete start"
+    ],
+    "Descent.Portability.AncestralEpochGenotypeSupport.epochGenome_good": [
+     "ContinuationGood continuation"
     ]
    }
   }
@@ -118760,15 +118987,20 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
-   "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation"
+   "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation",
+   "Descent.Portability.AncestralEpochGenotypeSupport.epochGenome_good"
   ],
   "constraints": {
    "hypotheses": [
-    "SampleComplete start"
+    "SampleComplete start",
+    "ContinuationGood continuation"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation": [
      "SampleComplete start"
+    ],
+    "Descent.Portability.AncestralEpochGenotypeSupport.epochGenome_good": [
+     "ContinuationGood continuation"
     ]
    }
   }
@@ -118788,12 +119020,14 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
-   "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation"
+   "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation",
+   "Descent.Portability.AncestralEpochGenotypeSupport.historyGenome_good"
   ],
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
-    "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation": []
+    "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.historyGenome_good": []
    }
   }
  },
@@ -118821,7 +119055,8 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
-   "Descent.Portability.AncestralEpochGenotypeLaw.mergingTail_expectation"
+   "Descent.Portability.AncestralEpochGenotypeLaw.mergingTail_expectation",
+   "Descent.Portability.AncestralEpochGenotypeSupport.mergingTail_good"
   ],
   "constraints": {
    "hypotheses": [
@@ -118829,6 +119064,9 @@
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.AncestralEpochGenotypeLaw.mergingTail_expectation": [
+     "∀ destination, rates.migration ancestor destination = 0"
+    ],
+    "Descent.Portability.AncestralEpochGenotypeSupport.mergingTail_good": [
      "∀ destination, rates.migration ancestor destination = 0"
     ]
    }
@@ -118860,8 +119098,149 @@
   },
   "numeric_standins": null,
   "vector_args": null,
-  "mentioned_by": [],
-  "constraints": {}
+  "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_covered",
+   "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_rawDosage_le_six"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "∀ destination, finalRates.migration ancestor destination = 0",
+    "SampleComplete start",
+    "0 < (completeDemographyLaw instructions finalRates ancestor hisolated rate start hs"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_good": [
+     "∀ destination, finalRates.migration ancestor destination = 0",
+     "SampleComplete start",
+     "0 < (completeDemographyLaw instructions finalRates ancestor hisolated rate start hs"
+    ],
+    "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_covered": [
+     "∀ destination, finalRates.migration ancestor destination = 0",
+     "SampleComplete start",
+     "0 < (completeDemographyLaw instructions finalRates ancestor hisolated rate start hs"
+    ],
+    "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_rawDosage_le_six": [
+     "∀ destination, finalRates.migration ancestor destination = 0",
+     "SampleComplete start",
+     "0 < (completeDemographyLaw instructions finalRates ancestor hisolated rate start hs"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.AncestralEpochGenotypeSupport.GenomeGood": {
+  "class": "STRUCTURAL",
+  "note": "Prop-valued / set-valued",
+  "file": "Descent/Portability/AncestralEpochGenotypeSupport.lean",
+  "line": 102,
+  "short": "GenomeGood",
+  "ret_type": "Prop",
+  "empirical_status": "",
+  "python": "GenomeGood",
+  "args": [
+   "earlier",
+   "genome"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "Uninhabitable(\"no inhabitant modelled for the type '{lineages : Finset (Lineage D L n) // Valid lineages} D L n'\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.intervalGenome_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.stoppedGenome_excludes_good"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "Extends earlier older",
+    "GenomeGood earlier source",
+    "¬ GenomeGood earlier target",
+    "Extends earlier start"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.intervalGenome_excludes": [
+     "Extends earlier older",
+     "GenomeGood earlier source",
+     "¬ GenomeGood earlier target"
+    ],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes": [
+     "Extends earlier start",
+     "¬ GenomeGood earlier target"
+    ],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_good": [
+     "Extends earlier start"
+    ],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good": [
+     "Extends earlier start",
+     "¬ GenomeGood earlier target"
+    ],
+    "Descent.Portability.AncestralEpochGenotypeSupport.stoppedGenome_excludes_good": [
+     "Extends earlier start",
+     "¬ GenomeGood earlier target"
+    ],
+    "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_good": []
+   }
+  }
+ },
+ "Descent.Portability.AncestralEpochGenotypeSupport.ContinuationGood": {
+  "class": "STRUCTURAL",
+  "note": "Prop-valued / set-valued",
+  "file": "Descent/Portability/AncestralEpochGenotypeSupport.lean",
+  "line": 106,
+  "short": "ContinuationGood",
+  "ret_type": "Prop",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.epochGenome_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.historyGenome_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.mergingTail_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "hypotheses": [
+    "ContinuationGood continuation",
+    "0 < (conditionalEpochLaw continuation rate trace hs duration times",
+    "0 < (conditionalEpochLaw continuation rate rest (sampleComplete_proposal start hs event"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes": [
+     "ContinuationGood continuation"
+    ],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_good": [
+     "ContinuationGood continuation",
+     "0 < (conditionalEpochLaw continuation rate trace hs duration times"
+    ],
+    "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous": [
+     "ContinuationGood continuation",
+     "0 < (conditionalEpochLaw continuation rate rest (sampleComplete_proposal start hs event"
+    ],
+    "Descent.Portability.AncestralEpochGenotypeSupport.epochGenome_good": [
+     "ContinuationGood continuation"
+    ],
+    "Descent.Portability.AncestralEpochGenotypeSupport.mergingTail_good": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.historyGenome_good": [
+     "ContinuationGood continuation"
+    ]
+   }
+  }
  },
  "Descent.Portability.AncestralEpochLaw.steps": {
   "class": "STRUCTURAL",
@@ -119242,6 +119621,7 @@
    "Descent.Portability.AncestralAbsorptionLaw.sampleComplete_proposal",
    "Descent.Portability.AncestralAbsorptionLaw.supportedAt_proposal",
    "Descent.Portability.AncestralCladePartition.extends_proposal",
+   "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous",
    "Descent.Portability.AncestralEventLaw.eventRate_nonneg",
    "Descent.Portability.AncestralMutationAbsorption.jointChannel_empty",
    "Descent.Portability.AncestralMutationTransfer.transfer_empty",
@@ -119276,6 +119656,7 @@
      "0 < (proposalLaw rates s"
     ],
     "Descent.Portability.AncestralCladePartition.extends_proposal": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous": [],
     "Descent.Portability.AncestralEventLaw.eventRate_nonneg": [],
     "Descent.Portability.AncestralMutationAbsorption.jointChannel_empty": [],
     "Descent.Portability.AncestralMutationTransfer.transfer_expectation": [],
@@ -119721,6 +120102,7 @@
    "Descent.Portability.AncestralAbsorptionLaw.supportedAt_terminal",
    "Descent.Portability.AncestralAbsorptionLaw.survival_succ",
    "Descent.Portability.AncestralCladePartition.extends_proposal",
+   "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous",
    "Descent.Portability.AncestralEventLaw.proposal_generator",
    "Descent.Portability.MarkedAncestralLaw.traceMass_nonneg",
    "Descent.Portability.MarkedAncestralLaw.traceMass_sum",
@@ -119762,6 +120144,7 @@
     "Descent.Portability.AncestralAbsorptionLaw.completionMass_succ": [],
     "Descent.Portability.AncestralAbsorptionLaw.stoppingTraceMass_sum": [],
     "Descent.Portability.AncestralCladePartition.extends_proposal": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous": [],
     "Descent.Portability.AncestralEventLaw.proposal_generator": [],
     "Descent.Portability.MarkedAncestralLaw.traceMass_nonneg": [],
     "Descent.Portability.MarkedAncestralLaw.traceMass_sum": [],
@@ -119835,7 +120218,8 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Portability.AncestralGenealogyLaw.intervalBranchesAux_exposure",
-   "Descent.Portability.AncestralGenealogyOrdering.mem_intervalBranchesAux"
+   "Descent.Portability.AncestralGenealogyOrdering.mem_intervalBranchesAux",
+   "Descent.Portability.MutationChannelBridge.compiler_sum"
   ],
   "constraints": {
    "hypotheses": [
@@ -119845,7 +120229,8 @@
     "Descent.Portability.AncestralGenealogyLaw.intervalBranchesAux_exposure": [],
     "Descent.Portability.AncestralGenealogyOrdering.mem_intervalBranchesAux": [
      "branch ∈ intervalBranchesAux locus exposure lineages"
-    ]
+    ],
+    "Descent.Portability.MutationChannelBridge.compiler_sum": []
    }
   }
  },
@@ -119864,10 +120249,12 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous",
    "Descent.Portability.AncestralGenealogyLaw.intervalBranches_exposure",
    "Descent.Portability.AncestralGenealogyLaw.traceBranches_exposure",
    "Descent.Portability.AncestralGenealogyOrdering.intervalBranches_ordered",
    "Descent.Portability.AncestralGenealogyOrdering.mem_intervalBranches",
+   "Descent.Portability.MutationChannelBridge.template_sum",
    "Descent.Portability.StoppedGenotypeReadiness.intervalCount_ready",
    "Descent.Portability.StoppedGenotypeReadiness.nextInterval_input_homogeneous",
    "Descent.Portability.StoppedGenotypeReadiness.recordMutation_ready",
@@ -119882,12 +120269,14 @@
     "0 < FiniteReportLaw.mass (InterleavedMutationLaw.countLaw (replaceExposure (intervalTemplates state locus"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous": [],
     "Descent.Portability.AncestralGenealogyLaw.intervalBranches_exposure": [],
     "Descent.Portability.AncestralGenealogyLaw.traceBranches_exposure": [],
     "Descent.Portability.AncestralGenealogyOrdering.mem_intervalBranches": [
      "branch ∈ intervalBranches state locus exposure"
     ],
     "Descent.Portability.AncestralGenealogyOrdering.intervalBranches_ordered": [],
+    "Descent.Portability.MutationChannelBridge.template_sum": [],
     "Descent.Portability.StoppedGenotypeReadiness.recordMutation_ready": [
      "StateReady earlier locus site"
     ],
@@ -120478,6 +120867,7 @@
    "Descent.Portability.AncestralMutationResolvent.expectation_resolvent",
    "Descent.Portability.AncestralMutationResolvent.solution_boundary_row",
    "Descent.Portability.AncestralMutationResolvent.solution_equation",
+   "Descent.Portability.MutationChannelBridge.stoppedGenome_eq_limit",
    "Descent.Portability.SignedTransferIdentification.balance_identifies_limit",
    "Descent.Portability.SignedTransferIdentification.stoppedGenome_eq_limit_of_generator"
   ],
@@ -120490,8 +120880,8 @@
     "SupportedAt deme s",
     "∀ destination, rates.migration deme destination = 0",
     "∀ state, SampleComplete state → SupportedAt deme state → transfer rates mutationRate family state = family state",
-    "∀ state, Interior deme state → ∀ target, (∑ event : Channel state, eventRate rates state event * (rows (nextState state event",
-    "SupportedAt deme state"
+    "SupportedAt deme state",
+    "∀ state, Interior deme state → ∀ target, (∑ event : Channel state, eventRate rates state event * (rows (nextState state event"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.AncestralMutationLimit.distance_tendsto": [
@@ -120538,6 +120928,10 @@
     ],
     "Descent.Portability.AncestralMutationResolvent.expectation_resolvent": [
      "∀ destination, rates.migration deme destination = 0"
+    ],
+    "Descent.Portability.MutationChannelBridge.stoppedGenome_eq_limit": [
+     "∀ destination, rates.migration deme destination = 0",
+     "SupportedAt deme state"
     ],
     "Descent.Portability.SignedTransferIdentification.balance_identifies_limit": [
      "∀ destination, rates.migration deme destination = 0",
@@ -121541,6 +121935,8 @@
    "Descent.Portability.AncestralMutationTransfer.transfer_empty",
    "Descent.Portability.AncestralMutationTransfer.transfer_expectation",
    "Descent.Portability.AncestralMutationTransfer.transfer_generator",
+   "Descent.Portability.MutationChannelBridge.channel_sum",
+   "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels",
    "Descent.Portability.SignedTransferIdentification.arrayTransfer_generator",
    "Descent.Portability.SignedTransferIdentification.balance_identifies_limit",
    "Descent.Portability.SignedTransferIdentification.mutation_generator_row",
@@ -121553,6 +121949,8 @@
     "Descent.Portability.AncestralMutationTransfer.transfer_expectation": [],
     "Descent.Portability.AncestralMutationTransfer.transfer_generator": [],
     "Descent.Portability.AncestralMutationTransfer.transfer_empty": [],
+    "Descent.Portability.MutationChannelBridge.channel_sum": [],
+    "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels": [],
     "Descent.Portability.SignedTransferIdentification.arrayTransfer_generator": [],
     "Descent.Portability.SignedTransferIdentification.balance_identifies_limit": [],
     "Descent.Portability.SignedTransferIdentification.mutation_generator_row": [],
@@ -121592,6 +121990,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.intervalKernel_excludes",
    "Descent.Portability.AncestralMutationResolvent.rowNorm_postcompose",
    "Descent.Portability.AncestralMutationTransfer.transfer_distance",
    "Descent.Portability.AncestralMutationTransfer.transfer_expectation",
@@ -121601,6 +122000,8 @@
    "Descent.Portability.InterleavedMutationLaw.kernel_absence",
    "Descent.Portability.InterleavedMutationMeasurability.intervalKernel_mass_measurable",
    "Descent.Portability.InterleavedMutationMeasurability.mutationKernel_replaceExposure",
+   "Descent.Portability.MutationChannelBridge.generator_template_sum",
+   "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels",
    "Descent.Portability.OrderedMutationCatalogue.mutationCount_nucleotide",
    "Descent.Portability.OrderedMutationCatalogue.mutationCount_presence",
    "Descent.Portability.OrderedMutationCatalogue.mutationCount_unsupported",
@@ -121614,6 +122015,7 @@
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.intervalKernel_excludes": [],
     "Descent.Portability.AncestralMutationResolvent.rowNorm_postcompose": [],
     "Descent.Portability.AncestralMutationTransfer.transfer_expectation": [],
     "Descent.Portability.AncestralMutationTransfer.transfer_generator": [],
@@ -121623,6 +122025,8 @@
     "Descent.Portability.InterleavedMutationLaw.kernel_absence": [],
     "Descent.Portability.InterleavedMutationMeasurability.mutationKernel_replaceExposure": [],
     "Descent.Portability.InterleavedMutationMeasurability.intervalKernel_mass_measurable": [],
+    "Descent.Portability.MutationChannelBridge.generator_template_sum": [],
+    "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels": [],
     "Descent.Portability.OrderedMutationCatalogue.mutationKernel_unsupported": [],
     "Descent.Portability.OrderedMutationCatalogue.mutationCount_unsupported": [],
     "Descent.Portability.OrderedMutationCatalogue.mutationCount_nucleotide": [],
@@ -121859,6 +122263,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.intervalKernel_excludes",
    "Descent.Portability.AncestralMutationAbsorption.coalescenceFloor_le_mass",
    "Descent.Portability.AncestralMutationAbsorption.empty_mark_mass",
    "Descent.Portability.AncestralMutationAbsorption.exists_completion_trace",
@@ -121906,6 +122311,7 @@
     "∀ state, Interior deme state → ∀ output, arrayTransfer rates mutationRate rows state output = rows state output"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.intervalKernel_excludes": [],
     "Descent.Portability.AncestralMutationAbsorption.empty_mark_mass": [],
     "Descent.Portability.AncestralMutationAbsorption.supportedAt_scan": [
      "∀ destination, rates.migration deme destination = 0",
@@ -136302,6 +136708,7 @@
    "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation",
    "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation",
    "Descent.Portability.AncestralEpochGenotypeLaw.mergingTail_expectation",
+   "Descent.Portability.AncestralEpochGenotypeSupport.epochGenome_good",
    "Descent.Portability.AncestralEpochLaw.epoch_expectation",
    "Descent.Portability.AncestralEpochLaw.epoch_expectation_bounds",
    "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation",
@@ -136499,6 +136906,7 @@
     "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.mergingTail_expectation": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.epochGenome_good": [],
     "Descent.Portability.AncestralEpochLaw.epoch_expectation": [],
     "Descent.Portability.AncestralEpochLaw.expectation_bounds": [],
     "Descent.Portability.AncestralEpochLaw.epoch_expectation_bounds": [],
@@ -139209,6 +139617,8 @@
    "Descent.Decision.FiniteMinimax.Problem.garbleObservations_observation_eq",
    "Descent.Decision.FiniteMinimax.Problem.observationL1Distance_garble_le",
    "Descent.Decision.FiniteMinimax.Problem.toMixtureExperiment_mixture",
+   "Descent.Portability.AncestralEpochGenotypeSupport.bind_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.pushforward_excludes",
    "Descent.Portability.AncestralMutationLimit.limitLaw_fixed",
    "Descent.Portability.AncestralMutationTransfer.iterate_history_law",
    "Descent.Portability.AncestralMutationTransfer.rowDistance_bind",
@@ -139223,6 +139633,7 @@
    "Descent.Portability.InterleavedMutationLaw.intervalKernel_unsupported",
    "Descent.Portability.InterleavedMutationLaw.zero_exposure_count",
    "Descent.Portability.InterleavedMutationMeasurability.bind_mass_measurable",
+   "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward",
    "Descent.Portability.NucleotideMutationLaw.branch_compose",
    "Descent.Portability.NucleotideMutationLaw.count_expectation",
    "Descent.Portability.OrderedMutationCatalogue.mutationCount_nucleotide",
@@ -139251,8 +139662,8 @@
   ],
   "constraints": {
    "hypotheses": [
-    "∀ state target, Measurable (fun input ↦ (kernel input state",
-    "∀ source, sourceProperty source → ∀ target, ¬ targetProperty target → (kernel source"
+    "∀ source, sourceProperty source → ∀ target, ¬ targetProperty target → (kernel source",
+    "∀ state target, Measurable (fun input ↦ (kernel input state"
    ],
    "hypotheses_by_theorem": {
     "Descent.Coalescent.targetHeterozygosityGivenSourcePolymorphic_eq_factorialMoments": [],
@@ -139260,6 +139671,10 @@
     "Descent.Decision.FiniteMinimax.Problem.garbleObservations_observation_eq": [],
     "Descent.Decision.FiniteMinimax.Problem.finitePrior_probability_bind": [],
     "Descent.Decision.FiniteMinimax.Problem.observationL1Distance_garble_le": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.pushforward_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.bind_excludes": [
+     "∀ source, sourceProperty source → ∀ target, ¬ targetProperty target → (kernel source"
+    ],
     "Descent.Portability.AncestralMutationLimit.limitLaw_fixed": [],
     "Descent.Portability.AncestralMutationTransfer.transfer_expectation": [],
     "Descent.Portability.AncestralMutationTransfer.transfer_generator": [],
@@ -139277,6 +139692,7 @@
     "Descent.Portability.InterleavedMutationMeasurability.bind_mass_measurable": [
      "∀ state target, Measurable (fun input ↦ (kernel input state"
     ],
+    "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward": [],
     "Descent.Portability.NucleotideMutationLaw.count_expectation": [],
     "Descent.Portability.NucleotideMutationLaw.branch_compose": [],
     "Descent.Portability.OrderedMutationCatalogue.mutationKernel_unsupported": [],
@@ -139328,7 +139744,9 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.pushforward_excludes",
    "Descent.Portability.FiniteReportLaw.expectation_pushforward",
+   "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward",
    "Descent.Portability.OrderedMutationCatalogue.mutationKernel_unsupported",
    "Descent.Portability.ReservoirSamplingLaw.choiceLaw_some_mass",
    "Descent.Portability.ReservoirSamplingLaw.kernel_unstable_mass_zero",
@@ -139339,7 +139757,9 @@
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.pushforward_excludes": [],
     "Descent.Portability.FiniteReportLaw.expectation_pushforward": [],
+    "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward": [],
     "Descent.Portability.OrderedMutationCatalogue.mutationKernel_unsupported": [],
     "Descent.Portability.ReservoirSamplingLaw.choiceLaw_some_mass": [],
     "Descent.Portability.ReservoirSamplingLaw.kernel_unstable_mass_zero": [],
@@ -139404,6 +139824,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.count_excludes",
    "Descent.Portability.ExactFiniteHistoryLaw.expectation_propagate",
    "Descent.Portability.ExactFiniteHistoryLaw.path_sum_eq_expectation",
    "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step",
@@ -139420,6 +139841,7 @@
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.count_excludes": [],
     "Descent.Portability.ExactFiniteHistoryLaw.expectation_propagate": [],
     "Descent.Portability.ExactFiniteHistoryLaw.path_sum_eq_expectation": [],
     "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step": [],
@@ -141040,6 +141462,7 @@
   "mentioned_by": [
    "Descent.Portability.FiniteProductExponential.productEvolution_deriv_zero",
    "Descent.Portability.FiniteProductExponential.productEvolution_exponential",
+   "Descent.Portability.MutationChannelBridge.generator_template_sum",
    "Descent.Portability.WholeGenomeMutationRace.global_generator",
    "Descent.Portability.WholeGenomeMutationRace.intervalGenome_expMeasure"
   ],
@@ -141048,6 +141471,7 @@
    "hypotheses_by_theorem": {
     "Descent.Portability.FiniteProductExponential.productEvolution_deriv_zero": [],
     "Descent.Portability.FiniteProductExponential.productEvolution_exponential": [],
+    "Descent.Portability.MutationChannelBridge.generator_template_sum": [],
     "Descent.Portability.WholeGenomeMutationRace.global_generator": [],
     "Descent.Portability.WholeGenomeMutationRace.intervalGenome_expMeasure": []
    }
@@ -141076,6 +141500,8 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Portability.FiniteProductExponential.intervalGenome_exponential",
+   "Descent.Portability.MutationChannelBridge.generator_template_sum",
+   "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels",
    "Descent.Portability.SignedTransferIdentification.mutation_generator_row",
    "Descent.Portability.SignedTransferIdentification.stoppedGenome_eq_limit_of_generator",
    "Descent.Portability.StoppedGenotypeRenewal.genomeGenerator_eq_proposal",
@@ -141093,6 +141519,8 @@
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.FiniteProductExponential.intervalGenome_exponential": [],
+    "Descent.Portability.MutationChannelBridge.generator_template_sum": [],
+    "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels": [],
     "Descent.Portability.SignedTransferIdentification.mutation_generator_row": [
      "∀ source target, genomeGenerator state rate source target = ∑ event : MutationChannel state, (rate : ℝ"
     ],
@@ -143226,6 +143654,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous",
    "Descent.Portability.GenealogyGenotypeLaw.overwrite_original",
    "Descent.Portability.OrderedCladeLaw.homogeneous_overwrite",
    "Descent.Portability.OrderedMutationCatalogue.mutationBranch_nucleotide",
@@ -143240,6 +143669,7 @@
     "Homogeneous branch state.1"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous": [],
     "Descent.Portability.GenealogyGenotypeLaw.overwrite_original": [
      "Homogeneous branch leaves"
     ],
@@ -144715,6 +145145,7 @@
    "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure",
    "Descent.Portability.InterleavedMutationExponential.generator_matrix",
    "Descent.Portability.InterleavedMutationExponential.propagate_mass",
+   "Descent.Portability.MutationChannelBridge.generator_template_sum",
    "Descent.Portability.StoppedGenotypeRenewal.genomeGenerator_eq_proposal",
    "Descent.Portability.StoppedGenotypeRenewal.stoppedMass_generator_balance",
    "Descent.Portability.WholeGenomeMutationRace.global_generator",
@@ -144727,6 +145158,7 @@
     "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure": [],
     "Descent.Portability.InterleavedMutationExponential.propagate_mass": [],
     "Descent.Portability.InterleavedMutationExponential.generator_matrix": [],
+    "Descent.Portability.MutationChannelBridge.generator_template_sum": [],
     "Descent.Portability.StoppedGenotypeRenewal.genomeGenerator_eq_proposal": [],
     "Descent.Portability.StoppedGenotypeRenewal.stoppedMass_generator_balance": [],
     "Descent.Portability.WholeGenomeMutationRace.global_generator": [],
@@ -144754,7 +145186,8 @@
    "Descent.Portability.InterleavedMutationExponential.generator_matrix",
    "Descent.Portability.InterleavedMutationExponential.interval_compose",
    "Descent.Portability.InterleavedMutationExponential.interval_matrix_exponential",
-   "Descent.Portability.InterleavedMutationExponential.physicalGenerator_scale"
+   "Descent.Portability.InterleavedMutationExponential.physicalGenerator_scale",
+   "Descent.Portability.MutationChannelBridge.generator_template_sum"
   ],
   "constraints": {
    "hypotheses": [],
@@ -144763,7 +145196,8 @@
     "Descent.Portability.InterleavedMutationExponential.generator_matrix": [],
     "Descent.Portability.InterleavedMutationExponential.interval_matrix_exponential": [],
     "Descent.Portability.InterleavedMutationExponential.physicalGenerator_scale": [],
-    "Descent.Portability.InterleavedMutationExponential.interval_compose": []
+    "Descent.Portability.InterleavedMutationExponential.interval_compose": [],
+    "Descent.Portability.MutationChannelBridge.generator_template_sum": []
    }
   }
  },
@@ -144900,6 +145334,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.intervalKernel_excludes",
    "Descent.Portability.AncestralMutationAbsorption.coalescenceFloor_le_mass",
    "Descent.Portability.AncestralMutationAbsorption.empty_mark_mass",
    "Descent.Portability.AncestralMutationAbsorption.exists_completion_trace",
@@ -144936,6 +145371,9 @@
     "∀ site, property site → ∀ index base, property (recordMutation (branches index"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.intervalKernel_excludes": [
+     "∀ site, property site → ∀ index base, property (recordMutation (branches index"
+    ],
     "Descent.Portability.AncestralMutationAbsorption.empty_mark_mass": [],
     "Descent.Portability.AncestralMutationAbsorption.supportedAt_scan": [],
     "Descent.Portability.AncestralMutationAbsorption.historySupportedAt": [],
@@ -144986,6 +145424,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.intervalKernel_excludes",
    "Descent.Portability.InterleavedMutationLaw.intervalKernel_expectation",
    "Descent.Portability.InterleavedMutationLaw.intervalKernel_unsupported",
    "Descent.Portability.InterleavedMutationMeasurability.intervalKernel_mass_measurable",
@@ -144993,10 +145432,13 @@
   ],
   "constraints": {
    "hypotheses": [
-    "Covered state",
-    "∀ site, property site → ∀ index base, property (recordMutation (branches index"
+    "∀ site, property site → ∀ index base, property (recordMutation (branches index",
+    "Covered state"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.intervalKernel_excludes": [
+     "∀ site, property site → ∀ index base, property (recordMutation (branches index"
+    ],
     "Descent.Portability.InterleavedMutationLaw.intervalKernel_expectation": [],
     "Descent.Portability.InterleavedMutationLaw.intervalKernel_unsupported": [
      "Covered state"
@@ -145091,6 +145533,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.intervalKernel_excludes",
    "Descent.Portability.ExponentialPoissonRace.interval_expMeasure_eq_raceKernelLaw",
    "Descent.Portability.InterleavedMutationExponential.generator_matrix",
    "Descent.Portability.InterleavedMutationExponential.interval_matrix_exponential",
@@ -145108,11 +145551,14 @@
   ],
   "constraints": {
    "hypotheses": [
+    "∀ site, property site → ∀ index base, property (recordMutation (branches index",
     "Covered state",
-    "∀ index, (branches index",
-    "∀ site, property site → ∀ index base, property (recordMutation (branches index"
+    "∀ index, (branches index"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.intervalKernel_excludes": [
+     "∀ site, property site → ∀ index base, property (recordMutation (branches index"
+    ],
     "Descent.Portability.ExponentialPoissonRace.interval_expMeasure_eq_raceKernelLaw": [],
     "Descent.Portability.InterleavedMutationExponential.generator_matrix": [],
     "Descent.Portability.InterleavedMutationExponential.interval_matrix_exponential": [],
@@ -145160,6 +145606,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.count_excludes",
    "Descent.Portability.ExponentialPoissonRace.interval_expMeasure",
    "Descent.Portability.ExponentialPoissonRace.interval_fixed_uniformization",
    "Descent.Portability.InterleavedMutationLaw.coordinate_summable",
@@ -145181,14 +145628,17 @@
   ],
   "constraints": {
    "hypotheses": [
+    "∀ site, property site → ∀ index base, property (recordMutation (branches index",
     "Covered state",
     "∀ index, (branches index",
     "Homogeneous branch state.1",
-    "∀ site, property site → ∀ index base, property (recordMutation (branches index",
     "StateReady state locus site",
     "0 < FiniteReportLaw.mass (InterleavedMutationLaw.countLaw (replaceExposure (intervalTemplates state locus"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.count_excludes": [
+     "∀ site, property site → ∀ index base, property (recordMutation (branches index"
+    ],
     "Descent.Portability.ExponentialPoissonRace.interval_fixed_uniformization": [],
     "Descent.Portability.ExponentialPoissonRace.interval_expMeasure": [],
     "Descent.Portability.InterleavedMutationLaw.coordinate_summable": [],
@@ -145238,6 +145688,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.interval_excludes",
    "Descent.Portability.ExponentialPoissonRace.interval_expMeasure",
    "Descent.Portability.ExponentialPoissonRace.interval_expMeasure_eq_raceKernelLaw",
    "Descent.Portability.ExponentialPoissonRace.interval_fixed_uniformization",
@@ -145256,12 +145707,15 @@
   ],
   "constraints": {
    "hypotheses": [
+    "∀ site, property site → ∀ index base, property (recordMutation (branches index",
     "Covered state",
     "0 < (intervalLaw branches state",
-    "∀ index, (branches index",
-    "∀ site, property site → ∀ index base, property (recordMutation (branches index"
+    "∀ index, (branches index"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.interval_excludes": [
+     "∀ site, property site → ∀ index base, property (recordMutation (branches index"
+    ],
     "Descent.Portability.ExponentialPoissonRace.interval_fixed_uniformization": [],
     "Descent.Portability.ExponentialPoissonRace.interval_expMeasure": [],
     "Descent.Portability.ExponentialPoissonRace.interval_expMeasure_eq_raceKernelLaw": [],
@@ -145356,6 +145810,7 @@
    "Descent.Portability.InterleavedMutationMeasurability.mutationKernel_replaceExposure",
    "Descent.Portability.InterleavedMutationMeasurability.poissonCoefficient_measurable",
    "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable",
+   "Descent.Portability.MutationChannelBridge.generator_template_sum",
    "Descent.Portability.StoppedGenotypeReadiness.intervalCount_ready",
    "Descent.Portability.StoppedGenotypeReadiness.nextInterval_input_homogeneous",
    "Descent.Portability.StoppedGenotypeReadiness.recordMutation_ready",
@@ -145380,6 +145835,7 @@
     "Descent.Portability.InterleavedMutationMeasurability.interval_mass_measurable": [],
     "Descent.Portability.InterleavedMutationMeasurability.interval_expectation_measurable": [],
     "Descent.Portability.InterleavedMutationMeasurability.interval_expectation_integrable": [],
+    "Descent.Portability.MutationChannelBridge.generator_template_sum": [],
     "Descent.Portability.StoppedGenotypeReadiness.recordMutation_ready": [],
     "Descent.Portability.StoppedGenotypeReadiness.stateReady_branch": [],
     "Descent.Portability.StoppedGenotypeReadiness.nextInterval_input_homogeneous": [],
@@ -146142,6 +146598,12 @@
    "Descent.Portability.AncestralEpochGenotypeLaw.conditionalEpoch_mass_integrable",
    "Descent.Portability.AncestralEpochGenotypeLaw.conditionalEpoch_mass_measurable",
    "Descent.Portability.AncestralEpochGenotypeLaw.conditionalEpoch_times_measurable",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.epochGenome_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous",
+   "Descent.Portability.AncestralEpochGenotypeSupport.stoppedGenome_excludes_good",
    "Descent.Portability.AncestralGenealogyLaw.traceBranches_exposure",
    "Descent.Portability.AncestralGenealogyLaw.traceNucleotide_expectation",
    "Descent.Portability.AncestralGenealogyOrdering.traceBranches_extends",
@@ -146201,6 +146663,12 @@
     "Descent.Portability.AncestralEpochGenotypeLaw.conditionalEpoch_mass_measurable": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.conditionalEpoch_times_measurable": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.conditionalEpoch_mass_integrable": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_good": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.epochGenome_good": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.stoppedGenome_excludes_good": [],
     "Descent.Portability.AncestralGenealogyLaw.traceBranches_exposure": [],
     "Descent.Portability.AncestralGenealogyOrdering.traceBranches_extends": [],
     "Descent.Portability.AncestralGenealogyOrdering.traceBranches_ordered": [],
@@ -150748,6 +151216,34 @@
    "range_lo": 0
   }
  },
+ "Descent.Portability.MutationChannelBridge.lineageBranch": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/MutationChannelBridge.lean",
+  "line": 28,
+  "short": "lineageBranch",
+  "ret_type": "Branch n",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.MutationChannelBridge.compiler_sum",
+   "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels",
+   "Descent.Portability.MutationChannelBridge.template_sum"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.MutationChannelBridge.compiler_sum": [],
+    "Descent.Portability.MutationChannelBridge.template_sum": [],
+    "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels": []
+   }
+  }
+ },
  "Descent.Portability.NucleotideMutationLaw.Nucleotide": {
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition Fin",
@@ -150941,6 +151437,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.count_excludes",
    "Descent.Portability.ExponentialPoissonRace.interval_expMeasure",
    "Descent.Portability.ExponentialPoissonRace.interval_fixed_uniformization",
    "Descent.Portability.InterleavedMutationLaw.coordinate_summable",
@@ -150963,6 +151460,7 @@
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.count_excludes": [],
     "Descent.Portability.ExponentialPoissonRace.interval_fixed_uniformization": [],
     "Descent.Portability.ExponentialPoissonRace.interval_expMeasure": [],
     "Descent.Portability.InterleavedMutationLaw.coordinate_summable": [],
@@ -151201,6 +151699,9 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.count_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.intervalKernel_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.interval_excludes",
    "Descent.Portability.ExponentialPoissonRace.interval_expMeasure",
    "Descent.Portability.ExponentialPoissonRace.interval_expMeasure_eq_raceKernelLaw",
    "Descent.Portability.ExponentialPoissonRace.interval_fixed_uniformization",
@@ -151231,6 +151732,7 @@
    "Descent.Portability.InterleavedMutationMeasurability.interval_expectation_measurable",
    "Descent.Portability.InterleavedMutationMeasurability.interval_mass_measurable",
    "Descent.Portability.InterleavedMutationMeasurability.mutationKernel_replaceExposure",
+   "Descent.Portability.MutationChannelBridge.generator_template_sum",
    "Descent.Portability.OrderedMutationCatalogue.alleleIndex_decodes",
    "Descent.Portability.OrderedMutationCatalogue.alleleIndex_lt_four",
    "Descent.Portability.OrderedMutationCatalogue.bedDosage_le_two",
@@ -151266,6 +151768,9 @@
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.intervalKernel_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.count_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.interval_excludes": [],
     "Descent.Portability.ExponentialPoissonRace.interval_fixed_uniformization": [],
     "Descent.Portability.ExponentialPoissonRace.interval_expMeasure": [],
     "Descent.Portability.ExponentialPoissonRace.interval_expMeasure_eq_raceKernelLaw": [],
@@ -151296,6 +151801,7 @@
     "Descent.Portability.InterleavedMutationMeasurability.interval_expectation_measurable": [],
     "Descent.Portability.InterleavedMutationMeasurability.abs_expectation_le": [],
     "Descent.Portability.InterleavedMutationMeasurability.interval_expectation_integrable": [],
+    "Descent.Portability.MutationChannelBridge.generator_template_sum": [],
     "Descent.Portability.OrderedMutationCatalogue.recordMutation_covered": [],
     "Descent.Portability.OrderedMutationCatalogue.alleleIndex_decodes": [],
     "Descent.Portability.OrderedMutationCatalogue.alleleIndex_lt_four": [],
@@ -151345,6 +151851,8 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.intervalGenome_excludes",
    "Descent.Portability.InterleavedMutationLaw.count_unsupported",
    "Descent.Portability.InterleavedMutationLaw.intervalKernel_unsupported",
    "Descent.Portability.InterleavedMutationLaw.interval_covered",
@@ -151367,6 +151875,8 @@
     "0 < (mutationBranchLaw branch state"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.intervalGenome_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good": [],
     "Descent.Portability.InterleavedMutationLaw.intervalKernel_unsupported": [
      "Covered state"
     ],
@@ -151457,6 +151967,9 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.count_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.intervalKernel_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.interval_excludes",
    "Descent.Portability.InterleavedMutationLaw.kernel_absence",
    "Descent.Portability.OrderedMutationCatalogue.mutationCount_presence",
    "Descent.Portability.OrderedMutationCatalogue.mutationKernel_unsupported",
@@ -151468,10 +151981,19 @@
   ],
   "constraints": {
    "hypotheses": [
-    "Covered state",
-    "∀ site, property site → ∀ index base, property (recordMutation (branches index"
+    "∀ site, property site → ∀ index base, property (recordMutation (branches index",
+    "Covered state"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.intervalKernel_excludes": [
+     "∀ site, property site → ∀ index base, property (recordMutation (branches index"
+    ],
+    "Descent.Portability.AncestralEpochGenotypeSupport.count_excludes": [
+     "∀ site, property site → ∀ index base, property (recordMutation (branches index"
+    ],
+    "Descent.Portability.AncestralEpochGenotypeSupport.interval_excludes": [
+     "∀ site, property site → ∀ index base, property (recordMutation (branches index"
+    ],
     "Descent.Portability.InterleavedMutationLaw.kernel_absence": [],
     "Descent.Portability.OrderedMutationCatalogue.recordMutation_covered": [
      "Covered state"
@@ -151638,6 +152160,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.intervalKernel_excludes",
    "Descent.Portability.AncestralMutationResolvent.rowNorm_postcompose",
    "Descent.Portability.AncestralMutationTransfer.transfer_distance",
    "Descent.Portability.AncestralMutationTransfer.transfer_expectation",
@@ -151647,6 +152170,8 @@
    "Descent.Portability.InterleavedMutationLaw.kernel_absence",
    "Descent.Portability.InterleavedMutationMeasurability.intervalKernel_mass_measurable",
    "Descent.Portability.InterleavedMutationMeasurability.mutationKernel_replaceExposure",
+   "Descent.Portability.MutationChannelBridge.generator_template_sum",
+   "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels",
    "Descent.Portability.OrderedMutationCatalogue.mutationCount_nucleotide",
    "Descent.Portability.OrderedMutationCatalogue.mutationCount_presence",
    "Descent.Portability.OrderedMutationCatalogue.mutationCount_unsupported",
@@ -151668,6 +152193,7 @@
     "∀ state : State D L n, ∀ source target, genomeGenerator state rate source target = ∑ event : MutationChannel state, (rate : ℝ"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.intervalKernel_excludes": [],
     "Descent.Portability.AncestralMutationResolvent.rowNorm_postcompose": [],
     "Descent.Portability.AncestralMutationTransfer.transfer_expectation": [],
     "Descent.Portability.AncestralMutationTransfer.transfer_generator": [],
@@ -151677,6 +152203,8 @@
     "Descent.Portability.InterleavedMutationLaw.kernel_absence": [],
     "Descent.Portability.InterleavedMutationMeasurability.mutationKernel_replaceExposure": [],
     "Descent.Portability.InterleavedMutationMeasurability.intervalKernel_mass_measurable": [],
+    "Descent.Portability.MutationChannelBridge.generator_template_sum": [],
+    "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels": [],
     "Descent.Portability.OrderedMutationCatalogue.mutationKernel_unsupported": [
      "Covered state"
     ],
@@ -177865,6 +178393,7 @@
    "Descent.Pangenome.Presentation.support_eq_of_iso",
    "Descent.Pangenome.Register.kernel_registerPresentation",
    "Descent.Pangenome.Strand.frustrated_iff_encode_eq",
+   "Descent.Portability.AncestralEpochGenotypeSupport.bind_excludes",
    "Descent.Portability.AncestralMutationTransfer.rowDistance_bind",
    "Descent.Portability.ChunkedGenotypeLaw.dependentJoint_expectation",
    "Descent.Portability.ExactFiniteHistoryLaw.expectation_propagate",
@@ -177883,6 +178412,7 @@
    "Descent.Portability.FiniteReportLaw.weightedDefinedMetric_joint",
    "Descent.Portability.InterleavedMutationExponential.propagate_mass",
    "Descent.Portability.InterleavedMutationMeasurability.bind_mass_measurable",
+   "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward",
    "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.branchMeasure_univ",
    "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integrable_branchMeasure",
    "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integrable_jointMeasure",
@@ -177926,6 +178456,7 @@
     "Descent.Pangenome.Presentation.coordinateCount_eq_kernel": [],
     "Descent.Pangenome.Register.kernel_registerPresentation": [],
     "Descent.Pangenome.Strand.frustrated_iff_encode_eq": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.bind_excludes": [],
     "Descent.Portability.AncestralMutationTransfer.rowDistance_bind": [],
     "Descent.Portability.ChunkedGenotypeLaw.dependentJoint_expectation": [],
     "Descent.Portability.indexWiseCalibrationMoment_at_zero_weight": [],
@@ -177946,6 +178477,7 @@
     "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure": [],
     "Descent.Portability.InterleavedMutationExponential.propagate_mass": [],
     "Descent.Portability.InterleavedMutationMeasurability.bind_mass_measurable": [],
+    "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward": [],
     "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.branchMeasure_univ": [],
     "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integrable_branchMeasure": [],
     "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integral_branchMeasure": [],
@@ -184048,6 +184580,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.stoppedGenome_excludes_good",
    "Descent.Portability.StoppedAncestralTiming.stoppedCountExpectation_bounds",
    "Descent.Portability.StoppedAncestralTiming.stoppedCountExpectation_one",
    "Descent.Portability.StoppedAncestralTiming.stoppedExpectation_summable",
@@ -184062,13 +184595,20 @@
    "declared_lo": 0.0,
    "declared_hi": 1.0,
    "hypotheses": [
-    "∀ trace, Measurable (readout trace",
     "SampleComplete start",
     "SupportedAt deme start",
     "∀ destination, rates.migration deme destination = 0",
+    "Extends earlier start",
+    "∀ trace, Measurable (readout trace",
     "∀ count trace, Measurable (readout count trace"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.stoppedGenome_excludes_good": [
+     "SampleComplete start",
+     "SupportedAt deme start",
+     "∀ destination, rates.migration deme destination = 0",
+     "Extends earlier start"
+    ],
     "Descent.Portability.StoppedAncestralTiming.stoppedCountExpectation_one": [],
     "Descent.Portability.StoppedAncestralTiming.stoppedCountExpectation_bounds": [
      "∀ trace, Measurable (readout trace"
@@ -184183,11 +184723,22 @@
    "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation",
    "Descent.Portability.AncestralEpochGenotypeLaw.intervalGenome_mass_measurable",
    "Descent.Portability.AncestralEpochGenotypeLaw.mergingTail_expectation",
+   "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_covered",
+   "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_rawDosage_le_six",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.intervalGenome_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous",
+   "Descent.Portability.AncestralEpochGenotypeSupport.stoppedGenome_excludes_good",
    "Descent.Portability.ChunkedGenotypeLaw.genomeLaw_expectation",
    "Descent.Portability.ChunkedGenotypeLaw.reservoirPair_expectation",
    "Descent.Portability.ChunkedGenotypeLaw.sourceGenomeReservoir_expectation",
    "Descent.Portability.ChunkedGenotypeLaw.sourceGenome_expectation",
    "Descent.Portability.FiniteProductExponential.intervalGenome_exponential",
+   "Descent.Portability.MutationChannelBridge.generator_template_sum",
+   "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels",
    "Descent.Portability.SimulationDemographyLaw.gridSourceGenome_expectation",
    "Descent.Portability.SimulationDemographyLaw.serialSourceGenome_expectation",
    "Descent.Portability.StoppedGenotypeLaw.bedDiploidDosage_eq_clip",
@@ -184238,11 +184789,22 @@
     "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.mergingTail_expectation": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.intervalGenome_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_good": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.stoppedGenome_excludes_good": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_good": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_covered": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_rawDosage_le_six": [],
     "Descent.Portability.ChunkedGenotypeLaw.genomeLaw_expectation": [],
     "Descent.Portability.ChunkedGenotypeLaw.sourceGenome_expectation": [],
     "Descent.Portability.ChunkedGenotypeLaw.reservoirPair_expectation": [],
     "Descent.Portability.ChunkedGenotypeLaw.sourceGenomeReservoir_expectation": [],
     "Descent.Portability.FiniteProductExponential.intervalGenome_exponential": [],
+    "Descent.Portability.MutationChannelBridge.generator_template_sum": [],
+    "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels": [],
     "Descent.Portability.SimulationDemographyLaw.serialSourceGenome_expectation": [
      "0 < L"
     ],
@@ -184364,24 +184926,26 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_rawDosage_le_six",
    "Descent.Portability.StoppedGenotypeLaw.bedDiploidDosage_eq_clip",
    "Descent.Portability.StoppedGenotypeReadiness.rawDiploidDosage_le_six"
   ],
   "constraints": {
+   "range_hi_thm": [
+    "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_rawDosage_le_six",
+    3
+   ],
+   "range_hi": 6,
    "hypotheses": [
     "GenomeCovered genome"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_rawDosage_le_six": [],
     "Descent.Portability.StoppedGenotypeLaw.bedDiploidDosage_eq_clip": [],
     "Descent.Portability.StoppedGenotypeReadiness.rawDiploidDosage_le_six": [
      "GenomeCovered genome"
     ]
-   },
-   "range_hi_thm": [
-    "Descent.Portability.StoppedGenotypeReadiness.rawDiploidDosage_le_six",
-    1
-   ],
-   "range_hi": 6
+   }
   }
  },
  "Descent.Portability.StoppedGenotypeLaw.bedDiploidDosage": {
@@ -184462,7 +185026,10 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous",
    "Descent.Portability.FiniteProductExponential.intervalGenome_exponential",
+   "Descent.Portability.MutationChannelBridge.generator_template_sum",
+   "Descent.Portability.MutationChannelBridge.template_sum",
    "Descent.Portability.StoppedGenotypeLaw.stateInterval_mass_measurable",
    "Descent.Portability.StoppedGenotypeReadiness.intervalCount_ready",
    "Descent.Portability.StoppedGenotypeReadiness.nextInterval_input_homogeneous",
@@ -184478,7 +185045,10 @@
     "0 < FiniteReportLaw.mass (InterleavedMutationLaw.countLaw (replaceExposure (intervalTemplates state locus"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous": [],
     "Descent.Portability.FiniteProductExponential.intervalGenome_exponential": [],
+    "Descent.Portability.MutationChannelBridge.template_sum": [],
+    "Descent.Portability.MutationChannelBridge.generator_template_sum": [],
     "Descent.Portability.StoppedGenotypeLaw.stateInterval_mass_measurable": [],
     "Descent.Portability.StoppedGenotypeReadiness.recordMutation_ready": [
      "StateReady earlier locus site"
@@ -184518,6 +185088,7 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Portability.AncestralEpochGenotypeLaw.intervalGenome_mass_measurable",
+   "Descent.Portability.AncestralEpochGenotypeSupport.intervalGenome_excludes",
    "Descent.Portability.FiniteProductExponential.intervalGenome_exponential",
    "Descent.Portability.StoppedGenotypeLaw.stateInterval_mass_measurable",
    "Descent.Portability.StoppedGenotypeRenewal.conditionalGenome_succ",
@@ -184529,6 +185100,7 @@
    "hypotheses": [],
    "hypotheses_by_theorem": {
     "Descent.Portability.AncestralEpochGenotypeLaw.intervalGenome_mass_measurable": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.intervalGenome_excludes": [],
     "Descent.Portability.FiniteProductExponential.intervalGenome_exponential": [],
     "Descent.Portability.StoppedGenotypeLaw.stateInterval_mass_measurable": [],
     "Descent.Portability.StoppedGenotypeRenewal.conditionalGenome_succ": [],
@@ -184602,6 +185174,7 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Portability.AncestralEpochGenotypeLaw.mergingTail_expectation",
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good",
    "Descent.Portability.StoppedGenotypeLaw.conditionalGenome_expectation_measurable",
    "Descent.Portability.StoppedGenotypeLaw.conditionalGenome_mass_bounds",
    "Descent.Portability.StoppedGenotypeLaw.conditionalGenome_mass_integrable",
@@ -184619,11 +185192,15 @@
   "constraints": {
    "hypotheses": [
     "SampleComplete start",
+    "Extends earlier start",
     "SupportedAt deme start"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.AncestralEpochGenotypeLaw.mergingTail_expectation": [
      "SampleComplete start"
+    ],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good": [
+     "Extends earlier start"
     ],
     "Descent.Portability.StoppedGenotypeLaw.conditionalGenome_mass_measurable": [],
     "Descent.Portability.StoppedGenotypeLaw.conditionalGenome_mass_bounds": [],
@@ -184677,6 +185254,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.stoppedGenome_excludes_good",
    "Descent.Portability.StoppedGenotypeLaw.genomeCountMass_bounds",
    "Descent.Portability.StoppedGenotypeLaw.genomeCountMass_expectation",
    "Descent.Portability.StoppedGenotypeLaw.genomeCountMass_sum",
@@ -184690,19 +185268,21 @@
    "Descent.Portability.StoppedGenotypeRenewal.stoppedMass_renewal"
   ],
   "constraints": {
-   "range_lo_thm": [
-    "Descent.Portability.StoppedGenotypeLaw.genomeCountMass_bounds",
-    0
-   ],
-   "range_lo": 0,
    "hypotheses": [
     "SampleComplete start",
     "SupportedAt deme start",
     "∀ destination, rates.migration deme destination = 0",
+    "Extends earlier start",
     "∀ genome, 0 ≤ readout genome ∧ readout genome ≤ bound",
     "¬ GenomeCovered genome"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.stoppedGenome_excludes_good": [
+     "SampleComplete start",
+     "SupportedAt deme start",
+     "∀ destination, rates.migration deme destination = 0",
+     "Extends earlier start"
+    ],
     "Descent.Portability.StoppedGenotypeLaw.genomeCountMass_bounds": [],
     "Descent.Portability.StoppedGenotypeLaw.genomeCountMass_expectation": [],
     "Descent.Portability.StoppedGenotypeLaw.genomeCountMass_sum": [],
@@ -184732,7 +185312,12 @@
     "Descent.Portability.StoppedGenotypeRenewal.genomeCountMass_summable_any": [],
     "Descent.Portability.StoppedGenotypeRenewal.genomeCountMass_zero": [],
     "Descent.Portability.StoppedGenotypeRenewal.stoppedMass_renewal": []
-   }
+   },
+   "range_lo_thm": [
+    "Descent.Portability.StoppedGenotypeLaw.genomeCountMass_bounds",
+    0
+   ],
+   "range_lo": 0
   }
  },
  "Descent.Portability.StoppedGenotypeLaw.stoppedGenomeLaw": {
@@ -184750,6 +185335,8 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.stoppedGenome_excludes_good",
+   "Descent.Portability.MutationChannelBridge.stoppedGenome_eq_limit",
    "Descent.Portability.SignedTransferIdentification.stoppedGenome_eq_limit_of_generator",
    "Descent.Portability.StoppedGenotypeLaw.stoppedGenome_expectation",
    "Descent.Portability.StoppedGenotypeLaw.stoppedGenome_truncation",
@@ -184759,13 +185346,24 @@
   ],
   "constraints": {
    "hypotheses": [
-    "∀ destination, rates.migration deme destination = 0",
-    "SupportedAt deme state",
     "SampleComplete start",
     "SupportedAt deme start",
+    "∀ destination, rates.migration deme destination = 0",
+    "Extends earlier start",
+    "SupportedAt deme state",
     "0 < FiniteReportLaw.mass (stoppedGenomeLaw rates deme start hs hsupported hisolated mutationRate"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.stoppedGenome_excludes_good": [
+     "SampleComplete start",
+     "SupportedAt deme start",
+     "∀ destination, rates.migration deme destination = 0",
+     "Extends earlier start"
+    ],
+    "Descent.Portability.MutationChannelBridge.stoppedGenome_eq_limit": [
+     "∀ destination, rates.migration deme destination = 0",
+     "SupportedAt deme state"
+    ],
     "Descent.Portability.SignedTransferIdentification.stoppedGenome_eq_limit_of_generator": [
      "∀ destination, rates.migration deme destination = 0",
      "SupportedAt deme state"
@@ -184822,6 +185420,8 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good",
+   "Descent.Portability.AncestralEpochGenotypeSupport.intervalGenome_excludes",
    "Descent.Portability.StoppedGenotypeReadiness.conditionalSiteLaw_ready",
    "Descent.Portability.StoppedGenotypeReadiness.conditionalSite_unsupported_ready",
    "Descent.Portability.StoppedGenotypeReadiness.intervalCount_ready",
@@ -184837,6 +185437,8 @@
     "0 < FiniteReportLaw.mass (InterleavedMutationLaw.countLaw (replaceExposure (intervalTemplates state locus"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.intervalGenome_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good": [],
     "Descent.Portability.StoppedGenotypeReadiness.recordMutation_ready": [
      "StateReady earlier locus site"
     ],
@@ -184877,6 +185479,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_covered",
    "Descent.Portability.StoppedGenotypeReadiness.conditionalGenome_unsupported_covered",
    "Descent.Portability.StoppedGenotypeReadiness.rawDiploidDosage_le_six",
    "Descent.Portability.StoppedGenotypeReadiness.stoppedGenome_covered",
@@ -184888,6 +185491,7 @@
     "GenomeCovered genome"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_covered": [],
     "Descent.Portability.StoppedGenotypeReadiness.conditionalGenome_unsupported_covered": [
      "¬ GenomeCovered genome"
     ],
@@ -186733,6 +187337,7 @@
   "mentioned_by": [
    "Descent.Portability.AncestralBranchExposure.mutationFactor_summable",
    "Descent.Portability.AncestralEpochGenotypeLaw.epochCountMass_expectation",
+   "Descent.Portability.AncestralEpochGenotypeSupport.epochGenome_good",
    "Descent.Portability.TimedAncestralLaw.countExpectation_bounds",
    "Descent.Portability.TimedAncestralLaw.countExpectation_one",
    "Descent.Portability.TimedAncestralLaw.countExpectation_terminal",
@@ -186752,6 +187357,7 @@
     "Descent.Portability.AncestralEpochGenotypeLaw.epochCountMass_expectation": [
      "SampleComplete start"
     ],
+    "Descent.Portability.AncestralEpochGenotypeSupport.epochGenome_good": [],
     "Descent.Portability.TimedAncestralLaw.countExpectation_one": [],
     "Descent.Portability.TimedAncestralLaw.countExpectation_terminal": [],
     "Descent.Portability.TimedAncestralLaw.countExpectation_bounds": [
@@ -191730,6 +192336,7 @@
    "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation",
    "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation",
    "Descent.Portability.AncestralEpochGenotypeLaw.mergingTail_expectation",
+   "Descent.Portability.AncestralEpochGenotypeSupport.epochGenome_good",
    "Descent.Portability.AncestralEpochLaw.epoch_expectation",
    "Descent.Portability.AncestralEpochLaw.epoch_expectation_bounds",
    "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation",
@@ -191935,6 +192542,7 @@
     "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.mergingTail_expectation": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.epochGenome_good": [],
     "Descent.Portability.AncestralEpochLaw.epoch_expectation": [],
     "Descent.Portability.AncestralEpochLaw.expectation_bounds": [],
     "Descent.Portability.AncestralEpochLaw.epoch_expectation_bounds": [],
@@ -192337,6 +192945,9 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.count_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.intervalKernel_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.pushforward_excludes",
    "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation",
    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg",
    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_sum",
@@ -192352,6 +192963,10 @@
    "Descent.Portability.InterleavedMutationLaw.zero_exposure_count",
    "Descent.Portability.InterleavedMutationLaw.zero_exposure_interval",
    "Descent.Portability.InterleavedMutationLaw.zero_exposure_kernel",
+   "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward",
+   "Descent.Portability.MutationChannelBridge.coordinate_identity",
+   "Descent.Portability.MutationChannelBridge.generator_template_sum",
+   "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels",
    "Descent.Portability.NucleotideMutationLaw.branch_history_expectation",
    "Descent.Portability.OrderedMutationCatalogue.mutationCount_unsupported",
    "Descent.Portability.OrderedMutationCatalogue.mutationKernel_unsupported",
@@ -192379,6 +192994,9 @@
     "Integrable (fun sample ↦ metric (sample, selected"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.pushforward_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.intervalKernel_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.count_excludes": [],
     "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg": [],
     "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_sum": [],
     "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation": [],
@@ -192393,6 +193011,10 @@
     "Descent.Portability.InterleavedMutationLaw.zero_exposure_kernel": [],
     "Descent.Portability.InterleavedMutationLaw.zero_exposure_count": [],
     "Descent.Portability.InterleavedMutationLaw.zero_exposure_interval": [],
+    "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward": [],
+    "Descent.Portability.MutationChannelBridge.coordinate_identity": [],
+    "Descent.Portability.MutationChannelBridge.generator_template_sum": [],
+    "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels": [],
     "Descent.Portability.NucleotideMutationLaw.branch_history_expectation": [],
     "Descent.Portability.OrderedMutationCatalogue.mutationKernel_unsupported": [],
     "Descent.Portability.OrderedMutationCatalogue.mutationCount_unsupported": [],
@@ -192435,12 +193057,18 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward",
+   "Descent.Portability.MutationChannelBridge.generator_template_sum",
+   "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels",
    "Descent.Portability.WholeGenomeMutationRace.coordinateKernel_mass",
    "Descent.Portability.WholeGenomeMutationRace.globalKernel_mass"
   ],
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward": [],
+    "Descent.Portability.MutationChannelBridge.generator_template_sum": [],
+    "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels": [],
     "Descent.Portability.WholeGenomeMutationRace.coordinateKernel_mass": [],
     "Descent.Portability.WholeGenomeMutationRace.globalKernel_mass": []
    }
@@ -192937,6 +193565,9 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochGenotypeSupport.count_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.intervalKernel_excludes",
+   "Descent.Portability.AncestralEpochGenotypeSupport.pushforward_excludes",
    "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation",
    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg",
    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_sum",
@@ -192952,6 +193583,10 @@
    "Descent.Portability.InterleavedMutationLaw.zero_exposure_count",
    "Descent.Portability.InterleavedMutationLaw.zero_exposure_interval",
    "Descent.Portability.InterleavedMutationLaw.zero_exposure_kernel",
+   "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward",
+   "Descent.Portability.MutationChannelBridge.coordinate_identity",
+   "Descent.Portability.MutationChannelBridge.generator_template_sum",
+   "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels",
    "Descent.Portability.NucleotideMutationLaw.branch_history_expectation",
    "Descent.Portability.OrderedMutationCatalogue.mutationCount_unsupported",
    "Descent.Portability.OrderedMutationCatalogue.mutationKernel_unsupported",
@@ -192977,6 +193612,9 @@
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochGenotypeSupport.pushforward_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.intervalKernel_excludes": [],
+    "Descent.Portability.AncestralEpochGenotypeSupport.count_excludes": [],
     "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg": [],
     "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_sum": [],
     "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation": [],
@@ -192991,6 +193629,10 @@
     "Descent.Portability.InterleavedMutationLaw.zero_exposure_kernel": [],
     "Descent.Portability.InterleavedMutationLaw.zero_exposure_count": [],
     "Descent.Portability.InterleavedMutationLaw.zero_exposure_interval": [],
+    "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward": [],
+    "Descent.Portability.MutationChannelBridge.coordinate_identity": [],
+    "Descent.Portability.MutationChannelBridge.generator_template_sum": [],
+    "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels": [],
     "Descent.Portability.NucleotideMutationLaw.branch_history_expectation": [],
     "Descent.Portability.OrderedMutationCatalogue.mutationKernel_unsupported": [],
     "Descent.Portability.OrderedMutationCatalogue.mutationCount_unsupported": [],
