@@ -1,0 +1,202 @@
+{
+  "snapshot": "/projects/standard/hsiehph/sauer354/.snapshot/snapshot_2026-08-16_00_00_00_UTC/gnomon/sims/results_hpc/ancestry_calibration/data",
+  "archive_sha256": "1acf86a1837e23b212a77e3b50c75a36ada54d8a3420c41312fd54332fff93b7",
+  "source_files": [
+    {
+      "name": "grid2d_phenoA_realpt_s1.sanity.tsv",
+      "sha256": "fda4e093aed52a7ab7a93dee0314ea170d0188eb45a7dbbac34bf9302a2b3991"
+    },
+    {
+      "name": "grid2d_phenoA_realpt_s10.sanity.tsv",
+      "sha256": "25927efcacb47a8214974059ec7df10ded8598a7d7ef6c0e7b74fed5d914128c"
+    },
+    {
+      "name": "grid2d_phenoA_realpt_s2.sanity.tsv",
+      "sha256": "a75f1444d951a6b100f66b5b51760c48d48b165020c64bcd576f86a73b8e9b94"
+    },
+    {
+      "name": "grid2d_phenoA_realpt_s3.sanity.tsv",
+      "sha256": "81b636bbbbc1889356a1513288a9cdf6418f45cf0b9476838c6b7e2ae5e3a986"
+    },
+    {
+      "name": "grid2d_phenoA_realpt_s4.sanity.tsv",
+      "sha256": "48145c47026f89fe7e8f6c12053579e46056ca3bbd5affdd747cf9cc871f101d"
+    },
+    {
+      "name": "grid2d_phenoA_realpt_s5.sanity.tsv",
+      "sha256": "b092409a86e490b2b8d31676ea813907580f42843c376a51f9c88b865de81917"
+    },
+    {
+      "name": "grid2d_phenoA_realpt_s6.sanity.tsv",
+      "sha256": "85a674f13ac096eb6c15d7eb5f236b07304a09379ff3490574c77d884754018d"
+    },
+    {
+      "name": "grid2d_phenoA_realpt_s7.sanity.tsv",
+      "sha256": "99d3b93d21acd114573393824296af3f48738a78f2937020701eb643b7e52b50"
+    },
+    {
+      "name": "grid2d_phenoA_realpt_s8.sanity.tsv",
+      "sha256": "87c13c2acbfc3739da83fd01358d47ae52143beeffa5caad736ba6fef6aafddd"
+    },
+    {
+      "name": "grid2d_phenoA_realpt_s9.sanity.tsv",
+      "sha256": "f016d754ab2f4cf3e045be5fdb740dcf4b74796c82742f4c56bf44324f11fdfa"
+    },
+    {
+      "name": "grid2d_phenoA_realpt_s96.sanity.tsv",
+      "sha256": "211a821f0199bf6f2d2b2103b46710f44f98d0ee6a3485816051ddd22e09b35a"
+    },
+    {
+      "name": "serial1d_phenoA_realpt_s1.sanity.tsv",
+      "sha256": "12cf428782a2552ea73e376892896b82fd86582810b9b7de86a217112800de4d"
+    },
+    {
+      "name": "serial1d_phenoA_realpt_s10.sanity.tsv",
+      "sha256": "0d4a919106d36bbf708ada980cae0fd888e4f5defb1f361dccf7701976e06990"
+    },
+    {
+      "name": "serial1d_phenoA_realpt_s2.sanity.tsv",
+      "sha256": "72c3ba79d64ef277d6470d30c675fd18788646c8ef15f03d6c7b9f9383c521e8"
+    },
+    {
+      "name": "serial1d_phenoA_realpt_s3.sanity.tsv",
+      "sha256": "85b982182974ec6b57b2e992ab11e85cc68d121bd8c1838ee34cc5f9d309eced"
+    },
+    {
+      "name": "serial1d_phenoA_realpt_s4.sanity.tsv",
+      "sha256": "8a897d9da106d8579ecc7bda2eb069d09d2020ade39f87420b45d6083d5d6cf0"
+    },
+    {
+      "name": "serial1d_phenoA_realpt_s5.sanity.tsv",
+      "sha256": "777679773fb43b1fdf672b407ed82cb81f2db29e435f7ce55b16239784a8215d"
+    },
+    {
+      "name": "serial1d_phenoA_realpt_s6.sanity.tsv",
+      "sha256": "d297a06c728f2e15d06e5c6b182546350840d817b5fea54df2e9a7eab5f46304"
+    },
+    {
+      "name": "serial1d_phenoA_realpt_s7.sanity.tsv",
+      "sha256": "3ea487f951a08f8011967fc293c483641ebf0cf5b67be496094b191239040c9a"
+    },
+    {
+      "name": "serial1d_phenoA_realpt_s8.sanity.tsv",
+      "sha256": "3c7e6e731e157d8349072933e9562944a44df386dc72b6a64af7c935f84a74b4"
+    },
+    {
+      "name": "serial1d_phenoA_realpt_s9.sanity.tsv",
+      "sha256": "cc7b2bd4b40ebf1eb99da9fd2e9afa8513a8f56584e9662ab38831760b6e5d23"
+    },
+    {
+      "name": "serial1d_phenoA_realpt_s96.sanity.tsv",
+      "sha256": "d44b2eca00d1e92cc4ed2f1dd45310f3a777e54f3b4086ec4f87895915ab1d49"
+    }
+  ],
+  "bootstrap_replicates": 50000,
+  "bootstrap_seed": 20260910,
+  "ci_method": "pointwise percentile bootstrap, resampling whole simulation seeds within demography",
+  "metric": "within-deme held-out squared Pearson correlation of PGS and true_liab",
+  "averaging": "mean of target/source R2 ratios within seed and distance; equal-weight mean of available seeds",
+  "distance_conditioning": "only runs containing a target at this distance contribute",
+  "limitation": "11 recoverable runs per demography; far distances have fewer contributing runs; not simultaneous confidence bands",
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    96
+  ],
+  "missing_summaries_for_metadata_seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    90,
+    91,
+    92,
+    93,
+    94,
+    95
+  ],
+  "original_image": "best4_rawpgs_vs_fst.png was a migration sweep; this artifact is the requested within-history distance curve, not that image with added error bars"
+}
