@@ -145,6 +145,28 @@ theorem reportedExpectation_eq_finite_sum (mean : I → ℝ) (variance : I → �
     integral_readout mean variance (fun outcome ↦ (readout outcome).getD 0)]
   rfl
 
+/-- Gaussian label noise integrated exactly, with the learned score evaluated
+through the cohort's genotype covariance matrix and trait covariance vector. -/
+theorem reportedAccuracy_eq_moment_sum {S J : Type*} [Fintype S] [Fintype J]
+    (mean : I → ℝ) (variance : I → ℝ≥0)
+    (evaluation : FiniteReportLaw S) (genotype : S → J → ℝ) (liability : S → ℝ)
+    (learn : (I → Bool) → Option (J → ℝ)) :
+    reportedExpectation mean variance (accuracy evaluation genotype liability learn) =
+      conditionalExpectation (fun i ↦ caseProbability (mean i) (variance i))
+        (fun outcome ↦ (learn outcome).bind fun weights ↦
+          let scoreVariance := ∑ j, ∑ k, weights j * weights k *
+            evaluation.covariance (fun s ↦ genotype s j) (fun s ↦ genotype s k)
+          if 0 < scoreVariance ∧ 0 < evaluation.variance liability then
+            some ((∑ j, weights j *
+              evaluation.covariance (fun s ↦ genotype s j) liability) ^ 2 /
+              (scoreVariance * evaluation.variance liability))
+          else none) := by
+  rw [reportedExpectation_eq_finite_sum]
+  apply congrArg (conditionalExpectation (fun i ↦ caseProbability (mean i) (variance i)))
+  funext outcome
+  simp only [accuracy, FiniteReportLaw.squaredCorrelation,
+    covariance_linearScore, variance_linearScore]
+
 theorem reportedAccuracy_bounds {S J : Type*} [Fintype S] [Fintype J]
     (mean : I → ℝ) (variance : I → ℝ≥0)
     (evaluation : FiniteReportLaw S) (genotype : S → J → ℝ) (liability : S → ℝ)

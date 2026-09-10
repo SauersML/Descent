@@ -21,3 +21,5 @@ import Descent.Portability.ProbitTrainingLaw
 #print axioms Descent.Portability.ProbitTrainingLaw.reportedSourceRatio_eq_one
 
 #print axioms Descent.Portability.ProbitTrainingLaw.fixedData_reportedRatio_bounded
+
+#print axioms Descent.Portability.ProbitTrainingLaw.reportedAccuracy_eq_moment_sum
