@@ -3141,6 +3141,9 @@ def rowScore(a, x):
 def jump():
     return ((_rt.rdiv(1.0, 2.0)) * ((translate(1.0) + translate(((-1.0))))))
 
+def unitAmplitude(m, N):
+    return _rt.rdiv(_rt.lpow(_rt.rsqrt(2.0), m), _rt.rsqrt(N))
+
 def signValue(b):
     return (1.0 if b else (-1.0))
 
@@ -4328,6 +4331,12 @@ def Nucleotide():
 
 def uniformMean(readout):
     return _rt.rdiv((sum((readout[int(base)]) for base in range(int(len(readout))))), 4.0)
+
+def observationJet(readout, generator, direction, report, order, time):
+    return observation(readout, generator, (_rt.mul((_rt.lpow(generator, order)), _v(direction))), time, report)
+
+def visibleCoefficient(readout, generator, direction, order):
+    return sum((_rt.lpow((_rt.mul(_rt.mul(readout, _v((_rt.lpow(generator, order)))), _v(direction)))(report), 2.0)) for report in range(int(_rt.sumdim('report', len((_rt.mul(_rt.mul(readout, _v((_rt.lpow(generator, order)))), _v(direction))))))))
 
 def scalarMean(values, p):
     return sum((_rt.mul(hweMass(p, g), values[int(g)])) for g in range(int(len(values))))

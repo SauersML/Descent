@@ -177,6 +177,10 @@ import Descent.Portability.BalancedHWEOperatorLimit
 import Descent.Portability.BalancedHWEWeakLimit
 import Descent.Portability.RareEventInformationLaw
 import Descent.Portability.GaussianHermiteLaw
+import Descent.Portability.ObservationAsymptotics
+import Descent.Portability.ContinuousObservabilityGramian
+import Descent.Portability.MarkovSeparatorLaw
+import Descent.Portability.BalancedHWEVanishingLaw
 
 assert_below Descent.Program
 
