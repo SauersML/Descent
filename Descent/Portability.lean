@@ -73,6 +73,14 @@ import Descent.Portability.TransferLearningPGS.ImportanceWeighting
 import Descent.Portability.TransferLearningPGS.PGSPortabilityDerivation
 import Descent.Portability.TransplantationStability
 
+import Descent.Portability.UniversalMetricIdentification
+import Descent.Portability.ExactFiniteHistoryLaw
+import Descent.Portability.EmpiricalAUCComparison
+import Descent.Portability.ExactMetricEvaluation
+import Descent.Portability.TrainingNoiseAccuracy
+import Descent.Portability.ScoreMomentLaw
+import Descent.Portability.ProbitTrainingLaw
+
 assert_below Descent.Program
 
 /-!
