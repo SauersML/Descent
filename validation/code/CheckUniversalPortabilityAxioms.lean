@@ -1,0 +1,64 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.DemographyAccuracyFiber
+import Descent.Portability.ExactMetricEvaluation
+import Descent.Portability.FiniteDemographicSampling
+import Descent.Portability.MeasurePortabilityLaw
+import Descent.Portability.MomentAUCNonidentifiability
+import Descent.Portability.PartialMetricMixture
+
+/-!
+# Universal portability axiom audit
+
+The transitive dependencies of the identification, sharpness, and biological obstruction
+theorems must use only `propext`, `Classical.choice`, and `Quot.sound`.
+-/
+
+#print axioms Descent.Portability.FiniteReportLaw.totalVariation_eq_half_sum_abs
+#print axioms Descent.Portability.FiniteReportLaw.all_bounded_metric_errors_le_iff
+#print axioms Descent.Portability.FiniteReportLaw.identified_iff_all_bounded_metrics_identified
+#print axioms Descent.Portability.ExactFiniteHistoryLaw.path_sum_eq_expectation
+#print axioms Descent.Portability.ExactFiniteHistoryLaw.path_mass_sum_one
+#print axioms Descent.Portability.ExactFiniteHistoryLaw.report_path_sum_eq_backward
+#print axioms Descent.Portability.FiniteDemographicSampling.offspringAlleleLaw_true
+#print axioms Descent.Portability.FiniteDemographicSampling.offspringLaw_mass
+#print axioms Descent.Portability.FiniteDemographicSampling.transition_mass
+#print axioms Descent.Portability.FiniteDemographicSampling.history_readout_exact
+#print axioms Descent.Portability.FiniteDemographicSampling.history_path_sum_exact
+#print axioms Descent.Portability.FiniteReportLaw.squaredCorrelation_eq_rawMoments
+#print axioms Descent.Portability.FiniteReportLaw.calibrationSlope_eq_rawMoments
+#print axioms Descent.Portability.FiniteReportLaw.meanSquaredError_eq_rawMoments
+#print axioms Descent.Portability.FiniteReportLaw.binaryAUC_eq_double_sum
+#print axioms Descent.Portability.FiniteReportLaw.conditionalMetric_joint
+#print axioms Descent.Portability.MeasurePortabilityLaw.covariance_linearScore
+#print axioms Descent.Portability.MeasurePortabilityLaw.variance_linearScore
+#print axioms Descent.Portability.MeasurePortabilityLaw.squaredCorrelation_linearScore
+open Descent.Portability.PartialMetricMixture in
+#print axioms FiniteOutcomeKernel.jointMeasure_probability
+open Descent.Portability.PartialMetricMixture in
+#print axioms FiniteOutcomeKernel.integrable_jointMeasure
+open Descent.Portability.PartialMetricMixture in
+#print axioms FiniteOutcomeKernel.integral_jointMeasure
+open Descent.Portability.PartialMetricMixture in
+#print axioms FiniteOutcomeKernel.integral_constant_kernel
+open Descent.Portability.PartialMetricMixture in
+#print axioms FiniteOutcomeKernel.integral_deterministic_kernel
+#print axioms Descent.Portability.PartialMetricMixture.conditionalMetric_jointMeasure
+open Descent.Portability.FiniteReportLaw in
+#print axioms ConditionalWitness.averaging_inner_conditionalMetrics_is_wrong
+#print axioms Descent.Portability.DemographyAccuracyFiber.accuracy_eq
+#print axioms Descent.Portability.DemographyAccuracyFiber.squaredCorrelation_eq
+#print axioms Descent.Portability.DemographyAccuracyFiber.portability_ratio_eq
+#print axioms Descent.Portability.DemographyAccuracyFiber.no_history_only_exact_accuracy
+#print axioms Descent.Portability.DemographyAccuracyFiber.endpoint_error_at_least_half
+#print axioms Descent.Portability.DemographyAccuracyFiber.midpoint_error_le_half
+#print axioms Descent.Portability.MomentAUCNonidentifiability.same_jointMoments
+#print axioms Descent.Portability.MomentAUCNonidentifiability.first_exact_auc
+#print axioms Descent.Portability.MomentAUCNonidentifiability.second_exact_auc
+#print axioms Descent.Portability.MomentAUCNonidentifiability.first_r2
+#print axioms Descent.Portability.MomentAUCNonidentifiability.second_r2
+#print axioms Descent.Portability.MomentAUCNonidentifiability.first_brier
+#print axioms Descent.Portability.MomentAUCNonidentifiability.second_brier
+#print axioms Descent.Portability.MomentAUCNonidentifiability.no_moments_only_auc_readout
+#print axioms Descent.Portability.MomentAUCNonidentifiability.moments_only_auc_error_lower_bound

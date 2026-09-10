@@ -35,43 +35,40 @@ opened `section PortabilityDrift` and closed it 8,000 lines later. A section sco
 -/
 
 
-/-! ## Nonreversible gene flow: the mixing time is not the transfer time
+/-! ## Isotropic circulation: instantaneous energy and integrated correlation
 
-Everything above this point models divergence with reversible machinery — drift, symmetric
-migration, coalescent times. Real gene flow is not reversible: expansions, admixture pulses and
-sex-biased migration carry probability around cycles. `Descent.Spectral.CirculationDefect` separates
-what that changes from what it does not.
+The scalar formulas below concern the two-dimensional mode with generator
+`L = -s I + A`, where `A = [[0,a],[-a,0]]` and `s > 0`. Its instantaneous
+Dirichlet quadratic form depends on `s` and not on `a`. This statement concerns
+instantaneous energy; it does not imply that finite-horizon stale-score loss
+is independent of circulation.
 
-It does not change the degradation calculus: the Dirichlet energy annihilates the circulation, so
-every ordering of weighting schemes by that energy survives unchanged.
+In the normalized stationary mode, the correlation is `exp(-s*t) * cos(a*t)`.
+Its one-sided integrated correlation is `s / (s^2 + a^2)`, while inverse
+dissipation is `1 / s`. The unchanged historical names `apparentMixingTime`
+and `frontierTime` denote these two scalar quantities. The former is not a
+total-variation mixing time, and the latter is not a universal portability or
+prediction frontier. At equal nonzero damping and circulation the integrated
+correlation is half the inverse dissipation.
 
-It does change what a measured mixing time means. Circulation accelerates ergodic averaging
-without contributing to the frontier, so the diagnostic reports a shorter time than the one
-governing transfer — at equal circulation and dissipation, half of it.
-
-That is a third mechanism alongside the two this file carries. Allele-frequency divergence says
-how far apart populations are, tagging mismatch says how much linkage structure carries over, and
-this says a well-mixed-looking population can still be a bad transfer target because the rate at
-which its environment forgets is not the rate at which a design degrades. -/
+A fixed observable compared with its future value and an optimally transported
+predictor define different risks. Finite-horizon stale loss can depend on
+circulation even when the instantaneous Dirichlet form is unchanged. -/
 
 section NonreversibleFlow
 
-/-- A mixing-time diagnostic understates the transfer-relevant time. Instance of
-    `apparentMixingTime_lt_frontierTime`: with any cyclic component to gene flow, the time
-    constant an ergodic-averaging diagnostic measures is strictly shorter than the one setting the
-    transfer frontier, so substituting it into a horizon calculus overstates transportability.
-
-    Empirical status: DERIVED; the circulation-to-dissipation ratio of a real demography is the
-    unmeasured input this asks for. -/
+/-- For an isotropic damped-rotation mode, nonzero circulation makes its
+one-sided integrated correlation strictly smaller than inverse dissipation.
+The theorem compares the two defined scalars; it does not identify a
+population-specific portability endpoint or total-variation mixing time. -/
 theorem geneFlowMixingTime_understates_transferTime
     (dissipation circulation : ℝ) (hd : 0 < dissipation) (hc : circulation ≠ 0) :
     Spectral.apparentMixingTime dissipation circulation < Spectral.frontierTime dissipation :=
   Spectral.apparentMixingTime_lt_frontierTime dissipation circulation hd hc
 
-/-- The overstatement is a factor of two at equal circulation and dissipation, and grows
-    quadratically in the ratio beyond that.
-
-    Empirical status: DERIVED. -/
+/-- At equal damping and circulation, inverse dissipation is exactly twice
+the mode's one-sided integrated correlation. The historical inflation name
+refers to that scalar ratio, not to every transfer or prediction risk. -/
 theorem transferTime_doubles_at_equal_circulation (dissipation : ℝ) (hd : 0 < dissipation) :
     Spectral.frontierTime dissipation
         = Spectral.transferTimeInflation dissipation dissipation *

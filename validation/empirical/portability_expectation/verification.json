@@ -1,0 +1,52 @@
+{
+  "status": "passed",
+  "exact_rational_sample_fixtures": 25,
+  "exact_geometry_checks": {
+    "nonparallel_source_rank_two": "Q(1/n,1) = n\u00b2, exactly",
+    "rank_one_source": "source accuracy = 1; ratio bounded by 1",
+    "zero_target_vector": "target accuracy and ratio = 0",
+    "parallel_rank_two_target": "Q(1/n,1/n,1) = 1 + n\u00b2/2, exactly",
+    "parallel_rank_three_target": "checked reversed geometry has bounded ratio",
+    "kernel_containment": "identical panels give ratio = 1"
+  },
+  "gaussian_witness_truncated_means": [
+    {
+      "cap": 1,
+      "exact_expression": "2/pi * (sqrt(cap) - atan(sqrt(cap)))",
+      "expression_evaluated": 0.13661977236758138,
+      "angle_quadrature": 0.13661977236758138,
+      "absolute_difference": 0.0
+    },
+    {
+      "cap": 4,
+      "exact_expression": "2/pi * (sqrt(cap) - atan(sqrt(cap)))",
+      "expression_evaluated": 0.5684067800360292,
+      "angle_quadrature": 0.5684067800360301,
+      "absolute_difference": 8.881784197001252e-16
+    },
+    {
+      "cap": 25,
+      "exact_expression": "2/pi * (sqrt(cap) - atan(sqrt(cap)))",
+      "expression_evaluated": 2.308764778215909,
+      "angle_quadrature": 2.308764778215922,
+      "absolute_difference": 1.2878587085651816e-14
+    },
+    {
+      "cap": 100,
+      "exact_expression": "2/pi * (sqrt(cap) - atan(sqrt(cap)))",
+      "expression_evaluated": 5.4296487585369215,
+      "angle_quadrature": 5.429648758537006,
+      "absolute_difference": 8.43769498715119e-14
+    },
+    {
+      "cap": 10000,
+      "exact_expression": "2/pi * (sqrt(cap) - atan(sqrt(cap)))",
+      "expression_evaluated": 62.66834322228795,
+      "angle_quadrature": 62.668343222311975,
+      "absolute_difference": 2.4023449896048987e-11
+    }
+  ],
+  "method": "exact rational identities and deterministic 512-node Gaussian quadrature",
+  "scope": "checks analytical consequences; does not certify simulator support or replace proof",
+  "numpy_version": "2.5.3"
+}

@@ -1,0 +1,19 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.RatioSourceDegeneracy
+
+/-! Axiom audit for source covariance degeneracy. -/
+#print axioms Descent.Portability.RatioSourceDegeneracy.form_cauchy
+#print axioms Descent.Portability.RatioSourceDegeneracy.kernel_factorization
+#print axioms Descent.Portability.RatioSourceDegeneracy.kernel_iff_positive_factorization
+#print axioms Descent.Portability.RatioSourceDegeneracy.source_accuracy_constant
+#print axioms Descent.Portability.RatioSourceDegeneracy.factorized_ratio_bounds
+#print axioms Descent.Portability.RatioSourceDegeneracy.kernel_ratio_integrable
+#print axioms Descent.Portability.RatioSourceDegeneracy.nonalignment_kernel_direction
+#print axioms Descent.Portability.RatioSourceDegeneracy.nondegenerate_nonaligned_witness
+#print axioms Descent.Portability.RatioSourceDegeneracy.witness_exists_iff_not_kernel
+#print axioms Descent.Portability.RatioSourceDegeneracy.nonaligned_integrable_iff_kernel
+#print axioms Descent.Portability.RatioSourceDegeneracy.nondegenerate_nonaligned_label_numerator_top
+#print axioms Descent.Portability.RatioSourceDegeneracy.kernel_label_numerator_integrable
+#print axioms Descent.Portability.RatioSourceDegeneracy.nonaligned_label_integrable_iff_kernels

@@ -2,6 +2,9 @@
 
 A Lean 4 formalization of genetic theory.
 
+For exact results and limits of demographic prediction of polygenic score accuracy,
+see [Universal portability](UNIVERSAL_PORTABILITY.md).
+
 ## Building
 
 ```sh

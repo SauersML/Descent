@@ -34,6 +34,8 @@ BARS: unchanged form (|mean resid| <= 3 sems per case x pheno).
 """
 import json, glob, math, os
 import numpy as np
+if not hasattr(np, "trapezoid"):  # numpy < 1.22 (MSI module env)
+    np.trapezoid = np.trapz
 import pandas as pd
 from statistics import NormalDist
 

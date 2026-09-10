@@ -1,0 +1,17 @@
+import Descent.Portability.OrderedMutationCatalogue
+
+#print axioms Descent.Portability.GenealogyGenotypeLaw.branchKernel_expectation
+#print axioms Descent.Portability.GenealogyGenotypeLaw.shared_branch_equal
+#print axioms Descent.Portability.GenealogyGenotypeLaw.branchKernel_commute
+#print axioms Descent.Portability.GenealogyGenotypeLaw.genealogy_expectation
+#print axioms Descent.Portability.GenealogyGenotypeLaw.genealogy_mass
+#print axioms Descent.Portability.GenealogyGenotypeLaw.rootedGenealogy_expectation
+#print axioms Descent.Portability.OrderedMutationCatalogue.remember_old_index
+#print axioms Descent.Portability.OrderedMutationCatalogue.remember_new_index
+#print axioms Descent.Portability.OrderedMutationCatalogue.alleleIndex_decodes
+#print axioms Descent.Portability.OrderedMutationCatalogue.rawDosage_le_six
+#print axioms Descent.Portability.OrderedMutationCatalogue.endpoints_do_not_determine_dosage
+#print axioms Descent.Portability.OrderedMutationCatalogue.mutationBranch_expectation
+#print axioms Descent.Portability.OrderedMutationCatalogue.mutationBranch_covered
+#print axioms Descent.Portability.OrderedMutationCatalogue.mutationBranch_nucleotide
+#print axioms Descent.Portability.OrderedMutationCatalogue.mutationBranch_presence

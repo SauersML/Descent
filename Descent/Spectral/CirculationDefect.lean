@@ -10,46 +10,30 @@ assert_below Descent.Program
 namespace Descent.Spectral
 
 /-!
-# Nonreversible gene flow: the mixing time is not the transfer time
+# Instantaneous energy and integrated correlation in an isotropic mode
 
-Self-contained: imports only Mathlib.
+This file proves scalar algebra for the two-dimensional generator
+`L = -s I + A`, where `A = [[0,a],[-a,0]]`. The antisymmetric quadratic form
+vanishes, so its instantaneous Dirichlet energy is `s * (x^2 + y^2)`.
+This does not determine the finite-horizon error of a fixed observable.
 
-`Descent.Spectral.DirichletTransfer` derives its construction rule — among schemes with equal source
-performance, the one with the smallest Dirichlet energy degrades slowest — under a reversible
-coupling, and reads the sharp floor as an integrated autocorrelation time. Gene flow is not
-reversible: directional migration, admixture pulses, sex-biased flow and serial founder expansion
-carry probability around cycles. Splitting the generator into a symmetric part `S` and an
-antisymmetric part `A` separates what changes from what does not.
+For `s > 0`, the normalized stationary mode has correlation
+`exp(-s*t) * cos(a*t)`. Its one-sided integrated correlation is
+`s / (s^2 + a^2)`. The inverse dissipation is `1 / s`, and the exact gap is
+`a^2 / (s * (s^2 + a^2))`.
 
-The Dirichlet form does not see `A`. The quadratic form of an antisymmetric operator vanishes
-identically (`driftGeneratorForm_independent_of_circulation`), so the energy governing degradation
-is the energy of `S`, and the construction rule holds verbatim for nonreversible couplings with `S`
-in place of `-L`.
+The historical names `apparentMixingTime`, `frontierTime`, and
+`transferTimeInflation` below denote this integrated correlation, inverse
+dissipation, and their ratio. They do not establish a total-variation mixing
+time or a universal portability frontier. Instantaneous energy, finite-time
+stale-observable loss, optimal transported prediction risk, and integrated
+correlation are separate endpoints. Circulation can affect them differently.
 
-The autocorrelation time does see `A`. The asymptotic variance of a time-average is governed by
-the symmetric part of the resolvent, `s/(s² + a²)`, not by the inverse of the symmetric part,
-`1/s`, and the two differ by an exact nonnegative amount:
-
-`1/s = s/(s² + a²) + a²/(s(s² + a²))`     (`circulationDefect_identity`).
-
-So circulation accelerates ergodic averaging without contributing to the frontier: a mixing-time
-diagnostic reports a shorter time than the one governing transfer, by the factor
-`transferTimeInflation s a = 1 + (a/s)²` — two at equal strengths, growing quadratically in the
-circulation-to-dissipation ratio, unbounded.
-
-That is a third mechanism alongside the two the corpus already carries. Allele-frequency
-divergence says how far apart two populations are; tagging mismatch says how much linkage
-structure carries over; this says the rate at which the environment forgets and the rate at which
-a design degrades are different numbers, with the gap set by how much of the flow is cyclic.
-
-Scope: everything here is the two-dimensional model with isotropic symmetric part, where the
-algebra is closed-form. The general operator identity
-`⟨g, S⁻¹g⟩ = ⟨g, Re(-L)⁻¹g⟩ + ‖S^{-1/2}A(S+A)^{-1}g‖²`, of which the display is the
-two-dimensional instance, is not asserted, and neither is any circulation ratio for a particular
-demography.
-
-Empirical status: DERIVED. The identity is proved; the circulation-to-dissipation ratio of a real
-demography is an unmeasured input.
+The formal content here is the displayed quadratic and rational identities.
+It neither estimates a circulation ratio for a real demography nor proves the
+general operator resolvent identity outside this isotropic two-dimensional
+special case. The zero-denominator lemmas record Lean's totalized algebra;
+positive damping is required for the stated stationary timescale interpretation.
 -/
 
 /-! ## Circulation is invisible to the Dirichlet form -/
@@ -76,32 +60,34 @@ theorem driftGeneratorForm_eq_dissipative (s a x y : ℝ) :
   rw [circulationQuadraticForm_eq_zero]
   ring
 
-/-- Two demographies with the same dissipation and different circulation have the same Dirichlet
-energy at every design, so every ordering derived from that energy is unchanged. -/
+/-- Isotropic modes with equal damping have the same instantaneous Dirichlet
+quadratic form for every circulation value. This equality does not extend by
+itself to finite-horizon stale-observable loss. -/
 theorem driftGeneratorForm_independent_of_circulation (s a a' x y : ℝ) :
     driftGeneratorForm s a x y = driftGeneratorForm s a' x y := by
   rw [driftGeneratorForm_eq_dissipative, driftGeneratorForm_eq_dissipative]
 
 /-! ## The autocorrelation time is not blind to it -/
 
-/-- The time constant that sets the transfer frontier: the inverse dissipation. -/
+/-- Inverse dissipation of the isotropic mode. The historical name does not
+assert that this scalar is the frontier for an unspecified prediction task. -/
 noncomputable def frontierTime (s : ℝ) : ℝ := 1 / s
 
-/-- **frontierTime at zero s, named.** A zero rate never reaches the frontier, so the time
-diverges. Lean returns `0`: arrival is instantaneous, the opposite end of the scale. Consumers
-must require `s ≠ 0`. -/
+/-- Lean's totalized inverse at zero is zero. The positive-damping timescale
+interpretation requires `s > 0`; the one-sided limit as `s` decreases to zero
+is divergent and is not represented by this value. -/
 theorem frontierTime_zero_s_is_junk :
     frontierTime 0 = 0 := by
   unfold frontierTime
   simp
 
-/-- The integrated autocorrelation time an ergodic-averaging diagnostic actually measures: the
-symmetric part of the resolvent of `S + A`. -/
+/-- One-sided integrated correlation of the normalized isotropic mode,
+equivalently the symmetric resolvent coefficient. This is not a general
+mixing-time or semigroup-relaxation definition. -/
 noncomputable def apparentMixingTime (s a : ℝ) : ℝ := s / (s ^ 2 + a ^ 2)
 
-/-- **apparentMixingTime where its denominator vanishes, named.** The guard `s ^ 2 + a ^ 2` is zero
-at `s = 0`, `a = 0`. Lean returns `0` there rather than the value the modelled quantity takes,
-and no type error marks the point. Consumers must require `s ^ 2 + a ^ 2 ≠ 0`. -/
+/-- The rational formula has zero denominator at `(s,a)=(0,0)`.
+Lean returns zero there; this value has no stationary timescale interpretation. -/
 theorem apparentMixingTime_at_s0a0_is_junk :
     apparentMixingTime 0 0 = 0 := by
   unfold apparentMixingTime
@@ -110,10 +96,9 @@ theorem apparentMixingTime_at_s0a0_is_junk :
 /-- The exact gap between the two. -/
 noncomputable def circulationDefect (s a : ℝ) : ℝ := a ^ 2 / (s * (s ^ 2 + a ^ 2))
 
-/-- **circulationDefect at zero s, named.** A zero symmetric part leaves no circulation to be
-defective about, and the defect diverges. Lean returns `0`, reporting a perfectly circulating
-flow -- the best case -- for a flow with no symmetric component at all. Consumers must require
-`s ≠ 0`. -/
+/-- Lean returns zero when the displayed rational gap has zero damping in
+its denominator. This totalized value does not describe the positive-damping
+limit and is excluded from the timescale interpretation. -/
 theorem circulationDefect_zero_s_is_junk (a : ℝ) :
     circulationDefect 0 a = 0 := by
   unfold circulationDefect
@@ -129,8 +114,8 @@ theorem circulationDefect_eq_sub (s a : ℝ) (hs : 0 < s) :
   field_simp [h1, h2]
   ring
 
-/-- The frontier time is the measured mixing time plus a nonnegative defect carried entirely by
-the circulation. -/
+/-- Inverse dissipation equals one-sided integrated correlation plus the
+nonnegative rational gap for this isotropic mode. -/
 theorem circulationDefect_identity (s a : ℝ) (hs : 0 < s) :
     frontierTime s = apparentMixingTime s a + circulationDefect s a := by
   have h := circulationDefect_eq_sub s a hs
@@ -145,36 +130,35 @@ theorem circulationDefect_pos (s a : ℝ) (hs : 0 < s) (ha : a ≠ 0) :
   unfold circulationDefect
   exact div_pos ha2 (mul_pos hs h2)
 
-/-- A mixing diagnostic understates the transfer time whenever the demography circulates. -/
+/-- Nonzero circulation makes integrated correlation strictly smaller than
+inverse dissipation in the isotropic mode. -/
 theorem apparentMixingTime_lt_frontierTime (s a : ℝ) (hs : 0 < s) (ha : a ≠ 0) :
     apparentMixingTime s a < frontierTime s := by
   have hid := circulationDefect_identity s a hs
   have hpos := circulationDefect_pos s a hs ha
   linarith
 
-/-- **The apparent mixing time's scale, pinned.** The comparison with the frontier time is
-one-sided and holds for any body smaller than it, including `s / (s + a) ^ 2` and half of the
-intended value. At equal symmetric and antisymmetric parts the apparent mixing time is exactly
-half the symmetric part; the squared-sum body returns a quarter. -/
+/-- At unit damping and circulation, the one-sided integrated correlation
+is exactly one half, distinguishing the intended squared-sum denominator
+from alternative rational formulas. -/
 theorem apparentMixingTime_at_equal_parts :
     apparentMixingTime 1 1 = 1 / 2 := by
   unfold apparentMixingTime
   norm_num
 
-/-- The factor by which a mixing-time diagnostic understates the transfer-relevant time. -/
+/-- Ratio of inverse dissipation to one-sided integrated correlation when
+`s > 0`. The historical name does not assign this ratio to arbitrary risks. -/
 noncomputable def transferTimeInflation (s a : ℝ) : ℝ := 1 + (a / s) ^ 2
 
-/-- **transferTimeInflation at its junk point, named.** A flow with no symmetric part has no
-reversible timescale to inflate against. Lean returns `1`: no inflation at all, the value for a
-perfectly reversible flow, so the maximally irreversible case and the reversible case are
-reported identically. Consumers must exclude the argument that makes the guard vanish. -/
+/-- At zero damping Lean returns one for the totalized ratio formula.
+This is not the ratio of finite stationary timescales, which requires `s > 0`. -/
 theorem transferTimeInflation_zero_symmetric_is_junk (a : ℝ) :
     transferTimeInflation 0 a = 1 := by
   unfold transferTimeInflation
   simp
 
-/-- The bias is the inflation factor: quadratic in the circulation-to-dissipation ratio, and
-twice the measured mixing time at equal strengths. -/
+/-- The exact scalar ratio is quadratic in circulation divided by damping;
+at equal nonzero strengths, inverse dissipation is twice integrated correlation. -/
 theorem frontierTime_eq_inflation_mul_apparent (s a : ℝ) (hs : 0 < s) :
     frontierTime s = transferTimeInflation s a * apparentMixingTime s a := by
   have h1 : s ≠ 0 := ne_of_gt hs
@@ -182,18 +166,16 @@ theorem frontierTime_eq_inflation_mul_apparent (s a : ℝ) (hs : 0 < s) :
   unfold frontierTime transferTimeInflation apparentMixingTime
   field_simp [h1, ne_of_gt h2]
 
-/-- The inflation factor is at least one for every algebraic input.  At `s = 0` this remains true
-only because Lean's totalized quotient sets `a / 0 = 0`; the separate equality characterization
-therefore retains the biologically necessary guard `0 < s`. -/
+/-- The algebraic ratio formula is at least one. At zero damping this uses
+Lean's totalized quotient; the stationary interpretation requires `s > 0`. -/
 theorem transferTimeInflation_ge_one (s a : ℝ) :
     1 ≤ transferTimeInflation s a := by
   unfold transferTimeInflation
   nlinarith [sq_nonneg (a / s)]
 
-/-- **Equality holds exactly at reversibility**, which is the half the inequality alone does not
-carry. Stated as a theorem rather than asserted in prose beside `transferTimeInflation_ge_one`,
-because at `s = 0` the junk quotient gives equality at maximal circulation and the prose reading
-would be false there. -/
+/-- With positive damping, the scalar ratio equals one exactly when the
+antisymmetric component vanishes. The damping guard excludes the totalized
+zero-denominator equality. -/
 theorem transferTimeInflation_eq_one_iff (s a : ℝ) (hs : 0 < s) :
     transferTimeInflation s a = 1 ↔ a = 0 := by
   unfold transferTimeInflation

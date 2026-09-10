@@ -1,0 +1,54 @@
+{
+  "status": "passed",
+  "archive_sha256": "bfdf7a1be129781d45dc9d4d5a7b58077f6830ada69c88d6a0c36c6d22d4f91a",
+  "certificates": [
+    {
+      "demography": "serial1d",
+      "targets_verified": 9,
+      "source_rank_at_least": 2,
+      "common_source_zero_direction_first_two_coordinates": [
+        "66148942053065155741558238207/3812559812595159567196443691401",
+        "1"
+      ],
+      "all_target_covariances_nonzero_at_source_zero_direction": true,
+      "distance_zero_ratio": 1,
+      "positive_distances_with_nonparallel_covariance_witnesses": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "panel_sha256": "1cdb2d2c2b243f3e9ae4237c5de20df3d4d306d68feea6561eaaf4d94743cf51"
+    },
+    {
+      "demography": "grid2d",
+      "targets_verified": 35,
+      "source_rank_at_least": 2,
+      "common_source_zero_direction_first_two_coordinates": [
+        "11462930909125586431768852561/851051820459882712292086775808",
+        "1"
+      ],
+      "all_target_covariances_nonzero_at_source_zero_direction": true,
+      "distance_zero_ratio": 1,
+      "positive_distances_with_nonparallel_covariance_witnesses": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "panel_sha256": "96d45dff52eae76467d95f3eea47255de533b47ee9c4f2eb76d87078a93dacca"
+    }
+  ],
+  "scope": "constructed-panel geometry only; does not verify demographic support, experimental-model equivalence, or an expected portability curve; see AUDIT.md"
+}

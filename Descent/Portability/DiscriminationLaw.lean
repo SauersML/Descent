@@ -2,6 +2,8 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.EndToEndScoreLaw
+import Descent.Portability.EmpiricalAUCComparison
+import Descent.Portability.PartialMetricMixture
 import Descent.Portability.PopulationAUC
 import Mathlib.Analysis.Convex.Deriv
 import Mathlib.Analysis.SpecialFunctions.Sigmoid
@@ -240,10 +242,6 @@ theorem BinaryRiskCohort.noR2Domain_singleton (cohort : BinaryRiskCohort (Fin 1)
   have hvariance : cohort.outcomeVariance = 0 := by
     simp [BinaryRiskCohort.outcomeVariance, finiteCohortMean]
   linarith [domain.outcomeVariance_pos]
-
-/-- One case-control comparison with half credit for a predicted-risk tie. -/
-noncomputable def empiricalAUCComparison (caseRisk controlRisk : ℝ) : ℝ :=
-  if controlRisk < caseRisk then 1 else if caseRisk = controlRisk then 1 / 2 else 0
 
 /-- Exact empirical AUC as the Mann--Whitney pair average used by standard evaluators. -/
 noncomputable def BinaryRiskCohort.auc {Individual : Type*} [Fintype Individual]
@@ -992,6 +990,18 @@ structure DemeRiskPredictionPanel {D : ℕ} (design : PipelineStudyDesign D) whe
 abbrev DemeOutcomeConfiguration {D : ℕ} (design : PipelineStudyDesign D) :=
   (Σ deme, Fin (design.cohortSize deme)) → Bool
 
+/-- A complete finite outcome includes an explicit genome/GWAS construction-failure branch. -/
+abbrev PipelineOutcomeConfiguration {D : ℕ} (design : PipelineStudyDesign D) :=
+  Option (DemeOutcomeConfiguration design)
+
+/-- Every event in the finite outcome space is measurable. -/
+instance pipelineOutcomeMeasurableSpace {D : ℕ} (design : PipelineStudyDesign D) :
+    MeasurableSpace (PipelineOutcomeConfiguration design) := ⊤
+
+instance pipelineOutcomeMeasurableSingletonClass {D : ℕ} (design : PipelineStudyDesign D) :
+    MeasurableSingletonClass (PipelineOutcomeConfiguration design) :=
+  ⟨fun _ ↦ trivial⟩
+
 /-- Exact product-Bernoulli probability of one finite outcome configuration. -/
 noncomputable def DemeRiskPredictionPanel.outcomeWeight
     {D : ℕ} {design : PipelineStudyDesign D} (panel : DemeRiskPredictionPanel design)
@@ -1030,6 +1040,14 @@ theorem DemeRiskPredictionPanel.outcomeWeight_sum_one
             if outcome then panel.outcomeProbability individual.1 individual.2
             else 1 - panel.outcomeProbability individual.1 individual.2)).symm
     _ = 1 := by simp
+
+/-- The normalized finite law of all binary outcomes at one realized prediction panel. -/
+noncomputable def DemeRiskPredictionPanel.outcomeLaw
+    {D : ℕ} {design : PipelineStudyDesign D} (panel : DemeRiskPredictionPanel design) :
+    FiniteReportLaw (DemeOutcomeConfiguration design) where
+  mass := panel.outcomeWeight
+  mass_nonneg := panel.outcomeWeight_nonneg
+  mass_sum := panel.outcomeWeight_sum_one
 
 /-- Materialize the exact empirical evaluator input for one outcome configuration. -/
 def DemeRiskPredictionPanel.withOutcome
@@ -1084,20 +1102,6 @@ noncomputable def DemeRiskPredictionPanel.weightedMetric
   ∑ outcome : DemeOutcomeConfiguration design,
     panel.outcomeWeight outcome *
       ((panel.withOutcome outcome).evaluate coordinate).getD 0
-
-/-- Exact conditional finite-cohort metric after binary outcomes are marginalized.  This is
-the finite sum targeted by a skip-undefined simulation average. -/
-noncomputable def DemeRiskPredictionPanel.expectedMetric
-    {D : ℕ} {design : PipelineStudyDesign D} (panel : DemeRiskPredictionPanel design)
-    (coordinate : PipelineQuantity D) : Option ℝ :=
-  let mass := panel.metricDefinedMass coordinate
-  if mass = 0 then none else some (panel.weightedMetric coordinate / mass)
-
-/-- All exact finite-cohort coordinates as one partial report. -/
-noncomputable def DemeRiskPredictionPanel.expectedOutput
-    {D : ℕ} {design : PipelineStudyDesign D} (panel : DemeRiskPredictionPanel design) :
-    PipelineOutput D :=
-  panel.expectedMetric
 
 /-- Build the pre-outcome panel from one selected-score draw, an explicit phenotype-baseline
 rule, and a prediction rule on that same visible cohort.  The true Bernoulli risks use the
@@ -1155,50 +1159,309 @@ noncomputable def PredictionPipelineKernel.panelAt
       (kernel.predictedRisk_pos input sample)
       (kernel.predictedRisk_lt_one input sample)
 
-/-- One sample's requested finite metric, with genome/GWAS construction failure and metric
-undefinedness represented by the same outer partial-value convention. -/
-noncomputable def PredictionPipelineKernel.expectedMetricAt
+/-- The actual conditional finite outcome law. Failed constructions concentrate on `none`;
+successful constructions retain every Bernoulli configuration with its derived probability. -/
+noncomputable def PredictionPipelineKernel.outcomeLawAt
     {Sample : Type*} [MeasurableSpace Sample] {D : ℕ}
     (kernel : PredictionPipelineKernel Sample D) (input : VisiblePipelineInput D)
-    (sample : Sample) (coordinate : PipelineQuantity D) : Option ℝ :=
-  (kernel.panelAt input sample).bind fun panel ↦ panel.expectedMetric coordinate
+    (sample : Sample) : FiniteReportLaw (PipelineOutcomeConfiguration input.studyDesign) :=
+  match kernel.panelAt input sample with
+  | none => FiniteReportLaw.pointMass none
+  | some panel => panel.outcomeLaw.pushforward some
+
+/-- Evaluate the actual finite outcome. Both construction failure and metric undefinedness
+remain `none`, while successful outcomes use the existing empirical cohort evaluator. -/
+noncomputable def PredictionPipelineKernel.outcomeMetricAt
+    {Sample : Type*} [MeasurableSpace Sample] {D : ℕ}
+    (kernel : PredictionPipelineKernel Sample D) (input : VisiblePipelineInput D)
+    (sample : Sample) (outcome : PipelineOutcomeConfiguration input.studyDesign)
+    (coordinate : PipelineQuantity D) : Option ℝ :=
+  match kernel.panelAt input sample, outcome with
+  | some panel, some configuration => (panel.withOutcome configuration).evaluate coordinate
+  | _, _ => none
+
+/-- Probability of a defined metric after outcomes are marginalized at one upstream draw.
+A failed genome/GWAS construction has zero definedness mass. This probability is retained
+through the outer integral; having any possible defined outcome does not give it unit mass. -/
+noncomputable def PredictionPipelineKernel.metricDefinedMassAt
+    {Sample : Type*} [MeasurableSpace Sample] {D : ℕ}
+    (kernel : PredictionPipelineKernel Sample D) (input : VisiblePipelineInput D)
+    (sample : Sample) (coordinate : PipelineQuantity D) : ℝ :=
+  match kernel.panelAt input sample with
+  | none => 0
+  | some panel => panel.metricDefinedMass coordinate
+
+/-- Unnormalized metric numerator at one upstream draw. A failed construction contributes
+zero numerator and zero definedness mass, so it is excluded from the final conditional mean. -/
+noncomputable def PredictionPipelineKernel.weightedMetricAt
+    {Sample : Type*} [MeasurableSpace Sample] {D : ℕ}
+    (kernel : PredictionPipelineKernel Sample D) (input : VisiblePipelineInput D)
+    (sample : Sample) (coordinate : PipelineQuantity D) : ℝ :=
+  match kernel.panelAt input sample with
+  | none => 0
+  | some panel => panel.weightedMetric coordinate
+
+/-- The finite conditional law reproduces the existing per-panel definedness sum exactly. -/
+theorem PredictionPipelineKernel.outcomeLawAt_definedMass
+    {Sample : Type*} [MeasurableSpace Sample] {D : ℕ}
+    (kernel : PredictionPipelineKernel Sample D) (input : VisiblePipelineInput D)
+    (sample : Sample) (coordinate : PipelineQuantity D) :
+    (kernel.outcomeLawAt input sample).definedMass
+      (fun outcome ↦ kernel.outcomeMetricAt input sample outcome coordinate) =
+        kernel.metricDefinedMassAt input sample coordinate := by
+  cases hpanel : kernel.panelAt input sample with
+  | none =>
+    simp [PredictionPipelineKernel.outcomeLawAt, PredictionPipelineKernel.outcomeMetricAt,
+      PredictionPipelineKernel.metricDefinedMassAt, hpanel, FiniteReportLaw.definedMass,
+      FiniteReportLaw.expectation_pointMass]
+  | some panel =>
+    simp only [PredictionPipelineKernel.outcomeLawAt, hpanel, FiniteReportLaw.definedMass,
+      FiniteReportLaw.expectation_pushforward]
+    simp [PredictionPipelineKernel.outcomeMetricAt,
+      PredictionPipelineKernel.metricDefinedMassAt, hpanel, FiniteReportLaw.expectation,
+      DemeRiskPredictionPanel.outcomeLaw, DemeRiskPredictionPanel.metricDefinedMass, mul_ite]
+
+/-- The same conditional law reproduces the existing unnormalized metric sum exactly. -/
+theorem PredictionPipelineKernel.outcomeLawAt_weightedMetric
+    {Sample : Type*} [MeasurableSpace Sample] {D : ℕ}
+    (kernel : PredictionPipelineKernel Sample D) (input : VisiblePipelineInput D)
+    (sample : Sample) (coordinate : PipelineQuantity D) :
+    (kernel.outcomeLawAt input sample).weightedDefinedMetric
+      (fun outcome ↦ kernel.outcomeMetricAt input sample outcome coordinate) =
+        kernel.weightedMetricAt input sample coordinate := by
+  cases hpanel : kernel.panelAt input sample with
+  | none =>
+    simp [PredictionPipelineKernel.outcomeLawAt, PredictionPipelineKernel.outcomeMetricAt,
+      PredictionPipelineKernel.weightedMetricAt, hpanel, FiniteReportLaw.weightedDefinedMetric,
+      FiniteReportLaw.expectation_pointMass]
+  | some panel =>
+    simp only [PredictionPipelineKernel.outcomeLawAt, hpanel, FiniteReportLaw.weightedDefinedMetric,
+      FiniteReportLaw.expectation_pushforward]
+    simp [PredictionPipelineKernel.outcomeMetricAt,
+      PredictionPipelineKernel.weightedMetricAt, hpanel, FiniteReportLaw.expectation,
+      DemeRiskPredictionPanel.outcomeLaw, DemeRiskPredictionPanel.weightedMetric]
+
+theorem PredictionPipelineKernel.metricDefinedMassAt_nonneg
+    {Sample : Type*} [MeasurableSpace Sample] {D : ℕ}
+    (kernel : PredictionPipelineKernel Sample D) (input : VisiblePipelineInput D)
+    (sample : Sample) (coordinate : PipelineQuantity D) :
+    0 ≤ kernel.metricDefinedMassAt input sample coordinate := by
+  unfold PredictionPipelineKernel.metricDefinedMassAt
+  cases kernel.panelAt input sample with
+  | none => exact le_rfl
+  | some panel => exact panel.metricDefinedMass_nonneg coordinate
+
+theorem PredictionPipelineKernel.metricDefinedMassAt_le_one
+    {Sample : Type*} [MeasurableSpace Sample] {D : ℕ}
+    (kernel : PredictionPipelineKernel Sample D) (input : VisiblePipelineInput D)
+    (sample : Sample) (coordinate : PipelineQuantity D) :
+    kernel.metricDefinedMassAt input sample coordinate ≤ 1 := by
+  unfold PredictionPipelineKernel.metricDefinedMassAt
+  cases kernel.panelAt input sample with
+  | none => exact zero_le_one
+  | some panel => exact panel.metricDefinedMass_le_one coordinate
 
 /-- Exact input-indexed law of the remaining genome, GWAS, and prediction randomness after
 finite binary outcomes have already been summed analytically.  The inner finite sum changes
-with cohort size; the outer integral handles continuous simulator/GWAS draws. -/
+with cohort size; the outer integral handles continuous simulator/GWAS draws. Measurability
+of each actual conditional weight and integrability of each outcome contribution construct
+the joint measure and justify marginalization. No metric equality or simulator agreement is
+supplied as a premise. Aggregate integrability is derived below from these outcome premises. -/
 structure FinitePipelineKernel (Sample : Type*) [MeasurableSpace Sample] (D : ℕ) where
   predictionKernel : PredictionPipelineKernel Sample D
-  metricDefined_measurable : ∀ input coordinate,
-    MeasurableSet {sample |
-      (predictionKernel.expectedMetricAt input sample coordinate).isSome = true}
-  definedMetric_integrable : ∀ input coordinate,
-    Integrable (fun sample ↦
-      if (predictionKernel.expectedMetricAt input sample coordinate).isSome = true then
-        (predictionKernel.expectedMetricAt input sample coordinate).getD 0 else 0)
+  outcomeWeight_measurable : ∀ input outcome,
+    Measurable (fun sample ↦ (predictionKernel.outcomeLawAt input sample).mass outcome)
+  definedOutcome_integrable : ∀ input coordinate outcome,
+    Integrable (fun sample ↦ (predictionKernel.outcomeLawAt input sample).mass outcome *
+      (if (predictionKernel.outcomeMetricAt input sample outcome coordinate).isSome then 1 else 0))
+      (predictionKernel.scoreKernel.drawLaw input)
+  weightedOutcome_integrable : ∀ input coordinate outcome,
+    Integrable (fun sample ↦ (predictionKernel.outcomeLawAt input sample).mass outcome *
+      (predictionKernel.outcomeMetricAt input sample outcome coordinate).getD 0)
       (predictionKernel.scoreKernel.drawLaw input)
 
-/-- Every fully constructed finite pipeline kernel induces the generic partial semantics.
-Undefined AUC/calibration/`R²` draws remain outside the conditional mean rather than being
-replaced by a sentinel. -/
-noncomputable def FinitePipelineKernel.toPartialSemantics
+theorem FinitePipelineKernel.metricDefinedMass_integrable
     {Sample : Type*} [MeasurableSpace Sample] {D : ℕ}
-    (kernel : FinitePipelineKernel Sample D) : PartialPipelineRandomSemantics D Sample where
-  drawLaw := kernel.predictionKernel.scoreKernel.drawLaw
-  drawLaw_probability := kernel.predictionKernel.scoreKernel.drawLaw_probability
-  defined := fun input sample coordinate ↦
-    (kernel.predictionKernel.expectedMetricAt input sample coordinate).isSome
-  defined_measurable := kernel.metricDefined_measurable
-  realizedValue := fun input sample coordinate ↦
-    (kernel.predictionKernel.expectedMetricAt input sample coordinate).getD 0
-  definedValue_integrable := kernel.definedMetric_integrable
+    (kernel : FinitePipelineKernel Sample D) (input : VisiblePipelineInput D)
+    (coordinate : PipelineQuantity D) :
+    Integrable (fun sample ↦ kernel.predictionKernel.metricDefinedMassAt input sample coordinate)
+      (kernel.predictionKernel.scoreKernel.drawLaw input) := by
+  have h := integrable_finsetSum Finset.univ
+    (fun outcome _ ↦ kernel.definedOutcome_integrable input coordinate outcome)
+  simpa only [← kernel.predictionKernel.outcomeLawAt_definedMass,
+    FiniteReportLaw.definedMass, FiniteReportLaw.expectation] using h
+
+theorem FinitePipelineKernel.weightedMetric_integrable
+    {Sample : Type*} [MeasurableSpace Sample] {D : ℕ}
+    (kernel : FinitePipelineKernel Sample D) (input : VisiblePipelineInput D)
+    (coordinate : PipelineQuantity D) :
+    Integrable (fun sample ↦ kernel.predictionKernel.weightedMetricAt input sample coordinate)
+      (kernel.predictionKernel.scoreKernel.drawLaw input) := by
+  have h := integrable_finsetSum Finset.univ
+    (fun outcome _ ↦ kernel.weightedOutcome_integrable input coordinate outcome)
+  simpa only [← kernel.predictionKernel.outcomeLawAt_weightedMetric,
+    FiniteReportLaw.weightedDefinedMetric, FiniteReportLaw.expectation] using h
+
+/-- A measurable conditional kernel built from the actual outcome law, not an assumed joint
+distribution. Its normalization is inherited from the exact Bernoulli law and failure atom. -/
+noncomputable def FinitePipelineKernel.outcomeKernel
+    {Sample : Type*} [MeasurableSpace Sample] {D : ℕ}
+    (kernel : FinitePipelineKernel Sample D) (input : VisiblePipelineInput D) :
+    PartialMetricMixture.FiniteOutcomeKernel Sample
+      (PipelineOutcomeConfiguration input.studyDesign) where
+  weight := fun sample ↦ (kernel.predictionKernel.outcomeLawAt input sample).mass
+  weight_nonneg := fun sample ↦ (kernel.predictionKernel.outcomeLawAt input sample).mass_nonneg
+  weight_sum_one := fun sample ↦ (kernel.predictionKernel.outcomeLawAt input sample).mass_sum
+  weight_measurable := kernel.outcomeWeight_measurable input
+
+theorem FinitePipelineKernel.outcomeKernel_lawAt
+    {Sample : Type*} [MeasurableSpace Sample] {D : ℕ}
+    (kernel : FinitePipelineKernel Sample D) (input : VisiblePipelineInput D) (sample : Sample) :
+    (kernel.outcomeKernel input).lawAt sample = kernel.predictionKernel.outcomeLawAt input sample := by
+  apply FiniteReportLaw.ext
+  intro outcome
+  rfl
+
+/-- The constructed joint probability measure of upstream draws and complete finite outcomes. -/
+noncomputable def FinitePipelineKernel.jointMeasure
+    {Sample : Type*} [MeasurableSpace Sample] {D : ℕ}
+    (kernel : FinitePipelineKernel Sample D) (input : VisiblePipelineInput D) :
+    Measure (Sample × PipelineOutcomeConfiguration input.studyDesign) :=
+  (kernel.outcomeKernel input).jointMeasure (kernel.predictionKernel.scoreKernel.drawLaw input)
+
+instance FinitePipelineKernel.jointMeasure_probability
+    {Sample : Type*} [MeasurableSpace Sample] {D : ℕ}
+    (kernel : FinitePipelineKernel Sample D) (input : VisiblePipelineInput D) :
+    IsProbabilityMeasure (kernel.jointMeasure input) := by
+  letI := kernel.predictionKernel.scoreKernel.drawLaw_probability input
+  unfold FinitePipelineKernel.jointMeasure
+  infer_instance
+
+/-- Unconditional probability that the whole experiment defines the requested metric.
+Upstream draws are weighted by their actual downstream definedness probability. -/
+noncomputable def FinitePipelineKernel.definedProbability
+    {Sample : Type*} [MeasurableSpace Sample] {D : ℕ}
+    (kernel : FinitePipelineKernel Sample D) (input : VisiblePipelineInput D)
+    (coordinate : PipelineQuantity D) : ℝ :=
+  ∫ sample, kernel.predictionKernel.metricDefinedMassAt input sample coordinate
+    ∂kernel.predictionKernel.scoreKernel.drawLaw input
+
+/-- Unconditional unnormalized metric integral after both layers of randomness are summed.
+No panel-specific conditional mean is taken before this integral. -/
+noncomputable def FinitePipelineKernel.weightedMetric
+    {Sample : Type*} [MeasurableSpace Sample] {D : ℕ}
+    (kernel : FinitePipelineKernel Sample D) (input : VisiblePipelineInput D)
+    (coordinate : PipelineQuantity D) : ℝ :=
+  ∫ sample, kernel.predictionKernel.weightedMetricAt input sample coordinate
+    ∂kernel.predictionKernel.scoreKernel.drawLaw input
+
+/-- The integrated finite definedness sum equals definedness mass under the constructed
+joint measure. Per-outcome measurability and integrability discharge the mixture theorem. -/
+theorem FinitePipelineKernel.definedProbability_eq_jointDefinedMass
+    {Sample : Type*} [MeasurableSpace Sample] {D : ℕ}
+    (kernel : FinitePipelineKernel Sample D) (input : VisiblePipelineInput D)
+    (coordinate : PipelineQuantity D) :
+    kernel.definedProbability input coordinate =
+      PartialMetricMixture.definedMass (kernel.jointMeasure input)
+        (fun pair ↦ kernel.predictionKernel.outcomeMetricAt input pair.1 pair.2 coordinate) := by
+  symm
+  simpa only [FinitePipelineKernel.jointMeasure, FinitePipelineKernel.outcomeKernel_lawAt,
+    PredictionPipelineKernel.outcomeLawAt_definedMass, FinitePipelineKernel.definedProbability]
+    using PartialMetricMixture.definedMass_jointMeasure (kernel.outcomeKernel input)
+      (kernel.predictionKernel.scoreKernel.drawLaw input)
+      (fun pair ↦ kernel.predictionKernel.outcomeMetricAt input pair.1 pair.2 coordinate)
+      (kernel.definedOutcome_integrable input coordinate)
+
+/-- The integrated finite numerator equals the metric integral under the same joint measure. -/
+theorem FinitePipelineKernel.weightedMetric_eq_jointWeightedMetric
+    {Sample : Type*} [MeasurableSpace Sample] {D : ℕ}
+    (kernel : FinitePipelineKernel Sample D) (input : VisiblePipelineInput D)
+    (coordinate : PipelineQuantity D) :
+    kernel.weightedMetric input coordinate =
+      PartialMetricMixture.weightedMetric (kernel.jointMeasure input)
+        (fun pair ↦ kernel.predictionKernel.outcomeMetricAt input pair.1 pair.2 coordinate) := by
+  symm
+  simpa only [FinitePipelineKernel.jointMeasure, FinitePipelineKernel.outcomeKernel_lawAt,
+    PredictionPipelineKernel.outcomeLawAt_weightedMetric, FinitePipelineKernel.weightedMetric]
+    using PartialMetricMixture.weightedMetric_jointMeasure (kernel.outcomeKernel input)
+      (kernel.predictionKernel.scoreKernel.drawLaw input)
+      (fun pair ↦ kernel.predictionKernel.outcomeMetricAt input pair.1 pair.2 coordinate)
+      (kernel.weightedOutcome_integrable input coordinate)
+
+theorem FinitePipelineKernel.definedProbability_nonneg
+    {Sample : Type*} [MeasurableSpace Sample] {D : ℕ}
+    (kernel : FinitePipelineKernel Sample D) (input : VisiblePipelineInput D)
+    (coordinate : PipelineQuantity D) : 0 ≤ kernel.definedProbability input coordinate := by
+  exact integral_nonneg fun sample ↦
+    kernel.predictionKernel.metricDefinedMassAt_nonneg input sample coordinate
+
+theorem FinitePipelineKernel.definedProbability_le_one
+    {Sample : Type*} [MeasurableSpace Sample] {D : ℕ}
+    (kernel : FinitePipelineKernel Sample D) (input : VisiblePipelineInput D)
+    (coordinate : PipelineQuantity D) : kernel.definedProbability input coordinate ≤ 1 := by
+  letI := kernel.predictionKernel.scoreKernel.drawLaw_probability input
+  calc
+    kernel.definedProbability input coordinate ≤
+        ∫ _sample, (1 : ℝ) ∂kernel.predictionKernel.scoreKernel.drawLaw input :=
+      integral_mono (kernel.metricDefinedMass_integrable input coordinate)
+        (integrable_const 1) (fun sample ↦
+          kernel.predictionKernel.metricDefinedMassAt_le_one input sample coordinate)
+    _ = 1 := by simp
+
+/-- Exact global skip-undefined report: integrate the numerator and definedness mass
+separately, then divide once. If no realization defines the metric, return `none`. -/
+noncomputable def FinitePipelineKernel.expectedOutput
+    {Sample : Type*} [MeasurableSpace Sample] {D : ℕ}
+    (kernel : FinitePipelineKernel Sample D) (input : VisiblePipelineInput D) :
+    PipelineOutput D :=
+  fun coordinate ↦
+    let mass := kernel.definedProbability input coordinate
+    if mass = 0 then none else some (kernel.weightedMetric input coordinate / mass)
+
+/-- The corrected pipeline report is exactly the conditional metric under its constructed
+joint experiment. This proves the connection; it is not an equality supplied by the caller. -/
+theorem FinitePipelineKernel.expectedOutput_eq_jointConditionalMetric
+    {Sample : Type*} [MeasurableSpace Sample] {D : ℕ}
+    (kernel : FinitePipelineKernel Sample D) (input : VisiblePipelineInput D)
+    (coordinate : PipelineQuantity D) :
+    kernel.expectedOutput input coordinate =
+      PartialMetricMixture.conditionalMetric (kernel.jointMeasure input)
+        (fun pair ↦ kernel.predictionKernel.outcomeMetricAt input pair.1 pair.2 coordinate) := by
+  symm
+  simpa only [FinitePipelineKernel.jointMeasure, FinitePipelineKernel.outcomeKernel_lawAt,
+    PredictionPipelineKernel.outcomeLawAt_definedMass,
+    PredictionPipelineKernel.outcomeLawAt_weightedMetric, FinitePipelineKernel.expectedOutput,
+    FinitePipelineKernel.definedProbability, FinitePipelineKernel.weightedMetric]
+    using PartialMetricMixture.conditionalMetric_jointMeasure (kernel.outcomeKernel input)
+      (kernel.predictionKernel.scoreKernel.drawLaw input)
+      (fun pair ↦ kernel.predictionKernel.outcomeMetricAt input pair.1 pair.2 coordinate)
+      (kernel.definedOutcome_integrable input coordinate)
+      (kernel.weightedOutcome_integrable input coordinate)
+
+theorem FinitePipelineKernel.expectedOutput_eq_none_iff
+    {Sample : Type*} [MeasurableSpace Sample] {D : ℕ}
+    (kernel : FinitePipelineKernel Sample D) (input : VisiblePipelineInput D)
+    (coordinate : PipelineQuantity D) :
+    kernel.expectedOutput input coordinate = none ↔
+      kernel.definedProbability input coordinate = 0 := by
+  by_cases hmass : kernel.definedProbability input coordinate = 0 <;>
+    simp [FinitePipelineKernel.expectedOutput, hmass]
+
+/-- The fully marginalized report has no residual completion coordinate. Its law is the
+globally normalized output above, not an average of panel-specific conditional outputs. -/
+noncomputable def FinitePipelineKernel.expectedCompletionLaw
+    {Sample : Type*} [MeasurableSpace Sample] {D : ℕ}
+    (kernel : FinitePipelineKernel Sample D) : PipelineCompletionLaw D PUnit where
+  value := fun input _completion coordinate ↦ kernel.expectedOutput input coordinate
 
 /-- Once the actual kernel is constructed, all finite metric draws integrate to an exact
-visible-input partial readout.  The theorem is composition, not a construction of the kernel. -/
+visible-input partial readout with one global definedness normalization. The theorem is
+composition, not a construction of the biological or executable kernel. -/
 theorem FinitePipelineKernel.hasExactExpectedReadout
     {Sample : Type*} [MeasurableSpace Sample] {D : ℕ}
     (kernel : FinitePipelineKernel Sample D) :
-    HasExactPipelineReadout kernel.toPartialSemantics.expectedCompletionLaw :=
-  kernel.toPartialSemantics.hasExactExpectedReadout
+    HasExactPipelineReadout kernel.expectedCompletionLaw := by
+  exact ⟨kernel.expectedOutput, fun _input _completion _coordinate ↦ rfl⟩
 
 /-- The pooled formula exposes its diagonal and off-diagonal pieces exactly. -/
 theorem DemeMixture.pooledAUC_diagonal_offDiagonal {D : ℕ} (mix : DemeMixture D) :
