@@ -38721,6 +38721,14 @@
    "Descent.Portability.GaussianInverseQuadratic.ae_coordinates_nonzero",
    "Descent.Portability.GaussianInverseQuadratic.gaussian_square_product_integrable",
    "Descent.Portability.GaussianInverseQuadratic.quotient_integrable_of_product_lower",
+   "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit",
+   "Descent.Portability.GaussianPanelLaw.bag_relabel",
+   "Descent.Portability.GaussianPanelLaw.centered_gaussian_eq_of_covariance_eq",
+   "Descent.Portability.GaussianPanelLaw.covariance_relabel",
+   "Descent.Portability.GaussianPanelLaw.projection_surjective",
+   "Descent.Portability.GaussianPanelLaw.projection_variance",
+   "Descent.Portability.GaussianPanelLaw.symmetricPhase_continuous",
+   "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral",
    "Descent.Portability.GaussianSlabLaw.graphPoint_continuous",
    "Descent.Portability.GaussianSlabLaw.linearForm_continuous",
    "Descent.Portability.GaussianSlabLaw.linearForm_update",
@@ -39907,6 +39915,14 @@
     "Descent.Portability.GaussianInverseQuadratic.ae_coordinates_nonzero": [],
     "Descent.Portability.GaussianInverseQuadratic.gaussian_square_product_integrable": [],
     "Descent.Portability.GaussianInverseQuadratic.quotient_integrable_of_product_lower": [],
+    "Descent.Portability.GaussianPanelLaw.projection_variance": [],
+    "Descent.Portability.GaussianPanelLaw.covariance_relabel": [],
+    "Descent.Portability.GaussianPanelLaw.bag_relabel": [],
+    "Descent.Portability.GaussianPanelLaw.symmetricPhase_continuous": [],
+    "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral": [],
+    "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit": [],
+    "Descent.Portability.GaussianPanelLaw.projection_surjective": [],
+    "Descent.Portability.GaussianPanelLaw.centered_gaussian_eq_of_covariance_eq": [],
     "Descent.Portability.GaussianSlabLaw.linearForm_continuous": [],
     "Descent.Portability.GaussianSlabLaw.linearForm_update": [],
     "Descent.Portability.GaussianSlabLaw.graphPoint_continuous": [],
@@ -48389,6 +48405,14 @@
    "Descent.Portability.GaussianInverseQuadratic.ae_coordinates_nonzero",
    "Descent.Portability.GaussianInverseQuadratic.gaussian_square_product_integrable",
    "Descent.Portability.GaussianInverseQuadratic.quotient_integrable_of_product_lower",
+   "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit",
+   "Descent.Portability.GaussianPanelLaw.bag_relabel",
+   "Descent.Portability.GaussianPanelLaw.centered_gaussian_eq_of_covariance_eq",
+   "Descent.Portability.GaussianPanelLaw.covariance_relabel",
+   "Descent.Portability.GaussianPanelLaw.projection_surjective",
+   "Descent.Portability.GaussianPanelLaw.projection_variance",
+   "Descent.Portability.GaussianPanelLaw.symmetricPhase_continuous",
+   "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral",
    "Descent.Portability.GaussianSlabLaw.graphPoint_continuous",
    "Descent.Portability.GaussianSlabLaw.linearForm_continuous",
    "Descent.Portability.GaussianSlabLaw.linearForm_update",
@@ -49553,6 +49577,14 @@
     "Descent.Portability.GaussianInverseQuadratic.ae_coordinates_nonzero": [],
     "Descent.Portability.GaussianInverseQuadratic.gaussian_square_product_integrable": [],
     "Descent.Portability.GaussianInverseQuadratic.quotient_integrable_of_product_lower": [],
+    "Descent.Portability.GaussianPanelLaw.projection_variance": [],
+    "Descent.Portability.GaussianPanelLaw.covariance_relabel": [],
+    "Descent.Portability.GaussianPanelLaw.bag_relabel": [],
+    "Descent.Portability.GaussianPanelLaw.symmetricPhase_continuous": [],
+    "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral": [],
+    "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit": [],
+    "Descent.Portability.GaussianPanelLaw.projection_surjective": [],
+    "Descent.Portability.GaussianPanelLaw.centered_gaussian_eq_of_covariance_eq": [],
     "Descent.Portability.GaussianSlabLaw.linearForm_continuous": [],
     "Descent.Portability.GaussianSlabLaw.linearForm_update": [],
     "Descent.Portability.GaussianSlabLaw.graphPoint_continuous": [],
@@ -67328,6 +67360,14 @@
    "Descent.Portability.GaussianInverseQuadratic.ae_coordinates_nonzero",
    "Descent.Portability.GaussianInverseQuadratic.gaussian_square_product_integrable",
    "Descent.Portability.GaussianInverseQuadratic.quotient_integrable_of_product_lower",
+   "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit",
+   "Descent.Portability.GaussianPanelLaw.bag_relabel",
+   "Descent.Portability.GaussianPanelLaw.centered_gaussian_eq_of_covariance_eq",
+   "Descent.Portability.GaussianPanelLaw.covariance_relabel",
+   "Descent.Portability.GaussianPanelLaw.projection_surjective",
+   "Descent.Portability.GaussianPanelLaw.projection_variance",
+   "Descent.Portability.GaussianPanelLaw.symmetricPhase_continuous",
+   "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral",
    "Descent.Portability.GaussianSlabLaw.graphPoint_continuous",
    "Descent.Portability.GaussianSlabLaw.linearForm_continuous",
    "Descent.Portability.GaussianSlabLaw.linearForm_update",
@@ -68565,6 +68605,14 @@
     "Descent.Portability.GaussianInverseQuadratic.ae_coordinates_nonzero": [],
     "Descent.Portability.GaussianInverseQuadratic.gaussian_square_product_integrable": [],
     "Descent.Portability.GaussianInverseQuadratic.quotient_integrable_of_product_lower": [],
+    "Descent.Portability.GaussianPanelLaw.projection_variance": [],
+    "Descent.Portability.GaussianPanelLaw.covariance_relabel": [],
+    "Descent.Portability.GaussianPanelLaw.bag_relabel": [],
+    "Descent.Portability.GaussianPanelLaw.symmetricPhase_continuous": [],
+    "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral": [],
+    "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit": [],
+    "Descent.Portability.GaussianPanelLaw.projection_surjective": [],
+    "Descent.Portability.GaussianPanelLaw.centered_gaussian_eq_of_covariance_eq": [],
     "Descent.Portability.GaussianSlabLaw.linearForm_continuous": [],
     "Descent.Portability.GaussianSlabLaw.linearForm_update": [],
     "Descent.Portability.GaussianSlabLaw.graphPoint_continuous": [],
@@ -69340,6 +69388,8 @@
    "Descent.Portability.GaussianEffectPortabilityLaw.extendedNumerator_toReal",
    "Descent.Portability.GaussianEffectPortabilityLaw.innerValue_eq_iSup_clipped",
    "Descent.Portability.GaussianEffectPortabilityLaw.successProbability_eq_joint_defined",
+   "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff",
+   "Descent.Portability.GaussianPanelLaw.bag_relabel",
    "Descent.Portability.GaussianSlabLaw.section_lower",
    "Descent.Portability.HWEInteractionLaw.complexExpectation_independent_product",
    "Descent.Portability.HWEInteractionLaw.expectation_independent_product",
@@ -69755,6 +69805,8 @@
     "Descent.Portability.GaussianEffectPortabilityLaw.extendedNumerator_eq_iSup_clipped": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.successProbability_eq_joint_defined": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.extendedNumerator_toReal": [],
+    "Descent.Portability.GaussianPanelLaw.bag_relabel": [],
+    "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff": [],
     "Descent.Portability.GaussianSlabLaw.section_lower": [],
     "Descent.Portability.HWEInteractionLaw.expectation_independent_product": [],
     "Descent.Portability.HWEInteractionLaw.complexExpectation_independent_product": [],
@@ -70032,6 +70084,7 @@
    "Descent.Portability.FiniteReportLaw.all_bounded_metric_errors_le_iff",
    "Descent.Portability.FirthFiniteIterationLaw.clippedStep_coordinate_bound",
    "Descent.Portability.FirthFiniteIterationLaw.maxAbs_nonneg",
+   "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff",
    "Descent.Portability.GuardedMetricOptimization.scale_pos",
    "Descent.Portability.MarkovCoarseGraining.bounded_report_error",
    "Descent.Portability.OptimalMeasurementAllocation.allocation_lower_bound",
@@ -70247,6 +70300,7 @@
     "Descent.Portability.FiniteNumericalCertificate.totalVariation_kernel_change": [],
     "Descent.Portability.FirthFiniteIterationLaw.maxAbs_nonneg": [],
     "Descent.Portability.FirthFiniteIterationLaw.clippedStep_coordinate_bound": [],
+    "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff": [],
     "Descent.Portability.GuardedMetricOptimization.scale_pos": [],
     "Descent.Portability.MarkovCoarseGraining.bounded_report_error": [],
     "Descent.Portability.OptimalMeasurementAllocation.allocation_lower_bound": [],
@@ -84789,6 +84843,7 @@
    "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul",
    "Descent.Portability.FiniteReportLaw.variance_eq_rawMoments",
    "Descent.Portability.FiniteReportLaw.variance_nonneg",
+   "Descent.Portability.GaussianPanelLaw.projection_variance",
    "Descent.Portability.OptimalMeasurementAllocation.allocation_lower_bound",
    "Descent.Portability.OptimalMeasurementAllocation.optimal_among_allocations",
    "Descent.Portability.OptimalMeasurementAllocation.optimal_variance",
@@ -84883,6 +84938,7 @@
     "Descent.Portability.FiniteReportLaw.variance_eq_rawMoments": [],
     "Descent.Portability.FiniteReportLaw.variance_nonneg": [],
     "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul": [],
+    "Descent.Portability.GaussianPanelLaw.projection_variance": [],
     "Descent.Portability.OptimalMeasurementAllocation.variance_nonneg": [],
     "Descent.Portability.OptimalMeasurementAllocation.allocation_lower_bound": [],
     "Descent.Portability.OptimalMeasurementAllocation.optimal_variance": [],
@@ -85002,6 +85058,13 @@
    "Descent.Portability.FiniteReportLaw.covariance_eq_rawMoments",
    "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul",
    "Descent.Portability.FiniteReportLaw.variance_nonneg",
+   "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff",
+   "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit",
+   "Descent.Portability.GaussianPanelLaw.centered_gaussian_eq_of_covariance_eq",
+   "Descent.Portability.GaussianPanelLaw.covariance_relabel",
+   "Descent.Portability.GaussianPanelLaw.gaussian_characteristic",
+   "Descent.Portability.GaussianPanelLaw.projection_variance",
+   "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral",
    "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_covariance",
    "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_regression",
    "Descent.Portability.PThresholdTrainingLaw.flipSign_iff_negative_correlation",
@@ -85116,6 +85179,13 @@
     "Descent.Portability.FiniteReportLaw.covariance_eq_rawMoments": [],
     "Descent.Portability.FiniteReportLaw.variance_nonneg": [],
     "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul": [],
+    "Descent.Portability.GaussianPanelLaw.projection_variance": [],
+    "Descent.Portability.GaussianPanelLaw.gaussian_characteristic": [],
+    "Descent.Portability.GaussianPanelLaw.covariance_relabel": [],
+    "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral": [],
+    "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit": [],
+    "Descent.Portability.GaussianPanelLaw.centered_gaussian_eq_of_covariance_eq": [],
+    "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff": [],
     "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_covariance": [],
     "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_regression": [],
     "Descent.Portability.PThresholdTrainingLaw.flipSign_iff_negative_correlation": [],
@@ -95776,6 +95846,7 @@
    "Descent.Portability.CalibrationLaw.calibrated_effectProbability_measurable",
    "Descent.Portability.CalibrationLaw.normalized_prevalence_continuous",
    "Descent.Portability.CalibrationLaw.prevalence_continuous",
+   "Descent.Portability.ContinuousMemoryLaw.hiddenIntegrand_continuous",
    "Descent.Portability.ControlledCoarseGraining.bridge_derivative",
    "Descent.Portability.ControlledCoarseGraining.contraction_defect_bound",
    "Descent.Portability.ControlledCoarseGraining.defectIntegrand_continuous",
@@ -95788,6 +95859,9 @@
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.GaussianCovarianceSeparation.exponential_characters_independent",
    "Descent.Portability.GaussianEffectPortabilityLaw.formRatio_observable_measurable",
+   "Descent.Portability.GaussianPanelLaw.projection_surjective",
+   "Descent.Portability.GaussianPanelLaw.symmetricPhase_continuous",
+   "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral",
    "Descent.Portability.GaussianSlabLaw.graphPoint_continuous",
    "Descent.Portability.GaussianSlabLaw.local_cylinder",
    "Descent.Portability.HasPositiveLowerBound.comp",
@@ -95888,6 +95962,7 @@
     "Descent.Portability.CalibrationLaw.normalized_prevalence_continuous": [],
     "Descent.Portability.CalibrationLaw.calibrated_caseProbability_measurable": [],
     "Descent.Portability.CalibrationLaw.calibrated_effectProbability_measurable": [],
+    "Descent.Portability.ContinuousMemoryLaw.hiddenIntegrand_continuous": [],
     "Descent.Portability.ControlledCoarseGraining.defectIntegrand_continuous": [],
     "Descent.Portability.ControlledCoarseGraining.bridge_derivative": [],
     "Descent.Portability.ControlledCoarseGraining.defect_integral_identity": [],
@@ -95927,6 +96002,9 @@
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
     "Descent.Portability.GaussianCovarianceSeparation.exponential_characters_independent": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.formRatio_observable_measurable": [],
+    "Descent.Portability.GaussianPanelLaw.symmetricPhase_continuous": [],
+    "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral": [],
+    "Descent.Portability.GaussianPanelLaw.projection_surjective": [],
     "Descent.Portability.GaussianSlabLaw.graphPoint_continuous": [],
     "Descent.Portability.GaussianSlabLaw.local_cylinder": [],
     "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable": [],
@@ -118911,6 +118989,7 @@
    "Descent.PopGen.MafSpectrum.fourthMoment_eq",
    "Descent.PopGen.MafSpectrum.sixthMoment_eq_floorOne_plus_dispersion",
    "Descent.PopGen.MeanAbsoluteEffectCertificateProblem.finiteProblem_moment",
+   "Descent.Portability.ContinuousMemoryLaw.propagated_hidden_derivative",
    "Descent.Portability.ControlledCoarseGraining.bridge_derivative",
    "Descent.Spectral.ScalarSecondMoments.gamma_symmetric_of_stationary"
   ],
@@ -118959,6 +119038,7 @@
      "spectrum.moment 4 = spectrum'.moment 4",
      "spectrum.moment 6 ≠ spectrum'.moment 6"
     ],
+    "Descent.Portability.ContinuousMemoryLaw.propagated_hidden_derivative": [],
     "Descent.Portability.ControlledCoarseGraining.bridge_derivative": [],
     "Descent.Spectral.ScalarSecondMoments.gamma_symmetric_of_stationary": []
    }
@@ -130179,6 +130259,69 @@
    }
   }
  },
+ "Descent.Portability.ContinuousMemoryLaw.hiddenIntegrand": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'L[ℝ] F'\")",
+  "file": "Descent/Portability/ContinuousMemoryLaw.lean",
+  "line": 23,
+  "short": "hiddenIntegrand",
+  "ret_type": "F",
+  "empirical_status": "",
+  "python": "hiddenIntegrand",
+  "args": [
+   "coupling",
+   "hidden",
+   "retained",
+   "horizon",
+   "time"
+  ],
+  "box": {
+   "horizon": [
+    0.05,
+    3.0
+   ],
+   "time": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'L[ℝ] F'\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ContinuousMemoryLaw.hiddenIntegrand_continuous",
+   "Descent.Portability.ContinuousMemoryLaw.hidden_expansion",
+   "Descent.Portability.ContinuousMemoryLaw.propagated_hidden_derivative",
+   "Descent.Portability.ContinuousMemoryLaw.retained_memory"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "Continuous retained",
+    "∀ time, HasDerivAt discarded (coupling (retained time",
+    "∀ time, HasDerivAt retained (direct (retained time"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ContinuousMemoryLaw.hiddenIntegrand_continuous": [
+     "Continuous retained"
+    ],
+    "Descent.Portability.ContinuousMemoryLaw.propagated_hidden_derivative": [
+     "∀ time, HasDerivAt discarded (coupling (retained time"
+    ],
+    "Descent.Portability.ContinuousMemoryLaw.hidden_expansion": [
+     "Continuous retained",
+     "∀ time, HasDerivAt discarded (coupling (retained time"
+    ],
+    "Descent.Portability.ContinuousMemoryLaw.retained_memory": [
+     "∀ time, HasDerivAt retained (direct (retained time",
+     "∀ time, HasDerivAt discarded (coupling (retained time"
+    ]
+   }
+  }
+ },
  "Descent.Portability.posteriorMean": {
   "class": "NUMERIC",
   "note": "",
@@ -132705,6 +132848,9 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.ContinuousMemoryLaw.hidden_expansion",
+   "Descent.Portability.ContinuousMemoryLaw.propagated_hidden_derivative",
+   "Descent.Portability.ContinuousMemoryLaw.retained_memory",
    "Descent.Portability.ControlledCoarseGraining.bridge_derivative",
    "Descent.Portability.ControlledCoarseGraining.contraction_defect_bound",
    "Descent.Portability.ControlledCoarseGraining.defect_integral_identity",
@@ -132726,12 +132872,24 @@
   ],
   "constraints": {
    "hypotheses": [
+    "∀ time, HasDerivAt discarded (coupling (retained time",
+    "∀ time, HasDerivAt retained (direct (retained time",
     "∀ time, 0 ≤ time → ‖evolution fine time‖ ≤ 1",
     "∀ time, 0 ≤ time → ‖evolution coarse time‖ ≤ 1",
     "HasDerivAt evolution generator 0",
     "0 ≤ time"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ContinuousMemoryLaw.propagated_hidden_derivative": [
+     "∀ time, HasDerivAt discarded (coupling (retained time"
+    ],
+    "Descent.Portability.ContinuousMemoryLaw.hidden_expansion": [
+     "∀ time, HasDerivAt discarded (coupling (retained time"
+    ],
+    "Descent.Portability.ContinuousMemoryLaw.retained_memory": [
+     "∀ time, HasDerivAt retained (direct (retained time",
+     "∀ time, HasDerivAt discarded (coupling (retained time"
+    ],
     "Descent.Portability.ControlledCoarseGraining.evolution_continuous": [],
     "Descent.Portability.ControlledCoarseGraining.bridge_derivative": [],
     "Descent.Portability.ControlledCoarseGraining.defect_integral_identity": [],
@@ -146593,6 +146751,13 @@
    "Descent.Portability.FiniteReportLaw.covariance_eq_rawMoments",
    "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul",
    "Descent.Portability.FiniteReportLaw.variance_nonneg",
+   "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff",
+   "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit",
+   "Descent.Portability.GaussianPanelLaw.centered_gaussian_eq_of_covariance_eq",
+   "Descent.Portability.GaussianPanelLaw.covariance_relabel",
+   "Descent.Portability.GaussianPanelLaw.gaussian_characteristic",
+   "Descent.Portability.GaussianPanelLaw.projection_variance",
+   "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral",
    "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_covariance",
    "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_regression",
    "Descent.Portability.PThresholdTrainingLaw.flipSign_iff_negative_correlation",
@@ -146703,6 +146868,13 @@
     "Descent.Portability.FiniteReportLaw.covariance_eq_rawMoments": [],
     "Descent.Portability.FiniteReportLaw.variance_nonneg": [],
     "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul": [],
+    "Descent.Portability.GaussianPanelLaw.projection_variance": [],
+    "Descent.Portability.GaussianPanelLaw.gaussian_characteristic": [],
+    "Descent.Portability.GaussianPanelLaw.covariance_relabel": [],
+    "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral": [],
+    "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit": [],
+    "Descent.Portability.GaussianPanelLaw.centered_gaussian_eq_of_covariance_eq": [],
+    "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff": [],
     "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_covariance": [
      "0 ≤ p ∧ p ≤ 1"
     ],
@@ -146847,6 +147019,7 @@
    "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul",
    "Descent.Portability.FiniteReportLaw.variance_eq_rawMoments",
    "Descent.Portability.FiniteReportLaw.variance_nonneg",
+   "Descent.Portability.GaussianPanelLaw.projection_variance",
    "Descent.Portability.OptimalMeasurementAllocation.allocation_lower_bound",
    "Descent.Portability.OptimalMeasurementAllocation.optimal_among_allocations",
    "Descent.Portability.OptimalMeasurementAllocation.optimal_variance",
@@ -146941,6 +147114,7 @@
     "Descent.Portability.FiniteReportLaw.variance_eq_rawMoments": [],
     "Descent.Portability.FiniteReportLaw.variance_nonneg": [],
     "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul": [],
+    "Descent.Portability.GaussianPanelLaw.projection_variance": [],
     "Descent.Portability.OptimalMeasurementAllocation.variance_nonneg": [],
     "Descent.Portability.OptimalMeasurementAllocation.allocation_lower_bound": [],
     "Descent.Portability.OptimalMeasurementAllocation.optimal_variance": [],
@@ -149375,7 +149549,8 @@
    "Descent.Portability.GaussianCovarianceSeparation.gaussianFourier_independent",
    "Descent.Portability.GaussianCovarianceSeparation.quadraticValue_pair",
    "Descent.Portability.GaussianCovarianceSeparation.quadraticValue_single",
-   "Descent.Portability.GaussianCovarianceSeparation.quadraticValue_smul"
+   "Descent.Portability.GaussianCovarianceSeparation.quadraticValue_smul",
+   "Descent.Portability.GaussianPanelLaw.projection_variance"
   ],
   "constraints": {
    "declared_kind": "ratio",
@@ -149403,7 +149578,8 @@
     "Descent.Portability.GaussianCovarianceSeparation.gaussianFourier_independent": [
      "∀ k i j, A k i j = A k j i",
      "Function.Injective A"
-    ]
+    ],
+    "Descent.Portability.GaussianPanelLaw.projection_variance": []
    }
   }
  },
@@ -149480,7 +149656,8 @@
   "mentioned_by": [
    "Descent.Portability.GaussianCovarianceSeparation.all_gaussianFourier_independent",
    "Descent.Portability.GaussianCovarianceSeparation.gaussianFourier_independent",
-   "Descent.Portability.GaussianCovarianceSeparation.orbitFourier_eq_iff"
+   "Descent.Portability.GaussianCovarianceSeparation.orbitFourier_eq_iff",
+   "Descent.Portability.GaussianPanelLaw.gaussian_characteristic"
   ],
   "constraints": {
    "declared_kind": "ratio",
@@ -149496,7 +149673,8 @@
      "Function.Injective A"
     ],
     "Descent.Portability.GaussianCovarianceSeparation.all_gaussianFourier_independent": [],
-    "Descent.Portability.GaussianCovarianceSeparation.orbitFourier_eq_iff": []
+    "Descent.Portability.GaussianCovarianceSeparation.orbitFourier_eq_iff": [],
+    "Descent.Portability.GaussianPanelLaw.gaussian_characteristic": []
    }
   }
  },
@@ -149550,7 +149728,10 @@
   "mentioned_by": [
    "Descent.Portability.GaussianCovarianceSeparation.orbitFourier_eq_iff",
    "Descent.Portability.GaussianCovarianceSeparation.permuteCovariance_mul",
-   "Descent.Portability.GaussianCovarianceSeparation.permuteCovariance_one"
+   "Descent.Portability.GaussianCovarianceSeparation.permuteCovariance_one",
+   "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff",
+   "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit",
+   "Descent.Portability.GaussianPanelLaw.covariance_relabel"
   ],
   "constraints": {
    "declared_kind": "ratio",
@@ -149560,7 +149741,10 @@
    "hypotheses_by_theorem": {
     "Descent.Portability.GaussianCovarianceSeparation.permuteCovariance_one": [],
     "Descent.Portability.GaussianCovarianceSeparation.permuteCovariance_mul": [],
-    "Descent.Portability.GaussianCovarianceSeparation.orbitFourier_eq_iff": []
+    "Descent.Portability.GaussianCovarianceSeparation.orbitFourier_eq_iff": [],
+    "Descent.Portability.GaussianPanelLaw.covariance_relabel": [],
+    "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit": [],
+    "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff": []
    }
   }
  },
@@ -149579,7 +149763,8 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
-   "Descent.Portability.GaussianCovarianceSeparation.orbitFourier_eq_iff"
+   "Descent.Portability.GaussianCovarianceSeparation.orbitFourier_eq_iff",
+   "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral"
   ],
   "constraints": {
    "declared_kind": "ratio",
@@ -149587,7 +149772,8 @@
    "declared_hi": 1.0,
    "hypotheses": [],
    "hypotheses_by_theorem": {
-    "Descent.Portability.GaussianCovarianceSeparation.orbitFourier_eq_iff": []
+    "Descent.Portability.GaussianCovarianceSeparation.orbitFourier_eq_iff": [],
+    "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral": []
    }
   }
  },
@@ -150464,6 +150650,522 @@
    "declared_kind": "probability",
    "declared_lo": 0.0,
    "declared_hi": 1.0
+  }
+ },
+ "Descent.Portability.GaussianPanelLaw.projection": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name ContinuousLinearMap.proj",
+  "file": "Descent/Portability/GaussianPanelLaw.lean",
+  "line": 25,
+  "short": "projection",
+  "ret_type": "(D → ℝ) →L[ℝ] ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Coalescent.matrixExponential_intertwines",
+   "Descent.Coalescent.matrix_pow_intertwines",
+   "Descent.Portability.ExactMemoryLaw.projected_block_steps",
+   "Descent.Portability.ExactMemoryLaw.projected_memory",
+   "Descent.Portability.ExactMemoryLaw.projection_discarded",
+   "Descent.Portability.ExactMemoryLaw.projection_retained",
+   "Descent.Portability.ExactMemoryLaw.retained_add_discarded",
+   "Descent.Portability.GaussianPanelLaw.gaussian_characteristic",
+   "Descent.Portability.GaussianPanelLaw.projection_apply",
+   "Descent.Portability.GaussianPanelLaw.projection_mean",
+   "Descent.Portability.GaussianPanelLaw.projection_surjective",
+   "Descent.Portability.GaussianPanelLaw.projection_variance",
+   "Descent.Portability.GaussianPanelLaw.symmetricPhase_continuous",
+   "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral",
+   "Descent.Portability.GaussianPanelLaw.symmetricPhase_relabel"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Coalescent.matrix_pow_intertwines": [],
+    "Descent.Coalescent.matrixExponential_intertwines": [],
+    "Descent.Portability.ExactMemoryLaw.retained_add_discarded": [],
+    "Descent.Portability.ExactMemoryLaw.projection_retained": [],
+    "Descent.Portability.ExactMemoryLaw.projection_discarded": [],
+    "Descent.Portability.ExactMemoryLaw.projected_block_steps": [],
+    "Descent.Portability.ExactMemoryLaw.projected_memory": [],
+    "Descent.Portability.GaussianPanelLaw.projection_apply": [],
+    "Descent.Portability.GaussianPanelLaw.projection_mean": [],
+    "Descent.Portability.GaussianPanelLaw.projection_variance": [],
+    "Descent.Portability.GaussianPanelLaw.gaussian_characteristic": [],
+    "Descent.Portability.GaussianPanelLaw.symmetricPhase_continuous": [],
+    "Descent.Portability.GaussianPanelLaw.symmetricPhase_relabel": [],
+    "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral": [],
+    "Descent.Portability.GaussianPanelLaw.projection_surjective": []
+   }
+  }
+ },
+ "Descent.Portability.GaussianPanelLaw.covariance": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "anonymous constructor",
+  "file": "Descent/Portability/GaussianPanelLaw.lean",
+  "line": 31,
+  "short": "covariance",
+  "ret_type": "SymmetricCovariance D",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Blindness.covarianceMatrix_addRankOneSignal",
+   "Descent.Blindness.covariance_imitation_of_rankOne_closed",
+   "Descent.Blindness.entryFourthSum_eq_sum_ldPowerScore_four",
+   "Descent.Blindness.entryPowerSum_four",
+   "Descent.Blindness.entryPowerSum_three",
+   "Descent.Blindness.entryPowerSum_two",
+   "Descent.Blindness.entrySquareSum_eq_trace_sq_of_symmetric",
+   "Descent.Blindness.no_isospectral_formula_for_blockEntryFourthMean",
+   "Descent.Blindness.spiked_genotype_covariance_belowCeiling_of_threshold",
+   "Descent.Foundations.covariance_add_left_exp",
+   "Descent.Foundations.covariance_add_right",
+   "Descent.Foundations.covariance_affine_right",
+   "Descent.Foundations.covariance_comm_exp",
+   "Descent.Foundations.covariance_eq_expect_mul_sub_means",
+   "Descent.Foundations.covariance_finset_sum_right",
+   "Descent.Foundations.covariance_linScore_eq_dot_crossCov",
+   "Descent.Foundations.covariance_linScore_left",
+   "Descent.Foundations.covariance_linScore_linScore",
+   "Descent.Foundations.covariance_smul_left_exp",
+   "Descent.Foundations.covariance_smul_right",
+   "Descent.Foundations.covariance_with_causal_signal",
+   "Descent.Foundations.mse_eq_variance_add_variance_sub_two_cov_add_bias_sq",
+   "Descent.Foundations.mse_from_variance_ratio_corr_bias",
+   "Descent.Foundations.variance_add_exp",
+   "Descent.Foundations.variance_eq_covariance_self",
+   "Descent.Portability.DeploymentPopulation.deployedMse_eq",
+   "Descent.Portability.DeploymentPopulation.predictiveCovariance_sq_le",
+   "Descent.Portability.DeploymentPopulation.r2_affine_invariant",
+   "Descent.Portability.DeploymentPopulation.recalibrated_mse_eq",
+   "Descent.Portability.DiploidEffectLaw.additiveEffect_normal_equations",
+   "Descent.Portability.DiploidEffectLaw.additiveEffect_unique",
+   "Descent.Portability.DiploidEffectLaw.genotype_covariance",
+   "Descent.Portability.DiploidEffectLaw.partialMean_covariance",
+   "Descent.Portability.FiniteReportLaw.covariance_eq_rawMoments",
+   "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul",
+   "Descent.Portability.FiniteReportLaw.variance_nonneg",
+   "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff",
+   "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit",
+   "Descent.Portability.GaussianPanelLaw.centered_gaussian_eq_of_covariance_eq",
+   "Descent.Portability.GaussianPanelLaw.covariance_relabel",
+   "Descent.Portability.GaussianPanelLaw.gaussian_characteristic",
+   "Descent.Portability.GaussianPanelLaw.projection_variance",
+   "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral",
+   "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_covariance",
+   "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_regression",
+   "Descent.Portability.PThresholdTrainingLaw.flipSign_iff_negative_correlation",
+   "Descent.Portability.PortabilityRatioGeometry.trait_domination_iff",
+   "Descent.Portability.ProbitTrainingLaw.reportedAccuracy_eq_moment_sum",
+   "Descent.Portability.SimulationAccuracy.covariance_affine",
+   "Descent.Portability.SimulationAccuracy.covariance_two_scores",
+   "Descent.Portability.TrainingNoiseAccuracy.covariance_linearScore",
+   "Descent.Portability.TrainingNoiseAccuracy.covariance_symmetric",
+   "Descent.Portability.TrainingNoiseAccuracy.squaredCorrelation_linearScore",
+   "Descent.Portability.TrainingNoiseAccuracy.variance_linearScore",
+   "Descent.Portability.covariance_uniformExp_four",
+   "Descent.Portability.ld_r2_matches_covariance_response_retention",
+   "Descent.Portability.twoContrast_contextX",
+   "Descent.Portability.twoContrast_kappa",
+   "Descent.Portability.twoContrast_predictiveCovariance",
+   "Descent.Spectral.centeredSquareVariance_gaussian",
+   "Descent.Spectral.covarianceMomentPermeability_gaussian",
+   "Descent.Spectral.covarianceMomentPermeability_kurtosis_eq_gaussian_factor",
+   "Descent.Spectral.covarianceScoreInformation_gaussian",
+   "Descent.Spectral.covarianceScoreInformation_kurtosis",
+   "Descent.Spectral.covarianceTangentEstimatorVariance_kurtosis_attenuation",
+   "Descent.Spectral.covarianceTangentEstimatorVariance_kurtosis_eq_gaussian_factor",
+   "Descent.Spectral.diagonalCovarianceMomentPermeability_gaussian",
+   "Descent.Spectral.diagonalPermeability_derivative_scale",
+   "Descent.Spectral.diagonalPermeability_eq_zero_iff",
+   "Descent.Spectral.finiteEnvironmentCovariancePool_energy",
+   "Descent.Spectral.finiteEnvironmentCovariancePool_energy_eq_zero_iff_active",
+   "Descent.Spectral.finiteEnvironmentCovariancePool_energy_nonneg",
+   "Descent.Spectral.finiteEnvironmentCovariancePool_energy_pos_iff_exists_active",
+   "Descent.Spectral.finiteEnvironmentCovariancePool_kernel_ssubset",
+   "Descent.Spectral.finiteEnvironmentCovariancePool_kernel_ssubset_active",
+   "Descent.Spectral.finiteEnvironmentCovariancePool_mulVec",
+   "Descent.Spectral.finiteEnvironmentCovariancePool_mulVec_eq_zero_iff",
+   "Descent.Spectral.finiteEnvironmentCovariancePool_mulVec_eq_zero_iff_active",
+   "Descent.Spectral.finiteEnvironmentCovariancePool_mulVec_ne_zero_of_exists",
+   "Descent.Spectral.finiteEnvironmentCovariancePool_mulVec_ne_zero_of_exists_active",
+   "Descent.Spectral.gaussianCovarianceHalfSquaredRisk_eq",
+   "Descent.Spectral.gaussianCovarianceTangentEstimatorVariance_eq",
+   "Descent.Spectral.gaussianCovarianceTangentEstimatorVariance_eq_inv_information",
+   "Descent.Spectral.gaussianCovarianceTangentEstimatorVariance_pos",
+   "Descent.Spectral.inverse_square_replicates_compensate_attenuation",
+   "Descent.Spectral.lagCompletionPermeability_eq_zero_iff",
+   "Descent.Spectral.multivariateGaussianPermeability_diagonal",
+   "Descent.Spectral.no_uniformQuadraticPortabilityBound_to_activeEnvironmentPool",
+   "Descent.Spectral.no_uniformQuadraticPortabilityBound_to_finiteEnvironmentPool",
+   "Descent.Spectral.scalarPermeability_derivative_scale",
+   "Descent.Spectral.scalarPermeability_eq_zero_iff",
+   "Descent.Spectral.scalarPermeability_nonneg",
+   "Descent.Spectral.scalarPermeability_rescale",
+   "Descent.Spectral.totalGaussianInformation_mul_estimatorVariance"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "hypotheses": [
+    "Centered μ",
+    "μ.map bag = ν.map bag",
+    "covariance μ = covariance ν"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Blindness.covarianceMatrix_addRankOneSignal": [],
+    "Descent.Blindness.covariance_imitation_of_rankOne_closed": [],
+    "Descent.Blindness.spiked_genotype_covariance_belowCeiling_of_threshold": [],
+    "Descent.Blindness.entryPowerSum_three": [],
+    "Descent.Blindness.entryPowerSum_four": [],
+    "Descent.Blindness.entryFourthSum_eq_sum_ldPowerScore_four": [],
+    "Descent.Blindness.no_isospectral_formula_for_blockEntryFourthMean": [],
+    "Descent.Blindness.entryPowerSum_two": [],
+    "Descent.Blindness.entrySquareSum_eq_trace_sq_of_symmetric": [],
+    "Descent.Foundations.covariance_eq_expect_mul_sub_means": [],
+    "Descent.Foundations.mse_eq_variance_add_variance_sub_two_cov_add_bias_sq": [],
+    "Descent.Foundations.covariance_add_right": [],
+    "Descent.Foundations.covariance_smul_right": [],
+    "Descent.Foundations.covariance_finset_sum_right": [],
+    "Descent.Foundations.covariance_comm_exp": [],
+    "Descent.Foundations.covariance_add_left_exp": [],
+    "Descent.Foundations.covariance_smul_left_exp": [],
+    "Descent.Foundations.variance_eq_covariance_self": [],
+    "Descent.Foundations.variance_add_exp": [],
+    "Descent.Foundations.covariance_affine_right": [],
+    "Descent.Foundations.covariance_with_causal_signal": [],
+    "Descent.Foundations.covariance_linScore_left": [],
+    "Descent.Foundations.covariance_linScore_linScore": [],
+    "Descent.Foundations.covariance_linScore_eq_dot_crossCov": [],
+    "Descent.Foundations.mse_from_variance_ratio_corr_bias": [],
+    "Descent.Portability.ld_r2_matches_covariance_response_retention": [],
+    "Descent.Portability.DiploidEffectLaw.partialMean_covariance": [],
+    "Descent.Portability.DiploidEffectLaw.genotype_covariance": [],
+    "Descent.Portability.DiploidEffectLaw.additiveEffect_normal_equations": [],
+    "Descent.Portability.DiploidEffectLaw.additiveEffect_unique": [],
+    "Descent.Portability.FiniteReportLaw.covariance_eq_rawMoments": [],
+    "Descent.Portability.FiniteReportLaw.variance_nonneg": [],
+    "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul": [],
+    "Descent.Portability.GaussianPanelLaw.projection_variance": [],
+    "Descent.Portability.GaussianPanelLaw.gaussian_characteristic": [
+     "Centered μ"
+    ],
+    "Descent.Portability.GaussianPanelLaw.covariance_relabel": [],
+    "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral": [
+     "Centered μ"
+    ],
+    "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit": [
+     "Centered μ",
+     "μ.map bag = ν.map bag"
+    ],
+    "Descent.Portability.GaussianPanelLaw.centered_gaussian_eq_of_covariance_eq": [
+     "Centered μ",
+     "covariance μ = covariance ν"
+    ],
+    "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff": [
+     "Centered μ"
+    ],
+    "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_covariance": [],
+    "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_regression": [],
+    "Descent.Portability.PThresholdTrainingLaw.flipSign_iff_negative_correlation": [],
+    "Descent.Portability.DeploymentPopulation.deployedMse_eq": [],
+    "Descent.Portability.DeploymentPopulation.predictiveCovariance_sq_le": [],
+    "Descent.Portability.covariance_uniformExp_four": [],
+    "Descent.Portability.twoContrast_predictiveCovariance": [],
+    "Descent.Portability.twoContrast_kappa": [],
+    "Descent.Portability.twoContrast_contextX": [],
+    "Descent.Portability.DeploymentPopulation.recalibrated_mse_eq": [],
+    "Descent.Portability.DeploymentPopulation.r2_affine_invariant": [],
+    "Descent.Portability.PortabilityRatioGeometry.trait_domination_iff": [],
+    "Descent.Portability.ProbitTrainingLaw.reportedAccuracy_eq_moment_sum": [],
+    "Descent.Portability.TrainingNoiseAccuracy.covariance_symmetric": [],
+    "Descent.Portability.TrainingNoiseAccuracy.covariance_linearScore": [],
+    "Descent.Portability.TrainingNoiseAccuracy.variance_linearScore": [],
+    "Descent.Portability.TrainingNoiseAccuracy.squaredCorrelation_linearScore": [],
+    "Descent.Portability.SimulationAccuracy.covariance_affine": [],
+    "Descent.Portability.SimulationAccuracy.covariance_two_scores": [],
+    "Descent.Spectral.centeredSquareVariance_gaussian": [],
+    "Descent.Spectral.covarianceScoreInformation_gaussian": [],
+    "Descent.Spectral.covarianceScoreInformation_kurtosis": [],
+    "Descent.Spectral.covarianceMomentPermeability_gaussian": [],
+    "Descent.Spectral.covarianceMomentPermeability_kurtosis_eq_gaussian_factor": [],
+    "Descent.Spectral.scalarPermeability_nonneg": [],
+    "Descent.Spectral.scalarPermeability_eq_zero_iff": [],
+    "Descent.Spectral.scalarPermeability_rescale": [],
+    "Descent.Spectral.scalarPermeability_derivative_scale": [],
+    "Descent.Spectral.diagonalCovarianceMomentPermeability_gaussian": [],
+    "Descent.Spectral.diagonalPermeability_derivative_scale": [],
+    "Descent.Spectral.multivariateGaussianPermeability_diagonal": [],
+    "Descent.Spectral.gaussianCovarianceTangentEstimatorVariance_eq": [],
+    "Descent.Spectral.covarianceTangentEstimatorVariance_kurtosis_eq_gaussian_factor": [],
+    "Descent.Spectral.covarianceTangentEstimatorVariance_kurtosis_attenuation": [],
+    "Descent.Spectral.gaussianCovarianceTangentEstimatorVariance_pos": [],
+    "Descent.Spectral.totalGaussianInformation_mul_estimatorVariance": [],
+    "Descent.Spectral.gaussianCovarianceTangentEstimatorVariance_eq_inv_information": [],
+    "Descent.Spectral.gaussianCovarianceHalfSquaredRisk_eq": [],
+    "Descent.Spectral.inverse_square_replicates_compensate_attenuation": [],
+    "Descent.Spectral.diagonalPermeability_eq_zero_iff": [],
+    "Descent.Spectral.lagCompletionPermeability_eq_zero_iff": [],
+    "Descent.Spectral.finiteEnvironmentCovariancePool_mulVec": [],
+    "Descent.Spectral.finiteEnvironmentCovariancePool_energy": [],
+    "Descent.Spectral.finiteEnvironmentCovariancePool_energy_pos_iff_exists_active": [],
+    "Descent.Spectral.finiteEnvironmentCovariancePool_energy_nonneg": [],
+    "Descent.Spectral.finiteEnvironmentCovariancePool_energy_eq_zero_iff_active": [],
+    "Descent.Spectral.finiteEnvironmentCovariancePool_mulVec_eq_zero_iff_active": [],
+    "Descent.Spectral.finiteEnvironmentCovariancePool_mulVec_eq_zero_iff": [],
+    "Descent.Spectral.finiteEnvironmentCovariancePool_mulVec_ne_zero_of_exists_active": [],
+    "Descent.Spectral.finiteEnvironmentCovariancePool_mulVec_ne_zero_of_exists": [],
+    "Descent.Spectral.finiteEnvironmentCovariancePool_kernel_ssubset_active": [],
+    "Descent.Spectral.finiteEnvironmentCovariancePool_kernel_ssubset": [],
+    "Descent.Spectral.no_uniformQuadraticPortabilityBound_to_activeEnvironmentPool": [],
+    "Descent.Spectral.no_uniformQuadraticPortabilityBound_to_finiteEnvironmentPool": []
+   }
+  }
+ },
+ "Descent.Portability.GaussianPanelLaw.Centered": {
+  "class": "STRUCTURAL",
+  "note": "Prop-valued / set-valued",
+  "file": "Descent/Portability/GaussianPanelLaw.lean",
+  "line": 35,
+  "short": "Centered",
+  "ret_type": "Prop",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff",
+   "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit",
+   "Descent.Portability.GaussianPanelLaw.centered_gaussian_eq_of_covariance_eq",
+   "Descent.Portability.GaussianPanelLaw.centered_relabel",
+   "Descent.Portability.GaussianPanelLaw.gaussian_characteristic",
+   "Descent.Portability.GaussianPanelLaw.projection_mean",
+   "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "Centered μ",
+    "μ.map bag = ν.map bag",
+    "covariance μ = covariance ν"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.GaussianPanelLaw.projection_mean": [
+     "Centered μ"
+    ],
+    "Descent.Portability.GaussianPanelLaw.gaussian_characteristic": [
+     "Centered μ"
+    ],
+    "Descent.Portability.GaussianPanelLaw.centered_relabel": [
+     "Centered μ"
+    ],
+    "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral": [
+     "Centered μ"
+    ],
+    "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit": [
+     "Centered μ",
+     "μ.map bag = ν.map bag"
+    ],
+    "Descent.Portability.GaussianPanelLaw.centered_gaussian_eq_of_covariance_eq": [
+     "Centered μ",
+     "covariance μ = covariance ν"
+    ],
+    "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff": [
+     "Centered μ"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.GaussianPanelLaw.relabel": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name Pi.compRightL",
+  "file": "Descent/Portability/GaussianPanelLaw.lean",
+  "line": 74,
+  "short": "relabel",
+  "ret_type": "(D → ℝ) →L[ℝ] (D → ℝ)",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Blindness.alignmentEnergy_perm_invariant",
+   "Descent.Blindness.marginEnergy_perm_invariant",
+   "Descent.Blindness.sum_double_comp_perm",
+   "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff",
+   "Descent.Portability.GaussianPanelLaw.bag_relabel",
+   "Descent.Portability.GaussianPanelLaw.centered_relabel",
+   "Descent.Portability.GaussianPanelLaw.covariance_relabel",
+   "Descent.Portability.GaussianPanelLaw.relabel_apply",
+   "Descent.Portability.GaussianPanelLaw.symmetricPhase_continuous",
+   "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral",
+   "Descent.Portability.GaussianPanelLaw.symmetricPhase_relabel",
+   "Descent.Portability.stratifiedCalibrationEnergy_relabel_invariant"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Blindness.marginEnergy_perm_invariant": [],
+    "Descent.Blindness.sum_double_comp_perm": [],
+    "Descent.Blindness.alignmentEnergy_perm_invariant": [],
+    "Descent.Portability.stratifiedCalibrationEnergy_relabel_invariant": [],
+    "Descent.Portability.GaussianPanelLaw.relabel_apply": [],
+    "Descent.Portability.GaussianPanelLaw.centered_relabel": [],
+    "Descent.Portability.GaussianPanelLaw.covariance_relabel": [],
+    "Descent.Portability.GaussianPanelLaw.bag_relabel": [],
+    "Descent.Portability.GaussianPanelLaw.symmetricPhase_continuous": [],
+    "Descent.Portability.GaussianPanelLaw.symmetricPhase_relabel": [],
+    "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral": [],
+    "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff": []
+   }
+  }
+ },
+ "Descent.Portability.GaussianPanelLaw.panelSetoid": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/GaussianPanelLaw.lean",
+  "line": 95,
+  "short": "panelSetoid",
+  "ret_type": "Setoid (D → ℝ) where r x y",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [],
+  "constraints": {}
+ },
+ "Descent.Portability.GaussianPanelLaw.Bag": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'Type*'\")",
+  "file": "Descent/Portability/GaussianPanelLaw.lean",
+  "line": 106,
+  "short": "Bag",
+  "ret_type": "",
+  "empirical_status": "",
+  "python": "Bag",
+  "args": [
+   "D"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'Type*'\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.GaussianPanelLaw.bag_measurable"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.GaussianPanelLaw.bag_measurable": []
+   }
+  }
+ },
+ "Descent.Portability.GaussianPanelLaw.bag": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name Quotient.mk",
+  "file": "Descent/Portability/GaussianPanelLaw.lean",
+  "line": 108,
+  "short": "bag",
+  "ret_type": "Bag D",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff",
+   "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit",
+   "Descent.Portability.GaussianPanelLaw.bag_measurable",
+   "Descent.Portability.GaussianPanelLaw.bag_relabel"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.GaussianPanelLaw.bag_measurable": [],
+    "Descent.Portability.GaussianPanelLaw.bag_relabel": [],
+    "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit": [],
+    "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff": []
+   }
+  }
+ },
+ "Descent.Portability.GaussianPanelLaw.symmetricPhase": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "trailing tokens after expression: op:∑",
+  "file": "Descent/Portability/GaussianPanelLaw.lean",
+  "line": 119,
+  "short": "symmetricPhase",
+  "ret_type": "ℂ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit",
+   "Descent.Portability.GaussianPanelLaw.symmetricPhase_continuous",
+   "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral",
+   "Descent.Portability.GaussianPanelLaw.symmetricPhase_relabel"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.GaussianPanelLaw.symmetricPhase_continuous": [],
+    "Descent.Portability.GaussianPanelLaw.symmetricPhase_relabel": [],
+    "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral": [],
+    "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit": []
+   }
+  }
+ },
+ "Descent.Portability.GaussianPanelLaw.bagPhase": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name Quotient.lift",
+  "file": "Descent/Portability/GaussianPanelLaw.lean",
+  "line": 136,
+  "short": "bagPhase",
+  "ret_type": "Bag D → ℂ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.GaussianPanelLaw.bagPhase_measurable",
+   "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.GaussianPanelLaw.bagPhase_measurable": [],
+    "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit": []
+   }
   }
  },
  "Descent.Portability.GaussianSlabLaw.linearForm": {
@@ -160502,6 +161204,7 @@
    "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul",
    "Descent.Portability.FiniteReportLaw.variance_eq_rawMoments",
    "Descent.Portability.FiniteReportLaw.variance_nonneg",
+   "Descent.Portability.GaussianPanelLaw.projection_variance",
    "Descent.Portability.OptimalMeasurementAllocation.allocation_lower_bound",
    "Descent.Portability.OptimalMeasurementAllocation.optimal_among_allocations",
    "Descent.Portability.OptimalMeasurementAllocation.optimal_variance",
@@ -160596,6 +161299,7 @@
     "Descent.Portability.FiniteReportLaw.variance_eq_rawMoments": [],
     "Descent.Portability.FiniteReportLaw.variance_nonneg": [],
     "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul": [],
+    "Descent.Portability.GaussianPanelLaw.projection_variance": [],
     "Descent.Portability.OptimalMeasurementAllocation.variance_nonneg": [
      "∀ mode, 0 < effort mode"
     ],

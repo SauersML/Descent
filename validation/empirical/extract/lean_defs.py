@@ -3237,6 +3237,9 @@ def phaseMean(p, z):
 def gibbsNormalizer(ν, U):
     return sum((_rt.mul(_rt._proj(ν, 'mass')(x), _rt.rexp((U[int(x)])))) for x in range(int(len(U))))
 
+def hiddenIntegrand(coupling, hidden, retained, horizon, time):
+    return evolution(hidden, ((horizon - time)), (coupling((retained(time)))))
+
 def Descent_Portability_posteriorMean(posterior, conditional, x):
     return sum((_rt.mul(posterior[int(x)][int(t)], conditional[int(t)][int(x)])) for t in range(int(_rt.sumdim('t', len(posterior[0]), len(conditional)))))
 
@@ -3920,6 +3923,9 @@ def innerValue(effects):
 
 def clippedInner(cap, effects):
     return sum((_rt.mul(_rt._proj((labelKernel(Descent_Portability_SimulationDesignDecoder_design())), 'weight')(effects, outcome), _rt._proj((clippedReport(Descent_Portability_SimulationDesignDecoder_design(), cap, effects, outcome)), 'getD')(0.0))) for outcome in range(int(len(effects))))
+
+def Bag(D):
+    return Quotient((panelSetoid(D)))
 
 def linearForm(a, x):
     return sum((_rt.mul(a[int(k)], x[int(k)])) for k in range(int(len(a))))

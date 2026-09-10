@@ -169,6 +169,8 @@ import Descent.Portability.MarkovCoarseGraining
 import Descent.Portability.BanachEulerExponential
 import Descent.Portability.OneLocusCompatibilityLaw
 import Descent.Portability.ConditionalSeparatorLaw
+import Descent.Portability.GaussianPanelLaw
+import Descent.Portability.ContinuousMemoryLaw
 
 assert_below Descent.Program
 
