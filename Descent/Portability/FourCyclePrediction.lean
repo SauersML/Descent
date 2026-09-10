@@ -110,28 +110,30 @@ noncomputable def uniform : FiniteReportLaw (Fin 4) where
   mass_sum := by norm_num
 
 noncomputable def directedKernel (source : Fin 4) : FiniteReportLaw (Fin 4) where
-  mass target := (directed + 1) source target
+  mass target := !![0, 1, 0, 0; 0, 0, 1, 0; 0, 0, 0, 1; 1, 0, 0, 0] source target
   mass_nonneg target := by
-    fin_cases source <;> fin_cases target <;> norm_num [directed, Matrix.one_apply]
+    fin_cases source <;> fin_cases target <;> norm_num
   mass_sum := by
-    fin_cases source <;> norm_num [directed, Matrix.one_apply, Fin.sum_univ_four]
+    fin_cases source <;> norm_num [Fin.sum_univ_succ]
 
 noncomputable def reversibleKernel (source : Fin 4) : FiniteReportLaw (Fin 4) where
-  mass target := (reversible + 1) source target
+  mass target :=
+    !![0, 1 / 2, 0, 1 / 2; 1 / 2, 0, 1 / 2, 0;
+      0, 1 / 2, 0, 1 / 2; 1 / 2, 0, 1 / 2, 0] source target
   mass_nonneg target := by
-    fin_cases source <;> fin_cases target <;> norm_num [reversible, Matrix.one_apply]
+    fin_cases source <;> fin_cases target <;> norm_num
   mass_sum := by
-    fin_cases source <;> norm_num [reversible, Matrix.one_apply, Fin.sum_univ_four]
+    fin_cases source <;> norm_num [Fin.sum_univ_succ]
 
 theorem directed_stationary : Stationary uniform directedKernel := by
   intro target
   fin_cases target <;>
-    norm_num [uniform, directedKernel, directed, Matrix.one_apply, Fin.sum_univ_four]
+    norm_num [uniform, directedKernel, Fin.sum_univ_succ]
 
 theorem reversible_stationary : Stationary uniform reversibleKernel := by
   intro target
   fin_cases target <;>
-    norm_num [uniform, reversibleKernel, reversible, Matrix.one_apply, Fin.sum_univ_four]
+    norm_num [uniform, reversibleKernel, Fin.sum_univ_succ]
 
 noncomputable def directedLaw (time : ℝ) : Fin 4 → FiniteReportLaw (Fin 4) :=
   stateLaw directedKernel 1 time
@@ -149,19 +151,24 @@ theorem directedLaw_matrix (time : ℝ) (htime : 0 ≤ time) :
     kernelMatrix (directedLaw time) = NormedSpace.exp ℝ (time • directed) := by
   have h := stateLaw_matrix directedKernel 1 time htime
   have hgenerator : generator directedKernel 1 = directed := by
-    change (1 : ℝ) • ((directed + 1) - 1) = directed
-    simp
+    ext source target
+    fin_cases source <;> fin_cases target <;>
+      norm_num [generator, kernelMatrix, directedKernel, directed, Matrix.one_apply]
   simpa only [directedLaw, hgenerator] using h
 
 theorem reversibleLaw_matrix (time : ℝ) (htime : 0 ≤ time) :
     kernelMatrix (reversibleLaw time) = NormedSpace.exp ℝ (time • reversible) := by
   have h := stateLaw_matrix reversibleKernel 1 time htime
   have hgenerator : generator reversibleKernel 1 = reversible := by
-    change (1 : ℝ) • ((reversible + 1) - 1) = reversible
-    simp
+    ext source target
+    fin_cases source <;> fin_cases target <;>
+      norm_num [generator, kernelMatrix, reversibleKernel, reversible, Matrix.one_apply]
   simpa only [reversibleLaw, hgenerator] using h
 
 noncomputable def report : Fin 4 → ℝ := Real.sqrt 2 • mode
+
+theorem report_mean_zero : uniform.expectation report = 0 := by
+  simp [FiniteReportLaw.expectation, uniform, report, mode, Fin.sum_univ_succ]
 
 theorem report_energy : energy uniform report = 1 := by
   have hsqrt : Real.sqrt 2 ^ 2 = 2 := Real.sq_sqrt (by norm_num)
@@ -183,7 +190,8 @@ theorem directed_correlation (time : ℝ) (htime : 0 ≤ time) :
       Real.exp (-time) * Real.cos time := by
   rw [directed_prediction time htime]
   have hsqrt : Real.sqrt 2 ^ 2 = 2 := Real.sq_sqrt (by norm_num)
-  simp [FiniteHorizonLoss.inner, uniform, report, mode, directedOrbit, Fin.sum_univ_succ, cosineDecay]
+  simp [FiniteHorizonLoss.inner, uniform, report, mode, directedOrbit,
+    Fin.sum_univ_succ, cosineDecay]
   ring_nf
   rw [hsqrt]
   ring
@@ -226,6 +234,15 @@ theorem reversible_prediction_energy (time : ℝ) (htime : 0 ≤ time) :
   ring_nf
   rw [hsqrt]
   ring
+
+/-- The two chains have identical instantaneous stationary energy on this mode. -/
+theorem same_instantaneous_energy :
+    -FiniteHorizonLoss.inner uniform report (directed *ᵥ report) = 1 ∧
+      -FiniteHorizonLoss.inner uniform report (reversible *ᵥ report) = 1 := by
+  have hsqrt : Real.sqrt 2 ^ 2 = 2 := Real.sq_sqrt (by norm_num)
+  constructor <;>
+    simp [FiniteHorizonLoss.inner, uniform, report, mode, directed, reversible,
+      Matrix.mulVec, dotProduct, Fin.sum_univ_succ] <;> nlinarith
 
 /-- The directed cycle's frozen score rotates out of phase. -/
 theorem directed_stale_risk (time : ℝ) (htime : 0 ≤ time) :

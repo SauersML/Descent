@@ -1005,43 +1005,43 @@ noncomputable def AffineTwoDemeLDSystem.toSystem {n : ℕ}
 /-- A stationary two-locus coordinate, exactly `-(D+R+M)^{-1}Uh` in the published moment
 system, expressed by Cramer's rule. -/
 noncomputable def TwoDemeLDSystem.stationaryCoordinate {n : ℕ}
-    (sys : TwoDemeLDSystem n) (rho : Descent.Core.Rho) (M : ℝ) (k : Fin n) : ℝ :=
-  cramerCoordinate (sys.operator rho.value M) (fun i ↦ -sys.forcing M i) k
+    (sys : TwoDemeLDSystem n) (rho M : ℝ) (k : Fin n) : ℝ :=
+  cramerCoordinate (sys.operator rho M) (fun i ↦ -sys.forcing M i) k
 
 /-- The `E[D_source D_target]` member of the stationary family. -/
 noncomputable def TwoDemeLDSystem.crossD {n : ℕ}
-    (sys : TwoDemeLDSystem n) (rho : Descent.Core.Rho) (M : ℝ) : ℝ :=
+    (sys : TwoDemeLDSystem n) (rho M : ℝ) : ℝ :=
   sys.stationaryCoordinate rho M sys.crossSourceTarget
 
 /-- The source `E[D^2]` member of the same solve. -/
 noncomputable def TwoDemeLDSystem.withinD {n : ℕ}
-    (sys : TwoDemeLDSystem n) (rho : Descent.Core.Rho) (M : ℝ) : ℝ :=
+    (sys : TwoDemeLDSystem n) (rho M : ℝ) : ℝ :=
   sys.stationaryCoordinate rho M sys.withinSource
 
 /-- Cross-deme correlation of `D`.  Equal sizes and symmetric migration make the two
 within-deme second moments equal, so the square-root denominator reduces to `E[D^2]`.
 This name is introduced only after both numerator and denominator exist in the solved law. -/
 noncomputable def TwoDemeLDSystem.crossDCorrelation {n : ℕ}
-    (sys : TwoDemeLDSystem n) (rho : Descent.Core.Rho) (M : ℝ) : ℝ :=
+    (sys : TwoDemeLDSystem n) (rho M : ℝ) : ℝ :=
   sys.crossD rho M / sys.withinD rho M
 
 /-- A2's closed form for an arbitrary published affine moment system. -/
 noncomputable def AffineTwoDemeLDSystem.crossDCorrelation {n : ℕ}
-    (sys : AffineTwoDemeLDSystem n) (rho : Descent.Core.Rho) (M : ℝ) : ℝ :=
+    (sys : AffineTwoDemeLDSystem n) (rho M : ℝ) : ℝ :=
   sys.toSystem.crossDCorrelation rho M
 
 /-- A parameter point on which the affine stationary solution and its correlation denominator
 exist.  Both counterexample-producing poles are excluded by the value's type. -/
 structure NonsingularAffineLDPoint {n : ℕ} (sys : AffineTwoDemeLDSystem n) where
-  rho : Descent.Core.Rho
+  rho : ℝ
   migration : ℝ
-  rho_nonnegative : 0 ≤ rho.value
+  rho_nonnegative : 0 ≤ rho
   migration_nonnegative : 0 ≤ migration
   operator_nonsingular :
-    (sys.drift + rho.value • sys.recombination + migration • sys.migration).det ≠ 0
+    (sys.drift + rho • sys.recombination + migration • sys.migration).det ≠ 0
   within_numerator_nonzero :
     (replaceColumn
-      (sys.drift + rho.value • sys.recombination + migration • sys.migration)
+      (sys.drift + rho • sys.recombination + migration • sys.migration)
       (fun i ↦ -(sys.forcingBase i + migration * sys.forcingMigration i))
       sys.withinSource).det ≠ 0
 
@@ -1053,27 +1053,27 @@ noncomputable def NonsingularAffineLDPoint.crossDCorrelation {n : ℕ}
 /-- The affine system's cross moment is visibly the Cramer quotient of a matrix affine in
 recombination and migration. -/
 theorem AffineTwoDemeLDSystem.crossD_eq_det_ratio {n : ℕ}
-    (sys : AffineTwoDemeLDSystem n) (rho : Descent.Core.Rho) (M : ℝ) :
+    (sys : AffineTwoDemeLDSystem n) (rho M : ℝ) :
     sys.toSystem.crossD rho M =
       (replaceColumn
-        (sys.drift + rho.value • sys.recombination + M • sys.migration)
+        (sys.drift + rho • sys.recombination + M • sys.migration)
         (fun i ↦ -(sys.forcingBase i + M * sys.forcingMigration i))
         sys.crossSourceTarget).det /
-      (sys.drift + rho.value • sys.recombination + M • sys.migration).det := rfl
+      (sys.drift + rho • sys.recombination + M • sys.migration).det := rfl
 
 
 /-- **The migration--LD law is rational in `(rho,M)`.**  Expanded determinants are not a
 different result: this quotient is exactly the quotient of two Cramer numerators, because
 the common system determinant cancels. -/
 theorem TwoDemeLDSystem.crossDCorrelation_eq_cramer_numerator_ratio {n : ℕ}
-    (sys : TwoDemeLDSystem n) (rho : Descent.Core.Rho) (M : ℝ)
-    (hdet : (sys.operator rho.value M).det ≠ 0)
-    (hwithin : (replaceColumn (sys.operator rho.value M) (fun i ↦ -sys.forcing M i)
+    (sys : TwoDemeLDSystem n) (rho M : ℝ)
+    (hdet : (sys.operator rho M).det ≠ 0)
+    (hwithin : (replaceColumn (sys.operator rho M) (fun i ↦ -sys.forcing M i)
       sys.withinSource).det ≠ 0) :
     sys.crossDCorrelation rho M =
-      (replaceColumn (sys.operator rho.value M) (fun i ↦ -sys.forcing M i)
+      (replaceColumn (sys.operator rho M) (fun i ↦ -sys.forcing M i)
         sys.crossSourceTarget).det /
-      (replaceColumn (sys.operator rho.value M) (fun i ↦ -sys.forcing M i)
+      (replaceColumn (sys.operator rho M) (fun i ↦ -sys.forcing M i)
         sys.withinSource).det := by
   unfold TwoDemeLDSystem.crossDCorrelation TwoDemeLDSystem.crossD
     TwoDemeLDSystem.withinD TwoDemeLDSystem.stationaryCoordinate cramerCoordinate
@@ -1082,7 +1082,7 @@ theorem TwoDemeLDSystem.crossDCorrelation_eq_cramer_numerator_ratio {n : ℕ}
 /-- The panmictic check: once migration makes the cross and within Cramer numerators equal,
 the correlation is exactly one.  This is an analytic limit check, not a numerical validator. -/
 theorem TwoDemeLDSystem.crossDCorrelation_panmixia {n : ℕ}
-    (sys : TwoDemeLDSystem n) (rho : Descent.Core.Rho) (M : ℝ)
+    (sys : TwoDemeLDSystem n) (rho M : ℝ)
     (hwithin : sys.withinD rho M ≠ 0)
     (hpan : sys.crossD rho M = sys.withinD rho M) :
     sys.crossDCorrelation rho M = 1 := by
@@ -7294,7 +7294,7 @@ cross moment is 1 against within-deme moments 2 and 3, so the certificate inequa
 and hide a body that only works on the degenerate boundary.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- an inhabitation witness. -/
-theorem panelMomentPairDomainWitness :
+noncomputable def panelMomentPairDomainWitness :
     panelMomentWitnessMoments.LDPairDomain clumpWindowSeparation 0 1 where
   firstWithin_pos := by
     simp [panelMomentWitnessMoments]
@@ -7312,7 +7312,7 @@ detect a body that dropped the size-correction factor rather than only certifyin
 quotients evaluate.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- an inhabitation witness. -/
-theorem panelMomentDomainWitness :
+noncomputable def panelMomentDomainWitness :
     panelMomentWitnessMoments.UnascertainedPanelMomentDomain
       (fun _ : Fin 1 ↦ clumpWindowSeparation) clumpWindowSeparation 0 1 where
   panelWithin_pos := by
@@ -7327,7 +7327,7 @@ within-deme linkage 2 and 3 (positive, distinct) and cross linkage 1 (nonzero), 
 reference regression is exercised away from every degenerate value.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- an inhabitation witness. -/
-theorem selectionPanelDomainWitness :
+noncomputable def selectionPanelDomainWitness :
     panelMomentWitnessMoments.SelectionWeightedDDProxyDomain
       (fun _ : Fin 2 ↦ clumpWindowSeparation) 0 1 where
   within_pos := by
@@ -7340,7 +7340,7 @@ theorem selectionPanelDomainWitness :
 /-- The bare normalization domain inherits the pair witness's inhabitant by projection.
 
 Empirical status: NOT AN EMPIRICAL CLAIM -- an inhabitation witness by projection. -/
-theorem panelMomentNormalizationDomainWitness :
+noncomputable def panelMomentNormalizationDomainWitness :
     panelMomentWitnessMoments.LDNormalizationDomain clumpWindowSeparation 0 1 :=
   panelMomentPairDomainWitness.toLDNormalizationDomain
 

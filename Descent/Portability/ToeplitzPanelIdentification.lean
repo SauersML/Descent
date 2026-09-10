@@ -29,7 +29,7 @@ def lag {d : ℕ} (i j : Fin d) : Fin d :=
 
 @[simp] theorem lag_zero {d : ℕ} [NeZero d] (i : Fin d) : lag 0 i = i := by
   apply Fin.ext
-  simp [lag]
+  simp [lag, Nat.dist]
 
 theorem lag_pos_iff {d : ℕ} (i j : Fin d) : 0 < (lag i j).val ↔ i ≠ j := by
   simp only [lag, Nat.dist]
@@ -42,18 +42,20 @@ theorem lag_pos_iff {d : ℕ} (i j : Fin d) : 0 < (lag i j).val ↔ i ≠ j := b
     omega
 
 def toeplitz {d : ℕ} (r : Fin d → ℝ) : SymmetricCovariance (Fin d) :=
-  ⟨fun i j ↦ r (lag i j), by intro i j; congr 1; apply Fin.ext; exact Nat.dist_comm _ _⟩
+  ⟨fun i j ↦ r (lag i j), by
+    intro i j
+    apply congrArg r
+    apply Fin.ext
+    exact Nat.dist_comm _ _⟩
 
-noncomputable def offMultiplicity {D : Type*} [Fintype D] (A : Matrix D D ℝ)
-    (value : ℝ) : ℕ := by
-  classical
-  exact Fintype.card {ij : D × D // ij.1 ≠ ij.2 ∧ A ij.1 ij.2 = value}
+noncomputable def offMultiplicity {D : Type*} (A : Matrix D D ℝ)
+    (value : ℝ) : ℕ :=
+  Nat.card {ij : D × D // ij.1 ≠ ij.2 ∧ A ij.1 ij.2 = value}
 
-theorem offMultiplicity_permute {D : Type*} [Fintype D]
+theorem offMultiplicity_permute {D : Type*}
     (A : SymmetricCovariance D) (π : Equiv.Perm D) (value : ℝ) :
     offMultiplicity (permuteCovariance A π).val value = offMultiplicity A.val value := by
-  classical
-  apply Fintype.card_congr
+  apply Nat.card_congr
   exact (Equiv.prodCongr π π).subtypeEquiv (fun ij ↦ by simp [permuteCovariance])
 
 def upperEquiv (d k : ℕ) :
@@ -88,17 +90,23 @@ theorem lag_card (d k : ℕ) (hk : 0 < k) :
     apply propext
     simp only [p, q, Nat.dist]
     omega
-  rw [he, Fintype.card_subtype_or_disjoint]
+  trans Fintype.card {ij : Fin d × Fin d // p ij ∨ q ij}
+  · exact Fintype.card_congr
+      (Equiv.subtypeEquivRight (fun ij ↦ Iff.of_eq (congrFun he ij)))
+  rw [Fintype.card_subtype_or_disjoint]
   · change Fintype.card {ij : Fin d × Fin d // ij.1.val + k = ij.2.val} +
         Fintype.card {ij : Fin d × Fin d // ij.2.val + k = ij.1.val} = _
     rw [upper_card, lower_card]
     omega
   · rw [disjoint_iff]
-    intro ij h
-    change (p ij ∧ q ij) → False at h ⊢
-    intro hh
-    dsimp [p, q] at hh
-    omega
+    funext ij
+    apply propext
+    change (p ij ∧ q ij) ↔ False
+    constructor
+    · intro hh
+      dsimp [p, q] at hh
+      omega
+    · exact False.elim
 
 theorem toeplitz_multiplicity {d : ℕ} (r : Fin d → ℝ)
     (hr : Set.InjOn r {k | 0 < k.val}) (k : Fin d) (hk : 0 < k.val) :
@@ -115,7 +123,9 @@ theorem toeplitz_multiplicity {d : ℕ} (r : Fin d → ℝ)
     · intro h
       have hl : lag ij.1 ij.2 = k := Fin.ext h
       exact ⟨(lag_pos_iff _ _).mp (by rw [hl]; exact hk), congrArg r hl⟩
-  rw [he]
+  trans Nat.card {ij : Fin d × Fin d // Nat.dist ij.1.val ij.2.val = k.val}
+  · exact Nat.card_congr (Equiv.subtypeEquivRight (fun ij ↦ Iff.of_eq (congrFun he ij)))
+  rw [Nat.card_eq_fintype_card]
   exact lag_card d k.val hk
 
 /-- Distinct off-diagonal lag values force a Toeplitz covariance orbit to

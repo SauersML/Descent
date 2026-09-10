@@ -71,7 +71,10 @@ theorem squared_loss_between_decomposition (E : ExpFunctional D)
     funext d
     simp only [Pi.add_apply, variance_eq_expect_sq_sub_sq_mean, sub_add_cancel]
   rw [h]
-  exact variance_add_exp E _ _
+  convert variance_add_exp E
+    (fun d ↦ variance (K d) (fun ω ↦ r (d, ω)))
+    (fun d ↦ K d (fun ω ↦ r (d, ω)) ^ 2) using 1
+  ring
 
 /-- The exact denominator of loss-R² requires conditional fourth moments. -/
 theorem squared_loss_total (E : ExpFunctional D) (K : D → ExpFunctional Ω)
@@ -93,7 +96,7 @@ theorem gaussian_style_loss_variance (E : ExpFunctional D) (K : D → ExpFunctio
       2 * (E v) ^ 2 + 3 * variance E v := by
   rw [squared_loss_total]
   simp only [hsecond, hfourth]
-  have h : (fun d ↦ 3 * v d ^ 2 - v d ^ 2) = 2 • (fun d ↦ v d ^ 2) := by
+  have h : (fun d ↦ 3 * v d ^ 2 - v d ^ 2) = (2 : ℝ) • (fun d ↦ v d ^ 2) := by
     funext d
     simp only [Pi.smul_apply, smul_eq_mul]
     ring
@@ -111,7 +114,6 @@ theorem gaussian_style_explainable_fraction (E : ExpFunctional D)
       (variance E v / (E v) ^ 2) / (2 + 3 * (variance E v / (E v) ^ 2)) := by
   simp only [hsecond, gaussian_style_loss_variance E K r v hsecond hfourth]
   field_simp
-  <;> ring
 
 /-- Sharp squared-CV bound. Positivity of the interval endpoints is essential.
 This corrects the equal-endpoint-mass bound in the exploratory script. -/
@@ -138,7 +140,9 @@ theorem sharp_interval_cv_squared (E : ExpFunctional D) (v : D → ℝ)
 /-- The maximizing endpoint probabilities are b/(a+b) and a/(a+b). -/
 def extremalIntervalLaw (a b : ℝ) (ha : 0 < a) (hab : a ≤ b) : ExpFunctional Bool :=
   weightedExp (fun d ↦ if d then a / (a + b) else b / (a + b))
-    (by intro d; cases d <;> dsimp <;> positivity)
+    (by
+      have hb : 0 < b := lt_of_lt_of_le ha hab
+      intro d; cases d <;> dsimp <;> positivity)
     (by simp only [Fintype.sum_bool, Bool.false_eq_true, if_false, if_true]
         have : a + b ≠ 0 := ne_of_gt (by linarith)
         field_simp)
@@ -153,13 +157,13 @@ theorem sharp_interval_cv_attained (a b : ℝ) (ha : 0 < a) (hab : a ≤ b) :
   simp only [extremalIntervalLaw, weightedExp_apply, Fintype.sum_bool,
     Bool.false_eq_true, if_false, if_true]
   field_simp
-  <;> ring
+  ring
 
 /-- A centered bias with rare larger shifts: variance one, fourth moment four. -/
 def sparseBiasLaw : ExpFunctional (Fin 3) :=
   weightedExp ![1 / 8, 3 / 4, 1 / 8]
     (by intro i; fin_cases i <;> norm_num)
-    (by norm_num [Fin.sum_univ_three])
+    (by norm_num [Fin.sum_univ_three, Matrix.cons_val_two])
 
 /-- Two actual probability laws with identical signed-bias variance have
 different squared-bias variance. No function of that one variance can recover it. -/
@@ -170,9 +174,10 @@ theorem signed_variance_does_not_determine_squared_bias :
   have h₁ := hf (Fin 2) (uniformExp (Fin 2)) ![-1, 1] (by
     norm_num [uniformExp_apply, Fin.sum_univ_two])
   have h₂ := hf (Fin 3) sparseBiasLaw ![-2, 0, 2] (by
-    norm_num [sparseBiasLaw, weightedExp_apply, Fin.sum_univ_three])
+    norm_num [sparseBiasLaw, weightedExp_apply, Fin.sum_univ_three, Matrix.cons_val_two])
   norm_num [variance_eq_expect_sq_sub_sq_mean, uniformExp_apply,
-    sparseBiasLaw, weightedExp_apply, Fin.sum_univ_two, Fin.sum_univ_three] at h₁ h₂
+    sparseBiasLaw, weightedExp_apply, Fin.sum_univ_two, Fin.sum_univ_three,
+    Matrix.cons_val_two] at h₁ h₂
   linarith
 
 end
