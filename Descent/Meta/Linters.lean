@@ -244,6 +244,7 @@ exist; this reports the signatures that have not taken them. -/
     "SCALED QUANTITIES CARRIED AS BARE REALS:"
   test declName := do
     unless isDefinition (← getEnv) declName do return none
+    if ← Batteries.Tactic.Lint.isAutoDecl declName then return none
     unless (← inCorpus declName) do return none
     unless (← onScaledSurface declName) do return none
     let bad := realScaledBinders (← getConstInfo declName).type
