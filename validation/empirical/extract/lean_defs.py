@@ -3330,6 +3330,42 @@ def dynamicsContrastCoefficient(β):
 def combinedPostprocessor(T, a):
     return sum(((a(j) * T(j))) for j in range(int(_rt.sumdim('j', len(a), len(T)))))
 
+def inverseEntry(g, x):
+    return (((1.0 if (x == 0.0) else 0.0)) if (g == 0.0) else (((2.0 if (x == 1.0) else _rt.rdiv((-1.0), 2.0))) if (g == 1.0) else ((1.0 if (x == 2.0) else 0.0))))
+
+def Descent_Portability_DiploidBernsteinLaw_grid(x):
+    return (lambda i: _rt.rdiv((x(i)), 2.0))
+
+def monomialEntry(degree, dosage):
+    return (1.0 if (degree == 0.0) else (_rt.rdiv((dosage), 2.0) if (degree == 1.0) else (1.0 if (dosage == 2.0) else 0.0)))
+
+def powerEntry(dosage, degree):
+    return ((((-2.0) if (degree == 1.0) else 1.0)) if (dosage == 0.0) else (((0.0 if (degree == 0.0) else (2.0 if (degree == 1.0) else (-2.0)))) if (dosage == 1.0) else (1.0 if (degree == 2.0) else 0.0)))
+
+def hweMass(p, g):
+    return (_rt.lpow(((1.0 - p)), 2.0) if (g == 0.0) else (((2.0 * p) * ((1.0 - p))) if (g == 1.0) else _rt.lpow(p, 2.0)))
+
+def hweDerivative(p, g):
+    return ((2.0 * ((p - 1.0))) if (g == 0.0) else ((2.0 - (4.0 * p)) if (g == 1.0) else (2.0 * p)))
+
+def phenotypeMean(f, p):
+    return sum((_rt.mul(genotypeMass(p, g), f(g))) for g in range(int(len(p))))
+
+def additiveEffect(f, p, hp, i):
+    return _rt.rdiv(_rt._proj((genotypeLaw(p, hp)), 'covariance')(((lambda g: (g(i)))), f), (_rt.mul(_rt.mul(2.0, p[int(i)]), (_rt.sub(1.0, p[int(i)])))))
+
+def transported(kernel, matrix, time):
+    return _rt.mul(_rt.mul(_rt.lpow(kernelMatrix(kernel), time), matrix), _rt._proj((_rt.lpow(kernelMatrix(kernel), time)), 'transpose'))
+
+def entryBound(matrix):
+    return sum((sum((_rt.rabs(matrix[int(first)][int(second)])) for second in range(int(len(matrix))))) for first in range(int(len(matrix))))
+
+def discountedTerm(kernel, matrix, discount, time):
+    return _rt.mul(_rt.lpow(discount, time), transported(kernel, matrix, time))
+
+def discountedGramian(kernel, reports, discount):
+    return discountedSum(kernel, (_rt.mul(reports, ('_rt.transpose', 'reports'))), discount)
+
 def caseScoreMean(law):
     return (_rt._proj(law, 'scoreMean') + ((_rt.rsqrt(_rt._proj(_rt._proj(law, 'moments'), 'scoreVariance')) * pearson(law)) * liabilityCaseMean(_rt._proj(law, 'prevalence'))))
 
@@ -3730,6 +3766,18 @@ def phenotypeMarginalLogitShift(input, predictedPrevalence, rung):
 def expectedR2FromN(n, h2, M):
     return (h2 * (_rt.rdiv((n * h2), (((n * h2) + M)))))
 
+def gramian(reports, weights):
+    return sum((_rt.mul(weights[int(time)], (_rt.mul(reports(time), _rt._proj((reports(time)), 'transpose'))))) for time in range(int(len(weights))))
+
+def forecastLoss(reports, weights, difference):
+    return sum((_rt.mul(weights[int(time)], sum((_rt.lpow((_rt.mul(_rt._proj((reports(time)), 'transpose'), _v(difference)))(report), 2.0)) for report in range(int(_rt.sumdim('report', len((_rt.mul(_rt._proj((reports(time)), 'transpose'), _v(difference)))))))))) for time in range(int(_rt.sumdim('time', len(weights), len(reports)))))
+
+def trajectoryMatrix(reports, weights):
+    return (lambda output, state: _rt.mul(_rt.rsqrt((weights[int(_rt._proj(output, '1'))])), reports(_rt._proj(output, '1'), state, _rt._proj(output, '2'))))
+
+def evolvedReports(kernel, reports, time):
+    return _rt.mul(_rt.lpow(kernelMatrix(kernel), time), reports)
+
 def pushforward(p, report):
     return bind(p, ((lambda state: Descent_Portability_FiniteReportLaw_pointMass((report(state))))))
 
@@ -3866,8 +3914,14 @@ def historyDegradation(h, h_p):
 def historyMarginalAmplitude(h):
     return _rt._proj(h, 'amplitude')
 
-def recover(problem):
+def Descent_Portability_GuardedMetricOptimization_recover(problem):
     return ((_rt.rdiv(1.0, _rt._proj(problem, 'scale'))) * _rt._proj(problem, 'weights'))
+
+def complexExpectation(p, f):
+    return sum((((_rt._proj(p, 'mass')(x)) * f(x))) for x in range(int(_rt.sumdim('x', len(_rt._proj(p, 'mass')), len(f)))))
+
+def Descent_Portability_HWEInteractionLaw_blockLaw(h):
+    return Descent_Portability_HWEInteractionLaw_independentLaw(((lambda i: locusLaw((h(i))))))
 
 def IsStationaryKernel(π, P):
     return all((sum(((_rt.mul(π[int(x)], P[int(x)][int(y)]) == π[int(y)])) for x in range(int(len(π))))) for y in range(int(len(π))))
@@ -5147,7 +5201,7 @@ def fiberCovariance(p, score, a, f, g):
 def allele(b):
     return (1.0 if b else 0.0)
 
-def interaction(x):
+def Descent_Portability_ReportFiniteCalibrationLaw_interaction(x):
     return (allele(_rt._proj(x, '1')) * allele(_rt._proj(x, '2')))
 
 def additiveFit(p1, p2, x):
@@ -5282,7 +5336,7 @@ def serial(deme):
 def gridRaw(deme):
     return ((_rt.rdiv(7.0, 5.0)) * (((_rt.rdiv(((_rt.rdiv(((_rt.rdiv(deme, 6.0))), 5.0) + _rt.rdiv((((deme % 6.0))), 5.0))), 2.0)) - _rt.rdiv(1.0, 2.0))))
 
-def grid(deme):
+def Descent_Portability_SimulationBaselineLaw_grid(deme):
     return (gridRaw(deme) - _rt.rdiv((sum((gridRaw(d)) for d in range(int(36)))), 36.0))
 
 def Individuals(demes):

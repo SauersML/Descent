@@ -149,6 +149,13 @@ import Descent.Portability.ReportFiniteCalibrationLaw
 import Descent.Portability.ReportCalibrationTransport
 import Descent.Portability.MinimalObservableLaw
 import Descent.Portability.LowMomentObstruction
+import Descent.Portability.DiploidEffectLaw
+import Descent.Portability.DiploidBernsteinLaw
+import Descent.Portability.EvolutionaryObservability
+import Descent.Portability.DiscountedObservability
+import Descent.Portability.DynamicBlindness
+import Descent.Portability.HWEInteractionLaw
+import Descent.Portability.CombinedPredictionCertificate
 
 assert_below Descent.Program
 
