@@ -92,6 +92,12 @@ import Descent.Portability.SimulationAccuracy
 import Descent.Portability.AncestralAbsorptionLaw
 import Descent.Portability.OrderedCladeLaw
 import Descent.Portability.AncestralGenealogyLaw
+import Descent.Portability.AncestralCladePartition
+import Descent.Portability.AncestralGenealogyOrdering
+import Descent.Portability.StoppedAncestralTiming
+import Descent.Portability.CalibrationLaw
+import Descent.Portability.InterleavedMutationLaw
+import Descent.Portability.InterleavedMutationMeasurability
 
 assert_below Descent.Program
 

@@ -2,7 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.AncestralBranchExposure
-import Descent.Portability.OrderedCladeLaw
+import Descent.Portability.GenealogyGenotypeLaw
 
 assert_below Descent.Decision Descent.Program
 
@@ -119,31 +119,5 @@ theorem traceBranches_exposure (locus : Fin L) (mutationRate : ℝ≥0)
         NNReal.coe_sub (hmono (Fin.zero_le _))
       simp only [cladeExposure, occupation, NNReal.coe_mul, NNReal.coe_sub (htimes 0), heq]
       ring
-
-/-- The rooted branch-kernel calculation compiled from a completed ancestry
-trace. Its genealogy interpretation requires the clade ordering condition. -/
-noncomputable def traceNucleotideLaw {start : State D L n} (trace : Trace count start)
-    (duration : ℝ≥0) (times : Fin count → ℝ≥0) (mutationRate : ℝ≥0) (locus : Fin L)
-    (_hcomplete : (terminal trace).val = ∅) (_hmono : Monotone times)
-    (_htimes : ∀ i, times i ≤ duration)
-    (_horder : OrderedCladeLaw.Ordered (traceBranches locus mutationRate trace duration times)) :
-    FiniteReportLaw (Leaves n) :=
-  rootedGenealogyLaw (traceBranches locus mutationRate trace duration times)
-
-/-- Every leaf configuration probability is an explicit finite branch recursion,
-conditional on the demographic ancestry trace and its times. -/
-theorem traceNucleotide_expectation {start : State D L n} (trace : Trace count start)
-    (duration : ℝ≥0) (times : Fin count → ℝ≥0) (mutationRate : ℝ≥0) (locus : Fin L)
-    (hcomplete : (terminal trace).val = ∅) (hmono : Monotone times)
-    (htimes : ∀ i, times i ≤ duration)
-    (horder : OrderedCladeLaw.Ordered (traceBranches locus mutationRate trace duration times))
-    (readout : Leaves n → ℝ) :
-    (traceNucleotideLaw trace duration times mutationRate locus
-      hcomplete hmono htimes horder).expectation
-        readout =
-      (∑ root : NucleotideMutationLaw.Nucleotide,
-        genealogyExpectation (traceBranches locus mutationRate trace duration times)
-          (fun _ ↦ root) readout) / 4 :=
-  rootedGenealogy_expectation _ readout
 
 end Descent.Portability.AncestralGenealogyLaw

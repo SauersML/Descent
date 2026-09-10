@@ -1,0 +1,16 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.InterleavedMutationMeasurability
+
+/-! Principal theorem axiom closure for InterleavedMutationMeasurability. -/
+
+#print axioms Descent.Portability.InterleavedMutationMeasurability.measurable_real_tsum
+#print axioms Descent.Portability.InterleavedMutationMeasurability.intervalKernel_mass_measurable
+#print axioms Descent.Portability.InterleavedMutationMeasurability.count_mass_measurable
+#print axioms Descent.Portability.InterleavedMutationMeasurability.poissonCoefficient_measurable
+#print axioms Descent.Portability.InterleavedMutationMeasurability.interval_mass_measurable
+#print axioms Descent.Portability.InterleavedMutationMeasurability.interval_expectation_measurable
+#print axioms Descent.Portability.InterleavedMutationMeasurability.waiting_exposure_measurable
+#print axioms Descent.Portability.InterleavedMutationMeasurability.interval_expectation_integrable
+#print axioms Descent.Portability.InterleavedMutationMeasurability.bind_mass_measurable

@@ -2051,7 +2051,7 @@ def transportFactor(aQ, aT, l):
 def explainableFraction(between, total):
     return Descent_Core_ratio(between, total)
 
-def prevalence(c):
+def Descent_Foundations_ConfusionMatrix_prevalence(c):
     return (_rt._proj(c, 'tp') + _rt._proj(c, 'fn'))
 
 def Descent_Foundations_ConfusionMatrix_recallRate(c):
@@ -3062,7 +3062,7 @@ def jumpStateLaw(rates, s, h):
 def proposalKernel(rates, s):
     return _rt._proj((proposalLaw(rates, s)), 'pushforward')((proposalNext(s)))
 
-def traceNucleotideLaw(trace, duration, times, mutationRate, locus, _hcomplete, _hmono, _htimes, _horder):
+def traceNucleotideLaw(trace, duration, times, mutationRate, locus, _hcomplete, _hmono, _htimes):
     return rootedGenealogyLaw((traceBranches(locus, mutationRate, trace, duration, times)))
 
 def ancestryRecalibratedSlope(bSource, rho, alpha):
@@ -3127,6 +3127,12 @@ def misspecExcessRisk(π, σ_β_sq):
 
 def posteriorPredictiveVariance(residual_var, estimation_var):
     return Descent_Core_sum(residual_var, estimation_var)
+
+def Descent_Portability_CalibrationLaw_prevalence(p, linear, intercept):
+    return Descent_Portability_FiniteReportLaw_expectation(p, ((lambda s: normalCDF((_rt.add(intercept, linear[int(s)]))))))
+
+def calibratedIntercept(p, baseline, epsilon, he, hb, raw):
+    return _rt._proj(_rt._proj((standardized_calibrated_intercept(p, raw, baseline, epsilon, he, hb)), 'exists'), 'choose')
 
 def liabilitySensitivity(Φ, m, R2, T_p):
     R = _rt.rsqrt(R2)
@@ -3763,6 +3769,18 @@ def ascertainment_loss(coverage, v_causal):
 
 def total_portability_loss(loss_genetic, loss_technical):
     return Descent_Core_sum(loss_genetic, loss_technical)
+
+def totalExposure(branches):
+    return sum((_rt._proj((branches(index)), 'exposure')) for index in range(int(_rt.sumdim('index', len(branches)))))
+
+def proposalParameter(branches):
+    return (1.0 + totalExposure(branches))
+
+def intervalKernel(branches, state):
+    return _rt._proj((markLaw(branches)), 'bind')((markedKernel(branches, state)))
+
+def absentReadout(state):
+    return (0.0 if _rt._proj(_rt._proj(state, '2'), '2') else 1.0)
 
 def portabilityAtTime(r2_initial, lambda_total, t):
     return (r2_initial * _rt.rexp((((-lambda_total) * t))))
@@ -4993,6 +5011,9 @@ def twoRegionGeneticCorrelation(rhoFirst, rhoSecond, firstWeight, secondWeight):
 
 def disjointWindowLimitVariance(share):
     return sum((share[int(j)]) for j in range(int(len(share))))
+
+def completionTime(waits):
+    return sum((waits[int(j)]) for j in range(int(len(waits))))
 
 def varTrue(m):
     return sum(((_rt.lpow(_rt._proj(m, 'β')(i), 2.0) * _rt._proj(m, 'H')(i))) for i in range(int(_rt.sumdim('i', len(_rt._proj(m, 'β')), len(_rt._proj(m, 'H'))))))
