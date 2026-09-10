@@ -3042,7 +3042,7 @@ def liabilityScaleH2(h2_observed, prevalence, z_height):
     return _rt.rdiv(((h2_observed * prevalence) * ((1.0 - prevalence))), _rt.lpow(z_height, 2.0))
 
 def acceptedContribution(deme, outcome, effects):
-    return by(classical, exact, (_rt.mul(_rt._proj((labelKernel(design())), 'weight')(effects, outcome), _rt._proj((report((targetDesign(design(), targets, deme)), effects, outcome)), 'getD')(0.0)) if allValid(design(), targets, effects, outcome) else 0.0))
+    return by(classical, exact, (_rt.mul(_rt._proj((labelKernel(Descent_Portability_SimulationDesignDecoder_design())), 'weight')(effects, outcome), _rt._proj((report((targetDesign(Descent_Portability_SimulationDesignDecoder_design(), targets, deme)), effects, outcome)), 'getD')(0.0)) if allValid(Descent_Portability_SimulationDesignDecoder_design(), targets, effects, outcome) else 0.0))
 
 def completionMass(rates, s, count):
     if count == 0:
@@ -3128,6 +3128,16 @@ def portableFraction(r2_causal, r2_total):
 def proportionalAllocation(pop_size, total_n, total_pop):
     return (total_n * (_rt.rdiv(pop_size, total_pop)))
 
+def code(*_a):
+    if len(_a) < 1:
+        return lambda *_b: code(*(_a + _b))
+    _e, = _a[:1]
+    _t = [(-1.0), 0.0, 1.0]
+    return _t[_rt._ix(_e, 3, 'code')]
+
+def rowScore(a, x):
+    return sum(((a * blockCode((x(j))))) for j in range(int(_rt.sumdim('j', len(x)))))
+
 def posteriorPrecision(m):
     return (_rt.rdiv(1.0, _rt._proj(m, 'prior_var')) + _rt._proj(m, 'data_precision'))
 
@@ -3159,7 +3169,7 @@ def calibratedIntercept(p, baseline, epsilon, he, hb, raw):
     return _rt._proj(_rt._proj((standardized_calibrated_intercept(p, raw, baseline, epsilon, he, hb)), 'exists'), 'choose')
 
 def genomeLaw(laws):
-    return _rt._proj((chunkLaw(laws)), 'pushforward')(flatten)
+    return _rt._proj((chunkLaw(laws)), 'pushforward')(Descent_Portability_ChunkedGenotypeLaw_flatten)
 
 def sourceGenomeLaw(source, laws):
     return joint(source, ((lambda trainingSource: genomeLaw((laws(trainingSource))))))
@@ -3342,6 +3352,12 @@ def monomialEntry(degree, dosage):
 def powerEntry(dosage, degree):
     return ((((-2.0) if (degree == 1.0) else 1.0)) if (dosage == 0.0) else (((0.0 if (degree == 0.0) else (2.0 if (degree == 1.0) else (-2.0)))) if (dosage == 1.0) else (1.0 if (degree == 2.0) else 0.0)))
 
+def effectField(f, p, i):
+    return _rt.rdiv(partialMean(f, p, i), 2.0)
+
+def hweSecond(g):
+    return ((-4.0) if (g == 1.0) else 2.0)
+
 def hweMass(p, g):
     return (_rt.lpow(((1.0 - p)), 2.0) if (g == 0.0) else (((2.0 * p) * ((1.0 - p))) if (g == 1.0) else _rt.lpow(p, 2.0)))
 
@@ -3492,16 +3508,16 @@ def administrativeHarrellC(g, law, _):
     return _rt.rdiv(administrativeConcordantMass(g, law), administrativeComparableMass(g, law))
 
 def clippedBinReport(distance, cap, effects, outcome):
-    return by(classical, exact, (some((average((binMembers(targets, distance)), ((lambda deme: _rt.rmin((_rt._proj((report((targetDesign(design(), targets, deme)), effects, outcome)), 'getD')(0.0)), cap)))))) if (_rt._proj((binMembers(targets, distance)), 'Nonempty') and allValid(design(), targets, effects, outcome)) else none))
+    return by(classical, exact, (some((average((binMembers(targets, distance)), ((lambda deme: _rt.rmin((_rt._proj((report((targetDesign(Descent_Portability_SimulationDesignDecoder_design(), targets, deme)), effects, outcome)), 'getD')(0.0)), cap)))))) if (_rt._proj((binMembers(targets, distance)), 'Nonempty') and allValid(Descent_Portability_SimulationDesignDecoder_design(), targets, effects, outcome)) else none))
 
 def binReport(distance, effects, outcome):
-    return by(classical, exact, (some((average((binMembers(targets, distance)), ((lambda deme: _rt._proj((report((targetDesign(design(), targets, deme)), effects, outcome)), 'getD')(0.0)))))) if (_rt._proj((binMembers(targets, distance)), 'Nonempty') and allValid(design(), targets, effects, outcome)) else none))
+    return by(classical, exact, (some((average((binMembers(targets, distance)), ((lambda deme: _rt._proj((report((targetDesign(Descent_Portability_SimulationDesignDecoder_design(), targets, deme)), effects, outcome)), 'getD')(0.0)))))) if (_rt._proj((binMembers(targets, distance)), 'Nonempty') and allValid(Descent_Portability_SimulationDesignDecoder_design(), targets, effects, outcome)) else none))
 
 def binInner(distance, effects):
-    return sum((_rt.mul(_rt._proj((labelKernel(design())), 'weight')(effects, outcome), _rt._proj((binReport(design(), targets, distance, effects, outcome)), 'getD')(0.0))) for outcome in range(int(len(effects))))
+    return sum((_rt.mul(_rt._proj((labelKernel(Descent_Portability_SimulationDesignDecoder_design())), 'weight')(effects, outcome), _rt._proj((binReport(Descent_Portability_SimulationDesignDecoder_design(), targets, distance, effects, outcome)), 'getD')(0.0))) for outcome in range(int(len(effects))))
 
 def binClippedInner(distance, cap, effects):
-    return sum((_rt.mul(_rt._proj((labelKernel(design())), 'weight')(effects, outcome), _rt._proj((clippedBinReport(design(), targets, distance, cap, effects, outcome)), 'getD')(0.0))) for outcome in range(int(len(effects))))
+    return sum((_rt.mul(_rt._proj((labelKernel(Descent_Portability_SimulationDesignDecoder_design())), 'weight')(effects, outcome), _rt._proj((clippedBinReport(Descent_Portability_SimulationDesignDecoder_design(), targets, distance, cap, effects, outcome)), 'getD')(0.0))) for outcome in range(int(len(effects))))
 
 def symmetricBetaBernsteinClosedForm(shape, derived, ancestral):
     return _rt.rdiv((realRisingFactorial(shape, derived) * realRisingFactorial(shape, ancestral)), realRisingFactorial(((2.0 * shape)), ((derived + ancestral))))
@@ -3878,17 +3894,23 @@ def Converged(iteration, state, current):
 def exactRun(x, labels):
     return Descent_Portability_FirthFiniteIterationLaw_run(exactMatrixChecks(), x, labels)
 
+def quadraticValue(A, v):
+    return sum((sum((_rt.mul(_rt.mul(A[int(i)][int(j)], v[int(i)]), v[int(j)])) for j in range(int(len(A))))) for i in range(int(len(A))))
+
+def gaussianFourier(A, v):
+    return _rt.rexp((_rt.rdiv(_rt.neg(quadraticValue(A, v)), 2.0)))
+
 def jointLaw():
-    return _rt._proj((labelKernel(design())), 'jointMeasure')((effectLaw(K)))
+    return _rt._proj((labelKernel(Descent_Portability_SimulationDesignDecoder_design())), 'jointMeasure')((effectLaw(K)))
 
 def clippedReport(cap, effects, outcome):
-    return _rt._proj((report(design(), effects, outcome)), 'map')(((lambda r: _rt.rmin(r, cap))))
+    return _rt._proj((report(Descent_Portability_SimulationDesignDecoder_design(), effects, outcome)), 'map')(((lambda r: _rt.rmin(r, cap))))
 
 def innerValue(effects):
-    return sum((_rt.mul(_rt._proj((labelKernel(design())), 'weight')(effects, outcome), _rt._proj((report(design(), effects, outcome)), 'getD')(0.0))) for outcome in range(int(len(effects))))
+    return sum((_rt.mul(_rt._proj((labelKernel(Descent_Portability_SimulationDesignDecoder_design())), 'weight')(effects, outcome), _rt._proj((report(Descent_Portability_SimulationDesignDecoder_design(), effects, outcome)), 'getD')(0.0))) for outcome in range(int(len(effects))))
 
 def clippedInner(cap, effects):
-    return sum((_rt.mul(_rt._proj((labelKernel(design())), 'weight')(effects, outcome), _rt._proj((clippedReport(design(), cap, effects, outcome)), 'getD')(0.0))) for outcome in range(int(len(effects))))
+    return sum((_rt.mul(_rt._proj((labelKernel(Descent_Portability_SimulationDesignDecoder_design())), 'weight')(effects, outcome), _rt._proj((clippedReport(Descent_Portability_SimulationDesignDecoder_design(), cap, effects, outcome)), 'getD')(0.0))) for outcome in range(int(len(effects))))
 
 def linearForm(a, x):
     return sum((_rt.mul(a[int(k)], x[int(k)])) for k in range(int(len(a))))

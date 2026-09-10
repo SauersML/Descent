@@ -156,6 +156,12 @@ import Descent.Portability.DiscountedObservability
 import Descent.Portability.DynamicBlindness
 import Descent.Portability.HWEInteractionLaw
 import Descent.Portability.CombinedPredictionCertificate
+import Descent.Portability.FiniteIndependentMoments
+import Descent.Portability.BalancedHWEInteraction
+import Descent.Portability.BalancedHWECounterexample
+import Descent.Portability.DiploidEffectFieldLaw
+import Descent.Portability.QuadraticRigidityLaw
+import Descent.Portability.GaussianCovarianceSeparation
 
 assert_below Descent.Program
 

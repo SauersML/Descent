@@ -1,0 +1,21 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.GaussianCovarianceSeparation
+
+/-! Axiom audit of covariance separation and finite orbit Fourier identification. -/
+
+#print axioms Descent.Portability.GaussianCovarianceSeparation.exists_separating_evaluation
+#print axioms Descent.Portability.GaussianCovarianceSeparation.eval_covariancePolynomial
+#print axioms Descent.Portability.GaussianCovarianceSeparation.quadraticValue_single
+#print axioms Descent.Portability.GaussianCovarianceSeparation.quadraticValue_pair
+#print axioms Descent.Portability.GaussianCovarianceSeparation.covariancePolynomial_injective
+#print axioms Descent.Portability.GaussianCovarianceSeparation.exists_covariance_separating_vector
+#print axioms Descent.Portability.GaussianCovarianceSeparation.quadraticValue_smul
+#print axioms Descent.Portability.GaussianCovarianceSeparation.exponentialCharacter_injective
+#print axioms Descent.Portability.GaussianCovarianceSeparation.exponential_characters_independent
+#print axioms Descent.Portability.GaussianCovarianceSeparation.gaussianFourier_independent
+#print axioms Descent.Portability.GaussianCovarianceSeparation.all_gaussianFourier_independent
+#print axioms Descent.Portability.GaussianCovarianceSeparation.permuteCovariance_one
+#print axioms Descent.Portability.GaussianCovarianceSeparation.permuteCovariance_mul
+#print axioms Descent.Portability.GaussianCovarianceSeparation.orbitFourier_eq_iff
