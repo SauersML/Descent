@@ -107,6 +107,12 @@ import Descent.Portability.StoppedGenotypeReadiness
 import Descent.Portability.AncestralMutationLimit
 import Descent.Portability.DistanceBinnedPortabilityLaw
 import Descent.Portability.ReservoirSamplingLaw
+import Descent.Portability.AncestralEpochGenotypeLaw
+import Descent.Portability.AncestralMutationResolvent
+import Descent.Portability.SamplingDesignLaw
+import Descent.Portability.SourceDesignLaw
+import Descent.Portability.PortabilityRatioGeometry
+import Descent.Portability.InterleavedMutationExponential
 
 assert_below Descent.Program
 

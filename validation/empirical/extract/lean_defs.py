@@ -3056,6 +3056,12 @@ def cladeExposure(trace, duration, times, locus, clade):
 def mutationFactor(trace, duration, mutationRate, locus, clade, times):
     return _rt.rexp((_rt.rdiv(_rt.mul(_rt.mul(_rt.neg(4.0), (mutationRate)), cladeExposure(trace, duration, times, locus, clade)), 3.0)))
 
+def mergingTailContinuation(rates, ancestor, hisolated, mutationRate):
+    return (lambda start, hs: stoppedGenomeLaw(rates, ancestor, (relabelDemes(start, ((lambda _: ancestor)))), (sampleComplete_relabel(start, hs, ((lambda _: ancestor)))), (supportedAt_relabel(ancestor, start)), hisolated, mutationRate))
+
+def completeDemographyLaw(instructions, finalRates, ancestor, hisolated, mutationRate, start, hs):
+    return historyGenomeLaw(mutationRate, instructions, (mergingTailContinuation(finalRates, ancestor, hisolated, mutationRate)), start, hs)
+
 def jumpStateLaw(rates, s, h):
     return _rt._proj((Descent_Portability_AncestralEventLaw_jumpLaw(rates, s, h)), 'pushforward')((nextState(s)))
 
@@ -3067,6 +3073,9 @@ def traceNucleotideLaw(trace, duration, times, mutationRate, locus, _hcomplete, 
 
 def limitMarkLaw(rates, mutationRate, deme, s, hs, hsupported, hisolated, mark):
     return postcomposeMark(mark, (limitLaw(rates, mutationRate, deme, (scanNext(s, mark)), (positiveNextComplete(rates, mutationRate, s, hs, mark)), (positiveNextSupported(rates, mutationRate, deme, s, hsupported, hisolated, mark)), hisolated)))
+
+def rowNorm(values):
+    return sum((_rt.rabs(values(output))) for output in range(int(_rt.sumdim('output', len(values)))))
 
 def Descent_Portability_AncestralMutationTransfer_transfer(rates, mutationRate, family):
     return (lambda s: _rt._proj((Descent_Portability_AncestralMutationTransfer_markLaw(rates, mutationRate, s)), 'bind')((transferMark(family, s))))
@@ -3802,6 +3811,9 @@ def ascertainment_loss(coverage, v_causal):
 
 def total_portability_loss(loss_genetic, loss_technical):
     return Descent_Core_sum(loss_genetic, loss_technical)
+
+def kernelMatrix(kernel):
+    return (lambda source, target: _rt._proj((kernel(source)), 'mass')(target))
 
 def totalExposure(branches):
     return sum((_rt._proj((branches(index)), 'exposure')) for index in range(int(_rt.sumdim('index', len(branches)))))
@@ -4904,6 +4916,9 @@ def balancedContrast():
 def spreadContrast():
     return _rt.VecFn([(-_rt.rsqrt(2.0)), 0.0, 0.0, _rt.rsqrt(2.0)])
 
+def covarianceVector(p, scoreGenotype, causalGenotype, weights, k):
+    return sum((_rt.mul(weights[int(j)], Descent_Portability_FiniteReportLaw_covariance(p, ((lambda s: scoreGenotype[int(s)][int(j)])), ((lambda s: causalGenotype[int(s)][int(k)]))))) for j in range(int(_rt.sumdim('j', len(weights), len(scoreGenotype[0])))))
+
 def labels(liabilities):
     return (lambda i: decide(((0.0 < liabilities[int(i)]))))
 
@@ -4985,6 +5000,30 @@ def approxLOOPGS(pgs_full, leverage, residual):
 def kinshipInflation(r2_true, K, h2_family):
     return affineStep(r2_true, K, h2_family)
 
+def reservoirCausalLaw(requested, total, count, h):
+    return _rt._proj((completeLaw(requested, total)), 'joint')(((lambda _: causalChoice(count, (_rt.rmin(requested, total)), h))))
+
+def causalStream(draw):
+    return _rt._proj(_rt._proj(draw, '2'), 'trans')(_rt._proj(draw, '1'))
+
+def permutationLaw(n):
+    return Descent_Portability_SamplingDesignLaw_uniform(_)
+
+def sortedFit(h, permutation):
+    return _rt._proj((_rt._proj((fitSet(h, permutation)), 'orderEmbOfFin')((fitSet_card(h, permutation)))), 'toEmbedding')
+
+def innerFitRows(h, hi, outer, fixedInner):
+    return _rt._proj((fitRows(hi, fixedInner)), 'trans')((sortedFit(h, outer)))
+
+def innerSelectionRows(h, hi, outer, fixedInner):
+    return _rt._proj((testRows(hi, fixedInner)), 'trans')((sortedFit(h, outer)))
+
+def demePermutations(size):
+    return Descent_Portability_SamplingDesignLaw_uniform(_)
+
+def randomDesign(requested, total, count, h, size):
+    return _rt._proj((reservoirCausalLaw(requested, total, count, h)), 'joint')(((lambda _: demePermutations(size))))
+
 def pgsMean(β, p):
     return sum((_rt.mul(β[int(i)], (_rt.mul(2.0, p[int(i)])))) for i in range(int(len(β))))
 
@@ -5035,6 +5074,21 @@ def formAccuracy(p, scoreGenotype, causalGenotype, weights, effects):
 
 def formRatio(source, target, sourceScore, targetScore, sourceCausal, targetCausal, weights, effects):
     return _rt._proj((formAccuracy(source, sourceScore, sourceCausal, weights, effects)), 'bind')((lambda sourceR2: _rt._proj((formAccuracy(target, targetScore, targetCausal, weights, effects)), 'bind')((lambda targetR2: (some((_rt.rdiv(targetR2, sourceR2))) if (0.0 < sourceR2) else none)))))
+
+def sampleSize(source, deme):
+    return (5000.0 if (deme == source) else 250.0)
+
+def serialDistance(source, target):
+    return (((source - target)) + ((target - source)))
+
+def serialRadius(source):
+    return _rt.rmax(source, (((demes - 1.0) - source)))
+
+def gridDistance(source, target):
+    return (serialDistance(_rt._proj(source, '1'), _rt._proj(target, '1')) + serialDistance(_rt._proj(source, '2'), _rt._proj(target, '2')))
+
+def gridRadius(source):
+    return (serialRadius(_rt._proj(source, '1')) + serialRadius(_rt._proj(source, '2')))
 
 def incrementalR2(r2_full, r2_covariates):
     return difference(r2_full, r2_covariates)
