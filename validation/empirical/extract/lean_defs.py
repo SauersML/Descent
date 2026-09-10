@@ -3788,6 +3788,12 @@ def residual(kernel, approximation, time, state):
 def genomeGenerator(state, rate):
     return productGenerator(((lambda locus: physicalGenerator((replaceExposure((intervalTemplates(state, locus)), ((lambda _: rate))))))))
 
+def squaredSingularValues(L):
+    return _rt._proj((gram_symmetric(L)), 'eigenvalues')(rfl)
+
+def rightBasis(L):
+    return _rt._proj((gram_symmetric(L)), 'eigenvectorBasis')(rfl)
+
 def clippedStep(delta):
     return ((lambda j: _rt.mul((_rt.rdiv(5.0, maxAbs(delta))), delta[int(j)])) if (5.0 < maxAbs(delta)) else delta)
 
@@ -3822,7 +3828,7 @@ def Converged(iteration, state, current):
     return ((((iteration != 0.0) and (_rt._proj(state, 'previousMagnitude') <= _rt.rdiv(1.0, 100000.0))) and (maxAbs(_rt._proj(current, 'score')) < _rt.rdiv(1.0, 100000.0))) and ((_rt._proj(current, 'penalizedLogLikelihood') - _rt._proj(state, 'previousLogLikelihood')) < _rt.rdiv(1.0, 100000.0)))
 
 def exactRun(x, labels):
-    return run(exactMatrixChecks(), x, labels)
+    return Descent_Portability_FirthFiniteIterationLaw_run(exactMatrixChecks(), x, labels)
 
 def jointLaw():
     return _rt._proj((labelKernel(design())), 'jointMeasure')((effectLaw(K)))
@@ -3961,6 +3967,9 @@ def temporalExactBrierRisk(π, signalAtTime):
 
 def modelStaleness(lambda_, t):
     return (1.0 - _rt.rexp((((-lambda_) * t))))
+
+def Descent_Portability_LowMomentObstruction_sign(bit):
+    return ((-1.0) if bit else 1.0)
 
 def mechanisticPortabilityRatio(m):
     return _rt.rdiv(r2FromSourceWeights(m, 1), r2FromSourceWeights(m, 0))
@@ -4562,7 +4571,7 @@ def fitOutcomes(cohorts, labels):
 def flipSign(cohorts, labels, scores):
     return (((AllFinite(scores, _rt._proj(cohorts, 'fitRow')) and (0.0 < _rt._proj((Descent_Portability_SamplingDesignLaw_uniform(Fit)), 'variance')((fitScore(cohorts, scores))))) and (0.0 < _rt._proj((Descent_Portability_SamplingDesignLaw_uniform(Fit)), 'variance')((fitOutcomes(cohorts, labels))))) and (_rt._proj((Descent_Portability_SamplingDesignLaw_uniform(Fit)), 'covariance')((fitScore(cohorts, scores)), (fitOutcomes(cohorts, labels))) < 0.0))
 
-def sign(cohorts, labels, scores):
+def Descent_Portability_PThresholdTrainingLaw_sign(cohorts, labels, scores):
     return by(classical, exact, ((-1.0) if flipSign(cohorts, labels, scores) else 1.0))
 
 def linearScoreFiles(table, genotype, factor):
@@ -5119,6 +5128,45 @@ def expectedEffectMultiplier(p, α):
 
 def numeratorFactor(effects):
     return _rt.rdiv((_rt.mul(_rt.lpow(crossForm(target, targetScore, targetCausal, weights, effects), 2.0), (_rt.mul(varianceForm(source, sourceScore, weights), varianceForm(source, sourceCausal, effects))))), (_rt.mul(varianceForm(target, targetScore, weights), varianceForm(target, targetCausal, effects))))
+
+def excessRisk(fminus, fplus, delta):
+    return _rt.rdiv(((_rt.lpow(((fminus - ((_rt.rdiv(1.0, 2.0) - delta)))), 2.0) + _rt.lpow(((fplus - ((_rt.rdiv(1.0, 2.0) + delta)))), 2.0))), 2.0)
+
+def fiberSum(p, score, a, f):
+    return sum(((_rt.mul(_rt._proj(p, 'mass')(x), f[int(x)]) if (score(x) == a) else 0.0)) for x in range(int(len(f))))
+
+def fiberMass(p, score, a):
+    return fiberSum(p, score, a, ((lambda _: 1.0)))
+
+def fiberMean(p, score, a, f):
+    return _rt.rdiv(fiberSum(p, score, a, f), fiberMass(p, score, a))
+
+def fiberCovariance(p, score, a, f, g):
+    return _rt.sub(fiberMean(p, score, a, ((lambda x: _rt.mul(f[int(x)], g[int(x)])))), _rt.mul(fiberMean(p, score, a, f), fiberMean(p, score, a, g)))
+
+def allele(b):
+    return (1.0 if b else 0.0)
+
+def interaction(x):
+    return (allele(_rt._proj(x, '1')) * allele(_rt._proj(x, '2')))
+
+def additiveFit(p1, p2, x):
+    return ((((-p1) * p2) + (p2 * allele(_rt._proj(x, '1')))) + (p1 * allele(_rt._proj(x, '2'))))
+
+def witnessSource():
+    return twoLocusLaw((_rt.rdiv(1.0, 2.0)), (_rt.rdiv(1.0, 2.0)), (by(norm_num)), (by(norm_num)))
+
+def witnessRisk(x):
+    return _rt.rdiv(((allele(_rt._proj(x, '1')) + allele(_rt._proj(x, '2')))), 2.0)
+
+def witnessScore(b):
+    return (_rt.rdiv(1.0, 4.0) + _rt.rdiv(allele(b), 2.0))
+
+def posterior(prior, likelihood0, likelihood1):
+    return _rt.rdiv((prior * likelihood1), (((((1.0 - prior)) * likelihood0) + (prior * likelihood1))))
+
+def priorOddsMultiplier(sourcePrior, targetPrior):
+    return _rt.rdiv((_rt.rdiv(targetPrior, ((1.0 - targetPrior)))), (_rt.rdiv(sourcePrior, ((1.0 - sourcePrior)))))
 
 def choiceLaw(capacity, seen):
     return _rt._proj((uniformDraw(seen)), 'pushforward')((choice(capacity, seen)))

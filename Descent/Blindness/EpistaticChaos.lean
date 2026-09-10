@@ -13,83 +13,36 @@ namespace Descent.Blindness
 noncomputable section
 
 /-!
-# Epistatic chaos: no jumps, and what erases signs
+# Epistatic chaos: conditional tail control and finite genotype algebra
 
-A phenotype built from interactions is a multilinear form in standardized
-genotypes: `f = ∑_S c_S ∏_{i ∈ S} x_i`, with `∑_S c_S² = 1` fixing the scale.
-Two questions decide whether the Gaussian surrogate used throughout PGS theory
-is legitimate at high interaction order, and they have different answers.
+The no-jump theorem in this file assumes a uniform per-monomial tilted-tail
+bound. It propagates that bound to the entire design by a union bound and
+unit coefficient energy. Disjointness, linkage equilibrium, growing degree,
+and vanishing individual-locus influence do not imply the missing tail bound
+or a Gaussian limit.
 
-**Can one interaction term dominate?** No. If every monomial obeys the tilted
-tail bound — the size-biased walk's concentration bound, which supplies
-`P((x^S)² > T) ≤ C / (T √|S|)` — then a union bound over the whole design gives
-`P(some term exceeds τ) ≤ C / (τ² √m_min)`, which vanishes as the minimum
-interaction order grows. High-order epistasis produces no macroscopic
-single-combination effects, for any design and any coding: there are no
-epistatic outliers to find, and a search for them is a search for something
-that cannot exist.
+At balanced HWE loci, a standardized dosage is zero with probability one half
+and is each of `-sqrt 2` and `sqrt 2` with probability one quarter. For `2^m`
+independent disjoint blocks of degree `m`, each block normalized by `sqrt (2^m)`
+is zero with probability `1 - 2^(-m)` and otherwise has magnitude one. The sum
+has characteristic function `(1 + 2^(-m) * (cos t - 1))^(2^m)`, whose limit is
+`exp (cos t - 1)`. This is a signed compound-Poisson limit, despite unit
+variance and locus influence `2^(-m)`. Consequently no Gaussian-only
+classification follows from those design conditions.
 
-**Do overlapping interaction terms decouple at second order?** Only when the
-coding is sign-symmetric. The Sign-Erasure Lemma below is exact and finite: if
-the coordinate law is invariant under a value-negating relabelling and the
-truncation depends only on magnitudes, then every truncated cross-moment between
-two distinct monomials vanishes identically.
+Sign erasure is a separate finite statement: a value-negating relabelling
+preserving the coordinate law kills truncated cross-moments when truncation
+depends only on magnitudes. It does not determine higher moments or the law
+of the entire statistic. The two-pool results below give finite overlap and
+moment identities; their assumed moments do not constitute a limit theorem.
 
-Second order is as far as that goes, and the qualifier is load-bearing. Sign
-erasure does **not** license the conclusion that overlapping designs collapse
-onto their disjoint skeletons and so inherit the independent limit theory. That
-conclusion is false, and §`OverlapSpectrum` below refutes it inside the
-symmetric class: the two-pool interaction statistic
-`T₁ * T₂` has vanishing truncated cross-moments under any symmetric law, and a
-limiting fourth cumulant of `6`, whereas every disjoint design's limit has
-fourth cumulant `0` (`sign_symmetry_does_not_license_disjoint_reduction`). What
-actually licenses the independent limit theory is *disjointness of the tested
-locus-sets*, and nothing weaker.
+For centered and standardized polymorphic HWE dosage, sign symmetry holds
+exactly at allele frequency one half. At that frequency the square-biased
+log increment has zero variance, while its drift is `log 2`. The corresponding
+Mellin-jet degeneracy does not establish a uniform no-jump estimate. Every use
+of a Gaussian calibration must separately discharge suitable tail or
+Lindeberg conditions for the stated array.
 
-The genetics is decided by where hard-called diploid dosage sits with respect
-to that symmetry, and the answer is that it never sits inside: away from
-frequency one half the coding is skewed, and at one half the squared coding
-takes only two values, so its logarithm is confined to a single point. Both
-failures are proved below. The consequence is not that the Gaussian surrogate
-is wrong — no jumps means no gross failure — but that its justification cannot
-come from a universality argument about the coding, and must come from the
-bounded-degree invariance principle or from the Mellin data of
-`Descent.Spectral.PolygenicSpectroscopy` instead.
-
-## Applicability record for the genotype instantiation
-
-Because the symmetry hypothesis is a *hypothesis*, every result that carries it
-is true as stated and says nothing about genotypes until the hypothesis is
-discharged for genotypes. `hwe_symmetricCoding_iff_half` and
-`standardizedGenotype_symmetric_iff` discharge it, and the answer is a single
-point: **a Hardy-Weinberg locus is sign-symmetric if and only if its allele
-frequency is exactly one half**, for the centered dosage and equally for the
-standardized coordinate `x = (dosage - 2q) / sqrt (2 q (1 - q))`, since
-rescaling by a constant cannot create or destroy a value-negating relabelling
-(`SymmetricCoding.scale`).
-
-> the genotype instantiation of any sign-symmetry result is licensed only at
-> `q = 1/2`.
-
-And `q = 1/2` is the frequency at which the theory's other quantitative input
-degenerates: `Descent.PolygenicSpectroscopy.hweMellinJetVariance_half` gives
-`v(1/2) = 0`, and `centeredDosageSquare_two_valued_at_half` below is the same
-degeneracy read off the coding. The one frequency where the symmetry hypothesis
-holds is the one frequency where the size-biased increment carries no variance
-at all, so the symmetric-law branch of the theory is, for genotypes, supported
-on a point where the second observable is empty.
-
-Two things this record is *not*. It is not a claim that the drift is degenerate
-at `q = 1/2`: the size-biased drift there is `c(1/2) = log 2 = 0.6931...`
-(`hweMellinDrift_half`), not zero, because the standardized coordinate at a
-balanced locus takes the values `-sqrt 2, 0, sqrt 2` — it is *not* Rademacher,
-and `x ^ 2` is not identically one. It is also not a caveat on the
-condensation/drift arc: the direct quantities in `Descent.Blindness.Condensation` require no
-symmetry field, so the drift-separation and critical-degree results apply at
-every allele frequency. What is symmetry-gated is the sign-erasure lemma here —
-the vanishing of truncated cross-moments — and the completeness statements built
-on it. §`OverlapSpectrum` is gated on something else entirely, disjointness of
-the tested locus-sets, and is licensed at every allele frequency.
 -/
 
 section NoJump
@@ -147,8 +100,8 @@ theorem no_macroscopic_interaction_term_of_tilted_tail
   simp_rw [hfactor]
   rw [← Finset.mul_sum, hnorm, mul_one]
 
-/-- The no-jump bound vanishes as the minimum interaction order grows: at high
-epistatic order the design has no jump part at all, whatever the coding. -/
+/-- The numerical upper bound vanishes for a fixed uniform tail constant.
+Applying this limit to a design still requires the preceding tilted-tail hypothesis. -/
 theorem no_macroscopic_interaction_limit
     (tiltConstant threshold : ℝ) (hthreshold : threshold ≠ 0) :
     Filter.Tendsto
@@ -696,71 +649,29 @@ end GenotypeCoding
 section OverlapSpectrum
 
 /-!
-## Disjoint locus-sets versus overlapping ones: a licence and a prohibition
+## What disjointness and genotype normalization establish
 
-Everything above concerns one interaction term at a time (no jumps) or two terms
-at a time (sign erasure). Neither settles the question a practitioner faces,
-which is about a whole *design* at once: given the collection of locus-sets a
-set-based or interaction study tests over a panel of Hardy-Weinberg loci, what
-null distributions can the test statistic have?
+The declarations below construct standardized HWE coordinates, joint genotype
+panels, disjoint burden designs, and overlapping window and two-pool designs.
+They prove centering, second moments, finite influence identities, and the
+stated disjointness or overlap properties.
 
-Two results answer it, and they answer in opposite directions according to a
-single structural property — whether the tested locus-sets share variants. Neither
-is carried as a field of an assumption-packaging interface such as
-`GenotypeChaosLimits`, because a hypothesis held as a field cannot be contradicted.
-Everything is stated over
-`GenotypeDesign`, whose coordinates are the standardized Hardy-Weinberg genotypes
-`HardyWeinbergModel.standardizedGenotype` of a stated allele-frequency family, so
-that the statements can be contradicted by the rest of the corpus.
+Pairwise disjoint locus sets under the product genotype law give independent
+blocks. They do not by themselves select a Gaussian limit. Growing minimum
+order, vanishing locus influence, and unit variance still permit the balanced
+compound-Poisson construction described above.
 
-Call a design admissible when the minimum interaction order grows, the influence
-of each locus (`GenotypeDesign.locusInfluence`, the share of the statistic's
-energy carried by that variant) vanishes, and the statistic has unit variance.
+The previous Gaussian-only classification, called “Theorem D”, omitted the
+uniform tilted-tail hypothesis from its advertised assumptions. The formal
+`no_macroscopic_interaction_term_of_tilted_tail` includes that hypothesis and
+remains a conditional bound. No unconditional Gaussian classification is
+proved by this section. Likewise, the finite overlapping-design witnesses do
+not prove an exhaustive classification of achievable weak limits.
 
-* **Theorem D (the licence).** For a design whose tested locus-sets are pairwise
-  *disjoint*, over polymorphic loci in linkage equilibrium, the achievable limits
-  are the one-parameter Gaussian segment `{N(0, s²) : 0 ≤ s² ≤ 1}`. Only the
-  variance is free, so a Gaussian or chi-square calibration is justified by the
-  asymptotics. Gene-based burden or kernel tests in which each variant is
-  assigned to one gene are in this case: `geneBurdenDesign_variantDisjoint`.
+Sign symmetry, independence of disjoint blocks, and small-tail conditions are
+separate requirements. The centering and second-moment facts below hold at
+all polymorphic frequencies; they do not discharge the small-tail condition.
 
-* **Theorem S (the prohibition).** With disjointness dropped, and at *any*
-  prescribed polymorphic allele-frequency family, the achievable limits are
-  weakly dense in the entire moment body: every centered law with second moment
-  at most one. Sliding windows are in this case
-  (`slidingWindowDesign_not_variantDisjoint`), as are overlapping pathway panels
-  and any pleiotropic variant recurring across tested sets.
-
-Theorem S is strictly stronger than the folklore. Folklore puts the effect of
-overlap at a variance-mixture component in the limit. A variance mixture of
-centered Gaussians is symmetric, unimodal and has non-negative fourth cumulant,
-and the moment body contains laws that are none of those.
-
-### Does the licence need sign symmetry? No, and this matters
-
-`standardizedGenotype_symmetric_iff` proves that a standardized Hardy-Weinberg
-coordinate is sign-symmetric only at `q = 1/2`, so any result needing symmetry is
-licensed for genotypes at one frequency. The disjoint licence does **not** need
-it, and the reason is visible in the inputs its proof route uses:
-
-1. each coordinate is centered with unit variance — proved for the standardized
-   genotype at every polymorphic frequency below, without symmetry, in
-   `standardizedGenotype_expectation_zero` and
-   `standardizedGenotype_second_moment_one`;
-2. the coordinates are independent across loci — the linkage-equilibrium
-   hypothesis `GenotypeDesign.InLinkageEquilibrium`, an argument of the licence,
-   not an assumption about the coding;
-3. no monomial is macroscopic — `no_macroscopic_interaction_term_of_tilted_tail`
-   of §`NoJump`, which carries no symmetry hypothesis and holds for any design
-   and any coding that supplies the per-monomial tilted tail bound.
-
-Sign symmetry belongs to the *other* route, the one that tries to reduce
-overlapping designs to disjoint skeletons by killing cross-moments. That route
-fails for a reason unrelated to genotypes, and
-`sign_symmetry_does_not_license_disjoint_reduction` below exhibits the failure
-inside the symmetric class. So the honest division is: the licence is
-frequency-free and needs linkage equilibrium; the sign-erasure reduction is
-frequency-gated and does not deliver the licence anyway.
 -/
 
 variable {ι : Type*} [Fintype ι] {n : ℕ}
@@ -802,8 +713,7 @@ theorem hweCenteredMoment_eq (h : Foundations.HardyWeinbergModel) (k : ℕ) :
 /-- **The standardized genotype is centered**, at every allele frequency and with no symmetry
 hypothesis: `E[(g - 2q) / sqrt (2q(1-q))] = 0`.
 
-This is the first of the two coordinate-level inputs the disjoint licence needs,
-and it is the reason that licence is not frequency-gated. -/
+This coordinate identity holds at every frequency; it does not imply a tail bound. -/
 theorem standardizedGenotype_expectation_zero (h : Foundations.HardyWeinbergModel) :
     ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g = 0 := by
   have hfactor : ∀ g : Foundations.DiploidGenotype,
@@ -826,10 +736,8 @@ allele frequency, again with no symmetry hypothesis: the normalization divides b
 `sqrt` of exactly the variance `HardyWeinbergModel.genotypeVariance` is defined
 to be.
 
-This is the second coordinate-level input of the disjoint licence. Together with
-`standardizedGenotype_expectation_zero` it says the genotype coordinate meets the
-hypotheses of the chaos theory at every frequency in `(0, 1)` — which is why
-Theorem D, unlike everything in §`SignErasure`, is not restricted to `q = 1/2`. -/
+Together with centering, this establishes the coordinate normalization at every
+polymorphic frequency. Uniform tail control is an additional requirement. -/
 theorem standardizedGenotype_second_moment_one (h : Foundations.HardyWeinbergModel)
     (hq0 : 0 < h.altFreq) (hq1 : h.altFreq < 1) :
     ∑ g : Foundations.DiploidGenotype, h.genotypeProb g * h.standardizedGenotype g ^ 2 = 1 := by
@@ -1532,8 +1440,8 @@ population's joint genotype law over the panel.
 The joint law is carried alongside the per-locus models so that linkage
 equilibrium is a checkable relation between them
 (`GenotypeDesign.InLinkageEquilibrium`) rather than a silent assumption; the
-disjoint licence needs it, and a design whose tested sets sit inside one LD block
-does not have it. -/
+independent-block argument needs it. Pairwise disjointness of locus sets alone
+does not imply factorization of the joint genotype law. -/
 structure GenotypeDesign (n : ℕ) (ι : Type*) where
   /-- The Hardy-Weinberg model of each locus on the panel. -/
   model : Fin n → Foundations.HardyWeinbergModel
@@ -1561,10 +1469,8 @@ factorizes into the per-locus Hardy-Weinberg laws. It is stated as the
 factorization it is; the dynamics that drive a population towards it live in
 `Descent.PopGen.LDDecayTheory`.
 
-This is an assumption about the population, not about the coding, and it is what
-the disjoint licence needs in place of symmetry. A design whose tested sets sit
-inside one LD block does not have it, which makes the licence's applicability
-checkable on a study's own panel rather than on an idealized coordinate law.
+This is an assumption about the joint population law. It supplies independence
+of disjoint blocks, not a Gaussian limit or an order-uniform tail estimate.
 
 Note for automated checking: this is a *predicate* on a design, not a stipulated
 equilibrium quantity. There is no one-step map here and nothing for a
@@ -1638,7 +1544,7 @@ def freeRecombinationStep (d : GenotypeDesign n ι) : GenotypeDesign n ι where
     It is the rest point of `freeRecombinationStep`
     (`equilibriumDesign_isFixedPoint`), so the name is earned by the dynamic
     rather than stipulated. A design in linkage DISequilibrium is equally easy
-    to write and is what the disjoint-licence results are about failing on. -/
+    to write; disjoint locus sets need not be independent under that law. -/
 def equilibriumDesign (model : Fin n → Foundations.HardyWeinbergModel)
     (locusSet : ι → Finset (Fin n)) (coefficient : ι → ℝ) : GenotypeDesign n ι where
   model := model
@@ -1710,7 +1616,7 @@ This is the design-level form of `standardizedGenotype_second_moment_one`, which
 is stated one locus at a time. The chaos results of this module quantify over a
 `GenotypeDesign`, so the hypothesis they actually need is the panel-level one;
 carrying it as `Polymorphic` rather than as a pair of inequalities per locus is
-what lets a licence state its frequency requirement once. -/
+what lets a normalization theorem state its frequency requirement once. -/
 theorem polymorphic_standardizedGenotype_second_moment_one
     (h : design.Polymorphic) (i : Fin n) :
     ∑ g : Foundations.DiploidGenotype,
@@ -1721,7 +1627,7 @@ theorem polymorphic_standardizedGenotype_second_moment_one
 omit [Fintype ι] in
 /-- **Centering needs no polymorphism.** The companion first-moment fact holds at
 every locus of every design, polymorphic or not, so the two coordinate-level
-inputs of the disjoint licence are not symmetric in what they cost: only the
+normalization inputs have different hypotheses: only the
 variance normalization is frequency-gated. Recording that asymmetry here is what
 keeps `Polymorphic` from being attached to results that do not need it. -/
 theorem standardizedGenotype_expectation_zero_of_design (i : Fin n) :
@@ -1733,9 +1639,9 @@ theorem standardizedGenotype_expectation_zero_of_design (i : Fin n) :
 /-- **The disjointness hypothesis, as a property of the design.** No variant
 enters two tested sets.
 
-This is what Theorem D needs and what Theorem S is the failure of. It is a named
-predicate so that every result depending on it carries it as an argument rather
-than in prose. Gene-based burden tests over non-overlapping genes have it
+This named predicate records the combinatorial property. It supplies no
+asymptotic tail bound or distributional classification. Gene-based burden tests
+over non-overlapping genes have it
 (`geneBurdenDesign_variantDisjoint`); sliding windows never do
 (`slidingWindowDesign_not_variantDisjoint`); a pathway panel has it only if no
 gene belongs to two pathways.
@@ -1964,8 +1870,7 @@ theorem variantDisjoint_iff_variantRecurrence_le_one {design : GenotypeDesign n 
 omit [Fintype ι] in
 /-- **A recurrent variant refutes disjointness.** If one variant enters two
 distinct tested sets — one SNP in two sliding windows, one gene in two pathways,
-one pleiotropic variant in two panels — the design is not disjoint and the
-licence below does not apply to it. -/
+one pleiotropic variant in two panels — the design is not disjoint. -/
 theorem not_variantDisjoint_of_recurrent {design : GenotypeDesign n ι}
     {i : Fin n} {s t : ι} (hst : s ≠ t)
     (hs : i ∈ design.locusSet s) (ht : i ∈ design.locusSet t) :
@@ -2010,8 +1915,7 @@ def geneBurdenDesign {γ : Type*} [DecidableEq γ] (model : Fin n → Foundation
   jointGenotypeProb := jointGenotypeProb
 
 /-- **Gene-based burden over non-overlapping genes is disjoint**, because each
-variant has one gene. This is the hypothesis of the licence, discharged for the
-first of the two classes. -/
+variant has one gene. This proves the combinatorial property only. -/
 theorem geneBurdenDesign_variantDisjoint {γ : Type*} [DecidableEq γ]
     (model : Fin n → Foundations.HardyWeinbergModel) (geneOf : Fin n → γ) (coeff : γ → ℝ)
     (jointGenotypeProb : (Fin n → Foundations.DiploidGenotype) → ℝ) :
@@ -2038,9 +1942,8 @@ def slidingWindowDesign (model : Fin n → Foundations.HardyWeinbergModel) (widt
   jointGenotypeProb := jointGenotypeProb
 
 /-- **Sliding windows are never disjoint** once the window is wider than one
-locus: consecutive windows share the variant at the later start position. The
-licence below therefore does not apply to any sliding-window scan, and by
-Theorem S its achievable nulls are the whole moment body. -/
+locus: consecutive windows share the variant at the later start position.
+The supplied indices certify the overlap; no classification of limits follows. -/
 theorem slidingWindowDesign_not_variantDisjoint
     (model : Fin n → Foundations.HardyWeinbergModel) (width : ℕ)
     (coeff : Fin n → ℝ) (jointGenotypeProb : (Fin n → Foundations.DiploidGenotype) → ℝ)
@@ -2091,8 +1994,7 @@ asymptotic statement anywhere below. What is proved is:
 * `twoPool_expansion` — the product of the two pool sums is the sum of the
   cross-pool terms. Finite algebra.
 * `twoPool_pairs_overlap`, `twoPool_not_variantDisjoint` — the design is not
-  variant-disjoint once the second pool holds two loci, so the licence of
-  Theorem D does not cover it.
+  variant-disjoint once the second pool holds two loci.
 * `fourthCumulantFromMoments_gaussian` — Gaussian moments give fourth cumulant
   `0`.
 * `fourthCumulantFromMoments_of_squared_standard_moments` — *if* the product law's second and
@@ -2136,9 +2038,8 @@ theorem twoPool_pairs_overlap {poolOne poolTwo : Finset (Fin n)}
 omit [Fintype ι] in
 /-- **The witness design is not disjoint**, as soon as the second pool holds two
 loci: the two cross-pairs at a fixed first locus are distinct tested sets sharing
-that locus. So the witness is an admissible design outside the reach of the
-licence — which is what makes it a witness rather than a counterexample to
-Theorem D. -/
+that locus. This is a finite overlap statement, not an asymptotic admissibility
+or limit-distribution theorem. -/
 theorem twoPool_not_variantDisjoint {design : GenotypeDesign n ι}
     {poolOne poolTwo : Finset (Fin n)}
     (hwitness : design.IsTwoPoolInteraction poolOne poolTwo)
@@ -2185,8 +2086,7 @@ this body below that threshold is reading rounding noise. -/
 def fourthCumulantFromMoments (secondMoment fourthMoment : ℝ) : ℝ :=
   fourthMoment - 3 * secondMoment ^ 2
 
-/-- A centered Gaussian has vanishing fourth cumulant whatever its variance: the
-order-four content of Theorem D's segment. -/
+/-- Gaussian second and fourth moments give zero fourth cumulant. -/
 theorem fourthCumulantFromMoments_gaussian (s2 : ℝ) :
     fourthCumulantFromMoments s2 (3 * s2 ^ 2) = 0 := by
   unfold fourthCumulantFromMoments

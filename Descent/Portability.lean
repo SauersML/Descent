@@ -141,6 +141,14 @@ import Descent.Portability.ReportConditionalRiskLaw
 import Descent.Portability.ObservableClosureLaw
 import Descent.Portability.GuardedMetricOptimization
 import Descent.Portability.OptimalMeasurementAllocation
+import Descent.Portability.TargetUncertainty
+import Descent.Portability.AdaptiveLinearMeasurements
+import Descent.Portability.EllipsoidTargetRadius
+import Descent.Portability.FiniteTargetSpectrum
+import Descent.Portability.ReportFiniteCalibrationLaw
+import Descent.Portability.ReportCalibrationTransport
+import Descent.Portability.MinimalObservableLaw
+import Descent.Portability.LowMomentObstruction
 
 assert_below Descent.Program
 
