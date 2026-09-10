@@ -3131,6 +3131,13 @@ def portableFraction(r2_causal, r2_total):
 def proportionalAllocation(pop_size, total_n, total_pop):
     return (total_n * (_rt.rdiv(pop_size, total_pop)))
 
+def coordinateRisk(u, V, a):
+    return _rt.sub((sum((sum((_rt.mul(_rt.mul(a[int(i)], V[int(i)][int(j)]), a[int(j)])) for j in range(int(len(u))))) for i in range(int(len(u))))), _rt.mul(2.0, sum((_rt.mul(u[int(i)], a[int(i)])) for i in range(int(len(u))))))
+
+def certifiedBound(u, V, εu, εV, a):
+    I = float(len(u))
+    return _rt.add(_rt.add(coordinateRisk(u, V, a), _rt.mul(_rt.mul((_rt.sumdim('I', len(u), len(V), len(a))), εV), (sum((_rt.lpow(a[int(i)], 2.0)) for i in range(int(len(u))))))), _rt.mul(_rt.mul(2.0, εu), sum((_rt.rabs(a[int(i)])) for i in range(int(len(u))))))
+
 def code(*_a):
     if len(_a) < 1:
         return lambda *_b: code(*(_a + _b))
@@ -3179,6 +3186,12 @@ def misspecExcessRisk(π, σ_β_sq):
 
 def posteriorPredictiveVariance(residual_var, estimation_var):
     return Descent_Core_sum(residual_var, estimation_var)
+
+def interiorNodes(lo, hi, i, k):
+    return (_rt.rdiv((_rt.add(_rt.mul(2.0, lo[int(i)]), hi[int(i)])), 3.0) if (k == 0.0) else (_rt.rdiv((_rt.add(lo[int(i)], hi[int(i)])), 2.0) if (k == 1.0) else _rt.rdiv((_rt.add(lo[int(i)], _rt.mul(2.0, hi[int(i)]))), 3.0)))
+
+def extension(lo, hi, b, i):
+    return tensorQuadratic((interpolatedCoefficients((interiorNodes(lo, hi)), ((lambda g: b(i, ((lambda j: interiorNodes(lo, hi, j, (g(j)))))))))))
 
 def Descent_Portability_CalibrationLaw_prevalence(p, linear, intercept):
     return Descent_Portability_FiniteReportLaw_expectation(p, ((lambda s: normalCDF((_rt.add(intercept, linear[int(s)]))))))
@@ -3900,11 +3913,11 @@ def offspringFrequency(step, counts, destination):
     q = sum(((_rt._proj((_rt._proj(step, 'migration')(destination)), 'mass')(source) * parentalFrequency(counts, source))) for source in range(int(_rt.sumdim('source', len(_rt._proj((_rt._proj(step, 'migration')(destination)), 'mass'))))))
     return ((((1.0 - _rt._proj((_rt._proj(step, 'mutationDown')(destination)), 'val'))) * q) + (_rt._proj((_rt._proj(step, 'mutationUp')(destination)), 'val') * ((1.0 - q))))
 
-def offspringLaw(step, hN, counts):
+def Descent_Portability_FiniteDemographicSampling_offspringLaw(step, hN, counts):
     return Descent_Portability_FiniteDemographicSampling_independentLaw(((lambda copy, Deme, Fin, N: offspringAlleleLaw(step, hN, counts, _rt._proj(copy, '1')))))
 
-def transition(step, hN, counts):
-    return _rt._proj((offspringLaw(step, hN, counts)), 'pushforward')(countOffspring)
+def Descent_Portability_FiniteDemographicSampling_transition(step, hN, counts):
+    return _rt._proj((Descent_Portability_FiniteDemographicSampling_offspringLaw(step, hN, counts)), 'pushforward')(countOffspring)
 
 def inner(law, first, second):
     return sum((_rt.mul(_rt.mul(_rt._proj(law, 'mass')(state), first[int(state)]), second[int(state)])) for state in range(int(len(first))))
@@ -3924,11 +3937,17 @@ def Stationary(law, kernel):
 def pairing(f, p):
     return sum((_rt.mul(f[int(state)], p[int(state)])) for state in range(int(len(f))))
 
-def residual(kernel, approximation, time, state):
+def Descent_Portability_FiniteNumericalCertificate_residual(kernel, approximation, time, state):
     return (approximation(time, state) - _rt._proj((kernel(time, state)), 'expectation')((approximation(((time + 1.0))))))
 
 def genomeGenerator(state, rate):
     return productGenerator(((lambda locus: physicalGenerator((replaceExposure((intervalTemplates(state, locus)), ((lambda _: rate))))))))
+
+def Descent_Portability_FiniteReproductiveKernel_offspringLaw(model, state):
+    return _rt._proj((_rt._proj(model, 'mating')(state)), 'bind')((_rt._proj(model, 'transmission')(state)))
+
+def fitnessTotal(counts, fitness):
+    return sum((_rt.mul((counts(reproductiveType)), fitness[int(reproductiveType)])) for reproductiveType in range(int(len(fitness))))
 
 def squaredSingularValues(L):
     return _rt._proj((gram_symmetric(L)), 'eigenvalues')(rfl)
@@ -4182,6 +4201,12 @@ def temporalExactBrierRisk(π, signalAtTime):
 def modelStaleness(lambda_, t):
     return (1.0 - _rt.rexp((((-lambda_) * t))))
 
+def Descent_Portability_LossMomentRange_residual(s, z):
+    return (((2.0 if _rt._proj(z, '1') else 1.0)) * (_rt.VecFn([(-_rt.rsqrt(s)), 0.0, _rt.rsqrt(s)]))(_rt._proj(z, '2')))
+
+def Descent_Portability_LossMomentRange_conditionalVariance():
+    return (lambda d: (4.0 if d else 1.0))
+
 def Descent_Portability_LowMomentObstruction_sign(bit):
     return ((-1.0) if bit else 1.0)
 
@@ -4202,6 +4227,15 @@ def marker():
 
 def hidden():
     return _rt.VecFn([(-1.0), 1.0, (-1.0), 1.0])
+
+def concentratedSignal():
+    return _rt.VecFn([1.0, 7.0])
+
+def evenSignal():
+    return _rt.VecFn([5.0, 5.0])
+
+def replicationNoise(b):
+    return (2.0 if b else (-2.0))
 
 def mechanisticPortabilityRatio(m):
     return _rt.rdiv(r2FromSourceWeights(m, 1), r2FromSourceWeights(m, 0))
@@ -5609,6 +5643,9 @@ def gridDistance(source, target):
 
 def gridRadius(source):
     return (serialRadius(_rt._proj(source, '1')) + serialRadius(_rt._proj(source, '2')))
+
+def coordinate(L, i):
+    return innerSL(ℝ, (rightBasis(L, i)))
 
 def incrementalR2(r2_full, r2_covariates):
     return difference(r2_full, r2_covariates)

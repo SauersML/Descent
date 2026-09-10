@@ -215,6 +215,12 @@ import Descent.Portability.FourCycleIntegratedCorrelation
 import Descent.Portability.ProbabilityTestClosure
 import Descent.Portability.CompactParameterIntegralLaw
 
+import Descent.Portability.SpectralMeasurementMinimax
+import Descent.Portability.FiniteReproductiveKernel
+import Descent.Portability.RadialPotentialLaw
+import Descent.Portability.BoxDifferentialLaw
+import Descent.Portability.TightAlgebraConvergence
+
 assert_below Descent.Program
 
 /-!

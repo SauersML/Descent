@@ -43,7 +43,8 @@ theorem target_coordinates (L : E →L[ℝ] F) (v : E) :
     ‖L v‖ ^ 2 = ∑ i, squaredSingularValues L i * (coordinate L i v) ^ 2 := by
   simp only [coordinate_repr, target_norm_expansion]
 
-noncomputable def truncatedParameter (L : E →L[ℝ] F) (q : ℕ) (hq : q ≤ Module.finrank ℝ E) (v : E) : E :=
+noncomputable def truncatedParameter (L : E →L[ℝ] F) (q : ℕ)
+    (hq : q ≤ Module.finrank ℝ E) (v : E) : E :=
   ∑ j : Fin q, coordinate L (j.castLE hq) v • rightBasis L (j.castLE hq)
 
 theorem coordinate_prefix (L : E →L[ℝ] F) (q : ℕ) (hq : q ≤ Module.finrank ℝ E)
@@ -171,5 +172,54 @@ theorem adaptive_minimax (L : E →L[ℝ] F) (q : ℕ) (hq : q < Module.finrank 
   refine ⟨⟨leadingProcedure L q hq.le, leadingProcedure_upper L q hq radius⟩, ?_⟩
   rintro risk ⟨procedure, h⟩
   exact adaptive_spectral_lower L q hq procedure radius risk hr h
+
+theorem truncatedParameter_full (L : E →L[ℝ] F) (v : E) :
+    truncatedParameter L (Module.finrank ℝ E) le_rfl v = v := by
+  simpa only [truncatedParameter, Fin.castLE_refl, coordinate_repr] using
+    (rightBasis L).sum_repr v
+
+theorem leadingProcedure_full (L : E →L[ℝ] F) (radius : ℝ) :
+    UniformRisk (leadingProcedure L (Module.finrank ℝ E) le_rfl) L radius 0 := by
+  intro v _
+  rw [leadingProcedure_run, truncatedParameter_full, sub_self, norm_zero]
+  norm_num
+
+/-- Padding by zero-valued linear questions represents every budget above the
+dimension without altering the prediction of the original procedure. -/
+def pad {q : ℕ} (procedure : Procedure E F q) : (extra : ℕ) → Procedure E F (q + extra)
+  | 0 => procedure
+  | extra + 1 => .ask 0 (fun _ ↦ pad procedure extra)
+
+omit [FiniteDimensional ℝ E] [NormedAddCommGroup F] [InnerProductSpace ℝ F] [CompleteSpace F] in
+theorem pad_run {q : ℕ} (procedure : Procedure E F q) (extra : ℕ) (v : E) :
+    (pad procedure extra).run v = procedure.run v := by
+  induction extra with
+  | zero => rfl
+  | succ extra ih => exact ih
+
+theorem full_budget_achievable (L : E →L[ℝ] F) (q : ℕ) (hq : Module.finrank ℝ E ≤ q)
+    (radius : ℝ) : ∃ procedure : Procedure E F q, UniformRisk procedure L radius 0 := by
+  obtain ⟨extra, rfl⟩ := Nat.exists_eq_add_of_le hq
+  refine ⟨pad (leadingProcedure L (Module.finrank ℝ E) le_rfl) extra, ?_⟩
+  intro v hv
+  rw [pad_run]
+  exact leadingProcedure_full L radius v hv
+
+noncomputable def residualEigenvalue (L : E →L[ℝ] F) (q : ℕ) : ℝ :=
+  if hq : q < Module.finrank ℝ E then squaredSingularValues L ⟨q, hq⟩ else 0
+
+/-- The exact spectral minimax law includes every budget, zero radius, and
+zero-dimensional or rank-deficient target maps. -/
+theorem adaptive_minimax_all_budgets (L : E →L[ℝ] F) (q : ℕ) (radius : ℝ)
+    (hr : 0 ≤ radius) :
+    IsLeast {risk : ℝ | ∃ procedure : Procedure E F q, UniformRisk procedure L radius risk}
+      (radius ^ 2 * residualEigenvalue L q) := by
+  by_cases hq : q < Module.finrank ℝ E
+  · simpa only [residualEigenvalue, dif_pos hq] using adaptive_minimax L q hq radius hr
+  · simp only [residualEigenvalue, dif_neg hq, mul_zero]
+    refine ⟨full_budget_achievable L q (Nat.le_of_not_gt hq) radius, ?_⟩
+    rintro risk ⟨procedure, h⟩
+    have hh := h 0 (by simpa only [norm_zero] using hr)
+    exact (sq_nonneg _).trans hh
 
 end Descent.Portability.SpectralMeasurementMinimax

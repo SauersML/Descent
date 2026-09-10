@@ -47,6 +47,9 @@ theorem damp_integral_approx (P : ProbabilityMeasure ℝ) (f g : Observable)
     (integrable_mulExpNegMulSq_comp g.toContinuousMap hε)
   have hmid := abs_setIntegral_mulExpNegMulSq_comp_sub_le_mul_measure
     (P := (P : Measure ℝ)) hK hmeas f.toContinuousMap g.toContinuousMap hε hfg
+  change |∫ x in K, Real.mulExpNegMulSq ε (g x) ∂(P : Measure ℝ) -
+      ∫ x in K, Real.mulExpNegMulSq ε (f x) ∂(P : Measure ℝ)| ≤
+    δ * (P : Measure ℝ).real K at hmid
   have hm : δ * (P : Measure ℝ).real K ≤ δ :=
     mul_le_of_le_one_right hδ measureReal_le_one
   have ht : (P : Measure ℝ).real Kᶜ * (Real.sqrt ε)⁻¹ ≤ η * (Real.sqrt ε)⁻¹ :=

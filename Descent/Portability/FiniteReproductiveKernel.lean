@@ -37,7 +37,9 @@ noncomputable def multinomialLaw (offspring : FiniteReportLaw H) (population : �
     (Finset.prod_nonneg fun reproductiveType _ ↦
       pow_nonneg (offspring.mass_nonneg reproductiveType) _)
   mass_sum := by
-    rw [Finset.sum_coe_sort]
+    rw [Finset.sum_coe_sort (Finset.piAntidiag Finset.univ population)
+      (fun counts : H → ℕ ↦ (Nat.multinomial Finset.univ counts : ℝ) *
+        ∏ reproductiveType, offspring.mass reproductiveType ^ counts reproductiveType)]
     rw [← Finset.sum_pow_eq_sum_piAntidiag, offspring.mass_sum, one_pow]
 
 /-- The natural multinomial coefficient equals the real factorial ratio exactly. -/
@@ -109,7 +111,8 @@ theorem transition_mass {population : ℕ} (model : Model H E population)
               (model.transmission state (firstParent, secondParent)).mass reproductiveType) ^
                 target.1.val reproductiveType) *
                   (model.environment state target.1).mass target.2 := by
-  unfold transition
+  change (multinomialLaw (offspringLaw model state) population).mass target.1 *
+    (model.environment state target.1).mass target.2 = _
   rw [multinomialLaw_mass]
   simp_rw [offspringLaw_mass]
 
@@ -124,5 +127,60 @@ theorem historyLaw_normalized {population : ℕ} (models : ℕ → Model H E pop
     (initial : FiniteReportLaw (State H E population)) (generations : ℕ) :
     ∑ target, (historyLaw models initial generations).mass target = 1 :=
   (historyLaw models initial generations).mass_sum
+
+/-- The total viability weight of the actual reproductive census. -/
+noncomputable def fitnessTotal {population : ℕ} (counts : Counts H population)
+    (fitness : H → ℝ) : ℝ :=
+  ∑ reproductiveType, (counts.val reproductiveType : ℝ) * fitness reproductiveType
+
+/-- Viability selection with arbitrary count-dependent fitness gives a normalized
+parental distribution whenever its total viability weight is positive. -/
+noncomputable def selectedParent {population : ℕ} (counts : Counts H population)
+    (fitness : H → ℝ) (hfitness : ∀ reproductiveType, 0 ≤ fitness reproductiveType)
+    (htotal : 0 < fitnessTotal counts fitness) : FiniteReportLaw H where
+  mass reproductiveType :=
+    (counts.val reproductiveType : ℝ) * fitness reproductiveType / fitnessTotal counts fitness
+  mass_nonneg reproductiveType := div_nonneg
+    (mul_nonneg (Nat.cast_nonneg _) (hfitness reproductiveType)) htotal.le
+  mass_sum := by
+    rw [← Finset.sum_div]
+    exact div_self (ne_of_gt htotal)
+
+noncomputable def independentMating (parents : FiniteReportLaw H) : FiniteReportLaw (H × H) where
+  mass pair := parents.mass pair.1 * parents.mass pair.2
+  mass_nonneg pair := mul_nonneg (parents.mass_nonneg pair.1) (parents.mass_nonneg pair.2)
+  mass_sum := by
+    rw [Fintype.sum_prod_type]
+    simp only [← Finset.mul_sum, parents.mass_sum, mul_one]
+
+/-- A fully specified viability-selection instance, with environmental and
+whole-census dependence retained in every biological input. -/
+noncomputable def viabilityModel {population : ℕ}
+    (fitness : State H E population → H → ℝ)
+    (hfitness : ∀ state reproductiveType, 0 ≤ fitness state reproductiveType)
+    (htotal : ∀ state, 0 < fitnessTotal state.1 (fitness state))
+    (transmission : State H E population → H × H → FiniteReportLaw H)
+    (environment : State H E population → Counts H population → FiniteReportLaw E) :
+    Model H E population where
+  mating state := independentMating
+    (selectedParent state.1 (fitness state) (hfitness state) (htotal state))
+  transmission := transmission
+  environment := environment
+
+/-- In this instance, parental-pair probabilities are derived from count times
+fitness, rather than supplied as a separate fitted distribution. -/
+theorem viabilityModel_mating {population : ℕ}
+    (fitness : State H E population → H → ℝ)
+    (hfitness : ∀ state reproductiveType, 0 ≤ fitness state reproductiveType)
+    (htotal : ∀ state, 0 < fitnessTotal state.1 (fitness state))
+    (transmission : State H E population → H × H → FiniteReportLaw H)
+    (environment : State H E population → Counts H population → FiniteReportLaw E)
+    (state : State H E population) (firstParent secondParent : H) :
+    ((viabilityModel fitness hfitness htotal transmission environment).mating state).mass
+        (firstParent, secondParent) =
+      ((state.1.val firstParent : ℝ) * fitness state firstParent /
+        fitnessTotal state.1 (fitness state)) *
+      ((state.1.val secondParent : ℝ) * fitness state secondParent /
+        fitnessTotal state.1 (fitness state)) := rfl
 
 end Descent.Portability.FiniteReproductiveKernel
