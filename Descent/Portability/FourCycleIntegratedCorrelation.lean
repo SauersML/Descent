@@ -25,23 +25,19 @@ private theorem decay_real_part (time : ℝ) :
   simp [Complex.exp_re, cosineDecay]
 
 theorem cosineDecay_integrable : IntegrableOn cosineDecay (Set.Ioi 0) := by
-  have h := (integrableOn_exp_mul_complex_Ioi
-    (a := (-1 : ℂ) + Complex.I) (by norm_num) 0).re
-  change IntegrableOn (fun time : ℝ ↦
-    (Complex.exp (((-1 : ℂ) + Complex.I) * time)).re) (Set.Ioi 0) at h
-  simpa only [decay_real_part] using h
+  have hi := integrableOn_exp_mul_complex_Ioi
+    (a := (-1 : ℂ) + Complex.I) (by norm_num) 0
+  have h := Complex.reCLM.integrable_comp hi
+  simpa only [Complex.reCLM_apply, decay_real_part] using h
 
 theorem cosineDecay_integral : (∫ time in Set.Ioi (0 : ℝ), cosineDecay time) = 1 / 2 := by
   have hi := integrableOn_exp_mul_complex_Ioi
     (a := (-1 : ℂ) + Complex.I) (by norm_num) 0
   have h := integral_exp_mul_complex_Ioi (a := (-1 : ℂ) + Complex.I) (by norm_num) 0
   have hre := congrArg Complex.re h
-  have hreal := integral_re hi
-  change (∫ time in Set.Ioi (0 : ℝ),
-    (Complex.exp (((-1 : ℂ) + Complex.I) * time)).re) =
-      (∫ time in Set.Ioi (0 : ℝ), Complex.exp (((-1 : ℂ) + Complex.I) * time)).re at hreal
+  have hreal := Complex.reCLM.integral_comp_comm hi
+  simp only [Complex.reCLM_apply, decay_real_part] at hreal
   rw [← hreal] at hre
-  simp only [decay_real_part] at hre
   convert hre using 1
   norm_num [Complex.div_re, Complex.normSq]
 

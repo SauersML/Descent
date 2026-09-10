@@ -75,17 +75,18 @@ private def evalRing (x : ℝ) : Observable →+* ℝ where
     (BoundedContinuousFunction.evalCLM ℝ x).continuous (-(ε • f * f))
   change f x * (evalRing x (NormedSpace.exp ℝ (-(ε • f * f)))) = _
   rw [h]
-  simp only [evalRing, BoundedContinuousFunction.neg_apply,
-    BoundedContinuousFunction.mul_apply, BoundedContinuousFunction.smul_apply,
-    smul_eq_mul, ← Real.exp_eq_exp_ℝ, Real.mulExpNegMulSq]
+  change f x * NormedSpace.exp ℝ (-(ε * f x * f x)) = _
+  rw [← Real.exp_eq_exp_ℝ]
+  rfl
 
-/-- Damping belongs to the uniform closure because every Euler approximant belongs to the algebra. -/
+/-- Damping belongs to the uniform closure because every Euler approximant
+belongs to the algebra. -/
 theorem damp_mem_closure (A : Subalgebra ℝ Observable) (ε : ℝ) {f : Observable}
     (hf : f ∈ A) : damp ε f ∈ A.topologicalClosure := by
   apply A.isClosed_topologicalClosure.mem_of_tendsto
     ((BanachEulerExponential.euler_tends_exp (-(ε • f * f))).const_mul f)
   filter_upwards with n
-  apply A.subset_topologicalClosure
+  apply subset_closure
   exact A.mul_mem hf (A.pow_mem (A.add_mem A.one_mem
     (A.smul_mem (A.neg_mem (A.mul_mem (A.smul_mem hf ε) hf)) (n : ℝ)⁻¹)) n)
 

@@ -22,9 +22,11 @@ import Descent.Portability.GenerativePortabilityLaw
 import Descent.Portability.HorizonCurve
 import Descent.Portability.HumanDemography
 import Descent.Portability.ImputationPortability
+import Descent.Portability.IndividualLossMoments
 import Descent.Portability.LongitudinalPortability
 import Descent.Portability.MeasurePortabilityLaw
 import Descent.Portability.MechanisticPortabilityWitnesses
+import Descent.Portability.MechanismIdentification
 import Descent.Portability.MetricSpecificPortability
 import Descent.Portability.MetricSpecificPortability.ARoneFrontier
 import Descent.Portability.MetricSpecificPortability.CalibrationVsDiscrimination
@@ -76,6 +78,7 @@ import Descent.Portability.ScoreDistribution
 import Descent.Portability.StatisticalGeneticsMethodology
 import Descent.Portability.StratificationConfounding
 import Descent.Portability.TransferLearningPGS
+import Descent.Portability.ThresholdPolicyTransport
 import Descent.Portability.TransferLearningPGS.FeatureRepresentation
 import Descent.Portability.TransferLearningPGS.FineTuning
 import Descent.Portability.TransferLearningPGS.ImportanceWeighting
@@ -204,6 +207,13 @@ import Descent.Portability.StationaryPoissonLaw
 import Descent.Portability.TensorInterpolationLaw
 import Descent.Portability.RealVaryingEuler
 import Descent.Portability.BalancedHWEGaussianCharacteristic
+
+import Descent.Portability.ToeplitzPanelIdentification
+
+import Descent.Portability.FourCyclePrediction
+import Descent.Portability.FourCycleIntegratedCorrelation
+import Descent.Portability.ProbabilityTestClosure
+import Descent.Portability.CompactParameterIntegralLaw
 
 assert_below Descent.Program
 

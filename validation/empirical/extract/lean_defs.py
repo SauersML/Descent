@@ -1512,7 +1512,7 @@ def Descent_Core_OperatingPoint_precision(o, prevalence):
 def Descent_Core_OperatingPoint_recallRate(o):
     return identifiedWith(_rt._proj(o, 'sensitivity'))
 
-def f1(o, prevalence):
+def Descent_Core_OperatingPoint_f1(o, prevalence):
     return Descent_Core_ratio((((2.0 * (Descent_Core_OperatingPoint_precision(o, prevalence))) * (Descent_Core_OperatingPoint_recallRate(o)))), ((Descent_Core_OperatingPoint_precision(o, prevalence) + Descent_Core_OperatingPoint_recallRate(o))))
 
 def thresholdOdds(t):
@@ -5331,6 +5331,12 @@ def labels(liabilities):
 def Descent_Portability_ProbitTrainingLaw_outcomeLaw(mean, variance):
     return labelLaw(((lambda i: Descent_Portability_ProbitTrainingLaw_caseProbability((mean[int(i)]), (variance(i))))), ((lambda i: caseProbability_bounds((mean[int(i)]), (variance(i))))))
 
+def segment(a, p, t):
+    return _rt.add(a, _rt.mul(t, (_rt.sub(p, a))))
+
+def radialDensity(B, a, p, t):
+    return sum((_rt.mul((_rt.sub(p[int(i)], a[int(i)])), B(i, (segment(a, p, t))))) for i in range(int(len(a))))
+
 def markMass(η, z):
     return (η if z else (1.0 - η))
 
@@ -5578,10 +5584,10 @@ def gridAdjacent(a, b):
     return (((a < 36.0) and (b < 36.0)) and (((((((_rt.rdiv(a, 6.0) - _rt.rdiv(b, 6.0))) + ((_rt.rdiv(b, 6.0) - _rt.rdiv(a, 6.0)))) + (((a % 6.0) - (b % 6.0)))) + (((b % 6.0) - (a % 6.0)))) == 1.0)))
 
 def serialSourceGenomeLaw(L, hL):
-    return _rt._proj((sourceLaw(10.0, (by(norm_num)))), 'joint')((serialGenomeLaw(L, hL)))
+    return _rt._proj((Descent_Portability_SourceDesignLaw_sourceLaw(10.0, (by(norm_num)))), 'joint')((serialGenomeLaw(L, hL)))
 
 def gridSourceGenomeLaw(L, hL):
-    return _rt._proj((sourceLaw(36.0, (by(norm_num)))), 'joint')((gridGenomeLaw(L, hL)))
+    return _rt._proj((Descent_Portability_SourceDesignLaw_sourceLaw(36.0, (by(norm_num)))), 'joint')((gridGenomeLaw(L, hL)))
 
 def causalColumns(individual, causal):
     return rawDiploidDosage(genome, (causalSites(causal)), individual)
@@ -5723,6 +5729,21 @@ def permuted(A, π):
 
 def densitySecondCoefficient(x):
     return _rt.mul((_rt.rdiv(1.0, 6.0)), sum(((_rt.add(_rt.sub(_rt.rdiv(_rt.trace((_rt.mul(direction(), direction()))), 4.0), _rt.rdiv(quadraticValue((permuted((_rt.mul(direction(), direction())), π)), x), 2.0)), _rt.rdiv(_rt.lpow(quadraticValue((permuted(direction(), π)), x), 2.0), 8.0)))) for π in range(int(len(x)))))
+
+def thresholdCells(E, score, outcome, cutoff):
+    return decisionCells(E, ((lambda ω: decide(((cutoff <= score[int(ω)]))))), outcome)
+
+def Descent_Portability_ThresholdPolicyTransport_f1(c):
+    return (some((_rt.rdiv((2.0 * _rt._proj(c, 'tp')), ((((2.0 * _rt._proj(c, 'tp')) + _rt._proj(c, 'fp')) + _rt._proj(c, 'fn')))))) if (0.0 < (((2.0 * _rt._proj(c, 'tp')) + _rt._proj(c, 'fp')) + _rt._proj(c, 'fn'))) else none)
+
+def decisionLoss(c, lambda_):
+    return (_rt._proj(c, 'fn') + (lambda_ * _rt._proj(c, 'fp')))
+
+def Descent_Portability_ThresholdPolicyTransport_score():
+    return _rt.VecFn([3.0, 1.0, 2.0, 0.0])
+
+def disease():
+    return _rt.VecFn([true, true, false, false])
 
 def orderedTimes(duration, values):
     return (lambda i: _rt.mul((duration), sortedValues(values, i)))
