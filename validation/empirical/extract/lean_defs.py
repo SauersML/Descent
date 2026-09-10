@@ -3041,6 +3041,15 @@ def additiveVariance(p, α):
 def liabilityScaleH2(h2_observed, prevalence, z_height):
     return _rt.rdiv(((h2_observed * prevalence) * ((1.0 - prevalence))), _rt.lpow(z_height, 2.0))
 
+def completionMass(rates, s, count):
+    if count == 0:
+        return (1.0 - survival(rates, 0.0, s))
+    count = count - 1     # the `n + 1` pattern
+    return (survival(rates, count, s) - survival(rates, ((count + 1.0)), s))
+
+def stoppingTraceMass(rates, s, trace):
+    return (traceMass(rates, s, trace) * stoppingIndicator(s, trace))
+
 def cladeExposure(trace, duration, times, locus, clade):
     return occupation((cladeCount(locus, clade)), trace, duration, times)
 
@@ -3052,6 +3061,9 @@ def jumpStateLaw(rates, s, h):
 
 def proposalKernel(rates, s):
     return _rt._proj((proposalLaw(rates, s)), 'pushforward')((proposalNext(s)))
+
+def traceNucleotideLaw(trace, duration, times, mutationRate, locus, _hcomplete, _hmono, _htimes, _horder):
+    return rootedGenealogyLaw((traceBranches(locus, mutationRate, trace, duration, times)))
 
 def ancestryRecalibratedSlope(bSource, rho, alpha):
     return _rt.rdiv((rho * ((bSource * alpha))), _rt.lpow(alpha, 2.0))
@@ -3686,6 +3698,9 @@ def conditionalMetric(p, metric):
 def metric(state):
     return (some(((0.0 if (_rt._proj(state, '1') == 0.0) else 1.0))) if (_rt._proj(state, '2') == 0.0) else none)
 
+def branchKernel(branch, leaves):
+    return _rt._proj((branchLaw(_rt._proj(branch, 'exposure'), (leaves(_rt._proj(branch, 'representative'))))), 'pushforward')((overwrite(branch, leaves)))
+
 def historyKernel(h, h_p):
     return markovPoissonKernel(((_rt._proj(h, 'memory') * _rt._proj(h_p, 'memory'))), (_rt.cos(((_rt._proj(h, 'phase') - _rt._proj(h_p, 'phase'))))))
 
@@ -4015,6 +4030,18 @@ def Nucleotide():
 
 def uniformMean(readout):
     return _rt.rdiv((sum((readout[int(base)]) for base in range(int(len(readout))))), 4.0)
+
+def alleleIndex(state, sample):
+    return _rt._proj(_rt._proj(_rt._proj(_rt._proj(state, '2'), '1'), 'val'), 'idxOf')((_rt._proj(state, '1')(sample)))
+
+def rawDosage(state, first, second):
+    return (alleleIndex(state, first) + alleleIndex(state, second))
+
+def bedDosage(state, first, second):
+    return _rt.rmin((rawDosage(state, first, second)), 2.0)
+
+def presentReadout(state):
+    return (1.0 if _rt._proj(_rt._proj(state, '2'), '2') else 0.0)
 
 def residualBias(m):
     return (_rt._proj(m, 'c') * sum(((_rt._proj(m, 'eigenvals')(i) if (_rt._proj(_rt._proj(m, 'k'), 'val') < i) else 0.0)) for i in range(int(_rt.sumdim('i', len(_rt._proj(m, 'eigenvals')))))))
@@ -4924,6 +4951,24 @@ def externallyStandardized(pgs, μ_source, σ_source):
 
 def internallyStandardized(pgs, μ_target, σ_target):
     return _rt.rdiv(((pgs - μ_target)), σ_target)
+
+def affine(a, b, f):
+    return (lambda s: _rt.add(_rt.mul(a, f[int(s)]), b))
+
+def standardize(p, epsilon, f):
+    return (lambda s: _rt.rdiv((_rt.sub(f[int(s)], Descent_Portability_FiniteReportLaw_expectation(p, f))), (_rt.add(_rt.rsqrt((Descent_Portability_FiniteReportLaw_variance(p, f))), epsilon))))
+
+def crossForm(p, scoreGenotype, causalGenotype, weights, effects):
+    return sum((sum((_rt.mul(_rt.mul(weights[int(j)], effects[int(k)]), Descent_Portability_FiniteReportLaw_covariance(p, ((lambda s: scoreGenotype[int(s)][int(j)])), ((lambda s: causalGenotype[int(s)][int(k)]))))) for k in range(int(_rt.sumdim('k', len(effects), len(causalGenotype[0])))))) for j in range(int(_rt.sumdim('j', len(weights), len(scoreGenotype[0])))))
+
+def varianceForm(p, genotype, weights):
+    return sum((sum((_rt.mul(_rt.mul(weights[int(j)], weights[int(k)]), Descent_Portability_FiniteReportLaw_covariance(p, ((lambda s: genotype[int(s)][int(j)])), ((lambda s: genotype[int(s)][int(k)]))))) for k in range(int(_rt.sumdim('k', len(weights), len(genotype[0])))))) for j in range(int(_rt.sumdim('j', len(weights), len(genotype[0])))))
+
+def formAccuracy(p, scoreGenotype, causalGenotype, weights, effects):
+    return (some((_rt.rdiv(_rt.lpow(crossForm(p, scoreGenotype, causalGenotype, weights, effects), 2.0), (_rt.mul(varianceForm(p, scoreGenotype, weights), varianceForm(p, causalGenotype, effects)))))) if ((0.0 < varianceForm(p, scoreGenotype, weights)) and (0.0 < varianceForm(p, causalGenotype, effects))) else none)
+
+def formRatio(source, target, sourceScore, targetScore, sourceCausal, targetCausal, weights, effects):
+    return _rt._proj((formAccuracy(source, sourceScore, sourceCausal, weights, effects)), 'bind')((lambda sourceR2: _rt._proj((formAccuracy(target, targetScore, targetCausal, weights, effects)), 'bind')((lambda targetR2: (some((_rt.rdiv(targetR2, sourceR2))) if (0.0 < sourceR2) else none)))))
 
 def incrementalR2(r2_full, r2_covariates):
     return difference(r2_full, r2_covariates)

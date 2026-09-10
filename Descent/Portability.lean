@@ -86,6 +86,12 @@ import Descent.Portability.MarkedAncestralLaw
 import Descent.Portability.TimedAncestralLaw
 import Descent.Portability.NucleotideMutationLaw
 import Descent.Portability.AncestralBranchExposure
+import Descent.Portability.GenealogyGenotypeLaw
+import Descent.Portability.OrderedMutationCatalogue
+import Descent.Portability.SimulationAccuracy
+import Descent.Portability.AncestralAbsorptionLaw
+import Descent.Portability.OrderedCladeLaw
+import Descent.Portability.AncestralGenealogyLaw
 
 assert_below Descent.Program
 

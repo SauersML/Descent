@@ -1,0 +1,20 @@
+import Descent.Portability.SimulationAccuracy
+
+#print axioms Descent.Portability.SimulationAccuracy.expectation_affine
+#print axioms Descent.Portability.SimulationAccuracy.covariance_affine
+#print axioms Descent.Portability.SimulationAccuracy.variance_affine
+#print axioms Descent.Portability.SimulationAccuracy.squaredCorrelation_affine
+#print axioms Descent.Portability.SimulationAccuracy.standardize_eq_affine
+#print axioms Descent.Portability.SimulationAccuracy.squaredCorrelation_standardized_restriction
+#print axioms Descent.Portability.SimulationAccuracy.covariance_two_scores
+#print axioms Descent.Portability.SimulationAccuracy.squaredCorrelation_eq_formAccuracy
+#print axioms Descent.Portability.SimulationAccuracy.squaredCorrelation_affine_eq_formAccuracy
+#print axioms Descent.Portability.SimulationAccuracy.formRatio_value
+#print axioms Descent.Portability.SimulationAccuracy.accuracy_affine_liability
+#print axioms Descent.Portability.SimulationAccuracy.ratio_eq_formRatio
+#print axioms Descent.Portability.SimulationAccuracy.ratio_affine_eq_formRatio
+#print axioms Descent.Portability.SimulationAccuracy.reportedRatio_eq_form_sum
+
+#print axioms Descent.Portability.SimulationAccuracy.linearScore_center_columns
+#print axioms Descent.Portability.SimulationAccuracy.standardize_shift
+#print axioms Descent.Portability.SimulationAccuracy.standardize_linearScore_center_columns

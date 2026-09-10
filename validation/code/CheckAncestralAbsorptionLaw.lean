@@ -1,0 +1,13 @@
+import Descent.Portability.AncestralAbsorptionLaw
+
+#print axioms Descent.Portability.AncestralAbsorptionLaw.sampleComplete_initial
+#print axioms Descent.Portability.AncestralAbsorptionLaw.sampleComplete_terminal
+#print axioms Descent.Portability.AncestralAbsorptionLaw.supportedAt_terminal
+#print axioms Descent.Portability.AncestralAbsorptionLaw.exists_completion_trace
+#print axioms Descent.Portability.AncestralAbsorptionLaw.survival_geometric
+#print axioms Descent.Portability.AncestralAbsorptionLaw.survival_bound
+#print axioms Descent.Portability.AncestralAbsorptionLaw.survival_tendsto_zero
+#print axioms Descent.Portability.AncestralAbsorptionLaw.completionMass_hasSum
+#print axioms Descent.Portability.AncestralAbsorptionLaw.stoppingTraceMass_sum
+#print axioms Descent.Portability.AncestralAbsorptionLaw.stoppingTraceMass_hasSum
+#print axioms Descent.Portability.AncestralAbsorptionLaw.stoppingTraceMass_hasSum_after_relocation
