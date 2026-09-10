@@ -3041,6 +3041,12 @@ def additiveVariance(p, α):
 def liabilityScaleH2(h2_observed, prevalence, z_height):
     return _rt.rdiv(((h2_observed * prevalence) * ((1.0 - prevalence))), _rt.lpow(z_height, 2.0))
 
+def cladeExposure(trace, duration, times, locus, clade):
+    return occupation((cladeCount(locus, clade)), trace, duration, times)
+
+def mutationFactor(trace, duration, mutationRate, locus, clade, times):
+    return _rt.rexp((_rt.rdiv(_rt.mul(_rt.mul(_rt.neg(4.0), (mutationRate)), cladeExposure(trace, duration, times, locus, clade)), 3.0)))
+
 def jumpStateLaw(rates, s, h):
     return _rt._proj((Descent_Portability_AncestralEventLaw_jumpLaw(rates, s, h)), 'pushforward')((nextState(s)))
 
@@ -4003,6 +4009,12 @@ def portabilityGap(r2_source, r2_target):
 
 def portabilityNoiseVariance(variantCount, varianceScale):
     return _rt.rdiv(varianceScale, (variantCount))
+
+def Nucleotide():
+    return Fin(4.0)
+
+def uniformMean(readout):
+    return _rt.rdiv((sum((readout[int(base)]) for base in range(int(len(readout))))), 4.0)
 
 def residualBias(m):
     return (_rt._proj(m, 'c') * sum(((_rt._proj(m, 'eigenvals')(i) if (_rt._proj(_rt._proj(m, 'k'), 'val') < i) else 0.0)) for i in range(int(_rt.sumdim('i', len(_rt._proj(m, 'eigenvals')))))))
@@ -4981,6 +4993,12 @@ def fStat(m, p):
 
 def r2EstimatorVariance(r2, n):
     return _rt.rdiv(((4.0 * r2) * _rt.lpow(((1.0 - r2)), 2.0)), n)
+
+def orderedTimes(duration, values):
+    return (lambda i: _rt.mul((duration), sortedValues(values, i)))
+
+def timeLaw(duration, count):
+    return _rt._proj((cubeTimeLaw(count)), 'map')((orderedTimes(duration)))
 
 def linearScore(genotype, weights):
     return (lambda individual: sum((_rt.mul(weights[int(marker)], genotype[int(individual)][int(marker)])) for marker in range(int(_rt.sumdim('marker', len(weights), len(genotype[0]))))))

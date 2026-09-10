@@ -82,6 +82,10 @@ import Descent.Portability.ScoreMomentLaw
 import Descent.Portability.ProbitTrainingLaw
 import Descent.Portability.AncestralEventLaw
 import Descent.Portability.AncestralEpochLaw
+import Descent.Portability.MarkedAncestralLaw
+import Descent.Portability.TimedAncestralLaw
+import Descent.Portability.NucleotideMutationLaw
+import Descent.Portability.AncestralBranchExposure
 
 assert_below Descent.Program
 
