@@ -3927,6 +3927,12 @@ def clippedInner(cap, effects):
 def Bag(D):
     return Quotient((panelSetoid(D)))
 
+def momentPolynomial(variance, n):
+    _prev = 1.0
+    for _ in range(int(n)):
+        _prev = (_rt._proj((_prev), 'derivative') + ((C(variance) * X) * _prev))
+    return _prev
+
 def linearForm(a, x):
     return sum((_rt.mul(a[int(k)], x[int(k)])) for k in range(int(len(a))))
 
@@ -4007,6 +4013,9 @@ def ascertainment_loss(coverage, v_causal):
 
 def total_portability_loss(loss_genetic, loss_technical):
     return Descent_Core_sum(loss_genetic, loss_technical)
+
+def Descent_Portability_IndependentShiftOperator_shift(p, g):
+    return sum((_rt.mul(_rt._proj(p, 'mass')(a), translate((g[int(a)])))) for a in range(int(len(g))))
 
 def kernelMatrix(kernel):
     return (lambda source, target: _rt._proj((kernel(source)), 'mass')(target))

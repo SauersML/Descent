@@ -171,6 +171,8 @@ import Descent.Portability.OneLocusCompatibilityLaw
 import Descent.Portability.ConditionalSeparatorLaw
 import Descent.Portability.GaussianPanelLaw
 import Descent.Portability.ContinuousMemoryLaw
+import Descent.Portability.GaussianPolynomialMoments
+import Descent.Portability.IndependentShiftOperator
 
 assert_below Descent.Program
 
