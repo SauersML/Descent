@@ -45,7 +45,7 @@ def sampleCost(η, C, k):
 def weightRatio(P, Q, w):
     return _rt.rdiv(prodWeight(Q, w), prodWeight(P, w))
 
-def defect(P, Q, w, u):
+def Descent_Blindness_BundleRigidity_defect(P, Q, w, u):
     return _rt.rdiv(weightRatio(P, Q, w), weightRatio(P, Q, u))
 
 def falsifierP():
@@ -3231,6 +3231,12 @@ def numberNeededToScreen(sens, π, _hsens, _hπ):
 def populationAttributableFraction(p_high, rr):
     return (p_high * ((1.0 - _rt.rdiv(1.0, rr))))
 
+def phaseMean(p, z):
+    return sum((((_rt._proj(p, 'mass')(x)) * z(x))) for x in range(int(_rt.sumdim('x', len(_rt._proj(p, 'mass')), len(z)))))
+
+def gibbsNormalizer(ν, U):
+    return sum((_rt.mul(_rt._proj(ν, 'mass')(x), _rt.rexp((U[int(x)])))) for x in range(int(len(U))))
+
 def Descent_Portability_posteriorMean(posterior, conditional, x):
     return sum((_rt.mul(posterior[int(x)][int(t)], conditional[int(t)][int(x)])) for t in range(int(_rt.sumdim('t', len(posterior[0]), len(conditional)))))
 
@@ -3333,6 +3339,9 @@ def driftDecisionRegret(posterior, conditional, cutoff, treat):
 def effectiveStratumCount(n):
     Stratum = float(len(n))
     return _rt.rdiv(_rt.mul((sum((n[int(s)]) for s in range(int(len(n))))), (sum((_rt.rdiv(1.0, n[int(s)])) for s in range(int(len(n)))))), (_rt.sumdim('Stratum', len(n))))
+
+def defectIntegrand(fine, coarse, lift, horizon, time):
+    return _rt._proj((evolution(fine, ((horizon - time)))), 'comp')((_rt._proj((Descent_Portability_ControlledCoarseGraining_defect(fine, coarse, lift)), 'comp')((evolution(coarse, time)))))
 
 def dynamicsContrastCoefficient(β):
     return _rt.rdiv((_rt.sub(β[int(true)], β[int(false)])), 2.0)
@@ -4047,6 +4056,15 @@ def modelStaleness(lambda_, t):
 def Descent_Portability_LowMomentObstruction_sign(bit):
     return ((-1.0) if bit else 1.0)
 
+def matrixDefect(fine, coarse, lift):
+    return _rt.sub(_rt.mul(fine, lift), _rt.mul(lift, coarse))
+
+def membership(partition):
+    return (lambda source, target: (1.0 if (partition(source) == target) else 0.0))
+
+def generator(kernel, rate):
+    return ((rate) * ((kernelMatrix(kernel) - 1.0)))
+
 def mechanisticPortabilityRatio(m):
     return _rt.rdiv(r2FromSourceWeights(m, 1), r2FromSourceWeights(m, 0))
 
@@ -4277,6 +4295,12 @@ def Nucleotide():
 
 def uniformMean(readout):
     return _rt.rdiv((sum((readout[int(base)]) for base in range(int(len(readout))))), 4.0)
+
+def scalarMean(values, p):
+    return sum((_rt.mul(hweMass(p, g), values[int(g)])) for g in range(int(len(values))))
+
+def scalarEffect(values, p):
+    return _rt.add(_rt.sub(values[int(1.0)], values[int(0.0)]), _rt.mul((_rt.add(_rt.sub(values[int(0.0)], _rt.mul(2.0, values[int(1.0)])), values[int(2.0)])), p))
 
 def Descent_Portability_OptimalMeasurementAllocation_variance(amplitude, effort):
     return sum((_rt.rdiv(_rt.lpow(amplitude[int(mode)], 2.0), effort[int(mode)])) for mode in range(int(len(amplitude))))

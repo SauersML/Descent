@@ -1035,7 +1035,7 @@
   "short": "defect",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": "defect",
+  "python": "Descent_Blindness_BundleRigidity_defect",
   "args": [
    "P",
    "Q",
@@ -1065,6 +1065,10 @@
    "Descent.Blindness.BundleRigidity.defect_eq_chi_ratio",
    "Descent.Blindness.BundleRigidity.defect_witness",
    "Descent.Blindness.BundleRigidity.defect_witness_ne_one",
+   "Descent.Portability.ControlledCoarseGraining.bridge_derivative",
+   "Descent.Portability.ControlledCoarseGraining.contraction_defect_bound",
+   "Descent.Portability.ControlledCoarseGraining.exact_closure_of_zero_defect",
+   "Descent.Portability.MarkovCoarseGraining.operator_matrixDefect",
    "Descent.Program.parity_and_commutativity_admit_no_escape"
   ],
   "constraints": {
@@ -1093,6 +1097,10 @@
      "∀ i, 0 < P i",
      "∀ i, 0 < Q i"
     ],
+    "Descent.Portability.ControlledCoarseGraining.bridge_derivative": [],
+    "Descent.Portability.ControlledCoarseGraining.contraction_defect_bound": [],
+    "Descent.Portability.ControlledCoarseGraining.exact_closure_of_zero_defect": [],
+    "Descent.Portability.MarkovCoarseGraining.operator_matrixDefect": [],
     "Descent.Program.parity_and_commutativity_admit_no_escape": [
      "P i ≠ 0",
      "P j ≠ 0",
@@ -38580,6 +38588,8 @@
    "Descent.Portability.BalancedHWEInteraction.block_characteristic",
    "Descent.Portability.BalancedHWEInteraction.critical_characteristic_limit",
    "Descent.Portability.BalancedHWEInteraction.critical_standardization",
+   "Descent.Portability.BanachEulerExponential.coefficient_limit",
+   "Descent.Portability.BanachEulerExponential.euler_eq_series",
    "Descent.Portability.BinaryRiskCohort.continuous_citlEquation",
    "Descent.Portability.BinaryRiskCohort.continuous_logisticCalibrationObjective",
    "Descent.Portability.BinaryRiskCohort.isBounded_logisticCalibration_baselineSublevel",
@@ -38607,6 +38617,14 @@
    "Descent.Portability.ConditionalErrorCertificate.conditional_totalVariation",
    "Descent.Portability.ConditionalErrorCertificate.eventMass_le_one",
    "Descent.Portability.ConditionalErrorCertificate.eventMass_nonneg",
+   "Descent.Portability.ConditionalSeparatorLaw.gibbsLaw_minorization",
+   "Descent.Portability.ConditionalSeparatorLaw.gibbsNormalizer_pos",
+   "Descent.Portability.ConditionalSeparatorLaw.gibbs_separator_exp_bound",
+   "Descent.Portability.ConditionalSeparatorLaw.separator_phase_bound",
+   "Descent.Portability.ConditionalSeparatorLaw.separator_phase_exp_bound",
+   "Descent.Portability.ConditionalSeparatorLaw.separator_phase_identity",
+   "Descent.Portability.ControlledCoarseGraining.contraction_defect_bound",
+   "Descent.Portability.ControlledCoarseGraining.exact_closure_of_zero_defect",
    "Descent.Portability.DemeMixture.pooledAUC_diagonal_offDiagonal",
    "Descent.Portability.DemeRiskPredictionPanel.metricDefinedMass_le_one",
    "Descent.Portability.DemeRiskPredictionPanel.outcomeWeight_nonneg",
@@ -38739,6 +38757,16 @@
    "Descent.Portability.LowMomentObstruction.perturbation_moment",
    "Descent.Portability.LowMomentObstruction.selected_first_moment",
    "Descent.Portability.ManyDemeSampleCount.total_le_totalSampleSize",
+   "Descent.Portability.MarkovCoarseGraining.expectation_range_totalVariation",
+   "Descent.Portability.MarkovCoarseGraining.finite_generator_matrix_bound",
+   "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference",
+   "Descent.Portability.MarkovCoarseGraining.ranged_report_error",
+   "Descent.Portability.MarkovCoarseGraining.row_error_bound",
+   "Descent.Portability.MarkovPoissonLaw.coordinate_summable",
+   "Descent.Portability.MatrixOperatorBridge.markov_operator_norm_le_one",
+   "Descent.Portability.MatrixOperatorBridge.operator_norm_eq",
+   "Descent.Portability.MatrixOperatorBridge.operator_norm_le",
+   "Descent.Portability.MatrixOperatorBridge.row_abs_sum_le_operator_norm",
    "Descent.Portability.MinimalObservableLaw.closureStage_le_wordSpan",
    "Descent.Portability.MinimalObservableLaw.finiteOrbitSpan_eq",
    "Descent.Portability.MinimalObservableLaw.orbitSpan_invariant",
@@ -39124,6 +39152,7 @@
     "Covered state",
     "∀ state, Measurable (fun input ↦ (law input",
     "∀ state target, Measurable (fun input ↦ (kernel input state",
+    "∀ state, lower ≤ report state ∧ report state ≤ upper",
     "Homogeneous branch state.1",
     "0 < K",
     "K < 1",
@@ -39667,6 +39696,8 @@
     "Descent.Portability.BalancedHWEInteraction.block_characteristic": [],
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.critical_characteristic_limit": [],
+    "Descent.Portability.BanachEulerExponential.coefficient_limit": [],
+    "Descent.Portability.BanachEulerExponential.euler_eq_series": [],
     "Descent.Portability.misspec_excess_risk_nonneg": [],
     "Descent.Portability.estimation_variance_decreases_with_n": [],
     "Descent.Portability.global_shrinkage_controls_sparsity": [],
@@ -39705,6 +39736,12 @@
     "Descent.Portability.ConditionalErrorCertificate.conditional_bound_of_le": [],
     "Descent.Portability.ConditionalErrorCertificate.conditional_totalVariation": [],
     "Descent.Portability.ConditionalErrorCertificate.conditional_mean_interval": [],
+    "Descent.Portability.ConditionalSeparatorLaw.separator_phase_identity": [],
+    "Descent.Portability.ConditionalSeparatorLaw.separator_phase_bound": [],
+    "Descent.Portability.ConditionalSeparatorLaw.separator_phase_exp_bound": [],
+    "Descent.Portability.ConditionalSeparatorLaw.gibbsNormalizer_pos": [],
+    "Descent.Portability.ConditionalSeparatorLaw.gibbsLaw_minorization": [],
+    "Descent.Portability.ConditionalSeparatorLaw.gibbs_separator_exp_bound": [],
     "Descent.Portability.posteriorDrift_weighted_sum_eq_zero": [],
     "Descent.Portability.posterior_bias_variance_decomposition": [],
     "Descent.Portability.posteriorPairwiseDriftEnergy_eq_posteriorDriftEnergy": [],
@@ -39727,6 +39764,8 @@
     "Descent.Portability.driftDecisionRegret_eq_zero_of_no_crossing": [],
     "Descent.Portability.driftDecisionRegret_eq_zero_of_below": [],
     "Descent.Portability.aggregateCalibrationMoment_one_eq_calibrationInTheLarge": [],
+    "Descent.Portability.ControlledCoarseGraining.contraction_defect_bound": [],
+    "Descent.Portability.ControlledCoarseGraining.exact_closure_of_zero_defect": [],
     "Descent.Portability.dynamicsPooledProjector_mem_uniformCorrectionFamily": [],
     "Descent.Portability.factoredDynamicsCorrection_eq_of_pooledSum_eq": [],
     "Descent.Portability.factoredDynamicsCorrection_add_contrast": [],
@@ -39917,6 +39956,20 @@
     "Descent.Portability.LowMomentObstruction.complement_nonempty": [],
     "Descent.Portability.LowMomentObstruction.selected_first_moment": [],
     "Descent.Portability.LowMomentObstruction.every_order_obstruction": [],
+    "Descent.Portability.MarkovCoarseGraining.row_error_bound": [],
+    "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference": [],
+    "Descent.Portability.MarkovCoarseGraining.expectation_range_totalVariation": [
+     "∀ state, lower ≤ report state ∧ report state ≤ upper"
+    ],
+    "Descent.Portability.MarkovCoarseGraining.ranged_report_error": [
+     "∀ state, lower ≤ report state ∧ report state ≤ upper"
+    ],
+    "Descent.Portability.MarkovCoarseGraining.finite_generator_matrix_bound": [],
+    "Descent.Portability.MarkovPoissonLaw.coordinate_summable": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_norm_le": [],
+    "Descent.Portability.MatrixOperatorBridge.row_abs_sum_le_operator_norm": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_norm_eq": [],
+    "Descent.Portability.MatrixOperatorBridge.markov_operator_norm_le_one": [],
     "Descent.Portability.neutralAF_benchmark_discrimination_preserved_calibration_lost": [],
     "Descent.Portability.brier_portability_gap_positive_of_r2_shift": [],
     "Descent.Portability.clinical_utility_threshold": [],
@@ -48203,6 +48256,8 @@
    "Descent.Portability.BalancedHWEInteraction.block_characteristic",
    "Descent.Portability.BalancedHWEInteraction.critical_characteristic_limit",
    "Descent.Portability.BalancedHWEInteraction.critical_standardization",
+   "Descent.Portability.BanachEulerExponential.coefficient_limit",
+   "Descent.Portability.BanachEulerExponential.euler_eq_series",
    "Descent.Portability.BinaryRiskCohort.continuous_citlEquation",
    "Descent.Portability.BinaryRiskCohort.continuous_logisticCalibrationObjective",
    "Descent.Portability.BinaryRiskCohort.isBounded_logisticCalibration_baselineSublevel",
@@ -48230,6 +48285,14 @@
    "Descent.Portability.ConditionalErrorCertificate.conditional_totalVariation",
    "Descent.Portability.ConditionalErrorCertificate.eventMass_le_one",
    "Descent.Portability.ConditionalErrorCertificate.eventMass_nonneg",
+   "Descent.Portability.ConditionalSeparatorLaw.gibbsLaw_minorization",
+   "Descent.Portability.ConditionalSeparatorLaw.gibbsNormalizer_pos",
+   "Descent.Portability.ConditionalSeparatorLaw.gibbs_separator_exp_bound",
+   "Descent.Portability.ConditionalSeparatorLaw.separator_phase_bound",
+   "Descent.Portability.ConditionalSeparatorLaw.separator_phase_exp_bound",
+   "Descent.Portability.ConditionalSeparatorLaw.separator_phase_identity",
+   "Descent.Portability.ControlledCoarseGraining.contraction_defect_bound",
+   "Descent.Portability.ControlledCoarseGraining.exact_closure_of_zero_defect",
    "Descent.Portability.DemeMixture.pooledAUC_diagonal_offDiagonal",
    "Descent.Portability.DemeRiskPredictionPanel.metricDefinedMass_le_one",
    "Descent.Portability.DemeRiskPredictionPanel.outcomeWeight_nonneg",
@@ -48362,6 +48425,16 @@
    "Descent.Portability.LowMomentObstruction.perturbation_moment",
    "Descent.Portability.LowMomentObstruction.selected_first_moment",
    "Descent.Portability.ManyDemeSampleCount.total_le_totalSampleSize",
+   "Descent.Portability.MarkovCoarseGraining.expectation_range_totalVariation",
+   "Descent.Portability.MarkovCoarseGraining.finite_generator_matrix_bound",
+   "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference",
+   "Descent.Portability.MarkovCoarseGraining.ranged_report_error",
+   "Descent.Portability.MarkovCoarseGraining.row_error_bound",
+   "Descent.Portability.MarkovPoissonLaw.coordinate_summable",
+   "Descent.Portability.MatrixOperatorBridge.markov_operator_norm_le_one",
+   "Descent.Portability.MatrixOperatorBridge.operator_norm_eq",
+   "Descent.Portability.MatrixOperatorBridge.operator_norm_le",
+   "Descent.Portability.MatrixOperatorBridge.row_abs_sum_le_operator_norm",
    "Descent.Portability.MinimalObservableLaw.closureStage_le_wordSpan",
    "Descent.Portability.MinimalObservableLaw.finiteOrbitSpan_eq",
    "Descent.Portability.MinimalObservableLaw.orbitSpan_invariant",
@@ -48741,6 +48814,7 @@
     "Covered state",
     "∀ state, Measurable (fun input ↦ (law input",
     "∀ state target, Measurable (fun input ↦ (kernel input state",
+    "∀ state, lower ≤ report state ∧ report state ≤ upper",
     "Homogeneous branch state.1",
     "∀ state, Interior deme state → ∀ output, arrayTransfer rates mutationRate rows state output = rows state output",
     "∀ state, Interior deme state → ∀ target, (∑ event : Channel state, eventRate rates state event * (rows (nextState state event",
@@ -49268,6 +49342,8 @@
     "Descent.Portability.BalancedHWEInteraction.block_characteristic": [],
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.critical_characteristic_limit": [],
+    "Descent.Portability.BanachEulerExponential.coefficient_limit": [],
+    "Descent.Portability.BanachEulerExponential.euler_eq_series": [],
     "Descent.Portability.misspec_excess_risk_nonneg": [],
     "Descent.Portability.estimation_variance_decreases_with_n": [],
     "Descent.Portability.global_shrinkage_controls_sparsity": [],
@@ -49306,6 +49382,12 @@
     "Descent.Portability.ConditionalErrorCertificate.conditional_bound_of_le": [],
     "Descent.Portability.ConditionalErrorCertificate.conditional_totalVariation": [],
     "Descent.Portability.ConditionalErrorCertificate.conditional_mean_interval": [],
+    "Descent.Portability.ConditionalSeparatorLaw.separator_phase_identity": [],
+    "Descent.Portability.ConditionalSeparatorLaw.separator_phase_bound": [],
+    "Descent.Portability.ConditionalSeparatorLaw.separator_phase_exp_bound": [],
+    "Descent.Portability.ConditionalSeparatorLaw.gibbsNormalizer_pos": [],
+    "Descent.Portability.ConditionalSeparatorLaw.gibbsLaw_minorization": [],
+    "Descent.Portability.ConditionalSeparatorLaw.gibbs_separator_exp_bound": [],
     "Descent.Portability.posteriorDrift_weighted_sum_eq_zero": [],
     "Descent.Portability.posterior_bias_variance_decomposition": [],
     "Descent.Portability.posteriorPairwiseDriftEnergy_eq_posteriorDriftEnergy": [],
@@ -49328,6 +49410,8 @@
     "Descent.Portability.driftDecisionRegret_eq_zero_of_no_crossing": [],
     "Descent.Portability.driftDecisionRegret_eq_zero_of_below": [],
     "Descent.Portability.aggregateCalibrationMoment_one_eq_calibrationInTheLarge": [],
+    "Descent.Portability.ControlledCoarseGraining.contraction_defect_bound": [],
+    "Descent.Portability.ControlledCoarseGraining.exact_closure_of_zero_defect": [],
     "Descent.Portability.dynamicsPooledProjector_mem_uniformCorrectionFamily": [],
     "Descent.Portability.factoredDynamicsCorrection_eq_of_pooledSum_eq": [],
     "Descent.Portability.factoredDynamicsCorrection_add_contrast": [],
@@ -49518,6 +49602,20 @@
     "Descent.Portability.LowMomentObstruction.complement_nonempty": [],
     "Descent.Portability.LowMomentObstruction.selected_first_moment": [],
     "Descent.Portability.LowMomentObstruction.every_order_obstruction": [],
+    "Descent.Portability.MarkovCoarseGraining.row_error_bound": [],
+    "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference": [],
+    "Descent.Portability.MarkovCoarseGraining.expectation_range_totalVariation": [
+     "∀ state, lower ≤ report state ∧ report state ≤ upper"
+    ],
+    "Descent.Portability.MarkovCoarseGraining.ranged_report_error": [
+     "∀ state, lower ≤ report state ∧ report state ≤ upper"
+    ],
+    "Descent.Portability.MarkovCoarseGraining.finite_generator_matrix_bound": [],
+    "Descent.Portability.MarkovPoissonLaw.coordinate_summable": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_norm_le": [],
+    "Descent.Portability.MatrixOperatorBridge.row_abs_sum_le_operator_norm": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_norm_eq": [],
+    "Descent.Portability.MatrixOperatorBridge.markov_operator_norm_le_one": [],
     "Descent.Portability.neutralAF_benchmark_discrimination_preserved_calibration_lost": [],
     "Descent.Portability.brier_portability_gap_positive_of_r2_shift": [],
     "Descent.Portability.clinical_utility_threshold": [],
@@ -67097,6 +67195,8 @@
    "Descent.Portability.BalancedHWEInteraction.block_characteristic",
    "Descent.Portability.BalancedHWEInteraction.critical_characteristic_limit",
    "Descent.Portability.BalancedHWEInteraction.critical_standardization",
+   "Descent.Portability.BanachEulerExponential.coefficient_limit",
+   "Descent.Portability.BanachEulerExponential.euler_eq_series",
    "Descent.Portability.BinaryRiskCohort.continuous_citlEquation",
    "Descent.Portability.BinaryRiskCohort.continuous_logisticCalibrationObjective",
    "Descent.Portability.BinaryRiskCohort.isBounded_logisticCalibration_baselineSublevel",
@@ -67124,6 +67224,14 @@
    "Descent.Portability.ConditionalErrorCertificate.conditional_totalVariation",
    "Descent.Portability.ConditionalErrorCertificate.eventMass_le_one",
    "Descent.Portability.ConditionalErrorCertificate.eventMass_nonneg",
+   "Descent.Portability.ConditionalSeparatorLaw.gibbsLaw_minorization",
+   "Descent.Portability.ConditionalSeparatorLaw.gibbsNormalizer_pos",
+   "Descent.Portability.ConditionalSeparatorLaw.gibbs_separator_exp_bound",
+   "Descent.Portability.ConditionalSeparatorLaw.separator_phase_bound",
+   "Descent.Portability.ConditionalSeparatorLaw.separator_phase_exp_bound",
+   "Descent.Portability.ConditionalSeparatorLaw.separator_phase_identity",
+   "Descent.Portability.ControlledCoarseGraining.contraction_defect_bound",
+   "Descent.Portability.ControlledCoarseGraining.exact_closure_of_zero_defect",
    "Descent.Portability.DemeMixture.pooledAUC_diagonal_offDiagonal",
    "Descent.Portability.DemeRiskPredictionPanel.metricDefinedMass_le_one",
    "Descent.Portability.DemeRiskPredictionPanel.outcomeWeight_nonneg",
@@ -67256,6 +67364,16 @@
    "Descent.Portability.LowMomentObstruction.perturbation_moment",
    "Descent.Portability.LowMomentObstruction.selected_first_moment",
    "Descent.Portability.ManyDemeSampleCount.total_le_totalSampleSize",
+   "Descent.Portability.MarkovCoarseGraining.expectation_range_totalVariation",
+   "Descent.Portability.MarkovCoarseGraining.finite_generator_matrix_bound",
+   "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference",
+   "Descent.Portability.MarkovCoarseGraining.ranged_report_error",
+   "Descent.Portability.MarkovCoarseGraining.row_error_bound",
+   "Descent.Portability.MarkovPoissonLaw.coordinate_summable",
+   "Descent.Portability.MatrixOperatorBridge.markov_operator_norm_le_one",
+   "Descent.Portability.MatrixOperatorBridge.operator_norm_eq",
+   "Descent.Portability.MatrixOperatorBridge.operator_norm_le",
+   "Descent.Portability.MatrixOperatorBridge.row_abs_sum_le_operator_norm",
    "Descent.Portability.MinimalObservableLaw.closureStage_le_wordSpan",
    "Descent.Portability.MinimalObservableLaw.finiteOrbitSpan_eq",
    "Descent.Portability.MinimalObservableLaw.orbitSpan_invariant",
@@ -67649,6 +67767,10 @@
     "a ≠ b",
     "a.1 = b.1",
     "∀ a ∈ values, ∀ b ∈ values, relation a b",
+    "∀ y i x, η i * (ν i",
+    "∀ y, ‖u y‖ ≤ 1",
+    "∀ x y, U y - U x ≤ R",
+    "∀ y i x x', U y i x' - U y i x ≤ R i",
     "a ≤ b",
     "0 < b",
     "c ∈ Ioo a b",
@@ -68227,6 +68349,8 @@
     "Descent.Portability.BalancedHWEInteraction.block_characteristic": [],
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.critical_characteristic_limit": [],
+    "Descent.Portability.BanachEulerExponential.coefficient_limit": [],
+    "Descent.Portability.BanachEulerExponential.euler_eq_series": [],
     "Descent.Portability.misspec_excess_risk_nonneg": [],
     "Descent.Portability.estimation_variance_decreases_with_n": [],
     "Descent.Portability.global_shrinkage_controls_sparsity": [],
@@ -68265,6 +68389,23 @@
     "Descent.Portability.ConditionalErrorCertificate.conditional_bound_of_le": [],
     "Descent.Portability.ConditionalErrorCertificate.conditional_totalVariation": [],
     "Descent.Portability.ConditionalErrorCertificate.conditional_mean_interval": [],
+    "Descent.Portability.ConditionalSeparatorLaw.separator_phase_identity": [],
+    "Descent.Portability.ConditionalSeparatorLaw.separator_phase_bound": [
+     "∀ y i x, η i * (ν i",
+     "∀ y, ‖u y‖ ≤ 1"
+    ],
+    "Descent.Portability.ConditionalSeparatorLaw.separator_phase_exp_bound": [
+     "∀ y i x, η i * (ν i",
+     "∀ y, ‖u y‖ ≤ 1"
+    ],
+    "Descent.Portability.ConditionalSeparatorLaw.gibbsNormalizer_pos": [],
+    "Descent.Portability.ConditionalSeparatorLaw.gibbsLaw_minorization": [
+     "∀ x y, U y - U x ≤ R"
+    ],
+    "Descent.Portability.ConditionalSeparatorLaw.gibbs_separator_exp_bound": [
+     "∀ y i x x', U y i x' - U y i x ≤ R i",
+     "∀ y, ‖u y‖ ≤ 1"
+    ],
     "Descent.Portability.posteriorDrift_weighted_sum_eq_zero": [],
     "Descent.Portability.posterior_bias_variance_decomposition": [],
     "Descent.Portability.posteriorPairwiseDriftEnergy_eq_posteriorDriftEnergy": [],
@@ -68287,6 +68428,8 @@
     "Descent.Portability.driftDecisionRegret_eq_zero_of_no_crossing": [],
     "Descent.Portability.driftDecisionRegret_eq_zero_of_below": [],
     "Descent.Portability.aggregateCalibrationMoment_one_eq_calibrationInTheLarge": [],
+    "Descent.Portability.ControlledCoarseGraining.contraction_defect_bound": [],
+    "Descent.Portability.ControlledCoarseGraining.exact_closure_of_zero_defect": [],
     "Descent.Portability.dynamicsPooledProjector_mem_uniformCorrectionFamily": [],
     "Descent.Portability.factoredDynamicsCorrection_eq_of_pooledSum_eq": [],
     "Descent.Portability.factoredDynamicsCorrection_add_contrast": [],
@@ -68464,6 +68607,16 @@
     "Descent.Portability.LowMomentObstruction.complement_nonempty": [],
     "Descent.Portability.LowMomentObstruction.selected_first_moment": [],
     "Descent.Portability.LowMomentObstruction.every_order_obstruction": [],
+    "Descent.Portability.MarkovCoarseGraining.row_error_bound": [],
+    "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference": [],
+    "Descent.Portability.MarkovCoarseGraining.expectation_range_totalVariation": [],
+    "Descent.Portability.MarkovCoarseGraining.ranged_report_error": [],
+    "Descent.Portability.MarkovCoarseGraining.finite_generator_matrix_bound": [],
+    "Descent.Portability.MarkovPoissonLaw.coordinate_summable": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_norm_le": [],
+    "Descent.Portability.MatrixOperatorBridge.row_abs_sum_le_operator_norm": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_norm_eq": [],
+    "Descent.Portability.MatrixOperatorBridge.markov_operator_norm_le_one": [],
     "Descent.Portability.neutralAF_benchmark_discrimination_preserved_calibration_lost": [],
     "Descent.Portability.brier_portability_gap_positive_of_r2_shift": [],
     "Descent.Portability.clinical_utility_threshold": [],
@@ -68807,6 +68960,7 @@
    "Descent.Portability.AncestralCladePartition.extends_terminal",
    "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_good",
    "Descent.Portability.AncestralGenealogyOrdering.intervalBranches_ordered",
+   "Descent.Portability.BanachEulerExponential.coefficient_limit",
    "Descent.Portability.FiniteProductExponential.productEvolution_add",
    "Descent.Portability.FiniteProductExponential.semigroup_eq_exponential",
    "Descent.Portability.InterleavedMutationExponential.interval_compose",
@@ -68852,6 +69006,7 @@
     "Descent.Portability.AncestralCladePartition.extends_terminal": [],
     "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_good": [],
     "Descent.Portability.AncestralGenealogyOrdering.intervalBranches_ordered": [],
+    "Descent.Portability.BanachEulerExponential.coefficient_limit": [],
     "Descent.Portability.FiniteProductExponential.semigroup_eq_exponential": [],
     "Descent.Portability.FiniteProductExponential.productEvolution_add": [],
     "Descent.Portability.InterleavedMutationExponential.interval_compose": [],
@@ -69159,10 +69314,12 @@
    "Descent.Portability.BalancedHWECounterexample.flatten_mass",
    "Descent.Portability.BalancedHWECounterexample.mem_blockSet",
    "Descent.Portability.BalancedHWEInteraction.critical_limit_not_gaussian",
+   "Descent.Portability.BanachEulerExponential.euler_eq_series",
    "Descent.Portability.BinaryRiskCohort.CITLDomain.existsUniqueBracketedRoot",
    "Descent.Portability.CalibrationLaw.calibratedIntercept_lt_iff",
    "Descent.Portability.CalibrationLaw.exists_unique_calibrated_intercept",
    "Descent.Portability.CalibrationLaw.lt_calibratedIntercept_iff",
+   "Descent.Portability.ControlledCoarseGraining.defect_integral_identity",
    "Descent.Portability.DemeRiskPredictionPanel.outcomeWeight_sum_one",
    "Descent.Portability.DiploidEffectFieldLaw.effectField_cross_derivatives",
    "Descent.Portability.DiploidEffectFieldLaw.erased_product_update",
@@ -69189,6 +69346,7 @@
    "Descent.Portability.LowMomentObstruction.mean_fitness_one",
    "Descent.Portability.LowMomentObstruction.singleton_proper",
    "Descent.Portability.MarkedAncestralLaw.trace_terminal_iterate",
+   "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference",
    "Descent.Portability.MinimalObservableLaw.power_remainder",
    "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward",
    "Descent.Portability.ObservableClosureLaw.matrix_autonomy_iff",
@@ -69555,6 +69713,7 @@
     "Descent.Portability.BalancedHWECounterexample.flatten_mass": [],
     "Descent.Portability.BalancedHWECounterexample.critical_cosine_limit": [],
     "Descent.Portability.BalancedHWEInteraction.critical_limit_not_gaussian": [],
+    "Descent.Portability.BanachEulerExponential.euler_eq_series": [],
     "Descent.Portability.CalibrationLaw.exists_unique_calibrated_intercept": [],
     "Descent.Portability.CalibrationLaw.calibratedIntercept_lt_iff": [],
     "Descent.Portability.CalibrationLaw.lt_calibratedIntercept_iff": [],
@@ -69562,6 +69721,7 @@
     "Descent.Portability.pairwiseCalibrationDriftEnergy_eq_zero_iff_on_support": [],
     "Descent.Portability.posteriorPairwiseDriftEnergy_ge_pair": [],
     "Descent.Portability.treatNetBenefit_eq": [],
+    "Descent.Portability.ControlledCoarseGraining.defect_integral_identity": [],
     "Descent.Portability.factorsThrough_iff_ker_le": [],
     "Descent.Portability.factorsThrough_conjugate_iff": [],
     "Descent.Portability.hasUnitApproxKernel_postcomp_iff": [],
@@ -69604,6 +69764,7 @@
     "Descent.Portability.LowMomentObstruction.singleton_proper": [],
     "Descent.Portability.LowMomentObstruction.mean_fitness_one": [],
     "Descent.Portability.MarkedAncestralLaw.trace_terminal_iterate": [],
+    "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference": [],
     "Descent.Portability.MinimalObservableLaw.power_remainder": [],
     "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward": [],
     "Descent.Portability.ObservableClosureLaw.matrix_autonomy_iff": [],
@@ -69860,6 +70021,7 @@
    "Descent.Portability.ChunkedGenotypeLaw.eligibleReservoir_expectation",
    "Descent.Portability.CombinedPredictionCertificate.combined_rmse",
    "Descent.Portability.ConditionalErrorCertificate.conditional_bound_of_le",
+   "Descent.Portability.ConditionalSeparatorLaw.separator_phase_exp_bound",
    "Descent.Portability.DistanceBinnedPortabilityLaw.binInner_eq_iSup_clipped",
    "Descent.Portability.DistanceBinnedPortabilityLaw.weighted_integrable",
    "Descent.Portability.ExactFiniteHistoryLaw.report_path_sum_eq_backward",
@@ -69871,6 +70033,7 @@
    "Descent.Portability.FirthFiniteIterationLaw.clippedStep_coordinate_bound",
    "Descent.Portability.FirthFiniteIterationLaw.maxAbs_nonneg",
    "Descent.Portability.GuardedMetricOptimization.scale_pos",
+   "Descent.Portability.MarkovCoarseGraining.bounded_report_error",
    "Descent.Portability.OptimalMeasurementAllocation.allocation_lower_bound",
    "Descent.Portability.PThresholdTrainingLaw.scan_quality_ge_incumbent",
    "Descent.Portability.PThresholdTrainingLaw.scan_quality_ge_member",
@@ -70062,6 +70225,7 @@
     "Descent.Portability.ChunkedGenotypeLaw.eligibleReservoir_expectation": [],
     "Descent.Portability.CombinedPredictionCertificate.combined_rmse": [],
     "Descent.Portability.ConditionalErrorCertificate.conditional_bound_of_le": [],
+    "Descent.Portability.ConditionalSeparatorLaw.separator_phase_exp_bound": [],
     "Descent.Portability.no_common_thresholdDecision_of_crossing": [],
     "Descent.Portability.dynamicsPooledProjector_eq_of_factorsThrough_of_fixes_common": [
      "∀ c : ℝ, C (fun _ : Bool ↦ c"
@@ -70084,6 +70248,7 @@
     "Descent.Portability.FirthFiniteIterationLaw.maxAbs_nonneg": [],
     "Descent.Portability.FirthFiniteIterationLaw.clippedStep_coordinate_bound": [],
     "Descent.Portability.GuardedMetricOptimization.scale_pos": [],
+    "Descent.Portability.MarkovCoarseGraining.bounded_report_error": [],
     "Descent.Portability.OptimalMeasurementAllocation.allocation_lower_bound": [],
     "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan": [],
     "Descent.Portability.pc_correction_recent_structure_lower_bound": [],
@@ -76940,7 +77105,10 @@
    "Descent.Portability.FiniteReportLaw.separatingMetric_attains",
    "Descent.Portability.FiniteReportLaw.totalVariation_eq_half_sum_abs",
    "Descent.Portability.FiniteReportLaw.totalVariation_le_one",
-   "Descent.Portability.FiniteReportLaw.totalVariation_nonneg"
+   "Descent.Portability.FiniteReportLaw.totalVariation_nonneg",
+   "Descent.Portability.MarkovCoarseGraining.expectation_range_totalVariation",
+   "Descent.Portability.MarkovCoarseGraining.finite_generator_totalVariation_bound",
+   "Descent.Portability.MarkovCoarseGraining.totalVariation_error_bound"
   ],
   "constraints": {
    "hypotheses": [],
@@ -76968,6 +77136,9 @@
     "Descent.Portability.FiniteNumericalCertificate.totalVariation_bind": [],
     "Descent.Portability.FiniteNumericalCertificate.totalVariation_kernel_change": [],
     "Descent.Portability.FiniteNumericalCertificate.propagation_perturbation": [],
+    "Descent.Portability.MarkovCoarseGraining.totalVariation_error_bound": [],
+    "Descent.Portability.MarkovCoarseGraining.expectation_range_totalVariation": [],
+    "Descent.Portability.MarkovCoarseGraining.finite_generator_totalVariation_bound": [],
     "Descent.Portability.FiniteReportLaw.totalVariation_nonneg": [],
     "Descent.Portability.FiniteReportLaw.totalVariation_le_one": [],
     "Descent.Portability.FiniteReportLaw.totalVariation_eq_half_sum_abs": [],
@@ -84831,6 +85002,8 @@
    "Descent.Portability.FiniteReportLaw.covariance_eq_rawMoments",
    "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul",
    "Descent.Portability.FiniteReportLaw.variance_nonneg",
+   "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_covariance",
+   "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_regression",
    "Descent.Portability.PThresholdTrainingLaw.flipSign_iff_negative_correlation",
    "Descent.Portability.PortabilityRatioGeometry.trait_domination_iff",
    "Descent.Portability.ProbitTrainingLaw.reportedAccuracy_eq_moment_sum",
@@ -84943,6 +85116,8 @@
     "Descent.Portability.FiniteReportLaw.covariance_eq_rawMoments": [],
     "Descent.Portability.FiniteReportLaw.variance_nonneg": [],
     "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul": [],
+    "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_covariance": [],
+    "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_regression": [],
     "Descent.Portability.PThresholdTrainingLaw.flipSign_iff_negative_correlation": [],
     "Descent.Portability.DeploymentPopulation.deployedMse_eq": [],
     "Descent.Portability.DeploymentPopulation.predictiveCovariance_sq_le": [],
@@ -88777,6 +88952,34 @@
    "Descent.Portability.InterleavedMutationExponential.poisson_matrix_series",
    "Descent.Portability.InterleavedMutationExponential.propagate_mass",
    "Descent.Portability.InterleavedMutationExponential.scalar_identity_exp",
+   "Descent.Portability.MarkovCoarseGraining.bounded_report_error",
+   "Descent.Portability.MarkovCoarseGraining.finite_generator_matrix_bound",
+   "Descent.Portability.MarkovCoarseGraining.finite_generator_totalVariation_bound",
+   "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference",
+   "Descent.Portability.MarkovCoarseGraining.operator_matrixDefect",
+   "Descent.Portability.MarkovCoarseGraining.operator_matrixError",
+   "Descent.Portability.MarkovCoarseGraining.ranged_report_error",
+   "Descent.Portability.MarkovCoarseGraining.row_error_bound",
+   "Descent.Portability.MarkovCoarseGraining.stateLaw_matrix",
+   "Descent.Portability.MarkovCoarseGraining.totalVariation_error_bound",
+   "Descent.Portability.MarkovPoissonLaw.coordinate_summable",
+   "Descent.Portability.MarkovPoissonLaw.evolution_norm_le_one",
+   "Descent.Portability.MarkovPoissonLaw.finiteGenerator_evolution_norm_le_one",
+   "Descent.Portability.MarkovPoissonLaw.normalizationRate_pos",
+   "Descent.Portability.MarkovPoissonLaw.normalized_generator",
+   "Descent.Portability.MarkovPoissonLaw.poissonLaw_matrix",
+   "Descent.Portability.MatrixOperatorBridge.markov_operator_norm_le_one",
+   "Descent.Portability.MatrixOperatorBridge.operator_add",
+   "Descent.Portability.MatrixOperatorBridge.operator_apply",
+   "Descent.Portability.MatrixOperatorBridge.operator_exp",
+   "Descent.Portability.MatrixOperatorBridge.operator_mul",
+   "Descent.Portability.MatrixOperatorBridge.operator_norm_eq",
+   "Descent.Portability.MatrixOperatorBridge.operator_norm_le",
+   "Descent.Portability.MatrixOperatorBridge.operator_one",
+   "Descent.Portability.MatrixOperatorBridge.operator_smul",
+   "Descent.Portability.MatrixOperatorBridge.operator_sub",
+   "Descent.Portability.MatrixOperatorBridge.operator_zero",
+   "Descent.Portability.MatrixOperatorBridge.row_abs_sum_le_operator_norm",
    "Descent.Portability.MinimalObservableLaw.finiteOrbitSpan_eq",
    "Descent.Portability.MinimalObservableLaw.finiteOrbitSpan_invariant",
    "Descent.Portability.MinimalObservableLaw.finiteOrbitSpan_minimal",
@@ -89106,6 +89309,34 @@
     "Descent.Portability.InterleavedMutationExponential.poisson_matrix_series": [],
     "Descent.Portability.InterleavedMutationExponential.scalar_identity_exp": [],
     "Descent.Portability.InterleavedMutationExponential.poisson_matrix_exponential": [],
+    "Descent.Portability.MarkovCoarseGraining.operator_matrixDefect": [],
+    "Descent.Portability.MarkovCoarseGraining.operator_matrixError": [],
+    "Descent.Portability.MarkovCoarseGraining.row_error_bound": [],
+    "Descent.Portability.MarkovCoarseGraining.stateLaw_matrix": [],
+    "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference": [],
+    "Descent.Portability.MarkovCoarseGraining.totalVariation_error_bound": [],
+    "Descent.Portability.MarkovCoarseGraining.bounded_report_error": [],
+    "Descent.Portability.MarkovCoarseGraining.ranged_report_error": [],
+    "Descent.Portability.MarkovCoarseGraining.finite_generator_matrix_bound": [],
+    "Descent.Portability.MarkovCoarseGraining.finite_generator_totalVariation_bound": [],
+    "Descent.Portability.MarkovPoissonLaw.coordinate_summable": [],
+    "Descent.Portability.MarkovPoissonLaw.poissonLaw_matrix": [],
+    "Descent.Portability.MarkovPoissonLaw.evolution_norm_le_one": [],
+    "Descent.Portability.MarkovPoissonLaw.normalizationRate_pos": [],
+    "Descent.Portability.MarkovPoissonLaw.normalized_generator": [],
+    "Descent.Portability.MarkovPoissonLaw.finiteGenerator_evolution_norm_le_one": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_apply": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_zero": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_one": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_add": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_sub": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_smul": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_mul": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_exp": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_norm_le": [],
+    "Descent.Portability.MatrixOperatorBridge.row_abs_sum_le_operator_norm": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_norm_eq": [],
+    "Descent.Portability.MatrixOperatorBridge.markov_operator_norm_le_one": [],
     "Descent.Portability.clumping_minimizes_detection_on_ld_kernel": [],
     "Descent.Portability.clumping_maximizes_reconstruction_on_ld_kernel": [],
     "Descent.Portability.MinimalObservableLaw.power_remainder": [],
@@ -89949,6 +90180,8 @@
    "Descent.Portability.MarkedAncestralLaw.trace_expectation_succ",
    "Descent.Portability.MarkedAncestralLaw.trace_terminal_expectation",
    "Descent.Portability.MarkedAncestralLaw.trace_terminal_iterate",
+   "Descent.Portability.MarkovPoissonLaw.coordinate_summable",
+   "Descent.Portability.MarkovPoissonLaw.poissonLaw_matrix",
    "Descent.Portability.NucleotideMutationLaw.branch_expectation",
    "Descent.Portability.NucleotideMutationLaw.branch_history_expectation",
    "Descent.Portability.NucleotideMutationLaw.coordinate_summable",
@@ -90210,6 +90443,8 @@
     "Descent.Portability.MarkedAncestralLaw.trace_terminal_iterate": [],
     "Descent.Portability.MarkedAncestralLaw.trace_terminal_expectation": [],
     "Descent.Portability.MarkedAncestralLaw.marked_epoch_mass_sum": [],
+    "Descent.Portability.MarkovPoissonLaw.coordinate_summable": [],
+    "Descent.Portability.MarkovPoissonLaw.poissonLaw_matrix": [],
     "Descent.Portability.NucleotideMutationLaw.count_expectation": [],
     "Descent.Portability.NucleotideMutationLaw.coordinate_summable": [],
     "Descent.Portability.NucleotideMutationLaw.eigen_summable": [],
@@ -95541,6 +95776,11 @@
    "Descent.Portability.CalibrationLaw.calibrated_effectProbability_measurable",
    "Descent.Portability.CalibrationLaw.normalized_prevalence_continuous",
    "Descent.Portability.CalibrationLaw.prevalence_continuous",
+   "Descent.Portability.ControlledCoarseGraining.bridge_derivative",
+   "Descent.Portability.ControlledCoarseGraining.contraction_defect_bound",
+   "Descent.Portability.ControlledCoarseGraining.defectIntegrand_continuous",
+   "Descent.Portability.ControlledCoarseGraining.defect_integral_identity",
+   "Descent.Portability.ControlledCoarseGraining.exact_closure_of_zero_defect",
    "Descent.Portability.EllipsoidTargetRadius.weighted_ellipsoid_minimax",
    "Descent.Portability.EllipsoidTargetRadius.weighted_fiber_minimax",
    "Descent.Portability.EllipsoidTargetRadius.zero_radius_iff_kernel",
@@ -95555,6 +95795,8 @@
    "Descent.Portability.HasUnitApproxKernel.postcomp",
    "Descent.Portability.InterleavedMutationMeasurability.mark_mass_measurable",
    "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable",
+   "Descent.Portability.MarkovCoarseGraining.operator_matrixError",
+   "Descent.Portability.MatrixOperatorBridge.operator_mul",
    "Descent.Portability.ObservableClosureLaw.autonomy_iff_linear_update",
    "Descent.Portability.ObservableClosureLaw.linear_factorization_iff",
    "Descent.Portability.RatioPoleLaw.calibrated_probability_continuous",
@@ -95646,6 +95888,11 @@
     "Descent.Portability.CalibrationLaw.normalized_prevalence_continuous": [],
     "Descent.Portability.CalibrationLaw.calibrated_caseProbability_measurable": [],
     "Descent.Portability.CalibrationLaw.calibrated_effectProbability_measurable": [],
+    "Descent.Portability.ControlledCoarseGraining.defectIntegrand_continuous": [],
+    "Descent.Portability.ControlledCoarseGraining.bridge_derivative": [],
+    "Descent.Portability.ControlledCoarseGraining.defect_integral_identity": [],
+    "Descent.Portability.ControlledCoarseGraining.contraction_defect_bound": [],
+    "Descent.Portability.ControlledCoarseGraining.exact_closure_of_zero_defect": [],
     "Descent.Portability.dynamicsPooledProjector_idempotent": [],
     "Descent.Portability.FactorsThroughObservation.postcomp": [],
     "Descent.Portability.factorsThroughSubmodule_postcomp_mem": [],
@@ -95684,6 +95931,8 @@
     "Descent.Portability.GaussianSlabLaw.local_cylinder": [],
     "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable": [],
     "Descent.Portability.InterleavedMutationMeasurability.mark_mass_measurable": [],
+    "Descent.Portability.MarkovCoarseGraining.operator_matrixError": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_mul": [],
     "Descent.Portability.r2_less_portable_than_auc_from_decomposition": [
      "StrictMono g",
      "scoreTarget = g ∘ scoreSource"
@@ -95779,6 +96028,11 @@
    "Descent.Portability.FiniteReportLaw.weightedDefinedMetric_joint",
    "Descent.Portability.InterleavedMutationExponential.propagate_mass",
    "Descent.Portability.InterleavedMutationMeasurability.bind_mass_measurable",
+   "Descent.Portability.MarkovCoarseGraining.stateLaw_matrix",
+   "Descent.Portability.MarkovPoissonLaw.coordinate_summable",
+   "Descent.Portability.MarkovPoissonLaw.evolution_norm_le_one",
+   "Descent.Portability.MarkovPoissonLaw.poissonLaw_matrix",
+   "Descent.Portability.MatrixOperatorBridge.markov_operator_norm_le_one",
    "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward",
    "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.branchMeasure_univ",
    "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integrable_branchMeasure",
@@ -95869,6 +96123,11 @@
     "Descent.Portability.FiniteNumericalCertificate.totalVariation_bind": [],
     "Descent.Portability.InterleavedMutationExponential.propagate_mass": [],
     "Descent.Portability.InterleavedMutationMeasurability.bind_mass_measurable": [],
+    "Descent.Portability.MarkovCoarseGraining.stateLaw_matrix": [],
+    "Descent.Portability.MarkovPoissonLaw.coordinate_summable": [],
+    "Descent.Portability.MarkovPoissonLaw.poissonLaw_matrix": [],
+    "Descent.Portability.MarkovPoissonLaw.evolution_norm_le_one": [],
+    "Descent.Portability.MatrixOperatorBridge.markov_operator_norm_le_one": [],
     "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward": [],
     "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.branchMeasure_univ": [],
     "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integrable_branchMeasure": [],
@@ -96721,6 +96980,7 @@
    "Descent.Portability.FiniteLiabilityPanel.prevalenceIntercept_shift",
    "Descent.Portability.FiniteLiabilityPanel.risk_eq_iff_liability_eq_up_to_common_shift",
    "Descent.Portability.FiniteLiabilityPanel.risk_shift",
+   "Descent.Portability.OneLocusCompatibilityLaw.realizing_values_unique_mod_constant",
    "Descent.Portability.PThresholdTrainingLaw.binaryAUC_affine_positive",
    "Descent.Portability.PThresholdTrainingLaw.comparison_affine_positive",
    "Descent.Portability.ReportFiniteCalibrationLaw.residual_gauge",
@@ -96752,7 +97012,8 @@
   ],
   "constraints": {
    "hypotheses": [
-    "∀ D D' : GxEDeployment n, (∀ i, D.shift i = D'.shift i"
+    "∀ D D' : GxEDeployment n, (∀ i, D.shift i = D'.shift i",
+    "c ∈ Ioo a b"
    ],
    "hypotheses_by_theorem": {
     "Descent.Blindness.Fiber.transfer_total": [],
@@ -96781,6 +97042,9 @@
     "Descent.Portability.FiniteLiabilityPanel.prevalenceIntercept_shift": [],
     "Descent.Portability.FiniteLiabilityPanel.risk_shift": [],
     "Descent.Portability.FiniteLiabilityPanel.risk_eq_iff_liability_eq_up_to_common_shift": [],
+    "Descent.Portability.OneLocusCompatibilityLaw.realizing_values_unique_mod_constant": [
+     "c ∈ Ioo a b"
+    ],
     "Descent.Portability.shiftedObservedMean_source": [],
     "Descent.Portability.PThresholdTrainingLaw.comparison_affine_positive": [],
     "Descent.Portability.PThresholdTrainingLaw.binaryAUC_affine_positive": [],
@@ -109689,6 +109953,7 @@
    "Descent.Portability.FiniteLiabilityPanel.prevalenceIntercept_shift",
    "Descent.Portability.FiniteLiabilityPanel.risk_eq_iff_liability_eq_up_to_common_shift",
    "Descent.Portability.FiniteLiabilityPanel.risk_shift",
+   "Descent.Portability.OneLocusCompatibilityLaw.realizing_values_unique_mod_constant",
    "Descent.Portability.PThresholdTrainingLaw.binaryAUC_affine_positive",
    "Descent.Portability.PThresholdTrainingLaw.comparison_affine_positive",
    "Descent.Portability.ReportFiniteCalibrationLaw.residual_gauge",
@@ -109760,6 +110025,7 @@
     "Descent.Portability.FiniteLiabilityPanel.prevalenceIntercept_shift": [],
     "Descent.Portability.FiniteLiabilityPanel.risk_shift": [],
     "Descent.Portability.FiniteLiabilityPanel.risk_eq_iff_liability_eq_up_to_common_shift": [],
+    "Descent.Portability.OneLocusCompatibilityLaw.realizing_values_unique_mod_constant": [],
     "Descent.Portability.shiftedObservedMean_source": [],
     "Descent.Portability.PThresholdTrainingLaw.comparison_affine_positive": [],
     "Descent.Portability.PThresholdTrainingLaw.binaryAUC_affine_positive": [],
@@ -118645,6 +118911,7 @@
    "Descent.PopGen.MafSpectrum.fourthMoment_eq",
    "Descent.PopGen.MafSpectrum.sixthMoment_eq_floorOne_plus_dispersion",
    "Descent.PopGen.MeanAbsoluteEffectCertificateProblem.finiteProblem_moment",
+   "Descent.Portability.ControlledCoarseGraining.bridge_derivative",
    "Descent.Spectral.ScalarSecondMoments.gamma_symmetric_of_stationary"
   ],
   "constraints": {
@@ -118692,6 +118959,7 @@
      "spectrum.moment 4 = spectrum'.moment 4",
      "spectrum.moment 6 ≠ spectrum'.moment 6"
     ],
+    "Descent.Portability.ControlledCoarseGraining.bridge_derivative": [],
     "Descent.Spectral.ScalarSecondMoments.gamma_symmetric_of_stationary": []
    }
   }
@@ -129747,6 +130015,170 @@
    }
   }
  },
+ "Descent.Portability.ConditionalSeparatorLaw.phaseMean": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'ℂ'\")",
+  "file": "Descent/Portability/ConditionalSeparatorLaw.lean",
+  "line": 26,
+  "short": "phaseMean",
+  "ret_type": "ℂ",
+  "empirical_status": "",
+  "python": "phaseMean",
+  "args": [
+   "p",
+   "z"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'ℂ'\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ConditionalSeparatorLaw.gibbs_separator_exp_bound",
+   "Descent.Portability.ConditionalSeparatorLaw.phaseMean_norm_le_one",
+   "Descent.Portability.ConditionalSeparatorLaw.phaseMean_norm_minorization",
+   "Descent.Portability.ConditionalSeparatorLaw.separator_phase_bound",
+   "Descent.Portability.ConditionalSeparatorLaw.separator_phase_exp_bound",
+   "Descent.Portability.ConditionalSeparatorLaw.separator_phase_identity"
+  ],
+  "constraints": {
+   "declared_kind": "probability",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [
+    "∀ x, ‖z x‖ ≤ 1",
+    "∀ x, η * ν.mass x ≤ p.mass x",
+    "∀ i x, ‖z i x‖ ≤ 1"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ConditionalSeparatorLaw.phaseMean_norm_le_one": [
+     "∀ x, ‖z x‖ ≤ 1"
+    ],
+    "Descent.Portability.ConditionalSeparatorLaw.phaseMean_norm_minorization": [
+     "∀ x, η * ν.mass x ≤ p.mass x",
+     "∀ x, ‖z x‖ ≤ 1"
+    ],
+    "Descent.Portability.ConditionalSeparatorLaw.separator_phase_identity": [],
+    "Descent.Portability.ConditionalSeparatorLaw.separator_phase_bound": [
+     "∀ i x, ‖z i x‖ ≤ 1"
+    ],
+    "Descent.Portability.ConditionalSeparatorLaw.separator_phase_exp_bound": [
+     "∀ i x, ‖z i x‖ ≤ 1"
+    ],
+    "Descent.Portability.ConditionalSeparatorLaw.gibbs_separator_exp_bound": [
+     "∀ i x, ‖z i x‖ ≤ 1"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.ConditionalSeparatorLaw.separatorLaw": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/ConditionalSeparatorLaw.lean",
+  "line": 69,
+  "short": "separatorLaw",
+  "ret_type": "FiniteReportLaw (Y × (D → X)) where mass yx",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ConditionalSeparatorLaw.gibbs_separator_exp_bound",
+   "Descent.Portability.ConditionalSeparatorLaw.separator_phase_bound",
+   "Descent.Portability.ConditionalSeparatorLaw.separator_phase_exp_bound",
+   "Descent.Portability.ConditionalSeparatorLaw.separator_phase_identity"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ConditionalSeparatorLaw.separator_phase_identity": [],
+    "Descent.Portability.ConditionalSeparatorLaw.separator_phase_bound": [],
+    "Descent.Portability.ConditionalSeparatorLaw.separator_phase_exp_bound": [],
+    "Descent.Portability.ConditionalSeparatorLaw.gibbs_separator_exp_bound": []
+   }
+  }
+ },
+ "Descent.Portability.ConditionalSeparatorLaw.gibbsNormalizer": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/ConditionalSeparatorLaw.lean",
+  "line": 149,
+  "short": "gibbsNormalizer",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "gibbsNormalizer",
+  "args": [
+   "ν",
+   "U"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": {
+   "U": {
+    "dim": "X",
+    "rank": 1
+   }
+  },
+  "mentioned_by": [
+   "Descent.Portability.ConditionalSeparatorLaw.gibbsLaw_minorization",
+   "Descent.Portability.ConditionalSeparatorLaw.gibbsNormalizer_pos"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "∀ x y, U y - U x ≤ R"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ConditionalSeparatorLaw.gibbsNormalizer_pos": [],
+    "Descent.Portability.ConditionalSeparatorLaw.gibbsLaw_minorization": [
+     "∀ x y, U y - U x ≤ R"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.ConditionalSeparatorLaw.gibbsLaw": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/ConditionalSeparatorLaw.lean",
+  "line": 164,
+  "short": "gibbsLaw",
+  "ret_type": "FiniteReportLaw X where mass x",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ConditionalSeparatorLaw.gibbsLaw_minorization",
+   "Descent.Portability.ConditionalSeparatorLaw.gibbs_separator_exp_bound"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "∀ x y, U y - U x ≤ R",
+    "∀ y i x x', U y i x' - U y i x ≤ R i"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ConditionalSeparatorLaw.gibbsLaw_minorization": [
+     "∀ x y, U y - U x ≤ R"
+    ],
+    "Descent.Portability.ConditionalSeparatorLaw.gibbs_separator_exp_bound": [
+     "∀ y i x x', U y i x' - U y i x ≤ R i"
+    ]
+   }
+  }
+ },
  "Descent.Portability.posteriorMean": {
   "class": "NUMERIC",
   "note": "",
@@ -132253,6 +132685,196 @@
    }
   }
  },
+ "Descent.Portability.ControlledCoarseGraining.evolution": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name NormedSpace.exp",
+  "file": "Descent/Portability/ControlledCoarseGraining.lean",
+  "line": 25,
+  "short": "evolution",
+  "ret_type": "E →L[ℝ] E",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "time": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ControlledCoarseGraining.bridge_derivative",
+   "Descent.Portability.ControlledCoarseGraining.contraction_defect_bound",
+   "Descent.Portability.ControlledCoarseGraining.defect_integral_identity",
+   "Descent.Portability.ControlledCoarseGraining.evolution_continuous",
+   "Descent.Portability.ControlledCoarseGraining.exact_closure_of_zero_defect",
+   "Descent.Portability.ExactMemoryLaw.projected_block_steps",
+   "Descent.Portability.ExactMemoryLaw.projected_memory",
+   "Descent.Portability.ExactMemoryLaw.projection_discarded",
+   "Descent.Portability.ExactMemoryLaw.projection_retained",
+   "Descent.Portability.ExactMemoryLaw.retained_add_discarded",
+   "Descent.Portability.FiniteProductExponential.semigroup_eq_exponential",
+   "Descent.Portability.MarkovCoarseGraining.operator_matrixError",
+   "Descent.Portability.MarkovPoissonLaw.evolution_norm_le_one",
+   "Descent.Portability.MarkovPoissonLaw.finiteGenerator_evolution_norm_le_one",
+   "Descent.Portability.MinimalObservableLaw.orbitSpan_invariant",
+   "Descent.Portability.MinimalObservableLaw.orbitSpan_minimal",
+   "Descent.Portability.MinimalObservableLaw.orbit_mem",
+   "Descent.Portability.MinimalObservableLaw.target_mem"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "∀ time, 0 ≤ time → ‖evolution fine time‖ ≤ 1",
+    "∀ time, 0 ≤ time → ‖evolution coarse time‖ ≤ 1",
+    "HasDerivAt evolution generator 0",
+    "0 ≤ time"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ControlledCoarseGraining.evolution_continuous": [],
+    "Descent.Portability.ControlledCoarseGraining.bridge_derivative": [],
+    "Descent.Portability.ControlledCoarseGraining.defect_integral_identity": [],
+    "Descent.Portability.ControlledCoarseGraining.contraction_defect_bound": [
+     "∀ time, 0 ≤ time → ‖evolution fine time‖ ≤ 1",
+     "∀ time, 0 ≤ time → ‖evolution coarse time‖ ≤ 1"
+    ],
+    "Descent.Portability.ControlledCoarseGraining.exact_closure_of_zero_defect": [],
+    "Descent.Portability.ExactMemoryLaw.retained_add_discarded": [],
+    "Descent.Portability.ExactMemoryLaw.projection_retained": [],
+    "Descent.Portability.ExactMemoryLaw.projection_discarded": [],
+    "Descent.Portability.ExactMemoryLaw.projected_block_steps": [],
+    "Descent.Portability.ExactMemoryLaw.projected_memory": [],
+    "Descent.Portability.FiniteProductExponential.semigroup_eq_exponential": [
+     "HasDerivAt evolution generator 0"
+    ],
+    "Descent.Portability.MarkovCoarseGraining.operator_matrixError": [],
+    "Descent.Portability.MarkovPoissonLaw.evolution_norm_le_one": [
+     "0 ≤ time"
+    ],
+    "Descent.Portability.MarkovPoissonLaw.finiteGenerator_evolution_norm_le_one": [
+     "0 ≤ time"
+    ],
+    "Descent.Portability.MinimalObservableLaw.orbit_mem": [],
+    "Descent.Portability.MinimalObservableLaw.target_mem": [],
+    "Descent.Portability.MinimalObservableLaw.orbitSpan_invariant": [],
+    "Descent.Portability.MinimalObservableLaw.orbitSpan_minimal": []
+   }
+  }
+ },
+ "Descent.Portability.ControlledCoarseGraining.defect": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name fine.comp",
+  "file": "Descent/Portability/ControlledCoarseGraining.lean",
+  "line": 28,
+  "short": "defect",
+  "ret_type": "F →L[ℝ] E",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Blindness.BundleRigidity.commutation_defect_eq_one",
+   "Descent.Blindness.BundleRigidity.defect_at_zero_denominator_is_junk",
+   "Descent.Blindness.BundleRigidity.defect_eq_chi_ratio",
+   "Descent.Blindness.BundleRigidity.defect_witness",
+   "Descent.Blindness.BundleRigidity.defect_witness_ne_one",
+   "Descent.Portability.ControlledCoarseGraining.bridge_derivative",
+   "Descent.Portability.ControlledCoarseGraining.contraction_defect_bound",
+   "Descent.Portability.ControlledCoarseGraining.exact_closure_of_zero_defect",
+   "Descent.Portability.MarkovCoarseGraining.operator_matrixDefect",
+   "Descent.Program.parity_and_commutativity_admit_no_escape"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "∀ time, 0 ≤ time → ‖evolution fine time‖ ≤ 1",
+    "∀ time, 0 ≤ time → ‖evolution coarse time‖ ≤ 1",
+    "defect fine coarse lift = 0"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Blindness.BundleRigidity.defect_at_zero_denominator_is_junk": [],
+    "Descent.Blindness.BundleRigidity.commutation_defect_eq_one": [],
+    "Descent.Blindness.BundleRigidity.defect_witness": [],
+    "Descent.Blindness.BundleRigidity.defect_witness_ne_one": [],
+    "Descent.Blindness.BundleRigidity.defect_eq_chi_ratio": [],
+    "Descent.Portability.ControlledCoarseGraining.bridge_derivative": [],
+    "Descent.Portability.ControlledCoarseGraining.contraction_defect_bound": [
+     "∀ time, 0 ≤ time → ‖evolution fine time‖ ≤ 1",
+     "∀ time, 0 ≤ time → ‖evolution coarse time‖ ≤ 1"
+    ],
+    "Descent.Portability.ControlledCoarseGraining.exact_closure_of_zero_defect": [
+     "defect fine coarse lift = 0"
+    ],
+    "Descent.Portability.MarkovCoarseGraining.operator_matrixDefect": [],
+    "Descent.Program.parity_and_commutativity_admit_no_escape": []
+   }
+  }
+ },
+ "Descent.Portability.ControlledCoarseGraining.defectIntegrand": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'L[ℝ] E'\")",
+  "file": "Descent/Portability/ControlledCoarseGraining.lean",
+  "line": 31,
+  "short": "defectIntegrand",
+  "ret_type": "F →L[ℝ] E",
+  "empirical_status": "",
+  "python": "defectIntegrand",
+  "args": [
+   "fine",
+   "coarse",
+   "lift",
+   "horizon",
+   "time"
+  ],
+  "box": {
+   "horizon": [
+    0.05,
+    3.0
+   ],
+   "time": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'L[ℝ] E'\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ControlledCoarseGraining.bridge_derivative",
+   "Descent.Portability.ControlledCoarseGraining.contraction_defect_bound",
+   "Descent.Portability.ControlledCoarseGraining.defectIntegrand_continuous",
+   "Descent.Portability.ControlledCoarseGraining.defect_integral_identity",
+   "Descent.Portability.ControlledCoarseGraining.exact_closure_of_zero_defect"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "0 ≤ horizon",
+    "∀ time, 0 ≤ time → ‖evolution fine time‖ ≤ 1",
+    "∀ time, 0 ≤ time → ‖evolution coarse time‖ ≤ 1",
+    "defect fine coarse lift = 0"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ControlledCoarseGraining.defectIntegrand_continuous": [],
+    "Descent.Portability.ControlledCoarseGraining.bridge_derivative": [],
+    "Descent.Portability.ControlledCoarseGraining.defect_integral_identity": [],
+    "Descent.Portability.ControlledCoarseGraining.contraction_defect_bound": [
+     "0 ≤ horizon",
+     "∀ time, 0 ≤ time → ‖evolution fine time‖ ≤ 1",
+     "∀ time, 0 ≤ time → ‖evolution coarse time‖ ≤ 1"
+    ],
+    "Descent.Portability.ControlledCoarseGraining.exact_closure_of_zero_defect": [
+     "defect fine coarse lift = 0"
+    ]
+   }
+  }
+ },
  "Descent.Portability.dynamicsPooledProjector": {
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name Conditionals.dynamicsBroadcast.comp",
@@ -133295,7 +133917,9 @@
    "Descent.Portability.DiploidEffectLaw.hweMass_second_moment",
    "Descent.Portability.DiploidEffectLaw.hweMass_sum",
    "Descent.Portability.DiploidEffectLaw.hwe_score_identity",
-   "Descent.Portability.DiploidEffectLaw.partialMean_covariance"
+   "Descent.Portability.DiploidEffectLaw.partialMean_covariance",
+   "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_covariance",
+   "Descent.Portability.OneLocusCompatibilityLaw.scalarMean_polynomial"
   ],
   "constraints": {
    "hypotheses": [
@@ -133330,6 +133954,10 @@
     ],
     "Descent.Portability.DiploidEffectLaw.genotype_cross_moment": [
      "∀ i, 0 ≤ p i ∧ p i ≤ 1"
+    ],
+    "Descent.Portability.OneLocusCompatibilityLaw.scalarMean_polynomial": [],
+    "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_covariance": [
+     "0 ≤ p ∧ p ≤ 1"
     ]
    },
    "range_lo_thm": [
@@ -141440,6 +142068,7 @@
    "Descent.Portability.FiniteLiabilityPanel.prevalenceIntercept_shift",
    "Descent.Portability.FiniteLiabilityPanel.risk_eq_iff_liability_eq_up_to_common_shift",
    "Descent.Portability.FiniteLiabilityPanel.risk_shift",
+   "Descent.Portability.OneLocusCompatibilityLaw.realizing_values_unique_mod_constant",
    "Descent.Portability.PThresholdTrainingLaw.binaryAUC_affine_positive",
    "Descent.Portability.PThresholdTrainingLaw.comparison_affine_positive",
    "Descent.Portability.ReportFiniteCalibrationLaw.residual_gauge",
@@ -141499,6 +142128,7 @@
     "Descent.Portability.FiniteLiabilityPanel.prevalenceIntercept_shift": [],
     "Descent.Portability.FiniteLiabilityPanel.risk_shift": [],
     "Descent.Portability.FiniteLiabilityPanel.risk_eq_iff_liability_eq_up_to_common_shift": [],
+    "Descent.Portability.OneLocusCompatibilityLaw.realizing_values_unique_mod_constant": [],
     "Descent.Portability.shiftedObservedMean_source": [],
     "Descent.Portability.PThresholdTrainingLaw.comparison_affine_positive": [],
     "Descent.Portability.PThresholdTrainingLaw.binaryAUC_affine_positive": [],
@@ -141924,6 +142554,10 @@
    "Descent.Portability.MarkedAncestralLaw.trace_expectation_succ",
    "Descent.Portability.MarkedAncestralLaw.trace_terminal_expectation",
    "Descent.Portability.MarkedAncestralLaw.trace_terminal_iterate",
+   "Descent.Portability.MarkovCoarseGraining.bounded_report_error",
+   "Descent.Portability.MarkovCoarseGraining.expectation_range_totalVariation",
+   "Descent.Portability.MarkovCoarseGraining.ranged_report_error",
+   "Descent.Portability.MatrixOperatorBridge.markov_operator_norm_le_one",
    "Descent.Portability.NucleotideMutationLaw.branch_expectation",
    "Descent.Portability.NucleotideMutationLaw.branch_history_expectation",
    "Descent.Portability.NucleotideMutationLaw.branch_mass",
@@ -141931,6 +142565,7 @@
    "Descent.Portability.NucleotideMutationLaw.count_expectation",
    "Descent.Portability.NucleotideMutationLaw.jump_expectation",
    "Descent.Portability.NucleotideMutationLaw.jump_uniformMean",
+   "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_covariance",
    "Descent.Portability.OrderedMutationCatalogue.mutationBranch_expectation",
    "Descent.Portability.OrderedMutationCatalogue.mutationBranch_nucleotide",
    "Descent.Portability.OrderedMutationCatalogue.mutationBranch_presence",
@@ -142156,6 +142791,10 @@
     "Descent.Portability.MarkedAncestralLaw.backward_eq_iterate": [],
     "Descent.Portability.MarkedAncestralLaw.trace_terminal_iterate": [],
     "Descent.Portability.MarkedAncestralLaw.trace_terminal_expectation": [],
+    "Descent.Portability.MarkovCoarseGraining.bounded_report_error": [],
+    "Descent.Portability.MarkovCoarseGraining.expectation_range_totalVariation": [],
+    "Descent.Portability.MarkovCoarseGraining.ranged_report_error": [],
+    "Descent.Portability.MatrixOperatorBridge.markov_operator_norm_le_one": [],
     "Descent.Portability.NucleotideMutationLaw.jump_expectation": [],
     "Descent.Portability.NucleotideMutationLaw.jump_uniformMean": [],
     "Descent.Portability.NucleotideMutationLaw.count_expectation": [],
@@ -142163,6 +142802,7 @@
     "Descent.Portability.NucleotideMutationLaw.branch_mass": [],
     "Descent.Portability.NucleotideMutationLaw.branch_uniformMean": [],
     "Descent.Portability.NucleotideMutationLaw.branch_history_expectation": [],
+    "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_covariance": [],
     "Descent.Portability.OrderedMutationCatalogue.mutationCount_nucleotide": [],
     "Descent.Portability.OrderedMutationCatalogue.mutationBranch_expectation": [],
     "Descent.Portability.OrderedMutationCatalogue.mutationBranch_nucleotide": [],
@@ -143082,7 +143722,7 @@
   "selfcheck": {
    "finite_points": 2,
    "total_points": 8,
-   "error": "ValueError('expected a number in range from -1 up to 1, got 1.351554683445237')"
+   "error": "ValueError('expected a number in range from -1 up to 1, got 1.3814786261804732')"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -143134,9 +143774,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 6,
+   "finite_points": 7,
    "total_points": 8,
-   "error": "ValueError('expected a number in range from -1 up to 1, got 1.0994308541972586')"
+   "error": "ValueError('expected a number in range from -1 up to 1, got 1.3285669161201836')"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -145223,7 +145863,9 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Portability.DiscountedObservability.transported_expectation",
-   "Descent.Portability.EvolutionaryObservability.powerLaw_mass"
+   "Descent.Portability.EvolutionaryObservability.powerLaw_mass",
+   "Descent.Portability.MarkovPoissonLaw.coordinate_summable",
+   "Descent.Portability.MarkovPoissonLaw.poissonLaw_matrix"
   ],
   "constraints": {
    "declared_kind": "probability",
@@ -145232,7 +145874,9 @@
    "hypotheses": [],
    "hypotheses_by_theorem": {
     "Descent.Portability.DiscountedObservability.transported_expectation": [],
-    "Descent.Portability.EvolutionaryObservability.powerLaw_mass": []
+    "Descent.Portability.EvolutionaryObservability.powerLaw_mass": [],
+    "Descent.Portability.MarkovPoissonLaw.coordinate_summable": [],
+    "Descent.Portability.MarkovPoissonLaw.poissonLaw_matrix": []
    }
   }
  },
@@ -145275,6 +145919,7 @@
    "Descent.Portability.InterleavedMutationLaw.intervalKernel_unsupported",
    "Descent.Portability.InterleavedMutationLaw.zero_exposure_count",
    "Descent.Portability.InterleavedMutationMeasurability.bind_mass_measurable",
+   "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference",
    "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward",
    "Descent.Portability.NucleotideMutationLaw.branch_compose",
    "Descent.Portability.NucleotideMutationLaw.count_expectation",
@@ -145340,6 +145985,7 @@
     "Descent.Portability.InterleavedMutationMeasurability.bind_mass_measurable": [
      "∀ state target, Measurable (fun input ↦ (kernel input state"
     ],
+    "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference": [],
     "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward": [],
     "Descent.Portability.NucleotideMutationLaw.count_expectation": [],
     "Descent.Portability.NucleotideMutationLaw.branch_compose": [],
@@ -145394,6 +146040,11 @@
   "mentioned_by": [
    "Descent.Portability.AncestralEpochGenotypeSupport.pushforward_excludes",
    "Descent.Portability.FiniteReportLaw.expectation_pushforward",
+   "Descent.Portability.MarkovCoarseGraining.bounded_report_error",
+   "Descent.Portability.MarkovCoarseGraining.finite_generator_totalVariation_bound",
+   "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference",
+   "Descent.Portability.MarkovCoarseGraining.ranged_report_error",
+   "Descent.Portability.MarkovCoarseGraining.totalVariation_error_bound",
    "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward",
    "Descent.Portability.OrderedMutationCatalogue.mutationKernel_unsupported",
    "Descent.Portability.ReservoirSamplingLaw.choiceLaw_some_mass",
@@ -145403,10 +146054,22 @@
    "Descent.Portability.WholeGenomeMutationSemigroup.independent_pushforward"
   ],
   "constraints": {
-   "hypotheses": [],
+   "hypotheses": [
+    "FiniteReportLaw.BoundedMetric report",
+    "∀ state, lower ≤ report state ∧ report state ≤ upper"
+   ],
    "hypotheses_by_theorem": {
     "Descent.Portability.AncestralEpochGenotypeSupport.pushforward_excludes": [],
     "Descent.Portability.FiniteReportLaw.expectation_pushforward": [],
+    "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference": [],
+    "Descent.Portability.MarkovCoarseGraining.totalVariation_error_bound": [],
+    "Descent.Portability.MarkovCoarseGraining.bounded_report_error": [
+     "FiniteReportLaw.BoundedMetric report"
+    ],
+    "Descent.Portability.MarkovCoarseGraining.ranged_report_error": [
+     "∀ state, lower ≤ report state ∧ report state ≤ upper"
+    ],
+    "Descent.Portability.MarkovCoarseGraining.finite_generator_totalVariation_bound": [],
     "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward": [],
     "Descent.Portability.OrderedMutationCatalogue.mutationKernel_unsupported": [],
     "Descent.Portability.ReservoirSamplingLaw.choiceLaw_some_mass": [],
@@ -145930,6 +146593,8 @@
    "Descent.Portability.FiniteReportLaw.covariance_eq_rawMoments",
    "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul",
    "Descent.Portability.FiniteReportLaw.variance_nonneg",
+   "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_covariance",
+   "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_regression",
    "Descent.Portability.PThresholdTrainingLaw.flipSign_iff_negative_correlation",
    "Descent.Portability.PortabilityRatioGeometry.trait_domination_iff",
    "Descent.Portability.ProbitTrainingLaw.reportedAccuracy_eq_moment_sum",
@@ -145988,6 +146653,8 @@
     "∀ i, 0 ≤ p i ∧ p i ≤ 1",
     "∀ i, 0 < p i ∧ p i < 1",
     "∀ i, (∑ j, weights j * (genotypeLaw p hp",
+    "0 ≤ p ∧ p ≤ 1",
+    "0 < p ∧ p < 1",
     "0 < p.variance (linearScore genotype weights",
     "0 < p.variance liability"
    ],
@@ -146036,6 +146703,12 @@
     "Descent.Portability.FiniteReportLaw.covariance_eq_rawMoments": [],
     "Descent.Portability.FiniteReportLaw.variance_nonneg": [],
     "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul": [],
+    "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_covariance": [
+     "0 ≤ p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_regression": [
+     "0 < p ∧ p < 1"
+    ],
     "Descent.Portability.PThresholdTrainingLaw.flipSign_iff_negative_correlation": [],
     "Descent.Portability.DeploymentPopulation.deployedMse_eq": [],
     "Descent.Portability.DeploymentPopulation.predictiveCovariance_sq_le": [],
@@ -149302,6 +149975,9 @@
    "Descent.Portability.GaussianEffectPortabilityLaw.successProbability_eq_joint_defined",
    "Descent.Portability.GaussianEffectPortabilityLaw.weighted_defined_integrable",
    "Descent.Portability.GaussianEffectPortabilityLaw.weighted_report_integrable",
+   "Descent.Portability.MarkovCoarseGraining.bounded_report_error",
+   "Descent.Portability.MarkovCoarseGraining.expectation_range_totalVariation",
+   "Descent.Portability.MarkovCoarseGraining.ranged_report_error",
    "Descent.Portability.PortabilityRatioGeometry.binReport_le_sum",
    "Descent.Portability.PortabilityRatioGeometry.certified_expected_ratio",
    "Descent.Portability.PortabilityRatioGeometry.report_le_outcomeBound",
@@ -149378,6 +150054,9 @@
     "Descent.Portability.GaussianEffectPortabilityLaw.weighted_report_integrable": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.finite_reportedExpectation_formula": [],
     "Descent.Portability.no_marginal_only_history_degradation_criterion": [],
+    "Descent.Portability.MarkovCoarseGraining.bounded_report_error": [],
+    "Descent.Portability.MarkovCoarseGraining.expectation_range_totalVariation": [],
+    "Descent.Portability.MarkovCoarseGraining.ranged_report_error": [],
     "Descent.Portability.PortabilityRatioGeometry.report_le_outcomeBound": [],
     "Descent.Portability.PortabilityRatioGeometry.certified_expected_ratio": [],
     "Descent.Portability.PortabilityRatioGeometry.binReport_le_sum": [],
@@ -152087,6 +152766,11 @@
    "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure",
    "Descent.Portability.InterleavedMutationExponential.generator_matrix",
    "Descent.Portability.InterleavedMutationExponential.propagate_mass",
+   "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference",
+   "Descent.Portability.MarkovCoarseGraining.stateLaw_matrix",
+   "Descent.Portability.MarkovPoissonLaw.evolution_norm_le_one",
+   "Descent.Portability.MarkovPoissonLaw.poissonLaw_matrix",
+   "Descent.Portability.MatrixOperatorBridge.markov_operator_norm_le_one",
    "Descent.Portability.MutationChannelBridge.generator_template_sum",
    "Descent.Portability.StoppedGenotypeRenewal.genomeGenerator_eq_proposal",
    "Descent.Portability.StoppedGenotypeRenewal.stoppedMass_generator_balance",
@@ -152117,6 +152801,11 @@
     "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure": [],
     "Descent.Portability.InterleavedMutationExponential.propagate_mass": [],
     "Descent.Portability.InterleavedMutationExponential.generator_matrix": [],
+    "Descent.Portability.MarkovCoarseGraining.stateLaw_matrix": [],
+    "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference": [],
+    "Descent.Portability.MarkovPoissonLaw.poissonLaw_matrix": [],
+    "Descent.Portability.MarkovPoissonLaw.evolution_norm_le_one": [],
+    "Descent.Portability.MatrixOperatorBridge.markov_operator_norm_le_one": [],
     "Descent.Portability.MutationChannelBridge.generator_template_sum": [],
     "Descent.Portability.StoppedGenotypeRenewal.genomeGenerator_eq_proposal": [],
     "Descent.Portability.StoppedGenotypeRenewal.stoppedMass_generator_balance": [],
@@ -154228,6 +154917,450 @@
     "Descent.Portability.StoppedGenotypeLaw.incomplete_trace_weight_zero": [],
     "Descent.Portability.TimedAncestralLaw.countExpectation_terminal": [],
     "Descent.Portability.TimedAncestralLaw.timedExpectation_terminal": []
+   }
+  }
+ },
+ "Descent.Portability.MarkovCoarseGraining.matrixDefect": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/MarkovCoarseGraining.lean",
+  "line": 24,
+  "short": "matrixDefect",
+  "ret_type": "Matrix S T ℝ",
+  "empirical_status": "",
+  "python": "matrixDefect",
+  "args": [
+   "fine",
+   "coarse",
+   "lift"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": {
+   "fine": {
+    "dim": "S",
+    "rank": 2
+   },
+   "coarse": {
+    "dim": "T",
+    "rank": 2
+   },
+   "lift": {
+    "dim": "S",
+    "rank": 2
+   }
+  },
+  "mentioned_by": [
+   "Descent.Portability.MarkovCoarseGraining.bounded_report_error",
+   "Descent.Portability.MarkovCoarseGraining.finite_generator_matrix_bound",
+   "Descent.Portability.MarkovCoarseGraining.finite_generator_totalVariation_bound",
+   "Descent.Portability.MarkovCoarseGraining.operator_matrixDefect",
+   "Descent.Portability.MarkovCoarseGraining.ranged_report_error",
+   "Descent.Portability.MarkovCoarseGraining.row_error_bound",
+   "Descent.Portability.MarkovCoarseGraining.totalVariation_error_bound"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.MarkovCoarseGraining.operator_matrixDefect": [],
+    "Descent.Portability.MarkovCoarseGraining.row_error_bound": [],
+    "Descent.Portability.MarkovCoarseGraining.totalVariation_error_bound": [],
+    "Descent.Portability.MarkovCoarseGraining.bounded_report_error": [],
+    "Descent.Portability.MarkovCoarseGraining.ranged_report_error": [],
+    "Descent.Portability.MarkovCoarseGraining.finite_generator_matrix_bound": [],
+    "Descent.Portability.MarkovCoarseGraining.finite_generator_totalVariation_bound": []
+   }
+  }
+ },
+ "Descent.Portability.MarkovCoarseGraining.matrixError": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name NormedSpace.exp",
+  "file": "Descent/Portability/MarkovCoarseGraining.lean",
+  "line": 27,
+  "short": "matrixError",
+  "ret_type": "Matrix S T ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "time": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.MarkovCoarseGraining.finite_generator_matrix_bound",
+   "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference",
+   "Descent.Portability.MarkovCoarseGraining.operator_matrixError",
+   "Descent.Portability.MarkovCoarseGraining.row_error_bound"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "0 ≤ time"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.MarkovCoarseGraining.operator_matrixError": [],
+    "Descent.Portability.MarkovCoarseGraining.row_error_bound": [
+     "0 ≤ time"
+    ],
+    "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference": [
+     "0 ≤ time"
+    ],
+    "Descent.Portability.MarkovCoarseGraining.finite_generator_matrix_bound": [
+     "0 ≤ time"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.MarkovCoarseGraining.membership": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/MarkovCoarseGraining.lean",
+  "line": 58,
+  "short": "membership",
+  "ret_type": "Matrix S T ℝ",
+  "empirical_status": "",
+  "python": "membership",
+  "args": [
+   "partition"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.MarkovCoarseGraining.bounded_report_error",
+   "Descent.Portability.MarkovCoarseGraining.finite_generator_totalVariation_bound",
+   "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference",
+   "Descent.Portability.MarkovCoarseGraining.ranged_report_error",
+   "Descent.Portability.MarkovCoarseGraining.totalVariation_error_bound",
+   "Descent.Portability.sum_choose_neg_pow_eq_one_sub_pow"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.sum_choose_neg_pow_eq_one_sub_pow": [],
+    "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference": [],
+    "Descent.Portability.MarkovCoarseGraining.totalVariation_error_bound": [],
+    "Descent.Portability.MarkovCoarseGraining.bounded_report_error": [],
+    "Descent.Portability.MarkovCoarseGraining.ranged_report_error": [],
+    "Descent.Portability.MarkovCoarseGraining.finite_generator_totalVariation_bound": []
+   }
+  }
+ },
+ "Descent.Portability.MarkovCoarseGraining.stateLaw": {
+  "class": "STRUCTURAL",
+  "note": "builds a structure value (FiniteReportLaw S)",
+  "file": "Descent/Portability/MarkovCoarseGraining.lean",
+  "line": 61,
+  "short": "stateLaw",
+  "ret_type": "FiniteReportLaw S",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "time": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.MarkovCoarseGraining.bounded_report_error",
+   "Descent.Portability.MarkovCoarseGraining.finite_generator_totalVariation_bound",
+   "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference",
+   "Descent.Portability.MarkovCoarseGraining.ranged_report_error",
+   "Descent.Portability.MarkovCoarseGraining.stateLaw_matrix",
+   "Descent.Portability.MarkovCoarseGraining.totalVariation_error_bound"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "0 ≤ time"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.MarkovCoarseGraining.stateLaw_matrix": [
+     "0 ≤ time"
+    ],
+    "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference": [
+     "0 ≤ time"
+    ],
+    "Descent.Portability.MarkovCoarseGraining.totalVariation_error_bound": [
+     "0 ≤ time"
+    ],
+    "Descent.Portability.MarkovCoarseGraining.bounded_report_error": [
+     "0 ≤ time"
+    ],
+    "Descent.Portability.MarkovCoarseGraining.ranged_report_error": [
+     "0 ≤ time"
+    ],
+    "Descent.Portability.MarkovCoarseGraining.finite_generator_totalVariation_bound": [
+     "0 ≤ time"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.MarkovPoissonLaw.poissonLaw": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/MarkovPoissonLaw.lean",
+  "line": 38,
+  "short": "poissonLaw",
+  "ret_type": "FiniteReportLaw S where mass target",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.MarkovCoarseGraining.stateLaw_matrix",
+   "Descent.Portability.MarkovPoissonLaw.evolution_norm_le_one",
+   "Descent.Portability.MarkovPoissonLaw.poissonLaw_matrix"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.MarkovCoarseGraining.stateLaw_matrix": [],
+    "Descent.Portability.MarkovPoissonLaw.poissonLaw_matrix": [],
+    "Descent.Portability.MarkovPoissonLaw.evolution_norm_le_one": []
+   }
+  }
+ },
+ "Descent.Portability.MarkovPoissonLaw.generator": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "self-check: arity/type mismatch (TypeError(\"unsupported operand type(s) for -: 'function' and 'float'\"))",
+  "file": "Descent/Portability/MarkovPoissonLaw.lean",
+  "line": 59,
+  "short": "generator",
+  "ret_type": "Matrix S S ℝ",
+  "empirical_status": "",
+  "python": "generator",
+  "args": [
+   "kernel",
+   "rate"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "TypeError(\"unsupported operand type(s) for -: 'function' and 'float'\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Coalescent.manyDemeMomentGenerator_biologicalSynthesis",
+   "Descent.Portability.ControlledCoarseGraining.evolution_continuous",
+   "Descent.Portability.DynamicBlindness.finite_powers_iff_all",
+   "Descent.Portability.DynamicBlindness.observation_hasDerivAt",
+   "Descent.Portability.DynamicBlindness.observation_zero_of_powers",
+   "Descent.Portability.DynamicBlindness.permanent_blindness_iff",
+   "Descent.Portability.DynamicBlindness.powers_zero_of_observation",
+   "Descent.Portability.FiniteProductExponential.semigroup_eq_exponential",
+   "Descent.Portability.MarkovCoarseGraining.bounded_report_error",
+   "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference",
+   "Descent.Portability.MarkovCoarseGraining.ranged_report_error",
+   "Descent.Portability.MarkovCoarseGraining.row_error_bound",
+   "Descent.Portability.MarkovCoarseGraining.stateLaw_matrix",
+   "Descent.Portability.MarkovCoarseGraining.totalVariation_error_bound",
+   "Descent.Portability.MarkovPoissonLaw.evolution_norm_le_one",
+   "Descent.Portability.MarkovPoissonLaw.normalized_generator"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Coalescent.manyDemeMomentGenerator_biologicalSynthesis": [],
+    "Descent.Portability.ControlledCoarseGraining.evolution_continuous": [],
+    "Descent.Portability.DynamicBlindness.observation_hasDerivAt": [],
+    "Descent.Portability.DynamicBlindness.finite_powers_iff_all": [],
+    "Descent.Portability.DynamicBlindness.observation_zero_of_powers": [],
+    "Descent.Portability.DynamicBlindness.powers_zero_of_observation": [],
+    "Descent.Portability.DynamicBlindness.permanent_blindness_iff": [],
+    "Descent.Portability.FiniteProductExponential.semigroup_eq_exponential": [],
+    "Descent.Portability.MarkovCoarseGraining.row_error_bound": [],
+    "Descent.Portability.MarkovCoarseGraining.stateLaw_matrix": [],
+    "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference": [],
+    "Descent.Portability.MarkovCoarseGraining.totalVariation_error_bound": [],
+    "Descent.Portability.MarkovCoarseGraining.bounded_report_error": [],
+    "Descent.Portability.MarkovCoarseGraining.ranged_report_error": [],
+    "Descent.Portability.MarkovPoissonLaw.evolution_norm_le_one": [],
+    "Descent.Portability.MarkovPoissonLaw.normalized_generator": []
+   }
+  }
+ },
+ "Descent.Portability.MarkovPoissonLaw.normalizationRate": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "anonymous constructor",
+  "file": "Descent/Portability/MarkovPoissonLaw.lean",
+  "line": 83,
+  "short": "normalizationRate",
+  "ret_type": "ℝ≥0",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.MarkovCoarseGraining.finite_generator_totalVariation_bound",
+   "Descent.Portability.MarkovPoissonLaw.normalizationRate_pos",
+   "Descent.Portability.MarkovPoissonLaw.normalized_generator"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.MarkovCoarseGraining.finite_generator_totalVariation_bound": [],
+    "Descent.Portability.MarkovPoissonLaw.normalizationRate_pos": [],
+    "Descent.Portability.MarkovPoissonLaw.normalized_generator": []
+   }
+  }
+ },
+ "Descent.Portability.MarkovPoissonLaw.normalizedKernel": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/MarkovPoissonLaw.lean",
+  "line": 91,
+  "short": "normalizedKernel",
+  "ret_type": "FiniteReportLaw S where mass target",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.MarkovCoarseGraining.finite_generator_totalVariation_bound",
+   "Descent.Portability.MarkovPoissonLaw.normalized_generator"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.MarkovCoarseGraining.finite_generator_totalVariation_bound": [],
+    "Descent.Portability.MarkovPoissonLaw.normalized_generator": []
+   }
+  }
+ },
+ "Descent.Portability.MatrixOperatorBridge.operator": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name LinearMap.toContinuousLinearMap",
+  "file": "Descent/Portability/MatrixOperatorBridge.lean",
+  "line": 24,
+  "short": "operator",
+  "ret_type": "(T → ℝ) →L[ℝ] (S → ℝ)",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Coalescent.TwoDemeLDSystem.crossDCorrelation_eq_cramer_numerator_ratio",
+   "Descent.Portability.ExactMemoryLaw.projection_discarded",
+   "Descent.Portability.ExactMemoryLaw.projection_retained",
+   "Descent.Portability.MarkovCoarseGraining.operator_matrixDefect",
+   "Descent.Portability.MarkovCoarseGraining.operator_matrixError",
+   "Descent.Portability.MarkovPoissonLaw.evolution_norm_le_one",
+   "Descent.Portability.MarkovPoissonLaw.finiteGenerator_evolution_norm_le_one",
+   "Descent.Portability.MatrixOperatorBridge.markov_operator_norm_le_one",
+   "Descent.Portability.MatrixOperatorBridge.operator_add",
+   "Descent.Portability.MatrixOperatorBridge.operator_apply",
+   "Descent.Portability.MatrixOperatorBridge.operator_exp",
+   "Descent.Portability.MatrixOperatorBridge.operator_mul",
+   "Descent.Portability.MatrixOperatorBridge.operator_norm_eq",
+   "Descent.Portability.MatrixOperatorBridge.operator_norm_le",
+   "Descent.Portability.MatrixOperatorBridge.operator_one",
+   "Descent.Portability.MatrixOperatorBridge.operator_smul",
+   "Descent.Portability.MatrixOperatorBridge.operator_sub",
+   "Descent.Portability.MatrixOperatorBridge.operator_zero",
+   "Descent.Portability.MatrixOperatorBridge.row_abs_sum_le_operator_norm"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Coalescent.TwoDemeLDSystem.crossDCorrelation_eq_cramer_numerator_ratio": [],
+    "Descent.Portability.ExactMemoryLaw.projection_retained": [],
+    "Descent.Portability.ExactMemoryLaw.projection_discarded": [],
+    "Descent.Portability.MarkovCoarseGraining.operator_matrixDefect": [],
+    "Descent.Portability.MarkovCoarseGraining.operator_matrixError": [],
+    "Descent.Portability.MarkovPoissonLaw.evolution_norm_le_one": [],
+    "Descent.Portability.MarkovPoissonLaw.finiteGenerator_evolution_norm_le_one": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_apply": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_zero": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_one": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_add": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_sub": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_smul": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_mul": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_exp": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_norm_le": [],
+    "Descent.Portability.MatrixOperatorBridge.row_abs_sum_le_operator_norm": [],
+    "Descent.Portability.MatrixOperatorBridge.operator_norm_eq": [],
+    "Descent.Portability.MatrixOperatorBridge.markov_operator_norm_le_one": []
+   }
+  }
+ },
+ "Descent.Portability.MatrixOperatorBridge.operatorLinear": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/MatrixOperatorBridge.lean",
+  "line": 64,
+  "short": "operatorLinear",
+  "ret_type": "Matrix S T ℝ →ₗ[ℝ] ((T → ℝ) →L[ℝ] (S → ℝ)) where toFun",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.MatrixOperatorBridge.operator_exp"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.MatrixOperatorBridge.operator_exp": []
+   }
+  }
+ },
+ "Descent.Portability.MatrixOperatorBridge.operatorHom": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/MatrixOperatorBridge.lean",
+  "line": 69,
+  "short": "operatorHom",
+  "ret_type": "Matrix S S ℝ →+* ((S → ℝ) →L[ℝ] (S → ℝ)) where toFun",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.MatrixOperatorBridge.operator_exp"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.MatrixOperatorBridge.operator_exp": []
    }
   }
  },
@@ -159140,6 +160273,148 @@
      "∀ direction, observe direction = 0 → ∑ state, direction state = 0"
     ],
     "Descent.Portability.ObservableClosureLaw.matrix_autonomy_iff": []
+   }
+  }
+ },
+ "Descent.Portability.OneLocusCompatibilityLaw.hweLaw": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/OneLocusCompatibilityLaw.lean",
+  "line": 24,
+  "short": "hweLaw",
+  "ret_type": "FiniteReportLaw (Fin 3) where mass",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "p": [
+    0.02,
+    0.98
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_covariance",
+   "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_regression"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "0 ≤ p ∧ p ≤ 1",
+    "0 < p ∧ p < 1"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_covariance": [
+     "0 ≤ p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_regression": [
+     "0 < p ∧ p < 1"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.OneLocusCompatibilityLaw.scalarMean": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/OneLocusCompatibilityLaw.lean",
+  "line": 29,
+  "short": "scalarMean",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "scalarMean",
+  "args": [
+   "values",
+   "p"
+  ],
+  "box": {
+   "p": [
+    0.02,
+    0.98
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": {
+   "values": {
+    "dim": "3",
+    "rank": 1
+   }
+  },
+  "mentioned_by": [
+   "Descent.Portability.OneLocusCompatibilityLaw.scalarMean_polynomial"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.OneLocusCompatibilityLaw.scalarMean_polynomial": []
+   }
+  }
+ },
+ "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/OneLocusCompatibilityLaw.lean",
+  "line": 32,
+  "short": "scalarEffect",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "scalarEffect",
+  "args": [
+   "values",
+   "p"
+  ],
+  "box": {
+   "p": [
+    0.02,
+    0.98
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": {
+   "values": {
+    "dim": "3",
+    "rank": 1
+   }
+  },
+  "mentioned_by": [
+   "Descent.Portability.OneLocusCompatibilityLaw.one_locus_compatibility",
+   "Descent.Portability.OneLocusCompatibilityLaw.realizing_values_unique_mod_constant",
+   "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_covariance",
+   "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_deriv",
+   "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_hasDerivAt",
+   "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_regression",
+   "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_second_deriv"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "0 ≤ p ∧ p ≤ 1",
+    "0 < p ∧ p < 1",
+    "EqOn (scalarEffect values"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_covariance": [
+     "0 ≤ p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_regression": [
+     "0 < p ∧ p < 1"
+    ],
+    "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_hasDerivAt": [],
+    "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_deriv": [],
+    "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_second_deriv": [],
+    "Descent.Portability.OneLocusCompatibilityLaw.one_locus_compatibility": [],
+    "Descent.Portability.OneLocusCompatibilityLaw.realizing_values_unique_mod_constant": [
+     "EqOn (scalarEffect values"
+    ]
    }
   }
  },
@@ -187804,6 +189079,11 @@
    "Descent.Portability.FiniteReportLaw.weightedDefinedMetric_joint",
    "Descent.Portability.InterleavedMutationExponential.propagate_mass",
    "Descent.Portability.InterleavedMutationMeasurability.bind_mass_measurable",
+   "Descent.Portability.MarkovCoarseGraining.stateLaw_matrix",
+   "Descent.Portability.MarkovPoissonLaw.coordinate_summable",
+   "Descent.Portability.MarkovPoissonLaw.evolution_norm_le_one",
+   "Descent.Portability.MarkovPoissonLaw.poissonLaw_matrix",
+   "Descent.Portability.MatrixOperatorBridge.markov_operator_norm_le_one",
    "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward",
    "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.branchMeasure_univ",
    "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integrable_branchMeasure",
@@ -187889,6 +189169,11 @@
     "Descent.Portability.FiniteNumericalCertificate.totalVariation_bind": [],
     "Descent.Portability.InterleavedMutationExponential.propagate_mass": [],
     "Descent.Portability.InterleavedMutationMeasurability.bind_mass_measurable": [],
+    "Descent.Portability.MarkovCoarseGraining.stateLaw_matrix": [],
+    "Descent.Portability.MarkovPoissonLaw.coordinate_summable": [],
+    "Descent.Portability.MarkovPoissonLaw.poissonLaw_matrix": [],
+    "Descent.Portability.MarkovPoissonLaw.evolution_norm_le_one": [],
+    "Descent.Portability.MatrixOperatorBridge.markov_operator_norm_le_one": [],
     "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward": [],
     "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.branchMeasure_univ": [],
     "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integrable_branchMeasure": [],
@@ -202421,6 +203706,10 @@
    "Descent.Portability.MarkedAncestralLaw.trace_expectation_succ",
    "Descent.Portability.MarkedAncestralLaw.trace_terminal_expectation",
    "Descent.Portability.MarkedAncestralLaw.trace_terminal_iterate",
+   "Descent.Portability.MarkovCoarseGraining.bounded_report_error",
+   "Descent.Portability.MarkovCoarseGraining.expectation_range_totalVariation",
+   "Descent.Portability.MarkovCoarseGraining.ranged_report_error",
+   "Descent.Portability.MatrixOperatorBridge.markov_operator_norm_le_one",
    "Descent.Portability.NucleotideMutationLaw.branch_expectation",
    "Descent.Portability.NucleotideMutationLaw.branch_history_expectation",
    "Descent.Portability.NucleotideMutationLaw.branch_mass",
@@ -202428,6 +203717,7 @@
    "Descent.Portability.NucleotideMutationLaw.count_expectation",
    "Descent.Portability.NucleotideMutationLaw.jump_expectation",
    "Descent.Portability.NucleotideMutationLaw.jump_uniformMean",
+   "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_covariance",
    "Descent.Portability.OrderedMutationCatalogue.mutationBranch_expectation",
    "Descent.Portability.OrderedMutationCatalogue.mutationBranch_nucleotide",
    "Descent.Portability.OrderedMutationCatalogue.mutationBranch_presence",
@@ -202486,6 +203776,7 @@
     "(p i",
     "∀ i, (p i",
     "BoundedMetric metric",
+    "0 ≤ p ∧ p ≤ 1",
     "∀ outcome, Integrable (fun sample ↦ kernel.weight sample outcome * metric (sample, outcome"
    ],
    "hypotheses_by_theorem": {
@@ -202699,6 +203990,10 @@
     "Descent.Portability.MarkedAncestralLaw.backward_eq_iterate": [],
     "Descent.Portability.MarkedAncestralLaw.trace_terminal_iterate": [],
     "Descent.Portability.MarkedAncestralLaw.trace_terminal_expectation": [],
+    "Descent.Portability.MarkovCoarseGraining.bounded_report_error": [],
+    "Descent.Portability.MarkovCoarseGraining.expectation_range_totalVariation": [],
+    "Descent.Portability.MarkovCoarseGraining.ranged_report_error": [],
+    "Descent.Portability.MatrixOperatorBridge.markov_operator_norm_le_one": [],
     "Descent.Portability.NucleotideMutationLaw.jump_expectation": [],
     "Descent.Portability.NucleotideMutationLaw.jump_uniformMean": [],
     "Descent.Portability.NucleotideMutationLaw.count_expectation": [],
@@ -202706,6 +204001,9 @@
     "Descent.Portability.NucleotideMutationLaw.branch_mass": [],
     "Descent.Portability.NucleotideMutationLaw.branch_uniformMean": [],
     "Descent.Portability.NucleotideMutationLaw.branch_history_expectation": [],
+    "Descent.Portability.OneLocusCompatibilityLaw.scalarEffect_covariance": [
+     "0 ≤ p ∧ p ≤ 1"
+    ],
     "Descent.Portability.OrderedMutationCatalogue.mutationCount_nucleotide": [],
     "Descent.Portability.OrderedMutationCatalogue.mutationBranch_expectation": [],
     "Descent.Portability.OrderedMutationCatalogue.mutationBranch_nucleotide": [],
@@ -202828,7 +204126,10 @@
    "Descent.Portability.FiniteReportLaw.separatingMetric_attains",
    "Descent.Portability.FiniteReportLaw.totalVariation_eq_half_sum_abs",
    "Descent.Portability.FiniteReportLaw.totalVariation_le_one",
-   "Descent.Portability.FiniteReportLaw.totalVariation_nonneg"
+   "Descent.Portability.FiniteReportLaw.totalVariation_nonneg",
+   "Descent.Portability.MarkovCoarseGraining.expectation_range_totalVariation",
+   "Descent.Portability.MarkovCoarseGraining.finite_generator_totalVariation_bound",
+   "Descent.Portability.MarkovCoarseGraining.totalVariation_error_bound"
   ],
   "constraints": {
    "declared_kind": "probability",
@@ -202873,6 +204174,9 @@
      "∀ state, 0 < p.mass state → (first state"
     ],
     "Descent.Portability.FiniteNumericalCertificate.propagation_perturbation": [],
+    "Descent.Portability.MarkovCoarseGraining.totalVariation_error_bound": [],
+    "Descent.Portability.MarkovCoarseGraining.expectation_range_totalVariation": [],
+    "Descent.Portability.MarkovCoarseGraining.finite_generator_totalVariation_bound": [],
     "Descent.Portability.FiniteReportLaw.totalVariation_nonneg": [],
     "Descent.Portability.FiniteReportLaw.totalVariation_le_one": [],
     "Descent.Portability.FiniteReportLaw.totalVariation_eq_half_sum_abs": [],
@@ -202922,7 +204226,8 @@
    "Descent.Portability.FiniteReportLaw.expectation_sub_le_totalVariation",
    "Descent.Portability.FiniteReportLaw.identified_iff_all_bounded_metrics_identified",
    "Descent.Portability.FiniteReportLaw.separatingMetric_bounded",
-   "Descent.Portability.FiniteReportLaw.singletonMetric_bounded"
+   "Descent.Portability.FiniteReportLaw.singletonMetric_bounded",
+   "Descent.Portability.MarkovCoarseGraining.bounded_report_error"
   ],
   "constraints": {
    "hypotheses": [
@@ -202932,6 +204237,7 @@
     "Descent.Portability.FiniteNumericalCertificate.expectation_bounded": [
      "BoundedMetric metric"
     ],
+    "Descent.Portability.MarkovCoarseGraining.bounded_report_error": [],
     "Descent.Portability.FiniteReportLaw.expectation_sub_le_totalVariation": [
      "BoundedMetric metric"
     ],
@@ -203055,6 +204361,7 @@
    "Descent.Portability.InterleavedMutationLaw.zero_exposure_count",
    "Descent.Portability.InterleavedMutationLaw.zero_exposure_interval",
    "Descent.Portability.InterleavedMutationLaw.zero_exposure_kernel",
+   "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference",
    "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward",
    "Descent.Portability.MutationChannelBridge.coordinate_identity",
    "Descent.Portability.MutationChannelBridge.generator_template_sum",
@@ -203104,6 +204411,7 @@
     "Descent.Portability.InterleavedMutationLaw.zero_exposure_kernel": [],
     "Descent.Portability.InterleavedMutationLaw.zero_exposure_count": [],
     "Descent.Portability.InterleavedMutationLaw.zero_exposure_interval": [],
+    "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference": [],
     "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward": [],
     "Descent.Portability.MutationChannelBridge.coordinate_identity": [],
     "Descent.Portability.MutationChannelBridge.generator_template_sum": [],
@@ -203703,6 +205011,7 @@
    "Descent.Portability.InterleavedMutationLaw.zero_exposure_count",
    "Descent.Portability.InterleavedMutationLaw.zero_exposure_interval",
    "Descent.Portability.InterleavedMutationLaw.zero_exposure_kernel",
+   "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference",
    "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward",
    "Descent.Portability.MutationChannelBridge.coordinate_identity",
    "Descent.Portability.MutationChannelBridge.generator_template_sum",
@@ -203750,6 +205059,7 @@
     "Descent.Portability.InterleavedMutationLaw.zero_exposure_kernel": [],
     "Descent.Portability.InterleavedMutationLaw.zero_exposure_count": [],
     "Descent.Portability.InterleavedMutationLaw.zero_exposure_interval": [],
+    "Descent.Portability.MarkovCoarseGraining.matrixError_mass_difference": [],
     "Descent.Portability.MutationChannelBridge.coordinateKernel_eq_pushforward": [],
     "Descent.Portability.MutationChannelBridge.coordinate_identity": [],
     "Descent.Portability.MutationChannelBridge.generator_template_sum": [],

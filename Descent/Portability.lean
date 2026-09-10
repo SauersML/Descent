@@ -162,6 +162,13 @@ import Descent.Portability.BalancedHWECounterexample
 import Descent.Portability.DiploidEffectFieldLaw
 import Descent.Portability.QuadraticRigidityLaw
 import Descent.Portability.GaussianCovarianceSeparation
+import Descent.Portability.ControlledCoarseGraining
+import Descent.Portability.MatrixOperatorBridge
+import Descent.Portability.MarkovPoissonLaw
+import Descent.Portability.MarkovCoarseGraining
+import Descent.Portability.BanachEulerExponential
+import Descent.Portability.OneLocusCompatibilityLaw
+import Descent.Portability.ConditionalSeparatorLaw
 
 assert_below Descent.Program
 
