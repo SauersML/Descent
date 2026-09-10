@@ -173,6 +173,10 @@ import Descent.Portability.GaussianPanelLaw
 import Descent.Portability.ContinuousMemoryLaw
 import Descent.Portability.GaussianPolynomialMoments
 import Descent.Portability.IndependentShiftOperator
+import Descent.Portability.BalancedHWEOperatorLimit
+import Descent.Portability.BalancedHWEWeakLimit
+import Descent.Portability.RareEventInformationLaw
+import Descent.Portability.GaussianHermiteLaw
 
 assert_below Descent.Program
 

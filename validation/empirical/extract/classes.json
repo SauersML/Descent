@@ -144,6 +144,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -193,6 +195,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -826,6 +830,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -872,6 +878,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -1440,6 +1448,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -1486,6 +1496,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -2588,6 +2600,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -2634,6 +2648,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -4437,6 +4453,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -4486,6 +4504,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -6085,6 +6105,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -6131,6 +6153,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -13738,6 +13762,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -13784,6 +13810,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -13849,6 +13877,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -13895,6 +13925,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -14085,6 +14117,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -14131,6 +14165,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -35584,6 +35620,7 @@
    "Descent.Portability.DiploidBernsteinLaw.phenotypeMean_polynomial",
    "Descent.Portability.DiploidBernsteinLaw.powerEntry_expand",
    "Descent.Portability.DiploidBernsteinLaw.realizingMap_mean",
+   "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral",
    "Descent.Portability.PipelineDemographicHistory.ancestralMoment_succ",
    "Descent.Portability.PipelineDemographicHistory.extend_biologicalAncestralMomentState",
    "Descent.Portability.manyDemeSampleCountKilledDualCoordinate_degree",
@@ -35675,7 +35712,8 @@
     "Descent.Portability.symmetricBetaMoment_zero_shape": [],
     "Descent.Portability.PipelineDemographicHistory.ancestralMoment_succ": [],
     "Descent.Portability.PipelineDemographicHistory.extend_biologicalAncestralMomentState": [],
-    "Descent.Portability.manyDemeSampleCountKilledDualCoordinate_degree": []
+    "Descent.Portability.manyDemeSampleCountKilledDualCoordinate_degree": [],
+    "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral": []
    },
    "range_lo_thm": [
     "Descent.Blindness.TrafficInvariantSeparation.two_le_degree_of_positive_even",
@@ -36338,6 +36376,7 @@
    "Descent.Portability.DiploidBernsteinLaw.phenotypeMean_polynomial",
    "Descent.Portability.DiploidBernsteinLaw.powerEntry_expand",
    "Descent.Portability.DiploidBernsteinLaw.realizingMap_mean",
+   "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral",
    "Descent.Portability.PipelineDemographicHistory.ancestralMoment_succ",
    "Descent.Portability.PipelineDemographicHistory.extend_biologicalAncestralMomentState",
    "Descent.Portability.manyDemeSampleCountKilledDualCoordinate_degree",
@@ -36429,7 +36468,8 @@
     "Descent.Portability.symmetricBetaMoment_zero_shape": [],
     "Descent.Portability.PipelineDemographicHistory.ancestralMoment_succ": [],
     "Descent.Portability.PipelineDemographicHistory.extend_biologicalAncestralMomentState": [],
-    "Descent.Portability.manyDemeSampleCountKilledDualCoordinate_degree": []
+    "Descent.Portability.manyDemeSampleCountKilledDualCoordinate_degree": [],
+    "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral": []
    },
    "range_lo_thm": [
     "Descent.Blindness.TrafficInvariantSeparation.two_le_degree_of_positive_even",
@@ -38588,6 +38628,10 @@
    "Descent.Portability.BalancedHWEInteraction.block_characteristic",
    "Descent.Portability.BalancedHWEInteraction.critical_characteristic_limit",
    "Descent.Portability.BalancedHWEInteraction.critical_standardization",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
+   "Descent.Portability.BalancedHWEOperatorLimit.limiting_poisson_series",
+   "Descent.Portability.BalancedHWEWeakLimit.critical_weak_convergence",
+   "Descent.Portability.BalancedHWEWeakLimit.integral_compoundPoisson",
    "Descent.Portability.BanachEulerExponential.coefficient_limit",
    "Descent.Portability.BanachEulerExponential.euler_eq_series",
    "Descent.Portability.BinaryRiskCohort.continuous_citlEquation",
@@ -38717,6 +38761,7 @@
    "Descent.Portability.GaussianEffectPortabilityLaw.weighted_defined_integrable",
    "Descent.Portability.GaussianEffectPortabilityLaw.weighted_observable_integrable",
    "Descent.Portability.GaussianEffectPortabilityLaw.weighted_report_integrable",
+   "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral",
    "Descent.Portability.GaussianInverseQuadratic.abs_rpow_exp_integrable",
    "Descent.Portability.GaussianInverseQuadratic.ae_coordinates_nonzero",
    "Descent.Portability.GaussianInverseQuadratic.gaussian_square_product_integrable",
@@ -38824,6 +38869,7 @@
    "Descent.Portability.ProbitTrainingLaw.threshold_probability",
    "Descent.Portability.QuadraticRigidityLaw.affine_of_second_derivative_zero",
    "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero",
+   "Descent.Portability.RareEventInformationLaw.erased_fisher_information",
    "Descent.Portability.RatioPoleLaw.calibrated_label_weight_continuous",
    "Descent.Portability.RatioPoleLaw.calibrated_label_weight_pos",
    "Descent.Portability.RatioPoleLaw.crossForm_affine_line",
@@ -39706,6 +39752,10 @@
     "Descent.Portability.BalancedHWEInteraction.block_characteristic": [],
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.critical_characteristic_limit": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.limiting_poisson_series": [],
+    "Descent.Portability.BalancedHWEWeakLimit.integral_compoundPoisson": [],
+    "Descent.Portability.BalancedHWEWeakLimit.critical_weak_convergence": [],
     "Descent.Portability.BanachEulerExponential.coefficient_limit": [],
     "Descent.Portability.BanachEulerExponential.euler_eq_series": [],
     "Descent.Portability.misspec_excess_risk_nonneg": [],
@@ -39913,6 +39963,7 @@
     "Descent.Portability.GaussianEffectPortabilityLaw.innerValue_eq_iSup_clipped": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.successProbability_bounds": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.weighted_report_integrable": [],
+    "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral": [],
     "Descent.Portability.GaussianInverseQuadratic.abs_rpow_exp_integrable": [],
     "Descent.Portability.GaussianInverseQuadratic.ae_coordinates_nonzero": [],
     "Descent.Portability.GaussianInverseQuadratic.gaussian_square_product_integrable": [],
@@ -40081,6 +40132,7 @@
     "Descent.Portability.ProbitTrainingLaw.reportedAccuracy_eq_moment_sum": [],
     "Descent.Portability.QuadraticRigidityLaw.affine_of_second_derivative_zero": [],
     "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero": [],
+    "Descent.Portability.RareEventInformationLaw.erased_fisher_information": [],
     "Descent.Portability.rareHeritabilityShare_mem_Ioo": [],
     "Descent.Portability.independentGeneSharingProbability_gt_single": [],
     "Descent.Portability.portableVariantSignal_mono_frequency_sharing": [],
@@ -41932,6 +41984,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -41978,6 +42032,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -42048,6 +42104,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -42094,6 +42152,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -42159,6 +42219,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -42208,6 +42270,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -42273,6 +42337,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -42319,6 +42385,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -42794,6 +42862,8 @@
    "Descent.Portability.BalancedHWEInteraction.block_jump_probability",
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.HWEInteractionLaw.interaction_mean_zero",
    "Descent.Portability.HWEInteractionLaw.interaction_second_moment",
    "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass"
@@ -42817,6 +42887,8 @@
     "Descent.Portability.BalancedHWEInteraction.row_characteristic": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.HWEInteractionLaw.interaction_mean_zero": [],
     "Descent.Portability.HWEInteractionLaw.interaction_second_moment": [],
     "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass": []
@@ -45745,11 +45817,13 @@
    "Descent.Portability.CalibrationLaw.standardize_coordinate_continuous",
    "Descent.Portability.FactorsThroughObservation.add",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
+   "Descent.Portability.GaussianHermiteLaw.integrable_polynomial",
    "Descent.Portability.GaussianInverseQuadratic.quotient_integrable_of_product_lower",
    "Descent.Portability.GaussianSlabLaw.graphPoint_continuous",
    "Descent.Portability.GaussianSlabLaw.local_cylinder",
    "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable",
    "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero",
+   "Descent.Portability.RareEventInformationLaw.erased_log_score",
    "Descent.Portability.RatioPoleLaw.calibrated_probability_continuous",
    "Descent.Portability.RatioPoleLaw.transverse_scaled_limit",
    "Descent.Portability.RatioSourceDegeneracy.nondegenerate_nonaligned_witness",
@@ -45803,11 +45877,13 @@
     "Descent.Portability.BinaryRiskCohort.continuous_logisticCalibrationObjective": [],
     "Descent.Portability.BinaryRiskCohort.continuous_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
+    "Descent.Portability.GaussianHermiteLaw.integrable_polynomial": [],
     "Descent.Portability.GaussianInverseQuadratic.quotient_integrable_of_product_lower": [],
     "Descent.Portability.GaussianSlabLaw.graphPoint_continuous": [],
     "Descent.Portability.GaussianSlabLaw.local_cylinder": [],
     "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable": [],
     "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero": [],
+    "Descent.Portability.RareEventInformationLaw.erased_log_score": [],
     "Descent.Portability.RatioPoleLaw.transverse_scaled_limit": [],
     "Descent.Portability.RatioPoleLaw.calibrated_probability_continuous": [],
     "Descent.Portability.RatioSourceDegeneracy.nondegenerate_nonaligned_witness": [],
@@ -48278,6 +48354,10 @@
    "Descent.Portability.BalancedHWEInteraction.block_characteristic",
    "Descent.Portability.BalancedHWEInteraction.critical_characteristic_limit",
    "Descent.Portability.BalancedHWEInteraction.critical_standardization",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
+   "Descent.Portability.BalancedHWEOperatorLimit.limiting_poisson_series",
+   "Descent.Portability.BalancedHWEWeakLimit.critical_weak_convergence",
+   "Descent.Portability.BalancedHWEWeakLimit.integral_compoundPoisson",
    "Descent.Portability.BanachEulerExponential.coefficient_limit",
    "Descent.Portability.BanachEulerExponential.euler_eq_series",
    "Descent.Portability.BinaryRiskCohort.continuous_citlEquation",
@@ -48407,6 +48487,7 @@
    "Descent.Portability.GaussianEffectPortabilityLaw.weighted_defined_integrable",
    "Descent.Portability.GaussianEffectPortabilityLaw.weighted_observable_integrable",
    "Descent.Portability.GaussianEffectPortabilityLaw.weighted_report_integrable",
+   "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral",
    "Descent.Portability.GaussianInverseQuadratic.abs_rpow_exp_integrable",
    "Descent.Portability.GaussianInverseQuadratic.ae_coordinates_nonzero",
    "Descent.Portability.GaussianInverseQuadratic.gaussian_square_product_integrable",
@@ -48514,6 +48595,7 @@
    "Descent.Portability.ProbitTrainingLaw.threshold_probability",
    "Descent.Portability.QuadraticRigidityLaw.affine_of_second_derivative_zero",
    "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero",
+   "Descent.Portability.RareEventInformationLaw.erased_fisher_information",
    "Descent.Portability.RatioPoleLaw.calibrated_label_weight_continuous",
    "Descent.Portability.RatioPoleLaw.calibrated_label_weight_pos",
    "Descent.Portability.RatioPoleLaw.crossForm_affine_line",
@@ -49374,6 +49456,10 @@
     "Descent.Portability.BalancedHWEInteraction.block_characteristic": [],
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.critical_characteristic_limit": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.limiting_poisson_series": [],
+    "Descent.Portability.BalancedHWEWeakLimit.integral_compoundPoisson": [],
+    "Descent.Portability.BalancedHWEWeakLimit.critical_weak_convergence": [],
     "Descent.Portability.BanachEulerExponential.coefficient_limit": [],
     "Descent.Portability.BanachEulerExponential.euler_eq_series": [],
     "Descent.Portability.misspec_excess_risk_nonneg": [],
@@ -49581,6 +49667,7 @@
     "Descent.Portability.GaussianEffectPortabilityLaw.innerValue_eq_iSup_clipped": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.successProbability_bounds": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.weighted_report_integrable": [],
+    "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral": [],
     "Descent.Portability.GaussianInverseQuadratic.abs_rpow_exp_integrable": [],
     "Descent.Portability.GaussianInverseQuadratic.ae_coordinates_nonzero": [],
     "Descent.Portability.GaussianInverseQuadratic.gaussian_square_product_integrable": [],
@@ -49746,6 +49833,7 @@
     "Descent.Portability.ProbitTrainingLaw.reportedAccuracy_eq_moment_sum": [],
     "Descent.Portability.QuadraticRigidityLaw.affine_of_second_derivative_zero": [],
     "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero": [],
+    "Descent.Portability.RareEventInformationLaw.erased_fisher_information": [],
     "Descent.Portability.rareHeritabilityShare_mem_Ioo": [],
     "Descent.Portability.independentGeneSharingProbability_gt_single": [],
     "Descent.Portability.portableVariantSignal_mono_frequency_sharing": [],
@@ -51284,6 +51372,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -51330,6 +51420,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -51882,6 +51974,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -51928,6 +52022,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -58078,6 +58174,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -58124,6 +58222,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -61379,6 +61479,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -61428,6 +61530,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -61493,6 +61597,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -61539,6 +61645,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -62250,6 +62358,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -62296,6 +62406,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -63585,6 +63697,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -63631,6 +63745,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -65611,6 +65727,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -65661,6 +65779,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -67241,6 +67361,10 @@
    "Descent.Portability.BalancedHWEInteraction.block_characteristic",
    "Descent.Portability.BalancedHWEInteraction.critical_characteristic_limit",
    "Descent.Portability.BalancedHWEInteraction.critical_standardization",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
+   "Descent.Portability.BalancedHWEOperatorLimit.limiting_poisson_series",
+   "Descent.Portability.BalancedHWEWeakLimit.critical_weak_convergence",
+   "Descent.Portability.BalancedHWEWeakLimit.integral_compoundPoisson",
    "Descent.Portability.BanachEulerExponential.coefficient_limit",
    "Descent.Portability.BanachEulerExponential.euler_eq_series",
    "Descent.Portability.BinaryRiskCohort.continuous_citlEquation",
@@ -67370,6 +67494,7 @@
    "Descent.Portability.GaussianEffectPortabilityLaw.weighted_defined_integrable",
    "Descent.Portability.GaussianEffectPortabilityLaw.weighted_observable_integrable",
    "Descent.Portability.GaussianEffectPortabilityLaw.weighted_report_integrable",
+   "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral",
    "Descent.Portability.GaussianInverseQuadratic.abs_rpow_exp_integrable",
    "Descent.Portability.GaussianInverseQuadratic.ae_coordinates_nonzero",
    "Descent.Portability.GaussianInverseQuadratic.gaussian_square_product_integrable",
@@ -67477,6 +67602,7 @@
    "Descent.Portability.ProbitTrainingLaw.threshold_probability",
    "Descent.Portability.QuadraticRigidityLaw.affine_of_second_derivative_zero",
    "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero",
+   "Descent.Portability.RareEventInformationLaw.erased_fisher_information",
    "Descent.Portability.RatioPoleLaw.calibrated_label_weight_continuous",
    "Descent.Portability.RatioPoleLaw.calibrated_label_weight_pos",
    "Descent.Portability.RatioPoleLaw.crossForm_affine_line",
@@ -68405,6 +68531,10 @@
     "Descent.Portability.BalancedHWEInteraction.block_characteristic": [],
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.critical_characteristic_limit": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.limiting_poisson_series": [],
+    "Descent.Portability.BalancedHWEWeakLimit.integral_compoundPoisson": [],
+    "Descent.Portability.BalancedHWEWeakLimit.critical_weak_convergence": [],
     "Descent.Portability.BanachEulerExponential.coefficient_limit": [],
     "Descent.Portability.BanachEulerExponential.euler_eq_series": [],
     "Descent.Portability.misspec_excess_risk_nonneg": [],
@@ -68615,6 +68745,7 @@
     "Descent.Portability.GaussianEffectPortabilityLaw.innerValue_eq_iSup_clipped": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.successProbability_bounds": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.weighted_report_integrable": [],
+    "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral": [],
     "Descent.Portability.GaussianInverseQuadratic.abs_rpow_exp_integrable": [
      "0 < b"
     ],
@@ -68775,6 +68906,7 @@
      "ContDiffOn ℝ 3 f (Ioo a b",
      "∀ x ∈ Ioo a b, deriv (deriv (deriv f"
     ],
+    "Descent.Portability.RareEventInformationLaw.erased_fisher_information": [],
     "Descent.Portability.rareHeritabilityShare_mem_Ioo": [],
     "Descent.Portability.independentGeneSharingProbability_gt_single": [],
     "Descent.Portability.portableVariantSignal_mono_frequency_sharing": [],
@@ -69380,6 +69512,8 @@
    "Descent.Portability.BalancedHWECounterexample.flatten_mass",
    "Descent.Portability.BalancedHWECounterexample.mem_blockSet",
    "Descent.Portability.BalancedHWEInteraction.critical_limit_not_gaussian",
+   "Descent.Portability.BalancedHWEOperatorLimit.exponential_generator",
+   "Descent.Portability.BalancedHWEOperatorLimit.limiting_poisson_series",
    "Descent.Portability.BanachEulerExponential.euler_eq_series",
    "Descent.Portability.BinaryRiskCohort.CITLDomain.existsUniqueBracketedRoot",
    "Descent.Portability.CalibrationLaw.calibratedIntercept_lt_iff",
@@ -69781,6 +69915,8 @@
     "Descent.Portability.BalancedHWECounterexample.flatten_mass": [],
     "Descent.Portability.BalancedHWECounterexample.critical_cosine_limit": [],
     "Descent.Portability.BalancedHWEInteraction.critical_limit_not_gaussian": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.exponential_generator": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.limiting_poisson_series": [],
     "Descent.Portability.BanachEulerExponential.euler_eq_series": [],
     "Descent.Portability.CalibrationLaw.exists_unique_calibrated_intercept": [],
     "Descent.Portability.CalibrationLaw.calibratedIntercept_lt_iff": [],
@@ -79980,6 +80116,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -80026,6 +80164,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -80528,6 +80668,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -80574,6 +80716,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -82737,6 +82881,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -82783,6 +82929,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -84480,6 +84628,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -84526,6 +84676,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -84700,6 +84852,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -84746,6 +84900,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -84865,6 +85021,12 @@
    "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul",
    "Descent.Portability.FiniteReportLaw.variance_eq_rawMoments",
    "Descent.Portability.FiniteReportLaw.variance_nonneg",
+   "Descent.Portability.GaussianHermiteLaw.integrable_polynomial",
+   "Descent.Portability.GaussianHermiteLaw.integrable_power",
+   "Descent.Portability.GaussianHermiteLaw.integratePolynomial_C",
+   "Descent.Portability.GaussianHermiteLaw.integratePolynomial_X",
+   "Descent.Portability.GaussianHermiteLaw.integratePolynomial_X_pow",
+   "Descent.Portability.GaussianHermiteLaw.integratePolynomial_one",
    "Descent.Portability.GaussianPanelLaw.projection_variance",
    "Descent.Portability.GaussianPolynomialMoments.first_moment",
    "Descent.Portability.GaussianPolynomialMoments.fourth_moment",
@@ -84966,6 +85128,12 @@
     "Descent.Portability.FiniteReportLaw.variance_eq_rawMoments": [],
     "Descent.Portability.FiniteReportLaw.variance_nonneg": [],
     "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul": [],
+    "Descent.Portability.GaussianHermiteLaw.integrable_power": [],
+    "Descent.Portability.GaussianHermiteLaw.integrable_polynomial": [],
+    "Descent.Portability.GaussianHermiteLaw.integratePolynomial_X_pow": [],
+    "Descent.Portability.GaussianHermiteLaw.integratePolynomial_C": [],
+    "Descent.Portability.GaussianHermiteLaw.integratePolynomial_one": [],
+    "Descent.Portability.GaussianHermiteLaw.integratePolynomial_X": [],
     "Descent.Portability.GaussianPanelLaw.projection_variance": [],
     "Descent.Portability.GaussianPolynomialMoments.tilted_power_moment": [],
     "Descent.Portability.GaussianPolynomialMoments.power_moment": [],
@@ -86593,6 +86761,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -86639,6 +86809,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -95874,6 +96046,8 @@
    "Descent.Portability.AncestralEpochGenotypeLaw.conditionalEpoch_times_measurable",
    "Descent.Portability.AncestralMutationAbsorption.survival_tendsto_zero",
    "Descent.Portability.BalancedHWEInteraction.critical_characteristic_limit",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_bounded_observable_limit",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.continuous_calibrationIndividualLoss",
    "Descent.Portability.BinaryRiskCohort.continuous_citlEquation",
    "Descent.Portability.CalibrationLaw.calibrated_caseProbability_measurable",
@@ -95992,6 +96166,8 @@
     "Descent.Portability.AncestralEpochGenotypeLaw.conditionalEpoch_times_measurable": [],
     "Descent.Portability.AncestralMutationAbsorption.survival_tendsto_zero": [],
     "Descent.Portability.BalancedHWEInteraction.critical_characteristic_limit": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_bounded_observable_limit": [],
     "Descent.Portability.CalibrationLaw.prevalence_continuous": [],
     "Descent.Portability.CalibrationLaw.normalized_prevalence_continuous": [],
     "Descent.Portability.CalibrationLaw.calibrated_caseProbability_measurable": [],
@@ -97086,6 +97262,9 @@
    "Descent.PopGen.GxEDeployment.shift_eq_of_matched_combination",
    "Descent.PopGen.GxEDeployment.shift_onSingleGradient",
    "Descent.PopGen.no_threshold_metric_separates_collinear_split",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
+   "Descent.Portability.BalancedHWEWeakLimit.sign_shift_eq_jump",
    "Descent.Portability.CalibrationLaw.shifted_caseProbability",
    "Descent.Portability.CalibrationLaw.shifted_caseProbability_upper",
    "Descent.Portability.CalibrationLaw.shifted_controlProbability_upper",
@@ -97148,6 +97327,9 @@
     "Descent.PopGen.no_threshold_metric_separates_collinear_split": [
      "∀ D D' : GxEDeployment n, (∀ i, D.shift i = D'.shift i"
     ],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
+    "Descent.Portability.BalancedHWEWeakLimit.sign_shift_eq_jump": [],
     "Descent.Portability.CalibrationLaw.shifted_caseProbability": [],
     "Descent.Portability.CalibrationLaw.shifted_caseProbability_upper": [],
     "Descent.Portability.CalibrationLaw.shifted_controlProbability_upper": [],
@@ -98294,6 +98476,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -98340,6 +98524,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -99433,6 +99619,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -99479,6 +99667,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -99654,6 +99844,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -99700,6 +99892,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -100686,6 +100880,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -100742,6 +100938,10 @@
      "0 < m"
     ],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [
+     "0 < m"
+    ],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -101015,6 +101215,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -101064,6 +101266,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -102605,6 +102809,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -102654,6 +102860,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -103616,6 +103824,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -103665,6 +103875,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -103828,6 +104040,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -103874,6 +104088,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -105305,6 +105521,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -105351,6 +105569,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -106036,6 +106256,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -106082,6 +106304,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -110063,6 +110287,9 @@
    "Descent.PopGen.GxEDeployment.shift_eq_of_matched_combination",
    "Descent.PopGen.GxEDeployment.shift_onSingleGradient",
    "Descent.PopGen.no_threshold_metric_separates_collinear_split",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
+   "Descent.Portability.BalancedHWEWeakLimit.sign_shift_eq_jump",
    "Descent.Portability.CalibrationLaw.shifted_caseProbability",
    "Descent.Portability.CalibrationLaw.shifted_caseProbability_upper",
    "Descent.Portability.CalibrationLaw.shifted_controlProbability_upper",
@@ -110135,6 +110362,9 @@
      "∀ i, G.environmentalGradient i = c * G.geneticGradient i",
      "∀ D D' : GxEDeployment n, (∀ i, D.shift i = D'.shift i"
     ],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
+    "Descent.Portability.BalancedHWEWeakLimit.sign_shift_eq_jump": [],
     "Descent.Portability.CalibrationLaw.shifted_caseProbability": [],
     "Descent.Portability.CalibrationLaw.shifted_caseProbability_upper": [],
     "Descent.Portability.CalibrationLaw.shifted_controlProbability_upper": [],
@@ -113545,6 +113775,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -113591,6 +113823,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -113656,6 +113890,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -113702,6 +113938,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -113767,6 +114005,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -113813,6 +114053,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -114673,6 +114915,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -114719,6 +114963,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -118160,6 +118406,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -118210,6 +118458,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -118709,6 +118959,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -118758,6 +119010,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -118902,6 +119156,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -118958,6 +119214,10 @@
      "0 < m"
     ],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [
+     "0 < m"
+    ],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -119636,6 +119896,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -119682,6 +119944,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -127463,7 +127727,9 @@
    "Descent.Portability.BalancedHWEInteraction.block_jump_probability",
    "Descent.Portability.BalancedHWEInteraction.interaction_eq",
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
-   "Descent.Portability.BalancedHWEInteraction.row_characteristic"
+   "Descent.Portability.BalancedHWEInteraction.row_characteristic",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit"
   ],
   "constraints": {
    "hypotheses": [],
@@ -127478,7 +127744,9 @@
     "Descent.Portability.BalancedHWEInteraction.block_characteristic": [],
     "Descent.Portability.BalancedHWEInteraction.row_characteristic": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
-    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": []
+    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": []
    }
   }
  },
@@ -127511,7 +127779,9 @@
    "Descent.Portability.BalancedHWECounterexample.critical_second_moment",
    "Descent.Portability.BalancedHWECounterexample.flatten_mass",
    "Descent.Portability.BalancedHWECounterexample.no_gaussian_cosine_limits",
-   "Descent.Portability.BalancedHWEInteraction.row_characteristic"
+   "Descent.Portability.BalancedHWEInteraction.row_characteristic",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_bounded_observable_limit",
+   "Descent.Portability.BalancedHWEWeakLimit.critical_weak_convergence"
   ],
   "constraints": {
    "hypotheses": [
@@ -127529,7 +127799,9 @@
     "Descent.Portability.BalancedHWECounterexample.no_gaussian_cosine_limits": [],
     "Descent.Portability.BalancedHWEInteraction.row_characteristic": [
      "0 < m"
-    ]
+    ],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_bounded_observable_limit": [],
+    "Descent.Portability.BalancedHWEWeakLimit.critical_weak_convergence": []
    }
   }
  },
@@ -127566,7 +127838,9 @@
    "Descent.Portability.BalancedHWECounterexample.design_statistic_eq",
    "Descent.Portability.BalancedHWECounterexample.no_gaussian_cosine_limits",
    "Descent.Portability.BalancedHWEInteraction.critical_standardization",
-   "Descent.Portability.BalancedHWEInteraction.row_characteristic"
+   "Descent.Portability.BalancedHWEInteraction.row_characteristic",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_bounded_observable_limit",
+   "Descent.Portability.BalancedHWEWeakLimit.critical_weak_convergence"
   ],
   "constraints": {
    "hypotheses": [
@@ -127585,7 +127859,314 @@
     "Descent.Portability.BalancedHWEInteraction.row_characteristic": [
      "0 < m"
     ],
-    "Descent.Portability.BalancedHWEInteraction.critical_standardization": []
+    "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_bounded_observable_limit": [],
+    "Descent.Portability.BalancedHWEWeakLimit.critical_weak_convergence": []
+   }
+  }
+ },
+ "Descent.Portability.BalancedHWEOperatorLimit.Operator": {
+  "class": "STRUCTURAL",
+  "note": "type alias",
+  "file": "Descent/Portability/BalancedHWEOperatorLimit.lean",
+  "line": 26,
+  "short": "Operator",
+  "ret_type": "",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Coalescent.matrixExponentialSeries_summable",
+   "Descent.Portability.BalancedHWEOperatorLimit.exponential_generator",
+   "Descent.Portability.BalancedHWEOperatorLimit.observer_apply"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Coalescent.matrixExponentialSeries_summable": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.observer_apply": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.exponential_generator": []
+   }
+  }
+ },
+ "Descent.Portability.BalancedHWEOperatorLimit.jump": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "self-check: calls untranslated definition translate",
+  "file": "Descent/Portability/BalancedHWEOperatorLimit.lean",
+  "line": 33,
+  "short": "jump",
+  "ret_type": "Operator",
+  "empirical_status": "",
+  "python": "jump",
+  "args": [],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "NameError(\"name 'translate' is not defined\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_bounded_observable_limit",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
+   "Descent.Portability.BalancedHWEOperatorLimit.exponential_generator",
+   "Descent.Portability.BalancedHWEOperatorLimit.jump_apply",
+   "Descent.Portability.BalancedHWEOperatorLimit.limiting_poisson_series",
+   "Descent.Portability.BalancedHWEWeakLimit.integral_compoundPoisson",
+   "Descent.Portability.BalancedHWEWeakLimit.integral_walkMeasure",
+   "Descent.Portability.BalancedHWEWeakLimit.sign_shift_eq_jump"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.BalancedHWEOperatorLimit.jump_apply": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_bounded_observable_limit": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.exponential_generator": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.limiting_poisson_series": [],
+    "Descent.Portability.BalancedHWEWeakLimit.sign_shift_eq_jump": [],
+    "Descent.Portability.BalancedHWEWeakLimit.integral_walkMeasure": [],
+    "Descent.Portability.BalancedHWEWeakLimit.integral_compoundPoisson": []
+   }
+  }
+ },
+ "Descent.Portability.BalancedHWEOperatorLimit.observer": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name BoundedContinuousFunction.evalCLM",
+  "file": "Descent/Portability/BalancedHWEOperatorLimit.lean",
+  "line": 71,
+  "short": "observer",
+  "ret_type": "Operator →L[ℝ] ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "x": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_bounded_observable_limit",
+   "Descent.Portability.BalancedHWEOperatorLimit.limiting_poisson_series",
+   "Descent.Portability.BalancedHWEOperatorLimit.observer_apply"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.BalancedHWEOperatorLimit.observer_apply": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_bounded_observable_limit": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.limiting_poisson_series": []
+   }
+  }
+ },
+ "Descent.Portability.BalancedHWEWeakLimit.finiteMeasure": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name Measure.sum",
+  "file": "Descent/Portability/BalancedHWEWeakLimit.lean",
+  "line": 32,
+  "short": "finiteMeasure",
+  "ret_type": "Measure ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.BalancedHWEWeakLimit.critical_weak_convergence",
+   "Descent.Portability.BalancedHWEWeakLimit.integral_finiteMeasure"
+  ],
+  "constraints": {
+   "declared_kind": "probability",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.BalancedHWEWeakLimit.integral_finiteMeasure": [],
+    "Descent.Portability.BalancedHWEWeakLimit.critical_weak_convergence": []
+   }
+  }
+ },
+ "Descent.Portability.BalancedHWEWeakLimit.signLaw": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/BalancedHWEWeakLimit.lean",
+  "line": 54,
+  "short": "signLaw",
+  "ret_type": "FiniteReportLaw Bool where mass _",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.BalancedHWEWeakLimit.sign_shift_eq_jump"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.BalancedHWEWeakLimit.sign_shift_eq_jump": []
+   }
+  }
+ },
+ "Descent.Portability.BalancedHWEWeakLimit.signValue": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/BalancedHWEWeakLimit.lean",
+  "line": 59,
+  "short": "signValue",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "signValue",
+  "args": [
+   "b"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.BalancedHWEWeakLimit.sign_shift_eq_jump"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.BalancedHWEWeakLimit.sign_shift_eq_jump": []
+   }
+  }
+ },
+ "Descent.Portability.BalancedHWEWeakLimit.walkMeasure": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "ambiguous call to 'independentLaw' with 1 argument(s): ['Descent.Portability.HWEInteractionLaw.independentLaw', 'Descent.Portability.WholeGenomeMutationSemigroup.independentLaw']",
+  "file": "Descent/Portability/BalancedHWEWeakLimit.lean",
+  "line": 62,
+  "short": "walkMeasure",
+  "ret_type": "Measure ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "k": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.BalancedHWEWeakLimit.integral_walkMeasure"
+  ],
+  "constraints": {
+   "declared_kind": "probability",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.BalancedHWEWeakLimit.integral_walkMeasure": []
+   }
+  }
+ },
+ "Descent.Portability.BalancedHWEWeakLimit.compoundPoisson": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name Measure.sum",
+  "file": "Descent/Portability/BalancedHWEWeakLimit.lean",
+  "line": 83,
+  "short": "compoundPoisson",
+  "ret_type": "Measure ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.BalancedHWEWeakLimit.critical_weak_convergence",
+   "Descent.Portability.BalancedHWEWeakLimit.integral_compoundPoisson"
+  ],
+  "constraints": {
+   "declared_kind": "probability",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.BalancedHWEWeakLimit.integral_compoundPoisson": [],
+    "Descent.Portability.BalancedHWEWeakLimit.critical_weak_convergence": []
+   }
+  }
+ },
+ "Descent.Portability.BalancedHWEWeakLimit.criticalProbability": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "anonymous constructor",
+  "file": "Descent/Portability/BalancedHWEWeakLimit.lean",
+  "line": 105,
+  "short": "criticalProbability",
+  "ret_type": "ProbabilityMeasure ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "m": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.BalancedHWEWeakLimit.critical_weak_convergence"
+  ],
+  "constraints": {
+   "declared_kind": "probability",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.BalancedHWEWeakLimit.critical_weak_convergence": []
+   }
+  }
+ },
+ "Descent.Portability.BalancedHWEWeakLimit.compoundPoissonProbability": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "anonymous constructor",
+  "file": "Descent/Portability/BalancedHWEWeakLimit.lean",
+  "line": 108,
+  "short": "compoundPoissonProbability",
+  "ret_type": "ProbabilityMeasure ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.BalancedHWEWeakLimit.critical_weak_convergence"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.BalancedHWEWeakLimit.critical_weak_convergence": []
    }
   }
  },
@@ -127639,6 +128220,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -127685,6 +128268,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -129298,6 +129883,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -129344,6 +129931,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -137218,6 +137807,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -137264,6 +137855,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -137329,6 +137922,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -137375,6 +137970,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -142262,6 +142859,9 @@
    "Descent.PopGen.GxEDeployment.shift_eq_of_matched_combination",
    "Descent.PopGen.GxEDeployment.shift_onSingleGradient",
    "Descent.PopGen.no_threshold_metric_separates_collinear_split",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
+   "Descent.Portability.BalancedHWEWeakLimit.sign_shift_eq_jump",
    "Descent.Portability.CalibrationLaw.shifted_caseProbability",
    "Descent.Portability.CalibrationLaw.shifted_caseProbability_upper",
    "Descent.Portability.CalibrationLaw.shifted_controlProbability_upper",
@@ -142322,6 +142922,9 @@
     "Descent.PopGen.GxEDeployment.shift_onSingleGradient": [],
     "Descent.PopGen.GxEDeployment.shift_eq_of_matched_combination": [],
     "Descent.PopGen.no_threshold_metric_separates_collinear_split": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
+    "Descent.Portability.BalancedHWEWeakLimit.sign_shift_eq_jump": [],
     "Descent.Portability.CalibrationLaw.shifted_caseProbability": [],
     "Descent.Portability.CalibrationLaw.shifted_caseProbability_upper": [],
     "Descent.Portability.CalibrationLaw.shifted_controlProbability_upper": [],
@@ -142648,6 +143251,9 @@
    "Descent.Portability.BalancedHWEInteraction.blockCode_second_moment",
    "Descent.Portability.BalancedHWEInteraction.block_jump_probability",
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_bounded_observable_limit",
+   "Descent.Portability.BalancedHWEWeakLimit.integral_finiteMeasure",
+   "Descent.Portability.BalancedHWEWeakLimit.sign_shift_eq_jump",
    "Descent.Portability.CalibrationLaw.exists_unique_calibrated_intercept",
    "Descent.Portability.CalibrationLaw.expectation_continuous",
    "Descent.Portability.CalibrationLaw.expectation_second_bound",
@@ -142899,6 +143505,9 @@
     "Descent.Portability.BalancedHWEInteraction.blockCode_law": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_bounded_observable_limit": [],
+    "Descent.Portability.BalancedHWEWeakLimit.integral_finiteMeasure": [],
+    "Descent.Portability.BalancedHWEWeakLimit.sign_shift_eq_jump": [],
     "Descent.Portability.CalibrationLaw.standardized_mean_zero": [],
     "Descent.Portability.CalibrationLaw.standardized_second_moment_le_one": [],
     "Descent.Portability.CalibrationLaw.prevalence_continuous": [],
@@ -144831,6 +145440,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -144877,6 +145488,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -144942,6 +145555,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -144991,6 +145606,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -145056,6 +145673,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -145102,6 +145721,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -145167,6 +145788,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -145213,6 +145836,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -145278,6 +145903,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -145324,6 +145951,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -145389,6 +146018,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -145435,6 +146066,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -145500,6 +146133,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -145546,6 +146181,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -145611,6 +146248,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -145657,6 +146296,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -145722,6 +146363,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -145768,6 +146411,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -147071,6 +147716,12 @@
    "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul",
    "Descent.Portability.FiniteReportLaw.variance_eq_rawMoments",
    "Descent.Portability.FiniteReportLaw.variance_nonneg",
+   "Descent.Portability.GaussianHermiteLaw.integrable_polynomial",
+   "Descent.Portability.GaussianHermiteLaw.integrable_power",
+   "Descent.Portability.GaussianHermiteLaw.integratePolynomial_C",
+   "Descent.Portability.GaussianHermiteLaw.integratePolynomial_X",
+   "Descent.Portability.GaussianHermiteLaw.integratePolynomial_X_pow",
+   "Descent.Portability.GaussianHermiteLaw.integratePolynomial_one",
    "Descent.Portability.GaussianPanelLaw.projection_variance",
    "Descent.Portability.GaussianPolynomialMoments.first_moment",
    "Descent.Portability.GaussianPolynomialMoments.fourth_moment",
@@ -147172,6 +147823,12 @@
     "Descent.Portability.FiniteReportLaw.variance_eq_rawMoments": [],
     "Descent.Portability.FiniteReportLaw.variance_nonneg": [],
     "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul": [],
+    "Descent.Portability.GaussianHermiteLaw.integrable_power": [],
+    "Descent.Portability.GaussianHermiteLaw.integrable_polynomial": [],
+    "Descent.Portability.GaussianHermiteLaw.integratePolynomial_X_pow": [],
+    "Descent.Portability.GaussianHermiteLaw.integratePolynomial_C": [],
+    "Descent.Portability.GaussianHermiteLaw.integratePolynomial_one": [],
+    "Descent.Portability.GaussianHermiteLaw.integratePolynomial_X": [],
     "Descent.Portability.GaussianPanelLaw.projection_variance": [],
     "Descent.Portability.GaussianPolynomialMoments.tilted_power_moment": [],
     "Descent.Portability.GaussianPolynomialMoments.power_moment": [],
@@ -150716,6 +151373,253 @@
    "declared_hi": 1.0
   }
  },
+ "Descent.Portability.GaussianHermiteLaw.integratePolynomial": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
+  "file": "Descent/Portability/GaussianHermiteLaw.lean",
+  "line": 34,
+  "short": "integratePolynomial",
+  "ret_type": "Polynomial ℝ →ₗ[ℝ] ℝ where toFun p",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.GaussianHermiteLaw.hermite_inner",
+   "Descent.Portability.GaussianHermiteLaw.hermite_polynomial_inner",
+   "Descent.Portability.GaussianHermiteLaw.integratePolynomial_C",
+   "Descent.Portability.GaussianHermiteLaw.integratePolynomial_X",
+   "Descent.Portability.GaussianHermiteLaw.integratePolynomial_X_pow",
+   "Descent.Portability.GaussianHermiteLaw.integratePolynomial_one"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.GaussianHermiteLaw.integratePolynomial_X_pow": [],
+    "Descent.Portability.GaussianHermiteLaw.integratePolynomial_C": [],
+    "Descent.Portability.GaussianHermiteLaw.integratePolynomial_one": [],
+    "Descent.Portability.GaussianHermiteLaw.integratePolynomial_X": [],
+    "Descent.Portability.GaussianHermiteLaw.hermite_polynomial_inner": [],
+    "Descent.Portability.GaussianHermiteLaw.hermite_inner": []
+   }
+  }
+ },
+ "Descent.Portability.GaussianHermiteLaw.hermitePolynomial": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/GaussianHermiteLaw.lean",
+  "line": 56,
+  "short": "hermitePolynomial",
+  "ret_type": "Polynomial ℝ",
+  "empirical_status": "",
+  "python": "hermitePolynomial",
+  "args": [
+   "order"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 2,
+   "total_points": 8,
+   "error": "NameError(\"name 'X' is not defined\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.GaussianHermiteLaw.hermite_polynomial_inner",
+   "Descent.Portability.GaussianHermiteLaw.tensor_pair_integrable"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.GaussianHermiteLaw.hermite_polynomial_inner": [],
+    "Descent.Portability.GaussianHermiteLaw.tensor_pair_integrable": []
+   }
+  }
+ },
+ "Descent.Portability.GaussianHermiteLaw.hermite": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "self-check: calls untranslated definition X",
+  "file": "Descent/Portability/GaussianHermiteLaw.lean",
+  "line": 59,
+  "short": "hermite",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "hermite",
+  "args": [
+   "order",
+   "x"
+  ],
+  "box": {
+   "x": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "NameError(\"name 'X' is not defined\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.GaussianHermiteLaw.hermite_inner",
+   "Descent.Portability.GaussianHermiteLaw.tensor_inner",
+   "Descent.Portability.GaussianHermiteLaw.tensor_pair_integrable"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.GaussianHermiteLaw.hermite_inner": [],
+    "Descent.Portability.GaussianHermiteLaw.tensor_pair_integrable": [],
+    "Descent.Portability.GaussianHermiteLaw.tensor_inner": []
+   }
+  }
+ },
+ "Descent.Portability.GaussianHermiteLaw.hermiteWeight": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/GaussianHermiteLaw.lean",
+  "line": 61,
+  "short": "hermiteWeight",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "hermiteWeight",
+  "args": [
+   "order"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.GaussianHermiteLaw.hermite_inner",
+   "Descent.Portability.GaussianHermiteLaw.hermite_polynomial_inner",
+   "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral",
+   "Descent.Portability.GaussianHermiteLaw.tensor_inner"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.GaussianHermiteLaw.hermite_polynomial_inner": [],
+    "Descent.Portability.GaussianHermiteLaw.hermite_inner": [],
+    "Descent.Portability.GaussianHermiteLaw.tensor_inner": [],
+    "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral": []
+   }
+  }
+ },
+ "Descent.Portability.GaussianHermiteLaw.tensorHermite": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "indexed product",
+  "file": "Descent/Portability/GaussianHermiteLaw.lean",
+  "line": 84,
+  "short": "tensorHermite",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral",
+   "Descent.Portability.GaussianHermiteLaw.tensor_inner",
+   "Descent.Portability.GaussianHermiteLaw.tensor_pair_integrable"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "Function.Injective degree"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.GaussianHermiteLaw.tensor_pair_integrable": [],
+    "Descent.Portability.GaussianHermiteLaw.tensor_inner": [],
+    "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral": [
+     "Function.Injective degree"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.GaussianHermiteLaw.productGaussian": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name Measure.pi",
+  "file": "Descent/Portability/GaussianHermiteLaw.lean",
+  "line": 87,
+  "short": "productGaussian",
+  "ret_type": "Measure (D → ℝ)",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral",
+   "Descent.Portability.GaussianHermiteLaw.tensor_inner",
+   "Descent.Portability.GaussianHermiteLaw.tensor_pair_integrable"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.GaussianHermiteLaw.tensor_pair_integrable": [],
+    "Descent.Portability.GaussianHermiteLaw.tensor_inner": [],
+    "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral": []
+   }
+  }
+ },
+ "Descent.Portability.GaussianHermiteLaw.tensorCombination": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "self-check: calls untranslated definition tensorHermite",
+  "file": "Descent/Portability/GaussianHermiteLaw.lean",
+  "line": 109,
+  "short": "tensorCombination",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "tensorCombination",
+  "args": [
+   "degree",
+   "coefficient",
+   "x"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "NameError(\"name 'tensorHermite' is not defined\")"
+  },
+  "numeric_standins": null,
+  "vector_args": {
+   "coefficient": {
+    "dim": "I",
+    "rank": 1
+   },
+   "x": {
+    "dim": "D",
+    "rank": 1
+   }
+  },
+  "mentioned_by": [
+   "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "Function.Injective degree"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral": [
+     "Function.Injective degree"
+    ]
+   }
+  }
+ },
  "Descent.Portability.GaussianPanelLaw.projection": {
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name ContinuousLinearMap.proj",
@@ -151259,6 +152163,8 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.GaussianHermiteLaw.hermite_polynomial_inner",
+   "Descent.Portability.GaussianHermiteLaw.integratePolynomial_X_pow",
    "Descent.Portability.GaussianPolynomialMoments.fourth_moment",
    "Descent.Portability.GaussianPolynomialMoments.power_moment",
    "Descent.Portability.GaussianPolynomialMoments.second_moment",
@@ -151268,6 +152174,8 @@
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Portability.GaussianHermiteLaw.integratePolynomial_X_pow": [],
+    "Descent.Portability.GaussianHermiteLaw.hermite_polynomial_inner": [],
     "Descent.Portability.GaussianPolynomialMoments.tilted_power_moment": [],
     "Descent.Portability.GaussianPolynomialMoments.power_moment": [],
     "Descent.Portability.GaussianPolynomialMoments.second_moment": [],
@@ -152467,6 +153375,8 @@
    "Descent.Portability.BalancedHWEInteraction.block_jump_probability",
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.HWEInteractionLaw.interaction_mean_zero",
    "Descent.Portability.HWEInteractionLaw.interaction_second_moment",
    "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass"
@@ -152488,6 +153398,8 @@
     "Descent.Portability.BalancedHWEInteraction.row_characteristic": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.HWEInteractionLaw.interaction_mean_zero": [
      "ι → HardyWeinbergModel"
     ],
@@ -153565,6 +154477,13 @@
   "mentioned_by": [
    "Descent.Blindness.identical_observable_law_implies_identical_statistic_law",
    "Descent.Blindness.not_identifiedBy_of_gaugeDependent",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_bounded_observable_limit",
+   "Descent.Portability.BalancedHWEOperatorLimit.jump_apply",
+   "Descent.Portability.BalancedHWEOperatorLimit.limiting_poisson_series",
+   "Descent.Portability.BalancedHWEOperatorLimit.observer_apply",
+   "Descent.Portability.BalancedHWEWeakLimit.integral_compoundPoisson",
+   "Descent.Portability.BalancedHWEWeakLimit.integral_finiteMeasure",
+   "Descent.Portability.BalancedHWEWeakLimit.integral_walkMeasure",
    "Descent.Portability.IndependentShiftOperator.shift_apply",
    "Descent.Portability.IndependentShiftOperator.shift_pow_sample",
    "Descent.Portability.IndependentShiftOperator.translate_apply"
@@ -153574,6 +154493,13 @@
    "hypotheses_by_theorem": {
     "Descent.Blindness.not_identifiedBy_of_gaugeDependent": [],
     "Descent.Blindness.identical_observable_law_implies_identical_statistic_law": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.jump_apply": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.observer_apply": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_bounded_observable_limit": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.limiting_poisson_series": [],
+    "Descent.Portability.BalancedHWEWeakLimit.integral_finiteMeasure": [],
+    "Descent.Portability.BalancedHWEWeakLimit.integral_walkMeasure": [],
+    "Descent.Portability.BalancedHWEWeakLimit.integral_compoundPoisson": [],
     "Descent.Portability.IndependentShiftOperator.translate_apply": [],
     "Descent.Portability.IndependentShiftOperator.shift_apply": [],
     "Descent.Portability.IndependentShiftOperator.shift_pow_sample": []
@@ -153652,6 +154578,9 @@
    "Descent.PopGen.GxEDeployment.shift_eq_of_matched_combination",
    "Descent.PopGen.GxEDeployment.shift_onSingleGradient",
    "Descent.PopGen.no_threshold_metric_separates_collinear_split",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
+   "Descent.Portability.BalancedHWEWeakLimit.sign_shift_eq_jump",
    "Descent.Portability.CalibrationLaw.shifted_caseProbability",
    "Descent.Portability.CalibrationLaw.shifted_caseProbability_upper",
    "Descent.Portability.CalibrationLaw.shifted_controlProbability_upper",
@@ -153709,6 +154638,9 @@
     "Descent.PopGen.GxEDeployment.shift_onSingleGradient": [],
     "Descent.PopGen.GxEDeployment.shift_eq_of_matched_combination": [],
     "Descent.PopGen.no_threshold_metric_separates_collinear_split": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
+    "Descent.Portability.BalancedHWEWeakLimit.sign_shift_eq_jump": [],
     "Descent.Portability.CalibrationLaw.shifted_caseProbability": [],
     "Descent.Portability.CalibrationLaw.shifted_caseProbability_upper": [],
     "Descent.Portability.CalibrationLaw.shifted_controlProbability_upper": [],
@@ -159841,6 +160773,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -159887,6 +160821,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -161546,6 +162482,12 @@
    "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul",
    "Descent.Portability.FiniteReportLaw.variance_eq_rawMoments",
    "Descent.Portability.FiniteReportLaw.variance_nonneg",
+   "Descent.Portability.GaussianHermiteLaw.integrable_polynomial",
+   "Descent.Portability.GaussianHermiteLaw.integrable_power",
+   "Descent.Portability.GaussianHermiteLaw.integratePolynomial_C",
+   "Descent.Portability.GaussianHermiteLaw.integratePolynomial_X",
+   "Descent.Portability.GaussianHermiteLaw.integratePolynomial_X_pow",
+   "Descent.Portability.GaussianHermiteLaw.integratePolynomial_one",
    "Descent.Portability.GaussianPanelLaw.projection_variance",
    "Descent.Portability.GaussianPolynomialMoments.first_moment",
    "Descent.Portability.GaussianPolynomialMoments.fourth_moment",
@@ -161647,6 +162589,12 @@
     "Descent.Portability.FiniteReportLaw.variance_eq_rawMoments": [],
     "Descent.Portability.FiniteReportLaw.variance_nonneg": [],
     "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul": [],
+    "Descent.Portability.GaussianHermiteLaw.integrable_power": [],
+    "Descent.Portability.GaussianHermiteLaw.integrable_polynomial": [],
+    "Descent.Portability.GaussianHermiteLaw.integratePolynomial_X_pow": [],
+    "Descent.Portability.GaussianHermiteLaw.integratePolynomial_C": [],
+    "Descent.Portability.GaussianHermiteLaw.integratePolynomial_one": [],
+    "Descent.Portability.GaussianHermiteLaw.integratePolynomial_X": [],
     "Descent.Portability.GaussianPanelLaw.projection_variance": [],
     "Descent.Portability.GaussianPolynomialMoments.tilted_power_moment": [],
     "Descent.Portability.GaussianPolynomialMoments.power_moment": [],
@@ -162819,6 +163767,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -162865,6 +163815,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -163737,6 +164689,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -163786,6 +164740,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -165179,6 +166135,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -165225,6 +166183,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -166179,6 +167139,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -166225,6 +167187,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -166729,6 +167693,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -166775,6 +167741,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -168951,6 +169919,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -169000,6 +169970,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -169829,6 +170801,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -169879,6 +170853,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -171784,6 +172760,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -171830,6 +172808,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -175654,6 +176634,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -175703,6 +176685,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -176055,6 +177039,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -176104,6 +177090,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -177766,6 +178754,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -177812,6 +178802,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -180226,6 +181218,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -180272,6 +181266,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -182157,6 +183153,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -182207,6 +183205,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -187716,6 +188716,298 @@
     ],
     "Descent.Portability.ProbitTrainingLaw.fixedData_reportedRatio_bounded": [],
     "Descent.Portability.SimulationAccuracy.reportedRatio_eq_form_sum": []
+   }
+  }
+ },
+ "Descent.Portability.RareEventInformationLaw.markMass": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/RareEventInformationLaw.lean",
+  "line": 29,
+  "short": "markMass",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "markMass",
+  "args": [
+   "η",
+   "z"
+  ],
+  "box": {
+   "η": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.RareEventInformationLaw.erasedDensity_eq_sum",
+   "Descent.Portability.RareEventInformationLaw.marked_log_score"
+  ],
+  "constraints": {
+   "declared_kind": "probability",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [
+    "0 < η ∧ η < 1"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.RareEventInformationLaw.erasedDensity_eq_sum": [],
+    "Descent.Portability.RareEventInformationLaw.marked_log_score": [
+     "0 < η ∧ η < 1"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.RareEventInformationLaw.markedDensity": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "self-check: calls untranslated definition gaussianPDFReal",
+  "file": "Descent/Portability/RareEventInformationLaw.lean",
+  "line": 32,
+  "short": "markedDensity",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "markedDensity",
+  "args": [
+   "η",
+   "v",
+   "θ",
+   "z",
+   "y"
+  ],
+  "box": {
+   "η": [
+    0.05,
+    3.0
+   ],
+   "θ": [
+    0.05,
+    3.0
+   ],
+   "y": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "NameError(\"name 'gaussianPDFReal' is not defined\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.RareEventInformationLaw.erasedDensity_eq_sum",
+   "Descent.Portability.RareEventInformationLaw.marked_fisher_integral",
+   "Descent.Portability.RareEventInformationLaw.marked_log_score"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "0 < η ∧ η < 1",
+    "v ≠ 0"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.RareEventInformationLaw.erasedDensity_eq_sum": [],
+    "Descent.Portability.RareEventInformationLaw.marked_log_score": [
+     "0 < η ∧ η < 1",
+     "v ≠ 0"
+    ],
+    "Descent.Portability.RareEventInformationLaw.marked_fisher_integral": [
+     "0 < η ∧ η < 1",
+     "v ≠ 0"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.RareEventInformationLaw.erasedDensity": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "self-check: calls untranslated definition gaussianPDFReal",
+  "file": "Descent/Portability/RareEventInformationLaw.lean",
+  "line": 36,
+  "short": "erasedDensity",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "erasedDensity",
+  "args": [
+   "η",
+   "v",
+   "θ",
+   "y"
+  ],
+  "box": {
+   "η": [
+    0.05,
+    3.0
+   ],
+   "θ": [
+    0.05,
+    3.0
+   ],
+   "y": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "NameError(\"name 'gaussianPDFReal' is not defined\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.RareEventInformationLaw.erasedDensity_eq_sum",
+   "Descent.Portability.RareEventInformationLaw.erasedDensity_null",
+   "Descent.Portability.RareEventInformationLaw.erased_fisher_integral",
+   "Descent.Portability.RareEventInformationLaw.erased_log_score"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "v ≠ 0",
+    "0 ≤ η ∧ η ≤ 1"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.RareEventInformationLaw.erasedDensity_eq_sum": [],
+    "Descent.Portability.RareEventInformationLaw.erasedDensity_null": [],
+    "Descent.Portability.RareEventInformationLaw.erased_log_score": [
+     "v ≠ 0"
+    ],
+    "Descent.Portability.RareEventInformationLaw.erased_fisher_integral": [
+     "0 ≤ η ∧ η ≤ 1",
+     "v ≠ 0"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.RareEventInformationLaw.experimentExpectation": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
+  "file": "Descent/Portability/RareEventInformationLaw.lean",
+  "line": 108,
+  "short": "experimentExpectation",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "η": [
+    0.05,
+    3.0
+   ],
+   "θ": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.RareEventInformationLaw.erased_estimator_null_second_moment",
+   "Descent.Portability.RareEventInformationLaw.erased_estimator_unbiased",
+   "Descent.Portability.RareEventInformationLaw.erased_fisher_information",
+   "Descent.Portability.RareEventInformationLaw.experimentExpectation_eq_integral",
+   "Descent.Portability.RareEventInformationLaw.marked_estimator_null_second_moment",
+   "Descent.Portability.RareEventInformationLaw.marked_estimator_unbiased",
+   "Descent.Portability.RareEventInformationLaw.marked_fisher_information",
+   "Descent.Portability.RareEventInformationLaw.partial_label_information"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "0 ≤ η ∧ η ≤ 1",
+    "Measurable (fun zy : Bool × ℝ ↦ h zy.1 zy.2",
+    "Integrable (h false",
+    "Integrable (h true",
+    "v ≠ 0",
+    "η ≠ 0"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.RareEventInformationLaw.experimentExpectation_eq_integral": [
+     "0 ≤ η ∧ η ≤ 1",
+     "Measurable (fun zy : Bool × ℝ ↦ h zy.1 zy.2",
+     "Integrable (h false",
+     "Integrable (h true"
+    ],
+    "Descent.Portability.RareEventInformationLaw.marked_fisher_information": [
+     "v ≠ 0"
+    ],
+    "Descent.Portability.RareEventInformationLaw.erased_fisher_information": [
+     "v ≠ 0"
+    ],
+    "Descent.Portability.RareEventInformationLaw.marked_estimator_unbiased": [
+     "η ≠ 0"
+    ],
+    "Descent.Portability.RareEventInformationLaw.erased_estimator_unbiased": [
+     "η ≠ 0"
+    ],
+    "Descent.Portability.RareEventInformationLaw.marked_estimator_null_second_moment": [
+     "η ≠ 0"
+    ],
+    "Descent.Portability.RareEventInformationLaw.erased_estimator_null_second_moment": [],
+    "Descent.Portability.RareEventInformationLaw.partial_label_information": [
+     "v ≠ 0"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.RareEventInformationLaw.experimentLaw": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name ENNReal.ofReal",
+  "file": "Descent/Portability/RareEventInformationLaw.lean",
+  "line": 114,
+  "short": "experimentLaw",
+  "ret_type": "Measure (Bool × ℝ)",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "η": [
+    0.05,
+    3.0
+   ],
+   "θ": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.RareEventInformationLaw.erased_fisher_integral",
+   "Descent.Portability.RareEventInformationLaw.experimentExpectation_eq_integral",
+   "Descent.Portability.RareEventInformationLaw.experimentLaw_probability",
+   "Descent.Portability.RareEventInformationLaw.marked_fisher_integral"
+  ],
+  "constraints": {
+   "declared_kind": "probability",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [
+    "0 ≤ η ∧ η ≤ 1",
+    "0 < η ∧ η < 1",
+    "v ≠ 0"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.RareEventInformationLaw.experimentLaw_probability": [
+     "0 ≤ η ∧ η ≤ 1"
+    ],
+    "Descent.Portability.RareEventInformationLaw.experimentExpectation_eq_integral": [
+     "0 ≤ η ∧ η ≤ 1"
+    ],
+    "Descent.Portability.RareEventInformationLaw.marked_fisher_integral": [
+     "0 < η ∧ η < 1",
+     "v ≠ 0"
+    ],
+    "Descent.Portability.RareEventInformationLaw.erased_fisher_integral": [
+     "0 ≤ η ∧ η ≤ 1",
+     "v ≠ 0"
+    ]
    }
   }
  },
@@ -195893,6 +197185,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -195939,6 +197233,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -196153,6 +197449,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -196209,6 +197507,10 @@
      "0 < m"
     ],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [
+     "0 < m"
+    ],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -197599,6 +198901,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -197645,6 +198949,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -197785,6 +199091,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -197831,6 +199139,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -197929,6 +199239,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -197978,6 +199290,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -198126,6 +199440,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -198172,6 +199488,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -198276,6 +199594,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -198322,6 +199642,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -198422,6 +199744,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -198468,6 +199792,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -198572,6 +199898,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -198618,6 +199946,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -198762,6 +200092,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -198808,6 +200140,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -198972,6 +200306,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -199018,6 +200354,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -199164,6 +200502,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -199210,6 +200550,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -204654,6 +205996,9 @@
    "Descent.Portability.BalancedHWEInteraction.blockCode_second_moment",
    "Descent.Portability.BalancedHWEInteraction.block_jump_probability",
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_bounded_observable_limit",
+   "Descent.Portability.BalancedHWEWeakLimit.integral_finiteMeasure",
+   "Descent.Portability.BalancedHWEWeakLimit.sign_shift_eq_jump",
    "Descent.Portability.CalibrationLaw.exists_unique_calibrated_intercept",
    "Descent.Portability.CalibrationLaw.expectation_continuous",
    "Descent.Portability.CalibrationLaw.expectation_second_bound",
@@ -204918,6 +206263,9 @@
     "Descent.Portability.BalancedHWEInteraction.blockCode_law": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_bounded_observable_limit": [],
+    "Descent.Portability.BalancedHWEWeakLimit.integral_finiteMeasure": [],
+    "Descent.Portability.BalancedHWEWeakLimit.sign_shift_eq_jump": [],
     "Descent.Portability.CalibrationLaw.standardized_mean_zero": [],
     "Descent.Portability.CalibrationLaw.standardized_second_moment_le_one": [],
     "Descent.Portability.CalibrationLaw.prevalence_continuous": [],
@@ -209069,6 +210417,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -209115,6 +210465,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -209197,6 +210549,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -209243,6 +210597,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -210510,6 +211866,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -210556,6 +211914,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
@@ -215540,6 +216900,8 @@
    "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant",
    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq",
+   "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -215586,6 +216948,8 @@
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEInteraction.block_jump_probability": [],
     "Descent.Portability.BalancedHWEInteraction.no_uniform_tilted_tail_constant": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.block_shift_eq": [],
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_operator_limit": [],
     "Descent.Portability.thresholdRegime_witness": [],
     "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],

@@ -3138,6 +3138,12 @@ def code(*_a):
 def rowScore(a, x):
     return sum(((a * blockCode((x(j))))) for j in range(int(_rt.sumdim('j', len(x)))))
 
+def jump():
+    return ((_rt.rdiv(1.0, 2.0)) * ((translate(1.0) + translate(((-1.0))))))
+
+def signValue(b):
+    return (1.0 if b else (-1.0))
+
 def posteriorPrecision(m):
     return (_rt.rdiv(1.0, _rt._proj(m, 'prior_var')) + _rt._proj(m, 'data_precision'))
 
@@ -3923,6 +3929,18 @@ def innerValue(effects):
 
 def clippedInner(cap, effects):
     return sum((_rt.mul(_rt._proj((labelKernel(Descent_Portability_SimulationDesignDecoder_design())), 'weight')(effects, outcome), _rt._proj((clippedReport(Descent_Portability_SimulationDesignDecoder_design(), cap, effects, outcome)), 'getD')(0.0))) for outcome in range(int(len(effects))))
+
+def hermitePolynomial(order):
+    return (1.0 if (order == 0.0) else (X if (order == 1.0) else (_rt.lpow(X, 2.0) - 1.0)))
+
+def hermite(order, x):
+    return _rt._proj((hermitePolynomial(order)), 'eval')(x)
+
+def hermiteWeight(order):
+    return (2.0 if (order == 2.0) else 1.0)
+
+def tensorCombination(degree, coefficient, x):
+    return sum((_rt.mul(coefficient[int(i)], tensorHermite((degree(i)), x))) for i in range(int(_rt.sumdim('i', len(coefficient), len(degree)))))
 
 def Bag(D):
     return Quotient((panelSetoid(D)))
@@ -5189,6 +5207,15 @@ def labels(liabilities):
 
 def outcomeLaw(mean, variance):
     return labelLaw(((lambda i: Descent_Portability_ProbitTrainingLaw_caseProbability((mean[int(i)]), (variance(i))))), ((lambda i: caseProbability_bounds((mean[int(i)]), (variance(i))))))
+
+def markMass(η, z):
+    return (η if z else (1.0 - η))
+
+def markedDensity(η, v, θ, z, y):
+    return (markMass(η, z) * gaussianPDFReal(((θ if z else 0.0)), v, y))
+
+def erasedDensity(η, v, θ, y):
+    return ((((1.0 - η)) * gaussianPDFReal(0.0, v, y)) + (η * gaussianPDFReal(θ, v, y)))
 
 def rareVariantSharingApproximation(Ne, p):
     return pgsDriftVariance_one_pop(p, Ne)
