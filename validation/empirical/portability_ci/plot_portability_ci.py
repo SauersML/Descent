@@ -145,7 +145,8 @@ def plot(summaries, metric, filename):
     title = "Polygenic score accuracy retained away from training" if metric == "ratio" else "Polygenic score accuracy away from training"
     fig.suptitle(title, x=.085, y=.965, ha="left", fontsize=19, fontweight="bold")
     fig.text(.085, .904, "Held-out squared correlation with true liability · phenoA · real GWAS + clumping + thresholding", fontsize=10.7)
-    fig.text(.085, .858, "Mean across 11 recovered runs per demography; bars and shading: pointwise 95% bootstrap CIs", fontsize=10.5, color="#596272")
+    interval_label = "bootstrap intervals" if metric == "ratio" else "bootstrap CIs"
+    fig.text(.085, .858, f"Mean across 11 recovered runs per demography; bars and shading: pointwise 95% {interval_label}", fontsize=10.5, color="#596272")
     all_upper = [r["ci95_high"] for r in summaries if r["metric"] == metric]
     for ax, (dem, label, color, marker) in zip(axes, [
         ("grid2d", "2-D grid", "#c0453b", "o"),
@@ -178,7 +179,10 @@ def plot(summaries, metric, filename):
     axes[0].set_ylabel("Accuracy ratio: target R² / training-population R²" if metric == "ratio" else "Squared correlation (R²)", labelpad=12)
     fig.text(.018, .13, "Runs:", fontsize=9, color="#6a717b")
     fig.text(.085, .077, "Entire runs are resampled together. Deme ratios are averaged within each run and distance, then across runs.", fontsize=9, color="#596272")
-    fig.text(.085, .040, "Far distances occur in fewer runs (counts above); intervals there are less reliable. CIs describe the mean, not the spread of individual runs.", fontsize=9, color="#596272")
+    footer = ("Descriptive resampling intervals: the continuous model's positive-distance ratio mean is infinite. See the expectation derivation."
+              if metric == "ratio" else
+              "Far distances occur in fewer runs (counts above); intervals there are less reliable. CIs describe the mean, not the spread of individual runs.")
+    fig.text(.085, .040, footer, fontsize=9, color="#596272")
     fig.savefig(ROOT / f"{filename}.png", dpi=220)
     fig.savefig(ROOT / f"{filename}.pdf")
     plt.close(fig)
@@ -198,6 +202,7 @@ def main():
         averaging="mean of target/source R2 ratios within seed and distance; equal-weight mean of available seeds",
         distance_conditioning="only runs containing a target at this distance contribute",
         limitation="11 recoverable runs per demography; far distances have fewer contributing runs; not simultaneous confidence bands",
+        ratio_expectation="infinite at positive distances under the specified continuous Gaussian model and checked P+T implementation; ratio bootstrap bars are descriptive recovered-run intervals, not finite-mean CIs for that model; see ../portability_expectation/SUPPORT.md",
         seeds=sorted({r["seed"] for r in records}),
         missing_summaries_for_metadata_seeds=list(range(11, 96)),
         original_image="best4_rawpgs_vs_fst.png was a migration sweep; this artifact is the requested within-history distance curve, not that image with added error bars",

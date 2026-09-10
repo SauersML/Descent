@@ -1,0 +1,42 @@
+{
+  "snapshot": "/projects/standard/hsiehph/sauer354/.snapshot/snapshot_2026-08-16_00_00_00_UTC/gnomon/sims/ancestry_calibration",
+  "snapshot_hash_match_verified": "2026-09-10",
+  "sources": [
+    {
+      "path": "/Users/user/gnomon/sims/ancestry_calibration/gen_real_pt.py",
+      "sha256": "53e677c1f756aa15c36506fcea6b7ce14db27fabe6e1a4a1bec659b438e2c9ba"
+    },
+    {
+      "path": "/Users/user/gnomon/sims/ancestry_calibration/stream_geno.py",
+      "sha256": "8a87fa798f6c680cd52b86a25251894a1576201ea7114c7e98ceb7726fdf02c4"
+    }
+  ],
+  "endpoint": "held-out within-deme squared Pearson correlation with true_liab; mean target/source ratio within run and distance, then across runs containing that distance",
+  "mathematical_model": "independent ideal random draws, Gaussian effects and probit environmental labels; fixed deterministic PCA and P+T maps",
+  "machine_seed_model": "distinct; requires specified seed weights, binaries, dependencies and numerical semantics",
+  "derivation_status": "analytical branch law and complete branch integrability classification; positive-support learner witnesses establish divergent positive-distance expectations for the specified continuous model; not formalized in Lean",
+  "source_encoding": "sum haploid allele indices for causal/PCA matrices; clip those sums to [0,2] for BED encoding",
+  "metric_scaling": "global liability and score affine transformations cancel in Pearson correlation; liability epsilon retained in label likelihood",
+  "not_recovered": [
+    "causal genotype matrices for the archived runs",
+    "causal site IDs and exact causal count from those runs",
+    "causal effect vectors",
+    "selected score weight vectors",
+    "complete historical Python package versions",
+    "historical PLINK2 binary identity"
+  ],
+  "not_established": [
+    "exact numerical demographic branch weights (positivity is sufficient for divergence)",
+    "bit-for-bit historical mathematical/executable equivalence",
+    "random retention mechanism for surviving run summaries",
+    "finite laws for other portability estimands"
+  ],
+  "established": [
+    "positive-support genotype/label branches with successful checked P+T execution in grid2d and serial1d",
+    "exact rational nonparallel covariance certificates for all 44 targets",
+    "ideal continuous-model ratio expectation: 1 at zero distance, +infinity at all positive distances",
+    "actual fixed float32 causal design retained in the certificates"
+  ],
+  "checked_causal_count": 150,
+  "branch_evidence": "branch_witnesses.tar.gz and branch_verification.json"
+}

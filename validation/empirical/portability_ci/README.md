@@ -23,6 +23,14 @@ change across distances.
 
 ## Confidence intervals
 
+**Interpretation update:** the [expectation derivation](../portability_expectation/README.md)
+shows that the unmodified ratio has an infinite mean at positive distances in
+the specified continuous Gaussian version of this simulator. The result uses
+the recovered default causal count and checked P+T implementation, not a claim
+about an infinite average over finite machine seeds. Consequently the ratio
+bars here are descriptive bootstrap intervals for the recovered-run means;
+they are not confidence intervals for a finite mean of that ideal model.
+
 Bars and shading are pointwise 95% percentile bootstrap confidence intervals
 from 50,000 resamples, with RNG seed 20260910. Resampling is by complete simulation
 run within demography, keeping populations that share the trained score and
@@ -30,8 +38,10 @@ source denominator together. For a distance absent from an entire bootstrap
 sample, that sample does not contribute to that distance's percentile estimate;
 the exact count is recorded in `confidence_intervals.csv`.
 
-These are approximate confidence intervals for the mean, not prediction intervals
-for individual runs, simultaneous confidence bands, or exact theoretical bounds.
+These intervals are not prediction intervals for individual runs, simultaneous
+confidence bands, or exact theoretical bounds. The absolute-accuracy endpoint
+is bounded; its bars retain the usual approximate bootstrap interpretation,
+subject to the small sample and recovery limitations below.
 The farthest grid distance has only two recovered runs; its interval is especially
 unreliable with so few independent observations. The recovered runs are an available
 subset, not a newly generated or prospectively selected simulation batch. No claim
