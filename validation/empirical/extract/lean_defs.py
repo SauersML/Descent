@@ -3138,6 +3138,9 @@ def certifiedBound(u, V, εu, εV, a):
     I = float(len(u))
     return _rt.add(_rt.add(coordinateRisk(u, V, a), _rt.mul(_rt.mul((_rt.sumdim('I', len(u), len(V), len(a))), εV), (sum((_rt.lpow(a[int(i)], 2.0)) for i in range(int(len(u))))))), _rt.mul(_rt.mul(2.0, εu), sum((_rt.rabs(a[int(i)])) for i in range(int(len(u))))))
 
+def shiftPolynomial(δ):
+    return eval_2Hom(C, ((lambda i: _rt.add(X(i), C((δ[int(i)]))))))
+
 def code(*_a):
     if len(_a) < 1:
         return lambda *_b: code(*(_a + _b))
@@ -3427,6 +3430,12 @@ def phenotypeMean(f, p):
 
 def additiveEffect(f, p, hp, i):
     return _rt.rdiv(_rt._proj((Descent_Portability_DiploidEffectLaw_genotypeLaw(p, hp)), 'covariance')(((lambda g: (g(i)))), f), (_rt.mul(_rt.mul(2.0, p[int(i)]), (_rt.sub(1.0, p[int(i)])))))
+
+def Trajectory(I):
+    return lp(((lambda _, ℕ: EuclideanSpace(ℝ, I))), 2.0)
+
+def Descent_Portability_DiscountedForecastMinimax_forecastOperator(kernel, reports, discount, hnonneg, hlt, residual):
+    return _rt._proj((forecastLinear(kernel, reports, discount, hnonneg, hlt, residual)), 'toContinuousLinearMap')
 
 def transported(kernel, matrix, time):
     return _rt.mul(_rt.mul(_rt.lpow(kernelMatrix(kernel), time), matrix), _rt._proj((_rt.lpow(kernelMatrix(kernel), time)), 'transpose'))
@@ -3836,6 +3845,15 @@ def phenotypeMarginalLogitShift(input, predictedPrevalence, rung):
 def expectedR2FromN(n, h2, M):
     return (h2 * (_rt.rdiv((n * h2), (((n * h2) + M)))))
 
+def Descent_Portability_EvolutionaryForecastMinimax_forecastOperator(reports, weights, residual):
+    return euclideanOperator((_rt.mul(trajectoryMatrix(reports, weights), residual)))
+
+def metricFeatures(report, metric):
+    return (lambda state: _rt.VecFn([1.0, _rt._proj((report(state)), 'definedMass')(metric), _rt._proj((report(state)), 'weightedDefinedMetric')(metric)]))
+
+def transitionMatrix(evolve):
+    return (lambda state, next: _rt._proj((evolve(state)), 'mass')(next))
+
 def gramian(reports, weights):
     return sum((_rt.mul(weights[int(time)], (_rt.mul(reports(time), _rt._proj((reports(time)), 'transpose'))))) for time in range(int(len(weights))))
 
@@ -3933,6 +3951,9 @@ def Descent_Portability_FiniteHorizonLoss_risk(law, kernel, report, predictor):
 
 def Stationary(law, kernel):
     return all((sum((((_rt._proj(law, 'mass')(source) * _rt._proj((kernel(source)), 'mass')(target)) == _rt._proj(law, 'mass')(target))) for source in range(int(_rt.sumdim('source', len(_rt._proj(law, 'mass')), len(kernel)))))) for target in range(int(_rt.sumdim('target', len(_rt._proj((kernel(source)), 'mass')), len(_rt._proj(law, 'mass'))))))
+
+def memoryTerm(feedback, coupling, hidden, retained, time, lag):
+    return feedback(((_rt.lpow(hidden, lag))((coupling((retained((((time - 1.0) - lag)))))))))
 
 def pairing(f, p):
     return sum((_rt.mul(f[int(state)], p[int(state)])) for state in range(int(len(f))))
@@ -5805,6 +5826,12 @@ def Descent_Portability_TrainingNoiseAccuracy_definedProbability(probability, re
 
 def conditionalExpectation(probability, readout):
     return (none if (Descent_Portability_TrainingNoiseAccuracy_definedProbability(probability, readout) == 0.0) else some((_rt.rdiv(Descent_Portability_TrainingNoiseAccuracy_numerator(probability, readout), Descent_Portability_TrainingNoiseAccuracy_definedProbability(probability, readout)))))
+
+def Descent_Portability_TraitPortabilityRange_sign(b):
+    return (1.0 if b else (-1.0))
+
+def alignedWorld(rho, noiseVariance):
+    return architectureWorld(rho, (_rt.rsqrt(((1.0 - _rt.lpow(rho, 2.0))))), (_rt.rsqrt(noiseVariance)))
 
 def pcaSignalLossPenalty(signalBaseline, signalRetained, lossWeight):
     return (lossWeight * ((signalBaseline - signalRetained)))

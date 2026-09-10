@@ -221,6 +221,13 @@ import Descent.Portability.RadialPotentialLaw
 import Descent.Portability.BoxDifferentialLaw
 import Descent.Portability.TightAlgebraConvergence
 
+import Descent.Portability.MeasurementRankLaw
+import Descent.Portability.TightCharacteristicConvergence
+import Descent.Portability.SecondMomentTightness
+import Descent.Portability.FiniteAtomicReportMeasure
+import Descent.Portability.BalancedHWEGaussianWeakLimit
+import Descent.Portability.BoxPolynomialExtensionLaw
+
 assert_below Descent.Program
 
 /-!
