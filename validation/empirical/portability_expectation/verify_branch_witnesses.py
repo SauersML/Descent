@@ -88,7 +88,7 @@ def verify(archive, demography):
         "common_source_zero_direction_first_two_coordinates": list(map(str, pole)),
         "all_target_covariances_nonzero_at_source_zero_direction": True,
         "distance_zero_ratio": 1,
-        "positive_distances_with_divergent_ideal_expectation": sorted({t["distance"] for t in cert["targets"]}),
+        "positive_distances_with_nonparallel_covariance_witnesses": sorted({t["distance"] for t in cert["targets"]}),
         "panel_sha256": cert["panel_sha256"],
     }
 
@@ -104,7 +104,7 @@ def main():
             "status": "passed",
             "archive_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
             "certificates": [verify(archive, dem) for dem in ("serial1d", "grid2d")],
-            "scope": "exact geometry of checked learner outputs; positive demographic support and divergence are proved analytically in SUPPORT.md and DERIVATION.md",
+            "scope": "constructed-panel geometry only; does not verify demographic support, experimental-model equivalence, or an expected portability curve; see AUDIT.md",
         }
     (ROOT / "branch_verification.json").write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps(result, indent=2))

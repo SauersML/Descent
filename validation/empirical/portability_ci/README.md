@@ -23,15 +23,15 @@ change across distances.
 
 ## Confidence intervals
 
-**Interpretation update:** the [expectation derivation](../portability_expectation/README.md)
-shows that the unmodified ratio has an infinite mean at positive distances in
-the specified continuous Gaussian version of this simulator. The result uses
-the recovered default causal count and checked P+T implementation, not a claim
-about an infinite average over finite machine seeds. Consequently the ratio
-bars here are descriptive bootstrap intervals for the recovered-run means;
-they are not confidence intervals for a finite mean of that ideal model.
+**Correction:** the claim that the expectation relevant to this figure had been
+established as infinite is withdrawn. The [audit](../portability_expectation/AUDIT.md)
+explains the gap between the conditional ratio analysis and the requested
+simulation law. No exact demographic prediction has been derived. The ratio
+bars describe bootstrap resampling of the recovered-run means; a population
+confidence-interval interpretation requires appropriate sampling and moment
+assumptions that have not been established for these retained files.
 
-Bars and shading are pointwise 95% percentile bootstrap confidence intervals
+Bars and shading are pointwise 95% percentile bootstrap intervals
 from 50,000 resamples, with RNG seed 20260910. Resampling is by complete simulation
 run within demography, keeping populations that share the trained score and
 source denominator together. For a distance absent from an entire bootstrap

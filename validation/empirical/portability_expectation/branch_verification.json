@@ -12,7 +12,7 @@
       ],
       "all_target_covariances_nonzero_at_source_zero_direction": true,
       "distance_zero_ratio": 1,
-      "positive_distances_with_divergent_ideal_expectation": [
+      "positive_distances_with_nonparallel_covariance_witnesses": [
         1,
         2,
         3,
@@ -35,7 +35,7 @@
       ],
       "all_target_covariances_nonzero_at_source_zero_direction": true,
       "distance_zero_ratio": 1,
-      "positive_distances_with_divergent_ideal_expectation": [
+      "positive_distances_with_nonparallel_covariance_witnesses": [
         1,
         2,
         3,
@@ -50,5 +50,5 @@
       "panel_sha256": "96d45dff52eae76467d95f3eea47255de533b47ee9c4f2eb76d87078a93dacca"
     }
   ],
-  "scope": "exact geometry of checked learner outputs; positive demographic support and divergence are proved analytically in SUPPORT.md and DERIVATION.md"
+  "scope": "constructed-panel geometry only; does not verify demographic support, experimental-model equivalence, or an expected portability curve; see AUDIT.md"
 }

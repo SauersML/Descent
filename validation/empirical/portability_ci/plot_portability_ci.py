@@ -179,7 +179,7 @@ def plot(summaries, metric, filename):
     axes[0].set_ylabel("Accuracy ratio: target R² / training-population R²" if metric == "ratio" else "Squared correlation (R²)", labelpad=12)
     fig.text(.018, .13, "Runs:", fontsize=9, color="#6a717b")
     fig.text(.085, .077, "Entire runs are resampled together. Deme ratios are averaged within each run and distance, then across runs.", fontsize=9, color="#596272")
-    footer = ("Descriptive resampling intervals: the continuous model's positive-distance ratio mean is infinite. See the expectation derivation."
+    footer = ("Descriptive bootstrap intervals for the recovered runs. An exact demographic prediction for this curve has not been derived."
               if metric == "ratio" else
               "Far distances occur in fewer runs (counts above); intervals there are less reliable. CIs describe the mean, not the spread of individual runs.")
     fig.text(.085, .040, footer, fontsize=9, color="#596272")
@@ -202,7 +202,7 @@ def main():
         averaging="mean of target/source R2 ratios within seed and distance; equal-weight mean of available seeds",
         distance_conditioning="only runs containing a target at this distance contribute",
         limitation="11 recoverable runs per demography; far distances have fewer contributing runs; not simultaneous confidence bands",
-        ratio_expectation="infinite at positive distances under the specified continuous Gaussian model and checked P+T implementation; ratio bootstrap bars are descriptive recovered-run intervals, not finite-mean CIs for that model; see ../portability_expectation/SUPPORT.md",
+        ratio_expectation="not established; previous completion and applicability claims withdrawn; bootstrap bars describe recovered-run resampling; see ../portability_expectation/AUDIT.md",
         seeds=sorted({r["seed"] for r in records}),
         missing_summaries_for_metadata_seeds=list(range(11, 96)),
         original_image="best4_rawpgs_vs_fst.png was a migration sweep; this artifact is the requested within-history distance curve, not that image with added error bars",

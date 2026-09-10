@@ -14,7 +14,7 @@
   "endpoint": "held-out within-deme squared Pearson correlation with true_liab; mean target/source ratio within run and distance, then across runs containing that distance",
   "mathematical_model": "independent ideal random draws, Gaussian effects and probit environmental labels; fixed deterministic PCA and P+T maps",
   "machine_seed_model": "distinct; requires specified seed weights, binaries, dependencies and numerical semantics",
-  "derivation_status": "analytical branch law and complete branch integrability classification; positive-support learner witnesses establish divergent positive-distance expectations for the specified continuous model; not formalized in Lean",
+  "derivation_status": "conditional ratio analysis; claim of completing the requested experimental expectation law withdrawn; see AUDIT.md",
   "source_encoding": "sum haploid allele indices for causal/PCA matrices; clip those sums to [0,2] for BED encoding",
   "metric_scaling": "global liability and score affine transformations cancel in Pearson correlation; liability epsilon retained in label likelihood",
   "not_recovered": [
@@ -26,17 +26,19 @@
     "historical PLINK2 binary identity"
   ],
   "not_established": [
-    "exact numerical demographic branch weights (positivity is sufficient for divergence)",
-    "bit-for-bit historical mathematical/executable equivalence",
-    "random retention mechanism for surviving run summaries",
-    "finite laws for other portability estimands"
+    "requested experimental expectation and conditioning contract",
+    "exact input-to-portability-curve prediction",
+    "applicability of the idealized divergence argument to that requested expectation",
+    "exact numerical demographic branch weights",
+    "historical mathematical/executable equivalence",
+    "random retention mechanism for surviving run summaries"
   ],
   "established": [
-    "positive-support genotype/label branches with successful checked P+T execution in grid2d and serial1d",
-    "exact rational nonparallel covariance certificates for all 44 targets",
-    "ideal continuous-model ratio expectation: 1 at zero distance, +infinity at all positive distances",
+    "successful recovered P+T routine execution on two constructed genotype/label panels",
+    "exact rational nonparallel covariance checks for the 44 targets in those constructed panels",
     "actual fixed float32 causal design retained in the certificates"
   ],
   "checked_causal_count": 150,
-  "branch_evidence": "branch_witnesses.tar.gz and branch_verification.json"
+  "branch_evidence": "branch_witnesses.tar.gz and branch_verification.json",
+  "completion_claim_withdrawn": true
 }

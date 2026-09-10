@@ -1,7 +1,7 @@
-"""Construct a positive-support genotype/label branch and run the recovered P+T.
+"""Construct a genotype/label panel and run the recovered P+T.
 
-This is a support witness for DERIVATION.md, not a typical demographic draw or
-an estimate of mean accuracy. The learner and BED writer are imported unchanged
+This checks constructed-panel geometry. It does not run the demographic
+generator or establish its expectation. The learner and BED writer are imported unchanged
 from the explicitly supplied, hash-checked archived source directory.
 """
 
@@ -137,7 +137,7 @@ def run(args):
         out / "panel.npz", dosage=dosage, causal_indices=causal_indices, causal_design=causal_design,
         score=score, labels=labels, pcs=pcs, coord=coord, distance=distance, split=split)
     certificate = {
-        "status": "all target branches certified",
+        "status": "all constructed-panel covariance minors verified",
         "demography": args.demography, "training_deme": int(training_deme),
         "n_individuals": n, "n_variants": n_variants, "n_causal": 150,
         "n_source_test": int(source_rows.sum()),
@@ -153,7 +153,7 @@ def run(args):
                      for name in ("numpy", "pandas", "scipy", "scikit-learn", "msprime", "tskit", "threadpoolctl")},
         "panel_sha256": sha256(out / "panel.npz"),
         "causal_design_semantics": "fixed float32 StandardScaler output, interpreted exactly in the continuous-effect readout",
-        "interpretation": "positive-support witness, not a typical draw or a mean estimate",
+        "interpretation": "constructed-panel geometry witness; does not establish demographic support or a simulation expectation law",
     }
     (out / "certificate.json").write_text(json.dumps(certificate, indent=2) + "\n")
     print(json.dumps(certificate, indent=2), flush=True)

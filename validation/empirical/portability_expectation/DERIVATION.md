@@ -1,5 +1,10 @@
 # Exact conditional law and integrability of the simulator's accuracy ratio
 
+**Scope correction:** these are conditional mathematical calculations. The
+claim that they completed the user's requested simulation law is withdrawn;
+see [AUDIT.md](AUDIT.md). Their connection to the intended experimental
+expectation and normalization has not been established.
+
 ## 1. Experiment and meaning of expectation
 
 The inspected generator is `gnomon/sims/ancestry_calibration/gen_real_pt.py`,
@@ -320,11 +325,12 @@ weight vectors. It also does not fully pin historical numerical dependencies
 and the PLINK2 binary. This prevents reconstructing those particular branches
 from the summaries or asserting bit-for-bit historical equivalence.
 
-[SUPPORT.md](SUPPORT.md) resolves the ideal-model finiteness question by a
-different, explicit route: construct positive-support genotype/label branches,
+[SUPPORT.md](SUPPORT.md) gives an ideal-model support argument by a
+different route: construct genotype/label branches,
 execute the unmodified P+T code with pinned binaries/packages, and certify the
 nonparallel covariance geometry exactly. Their positive probabilities suffice
 to evaluate (7) as +∞ at every positive distance, without calculating those
-probabilities numerically. Predicting a different, finite endpoint still requires
-the demographic integration; no claim to have solved all portability metrics
-follows from this divergence result.
+probabilities numerically, if that support argument and idealization apply.
+This does not establish the requested experimental law or settle which
+normalization belongs in it. Demographic integration and a justified connection
+to the experimental target remain outstanding.

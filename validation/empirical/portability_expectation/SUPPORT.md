@@ -1,6 +1,13 @@
-# Applying the divergence theorem to both demographic configurations
+# Constructed-panel support argument under an idealized model
 
-## Result and scope
+**Status correction:** this conditional argument was incorrectly presented as
+completion of the requested simulation expectation law. That claim is
+withdrawn. The numerical certificates check constructed panels, and equivalence
+of this idealized model to the intended experimental expectation has not been
+established. See [AUDIT.md](AUDIT.md). The argument below is retained for review;
+it is not a validated prediction for the recovered simulation curve.
+
+## Conditional conclusion and scope
 
 For the continuous Gaussian-effect/probit-label model defined in
 [DERIVATION.md](DERIVATION.md), with the recovered default 150 causal variants
@@ -147,9 +154,9 @@ by a positive probability and cannot make this numerator finite.
 
 ## 4. What this answers
 
-The ideal model does have an exact answer for the requested expectation: its
-positive-distance entries are infinite. Thus a finite smooth curve cannot be
-the mean of this unmodified ratio in that model. Even a very long finite batch
+Under the assumptions and support argument in these notes, the candidate
+conclusion is divergence of the particular idealized random ratio. This does
+not establish the requested experimental expectation. Even a very long finite batch
 can entirely miss the rare branches responsible for this result. The theorem
 does not quantify how many runs would encounter them or predict the typical
 observed curve.

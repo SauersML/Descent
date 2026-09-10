@@ -98,7 +98,7 @@
   "averaging": "mean of target/source R2 ratios within seed and distance; equal-weight mean of available seeds",
   "distance_conditioning": "only runs containing a target at this distance contribute",
   "limitation": "11 recoverable runs per demography; far distances have fewer contributing runs; not simultaneous confidence bands",
-  "ratio_expectation": "infinite at positive distances under the specified continuous Gaussian model and checked P+T implementation; ratio bootstrap bars are descriptive recovered-run intervals, not finite-mean CIs for that model; see ../portability_expectation/SUPPORT.md",
+  "ratio_expectation": "not established; previous completion and applicability claims withdrawn; bootstrap bars describe recovered-run resampling; see ../portability_expectation/AUDIT.md",
   "seeds": [
     1,
     2,

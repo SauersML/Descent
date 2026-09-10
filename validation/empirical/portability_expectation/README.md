@@ -1,4 +1,10 @@
-# Expected accuracy ratio for the recovered simulator
+# Conditional ratio analysis — requested portability law not established
+
+**Correction:** the earlier claim that this work completed the requested exact
+law was unjustified and is withdrawn. The work below concerns a singularity
+of a particular idealized random ratio. It has not produced an exact predictive
+law from the simulation's demographic, environmental, and training inputs to
+the portability curve. See [AUDIT.md](AUDIT.md).
 
 The target is the expected **within-run target/source held-out squared-correlation
 ratio**, averaged over demes at each distance, as in
@@ -10,17 +16,17 @@ the finite training-label outcomes with their correct effect-dependent
 probabilities, and proves a complete finiteness criterion for each fixed
 genotype/training-label branch of the stated continuous Gaussian model.
 
-The result for the specified continuous Gaussian model is **one at distance
-zero and infinite at every positive distance**, for both the chain and grid.
-[SUPPORT.md](SUPPORT.md) proves that constructed genotype/label panels have
-positive probability under the demographic generator and connects them to
-successful executions of the recovered P+T routine. Exact rational geometry
-certificates cover all nine chain targets and all 35 grid targets.
+[SUPPORT.md](SUPPORT.md) records a conditional support argument for constructed
+genotype/label panels and successful executions of the recovered P+T routine.
+Exact rational geometry checks cover nine targets in one constructed chain
+panel and 35 targets in one constructed grid panel. These are not 44 validations
+of a demographic prediction against recovered simulation runs.
 
-Near-zero random source accuracy makes the mean ratio diverge. Neither an
-infinite variance of effects nor a positive probability of an undefined metric
-is necessary. This explains why a finite observed curve and finite bootstrap
-intervals do not establish a finite theoretical expectation of the ratio.
+The conditional analysis identifies assumptions under which a random source
+denominator can make a ratio's expectation diverge. Whether that is the right
+probability model and conditioning for the user's requested law was not
+established. The figure therefore carries no claim that its underlying
+expectation has been proved infinite.
 
 This is an analytical result with checked numerical branch certificates, not
 a Lean-checked end-to-end theorem. It uses the recovered default of 150 causal
