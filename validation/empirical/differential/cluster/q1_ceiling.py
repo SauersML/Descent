@@ -9,9 +9,10 @@ Deprivation Index explains a comparable 0.02-0.53%. The paper reads these as
 comparably weak.
 
 The outcome is a squared residual for ONE individual -- a single draw. Most of
-its variance is irreducible noise that no covariate can touch, so there is a
-CEILING on what any predictor can explain, and 100% is not it. This computes
-the ceiling.
+its variance CAN be conditional noise that a distance-only predictor cannot
+explain. This computes conditional model examples, not an empirical ceiling.
+The residual moments must come from the same individual prediction and
+residualization procedure. Bin-level partial R2 does not supply those moments.
 
 THE DERIVATION
     Let r be the prediction residual for an individual with covariates x, and
@@ -54,12 +55,10 @@ HONEST IN BOTH DIRECTIONS
     weak, and the paper is right as stated. The noise model is fixed BEFORE
     looking at where the answer lands, and both branches are reported.
 
-    A specific way this argument could die: if the implied ceiling comes out
-    BELOW the reported 0.51%, then the spline is explaining more than the
-    conditional-variance channel allows, which would mean the mean of the
-    residual also moves with distance (a bias, not a variance effect) or the
-    reported figure is optimistic. That outcome is reported as such rather than
-    absorbed.
+    A scenario below 0.51% only shows that scenario does not reproduce the
+    reported value. It does not identify bias, outcome heterogeneity, optimism,
+    or any other empirical mechanism. The distributional assumptions and the
+    connection between population and fitted R2 would first need validation.
 
 CONTROLS PINNED BY THEORY
     C1  Homoscedastic null. With s2(x) constant, v = 0 and the ceiling is
@@ -89,38 +88,33 @@ def ceiling_analytic(v, kappa=3.0):
     return v * v / ((kappa - 1.0) * (1.0 + v * v) + v * v)
 
 
-def v_from_r2_decline(r2_near, r2_far, shape="uniform"):
-    """Coefficient of variation of s2(x) implied by an R^2 decline with distance.
+def uniform_variance_scenario(r2_near, r2_far):
+    """CV in a hypothetical uniform conditional-error-variance scenario.
 
-    If Var(y) = 1 then the conditional error variance is s2 = 1 - R2(x), so a
-    decline in R2 across the cohort induces spread in s2. This is the ONLY
-    place the paper's numbers enter the ceiling, and it is deliberately
-    conservative: it assumes the entire R^2 decline is realised across the
-    sample, which maximises v and therefore maximises the ceiling. A larger
-    ceiling makes the argument HARDER, not easier.
+    The substitution s2=1-R2 requires unit within-cell outcome variance and
+    the corresponding within-cell optimal affine prediction. It cannot be
+    applied automatically to a fixed deployed score or to partial R2 from a
+    different residualization. A uniform law does not maximize CV on an interval.
     """
-    if shape == "uniform":
-        lo, hi = 1.0 - r2_near, 1.0 - r2_far
-        mean = 0.5 * (lo + hi)
-        sd = abs(hi - lo) / np.sqrt(12.0)
-        return sd / mean
-    raise ValueError(shape)
+    lo, hi = 1.0 - r2_near, 1.0 - r2_far
+    if not 0 < lo <= hi:
+        raise ValueError("Require 0 < 1-r2_near <= 1-r2_far")
+    mean = 0.5 * (lo + hi)
+    sd = (hi - lo) / np.sqrt(12.0)
+    return sd / mean
 
 
-def simulate(v, n=N_PRED, reps=REPS, kappa_gauss=True, rng=None):
+def simulate(v, n=N_PRED, reps=REPS, rng=None):
     """Empirical ceiling and the two controls, at the paper's sample size."""
+    if not 0 <= v < 1 / np.sqrt(3.0):
+        raise ValueError("Uniform conditional variances must stay strictly positive")
     rng = rng or np.random.default_rng(SEED)
     oracle_r2, null_r2 = [], []
     for _ in range(reps):
         # covariate x -> conditional error variance s2(x), CV = v
         x = rng.uniform(0.0, 1.0, n)
         s2 = 1.0 + v * np.sqrt(12.0) * (x - 0.5)      # uniform, CV = v exactly
-        s2 = np.clip(s2, 1e-9, None)
-        if kappa_gauss:
-            r = rng.normal(0.0, np.sqrt(s2))
-        else:
-            df = 6.0                                   # heavier tails
-            r = rng.standard_t(df, n) * np.sqrt(s2 * (df - 2.0) / df)
+        r = rng.normal(0.0, np.sqrt(s2))
         y = r * r
 
         # ORACLE predictor: the true conditional mean of y given x.
@@ -189,9 +183,9 @@ def main():
               % (g["cv_of_conditional_variance"], g["ceiling_gaussian"],
                  g["ceiling_kurtosis_6"]))
 
-    # --- v implied by published R^2 declines --------------------------------
+    # --- illustrative uniform-variance scenarios ----------------------------
     print("")
-    print("v IMPLIED BY AN R^2 DECLINE ACROSS THE COHORT, AND THE CEILING")
+    print("HYPOTHETICAL UNIFORM VARIANCE SCENARIOS; NOT ESTIMATED COHORT MOMENTS")
     print("  %-22s %-8s %-10s %-12s %s"
           % ("trait scenario", "v", "ceiling", "reported", "reported/ceiling"))
     scen = [("height 0.15 -> 0.05", 0.15, 0.05, 0.0051),
@@ -200,7 +194,7 @@ def main():
             ("weak decline 0.10 -> 0.08", 0.10, 0.08, 0.0051)]
     rows = []
     for name, a, b, rep in scen:
-        v = v_from_r2_decline(a, b)
+        v = uniform_variance_scenario(a, b)
         c = ceiling_analytic(v, 3.0)
         rows.append({"scenario": name, "r2_near": a, "r2_far": b,
                      "v_implied": v, "ceiling": c,
@@ -211,13 +205,13 @@ def main():
                  ("%.2f" % (rep / c)) if c > 0 else "n/a"))
     out["scenarios"] = rows
 
-    # --- the reported value exceeds the pure-variance ceiling -------------
+    # --- conditional bias examples, without empirical attribution ----------
     print("")
-    print("THE REPORTED 0.51% EXCEEDS THE PURE-VARIANCE CEILING")
-    print("  Under the most generous plausible decline (0.30 -> 0.05) the")
-    print("  ceiling is 0.378%%, and the reported figure is 0.51%%. A spline")
-    print("  cannot explain more of the squared residual than the conditional")
-    print("  variance channel allows, so a second channel must be carrying it.")
+    print("THE SCENARIOS DO NOT IDENTIFY THE PAPER'S EMPIRICAL EXPLANATION")
+    print("  Their moments and residualization have not been established for")
+    print("  the paper's individual residuals. In-sample fitted R2 is also")
+    print("  distinct from population oracle R2. The following bias examples")
+    print("  assume a centered uniform bias and independent symmetric noise.")
     print("")
     print("  If the residual MEAN moves with distance -- a distance-dependent")
     print("  calibration bias rather than an accuracy loss -- the explainable")
@@ -233,7 +227,7 @@ def main():
     print("")
     print("  Residual-mean spread required to produce R^2 = 0.51%%: B = %.4f"
           % B_needed)
-    print("  i.e. a distance-dependent bias of about %.2f outcome SDs." % B_needed)
+    print("  i.e. bias SD %.2f in the model's unit residual-noise scale." % B_needed)
     out["bias_channel"] = {"rows": bias_rows,
                            "bias_sd_needed_for_reported": B_needed}
 

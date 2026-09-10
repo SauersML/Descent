@@ -1,0 +1,32 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.IndividualLossMoments
+import Descent.Portability.MechanismIdentification
+import Descent.Portability.ThresholdPolicyTransport
+
+/-! Kernel axiom audit of the three-question results and their probability witnesses. -/
+
+#print axioms Descent.Portability.IndividualLossMoments.total_variance
+#print axioms Descent.Portability.IndividualLossMoments.squared_loss_between_decomposition
+#print axioms Descent.Portability.IndividualLossMoments.squared_loss_total
+#print axioms Descent.Portability.IndividualLossMoments.squared_loss_risk_decomposition
+#print axioms Descent.Portability.IndividualLossMoments.fitted_squared_loss_r2_gap
+#print axioms Descent.Portability.IndividualLossMoments.fitted_squared_loss_r2_le_oracle
+#print axioms Descent.Portability.IndividualLossMoments.gaussian_style_loss_variance
+#print axioms Descent.Portability.IndividualLossMoments.gaussian_style_explainable_fraction
+#print axioms Descent.Portability.IndividualLossMoments.sharp_interval_cv_squared
+#print axioms Descent.Portability.IndividualLossMoments.sharp_interval_cv_attained
+#print axioms Descent.Portability.IndividualLossMoments.signed_variance_does_not_determine_squared_bias
+#print axioms Descent.Portability.MechanismIdentification.complete_observational_equivalence
+#print axioms Descent.Portability.MechanismIdentification.standardized_orthogonal_worlds
+#print axioms Descent.Portability.MechanismIdentification.different_tagging_and_effects
+#print axioms Descent.Portability.MechanismIdentification.common_accuracy
+#print axioms Descent.Portability.MechanismIdentification.causal_effect_not_identified
+#print axioms Descent.Portability.MechanismIdentification.causal_observation_separates
+#print axioms Descent.Portability.MechanismIdentification.matched_signal_different_flip_rates
+#print axioms Descent.Portability.MechanismIdentification.score_construction_changes_accuracy
+#print axioms Descent.Portability.ThresholdPolicyTransport.source_f1_optimum
+#print axioms Descent.Portability.ThresholdPolicyTransport.transported_operating_point
+#print axioms Descent.Portability.ThresholdPolicyTransport.clinical_ranking_reverses
+#print axioms Descent.Portability.ThresholdPolicyTransport.clinical_choice_iff

@@ -72,7 +72,7 @@ theorem inverseQuadratic_fderiv (U : F →L[ℝ] E) (M : F →L[ℝ] E →L[ℝ]
   change fderiv ℝ (fun y => ⟪U y, a y⟫) x d = _
   rw [hq.fderiv]
   change ⟪U x, fderiv ℝ a x d⟫ + ⟪U d, a x⟫ = _
-  rw [real_inner_comm (a x) (U d)] at hinner
+  rw [real_inner_comm (U d) (a x)] at hinner
   dsimp [a] at *
   linarith
 
@@ -94,6 +94,7 @@ structure PositiveMoment (E : Type*) [NormedAddCommGroup E] [InnerProductSpace �
   symmetric : ∀ x y, ⟪x, op y⟫ = ⟪op x, y⟫
   positive : ∀ x, x ≠ 0 → 0 < ⟪x, op x⟫
 
+omit [CompleteSpace E] [FiniteDimensional ℝ E] in
 lemma PositiveMoment.nonneg (V : PositiveMoment E) (x : E) : 0 ≤ ⟪x, V.op x⟫ := by
   by_cases hx : x = 0
   · simp [hx]
@@ -103,6 +104,7 @@ lemma PositiveMoment.nonneg (V : PositiveMoment E) (x : E) : 0 ≤ ⟪x, V.op x�
 def populationGain (u : E) (V : PositiveMoment E) (a : E) : ℝ :=
   2 * ⟪u, a⟫ - ⟪a, V.op a⟫
 
+omit [Nonempty G] in
 lemma simplex_positive_weight (w : G → ℝ) (hw : w ∈ stdSimplex ℝ G) :
     ∃ g, 0 < w g := by
   by_contra h
@@ -111,6 +113,7 @@ lemma simplex_positive_weight (w : G → ℝ) (hw : w ∈ stdSimplex ℝ G) :
   have := hw.2
   simp [hz] at this
 
+omit [CompleteSpace E] [Nonempty G] [FiniteDimensional ℝ E] in
 lemma mixture_symmetric (V : G → PositiveMoment E) (w : G → ℝ) (x y : E) :
     ⟪x, mixtureMap (fun g => (V g).op) w y⟫ =
       ⟪mixtureMap (fun g => (V g).op) w x, y⟫ := by
@@ -121,6 +124,7 @@ lemma mixture_symmetric (V : G → PositiveMoment E) (w : G → ℝ) (x y : E) :
   intro g _
   rw [(V g).symmetric]
 
+omit [CompleteSpace E] [Nonempty G] [FiniteDimensional ℝ E] in
 lemma mixture_positive (V : G → PositiveMoment E) (w : G → ℝ)
     (hw : w ∈ stdSimplex ℝ G) (x : E) (hx : x ≠ 0) :
     0 < ⟪x, mixtureMap (fun g => (V g).op) w x⟫ := by
@@ -139,9 +143,11 @@ lemma mixture_isUnit (V : G → PositiveMoment E) (w : G → ℝ)
     have hpos := mixture_positive V w hw (a - b) (sub_ne_zero.mpr hne)
     have hz : mixtureMap (fun g => (V g).op) w (a - b) = 0 := by
       rw [map_sub, hab, sub_self]
-    simp [hz] at hpos
+    rw [hz, inner_zero_right] at hpos
+    exact lt_irrefl 0 hpos
   exact ⟨hinj, LinearMap.injective_iff_surjective.mp hinj⟩
 
+omit [CompleteSpace E] [Nonempty G] [FiniteDimensional ℝ E] in
 lemma mixed_gain (u : G → E) (V : G → PositiveMoment E) (w : G → ℝ) (a : E) :
     (∑ g, w g * populationGain (u g) (V g) a) =
       2 * ⟪mixtureMap u w, a⟫ - ⟪a, mixtureMap (fun g => (V g).op) w a⟫ := by
@@ -170,9 +176,10 @@ lemma mixture_upper_bound (u : G → E) (V : G → PositiveMoment E) (w : G → 
   change 2 * ⟪mixtureMap u w, a⟫ - ⟪a, M a⟫ ≤ ⟪mixtureMap u w, b⟫
   rw [map_sub, inner_sub_left, inner_sub_right, inner_sub_right, hn,
     mixture_symmetric V w b a, hn] at hpos
-  rw [real_inner_comm a (mixtureMap u w), real_inner_comm b (mixtureMap u w)] at hpos
+  rw [real_inner_comm (mixtureMap u w) a, real_inner_comm (mixtureMap u w) b] at hpos
   linarith
 
+omit [Nonempty G] in
 @[simp] lemma mixtureMap_single (v : G → F) (g : G) [DecidableEq G] :
     mixtureMap v (Pi.single g 1) = v g := by
   simp [mixtureMap_apply, Pi.single_apply, ite_smul]
@@ -213,7 +220,7 @@ theorem least_favorable_mixture (u : G → E) (V : G → PositiveMoment E) :
     change 0 ≤ 2 * ⟪U (Pi.single g 1 - w), a⟫ - ⟪a, M (Pi.single g 1 - w) a⟫ at hder
     simp only [map_sub, U, M, mixtureMap_single, ContinuousLinearMap.sub_apply] at hder
     change 0 ≤ 2 * ⟪u g - U w, a⟫ - ⟪a, (V g).op a - M w a⟫ at hder
-    rw [inner_sub_left, inner_sub_right, hn, real_inner_comm a (U w)] at hder
+    rw [inner_sub_left, inner_sub_right, hn, real_inner_comm (U w) a] at hder
     change ⟪U w, a⟫ ≤ 2 * ⟪u g, a⟫ - ⟪a, (V g).op a⟫
     linarith
   refine ⟨w, hw, ⟨⟨w, hw, rfl⟩, ?_⟩, ⟨⟨a, hgain⟩, ?_⟩, hgain⟩

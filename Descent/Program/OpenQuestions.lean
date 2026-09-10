@@ -2,6 +2,9 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PortabilityDrift.PresentDayMetrics
+import Descent.Portability.IndividualLossMoments
+import Descent.Portability.MechanismIdentification
+import Descent.Portability.ThresholdPolicyTransport
 
 namespace Descent.Program
 
@@ -29,12 +32,28 @@ We also formalize sub-questions:
 
 ## What this file proves
 
-THE FILE IS NAMED FOR QUESTIONS IT DOES NOT ANSWER.  Almost every docstring below already
-says so, in the corpus's usual careful way: `omitted_variable_bias` proves "that adding a
-nonzero product to a number changes it", `af_variance_fraction_lt_one` proves that one of
-four positive fractions is under one, `sum_lt_sum_of_net_gain_on_subset` has "no loci and
-no variance" in it.  Each docstring states the distance between the name and the body, and
-that statement is the only record of it.
+The mathematical answers are distributed across the imported modules:
+
+* `IndividualLossMoments`: derives the individual squared-loss denominator from
+  conditional second and fourth moments, splits the predictable component into
+  conditional variance, squared bias, and their covariance, and derives the gap
+  between a fitted predictor and the oracle. It proves the sharp interval CV
+  bound and disproves recovery of squared-bias variance from signed variance alone.
+* `MechanismIdentification`: constructs tagging-loss and effect-change worlds
+  with identical complete scored-genotype/outcome observations and orthogonal
+  residuals. Consequently those observations cannot identify the causal effect.
+  A separate witness changes score construction while holding biology fixed.
+* `ThresholdPolicyTransport`: computes confusion matrices from individual scores
+  and outcomes, selects a source F1-optimal threshold, deploys it unchanged, and
+  proves that clinical preferences reverse with false-positive cost.
+* `PortabilityMasterTheorem`: exact transport, metric non-equivalence, and affine
+  recalibration laws. `Foundations.TransportIdentities` also gives the arbitrary
+  probability-space conditional variance results.
+
+These are exact identities and identification limits. They do not establish the
+paper's empirical residual moments, identify immune-specific evolutionary causes,
+or choose an application's costs. The elementary inequalities below retain their
+explicit hypotheses and do not supply those missing measurements.
 
 -/
 
@@ -110,9 +129,9 @@ theorem div_le_of_ge_one_sub_mul
   linarith [le_div_iff₀ h_varZ_pos |>.mpr (by linarith : (1 - δ) * varZ ≤ eVarZgivenD)]
 
 
-/-- **SES explains as much as genetic distance.**
-    If both covariates explain comparable fractions and their total
-    is bounded, each individual fraction must be small. -/
+/-- If two fractions are already known to be comparable and their sum bounded,
+each is bounded. This does not establish empirical comparability of SES and
+genetic distance. -/
 theorem comparable_covariates_both_small
     (r2_d r2_s B ε : ℝ)
     (h_comparable : r2_d ≤ r2_s + ε)

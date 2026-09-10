@@ -117,7 +117,6 @@ theorem clinical_choice_iff (lambda : ℝ) :
       decisionLoss (thresholdCells targetLaw score disease 3) lambda ↔ lambda ≤ 1 := by
   norm_num [decisionLoss, thresholdCells, decisionCells, targetLaw,
     score, disease, weightedExp_apply, Fin.sum_univ_four]
-  constructor <;> intro h <;> linarith
 
 end
 

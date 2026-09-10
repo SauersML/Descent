@@ -23,7 +23,7 @@ namespace Descent.Portability.MechanismIdentification
 
 open Foundations
 
-attribute [local simp] Matrix.cons_val_two Matrix.cons_val_three
+attribute [local simp] Matrix.cons_val_two Matrix.cons_val_three Core.innerSum
 
 noncomputable section
 
@@ -95,6 +95,41 @@ theorem causal_effect_not_identified :
   rw [complete_observational_equivalence.1, complete_observational_equivalence.2] at ht
   have := ht.symm.trans he
   norm_num [taggingWorld, effectWorld] at this
+
+/-- Observing the causal coordinate supplies a discriminator that the scored
+genotype/outcome law lacks. Its covariance with outcome differs in these worlds. -/
+theorem causal_observation_separates :
+    covariance taggingWorld.E (fun i ↦ taggingWorld.C i 0) taggingWorld.phenotype = 1 ∧
+      covariance effectWorld.E (fun i ↦ effectWorld.C i 0) effectWorld.phenotype = 3 / 5 := by
+  norm_num [covariance_eq_expect_mul_sub_means, DeploymentPopulation.phenotype,
+    causalSignal, dot, taggingWorld, effectWorld, marker, hidden,
+    uniformExp_apply, Fin.sum_univ_four]
+
+/-- Same-variance independent standardized loci give additive signal variance
+equal to squared effect mass. These two architectures have the same number of loci. -/
+def concentratedSignal : Fin 2 → ℝ := ![1, 7]
+def evenSignal : Fin 2 → ℝ := ![5, 5]
+
+/-- Centered replication noise is shared by both architectures. The true effects
+do not change between discovery and replication; discovery signs are positive. -/
+def replicationNoise (b : Bool) : ℝ := if b then 2 else -2
+
+def replicationFlipRate (beta : Fin 2 → ℝ) : ℝ :=
+  uniformExp (Fin 2 × Bool) (fun z ↦
+    if beta z.1 + replicationNoise z.2 < 0 then 1 else 0)
+
+/-- Matching total genetic signal and replication-noise variance does not match
+estimated sign-flip rates, even with no true turnover and the same locus count.
+This finite noise model is a counterexample to sufficiency, not a Gaussian fit
+or a reproduction of a discovery-selection pipeline. -/
+theorem matched_signal_different_flip_rates :
+    (∑ j, concentratedSignal j ^ 2) = 50 ∧ (∑ j, evenSignal j ^ 2) = 50 ∧
+      uniformExp Bool replicationNoise = 0 ∧
+      variance (uniformExp Bool) replicationNoise = 4 ∧
+      replicationFlipRate concentratedSignal = 1 / 4 ∧ replicationFlipRate evenSignal = 0 := by
+  norm_num [concentratedSignal, evenSignal, replicationNoise, replicationFlipRate,
+    variance_eq_expect_sq_sub_sq_mean, uniformExp_apply, Fintype.sum_prod_type,
+    Fintype.sum_bool, Fin.sum_univ_two]
 
 /-- Making both coordinates available leaves trait biology fixed while allowing
 different score construction rules to give different portability. -/

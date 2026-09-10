@@ -11,6 +11,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import shlex
 import subprocess
 import sys
@@ -36,9 +37,33 @@ def compile_remote(args):
         [str(project), str(mathlib / ".lake/build/lib/lean")]
         + [str(p / ".lake/build/lib/lean") for p in (mathlib / ".lake/packages").iterdir()]
     )
+    lean = str(Path(args.cache) / "lean424/bin/lean")
+
+    def ensure_dependency(module):
+        if module.startswith("Descent."):
+            directory = project
+            source = project / (module.replace(".", "/") + ".lean")
+            output = source.with_suffix(".olean")
+        elif module.startswith("Mathlib."):
+            directory = mathlib
+            source = mathlib / (module.replace(".", "/") + ".lean")
+            output = mathlib / ".lake/build/lib/lean" / (module.replace(".", "/") + ".olean")
+        else:
+            return
+        if output.exists():
+            return
+        for dependency in re.findall(r"^import\s+(\S+)", source.read_text(), re.M):
+            ensure_dependency(dependency)
+        output.parent.mkdir(parents=True, exist_ok=True)
+        print("Building missing dependency " + module, flush=True)
+        subprocess.run([lean, "-j", "2", "-M", "4096", "-o", str(output), str(source)],
+                       cwd=str(directory), env=environment, check=True)
+
     for source in args.sources:
+        for dependency in re.findall(r"^import\s+(\S+)", (project / source).read_text(), re.M):
+            ensure_dependency(dependency)
         print("Checking " + source, flush=True)
-        command = [str(Path(args.cache) / "lean424/bin/lean"), "-j", "2", "-M", "4096",
+        command = [lean, "-j", "2", "-M", "4096",
                    "-DautoImplicit=false", "-DrelaxedAutoImplicit=false",
                    "-o", source[:-5] + ".olean", source]
         subprocess.run(command, cwd=str(project), env=environment, check=True)

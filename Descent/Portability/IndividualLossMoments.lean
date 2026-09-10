@@ -86,6 +86,91 @@ theorem squared_loss_total (E : ExpFunctional D) (K : D → ExpFunctional Ω)
   rw [total_variance]
   simp only [variance_eq_expect_sq_sub_sq_mean, ← pow_mul]
 
+private theorem expected_square_shift (E : ExpFunctional Ω) (f : Ω → ℝ) (c : ℝ) :
+    E (fun ω ↦ (f ω - c) ^ 2) = variance E f + (E f - c) ^ 2 := by
+  have h : (fun ω ↦ (f ω - c) ^ 2) =
+      (fun ω ↦ f ω ^ 2) + (-2 * c) • f + (fun _ ↦ c ^ 2) := by
+    funext ω
+    simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
+    ring
+  rw [h, E.add_eval, E.add_eval, E.smul_eval, E.eval_const,
+    variance_eq_expect_sq_sub_sq_mean]
+  ring
+
+/-- The excess risk of any distance-only loss predictor is its squared distance
+from the conditional second moment. This derives the oracle property, rather
+than assuming that a fitted spline attains it. -/
+theorem squared_loss_risk_decomposition (E : ExpFunctional D)
+    (K : D → ExpFunctional Ω) (r : D × Ω → ℝ) (g : D → ℝ) :
+    mixture E K (fun z ↦ (r z ^ 2 - g z.1) ^ 2) =
+      E (fun d ↦ variance (K d) (fun ω ↦ r (d, ω) ^ 2)) +
+        E (fun d ↦ (K d (fun ω ↦ r (d, ω) ^ 2) - g d) ^ 2) := by
+  change E (fun d ↦ K d (fun ω ↦ (r (d, ω) ^ 2 - g d) ^ 2)) = _
+  simp only [expected_square_shift]
+  exact E.add_eval _ _
+
+/-- Population loss-R² of a fixed predictor equals the oracle fraction minus
+an approximation penalty. Data-dependent fitting requires a separate evaluation
+law; this theorem does not identify an in-sample spline R² with the oracle. -/
+theorem fitted_squared_loss_r2_gap (E : ExpFunctional D)
+    (K : D → ExpFunctional Ω) (r : D × Ω → ℝ) (g : D → ℝ)
+    (hpos : 0 < variance (mixture E K) (fun z ↦ r z ^ 2)) :
+    1 - mixture E K (fun z ↦ (r z ^ 2 - g z.1) ^ 2) /
+        variance (mixture E K) (fun z ↦ r z ^ 2) =
+      variance E (fun d ↦ K d (fun ω ↦ r (d, ω) ^ 2)) /
+          variance (mixture E K) (fun z ↦ r z ^ 2) -
+        E (fun d ↦ (K d (fun ω ↦ r (d, ω) ^ 2) - g d) ^ 2) /
+          variance (mixture E K) (fun z ↦ r z ^ 2) := by
+  rw [squared_loss_risk_decomposition]
+  have ht := total_variance E K (fun z ↦ r z ^ 2)
+  field_simp
+  linarith
+
+/-- An ideal distance-only predictor bounds the population R² of every such
+fixed fitted predictor, with no Gaussian hypothesis. -/
+theorem fitted_squared_loss_r2_le_oracle (E : ExpFunctional D)
+    (K : D → ExpFunctional Ω) (r : D × Ω → ℝ) (g : D → ℝ)
+    (hpos : 0 < variance (mixture E K) (fun z ↦ r z ^ 2)) :
+    1 - mixture E K (fun z ↦ (r z ^ 2 - g z.1) ^ 2) /
+        variance (mixture E K) (fun z ↦ r z ^ 2) ≤
+      variance E (fun d ↦ K d (fun ω ↦ r (d, ω) ^ 2)) /
+        variance (mixture E K) (fun z ↦ r z ^ 2) := by
+  rw [fitted_squared_loss_r2_gap E K r g hpos]
+  exact sub_le_self _ (div_nonneg
+    (E.nonneg_eval _ (fun _ ↦ sq_nonneg _)) hpos.le)
+
+/-- General conditional squared-loss noise, including skewness. Apply this
+to each conditional law K d; no Gaussian or symmetry hypothesis is used. -/
+theorem squared_loss_central_moments (E : ExpFunctional Ω) (r : Ω → ℝ) :
+    variance E (fun ω ↦ r ω ^ 2) =
+      E (fun ω ↦ (r ω - E r) ^ 4) - variance E r ^ 2 +
+      4 * E r * E (fun ω ↦ (r ω - E r) ^ 3) +
+      4 * (E r) ^ 2 * variance E r := by
+  let b := E r
+  let z := fun ω ↦ r ω - b
+  have hz : E z = 0 := eval_centered_zero E r
+  have hv : E (fun ω ↦ z ω ^ 2) = variance E r := rfl
+  have hpoint : (fun ω ↦ r ω ^ 4) =
+      (fun ω ↦ z ω ^ 4) + (4 * b) • (fun ω ↦ z ω ^ 3) +
+      (6 * b ^ 2) • (fun ω ↦ z ω ^ 2) + (4 * b ^ 3) • z +
+      (fun _ ↦ b ^ 4) := by
+    funext ω
+    simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
+    dsimp [z]
+    ring
+  have hfour : E (fun ω ↦ r ω ^ 4) =
+      E (fun ω ↦ z ω ^ 4) + 4 * b * E (fun ω ↦ z ω ^ 3) +
+        6 * b ^ 2 * variance E r + b ^ 4 := by
+    rw [hpoint, E.add_eval, E.add_eval, E.add_eval, E.add_eval,
+      E.smul_eval, E.smul_eval, E.smul_eval, E.eval_const, hz, hv]
+    ring
+  have hsecond := variance_eq_expect_sq_sub_sq_mean E r
+  rw [variance_eq_expect_sq_sub_sq_mean]
+  simp only [← pow_mul]
+  rw [hfour]
+  dsimp [z, b] at *
+  nlinarith [sq_nonneg (variance E r)]
+
 /-- The Gaussian-style expression follows from second and fourth moments alone.
 The hypotheses must be checked for the residuals from the actual analysis. -/
 theorem gaussian_style_loss_variance (E : ExpFunctional D) (K : D → ExpFunctional Ω)
