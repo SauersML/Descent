@@ -3152,6 +3152,36 @@ def Descent_Portability_CalibrationLaw_prevalence(p, linear, intercept):
 def calibratedIntercept(p, baseline, epsilon, he, hb, raw):
     return _rt._proj(_rt._proj((standardized_calibrated_intercept(p, raw, baseline, epsilon, he, hb)), 'exists'), 'choose')
 
+def genomeLaw(laws):
+    return _rt._proj((chunkLaw(laws)), 'pushforward')(flatten)
+
+def sourceGenomeLaw(source, laws):
+    return joint(source, ((lambda trainingSource: genomeLaw((laws(trainingSource))))))
+
+def eligibleSites(threshold):
+    return _rt._proj((retainedSites(genome)), 'filter')(((lambda site: (threshold <= minorAlleleFrequency(cohort, genome, site)))))
+
+def eligibleOrder(threshold):
+    return _rt._proj((_rt._proj((eligibleSites(cohort, genome, threshold)), 'orderEmbOfFin')(rfl)), 'toEmbedding')
+
+def selectedRawDosage(slots, slot, individual):
+    return rawDiploidDosage(genome, (slots(slot)), individual)
+
+def selectedBedDosage(slots, slot, individual):
+    return bedDiploidDosage(genome, (slots(slot)), individual)
+
+def reservoirPairLaw(genome, causalCount):
+    return _rt._proj((eligibleReservoir(cohort, genome, (_rt.rdiv(1.0, 20.0)), 5000.0)), 'joint')(((lambda _: eligibleReservoir(cohort, genome, (_rt.rdiv(1.0, 100.0)), (_rt.rmax(((causalCount * 8.0)), 2000.0))))))
+
+def sourceGenomeReservoirLaw(genomes, causalCount):
+    return dependentJoint(genomes, ((lambda base: reservoirPairLaw(cohort, _rt._proj(base, '2'), causalCount))))
+
+def defaultSerialReservoirLaw(causalCount):
+    return sourceGenomeReservoirLaw((Descent_Portability_SamplingDesignLaw_uniform((Fin(7250.0)))), defaultSerialGenomeLaw(), causalCount)
+
+def defaultGridReservoirLaw(causalCount):
+    return sourceGenomeReservoirLaw((Descent_Portability_SamplingDesignLaw_uniform((Fin(13750.0)))), defaultGridGenomeLaw(), causalCount)
+
 def liabilitySensitivity(Φ, m, R2, T_p):
     R = _rt.rsqrt(R2)
     h = _rt.rsqrt(_rt._proj(m, 'h_sq'))
@@ -3733,6 +3763,9 @@ def Descent_Portability_FiniteReportLaw_conditionalMetric(p, metric):
 
 def metric(state):
     return (some(((0.0 if (_rt._proj(state, '1') == 0.0) else 1.0))) if (_rt._proj(state, '2') == 0.0) else none)
+
+def raceCoefficient(ancestry, mutation, count):
+    return _rt.rdiv((ancestry * _rt.lpow((mutation), count)), _rt.lpow(((ancestry + (mutation))), ((count + 1.0))))
 
 def jointLaw():
     return _rt._proj((labelKernel(design)), 'jointMeasure')((effectLaw(K)))
@@ -4976,6 +5009,9 @@ def recessiveMutationSelectionDriftParameter(Ne, mu, s):
 def expectedEffectMultiplier(p, α):
     return _rt.lpow(((p * ((1.0 - p)))), ((1.0 + α)))
 
+def numeratorFactor(effects):
+    return _rt.rdiv((_rt.mul(_rt.lpow(crossForm(target, targetScore, targetCausal, weights, effects), 2.0), (_rt.mul(varianceForm(source, sourceScore, weights), varianceForm(source, sourceCausal, effects))))), (_rt.mul(varianceForm(target, targetScore, weights), varianceForm(target, targetCausal, effects))))
+
 def choiceLaw(capacity, seen):
     return _rt._proj((uniformDraw(seen)), 'pushforward')((choice(capacity, seen)))
 
@@ -5074,6 +5110,21 @@ def formAccuracy(p, scoreGenotype, causalGenotype, weights, effects):
 
 def formRatio(source, target, sourceScore, targetScore, sourceCausal, targetCausal, weights, effects):
     return _rt._proj((formAccuracy(source, sourceScore, sourceCausal, weights, effects)), 'bind')((lambda sourceR2: _rt._proj((formAccuracy(target, targetScore, targetCausal, weights, effects)), 'bind')((lambda targetR2: (some((_rt.rdiv(targetR2, sourceR2))) if (0.0 < sourceR2) else none)))))
+
+def cohortSize(demes):
+    return ((demes * 250.0) + 4750.0)
+
+def populationSize(modern, deme):
+    return (10000.0 if (deme == modern) else 3000.0)
+
+def gridAdjacent(a, b):
+    return (((a < 36.0) and (b < 36.0)) and (((((((_rt.rdiv(a, 6.0) - _rt.rdiv(b, 6.0))) + ((_rt.rdiv(b, 6.0) - _rt.rdiv(a, 6.0)))) + (((a % 6.0) - (b % 6.0)))) + (((b % 6.0) - (a % 6.0)))) == 1.0)))
+
+def serialSourceGenomeLaw(L, hL):
+    return _rt._proj((sourceLaw(10.0, (by(norm_num)))), 'joint')((serialGenomeLaw(L, hL)))
+
+def gridSourceGenomeLaw(L, hL):
+    return _rt._proj((sourceLaw(36.0, (by(norm_num)))), 'joint')((gridGenomeLaw(L, hL)))
 
 def sampleSize(source, deme):
     return (5000.0 if (deme == source) else 250.0)

@@ -38138,6 +38138,7 @@
    "Descent.Portability.CalibrationLaw.standardize_coordinate_continuous",
    "Descent.Portability.CalibrationLaw.standardized_second_moment_le_one",
    "Descent.Portability.CalibrationLaw.variance_continuous",
+   "Descent.Portability.ChunkedGenotypeLaw.dependentJoint_expectation",
    "Descent.Portability.DemeMixture.pooledAUC_diagonal_offDiagonal",
    "Descent.Portability.DemeRiskPredictionPanel.metricDefinedMass_le_one",
    "Descent.Portability.DemeRiskPredictionPanel.outcomeWeight_nonneg",
@@ -38154,6 +38155,12 @@
    "Descent.Portability.DistanceBinnedPortabilityLaw.clipped_bin_expectation",
    "Descent.Portability.DistanceBinnedPortabilityLaw.finite_bin_expectation",
    "Descent.Portability.DistanceBinnedPortabilityLaw.weighted_integrable",
+   "Descent.Portability.ExponentialPoissonRace.interval_expMeasure",
+   "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure",
+   "Descent.Portability.ExponentialPoissonRace.poisson_coefficient_integrable",
+   "Descent.Portability.ExponentialPoissonRace.poisson_series_expMeasure",
+   "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step",
+   "Descent.Portability.ExponentialPoissonRace.race_coordinate_summable",
    "Descent.Portability.FiniteLiabilityPanel.abs_liability_le_liabilityAbsSum",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.FiniteLiabilityPanel.prevalenceIntercept_shift",
@@ -38231,6 +38238,15 @@
    "Descent.Portability.ProbitTrainingLaw.labelEvent_measurable",
    "Descent.Portability.ProbitTrainingLaw.reportedAccuracy_eq_moment_sum",
    "Descent.Portability.ProbitTrainingLaw.threshold_probability",
+   "Descent.Portability.RatioPoleLaw.calibrated_label_weight_continuous",
+   "Descent.Portability.RatioPoleLaw.calibrated_label_weight_pos",
+   "Descent.Portability.RatioPoleLaw.crossForm_affine_line",
+   "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass",
+   "Descent.Portability.RatioPoleLaw.inverse_square_lower",
+   "Descent.Portability.RatioPoleLaw.numeratorFactor_continuousAt",
+   "Descent.Portability.RatioPoleLaw.ratio_lintegral_top_of_local_slab_mass",
+   "Descent.Portability.RatioPoleLaw.transverse_scaled_limit",
+   "Descent.Portability.RatioPoleLaw.witness_not_aligned",
    "Descent.Portability.RealizedPTGWASDraw.exists_phenotypeRisk_ne_of_baseline_not_common_shift",
    "Descent.Portability.ReservoirSamplingLaw.kernel_unstable_mass_zero",
    "Descent.Portability.ReservoirSamplingLaw.lawAfter_expected_retainedSum",
@@ -38529,7 +38545,8 @@
     "∀ state target, Measurable (fun input ↦ (kernel input state",
     "Homogeneous branch state.1",
     "0 < K",
-    "K < 1"
+    "K < 1",
+    "∀ neighborhood : Set (K → ℝ"
    ],
    "hypotheses_by_theorem": {
     "Descent.Blindness.BundleRigidity.ModulusFamily.singleWindow_anti": [],
@@ -39060,6 +39077,7 @@
     "Descent.Portability.CalibrationLaw.normalized_prevalence_continuous": [],
     "Descent.Portability.CalibrationLaw.calibratedIntercept_continuous": [],
     "Descent.Portability.CalibrationLaw.linearScore_effects_continuous": [],
+    "Descent.Portability.ChunkedGenotypeLaw.dependentJoint_expectation": [],
     "Descent.Portability.sigmaResid_pos_pos_le": [],
     "Descent.Portability.liabilitySensitivity_monotone_in_R2_of_threshold_le": [],
     "Descent.Portability.liabilitySpecificity_monotone_in_R2_of_threshold_le": [],
@@ -39160,6 +39178,12 @@
     "Descent.Portability.validation_n_depends_on_r2": [],
     "Descent.Portability.do_no_harm_principle": [],
     "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul": [],
+    "Descent.Portability.ExponentialPoissonRace.poisson_coefficient_integrable": [],
+    "Descent.Portability.ExponentialPoissonRace.poisson_series_expMeasure": [],
+    "Descent.Portability.ExponentialPoissonRace.interval_expMeasure": [],
+    "Descent.Portability.ExponentialPoissonRace.race_coordinate_summable": [],
+    "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step": [],
+    "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.crossForm_effects_continuous": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.varianceForm_effects_continuous": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.formRatio_observable_measurable": [],
@@ -39286,6 +39310,19 @@
     "Descent.Portability.mutationSelectionBalanceRecessive_isFixedPoint": [],
     "Descent.Portability.mutationSelectionBalanceRecessive_sq_le": [],
     "Descent.Portability.alpha_model_portability_impact": [],
+    "Descent.Portability.RatioPoleLaw.numeratorFactor_continuousAt": [],
+    "Descent.Portability.RatioPoleLaw.crossForm_affine_line": [],
+    "Descent.Portability.RatioPoleLaw.transverse_scaled_limit": [],
+    "Descent.Portability.RatioPoleLaw.witness_not_aligned": [],
+    "Descent.Portability.RatioPoleLaw.inverse_square_lower": [],
+    "Descent.Portability.RatioPoleLaw.ratio_lintegral_top_of_local_slab_mass": [
+     "∀ neighborhood : Set (K → ℝ"
+    ],
+    "Descent.Portability.RatioPoleLaw.calibrated_label_weight_pos": [],
+    "Descent.Portability.RatioPoleLaw.calibrated_label_weight_continuous": [],
+    "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass": [
+     "∀ neighborhood : Set (K → ℝ"
+    ],
     "Descent.Portability.ReservoirSamplingLaw.lawAfter_expected_retainedSum": [],
     "Descent.Portability.ReservoirSamplingLaw.kernel_unstable_mass_zero": [],
     "Descent.Portability.ReservoirSamplingLaw.lawAfter_unstable_mass_zero": [],
@@ -44757,6 +44794,8 @@
    "Descent.Portability.FactorsThroughObservation.add",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable",
+   "Descent.Portability.RatioPoleLaw.calibrated_probability_continuous",
+   "Descent.Portability.RatioPoleLaw.transverse_scaled_limit",
    "Descent.Portability.hasDerivAt_logisticSoftplus"
   ],
   "constraints": {
@@ -44806,7 +44845,9 @@
     "Descent.Portability.BinaryRiskCohort.continuous_logisticCalibrationObjective": [],
     "Descent.Portability.BinaryRiskCohort.continuous_citlEquation": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
-    "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable": []
+    "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable": [],
+    "Descent.Portability.RatioPoleLaw.transverse_scaled_limit": [],
+    "Descent.Portability.RatioPoleLaw.calibrated_probability_continuous": []
    }
   }
  },
@@ -44919,6 +44960,7 @@
    "Descent.Portability.DistanceBinnedPortabilityLaw.binInner_measurable",
    "Descent.Portability.DistanceBinnedPortabilityLaw.finite_bin_expectation",
    "Descent.Portability.DistanceBinnedPortabilityLaw.weighted_integrable",
+   "Descent.Portability.ExponentialPoissonRace.poisson_coefficient_integrable",
    "Descent.Portability.GaussianEffectPortabilityLaw.clippedInner_measurable",
    "Descent.Portability.GaussianEffectPortabilityLaw.crossForm_effects_continuous",
    "Descent.Portability.GaussianEffectPortabilityLaw.formRatio_observable_measurable",
@@ -44933,6 +44975,8 @@
    "Descent.Portability.InterleavedMutationMeasurability.interval_expectation_measurable",
    "Descent.Portability.InterleavedMutationMeasurability.poissonCoefficient_measurable",
    "Descent.Portability.InterleavedMutationMeasurability.waiting_exposure_measurable",
+   "Descent.Portability.RatioPoleLaw.numeratorFactor_continuousAt",
+   "Descent.Portability.RatioPoleLaw.transverse_scaled_limit",
    "Descent.Program.deriv2_sigmoid"
   ],
   "constraints": {
@@ -44980,6 +45024,7 @@
     "Descent.Portability.DistanceBinnedPortabilityLaw.binInner_measurable": [],
     "Descent.Portability.DistanceBinnedPortabilityLaw.binClippedInner_measurable": [],
     "Descent.Portability.DistanceBinnedPortabilityLaw.finite_bin_expectation": [],
+    "Descent.Portability.ExponentialPoissonRace.poisson_coefficient_integrable": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.crossForm_effects_continuous": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.varianceForm_effects_continuous": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.formRatio_observable_measurable": [],
@@ -44994,6 +45039,8 @@
     "Descent.Portability.InterleavedMutationMeasurability.interval_expectation_measurable": [],
     "Descent.Portability.InterleavedMutationMeasurability.waiting_exposure_measurable": [],
     "Descent.Portability.InterleavedMutationMeasurability.bind_mass_measurable": [],
+    "Descent.Portability.RatioPoleLaw.numeratorFactor_continuousAt": [],
+    "Descent.Portability.RatioPoleLaw.transverse_scaled_limit": [],
     "Descent.Program.deriv2_sigmoid": []
    }
   }
@@ -47242,6 +47289,7 @@
    "Descent.Portability.CalibrationLaw.standardize_coordinate_continuous",
    "Descent.Portability.CalibrationLaw.standardized_second_moment_le_one",
    "Descent.Portability.CalibrationLaw.variance_continuous",
+   "Descent.Portability.ChunkedGenotypeLaw.dependentJoint_expectation",
    "Descent.Portability.DemeMixture.pooledAUC_diagonal_offDiagonal",
    "Descent.Portability.DemeRiskPredictionPanel.metricDefinedMass_le_one",
    "Descent.Portability.DemeRiskPredictionPanel.outcomeWeight_nonneg",
@@ -47258,6 +47306,12 @@
    "Descent.Portability.DistanceBinnedPortabilityLaw.clipped_bin_expectation",
    "Descent.Portability.DistanceBinnedPortabilityLaw.finite_bin_expectation",
    "Descent.Portability.DistanceBinnedPortabilityLaw.weighted_integrable",
+   "Descent.Portability.ExponentialPoissonRace.interval_expMeasure",
+   "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure",
+   "Descent.Portability.ExponentialPoissonRace.poisson_coefficient_integrable",
+   "Descent.Portability.ExponentialPoissonRace.poisson_series_expMeasure",
+   "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step",
+   "Descent.Portability.ExponentialPoissonRace.race_coordinate_summable",
    "Descent.Portability.FiniteLiabilityPanel.abs_liability_le_liabilityAbsSum",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.FiniteLiabilityPanel.prevalenceIntercept_shift",
@@ -47335,6 +47389,15 @@
    "Descent.Portability.ProbitTrainingLaw.labelEvent_measurable",
    "Descent.Portability.ProbitTrainingLaw.reportedAccuracy_eq_moment_sum",
    "Descent.Portability.ProbitTrainingLaw.threshold_probability",
+   "Descent.Portability.RatioPoleLaw.calibrated_label_weight_continuous",
+   "Descent.Portability.RatioPoleLaw.calibrated_label_weight_pos",
+   "Descent.Portability.RatioPoleLaw.crossForm_affine_line",
+   "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass",
+   "Descent.Portability.RatioPoleLaw.inverse_square_lower",
+   "Descent.Portability.RatioPoleLaw.numeratorFactor_continuousAt",
+   "Descent.Portability.RatioPoleLaw.ratio_lintegral_top_of_local_slab_mass",
+   "Descent.Portability.RatioPoleLaw.transverse_scaled_limit",
+   "Descent.Portability.RatioPoleLaw.witness_not_aligned",
    "Descent.Portability.RealizedPTGWASDraw.exists_phenotypeRisk_ne_of_baseline_not_common_shift",
    "Descent.Portability.ReservoirSamplingLaw.kernel_unstable_mass_zero",
    "Descent.Portability.ReservoirSamplingLaw.lawAfter_expected_retainedSum",
@@ -48146,6 +48209,7 @@
     "Descent.Portability.CalibrationLaw.normalized_prevalence_continuous": [],
     "Descent.Portability.CalibrationLaw.calibratedIntercept_continuous": [],
     "Descent.Portability.CalibrationLaw.linearScore_effects_continuous": [],
+    "Descent.Portability.ChunkedGenotypeLaw.dependentJoint_expectation": [],
     "Descent.Portability.sigmaResid_pos_pos_le": [],
     "Descent.Portability.liabilitySensitivity_monotone_in_R2_of_threshold_le": [],
     "Descent.Portability.liabilitySpecificity_monotone_in_R2_of_threshold_le": [],
@@ -48246,6 +48310,12 @@
     "Descent.Portability.validation_n_depends_on_r2": [],
     "Descent.Portability.do_no_harm_principle": [],
     "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul": [],
+    "Descent.Portability.ExponentialPoissonRace.poisson_coefficient_integrable": [],
+    "Descent.Portability.ExponentialPoissonRace.poisson_series_expMeasure": [],
+    "Descent.Portability.ExponentialPoissonRace.interval_expMeasure": [],
+    "Descent.Portability.ExponentialPoissonRace.race_coordinate_summable": [],
+    "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step": [],
+    "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.crossForm_effects_continuous": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.varianceForm_effects_continuous": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.formRatio_observable_measurable": [],
@@ -48369,6 +48439,15 @@
     "Descent.Portability.mutationSelectionBalanceRecessive_isFixedPoint": [],
     "Descent.Portability.mutationSelectionBalanceRecessive_sq_le": [],
     "Descent.Portability.alpha_model_portability_impact": [],
+    "Descent.Portability.RatioPoleLaw.numeratorFactor_continuousAt": [],
+    "Descent.Portability.RatioPoleLaw.crossForm_affine_line": [],
+    "Descent.Portability.RatioPoleLaw.transverse_scaled_limit": [],
+    "Descent.Portability.RatioPoleLaw.witness_not_aligned": [],
+    "Descent.Portability.RatioPoleLaw.inverse_square_lower": [],
+    "Descent.Portability.RatioPoleLaw.ratio_lintegral_top_of_local_slab_mass": [],
+    "Descent.Portability.RatioPoleLaw.calibrated_label_weight_pos": [],
+    "Descent.Portability.RatioPoleLaw.calibrated_label_weight_continuous": [],
+    "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass": [],
     "Descent.Portability.ReservoirSamplingLaw.lawAfter_expected_retainedSum": [],
     "Descent.Portability.ReservoirSamplingLaw.kernel_unstable_mass_zero": [],
     "Descent.Portability.ReservoirSamplingLaw.lawAfter_unstable_mass_zero": [],
@@ -65497,6 +65576,7 @@
    "Descent.Portability.CalibrationLaw.standardize_coordinate_continuous",
    "Descent.Portability.CalibrationLaw.standardized_second_moment_le_one",
    "Descent.Portability.CalibrationLaw.variance_continuous",
+   "Descent.Portability.ChunkedGenotypeLaw.dependentJoint_expectation",
    "Descent.Portability.DemeMixture.pooledAUC_diagonal_offDiagonal",
    "Descent.Portability.DemeRiskPredictionPanel.metricDefinedMass_le_one",
    "Descent.Portability.DemeRiskPredictionPanel.outcomeWeight_nonneg",
@@ -65513,6 +65593,12 @@
    "Descent.Portability.DistanceBinnedPortabilityLaw.clipped_bin_expectation",
    "Descent.Portability.DistanceBinnedPortabilityLaw.finite_bin_expectation",
    "Descent.Portability.DistanceBinnedPortabilityLaw.weighted_integrable",
+   "Descent.Portability.ExponentialPoissonRace.interval_expMeasure",
+   "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure",
+   "Descent.Portability.ExponentialPoissonRace.poisson_coefficient_integrable",
+   "Descent.Portability.ExponentialPoissonRace.poisson_series_expMeasure",
+   "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step",
+   "Descent.Portability.ExponentialPoissonRace.race_coordinate_summable",
    "Descent.Portability.FiniteLiabilityPanel.abs_liability_le_liabilityAbsSum",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.FiniteLiabilityPanel.prevalenceIntercept_shift",
@@ -65590,6 +65676,15 @@
    "Descent.Portability.ProbitTrainingLaw.labelEvent_measurable",
    "Descent.Portability.ProbitTrainingLaw.reportedAccuracy_eq_moment_sum",
    "Descent.Portability.ProbitTrainingLaw.threshold_probability",
+   "Descent.Portability.RatioPoleLaw.calibrated_label_weight_continuous",
+   "Descent.Portability.RatioPoleLaw.calibrated_label_weight_pos",
+   "Descent.Portability.RatioPoleLaw.crossForm_affine_line",
+   "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass",
+   "Descent.Portability.RatioPoleLaw.inverse_square_lower",
+   "Descent.Portability.RatioPoleLaw.numeratorFactor_continuousAt",
+   "Descent.Portability.RatioPoleLaw.ratio_lintegral_top_of_local_slab_mass",
+   "Descent.Portability.RatioPoleLaw.transverse_scaled_limit",
+   "Descent.Portability.RatioPoleLaw.witness_not_aligned",
    "Descent.Portability.RealizedPTGWASDraw.exists_phenotypeRisk_ne_of_baseline_not_common_shift",
    "Descent.Portability.ReservoirSamplingLaw.kernel_unstable_mass_zero",
    "Descent.Portability.ReservoirSamplingLaw.lawAfter_expected_retainedSum",
@@ -66471,6 +66566,7 @@
     "Descent.Portability.CalibrationLaw.normalized_prevalence_continuous": [],
     "Descent.Portability.CalibrationLaw.calibratedIntercept_continuous": [],
     "Descent.Portability.CalibrationLaw.linearScore_effects_continuous": [],
+    "Descent.Portability.ChunkedGenotypeLaw.dependentJoint_expectation": [],
     "Descent.Portability.sigmaResid_pos_pos_le": [],
     "Descent.Portability.liabilitySensitivity_monotone_in_R2_of_threshold_le": [],
     "Descent.Portability.liabilitySpecificity_monotone_in_R2_of_threshold_le": [],
@@ -66573,6 +66669,12 @@
     "Descent.Portability.validation_n_depends_on_r2": [],
     "Descent.Portability.do_no_harm_principle": [],
     "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul": [],
+    "Descent.Portability.ExponentialPoissonRace.poisson_coefficient_integrable": [],
+    "Descent.Portability.ExponentialPoissonRace.poisson_series_expMeasure": [],
+    "Descent.Portability.ExponentialPoissonRace.interval_expMeasure": [],
+    "Descent.Portability.ExponentialPoissonRace.race_coordinate_summable": [],
+    "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step": [],
+    "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.crossForm_effects_continuous": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.varianceForm_effects_continuous": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.formRatio_observable_measurable": [],
@@ -66685,6 +66787,15 @@
     "Descent.Portability.mutationSelectionBalanceRecessive_isFixedPoint": [],
     "Descent.Portability.mutationSelectionBalanceRecessive_sq_le": [],
     "Descent.Portability.alpha_model_portability_impact": [],
+    "Descent.Portability.RatioPoleLaw.numeratorFactor_continuousAt": [],
+    "Descent.Portability.RatioPoleLaw.crossForm_affine_line": [],
+    "Descent.Portability.RatioPoleLaw.transverse_scaled_limit": [],
+    "Descent.Portability.RatioPoleLaw.witness_not_aligned": [],
+    "Descent.Portability.RatioPoleLaw.inverse_square_lower": [],
+    "Descent.Portability.RatioPoleLaw.ratio_lintegral_top_of_local_slab_mass": [],
+    "Descent.Portability.RatioPoleLaw.calibrated_label_weight_pos": [],
+    "Descent.Portability.RatioPoleLaw.calibrated_label_weight_continuous": [],
+    "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass": [],
     "Descent.Portability.ReservoirSamplingLaw.lawAfter_expected_retainedSum": [],
     "Descent.Portability.ReservoirSamplingLaw.kernel_unstable_mass_zero": [],
     "Descent.Portability.ReservoirSamplingLaw.lawAfter_unstable_mass_zero": [],
@@ -67243,6 +67354,7 @@
    "Descent.Portability.DistanceBinnedPortabilityLaw.binExtendedNumerator_eq_iSup",
    "Descent.Portability.DistanceBinnedPortabilityLaw.binInner_eq_iSup_clipped",
    "Descent.Portability.DistanceBinnedPortabilityLaw.finite_bin_expectation",
+   "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure",
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.FiniteLiabilityPanel.risk_eq_iff_liability_eq_up_to_common_shift",
    "Descent.Portability.GaussianEffectPortabilityLaw.extendedNumerator_eq_iSup_clipped",
@@ -67258,6 +67370,7 @@
    "Descent.Portability.PipelineDemographicHistory.pooledMAFProbeMass_samplingDual",
    "Descent.Portability.PipelineDemographicHistory.presentBiologicalKilledDualState_eq_projection",
    "Descent.Portability.ProbitTrainingLaw.integral_readout",
+   "Descent.Portability.RatioPoleLaw.transverse_scaled_limit",
    "Descent.Portability.ReservoirSamplingLaw.choiceLaw_some_mass",
    "Descent.Portability.SamplingDesignLaw.fit_test_cover",
    "Descent.Portability.SourceDesignLaw.gridSourceLaw_eq_integer_draw",
@@ -67620,6 +67733,7 @@
     "Descent.Portability.PipelineDemographicHistory.commonDiffusionProjection_exact": [],
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
     "Descent.Portability.FiniteLiabilityPanel.risk_eq_iff_liability_eq_up_to_common_shift": [],
+    "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.innerValue_eq_iSup_clipped": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.extendedNumerator_eq_iSup_clipped": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.successProbability_eq_joint_defined": [],
@@ -67638,6 +67752,7 @@
     "Descent.Portability.no_score_side_summary_determines_r2": [],
     "Descent.Portability.ProbitTrainingLaw.integral_readout": [],
     "Descent.Portability.mutationSelectionBalanceRecessive_sq_le": [],
+    "Descent.Portability.RatioPoleLaw.transverse_scaled_limit": [],
     "Descent.Portability.ReservoirSamplingLaw.choiceLaw_some_mass": [],
     "Descent.Portability.SamplingDesignLaw.fit_test_cover": [],
     "Descent.Portability.threshold_standardized_coordinate_diff_of_variance_change": [],
@@ -67859,6 +67974,7 @@
    "Descent.Portability.BinaryRiskCohort.CITLDomain.existsUniqueBracketedRoot",
    "Descent.Portability.BinaryRiskCohort.isBounded_logisticCalibration_baselineSublevel",
    "Descent.Portability.CalibrationLaw.exists_unique_calibrated_intercept",
+   "Descent.Portability.ChunkedGenotypeLaw.eligibleReservoir_expectation",
    "Descent.Portability.DistanceBinnedPortabilityLaw.binInner_eq_iSup_clipped",
    "Descent.Portability.DistanceBinnedPortabilityLaw.weighted_integrable",
    "Descent.Portability.ExactFiniteHistoryLaw.report_path_sum_eq_backward",
@@ -67868,6 +67984,8 @@
    "Descent.Portability.PipelineDemographicHistory.biologicalAncestralBernsteinProjection_nonneg",
    "Descent.Portability.PipelineDemographicHistory.manyDemeSampleCountProjection_eq_momentMass",
    "Descent.Portability.PortabilityRatioGeometry.certified_innerValue_integrable",
+   "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass",
+   "Descent.Portability.RatioPoleLaw.ratio_lintegral_top_of_local_slab_mass",
    "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
    "Descent.Portability.StoppedGenotypeReadiness.conditionalSite_unsupported_ready",
    "Descent.Portability.binaryPolygenicDeploymentBoundary",
@@ -68038,6 +68156,7 @@
     "Descent.Portability.AncestralMutationTransfer.unwind_distance": [],
     "Descent.Portability.AncestralMutationTransfer.iterate_distance": [],
     "Descent.Portability.CalibrationLaw.exists_unique_calibrated_intercept": [],
+    "Descent.Portability.ChunkedGenotypeLaw.eligibleReservoir_expectation": [],
     "Descent.Portability.no_common_thresholdDecision_of_crossing": [],
     "Descent.Portability.dynamicsPooledProjector_eq_of_factorsThrough_of_fixes_common": [
      "∀ c : ℝ, C (fun _ : Bool ↦ c"
@@ -68068,6 +68187,8 @@
     "Descent.Portability.liabilityAUC_ne_equalVarianceAUC_of_prevalence_dependent": [],
     "Descent.Portability.no_score_side_summary_determines_r2": [],
     "Descent.Portability.PortabilityRatioGeometry.certified_innerValue_integrable": [],
+    "Descent.Portability.RatioPoleLaw.ratio_lintegral_top_of_local_slab_mass": [],
+    "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass": [],
     "Descent.Portability.StoppedGenotypeReadiness.conditionalSite_unsupported_ready": [],
     "Descent.Portability.FiniteReportLaw.all_bounded_metric_errors_le_iff": [],
     "Descent.Spectral.hasThresholdSetAtEveryRank_of_fintype": []
@@ -69635,6 +69756,8 @@
    "Descent.PopGen.snpH2_add_tagged",
    "Descent.PopGen.twoLocusCoalescentCovarianceMatrix_diff_lower_bound",
    "Descent.Portability.AncestralGenealogyLaw.intervalBranchesAux_exposure",
+   "Descent.Portability.SimulationDemographyLaw.gridInstructions_duration",
+   "Descent.Portability.SimulationDemographyLaw.serialInstructions_duration",
    "Descent.Portability.abs_treatmentMargin_error_le_componentwise_calibration_bound",
    "Descent.Portability.apparent_portability_loss_eq_total_of_ideal",
    "Descent.Portability.benDavidUpperBound_chain",
@@ -69737,6 +69860,8 @@
     "Descent.Portability.qalyLoss_eq_zero_of_componentwise_calibration_bound_lt_abs_true_margin": [],
     "Descent.Portability.sharedLD_from_equilibrium_add_swap": [],
     "Descent.Portability.covarianceRetention_additive_in_ldOverlap": [],
+    "Descent.Portability.SimulationDemographyLaw.serialInstructions_duration": [],
+    "Descent.Portability.SimulationDemographyLaw.gridInstructions_duration": [],
     "Descent.Portability.incrementalR2_baseline_shift_invariant": [],
     "Descent.Portability.pcaBiasReduction_reference_invariant": [],
     "Descent.Portability.scratchTargetR2_penalty_stages": [],
@@ -76956,6 +77081,16 @@
    "Descent.Portability.PortabilityRatioGeometry.formRatio_some_domain",
    "Descent.Portability.PortabilityRatioGeometry.report_le_outcomeBound",
    "Descent.Portability.PortabilityRatioGeometry.trait_domination_iff",
+   "Descent.Portability.RatioPoleLaw.calibrated_label_weight_continuous",
+   "Descent.Portability.RatioPoleLaw.calibrated_label_weight_pos",
+   "Descent.Portability.RatioPoleLaw.calibrated_probability_continuous",
+   "Descent.Portability.RatioPoleLaw.crossForm_affine_line",
+   "Descent.Portability.RatioPoleLaw.formRatio_eq_factor",
+   "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass",
+   "Descent.Portability.RatioPoleLaw.numeratorFactor_continuousAt",
+   "Descent.Portability.RatioPoleLaw.numeratorFactor_pos",
+   "Descent.Portability.RatioPoleLaw.open_neighborhood_pole",
+   "Descent.Portability.RatioPoleLaw.ratio_lintegral_top_of_local_slab_mass",
    "Descent.Portability.SimulationAccuracy.covariance_two_scores",
    "Descent.Portability.SimulationAccuracy.formRatio_value",
    "Descent.Portability.SimulationAccuracy.ratio_affine_eq_formRatio",
@@ -77031,6 +77166,16 @@
     "Descent.Portability.PortabilityRatioGeometry.binReport_le_sum": [],
     "Descent.Portability.PortabilityRatioGeometry.binInner_le_sum": [],
     "Descent.Portability.PortabilityRatioGeometry.certified_bin_integrable": [],
+    "Descent.Portability.RatioPoleLaw.numeratorFactor_pos": [],
+    "Descent.Portability.RatioPoleLaw.numeratorFactor_continuousAt": [],
+    "Descent.Portability.RatioPoleLaw.formRatio_eq_factor": [],
+    "Descent.Portability.RatioPoleLaw.open_neighborhood_pole": [],
+    "Descent.Portability.RatioPoleLaw.crossForm_affine_line": [],
+    "Descent.Portability.RatioPoleLaw.ratio_lintegral_top_of_local_slab_mass": [],
+    "Descent.Portability.RatioPoleLaw.calibrated_probability_continuous": [],
+    "Descent.Portability.RatioPoleLaw.calibrated_label_weight_pos": [],
+    "Descent.Portability.RatioPoleLaw.calibrated_label_weight_continuous": [],
+    "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass": [],
     "Descent.Portability.SimulationAccuracy.covariance_two_scores": [],
     "Descent.Portability.SimulationAccuracy.squaredCorrelation_eq_formAccuracy": [],
     "Descent.Portability.SimulationAccuracy.squaredCorrelation_affine_eq_formAccuracy": [],
@@ -86206,6 +86351,9 @@
    "Descent.Portability.CalibrationLaw.standardized_second_moment_le_one",
    "Descent.Portability.CalibrationLaw.variance_continuous",
    "Descent.Portability.EquiExit.certificateTest_null_control",
+   "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure",
+   "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step",
+   "Descent.Portability.ExponentialPoissonRace.race_coordinate_summable",
    "Descent.Portability.FactorsThroughObservation.add",
    "Descent.Portability.GaussianEffectPortabilityLaw.crossForm_effects_continuous",
    "Descent.Portability.GaussianEffectPortabilityLaw.formRatio_observable_measurable",
@@ -86429,6 +86577,9 @@
     "Descent.Portability.CalibrationLaw.calibrated_effectProbability_measurable": [],
     "Descent.Portability.FactorsThroughObservation.add": [],
     "Descent.Portability.factorsThrough_subset_uniformCorrectionFamily": [],
+    "Descent.Portability.ExponentialPoissonRace.race_coordinate_summable": [],
+    "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step": [],
+    "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.crossForm_effects_continuous": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.varianceForm_effects_continuous": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.formRatio_observable_measurable": [],
@@ -87173,6 +87324,20 @@
    "Descent.Portability.AncestralMutationTransfer.iterate_history_expectation",
    "Descent.Portability.AncestralMutationTransfer.iterate_history_law",
    "Descent.Portability.AncestralMutationTransfer.unwind_distance",
+   "Descent.Portability.ExponentialPoissonRace.interval_expMeasure",
+   "Descent.Portability.ExponentialPoissonRace.interval_expMeasure_eq_raceKernelLaw",
+   "Descent.Portability.ExponentialPoissonRace.interval_fixed_uniformization",
+   "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure",
+   "Descent.Portability.ExponentialPoissonRace.poisson_coefficient_integrable",
+   "Descent.Portability.ExponentialPoissonRace.poisson_expMeasure",
+   "Descent.Portability.ExponentialPoissonRace.poisson_race_integral",
+   "Descent.Portability.ExponentialPoissonRace.poisson_series_expMeasure",
+   "Descent.Portability.ExponentialPoissonRace.raceCoefficient_geometric",
+   "Descent.Portability.ExponentialPoissonRace.raceCoefficient_succ",
+   "Descent.Portability.ExponentialPoissonRace.raceCoefficient_sum",
+   "Descent.Portability.ExponentialPoissonRace.raceCoefficient_summable",
+   "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step",
+   "Descent.Portability.ExponentialPoissonRace.race_coordinate_summable",
    "Descent.Portability.InterleavedMutationExponential.generator_matrix",
    "Descent.Portability.InterleavedMutationExponential.interval_compose",
    "Descent.Portability.InterleavedMutationExponential.interval_matrix_exponential",
@@ -87408,6 +87573,20 @@
     "Descent.Portability.pooledMAFBiologicalKilledDualTerminalVector_dot": [],
     "Descent.Portability.PipelineDemographicHistory.pooledMAFProbeMassViaPositiveDual_eq": [],
     "Descent.Portability.pooledMAFTerminalProbe_dot_present": [],
+    "Descent.Portability.ExponentialPoissonRace.poisson_race_integral": [],
+    "Descent.Portability.ExponentialPoissonRace.poisson_expMeasure": [],
+    "Descent.Portability.ExponentialPoissonRace.raceCoefficient_geometric": [],
+    "Descent.Portability.ExponentialPoissonRace.raceCoefficient_summable": [],
+    "Descent.Portability.ExponentialPoissonRace.poisson_coefficient_integrable": [],
+    "Descent.Portability.ExponentialPoissonRace.poisson_series_expMeasure": [],
+    "Descent.Portability.ExponentialPoissonRace.interval_fixed_uniformization": [],
+    "Descent.Portability.ExponentialPoissonRace.interval_expMeasure": [],
+    "Descent.Portability.ExponentialPoissonRace.raceCoefficient_sum": [],
+    "Descent.Portability.ExponentialPoissonRace.raceCoefficient_succ": [],
+    "Descent.Portability.ExponentialPoissonRace.race_coordinate_summable": [],
+    "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step": [],
+    "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure": [],
+    "Descent.Portability.ExponentialPoissonRace.interval_expMeasure_eq_raceKernelLaw": [],
     "Descent.Portability.InterleavedMutationExponential.propagate_mass": [],
     "Descent.Portability.InterleavedMutationExponential.poisson_matrix_series": [],
     "Descent.Portability.InterleavedMutationExponential.poisson_matrix_exponential": [],
@@ -87582,6 +87761,8 @@
    "Descent.PopGen.snpH2_add_tagged",
    "Descent.PopGen.twoLocusCoalescentCovarianceMatrix_diff_lower_bound",
    "Descent.Portability.AncestralGenealogyLaw.intervalBranchesAux_exposure",
+   "Descent.Portability.SimulationDemographyLaw.gridInstructions_duration",
+   "Descent.Portability.SimulationDemographyLaw.serialInstructions_duration",
    "Descent.Portability.abs_treatmentMargin_error_le_componentwise_calibration_bound",
    "Descent.Portability.apparent_portability_loss_eq_total_of_ideal",
    "Descent.Portability.benDavidUpperBound_chain",
@@ -87685,6 +87866,8 @@
     "Descent.Portability.qalyLoss_eq_zero_of_componentwise_calibration_bound_lt_abs_true_margin": [],
     "Descent.Portability.sharedLD_from_equilibrium_add_swap": [],
     "Descent.Portability.covarianceRetention_additive_in_ldOverlap": [],
+    "Descent.Portability.SimulationDemographyLaw.serialInstructions_duration": [],
+    "Descent.Portability.SimulationDemographyLaw.gridInstructions_duration": [],
     "Descent.Portability.incrementalR2_baseline_shift_invariant": [],
     "Descent.Portability.pcaBiasReduction_reference_invariant": [],
     "Descent.Portability.scratchTargetR2_penalty_stages": [],
@@ -92742,6 +92925,8 @@
    "Descent.Portability.HasUnitApproxKernel.postcomp",
    "Descent.Portability.InterleavedMutationMeasurability.mark_mass_measurable",
    "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable",
+   "Descent.Portability.RatioPoleLaw.calibrated_probability_continuous",
+   "Descent.Portability.RatioPoleLaw.transverse_scaled_limit",
    "Descent.Portability.StoppedGenotypeLaw.conditionalSite_mass_measurable",
    "Descent.Portability.TimedAncestralLaw.orderedTimes_measurable",
    "Descent.Portability.auc_invariant_and_citl_shifts_under_score_offset",
@@ -92856,6 +93041,8 @@
     "Descent.Portability.auc_invariant_and_citl_shifts_under_score_offset": [],
     "Descent.Portability.logistic_recalibration_preserves_auc": [],
     "Descent.Portability.recalibration_preserves_auc": [],
+    "Descent.Portability.RatioPoleLaw.transverse_scaled_limit": [],
+    "Descent.Portability.RatioPoleLaw.calibrated_probability_continuous": [],
     "Descent.Portability.StoppedGenotypeLaw.conditionalSite_mass_measurable": [],
     "Descent.Portability.TimedAncestralLaw.orderedTimes_measurable": [],
     "Descent.Program.sigmoid_strictConcaveOn_Ici": []
@@ -92898,11 +93085,15 @@
    "Descent.Pangenome.Register.kernel_registerPresentation",
    "Descent.Pangenome.Strand.frustrated_iff_encode_eq",
    "Descent.Portability.AncestralMutationTransfer.rowDistance_bind",
+   "Descent.Portability.ChunkedGenotypeLaw.dependentJoint_expectation",
    "Descent.Portability.ExactFiniteHistoryLaw.expectation_propagate",
    "Descent.Portability.ExactFiniteHistoryLaw.expectation_reportLaw",
    "Descent.Portability.ExactFiniteHistoryLaw.path_mass_sum_one",
    "Descent.Portability.ExactFiniteHistoryLaw.path_sum_eq_expectation",
    "Descent.Portability.ExactFiniteHistoryLaw.report_path_sum_eq_backward",
+   "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure",
+   "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step",
+   "Descent.Portability.ExponentialPoissonRace.race_coordinate_summable",
    "Descent.Portability.FinitePipelineKernel.hasExactExpectedReadout",
    "Descent.Portability.FiniteReportLaw.conditionalMetric_joint",
    "Descent.Portability.FiniteReportLaw.definedMass_joint",
@@ -92958,6 +93149,7 @@
     "Descent.Pangenome.Register.kernel_registerPresentation": [],
     "Descent.Pangenome.Strand.frustrated_iff_encode_eq": [],
     "Descent.Portability.AncestralMutationTransfer.rowDistance_bind": [],
+    "Descent.Portability.ChunkedGenotypeLaw.dependentJoint_expectation": [],
     "Descent.Portability.indexWiseCalibrationMoment_at_zero_weight": [],
     "Descent.Portability.aggregateCalibrationMoment_eq_indexWiseCalibrationMoment": [],
     "Descent.Portability.FinitePipelineKernel.hasExactExpectedReadout": [],
@@ -92971,6 +93163,9 @@
     "Descent.Portability.FiniteReportLaw.definedMass_joint": [],
     "Descent.Portability.FiniteReportLaw.weightedDefinedMetric_joint": [],
     "Descent.Portability.FiniteReportLaw.conditionalMetric_joint": [],
+    "Descent.Portability.ExponentialPoissonRace.race_coordinate_summable": [],
+    "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step": [],
+    "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure": [],
     "Descent.Portability.InterleavedMutationExponential.propagate_mass": [],
     "Descent.Portability.InterleavedMutationMeasurability.bind_mass_measurable": [],
     "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.branchMeasure_univ": [],
@@ -116213,6 +116408,7 @@
    "Descent.Portability.AncestralMutationResolvent.next_admissible",
    "Descent.Portability.AncestralMutationResolvent.solution_boundary_row",
    "Descent.Portability.AncestralMutationResolvent.subharmonic_zero",
+   "Descent.Portability.SimulationDemographyLaw.initialSamples_complete",
    "Descent.Portability.StoppedAncestralTiming.completion_tail",
    "Descent.Portability.StoppedAncestralTiming.stoppedExpectation_one",
    "Descent.Portability.StoppedAncestralTiming.stoppedExpectation_summable",
@@ -116411,6 +116607,7 @@
      "SupportedAt deme s"
     ],
     "Descent.Portability.AncestralMutationResolvent.next_admissible": [],
+    "Descent.Portability.SimulationDemographyLaw.initialSamples_complete": [],
     "Descent.Portability.StoppedAncestralTiming.stoppedExpectation_one": [],
     "Descent.Portability.StoppedAncestralTiming.stoppedExpectation_summable": [],
     "Descent.Portability.StoppedAncestralTiming.completion_tail": [],
@@ -123338,6 +123535,595 @@
     ]
    }
   }
+ },
+ "Descent.Portability.ChunkedGenotypeLaw.ChunkedGenome": {
+  "class": "STRUCTURAL",
+  "note": "type alias",
+  "file": "Descent/Portability/ChunkedGenotypeLaw.lean",
+  "line": 26,
+  "short": "ChunkedGenome",
+  "ret_type": "",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "chunks": [
+    1.0,
+    20.0
+   ],
+   "loci": [
+    1.0,
+    20.0
+   ],
+   "chromosomes": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ChunkedGenotypeLaw.flatten_pair"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ChunkedGenotypeLaw.flatten_pair": []
+   }
+  }
+ },
+ "Descent.Portability.ChunkedGenotypeLaw.chunkLaw": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/ChunkedGenotypeLaw.lean",
+  "line": 31,
+  "short": "chunkLaw",
+  "ret_type": "FiniteReportLaw (ChunkedGenome chunks loci chromosomes) where mass",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [],
+  "constraints": {}
+ },
+ "Descent.Portability.ChunkedGenotypeLaw.flatten": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name finProdFinEquiv.symm",
+  "file": "Descent/Portability/ChunkedGenotypeLaw.lean",
+  "line": 40,
+  "short": "flatten",
+  "ret_type": "WholeGenome (chunks * loci) chromosomes",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ChunkedGenotypeLaw.flatten_pair",
+   "Descent.Portability.ChunkedGenotypeLaw.genomeLaw_expectation",
+   "Descent.Portability.ChunkedGenotypeLaw.sourceGenome_expectation"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ChunkedGenotypeLaw.flatten_pair": [],
+    "Descent.Portability.ChunkedGenotypeLaw.genomeLaw_expectation": [],
+    "Descent.Portability.ChunkedGenotypeLaw.sourceGenome_expectation": []
+   }
+  }
+ },
+ "Descent.Portability.ChunkedGenotypeLaw.flattenEquiv": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/ChunkedGenotypeLaw.lean",
+  "line": 49,
+  "short": "flattenEquiv",
+  "ret_type": "ChunkedGenome chunks loci chromosomes ≃ WholeGenome (chunks * loci) chromosomes where toFun",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [],
+  "constraints": {}
+ },
+ "Descent.Portability.ChunkedGenotypeLaw.genomeLaw": {
+  "class": "STRUCTURAL",
+  "note": "builds a structure value (FiniteReportLaw (WholeGenome (chunks * loci) chromosomes))",
+  "file": "Descent/Portability/ChunkedGenotypeLaw.lean",
+  "line": 60,
+  "short": "genomeLaw",
+  "ret_type": "FiniteReportLaw (WholeGenome (chunks * loci) chromosomes)",
+  "empirical_status": "",
+  "python": "genomeLaw",
+  "args": [
+   "laws"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "NameError(\"name 'chunkLaw' is not defined\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ChunkedGenotypeLaw.genomeLaw_expectation"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ChunkedGenotypeLaw.genomeLaw_expectation": []
+   }
+  }
+ },
+ "Descent.Portability.ChunkedGenotypeLaw.sourceGenomeLaw": {
+  "class": "STRUCTURAL",
+  "note": "builds a structure value (FiniteReportLaw (Source × WholeGenome (chunks * loci) chromosomes))",
+  "file": "Descent/Portability/ChunkedGenotypeLaw.lean",
+  "line": 76,
+  "short": "sourceGenomeLaw",
+  "ret_type": "FiniteReportLaw (Source × WholeGenome (chunks * loci) chromosomes)",
+  "empirical_status": "",
+  "python": "sourceGenomeLaw",
+  "args": [
+   "source",
+   "laws"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "NameError(\"name 'joint' is not defined\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ChunkedGenotypeLaw.sourceGenome_expectation"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ChunkedGenotypeLaw.sourceGenome_expectation": []
+   }
+  }
+ },
+ "Descent.Portability.ChunkedGenotypeLaw.minorAlleleFrequency": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name cohort.expectation",
+  "file": "Descent/Portability/ChunkedGenotypeLaw.lean",
+  "line": 101,
+  "short": "minorAlleleFrequency",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ChunkedGenotypeLaw.mem_eligibleSites"
+  ],
+  "constraints": {
+   "declared_kind": "frequency",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ChunkedGenotypeLaw.mem_eligibleSites": []
+   }
+  }
+ },
+ "Descent.Portability.ChunkedGenotypeLaw.eligibleSites": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "self-check: calls untranslated definition retainedSites",
+  "file": "Descent/Portability/ChunkedGenotypeLaw.lean",
+  "line": 106,
+  "short": "eligibleSites",
+  "ret_type": "Finset (Fin length)",
+  "empirical_status": "",
+  "python": "eligibleSites",
+  "args": [
+   "threshold"
+  ],
+  "box": {
+   "threshold": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "NameError(\"name 'retainedSites' is not defined\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ChunkedGenotypeLaw.eligibleOrder_mem",
+   "Descent.Portability.ChunkedGenotypeLaw.eligibleOrder_strictMono",
+   "Descent.Portability.ChunkedGenotypeLaw.eligibleReservoir_expectation",
+   "Descent.Portability.ChunkedGenotypeLaw.mem_eligibleSites"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ChunkedGenotypeLaw.mem_eligibleSites": [],
+    "Descent.Portability.ChunkedGenotypeLaw.eligibleOrder_mem": [],
+    "Descent.Portability.ChunkedGenotypeLaw.eligibleOrder_strictMono": [],
+    "Descent.Portability.ChunkedGenotypeLaw.eligibleReservoir_expectation": []
+   }
+  }
+ },
+ "Descent.Portability.ChunkedGenotypeLaw.eligibleOrder": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "self-check: calls untranslated definition cohort",
+  "file": "Descent/Portability/ChunkedGenotypeLaw.lean",
+  "line": 114,
+  "short": "eligibleOrder",
+  "ret_type": "Fin (eligibleSites cohort genome threshold).card ↪ Fin length",
+  "empirical_status": "",
+  "python": "eligibleOrder",
+  "args": [
+   "threshold"
+  ],
+  "box": {
+   "threshold": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "NameError(\"name 'cohort' is not defined\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ChunkedGenotypeLaw.eligibleOrder_mem",
+   "Descent.Portability.ChunkedGenotypeLaw.eligibleOrder_strictMono",
+   "Descent.Portability.ChunkedGenotypeLaw.eligibleReservoir_expectation"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ChunkedGenotypeLaw.eligibleOrder_mem": [],
+    "Descent.Portability.ChunkedGenotypeLaw.eligibleOrder_strictMono": [],
+    "Descent.Portability.ChunkedGenotypeLaw.eligibleReservoir_expectation": []
+   }
+  }
+ },
+ "Descent.Portability.ChunkedGenotypeLaw.eligibleReservoir": {
+  "class": "STRUCTURAL",
+  "note": "builds a structure value (FiniteReportLaw (Slots (min requested (eligibleSites cohort genome threshold).card) length))",
+  "file": "Descent/Portability/ChunkedGenotypeLaw.lean",
+  "line": 130,
+  "short": "eligibleReservoir",
+  "ret_type": "FiniteReportLaw (Slots (min requested (eligibleSites cohort genome threshold).card) length)",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "threshold": [
+    0.05,
+    3.0
+   ],
+   "requested": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ChunkedGenotypeLaw.eligibleReservoir_expectation",
+   "Descent.Portability.ChunkedGenotypeLaw.reservoirPair_expectation",
+   "Descent.Portability.ChunkedGenotypeLaw.sourceGenomeReservoir_expectation"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ChunkedGenotypeLaw.eligibleReservoir_expectation": [],
+    "Descent.Portability.ChunkedGenotypeLaw.reservoirPair_expectation": [],
+    "Descent.Portability.ChunkedGenotypeLaw.sourceGenomeReservoir_expectation": []
+   }
+  }
+ },
+ "Descent.Portability.ChunkedGenotypeLaw.selectedRawDosage": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "self-check: calls untranslated definition genome",
+  "file": "Descent/Portability/ChunkedGenotypeLaw.lean",
+  "line": 144,
+  "short": "selectedRawDosage",
+  "ret_type": "ℕ",
+  "empirical_status": "",
+  "python": "selectedRawDosage",
+  "args": [
+   "slots",
+   "slot",
+   "individual"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "NameError(\"name 'genome' is not defined\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ChunkedGenotypeLaw.selectedBedDosage_eq_clip"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ChunkedGenotypeLaw.selectedBedDosage_eq_clip": []
+   }
+  }
+ },
+ "Descent.Portability.ChunkedGenotypeLaw.selectedBedDosage": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "self-check: calls untranslated definition genome",
+  "file": "Descent/Portability/ChunkedGenotypeLaw.lean",
+  "line": 148,
+  "short": "selectedBedDosage",
+  "ret_type": "ℕ",
+  "empirical_status": "",
+  "python": "selectedBedDosage",
+  "args": [
+   "slots",
+   "slot",
+   "individual"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "NameError(\"name 'genome' is not defined\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ChunkedGenotypeLaw.selectedBedDosage_eq_clip"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ChunkedGenotypeLaw.selectedBedDosage_eq_clip": []
+   }
+  }
+ },
+ "Descent.Portability.ChunkedGenotypeLaw.dependentJoint": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/ChunkedGenotypeLaw.lean",
+  "line": 162,
+  "short": "dependentJoint",
+  "ret_type": "FiniteReportLaw (Sigma B) where mass",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ChunkedGenotypeLaw.dependentJoint_expectation"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ChunkedGenotypeLaw.dependentJoint_expectation": []
+   }
+  }
+ },
+ "Descent.Portability.ChunkedGenotypeLaw.ReservoirPair": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "trailing tokens after expression: op:×",
+  "file": "Descent/Portability/ChunkedGenotypeLaw.lean",
+  "line": 192,
+  "short": "ReservoirPair",
+  "ret_type": "",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "causalCount": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ChunkedGenotypeLaw.reservoirPair_expectation",
+   "Descent.Portability.ChunkedGenotypeLaw.sourceGenomeReservoir_expectation"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ChunkedGenotypeLaw.reservoirPair_expectation": [],
+    "Descent.Portability.ChunkedGenotypeLaw.sourceGenomeReservoir_expectation": []
+   }
+  }
+ },
+ "Descent.Portability.ChunkedGenotypeLaw.reservoirPairLaw": {
+  "class": "STRUCTURAL",
+  "note": "builds a structure value (FiniteReportLaw (ReservoirPair cohort genome causalCount))",
+  "file": "Descent/Portability/ChunkedGenotypeLaw.lean",
+  "line": 199,
+  "short": "reservoirPairLaw",
+  "ret_type": "FiniteReportLaw (ReservoirPair cohort genome causalCount)",
+  "empirical_status": "",
+  "python": "reservoirPairLaw",
+  "args": [
+   "genome",
+   "causalCount"
+  ],
+  "box": {
+   "causalCount": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "Uninhabitable(\"type nests deeper than 5 levels: 'Fin 4 n × Catalogue × Bool n length (2 * individuals)'\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ChunkedGenotypeLaw.reservoirPair_expectation"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ChunkedGenotypeLaw.reservoirPair_expectation": []
+   }
+  }
+ },
+ "Descent.Portability.ChunkedGenotypeLaw.sourceGenomeReservoirLaw": {
+  "class": "STRUCTURAL",
+  "note": "builds a structure value (FiniteReportLaw ((base : Source × WholeGenome length (2 * individuals)) × ReservoirPair cohort base.2 causalCount))",
+  "file": "Descent/Portability/ChunkedGenotypeLaw.lean",
+  "line": 215,
+  "short": "sourceGenomeReservoirLaw",
+  "ret_type": "FiniteReportLaw ((base : Source × WholeGenome length (2 * individuals)) × ReservoirPair cohort base.2 causalCount)",
+  "empirical_status": "",
+  "python": "sourceGenomeReservoirLaw",
+  "args": [
+   "genomes",
+   "causalCount"
+  ],
+  "box": {
+   "causalCount": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "NameError(\"name 'dependentJoint' is not defined\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ChunkedGenotypeLaw.sourceGenomeReservoir_expectation"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ChunkedGenotypeLaw.sourceGenomeReservoir_expectation": []
+   }
+  }
+ },
+ "Descent.Portability.ChunkedGenotypeLaw.defaultSerialGenomeLaw": {
+  "class": "STRUCTURAL",
+  "note": "builds a structure value (FiniteReportLaw (Fin 10 × WholeGenome 100000000 (SimulationDemographyLaw.cohortSize 10 * 2)))",
+  "file": "Descent/Portability/ChunkedGenotypeLaw.lean",
+  "line": 238,
+  "short": "defaultSerialGenomeLaw",
+  "ret_type": "FiniteReportLaw (Fin 10 × WholeGenome 100000000 (SimulationDemographyLaw.cohortSize 10 * 2))",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null
+  }
+ },
+ "Descent.Portability.ChunkedGenotypeLaw.defaultGridGenomeLaw": {
+  "class": "STRUCTURAL",
+  "note": "builds a structure value (FiniteReportLaw (Fin 36 × WholeGenome 100000000 (SimulationDemographyLaw.cohortSize 36 * 2)))",
+  "file": "Descent/Portability/ChunkedGenotypeLaw.lean",
+  "line": 244,
+  "short": "defaultGridGenomeLaw",
+  "ret_type": "FiniteReportLaw (Fin 36 × WholeGenome 100000000 (SimulationDemographyLaw.cohortSize 36 * 2))",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [],
+  "constraints": {}
+ },
+ "Descent.Portability.ChunkedGenotypeLaw.defaultSerialReservoirLaw": {
+  "class": "STRUCTURAL",
+  "note": "builds a structure value (FiniteReportLaw ((base : Fin 10 × WholeGenome 100000000 14500) × ReservoirPair (uniform (Fin 7250)) base.2 causalCount))",
+  "file": "Descent/Portability/ChunkedGenotypeLaw.lean",
+  "line": 251,
+  "short": "defaultSerialReservoirLaw",
+  "ret_type": "FiniteReportLaw ((base : Fin 10 × WholeGenome 100000000 14500) × ReservoirPair (uniform (Fin 7250)) base.2 causalCount)",
+  "empirical_status": "",
+  "python": "defaultSerialReservoirLaw",
+  "args": [
+   "causalCount"
+  ],
+  "box": {
+   "causalCount": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "NameError(\"name 'Descent_Portability_SamplingDesignLaw_uniform' is not defined\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [],
+  "constraints": {}
+ },
+ "Descent.Portability.ChunkedGenotypeLaw.defaultGridReservoirLaw": {
+  "class": "STRUCTURAL",
+  "note": "builds a structure value (FiniteReportLaw ((base : Fin 36 × WholeGenome 100000000 27500) × ReservoirPair (uniform (Fin 13750)) base.2 causalCount))",
+  "file": "Descent/Portability/ChunkedGenotypeLaw.lean",
+  "line": 257,
+  "short": "defaultGridReservoirLaw",
+  "ret_type": "FiniteReportLaw ((base : Fin 36 × WholeGenome 100000000 27500) × ReservoirPair (uniform (Fin 13750)) base.2 causalCount)",
+  "empirical_status": "",
+  "python": "defaultGridReservoirLaw",
+  "args": [
+   "causalCount"
+  ],
+  "box": {
+   "causalCount": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "NameError(\"name 'Descent_Portability_SamplingDesignLaw_uniform' is not defined\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [],
+  "constraints": {}
  },
  "Descent.Portability.LiabilityThresholdModel.witness": {
   "class": "STRUCTURAL",
@@ -134602,6 +135388,12 @@
    "Descent.Portability.CalibrationLaw.standardized_mean_zero",
    "Descent.Portability.CalibrationLaw.standardized_second_moment_le_one",
    "Descent.Portability.CalibrationLaw.variance_continuous",
+   "Descent.Portability.ChunkedGenotypeLaw.dependentJoint_expectation",
+   "Descent.Portability.ChunkedGenotypeLaw.eligibleReservoir_expectation",
+   "Descent.Portability.ChunkedGenotypeLaw.genomeLaw_expectation",
+   "Descent.Portability.ChunkedGenotypeLaw.reservoirPair_expectation",
+   "Descent.Portability.ChunkedGenotypeLaw.sourceGenomeReservoir_expectation",
+   "Descent.Portability.ChunkedGenotypeLaw.sourceGenome_expectation",
    "Descent.Portability.ExactFiniteHistoryLaw.expectation_propagate",
    "Descent.Portability.ExactFiniteHistoryLaw.expectation_reportLaw",
    "Descent.Portability.ExactFiniteHistoryLaw.path_mass_sum_one",
@@ -134693,6 +135485,8 @@
    "Descent.Portability.SimulationAccuracy.covariance_affine",
    "Descent.Portability.SimulationAccuracy.expectation_affine",
    "Descent.Portability.SimulationAccuracy.standardize_eq_affine",
+   "Descent.Portability.SimulationDemographyLaw.gridSourceGenome_expectation",
+   "Descent.Portability.SimulationDemographyLaw.serialSourceGenome_expectation",
    "Descent.Portability.SourceDesignLaw.gridSourceCount_mass",
    "Descent.Portability.SourceDesignLaw.serialSourceCount_mass",
    "Descent.Portability.StoppedGenotypeLaw.conditionalGenome_expectation_measurable",
@@ -134788,6 +135582,12 @@
     "Descent.Portability.CalibrationLaw.expectation_continuous": [],
     "Descent.Portability.CalibrationLaw.variance_continuous": [],
     "Descent.Portability.CalibrationLaw.normalized_prevalence_continuous": [],
+    "Descent.Portability.ChunkedGenotypeLaw.genomeLaw_expectation": [],
+    "Descent.Portability.ChunkedGenotypeLaw.sourceGenome_expectation": [],
+    "Descent.Portability.ChunkedGenotypeLaw.eligibleReservoir_expectation": [],
+    "Descent.Portability.ChunkedGenotypeLaw.dependentJoint_expectation": [],
+    "Descent.Portability.ChunkedGenotypeLaw.reservoirPair_expectation": [],
+    "Descent.Portability.ChunkedGenotypeLaw.sourceGenomeReservoir_expectation": [],
     "Descent.Portability.FiniteReportLaw.expectation_bind": [],
     "Descent.Portability.FiniteReportLaw.expectation_pointMass": [],
     "Descent.Portability.FiniteReportLaw.expectation_pushforward": [],
@@ -134870,6 +135670,8 @@
     "Descent.Portability.SimulationAccuracy.expectation_affine": [],
     "Descent.Portability.SimulationAccuracy.covariance_affine": [],
     "Descent.Portability.SimulationAccuracy.standardize_eq_affine": [],
+    "Descent.Portability.SimulationDemographyLaw.serialSourceGenome_expectation": [],
+    "Descent.Portability.SimulationDemographyLaw.gridSourceGenome_expectation": [],
     "Descent.Portability.SourceDesignLaw.serialSourceCount_mass": [],
     "Descent.Portability.SourceDesignLaw.gridSourceCount_mass": [],
     "Descent.Portability.StoppedGenotypeLaw.conditionalGenome_expectation_measurable": [],
@@ -135750,7 +136552,7 @@
   "selfcheck": {
    "finite_points": 6,
    "total_points": 8,
-   "error": "ValueError('expected a number in range from -1 up to 1, got 1.2198403495503556')"
+   "error": "ValueError('expected a number in range from -1 up to 1, got 1.0371181024022502')"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -135802,9 +136604,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 6,
+   "finite_points": 7,
    "total_points": 8,
-   "error": "ValueError('expected a number in range from -1 up to 1, got 1.1574720638604663')"
+   "error": "ValueError('expected a number in range from -1 up to 1, got 1.2017830748524567')"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -137451,6 +138253,7 @@
    "Descent.Portability.AncestralMutationTransfer.rowDistance_mixture",
    "Descent.Portability.AncestralMutationTransfer.transfer_expectation",
    "Descent.Portability.AncestralMutationTransfer.transfer_generator",
+   "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step",
    "Descent.Portability.FiniteReportLaw.expectation_bind",
    "Descent.Portability.GenealogyGenotypeLaw.branchKernel_commute",
    "Descent.Portability.InterleavedMutationExponential.interval_compose",
@@ -137494,6 +138297,7 @@
     "Descent.Portability.AncestralMutationTransfer.iterate_history_law": [],
     "Descent.Portability.VisiblePipelineInput.sourcePolymorphicTargetHeterozygosity_eq_factorialMoments": [],
     "Descent.Portability.FiniteReportLaw.expectation_bind": [],
+    "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step": [],
     "Descent.Portability.GenealogyGenotypeLaw.branchKernel_commute": [],
     "Descent.Portability.InterleavedMutationExponential.interval_compose": [],
     "Descent.Portability.InterleavedMutationLaw.intervalKernel_unsupported": [],
@@ -137620,6 +138424,7 @@
   "mentioned_by": [
    "Descent.Portability.ExactFiniteHistoryLaw.expectation_propagate",
    "Descent.Portability.ExactFiniteHistoryLaw.path_sum_eq_expectation",
+   "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step",
    "Descent.Portability.InterleavedMutationExponential.interval_matrix_exponential",
    "Descent.Portability.InterleavedMutationExponential.propagate_mass",
    "Descent.Portability.InterleavedMutationLaw.count_absence",
@@ -137635,6 +138440,7 @@
    "hypotheses_by_theorem": {
     "Descent.Portability.ExactFiniteHistoryLaw.expectation_propagate": [],
     "Descent.Portability.ExactFiniteHistoryLaw.path_sum_eq_expectation": [],
+    "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step": [],
     "Descent.Portability.InterleavedMutationExponential.propagate_mass": [],
     "Descent.Portability.InterleavedMutationExponential.interval_matrix_exponential": [],
     "Descent.Portability.InterleavedMutationLaw.count_unsupported": [],
@@ -138999,6 +139805,151 @@
    }
   }
  },
+ "Descent.Portability.ExponentialPoissonRace.raceCoefficient": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/ExponentialPoissonRace.lean",
+  "line": 88,
+  "short": "raceCoefficient",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "raceCoefficient",
+  "args": [
+   "ancestry",
+   "mutation",
+   "count"
+  ],
+  "box": {
+   "ancestry": [
+    0.05,
+    3.0
+   ],
+   "count": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ExponentialPoissonRace.interval_expMeasure",
+   "Descent.Portability.ExponentialPoissonRace.poisson_series_expMeasure",
+   "Descent.Portability.ExponentialPoissonRace.raceCoefficient_geometric",
+   "Descent.Portability.ExponentialPoissonRace.raceCoefficient_succ",
+   "Descent.Portability.ExponentialPoissonRace.raceCoefficient_sum",
+   "Descent.Portability.ExponentialPoissonRace.raceCoefficient_summable",
+   "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step",
+   "Descent.Portability.ExponentialPoissonRace.race_coordinate_summable"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "0 < ancestry",
+    "∀ count, 0 ≤ readout count ∧ readout count ≤ 1"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ExponentialPoissonRace.raceCoefficient_geometric": [],
+    "Descent.Portability.ExponentialPoissonRace.raceCoefficient_summable": [
+     "0 < ancestry"
+    ],
+    "Descent.Portability.ExponentialPoissonRace.poisson_series_expMeasure": [
+     "0 < ancestry",
+     "∀ count, 0 ≤ readout count ∧ readout count ≤ 1"
+    ],
+    "Descent.Portability.ExponentialPoissonRace.interval_expMeasure": [
+     "0 < ancestry"
+    ],
+    "Descent.Portability.ExponentialPoissonRace.raceCoefficient_sum": [
+     "0 < ancestry"
+    ],
+    "Descent.Portability.ExponentialPoissonRace.raceCoefficient_succ": [],
+    "Descent.Portability.ExponentialPoissonRace.race_coordinate_summable": [
+     "0 < ancestry"
+    ],
+    "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step": [
+     "0 < ancestry"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.ExponentialPoissonRace.kernelCount": {
+  "class": "STRUCTURAL",
+  "note": "builds a structure value (FiniteReportLaw S)",
+  "file": "Descent/Portability/ExponentialPoissonRace.lean",
+  "line": 212,
+  "short": "kernelCount",
+  "ret_type": "FiniteReportLaw S",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "count": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure",
+   "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step",
+   "Descent.Portability.ExponentialPoissonRace.race_coordinate_summable"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ExponentialPoissonRace.race_coordinate_summable": [],
+    "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step": [],
+    "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure": []
+   }
+  }
+ },
+ "Descent.Portability.ExponentialPoissonRace.raceKernelLaw": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/ExponentialPoissonRace.lean",
+  "line": 231,
+  "short": "raceKernelLaw",
+  "ret_type": "FiniteReportLaw S where mass",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "ancestry": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ExponentialPoissonRace.interval_expMeasure_eq_raceKernelLaw",
+   "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure",
+   "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "0 < ancestry"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step": [
+     "0 < ancestry"
+    ],
+    "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure": [
+     "0 < ancestry"
+    ],
+    "Descent.Portability.ExponentialPoissonRace.interval_expMeasure_eq_raceKernelLaw": [
+     "0 < ancestry"
+    ]
+   }
+  }
+ },
  "Descent.Portability.GaussianEffectPortabilityLaw.effectLaw": {
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name Measure.pi",
@@ -139033,10 +139984,13 @@
    "Descent.Portability.GaussianEffectPortabilityLaw.weighted_observable_integrable",
    "Descent.Portability.GaussianEffectPortabilityLaw.weighted_report_integrable",
    "Descent.Portability.PortabilityRatioGeometry.certified_bin_integrable",
-   "Descent.Portability.PortabilityRatioGeometry.certified_innerValue_integrable"
+   "Descent.Portability.PortabilityRatioGeometry.certified_innerValue_integrable",
+   "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass"
   ],
   "constraints": {
-   "hypotheses": [],
+   "hypotheses": [
+    "∀ neighborhood : Set (K → ℝ"
+   ],
    "hypotheses_by_theorem": {
     "Descent.Portability.DistanceBinnedPortabilityLaw.weighted_integrable": [],
     "Descent.Portability.DistanceBinnedPortabilityLaw.clipped_bin_expectation": [],
@@ -139057,7 +140011,10 @@
     "Descent.Portability.GaussianEffectPortabilityLaw.extendedNumerator_toReal": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.finite_reportedExpectation_formula": [],
     "Descent.Portability.PortabilityRatioGeometry.certified_innerValue_integrable": [],
-    "Descent.Portability.PortabilityRatioGeometry.certified_bin_integrable": []
+    "Descent.Portability.PortabilityRatioGeometry.certified_bin_integrable": [],
+    "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass": [
+     "∀ neighborhood : Set (K → ℝ"
+    ]
    }
   }
  },
@@ -139091,6 +140048,9 @@
    "Descent.Portability.ProbitTrainingLaw.reportedExpectation_eq_finite_sum",
    "Descent.Portability.ProbitTrainingLaw.reportedSourceRatio_eq_one",
    "Descent.Portability.ProbitTrainingLaw.threshold_probability",
+   "Descent.Portability.RatioPoleLaw.calibrated_label_weight_continuous",
+   "Descent.Portability.RatioPoleLaw.calibrated_label_weight_pos",
+   "Descent.Portability.RatioPoleLaw.calibrated_probability_continuous",
    "Descent.Portability.SimulationAccuracy.reportedRatio_eq_form_sum"
   ],
   "constraints": {
@@ -139115,6 +140075,9 @@
     "Descent.Portability.ProbitTrainingLaw.reportedSourceRatio_eq_one": [
      "definedProbability (fun i ↦ caseProbability (mean i"
     ],
+    "Descent.Portability.RatioPoleLaw.calibrated_probability_continuous": [],
+    "Descent.Portability.RatioPoleLaw.calibrated_label_weight_pos": [],
+    "Descent.Portability.RatioPoleLaw.calibrated_label_weight_continuous": [],
     "Descent.Portability.SimulationAccuracy.reportedRatio_eq_form_sum": []
    },
    "range_lo_thm": [
@@ -139170,7 +140133,10 @@
    "Descent.Portability.GaussianEffectPortabilityLaw.weighted_defined_integrable",
    "Descent.Portability.GaussianEffectPortabilityLaw.weighted_observable_integrable",
    "Descent.Portability.GaussianEffectPortabilityLaw.weighted_report_integrable",
-   "Descent.Portability.PortabilityRatioGeometry.binInner_le_sum"
+   "Descent.Portability.PortabilityRatioGeometry.binInner_le_sum",
+   "Descent.Portability.RatioPoleLaw.calibrated_label_weight_continuous",
+   "Descent.Portability.RatioPoleLaw.calibrated_label_weight_pos",
+   "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass"
   ],
   "constraints": {
    "hypotheses": [],
@@ -139201,7 +140167,10 @@
     "Descent.Portability.GaussianEffectPortabilityLaw.successProbability_bounds": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.weighted_report_integrable": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.finite_reportedExpectation_formula": [],
-    "Descent.Portability.PortabilityRatioGeometry.binInner_le_sum": []
+    "Descent.Portability.PortabilityRatioGeometry.binInner_le_sum": [],
+    "Descent.Portability.RatioPoleLaw.calibrated_label_weight_pos": [],
+    "Descent.Portability.RatioPoleLaw.calibrated_label_weight_continuous": [],
+    "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass": []
    }
   }
  },
@@ -139306,6 +140275,7 @@
    "Descent.Portability.PortabilityRatioGeometry.binReport_le_sum",
    "Descent.Portability.PortabilityRatioGeometry.certified_expected_ratio",
    "Descent.Portability.PortabilityRatioGeometry.report_le_outcomeBound",
+   "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass",
    "Descent.Portability.half_gap_le_max_abs_sub",
    "Descent.Portability.no_marginal_only_history_degradation_criterion",
    "Descent.Portability.reportResolutionEnergy_refine_le",
@@ -139317,7 +140287,8 @@
   ],
   "constraints": {
    "hypotheses": [
-    "report design effects outcome = some r"
+    "report design effects outcome = some r",
+    "design.learn outcome = some weights"
    ],
    "hypotheses_by_theorem": {
     "Descent.Blindness.not_identifiedBy_secondFactor_of_product": [],
@@ -139362,6 +140333,9 @@
     "Descent.Portability.PortabilityRatioGeometry.report_le_outcomeBound": [],
     "Descent.Portability.PortabilityRatioGeometry.certified_expected_ratio": [],
     "Descent.Portability.PortabilityRatioGeometry.binReport_le_sum": [],
+    "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass": [
+     "design.learn outcome = some weights"
+    ],
     "Descent.Portability.FiniteReportLaw.ext": [],
     "Descent.Portability.FiniteReportLaw.expectation_sub": [],
     "Descent.Portability.FiniteReportLaw.expectation_complement": [],
@@ -139519,7 +140493,8 @@
    "Descent.Portability.GaussianEffectPortabilityLaw.integrable_innerValue_iff",
    "Descent.Portability.PortabilityRatioGeometry.binInner_le_sum",
    "Descent.Portability.PortabilityRatioGeometry.certified_bin_integrable",
-   "Descent.Portability.PortabilityRatioGeometry.certified_innerValue_integrable"
+   "Descent.Portability.PortabilityRatioGeometry.certified_innerValue_integrable",
+   "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass"
   ],
   "constraints": {
    "range_lo_thm": [
@@ -139537,7 +140512,8 @@
     "Descent.Portability.GaussianEffectPortabilityLaw.extendedNumerator_toReal": [],
     "Descent.Portability.PortabilityRatioGeometry.certified_innerValue_integrable": [],
     "Descent.Portability.PortabilityRatioGeometry.binInner_le_sum": [],
-    "Descent.Portability.PortabilityRatioGeometry.certified_bin_integrable": []
+    "Descent.Portability.PortabilityRatioGeometry.certified_bin_integrable": [],
+    "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass": []
    }
   }
  },
@@ -141363,12 +142339,14 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure",
    "Descent.Portability.InterleavedMutationExponential.generator_matrix",
    "Descent.Portability.InterleavedMutationExponential.propagate_mass"
   ],
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure": [],
     "Descent.Portability.InterleavedMutationExponential.propagate_mass": [],
     "Descent.Portability.InterleavedMutationExponential.generator_matrix": []
    }
@@ -141465,6 +142443,9 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.ExponentialPoissonRace.interval_expMeasure",
+   "Descent.Portability.ExponentialPoissonRace.interval_expMeasure_eq_raceKernelLaw",
+   "Descent.Portability.ExponentialPoissonRace.interval_fixed_uniformization",
    "Descent.Portability.InterleavedMutationExponential.generator_matrix",
    "Descent.Portability.InterleavedMutationLaw.coordinate_summable",
    "Descent.Portability.InterleavedMutationLaw.count_absence",
@@ -141490,6 +142471,9 @@
     "∀ index, (branches index"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ExponentialPoissonRace.interval_fixed_uniformization": [],
+    "Descent.Portability.ExponentialPoissonRace.interval_expMeasure": [],
+    "Descent.Portability.ExponentialPoissonRace.interval_expMeasure_eq_raceKernelLaw": [],
     "Descent.Portability.InterleavedMutationExponential.generator_matrix": [],
     "Descent.Portability.InterleavedMutationLaw.proposalParameter_pos": [],
     "Descent.Portability.InterleavedMutationLaw.proposalParameter_eq": [],
@@ -141716,6 +142700,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.ExponentialPoissonRace.interval_expMeasure_eq_raceKernelLaw",
    "Descent.Portability.InterleavedMutationExponential.generator_matrix",
    "Descent.Portability.InterleavedMutationExponential.interval_matrix_exponential",
    "Descent.Portability.InterleavedMutationLaw.count_absence",
@@ -141737,6 +142722,7 @@
     "∀ site, property site → ∀ index base, property (recordMutation (branches index"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ExponentialPoissonRace.interval_expMeasure_eq_raceKernelLaw": [],
     "Descent.Portability.InterleavedMutationExponential.generator_matrix": [],
     "Descent.Portability.InterleavedMutationExponential.interval_matrix_exponential": [],
     "Descent.Portability.InterleavedMutationLaw.intervalKernel_expectation": [],
@@ -141783,6 +142769,8 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.ExponentialPoissonRace.interval_expMeasure",
+   "Descent.Portability.ExponentialPoissonRace.interval_fixed_uniformization",
    "Descent.Portability.InterleavedMutationLaw.coordinate_summable",
    "Descent.Portability.InterleavedMutationLaw.count_absence",
    "Descent.Portability.InterleavedMutationLaw.count_unsupported",
@@ -141810,6 +142798,8 @@
     "0 < FiniteReportLaw.mass (InterleavedMutationLaw.countLaw (replaceExposure (intervalTemplates state locus"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ExponentialPoissonRace.interval_fixed_uniformization": [],
+    "Descent.Portability.ExponentialPoissonRace.interval_expMeasure": [],
     "Descent.Portability.InterleavedMutationLaw.coordinate_summable": [],
     "Descent.Portability.InterleavedMutationLaw.interval_expectation": [],
     "Descent.Portability.InterleavedMutationLaw.count_unsupported": [
@@ -141857,6 +142847,9 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.ExponentialPoissonRace.interval_expMeasure",
+   "Descent.Portability.ExponentialPoissonRace.interval_expMeasure_eq_raceKernelLaw",
+   "Descent.Portability.ExponentialPoissonRace.interval_fixed_uniformization",
    "Descent.Portability.InterleavedMutationExponential.interval_compose",
    "Descent.Portability.InterleavedMutationExponential.interval_matrix_exponential",
    "Descent.Portability.InterleavedMutationLaw.interval_absence",
@@ -141878,6 +142871,9 @@
     "∀ site, property site → ∀ index base, property (recordMutation (branches index"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ExponentialPoissonRace.interval_fixed_uniformization": [],
+    "Descent.Portability.ExponentialPoissonRace.interval_expMeasure": [],
+    "Descent.Portability.ExponentialPoissonRace.interval_expMeasure_eq_raceKernelLaw": [],
     "Descent.Portability.InterleavedMutationExponential.interval_matrix_exponential": [],
     "Descent.Portability.InterleavedMutationExponential.interval_compose": [],
     "Descent.Portability.InterleavedMutationLaw.interval_expectation": [],
@@ -141953,6 +142949,9 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.ExponentialPoissonRace.interval_expMeasure",
+   "Descent.Portability.ExponentialPoissonRace.interval_expMeasure_eq_raceKernelLaw",
+   "Descent.Portability.ExponentialPoissonRace.interval_fixed_uniformization",
    "Descent.Portability.InterleavedMutationExponential.interval_compose",
    "Descent.Portability.InterleavedMutationExponential.physicalGenerator_scale",
    "Descent.Portability.InterleavedMutationMeasurability.countContribution_measurable",
@@ -141973,6 +142972,9 @@
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ExponentialPoissonRace.interval_fixed_uniformization": [],
+    "Descent.Portability.ExponentialPoissonRace.interval_expMeasure": [],
+    "Descent.Portability.ExponentialPoissonRace.interval_expMeasure_eq_raceKernelLaw": [],
     "Descent.Portability.InterleavedMutationExponential.physicalGenerator_scale": [],
     "Descent.Portability.InterleavedMutationExponential.interval_compose": [],
     "Descent.Portability.InterleavedMutationMeasurability.mutationKernel_replaceExposure": [],
@@ -147532,6 +148534,8 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.ExponentialPoissonRace.interval_expMeasure",
+   "Descent.Portability.ExponentialPoissonRace.interval_fixed_uniformization",
    "Descent.Portability.InterleavedMutationLaw.coordinate_summable",
    "Descent.Portability.InterleavedMutationLaw.count_absence",
    "Descent.Portability.InterleavedMutationLaw.count_unsupported",
@@ -147552,6 +148556,8 @@
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ExponentialPoissonRace.interval_fixed_uniformization": [],
+    "Descent.Portability.ExponentialPoissonRace.interval_expMeasure": [],
     "Descent.Portability.InterleavedMutationLaw.coordinate_summable": [],
     "Descent.Portability.InterleavedMutationLaw.interval_expectation": [],
     "Descent.Portability.InterleavedMutationLaw.count_unsupported": [],
@@ -147788,6 +148794,9 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.ExponentialPoissonRace.interval_expMeasure",
+   "Descent.Portability.ExponentialPoissonRace.interval_expMeasure_eq_raceKernelLaw",
+   "Descent.Portability.ExponentialPoissonRace.interval_fixed_uniformization",
    "Descent.Portability.InterleavedMutationExponential.interval_compose",
    "Descent.Portability.InterleavedMutationExponential.interval_matrix_exponential",
    "Descent.Portability.InterleavedMutationLaw.coordinate_summable",
@@ -147847,6 +148856,9 @@
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ExponentialPoissonRace.interval_fixed_uniformization": [],
+    "Descent.Portability.ExponentialPoissonRace.interval_expMeasure": [],
+    "Descent.Portability.ExponentialPoissonRace.interval_expMeasure_eq_raceKernelLaw": [],
     "Descent.Portability.InterleavedMutationExponential.interval_matrix_exponential": [],
     "Descent.Portability.InterleavedMutationExponential.interval_compose": [],
     "Descent.Portability.InterleavedMutationLaw.intervalKernel_expectation": [],
@@ -171391,7 +172403,8 @@
    "Descent.Portability.PortabilityRatioGeometry.crossForm_aligned",
    "Descent.Portability.PortabilityRatioGeometry.crossForm_eq_dot",
    "Descent.Portability.PortabilityRatioGeometry.formRatio_aligned_le",
-   "Descent.Portability.PortabilityRatioGeometry.formRatio_aligned_value"
+   "Descent.Portability.PortabilityRatioGeometry.formRatio_aligned_value",
+   "Descent.Portability.RatioPoleLaw.witness_not_aligned"
   ],
   "constraints": {
    "declared_kind": "ratio",
@@ -171399,7 +172412,8 @@
    "declared_hi": 1.0,
    "hypotheses": [
     "∀ k, covarianceVector target targetScore targetCausal weights k = factor * covarianceVector source sourceScore sourceCausal weights k",
-    "formRatio source target sourceScore targetScore sourceCausal targetCausal weights effects = some value"
+    "formRatio source target sourceScore targetScore sourceCausal targetCausal weights effects = some value",
+    "PoleWitness source target sourceScore targetScore sourceCausal targetCausal weights effects₀"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.PortabilityRatioGeometry.crossForm_eq_dot": [],
@@ -171413,6 +172427,9 @@
     "Descent.Portability.PortabilityRatioGeometry.formRatio_aligned_le": [
      "∀ k, covarianceVector target targetScore targetCausal weights k = factor * covarianceVector source sourceScore sourceCausal weights k",
      "formRatio source target sourceScore targetScore sourceCausal targetCausal weights effects = some value"
+    ],
+    "Descent.Portability.RatioPoleLaw.witness_not_aligned": [
+     "PoleWitness source target sourceScore targetScore sourceCausal targetCausal weights effects₀"
     ]
    }
   }
@@ -171693,6 +172710,9 @@
    "Descent.Portability.ProbitTrainingLaw.reportedExpectation_eq_finite_sum",
    "Descent.Portability.ProbitTrainingLaw.reportedSourceRatio_eq_one",
    "Descent.Portability.ProbitTrainingLaw.threshold_probability",
+   "Descent.Portability.RatioPoleLaw.calibrated_label_weight_continuous",
+   "Descent.Portability.RatioPoleLaw.calibrated_label_weight_pos",
+   "Descent.Portability.RatioPoleLaw.calibrated_probability_continuous",
    "Descent.Portability.SimulationAccuracy.reportedRatio_eq_form_sum"
   ],
   "constraints": {
@@ -171717,6 +172737,9 @@
     "Descent.Portability.ProbitTrainingLaw.reportedSourceRatio_eq_one": [
      "definedProbability (fun i ↦ caseProbability (mean i"
     ],
+    "Descent.Portability.RatioPoleLaw.calibrated_probability_continuous": [],
+    "Descent.Portability.RatioPoleLaw.calibrated_label_weight_pos": [],
+    "Descent.Portability.RatioPoleLaw.calibrated_label_weight_continuous": [],
     "Descent.Portability.SimulationAccuracy.reportedRatio_eq_form_sum": []
    },
    "range_lo_thm": [
@@ -172864,6 +173887,115 @@
    }
   }
  },
+ "Descent.Portability.RatioPoleLaw.numeratorFactor": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "self-check: calls untranslated definition target",
+  "file": "Descent/Portability/RatioPoleLaw.lean",
+  "line": 32,
+  "short": "numeratorFactor",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "numeratorFactor",
+  "args": [
+   "effects"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "NameError(\"name 'target' is not defined\")"
+  },
+  "numeric_standins": null,
+  "vector_args": {
+   "effects": {
+    "dim": "K",
+    "rank": 1
+   }
+  },
+  "mentioned_by": [
+   "Descent.Portability.RatioPoleLaw.formRatio_eq_factor",
+   "Descent.Portability.RatioPoleLaw.numeratorFactor_continuousAt",
+   "Descent.Portability.RatioPoleLaw.numeratorFactor_pos",
+   "Descent.Portability.RatioPoleLaw.open_neighborhood_pole",
+   "Descent.Portability.RatioPoleLaw.transverse_scaled_limit"
+  ],
+  "constraints": {
+   "declared_kind": "ratio",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "range_lo_thm": [
+    "Descent.Portability.RatioPoleLaw.numeratorFactor_pos",
+    1
+   ],
+   "range_lo": 0,
+   "hypotheses": [
+    "PoleWitness source target sourceScore targetScore sourceCausal targetCausal weights effects",
+    "0 < varianceForm target targetCausal effects",
+    "0 < varianceForm source sourceCausal effects",
+    "crossForm source sourceScore sourceCausal weights effects ≠ 0"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.RatioPoleLaw.numeratorFactor_pos": [
+     "PoleWitness source target sourceScore targetScore sourceCausal targetCausal weights effects"
+    ],
+    "Descent.Portability.RatioPoleLaw.numeratorFactor_continuousAt": [
+     "0 < varianceForm target targetCausal effects"
+    ],
+    "Descent.Portability.RatioPoleLaw.formRatio_eq_factor": [
+     "0 < varianceForm source sourceCausal effects",
+     "0 < varianceForm target targetCausal effects",
+     "crossForm source sourceScore sourceCausal weights effects ≠ 0"
+    ],
+    "Descent.Portability.RatioPoleLaw.open_neighborhood_pole": [],
+    "Descent.Portability.RatioPoleLaw.transverse_scaled_limit": []
+   }
+  }
+ },
+ "Descent.Portability.RatioPoleLaw.poleSlab": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/RatioPoleLaw.lean",
+  "line": 260,
+  "short": "poleSlab",
+  "ret_type": "Set (K → ℝ)",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "n": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass",
+   "Descent.Portability.RatioPoleLaw.poleSlab_measurable",
+   "Descent.Portability.RatioPoleLaw.ratio_lintegral_top_of_local_slab_mass"
+  ],
+  "constraints": {
+   "declared_kind": "ratio",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [
+    "IsOpen neighborhood",
+    "∀ neighborhood : Set (K → ℝ"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.RatioPoleLaw.poleSlab_measurable": [
+     "IsOpen neighborhood"
+    ],
+    "Descent.Portability.RatioPoleLaw.ratio_lintegral_top_of_local_slab_mass": [
+     "∀ neighborhood : Set (K → ℝ"
+    ],
+    "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass": [
+     "∀ neighborhood : Set (K → ℝ"
+    ]
+   }
+  }
+ },
  "Descent.Portability.ReservoirSamplingLaw.Slots": {
   "class": "NOT-EXTRACTABLE",
   "note": "unrecognised character '↪'",
@@ -172888,6 +174020,8 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.ChunkedGenotypeLaw.eligibleReservoir_expectation",
+   "Descent.Portability.ChunkedGenotypeLaw.selectedBedDosage_eq_clip",
    "Descent.Portability.ReservoirSamplingLaw.earlyStable_keep",
    "Descent.Portability.ReservoirSamplingLaw.earlyStable_replace",
    "Descent.Portability.ReservoirSamplingLaw.kernel_expectation",
@@ -172909,6 +174043,8 @@
     "0 < capacity"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ChunkedGenotypeLaw.eligibleReservoir_expectation": [],
+    "Descent.Portability.ChunkedGenotypeLaw.selectedBedDosage_eq_clip": [],
     "Descent.Portability.ReservoirSamplingLaw.retainedSum_keep": [],
     "Descent.Portability.ReservoirSamplingLaw.retainedSum_replace": [],
     "Descent.Portability.ReservoirSamplingLaw.kernel_expectation": [
@@ -173207,11 +174343,15 @@
    "Descent.Pangenome.Register.kernel_registerPresentation",
    "Descent.Pangenome.Strand.frustrated_iff_encode_eq",
    "Descent.Portability.AncestralMutationTransfer.rowDistance_bind",
+   "Descent.Portability.ChunkedGenotypeLaw.dependentJoint_expectation",
    "Descent.Portability.ExactFiniteHistoryLaw.expectation_propagate",
    "Descent.Portability.ExactFiniteHistoryLaw.expectation_reportLaw",
    "Descent.Portability.ExactFiniteHistoryLaw.path_mass_sum_one",
    "Descent.Portability.ExactFiniteHistoryLaw.path_sum_eq_expectation",
    "Descent.Portability.ExactFiniteHistoryLaw.report_path_sum_eq_backward",
+   "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure",
+   "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step",
+   "Descent.Portability.ExponentialPoissonRace.race_coordinate_summable",
    "Descent.Portability.FinitePipelineKernel.hasExactExpectedReadout",
    "Descent.Portability.FiniteReportLaw.conditionalMetric_joint",
    "Descent.Portability.FiniteReportLaw.definedMass_joint",
@@ -173262,6 +174402,7 @@
     "Descent.Pangenome.Register.kernel_registerPresentation": [],
     "Descent.Pangenome.Strand.frustrated_iff_encode_eq": [],
     "Descent.Portability.AncestralMutationTransfer.rowDistance_bind": [],
+    "Descent.Portability.ChunkedGenotypeLaw.dependentJoint_expectation": [],
     "Descent.Portability.indexWiseCalibrationMoment_at_zero_weight": [],
     "Descent.Portability.aggregateCalibrationMoment_eq_indexWiseCalibrationMoment": [],
     "Descent.Portability.FinitePipelineKernel.hasExactExpectedReadout": [],
@@ -173275,6 +174416,9 @@
     "Descent.Portability.FiniteReportLaw.definedMass_joint": [],
     "Descent.Portability.FiniteReportLaw.weightedDefinedMetric_joint": [],
     "Descent.Portability.FiniteReportLaw.conditionalMetric_joint": [],
+    "Descent.Portability.ExponentialPoissonRace.race_coordinate_summable": [],
+    "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step": [],
+    "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure": [],
     "Descent.Portability.InterleavedMutationExponential.propagate_mass": [],
     "Descent.Portability.InterleavedMutationMeasurability.bind_mass_measurable": [],
     "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.branchMeasure_univ": [],
@@ -173515,6 +174659,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.ChunkedGenotypeLaw.eligibleReservoir_expectation",
    "Descent.Portability.ReservoirSamplingLaw.completeLaw_expected_retainedSum",
    "Descent.Portability.SamplingDesignLaw.randomDesign_expectation",
    "Descent.Portability.SamplingDesignLaw.reservoirCausalLaw_expectation"
@@ -173525,6 +174670,7 @@
     "count ≤ min requested total"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ChunkedGenotypeLaw.eligibleReservoir_expectation": [],
     "Descent.Portability.ReservoirSamplingLaw.completeLaw_expected_retainedSum": [
      "0 < min requested total"
     ],
@@ -175185,6 +176331,10 @@
    "Descent.Portability.PortabilityRatioGeometry.crossForm_aligned",
    "Descent.Portability.PortabilityRatioGeometry.crossForm_eq_dot",
    "Descent.Portability.PortabilityRatioGeometry.formRatio_some_domain",
+   "Descent.Portability.RatioPoleLaw.crossForm_affine_line",
+   "Descent.Portability.RatioPoleLaw.formRatio_eq_factor",
+   "Descent.Portability.RatioPoleLaw.open_neighborhood_pole",
+   "Descent.Portability.RatioPoleLaw.transverse_scaled_limit",
    "Descent.Portability.SimulationAccuracy.covariance_two_scores",
    "Descent.Portability.SimulationAccuracy.formRatio_value"
   ],
@@ -175196,7 +176346,9 @@
     "0 < varianceForm source sourceCausal effects",
     "0 < varianceForm target targetScore weights",
     "0 < varianceForm target targetCausal effects",
-    "crossForm source sourceScore sourceCausal weights effects ≠ 0"
+    "crossForm source sourceScore sourceCausal weights effects ≠ 0",
+    "PoleWitness source target sourceScore targetScore sourceCausal targetCausal weights effects₀",
+    "crossForm source sourceScore sourceCausal weights direction ≠ 0"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.GaussianEffectPortabilityLaw.crossForm_effects_continuous": [],
@@ -175207,6 +176359,21 @@
     ],
     "Descent.Portability.PortabilityRatioGeometry.formRatio_some_domain": [
      "formRatio source target sourceScore targetScore sourceCausal targetCausal weights effects = some value"
+    ],
+    "Descent.Portability.RatioPoleLaw.formRatio_eq_factor": [
+     "0 < varianceForm source sourceScore weights",
+     "0 < varianceForm source sourceCausal effects",
+     "0 < varianceForm target targetScore weights",
+     "0 < varianceForm target targetCausal effects",
+     "crossForm source sourceScore sourceCausal weights effects ≠ 0"
+    ],
+    "Descent.Portability.RatioPoleLaw.open_neighborhood_pole": [
+     "PoleWitness source target sourceScore targetScore sourceCausal targetCausal weights effects₀"
+    ],
+    "Descent.Portability.RatioPoleLaw.crossForm_affine_line": [],
+    "Descent.Portability.RatioPoleLaw.transverse_scaled_limit": [
+     "PoleWitness source target sourceScore targetScore sourceCausal targetCausal weights effects₀",
+     "crossForm source sourceScore sourceCausal weights direction ≠ 0"
     ],
     "Descent.Portability.SimulationAccuracy.covariance_two_scores": [],
     "Descent.Portability.SimulationAccuracy.formRatio_value": [
@@ -175258,6 +176425,10 @@
    "Descent.Portability.PortabilityRatioGeometry.formRatio_some_domain",
    "Descent.Portability.PortabilityRatioGeometry.trait_domination_iff",
    "Descent.Portability.PortabilityRatioGeometry.varianceForm_nonneg",
+   "Descent.Portability.RatioPoleLaw.formRatio_eq_factor",
+   "Descent.Portability.RatioPoleLaw.numeratorFactor_continuousAt",
+   "Descent.Portability.RatioPoleLaw.open_neighborhood_pole",
+   "Descent.Portability.RatioPoleLaw.transverse_scaled_limit",
    "Descent.Portability.SimulationAccuracy.formRatio_value",
    "Descent.Portability.SimulationAccuracy.squaredCorrelation_eq_formAccuracy"
   ],
@@ -175268,9 +176439,11 @@
    "hypotheses": [
     "formRatio source target sourceScore targetScore sourceCausal targetCausal weights effects = some value",
     "∀ k, covarianceVector target targetScore targetCausal weights k = factor * covarianceVector source sourceScore sourceCausal weights k",
-    "0 < varianceForm source sourceScore weights",
     "0 < varianceForm target targetScore weights",
-    "crossForm source sourceScore sourceCausal weights effects ≠ 0"
+    "0 < varianceForm source sourceScore weights",
+    "crossForm source sourceScore sourceCausal weights effects ≠ 0",
+    "PoleWitness source target sourceScore targetScore sourceCausal targetCausal weights effects₀",
+    "crossForm source sourceScore sourceCausal weights direction ≠ 0"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.GaussianEffectPortabilityLaw.varianceForm_effects_continuous": [],
@@ -175288,6 +176461,21 @@
     ],
     "Descent.Portability.PortabilityRatioGeometry.varianceForm_nonneg": [],
     "Descent.Portability.PortabilityRatioGeometry.trait_domination_iff": [],
+    "Descent.Portability.RatioPoleLaw.numeratorFactor_continuousAt": [
+     "0 < varianceForm target targetScore weights"
+    ],
+    "Descent.Portability.RatioPoleLaw.formRatio_eq_factor": [
+     "0 < varianceForm source sourceScore weights",
+     "0 < varianceForm target targetScore weights",
+     "crossForm source sourceScore sourceCausal weights effects ≠ 0"
+    ],
+    "Descent.Portability.RatioPoleLaw.open_neighborhood_pole": [
+     "PoleWitness source target sourceScore targetScore sourceCausal targetCausal weights effects₀"
+    ],
+    "Descent.Portability.RatioPoleLaw.transverse_scaled_limit": [
+     "PoleWitness source target sourceScore targetScore sourceCausal targetCausal weights effects₀",
+     "crossForm source sourceScore sourceCausal weights direction ≠ 0"
+    ],
     "Descent.Portability.SimulationAccuracy.squaredCorrelation_eq_formAccuracy": [],
     "Descent.Portability.SimulationAccuracy.formRatio_value": [
      "0 < varianceForm source sourceScore weights",
@@ -175434,6 +176622,11 @@
    "Descent.Portability.PortabilityRatioGeometry.formRatio_aligned_le",
    "Descent.Portability.PortabilityRatioGeometry.formRatio_aligned_value",
    "Descent.Portability.PortabilityRatioGeometry.formRatio_some_domain",
+   "Descent.Portability.RatioPoleLaw.formRatio_eq_factor",
+   "Descent.Portability.RatioPoleLaw.open_neighborhood_pole",
+   "Descent.Portability.RatioPoleLaw.ratio_lintegral_top_of_local_slab_mass",
+   "Descent.Portability.RatioPoleLaw.transverse_scaled_limit",
+   "Descent.Portability.RatioPoleLaw.witness_inverse_square_limit",
    "Descent.Portability.SimulationAccuracy.formRatio_value",
    "Descent.Portability.SimulationAccuracy.ratio_affine_eq_formRatio",
    "Descent.Portability.SimulationAccuracy.ratio_eq_formRatio",
@@ -175451,7 +176644,9 @@
     "0 < varianceForm source sourceCausal effects",
     "0 < varianceForm target targetScore weights",
     "0 < varianceForm target targetCausal effects",
-    "crossForm source sourceScore sourceCausal weights effects ≠ 0"
+    "crossForm source sourceScore sourceCausal weights effects ≠ 0",
+    "PoleWitness source target sourceScore targetScore sourceCausal targetCausal weights effects₀",
+    "crossForm source sourceScore sourceCausal weights direction ≠ 0"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.GaussianEffectPortabilityLaw.formRatio_observable_measurable": [],
@@ -175468,6 +176663,26 @@
      "formRatio source target sourceScore targetScore sourceCausal targetCausal weights effects = some value"
     ],
     "Descent.Portability.PortabilityRatioGeometry.AlignmentCertificate.ratio_le_bound": [],
+    "Descent.Portability.RatioPoleLaw.formRatio_eq_factor": [
+     "0 < varianceForm source sourceScore weights",
+     "0 < varianceForm source sourceCausal effects",
+     "0 < varianceForm target targetScore weights",
+     "0 < varianceForm target targetCausal effects",
+     "crossForm source sourceScore sourceCausal weights effects ≠ 0"
+    ],
+    "Descent.Portability.RatioPoleLaw.open_neighborhood_pole": [
+     "PoleWitness source target sourceScore targetScore sourceCausal targetCausal weights effects₀"
+    ],
+    "Descent.Portability.RatioPoleLaw.transverse_scaled_limit": [
+     "PoleWitness source target sourceScore targetScore sourceCausal targetCausal weights effects₀",
+     "crossForm source sourceScore sourceCausal weights direction ≠ 0"
+    ],
+    "Descent.Portability.RatioPoleLaw.witness_inverse_square_limit": [
+     "PoleWitness source target sourceScore targetScore sourceCausal targetCausal weights effects₀"
+    ],
+    "Descent.Portability.RatioPoleLaw.ratio_lintegral_top_of_local_slab_mass": [
+     "PoleWitness source target sourceScore targetScore sourceCausal targetCausal weights effects₀"
+    ],
     "Descent.Portability.SimulationAccuracy.formRatio_value": [
      "0 < varianceForm source sourceScore weights",
      "0 < varianceForm source sourceCausal effects",
@@ -175478,6 +176693,941 @@
     "Descent.Portability.SimulationAccuracy.ratio_eq_formRatio": [],
     "Descent.Portability.SimulationAccuracy.ratio_affine_eq_formRatio": [],
     "Descent.Portability.SimulationAccuracy.reportedRatio_eq_form_sum": []
+   }
+  }
+ },
+ "Descent.Portability.SimulationDemographyLaw.cohortSize": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/SimulationDemographyLaw.lean",
+  "line": 28,
+  "short": "cohortSize",
+  "ret_type": "ℕ",
+  "empirical_status": "",
+  "python": "cohortSize",
+  "args": [
+   "demes"
+  ],
+  "box": {
+   "demes": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.DemeRiskPredictionPanel.outcomeWeight_sum_one",
+   "Descent.Portability.FiniteLiabilityPanel.abs_liability_le_liabilityAbsSum",
+   "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
+   "Descent.Portability.FiniteLiabilityPanel.risk_eq_riskForLiability",
+   "Descent.Portability.FiniteLiabilityPanel.risk_mem_unitInterval",
+   "Descent.Portability.FiniteLiabilityPanel.risk_shift",
+   "Descent.Portability.PipelineStudyDesign.pooledCohortSize_pos",
+   "Descent.Portability.RealizedPTGWASDraw.phenotypeBaselineForRung_phenoB",
+   "Descent.Portability.RealizedPTGWASDraw.phenotypeBaselineForRung_phenoC",
+   "Descent.Portability.RealizedPTGWASDraw.phenotypeLiabilityPanel_phenoC_demeMean",
+   "Descent.Portability.SimulationDemographyLaw.chromosomeDeme_not_ancestor",
+   "Descent.Portability.SimulationDemographyLaw.gridSourceGenome_expectation",
+   "Descent.Portability.SimulationDemographyLaw.initialSamples_complete",
+   "Descent.Portability.SimulationDemographyLaw.serialSourceGenome_expectation"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.DemeRiskPredictionPanel.outcomeWeight_sum_one": [],
+    "Descent.Portability.PipelineStudyDesign.pooledCohortSize_pos": [],
+    "Descent.Portability.FiniteLiabilityPanel.abs_liability_le_liabilityAbsSum": [],
+    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
+    "Descent.Portability.FiniteLiabilityPanel.risk_eq_riskForLiability": [],
+    "Descent.Portability.FiniteLiabilityPanel.risk_mem_unitInterval": [],
+    "Descent.Portability.FiniteLiabilityPanel.risk_shift": [],
+    "Descent.Portability.RealizedPTGWASDraw.phenotypeBaselineForRung_phenoB": [],
+    "Descent.Portability.RealizedPTGWASDraw.phenotypeBaselineForRung_phenoC": [],
+    "Descent.Portability.RealizedPTGWASDraw.phenotypeLiabilityPanel_phenoC_demeMean": [],
+    "Descent.Portability.SimulationDemographyLaw.chromosomeDeme_not_ancestor": [],
+    "Descent.Portability.SimulationDemographyLaw.initialSamples_complete": [],
+    "Descent.Portability.SimulationDemographyLaw.serialSourceGenome_expectation": [],
+    "Descent.Portability.SimulationDemographyLaw.gridSourceGenome_expectation": []
+   }
+  }
+ },
+ "Descent.Portability.SimulationDemographyLaw.individualIndex": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name finSigmaFinEquiv.trans",
+  "file": "Descent/Portability/SimulationDemographyLaw.lean",
+  "line": 30,
+  "short": "individualIndex",
+  "ret_type": "((deme : Fin demes) × Fin (sampleSize source deme)) ≃ Fin (cohortSize demes)",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.SimulationDemographyLaw.chromosomeDeme_pair",
+   "Descent.Portability.SimulationDemographyLaw.individualIndex_val"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.SimulationDemographyLaw.individualIndex_val": [],
+    "Descent.Portability.SimulationDemographyLaw.chromosomeDeme_pair": []
+   }
+  }
+ },
+ "Descent.Portability.SimulationDemographyLaw.chromosomeDeme": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name finProdFinEquiv.symm",
+  "file": "Descent/Portability/SimulationDemographyLaw.lean",
+  "line": 42,
+  "short": "chromosomeDeme",
+  "ret_type": "Fin (demes + 1)",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.SimulationDemographyLaw.chromosomeDeme_not_ancestor",
+   "Descent.Portability.SimulationDemographyLaw.chromosomeDeme_pair",
+   "Descent.Portability.SimulationDemographyLaw.initialSamples_complete"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.SimulationDemographyLaw.chromosomeDeme_pair": [],
+    "Descent.Portability.SimulationDemographyLaw.chromosomeDeme_not_ancestor": [],
+    "Descent.Portability.SimulationDemographyLaw.initialSamples_complete": []
+   }
+  }
+ },
+ "Descent.Portability.SimulationDemographyLaw.initialSamples": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "expected ')', found op:;",
+  "file": "Descent/Portability/SimulationDemographyLaw.lean",
+  "line": 57,
+  "short": "initialSamples",
+  "ret_type": "State (demes + 1) L (cohortSize demes * 2)",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.SimulationDemographyLaw.initialSamples_complete"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "0 < L"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.SimulationDemographyLaw.initialSamples_complete": [
+     "0 < L"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.SimulationDemographyLaw.populationSize": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/SimulationDemographyLaw.lean",
+  "line": 66,
+  "short": "populationSize",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "populationSize",
+  "args": [
+   "modern",
+   "deme"
+  ],
+  "box": {
+   "modern": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.AncestralAbsorptionLaw.coalescenceFloor_le_mass",
+   "Descent.Portability.AncestralAbsorptionLaw.coalescenceFloor_lt_one",
+   "Descent.Portability.AncestralAbsorptionLaw.coalescenceFloor_pos",
+   "Descent.Portability.AncestralEventLaw.unordered_pair_rate",
+   "Descent.Portability.AncestralMutationAbsorption.coalescenceFloor_le_mass",
+   "Descent.Portability.AncestralMutationAbsorption.coalescenceFloor_lt_one",
+   "Descent.Portability.AncestralMutationAbsorption.coalescenceFloor_pos",
+   "Descent.Portability.SimulationDemographyLaw.populationSize_pos"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "SupportedAt deme s"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralAbsorptionLaw.coalescenceFloor_pos": [],
+    "Descent.Portability.AncestralAbsorptionLaw.coalescenceFloor_lt_one": [],
+    "Descent.Portability.AncestralAbsorptionLaw.coalescenceFloor_le_mass": [
+     "SupportedAt deme s"
+    ],
+    "Descent.Portability.AncestralEventLaw.unordered_pair_rate": [],
+    "Descent.Portability.AncestralMutationAbsorption.coalescenceFloor_pos": [],
+    "Descent.Portability.AncestralMutationAbsorption.coalescenceFloor_lt_one": [],
+    "Descent.Portability.AncestralMutationAbsorption.coalescenceFloor_le_mass": [
+     "SupportedAt deme s"
+    ],
+    "Descent.Portability.SimulationDemographyLaw.populationSize_pos": []
+   },
+   "range_lo_thm": [
+    "Descent.Portability.SimulationDemographyLaw.populationSize_pos",
+    0
+   ],
+   "range_lo": 0
+  }
+ },
+ "Descent.Portability.SimulationDemographyLaw.tailRates": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/SimulationDemographyLaw.lean",
+  "line": 74,
+  "short": "tailRates",
+  "ret_type": "Rates (modern + 1) L where populationSize",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "modern": [
+    1.0,
+    20.0
+   ],
+   "L": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.SimulationDemographyLaw.tailRates_isolated"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.SimulationDemographyLaw.tailRates_isolated": []
+   }
+  }
+ },
+ "Descent.Portability.SimulationDemographyLaw.mutationRate": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "anonymous constructor",
+  "file": "Descent/Portability/SimulationDemographyLaw.lean",
+  "line": 85,
+  "short": "mutationRate",
+  "ret_type": "ℝ≥0",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.AncestralBranchExposure.mutationFactor_bounds",
+   "Descent.Portability.AncestralBranchExposure.mutationFactor_measurable",
+   "Descent.Portability.AncestralBranchExposure.mutationFactor_summable",
+   "Descent.Portability.AncestralEpochGenotypeLaw.conditionalEpoch_mass_integrable",
+   "Descent.Portability.AncestralEpochGenotypeLaw.conditionalEpoch_mass_measurable",
+   "Descent.Portability.AncestralEpochGenotypeLaw.conditionalEpoch_times_measurable",
+   "Descent.Portability.AncestralEpochGenotypeLaw.epochCountMass_bounds",
+   "Descent.Portability.AncestralEpochGenotypeLaw.epochCountMass_expectation",
+   "Descent.Portability.AncestralEpochGenotypeLaw.epochCountMass_sum",
+   "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation",
+   "Descent.Portability.AncestralEpochGenotypeLaw.epoch_coordinate_summable",
+   "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation",
+   "Descent.Portability.AncestralEpochGenotypeLaw.intervalGenome_mass_measurable",
+   "Descent.Portability.AncestralEpochGenotypeLaw.mergingTail_expectation",
+   "Descent.Portability.AncestralGenealogyLaw.traceBranches_exposure",
+   "Descent.Portability.AncestralGenealogyLaw.traceNucleotide_expectation",
+   "Descent.Portability.AncestralGenealogyOrdering.traceBranches_extends",
+   "Descent.Portability.AncestralGenealogyOrdering.traceBranches_ordered",
+   "Descent.Portability.AncestralMutationAbsorption.blockSurvivalBound_lt_one",
+   "Descent.Portability.AncestralMutationAbsorption.blockSurvivalBound_nonneg",
+   "Descent.Portability.AncestralMutationAbsorption.coalescenceFloor_le_mass",
+   "Descent.Portability.AncestralMutationAbsorption.coalescenceFloor_lt_one",
+   "Descent.Portability.AncestralMutationAbsorption.coalescenceFloor_pos",
+   "Descent.Portability.AncestralMutationAbsorption.empty_mark_mass",
+   "Descent.Portability.AncestralMutationAbsorption.exists_completion_trace",
+   "Descent.Portability.AncestralMutationAbsorption.fixed_point_unique",
+   "Descent.Portability.AncestralMutationAbsorption.historySupportedAt",
+   "Descent.Portability.AncestralMutationAbsorption.history_expectation_succ",
+   "Descent.Portability.AncestralMutationAbsorption.iterate_distance_geometric",
+   "Descent.Portability.AncestralMutationAbsorption.iterate_distance_survival",
+   "Descent.Portability.AncestralMutationAbsorption.supportedAt_scan",
+   "Descent.Portability.AncestralMutationAbsorption.survival_add",
+   "Descent.Portability.AncestralMutationAbsorption.survival_antitone",
+   "Descent.Portability.AncestralMutationAbsorption.survival_block_bound",
+   "Descent.Portability.AncestralMutationAbsorption.survival_block_relative",
+   "Descent.Portability.AncestralMutationAbsorption.survival_bound",
+   "Descent.Portability.AncestralMutationAbsorption.survival_empty",
+   "Descent.Portability.AncestralMutationAbsorption.survival_geometric",
+   "Descent.Portability.AncestralMutationAbsorption.survival_le_one",
+   "Descent.Portability.AncestralMutationAbsorption.survival_le_unfinished",
+   "Descent.Portability.AncestralMutationAbsorption.survival_nonneg",
+   "Descent.Portability.AncestralMutationAbsorption.survival_succ",
+   "Descent.Portability.AncestralMutationAbsorption.survival_tendsto_zero",
+   "Descent.Portability.AncestralMutationLimit.coordinate_cauchy",
+   "Descent.Portability.AncestralMutationLimit.distance_tendsto",
+   "Descent.Portability.AncestralMutationLimit.fixed_point_identifies_limit",
+   "Descent.Portability.AncestralMutationLimit.iterateLaw_boundary",
+   "Descent.Portability.AncestralMutationLimit.iterateLaw_tail_distance",
+   "Descent.Portability.AncestralMutationLimit.iterate_fixed_on_supported",
+   "Descent.Portability.AncestralMutationLimit.limitLaw_boundary",
+   "Descent.Portability.AncestralMutationLimit.limitLaw_error",
+   "Descent.Portability.AncestralMutationLimit.limitLaw_error_geometric",
+   "Descent.Portability.AncestralMutationLimit.limitLaw_expectation_tendsto",
+   "Descent.Portability.AncestralMutationLimit.limitLaw_fixed",
+   "Descent.Portability.AncestralMutationLimit.positiveMark_sum",
+   "Descent.Portability.AncestralMutationLimit.positiveNextComplete",
+   "Descent.Portability.AncestralMutationLimit.positiveNextSupported",
+   "Descent.Portability.AncestralMutationLimit.tendsto_limitMass",
+   "Descent.Portability.AncestralMutationLimit.transferMark_tendsto",
+   "Descent.Portability.AncestralMutationLimit.transfer_congr_on_supported",
+   "Descent.Portability.AncestralMutationResolvent.expectation_resolvent",
+   "Descent.Portability.AncestralMutationResolvent.history_reward_succ",
+   "Descent.Portability.AncestralMutationResolvent.next_admissible",
+   "Descent.Portability.AncestralMutationResolvent.positiveMark_sum",
+   "Descent.Portability.AncestralMutationResolvent.residual_injective",
+   "Descent.Portability.AncestralMutationResolvent.resolvent_solve",
+   "Descent.Portability.AncestralMutationResolvent.resolvent_unique",
+   "Descent.Portability.AncestralMutationResolvent.rowNorm_transient_le",
+   "Descent.Portability.AncestralMutationResolvent.solution_boundary_row",
+   "Descent.Portability.AncestralMutationResolvent.solution_eq_resolvent",
+   "Descent.Portability.AncestralMutationResolvent.solution_equation",
+   "Descent.Portability.AncestralMutationResolvent.subharmonic_iterate",
+   "Descent.Portability.AncestralMutationResolvent.subharmonic_zero",
+   "Descent.Portability.AncestralMutationResolvent.transient_no_fixed",
+   "Descent.Portability.AncestralMutationTransfer.historyMass_nonneg",
+   "Descent.Portability.AncestralMutationTransfer.historyMass_sum",
+   "Descent.Portability.AncestralMutationTransfer.intensity_pos",
+   "Descent.Portability.AncestralMutationTransfer.iterate_distance",
+   "Descent.Portability.AncestralMutationTransfer.iterate_history_expectation",
+   "Descent.Portability.AncestralMutationTransfer.iterate_history_law",
+   "Descent.Portability.AncestralMutationTransfer.mutationIntensity_nonneg",
+   "Descent.Portability.AncestralMutationTransfer.totalIntensity_le",
+   "Descent.Portability.AncestralMutationTransfer.totalIntensity_nonneg",
+   "Descent.Portability.AncestralMutationTransfer.transfer_boundary",
+   "Descent.Portability.AncestralMutationTransfer.transfer_distance",
+   "Descent.Portability.AncestralMutationTransfer.transfer_empty",
+   "Descent.Portability.AncestralMutationTransfer.transfer_expectation",
+   "Descent.Portability.AncestralMutationTransfer.transfer_generator",
+   "Descent.Portability.AncestralMutationTransfer.transfer_normalized",
+   "Descent.Portability.StoppedGenotypeLaw.conditionalGenome_expectation_measurable",
+   "Descent.Portability.StoppedGenotypeLaw.conditionalGenome_mass_bounds",
+   "Descent.Portability.StoppedGenotypeLaw.conditionalGenome_mass_integrable",
+   "Descent.Portability.StoppedGenotypeLaw.conditionalGenome_mass_measurable",
+   "Descent.Portability.StoppedGenotypeLaw.conditionalSite_mass_measurable",
+   "Descent.Portability.StoppedGenotypeLaw.genomeCountMass_bounds",
+   "Descent.Portability.StoppedGenotypeLaw.genomeCountMass_expectation",
+   "Descent.Portability.StoppedGenotypeLaw.genomeCountMass_sum",
+   "Descent.Portability.StoppedGenotypeLaw.genomeCountMass_summable",
+   "Descent.Portability.StoppedGenotypeLaw.stateInterval_mass_measurable",
+   "Descent.Portability.StoppedGenotypeLaw.stoppedGenome_expectation",
+   "Descent.Portability.StoppedGenotypeLaw.stoppedGenome_truncation",
+   "Descent.Portability.StoppedGenotypeReadiness.conditionalGenome_unsupported_covered",
+   "Descent.Portability.StoppedGenotypeReadiness.conditionalSiteLaw_ready",
+   "Descent.Portability.StoppedGenotypeReadiness.conditionalSite_unsupported_covered",
+   "Descent.Portability.StoppedGenotypeReadiness.conditionalSite_unsupported_ready",
+   "Descent.Portability.StoppedGenotypeReadiness.nextInterval_input_homogeneous",
+   "Descent.Portability.StoppedGenotypeReadiness.stoppedGenome_covered",
+   "Descent.Portability.StoppedGenotypeReadiness.stoppedGenome_unsupported_covered",
+   "Descent.Portability.symmetricBetaHeterozygosity_eq_recurrentLowOrderH"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralBranchExposure.mutationFactor_measurable": [],
+    "Descent.Portability.AncestralBranchExposure.mutationFactor_bounds": [],
+    "Descent.Portability.AncestralBranchExposure.mutationFactor_summable": [],
+    "Descent.Portability.AncestralEpochGenotypeLaw.intervalGenome_mass_measurable": [],
+    "Descent.Portability.AncestralEpochGenotypeLaw.conditionalEpoch_mass_measurable": [],
+    "Descent.Portability.AncestralEpochGenotypeLaw.conditionalEpoch_times_measurable": [],
+    "Descent.Portability.AncestralEpochGenotypeLaw.conditionalEpoch_mass_integrable": [],
+    "Descent.Portability.AncestralEpochGenotypeLaw.epochCountMass_bounds": [],
+    "Descent.Portability.AncestralEpochGenotypeLaw.epochCountMass_expectation": [],
+    "Descent.Portability.AncestralEpochGenotypeLaw.epochCountMass_sum": [],
+    "Descent.Portability.AncestralEpochGenotypeLaw.epoch_coordinate_summable": [],
+    "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation": [],
+    "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation": [],
+    "Descent.Portability.AncestralEpochGenotypeLaw.mergingTail_expectation": [],
+    "Descent.Portability.AncestralGenealogyLaw.traceBranches_exposure": [],
+    "Descent.Portability.AncestralGenealogyOrdering.traceBranches_extends": [],
+    "Descent.Portability.AncestralGenealogyOrdering.traceBranches_ordered": [],
+    "Descent.Portability.AncestralGenealogyLaw.traceNucleotide_expectation": [],
+    "Descent.Portability.AncestralMutationAbsorption.empty_mark_mass": [],
+    "Descent.Portability.AncestralMutationAbsorption.supportedAt_scan": [],
+    "Descent.Portability.AncestralMutationAbsorption.historySupportedAt": [],
+    "Descent.Portability.AncestralMutationAbsorption.history_expectation_succ": [],
+    "Descent.Portability.AncestralMutationAbsorption.coalescenceFloor_pos": [],
+    "Descent.Portability.AncestralMutationAbsorption.coalescenceFloor_lt_one": [],
+    "Descent.Portability.AncestralMutationAbsorption.coalescenceFloor_le_mass": [],
+    "Descent.Portability.AncestralMutationAbsorption.exists_completion_trace": [],
+    "Descent.Portability.AncestralMutationAbsorption.survival_nonneg": [],
+    "Descent.Portability.AncestralMutationAbsorption.survival_le_one": [],
+    "Descent.Portability.AncestralMutationAbsorption.survival_empty": [],
+    "Descent.Portability.AncestralMutationAbsorption.survival_succ": [],
+    "Descent.Portability.AncestralMutationAbsorption.survival_add": [],
+    "Descent.Portability.AncestralMutationAbsorption.survival_block_bound": [],
+    "Descent.Portability.AncestralMutationAbsorption.blockSurvivalBound_nonneg": [],
+    "Descent.Portability.AncestralMutationAbsorption.blockSurvivalBound_lt_one": [],
+    "Descent.Portability.AncestralMutationAbsorption.survival_block_relative": [],
+    "Descent.Portability.AncestralMutationAbsorption.survival_geometric": [],
+    "Descent.Portability.AncestralMutationAbsorption.survival_le_unfinished": [],
+    "Descent.Portability.AncestralMutationAbsorption.survival_antitone": [],
+    "Descent.Portability.AncestralMutationAbsorption.survival_bound": [],
+    "Descent.Portability.AncestralMutationAbsorption.survival_tendsto_zero": [],
+    "Descent.Portability.AncestralMutationAbsorption.iterate_distance_survival": [],
+    "Descent.Portability.AncestralMutationAbsorption.iterate_distance_geometric": [],
+    "Descent.Portability.AncestralMutationAbsorption.fixed_point_unique": [],
+    "Descent.Portability.AncestralMutationLimit.iterateLaw_boundary": [],
+    "Descent.Portability.AncestralMutationLimit.iterateLaw_tail_distance": [],
+    "Descent.Portability.AncestralMutationLimit.coordinate_cauchy": [],
+    "Descent.Portability.AncestralMutationLimit.tendsto_limitMass": [],
+    "Descent.Portability.AncestralMutationLimit.distance_tendsto": [],
+    "Descent.Portability.AncestralMutationLimit.limitLaw_error": [],
+    "Descent.Portability.AncestralMutationLimit.limitLaw_error_geometric": [],
+    "Descent.Portability.AncestralMutationLimit.limitLaw_expectation_tendsto": [],
+    "Descent.Portability.AncestralMutationLimit.positiveMark_sum": [],
+    "Descent.Portability.AncestralMutationLimit.positiveNextComplete": [],
+    "Descent.Portability.AncestralMutationLimit.positiveNextSupported": [],
+    "Descent.Portability.AncestralMutationLimit.transferMark_tendsto": [],
+    "Descent.Portability.AncestralMutationLimit.limitLaw_fixed": [],
+    "Descent.Portability.AncestralMutationLimit.limitLaw_boundary": [],
+    "Descent.Portability.AncestralMutationLimit.transfer_congr_on_supported": [],
+    "Descent.Portability.AncestralMutationLimit.iterate_fixed_on_supported": [],
+    "Descent.Portability.AncestralMutationLimit.fixed_point_identifies_limit": [],
+    "Descent.Portability.AncestralMutationResolvent.rowNorm_transient_le": [],
+    "Descent.Portability.AncestralMutationResolvent.history_reward_succ": [],
+    "Descent.Portability.AncestralMutationResolvent.subharmonic_iterate": [],
+    "Descent.Portability.AncestralMutationResolvent.subharmonic_zero": [],
+    "Descent.Portability.AncestralMutationResolvent.transient_no_fixed": [],
+    "Descent.Portability.AncestralMutationResolvent.residual_injective": [],
+    "Descent.Portability.AncestralMutationResolvent.resolvent_solve": [],
+    "Descent.Portability.AncestralMutationResolvent.resolvent_unique": [],
+    "Descent.Portability.AncestralMutationResolvent.solution_boundary_row": [],
+    "Descent.Portability.AncestralMutationResolvent.positiveMark_sum": [],
+    "Descent.Portability.AncestralMutationResolvent.next_admissible": [],
+    "Descent.Portability.AncestralMutationResolvent.solution_equation": [],
+    "Descent.Portability.AncestralMutationResolvent.solution_eq_resolvent": [],
+    "Descent.Portability.AncestralMutationResolvent.expectation_resolvent": [],
+    "Descent.Portability.AncestralMutationTransfer.mutationIntensity_nonneg": [],
+    "Descent.Portability.AncestralMutationTransfer.totalIntensity_nonneg": [],
+    "Descent.Portability.AncestralMutationTransfer.intensity_pos": [],
+    "Descent.Portability.AncestralMutationTransfer.totalIntensity_le": [],
+    "Descent.Portability.AncestralMutationTransfer.transfer_normalized": [],
+    "Descent.Portability.AncestralMutationTransfer.transfer_expectation": [],
+    "Descent.Portability.AncestralMutationTransfer.transfer_generator": [],
+    "Descent.Portability.AncestralMutationTransfer.transfer_empty": [],
+    "Descent.Portability.AncestralMutationTransfer.transfer_boundary": [],
+    "Descent.Portability.AncestralMutationTransfer.historyMass_nonneg": [],
+    "Descent.Portability.AncestralMutationTransfer.historyMass_sum": [],
+    "Descent.Portability.AncestralMutationTransfer.iterate_history_expectation": [],
+    "Descent.Portability.AncestralMutationTransfer.transfer_distance": [],
+    "Descent.Portability.AncestralMutationTransfer.iterate_history_law": [],
+    "Descent.Portability.AncestralMutationTransfer.iterate_distance": [],
+    "Descent.Portability.symmetricBetaHeterozygosity_eq_recurrentLowOrderH": [],
+    "Descent.Portability.StoppedGenotypeLaw.stateInterval_mass_measurable": [],
+    "Descent.Portability.StoppedGenotypeLaw.conditionalSite_mass_measurable": [],
+    "Descent.Portability.StoppedGenotypeLaw.conditionalGenome_mass_measurable": [],
+    "Descent.Portability.StoppedGenotypeLaw.conditionalGenome_mass_bounds": [],
+    "Descent.Portability.StoppedGenotypeLaw.conditionalGenome_mass_integrable": [],
+    "Descent.Portability.StoppedGenotypeLaw.conditionalGenome_expectation_measurable": [],
+    "Descent.Portability.StoppedGenotypeLaw.genomeCountMass_bounds": [],
+    "Descent.Portability.StoppedGenotypeLaw.genomeCountMass_expectation": [],
+    "Descent.Portability.StoppedGenotypeLaw.genomeCountMass_sum": [],
+    "Descent.Portability.StoppedGenotypeLaw.genomeCountMass_summable": [],
+    "Descent.Portability.StoppedGenotypeLaw.stoppedGenome_expectation": [],
+    "Descent.Portability.StoppedGenotypeLaw.stoppedGenome_truncation": [],
+    "Descent.Portability.StoppedGenotypeReadiness.conditionalSite_unsupported_ready": [],
+    "Descent.Portability.StoppedGenotypeReadiness.conditionalSiteLaw_ready": [],
+    "Descent.Portability.StoppedGenotypeReadiness.nextInterval_input_homogeneous": [],
+    "Descent.Portability.StoppedGenotypeReadiness.conditionalSite_unsupported_covered": [],
+    "Descent.Portability.StoppedGenotypeReadiness.conditionalGenome_unsupported_covered": [],
+    "Descent.Portability.StoppedGenotypeReadiness.stoppedGenome_unsupported_covered": [],
+    "Descent.Portability.StoppedGenotypeReadiness.stoppedGenome_covered": []
+   },
+   "range_hi_thm": [
+    "Descent.Portability.AncestralBranchExposure.mutationFactor_bounds",
+    0
+   ],
+   "range_hi": 1,
+   "range_lo_thm": [
+    "Descent.Portability.symmetricBetaHeterozygosity_eq_recurrentLowOrderH",
+    0
+   ],
+   "range_lo": 0
+  }
+ },
+ "Descent.Portability.SimulationDemographyLaw.serialRates": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/SimulationDemographyLaw.lean",
+  "line": 89,
+  "short": "serialRates",
+  "ret_type": "Rates 11 L where populationSize",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "L": [
+    1.0,
+    20.0
+   ],
+   "active": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.SimulationDemographyLaw.serialRates_enabled",
+   "Descent.Portability.SimulationDemographyLaw.serialRates_removed"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "a.val < active",
+    "b.val < active",
+    "active ≤ a.val"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.SimulationDemographyLaw.serialRates_enabled": [
+     "a.val < active",
+     "b.val < active"
+    ],
+    "Descent.Portability.SimulationDemographyLaw.serialRates_removed": [
+     "active ≤ a.val"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.SimulationDemographyLaw.serialRelocation": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "anonymous constructor",
+  "file": "Descent/Portability/SimulationDemographyLaw.lean",
+  "line": 111,
+  "short": "serialRelocation",
+  "ret_type": "Fin 11",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.SimulationDemographyLaw.serialRelocation_other",
+   "Descent.Portability.SimulationDemographyLaw.serialRelocation_source"
+  ],
+  "constraints": {
+   "declared_kind": "probability",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [
+    "deme.val ≠ 9 - stage.val"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.SimulationDemographyLaw.serialRelocation_source": [],
+    "Descent.Portability.SimulationDemographyLaw.serialRelocation_other": [
+     "deme.val ≠ 9 - stage.val"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.SimulationDemographyLaw.serialStage": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "unsupported token '['",
+  "file": "Descent/Portability/SimulationDemographyLaw.lean",
+  "line": 124,
+  "short": "serialStage",
+  "ret_type": "List (Instruction 11 L)",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "L": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.SimulationDemographyLaw.serialInstructions_duration"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "units": "generation",
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.SimulationDemographyLaw.serialInstructions_duration": []
+   }
+  }
+ },
+ "Descent.Portability.SimulationDemographyLaw.serialInstructions": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "unsupported token '['",
+  "file": "Descent/Portability/SimulationDemographyLaw.lean",
+  "line": 129,
+  "short": "serialInstructions",
+  "ret_type": "List (Instruction 11 L)",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "L": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.SimulationDemographyLaw.serialInstructions_duration"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.SimulationDemographyLaw.serialInstructions_duration": []
+   }
+  }
+ },
+ "Descent.Portability.SimulationDemographyLaw.serialEventSchedule": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name List.ofFn",
+  "file": "Descent/Portability/SimulationDemographyLaw.lean",
+  "line": 132,
+  "short": "serialEventSchedule",
+  "ret_type": "List (ℕ × ℕ × ℕ)",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.SimulationDemographyLaw.serialEventSchedule_exact"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.SimulationDemographyLaw.serialEventSchedule_exact": []
+   }
+  }
+ },
+ "Descent.Portability.SimulationDemographyLaw.instructionDuration": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "recursion has no `0` branch",
+  "file": "Descent/Portability/SimulationDemographyLaw.lean",
+  "line": 141,
+  "short": "instructionDuration",
+  "ret_type": "Instruction D L → ℝ≥0",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.SimulationDemographyLaw.gridInstructions_duration",
+   "Descent.Portability.SimulationDemographyLaw.serialInstructions_duration"
+  ],
+  "constraints": {
+   "declared_kind": "ratio",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.SimulationDemographyLaw.serialInstructions_duration": [],
+    "Descent.Portability.SimulationDemographyLaw.gridInstructions_duration": []
+   }
+  }
+ },
+ "Descent.Portability.SimulationDemographyLaw.gridAdjacent": {
+  "class": "STRUCTURAL",
+  "note": "Prop-valued / set-valued",
+  "file": "Descent/Portability/SimulationDemographyLaw.lean",
+  "line": 150,
+  "short": "gridAdjacent",
+  "ret_type": "Prop",
+  "empirical_status": "",
+  "python": "gridAdjacent",
+  "args": [
+   "a",
+   "b"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.SimulationDemographyLaw.gridAdjacent_eq_manhattan",
+   "Descent.Portability.SimulationDemographyLaw.gridRates_adjacent",
+   "Descent.Portability.SimulationDemographyLaw.gridRates_nonadjacent"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "gridAdjacent a b",
+    "¬ gridAdjacent a b"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.SimulationDemographyLaw.gridAdjacent_eq_manhattan": [],
+    "Descent.Portability.SimulationDemographyLaw.gridRates_adjacent": [
+     "gridAdjacent a b"
+    ],
+    "Descent.Portability.SimulationDemographyLaw.gridRates_nonadjacent": [
+     "¬ gridAdjacent a b"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.SimulationDemographyLaw.gridRates": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/SimulationDemographyLaw.lean",
+  "line": 173,
+  "short": "gridRates",
+  "ret_type": "Rates 37 L where populationSize",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "L": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.SimulationDemographyLaw.gridRates_adjacent",
+   "Descent.Portability.SimulationDemographyLaw.gridRates_nonadjacent"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.SimulationDemographyLaw.gridRates_adjacent": [],
+    "Descent.Portability.SimulationDemographyLaw.gridRates_nonadjacent": []
+   }
+  }
+ },
+ "Descent.Portability.SimulationDemographyLaw.gridInstructions": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "unsupported token '['",
+  "file": "Descent/Portability/SimulationDemographyLaw.lean",
+  "line": 187,
+  "short": "gridInstructions",
+  "ret_type": "List (Instruction 37 L)",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "L": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.SimulationDemographyLaw.gridInstructions_duration"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.SimulationDemographyLaw.gridInstructions_duration": []
+   }
+  }
+ },
+ "Descent.Portability.SimulationDemographyLaw.serialGenomeLaw": {
+  "class": "STRUCTURAL",
+  "note": "builds a structure value (FiniteReportLaw (WholeGenome L (cohortSize 10 * 2)))",
+  "file": "Descent/Portability/SimulationDemographyLaw.lean",
+  "line": 196,
+  "short": "serialGenomeLaw",
+  "ret_type": "FiniteReportLaw (WholeGenome L (cohortSize 10 * 2))",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "L": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.SimulationDemographyLaw.serialSourceGenome_expectation"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "units": "generation",
+   "hypotheses": [
+    "0 < L"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.SimulationDemographyLaw.serialSourceGenome_expectation": [
+     "0 < L"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.SimulationDemographyLaw.gridGenomeLaw": {
+  "class": "STRUCTURAL",
+  "note": "builds a structure value (FiniteReportLaw (WholeGenome L (cohortSize 36 * 2)))",
+  "file": "Descent/Portability/SimulationDemographyLaw.lean",
+  "line": 203,
+  "short": "gridGenomeLaw",
+  "ret_type": "FiniteReportLaw (WholeGenome L (cohortSize 36 * 2))",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "L": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.SimulationDemographyLaw.gridSourceGenome_expectation"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "units": "generation",
+   "hypotheses": [
+    "0 < L"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.SimulationDemographyLaw.gridSourceGenome_expectation": [
+     "0 < L"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.SimulationDemographyLaw.serialSourceGenomeLaw": {
+  "class": "STRUCTURAL",
+  "note": "builds a structure value (FiniteReportLaw (Fin 10 × WholeGenome L (cohortSize 10 * 2)))",
+  "file": "Descent/Portability/SimulationDemographyLaw.lean",
+  "line": 211,
+  "short": "serialSourceGenomeLaw",
+  "ret_type": "FiniteReportLaw (Fin 10 × WholeGenome L (cohortSize 10 * 2))",
+  "empirical_status": "",
+  "python": "serialSourceGenomeLaw",
+  "args": [
+   "L",
+   "hL"
+  ],
+  "box": {
+   "L": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "Uninhabitable(\"no inhabitant modelled for the type '0 < L'\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.SimulationDemographyLaw.serialSourceGenome_expectation"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "0 < L"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.SimulationDemographyLaw.serialSourceGenome_expectation": [
+     "0 < L"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.SimulationDemographyLaw.gridSourceGenomeLaw": {
+  "class": "STRUCTURAL",
+  "note": "builds a structure value (FiniteReportLaw (Fin 36 × WholeGenome L (cohortSize 36 * 2)))",
+  "file": "Descent/Portability/SimulationDemographyLaw.lean",
+  "line": 215,
+  "short": "gridSourceGenomeLaw",
+  "ret_type": "FiniteReportLaw (Fin 36 × WholeGenome L (cohortSize 36 * 2))",
+  "empirical_status": "",
+  "python": "gridSourceGenomeLaw",
+  "args": [
+   "L",
+   "hL"
+  ],
+  "box": {
+   "L": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "Uninhabitable(\"no inhabitant modelled for the type '0 < L'\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.SimulationDemographyLaw.gridSourceGenome_expectation"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "0 < L"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.SimulationDemographyLaw.gridSourceGenome_expectation": [
+     "0 < L"
+    ]
    }
   }
  },
@@ -175568,6 +177718,8 @@
    "Descent.Portability.PipelineDemographicHistory.pooledMAFProbeMassViaPositiveDual_eq_projection",
    "Descent.Portability.PipelineDemographicHistory.pooledMAFProbeMassViaPositiveDual_nonneg",
    "Descent.Portability.PipelineDemographicHistory.pooledMAFProbeMass_samplingDual",
+   "Descent.Portability.SimulationDemographyLaw.chromosomeDeme_pair",
+   "Descent.Portability.SimulationDemographyLaw.individualIndex_val",
    "Descent.Portability.SourceDesignLaw.sampleSize_total",
    "Descent.Portability.manyDemeSampleCountAlternatingPolynomial_eq_bernstein",
    "Descent.Portability.manyDemeSampleCountAlternating_eq_bernstein",
@@ -175619,6 +177771,8 @@
     "Descent.Portability.FrequencyResolvedCohort.combinedInformationIndex_mul_threshold_eq_spike": [],
     "Descent.Portability.FrequencyResolvedCohort.effectiveSubgroupSize_pos_of_admissible": [],
     "Descent.Portability.FrequencyResolvedCohort.effectiveSubgroupSize_nonpos_of_inadmissible": [],
+    "Descent.Portability.SimulationDemographyLaw.individualIndex_val": [],
+    "Descent.Portability.SimulationDemographyLaw.chromosomeDeme_pair": [],
     "Descent.Portability.SourceDesignLaw.sampleSize_total": []
    },
    "range_lo_thm": [
@@ -175655,12 +177809,14 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.SimulationDemographyLaw.gridAdjacent_eq_manhattan",
    "Descent.Portability.SourceDesignLaw.grid_available_iff",
    "Descent.Portability.SourceDesignLaw.serial_available_iff"
   ],
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Portability.SimulationDemographyLaw.gridAdjacent_eq_manhattan": [],
     "Descent.Portability.SourceDesignLaw.serial_available_iff": [],
     "Descent.Portability.SourceDesignLaw.grid_available_iff": []
    }
@@ -175726,11 +177882,13 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.SimulationDemographyLaw.gridAdjacent_eq_manhattan",
    "Descent.Portability.SourceDesignLaw.grid_available_iff"
   ],
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Portability.SimulationDemographyLaw.gridAdjacent_eq_manhattan": [],
     "Descent.Portability.SourceDesignLaw.grid_available_iff": []
    }
   }
@@ -176866,6 +179024,12 @@
    "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation",
    "Descent.Portability.AncestralEpochGenotypeLaw.intervalGenome_mass_measurable",
    "Descent.Portability.AncestralEpochGenotypeLaw.mergingTail_expectation",
+   "Descent.Portability.ChunkedGenotypeLaw.genomeLaw_expectation",
+   "Descent.Portability.ChunkedGenotypeLaw.reservoirPair_expectation",
+   "Descent.Portability.ChunkedGenotypeLaw.sourceGenomeReservoir_expectation",
+   "Descent.Portability.ChunkedGenotypeLaw.sourceGenome_expectation",
+   "Descent.Portability.SimulationDemographyLaw.gridSourceGenome_expectation",
+   "Descent.Portability.SimulationDemographyLaw.serialSourceGenome_expectation",
    "Descent.Portability.StoppedGenotypeLaw.bedDiploidDosage_eq_clip",
    "Descent.Portability.StoppedGenotypeLaw.conditionalGenome_expectation_measurable",
    "Descent.Portability.StoppedGenotypeLaw.conditionalGenome_mass_bounds",
@@ -176884,7 +179048,9 @@
    "Descent.Portability.StoppedGenotypeReadiness.stoppedGenome_unsupported_covered"
   ],
   "constraints": {
-   "hypotheses": [],
+   "hypotheses": [
+    "0 < L"
+   ],
    "hypotheses_by_theorem": {
     "Descent.Portability.AncestralEpochGenotypeLaw.intervalGenome_mass_measurable": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.conditionalEpoch_mass_measurable": [],
@@ -176897,6 +179063,16 @@
     "Descent.Portability.AncestralEpochGenotypeLaw.epochGenome_expectation": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.historyGenome_epoch_expectation": [],
     "Descent.Portability.AncestralEpochGenotypeLaw.mergingTail_expectation": [],
+    "Descent.Portability.ChunkedGenotypeLaw.genomeLaw_expectation": [],
+    "Descent.Portability.ChunkedGenotypeLaw.sourceGenome_expectation": [],
+    "Descent.Portability.ChunkedGenotypeLaw.reservoirPair_expectation": [],
+    "Descent.Portability.ChunkedGenotypeLaw.sourceGenomeReservoir_expectation": [],
+    "Descent.Portability.SimulationDemographyLaw.serialSourceGenome_expectation": [
+     "0 < L"
+    ],
+    "Descent.Portability.SimulationDemographyLaw.gridSourceGenome_expectation": [
+     "0 < L"
+    ],
     "Descent.Portability.StoppedGenotypeLaw.mem_retainedSites": [],
     "Descent.Portability.StoppedGenotypeLaw.bedDiploidDosage_eq_clip": [],
     "Descent.Portability.StoppedGenotypeLaw.conditionalGenome_mass_measurable": [],
@@ -184232,6 +186408,12 @@
    "Descent.Portability.CalibrationLaw.standardized_mean_zero",
    "Descent.Portability.CalibrationLaw.standardized_second_moment_le_one",
    "Descent.Portability.CalibrationLaw.variance_continuous",
+   "Descent.Portability.ChunkedGenotypeLaw.dependentJoint_expectation",
+   "Descent.Portability.ChunkedGenotypeLaw.eligibleReservoir_expectation",
+   "Descent.Portability.ChunkedGenotypeLaw.genomeLaw_expectation",
+   "Descent.Portability.ChunkedGenotypeLaw.reservoirPair_expectation",
+   "Descent.Portability.ChunkedGenotypeLaw.sourceGenomeReservoir_expectation",
+   "Descent.Portability.ChunkedGenotypeLaw.sourceGenome_expectation",
    "Descent.Portability.ExactFiniteHistoryLaw.expectation_propagate",
    "Descent.Portability.ExactFiniteHistoryLaw.expectation_reportLaw",
    "Descent.Portability.ExactFiniteHistoryLaw.path_mass_sum_one",
@@ -184323,6 +186505,8 @@
    "Descent.Portability.SimulationAccuracy.covariance_affine",
    "Descent.Portability.SimulationAccuracy.expectation_affine",
    "Descent.Portability.SimulationAccuracy.standardize_eq_affine",
+   "Descent.Portability.SimulationDemographyLaw.gridSourceGenome_expectation",
+   "Descent.Portability.SimulationDemographyLaw.serialSourceGenome_expectation",
    "Descent.Portability.SourceDesignLaw.gridSourceCount_mass",
    "Descent.Portability.SourceDesignLaw.serialSourceCount_mass",
    "Descent.Portability.StoppedGenotypeLaw.conditionalGenome_expectation_measurable",
@@ -184434,6 +186618,12 @@
     "Descent.Portability.CalibrationLaw.expectation_continuous": [],
     "Descent.Portability.CalibrationLaw.variance_continuous": [],
     "Descent.Portability.CalibrationLaw.normalized_prevalence_continuous": [],
+    "Descent.Portability.ChunkedGenotypeLaw.genomeLaw_expectation": [],
+    "Descent.Portability.ChunkedGenotypeLaw.sourceGenome_expectation": [],
+    "Descent.Portability.ChunkedGenotypeLaw.eligibleReservoir_expectation": [],
+    "Descent.Portability.ChunkedGenotypeLaw.dependentJoint_expectation": [],
+    "Descent.Portability.ChunkedGenotypeLaw.reservoirPair_expectation": [],
+    "Descent.Portability.ChunkedGenotypeLaw.sourceGenomeReservoir_expectation": [],
     "Descent.Portability.FiniteReportLaw.expectation_bind": [],
     "Descent.Portability.FiniteReportLaw.expectation_pointMass": [],
     "Descent.Portability.FiniteReportLaw.expectation_pushforward": [],
@@ -184526,6 +186716,8 @@
     "Descent.Portability.SimulationAccuracy.expectation_affine": [],
     "Descent.Portability.SimulationAccuracy.covariance_affine": [],
     "Descent.Portability.SimulationAccuracy.standardize_eq_affine": [],
+    "Descent.Portability.SimulationDemographyLaw.serialSourceGenome_expectation": [],
+    "Descent.Portability.SimulationDemographyLaw.gridSourceGenome_expectation": [],
     "Descent.Portability.SourceDesignLaw.serialSourceCount_mass": [],
     "Descent.Portability.SourceDesignLaw.gridSourceCount_mass": [],
     "Descent.Portability.StoppedGenotypeLaw.conditionalGenome_expectation_measurable": [],
@@ -184778,6 +186970,7 @@
    "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation",
    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg",
    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_sum",
+   "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step",
    "Descent.Portability.FiniteReportLaw.binary_pointMass_separation",
    "Descent.Portability.FiniteReportLaw.expectation_pointMass",
    "Descent.Portability.InterleavedMutationExponential.interval_matrix_exponential",
@@ -184810,6 +187003,7 @@
     "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_sum": [],
     "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation": [],
     "Descent.Portability.FiniteReportLaw.expectation_pointMass": [],
+    "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step": [],
     "Descent.Portability.InterleavedMutationExponential.propagate_mass": [],
     "Descent.Portability.InterleavedMutationExponential.interval_matrix_exponential": [],
     "Descent.Portability.InterleavedMutationLaw.intervalKernel_expectation": [],
@@ -185055,6 +187249,7 @@
    "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation",
    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg",
    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_sum",
+   "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step",
    "Descent.Portability.FiniteReportLaw.binary_pointMass_separation",
    "Descent.Portability.FiniteReportLaw.expectation_pointMass",
    "Descent.Portability.InterleavedMutationExponential.interval_matrix_exponential",
@@ -185085,6 +187280,7 @@
     "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_sum": [],
     "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation": [],
     "Descent.Portability.FiniteReportLaw.expectation_pointMass": [],
+    "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step": [],
     "Descent.Portability.InterleavedMutationExponential.propagate_mass": [],
     "Descent.Portability.InterleavedMutationExponential.interval_matrix_exponential": [],
     "Descent.Portability.InterleavedMutationLaw.intervalKernel_expectation": [],

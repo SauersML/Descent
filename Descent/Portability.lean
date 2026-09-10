@@ -113,6 +113,10 @@ import Descent.Portability.SamplingDesignLaw
 import Descent.Portability.SourceDesignLaw
 import Descent.Portability.PortabilityRatioGeometry
 import Descent.Portability.InterleavedMutationExponential
+import Descent.Portability.SimulationDemographyLaw
+import Descent.Portability.ChunkedGenotypeLaw
+import Descent.Portability.ExponentialPoissonRace
+import Descent.Portability.RatioPoleLaw
 
 assert_below Descent.Program
 
