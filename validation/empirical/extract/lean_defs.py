@@ -3138,6 +3138,12 @@ def code(*_a):
 def rowScore(a, x):
     return sum(((a * blockCode((x(j))))) for j in range(int(_rt.sumdim('j', len(x)))))
 
+def fairJump(a):
+    return ((_rt.rdiv(1.0, 2.0)) * ((translate(a) + translate(((-a))))))
+
+def Descent_Portability_BalancedHWEJumpOperator_generator(a):
+    return (fairJump(a) - 1.0)
+
 def jump():
     return ((_rt.rdiv(1.0, 2.0)) * ((translate(1.0) + translate(((-1.0))))))
 
@@ -3864,6 +3870,21 @@ def metric(state):
 def raceCoefficient(ancestry, mutation, count):
     return _rt.rdiv((ancestry * _rt.lpow((mutation), count)), _rt.lpow(((ancestry + (mutation))), ((count + 1.0))))
 
+def inner(law, first, second):
+    return sum((_rt.mul(_rt.mul(_rt._proj(law, 'mass')(state), first[int(state)]), second[int(state)])) for state in range(int(len(first))))
+
+def energy(law, report):
+    return inner(law, report, report)
+
+def predict(kernel, report):
+    return (lambda source: _rt._proj((kernel(source)), 'expectation')(report))
+
+def Descent_Portability_FiniteHorizonLoss_risk(law, kernel, report, predictor):
+    return sum((_rt.mul(_rt._proj(law, 'mass')(source), sum((_rt.mul(_rt._proj((kernel(source)), 'mass')(target), _rt.lpow((_rt.sub(report[int(target)], predictor[int(source)])), 2.0))) for target in range(int(len(report)))))) for source in range(int(len(report))))
+
+def Stationary(law, kernel):
+    return all((sum((((_rt._proj(law, 'mass')(source) * _rt._proj((kernel(source)), 'mass')(target)) == _rt._proj(law, 'mass')(target))) for source in range(int(_rt.sumdim('source', len(_rt._proj(law, 'mass')), len(kernel)))))) for target in range(int(_rt.sumdim('target', len(_rt._proj((kernel(source)), 'mass')), len(_rt._proj(law, 'mass'))))))
+
 def pairing(f, p):
     return sum((_rt.mul(f[int(state)], p[int(state)])) for state in range(int(len(f))))
 
@@ -4104,7 +4125,7 @@ def matrixDefect(fine, coarse, lift):
 def membership(partition):
     return (lambda source, target: (1.0 if (partition(source) == target) else 0.0))
 
-def generator(kernel, rate):
+def Descent_Portability_MarkovPoissonLaw_generator(kernel, rate):
     return ((rate) * ((kernelMatrix(kernel) - 1.0)))
 
 def mechanisticPortabilityRatio(m):

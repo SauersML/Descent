@@ -184,6 +184,14 @@ import Descent.Portability.BalancedHWEVanishingLaw
 import Descent.Portability.ThreeLocusInformation
 import Descent.Portability.GaussianEvenMoments
 import Descent.Portability.GraphColoringLaw
+import Descent.Portability.BalancedHWEJumpOperator
+import Descent.Portability.BalancedHWEFiniteIntensity
+import Descent.Portability.BalancedHWECompoundPoisson
+import Descent.Portability.FiniteHorizonLoss
+import Descent.Portability.ExponentialRemainder
+import Descent.Portability.NonreversibleLossExpansion
+import Descent.Portability.CrossCoordinateRigidityLaw
+import Descent.Portability.FiniteCovarianceMoments
 
 assert_below Descent.Program
 
