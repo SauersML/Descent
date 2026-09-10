@@ -2213,7 +2213,7 @@ def SegregatesAt(H, l):
     return any(any(((H(i, l) != H(j, l))) for j in range(int(_rt.sumdim('j', len(H))))) for i in range(int(_rt.sumdim('i', len(H)))))
 
 def canonicalIso(P):
-    return _rt._proj(isoOfKernelEq, 'symm')((kernel_ofSetoid(kernel(P))))
+    return _rt._proj(isoOfKernelEq, 'symm')((kernel_ofSetoid(Descent_Pangenome_Presentation_kernel(P))))
 
 def reindexIso(P, e):
     return _rt._proj(isoOfKernelEq, 'symm')((kernel_reindex(P, e)))
@@ -3065,6 +3065,9 @@ def proposalKernel(rates, s):
 def traceNucleotideLaw(trace, duration, times, mutationRate, locus, _hcomplete, _hmono, _htimes):
     return rootedGenealogyLaw((traceBranches(locus, mutationRate, trace, duration, times)))
 
+def limitMarkLaw(rates, mutationRate, deme, s, hs, hsupported, hisolated, mark):
+    return postcomposeMark(mark, (limitLaw(rates, mutationRate, deme, (scanNext(s, mark)), (positiveNextComplete(rates, mutationRate, s, hs, mark)), (positiveNextSupported(rates, mutationRate, deme, s, hsupported, hisolated, mark)), hisolated)))
+
 def Descent_Portability_AncestralMutationTransfer_transfer(rates, mutationRate, family):
     return (lambda s: _rt._proj((Descent_Portability_AncestralMutationTransfer_markLaw(rates, mutationRate, s)), 'bind')((transferMark(family, s))))
 
@@ -3406,6 +3409,18 @@ def prognosticIndex(g, score):
 
 def administrativeHarrellC(g, law, _):
     return _rt.rdiv(administrativeConcordantMass(g, law), administrativeComparableMass(g, law))
+
+def clippedBinReport(distance, cap, effects, outcome):
+    return by(classical, exact, (some((average((binMembers(targets, distance)), ((lambda deme: _rt.rmin((_rt._proj((report((targetDesign(design, targets, deme)), effects, outcome)), 'getD')(0.0)), cap)))))) if (_rt._proj((binMembers(targets, distance)), 'Nonempty') and allValid(design, targets, effects, outcome)) else none))
+
+def binReport(distance, effects, outcome):
+    return by(classical, exact, (some((average((binMembers(targets, distance)), ((lambda deme: _rt._proj((report((targetDesign(design, targets, deme)), effects, outcome)), 'getD')(0.0)))))) if (_rt._proj((binMembers(targets, distance)), 'Nonempty') and allValid(design, targets, effects, outcome)) else none))
+
+def binInner(distance, effects):
+    return sum((_rt.mul(_rt._proj((labelKernel(design)), 'weight')(effects, outcome), _rt._proj((binReport(design, targets, distance, effects, outcome)), 'getD')(0.0))) for outcome in range(int(len(effects))))
+
+def binClippedInner(distance, cap, effects):
+    return sum((_rt.mul(_rt._proj((labelKernel(design)), 'weight')(effects, outcome), _rt._proj((clippedBinReport(design, targets, distance, cap, effects, outcome)), 'getD')(0.0))) for outcome in range(int(len(effects))))
 
 def symmetricBetaBernsteinClosedForm(shape, derived, ancestral):
     return _rt.rdiv((realRisingFactorial(shape, derived) * realRisingFactorial(shape, ancestral)), realRisingFactorial(((2.0 * shape)), ((derived + ancestral))))
@@ -4945,6 +4960,18 @@ def recessiveMutationSelectionDriftParameter(Ne, mu, s):
 
 def expectedEffectMultiplier(p, α):
     return _rt.lpow(((p * ((1.0 - p)))), ((1.0 + α)))
+
+def choiceLaw(capacity, seen):
+    return _rt._proj((uniformDraw(seen)), 'pushforward')((choice(capacity, seen)))
+
+def Descent_Portability_ReservoirSamplingLaw_kernel(slots):
+    return _rt._proj((choiceLaw(capacity, seen)), 'pushforward')((nextSlots(slots)))
+
+def retainedSum(f, slots):
+    return sum((f[int((slots(slot)))]) for slot in range(int(len(f))))
+
+def columnLaw(capacity, extra, column):
+    return _rt._proj((lawAfter(capacity, extra)), 'pushforward')(((lambda slots, slot: column((slots(slot))))))
 
 def overlapInflation(r2_true, r2_observed):
     return (_rt.rdiv(r2_observed, r2_true) - 1.0)
