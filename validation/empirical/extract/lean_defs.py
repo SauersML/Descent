@@ -1818,7 +1818,7 @@ def coalescentTimeScale(Ne):
 def FinitePrior(n):
     return PMF((Fin(((n + 1.0)))))
 
-def probability(P, i):
+def Descent_Decision_CertificateGrading_FinitePrior_probability(P, i):
     return _rt._proj((P(i)), 'toReal')
 
 def Δ(M, K, h):
@@ -3450,16 +3450,16 @@ def administrativeHarrellC(g, law, _):
     return _rt.rdiv(administrativeConcordantMass(g, law), administrativeComparableMass(g, law))
 
 def clippedBinReport(distance, cap, effects, outcome):
-    return by(classical, exact, (some((average((binMembers(targets, distance)), ((lambda deme: _rt.rmin((_rt._proj((report((targetDesign(design, targets, deme)), effects, outcome)), 'getD')(0.0)), cap)))))) if (_rt._proj((binMembers(targets, distance)), 'Nonempty') and allValid(design, targets, effects, outcome)) else none))
+    return by(classical, exact, (some((average((binMembers(targets, distance)), ((lambda deme: _rt.rmin((_rt._proj((report((targetDesign(design(), targets, deme)), effects, outcome)), 'getD')(0.0)), cap)))))) if (_rt._proj((binMembers(targets, distance)), 'Nonempty') and allValid(design(), targets, effects, outcome)) else none))
 
 def binReport(distance, effects, outcome):
-    return by(classical, exact, (some((average((binMembers(targets, distance)), ((lambda deme: _rt._proj((report((targetDesign(design, targets, deme)), effects, outcome)), 'getD')(0.0)))))) if (_rt._proj((binMembers(targets, distance)), 'Nonempty') and allValid(design, targets, effects, outcome)) else none))
+    return by(classical, exact, (some((average((binMembers(targets, distance)), ((lambda deme: _rt._proj((report((targetDesign(design(), targets, deme)), effects, outcome)), 'getD')(0.0)))))) if (_rt._proj((binMembers(targets, distance)), 'Nonempty') and allValid(design(), targets, effects, outcome)) else none))
 
 def binInner(distance, effects):
-    return sum((_rt.mul(_rt._proj((labelKernel(design)), 'weight')(effects, outcome), _rt._proj((binReport(design, targets, distance, effects, outcome)), 'getD')(0.0))) for outcome in range(int(len(effects))))
+    return sum((_rt.mul(_rt._proj((labelKernel(design())), 'weight')(effects, outcome), _rt._proj((binReport(design(), targets, distance, effects, outcome)), 'getD')(0.0))) for outcome in range(int(len(effects))))
 
 def binClippedInner(distance, cap, effects):
-    return sum((_rt.mul(_rt._proj((labelKernel(design)), 'weight')(effects, outcome), _rt._proj((clippedBinReport(design, targets, distance, cap, effects, outcome)), 'getD')(0.0))) for outcome in range(int(len(effects))))
+    return sum((_rt.mul(_rt._proj((labelKernel(design())), 'weight')(effects, outcome), _rt._proj((clippedBinReport(design(), targets, distance, cap, effects, outcome)), 'getD')(0.0))) for outcome in range(int(len(effects))))
 
 def symmetricBetaBernsteinClosedForm(shape, derived, ancestral):
     return _rt.rdiv((realRisingFactorial(shape, derived) * realRisingFactorial(shape, ancestral)), realRisingFactorial(((2.0 * shape)), ((derived + ancestral))))
@@ -3767,17 +3767,62 @@ def metric(state):
 def raceCoefficient(ancestry, mutation, count):
     return _rt.rdiv((ancestry * _rt.lpow((mutation), count)), _rt.lpow(((ancestry + (mutation))), ((count + 1.0))))
 
+def genomeGenerator(state, rate):
+    return productGenerator(((lambda locus: physicalGenerator((replaceExposure((intervalTemplates(state, locus)), ((lambda _: rate))))))))
+
+def clippedStep(delta):
+    return ((lambda j: _rt.mul((_rt.rdiv(5.0, maxAbs(delta))), delta[int(j)])) if (5.0 < maxAbs(delta)) else delta)
+
+def clippedMagnitude(delta):
+    return _rt.rmin((maxAbs(delta)), 5.0)
+
+def Descent_Portability_FirthFiniteIterationLaw_probability(x, beta, row):
+    return _rt.rdiv(1.0, (_rt.add(1.0, _rt.rexp((_rt.neg((sum((_rt.mul(x[int(row)][int(j)], beta[int(j)])) for j in range(int(_rt.sumdim('j', len(x[0]), len(beta))))))))))))
+
+def varianceWeight(x, beta, row):
+    return _rt.mul(Descent_Portability_FirthFiniteIterationLaw_probability(x, beta, row), (_rt.sub(1.0, Descent_Portability_FirthFiniteIterationLaw_probability(x, beta, row))))
+
+def Descent_Portability_FirthFiniteIterationLaw_weightedInformation(x, weight):
+    return (lambda j, k: sum((_rt.mul(_rt.mul(x[int(row)][int(j)], weight[int(row)]), x[int(row)][int(k)])) for row in range(int(len(x)))))
+
+def logLikelihood(x, labels, beta):
+    return sum(((_rt.rlog((Descent_Portability_FirthFiniteIterationLaw_probability(x, beta, row))) if labels(row) else _rt.rlog((_rt.sub(1.0, Descent_Portability_FirthFiniteIterationLaw_probability(x, beta, row)))))) for row in range(int(_rt.sumdim('row', len(labels)))))
+
+def leverage(x, weight, inverse, row):
+    return _rt.mul(weight[int(row)], sum((sum((_rt.mul(_rt.mul(x[int(row)][int(j)], inverse[int(j)][int(k)]), x[int(row)][int(k)])) for k in range(int(_rt.sumdim('k', len(inverse[0]), len(x[0])))))) for j in range(int(_rt.sumdim('j', len(x[0]), len(inverse))))))
+
+def adjustedScore(x, labels, p, h, j):
+    return sum((_rt.mul(x[int(row)][int(j)], (_rt.add(_rt.sub(((1.0 if labels(row) else 0.0)), p[int(row)]), _rt.mul(h[int(row)], (_rt.sub(_rt.rdiv(1.0, 2.0), p[int(row)]))))))) for row in range(int(len(x))))
+
+def updateInformation(x, current):
+    return Descent_Portability_FirthFiniteIterationLaw_weightedInformation(x, ((lambda row: _rt.mul((_rt.add(1.0, _rt._proj(current, 'leverage')(row))), _rt._proj(current, 'variance')(row)))))
+
+def rawUpdate(x, current):
+    return (lambda j: sum((_rt.mul(_rt.rinv((updateInformation(x, current)))(j, k), _rt._proj(current, 'score')(k))) for k in range(int(len(x)))))
+
+def Converged(iteration, state, current):
+    return ((((iteration != 0.0) and (_rt._proj(state, 'previousMagnitude') <= _rt.rdiv(1.0, 100000.0))) and (maxAbs(_rt._proj(current, 'score')) < _rt.rdiv(1.0, 100000.0))) and ((_rt._proj(current, 'penalizedLogLikelihood') - _rt._proj(state, 'previousLogLikelihood')) < _rt.rdiv(1.0, 100000.0)))
+
+def exactRun(x, labels):
+    return run(exactMatrixChecks(), x, labels)
+
 def jointLaw():
-    return _rt._proj((labelKernel(design)), 'jointMeasure')((effectLaw(K)))
+    return _rt._proj((labelKernel(design())), 'jointMeasure')((effectLaw(K)))
 
 def clippedReport(cap, effects, outcome):
-    return _rt._proj((report(design, effects, outcome)), 'map')(((lambda r: _rt.rmin(r, cap))))
+    return _rt._proj((report(design(), effects, outcome)), 'map')(((lambda r: _rt.rmin(r, cap))))
 
 def innerValue(effects):
-    return sum((_rt.mul(_rt._proj((labelKernel(design)), 'weight')(effects, outcome), _rt._proj((report(design, effects, outcome)), 'getD')(0.0))) for outcome in range(int(len(effects))))
+    return sum((_rt.mul(_rt._proj((labelKernel(design())), 'weight')(effects, outcome), _rt._proj((report(design(), effects, outcome)), 'getD')(0.0))) for outcome in range(int(len(effects))))
 
 def clippedInner(cap, effects):
-    return sum((_rt.mul(_rt._proj((labelKernel(design)), 'weight')(effects, outcome), _rt._proj((clippedReport(design, cap, effects, outcome)), 'getD')(0.0))) for outcome in range(int(len(effects))))
+    return sum((_rt.mul(_rt._proj((labelKernel(design())), 'weight')(effects, outcome), _rt._proj((clippedReport(design(), cap, effects, outcome)), 'getD')(0.0))) for outcome in range(int(len(effects))))
+
+def linearForm(a, x):
+    return sum((_rt.mul(a[int(k)], x[int(k)])) for k in range(int(len(a))))
+
+def graphCenter(a, k, x):
+    return _rt.sub(x[int(k)], _rt.rdiv(linearForm(a, x), a[int(k)]))
 
 def branchKernel(branch, leaves):
     return _rt._proj((branchLaw(_rt._proj(branch, 'exposure'), (leaves(_rt._proj(branch, 'representative'))))), 'pushforward')((overwrite(branch, leaves)))
@@ -4187,7 +4232,7 @@ def weightedSignal(cohort, weight):
 def weightedNoise(cohort, weight):
     return sum((_rt.rdiv(_rt.lpow(weight[int(i)], 2.0), _rt._proj(cohort, 'effectiveMarkers')(i))) for i in range(int(len(weight))))
 
-def weightedInformation(cohort, weight):
+def Descent_Portability_FrequencyResolvedCohort_weightedInformation(cohort, weight):
     return _rt.rdiv(_rt.lpow(weightedSignal(cohort, weight), 2.0), weightedNoise(cohort, weight))
 
 def combinedInformationIndex(cohort):
@@ -4465,6 +4510,36 @@ def requiredEventsForRecalibration(nParams, infoPerEvent, targetTraceMSE):
 
 def requiredTargetCohortSizeForRecalibration(nParams, prevalence, infoPerEvent, targetTraceMSE):
     return _rt.rdiv(requiredEventsForRecalibration(nParams, infoPerEvent, targetTraceMSE), prevalence)
+
+def select(candidates):
+    return scan(none, candidates)
+
+def decoded(scores):
+    return (lambda row: _rt._proj((scores(row)), 'getD')(0.0))
+
+def AllFinite(scores, row):
+    return all((_rt._proj((scores((row(r)))), 'isSome')) for r in range(int(_rt.sumdim('r', len(row)))))
+
+def selectionAUC(cohorts, labels, scores):
+    return _rt._proj((Descent_Portability_SamplingDesignLaw_uniform(Sel)), 'binaryAUC')((selectionScore(cohorts, scores)), (selectionLabels(cohorts, labels)))
+
+def fitOutcomes(cohorts, labels):
+    return (lambda row: (1.0 if labels((_rt._proj(cohorts, 'fitLabel')(row))) else 0.0))
+
+def flipSign(cohorts, labels, scores):
+    return (((AllFinite(scores, _rt._proj(cohorts, 'fitRow')) and (0.0 < _rt._proj((Descent_Portability_SamplingDesignLaw_uniform(Fit)), 'variance')((fitScore(cohorts, scores))))) and (0.0 < _rt._proj((Descent_Portability_SamplingDesignLaw_uniform(Fit)), 'variance')((fitOutcomes(cohorts, labels))))) and (_rt._proj((Descent_Portability_SamplingDesignLaw_uniform(Fit)), 'covariance')((fitScore(cohorts, scores)), (fitOutcomes(cohorts, labels))) < 0.0))
+
+def sign(cohorts, labels, scores):
+    return by(classical, exact, ((-1.0) if flipSign(cohorts, labels, scores) else 1.0))
+
+def linearScoreFiles(table, genotype, factor):
+    return (lambda threshold: some(((lambda row: some((_rt.mul(factor(threshold), linearScore(genotype, (thresholdWeights(table, threshold)), row))))))))
+
+def learnerFromTables(cohorts, tables, files):
+    return (lambda labels: _rt._proj(_rt._proj(learnScore, 'clumped'), 'card')(cohorts, labels, (tables(labels)), (candidatesFromTable((tables(labels)), (files(labels))))))
+
+def rowSelectors(row):
+    return by(classical, exact, (lambda r, u: (1.0 if (row(r) == u) else 0.0)))
 
 def Descent_Portability_PartialMetricMixture_conditionalMetric(μ, metric):
     return by(classical, exact, ((none if (Descent_Portability_PartialMetricMixture_definedMass(μ, metric) == 0.0) else some((_rt.rdiv(Descent_Portability_PartialMetricMixture_weightedMetric(μ, metric), Descent_Portability_PartialMetricMixture_definedMass(μ, metric))))) if (Integrable(((lambda sample: ((1.0) if _rt._proj((metric(sample)), 'isSome') else 0.0))), μ) and Integrable(((lambda sample: _rt._proj((metric(sample)), 'getD')(0.0))), μ)) else none))
@@ -5093,6 +5168,9 @@ def externallyStandardized(pgs, μ_source, σ_source):
 def internallyStandardized(pgs, μ_target, σ_target):
     return _rt.rdiv(((pgs - μ_target)), σ_target)
 
+def arrayTransfer(rates, mutationRate, rows, state, target):
+    return sum(((_rt._proj((Descent_Portability_AncestralMutationTransfer_markLaw(rates, mutationRate, state)), 'mass')(mark) * postcomposeArray(mark, (rows((scanNext(state, mark)))), target))) for mark in range(int(_rt.sumdim('mark', len(_rt._proj((Descent_Portability_AncestralMutationTransfer_markLaw(rates, mutationRate, state)), 'mass'))))))
+
 def affine(a, b, f):
     return (lambda s: _rt.add(_rt.mul(a, f[int(s)]), b))
 
@@ -5111,6 +5189,39 @@ def formAccuracy(p, scoreGenotype, causalGenotype, weights, effects):
 def formRatio(source, target, sourceScore, targetScore, sourceCausal, targetCausal, weights, effects):
     return _rt._proj((formAccuracy(source, sourceScore, sourceCausal, weights, effects)), 'bind')((lambda sourceR2: _rt._proj((formAccuracy(target, targetScore, targetCausal, weights, effects)), 'bind')((lambda targetR2: (some((_rt.rdiv(targetR2, sourceR2))) if (0.0 < sourceR2) else none)))))
 
+def epsilon():
+    return _rt.rdiv(1.0, 1000000000000.0)
+
+def serialRaw(deme):
+    return ((_rt.rdiv(7.0, 5.0)) * ((_rt.rdiv((deme), ((9.0 + epsilon()))) - _rt.rdiv(1.0, 2.0))))
+
+def serial(deme):
+    return (serialRaw(deme) - _rt.rdiv((sum((serialRaw(d)) for d in range(int(10)))), 10.0))
+
+def gridRaw(deme):
+    return ((_rt.rdiv(7.0, 5.0)) * (((_rt.rdiv(((_rt.rdiv(((_rt.rdiv(deme, 6.0))), 5.0) + _rt.rdiv((((deme % 6.0))), 5.0))), 2.0)) - _rt.rdiv(1.0, 2.0))))
+
+def grid(deme):
+    return (gridRaw(deme) - _rt.rdiv((sum((gridRaw(d)) for d in range(int(36)))), 36.0))
+
+def Individuals(demes):
+    return Fin((cohortSize(demes)))
+
+def fitCount(source, deme):
+    return _rt.rdiv(sampleSize(source, deme), 2.0)
+
+def testCount(source, deme):
+    return (sampleSize(source, deme) - fitCount(source, deme))
+
+def individualDeme(source, individual):
+    return _rt._proj((_rt._proj((individualIndex(source)), 'symm')(individual)), '1')
+
+def trainingIndex():
+    return _rt._proj((sortedFit((fitCount_le(source, source)), (permutations(source)))), 'trans')((demeEmbedding(source, source)))
+
+def evaluationIndex(deme):
+    return _rt._proj((testRows((fitCount_le(source, deme)), (permutations(deme)))), 'trans')((demeEmbedding(source, deme)))
+
 def cohortSize(demes):
     return ((demes * 250.0) + 4750.0)
 
@@ -5125,6 +5236,12 @@ def serialSourceGenomeLaw(L, hL):
 
 def gridSourceGenomeLaw(L, hL):
     return _rt._proj((sourceLaw(36.0, (by(norm_num)))), 'joint')((gridGenomeLaw(L, hL)))
+
+def causalColumns(individual, causal):
+    return rawDiploidDosage(genome, (causalSites(causal)), individual)
+
+def defaultTableDesign(fixedInner, tables, files):
+    return _rt._proj(tableDesign, '1')(source, permutations, genome, causalSites, baseline, hbaseline, 2000.0, (by(decide)), (default_inner_counts(source)), fixedInner, tables, files)
 
 def sampleSize(source, deme):
     return (5000.0 if (deme == source) else 250.0)
@@ -5185,6 +5302,9 @@ def StateReady(state, locus, site):
 
 def GenomeCovered(genome):
     return all((Covered((genome(locus)))) for locus in range(int(_rt.sumdim('locus', len(genome)))))
+
+def olderMass(rates, start, mutationRate, target):
+    return sum(((_rt._proj((proposalLaw(rates, start)), 'mass')(event) * stoppedMass(rates, (proposalNext(start, event)), mutationRate, target))) for event in range(int(_rt.sumdim('event', len(_rt._proj((proposalLaw(rates, start)), 'mass'))))))
 
 def varTrue(m):
     return sum(((_rt.lpow(_rt._proj(m, 'β')(i), 2.0) * _rt._proj(m, 'H')(i))) for i in range(int(_rt.sumdim('i', len(_rt._proj(m, 'β')), len(_rt._proj(m, 'H'))))))
@@ -5456,6 +5576,18 @@ def separatingMetric(p, q):
 
 def singletonMetric(selected):
     return by(classical, exact, (lambda report: (1.0 if (report == selected) else 0.0)))
+
+def proposalRate(rates):
+    return (1.0 + sum((rates(index)) for index in range(int(_rt.sumdim('index', len(rates))))))
+
+def siteProposalRates(state, rate):
+    return (lambda locus: proposalParameter((replaceExposure((intervalTemplates(state, locus)), ((lambda _: rate))))))
+
+def siteProposalKernels(state, rate):
+    return (lambda locus: intervalKernel((replaceExposure((intervalTemplates(state, locus)), ((lambda _: rate))))))
+
+def genomeWaitLaw(ancestry, ha, state, rate, source):
+    return raceKernelLaw(ancestry, ha, (proposalRate((siteProposalRates(state, rate)))), (globalKernel((siteProposalRates(state, rate)), (siteProposalKernels(state, rate)))), source)
 
 def effectShare(indirect_effect, total_effect):
     return Descent_Core_ratio(indirect_effect, total_effect)

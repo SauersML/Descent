@@ -117,6 +117,18 @@ import Descent.Portability.SimulationDemographyLaw
 import Descent.Portability.ChunkedGenotypeLaw
 import Descent.Portability.ExponentialPoissonRace
 import Descent.Portability.RatioPoleLaw
+import Descent.Portability.WholeGenomeMutationSemigroup
+import Descent.Portability.FiniteProductExponential
+import Descent.Portability.WholeGenomeMutationRace
+import Descent.Portability.StoppedGenotypeRenewal
+import Descent.Portability.SignedTransferIdentification
+import Descent.Portability.GaussianSlabLaw
+import Descent.Portability.RatioSourceDegeneracy
+import Descent.Portability.PThresholdTrainingLaw
+import Descent.Portability.FirthFiniteIterationLaw
+import Descent.Portability.SimulationBaselineLaw
+import Descent.Portability.SimulationCohortLaw
+import Descent.Portability.SimulationDesignDecoder
 
 assert_below Descent.Program
 
