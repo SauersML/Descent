@@ -3860,6 +3860,9 @@ def historyDegradation(h, h_p):
 def historyMarginalAmplitude(h):
     return _rt._proj(h, 'amplitude')
 
+def recover(problem):
+    return ((_rt.rdiv(1.0, _rt._proj(problem, 'scale'))) * _rt._proj(problem, 'weights'))
+
 def IsStationaryKernel(π, P):
     return all((sum(((_rt.mul(π[int(x)], P[int(x)][int(y)]) == π[int(y)])) for x in range(int(len(π))))) for y in range(int(len(π))))
 
@@ -4189,6 +4192,18 @@ def Nucleotide():
 
 def uniformMean(readout):
     return _rt.rdiv((sum((readout[int(base)]) for base in range(int(len(readout))))), 4.0)
+
+def Descent_Portability_OptimalMeasurementAllocation_variance(amplitude, effort):
+    return sum((_rt.rdiv(_rt.lpow(amplitude[int(mode)], 2.0), effort[int(mode)])) for mode in range(int(len(amplitude))))
+
+def spending(cost, effort):
+    return sum((_rt.mul(cost[int(mode)], effort[int(mode)])) for mode in range(int(len(cost))))
+
+def weightedAmplitude(amplitude, cost):
+    return sum((_rt.mul(amplitude[int(mode)], _rt.rsqrt((cost[int(mode)])))) for mode in range(int(len(amplitude))))
+
+def optimalEffort(amplitude, cost, budget, mode):
+    return _rt.rdiv(_rt.mul(budget, amplitude[int(mode)]), (_rt.mul(_rt.rsqrt((cost[int(mode)])), weightedAmplitude(amplitude, cost))))
 
 def alleleIndex(state, sample):
     return _rt._proj(_rt._proj(_rt._proj(_rt._proj(state, '2'), '1'), 'val'), 'idxOf')((_rt._proj(state, '1')(sample)))

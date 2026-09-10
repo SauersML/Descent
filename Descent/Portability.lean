@@ -137,6 +137,10 @@ import Descent.Portability.ExactMemoryLaw
 import Descent.Portability.FiniteNumericalCertificate
 import Descent.Portability.ConditionalErrorCertificate
 import Descent.Portability.FiniteMetricIdentification
+import Descent.Portability.ReportConditionalRiskLaw
+import Descent.Portability.ObservableClosureLaw
+import Descent.Portability.GuardedMetricOptimization
+import Descent.Portability.OptimalMeasurementAllocation
 
 assert_below Descent.Program
 
