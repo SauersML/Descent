@@ -131,6 +131,12 @@ import Descent.Portability.SimulationCohortLaw
 import Descent.Portability.SimulationDesignDecoder
 import Descent.Portability.AncestralEpochGenotypeSupport
 import Descent.Portability.MutationChannelBridge
+import Descent.Portability.GaussianInverseQuadratic
+import Descent.Portability.AcceptedBinIntegrability
+import Descent.Portability.ExactMemoryLaw
+import Descent.Portability.FiniteNumericalCertificate
+import Descent.Portability.ConditionalErrorCertificate
+import Descent.Portability.FiniteMetricIdentification
 
 assert_below Descent.Program
 

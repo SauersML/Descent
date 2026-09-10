@@ -3041,6 +3041,9 @@ def additiveVariance(p, α):
 def liabilityScaleH2(h2_observed, prevalence, z_height):
     return _rt.rdiv(((h2_observed * prevalence) * ((1.0 - prevalence))), _rt.lpow(z_height, 2.0))
 
+def acceptedContribution(deme, outcome, effects):
+    return by(classical, exact, (_rt.mul(_rt._proj((labelKernel(design())), 'weight')(effects, outcome), _rt._proj((report((targetDesign(design(), targets, deme)), effects, outcome)), 'getD')(0.0)) if allValid(design(), targets, effects, outcome) else 0.0))
+
 def completionMass(rates, s, count):
     if count == 0:
         return (1.0 - Descent_Portability_AncestralAbsorptionLaw_survival(rates, 0.0, s))
@@ -3733,6 +3736,12 @@ def pushforward(p, report):
 def reportLaw(initial, kernel, n, report):
     return _rt._proj((propagate(initial, kernel, n)), 'pushforward')(report)
 
+def retainedState(projection, evolution, initial, time):
+    return projection(((_rt.lpow(evolution, time))(initial)))
+
+def discardedState(projection, evolution, initial, time):
+    return ((1.0 - projection))(((_rt.lpow(evolution, time))(initial)))
+
 def Descent_Portability_FiniteReportLaw_covariance(p, score, outcome):
     return Descent_Portability_FiniteReportLaw_expectation(p, (lambda s: _rt.mul((_rt.sub(score[int(s)], Descent_Portability_FiniteReportLaw_expectation(p, score))), (_rt.sub(outcome[int(s)], Descent_Portability_FiniteReportLaw_expectation(p, outcome))))))
 
@@ -3769,6 +3778,12 @@ def metric(state):
 
 def raceCoefficient(ancestry, mutation, count):
     return _rt.rdiv((ancestry * _rt.lpow((mutation), count)), _rt.lpow(((ancestry + (mutation))), ((count + 1.0))))
+
+def pairing(f, p):
+    return sum((_rt.mul(f[int(state)], p[int(state)])) for state in range(int(len(f))))
+
+def residual(kernel, approximation, time, state):
+    return (approximation(time, state) - _rt._proj((kernel(time, state)), 'expectation')((approximation(((time + 1.0))))))
 
 def genomeGenerator(state, rate):
     return productGenerator(((lambda locus: physicalGenerator((replaceExposure((intervalTemplates(state, locus)), ((lambda _: rate))))))))
