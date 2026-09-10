@@ -80,6 +80,8 @@ import Descent.Portability.ExactMetricEvaluation
 import Descent.Portability.TrainingNoiseAccuracy
 import Descent.Portability.ScoreMomentLaw
 import Descent.Portability.ProbitTrainingLaw
+import Descent.Portability.AncestralEventLaw
+import Descent.Portability.AncestralEpochLaw
 
 assert_below Descent.Program
 

@@ -86,6 +86,7 @@ import Descent.Coalescent.VariableSize
 import Descent.Coalescent.WrightFisher
 import Descent.Coalescent.Xi
 import Descent.Coalescent.XiRates
+import Descent.Coalescent.FiniteGenomeAncestry
 
 /-!
 # `Descent.Coalescent` -- the layer head

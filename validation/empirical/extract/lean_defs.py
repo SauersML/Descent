@@ -3041,6 +3041,12 @@ def additiveVariance(p, α):
 def liabilityScaleH2(h2_observed, prevalence, z_height):
     return _rt.rdiv(((h2_observed * prevalence) * ((1.0 - prevalence))), _rt.lpow(z_height, 2.0))
 
+def jumpStateLaw(rates, s, h):
+    return _rt._proj((Descent_Portability_AncestralEventLaw_jumpLaw(rates, s, h)), 'pushforward')((nextState(s)))
+
+def proposalKernel(rates, s):
+    return _rt._proj((proposalLaw(rates, s)), 'pushforward')((proposalNext(s)))
+
 def ancestryRecalibratedSlope(bSource, rho, alpha):
     return _rt.rdiv((rho * ((bSource * alpha))), _rt.lpow(alpha, 2.0))
 

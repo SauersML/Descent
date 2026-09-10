@@ -23772,6 +23772,439 @@
    }
   }
  },
+ "Descent.Coalescent.FiniteGenomeAncestry.Material": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "expected ')', found op:×",
+  "file": "Descent/Coalescent/FiniteGenomeAncestry.lean",
+  "line": 24,
+  "short": "Material",
+  "ret_type": "",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "L": [
+    1.0,
+    20.0
+   ],
+   "n": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Coalescent.FiniteGenomeAncestry.split_material_disjoint",
+   "Descent.Coalescent.FiniteGenomeAncestry.split_material_union",
+   "Descent.Coalescent.FiniteGenomeAncestry.unresolved_complete",
+   "Descent.Coalescent.FiniteGenomeAncestry.unresolved_subset"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Coalescent.FiniteGenomeAncestry.unresolved_subset": [],
+    "Descent.Coalescent.FiniteGenomeAncestry.unresolved_complete": [],
+    "Descent.Coalescent.FiniteGenomeAncestry.split_material_union": [],
+    "Descent.Coalescent.FiniteGenomeAncestry.split_material_disjoint": []
+   }
+  }
+ },
+ "Descent.Coalescent.FiniteGenomeAncestry.Lineage": {
+  "class": "STRUCTURAL",
+  "note": "type alias",
+  "file": "Descent/Coalescent/FiniteGenomeAncestry.lean",
+  "line": 25,
+  "short": "Lineage",
+  "ret_type": "",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "D": [
+    1.0,
+    20.0
+   ],
+   "L": [
+    1.0,
+    20.0
+   ],
+   "n": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Coalescent.FiniteGenomeAncestry.Valid.insert",
+   "Descent.Coalescent.FiniteGenomeAncestry.Valid.subset",
+   "Descent.Coalescent.FiniteGenomeAncestry.valid_empty"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Coalescent.FiniteGenomeAncestry.valid_empty": [],
+    "Descent.Coalescent.FiniteGenomeAncestry.Valid.subset": [],
+    "Descent.Coalescent.FiniteGenomeAncestry.Valid.insert": []
+   }
+  }
+ },
+ "Descent.Coalescent.FiniteGenomeAncestry.Valid": {
+  "class": "STRUCTURAL",
+  "note": "Prop-valued / set-valued",
+  "file": "Descent/Coalescent/FiniteGenomeAncestry.lean",
+  "line": 27,
+  "short": "Valid",
+  "ret_type": "Prop",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Coalescent.FiniteGenomeAncestry.Valid.insert",
+   "Descent.Coalescent.FiniteGenomeAncestry.Valid.subset",
+   "Descent.Coalescent.FiniteGenomeAncestry.valid_empty"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Coalescent.FiniteGenomeAncestry.valid_empty": [],
+    "Descent.Coalescent.FiniteGenomeAncestry.Valid.subset": [],
+    "Descent.Coalescent.FiniteGenomeAncestry.Valid.insert": []
+   }
+  }
+ },
+ "Descent.Coalescent.FiniteGenomeAncestry.State": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Coalescent/FiniteGenomeAncestry.lean",
+  "line": 31,
+  "short": "State",
+  "ret_type": "",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "D": [
+    1.0,
+    20.0
+   ],
+   "L": [
+    1.0,
+    20.0
+   ],
+   "n": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Coalescent.FiniteGenomeAncestry.lineage_count_bound",
+   "Descent.Conditionals.targetOnlyTransportPerformance_eq_onePoint",
+   "Descent.Portability.AncestralEpochLaw.coordinate_summable",
+   "Descent.Portability.AncestralEpochLaw.epoch_expectation",
+   "Descent.Portability.AncestralEpochLaw.epoch_expectation_bounds",
+   "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation",
+   "Descent.Portability.AncestralEpochLaw.epoch_history_mass_sum",
+   "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation",
+   "Descent.Portability.AncestralEpochLaw.history_expectation",
+   "Descent.Portability.AncestralEpochLaw.no_event_probability",
+   "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg",
+   "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_sum",
+   "Descent.Portability.AncestralEpochLaw.readout_summable",
+   "Descent.Portability.AncestralEventLaw.dominatingRate_pos",
+   "Descent.Portability.AncestralEventLaw.eventRate_nonneg",
+   "Descent.Portability.AncestralEventLaw.jump_expectation",
+   "Descent.Portability.AncestralEventLaw.proposal_generator",
+   "Descent.Portability.AncestralEventLaw.totalRate_le_dominating",
+   "Descent.Portability.AncestralEventLaw.totalRate_nonneg",
+   "Descent.Portability.ExactFiniteHistoryLaw.expectation_propagate",
+   "Descent.Portability.ExactFiniteHistoryLaw.expectation_reportLaw",
+   "Descent.Portability.ExactFiniteHistoryLaw.path_mass_sum_one",
+   "Descent.Portability.ExactFiniteHistoryLaw.path_sum_eq_expectation",
+   "Descent.Portability.ExactFiniteHistoryLaw.report_path_sum_eq_backward",
+   "Descent.Portability.FiniteReportLaw.binaryAUC_eq_double_sum",
+   "Descent.Portability.FiniteReportLaw.calibrationSlope_eq_rawMoments",
+   "Descent.Portability.FiniteReportLaw.conditionalMetric_joint",
+   "Descent.Portability.FiniteReportLaw.covariance_eq_rawMoments",
+   "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul",
+   "Descent.Portability.FiniteReportLaw.definedMass_joint",
+   "Descent.Portability.FiniteReportLaw.expectation_add_same",
+   "Descent.Portability.FiniteReportLaw.expectation_bind",
+   "Descent.Portability.FiniteReportLaw.expectation_constant",
+   "Descent.Portability.FiniteReportLaw.expectation_joint",
+   "Descent.Portability.FiniteReportLaw.expectation_mul_constant",
+   "Descent.Portability.FiniteReportLaw.expectation_pointMass",
+   "Descent.Portability.FiniteReportLaw.expectation_pushforward",
+   "Descent.Portability.FiniteReportLaw.expectation_sub_same",
+   "Descent.Portability.FiniteReportLaw.meanSquaredError_eq_rawMoments",
+   "Descent.Portability.FiniteReportLaw.squaredCorrelation_eq_rawMoments",
+   "Descent.Portability.FiniteReportLaw.squaredCorrelation_mem_unitInterval",
+   "Descent.Portability.FiniteReportLaw.variance_eq_rawMoments",
+   "Descent.Portability.FiniteReportLaw.variance_nonneg",
+   "Descent.Portability.FiniteReportLaw.weightedDefinedMetric_joint"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Coalescent.FiniteGenomeAncestry.lineage_count_bound": [],
+    "Descent.Conditionals.targetOnlyTransportPerformance_eq_onePoint": [],
+    "Descent.Portability.AncestralEpochLaw.coordinate_summable": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_expectation": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_expectation_bounds": [],
+    "Descent.Portability.AncestralEpochLaw.readout_summable": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation": [],
+    "Descent.Portability.AncestralEpochLaw.no_event_probability": [],
+    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg": [],
+    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_sum": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_history_mass_sum": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation": [],
+    "Descent.Portability.AncestralEpochLaw.history_expectation": [],
+    "Descent.Portability.AncestralEventLaw.eventRate_nonneg": [],
+    "Descent.Portability.AncestralEventLaw.totalRate_nonneg": [],
+    "Descent.Portability.AncestralEventLaw.jump_expectation": [],
+    "Descent.Portability.AncestralEventLaw.dominatingRate_pos": [],
+    "Descent.Portability.AncestralEventLaw.totalRate_le_dominating": [],
+    "Descent.Portability.AncestralEventLaw.proposal_generator": [],
+    "Descent.Portability.FiniteReportLaw.expectation_bind": [],
+    "Descent.Portability.FiniteReportLaw.expectation_pointMass": [],
+    "Descent.Portability.FiniteReportLaw.expectation_pushforward": [],
+    "Descent.Portability.FiniteReportLaw.expectation_joint": [],
+    "Descent.Portability.ExactFiniteHistoryLaw.expectation_propagate": [],
+    "Descent.Portability.ExactFiniteHistoryLaw.expectation_reportLaw": [],
+    "Descent.Portability.ExactFiniteHistoryLaw.path_sum_eq_expectation": [],
+    "Descent.Portability.ExactFiniteHistoryLaw.path_mass_sum_one": [],
+    "Descent.Portability.ExactFiniteHistoryLaw.report_path_sum_eq_backward": [],
+    "Descent.Portability.FiniteReportLaw.expectation_add_same": [],
+    "Descent.Portability.FiniteReportLaw.expectation_sub_same": [],
+    "Descent.Portability.FiniteReportLaw.expectation_mul_constant": [],
+    "Descent.Portability.FiniteReportLaw.expectation_constant": [],
+    "Descent.Portability.FiniteReportLaw.covariance_eq_rawMoments": [],
+    "Descent.Portability.FiniteReportLaw.variance_eq_rawMoments": [],
+    "Descent.Portability.FiniteReportLaw.variance_nonneg": [],
+    "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul": [],
+    "Descent.Portability.FiniteReportLaw.squaredCorrelation_mem_unitInterval": [],
+    "Descent.Portability.FiniteReportLaw.squaredCorrelation_eq_rawMoments": [],
+    "Descent.Portability.FiniteReportLaw.calibrationSlope_eq_rawMoments": [],
+    "Descent.Portability.FiniteReportLaw.meanSquaredError_eq_rawMoments": [],
+    "Descent.Portability.FiniteReportLaw.binaryAUC_eq_double_sum": [],
+    "Descent.Portability.FiniteReportLaw.definedMass_joint": [],
+    "Descent.Portability.FiniteReportLaw.weightedDefinedMetric_joint": [],
+    "Descent.Portability.FiniteReportLaw.conditionalMetric_joint": []
+   }
+  }
+ },
+ "Descent.Coalescent.FiniteGenomeAncestry.initialState": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "unrecognised character '?'",
+  "file": "Descent/Coalescent/FiniteGenomeAncestry.lean",
+  "line": 80,
+  "short": "initialState",
+  "ret_type": "State D L n",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [],
+  "constraints": {}
+ },
+ "Descent.Coalescent.FiniteGenomeAncestry.migrate": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "unrecognised character '?'",
+  "file": "Descent/Coalescent/FiniteGenomeAncestry.lean",
+  "line": 98,
+  "short": "migrate",
+  "ret_type": "State D L n",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [],
+  "constraints": {}
+ },
+ "Descent.Coalescent.FiniteGenomeAncestry.relabelDemes": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "unrecognised character '?'",
+  "file": "Descent/Coalescent/FiniteGenomeAncestry.lean",
+  "line": 109,
+  "short": "relabelDemes",
+  "ret_type": "State D L n",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.AncestralEpochLaw.history_expectation"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochLaw.history_expectation": []
+   }
+  }
+ },
+ "Descent.Coalescent.FiniteGenomeAncestry.completedLocus": {
+  "class": "STRUCTURAL",
+  "note": "Prop-valued / set-valued",
+  "file": "Descent/Coalescent/FiniteGenomeAncestry.lean",
+  "line": 122,
+  "short": "completedLocus",
+  "ret_type": "Prop",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Coalescent.FiniteGenomeAncestry.unresolved_complete"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "completedLocus material locus"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Coalescent.FiniteGenomeAncestry.unresolved_complete": [
+     "completedLocus material locus"
+    ]
+   }
+  }
+ },
+ "Descent.Coalescent.FiniteGenomeAncestry.unresolved": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name material.filter",
+  "file": "Descent/Coalescent/FiniteGenomeAncestry.lean",
+  "line": 126,
+  "short": "unresolved",
+  "ret_type": "Material L n",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Coalescent.FiniteGenomeAncestry.unresolved_complete",
+   "Descent.Coalescent.FiniteGenomeAncestry.unresolved_subset"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "completedLocus material locus"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Coalescent.FiniteGenomeAncestry.unresolved_subset": [],
+    "Descent.Coalescent.FiniteGenomeAncestry.unresolved_complete": [
+     "completedLocus material locus"
+    ]
+   }
+  }
+ },
+ "Descent.Coalescent.FiniteGenomeAncestry.coalesce": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "unrecognised character '?'",
+  "file": "Descent/Coalescent/FiniteGenomeAncestry.lean",
+  "line": 141,
+  "short": "coalesce",
+  "ret_type": "State D L n",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [],
+  "constraints": {}
+ },
+ "Descent.Coalescent.FiniteGenomeAncestry.leftMaterial": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name material.filter",
+  "file": "Descent/Coalescent/FiniteGenomeAncestry.lean",
+  "line": 158,
+  "short": "leftMaterial",
+  "ret_type": "Material L n",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Coalescent.FiniteGenomeAncestry.split_material_disjoint",
+   "Descent.Coalescent.FiniteGenomeAncestry.split_material_union"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Coalescent.FiniteGenomeAncestry.split_material_union": [],
+    "Descent.Coalescent.FiniteGenomeAncestry.split_material_disjoint": []
+   }
+  }
+ },
+ "Descent.Coalescent.FiniteGenomeAncestry.rightMaterial": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name material.filter",
+  "file": "Descent/Coalescent/FiniteGenomeAncestry.lean",
+  "line": 161,
+  "short": "rightMaterial",
+  "ret_type": "Material L n",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Coalescent.FiniteGenomeAncestry.split_material_disjoint",
+   "Descent.Coalescent.FiniteGenomeAncestry.split_material_union"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Coalescent.FiniteGenomeAncestry.split_material_union": [],
+    "Descent.Coalescent.FiniteGenomeAncestry.split_material_disjoint": []
+   }
+  }
+ },
+ "Descent.Coalescent.FiniteGenomeAncestry.recombine": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "unrecognised character '?'",
+  "file": "Descent/Coalescent/FiniteGenomeAncestry.lean",
+  "line": 178,
+  "short": "recombine",
+  "ret_type": "State D L n",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [],
+  "constraints": {}
+ },
  "Descent.Coalescent.neutralFixation": {
   "class": "WRAPPER",
   "note": "delegates to Descent.Core.identifiedWith",
@@ -24941,7 +25374,8 @@
    "Descent.Coalescent.jumpLaw_apply_cover",
    "Descent.Coalescent.mem_support_chainLaw_succ",
    "Descent.Coalescent.mem_support_jumpLaw",
-   "Descent.Coalescent.mem_support_jumpLaw_of_absorbed"
+   "Descent.Coalescent.mem_support_jumpLaw_of_absorbed",
+   "Descent.Portability.AncestralEventLaw.jump_expectation"
   ],
   "constraints": {
    "hypotheses": [
@@ -24967,7 +25401,8 @@
     ],
     "Descent.Coalescent.mem_support_chainLaw_succ": [
      "l ∈ (chainLaw n (m + 1"
-    ]
+    ],
+    "Descent.Portability.AncestralEventLaw.jump_expectation": []
    }
   }
  },
@@ -25194,7 +25629,12 @@
    "Descent.Coalescent.decreaseRate_eq_totalRate_of_binary",
    "Descent.Coalescent.kingman_rates_eq",
    "Descent.Coalescent.totalRate_kingman",
-   "Descent.Coalescent.totalRate_le_decreaseRate"
+   "Descent.Coalescent.totalRate_le_decreaseRate",
+   "Descent.Portability.AncestralEpochLaw.no_event_probability",
+   "Descent.Portability.AncestralEventLaw.jump_expectation",
+   "Descent.Portability.AncestralEventLaw.proposal_generator",
+   "Descent.Portability.AncestralEventLaw.totalRate_le_dominating",
+   "Descent.Portability.AncestralEventLaw.totalRate_nonneg"
   ],
   "constraints": {
    "hypotheses": [
@@ -25221,8 +25661,18 @@
     ],
     "Descent.Coalescent.totalRate_kingman": [
      "2 ≤ b"
-    ]
-   }
+    ],
+    "Descent.Portability.AncestralEpochLaw.no_event_probability": [],
+    "Descent.Portability.AncestralEventLaw.totalRate_nonneg": [],
+    "Descent.Portability.AncestralEventLaw.jump_expectation": [],
+    "Descent.Portability.AncestralEventLaw.totalRate_le_dominating": [],
+    "Descent.Portability.AncestralEventLaw.proposal_generator": []
+   },
+   "range_lo_thm": [
+    "Descent.Portability.AncestralEventLaw.totalRate_nonneg",
+    0
+   ],
+   "range_lo": 0
   }
  },
  "Descent.Coalescent.coalescentLaw": {
@@ -36557,6 +37007,7 @@
    "Descent.Blindness.thirdTensorEnergy_pushedThirdMomentTensor",
    "Descent.Coalescent.BiologicalManyDemeMomentCoordinate.exponent_injective",
    "Descent.Coalescent.BiologicalManyDemeMomentCoordinate.toAffine_injective",
+   "Descent.Coalescent.FiniteGenomeAncestry.lineage_count_bound",
    "Descent.Coalescent.LowOrderLDDDRealization.dd_quadraticForm_nonneg",
    "Descent.Coalescent.LowOrderLDEpoch.propagator_none",
    "Descent.Coalescent.LowOrderLDHaplotypeRealization.DD_abs_le_sixteenth",
@@ -36844,6 +37295,12 @@
    "Descent.PopGen.uniformOccupancyDistinctHaplotypes_le",
    "Descent.PopGen.weightedRetentionUpperBound_eq_predicted_iff_active",
    "Descent.PopGen.winners_curse_worse_near_threshold",
+   "Descent.Portability.AncestralEpochLaw.coordinate_summable",
+   "Descent.Portability.AncestralEpochLaw.epoch_expectation",
+   "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation",
+   "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation",
+   "Descent.Portability.AncestralEpochLaw.poisson_generating_function",
+   "Descent.Portability.AncestralEventLaw.jump_expectation",
    "Descent.Portability.BinaryRiskCohort.continuous_citlEquation",
    "Descent.Portability.BinaryRiskCohort.continuous_logisticCalibrationObjective",
    "Descent.Portability.BinaryRiskCohort.isBounded_logisticCalibration_baselineSublevel",
@@ -37282,6 +37739,7 @@
     "Descent.Blindness.XiFromMarks.distinctPairExceedanceMass_le_sum_sq": [],
     "Descent.Blindness.XiFromMarks.distinctPairParetoExceedanceMass_le_flux_sq": [],
     "Descent.Blindness.XiFromMarks.spectralResponse_pioneerFraction": [],
+    "Descent.Coalescent.FiniteGenomeAncestry.lineage_count_bound": [],
     "Descent.Coalescent.norm_prodUpTo_le_one": [],
     "Descent.Coalescent.norm_prodUpTo_sub_le": [],
     "Descent.Coalescent.restrict_lookdownApply": [],
@@ -37575,6 +38033,12 @@
     "Descent.PopGen.mul_mul_le_self_of_le_one_of_le_one": [],
     "Descent.PopGen.add_ne_self_of_ne_zero": [],
     "Descent.PopGen.greml_underestimates_with_poor_tagging": [],
+    "Descent.Portability.AncestralEpochLaw.coordinate_summable": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_expectation": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation": [],
+    "Descent.Portability.AncestralEpochLaw.poisson_generating_function": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation": [],
+    "Descent.Portability.AncestralEventLaw.jump_expectation": [],
     "Descent.Portability.cubicSplineApproximationScale_strictMono": [],
     "Descent.Portability.more_target_data_reduces_mse": [],
     "Descent.Portability.transferredEstimatorMSE_lt_targetOnly_iff": [],
@@ -44704,7 +45168,8 @@
    "Descent.Coalescent.ManyDemeMomentEpoch.propagator_zeroCoordinate",
    "Descent.Coalescent.ManyDemeMomentEpoch.samplingDual",
    "Descent.Coalescent.ManyDemeMomentInstruction.apply_none",
-   "Descent.Coalescent.manyDemePairDivergenceProjection_propagator_intertwines"
+   "Descent.Coalescent.manyDemePairDivergenceProjection_propagator_intertwines",
+   "Descent.Portability.AncestralEpochLaw.history_expectation"
   ],
   "constraints": {
    "hypotheses": [
@@ -44721,7 +45186,8 @@
     "Descent.Coalescent.manyDemePairDivergenceProjection_propagator_intertwines": [
      "∀ deme, epoch.rates.backwardMutation deme = epoch.rates.forwardMutation deme"
     ],
-    "Descent.Coalescent.LowOrderLDEpoch.propagator_none": []
+    "Descent.Coalescent.LowOrderLDEpoch.propagator_none": [],
+    "Descent.Portability.AncestralEpochLaw.history_expectation": []
    }
   }
  },
@@ -45160,6 +45626,7 @@
    "Descent.Blindness.thirdTensorEnergy_pushedThirdMomentTensor",
    "Descent.Coalescent.BiologicalManyDemeMomentCoordinate.exponent_injective",
    "Descent.Coalescent.BiologicalManyDemeMomentCoordinate.toAffine_injective",
+   "Descent.Coalescent.FiniteGenomeAncestry.lineage_count_bound",
    "Descent.Coalescent.LowOrderLDDDRealization.dd_quadraticForm_nonneg",
    "Descent.Coalescent.LowOrderLDEpoch.propagator_none",
    "Descent.Coalescent.LowOrderLDHaplotypeRealization.DD_abs_le_sixteenth",
@@ -45447,6 +45914,12 @@
    "Descent.PopGen.uniformOccupancyDistinctHaplotypes_le",
    "Descent.PopGen.weightedRetentionUpperBound_eq_predicted_iff_active",
    "Descent.PopGen.winners_curse_worse_near_threshold",
+   "Descent.Portability.AncestralEpochLaw.coordinate_summable",
+   "Descent.Portability.AncestralEpochLaw.epoch_expectation",
+   "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation",
+   "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation",
+   "Descent.Portability.AncestralEpochLaw.poisson_generating_function",
+   "Descent.Portability.AncestralEventLaw.jump_expectation",
    "Descent.Portability.BinaryRiskCohort.continuous_citlEquation",
    "Descent.Portability.BinaryRiskCohort.continuous_logisticCalibrationObjective",
    "Descent.Portability.BinaryRiskCohort.isBounded_logisticCalibration_baselineSublevel",
@@ -45871,6 +46344,7 @@
     "Descent.Blindness.XiFromMarks.distinctPairExceedanceMass_le_sum_sq": [],
     "Descent.Blindness.XiFromMarks.distinctPairParetoExceedanceMass_le_flux_sq": [],
     "Descent.Blindness.XiFromMarks.spectralResponse_pioneerFraction": [],
+    "Descent.Coalescent.FiniteGenomeAncestry.lineage_count_bound": [],
     "Descent.Coalescent.norm_prodUpTo_le_one": [],
     "Descent.Coalescent.norm_prodUpTo_sub_le": [],
     "Descent.Coalescent.restrict_lookdownApply": [],
@@ -46160,6 +46634,12 @@
     "Descent.PopGen.mul_mul_le_self_of_le_one_of_le_one": [],
     "Descent.PopGen.add_ne_self_of_ne_zero": [],
     "Descent.PopGen.greml_underestimates_with_poor_tagging": [],
+    "Descent.Portability.AncestralEpochLaw.coordinate_summable": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_expectation": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation": [],
+    "Descent.Portability.AncestralEpochLaw.poisson_generating_function": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation": [],
+    "Descent.Portability.AncestralEventLaw.jump_expectation": [],
     "Descent.Portability.cubicSplineApproximationScale_strictMono": [],
     "Descent.Portability.more_target_data_reduces_mse": [],
     "Descent.Portability.transferredEstimatorMSE_lt_targetOnly_iff": [],
@@ -51026,6 +51506,7 @@
    "Descent.PopGen.driftLDTrajectory_closedForm",
    "Descent.PopGen.hetMutationRecurrence_closed_form",
    "Descent.PopGen.ld_decay_closed_form",
+   "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg",
    "Descent.Portability.ExactFiniteHistoryLaw.expectation_propagate",
    "Descent.Portability.ExactFiniteHistoryLaw.path_sum_eq_expectation",
    "Descent.Portability.FactorsThroughObservation.zero",
@@ -51111,6 +51592,7 @@
     "Descent.PopGen.driftLDTrajectory_closedForm": [],
     "Descent.PopGen.ld_decay_closed_form": [],
     "Descent.PopGen.hetMutationRecurrence_closed_form": [],
+    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg": [],
     "Descent.Portability.FactorsThroughObservation.zero": [],
     "Descent.Portability.symmetricBetaMoment_eq_risingFactorialRatio": [],
     "Descent.Portability.symmetricBetaBernsteinMoment_eq_closedForm": [],
@@ -62886,6 +63368,7 @@
    "Descent.Blindness.thirdTensorEnergy_pushedThirdMomentTensor",
    "Descent.Coalescent.BiologicalManyDemeMomentCoordinate.exponent_injective",
    "Descent.Coalescent.BiologicalManyDemeMomentCoordinate.toAffine_injective",
+   "Descent.Coalescent.FiniteGenomeAncestry.lineage_count_bound",
    "Descent.Coalescent.LowOrderLDDDRealization.dd_quadraticForm_nonneg",
    "Descent.Coalescent.LowOrderLDEpoch.propagator_none",
    "Descent.Coalescent.LowOrderLDHaplotypeRealization.DD_abs_le_sixteenth",
@@ -63173,6 +63656,12 @@
    "Descent.PopGen.uniformOccupancyDistinctHaplotypes_le",
    "Descent.PopGen.weightedRetentionUpperBound_eq_predicted_iff_active",
    "Descent.PopGen.winners_curse_worse_near_threshold",
+   "Descent.Portability.AncestralEpochLaw.coordinate_summable",
+   "Descent.Portability.AncestralEpochLaw.epoch_expectation",
+   "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation",
+   "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation",
+   "Descent.Portability.AncestralEpochLaw.poisson_generating_function",
+   "Descent.Portability.AncestralEventLaw.jump_expectation",
    "Descent.Portability.BinaryRiskCohort.continuous_citlEquation",
    "Descent.Portability.BinaryRiskCohort.continuous_logisticCalibrationObjective",
    "Descent.Portability.BinaryRiskCohort.isBounded_logisticCalibration_baselineSublevel",
@@ -63623,6 +64112,7 @@
     "Descent.Blindness.XiFromMarks.distinctPairExceedanceMass_le_sum_sq": [],
     "Descent.Blindness.XiFromMarks.distinctPairParetoExceedanceMass_le_flux_sq": [],
     "Descent.Blindness.XiFromMarks.spectralResponse_pioneerFraction": [],
+    "Descent.Coalescent.FiniteGenomeAncestry.lineage_count_bound": [],
     "Descent.Coalescent.norm_prodUpTo_le_one": [],
     "Descent.Coalescent.norm_prodUpTo_sub_le": [],
     "Descent.Coalescent.restrict_lookdownApply": [],
@@ -63955,6 +64445,12 @@
     "Descent.PopGen.mul_mul_le_self_of_le_one_of_le_one": [],
     "Descent.PopGen.add_ne_self_of_ne_zero": [],
     "Descent.PopGen.greml_underestimates_with_poor_tagging": [],
+    "Descent.Portability.AncestralEpochLaw.coordinate_summable": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_expectation": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation": [],
+    "Descent.Portability.AncestralEpochLaw.poisson_generating_function": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation": [],
+    "Descent.Portability.AncestralEventLaw.jump_expectation": [],
     "Descent.Portability.cubicSplineApproximationScale_strictMono": [],
     "Descent.Portability.more_target_data_reduces_mse": [],
     "Descent.Portability.transferredEstimatorMSE_lt_targetOnly_iff": [],
@@ -64424,6 +64920,8 @@
    "Descent.Blindness.varianceNonneg_sub_rankOne_iff",
    "Descent.Blindness.witness_unique_of_factorization",
    "Descent.Coalescent.BiologicalManyDemeMomentCoordinate.exponent_injective",
+   "Descent.Coalescent.FiniteGenomeAncestry.Valid.insert",
+   "Descent.Coalescent.FiniteGenomeAncestry.lineage_count_bound",
    "Descent.Coalescent.LowOrderLDHaplotypeRealization.firstEndpointDDMigrationStencil_eq_expectation",
    "Descent.Coalescent.LowOrderLDHaplotypeRealization.leftIndexDzMigrationStencil_eq_expectation",
    "Descent.Coalescent.LowOrderLDHaplotypeRealization.linkageIndexDzMigrationStencil_eq_expectation",
@@ -64671,6 +65169,7 @@
     "b ≠ d",
     "c ≠ b",
     "¬((a = c ∧ b = d",
+    "∀ b ∈ s, Disjoint a.2 b.2",
     "b.source = c.source",
     "∀ y (hy : y ∈ b.source",
     "s a = s b",
@@ -64745,6 +65244,10 @@
     "Descent.Coalescent.sum_classSize": [],
     "Descent.Coalescent.card_fiber_of_seat_ne": [],
     "Descent.Coalescent.card_fiber_of_ne": [],
+    "Descent.Coalescent.FiniteGenomeAncestry.Valid.insert": [
+     "∀ b ∈ s, Disjoint a.2 b.2"
+    ],
+    "Descent.Coalescent.FiniteGenomeAncestry.lineage_count_bound": [],
     "Descent.Coalescent.fixationCoefficient_eq_duality": [],
     "Descent.Coalescent.fuTerm_eq": [],
     "Descent.Coalescent.rel_indep": [],
@@ -72377,6 +72880,7 @@
    "Descent.PopGen.driftLDTrajectory_closedForm",
    "Descent.PopGen.hetMutationRecurrence_closed_form",
    "Descent.PopGen.ld_decay_closed_form",
+   "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg",
    "Descent.Portability.ExactFiniteHistoryLaw.expectation_propagate",
    "Descent.Portability.ExactFiniteHistoryLaw.path_sum_eq_expectation",
    "Descent.Portability.FactorsThroughObservation.zero",
@@ -72462,6 +72966,7 @@
     "Descent.PopGen.driftLDTrajectory_closedForm": [],
     "Descent.PopGen.ld_decay_closed_form": [],
     "Descent.PopGen.hetMutationRecurrence_closed_form": [],
+    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg": [],
     "Descent.Portability.FactorsThroughObservation.zero": [],
     "Descent.Portability.symmetricBetaMoment_eq_risingFactorialRatio": [],
     "Descent.Portability.symmetricBetaBernsteinMoment_eq_closedForm": [],
@@ -83888,6 +84393,17 @@
    "Descent.Pangenome.Gauge.hiddenCount_eq_zero",
    "Descent.Pangenome.Gauge.rowDist_eq_walkDist_iff",
    "Descent.Pangenome.Gauge.rowDist_split",
+   "Descent.Portability.AncestralEpochLaw.coordinate_summable",
+   "Descent.Portability.AncestralEpochLaw.epoch_expectation",
+   "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation",
+   "Descent.Portability.AncestralEpochLaw.epoch_history_mass_sum",
+   "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation",
+   "Descent.Portability.AncestralEpochLaw.no_event_probability",
+   "Descent.Portability.AncestralEpochLaw.poisson_generating_function",
+   "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg",
+   "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_sum",
+   "Descent.Portability.AncestralEpochLaw.readout_summable",
+   "Descent.Portability.AncestralEpochLaw.tailProbability_eq_one_sub",
    "Descent.Portability.ManyDemeSampleCount.total_le_totalSampleSize",
    "Descent.Portability.PipelineDemographicHistory.manyDemeSampleCountMomentMass_eq_functional",
    "Descent.Portability.PipelineDemographicHistory.manyDemeSampleCountProjection_eq_momentMass",
@@ -83917,6 +84433,17 @@
     "Descent.Pangenome.Gauge.hiddenCount_eq_zero": [],
     "Descent.Pangenome.Gauge.rowDist_split": [],
     "Descent.Pangenome.Gauge.rowDist_eq_walkDist_iff": [],
+    "Descent.Portability.AncestralEpochLaw.coordinate_summable": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_expectation": [],
+    "Descent.Portability.AncestralEpochLaw.readout_summable": [],
+    "Descent.Portability.AncestralEpochLaw.tailProbability_eq_one_sub": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation": [],
+    "Descent.Portability.AncestralEpochLaw.poisson_generating_function": [],
+    "Descent.Portability.AncestralEpochLaw.no_event_probability": [],
+    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg": [],
+    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_sum": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_history_mass_sum": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation": [],
     "Descent.Portability.ManyDemeSampleCount.total_le_totalSampleSize": [],
     "Descent.Portability.manyDemeSampleCountAlternating_eq_bernstein": [],
     "Descent.Portability.manyDemeSampleCountAlternatingPolynomial_eq_bernstein": [],
@@ -112456,6 +112983,616 @@
    }
   }
  },
+ "Descent.Portability.AncestralEpochLaw.steps": {
+  "class": "STRUCTURAL",
+  "note": "builds a structure value (FiniteReportLaw (State D L n))",
+  "file": "Descent/Portability/AncestralEpochLaw.lean",
+  "line": 26,
+  "short": "steps",
+  "ret_type": "FiniteReportLaw (State D L n)",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "count": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Conditionals.FiniteCoupledPhaseLaw.conditionalGainFunctional_ge_linear_of_uniform_factor",
+   "Descent.Portability.AncestralEpochLaw.coordinate_summable",
+   "Descent.Portability.AncestralEpochLaw.epoch_expectation",
+   "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation",
+   "Descent.Portability.AncestralEpochLaw.readout_summable"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Conditionals.FiniteCoupledPhaseLaw.conditionalGainFunctional_ge_linear_of_uniform_factor": [],
+    "Descent.Portability.AncestralEpochLaw.coordinate_summable": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_expectation": [],
+    "Descent.Portability.AncestralEpochLaw.readout_summable": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation": []
+   }
+  }
+ },
+ "Descent.Portability.AncestralEpochLaw.poissonParameter": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "anonymous constructor",
+  "file": "Descent/Portability/AncestralEpochLaw.lean",
+  "line": 30,
+  "short": "poissonParameter",
+  "ret_type": "ℝ≥0",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.AncestralEpochLaw.coordinate_summable",
+   "Descent.Portability.AncestralEpochLaw.epoch_expectation",
+   "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation",
+   "Descent.Portability.AncestralEpochLaw.epoch_history_mass_sum",
+   "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation",
+   "Descent.Portability.AncestralEpochLaw.no_event_probability",
+   "Descent.Portability.AncestralEpochLaw.readout_summable",
+   "Descent.Portability.AncestralEpochLaw.tailProbability_eq_one_sub"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochLaw.coordinate_summable": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_expectation": [],
+    "Descent.Portability.AncestralEpochLaw.readout_summable": [],
+    "Descent.Portability.AncestralEpochLaw.tailProbability_eq_one_sub": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation": [],
+    "Descent.Portability.AncestralEpochLaw.no_event_probability": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_history_mass_sum": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation": []
+   }
+  }
+ },
+ "Descent.Portability.AncestralEpochLaw.epochLaw": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/AncestralEpochLaw.lean",
+  "line": 49,
+  "short": "epochLaw",
+  "ret_type": "FiniteReportLaw (State D L n) where mass",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.AncestralEpochLaw.epoch_expectation",
+   "Descent.Portability.AncestralEpochLaw.epoch_expectation_bounds",
+   "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation",
+   "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochLaw.epoch_expectation": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_expectation_bounds": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation": []
+   }
+  }
+ },
+ "Descent.Portability.AncestralEpochLaw.tailProbability": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "unrecognised character \"'\"",
+  "file": "Descent/Portability/AncestralEpochLaw.lean",
+  "line": 105,
+  "short": "tailProbability",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "cutoff": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation",
+   "Descent.Portability.AncestralEpochLaw.tailProbability_eq_one_sub"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochLaw.tailProbability_eq_one_sub": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation": []
+   }
+  }
+ },
+ "Descent.Portability.AncestralEpochLaw.proposalHistoryMass": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name ExactFiniteHistoryLaw.pathMass",
+  "file": "Descent/Portability/AncestralEpochLaw.lean",
+  "line": 192,
+  "short": "proposalHistoryMass",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.AncestralEpochLaw.epoch_history_mass_sum",
+   "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation",
+   "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg",
+   "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_sum"
+  ],
+  "constraints": {
+   "range_lo_thm": [
+    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg",
+    0
+   ],
+   "range_lo": 0,
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg": [],
+    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_sum": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_history_mass_sum": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation": []
+   }
+  }
+ },
+ "Descent.Portability.AncestralEpochLaw.historyLaw": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "recursion with 3 branches, expected 2",
+  "file": "Descent/Portability/AncestralEpochLaw.lean",
+  "line": 239,
+  "short": "historyLaw",
+  "ret_type": "List (Instruction D L) → State D L n → FiniteReportLaw (State D L n)",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.AncestralEpochLaw.history_expectation"
+  ],
+  "constraints": {
+   "declared_kind": "probability",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochLaw.history_expectation": []
+   }
+  }
+ },
+ "Descent.Portability.AncestralEpochLaw.historyExpectation": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "recursion with 3 branches, expected 2",
+  "file": "Descent/Portability/AncestralEpochLaw.lean",
+  "line": 246,
+  "short": "historyExpectation",
+  "ret_type": "List (Instruction D L) → (State D L n → ℝ) → State D L n → ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.AncestralEpochLaw.history_expectation"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochLaw.history_expectation": []
+   }
+  }
+ },
+ "Descent.Portability.AncestralEventLaw.MigrationChannel": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/AncestralEventLaw.lean",
+  "line": 34,
+  "short": "MigrationChannel",
+  "ret_type": "",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [],
+  "constraints": {
+   "declared_kind": "ratio",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0
+  }
+ },
+ "Descent.Portability.AncestralEventLaw.CoalescenceChannel": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/AncestralEventLaw.lean",
+  "line": 37,
+  "short": "CoalescenceChannel",
+  "ret_type": "",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [],
+  "constraints": {}
+ },
+ "Descent.Portability.AncestralEventLaw.RecombinationChannel": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/AncestralEventLaw.lean",
+  "line": 41,
+  "short": "RecombinationChannel",
+  "ret_type": "",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [],
+  "constraints": {}
+ },
+ "Descent.Portability.AncestralEventLaw.Channel": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "unrecognised character '⊕'",
+  "file": "Descent/Portability/AncestralEventLaw.lean",
+  "line": 45,
+  "short": "Channel",
+  "ret_type": "",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.AncestralEventLaw.eventRate_nonneg"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEventLaw.eventRate_nonneg": []
+   }
+  }
+ },
+ "Descent.Portability.AncestralEventLaw.nextState": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "recursion with 3 branches, expected 2",
+  "file": "Descent/Portability/AncestralEventLaw.lean",
+  "line": 52,
+  "short": "nextState",
+  "ret_type": "Channel s → State D L n",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.AncestralEventLaw.jump_expectation",
+   "Descent.Portability.AncestralEventLaw.proposal_generator"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "0 < totalRate rates s"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEventLaw.jump_expectation": [
+     "0 < totalRate rates s"
+    ],
+    "Descent.Portability.AncestralEventLaw.proposal_generator": []
+   }
+  }
+ },
+ "Descent.Portability.AncestralEventLaw.eventRate": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "recursion with 3 branches, expected 2",
+  "file": "Descent/Portability/AncestralEventLaw.lean",
+  "line": 59,
+  "short": "eventRate",
+  "ret_type": "Channel s → ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.AncestralEventLaw.eventRate_nonneg",
+   "Descent.Portability.AncestralEventLaw.jump_expectation",
+   "Descent.Portability.AncestralEventLaw.proposal_generator"
+  ],
+  "constraints": {
+   "range_lo_thm": [
+    "Descent.Portability.AncestralEventLaw.eventRate_nonneg",
+    0
+   ],
+   "range_lo": 0,
+   "hypotheses": [
+    "0 < totalRate rates s"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEventLaw.eventRate_nonneg": [],
+    "Descent.Portability.AncestralEventLaw.jump_expectation": [
+     "0 < totalRate rates s"
+    ],
+    "Descent.Portability.AncestralEventLaw.proposal_generator": []
+   }
+  }
+ },
+ "Descent.Portability.AncestralEventLaw.totalRate": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "∑ over an unannotated index whose index is never applied to a local value: there is nothing in the body to read a dimension from",
+  "file": "Descent/Portability/AncestralEventLaw.lean",
+  "line": 77,
+  "short": "totalRate",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Coalescent.comesDownFromInfinity_of_summable_totalRate",
+   "Descent.Coalescent.decreaseRate_eq_totalRate_of_binary",
+   "Descent.Coalescent.kingman_rates_eq",
+   "Descent.Coalescent.totalRate_kingman",
+   "Descent.Coalescent.totalRate_le_decreaseRate",
+   "Descent.Portability.AncestralEpochLaw.no_event_probability",
+   "Descent.Portability.AncestralEventLaw.jump_expectation",
+   "Descent.Portability.AncestralEventLaw.proposal_generator",
+   "Descent.Portability.AncestralEventLaw.totalRate_le_dominating",
+   "Descent.Portability.AncestralEventLaw.totalRate_nonneg"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "0 < totalRate rates s"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Coalescent.totalRate_le_decreaseRate": [],
+    "Descent.Coalescent.decreaseRate_eq_totalRate_of_binary": [],
+    "Descent.Coalescent.kingman_rates_eq": [],
+    "Descent.Coalescent.comesDownFromInfinity_of_summable_totalRate": [],
+    "Descent.Coalescent.totalRate_kingman": [],
+    "Descent.Portability.AncestralEpochLaw.no_event_probability": [],
+    "Descent.Portability.AncestralEventLaw.totalRate_nonneg": [],
+    "Descent.Portability.AncestralEventLaw.jump_expectation": [
+     "0 < totalRate rates s"
+    ],
+    "Descent.Portability.AncestralEventLaw.totalRate_le_dominating": [],
+    "Descent.Portability.AncestralEventLaw.proposal_generator": []
+   },
+   "range_lo_thm": [
+    "Descent.Portability.AncestralEventLaw.totalRate_nonneg",
+    0
+   ],
+   "range_lo": 0
+  }
+ },
+ "Descent.Portability.AncestralEventLaw.jumpLaw": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/AncestralEventLaw.lean",
+  "line": 86,
+  "short": "jumpLaw",
+  "ret_type": "FiniteReportLaw (Channel s) where mass",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Coalescent.jumpKernel_absorbing",
+   "Descent.Coalescent.jumpKernel_apply",
+   "Descent.Coalescent.jumpLaw_apply_cover",
+   "Descent.Coalescent.mem_support_chainLaw_succ",
+   "Descent.Coalescent.mem_support_jumpLaw",
+   "Descent.Coalescent.mem_support_jumpLaw_of_absorbed",
+   "Descent.Portability.AncestralEventLaw.jump_expectation"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "0 < totalRate rates s"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Coalescent.jumpKernel_apply": [],
+    "Descent.Coalescent.jumpKernel_absorbing": [],
+    "Descent.Coalescent.jumpLaw_apply_cover": [],
+    "Descent.Coalescent.mem_support_jumpLaw": [],
+    "Descent.Coalescent.mem_support_jumpLaw_of_absorbed": [],
+    "Descent.Coalescent.mem_support_chainLaw_succ": [],
+    "Descent.Portability.AncestralEventLaw.jump_expectation": [
+     "0 < totalRate rates s"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.AncestralEventLaw.jumpStateLaw": {
+  "class": "STRUCTURAL",
+  "note": "builds a structure value (FiniteReportLaw (State D L n))",
+  "file": "Descent/Portability/AncestralEventLaw.lean",
+  "line": 94,
+  "short": "jumpStateLaw",
+  "ret_type": "FiniteReportLaw (State D L n)",
+  "empirical_status": "",
+  "python": "jumpStateLaw",
+  "args": [
+   "rates",
+   "s",
+   "h"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "Uninhabitable(\"no inhabitant modelled for the type '{lineages : Finset (Lineage D L n) // Valid lineages} D L n'\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.AncestralEventLaw.jump_expectation"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "0 < totalRate rates s"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEventLaw.jump_expectation": [
+     "0 < totalRate rates s"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.AncestralEventLaw.dominatingRate": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "∑ over State D L n whose index is never applied to a local value: there is nothing in the body to read a dimension from",
+  "file": "Descent/Portability/AncestralEventLaw.lean",
+  "line": 112,
+  "short": "dominatingRate",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.AncestralEpochLaw.no_event_probability",
+   "Descent.Portability.AncestralEventLaw.dominatingRate_pos",
+   "Descent.Portability.AncestralEventLaw.proposal_generator",
+   "Descent.Portability.AncestralEventLaw.totalRate_le_dominating"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochLaw.no_event_probability": [],
+    "Descent.Portability.AncestralEventLaw.dominatingRate_pos": [],
+    "Descent.Portability.AncestralEventLaw.totalRate_le_dominating": [],
+    "Descent.Portability.AncestralEventLaw.proposal_generator": []
+   }
+  }
+ },
+ "Descent.Portability.AncestralEventLaw.proposalLaw": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/AncestralEventLaw.lean",
+  "line": 129,
+  "short": "proposalLaw",
+  "ret_type": "FiniteReportLaw (Option (Channel s)) where mass",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.AncestralEventLaw.proposal_generator"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEventLaw.proposal_generator": []
+   }
+  }
+ },
+ "Descent.Portability.AncestralEventLaw.proposalNext": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "recursion has no `0` branch",
+  "file": "Descent/Portability/AncestralEventLaw.lean",
+  "line": 149,
+  "short": "proposalNext",
+  "ret_type": "Option (Channel s) → State D L n",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.AncestralEventLaw.proposal_generator"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEventLaw.proposal_generator": []
+   }
+  }
+ },
+ "Descent.Portability.AncestralEventLaw.proposalKernel": {
+  "class": "STRUCTURAL",
+  "note": "builds a structure value (FiniteReportLaw (State D L n))",
+  "file": "Descent/Portability/AncestralEventLaw.lean",
+  "line": 153,
+  "short": "proposalKernel",
+  "ret_type": "FiniteReportLaw (State D L n)",
+  "empirical_status": "",
+  "python": "proposalKernel",
+  "args": [
+   "rates",
+   "s"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "Uninhabitable(\"no inhabitant modelled for the type '{lineages : Finset (Lineage D L n) // Valid lineages} D L n'\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation",
+   "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg",
+   "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_sum",
+   "Descent.Portability.AncestralEventLaw.proposal_generator"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg": [],
+    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_sum": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation": [],
+    "Descent.Portability.AncestralEventLaw.proposal_generator": []
+   }
+  }
+ },
  "Descent.Portability.ancestryRecalibratedSlope": {
   "class": "NUMERIC",
   "note": "",
@@ -124191,6 +125328,15 @@
    "Descent.Coalescent.lowOrderLDMutation_pi2_eq_haplotypeVelocity",
    "Descent.Coalescent.lowOrderLDRecombination_DD_eq_haplotypeVelocity",
    "Descent.Coalescent.lowOrderLDRecombination_Dz_eq_haplotypeVelocity",
+   "Descent.Portability.AncestralEpochLaw.epoch_expectation",
+   "Descent.Portability.AncestralEpochLaw.epoch_expectation_bounds",
+   "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation",
+   "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation",
+   "Descent.Portability.AncestralEpochLaw.expectation_bounds",
+   "Descent.Portability.AncestralEpochLaw.history_expectation",
+   "Descent.Portability.AncestralEpochLaw.readout_summable",
+   "Descent.Portability.AncestralEventLaw.jump_expectation",
+   "Descent.Portability.AncestralEventLaw.proposal_generator",
    "Descent.Portability.ExactFiniteHistoryLaw.expectation_propagate",
    "Descent.Portability.ExactFiniteHistoryLaw.expectation_reportLaw",
    "Descent.Portability.ExactFiniteHistoryLaw.path_mass_sum_one",
@@ -124259,6 +125405,15 @@
     "Descent.Coalescent.lowOrderLDMutation_DD_eq_haplotypeVelocity": [],
     "Descent.Coalescent.lowOrderLDMutation_Dz_eq_haplotypeVelocity": [],
     "Descent.Coalescent.lowOrderLDMutation_pi2_eq_haplotypeVelocity": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_expectation": [],
+    "Descent.Portability.AncestralEpochLaw.expectation_bounds": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_expectation_bounds": [],
+    "Descent.Portability.AncestralEpochLaw.readout_summable": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation": [],
+    "Descent.Portability.AncestralEpochLaw.history_expectation": [],
+    "Descent.Portability.AncestralEventLaw.jump_expectation": [],
+    "Descent.Portability.AncestralEventLaw.proposal_generator": [],
     "Descent.Portability.FiniteReportLaw.expectation_bind": [],
     "Descent.Portability.FiniteReportLaw.expectation_pointMass": [],
     "Descent.Portability.FiniteReportLaw.expectation_pushforward": [],
@@ -125156,9 +126311,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 6,
+   "finite_points": 4,
    "total_points": 8,
-   "error": "ValueError('expected a number in range from -1 up to 1, got 1.0945466753965385')"
+   "error": "ValueError('expected a number in range from -1 up to 1, got 1.3619992166484935')"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -125210,9 +126365,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 8,
+   "finite_points": 7,
    "total_points": 8,
-   "error": null
+   "error": "ValueError('expected a number in range from -1 up to 1, got 1.1135846535146987')"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -127029,6 +128184,10 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochLaw.epoch_history_mass_sum",
+   "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation",
+   "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg",
+   "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_sum",
    "Descent.Portability.ExactFiniteHistoryLaw.path_mass_sum_one",
    "Descent.Portability.ExactFiniteHistoryLaw.path_sum_eq_expectation",
    "Descent.Portability.ExactFiniteHistoryLaw.report_path_sum_eq_backward"
@@ -127036,6 +128195,10 @@
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg": [],
+    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_sum": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_history_mass_sum": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation": [],
     "Descent.Portability.ExactFiniteHistoryLaw.path_sum_eq_expectation": [],
     "Descent.Portability.ExactFiniteHistoryLaw.path_mass_sum_one": [],
     "Descent.Portability.ExactFiniteHistoryLaw.report_path_sum_eq_backward": []
@@ -127057,12 +128220,16 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation",
+   "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg",
    "Descent.Portability.ExactFiniteHistoryLaw.path_sum_eq_expectation",
    "Descent.Portability.ExactFiniteHistoryLaw.report_path_sum_eq_backward"
   ],
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation": [],
     "Descent.Portability.ExactFiniteHistoryLaw.path_sum_eq_expectation": [],
     "Descent.Portability.ExactFiniteHistoryLaw.report_path_sum_eq_backward": []
    }
@@ -166109,6 +167276,15 @@
    "Descent.Coalescent.lowOrderLDMutation_pi2_eq_haplotypeVelocity",
    "Descent.Coalescent.lowOrderLDRecombination_DD_eq_haplotypeVelocity",
    "Descent.Coalescent.lowOrderLDRecombination_Dz_eq_haplotypeVelocity",
+   "Descent.Portability.AncestralEpochLaw.epoch_expectation",
+   "Descent.Portability.AncestralEpochLaw.epoch_expectation_bounds",
+   "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation",
+   "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation",
+   "Descent.Portability.AncestralEpochLaw.expectation_bounds",
+   "Descent.Portability.AncestralEpochLaw.history_expectation",
+   "Descent.Portability.AncestralEpochLaw.readout_summable",
+   "Descent.Portability.AncestralEventLaw.jump_expectation",
+   "Descent.Portability.AncestralEventLaw.proposal_generator",
    "Descent.Portability.ExactFiniteHistoryLaw.expectation_propagate",
    "Descent.Portability.ExactFiniteHistoryLaw.expectation_reportLaw",
    "Descent.Portability.ExactFiniteHistoryLaw.path_mass_sum_one",
@@ -166183,6 +167359,15 @@
     "Descent.Coalescent.lowOrderLDMutation_DD_eq_haplotypeVelocity": [],
     "Descent.Coalescent.lowOrderLDMutation_Dz_eq_haplotypeVelocity": [],
     "Descent.Coalescent.lowOrderLDMutation_pi2_eq_haplotypeVelocity": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_expectation": [],
+    "Descent.Portability.AncestralEpochLaw.expectation_bounds": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_expectation_bounds": [],
+    "Descent.Portability.AncestralEpochLaw.readout_summable": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_expectation_truncation": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation": [],
+    "Descent.Portability.AncestralEpochLaw.history_expectation": [],
+    "Descent.Portability.AncestralEventLaw.jump_expectation": [],
+    "Descent.Portability.AncestralEventLaw.proposal_generator": [],
     "Descent.Portability.FiniteReportLaw.expectation_bind": [],
     "Descent.Portability.FiniteReportLaw.expectation_pointMass": [],
     "Descent.Portability.FiniteReportLaw.expectation_pushforward": [],
@@ -166459,6 +167644,9 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation",
+   "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg",
+   "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_sum",
    "Descent.Portability.FiniteReportLaw.binary_pointMass_separation",
    "Descent.Portability.FiniteReportLaw.expectation_pointMass",
    "Descent.Program.PosteriorPrediction.pointMass_prob_mean_eq_prob_mode"
@@ -166466,6 +167654,9 @@
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg": [],
+    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_sum": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation": [],
     "Descent.Portability.FiniteReportLaw.expectation_pointMass": [],
     "Descent.Portability.FiniteReportLaw.binary_pointMass_separation": [],
     "Descent.Program.PosteriorPrediction.pointMass_prob_mean_eq_prob_mode": []
@@ -166688,6 +167879,9 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation",
+   "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg",
+   "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_sum",
    "Descent.Portability.FiniteReportLaw.binary_pointMass_separation",
    "Descent.Portability.FiniteReportLaw.expectation_pointMass",
    "Descent.Program.PosteriorPrediction.pointMass_prob_mean_eq_prob_mode"
@@ -166695,6 +167889,9 @@
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_nonneg": [],
+    "Descent.Portability.AncestralEpochLaw.proposalHistoryMass_sum": [],
+    "Descent.Portability.AncestralEpochLaw.epoch_history_terminal_expectation": [],
     "Descent.Portability.FiniteReportLaw.expectation_pointMass": [],
     "Descent.Portability.FiniteReportLaw.binary_pointMass_separation": [],
     "Descent.Program.PosteriorPrediction.pointMass_prob_mean_eq_prob_mode": []
