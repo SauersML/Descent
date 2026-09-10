@@ -50,7 +50,7 @@ theorem cosine_generator_limit (r : ℕ → ℝ) (hr : Tendsto r atTop atTop) (t
     Tendsto (fun m ↦ r m * (Real.cos (t * (Real.sqrt (r m))⁻¹) - 1)) atTop
       (nhds (-(t ^ 2 / 2))) := by
   have hs : Tendsto (fun m ↦ (Real.sqrt (r m))⁻¹) atTop (nhds 0) := by
-    simpa only [Function.comp_apply, Real.sqrt_inv, Real.sqrt_zero] using
+    simpa only [Function.comp_def, Real.sqrt_inv, Real.sqrt_zero] using
       (Real.continuous_sqrt.tendsto 0).comp (tendsto_inv_atTop_zero.comp hr)
   have hz : Tendsto (fun m ↦ t * (Real.sqrt (r m))⁻¹ / 2) atTop (nhds 0) := by
     simpa only [mul_zero, zero_div] using (tendsto_const_nhds.mul hs).div_const 2

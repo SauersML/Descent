@@ -114,24 +114,24 @@ noncomputable def directedKernel (source : Fin 4) : FiniteReportLaw (Fin 4) wher
   mass_nonneg target := by
     fin_cases source <;> fin_cases target <;> norm_num [directed, Matrix.one_apply]
   mass_sum := by
-    fin_cases source <;> norm_num [directed, Matrix.one_apply, Fin.sum_univ_succ, Fin.ext_iff]
+    fin_cases source <;> norm_num [directed, Matrix.one_apply, Fin.sum_univ_four]
 
 noncomputable def reversibleKernel (source : Fin 4) : FiniteReportLaw (Fin 4) where
   mass target := (reversible + 1) source target
   mass_nonneg target := by
     fin_cases source <;> fin_cases target <;> norm_num [reversible, Matrix.one_apply]
   mass_sum := by
-    fin_cases source <;> norm_num [reversible, Matrix.one_apply, Fin.sum_univ_succ, Fin.ext_iff]
+    fin_cases source <;> norm_num [reversible, Matrix.one_apply, Fin.sum_univ_four]
 
 theorem directed_stationary : Stationary uniform directedKernel := by
   intro target
   fin_cases target <;>
-    norm_num [uniform, directedKernel, directed, Matrix.one_apply, Fin.sum_univ_succ, Fin.ext_iff]
+    norm_num [uniform, directedKernel, directed, Matrix.one_apply, Fin.sum_univ_four]
 
 theorem reversible_stationary : Stationary uniform reversibleKernel := by
   intro target
   fin_cases target <;>
-    norm_num [uniform, reversibleKernel, reversible, Matrix.one_apply, Fin.sum_univ_succ, Fin.ext_iff]
+    norm_num [uniform, reversibleKernel, reversible, Matrix.one_apply, Fin.sum_univ_four]
 
 noncomputable def directedLaw (time : ℝ) : Fin 4 → FiniteReportLaw (Fin 4) :=
   stateLaw directedKernel 1 time
@@ -196,5 +196,72 @@ theorem reversible_correlation (time : ℝ) (htime : 0 ≤ time) :
   ring_nf
   rw [hsqrt]
   ring
+
+theorem directed_prediction_energy (time : ℝ) (htime : 0 ≤ time) :
+    energy uniform (predict (directedLaw time) report) = Real.exp (-2 * time) := by
+  rw [directed_prediction time htime]
+  have hsqrt : Real.sqrt 2 ^ 2 = 2 := Real.sq_sqrt (by norm_num)
+  have htrig := Real.sin_sq_add_cos_sq time
+  have hexp : Real.exp (-2 * time) = Real.exp (-time) ^ 2 := by
+    rw [pow_two, ← Real.exp_add]
+    congr 1
+    ring
+  rw [hexp]
+  simp [energy, FiniteHorizonLoss.inner, uniform, directedOrbit,
+    cosineDecay, sineDecay, Fin.sum_univ_four]
+  ring_nf
+  rw [hsqrt]
+  nlinarith [sq_nonneg (Real.exp (-time))]
+
+theorem reversible_prediction_energy (time : ℝ) (htime : 0 ≤ time) :
+    energy uniform (predict (reversibleLaw time) report) = Real.exp (-2 * time) := by
+  rw [reversible_prediction time htime]
+  have hsqrt : Real.sqrt 2 ^ 2 = 2 := Real.sq_sqrt (by norm_num)
+  have hexp : Real.exp (-2 * time) = Real.exp (-time) ^ 2 := by
+    rw [pow_two, ← Real.exp_add]
+    congr 1
+    ring
+  rw [hexp]
+  simp [energy, FiniteHorizonLoss.inner, uniform, reversibleOrbit, Fin.sum_univ_four]
+  ring_nf
+  rw [hsqrt]
+  ring
+
+/-- The directed cycle's frozen score rotates out of phase. -/
+theorem directed_stale_risk (time : ℝ) (htime : 0 ≤ time) :
+    risk uniform (directedLaw time) report report =
+      2 - 2 * (Real.exp (-time) * Real.cos time) := by
+  rw [stale_loss uniform _ (directedLaw_stationary time), report_energy,
+    directed_correlation time htime]
+  ring
+
+/-- The reversible chain has the same instantaneous damping but no rotating phase. -/
+theorem reversible_stale_risk (time : ℝ) (htime : 0 ≤ time) :
+    risk uniform (reversibleLaw time) report report = 2 - 2 * Real.exp (-time) := by
+  rw [stale_loss uniform _ (reversibleLaw_stationary time), report_energy,
+    reversible_correlation time htime]
+  ring
+
+/-- Optimal transport removes the phase difference: both exact risks coincide. -/
+theorem optimal_risks_equal (time : ℝ) (htime : 0 ≤ time) :
+    risk uniform (directedLaw time) report (predict (directedLaw time) report) =
+        1 - Real.exp (-2 * time) ∧
+      risk uniform (reversibleLaw time) report (predict (reversibleLaw time) report) =
+        1 - Real.exp (-2 * time) := by
+  constructor
+  · rw [optimal_prediction_risk uniform _ (directedLaw_stationary time), report_energy,
+      directed_prediction_energy time htime]
+  · rw [optimal_prediction_risk uniform _ (reversibleLaw_stationary time), report_energy,
+      reversible_prediction_energy time htime]
+
+/-- At half pi, the directed frozen score is strictly worse, despite equal optimal risk. -/
+theorem stale_risks_differ_at_half_pi :
+    risk uniform (directedLaw (Real.pi / 2)) report report = 2 ∧
+      risk uniform (reversibleLaw (Real.pi / 2)) report report < 2 := by
+  have ht : 0 ≤ Real.pi / 2 := le_of_lt (div_pos Real.pi_pos (by norm_num))
+  rw [directed_stale_risk _ ht, reversible_stale_risk _ ht, Real.cos_pi_div_two]
+  constructor
+  · ring
+  · linarith [Real.exp_pos (-(Real.pi / 2))]
 
 end Descent.Portability.FourCyclePrediction
