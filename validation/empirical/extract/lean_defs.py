@@ -3043,9 +3043,9 @@ def liabilityScaleH2(h2_observed, prevalence, z_height):
 
 def completionMass(rates, s, count):
     if count == 0:
-        return (1.0 - survival(rates, 0.0, s))
+        return (1.0 - Descent_Portability_AncestralAbsorptionLaw_survival(rates, 0.0, s))
     count = count - 1     # the `n + 1` pattern
-    return (survival(rates, count, s) - survival(rates, ((count + 1.0)), s))
+    return (Descent_Portability_AncestralAbsorptionLaw_survival(rates, count, s) - Descent_Portability_AncestralAbsorptionLaw_survival(rates, ((count + 1.0)), s))
 
 def stoppingTraceMass(rates, s, trace):
     return (traceMass(rates, s, trace) * stoppingIndicator(s, trace))
@@ -3064,6 +3064,12 @@ def proposalKernel(rates, s):
 
 def traceNucleotideLaw(trace, duration, times, mutationRate, locus, _hcomplete, _hmono, _htimes):
     return rootedGenealogyLaw((traceBranches(locus, mutationRate, trace, duration, times)))
+
+def Descent_Portability_AncestralMutationTransfer_transfer(rates, mutationRate, family):
+    return (lambda s: _rt._proj((Descent_Portability_AncestralMutationTransfer_markLaw(rates, mutationRate, s)), 'bind')((transferMark(family, s))))
+
+def rowDistance(first, second):
+    return sum((_rt.rabs((_rt._proj(first, 'mass')(output) - _rt._proj(second, 'mass')(output)))) for output in range(int(_rt.sumdim('output', len(_rt._proj(first, 'mass')), len(_rt._proj(second, 'mass'))))))
 
 def ancestryRecalibratedSlope(bSource, rho, alpha):
     return _rt.rdiv((rho * ((bSource * alpha))), _rt.lpow(alpha, 2.0))
@@ -3378,7 +3384,7 @@ def citlEquation(cohort, intercept):
 
 def expectedMetric(panel, coordinate):
     mass = metricDefinedMass(panel, coordinate)
-    return (none if (mass == 0.0) else some((_rt.rdiv(weightedMetric(panel, coordinate), mass))))
+    return (none if (mass == 0.0) else some((_rt.rdiv(Descent_Portability_DemeRiskPredictionPanel_weightedMetric(panel, coordinate), mass))))
 
 def Descent_Portability_DemeRiskPredictionPanel_expectedOutput(panel):
     return expectedMetric(panel)
@@ -3692,17 +3698,29 @@ def binaryAUC(p, score, outcome):
     cases = binaryCaseMass(p, outcome)
     return (some((_rt.rdiv(binaryAUCNumerator(p, score, outcome), (_rt.mul(cases, (_rt.sub(1.0, cases))))))) if ((0.0 < cases) and (cases < 1.0)) else none)
 
-def definedMass(p, metric):
+def Descent_Portability_FiniteReportLaw_definedMass(p, metric):
     return Descent_Portability_FiniteReportLaw_expectation(p, (lambda s: (1.0 if _rt._proj((metric(s)), 'isSome') else 0.0)))
 
 def weightedDefinedMetric(p, metric):
     return Descent_Portability_FiniteReportLaw_expectation(p, (lambda s: _rt._proj((metric(s)), 'getD')(0.0)))
 
-def conditionalMetric(p, metric):
-    return (none if (definedMass(p, metric) == 0.0) else some((_rt.rdiv(weightedDefinedMetric(p, metric), definedMass(p, metric)))))
+def Descent_Portability_FiniteReportLaw_conditionalMetric(p, metric):
+    return (none if (Descent_Portability_FiniteReportLaw_definedMass(p, metric) == 0.0) else some((_rt.rdiv(weightedDefinedMetric(p, metric), Descent_Portability_FiniteReportLaw_definedMass(p, metric)))))
 
 def metric(state):
     return (some(((0.0 if (_rt._proj(state, '1') == 0.0) else 1.0))) if (_rt._proj(state, '2') == 0.0) else none)
+
+def jointLaw():
+    return _rt._proj((labelKernel(design)), 'jointMeasure')((effectLaw(K)))
+
+def clippedReport(cap, effects, outcome):
+    return _rt._proj((report(design, effects, outcome)), 'map')(((lambda r: _rt.rmin(r, cap))))
+
+def innerValue(effects):
+    return sum((_rt.mul(_rt._proj((labelKernel(design)), 'weight')(effects, outcome), _rt._proj((report(design, effects, outcome)), 'getD')(0.0))) for outcome in range(int(len(effects))))
+
+def clippedInner(cap, effects):
+    return sum((_rt.mul(_rt._proj((labelKernel(design)), 'weight')(effects, outcome), _rt._proj((clippedReport(design, cap, effects, outcome)), 'getD')(0.0))) for outcome in range(int(len(effects))))
 
 def branchKernel(branch, leaves):
     return _rt._proj((branchLaw(_rt._proj(branch, 'exposure'), (leaves(_rt._proj(branch, 'representative'))))), 'pushforward')((overwrite(branch, leaves)))
@@ -3777,7 +3795,7 @@ def proposalParameter(branches):
     return (1.0 + totalExposure(branches))
 
 def intervalKernel(branches, state):
-    return _rt._proj((markLaw(branches)), 'bind')((markedKernel(branches, state)))
+    return _rt._proj((Descent_Portability_InterleavedMutationLaw_markLaw(branches)), 'bind')((markedKernel(branches, state)))
 
 def absentReadout(state):
     return (0.0 if _rt._proj(_rt._proj(state, '2'), '2') else 1.0)
@@ -4388,6 +4406,9 @@ def requiredEventsForRecalibration(nParams, infoPerEvent, targetTraceMSE):
 def requiredTargetCohortSizeForRecalibration(nParams, prevalence, infoPerEvent, targetTraceMSE):
     return _rt.rdiv(requiredEventsForRecalibration(nParams, infoPerEvent, targetTraceMSE), prevalence)
 
+def Descent_Portability_PartialMetricMixture_conditionalMetric(μ, metric):
+    return by(classical, exact, ((none if (Descent_Portability_PartialMetricMixture_definedMass(μ, metric) == 0.0) else some((_rt.rdiv(Descent_Portability_PartialMetricMixture_weightedMetric(μ, metric), Descent_Portability_PartialMetricMixture_definedMass(μ, metric))))) if (Integrable(((lambda sample: ((1.0) if _rt._proj((metric(sample)), 'isSome') else 0.0))), μ) and Integrable(((lambda sample: _rt._proj((metric(sample)), 'getD')(0.0))), μ)) else none))
+
 def neutralPortabilityRatioLD(fst_additional, ld_factor):
     return retainedFraction(fst_additional, ld_factor)
 
@@ -4872,7 +4893,7 @@ def labels(liabilities):
     return (lambda i: decide(((0.0 < liabilities[int(i)]))))
 
 def outcomeLaw(mean, variance):
-    return labelLaw(((lambda i: caseProbability((mean[int(i)]), (variance(i))))), ((lambda i: caseProbability_bounds((mean[int(i)]), (variance(i))))))
+    return labelLaw(((lambda i: Descent_Portability_ProbitTrainingLaw_caseProbability((mean[int(i)]), (variance(i))))), ((lambda i: caseProbability_bounds((mean[int(i)]), (variance(i))))))
 
 def rareVariantSharingApproximation(Ne, p):
     return pgsDriftVariance_one_pop(p, Ne)
@@ -5014,6 +5035,24 @@ def disjointWindowLimitVariance(share):
 
 def completionTime(waits):
     return sum((waits[int(j)]) for j in range(int(len(waits))))
+
+def rawDiploidDosage(genome, locus, individual):
+    return rawDosage((genome(locus)), (firstHaplotype(individual)), (secondHaplotype(individual)))
+
+def bedDiploidDosage(genome, locus, individual):
+    return bedDosage((genome(locus)), (firstHaplotype(individual)), (secondHaplotype(individual)))
+
+def intervalTemplates(state, locus):
+    return _rt._proj((intervalBranches(state, locus, 0.0)), 'get')
+
+def genomeCountMass(rates, start, mutationRate, count, genome):
+    return stoppedCountExpectation(rates, start, count, ((lambda trace, waits: _rt._proj((conditionalGenomeLaw(mutationRate, trace, waits)), 'mass')(genome))))
+
+def StateReady(state, locus, site):
+    return Ready((intervalBranches(state, locus, 0.0)), _rt._proj(site, '1'))
+
+def GenomeCovered(genome):
+    return all((Covered((genome(locus)))) for locus in range(int(_rt.sumdim('locus', len(genome)))))
 
 def varTrue(m):
     return sum(((_rt.lpow(_rt._proj(m, 'β')(i), 2.0) * _rt._proj(m, 'H')(i))) for i in range(int(_rt.sumdim('i', len(_rt._proj(m, 'β')), len(_rt._proj(m, 'H'))))))

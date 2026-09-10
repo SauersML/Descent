@@ -98,6 +98,12 @@ import Descent.Portability.StoppedAncestralTiming
 import Descent.Portability.CalibrationLaw
 import Descent.Portability.InterleavedMutationLaw
 import Descent.Portability.InterleavedMutationMeasurability
+import Descent.Portability.PartialMetricMixture
+import Descent.Portability.GaussianEffectPortabilityLaw
+import Descent.Portability.AncestralMutationTransfer
+import Descent.Portability.AncestralMutationAbsorption
+import Descent.Portability.StoppedGenotypeLaw
+import Descent.Portability.StoppedGenotypeReadiness
 
 assert_below Descent.Program
 
