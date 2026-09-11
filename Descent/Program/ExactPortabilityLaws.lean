@@ -98,6 +98,7 @@ import Descent.Portability.PartialHaplotypePanelLikelihood
 import Descent.Portability.PartialHaplotypePulseKernel
 import Descent.Portability.PortabilityMeasureQueries
 import Descent.Portability.MultinomialRemainderConstant
+import Descent.Portability.MeasureKernelRealization
 
 namespace Descent.Program
 
@@ -126,7 +127,8 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
 * §2.1 realization bodies and atom counts: `RealizationBody`, `AffineCaratheodoryCount`,
   `FiniteMixtureKernel`.
 * Theorem 1 (positive microscopic approximation preserves the body): `EulerInvariantSet`,
-  `KernelRealizationPreservation`.
+  `KernelRealizationPreservation`; for microscopic kernels given by probability measures:
+  `MeasureKernelRealization`.
 * §2.2, equations (6) and (12), the enlarged left/right heterozygosity family, its generator
   and the embedding intertwining: `EnlargedLowOrderLDGenerator`, `EnlargedBodyClosedness`; the
   migration, mutation and recombination velocities of (8)-(9) as pulse jets: `PulseJetExpansion`.
@@ -181,7 +183,8 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
   `EmpiricalAUCUnbiasedness`, with (42) and the finite-cohort intercept, accuracy and Brier laws
   restated for the corpus metrics of the empirical table law: `EmpiricalTableLawMetrics`.
 
-Scope. Theorem 1 is proved for microscopic kernels with finitely many deterministic branches.
+Scope. Theorem 1 is proved for microscopic kernels given by probability measures with integrable
+features, with the approximation hypothesis (3) in sup norm.
 Equation (10) is proved for every polynomial of total degree at most four, with remainder
 `71 · coefficientMass / N²`. The drift
 operator (7) enters through the resampling jet certificates rather than as a displayed identity.
