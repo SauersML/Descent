@@ -305,17 +305,10 @@ theorem tsum_weighted_value_bounds {Index : Type*} (weight : Index → ℝ)
     lower * ∑' index, weight index ≤ ∑' index, weight index * value index ∧
       ∑' index, weight index * value index ≤ upper * ∑' index, weight index := by
   have hvalue : Summable fun index ↦ weight index * value index :=
-    (hsummable.mul_right (|lower| + |upper|)).of_norm_bounded fun index ↦ by
+    (hsummable.mul_right (max |lower| |upper|)).of_norm_bounded fun index ↦ by
       rw [Real.norm_eq_abs, abs_mul, abs_of_nonneg (hweight index)]
-      refine mul_le_mul_of_nonneg_left ?_ (hweight index)
-      have hbelow := hlower index
-      have habove := hupper index
-      have hlowerAbs := neg_abs_le lower
-      have hupperAbs := le_abs_self upper
-      have hlowerNonneg := abs_nonneg lower
-      have hupperNonneg := abs_nonneg upper
-      rw [abs_le]
-      constructor <;> linarith
+      exact mul_le_mul_of_nonneg_left (abs_le_max_abs_abs (hlower index) (hupper index))
+        (hweight index)
   constructor
   · rw [mul_comm lower, ← tsum_mul_right]
     exact Summable.tsum_le_tsum
@@ -343,15 +336,8 @@ theorem expectation_bounds [MeasurableSpace Report] [MeasurableSingletonClass Re
         ∫ report, value report ∂program.law ∧
       ∫ report, value report ∂program.law ≤
         program.enumeratedTotal enumerated value + upper * program.missingMass enumerated := by
-  have hbound : ∀ report, |value report| ≤ |lower| + |upper| := fun report ↦ by
-    have hbelow := hlower report
-    have habove := hupper report
-    have hlowerAbs := neg_abs_le lower
-    have hupperAbs := le_abs_self upper
-    have hlowerNonneg := abs_nonneg lower
-    have hupperNonneg := abs_nonneg upper
-    rw [abs_le]
-    constructor <;> linarith
+  have hbound : ∀ report, |value report| ≤ max |lower| |upper| :=
+    fun report ↦ abs_le_max_abs_abs (hlower report) (hupper report)
   have hsplit := program.integral_law_eq_enumeratedTotal_add enumerated value hbound
   obtain ⟨htailBelow, htailAbove⟩ := tsum_weighted_value_bounds
     (fun word : ↑((enumerated : Set program.halting)ᶜ) ↦ dyadicWeight word)
@@ -392,27 +378,20 @@ theorem conditional_expectation_bounds [MeasurableSpace Report]
           program.missingMass enumerated) := by
   have hindicatorBelow := SublawReportCertificate.definedIndicator_nonneg defined
   have hindicatorAbove := SublawReportCertificate.definedIndicator_le_one defined
-  have hbound : ∀ report, |value report| ≤ |lower| + |upper| := fun report ↦ by
-    have hbelow := hlower report
-    have habove := hupper report
-    have hlowerAbs := neg_abs_le lower
-    have hupperAbs := le_abs_self upper
-    have hlowerNonneg := abs_nonneg lower
-    have hupperNonneg := abs_nonneg upper
-    rw [abs_le]
-    constructor <;> linarith
+  have hbound : ∀ report, |value report| ≤ max |lower| |upper| :=
+    fun report ↦ abs_le_max_abs_abs (hlower report) (hupper report)
   have hindicatorBound : ∀ report,
       |SublawReportCertificate.definedIndicator defined report| ≤ 1 := fun report ↦ by
     rw [abs_of_nonneg (hindicatorBelow report)]
     exact hindicatorAbove report
   have hproductBound : ∀ report,
       |SublawReportCertificate.definedIndicator defined report * value report| ≤
-        |lower| + |upper| := fun report ↦ by
+        max |lower| |upper| := fun report ↦ by
     rw [abs_mul]
     calc |SublawReportCertificate.definedIndicator defined report| * |value report|
         ≤ 1 * |value report| :=
           mul_le_mul_of_nonneg_right (hindicatorBound report) (abs_nonneg _)
-      _ ≤ |lower| + |upper| := by rw [one_mul]; exact hbound report
+      _ ≤ max |lower| |upper| := by rw [one_mul]; exact hbound report
   have hmassSplit := program.integral_law_eq_enumeratedTotal_add enumerated
     (SublawReportCertificate.definedIndicator defined) hindicatorBound
   have htotalSplit := program.integral_law_eq_enumeratedTotal_add enumerated
