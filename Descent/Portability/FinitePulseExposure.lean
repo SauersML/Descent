@@ -76,9 +76,11 @@ theorem cumulativeMass_le_donor (donor : ℝ) (weight : ℕ → ℝ) (hweight : 
     (hsum : ∑ component ∈ Finset.range total, weight component = 1) :
     cumulativeMass donor weight index ≤ donor := by
   have hprefix : ∑ component ∈ Finset.range index, weight component ≤ 1 := by
+    have hsubset : Finset.range index ⊆ Finset.range total := by
+      intro component hmem
+      exact Finset.mem_range.mpr (lt_of_lt_of_le (Finset.mem_range.mp hmem) hle)
     rw [← hsum]
-    exact Finset.sum_le_sum_of_subset_of_nonneg (Finset.range_subset.mpr hle)
-      (fun i _ _ ↦ hweight i)
+    exact Finset.sum_le_sum_of_subset_of_nonneg hsubset (fun i _ _ ↦ hweight i)
   unfold cumulativeMass
   nlinarith [hprefix, hdonor]
 
@@ -149,6 +151,7 @@ theorem recipientFraction_eq (donor : ℝ) (weight : ℕ → ℝ) (hweight : ∀
     rw [hstep, ih hprev]
     unfold pulseFraction
     field_simp
+    ring
 
 /-- The whole pulse history leaves exactly the intended recipient fraction. -/
 theorem recipientFraction_total (donor : ℝ) (weight : ℕ → ℝ) (hweight : ∀ i, 0 ≤ weight i)
@@ -235,6 +238,7 @@ theorem stepEvent_migration_pulse (donor : ℝ) (weight : ℕ → ℝ) (hweight 
   rw [exp_neg_pulseMigration donor weight hweight hdonor hlt total index hle hsum]
   unfold pulseFraction
   field_simp
+  ring
 
 end
 
