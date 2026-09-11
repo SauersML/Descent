@@ -394,6 +394,14 @@ import Descent.Portability.CohortEvaluationOperators
 import Descent.Portability.FourthOrderLossObstruction
 import Descent.Portability.LossNoiseCompletion
 import Descent.Portability.ReportRegionCertificates
+import Descent.Portability.AngularReportClosure
+import Descent.Portability.ApproximationDuality
+import Descent.Portability.DecisionLossContrasts
+import Descent.Portability.GramSafeRepair
+import Descent.Portability.OperationalAuditConstraints
+import Descent.Portability.SharedAuditCompletion
+import Descent.Portability.SummaryInvisibleDiameter
+import Descent.Portability.TurnoverDependence
 assert_below Descent.Program
 
 /-!

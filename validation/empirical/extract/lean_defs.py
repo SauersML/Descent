@@ -3117,6 +3117,9 @@ def certifiedBound(u, V, εu, εV, a):
     I = float(len(u))
     return _rt.add(_rt.add(coordinateRisk(u, V, a), _rt.mul(_rt.mul((_rt.sumdim('I', len(u), len(V), len(a))), εV), (sum((_rt.lpow(a[int(i)], 2.0)) for i in range(int(len(u))))))), _rt.mul(_rt.mul(2.0, εu), sum((_rt.rabs(a[int(i)])) for i in range(int(len(u))))))
 
+def stdBasis(s):
+    return (lambda u: (1.0 if (u == s) else 0.0))
+
 def Descent_Portability_ArchaicPrediction_allele(b):
     return (1.0 if b else 0.0)
 
@@ -3340,11 +3343,29 @@ def partialR2(z, r):
 def augmentedProj(P, s):
     return _rt.add(P, rankOneProj((_rt._proj((residualMaker(P)), 'mulVec')(s))))
 
+def sequentialResidualOperator(MC, MB, MA):
+    return _rt.mul(_rt.mul(MC, MB), MA)
+
+def binMeanSquaredError(size, J, A, y):
+    return _rt.mul(_rt.rinv(size), dot((_rt.mulVec(J, (_rt.mulVec(A, y)))), (_rt.mulVec(J, (_rt.mulVec(A, y))))))
+
+def lossVector(e):
+    return (lambda i: _rt.mul(e[int(i)], e[int(i)]))
+
+def Descent_Portability_CohortEvaluationOperators_individualLoss(MC, MB, MA, y):
+    return lossVector((_rt._proj((sequentialResidualOperator(MC, MB, MA)), 'mulVec')(y)))
+
+def Descent_Portability_CohortEvaluationOperators_lossExplainedFraction(Jh, M1, loss):
+    return _rt.rdiv(Descent_Portability_CohortEvaluationOperators_quadForm(Jh, loss), Descent_Portability_CohortEvaluationOperators_quadForm(M1, loss))
+
 def Descent_Portability_CompactSingularSequence_direction(L, hc, n):
     return _rt._proj(_rt._proj(leading, '1'), '2')((Descent_Portability_CompactSingularSequence_residual(L, hc, n)), (Descent_Portability_CompactSingularSequence_residual(L, hc, n)))
 
 def imaginaryPart(t, y):
     return (_rt.lpow(t, 2.0) * compensator(((t * y))))
+
+def momentCompletionValue(b, a, δ, x):
+    return ((b + zeroMeanNoiseValue(((a - _rt.lpow(b, 2.0))), ((((-2.0) * b) + _rt.rsqrt((_rt.rdiv(δ, ((a - _rt.lpow(b, 2.0)))))))), x)) if (_rt.lpow(b, 2.0) < a) else b)
 
 def phaseMean(p, z):
     return sum((((_rt._proj(p, 'mass')(x)) * z(x))) for x in range(int(_rt.sumdim('x', len(_rt._proj(p, 'mass')), len(z)))))
@@ -3461,11 +3482,32 @@ def effectiveStratumCount(n):
 def defectIntegrand(fine, coarse, lift, horizon, time):
     return _rt._proj((evolution(fine, ((horizon - time)))), 'comp')((_rt._proj((Descent_Portability_ControlledCoarseGraining_defect(fine, coarse, lift)), 'comp')((evolution(coarse, time)))))
 
+def countDrift(n, α, β, k):
+    return ((β * (((n) - (k)))) - (α * (k)))
+
+def upRate(n, α, β, k):
+    return _rt.rmax((countDrift(n, α, β, k)), 0.0)
+
+def downRate(n, α, β, k):
+    return _rt.rmax(((-(countDrift(n, α, β, k)))), 0.0)
+
+def nearestDriftGen(n, α, β, f, k):
+    return ((upRate(n, α, β, k) * ((f(((k + 1.0))) - f(k)))) + (downRate(n, α, β, k) * ((f(((k - 1.0))) - f(k)))))
+
+def driftStep(n, α, β, τ, f):
+    return (lambda k: (f(k) + (τ * nearestDriftGen(n, α, β, f, k))))
+
+def meanStep(n, α, β, τ, x):
+    return (x + (τ * (((β * (((n) - x))) - (α * x)))))
+
 def dynamicsContrastCoefficient(β):
     return _rt.rdiv((_rt.sub(β[int(true)], β[int(false)])), 2.0)
 
 def combinedPostprocessor(T, a):
     return sum(((a(j) * T(j))) for j in range(int(_rt.sumdim('j', len(a), len(T)))))
+
+def bregman(F, D, y, f):
+    return ((F(y) - F(f)) - (D(f) * ((y - f))))
 
 def firstGenotype(report):
     return (1.0 if _rt._proj(report, '1') else (-1.0))
@@ -4021,7 +4063,7 @@ def inner(law, first, second):
 def Descent_Portability_FiniteHorizonLoss_energy(law, report):
     return inner(law, report, report)
 
-def predict(kernel, report):
+def Descent_Portability_FiniteHorizonLoss_predict(kernel, report):
     return (lambda source: _rt._proj((kernel(source)), 'expectation')(report))
 
 def Descent_Portability_FiniteHorizonLoss_risk(law, kernel, report, predictor):
@@ -4159,7 +4201,7 @@ def Descent_Portability_FourthOrderLossObstruction_score(ω):
 def Descent_Portability_FourthOrderLossObstruction_outcome(ω):
     return ((effectMean(_rt._proj(_rt._proj(ω, '2'), '1')) * effectSign(_rt._proj(_rt._proj(_rt._proj(ω, '2'), '2'), '1'))) + (_rt.rsqrt(((1.0 - _rt.lpow(effectMean(_rt._proj(_rt._proj(ω, '2'), '1')), 2.0)))) * effectSign(_rt._proj(_rt._proj(_rt._proj(ω, '2'), '2'), '2'))))
 
-def individualLoss(ω):
+def Descent_Portability_FourthOrderLossObstruction_individualLoss(ω):
     return _rt.lpow(((Descent_Portability_FourthOrderLossObstruction_outcome(ω) - Descent_Portability_FourthOrderLossObstruction_score(ω))), 2.0)
 
 def lossSecondMoment(z):
@@ -4260,6 +4302,27 @@ def historyDegradation(h, h_p):
 
 def historyMarginalAmplitude(h):
     return _rt._proj(h, 'amplitude')
+
+def minFourthMoment(E, X, β, k, m):
+    return sInf((reducedValues(E, X, β, k, m)))
+
+def slackSecond(β, k, X, m):
+    return (lambda ω: _rt.add(_rt.lpow(featureMean(β, k, X, ω), 2.0), (_rt.sub(_rt.sub(m, _rt.lpow(β, 2.0)), dot(k, k)))))
+
+def waterfillSecond(b, t):
+    return (lambda ω: _rt.rmax((_rt.lpow(b[int(ω)], 2.0)), t))
+
+def waterfillForm(b, t):
+    return (lambda ω: _rt.mul(_rt.mul(4.0, (_rt.sub(waterfillSecond(b, t, ω), t))), b[int(ω)]))
+
+def signal(G, r):
+    return _rt.rsqrt((oracle(G, r)))
+
+def repair(G, r, ε):
+    return (0.0 if (signal(G, r) <= ε) else _rt.mul((_rt.rdiv((_rt.sub(signal(G, r), ε)), signal(G, r))), (_rt.mul(_rt.rinv(G), _v(r)))))
+
+def toGram(G, hG, u):
+    return u
 
 def classWeight(color, w, c):
     return sum(((w[int(v)] if (color(v) == c) else 0.0)) for v in range(int(len(w))))
@@ -4418,6 +4481,12 @@ def intervalKernel(branches, state):
 
 def absentReadout(state):
     return (0.0 if _rt._proj(_rt._proj(state, '2'), '2') else 1.0)
+
+def closureStep(K, V_0, j):
+    _prev = V_0
+    for _ in range(int(j)):
+        _prev = enlarge(K, (_prev))
+    return _prev
 
 def portabilityAtTime(r2_initial, lambda_total, t):
     return (r2_initial * _rt.rexp((((-lambda_total) * t))))
@@ -4760,6 +4829,15 @@ def scalarMean(values, p):
 
 def scalarEffect(values, p):
     return _rt.add(_rt.sub(values[int(1.0)], values[int(0.0)]), _rt.mul((_rt.add(_rt.sub(values[int(0.0)], _rt.mul(2.0, values[int(1.0)])), values[int(2.0)])), p))
+
+def alert(w, d):
+    return sum((_rt.mul(w[int(i)], d[int(i)])) for i in range(int(len(w))))
+
+def Descent_Portability_OperationalAuditConstraints_prevalence(w, μ):
+    return sum((_rt.mul(w[int(i)], μ[int(i)])) for i in range(int(len(w))))
+
+def truePositive(w, d, μ):
+    return sum((_rt.mul(_rt.mul(w[int(i)], d[int(i)]), μ[int(i)])) for i in range(int(len(w))))
 
 def Descent_Portability_OptimalMeasurementAllocation_variance(amplitude, effort):
     return sum((_rt.rdiv(_rt.lpow(amplitude[int(mode)], 2.0), effort[int(mode)])) for mode in range(int(len(amplitude))))
@@ -5202,11 +5280,11 @@ def hetTrajectory(Ne, mu, H_0, t):
         _prev = hetStepWithMutation(Ne, mu, (_prev))
     return _prev
 
-def retention(r):
+def Descent_Portability_ClosedPopulationNoMutation_retention(r):
     return _rt.lpow(((1.0 - _rt.rdiv(1.0, ((2.0 * _rt._proj(r, 'Ne')))))), _rt._proj(r, 'horizon'))
 
 def targetHet(r):
-    return (_rt._proj(r, 'H₀') * retention(r))
+    return (_rt._proj(r, 'H₀') * Descent_Portability_ClosedPopulationNoMutation_retention(r))
 
 def coalescenceSurvivalFromHazard(hazard, t):
     return _rt.rexp(((-(integratedCoalescentHazard(hazard, t)))))
@@ -5634,6 +5712,15 @@ def labels(liabilities):
 def weightedSum(a, x):
     return sum((_rt.mul(a[int(i)], signValue((x(i))))) for i in range(int(len(a))))
 
+def radialMass(r, z):
+    return (_rt.rdiv(((_rt.rabs(radialWeight(r, _rt._proj(z, '1'))) + radialWeight(r, _rt._proj(z, '1')))), 2.0) if _rt._proj(z, '2') else _rt.rdiv(((_rt.rabs(radialWeight(r, _rt._proj(z, '1'))) - radialWeight(r, _rt._proj(z, '1')))), 2.0))
+
+def radialPoint(r, u, v, z):
+    return (_rt.mul(r(_rt._proj(z, '1')), u) if _rt._proj(z, '2') else _rt.mul(r(_rt._proj(z, '1')), v))
+
+def radialExp(r, hinj, s):
+    return weightedExp((radialLaw(r, s)), (radialLaw_nonneg(r, s)), (radialLaw_sum(r, hinj, s)))
+
 def segment(a, p, t):
     return _rt.add(a, _rt.mul(t, (_rt.sub(p, a))))
 
@@ -5904,6 +5991,24 @@ def causalColumns(individual, causal):
 def defaultTableDesign(fixedInner, tables, files):
     return _rt._proj(tableDesign, '1')(source, permutations, genome, causalSites, baseline, hbaseline, 2000.0, (by(decide)), (default_inner_counts(source)), fixedInner, tables, files)
 
+def coeffA(H, q, d):
+    return _rt.sub(_rt.rsqrt((q[int(d)])), _rt.rsqrt(H))
+
+def coeffB(H, q, d):
+    return _rt.rsqrt((_rt.sub(H, q[int(d)])))
+
+def cellResidual(H, q, e):
+    return (lambda z: _rt.sub(cellPhenotype(H, q, e, _rt._proj(z, '1'), _rt._proj(z, '2')), liftGenotype((deployedScore(H)), _rt._proj(z, '2'))))
+
+def lossMean(H, q):
+    return (lambda d: _rt.sub(_rt.add(1.0, H), _rt.mul(_rt.mul(2.0, _rt.rsqrt(H)), _rt.rsqrt((q[int(d)])))))
+
+def minimalWithinVariance(E, H, q):
+    return E(((lambda d: _rt.add(_rt.mul(_rt.mul(4.0, _rt.lpow(coeffA(H, q, d), 2.0)), _rt.lpow(coeffB(H, q, d), 2.0)), _rt.mul(_rt.mul(4.0, (_rt.sub(1.0, H))), (_rt.add(_rt.lpow(coeffA(H, q, d), 2.0), _rt.lpow(coeffB(H, q, d), 2.0))))))))
+
+def fullLaw(E, N):
+    return Descent_Portability_IndividualLossMoments_mixture(E, ((lambda _: cellLaw(N))))
+
 def compensator(x):
     return _rt.rdiv(((_rt.sin(x) - x)), _rt.lpow(x, 2.0))
 
@@ -6017,6 +6122,33 @@ def fStat(m, p):
 
 def r2EstimatorVariance(r2, n):
     return _rt.rdiv(((4.0 * r2) * _rt.lpow(((1.0 - r2)), 2.0)), n)
+
+def signScore():
+    return (lambda ω, _: (1.0 if ω else (-1.0)))
+
+def boolIntercept(w):
+    return _rt.rdiv((_rt.add(w[int(true)], w[int(false)])), 2.0)
+
+def boolSlope(w):
+    return (lambda _: _rt.rdiv((_rt.sub(w[int(true)], w[int(false)])), 2.0))
+
+def symmetricLevel(β, κ, m):
+    return _rt.rmin(m, (((2.0 * m) - _rt.lpow(((_rt.rabs(β) + _rt.rabs(κ))), 2.0))))
+
+def symmetricMean(β, κ):
+    return featureMean(β, ((lambda _: κ)), signScore())
+
+def sparseWeights(p):
+    return _rt.VecFn([_rt.rdiv(p, 2.0), _rt.rdiv(p, 2.0), (1.0 - p)])
+
+def sparseScore(p):
+    return (lambda i, _: _rt.VecFn([_rt.rdiv(1.0, _rt.rsqrt(p)), (-(_rt.rdiv(1.0, _rt.rsqrt(p)))), 0.0])(i))
+
+def sparseLevel(κ, m, p):
+    return _rt.rmin(m, (_rt.rdiv(((m - _rt.lpow(κ, 2.0))), ((1.0 - p)))))
+
+def sparseMean(κ, p):
+    return featureMean(0.0, ((lambda _: κ)), (sparseScore(p)))
 
 def lagrange(q, x, k):
     return (_rt.rdiv(_rt.mul((_rt.sub(x, q[int(1.0)])), (_rt.sub(x, q[int(2.0)]))), (_rt.mul((_rt.sub(q[int(0.0)], q[int(1.0)])), (_rt.sub(q[int(0.0)], q[int(2.0)]))))) if (k == 0.0) else (_rt.rdiv(_rt.mul((_rt.sub(x, q[int(0.0)])), (_rt.sub(x, q[int(2.0)]))), (_rt.mul((_rt.sub(q[int(1.0)], q[int(0.0)])), (_rt.sub(q[int(1.0)], q[int(2.0)]))))) if (k == 1.0) else _rt.rdiv(_rt.mul((_rt.sub(x, q[int(0.0)])), (_rt.sub(x, q[int(1.0)]))), (_rt.mul((_rt.sub(q[int(2.0)], q[int(0.0)])), (_rt.sub(q[int(2.0)], q[int(1.0)])))))))
@@ -6276,6 +6408,47 @@ def transplantDefect():
 
 def transplantExcess(ε):
     return transplantSqNorm((transplantModuleProjection(((lambda i: (transplantTarget(i) - transplantEstimate(ε, i)))))))
+
+def linSign(c, z):
+    return sum((_rt.mul(c[int(i)], sgn((z(i))))) for i in range(int(len(c))))
+
+def independentTurnover(n, m, hm, hm_p):
+    return weightedExp((bernoulliSign(n, m)), (bernoulliSign_nonneg(hm, hm_p)), (sum_bernoulliSign(n, m)))
+
+def independentSigns(n, z, i):
+    return sgn((z(i)))
+
+def synchronizedSigns(n, c, _):
+    return sgn(c)
+
+def ceiling(H, sigma):
+    return _rt.rdiv(H, ((H + _rt.lpow(sigma, 2.0))))
+
+def effectConcentration(n, b):
+    return sum((_rt.lpow((_rt.rdiv(_rt.lpow(b[int(i)], 2.0), sum((_rt.lpow(b[int(j)], 2.0)) for j in range(int(len(b)))))), 2.0)) for i in range(int(len(b))))
+
+def flipGenerator(lam):
+    return (lambda x, y: ((-lam) if (x == y) else lam))
+
+def flipSemigroup(lam, t):
+    return (lambda x, y: (_rt.rdiv(((1.0 + _rt.rexp(((-(((2.0 * lam) * t))))))), 2.0) if (x == y) else _rt.rdiv(((1.0 - _rt.rexp(((-(((2.0 * lam) * t))))))), 2.0)))
+
+def signState(x):
+    return sgn((decide(((x == 0.0)))))
+
+def Descent_Portability_TurnoverDependence_retention(lam, t):
+    return _rt.rexp(((-(((2.0 * lam) * t)))))
+
+def alignedPower(n, w, b):
+    return sum((_rt.mul(_rt.lpow(w[int(i)], 2.0), _rt.lpow(b[int(i)], 2.0))) for i in range(int(len(w))))
+
+def crossPower(n, w, b):
+    n = float(len(w))
+    return _rt.sub(_rt.lpow((sum((_rt.mul(w[int(i)], b[int(i)])) for i in range(int(len(w))))), 2.0), alignedPower(n, w, b))
+
+def independentTurnoverAccuracy(n, w, b, sigma, lam, t):
+    n = float(len(w))
+    return _rt.rdiv((_rt.add(alignedPower(n, w, b), _rt.mul(_rt.lpow(Descent_Portability_TurnoverDependence_retention(lam, t), 2.0), crossPower(n, w, b)))), (_rt.mul((sum((_rt.lpow(w[int(i)], 2.0)) for i in range(int(len(w))))), (_rt.add((sum((_rt.lpow(b[int(i)], 2.0)) for i in range(int(len(w))))), _rt.lpow(sigma, 2.0))))))
 
 def Descent_Portability_FiniteReportLaw_expectation(p, metric):
     return sum((_rt.mul(_rt._proj(p, 'mass')(report), metric[int(report)])) for report in range(int(len(metric))))
