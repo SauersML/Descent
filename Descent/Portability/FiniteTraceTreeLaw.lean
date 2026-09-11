@@ -462,19 +462,19 @@ def exampleTree : RationalTraceTree (Option Bool) :=
 /-- The algorithm running: the probability that the concrete experiment reports the present
 state `some true`, computed by rational arithmetic alone, is `1/3 · 1/4 = 1/12`. -/
 theorem exampleTree_evaluate :
-    evaluate exampleTree (fun environment ↦ if environment = some true then 1 else 0) =
+    evaluate exampleTree (fun environment ↦ if environment.getD false then 1 else 0) =
       1 / 12 := by
   norm_num [evaluate, exampleTree, exampleArchitectureLaw, exampleEnvironmentLaw,
     RationalReportLaw.expectation, Fintype.sum_bool, Fintype.sum_option]
 
-/-- The real theory returns the same value on the carried experiment. -/
+/-- The real theory returns the cast of the same value on the carried experiment. -/
 theorem exampleTree_backwardValue :
     TraceTree.backwardValue (toReal exampleTree)
-        (fun environment ↦ if environment = some true then 1 else 0) = 1 / 12 := by
+        (fun environment ↦ ((if environment.getD false then 1 else 0 : ℚ) : ℝ)) = 1 / 12 := by
   have h := backwardValue_toReal exampleTree fun environment ↦
-    if environment = some true then (1 : ℚ) else 0
+    if environment.getD false then (1 : ℚ) else 0
   rw [exampleTree_evaluate] at h
-  simpa using h
+  exact h.trans (by norm_num)
 
 end RationalTraceTree
 
