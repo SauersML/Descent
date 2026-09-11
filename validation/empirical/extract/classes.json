@@ -6735,6 +6735,7 @@
    "Descent.PopGen.standardizedGenotype_sq_eq_standardizedSquare",
    "Descent.Portability.BalancedHWECounterexample.design_statistic_eq",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.HWEHomozygoteAmplitude.standardized_homozygote",
    "Descent.Portability.HWEInteractionLaw.interaction_mean_zero",
    "Descent.Portability.HWEInteractionLaw.interaction_second_moment",
    "Descent.Portability.HWEInteractionLaw.squareBiasedLocus_mass"
@@ -6867,6 +6868,10 @@
     ],
     "Descent.Portability.BalancedHWECounterexample.design_statistic_eq": [],
     "Descent.Portability.BalancedHWEInteraction.standardized_coordinate": [],
+    "Descent.Portability.HWEHomozygoteAmplitude.standardized_homozygote": [
+     "0 < h.altFreq",
+     "h.altFreq < 1"
+    ],
     "Descent.Portability.HWEInteractionLaw.interaction_mean_zero": [],
     "Descent.Portability.HWEInteractionLaw.interaction_second_moment": [
      "∀ i, 0 < (h i",
@@ -39082,6 +39087,8 @@
    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
    "Descent.Portability.HWEHeterozygosityWeakLimit.counts_tight",
    "Descent.Portability.HWEHeterozygosityWeakLimit.poisson_weak_limit",
+   "Descent.Portability.HWEHomozygoteAmplitude.interaction_homoVector",
+   "Descent.Portability.HWEHomozygoteAmplitude.magnitude_identity",
    "Descent.Portability.HWEHomozygoteConditioning.count_homoVector",
    "Descent.Portability.HWEHomozygoteConditioning.homozygote_mass",
    "Descent.Portability.HWEHomozygoteConditioning.zeroMass_pos",
@@ -40503,6 +40510,8 @@
     "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [],
     "Descent.Portability.HWEHeterozygosityWeakLimit.counts_tight": [],
     "Descent.Portability.HWEHeterozygosityWeakLimit.poisson_weak_limit": [],
+    "Descent.Portability.HWEHomozygoteAmplitude.magnitude_identity": [],
+    "Descent.Portability.HWEHomozygoteAmplitude.interaction_homoVector": [],
     "Descent.Portability.HWEHomozygoteConditioning.count_homoVector": [],
     "Descent.Portability.HWEHomozygoteConditioning.zeroMass_pos": [],
     "Descent.Portability.HWEHomozygoteConditioning.homozygote_mass": [],
@@ -46842,6 +46851,7 @@
    "Descent.Portability.GaussianEffectPortabilityLaw.weighted_report_integrable",
    "Descent.Portability.GaussianPolynomialMoments.tilted_power_moment",
    "Descent.Portability.GaussianSlabLaw.linearForm_continuous",
+   "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit",
    "Descent.Portability.InterleavedMutationMeasurability.bind_mass_measurable",
    "Descent.Portability.InterleavedMutationMeasurability.countContribution_measurable",
    "Descent.Portability.InterleavedMutationMeasurability.count_mass_measurable",
@@ -46939,6 +46949,7 @@
     "Descent.Portability.GaussianEffectPortabilityLaw.weighted_report_integrable": [],
     "Descent.Portability.GaussianPolynomialMoments.tilted_power_moment": [],
     "Descent.Portability.GaussianSlabLaw.linearForm_continuous": [],
+    "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit": [],
     "Descent.Portability.InterleavedMutationMeasurability.intervalKernel_mass_measurable": [],
     "Descent.Portability.InterleavedMutationMeasurability.count_mass_measurable": [],
     "Descent.Portability.InterleavedMutationMeasurability.poissonCoefficient_measurable": [],
@@ -49506,6 +49517,8 @@
    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
    "Descent.Portability.HWEHeterozygosityWeakLimit.counts_tight",
    "Descent.Portability.HWEHeterozygosityWeakLimit.poisson_weak_limit",
+   "Descent.Portability.HWEHomozygoteAmplitude.interaction_homoVector",
+   "Descent.Portability.HWEHomozygoteAmplitude.magnitude_identity",
    "Descent.Portability.HWEHomozygoteConditioning.count_homoVector",
    "Descent.Portability.HWEHomozygoteConditioning.homozygote_mass",
    "Descent.Portability.HWEHomozygoteConditioning.zeroMass_pos",
@@ -50893,6 +50906,8 @@
     "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [],
     "Descent.Portability.HWEHeterozygosityWeakLimit.counts_tight": [],
     "Descent.Portability.HWEHeterozygosityWeakLimit.poisson_weak_limit": [],
+    "Descent.Portability.HWEHomozygoteAmplitude.magnitude_identity": [],
+    "Descent.Portability.HWEHomozygoteAmplitude.interaction_homoVector": [],
     "Descent.Portability.HWEHomozygoteConditioning.count_homoVector": [],
     "Descent.Portability.HWEHomozygoteConditioning.zeroMass_pos": [],
     "Descent.Portability.HWEHomozygoteConditioning.homozygote_mass": [],
@@ -63229,6 +63244,7 @@
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
    "Descent.Portability.DiploidBoxUniquenessLaw.box_mean_difference_determines_map",
    "Descent.Portability.DiploidBoxUniquenessLaw.diploid_box_unique_modulo_constant",
+   "Descent.Portability.HWEHomozygoteAmplitude.standardized_homozygote",
    "Descent.Portability.HWEInteractionLaw.squareBiasedLocus_mass",
    "Descent.Spectral.standardizedSquare_values"
   ],
@@ -63255,6 +63271,7 @@
     "Descent.Portability.BalancedHWEInteraction.standardized_coordinate": [],
     "Descent.Portability.DiploidBoxUniquenessLaw.box_mean_difference_determines_map": [],
     "Descent.Portability.DiploidBoxUniquenessLaw.diploid_box_unique_modulo_constant": [],
+    "Descent.Portability.HWEHomozygoteAmplitude.standardized_homozygote": [],
     "Descent.Portability.HWEInteractionLaw.squareBiasedLocus_mass": [],
     "Descent.Spectral.standardizedSquare_values": []
    },
@@ -63918,10 +63935,17 @@
    "Descent.Portability.HWEHeterozygosityWeakLimit.count_absolute_moment",
    "Descent.Portability.HWEHeterozygosityWeakLimit.counts_tight",
    "Descent.Portability.HWEHeterozygosityWeakLimit.poisson_weak_limit",
+   "Descent.Portability.HWEHomozygoteAmplitude.exp_coordinate",
+   "Descent.Portability.HWEHomozygoteAmplitude.exp_neg_coordinate",
+   "Descent.Portability.HWEHomozygoteAmplitude.interaction_homoVector",
+   "Descent.Portability.HWEHomozygoteAmplitude.standardized_homozygote",
    "Descent.Portability.HWEHomozygoteConditioning.conditional_expectation",
    "Descent.Portability.HWEHomozygoteConditioning.homozygote_mass",
    "Descent.Portability.HWEHomozygoteConditioning.zeroMass_pos",
    "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation",
+   "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit",
+   "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit",
+   "Descent.Portability.HWEHomozygoteLimit.normalized_homoVector",
    "Descent.Portability.HWEInteractionLaw.interaction_second_moment",
    "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass",
    "Descent.Portability.HWEInteractionLaw.squareBiasedLocus_mass",
@@ -64027,10 +64051,17 @@
     "Descent.Portability.HWEHeterozygosityWeakLimit.count_absolute_moment": [],
     "Descent.Portability.HWEHeterozygosityWeakLimit.counts_tight": [],
     "Descent.Portability.HWEHeterozygosityWeakLimit.poisson_weak_limit": [],
+    "Descent.Portability.HWEHomozygoteAmplitude.exp_coordinate": [],
+    "Descent.Portability.HWEHomozygoteAmplitude.exp_neg_coordinate": [],
+    "Descent.Portability.HWEHomozygoteAmplitude.standardized_homozygote": [],
+    "Descent.Portability.HWEHomozygoteAmplitude.interaction_homoVector": [],
     "Descent.Portability.HWEHomozygoteConditioning.zeroMass_pos": [],
     "Descent.Portability.HWEHomozygoteConditioning.homozygote_mass": [],
     "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation": [],
     "Descent.Portability.HWEHomozygoteConditioning.conditional_expectation": [],
+    "Descent.Portability.HWEHomozygoteLimit.normalized_homoVector": [],
+    "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit": [],
+    "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit": [],
     "Descent.Portability.HWEInteractionLaw.interaction_second_moment": [],
     "Descent.Portability.HWEInteractionLaw.squareBiasedLocus_mass": [],
     "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass": [],
@@ -69173,6 +69204,8 @@
    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
    "Descent.Portability.HWEHeterozygosityWeakLimit.counts_tight",
    "Descent.Portability.HWEHeterozygosityWeakLimit.poisson_weak_limit",
+   "Descent.Portability.HWEHomozygoteAmplitude.interaction_homoVector",
+   "Descent.Portability.HWEHomozygoteAmplitude.magnitude_identity",
    "Descent.Portability.HWEHomozygoteConditioning.count_homoVector",
    "Descent.Portability.HWEHomozygoteConditioning.homozygote_mass",
    "Descent.Portability.HWEHomozygoteConditioning.zeroMass_pos",
@@ -70653,6 +70686,8 @@
     "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [],
     "Descent.Portability.HWEHeterozygosityWeakLimit.counts_tight": [],
     "Descent.Portability.HWEHeterozygosityWeakLimit.poisson_weak_limit": [],
+    "Descent.Portability.HWEHomozygoteAmplitude.magnitude_identity": [],
+    "Descent.Portability.HWEHomozygoteAmplitude.interaction_homoVector": [],
     "Descent.Portability.HWEHomozygoteConditioning.count_homoVector": [],
     "Descent.Portability.HWEHomozygoteConditioning.zeroMass_pos": [],
     "Descent.Portability.HWEHomozygoteConditioning.homozygote_mass": [],
@@ -85160,6 +85195,7 @@
    "Descent.Foundations.HardyWeinbergModel.expectedAltAlleleCount_eq",
    "Descent.Foundations.HardyWeinbergModel.genotypeVariance_eq",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.HWEHomozygoteAmplitude.standardized_homozygote",
    "Descent.Portability.HWEInteractionLaw.squareBiasedLocus_mass",
    "Descent.Spectral.hwe_centered",
    "Descent.Spectral.standardizedSquare_values"
@@ -85177,6 +85213,7 @@
     "Descent.Foundations.HardyWeinbergModel.expectedAltAlleleCount_eq": [],
     "Descent.Foundations.HardyWeinbergModel.genotypeVariance_eq": [],
     "Descent.Portability.BalancedHWEInteraction.standardized_coordinate": [],
+    "Descent.Portability.HWEHomozygoteAmplitude.standardized_homozygote": [],
     "Descent.Portability.HWEInteractionLaw.squareBiasedLocus_mass": [],
     "Descent.Spectral.hwe_centered": [],
     "Descent.Spectral.standardizedSquare_values": []
@@ -85359,6 +85396,7 @@
    "Descent.Portability.BalancedHWEInteraction.blockCode_mean",
    "Descent.Portability.BalancedHWEInteraction.blockCode_second_moment",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.HWEHomozygoteAmplitude.standardized_homozygote",
    "Descent.Portability.HWEInteractionLaw.squareBiasedLocus_mass",
    "Descent.Spectral.genotypeProb_values",
    "Descent.Spectral.hwe_variance_eq"
@@ -85435,6 +85473,10 @@
     "Descent.Portability.BalancedHWEInteraction.standardized_coordinate": [],
     "Descent.Portability.BalancedHWEInteraction.blockCode_mean": [],
     "Descent.Portability.BalancedHWEInteraction.blockCode_second_moment": [],
+    "Descent.Portability.HWEHomozygoteAmplitude.standardized_homozygote": [
+     "0 < h.altFreq",
+     "h.altFreq < 1"
+    ],
     "Descent.Portability.HWEInteractionLaw.squareBiasedLocus_mass": [
      "0 < h.altFreq",
      "h.altFreq < 1"
@@ -85781,6 +85823,7 @@
    "Descent.PopGen.standardizedSquare_eq_over_genotypeVarianceHWE",
    "Descent.PopGen.standardizedSquare_never_symmetric",
    "Descent.Portability.BalancedHWEInteraction.standardized_coordinate",
+   "Descent.Portability.HWEHomozygoteAmplitude.standardized_homozygote",
    "Descent.Portability.HWEInteractionLaw.squareBiasedLocus_mass",
    "Descent.Spectral.hwe_centered"
   ],
@@ -85870,6 +85913,10 @@
      "h.altFreq < 1"
     ],
     "Descent.Portability.BalancedHWEInteraction.standardized_coordinate": [],
+    "Descent.Portability.HWEHomozygoteAmplitude.standardized_homozygote": [
+     "0 < h.altFreq",
+     "h.altFreq < 1"
+    ],
     "Descent.Portability.HWEInteractionLaw.squareBiasedLocus_mass": [
      "0 < h.altFreq",
      "h.altFreq < 1"
@@ -93292,6 +93339,8 @@
    "Descent.Portability.HWEHomozygoteConditioning.count_homoVector",
    "Descent.Portability.HWEHomozygoteConditioning.range_homoVector",
    "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation",
+   "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit",
+   "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit",
    "Descent.Portability.InterleavedMutationExponential.generator_matrix",
    "Descent.Portability.InterleavedMutationExponential.interval_compose",
    "Descent.Portability.InterleavedMutationExponential.interval_matrix_exponential",
@@ -93576,6 +93625,8 @@
     "Descent.Portability.HWEHomozygoteConditioning.range_homoVector": [],
     "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation": [],
     "Descent.Portability.HWEHomozygoteConditioning.conditional_expectation": [],
+    "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit": [],
+    "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit": [],
     "Descent.Portability.InterleavedMutationExponential.propagate_mass": [],
     "Descent.Portability.InterleavedMutationExponential.poisson_matrix_series": [],
     "Descent.Portability.InterleavedMutationExponential.poisson_matrix_exponential": [],
@@ -99015,6 +99066,7 @@
    "Descent.Portability.GaussianSlabLaw.graphPoint_continuous",
    "Descent.Portability.GaussianSlabLaw.local_cylinder",
    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
+   "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit",
    "Descent.Portability.HasPositiveLowerBound.comp",
    "Descent.Portability.HasPositiveLowerBound.of_postcomp",
    "Descent.Portability.HasUnitApproxKernel.postcomp",
@@ -99196,6 +99248,7 @@
     "Descent.Portability.GaussianSlabLaw.graphPoint_continuous": [],
     "Descent.Portability.GaussianSlabLaw.local_cylinder": [],
     "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [],
+    "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit": [],
     "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable": [],
     "Descent.Portability.InterleavedMutationMeasurability.mark_mass_measurable": [],
     "Descent.Portability.MarkovCoarseGraining.operator_matrixError": [],
@@ -134827,6 +134880,9 @@
   "mentioned_by": [
    "Descent.Portability.BalancedHWECompoundPoisson.sign_shift",
    "Descent.Portability.BalancedHWEWeakLimit.sign_shift_eq_jump",
+   "Descent.Portability.HWEHomozygoteAmplitude.standardized_homozygote",
+   "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit",
+   "Descent.Portability.HWEHomozygoteLimit.test_parity",
    "Descent.Portability.RademacherArrayWeakLimit.row_characteristic",
    "Descent.Portability.RademacherArrayWeakLimit.row_second",
    "Descent.Portability.RademacherArrayWeakLimit.sign_characteristic",
@@ -134848,6 +134904,9 @@
    "hypotheses_by_theorem": {
     "Descent.Portability.BalancedHWECompoundPoisson.sign_shift": [],
     "Descent.Portability.BalancedHWEWeakLimit.sign_shift_eq_jump": [],
+    "Descent.Portability.HWEHomozygoteAmplitude.standardized_homozygote": [],
+    "Descent.Portability.HWEHomozygoteLimit.test_parity": [],
+    "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit": [],
     "Descent.Portability.RademacherArrayWeakLimit.sign_mean": [],
     "Descent.Portability.RademacherArrayWeakLimit.sign_second": [],
     "Descent.Portability.RademacherArrayWeakLimit.sign_characteristic": [],
@@ -153586,6 +153645,8 @@
    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
    "Descent.Portability.HWEHomozygoteConditioning.conditional_expectation",
    "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation",
+   "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit",
+   "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit",
    "Descent.Portability.HWEInteractionLaw.characteristic_im",
    "Descent.Portability.HWEInteractionLaw.characteristic_re",
    "Descent.Portability.HWEInteractionLaw.expectation_independent_product",
@@ -153886,6 +153947,8 @@
     "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [],
     "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation": [],
     "Descent.Portability.HWEHomozygoteConditioning.conditional_expectation": [],
+    "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit": [],
+    "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit": [],
     "Descent.Portability.HWEInteractionLaw.expectation_independent_product": [],
     "Descent.Portability.HWEInteractionLaw.characteristic_re": [],
     "Descent.Portability.HWEInteractionLaw.characteristic_im": [],
@@ -160738,6 +160801,8 @@
    "Descent.Portability.HWEHomozygoteConditioning.conditional_expectation",
    "Descent.Portability.HWEHomozygoteConditioning.homozygote_mass",
    "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation",
+   "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit",
+   "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit",
    "Descent.Portability.HWEInteractionLaw.characteristic_independent_sum",
    "Descent.Portability.HWEInteractionLaw.complexExpectation_independent_product",
    "Descent.Portability.HWEInteractionLaw.expectation_independent_product",
@@ -160795,6 +160860,8 @@
     "Descent.Portability.HWEHomozygoteConditioning.homozygote_mass": [],
     "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation": [],
     "Descent.Portability.HWEHomozygoteConditioning.conditional_expectation": [],
+    "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit": [],
+    "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit": [],
     "Descent.Portability.HWEInteractionLaw.expectation_independent_product": [],
     "Descent.Portability.HWEInteractionLaw.complexExpectation_independent_product": [],
     "Descent.Portability.HWEInteractionLaw.characteristic_independent_sum": [],
@@ -169163,6 +169230,8 @@
    "Descent.Portability.HWEHomozygoteConditioning.count_homoVector",
    "Descent.Portability.HWEHomozygoteConditioning.range_homoVector",
    "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation",
+   "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit",
+   "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit",
    "Descent.Portability.InterleavedMutationExponential.generator_matrix",
    "Descent.Portability.InterleavedMutationExponential.interval_compose",
    "Descent.Portability.InterleavedMutationExponential.interval_matrix_exponential",
@@ -169460,6 +169529,8 @@
     "Descent.Portability.HWEHomozygoteConditioning.conditional_expectation": [
      "ι → HardyWeinbergModel"
     ],
+    "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit": [],
+    "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit": [],
     "Descent.Portability.InterleavedMutationExponential.propagate_mass": [],
     "Descent.Portability.InterleavedMutationExponential.poisson_matrix_series": [],
     "Descent.Portability.InterleavedMutationExponential.poisson_matrix_exponential": [],
@@ -169888,6 +169959,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.HWEHomozygoteAmplitude.standardized_homozygote",
    "Descent.Portability.HWEHomozygoteConditioning.count_homoVector",
    "Descent.Portability.HWEHomozygoteConditioning.homozygote_injective",
    "Descent.Portability.HWEHomozygoteConditioning.homozygote_mass",
@@ -169896,6 +169968,7 @@
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Portability.HWEHomozygoteAmplitude.standardized_homozygote": [],
     "Descent.Portability.HWEHomozygoteConditioning.homozygote_injective": [],
     "Descent.Portability.HWEHomozygoteConditioning.count_homoVector": [],
     "Descent.Portability.HWEHomozygoteConditioning.range_homoVector": [],
@@ -169966,18 +170039,23 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.HWEHomozygoteAmplitude.interaction_homoVector",
    "Descent.Portability.HWEHomozygoteConditioning.conditional_expectation",
    "Descent.Portability.HWEHomozygoteConditioning.count_homoVector",
    "Descent.Portability.HWEHomozygoteConditioning.homoVector_injective",
    "Descent.Portability.HWEHomozygoteConditioning.homozygote_mass",
    "Descent.Portability.HWEHomozygoteConditioning.range_homoVector",
-   "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation"
+   "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation",
+   "Descent.Portability.HWEHomozygoteLimit.normalized_homoVector"
   ],
   "constraints": {
    "hypotheses": [
     "ι → HardyWeinbergModel"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.HWEHomozygoteAmplitude.interaction_homoVector": [
+     "ι → HardyWeinbergModel"
+    ],
     "Descent.Portability.HWEHomozygoteConditioning.homoVector_injective": [],
     "Descent.Portability.HWEHomozygoteConditioning.count_homoVector": [],
     "Descent.Portability.HWEHomozygoteConditioning.range_homoVector": [],
@@ -169988,6 +170066,9 @@
      "ι → HardyWeinbergModel"
     ],
     "Descent.Portability.HWEHomozygoteConditioning.conditional_expectation": [
+     "ι → HardyWeinbergModel"
+    ],
+    "Descent.Portability.HWEHomozygoteLimit.normalized_homoVector": [
      "ι → HardyWeinbergModel"
     ]
    }
@@ -170011,7 +170092,9 @@
    "Descent.Portability.HWEHomozygoteConditioning.conditional_expectation",
    "Descent.Portability.HWEHomozygoteConditioning.homozygote_mass",
    "Descent.Portability.HWEHomozygoteConditioning.zeroMass_pos",
-   "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation"
+   "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation",
+   "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit",
+   "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit"
   ],
   "constraints": {
    "range_lo_thm": [
@@ -170022,7 +170105,11 @@
    "hypotheses": [
     "ι → HardyWeinbergModel",
     "∀ i, 0 < (h i",
-    "∀ i, (h i"
+    "∀ i, (h i",
+    "∀ m i, 0 < (h m i",
+    "∀ m i, (h m i",
+    "∀ m i, |(h m i",
+    "Tendsto (fun m ↦ ∑ i, ((h m i"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.HWEHomozygoteConditioning.zeroMass_pos": [
@@ -170044,7 +170131,100 @@
      "ι → HardyWeinbergModel",
      "∀ i, 0 < (h i",
      "∀ i, (h i"
+    ],
+    "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit": [
+     "∀ m i, 0 < (h m i",
+     "∀ m i, (h m i",
+     "∀ m i, |(h m i",
+     "Tendsto (fun m ↦ ∑ i, ((h m i"
+    ],
+    "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit": [
+     "∀ m i, 0 < (h m i",
+     "∀ m i, (h m i",
+     "∀ m i, |(h m i",
+     "Tendsto (fun m ↦ ∑ i, ((h m i"
     ]
+   }
+  }
+ },
+ "Descent.Portability.HWEHomozygoteLimit.normalized": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name Fintype.card",
+  "file": "Descent/Portability/HWEHomozygoteLimit.lean",
+  "line": 25,
+  "short": "normalized",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit",
+   "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit",
+   "Descent.Portability.HWEHomozygoteLimit.normalized_homoVector"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "ι → HardyWeinbergModel",
+    "∀ i, 0 < (h i",
+    "∀ i, (h i",
+    "∀ m i, 0 < (h m i",
+    "∀ m i, (h m i",
+    "∀ m i, |(h m i",
+    "Tendsto (fun m ↦ ∑ i, ((h m i"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.HWEHomozygoteLimit.normalized_homoVector": [
+     "ι → HardyWeinbergModel",
+     "∀ i, 0 < (h i",
+     "∀ i, (h i"
+    ],
+    "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit": [
+     "∀ m i, 0 < (h m i",
+     "∀ m i, (h m i",
+     "∀ m i, |(h m i",
+     "Tendsto (fun m ↦ ∑ i, ((h m i"
+    ],
+    "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit": [
+     "∀ m i, 0 < (h m i",
+     "∀ m i, (h m i",
+     "∀ m i, |(h m i",
+     "Tendsto (fun m ↦ ∑ i, ((h m i"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.HWEHomozygoteLimit.amplitudeTest": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name f.compContinuous",
+  "file": "Descent/Portability/HWEHomozygoteLimit.lean",
+  "line": 38,
+  "short": "amplitudeTest",
+  "ret_type": "ℝ →ᵇ ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "c": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit",
+   "Descent.Portability.HWEHomozygoteLimit.test_parity"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.HWEHomozygoteLimit.test_parity": [],
+    "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit": []
    }
   }
  },
@@ -170087,6 +170267,8 @@
    "Descent.Portability.HWEHomozygoteConditioning.conditional_expectation",
    "Descent.Portability.HWEHomozygoteConditioning.homozygote_mass",
    "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation",
+   "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit",
+   "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit",
    "Descent.Portability.HWEInteractionLaw.characteristic_independent_sum",
    "Descent.Portability.HWEInteractionLaw.complexExpectation_independent_product",
    "Descent.Portability.HWEInteractionLaw.expectation_independent_product",
@@ -170169,6 +170351,8 @@
     "Descent.Portability.HWEHomozygoteConditioning.conditional_expectation": [
      "ι → HardyWeinbergModel"
     ],
+    "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit": [],
+    "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit": [],
     "Descent.Portability.HWEInteractionLaw.expectation_independent_product": [],
     "Descent.Portability.HWEInteractionLaw.complexExpectation_independent_product": [],
     "Descent.Portability.HWEInteractionLaw.characteristic_independent_sum": [],
@@ -170419,6 +170603,7 @@
    "Descent.Portability.BalancedHWEInteraction.critical_standardization",
    "Descent.Portability.BalancedHWEInteraction.interaction_eq",
    "Descent.Portability.BalancedHWEVanishingLaw.original_standardization",
+   "Descent.Portability.HWEHomozygoteAmplitude.interaction_homoVector",
    "Descent.Portability.HWEInteractionLaw.interaction_mean_zero",
    "Descent.Portability.HWEInteractionLaw.interaction_second_moment",
    "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass",
@@ -170441,6 +170626,11 @@
     "Descent.Portability.BalancedHWEInteraction.interaction_eq": [],
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEVanishingLaw.original_standardization": [],
+    "Descent.Portability.HWEHomozygoteAmplitude.interaction_homoVector": [
+     "ι → HardyWeinbergModel",
+     "∀ i, 0 < (h i",
+     "∀ i, (h i"
+    ],
     "Descent.Portability.HWEInteractionLaw.interaction_mean_zero": [
      "ι → HardyWeinbergModel"
     ],
@@ -170490,6 +170680,8 @@
    "Descent.Portability.HWEHomozygoteConditioning.conditional_expectation",
    "Descent.Portability.HWEHomozygoteConditioning.homozygote_mass",
    "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation",
+   "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit",
+   "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit",
    "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass",
    "Descent.Portability.HWEInteractionLaw.squareBiasedLocus_mass"
   ],
@@ -170557,6 +170749,18 @@
     "Descent.Portability.HWEHomozygoteConditioning.conditional_expectation": [
      "∀ i, 0 < (h i",
      "∀ i, (h i"
+    ],
+    "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit": [
+     "∀ m i, 0 < (h m i",
+     "∀ m i, (h m i",
+     "∀ m i, |(h m i",
+     "Tendsto (fun m ↦ ∑ i, ((h m i"
+    ],
+    "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit": [
+     "∀ m i, 0 < (h m i",
+     "∀ m i, (h m i",
+     "∀ m i, |(h m i",
+     "Tendsto (fun m ↦ ∑ i, ((h m i"
     ],
     "Descent.Portability.HWEInteractionLaw.squareBiasedLocus_mass": [
      "0 < h.altFreq",
@@ -170717,6 +170921,12 @@
    "Descent.Portability.FinitePipelineKernel.metricDefinedMass_integrable",
    "Descent.Portability.FinitePipelineKernel.weightedMetric_eq_jointWeightedMetric",
    "Descent.Portability.FinitePipelineKernel.weightedMetric_integrable",
+   "Descent.Portability.HWEHomozygoteAmplitude.exp_coordinate",
+   "Descent.Portability.HWEHomozygoteAmplitude.exp_neg_coordinate",
+   "Descent.Portability.HWEHomozygoteAmplitude.interaction_homoVector",
+   "Descent.Portability.HWEHomozygoteAmplitude.standardized_homozygote",
+   "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit",
+   "Descent.Portability.HWEHomozygoteLimit.normalized_homoVector",
    "Descent.Portability.HWELogCoordinates.coordinate_derivative",
    "Descent.Portability.HWELogCoordinates.coordinate_frequency",
    "Descent.Portability.HWELogCoordinates.coordinate_slope",
@@ -170891,6 +171101,12 @@
     "Descent.Portability.pooledMAFKilledDualTerminalVector_dot_bernstein": [],
     "Descent.Portability.PipelineDemographicHistory.pooledMAFProbeMassViaPositiveDual_nonneg": [],
     "Descent.Portability.PipelineDemographicHistory.oneLocusMoment_eq_presentMomentState": [],
+    "Descent.Portability.HWEHomozygoteAmplitude.exp_coordinate": [],
+    "Descent.Portability.HWEHomozygoteAmplitude.exp_neg_coordinate": [],
+    "Descent.Portability.HWEHomozygoteAmplitude.standardized_homozygote": [],
+    "Descent.Portability.HWEHomozygoteAmplitude.interaction_homoVector": [],
+    "Descent.Portability.HWEHomozygoteLimit.normalized_homoVector": [],
+    "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit": [],
     "Descent.Portability.HWELogCoordinates.coordinate_zero": [],
     "Descent.Portability.HWELogCoordinates.coordinate_frequency": [],
     "Descent.Portability.HWELogCoordinates.coordinate_derivative": [],
@@ -209876,6 +210092,9 @@
    }
   },
   "mentioned_by": [
+   "Descent.Portability.HWEHomozygoteAmplitude.interaction_homoVector",
+   "Descent.Portability.HWEHomozygoteLimit.normalized_homoVector",
+   "Descent.Portability.HWEHomozygoteLimit.test_parity",
    "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit",
    "Descent.Portability.RademacherArrayWeakLimit.row_characteristic",
    "Descent.Portability.RademacherArrayWeakLimit.row_second",
@@ -209890,10 +210109,18 @@
   ],
   "constraints": {
    "hypotheses": [
+    "ι → HardyWeinbergModel",
     "Tendsto (fun m ↦ ∑ i, a m i ^ 2",
     "∀ m i, |a m i| ≤ ε m"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.HWEHomozygoteAmplitude.interaction_homoVector": [
+     "ι → HardyWeinbergModel"
+    ],
+    "Descent.Portability.HWEHomozygoteLimit.normalized_homoVector": [
+     "ι → HardyWeinbergModel"
+    ],
+    "Descent.Portability.HWEHomozygoteLimit.test_parity": [],
     "Descent.Portability.RademacherArrayWeakLimit.row_second": [],
     "Descent.Portability.RademacherArrayWeakLimit.row_characteristic": [],
     "Descent.Portability.RademacherArrayWeakLimit.rows_tight": [
@@ -210181,6 +210408,9 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.HWEHomozygoteAmplitude.interaction_homoVector",
+   "Descent.Portability.HWEHomozygoteLimit.normalized_homoVector",
+   "Descent.Portability.HWEHomozygoteLimit.test_parity",
    "Descent.Portability.RademacherJointLimit.joint_observable_limit",
    "Descent.Portability.RademacherJointLimit.parity_decomposition",
    "Descent.Portability.RademacherParityConditioning.complexExpectation_law",
@@ -210193,8 +210423,17 @@
    "Descent.Portability.RademacherParityLaw.parity_square"
   ],
   "constraints": {
-   "hypotheses": [],
+   "hypotheses": [
+    "ι → HardyWeinbergModel"
+   ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.HWEHomozygoteAmplitude.interaction_homoVector": [
+     "ι → HardyWeinbergModel"
+    ],
+    "Descent.Portability.HWEHomozygoteLimit.normalized_homoVector": [
+     "ι → HardyWeinbergModel"
+    ],
+    "Descent.Portability.HWEHomozygoteLimit.test_parity": [],
     "Descent.Portability.RademacherJointLimit.parity_decomposition": [],
     "Descent.Portability.RademacherJointLimit.joint_observable_limit": [],
     "Descent.Portability.RademacherParityConditioning.parity_factor_bounds": [],
@@ -212448,6 +212687,7 @@
    "Descent.Portability.BalancedHWEInteraction.critical_standardization",
    "Descent.Portability.BalancedHWEInteraction.interaction_eq",
    "Descent.Portability.BalancedHWEVanishingLaw.original_standardization",
+   "Descent.Portability.HWEHomozygoteAmplitude.interaction_homoVector",
    "Descent.Portability.HWEInteractionLaw.interaction_mean_zero",
    "Descent.Portability.HWEInteractionLaw.interaction_second_moment",
    "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass",
@@ -212469,6 +212709,7 @@
     "Descent.Portability.BalancedHWEInteraction.interaction_eq": [],
     "Descent.Portability.BalancedHWEInteraction.critical_standardization": [],
     "Descent.Portability.BalancedHWEVanishingLaw.original_standardization": [],
+    "Descent.Portability.HWEHomozygoteAmplitude.interaction_homoVector": [],
     "Descent.Portability.HWEInteractionLaw.interaction_mean_zero": [],
     "Descent.Portability.HWEInteractionLaw.interaction_second_moment": [],
     "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass": [],
@@ -219008,6 +219249,12 @@
    "Descent.Portability.FinitePipelineKernel.metricDefinedMass_integrable",
    "Descent.Portability.FinitePipelineKernel.weightedMetric_eq_jointWeightedMetric",
    "Descent.Portability.FinitePipelineKernel.weightedMetric_integrable",
+   "Descent.Portability.HWEHomozygoteAmplitude.exp_coordinate",
+   "Descent.Portability.HWEHomozygoteAmplitude.exp_neg_coordinate",
+   "Descent.Portability.HWEHomozygoteAmplitude.interaction_homoVector",
+   "Descent.Portability.HWEHomozygoteAmplitude.standardized_homozygote",
+   "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit",
+   "Descent.Portability.HWEHomozygoteLimit.normalized_homoVector",
    "Descent.Portability.HWELogCoordinates.coordinate_derivative",
    "Descent.Portability.HWELogCoordinates.coordinate_frequency",
    "Descent.Portability.HWELogCoordinates.coordinate_slope",
@@ -219041,6 +219288,12 @@
   ],
   "constraints": {
    "hypotheses": [
+    "∀ i, 0 < (h i",
+    "∀ i, (h i",
+    "∀ m i, 0 < (h m i",
+    "∀ m i, (h m i",
+    "∀ m i, |(h m i",
+    "Tendsto (fun m ↦ ∑ i, ((h m i",
     "∀ m i, |δ m i| ≤ ε m",
     "Tendsto (fun m ↦ ∑ i, δ m i ^ 2",
     "q ≤ i.val"
@@ -219180,6 +219433,23 @@
     "Descent.Portability.pooledMAFKilledDualTerminalVector_dot_bernstein": [],
     "Descent.Portability.PipelineDemographicHistory.pooledMAFProbeMassViaPositiveDual_nonneg": [],
     "Descent.Portability.PipelineDemographicHistory.oneLocusMoment_eq_presentMomentState": [],
+    "Descent.Portability.HWEHomozygoteAmplitude.exp_coordinate": [],
+    "Descent.Portability.HWEHomozygoteAmplitude.exp_neg_coordinate": [],
+    "Descent.Portability.HWEHomozygoteAmplitude.standardized_homozygote": [],
+    "Descent.Portability.HWEHomozygoteAmplitude.interaction_homoVector": [
+     "∀ i, 0 < (h i",
+     "∀ i, (h i"
+    ],
+    "Descent.Portability.HWEHomozygoteLimit.normalized_homoVector": [
+     "∀ i, 0 < (h i",
+     "∀ i, (h i"
+    ],
+    "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit": [
+     "∀ m i, 0 < (h m i",
+     "∀ m i, (h m i",
+     "∀ m i, |(h m i",
+     "Tendsto (fun m ↦ ∑ i, ((h m i"
+    ],
     "Descent.Portability.HWELogCoordinates.coordinate_zero": [],
     "Descent.Portability.HWELogCoordinates.coordinate_frequency": [],
     "Descent.Portability.HWELogCoordinates.coordinate_derivative": [],
@@ -230121,6 +230391,8 @@
    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
    "Descent.Portability.HWEHomozygoteConditioning.conditional_expectation",
    "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation",
+   "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit",
+   "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit",
    "Descent.Portability.HWEInteractionLaw.characteristic_im",
    "Descent.Portability.HWEInteractionLaw.characteristic_re",
    "Descent.Portability.HWEInteractionLaw.expectation_independent_product",
@@ -230468,6 +230740,8 @@
     "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [],
     "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation": [],
     "Descent.Portability.HWEHomozygoteConditioning.conditional_expectation": [],
+    "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit": [],
+    "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit": [],
     "Descent.Portability.HWEInteractionLaw.expectation_independent_product": [],
     "Descent.Portability.HWEInteractionLaw.characteristic_re": [],
     "Descent.Portability.HWEInteractionLaw.characteristic_im": [],
@@ -231288,6 +231562,8 @@
    "Descent.Portability.HWEHomozygoteConditioning.conditional_expectation",
    "Descent.Portability.HWEHomozygoteConditioning.homozygote_mass",
    "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation",
+   "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit",
+   "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit",
    "Descent.Portability.HWEInteractionLaw.characteristic_independent_sum",
    "Descent.Portability.HWEInteractionLaw.complexExpectation_independent_product",
    "Descent.Portability.HWEInteractionLaw.expectation_independent_product",
@@ -231345,6 +231621,8 @@
     "Descent.Portability.HWEHomozygoteConditioning.homozygote_mass": [],
     "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation": [],
     "Descent.Portability.HWEHomozygoteConditioning.conditional_expectation": [],
+    "Descent.Portability.HWEHomozygoteLimit.conditional_amplitude_limit": [],
+    "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit": [],
     "Descent.Portability.HWEInteractionLaw.expectation_independent_product": [],
     "Descent.Portability.HWEInteractionLaw.complexExpectation_independent_product": [],
     "Descent.Portability.HWEInteractionLaw.characteristic_independent_sum": [],

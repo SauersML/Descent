@@ -270,6 +270,8 @@ import Descent.Portability.RademacherParityConditioning
 import Descent.Portability.RademacherParityWeakLimit
 import Descent.Portability.HWEHomozygoteConditioning
 import Descent.Portability.RademacherJointLimit
+import Descent.Portability.HWEHomozygoteAmplitude
+import Descent.Portability.HWEHomozygoteLimit
 assert_below Descent.Program
 
 /-!
