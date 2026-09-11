@@ -23,19 +23,20 @@ every scale `ε` with `|ε| B ≤ μ`.  Conjugating that bound back by the eigen
 (`conjPerturb`) gives `extremePoint_no_supported_direction`, which is the contradiction the
 Barvinok-Pataki argument needs.
 
-At `m = 0` the bound is closed outright: `extremePoint_unique_positive_eigenvalue` proves that
-an extreme point with no prescribed reports has at most one positive eigenvalue, which is
-`r(r+1)/2 ≤ 1`, by feeding the criterion the explicit two-point direction `pairDirection`.  That
-also shows the criterion is not vacuous, which matters because its conclusion is `False`.
+`extremePoint_rank_bound` is then the rank bound itself: an extreme point with `m` prescribed
+reports has `r` positive eigenvalues with `r(r+1)/2 ≤ m + 1`.  The counting step is a
+rank-nullity argument over unordered index pairs: `sym2Basis` attaches a symmetric direction to
+each unordered pair drawn from the positive eigenspace, `Finset.card_sym2` counts those pairs as
+`(r+1).choose 2`, and `exists_nonzero_kernel` produces a nonzero combination annihilating the
+`m + 1` linear conditions on trace and reports whenever the pairs outnumber them.  Feeding that
+combination to the perturbation criterion contradicts extremality.
 
-SCOPE.  For general `m` what is proved here is the perturbation step, not the whole rank bound
-`r(r+1)/2 ≤ m + 1`.  The step still missing is the counting one: the symmetric matrices carried
-by an `r`-dimensional eigenspace form a space of dimension `r(r+1)/2`, so when
-`r(r+1)/2 > m + 1` the `m + 1` linear conditions on trace and reports must vanish on some
-nonzero such direction, which `extremePoint_no_supported_direction` then rules out.  Producing
-that direction needs a rank-nullity count over unordered index pairs, which is not formalized
-here, so PL Corollary 6.3's rank bound is closed only at `m = 0`.  Everything below is
-unconditional.
+`extremePoint_unique_positive_eigenvalue` is the same bound at `m = 0`, proved directly from
+the criterion with the explicit two-point direction `pairDirection`.  It is kept because it
+exhibits a concrete inhabitant of the criterion's hypotheses, which matters since the
+criterion's conclusion is `False`.
+
+Everything below is unconditional.
 -/
 
 set_option autoImplicit false
@@ -430,7 +431,11 @@ theorem trace_pairBasis (i j : Fin d) :
     Matrix.trace (pairBasis i j) = 2 * (if i = j then (1 : ℝ) else 0) := by
   rw [pairBasis, Matrix.trace_add, trace_vecMulVec, trace_vecMulVec, dot_single_left,
     dot_single_left, Pi.single_apply, Pi.single_apply]
-  by_cases h : i = j <;> (simp [h, eq_comm]; norm_num)
+  by_cases h : i = j
+  · rw [if_pos h, if_pos h.symm]
+    norm_num
+  · rw [if_neg h, if_neg (Ne.symm h)]
+    norm_num
 
 /-- The quadratic form of a pair direction. -/
 theorem quadForm_pairBasis (i j : Fin d) (w : Fin d → ℝ) :
