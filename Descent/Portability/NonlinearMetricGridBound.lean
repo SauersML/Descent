@@ -34,6 +34,8 @@ set_option relaxedAutoImplicit false
 
 namespace Descent.Portability.NonlinearMetricGridBound
 
+open FiniteMetricIdentification
+
 noncomputable section
 
 variable {S : Type*} [Fintype S]
@@ -187,6 +189,17 @@ theorem mixture_distance_le (count : ℕ) (vertex : Fin (count + 1) → (S → �
   rw [Finset.sum_comm]
   refine le_of_eq (Finset.sum_congr rfl fun k _ ↦ ?_)
   rw [← Finset.mul_sum, hmass k, mul_one]
+
+/-- A mixture of compatible laws is compatible, so both the law whose weights are rounded
+and the grid law produced from it lie in the feasible set of the specified linear
+information. This is what makes the grid a subset of the polytope, hence what makes the grid
+values never fall below the true minimum. -/
+theorem mixture_mem_feasible {O : Type*} (count : ℕ) (observe : O → S → ℝ)
+    (observed : O → ℝ) (vertex : Fin (count + 1) → (S → ℝ))
+    (hvertex : ∀ k, vertex k ∈ feasible observe observed)
+    (weight : Fin (count + 1) → ℝ) (hw0 : ∀ k, 0 ≤ weight k) (hw1 : ∑ k, weight k = 1) :
+    (∑ k, weight k • vertex k) ∈ feasible observe observed :=
+  Convex.sum_mem (feasible_convex observe observed) (fun k _ ↦ hw0 k) hw1 fun k _ ↦ hvertex k
 
 /-- TQ Proposition 7.4 (7.8): for every compatible mixture there is a grid mixture whose
 metric value exceeds it by at most the Lipschitz constant times twice the number of non-final

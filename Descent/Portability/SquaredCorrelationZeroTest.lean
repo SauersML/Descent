@@ -61,6 +61,16 @@ def scoreVar (draw : Bool × Bool) : ℝ := CounterfactualRegion.signOf draw.1
 def outcomeVar (draw : Bool × Bool) : ℝ :=
   CounterfactualRegion.signOf draw.1 * CounterfactualRegion.signOf draw.2
 
+/-- The score is the sign map of `CounterfactualRegion` read at the first coordinate, so the
+two modules share one sign convention rather than each carrying its own. -/
+theorem scoreVar_eq_signOf (draw : Bool × Bool) :
+    scoreVar draw = CounterfactualRegion.signOf draw.1 := rfl
+
+/-- The outcome is the product of the two sign values of that same sign map. -/
+theorem outcomeVar_eq_signOf_mul (draw : Bool × Bool) :
+    outcomeVar draw =
+      CounterfactualRegion.signOf draw.1 * CounterfactualRegion.signOf draw.2 := rfl
+
 /-- Exact evaluation of the four-point law on an arbitrary statistic. -/
 theorem signPairLaw_apply (corr : ℝ) (hcorr : |corr| ≤ 1) (statistic : Bool × Bool → ℝ) :
     signPairLaw corr hcorr statistic =

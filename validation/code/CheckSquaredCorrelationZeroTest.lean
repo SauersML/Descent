@@ -7,6 +7,8 @@ import Descent.Portability.SquaredCorrelationZeroTest
 
 open Descent.Portability.SquaredCorrelationZeroTest
 
+#print axioms scoreVar_eq_signOf
+#print axioms outcomeVar_eq_signOf_mul
 #print axioms signPairLaw_apply
 #print axioms signPairLaw_mean_score
 #print axioms signPairLaw_mean_outcome
