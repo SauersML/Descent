@@ -480,6 +480,22 @@ def mutationStageDrift {D : ℕ} (rates : ManyDemeLDRates D)
     ∑ deme : Fin D, stageRate rates (Stage.mutationRight deme) *
       stageVelocity (enlargedStageExpansion coordinate) (Stage.mutationRight deme) state
 
+/-- **The rate-weighted velocity of a single-locus mutation stage.**  The stage runs at half
+the deme's mutation rate, so a pulse velocity of `coefficient` times the two lineage indicators
+times a level gives the scaled level weighted by the rate at each counted lineage. -/
+theorem mutationStage_drift_of_velocity {D : ℕ} {jet : TwoLocusDiffusionJet D}
+    (rates : ManyDemeLDRates D) (certificate : StageExpansion jet) (stage : Stage D)
+    (deme : Fin D) (hrate : stageRate rates stage = rates.mutation deme / 2)
+    (state : DemeHaplotypeState D) {coefficient level scaled firstIndicator secondIndicator : ℝ}
+    (hvelocity : stageVelocity certificate stage state =
+      coefficient * (firstIndicator + secondIndicator) * level)
+    (hscaled : coefficient / 2 * level = scaled) :
+    stageRate rates stage * stageVelocity certificate stage state =
+      scaled * (rates.mutation deme * firstIndicator) +
+        scaled * (rates.mutation deme * secondIndicator) := by
+  rw [hrate, hvelocity, ← hscaled]
+  ring
+
 /-! ## The mutation stages reproduce the corpus heterozygosity mutation rows -/
 
 /-- A right-locus mutation pulse moves no left marginal, so the stored heterozygosity has
@@ -847,17 +863,9 @@ theorem mutationStage_sum_linkageProduct {D : ℕ} (rates : ManyDemeLDRates D)
       -((twoLocusDDJet first second).value state) *
           (rates.mutation deme * (if first = deme then (1 : ℝ) else 0)) +
         -((twoLocusDDJet first second).value state) *
-          (rates.mutation deme * (if second = deme then (1 : ℝ) else 0)) := by
-    intro deme
-    have hvelocity : stageVelocity (enlargedStageExpansion (some (.inl (.DD first second))))
-        (Stage.mutationLeft deme) state =
-        -2 * ((if first = deme then (1 : ℝ) else 0) +
-            (if second = deme then (1 : ℝ) else 0)) *
-          (twoLocusDDJet first second).value state :=
-      leftMutationLinkageProduct_velocity deme first second state
-    show rates.mutation deme / 2 * _ = _
-    rw [hvelocity]
-    ring
+          (rates.mutation deme * (if second = deme then (1 : ℝ) else 0)) :=
+    fun deme ↦ mutationStage_drift_of_velocity rates _ (.mutationLeft deme) deme rfl state
+      (leftMutationLinkageProduct_velocity deme first second state) (by ring)
   have hright : ∀ deme : Fin D,
       stageRate rates (Stage.mutationRight deme) *
         stageVelocity (enlargedStageExpansion (some (.inl (.DD first second))))
@@ -865,17 +873,9 @@ theorem mutationStage_sum_linkageProduct {D : ℕ} (rates : ManyDemeLDRates D)
       -((twoLocusDDJet first second).value state) *
           (rates.mutation deme * (if first = deme then (1 : ℝ) else 0)) +
         -((twoLocusDDJet first second).value state) *
-          (rates.mutation deme * (if second = deme then (1 : ℝ) else 0)) := by
-    intro deme
-    have hvelocity : stageVelocity (enlargedStageExpansion (some (.inl (.DD first second))))
-        (Stage.mutationRight deme) state =
-        -2 * ((if first = deme then (1 : ℝ) else 0) +
-            (if second = deme then (1 : ℝ) else 0)) *
-          (twoLocusDDJet first second).value state :=
-      rightMutationLinkageProduct_velocity deme first second state
-    show rates.mutation deme / 2 * _ = _
-    rw [hvelocity]
-    ring
+          (rates.mutation deme * (if second = deme then (1 : ℝ) else 0)) :=
+    fun deme ↦ mutationStage_drift_of_velocity rates _ (.mutationRight deme) deme rfl state
+      (rightMutationLinkageProduct_velocity deme first second state) (by ring)
   simp only [mutationStageDrift, hleft, hright, Finset.sum_add_distrib, ← Finset.mul_sum,
     sum_rate_indicator]
   simp only [hcoupling, hforcing, lowOrderLDRecurrentMutationDamping, twoLocusJetMoment,
@@ -1001,18 +1001,9 @@ theorem mutationStage_sum_dzObservable {D : ℕ} (rates : ManyDemeLDRates D)
       -((twoLocusDzJet first second third).value state) *
           (rates.mutation deme * (if first = deme then (1 : ℝ) else 0)) +
         -((twoLocusDzJet first second third).value state) *
-          (rates.mutation deme * (if second = deme then (1 : ℝ) else 0)) := by
-    intro deme
-    have hvelocity : stageVelocity
-        (enlargedStageExpansion (some (.inl (.Dz first second third))))
-        (Stage.mutationLeft deme) state =
-        -2 * ((if first = deme then (1 : ℝ) else 0) +
-            (if second = deme then (1 : ℝ) else 0)) *
-          (twoLocusDzJet first second third).value state :=
-      leftMutationDzObservable_velocity deme first second third state
-    show rates.mutation deme / 2 * _ = _
-    rw [hvelocity]
-    ring
+          (rates.mutation deme * (if second = deme then (1 : ℝ) else 0)) :=
+    fun deme ↦ mutationStage_drift_of_velocity rates _ (.mutationLeft deme) deme rfl state
+      (leftMutationDzObservable_velocity deme first second third state) (by ring)
   have hright : ∀ deme : Fin D,
       stageRate rates (Stage.mutationRight deme) *
         stageVelocity (enlargedStageExpansion (some (.inl (.Dz first second third))))
@@ -1020,18 +1011,9 @@ theorem mutationStage_sum_dzObservable {D : ℕ} (rates : ManyDemeLDRates D)
       -((twoLocusDzJet first second third).value state) *
           (rates.mutation deme * (if first = deme then (1 : ℝ) else 0)) +
         -((twoLocusDzJet first second third).value state) *
-          (rates.mutation deme * (if third = deme then (1 : ℝ) else 0)) := by
-    intro deme
-    have hvelocity : stageVelocity
-        (enlargedStageExpansion (some (.inl (.Dz first second third))))
-        (Stage.mutationRight deme) state =
-        -2 * ((if first = deme then (1 : ℝ) else 0) +
-            (if third = deme then (1 : ℝ) else 0)) *
-          (twoLocusDzJet first second third).value state :=
-      rightMutationDzObservable_velocity deme first second third state
-    show rates.mutation deme / 2 * _ = _
-    rw [hvelocity]
-    ring
+          (rates.mutation deme * (if third = deme then (1 : ℝ) else 0)) :=
+    fun deme ↦ mutationStage_drift_of_velocity rates _ (.mutationRight deme) deme rfl state
+      (rightMutationDzObservable_velocity deme first second third state) (by ring)
   have hcoupling : lowOrderLDMutationCoupling rates (twoLocusJetMoment state)
       (.Dz first second third) = 0 := rfl
   have hforcing : lowOrderLDMutationForcing rates (.Dz first second third) = 0 := rfl

@@ -248,19 +248,9 @@ theorem mutationStage_sum_jointHeterozygosity {D : ℕ} (rates : ManyDemeLDRates
       twoLocusPi2LeftMutationVelocity (state first) (state second) (state third)
           (state fourth) * (rates.mutation deme * (if first = deme then (1 : ℝ) else 0)) +
         twoLocusPi2LeftMutationVelocity (state first) (state second) (state third)
-          (state fourth) * (rates.mutation deme * (if second = deme then (1 : ℝ) else 0)) := by
-    intro deme
-    have hvelocity : stageVelocity
-        (enlargedStageExpansion (some (.inl (.pi2 first second third fourth))))
-        (Stage.mutationLeft deme) state =
-        2 * ((if first = deme then (1 : ℝ) else 0) +
-            (if second = deme then (1 : ℝ) else 0)) *
-          twoLocusPi2LeftMutationVelocity (state first) (state second) (state third)
-            (state fourth) :=
-      leftMutationJointHeterozygosity_velocity deme first second third fourth state
-    show rates.mutation deme / 2 * _ = _
-    rw [hvelocity]
-    ring
+          (state fourth) * (rates.mutation deme * (if second = deme then (1 : ℝ) else 0)) :=
+    fun deme ↦ mutationStage_drift_of_velocity rates _ (.mutationLeft deme) deme rfl state
+      (leftMutationJointHeterozygosity_velocity deme first second third fourth state) (by ring)
   have hright : ∀ deme : Fin D,
       stageRate rates (Stage.mutationRight deme) *
         stageVelocity
@@ -269,19 +259,9 @@ theorem mutationStage_sum_jointHeterozygosity {D : ℕ} (rates : ManyDemeLDRates
       twoLocusPi2RightMutationVelocity (state first) (state second) (state third)
           (state fourth) * (rates.mutation deme * (if third = deme then (1 : ℝ) else 0)) +
         twoLocusPi2RightMutationVelocity (state first) (state second) (state third)
-          (state fourth) * (rates.mutation deme * (if fourth = deme then (1 : ℝ) else 0)) := by
-    intro deme
-    have hvelocity : stageVelocity
-        (enlargedStageExpansion (some (.inl (.pi2 first second third fourth))))
-        (Stage.mutationRight deme) state =
-        2 * ((if third = deme then (1 : ℝ) else 0) +
-            (if fourth = deme then (1 : ℝ) else 0)) *
-          twoLocusPi2RightMutationVelocity (state first) (state second) (state third)
-            (state fourth) :=
-      rightMutationJointHeterozygosity_velocity deme first second third fourth state
-    show rates.mutation deme / 2 * _ = _
-    rw [hvelocity]
-    ring
+          (state fourth) * (rates.mutation deme * (if fourth = deme then (1 : ℝ) else 0)) :=
+    fun deme ↦ mutationStage_drift_of_velocity rates _ (.mutationRight deme) deme rfl state
+      (rightMutationJointHeterozygosity_velocity deme first second third fourth state) (by ring)
   have hforcing : lowOrderLDMutationForcing rates (.pi2 first second third fourth) = 0 := rfl
   rw [mutationStageDrift, (Finset.sum_congr rfl fun deme _ ↦ hleft deme),
     (Finset.sum_congr rfl fun deme _ ↦ hright deme),

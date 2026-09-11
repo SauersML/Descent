@@ -59,3 +59,4 @@ open Descent.Portability.TwoLocusMicroscopicKernel
 #print axioms migrationStage_sum_eq_rateWeighted
 #print axioms mutationStageDrift
 #print axioms enlargedGenerator_mulVec_stored_of_coupling_zero
+#print axioms mutationStage_drift_of_velocity
