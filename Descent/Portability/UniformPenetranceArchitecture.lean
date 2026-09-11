@@ -3,6 +3,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.ExactMetricEvaluation
 import Descent.Portability.ThetaFamilyNonclosure
+import Descent.Portability.EmpiricalCorrelationDefinedness
+import Descent.Portability.LogLossSeriesCertificate
 import Mathlib.Analysis.SpecialFunctions.BinaryEntropy
 import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 import Mathlib.MeasureTheory.Measure.Lebesgue.Basic
@@ -38,10 +40,15 @@ normalization-aware sandwich are the second half of the module.
 
 The parameter enters the law through a clamp onto the closed unit interval, so the family is
 a total function of a real parameter and can be integrated directly; every theorem states the
-parameter range it needs, and on that range the clamp is the identity. Not formalized here:
-the pooled law is exhibited as an explicit law whose cells are proved equal to the integrals
-of the conditional cells, not as an integral of laws in a Bochner sense; and the raw log loss
-is stated as an extended-real sum, not as a limit of truncated losses.
+parameter range it needs, and on that range the clamp is the identity. The pooled law is also
+the interval integral of the conditional laws in the finite-dimensional space of cell mass
+vectors, `pooledPenetranceLaw_mass_eq_intervalIntegral`. The raw log loss is the monotone
+limit of the truncated losses `min (-log r) n`, `rawLogLoss_eq_iSup_truncatedRawLogLoss`, and
+for every penetrance below one those truncated expectations diverge,
+`tendsto_truncatedRawLogLoss_penetranceLaw`. Both log losses are the corpus
+`LogLossSeriesCertificate.expectedLogLoss`, read at the raw forecast
+(`rawLogLoss_eq_expectedLogLoss`) and at the repaired forecast
+(`expectedLogLoss_repairedForecast`).
 
 ## Empirical status
 
@@ -125,16 +132,23 @@ def penetranceLaw (θ : ℝ) : FiniteReportLaw (Bool × Bool) where
 theorem penetranceLaw_mass (θ : ℝ) (cell : Bool × Bool) :
     (penetranceLaw θ).mass cell = penetranceMass (penetrance θ) cell := rfl
 
+/-- The four cell masses built here are exactly the masses `ThetaFamilyNonclosure.thetaMass`
+of NOTE2 (12), at every parameter value. -/
+theorem penetranceMass_eq_thetaMass (θ : ℝ) :
+    penetranceMass θ = ThetaFamilyNonclosure.thetaMass θ := by
+  funext cell
+  obtain ⟨score, outcome⟩ := cell
+  cases score <;> cases outcome <;>
+    simp only [penetranceMass, ThetaFamilyNonclosure.thetaMass]
+
 /-- The conditional law built here is exactly the family `ThetaFamilyNonclosure.thetaLaw` of
 NOTE2 (12) read at the clamped parameter: the two modules carry the same four cell masses,
 so every closed form below is a statement about that family as well. -/
 theorem penetranceLaw_eq_thetaLaw (θ : ℝ) (hlo : 0 ≤ θ) (hhi : θ ≤ 1) :
     penetranceLaw θ = ThetaFamilyNonclosure.thetaLaw θ hlo hhi := by
   refine FiniteReportLaw.ext fun cell ↦ ?_
-  obtain ⟨score, outcome⟩ := cell
-  rw [penetranceLaw_mass, ThetaFamilyNonclosure.thetaLaw_mass, penetrance_eq_self θ hlo hhi]
-  cases score <;> cases outcome <;>
-    simp only [penetranceMass, ThetaFamilyNonclosure.thetaMass]
+  rw [penetranceLaw_mass, ThetaFamilyNonclosure.thetaLaw_mass, penetrance_eq_self θ hlo hhi,
+    penetranceMass_eq_thetaMass]
 
 /-- Every report metric has the same three-term exact expectation under the conditional law:
 the null-score cell carries half the mass, and the positive-score cells split the rest. -/
@@ -283,6 +297,11 @@ theorem binaryAUC_penetranceLaw (θ : ℝ) (hpos : 0 < θ) (hhi : θ ≤ 1) :
 def scoreGroupMass (law : FiniteReportLaw (Bool × Bool)) (score : Bool) : ℝ :=
   law.mass (score, false) + law.mass (score, true)
 
+/-- The score-group mass is the corpus score marginal
+`EmpiricalCorrelationDefinedness.scoreMass` of a four-cell law, NOTE1 (31). -/
+theorem scoreGroupMass_eq_scoreMass (law : FiniteReportLaw (Bool × Bool)) (score : Bool) :
+    scoreGroupMass law score = EmpiricalCorrelationDefinedness.scoreMass law score := rfl
+
 /-- The joint mass of the score group `score` and a positive outcome. -/
 def scoreSuccessMass (law : FiniteReportLaw (Bool × Bool)) (score : Bool) : ℝ :=
   law.mass (score, true)
@@ -422,6 +441,173 @@ theorem rawLogLoss_penetranceLaw (θ : ℝ) (hlo : 0 ≤ θ) (hhi : θ < 1) :
           (f := fun cell ↦ ENNReal.ofReal ((penetranceLaw θ).mass cell) *
             logLossTerm (forecastOfOutcome cell))
           (fun cell _ ↦ zero_le _) (Finset.mem_univ _)
+
+/-- The raw log loss of a binary forecast is the corpus extended-real expected log loss of
+`LogLossSeriesCertificate` read at the raw forecast of the realized outcome. -/
+theorem rawLogLoss_eq_expectedLogLoss (law : FiniteReportLaw (Bool × Bool)) :
+    rawLogLoss law = LogLossSeriesCertificate.expectedLogLoss law forecastOfOutcome := by
+  unfold rawLogLoss LogLossSeriesCertificate.expectedLogLoss logLossTerm
+  refine Finset.sum_congr rfl fun cell _ ↦ ?_
+  by_cases hforecast : forecastOfOutcome cell ≤ 0
+  · rw [if_pos hforecast, if_neg (not_lt.mpr hforecast)]
+  · rw [if_neg hforecast, if_pos (not_le.mp hforecast)]
+
+/-- The log-loss contribution of a forecast truncated at `level`: the loss `min (-log r) level`,
+with a forecast that gives the realized outcome no probability contributing the full level. -/
+def truncatedLogLossTerm (level : ℕ) (forecast : ℝ) : ℝ :=
+  if forecast ≤ 0 then level else min (-Real.log forecast) level
+
+/-- The expected raw log loss truncated at `level`, a finite real number for every law. -/
+def truncatedRawLogLoss (level : ℕ) (law : FiniteReportLaw (Bool × Bool)) : ℝ :=
+  law.expectation fun cell ↦ truncatedLogLossTerm level (forecastOfOutcome cell)
+
+/-- The truncated losses increase with the truncation level. -/
+theorem truncatedLogLossTerm_mono (forecast : ℝ) :
+    Monotone fun level : ℕ ↦ truncatedLogLossTerm level forecast := by
+  intro first second hle
+  have hcast : (first : ℝ) ≤ second := by exact_mod_cast hle
+  show truncatedLogLossTerm first forecast ≤ truncatedLogLossTerm second forecast
+  unfold truncatedLogLossTerm
+  split_ifs
+  · exact hcast
+  · exact min_le_min_left _ hcast
+
+/-- The extended-real log-loss term is the supremum of its truncations: a ruled-out realized
+outcome is the supremum of the levels, and any other forecast is reached at a finite level. -/
+theorem logLossTerm_eq_iSup (forecast : ℝ) :
+    logLossTerm forecast =
+      ⨆ level : ℕ, ENNReal.ofReal (truncatedLogLossTerm level forecast) := by
+  unfold logLossTerm truncatedLogLossTerm
+  by_cases hforecast : forecast ≤ 0
+  · simp only [if_pos hforecast, ENNReal.ofReal_natCast]
+    exact ENNReal.iSup_natCast.symm
+  · simp only [if_neg hforecast]
+    refine le_antisymm ?_ (iSup_le fun level ↦ ENNReal.ofReal_le_ofReal (min_le_left _ _))
+    obtain ⟨level, hlevel⟩ := exists_nat_ge (-Real.log forecast)
+    exact le_iSup_of_le level (le_of_eq (by rw [min_eq_left hlevel]))
+
+/-- The truncated expected raw losses increase with the truncation level. -/
+theorem truncatedRawLogLoss_mono (law : FiniteReportLaw (Bool × Bool)) :
+    Monotone fun level : ℕ ↦ truncatedRawLogLoss level law := by
+  intro first second hle
+  simp only [truncatedRawLogLoss, FiniteReportLaw.expectation]
+  exact Finset.sum_le_sum fun cell _ ↦
+    mul_le_mul_of_nonneg_left (truncatedLogLossTerm_mono _ hle) (law.mass_nonneg cell)
+
+/-- NOTE2 section 9.1 with section 6.4: the expected raw log loss of every law is the monotone
+limit, in the extended nonnegative reals, of its truncated expected losses. -/
+theorem rawLogLoss_eq_iSup_truncatedRawLogLoss (law : FiniteReportLaw (Bool × Bool)) :
+    rawLogLoss law = ⨆ level : ℕ, ENNReal.ofReal (truncatedRawLogLoss level law) := by
+  have hnonneg : ∀ (level : ℕ) (cell : Bool × Bool),
+      0 ≤ truncatedLogLossTerm level (forecastOfOutcome cell) := by
+    rintro level ⟨score, outcome⟩
+    cases score <;> cases outcome <;> norm_num [truncatedLogLossTerm, forecastOfOutcome]
+  simp only [rawLogLoss, logLossTerm_eq_iSup, ENNReal.mul_iSup]
+  rw [ENNReal.finsetSum_iSup ?_]
+  · refine iSup_congr fun level ↦ ?_
+    simp only [truncatedRawLogLoss, FiniteReportLaw.expectation]
+    rw [ENNReal.ofReal_sum_of_nonneg fun cell _ ↦
+      mul_nonneg (law.mass_nonneg cell) (hnonneg level cell)]
+    exact Finset.sum_congr rfl fun cell _ ↦ (ENNReal.ofReal_mul (law.mass_nonneg cell)).symm
+  · intro first second
+    refine ⟨max first second, fun cell ↦ ⟨?_, ?_⟩⟩
+    · exact mul_le_mul_left' (ENNReal.ofReal_le_ofReal
+        (truncatedLogLossTerm_mono _ (le_max_left first second))) _
+    · exact mul_le_mul_left' (ENNReal.ofReal_le_ofReal
+        (truncatedLogLossTerm_mono _ (le_max_right first second))) _
+
+/-- NOTE2 section 9.1: at penetrance `θ` the truncated expected raw loss is the level times
+the mass of the outcome-free positive-score cell, the only cell the raw forecast rules out. -/
+theorem truncatedRawLogLoss_penetranceLaw (θ : ℝ) (hlo : 0 ≤ θ) (hhi : θ ≤ 1) (level : ℕ) :
+    truncatedRawLogLoss level (penetranceLaw θ) = (1 - θ) / 2 * level := by
+  have hone : truncatedLogLossTerm level 1 = 0 := by
+    rw [truncatedLogLossTerm, if_neg (by norm_num), Real.log_one, neg_zero]
+    exact min_eq_left (Nat.cast_nonneg level)
+  have hzero : truncatedLogLossTerm level 0 = level := by
+    rw [truncatedLogLossTerm, if_pos le_rfl]
+  rw [truncatedRawLogLoss, expectation_penetranceLaw θ hlo hhi]
+  simp only [forecastOfOutcome, hone, hzero]
+  ring
+
+/-- NOTE2 section 9.1 with section 6.4: for every penetrance below one the truncated expected
+raw losses increase without bound, and their monotone limit is the infinite raw log loss. -/
+theorem tendsto_truncatedRawLogLoss_penetranceLaw (θ : ℝ) (hlo : 0 ≤ θ) (hhi : θ < 1) :
+    Filter.Tendsto (fun level : ℕ ↦ truncatedRawLogLoss level (penetranceLaw θ))
+        Filter.atTop Filter.atTop ∧
+      ⨆ level : ℕ, ENNReal.ofReal (truncatedRawLogLoss level (penetranceLaw θ)) = ⊤ := by
+  refine ⟨?_, (rawLogLoss_eq_iSup_truncatedRawLogLoss _).symm.trans
+    (rawLogLoss_penetranceLaw θ hlo hhi)⟩
+  simp only [truncatedRawLogLoss_penetranceLaw θ hlo hhi.le]
+  exact tendsto_natCast_atTop_atTop.const_mul_atTop (by linarith)
+
+/-- The repaired forecast of NOTE2 section 9.1: the probability that the realized outcome rate
+of its own score group gives to the realized outcome. -/
+def repairedForecast (law : FiniteReportLaw (Bool × Bool)) : Bool × Bool → ℝ
+  | (score, true) => scoreSuccessMass law score / scoreGroupMass law score
+  | (score, false) => 1 - scoreSuccessMass law score / scoreGroupMass law score
+
+/-- NOTE2 section 9.1: the repaired log loss of every law is the corpus extended-real expected
+log loss of `LogLossSeriesCertificate` read at the repaired forecast. No outcome of positive
+mass is ruled out by its own group's realized rate, so the extended value is finite, and each
+score group contributes its mass times the binary entropy of its realized rate. -/
+theorem expectedLogLoss_repairedForecast (law : FiniteReportLaw (Bool × Bool)) :
+    LogLossSeriesCertificate.expectedLogLoss law (repairedForecast law) =
+      ENNReal.ofReal (repairedLogLoss law) := by
+  have hrate : ∀ score, 0 ≤ scoreSuccessMass law score / scoreGroupMass law score ∧
+      scoreSuccessMass law score / scoreGroupMass law score ≤ 1 := by
+    intro score
+    have hsuccess : 0 ≤ law.mass (score, true) := law.mass_nonneg _
+    have hfailure : 0 ≤ law.mass (score, false) := law.mass_nonneg _
+    simp only [scoreSuccessMass, scoreGroupMass]
+    exact ⟨div_nonneg hsuccess (by linarith), div_le_one_of_le₀ (by linarith) (by linarith)⟩
+  have hloss : ∀ cell : Bool × Bool, 0 ≤ -Real.log (repairedForecast law cell) := by
+    rintro ⟨score, outcome⟩
+    obtain ⟨hlow, hhigh⟩ := hrate score
+    refine neg_nonneg.mpr (Real.log_nonpos ?_ ?_) <;> cases outcome <;>
+      simp only [repairedForecast] <;> linarith
+  have hcell : ∀ cell : Bool × Bool,
+      ENNReal.ofReal (law.mass cell) *
+          (if 0 < repairedForecast law cell then
+            ENNReal.ofReal (-Real.log (repairedForecast law cell)) else ⊤) =
+        ENNReal.ofReal (law.mass cell * -Real.log (repairedForecast law cell)) := by
+    rintro ⟨score, outcome⟩
+    have hsuccess : 0 ≤ law.mass (score, true) := law.mass_nonneg _
+    have hfailure : 0 ≤ law.mass (score, false) := law.mass_nonneg _
+    rcases eq_or_lt_of_le (law.mass_nonneg (score, outcome)) with hzero | hmass
+    · simp [← hzero]
+    have hpos : 0 < repairedForecast law (score, outcome) := by
+      cases outcome
+      · simp only [repairedForecast, scoreSuccessMass, scoreGroupMass]
+        rw [sub_pos, div_lt_one (by linarith)]
+        linarith
+      · simp only [repairedForecast, scoreSuccessMass, scoreGroupMass]
+        exact div_pos hmass (by linarith)
+    rw [if_pos hpos, ← ENNReal.ofReal_mul (law.mass_nonneg _)]
+  unfold LogLossSeriesCertificate.expectedLogLoss
+  rw [Finset.sum_congr rfl fun cell _ ↦ hcell cell,
+    ← ENNReal.ofReal_sum_of_nonneg fun cell _ ↦ mul_nonneg (law.mass_nonneg cell) (hloss cell)]
+  congr 1
+  rw [repairedLogLoss, Fintype.sum_prod_type]
+  refine Finset.sum_congr rfl fun score _ ↦ ?_
+  have hsuccess : 0 ≤ law.mass (score, true) := law.mass_nonneg _
+  have hfailure : 0 ≤ law.mass (score, false) := law.mass_nonneg _
+  rw [Fintype.sum_bool]
+  simp only [repairedForecast, scoreSuccessMass, scoreGroupMass]
+  by_cases hgroup : law.mass (score, false) + law.mass (score, true) = 0
+  · have hs : law.mass (score, true) = 0 := by linarith
+    have hf : law.mass (score, false) = 0 := by linarith
+    simp [hs, hf]
+  set success := law.mass (score, true)
+  set failure := law.mass (score, false)
+  have hrecover : (failure + success) * (success / (failure + success)) = success :=
+    mul_div_cancel₀ success hgroup
+  have hcomplement : (failure + success) * (1 - success / (failure + success)) = failure := by
+    rw [mul_sub, mul_one, hrecover]
+    ring
+  rw [Real.binEntropy_eq_negMulLog_add_negMulLog_one_sub]
+  simp only [Real.negMulLog]
+  linear_combination Real.log (success / (failure + success)) * hrecover +
+    Real.log (1 - success / (failure + success)) * hcomplement
 
 /-- The four cell masses of the pooled individual law of NOTE2 section 9.1, obtained by
 averaging the conditional cells over a uniform penetrance. -/
@@ -753,6 +939,34 @@ theorem pooledPenetranceLaw_mass_eq_integral (cell : Bool × Bool) :
           ring)).trans (by rw [integral_unit_quadratic]; norm_num)
   cases score <;> cases outcome <;>
     simp only [pooledPenetranceLaw_mass, pooledMass, hnull, hzero, herror, hcase]
+
+/-- The conditional cell masses move continuously with the architecture parameter, as a map
+into the finite-dimensional space of cell mass vectors. -/
+theorem continuous_penetranceLaw_mass : Continuous fun θ : ℝ ↦ (penetranceLaw θ).mass := by
+  have hclamp : Continuous penetrance := by
+    show Continuous fun θ : ℝ ↦ max 0 (min 1 θ)
+    exact continuous_const.max (continuous_const.min continuous_id)
+  refine continuous_pi fun cell ↦ ?_
+  obtain ⟨score, outcome⟩ := cell
+  cases score <;> cases outcome <;> simp only [penetranceLaw_mass, penetranceMass]
+  · exact continuous_const
+  · exact continuous_const
+  · exact (continuous_const.sub hclamp).div_const 2
+  · exact hclamp.div_const 2
+
+/-- NOTE2 section 9.1: the pooled individual law is the interval integral of the conditional
+laws against the uniform architecture law, taken in the finite-dimensional space of cell mass
+vectors rather than cell by cell. -/
+theorem pooledPenetranceLaw_mass_eq_intervalIntegral :
+    pooledPenetranceLaw.mass = ∫ θ in (0:ℝ)..1, (penetranceLaw θ).mass := by
+  have hint : IntervalIntegrable (fun θ : ℝ ↦ (penetranceLaw θ).mass)
+      MeasureTheory.volume 0 1 :=
+    continuous_penetranceLaw_mass.intervalIntegrable 0 1
+  funext cell
+  rw [pooledPenetranceLaw_mass_eq_integral cell]
+  have hcomm := (ContinuousLinearMap.proj (R := ℝ) (φ := fun _ : Bool × Bool ↦ ℝ)
+    cell).intervalIntegral_comp_comm hint
+  simpa only [ContinuousLinearMap.proj_apply] using hcomm
 
 /-! ## The replica-domain reduction of the squared correlation -/
 

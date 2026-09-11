@@ -24,3 +24,12 @@ open Descent.Portability.LinearFundamentalMatrix
 #print axioms fundamentalMatrix_eq_integral
 #print axioms fundamentalMatrix_hasDerivWithinAt
 #print axioms norm_fundamentalMatrix_le
+#print axioms norm_matrixExponential_le
+#print axioms norm_fundamentalMatrix_step_sub_le
+#print axioms sampledProduct
+#print axioms norm_fundamentalMatrix_sub_sampledProduct_le
+#print axioms tendsto_sampledProduct
+#print axioms norm_picardIterate_sub_le
+#print axioms norm_fundamentalMatrix_sub_le
+#print axioms sampleTime
+#print axioms eventually_integral_norm_sample_sub_le

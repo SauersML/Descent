@@ -19,3 +19,4 @@ open Descent.Portability.MeiosisGameteLaw
 #print axioms independentMating_gametePool_mass
 #print axioms censusTransition_mass
 #print axioms censusTransition_sum_one
+#print axioms fairSwitch_eq_toReal_fairBinaryLaw

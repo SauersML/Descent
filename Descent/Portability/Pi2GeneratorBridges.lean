@@ -229,14 +229,7 @@ that moves the left-channel weight from the stored heterozygosity column onto th
 one. -/
 theorem mutationStage_sum_jointHeterozygosity {D : ℕ} (rates : ManyDemeLDRates D)
     (first second third fourth : Fin D) (state : DemeHaplotypeState D) :
-    (∑ deme : Fin D, stageRate rates (Stage.mutationLeft deme) *
-        stageVelocity
-          (enlargedStageExpansion (some (.inl (.pi2 first second third fourth))))
-          (Stage.mutationLeft deme) state) +
-      (∑ deme : Fin D, stageRate rates (Stage.mutationRight deme) *
-        stageVelocity
-          (enlargedStageExpansion (some (.inl (.pi2 first second third fourth))))
-          (Stage.mutationRight deme) state) =
+    mutationStageDrift rates (some (.inl (.pi2 first second third fourth))) state =
       lowOrderLDMutationCoupling rates (twoLocusJetMoment state)
           (.pi2 first second third fourth) +
         lowOrderLDRecurrentMutationDamping rates (twoLocusJetMoment state)
@@ -290,7 +283,7 @@ theorem mutationStage_sum_jointHeterozygosity {D : ℕ} (rates : ManyDemeLDRates
     rw [hvelocity]
     ring
   have hforcing : lowOrderLDMutationForcing rates (.pi2 first second third fourth) = 0 := rfl
-  rw [(Finset.sum_congr rfl fun deme _ ↦ hleft deme),
+  rw [mutationStageDrift, (Finset.sum_congr rfl fun deme _ ↦ hleft deme),
     (Finset.sum_congr rfl fun deme _ ↦ hright deme),
     rightHeterozygosityRedirect_sum_jointHeterozygosity rates first second third fourth
       (enlargedLowOrderLDFeature state), hforcing]
@@ -318,6 +311,7 @@ theorem stage_generator_jointHeterozygosity {D : ℕ} (rates : ManyDemeLDRates D
           (enlargedStageExpansion (some (.inl (.pi2 first second third fourth)))) stage
           state := by
   have hmutation := mutationStage_sum_jointHeterozygosity rates first second third fourth state
+  rw [mutationStageDrift] at hmutation
   have hstored : (fun coordinate ↦ enlargedLowOrderLDFeature state (some (.inl coordinate))) =
       twoLocusJetMoment state := rfl
   have hone : enlargedLowOrderLDFeature state (none : AffineEnlargedCoordinate D) = 1 := rfl

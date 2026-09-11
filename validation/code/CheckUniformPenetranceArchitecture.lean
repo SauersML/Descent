@@ -71,3 +71,15 @@ open Descent.Portability.UniformPenetranceArchitecture
 #print axioms ratio_eq_partial_add_remainder
 #print axioms ratio_mem_unitInterval
 #print axioms replica_certificate
+#print axioms penetranceMass_eq_thetaMass
+#print axioms scoreGroupMass_eq_scoreMass
+#print axioms continuous_penetranceLaw_mass
+#print axioms pooledPenetranceLaw_mass_eq_intervalIntegral
+#print axioms truncatedLogLossTerm_mono
+#print axioms logLossTerm_eq_iSup
+#print axioms truncatedRawLogLoss_mono
+#print axioms rawLogLoss_eq_iSup_truncatedRawLogLoss
+#print axioms truncatedRawLogLoss_penetranceLaw
+#print axioms tendsto_truncatedRawLogLoss_penetranceLaw
+#print axioms rawLogLoss_eq_expectedLogLoss
+#print axioms expectedLogLoss_repairedForecast

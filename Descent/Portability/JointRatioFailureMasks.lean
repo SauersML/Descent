@@ -37,7 +37,7 @@ equality, on an arbitrary point type for the algebra and a finite report law for
 probability statement. The exponent bookkeeping of a multi-index uses the NOTE's convention
 that a zero entry still contributes one power of its denominator. The portability query
 algebra of NOTE 2 equation (27), and the distinction among the four queries listed there, is
-not formalized here.
+formalized in `PortabilityRatioQueries`.
 
 ## Empirical status
 

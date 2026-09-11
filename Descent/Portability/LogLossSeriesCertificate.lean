@@ -36,7 +36,10 @@ replacing it.
 Scope: the forecast is a function from a finite outcome type to the reals with values in the
 unit interval, and no coherence between the forecast and the outcome law is assumed, so these
 statements cover miscalibrated forecasts. The repaired logarithmic loss of NOTE 2 section 9.1,
-which replaces the raw score by a population-level quantity, is not formalized here.
+which replaces the raw score by a population-level quantity, is formalized in
+`UniformPenetranceArchitecture`, where `expectedLogLoss_repairedForecast` identifies it with
+`expectedLogLoss` read at the forecast that repairs each score group to its realized rate;
+`rawLogLoss_eq_expectedLogLoss` does the same for the raw binary score.
 
 ## Empirical status
 

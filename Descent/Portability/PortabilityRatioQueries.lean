@@ -32,7 +32,7 @@ decision procedure on the reals.
 
 Scope. The accumulators are arbitrary supplied functions on a finite report space; no claim is
 made that any particular metric has this shape. NOTE2 (24)-(26), the joint failure masks, are
-not formalized here.
+formalized in `JointRatioFailureMasks`.
 
 ## Empirical status
 

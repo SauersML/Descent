@@ -808,6 +808,17 @@ private theorem abs_two_linkage_le_half (frequency : TwoLocusHaplotypeFrequencie
   rw [abs_le] at hquarter ⊢
   constructor <;> linarith [hquarter.1, hquarter.2]
 
+/-- Uniform bound on the mutation damping velocity of the linkage determinant of any deme: the
+velocity is `-2 D` in the mutating deme and zero in every other deme. -/
+private theorem abs_mutationLinkageVelocity_le_half {D : ℕ} (state : DemeHaplotypeState D)
+    (target index : Fin D) :
+    |(if index = target then (-2) * (state target).linkage else 0)| ≤ 1 / 2 := by
+  by_cases hindex : index = target
+  · rw [if_pos hindex]
+    exact abs_two_linkage_le_half (state target)
+  · rw [if_neg hindex, abs_zero]
+    norm_num
+
 /-- Uniform bound on the recombination velocity of the linkage determinant. -/
 private theorem abs_recombinationLinkageVelocity_le_quarter
     (frequency : TwoLocusHaplotypeFrequencies) :
@@ -818,8 +829,7 @@ private theorem abs_recombinationLinkageVelocity_le_quarter
 
 /-- The left marginal of any deme is fixed by a recombination pulse. -/
 def recombinationLeftExpansion {D : ℕ} (target index : Fin D) :
-    PulseExpansion (recombinationPulseAt target)
-      (fun state ↦ (state index).leftFrequency) where
+    PulseExpansion (recombinationPulseAt target) (fun state ↦ (state index).leftFrequency) where
   velocity _ := 0
   valueBound := 1
   velocityBound := 0
@@ -832,8 +842,7 @@ def recombinationLeftExpansion {D : ℕ} (target index : Fin D) :
 
 /-- The right marginal of any deme is fixed by a recombination pulse. -/
 def recombinationRightExpansion {D : ℕ} (target index : Fin D) :
-    PulseExpansion (recombinationPulseAt target)
-      (fun state ↦ (state index).rightFrequency) where
+    PulseExpansion (recombinationPulseAt target) (fun state ↦ (state index).rightFrequency) where
   velocity _ := 0
   valueBound := 1
   velocityBound := 0
@@ -890,8 +899,7 @@ def leftMutationLeftExpansion {D : ℕ} (target index : Fin D) :
 
 /-- The right marginal is fixed by a left-locus mutation pulse. -/
 def leftMutationRightExpansion {D : ℕ} (target index : Fin D) :
-    PulseExpansion (leftMutationPulseAt target)
-      (fun state ↦ (state index).rightFrequency) where
+    PulseExpansion (leftMutationPulseAt target) (fun state ↦ (state index).rightFrequency) where
   velocity _ := 0
   valueBound := 1
   velocityBound := 0
@@ -910,12 +918,7 @@ def leftMutationLinkageExpansion {D : ℕ} (target index : Fin D) :
   velocityBound := 1 / 2
   remainder := 0
   value_abs_le state := (state index).linkage_abs_le_quarter
-  velocity_abs_le state := by
-    by_cases hindex : index = target
-    · rw [if_pos hindex]
-      exact abs_two_linkage_le_half (state target)
-    · rw [if_neg hindex, abs_zero]
-      norm_num
+  velocity_abs_le state := abs_mutationLinkageVelocity_le_half state target index
   expansion tau h0 h1 state := by
     rw [leftMutationPulseAt_linkage target index h0 h1 state]
     exact abs_affine_residual_le _ _ _ (by norm_num)
@@ -929,8 +932,7 @@ def leftMutationCoordinateExpansion {D : ℕ} (target : Fin D) :
 
 /-- The left marginal is fixed by a right-locus mutation pulse. -/
 def rightMutationLeftExpansion {D : ℕ} (target index : Fin D) :
-    PulseExpansion (rightMutationPulseAt target)
-      (fun state ↦ (state index).leftFrequency) where
+    PulseExpansion (rightMutationPulseAt target) (fun state ↦ (state index).leftFrequency) where
   velocity _ := 0
   valueBound := 1
   velocityBound := 0
@@ -968,12 +970,7 @@ def rightMutationLinkageExpansion {D : ℕ} (target index : Fin D) :
   velocityBound := 1 / 2
   remainder := 0
   value_abs_le state := (state index).linkage_abs_le_quarter
-  velocity_abs_le state := by
-    by_cases hindex : index = target
-    · rw [if_pos hindex]
-      exact abs_two_linkage_le_half (state target)
-    · rw [if_neg hindex, abs_zero]
-      norm_num
+  velocity_abs_le state := abs_mutationLinkageVelocity_le_half state target index
   expansion tau h0 h1 state := by
     rw [rightMutationPulseAt_linkage target index h0 h1 state]
     exact abs_affine_residual_le _ _ _ (by norm_num)

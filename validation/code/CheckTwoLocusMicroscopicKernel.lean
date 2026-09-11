@@ -56,3 +56,6 @@ open Descent.Portability.TwoLocusMicroscopicKernel
 #print axioms rightMutationDzObservable_velocity
 #print axioms mutationStage_sum_dzObservable
 #print axioms stage_generator_dzObservable
+#print axioms migrationStage_sum_eq_rateWeighted
+#print axioms mutationStageDrift
+#print axioms enlargedGenerator_mulVec_stored_of_coupling_zero

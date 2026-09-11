@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.FiniteGeneticTransition
 import Descent.Portability.FiniteReproductiveKernel
+import Descent.Portability.RationalReportClosure
 
 assert_below Descent.Decision Descent.Program
 
@@ -92,6 +93,15 @@ def fairSwitch : FiniteReportLaw Bool where
   mass := fun _ ↦ 1 / 2
   mass_nonneg := fun _ ↦ by norm_num
   mass_sum := by norm_num [Fintype.sum_bool]
+
+/-- The fair switch is the real carrier of the corpus rational law
+`RationalReportClosure.fairBinaryLaw`: the elementary meiosis randomization is exactly
+representable in rational arithmetic. -/
+theorem fairSwitch_eq_toReal_fairBinaryLaw :
+    fairSwitch = RationalReportClosure.RationalReportLaw.fairBinaryLaw.toReal := by
+  refine FiniteReportLaw.ext fun outcome ↦ ?_
+  show (1 / 2 : ℝ) = ((1 / 2 : ℚ) : ℝ)
+  norm_num
 
 /-- The fair independent-switch mask law: every locus decides independently which parental
 strand it transmits, with no bias and no linkage between loci. -/
