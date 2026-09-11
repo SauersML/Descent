@@ -21,6 +21,7 @@ import Descent.Portability.FourthMomentDuality
 import Descent.Portability.GlobalFourthMomentRegion
 import Descent.Portability.FourthMomentMinimizer
 import Descent.Portability.FourthMomentAttainableRange
+import Descent.Portability.FourthMomentStrongDuality
 import Descent.Portability.ScoreMomentZonoid
 import Descent.Portability.SymmetricScoreFourthMoment
 import Descent.Portability.LossExplainabilityRegion
@@ -36,6 +37,8 @@ import Descent.Portability.MarginalSupportBound
 import Descent.Portability.UniversalReportMonotonicity
 import Descent.Portability.TurnoverCouplingPolytope
 import Descent.Portability.TurnoverTrajectoryRegion
+import Descent.Portability.CouplingPolytopeExtrema
+import Descent.Portability.ContinuousTrajectoryRegion
 import Descent.Portability.ConvexOrderCoupling
 import Descent.Portability.ContinuousTurnoverSemigroup
 import Descent.Portability.TurnoverArchitectureMetrics
@@ -43,6 +46,8 @@ import Descent.Portability.BinomialAggregateEnvelope
 import Descent.Portability.TurnoverQuadraticVariation
 import Descent.Portability.TurnoverExtremalCouplings
 import Descent.Portability.NonanticipationCost
+import Descent.Portability.NearestDriftConfigurationCoupling
+import Descent.Portability.OddLocusReportSolutions
 import Descent.Portability.ChannelComparison
 import Descent.Portability.ThresholdLawRegion
 import Descent.Portability.NonaffineRepair
@@ -57,6 +62,7 @@ import Descent.Portability.JointReportFeasibility
 import Descent.Portability.FourthOrderLossObstruction
 import Descent.Portability.ApproximationDuality
 import Descent.Portability.RadialInterpolation
+import Descent.Portability.RadialReportLaws
 import Descent.Portability.IndependentRadialLaws
 import Descent.Portability.MomentOrderObstruction
 import Descent.Portability.DenominatorAwareRecovery
@@ -131,21 +137,25 @@ form, the scope line says so and the module docstring repeats it.
   Gaussian interval ceiling, its attainment, and a non-Gaussian law with explainability one.
   `LossPredictorSynergy`: TQ Proposition 2.8, comparable-predictor and synergy constructions.
 * `FourthMomentDuality`, `GlobalFourthMomentRegion`, `FourthMomentMinimizer`,
-  `FourthMomentAttainableRange`, `ScoreMomentZonoid`, `SymmetricScoreFourthMoment`,
-  `LossExplainabilityRegion`: UPT Theorem 3.1 (feasibility of prescribed mean, cross-moments
-  and second moment both ways; the minimal residual fourth moment; weak duality for every law
-  and multiplier; no duality gap at every certified point, which covers the whole equality
-  face and the water-filling solved case; the conditional two-point minimizer; attainment of
-  the minimum for finitely supported laws; every fourth moment in the half-line attained
-  strictly inside the region; the singleton on the equality face), Theorem 3.2 with both
-  forms of its criterion proved equivalent by separating the compact convex score zonoid,
-  Corollaries 3.3 and 3.4 as exact closed forms with attaining laws and matching dual values,
-  and Theorem 3.5, the sharp loss-explainability region on the variance of an actual
-  multi-cell law with the manuscript's example.
-  Scope: strong duality is proved at every certified multiplier and, for finitely supported
-  feature laws, strictly inside the region; attainment for laws that are not finitely
-  supported is not formalized; three boundary statements hold in mean square in general and
-  pointwise for finite support.
+  `FourthMomentAttainableRange`, `FourthMomentStrongDuality`, `ScoreMomentZonoid`,
+  `SymmetricScoreFourthMoment`, `LossExplainabilityRegion`: UPT Theorem 3.1 (feasibility of
+  prescribed mean, cross-moments and second moment both ways; the minimal residual fourth
+  moment; the quartic maximum (3.9) attained at the root of the manuscript's cubic; weak
+  duality for every law and multiplier; no duality gap at every certified point, and for a
+  finitely supported feature law at every triple strictly inside the region the dual
+  supremum equals the primal minimum and is attained by explicit multipliers, (3.8), by
+  separating the value point from the attainable moment set with the Slater point removing
+  the degenerate coefficient; the
+  conditional two-point minimizer; attainment of the minimum for finitely supported laws;
+  every fourth moment in the half-line attained strictly inside the region; the singleton on
+  the equality face), Theorem 3.2 with both forms of its criterion proved equivalent by
+  separating the compact convex score zonoid, Corollaries 3.3 and 3.4 as exact closed forms
+  with attaining laws and matching dual values, and Theorem 3.5, the sharp
+  loss-explainability region on the variance of an actual multi-cell law with the
+  manuscript's example.
+  Scope: attainment of the minimum and strong duality are proved for finitely supported
+  feature laws (the manuscript's weak compactness in L⁴ × L² is not formalized); three
+  boundary statements hold in mean square in general and pointwise for finite support.
 
 ### Question 2: architecture statics
 
@@ -186,11 +196,15 @@ form, the scope line says so and the module docstring repeats it.
   coadapted path laws are exactly the stated polytope, nonempty and convex, every intermediate
   report value attained. `TurnoverTrajectoryRegion`: UPT Theorem 5.4, the two-locus
   trajectory law necessary for every coadapted process and sufficient by an explicit flip
-  coupling, with the terminal range in both directions.
-  Scope: existence of extremal path laws in the finite-horizon polytope and the
-  continuous-time trajectory law (5.10) are stated in discrete form; all loci share one state
-  alphabet; the continuous-time half of UPT 5.1 takes the transition semigroup through its
-  defining properties, witnessed by the two-state flip semigroup.
+  coupling, with the terminal range in both directions. `CouplingPolytopeExtrema`: the
+  extremal coadapted path laws exist at every finite horizon (truncation to the horizon and
+  a Tychonoff product of unit intervals), so the attainable report set is exactly a closed
+  interval. `ContinuousTrajectoryRegion`: UPT (5.10) at the level of agreement paths, every
+  admissible path trapped in [e^{−2λt}, 1] and every value attained by an explicit path.
+  Scope: (5.10) is proved for differentiable paths and about paths rather than the
+  continuous-time couplings that generate them; all loci share one state alphabet; the
+  continuous-time half of UPT 5.1 takes the transition semigroup through its defining
+  properties, witnessed by the two-state flip semigroup.
 
 ### Question 2: the dynamic theorem
 
@@ -200,8 +214,12 @@ form, the scope line says so and the module docstring repeats it.
   rate-preserving, history-dependent couplings.
 * `ContinuousTurnoverSemigroup`: the same theorem in continuous time for Markov generators,
   through the nearest-drift generator as a matrix on the count grid, DC Lemma 3.4's
-  minimality, and an Euler-limit bridge to the matrix exponential; the history-dependent case
-  stays in the discrete skeleton, which is complementary.
+  minimality, and an Euler-limit bridge to the matrix exponential; generator eigenvectors
+  pass to the semigroup, every falling factorial is an eigenvector of the pure-death
+  generator, and DC Corollary 3.5 holds as an identity of laws: the semigroup row from the
+  top state is exactly the binomial law at p = e^{−γt}, with the sharp lower endpoint
+  (1−2/n)p² + (2/n)p as its squared-count value; the history-dependent case stays in the
+  discrete skeleton, which is complementary.
 * `TurnoverArchitectureMetrics`: PL Theorem 5.1 / DC Theorem 4.1, the three exact report laws
   of one realized sign architecture on the corpus's own `DeploymentPopulation` metrics, DC
   (4.2)-(4.3), Proposition 4.6 and Theorem 4.5. `BinomialAggregateEnvelope`: DC Corollary
@@ -211,9 +229,19 @@ form, the scope line says so and the module docstring repeats it.
   Theorem 4.4 / PL Theorem 5.2 with both bounds of PL (5.6) attained by exhibited couplings,
   the symmetric count generator in closed form, and DC Theorem 5.1 with Corollary 5.2, the
   exact positive cost of nonanticipation.
-  Scope: the ODE solutions of DC Corollary 4.3 and the Duhamel form of DC (4.8) are stated
-  through their generators; DC Lemma 3.2's configuration-level coupling is replaced by
-  attainment at the aggregate-law level.
+* `NearestDriftConfigurationCoupling`: DC Lemma 3.2 at the configuration level, the
+  pair-and-singleton nearest-drift kernel on sign vectors written as an explicit sum of Dirac
+  rows, admissible with each coordinate's prescribed flip probability, whose count process is
+  exactly the nearest-drift chain at every horizon, so the envelope's lower endpoint is the
+  attained value of an actual joint sign process.
+* `OddLocusReportSolutions`: DC Corollary 4.3 — the odd-locus backward system (4.6) has the
+  explicit exponential-sum solution, verified clause by clause, unique by an integrating
+  factor level by level, with a₃ and a₅ evaluated exactly, and the same values obtained as
+  the odd-level generator's semigroup applied to the initial square report through the Euler
+  limit.
+  Scope: the Duhamel form of DC (4.8) is stated through its generator; the identification of
+  the odd-level generator with the lumping of the minimizing count chain is stated in the
+  module's own terms.
 
 ### Question 3: metric dependence
 
@@ -225,8 +253,11 @@ form, the scope line says so and the module docstring repeats it.
   score law and prevalence are exactly the submeasures of the score law with the right mass;
   UPT (6.5); TQ Theorem 4.5 / UPT (6.8) / PL (4.4), the sharp fixed-score confusion fiber
   with every value attained and realized as a thresholded score; UPT Corollary 6.3 in its
-  finite-grid form and in its continuous form on the line (a curve comes from a submeasure
-  exactly when it is the lower-tail integral of a measurable density bounded by one).
+  finite-grid form and in its continuous form on the line, stated both against a density (a
+  curve comes from a submeasure of the score law with the right mass exactly when it is the
+  lower-tail integral of a measurable conditional risk bounded by one) and against an actual
+  joint law of score and outcome assembled by the continuous Bernoulli construction, with
+  the (6.6) increment bounds, endpoints and a uniform-rank-law witness.
 * `NonaffineRepair`: TQ Proposition 4.2, over all functions of the score the least MSE is
   the mean conditional variance, attained by the conditional mean, with a strict three-point
   witness against every affine recalibration. `MetricOrderingClassification` and
@@ -236,8 +267,7 @@ form, the scope line says so and the module docstring repeats it.
   of the manuscript's ellipsoid, with the projection constructed by finite Gram-Schmidt),
   Corollaries 5.3 and 5.4, and all of Proposition 5.1 as derivatives at zero along
   information-preserving paths that remain positive laws.
-  Scope: in the continuous case of Corollary 6.3 the joint law on the product with the
-  outcome is assembled only in the finite case.
+  Nothing in this package is proved in a narrower form than the manuscript states.
 
 ### The reporting layer: the paper's cohort procedures
 
@@ -266,20 +296,24 @@ form, the scope line says so and the module docstring repeats it.
 * `ApproximationDuality`: PL Theorem 8.1, the largest report disagreement compatible with the
   supplied moments is exactly twice the best uniform approximation error, with the extremal
   moment-matched pair built by separation and both optimal-recovery halves.
-* `RadialInterpolation`, `IndependentRadialLaws`: PL Lemma 7.1, Theorem 7.2 with (7.4),
-  Corollaries 7.3 (expectation form) and 7.5, and Theorem 7.4's independent finite-support
-  core: for every finite raw-moment order, matched laws whose expected scale-invariant report
-  sits arbitrarily close to opposite ends of its range.
+* `RadialInterpolation`, `RadialReportLaws`, `IndependentRadialLaws`: PL Lemma 7.1,
+  Theorem 7.2 with (7.4), Corollary 7.3 in both its expectation form and its
+  total-variation form ((7.6): each direction marginal is within b/(a+b) of its target in
+  `FiniteReportLaw.totalVariation`, hence so is every report law), Corollary 7.5, and Theorem
+  7.4's independent finite-support core: for every finite raw-moment order, matched laws
+  whose expected scale-invariant report sits arbitrarily close to opposite ends of its range.
 * `MomentOrderObstruction`: DC Lemmas 8.1-8.2 and Theorems 8.3-8.4, no finite joint-moment
   order identifies expected partial R² or expected fitted loss-explainability, with the exact
-  instances 27/1768 and −24900075/1099632872 and the every-order halves proved through the
-  radial construction without analyticity.
+  instances 27/1768 and −24900075/1099632872; Lemma 8.2 is proved in a stronger form than
+  the manuscript's (a bounded nonconstant report has a nonzero forward difference at every
+  order, by a step-doubling identity with no analyticity or calculus), so the every-order
+  halves carry two independent proofs, the finite-difference one and the radial one.
 * `DenominatorAwareRecovery`: PL Theorem 9.1, Chebyshev recovery with its closed-form error
   level. `ConditionalOscillationDuality`: PL Theorem 8.2 and Corollary 8.3 as one duality
   theorem in the noise level.
-  Scope: the absolutely-continuous refinement of PL 7.4, the analyticity-to-finite-difference
-  step of DC Lemma 8.2 (nothing downstream depends on it) and the total-variation form of
-  PL Corollary 7.3 are not formalized.
+  Scope: the absolutely-continuous refinement of PL 7.4 (convolution with a uniform law,
+  the null zero set of a nonzero polynomial, and the Fubini step) is not formalized; its
+  independent finite-support core is.
 
 ### The pipeline: finite report laws, regions and identification
 
