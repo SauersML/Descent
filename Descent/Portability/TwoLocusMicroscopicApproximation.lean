@@ -96,7 +96,8 @@ theorem enlargedLowOrderLDGenerator_zeroDeme (rates : ManyDemeLDRates 0) :
   intro row column
   rcases row with _ | (coordinate | pair)
   · rfl
-  · rcases coordinate with ⟨first, _⟩ | ⟨first, _⟩ | ⟨first, _, _⟩ | ⟨first, _, _, _⟩ <;>
+  · rcases coordinate with
+      ⟨first, _⟩ | ⟨first, _⟩ | ⟨first, _, _⟩ | ⟨first, _, _, _⟩ <;>
       exact first.elim0
   · exact pair.1.elim0
 
