@@ -409,6 +409,265 @@ def locusExchangeableRealizationOfEnlargedFeature {D : ℕ} {sampleSpace : Type}
     have hentry := hfeature (some (.inr (first, second)))
     simpa only [embedLowOrderLDState, storedSource, enlargedLowOrderLDFeature] using hentry
 
+/-! ## Matrix application in generator-row form -/
+
+/-- The drift row is additive in the moment vector. -/
+private theorem drift_add {D : ℕ} (rates : ManyDemeLDRates D)
+    (first second : LowOrderLDCoordinate D → ℝ) (row : LowOrderLDCoordinate D) :
+    lowOrderLDDrift rates (first + second) row =
+      lowOrderLDDrift rates first row + lowOrderLDDrift rates second row := by
+  cases row <;> simp only [lowOrderLDDrift, Pi.add_apply] <;> split_ifs <;> ring
+
+/-- The drift row is homogeneous in the moment vector. -/
+private theorem drift_smul {D : ℕ} (rates : ManyDemeLDRates D) (scalar : ℝ)
+    (moment : LowOrderLDCoordinate D → ℝ) (row : LowOrderLDCoordinate D) :
+    lowOrderLDDrift rates (scalar • moment) row =
+      scalar * lowOrderLDDrift rates moment row := by
+  cases row <;> simp only [lowOrderLDDrift, Pi.smul_apply, smul_eq_mul] <;>
+    split_ifs <;> ring
+
+/-- The migration row is additive in the moment vector. -/
+private theorem migration_add {D : ℕ} (rates : ManyDemeLDRates D)
+    (first second : LowOrderLDCoordinate D → ℝ) (row : LowOrderLDCoordinate D) :
+    lowOrderLDMigration rates (first + second) row =
+      lowOrderLDMigration rates first row + lowOrderLDMigration rates second row := by
+  cases row <;>
+    simp only [lowOrderLDMigration, Pi.add_apply, mul_add, mul_sub, add_div, sub_div,
+      mul_div_assoc, Finset.sum_add_distrib, Finset.sum_sub_distrib] <;> ring
+
+/-- The migration row is homogeneous in the moment vector. -/
+private theorem migration_smul {D : ℕ} (rates : ManyDemeLDRates D) (scalar : ℝ)
+    (moment : LowOrderLDCoordinate D → ℝ) (row : LowOrderLDCoordinate D) :
+    lowOrderLDMigration rates (scalar • moment) row =
+      scalar * lowOrderLDMigration rates moment row := by
+  cases row <;>
+    simp only [lowOrderLDMigration, Pi.smul_apply, smul_eq_mul, mul_add, mul_sub, add_div,
+      sub_div, mul_div_assoc, Finset.mul_sum, Finset.sum_add_distrib,
+      Finset.sum_sub_distrib, mul_comm, mul_left_comm, mul_assoc] <;> ring
+
+/-- The recombination row is additive in the moment vector. -/
+private theorem recombination_add {D : ℕ} (rates : ManyDemeLDRates D)
+    (first second : LowOrderLDCoordinate D → ℝ) (row : LowOrderLDCoordinate D) :
+    lowOrderLDRecombination rates (first + second) row =
+      lowOrderLDRecombination rates first row + lowOrderLDRecombination rates second row := by
+  cases row <;> simp only [lowOrderLDRecombination, Pi.add_apply] <;> ring
+
+/-- The recombination row is homogeneous in the moment vector. -/
+private theorem recombination_smul {D : ℕ} (rates : ManyDemeLDRates D) (scalar : ℝ)
+    (moment : LowOrderLDCoordinate D → ℝ) (row : LowOrderLDCoordinate D) :
+    lowOrderLDRecombination rates (scalar • moment) row =
+      scalar * lowOrderLDRecombination rates moment row := by
+  cases row <;> simp only [lowOrderLDRecombination, Pi.smul_apply, smul_eq_mul] <;> ring
+
+/-- The mutation coupling row is additive in the moment vector. -/
+private theorem coupling_add {D : ℕ} (rates : ManyDemeLDRates D)
+    (first second : LowOrderLDCoordinate D → ℝ) (row : LowOrderLDCoordinate D) :
+    lowOrderLDMutationCoupling rates (first + second) row =
+      lowOrderLDMutationCoupling rates first row +
+        lowOrderLDMutationCoupling rates second row := by
+  cases row <;> simp only [lowOrderLDMutationCoupling, Pi.add_apply] <;> ring
+
+/-- The mutation coupling row is homogeneous in the moment vector. -/
+private theorem coupling_smul {D : ℕ} (rates : ManyDemeLDRates D) (scalar : ℝ)
+    (moment : LowOrderLDCoordinate D → ℝ) (row : LowOrderLDCoordinate D) :
+    lowOrderLDMutationCoupling rates (scalar • moment) row =
+      scalar * lowOrderLDMutationCoupling rates moment row := by
+  cases row <;> simp only [lowOrderLDMutationCoupling, Pi.smul_apply, smul_eq_mul] <;> ring
+
+/-- The recurrent mutation damping row is additive in the moment vector. -/
+private theorem damping_add {D : ℕ} (rates : ManyDemeLDRates D)
+    (first second : LowOrderLDCoordinate D → ℝ) (row : LowOrderLDCoordinate D) :
+    lowOrderLDRecurrentMutationDamping rates (first + second) row =
+      lowOrderLDRecurrentMutationDamping rates first row +
+        lowOrderLDRecurrentMutationDamping rates second row := by
+  cases row <;> simp only [lowOrderLDRecurrentMutationDamping, Pi.add_apply] <;> ring
+
+/-- The recurrent mutation damping row is homogeneous in the moment vector. -/
+private theorem damping_smul {D : ℕ} (rates : ManyDemeLDRates D) (scalar : ℝ)
+    (moment : LowOrderLDCoordinate D → ℝ) (row : LowOrderLDCoordinate D) :
+    lowOrderLDRecurrentMutationDamping rates (scalar • moment) row =
+      scalar * lowOrderLDRecurrentMutationDamping rates moment row := by
+  cases row <;>
+    simp only [lowOrderLDRecurrentMutationDamping, Pi.smul_apply, smul_eq_mul] <;> ring
+
+/-- The homogeneous low-order generator as a linear map of the moment vector.  Linearity is
+what lets the corpus's basis-column matrix be applied to a whole moment vector. -/
+def lowOrderLDGeneratorMap {D : ℕ} (rates : ManyDemeLDRates D) :
+    (LowOrderLDCoordinate D → ℝ) →ₗ[ℝ] (LowOrderLDCoordinate D → ℝ) where
+  toFun := lowOrderLDHomogeneousGenerator rates
+  map_add' first second := by
+    funext row
+    simp only [lowOrderLDHomogeneousGenerator, Pi.add_apply]
+    rw [drift_add, migration_add, recombination_add, coupling_add, damping_add]
+    ring
+  map_smul' scalar moment := by
+    funext row
+    simp only [lowOrderLDHomogeneousGenerator, Pi.smul_apply, smul_eq_mul, RingHom.id_apply]
+    rw [drift_smul, migration_smul, recombination_smul, coupling_smul, damping_smul]
+    ring
+
+/-- The linear map is the corpus generator. -/
+theorem lowOrderLDGeneratorMap_apply {D : ℕ} (rates : ManyDemeLDRates D)
+    (moment : LowOrderLDCoordinate D → ℝ) :
+    lowOrderLDGeneratorMap rates moment = lowOrderLDHomogeneousGenerator rates moment := rfl
+
+/-- Every moment vector is the basis expansion of its own coordinates. -/
+theorem moment_eq_sum_basis {D : ℕ} (moment : LowOrderLDCoordinate D → ℝ) :
+    moment = ∑ column : LowOrderLDCoordinate D, moment column • lowOrderLDBasis column := by
+  classical
+  funext coordinate
+  rw [Finset.sum_apply]
+  simp only [Pi.smul_apply, smul_eq_mul, lowOrderLDBasis]
+  rw [Finset.sum_eq_single coordinate]
+  · rw [if_pos rfl, mul_one]
+  · intro other _ hother
+    rw [if_neg (Ne.symm hother), mul_zero]
+  · intro hmember
+    exact absurd (Finset.mem_univ coordinate) hmember
+
+/-- The corpus generator applied to a moment vector is the basis-column expansion that the
+augmented matrix stores. -/
+theorem homogeneousGenerator_sum_basis {D : ℕ} (rates : ManyDemeLDRates D)
+    (moment : LowOrderLDCoordinate D → ℝ) (row : LowOrderLDCoordinate D) :
+    ∑ column : LowOrderLDCoordinate D,
+        lowOrderLDHomogeneousGenerator rates (lowOrderLDBasis column) row * moment column =
+      lowOrderLDHomogeneousGenerator rates moment row := by
+  have hmap : lowOrderLDGeneratorMap rates moment =
+      ∑ column : LowOrderLDCoordinate D,
+        moment column • lowOrderLDGeneratorMap rates (lowOrderLDBasis column) := by
+    conv_lhs => rw [moment_eq_sum_basis moment]
+    rw [map_sum]
+    exact Finset.sum_congr rfl fun column _ ↦ map_smul _ _ _
+  have happly := congrFun hmap row
+  rw [Finset.sum_apply] at happly
+  simp only [Pi.smul_apply, smul_eq_mul, lowOrderLDGeneratorMap_apply] at happly
+  rw [happly]
+  exact Finset.sum_congr rfl fun column _ ↦ by ring
+
+/-- **Matrix application of the corpus generator is its generator row.**  The constant column
+carries the mutation forcing and the stored columns carry the homogeneous rows. -/
+theorem augmentedGenerator_mulVec {D : ℕ} (rates : ManyDemeLDRates D)
+    (state : AffineLowOrderLDCoordinate D → ℝ) (row : LowOrderLDCoordinate D) :
+    (augmentedLowOrderLDGenerator rates).mulVec state (some row) =
+      lowOrderLDHomogeneousGenerator rates (fun coordinate ↦ state (some coordinate)) row +
+        lowOrderLDMutationForcing rates row * state none := by
+  rw [affine_mulVec_split]
+  have hentry : ∀ coordinate : LowOrderLDCoordinate D,
+      augmentedLowOrderLDGenerator rates (some row) (some coordinate) =
+        lowOrderLDHomogeneousGenerator rates (lowOrderLDBasis coordinate) row :=
+    fun _ ↦ rfl
+  have hconstant : augmentedLowOrderLDGenerator rates (some row) none =
+      lowOrderLDMutationForcing rates row := rfl
+  simp only [hentry, hconstant]
+  rw [homogeneousGenerator_sum_basis]
+  ring
+
+/-- The right-locus heterozygosity block of an enlarged vector, read as a stored moment
+vector supported on the `H` coordinates. -/
+def rightHeterozygosityMoment {D : ℕ} (vector : AffineEnlargedCoordinate D → ℝ) :
+    LowOrderLDCoordinate D → ℝ
+  | .H first second => vector (some (.inr (first, second)))
+  | _ => 0
+
+/-- **The enlarged generator on a stored row.**  It is the corpus row of the stored block
+plus the mutation forcing, corrected by the amount the `pi2` mutation channel now reads off
+the right-locus heterozygosity instead of the stored one. -/
+theorem enlargedGenerator_mulVec_stored {D : ℕ} (rates : ManyDemeLDRates D)
+    (vector : AffineEnlargedCoordinate D → ℝ) (row : LowOrderLDCoordinate D) :
+    (enlargedLowOrderLDGenerator rates).mulVec vector (some (.inl row)) =
+      lowOrderLDHomogeneousGenerator rates
+          (fun coordinate ↦ vector (some (.inl coordinate))) row +
+        lowOrderLDMutationForcing rates row * vector none +
+        ∑ pair : Fin D × Fin D,
+          rightHeterozygosityMutationCoupling rates row pair.1 pair.2 *
+            (vector (some (.inr pair)) -
+              vector (some (.inl (.H pair.1 pair.2)))) := by
+  classical
+  rw [enlarged_mulVec_split]
+  have hentry : ∀ coordinate : LowOrderLDCoordinate D,
+      enlargedLowOrderLDGenerator rates (some (.inl row)) (some (.inl coordinate)) =
+        lowOrderLDHomogeneousGenerator rates (lowOrderLDBasis coordinate) row -
+          storedHeterozygosityMutationCoupling rates row coordinate := fun _ ↦ rfl
+  have hconstant : enlargedLowOrderLDGenerator rates (some (.inl row)) none =
+      lowOrderLDMutationForcing rates row := rfl
+  have hpair : ∀ pair : Fin D × Fin D,
+      enlargedLowOrderLDGenerator rates (some (.inl row)) (some (.inr pair)) =
+        rightHeterozygosityMutationCoupling rates row pair.1 pair.2 := fun _ ↦ rfl
+  have hcoupling : ∑ coordinate : LowOrderLDCoordinate D,
+      storedHeterozygosityMutationCoupling rates row coordinate *
+        vector (some (.inl coordinate)) =
+      ∑ pair : Fin D × Fin D,
+        rightHeterozygosityMutationCoupling rates row pair.1 pair.2 *
+          vector (some (.inl (.H pair.1 pair.2))) := by
+    refine sum_heterozygosity_columns _ ?_
+    intro coordinate hcoordinate
+    rcases coordinate with ⟨k, l⟩ | ⟨k, l⟩ | ⟨k, l, m⟩ | ⟨k, l, m, n⟩
+    · exact absurd rfl (hcoordinate k l)
+    all_goals simp [storedHeterozygosityMutationCoupling]
+  have hsplit : ∑ coordinate : LowOrderLDCoordinate D,
+      (lowOrderLDHomogeneousGenerator rates (lowOrderLDBasis coordinate) row -
+          storedHeterozygosityMutationCoupling rates row coordinate) *
+        vector (some (.inl coordinate)) =
+      (∑ coordinate : LowOrderLDCoordinate D,
+        lowOrderLDHomogeneousGenerator rates (lowOrderLDBasis coordinate) row *
+          vector (some (.inl coordinate))) -
+      ∑ coordinate : LowOrderLDCoordinate D,
+        storedHeterozygosityMutationCoupling rates row coordinate *
+          vector (some (.inl coordinate)) := by
+    rw [← Finset.sum_sub_distrib]
+    exact Finset.sum_congr rfl fun _ _ ↦ by ring
+  have hdifference : ∑ pair : Fin D × Fin D,
+      rightHeterozygosityMutationCoupling rates row pair.1 pair.2 *
+        (vector (some (.inr pair)) - vector (some (.inl (.H pair.1 pair.2)))) =
+      (∑ pair : Fin D × Fin D,
+        rightHeterozygosityMutationCoupling rates row pair.1 pair.2 *
+          vector (some (.inr pair))) -
+      ∑ pair : Fin D × Fin D,
+        rightHeterozygosityMutationCoupling rates row pair.1 pair.2 *
+          vector (some (.inl (.H pair.1 pair.2))) := by
+    rw [← Finset.sum_sub_distrib]
+    exact Finset.sum_congr rfl fun _ _ ↦ by ring
+  simp only [hentry, hconstant, hpair]
+  rw [hsplit, hcoupling, hdifference, homogeneousGenerator_sum_basis]
+  ring
+
+/-- **The enlarged generator on a right-locus heterozygosity row.**  It is the corpus `H` row
+read at the right-locus block, with the same affine mutation forcing: both heterozygosity
+families obey the same one-locus system, which is the invariance statement of NOTE1 (12). -/
+theorem enlargedGenerator_mulVec_rightHeterozygosity {D : ℕ} (rates : ManyDemeLDRates D)
+    (vector : AffineEnlargedCoordinate D → ℝ) (first second : Fin D) :
+    (enlargedLowOrderLDGenerator rates).mulVec vector (some (.inr (first, second))) =
+      lowOrderLDHomogeneousGenerator rates (rightHeterozygosityMoment vector)
+          (.H first second) +
+        lowOrderLDMutationForcing rates (.H first second) * vector none := by
+  classical
+  rw [enlarged_mulVec_split]
+  have hentry : ∀ pair : Fin D × Fin D,
+      enlargedLowOrderLDGenerator rates (some (.inr (first, second))) (some (.inr pair)) =
+        augmentedLowOrderLDGenerator rates (some (.H first second))
+          (some (.H pair.1 pair.2)) := fun _ ↦ rfl
+  have hstored : ∀ coordinate : LowOrderLDCoordinate D,
+      enlargedLowOrderLDGenerator rates (some (.inr (first, second)))
+        (some (.inl coordinate)) = 0 := fun _ ↦ rfl
+  have hconstant : enlargedLowOrderLDGenerator rates (some (.inr (first, second))) none =
+      lowOrderLDMutationForcing rates (.H first second) := rfl
+  have hclosed : ∑ coordinate : LowOrderLDCoordinate D,
+      lowOrderLDHomogeneousGenerator rates (lowOrderLDBasis coordinate) (.H first second) *
+        rightHeterozygosityMoment vector coordinate =
+      ∑ pair : Fin D × Fin D,
+        augmentedLowOrderLDGenerator rates (some (.H first second))
+            (some (.H pair.1 pair.2)) * vector (some (.inr pair)) := by
+    refine sum_heterozygosity_columns _ ?_
+    intro coordinate hcoordinate
+    have hzero := augmentedGenerator_heterozygosity_row_of_other rates first second
+      coordinate hcoordinate
+    have hrow : lowOrderLDHomogeneousGenerator rates (lowOrderLDBasis coordinate)
+        (.H first second) = 0 := hzero
+    rw [hrow, zero_mul]
+  simp only [hentry, hstored, hconstant, zero_mul, Finset.sum_const_zero]
+  rw [← hclosed, homogeneousGenerator_sum_basis]
+  ring
+
 /-- The enlarged feature map of an actual haplotype configuration is realized by the Dirac
 expectation at that configuration, so the enlarged family is inhabited by genuine laws rather
 than merely constrained by equations. -/

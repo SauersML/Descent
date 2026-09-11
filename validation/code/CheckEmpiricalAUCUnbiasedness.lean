@@ -12,6 +12,7 @@ open Descent.Portability.EmpiricalAUCUnbiasedness
 #print axioms scoreMass_eq_scoreCellMass
 #print axioms binaryCaseMass_eq_outcomeMass
 #print axioms outcomeMass_add_eq_one
+#print axioms caseControl_iff
 #print axioms empiricalPairMass_eq_sum
 #print axioms outcomeCount_pos
 #print axioms outcomeCount_nonneg

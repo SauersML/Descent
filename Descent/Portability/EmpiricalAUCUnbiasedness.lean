@@ -95,15 +95,21 @@ noncomputable def aucDefinedIndicator {n : ℕ} (sample : Fin n → Bool × Bool
   if (¬ ∀ member, caseOf (sample member) = false) ∧
       (¬ ∀ member, caseOf (sample member) = true) then 1 else 0
 
+/-- A member is a case paired against a control exactly when the corpus Boolean guard holds. -/
+theorem caseControl_iff (first second : Bool) :
+    (first && !second) = true ↔ first = true ∧ second = false := by
+  cases first <;> cases second <;> simp
+
 /-- The pair count is the ordered case-control sum of the constant one, so it normalises the
 ranking credit over exactly the pairs the credit runs over. -/
 theorem empiricalPairMass_eq_sum {n : ℕ} (sample : Fin n → Bool × Bool) :
     empiricalPairMass sample =
       ∑ caseMember, ∑ controlMember,
         if caseOf (sample caseMember) && !caseOf (sample controlMember) then (1 : ℝ) else 0 := by
-  simp only [empiricalPairMass, outcomeCount, Finset.sum_mul, Finset.mul_sum]
+  simp only [empiricalPairMass, outcomeCount, Finset.sum_mul, Finset.mul_sum, caseControl_iff]
   refine Finset.sum_congr rfl fun caseMember _ ↦ Finset.sum_congr rfl fun controlMember _ ↦ ?_
-  cases hcase : caseOf (sample caseMember) <;> cases hcontrol : caseOf (sample controlMember) <;>
+  by_cases hcase : caseOf (sample caseMember) = true <;>
+    by_cases hcontrol : caseOf (sample controlMember) = false <;>
     simp [hcase, hcontrol]
 
 /-- An outcome count is positive exactly when some member carries that outcome. -/
@@ -152,18 +158,25 @@ theorem aucDefinedIndicator_expand {n : ℕ} (hn : 0 < n) (sample : Fin n → Bo
       1 - (∏ member, outcomeIndicator false (sample member)) -
         ∏ member, outcomeIndicator true (sample member) := by
   have hprodOutcome : ∀ value : Bool, (∏ member, outcomeIndicator value (sample member)) =
-      if ∀ member, (sample member).2 = value then (1 : ℝ) else 0 := by
+      if ∀ member, caseOf (sample member) = value then (1 : ℝ) else 0 := by
     intro value
-    simp only [outcomeIndicator]
+    simp only [outcomeIndicator, caseOf]
     exact prod_member_indicator fun member ↦ (sample member).2 = value
-  have hexclusive : ¬((∀ member, (sample member).2 = false) ∧
-      ∀ member, (sample member).2 = true) := by
+  have hexclusive : ¬((∀ member, caseOf (sample member) = false) ∧
+      ∀ member, caseOf (sample member) = true) := by
     rintro ⟨hfalse, htrue⟩
     exact Bool.false_ne_true ((hfalse ⟨0, hn⟩).symm.trans (htrue ⟨0, hn⟩))
-  rw [aucDefinedIndicator, hprodOutcome false, hprodOutcome true]
-  by_cases hfalse : ∀ member, (sample member).2 = false <;>
-    by_cases htrue : ∀ member, (sample member).2 = true <;>
-    simp_all [caseOf]
+  unfold aucDefinedIndicator
+  rw [hprodOutcome false, hprodOutcome true]
+  by_cases hfalse : ∀ member, caseOf (sample member) = false
+  · rw [if_neg fun hdefined ↦ hdefined.1 hfalse, if_pos hfalse,
+      if_neg fun htrue ↦ hexclusive ⟨hfalse, htrue⟩]
+    ring
+  · by_cases htrue : ∀ member, caseOf (sample member) = true
+    · rw [if_neg fun hdefined ↦ hdefined.2 htrue, if_neg hfalse, if_pos htrue]
+      ring
+    · rw [if_pos ⟨hfalse, htrue⟩, if_neg hfalse, if_neg htrue]
+      ring
 
 /-- NOTE1 (42): the exact probability that the empirical AUC of an independent cohort of size
 `n` is defined. -/
