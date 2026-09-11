@@ -1,0 +1,19 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.FellerKernelRepresentation
+
+/-! Axiom audit of FellerKernelRepresentation. -/
+
+open Descent.Portability.FellerKernelRepresentation
+
+#print axioms Descent.Portability.FellerKernelRepresentation.evalFunctional
+#print axioms Descent.Portability.FellerKernelRepresentation.kernelMeasure
+#print axioms Descent.Portability.FellerKernelRepresentation.integral_kernelMeasure
+#print axioms Descent.Portability.FellerKernelRepresentation.isProbabilityMeasure_kernelMeasure
+#print axioms Descent.Portability.FellerKernelRepresentation.kernelProbability
+#print axioms Descent.Portability.FellerKernelRepresentation.continuous_kernelProbability
+#print axioms Descent.Portability.FellerKernelRepresentation.kernelMeasure_eq_of_integral_eq
+#print axioms Descent.Portability.FellerKernelRepresentation.integral_kernelMeasure_add
+#print axioms Descent.Portability.FellerKernelRepresentation.integral_kernelMeasure_denseExtension
+#print axioms Descent.Portability.FellerKernelRepresentation.exists_probabilityKernel_semigroup
