@@ -213,9 +213,10 @@ theorem budgetInclusion_mul_dualGenerator (rates : NeutralRates Deme Locus Allel
       exact if_neg fun h ↦ hne (Subtype.ext h)
     · intro hnot
       exact absurd (Finset.mem_univ _) hnot
-  · rw [Finset.sum_eq_zero fun ζ _ ↦ if_neg fun h ↦ hη (h ▸ ζ.2)]
+  · rw [Finset.sum_eq_zero fun ζ _ ↦ if_neg fun (h : ζ.1 = η.1) ↦ hη (h ▸ ζ.2)]
     have hne : (⟨ξ.1, withinBudget_of_capacity_le hle ξ.2⟩ :
-        BudgetConfiguration Deme Locus Allele capacity') ≠ η := fun h ↦ hη (h ▸ ξ.2)
+        BudgetConfiguration Deme Locus Allele capacity') ≠ η := fun h ↦
+      hη ((congrArg Subtype.val h : ξ.1 = η.1) ▸ ξ.2)
     simp only [dualGenerator]
     rw [if_neg hne, sub_zero, jumpRate]
     refine Multiset.sum_eq_zero fun r hr ↦ ?_
@@ -252,6 +253,7 @@ theorem matrixExponential_mulVec_budget (rates : NeutralRates Deme Locus Allele)
   rw [hmoment] at h
   exact h
 
+omit [Fintype Deme] [DecidableEq Deme] in
 /-- Configuration moments of per-deme haplotype laws are nonnegative. -/
 theorem configurationMoment_nonneg (law : Deme → FiniteReportLaw (FullHaplotype Locus Allele))
     (ξ : Multiset (PartialType Deme Locus Allele)) : 0 ≤ configurationMoment law ξ := by
