@@ -135,6 +135,17 @@ theorem upperValue_succ (step : S → Ctrl → FiniteReportLaw S) (terminal : S 
       Finset.univ.sup' Finset.univ_nonempty fun c ↦
         (step s c).expectation (upperValue step terminal k) := rfl
 
+/-- One admissible step from a state is the point mass at that state bound with the chosen
+transition law, so the dynamic program runs on the same composition of laws the corpus
+already uses rather than on a private one. -/
+theorem policyValue_succ_eq_bind (step : S → Ctrl → FiniteReportLaw S) (terminal : S → ℝ)
+    (policy : ℕ → S → Ctrl) (k : ℕ) (s : S) :
+    policyValue step terminal policy (k + 1) s =
+      ((FiniteReportLaw.pointMass s).bind fun t ↦ step t (policy k t)).expectation
+        (policyValue step terminal policy k) := by
+  rw [FiniteReportLaw.expectation_bind, FiniteReportLaw.expectation_pointMass]
+  rfl
+
 /-- No admissible policy reports less than the lower value. -/
 theorem lowerValue_le_policyValue (step : S → Ctrl → FiniteReportLaw S) (terminal : S → ℝ)
     (policy : ℕ → S → Ctrl) :

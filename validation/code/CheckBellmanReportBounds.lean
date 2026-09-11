@@ -14,6 +14,7 @@ open Descent.Portability.BellmanReportBounds
 #print axioms abs_sup'_sub_le
 #print axioms lowerValue_succ
 #print axioms upperValue_succ
+#print axioms policyValue_succ_eq_bind
 #print axioms lowerValue_le_policyValue
 #print axioms policyValue_le_upperValue
 #print axioms exists_lower_optimal_policy
