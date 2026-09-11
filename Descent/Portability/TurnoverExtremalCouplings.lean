@@ -34,7 +34,7 @@ set_option relaxedAutoImplicit false
 
 namespace Descent.Portability.TurnoverExtremalCouplings
 
-open Foundations NonanticipationCost
+open Foundations NonanticipationCost TurnoverArchitectureMetrics
 
 noncomputable section
 
@@ -141,6 +141,168 @@ theorem synchronous_pathExp_nearestDrift_le (n : ℕ) (α β τ : ℝ) (hα : 0 
     (fun _ s s' ↦ synchronousKernel_nonneg n α β τ hα0 hα1 hβ0 hβ1 s s')
     (fun _ s ↦ synchronousKernel_sum n α β τ s)
     (fun _ s i ↦ synchronousKernel_flip n α β τ s i) f hf m hist s
+
+
+/-! ## Both sharp quadratic-variation bounds are attained -/
+
+/-- Evaluating a report against the synchronous kernel's row. -/
+theorem synchronousKernel_apply {n : ℕ} (α β τ : ℝ) (s : Fin n → Bool)
+    (g : (Fin n → Bool) → ℝ) :
+    ∑ s', synchronousKernel n α β τ s s' * g s'
+      = (1 - τ * α) * (1 - τ * β) * g s + (τ * α) * (1 - τ * β) * g (fun _ ↦ false)
+        + (1 - τ * α) * (τ * β) * g (fun _ ↦ true)
+        + (τ * α) * (τ * β) * g (fun i ↦ !s i) := by
+  simp only [synchronousKernel, add_mul, Finset.sum_add_distrib, ite_mul, zero_mul,
+    Finset.sum_ite_eq', Finset.mem_univ, if_true]
+
+/-- The alignment of the source-aligned configuration is the total score weight. -/
+theorem alignment_allTrue {n : ℕ} (a : Fin n → ℝ) :
+    alignment a (fun _ ↦ true) = ∑ i, a i ^ 2 := by
+  have hpt : ∀ i : Fin n, a i ^ 2 * signValue ((fun _ : Fin n ↦ true) i) = a i ^ 2 := by
+    intro i
+    show a i ^ 2 * (1 : ℝ) = a i ^ 2
+    ring
+  simp only [alignment]
+  exact Finset.sum_congr rfl fun i _ ↦ hpt i
+
+/-- The alignment of the fully reversed configuration is minus the total score weight. -/
+theorem alignment_allFalse {n : ℕ} (a : Fin n → ℝ) :
+    alignment a (fun _ ↦ false) = -∑ i, a i ^ 2 := by
+  have hpt : ∀ i : Fin n, a i ^ 2 * signValue ((fun _ : Fin n ↦ false) i) = -(a i ^ 2) := by
+    intro i
+    show a i ^ 2 * (-1 : ℝ) = -(a i ^ 2)
+    ring
+  simp only [alignment]
+  rw [Finset.sum_congr rfl fun i _ ↦ hpt i, Finset.sum_neg_distrib]
+
+/-- Flipping one locus of the source-aligned configuration moves the alignment by `-2wᵢ`. -/
+theorem alignment_flipCoord_allTrue {n : ℕ} (a : Fin n → ℝ) (i : Fin n) :
+    alignment a (flipCoord i (fun _ ↦ true)) = (∑ j, a j ^ 2) - 2 * a i ^ 2 := by
+  have hpt : ∀ j : Fin n,
+      a j ^ 2 * signValue (flipCoord i (fun _ : Fin n ↦ true) j)
+        = a j ^ 2 - 2 * (if j = i then a j ^ 2 else 0) := by
+    intro j
+    by_cases h : j = i
+    · subst h
+      simp only [flipCoord_self, if_pos rfl]
+      show a j ^ 2 * (-1 : ℝ) = a j ^ 2 - 2 * a j ^ 2
+      ring
+    · rw [flipCoord_ne i h, if_neg h]
+      show a j ^ 2 * (1 : ℝ) = a j ^ 2 - 2 * 0
+      ring
+  simp only [alignment]
+  rw [Finset.sum_congr rfl fun j _ ↦ hpt j, Finset.sum_sub_distrib, ← Finset.mul_sum,
+    Finset.sum_ite_eq' Finset.univ i (fun j ↦ a j ^ 2), if_pos (Finset.mem_univ i)]
+
+/-- **PL (5.6), upper bound attained.**  The synchronous coupling's quadratic variation at
+the source-aligned state is exactly `4τλ`, the largest value the sharp bound allows. -/
+theorem synchronous_quadraticVariation {n : ℕ} (a : Fin n → ℝ) (lam τ : ℝ)
+    (hnorm : ∑ i, a i ^ 2 = 1) :
+    ∑ s', synchronousKernel n lam lam τ (fun _ ↦ true) s'
+        * (alignment a s' - alignment a (fun _ ↦ true)) ^ 2 = 4 * (τ * lam) := by
+  have hneg : (fun i ↦ !(fun _ : Fin n ↦ true) i) = (fun _ : Fin n ↦ false) := by
+    funext i
+    simp
+  rw [synchronousKernel_apply lam lam τ (fun _ ↦ true)
+    (fun s' ↦ (alignment a s' - alignment a (fun _ ↦ true)) ^ 2), hneg,
+    alignment_allTrue, alignment_allFalse, hnorm]
+  ring
+
+/-- **The single-flip coupling.**  Each locus flips alone with probability `τλ` and nothing
+else happens.  This is the independent-coordinate coupling PL Theorem 5.2 names as attaining
+the lower slope bound. -/
+def singleFlipKernel (n : ℕ) (lam τ : ℝ) (s s' : Fin n → Bool) : ℝ :=
+  (if s' = s then 1 - (n : ℝ) * (τ * lam) else 0)
+    + ∑ i, (if s' = flipCoord i s then τ * lam else 0)
+
+/-- Evaluating a report against the single-flip kernel's row. -/
+theorem singleFlipKernel_apply {n : ℕ} (lam τ : ℝ) (s : Fin n → Bool)
+    (g : (Fin n → Bool) → ℝ) :
+    ∑ s', singleFlipKernel n lam τ s s' * g s'
+      = (1 - (n : ℝ) * (τ * lam)) * g s + ∑ i, (τ * lam) * g (flipCoord i s) := by
+  have h1 : ∑ s' : Fin n → Bool,
+      (if s' = s then 1 - (n : ℝ) * (τ * lam) else 0) * g s'
+      = (1 - (n : ℝ) * (τ * lam)) * g s := by
+    simp only [ite_mul, zero_mul]
+    rw [Finset.sum_ite_eq' Finset.univ s (fun s' ↦ (1 - (n : ℝ) * (τ * lam)) * g s'),
+      if_pos (Finset.mem_univ s)]
+  have h2 : ∑ s' : Fin n → Bool,
+      (∑ i, (if s' = flipCoord i s then τ * lam else 0)) * g s'
+      = ∑ i, (τ * lam) * g (flipCoord i s) := by
+    simp only [Finset.sum_mul, ite_mul, zero_mul]
+    rw [Finset.sum_comm]
+    refine Finset.sum_congr rfl fun i _ ↦ ?_
+    rw [Finset.sum_ite_eq' Finset.univ (flipCoord i s) (fun s' ↦ (τ * lam) * g s'),
+      if_pos (Finset.mem_univ _)]
+  simp only [singleFlipKernel, add_mul, Finset.sum_add_distrib]
+  rw [h1, h2]
+
+/-- Every row of the single-flip kernel is a probability vector. -/
+theorem singleFlipKernel_sum {n : ℕ} (lam τ : ℝ) (s : Fin n → Bool) :
+    ∑ s', singleFlipKernel n lam τ s s' = 1 := by
+  have h := singleFlipKernel_apply lam τ s (fun _ ↦ (1 : ℝ))
+  simp only [mul_one, Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul] at h
+  rw [h]
+  ring
+
+/-- The single-flip kernel is nonnegative when the step is short enough. -/
+theorem singleFlipKernel_nonneg {n : ℕ} (lam τ : ℝ) (h0 : 0 ≤ τ * lam)
+    (h1 : (n : ℝ) * (τ * lam) ≤ 1) (s s' : Fin n → Bool) :
+    0 ≤ singleFlipKernel n lam τ s s' := by
+  refine add_nonneg ?_ (Finset.sum_nonneg fun i _ ↦ ?_)
+  · split
+    · linarith
+    · exact le_rfl
+  · split
+    · exact h0
+    · exact le_rfl
+
+/-- **The single-flip coupling is admissible**: every locus flips with probability exactly
+`τλ`, which is PL (5.4) for a skeleton step. -/
+theorem singleFlipKernel_flip {n : ℕ} (lam τ : ℝ) (s : Fin n → Bool) (i : Fin n) :
+    ∑ s', (if s' i = s i then (0 : ℝ) else singleFlipKernel n lam τ s s') = τ * lam := by
+  have hpt : ∀ s' : Fin n → Bool,
+      (if s' i = s i then (0 : ℝ) else singleFlipKernel n lam τ s s')
+        = singleFlipKernel n lam τ s s' * (if s' i = s i then (0 : ℝ) else 1) := by
+    intro s'
+    by_cases h : s' i = s i
+    · rw [if_pos h, if_pos h]
+      ring
+    · rw [if_neg h, if_neg h]
+      ring
+  have hind : ∀ j : Fin n,
+      (if flipCoord j s i = s i then (0 : ℝ) else 1) = (if j = i then (1 : ℝ) else 0) := by
+    intro j
+    by_cases h : j = i
+    · subst h
+      rw [flipCoord_self, if_pos rfl, if_neg]
+      exact fun hc ↦ by simp at hc
+    · rw [flipCoord_ne j (Ne.symm h), if_pos rfl, if_neg h]
+  rw [Finset.sum_congr rfl fun s' _ ↦ hpt s',
+    singleFlipKernel_apply lam τ s (fun s' ↦ if s' i = s i then (0 : ℝ) else 1), if_pos rfl]
+  simp only [hind, mul_ite, mul_one, mul_zero]
+  rw [Finset.sum_ite_eq' Finset.univ i (fun _ ↦ τ * lam), if_pos (Finset.mem_univ i)]
+  ring
+
+/-- **PL (5.6), lower bound attained.**  The single-flip coupling's quadratic variation at
+the source-aligned state is exactly `4τλ ∑ wᵢ²`, the smallest value the sharp bound allows.
+The ratio between the two attained values is the effective number of score-weight
+contributions. -/
+theorem singleFlip_quadraticVariation {n : ℕ} (a : Fin n → ℝ) (lam τ : ℝ) :
+    ∑ s', singleFlipKernel n lam τ (fun _ ↦ true) s'
+        * (alignment a s' - alignment a (fun _ ↦ true)) ^ 2
+      = 4 * (τ * lam) * ∑ i, (a i ^ 2) ^ 2 := by
+  have hpt : ∀ i : Fin n,
+      (τ * lam) * (alignment a (flipCoord i (fun _ ↦ true))
+          - alignment a (fun _ ↦ true)) ^ 2
+        = (4 * (τ * lam)) * (a i ^ 2) ^ 2 := by
+    intro i
+    rw [alignment_flipCoord_allTrue, alignment_allTrue]
+    ring
+  rw [singleFlipKernel_apply lam τ (fun _ ↦ true)
+    (fun s' ↦ (alignment a s' - alignment a (fun _ ↦ true)) ^ 2),
+    Finset.sum_congr rfl fun i _ ↦ hpt i, ← Finset.mul_sum]
+  ring
 
 end
 
