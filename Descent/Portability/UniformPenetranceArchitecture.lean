@@ -805,6 +805,99 @@ theorem replica_mass_normalization (K : ℕ) :
   rw [integral_replica_resolved K, integral_replica_tail K]
   ring
 
+/-- The `K`-term replica lower sum of NOTE2 (16), in closed form for this architecture. -/
+def replicaLowerSum (K : ℕ) : ℝ := ∑ k ∈ Finset.range K, 1 / (2 ^ (k + 1) * ((k : ℝ) + 2))
+
+/-- The unresolved mass bound of NOTE2 (17), in closed form for this architecture. Here it
+is not merely a bound: it is the exact unresolved mass. -/
+def replicaTail (K : ℕ) : ℝ := 1 / (2 ^ K * ((K : ℝ) + 1))
+
+theorem intervalIntegrable_replica_partial (K : ℕ) :
+    IntervalIntegrable (fun θ : ℝ ↦ ∑ k ∈ Finset.range K, (θ / 2) ^ (k + 1))
+      MeasureTheory.volume 0 1 := by
+  apply Continuous.intervalIntegrable
+  exact continuous_finset_sum _ fun k _ ↦ by fun_prop
+
+/-- The lower sum of NOTE2 (16) is the exact integral of the truncated expansion. -/
+theorem integral_replica_partial (K : ℕ) :
+    (∫ θ in (0:ℝ)..1, ∑ k ∈ Finset.range K, (θ / 2) ^ (k + 1)) = replicaLowerSum K := by
+  have hint : ∀ k ∈ Finset.range K,
+      IntervalIntegrable (fun θ : ℝ ↦ (θ / 2) ^ (k + 1)) MeasureTheory.volume 0 1 := by
+    intro k _
+    exact (by fun_prop : Continuous fun θ : ℝ ↦ (θ / 2) ^ (k + 1)).intervalIntegrable 0 1
+  rw [intervalIntegral.integral_finset_sum hint, replicaLowerSum]
+  refine Finset.sum_congr rfl fun k _ ↦ ?_
+  rw [integral_unit_half_pow (k + 1)]
+  push_cast
+  ring
+
+/-- The truncated positive ratio expansion of NOTE2 (15) with its exact remainder: the
+reduced ratio is the `K`-term sum plus the `K`-th replica weight times the ratio itself. -/
+theorem ratio_eq_partial_add_remainder (θ : ℝ) (hlo : 0 ≤ θ) (hhi : θ ≤ 1) (K : ℕ) :
+    θ / (2 - θ) = (∑ k ∈ Finset.range K, (θ / 2) ^ (k + 1)) +
+      (θ / 2) ^ K * (θ / (2 - θ)) := by
+  have hpos : (0:ℝ) < 2 - θ := by linarith
+  have hkey : θ / (2 - θ) * (1 - θ / 2) = θ / 2 := by
+    field_simp
+    ring
+  induction K with
+  | zero => simp
+  | succ K ih =>
+    rw [Finset.sum_range_succ]
+    linear_combination ih + (θ / 2) ^ K * hkey
+
+/-- The reduced ratio lies in the unit interval on the whole parameter range, which is what
+makes the remainder of NOTE2 (15) bounded by the unresolved mass. -/
+theorem ratio_mem_unitInterval (θ : ℝ) (hlo : 0 ≤ θ) (hhi : θ ≤ 1) :
+    0 ≤ θ / (2 - θ) ∧ θ / (2 - θ) ≤ 1 := by
+  have hpos : (0:ℝ) < 2 - θ := by linarith
+  refine ⟨div_nonneg hlo hpos.le, ?_⟩
+  rw [div_le_one hpos]
+  linarith
+
+/-- NOTE2 (18) and section 9.1: the `K`-term replica readout brackets the exact expected
+population squared correlation, with width exactly the unresolved mass. The normalization
+of (18) is the identity here because the resolved mass and the unresolved mass sum to one,
+which `replica_mass_normalization` records; the bracket therefore reads directly as the
+lower sum and the lower sum plus the tail. -/
+theorem replica_certificate (K : ℕ) :
+    replicaLowerSum K ≤ 2 * Real.log 2 - 1 ∧
+      2 * Real.log 2 - 1 ≤ replicaLowerSum K + replicaTail K := by
+  have hpow : IntervalIntegrable (fun θ : ℝ ↦ (θ / 2) ^ K) MeasureTheory.volume 0 1 :=
+    (by fun_prop : Continuous fun θ : ℝ ↦ (θ / 2) ^ K).intervalIntegrable 0 1
+  have hpart := intervalIntegrable_replica_partial K
+  have hsum : (∫ θ in (0:ℝ)..1,
+      ((∑ k ∈ Finset.range K, (θ / 2) ^ (k + 1)) + (θ / 2) ^ K)) =
+      replicaLowerSum K + 1 / (2 ^ K * ((K : ℝ) + 1)) := by
+    rw [intervalIntegral.integral_add hpart hpow, integral_replica_partial K,
+      integral_unit_half_pow K]
+  constructor
+  · rw [← integral_replica_partial K, ← integral_unit_ratio]
+    refine intervalIntegral.integral_mono_on (by norm_num) hpart
+      intervalIntegrable_unit_ratio ?_
+    intro θ hθ
+    simp only [Set.mem_Icc] at hθ
+    have hexp := ratio_eq_partial_add_remainder θ hθ.1 hθ.2 K
+    have hr := ratio_mem_unitInterval θ hθ.1 hθ.2
+    have hx : (0:ℝ) ≤ (θ / 2) ^ K := by positivity
+    have hprod : 0 ≤ (θ / 2) ^ K * (θ / (2 - θ)) := mul_nonneg hx hr.1
+    linarith
+  · have htarget : replicaLowerSum K + replicaTail K =
+        ∫ θ in (0:ℝ)..1, ((∑ k ∈ Finset.range K, (θ / 2) ^ (k + 1)) + (θ / 2) ^ K) := by
+      rw [hsum, replicaTail]
+    rw [htarget, ← integral_unit_ratio]
+    refine intervalIntegral.integral_mono_on (by norm_num) intervalIntegrable_unit_ratio
+      (hpart.add hpow) ?_
+    intro θ hθ
+    simp only [Set.mem_Icc] at hθ
+    have hexp := ratio_eq_partial_add_remainder θ hθ.1 hθ.2 K
+    have hr := ratio_mem_unitInterval θ hθ.1 hθ.2
+    have hx : (0:ℝ) ≤ (θ / 2) ^ K := by positivity
+    have hprod : (θ / 2) ^ K * (θ / (2 - θ)) ≤ (θ / 2) ^ K * 1 :=
+      mul_le_mul_of_nonneg_left hr.2 hx
+    rw [mul_one] at hprod
+    linarith
+
 end
 
 end Descent.Portability.UniformPenetranceArchitecture
