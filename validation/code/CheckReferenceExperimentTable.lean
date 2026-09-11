@@ -7,8 +7,36 @@ import Descent.Portability.ReferenceExperimentTable
 
 open Descent.Portability.ReferenceExperimentTable
 
-#print axioms early_target_rows
-#print axioms late_target_rows
+#print axioms early_terminalMass_table
+#print axioms late_terminalMass_table
+#print axioms historyReport_eq_tableReport
+#print axioms early_historyReport_table
+#print axioms late_historyReport_table
+#print axioms early_target_r2_weightedNumerator
+#print axioms early_target_auc_definedProbability
+#print axioms early_target_auc_weightedNumerator
+#print axioms early_target_slope_definedProbability
+#print axioms early_target_slope_weightedNumerator
+#print axioms early_target_brier_expectation
+#print axioms early_target_ece_expectation
+#print axioms early_target_repairedBrier_expectation
+#print axioms early_r2Portability_definedProbability
+#print axioms early_r2Portability_weightedNumerator
+#print axioms early_cohort_r2_definedProbability
+#print axioms early_cohort_r2_weightedNumerator
+#print axioms late_target_r2_definedProbability
+#print axioms late_target_r2_weightedNumerator
+#print axioms late_target_auc_definedProbability
+#print axioms late_target_auc_weightedNumerator
+#print axioms late_target_slope_definedProbability
+#print axioms late_target_slope_weightedNumerator
+#print axioms late_target_brier_expectation
+#print axioms late_target_ece_expectation
+#print axioms late_target_repairedBrier_expectation
+#print axioms late_r2Portability_definedProbability
+#print axioms late_r2Portability_weightedNumerator
+#print axioms late_cohort_r2_definedProbability
+#print axioms late_cohort_r2_weightedNumerator
 #print axioms early_target_r2_givenDefined
 #print axioms early_target_slope_givenDefined
 #print axioms early_r2Portability_givenDefined
