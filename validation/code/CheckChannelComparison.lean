@@ -21,3 +21,6 @@ import Descent.Portability.ChannelComparison
 #print axioms Descent.Portability.ChannelComparison.closest_garbling_variational
 #print axioms Descent.Portability.ChannelComparison.uniform_risk_relabel
 #print axioms Descent.Portability.ChannelComparison.garbling_iff_decision_dominance
+#print axioms Descent.Portability.ChannelComparison.closestGarbling_nonneg
+#print axioms Descent.Portability.ChannelComparison.closestGarbling_row_sum
+#print axioms Descent.Portability.ChannelComparison.closestGarbling_min

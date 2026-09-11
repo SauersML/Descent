@@ -18,7 +18,8 @@ against the induced state-to-action matrix. `garbling_iff_decision_dominance`
 proves both directions of TQ Theorem 4.9 / UPT Theorem 6.5: `B` is a garbling of
 `A` exactly when `A` is never worse in any finite decision problem. The converse
 is the manuscript's nearest-point argument, made unconditional here by
-`exists_closest_garbling` (compactness of a product of standard simplices),
+`closestGarbling`, the nearest garbling handed over as data and built by
+compactness of a product of standard simplices,
 `closest_garbling_variational` (the segment between garblings is a garbling), and
 the explicit separating decision problem built from the residual. The tie to the
 corpus is
@@ -173,6 +174,31 @@ theorem exists_closest_garbling [Nonempty Y] (A : Θ → X → ℝ) (B : Θ → 
   refine ⟨G, fun x y ↦ (hG x).1 y, fun x ↦ (hG x).2, ?_⟩
   intro G' hG'0 hG'1
   exact hGmin (Set.mem_univ_pi.mpr fun x ↦ ⟨fun y ↦ hG'0 x y, hG'1 x⟩)
+
+/-- **The nearest garbling, as data.** The caller is handed the minimiser itself,
+not merely its existence: this is the garbling of `A` whose composed channel is
+closest to `B` in squared distance. -/
+def closestGarbling [Nonempty Y] (A : Θ → X → ℝ) (B : Θ → Y → ℝ) : X → Y → ℝ :=
+  Classical.choose (exists_closest_garbling A B)
+
+/-- The nearest garbling has nonnegative entries. -/
+theorem closestGarbling_nonneg [Nonempty Y] (A : Θ → X → ℝ) (B : Θ → Y → ℝ)
+    (x : X) (y : Y) : 0 ≤ closestGarbling A B x y :=
+  (Classical.choose_spec (exists_closest_garbling A B)).1 x y
+
+/-- The rows of the nearest garbling sum to one, so it is a garbling. -/
+theorem closestGarbling_row_sum [Nonempty Y] (A : Θ → X → ℝ) (B : Θ → Y → ℝ)
+    (x : X) : ∑ y, closestGarbling A B x y = 1 :=
+  (Classical.choose_spec (exists_closest_garbling A B)).2.1 x
+
+/-- **Minimality of the nearest garbling.** No garbling of `A` composes to a
+channel closer to `B`, so this value is the argument minimum the variational
+inequality is taken at. -/
+theorem closestGarbling_min [Nonempty Y] (A : Θ → X → ℝ) (B : Θ → Y → ℝ)
+    (G : X → Y → ℝ) (h0 : ∀ x y, 0 ≤ G x y) (h1 : ∀ x, ∑ y, G x y = 1) :
+    ∑ θ, ∑ y, (B θ y - chanCompose A (closestGarbling A B) θ y) ^ 2 ≤
+      ∑ θ, ∑ y, (B θ y - chanCompose A G θ y) ^ 2 :=
+  (Classical.choose_spec (exists_closest_garbling A B)).2.2 G h0 h1
 
 /-- A quadratic in `t` that is nonnegative throughout `[0, 1]` and has a
 nonnegative leading coefficient has a nonpositive linear coefficient. This is the
@@ -334,7 +360,13 @@ theorem garbling_iff_decision_dominance [Nonempty Θ] (A : Θ → X → ℝ) (B 
       have h := hB1 (Classical.arbitrary Θ)
       rw [Finset.univ_eq_empty, Finset.sum_empty] at h
       exact zero_ne_one h
-    obtain ⟨G, hG0, hG1, hmin⟩ := exists_closest_garbling A B
+    have hG0 : ∀ x y, 0 ≤ closestGarbling A B x y := closestGarbling_nonneg A B
+    have hG1 : ∀ x, ∑ y, closestGarbling A B x y = 1 := closestGarbling_row_sum A B
+    have hmin : ∀ G' : X → Y → ℝ, (∀ x y, 0 ≤ G' x y) → (∀ x, ∑ y, G' x y = 1) →
+        ∑ θ, ∑ y, (B θ y - chanCompose A (closestGarbling A B) θ y) ^ 2 ≤
+          ∑ θ, ∑ y, (B θ y - chanCompose A G' θ y) ^ 2 :=
+      fun G' h0 h1 ↦ closestGarbling_min A B G' h0 h1
+    set G : X → Y → ℝ := closestGarbling A B with hGdef
     refine ⟨G, hG0, hG1, ?_⟩
     by_contra hne
     obtain ⟨θ₀, hθ₀⟩ := Function.ne_iff.mp hne
