@@ -402,6 +402,7 @@ import Descent.Portability.OperationalAuditConstraints
 import Descent.Portability.SharedAuditCompletion
 import Descent.Portability.SummaryInvisibleDiameter
 import Descent.Portability.TurnoverDependence
+import Descent.Portability.ExplainabilityRay
 assert_below Descent.Program
 
 /-!
