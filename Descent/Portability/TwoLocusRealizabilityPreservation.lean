@@ -142,9 +142,13 @@ def locusExchangeableSplit {D : ℕ} {state : AffineLowOrderLDCoordinate D → �
     realization.toLowOrderLDHaplotypeRealization.split parent child
   H_right_eq := by
     intro first second
-    rw [lowOrderLDSplitTransform_mulVec]
-    change state (some (.H (if first = child then parent else first)
-      (if second = child then parent else second))) = _
+    have hvalue : (lowOrderLDSplitTransform parent child).mulVec state
+        (some (.H first second)) =
+        state (some (.H (if first = child then parent else first)
+          (if second = child then parent else second))) := by
+      rw [lowOrderLDSplitTransform_mulVec]
+      rfl
+    rw [hvalue]
     exact realization.H_right_eq _ _
 
 /-! ## NOTE1 Corollary 2.1 -/
