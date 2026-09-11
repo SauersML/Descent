@@ -136,18 +136,21 @@ theorem smoothDensity_nonneg (p v : Z → ℝ) (hp : ∀ z, 0 ≤ p z) (ε : ℝ
     (y : ℝ) : 0 ≤ smoothDensity p v ε y := by
   unfold smoothDensity
   refine div_nonneg (Finset.sum_nonneg fun z _ ↦ mul_nonneg (hp z) ?_) (by linarith)
-  exact (indicator_mem_unitInterval 1 _ y le_rfl le_rfl).1
+  exact (indicator_mem_unitInterval 1 _ y zero_le_one le_rfl).1
 
 /-- **The smoothed law has a bounded density.** -/
 theorem smoothDensity_le (p v : Z → ℝ) (hp : ∀ z, 0 ≤ p z) (hps : ∑ z, p z = 1)
     (ε : ℝ) (hε : 0 < ε) (y : ℝ) : smoothDensity p v ε y ≤ 1 / (2 * ε) := by
   have h2 : (0 : ℝ) < 2 * ε := by linarith
-  have hnum : (∑ z, p z *
-      Set.indicator (Set.Icc (v z - ε) (v z + ε)) (fun _ ↦ (1 : ℝ)) y) ≤ 1 := by
-    rw [← hps]
+  have hle : (∑ z, p z *
+      Set.indicator (Set.Icc (v z - ε) (v z + ε)) (fun _ ↦ (1 : ℝ)) y) ≤ ∑ z, p z := by
     refine Finset.sum_le_sum fun z _ ↦ ?_
-    have hind := indicator_mem_unitInterval 1 (Set.Icc (v z - ε) (v z + ε)) y le_rfl le_rfl
-    nlinarith [hp z, hind.1, hind.2]
+    have hind :=
+      indicator_mem_unitInterval 1 (Set.Icc (v z - ε) (v z + ε)) y zero_le_one le_rfl
+    exact mul_le_of_le_one_right (hp z) hind.2
+  rw [hps] at hle
+  have hnum : (∑ z, p z *
+      Set.indicator (Set.Icc (v z - ε) (v z + ε)) (fun _ ↦ (1 : ℝ)) y) ≤ 1 := hle
   unfold smoothDensity
   rw [div_eq_mul_inv, div_eq_mul_inv]
   exact mul_le_mul_of_nonneg_right hnum (le_of_lt (inv_pos.mpr h2))
@@ -161,8 +164,8 @@ theorem smoothDensity_integral (p v : Z → ℝ) (hps : ∑ z, p z = 1) (ε : �
         p z * (2 * ε) := by
     intro z
     rw [MeasureTheory.integral_const_mul,
-      MeasureTheory.integral_indicator_const (1 : ℝ) measurableSet_Icc, Real.volume_Icc]
-    rw [ENNReal.toReal_ofReal (by linarith)]
+      MeasureTheory.integral_indicator_const (1 : ℝ) measurableSet_Icc,
+      Real.volume_real_Icc_of_le (by linarith), smul_eq_mul]
     ring
   have hintegrable : ∀ z ∈ Finset.univ,
       MeasureTheory.Integrable
@@ -171,8 +174,8 @@ theorem smoothDensity_integral (p v : Z → ℝ) (hps : ∑ z, p z = 1) (ε : �
     intro z _
     refine MeasureTheory.Integrable.const_mul ?_ _
     rw [MeasureTheory.integrable_indicator_iff measurableSet_Icc]
-    exact MeasureTheory.integrableOn_const.mpr
-      (Or.inr (by rw [Real.volume_Icc]; exact ENNReal.ofReal_lt_top))
+    exact MeasureTheory.integrableOn_const
+      (by rw [Real.volume_Icc]; exact ENNReal.ofReal_ne_top)
   unfold smoothDensity
   rw [MeasureTheory.integral_div, MeasureTheory.integral_finset_sum _ hintegrable]
   rw [Finset.sum_congr rfl fun z _ ↦ hwin z, ← Finset.sum_mul, hps, one_mul]
