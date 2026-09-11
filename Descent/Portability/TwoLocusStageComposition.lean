@@ -17,9 +17,13 @@ stage at random (`TwoLocusMicroscopicApproximation.enlargedMicroscopicApproximat
 module builds the note's literal composition and proves that it is a second
 `MicroscopicApproximation` of the same generator, with nothing assumed.
 
-The physical stages.  `PhysicalStage D` has four kinds: resampling in each deme, migration
-along each ordered deme pair, recombination in each deme, and one allele-flip stage per deme.
-The last is the note's stage 3, independent symmetric flips at BOTH loci:
+The physical stages.  `PhysicalStage D` has four kinds: resampling in each deme, one migration
+stage, recombination in each deme, and one allele-flip stage per deme.  The migration stage is
+the note's stage 1, the deterministic convex haplotype mixture in which every recipient takes
+the fraction `h m_ij` from every source at once (`SimultaneousMigrationPulse`); its rate-weighted
+velocity is the sum of the corpus's per-pair migration drifts
+(`SimultaneousMigrationPulse.simultaneousMigrationExpansion_velocity`).  The allele-flip stage
+is the note's stage 3, independent symmetric flips at BOTH loci:
 `bothMutationPulseAt` runs the corpus's left-locus pulse and then its right-locus pulse at the
 same parameter.  Its three base coordinate laws are exact (`bothMutationPulseAt_leftFrequency`,
 `_rightFrequency`, `_linkage`, the last with an explicit quadratic term), so every enlarged
@@ -35,8 +39,9 @@ feature family is a matrix applied to the features.  The identification the corp
 `Pi2GeneratorBridges.stage_generator_enlarged`, is for the SUM over stages.  Individual stages
 are separated through the rates: the stage velocities of the corpus certificates do not depend
 on the rates, and `stage_generator_enlarged` holds at every rate law.  Doubling one deme's
-coalescence rate, or zeroing one migration, recombination or mutation rate, changes the
-generator by exactly that stage's rate-weighted velocity (`physicalStageDrift_eq_mulVec`).
+coalescence rate, switching off all migration, or zeroing one deme's recombination or mutation
+rate changes the generator by exactly that stage's rate-weighted velocity
+(`physicalStageDrift_eq_mulVec`).
 `physicalGenerator` is that difference of two corpus generators.  The left-locus and right-locus
 flips share the parameter `theta_i`, so they are separated only jointly; that is why the
 allele-flip stage flips both loci.
@@ -53,8 +58,7 @@ constant.  No deme is needed as data, because a step with no stages is the idle 
 
 Scope.  Resampling is the corpus's single-draw stage calibrated by
 `RandomStageKernel.driftChromosomeCount`, not NOTE1's multinomial sample of `ceil (1 / (c h))`
-chromosomes, and migration is one pulse per ordered pair rather than one simultaneous convex
-mixture.  How far those two choices move the step is not quantified here; the approximation is
+chromosomes.  How far that choice moves the step is not quantified here; the approximation is
 proved for the stages as formalized.  The error bound is crude and explicit; no rate of
 convergence beyond "vanishes with `h`" is claimed.
 
@@ -353,9 +357,9 @@ theorem physicalStageKernel_expansion {D : ℕ} (rates : ManyDemeLDRates D)
   | drift deme =>
       exact apply_stageKernel_expansion rates (enlargedStageExpansion coordinate) (.drift deme)
         step hstep state
-  | migration source recipient =>
-      exact apply_stageKernel_expansion rates (enlargedStageExpansion coordinate)
-        (.migration source recipient) step hstep state
+  | migration =>
+      exact apply_pulseStageKernel_expansion (simultaneousMigrationExpansion rates coordinate)
+        (1 + totalMigration rates) step (by linarith [totalMigration_nonneg rates]) hstep.le state
   | recombination deme =>
       exact apply_stageKernel_expansion rates (enlargedStageExpansion coordinate)
         (.recombination deme) step hstep state
@@ -370,24 +374,22 @@ theorem physicalStageSlack_tendsto {D : ℕ} (rates : ManyDemeLDRates D)
   cases stage with
   | drift deme =>
       exact stageSlack_tendsto rates (enlargedStageExpansion coordinate) (.drift deme)
-  | migration source recipient =>
-      exact stageSlack_tendsto rates (enlargedStageExpansion coordinate)
-        (.migration source recipient)
+  | migration => exact pulseStageSlack_tendsto _ _ _ _
   | recombination deme =>
       exact stageSlack_tendsto rates (enlargedStageExpansion coordinate) (.recombination deme)
   | mutation deme => exact pulseStageSlack_tendsto _ _ _ _
 
 /-- The physical stage index is the disjoint union of its four constructor families. -/
 def physicalStageStructure (D : ℕ) :
-    (Fin D ⊕ (Fin D × Fin D) ⊕ Fin D ⊕ Fin D) ≃ PhysicalStage D where
+    (Fin D ⊕ Unit ⊕ Fin D ⊕ Fin D) ≃ PhysicalStage D where
   toFun
     | .inl deme => .drift deme
-    | .inr (.inl pair) => .migration pair.1 pair.2
+    | .inr (.inl _) => .migration
     | .inr (.inr (.inl deme)) => .recombination deme
     | .inr (.inr (.inr deme)) => .mutation deme
   invFun
     | .drift deme => .inl deme
-    | .migration source recipient => .inr (.inl (source, recipient))
+    | .migration => .inr (.inl ())
     | .recombination deme => .inr (.inr (.inl deme))
     | .mutation deme => .inr (.inr (.inr deme))
   left_inv := by rintro (_ | (_ | (_ | _))) <;> rfl
@@ -397,23 +399,24 @@ def physicalStageStructure (D : ℕ) :
 theorem sum_physicalStage {D : ℕ} (summand : PhysicalStage D → ℝ) :
     ∑ stage : PhysicalStage D, summand stage =
       (∑ deme : Fin D, summand (PhysicalStage.drift deme)) +
-      (∑ pair : Fin D × Fin D, summand (PhysicalStage.migration pair.1 pair.2)) +
+      summand PhysicalStage.migration +
       (∑ deme : Fin D, summand (PhysicalStage.recombination deme)) +
       (∑ deme : Fin D, summand (PhysicalStage.mutation deme)) := by
   rw [← Equiv.sum_comp (physicalStageStructure D) summand]
-  simp only [Fintype.sum_sum_type, physicalStageStructure, Equiv.coe_fn_mk]
+  simp only [Fintype.sum_sum_type, physicalStageStructure, Equiv.coe_fn_mk, Fintype.sum_unique]
   ring
 
 /-- **The physical stages carry the same total velocity as the corpus's five stage families.**
-The allele-flip stage at both loci carries the left-locus and right-locus flip velocities
-together. -/
+The simultaneous migration stage carries every ordered pair's migration drift together, and the
+allele-flip stage at both loci the left-locus and right-locus flip velocities together. -/
 theorem sum_physicalStageDrift {D : ℕ} (rates : ManyDemeLDRates D)
     (coordinate : AffineEnlargedCoordinate D) (state : DemeHaplotypeState D) :
     ∑ stage : PhysicalStage D, physicalStageDrift rates coordinate stage state =
       ∑ stage : Stage D, stageDrift rates (enlargedStageExpansion coordinate) stage state := by
   rw [sum_physicalStage, sum_stage]
-  simp only [physicalStageDrift, bothMutationExpansion_velocity, stageDrift, stageRate,
-    stageVelocity, mul_add, Finset.sum_add_distrib]
+  simp only [physicalStageDrift, simultaneousMigrationExpansion_velocity,
+    bothMutationExpansion_velocity, stageDrift, stageRate, stageVelocity, mul_add,
+    Finset.sum_add_distrib]
   ring
 
 /-! ## Separating the stages through the rates -/
@@ -428,20 +431,12 @@ def doubledCoalescenceRates {D : ℕ} (rates : ManyDemeLDRates D) (deme : Fin D)
       have hpos := rates.coalescence_pos other
       split_ifs <;> linarith }
 
-/-- The rate law with the migration into `recipient` from `source` switched off. -/
-def withoutMigrationRates {D : ℕ} (rates : ManyDemeLDRates D) (source recipient : Fin D) :
-    ManyDemeLDRates D :=
+/-- The rate law with every migration rate switched off. -/
+def withoutMigrationRates {D : ℕ} (rates : ManyDemeLDRates D) : ManyDemeLDRates D :=
   { rates with
-    migration := fun into from_ ↦
-      if from_ = source ∧ into = recipient then 0 else rates.migration into from_
-    migration_nonneg := fun into from_ ↦ by
-      split_ifs
-      · exact le_rfl
-      · exact rates.migration_nonneg into from_
-    migration_self := fun deme ↦ by
-      split_ifs
-      · rfl
-      · exact rates.migration_self deme }
+    migration := fun _ _ ↦ 0
+    migration_nonneg := fun _ _ ↦ le_rfl
+    migration_self := fun _ ↦ rfl }
 
 /-- The rate law with one deme's recombination rate switched off. -/
 def withoutRecombinationRates {D : ℕ} (rates : ManyDemeLDRates D) (deme : Fin D) :
@@ -470,9 +465,9 @@ def physicalGenerator {D : ℕ} (rates : ManyDemeLDRates D) :
   | .drift deme =>
       enlargedLowOrderLDGenerator (doubledCoalescenceRates rates deme) -
         enlargedLowOrderLDGenerator rates
-  | .migration source recipient =>
+  | .migration =>
       enlargedLowOrderLDGenerator rates -
-        enlargedLowOrderLDGenerator (withoutMigrationRates rates source recipient)
+        enlargedLowOrderLDGenerator (withoutMigrationRates rates)
   | .recombination deme =>
       enlargedLowOrderLDGenerator rates -
         enlargedLowOrderLDGenerator (withoutRecombinationRates rates deme)
@@ -527,29 +522,11 @@ theorem physicalStageDrift_eq_mulVec {D : ℕ} (rates : ManyDemeLDRates D)
       rw [physicalGenerator, generatorDifference_mulVec]
       simp only [hdifference, ite_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ, if_true]
       rfl
-  | migration source recipient =>
-      have hdifference : ∀ other : Stage D,
-          stageRate rates other - stageRate (withoutMigrationRates rates source recipient) other =
-            if other = .migration source recipient then stageRate rates other else 0 := by
-        intro other
-        cases other with
-        | migration otherSource otherRecipient =>
-            show rates.migration otherRecipient otherSource -
-                (if otherSource = source ∧ otherRecipient = recipient then 0
-                  else rates.migration otherRecipient otherSource) =
-              if Stage.migration otherSource otherRecipient = Stage.migration source recipient
-              then rates.migration otherRecipient otherSource else 0
-            by_cases hpair : otherSource = source ∧ otherRecipient = recipient
-            · rw [if_pos hpair, if_pos (by rw [hpair.1, hpair.2])]
-              ring
-            · rw [if_neg hpair, if_neg fun hequal ↦ hpair (Stage.migration.inj hequal)]
-              ring
-        | _ =>
-            rw [if_neg (by simp)]
-            exact sub_self _
-      rw [physicalGenerator, generatorDifference_mulVec]
-      simp only [hdifference, ite_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ, if_true]
-      rfl
+  | migration =>
+      rw [physicalGenerator, generatorDifference_mulVec, sum_stage]
+      simp only [physicalStageDrift, simultaneousMigrationExpansion_velocity, stageDrift,
+        stageRate, stageVelocity, withoutMigrationRates, sub_self, sub_zero, zero_mul,
+        Finset.sum_const_zero, zero_add, add_zero]
   | recombination deme =>
       have hdifference : ∀ other : Stage D,
           stageRate rates other - stageRate (withoutRecombinationRates rates deme) other =
