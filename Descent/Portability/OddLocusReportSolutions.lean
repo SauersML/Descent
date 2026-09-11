@@ -31,7 +31,8 @@ exponential-decay approximation is needed is checked rather than repeated.
 
 `oddLevelMatrix` writes the same system as a finite generator against the grid predecessor
 `gridPred` of `Descent.Portability.ContinuousTurnoverSemigroup`, in the shape that module's
-`linearDeathMatrix` uses, and `oddSolution_ode_matrix` states the system as `a' = L a`.
+`linearDeathMatrix` uses, and `oddLevelMatrix_mulVec` evaluates it as the scaled down-difference
+that is the right-hand side of (4.6) read on the level grid.
 
 Domain conditions: none beyond the manuscript's own.  The rate `λ` is an arbitrary real
 throughout; nonnegativity is never needed for the solution or its uniqueness.
@@ -153,14 +154,18 @@ theorem oddSolution_initial (lam : ℝ) (r : ℕ) : oddSolution lam r 0 = (2 * (
     simp
   rw [Finset.sum_congr rfl hpt, sum_oddRow]
 
+/-- The derivative of a bare exponential of a linear argument. -/
+theorem hasDerivAt_expLin (a t : ℝ) :
+    HasDerivAt (fun s : ℝ ↦ Real.exp (a * s)) (Real.exp (a * t) * a) t := by
+  have h1 : HasDerivAt (fun s : ℝ ↦ a * s) a t := by
+    simpa using (hasDerivAt_id t).const_mul a
+  exact h1.exp
+
 /-- The derivative of a single exponential term. -/
 theorem hasDerivAt_expTerm (a c t : ℝ) :
     HasDerivAt (fun s : ℝ ↦ c * Real.exp (a * s)) (c * a * Real.exp (a * t)) t := by
-  have h1 : HasDerivAt (fun s : ℝ ↦ a * s) a t := by
-    simpa using (hasDerivAt_id t).const_mul a
-  have h2 : HasDerivAt (fun s : ℝ ↦ Real.exp (a * s)) (Real.exp (a * t) * a) t := h1.exp
   have h3 : HasDerivAt (fun s : ℝ ↦ c * Real.exp (a * s)) (c * (Real.exp (a * t) * a)) t :=
-    h2.const_mul c
+    (hasDerivAt_expLin a t).const_mul c
   convert h3 using 1
   ring
 
@@ -169,8 +174,16 @@ theorem hasDerivAt_oddSolution (lam : ℝ) (r : ℕ) (t : ℝ) :
     HasDerivAt (oddSolution lam r)
       (∑ q ∈ Finset.range (r + 1),
         oddRow r q * (-(dexp q) * lam) * Real.exp (-(dexp q) * lam * t)) t := by
-  refine HasDerivAt.sum fun q _ ↦ ?_
-  exact hasDerivAt_expTerm (-(dexp q) * lam) (oddRow r q) t
+  have h : HasDerivAt (∑ q ∈ Finset.range (r + 1),
+        fun s : ℝ ↦ oddRow r q * Real.exp (-(dexp q) * lam * s))
+      (∑ q ∈ Finset.range (r + 1),
+        oddRow r q * (-(dexp q) * lam) * Real.exp (-(dexp q) * lam * t)) t :=
+    HasDerivAt.sum fun q _ ↦ hasDerivAt_expTerm (-(dexp q) * lam) (oddRow r q) t
+  have hfun : (∑ q ∈ Finset.range (r + 1),
+      fun s : ℝ ↦ oddRow r q * Real.exp (-(dexp q) * lam * s)) = oddSolution lam r := by
+    funext s
+    rw [oddSolution, Finset.sum_apply]
+  rwa [hfun] at h
 
 /-- **The third clause of (4.6):** level `r + 1` obeys `a' = λ(2r+3)(a_r − a_{r+1})`.  Matching
 each exponential separately is exactly the coefficient recursion, and the diagonal slot matches
@@ -236,6 +249,87 @@ theorem oddSolution_two (lam t : ℝ) :
   rw [oddSolution, Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_one,
     oddRow_two_zero, oddRow_two_one, oddRow_two_two, dexp_zero, dexp_one, dexp_two]
   norm_num
+
+/-! ## Uniqueness of the solution -/
+
+/-- **The system (4.6) determines its solution.**  Two families satisfying the three clauses
+agree at every level and time, so `a_n` is a determinate function and the endpoint of
+DC Corollary 4.3 is a number rather than a description.  The argument is the integrating factor
+`e^{λ(2r+3)t}` applied to the difference at each level in turn. -/
+theorem oddSystem_unique (lam : ℝ) (a b : ℕ → ℝ → ℝ) (ha0 : ∀ t, a 0 t = 1)
+    (hb0 : ∀ t, b 0 t = 1)
+    (haD : ∀ r t, HasDerivAt (a (r + 1))
+      (lam * (2 * ((r : ℝ) + 1) + 1) * (a r t - a (r + 1) t)) t)
+    (hbD : ∀ r t, HasDerivAt (b (r + 1))
+      (lam * (2 * ((r : ℝ) + 1) + 1) * (b r t - b (r + 1) t)) t)
+    (hai : ∀ r, a (r + 1) 0 = (2 * ((r : ℝ) + 1) + 1) ^ 2)
+    (hbi : ∀ r, b (r + 1) 0 = (2 * ((r : ℝ) + 1) + 1) ^ 2) :
+    ∀ r t, a r t = b r t := by
+  intro r
+  induction r with
+  | zero =>
+    intro t
+    rw [ha0, hb0]
+  | succ r ih =>
+    intro t
+    have hg : ∀ s : ℝ, HasDerivAt (fun u : ℝ ↦ (a (r + 1) u - b (r + 1) u)
+        * Real.exp (lam * (2 * ((r : ℝ) + 1) + 1) * u)) 0 s := by
+      intro s
+      have hd : HasDerivAt (fun u : ℝ ↦ a (r + 1) u - b (r + 1) u)
+          (lam * (2 * ((r : ℝ) + 1) + 1) * (a r s - a (r + 1) s)
+            - lam * (2 * ((r : ℝ) + 1) + 1) * (b r s - b (r + 1) s)) s :=
+        (haD r s).sub (hbD r s)
+      have hmul := hd.mul (hasDerivAt_expLin (lam * (2 * ((r : ℝ) + 1) + 1)) s)
+      convert hmul using 1
+      rw [ih s]
+      ring
+    have hconst := is_const_of_deriv_eq_zero
+      (f := fun u : ℝ ↦ (a (r + 1) u - b (r + 1) u)
+        * Real.exp (lam * (2 * ((r : ℝ) + 1) + 1) * u))
+      (fun s ↦ (hg s).differentiableAt) (fun s ↦ (hg s).deriv) t 0
+    have hg0 : (a (r + 1) 0 - b (r + 1) 0)
+        * Real.exp (lam * (2 * ((r : ℝ) + 1) + 1) * 0) = 0 := by
+      rw [hai r, hbi r]
+      ring
+    rw [hg0] at hconst
+    rcases mul_eq_zero.mp hconst with h | h
+    · linarith
+    · exact absurd h (Real.exp_ne_zero _)
+
+/-! ## The same system as a finite generator -/
+
+/-- The odd-locus generator on levels `0, …, m`, written in the shape that
+`ContinuousTurnoverSemigroup.linearDeathMatrix` uses: level `r` falls to `gridPred m r` at rate
+`λ(2r+1)`, and level `0` is absorbing because its own predecessor is itself. -/
+def oddLevelMatrix (m : ℕ) (lam : ℝ) : Matrix (Fin (m + 1)) (Fin (m + 1)) ℝ :=
+  Matrix.of fun r i ↦ lam * (2 * (((r : ℕ) : ℝ)) + 1)
+    * ((if i = gridPred m r then (1 : ℝ) else 0) - (if i = r then (1 : ℝ) else 0))
+
+/-- **The odd-locus generator acts by the scaled down-difference**, which is the right-hand side
+of (4.6) read on the level grid. -/
+theorem oddLevelMatrix_mulVec (m : ℕ) (lam : ℝ) (v : Fin (m + 1) → ℝ) (r : Fin (m + 1)) :
+    (oddLevelMatrix m lam).mulVec v r
+      = lam * (2 * (((r : ℕ) : ℝ)) + 1) * (v (gridPred m r) - v r) := by
+  have hpt : ∀ i : Fin (m + 1), oddLevelMatrix m lam r i * v i
+      = lam * (2 * (((r : ℕ) : ℝ)) + 1) * ((if i = gridPred m r then v i else 0)
+        - (if i = r then v i else 0)) := by
+    intro i
+    simp only [oddLevelMatrix, Matrix.of_apply]
+    by_cases h1 : i = gridPred m r
+    · by_cases h2 : i = r
+      · rw [if_pos h1, if_pos h2, if_pos h1, if_pos h2]
+        ring
+      · rw [if_pos h1, if_neg h2, if_pos h1, if_neg h2]
+        ring
+    · by_cases h2 : i = r
+      · rw [if_neg h1, if_pos h2, if_neg h1, if_pos h2]
+        ring
+      · rw [if_neg h1, if_neg h2, if_neg h1, if_neg h2]
+        ring
+  simp only [Matrix.mulVec, dotProduct]
+  rw [Finset.sum_congr rfl fun i _ ↦ hpt i, ← Finset.mul_sum, Finset.sum_sub_distrib,
+    Finset.sum_ite_eq' Finset.univ (gridPred m r) v, Finset.sum_ite_eq' Finset.univ r v,
+    if_pos (Finset.mem_univ _), if_pos (Finset.mem_univ _)]
 
 end
 

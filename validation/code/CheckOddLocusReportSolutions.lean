@@ -19,6 +19,7 @@ open Descent.Portability.OddLocusReportSolutions
 #print axioms sum_oddRow
 #print axioms oddSolution_level_zero
 #print axioms oddSolution_initial
+#print axioms hasDerivAt_expLin
 #print axioms hasDerivAt_expTerm
 #print axioms hasDerivAt_oddSolution
 #print axioms oddSolution_ode
@@ -29,3 +30,5 @@ open Descent.Portability.OddLocusReportSolutions
 #print axioms oddRow_two_two
 #print axioms oddSolution_one
 #print axioms oddSolution_two
+#print axioms oddSystem_unique
+#print axioms oddLevelMatrix_mulVec
