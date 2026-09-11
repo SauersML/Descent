@@ -103,15 +103,18 @@ theorem neg_log_tail_bound (rate : ℝ) (hpos : 0 < rate) (hle : rate ≤ 1) (te
     have hmono : ((terms : ℝ) + 1) ≤ (↑(index + terms) : ℝ) + 1 := by
       push_cast
       linarith [Nat.cast_nonneg (α := ℝ) index]
-    have hnum : (0 : ℝ) ≤ (1 - rate) ^ (index + terms + 1) := pow_nonneg hdeficit _
-    have hstep : (1 - rate) ^ (index + terms + 1) / ((↑(index + terms) : ℝ) + 1) ≤
-        (1 - rate) ^ (index + terms + 1) / ((terms : ℝ) + 1) := by
-      gcongr
+    have hshifted : (0 : ℝ) < (↑(index + terms) : ℝ) + 1 := by positivity
+    have hbase : (0 : ℝ) ≤ (1 - rate) ^ (terms + 1) := pow_nonneg hdeficit _
+    have hlead : (0 : ℝ) ≤ (1 - rate) ^ index := pow_nonneg hdeficit _
+    have hinner : (1 - rate) ^ (terms + 1) / ((↑(index + terms) : ℝ) + 1) ≤
+        (1 - rate) ^ (terms + 1) / ((terms : ℝ) + 1) := by
+      rw [div_le_div_iff₀ hshifted horder]
+      exact mul_le_mul_of_nonneg_left hmono hbase
     have hfactor : (1 - rate) ^ (index + terms + 1) =
         (1 - rate) ^ index * (1 - rate) ^ (terms + 1) := by
-      rw [← pow_add]
-    rw [hfactor, mul_div_assoc] at hstep
-    exact hstep
+      rw [← pow_add, Nat.add_assoc]
+    rw [hfactor, mul_div_assoc]
+    exact mul_le_mul_of_nonneg_left hinner hlead
   have htailNonneg : ∀ index : ℕ,
       0 ≤ (1 - rate) ^ (index + terms + 1) / ((↑(index + terms) : ℝ) + 1) := by
     intro index
@@ -162,7 +165,9 @@ theorem expectedLogLoss_eq_top (law : FiniteReportLaw Outcome) (forecast : Outco
     _ ≤ ∑ outcome, ENNReal.ofReal (law.mass outcome) *
           (if 0 < forecast outcome then ENNReal.ofReal (-Real.log (forecast outcome))
             else ⊤) :=
-        Finset.single_le_sum (fun outcome _ ↦ zero_le _) (Finset.mem_univ ruled)
+        Finset.single_le_sum (f := fun outcome ↦ ENNReal.ofReal (law.mass outcome) *
+          (if 0 < forecast outcome then ENNReal.ofReal (-Real.log (forecast outcome))
+            else ⊤)) (fun outcome _ ↦ zero_le _) (Finset.mem_univ ruled)
 
 /-- **NOTE 2 section 6.4, finite branch.** When no outcome is ruled out, the extended-valued
 expected logarithmic loss is exactly the real expectation of the pointwise loss. -/
