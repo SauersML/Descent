@@ -168,8 +168,12 @@ theorem draw_bracket (stage : ℕ) (stream : ℕ → Bool) :
         truncatedDraw stage stream + (1 / 2 : ℝ) ^ stage ≤ 1 := by
   refine ⟨Finset.sum_nonneg fun index _ ↦ binaryDigit_nonneg stream index,
     truncatedDraw_le_uniformDraw stage stream, uniformDraw_le_truncatedDraw_add stage stream, ?_⟩
+  have hrational : ((wordDraw stage (prefixOf stream stage) + (1 / 2 : ℚ) ^ stage : ℚ) : ℝ) ≤
+      ((1 : ℚ) : ℝ) := by
+    exact_mod_cast wordDraw_add_le_one stage (prefixOf stream stage)
+  push_cast at hrational
   rw [← wordDraw_prefixOf]
-  exact_mod_cast wordDraw_add_le_one stage (prefixOf stream stage)
+  exact hrational
 
 /-- NOTE2 Theorem 5 for a metric of the uniform draw: the cylinder evaluator whose lower value
 on a word is the metric at the spelled digits and whose upper value is the metric at those
@@ -279,6 +283,7 @@ theorem lowerSum_metricEvaluator (metric : ℚ → ℚ) (curve : ℝ → ℝ) (c
   show (1 / 2 : ℝ) ^ stage * (metric ((index : ℚ) / 2 ^ stage) : ℝ) = _
   rw [hcast]
   push_cast
+  rfl
 
 /-- NOTE2 Theorem 5, executed: the rational upper certificate of a metric of the uniform draw is
 the right dyadic Riemann sum of its curve. -/
@@ -300,7 +305,7 @@ theorem upperSum_metricEvaluator (metric : ℚ → ℚ) (curve : ℝ → ℝ) (c
   congr 1
   congr 1
   push_cast
-  rw [one_div_pow, div_add_div_same]
+  rw [one_div_pow, ← add_div]
 
 /-! ### Dyadic Riemann sums of an increasing curve -/
 
@@ -310,7 +315,7 @@ theorem integral_unit_eq_sum_dyadic (curve : ℝ → ℝ) (hmonotone : MonotoneO
     ∫ θ in (0:ℝ)..1, curve θ =
       ∑ index ∈ Finset.range (2 ^ stage),
         ∫ θ in (index : ℝ) / 2 ^ stage..((index + 1 : ℕ) : ℝ) / 2 ^ stage, curve θ := by
-  have hpieces : ∀ index < 2 ^ stage, IntervalIntegrable curve volume
+  have hpieces : ∀ index : ℕ, index < 2 ^ stage → IntervalIntegrable curve volume
       ((index : ℝ) / 2 ^ stage) (((index + 1 : ℕ) : ℝ) / 2 ^ stage) := by
     intro index hindex
     refine (hmonotone.mono ?_).intervalIntegrable
@@ -431,13 +436,13 @@ theorem tendsto_riemannSums (curve : ℝ → ℝ) (hmonotone : MonotoneOn curve 
       fun stage ↦ (riemannSums_bracket_integral curve hmonotone stage).1
     have hbracket := (riemannSums_bracket_integral curve hmonotone stage).2
     have hdifference := riemannSums_gap curve stage
-    show ∫ θ in (0:ℝ)..1, curve θ - (1 / 2 : ℝ) ^ stage * (curve 1 - curve 0) ≤ _
+    show (∫ θ in (0:ℝ)..1, curve θ) - (1 / 2 : ℝ) ^ stage * (curve 1 - curve 0) ≤ _
     linarith
   · refine tendsto_of_tendsto_of_tendsto_of_le_of_le hconst habove
       (fun stage ↦ (riemannSums_bracket_integral curve hmonotone stage).2) fun stage ↦ ?_
     have hbracket := (riemannSums_bracket_integral curve hmonotone stage).1
     have hdifference := riemannSums_gap curve stage
-    show _ ≤ ∫ θ in (0:ℝ)..1, curve θ + (1 / 2 : ℝ) ^ stage * (curve 1 - curve 0)
+    show _ ≤ (∫ θ in (0:ℝ)..1, curve θ) + (1 / 2 : ℝ) ^ stage * (curve 1 - curve 0)
     linarith
 
 /-- NOTE2 Theorem 5, executed for an increasing metric of the uniform draw: at every stage the
@@ -484,7 +489,7 @@ theorem cast_aucFormula (θ : ℚ) : ((aucFormula θ : ℚ) : ℝ) = aucFormula 
 
 /-- On the unit interval the squared correlation increases, by at most twice the increase of
 the penetrance. -/
-theorem squaredCorrelationFormula_increase (first second : ℝ) (hfirst : 0 ≤ first)
+theorem squaredCorrelationFormula_increase (first second : ℝ) (_hfirst : 0 ≤ first)
     (hle : first ≤ second) (hsecond : second ≤ 1) :
     0 ≤ squaredCorrelationFormula second - squaredCorrelationFormula first ∧
       squaredCorrelationFormula second - squaredCorrelationFormula first ≤
@@ -506,7 +511,7 @@ theorem squaredCorrelationFormula_increase (first second : ℝ) (hfirst : 0 ≤ 
 
 /-- On the unit interval the area under the curve increases, by at most half the increase of
 the penetrance. -/
-theorem aucFormula_increase (first second : ℝ) (hfirst : 0 ≤ first) (hle : first ≤ second)
+theorem aucFormula_increase (first second : ℝ) (_hfirst : 0 ≤ first) (hle : first ≤ second)
     (hsecond : second ≤ 1) :
     0 ≤ aucFormula second - aucFormula first ∧
       aucFormula second - aucFormula first ≤ 1 / 2 * (second - first) := by
