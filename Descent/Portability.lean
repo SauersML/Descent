@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.EnlargedBodyClosedness
 import Descent.Portability.TwoLocusRealizabilityPreservation
 import Descent.Portability.PulseStageKernel
 import Descent.Portability.MeiosisGameteLaw
