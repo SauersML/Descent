@@ -374,12 +374,12 @@ theorem nearestDriftKernel_count {α β τ : ℝ} (hα : 0 ≤ α) (hβ : 0 ≤ 
         have hcast : ((occupiedCount (flipCoord i s) : ℕ) : ℤ)
             = ((occupiedCount s : ℕ) : ℤ) + 1 := by omega
         rw [hcast]
-        simp [hsi]
+        simp
       · have hc := occupiedCount_flipCoord_true i s hsi
         have hcast : ((occupiedCount (flipCoord i s) : ℕ) : ℤ)
             = ((occupiedCount s : ℕ) : ℤ) - 1 := by omega
         rw [hcast]
-        simp [hsi]
+        simp
     rw [Finset.sum_congr rfl fun i _ ↦ hpt i, Finset.sum_add_distrib, ← Finset.sum_mul,
       ← Finset.sum_mul, ← occupiedCount_eq_sum, occupiedCount_compl]
     ring
