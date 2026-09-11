@@ -13,5 +13,7 @@ import Descent.Portability.FourthMomentStrongDuality
 #print axioms Descent.Portability.FourthMomentStrongDuality.isOpen_slackRegion
 #print axioms Descent.Portability.FourthMomentStrongDuality.momentVector_decomp
 #print axioms Descent.Portability.FourthMomentStrongDuality.apply_momentVector
+#print axioms Descent.Portability.FourthMomentStrongDuality.exists_optimal_multipliers
 #print axioms Descent.Portability.FourthMomentStrongDuality.exists_near_optimal_multipliers
+#print axioms Descent.Portability.FourthMomentStrongDuality.isGreatest_dual
 #print axioms Descent.Portability.FourthMomentStrongDuality.dual_sup_eq_minFourthMoment

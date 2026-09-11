@@ -30,10 +30,13 @@ separation becomes the dual inequality verbatim. Finally the quartic maximum of 
 attained (`FourthMomentDuality.exists_quartic_argmax`), so `E Φ` is itself the value of a
 feasible pair, which is what turns the separation into a bound on the dual objective.
 
-* `exists_near_optimal_multipliers` is the `ε` form: multipliers whose dual value exceeds
-  `V − ε`.
-* `dual_sup_eq_minFourthMoment` is UPT (3.8) itself: the supremum over all multipliers
-  equals `V(β, k, m)`.
+* `exists_optimal_multipliers` produces multipliers whose dual value is exactly
+  `V(β, k, m)`. Separating the value point `(β, k, m, V)` rather than a point strictly
+  below it gives attainment, not just an `ε` bound: the point is not interior, because an
+  interior point would put `(β, k, m, V − δ)` in the set and contradict minimality.
+* `isGreatest_dual` and `dual_sup_eq_minFourthMoment` are UPT (3.8): the supremum over all
+  multipliers is a maximum and equals `V(β, k, m)`. `exists_near_optimal_multipliers` is
+  the `ε` corollary.
 -/
 
 set_option autoImplicit false
@@ -243,25 +246,22 @@ theorem apply_momentVector (f : ((Option ι ⊕ Bool) → ℝ) →L[ℝ] ℝ) (�
 
 /-! ## Strong duality -/
 
-/-- **No duality gap, in `ε` form.** For a finitely supported law at a triple strictly
-inside the feasible region there are multipliers whose dual value exceeds `V − ε`. -/
-theorem exists_near_optimal_multipliers (E : ExpFunctional Ω) (p : Ω → ℝ)
+/-- **No duality gap, with the dual supremum attained.** For a finitely supported law at a
+triple strictly inside the feasible region there are multipliers whose dual value is
+exactly `V(β, k, m)`. The Slater point is what supplies a finite maximizing dual vector,
+which the manuscript declines to assert on the boundary. -/
+theorem exists_optimal_multipliers (E : ExpFunctional Ω) (p : Ω → ℝ)
     (hE : ∀ f : Ω → ℝ, E f = ∑ ω, p ω * f ω) (X : Ω → ι → ℝ) (β : ℝ) (k : ι → ℝ) (m : ℝ)
     (hmean : ∀ i, E (fun ω ↦ X ω i) = 0)
     (horth : ∀ i j, E (fun ω ↦ X ω i * X ω j) = if i = j then 1 else 0)
-    (hslater : β ^ 2 + dot k k < m) (ε : ℝ) (hε : 0 < ε) :
+    (hslater : β ^ 2 + dot k k < m) :
     ∃ (lam0 : ℝ) (lam : ι → ℝ) (r : ℝ),
-      minFourthMoment E X β k m - ε ≤ dualObjective E X β k m lam0 lam r := by
+      dualObjective E X β k m lam0 lam r = minFourthMoment E X β k m := by
   have hA : Convex ℝ (attainableSet E X) := convex_attainableSet E X
   set V := minFourthMoment E X β k m with hVdef
   set T := slackValue E X β k m + 1 with hTdef
-  set y₀ := momentVector β k m (V - ε) with hy₀
+  set y₀ := momentVector β k m V with hy₀
   set y₁ := momentVector β k m T with hy₁
-  have hy₀not : y₀ ∉ attainableSet E X := by
-    intro hmem
-    have hle := minFourthMoment_le_of_mem E X β k m (V - ε) hmem
-    rw [← hVdef] at hle
-    linarith
   have hsub : slackRegion E X ⊆ attainableSet E X := slackRegion_subset E X hmean horth
   have hopen : IsOpen (slackRegion E X) := isOpen_slackRegion E p hE X
   have hmemT : ∀ s : ℝ, T ≤ s → momentVector β k m s ∈ attainableSet E X := by
@@ -283,7 +283,32 @@ theorem exists_near_optimal_multipliers (E : ExpFunctional Ω) (p : Ω → ℝ)
     have hmono := interior_mono hsub
     rw [hopen.interior_eq] at hmono
     exact hmono hy₁mem
-  have hy₀notint : y₀ ∉ interior (attainableSet E X) := fun h ↦ hy₀not (interior_subset h)
+  have hy₀notint : y₀ ∉ interior (attainableSet E X) := by
+    intro hint
+    obtain ⟨u, hu, hball⟩ := Metric.isOpen_iff.mp isOpen_interior _ hint
+    set sp : (Option ι ⊕ Bool) → ℝ := spike (Sum.inr true) with hsp
+    set δ : ℝ := u / (2 * (‖sp‖ + 1)) with hδ
+    have hnn : (0 : ℝ) ≤ ‖sp‖ := norm_nonneg _
+    have hδpos : 0 < δ := by
+      rw [hδ]
+      positivity
+    have heq : momentVector β k m (V - δ) = y₀ - δ • sp := by
+      funext j
+      rw [hy₀]
+      rcases j with j | c
+      · rcases j with _ | i <;>
+          simp [momentVector, hsp, spike, Pi.sub_apply, Pi.smul_apply]
+      · cases c <;>
+          simp [momentVector, hsp, spike, Pi.sub_apply, Pi.smul_apply]
+    have hmemball : momentVector β k m (V - δ) ∈ Metric.ball y₀ u := by
+      rw [Metric.mem_ball, heq, dist_eq_norm, sub_sub_cancel_left, norm_neg, norm_smul,
+        Real.norm_eq_abs, abs_of_pos hδpos, hδ, div_mul_eq_mul_div,
+        div_lt_iff₀ (by linarith)]
+      nlinarith
+    have hle := minFourthMoment_le_of_mem E X β k m (V - δ)
+      (interior_subset (hball hmemball))
+    rw [← hVdef] at hle
+    linarith
   obtain ⟨f, hsep⟩ :=
     geometric_hahn_banach_open_point hA.interior isOpen_interior hy₀notint
   have hy₁lt : f y₁ < f y₀ := hsep y₁ hy₁int
@@ -295,7 +320,7 @@ theorem exists_near_optimal_multipliers (E : ExpFunctional Ω) (p : Ω → ℝ)
     ring
   have hcne : c ≠ 0 := by
     intro h0
-    have hgap := hcoef (V - ε) T
+    have hgap := hcoef V T
     rw [h0, mul_zero, ← hy₀, ← hy₁] at hgap
     linarith
   have hall : ∀ v ∈ attainableSet E X, f v ≤ f y₀ := by
@@ -356,7 +381,7 @@ theorem exists_near_optimal_multipliers (E : ExpFunctional Ω) (p : Ω → ℝ)
   set r : ℝ := g (spike (Sum.inr false)) with hr
   have hpair : ∀ b a : Ω → ℝ, (∀ ω, b ω ^ 2 ≤ a ω) →
       lam0 * E b + dot lam (fun i ↦ E (fun ω ↦ X ω i * b ω)) + r * E a
-        - E (fun ω ↦ a ω ^ 2) ≤ lam0 * β + dot lam k + r * m - (V - ε) := by
+        - E (fun ω ↦ a ω ^ 2) ≤ lam0 * β + dot lam k + r * m - V := by
     intro b a hab
     have hmem : momentVector (E b) (fun i ↦ E (fun ω ↦ X ω i * b ω)) (E a)
         (E (fun ω ↦ a ω ^ 2)) ∈ attainableSet E X :=
@@ -393,13 +418,51 @@ theorem exists_near_optimal_multipliers (E : ExpFunctional Ω) (p : Ω → ℝ)
         = fun ω ↦ (lam0 + dot lam (X ω)) * eStar ω + r * eStar ω ^ 2 - eStar ω ^ 4 :=
       funext hphi
     rw [hfun, eval_comb E _ (fun ω ↦ eStar ω ^ 2) (fun ω ↦ eStar ω ^ 4) r]
-  refine ⟨lam0, lam, r, ?_⟩
-  unfold dualObjective
-  rw [hPhi, hlin]
-  linarith
+  have hne : (reducedValues E X β k m).Nonempty :=
+    reducedValues_nonempty E X β k m hmean horth (le_of_lt hslater)
+  refine ⟨lam0, lam, r, le_antisymm ?_ ?_⟩
+  · have hinf : V = sInf (reducedValues E X β k m) := hVdef
+    rw [hinf]
+    refine le_csInf hne ?_
+    rintro w ⟨b, a, hab, hb, hk, ha, rfl⟩
+    exact dualObjective_le E X b a β k m lam0 lam r hab hb hk ha
+  · unfold dualObjective
+    rw [hPhi, hlin]
+    linarith
 
-/-- **UPT (3.8): the dual supremum equals the primal minimum.** For a finitely supported
-law at a triple strictly inside the feasible region there is no duality gap. -/
+/-- **No duality gap, in `ε` form**, a corollary of attainment. -/
+theorem exists_near_optimal_multipliers (E : ExpFunctional Ω) (p : Ω → ℝ)
+    (hE : ∀ f : Ω → ℝ, E f = ∑ ω, p ω * f ω) (X : Ω → ι → ℝ) (β : ℝ) (k : ι → ℝ) (m : ℝ)
+    (hmean : ∀ i, E (fun ω ↦ X ω i) = 0)
+    (horth : ∀ i j, E (fun ω ↦ X ω i * X ω j) = if i = j then 1 else 0)
+    (hslater : β ^ 2 + dot k k < m) (ε : ℝ) (hε : 0 < ε) :
+    ∃ (lam0 : ℝ) (lam : ι → ℝ) (r : ℝ),
+      minFourthMoment E X β k m - ε ≤ dualObjective E X β k m lam0 lam r := by
+  obtain ⟨lam0, lam, r, heq⟩ :=
+    exists_optimal_multipliers E p hE X β k m hmean horth hslater
+  exact ⟨lam0, lam, r, by rw [heq]; linarith⟩
+
+/-- **UPT (3.8): the dual supremum is a maximum and equals the primal minimum.** -/
+theorem isGreatest_dual (E : ExpFunctional Ω) (p : Ω → ℝ)
+    (hE : ∀ f : Ω → ℝ, E f = ∑ ω, p ω * f ω) (X : Ω → ι → ℝ) (β : ℝ) (k : ι → ℝ) (m : ℝ)
+    (hmean : ∀ i, E (fun ω ↦ X ω i) = 0)
+    (horth : ∀ i j, E (fun ω ↦ X ω i * X ω j) = if i = j then 1 else 0)
+    (hslater : β ^ 2 + dot k k < m) :
+    IsGreatest {u : ℝ | ∃ (lam0 : ℝ) (lam : ι → ℝ) (r : ℝ),
+        u = dualObjective E X β k m lam0 lam r} (minFourthMoment E X β k m) := by
+  have hne : (reducedValues E X β k m).Nonempty :=
+    reducedValues_nonempty E X β k m hmean horth (le_of_lt hslater)
+  obtain ⟨lam0, lam, r, heq⟩ :=
+    exists_optimal_multipliers E p hE X β k m hmean horth hslater
+  refine ⟨⟨lam0, lam, r, heq.symm⟩, ?_⟩
+  rintro u ⟨lam0', lam', r', rfl⟩
+  have hinf : minFourthMoment E X β k m = sInf (reducedValues E X β k m) := rfl
+  rw [hinf]
+  refine le_csInf hne ?_
+  rintro w ⟨b, a, hab, hb, hk, ha, rfl⟩
+  exact dualObjective_le E X b a β k m lam0' lam' r' hab hb hk ha
+
+/-- **UPT (3.8) as an equality of the supremum with the minimum.** -/
 theorem dual_sup_eq_minFourthMoment (E : ExpFunctional Ω) (p : Ω → ℝ)
     (hE : ∀ f : Ω → ℝ, E f = ∑ ω, p ω * f ω) (X : Ω → ι → ℝ) (β : ℝ) (k : ι → ℝ) (m : ℝ)
     (hmean : ∀ i, E (fun ω ↦ X ω i) = 0)
@@ -407,30 +470,8 @@ theorem dual_sup_eq_minFourthMoment (E : ExpFunctional Ω) (p : Ω → ℝ)
     (hslater : β ^ 2 + dot k k < m) :
     sSup {u : ℝ | ∃ (lam0 : ℝ) (lam : ι → ℝ) (r : ℝ),
         u = dualObjective E X β k m lam0 lam r}
-      = minFourthMoment E X β k m := by
-  have hne : (reducedValues E X β k m).Nonempty :=
-    reducedValues_nonempty E X β k m hmean horth (le_of_lt hslater)
-  have hupper : ∀ u ∈ {u : ℝ | ∃ (lam0 : ℝ) (lam : ι → ℝ) (r : ℝ),
-      u = dualObjective E X β k m lam0 lam r}, u ≤ minFourthMoment E X β k m := by
-    rintro u ⟨lam0, lam, r, rfl⟩
-    refine le_csInf hne ?_
-    rintro w ⟨b, a, hab, hb, hk, ha, rfl⟩
-    exact dualObjective_le E X b a β k m lam0 lam r hab hb hk ha
-  have hsetne : {u : ℝ | ∃ (lam0 : ℝ) (lam : ι → ℝ) (r : ℝ),
-      u = dualObjective E X β k m lam0 lam r}.Nonempty :=
-    ⟨dualObjective E X β k m 0 (fun _ ↦ 0) 0, 0, fun _ ↦ 0, 0, rfl⟩
-  refine le_antisymm (csSup_le hsetne hupper) ?_
-  by_contra hcon
-  push_neg at hcon
-  obtain ⟨lam0, lam, r, hlt⟩ := exists_near_optimal_multipliers E p hE X β k m hmean horth
-    hslater ((minFourthMoment E X β k m
-      - sSup {u : ℝ | ∃ (lam0 : ℝ) (lam : ι → ℝ) (r : ℝ),
-        u = dualObjective E X β k m lam0 lam r}) / 2) (by linarith)
-  have hle : dualObjective E X β k m lam0 lam r
-      ≤ sSup {u : ℝ | ∃ (lam0 : ℝ) (lam : ι → ℝ) (r : ℝ),
-        u = dualObjective E X β k m lam0 lam r} :=
-    le_csSup ⟨minFourthMoment E X β k m, hupper⟩ ⟨lam0, lam, r, rfl⟩
-  linarith
+      = minFourthMoment E X β k m :=
+  (isGreatest_dual E p hE X β k m hmean horth hslater).csSup_eq
 
 end
 
