@@ -44,8 +44,8 @@ Scope.  Only the drift stage is instantiated here; migration, recombination and 
 stages are deterministic and belong to the pulse package, which feeds them into
 `apply_uniformStageMixture` through the same interface, folding its rates into the velocity
 and discharging its clamp at the single step size the lemma asks about.  Nothing here forms a
-semigroup or takes a limit; Theorem 1's Euler passage is separate.  Multinomial resampling, NOTE 1 (10),
-is still not formalized: the single-draw alternative is used throughout.
+semigroup or takes a limit; Theorem 1's Euler passage is separate.  Multinomial resampling,
+NOTE 1 (10), is still not formalized: the single-draw alternative is used throughout.
 
 ## Empirical status
 
