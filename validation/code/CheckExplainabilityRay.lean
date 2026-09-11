@@ -19,3 +19,5 @@ import Descent.Portability.ExplainabilityRay
 #print axioms Descent.Portability.ExplainabilityRay.ray_excess
 #print axioms Descent.Portability.ExplainabilityRay.sharp_explainability_ray
 #print axioms Descent.Portability.ExplainabilityRay.nested_summary_gain
+#print axioms Descent.Portability.ExplainabilityRay.excessCompletionKernel_eq
+#print axioms Descent.Portability.ExplainabilityRay.excessCompletionResidual_eq

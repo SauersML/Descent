@@ -176,6 +176,19 @@ def excessCompletionResidual (E : ExpFunctional D) (b a : D → ℝ) (t : ℝ)
     (z : D × Bool) : ℝ :=
   momentCompletionValue (b z.1) (a z.1) (excessProfile E b a t z.1) z.2
 
+/-- The completion kernel is, cell by cell, the two-point moment completion
+`momentCompletionLaw` of `ConditionalFourthMomentLaw` at the excess profile. -/
+theorem excessCompletionKernel_eq (E : ExpFunctional D) (b a : D → ℝ) (t : ℝ)
+    (d : D) :
+    excessCompletionKernel E b a t d
+      = momentCompletionLaw (b d) (a d) (excessProfile E b a t d) := rfl
+
+/-- Its residual is the corresponding `momentCompletionValue`. -/
+theorem excessCompletionResidual_eq (E : ExpFunctional D) (b a : D → ℝ) (t : ℝ)
+    (z : D × Bool) :
+    excessCompletionResidual E b a t z
+      = momentCompletionValue (b z.1) (a z.1) (excessProfile E b a t z.1) z.2 := rfl
+
 /-- The completion keeps the prescribed conditional first and second moment
 functions and has total loss variance exactly `A + t`. -/
 theorem excessCompletion_moments (E : ExpFunctional D) (b a : D → ℝ) (t : ℝ)
