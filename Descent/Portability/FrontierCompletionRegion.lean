@@ -45,9 +45,11 @@ maxima and no per-cell certificate supplied.
 
 Scope: the cells and the coordinates are finite types. The region statements take arbitrary
 sets of coordinate vectors with no topology; compactness and nonemptiness are hypotheses only
-of the compact forms of (34). The conditional-mean image map and the certificate (35) of the
-same section are not treated here. Nothing here says which completions a demographic history
-actually permits.
+of the compact forms of (34). The conditional-mean image map of the same section is
+`conditionalMeans`, and `exists_convex_not_convex_conditionalMeans` makes precise the note's
+remark that its image of a convex set of completions need not be convex, so that coordinate
+intervals lose the coupling between metrics. The certificate (35) is not treated here. Nothing
+here says which completions a demographic history actually permits.
 
 ## Empirical status
 
@@ -344,5 +346,49 @@ theorem support_csSup_of_isCompact (direction baseline : Coord → ℝ) (cellMas
         ∑ cell, cellMass cell * cellSupport direction (values cell) :=
   (support_isGreatest_of_isCompact direction baseline cellMass hmass values hcompact
     hnonempty).csSup_eq
+
+/-! ## The conditional-mean image need not be convex -/
+
+/-- The conditional means of a joint domain/numerator report: each metric's numerator divided
+by its defined mass, the map `(d_j, n_j)_j ↦ (n_j / d_j)_j` of NOTE 2 section 8. -/
+noncomputable def conditionalMeans {Metric : Type*} (pairs : Metric → ℝ × ℝ) : Metric → ℝ :=
+  fun metric ↦ (pairs metric).2 / (pairs metric).1
+
+/-- **NOTE 2 section 8, the conditional-mean image need not be convex.** A convex set of joint
+domain/numerator pairs, with every domain positive, whose image under the conditional-mean map
+is not convex. Along one segment of completions two metrics reach the conditional means
+`(1, 0)` and `(0, 1)` but never their midpoint, so independent coordinate intervals would
+report a pair of conditional means that no completion attains. -/
+theorem exists_convex_not_convex_conditionalMeans :
+    ∃ pairs : Set (Fin 2 → ℝ × ℝ), Convex ℝ pairs ∧
+      (∀ point ∈ pairs, ∀ metric, 0 < (point metric).1) ∧
+        ¬ Convex ℝ (conditionalMeans '' pairs) := by
+  let first : Fin 2 → ℝ × ℝ := ![(1, 1), (1, 0)]
+  let second : Fin 2 → ℝ × ℝ := ![(1 / 2, 0), (1, 1)]
+  have hcombination : ∀ weight : ℝ,
+      (1 - weight) • first + weight • second = ![(1 - weight / 2, 1 - weight), (1, weight)] := by
+    intro weight
+    funext metric
+    fin_cases metric <;> ext <;> simp [first, second] <;> ring
+  refine ⟨segment ℝ first second, convex_segment first second, ?_, ?_⟩
+  · rintro point ⟨a, b, ha, hb, hab, rfl⟩ metric
+    obtain rfl : a = 1 - b := by linarith
+    rw [hcombination]
+    fin_cases metric <;> simp <;> linarith
+  · intro hconvex
+    have hfirst : conditionalMeans first ∈ conditionalMeans '' segment ℝ first second :=
+      ⟨first, left_mem_segment ℝ first second, rfl⟩
+    have hsecond : conditionalMeans second ∈ conditionalMeans '' segment ℝ first second :=
+      ⟨second, right_mem_segment ℝ first second, rfl⟩
+    obtain ⟨point, ⟨a, b, ha, hb, hab, rfl⟩, hpoint⟩ :=
+      hconvex hfirst hsecond (by norm_num : (0 : ℝ) ≤ 1 / 2) (by norm_num : (0 : ℝ) ≤ 1 / 2)
+        (by norm_num)
+    obtain rfl : a = 1 - b := by linarith
+    rw [hcombination] at hpoint
+    have hsecondMetric := congrFun hpoint 1
+    have hfirstMetric := congrFun hpoint 0
+    simp [conditionalMeans, first, second] at hsecondMetric hfirstMetric
+    rw [hsecondMetric] at hfirstMetric
+    norm_num at hfirstMetric
 
 end Descent.Portability.FrontierCompletionRegion
