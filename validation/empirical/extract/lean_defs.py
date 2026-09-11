@@ -4196,7 +4196,10 @@ def Descent_Portability_HWEHeterozygosityLaw_probability(h):
 def seriesTerm(κ, α, C, t, r):
     return ((poissonPMFReal(((4.0 * Descent_Portability_HWEFixedLayerInputs_energy(κ))), r)) * limitingKernel(κ, α, C, r, t))
 
-def layerAmplitude(h, m, r, c, b):
+def Descent_Portability_HWEHierarchyLimitLaw_layerAmplitude(κ, C, r):
+    return ((_rt.rdiv(1.0, _rt.rsqrt(C))) * _rt.lpow((((-2.0) * κ)), r))
+
+def Descent_Portability_HWEHomogeneousLayer_layerAmplitude(h, m, r, c, b):
     return ((((c * _rt.lpow(_rt._proj(standardizedGenotype(h), 'het'), r)) * _rt.lpow(_rt.rsqrt(2.0), ((m - r)))) * parity(b)) * _rt.rexp(((-weightedSum(((lambda _: Descent_Portability_HWELogCoordinates_coordinate(((_rt._proj(h, 'altFreq') - _rt.rdiv(1.0, 2.0)))))), b)))))
 
 def Descent_Portability_HWEHomozygoteConditioning_encode(*_a):

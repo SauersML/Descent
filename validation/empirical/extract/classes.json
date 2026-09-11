@@ -26748,6 +26748,14 @@
    "Descent.Portability.HWECriticalMoments.critical_mean",
    "Descent.Portability.HWECriticalMoments.critical_power_integrable",
    "Descent.Portability.HWECriticalMoments.critical_second",
+   "Descent.Portability.HWEHierarchyJumpRepresentation.jumpLaw_abs",
+   "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation",
+   "Descent.Portability.HWEHierarchyLimitLaw.signed_kernel_characteristic",
+   "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant",
+   "Descent.Portability.HWEHierarchyMoments.integer_mean",
+   "Descent.Portability.HWEHierarchyMoments.integer_power_integrable",
+   "Descent.Portability.HWEHierarchyMoments.integer_second",
+   "Descent.Portability.HWEHierarchyParameters.layer_jump_variance",
    "Descent.Portability.HWEJumpMoments.jump_fourth",
    "Descent.Portability.HWEJumpMoments.jump_mean",
    "Descent.Portability.HWEJumpMoments.jump_power_integrable",
@@ -26796,6 +26804,16 @@
     "Descent.Portability.HWECriticalMoments.critical_mean": [],
     "Descent.Portability.HWECriticalMoments.critical_second": [],
     "Descent.Portability.HWECriticalMoments.critical_fourth_cumulant": [],
+    "Descent.Portability.HWEHierarchyJumpRepresentation.jumpLaw_abs": [],
+    "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation": [],
+    "Descent.Portability.HWEHierarchyLimitLaw.signed_kernel_characteristic": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_power_integrable": [
+     "n ≤ 4"
+    ],
+    "Descent.Portability.HWEHierarchyMoments.integer_mean": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_second": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant": [],
+    "Descent.Portability.HWEHierarchyParameters.layer_jump_variance": [],
     "Descent.Portability.HWEJumpMoments.jump_power_integrable": [],
     "Descent.Portability.HWEJumpMoments.jump_mean": [],
     "Descent.Portability.HWEJumpMoments.jump_second": [],
@@ -39213,8 +39231,20 @@
    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
    "Descent.Portability.HWEHeterozygosityWeakLimit.counts_tight",
    "Descent.Portability.HWEHeterozygosityWeakLimit.poisson_weak_limit",
+   "Descent.Portability.HWEHierarchyCharacteristic.exponential_adjustment_diverges",
+   "Descent.Portability.HWEHierarchyCharacteristic.original_generator_limit",
+   "Descent.Portability.HWEHierarchyCharacteristic.polynomial_block_count_diverges",
    "Descent.Portability.HWEHierarchyGenerator.full_generator_limit",
    "Descent.Portability.HWEHierarchyGenerator.series_summable",
+   "Descent.Portability.HWEHierarchyJumpRepresentation.jumpLaw_abs",
+   "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation",
+   "Descent.Portability.HWEHierarchyMoments.inclusiveMass_split",
+   "Descent.Portability.HWEHierarchySeries.integer_generator",
+   "Descent.Portability.HWEHierarchySeries.noninteger_generator",
+   "Descent.Portability.HWEHierarchySeries.tail_bounds",
+   "Descent.Portability.HWEHierarchySeries.tail_summable",
+   "Descent.Portability.HWEHierarchyTheorem.integer_weak_limit",
+   "Descent.Portability.HWEHierarchyTheorem.noninteger_weak_limit",
    "Descent.Portability.HWEHomogeneousFrequencyLimit.displacement_limit",
    "Descent.Portability.HWEHomogeneousFrequencyLimit.scaled_displacement_limit",
    "Descent.Portability.HWEHomogeneousLayer.homogeneous_layer_statistic",
@@ -40709,8 +40739,20 @@
     "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [],
     "Descent.Portability.HWEHeterozygosityWeakLimit.counts_tight": [],
     "Descent.Portability.HWEHeterozygosityWeakLimit.poisson_weak_limit": [],
+    "Descent.Portability.HWEHierarchyCharacteristic.exponential_adjustment_diverges": [],
+    "Descent.Portability.HWEHierarchyCharacteristic.polynomial_block_count_diverges": [],
+    "Descent.Portability.HWEHierarchyCharacteristic.original_generator_limit": [],
     "Descent.Portability.HWEHierarchyGenerator.series_summable": [],
     "Descent.Portability.HWEHierarchyGenerator.full_generator_limit": [],
+    "Descent.Portability.HWEHierarchyJumpRepresentation.jumpLaw_abs": [],
+    "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation": [],
+    "Descent.Portability.HWEHierarchyMoments.inclusiveMass_split": [],
+    "Descent.Portability.HWEHierarchySeries.tail_summable": [],
+    "Descent.Portability.HWEHierarchySeries.tail_bounds": [],
+    "Descent.Portability.HWEHierarchySeries.noninteger_generator": [],
+    "Descent.Portability.HWEHierarchySeries.integer_generator": [],
+    "Descent.Portability.HWEHierarchyTheorem.noninteger_weak_limit": [],
+    "Descent.Portability.HWEHierarchyTheorem.integer_weak_limit": [],
     "Descent.Portability.HWEHomogeneousFrequencyLimit.displacement_limit": [],
     "Descent.Portability.HWEHomogeneousFrequencyLimit.scaled_displacement_limit": [],
     "Descent.Portability.HWEHomogeneousLayer.homogeneous_layer_statistic": [],
@@ -43783,6 +43825,7 @@
    "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic",
    "Descent.Portability.HWECriticalScoreCharacteristic.score_mean",
    "Descent.Portability.HWECriticalScoreCharacteristic.score_second",
+   "Descent.Portability.HWEHierarchyCharacteristic.original_generator_limit",
    "Descent.Portability.HWEInteractionLaw.interaction_mean_zero",
    "Descent.Portability.HWEInteractionLaw.interaction_second_moment",
    "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass",
@@ -43821,6 +43864,7 @@
     "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic": [],
     "Descent.Portability.HWECriticalScoreCharacteristic.score_mean": [],
     "Descent.Portability.HWECriticalScoreCharacteristic.score_second": [],
+    "Descent.Portability.HWEHierarchyCharacteristic.original_generator_limit": [],
     "Descent.Portability.HWEInteractionLaw.interaction_mean_zero": [],
     "Descent.Portability.HWEInteractionLaw.interaction_second_moment": [],
     "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass": [],
@@ -49837,8 +49881,20 @@
    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
    "Descent.Portability.HWEHeterozygosityWeakLimit.counts_tight",
    "Descent.Portability.HWEHeterozygosityWeakLimit.poisson_weak_limit",
+   "Descent.Portability.HWEHierarchyCharacteristic.exponential_adjustment_diverges",
+   "Descent.Portability.HWEHierarchyCharacteristic.original_generator_limit",
+   "Descent.Portability.HWEHierarchyCharacteristic.polynomial_block_count_diverges",
    "Descent.Portability.HWEHierarchyGenerator.full_generator_limit",
    "Descent.Portability.HWEHierarchyGenerator.series_summable",
+   "Descent.Portability.HWEHierarchyJumpRepresentation.jumpLaw_abs",
+   "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation",
+   "Descent.Portability.HWEHierarchyMoments.inclusiveMass_split",
+   "Descent.Portability.HWEHierarchySeries.integer_generator",
+   "Descent.Portability.HWEHierarchySeries.noninteger_generator",
+   "Descent.Portability.HWEHierarchySeries.tail_bounds",
+   "Descent.Portability.HWEHierarchySeries.tail_summable",
+   "Descent.Portability.HWEHierarchyTheorem.integer_weak_limit",
+   "Descent.Portability.HWEHierarchyTheorem.noninteger_weak_limit",
    "Descent.Portability.HWEHomogeneousFrequencyLimit.displacement_limit",
    "Descent.Portability.HWEHomogeneousFrequencyLimit.scaled_displacement_limit",
    "Descent.Portability.HWEHomogeneousLayer.homogeneous_layer_statistic",
@@ -51299,8 +51355,20 @@
     "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [],
     "Descent.Portability.HWEHeterozygosityWeakLimit.counts_tight": [],
     "Descent.Portability.HWEHeterozygosityWeakLimit.poisson_weak_limit": [],
+    "Descent.Portability.HWEHierarchyCharacteristic.exponential_adjustment_diverges": [],
+    "Descent.Portability.HWEHierarchyCharacteristic.polynomial_block_count_diverges": [],
+    "Descent.Portability.HWEHierarchyCharacteristic.original_generator_limit": [],
     "Descent.Portability.HWEHierarchyGenerator.series_summable": [],
     "Descent.Portability.HWEHierarchyGenerator.full_generator_limit": [],
+    "Descent.Portability.HWEHierarchyJumpRepresentation.jumpLaw_abs": [],
+    "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation": [],
+    "Descent.Portability.HWEHierarchyMoments.inclusiveMass_split": [],
+    "Descent.Portability.HWEHierarchySeries.tail_summable": [],
+    "Descent.Portability.HWEHierarchySeries.tail_bounds": [],
+    "Descent.Portability.HWEHierarchySeries.noninteger_generator": [],
+    "Descent.Portability.HWEHierarchySeries.integer_generator": [],
+    "Descent.Portability.HWEHierarchyTheorem.noninteger_weak_limit": [],
+    "Descent.Portability.HWEHierarchyTheorem.integer_weak_limit": [],
     "Descent.Portability.HWEHomogeneousFrequencyLimit.displacement_limit": [],
     "Descent.Portability.HWEHomogeneousFrequencyLimit.scaled_displacement_limit": [],
     "Descent.Portability.HWEHomogeneousLayer.homogeneous_layer_statistic": [],
@@ -64423,7 +64491,11 @@
    "Descent.Portability.HWEHeterozygosityWeakLimit.count_absolute_moment",
    "Descent.Portability.HWEHeterozygosityWeakLimit.counts_tight",
    "Descent.Portability.HWEHeterozygosityWeakLimit.poisson_weak_limit",
+   "Descent.Portability.HWEHierarchyCharacteristic.hierarchy_characteristic_limit",
+   "Descent.Portability.HWEHierarchyCharacteristic.original_generator_limit",
    "Descent.Portability.HWEHierarchyGenerator.full_generator_limit",
+   "Descent.Portability.HWEHierarchyTheorem.integer_weak_limit",
+   "Descent.Portability.HWEHierarchyTheorem.noninteger_weak_limit",
    "Descent.Portability.HWEHomogeneousFrequencyLimit.displacement_limit",
    "Descent.Portability.HWEHomogeneousFrequencyLimit.frequency_limit",
    "Descent.Portability.HWEHomogeneousFrequencyLimit.heterozygote_factor_limit",
@@ -64623,7 +64695,11 @@
     "Descent.Portability.HWEHeterozygosityWeakLimit.count_absolute_moment": [],
     "Descent.Portability.HWEHeterozygosityWeakLimit.counts_tight": [],
     "Descent.Portability.HWEHeterozygosityWeakLimit.poisson_weak_limit": [],
+    "Descent.Portability.HWEHierarchyCharacteristic.original_generator_limit": [],
+    "Descent.Portability.HWEHierarchyCharacteristic.hierarchy_characteristic_limit": [],
     "Descent.Portability.HWEHierarchyGenerator.full_generator_limit": [],
+    "Descent.Portability.HWEHierarchyTheorem.noninteger_weak_limit": [],
+    "Descent.Portability.HWEHierarchyTheorem.integer_weak_limit": [],
     "Descent.Portability.HWEHomogeneousFrequencyLimit.displacement_limit": [],
     "Descent.Portability.HWEHomogeneousFrequencyLimit.frequency_limit": [],
     "Descent.Portability.HWEHomogeneousFrequencyLimit.scaled_displacement_limit": [],
@@ -69856,8 +69932,20 @@
    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
    "Descent.Portability.HWEHeterozygosityWeakLimit.counts_tight",
    "Descent.Portability.HWEHeterozygosityWeakLimit.poisson_weak_limit",
+   "Descent.Portability.HWEHierarchyCharacteristic.exponential_adjustment_diverges",
+   "Descent.Portability.HWEHierarchyCharacteristic.original_generator_limit",
+   "Descent.Portability.HWEHierarchyCharacteristic.polynomial_block_count_diverges",
    "Descent.Portability.HWEHierarchyGenerator.full_generator_limit",
    "Descent.Portability.HWEHierarchyGenerator.series_summable",
+   "Descent.Portability.HWEHierarchyJumpRepresentation.jumpLaw_abs",
+   "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation",
+   "Descent.Portability.HWEHierarchyMoments.inclusiveMass_split",
+   "Descent.Portability.HWEHierarchySeries.integer_generator",
+   "Descent.Portability.HWEHierarchySeries.noninteger_generator",
+   "Descent.Portability.HWEHierarchySeries.tail_bounds",
+   "Descent.Portability.HWEHierarchySeries.tail_summable",
+   "Descent.Portability.HWEHierarchyTheorem.integer_weak_limit",
+   "Descent.Portability.HWEHierarchyTheorem.noninteger_weak_limit",
    "Descent.Portability.HWEHomogeneousFrequencyLimit.displacement_limit",
    "Descent.Portability.HWEHomogeneousFrequencyLimit.scaled_displacement_limit",
    "Descent.Portability.HWEHomogeneousLayer.homogeneous_layer_statistic",
@@ -71417,8 +71505,20 @@
     "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [],
     "Descent.Portability.HWEHeterozygosityWeakLimit.counts_tight": [],
     "Descent.Portability.HWEHeterozygosityWeakLimit.poisson_weak_limit": [],
+    "Descent.Portability.HWEHierarchyCharacteristic.exponential_adjustment_diverges": [],
+    "Descent.Portability.HWEHierarchyCharacteristic.polynomial_block_count_diverges": [],
+    "Descent.Portability.HWEHierarchyCharacteristic.original_generator_limit": [],
     "Descent.Portability.HWEHierarchyGenerator.series_summable": [],
     "Descent.Portability.HWEHierarchyGenerator.full_generator_limit": [],
+    "Descent.Portability.HWEHierarchyJumpRepresentation.jumpLaw_abs": [],
+    "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation": [],
+    "Descent.Portability.HWEHierarchyMoments.inclusiveMass_split": [],
+    "Descent.Portability.HWEHierarchySeries.tail_summable": [],
+    "Descent.Portability.HWEHierarchySeries.tail_bounds": [],
+    "Descent.Portability.HWEHierarchySeries.noninteger_generator": [],
+    "Descent.Portability.HWEHierarchySeries.integer_generator": [],
+    "Descent.Portability.HWEHierarchyTheorem.noninteger_weak_limit": [],
+    "Descent.Portability.HWEHierarchyTheorem.integer_weak_limit": [],
     "Descent.Portability.HWEHomogeneousFrequencyLimit.displacement_limit": [],
     "Descent.Portability.HWEHomogeneousFrequencyLimit.scaled_displacement_limit": [],
     "Descent.Portability.HWEHomogeneousLayer.homogeneous_layer_statistic": [],
@@ -72316,6 +72416,7 @@
    "Descent.Portability.HWECriticalAmplitudeLimit.scaling_identity",
    "Descent.Portability.HWEFixedLayerKernelLimit.original_layer_kernel_limit",
    "Descent.Portability.HWEHeterozygosityLimit.zero_indicator",
+   "Descent.Portability.HWEHierarchyMoments.inclusiveMass_split",
    "Descent.Portability.HWEHomogeneousFrequencyLimit.displacement_limit",
    "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation",
    "Descent.Portability.HWEInteractionLaw.complexExpectation_independent_product",
@@ -72832,6 +72933,7 @@
     "Descent.Portability.HWECriticalAmplitudeLimit.scaling_identity": [],
     "Descent.Portability.HWEFixedLayerKernelLimit.original_layer_kernel_limit": [],
     "Descent.Portability.HWEHeterozygosityLimit.zero_indicator": [],
+    "Descent.Portability.HWEHierarchyMoments.inclusiveMass_split": [],
     "Descent.Portability.HWEHomogeneousFrequencyLimit.displacement_limit": [],
     "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation": [],
     "Descent.Portability.HWEInteractionLaw.expectation_independent_product": [],
@@ -88450,6 +88552,7 @@
    "Descent.Portability.GaussianPolynomialMoments.third_moment",
    "Descent.Portability.GaussianPolynomialMoments.tilted_power_moment",
    "Descent.Portability.HWECriticalMoments.critical_variance",
+   "Descent.Portability.HWEHierarchyMoments.integer_variance",
    "Descent.Portability.IndividualLossMoments.expected_square_shift",
    "Descent.Portability.IndividualLossMoments.fitted_squared_loss_r2_gap",
    "Descent.Portability.IndividualLossMoments.fitted_squared_loss_r2_le_oracle",
@@ -88595,6 +88698,7 @@
     "Descent.Portability.GaussianPolynomialMoments.third_moment": [],
     "Descent.Portability.GaussianPolynomialMoments.fourth_moment": [],
     "Descent.Portability.HWECriticalMoments.critical_variance": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_variance": [],
     "Descent.Portability.IndividualLossMoments.total_variance": [],
     "Descent.Portability.IndividualLossMoments.squared_loss_between_decomposition": [],
     "Descent.Portability.IndividualLossMoments.squared_loss_total": [],
@@ -100045,6 +100149,9 @@
    "Descent.Portability.HWEFixedLayerKernelLimit.conditional_layer_kernel_limit",
    "Descent.Portability.HWEFixedLayerKernelLimit.original_layer_kernel_limit",
    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
+   "Descent.Portability.HWEHierarchyCharacteristic.exponential_adjustment_diverges",
+   "Descent.Portability.HWEHierarchyCharacteristic.hierarchy_characteristic_limit",
+   "Descent.Portability.HWEHierarchyCharacteristic.original_generator_limit",
    "Descent.Portability.HWEHomogeneousFrequencyLimit.displacement_limit",
    "Descent.Portability.HWEHomogeneousFrequencyLimit.heterozygote_factor_limit",
    "Descent.Portability.HWEHomogeneousFrequencyLimit.remaining_budget_limit",
@@ -100255,6 +100362,9 @@
     "Descent.Portability.HWEFixedLayerKernelLimit.conditional_layer_kernel_limit": [],
     "Descent.Portability.HWEFixedLayerKernelLimit.original_layer_kernel_limit": [],
     "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [],
+    "Descent.Portability.HWEHierarchyCharacteristic.exponential_adjustment_diverges": [],
+    "Descent.Portability.HWEHierarchyCharacteristic.original_generator_limit": [],
+    "Descent.Portability.HWEHierarchyCharacteristic.hierarchy_characteristic_limit": [],
     "Descent.Portability.HWEHomogeneousFrequencyLimit.displacement_limit": [],
     "Descent.Portability.HWEHomogeneousFrequencyLimit.remaining_budget_limit": [],
     "Descent.Portability.HWEHomogeneousFrequencyLimit.heterozygote_factor_limit": [],
@@ -100428,6 +100538,9 @@
    "Descent.Portability.HWEFixedLayerKernelLimit.conditional_layer_kernel_limit",
    "Descent.Portability.HWEFixedLayerKernelLimit.original_layer_kernel_limit",
    "Descent.Portability.HWEHierarchyGenerator.limitingKernel_bound",
+   "Descent.Portability.HWEHierarchyLimitLaw.charFun_integerLaw",
+   "Descent.Portability.HWEHierarchyLimitLaw.signed_kernel_characteristic",
+   "Descent.Portability.HWEHierarchySeries.integer_generator",
    "Descent.Portability.HWEKernelTruncation.truncation_bound",
    "Descent.Portability.HWETiltedKernelLaw.explicit_kernel_generator",
    "Descent.Portability.HWETiltedKernelLaw.mixture_kernel",
@@ -100598,6 +100711,9 @@
     "Descent.Portability.HWEFixedLayerKernelLimit.conditional_layer_kernel_limit": [],
     "Descent.Portability.HWEFixedLayerKernelLimit.original_layer_kernel_limit": [],
     "Descent.Portability.HWEHierarchyGenerator.limitingKernel_bound": [],
+    "Descent.Portability.HWEHierarchyLimitLaw.signed_kernel_characteristic": [],
+    "Descent.Portability.HWEHierarchyLimitLaw.charFun_integerLaw": [],
+    "Descent.Portability.HWEHierarchySeries.integer_generator": [],
     "Descent.Portability.HWEKernelTruncation.truncation_bound": [],
     "Descent.Portability.HWETiltedKernelLaw.mixture_kernel": [],
     "Descent.Portability.HWETiltedKernelLaw.explicit_kernel_generator": [],
@@ -127894,6 +128010,14 @@
    "Descent.Portability.HWECriticalMoments.critical_mean",
    "Descent.Portability.HWECriticalMoments.critical_power_integrable",
    "Descent.Portability.HWECriticalMoments.critical_second",
+   "Descent.Portability.HWEHierarchyJumpRepresentation.jumpLaw_abs",
+   "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation",
+   "Descent.Portability.HWEHierarchyLimitLaw.signed_kernel_characteristic",
+   "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant",
+   "Descent.Portability.HWEHierarchyMoments.integer_mean",
+   "Descent.Portability.HWEHierarchyMoments.integer_power_integrable",
+   "Descent.Portability.HWEHierarchyMoments.integer_second",
+   "Descent.Portability.HWEHierarchyParameters.layer_jump_variance",
    "Descent.Portability.HWEJumpMoments.jump_fourth",
    "Descent.Portability.HWEJumpMoments.jump_mean",
    "Descent.Portability.HWEJumpMoments.jump_power_integrable",
@@ -127927,6 +128051,14 @@
     "Descent.Portability.HWECriticalMoments.critical_mean": [],
     "Descent.Portability.HWECriticalMoments.critical_second": [],
     "Descent.Portability.HWECriticalMoments.critical_fourth_cumulant": [],
+    "Descent.Portability.HWEHierarchyJumpRepresentation.jumpLaw_abs": [],
+    "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation": [],
+    "Descent.Portability.HWEHierarchyLimitLaw.signed_kernel_characteristic": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_power_integrable": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_mean": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_second": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant": [],
+    "Descent.Portability.HWEHierarchyParameters.layer_jump_variance": [],
     "Descent.Portability.HWEJumpMoments.jump_power_integrable": [],
     "Descent.Portability.HWEJumpMoments.jump_mean": [],
     "Descent.Portability.HWEJumpMoments.jump_second": [],
@@ -130178,6 +130310,7 @@
    "Descent.Portability.HWECriticalGenerator.block_count_diverges",
    "Descent.Portability.HWECriticalGenerator.generator_limit",
    "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic_limit",
+   "Descent.Portability.HWEHierarchyCharacteristic.polynomial_block_count_diverges",
    "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit",
    "Descent.Portability.HWEPolynomialLayerScale.eventual_factorization",
    "Descent.Portability.HWEPolynomialLayerScale.layerScale_factorization",
@@ -130218,6 +130351,7 @@
     "Descent.Portability.HWECriticalGenerator.block_count_diverges": [],
     "Descent.Portability.HWECriticalGenerator.generator_limit": [],
     "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic_limit": [],
+    "Descent.Portability.HWEHierarchyCharacteristic.polynomial_block_count_diverges": [],
     "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit": [],
     "Descent.Portability.HWEPolynomialLayerScale.layerScale_factorization": [],
     "Descent.Portability.HWEPolynomialLayerScale.eventual_factorization": [],
@@ -134608,7 +134742,8 @@
    "Descent.Portability.GaussianCompoundMoments.gaussian_compound_power_integral",
    "Descent.Portability.GaussianCompoundMoments.gaussian_compound_second",
    "Descent.Portability.HWECriticalMoments.critical_fourth_cumulant",
-   "Descent.Portability.HWECriticalMoments.critical_second"
+   "Descent.Portability.HWECriticalMoments.critical_second",
+   "Descent.Portability.HWEHierarchyMoments.integer_second"
   ],
   "constraints": {
    "hypotheses": [
@@ -134636,7 +134771,8 @@
     "Descent.Portability.HWECriticalMoments.critical_second": [],
     "Descent.Portability.HWECriticalMoments.critical_fourth_cumulant": [
      "0 < r"
-    ]
+    ],
+    "Descent.Portability.HWEHierarchyMoments.integer_second": []
    }
   }
  },
@@ -141066,6 +141202,9 @@
    "Descent.Portability.HWEFixedLayerKernelLimit.conditional_layer_kernel_limit",
    "Descent.Portability.HWEFixedLayerKernelLimit.original_layer_kernel_limit",
    "Descent.Portability.HWEHierarchyGenerator.limitingKernel_bound",
+   "Descent.Portability.HWEHierarchyLimitLaw.charFun_integerLaw",
+   "Descent.Portability.HWEHierarchyLimitLaw.signed_kernel_characteristic",
+   "Descent.Portability.HWEHierarchySeries.integer_generator",
    "Descent.Portability.HWEKernelTruncation.truncation_bound",
    "Descent.Portability.HWETiltedKernelLaw.explicit_kernel_generator",
    "Descent.Portability.HWETiltedKernelLaw.mixture_kernel",
@@ -141232,6 +141371,9 @@
     "Descent.Portability.HWEFixedLayerKernelLimit.conditional_layer_kernel_limit": [],
     "Descent.Portability.HWEFixedLayerKernelLimit.original_layer_kernel_limit": [],
     "Descent.Portability.HWEHierarchyGenerator.limitingKernel_bound": [],
+    "Descent.Portability.HWEHierarchyLimitLaw.signed_kernel_characteristic": [],
+    "Descent.Portability.HWEHierarchyLimitLaw.charFun_integerLaw": [],
+    "Descent.Portability.HWEHierarchySeries.integer_generator": [],
     "Descent.Portability.HWEKernelTruncation.truncation_bound": [],
     "Descent.Portability.HWETiltedKernelLaw.mixture_kernel": [],
     "Descent.Portability.HWETiltedKernelLaw.explicit_kernel_generator": [],
@@ -141346,7 +141488,8 @@
    "Descent.Portability.GaussianCompoundMoments.gaussian_compound_power_integral",
    "Descent.Portability.GaussianCompoundMoments.gaussian_compound_second",
    "Descent.Portability.HWECriticalMoments.critical_fourth_cumulant",
-   "Descent.Portability.HWECriticalMoments.critical_second"
+   "Descent.Portability.HWECriticalMoments.critical_second",
+   "Descent.Portability.HWEHierarchyMoments.integer_second"
   ],
   "constraints": {
    "declared_kind": "probability",
@@ -141399,7 +141542,8 @@
     "Descent.Portability.HWECriticalMoments.critical_second": [],
     "Descent.Portability.HWECriticalMoments.critical_fourth_cumulant": [
      "0 < r"
-    ]
+    ],
+    "Descent.Portability.HWEHierarchyMoments.integer_second": []
    }
   }
  },
@@ -161665,6 +161809,7 @@
    "Descent.Portability.GaussianPolynomialMoments.third_moment",
    "Descent.Portability.GaussianPolynomialMoments.tilted_power_moment",
    "Descent.Portability.HWECriticalMoments.critical_variance",
+   "Descent.Portability.HWEHierarchyMoments.integer_variance",
    "Descent.Portability.IndividualLossMoments.expected_square_shift",
    "Descent.Portability.IndividualLossMoments.fitted_squared_loss_r2_gap",
    "Descent.Portability.IndividualLossMoments.fitted_squared_loss_r2_le_oracle",
@@ -161808,6 +161953,7 @@
     "Descent.Portability.GaussianPolynomialMoments.third_moment": [],
     "Descent.Portability.GaussianPolynomialMoments.fourth_moment": [],
     "Descent.Portability.HWECriticalMoments.critical_variance": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_variance": [],
     "Descent.Portability.IndividualLossMoments.total_variance": [],
     "Descent.Portability.IndividualLossMoments.squared_loss_between_decomposition": [],
     "Descent.Portability.IndividualLossMoments.squared_loss_total": [],
@@ -162995,6 +163141,11 @@
    "Descent.Portability.FiniteProductExponential.intervalGenome_exponential",
    "Descent.Portability.GaussianCovarianceSeparation.exponential_characters_independent",
    "Descent.Portability.HWECountLayerLimit.countTest_poisson",
+   "Descent.Portability.HWEHierarchyMoments.inclusiveMass_split",
+   "Descent.Portability.HWEHierarchySeries.gaussian_tail_sum",
+   "Descent.Portability.HWEHierarchySeries.tail_bounds",
+   "Descent.Portability.HWEHierarchySeries.tail_of_negative",
+   "Descent.Portability.HWEHierarchySeries.tail_summable",
    "Descent.Portability.InterleavedMutationMeasurability.waiting_exposure_measurable",
    "Descent.Portability.MarkovCoarseGraining.stateLaw_matrix",
    "Descent.Portability.MarkovPoissonLaw.evolution_norm_le_one",
@@ -163061,6 +163212,11 @@
     "Descent.Portability.FiniteProductExponential.intervalGenome_exponential": [],
     "Descent.Portability.GaussianCovarianceSeparation.exponential_characters_independent": [],
     "Descent.Portability.HWECountLayerLimit.countTest_poisson": [],
+    "Descent.Portability.HWEHierarchyMoments.inclusiveMass_split": [],
+    "Descent.Portability.HWEHierarchySeries.tail_summable": [],
+    "Descent.Portability.HWEHierarchySeries.tail_bounds": [],
+    "Descent.Portability.HWEHierarchySeries.tail_of_negative": [],
+    "Descent.Portability.HWEHierarchySeries.gaussian_tail_sum": [],
     "Descent.Portability.InterleavedMutationMeasurability.waiting_exposure_measurable": [],
     "Descent.Portability.MarkovCoarseGraining.stateLaw_matrix": [],
     "Descent.Portability.MarkovPoissonLaw.evolution_norm_le_one": [],
@@ -164134,7 +164290,18 @@
    "Descent.Portability.HWEFixedLayerKernelLimit.original_layer_kernel_limit",
    "Descent.Portability.HWEFixedLayerKernelLimit.original_layer_limit",
    "Descent.Portability.HWEHierarchyGenerator.limitingKernel_bound",
-   "Descent.Portability.HWEHierarchyGenerator.series_summable"
+   "Descent.Portability.HWEHierarchyGenerator.series_summable",
+   "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation",
+   "Descent.Portability.HWEHierarchyLimitLaw.charFun_integerLaw",
+   "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant",
+   "Descent.Portability.HWEHierarchyMoments.integer_mean",
+   "Descent.Portability.HWEHierarchyMoments.integer_power_integrable",
+   "Descent.Portability.HWEHierarchyMoments.integer_second",
+   "Descent.Portability.HWEHierarchyMoments.integer_variance",
+   "Descent.Portability.HWEHierarchyParameters.layerIntensity_explicit",
+   "Descent.Portability.HWEHierarchyParameters.layer_jump_variance",
+   "Descent.Portability.HWEHierarchySeries.integer_generator",
+   "Descent.Portability.HWEHierarchySeries.noninteger_generator"
   ],
   "constraints": {
    "hypotheses": [
@@ -164179,7 +164346,18 @@
     "Descent.Portability.HWEFixedLayerKernelLimit.original_layer_kernel_limit": [],
     "Descent.Portability.HWEFixedLayerKernelLimit.original_layer_limit": [],
     "Descent.Portability.HWEHierarchyGenerator.limitingKernel_bound": [],
-    "Descent.Portability.HWEHierarchyGenerator.series_summable": []
+    "Descent.Portability.HWEHierarchyGenerator.series_summable": [],
+    "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation": [],
+    "Descent.Portability.HWEHierarchyLimitLaw.charFun_integerLaw": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_power_integrable": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_mean": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_second": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_variance": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant": [],
+    "Descent.Portability.HWEHierarchyParameters.layerIntensity_explicit": [],
+    "Descent.Portability.HWEHierarchyParameters.layer_jump_variance": [],
+    "Descent.Portability.HWEHierarchySeries.noninteger_generator": [],
+    "Descent.Portability.HWEHierarchySeries.integer_generator": []
    },
    "range_lo_thm": [
     "Descent.Portability.FiniteHorizonLoss.energy_nonneg",
@@ -172362,11 +172540,15 @@
    "Descent.Portability.HWEConditionalScaleLimit.sign_varying_scale_limit",
    "Descent.Portability.HWEConditionalScaleLimit.sign_weak_limit",
    "Descent.Portability.HWEHierarchyGenerator.limitingKernel_bound",
+   "Descent.Portability.HWEHierarchyLimitLaw.charFun_integerLaw",
+   "Descent.Portability.HWEHierarchyLimitLaw.signed_kernel_characteristic",
+   "Descent.Portability.HWEHierarchySeries.integer_generator",
    "Descent.Portability.HWETiltedKernelLaw.signedLognormal_pair"
   ],
   "constraints": {
    "hypotheses": [
-    "Tendsto a atTop (𝓝 c"
+    "Tendsto a atTop (𝓝 c",
+    "c ≠ 0"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.HWEAmplitudeWeakLimit.integral_amplitudeLimit": [],
@@ -172380,6 +172562,11 @@
      "Tendsto a atTop (𝓝 c"
     ],
     "Descent.Portability.HWEHierarchyGenerator.limitingKernel_bound": [],
+    "Descent.Portability.HWEHierarchyLimitLaw.signed_kernel_characteristic": [
+     "c ≠ 0"
+    ],
+    "Descent.Portability.HWEHierarchyLimitLaw.charFun_integerLaw": [],
+    "Descent.Portability.HWEHierarchySeries.integer_generator": [],
     "Descent.Portability.HWETiltedKernelLaw.signedLognormal_pair": []
    }
   }
@@ -172732,6 +172919,7 @@
    "Descent.Portability.HWECriticalGenerator.block_count_diverges",
    "Descent.Portability.HWECriticalGenerator.generator_limit",
    "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic_limit",
+   "Descent.Portability.HWEHierarchyCharacteristic.polynomial_block_count_diverges",
    "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit",
    "Descent.Portability.HWEPolynomialLayerScale.eventual_factorization",
    "Descent.Portability.HWEPolynomialLayerScale.layerScale_factorization",
@@ -172758,9 +172946,9 @@
     "∀ m i, |(h m i",
     "Tendsto (fun m ↦ ∑ i, ((h m i",
     "Tendsto (fun m ↦ intensity m (N m",
+    "Tendsto (fun m : ℕ ↦ adjustedIntensity m (N m",
     "0 < m",
-    "0 < intensity m N",
-    "Tendsto (fun m : ℕ ↦ adjustedIntensity m (N m"
+    "0 < intensity m N"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.AncestralMutationAbsorption.supportedAt_scan": [],
@@ -172807,6 +172995,9 @@
      "∀ m i, |(h m i",
      "Tendsto (fun m ↦ ∑ i, ((h m i",
      "Tendsto (fun m ↦ intensity m (N m"
+    ],
+    "Descent.Portability.HWEHierarchyCharacteristic.polynomial_block_count_diverges": [
+     "Tendsto (fun m : ℕ ↦ adjustedIntensity m (N m"
     ],
     "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit": [
      "(m : ℕ",
@@ -172926,6 +173117,7 @@
    "Descent.Portability.HWECriticalGenerator.summand_centered",
    "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic",
    "Descent.Portability.HWECriticalScoreCharacteristic.score_second",
+   "Descent.Portability.HWEHierarchyCharacteristic.original_generator_limit",
    "Descent.Portability.HWENearBalancedTheorem.score_second_bound"
   ],
   "constraints": {
@@ -172938,7 +173130,11 @@
     "∀ m i, (h m i",
     "∀ m i, |(h m i",
     "Tendsto (fun m ↦ ∑ i, ((h m i",
-    "Tendsto (fun m ↦ intensity m (N m"
+    "Tendsto (fun m ↦ intensity m (N m",
+    "∀ m, 0 < (h m",
+    "∀ m, (h m",
+    "∀ᶠ m in atTop, (h m",
+    "Tendsto (fun m : ℕ ↦ adjustedIntensity m (N m"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.HWECriticalGenerator.summand_centered": [
@@ -172975,6 +173171,12 @@
      "∀ i, 0 < (h i",
      "∀ i, (h i",
      "0 < N"
+    ],
+    "Descent.Portability.HWEHierarchyCharacteristic.original_generator_limit": [
+     "∀ m, 0 < (h m",
+     "∀ m, (h m",
+     "∀ᶠ m in atTop, (h m",
+     "Tendsto (fun m : ℕ ↦ adjustedIntensity m (N m"
     ],
     "Descent.Portability.HWENearBalancedTheorem.score_second_bound": [
      "ι → HardyWeinbergModel",
@@ -173102,6 +173304,14 @@
    "Descent.Portability.HWECriticalMoments.critical_mean",
    "Descent.Portability.HWECriticalMoments.critical_power_integrable",
    "Descent.Portability.HWECriticalMoments.critical_second",
+   "Descent.Portability.HWEHierarchyJumpRepresentation.jumpLaw_abs",
+   "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation",
+   "Descent.Portability.HWEHierarchyLimitLaw.signed_kernel_characteristic",
+   "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant",
+   "Descent.Portability.HWEHierarchyMoments.integer_mean",
+   "Descent.Portability.HWEHierarchyMoments.integer_power_integrable",
+   "Descent.Portability.HWEHierarchyMoments.integer_second",
+   "Descent.Portability.HWEHierarchyParameters.layer_jump_variance",
    "Descent.Portability.HWEJumpMoments.jump_fourth",
    "Descent.Portability.HWEJumpMoments.jump_mean",
    "Descent.Portability.HWEJumpMoments.jump_power_integrable",
@@ -173140,6 +173350,16 @@
      "c ≠ 0"
     ],
     "Descent.Portability.HWECriticalMoments.critical_fourth_cumulant": [],
+    "Descent.Portability.HWEHierarchyJumpRepresentation.jumpLaw_abs": [],
+    "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation": [],
+    "Descent.Portability.HWEHierarchyLimitLaw.signed_kernel_characteristic": [
+     "c ≠ 0"
+    ],
+    "Descent.Portability.HWEHierarchyMoments.integer_power_integrable": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_mean": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_second": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant": [],
+    "Descent.Portability.HWEHierarchyParameters.layer_jump_variance": [],
     "Descent.Portability.HWEJumpMoments.jump_power_integrable": [],
     "Descent.Portability.HWEJumpMoments.jump_mean": [],
     "Descent.Portability.HWEJumpMoments.jump_second": [],
@@ -173446,6 +173666,9 @@
   "mentioned_by": [
    "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic",
    "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic_limit",
+   "Descent.Portability.HWEHierarchyCharacteristic.hierarchy_characteristic_limit",
+   "Descent.Portability.HWEHierarchyTheorem.integer_weak_limit",
+   "Descent.Portability.HWEHierarchyTheorem.noninteger_weak_limit",
    "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit",
    "Descent.Portability.HWENearBalancedTheorem.scores_tight"
   ],
@@ -173456,7 +173679,11 @@
     "∀ m i, (h m i",
     "∀ m i, |(h m i",
     "Tendsto (fun m ↦ ∑ i, ((h m i",
-    "Tendsto (fun m ↦ intensity m (N m"
+    "Tendsto (fun m ↦ intensity m (N m",
+    "∀ m, 0 < (h m",
+    "∀ m, (h m",
+    "∀ᶠ m in atTop, (h m",
+    "Tendsto (fun m : ℕ ↦ adjustedIntensity m (N m"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic": [
@@ -173468,6 +173695,24 @@
      "∀ m i, |(h m i",
      "Tendsto (fun m ↦ ∑ i, ((h m i",
      "Tendsto (fun m ↦ intensity m (N m"
+    ],
+    "Descent.Portability.HWEHierarchyCharacteristic.hierarchy_characteristic_limit": [
+     "∀ m, 0 < (h m",
+     "∀ m, (h m",
+     "∀ᶠ m in atTop, (h m",
+     "Tendsto (fun m : ℕ ↦ adjustedIntensity m (N m"
+    ],
+    "Descent.Portability.HWEHierarchyTheorem.noninteger_weak_limit": [
+     "∀ m, 0 < (h m",
+     "∀ m, (h m",
+     "∀ᶠ m in atTop, (h m",
+     "Tendsto (fun m : ℕ ↦ adjustedIntensity m (N m"
+    ],
+    "Descent.Portability.HWEHierarchyTheorem.integer_weak_limit": [
+     "∀ m, 0 < (h m",
+     "∀ m, (h m",
+     "∀ᶠ m in atTop, (h m",
+     "Tendsto (fun m : ℕ ↦ adjustedIntensity m (N m"
     ],
     "Descent.Portability.HWENearBalancedTheorem.scores_tight": [
      "∀ m i, 0 < (h m i",
@@ -173608,7 +173853,18 @@
    "Descent.Portability.HWEFixedLayerKernelLimit.original_layer_kernel_limit",
    "Descent.Portability.HWEFixedLayerKernelLimit.original_layer_limit",
    "Descent.Portability.HWEHierarchyGenerator.limitingKernel_bound",
-   "Descent.Portability.HWEHierarchyGenerator.series_summable"
+   "Descent.Portability.HWEHierarchyGenerator.series_summable",
+   "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation",
+   "Descent.Portability.HWEHierarchyLimitLaw.charFun_integerLaw",
+   "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant",
+   "Descent.Portability.HWEHierarchyMoments.integer_mean",
+   "Descent.Portability.HWEHierarchyMoments.integer_power_integrable",
+   "Descent.Portability.HWEHierarchyMoments.integer_second",
+   "Descent.Portability.HWEHierarchyMoments.integer_variance",
+   "Descent.Portability.HWEHierarchyParameters.layerIntensity_explicit",
+   "Descent.Portability.HWEHierarchyParameters.layer_jump_variance",
+   "Descent.Portability.HWEHierarchySeries.integer_generator",
+   "Descent.Portability.HWEHierarchySeries.noninteger_generator"
   ],
   "constraints": {
    "declared_kind": "frequency",
@@ -173650,7 +173906,28 @@
      "κ ≠ 0"
     ],
     "Descent.Portability.HWEHierarchyGenerator.limitingKernel_bound": [],
-    "Descent.Portability.HWEHierarchyGenerator.series_summable": []
+    "Descent.Portability.HWEHierarchyGenerator.series_summable": [],
+    "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation": [],
+    "Descent.Portability.HWEHierarchyLimitLaw.charFun_integerLaw": [
+     "κ ≠ 0"
+    ],
+    "Descent.Portability.HWEHierarchyMoments.integer_power_integrable": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_mean": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_second": [
+     "κ ≠ 0"
+    ],
+    "Descent.Portability.HWEHierarchyMoments.integer_variance": [
+     "κ ≠ 0"
+    ],
+    "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant": [],
+    "Descent.Portability.HWEHierarchyParameters.layerIntensity_explicit": [
+     "κ ≠ 0"
+    ],
+    "Descent.Portability.HWEHierarchyParameters.layer_jump_variance": [
+     "κ ≠ 0"
+    ],
+    "Descent.Portability.HWEHierarchySeries.noninteger_generator": [],
+    "Descent.Portability.HWEHierarchySeries.integer_generator": []
    },
    "range_lo_thm": [
     "Descent.Portability.FiniteHorizonLoss.energy_nonneg",
@@ -173911,7 +174188,9 @@
    "Descent.Portability.HWEFixedLayerKernelLimit.conditional_layer_kernel_limit",
    "Descent.Portability.HWEFixedLayerKernelLimit.original_layer_kernel_limit",
    "Descent.Portability.HWEFixedLayerKernelLimit.original_layer_limit",
-   "Descent.Portability.HWEHierarchyGenerator.limitingKernel_bound"
+   "Descent.Portability.HWEHierarchyGenerator.limitingKernel_bound",
+   "Descent.Portability.HWEHierarchySeries.integer_generator",
+   "Descent.Portability.HWEHierarchySeries.noninteger_generator"
   ],
   "constraints": {
    "declared_kind": "heterozygosity",
@@ -173919,7 +174198,8 @@
    "declared_hi": 1.0,
    "hypotheses": [
     "κ ≠ 0",
-    "0 < C"
+    "0 < C",
+    "∀ r : ℕ, α ≠ (r : ℝ"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.HWEFixedLayerKernelLimit.conditional_layer_kernel_limit": [
@@ -173934,7 +174214,11 @@
      "κ ≠ 0",
      "0 < C"
     ],
-    "Descent.Portability.HWEHierarchyGenerator.limitingKernel_bound": []
+    "Descent.Portability.HWEHierarchyGenerator.limitingKernel_bound": [],
+    "Descent.Portability.HWEHierarchySeries.noninteger_generator": [
+     "∀ r : ℕ, α ≠ (r : ℝ"
+    ],
+    "Descent.Portability.HWEHierarchySeries.integer_generator": []
    }
   }
  },
@@ -175104,7 +175388,9 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Portability.HWEHierarchyGenerator.full_generator_limit",
-   "Descent.Portability.HWEHierarchyGenerator.series_summable"
+   "Descent.Portability.HWEHierarchyGenerator.series_summable",
+   "Descent.Portability.HWEHierarchySeries.integer_generator",
+   "Descent.Portability.HWEHierarchySeries.noninteger_generator"
   ],
   "constraints": {
    "declared_kind": "heterozygosity",
@@ -175112,14 +175398,19 @@
    "declared_hi": 1.0,
    "hypotheses": [
     "κ ≠ 0",
-    "0 < C"
+    "0 < C",
+    "∀ r : ℕ, α ≠ (r : ℝ"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.HWEHierarchyGenerator.series_summable": [],
     "Descent.Portability.HWEHierarchyGenerator.full_generator_limit": [
      "κ ≠ 0",
      "0 < C"
-    ]
+    ],
+    "Descent.Portability.HWEHierarchySeries.noninteger_generator": [
+     "∀ r : ℕ, α ≠ (r : ℝ"
+    ],
+    "Descent.Portability.HWEHierarchySeries.integer_generator": []
    }
   }
  },
@@ -175155,7 +175446,294 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
-   "Descent.Portability.HWEHierarchyGenerator.full_generator_limit"
+   "Descent.Portability.HWEHierarchyCharacteristic.hierarchy_characteristic_limit",
+   "Descent.Portability.HWEHierarchyCharacteristic.original_generator_limit",
+   "Descent.Portability.HWEHierarchyGenerator.full_generator_limit",
+   "Descent.Portability.HWEHierarchyLimitLaw.charFun_gaussianLaw",
+   "Descent.Portability.HWEHierarchyLimitLaw.charFun_integerLaw",
+   "Descent.Portability.HWEHierarchySeries.integer_generator",
+   "Descent.Portability.HWEHierarchySeries.noninteger_generator"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "κ ≠ 0",
+    "0 < C",
+    "∀ r : ℕ, α ≠ (r : ℝ"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.HWEHierarchyCharacteristic.original_generator_limit": [
+     "κ ≠ 0",
+     "0 < C"
+    ],
+    "Descent.Portability.HWEHierarchyCharacteristic.hierarchy_characteristic_limit": [
+     "κ ≠ 0",
+     "0 < C"
+    ],
+    "Descent.Portability.HWEHierarchyGenerator.full_generator_limit": [
+     "κ ≠ 0",
+     "0 < C"
+    ],
+    "Descent.Portability.HWEHierarchyLimitLaw.charFun_gaussianLaw": [
+     "∀ r : ℕ, α ≠ (r : ℝ"
+    ],
+    "Descent.Portability.HWEHierarchyLimitLaw.charFun_integerLaw": [
+     "κ ≠ 0",
+     "0 < C"
+    ],
+    "Descent.Portability.HWEHierarchySeries.noninteger_generator": [
+     "∀ r : ℕ, α ≠ (r : ℝ"
+    ],
+    "Descent.Portability.HWEHierarchySeries.integer_generator": []
+   }
+  }
+ },
+ "Descent.Portability.HWEHierarchyJumpRepresentation.reportMarkMap": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "anonymous constructor",
+  "file": "Descent/Portability/HWEHierarchyJumpRepresentation.lean",
+  "line": 48,
+  "short": "reportMarkMap",
+  "ret_type": "C(ℝ, ℝ)",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "κ": [
+    0.05,
+    3.0
+   ],
+   "C": [
+    0.05,
+    3.0
+   ],
+   "r": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "0 < C"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation": [
+     "0 < C"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.HWEHierarchyLimitLaw.tailVariance": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "anonymous constructor",
+  "file": "Descent/Portability/HWEHierarchyLimitLaw.lean",
+  "line": 28,
+  "short": "tailVariance",
+  "ret_type": "ℝ≥0",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "κ": [
+    0.05,
+    3.0
+   ],
+   "α": [
+    0.02,
+    1.02
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.HWEHierarchyLimitLaw.charFun_gaussianLaw",
+   "Descent.Portability.HWEHierarchyLimitLaw.charFun_integerLaw",
+   "Descent.Portability.HWEHierarchyMoments.gaussianLaw_of_negative",
+   "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant",
+   "Descent.Portability.HWEHierarchyMoments.integer_mean",
+   "Descent.Portability.HWEHierarchyMoments.integer_power_integrable",
+   "Descent.Portability.HWEHierarchyMoments.integer_second"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "hypotheses": [
+    "∀ r : ℕ, α ≠ (r : ℝ",
+    "κ ≠ 0",
+    "α < 0"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.HWEHierarchyLimitLaw.charFun_gaussianLaw": [
+     "∀ r : ℕ, α ≠ (r : ℝ"
+    ],
+    "Descent.Portability.HWEHierarchyLimitLaw.charFun_integerLaw": [
+     "κ ≠ 0"
+    ],
+    "Descent.Portability.HWEHierarchyMoments.gaussianLaw_of_negative": [
+     "α < 0"
+    ],
+    "Descent.Portability.HWEHierarchyMoments.integer_power_integrable": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_mean": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_second": [
+     "κ ≠ 0"
+    ],
+    "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant": []
+   }
+  }
+ },
+ "Descent.Portability.HWEHierarchyLimitLaw.layerAmplitude": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/HWEHierarchyLimitLaw.lean",
+  "line": 32,
+  "short": "layerAmplitude",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "Descent_Portability_HWEHierarchyLimitLaw_layerAmplitude",
+  "args": [
+   "κ",
+   "C",
+   "r"
+  ],
+  "box": {
+   "κ": [
+    0.05,
+    3.0
+   ],
+   "C": [
+    0.05,
+    3.0
+   ],
+   "r": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.HWEActualLayerKernel.actual_layer_amplitude",
+   "Descent.Portability.HWEActualLayerKernel.complex_layer_statistic",
+   "Descent.Portability.HWEActualLayerKernel.real_layer_statistic_fin",
+   "Descent.Portability.HWEHierarchyJumpRepresentation.abs_layerAmplitude",
+   "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation",
+   "Descent.Portability.HWEHierarchyLimitLaw.charFun_integerLaw",
+   "Descent.Portability.HWEHierarchyLimitLaw.layerAmplitude_ne_zero",
+   "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant",
+   "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant_pos",
+   "Descent.Portability.HWEHierarchyMoments.integer_mean",
+   "Descent.Portability.HWEHierarchyMoments.integer_power_integrable",
+   "Descent.Portability.HWEHierarchyMoments.integer_second",
+   "Descent.Portability.HWEHierarchyParameters.layerAmplitude_sq",
+   "Descent.Portability.HWEHierarchyParameters.layerIntensity_explicit",
+   "Descent.Portability.HWEHierarchyParameters.layer_jump_variance",
+   "Descent.Portability.HWEHomogeneousLayer.homogeneous_layer_statistic",
+   "Descent.Portability.HWEHomogeneousLayer.pattern_statistic"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "r ≤ m",
+    "0 < C",
+    "κ ≠ 0",
+    "s.card = r"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.HWEActualLayerKernel.actual_layer_amplitude": [
+     "r ≤ m"
+    ],
+    "Descent.Portability.HWEActualLayerKernel.real_layer_statistic_fin": [],
+    "Descent.Portability.HWEActualLayerKernel.complex_layer_statistic": [],
+    "Descent.Portability.HWEHierarchyJumpRepresentation.abs_layerAmplitude": [
+     "0 < C"
+    ],
+    "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation": [
+     "0 < C"
+    ],
+    "Descent.Portability.HWEHierarchyLimitLaw.layerAmplitude_ne_zero": [
+     "κ ≠ 0",
+     "0 < C"
+    ],
+    "Descent.Portability.HWEHierarchyLimitLaw.charFun_integerLaw": [
+     "κ ≠ 0",
+     "0 < C"
+    ],
+    "Descent.Portability.HWEHierarchyMoments.integer_power_integrable": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_mean": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_second": [
+     "κ ≠ 0",
+     "0 < C"
+    ],
+    "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant_pos": [
+     "κ ≠ 0",
+     "0 < C"
+    ],
+    "Descent.Portability.HWEHierarchyParameters.layerAmplitude_sq": [
+     "0 < C"
+    ],
+    "Descent.Portability.HWEHierarchyParameters.layerIntensity_explicit": [
+     "κ ≠ 0",
+     "0 < C"
+    ],
+    "Descent.Portability.HWEHierarchyParameters.layer_jump_variance": [
+     "κ ≠ 0",
+     "0 < C"
+    ],
+    "Descent.Portability.HWEHomogeneousLayer.pattern_statistic": [
+     "s.card = r"
+    ],
+    "Descent.Portability.HWEHomogeneousLayer.homogeneous_layer_statistic": []
+   }
+  }
+ },
+ "Descent.Portability.HWEHierarchyLimitLaw.layerIntensity": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "anonymous constructor",
+  "file": "Descent/Portability/HWEHierarchyLimitLaw.lean",
+  "line": 36,
+  "short": "layerIntensity",
+  "ret_type": "ℝ≥0",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "κ": [
+    0.05,
+    3.0
+   ],
+   "C": [
+    0.05,
+    3.0
+   ],
+   "r": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.HWEHierarchyLimitLaw.charFun_integerLaw",
+   "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant",
+   "Descent.Portability.HWEHierarchyMoments.integer_mean",
+   "Descent.Portability.HWEHierarchyMoments.integer_power_integrable",
+   "Descent.Portability.HWEHierarchyMoments.integer_second",
+   "Descent.Portability.HWEHierarchyParameters.layerIntensity_explicit",
+   "Descent.Portability.HWEHierarchyParameters.layerIntensity_pos",
+   "Descent.Portability.HWEHierarchyParameters.layer_jump_variance"
   ],
   "constraints": {
    "hypotheses": [
@@ -175163,10 +175741,235 @@
     "0 < C"
    ],
    "hypotheses_by_theorem": {
-    "Descent.Portability.HWEHierarchyGenerator.full_generator_limit": [
+    "Descent.Portability.HWEHierarchyLimitLaw.charFun_integerLaw": [
+     "κ ≠ 0",
+     "0 < C"
+    ],
+    "Descent.Portability.HWEHierarchyMoments.integer_power_integrable": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_mean": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_second": [
+     "κ ≠ 0",
+     "0 < C"
+    ],
+    "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant": [],
+    "Descent.Portability.HWEHierarchyParameters.layerIntensity_explicit": [
+     "κ ≠ 0",
+     "0 < C"
+    ],
+    "Descent.Portability.HWEHierarchyParameters.layerIntensity_pos": [
+     "κ ≠ 0",
+     "0 < C"
+    ],
+    "Descent.Portability.HWEHierarchyParameters.layer_jump_variance": [
      "κ ≠ 0",
      "0 < C"
     ]
+   }
+  }
+ },
+ "Descent.Portability.HWEHierarchyLimitLaw.gaussianLaw": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "anonymous constructor",
+  "file": "Descent/Portability/HWEHierarchyLimitLaw.lean",
+  "line": 43,
+  "short": "gaussianLaw",
+  "ret_type": "ProbabilityMeasure ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "κ": [
+    0.05,
+    3.0
+   ],
+   "α": [
+    0.02,
+    1.02
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.HWEHierarchyLimitLaw.charFun_gaussianLaw",
+   "Descent.Portability.HWEHierarchyMoments.gaussianLaw_of_negative",
+   "Descent.Portability.HWEHierarchyTheorem.noninteger_weak_limit"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "∀ r : ℕ, α ≠ (r : ℝ",
+    "α < 0",
+    "κ ≠ 0"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.HWEHierarchyLimitLaw.charFun_gaussianLaw": [
+     "∀ r : ℕ, α ≠ (r : ℝ"
+    ],
+    "Descent.Portability.HWEHierarchyMoments.gaussianLaw_of_negative": [
+     "α < 0"
+    ],
+    "Descent.Portability.HWEHierarchyTheorem.noninteger_weak_limit": [
+     "κ ≠ 0",
+     "∀ r : ℕ, α ≠ (r : ℝ"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.HWEHierarchyLimitLaw.integerLaw": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "unrecognised character '∗'",
+  "file": "Descent/Portability/HWEHierarchyLimitLaw.lean",
+  "line": 47,
+  "short": "integerLaw",
+  "ret_type": "ProbabilityMeasure ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "κ": [
+    0.05,
+    3.0
+   ],
+   "C": [
+    0.05,
+    3.0
+   ],
+   "r": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.HWEHierarchyLimitLaw.charFun_integerLaw",
+   "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant",
+   "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant_pos",
+   "Descent.Portability.HWEHierarchyMoments.integer_mean",
+   "Descent.Portability.HWEHierarchyMoments.integer_ne_gaussian",
+   "Descent.Portability.HWEHierarchyMoments.integer_power_integrable",
+   "Descent.Portability.HWEHierarchyMoments.integer_second",
+   "Descent.Portability.HWEHierarchyMoments.integer_variance",
+   "Descent.Portability.HWEHierarchyTheorem.integer_weak_limit"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "κ ≠ 0",
+    "0 < C"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.HWEHierarchyLimitLaw.charFun_integerLaw": [
+     "κ ≠ 0",
+     "0 < C"
+    ],
+    "Descent.Portability.HWEHierarchyMoments.integer_power_integrable": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_mean": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_second": [
+     "κ ≠ 0",
+     "0 < C"
+    ],
+    "Descent.Portability.HWEHierarchyMoments.integer_variance": [
+     "κ ≠ 0",
+     "0 < C"
+    ],
+    "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant_pos": [
+     "κ ≠ 0",
+     "0 < C"
+    ],
+    "Descent.Portability.HWEHierarchyMoments.integer_ne_gaussian": [
+     "κ ≠ 0",
+     "0 < C"
+    ],
+    "Descent.Portability.HWEHierarchyTheorem.integer_weak_limit": [
+     "κ ≠ 0",
+     "0 < C"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.HWEHierarchyMoments.inclusiveMass": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "unrecognised character \"'\"",
+  "file": "Descent/Portability/HWEHierarchyMoments.lean",
+  "line": 27,
+  "short": "inclusiveMass",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "r": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.HWEHierarchyMoments.inclusiveMass_split",
+   "Descent.Portability.HWEHierarchyMoments.integer_second",
+   "Descent.Portability.HWEHierarchyMoments.integer_variance"
+  ],
+  "constraints": {
+   "declared_kind": "probability",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.HWEHierarchyMoments.inclusiveMass_split": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_second": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_variance": []
+   }
+  }
+ },
+ "Descent.Portability.HWEHierarchySeries.tailMass": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "unrecognised character \"'\"",
+  "file": "Descent/Portability/HWEHierarchySeries.lean",
+  "line": 24,
+  "short": "tailMass",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "α": [
+    0.02,
+    1.02
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.HWEHierarchyLimitLaw.charFun_integerLaw",
+   "Descent.Portability.HWEHierarchyMoments.inclusiveMass_split",
+   "Descent.Portability.HWEHierarchySeries.gaussian_tail_sum",
+   "Descent.Portability.HWEHierarchySeries.integer_generator",
+   "Descent.Portability.HWEHierarchySeries.noninteger_generator",
+   "Descent.Portability.HWEHierarchySeries.tail_bounds",
+   "Descent.Portability.HWEHierarchySeries.tail_of_negative"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "α < 0",
+    "∀ r : ℕ, α ≠ (r : ℝ"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.HWEHierarchyLimitLaw.charFun_integerLaw": [],
+    "Descent.Portability.HWEHierarchyMoments.inclusiveMass_split": [],
+    "Descent.Portability.HWEHierarchySeries.tail_bounds": [],
+    "Descent.Portability.HWEHierarchySeries.tail_of_negative": [
+     "α < 0"
+    ],
+    "Descent.Portability.HWEHierarchySeries.gaussian_tail_sum": [],
+    "Descent.Portability.HWEHierarchySeries.noninteger_generator": [
+     "∀ r : ℕ, α ≠ (r : ℝ"
+    ],
+    "Descent.Portability.HWEHierarchySeries.integer_generator": []
    }
   }
  },
@@ -175178,7 +175981,7 @@
   "short": "layerAmplitude",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": "layerAmplitude",
+  "python": "Descent_Portability_HWEHomogeneousLayer_layerAmplitude",
   "args": [
    "h",
    "m",
@@ -175211,6 +176014,18 @@
    "Descent.Portability.HWEActualLayerKernel.actual_layer_amplitude",
    "Descent.Portability.HWEActualLayerKernel.complex_layer_statistic",
    "Descent.Portability.HWEActualLayerKernel.real_layer_statistic_fin",
+   "Descent.Portability.HWEHierarchyJumpRepresentation.abs_layerAmplitude",
+   "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation",
+   "Descent.Portability.HWEHierarchyLimitLaw.charFun_integerLaw",
+   "Descent.Portability.HWEHierarchyLimitLaw.layerAmplitude_ne_zero",
+   "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant",
+   "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant_pos",
+   "Descent.Portability.HWEHierarchyMoments.integer_mean",
+   "Descent.Portability.HWEHierarchyMoments.integer_power_integrable",
+   "Descent.Portability.HWEHierarchyMoments.integer_second",
+   "Descent.Portability.HWEHierarchyParameters.layerAmplitude_sq",
+   "Descent.Portability.HWEHierarchyParameters.layerIntensity_explicit",
+   "Descent.Portability.HWEHierarchyParameters.layer_jump_variance",
    "Descent.Portability.HWEHomogeneousLayer.homogeneous_layer_statistic",
    "Descent.Portability.HWEHomogeneousLayer.pattern_statistic"
   ],
@@ -175235,6 +176050,18 @@
      "0 < h.altFreq",
      "h.altFreq < 1"
     ],
+    "Descent.Portability.HWEHierarchyJumpRepresentation.abs_layerAmplitude": [],
+    "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation": [],
+    "Descent.Portability.HWEHierarchyLimitLaw.layerAmplitude_ne_zero": [],
+    "Descent.Portability.HWEHierarchyLimitLaw.charFun_integerLaw": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_power_integrable": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_mean": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_second": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant_pos": [],
+    "Descent.Portability.HWEHierarchyParameters.layerAmplitude_sq": [],
+    "Descent.Portability.HWEHierarchyParameters.layerIntensity_explicit": [],
+    "Descent.Portability.HWEHierarchyParameters.layer_jump_variance": [],
     "Descent.Portability.HWEHomogeneousLayer.pattern_statistic": [
      "0 < h.altFreq",
      "h.altFreq < 1",
@@ -176021,6 +176848,7 @@
    "Descent.Portability.HWEHeterozygosityLaw.count_characteristic",
    "Descent.Portability.HWEHeterozygosityLaw.locus_characteristic",
    "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit",
+   "Descent.Portability.HWEHierarchyCharacteristic.original_generator_limit",
    "Descent.Portability.HWEInteractionLaw.characteristic_im",
    "Descent.Portability.HWEInteractionLaw.characteristic_independent_sum",
    "Descent.Portability.HWEInteractionLaw.characteristic_re",
@@ -176079,6 +176907,7 @@
     "Descent.Portability.HWEHeterozygosityLaw.locus_characteristic": [],
     "Descent.Portability.HWEHeterozygosityLaw.count_characteristic": [],
     "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit": [],
+    "Descent.Portability.HWEHierarchyCharacteristic.original_generator_limit": [],
     "Descent.Portability.HWEInteractionLaw.complexExpectation_independent_product": [],
     "Descent.Portability.HWEInteractionLaw.characteristic_independent_sum": [],
     "Descent.Portability.HWEInteractionLaw.characteristic_re": [],
@@ -176182,6 +177011,7 @@
    "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic",
    "Descent.Portability.HWECriticalScoreCharacteristic.score_mean",
    "Descent.Portability.HWECriticalScoreCharacteristic.score_second",
+   "Descent.Portability.HWEHierarchyCharacteristic.original_generator_limit",
    "Descent.Portability.HWEInteractionLaw.interaction_mean_zero",
    "Descent.Portability.HWEInteractionLaw.interaction_second_moment",
    "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass",
@@ -176195,7 +177025,10 @@
     "∀ m i, 0 < (h m i",
     "∀ m i, (h m i",
     "∀ m i, |(h m i",
-    "Tendsto (fun m ↦ ∑ i, ((h m i"
+    "Tendsto (fun m ↦ ∑ i, ((h m i",
+    "∀ m, 0 < (h m",
+    "∀ m, (h m",
+    "∀ᶠ m in atTop, (h m"
    ],
    "hypotheses_by_theorem": {
     "Descent.Coalescent.blocks_of_mem_support_blockLaw": [],
@@ -176244,6 +177077,11 @@
      "ι → HardyWeinbergModel",
      "∀ i, 0 < (h i",
      "∀ i, (h i"
+    ],
+    "Descent.Portability.HWEHierarchyCharacteristic.original_generator_limit": [
+     "∀ m, 0 < (h m",
+     "∀ m, (h m",
+     "∀ᶠ m in atTop, (h m"
     ],
     "Descent.Portability.HWEInteractionLaw.interaction_mean_zero": [
      "ι → HardyWeinbergModel"
@@ -176754,11 +177592,13 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation",
    "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation"
   ],
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation": [],
     "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation": []
    }
   }
@@ -177395,7 +178235,12 @@
    "Descent.Portability.HWEFixedLayerKernelLimit.conditional_layer_kernel_limit",
    "Descent.Portability.HWEFixedLayerKernelLimit.original_layer_kernel_limit",
    "Descent.Portability.HWEFixedLayerKernelLimit.original_layer_limit",
+   "Descent.Portability.HWEHierarchyCharacteristic.hierarchy_characteristic_limit",
+   "Descent.Portability.HWEHierarchyCharacteristic.original_generator_limit",
+   "Descent.Portability.HWEHierarchyCharacteristic.polynomial_block_count_diverges",
    "Descent.Portability.HWEHierarchyGenerator.full_generator_limit",
+   "Descent.Portability.HWEHierarchyTheorem.integer_weak_limit",
+   "Descent.Portability.HWEHierarchyTheorem.noninteger_weak_limit",
    "Descent.Portability.HWEPolynomialLayerScale.coefficient_limit",
    "Descent.Portability.HWEPolynomialLayerScale.eventual_factorization",
    "Descent.Portability.HWEPolynomialScaleRegimes.layerScale_collapse",
@@ -177408,6 +178253,7 @@
     "∀ m, (h m",
     "∀ᶠ m in atTop, (h m",
     "Tendsto (fun m : ℕ ↦ adjustedIntensity m (N m",
+    "∀ r : ℕ, α ≠ (r : ℝ",
     "α < (r : ℝ"
    ],
    "hypotheses_by_theorem": {
@@ -177429,7 +178275,35 @@
      "∀ᶠ m in atTop, (h m",
      "Tendsto (fun m : ℕ ↦ adjustedIntensity m (N m"
     ],
+    "Descent.Portability.HWEHierarchyCharacteristic.polynomial_block_count_diverges": [
+     "Tendsto (fun m : ℕ ↦ adjustedIntensity m (N m"
+    ],
+    "Descent.Portability.HWEHierarchyCharacteristic.original_generator_limit": [
+     "∀ m, 0 < (h m",
+     "∀ m, (h m",
+     "∀ᶠ m in atTop, (h m",
+     "Tendsto (fun m : ℕ ↦ adjustedIntensity m (N m"
+    ],
+    "Descent.Portability.HWEHierarchyCharacteristic.hierarchy_characteristic_limit": [
+     "∀ m, 0 < (h m",
+     "∀ m, (h m",
+     "∀ᶠ m in atTop, (h m",
+     "Tendsto (fun m : ℕ ↦ adjustedIntensity m (N m"
+    ],
     "Descent.Portability.HWEHierarchyGenerator.full_generator_limit": [
+     "∀ m, 0 < (h m",
+     "∀ m, (h m",
+     "∀ᶠ m in atTop, (h m",
+     "Tendsto (fun m : ℕ ↦ adjustedIntensity m (N m"
+    ],
+    "Descent.Portability.HWEHierarchyTheorem.noninteger_weak_limit": [
+     "∀ m, 0 < (h m",
+     "∀ m, (h m",
+     "∀ᶠ m in atTop, (h m",
+     "Tendsto (fun m : ℕ ↦ adjustedIntensity m (N m",
+     "∀ r : ℕ, α ≠ (r : ℝ"
+    ],
+    "Descent.Portability.HWEHierarchyTheorem.integer_weak_limit": [
      "∀ m, 0 < (h m",
      "∀ m, (h m",
      "∀ᶠ m in atTop, (h m",
@@ -177799,6 +178673,8 @@
    "Descent.Portability.GaussianImageMoments.signed_power_integral",
    "Descent.Portability.HWEConditionalKernelLimit.zero_scale_kernel",
    "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw",
+   "Descent.Portability.HWEHierarchyJumpRepresentation.jumpLaw_abs",
+   "Descent.Portability.HWEHierarchyLimitLaw.signed_kernel_characteristic",
    "Descent.Portability.HWETiltedKernelLaw.mixture_kernel",
    "Descent.Portability.HWETiltedKernelLaw.signedLognormal_pair"
   ],
@@ -177811,6 +178687,10 @@
     "Descent.Portability.GaussianImageMoments.signed_power_integral": [],
     "Descent.Portability.HWEConditionalKernelLimit.zero_scale_kernel": [],
     "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": [
+     "c ≠ 0"
+    ],
+    "Descent.Portability.HWEHierarchyJumpRepresentation.jumpLaw_abs": [],
+    "Descent.Portability.HWEHierarchyLimitLaw.signed_kernel_characteristic": [
      "c ≠ 0"
     ],
     "Descent.Portability.HWETiltedKernelLaw.signedLognormal_pair": [],
@@ -189191,6 +190071,14 @@
    "Descent.Portability.HWECriticalMoments.critical_mean",
    "Descent.Portability.HWECriticalMoments.critical_power_integrable",
    "Descent.Portability.HWECriticalMoments.critical_second",
+   "Descent.Portability.HWEHierarchyJumpRepresentation.jumpLaw_abs",
+   "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation",
+   "Descent.Portability.HWEHierarchyLimitLaw.signed_kernel_characteristic",
+   "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant",
+   "Descent.Portability.HWEHierarchyMoments.integer_mean",
+   "Descent.Portability.HWEHierarchyMoments.integer_power_integrable",
+   "Descent.Portability.HWEHierarchyMoments.integer_second",
+   "Descent.Portability.HWEHierarchyParameters.layer_jump_variance",
    "Descent.Portability.HWEJumpMoments.jump_fourth",
    "Descent.Portability.HWEJumpMoments.jump_mean",
    "Descent.Portability.HWEJumpMoments.jump_power_integrable",
@@ -189220,6 +190108,14 @@
     "Descent.Portability.HWECriticalMoments.critical_mean": [],
     "Descent.Portability.HWECriticalMoments.critical_second": [],
     "Descent.Portability.HWECriticalMoments.critical_fourth_cumulant": [],
+    "Descent.Portability.HWEHierarchyJumpRepresentation.jumpLaw_abs": [],
+    "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation": [],
+    "Descent.Portability.HWEHierarchyLimitLaw.signed_kernel_characteristic": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_power_integrable": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_mean": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_second": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_fourth_cumulant": [],
+    "Descent.Portability.HWEHierarchyParameters.layer_jump_variance": [],
     "Descent.Portability.HWEJumpMoments.jump_power_integrable": [],
     "Descent.Portability.HWEJumpMoments.jump_mean": [],
     "Descent.Portability.HWEJumpMoments.jump_second": [],
@@ -189849,6 +190745,7 @@
    "Descent.Portability.GaussianPolynomialMoments.third_moment",
    "Descent.Portability.GaussianPolynomialMoments.tilted_power_moment",
    "Descent.Portability.HWECriticalMoments.critical_variance",
+   "Descent.Portability.HWEHierarchyMoments.integer_variance",
    "Descent.Portability.IndividualLossMoments.expected_square_shift",
    "Descent.Portability.IndividualLossMoments.fitted_squared_loss_r2_gap",
    "Descent.Portability.IndividualLossMoments.fitted_squared_loss_r2_le_oracle",
@@ -189992,6 +190889,7 @@
     "Descent.Portability.GaussianPolynomialMoments.third_moment": [],
     "Descent.Portability.GaussianPolynomialMoments.fourth_moment": [],
     "Descent.Portability.HWECriticalMoments.critical_variance": [],
+    "Descent.Portability.HWEHierarchyMoments.integer_variance": [],
     "Descent.Portability.IndividualLossMoments.total_variance": [],
     "Descent.Portability.IndividualLossMoments.squared_loss_between_decomposition": [],
     "Descent.Portability.IndividualLossMoments.squared_loss_total": [],
@@ -216959,6 +217857,8 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation",
+   "Descent.Portability.HWEHierarchyLimitLaw.signed_kernel_characteristic",
    "Descent.Portability.HWEJumpRepresentation.gaussian_coordinate_image",
    "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation",
    "Descent.Portability.HWELogCoordinates.fair_log_profile_limit",
@@ -216970,6 +217870,8 @@
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation": [],
+    "Descent.Portability.HWEHierarchyLimitLaw.signed_kernel_characteristic": [],
     "Descent.Portability.HWEJumpRepresentation.gaussian_coordinate_image": [],
     "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation": [],
     "Descent.Portability.HWELogCoordinates.fair_log_profile_limit": [],
@@ -220383,6 +221285,9 @@
    "Descent.Portability.HWEFixedLayerKernelLimit.conditional_layer_kernel_limit",
    "Descent.Portability.HWEFixedLayerKernelLimit.original_layer_kernel_limit",
    "Descent.Portability.HWEHierarchyGenerator.limitingKernel_bound",
+   "Descent.Portability.HWEHierarchyLimitLaw.charFun_integerLaw",
+   "Descent.Portability.HWEHierarchyLimitLaw.signed_kernel_characteristic",
+   "Descent.Portability.HWEHierarchySeries.integer_generator",
    "Descent.Portability.HWEKernelTruncation.truncation_bound",
    "Descent.Portability.HWETiltedKernelLaw.explicit_kernel_generator",
    "Descent.Portability.HWETiltedKernelLaw.mixture_kernel",
@@ -220548,6 +221453,9 @@
     "Descent.Portability.HWEFixedLayerKernelLimit.conditional_layer_kernel_limit": [],
     "Descent.Portability.HWEFixedLayerKernelLimit.original_layer_kernel_limit": [],
     "Descent.Portability.HWEHierarchyGenerator.limitingKernel_bound": [],
+    "Descent.Portability.HWEHierarchyLimitLaw.signed_kernel_characteristic": [],
+    "Descent.Portability.HWEHierarchyLimitLaw.charFun_integerLaw": [],
+    "Descent.Portability.HWEHierarchySeries.integer_generator": [],
     "Descent.Portability.HWEKernelTruncation.truncation_bound": [],
     "Descent.Portability.HWETiltedKernelLaw.mixture_kernel": [],
     "Descent.Portability.HWETiltedKernelLaw.explicit_kernel_generator": [],
@@ -230605,6 +231513,7 @@
   "mentioned_by": [
    "Descent.Portability.GaussianImageMoments.signed_power_integrable",
    "Descent.Portability.GaussianImageMoments.signed_power_integral",
+   "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation",
    "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation",
    "Descent.Portability.HWEJumpRepresentation.pairLaw_map",
    "Descent.Portability.HWETiltedKernelLaw.signedLognormal_pair",
@@ -230617,6 +231526,7 @@
    "hypotheses_by_theorem": {
     "Descent.Portability.GaussianImageMoments.signed_power_integrable": [],
     "Descent.Portability.GaussianImageMoments.signed_power_integral": [],
+    "Descent.Portability.HWEHierarchyJumpRepresentation.layer_jump_report_representation": [],
     "Descent.Portability.HWEJumpRepresentation.pairLaw_map": [],
     "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation": [],
     "Descent.Portability.HWETiltedKernelLaw.signedLognormal_pair": [],
@@ -248836,6 +249746,7 @@
    "Descent.Portability.HWECriticalGenerator.block_count_diverges",
    "Descent.Portability.HWECriticalGenerator.generator_limit",
    "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic_limit",
+   "Descent.Portability.HWEHierarchyCharacteristic.polynomial_block_count_diverges",
    "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit",
    "Descent.Portability.HWEPolynomialLayerScale.eventual_factorization",
    "Descent.Portability.HWEPolynomialLayerScale.layerScale_factorization",
@@ -248876,6 +249787,7 @@
     "Descent.Portability.HWECriticalGenerator.block_count_diverges": [],
     "Descent.Portability.HWECriticalGenerator.generator_limit": [],
     "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic_limit": [],
+    "Descent.Portability.HWEHierarchyCharacteristic.polynomial_block_count_diverges": [],
     "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit": [],
     "Descent.Portability.HWEPolynomialLayerScale.layerScale_factorization": [],
     "Descent.Portability.HWEPolynomialLayerScale.eventual_factorization": [],

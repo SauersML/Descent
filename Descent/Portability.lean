@@ -355,6 +355,13 @@ import Descent.Portability.FiniteCountTail
 import Descent.Portability.HWEKernelTruncation
 import Descent.Portability.CountTailConvergence
 import Descent.Portability.HWEHierarchyGenerator
+import Descent.Portability.HWEHierarchySeries
+import Descent.Portability.HWEHierarchyCharacteristic
+import Descent.Portability.HWEHierarchyLimitLaw
+import Descent.Portability.HWEHierarchyTheorem
+import Descent.Portability.HWEHierarchyParameters
+import Descent.Portability.HWEHierarchyJumpRepresentation
+import Descent.Portability.HWEHierarchyMoments
 assert_below Descent.Program
 
 /-!
