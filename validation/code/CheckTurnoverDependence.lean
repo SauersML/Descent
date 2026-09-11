@@ -51,4 +51,4 @@ import Descent.Portability.TurnoverDependence
 #print axioms Descent.Portability.TurnoverDependence.turnover_monotonicity_criterion
 #print axioms Descent.Portability.TurnoverDependence.independentTurnoverAccuracy_hasDerivAt
 #print axioms Descent.Portability.TurnoverDependence.random_weight_turnover_law
-#print axioms Descent.Portability.TurnoverDependence.antialigned_weight_has_negative_cross_power
+#print axioms Descent.Portability.TurnoverDependence.antialigned_weight_has_negative_cross_signal

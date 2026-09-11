@@ -23,6 +23,14 @@ criterion for the direction of change. This module builds on `uniformExp`,
 `TraitPortabilityRange`. Hypotheses are only finiteness of the locus set, the
 sign law's own normalisation, and positivity of the genetic variance wherever a
 ratio is evaluated.
+
+## Empirical status
+
+None. The bodies here are algebra: a weight vector, an effect vector, a noise
+scale and a sign law are inputs, and every definition is a sum, a product or a
+ratio of them. What would carry an empirical status is a named quantity claiming
+that one of these algebraic expressions is a measured retention or a measured
+accuracy; no definition here makes that claim.
 -/
 
 set_option autoImplicit false
@@ -689,12 +697,12 @@ section LearningDependentMonotonicity
 
 variable {n : ℕ}
 
-/-- Aligned power `A_w = ∑ w_i² b_i²`. -/
-def alignedPower (n : ℕ) (w b : Fin n → ℝ) : ℝ := ∑ i, w i ^ 2 * b i ^ 2
+/-- Aligned signal `A_w = ∑ w_i² b_i²`: the part carried by single loci. -/
+def alignedSignal (n : ℕ) (w b : Fin n → ℝ) : ℝ := ∑ i, w i ^ 2 * b i ^ 2
 
-/-- Cross power `B_w = (wᵀb)² - A_w`: the part of the signal carried by cross-locus
-alignment rather than by single loci. -/
-def crossPower (n : ℕ) (w b : Fin n → ℝ) : ℝ := (∑ i, w i * b i) ^ 2 - alignedPower n w b
+/-- Cross signal `B_w = (wᵀb)² - A_w`: the part carried by cross-locus alignment rather
+than by single loci. -/
+def crossSignal (n : ℕ) (w b : Fin n → ℝ) : ℝ := (∑ i, w i * b i) ^ 2 - alignedSignal n w b
 
 /-- **TQ Corollary 3.8 (3.12) at an arbitrary weight vector.**  Under independent turnover
 with one-locus mean `m` the expected accuracy is `(A_w + m² B_w)/(‖w‖² V)`. -/
@@ -702,7 +710,7 @@ theorem independent_turnover_general_weights (w b : Fin n → ℝ) (sigma m : �
     (hm' : m ≤ 1) :
     independentTurnover n m hm hm'
         (fun z ↦ (turnoverWorld b sigma (independentSigns n z)).r2 w)
-      = (alignedPower n w b + m ^ 2 * crossPower n w b)
+      = (alignedSignal n w b + m ^ 2 * crossSignal n w b)
           / ((∑ i, w i ^ 2) * ((∑ i, b i ^ 2) + sigma ^ 2)) := by
   rw [expected_r2_turnover_law (independentTurnover n m hm hm') (independentSigns n)
     (fun z i ↦ sgn_cases (z i)) w b sigma]
@@ -716,17 +724,17 @@ theorem independent_turnover_general_weights (w b : Fin n → ℝ) (sigma m : �
   have hquad : ∑ i, ∑ j, (w i * b i) * (if i = j then (1 : ℝ) else m ^ 2) * (w j * b j)
       = m ^ 2 * (∑ i, w i * b i) ^ 2 + (1 - m ^ 2) * ∑ i, (w i * b i) ^ 2 :=
     quadratic_form_equicorrelated (fun i ↦ w i * b i) (m ^ 2)
-  have hA : ∑ i, (w i * b i) ^ 2 = alignedPower n w b := by
-    unfold alignedPower
+  have hA : ∑ i, (w i * b i) ^ 2 = alignedSignal n w b := by
+    unfold alignedSignal
     exact Finset.sum_congr rfl fun i _ ↦ by ring
   rw [Finset.sum_congr rfl fun i _ ↦ hstep i, hquad, hA]
   congr 1
-  unfold crossPower
+  unfold crossSignal
   ring
 
 /-- Expected accuracy at evolutionary time `t` under independent equal-rate turnover. -/
 def independentTurnoverAccuracy (n : ℕ) (w b : Fin n → ℝ) (sigma lam t : ℝ) : ℝ :=
-  (alignedPower n w b + retention lam t ^ 2 * crossPower n w b)
+  (alignedSignal n w b + retention lam t ^ 2 * crossSignal n w b)
     / ((∑ i, w i ^ 2) * ((∑ i, b i ^ 2) + sigma ^ 2))
 
 /-- The time law is the expectation of the population `R²` over the turnover law, not a
@@ -746,18 +754,18 @@ theorem turnover_monotonicity_criterion (w b : Fin n → ℝ) (sigma lam s t : �
     (hlam : 0 < lam) (hst : s < t) (hw : 0 < ∑ i, w i ^ 2)
     (hV : 0 < (∑ i, b i ^ 2) + sigma ^ 2) :
     (independentTurnoverAccuracy n w b sigma lam t
-          < independentTurnoverAccuracy n w b sigma lam s ↔ 0 < crossPower n w b) ∧
+          < independentTurnoverAccuracy n w b sigma lam s ↔ 0 < crossSignal n w b) ∧
       (independentTurnoverAccuracy n w b sigma lam t
-          = independentTurnoverAccuracy n w b sigma lam s ↔ crossPower n w b = 0) ∧
+          = independentTurnoverAccuracy n w b sigma lam s ↔ crossSignal n w b = 0) ∧
       (independentTurnoverAccuracy n w b sigma lam s
-          < independentTurnoverAccuracy n w b sigma lam t ↔ crossPower n w b < 0) := by
+          < independentTurnoverAccuracy n w b sigma lam t ↔ crossSignal n w b < 0) := by
   have hD : 0 < (∑ i, w i ^ 2) * ((∑ i, b i ^ 2) + sigma ^ 2) := mul_pos hw hV
   have hexp : Real.exp (-(4 * lam * t)) < Real.exp (-(4 * lam * s)) := by
     rw [Real.exp_lt_exp]
     nlinarith
   have hdiff : independentTurnoverAccuracy n w b sigma lam t
       - independentTurnoverAccuracy n w b sigma lam s
-      = (Real.exp (-(4 * lam * t)) - Real.exp (-(4 * lam * s))) * crossPower n w b
+      = (Real.exp (-(4 * lam * t)) - Real.exp (-(4 * lam * s))) * crossSignal n w b
           / ((∑ i, w i ^ 2) * ((∑ i, b i ^ 2) + sigma ^ 2)) := by
     unfold independentTurnoverAccuracy
     rw [retention_sq, retention_sq, div_sub_div_same]
@@ -795,7 +803,7 @@ theorem turnover_monotonicity_criterion (w b : Fin n → ℝ) (sigma lam s t : �
 /-- **The exact time derivative of TQ Corollary 3.8.** -/
 theorem independentTurnoverAccuracy_hasDerivAt (w b : Fin n → ℝ) (sigma lam t : ℝ) :
     HasDerivAt (independentTurnoverAccuracy n w b sigma lam)
-      (-(4 * lam) * Real.exp (-(4 * lam * t)) * crossPower n w b
+      (-(4 * lam) * Real.exp (-(4 * lam * t)) * crossSignal n w b
         / ((∑ i, w i ^ 2) * ((∑ i, b i ^ 2) + sigma ^ 2))) t := by
   have hlin : HasDerivAt (fun s : ℝ ↦ -(4 * lam * s)) (-(4 * lam)) t := by
     simpa using ((hasDerivAt_id t).const_mul (4 * lam)).neg
@@ -803,16 +811,16 @@ theorem independentTurnoverAccuracy_hasDerivAt (w b : Fin n → ℝ) (sigma lam 
       (Real.exp (-(4 * lam * t)) * -(4 * lam)) t :=
     (Real.hasDerivAt_exp _).comp t hlin
   have hfun : independentTurnoverAccuracy n w b sigma lam
-      = fun s ↦ (alignedPower n w b + Real.exp (-(4 * lam * s)) * crossPower n w b)
+      = fun s ↦ (alignedSignal n w b + Real.exp (-(4 * lam * s)) * crossSignal n w b)
           / ((∑ i, w i ^ 2) * ((∑ i, b i ^ 2) + sigma ^ 2)) := by
     funext s
     rw [independentTurnoverAccuracy, retention_sq]
-  have hval : -(4 * lam) * Real.exp (-(4 * lam * t)) * crossPower n w b
+  have hval : -(4 * lam) * Real.exp (-(4 * lam * t)) * crossSignal n w b
         / ((∑ i, w i ^ 2) * ((∑ i, b i ^ 2) + sigma ^ 2))
-      = Real.exp (-(4 * lam * t)) * -(4 * lam) * crossPower n w b
+      = Real.exp (-(4 * lam * t)) * -(4 * lam) * crossSignal n w b
         / ((∑ i, w i ^ 2) * ((∑ i, b i ^ 2) + sigma ^ 2)) := by ring
   rw [hfun, hval]
-  exact ((hexp.mul_const (crossPower n w b)).const_add (alignedPower n w b)).div_const
+  exact ((hexp.mul_const (crossSignal n w b)).const_add (alignedSignal n w b)).div_const
     ((∑ i, w i ^ 2) * ((∑ i, b i ^ 2) + sigma ^ 2))
 
 /-- **TQ Corollary 3.8 (3.13).**  For a source-trained weight drawn independently of the
@@ -820,14 +828,14 @@ turnover process, the time law is affine in `e^{-4λt}` with coefficient `E[B_ŵ
 theorem random_weight_turnover_law {W : Type*} (EW : ExpFunctional W) (wf : W → Fin n → ℝ)
     (b : Fin n → ℝ) (sigma lam t : ℝ) :
     EW (fun u ↦ independentTurnoverAccuracy n (wf u) b sigma lam t)
-      = (EW (fun u ↦ alignedPower n (wf u) b / ∑ i, wf u i ^ 2)
+      = (EW (fun u ↦ alignedSignal n (wf u) b / ∑ i, wf u i ^ 2)
           + Real.exp (-(4 * lam * t))
-            * EW (fun u ↦ crossPower n (wf u) b / ∑ i, wf u i ^ 2))
+            * EW (fun u ↦ crossSignal n (wf u) b / ∑ i, wf u i ^ 2))
         / ((∑ i, b i ^ 2) + sigma ^ 2) := by
   have hdecomp : (fun u ↦ independentTurnoverAccuracy n (wf u) b sigma lam t)
       = ((∑ i, b i ^ 2) + sigma ^ 2)⁻¹ •
-          ((fun u ↦ alignedPower n (wf u) b / ∑ i, wf u i ^ 2)
-            + Real.exp (-(4 * lam * t)) • fun u ↦ crossPower n (wf u) b / ∑ i, wf u i ^ 2) := by
+          ((fun u ↦ alignedSignal n (wf u) b / ∑ i, wf u i ^ 2)
+            + Real.exp (-(4 * lam * t)) • fun u ↦ crossSignal n (wf u) b / ∑ i, wf u i ^ 2) := by
     funext u
     simp only [Pi.smul_apply, Pi.add_apply, smul_eq_mul]
     rw [independentTurnoverAccuracy, retention_sq, ← div_div, add_div, mul_div_assoc]
@@ -836,11 +844,11 @@ theorem random_weight_turnover_law {W : Type*} (EW : ExpFunctional W) (wf : W �
   ring
 
 /-- **Turnover can raise accuracy.**  With `b = (1,1)` and the anti-aligned weight
-`w = (1,-1)` the cross power is `-2` while the aligned power is `2`, so independent
+`w = (1,-1)` the cross signal is `-2` while the aligned signal is `2`, so independent
 turnover strictly increases expected squared correlation from zero. -/
-theorem antialigned_weight_has_negative_cross_power :
-    crossPower 2 ![1, -1] ![1, 1] = -2 ∧ alignedPower 2 ![1, -1] ![1, 1] = 2 := by
-  constructor <;> norm_num [crossPower, alignedPower, Fin.sum_univ_two]
+theorem antialigned_weight_has_negative_cross_signal :
+    crossSignal 2 ![1, -1] ![1, 1] = -2 ∧ alignedSignal 2 ![1, -1] ![1, 1] = 2 := by
+  constructor <;> norm_num [crossSignal, alignedSignal, Fin.sum_univ_two]
 
 end LearningDependentMonotonicity
 

@@ -22,7 +22,14 @@ Equation (8.3)'s recovery rule and its worst-case error `Δ/2` are proved direct
 
 This module reuses `ApproximationDuality.eval_as_sum` and `stdBasis` to read off the
 separating functional, and ties the kernels to the corpus through
-`jointLaw_expectation`, which evaluates `Portability.weightedExp` on the joint mass.
+`jointLaw_expectation`, which evaluates `Portability.weightedExp` on the joint mass. The
+extremal kernels and the shrinking radius are named definitions, not existentials.
+
+## Empirical status
+
+None. The bodies here are algebra: a report diameter over a kernel class and a weighted
+oscillation are claims about a model, and what carries an empirical status is a named
+quantity in a subsystem module asserting that this algebra computes something measurable.
 -/
 
 set_option autoImplicit false
@@ -46,6 +53,15 @@ def oscTotal (μ : W → ℝ) (h : W × Y → ℝ) : ℝ :=
 /-- The supplied feature combination `λᵀg`. -/
 def featureCombo (g : F → W × Y → ℝ) (lam : F → ℝ) : W × Y → ℝ :=
   fun z ↦ ∑ i, lam i * g i z
+
+/-- A convex combination of multiplier vectors combines the feature combinations the
+same way. -/
+theorem featureCombo_combo (g : F → W × Y → ℝ) (lam₁ lam₂ : F → ℝ) (a b : ℝ)
+    (z : W × Y) :
+    featureCombo g (fun i ↦ a * lam₁ i + b * lam₂ i) z =
+      a * featureCombo g lam₁ z + b * featureCombo g lam₂ z := by
+  simp only [featureCombo, Finset.mul_sum, ← Finset.sum_add_distrib]
+  exact Finset.sum_congr rfl fun i _ ↦ by ring
 
 /-- The joint mass of a pre-outcome marginal and a conditional kernel. -/
 def jointLaw (μ : W → ℝ) (K : W → Y → ℝ) : W × Y → ℝ := fun z ↦ μ z.1 * K z.1 z.2
@@ -170,21 +186,13 @@ theorem convex_oscNbhd (μ : W → ℝ) (hμ : ∀ w, 0 ≤ μ w) (g : F → W �
   refine ⟨fun i ↦ a * lam₁ i + b * lam₂ i, fun w ↦ a * u₁ w + b * u₂ w,
     fun w ↦ a * l₁ w + b * l₂ w, ?_, ?_, ?_⟩
   · intro w y
-    have hc : featureCombo g (fun i ↦ a * lam₁ i + b * lam₂ i) (w, y) =
-        a * featureCombo g lam₁ (w, y) + b * featureCombo g lam₂ (w, y) := by
-      simp only [featureCombo, Finset.mul_sum, ← Finset.sum_add_distrib]
-      exact Finset.sum_congr rfl fun i _ ↦ by ring
-    rw [hc]
+    rw [featureCombo_combo g lam₁ lam₂ a b (w, y)]
     have e1 := mul_le_mul_of_nonneg_left (hl₁ w y) ha
     have e2 := mul_le_mul_of_nonneg_left (hl₂ w y) hb
     simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
     nlinarith [e1, e2]
   · intro w y
-    have hc : featureCombo g (fun i ↦ a * lam₁ i + b * lam₂ i) (w, y) =
-        a * featureCombo g lam₁ (w, y) + b * featureCombo g lam₂ (w, y) := by
-      simp only [featureCombo, Finset.mul_sum, ← Finset.sum_add_distrib]
-      exact Finset.sum_congr rfl fun i _ ↦ by ring
-    rw [hc]
+    rw [featureCombo_combo g lam₁ lam₂ a b (w, y)]
     have e1 := mul_le_mul_of_nonneg_left (hu₁ w y) ha
     have e2 := mul_le_mul_of_nonneg_left (hu₂ w y) hb
     simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
@@ -251,15 +259,28 @@ theorem oscNbhd_mem_of_close (μ : W → ℝ) (g : F → W × Y → ℝ) (ε r :
     rw [hexp]
     linarith
 
-/-- A positive slack admits a positive radius whose doubled weight fits inside it. -/
-theorem exists_radius (s S : ℝ) (hs : 0 < s) (hS : 0 ≤ S) :
-    ∃ ρ : ℝ, 0 < ρ ∧ 2 * ρ * S < s := by
-  refine ⟨s / (2 * S + 2), by positivity, ?_⟩
+/-- The radius whose doubled weighted total fits inside a given slack. -/
+def shrinkRadius (s S : ℝ) : ℝ := s / (2 * S + 2)
+
+/-- The shrinking radius is positive. -/
+theorem shrinkRadius_pos (s S : ℝ) (hs : 0 < s) (hS : 0 ≤ S) : 0 < shrinkRadius s S := by
+  unfold shrinkRadius
+  positivity
+
+/-- Twice the shrinking radius, weighted, stays inside the slack. -/
+theorem shrinkRadius_spec (s S : ℝ) (hs : 0 < s) (hS : 0 ≤ S) :
+    2 * shrinkRadius s S * S < s := by
   have hD : (0 : ℝ) < 2 * S + 2 := by linarith
   have h1 : s / (2 * S + 2) * (2 * S) < s / (2 * S + 2) * (2 * S + 2) :=
     mul_lt_mul_of_pos_left (by linarith) (by positivity)
   rw [div_mul_cancel₀ _ hD.ne'] at h1
+  unfold shrinkRadius
   linarith
+
+/-- A positive slack admits a positive radius whose doubled weight fits inside it. -/
+theorem exists_radius (s S : ℝ) (hs : 0 < s) (hS : 0 ≤ S) :
+    ∃ ρ : ℝ, 0 < ρ ∧ 2 * ρ * S < s :=
+  ⟨shrinkRadius s S, shrinkRadius_pos s S hs hS, shrinkRadius_spec s S hs hS⟩
 
 /-- The oscillation neighbourhood is open. -/
 theorem isOpen_oscNbhd (μ : W → ℝ) (hμ : ∀ w, 0 ≤ μ w) (g : F → W × Y → ℝ)
@@ -267,9 +288,13 @@ theorem isOpen_oscNbhd (μ : W → ℝ) (hμ : ∀ w, 0 ≤ μ w) (g : F → W �
   rw [Metric.isOpen_iff]
   rintro h ⟨lam, u, l, hl, hu, hs⟩
   have hSnn : (0 : ℝ) ≤ ∑ w, μ w := Finset.sum_nonneg fun w _ ↦ hμ w
-  obtain ⟨ρ, hρpos, hρlt⟩ := exists_radius
-    (r - ((∑ w, μ w * (u w - l w)) + 2 * ε * ∑ i, |lam i|)) (∑ w, μ w)
-    (by linarith) hSnn
+  have hslack : 0 < r - ((∑ w, μ w * (u w - l w)) + 2 * ε * ∑ i, |lam i|) := by linarith
+  have hρpos := shrinkRadius_pos
+    (r - ((∑ w, μ w * (u w - l w)) + 2 * ε * ∑ i, |lam i|)) (∑ w, μ w) hslack hSnn
+  have hρlt := shrinkRadius_spec
+    (r - ((∑ w, μ w * (u w - l w)) + 2 * ε * ∑ i, |lam i|)) (∑ w, μ w) hslack hSnn
+  set ρ := shrinkRadius
+    (r - ((∑ w, μ w * (u w - l w)) + 2 * ε * ∑ i, |lam i|)) (∑ w, μ w) with hρdef
   refine ⟨ρ, hρpos, ?_⟩
   intro h' hh'
   have hd : ‖h' - h‖ < ρ := by
@@ -370,6 +395,84 @@ theorem kernel_pair_difference (μ : W → ℝ) (K L : W → Y → ℝ) (τ : W 
   rw [← mul_sub, ← Finset.sum_sub_distrib, Finset.mul_sum]
   refine Finset.sum_congr rfl fun y _ ↦ ?_
   rw [← sub_mul, ← mul_assoc, hdiff w y]
+
+/-- The negative part of a row with vanishing total equals its positive part. -/
+theorem negPart_sum (τ : W × Y → ℝ) (w : W) (hrow : ∑ y, τ (w, y) = 0) :
+    (∑ y, (|τ (w, y)| - τ (w, y)) / 2) = ∑ y, (|τ (w, y)| + τ (w, y)) / 2 := by
+  have hsplit : ∀ y : Y, (|τ (w, y)| - τ (w, y)) / 2 =
+      (|τ (w, y)| + τ (w, y)) / 2 - τ (w, y) := by intro y; ring
+  rw [Finset.sum_congr rfl fun y _ ↦ hsplit y, Finset.sum_sub_distrib, hrow, sub_zero]
+
+/-- A row topped up on one outcome to its prescribed mass is nonnegative. -/
+theorem topUp_nonneg (μ : W → ℝ) (hμ : ∀ w, 0 < μ w) (y₀ : Y) (w : W) (y : Y)
+    (aw pv : ℝ) (hpv : 0 ≤ pv) (haw : aw ≤ μ w) :
+    0 ≤ (pv + (μ w - aw) * (if y = y₀ then 1 else 0)) / μ w := by
+  have h3 : (0 : ℝ) ≤ (if y = y₀ then (1 : ℝ) else 0) := by split_ifs <;> norm_num
+  exact div_nonneg (by nlinarith) (hμ w).le
+
+/-- A row topped up on one outcome to its prescribed mass is a probability row. -/
+theorem topUp_sum (μ : W → ℝ) (hμ : ∀ w, 0 < μ w) (y₀ : Y) (w : W) (aw : ℝ)
+    (p : Y → ℝ) (hp : ∑ y, p y = aw) :
+    (∑ y, (p y + (μ w - aw) * (if y = y₀ then 1 else 0)) / μ w) = 1 := by
+  have hμne : μ w ≠ 0 := (hμ w).ne'
+  have hind : (∑ y, (if y = y₀ then (1 : ℝ) else 0)) = 1 := by
+    rw [Finset.sum_ite_eq' Finset.univ y₀]
+    simp
+  have hstep : (∑ y, (p y + (μ w - aw) * (if y = y₀ then 1 else 0))) = μ w := by
+    rw [Finset.sum_add_distrib, ← Finset.mul_sum, hind, mul_one, hp]
+    ring
+  calc (∑ y, (p y + (μ w - aw) * (if y = y₀ then 1 else 0)) / μ w)
+      = (∑ y, (p y + (μ w - aw) * (if y = y₀ then 1 else 0))) / μ w := by
+        rw [Finset.sum_div]
+    _ = 1 := by rw [hstep, div_self hμne]
+
+/-- **The extremal conditional kernels.** The sign parts of a signed weight, topped up on
+a fixed outcome so that each row carries the prescribed pre-outcome mass. -/
+def extremalKernel (μ : W → ℝ) (τ : W × Y → ℝ) (y₀ : Y) (s : Bool) : W → Y → ℝ :=
+  fun w y ↦ ((|τ (w, y)| + (if s then -τ (w, y) else τ (w, y))) / 2 +
+    (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) * (if y = y₀ then 1 else 0)) / μ w
+
+/-- The extremal kernels are nonnegative. -/
+theorem extremalKernel_nonneg (μ : W → ℝ) (hμ : ∀ w, 0 < μ w) (τ : W × Y → ℝ) (y₀ : Y)
+    (s : Bool) (hτpos : ∀ w, (∑ y, (|τ (w, y)| + τ (w, y)) / 2) ≤ μ w) (w : W) (y : Y) :
+    0 ≤ extremalKernel μ τ y₀ s w y := by
+  cases s
+  · exact topUp_nonneg μ hμ y₀ w y (∑ y', (|τ (w, y')| + τ (w, y')) / 2)
+      ((|τ (w, y)| + τ (w, y)) / 2) (by linarith [neg_abs_le (τ (w, y))]) (hτpos w)
+  · exact topUp_nonneg μ hμ y₀ w y (∑ y', (|τ (w, y')| + τ (w, y')) / 2)
+      ((|τ (w, y)| - τ (w, y)) / 2) (by linarith [le_abs_self (τ (w, y))]) (hτpos w)
+
+/-- The extremal kernels are probability kernels. -/
+theorem extremalKernel_sum (μ : W → ℝ) (hμ : ∀ w, 0 < μ w) (τ : W × Y → ℝ) (y₀ : Y)
+    (s : Bool) (hτrow : ∀ w, ∑ y, τ (w, y) = 0) (w : W) :
+    ∑ y, extremalKernel μ τ y₀ s w y = 1 := by
+  cases s
+  · have hK : ∀ y, extremalKernel μ τ y₀ false w y =
+        ((|τ (w, y)| + τ (w, y)) / 2 +
+          (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) *
+            (if y = y₀ then 1 else 0)) / μ w := fun _ ↦ rfl
+    simp only [hK]
+    exact topUp_sum μ hμ y₀ w _ (fun y ↦ (|τ (w, y)| + τ (w, y)) / 2) rfl
+  · have hK : ∀ y, extremalKernel μ τ y₀ true w y =
+        ((|τ (w, y)| - τ (w, y)) / 2 +
+          (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) *
+            (if y = y₀ then 1 else 0)) / μ w := fun _ ↦ rfl
+    simp only [hK]
+    exact topUp_sum μ hμ y₀ w _ (fun y ↦ (|τ (w, y)| - τ (w, y)) / 2)
+      (negPart_sum τ w (hτrow w))
+
+/-- The weighted difference of the extremal kernels is the signed weight. -/
+theorem extremalKernel_diff (μ : W → ℝ) (hμ : ∀ w, 0 < μ w) (τ : W × Y → ℝ) (y₀ : Y)
+    (w : W) (y : Y) :
+    μ w * (extremalKernel μ τ y₀ false w y - extremalKernel μ τ y₀ true w y) =
+      τ (w, y) := by
+  have hμne : μ w ≠ 0 := (hμ w).ne'
+  show μ w * (((|τ (w, y)| + τ (w, y)) / 2 +
+      (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) * (if y = y₀ then 1 else 0)) / μ w -
+    ((|τ (w, y)| - τ (w, y)) / 2 +
+      (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) * (if y = y₀ then 1 else 0)) / μ w) = _
+  field_simp
+  ring
 
 /-- **PL Theorem 8.2, lower bound.** If the dual objective is bounded below by `r`, then
 every `c` in `(0, r)` is attained by an explicit feasible pair of conditional kernels,
@@ -538,81 +641,19 @@ theorem exists_kernelGap_ge (μ : W → ℝ) (hμ : ∀ w, 0 < μ w) (g : F → 
         exact Finset.sum_congr rfl fun z _ ↦ (mul_div_assoc _ _ _).symm
       rw [hid, ← hφeval f]
       field_simp
-  have hτneg : ∀ w, (∑ y, (|τ (w, y)| - τ (w, y)) / 2) =
-      ∑ y, (|τ (w, y)| + τ (w, y)) / 2 := by
-    intro w
-    have hsplit : ∀ y : Y, (|τ (w, y)| - τ (w, y)) / 2 =
-        (|τ (w, y)| + τ (w, y)) / 2 - τ (w, y) := by intro y; ring
-    rw [Finset.sum_congr rfl fun y _ ↦ hsplit y, Finset.sum_sub_distrib, hτrow w, sub_zero]
-  obtain ⟨Kk, Ll, hKnn, hLnn, hKsum, hLsum, hdiff⟩ :
-      ∃ Kk Ll : W → Y → ℝ, (∀ w y, 0 ≤ Kk w y) ∧ (∀ w y, 0 ≤ Ll w y) ∧
-        (∀ w, ∑ y, Kk w y = 1) ∧ (∀ w, ∑ y, Ll w y = 1) ∧
-        (∀ w y, μ w * (Kk w y - Ll w y) = τ (w, y)) := by
-    refine ⟨fun w y ↦ ((|τ (w, y)| + τ (w, y)) / 2 +
-        (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) * (if y = y₀ then 1 else 0)) / μ w,
-      fun w y ↦ ((|τ (w, y)| - τ (w, y)) / 2 +
-        (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) * (if y = y₀ then 1 else 0)) / μ w,
-      ?_, ?_, ?_, ?_, ?_⟩
-    · intro w y
-      have h1 : (0 : ℝ) ≤ (|τ (w, y)| + τ (w, y)) / 2 := by
-        linarith [neg_abs_le (τ (w, y))]
-      have h2 : (0 : ℝ) ≤ μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2 := by
-        linarith [hτpos w]
-      have h3 : (0 : ℝ) ≤ (if y = y₀ then (1 : ℝ) else 0) := by split_ifs <;> norm_num
-      exact div_nonneg (by nlinarith) (hμ w).le
-    · intro w y
-      have h1 : (0 : ℝ) ≤ (|τ (w, y)| - τ (w, y)) / 2 := by
-        linarith [le_abs_self (τ (w, y))]
-      have h2 : (0 : ℝ) ≤ μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2 := by
-        linarith [hτpos w]
-      have h3 : (0 : ℝ) ≤ (if y = y₀ then (1 : ℝ) else 0) := by split_ifs <;> norm_num
-      exact div_nonneg (by nlinarith) (hμ w).le
-    · intro w
-      have hμne : μ w ≠ 0 := (hμ w).ne'
-      have hind : (∑ y, (if y = y₀ then (1 : ℝ) else 0)) = 1 := by
-        rw [Finset.sum_ite_eq' Finset.univ y₀]
-        simp
-      have hstep : (∑ y, ((|τ (w, y)| + τ (w, y)) / 2 +
-          (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) *
-            (if y = y₀ then 1 else 0))) = μ w := by
-        rw [Finset.sum_add_distrib, ← Finset.mul_sum, hind, mul_one]
-        ring
-      calc (∑ y, ((|τ (w, y)| + τ (w, y)) / 2 +
-            (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) *
-              (if y = y₀ then 1 else 0)) / μ w)
-          = (∑ y, ((|τ (w, y)| + τ (w, y)) / 2 +
-            (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) *
-              (if y = y₀ then 1 else 0))) / μ w := by rw [Finset.sum_div]
-        _ = 1 := by rw [hstep, div_self hμne]
-    · intro w
-      have hμne : μ w ≠ 0 := (hμ w).ne'
-      have hind : (∑ y, (if y = y₀ then (1 : ℝ) else 0)) = 1 := by
-        rw [Finset.sum_ite_eq' Finset.univ y₀]
-        simp
-      have hstep : (∑ y, ((|τ (w, y)| - τ (w, y)) / 2 +
-          (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) *
-            (if y = y₀ then 1 else 0))) = μ w := by
-        rw [Finset.sum_add_distrib, ← Finset.mul_sum, hind, mul_one, hτneg w]
-        ring
-      calc (∑ y, ((|τ (w, y)| - τ (w, y)) / 2 +
-            (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) *
-              (if y = y₀ then 1 else 0)) / μ w)
-          = (∑ y, ((|τ (w, y)| - τ (w, y)) / 2 +
-            (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) *
-              (if y = y₀ then 1 else 0))) / μ w := by rw [Finset.sum_div]
-        _ = 1 := by rw [hstep, div_self hμne]
-    · intro w y
-      have hμne : μ w ≠ 0 := (hμ w).ne'
-      field_simp
-      ring
-  refine ⟨∑ z, τ z * f z, ⟨Kk, Ll, hKnn, hLnn, hKsum, hLsum, ?_, ?_⟩, ?_⟩
+  refine ⟨∑ z, τ z * f z,
+    ⟨extremalKernel μ τ y₀ false, extremalKernel μ τ y₀ true,
+      fun w y ↦ extremalKernel_nonneg μ hμ τ y₀ false hτpos w y,
+      fun w y ↦ extremalKernel_nonneg μ hμ τ y₀ true hτpos w y,
+      fun w ↦ extremalKernel_sum μ hμ τ y₀ false hτrow w,
+      fun w ↦ extremalKernel_sum μ hμ τ y₀ true hτrow w, ?_, ?_⟩, ?_⟩
   · intro i
-    rw [kernel_pair_difference μ Kk Ll τ hdiff (g i)]
+    rw [kernel_pair_difference μ _ _ τ (extremalKernel_diff μ hμ τ y₀) (g i)]
     have hcomm : (∑ z, τ z * g i z) = ∑ z, g i z * τ z :=
       Finset.sum_congr rfl fun z _ ↦ by ring
     rw [hcomm]
     exact hτfeat i
-  · exact (kernel_pair_difference μ Kk Ll τ hdiff f).symm
+  · exact (kernel_pair_difference μ _ _ τ (extremalKernel_diff μ hμ τ y₀) f).symm
   · have hcomm : (∑ z, τ z * f z) = ∑ z, f z * τ z :=
       Finset.sum_congr rfl fun z _ ↦ by ring
     rw [hcomm, hτf]

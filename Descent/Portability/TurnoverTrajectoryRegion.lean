@@ -23,6 +23,14 @@ interval of width `2p` whose position depends only on whether the current state
 agrees. Sufficiency: every sequence obeying those inequalities is produced
 exactly by an explicit coadapted coupling whose one-locus flip probability is
 `p` after every history.
+
+## Empirical status
+
+None. The bodies here are algebra: a flip probability, a joint kernel family and
+a target agreement sequence are inputs, and every definition is a sum, a product
+or a ratio of them. The one-locus law is time-homogeneous by construction, as
+`flipKernel_time_invariant` records; no definition names a measured quantity or
+carries a fitted constant.
 -/
 
 set_option autoImplicit false
@@ -70,9 +78,17 @@ theorem agree_cases (z : Fin 2 → Bool) : agree z = 1 ∨ agree z = 0 := by
 /-- Both signs start at `+1`. -/
 def startLaw : (Fin 2 → Bool) → ℝ := fun a ↦ if a 0 = true ∧ a 1 = true then 1 else 0
 
-/-- The prescribed one-locus law: each locus flips with probability `p` at every step. -/
+/-- The prescribed one-locus law: each locus flips with probability `p` at every step.
+The time index is carried so that the law has the shape a coadapted kernel family expects,
+and `flipKernel_time_invariant` records that nothing reads it. -/
 def flipKernel (p : ℝ) (_t : ℕ) (i : Fin 2) (z : Fin 2 → Bool) (b : Bool) : ℝ :=
   if b = z i then 1 - p else p
+
+/-- **The prescribed one-locus law is time-homogeneous.**  The flip probability after a
+history of length `s` is the flip probability after a history of length `t`, which is why
+the time index is never read. -/
+theorem flipKernel_time_invariant (p : ℝ) (s t : ℕ) (i : Fin 2) (z : Fin 2 → Bool)
+    (b : Bool) : flipKernel p s i z b = flipKernel p t i z b := rfl
 
 /-- The agreement probability of the next state given a history. -/
 def stepAgree (J : List (Fin 2 → Bool) → (Fin 2 → Bool) → ℝ) (v : List (Fin 2 → Bool)) : ℝ :=

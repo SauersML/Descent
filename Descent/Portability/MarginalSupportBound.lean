@@ -21,6 +21,13 @@ the resulting null direction leaves normalisation and every one-locus mean
 unchanged, optimality forces the objective to be flat along it, and moving until
 one support probability reaches zero gives an optimum of strictly smaller
 support.
+
+## Empirical status
+
+None. The bodies here are algebra and linear algebra: a weight vector on the sign
+cube is the input, and every definition is its support or the moment vector of a
+sign configuration. No definition names a measurable quantity or carries a fitted
+constant.
 -/
 
 set_option autoImplicit false

@@ -22,6 +22,13 @@ law with the prescribed means), compact and convex, so its image under the
 linear objective is a compact connected subset of the line. No fitted retention
 parameter enters; the hypotheses are only that the prescribed means lie in
 `[-1,1]`.
+
+## Empirical status
+
+None. The bodies here are algebra and topology: a weight vector on the sign cube
+and a vector of prescribed one-locus means are inputs, and every definition is a
+product, a sum or a feasibility condition on them. No definition names a
+measurable quantity or carries a fitted constant.
 -/
 
 set_option autoImplicit false

@@ -19,6 +19,12 @@ shifts of two threshold patterns; the upper-endpoint law is the fully
 synchronised two-point law. The bound side assumes only that the signs are
 genuine `±1` values with the prescribed marginal means; it does not assume the
 joint law is a product, exchangeable, or Markov.
+
+## Empirical status
+
+None. The bodies here are algebra: a grid index, an effect vector, a noise scale
+and a sign law are inputs, and every definition is a sum, a product or a ratio of
+them. No definition names a measurable quantity or carries a fitted constant.
 -/
 
 set_option autoImplicit false

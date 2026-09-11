@@ -25,3 +25,12 @@ import Descent.Portability.ConditionalOscillationDuality
 #print axioms Descent.Portability.ConditionalOscillationDuality.kernel_report_split
 #print axioms Descent.Portability.ConditionalOscillationDuality.oscillation_rule_error
 #print axioms Descent.Portability.ConditionalOscillationDuality.kernelGaps_zero_iff
+#print axioms Descent.Portability.ConditionalOscillationDuality.featureCombo_combo
+#print axioms Descent.Portability.ConditionalOscillationDuality.shrinkRadius_pos
+#print axioms Descent.Portability.ConditionalOscillationDuality.shrinkRadius_spec
+#print axioms Descent.Portability.ConditionalOscillationDuality.negPart_sum
+#print axioms Descent.Portability.ConditionalOscillationDuality.topUp_nonneg
+#print axioms Descent.Portability.ConditionalOscillationDuality.topUp_sum
+#print axioms Descent.Portability.ConditionalOscillationDuality.extremalKernel_nonneg
+#print axioms Descent.Portability.ConditionalOscillationDuality.extremalKernel_sum
+#print axioms Descent.Portability.ConditionalOscillationDuality.extremalKernel_diff

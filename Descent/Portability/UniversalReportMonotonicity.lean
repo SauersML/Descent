@@ -21,6 +21,14 @@ them, so those hypotheses are not vacuous. UPT Corollary 5.2 follows in both
 time scales: under irreducibility only a constant report can decline from every
 initial condition, so a decline observed from one source-selected start cannot
 be upgraded to a claim about every start.
+
+## Empirical status
+
+None. The bodies here are algebra: a transition law, a generator and a report
+are inputs, and every definition is a sum or a matrix action on them. What would
+carry an empirical status is a named quantity claiming that one of these matrices
+is the transition law of a measured population; no definition here makes that
+claim.
 -/
 
 set_option autoImplicit false
@@ -34,19 +42,17 @@ open scoped Matrix
 
 noncomputable section
 
-variable {S : Type*} [Fintype S] [DecidableEq S]
+variable {S : Type*} [Fintype S]
 
-section OneStep
+section PushForward
 
 /-- The state law after one transition step. -/
 def pushLaw (K : Matrix S S ℝ) (p : S → ℝ) : S → ℝ := fun y ↦ ∑ x, p x * K x y
 
-omit [DecidableEq S] in
 /-- Coordinate form of a matrix acting on a report. -/
 theorem mulVec_coord (K : Matrix S S ℝ) (g : S → ℝ) (x : S) :
     (K *ᵥ g) x = ∑ y, K x y * g y := rfl
 
-omit [DecidableEq S] in
 /-- A stochastic step carries probability vectors to probability vectors. -/
 theorem pushLaw_isLaw (K : Matrix S S ℝ) (hKnn : ∀ x y, 0 ≤ K x y)
     (hKrow : ∀ x, ∑ y, K x y = 1) (p : S → ℝ) (hp : ∀ x, 0 ≤ p x) (hsum : ∑ x, p x = 1) :
@@ -61,7 +67,6 @@ theorem pushLaw_isLaw (K : Matrix S S ℝ) (hKnn : ∀ x y, 0 ≤ K x y)
     rw [Finset.sum_comm, Finset.sum_congr rfl fun x _ ↦ h1 x]
     exact hsum
 
-omit [DecidableEq S] in
 /-- Backward form of the one-step report expectation. -/
 theorem pushLaw_expectation (K : Matrix S S ℝ) (p g : S → ℝ) :
     ∑ y, pushLaw K p y * g y = ∑ x, p x * (K *ᵥ g) x := by
@@ -76,6 +81,12 @@ theorem pushLaw_expectation (K : Matrix S S ℝ) (p g : S → ℝ) :
     rw [Finset.mul_sum]
   rw [Finset.sum_congr rfl fun y _ ↦ h1 y, Finset.sum_congr rfl fun x _ ↦ h2 x]
   exact Finset.sum_comm
+
+end PushForward
+
+variable [DecidableEq S]
+
+section OneStep
 
 /-- **UPT Theorem 5.1 (5.1), discrete time.**  The expected report does not increase in
 one step for every initial law exactly when `K h' ≤ h` coordinatewise. -/
@@ -177,9 +188,7 @@ end ContinuousTime
 
 section Irreducibility
 
-variable [Nonempty S]
-
-omit [DecidableEq S] [Nonempty S] in
+omit [DecidableEq S] in
 /-- **A minimiser's reachable successors are minimisers**, in discrete time. -/
 theorem minimizer_successor (K : Matrix S S ℝ) (hKnn : ∀ x y, 0 ≤ K x y)
     (hKrow : ∀ x, ∑ y, K x y = 1) (h : S → ℝ) (hKh : ∀ x, (K *ᵥ h) x ≤ h x)
@@ -206,7 +215,6 @@ theorem minimizer_successor (K : Matrix S S ℝ) (hKnn : ∀ x y, 0 ≤ K x y)
   · exact absurd h3 (ne_of_gt hy)
   · linarith
 
-omit [Nonempty S] in
 /-- Powers of a nonnegative matrix are nonnegative. -/
 theorem pow_nonneg_entries (K : Matrix S S ℝ) (hKnn : ∀ x y, 0 ≤ K x y) (n : ℕ) :
     ∀ x y, 0 ≤ (K ^ n) x y := by
@@ -225,8 +233,9 @@ report does not increase in one step from any state has a constant report. -/
 theorem irreducible_forces_constant (K : Matrix S S ℝ) (hKnn : ∀ x y, 0 ≤ K x y)
     (hKrow : ∀ x, ∑ y, K x y = 1) (hirr : ∀ x y, ∃ n : ℕ, 0 < (K ^ n) x y)
     (h : S → ℝ) (hKh : ∀ x, (K *ᵥ h) x ≤ h x) : ∀ x y, h x = h y := by
+  intro x y
   obtain ⟨x0, -, hx0⟩ :=
-    Finset.exists_min_image (Finset.univ : Finset S) h ⟨Classical.arbitrary S, Finset.mem_univ _⟩
+    Finset.exists_min_image (Finset.univ : Finset S) h ⟨x, Finset.mem_univ x⟩
   have hmin : ∀ w, h x0 ≤ h w := fun w ↦ hx0 w (Finset.mem_univ w)
   have hstep : ∀ n : ℕ, ∀ y, 0 < (K ^ n) x0 y → h y = h x0 := by
     intro n
@@ -263,7 +272,6 @@ theorem irreducible_forces_constant (K : Matrix S S ℝ) (hKnn : ∀ x y, 0 ≤ 
           rw [ih z hz1]
           exact hmin w
         rw [minimizer_successor K hKnn hKrow h hKh z hzmin y hz2, ih z hz1]
-  intro x y
   obtain ⟨nx, hnx⟩ := hirr x0 x
   obtain ⟨ny, hny⟩ := hirr x0 y
   rw [hstep nx x hnx, hstep ny y hny]
@@ -280,7 +288,6 @@ theorem recurrent_evolution_obstruction (K : Matrix S S ℝ) (hKnn : ∀ x y, 0 
   exact hxy (irreducible_forces_constant K hKnn hKrow hirr h
     ((universal_one_step_monotone_iff K h h).mp hall) x y)
 
-omit [Nonempty S] in
 /-- **A minimiser's reachable successors are minimisers**, for a generator. -/
 theorem generator_minimizer_successor (Q : Matrix S S ℝ)
     (hQnn : ∀ x y, x ≠ y → 0 ≤ Q x y) (hQrow : ∀ x, ∑ y, Q x y = 0) (h : S → ℝ)
@@ -314,8 +321,9 @@ theorem generator_irreducible_forces_constant (Q : Matrix S S ℝ)
     (hQnn : ∀ x y, x ≠ y → 0 ≤ Q x y) (hQrow : ∀ x, ∑ y, Q x y = 0)
     (hirr : ∀ x y, Relation.ReflTransGen (fun a b ↦ 0 < Q a b) x y) (h : S → ℝ)
     (hQh : ∀ x, (Q *ᵥ h) x ≤ 0) : ∀ x y, h x = h y := by
+  intro x y
   obtain ⟨x0, -, hx0⟩ :=
-    Finset.exists_min_image (Finset.univ : Finset S) h ⟨Classical.arbitrary S, Finset.mem_univ _⟩
+    Finset.exists_min_image (Finset.univ : Finset S) h ⟨x, Finset.mem_univ x⟩
   have hmin : ∀ w, h x0 ≤ h w := fun w ↦ hx0 w (Finset.mem_univ w)
   have hstep : ∀ y, Relation.ReflTransGen (fun a b ↦ 0 < Q a b) x0 y → h y = h x0 := by
     intro y hy
@@ -328,7 +336,6 @@ theorem generator_irreducible_forces_constant (Q : Matrix S S ℝ)
           rw [ih]
           exact hmin w
         rw [generator_minimizer_successor Q hQnn hQrow h hQh b hbmin c hbc, ih]
-  intro x y
   rw [hstep x (hirr x0 x), hstep y (hirr x0 y)]
 
 end Irreducibility

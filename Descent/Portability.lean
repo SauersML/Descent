@@ -1,6 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.SecondMomentAuditConfidence
+import Descent.Portability.SecondMomentFrameRepair
 import Descent.Portability.GuardedRepairDeployment
 import Descent.Portability.ContinuousTrajectoryRegion
 import Descent.Portability.RadialReportLaws

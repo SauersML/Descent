@@ -27,6 +27,13 @@ absolutely continuous with the inequalities holding almost everywhere, and the
 statement is about paths rather than about the coadapted continuous-time
 couplings that generate them. The discrete-time counterpart in
 `TurnoverTrajectoryRegion` is the one proved at process level.
+
+## Empirical status
+
+None. The bodies here are algebra and calculus: a flip rate, a mixing weight and
+a time are inputs, and every definition is an exponential or a linear combination
+of exponentials. No definition names a measurable quantity or carries a fitted
+constant.
 -/
 
 set_option autoImplicit false

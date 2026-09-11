@@ -71,6 +71,7 @@ def momentVector (β : ℝ) (k : ι → ℝ) (m t : ℝ) : Option ι ⊕ Bool �
 /-- The unit spike at one coordinate of the moment space. -/
 def spike (j : Option ι ⊕ Bool) : (Option ι ⊕ Bool) → ℝ := Pi.single j 1
 
+omit [Fintype ι] in
 /-- The spike is the coordinate basis vector of `RadialPotentialLaw.basis`, at the moment
 space's index type. -/
 theorem spike_eq_basis : (spike : (Option ι ⊕ Bool) → (Option ι ⊕ Bool) → ℝ)

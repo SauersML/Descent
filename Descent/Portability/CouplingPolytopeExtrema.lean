@@ -24,6 +24,12 @@ of total mass one. They therefore form a closed subset of a product of compact
 intervals, compact by Tychonoff, and the report is continuous and linear on it,
 so the extreme value theorem applies and mixing fills the interval between the
 two extremes.
+
+## Empirical status
+
+None. The bodies here are algebra and topology: a history-mass vector and a path
+report are inputs, and every definition is a truncation or a finite sum. No
+definition names a measurable quantity or carries a fitted constant.
 -/
 
 set_option autoImplicit false
@@ -35,22 +41,27 @@ open Foundations TurnoverCouplingPolytope
 
 noncomputable section
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι] {Z : Type*} [Fintype Z] [DecidableEq Z]
+variable {ι : Type*} {Z : Type*}
+
+section Horizon
+
+/-- Truncation of a history-mass vector to the histories the horizon constrains. -/
+def truncate (T : ℕ) (γ : List (ι → Z) → ℝ) : List (ι → Z) → ℝ :=
+  fun v ↦ if 1 ≤ v.length ∧ v.length ≤ T + 1 then γ v else 0
+
+/-- Value of a truncated mass vector. -/
+@[simp] theorem truncate_apply (T : ℕ) (γ : List (ι → Z) → ℝ) (v : List (ι → Z)) :
+    truncate T γ v = if 1 ≤ v.length ∧ v.length ≤ T + 1 then γ v else 0 := rfl
+
+end Horizon
+
+variable [Fintype ι] [DecidableEq ι] [Fintype Z] [DecidableEq Z]
 
 section Truncation
 
 /-- The horizon-`T` expectation of a path report under a history-mass vector. -/
 def pathReport (T : ℕ) (F : (Fin (T + 1) → ι → Z) → ℝ) (γ : List (ι → Z) → ℝ) : ℝ :=
   ∑ u : Fin (T + 1) → ι → Z, γ (List.ofFn u) * F u
-
-/-- Truncation of a history-mass vector to the histories the horizon constrains. -/
-def truncate (T : ℕ) (γ : List (ι → Z) → ℝ) : List (ι → Z) → ℝ :=
-  fun v ↦ if 1 ≤ v.length ∧ v.length ≤ T + 1 then γ v else 0
-
-omit [Fintype ι] [DecidableEq ι] [Fintype Z] [DecidableEq Z] in
-/-- Value of a truncated mass vector. -/
-@[simp] theorem truncate_apply (T : ℕ) (γ : List (ι → Z) → ℝ) (v : List (ι → Z)) :
-    truncate T γ v = if 1 ≤ v.length ∧ v.length ≤ T + 1 then γ v else 0 := rfl
 
 omit [DecidableEq Z] in
 /-- Each initial mass is at most one. -/

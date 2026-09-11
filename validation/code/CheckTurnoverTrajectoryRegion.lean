@@ -7,6 +7,7 @@ import Descent.Portability.TurnoverTrajectoryRegion
 
 #print axioms Descent.Portability.TurnoverTrajectoryRegion.sum_pi_two
 #print axioms Descent.Portability.TurnoverTrajectoryRegion.agree_cases
+#print axioms Descent.Portability.TurnoverTrajectoryRegion.flipKernel_time_invariant
 #print axioms Descent.Portability.TurnoverTrajectoryRegion.sum_succ_paths
 #print axioms Descent.Portability.TurnoverTrajectoryRegion.sum_fin_one
 #print axioms Descent.Portability.TurnoverTrajectoryRegion.pathMass_zero
