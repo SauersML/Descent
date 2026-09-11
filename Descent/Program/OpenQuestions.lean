@@ -1,64 +1,6 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Portability.GeometricAuditCaps
-import Descent.Portability.AuditRangeCaps
-import Descent.Portability.FiniteDualityNoGap
-import Descent.Portability.AuditAllocationCoordinate
-import Descent.Portability.ContinuousTurnoverSemigroup
-import Descent.Portability.TurnoverTrajectoryRegion
-import Descent.Portability.GramRepairOptimality
-import Descent.Portability.AuditCovarianceSpectrum
-import Descent.Portability.ExtraInformationRank
-import Descent.Portability.GramAuditGeometry
-import Descent.Portability.SpectralAuditConfidence
-import Descent.Portability.TurnoverCouplingPolytope
-import Descent.Portability.TurnoverExtremalCouplings
-import Descent.Portability.FiniteNetConfidence
-import Descent.Portability.FiniteSphereNet
-import Descent.Portability.MarginalPathCoupling
-import Descent.Portability.MarginalTurnoverRegion
-import Descent.Portability.TransportCoordinates
-import Descent.Portability.TurnoverQuadraticVariation
-import Descent.Portability.DenominatorAwareRecovery
-import Descent.Portability.FixedBackgroundCurveRegion
-import Descent.Portability.MechanismReportDerivative
-import Descent.Portability.MetricInfluenceFunctions
-import Descent.Portability.NonanticipationCost
-import Descent.Portability.FourthMomentMinimizer
-import Descent.Portability.JointReportFeasibility
-import Descent.Portability.NonaffineRepair
-import Descent.Portability.SparseExtremalLaws
-import Descent.Portability.UniversalReportMonotonicity
-import Descent.Portability.AngularExtremalReports
-import Descent.Portability.FourthMomentAttainableRange
-import Descent.Portability.GaussianCeilingBound
-import Descent.Portability.SynchronyEnvelope
-import Descent.Portability.ThresholdLawRegion
-import Descent.Portability.UniversalConditionalSufficiency
-import Descent.Portability.AuditCenteredObservations
-import Descent.Portability.BernsteinConfidence
-import Descent.Portability.BernsteinExponentialBound
-import Descent.Portability.BernsteinMomentBound
-import Descent.Portability.CounterfactualRegion
-import Descent.Portability.LossExplainabilityRegion
-import Descent.Portability.LossPredictorSynergy
-import Descent.Portability.MetricResponseEllipsoid
-import Descent.Portability.SourceFixedRealization
-import Descent.Portability.SymmetricScoreFourthMoment
-import Descent.Portability.TurnoverArchitectureMetrics
-import Descent.Portability.AngularSpectralBounds
-import Descent.Portability.BellmanReportBounds
-import Descent.Portability.FiniteGeneticTransition
-import Descent.Portability.MomentOrderObstruction
-import Descent.Portability.RadialInterpolation
-import Descent.Portability.ConditionalFourthMomentLaw
-import Descent.Portability.GlobalFourthMomentRegion
-import Descent.Portability.InvariantReportSpace
-import Descent.Portability.SimultaneousRealization
-import Descent.Portability.ConvexOrderCoupling
-import Descent.Portability.ChannelComparison
-import Descent.Portability.FourthMomentDuality
 import Descent.Portability.PortabilityDrift.PresentDayMetrics
 import Descent.Portability.IndividualLossMoments
 import Descent.Portability.MechanismIdentification
@@ -70,6 +12,69 @@ import Descent.Portability.TraitPortabilityRange
 import Descent.Portability.PortabilityCurveClassification
 import Descent.Portability.EvolutionaryMetricClosure
 import Descent.Portability.MetricOrderingClassification
+import Descent.Portability.LossNoiseCompletion
+import Descent.Portability.ConditionalFourthMomentLaw
+import Descent.Portability.ExplainabilityRay
+import Descent.Portability.GaussianCeilingBound
+import Descent.Portability.LossPredictorSynergy
+import Descent.Portability.FourthMomentDuality
+import Descent.Portability.GlobalFourthMomentRegion
+import Descent.Portability.FourthMomentMinimizer
+import Descent.Portability.FourthMomentAttainableRange
+import Descent.Portability.ScoreMomentZonoid
+import Descent.Portability.SymmetricScoreFourthMoment
+import Descent.Portability.LossExplainabilityRegion
+import Descent.Portability.TransportCoordinates
+import Descent.Portability.AlignmentFactorization
+import Descent.Portability.FixedBackgroundCurveRegion
+import Descent.Portability.SimultaneousRealization
+import Descent.Portability.SourceFixedRealization
+import Descent.Portability.TurnoverDependence
+import Descent.Portability.SynchronyEnvelope
+import Descent.Portability.MarginalTurnoverRegion
+import Descent.Portability.MarginalSupportBound
+import Descent.Portability.UniversalReportMonotonicity
+import Descent.Portability.TurnoverCouplingPolytope
+import Descent.Portability.TurnoverTrajectoryRegion
+import Descent.Portability.ConvexOrderCoupling
+import Descent.Portability.ContinuousTurnoverSemigroup
+import Descent.Portability.TurnoverArchitectureMetrics
+import Descent.Portability.BinomialAggregateEnvelope
+import Descent.Portability.TurnoverQuadraticVariation
+import Descent.Portability.TurnoverExtremalCouplings
+import Descent.Portability.NonanticipationCost
+import Descent.Portability.ChannelComparison
+import Descent.Portability.ThresholdLawRegion
+import Descent.Portability.NonaffineRepair
+import Descent.Portability.MetricResponseEllipsoid
+import Descent.Portability.MetricInfluenceFunctions
+import Descent.Portability.CohortEvaluationOperators
+import Descent.Portability.AngularReportClosure
+import Descent.Portability.AngularSpectralBounds
+import Descent.Portability.AngularExtremalReports
+import Descent.Portability.AngularExtremePoints
+import Descent.Portability.JointReportFeasibility
+import Descent.Portability.FourthOrderLossObstruction
+import Descent.Portability.ApproximationDuality
+import Descent.Portability.RadialInterpolation
+import Descent.Portability.IndependentRadialLaws
+import Descent.Portability.MomentOrderObstruction
+import Descent.Portability.DenominatorAwareRecovery
+import Descent.Portability.ConditionalOscillationDuality
+import Descent.Portability.FiniteGeneticTransition
+import Descent.Portability.MechanismReportDerivative
+import Descent.Portability.InvariantReportSpace
+import Descent.Portability.SparseExtremalLaws
+import Descent.Portability.NonlinearMetricGridBound
+import Descent.Portability.ReportRegionCertificates
+import Descent.Portability.MarginalPathCoupling
+import Descent.Portability.ExtraInformationRank
+import Descent.Portability.FiniteDualityNoGap
+import Descent.Portability.BellmanReportBounds
+import Descent.Portability.UniversalConditionalSufficiency
+import Descent.Portability.SummaryInvisibleDiameter
+import Descent.Portability.CounterfactualRegion
+import Descent.Portability.SquaredCorrelationZeroTest
 
 namespace Descent.Program
 
@@ -97,40 +102,221 @@ We also formalize sub-questions:
 
 ## What this file proves
 
-The mathematical answers are distributed across the imported modules:
+The mathematical answers are distributed across the imported modules. The labels TQ, UPT, DC
+and PL refer to the four proof manuscripts of 10 September 2026 ("Three Questions Mathematical
+Manuscript", "Unconditional Portability Theorems", "Dynamic Coupling and Reporting Proofs",
+"Portability Is a Law, Not a Distance"); the numbering is the manuscripts' own. Every theorem
+named below was checked on the pinned toolchain with axioms limited to `propext`,
+`Classical.choice` and `Quot.sound`; every attainment claim is an explicit finite law whose
+target quantity is computed exactly. Where a manuscript statement is proved in a narrower
+form, the scope line says so and the module docstring repeats it.
 
-* `IndividualLossMoments`: derives the individual squared-loss denominator from
-  conditional second and fourth moments, splits the predictable component into
-  conditional variance, squared bias, and their covariance, and derives the gap
-  between a fitted predictor and the oracle. It proves the sharp interval CV
-  bound and disproves recovery of squared-bias variance from signed variance alone.
-  `LossInformationClassification` gives the three-way information decomposition
-  and almost-sure sufficiency converse. `LossMomentRange` proves the sharp identified
-  set (0,1] at fixed conditional second moments. `GaussianLossNoise` derives the
-  Gaussian squared-loss variance from the actual Gaussian measure.
-* `MechanismIdentification`: constructs tagging-loss and effect-change worlds
-  with identical complete scored-genotype/outcome observations and orthogonal
-  residuals. Consequently those observations cannot identify the causal effect.
-  A separate witness changes score construction while holding biology fixed.
-  `TraitPortabilityRange` gives the full attainable alignment range at fixed genotype
-  law and genetic variance. `PortabilityCurveClassification` classifies local
-  derivatives, including covariance zeros. `EvolutionaryMetricClosure` composes
-  finite evolutionary and stochastic reporting kernels, and gives a necessary and
-  sufficient invariant-feature condition for autonomous prediction of their summaries.
-* `ThresholdPolicyTransport`: computes confusion matrices from individual scores
-  and outcomes, selects a source F1-optimal threshold, deploys it unchanged, and
-  proves that clinical preferences reverse with false-positive cost.
-  `MetricOrderingClassification` supplies exact affine-MSE ordering conditions,
-  the full nondegenerate constant-precision feasibility range and its realizability,
-  and the equivalence of all-positive-cost dominance and coordinatewise error dominance.
-* `PortabilityMasterTheorem`: exact transport, metric non-equivalence, and affine
-  recalibration laws. `Foundations.TransportIdentities` also gives the arbitrary
-  probability-space conditional variance results.
+### Question 1: individual squared-loss predictability
 
-These are exact identities and identification limits. They do not establish the
-paper's empirical residual moments, identify immune-specific evolutionary causes,
-or choose an application's costs. The elementary inequalities below retain their
-explicit hypotheses and do not supply those missing measurements.
+* `IndividualLossMoments`, `LossInformationClassification`, `LossMomentRange`,
+  `GaussianLossNoise`: the squared-loss denominator from conditional second and fourth
+  moments, the three-way sigma-algebra decomposition with its almost-sure sufficiency converse
+  (TQ 2.1-2.4, UPT 2.1, PL 2.1), the (0,1] family at fixed conditional second moments, and
+  the Gaussian squared-loss variance from the actual Gaussian measure.
+* `LossNoiseCompletion`: TQ Theorem 2.5, the smallest conditional variance of squared error
+  under independent environmental noise of fixed mean and variance, its two-point attaining
+  law and the law attaining every larger value; Corollary 2.6, the exact fixed-architecture
+  attainable interval of the distance-explainable fraction, every value attained.
+* `ConditionalFourthMomentLaw`: UPT Lemma 2.2 (raw-moment completion, both directions) and
+  UPT Theorem 2.3 / PL Theorem 2.2, the exact set of conditional squared-loss variances at
+  fixed conditional first and second moments, with necessity and attainment.
+* `ExplainabilityRay`: UPT Theorem 2.4 / PL Corollary 2.3, the simultaneous explainability
+  vector over every summary lies on an explicitly realized ray (an iff), with the
+  nested-summary gain (2.9). `GaussianCeilingBound`: the rest of TQ Proposition 2.7, the
+  Gaussian interval ceiling, its attainment, and a non-Gaussian law with explainability one.
+  `LossPredictorSynergy`: TQ Proposition 2.8, comparable-predictor and synergy constructions.
+* `FourthMomentDuality`, `GlobalFourthMomentRegion`, `FourthMomentMinimizer`,
+  `FourthMomentAttainableRange`, `ScoreMomentZonoid`, `SymmetricScoreFourthMoment`,
+  `LossExplainabilityRegion`: UPT Theorem 3.1 (feasibility of prescribed mean, cross-moments
+  and second moment both ways; the minimal residual fourth moment; weak duality for every law
+  and multiplier; no duality gap at every certified point, which covers the whole equality
+  face and the water-filling solved case; the conditional two-point minimizer; attainment of
+  the minimum for finitely supported laws; every fourth moment in the half-line attained
+  strictly inside the region; the singleton on the equality face), Theorem 3.2 with both
+  forms of its criterion proved equivalent by separating the compact convex score zonoid,
+  Corollaries 3.3 and 3.4 as exact closed forms with attaining laws and matching dual values,
+  and Theorem 3.5, the sharp loss-explainability region on the variance of an actual
+  multi-cell law with the manuscript's example.
+  Scope: strong duality is proved at every certified multiplier and, for finitely supported
+  feature laws, strictly inside the region; attainment for laws that are not finitely
+  supported is not formalized; three boundary statements hold in mean square in general and
+  pointwise for finite support.
+
+### Question 2: architecture statics
+
+* `TransportCoordinates`: TQ Proposition 3.1 / Theorem 3.2 and UPT Theorem 4.3, the
+  cross-moment vector in the range of the score second-moment matrix with no invertibility
+  assumed, the excess-risk law of any deployed weight, the oracle value's independence of the
+  chosen normal-equation solution, the expected target risk of a learned weight law and the
+  centered-score squared correlation.
+* `AlignmentFactorization`: UPT Theorem 4.1 / PL Theorem 3.1, squared correlation as the
+  genotype-explained fraction times squared alignment, the chain 0 ≤ q ≤ H ≤ 1 and its
+  equality case, with the residual orthogonality derived from the conditional kernel.
+* `FixedBackgroundCurveRegion`: UPT Theorem 4.2 / PL Corollary 3.2, an arbitrary cellwise
+  array of outcome variance, heritability and accuracy realized on an unchanged genotype
+  background, and the exact product region; the general form of `TraitPortabilityRange`.
+* `SimultaneousRealization`: TQ Theorem 8.1 in full (model (8.1), the cell loss mean, the
+  sharp loss-fraction interval as an iff, the spike law) and TQ (3.6), with the four-cell
+  example evaluated exactly. `SourceFixedRealization`: UPT Theorem 7.1, prescribed
+  trait-specific accuracy curves coexisting with any prescribed positive distance-explainable
+  loss fraction on an unchanged genotype and source-training law, through an explicit
+  four-point residual law.
+
+### Question 2: turnover, synchrony and coupling regions
+
+* `TurnoverDependence`: TQ Theorem 3.5 (expected accuracy under turnover as the exact
+  quadratic form (3.8), every sign configuration a complete `DeploymentPopulation`),
+  Theorem 3.7 (independent and synchronized turnover share every one-locus law, including
+  the two-state generator's exponential retention, yet give expected accuracies 1/2 and 1)
+  and Corollary 3.8 (the general-weight law, the three-way monotonicity criterion with its
+  time derivative, the random-weight law and the anti-aligned example).
+* `SynchronyEnvelope`: TQ Theorem 3.6, the sharp envelope (3.9) for an arbitrary joint sign
+  law with prescribed one-locus means and an explicit family attaining every value.
+  `MarginalTurnoverRegion`, `MarginalSupportBound`: TQ Theorem 3.9, the attainable range at
+  fixed marginal means is a closed interval with both ends attained, each by a law charging
+  at most n+1 configurations.
+* `UniversalReportMonotonicity`: UPT Theorem 5.1 (universal one-step and generator
+  monotonicity, necessary and sufficient) and Corollary 5.2 (the recurrent-evolution
+  obstruction, without a stationary law). `TurnoverCouplingPolytope`: UPT Theorem 5.3, the
+  coadapted path laws are exactly the stated polytope, nonempty and convex, every intermediate
+  report value attained. `TurnoverTrajectoryRegion`: UPT Theorem 5.4, the two-locus
+  trajectory law necessary for every coadapted process and sufficient by an explicit flip
+  coupling, with the terminal range in both directions.
+  Scope: existence of extremal path laws in the finite-horizon polytope and the
+  continuous-time trajectory law (5.10) are stated in discrete form; all loci share one state
+  alphabet; the continuous-time half of UPT 5.1 takes the transition semigroup through its
+  defining properties, witnessed by the two-state flip semigroup.
+
+### Question 2: the dynamic theorem
+
+* `ConvexOrderCoupling`: DC Lemmas 3.3-3.4 / PL (5.11)-(5.12) and DC Theorem 3.1 / PL
+  Theorem 5.3 in the discrete skeleton with kernels indexed by the entire past: the
+  nearest-drift coupling minimizes every convex aggregate functional among all
+  rate-preserving, history-dependent couplings.
+* `ContinuousTurnoverSemigroup`: the same theorem in continuous time for Markov generators,
+  through the nearest-drift generator as a matrix on the count grid, DC Lemma 3.4's
+  minimality, and an Euler-limit bridge to the matrix exponential; the history-dependent case
+  stays in the discrete skeleton, which is complementary.
+* `TurnoverArchitectureMetrics`: PL Theorem 5.1 / DC Theorem 4.1, the three exact report laws
+  of one realized sign architecture on the corpus's own `DeploymentPopulation` metrics, DC
+  (4.2)-(4.3), Proposition 4.6 and Theorem 4.5. `BinomialAggregateEnvelope`: DC Corollary
+  3.5, Theorem 4.2, (4.5) / PL Corollary 5.4, the binomial lower envelope, the synchronous
+  upper envelope, every intermediate value by mixing, and the invariant mean squared error.
+* `TurnoverQuadraticVariation`, `TurnoverExtremalCouplings`, `NonanticipationCost`: DC
+  Theorem 4.4 / PL Theorem 5.2 with both bounds of PL (5.6) attained by exhibited couplings,
+  the symmetric count generator in closed form, and DC Theorem 5.1 with Corollary 5.2, the
+  exact positive cost of nonanticipation.
+  Scope: the ODE solutions of DC Corollary 4.3 and the Duhamel form of DC (4.8) are stated
+  through their generators; DC Lemma 3.2's configuration-level coupling is replaced by
+  attainment at the aggregate-law level.
+
+### Question 3: metric dependence
+
+* `ChannelComparison`: TQ Theorem 4.9 / UPT Theorem 6.5, both directions: a row-stochastic
+  garbling exists iff every decision rule after the coarser channel is matched at no larger
+  expected loss after the finer one, for every finite action set, prior and loss, the
+  converse by the closest-garbling minimizer with no hyperplane import.
+* `ThresholdLawRegion`: UPT Theorem 6.2 / PL Theorem 4.2, the joint laws at a fixed finite
+  score law and prevalence are exactly the submeasures of the score law with the right mass;
+  UPT (6.5); TQ Theorem 4.5 / UPT (6.8) / PL (4.4), the sharp fixed-score confusion fiber
+  with every value attained and realized as a thresholded score; UPT Corollary 6.3 in its
+  finite-grid form and in its continuous form on the line (a curve comes from a submeasure
+  exactly when it is the lower-tail integral of a measurable density bounded by one).
+* `NonaffineRepair`: TQ Proposition 4.2, over all functions of the score the least MSE is
+  the mean conditional variance, attained by the conditional mean, with a strict three-point
+  witness against every affine recalibration. `MetricOrderingClassification` and
+  `ThresholdPolicyTransport` (earlier) hold TQ 4.1, 4.6, 4.8 and UPT 6.1, 6.4, (6.10).
+* `MetricResponseEllipsoid`, `MetricInfluenceFunctions`: TQ Theorem 5.2 (the constrained
+  metric-response set as the Gram image with unit quadratic form, the pseudoinverse-free form
+  of the manuscript's ellipsoid, with the projection constructed by finite Gram-Schmidt),
+  Corollaries 5.3 and 5.4, and all of Proposition 5.1 as derivatives at zero along
+  information-preserving paths that remain positive laws.
+  Scope: in the continuous case of Corollary 6.3 the joint law on the product with the
+  outcome is assembled only in the finite case.
+
+### The reporting layer: the paper's cohort procedures
+
+* `CohortEvaluationOperators`: TQ Theorem 4.3 / UPT 8.2 / DC 7.1-7.2 / PL 6.1, the group
+  partial-R² operator as an angular ratio and as the relative reduction in residual sum of
+  squares with both sums proved least-squares minima, the sequential residualization
+  operator, TQ Proposition 4.4 (sequential equals joint iff the projections commute), the
+  centered loss-regression report and UPT Corollary 8.3's fourth-order homogeneity.
+* `AngularReportClosure`: PL Theorem 6.2, the angular identity with no symmetry hypothesis,
+  the angular matrix of trace one and positive semidefinite, expected reports as traces
+  against it; Proposition 6.4, the projective state for even scale-invariant reports.
+* `AngularSpectralBounds`, `AngularExtremalReports`, `AngularExtremePoints`: PL Corollary
+  6.3 (feasibility by explicit spectral realization, the attaining law on rank-many
+  directions, the two-dimension-plus-direction interval, the Ky Fan optimum as an attained
+  maximum, and the Barvinok-Pataki bound r(r+1)/2 ≤ m+1 for extreme angular matrices by an
+  explicit perturbation inside the positive semidefinite cone), Theorems 9.2 and 9.4.
+* `JointReportFeasibility`: PL Theorem 9.3 over a finite state set, the report region as a
+  convex hull with its support bound, the dual certificate, and primal attainment.
+
+### Obstructions and their exact price
+
+* `FourthOrderLossObstruction`: TQ Theorem 8.2, two hierarchical mixtures with identical
+  genotype and source laws, three-sign effect marginals, conditional first and second
+  moments, cellwise MSE and squared-correlation summaries, whose distance-explainable loss
+  fractions are exactly 1/12 and 2/27.
+* `ApproximationDuality`: PL Theorem 8.1, the largest report disagreement compatible with the
+  supplied moments is exactly twice the best uniform approximation error, with the extremal
+  moment-matched pair built by separation and both optimal-recovery halves.
+* `RadialInterpolation`, `IndependentRadialLaws`: PL Lemma 7.1, Theorem 7.2 with (7.4),
+  Corollaries 7.3 (expectation form) and 7.5, and Theorem 7.4's independent finite-support
+  core: for every finite raw-moment order, matched laws whose expected scale-invariant report
+  sits arbitrarily close to opposite ends of its range.
+* `MomentOrderObstruction`: DC Lemmas 8.1-8.2 and Theorems 8.3-8.4, no finite joint-moment
+  order identifies expected partial R² or expected fitted loss-explainability, with the exact
+  instances 27/1768 and −24900075/1099632872 and the every-order halves proved through the
+  radial construction without analyticity.
+* `DenominatorAwareRecovery`: PL Theorem 9.1, Chebyshev recovery with its closed-form error
+  level. `ConditionalOscillationDuality`: PL Theorem 8.2 and Corollary 8.3 as one duality
+  theorem in the noise level.
+  Scope: the absolutely-continuous refinement of PL 7.4, the analyticity-to-finite-difference
+  step of DC Lemma 8.2 (nothing downstream depends on it) and the total-variation form of
+  PL Corollary 7.3 are not formalized.
+
+### The pipeline: finite report laws, regions and identification
+
+* `FiniteGeneticTransition`, `MechanismReportDerivative`: TQ Theorems 6.1-6.3 and UPT
+  Theorem 8.1, the exact finite genetic transition, the end-to-end report law it induces, and
+  the mechanism-to-report derivative with its exponential-tilt form.
+* `InvariantReportSpace`, `SparseExtremalLaws`, `NonlinearMetricGridBound`: TQ Theorem 7.2
+  (the terminating minimal invariant report space), Theorem 7.3 and Proposition 7.4.
+* `ReportRegionCertificates`, `MarginalPathCoupling`, `ExtraInformationRank`,
+  `FiniteDualityNoGap`: DC Theorems 2.1-2.2 and Proposition 2.3 (finite refinement form),
+  PL Theorems 10.1-10.2, the complete joint report region as a polytope with attained
+  extrema, certificates in both directions, exact separation, the per-coordinate dual, the
+  rank formula for the minimum extra linear information, and strong duality for DC (2.5) /
+  PL (10.4) with an attained dual minimum under a box-form Slater condition.
+* `BellmanReportBounds`: DC Theorems 6.1-6.3 and PL Theorem 10.3 in discrete horizon.
+  `UniversalConditionalSufficiency`: UPT Theorem 9.1 (finite case).
+  `SummaryInvisibleDiameter`: UPT Theorem 9.2 with its attaining law pair.
+  `CounterfactualRegion`: UPT Theorem 10.1 and PL Theorem 11.1, complete agreement of reports
+  does not imply agreement of causes. `SquaredCorrelationZeroTest`: the mathematical half of
+  UPT Theorem 10.2.
+  Scope: continuous-time optimality DC (6.5) / PL (10.7) and DC 2.3 in continuous time are
+  not formalized (no predictable-rate jump processes at this pin); UPT 9.1 is proved in the
+  finite case; UPT 10.2's computability half needs computable reals, absent at this pin.
+
+### Earlier modules
+
+* `MechanismIdentification` (TQ 3.10 nonidentification worlds), `TraitPortabilityRange`,
+  `PortabilityCurveClassification` (the local trend law), `EvolutionaryMetricClosure`
+  (TQ 7.1), `ThresholdPolicyTransport` (TQ 4.6), `MetricOrderingClassification`,
+  `PortabilityMasterTheorem` (exact transport, metric non-equivalence and affine
+  recalibration laws) and `Foundations.TransportIdentities` (the probability-space
+  conditional variance results) remain the foundation the modules above build on.
+
+These are exact identities, sharp regions and identification limits. They do not establish
+the paper's empirical residual moments, identify immune-specific evolutionary causes, or
+choose an application's costs. The elementary inequalities below retain their explicit
+hypotheses and do not supply those missing measurements.
 
 -/
 
