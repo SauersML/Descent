@@ -70,8 +70,10 @@ theorem hasDerivAt_cumulativeRate (rate : ℝ → ℝ) (hrate : Continuous rate)
 
 /-- A cumulative total of a continuous rate is continuous. -/
 theorem continuous_cumulativeRate (rate : ℝ → ℝ) (hrate : Continuous rate) :
-    Continuous (cumulativeRate rate) :=
-  (fun t ↦ (hasDerivAt_cumulativeRate rate hrate t).differentiableAt).continuous
+    Continuous (cumulativeRate rate) := by
+  have hdiff : Differentiable ℝ (cumulativeRate rate) :=
+    fun t ↦ (hasDerivAt_cumulativeRate rate hrate t).differentiableAt
+  exact hdiff.continuous
 
 /-- Scaling a whole rate history scales its cumulative total. -/
 theorem cumulativeRate_const_mul (c : ℝ) (rate : ℝ → ℝ) (t : ℝ) :
@@ -148,7 +150,7 @@ theorem hasDerivAt_admixtureLinkage (m r : ℝ → ℝ) (hm : Continuous m) (hr 
   have hRc := continuous_cumulativeRate r hr
   have hcont : Continuous
       (fun s ↦ m s * Real.exp (-cumulativeRate m s + cumulativeRate r s)) :=
-    hm.mul ((hMc.neg.add hRc).exp)
+    hm.mul ((hMc.neg.add hRc).rexp)
   have hG : HasDerivAt
       (fun v ↦ ∫ s in (0 : ℝ)..v, m s * Real.exp (-cumulativeRate m s + cumulativeRate r s))
       (m t * Real.exp (-cumulativeRate m t + cumulativeRate r t)) t :=
@@ -176,7 +178,7 @@ theorem eq_admixtureLinkage_of_hasDerivAt (m r : ℝ → ℝ) (hm : Continuous m
   have hRc := continuous_cumulativeRate r hr
   have hcont : Continuous
       (fun s ↦ m s * Real.exp (-cumulativeRate m s + cumulativeRate r s)) :=
-    hm.mul ((hMc.neg.add hRc).exp)
+    hm.mul ((hMc.neg.add hRc).rexp)
   have hderiv : ∀ u, HasDerivAt
       (fun v ↦ F v * Real.exp (cumulativeRate m v + cumulativeRate r v) -
         ∫ s in (0 : ℝ)..v, m s * Real.exp (-cumulativeRate m s + cumulativeRate r s)) 0 u := by
@@ -199,14 +201,16 @@ theorem eq_admixtureLinkage_of_hasDerivAt (m r : ℝ → ℝ) (hm : Continuous m
   have hconst := is_const_of_deriv_eq_zero (fun u ↦ (hderiv u).differentiableAt)
     (fun u ↦ (hderiv u).deriv) t 0
   simp only [cumulativeRate_zero, add_zero, Real.exp_zero, hF0, zero_mul,
-    intervalIntegral.integral_same, sub_zero, sub_self] at hconst
-  have hne : Real.exp (cumulativeRate m t + cumulativeRate r t) ≠ 0 := Real.exp_ne_zero _
+    intervalIntegral.integral_same, sub_self] at hconst
+  have hI : (∫ s in (0 : ℝ)..t, m s * Real.exp (-cumulativeRate m s + cumulativeRate r s)) =
+      F t * Real.exp (cumulativeRate m t + cumulativeRate r t) := by linarith [hconst]
+  have hprod : Real.exp (-cumulativeRate m t - cumulativeRate r t) *
+      Real.exp (cumulativeRate m t + cumulativeRate r t) = 1 := by
+    rw [← Real.exp_add, show -cumulativeRate m t - cumulativeRate r t +
+      (cumulativeRate m t + cumulativeRate r t) = 0 from by ring, Real.exp_zero]
   unfold admixtureLinkage
-  rw [Real.exp_sub, Real.exp_neg, Real.exp_neg]
-  field_simp
-  rw [Real.exp_add] at hconst
-  field_simp at hconst
-  linarith [hconst]
+  rw [hI]
+  linear_combination (-F t) * hprod
 
 /-- The normalised coupling `C = D / (p (1 - p))` of NOTE1 section 6.1: the linkage in units
 of the common variance of the two loci. -/
@@ -241,7 +245,6 @@ theorem normalisedCoupling_eq_exposure_integral (m r : ℝ → ℝ) (T : ℝ)
   rw [hkey, one_sub_donorFraction]
   simp only [Real.exp_sub, Real.exp_neg]
   field_simp
-  ring
 
 /-- NOTE1 (30): scaling the entire recombination history by `lam` replaces the survival factor
 by `e^{-lam b}` against the same exposure weights. -/
@@ -255,9 +258,9 @@ theorem scaled_normalisedCoupling_eq_exposure_integral (m r : ℝ → ℝ) (lam 
   congr 1
   refine intervalIntegral.integral_congr ?_
   intro s _
-  rw [cumulativeRate_const_mul, cumulativeRate_const_mul,
-    show -(lam * cumulativeRate r T - lam * cumulativeRate r s) =
-      -(lam * (cumulativeRate r T - cumulativeRate r s)) from by ring]
+  simp only [cumulativeRate_const_mul]
+  rw [show -(lam * cumulativeRate r T - lam * cumulativeRate r s) =
+    -(lam * (cumulativeRate r T - cumulativeRate r s)) from by ring]
 
 /-- Assumes: migration has stopped, so (27) reduces to pure recombination decay. Over such a
 block the linkage is multiplied by exactly the survival factor of the recombination exposure

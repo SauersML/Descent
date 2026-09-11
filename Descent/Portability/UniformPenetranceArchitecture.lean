@@ -464,6 +464,344 @@ theorem squaredCorrelation_pooledPenetranceLaw :
     norm_num
   · exact absurd ⟨by norm_num, by norm_num⟩ hcond
 
+/-! ## Exact expectations against the uniform architecture law -/
+
+/-- Two integrands that agree at every parameter of the half-open unit interval have the
+same exact expectation against the uniform architecture law. The excluded left endpoint is
+where the corpus metrics report undefinedness rather than a number. -/
+theorem integral_unit_congr (first second : ℝ → ℝ)
+    (h : ∀ θ, 0 < θ → θ ≤ 1 → first θ = second θ) :
+    ∫ θ in (0:ℝ)..1, first θ = ∫ θ in (0:ℝ)..1, second θ := by
+  refine intervalIntegral.integral_congr_ae (Filter.Eventually.of_forall ?_)
+  intro θ hθ
+  rw [Set.uIoc_of_le (by norm_num : (0:ℝ) ≤ 1)] at hθ
+  exact h θ hθ.1 hθ.2
+
+/-- Every quadratic integrand has this exact expectation against the uniform law. -/
+theorem integral_unit_quadratic (c₀ c₁ c₂ : ℝ) :
+    ∫ θ in (0:ℝ)..1, (c₀ + c₁ * θ + c₂ * θ ^ 2) = c₀ + c₁ / 2 + c₂ / 3 := by
+  have hi0 : IntervalIntegrable (fun _ : ℝ ↦ c₀) MeasureTheory.volume 0 1 :=
+    continuous_const.intervalIntegrable 0 1
+  have hi1 : IntervalIntegrable (fun θ : ℝ ↦ c₁ * θ) MeasureTheory.volume 0 1 :=
+    (by fun_prop : Continuous fun θ : ℝ ↦ c₁ * θ).intervalIntegrable 0 1
+  have hi2 : IntervalIntegrable (fun θ : ℝ ↦ c₂ * θ ^ 2) MeasureTheory.volume 0 1 :=
+    (by fun_prop : Continuous fun θ : ℝ ↦ c₂ * θ ^ 2).intervalIntegrable 0 1
+  rw [intervalIntegral.integral_add (hi0.add hi1) hi2,
+    intervalIntegral.integral_add hi0 hi1, intervalIntegral.integral_const_mul,
+    intervalIntegral.integral_const_mul, intervalIntegral.integral_const, integral_id,
+    integral_pow]
+  norm_num
+  all_goals ring
+
+/-- The exact expectation of every power of the reduced replica variable. -/
+theorem integral_unit_half_pow (n : ℕ) :
+    ∫ θ in (0:ℝ)..1, (θ / 2) ^ n = 1 / (2 ^ n * ((n : ℝ) + 1)) := by
+  have hcast : ((n : ℝ) + 1) ≠ 0 := by positivity
+  have htwo : ((2:ℝ) ^ n) ≠ 0 := by positivity
+  simp only [div_pow]
+  rw [intervalIntegral.integral_div, integral_pow, one_pow,
+    zero_pow (by omega : n + 1 ≠ 0)]
+  field_simp
+  all_goals ring
+
+/-- The squared-correlation integrand is integrable on the unit interval: its denominator
+is bounded below by one there. -/
+theorem intervalIntegrable_unit_ratio :
+    IntervalIntegrable (fun θ : ℝ ↦ θ / (2 - θ)) MeasureTheory.volume 0 1 := by
+  apply ContinuousOn.intervalIntegrable
+  refine ContinuousOn.div (by fun_prop) (by fun_prop) ?_
+  intro θ hθ
+  rw [Set.uIcc_of_le (by norm_num : (0:ℝ) ≤ 1)] at hθ
+  have hpos : (0:ℝ) < 2 - θ := by linarith [hθ.2]
+  exact ne_of_gt hpos
+
+/-- NOTE2 section 9.1: the exact expected population squared correlation in closed form. -/
+theorem integral_unit_ratio : ∫ θ in (0:ℝ)..1, θ / (2 - θ) = 2 * Real.log 2 - 1 := by
+  have hderiv : ∀ θ ∈ Set.uIcc (0:ℝ) 1,
+      HasDerivAt (fun t : ℝ ↦ -(2 * Real.log (2 - t)) - t) (θ / (2 - θ)) θ := by
+    intro θ hθ
+    rw [Set.uIcc_of_le (by norm_num : (0:ℝ) ≤ 1)] at hθ
+    have hpos : (0:ℝ) < 2 - θ := by linarith [hθ.2]
+    have hne : (2:ℝ) - θ ≠ 0 := ne_of_gt hpos
+    have hinner : HasDerivAt (fun t : ℝ ↦ 2 - t) (-1) θ := by
+      simpa using (hasDerivAt_id θ).const_sub (2:ℝ)
+    have hlog : HasDerivAt (fun t : ℝ ↦ Real.log (2 - t)) (-1 / (2 - θ)) θ :=
+      hinner.log hne
+    have hfull : HasDerivAt (fun t : ℝ ↦ -(2 * Real.log (2 - t)) - t)
+        (-(2 * (-1 / (2 - θ))) - 1) θ := ((hlog.const_mul 2).neg).sub (hasDerivAt_id θ)
+    refine hfull.congr_deriv ?_
+    field_simp
+  rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv intervalIntegrable_unit_ratio]
+  norm_num
+  all_goals ring
+
+/-- NOTE2 section 9.1: the exact expected population area under the curve in closed form. -/
+theorem integral_unit_auc :
+    ∫ θ in (0:ℝ)..1, (3 - θ) / (2 * (2 - θ)) = (1 + Real.log 2) / 2 := by
+  have hint : IntervalIntegrable (fun θ : ℝ ↦ (3 - θ) / (2 * (2 - θ)))
+      MeasureTheory.volume 0 1 := by
+    apply ContinuousOn.intervalIntegrable
+    refine ContinuousOn.div (by fun_prop) (by fun_prop) ?_
+    intro θ hθ
+    rw [Set.uIcc_of_le (by norm_num : (0:ℝ) ≤ 1)] at hθ
+    have hpos : (0:ℝ) < 2 * (2 - θ) := by linarith [hθ.2]
+    exact ne_of_gt hpos
+  have hderiv : ∀ θ ∈ Set.uIcc (0:ℝ) 1,
+      HasDerivAt (fun t : ℝ ↦ t / 2 - Real.log (2 - t) / 2) ((3 - θ) / (2 * (2 - θ))) θ := by
+    intro θ hθ
+    rw [Set.uIcc_of_le (by norm_num : (0:ℝ) ≤ 1)] at hθ
+    have hpos : (0:ℝ) < 2 - θ := by linarith [hθ.2]
+    have hne : (2:ℝ) - θ ≠ 0 := ne_of_gt hpos
+    have hinner : HasDerivAt (fun t : ℝ ↦ 2 - t) (-1) θ := by
+      simpa using (hasDerivAt_id θ).const_sub (2:ℝ)
+    have hlog : HasDerivAt (fun t : ℝ ↦ Real.log (2 - t)) (-1 / (2 - θ)) θ :=
+      hinner.log hne
+    have hfull : HasDerivAt (fun t : ℝ ↦ t / 2 - Real.log (2 - t) / 2)
+        (1 / 2 - (-1 / (2 - θ)) / 2) θ :=
+      ((hasDerivAt_id θ).div_const 2).sub (hlog.div_const 2)
+    refine hfull.congr_deriv ?_
+    field_simp
+    ring
+  rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv hint]
+  norm_num
+  all_goals ring
+
+/-- The exact expectation of the negated entropy term. The integrand extends continuously
+by zero at the left endpoint, so the interval integral needs no truncation. -/
+theorem integral_unit_negMulLog : ∫ θ in (0:ℝ)..1, Real.negMulLog θ = 1 / 4 := by
+  have hcont : ContinuousOn (fun t : ℝ ↦ t * Real.negMulLog t / 2 + t * t / 4)
+      (Set.Icc 0 1) := by fun_prop
+  have hint : IntervalIntegrable Real.negMulLog MeasureTheory.volume 0 1 :=
+    Real.continuous_negMulLog.intervalIntegrable 0 1
+  have hderiv : ∀ θ ∈ Set.Ioo (0:ℝ) 1,
+      HasDerivWithinAt (fun t : ℝ ↦ t * Real.negMulLog t / 2 + t * t / 4)
+        (Real.negMulLog θ) (Set.Ioi θ) θ := by
+    intro θ hθ
+    have hne : θ ≠ 0 := ne_of_gt hθ.1
+    have hbase := (((hasDerivAt_id θ).mul (Real.hasDerivAt_negMulLog hne)).div_const 2).add
+      (((hasDerivAt_id θ).mul (hasDerivAt_id θ)).div_const 4)
+    refine (hbase.congr_deriv ?_).hasDerivWithinAt
+    simp only [Real.negMulLog, id_eq]
+    ring
+  rw [intervalIntegral.integral_eq_sub_of_hasDeriv_right_of_le (by norm_num : (0:ℝ) ≤ 1)
+    hcont hderiv hint]
+  norm_num [Real.negMulLog]
+
+/-- The reflected entropy term has the same exact expectation, by the reflection of the
+unit interval onto itself. -/
+theorem integral_unit_negMulLog_one_sub :
+    ∫ θ in (0:ℝ)..1, Real.negMulLog (1 - θ) = 1 / 4 := by
+  rw [intervalIntegral.integral_comp_sub_left Real.negMulLog 1,
+    show (1:ℝ) - 1 = 0 by norm_num, show (1:ℝ) - 0 = 1 by norm_num]
+  exact integral_unit_negMulLog
+
+/-- The exact expected binary entropy of a uniform parameter is half a nat. -/
+theorem integral_unit_binEntropy : ∫ θ in (0:ℝ)..1, Real.binEntropy θ = 1 / 2 := by
+  have hi1 : IntervalIntegrable Real.negMulLog MeasureTheory.volume 0 1 :=
+    Real.continuous_negMulLog.intervalIntegrable 0 1
+  have hi2 : IntervalIntegrable (fun θ : ℝ ↦ Real.negMulLog (1 - θ))
+      MeasureTheory.volume 0 1 :=
+    (by fun_prop : Continuous fun θ : ℝ ↦ Real.negMulLog (1 - θ)).intervalIntegrable 0 1
+  simp only [Real.binEntropy_eq_negMulLog_add_negMulLog_one_sub]
+  rw [intervalIntegral.integral_add hi1 hi2, integral_unit_negMulLog,
+    integral_unit_negMulLog_one_sub]
+  norm_num
+
+/-- NOTE2 section 9.1: the expected population squared correlation is `2 log 2 - 1`. -/
+theorem integral_squaredCorrelation_penetranceLaw :
+    ∫ θ in (0:ℝ)..1, ((penetranceLaw θ).squaredCorrelation cellScore cellOutcome).getD 0 =
+      2 * Real.log 2 - 1 :=
+  (integral_unit_congr _ (fun θ ↦ θ / (2 - θ))
+    (fun θ hpos hhi ↦ by rw [squaredCorrelation_penetranceLaw θ hpos hhi];
+      rfl)).trans integral_unit_ratio
+
+/-- NOTE2 section 9.1: the expected population area under the curve is `(1 + log 2) / 2`. -/
+theorem integral_binaryAUC_penetranceLaw :
+    ∫ θ in (0:ℝ)..1, ((penetranceLaw θ).binaryAUC cellScore outcomeFlag).getD 0 =
+      (1 + Real.log 2) / 2 :=
+  (integral_unit_congr _ (fun θ ↦ (3 - θ) / (2 * (2 - θ)))
+    (fun θ hpos hhi ↦ by rw [binaryAUC_penetranceLaw θ hpos hhi];
+      rfl)).trans integral_unit_auc
+
+/-- NOTE2 section 9.1: the expected calibration slope is one half. -/
+theorem integral_calibrationSlope_penetranceLaw :
+    ∫ θ in (0:ℝ)..1, ((penetranceLaw θ).calibrationSlope cellScore cellOutcome).getD 0 =
+      1 / 2 :=
+  (integral_unit_congr _ (fun θ ↦ 0 + 1 * θ + 0 * θ ^ 2)
+      (fun θ hpos hhi ↦ by
+        rw [calibrationSlope_penetranceLaw θ hpos.le hhi]
+        show θ = 0 + 1 * θ + 0 * θ ^ 2
+        ring)).trans (by rw [integral_unit_quadratic]; norm_num)
+
+/-- NOTE2 section 9.1: the expected Brier score of the raw binary forecast is one quarter. -/
+theorem integral_meanSquaredError_penetranceLaw :
+    ∫ θ in (0:ℝ)..1, (penetranceLaw θ).meanSquaredError cellScore cellOutcome = 1 / 4 :=
+  (integral_unit_congr _ (fun θ ↦ 1 / 2 + (-1 / 2) * θ + 0 * θ ^ 2)
+      (fun θ hpos hhi ↦ by
+        rw [meanSquaredError_penetranceLaw θ hpos.le hhi]
+        ring)).trans (by rw [integral_unit_quadratic]; norm_num)
+
+/-- NOTE2 section 9.1: the expected calibration error is also one quarter. -/
+theorem integral_discreteECE_penetranceLaw :
+    ∫ θ in (0:ℝ)..1, discreteECE (penetranceLaw θ) = 1 / 4 :=
+  (integral_unit_congr _ (fun θ ↦ 1 / 2 + (-1 / 2) * θ + 0 * θ ^ 2)
+      (fun θ hpos hhi ↦ by
+        rw [discreteECE_penetranceLaw θ hpos.le hhi]
+        ring)).trans (by rw [integral_unit_quadratic]; norm_num)
+
+/-- NOTE2 section 9.1: the expected agreement rate is three quarters. -/
+theorem integral_accuracyRate_penetranceLaw :
+    ∫ θ in (0:ℝ)..1, accuracyRate (penetranceLaw θ) = 3 / 4 :=
+  (integral_unit_congr _ (fun θ ↦ 1 / 2 + (1 / 2) * θ + 0 * θ ^ 2)
+      (fun θ hpos hhi ↦ by
+        rw [accuracyRate_penetranceLaw θ hpos.le hhi]
+        ring)).trans (by rw [integral_unit_quadratic]; norm_num)
+
+/-- NOTE2 section 9.1: the expected repaired Brier score is one twelfth. -/
+theorem integral_repairedBrier_penetranceLaw :
+    ∫ θ in (0:ℝ)..1, repairedBrier (penetranceLaw θ) = 1 / 12 :=
+  (integral_unit_congr _ (fun θ ↦ 0 + (1 / 2) * θ + (-1 / 2) * θ ^ 2)
+      (fun θ hpos hhi ↦ by
+        rw [repairedBrier_penetranceLaw θ hpos.le hhi]
+        ring)).trans (by rw [integral_unit_quadratic]; norm_num)
+
+/-- NOTE2 section 9.1: the expected repaired log loss is exactly a quarter of a nat, while
+the raw log loss is infinite for almost every study. -/
+theorem integral_repairedLogLoss_penetranceLaw :
+    ∫ θ in (0:ℝ)..1, repairedLogLoss (penetranceLaw θ) = 1 / 4 :=
+  (integral_unit_congr _ (fun θ ↦ Real.binEntropy θ / 2)
+      (fun θ hpos hhi ↦ repairedLogLoss_penetranceLaw θ hpos.le hhi)).trans
+    (by rw [intervalIntegral.integral_div, integral_unit_binEntropy]; norm_num)
+
+/-! ## The distribution function of the squared correlation -/
+
+/-- NOTE2 section 9.1: the sublevel sets of the population squared correlation are exactly
+the intervals `[0, 2r / (1 + r)]`. -/
+theorem squaredCorrelation_sublevel_eq_Icc (r : ℝ) (hlo : 0 ≤ r) (hhi : r ≤ 1) :
+    {θ : ℝ | θ ∈ Set.Icc (0:ℝ) 1 ∧ θ / (2 - θ) ≤ r} =
+      Set.Icc 0 (2 * r / (1 + r)) := by
+  have hr : (0:ℝ) < 1 + r := by linarith
+  have hbound : 2 * r / (1 + r) ≤ 1 := by
+    rw [div_le_one hr]
+    linarith
+  ext θ
+  simp only [Set.mem_setOf_eq, Set.mem_Icc]
+  constructor
+  · rintro ⟨⟨h0, h1⟩, hle⟩
+    have hpos : (0:ℝ) < 2 - θ := by linarith
+    rw [div_le_iff₀ hpos] at hle
+    refine ⟨h0, ?_⟩
+    rw [le_div_iff₀ hr]
+    nlinarith
+  · rintro ⟨h0, h1⟩
+    have hθ1 : θ ≤ 1 := le_trans h1 hbound
+    have hpos : (0:ℝ) < 2 - θ := by linarith
+    rw [le_div_iff₀ hr] at h1
+    refine ⟨⟨h0, hθ1⟩, ?_⟩
+    rw [div_le_iff₀ hpos]
+    nlinarith
+
+/-- NOTE2 section 9.1: the distribution function of the population squared correlation
+under the uniform architecture law is `2r / (1 + r)`. -/
+theorem volume_squaredCorrelation_sublevel (r : ℝ) (hlo : 0 ≤ r) (hhi : r ≤ 1) :
+    MeasureTheory.volume {θ : ℝ | θ ∈ Set.Icc (0:ℝ) 1 ∧ θ / (2 - θ) ≤ r} =
+      ENNReal.ofReal (2 * r / (1 + r)) := by
+  rw [squaredCorrelation_sublevel_eq_Icc r hlo hhi, Real.volume_Icc, sub_zero]
+
+/-! ## The pooled individual law as an average of conditional cells -/
+
+/-- NOTE2 section 9.1: every cell of the pooled individual law is the exact integral of the
+corresponding conditional cell against the uniform architecture law. -/
+theorem pooledPenetranceLaw_mass_eq_integral (cell : Bool × Bool) :
+    pooledPenetranceLaw.mass cell = ∫ θ in (0:ℝ)..1, (penetranceLaw θ).mass cell := by
+  obtain ⟨score, outcome⟩ := cell
+  have hnull : (∫ θ in (0:ℝ)..1, (penetranceLaw θ).mass (false, false)) = 1 / 2 := by
+    have h : ∀ θ : ℝ, (penetranceLaw θ).mass (false, false) = 1 / 2 := fun _ ↦ rfl
+    simp only [h]
+    rw [intervalIntegral.integral_const]
+    norm_num
+  have hzero : (∫ θ in (0:ℝ)..1, (penetranceLaw θ).mass (false, true)) = 0 := by
+    have h : ∀ θ : ℝ, (penetranceLaw θ).mass (false, true) = 0 := fun _ ↦ rfl
+    simp only [h]
+    exact intervalIntegral.integral_zero
+  have herror : (∫ θ in (0:ℝ)..1, (penetranceLaw θ).mass (true, false)) = 1 / 4 :=
+    (integral_unit_congr _ (fun θ ↦ 1 / 2 + (-1 / 2) * θ + 0 * θ ^ 2)
+        (fun θ hpos hhi ↦ by
+          simp only [penetranceLaw_mass, penetrance_eq_self θ hpos.le hhi, penetranceMass]
+          ring)).trans (by rw [integral_unit_quadratic]; norm_num)
+  have hcase : (∫ θ in (0:ℝ)..1, (penetranceLaw θ).mass (true, true)) = 1 / 4 :=
+    (integral_unit_congr _ (fun θ ↦ 0 + (1 / 2) * θ + 0 * θ ^ 2)
+        (fun θ hpos hhi ↦ by
+          simp only [penetranceLaw_mass, penetrance_eq_self θ hpos.le hhi, penetranceMass]
+          ring)).trans (by rw [integral_unit_quadratic]; norm_num)
+  cases score <;> cases outcome <;>
+    simp only [pooledPenetranceLaw_mass, pooledMass, hnull, hzero, herror, hcase]
+
+/-! ## The replica-domain reduction of the squared correlation -/
+
+/-- The reduced numerator of NOTE2 section 9.1: on this family the squared correlation is
+the ratio `N / D` with `N θ = θ / 2`. -/
+def replicaNumerator (θ : ℝ) : ℝ := θ / 2
+
+/-- The reduced definedness mass of NOTE2 section 9.1: `D θ = 1 - θ / 2`. -/
+def replicaDenominator (θ : ℝ) : ℝ := 1 - θ / 2
+
+/-- The reduced pair reproduces the population squared correlation exactly, so the positive
+ratio expansion of NOTE2 (15) applies to it. -/
+theorem replicaRatio_eq_ratio (θ : ℝ) (hlo : 0 ≤ θ) (hhi : θ ≤ 1) :
+    replicaNumerator θ / replicaDenominator θ = θ / (2 - θ) := by
+  have hpos : (0:ℝ) < 2 - θ := by linarith
+  have hden : (0:ℝ) < 1 - θ / 2 := by linarith
+  rw [replicaNumerator, replicaDenominator, div_eq_div_iff (ne_of_gt hden) (ne_of_gt hpos)]
+  ring
+
+/-- The complement of the reduced definedness mass is the reduced replica variable. -/
+theorem one_sub_replicaDenominator (θ : ℝ) : 1 - replicaDenominator θ = θ / 2 := by
+  rw [replicaDenominator]
+  ring
+
+/-- NOTE2 section 9.1: the `k`-th coefficient of the positive ratio expansion (15). -/
+theorem integral_replica_coefficient (k : ℕ) :
+    ∫ θ in (0:ℝ)..1, replicaNumerator θ * (1 - replicaDenominator θ) ^ k =
+      1 / (2 ^ (k + 1) * ((k : ℝ) + 2)) := by
+  have hpoint : ∀ θ : ℝ,
+      replicaNumerator θ * (1 - replicaDenominator θ) ^ k = (θ / 2) ^ (k + 1) := by
+    intro θ
+    rw [replicaNumerator, one_sub_replicaDenominator, pow_succ]
+    ring
+  simp only [hpoint]
+  rw [integral_unit_half_pow (k + 1)]
+  push_cast
+  ring
+
+/-- NOTE2 section 9.1: the unresolved definedness mass after `K` replica terms. -/
+theorem integral_replica_tail (K : ℕ) :
+    ∫ θ in (0:ℝ)..1, (1 - replicaDenominator θ) ^ K = 1 / (2 ^ K * ((K : ℝ) + 1)) := by
+  simp only [one_sub_replicaDenominator]
+  exact integral_unit_half_pow K
+
+/-- NOTE2 section 9.1: the resolved definedness mass after `K` replica terms. -/
+theorem integral_replica_resolved (K : ℕ) :
+    ∫ θ in (0:ℝ)..1, (1 - (1 - replicaDenominator θ) ^ K) =
+      1 - 1 / (2 ^ K * ((K : ℝ) + 1)) := by
+  have hi1 : IntervalIntegrable (fun _ : ℝ ↦ (1:ℝ)) MeasureTheory.volume 0 1 :=
+    continuous_const.intervalIntegrable 0 1
+  have hi2 : IntervalIntegrable (fun θ : ℝ ↦ (1 - replicaDenominator θ) ^ K)
+      MeasureTheory.volume 0 1 := by
+    simp only [one_sub_replicaDenominator]
+    exact (by fun_prop : Continuous fun θ : ℝ ↦ (θ / 2) ^ K).intervalIntegrable 0 1
+  rw [intervalIntegral.integral_sub hi1 hi2, integral_replica_tail K,
+    intervalIntegral.integral_const]
+  norm_num
+
+/-- NOTE2 (16): the resolved definedness mass and the unresolved tail sum to one for this
+architecture, so the normalization of the certificate (18) is the identity. -/
+theorem replica_mass_normalization (K : ℕ) :
+    (∫ θ in (0:ℝ)..1, (1 - (1 - replicaDenominator θ) ^ K)) +
+      (∫ θ in (0:ℝ)..1, (1 - replicaDenominator θ) ^ K) = 1 := by
+  rw [integral_replica_resolved K, integral_replica_tail K]
+  ring
+
 end
 
 end Descent.Portability.UniformPenetranceArchitecture
