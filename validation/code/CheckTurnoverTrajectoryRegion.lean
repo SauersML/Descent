@@ -18,3 +18,14 @@ import Descent.Portability.TurnoverTrajectoryRegion
 #print axioms Descent.Portability.TurnoverTrajectoryRegion.agreeProb_trajectory_bounds
 #print axioms Descent.Portability.TurnoverTrajectoryRegion.agreeProb_zero_startLaw
 #print axioms Descent.Portability.TurnoverTrajectoryRegion.startLaw_isLaw
+#print axioms Descent.Portability.TurnoverTrajectoryRegion.flipCoupling_cons
+#print axioms Descent.Portability.TurnoverTrajectoryRegion.flipCoupling_coadapted
+#print axioms Descent.Portability.TurnoverTrajectoryRegion.stepAgree_flipCoupling
+#print axioms Descent.Portability.TurnoverTrajectoryRegion.agreeProb_flipCoupling_succ
+#print axioms Descent.Portability.TurnoverTrajectoryRegion.traj_mem_unit
+#print axioms Descent.Portability.TurnoverTrajectoryRegion.trajU_bounds
+#print axioms Descent.Portability.TurnoverTrajectoryRegion.trajV_bounds
+#print axioms Descent.Portability.TurnoverTrajectoryRegion.traj_recursion
+#print axioms Descent.Portability.TurnoverTrajectoryRegion.trajectory_attained
+#print axioms Descent.Portability.TurnoverTrajectoryRegion.terminal_range_bounds
+#print axioms Descent.Portability.TurnoverTrajectoryRegion.terminal_range_attained

@@ -26,3 +26,8 @@ open Descent.Portability.FixedBackgroundCurveRegion
 #print axioms sharp_curve_region
 #print axioms rademacher_pair_witness
 #print axioms unit_variance_curve_realized
+#print axioms curve_second_moment
+#print axioms curve_score_second_moment
+#print axioms curve_score_cross_moment
+#print axioms curve_expected_mse
+#print axioms curve_mse_eq_prescribed

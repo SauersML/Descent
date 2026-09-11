@@ -2,6 +2,8 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.SourceFixedRealization
+import Descent.Portability.AlignmentFactorization
+import Descent.Portability.TraitPortabilityRange
 
 assert_below Descent.Decision Descent.Program
 
@@ -173,27 +175,34 @@ theorem curve_mean (G : ExpFunctional Γ) (T U : Γ → ℝ) (hT : G T = 0) (hU 
         (curvePhenotype T U v H q d)) := rfl
   rw [hreg, curve_regression_function, pair_mean G T U hT hU]
 
+/-- The cellwise second moment of the prescribed phenotype. -/
+theorem curve_second_moment (G : ExpFunctional Γ) (T U : Γ → ℝ)
+    (hT2 : G (fun g ↦ T g ^ 2) = 1) (hU2 : G (fun g ↦ U g ^ 2) = 1)
+    (hTU : G (fun g ↦ T g * U g) = 0) (v H q : D → ℝ) (d : D) (hv : 0 ≤ v d)
+    (hq0 : 0 ≤ q d) (hqH : q d ≤ H d) (hH1 : H d ≤ 1) :
+    backgroundLaw G (fun z ↦ curvePhenotype T U v H q d z ^ 2) = v d := by
+  have hinner : (fun g : Γ ↦ uniformExp Bool
+      (fun b ↦ curvePhenotype T U v H q d (g, b) ^ 2))
+      = fun g : Γ ↦ (curveA v q d * T g + curveB v H q d * U g) ^ 2
+          + curveC v H d ^ 2 := by
+    funext g
+    show uniformExp Bool (fun b ↦
+        ((curveA v q d * T g + curveB v H q d * U g) + envValue (curveC v H d) b) ^ 2)
+      = (curveA v q d * T g + curveB v H q d * U g) ^ 2 + curveC v H d ^ 2
+    rw [shift_sq, env_mean, env_second]
+    ring
+  rw [background_eval, hinner, eval_add_const, pair_second G T U hT2 hU2 hTU,
+    curveA_sq v q d hv hq0, curveB_sq v H q d hv hqH, curveC_sq v H d hv hH1]
+  ring
+
 /-- **The cellwise outcome variance is exactly the prescribed `v_d`.** -/
 theorem curve_variance (G : ExpFunctional Γ) (T U : Γ → ℝ) (hT : G T = 0) (hU : G U = 0)
     (hT2 : G (fun g ↦ T g ^ 2) = 1) (hU2 : G (fun g ↦ U g ^ 2) = 1)
     (hTU : G (fun g ↦ T g * U g) = 0) (v H q : D → ℝ) (d : D) (hv : 0 ≤ v d)
     (hq0 : 0 ≤ q d) (hqH : q d ≤ H d) (hH1 : H d ≤ 1) :
     variance (backgroundLaw G) (curvePhenotype T U v H q d) = v d := by
-  have hsq : backgroundLaw G (fun z ↦ curvePhenotype T U v H q d z ^ 2)
-      = curveA v q d ^ 2 + curveB v H q d ^ 2 + curveC v H d ^ 2 := by
-    have hinner : (fun g : Γ ↦ uniformExp Bool
-        (fun b ↦ curvePhenotype T U v H q d (g, b) ^ 2))
-        = fun g : Γ ↦ (curveA v q d * T g + curveB v H q d * U g) ^ 2
-            + curveC v H d ^ 2 := by
-      funext g
-      show uniformExp Bool (fun b ↦
-          ((curveA v q d * T g + curveB v H q d * U g) + envValue (curveC v H d) b) ^ 2)
-        = (curveA v q d * T g + curveB v H q d * U g) ^ 2 + curveC v H d ^ 2
-      rw [shift_sq, env_mean, env_second]
-      ring
-    rw [background_eval, hinner, eval_add_const, pair_second G T U hT2 hU2 hTU]
-  rw [variance_eq_expect_sq_sub_sq_mean, curve_mean G T U hT hU, hsq,
-    curveA_sq v q d hv hq0, curveB_sq v H q d hv hqH, curveC_sq v H d hv hH1]
+  rw [variance_eq_expect_sq_sub_sq_mean, curve_mean G T U hT hU,
+    curve_second_moment G T U hT2 hU2 hTU v H q d hv hq0 hqH hH1]
   ring
 
 /-- **The cellwise genotype-explained variance fraction is exactly the prescribed
@@ -328,6 +337,87 @@ theorem unit_variance_curve_realized (h q : D → ℝ) (hq0 : ∀ d, 0 ≤ q d)
   obtain ⟨hT, hU, hT2, hU2, hTU⟩ := rademacher_pair_witness
   exact fixed_background_curve_realized (uniformExp (Bool × Bool)) (fun g ↦ sign g.1)
     (fun g ↦ sign g.2) hT hU hT2 hU2 hTU (fun _ ↦ 1) h q (fun _ ↦ one_pos) hq0 hqh hh1
+
+/-! ### The mean squared error the construction leaves -/
+
+/-- The cellwise second moment of the deployed score is one. -/
+theorem curve_score_second_moment (G : ExpFunctional Γ) (T : Γ → ℝ)
+    (hT2 : G (fun g ↦ T g ^ 2) = 1) :
+    backgroundLaw G (fun z ↦ liftGenotype (Ω := Bool) T z ^ 2) = 1 := by
+  have hinner : (fun g : Γ ↦ uniformExp Bool
+      (fun b ↦ liftGenotype (Ω := Bool) T (g, b) ^ 2)) = fun g : Γ ↦ T g ^ 2 := by
+    funext g
+    exact ExpFunctional.eval_const _ _
+  rw [background_eval, hinner, hT2]
+
+/-- The cellwise cross moment of the deployed score with the phenotype. -/
+theorem curve_score_cross_moment (G : ExpFunctional Γ) (T U : Γ → ℝ)
+    (hT2 : G (fun g ↦ T g ^ 2) = 1) (hTU : G (fun g ↦ T g * U g) = 0) (v H q : D → ℝ)
+    (d : D) :
+    backgroundLaw G
+        (fun z ↦ liftGenotype (Ω := Bool) T z * curvePhenotype T U v H q d z)
+      = curveA v q d := by
+  have hinner : (fun g : Γ ↦ uniformExp Bool (fun b ↦
+      liftGenotype (Ω := Bool) T (g, b) * curvePhenotype T U v H q d (g, b)))
+      = fun g : Γ ↦ T g * (curveA v q d * T g + curveB v H q d * U g) := by
+    funext g
+    show uniformExp Bool (fun b ↦ T g * ((curveA v q d * T g + curveB v H q d * U g)
+        + envValue (curveC v H d) b))
+      = T g * (curveA v q d * T g + curveB v H q d * U g)
+    rw [shift_mul, env_mean]
+    ring
+  rw [background_eval, hinner, pair_cross G T U hT2 hTU]
+
+/-- **The cellwise mean squared error of the deployed score on the fixed background**,
+`1 + v_d − 2√(q_d v_d)`.  This is the relation UPT equation (7.3) inverts. -/
+theorem curve_expected_mse (G : ExpFunctional Γ) (T U : Γ → ℝ) (hT : G T = 0)
+    (hU : G U = 0) (hT2 : G (fun g ↦ T g ^ 2) = 1) (hU2 : G (fun g ↦ U g ^ 2) = 1)
+    (hTU : G (fun g ↦ T g * U g) = 0) (v H q : D → ℝ) (d : D) (hv : 0 ≤ v d)
+    (hq0 : 0 ≤ q d) (hqH : q d ≤ H d) (hH1 : H d ≤ 1) :
+    expMse (backgroundLaw G) (curvePhenotype T U v H q d) (liftGenotype (Ω := Bool) T)
+      = 1 + v d - 2 * (Real.sqrt (v d) * Real.sqrt (q d)) := by
+  have hsplit : (fun z : Γ × Bool ↦
+      (curvePhenotype T U v H q d z - liftGenotype (Ω := Bool) T z) ^ 2)
+      = (fun z ↦ curvePhenotype T U v H q d z ^ 2)
+        + ((-2 : ℝ) • fun z ↦
+            liftGenotype (Ω := Bool) T z * curvePhenotype T U v H q d z)
+        + (fun z ↦ liftGenotype (Ω := Bool) T z ^ 2) := by
+    funext z
+    simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
+    ring
+  unfold expMse
+  rw [hsplit, (backgroundLaw G).add_eval, (backgroundLaw G).add_eval,
+    (backgroundLaw G).smul_eval,
+    curve_second_moment G T U hT2 hU2 hTU v H q d hv hq0 hqH hH1,
+    curve_score_cross_moment G T U hT2 hTU v H q d,
+    curve_score_second_moment G T hT2]
+  unfold curveA
+  ring
+
+/-- **The fixed-background construction attains the mean squared error UPT Theorem 7.1
+prescribes.**  Taking the outcome variance to be `SourceFixedRealization.outcomeVar`,
+the cellwise pair prescribed by equation (4.2) and the pair prescribed by equation
+(7.1) are the same, related by equation (7.3). -/
+theorem curve_mse_eq_prescribed (G : ExpFunctional Γ) (T U : Γ → ℝ) (hT : G T = 0)
+    (hU : G U = 0) (hT2 : G (fun g ↦ T g ^ 2) = 1) (hU2 : G (fun g ↦ U g ^ 2) = 1)
+    (hTU : G (fun g ↦ T g * U g) = 0) (H q m : D → ℝ) (d : D) (hq0 : 0 ≤ q d)
+    (hm : 1 < m d) (hqH : q d ≤ H d) (hH1 : H d ≤ 1) :
+    expMse (backgroundLaw G)
+        (curvePhenotype T U (SourceFixedRealization.outcomeVar q m) H q d)
+        (liftGenotype (Ω := Bool) T) = m d := by
+  have hx := SourceFixedRealization.scaleX_pos q m d hq0 hm
+  have hvpos : (0:ℝ) ≤ SourceFixedRealization.outcomeVar q m d := by
+    unfold SourceFixedRealization.outcomeVar
+    positivity
+  have hsqrt : Real.sqrt (SourceFixedRealization.outcomeVar q m d)
+      = SourceFixedRealization.scaleX q m d := by
+    unfold SourceFixedRealization.outcomeVar
+    exact Real.sqrt_sq hx.le
+  have hmid := SourceFixedRealization.mse_identity q m d hq0 hm.le
+  rw [curve_expected_mse G T U hT hU hT2 hU2 hTU
+      (SourceFixedRealization.outcomeVar q m) H q d hvpos hq0 hqH hH1, hsqrt]
+  unfold SourceFixedRealization.outcomeVar
+  linear_combination -hmid
 
 end
 
