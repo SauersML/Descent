@@ -225,7 +225,7 @@ theorem reference_logLossCertificateWidth_le {Observation : Type*} [Fintype Obse
 /-- At eighty terms the tail bound at the forecast `1/4` equals `3^77 / 4^80`, which is below
 `10^-10`. -/
 theorem logTailBound_eighty_quarter :
-    (1 - 1 / 4 : ℚ) ^ (80 + 1) / (((80 : ℕ) : ℚ) + 1) * (1 / 4)) = 3 ^ 77 / 4 ^ 80 ∧
+    (1 - 1 / 4 : ℚ) ^ (80 + 1) / ((((80 : ℕ) : ℚ) + 1) * (1 / 4)) = 3 ^ 77 / 4 ^ 80 ∧
       (3 : ℚ) ^ 77 / 4 ^ 80 < 1 / 10 ^ 10 := by
   norm_num
 
