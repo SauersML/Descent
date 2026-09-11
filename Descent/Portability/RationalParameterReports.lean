@@ -55,7 +55,15 @@ for every finite algebraic experiment, obtained without quantifier elimination. 
 architecture and environment region of NOTE2 §3.2 is an instance: `architectureTree` enumerates
 the mixture averages of `ArchitectureEnvironmentRegion` (`accumulation_architectureTree`), and
 its attainable region over the unit square is the corpus region `jointRegion` of NOTE2 (10)
-(`attainableRegion_architectureTree_eq_jointRegion`).
+(`attainableRegion_architectureTree_eq_jointRegion`). A non-degenerate instance, with a genuine
+quotient probability and a genuine decision guard, is `selectionTree`: it draws the selected type
+with the fitness-weighted probability `x w / (x w + 1 - x)` of NOTE2 (4), then takes the
+advantage decision on the sign of `w - 1`. The normalizing total is itself a guard, so regularity
+on the cells where it is positive is read off the pattern (`regularAt_selectionTree`); the
+experiment is valid for `0 ≤ x < 1` and `w ≥ 0` (`validAt_selectionTree`); its selected-type
+accumulation is the quotient of NOTE2 (4) whichever way the decision goes
+(`accumulation_selectionTree_selected`); and its joint graph over those cells is the explicit
+finite union (`reportGraph_selectionTree`).
 
 Not formalized: Mathlib's notion of a semialgebraic set, and real quantifier elimination, which
 the note uses to eliminate the parameters from the graph and so describe (8) without them,
@@ -842,6 +850,138 @@ theorem attainableRegion_architectureTree_eq_jointRegion {J : Type} [Fintype J]
     refine ⟨![α, η], ⟨⟨hα, hη⟩, fun j ↦ ?_⟩, rfl⟩
     exact ArchitectureEnvironmentRegion.mixtureDenominator_pos (den j) (hden j) α η
       (Set.mem_Icc.mp hα).1 (Set.mem_Icc.mp hα).2 (Set.mem_Icc.mp hη).1 (Set.mem_Icc.mp hη).2
+
+/-! ### A non-degenerate instance: fitness-weighted selection with a decision guard -/
+
+/-- The guards of the selection experiment in the coordinates `θ 0 = x`, the frequency of the
+selected type, and `θ 1 = w`, its relative fitness. The guard `false` is the normalizing total
+`x w + 1 - x` of NOTE2 (4); the guard `true` is the advantage contrast `w - 1`. -/
+def selectionGuard : Bool → MvPolynomial (Fin 2) ℝ :=
+  fun index ↦ if index then MvPolynomial.X 1 - 1
+    else MvPolynomial.X 0 * MvPolynomial.X 1 + 1 - MvPolynomial.X 0
+
+/-- The fitness-weighted selection probabilities of NOTE2 (4) as presented quotients: the
+selected type with probability `x w / (x w + 1 - x)`, the other with `(1 - x) / (x w + 1 - x)`. -/
+def selectionQuotient : Bool → PolynomialQuotient (Fin 2)
+  | true => ⟨MvPolynomial.X 0 * MvPolynomial.X 1,
+      MvPolynomial.X 0 * MvPolynomial.X 1 + 1 - MvPolynomial.X 0⟩
+  | false => ⟨1 - MvPolynomial.X 0,
+      MvPolynomial.X 0 * MvPolynomial.X 1 + 1 - MvPolynomial.X 0⟩
+
+/-- The selected type is drawn with probability `x w / (x w + 1 - x)`. -/
+theorem eval_selectionQuotient_true (θ : Fin 2 → ℝ) :
+    (selectionQuotient true).eval θ = θ 0 * θ 1 / (θ 0 * θ 1 + 1 - θ 0) := by
+  simp only [selectionQuotient, PolynomialQuotient.eval, map_mul, map_add, map_sub, map_one,
+    MvPolynomial.eval_X]
+
+/-- The other type is drawn with probability `(1 - x) / (x w + 1 - x)`. -/
+theorem eval_selectionQuotient_false (θ : Fin 2 → ℝ) :
+    (selectionQuotient false).eval θ = (1 - θ 0) / (θ 0 * θ 1 + 1 - θ 0) := by
+  simp only [selectionQuotient, PolynomialQuotient.eval, map_mul, map_add, map_sub, map_one,
+    MvPolynomial.eval_X]
+
+/-- A decision taken by a polynomial sign condition, presented per cell: the branch that agrees
+with the decision has probability `1` and the other `0`. -/
+def decisionQuotient (decision branch : Bool) : PolynomialQuotient (Fin 2) :=
+  if branch = decision then PolynomialQuotient.ofPolynomial 1
+  else PolynomialQuotient.ofPolynomial 0
+
+/-- A presented decision evaluates to the indicator of agreement. -/
+theorem eval_decisionQuotient (decision branch : Bool) (θ : Fin 2 → ℝ) :
+    (decisionQuotient decision branch).eval θ = if branch = decision then 1 else 0 := by
+  simp only [decisionQuotient]
+  split_ifs <;> simp only [PolynomialQuotient.eval_ofPolynomial, map_one, map_zero]
+
+/-- NOTE2 (4) with a decision guard: draw the selected type with the fitness-weighted probability,
+then take the advantage decision `w > 1` on the sign of the guard `w - 1`, reporting both. -/
+def selectionTree : ParametricTree (Fin 2) Bool (Bool × Bool) :=
+  .node Bool (fun _ selected ↦ selectionQuotient selected) fun selected ↦
+    .node Bool (fun pattern advantaged ↦ decisionQuotient (decide (pattern true = 1)) advantaged)
+      fun advantaged ↦ .leaf (selected, advantaged)
+
+/-- On every cell where the normalizing total is positive the selection experiment is regular:
+its only non-unit denominator is that total, whose sign the pattern prescribes. -/
+theorem regularAt_selectionTree (pattern : Bool → SignType) (hpattern : pattern false = 1)
+    {θ : Fin 2 → ℝ} (hcell : θ ∈ signCell selectionGuard pattern) :
+    ParametricTree.RegularAt pattern θ selectionTree := by
+  have htotal : 0 < θ 0 * θ 1 + 1 - θ 0 := by
+    have h := (mem_signCell_iff selectionGuard pattern θ).mp hcell false
+    rw [hpattern, sign_eq_one_iff] at h
+    simpa only [selectionGuard, Bool.false_eq_true, if_false, map_sub, map_add, map_mul, map_one,
+      MvPolynomial.eval_X] using h
+  have hden : MvPolynomial.eval θ
+      (MvPolynomial.X 0 * MvPolynomial.X 1 + 1 - MvPolynomial.X 0 : MvPolynomial (Fin 2) ℝ) ≠ 0 := by
+    simp only [map_sub, map_add, map_mul, map_one, MvPolynomial.eval_X]
+    exact htotal.ne'
+  have hselection : ∀ selected,
+      MvPolynomial.eval θ (selectionQuotient selected).denominator ≠ 0 := by
+    intro selected
+    cases selected <;> exact hden
+  have hdecision : ∀ decision branch,
+      MvPolynomial.eval θ (decisionQuotient decision branch).denominator ≠ 0 := by
+    intro decision branch
+    simp only [decisionQuotient]
+    split_ifs <;> exact PolynomialQuotient.denominator_ofPolynomial_ne_zero _ θ
+  exact ⟨hselection, fun _ ↦ ⟨fun branch ↦ hdecision _ branch, fun _ ↦ trivial⟩⟩
+
+/-- The selection experiment is valid at every point with `0 ≤ x < 1` and `w ≥ 0`. -/
+theorem validAt_selectionTree {θ : Fin 2 → ℝ} (h0x : 0 ≤ θ 0) (h1x : θ 0 < 1) (h0w : 0 ≤ θ 1) :
+    ParametricTree.ValidAt selectionGuard θ selectionTree := by
+  have htotal : 0 < θ 0 * θ 1 + 1 - θ 0 := by nlinarith
+  refine ⟨fun selected ↦ ?_, ?_, fun _ ↦ ⟨fun advantaged ↦ ?_, ?_, fun _ ↦ trivial⟩⟩
+  · cases selected
+    · simp only [eval_selectionQuotient_false]
+      exact div_nonneg (by linarith) htotal.le
+    · simp only [eval_selectionQuotient_true]
+      exact div_nonneg (mul_nonneg h0x h0w) htotal.le
+  · simp only [Fintype.sum_bool, eval_selectionQuotient_true, eval_selectionQuotient_false]
+    rw [div_add_div_same, div_eq_one_iff_eq htotal.ne']
+    ring
+  · simp only [eval_decisionQuotient]
+    split_ifs <;> norm_num
+  · simp only [Fintype.sum_bool, eval_decisionQuotient]
+    cases decide (signPattern selectionGuard θ true = 1) <;> simp
+
+/-- The trace enumeration of the selected-type indicator over the selection experiment is the
+fitness-weighted probability `x w / (x w + 1 - x)` of NOTE2 (4), whichever way the decision goes. -/
+theorem accumulation_selectionTree_selected (θ : Fin 2 → ℝ) :
+    ParametricTree.accumulation selectionGuard selectionTree
+        (fun report _ ↦ PolynomialQuotient.ofPolynomial (if report.1 then 1 else 0)) θ =
+      θ 0 * θ 1 / (θ 0 * θ 1 + 1 - θ 0) := by
+  change ∑ trace : (Σ _selected : Bool, Σ _advantaged : Bool, Unit),
+      (selectionQuotient trace.1).eval θ *
+          ((decisionQuotient (decide (signPattern selectionGuard θ true = 1)) trace.2.1).eval θ *
+            1) *
+        (PolynomialQuotient.ofPolynomial (if trace.1 then 1 else 0)).eval θ = _
+  obtain ⟨decision, hdecision⟩ :
+      ∃ decision, decide (signPattern selectionGuard θ true = 1) = decision := ⟨_, rfl⟩
+  rw [hdecision]
+  cases decision <;>
+    simp [Fintype.sum_sigma, Fintype.sum_bool, Finset.univ_unique, Finset.sum_singleton,
+      eval_decisionQuotient, PolynomialQuotient.eval_ofPolynomial, eval_selectionQuotient_true]
+
+/-- **NOTE2 Theorem 2, a non-degenerate instance.** For the selection experiment with its
+decision guard and any finite family of requested quantities with polynomial accumulators, the
+joint input-output graph over the cells where the normalizing total is positive is the explicit
+finite union of polynomial sign-condition sets. -/
+theorem reportGraph_selectionTree {J : Type}
+    (definedness numerator : J → Bool × Bool → (Bool → SignType) → MvPolynomial (Fin 2) ℝ) :
+    reportGraph (⋃ pattern ∈ {pattern : Bool → SignType | pattern false = 1},
+          signCell selectionGuard pattern)
+        (fun j ↦ ParametricTree.accumulation selectionGuard selectionTree
+          (fun report pattern ↦ PolynomialQuotient.ofPolynomial (definedness j report pattern)))
+        (fun j ↦ ParametricTree.accumulation selectionGuard selectionTree
+          (fun report pattern ↦ PolynomialQuotient.ofPolynomial (numerator j report pattern))) =
+      ⋃ pattern ∈ {pattern : Bool → SignType | pattern false = 1},
+        signCell (graphGuard selectionGuard selectionTree
+            (fun j report pattern ↦ PolynomialQuotient.ofPolynomial (definedness j report pattern))
+            (fun j report pattern ↦ PolynomialQuotient.ofPolynomial (numerator j report pattern))
+            pattern)
+          (graphPattern pattern) :=
+  reportGraph_eq_iUnion_signCell selectionGuard selectionTree _ _ _
+    fun pattern hpattern θ hcell ↦ ⟨regularAt_selectionTree pattern hpattern hcell, fun _ _ ↦
+      ⟨PolynomialQuotient.denominator_ofPolynomial_ne_zero _ θ,
+        PolynomialQuotient.denominator_ofPolynomial_ne_zero _ θ⟩⟩
 
 end
 
