@@ -32,20 +32,23 @@ the feature vector, coordinate by coordinate.  That identification is the remain
 mathematical content of NOTE1 equation (11), and it is a finite list of per-stage,
 per-coordinate polynomial identities rather than an analytic statement.
 
-Three of its coordinate families are discharged here, and the discharges are the substance of
-the second half of this file.  `stage_generator_constant` settles the affine coordinate,
-`stage_generator_leftHeterozygosity` the stored `H` coordinates and
-`stage_generator_rightHeterozygosity` the `H^R` coordinates that NOTE1 equation (6) adds, each
-by matching all five stage families against the corresponding corpus row: the drift family
-against `twoLocusWeightedJetDrift_*_eq_lowOrderLDDrift`, the migration family against
-`lowOrderLDMigration`, the recombination family against the vanishing `lowOrderLDRecombination`
-heterozygosity row, and the two mutation families against the complete affine mutation row
-made of `lowOrderLDMutationCoupling`, `lowOrderLDRecurrentMutationDamping` and
-`lowOrderLDMutationForcing`.  The `DD`, `Dz` and `pi2` coordinates are NOT discharged: their
-drift and recombination stage sums are proved (`driftStage_sum_stored`,
-`recombinationStage_sum_stored`), but the migration and mutation velocity computations for
-those three families are not formalized, so for them the hypothesis is what a caller must
-supply.
+Four of its six coordinate families are discharged here, and the discharges are the substance
+of the second half of this file.  `stage_generator_constant` settles the affine coordinate,
+`stage_generator_leftHeterozygosity` the stored `H` coordinates,
+`stage_generator_rightHeterozygosity` the `H^R` coordinates that NOTE1 equation (6) adds, and
+`stage_generator_linkageProduct` the `DD` coordinates that the `EndToEndScoreLaw` contract
+reads.  Each matches all five stage families against the corresponding corpus row: the drift
+family against `twoLocusWeightedJetDrift_*_eq_lowOrderLDDrift`, the migration family against
+`lowOrderLDMigration` (through the corpus's own expectation-level bridges, read at a point
+mass), the recombination family against `lowOrderLDRecombination`, and the two mutation
+families against the complete affine mutation row made of `lowOrderLDMutationCoupling`,
+`lowOrderLDRecurrentMutationDamping` and `lowOrderLDMutationForcing`.
+
+The `Dz` and `pi2` coordinates are NOT discharged.  Their drift and recombination stage sums
+are proved (`driftStage_sum_stored`, `recombinationStage_sum_stored`), but the migration and
+mutation velocity computations for those two families are not formalized, so for them the
+identification is what a caller must supply.  That is the whole of the remaining gap between
+this module and an unconditional `MicroscopicApproximation`.
 
 Scope.  `microscopicError` is a sum of per-coordinate, per-stage slacks and is therefore a
 crude but explicit bound; no attempt is made to make it sharp.  Multinomial resampling, NOTE1
@@ -724,6 +727,168 @@ theorem recombinationStage_sum_rightHeterozygosity {D : ℕ} (rates : ManyDemeLD
           state := fun _ ↦ rfl
   simp [hvelocity, recombinationRightHeterozygosity_velocity]
 
+/-! ## The linkage-product coordinate -/
+
+/-- The low-order state of the point mass at one haplotype configuration is that
+configuration's own moment vector.  This is what turns the corpus's expectation-level
+migration bridges into pointwise identities. -/
+theorem diracLowOrderLDState {D : ℕ} (state : DemeHaplotypeState D)
+    (coordinate : LowOrderLDCoordinate D) :
+    haplotypeLowOrderLDState (Foundations.ExpFunctional.evalAt state) (fun _ ↦ state)
+        (some coordinate) = twoLocusJetMoment state coordinate := by
+  cases coordinate with
+  | H first second => exact (twoLocusHJet_value state first second).symm
+  | DD first second => rfl
+  | Dz first second third => exact (twoLocusDzJet_value state first second third).symm
+  | pi2 first second third fourth =>
+      exact (twoLocusPi2Jet_value state first second third fourth).symm
+
+/-- The point mass at one haplotype configuration, as a corpus haplotype realization. -/
+def diracRealization {D : ℕ} (state : DemeHaplotypeState D) :
+    LowOrderLDHaplotypeRealization
+      (haplotypeLowOrderLDState (Foundations.ExpFunctional.evalAt state) (fun _ ↦ state)) :=
+  haplotypeLowOrderLDState_realization _ _
+
+/-- The corpus's `DD` migration row read at one haplotype configuration. -/
+theorem lowOrderLDMigration_linkageProduct_pointwise {D : ℕ} (rates : ManyDemeLDRates D)
+    (state : DemeHaplotypeState D) (first second : Fin D) :
+    lowOrderLDMigration rates (twoLocusJetMoment state) (.DD first second) =
+      (∑ target : Fin D, rates.migration first target *
+        ((state target).migrationLinkageVelocity (state first) * (state second).linkage)) +
+      (∑ target : Fin D, rates.migration second target *
+        ((state first).linkage *
+          (state target).migrationLinkageVelocity (state second))) := by
+  have hmoment : (fun coordinate ↦ haplotypeLowOrderLDState
+      (Foundations.ExpFunctional.evalAt state) (fun _ ↦ state) (some coordinate)) =
+      twoLocusJetMoment state := by
+    funext coordinate
+    exact diracLowOrderLDState state coordinate
+  have hrow := lowOrderLDMigration_DD_eq_haplotypeVelocity rates (diracRealization state)
+    first second
+  rw [hmoment] at hrow
+  exact hrow
+
+/-- The migration velocity of a cross-deme linkage product is the exact restored-linkage
+velocity at whichever endpoint is the recipient. -/
+theorem migrationLinkageProduct_velocity {D : ℕ} (source recipient first second : Fin D)
+    (state : DemeHaplotypeState D) :
+    ((migrationCoordinateExpansion source recipient).linkageProduct first second).velocity
+        state =
+      (if second = recipient then (state first).linkage *
+          (state source).migrationLinkageVelocity (state recipient) else 0) +
+      (if first = recipient then
+          (state source).migrationLinkageVelocity (state recipient) *
+            (state second).linkage else 0) := by
+  by_cases hfirst : first = recipient <;> by_cases hsecond : second = recipient <;>
+    simp [PulseCoordinateExpansion.linkageProduct, PulseExpansion.ofEq, PulseExpansion.mul,
+      migrationCoordinateExpansion, migrationLinkageExpansion, hfirst, hsecond] <;> ring
+
+/-- The migration stages sum to the corpus's `DD` migration row. -/
+theorem migrationStage_sum_linkageProduct {D : ℕ} (rates : ManyDemeLDRates D)
+    (first second : Fin D) (state : DemeHaplotypeState D) :
+    ∑ pair : Fin D × Fin D, stageRate rates (Stage.migration pair.1 pair.2) *
+        stageVelocity (enlargedStageExpansion (some (.inl (.DD first second))))
+          (Stage.migration pair.1 pair.2) state =
+      lowOrderLDMigration rates (twoLocusJetMoment state) (.DD first second) := by
+  classical
+  have hvelocity : ∀ pair : Fin D × Fin D,
+      stageRate rates (Stage.migration pair.1 pair.2) *
+        stageVelocity (enlargedStageExpansion (some (.inl (.DD first second))))
+          (Stage.migration pair.1 pair.2) state =
+      rates.migration pair.2 pair.1 *
+        ((if second = pair.2 then (state first).linkage *
+            (state pair.1).migrationLinkageVelocity (state pair.2) else 0) +
+          (if first = pair.2 then
+            (state pair.1).migrationLinkageVelocity (state pair.2) *
+              (state second).linkage else 0)) := by
+    intro pair
+    rw [migrationLinkageProduct_velocity]
+  rw [lowOrderLDMigration_linkageProduct_pointwise]
+  simp only [hvelocity, Fintype.sum_prod_type, mul_add, Finset.sum_add_distrib, mul_ite,
+    mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
+  ring
+
+/-- A left-locus mutation pulse damps each linkage factor of a cross-deme product. -/
+theorem leftMutationLinkageProduct_velocity {D : ℕ} (target first second : Fin D)
+    (state : DemeHaplotypeState D) :
+    ((leftMutationCoordinateExpansion target).linkageProduct first second).velocity state =
+      -2 * ((if first = target then (1 : ℝ) else 0) +
+          (if second = target then (1 : ℝ) else 0)) *
+        (twoLocusDDJet first second).value state := by
+  by_cases hfirst : first = target <;> by_cases hsecond : second = target <;>
+    simp [PulseCoordinateExpansion.linkageProduct, PulseExpansion.ofEq, PulseExpansion.mul,
+      leftMutationCoordinateExpansion, leftMutationLinkageExpansion, twoLocusDDJet,
+      TwoLocusDiffusionJet.mul, twoLocusLinkageJet, hfirst, hsecond] <;> ring
+
+/-- A right-locus mutation pulse damps the linkage product at the same rate. -/
+theorem rightMutationLinkageProduct_velocity {D : ℕ} (target first second : Fin D)
+    (state : DemeHaplotypeState D) :
+    ((rightMutationCoordinateExpansion target).linkageProduct first second).velocity state =
+      -2 * ((if first = target then (1 : ℝ) else 0) +
+          (if second = target then (1 : ℝ) else 0)) *
+        (twoLocusDDJet first second).value state := by
+  by_cases hfirst : first = target <;> by_cases hsecond : second = target <;>
+    simp [PulseCoordinateExpansion.linkageProduct, PulseExpansion.ofEq, PulseExpansion.mul,
+      rightMutationCoordinateExpansion, rightMutationLinkageExpansion, twoLocusDDJet,
+      TwoLocusDiffusionJet.mul, twoLocusLinkageJet, hfirst, hsecond] <;> ring
+
+/-- The two mutation stage families sum to the corpus's complete mutation row on the
+linkage-product coordinate: two contrast factors per linkage determinant, so four per
+product, and no forcing. -/
+theorem mutationStage_sum_linkageProduct {D : ℕ} (rates : ManyDemeLDRates D)
+    (first second : Fin D) (state : DemeHaplotypeState D) :
+    (∑ deme : Fin D, stageRate rates (Stage.mutationLeft deme) *
+        stageVelocity (enlargedStageExpansion (some (.inl (.DD first second))))
+          (Stage.mutationLeft deme) state) +
+      (∑ deme : Fin D, stageRate rates (Stage.mutationRight deme) *
+        stageVelocity (enlargedStageExpansion (some (.inl (.DD first second))))
+          (Stage.mutationRight deme) state) =
+      lowOrderLDMutationCoupling rates (twoLocusJetMoment state) (.DD first second) +
+        lowOrderLDRecurrentMutationDamping rates (twoLocusJetMoment state)
+          (.DD first second) +
+        lowOrderLDMutationForcing rates (.DD first second) := by
+  classical
+  have hleft : ∀ deme : Fin D,
+      stageRate rates (Stage.mutationLeft deme) *
+        stageVelocity (enlargedStageExpansion (some (.inl (.DD first second))))
+          (Stage.mutationLeft deme) state =
+      -((twoLocusDDJet first second).value state) *
+          (rates.mutation deme * (if first = deme then (1 : ℝ) else 0)) +
+        -((twoLocusDDJet first second).value state) *
+          (rates.mutation deme * (if second = deme then (1 : ℝ) else 0)) := by
+    intro deme
+    have hvelocity : stageVelocity (enlargedStageExpansion (some (.inl (.DD first second))))
+        (Stage.mutationLeft deme) state =
+        -2 * ((if first = deme then (1 : ℝ) else 0) +
+            (if second = deme then (1 : ℝ) else 0)) *
+          (twoLocusDDJet first second).value state :=
+      leftMutationLinkageProduct_velocity deme first second state
+    show rates.mutation deme / 2 * _ = _
+    rw [hvelocity]
+    ring
+  have hright : ∀ deme : Fin D,
+      stageRate rates (Stage.mutationRight deme) *
+        stageVelocity (enlargedStageExpansion (some (.inl (.DD first second))))
+          (Stage.mutationRight deme) state =
+      -((twoLocusDDJet first second).value state) *
+          (rates.mutation deme * (if first = deme then (1 : ℝ) else 0)) +
+        -((twoLocusDDJet first second).value state) *
+          (rates.mutation deme * (if second = deme then (1 : ℝ) else 0)) := by
+    intro deme
+    have hvelocity : stageVelocity (enlargedStageExpansion (some (.inl (.DD first second))))
+        (Stage.mutationRight deme) state =
+        -2 * ((if first = deme then (1 : ℝ) else 0) +
+            (if second = deme then (1 : ℝ) else 0)) *
+          (twoLocusDDJet first second).value state :=
+      rightMutationLinkageProduct_velocity deme first second state
+    show rates.mutation deme / 2 * _ = _
+    rw [hvelocity]
+    ring
+  simp only [hleft, hright, Finset.sum_add_distrib, ← Finset.mul_sum, sum_rate_indicator]
+  simp only [lowOrderLDMutationCoupling, lowOrderLDRecurrentMutationDamping,
+    lowOrderLDMutationForcing, twoLocusJetMoment, twoLocusCoordinateJet]
+  ring
+
 /-! ## The generator identification on the heterozygosity coordinates -/
 
 /-- The affine constant coordinate is moved by no stage, matching the enlarged generator's
@@ -800,6 +965,36 @@ theorem stage_generator_rightHeterozygosity {D : ℕ} (rates : ManyDemeLDRates D
   simp only [stageDrift_eq, lowOrderLDHomogeneousGenerator, hrecombination]
   rw [driftStage_sum_rightHeterozygosity, migrationStage_sum_rightHeterozygosity,
     recombinationStage_sum_rightHeterozygosity]
+  have hone : enlargedLowOrderLDFeature state (none : AffineEnlargedCoordinate D) = 1 := rfl
+  rw [hone]
+  linarith [hmutation]
+
+/-- **The stage velocities reproduce the enlarged generator on the linkage-product
+coordinate.**  This is the coordinate the `EndToEndScoreLaw` contract reads, so it is the one
+whose microscopic origin matters most: drift supplies the Hill--Robertson quadratic-variation
+row, migration the restored-linkage product rule, recombination the per-lineage decay, and
+mutation the four-contrast damping. -/
+theorem stage_generator_linkageProduct {D : ℕ} (rates : ManyDemeLDRates D)
+    (first second : Fin D) (state : DemeHaplotypeState D) :
+    (enlargedLowOrderLDGenerator rates).mulVec (enlargedLowOrderLDFeature state)
+        (some (.inl (.DD first second))) =
+      ∑ stage : Stage D,
+        stageDrift rates (enlargedStageExpansion (some (.inl (.DD first second)))) stage
+          state := by
+  classical
+  have hredirect : ∀ pair : Fin D × Fin D,
+      rightHeterozygosityMutationCoupling rates
+          (LowOrderLDCoordinate.DD first second) pair.1 pair.2 *
+        (enlargedLowOrderLDFeature state (some (.inr pair)) -
+          enlargedLowOrderLDFeature state (some (.inl (.H pair.1 pair.2)))) = 0 := by
+    intro pair
+    simp [rightHeterozygosityMutationCoupling]
+  have hmutation := mutationStage_sum_linkageProduct rates first second state
+  rw [enlargedGenerator_mulVec_stored, sum_stage]
+  simp only [stageDrift_eq, hredirect, Finset.sum_const_zero, add_zero,
+    enlargedFeature_stored, lowOrderLDHomogeneousGenerator]
+  rw [driftStage_sum_stored, migrationStage_sum_linkageProduct,
+    recombinationStage_sum_stored]
   have hone : enlargedLowOrderLDFeature state (none : AffineEnlargedCoordinate D) = 1 := rfl
   rw [hone]
   linarith [hmutation]

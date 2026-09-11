@@ -322,7 +322,8 @@ theorem dyadic_sum_le_one_of_length_le : ∀ (depth : ℕ) (words : Finset (List
     intro words hlength _
     refine dyadic_sum_le_one_of_subset_nil words fun word hword ↦ ?_
     rw [Finset.mem_singleton]
-    exact List.eq_nil_of_length_eq_zero (Nat.le_zero.mp (hlength word hword))
+    have hzero : word.length = 0 := Nat.le_zero.mp (hlength word hword)
+    simpa using hzero
   | succ depth ih =>
     intro words hlength hfree
     by_cases hnil : ([] : List Bool) ∈ words
@@ -425,6 +426,8 @@ noncomputable def haltingSublaw {Report : Type*} [Fintype Report] [DecidableEq R
     ∑ word ∈ words.filter (fun word ↦ report word = target), (1 / 2 : ℝ) ^ word.length
   mass_nonneg := fun _ ↦ Finset.sum_nonneg fun _ _ ↦ by positivity
   mass_sum_le_one := by
+    show ∑ target, ∑ word ∈ words.filter (fun word ↦ report word = target),
+      (1 / 2 : ℝ) ^ word.length ≤ 1
     rw [Finset.sum_fiberwise_of_maps_to (fun word _ ↦ Finset.mem_univ (report word))]
     exact kraft_sum_le_one words hfree
 

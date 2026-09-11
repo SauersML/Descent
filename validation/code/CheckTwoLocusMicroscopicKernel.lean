@@ -40,3 +40,12 @@ open Descent.Portability.TwoLocusMicroscopicKernel
 #print axioms stage_generator_constant
 #print axioms stage_generator_leftHeterozygosity
 #print axioms stage_generator_rightHeterozygosity
+#print axioms diracLowOrderLDState
+#print axioms diracRealization
+#print axioms lowOrderLDMigration_linkageProduct_pointwise
+#print axioms migrationLinkageProduct_velocity
+#print axioms migrationStage_sum_linkageProduct
+#print axioms leftMutationLinkageProduct_velocity
+#print axioms rightMutationLinkageProduct_velocity
+#print axioms mutationStage_sum_linkageProduct
+#print axioms stage_generator_linkageProduct
