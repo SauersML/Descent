@@ -80,16 +80,14 @@ def deterministicHaplotypeKernel {X : Type*} (move : X → X) :
     simp only [twoLocusHaplotypeIndicator]
     split <;> norm_num
   weight_sum _ := by
-    simp only [sum_haplotype, twoLocusHaplotypeIndicator]
-    norm_num
+    simp [sum_haplotype, twoLocusHaplotypeIndicator]
 
 /-- The deterministic kernel evaluates an observable at the moved state. -/
 theorem apply_deterministicHaplotypeKernel {X : Type*} (move : X → X)
     (observable : X → ℝ) (point : X) :
     (deterministicHaplotypeKernel move).apply observable point = observable (move point) := by
-  simp only [FiniteMixtureKernel.apply, deterministicHaplotypeKernel, sum_haplotype,
+  simp [FiniteMixtureKernel.apply, deterministicHaplotypeKernel, sum_haplotype,
     twoLocusHaplotypeIndicator]
-  norm_num
 
 /-! ## One deterministic pulse stage -/
 
@@ -115,7 +113,7 @@ theorem pulseStageSlack_tendsto (rate valueBound velocityBound remainder : ℝ) 
     Filter.Tendsto (pulseStageSlack rate valueBound velocityBound remainder)
       (nhds 0) (nhds 0) := by
   have hcontinuous : Continuous
-      (pulseStageSlack rate valueBound velocityBound remainder) := by
+      fun tau : ℝ ↦ pulseStageSlack rate valueBound velocityBound remainder tau := by
     simp only [pulseStageSlack, pulseFraction]
     exact Continuous.add (continuous_const.mul continuous_id)
       (continuous_const.mul (Continuous.min continuous_const
@@ -218,9 +216,15 @@ theorem stageRate_nonneg {D : ℕ} (rates : ManyDemeLDRates D) (stage : Stage D)
   cases stage with
   | drift deme => exact le_of_lt (rates.coalescence_pos deme)
   | migration source recipient => exact rates.migration_nonneg recipient source
-  | recombination deme => linarith [rates.recombination_nonneg deme]
-  | mutationLeft deme => linarith [rates.mutation_nonneg deme]
-  | mutationRight deme => linarith [rates.mutation_nonneg deme]
+  | recombination deme =>
+      simp only [stageRate]
+      linarith [rates.recombination_nonneg deme]
+  | mutationLeft deme =>
+      simp only [stageRate]
+      linarith [rates.mutation_nonneg deme]
+  | mutationRight deme =>
+      simp only [stageRate]
+      linarith [rates.mutation_nonneg deme]
 
 /-- The kernel of each stage at parameter `tau`: the calibrated resampling kernel for drift
 and the clamped deterministic pulse for each of the four pulse stages.  All five carry the
