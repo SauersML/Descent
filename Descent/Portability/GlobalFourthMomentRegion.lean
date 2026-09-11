@@ -29,6 +29,11 @@ Theorem 3.2.
 * `constant_magnitude_value` and `constant_magnitude_of_value_eq` are the two halves of
   UPT Theorem 3.2 (3.16), and `support_function_bound` is the support-function inequality
   (3.17) for a point of `√m 𝒵_X`.
+* `waterfill_minFourthMoment` is the general solved case behind every closed form in UPT
+  §3.5: when the conditional mean `b` is forced, the optimal second moment raises `b²` to
+  a common water level `t`, and the multipliers `r = 2t`, `λ₀ + λᵀX = 4(a − t) b` certify
+  it whenever that form is affine in the features. Both Corollary 3.3 and Corollary 3.4
+  are instances.
 
 The orthonormality hypotheses `E X = 0` and `E[XXᵀ] = I` are UPT (3.1); they are the
 coordinate choice the manuscript makes, not an assumption about the answer.
@@ -461,6 +466,57 @@ theorem support_function_bound (E : ExpFunctional Ω) (X : Ω → ι → ℝ) (�
   rw [abs_mul]
   have h1 : |z ω| ≤ 1 := hz ω
   nlinarith [abs_nonneg (lam0 + dot lam (X ω)), abs_nonneg (z ω)]
+
+/-! ## Water filling: the solved case behind the closed forms of UPT §3.5 -/
+
+/-- The water-filling conditional second moment at level `t`: the forced lower bound `b²`
+raised to `t` wherever it falls short. -/
+def waterfillSecond (b : Ω → ℝ) (t : ℝ) : Ω → ℝ :=
+  fun ω ↦ max (b ω ^ 2) t
+
+/-- The dual linear form attached to the water-filling pair, `4(a − t) b`. It vanishes
+wherever the level `t` is binding and is proportional to `b` wherever `b²` is. -/
+def waterfillForm (b : Ω → ℝ) (t : ℝ) : Ω → ℝ :=
+  fun ω ↦ 4 * (waterfillSecond b t ω - t) * b ω
+
+omit [Fintype ι] [DecidableEq ι] in
+/-- **Pointwise complementarity of the water-filling pair.** Where `b²` binds, the quartic
+of (3.7) exceeds its value at `e = b` by `(b² − e²)² + 2(b² − t)(b − e)²`; where the level
+binds, by `(e² − t)²`. Both are nonnegative, so the pair maximizes the pointwise
+Lagrangian at the multipliers `r = 2t` and `z = 4(a − t) b`. -/
+theorem waterfill_pointwise (b : Ω → ℝ) (t : ℝ) (ω : Ω) (e : ℝ) :
+    waterfillForm b t ω * e + 2 * t * e ^ 2 - e ^ 4
+      ≤ waterfillForm b t ω * b ω + 2 * t * waterfillSecond b t ω
+        - waterfillSecond b t ω ^ 2 := by
+  unfold waterfillForm waterfillSecond
+  rcases le_total t (b ω ^ 2) with h | h
+  · rw [max_eq_left h]
+    nlinarith [sq_nonneg (b ω ^ 2 - e ^ 2), sq_nonneg (b ω - e), sub_nonneg.mpr h]
+  · rw [max_eq_right h]
+    nlinarith [sq_nonneg (e ^ 2 - t)]
+
+/-- **The water-filling pair attains `V` and closes the duality gap.** If the conditional
+mean `b` has the prescribed mean and feature cross-moments, the water level `t` makes the
+second moment come out at `m`, and the form `4(a − t) b` is affine in the features, then
+`V(β, k, m) = E[a²]` and the supremum of (3.8) is attained at `(λ₀, λ, 2t)`. -/
+theorem waterfill_minFourthMoment (E : ExpFunctional Ω) (X : Ω → ι → ℝ) (b : Ω → ℝ)
+    (t : ℝ) (β : ℝ) (k : ι → ℝ) (m : ℝ) (lam0 : ℝ) (lam : ι → ℝ)
+    (haff : ∀ ω, lam0 + dot lam (X ω) = waterfillForm b t ω)
+    (hb : E b = β) (hk : ∀ i, E (fun ω ↦ X ω i * b ω) = k i)
+    (ha : E (waterfillSecond b t) = m) :
+    minFourthMoment E X β k m = E (fun ω ↦ waterfillSecond b t ω ^ 2) ∧
+      minFourthMoment E X β k m = dualObjective E X β k m lam0 lam (2 * t) := by
+  have hab : ∀ ω, b ω ^ 2 ≤ waterfillSecond b t ω := fun ω ↦ le_max_left _ _
+  have hmax : ∀ ω, ∀ e : ℝ, (lam0 + dot lam (X ω)) * e + 2 * t * e ^ 2 - e ^ 4
+      ≤ (lam0 + dot lam (X ω)) * b ω + 2 * t * waterfillSecond b t ω
+        - waterfillSecond b t ω ^ 2 := by
+    intro ω e
+    rw [haff ω]
+    exact waterfill_pointwise b t ω e
+  exact ⟨minFourthMoment_eq_of_certificate E X b (waterfillSecond b t) β k m lam0 lam
+      (2 * t) hab hb hk ha hmax,
+    strong_duality_at_certificate E X b (waterfillSecond b t) β k m lam0 lam (2 * t)
+      hab hb hk ha hmax⟩
 
 end
 

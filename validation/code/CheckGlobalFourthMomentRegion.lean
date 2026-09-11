@@ -22,3 +22,5 @@ import Descent.Portability.GlobalFourthMomentRegion
 #print axioms Descent.Portability.GlobalFourthMomentRegion.constant_magnitude_value
 #print axioms Descent.Portability.GlobalFourthMomentRegion.constant_magnitude_of_value_eq
 #print axioms Descent.Portability.GlobalFourthMomentRegion.support_function_bound
+#print axioms Descent.Portability.GlobalFourthMomentRegion.waterfill_pointwise
+#print axioms Descent.Portability.GlobalFourthMomentRegion.waterfill_minFourthMoment
