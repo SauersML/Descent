@@ -37,8 +37,23 @@ exponential-decay approximation is needed is checked rather than repeated.
 square report `(2r+1)²` as exactly `a_{2r+1}(t)`.  That last step runs through
 `exp_mulVec_eigen`, hence through the Euler limit, not through a differential equation.
 
+`nearestDriftGen_lump` closes the loop back to the coupling: at symmetric rates the count drift
+is `b(k) = λ(n − 2k)`, so the nearest-drift chain always steps toward the balance point, and the
+aggregate `|2k − n|` therefore falls by exactly two at rate `λ|2k − n|`, which is the odd-level
+generator.  At `|2k − n| = 1` the count still moves while the aggregate does not, the
+manuscript's remark that the sign can switch while the square stays one.
+`driftStep_iterate_lump` carries that to every skeleton horizon, so running the nearest-drift
+count chain on a report of the aggregate is running the odd-level chain on that report.
+
+What is not proved here is the continuous-time transfer of the lumping: that
+`exp(t L_*) (f ∘ |2·−n|) = (exp(t L_odd) f) ∘ |2·−n|`, which would chain the skeleton statement
+to `exp_oddLevelMatrix_square_report` and identify `a_n(t)` with the expected terminal square
+under the minimising coupling itself.  The generator identity and the skeleton identity are
+proved; the Euler-limit transfer between them is not.
+
 Domain conditions: none beyond the manuscript's own.  The rate `λ` is an arbitrary real
-throughout; nonnegativity is never needed for the solution or its uniqueness.
+throughout, and nonnegativity is needed only for the lumping, where it fixes which of the two
+nearest-drift rates is active.
 -/
 
 set_option autoImplicit false
@@ -427,6 +442,129 @@ theorem exp_oddLevelMatrix_square_report (m : ℕ) (lam t : ℝ) (r : Fin (m + 1
     rw [oddRow_eq_zero_of_lt (r : ℕ) q (by
       have := Finset.mem_range.not.mp hq
       omega), zero_mul]
+
+/-! ## The odd-level generator as a lumping of the count generator -/
+
+/-- The odd aggregate report `|2k − n|` at count `k`, for an odd cohort size `n = 2c + 1`. -/
+def oddAggregate (c : ℕ) (k : ℤ) : ℤ :=
+  |2 * k - ((2 * c + 1 : ℕ) : ℤ)|
+
+/-- The odd-level generator read on `ℤ`: `|M|` falls by two at rate `λ|M|`, and `M = 1` is
+absorbing because its truncated predecessor is itself. -/
+def oddGenZ (lam : ℝ) (g : ℤ → ℝ) (M : ℤ) : ℝ :=
+  lam * (M : ℝ) * (g (max (M - 2) 1) - g M)
+
+/-- The aggregate is never zero or two, because `2k − n` is odd. -/
+theorem oddAggregate_cases (c : ℕ) (k : ℤ) :
+    oddAggregate c k = 1 ∨ 3 ≤ oddAggregate c k := by
+  rw [oddAggregate]
+  rcases abs_cases (2 * k - ((2 * c + 1 : ℕ) : ℤ)) with ⟨he, _⟩ | ⟨he, _⟩ <;> rw [he] <;> omega
+
+/-- The aggregate one step up is the truncated predecessor of the aggregate, when the count is
+below the balance point. -/
+theorem oddAggregate_succ_of_lt (c : ℕ) (k : ℤ) (h : 2 * k < ((2 * c + 1 : ℕ) : ℤ)) :
+    oddAggregate c (k + 1) = max (oddAggregate c k - 2) 1 := by
+  have habs : oddAggregate c k = ((2 * c + 1 : ℕ) : ℤ) - 2 * k := by
+    rw [oddAggregate, abs_sub_comm, abs_of_pos (by omega)]
+  rw [habs, oddAggregate]
+  rcases (by omega : ((2 * c + 1 : ℕ) : ℤ) - 2 * k = 1
+      ∨ 3 ≤ ((2 * c + 1 : ℕ) : ℤ) - 2 * k) with h1 | h3
+  · rw [abs_of_pos (by omega), h1]
+    norm_num
+    omega
+  · rw [abs_of_neg (by omega), max_eq_left (by omega)]
+    omega
+
+/-- The aggregate one step down is the truncated predecessor of the aggregate, when the count is
+above the balance point. -/
+theorem oddAggregate_pred_of_gt (c : ℕ) (k : ℤ) (h : ((2 * c + 1 : ℕ) : ℤ) < 2 * k) :
+    oddAggregate c (k - 1) = max (oddAggregate c k - 2) 1 := by
+  have habs : oddAggregate c k = 2 * k - ((2 * c + 1 : ℕ) : ℤ) := by
+    rw [oddAggregate, abs_of_pos (by omega)]
+  rw [habs, oddAggregate]
+  rcases (by omega : 2 * k - ((2 * c + 1 : ℕ) : ℤ) = 1
+      ∨ 3 ≤ 2 * k - ((2 * c + 1 : ℕ) : ℤ)) with h1 | h3
+  · rw [abs_of_neg (by omega), h1]
+    norm_num
+    omega
+  · rw [abs_of_pos (by omega), max_eq_left (by omega)]
+    omega
+
+/-- **The odd-level generator is the lumping of the nearest-drift count generator.**  At
+symmetric rates the count drift is `b(k) = λ(n − 2k)`, so the nearest-drift chain always moves
+one step toward the balance point, and the aggregate `|2k − n|` therefore falls by exactly two
+at rate `λ|2k − n|`.  At `|2k − n| = 1` the count still moves but the aggregate does not, which
+is the manuscript's remark that the sign can switch while the square stays one. -/
+theorem nearestDriftGen_lump (c : ℕ) (lam : ℝ) (hlam : 0 ≤ lam) (g : ℤ → ℝ) (k : ℤ) :
+    ConvexOrderCoupling.nearestDriftGen (2 * c + 1) lam lam
+        (fun j ↦ g (oddAggregate c j)) k
+      = oddGenZ lam g (oddAggregate c k) := by
+  have hdrift : ConvexOrderCoupling.countDrift (2 * c + 1) lam lam k
+      = lam * (((((2 * c + 1 : ℕ) : ℤ) - 2 * k : ℤ)) : ℝ) := by
+    rw [ConvexOrderCoupling.countDrift]
+    push_cast
+    ring
+  rcases lt_trichotomy (2 * k) (((2 * c + 1 : ℕ) : ℤ)) with hlt | heq | hgt
+  · have hpos : (0 : ℝ) < (((((2 * c + 1 : ℕ) : ℤ) - 2 * k : ℤ)) : ℝ) := by
+      have : (0 : ℤ) < ((2 * c + 1 : ℕ) : ℤ) - 2 * k := by omega
+      exact_mod_cast this
+    have habs : oddAggregate c k = ((2 * c + 1 : ℕ) : ℤ) - 2 * k := by
+      rw [oddAggregate, abs_sub_comm, abs_of_pos (by omega)]
+    rw [ConvexOrderCoupling.nearestDriftGen, ConvexOrderCoupling.upRate,
+      ConvexOrderCoupling.downRate, hdrift,
+      max_eq_left (by positivity : (0 : ℝ) ≤ lam * _),
+      max_eq_right (by nlinarith : -(lam * (((((2 * c + 1 : ℕ) : ℤ) - 2 * k : ℤ)) : ℝ)) ≤ 0),
+      oddGenZ, oddAggregate_succ_of_lt c k hlt, habs]
+    push_cast
+    ring
+  · exfalso
+    omega
+  · have hneg : (((((2 * c + 1 : ℕ) : ℤ) - 2 * k : ℤ)) : ℝ) < 0 := by
+      have : ((2 * c + 1 : ℕ) : ℤ) - 2 * k < 0 := by omega
+      exact_mod_cast this
+    have habs : oddAggregate c k = 2 * k - ((2 * c + 1 : ℕ) : ℤ) := by
+      rw [oddAggregate, abs_of_pos (by omega)]
+    rw [ConvexOrderCoupling.nearestDriftGen, ConvexOrderCoupling.upRate,
+      ConvexOrderCoupling.downRate, hdrift,
+      max_eq_right (by nlinarith : lam * (((((2 * c + 1 : ℕ) : ℤ) - 2 * k : ℤ)) : ℝ) ≤ 0),
+      max_eq_left (by nlinarith : (0 : ℝ) ≤ -(lam * (((((2 * c + 1 : ℕ) : ℤ) - 2 * k : ℤ)) : ℝ))),
+      oddGenZ, oddAggregate_pred_of_gt c k hgt, habs]
+    push_cast
+    ring
+
+/-! ## The lumping at every skeleton horizon -/
+
+/-- One skeleton step of the odd-level generator. -/
+def oddStepZ (lam tau : ℝ) (g : ℤ → ℝ) : ℤ → ℝ :=
+  fun M ↦ g M + tau * oddGenZ lam g M
+
+/-- **One skeleton step lumps.** -/
+theorem driftStep_lump (c : ℕ) (lam tau : ℝ) (hlam : 0 ≤ lam) (g : ℤ → ℝ) (k : ℤ) :
+    ConvexOrderCoupling.driftStep (2 * c + 1) lam lam tau (fun j ↦ g (oddAggregate c j)) k
+      = oddStepZ lam tau g (oddAggregate c k) := by
+  rw [ConvexOrderCoupling.driftStep, oddStepZ, nearestDriftGen_lump c lam hlam g k]
+
+/-- **The lumping survives every horizon.**  Running the nearest-drift count chain on a report
+that depends only on the aggregate is the same as running the odd-level chain on that report.
+This is what ties DC Corollary 4.3's system back to the minimising coupling: the aggregate
+report of the count chain is the odd-level chain. -/
+theorem driftStep_iterate_lump (c : ℕ) (lam tau : ℝ) (hlam : 0 ≤ lam) (g : ℤ → ℝ) (m : ℕ) :
+    ∀ k : ℤ, (ConvexOrderCoupling.driftStep (2 * c + 1) lam lam tau)^[m]
+        (fun j ↦ g (oddAggregate c j)) k
+      = (oddStepZ lam tau)^[m] g (oddAggregate c k) := by
+  induction m with
+  | zero =>
+    intro k
+    simp
+  | succ m ih =>
+    intro k
+    rw [Function.iterate_succ_apply', Function.iterate_succ_apply']
+    have hfun : (ConvexOrderCoupling.driftStep (2 * c + 1) lam lam tau)^[m]
+        (fun j ↦ g (oddAggregate c j))
+        = fun j ↦ ((oddStepZ lam tau)^[m] g) (oddAggregate c j) := by
+      funext j
+      exact ih j
+    rw [hfun, driftStep_lump c lam tau hlam ((oddStepZ lam tau)^[m] g) k]
 
 end
 

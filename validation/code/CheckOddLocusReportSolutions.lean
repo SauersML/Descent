@@ -37,3 +37,9 @@ open Descent.Portability.OddLocusReportSolutions
 #print axioms mulVec_sum
 #print axioms sum_oddRow_columns
 #print axioms exp_oddLevelMatrix_square_report
+#print axioms oddAggregate_cases
+#print axioms oddAggregate_succ_of_lt
+#print axioms oddAggregate_pred_of_gt
+#print axioms nearestDriftGen_lump
+#print axioms driftStep_lump
+#print axioms driftStep_iterate_lump
