@@ -951,17 +951,24 @@ def selectionQuotient : Bool → PolynomialQuotient (Fin 2)
   | false => ⟨1 - MvPolynomial.X 0,
       MvPolynomial.X 0 * MvPolynomial.X 1 + 1 - MvPolynomial.X 0⟩
 
+/-- The two selection branches over the normalizing total `x w + 1 - x`: the selected type with
+numerator `x w`, the other type with numerator `1 - x`. -/
+theorem eval_selectionQuotient (θ : Fin 2 → ℝ) :
+    (selectionQuotient true).eval θ = θ 0 * θ 1 / (θ 0 * θ 1 + 1 - θ 0) ∧
+      (selectionQuotient false).eval θ = (1 - θ 0) / (θ 0 * θ 1 + 1 - θ 0) := by
+  constructor <;>
+    simp only [selectionQuotient, PolynomialQuotient.eval, map_mul, map_add, map_sub, map_one,
+      MvPolynomial.eval_X]
+
 /-- The selected type is drawn with probability `x w / (x w + 1 - x)`. -/
 theorem eval_selectionQuotient_true (θ : Fin 2 → ℝ) :
-    (selectionQuotient true).eval θ = θ 0 * θ 1 / (θ 0 * θ 1 + 1 - θ 0) := by
-  simp only [selectionQuotient, PolynomialQuotient.eval, map_mul, map_add, map_sub, map_one,
-    MvPolynomial.eval_X]
+    (selectionQuotient true).eval θ = θ 0 * θ 1 / (θ 0 * θ 1 + 1 - θ 0) :=
+  (eval_selectionQuotient θ).1
 
 /-- The other type is drawn with probability `(1 - x) / (x w + 1 - x)`. -/
 theorem eval_selectionQuotient_false (θ : Fin 2 → ℝ) :
-    (selectionQuotient false).eval θ = (1 - θ 0) / (θ 0 * θ 1 + 1 - θ 0) := by
-  simp only [selectionQuotient, PolynomialQuotient.eval, map_mul, map_add, map_sub, map_one,
-    MvPolynomial.eval_X]
+    (selectionQuotient false).eval θ = (1 - θ 0) / (θ 0 * θ 1 + 1 - θ 0) :=
+  (eval_selectionQuotient θ).2
 
 /-- A decision taken by a polynomial sign condition, presented per cell: the branch that agrees
 with the decision has probability `1` and the other `0`. -/
