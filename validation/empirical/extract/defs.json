@@ -1,6 +1,6 @@
 {
  "_NOT_AUTHORITATIVE": "The committed copy of this file is STALE BY CONSTRUCTION: the Lean corpus moves every few minutes and this is a cache of it. Do not consume a committed copy -- run validation/extract/emit.py in your own worktree immediately before use, and call api.require_fresh(), which raises if the table does not describe the Lean on disk.",
- "source_digest": "sha256:8aa5ac93a518b26ab276fdbcd496a76b",
+ "source_digest": "sha256:702174d100ec178e2d3fef85c150d100",
  "source_files": 614,
  "collisions": {},
  "theorems": [
