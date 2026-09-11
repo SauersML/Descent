@@ -74,9 +74,10 @@ theorem measurable_kernelMeasure_of_isClosed (S : C(X, ℝ) →L[ℝ] C(X, ℝ))
     have key : (fun x ↦ ∫⁻ y, (hF.apprSeq n y : ℝ≥0∞) ∂(kernelMeasure S hS x))
         = fun x ↦ ENNReal.ofReal (S g x) := by
       funext x
-      rw [← ENNReal.ofReal_toReal
-          (lintegral_lt_top_of_nnreal (kernelMeasure S hS x) (hF.apprSeq n)).ne,
-        toReal_lintegral_coe_eq_integral]
+      have hfin := BoundedContinuousFunction.lintegral_lt_top_of_nnreal (kernelMeasure S hS x)
+        (hF.apprSeq n)
+      rw [← ENNReal.ofReal_toReal hfin.ne,
+        BoundedContinuousFunction.toReal_lintegral_coe_eq_integral]
       exact congrArg ENNReal.ofReal (integral_kernelMeasure S hS x g)
     rw [key]
     exact (S g).continuous.measurable.ennreal_ofReal
