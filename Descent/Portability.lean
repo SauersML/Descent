@@ -251,6 +251,9 @@ import Descent.Portability.HWEHeterozygosityLimit
 import Descent.Portability.CompactSingularSequence
 import Descent.Portability.CompactTargetDeflation
 import Descent.Portability.CompactMeasurementMinimax
+import Descent.Portability.CompactSpectralIdentification
+import Descent.Portability.CompactSpectralDecay
+import Descent.Portability.InfiniteIdentityMinimax
 assert_below Descent.Program
 
 /-!
