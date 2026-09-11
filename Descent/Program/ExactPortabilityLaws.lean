@@ -179,7 +179,8 @@ executed reference experiment of §9 is not formalized yet. `IntervalEvaluatorCe
 assumes a finite measure, a common bound and pointwise vanishing widths;
 `CylinderIntervalCertificate` needs only almost sure vanishing widths on fair-bit streams but
 does not show that its rational values are computed by an algorithm. (32) covers finite prefix
-enumerations. Frontier attainment (33) is proved per cell.
+enumerations. Equations (33) and (34) are proved for finitely many cells and coordinates, with
+the whole region attained by completions.
 -/
 
 end Descent.Program
