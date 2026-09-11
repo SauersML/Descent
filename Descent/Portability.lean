@@ -348,6 +348,10 @@ import Descent.Portability.HWEConditionalKernelLimit
 import Descent.Portability.HWEHomogeneousFrequencyLimit
 import Descent.Portability.HWEPolynomialLayerScale
 import Descent.Portability.HWEPolynomialScaleRegimes
+import Descent.Portability.HWEActualLayerKernel
+import Descent.Portability.HWEFixedLayerInputs
+import Descent.Portability.HWEFixedLayerKernelLimit
+import Descent.Portability.FiniteCountTail
 assert_below Descent.Program
 
 /-!

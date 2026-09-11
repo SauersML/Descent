@@ -3970,7 +3970,7 @@ def Descent_Portability_FiniteDemographicSampling_transition(step, hN, counts):
 def inner(law, first, second):
     return sum((_rt.mul(_rt.mul(_rt._proj(law, 'mass')(state), first[int(state)]), second[int(state)])) for state in range(int(len(first))))
 
-def energy(law, report):
+def Descent_Portability_FiniteHorizonLoss_energy(law, report):
     return inner(law, report, report)
 
 def predict(kernel, report):
@@ -4174,6 +4174,12 @@ def summand(h, N, x):
 def Descent_Portability_HWECriticalScoreCharacteristic_score(h, N, x):
     return sum((summand(h, N, (x(j)))) for j in range(int(_rt.sumdim('j', len(x)))))
 
+def remaining(h, r, n):
+    return (lambda _: h(((n + r))))
+
+def cap(h, r, n):
+    return _rt.rabs((_rt._proj((h(((n + r)))), 'altFreq') - _rt.rdiv(1.0, 2.0)))
+
 def heterozygote(*_a):
     if len(_a) < 1:
         return lambda *_b: heterozygote(*(_a + _b))
@@ -4208,6 +4214,9 @@ def Descent_Portability_HWEInteractionLaw_blockLaw(h):
 
 def Descent_Portability_HWELogCoordinates_coordinate(δ):
     return ((_rt.rdiv(1.0, 2.0)) * ((_rt.rlog(((_rt.rdiv(1.0, 2.0) + δ))) - _rt.rlog(((_rt.rdiv(1.0, 2.0) - δ))))))
+
+def coefficient(h, m, N, r, α):
+    return ((_rt.rdiv(1.0, _rt.rsqrt((adjustedIntensity(m, N, α))))) * _rt.lpow(((_rt.rsqrt((m)) * (_rt.rdiv(_rt._proj(standardizedGenotype(h), 'het'), _rt.rsqrt(2.0))))), r))
 
 def IsStationaryKernel(π, P):
     return all((sum(((_rt.mul(π[int(x)], P[int(x)][int(y)]) == π[int(y)])) for x in range(int(len(π))))) for y in range(int(len(π))))
