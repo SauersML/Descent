@@ -55,7 +55,8 @@ theorem zero_mem_reportGaps [Nonempty S] (V : Submodule ℝ (S → ℝ)) (f : S 
     (0 : ℝ) ∈ reportGaps V f := by
   obtain ⟨s₀⟩ := ‹Nonempty S›
   refine ⟨fun s ↦ if s = s₀ then 1 else 0, fun s ↦ if s = s₀ then 1 else 0,
-    fun s ↦ by split <;> norm_num, fun s ↦ by split <;> norm_num, by simp, by simp,
+    fun s ↦ by by_cases h : s = s₀ <;> simp [h],
+    fun s ↦ by by_cases h : s = s₀ <;> simp [h], by simp, by simp,
     fun v _ ↦ rfl, by ring⟩
 
 /-- A probability average of `f - v` never exceeds the uniform norm of `f - v`. -/
@@ -310,6 +311,7 @@ theorem weightedExp_report_gap_mem (V : Submodule ℝ (S → ℝ)) (f : S → �
     weightedExp p hp hps f - weightedExp q hq hqs f ∈ reportGaps V f :=
   ⟨p, q, hp, hq, hps, hqs, hmatch, rfl⟩
 
+omit [DecidableEq S] in
 /-- **Optimal recovery, lower half.** Any single reported number incurs, on one of a
 moment-matched pair, at least half their report difference. -/
 theorem recovery_error_lower (f : S → ℝ) (p q : S → ℝ) (θ : ℝ) :
