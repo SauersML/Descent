@@ -34,7 +34,7 @@ set_option relaxedAutoImplicit false
 
 namespace Descent.Portability.CohortEvaluationOperators
 
-open Foundations
+open Foundations Matrix
 
 noncomputable section
 
@@ -120,7 +120,7 @@ theorem quadForm_add (B : Matrix (Fin n) (Fin n) ℝ) (u v : Fin n → ℝ) :
 theorem dot_single_mulVec_single (D : Matrix (Fin n) (Fin n) ℝ) (i j : Fin n) :
     dot (Pi.single i (1 : ℝ)) (D.mulVec (Pi.single j 1)) = D i j := by
   rw [Matrix.mulVec_single_one]
-  simp only [dot, Descent.Core.innerSum, Pi.single_apply, Matrix.transpose_apply]
+  simp only [dot, Descent.Core.innerSum, Pi.single_apply]
   rw [Finset.sum_eq_single i]
   · simp
   · intro b _ hb
@@ -299,7 +299,8 @@ theorem quadForm_rankOneProj (z v : Fin n → ℝ) :
 zero reduction in the residual sum of squares.  This is the case the manuscripts single out:
 "when `z = 0` but reduced SSE is positive, the SSE-defined partial `R²` is zero". -/
 theorem rankOneProj_zero : rankOneProj (0 : Fin n → ℝ) = 0 := by
-  simp [rankOneProj, Matrix.vecMulVec]
+  ext i j
+  simp [rankOneProj]
 
 /-! ## The exact group report -/
 
@@ -395,10 +396,10 @@ theorem partialR2_eq_sse_reduction_ratio (P : Matrix (Fin n) (Fin n) ℝ) (hs : 
     quadForm_proj_eq_sq_norm _ hMs hMi y
   have hzy : dot ((residualMaker P).mulVec s) y
       = dot ((residualMaker P).mulVec s) ((residualMaker P).mulVec y) :=
-    (dot_proj_mulVec (residualMaker P) hMs hMi s y)
-  rw [residualMaker_augmentedProj, quadForm_sub, hrr]
-  rw [partialR2_eq_angular_ratio, quadForm_rankOneProj, hzy]
-  ring_nf
+    (dot_proj_mulVec (residualMaker P) hMs hMi s y).symm
+  rw [residualMaker_augmentedProj, quadForm_sub,
+    quadForm_rankOneProj ((residualMaker P).mulVec s) y, hzy, hrr, partialR2]
+  ring
 
 /-! ## Domain facts for the group report -/
 
