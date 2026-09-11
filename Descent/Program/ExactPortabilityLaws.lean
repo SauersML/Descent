@@ -203,7 +203,8 @@ step size, for every deme count with at least one deme. The history forms compos
 statement as proved in `TwoLocusMicroscopicApproximation` through a single-draw stage with
 `N = ⌈(c h)^(-1/2)⌉`. The note's literal composition of physical stages, with simultaneous
 migration and multinomial resampling, is a microscopic approximation with a padded fixed branch
-type in `MultinomialStageComposition`. The rate laws have strictly positive coalescence, where the note allows `c_i ≥ 0`. §2.4 is proved for
+type in `MultinomialStageComposition`. The rate laws have strictly positive coalescence, where
+the note allows `c_i ≥ 0`. §2.4 is proved for
 rate histories with integrable rate coordinates; the propagator is characterized by the integral
 equation. Theorem 2 covers histories of rate epochs, splits and admixture pulses; the pipeline
 compiler emits nothing else. Of §4.2, mutation is symmetric, and (20) takes the forward moment
