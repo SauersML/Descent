@@ -349,8 +349,10 @@ theorem example_not_rel_zero_two : ¬ (observed exampleInterface ⊥).r 0 2 := b
   decide
 
 /-- Haplotypes `0` and `1` are distinct lineages before any coalescence. -/
-theorem example_ne_zero_one : Quotient.mk (⊥ : ER 3) 0 ≠ Quotient.mk (⊥ : ER 3) 1 :=
-  fun hq ↦ absurd (Quotient.exact hq : (0 : Fin 3) = 1) (by decide)
+theorem example_ne_zero_one : Quotient.mk (⊥ : ER 3) 0 ≠ Quotient.mk (⊥ : ER 3) 1 := by
+  intro hq
+  have h : (0 : Fin 3) = 1 := Quotient.exact hq
+  exact absurd h (by decide)
 
 /-- **Example (A4), the starting loads `(2, 1)`.** -/
 theorem example_loads_bot :

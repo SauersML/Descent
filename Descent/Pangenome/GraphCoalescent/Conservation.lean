@@ -98,8 +98,7 @@ theorem hiddenExcess_bot {n : ℕ} (s : Fin n → Fin n) : hiddenExcess s ⊥ = 
   rfl
 
 /-- At the root nothing is hidden. -/
-theorem hiddenExcess_top {n : ℕ} (hn : 0 < n) (s : Fin n → Fin n) : hiddenExcess s ⊤ = 0 := by
-  haveI : NeZero n := ⟨hn.ne'⟩
+theorem hiddenExcess_top {n : ℕ} (s : Fin n → Fin n) : hiddenExcess s ⊤ = 0 := by
   rw [hiddenExcess, top_unique (le_observed s ⊤)]
   exact Nat.sub_self _
 
@@ -127,9 +126,9 @@ theorem hiddenExcess_path_eq {n : ℕ} (s : Fin n → Fin n) (path : ℕ → ER 
     have hstep := hcov k (Nat.lt_succ_self k)
     rw [hprev]
     unfold silentSteps
-    rw [range_succ, filter_insert]
+    rw [range_add_one, filter_insert]
     split_ifs with hsilent
-    · rw [card_insert_of_not_mem (by simp)]
+    · rw [card_insert_of_notMem (by simp)]
       have := hiddenExcess_of_invisible s hstep hsilent
       omega
     · rcases observed_eq_or_covers s hstep with hobs | hobs
@@ -152,9 +151,9 @@ theorem reportBlocks_path_eq {n : ℕ} (s : Fin n → Fin n) (path : ℕ → ER 
     have hstep := hcov k (Nat.lt_succ_self k)
     rw [hprev]
     unfold visibleSteps
-    rw [range_succ, filter_insert]
+    rw [range_add_one, filter_insert]
     split_ifs with hvisible
-    · rw [card_insert_of_not_mem (by simp)]
+    · rw [card_insert_of_notMem (by simp)]
       rcases observed_eq_or_covers s hstep with hobs | hobs
       · exact absurd hobs hvisible
       · have := hobs.2
@@ -171,7 +170,7 @@ theorem card_silentSteps_visibleSteps {n : ℕ} (hn : 0 < n) (s : Fin n → Fin 
   haveI : NeZero n := ⟨hn.ne'⟩
   have hE := hiddenExcess_path_eq s path k hcov
   have hr := reportBlocks_path_eq s path k hcov
-  rw [hstart, hend, hiddenExcess_bot, hiddenExcess_top hn] at hE
+  rw [hstart, hend, hiddenExcess_bot, hiddenExcess_top] at hE
   rw [hstart, hend, observed_bot, blocks_graphKer, top_unique (le_observed s ⊤), blocks_top] at hr
   exact ⟨by omega, by omega⟩
 
