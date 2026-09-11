@@ -4251,6 +4251,9 @@ def neutralDriftR2Ratio(V_A, V_E, fst):
 def taggedDriftR2RatioCorrected(V_A, V_E, fst, shared_ld):
     return _rt.rdiv(((((1.0 - fst)) * shared_ld) * ((V_A + V_E))), (((((1.0 - fst)) * V_A) + V_E)))
 
+def Descent_Portability_IIDAverageLaw_average(f, M, x):
+    return _rt.mul((_rt.rdiv(1.0, (M))), sum((f[int((x(i)))]) for i in range(int(len(f)))))
+
 def label(b):
     return (1.0 if b else 0.0)
 
@@ -5507,6 +5510,12 @@ def markedDensity(η, v, θ, z, y):
 
 def erasedDensity(η, v, θ, y):
     return ((((1.0 - η)) * gaussianPDFReal(0.0, v, y)) + (η * gaussianPDFReal(θ, v, y)))
+
+def markedEstimate(η, zy):
+    return (_rt.rdiv(_rt._proj(zy, '2'), η) if _rt._proj(zy, '1') else 0.0)
+
+def erasedEstimate(η, zy):
+    return _rt.rdiv(_rt._proj(zy, '2'), η)
 
 def rareVariantSharingApproximation(Ne, p):
     return pgsDriftVariance_one_pop(p, Ne)

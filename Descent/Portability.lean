@@ -192,6 +192,9 @@ import Descent.Portability.IndependentShiftOperator
 import Descent.Portability.BalancedHWEOperatorLimit
 import Descent.Portability.BalancedHWEWeakLimit
 import Descent.Portability.RareEventInformationLaw
+import Descent.Portability.IIDAverageLaw
+import Descent.Portability.RareEventSampleLaw
+import Descent.Portability.RareEventAbsenceRisk
 import Descent.Portability.GaussianHermiteLaw
 import Descent.Portability.ObservationAsymptotics
 import Descent.Portability.ContinuousObservabilityGramian

@@ -1,7 +1,7 @@
 {
  "_NOT_AUTHORITATIVE": "The committed copy of this file is STALE BY CONSTRUCTION: the Lean corpus moves every few minutes and this is a cache of it. Do not consume a committed copy -- run validation/extract/emit.py in your own worktree immediately before use, and call api.require_fresh(), which raises if the table does not describe the Lean on disk.",
- "source_digest": "sha256:df0d1b41bb034494fccb6a9582b50565",
- "source_files": 641,
+ "source_digest": "sha256:e89ec0057b9becdd12137cbfbe214753",
+ "source_files": 644,
  "collisions": {},
  "theorems": [
   {
@@ -20636,6 +20636,7 @@
    "line": 1313,
    "statement": "{D : ℕ} (deme : Fin D) (derived ancestral : Fin D → ℕ) (demes : Finset (Fin D)) (absent : deme ∉ demes) : MvPolynomial.pderiv deme (∏ different ∈ demes, manyDemeBernsteinPolynomialFactor different (derived different) (ancestral different)) = 0",
    "mentions": [
+    "absent",
     "manyDemeBernsteinPolynomialFactor"
    ]
   },
@@ -80669,6 +80670,37 @@
    ]
   },
   {
+   "name": "Descent.Portability.IIDAverageLaw.average_integral",
+   "kind": "theorem",
+   "file": "Descent/Portability/IIDAverageLaw.lean",
+   "line": 32,
+   "statement": "(μ : Measure Ω) [IsProbabilityMeasure μ] (f : Ω → ℝ) (hf : Integrable f μ) (M : ℕ) (hM : 0 < M) : (∫ x, average f M x ∂Measure.pi (fun _ : Fin M ↦ μ)) = ∫ x, f x ∂μ",
+   "mentions": [
+    "average"
+   ]
+  },
+  {
+   "name": "Descent.Portability.IIDAverageLaw.sample_sum_variance",
+   "kind": "theorem",
+   "file": "Descent/Portability/IIDAverageLaw.lean",
+   "line": 46,
+   "statement": "(μ : Measure Ω) [IsProbabilityMeasure μ] (f : Ω → ℝ) (hf : MemLp f 2 μ) (M : ℕ) : variance (fun x : Fin M → Ω ↦ ∑ i, f (x i)) (Measure.pi (fun _ : Fin M ↦ μ)) = (M : ℝ) * variance f μ",
+   "mentions": [
+    "variance"
+   ]
+  },
+  {
+   "name": "Descent.Portability.IIDAverageLaw.average_variance",
+   "kind": "theorem",
+   "file": "Descent/Portability/IIDAverageLaw.lean",
+   "line": 67,
+   "statement": "(μ : Measure Ω) [IsProbabilityMeasure μ] (f : Ω → ℝ) (hf : MemLp f 2 μ) (M : ℕ) (hM : 0 < M) : variance (average f M) (Measure.pi (fun _ : Fin M ↦ μ)) = variance f μ / (M : ℝ)",
+   "mentions": [
+    "average",
+    "variance"
+   ]
+  },
+  {
    "name": "Descent.Portability.IIDBinExperiment.label_mean",
    "kind": "theorem",
    "file": "Descent/Portability/IIDBinExperiment.lean",
@@ -99665,6 +99697,83 @@
    ]
   },
   {
+   "name": "Descent.Portability.RareEventAbsenceRisk.absent_measurable",
+   "kind": "theorem",
+   "file": "Descent/Portability/RareEventAbsenceRisk.lean",
+   "line": 35,
+   "statement": ": MeasurableSet absent",
+   "mentions": [
+    "absent"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RareEventAbsenceRisk.experiment_absent_restriction",
+   "kind": "theorem",
+   "file": "Descent/Portability/RareEventAbsenceRisk.lean",
+   "line": 39,
+   "statement": "(η : ℝ) (v : ℝ≥0) (θ : ℝ) : (experimentLaw η v θ).restrict absent = ENNReal.ofReal (1 - η) • (gaussianReal 0 v).map (fun y ↦ (false, y))",
+   "mentions": [
+    "absent",
+    "experimentLaw",
+    "restrict"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RareEventAbsenceRisk.experiment_absent_mass",
+   "kind": "theorem",
+   "file": "Descent/Portability/RareEventAbsenceRisk.lean",
+   "line": 48,
+   "statement": "(η : ℝ) (v : ℝ≥0) (θ : ℝ) : experimentLaw η v θ absent = ENNReal.ofReal (1 - η)",
+   "mentions": [
+    "absent",
+    "experimentLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RareEventAbsenceRisk.sample_noEvents_restriction",
+   "kind": "theorem",
+   "file": "Descent/Portability/RareEventAbsenceRisk.lean",
+   "line": 55,
+   "statement": "(η : ℝ) (hη : 0 ≤ η ∧ η ≤ 1) (v : ℝ≥0) (θ : ℝ) (M : ℕ) : (sampleLaw η v θ M).restrict (noEvents M) = (sampleLaw η v 0 M).restrict (noEvents M)",
+   "mentions": [
+    "noEvents",
+    "restrict",
+    "sampleLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RareEventAbsenceRisk.sample_noEvents_mass",
+   "kind": "theorem",
+   "file": "Descent/Portability/RareEventAbsenceRisk.lean",
+   "line": 66,
+   "statement": "(η : ℝ) (hη : 0 ≤ η ∧ η ≤ 1) (v : ℝ≥0) (θ : ℝ) (M : ℕ) : sampleLaw η v θ M (noEvents M) = ENNReal.ofReal ((1 - η) ^ M)",
+   "mentions": [
+    "noEvents",
+    "sampleLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RareEventAbsenceRisk.common_submeasure_risk",
+   "kind": "theorem",
+   "file": "Descent/Portability/RareEventAbsenceRisk.lean",
+   "line": 80,
+   "statement": "{Ω : Type*} [MeasurableSpace Ω] (μ ν ρ : Measure Ω) (hμ : ρ ≤ μ) (hν : ρ ≤ ν) (T : Ω → ℝ) (hT : Measurable T) (B : ℝ) : ENNReal.ofReal (B ^ 2) * ρ Set.univ ≤ ENNReal.ofReal (1 / 2 : ℝ) * (squaredRisk μ T B + squaredRisk ν T (-B))",
+   "mentions": [
+    "squaredRisk"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RareEventAbsenceRisk.no_events_bayes_floor",
+   "kind": "theorem",
+   "file": "Descent/Portability/RareEventAbsenceRisk.lean",
+   "line": 110,
+   "statement": "(η : ℝ) (hη : 0 ≤ η ∧ η ≤ 1) (v : ℝ≥0) (M : ℕ) (B : ℝ) (T : (Fin M → Bool × ℝ) → ℝ) (hT : Measurable T) : ENNReal.ofReal (B ^ 2 * (1 - η) ^ M) ≤ ENNReal.ofReal (1 / 2 : ℝ) * (squaredRisk (sampleLaw η v B M) T B + squaredRisk (sampleLaw η v (-B) M) T (-B))",
+   "mentions": [
+    "sampleLaw",
+    "squaredRisk"
+   ]
+  },
+  {
    "name": "Descent.Portability.RareEventInformationLaw.erasedDensity_eq_sum",
    "kind": "theorem",
    "file": "Descent/Portability/RareEventInformationLaw.lean",
@@ -99848,6 +99957,154 @@
    "statement": "(η q : ℝ) (v : ℝ≥0) (hv : v ≠ 0) : q * experimentExpectation η v 0 (fun z y ↦ (if z then y / v else 0) ^ 2) + (1 - q) * experimentExpectation η v 0 (fun _ y ↦ (η * y / v) ^ 2) = (q * η + (1 - q) * η ^ 2) / v",
    "mentions": [
     "experimentExpectation"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RareEventSampleLaw.markedEstimate_measurable",
+   "kind": "theorem",
+   "file": "Descent/Portability/RareEventSampleLaw.lean",
+   "line": 32,
+   "statement": "(η : ℝ) : Measurable (markedEstimate η)",
+   "mentions": [
+    "markedEstimate"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RareEventSampleLaw.erasedEstimate_measurable",
+   "kind": "theorem",
+   "file": "Descent/Portability/RareEventSampleLaw.lean",
+   "line": 37,
+   "statement": "(η : ℝ) : Measurable (erasedEstimate η)",
+   "mentions": [
+    "erasedEstimate"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RareEventSampleLaw.experiment_integrable",
+   "kind": "theorem",
+   "file": "Descent/Portability/RareEventSampleLaw.lean",
+   "line": 41,
+   "statement": "(η : ℝ) (v : ℝ≥0) (θ : ℝ) (f : Bool × ℝ → ℝ) (hf : Measurable f) (h0 : Integrable (fun y ↦ f (false, y)) (gaussianReal 0 v)) (h1 : Integrable (fun y ↦ f (true, y)) (gaussianReal θ v)) : Integrable f (experimentLaw η v θ)",
+   "mentions": [
+    "experimentLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RareEventSampleLaw.markedEstimate_memLp",
+   "kind": "theorem",
+   "file": "Descent/Portability/RareEventSampleLaw.lean",
+   "line": 53,
+   "statement": "(η : ℝ) (v : ℝ≥0) (θ : ℝ) : MemLp (markedEstimate η) 2 (experimentLaw η v θ)",
+   "mentions": [
+    "experimentLaw",
+    "markedEstimate"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RareEventSampleLaw.erasedEstimate_memLp",
+   "kind": "theorem",
+   "file": "Descent/Portability/RareEventSampleLaw.lean",
+   "line": 62,
+   "statement": "(η : ℝ) (v : ℝ≥0) (θ : ℝ) : MemLp (erasedEstimate η) 2 (experimentLaw η v θ)",
+   "mentions": [
+    "erasedEstimate",
+    "experimentLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RareEventSampleLaw.markedEstimate_mean",
+   "kind": "theorem",
+   "file": "Descent/Portability/RareEventSampleLaw.lean",
+   "line": 71,
+   "statement": "(η : ℝ) (hη : 0 < η ∧ η ≤ 1) (v : ℝ≥0) (θ : ℝ) : (∫ zy, markedEstimate η zy ∂experimentLaw η v θ) = θ",
+   "mentions": [
+    "experimentLaw",
+    "markedEstimate"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RareEventSampleLaw.erasedEstimate_mean",
+   "kind": "theorem",
+   "file": "Descent/Portability/RareEventSampleLaw.lean",
+   "line": 80,
+   "statement": "(η : ℝ) (hη : 0 < η ∧ η ≤ 1) (v : ℝ≥0) (θ : ℝ) : (∫ zy, erasedEstimate η zy ∂experimentLaw η v θ) = θ",
+   "mentions": [
+    "erasedEstimate",
+    "experimentLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RareEventSampleLaw.markedEstimate_variance",
+   "kind": "theorem",
+   "file": "Descent/Portability/RareEventSampleLaw.lean",
+   "line": 89,
+   "statement": "(η : ℝ) (hη : 0 < η ∧ η ≤ 1) (v : ℝ≥0) : variance (markedEstimate η) (experimentLaw η v 0) = (v : ℝ) / η",
+   "mentions": [
+    "experimentLaw",
+    "markedEstimate",
+    "variance"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RareEventSampleLaw.erasedEstimate_variance",
+   "kind": "theorem",
+   "file": "Descent/Portability/RareEventSampleLaw.lean",
+   "line": 102,
+   "statement": "(η : ℝ) (hη : 0 < η ∧ η ≤ 1) (v : ℝ≥0) : variance (erasedEstimate η) (experimentLaw η v 0) = (v : ℝ) / η ^ 2",
+   "mentions": [
+    "erasedEstimate",
+    "experimentLaw",
+    "variance"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RareEventSampleLaw.marked_sample_unbiased",
+   "kind": "theorem",
+   "file": "Descent/Portability/RareEventSampleLaw.lean",
+   "line": 115,
+   "statement": "(η : ℝ) (hη : 0 < η ∧ η ≤ 1) (v : ℝ≥0) (θ : ℝ) (M : ℕ) (hM : 0 < M) : (∫ x, average (markedEstimate η) M x ∂Measure.pi (fun _ : Fin M ↦ experimentLaw η v θ)) = θ",
+   "mentions": [
+    "average",
+    "experimentLaw",
+    "markedEstimate"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RareEventSampleLaw.erased_sample_unbiased",
+   "kind": "theorem",
+   "file": "Descent/Portability/RareEventSampleLaw.lean",
+   "line": 124,
+   "statement": "(η : ℝ) (hη : 0 < η ∧ η ≤ 1) (v : ℝ≥0) (θ : ℝ) (M : ℕ) (hM : 0 < M) : (∫ x, average (erasedEstimate η) M x ∂Measure.pi (fun _ : Fin M ↦ experimentLaw η v θ)) = θ",
+   "mentions": [
+    "average",
+    "erasedEstimate",
+    "experimentLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RareEventSampleLaw.marked_sample_variance",
+   "kind": "theorem",
+   "file": "Descent/Portability/RareEventSampleLaw.lean",
+   "line": 133,
+   "statement": "(η : ℝ) (hη : 0 < η ∧ η ≤ 1) (v : ℝ≥0) (M : ℕ) (hM : 0 < M) : variance (average (markedEstimate η) M) (Measure.pi (fun _ : Fin M ↦ experimentLaw η v 0)) = (v : ℝ) / ((M : ℝ) * η)",
+   "mentions": [
+    "average",
+    "experimentLaw",
+    "markedEstimate",
+    "variance"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RareEventSampleLaw.erased_sample_variance",
+   "kind": "theorem",
+   "file": "Descent/Portability/RareEventSampleLaw.lean",
+   "line": 142,
+   "statement": "(η : ℝ) (hη : 0 < η ∧ η ≤ 1) (v : ℝ≥0) (M : ℕ) (hM : 0 < M) : variance (average (erasedEstimate η) M) (Measure.pi (fun _ : Fin M ↦ experimentLaw η v 0)) = (v : ℝ) / ((M : ℝ) * η ^ 2)",
+   "mentions": [
+    "average",
+    "erasedEstimate",
+    "experimentLaw",
+    "variance"
    ]
   },
   {
@@ -151123,7 +151380,10 @@
       "l ≤ m"
      ],
      "Descent.Coalescent.isPiSystem_cylinders": [],
-     "Descent.Portability.CompactParameterIntegralLaw.hasDerivAt_interval_integral": []
+     "Descent.Portability.CompactParameterIntegralLaw.hasDerivAt_interval_integral": [],
+     "Descent.Portability.RareEventAbsenceRisk.experiment_absent_restriction": [],
+     "Descent.Portability.RareEventAbsenceRisk.sample_noEvents_restriction": [],
+     "Descent.Portability.RareEventAbsenceRisk.no_events_bayes_floor": []
     }
    },
    "mentioned_by": [
@@ -151148,7 +151408,10 @@
     "Descent.Coalescent.restrict_voterAncestralRel",
     "Descent.Coalescent.sum_ER_succ",
     "Descent.Coalescent.sum_fiber_eq_sum_seatings",
-    "Descent.Portability.CompactParameterIntegralLaw.hasDerivAt_interval_integral"
+    "Descent.Portability.CompactParameterIntegralLaw.hasDerivAt_interval_integral",
+    "Descent.Portability.RareEventAbsenceRisk.experiment_absent_restriction",
+    "Descent.Portability.RareEventAbsenceRisk.no_events_bayes_floor",
+    "Descent.Portability.RareEventAbsenceRisk.sample_noEvents_restriction"
    ]
   },
   {
@@ -164460,7 +164723,10 @@
      "Descent.Portability.RadialPotentialLaw.coordinateDerivative_joint_continuous": [],
      "Descent.Portability.RadialPotentialLaw.coordinateDerivative_closed": [],
      "Descent.Portability.RadialPotentialLaw.potential_coordinate_hasDerivAt": [],
+     "Descent.Portability.RareEventAbsenceRisk.common_submeasure_risk": [],
      "Descent.Portability.RareEventInformationLaw.erased_fisher_information": [],
+     "Descent.Portability.RareEventSampleLaw.markedEstimate_memLp": [],
+     "Descent.Portability.RareEventSampleLaw.erasedEstimate_memLp": [],
      "Descent.Portability.rareHeritabilityShare_mem_Ioo": [],
      "Descent.Portability.independentGeneSharingProbability_gt_single": [],
      "Descent.Portability.portableVariantSignal_mono_frequency_sharing": [],
@@ -165709,7 +165975,10 @@
     "Descent.Portability.RadialPotentialLaw.radialDensity_coordinate_hasDerivAt",
     "Descent.Portability.RadialPotentialLaw.radialDensity_joint_continuous",
     "Descent.Portability.RadialPotentialLaw.update_hasDerivAt",
+    "Descent.Portability.RareEventAbsenceRisk.common_submeasure_risk",
     "Descent.Portability.RareEventInformationLaw.erased_fisher_information",
+    "Descent.Portability.RareEventSampleLaw.erasedEstimate_memLp",
+    "Descent.Portability.RareEventSampleLaw.markedEstimate_memLp",
     "Descent.Portability.RatioPoleLaw.calibrated_label_weight_continuous",
     "Descent.Portability.RatioPoleLaw.calibrated_label_weight_pos",
     "Descent.Portability.RatioPoleLaw.crossForm_affine_line",
@@ -178604,7 +178873,10 @@
      "Descent.Portability.RadialPotentialLaw.coordinateDerivative_joint_continuous": [],
      "Descent.Portability.RadialPotentialLaw.coordinateDerivative_closed": [],
      "Descent.Portability.RadialPotentialLaw.potential_coordinate_hasDerivAt": [],
+     "Descent.Portability.RareEventAbsenceRisk.common_submeasure_risk": [],
      "Descent.Portability.RareEventInformationLaw.erased_fisher_information": [],
+     "Descent.Portability.RareEventSampleLaw.markedEstimate_memLp": [],
+     "Descent.Portability.RareEventSampleLaw.erasedEstimate_memLp": [],
      "Descent.Portability.rareHeritabilityShare_mem_Ioo": [],
      "Descent.Portability.independentGeneSharingProbability_gt_single": [],
      "Descent.Portability.portableVariantSignal_mono_frequency_sharing": [],
@@ -179849,7 +180121,10 @@
     "Descent.Portability.RadialPotentialLaw.radialDensity_coordinate_hasDerivAt",
     "Descent.Portability.RadialPotentialLaw.radialDensity_joint_continuous",
     "Descent.Portability.RadialPotentialLaw.update_hasDerivAt",
+    "Descent.Portability.RareEventAbsenceRisk.common_submeasure_risk",
     "Descent.Portability.RareEventInformationLaw.erased_fisher_information",
+    "Descent.Portability.RareEventSampleLaw.erasedEstimate_memLp",
+    "Descent.Portability.RareEventSampleLaw.markedEstimate_memLp",
     "Descent.Portability.RatioPoleLaw.calibrated_label_weight_continuous",
     "Descent.Portability.RatioPoleLaw.calibrated_label_weight_pos",
     "Descent.Portability.RatioPoleLaw.crossForm_affine_line",
@@ -201476,7 +201751,10 @@
      "Descent.Portability.RadialPotentialLaw.coordinateDerivative_joint_continuous": [],
      "Descent.Portability.RadialPotentialLaw.coordinateDerivative_closed": [],
      "Descent.Portability.RadialPotentialLaw.potential_coordinate_hasDerivAt": [],
+     "Descent.Portability.RareEventAbsenceRisk.common_submeasure_risk": [],
      "Descent.Portability.RareEventInformationLaw.erased_fisher_information": [],
+     "Descent.Portability.RareEventSampleLaw.markedEstimate_memLp": [],
+     "Descent.Portability.RareEventSampleLaw.erasedEstimate_memLp": [],
      "Descent.Portability.rareHeritabilityShare_mem_Ioo": [],
      "Descent.Portability.independentGeneSharingProbability_gt_single": [],
      "Descent.Portability.portableVariantSignal_mono_frequency_sharing": [],
@@ -202712,7 +202990,10 @@
     "Descent.Portability.RadialPotentialLaw.radialDensity_coordinate_hasDerivAt",
     "Descent.Portability.RadialPotentialLaw.radialDensity_joint_continuous",
     "Descent.Portability.RadialPotentialLaw.update_hasDerivAt",
+    "Descent.Portability.RareEventAbsenceRisk.common_submeasure_risk",
     "Descent.Portability.RareEventInformationLaw.erased_fisher_information",
+    "Descent.Portability.RareEventSampleLaw.erasedEstimate_memLp",
+    "Descent.Portability.RareEventSampleLaw.markedEstimate_memLp",
     "Descent.Portability.RatioPoleLaw.calibrated_label_weight_continuous",
     "Descent.Portability.RatioPoleLaw.calibrated_label_weight_pos",
     "Descent.Portability.RatioPoleLaw.crossForm_affine_line",
@@ -203704,6 +203985,8 @@
      "Descent.Portability.no_score_side_summary_determines_r2": [],
      "Descent.Portability.ProbitTrainingLaw.integral_readout": [],
      "Descent.Portability.RademacherReindex.mass_reindex": [],
+     "Descent.Portability.RareEventAbsenceRisk.common_submeasure_risk": [],
+     "Descent.Portability.RareEventAbsenceRisk.no_events_bayes_floor": [],
      "Descent.Portability.mutationSelectionBalanceRecessive_sq_le": [],
      "Descent.Portability.RatioPoleLaw.transverse_scaled_limit": [],
      "Descent.Portability.RatioSourceDegeneracy.nondegenerate_nonaligned_witness": [],
@@ -204100,6 +204383,8 @@
     "Descent.Portability.PipelineDemographicHistory.presentBiologicalKilledDualState_eq_projection",
     "Descent.Portability.ProbitTrainingLaw.integral_readout",
     "Descent.Portability.RademacherReindex.mass_reindex",
+    "Descent.Portability.RareEventAbsenceRisk.common_submeasure_risk",
+    "Descent.Portability.RareEventAbsenceRisk.no_events_bayes_floor",
     "Descent.Portability.RatioPoleLaw.transverse_scaled_limit",
     "Descent.Portability.RatioSourceDegeneracy.nondegenerate_nonaligned_witness",
     "Descent.Portability.ReportCalibrationTransport.conditional_density_pos_target_ae",
@@ -221522,6 +221807,8 @@
      "Descent.Portability.GaussianPolynomialMoments.fourth_moment": [],
      "Descent.Portability.HWECriticalMoments.critical_variance": [],
      "Descent.Portability.HWEHierarchyMoments.integer_variance": [],
+     "Descent.Portability.IIDAverageLaw.sample_sum_variance": [],
+     "Descent.Portability.IIDAverageLaw.average_variance": [],
      "Descent.Portability.IndividualLossMoments.total_variance": [],
      "Descent.Portability.IndividualLossMoments.squared_loss_between_decomposition": [],
      "Descent.Portability.IndividualLossMoments.squared_loss_total": [],
@@ -221584,6 +221871,10 @@
      "Descent.Portability.ProbitTrainingLaw.reportedRatio_bounds": [],
      "Descent.Portability.ProbitTrainingLaw.reportedSourceRatio_eq_one": [],
      "Descent.Portability.ProbitTrainingLaw.fixedData_reportedRatio_bounded": [],
+     "Descent.Portability.RareEventSampleLaw.markedEstimate_variance": [],
+     "Descent.Portability.RareEventSampleLaw.erasedEstimate_variance": [],
+     "Descent.Portability.RareEventSampleLaw.marked_sample_variance": [],
+     "Descent.Portability.RareEventSampleLaw.erased_sample_variance": [],
      "Descent.Portability.ReportFiniteCalibrationLaw.interaction_residual_variance": [],
      "Descent.Portability.TrainingNoiseAccuracy.variance_linearScore": [],
      "Descent.Portability.TrainingNoiseAccuracy.squaredCorrelation_linearScore": [],
@@ -221682,6 +221973,8 @@
     "Descent.Portability.GaussianPolynomialMoments.tilted_power_moment",
     "Descent.Portability.HWECriticalMoments.critical_variance",
     "Descent.Portability.HWEHierarchyMoments.integer_variance",
+    "Descent.Portability.IIDAverageLaw.average_variance",
+    "Descent.Portability.IIDAverageLaw.sample_sum_variance",
     "Descent.Portability.IndividualLossMoments.expected_square_shift",
     "Descent.Portability.IndividualLossMoments.fitted_squared_loss_r2_gap",
     "Descent.Portability.IndividualLossMoments.fitted_squared_loss_r2_le_oracle",
@@ -221725,6 +222018,10 @@
     "Descent.Portability.ProbitTrainingLaw.reportedSourceRatio_eq_one",
     "Descent.Portability.ProbitTrainingLaw.threshold_probabilities_sum_one",
     "Descent.Portability.ProbitTrainingLaw.threshold_probability",
+    "Descent.Portability.RareEventSampleLaw.erasedEstimate_variance",
+    "Descent.Portability.RareEventSampleLaw.erased_sample_variance",
+    "Descent.Portability.RareEventSampleLaw.markedEstimate_variance",
+    "Descent.Portability.RareEventSampleLaw.marked_sample_variance",
     "Descent.Portability.ReportFiniteCalibrationLaw.interaction_residual_variance",
     "Descent.Portability.SimulationAccuracy.squaredCorrelation_affine",
     "Descent.Portability.SimulationAccuracy.squaredCorrelation_standardized_restriction",
@@ -296406,7 +296703,13 @@
       "∀ deme ∈ members, 0 ≤ values deme ∧ values deme ≤ bound"
      ],
      "Descent.Portability.DistanceBinnedPortabilityLaw.clippedBinReport_measurable": [],
-     "Descent.Portability.DistanceBinnedPortabilityLaw.binReport_measurable": []
+     "Descent.Portability.DistanceBinnedPortabilityLaw.binReport_measurable": [],
+     "Descent.Portability.IIDAverageLaw.average_integral": [],
+     "Descent.Portability.IIDAverageLaw.average_variance": [],
+     "Descent.Portability.RareEventSampleLaw.marked_sample_unbiased": [],
+     "Descent.Portability.RareEventSampleLaw.erased_sample_unbiased": [],
+     "Descent.Portability.RareEventSampleLaw.marked_sample_variance": [],
+     "Descent.Portability.RareEventSampleLaw.erased_sample_variance": []
     },
     "range_lo_thm": [
      "Descent.Portability.DistanceBinnedPortabilityLaw.average_bounds",
@@ -296418,7 +296721,13 @@
     "Descent.Portability.AcceptedBinIntegrability.binInner_eq_accepted_sum",
     "Descent.Portability.DistanceBinnedPortabilityLaw.average_bounds",
     "Descent.Portability.DistanceBinnedPortabilityLaw.binReport_measurable",
-    "Descent.Portability.DistanceBinnedPortabilityLaw.clippedBinReport_measurable"
+    "Descent.Portability.DistanceBinnedPortabilityLaw.clippedBinReport_measurable",
+    "Descent.Portability.IIDAverageLaw.average_integral",
+    "Descent.Portability.IIDAverageLaw.average_variance",
+    "Descent.Portability.RareEventSampleLaw.erased_sample_unbiased",
+    "Descent.Portability.RareEventSampleLaw.erased_sample_variance",
+    "Descent.Portability.RareEventSampleLaw.marked_sample_unbiased",
+    "Descent.Portability.RareEventSampleLaw.marked_sample_variance"
    ]
   },
   {
@@ -311830,6 +312139,8 @@
      "Descent.Portability.GaussianPolynomialMoments.fourth_moment": [],
      "Descent.Portability.HWECriticalMoments.critical_variance": [],
      "Descent.Portability.HWEHierarchyMoments.integer_variance": [],
+     "Descent.Portability.IIDAverageLaw.sample_sum_variance": [],
+     "Descent.Portability.IIDAverageLaw.average_variance": [],
      "Descent.Portability.IndividualLossMoments.total_variance": [],
      "Descent.Portability.IndividualLossMoments.squared_loss_between_decomposition": [],
      "Descent.Portability.IndividualLossMoments.squared_loss_total": [],
@@ -311886,6 +312197,10 @@
      "Descent.Portability.ProbitTrainingLaw.reportedRatio_bounds": [],
      "Descent.Portability.ProbitTrainingLaw.reportedSourceRatio_eq_one": [],
      "Descent.Portability.ProbitTrainingLaw.fixedData_reportedRatio_bounded": [],
+     "Descent.Portability.RareEventSampleLaw.markedEstimate_variance": [],
+     "Descent.Portability.RareEventSampleLaw.erasedEstimate_variance": [],
+     "Descent.Portability.RareEventSampleLaw.marked_sample_variance": [],
+     "Descent.Portability.RareEventSampleLaw.erased_sample_variance": [],
      "Descent.Portability.ReportFiniteCalibrationLaw.interaction_residual_variance": [],
      "Descent.Portability.TrainingNoiseAccuracy.variance_linearScore": [],
      "Descent.Portability.TrainingNoiseAccuracy.squaredCorrelation_linearScore": [
@@ -311987,6 +312302,8 @@
     "Descent.Portability.GaussianPolynomialMoments.tilted_power_moment",
     "Descent.Portability.HWECriticalMoments.critical_variance",
     "Descent.Portability.HWEHierarchyMoments.integer_variance",
+    "Descent.Portability.IIDAverageLaw.average_variance",
+    "Descent.Portability.IIDAverageLaw.sample_sum_variance",
     "Descent.Portability.IndividualLossMoments.expected_square_shift",
     "Descent.Portability.IndividualLossMoments.fitted_squared_loss_r2_gap",
     "Descent.Portability.IndividualLossMoments.fitted_squared_loss_r2_le_oracle",
@@ -312030,6 +312347,10 @@
     "Descent.Portability.ProbitTrainingLaw.reportedSourceRatio_eq_one",
     "Descent.Portability.ProbitTrainingLaw.threshold_probabilities_sum_one",
     "Descent.Portability.ProbitTrainingLaw.threshold_probability",
+    "Descent.Portability.RareEventSampleLaw.erasedEstimate_variance",
+    "Descent.Portability.RareEventSampleLaw.erased_sample_variance",
+    "Descent.Portability.RareEventSampleLaw.markedEstimate_variance",
+    "Descent.Portability.RareEventSampleLaw.marked_sample_variance",
     "Descent.Portability.ReportFiniteCalibrationLaw.interaction_residual_variance",
     "Descent.Portability.SimulationAccuracy.squaredCorrelation_affine",
     "Descent.Portability.SimulationAccuracy.squaredCorrelation_standardized_restriction",
@@ -332806,6 +333127,99 @@
    ]
   },
   {
+   "name": "Descent.Portability.IIDAverageLaw.average",
+   "decl_name": "average",
+   "short": "average",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/IIDAverageLaw.lean",
+   "line": 28,
+   "signature": "(f : Ω → ℝ) (M : ℕ) (x : Fin M → Ω) : ℝ",
+   "args": [
+    {
+     "names": [
+      "f"
+     ],
+     "type": "Ω → ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "M"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "x"
+     ],
+     "type": "Fin M → Ω",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  (1 / (M : ℝ)) * ∑ i, f (x i)",
+   "docstring": "The empirical average of a scalar statistic across a finite sample.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.IIDAverageLaw",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "Integrable f μ",
+     "0 < M",
+     "MemLp f 2 μ"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.AcceptedBinIntegrability.binInner_eq_accepted_sum": [],
+     "Descent.Portability.DistanceBinnedPortabilityLaw.average_bounds": [],
+     "Descent.Portability.DistanceBinnedPortabilityLaw.clippedBinReport_measurable": [],
+     "Descent.Portability.DistanceBinnedPortabilityLaw.binReport_measurable": [],
+     "Descent.Portability.IIDAverageLaw.average_integral": [
+      "Integrable f μ",
+      "0 < M"
+     ],
+     "Descent.Portability.IIDAverageLaw.average_variance": [
+      "MemLp f 2 μ",
+      "0 < M"
+     ],
+     "Descent.Portability.RareEventSampleLaw.marked_sample_unbiased": [
+      "0 < M"
+     ],
+     "Descent.Portability.RareEventSampleLaw.erased_sample_unbiased": [
+      "0 < M"
+     ],
+     "Descent.Portability.RareEventSampleLaw.marked_sample_variance": [
+      "0 < M"
+     ],
+     "Descent.Portability.RareEventSampleLaw.erased_sample_variance": [
+      "0 < M"
+     ]
+    },
+    "range_lo_thm": [
+     "Descent.Portability.DistanceBinnedPortabilityLaw.average_bounds",
+     2
+    ],
+    "range_lo": 0
+   },
+   "mentioned_by": [
+    "Descent.Portability.AcceptedBinIntegrability.binInner_eq_accepted_sum",
+    "Descent.Portability.DistanceBinnedPortabilityLaw.average_bounds",
+    "Descent.Portability.DistanceBinnedPortabilityLaw.binReport_measurable",
+    "Descent.Portability.DistanceBinnedPortabilityLaw.clippedBinReport_measurable",
+    "Descent.Portability.IIDAverageLaw.average_integral",
+    "Descent.Portability.IIDAverageLaw.average_variance",
+    "Descent.Portability.RareEventSampleLaw.erased_sample_unbiased",
+    "Descent.Portability.RareEventSampleLaw.erased_sample_variance",
+    "Descent.Portability.RareEventSampleLaw.marked_sample_unbiased",
+    "Descent.Portability.RareEventSampleLaw.marked_sample_variance"
+   ]
+  },
+  {
    "name": "Descent.Portability.IIDBinExperiment.labelLaw",
    "decl_name": "labelLaw",
    "short": "labelLaw",
@@ -333050,7 +333464,8 @@
    "equations": [],
    "constraints": {
     "hypotheses": [
-     "∀ j, 0 ≤ η j ∧ η j ≤ 1"
+     "∀ j, 0 ≤ η j ∧ η j ≤ 1",
+     "0 ≤ η ∧ η ≤ 1"
     ],
     "hypotheses_by_theorem": {
      "Descent.Portability.FiniteBinCalibrationLaw.iid_miss_probability": [],
@@ -333059,13 +333474,25 @@
      ],
      "Descent.Portability.IIDBinExperiment.iid_confidence": [
       "∀ j, 0 ≤ η j ∧ η j ≤ 1"
+     ],
+     "Descent.Portability.RareEventAbsenceRisk.sample_noEvents_restriction": [
+      "0 ≤ η ∧ η ≤ 1"
+     ],
+     "Descent.Portability.RareEventAbsenceRisk.sample_noEvents_mass": [
+      "0 ≤ η ∧ η ≤ 1"
+     ],
+     "Descent.Portability.RareEventAbsenceRisk.no_events_bayes_floor": [
+      "0 ≤ η ∧ η ≤ 1"
      ]
     }
    },
    "mentioned_by": [
     "Descent.Portability.FiniteBinCalibrationLaw.iid_miss_probability",
     "Descent.Portability.IIDBinExperiment.expectation_assignments",
-    "Descent.Portability.IIDBinExperiment.iid_confidence"
+    "Descent.Portability.IIDBinExperiment.iid_confidence",
+    "Descent.Portability.RareEventAbsenceRisk.no_events_bayes_floor",
+    "Descent.Portability.RareEventAbsenceRisk.sample_noEvents_mass",
+    "Descent.Portability.RareEventAbsenceRisk.sample_noEvents_restriction"
    ]
   },
   {
@@ -345880,6 +346307,8 @@
      "Descent.Portability.GaussianPolynomialMoments.fourth_moment": [],
      "Descent.Portability.HWECriticalMoments.critical_variance": [],
      "Descent.Portability.HWEHierarchyMoments.integer_variance": [],
+     "Descent.Portability.IIDAverageLaw.sample_sum_variance": [],
+     "Descent.Portability.IIDAverageLaw.average_variance": [],
      "Descent.Portability.IndividualLossMoments.total_variance": [],
      "Descent.Portability.IndividualLossMoments.squared_loss_between_decomposition": [],
      "Descent.Portability.IndividualLossMoments.squared_loss_total": [],
@@ -345947,6 +346376,10 @@
      "Descent.Portability.ProbitTrainingLaw.reportedRatio_bounds": [],
      "Descent.Portability.ProbitTrainingLaw.reportedSourceRatio_eq_one": [],
      "Descent.Portability.ProbitTrainingLaw.fixedData_reportedRatio_bounded": [],
+     "Descent.Portability.RareEventSampleLaw.markedEstimate_variance": [],
+     "Descent.Portability.RareEventSampleLaw.erasedEstimate_variance": [],
+     "Descent.Portability.RareEventSampleLaw.marked_sample_variance": [],
+     "Descent.Portability.RareEventSampleLaw.erased_sample_variance": [],
      "Descent.Portability.ReportFiniteCalibrationLaw.interaction_residual_variance": [],
      "Descent.Portability.TrainingNoiseAccuracy.variance_linearScore": [],
      "Descent.Portability.TrainingNoiseAccuracy.squaredCorrelation_linearScore": [],
@@ -346045,6 +346478,8 @@
     "Descent.Portability.GaussianPolynomialMoments.tilted_power_moment",
     "Descent.Portability.HWECriticalMoments.critical_variance",
     "Descent.Portability.HWEHierarchyMoments.integer_variance",
+    "Descent.Portability.IIDAverageLaw.average_variance",
+    "Descent.Portability.IIDAverageLaw.sample_sum_variance",
     "Descent.Portability.IndividualLossMoments.expected_square_shift",
     "Descent.Portability.IndividualLossMoments.fitted_squared_loss_r2_gap",
     "Descent.Portability.IndividualLossMoments.fitted_squared_loss_r2_le_oracle",
@@ -346088,6 +346523,10 @@
     "Descent.Portability.ProbitTrainingLaw.reportedSourceRatio_eq_one",
     "Descent.Portability.ProbitTrainingLaw.threshold_probabilities_sum_one",
     "Descent.Portability.ProbitTrainingLaw.threshold_probability",
+    "Descent.Portability.RareEventSampleLaw.erasedEstimate_variance",
+    "Descent.Portability.RareEventSampleLaw.erased_sample_variance",
+    "Descent.Portability.RareEventSampleLaw.markedEstimate_variance",
+    "Descent.Portability.RareEventSampleLaw.marked_sample_variance",
     "Descent.Portability.ReportFiniteCalibrationLaw.interaction_residual_variance",
     "Descent.Portability.SimulationAccuracy.squaredCorrelation_affine",
     "Descent.Portability.SimulationAccuracy.squaredCorrelation_standardized_restriction",
@@ -377666,6 +378105,248 @@
    ]
   },
   {
+   "name": "Descent.Portability.RareEventAbsenceRisk.absent",
+   "decl_name": "absent",
+   "short": "absent",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Descent/Portability/RareEventAbsenceRisk.lean",
+   "line": 25,
+   "signature": ": Set (Bool × ℝ)",
+   "args": [],
+   "ret_type": "Set (Bool × ℝ)",
+   "body": " {zy | zy.1 = false}",
+   "docstring": "A single observation with no occurrence of the named genotype event.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.RareEventAbsenceRisk",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Coalescent.manyDemeBernsteinPolynomial_zeroAncestral_eq_monomial": [],
+     "Descent.Coalescent.pderiv_manyDemeBernsteinPolynomial_prod_of_not_mem": [],
+     "Descent.Coalescent.restrictAffineManyDemeMomentState_generator_mulVec": [],
+     "Descent.Portability.RareEventAbsenceRisk.absent_measurable": [],
+     "Descent.Portability.RareEventAbsenceRisk.experiment_absent_restriction": [],
+     "Descent.Portability.RareEventAbsenceRisk.experiment_absent_mass": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Coalescent.manyDemeBernsteinPolynomial_zeroAncestral_eq_monomial",
+    "Descent.Coalescent.pderiv_manyDemeBernsteinPolynomial_prod_of_not_mem",
+    "Descent.Coalescent.restrictAffineManyDemeMomentState_generator_mulVec",
+    "Descent.Portability.RareEventAbsenceRisk.absent_measurable",
+    "Descent.Portability.RareEventAbsenceRisk.experiment_absent_mass",
+    "Descent.Portability.RareEventAbsenceRisk.experiment_absent_restriction"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RareEventAbsenceRisk.sampleLaw",
+   "decl_name": "sampleLaw",
+   "short": "sampleLaw",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/RareEventAbsenceRisk.lean",
+   "line": 28,
+   "signature": "(η : ℝ) (v : ℝ≥0) (θ : ℝ) (M : ℕ) : Measure (Fin M → Bool × ℝ)",
+   "args": [
+    {
+     "names": [
+      "η"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "v"
+     ],
+     "type": "ℝ≥0",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "θ"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "M"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "Measure (Fin M → Bool × ℝ)",
+   "body": " Measure.pi (fun _ ↦ experimentLaw η v θ)",
+   "docstring": "The actual independent marked experiment with M observations.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.RareEventAbsenceRisk",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "∀ j, 0 ≤ η j ∧ η j ≤ 1",
+     "0 ≤ η ∧ η ≤ 1"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.FiniteBinCalibrationLaw.iid_miss_probability": [],
+     "Descent.Portability.IIDBinExperiment.expectation_assignments": [
+      "∀ j, 0 ≤ η j ∧ η j ≤ 1"
+     ],
+     "Descent.Portability.IIDBinExperiment.iid_confidence": [
+      "∀ j, 0 ≤ η j ∧ η j ≤ 1"
+     ],
+     "Descent.Portability.RareEventAbsenceRisk.sample_noEvents_restriction": [
+      "0 ≤ η ∧ η ≤ 1"
+     ],
+     "Descent.Portability.RareEventAbsenceRisk.sample_noEvents_mass": [
+      "0 ≤ η ∧ η ≤ 1"
+     ],
+     "Descent.Portability.RareEventAbsenceRisk.no_events_bayes_floor": [
+      "0 ≤ η ∧ η ≤ 1"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.FiniteBinCalibrationLaw.iid_miss_probability",
+    "Descent.Portability.IIDBinExperiment.expectation_assignments",
+    "Descent.Portability.IIDBinExperiment.iid_confidence",
+    "Descent.Portability.RareEventAbsenceRisk.no_events_bayes_floor",
+    "Descent.Portability.RareEventAbsenceRisk.sample_noEvents_mass",
+    "Descent.Portability.RareEventAbsenceRisk.sample_noEvents_restriction"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RareEventAbsenceRisk.noEvents",
+   "decl_name": "noEvents",
+   "short": "noEvents",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Descent/Portability/RareEventAbsenceRisk.lean",
+   "line": 32,
+   "signature": "(M : ℕ) : Set (Fin M → Bool × ℝ)",
+   "args": [
+    {
+     "names": [
+      "M"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "Set (Fin M → Bool × ℝ)",
+   "body": " Set.univ.pi (fun _ ↦ absent)",
+   "docstring": "The measurable event that all sampled genotype-event marks are absent.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.RareEventAbsenceRisk",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.RareEventAbsenceRisk.sample_noEvents_restriction": [],
+     "Descent.Portability.RareEventAbsenceRisk.sample_noEvents_mass": [],
+     "Descent.Portability.RareEventAbsenceRisk.no_events_bayes_floor": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.RareEventAbsenceRisk.no_events_bayes_floor",
+    "Descent.Portability.RareEventAbsenceRisk.sample_noEvents_mass",
+    "Descent.Portability.RareEventAbsenceRisk.sample_noEvents_restriction"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RareEventAbsenceRisk.squaredRisk",
+   "decl_name": "squaredRisk",
+   "short": "squaredRisk",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/RareEventAbsenceRisk.lean",
+   "line": 75,
+   "signature": "{Ω : Type*} [MeasurableSpace Ω] (μ : Measure Ω) (T : Ω → ℝ) (θ : ℝ) : ℝ≥0∞",
+   "args": [
+    {
+     "names": [
+      "Ω"
+     ],
+     "type": "Type*",
+     "binder": "{}",
+     "implicit": true
+    },
+    {
+     "names": [
+      "MeasurableSpace",
+      "Ω"
+     ],
+     "type": "",
+     "binder": "[]",
+     "implicit": true
+    },
+    {
+     "names": [
+      "μ"
+     ],
+     "type": "Measure Ω",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "T"
+     ],
+     "type": "Ω → ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "θ"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ≥0∞",
+   "body": "  ∫⁻ x, ENNReal.ofReal ((T x - θ) ^ 2) ∂μ",
+   "docstring": "Extended squared-error risk, retaining infinite risk rather than totalizing its integral.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.RareEventAbsenceRisk",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "nonnegative",
+    "declared_lo": 0.0,
+    "declared_hi": null,
+    "hypotheses": [
+     "ρ ≤ μ",
+     "Measurable T"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.RareEventAbsenceRisk.common_submeasure_risk": [
+      "ρ ≤ μ",
+      "Measurable T"
+     ],
+     "Descent.Portability.RareEventAbsenceRisk.no_events_bayes_floor": [
+      "Measurable T"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.RareEventAbsenceRisk.common_submeasure_risk",
+    "Descent.Portability.RareEventAbsenceRisk.no_events_bayes_floor"
+   ]
+  },
+  {
    "name": "Descent.Portability.RareEventInformationLaw.markMass",
    "decl_name": "markMass",
    "short": "markMass",
@@ -378013,9 +378694,12 @@
     "hypotheses": [
      "0 ≤ η ∧ η ≤ 1",
      "0 < η ∧ η < 1",
-     "v ≠ 0"
+     "v ≠ 0",
+     "0 < η ∧ η ≤ 1"
     ],
     "hypotheses_by_theorem": {
+     "Descent.Portability.RareEventAbsenceRisk.experiment_absent_restriction": [],
+     "Descent.Portability.RareEventAbsenceRisk.experiment_absent_mass": [],
      "Descent.Portability.RareEventInformationLaw.experimentLaw_probability": [
       "0 ≤ η ∧ η ≤ 1"
      ],
@@ -378029,14 +378713,188 @@
      "Descent.Portability.RareEventInformationLaw.erased_fisher_integral": [
       "0 ≤ η ∧ η ≤ 1",
       "v ≠ 0"
+     ],
+     "Descent.Portability.RareEventSampleLaw.experiment_integrable": [],
+     "Descent.Portability.RareEventSampleLaw.markedEstimate_memLp": [],
+     "Descent.Portability.RareEventSampleLaw.erasedEstimate_memLp": [],
+     "Descent.Portability.RareEventSampleLaw.markedEstimate_mean": [
+      "0 < η ∧ η ≤ 1"
+     ],
+     "Descent.Portability.RareEventSampleLaw.erasedEstimate_mean": [
+      "0 < η ∧ η ≤ 1"
+     ],
+     "Descent.Portability.RareEventSampleLaw.markedEstimate_variance": [
+      "0 < η ∧ η ≤ 1"
+     ],
+     "Descent.Portability.RareEventSampleLaw.erasedEstimate_variance": [
+      "0 < η ∧ η ≤ 1"
+     ],
+     "Descent.Portability.RareEventSampleLaw.marked_sample_unbiased": [
+      "0 < η ∧ η ≤ 1"
+     ],
+     "Descent.Portability.RareEventSampleLaw.erased_sample_unbiased": [
+      "0 < η ∧ η ≤ 1"
+     ],
+     "Descent.Portability.RareEventSampleLaw.marked_sample_variance": [
+      "0 < η ∧ η ≤ 1"
+     ],
+     "Descent.Portability.RareEventSampleLaw.erased_sample_variance": [
+      "0 < η ∧ η ≤ 1"
      ]
     }
    },
    "mentioned_by": [
+    "Descent.Portability.RareEventAbsenceRisk.experiment_absent_mass",
+    "Descent.Portability.RareEventAbsenceRisk.experiment_absent_restriction",
     "Descent.Portability.RareEventInformationLaw.erased_fisher_integral",
     "Descent.Portability.RareEventInformationLaw.experimentExpectation_eq_integral",
     "Descent.Portability.RareEventInformationLaw.experimentLaw_probability",
-    "Descent.Portability.RareEventInformationLaw.marked_fisher_integral"
+    "Descent.Portability.RareEventInformationLaw.marked_fisher_integral",
+    "Descent.Portability.RareEventSampleLaw.erasedEstimate_mean",
+    "Descent.Portability.RareEventSampleLaw.erasedEstimate_memLp",
+    "Descent.Portability.RareEventSampleLaw.erasedEstimate_variance",
+    "Descent.Portability.RareEventSampleLaw.erased_sample_unbiased",
+    "Descent.Portability.RareEventSampleLaw.erased_sample_variance",
+    "Descent.Portability.RareEventSampleLaw.experiment_integrable",
+    "Descent.Portability.RareEventSampleLaw.markedEstimate_mean",
+    "Descent.Portability.RareEventSampleLaw.markedEstimate_memLp",
+    "Descent.Portability.RareEventSampleLaw.markedEstimate_variance",
+    "Descent.Portability.RareEventSampleLaw.marked_sample_unbiased",
+    "Descent.Portability.RareEventSampleLaw.marked_sample_variance"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RareEventSampleLaw.markedEstimate",
+   "decl_name": "markedEstimate",
+   "short": "markedEstimate",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/RareEventSampleLaw.lean",
+   "line": 25,
+   "signature": "(η : ℝ) (zy : Bool × ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "η"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "zy"
+     ],
+     "type": "Bool × ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  if zy.1 then zy.2 / η else 0",
+   "docstring": "The observed-event inverse-probability statistic.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.RareEventSampleLaw",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "probability",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0,
+    "hypotheses": [
+     "0 < η ∧ η ≤ 1"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.RareEventSampleLaw.markedEstimate_measurable": [],
+     "Descent.Portability.RareEventSampleLaw.markedEstimate_memLp": [],
+     "Descent.Portability.RareEventSampleLaw.markedEstimate_mean": [
+      "0 < η ∧ η ≤ 1"
+     ],
+     "Descent.Portability.RareEventSampleLaw.markedEstimate_variance": [
+      "0 < η ∧ η ≤ 1"
+     ],
+     "Descent.Portability.RareEventSampleLaw.marked_sample_unbiased": [
+      "0 < η ∧ η ≤ 1"
+     ],
+     "Descent.Portability.RareEventSampleLaw.marked_sample_variance": [
+      "0 < η ∧ η ≤ 1"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.RareEventSampleLaw.markedEstimate_mean",
+    "Descent.Portability.RareEventSampleLaw.markedEstimate_measurable",
+    "Descent.Portability.RareEventSampleLaw.markedEstimate_memLp",
+    "Descent.Portability.RareEventSampleLaw.markedEstimate_variance",
+    "Descent.Portability.RareEventSampleLaw.marked_sample_unbiased",
+    "Descent.Portability.RareEventSampleLaw.marked_sample_variance"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RareEventSampleLaw.erasedEstimate",
+   "decl_name": "erasedEstimate",
+   "short": "erasedEstimate",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/RareEventSampleLaw.lean",
+   "line": 29,
+   "signature": "(η : ℝ) (zy : Bool × ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "η"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "zy"
+     ],
+     "type": "Bool × ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": " zy.2 / η",
+   "docstring": "The inverse-probability statistic using only the phenotype.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.RareEventSampleLaw",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "probability",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0,
+    "hypotheses": [
+     "0 < η ∧ η ≤ 1"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.RareEventSampleLaw.erasedEstimate_measurable": [],
+     "Descent.Portability.RareEventSampleLaw.erasedEstimate_memLp": [],
+     "Descent.Portability.RareEventSampleLaw.erasedEstimate_mean": [
+      "0 < η ∧ η ≤ 1"
+     ],
+     "Descent.Portability.RareEventSampleLaw.erasedEstimate_variance": [
+      "0 < η ∧ η ≤ 1"
+     ],
+     "Descent.Portability.RareEventSampleLaw.erased_sample_unbiased": [
+      "0 < η ∧ η ≤ 1"
+     ],
+     "Descent.Portability.RareEventSampleLaw.erased_sample_variance": [
+      "0 < η ∧ η ≤ 1"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.RareEventSampleLaw.erasedEstimate_mean",
+    "Descent.Portability.RareEventSampleLaw.erasedEstimate_measurable",
+    "Descent.Portability.RareEventSampleLaw.erasedEstimate_memLp",
+    "Descent.Portability.RareEventSampleLaw.erasedEstimate_variance",
+    "Descent.Portability.RareEventSampleLaw.erased_sample_unbiased",
+    "Descent.Portability.RareEventSampleLaw.erased_sample_variance"
    ]
   },
   {
