@@ -203,34 +203,27 @@ theorem twoLocusHaplotypeMean_stepDirection (frequency : TwoLocusHaplotypeFreque
   rw [hfun, twoLocusHaplotypeMean_sub_const]
   ring
 
-/-- One single-draw step keeps every coordinate nonnegative: with at least one chromosome
-drawn it is the convex combination `(1 - 1 / N) * x b + (1 / N) * e b`, and with `N = 0` the
-division convention leaves the coordinate alone. -/
-theorem resampleStep_coordinate_nonneg (frequency : TwoLocusHaplotypeFrequencies) (N : ℕ)
-    (drawn observed : TwoLocusHaplotype) :
+/-- One single-draw step keeps every coordinate nonnegative whenever its step fraction lies
+in `[0, 1]`: the coordinate is then the convex combination
+`(1 - fraction) * x b + fraction * e b`.  A population of `N` chromosomes steps by the
+fraction `1 / N`, which lies in `[0, 1]` for every `N`; at `N = 0` it is zero and the step is
+the identity. -/
+theorem resampleStep_coordinate_nonneg (frequency : TwoLocusHaplotypeFrequencies) {fraction : ℝ}
+    (hlow : 0 ≤ fraction) (hhigh : fraction ≤ 1) (drawn observed : TwoLocusHaplotype) :
     0 ≤ haplotypeCoordinate frequency observed +
-      stepDirection frequency drawn observed / N := by
+      fraction * stepDirection frequency drawn observed := by
   have hcoord := haplotypeCoordinate_nonneg frequency observed
-  rcases Nat.eq_zero_or_pos N with hN | hN
-  · subst hN
-    simpa using hcoord
-  · have hNpos : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hN
-    have hNone : (1 : ℝ) ≤ (N : ℝ) := by exact_mod_cast hN
-    have hfrac : (1 : ℝ) / (N : ℝ) ≤ 1 := by
-      rw [div_le_one hNpos]
-      exact hNone
-    have hfracnn : (0 : ℝ) ≤ 1 / (N : ℝ) := by positivity
-    have hind : 0 ≤ twoLocusHaplotypeIndicator drawn observed := by
-      simp only [twoLocusHaplotypeIndicator]
-      split <;> norm_num
-    have hconvex : haplotypeCoordinate frequency observed +
-        stepDirection frequency drawn observed / (N : ℝ) =
-        haplotypeCoordinate frequency observed * (1 - 1 / (N : ℝ)) +
-          twoLocusHaplotypeIndicator drawn observed * (1 / (N : ℝ)) := by
-      simp only [stepDirection]
-      ring
-    rw [hconvex]
-    exact add_nonneg (mul_nonneg hcoord (by linarith)) (mul_nonneg hind hfracnn)
+  have hind : 0 ≤ twoLocusHaplotypeIndicator drawn observed := by
+    simp only [twoLocusHaplotypeIndicator]
+    split <;> norm_num
+  have hconvex : haplotypeCoordinate frequency observed +
+      fraction * stepDirection frequency drawn observed =
+      haplotypeCoordinate frequency observed * (1 - fraction) +
+        twoLocusHaplotypeIndicator drawn observed * fraction := by
+    simp only [stepDirection]
+    ring
+  rw [hconvex]
+  exact add_nonneg (mul_nonneg hcoord (by linarith)) (mul_nonneg hind hlow)
 
 /-- One single-draw (Moran-type) resampling step in a population of `N` chromosomes: a
 haplotype is drawn and the frequency vector moves a fraction `1 / N` of the way toward that
@@ -241,10 +234,18 @@ def resampleStep (frequency : TwoLocusHaplotypeFrequencies) (N : ℕ)
   Ab := frequency.Ab + stepDirection frequency drawn .Ab / N
   aB := frequency.aB + stepDirection frequency drawn .aB / N
   ab := frequency.ab + stepDirection frequency drawn .ab / N
-  AB_nonneg := resampleStep_coordinate_nonneg frequency N drawn .AB
-  Ab_nonneg := resampleStep_coordinate_nonneg frequency N drawn .Ab
-  aB_nonneg := resampleStep_coordinate_nonneg frequency N drawn .aB
-  ab_nonneg := resampleStep_coordinate_nonneg frequency N drawn .ab
+  AB_nonneg := by
+    rw [div_eq_inv_mul]
+    exact resampleStep_coordinate_nonneg frequency (by positivity) N.cast_inv_le_one drawn .AB
+  Ab_nonneg := by
+    rw [div_eq_inv_mul]
+    exact resampleStep_coordinate_nonneg frequency (by positivity) N.cast_inv_le_one drawn .Ab
+  aB_nonneg := by
+    rw [div_eq_inv_mul]
+    exact resampleStep_coordinate_nonneg frequency (by positivity) N.cast_inv_le_one drawn .aB
+  ab_nonneg := by
+    rw [div_eq_inv_mul]
+    exact resampleStep_coordinate_nonneg frequency (by positivity) N.cast_inv_le_one drawn .ab
   total_eq_one := by
     have htotal := frequency.total_eq_one
     have hsum : stepDirection frequency drawn .AB + stepDirection frequency drawn .Ab +
