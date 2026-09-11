@@ -173817,7 +173817,7 @@
   "selfcheck": {
    "finite_points": 7,
    "total_points": 8,
-   "error": "ValueError('expected a number in range from -1 up to 1, got 1.2504691881674868')"
+   "error": "ValueError('math domain error')"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -173871,7 +173871,7 @@
   "selfcheck": {
    "finite_points": 6,
    "total_points": 8,
-   "error": "ValueError('expected a number in range from -1 up to 1, got 1.1430754740893918')"
+   "error": "ValueError('math domain error')"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -290542,7 +290542,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Program/OpenQuestions.lean",
-  "line": 939,
+  "line": 946,
   "short": "combinedPortability",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -290615,7 +290615,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Program/OpenQuestions.lean",
-  "line": 1050,
+  "line": 1057,
   "short": "snrPortabilityRatio",
   "ret_type": "ℝ",
   "empirical_status": "",
