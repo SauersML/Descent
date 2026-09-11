@@ -98,7 +98,7 @@ theorem lowOrderLDDrift_addRates {D : ℕ} (first second : ManyDemeLDRates D)
     (moment : LowOrderLDCoordinate D → ℝ) (coordinate : LowOrderLDCoordinate D) :
     lowOrderLDDrift (addRates first second) moment coordinate =
       lowOrderLDDrift first moment coordinate + lowOrderLDDrift second moment coordinate := by
-  cases coordinate <;> simp only [lowOrderLDDrift, addRates] <;> split_ifs <;> ring
+  cases coordinate <;> simp only [lowOrderLDDrift, addRates, ite_add_ite] <;> ring_nf
 
 theorem lowOrderLDMigration_addRates {D : ℕ} (first second : ManyDemeLDRates D)
     (moment : LowOrderLDCoordinate D → ℝ) (coordinate : LowOrderLDCoordinate D) :
@@ -176,7 +176,7 @@ theorem lowOrderLDDrift_scaleRates {D : ℕ} (factor : ℝ) (hfactor : 0 < facto
     (coordinate : LowOrderLDCoordinate D) :
     lowOrderLDDrift (scaleRates factor hfactor rates) moment coordinate =
       factor * lowOrderLDDrift rates moment coordinate := by
-  cases coordinate <;> simp only [lowOrderLDDrift, scaleRates] <;> split_ifs <;> ring
+  cases coordinate <;> simp only [lowOrderLDDrift, scaleRates, mul_ite] <;> ring_nf
 
 theorem lowOrderLDMigration_scaleRates {D : ℕ} (factor : ℝ) (hfactor : 0 < factor)
     (rates : ManyDemeLDRates D) (moment : LowOrderLDCoordinate D → ℝ)
