@@ -21,6 +21,7 @@ open Descent.Portability.EmpiricalCorrelationDefinedness
 #print axioms expectation_scoreIndicator
 #print axioms expectation_outcomeIndicator
 #print axioms expectation_cellIndicator
+#print axioms cellIndicator_mul
 #print axioms cohort_expectation_prod
 #print axioms sum_mass_all_score
 #print axioms sum_mass_all_outcome

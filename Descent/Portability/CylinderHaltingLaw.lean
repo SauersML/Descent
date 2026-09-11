@@ -538,10 +538,9 @@ theorem exists_waitingWord_cylinder {stream : ℕ → Bool}
   rcases Nat.lt_succ_iff_lt_or_eq.mp hindex with hbefore | hat
   · have hfalse : stream index = false :=
       Bool.eq_false_iff.mpr (Nat.find_min htrue hbefore)
-    simp [List.getD_eq_getElem?_getD, List.getElem?_append_left, List.getElem?_replicate,
-      hbefore, hfalse]
+    simp [List.getD_eq_getElem?_getD, List.getElem?_append_left, hbefore, hfalse]
   · have htrueAt : stream (Nat.find htrue) = true := Nat.find_spec htrue
-    simp [List.getD_eq_getElem?_getD, List.getElem?_append_right, hat, htrueAt]
+    simp [List.getD_eq_getElem?_getD, hat, htrueAt]
 
 /-- The program that waits for a `true` bit halts almost surely: its halting cylinders cover
 every stream containing a `true` bit, and the remaining all-`false` stream is null. -/

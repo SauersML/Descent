@@ -10,6 +10,10 @@ open Descent.Portability.PulseHistoryRealization
 #print axioms slotAverage
 #print axioms contrastStencil
 #print axioms pulseMoment
+#print axioms slotAverage_add
+#print axioms slotAverage_smul
+#print axioms contrastStencil_add
+#print axioms contrastStencil_smul
 #print axioms pulseMomentMap
 #print axioms lowOrderLDPulseTransform
 #print axioms lowOrderLDPulseTransform_mulVec

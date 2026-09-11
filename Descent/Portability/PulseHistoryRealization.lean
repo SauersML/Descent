@@ -114,20 +114,54 @@ def pulseMoment {D : ℕ} (alpha : ℝ) (source recipient : Fin D)
           slotAverage alpha source recipient third fun c ↦
             slotAverage alpha source recipient fourth fun e ↦ state (some (.pi2 a b c e))
 
-/-- The pulse moment map is linear in the moment vector. -/
+/-- A slot average is additive in the deme-indexed quantity it averages. -/
+theorem slotAverage_add {D : ℕ} (alpha : ℝ) (source recipient deme : Fin D)
+    (first second : Fin D → ℝ) :
+    (slotAverage alpha source recipient deme fun a ↦ first a + second a) =
+      slotAverage alpha source recipient deme first +
+        slotAverage alpha source recipient deme second := by
+  unfold slotAverage
+  split_ifs <;> ring
+
+/-- A slot average is homogeneous in the deme-indexed quantity it averages. -/
+theorem slotAverage_smul {D : ℕ} (alpha : ℝ) (source recipient deme : Fin D) (scalar : ℝ)
+    (value : Fin D → ℝ) :
+    (slotAverage alpha source recipient deme fun a ↦ scalar * value a) =
+      scalar * slotAverage alpha source recipient deme value := by
+  unfold slotAverage
+  split_ifs <;> ring
+
+/-- The contrast stencil is additive in the quantity it reads. -/
+theorem contrastStencil_add {D : ℕ} (source recipient : Fin D)
+    (first second : Fin D → Fin D → ℝ) :
+    (contrastStencil source recipient fun x y ↦ first x y + second x y) =
+      contrastStencil source recipient first + contrastStencil source recipient second := by
+  unfold contrastStencil
+  ring
+
+/-- The contrast stencil is homogeneous in the quantity it reads. -/
+theorem contrastStencil_smul {D : ℕ} (source recipient : Fin D) (scalar : ℝ)
+    (value : Fin D → Fin D → ℝ) :
+    (contrastStencil source recipient fun x y ↦ scalar * value x y) =
+      scalar * contrastStencil source recipient value := by
+  unfold contrastStencil
+  ring
+
+/-- The pulse moment map is linear in the moment vector: every row is built from slot averages
+and contrast stencils, each linear in what it reads. -/
 def pulseMomentMap {D : ℕ} (alpha : ℝ) (source recipient : Fin D) :
     (AffineLowOrderLDCoordinate D → ℝ) →ₗ[ℝ] (AffineLowOrderLDCoordinate D → ℝ) where
   toFun := pulseMoment alpha source recipient
   map_add' first second := by
     funext coordinate
     rcases coordinate with _ | (⟨i, j⟩ | ⟨i, j⟩ | ⟨i, j, k⟩ | ⟨i, j, k, l⟩) <;>
-      simp only [pulseMoment, slotAverage, contrastStencil, Pi.add_apply] <;>
+      simp only [pulseMoment, Pi.add_apply, slotAverage_add, contrastStencil_add] <;>
       (try split_ifs) <;> ring
   map_smul' scalar state := by
     funext coordinate
     rcases coordinate with _ | (⟨i, j⟩ | ⟨i, j⟩ | ⟨i, j, k⟩ | ⟨i, j, k, l⟩) <;>
-      simp only [pulseMoment, slotAverage, contrastStencil, Pi.smul_apply, smul_eq_mul,
-        RingHom.id_apply] <;>
+      simp only [pulseMoment, Pi.smul_apply, smul_eq_mul, RingHom.id_apply, slotAverage_smul,
+        contrastStencil_smul] <;>
       (try split_ifs) <;> ring
 
 /-- **The finite matrix of an admixture pulse on the stored low-order coordinates.** -/

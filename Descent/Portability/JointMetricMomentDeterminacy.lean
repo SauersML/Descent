@@ -292,6 +292,7 @@ def metricVector (num den : Metric → Ω → ℝ) (hnum : ∀ index point, 0 �
       ⟨ratioOnDefined_nonneg (num index) (den index) (hnum index) point,
         ratioOnDefined_le_one (num index) (den index) (hle index) point⟩⟩
 
+omit [Fintype Metric] [DecidableEq Metric] in
 /-- The metric vector of a measurable family is measurable. -/
 theorem measurable_metricVector (num den : Metric → Ω → ℝ)
     (hnumMeasurable : ∀ index, Measurable (num index))
@@ -330,7 +331,12 @@ theorem measurableSet_maskEvent (den : Metric → Ω → ℝ)
   refine MeasurableSet.iInter fun index ↦ ?_
   by_cases hmem : index ∈ selected
   · simpa [hmem] using measurableSet_lt measurable_const (hdenMeasurable index)
-  · simpa [hmem] using (measurableSet_lt measurable_const (hdenMeasurable index)).compl
+  · have hcomplement : {point | 0 < den index point ↔ index ∈ selected} =
+        {point | 0 < den index point}ᶜ := by
+      ext point
+      simp [hmem]
+    rw [hcomplement]
+    exact (measurableSet_lt measurable_const (hdenMeasurable index)).compl
 
 /-- The joint moment of a pushed-forward metric vector law is the population integral of the
 product of the metrics raised to the multi-index. -/
@@ -382,6 +388,7 @@ theorem integral_multiIndexRatio_eq_moment (μ : Measure Ω) (num den : Metric �
     simp only [ratioOnDefined, hjointZero, lt_self_iff_false, Set.indicator_apply, hnotMem,
       ↓reduceIte]
 
+omit [DecidableEq Metric] in
 /-- The multi-index numerator of a measurable family is measurable. -/
 theorem measurable_multiIndexNumerator (num den : Metric → Ω → ℝ)
     (hnumMeasurable : ∀ index, Measurable (num index))
@@ -390,6 +397,7 @@ theorem measurable_multiIndexNumerator (num den : Metric → Ω → ℝ)
   Finset.measurable_prod _ fun index _ ↦
     ((hnumMeasurable index).pow_const _).mul ((hdenMeasurable index).pow_const _)
 
+omit [DecidableEq Metric] in
 /-- The multi-index denominator of a measurable family is measurable. -/
 theorem measurable_multiIndexDenominator (den : Metric → Ω → ℝ)
     (hdenMeasurable : ∀ index, Measurable (den index)) (order : Metric → ℕ) :
@@ -467,6 +475,7 @@ def subfamilyDenominator (den : Metric → Ω → ℝ) (subfamily : Finset Metri
     Metric → Ω → ℝ :=
   fun index point ↦ if index ∈ subfamily then den index point else 1
 
+omit [MeasurableSpace Ω] in
 /-- Setting the denominators outside a subfamily to one turns the common defined event into
 the event on which that subfamily is defined. -/
 theorem definedDomain_subfamilyDenominator (den : Metric → Ω → ℝ)
@@ -521,9 +530,13 @@ theorem subfamily_moment_eq_tsum (μ : Measure Ω) [IsProbabilityMeasure μ]
       ∀ index, Measurable (subfamilyDenominator den subfamily index) := by
     intro index
     by_cases hindex : index ∈ subfamily
-    · simp only [subfamilyDenominator, hindex, ↓reduceIte]
+    · have hsame : subfamilyDenominator den subfamily index = den index :=
+        funext fun point ↦ by simp [subfamilyDenominator, hindex]
+      rw [hsame]
       exact hdenMeasurable index
-    · simp only [subfamilyDenominator, hindex, ↓reduceIte]
+    · have hsame : subfamilyDenominator den subfamily index = fun _ ↦ 1 :=
+        funext fun point ↦ by simp [subfamilyDenominator, hindex]
+      rw [hsame]
       exact measurable_const
   have hproduct : ∀ point,
       ∏ index, ratioOnDefined (num index) (den index) point ^ order index =
@@ -545,6 +558,7 @@ theorem subfamily_moment_eq_tsum (μ : Measure Ω) [IsProbabilityMeasure μ]
 def definedIndicators (den : Metric → Ω → ℝ) : Metric → Ω → ℝ :=
   fun index point ↦ if 0 < den index point then 1 else 0
 
+omit [MeasurableSpace Ω] in
 /-- The mask statistic of `JointRatioFailureMasks`, evaluated on the definedness indicators, is
 the indicator of the failure-mask event. -/
 theorem maskStatistic_definedIndicators (den : Metric → Ω → ℝ) (selected : Finset Metric)
@@ -573,6 +587,7 @@ theorem maskStatistic_definedIndicators (den : Metric → Ω → ℝ) (selected 
       exact maskStatistic_eq_zero_of_not_mem _ selected point index
         (Finset.mem_compl.mpr hmem) (by simp [definedIndicators, hpos])
 
+omit [MeasurableSpace Ω] in
 /-- The product of the definedness indicators over a subfamily is the indicator of the event
 on which every metric of the subfamily is defined. -/
 theorem prod_definedIndicators (den : Metric → Ω → ℝ) (subfamily : Finset Metric)
@@ -654,6 +669,7 @@ theorem masked_moment_expansion (μ : Measure Ω) [IsProbabilityMeasure μ]
   rw [integral_const_mul,
     integral_indicator (measurableSet_definedDomain den hdenMeasurable (selected ∪ subset))]
 
+omit [DecidableEq Metric] in
 /-- On a failure mask every metric outside the mask reads zero, so a metric monomial with a
 positive exponent outside the mask has zero moment on the mask. -/
 theorem masked_moment_eq_zero (μ : Measure Ω) (num den : Metric → Ω → ℝ)

@@ -303,6 +303,20 @@ theorem expectation_cellIndicator (law : FiniteReportLaw (Bool × Bool))
     (target : Bool × Bool) : law.expectation (cellIndicator target) = law.mass target := by
   simp [FiniteReportLaw.expectation, cellIndicator, Descent.Core.kronecker, Finset.sum_ite_eq']
 
+/-- The cell indicators are orthogonal idempotents: at one report, the product of the
+indicators of two cells is the corpus Kronecker delta of the two cells times either
+indicator. -/
+theorem cellIndicator_mul (target other cell : Bool × Bool) :
+    cellIndicator target cell * cellIndicator other cell =
+      Descent.Core.kronecker target other * cellIndicator target cell := by
+  simp only [cellIndicator, Descent.Core.kronecker]
+  by_cases htarget : cell = target
+  · by_cases hother : cell = other
+    · rw [if_pos htarget, if_pos hother, if_pos (htarget.symm.trans hother)]
+    · rw [if_pos htarget, if_neg hother, if_neg fun hsame ↦ hother (htarget.trans hsame),
+        mul_zero, zero_mul]
+  · rw [if_neg htarget, zero_mul, mul_zero]
+
 /-- Under the independent cohort law the expectation of a product over the members is the
 member expectation raised to the cohort size. -/
 theorem cohort_expectation_prod (law : FiniteReportLaw (Bool × Bool)) (n : ℕ)
