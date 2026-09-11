@@ -887,6 +887,100 @@ theorem measure_eq_of_measureLaplace_eq (first second : Measure ℝ)
   measure_eq_of_measureLaplace_natCast_eq first second bound hfirst hsecond
     fun scale ↦ hlaplace scale (Nat.cast_nonneg scale)
 
+/-- Assumes: a finite measure carried by `[0, R]`. For every `k`, the `k`-th derivative of the
+scaled moment transform `λ ↦ c ∫ (-b)^j e^{-λ b} ν(db)` is `c ∫ (-b)^(j+k) e^{-λ b} ν(db)`. -/
+theorem iteratedDeriv_const_mul_momentLaplace (exposureLaw : Measure ℝ)
+    [IsFiniteMeasure exposureLaw] (bound : ℝ)
+    (hsupport : ∀ᵐ exposure ∂exposureLaw, exposure ∈ Set.Icc 0 bound) (factor : ℝ)
+    (start order : ℕ) :
+    iteratedDeriv order (fun lam ↦
+        factor * ∫ exposure, (-exposure) ^ start * Real.exp (-(lam * exposure)) ∂exposureLaw) =
+      fun lam ↦ factor *
+        ∫ exposure, (-exposure) ^ (start + order) * Real.exp (-(lam * exposure))
+          ∂exposureLaw := by
+  induction order with
+  | zero =>
+    funext lam
+    simp [iteratedDeriv_zero]
+  | succ order ih =>
+    rw [iteratedDeriv_succ, ih]
+    funext lam
+    rw [← add_assoc]
+    exact ((hasDerivAt_momentLaplace exposureLaw bound hsupport (start + order) lam).const_mul
+      factor).deriv
+
+/-- NOTE1 section 6.3, the raw Brier curve. Assumes: a finite measure carried by `[0, R]` and
+`h ≥ 0`. Under recombination scaling the Brier loss `2h(1 - C(λ))` of NOTE1 (31) has a completely
+monotone derivative: `(-1)^k` times its `(k + 1)`-th derivative is nonnegative, so in particular
+it increases with the multiplier `λ`. -/
+theorem sign_iteratedDeriv_brierCurve (exposureLaw : Measure ℝ) [IsFiniteMeasure exposureLaw]
+    (bound : ℝ) (hsupport : ∀ᵐ exposure ∂exposureLaw, exposure ∈ Set.Icc 0 bound) (h : ℝ)
+    (hh : 0 ≤ h) (order : ℕ) (lam : ℝ) :
+    0 ≤ (-1 : ℝ) ^ order *
+      iteratedDeriv (order + 1) (fun scale ↦ 2 * h * (1 - measureLaplace exposureLaw scale))
+        lam := by
+  have hderiv : deriv (fun scale ↦ 2 * h * (1 - measureLaplace exposureLaw scale)) =
+      fun scale ↦ -(2 * h) *
+        ∫ exposure, (-exposure) ^ 1 * Real.exp (-(scale * exposure)) ∂exposureLaw := by
+    funext scale
+    have hbase := hasDerivAt_momentLaplace exposureLaw bound hsupport 0 scale
+    simp only [pow_zero, one_mul, zero_add] at hbase
+    exact ((hbase.const_sub 1).const_mul (2 * h)).deriv.trans (by ring)
+  rw [iteratedDeriv_succ', hderiv,
+    iteratedDeriv_const_mul_momentLaplace exposureLaw bound hsupport]
+  show 0 ≤ (-1 : ℝ) ^ order * (-(2 * h) *
+    ∫ exposure, (-exposure) ^ (1 + order) * Real.exp (-(lam * exposure)) ∂exposureLaw)
+  have hintegral : 0 ≤ ∫ exposure, (-1 : ℝ) ^ (1 + order) *
+      ((-exposure) ^ (1 + order) * Real.exp (-(lam * exposure))) ∂exposureLaw := by
+    refine integral_nonneg_of_ae (hsupport.mono fun exposure hexposure ↦ ?_)
+    show 0 ≤ (-1 : ℝ) ^ (1 + order) * ((-exposure) ^ (1 + order) * Real.exp (-(lam * exposure)))
+    rw [← mul_assoc, ← mul_pow, show (-1 : ℝ) * -exposure = exposure from by ring]
+    exact mul_nonneg (pow_nonneg hexposure.1 _) (Real.exp_pos _).le
+  rw [integral_const_mul] at hintegral
+  have hsign : (-1 : ℝ) ^ order * (-(2 * h) *
+      ∫ exposure, (-exposure) ^ (1 + order) * Real.exp (-(lam * exposure)) ∂exposureLaw) =
+        2 * h * ((-1 : ℝ) ^ (1 + order) *
+          ∫ exposure, (-exposure) ^ (1 + order) * Real.exp (-(lam * exposure)) ∂exposureLaw) := by
+    ring
+  rw [hsign]
+  exact mul_nonneg (mul_nonneg (by norm_num) hh) hintegral
+
+/-- Assumes: a finite measure carried by `[0, R]`. Its self-convolution `ν ∗ ν`, the law of the
+sum of two independent exposures, is carried by `[0, 2R]`. -/
+theorem conv_ae_mem_Icc (exposureLaw : Measure ℝ) [IsFiniteMeasure exposureLaw] (bound : ℝ)
+    (hsupport : ∀ᵐ exposure ∂exposureLaw, exposure ∈ Set.Icc 0 bound) :
+    ∀ᵐ exposure ∂Measure.conv exposureLaw exposureLaw, exposure ∈ Set.Icc 0 (2 * bound) := by
+  have hadd : Measurable fun pair : ℝ × ℝ ↦ pair.1 + pair.2 := by fun_prop
+  unfold Measure.conv
+  refine (ae_map_iff hadd.aemeasurable
+    (measurableSet_Icc : MeasurableSet (Set.Icc (0 : ℝ) (2 * bound)))).mpr ?_
+  refine (Measure.ae_prod_iff_ae_ae
+    (hadd (measurableSet_Icc : MeasurableSet (Set.Icc (0 : ℝ) (2 * bound))))).mpr ?_
+  refine hsupport.mono fun first hfirst ↦ hsupport.mono fun second hsecond ↦ ?_
+  show first + second ∈ Set.Icc 0 (2 * bound)
+  exact Set.mem_Icc.mpr ⟨by linarith [hfirst.1, hsecond.1], by linarith [hfirst.2, hsecond.2]⟩
+
+/-- NOTE1 section 6.3, the repaired Brier curve. Assumes: a finite measure carried by `[0, R]`
+and `h ≥ 0`. The population-optimal repaired Brier `h(1 - C(λ)²)` of NOTE1 (31) has a completely
+monotone derivative, so it increases with the multiplier `λ`: `C²` is the transform of `ν ∗ ν`,
+which is carried by `[0, 2R]`. -/
+theorem sign_iteratedDeriv_repairedBrierCurve (exposureLaw : Measure ℝ)
+    [IsFiniteMeasure exposureLaw] (bound : ℝ)
+    (hsupport : ∀ᵐ exposure ∂exposureLaw, exposure ∈ Set.Icc 0 bound) (h : ℝ) (hh : 0 ≤ h)
+    (order : ℕ) (lam : ℝ) :
+    0 ≤ (-1 : ℝ) ^ order *
+      iteratedDeriv (order + 1) (fun scale ↦ h * (1 - measureLaplace exposureLaw scale ^ 2))
+        lam := by
+  have hcurve : (fun scale ↦ h * (1 - measureLaplace exposureLaw scale ^ 2)) =
+      fun scale ↦ 2 * (h / 2) *
+        (1 - measureLaplace (Measure.conv exposureLaw exposureLaw) scale) := by
+    funext scale
+    rw [measureLaplace_conv]
+    ring
+  rw [hcurve]
+  exact sign_iteratedDeriv_brierCurve (Measure.conv exposureLaw exposureLaw) (2 * bound)
+    (conv_ae_mem_Icc exposureLaw bound hsupport) (h / 2) (by linarith) order lam
+
 end
 
 end Descent.Portability.ExposureLaplaceConstraints

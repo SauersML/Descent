@@ -48,3 +48,9 @@ open Descent.Portability.ExposureLaplaceConstraints
 #print axioms
   Descent.Portability.ExposureLaplaceConstraints.measure_eq_of_measureLaplace_natCast_eq
 #print axioms Descent.Portability.ExposureLaplaceConstraints.measure_eq_of_measureLaplace_eq
+#print axioms
+  Descent.Portability.ExposureLaplaceConstraints.iteratedDeriv_const_mul_momentLaplace
+#print axioms Descent.Portability.ExposureLaplaceConstraints.sign_iteratedDeriv_brierCurve
+#print axioms Descent.Portability.ExposureLaplaceConstraints.conv_ae_mem_Icc
+#print axioms
+  Descent.Portability.ExposureLaplaceConstraints.sign_iteratedDeriv_repairedBrierCurve
