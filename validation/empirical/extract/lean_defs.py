@@ -4153,6 +4153,12 @@ def homoMass(h):
 def heteroMass(h):
     return _rt.rdiv(((4.0 * _rt.lpow(((_rt._proj(h, 'altFreq') - _rt.rdiv(1.0, 2.0))), 2.0)) * _rt.rabs((_rt._proj(h, 'altFreq') - _rt.rdiv(1.0, 2.0)))), _rt.rsqrt(((_rt._proj(h, 'altFreq') * ((1.0 - _rt._proj(h, 'altFreq')))))))
 
+def lognormal(K, c):
+    return _rt._proj((centeredGaussian(((4.0 * K)))), 'map')((show(AEMeasurable, ((lambda x, ℝ: (c * _rt.rexp(((-x)))))), _, by, fun_prop)))
+
+def signedLognormal(K, c):
+    return blend((_rt.rdiv(1.0, 2.0)), (by(norm_num)), (by(norm_num)), (lognormal(K, c)), (lognormal(K, ((-c)))))
+
 def heterozygote(*_a):
     if len(_a) < 1:
         return lambda *_b: heterozygote(*(_a + _b))

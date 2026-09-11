@@ -276,6 +276,9 @@ import Descent.Portability.HWEAbsoluteLocusLaw
 import Descent.Portability.HWEAbsoluteLocusBounds
 import Descent.Portability.HWEExceptionalAmplitude
 import Descent.Portability.HWEExceptionalLimit
+import Descent.Portability.FiniteL1BoundedTests
+import Descent.Portability.HWEAmplitudeMixture
+import Descent.Portability.HWEAmplitudeWeakLimit
 assert_below Descent.Program
 
 /-!

@@ -1,7 +1,7 @@
 {
  "_NOT_AUTHORITATIVE": "The committed copy of this file is STALE BY CONSTRUCTION: the Lean corpus moves every few minutes and this is a cache of it. Do not consume a committed copy -- run validation/extract/emit.py in your own worktree immediately before use, and call api.require_fresh(), which raises if the table does not describe the Lean on disk.",
- "source_digest": "sha256:a291904f46ed1d5b02e8af23f2f566b7",
- "source_files": 584,
+ "source_digest": "sha256:129178676e8b0b1bd0dab92ed4dabc1f",
+ "source_files": 586,
  "collisions": {},
  "theorems": [
   {
@@ -73566,7 +73566,7 @@
    "name": "Descent.Portability.FiniteL1BoundedTests.expectation_bound",
    "kind": "theorem",
    "file": "Descent/Portability/FiniteL1BoundedTests.lean",
-   "line": 44,
+   "line": 45,
    "statement": "{α : Type*} [Fintype α] (p : FiniteReportLaw α) (z : α → ℝ) (f : ℝ →ᵇ ℝ) (η C : ℝ) (hf : ∀ x : ℝ, |f x - f 0| ≤ η + C * |x|) : |p.expectation (fun x ↦ f (z x)) - f 0| ≤ η + C * p.expectation (fun x ↦ |z x|)",
    "mentions": [
     "expectation"
@@ -73576,7 +73576,7 @@
    "name": "Descent.Portability.FiniteL1BoundedTests.test_limit",
    "kind": "theorem",
    "file": "Descent/Portability/FiniteL1BoundedTests.lean",
-   "line": 70,
+   "line": 71,
    "statement": "{α : ℕ → Type*} [∀ m, Fintype (α m)] (p : (m : ℕ) → FiniteReportLaw (α m)) (z : (m : ℕ) → α m → ℝ) (hL1 : Tendsto (fun m ↦ (p m).expectation (fun x ↦ |z m x|)) atTop (𝓝 0)) (f : ℝ →ᵇ ℝ) : Tendsto (fun m ↦ (p m).expectation (fun x ↦ f (z m x))) atTop (𝓝 (f 0))",
    "mentions": [
     "expectation"
@@ -76727,6 +76727,115 @@
    "statement": "(h : HardyWeinbergModel) : homoMass h ≤ 1",
    "mentions": [
     "homoMass"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWEAmplitudeMixture.lean",
+   "line": 31,
+   "statement": "{ι : Type*} [Fintype ι] [DecidableEq ι] (h : ι → HardyWeinbergModel) (h0 : ∀ i, 0 < (h i).altFreq) (h1 : ∀ i, (h i).altFreq < 1) (c : ℝ) : (independentLaw (fun i ↦ squareBiasedLocus (h i) (h0 i) (h1 i))).expectation (fun x ↦ |exceptionalAmplitude h c x|) = |c| * exceptionalMoment h h0 h1",
+   "mentions": [
+    "altFreq",
+    "exceptionalAmplitude",
+    "exceptionalMoment",
+    "expectation",
+    "independentLaw",
+    "squareBiasedLocus"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWEAmplitudeMixture.exceptional_test_limit",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWEAmplitudeMixture.lean",
+   "line": 42,
+   "statement": "(h : (m : ℕ) → Fin m → HardyWeinbergModel) (h0 : ∀ m i, 0 < (h m i).altFreq) (h1 : ∀ m i, (h m i).altFreq < 1) (ε : ℕ → ℝ) (hcap : ∀ m i, |(h m i).altFreq - 1 / 2| ≤ ε m) (hε : Tendsto ε atTop (𝓝 0)) (K : ℝ) (hK : Tendsto (fun m ↦ ∑ i, ((h m i).altFreq - 1 / 2) ^ 2) atTop (𝓝 K)) (f : ℝ →ᵇ ℝ) (c : ℝ) : Tendsto (fun m ↦ (independentLaw (fun i ↦ squareBiasedLocus (h m i) (h0 m i) (h1 m i))).expectation (fun x ↦ f (exceptionalAmplitude (h m) c x))) atTop (𝓝 (f 0))",
+   "mentions": [
+    "altFreq",
+    "exceptionalAmplitude",
+    "expectation",
+    "independentLaw",
+    "squareBiasedLocus"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWEAmplitudeMixture.lean",
+   "line": 56,
+   "statement": "{ι : Type*} [Fintype ι] [DecidableEq ι] (h : ι → HardyWeinbergModel) (h0 : ∀ i, 0 < (h i).altFreq) (h1 : ∀ i, (h i).altFreq < 1) (f : ℝ → ℝ) (c : ℝ) : (independentLaw (fun i ↦ squareBiasedLocus (h i) (h0 i) (h1 i))).expectation (fun x ↦ f (c * normalized h x)) = (independentLaw (fun i ↦ squareBiasedLocus (h i) (h0 i) (h1 i))).expectation (fun x ↦ if count x = 0 then f (c * normalized h x) else 0) + (independentLaw (fun i ↦ squareBiasedLocus (h i) (h0 i) (h1 i))).expectation (fun x ↦ f (exceptionalAmplitude h c x)) - f 0 * (independentLaw (fun i ↦ squareBiasedLocus (h i) (h0 i) (h1 i))).expectation (fun x ↦ if count x = 0 then 1 else 0)",
+   "mentions": [
+    "altFreq",
+    "count",
+    "exceptionalAmplitude",
+    "expectation",
+    "independentLaw",
+    "normalized",
+    "squareBiasedLocus"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWEAmplitudeMixture.lean",
+   "line": 75,
+   "statement": "(h : (m : ℕ) → Fin m → HardyWeinbergModel) (h0 : ∀ m i, 0 < (h m i).altFreq) (h1 : ∀ m i, (h m i).altFreq < 1) (ε : ℕ → ℝ) (hcap : ∀ m i, |(h m i).altFreq - 1 / 2| ≤ ε m) (hε : Tendsto ε atTop (𝓝 0)) (K : ℝ≥0) (hK : Tendsto (fun m ↦ ∑ i, ((h m i).altFreq - 1 / 2) ^ 2) atTop (𝓝 (K : ℝ))) (f : ℝ →ᵇ ℝ) (c : ℝ) : Tendsto (fun m ↦ (independentLaw (fun i ↦ squareBiasedLocus (h (m + 1) i) (h0 (m + 1) i) (h1 (m + 1) i))).expectation (fun x ↦ f (c * normalized (h (m + 1)) x))) atTop (𝓝 ((1 - Real.exp (-4 * (K : ℝ))) * f 0 + Real.exp (-4 * (K : ℝ)) * (((∫ x, f (c * Real.exp (-x)) ∂gaussianReal 0 (4 * K)) + (∫ x, f (-c * Real.exp (-x)) ∂gaussianReal 0 (4 * K))) / 2)))",
+   "mentions": [
+    "altFreq",
+    "expectation",
+    "independentLaw",
+    "normalized",
+    "squareBiasedLocus"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWEAmplitudeWeakLimit.integral_blend",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWEAmplitudeWeakLimit.lean",
+   "line": 33,
+   "statement": "(w : ℝ) (hw0 : 0 ≤ w) (hw1 : w ≤ 1) (μ ν : ProbabilityMeasure ℝ) (f : ℝ →ᵇ ℝ) : (∫ x, f x ∂(blend w hw0 hw1 μ ν : Measure ℝ)) = (1 - w) * (∫ x, f x ∂(μ : Measure ℝ)) + w * (∫ x, f x ∂(ν : Measure ℝ))",
+   "mentions": [
+    "blend"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWEAmplitudeWeakLimit.integral_lognormal",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWEAmplitudeWeakLimit.lean",
+   "line": 50,
+   "statement": "(K : ℝ≥0) (c : ℝ) (f : ℝ →ᵇ ℝ) : (∫ x, f x ∂(lognormal K c : Measure ℝ)) = ∫ x, f (c * Real.exp (-x)) ∂gaussianReal 0 (4 * K)",
+   "mentions": [
+    "lognormal"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWEAmplitudeWeakLimit.weight_bounds",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWEAmplitudeWeakLimit.lean",
+   "line": 61,
+   "statement": "(K : ℝ≥0) : 0 ≤ Real.exp (-4 * (K : ℝ)) ∧ Real.exp (-4 * (K : ℝ)) ≤ 1",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Portability.HWEAmplitudeWeakLimit.integral_amplitudeLimit",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWEAmplitudeWeakLimit.lean",
+   "line": 74,
+   "statement": "(K : ℝ≥0) (c : ℝ) (f : ℝ →ᵇ ℝ) : (∫ x, f x ∂(amplitudeLimit K c : Measure ℝ)) = (1 - Real.exp (-4 * (K : ℝ))) * f 0 + Real.exp (-4 * (K : ℝ)) * (((∫ x, f (c * Real.exp (-x)) ∂gaussianReal 0 (4 * K)) + (∫ x, f (-c * Real.exp (-x)) ∂gaussianReal 0 (4 * K))) / 2)",
+   "mentions": [
+    "amplitudeLimit"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWEAmplitudeWeakLimit.amplitude_weak_limit",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWEAmplitudeWeakLimit.lean",
+   "line": 93,
+   "statement": "(h : (m : ℕ) → Fin m → HardyWeinbergModel) (h0 : ∀ m i, 0 < (h m i).altFreq) (h1 : ∀ m i, (h m i).altFreq < 1) (ε : ℕ → ℝ) (hcap : ∀ m i, |(h m i).altFreq - 1 / 2| ≤ ε m) (hε : Tendsto ε atTop (𝓝 0)) (K : ℝ≥0) (hK : Tendsto (fun m ↦ ∑ i, ((h m i).altFreq - 1 / 2) ^ 2) atTop (𝓝 (K : ℝ))) (c : ℝ) : Tendsto (fun m ↦ amplitudeProbability (h (m + 1)) (h0 (m + 1)) (h1 (m + 1)) c) atTop (𝓝 (amplitudeLimit K c))",
+   "mentions": [
+    "altFreq",
+    "amplitudeLimit",
+    "amplitudeProbability"
    ]
   },
   {
@@ -160944,6 +161053,11 @@
      "Descent.Portability.GuardedMetricOptimization.scale_pos": [],
      "Descent.Portability.GuardedMetricOptimization.recover_guard": [],
      "Descent.Portability.HWEAbsoluteLocusLaw.total_absolute": [],
+     "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute": [],
+     "Descent.Portability.HWEAmplitudeMixture.exceptional_test_limit": [],
+     "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition": [],
+     "Descent.Portability.HWEAmplitudeWeakLimit.weight_bounds": [],
+     "Descent.Portability.HWEAmplitudeWeakLimit.amplitude_weak_limit": [],
      "Descent.Portability.HWEExceptionalAmplitude.homo_absolute_product": [],
      "Descent.Portability.HWEExceptionalAmplitude.exceptional_product_difference": [],
      "Descent.Portability.HWEExceptionalLimit.exceptionalMoment_nonneg": [],
@@ -162185,6 +162299,11 @@
     "Descent.Portability.GuardedMetricOptimization.recover_guard",
     "Descent.Portability.GuardedMetricOptimization.scale_pos",
     "Descent.Portability.HWEAbsoluteLocusLaw.total_absolute",
+    "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition",
+    "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute",
+    "Descent.Portability.HWEAmplitudeMixture.exceptional_test_limit",
+    "Descent.Portability.HWEAmplitudeWeakLimit.amplitude_weak_limit",
+    "Descent.Portability.HWEAmplitudeWeakLimit.weight_bounds",
     "Descent.Portability.HWEExceptionalAmplitude.exceptional_product_difference",
     "Descent.Portability.HWEExceptionalAmplitude.homo_absolute_product",
     "Descent.Portability.HWEExceptionalLimit.exceptionalMoment_nonneg",
@@ -170488,6 +170607,7 @@
      "Descent.Portability.GaussianInverseQuadratic.quotient_integrable_of_product_lower": [],
      "Descent.Portability.GaussianSlabLaw.graphPoint_continuous": [],
      "Descent.Portability.GaussianSlabLaw.local_cylinder": [],
+     "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit": [],
      "Descent.Portability.HWELogCoordinates.coordinate_derivative": [],
      "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable": [],
      "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero": [],
@@ -170554,6 +170674,7 @@
     "Descent.Portability.GaussianInverseQuadratic.quotient_integrable_of_product_lower",
     "Descent.Portability.GaussianSlabLaw.graphPoint_continuous",
     "Descent.Portability.GaussianSlabLaw.local_cylinder",
+    "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit",
     "Descent.Portability.HWELogCoordinates.coordinate_derivative",
     "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable",
     "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero",
@@ -174898,6 +175019,11 @@
      "Descent.Portability.GuardedMetricOptimization.scale_pos": [],
      "Descent.Portability.GuardedMetricOptimization.recover_guard": [],
      "Descent.Portability.HWEAbsoluteLocusLaw.total_absolute": [],
+     "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute": [],
+     "Descent.Portability.HWEAmplitudeMixture.exceptional_test_limit": [],
+     "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition": [],
+     "Descent.Portability.HWEAmplitudeWeakLimit.weight_bounds": [],
+     "Descent.Portability.HWEAmplitudeWeakLimit.amplitude_weak_limit": [],
      "Descent.Portability.HWEExceptionalAmplitude.homo_absolute_product": [],
      "Descent.Portability.HWEExceptionalAmplitude.exceptional_product_difference": [],
      "Descent.Portability.HWEExceptionalLimit.exceptionalMoment_nonneg": [],
@@ -176125,6 +176251,11 @@
     "Descent.Portability.GuardedMetricOptimization.recover_guard",
     "Descent.Portability.GuardedMetricOptimization.scale_pos",
     "Descent.Portability.HWEAbsoluteLocusLaw.total_absolute",
+    "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition",
+    "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute",
+    "Descent.Portability.HWEAmplitudeMixture.exceptional_test_limit",
+    "Descent.Portability.HWEAmplitudeWeakLimit.amplitude_weak_limit",
+    "Descent.Portability.HWEAmplitudeWeakLimit.weight_bounds",
     "Descent.Portability.HWEExceptionalAmplitude.exceptional_product_difference",
     "Descent.Portability.HWEExceptionalAmplitude.homo_absolute_product",
     "Descent.Portability.HWEExceptionalLimit.exceptionalMoment_nonneg",
@@ -191293,6 +191424,11 @@
      "Descent.Portability.HWEAbsoluteLocusLaw.hetero_absolute": [],
      "Descent.Portability.HWEAbsoluteLocusLaw.total_absolute": [],
      "Descent.Portability.HWEAbsoluteLocusLaw.homoMass_le_one": [],
+     "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute": [],
+     "Descent.Portability.HWEAmplitudeMixture.exceptional_test_limit": [],
+     "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition": [],
+     "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit": [],
+     "Descent.Portability.HWEAmplitudeWeakLimit.amplitude_weak_limit": [],
      "Descent.Portability.HWEExceptionalAmplitude.total_absolute_product": [],
      "Descent.Portability.HWEExceptionalAmplitude.homo_absolute_product": [],
      "Descent.Portability.HWEExceptionalAmplitude.exceptional_product_difference": [],
@@ -191422,6 +191558,11 @@
     "Descent.Portability.HWEAbsoluteLocusLaw.homo_absolute",
     "Descent.Portability.HWEAbsoluteLocusLaw.locusAmplitude_eq",
     "Descent.Portability.HWEAbsoluteLocusLaw.total_absolute",
+    "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition",
+    "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit",
+    "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute",
+    "Descent.Portability.HWEAmplitudeMixture.exceptional_test_limit",
+    "Descent.Portability.HWEAmplitudeWeakLimit.amplitude_weak_limit",
     "Descent.Portability.HWEExceptionalAmplitude.exceptional_bound",
     "Descent.Portability.HWEExceptionalAmplitude.exceptional_product_difference",
     "Descent.Portability.HWEExceptionalAmplitude.homo_absolute_product",
@@ -197461,6 +197602,11 @@
      "Descent.Portability.GuardedMetricOptimization.scale_pos": [],
      "Descent.Portability.GuardedMetricOptimization.recover_guard": [],
      "Descent.Portability.HWEAbsoluteLocusLaw.total_absolute": [],
+     "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute": [],
+     "Descent.Portability.HWEAmplitudeMixture.exceptional_test_limit": [],
+     "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition": [],
+     "Descent.Portability.HWEAmplitudeWeakLimit.weight_bounds": [],
+     "Descent.Portability.HWEAmplitudeWeakLimit.amplitude_weak_limit": [],
      "Descent.Portability.HWEExceptionalAmplitude.homo_absolute_product": [],
      "Descent.Portability.HWEExceptionalAmplitude.exceptional_product_difference": [],
      "Descent.Portability.HWEExceptionalLimit.exceptionalMoment_nonneg": [],
@@ -198676,6 +198822,11 @@
     "Descent.Portability.GuardedMetricOptimization.recover_guard",
     "Descent.Portability.GuardedMetricOptimization.scale_pos",
     "Descent.Portability.HWEAbsoluteLocusLaw.total_absolute",
+    "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition",
+    "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute",
+    "Descent.Portability.HWEAmplitudeMixture.exceptional_test_limit",
+    "Descent.Portability.HWEAmplitudeWeakLimit.amplitude_weak_limit",
+    "Descent.Portability.HWEAmplitudeWeakLimit.weight_bounds",
     "Descent.Portability.HWEExceptionalAmplitude.exceptional_product_difference",
     "Descent.Portability.HWEExceptionalAmplitude.homo_absolute_product",
     "Descent.Portability.HWEExceptionalLimit.exceptionalMoment_nonneg",
@@ -224493,6 +224644,8 @@
      "Descent.Portability.FixedBinHoeffdingLaw.radius_tail_value": [
       "0 < α ∧ α < 1"
      ],
+     "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute": [],
+     "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition": [],
      "Descent.Portability.HWEExceptionalAmplitude.homo_absolute_product": [],
      "Descent.Portability.HWEExceptionalAmplitude.exceptional_product_difference": [],
      "Descent.Portability.HWEExceptionalAmplitude.exceptional_bound": [],
@@ -224760,6 +224913,8 @@
     "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step",
     "Descent.Portability.ExponentialPoissonRace.race_coordinate_summable",
     "Descent.Portability.FixedBinHoeffdingLaw.radius_tail_value",
+    "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition",
+    "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute",
     "Descent.Portability.HWEExceptionalAmplitude.exceptional_bound",
     "Descent.Portability.HWEExceptionalAmplitude.exceptional_product_difference",
     "Descent.Portability.HWEExceptionalAmplitude.homo_absolute_product",
@@ -231905,6 +232060,7 @@
      "Descent.Portability.GaussianPanelLaw.projection_surjective": [],
      "Descent.Portability.GaussianSlabLaw.graphPoint_continuous": [],
      "Descent.Portability.GaussianSlabLaw.local_cylinder": [],
+     "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit": [],
      "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [],
      "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit": [],
      "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable": [],
@@ -232038,6 +232194,7 @@
     "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral",
     "Descent.Portability.GaussianSlabLaw.graphPoint_continuous",
     "Descent.Portability.GaussianSlabLaw.local_cylinder",
+    "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit",
     "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
     "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit",
     "Descent.Portability.HasPositiveLowerBound.comp",
@@ -273210,6 +273367,7 @@
      "Descent.Portability.FiniteAtomicReportMeasure.finite_report_integrable": [],
      "Descent.Portability.FiniteAtomicReportMeasure.integral_finite_report": [],
      "Descent.Portability.FiniteAtomicReportMeasure.charFun_finite_report": [],
+     "Descent.Portability.HWEAmplitudeWeakLimit.amplitude_weak_limit": [],
      "Descent.Portability.HWEHeterozygosityWeakLimit.count_absolute_moment": [],
      "Descent.Portability.HWEHeterozygosityWeakLimit.poisson_weak_limit": [],
      "Descent.Portability.RademacherArrayWeakLimit.rows_tight": [],
@@ -273229,6 +273387,7 @@
     "Descent.Portability.FiniteAtomicReportMeasure.charFun_finite_report",
     "Descent.Portability.FiniteAtomicReportMeasure.finite_report_integrable",
     "Descent.Portability.FiniteAtomicReportMeasure.integral_finite_report",
+    "Descent.Portability.HWEAmplitudeWeakLimit.amplitude_weak_limit",
     "Descent.Portability.HWEHeterozygosityWeakLimit.count_absolute_moment",
     "Descent.Portability.HWEHeterozygosityWeakLimit.poisson_weak_limit",
     "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit",
@@ -298945,6 +299104,10 @@
      "Descent.Portability.HWEAbsoluteLocusLaw.homo_absolute": [],
      "Descent.Portability.HWEAbsoluteLocusLaw.hetero_absolute": [],
      "Descent.Portability.HWEAbsoluteLocusLaw.total_absolute": [],
+     "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute": [],
+     "Descent.Portability.HWEAmplitudeMixture.exceptional_test_limit": [],
+     "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition": [],
+     "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit": [],
      "Descent.Portability.HWEExceptionalAmplitude.total_absolute_product": [],
      "Descent.Portability.HWEExceptionalAmplitude.homo_absolute_product": [],
      "Descent.Portability.HWEExceptionalAmplitude.exceptional_product_difference": [],
@@ -299280,6 +299443,10 @@
     "Descent.Portability.HWEAbsoluteLocusLaw.hetero_absolute",
     "Descent.Portability.HWEAbsoluteLocusLaw.homo_absolute",
     "Descent.Portability.HWEAbsoluteLocusLaw.total_absolute",
+    "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition",
+    "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit",
+    "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute",
+    "Descent.Portability.HWEAmplitudeMixture.exceptional_test_limit",
     "Descent.Portability.HWEExceptionalAmplitude.exceptional_bound",
     "Descent.Portability.HWEExceptionalAmplitude.exceptional_product_difference",
     "Descent.Portability.HWEExceptionalAmplitude.homo_absolute_product",
@@ -308239,6 +308406,11 @@
      "Descent.Portability.FiniteIndependentMoments.independent_sum_mean": [],
      "Descent.Portability.FiniteIndependentMoments.independent_sum_second": [],
      "Descent.Portability.FiniteProductExponential.productMatrix_one": [],
+     "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute": [],
+     "Descent.Portability.HWEAmplitudeMixture.exceptional_test_limit": [],
+     "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition": [],
+     "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit": [],
+     "Descent.Portability.HWEAmplitudeWeakLimit.amplitude_weak_limit": [],
      "Descent.Portability.HWEExceptionalAmplitude.total_absolute_product": [],
      "Descent.Portability.HWEExceptionalAmplitude.homo_absolute_product": [],
      "Descent.Portability.HWEExceptionalAmplitude.exceptional_product_difference": [],
@@ -308302,6 +308474,11 @@
     "Descent.Portability.FiniteIndependentMoments.independent_sum_mean",
     "Descent.Portability.FiniteIndependentMoments.independent_sum_second",
     "Descent.Portability.FiniteProductExponential.productMatrix_one",
+    "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition",
+    "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit",
+    "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute",
+    "Descent.Portability.HWEAmplitudeMixture.exceptional_test_limit",
+    "Descent.Portability.HWEAmplitudeWeakLimit.amplitude_weak_limit",
     "Descent.Portability.HWEExceptionalAmplitude.exceptional_bound",
     "Descent.Portability.HWEExceptionalAmplitude.exceptional_product_difference",
     "Descent.Portability.HWEExceptionalAmplitude.homo_absolute_product",
@@ -318541,6 +318718,409 @@
    ]
   },
   {
+   "name": "Descent.Portability.HWEAmplitudeMixture.exceptionalAmplitude",
+   "decl_name": "exceptionalAmplitude",
+   "short": "exceptionalAmplitude",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/HWEAmplitudeMixture.lean",
+   "line": 26,
+   "signature": "{ι : Type*} [Fintype ι] [DecidableEq ι] (h : ι → HardyWeinbergModel) (c : ℝ) (x : ι → DiploidGenotype) : ℝ",
+   "args": [
+    {
+     "names": [
+      "ι"
+     ],
+     "type": "Type*",
+     "binder": "{}",
+     "implicit": true
+    },
+    {
+     "names": [
+      "Fintype",
+      "ι"
+     ],
+     "type": "",
+     "binder": "[]",
+     "implicit": true
+    },
+    {
+     "names": [
+      "DecidableEq",
+      "ι"
+     ],
+     "type": "",
+     "binder": "[]",
+     "implicit": true
+    },
+    {
+     "names": [
+      "h"
+     ],
+     "type": "ι → HardyWeinbergModel",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "c"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "x"
+     ],
+     "type": "ι → DiploidGenotype",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  if count x = 0 then 0 else c * normalized h x",
+   "docstring": "Keep the original amplitude only on the heterozygote-containing event.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.HWEAmplitudeMixture",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "ι → HardyWeinbergModel",
+     "∀ i, 0 < (h i",
+     "∀ i, (h i",
+     "∀ m i, 0 < (h m i",
+     "∀ m i, (h m i",
+     "∀ m i, |(h m i",
+     "Tendsto (fun m ↦ ∑ i, ((h m i"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute": [
+      "ι → HardyWeinbergModel",
+      "∀ i, 0 < (h i",
+      "∀ i, (h i"
+     ],
+     "Descent.Portability.HWEAmplitudeMixture.exceptional_test_limit": [
+      "∀ m i, 0 < (h m i",
+      "∀ m i, (h m i",
+      "∀ m i, |(h m i",
+      "Tendsto (fun m ↦ ∑ i, ((h m i"
+     ],
+     "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition": [
+      "ι → HardyWeinbergModel",
+      "∀ i, 0 < (h i",
+      "∀ i, (h i"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition",
+    "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute",
+    "Descent.Portability.HWEAmplitudeMixture.exceptional_test_limit"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWEAmplitudeWeakLimit.blend",
+   "decl_name": "blend",
+   "short": "blend",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/HWEAmplitudeWeakLimit.lean",
+   "line": 24,
+   "signature": "(w : ℝ) (hw0 : 0 ≤ w) (hw1 : w ≤ 1) (μ ν : ProbabilityMeasure ℝ) : ProbabilityMeasure ℝ",
+   "args": [
+    {
+     "names": [
+      "w"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "hw0"
+     ],
+     "type": "0 ≤ w",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "hw1"
+     ],
+     "type": "w ≤ 1",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "μ",
+      "ν"
+     ],
+     "type": "ProbabilityMeasure ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ProbabilityMeasure ℝ",
+   "body": "  ⟨ENNReal.ofReal (1 - w) • (μ : Measure ℝ) + ENNReal.ofReal w • (ν : Measure ℝ), by\n    constructor\n    simp only [Measure.add_apply, Measure.smul_apply, measure_univ, smul_eq_mul, mul_one]\n    rw [← ENNReal.ofReal_add (sub_nonneg.mpr hw1) hw0]\n    simp⟩",
+   "docstring": "Convex combination of two actual real probability measures.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.HWEAmplitudeWeakLimit",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "probability",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0,
+    "hypotheses": [
+     "0 ≤ w",
+     "w ≤ 1"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.HWEAmplitudeWeakLimit.integral_blend": [
+      "0 ≤ w",
+      "w ≤ 1"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.HWEAmplitudeWeakLimit.integral_blend"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWEAmplitudeWeakLimit.lognormal",
+   "decl_name": "lognormal",
+   "short": "lognormal",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/HWEAmplitudeWeakLimit.lean",
+   "line": 46,
+   "signature": "(K : ℝ≥0) (c : ℝ) : ProbabilityMeasure ℝ",
+   "args": [
+    {
+     "names": [
+      "K"
+     ],
+     "type": "ℝ≥0",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "c"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ProbabilityMeasure ℝ",
+   "body": "  (centeredGaussian (4 * K)).map\n    (show AEMeasurable (fun x : ℝ ↦ c * Real.exp (-x)) _ by fun_prop)",
+   "docstring": "A scaled lognormal law as the actual continuous image of N(0,4K).",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.HWEAmplitudeWeakLimit",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.HWEAmplitudeWeakLimit.integral_lognormal": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.HWEAmplitudeWeakLimit.integral_lognormal"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWEAmplitudeWeakLimit.signedLognormal",
+   "decl_name": "signedLognormal",
+   "short": "signedLognormal",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/HWEAmplitudeWeakLimit.lean",
+   "line": 58,
+   "signature": "(K : ℝ≥0) (c : ℝ) : ProbabilityMeasure ℝ",
+   "args": [
+    {
+     "names": [
+      "K"
+     ],
+     "type": "ℝ≥0",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "c"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ProbabilityMeasure ℝ",
+   "body": "  blend (1 / 2) (by norm_num) (by norm_num) (lognormal K c) (lognormal K (-c))",
+   "docstring": "Fair signed lognormal component, including its degenerate balanced case.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.HWEAmplitudeWeakLimit",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.HWEAmplitudeWeakLimit.integral_amplitudeLimit": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.HWEAmplitudeWeakLimit.integral_amplitudeLimit"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWEAmplitudeWeakLimit.amplitudeLimit",
+   "decl_name": "amplitudeLimit",
+   "short": "amplitudeLimit",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/HWEAmplitudeWeakLimit.lean",
+   "line": 69,
+   "signature": "(K : ℝ≥0) (c : ℝ) : ProbabilityMeasure ℝ",
+   "args": [
+    {
+     "names": [
+      "K"
+     ],
+     "type": "ℝ≥0",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "c"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ProbabilityMeasure ℝ",
+   "body": "  blend (Real.exp (-4 * (K : ℝ))) (weight_bounds K).1 (weight_bounds K).2\n    ⟨Measure.dirac 0, inferInstance⟩ (signedLognormal K c)",
+   "docstring": "The complete tilted amplitude limit: atom at zero plus the signed lognormal law.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.HWEAmplitudeWeakLimit",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.HWEAmplitudeWeakLimit.integral_amplitudeLimit": [],
+     "Descent.Portability.HWEAmplitudeWeakLimit.amplitude_weak_limit": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.HWEAmplitudeWeakLimit.amplitude_weak_limit",
+    "Descent.Portability.HWEAmplitudeWeakLimit.integral_amplitudeLimit"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWEAmplitudeWeakLimit.amplitudeProbability",
+   "decl_name": "amplitudeProbability",
+   "short": "amplitudeProbability",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/HWEAmplitudeWeakLimit.lean",
+   "line": 85,
+   "signature": "{ι : Type*} [Fintype ι] [DecidableEq ι] (h : ι → HardyWeinbergModel) (h0 : ∀ i, 0 < (h i).altFreq) (h1 : ∀ i, (h i).altFreq < 1) (c : ℝ) : ProbabilityMeasure ℝ",
+   "args": [
+    {
+     "names": [
+      "ι"
+     ],
+     "type": "Type*",
+     "binder": "{}",
+     "implicit": true
+    },
+    {
+     "names": [
+      "Fintype",
+      "ι"
+     ],
+     "type": "",
+     "binder": "[]",
+     "implicit": true
+    },
+    {
+     "names": [
+      "DecidableEq",
+      "ι"
+     ],
+     "type": "",
+     "binder": "[]",
+     "implicit": true
+    },
+    {
+     "names": [
+      "h"
+     ],
+     "type": "ι → HardyWeinbergModel",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "h0"
+     ],
+     "type": "∀ i, 0 < (h i).altFreq",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "h1"
+     ],
+     "type": "∀ i, (h i).altFreq < 1",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "c"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ProbabilityMeasure ℝ",
+   "body": "  ⟨finiteMeasure (independentLaw (fun i ↦ squareBiasedLocus (h i) (h0 i) (h1 i)))\n    (fun x ↦ c * normalized h x), inferInstance⟩",
+   "docstring": "The actual finite-genotype amplitude distribution.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.HWEAmplitudeWeakLimit",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "∀ m i, 0 < (h m i",
+     "∀ m i, (h m i",
+     "∀ m i, |(h m i",
+     "Tendsto (fun m ↦ ∑ i, ((h m i"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.HWEAmplitudeWeakLimit.amplitude_weak_limit": [
+      "∀ m i, 0 < (h m i",
+      "∀ m i, (h m i",
+      "∀ m i, |(h m i",
+      "Tendsto (fun m ↦ ∑ i, ((h m i"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.HWEAmplitudeWeakLimit.amplitude_weak_limit"
+   ]
+  },
+  {
    "name": "Descent.Portability.HWEExceptionalLimit.exceptionalMoment",
    "decl_name": "exceptionalMoment",
    "short": "exceptionalMoment",
@@ -318609,11 +319189,6 @@
    "fields": [],
    "equations": [],
    "constraints": {
-    "range_lo_thm": [
-     "Descent.Portability.HWEExceptionalLimit.exceptionalMoment_nonneg",
-     3
-    ],
-    "range_lo": 0,
     "hypotheses": [
      "ι → HardyWeinbergModel",
      "∀ i, 0 < (h i",
@@ -318625,6 +319200,11 @@
      "Tendsto (fun m ↦ ∑ i, ((h m i"
     ],
     "hypotheses_by_theorem": {
+     "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute": [
+      "ι → HardyWeinbergModel",
+      "∀ i, 0 < (h i",
+      "∀ i, (h i"
+     ],
      "Descent.Portability.HWEExceptionalLimit.exceptionalMoment_nonneg": [
       "ι → HardyWeinbergModel",
       "∀ i, 0 < (h i",
@@ -318648,6 +319228,11 @@
       "∀ i, (h i"
      ]
     },
+    "range_lo_thm": [
+     "Descent.Portability.HWEExceptionalLimit.exceptionalMoment_nonneg",
+     3
+    ],
+    "range_lo": 0,
     "range_hi_thm": [
      "Descent.Portability.HWEExceptionalLimit.finite_row_bound",
      5
@@ -318655,6 +319240,7 @@
     "range_hi": 16
    },
    "mentioned_by": [
+    "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute",
     "Descent.Portability.HWEExceptionalLimit.exceptionalMoment_nonneg",
     "Descent.Portability.HWEExceptionalLimit.exceptional_L1_limit",
     "Descent.Portability.HWEExceptionalLimit.exceptional_markov",
@@ -318901,6 +319487,12 @@
      "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure": [],
      "Descent.Portability.ExponentialPoissonRace.interval_expMeasure_eq_raceKernelLaw": [],
      "Descent.Portability.FixedBinHoeffdingLaw.radius_tail_value": [],
+     "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute": [
+      "ι → HardyWeinbergModel"
+     ],
+     "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition": [
+      "ι → HardyWeinbergModel"
+     ],
      "Descent.Portability.HWEExceptionalAmplitude.homo_absolute_product": [
       "ι → HardyWeinbergModel"
      ],
@@ -319188,6 +319780,8 @@
     "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step",
     "Descent.Portability.ExponentialPoissonRace.race_coordinate_summable",
     "Descent.Portability.FixedBinHoeffdingLaw.radius_tail_value",
+    "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition",
+    "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute",
     "Descent.Portability.HWEExceptionalAmplitude.exceptional_bound",
     "Descent.Portability.HWEExceptionalAmplitude.exceptional_product_difference",
     "Descent.Portability.HWEExceptionalAmplitude.homo_absolute_product",
@@ -320016,13 +320610,30 @@
      "ι → HardyWeinbergModel",
      "∀ i, 0 < (h i",
      "∀ i, (h i",
-     "∀ i, |(h i",
      "∀ m i, 0 < (h m i",
      "∀ m i, (h m i",
      "∀ m i, |(h m i",
-     "Tendsto (fun m ↦ ∑ i, ((h m i"
+     "Tendsto (fun m ↦ ∑ i, ((h m i",
+     "∀ i, |(h i"
     ],
     "hypotheses_by_theorem": {
+     "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition": [
+      "ι → HardyWeinbergModel",
+      "∀ i, 0 < (h i",
+      "∀ i, (h i"
+     ],
+     "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit": [
+      "∀ m i, 0 < (h m i",
+      "∀ m i, (h m i",
+      "∀ m i, |(h m i",
+      "Tendsto (fun m ↦ ∑ i, ((h m i"
+     ],
+     "Descent.Portability.HWEAmplitudeWeakLimit.amplitude_weak_limit": [
+      "∀ m i, 0 < (h m i",
+      "∀ m i, (h m i",
+      "∀ m i, |(h m i",
+      "Tendsto (fun m ↦ ∑ i, ((h m i"
+     ],
      "Descent.Portability.HWEExceptionalAmplitude.normalized_product": [
       "ι → HardyWeinbergModel"
      ],
@@ -320075,6 +320686,9 @@
     }
    },
    "mentioned_by": [
+    "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition",
+    "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit",
+    "Descent.Portability.HWEAmplitudeWeakLimit.amplitude_weak_limit",
     "Descent.Portability.HWEExceptionalAmplitude.absolute_product",
     "Descent.Portability.HWEExceptionalAmplitude.exceptional_bound",
     "Descent.Portability.HWEExceptionalAmplitude.exceptional_product_difference",
@@ -320234,6 +320848,15 @@
       "∀ i, (p i"
      ],
      "Descent.Portability.FiniteProductExponential.productMatrix_one": [],
+     "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute": [
+      "ι → HardyWeinbergModel"
+     ],
+     "Descent.Portability.HWEAmplitudeMixture.exceptional_test_limit": [],
+     "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition": [
+      "ι → HardyWeinbergModel"
+     ],
+     "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit": [],
+     "Descent.Portability.HWEAmplitudeWeakLimit.amplitude_weak_limit": [],
      "Descent.Portability.HWEExceptionalAmplitude.total_absolute_product": [
       "ι → HardyWeinbergModel"
      ],
@@ -320327,6 +320950,11 @@
     "Descent.Portability.FiniteIndependentMoments.independent_sum_mean",
     "Descent.Portability.FiniteIndependentMoments.independent_sum_second",
     "Descent.Portability.FiniteProductExponential.productMatrix_one",
+    "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition",
+    "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit",
+    "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute",
+    "Descent.Portability.HWEAmplitudeMixture.exceptional_test_limit",
+    "Descent.Portability.HWEAmplitudeWeakLimit.amplitude_weak_limit",
     "Descent.Portability.HWEExceptionalAmplitude.exceptional_bound",
     "Descent.Portability.HWEExceptionalAmplitude.exceptional_product_difference",
     "Descent.Portability.HWEExceptionalAmplitude.homo_absolute_product",
@@ -320810,11 +321438,11 @@
      "h.altFreq < 1",
      "∀ i, 0 < (h i",
      "∀ i, (h i",
-     "∀ i, |(h i",
      "∀ m i, 0 < (h m i",
      "∀ m i, (h m i",
      "∀ m i, |(h m i",
-     "Tendsto (fun m ↦ ∑ i, ((h m i"
+     "Tendsto (fun m ↦ ∑ i, ((h m i",
+     "∀ i, |(h i"
     ],
     "hypotheses_by_theorem": {
      "Descent.Portability.HWEAbsoluteLocusLaw.homo_absolute": [
@@ -320828,6 +321456,32 @@
      "Descent.Portability.HWEAbsoluteLocusLaw.total_absolute": [
       "0 < h.altFreq",
       "h.altFreq < 1"
+     ],
+     "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute": [
+      "∀ i, 0 < (h i",
+      "∀ i, (h i"
+     ],
+     "Descent.Portability.HWEAmplitudeMixture.exceptional_test_limit": [
+      "∀ m i, 0 < (h m i",
+      "∀ m i, (h m i",
+      "∀ m i, |(h m i",
+      "Tendsto (fun m ↦ ∑ i, ((h m i"
+     ],
+     "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition": [
+      "∀ i, 0 < (h i",
+      "∀ i, (h i"
+     ],
+     "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit": [
+      "∀ m i, 0 < (h m i",
+      "∀ m i, (h m i",
+      "∀ m i, |(h m i",
+      "Tendsto (fun m ↦ ∑ i, ((h m i"
+     ],
+     "Descent.Portability.HWEAmplitudeWeakLimit.amplitude_weak_limit": [
+      "∀ m i, 0 < (h m i",
+      "∀ m i, (h m i",
+      "∀ m i, |(h m i",
+      "Tendsto (fun m ↦ ∑ i, ((h m i"
      ],
      "Descent.Portability.HWEExceptionalAmplitude.total_absolute_product": [
       "∀ i, 0 < (h i",
@@ -320926,6 +321580,11 @@
     "Descent.Portability.HWEAbsoluteLocusLaw.hetero_absolute",
     "Descent.Portability.HWEAbsoluteLocusLaw.homo_absolute",
     "Descent.Portability.HWEAbsoluteLocusLaw.total_absolute",
+    "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition",
+    "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit",
+    "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute",
+    "Descent.Portability.HWEAmplitudeMixture.exceptional_test_limit",
+    "Descent.Portability.HWEAmplitudeWeakLimit.amplitude_weak_limit",
     "Descent.Portability.HWEExceptionalAmplitude.exceptional_bound",
     "Descent.Portability.HWEExceptionalAmplitude.exceptional_product_difference",
     "Descent.Portability.HWEExceptionalAmplitude.homo_absolute_product",
@@ -389449,6 +390108,10 @@
      "Descent.Portability.HWEAbsoluteLocusLaw.homo_absolute": [],
      "Descent.Portability.HWEAbsoluteLocusLaw.hetero_absolute": [],
      "Descent.Portability.HWEAbsoluteLocusLaw.total_absolute": [],
+     "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute": [],
+     "Descent.Portability.HWEAmplitudeMixture.exceptional_test_limit": [],
+     "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition": [],
+     "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit": [],
      "Descent.Portability.HWEExceptionalAmplitude.total_absolute_product": [],
      "Descent.Portability.HWEExceptionalAmplitude.homo_absolute_product": [],
      "Descent.Portability.HWEExceptionalAmplitude.exceptional_product_difference": [],
@@ -389792,6 +390455,10 @@
     "Descent.Portability.HWEAbsoluteLocusLaw.hetero_absolute",
     "Descent.Portability.HWEAbsoluteLocusLaw.homo_absolute",
     "Descent.Portability.HWEAbsoluteLocusLaw.total_absolute",
+    "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition",
+    "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit",
+    "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute",
+    "Descent.Portability.HWEAmplitudeMixture.exceptional_test_limit",
     "Descent.Portability.HWEExceptionalAmplitude.exceptional_bound",
     "Descent.Portability.HWEExceptionalAmplitude.exceptional_product_difference",
     "Descent.Portability.HWEExceptionalAmplitude.homo_absolute_product",
@@ -390768,6 +391435,11 @@
      "Descent.Portability.FiniteIndependentMoments.independent_sum_mean": [],
      "Descent.Portability.FiniteIndependentMoments.independent_sum_second": [],
      "Descent.Portability.FiniteProductExponential.productMatrix_one": [],
+     "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute": [],
+     "Descent.Portability.HWEAmplitudeMixture.exceptional_test_limit": [],
+     "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition": [],
+     "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit": [],
+     "Descent.Portability.HWEAmplitudeWeakLimit.amplitude_weak_limit": [],
      "Descent.Portability.HWEExceptionalAmplitude.total_absolute_product": [],
      "Descent.Portability.HWEExceptionalAmplitude.homo_absolute_product": [],
      "Descent.Portability.HWEExceptionalAmplitude.exceptional_product_difference": [],
@@ -390831,6 +391503,11 @@
     "Descent.Portability.FiniteIndependentMoments.independent_sum_mean",
     "Descent.Portability.FiniteIndependentMoments.independent_sum_second",
     "Descent.Portability.FiniteProductExponential.productMatrix_one",
+    "Descent.Portability.HWEAmplitudeMixture.amplitude_decomposition",
+    "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit",
+    "Descent.Portability.HWEAmplitudeMixture.exceptional_absolute",
+    "Descent.Portability.HWEAmplitudeMixture.exceptional_test_limit",
+    "Descent.Portability.HWEAmplitudeWeakLimit.amplitude_weak_limit",
     "Descent.Portability.HWEExceptionalAmplitude.exceptional_bound",
     "Descent.Portability.HWEExceptionalAmplitude.exceptional_product_difference",
     "Descent.Portability.HWEExceptionalAmplitude.homo_absolute_product",
