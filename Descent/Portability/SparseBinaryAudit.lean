@@ -73,7 +73,7 @@ theorem variance_attained (p w : ι → ℝ) (hp : Admissible p w) :
     Var[contrast w; frameLaw (fun _ ↦ endpointLaw 0 1 (1 / 2)) p (fun _ ↦ 1 / 2)] =
       ∑ i, w i ^ 2 / (4 * p i) := by
   let μ : ι → Measure ℝ := fun _ ↦ endpointLaw 0 1 (1 / 2)
-  letI (i : ι) : IsProbabilityMeasure (μ i) :=
+  letI : IsProbabilityMeasure (endpointLaw 0 1 (1 / 2)) :=
     endpointLaw_probability _ _ _ (by norm_num) (by norm_num)
   letI (i : ι) := auditLaw_probability (μ i) (p i) (1 / 2) (hp.1 i)
   have hY (i : ι) : MemLp (fun y : ℝ ↦ y) 2 (μ i) := memLp_of_bounded

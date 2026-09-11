@@ -72,7 +72,7 @@ theorem targeted_admissible (D : Finset ι) (b : ι → ℝ) (B : ℝ)
       exact hw (by simp [weight, hz])
     simpa only [targeted, if_pos hi] using hp
 
-/-- Both designs spend exactly B labels in expectation, including zero probabilities off the cell. -/
+/-- Both designs spend exactly B labels in expectation, with no labels off the targeted cell. -/
 theorem equal_expected_budgets (D : Finset ι) (B : ℝ) (hB : 0 < B) (hcap : B ≤ D.card) :
     (∑ i : ι, uniform B i) = B ∧ (∑ i, targeted D B i) = B := by
   have hN : (Fintype.card ι : ℝ) ≠ 0 := by exact_mod_cast Fintype.card_pos.ne'
@@ -80,7 +80,7 @@ theorem equal_expected_budgets (D : Finset ι) (B : ℝ) (hB : 0 < B) (hcap : B 
   constructor
   · simp only [uniform, Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
     exact mul_div_cancel₀ B hN
-  · simp only [targeted, Finset.sum_ite_mem, Finset.sum_const, nsmul_eq_mul]
+  · simp only [targeted, Finset.sum_ite_mem, Finset.univ_inter, Finset.sum_const, nsmul_eq_mul]
     exact mul_div_cancel₀ B hD
 
 /-- A constant request rate on the active cell has an exactly computed variance envelope. -/
@@ -95,7 +95,7 @@ theorem cell_variance_identity (D : Finset ι) (b p : ι → ℝ) (t : ℝ)
       ring
     · simp only [weight, div_pow, hb i, if_neg hi, zero_div]
   simp_rw [he]
-  simp only [Finset.sum_ite_mem, Finset.sum_const, nsmul_eq_mul]
+  simp only [Finset.sum_ite_mem, Finset.univ_inter, Finset.sum_const, nsmul_eq_mul]
   ring
 
 /-- The two exact envelope values give the alpha and alpha-squared laws. -/
@@ -107,13 +107,13 @@ theorem envelope_values (D : Finset ι) (b : ι → ℝ) (B : ℝ)
   have hN : (Fintype.card ι : ℝ) ≠ 0 := by exact_mod_cast Fintype.card_pos.ne'
   have hD : (D.card : ℝ) ≠ 0 := (hB.trans_le hcap).ne'
   constructor
-  · rw [cell_variance_identity D b (uniform B) _ hb (fun _ _ ↦ rfl)]
+  · rw [cell_variance_identity D b (uniform B) (B / Fintype.card ι) hb (fun _ _ ↦ rfl)]
     unfold fraction
-    field_simp
+    field_simp [hB.ne', hN, hD]
   · rw [cell_variance_identity D b (targeted D B) (B / D.card) hb
       (fun i hi ↦ by simp only [targeted, if_pos hi])]
     unfold fraction
-    field_simp
+    field_simp [hB.ne', hN, hD]
 
 /-- Actual prospective audit variances obey the two bounds for every bounded outcome law. -/
 theorem prospective_bounds (D : Finset ι) (b : ι → ℝ) (B : ℝ)
