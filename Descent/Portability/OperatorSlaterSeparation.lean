@@ -42,7 +42,7 @@ theorem upperImage_open (C : Set X) (F : X → ResidualSpace E) :
       ({y : ResidualSpace E | (F x).2.1 < y.2.1} ∩
       {y : ResidualSpace E | StrictPositive (y.2.2 - (F x).2.2)}) := by
     ext y
-    simp [upperImage, and_assoc, and_left_comm, and_comm]
+    simp [upperImage, and_left_comm]
   rw [he]
   apply isOpen_iUnion
   intro x
@@ -121,7 +121,7 @@ theorem direction_nonneg (C : Set X) (F : X → ResidualSpace E)
 /-- Positive slack in all coordinates approaches every original residual. -/
 theorem shifted_mem (C : Set X) (F : X → ResidualSpace E) (x : X) (hx : x ∈ C)
     (e : ℝ) (he : 0 < e) :
-    F x + e • (1, 1, ContinuousLinearMap.id ℝ E) ∈ upperImage C F := by
+    F x + e • ((1 : ℝ), (1 : ℝ), ContinuousLinearMap.id ℝ E) ∈ upperImage C F := by
   refine ⟨x, hx, ?_, ?_, ?_⟩
   · change (F x).1 < (F x).1 + e * 1
     linarith
@@ -135,10 +135,11 @@ theorem supporting_boundary (C : Set X) (F : X → ResidualSpace E)
     (L : ResidualSpace E →L[ℝ] ℝ) (hL : ∀ y ∈ upperImage C F, 0 < L y)
     (x : X) (hx : x ∈ C) : 0 ≤ L (F x) := by
   have ht : Tendsto (fun n : ℕ ↦ F x + (1 / ((n : ℝ) + 1)) •
-      (1, 1, ContinuousLinearMap.id ℝ E)) atTop (𝓝 (F x)) := by
+      ((1 : ℝ), (1 : ℝ), ContinuousLinearMap.id ℝ E)) atTop (𝓝 (F x)) := by
     have hs := tendsto_one_div_add_atTop_nhds_zero_nat.smul
       (tendsto_const_nhds : Tendsto (fun _ : ℕ ↦
-        (1, 1, ContinuousLinearMap.id ℝ E)) atTop (𝓝 (1, 1, ContinuousLinearMap.id ℝ E)))
+        ((1 : ℝ), (1 : ℝ), ContinuousLinearMap.id ℝ E)) atTop
+        (𝓝 ((1 : ℝ), (1 : ℝ), ContinuousLinearMap.id ℝ E)))
     simpa using (tendsto_const_nhds : Tendsto (fun _ : ℕ ↦ F x) atTop (𝓝 (F x))).add hs
   apply ge_of_tendsto (L.continuous.tendsto (F x) |>.comp ht)
   exact Eventually.of_forall (fun n ↦ (hL _ (shifted_mem C F x hx _ (by positivity))).le)

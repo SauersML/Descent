@@ -39694,6 +39694,9 @@
    "Descent.Portability.OperationalAuditConstraints.f1_linear_target",
    "Descent.Portability.OperationalAuditConstraints.paired_true_positive",
    "Descent.Portability.OperationalAuditConstraints.recall_linear_target",
+   "Descent.Portability.OperatorPositiveCone.strictPositive_open",
+   "Descent.Portability.OperatorSlaterSeparation.supporting_boundary",
+   "Descent.Portability.OperatorSlaterSeparation.upperImage_open",
    "Descent.Portability.OptimalMeasurementAllocation.allocation_lower_bound",
    "Descent.Portability.OptimalMeasurementAllocation.weightedAmplitude_pos",
    "Descent.Portability.OrderedMutationCatalogue.coordinate_summable",
@@ -39721,6 +39724,8 @@
    "Descent.Portability.PortabilityRatioGeometry.crossForm_eq_dot",
    "Descent.Portability.PortabilityRatioGeometry.formRatio_aligned_le",
    "Descent.Portability.PortabilityRatioGeometry.trait_domination_iff",
+   "Descent.Portability.PositiveOperatorFunctional.representative_positive",
+   "Descent.Portability.PositiveOperatorFunctional.trace_representation",
    "Descent.Portability.ProbabilityTestClosure.convergent_tests_isClosed",
    "Descent.Portability.ProbabilityTestClosure.damp_mem_closure",
    "Descent.Portability.ProbabilityTestClosure.integral_uniformEquicontinuous",
@@ -41417,6 +41422,9 @@
     "Descent.Portability.OperationalAuditConstraints.recall_linear_target": [],
     "Descent.Portability.OperationalAuditConstraints.f1_linear_target": [],
     "Descent.Portability.OperationalAuditConstraints.paired_true_positive": [],
+    "Descent.Portability.OperatorPositiveCone.strictPositive_open": [],
+    "Descent.Portability.OperatorSlaterSeparation.upperImage_open": [],
+    "Descent.Portability.OperatorSlaterSeparation.supporting_boundary": [],
     "Descent.Portability.OptimalMeasurementAllocation.allocation_lower_bound": [],
     "Descent.Portability.OptimalMeasurementAllocation.weightedAmplitude_pos": [],
     "Descent.Portability.OrderedMutationCatalogue.mutationCount_unsupported": [
@@ -41480,6 +41488,8 @@
     "Descent.Portability.PortabilityRatioGeometry.binReport_le_sum": [],
     "Descent.Portability.PortabilityRatioGeometry.binInner_le_sum": [],
     "Descent.Portability.PortabilityRatioGeometry.certified_bin_integrable": [],
+    "Descent.Portability.PositiveOperatorFunctional.representative_positive": [],
+    "Descent.Portability.PositiveOperatorFunctional.trace_representation": [],
     "Descent.Portability.ProbabilityTestClosure.integral_uniformEquicontinuous": [],
     "Descent.Portability.ProbabilityTestClosure.convergent_tests_isClosed": [],
     "Descent.Portability.ProbabilityTestClosure.damp_mem_closure": [],
@@ -47678,6 +47688,7 @@
    "Descent.Portability.HWELogCoordinates.coordinate_derivative",
    "Descent.Portability.IndependentRadialLaws.cellMass_continuousAt",
    "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable",
+   "Descent.Portability.OperatorSlaterSeparation.supporting_boundary",
    "Descent.Portability.PartialLabelExperiment.scaled_log_score",
    "Descent.Portability.PoissonMomentSeries.poisson_quadratic",
    "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero",
@@ -47776,6 +47787,7 @@
     "Descent.Portability.HWELogCoordinates.coordinate_derivative": [],
     "Descent.Portability.IndependentRadialLaws.cellMass_continuousAt": [],
     "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable": [],
+    "Descent.Portability.OperatorSlaterSeparation.supporting_boundary": [],
     "Descent.Portability.PartialLabelExperiment.scaled_log_score": [],
     "Descent.Portability.PoissonMomentSeries.poisson_quadratic": [],
     "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero": [],
@@ -47830,6 +47842,7 @@
    "Descent.Coalescent.twoLocusRightHJet_value",
    "Descent.Portability.FactorsThroughObservation.smul",
    "Descent.Portability.FrameMeanImage.estimate_continuous",
+   "Descent.Portability.OperatorSlaterSeparation.supporting_boundary",
    "Descent.Portability.RadialPotentialLaw.coordinateDerivative_joint_continuous",
    "Descent.Portability.RadialPotentialLaw.radialDensity_joint_continuous",
    "Descent.Portability.RadialPotentialLaw.radial_endpoint_integral",
@@ -47853,6 +47866,7 @@
     "Descent.Coalescent.twoLocusPi2Jet_driftAt": [],
     "Descent.Portability.FactorsThroughObservation.smul": [],
     "Descent.Portability.FrameMeanImage.estimate_continuous": [],
+    "Descent.Portability.OperatorSlaterSeparation.supporting_boundary": [],
     "Descent.Portability.RadialPotentialLaw.radialDensity_joint_continuous": [],
     "Descent.Portability.RadialPotentialLaw.coordinateDerivative_joint_continuous": [],
     "Descent.Portability.RadialPotentialLaw.radial_endpoint_integral": [],
@@ -51040,6 +51054,9 @@
    "Descent.Portability.OperationalAuditConstraints.f1_linear_target",
    "Descent.Portability.OperationalAuditConstraints.paired_true_positive",
    "Descent.Portability.OperationalAuditConstraints.recall_linear_target",
+   "Descent.Portability.OperatorPositiveCone.strictPositive_open",
+   "Descent.Portability.OperatorSlaterSeparation.supporting_boundary",
+   "Descent.Portability.OperatorSlaterSeparation.upperImage_open",
    "Descent.Portability.OptimalMeasurementAllocation.allocation_lower_bound",
    "Descent.Portability.OptimalMeasurementAllocation.weightedAmplitude_pos",
    "Descent.Portability.OrderedMutationCatalogue.coordinate_summable",
@@ -51067,6 +51084,8 @@
    "Descent.Portability.PortabilityRatioGeometry.crossForm_eq_dot",
    "Descent.Portability.PortabilityRatioGeometry.formRatio_aligned_le",
    "Descent.Portability.PortabilityRatioGeometry.trait_domination_iff",
+   "Descent.Portability.PositiveOperatorFunctional.representative_positive",
+   "Descent.Portability.PositiveOperatorFunctional.trace_representation",
    "Descent.Portability.ProbabilityTestClosure.convergent_tests_isClosed",
    "Descent.Portability.ProbabilityTestClosure.damp_mem_closure",
    "Descent.Portability.ProbabilityTestClosure.integral_uniformEquicontinuous",
@@ -52716,6 +52735,9 @@
     "Descent.Portability.OperationalAuditConstraints.recall_linear_target": [],
     "Descent.Portability.OperationalAuditConstraints.f1_linear_target": [],
     "Descent.Portability.OperationalAuditConstraints.paired_true_positive": [],
+    "Descent.Portability.OperatorPositiveCone.strictPositive_open": [],
+    "Descent.Portability.OperatorSlaterSeparation.upperImage_open": [],
+    "Descent.Portability.OperatorSlaterSeparation.supporting_boundary": [],
     "Descent.Portability.OptimalMeasurementAllocation.allocation_lower_bound": [],
     "Descent.Portability.OptimalMeasurementAllocation.weightedAmplitude_pos": [],
     "Descent.Portability.OrderedMutationCatalogue.mutationCount_unsupported": [
@@ -52776,6 +52798,8 @@
     "Descent.Portability.PortabilityRatioGeometry.binReport_le_sum": [],
     "Descent.Portability.PortabilityRatioGeometry.binInner_le_sum": [],
     "Descent.Portability.PortabilityRatioGeometry.certified_bin_integrable": [],
+    "Descent.Portability.PositiveOperatorFunctional.representative_positive": [],
+    "Descent.Portability.PositiveOperatorFunctional.trace_representation": [],
     "Descent.Portability.ProbabilityTestClosure.integral_uniformEquicontinuous": [],
     "Descent.Portability.ProbabilityTestClosure.convergent_tests_isClosed": [],
     "Descent.Portability.ProbabilityTestClosure.damp_mem_closure": [],
@@ -66469,6 +66493,11 @@
    "Descent.Portability.HWECriticalMoments.critical_not_isGaussian",
    "Descent.Portability.InfiniteIdentityMinimax.adaptive_lower",
    "Descent.Portability.InfiniteIdentityMinimax.identity_minimax",
+   "Descent.Portability.OperatorPositiveCone.identity_nonnegative",
+   "Descent.Portability.OperatorPositiveCone.strict_identity",
+   "Descent.Portability.OperatorSlaterSeparation.shifted_mem",
+   "Descent.Portability.OperatorSlaterSeparation.supporting_boundary",
+   "Descent.Portability.PositiveOperatorFunctional.representative_trace",
    "Descent.Portability.SimulationDesignDecoder.decoded_report",
    "Descent.Portability.SpectralAuditCost.attained_cost_bound",
    "Descent.Portability.SpectralAuditCost.isotropic_trace",
@@ -66501,6 +66530,11 @@
     "Descent.Portability.HWECriticalMoments.critical_not_isGaussian": [],
     "Descent.Portability.InfiniteIdentityMinimax.adaptive_lower": [],
     "Descent.Portability.InfiniteIdentityMinimax.identity_minimax": [],
+    "Descent.Portability.OperatorPositiveCone.strict_identity": [],
+    "Descent.Portability.OperatorPositiveCone.identity_nonnegative": [],
+    "Descent.Portability.OperatorSlaterSeparation.shifted_mem": [],
+    "Descent.Portability.OperatorSlaterSeparation.supporting_boundary": [],
+    "Descent.Portability.PositiveOperatorFunctional.representative_trace": [],
     "Descent.Portability.SimulationDesignDecoder.decoded_report": [],
     "Descent.Portability.SpectralAuditCost.isotropic_trace": [],
     "Descent.Portability.SpectralAuditCost.attained_cost_bound": [],
@@ -71688,6 +71722,9 @@
    "Descent.Portability.OperationalAuditConstraints.f1_linear_target",
    "Descent.Portability.OperationalAuditConstraints.paired_true_positive",
    "Descent.Portability.OperationalAuditConstraints.recall_linear_target",
+   "Descent.Portability.OperatorPositiveCone.strictPositive_open",
+   "Descent.Portability.OperatorSlaterSeparation.supporting_boundary",
+   "Descent.Portability.OperatorSlaterSeparation.upperImage_open",
    "Descent.Portability.OptimalMeasurementAllocation.allocation_lower_bound",
    "Descent.Portability.OptimalMeasurementAllocation.weightedAmplitude_pos",
    "Descent.Portability.OrderedMutationCatalogue.coordinate_summable",
@@ -71715,6 +71752,8 @@
    "Descent.Portability.PortabilityRatioGeometry.crossForm_eq_dot",
    "Descent.Portability.PortabilityRatioGeometry.formRatio_aligned_le",
    "Descent.Portability.PortabilityRatioGeometry.trait_domination_iff",
+   "Descent.Portability.PositiveOperatorFunctional.representative_positive",
+   "Descent.Portability.PositiveOperatorFunctional.trace_representation",
    "Descent.Portability.ProbabilityTestClosure.convergent_tests_isClosed",
    "Descent.Portability.ProbabilityTestClosure.damp_mem_closure",
    "Descent.Portability.ProbabilityTestClosure.integral_uniformEquicontinuous",
@@ -73521,6 +73560,11 @@
     "Descent.Portability.OperationalAuditConstraints.recall_linear_target": [],
     "Descent.Portability.OperationalAuditConstraints.f1_linear_target": [],
     "Descent.Portability.OperationalAuditConstraints.paired_true_positive": [],
+    "Descent.Portability.OperatorPositiveCone.strictPositive_open": [],
+    "Descent.Portability.OperatorSlaterSeparation.upperImage_open": [],
+    "Descent.Portability.OperatorSlaterSeparation.supporting_boundary": [
+     "∀ y ∈ upperImage C F, 0 < L y"
+    ],
     "Descent.Portability.OptimalMeasurementAllocation.allocation_lower_bound": [],
     "Descent.Portability.OptimalMeasurementAllocation.weightedAmplitude_pos": [],
     "Descent.Portability.OrderedMutationCatalogue.mutationCount_unsupported": [],
@@ -73577,6 +73621,8 @@
     "Descent.Portability.PortabilityRatioGeometry.binReport_le_sum": [],
     "Descent.Portability.PortabilityRatioGeometry.binInner_le_sum": [],
     "Descent.Portability.PortabilityRatioGeometry.certified_bin_integrable": [],
+    "Descent.Portability.PositiveOperatorFunctional.representative_positive": [],
+    "Descent.Portability.PositiveOperatorFunctional.trace_representation": [],
     "Descent.Portability.ProbabilityTestClosure.integral_uniformEquicontinuous": [],
     "Descent.Portability.ProbabilityTestClosure.convergent_tests_isClosed": [],
     "Descent.Portability.ProbabilityTestClosure.damp_mem_closure": [],
@@ -74487,6 +74533,8 @@
    "Descent.Portability.OperationalAuditConstraints.false_positive_requirement",
    "Descent.Portability.OperationalAuditConstraints.precision_requirement",
    "Descent.Portability.OperationalAuditConstraints.recall_requirement",
+   "Descent.Portability.OperatorPositiveCone.strictPositive_convex",
+   "Descent.Portability.OperatorSlaterSeparation.upperImage_convex",
    "Descent.Portability.PThresholdTrainingLaw.linearScoreFiles_values",
    "Descent.Portability.PThresholdTrainingLaw.scan_mem",
    "Descent.Portability.PartialLabelExperiment.observation_log_score",
@@ -74497,6 +74545,8 @@
    "Descent.Portability.PipelineDemographicHistory.pooledMAFProbeMassViaDual_eq",
    "Descent.Portability.PipelineDemographicHistory.pooledMAFProbeMass_samplingDual",
    "Descent.Portability.PipelineDemographicHistory.presentBiologicalKilledDualState_eq_projection",
+   "Descent.Portability.PositiveOperatorFunctional.operator_expansion",
+   "Descent.Portability.PositiveOperatorFunctional.trace_representation",
    "Descent.Portability.ProbitTrainingLaw.integral_readout",
    "Descent.Portability.RademacherReindex.mass_reindex",
    "Descent.Portability.RadialInterpolation.radialWeight_continuousAt",
@@ -75124,6 +75174,8 @@
     "Descent.Portability.OperationalAuditConstraints.recall_requirement": [],
     "Descent.Portability.OperationalAuditConstraints.f1_requirement": [],
     "Descent.Portability.OperationalAuditConstraints.false_positive_requirement": [],
+    "Descent.Portability.OperatorPositiveCone.strictPositive_convex": [],
+    "Descent.Portability.OperatorSlaterSeparation.upperImage_convex": [],
     "Descent.Portability.signal_exceeds_threshold_iff_confounding_exceeds_critical": [],
     "Descent.Portability.no_exact_estimator_of_two_point_collision": [],
     "Descent.Portability.decisionCurveScreeningModel_harm_eq_threshold_scale": [],
@@ -75135,6 +75187,8 @@
     "Descent.Portability.populationAUC_optimal_of_eta_transform": [],
     "Descent.Portability.liabilityAUC_ne_equalVarianceAUC_of_prevalence_dependent": [],
     "Descent.Portability.no_score_side_summary_determines_r2": [],
+    "Descent.Portability.PositiveOperatorFunctional.operator_expansion": [],
+    "Descent.Portability.PositiveOperatorFunctional.trace_representation": [],
     "Descent.Portability.ProbitTrainingLaw.integral_readout": [],
     "Descent.Portability.RademacherReindex.mass_reindex": [],
     "Descent.Portability.RadialInterpolation.radialWeight_radii_zero": [],
@@ -75568,6 +75622,9 @@
    "Descent.Portability.MinimaxAuditDesignLaw.ranges_nonneg",
    "Descent.Portability.MomentAUCNonidentifiability.same_jointMoments",
    "Descent.Portability.MomentOrderObstruction.alternating_annihilates",
+   "Descent.Portability.OperatorPositiveCone.quadratic_difference",
+   "Descent.Portability.OperatorPositiveCone.strict_add_nonnegative",
+   "Descent.Portability.OperatorPositiveCone.strict_nonnegative",
    "Descent.Portability.OptimalMeasurementAllocation.allocation_lower_bound",
    "Descent.Portability.OptimizedFrameRepairAudit.design_exists",
    "Descent.Portability.PThresholdTrainingLaw.scan_quality_ge_incumbent",
@@ -76053,6 +76110,9 @@
     "Descent.Portability.MinimaxAuditDesignLaw.common_confidence": [],
     "Descent.Portability.MomentAUCNonidentifiability.same_jointMoments": [],
     "Descent.Portability.MomentOrderObstruction.alternating_annihilates": [],
+    "Descent.Portability.OperatorPositiveCone.quadratic_difference": [],
+    "Descent.Portability.OperatorPositiveCone.strict_add_nonnegative": [],
+    "Descent.Portability.OperatorPositiveCone.strict_nonnegative": [],
     "Descent.Portability.OptimalMeasurementAllocation.allocation_lower_bound": [],
     "Descent.Portability.OptimizedFrameRepairAudit.design_exists": [
      "∃ p, Feasible floor c B p"
@@ -104593,6 +104653,11 @@
    "Descent.Portability.HWECriticalMoments.critical_not_isGaussian",
    "Descent.Portability.InfiniteIdentityMinimax.adaptive_lower",
    "Descent.Portability.InfiniteIdentityMinimax.identity_minimax",
+   "Descent.Portability.OperatorPositiveCone.identity_nonnegative",
+   "Descent.Portability.OperatorPositiveCone.strict_identity",
+   "Descent.Portability.OperatorSlaterSeparation.shifted_mem",
+   "Descent.Portability.OperatorSlaterSeparation.supporting_boundary",
+   "Descent.Portability.PositiveOperatorFunctional.representative_trace",
    "Descent.Portability.SimulationDesignDecoder.decoded_report",
    "Descent.Portability.SpectralAuditCost.attained_cost_bound",
    "Descent.Portability.SpectralAuditCost.isotropic_trace",
@@ -104625,6 +104690,11 @@
     "Descent.Portability.HWECriticalMoments.critical_not_isGaussian": [],
     "Descent.Portability.InfiniteIdentityMinimax.adaptive_lower": [],
     "Descent.Portability.InfiniteIdentityMinimax.identity_minimax": [],
+    "Descent.Portability.OperatorPositiveCone.strict_identity": [],
+    "Descent.Portability.OperatorPositiveCone.identity_nonnegative": [],
+    "Descent.Portability.OperatorSlaterSeparation.shifted_mem": [],
+    "Descent.Portability.OperatorSlaterSeparation.supporting_boundary": [],
+    "Descent.Portability.PositiveOperatorFunctional.representative_trace": [],
     "Descent.Portability.SimulationDesignDecoder.decoded_report": [],
     "Descent.Portability.SpectralAuditCost.isotropic_trace": [],
     "Descent.Portability.SpectralAuditCost.attained_cost_bound": [],
@@ -104815,6 +104885,8 @@
    "Descent.Portability.ObservableClosureLaw.autonomy_iff_linear_update",
    "Descent.Portability.ObservableClosureLaw.linear_factorization_iff",
    "Descent.Portability.OddLocusReportSolutions.exp_intertwine",
+   "Descent.Portability.OperatorSlaterSeparation.supporting_boundary",
+   "Descent.Portability.PositiveOperatorFunctional.trace_representation",
    "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit",
    "Descent.Portability.RadialPotentialLaw.coordinateDerivative_joint_continuous",
    "Descent.Portability.RadialPotentialLaw.radialDensity_joint_continuous",
@@ -105083,10 +105155,12 @@
     "Descent.Portability.OddLocusReportSolutions.exp_intertwine": [
      "A * Q = Q * B"
     ],
+    "Descent.Portability.OperatorSlaterSeparation.supporting_boundary": [],
     "Descent.Portability.bbpProxyThreshold_tendsto_zero": [],
     "Descent.Portability.auc_invariant_and_citl_shifts_under_score_offset": [],
     "Descent.Portability.logistic_recalibration_preserves_auc": [],
     "Descent.Portability.recalibration_preserves_auc": [],
+    "Descent.Portability.PositiveOperatorFunctional.trace_representation": [],
     "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit": [],
     "Descent.Portability.RadialPotentialLaw.radialDensity_joint_continuous": [],
     "Descent.Portability.RadialPotentialLaw.coordinateDerivative_joint_continuous": [],
@@ -184295,6 +184369,17 @@
    "Descent.Portability.FourCyclePrediction.same_instantaneous_energy",
    "Descent.Portability.IdenticalAuditCells.spectral_variance_le",
    "Descent.Portability.MeasurementRankLaw.gram_kernel",
+   "Descent.Portability.OperatorPositiveCone.quadratic_difference",
+   "Descent.Portability.OperatorPositiveCone.quadratic_norm_bound",
+   "Descent.Portability.OperatorSlaterMultipliers.exists_multipliers",
+   "Descent.Portability.OperatorSlaterSeparation.exists_separator",
+   "Descent.Portability.OperatorSlaterSeparation.upperImage_convex",
+   "Descent.Portability.PositiveOperatorFunctional.operator_expansion",
+   "Descent.Portability.PositiveOperatorFunctional.rank_apply",
+   "Descent.Portability.PositiveOperatorFunctional.rank_skew_quadratic",
+   "Descent.Portability.PositiveOperatorFunctional.representative_pairing",
+   "Descent.Portability.PositiveOperatorFunctional.representative_positive",
+   "Descent.Portability.PositiveOperatorFunctional.trace_representation",
    "Descent.Portability.SamplingDesignLaw.inner_fit_selection_disjoint",
    "Descent.Portability.SamplingDesignLaw.inner_fit_test_disjoint",
    "Descent.Portability.SamplingDesignLaw.inner_selection_test_disjoint",
@@ -184404,6 +184489,17 @@
     "Descent.Portability.FourCyclePrediction.same_instantaneous_energy": [],
     "Descent.Portability.IdenticalAuditCells.spectral_variance_le": [],
     "Descent.Portability.MeasurementRankLaw.gram_kernel": [],
+    "Descent.Portability.OperatorPositiveCone.quadratic_norm_bound": [],
+    "Descent.Portability.OperatorPositiveCone.quadratic_difference": [],
+    "Descent.Portability.OperatorSlaterMultipliers.exists_multipliers": [],
+    "Descent.Portability.OperatorSlaterSeparation.upperImage_convex": [],
+    "Descent.Portability.OperatorSlaterSeparation.exists_separator": [],
+    "Descent.Portability.PositiveOperatorFunctional.rank_apply": [],
+    "Descent.Portability.PositiveOperatorFunctional.representative_pairing": [],
+    "Descent.Portability.PositiveOperatorFunctional.rank_skew_quadratic": [],
+    "Descent.Portability.PositiveOperatorFunctional.representative_positive": [],
+    "Descent.Portability.PositiveOperatorFunctional.operator_expansion": [],
+    "Descent.Portability.PositiveOperatorFunctional.trace_representation": [],
     "Descent.Portability.SamplingDesignLaw.inner_fit_selection_disjoint": [],
     "Descent.Portability.SamplingDesignLaw.inner_fit_test_disjoint": [],
     "Descent.Portability.SamplingDesignLaw.inner_selection_test_disjoint": [],
@@ -187309,7 +187405,15 @@
    "Descent.Portability.FiniteSlaterSeparation.exists_nonnegative_separator",
    "Descent.Portability.FiniteSlaterSeparation.supporting_boundary",
    "Descent.Portability.FiniteSlaterSeparation.upperImage_convex",
-   "Descent.Portability.FiniteSlaterSeparation.upperImage_open"
+   "Descent.Portability.FiniteSlaterSeparation.upperImage_open",
+   "Descent.Portability.OperatorSlaterMultipliers.exists_multipliers",
+   "Descent.Portability.OperatorSlaterSeparation.direction_nonneg",
+   "Descent.Portability.OperatorSlaterSeparation.exists_separator",
+   "Descent.Portability.OperatorSlaterSeparation.shifted_mem",
+   "Descent.Portability.OperatorSlaterSeparation.supporting_boundary",
+   "Descent.Portability.OperatorSlaterSeparation.upperImage_add",
+   "Descent.Portability.OperatorSlaterSeparation.upperImage_convex",
+   "Descent.Portability.OperatorSlaterSeparation.upperImage_open"
   ],
   "constraints": {
    "declared_kind": "ratio",
@@ -187325,7 +187429,15 @@
     "∀ i, ConvexOn ℝ C (fun x ↦ F x i",
     "C.Nonempty",
     "∀ y ∈ upperImage C F, 0 < L y",
-    "x ∈ C"
+    "x ∈ C",
+    "ConvexOn ℝ C g",
+    "∀ v : E, ConvexOn ℝ C (fun x ↦ inner ℝ v (H x v",
+    "∀ x ∈ C, g x ≤ 0 → Nonnegative (-H x",
+    "∃ x ∈ C, g x < 0 ∧ StrictPositive (-H x",
+    "ConvexOn ℝ C (fun x ↦ (F x",
+    "∀ v : E, ConvexOn ℝ C (fun x ↦ inner ℝ v ((F x",
+    "y ∈ upperImage C F",
+    "(upperImage C F"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.FiniteSlaterMultipliers.exists_multipliers": [
@@ -187352,6 +187464,40 @@
      "Convex ℝ C",
      "C.Nonempty",
      "∀ i, ConvexOn ℝ C (fun x ↦ F x i"
+    ],
+    "Descent.Portability.OperatorSlaterMultipliers.exists_multipliers": [
+     "ConvexOn ℝ C f",
+     "ConvexOn ℝ C g",
+     "∀ v : E, ConvexOn ℝ C (fun x ↦ inner ℝ v (H x v",
+     "xstar ∈ C",
+     "∀ x ∈ C, g x ≤ 0 → Nonnegative (-H x",
+     "∃ x ∈ C, g x < 0 ∧ StrictPositive (-H x"
+    ],
+    "Descent.Portability.OperatorSlaterSeparation.upperImage_open": [],
+    "Descent.Portability.OperatorSlaterSeparation.upperImage_convex": [
+     "Convex ℝ C",
+     "ConvexOn ℝ C (fun x ↦ (F x",
+     "∀ v : E, ConvexOn ℝ C (fun x ↦ inner ℝ v ((F x"
+    ],
+    "Descent.Portability.OperatorSlaterSeparation.upperImage_add": [
+     "y ∈ upperImage C F"
+    ],
+    "Descent.Portability.OperatorSlaterSeparation.direction_nonneg": [
+     "(upperImage C F",
+     "∀ y ∈ upperImage C F, 0 < L y"
+    ],
+    "Descent.Portability.OperatorSlaterSeparation.shifted_mem": [
+     "x ∈ C"
+    ],
+    "Descent.Portability.OperatorSlaterSeparation.supporting_boundary": [
+     "∀ y ∈ upperImage C F, 0 < L y",
+     "x ∈ C"
+    ],
+    "Descent.Portability.OperatorSlaterSeparation.exists_separator": [
+     "Convex ℝ C",
+     "C.Nonempty",
+     "ConvexOn ℝ C (fun x ↦ (F x",
+     "∀ v : E, ConvexOn ℝ C (fun x ↦ inner ℝ v ((F x"
     ]
    }
   }
@@ -228007,6 +228153,319 @@
    }
   }
  },
+ "Descent.Portability.OperatorPositiveCone.Nonnegative": {
+  "class": "STRUCTURAL",
+  "note": "Prop-valued / set-valued",
+  "file": "Descent/Portability/OperatorPositiveCone.lean",
+  "line": 27,
+  "short": "Nonnegative",
+  "ret_type": "Prop",
+  "empirical_status": "",
+  "python": "Nonnegative",
+  "args": [
+   "A"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'L[ℝ] E'\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.OperatorPositiveCone.identity_nonnegative",
+   "Descent.Portability.OperatorPositiveCone.nonnegative_smul",
+   "Descent.Portability.OperatorPositiveCone.strict_add_nonnegative",
+   "Descent.Portability.OperatorPositiveCone.strict_nonnegative",
+   "Descent.Portability.OperatorSlaterMultipliers.exists_multipliers",
+   "Descent.Portability.OperatorSlaterSeparation.direction_nonneg",
+   "Descent.Portability.OperatorSlaterSeparation.exists_separator",
+   "Descent.Portability.OperatorSlaterSeparation.upperImage_add",
+   "Descent.Portability.PositiveOperatorFunctional.rank_symmetry",
+   "Descent.Portability.PositiveOperatorFunctional.representative_positive"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "StrictPositive A",
+    "Nonnegative A",
+    "∀ A, Nonnegative A → 0 ≤ R A"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.OperatorPositiveCone.strict_add_nonnegative": [
+     "StrictPositive A"
+    ],
+    "Descent.Portability.OperatorPositiveCone.nonnegative_smul": [
+     "Nonnegative A"
+    ],
+    "Descent.Portability.OperatorPositiveCone.identity_nonnegative": [],
+    "Descent.Portability.OperatorPositiveCone.strict_nonnegative": [
+     "StrictPositive A"
+    ],
+    "Descent.Portability.OperatorSlaterMultipliers.exists_multipliers": [],
+    "Descent.Portability.OperatorSlaterSeparation.upperImage_add": [],
+    "Descent.Portability.OperatorSlaterSeparation.direction_nonneg": [],
+    "Descent.Portability.OperatorSlaterSeparation.exists_separator": [],
+    "Descent.Portability.PositiveOperatorFunctional.rank_symmetry": [
+     "∀ A, Nonnegative A → 0 ≤ R A"
+    ],
+    "Descent.Portability.PositiveOperatorFunctional.representative_positive": [
+     "∀ A, Nonnegative A → 0 ≤ R A"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.OperatorPositiveCone.StrictPositive": {
+  "class": "STRUCTURAL",
+  "note": "Prop-valued / set-valued",
+  "file": "Descent/Portability/OperatorPositiveCone.lean",
+  "line": 30,
+  "short": "StrictPositive",
+  "ret_type": "Prop",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.OperatorPositiveCone.strictPositive_convex",
+   "Descent.Portability.OperatorPositiveCone.strictPositive_open",
+   "Descent.Portability.OperatorPositiveCone.strict_add_nonnegative",
+   "Descent.Portability.OperatorPositiveCone.strict_identity",
+   "Descent.Portability.OperatorPositiveCone.strict_nonnegative",
+   "Descent.Portability.OperatorSlaterMultipliers.exists_multipliers",
+   "Descent.Portability.OperatorSlaterSeparation.shifted_mem",
+   "Descent.Portability.OperatorSlaterSeparation.upperImage_open"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "StrictPositive A"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.OperatorPositiveCone.strictPositive_open": [],
+    "Descent.Portability.OperatorPositiveCone.strictPositive_convex": [],
+    "Descent.Portability.OperatorPositiveCone.strict_add_nonnegative": [
+     "StrictPositive A"
+    ],
+    "Descent.Portability.OperatorPositiveCone.strict_identity": [],
+    "Descent.Portability.OperatorPositiveCone.strict_nonnegative": [
+     "StrictPositive A"
+    ],
+    "Descent.Portability.OperatorSlaterMultipliers.exists_multipliers": [],
+    "Descent.Portability.OperatorSlaterSeparation.upperImage_open": [],
+    "Descent.Portability.OperatorSlaterSeparation.shifted_mem": []
+   }
+  }
+ },
+ "Descent.Portability.OperatorSlaterMultipliers.operatorPart": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/OperatorSlaterMultipliers.lean",
+  "line": 27,
+  "short": "operatorPart",
+  "ret_type": "(E →L[ℝ] E) →L[ℝ] ℝ where toFun A",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.OperatorSlaterMultipliers.decomposition",
+   "Descent.Portability.OperatorSlaterMultipliers.exists_multipliers"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.OperatorSlaterMultipliers.decomposition": [],
+    "Descent.Portability.OperatorSlaterMultipliers.exists_multipliers": []
+   }
+  }
+ },
+ "Descent.Portability.OperatorSlaterSeparation.ResidualSpace": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "trailing tokens after expression: op:×",
+  "file": "Descent/Portability/OperatorSlaterSeparation.lean",
+  "line": 29,
+  "short": "ResidualSpace",
+  "ret_type": "",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.OperatorSlaterMultipliers.decomposition",
+   "Descent.Portability.OperatorSlaterMultipliers.exists_multipliers",
+   "Descent.Portability.OperatorSlaterSeparation.direction_nonneg",
+   "Descent.Portability.OperatorSlaterSeparation.exists_separator",
+   "Descent.Portability.OperatorSlaterSeparation.shifted_mem",
+   "Descent.Portability.OperatorSlaterSeparation.supporting_boundary",
+   "Descent.Portability.OperatorSlaterSeparation.upperImage_add",
+   "Descent.Portability.OperatorSlaterSeparation.upperImage_convex",
+   "Descent.Portability.OperatorSlaterSeparation.upperImage_open"
+  ],
+  "constraints": {
+   "declared_kind": "ratio",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [
+    "ConvexOn ℝ C f",
+    "ConvexOn ℝ C g",
+    "∀ v : E, ConvexOn ℝ C (fun x ↦ inner ℝ v (H x v",
+    "Convex ℝ C",
+    "ConvexOn ℝ C (fun x ↦ (F x",
+    "∀ v : E, ConvexOn ℝ C (fun x ↦ inner ℝ v ((F x",
+    "(0 : ResidualSpace E"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.OperatorSlaterMultipliers.decomposition": [],
+    "Descent.Portability.OperatorSlaterMultipliers.exists_multipliers": [
+     "ConvexOn ℝ C f",
+     "ConvexOn ℝ C g",
+     "∀ v : E, ConvexOn ℝ C (fun x ↦ inner ℝ v (H x v"
+    ],
+    "Descent.Portability.OperatorSlaterSeparation.upperImage_open": [],
+    "Descent.Portability.OperatorSlaterSeparation.upperImage_convex": [
+     "Convex ℝ C",
+     "ConvexOn ℝ C (fun x ↦ (F x",
+     "∀ v : E, ConvexOn ℝ C (fun x ↦ inner ℝ v ((F x"
+    ],
+    "Descent.Portability.OperatorSlaterSeparation.upperImage_add": [],
+    "Descent.Portability.OperatorSlaterSeparation.direction_nonneg": [],
+    "Descent.Portability.OperatorSlaterSeparation.shifted_mem": [],
+    "Descent.Portability.OperatorSlaterSeparation.supporting_boundary": [],
+    "Descent.Portability.OperatorSlaterSeparation.exists_separator": [
+     "Convex ℝ C",
+     "ConvexOn ℝ C (fun x ↦ (F x",
+     "∀ v : E, ConvexOn ℝ C (fun x ↦ inner ℝ v ((F x",
+     "(0 : ResidualSpace E"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.OperatorSlaterSeparation.upperImage": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/OperatorSlaterSeparation.lean",
+  "line": 33,
+  "short": "upperImage",
+  "ret_type": "Set (ResidualSpace E)",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.FiniteSlaterMultipliers.exists_multipliers",
+   "Descent.Portability.FiniteSlaterSeparation.coefficient_nonneg",
+   "Descent.Portability.FiniteSlaterSeparation.exists_nonnegative_separator",
+   "Descent.Portability.FiniteSlaterSeparation.supporting_boundary",
+   "Descent.Portability.FiniteSlaterSeparation.upperImage_convex",
+   "Descent.Portability.FiniteSlaterSeparation.upperImage_open",
+   "Descent.Portability.OperatorSlaterMultipliers.exists_multipliers",
+   "Descent.Portability.OperatorSlaterSeparation.direction_nonneg",
+   "Descent.Portability.OperatorSlaterSeparation.exists_separator",
+   "Descent.Portability.OperatorSlaterSeparation.shifted_mem",
+   "Descent.Portability.OperatorSlaterSeparation.supporting_boundary",
+   "Descent.Portability.OperatorSlaterSeparation.upperImage_add",
+   "Descent.Portability.OperatorSlaterSeparation.upperImage_convex",
+   "Descent.Portability.OperatorSlaterSeparation.upperImage_open"
+  ],
+  "constraints": {
+   "declared_kind": "ratio",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [
+    "ConvexOn ℝ C f",
+    "∀ j, ConvexOn ℝ C (g j",
+    "xstar ∈ C",
+    "∀ x ∈ C, (∀ j, g j x ≤ 0",
+    "∃ x ∈ C, ∀ j, g j x < 0",
+    "Convex ℝ C",
+    "∀ i, ConvexOn ℝ C (fun x ↦ F x i",
+    "C.Nonempty",
+    "∀ y ∈ upperImage C F, 0 < L y",
+    "x ∈ C",
+    "ConvexOn ℝ C g",
+    "∀ v : E, ConvexOn ℝ C (fun x ↦ inner ℝ v (H x v",
+    "∀ x ∈ C, g x ≤ 0 → Nonnegative (-H x",
+    "∃ x ∈ C, g x < 0 ∧ StrictPositive (-H x",
+    "ConvexOn ℝ C (fun x ↦ (F x",
+    "∀ v : E, ConvexOn ℝ C (fun x ↦ inner ℝ v ((F x",
+    "y ∈ upperImage C F",
+    "(upperImage C F"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.FiniteSlaterMultipliers.exists_multipliers": [
+     "ConvexOn ℝ C f",
+     "∀ j, ConvexOn ℝ C (g j",
+     "xstar ∈ C",
+     "∀ x ∈ C, (∀ j, g j x ≤ 0",
+     "∃ x ∈ C, ∀ j, g j x < 0"
+    ],
+    "Descent.Portability.FiniteSlaterSeparation.upperImage_open": [],
+    "Descent.Portability.FiniteSlaterSeparation.upperImage_convex": [
+     "Convex ℝ C",
+     "∀ i, ConvexOn ℝ C (fun x ↦ F x i"
+    ],
+    "Descent.Portability.FiniteSlaterSeparation.coefficient_nonneg": [
+     "C.Nonempty",
+     "∀ y ∈ upperImage C F, 0 < L y"
+    ],
+    "Descent.Portability.FiniteSlaterSeparation.supporting_boundary": [
+     "∀ y ∈ upperImage C F, 0 < L y",
+     "x ∈ C"
+    ],
+    "Descent.Portability.FiniteSlaterSeparation.exists_nonnegative_separator": [
+     "Convex ℝ C",
+     "C.Nonempty",
+     "∀ i, ConvexOn ℝ C (fun x ↦ F x i"
+    ],
+    "Descent.Portability.OperatorSlaterMultipliers.exists_multipliers": [
+     "ConvexOn ℝ C f",
+     "ConvexOn ℝ C g",
+     "∀ v : E, ConvexOn ℝ C (fun x ↦ inner ℝ v (H x v",
+     "xstar ∈ C",
+     "∀ x ∈ C, g x ≤ 0 → Nonnegative (-H x",
+     "∃ x ∈ C, g x < 0 ∧ StrictPositive (-H x"
+    ],
+    "Descent.Portability.OperatorSlaterSeparation.upperImage_open": [],
+    "Descent.Portability.OperatorSlaterSeparation.upperImage_convex": [
+     "Convex ℝ C",
+     "ConvexOn ℝ C (fun x ↦ (F x",
+     "∀ v : E, ConvexOn ℝ C (fun x ↦ inner ℝ v ((F x"
+    ],
+    "Descent.Portability.OperatorSlaterSeparation.upperImage_add": [
+     "y ∈ upperImage C F"
+    ],
+    "Descent.Portability.OperatorSlaterSeparation.direction_nonneg": [
+     "(upperImage C F",
+     "∀ y ∈ upperImage C F, 0 < L y"
+    ],
+    "Descent.Portability.OperatorSlaterSeparation.shifted_mem": [
+     "x ∈ C"
+    ],
+    "Descent.Portability.OperatorSlaterSeparation.supporting_boundary": [
+     "∀ y ∈ upperImage C F, 0 < L y",
+     "x ∈ C"
+    ],
+    "Descent.Portability.OperatorSlaterSeparation.exists_separator": [
+     "Convex ℝ C",
+     "C.Nonempty",
+     "ConvexOn ℝ C (fun x ↦ (F x",
+     "∀ v : E, ConvexOn ℝ C (fun x ↦ inner ℝ v ((F x"
+    ]
+   }
+  }
+ },
  "Descent.Portability.OptimalMeasurementAllocation.variance": {
   "class": "NUMERIC",
   "note": "",
@@ -256574,6 +257033,148 @@
     "Descent.Portability.PortabilityRatioGeometry.outcomeBound_nonneg": [],
     "Descent.Portability.PortabilityRatioGeometry.report_le_outcomeBound": [],
     "Descent.Portability.PortabilityRatioGeometry.certified_innerValue_integrable": []
+   }
+  }
+ },
+ "Descent.Portability.PositiveOperatorFunctional.rank": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "self-check: calls untranslated definition innerSL",
+  "file": "Descent/Portability/PositiveOperatorFunctional.lean",
+  "line": 30,
+  "short": "rank",
+  "ret_type": "E →L[ℝ] E",
+  "empirical_status": "",
+  "python": "rank",
+  "args": [
+   "x",
+   "y"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "NameError(\"name 'innerSL' is not defined\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Blindness.TrafficInvariantSeparation.FiniteLowRankSingularSpectrum.normalizedNuclearDistance_le_operatorBound_mul_rankFraction",
+   "Descent.Blindness.TrafficInvariantSeparation.FiniteLowRankSingularSpectrum.rawNuclearDistance_le_rank_mul_operatorBound",
+   "Descent.Blindness.TrafficInvariantSeparation.finiteRankOneSingularSpectrum_rawNuclearDistance_eq_bound",
+   "Descent.Portability.AngularSpectralBounds.angularEigenLaw_support_card",
+   "Descent.Portability.MatrixDecisionInformation.exact_matrix_summary_count",
+   "Descent.Portability.PositiveOperatorFunctional.operator_expansion",
+   "Descent.Portability.PositiveOperatorFunctional.rank_add_left",
+   "Descent.Portability.PositiveOperatorFunctional.rank_add_right",
+   "Descent.Portability.PositiveOperatorFunctional.rank_apply",
+   "Descent.Portability.PositiveOperatorFunctional.rank_skew_quadratic",
+   "Descent.Portability.PositiveOperatorFunctional.rank_smul_left",
+   "Descent.Portability.PositiveOperatorFunctional.rank_smul_right",
+   "Descent.Portability.PositiveOperatorFunctional.rank_symmetry",
+   "Descent.Portability.PositiveOperatorFunctional.representative_pairing",
+   "Descent.Portability.PositiveOperatorFunctional.trace_representation",
+   "Descent.Portability.SamplingDesignLaw.fit_test_cover"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Blindness.TrafficInvariantSeparation.FiniteLowRankSingularSpectrum.rawNuclearDistance_le_rank_mul_operatorBound": [],
+    "Descent.Blindness.TrafficInvariantSeparation.FiniteLowRankSingularSpectrum.normalizedNuclearDistance_le_operatorBound_mul_rankFraction": [],
+    "Descent.Blindness.TrafficInvariantSeparation.finiteRankOneSingularSpectrum_rawNuclearDistance_eq_bound": [],
+    "Descent.Portability.AngularSpectralBounds.angularEigenLaw_support_card": [],
+    "Descent.Portability.MatrixDecisionInformation.exact_matrix_summary_count": [],
+    "Descent.Portability.PositiveOperatorFunctional.rank_apply": [],
+    "Descent.Portability.PositiveOperatorFunctional.rank_add_left": [],
+    "Descent.Portability.PositiveOperatorFunctional.rank_add_right": [],
+    "Descent.Portability.PositiveOperatorFunctional.rank_smul_left": [],
+    "Descent.Portability.PositiveOperatorFunctional.rank_smul_right": [],
+    "Descent.Portability.PositiveOperatorFunctional.representative_pairing": [],
+    "Descent.Portability.PositiveOperatorFunctional.rank_skew_quadratic": [],
+    "Descent.Portability.PositiveOperatorFunctional.rank_symmetry": [],
+    "Descent.Portability.PositiveOperatorFunctional.operator_expansion": [],
+    "Descent.Portability.PositiveOperatorFunctional.trace_representation": [],
+    "Descent.Portability.SamplingDesignLaw.fit_test_cover": []
+   }
+  }
+ },
+ "Descent.Portability.PositiveOperatorFunctional.rowFunctional": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "trailing tokens after expression: op::=",
+  "file": "Descent/Portability/PositiveOperatorFunctional.lean",
+  "line": 57,
+  "short": "rowFunctional",
+  "ret_type": "E →ₗ[ℝ] ℝ where toFun y",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [],
+  "constraints": {}
+ },
+ "Descent.Portability.PositiveOperatorFunctional.representative": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name InnerProductSpace.toDual",
+  "file": "Descent/Portability/PositiveOperatorFunctional.lean",
+  "line": 63,
+  "short": "representative",
+  "ret_type": "E →ₗ[ℝ] E where toFun x",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Blindness.TrafficInvariantSeparation.lipschitzPressureProfiles_dist_le_of_net",
+   "Descent.Blindness.TrafficInvariantSeparation.lipschitzPressureProfiles_tendstoUniformly_of_tendstoOn_dense",
+   "Descent.Blindness.TrafficInvariantSeparation.lipschitzPressureProfiles_tendsto_of_tendstoOn_dense",
+   "Descent.Conditionals.genomicPressureProfiles_dist_le_of_tiltNet",
+   "Descent.Portability.GenealogyGenotypeLaw.branchKernel_commute",
+   "Descent.Portability.GenealogyGenotypeLaw.branchKernel_expectation",
+   "Descent.Portability.GenealogyGenotypeLaw.overwrite_original",
+   "Descent.Portability.GenealogyGenotypeLaw.overwrite_representative",
+   "Descent.Portability.OrderedCladeLaw.homogeneous_overwrite",
+   "Descent.Portability.OrderedMutationCatalogue.mutationBranch_nucleotide",
+   "Descent.Portability.OrderedMutationCatalogue.mutationCount_nucleotide",
+   "Descent.Portability.PositiveOperatorFunctional.representative_pairing",
+   "Descent.Portability.PositiveOperatorFunctional.representative_positive",
+   "Descent.Portability.PositiveOperatorFunctional.representative_trace",
+   "Descent.Portability.PositiveOperatorFunctional.trace_representation",
+   "Descent.Portability.cellBalanced_cross_term_eq_zero",
+   "Descent.Portability.cellBalanced_energy_eq_add_gap",
+   "Descent.Portability.cellBalanced_sum_residual_eq_zero",
+   "Descent.Portability.cellBalanced_total_energy_eq"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "∀ A, Nonnegative A → 0 ≤ R A"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Blindness.TrafficInvariantSeparation.lipschitzPressureProfiles_dist_le_of_net": [],
+    "Descent.Blindness.TrafficInvariantSeparation.lipschitzPressureProfiles_tendsto_of_tendstoOn_dense": [],
+    "Descent.Blindness.TrafficInvariantSeparation.lipschitzPressureProfiles_tendstoUniformly_of_tendstoOn_dense": [],
+    "Descent.Conditionals.genomicPressureProfiles_dist_le_of_tiltNet": [],
+    "Descent.Portability.cellBalanced_cross_term_eq_zero": [],
+    "Descent.Portability.cellBalanced_sum_residual_eq_zero": [],
+    "Descent.Portability.cellBalanced_energy_eq_add_gap": [],
+    "Descent.Portability.cellBalanced_total_energy_eq": [],
+    "Descent.Portability.GenealogyGenotypeLaw.overwrite_representative": [],
+    "Descent.Portability.GenealogyGenotypeLaw.overwrite_original": [],
+    "Descent.Portability.GenealogyGenotypeLaw.branchKernel_expectation": [],
+    "Descent.Portability.GenealogyGenotypeLaw.branchKernel_commute": [],
+    "Descent.Portability.OrderedCladeLaw.homogeneous_overwrite": [],
+    "Descent.Portability.OrderedMutationCatalogue.mutationCount_nucleotide": [],
+    "Descent.Portability.OrderedMutationCatalogue.mutationBranch_nucleotide": [],
+    "Descent.Portability.PositiveOperatorFunctional.representative_pairing": [],
+    "Descent.Portability.PositiveOperatorFunctional.representative_positive": [
+     "∀ A, Nonnegative A → 0 ≤ R A"
+    ],
+    "Descent.Portability.PositiveOperatorFunctional.trace_representation": [],
+    "Descent.Portability.PositiveOperatorFunctional.representative_trace": []
    }
   }
  },

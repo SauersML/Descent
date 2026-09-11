@@ -1,6 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.OperatorSlaterSeparation
+import Descent.Portability.PositiveOperatorFunctional
 import Descent.Portability.OperatorPositiveCone
 import Descent.Portability.SpectralCostEquality
 import Descent.Portability.FrameConvexRepair

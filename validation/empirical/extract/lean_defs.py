@@ -5239,6 +5239,9 @@ def Descent_Portability_OperationalAuditConstraints_prevalence(w, μ):
 def truePositive(w, d, μ):
     return sum((_rt.mul(_rt.mul(w[int(i)], d[int(i)]), μ[int(i)])) for i in range(int(len(w))))
 
+def Nonnegative(A):
+    return all(((0.0 <= inner(ℝ, x, (A(x))))) for x in range(int(_rt.sumdim('x', len(A)))))
+
 def Descent_Portability_OptimalMeasurementAllocation_variance(amplitude, effort):
     return sum((_rt.rdiv(_rt.lpow(amplitude[int(mode)], 2.0), effort[int(mode)])) for mode in range(int(len(amplitude))))
 
@@ -6120,6 +6123,9 @@ def spreadContrast():
 
 def covarianceVector(p, scoreGenotype, causalGenotype, weights, k):
     return sum((_rt.mul(weights[int(j)], Descent_Portability_FiniteReportLaw_covariance(p, ((lambda s: scoreGenotype[int(s)][int(j)])), ((lambda s: causalGenotype[int(s)][int(k)]))))) for j in range(int(_rt.sumdim('j', len(weights), len(scoreGenotype[0])))))
+
+def rank(x, y):
+    return _rt._proj((innerSL(ℝ, y)), 'smulRight')(x)
 
 def labels(liabilities):
     return (lambda i: decide(((0.0 < liabilities[int(i)]))))
