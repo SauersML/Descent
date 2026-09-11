@@ -7,6 +7,7 @@ import Descent.Portability.ReplicaMetricInstances
 
 open Descent.Portability.ReplicaMetricInstances
 
+#print axioms guardedRatio
 #print axioms getD_guardedRatio
 #print axioms conditionalMetric_guardedRatio
 #print axioms expectation_guardedRatio_eq_tsum

@@ -7,6 +7,7 @@ import Descent.Portability.ReferenceExperimentLaw
 
 open Descent.Portability.ReferenceExperimentLaw
 
+#print axioms bitValue_cast_eq_allele
 #print axioms contextMass_eq_cellWeight
 #print axioms contextMass_nonneg
 #print axioms drawMass_nonneg
