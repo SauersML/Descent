@@ -19,6 +19,7 @@ open Descent.Portability.SmallDenominatorLayerCake
 #print axioms truncation_layerCake
 #print axioms inverse_layerCake
 #print axioms remainder_layerCake
+#print axioms ratio_mul_decay_le
 #print axioms density_mul_smallDenominatorMass
 #print axioms intervalIntegrable_density_mul_smallDenominatorMass
 #print axioms expectation_profile_eq_integral
@@ -27,3 +28,10 @@ open Descent.Portability.SmallDenominatorLayerCake
 #print axioms unresolvedMass_le_gamma
 #print axioms expectation_inverse_le
 #print axioms unresolvedNumerator_le_gamma
+#print axioms lintegral_profile_eq_lintegral
+#print axioms lintegral_density_mul_measure_le
+#print axioms lintegral_truncation_le_gamma
+#print axioms lintegral_inverse_le
+#print axioms lintegral_unresolvedNumerator_le_gamma
+#print axioms lintegral_ratioOnDefined_eq_top
+#print axioms uniformDenominator_divergence_depends_on_numerator

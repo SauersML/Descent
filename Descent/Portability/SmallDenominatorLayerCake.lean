@@ -37,10 +37,25 @@ corpus quantity `ReplicaDomainCertificate.unresolvedMass`. Inserting the power l
 `M C Γ(α+1)/(α-1) · Γ(K+1)/Γ(K+α)`, where the two beta integrals combine through
 `Γ(α) + Γ(α-1) = α Γ(α-1)` (`remainderDensity_beta_bound`).
 
+Over an s-finite measure Tonelli's theorem gives the same identities as upper integrals
+(`lintegral_profile_eq_lintegral`), and the three bounds follow with the rate stated in
+extended nonnegative reals (`lintegral_truncation_le_gamma`, `lintegral_inverse_le`,
+`lintegral_unresolvedNumerator_le_gamma`). The divergence criterion of NOTE 2 section 6.3 is
+`lintegral_ratioOnDefined_eq_top`: over a finite measure, a matching lower bound
+`μ(0 < D ≤ t) ≥ c t^α` with `c > 0` and exponent `α ≤ 1` for `0 < t ≤ θ`, together with a
+numerator at least `ν > 0` on `0 < D ≤ θ`, makes the upper integral of the ratio infinite. The
+note's caveat that denominator bounds alone decide nothing is
+`uniformDenominator_divergence_depends_on_numerator`: under the uniform law the same clipped
+denominator gives an infinite expectation with numerator one, the note's slope `1/U`, and an
+expectation at most one with numerator equal to the denominator.
+
 Narrower and stronger than the note. The beta evaluation and (20) hold for every real `α > -1`,
-not only `α > 0`, and the power law is used only on `0 < t < 1`. Equation (29) needs no sign
-on the numerator, only the ceiling `N ≤ M`. The report-law results take the bounds
-`0 ≤ D ≤ 1` pointwise, as the corpus certificates do.
+not only `α > 0`, and the power law is used only on `0 < t ≤ 1`. Equation (29) needs no sign
+on the numerator, only the ceiling `N ≤ M`. All results take the bounds `0 ≤ D ≤ 1`
+pointwise, as the corpus certificates do, and the measure results take the denominator
+measurable. The divergence criterion is proved for finite measures, the setting of a
+probability law; signed numerators, which the note splits into positive and negative parts,
+are not treated.
 
 ## Empirical status
 
@@ -229,7 +244,8 @@ theorem remainderDensity_beta_bound (K : ℕ) (hK : 1 ≤ K) (scale α : ℝ) (h
       have hshift := Real.Gamma_add_one hαne
       rwa [harg1] at hshift
     rw [hGammaAlpha, hGammaShift, Real.Gamma_add_one hK0]
-    field_simp <;> ring
+    field_simp
+    ring
   exact ⟨hcont, hdensity, ((hfirst.const_mul (K : ℝ)).add hsecond).const_mul scale, hdominates,
     hvalue⟩
 
@@ -365,6 +381,21 @@ theorem remainder_layerCake (D : ℝ) (hD1 : D ≤ 1) (K : ℕ) (hK : 1 ≤ K) :
       neg_neg]
   rw [← primitive_eq_integral_selector _ (fun s ↦ -((1 - s) ^ K / s))
     (remainderDensity_beta_bound K hK 0 2 one_lt_two).1 hderiv D hD1, hvalue]
+
+/-- Pointwise, a numerator below a ceiling `M` makes the discarded ratio term
+`1_{D>0} (N / D) (1 - D)^K` at most `M 1_{D>0} (1 - D)^K / D` whenever `D ≤ 1`. -/
+theorem ratio_mul_decay_le (num den ceilingValue : ℝ) (hceiling : num ≤ ceilingValue)
+    (hone : den ≤ 1) (K : ℕ) :
+    (if 0 < den then num / den else 0) * (1 - den) ^ K ≤
+      ceilingValue * (if 0 < den then (1 - den) ^ K / den else 0) := by
+  by_cases hpos : 0 < den
+  · rw [if_pos hpos, if_pos hpos]
+    have hdecay : 0 ≤ (1 - den) ^ K := pow_nonneg (by linarith) K
+    calc num / den * (1 - den) ^ K = num * (1 - den) ^ K / den := by ring
+      _ ≤ ceilingValue * (1 - den) ^ K / den :=
+        div_le_div_of_nonneg_right (mul_le_mul_of_nonneg_right hceiling hdecay) hpos.le
+      _ = ceilingValue * ((1 - den) ^ K / den) := by ring
+  · simp [hpos]
 
 end Pointwise
 
@@ -513,24 +544,13 @@ theorem unresolvedNumerator_le_gamma (law : FiniteReportLaw Report) (num den : R
     unfold unresolvedNumerator FiniteReportLaw.expectation
     rw [Finset.mul_sum]
     refine Finset.sum_le_sum fun report _ ↦ ?_
-    by_cases hpos : 0 < den report
-    · simp only [ratioOnDefined, if_pos hpos]
-      have hdecay : 0 ≤ (1 - den report) ^ K := pow_nonneg (by linarith [hone report]) K
-      have hstep : num report * (1 - den report) ^ K ≤ ceilingValue * (1 - den report) ^ K :=
-        mul_le_mul_of_nonneg_right (hceiling report) hdecay
-      have hratio : num report / den report * (1 - den report) ^ K ≤
-          ceilingValue * ((1 - den report) ^ K / den report) := by
-        calc num report / den report * (1 - den report) ^ K
-            = num report * (1 - den report) ^ K / den report := by ring
-          _ ≤ ceilingValue * (1 - den report) ^ K / den report :=
-            div_le_div_of_nonneg_right hstep hpos.le
-          _ = ceilingValue * ((1 - den report) ^ K / den report) := by ring
-      calc law.mass report * (num report / den report * (1 - den report) ^ K)
-          ≤ law.mass report * (ceilingValue * ((1 - den report) ^ K / den report)) :=
-            mul_le_mul_of_nonneg_left hratio (law.mass_nonneg report)
-        _ = ceilingValue * (law.mass report * ((1 - den report) ^ K / den report)) := by ring
-    · simp only [ratioOnDefined, if_neg hpos]
-      simp
+    calc law.mass report * (ratioOnDefined num den report * (1 - den report) ^ K)
+        ≤ law.mass report * (ceilingValue *
+          (if 0 < den report then (1 - den report) ^ K / den report else 0)) :=
+          mul_le_mul_of_nonneg_left (ratio_mul_decay_le (num report) (den report) ceilingValue
+            (hceiling report) (hone report) K) (law.mass_nonneg report)
+      _ = ceilingValue * (law.mass report *
+          (if 0 < den report then (1 - den report) ^ K / den report else 0)) := by ring
   have hlayer : law.expectation (fun report ↦
       if 0 < den report then (1 - den report) ^ K / den report else 0) =
       ∫ t in (0 : ℝ)..1, ((K : ℝ) * (1 - t) ^ (K - 1) * t + (1 - t) ^ K) / t ^ 2 *
@@ -557,6 +577,338 @@ theorem unresolvedNumerator_le_gamma (law : FiniteReportLaw Report) (num den : R
         ring
 
 end FiniteReport
+
+section Measure
+
+variable {Ω : Type*} [MeasurableSpace Ω]
+
+/-- **NOTE 2 section 5.3, the layer cake over a measure.** For an s-finite measure and a
+measurable denominator in `[0, 1]`, if a profile has a layer-cake representation against a
+measurable density that is continuous and nonnegative on `(0, 1]`, the upper integral of the
+profile on the defined event is `∫_(0,1] density(t) μ(0 < D ≤ t) dt`. The content is Tonelli's
+exchange of the two integrals. -/
+theorem lintegral_profile_eq_lintegral (μ : Measure Ω) [SFinite μ] (den : Ω → ℝ)
+    (hmeas : Measurable den) (hnonneg : ∀ ω, 0 ≤ den ω) (hone : ∀ ω, den ω ≤ 1)
+    (density profile : ℝ → ℝ) (hdensityMeasurable : Measurable density)
+    (hcont : ContinuousOn density (Ioc 0 1)) (hdensity : ∀ t ∈ Ioc (0 : ℝ) 1, 0 ≤ density t)
+    (hprofile : ∀ D : ℝ, D ≤ 1 → (if 0 < D then profile D else 0) =
+      ∫ t in (0 : ℝ)..1, density t * (if 0 < D ∧ D ≤ t then 1 else 0)) :
+    ∫⁻ ω, ENNReal.ofReal (if 0 < den ω then profile (den ω) else 0) ∂μ =
+      ∫⁻ t in Ioc (0 : ℝ) 1, ENNReal.ofReal (density t) * μ {ω | 0 < den ω ∧ den ω ≤ t} := by
+  have hslice : ∀ ω, ENNReal.ofReal (if 0 < den ω then profile (den ω) else 0) =
+      ∫⁻ t in Ioc (0 : ℝ) 1,
+        ENNReal.ofReal (density t * (if 0 < den ω ∧ den ω ≤ t then 1 else 0)) := by
+    intro ω
+    have hint : IntegrableOn
+        (fun t ↦ density t * (if 0 < den ω ∧ den ω ≤ t then 1 else 0)) (Ioc 0 1) volume :=
+      (intervalIntegrable_iff_integrableOn_Ioc_of_le zero_le_one).mp
+        (intervalIntegrable_density_mul_selector density hcont (den ω) (hnonneg ω))
+    have hnn : 0 ≤ᵐ[volume.restrict (Ioc (0 : ℝ) 1)]
+        fun t ↦ density t * (if 0 < den ω ∧ den ω ≤ t then 1 else 0) := by
+      filter_upwards [ae_restrict_mem measurableSet_Ioc] with t ht
+      show (0 : ℝ) ≤ density t * (if 0 < den ω ∧ den ω ≤ t then 1 else 0)
+      exact mul_nonneg (hdensity t ht) (by split_ifs <;> norm_num)
+    rw [← ofReal_integral_eq_lintegral_ofReal hint hnn,
+      ← intervalIntegral.integral_of_le zero_le_one, hprofile (den ω) (hone ω)]
+  have hevent : ∀ t : ℝ, MeasurableSet {ω | 0 < den ω ∧ den ω ≤ t} := fun t ↦
+    (measurableSet_lt measurable_const hmeas).inter (measurableSet_le hmeas measurable_const)
+  have hsection : ∀ t : ℝ, ∫⁻ ω,
+      ENNReal.ofReal (density t * (if 0 < den ω ∧ den ω ≤ t then 1 else 0)) ∂μ =
+        ENNReal.ofReal (density t) * μ {ω | 0 < den ω ∧ den ω ≤ t} := by
+    intro t
+    have hfun : (fun ω ↦ ENNReal.ofReal
+        (density t * (if 0 < den ω ∧ den ω ≤ t then 1 else 0))) =
+        fun ω ↦ ENNReal.ofReal (density t) * {ω | 0 < den ω ∧ den ω ≤ t}.indicator 1 ω := by
+      funext ω
+      by_cases hω : 0 < den ω ∧ den ω ≤ t
+      · simp [hω]
+      · simp [hω]
+    rw [hfun, lintegral_const_mul _ (measurable_one.indicator (hevent t)),
+      lintegral_indicator_one (hevent t)]
+  have hjoint : Measurable fun p : Ω × ℝ ↦
+      ENNReal.ofReal (density p.2 * (if 0 < den p.1 ∧ den p.1 ≤ p.2 then 1 else 0)) := by
+    have hset : MeasurableSet {p : Ω × ℝ | 0 < den p.1 ∧ den p.1 ≤ p.2} :=
+      (measurableSet_lt measurable_const (hmeas.comp measurable_fst)).inter
+        (measurableSet_le (hmeas.comp measurable_fst) measurable_snd)
+    exact ENNReal.measurable_ofReal.comp ((hdensityMeasurable.comp measurable_snd).mul
+      (Measurable.ite hset measurable_const measurable_const))
+  calc ∫⁻ ω, ENNReal.ofReal (if 0 < den ω then profile (den ω) else 0) ∂μ
+      = ∫⁻ ω, (∫⁻ t in Ioc (0 : ℝ) 1,
+          ENNReal.ofReal (density t * (if 0 < den ω ∧ den ω ≤ t then 1 else 0))) ∂μ :=
+        lintegral_congr hslice
+    _ = ∫⁻ t in Ioc (0 : ℝ) 1, (∫⁻ ω,
+          ENNReal.ofReal (density t * (if 0 < den ω ∧ den ω ≤ t then 1 else 0)) ∂μ) :=
+        lintegral_lintegral_swap hjoint.aemeasurable
+    _ = ∫⁻ t in Ioc (0 : ℝ) 1, ENNReal.ofReal (density t) * μ {ω | 0 < den ω ∧ den ω ≤ t} :=
+        lintegral_congr hsection
+
+/-- **Power-law insertion over a measure.** Under `μ(0 < D ≤ t) ≤ C t^α` for `0 < t ≤ 1` with
+`C ≥ 0`, the layer-cake integral of a density nonnegative on `(0, 1]` is at most the integral of
+any integrable function dominating the density times `C t^α` there. -/
+theorem lintegral_density_mul_measure_le (μ : Measure Ω) (den : Ω → ℝ) (density : ℝ → ℝ)
+    (hdensity : ∀ t ∈ Ioc (0 : ℝ) 1, 0 ≤ density t) (scale α : ℝ) (hscale : 0 ≤ scale)
+    (bound : ℝ → ℝ) (hbound : IntervalIntegrable bound volume 0 1)
+    (hdominates : ∀ t ∈ Ioc (0 : ℝ) 1, density t * (scale * t ^ α) ≤ bound t)
+    (hrate : ∀ t, 0 < t → t ≤ 1 →
+      μ {ω | 0 < den ω ∧ den ω ≤ t} ≤ ENNReal.ofReal (scale * t ^ α)) :
+    ∫⁻ t in Ioc (0 : ℝ) 1, ENNReal.ofReal (density t) * μ {ω | 0 < den ω ∧ den ω ≤ t} ≤
+      ENNReal.ofReal (∫ t in (0 : ℝ)..1, bound t) := by
+  have hnn : 0 ≤ᵐ[volume.restrict (Ioc (0 : ℝ) 1)] bound := by
+    filter_upwards [ae_restrict_mem measurableSet_Ioc] with t ht
+    show (0 : ℝ) ≤ bound t
+    exact (mul_nonneg (hdensity t ht)
+      (mul_nonneg hscale (Real.rpow_nonneg ht.1.le α))).trans (hdominates t ht)
+  rw [intervalIntegral.integral_of_le zero_le_one, ofReal_integral_eq_lintegral_ofReal
+    ((intervalIntegrable_iff_integrableOn_Ioc_of_le zero_le_one).mp hbound) hnn]
+  refine setLIntegral_mono' measurableSet_Ioc fun t ht ↦ ?_
+  calc ENNReal.ofReal (density t) * μ {ω | 0 < den ω ∧ den ω ≤ t}
+      ≤ ENNReal.ofReal (density t) * ENNReal.ofReal (scale * t ^ α) :=
+        mul_le_mul_left' (hrate t ht.1 ht.2) _
+    _ = ENNReal.ofReal (density t * (scale * t ^ α)) :=
+        (ENNReal.ofReal_mul (hdensity t ht)).symm
+    _ ≤ ENNReal.ofReal (bound t) := ENNReal.ofReal_le_ofReal (hdominates t ht)
+
+/-- **NOTE 2 equation (20) over a measure.** For an s-finite measure, a measurable denominator
+in `[0, 1]` with `μ(0 < D ≤ t) ≤ C t^α` for `0 < t ≤ 1`, `C ≥ 0`, `α > -1` and `K ≥ 1`, the
+upper integral of `1_{D>0} (1 - D)^K` is at most `C Γ(α + 1) Γ(K + 1) / Γ(K + α + 1)`. -/
+theorem lintegral_truncation_le_gamma (μ : Measure Ω) [SFinite μ] (den : Ω → ℝ)
+    (hmeas : Measurable den) (hnonneg : ∀ ω, 0 ≤ den ω) (hone : ∀ ω, den ω ≤ 1) (scale α : ℝ)
+    (hscale : 0 ≤ scale) (hα : -1 < α)
+    (hrate : ∀ t, 0 < t → t ≤ 1 →
+      μ {ω | 0 < den ω ∧ den ω ≤ t} ≤ ENNReal.ofReal (scale * t ^ α)) (K : ℕ) (hK : 1 ≤ K) :
+    ∫⁻ ω, ENNReal.ofReal (if 0 < den ω then (1 - den ω) ^ K else 0) ∂μ ≤
+      ENNReal.ofReal
+        (scale * (Real.Gamma (α + 1) * Real.Gamma (K + 1) / Real.Gamma (K + α + 1))) := by
+  obtain ⟨hcont, hdensity, hbound, hvalue⟩ := truncationDensity_beta_bound K hK scale α hα
+  rw [lintegral_profile_eq_lintegral μ den hmeas hnonneg hone _ (fun D ↦ (1 - D) ^ K)
+    (by fun_prop) hcont hdensity fun D hD1 ↦ truncation_layerCake D hD1 K hK, ← hvalue]
+  exact lintegral_density_mul_measure_le μ den _ hdensity scale α hscale _ hbound
+    (fun t _ ↦ le_of_eq (by ring)) hrate
+
+/-- **NOTE 2 equation (28) over a measure.** For an s-finite measure and a measurable
+denominator in `[0, 1]` with `μ(0 < D ≤ t) ≤ C t^α` for `0 < t ≤ 1`, `C ≥ 0` and `α > 1`, the
+upper integral of `1_{D>0} D⁻¹` is at most `μ(D > 0) + C / (α - 1)`. -/
+theorem lintegral_inverse_le (μ : Measure Ω) [SFinite μ] (den : Ω → ℝ) (hmeas : Measurable den)
+    (hnonneg : ∀ ω, 0 ≤ den ω) (hone : ∀ ω, den ω ≤ 1) (scale α : ℝ) (hscale : 0 ≤ scale)
+    (hα : 1 < α)
+    (hrate : ∀ t, 0 < t → t ≤ 1 →
+      μ {ω | 0 < den ω ∧ den ω ≤ t} ≤ ENNReal.ofReal (scale * t ^ α)) :
+    ∫⁻ ω, ENNReal.ofReal (ratioOnDefined (fun _ ↦ 1) den ω) ∂μ ≤
+      μ {ω | 0 < den ω} + ENNReal.ofReal (scale / (α - 1)) := by
+  obtain ⟨hcont, hdensity, hbound, hdominates, hvalue⟩ := inverseDensity_beta_bound scale α hα
+  have hpositive : MeasurableSet {ω | 0 < den ω} := measurableSet_lt measurable_const hmeas
+  have hsplit : ∀ ω, ENNReal.ofReal (ratioOnDefined (fun _ ↦ 1) den ω) =
+      {ω | 0 < den ω}.indicator 1 ω +
+        ENNReal.ofReal (if 0 < den ω then (den ω)⁻¹ - 1 else 0) := by
+    intro ω
+    by_cases hpos : 0 < den ω
+    · have hinv : (0 : ℝ) ≤ (den ω)⁻¹ - 1 := by
+        have hle := (one_le_inv₀ hpos).mpr (hone ω)
+        linarith
+      simp only [ratioOnDefined, if_pos hpos,
+        Set.indicator_of_mem (show ω ∈ {ω | 0 < den ω} from hpos), Pi.one_apply]
+      rw [← ENNReal.ofReal_one, ← ENNReal.ofReal_add zero_le_one hinv]
+      congr 1
+      ring
+    · simp [ratioOnDefined, hpos]
+  have hlayer := lintegral_profile_eq_lintegral μ den hmeas hnonneg hone _ (fun D ↦ D⁻¹ - 1)
+    (by fun_prop) hcont hdensity fun D hD1 ↦ inverse_layerCake D hD1
+  have hle := lintegral_density_mul_measure_le μ den _ hdensity scale α hscale _ hbound
+    hdominates hrate
+  rw [lintegral_congr hsplit, lintegral_add_left (measurable_one.indicator hpositive),
+    lintegral_indicator_one hpositive, hlayer, ← hvalue]
+  exact add_le_add_left hle _
+
+/-- **NOTE 2 equation (29) over a measure.** For an s-finite measure, `N ≤ M` with `M ≥ 0`, a
+measurable denominator in `[0, 1]` with `μ(0 < D ≤ t) ≤ C t^α` for `0 < t ≤ 1`, `C ≥ 0`,
+`α > 1` and `K ≥ 1`, the upper integral of the discarded term `1_{D>0} (N / D) (1 - D)^K` is at
+most `M C Γ(α + 1) / (α - 1) · Γ(K + 1) / Γ(K + α)`. -/
+theorem lintegral_unresolvedNumerator_le_gamma (μ : Measure Ω) [SFinite μ] (num den : Ω → ℝ)
+    (hmeas : Measurable den) (ceilingValue : ℝ) (hceilingNonneg : 0 ≤ ceilingValue)
+    (hceiling : ∀ ω, num ω ≤ ceilingValue) (hnonneg : ∀ ω, 0 ≤ den ω) (hone : ∀ ω, den ω ≤ 1)
+    (scale α : ℝ) (hscale : 0 ≤ scale) (hα : 1 < α)
+    (hrate : ∀ t, 0 < t → t ≤ 1 →
+      μ {ω | 0 < den ω ∧ den ω ≤ t} ≤ ENNReal.ofReal (scale * t ^ α)) (K : ℕ) (hK : 1 ≤ K) :
+    ∫⁻ ω, ENNReal.ofReal (ratioOnDefined num den ω * (1 - den ω) ^ K) ∂μ ≤
+      ENNReal.ofReal (ceilingValue * scale * (Real.Gamma (α + 1) / (α - 1)) *
+        (Real.Gamma (K + 1) / Real.Gamma (K + α))) := by
+  obtain ⟨hcont, hdensity, hbound, hdominates, hvalue⟩ :=
+    remainderDensity_beta_bound K hK scale α hα
+  have hlayer := lintegral_profile_eq_lintegral μ den hmeas hnonneg hone _
+    (fun D ↦ (1 - D) ^ K / D) (by fun_prop) hcont hdensity
+    fun D hD1 ↦ remainder_layerCake D hD1 K hK
+  have hle := lintegral_density_mul_measure_le μ den _ hdensity scale α hscale _ hbound
+    hdominates hrate
+  calc ∫⁻ ω, ENNReal.ofReal (ratioOnDefined num den ω * (1 - den ω) ^ K) ∂μ
+      ≤ ∫⁻ ω, ENNReal.ofReal ceilingValue *
+          ENNReal.ofReal (if 0 < den ω then (1 - den ω) ^ K / den ω else 0) ∂μ :=
+        lintegral_mono fun ω ↦ (ENNReal.ofReal_le_ofReal (ratio_mul_decay_le (num ω) (den ω)
+          ceilingValue (hceiling ω) (hone ω) K)).trans_eq (ENNReal.ofReal_mul hceilingNonneg)
+    _ = ENNReal.ofReal ceilingValue * ∫⁻ ω,
+          ENNReal.ofReal (if 0 < den ω then (1 - den ω) ^ K / den ω else 0) ∂μ :=
+        lintegral_const_mul' _ _ ENNReal.ofReal_ne_top
+    _ ≤ ENNReal.ofReal ceilingValue * ENNReal.ofReal (∫ t in (0 : ℝ)..1, scale *
+          ((K : ℝ) * (t ^ (α - 1) * (1 - t) ^ (K - 1)) + t ^ (α - 2) * (1 - t) ^ K)) := by
+        rw [hlayer]
+        exact mul_le_mul_left' hle _
+    _ = ENNReal.ofReal (ceilingValue * scale * (Real.Gamma (α + 1) / (α - 1)) *
+          (Real.Gamma (K + 1) / Real.Gamma (K + α))) := by
+        rw [hvalue, ← ENNReal.ofReal_mul hceilingNonneg]
+        congr 1
+        ring
+
+/-- **NOTE 2 section 6.3, the divergence criterion.** Let `μ` be a finite measure and `D` a
+measurable denominator in `[0, 1]`. If a matching lower small-denominator bound
+`μ(0 < D ≤ t) ≥ c t^α` holds for `0 < t ≤ θ` with `c > 0`, `0 < θ ≤ 1` and exponent `α ≤ 1`,
+and the numerator is at least `ν > 0` on the small-denominator event `0 < D ≤ θ`, then the upper
+integral of the ratio on its defined event is infinite. -/
+theorem lintegral_ratioOnDefined_eq_top (μ : Measure Ω) [IsFiniteMeasure μ] (num den : Ω → ℝ)
+    (hmeas : Measurable den) (hnonneg : ∀ ω, 0 ≤ den ω) (hone : ∀ ω, den ω ≤ 1)
+    (scale α threshold level : ℝ) (hscale : 0 < scale) (hα : α ≤ 1)
+    (hthreshold : 0 < threshold) (hthresholdOne : threshold ≤ 1) (hlevel : 0 < level)
+    (hrate : ∀ t, 0 < t → t ≤ threshold →
+      ENNReal.ofReal (scale * t ^ α) ≤ μ {ω | 0 < den ω ∧ den ω ≤ t})
+    (hlower : ∀ ω, 0 < den ω → den ω ≤ threshold → level ≤ num ω) :
+    ∫⁻ ω, ENNReal.ofReal (ratioOnDefined num den ω) ∂μ = ⊤ := by
+  have hinvtop : ∫⁻ t in Ioc (0 : ℝ) threshold, ENNReal.ofReal t⁻¹ = ⊤ := by
+    by_contra hfinite
+    have hnn : 0 ≤ᵐ[volume.restrict (Ioc (0 : ℝ) threshold)] fun t : ℝ ↦ t⁻¹ := by
+      filter_upwards [ae_restrict_mem measurableSet_Ioc] with t ht
+      show (0 : ℝ) ≤ t⁻¹
+      exact inv_nonneg.mpr ht.1.le
+    have hon : IntegrableOn (fun t : ℝ ↦ t⁻¹) (Ioc 0 threshold) volume :=
+      ⟨measurable_id.inv.aestronglyMeasurable,
+        (hasFiniteIntegral_iff_ofReal hnn).mpr (lt_top_iff_ne_top.mpr hfinite)⟩
+    have hinterval := (intervalIntegrable_iff_integrableOn_Ioc_of_le hthreshold.le).mpr hon
+    rw [intervalIntegrable_inv_iff, uIcc_of_le hthreshold.le] at hinterval
+    rcases hinterval with hzero | hnot
+    · exact hthreshold.ne hzero
+    · exact hnot ⟨le_rfl, hthreshold.le⟩
+  have hlayertop : ∫⁻ t in Ioc (0 : ℝ) 1,
+      ENNReal.ofReal ((t ^ 2)⁻¹) * μ {ω | 0 < den ω ∧ den ω ≤ t} = ⊤ := by
+    refine top_le_iff.mp ?_
+    calc (⊤ : ENNReal)
+        = ENNReal.ofReal scale * ∫⁻ t in Ioc (0 : ℝ) threshold, ENNReal.ofReal t⁻¹ := by
+          rw [hinvtop, ENNReal.mul_top (ENNReal.ofReal_pos.mpr hscale).ne']
+      _ = ∫⁻ t in Ioc (0 : ℝ) threshold, ENNReal.ofReal scale * ENNReal.ofReal t⁻¹ :=
+          (lintegral_const_mul' _ _ ENNReal.ofReal_ne_top).symm
+      _ ≤ ∫⁻ t in Ioc (0 : ℝ) threshold,
+            ENNReal.ofReal ((t ^ 2)⁻¹) * μ {ω | 0 < den ω ∧ den ω ≤ t} := by
+          refine setLIntegral_mono' measurableSet_Ioc fun t ht ↦ ?_
+          have ht0 : t ≠ 0 := ht.1.ne'
+          have hpow : t ≤ t ^ α := by
+            simpa using Real.rpow_le_rpow_of_exponent_ge ht.1 (ht.2.trans hthresholdOne) hα
+          have hreal : scale * t⁻¹ ≤ (t ^ 2)⁻¹ * (scale * t ^ α) := by
+            calc scale * t⁻¹ = scale * (t * t⁻¹) * t⁻¹ := by rw [mul_inv_cancel₀ ht0, mul_one]
+              _ = (t ^ 2)⁻¹ * (scale * t) := by ring
+              _ ≤ (t ^ 2)⁻¹ * (scale * t ^ α) :=
+                mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left hpow hscale.le)
+                  (inv_nonneg.mpr (sq_nonneg t))
+          calc ENNReal.ofReal scale * ENNReal.ofReal t⁻¹ = ENNReal.ofReal (scale * t⁻¹) :=
+                (ENNReal.ofReal_mul hscale.le).symm
+            _ ≤ ENNReal.ofReal ((t ^ 2)⁻¹ * (scale * t ^ α)) := ENNReal.ofReal_le_ofReal hreal
+            _ = ENNReal.ofReal ((t ^ 2)⁻¹) * ENNReal.ofReal (scale * t ^ α) :=
+                ENNReal.ofReal_mul (inv_nonneg.mpr (sq_nonneg t))
+            _ ≤ ENNReal.ofReal ((t ^ 2)⁻¹) * μ {ω | 0 < den ω ∧ den ω ≤ t} :=
+                mul_le_mul_left' (hrate t ht.1 ht.2) _
+      _ ≤ ∫⁻ t in Ioc (0 : ℝ) 1,
+            ENNReal.ofReal ((t ^ 2)⁻¹) * μ {ω | 0 < den ω ∧ den ω ≤ t} :=
+          lintegral_mono_set (Ioc_subset_Ioc_right hthresholdOne)
+  obtain ⟨hcont, hdensity, -, -, -⟩ := inverseDensity_beta_bound 1 2 one_lt_two
+  have hlayer : ∫⁻ ω, ENNReal.ofReal (if 0 < den ω then (den ω)⁻¹ - 1 else 0) ∂μ = ⊤ := by
+    rw [lintegral_profile_eq_lintegral μ den hmeas hnonneg hone _ (fun D ↦ D⁻¹ - 1)
+      (by fun_prop) hcont hdensity fun D hD1 ↦ inverse_layerCake D hD1]
+    exact hlayertop
+  have hpoint : ∀ ω, ENNReal.ofReal level *
+      ENNReal.ofReal (if 0 < den ω then (den ω)⁻¹ - 1 else 0) ≤
+        ENNReal.ofReal (ratioOnDefined num den ω) + ENNReal.ofReal (level * threshold⁻¹) := by
+    intro ω
+    rw [← ENNReal.ofReal_mul hlevel.le]
+    by_cases hpos : 0 < den ω
+    · simp only [ratioOnDefined, if_pos hpos]
+      by_cases hsmall : den ω ≤ threshold
+      · have hstep : level * ((den ω)⁻¹ - 1) ≤ num ω / den ω := by
+          have hinvNonneg : 0 ≤ (den ω)⁻¹ := inv_nonneg.mpr hpos.le
+          calc level * ((den ω)⁻¹ - 1) ≤ level * (den ω)⁻¹ :=
+                mul_le_mul_of_nonneg_left (by linarith) hlevel.le
+            _ ≤ num ω * (den ω)⁻¹ :=
+                mul_le_mul_of_nonneg_right (hlower ω hpos hsmall) hinvNonneg
+            _ = num ω / den ω := (div_eq_mul_inv _ _).symm
+        exact (ENNReal.ofReal_le_ofReal hstep).trans le_self_add
+      · have hstep : level * ((den ω)⁻¹ - 1) ≤ level * threshold⁻¹ := by
+          have hinv : (den ω)⁻¹ ≤ threshold⁻¹ := inv_anti₀ hthreshold (not_le.mp hsmall).le
+          exact mul_le_mul_of_nonneg_left (by linarith) hlevel.le
+        exact (ENNReal.ofReal_le_ofReal hstep).trans le_add_self
+    · simp only [ratioOnDefined, if_neg hpos, mul_zero, ENNReal.ofReal_zero]
+      exact zero_le _
+  have hsum : ⊤ ≤ ∫⁻ ω, ENNReal.ofReal (ratioOnDefined num den ω) ∂μ +
+      ENNReal.ofReal (level * threshold⁻¹) * μ univ := by
+    calc (⊤ : ENNReal)
+        = ENNReal.ofReal level *
+            ∫⁻ ω, ENNReal.ofReal (if 0 < den ω then (den ω)⁻¹ - 1 else 0) ∂μ := by
+          rw [hlayer, ENNReal.mul_top (ENNReal.ofReal_pos.mpr hlevel).ne']
+      _ = ∫⁻ ω, ENNReal.ofReal level *
+            ENNReal.ofReal (if 0 < den ω then (den ω)⁻¹ - 1 else 0) ∂μ :=
+          (lintegral_const_mul' _ _ ENNReal.ofReal_ne_top).symm
+      _ ≤ ∫⁻ ω, (ENNReal.ofReal (ratioOnDefined num den ω) +
+            ENNReal.ofReal (level * threshold⁻¹)) ∂μ := lintegral_mono hpoint
+      _ = ∫⁻ ω, ENNReal.ofReal (ratioOnDefined num den ω) ∂μ +
+            ENNReal.ofReal (level * threshold⁻¹) * μ univ := by
+          rw [lintegral_add_right _ measurable_const, lintegral_const]
+  by_contra hfinite
+  have hlt : ∫⁻ ω, ENNReal.ofReal (ratioOnDefined num den ω) ∂μ +
+      ENNReal.ofReal (level * threshold⁻¹) * μ univ < ⊤ :=
+    ENNReal.add_lt_top.mpr ⟨lt_top_iff_ne_top.mpr hfinite,
+      ENNReal.mul_lt_top ENNReal.ofReal_lt_top (measure_lt_top μ univ)⟩
+  exact hlt.ne (top_le_iff.mp hsum)
+
+/-- **NOTE 2 section 6.3, denominator bounds alone do not decide divergence.** Under the uniform
+law on `(0, 1]` the clipped identity denominator `U = max 0 (min ω 1)` has the matching lower
+bound `μ(0 < U ≤ t) ≥ t` with exponent one. With numerator one the ratio `1/U`, the note's
+slope, has infinite expectation, as the divergence criterion predicts; with numerator `U`, which
+vanishes as fast as the denominator, the same denominator law gives expectation at most one. -/
+theorem uniformDenominator_divergence_depends_on_numerator :
+    (∀ t : ℝ, 0 < t → t ≤ 1 → ENNReal.ofReal (1 * t ^ (1 : ℝ)) ≤
+      volume.restrict (Ioc (0 : ℝ) 1) {ω | 0 < max 0 (min ω 1) ∧ max 0 (min ω 1) ≤ t}) ∧
+    ∫⁻ ω in Ioc (0 : ℝ) 1,
+      ENNReal.ofReal (ratioOnDefined (fun _ ↦ 1) (fun ω : ℝ ↦ max 0 (min ω 1)) ω) = ⊤ ∧
+    ∫⁻ ω in Ioc (0 : ℝ) 1, ENNReal.ofReal (ratioOnDefined (fun ω : ℝ ↦ max 0 (min ω 1))
+      (fun ω : ℝ ↦ max 0 (min ω 1)) ω) ≤ 1 := by
+  have hmeas : Measurable fun ω : ℝ ↦ max 0 (min ω 1) :=
+    measurable_const.max (measurable_id.min measurable_const)
+  have hnonneg : ∀ ω : ℝ, 0 ≤ max 0 (min ω 1) := fun ω ↦ le_max_left _ _
+  have hone : ∀ ω : ℝ, max 0 (min ω 1) ≤ 1 := fun ω ↦ max_le zero_le_one (min_le_right _ _)
+  have hrate : ∀ t : ℝ, 0 < t → t ≤ 1 → ENNReal.ofReal (1 * t ^ (1 : ℝ)) ≤
+      volume.restrict (Ioc (0 : ℝ) 1) {ω | 0 < max 0 (min ω 1) ∧ max 0 (min ω 1) ≤ t} := by
+    intro t ht ht1
+    have hset : {ω : ℝ | 0 < max 0 (min ω 1) ∧ max 0 (min ω 1) ≤ t} ∩ Ioc 0 1 = Ioc 0 t := by
+      ext ω
+      simp only [mem_inter_iff, mem_setOf_eq, mem_Ioc]
+      constructor
+      · rintro ⟨⟨_, hle⟩, hω0, hω1⟩
+        rw [min_eq_left hω1, max_eq_right hω0.le] at hle
+        exact ⟨hω0, hle⟩
+      · rintro ⟨hω0, hωt⟩
+        have hω1 : ω ≤ 1 := hωt.trans ht1
+        rw [min_eq_left hω1, max_eq_right hω0.le]
+        exact ⟨⟨hω0, hωt⟩, hω0, hω1⟩
+    refine le_of_eq ?_
+    have hevent : MeasurableSet {ω : ℝ | 0 < max 0 (min ω 1) ∧ max 0 (min ω 1) ≤ t} :=
+      (measurableSet_lt measurable_const hmeas).inter (measurableSet_le hmeas measurable_const)
+    rw [Measure.restrict_apply hevent, hset, Real.volume_Ioc, Real.rpow_one, one_mul, sub_zero]
+  refine ⟨hrate, ?_, ?_⟩
+  · exact lintegral_ratioOnDefined_eq_top (volume.restrict (Ioc (0 : ℝ) 1)) (fun _ ↦ 1) _ hmeas
+      hnonneg hone 1 1 1 1 one_pos le_rfl one_pos le_rfl one_pos hrate fun _ _ _ ↦ le_rfl
+  · calc ∫⁻ ω in Ioc (0 : ℝ) 1, ENNReal.ofReal (ratioOnDefined (fun ω : ℝ ↦ max 0 (min ω 1))
+          (fun ω : ℝ ↦ max 0 (min ω 1)) ω)
+        ≤ ∫⁻ _ in Ioc (0 : ℝ) 1, 1 := lintegral_mono fun ω ↦
+          (ENNReal.ofReal_le_ofReal (ratioOnDefined_le_one _ _ (fun _ ↦ le_rfl) ω)).trans_eq
+            ENNReal.ofReal_one
+      _ = 1 := by
+          rw [lintegral_const, Measure.restrict_apply_univ, Real.volume_Ioc, sub_zero,
+            ENNReal.ofReal_one, one_mul]
+
+end Measure
 
 end
 
