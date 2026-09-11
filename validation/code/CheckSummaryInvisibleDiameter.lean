@@ -10,6 +10,7 @@ open Descent.Portability.SummaryInvisibleDiameter
 #print axioms summaryGap_nonneg
 #print axioms exists_best_approximation
 #print axioms abs_expectation_le_norm
+#print axioms expectation_sub_metric
 #print axioms abs_expectation_sub_le_two_summaryGap
 #print axioms max_sub_max_neg
 #print axioms max_add_max_neg
