@@ -14,3 +14,4 @@ import Descent.Portability.JointReportFeasibility
 #print axioms Descent.Portability.JointReportFeasibility.region_eq_convexHull_of_module
 #print axioms Descent.Portability.JointReportFeasibility.isCompact_primalValues
 #print axioms Descent.Portability.JointReportFeasibility.primal_max_eq_dual_inf
+#print axioms Descent.Portability.JointReportFeasibility.expected_partialR2_mem_convexHull

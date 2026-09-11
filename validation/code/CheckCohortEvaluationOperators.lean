@@ -67,3 +67,4 @@ import Descent.Portability.CohortEvaluationOperators
 #print axioms Descent.Portability.CohortEvaluationOperators.loss_report_quartic
 #print axioms Descent.Portability.CohortEvaluationOperators.individualLoss_smul
 #print axioms Descent.Portability.CohortEvaluationOperators.lossReport_outcome_scale_invariant
+#print axioms Descent.Portability.CohortEvaluationOperators.binMeanSquaredError_eq_uniformExp

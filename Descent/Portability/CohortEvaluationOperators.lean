@@ -1,7 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Portability.IndividualLossMoments
+import Descent.Portability.PortabilityMasterTheorem
 
 assert_below Descent.Decision Descent.Program
 
@@ -25,8 +25,9 @@ concrete matrices built here: `rankOneProj_transpose` and `rankOneProj_mul_self`
 `augmentedProj_transpose` and `augmentedProj_mul_self` for the score-augmented nuisance
 projection.  Singular nuisance designs are therefore allowed: nothing below inverts `WᵀW`.
 
-Built on `Descent.Foundations.dot` and the finite expectation vocabulary reached through
-`Descent.Portability.IndividualLossMoments`.
+Built on `Descent.Foundations.dot` and on the empirical cohort expectation `uniformExp` of
+`Descent.Portability.PortabilityMasterTheorem`, to which `binMeanSquaredError_eq_uniformExp`
+ties the bin mean squared error.
 -/
 
 set_option autoImplicit false
@@ -722,6 +723,17 @@ theorem lossVector_smul (c : ℝ) (e : Fin n → ℝ) :
   funext i
   simp only [lossVector, Pi.smul_apply, smul_eq_mul]
   ring
+
+/-- **The bin mean squared error is the empirical cohort expectation of the squared-residual
+vector.**  Taking the bin to be the whole cohort, the operator quantity of TQ (4.6) and
+UPT (8.5) is the corpus empirical expectation `uniformExp` of the squared-residual vector, so
+the individual procedure's report is an average of actual per-individual losses. -/
+theorem binMeanSquaredError_eq_uniformExp [NeZero n] (A : Matrix (Fin n) (Fin n) ℝ)
+    (y : Fin n → ℝ) :
+    binMeanSquaredError (Fintype.card (Fin n) : ℝ) (1 : Matrix (Fin n) (Fin n) ℝ) A y
+      = uniformExp (Fin n) (lossVector (A.mulVec y)) := by
+  rw [binMeanSquaredError, uniformExp_apply, Matrix.one_mulVec]
+  simp only [dot, Descent.Core.innerSum, lossVector, Finset.mul_sum]
 
 /-- **UPT Corollary 8.3, the degree assertion.**  Numerator and denominator of the
 loss-regression report are exactly homogeneous of degree four in the outcome vector, which is

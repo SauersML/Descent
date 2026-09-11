@@ -42,7 +42,7 @@ set_option relaxedAutoImplicit false
 
 namespace Descent.Portability.JointReportFeasibility
 
-open Foundations CohortEvaluationOperators
+open Foundations CohortEvaluationOperators AngularReportClosure
 
 noncomputable section
 
@@ -329,6 +329,20 @@ theorem primal_max_eq_dual_inf (h : Ω → Fin m → ℝ) (f : Ω → ℝ) (c : 
     push_neg at hcon
     have hX : U + ε < dot lam c + (f ω₀ - dot lam (h ω₀)) := lt_of_lt_of_le hcon hbound
     nlinarith [h1, hgt, hκpos, hX]
+
+/-- **The expected cohort report is a convex combination of actual reports.**  PL (9.5) applied
+to the group report of PL (6.6): the angular trace pairing that evaluates the expected report
+lies in the convex hull of the pointwise reports, because every ratio is evaluated before its
+expectation.  It is never a ratio of expectations. -/
+theorem expected_partialR2_mem_convexHull {d : ℕ} (z : Fin d → ℝ) (R : Ω → Fin d → ℝ)
+    (p : Ω → ℝ) (hp : ∀ ω, 0 ≤ p ω) (hs : ∑ ω, p ω = 1) :
+    Matrix.trace (rankOneProj z * angularMatrix (weightedExp p hp hs) R)
+      ∈ convexHull ℝ (Set.range fun ω ↦ partialR2 z (R ω)) := by
+  rw [← expected_partialR2_eq_trace,
+    ← region_eq_convexHull_of_module fun ω ↦ partialR2 z (R ω)]
+  refine ⟨p, hp, hs, ?_⟩
+  rw [weightedExp_apply]
+  exact Finset.sum_congr rfl fun ω _ ↦ (smul_eq_mul _ _).symm
 
 end
 
