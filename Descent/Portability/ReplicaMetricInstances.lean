@@ -13,8 +13,11 @@ assert_below Descent.Decision Descent.Program
 # Concrete population metrics as bounded replica ratios
 
 NOTE 2 section 5.4 instantiates the replica-domain compiler of sections 5.1 and 5.2 for the
-metrics a report actually carries. This module derives every instance from the corpus
-definitions of the metrics, not from restatements of them.
+metrics a report actually carries. Every instance is derived from the corpus definitions of
+the metrics, not from restatements of them. Scope: population laws and study contexts are
+finite report laws; the replica readouts have signed coefficients, as NOTE 2 remarks after (15),
+and are not claimed to be pointwise nonnegative; the ROC rates, predictive values, average
+precision and threshold curves of the last paragraph of section 5.4 are not formalized.
 
 Squared correlation. For a score and an outcome in the unit interval, `correlationNumerator`
 and `correlationDenominator` are `N = 16 C_SY²` and `D = 16 V_S V_Y` of NOTE 2 (21), built from
@@ -49,6 +52,18 @@ largest of the linear functionals `signedResidual`, each a one-replica moment
 (`signedResidual_eq_expectation`), and `expectation_calibrationError_eq_strata` is the exact
 stratum expansion over study contexts. `calibrationError_continuous` is continuity in the mass
 vector and `abs_calibrationError_sub_le` the total-variation Lipschitz bound.
+
+Degree accounting. `expectationPolynomial`, `pairPolynomial` and `covariancePolynomial` are
+polynomials in the population probability vector evaluating to the corpus expectation, double
+expectation and covariance. The numerator and denominator polynomials of (21) have total degree
+at most four and those of the AUC at most two, so the `k`-th expansion term has degree at most
+`4 (k + 1)` (`totalDegree_correlationTerm_le`) and `2 (k + 1)` (`totalDegree_aucTerm_le`).
+`expectation_monomialEvent` shows that a monomial moment of degree at most `n` is the
+probability, under the corpus product law of `n` replicas, of the explicit `monomialEvent`
+built from the corpus `ReplicaMomentCompleteness.exponentListing`, and
+`expectation_eval_eq_replicaReadout` combines the two under `replicaCohortLaw`, the
+finite-context replica law of NOTE 2 (11). `expectation_correlationTerm_eq_replicaReadout` and
+`expectation_aucTerm_eq_replicaReadout` are the instances.
 
 ## Empirical status
 
@@ -950,7 +965,7 @@ theorem calibrationError_continuous (value : Score → ℝ) :
       ∀ law : FiniteReportLaw (Score × Bool), calibrationError law value =
         ∑ group, |law.mass (group, true) -
           value group * (law.mass (group, false) + law.mass (group, true))| :=
-  ⟨continuous_finset_sum _ fun group _ ↦ continuous_abs.comp
+  ⟨continuous_finset_sum _ fun _ _ ↦ continuous_abs.comp
       ((continuous_apply _).sub
         (continuous_const.mul ((continuous_apply _).add (continuous_apply _)))),
     fun _ ↦ rfl⟩
@@ -996,8 +1011,8 @@ theorem abs_calibrationError_sub_le (first second : FiniteReportLaw (Score × Bo
   rw [← Finset.sum_sub_distrib]
   calc |∑ group, (|calibrationResidual first value group| -
         |calibrationResidual second value group|)|
-      ≤ ∑ group, | |calibrationResidual first value group| -
-          |calibrationResidual second value group| | := Finset.abs_sum_le_sum_abs _ _
+      ≤ ∑ group, |(|calibrationResidual first value group| -
+          |calibrationResidual second value group|)| := Finset.abs_sum_le_sum_abs _ _
     _ ≤ ∑ group, |calibrationResidual first value group -
           calibrationResidual second value group| :=
         Finset.sum_le_sum fun group _ ↦ abs_abs_sub_abs_le_abs_sub _ _
@@ -1007,6 +1022,389 @@ theorem abs_calibrationError_sub_le (first second : FiniteReportLaw (Score × Bo
           |first.mass (group, outcome) - second.mass (group, outcome)|) / 2) := by ring
 
 end CalibrationError
+
+/-! ### Degree accounting -/
+
+section PopulationPolynomials
+
+open MvPolynomial
+
+variable {State : Type*} [Fintype State]
+
+/-- The linear polynomial `∑_s f(s) X_s` in the population probability vector, whose value at a
+law is the expectation of the observable `f`. -/
+def expectationPolynomial (value : State → ℝ) : MvPolynomial State ℝ :=
+  ∑ state, C (value state) * X state
+
+/-- The expectation polynomial evaluates at the mass vector to the corpus expectation. -/
+theorem eval_expectationPolynomial (law : FiniteReportLaw State) (value : State → ℝ) :
+    eval law.mass (expectationPolynomial value) = law.expectation value := by
+  simp only [expectationPolynomial, map_sum, map_mul, eval_C, eval_X,
+    FiniteReportLaw.expectation]
+  exact Finset.sum_congr rfl fun state _ ↦ mul_comm _ _
+
+/-- The expectation polynomial has total degree at most one. -/
+theorem totalDegree_expectationPolynomial_le (value : State → ℝ) :
+    (expectationPolynomial value).totalDegree ≤ 1 := by
+  refine (totalDegree_finset_sum _ _).trans (Finset.sup_le fun state _ ↦ ?_)
+  calc (C (value state) * X state : MvPolynomial State ℝ).totalDegree
+      ≤ (C (value state) : MvPolynomial State ℝ).totalDegree +
+          (X state : MvPolynomial State ℝ).totalDegree := totalDegree_mul _ _
+    _ = 1 := by rw [totalDegree_C, totalDegree_X, zero_add]
+
+/-- The quadratic polynomial `∑_{s,t} g(s, t) X_s X_t`, whose value at a law is the expectation
+of `g` over two independent draws. -/
+def pairPolynomial (credit : State → State → ℝ) : MvPolynomial State ℝ :=
+  ∑ first, ∑ second, C (credit first second) * (X first * X second)
+
+/-- The pair polynomial evaluates at the mass vector to the double expectation. -/
+theorem eval_pairPolynomial (law : FiniteReportLaw State) (credit : State → State → ℝ) :
+    eval law.mass (pairPolynomial credit) =
+      law.expectation (fun first ↦ law.expectation (fun second ↦ credit first second)) := by
+  simp only [pairPolynomial, map_sum, map_mul, eval_C, eval_X, FiniteReportLaw.expectation,
+    Finset.mul_sum]
+  exact Finset.sum_congr rfl fun first _ ↦ Finset.sum_congr rfl fun second _ ↦ by ring
+
+/-- The pair polynomial has total degree at most two. -/
+theorem totalDegree_pairPolynomial_le (credit : State → State → ℝ) :
+    (pairPolynomial credit).totalDegree ≤ 2 := by
+  refine (totalDegree_finset_sum _ _).trans (Finset.sup_le fun first _ ↦ ?_)
+  refine (totalDegree_finset_sum _ _).trans (Finset.sup_le fun second _ ↦ ?_)
+  calc (C (credit first second) * (X first * X second) : MvPolynomial State ℝ).totalDegree
+      ≤ (C (credit first second) : MvPolynomial State ℝ).totalDegree +
+          (X first * X second : MvPolynomial State ℝ).totalDegree := totalDegree_mul _ _
+    _ ≤ 0 + (1 + 1) := by
+        rw [totalDegree_C]
+        exact Nat.add_le_add_left ((totalDegree_mul _ _).trans (by
+          rw [totalDegree_X, totalDegree_X])) 0
+    _ = 2 := rfl
+
+/-- The covariance polynomial: the expectation polynomial of the product minus the product of
+the expectation polynomials. -/
+def covariancePolynomial (score outcome : State → ℝ) : MvPolynomial State ℝ :=
+  expectationPolynomial (fun state ↦ score state * outcome state) -
+    expectationPolynomial score * expectationPolynomial outcome
+
+/-- The covariance polynomial evaluates at the mass vector to the corpus covariance. -/
+theorem eval_covariancePolynomial (law : FiniteReportLaw State) (score outcome : State → ℝ) :
+    eval law.mass (covariancePolynomial score outcome) = law.covariance score outcome := by
+  rw [covariancePolynomial, map_sub, map_mul, eval_expectationPolynomial,
+    eval_expectationPolynomial, eval_expectationPolynomial,
+    FiniteReportLaw.covariance_eq_rawMoments]
+
+/-- The covariance polynomial has total degree at most two. -/
+theorem totalDegree_covariancePolynomial_le (score outcome : State → ℝ) :
+    (covariancePolynomial score outcome).totalDegree ≤ 2 := by
+  have hproduct := totalDegree_expectationPolynomial_le (fun state ↦ score state * outcome state)
+  have hscore := totalDegree_expectationPolynomial_le score
+  have houtcome := totalDegree_expectationPolynomial_le outcome
+  refine (totalDegree_sub _ _).trans (max_le (hproduct.trans (by norm_num)) ?_)
+  exact (totalDegree_mul _ _).trans (by omega)
+
+/-- The numerator polynomial `16 C²` of NOTE 2 (21). -/
+def correlationNumeratorPolynomial (score outcome : State → ℝ) : MvPolynomial State ℝ :=
+  C 16 * covariancePolynomial score outcome ^ 2
+
+/-- The denominator polynomial `16 V_S V_Y` of NOTE 2 (21). -/
+def correlationDenominatorPolynomial (score outcome : State → ℝ) : MvPolynomial State ℝ :=
+  C 16 * (covariancePolynomial score score * covariancePolynomial outcome outcome)
+
+/-- **NOTE 2 section 5.4.** The numerator polynomial evaluates to the correlation numerator. -/
+theorem eval_correlationNumeratorPolynomial (law : FiniteReportLaw State)
+    (score outcome : State → ℝ) :
+    eval law.mass (correlationNumeratorPolynomial score outcome) =
+      correlationNumerator law score outcome := by
+  rw [correlationNumeratorPolynomial, map_mul, map_pow, eval_C, eval_covariancePolynomial,
+    correlationNumerator]
+
+/-- **NOTE 2 section 5.4.** The denominator polynomial evaluates to the correlation
+denominator. -/
+theorem eval_correlationDenominatorPolynomial (law : FiniteReportLaw State)
+    (score outcome : State → ℝ) :
+    eval law.mass (correlationDenominatorPolynomial score outcome) =
+      correlationDenominator law score outcome := by
+  rw [correlationDenominatorPolynomial, map_mul, map_mul, eval_C, eval_covariancePolynomial,
+    eval_covariancePolynomial, correlationDenominator]
+  rfl
+
+/-- **NOTE 2 section 5.4, degree four.** The correlation numerator polynomial has total degree at
+most four. -/
+theorem totalDegree_correlationNumeratorPolynomial_le (score outcome : State → ℝ) :
+    (correlationNumeratorPolynomial score outcome).totalDegree ≤ 4 := by
+  have hcovariance := totalDegree_covariancePolynomial_le score outcome
+  refine (totalDegree_mul _ _).trans ?_
+  rw [totalDegree_C, zero_add]
+  exact (totalDegree_pow _ _).trans (by omega)
+
+/-- **NOTE 2 section 5.4, degree four.** The correlation denominator polynomial has total degree
+at most four. -/
+theorem totalDegree_correlationDenominatorPolynomial_le (score outcome : State → ℝ) :
+    (correlationDenominatorPolynomial score outcome).totalDegree ≤ 4 := by
+  have hscore := totalDegree_covariancePolynomial_le score score
+  have houtcome := totalDegree_covariancePolynomial_le outcome outcome
+  refine (totalDegree_mul _ _).trans ?_
+  rw [totalDegree_C, zero_add]
+  exact (totalDegree_mul _ _).trans (by omega)
+
+/-- **NOTE 2 section 5.4, degree accounting.** If a numerator polynomial has degree at most `a`
+and a denominator polynomial degree at most `b`, the `power`-th expansion term
+`num * (1 - den) ^ power` has degree at most `a + power * b`. -/
+theorem totalDegree_expansionTerm_le (num den : MvPolynomial State ℝ)
+    (numDegree denDegree power : ℕ) (hnum : num.totalDegree ≤ numDegree)
+    (hden : den.totalDegree ≤ denDegree) :
+    (num * (1 - den) ^ power).totalDegree ≤ numDegree + power * denDegree := by
+  refine (totalDegree_mul _ _).trans (Nat.add_le_add hnum ?_)
+  refine (totalDegree_pow _ _).trans (Nat.mul_le_mul_left power ?_)
+  refine (totalDegree_sub _ _).trans (max_le ?_ hden)
+  rw [totalDegree_one]
+  exact Nat.zero_le _
+
+/-- **NOTE 2 section 5.4.** The `power`-th term of the squared-correlation expansion is a
+polynomial of total degree at most `4 * (power + 1)` in the population probability vector. -/
+theorem totalDegree_correlationTerm_le (score outcome : State → ℝ) (power : ℕ) :
+    (correlationNumeratorPolynomial score outcome *
+      (1 - correlationDenominatorPolynomial score outcome) ^ power).totalDegree ≤
+        4 * (power + 1) := by
+  have hterm := totalDegree_expansionTerm_le _ _ 4 4 power
+    (totalDegree_correlationNumeratorPolynomial_le score outcome)
+    (totalDegree_correlationDenominatorPolynomial_le score outcome)
+  calc _ ≤ 4 + power * 4 := hterm
+    _ = 4 * (power + 1) := by ring
+
+/-- The expansion term polynomial evaluates to the squared-correlation expansion term. -/
+theorem eval_correlationTerm (law : FiniteReportLaw State) (score outcome : State → ℝ)
+    (power : ℕ) :
+    eval law.mass (correlationNumeratorPolynomial score outcome *
+        (1 - correlationDenominatorPolynomial score outcome) ^ power) =
+      correlationNumerator law score outcome *
+        (1 - correlationDenominator law score outcome) ^ power := by
+  rw [map_mul, map_pow, map_sub, map_one, eval_correlationNumeratorPolynomial,
+    eval_correlationDenominatorPolynomial]
+
+/-- The AUC numerator polynomial `4A`: four times the pair polynomial of the ranking credit. -/
+def aucNumeratorPolynomial (score : State → ℝ) (outcome : State → Bool) :
+    MvPolynomial State ℝ :=
+  C 4 * pairPolynomial fun first second ↦
+    if outcome first && !outcome second then
+      empiricalAUCComparison (score first) (score second) else 0
+
+/-- The AUC denominator polynomial `4p(1 - p)`. -/
+def aucDenominatorPolynomial (outcome : State → Bool) : MvPolynomial State ℝ :=
+  C 4 * (expectationPolynomial (fun state ↦ if outcome state then 1 else 0) *
+    (1 - expectationPolynomial (fun state ↦ if outcome state then 1 else 0)))
+
+/-- **NOTE 2 section 5.4.** The AUC expansion term polynomial evaluates to the AUC expansion
+term. -/
+theorem eval_aucTerm (law : FiniteReportLaw State) (score : State → ℝ)
+    (outcome : State → Bool) (power : ℕ) :
+    eval law.mass (aucNumeratorPolynomial score outcome *
+        (1 - aucDenominatorPolynomial outcome) ^ power) =
+      aucNumerator law score outcome * (1 - aucDenominator law outcome) ^ power := by
+  simp only [aucNumeratorPolynomial, aucDenominatorPolynomial, map_mul, map_pow, map_sub,
+    map_one, eval_C, eval_pairPolynomial, eval_expectationPolynomial, aucNumerator,
+    aucDenominator]
+  rfl
+
+/-- **NOTE 2 section 5.4, degree two.** The `power`-th term of the AUC expansion is a polynomial
+of total degree at most `2 * (power + 1)` in the population probability vector. -/
+theorem totalDegree_aucTerm_le (score : State → ℝ) (outcome : State → Bool) (power : ℕ) :
+    (aucNumeratorPolynomial score outcome *
+      (1 - aucDenominatorPolynomial outcome) ^ power).totalDegree ≤ 2 * (power + 1) := by
+  have hcase := totalDegree_expectationPolynomial_le
+    (fun state : State ↦ if outcome state then (1 : ℝ) else 0)
+  have hnum : (aucNumeratorPolynomial score outcome).totalDegree ≤ 2 := by
+    refine (totalDegree_mul _ _).trans ?_
+    rw [totalDegree_C, zero_add]
+    exact totalDegree_pairPolynomial_le _
+  have hden : (aucDenominatorPolynomial outcome).totalDegree ≤ 2 := by
+    refine (totalDegree_mul _ _).trans ?_
+    rw [totalDegree_C, zero_add]
+    refine (totalDegree_mul _ _).trans ?_
+    have hcomplement := (totalDegree_sub (1 : MvPolynomial State ℝ)
+      (expectationPolynomial fun state : State ↦ if outcome state then (1 : ℝ) else 0))
+    rw [totalDegree_one] at hcomplement
+    omega
+  calc _ ≤ 2 + power * 2 := totalDegree_expansionTerm_le _ _ 2 2 power hnum hden
+    _ = 2 * (power + 1) := by ring
+
+end PopulationPolynomials
+
+section ReplicaReadout
+
+open MvPolynomial
+
+variable {m : ℕ}
+
+/-- The tie between the two corpus product laws: `FiniteGeneticTransition.piLaw` of identical
+coordinates is `HWEInteractionLaw.independentLaw`. -/
+theorem piLaw_eq_independentLaw {Slot Letter : Type*} [Fintype Slot] [DecidableEq Slot]
+    [Fintype Letter] (law : Slot → FiniteReportLaw Letter) :
+    FiniteGeneticTransition.piLaw law = HWEInteractionLaw.independentLaw law :=
+  FiniteReportLaw.ext fun _ ↦ rfl
+
+/-- **NOTE 2 section 5.4, replica event of a monomial.** The event on a cohort of `size`
+replicas that the first `∑_a e_a` slots read out the letters of the corpus exponent listing of
+`e`, every later slot being free. -/
+def monomialEvent (size : ℕ) (exponent : Fin m → ℕ) (replica : Fin size → Fin m) : Prop :=
+  ∀ (slot : Fin size) (hslot : (slot : ℕ) < ∑ letter, exponent letter),
+    replica slot = ReplicaMomentCompleteness.exponentListing m exponent ⟨slot, hslot⟩
+
+instance (size : ℕ) (exponent : Fin m → ℕ) : DecidablePred (monomialEvent size exponent) :=
+  fun replica ↦ by
+    unfold monomialEvent
+    infer_instance
+
+/-- The indicator of one slot of a monomial event: the listed letter is read on a listed slot,
+and a free slot always passes. -/
+def slotIndicator {size : ℕ} (exponent : Fin m → ℕ) (slot : Fin size) (letter : Fin m) : ℝ :=
+  if hslot : (slot : ℕ) < ∑ index, exponent index then
+    (if letter = ReplicaMomentCompleteness.exponentListing m exponent ⟨slot, hslot⟩ then 1
+      else 0)
+  else 1
+
+/-- The indicator of a monomial event is the product of its slot indicators. -/
+theorem definedIndicator_monomialEvent (size : ℕ) (exponent : Fin m → ℕ)
+    (replica : Fin size → Fin m) :
+    definedIndicator (monomialEvent size exponent) replica =
+      ∏ slot, slotIndicator exponent slot (replica slot) := by
+  unfold definedIndicator
+  by_cases hevent : monomialEvent size exponent replica
+  · rw [if_pos hevent]
+    refine (Finset.prod_eq_one fun slot _ ↦ ?_).symm
+    unfold slotIndicator
+    split_ifs with hslot hmatch
+    · rfl
+    · exact absurd (hevent slot hslot) hmatch
+    · rfl
+  · rw [if_neg hevent]
+    unfold monomialEvent at hevent
+    push_neg at hevent
+    obtain ⟨slot, hslot, hmismatch⟩ := hevent
+    refine (Finset.prod_eq_zero (Finset.mem_univ slot) ?_).symm
+    unfold slotIndicator
+    rw [dif_pos hslot, if_neg hmismatch]
+
+/-- A product over `size` slots whose factor is one beyond the first `bound` slots is the
+product over the first `bound` slots. -/
+theorem prod_dite_lt (size bound : ℕ) (hbound : bound ≤ size) (factor : Fin bound → ℝ) :
+    ∏ slot : Fin size, (if hslot : (slot : ℕ) < bound then factor ⟨slot, hslot⟩ else 1) =
+      ∏ index, factor index := by
+  calc ∏ slot : Fin size, (if hslot : (slot : ℕ) < bound then factor ⟨slot, hslot⟩ else 1)
+      = ∏ j ∈ Finset.range size, (if hj : j < bound then factor ⟨j, hj⟩ else 1) :=
+        Fin.prod_univ_eq_prod_range (fun j ↦ if hj : j < bound then factor ⟨j, hj⟩ else 1) size
+    _ = (∏ j ∈ Finset.range bound, (if hj : j < bound then factor ⟨j, hj⟩ else 1)) *
+          ∏ j ∈ Finset.Ico bound size, (if hj : j < bound then factor ⟨j, hj⟩ else 1) :=
+        (Finset.prod_range_mul_prod_Ico _ hbound).symm
+    _ = ∏ j ∈ Finset.range bound, (if hj : j < bound then factor ⟨j, hj⟩ else 1) := by
+        rw [Finset.prod_eq_one (s := Finset.Ico bound size)
+          (f := fun j ↦ if hj : j < bound then factor ⟨j, hj⟩ else 1)
+          fun j hj ↦ dif_neg (not_lt.mpr (Finset.mem_Ico.mp hj).1), mul_one]
+    _ = ∏ index : Fin bound, factor index := by
+        rw [← Fin.prod_univ_eq_prod_range]
+        exact Finset.prod_congr rfl fun index _ ↦ dif_pos index.isLt
+
+/-- **NOTE 2 section 5.4, monomial moments as replica events.** A monomial `∏_a q_a ^ e_a` of
+degree at most `size` in a population probability vector is the probability of the monomial
+event under the corpus product law of `size` independent replicas. -/
+theorem expectation_monomialEvent (law : FiniteReportLaw (Fin m)) (size : ℕ)
+    (exponent : Fin m → ℕ) (hdegree : ∑ letter, exponent letter ≤ size) :
+    (FiniteGeneticTransition.piLaw fun _ : Fin size ↦ law).expectation
+        (definedIndicator (monomialEvent size exponent)) =
+      ∏ letter, law.mass letter ^ exponent letter := by
+  have hindicator : definedIndicator (monomialEvent size exponent) = fun replica ↦
+      ∏ slot, slotIndicator exponent slot (replica slot) :=
+    funext fun replica ↦ definedIndicator_monomialEvent size exponent replica
+  have hfactor : ∀ slot : Fin size, law.expectation (slotIndicator exponent slot) =
+      if hslot : (slot : ℕ) < ∑ letter, exponent letter then
+        law.mass (ReplicaMomentCompleteness.exponentListing m exponent ⟨slot, hslot⟩) else 1 := by
+    intro slot
+    by_cases hslot : (slot : ℕ) < ∑ letter, exponent letter
+    · have hslotIndicator : slotIndicator exponent slot = fun letter ↦
+          if letter = ReplicaMomentCompleteness.exponentListing m exponent ⟨slot, hslot⟩ then
+            (1 : ℝ) else 0 :=
+        funext fun letter ↦ dif_pos hslot
+      rw [hslotIndicator, dif_pos hslot]
+      simp [FiniteReportLaw.expectation]
+    · have hslotIndicator : slotIndicator exponent slot = fun _ ↦ (1 : ℝ) :=
+        funext fun _ ↦ dif_neg hslot
+      rw [hslotIndicator, dif_neg hslot]
+      exact FiniteIndependentMoments.expectation_const law 1
+  rw [hindicator, piLaw_eq_independentLaw,
+    HWEInteractionLaw.expectation_independent_product (fun _ : Fin size ↦ law)
+      (slotIndicator exponent)]
+  simp only [hfactor]
+  rw [prod_dite_lt size _ hdegree
+    (fun index ↦ law.mass (ReplicaMomentCompleteness.exponentListing m exponent index))]
+  exact (ReplicaMomentCompleteness.prod_exponentListing m exponent
+    (ReplicaMomentCompleteness.simplexPoint m law)).trans
+      (ReplicaMomentCompleteness.monomialMap_simplexPoint m law exponent)
+
+/-- **NOTE 2 section 5.4, finite-replica readout.** Over a finite law of study contexts, the
+expectation of any polynomial functional of total degree at most `size` in the population
+probability vector is the expectation, under the replica cohort law of `size` conditionally
+independent replicas, of the signed combination of monomial-event indicators with the
+polynomial's coefficients. -/
+theorem expectation_eval_eq_replicaReadout (law : FiniteReportLaw Context)
+    (population : Context → FiniteReportLaw (Fin m)) (polynomial : MvPolynomial (Fin m) ℝ)
+    (size : ℕ) (hdegree : polynomial.totalDegree ≤ size) :
+    law.expectation (fun context ↦ eval (population context).mass polynomial) =
+      (replicaCohortLaw law population size).expectation (fun replica ↦
+        ∑ exponent ∈ polynomial.support, polynomial.coeff exponent *
+          definedIndicator (monomialEvent size exponent) replica) := by
+  rw [replicaCohortLaw, FiniteReportLaw.expectation_bind]
+  congr 1
+  funext context
+  have hlinear : (FiniteGeneticTransition.piLaw fun _ : Fin size ↦ population context).expectation
+      (fun replica ↦ ∑ exponent ∈ polynomial.support, polynomial.coeff exponent *
+        definedIndicator (monomialEvent size exponent) replica) =
+        ∑ exponent ∈ polynomial.support, polynomial.coeff exponent *
+          (FiniteGeneticTransition.piLaw fun _ : Fin size ↦ population context).expectation
+            (definedIndicator (monomialEvent size exponent)) := by
+    simp only [FiniteReportLaw.expectation, Finset.mul_sum]
+    exact Finset.sum_comm.trans
+      (Finset.sum_congr rfl fun exponent _ ↦ Finset.sum_congr rfl fun replica _ ↦ by ring)
+  rw [hlinear, eval_eq']
+  refine Finset.sum_congr rfl fun exponent hexponent ↦ ?_
+  have hsupport := le_totalDegree hexponent
+  rw [Finsupp.sum_fintype exponent (fun _ degree ↦ degree) fun _ ↦ rfl] at hsupport
+  rw [expectation_monomialEvent (population context) size exponent
+    (hsupport.trans hdegree)]
+
+/-- **NOTE 2 section 5.4, squared correlation.** The `power`-th coefficient of the positive ratio
+expansion of the squared correlation is an exact readout of `4 * (power + 1)` conditionally
+independent replicas: the expectation of a signed combination of monomial-event indicators. -/
+theorem expectation_correlationTerm_eq_replicaReadout (law : FiniteReportLaw Context)
+    (population : Context → FiniteReportLaw (Fin m)) (score outcome : Fin m → ℝ) (power : ℕ) :
+    law.expectation (fun context ↦ correlationNumerator (population context) score outcome *
+        (1 - correlationDenominator (population context) score outcome) ^ power) =
+      (replicaCohortLaw law population (4 * (power + 1))).expectation (fun replica ↦
+        ∑ exponent ∈ (correlationNumeratorPolynomial score outcome *
+            (1 - correlationDenominatorPolynomial score outcome) ^ power).support,
+          (correlationNumeratorPolynomial score outcome *
+            (1 - correlationDenominatorPolynomial score outcome) ^ power).coeff exponent *
+            definedIndicator (monomialEvent (4 * (power + 1)) exponent) replica) := by
+  rw [← expectation_eval_eq_replicaReadout law population _ _
+    (totalDegree_correlationTerm_le score outcome power)]
+  simp only [eval_correlationTerm]
+
+/-- **NOTE 2 section 5.4, AUC.** The `power`-th coefficient of the positive ratio expansion of
+the AUC is an exact readout of `2 * (power + 1)` conditionally independent replicas. -/
+theorem expectation_aucTerm_eq_replicaReadout (law : FiniteReportLaw Context)
+    (population : Context → FiniteReportLaw (Fin m)) (score : Fin m → ℝ)
+    (outcome : Fin m → Bool) (power : ℕ) :
+    law.expectation (fun context ↦ aucNumerator (population context) score outcome *
+        (1 - aucDenominator (population context) outcome) ^ power) =
+      (replicaCohortLaw law population (2 * (power + 1))).expectation (fun replica ↦
+        ∑ exponent ∈ (aucNumeratorPolynomial score outcome *
+            (1 - aucDenominatorPolynomial outcome) ^ power).support,
+          (aucNumeratorPolynomial score outcome *
+            (1 - aucDenominatorPolynomial outcome) ^ power).coeff exponent *
+            definedIndicator (monomialEvent (2 * (power + 1)) exponent) replica) := by
+  rw [← expectation_eval_eq_replicaReadout law population _ _
+    (totalDegree_aucTerm_le score outcome power)]
+  simp only [eval_aucTerm]
+
+end ReplicaReadout
 
 end
 

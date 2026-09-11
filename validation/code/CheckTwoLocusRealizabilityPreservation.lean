@@ -11,8 +11,5 @@ open Descent.Portability.TwoLocusRealizabilityPreservation
 #print axioms nonempty_locusExchangeableRealization_of_embed_mem
 #print axioms epoch_preserves_locusExchangeable_realization
 #print axioms locusExchangeableSplit
-#print axioms nonempty_propagatedDDRealization
-#print axioms propagated_dd_quadraticForm_nonneg
-#print axioms propagated_dd_cauchySchwarz
-#print axioms propagated_dd_diagonal_nonneg
+#print axioms propagated_dd_realization_readouts
 #print axioms propagatedLDPairDomain

@@ -67,9 +67,15 @@ coefficient sum is `|b| (|b| - 1)` (`sum_sum_cast_mul_cast_sub`). Hence
 `resamplingOperator_monomialPolynomial`: `resamplingOperator x (monomialPolynomial b)` equals
 `monomialFirstOrder x b`, and the monomial expansion above is (10) exactly.
 
-What is NOT proved in this module: the extension to linear combinations of monomials, and the
-multinomial drift stage that would replace the single-draw drift stage of the microscopic
-kernel.
+Linear combinations follow by linearity. `resamplingOperator_add` and `resamplingOperator_smul`
+make the operator additive and homogeneous, `eq_sum_smul_monomialPolynomial` writes a polynomial as
+the coefficient-weighted sum of the monomials of its support, and `abs_expectation_eval_sub_le`
+gives (10) for every polynomial `f` of total degree at most four,
+`|E f(Z / N) - f(x) - resamplingOperator x f / N|` is at most
+`Σ_s |f_s| (11 + 4 totalStirlingWeight s) / N ^ 2`.
+
+What is NOT proved in this module: the multinomial drift stage that would replace the single-draw
+drift stage of the microscopic kernel.
 
 ## Empirical status
 
@@ -906,6 +912,102 @@ theorem resamplingOperator_monomialPolynomial {H : Type*} [Fintype H] [Decidable
   congr 1
   · exact Finset.sum_congr rfl fun a _ ↦ by ring
   · ring
+
+/-! ## The expansion (10) for polynomials of degree at most four -/
+
+/-- The second-order operator of (10) is additive in the polynomial. -/
+theorem resamplingOperator_add {H : Type*} [Fintype H] [DecidableEq H] (x : H → ℝ)
+    (f g : MvPolynomial H ℝ) :
+    resamplingOperator x (f + g) = resamplingOperator x f + resamplingOperator x g := by
+  simp only [resamplingOperator, map_add, mul_add, Finset.sum_add_distrib]
+
+/-- The second-order operator of (10) is homogeneous in the polynomial. -/
+theorem resamplingOperator_smul {H : Type*} [Fintype H] [DecidableEq H] (x : H → ℝ) (r : ℝ)
+    (f : MvPolynomial H ℝ) : resamplingOperator x (r • f) = r * resamplingOperator x f := by
+  have hpd : ∀ a c,
+      MvPolynomial.eval x (MvPolynomial.pderiv a (MvPolynomial.pderiv c (r • f)))
+        = r * MvPolynomial.eval x (MvPolynomial.pderiv a (MvPolynomial.pderiv c f)) := by
+    intro a c
+    rw [Derivation.map_smul, Derivation.map_smul, MvPolynomial.smul_eq_C_mul, map_mul,
+      MvPolynomial.eval_C]
+  simp only [resamplingOperator, hpd, Finset.mul_sum]
+  exact Finset.sum_congr rfl fun a _ ↦ Finset.sum_congr rfl fun c _ ↦ by ring
+
+/-- The second-order operator of (10) as an additive map on polynomials. -/
+def resamplingOperatorHom {H : Type*} [Fintype H] [DecidableEq H] (x : H → ℝ) :
+    MvPolynomial H ℝ →+ ℝ :=
+  AddMonoidHom.mk' (resamplingOperator x) (resamplingOperator_add x)
+
+/-- A polynomial is the coefficient-weighted sum of the monomials of its support. -/
+theorem eq_sum_smul_monomialPolynomial {H : Type*} [Fintype H] (f : MvPolynomial H ℝ) :
+    f = ∑ s ∈ f.support, f.coeff s • monomialPolynomial ⇑s := by
+  conv_lhs => rw [MvPolynomial.as_sum f]
+  refine Finset.sum_congr rfl fun s _ ↦ ?_
+  rw [monomialPolynomial, Finsupp.equivFunOnFinite_symm_coe, MvPolynomial.smul_monomial,
+    smul_eq_mul, mul_one]
+
+/-- The second-order operator of (10) on a polynomial is the coefficient-weighted sum of the
+first-order coefficients of its monomials. -/
+theorem resamplingOperator_eq_sum_coeff {H : Type*} [Fintype H] [DecidableEq H] (x : H → ℝ)
+    (f : MvPolynomial H ℝ) :
+    resamplingOperator x f = ∑ s ∈ f.support, f.coeff s * monomialFirstOrder x ⇑s := by
+  have hhom : resamplingOperator x f = resamplingOperatorHom x f := rfl
+  conv_lhs => rw [hhom, eq_sum_smul_monomialPolynomial f]
+  rw [map_sum]
+  refine Finset.sum_congr rfl fun s _ ↦ ?_
+  show resamplingOperator x (f.coeff s • monomialPolynomial ⇑s) = _
+  rw [resamplingOperator_smul, resamplingOperator_monomialPolynomial]
+
+/-- The expected polynomial of the census proportions is the coefficient-weighted sum of the
+expected monomials. -/
+theorem expectation_eval_eq_sum_coeff {H : Type*} [Fintype H] [DecidableEq H]
+    (offspring : FiniteReportLaw H) (N : ℕ) (f : MvPolynomial H ℝ) :
+    (multinomialLaw offspring N).expectation
+        (fun counts ↦ MvPolynomial.eval (fun a ↦ (counts.val a : ℝ) / N) f)
+      = ∑ s ∈ f.support, f.coeff s * (multinomialLaw offspring N).expectation
+          (fun counts ↦ ∏ a, ((counts.val a : ℝ) / N) ^ s a) := by
+  simp only [MvPolynomial.eval_eq', FiniteReportLaw.expectation, Finset.mul_sum]
+  rw [Finset.sum_comm]
+  exact Finset.sum_congr rfl fun s _ ↦ Finset.sum_congr rfl fun counts _ ↦ by ring
+
+/-- **NOTE1 (10) for every polynomial of degree at most four.** Under the multinomial census with
+`N ≥ 1` draws from the category law `x`, the expected value of a polynomial `f` of total degree
+at most four at the census proportions is `f(x) + resamplingOperator x f / N`, up to
+`Σ_s |f_s| (11 + 4 totalStirlingWeight s) / N ^ 2`, uniformly in `x`. -/
+theorem abs_expectation_eval_sub_le {H : Type*} [Fintype H] [DecidableEq H]
+    (offspring : FiniteReportLaw H) (N : ℕ) (hN : 1 ≤ N) (f : MvPolynomial H ℝ)
+    (hf : f.totalDegree ≤ 4) :
+    |(multinomialLaw offspring N).expectation
+          (fun counts ↦ MvPolynomial.eval (fun a ↦ (counts.val a : ℝ) / N) f)
+        - MvPolynomial.eval offspring.mass f - resamplingOperator offspring.mass f / N|
+      ≤ (∑ s ∈ f.support, |f.coeff s| * (11 + 4 * totalStirlingWeight ⇑s)) / (N : ℝ) ^ 2 := by
+  have hdeg : ∀ s ∈ f.support, ∑ a, s a ≤ 4 := by
+    intro s hs
+    have hle := MvPolynomial.le_totalDegree hs
+    rw [Finsupp.sum_fintype s (fun _ e ↦ e) (fun _ ↦ rfl)] at hle
+    omega
+  have hsum : (multinomialLaw offspring N).expectation
+          (fun counts ↦ MvPolynomial.eval (fun a ↦ (counts.val a : ℝ) / N) f)
+        - MvPolynomial.eval offspring.mass f - resamplingOperator offspring.mass f / N
+      = ∑ s ∈ f.support, (f.coeff s * (multinomialLaw offspring N).expectation
+            (fun counts ↦ ∏ a, ((counts.val a : ℝ) / N) ^ s a)
+          - f.coeff s * ∏ a, offspring.mass a ^ s a
+          - f.coeff s * monomialFirstOrder offspring.mass ⇑s / N) := by
+    rw [expectation_eval_eq_sum_coeff, MvPolynomial.eval_eq', resamplingOperator_eq_sum_coeff,
+      Finset.sum_div, ← Finset.sum_sub_distrib, ← Finset.sum_sub_distrib]
+  rw [hsum, Finset.sum_div]
+  refine (Finset.abs_sum_le_sum_abs _ _).trans (Finset.sum_le_sum fun s hs ↦ ?_)
+  have hbound := abs_expectation_monomial_sub_le offspring N hN ⇑s (hdeg s hs)
+  have hfactor : f.coeff s * (multinomialLaw offspring N).expectation
+          (fun counts ↦ ∏ a, ((counts.val a : ℝ) / N) ^ s a)
+        - f.coeff s * ∏ a, offspring.mass a ^ s a
+        - f.coeff s * monomialFirstOrder offspring.mass ⇑s / N
+      = f.coeff s * ((multinomialLaw offspring N).expectation
+          (fun counts ↦ ∏ a, ((counts.val a : ℝ) / N) ^ s a)
+        - ∏ a, offspring.mass a ^ s a - monomialFirstOrder offspring.mass ⇑s / N) := by
+    ring
+  rw [hfactor, abs_mul, mul_div_assoc]
+  exact mul_le_mul_of_nonneg_left hbound (abs_nonneg _)
 
 end
 

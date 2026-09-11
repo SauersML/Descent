@@ -259,7 +259,8 @@ def pulseRealization {D : ℕ} {state : AffineLowOrderLDCoordinate D → ℝ}
 /-- An expectation passes through a slot average. -/
 theorem expectation_slotAverage {Ω : Type*} {D : ℕ} (expectation : Foundations.ExpFunctional Ω)
     (alpha : ℝ) (source recipient deme : Fin D) (observable : Fin D → Ω → ℝ) :
-    (expectation fun outcome ↦ slotAverage alpha source recipient deme fun a ↦ observable a outcome) =
+    (expectation fun outcome ↦
+        slotAverage alpha source recipient deme fun a ↦ observable a outcome) =
       slotAverage alpha source recipient deme fun a ↦ expectation (observable a) := by
   by_cases hdeme : deme = recipient
   · have hform : (fun outcome ↦

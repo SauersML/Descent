@@ -153,10 +153,17 @@ def locusExchangeableSplit {D : ℕ} {state : AffineLowOrderLDCoordinate D → �
 
 /-! ## NOTE1 Corollary 2.1 -/
 
-/-- The propagated `DD` block carries a common Gram witness after every epoch, which is what
-turns the low-order vector into an object with positive-semidefinite structure rather than a
-list of numbers satisfying an assumed inequality. -/
-theorem nonempty_propagatedDDRealization {D : ℕ} {Branch : Type*} [Fintype Branch]
+/-- **NOTE1 Corollary 2.1 after one epoch.**  The propagated `DD` block carries a common Gram
+witness.  It is positive semidefinite: every finite linear combination of deme-specific linkage
+disequilibria has nonnegative second moment under the common propagated law.  Its cross-deme
+entries obey Cauchy--Schwarz against the diagonal, NOTE1 (13), with no strict positivity
+assumption, and its diagonal is nonnegative, which is the sign condition the normalized
+portability domain needs.  All four readouts come from the propagated realization rather than
+from inequalities assumed of the numbers.
+
+Assumes: the enlarged body is closed, and the enlarged generator has a microscopic
+approximation by genuine finite mixture kernels, supplied as data. -/
+theorem propagated_dd_realization_readouts {D : ℕ} {Branch : Type*} [Fintype Branch]
     (hclosed : IsClosed (realizationBody (enlargedLowOrderLDFeature (D := D))))
     (rates : ManyDemeLDRates D)
     (approximation : MicroscopicApproximation (B := Branch)
@@ -165,66 +172,24 @@ theorem nonempty_propagatedDDRealization {D : ℕ} {Branch : Type*} [Fintype Bra
     {state : AffineLowOrderLDCoordinate D → ℝ}
     (realization : LocusExchangeableLowOrderLDHaplotypeRealization state) :
     Nonempty (LowOrderLDDDRealization
-      ((rates.epoch duration hduration).propagator.mulVec state)) := by
+        ((rates.epoch duration hduration).propagator.mulVec state)) ∧
+      (∀ weight : Fin D → ℝ, 0 ≤ ∑ first, ∑ second, weight first *
+        ((rates.epoch duration hduration).propagator.mulVec state (some (.DD first second))) *
+          weight second) ∧
+      (∀ first second : Fin D,
+        ((rates.epoch duration hduration).propagator.mulVec state
+            (some (.DD first second))) ^ 2 ≤
+          ((rates.epoch duration hduration).propagator.mulVec state
+              (some (.DD first first))) *
+            ((rates.epoch duration hduration).propagator.mulVec state
+              (some (.DD second second)))) ∧
+      (∀ deme : Fin D,
+        0 ≤ (rates.epoch duration hduration).propagator.mulVec state (some (.DD deme deme))) := by
   obtain ⟨propagated⟩ := epoch_preserves_locusExchangeable_realization hclosed rates
     approximation duration hduration realization
-  exact ⟨propagated.toLowOrderLDHaplotypeRealization.toDDDRealization⟩
-
-/-- **NOTE1 Corollary 2.1, the endpoint obligation of `EndToEndScoreLaw`.**  The propagated
-`DD` block is positive semidefinite: every finite linear combination of deme-specific linkage
-disequilibria has nonnegative second moment under the common propagated law.  This is derived
-from the realization, not assumed as an inequality on the numbers. -/
-theorem propagated_dd_quadraticForm_nonneg {D : ℕ} {Branch : Type*} [Fintype Branch]
-    (hclosed : IsClosed (realizationBody (enlargedLowOrderLDFeature (D := D))))
-    (rates : ManyDemeLDRates D)
-    (approximation : MicroscopicApproximation (B := Branch)
-      (enlargedLowOrderLDFeature (D := D)) (enlargedLowOrderLDGenerator rates))
-    (duration : ℝ) (hduration : 0 ≤ duration)
-    {state : AffineLowOrderLDCoordinate D → ℝ}
-    (realization : LocusExchangeableLowOrderLDHaplotypeRealization state)
-    (weight : Fin D → ℝ) :
-    0 ≤ ∑ first, ∑ second, weight first *
-      ((rates.epoch duration hduration).propagator.mulVec state (some (.DD first second))) *
-        weight second := by
-  obtain ⟨propagated⟩ := nonempty_propagatedDDRealization hclosed rates approximation duration
-    hduration realization
-  exact propagated.dd_quadraticForm_nonneg weight
-
-/-- NOTE1 (13) after an epoch: the propagated cross-deme `DD` entries obey Cauchy--Schwarz
-against the propagated diagonals, without any strict positivity assumption. -/
-theorem propagated_dd_cauchySchwarz {D : ℕ} {Branch : Type*} [Fintype Branch]
-    (hclosed : IsClosed (realizationBody (enlargedLowOrderLDFeature (D := D))))
-    (rates : ManyDemeLDRates D)
-    (approximation : MicroscopicApproximation (B := Branch)
-      (enlargedLowOrderLDFeature (D := D)) (enlargedLowOrderLDGenerator rates))
-    (duration : ℝ) (hduration : 0 ≤ duration)
-    {state : AffineLowOrderLDCoordinate D → ℝ}
-    (realization : LocusExchangeableLowOrderLDHaplotypeRealization state)
-    (first second : Fin D) :
-    ((rates.epoch duration hduration).propagator.mulVec state (some (.DD first second))) ^ 2 ≤
-      ((rates.epoch duration hduration).propagator.mulVec state (some (.DD first first))) *
-        ((rates.epoch duration hduration).propagator.mulVec state
-          (some (.DD second second))) := by
-  obtain ⟨propagated⟩ := nonempty_propagatedDDRealization hclosed rates approximation duration
-    hduration realization
-  exact propagated.dd_cauchySchwarz first second
-
-/-- The propagated within-deme `DD` diagonal is a second moment and therefore nonnegative,
-which is the sign condition the normalized portability domain needs before its positivity
-hypothesis can even be stated. -/
-theorem propagated_dd_diagonal_nonneg {D : ℕ} {Branch : Type*} [Fintype Branch]
-    (hclosed : IsClosed (realizationBody (enlargedLowOrderLDFeature (D := D))))
-    (rates : ManyDemeLDRates D)
-    (approximation : MicroscopicApproximation (B := Branch)
-      (enlargedLowOrderLDFeature (D := D)) (enlargedLowOrderLDGenerator rates))
-    (duration : ℝ) (hduration : 0 ≤ duration)
-    {state : AffineLowOrderLDCoordinate D → ℝ}
-    (realization : LocusExchangeableLowOrderLDHaplotypeRealization state)
-    (deme : Fin D) :
-    0 ≤ (rates.epoch duration hduration).propagator.mulVec state (some (.DD deme deme)) := by
-  obtain ⟨propagated⟩ := nonempty_propagatedDDRealization hclosed rates approximation duration
-    hduration realization
-  exact propagated.dd_diagonal_nonneg deme
+  have hwitness := propagated.toLowOrderLDHaplotypeRealization.toDDDRealization
+  exact ⟨⟨hwitness⟩, hwitness.dd_quadraticForm_nonneg, hwitness.dd_cauchySchwarz,
+    hwitness.dd_diagonal_nonneg⟩
 
 /-- The normalized linkage-pair domain of the composed history is constructed from the
 propagated Gram witness, so the `EndToEndScoreLaw` contract's `LDPairDomain` is reached

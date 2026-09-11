@@ -50,5 +50,12 @@ namespace Descent.Portability.MultinomialMomentExpansion
 #print axioms mul_eval_pderiv_diag_eq
 #print axioms sum_sum_cast_mul_cast_sub
 #print axioms resamplingOperator_monomialPolynomial
+#print axioms resamplingOperator_add
+#print axioms resamplingOperator_smul
+#print axioms resamplingOperatorHom
+#print axioms eq_sum_smul_monomialPolynomial
+#print axioms resamplingOperator_eq_sum_coeff
+#print axioms expectation_eval_eq_sum_coeff
+#print axioms abs_expectation_eval_sub_le
 
 end Descent.Portability.MultinomialMomentExpansion
