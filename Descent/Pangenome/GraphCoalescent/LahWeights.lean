@@ -497,6 +497,8 @@ end Weights
 parts as it has blocks. -/
 theorem card_parts_ofSetoid {n : ℕ} (ξ : Coalescent.ER n) [DecidableRel ξ.r] :
     #(Finpartition.ofSetoid ξ).parts = Coalescent.blocks ξ := by
+  have hparts : (Finpartition.ofSetoid ξ).parts
+      = (univ : Finset (Fin n)).image (fun x ↦ {z ∈ (univ : Finset (Fin n)) | ξ.r x z}) := rfl
   have hclass : ∀ x y : Fin n, ξ.r x y →
       ({z ∈ (univ : Finset (Fin n)) | ξ.r x z} : Finset (Fin n))
         = {z ∈ (univ : Finset (Fin n)) | ξ.r y z} := by
@@ -507,7 +509,7 @@ theorem card_parts_ofSetoid {n : ℕ} (ξ : Coalescent.ER n) [DecidableRel ξ.r]
   have hmem : ∀ x : Fin n, ({z ∈ (univ : Finset (Fin n)) | ξ.r x z} : Finset (Fin n))
       ∈ (Finpartition.ofSetoid ξ).parts := by
     intro x
-    rw [Finpartition.ofSetoid_parts]
+    rw [hparts]
     exact mem_image_of_mem _ (mem_univ x)
   let toPart : Quotient ξ → (Finpartition.ofSetoid ξ).parts :=
     Quotient.lift (fun x ↦ ⟨{z ∈ (univ : Finset (Fin n)) | ξ.r x z}, hmem x⟩)
@@ -527,7 +529,7 @@ theorem card_parts_ofSetoid {n : ℕ} (ξ : Coalescent.ER n) [DecidableRel ξ.r]
         exact Quotient.sound (by simpa using hy)
   have hsurj : Function.Surjective toPart := by
     rintro ⟨p, hp⟩
-    rw [Finpartition.ofSetoid_parts] at hp
+    rw [hparts] at hp
     obtain ⟨x, -, rfl⟩ := mem_image.mp hp
     exact ⟨Quotient.mk ξ x, rfl⟩
   unfold Coalescent.blocks
