@@ -97,6 +97,7 @@ import Descent.Portability.UniformPenetranceCertificate
 import Descent.Portability.PartialHaplotypePanelLikelihood
 import Descent.Portability.PartialHaplotypePulseKernel
 import Descent.Portability.PortabilityMeasureQueries
+import Descent.Portability.MultinomialRemainderConstant
 
 namespace Descent.Program
 
@@ -137,7 +138,8 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
   the literal composition of the two-locus physical stages as a second microscopic approximation
   of the enlarged generator, with nothing assumed: `TwoLocusStageComposition`; the note's
   multinomial drift stage with `⌈1/(c h)⌉` chromosomes and the simultaneous migration stage,
-  each with its first-order expansion: `MultinomialDriftStage`, `SimultaneousMigrationPulse`.
+  each with its first-order expansion: `MultinomialDriftStage`, `SimultaneousMigrationPulse`; the
+  uniform remainder `71 / N²` of (10): `MultinomialRemainderConstant`.
 * Theorem 2 and Corollary 2.1, with no hypotheses: `TwoLocusMicroscopicApproximation`
   (`enlargedMicroscopicApproximation`, `rateEpoch_preserves_locusExchangeable_realization`,
   `history_present_locusExchangeable_realization`, `history_LDPairDomain`); the closedness-taking
@@ -176,18 +178,18 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
   `FinitePulseExposure`.
 * §7 equations (37)-(42), finite cohorts: `FourCellCohortLaw`,
   `EmpiricalCorrelationDefinedness`, `SmallCohortCorrelation`, `SmallCohortConditionalMeans`,
-  `EmpiricalAUCUnbiasedness`, with (42) restated for the corpus metrics of the empirical table
-  law: `EmpiricalTableLawMetrics`.
+  `EmpiricalAUCUnbiasedness`, with (42) and the finite-cohort intercept, accuracy and Brier laws
+  restated for the corpus metrics of the empirical table law: `EmpiricalTableLawMetrics`.
 
 Scope. Theorem 1 is proved for microscopic kernels with finitely many deterministic branches.
 Equation (10) is proved for every polynomial of total degree at most four, with remainder
-`(11 + 4 · totalStirlingWeight) / N²` per monomial; no uniform 71/N² constant is stated. The drift
+`71 · coefficientMass / N²`. The drift
 operator (7) enters through the resampling jet certificates rather than as a displayed identity.
 Both microscopic approximations behind Theorem 2 use a single-draw resampling stage with
 `N = ⌈(c h)^(-1/2)⌉` and a step error of order o(h), not the note's multinomial sample of size
-`⌈1/(c h)⌉`, and `TwoLocusStageComposition` runs migration as one pulse per ordered pair; the
-multinomial and simultaneous stages are proved at stage level but not yet assembled into a
-microscopic approximation. The
+`⌈1/(c h)⌉`; `TwoLocusStageComposition` runs the simultaneous migration stage, and the
+multinomial drift stage is proved at stage level but not yet assembled into a microscopic
+approximation. The
 rate laws have strictly positive coalescence, where the note allows `c_i ≥ 0`. §2.4 is proved for
 rate histories with integrable rate coordinates; the propagator is characterized by the integral
 equation. Theorem 2 covers histories of rate epochs, splits and admixture pulses; the pipeline
@@ -198,8 +200,7 @@ modules assume the polynomial semigroup, its positivity and its Euler limit;
 neutral two-locus kernels; their kernels are Markov kernels on pseudo-metrizable
 compact spaces, which include the haplotype-frequency simplex. In §6 the attainable metric curve
 of NOTE1 Theorem 5 is proved exactly for lists of discrete events; for continuous rates only its
-coupling bounds are proved. The finite-cohort intercept and
-accuracy of §7 are not formalized.
+coupling bounds are proved.
 
 Guard witnesses: `LowOrderLDWitnesses` inhabits the corpus rate, epoch and history structures
 from data alone, and `PipelineWitnesses` inhabits the pipeline structures of `EndToEndScoreLaw`
