@@ -29,3 +29,4 @@ open Descent.Portability.ContinuousTurnoverSemigroup
 #print axioms linearDeathMatrix_eigen_id
 #print axioms linearDeathMatrix_eigen_quad
 #print axioms exp_linearDeath_sq
+#print axioms exp_linearDeath_lower_endpoint

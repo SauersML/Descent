@@ -545,6 +545,29 @@ theorem exp_linearDeath_sq (m : ℕ) (gamma t : ℝ) (j : Fin (m + 1)) :
   rw [exp_mulVec_eigen (linearDeathMatrix m gamma) _ _ t (linearDeathMatrix_eigen_quad m gamma) j,
     exp_mulVec_eigen (linearDeathMatrix m gamma) _ _ t (linearDeathMatrix_eigen_id m gamma) j]
 
+/-- **PL (5.13) / DC (4.4), lower endpoint, in continuous time.**  Starting from the top
+state `m`, the pure-death semigroup's normalized squared count is exactly
+`(1 - 2/n) p² + (2/n) p` with `n = 2m` and `p = e^{-γt}` -- the same closed form that
+`Descent.Portability.BinomialAggregateEnvelope.binomial_envelope_lower` evaluates on the
+explicit binomial law, now as a value of the semigroup itself. -/
+theorem exp_linearDeath_lower_endpoint (m : ℕ) (hm : 0 < m) (gamma t ν : ℝ) (hν : 0 ≤ ν) :
+    (NormedSpace.exp ℝ (t • linearDeathMatrix m gamma)).mulVec
+          (fun i ↦ ((i : ℕ) : ℝ) ^ 2) ⟨m, Nat.lt_succ_self m⟩ / ((m : ℝ) ^ 2 * (1 + ν))
+      = ((1 - 2 / (2 * (m : ℝ))) * NormedSpace.exp ℝ (t * (-gamma)) ^ 2
+          + (2 / (2 * (m : ℝ))) * NormedSpace.exp ℝ (t * (-gamma))) / (1 + ν) := by
+  have hmne : (m : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hm.ne'
+  have hcne : (1 + ν) ≠ 0 := by
+    intro h
+    linarith
+  have hsq : NormedSpace.exp ℝ (t * (-(2 * gamma)))
+      = NormedSpace.exp ℝ (t * (-gamma)) ^ 2 := by
+    rw [show t * (-(2 * gamma)) = t * (-gamma) + t * (-gamma) from by ring,
+      NormedSpace.exp_add]
+    ring
+  have hval : (((⟨m, Nat.lt_succ_self m⟩ : Fin (m + 1)) : ℕ) : ℝ) = (m : ℝ) := rfl
+  rw [exp_linearDeath_sq m gamma t ⟨m, Nat.lt_succ_self m⟩, hsq, hval]
+  field_simp
+
 end
 
 end Descent.Portability.ContinuousTurnoverSemigroup
