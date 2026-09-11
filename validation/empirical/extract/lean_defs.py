@@ -3298,6 +3298,9 @@ def populationAttributableFraction(p_high, rr):
 def Descent_Portability_CompactSingularSequence_direction(L, hc, n):
     return _rt._proj(_rt._proj(leading, '1'), '2')((Descent_Portability_CompactSingularSequence_residual(L, hc, n)), (Descent_Portability_CompactSingularSequence_residual(L, hc, n)))
 
+def imaginaryPart(t, y):
+    return (_rt.lpow(t, 2.0) * compensator(((t * y))))
+
 def phaseMean(p, z):
     return sum((((_rt._proj(p, 'mass')(x)) * z(x))) for x in range(int(_rt.sumdim('x', len(_rt._proj(p, 'mass')), len(z)))))
 
@@ -4161,6 +4164,12 @@ def signedLognormal(K, c):
 
 def Descent_Portability_HWECriticalAmplitudeLimit_intensity(m, N):
     return _rt.rdiv((N), _rt.lpow(2.0, m))
+
+def summand(h, N, x):
+    return _rt.rdiv(Descent_Portability_HWEInteractionLaw_interaction(h, x), _rt.rsqrt((N)))
+
+def Descent_Portability_HWECriticalScoreCharacteristic_score(h, N, x):
+    return sum((summand(h, N, (x(j)))) for j in range(int(_rt.sumdim('j', len(x)))))
 
 def heterozygote(*_a):
     if len(_a) < 1:
@@ -5726,6 +5735,9 @@ def causalColumns(individual, causal):
 
 def defaultTableDesign(fixedInner, tables, files):
     return _rt._proj(tableDesign, '1')(source, permutations, genome, causalSites, baseline, hbaseline, 2000.0, (by(decide)), (default_inner_counts(source)), fixedInner, tables, files)
+
+def compensator(x):
+    return _rt.rdiv(((_rt.sin(x) - x)), _rt.lpow(x, 2.0))
 
 def sampleSize(source, deme):
     return (5000.0 if (deme == source) else 250.0)

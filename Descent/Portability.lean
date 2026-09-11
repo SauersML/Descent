@@ -283,6 +283,10 @@ import Descent.Portability.HWEAbsoluteMomentLimit
 import Descent.Portability.FiniteCharacteristicL1
 import Descent.Portability.FiniteL1WeakStability
 import Descent.Portability.HWECriticalAmplitudeLimit
+import Descent.Portability.SineCompensator
+import Descent.Portability.CompensatedCharacteristicKernel
+import Descent.Portability.FiniteSquareBiasCharacteristic
+import Descent.Portability.HWECriticalGenerator
 assert_below Descent.Program
 
 /-!
