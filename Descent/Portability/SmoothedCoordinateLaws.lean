@@ -34,15 +34,17 @@ share every joint raw moment whose coordinate exponents are at most `k`. That is
 
 ## Scope
 
-One step is NOT proved here, and it is the single open item of the obstruction package:
-the convergence of the expected fitted report under the smoothed product law to its value
-under the finitely supported product law as `ε → 0`. Conditioning on the finitely
-supported atom reduces it to a finite sum of averages of the report over small cubes, so
-no null-set argument is needed: the report is continuous at each atom because its
-denominator is nonzero there, which is the definedness condition the finite theorems
-already carry. What remains unformalized is that reduction together with dominated
-convergence. The finitely supported, genuinely independent core is
-`IndependentRadialLaws.independent_radial_obstruction`.
+The remaining step, the convergence of the expected fitted report under the smoothed
+product law to its value under the finitely supported product law as `ε → 0`, is proved
+in `CubeAverageConvergence`: `pi_smoothedLaw_eq_mixtureLaw` identifies the product law
+below with the mixture over atom tuples of uniform cube laws, and
+`exists_smoothing_scale` bounds the difference by a finite sum over the atoms, needing
+only continuity of the report at each of them. That is the definedness condition the
+finite theorems already carry, since a fitted report is continuous wherever its
+denominator does not vanish, so no null-set argument and no dominated convergence enter.
+The finitely supported, genuinely independent core is
+`IndependentRadialLaws.independent_radial_obstruction`, and the absolutely continuous
+headline is `CubeAverageConvergence.independent_smoothed_obstruction`.
 
 ## Empirical status
 
