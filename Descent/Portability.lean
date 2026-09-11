@@ -343,6 +343,8 @@ import Descent.Portability.HWEHomogeneousLayer
 import Descent.Portability.HWECountLayerLimit
 import Descent.Portability.HWEConditionalScaleLimit
 import Descent.Portability.HWEConditionalInverseMoment
+import Descent.Portability.FiniteEscapingKernel
+import Descent.Portability.HWEConditionalKernelLimit
 assert_below Descent.Program
 
 /-!
