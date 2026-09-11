@@ -48,3 +48,4 @@ import Descent.Portability.MomentOrderObstruction
 #print axioms Descent.Portability.MomentOrderObstruction.one_le_two_pow_real
 #print axioms Descent.Portability.MomentOrderObstruction.partial_r2_parity_separates
 #print axioms Descent.Portability.MomentOrderObstruction.loss_report_parity_separates
+#print axioms Descent.Portability.MomentOrderObstruction.neg_one_pow_sub

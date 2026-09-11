@@ -44,11 +44,15 @@ noncomputable section
 /-- One draw of the four latent effect signs, encoded as Booleans. -/
 abbrev EffectContext : Type := Bool × Bool × Bool × Bool
 
-/-- The `±1` effect sign carried by one Boolean coordinate. -/
-def effectSign (b : Bool) : ℝ := if b then 1 else -1
+/-- The `±1` effect sign carried by one Boolean coordinate: the corpus'
+`TraitPortabilityRange.sign`. -/
+def effectSign : Bool → ℝ := TraitPortabilityRange.sign
 
 /-- The effect sign is the corpus' `TraitPortabilityRange.sign`. -/
 theorem effectSign_eq_sign : effectSign = TraitPortabilityRange.sign := rfl
+
+/-- The effect sign takes the values `1` and `-1`. -/
+theorem effectSign_apply (b : Bool) : effectSign b = if b then 1 else -1 := rfl
 
 /-- `true` exactly when the product of the four effect signs is `+1`. -/
 def evenParity (z : EffectContext) : Bool :=
@@ -151,7 +155,7 @@ theorem noise_loss_mean (d : Fin 2) (z : EffectContext) :
       2 * (1 - effectMean z) := by
   have hb := sqrt_residual_sq z
   simp only [uniformExp_apply, Fintype.sum_prod_type, Fintype.sum_bool, individualLoss,
-    outcome, score, effectSign, Fintype.card_prod, Fintype.card_bool]
+    outcome, score, effectSign_apply, Fintype.card_prod, Fintype.card_bool]
   norm_num
   linear_combination hb
 
@@ -166,7 +170,7 @@ theorem noise_loss_second_moment (d : Fin 2) (z : EffectContext) :
       lossSecondMoment z := by
   have hb := sqrt_residual_sq z
   simp only [uniformExp_apply, Fintype.sum_prod_type, Fintype.sum_bool, individualLoss,
-    outcome, score, effectSign, lossSecondMoment, Fintype.card_prod, Fintype.card_bool]
+    outcome, score, effectSign_apply, lossSecondMoment, Fintype.card_prod, Fintype.card_bool]
   norm_num
   linear_combination
     (6 * (effectMean z - 1) ^ 2 + (1 - effectMean z ^ 2) +
@@ -179,7 +183,7 @@ theorem parity_expectation (par : Bool) (g : ℝ → ℝ) :
     ∑ z, parityWeight par z * g (effectMean z) =
       if par then (g 1 + 6 * g 0 + g (-1)) / 8 else (g (1 / 2) + g (-1 / 2)) / 2 := by
   cases par <;>
-    simp [parityWeight, evenParity, effectMean, effectSign,
+    simp [parityWeight, evenParity, effectMean, effectSign_apply,
       Fintype.sum_prod_type] <;> ring
 
 /-- Mean effect sign under either parity class is zero. -/
@@ -285,7 +289,7 @@ theorem cell_loss_mean (par : Bool) (d : Fin 2) :
     rw [this, h1, h2]; ring
   rw [hsum]
   have h1 : effectMean (true, true, true, true) = 1 := by
-    norm_num [effectMean, effectSign]
+    norm_num [effectMean, effectSign_apply]
   rw [h1]
   ring
 
@@ -301,7 +305,7 @@ theorem cell_loss_second_moment (par : Bool) (d : Fin 2) :
     funext fun z ↦ noise_loss_second_moment d z
   rw [hfun, cellExp_apply, parity_lossSecondMoment]
   have hzero : lossSecondMoment (true, true, true, true) = 0 := by
-    norm_num [lossSecondMoment, effectMean, effectSign]
+    norm_num [lossSecondMoment, effectMean, effectSign_apply]
   rw [hzero]; ring
 
 /-- Unconditional mean individual loss is `1` in both models. -/
@@ -375,7 +379,7 @@ theorem cell_score_mean (par : Bool) (d : Fin 2) :
   have hfun : (fun z ↦ uniformExp (Bool × Bool)
       (fun p ↦ score (d, (z, p)))) = fun _ : EffectContext ↦ (0 : ℝ) := by
     funext z
-    simp [uniformExp_apply, Fintype.sum_prod_type, score, effectSign]
+    simp [uniformExp_apply, Fintype.sum_prod_type, score, effectSign_apply]
     norm_num
   rw [hfun, cellExp_apply]
   simp
@@ -388,7 +392,7 @@ theorem cell_outcome_mean (par : Bool) (d : Fin 2) :
   have hfun : (fun z ↦ uniformExp (Bool × Bool)
       (fun p ↦ outcome (d, (z, p)))) = fun _ : EffectContext ↦ (0 : ℝ) := by
     funext z
-    simp [uniformExp_apply, Fintype.sum_prod_type, outcome, effectSign]
+    simp [uniformExp_apply, Fintype.sum_prod_type, outcome, effectSign_apply]
     ring
   rw [hfun, cellExp_apply]
   simp
@@ -406,7 +410,7 @@ theorem cell_second_moments (par : Bool) (d : Fin 2) :
     have hfun : (fun z ↦ uniformExp (Bool × Bool)
         (fun p ↦ score (d, (z, p)) ^ 2)) = fun _ : EffectContext ↦ (1 : ℝ) := by
       funext z
-      simp [uniformExp_apply, score, effectSign]
+      simp [uniformExp_apply, score, effectSign_apply]
     rw [hfun, cellExp_apply, ← Finset.sum_mul, parityWeight_sum]
     ring
   · show cellExp par d (fun z ↦ uniformExp (Bool × Bool)
@@ -416,7 +420,7 @@ theorem cell_second_moments (par : Bool) (d : Fin 2) :
       funext z
       have hb := sqrt_residual_sq z
       simp only [uniformExp_apply, Fintype.sum_prod_type, Fintype.sum_bool, outcome,
-        effectSign, Fintype.card_prod, Fintype.card_bool]
+        effectSign_apply, Fintype.card_prod, Fintype.card_bool]
       norm_num
       linear_combination hb
     rw [hfun, cellExp_apply, ← Finset.sum_mul, parityWeight_sum]
@@ -427,11 +431,11 @@ theorem cell_second_moments (par : Bool) (d : Fin 2) :
         (fun p ↦ score (d, (z, p)) * outcome (d, (z, p)))) = effectMean := by
       funext z
       simp only [uniformExp_apply, Fintype.sum_prod_type, Fintype.sum_bool, outcome,
-        score, effectSign, Fintype.card_prod, Fintype.card_bool]
+        score, effectSign_apply, Fintype.card_prod, Fintype.card_bool]
       norm_num
       ring
     rw [hfun, cellExp_apply, parity_effectMean]
-    norm_num [effectMean, effectSign]
+    norm_num [effectMean, effectSign_apply]
 
 /-- The pooled within-cell squared correlation is `(1 - θ_d)^2` and the expected
 squared correlation given the sampled effect state is `1 - 3θ_d/4`: both summaries
@@ -441,7 +445,7 @@ theorem cell_squared_correlations (par : Bool) (d : Fin 2) :
       cellExp par d (fun z ↦ effectMean z ^ 2) = 1 - 3 * cellTheta d / 4 := by
   refine ⟨by rw [(cell_second_moments par d).2.2], ?_⟩
   rw [cellExp_apply, parity_effectMean_sq]
-  norm_num [effectMean, effectSign]
+  norm_num [effectMean, effectSign_apply]
   ring
 
 end

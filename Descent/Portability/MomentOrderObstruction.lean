@@ -49,6 +49,19 @@ theorem abs_alternatingWeight (k j : ℕ) :
   unfold alternatingWeight
   rw [abs_div, abs_mul, h1, h2, h3, one_mul]
 
+/-- The alternating sign of an order-`k+1` difference splits off the overall sign. -/
+theorem neg_one_pow_sub (k j : ℕ) (hj : j ≤ k + 1) :
+    (-1 : ℝ) ^ (k + 1 - j) = (-1 : ℝ) ^ (k + 1) * (-1 : ℝ) ^ j := by
+  have hsq : ((-1 : ℝ) ^ j) * ((-1 : ℝ) ^ j) = 1 := by
+    rw [← pow_add]
+    exact Even.neg_one_pow ⟨j, rfl⟩
+  have hcancel : (-1 : ℝ) ^ (k + 1 - j) * (-1 : ℝ) ^ j = (-1 : ℝ) ^ (k + 1) := by
+    rw [← pow_add, Nat.sub_add_cancel hj]
+  calc (-1 : ℝ) ^ (k + 1 - j)
+      = (-1 : ℝ) ^ (k + 1 - j) * ((-1 : ℝ) ^ j * (-1 : ℝ) ^ j) := by rw [hsq, mul_one]
+    _ = ((-1 : ℝ) ^ (k + 1 - j) * (-1 : ℝ) ^ j) * (-1 : ℝ) ^ j := by ring
+    _ = (-1 : ℝ) ^ (k + 1) * (-1 : ℝ) ^ j := by rw [hcancel]
+
 /-- **The annihilation identity.** The alternating binomial weights of order `k+1` kill
 every polynomial of degree at most `k` sampled on an arithmetic progression. -/
 theorem alternating_annihilates (k : ℕ) (a step : ℝ) (P : Polynomial ℝ)
@@ -91,17 +104,8 @@ theorem alternating_annihilates (k : ℕ) (a step : ℝ) (P : Polynomial ℝ)
           ((-1 : ℝ) ^ j * ((k + 1).choose j : ℝ) * P.eval (a + j * step)) := by
     intro j hj
     have hjle : j ≤ k + 1 := Nat.lt_succ_iff.mp (Finset.mem_range.mp hj)
-    have hsq : ((-1 : ℝ) ^ j) * ((-1 : ℝ) ^ j) = 1 := by
-      rw [← pow_add]
-      exact Even.neg_one_pow ⟨j, rfl⟩
-    have hcancel : (-1 : ℝ) ^ (k + 1 - j) * (-1 : ℝ) ^ j = (-1 : ℝ) ^ (k + 1) := by
-      rw [← pow_add, Nat.sub_add_cancel hjle]
-    have hkey : (-1 : ℝ) ^ (k + 1 - j) = (-1 : ℝ) ^ (k + 1) * (-1 : ℝ) ^ j := by
-      calc (-1 : ℝ) ^ (k + 1 - j)
-          = (-1 : ℝ) ^ (k + 1 - j) * ((-1 : ℝ) ^ j * (-1 : ℝ) ^ j) := by rw [hsq, mul_one]
-        _ = ((-1 : ℝ) ^ (k + 1 - j) * (-1 : ℝ) ^ j) * (-1 : ℝ) ^ j := by ring
-        _ = (-1 : ℝ) ^ (k + 1) * (-1 : ℝ) ^ j := by rw [hcancel]
-    rw [hkey]; ring
+    rw [neg_one_pow_sub k j hjle]
+    ring
   rw [Finset.sum_congr rfl hsign, ← Finset.mul_sum] at hsum
   have hne : ((-1 : ℝ) ^ (k + 1)) ≠ 0 := by
     intro hc
@@ -671,12 +675,11 @@ a Taylor estimate; boundedness with nonconstancy is weaker and suffices, and the
 below is elementary: doubling the step multiplies the top-order difference by `2^k`,
 which a uniform bound cannot survive. -/
 theorem exists_fwdDiff_ne_zero (k : ℕ) (f : ℝ → ℝ) (M : ℝ) (hM : ∀ x, |f x| ≤ M)
-    (hnc : ∃ x, f x ≠ f 0) : ∃ a step : ℝ, Δ_[step]^[k + 1] f a ≠ 0 := by
+    (x₀ : ℝ) (hx₀ : f x₀ ≠ f 0) : ∃ a step : ℝ, Δ_[step]^[k + 1] f a ≠ 0 := by
   by_contra hcon
   push_neg at hcon
-  obtain ⟨x, hx⟩ := hnc
-  exact hx (const_of_fwdDiff_iter_eq_zero f M hM (k + 1)
-    (fun t ↦ funext fun a ↦ hcon a t) x)
+  exact hx₀ (const_of_fwdDiff_iter_eq_zero f M hM (k + 1)
+    (fun t ↦ funext fun a ↦ hcon a t) x₀)
 
 /-- The forward difference is the alternating binomial sum, up to the overall sign. -/
 theorem fwdDiff_iter_eq_alternating (k : ℕ) (a step : ℝ) (f : ℝ → ℝ) :
@@ -686,28 +689,18 @@ theorem fwdDiff_iter_eq_alternating (k : ℕ) (a step : ℝ) (f : ℝ → ℝ) :
   rw [fwdDiff_iter_eq_sum_shift, Finset.mul_sum]
   refine Finset.sum_congr rfl fun j hj ↦ ?_
   have hjle : j ≤ k + 1 := Nat.lt_succ_iff.mp (Finset.mem_range.mp hj)
-  have hsq : ((-1 : ℝ) ^ j) * ((-1 : ℝ) ^ j) = 1 := by
-    rw [← pow_add]
-    exact Even.neg_one_pow ⟨j, rfl⟩
-  have hcancel : (-1 : ℝ) ^ (k + 1 - j) * (-1 : ℝ) ^ j = (-1 : ℝ) ^ (k + 1) := by
-    rw [← pow_add, Nat.sub_add_cancel hjle]
-  have hkey : (-1 : ℝ) ^ (k + 1 - j) = (-1 : ℝ) ^ (k + 1) * (-1 : ℝ) ^ j := by
-    calc (-1 : ℝ) ^ (k + 1 - j)
-        = (-1 : ℝ) ^ (k + 1 - j) * ((-1 : ℝ) ^ j * (-1 : ℝ) ^ j) := by rw [hsq, mul_one]
-      _ = ((-1 : ℝ) ^ (k + 1 - j) * (-1 : ℝ) ^ j) * (-1 : ℝ) ^ j := by ring
-      _ = (-1 : ℝ) ^ (k + 1) * (-1 : ℝ) ^ j := by rw [hcancel]
   rw [zsmul_eq_mul, nsmul_eq_mul]
   push_cast
-  rw [hkey]
+  rw [neg_one_pow_sub k j hjle]
   ring
 
 /-- **DC Lemma 8.2.** For every finite order, a bounded nonconstant report separates the
 two parity laws of DC Lemma 8.1. -/
 theorem bounded_nonconstant_separates (k : ℕ) (f : ℝ → ℝ) (M : ℝ)
-    (hM : ∀ x, |f x| ≤ M) (hnc : ∃ x, f x ≠ f 0) :
+    (hM : ∀ x, |f x| ≤ M) (x₀ : ℝ) (hx₀ : f x₀ ≠ f 0) :
     ∃ a step : ℝ, parityExp k false (fun j ↦ f (a + (j : ℕ) * step)) ≠
       parityExp k true (fun j ↦ f (a + (j : ℕ) * step)) := by
-  obtain ⟨a, step, hne⟩ := exists_fwdDiff_ne_zero k f M hM hnc
+  obtain ⟨a, step, hne⟩ := exists_fwdDiff_ne_zero k f M hM x₀ hx₀
   refine ⟨a, step, parity_separates k a step f ?_⟩
   intro hzero
   rw [fwdDiff_iter_eq_alternating k a step f, hzero, mul_zero] at hne
@@ -724,7 +717,7 @@ theorem partial_r2_parity_separates (k : ℕ) {N : Type*} [Fintype N] [Decidable
         parityExp k true
           (fun j ↦ partialR2 z (lineOutcome z u (a + (j : ℕ) * step))) := by
   refine bounded_nonconstant_separates k
-    (fun x ↦ partialR2 z (lineOutcome z u x)) 1 (fun x ↦ ?_) ⟨1, ?_⟩
+    (fun x ↦ partialR2 z (lineOutcome z u x)) 1 (fun x ↦ ?_) 1 ?_
   · show |partialR2 z (lineOutcome z u x)| ≤ 1
     rw [partialR2_line z u hzu hnorm hz, abs_le]
     have hd : (0 : ℝ) < 1 + x ^ 2 := by positivity
@@ -745,7 +738,7 @@ theorem loss_report_parity_separates (k : ℕ) :
       parityExp k false (fun j ↦ lossReport (lineResidual (a + (j : ℕ) * step))) ≠
         parityExp k true (fun j ↦ lossReport (lineResidual (a + (j : ℕ) * step))) := by
   refine bounded_nonconstant_separates k (fun x ↦ lossReport (lineResidual x)) 1
-    (fun x ↦ ?_) ⟨1, ?_⟩
+    (fun x ↦ ?_) 1 ?_
   · have hden : (0 : ℝ) < x ^ 4 - x ^ 2 + 1 := by nlinarith [sq_nonneg (x ^ 2 - 1 / 2)]
     show |lossReport (lineResidual x)| ≤ 1
     rw [lossReport_line, abs_le]

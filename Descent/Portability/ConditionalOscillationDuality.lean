@@ -277,11 +277,6 @@ theorem shrinkRadius_spec (s S : ℝ) (hs : 0 < s) (hS : 0 ≤ S) :
   unfold shrinkRadius
   linarith
 
-/-- A positive slack admits a positive radius whose doubled weight fits inside it. -/
-theorem exists_radius (s S : ℝ) (hs : 0 < s) (hS : 0 ≤ S) :
-    ∃ ρ : ℝ, 0 < ρ ∧ 2 * ρ * S < s :=
-  ⟨shrinkRadius s S, shrinkRadius_pos s S hs hS, shrinkRadius_spec s S hs hS⟩
-
 /-- The oscillation neighbourhood is open. -/
 theorem isOpen_oscNbhd (μ : W → ℝ) (hμ : ∀ w, 0 ≤ μ w) (g : F → W × Y → ℝ)
     (ε r : ℝ) : IsOpen (oscNbhd μ g ε r) := by
@@ -475,13 +470,14 @@ theorem extremalKernel_diff (μ : W → ℝ) (hμ : ∀ w, 0 < μ w) (τ : W × 
   ring
 
 /-- **PL Theorem 8.2, lower bound.** If the dual objective is bounded below by `r`, then
-every `c` in `(0, r)` is attained by an explicit feasible pair of conditional kernels,
-built from the separating functional. -/
-theorem exists_kernelGap_ge (μ : W → ℝ) (hμ : ∀ w, 0 < μ w) (g : F → W × Y → ℝ)
-    (f : W × Y → ℝ) (ε : ℝ) (hε : 0 ≤ ε) {c r : ℝ} (hc : 0 < c) (hcr : c < r)
+every upper bound on the feasible report gaps is at least every `c` in `(0, r)`: the
+separating functional becomes the explicit extremal kernel pair of `extremalKernel`,
+whose gap is at least `c`. -/
+theorem le_of_kernelGaps_upperBound (μ : W → ℝ) (hμ : ∀ w, 0 < μ w) (g : F → W × Y → ℝ)
+    (f : W × Y → ℝ) (ε : ℝ) (hε : 0 ≤ ε) {c r ub : ℝ} (hc : 0 < c) (hcr : c < r)
     (hr : ∀ lam : F → ℝ,
-      r ≤ oscTotal μ (f - featureCombo g lam) + 2 * ε * ∑ i, |lam i|) :
-    ∃ t ∈ kernelGaps μ g f ε, c ≤ t := by
+      r ≤ oscTotal μ (f - featureCombo g lam) + 2 * ε * ∑ i, |lam i|)
+    (hub : ∀ t ∈ kernelGaps μ g f ε, t ≤ ub) : c ≤ ub := by
   classical
   obtain ⟨y₀⟩ := ‹Nonempty Y›
   have hμ0 : ∀ w, 0 ≤ μ w := fun w ↦ (hμ w).le
@@ -641,22 +637,24 @@ theorem exists_kernelGap_ge (μ : W → ℝ) (hμ : ∀ w, 0 < μ w) (g : F → 
         exact Finset.sum_congr rfl fun z _ ↦ (mul_div_assoc _ _ _).symm
       rw [hid, ← hφeval f]
       field_simp
-  refine ⟨∑ z, τ z * f z,
-    ⟨extremalKernel μ τ y₀ false, extremalKernel μ τ y₀ true,
+  have hmem : (∑ z, τ z * f z) ∈ kernelGaps μ g f ε := by
+    refine ⟨extremalKernel μ τ y₀ false, extremalKernel μ τ y₀ true,
       fun w y ↦ extremalKernel_nonneg μ hμ τ y₀ false hτpos w y,
       fun w y ↦ extremalKernel_nonneg μ hμ τ y₀ true hτpos w y,
       fun w ↦ extremalKernel_sum μ hμ τ y₀ false hτrow w,
-      fun w ↦ extremalKernel_sum μ hμ τ y₀ true hτrow w, ?_, ?_⟩, ?_⟩
-  · intro i
-    rw [kernel_pair_difference μ _ _ τ (extremalKernel_diff μ hμ τ y₀) (g i)]
-    have hcomm : (∑ z, τ z * g i z) = ∑ z, g i z * τ z :=
-      Finset.sum_congr rfl fun z _ ↦ by ring
-    rw [hcomm]
-    exact hτfeat i
-  · exact (kernel_pair_difference μ _ _ τ (extremalKernel_diff μ hμ τ y₀) f).symm
-  · have hcomm : (∑ z, τ z * f z) = ∑ z, f z * τ z :=
+      fun w ↦ extremalKernel_sum μ hμ τ y₀ true hτrow w, ?_, ?_⟩
+    · intro i
+      rw [kernel_pair_difference μ _ _ τ (extremalKernel_diff μ hμ τ y₀) (g i)]
+      have hcomm : (∑ z, τ z * g i z) = ∑ z, g i z * τ z :=
+        Finset.sum_congr rfl fun z _ ↦ by ring
+      rw [hcomm]
+      exact hτfeat i
+    · exact (kernel_pair_difference μ _ _ τ (extremalKernel_diff μ hμ τ y₀) f).symm
+  have hge : c ≤ ∑ z, τ z * f z := by
+    have hcomm : (∑ z, τ z * f z) = ∑ z, f z * τ z :=
       Finset.sum_congr rfl fun z _ ↦ by ring
     rw [hcomm, hτf]
+  exact le_trans hge (hub _ hmem)
 
 /-- **PL Theorem 8.2 and Corollary 8.3.** The report diameter over conditional kernel
 pairs whose supplied feature expectations agree coordinatewise to within `2ε` is exactly
@@ -697,8 +695,8 @@ theorem conditional_oscillation_duality (μ : W → ℝ) (hμ : ∀ w, 0 < μ w)
     have hr : ∀ lam : F → ℝ, sInf (dualValues μ g f ε) ≤
         oscTotal μ (f - featureCombo g lam) + 2 * ε * ∑ i, |lam i| :=
       fun lam ↦ csInf_le hbdd ⟨lam, rfl⟩
-    obtain ⟨t, ht, hge⟩ := exists_kernelGap_ge μ hμ g f ε hε hcpos hc2 hr
-    have hle := hub ht
+    have hcub := le_of_kernelGaps_upperBound μ hμ g f ε hε hcpos hc2 hr
+      (fun t ht ↦ hub ht)
     linarith
 
 /-- The midpoint of the conditional range, the constant in PL equation (8.3). -/
