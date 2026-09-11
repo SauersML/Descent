@@ -839,7 +839,6 @@ theorem ratio_eq_partial_add_remainder (θ : ℝ) (hlo : 0 ≤ θ) (hhi : θ ≤
   have hpos : (0:ℝ) < 2 - θ := by linarith
   have hkey : θ / (2 - θ) * (1 - θ / 2) = θ / 2 := by
     field_simp
-    ring
   induction K with
   | zero => simp
   | succ K ih =>
@@ -879,7 +878,7 @@ theorem replica_certificate (K : ℕ) :
     simp only [Set.mem_Icc] at hθ
     have hexp := ratio_eq_partial_add_remainder θ hθ.1 hθ.2 K
     have hr := ratio_mem_unitInterval θ hθ.1 hθ.2
-    have hx : (0:ℝ) ≤ (θ / 2) ^ K := by positivity
+    have hx : (0:ℝ) ≤ (θ / 2) ^ K := pow_nonneg (by linarith [hθ.1]) K
     have hprod : 0 ≤ (θ / 2) ^ K * (θ / (2 - θ)) := mul_nonneg hx hr.1
     linarith
   · have htarget : replicaLowerSum K + replicaTail K =
@@ -892,7 +891,7 @@ theorem replica_certificate (K : ℕ) :
     simp only [Set.mem_Icc] at hθ
     have hexp := ratio_eq_partial_add_remainder θ hθ.1 hθ.2 K
     have hr := ratio_mem_unitInterval θ hθ.1 hθ.2
-    have hx : (0:ℝ) ≤ (θ / 2) ^ K := by positivity
+    have hx : (0:ℝ) ≤ (θ / 2) ^ K := pow_nonneg (by linarith [hθ.1]) K
     have hprod : (θ / 2) ^ K * (θ / (2 - θ)) ≤ (θ / 2) ^ K * 1 :=
       mul_le_mul_of_nonneg_left hr.2 hx
     rw [mul_one] at hprod
