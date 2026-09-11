@@ -31,6 +31,10 @@ open Descent.Portability.RationalParameterReports
 #print axioms ParametricTree.conditionalMetric_experimentAt_eq_eval
 #print axioms attainableRegion_eq_image
 #print axioms attainableRegion_eq_iUnion_image_cells
+#print axioms attainableRegion_eq_image_reportGraph
+#print axioms mem_signCell_graphGuard_iff
+#print axioms accumulation_region_iff_polynomial
+#print axioms reportGraph_eq_iUnion_signCell
 #print axioms eval_indicatorQuotient_true
 #print axioms eval_indicatorQuotient_false
 #print axioms regularAt_architectureTree

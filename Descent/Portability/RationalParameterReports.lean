@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.FiniteTraceTreeLaw
 import Descent.Portability.ArchitectureEnvironmentRegion
 import Mathlib.Algebra.MvPolynomial.Eval
+import Mathlib.Algebra.MvPolynomial.Rename
 import Mathlib.Data.Sign.Defs
 
 assert_below Descent.Decision Descent.Program
@@ -42,15 +43,23 @@ quantities over any admissible parameter set, is the image of the admissible poi
 `d_j > 0` under the report map `θ ↦ (n_j(θ) / d_j(θ))_j` (`attainableRegion_eq_image`). For a
 parametric experiment it is the finite union over the cells of images under explicit
 polynomial-quotient maps (`attainableRegion_eq_iUnion_image_cells`). One parameter point serves
-every metric, so globally shared parameters stay shared. The two-by-two architecture and
+every metric, so globally shared parameters stay shared. The joint input-output graph
+`reportGraph`, in the joint coordinates `σ ⊕ J` of parameters and reports, projects onto (8)
+(`attainableRegion_eq_image_reportGraph`). Over any admissible set that is a union of guard
+cells, the graph is the finite union over those cells of the sets cut out by the explicit
+polynomial sign conditions `graphGuard` with signs `graphPattern`: the guards, the positivity
+`D_num D_den > 0` of every presented definedness probability, and the polynomial equation
+`D_num N_den r_j = N_num D_den` of every report coordinate
+(`reportGraph_eq_iUnion_signCell`). This is the defining presentation of a semialgebraic set,
+for every finite algebraic experiment, obtained without quantifier elimination. The two-by-two architecture and
 environment region of NOTE2 §3.2 is an instance: `architectureTree` enumerates the mixture
 averages of `ArchitectureEnvironmentRegion` (`accumulation_architectureTree`), and its attainable
 region over the unit square is the corpus region `jointRegion` of NOTE2 (10)
 (`attainableRegion_architectureTree_eq_jointRegion`).
 
-Not formalized: semialgebraic sets, the semialgebraicity of the joint input-output graph, and
-real quantifier elimination, which the note uses to describe (8), establish sharp bounds, and
-decide attainment; none of them is available at this Mathlib pin. The partition here is by the
+Not formalized: Mathlib's notion of a semialgebraic set, and real quantifier elimination, which
+the note uses to eliminate the parameters from the graph and so describe (8) without them,
+establish sharp bounds, and decide attainment; neither is available at this Mathlib pin. The partition here is by the
 signs of the supplied guards, and regularity of the presented denominators at a point is a
 supplied hypothesis, not a refinement the module computes. Algebraic roots, optimizers and
 transcendental primitives are outside the rational conclusion, as the note states.
@@ -571,6 +580,168 @@ theorem attainableRegion_eq_iUnion_image_cells {J : Type} (guard : Guard → MvP
     have hsign : signPattern guard θ = pattern := hcell
     subst hsign
     exact ⟨θ, ⟨hθ, hpositive⟩, hmean θ hθ hpositive⟩
+
+/-! ### The joint input-output graph -/
+
+/-- The joint input-output graph of NOTE2 Theorem 2 in the joint coordinates `σ ⊕ J`: the points
+whose parameter part is admissible, with every definedness probability positive and
+`d_j(θ) r_j = n_j(θ)` for the report part. -/
+def reportGraph {J : Type} (admissible : Set (σ → ℝ))
+    (definedness numerator : J → (σ → ℝ) → ℝ) : Set (σ ⊕ J → ℝ) :=
+  {point | point ∘ Sum.inl ∈ admissible ∧ ∀ j, 0 < definedness j (point ∘ Sum.inl) ∧
+    definedness j (point ∘ Sum.inl) * point (Sum.inr j) = numerator j (point ∘ Sum.inl)}
+
+/-- **NOTE2 (8) is the projection of the graph.** The attainable region is the image of the joint
+input-output graph under the projection onto the report coordinates. Describing it without the
+parameters is the quantifier elimination this module does not formalize. -/
+theorem attainableRegion_eq_image_reportGraph {J : Type} (admissible : Set (σ → ℝ))
+    (definedness numerator : J → (σ → ℝ) → ℝ) :
+    attainableRegion admissible definedness numerator =
+      (fun point j ↦ point (Sum.inr j)) '' reportGraph admissible definedness numerator := by
+  ext report
+  constructor
+  · rintro ⟨θ, hθ, hreport⟩
+    exact ⟨Sum.elim θ report, ⟨hθ, hreport⟩, rfl⟩
+  · rintro ⟨point, ⟨hθ, hreport⟩, rfl⟩
+    exact ⟨point ∘ Sum.inl, hθ, hreport⟩
+
+/-- The polynomial conditions in the joint coordinates that cut out the graph on the cell of one
+guard pattern: the guards, the product of the numerator and denominator of every presented
+definedness probability, and the defining equation of every report coordinate. -/
+def graphGuard {J : Type} (guard : Guard → MvPolynomial σ ℝ)
+    (tree : ParametricTree σ Guard Report)
+    (definedness numerator : J → Report → (Guard → SignType) → PolynomialQuotient σ)
+    (pattern : Guard → SignType) : Guard ⊕ J ⊕ J → MvPolynomial (σ ⊕ J) ℝ
+  | Sum.inl index => MvPolynomial.rename Sum.inl (guard index)
+  | Sum.inr (Sum.inl j) =>
+      MvPolynomial.rename Sum.inl
+        ((ParametricTree.accumulationQuotient tree (definedness j) pattern).numerator *
+          (ParametricTree.accumulationQuotient tree (definedness j) pattern).denominator)
+  | Sum.inr (Sum.inr j) =>
+      MvPolynomial.rename Sum.inl
+          ((ParametricTree.accumulationQuotient tree (definedness j) pattern).numerator *
+            (ParametricTree.accumulationQuotient tree (numerator j) pattern).denominator) *
+        MvPolynomial.X (Sum.inr j) -
+      MvPolynomial.rename Sum.inl
+        ((ParametricTree.accumulationQuotient tree (numerator j) pattern).numerator *
+          (ParametricTree.accumulationQuotient tree (definedness j) pattern).denominator)
+
+/-- The prescribed signs of the graph conditions: the pattern on the guards, `+1` on every
+definedness product, and `0` on every defining equation. -/
+def graphPattern {J : Type} (pattern : Guard → SignType) : Guard ⊕ J ⊕ J → SignType
+  | Sum.inl index => pattern index
+  | Sum.inr (Sum.inl _) => 1
+  | Sum.inr (Sum.inr _) => 0
+
+/-- Membership in the sign-condition set of the graph conditions, written out: the parameter part
+lies in the guard cell, every presented definedness product is positive, and every report
+coordinate satisfies its polynomial equation. -/
+theorem mem_signCell_graphGuard_iff {J : Type} (guard : Guard → MvPolynomial σ ℝ)
+    (tree : ParametricTree σ Guard Report)
+    (definedness numerator : J → Report → (Guard → SignType) → PolynomialQuotient σ)
+    (pattern : Guard → SignType) (point : σ ⊕ J → ℝ) :
+    point ∈ signCell (graphGuard guard tree definedness numerator pattern)
+        (graphPattern pattern) ↔
+      point ∘ Sum.inl ∈ signCell guard pattern ∧
+        ∀ j, 0 < MvPolynomial.eval (point ∘ Sum.inl)
+              (ParametricTree.accumulationQuotient tree (definedness j) pattern).numerator *
+            MvPolynomial.eval (point ∘ Sum.inl)
+              (ParametricTree.accumulationQuotient tree (definedness j) pattern).denominator ∧
+          MvPolynomial.eval (point ∘ Sum.inl)
+                (ParametricTree.accumulationQuotient tree (definedness j) pattern).numerator *
+              MvPolynomial.eval (point ∘ Sum.inl)
+                (ParametricTree.accumulationQuotient tree (numerator j) pattern).denominator *
+              point (Sum.inr j) =
+            MvPolynomial.eval (point ∘ Sum.inl)
+                (ParametricTree.accumulationQuotient tree (numerator j) pattern).numerator *
+              MvPolynomial.eval (point ∘ Sum.inl)
+                (ParametricTree.accumulationQuotient tree (definedness j) pattern).denominator := by
+  simp only [signCell, Set.mem_setOf_eq, funext_iff, Sum.forall, signPattern, graphGuard,
+    graphPattern, map_sub, map_mul, MvPolynomial.eval_rename, MvPolynomial.eval_X,
+    sign_eq_one_iff, sign_eq_zero_iff, sub_eq_zero, forall_and]
+
+/-- On the cell of a pattern, at a regular point, a report value satisfies the definedness and
+defining equation of one requested quantity exactly when the presented polynomials satisfy the
+positivity and the polynomial equation of the graph conditions. Assumes:
+`RegularAt pattern θ tree`. -/
+theorem accumulation_region_iff_polynomial (guard : Guard → MvPolynomial σ ℝ)
+    (pattern : Guard → SignType) {θ : σ → ℝ} (hcell : θ ∈ signCell guard pattern)
+    (tree : ParametricTree σ Guard Report)
+    (definedness numerator : Report → (Guard → SignType) → PolynomialQuotient σ)
+    (hregular : ParametricTree.RegularAt pattern θ tree)
+    (hdefinedness : ∀ report, MvPolynomial.eval θ (definedness report pattern).denominator ≠ 0)
+    (hnumerator : ∀ report, MvPolynomial.eval θ (numerator report pattern).denominator ≠ 0)
+    (value : ℝ) :
+    (0 < ParametricTree.accumulation guard tree definedness θ ∧
+        ParametricTree.accumulation guard tree definedness θ * value =
+          ParametricTree.accumulation guard tree numerator θ) ↔
+      (0 < MvPolynomial.eval θ
+            (ParametricTree.accumulationQuotient tree definedness pattern).numerator *
+          MvPolynomial.eval θ
+            (ParametricTree.accumulationQuotient tree definedness pattern).denominator ∧
+        MvPolynomial.eval θ
+              (ParametricTree.accumulationQuotient tree definedness pattern).numerator *
+            MvPolynomial.eval θ
+              (ParametricTree.accumulationQuotient tree numerator pattern).denominator * value =
+          MvPolynomial.eval θ
+              (ParametricTree.accumulationQuotient tree numerator pattern).numerator *
+            MvPolynomial.eval θ
+              (ParametricTree.accumulationQuotient tree definedness pattern).denominator) := by
+  have hD := ParametricTree.accumulation_eq_eval_accumulationQuotient guard pattern hcell tree
+    definedness hregular hdefinedness
+  have hN := ParametricTree.accumulation_eq_eval_accumulationQuotient guard pattern hcell tree
+    numerator hregular hnumerator
+  have hDd := ParametricTree.denominator_accumulationQuotient_ne_zero tree definedness pattern
+    hregular hdefinedness
+  have hNd := ParametricTree.denominator_accumulationQuotient_ne_zero tree numerator pattern
+    hregular hnumerator
+  rw [hD, hN]
+  simp only [PolynomialQuotient.eval]
+  constructor
+  · rintro ⟨hpositive, hequation⟩
+    refine ⟨mul_pos_iff.mpr (div_pos_iff.mp hpositive), ?_⟩
+    rw [div_mul_eq_mul_div, div_eq_div_iff hDd hNd] at hequation
+    linear_combination hequation
+  · rintro ⟨hpositive, hequation⟩
+    refine ⟨div_pos_iff.mpr (mul_pos_iff.mp hpositive), ?_⟩
+    rw [div_mul_eq_mul_div, div_eq_div_iff hDd hNd]
+    linear_combination hequation
+
+/-- **NOTE2 Theorem 2, the joint input-output graph is semialgebraic, by explicit presentation.**
+Let the admissible set be the union of the cells of a set of guard patterns, with the presented
+probabilities and accumulators regular on those cells. Then the joint input-output graph is the
+finite union, over those patterns, of the sets cut out in the joint coordinates by the explicit
+polynomial sign conditions `graphGuard` with the signs `graphPattern`. Assumes:
+`RegularAt pattern θ tree` on every admissible cell. -/
+theorem reportGraph_eq_iUnion_signCell {J : Type} (guard : Guard → MvPolynomial σ ℝ)
+    (tree : ParametricTree σ Guard Report)
+    (definedness numerator : J → Report → (Guard → SignType) → PolynomialQuotient σ)
+    (patterns : Set (Guard → SignType))
+    (hregular : ∀ pattern ∈ patterns, ∀ θ ∈ signCell guard pattern,
+      ParametricTree.RegularAt pattern θ tree ∧ ∀ j report,
+        MvPolynomial.eval θ (definedness j report pattern).denominator ≠ 0 ∧
+          MvPolynomial.eval θ (numerator j report pattern).denominator ≠ 0) :
+    reportGraph (⋃ pattern ∈ patterns, signCell guard pattern)
+        (fun j ↦ ParametricTree.accumulation guard tree (definedness j))
+        (fun j ↦ ParametricTree.accumulation guard tree (numerator j)) =
+      ⋃ pattern ∈ patterns,
+        signCell (graphGuard guard tree definedness numerator pattern) (graphPattern pattern) := by
+  ext point
+  simp only [reportGraph, Set.mem_setOf_eq, Set.mem_iUnion, exists_prop,
+    mem_signCell_graphGuard_iff]
+  constructor
+  · rintro ⟨⟨pattern, hpattern, hcell⟩, hreport⟩
+    obtain ⟨hregularAt, hden⟩ := hregular pattern hpattern _ hcell
+    exact ⟨pattern, hpattern, hcell, fun j ↦
+      (accumulation_region_iff_polynomial guard pattern hcell tree (definedness j) (numerator j)
+        hregularAt (fun report ↦ (hden j report).1) (fun report ↦ (hden j report).2)
+        (point (Sum.inr j))).mp (hreport j)⟩
+  · rintro ⟨pattern, hpattern, hcell, hgraph⟩
+    obtain ⟨hregularAt, hden⟩ := hregular pattern hpattern _ hcell
+    exact ⟨⟨pattern, hpattern, hcell⟩, fun j ↦
+      (accumulation_region_iff_polynomial guard pattern hcell tree (definedness j) (numerator j)
+        hregularAt (fun report ↦ (hden j report).1) (fun report ↦ (hden j report).2)
+        (point (Sum.inr j))).mpr (hgraph j)⟩
 
 /-! ### The architecture/environment region of NOTE2 §3.2 is an instance -/
 
