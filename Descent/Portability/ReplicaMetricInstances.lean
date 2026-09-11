@@ -7,6 +7,7 @@ import Descent.Portability.ChronologyReportLaw
 import Descent.Portability.FiniteGeneticTransition
 import Descent.Portability.PThresholdTrainingLaw
 import Descent.Portability.ReplicaMomentCompleteness
+import Descent.Portability.UniformPenetranceArchitecture
 import Mathlib.Algebra.MvPolynomial.CommRing
 
 assert_below Descent.Decision Descent.Program
@@ -601,6 +602,14 @@ def scoreGroupMass (law : FiniteReportLaw (Score × Bool)) (group : Score) : ℝ
 theorem scoreGroupMass_eq_scoreCellMass (law : FiniteReportLaw (Bool × Bool)) (allele : Bool) :
     scoreGroupMass law allele = ChronologyReportLaw.scoreCellMass law allele :=
   (ChronologyReportLaw.scoreCellMass_eq_cells law allele).symm
+
+/-- For a binary score the score group mass is the four-cell score marginal
+`EmpiricalCorrelationDefinedness.scoreMass` of NOTE1 (31), and the score-group mass of the
+uniform-penetrance example of NOTE2 section 9.1. -/
+theorem scoreGroupMass_bool_eq_scoreMass (law : FiniteReportLaw (Bool × Bool)) (group : Bool) :
+    scoreGroupMass law group = EmpiricalCorrelationDefinedness.scoreMass law group ∧
+      scoreGroupMass law group = UniformPenetranceArchitecture.scoreGroupMass law group :=
+  ⟨rfl, rfl⟩
 
 /-- A score group mass is nonnegative. -/
 theorem scoreGroupMass_nonneg (law : FiniteReportLaw (Score × Bool)) (group : Score) :
