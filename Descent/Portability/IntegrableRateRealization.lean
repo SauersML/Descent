@@ -178,8 +178,8 @@ theorem continuous_rateCoordinates_floorRates {D : ℕ} (floor : ℝ) (hfloor : 
     · simp only [if_pos hsame]
       exact continuous_const
     · simp only [if_neg hsame]
-      exact (((continuous_apply j).comp (continuous_apply i)).comp
-        (continuous_fst.comp continuous_snd)).max continuous_const
+      have hsecond : Continuous fun x : RateCoordinates D ↦ x.2.1 := continuous_snd.fst
+      exact ((continuous_apply j).comp ((continuous_apply i).comp hsecond)).max continuous_const
   have hmutation : Continuous fun x : RateCoordinates D ↦ fun i ↦ max (x.2.2.1 i) 0 :=
     continuous_pi fun i ↦ ((continuous_apply i).comp
       (continuous_fst.comp (continuous_snd.comp continuous_snd))).max continuous_const
@@ -352,7 +352,6 @@ theorem exists_integral_solution_of_continuous_approximation {ι : Type*} [Finty
   have hinverse : ∀ {k j : ℕ}, k ≤ j → 1 / ((j : ℝ) + 1) ≤ 1 / ((k : ℝ) + 1) := by
     intro k j hkj
     gcongr
-    exact_mod_cast hkj
   have hinverseOne : ∀ k : ℕ, 1 / ((k : ℝ) + 1) ≤ 1 := by
     intro k
     rw [div_le_one (by positivity)]
