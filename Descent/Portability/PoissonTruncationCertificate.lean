@@ -206,14 +206,15 @@ theorem rowSum_deficit_le (Q : Matrix ι ι ℝ) (hQ : KillingGenerator Q) (unif
         ((uniformRate * time) ^ power *
           ∑ column, (uniformization Q uniformRate ^ power) row column) := by
     rw [matrixExponential_eq_poissonMixture Q uniformRate hpos time]
-    simp only [Matrix.smul_apply, smul_eq_mul, ← Finset.mul_sum]
-    rw [exponential_rowSum_eq_tsum]
+    simp only [Matrix.smul_apply, smul_eq_mul]
+    rw [← Finset.mul_sum, exponential_rowSum_eq_tsum]
   have htruncRow : ∑ column, poissonTruncation Q uniformRate time terms row column
       = Real.exp (-(uniformRate * time)) * ∑ power ∈ Finset.range terms,
         ((power.factorial : ℝ)⁻¹) * ((uniformRate * time) ^ power *
           ∑ column, (uniformization Q uniformRate ^ power) row column) := by
     unfold poissonTruncation
-    simp only [Matrix.smul_apply, smul_eq_mul, ← Finset.mul_sum]
+    simp only [Matrix.smul_apply, smul_eq_mul]
+    rw [← Finset.mul_sum]
     congr 1
     simp only [partialSum_apply]
     rw [Finset.sum_comm]
