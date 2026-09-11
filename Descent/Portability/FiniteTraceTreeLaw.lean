@@ -78,12 +78,12 @@ variable {Report : Type}
 a leaf. -/
 def Trace : TraceTree Report → Type
   | .leaf _ => Unit
-  | .node Branch _ child => Σ branch : Branch, Trace (child branch)
+  | @TraceTree.node _ Branch _ _ child => Σ branch : Branch, Trace (child branch)
 
 /-- An experiment has finitely many complete traces. -/
 instance traceFintype : (tree : TraceTree Report) → Fintype (Trace tree)
   | .leaf _ => inferInstanceAs (Fintype Unit)
-  | .node Branch _ child => by
+  | @TraceTree.node _ Branch _ _ child => by
       letI : ∀ branch, Fintype (Trace (child branch)) :=
         fun branch ↦ traceFintype (child branch)
       exact inferInstanceAs (Fintype (Σ branch : Branch, Trace (child branch)))
@@ -91,19 +91,20 @@ instance traceFintype : (tree : TraceTree Report) → Fintype (Trace tree)
 /-- The report at the end of a complete trace. -/
 def traceReport : (tree : TraceTree Report) → Trace tree → Report
   | .leaf report, _ => report
-  | .node _ _ child, trace => traceReport (child trace.1) trace.2
+  | @TraceTree.node _ _ _ _ child, trace => traceReport (child trace.1) trace.2
 
 /-- The chain-rule weight of a complete trace: the conditional probability of its first branch
 times the weight of the rest of the trace in the continuation that branch selected. -/
 def traceWeight : (tree : TraceTree Report) → Trace tree → ℝ
   | .leaf _, _ => 1
-  | .node _ law child, trace => law.mass trace.1 * traceWeight (child trace.1) trace.2
+  | @TraceTree.node _ _ _ law child, trace =>
+      law.mass trace.1 * traceWeight (child trace.1) trace.2
 
 /-- The edge probabilities along a complete trace, in the order the edges are taken. Each is
 read at the node the preceding history reached. -/
 def edgeProbabilities : (tree : TraceTree Report) → Trace tree → List ℝ
   | .leaf _, _ => []
-  | .node _ law child, trace =>
+  | @TraceTree.node _ _ _ law child, trace =>
       law.mass trace.1 :: edgeProbabilities (child trace.1) trace.2
 
 /-- The chain-rule weight of a trace is the product of its edge probabilities, `∏_{e ∈ τ} p_e`
@@ -111,7 +112,7 @@ in NOTE2 (7). -/
 theorem traceWeight_eq_prod_edgeProbabilities (tree : TraceTree Report) (trace : Trace tree) :
     traceWeight tree trace = (edgeProbabilities tree trace).prod := by
   induction tree with
-  | leaf _ => exact List.prod_nil.symm
+  | leaf _ => rfl
   | node Branch law child ih =>
     change law.mass trace.1 * traceWeight (child trace.1) trace.2 =
       (law.mass trace.1 :: edgeProbabilities (child trace.1) trace.2).prod
@@ -129,7 +130,7 @@ theorem traceWeight_nonneg (tree : TraceTree Report) (trace : Trace tree) :
 a node returns the expectation, under its branch law, of the values of its continuations. -/
 def backwardValue : TraceTree Report → (Report → ℝ) → ℝ
   | .leaf report, metric => metric report
-  | .node _ law child, metric =>
+  | @TraceTree.node _ _ _ law child, metric =>
       law.expectation fun branch ↦ backwardValue (child branch) metric
 
 /-- **NOTE2 (7), enumeration equals backward evaluation.** Summing the chain-rule weight of
@@ -178,7 +179,7 @@ def traceLaw (tree : TraceTree Report) : FiniteReportLaw (Trace tree) where
 leaf, and at a node the mixture of the continuations' laws by the branch law. -/
 def reportLaw [Fintype Report] : TraceTree Report → FiniteReportLaw Report
   | .leaf report => FiniteReportLaw.pointMass report
-  | .node _ law child => law.bind fun branch ↦ reportLaw (child branch)
+  | @TraceTree.node _ _ _ law child => law.bind fun branch ↦ reportLaw (child branch)
 
 /-- The recursively composed report law integrates every metric to its backward value. -/
 theorem expectation_reportLaw [Fintype Report] (tree : TraceTree Report)
@@ -232,7 +233,7 @@ theorem weightedDefinedMetric_reportLaw [Fintype Report] (tree : TraceTree Repor
 end of the first stage, and the continuation it selects may be an arbitrary experiment. -/
 def graft {Memory : Type} : TraceTree Memory → (Memory → TraceTree Report) → TraceTree Report
   | .leaf memory, continuation => continuation memory
-  | .node Branch law child, continuation =>
+  | @TraceTree.node _ Branch _ law child, continuation =>
       .node Branch law fun branch ↦ graft (child branch) continuation
 
 /-- Backward evaluation of a composite experiment evaluates the continuations first, then the
@@ -341,7 +342,7 @@ theorem trace_sum_historyTree_eq_path_sum {State : Type} [Fintype State]
 supplies its branch probabilities as exact rationals. -/
 def RationalTree : TraceTree Report → Prop
   | .leaf _ => True
-  | .node _ law child => RationalLaw law ∧ ∀ branch, RationalTree (child branch)
+  | @TraceTree.node _ _ _ law child => RationalLaw law ∧ ∀ branch, RationalTree (child branch)
 
 /-- **NOTE2 Theorem 1, rational clause.** Every trace weight of a rational experiment is
 rational. Assumes: `RationalTree tree`. -/
@@ -406,12 +407,14 @@ variable {Report : Type}
 on rationals and never touches a real number. -/
 def evaluate : RationalTraceTree Report → (Report → ℚ) → ℚ
   | .leaf report, metric => metric report
-  | .node _ law child, metric => law.expectation fun branch ↦ evaluate (child branch) metric
+  | @RationalTraceTree.node _ _ _ law child, metric =>
+      law.expectation fun branch ↦ evaluate (child branch) metric
 
 /-- The real trace tree carried by a rational one. -/
 def toReal : RationalTraceTree Report → TraceTree Report
   | .leaf report => .leaf report
-  | .node Branch law child => .node Branch law.toReal fun branch ↦ toReal (child branch)
+  | @RationalTraceTree.node _ Branch _ law child =>
+      .node Branch law.toReal fun branch ↦ toReal (child branch)
 
 /-- A carried tree is rational, which inhabits `RationalTree` by every rational experiment. -/
 theorem rationalTree_toReal (tree : RationalTraceTree Report) :

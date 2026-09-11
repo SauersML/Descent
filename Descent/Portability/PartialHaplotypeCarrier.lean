@@ -2,8 +2,13 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.UniversalMetricIdentification
+import Mathlib.Data.Finite.Card
+import Mathlib.Data.Fintype.Vector
 import Mathlib.Data.Multiset.Count
 import Mathlib.Data.Set.Finite.Basic
+import Mathlib.Data.Sym.Card
+import Mathlib.Logic.Equiv.Option
+import Mathlib.SetTheory.Cardinal.Finite
 import Mathlib.Tactic
 
 assert_below Descent.Decision Descent.Program
@@ -15,13 +20,21 @@ A partial haplotype type is a deme label together with an allele assignment on a
 subset of the loci; a sampling configuration is a multiset of such types.  This module
 formalizes the material grading of NOTE1 §4.1: the per-locus load of a configuration, the
 retention budget (18), the resulting cardinality bound, the finiteness of the retained state
-space, and the fact that the four ancestral transitions never violate the budget.
+space, the loose configuration count, and the fact that the four ancestral transitions never
+violate the budget.
 
 The load of a configuration at a locus counts the carriers that retain that locus.  Because
 every partial type retains at least one locus, the number of carriers is bounded by the total
 load, hence by the panel budget `B = Σ_ℓ n_ℓ` of (18).  Finiteness of the retained state space
 then follows from finiteness of the carrier type together with that cardinality bound: two
 budget-respecting configurations with equal clamped multiplicities are equal.
+
+The loose bound of §4.1 is `card_withinBudget_le_choose`: at most `C(K + B, B)` configurations
+respect the budget, where `K = d [∏_ℓ (1 + |A_ℓ|) - 1]` is the number of partial types
+(`card_partialType`).  The proof is stars and bars.  Padding a configuration with empty slots
+to exactly `B` slots (`padWithinBudget`) is injective, and the multisets of `B` slots over the
+`K` types and the empty slot number `C(K + B, B)`.  The bound counts configurations; the
+cemetery state of §4.1 is one state more.
 
 Migration replaces the deme label and leaves every load unchanged.  Mutation rewrites one
 already retained allele label and leaves every load unchanged.  Recombination splits one
@@ -44,8 +57,7 @@ one locus, and by `fullType`, the lineage retaining them all.
 
 Not formalized here: the generator identity (19), that is, the coalescent duality with
 recombination that identifies the jump rates `q_{ξη}` on configurations.  It is classical and
-NOTE1 §4.2 states it without proof.  The loose counting bound `C(K+B, B)` of §4.1 is also not
-formalized, since the finiteness theorem below does not use it.
+NOTE1 §4.2 states it without proof.
 
 ## Empirical status
 
@@ -209,6 +221,133 @@ theorem withinBudget_finite [Fintype Deme] [Fintype Locus] [∀ ℓ, Fintype (Al
   have hval : min (Multiset.count τ ξ) bound = min (Multiset.count τ ζ) bound :=
     congrArg Fin.val (congrFun heq τ)
   omega
+
+section Counting
+
+/-- A partial type is exactly a deme label together with an allele assignment that retains at
+least one locus. -/
+def partialTypeEquiv :
+    PartialType Deme Locus Allele ≃
+      Deme × {allele : ∀ ℓ, Option (Allele ℓ) // ∃ ℓ, (allele ℓ).isSome = true} where
+  toFun τ := (τ.deme, ⟨τ.allele, τ.retained⟩)
+  invFun pair := ⟨pair.1, pair.2.1, pair.2.2⟩
+  left_inv _ := rfl
+  right_inv _ := rfl
+
+/-- An allele assignment retains some locus exactly when it is not the empty assignment. -/
+theorem retains_iff_ne_empty (allele : ∀ ℓ, Option (Allele ℓ)) :
+    (∃ ℓ, (allele ℓ).isSome = true) ↔ allele ≠ fun _ ↦ none := by
+  constructor
+  · rintro ⟨ℓ, hℓ⟩ hempty
+    simp [hempty] at hℓ
+  · intro hne
+    by_contra hnone
+    apply hne
+    funext ℓ
+    cases hℓ : allele ℓ with
+    | none => rfl
+    | some a => exact (hnone ⟨ℓ, by simp [hℓ]⟩).elim
+
+/-- **The retained-assignment count.**  The allele assignments retaining at least one locus
+number `∏_ℓ (1 + |A_ℓ|) - 1`: every locus carries an allele or no material, and only the
+empty assignment is excluded. -/
+theorem card_retainingAssignment [Fintype Locus] [∀ ℓ, Fintype (Allele ℓ)] :
+    Nat.card {allele : ∀ ℓ, Option (Allele ℓ) // ∃ ℓ, (allele ℓ).isSome = true} =
+      ∏ ℓ, (1 + Fintype.card (Allele ℓ)) - 1 := by
+  classical
+  have hoption :
+      Nat.card {allele : ∀ ℓ, Option (Allele ℓ) // ∃ ℓ, (allele ℓ).isSome = true} + 1 =
+        ∏ ℓ, (1 + Fintype.card (Allele ℓ)) := by
+    have hequiv : Option {allele : ∀ ℓ, Option (Allele ℓ) // ∃ ℓ, (allele ℓ).isSome = true} ≃
+        ∀ ℓ, Option (Allele ℓ) :=
+      (Equiv.subtypeEquivRight (retains_iff_ne_empty (Allele := Allele))).optionCongr.trans
+        (Equiv.optionSubtypeNe (fun _ ↦ none : ∀ ℓ, Option (Allele ℓ)))
+    rw [← Finite.card_option, Nat.card_congr hequiv, Nat.card_pi]
+    exact Finset.prod_congr rfl fun ℓ _ ↦ by
+      rw [Finite.card_option, Nat.card_eq_fintype_card, add_comm]
+  omega
+
+/-- **The carrier-type count of NOTE1 §4.1.**  There are `K = d [∏_ℓ (1 + |A_ℓ|) - 1]`
+partial haplotype types: a deme label together with a nonempty allele assignment. -/
+theorem card_partialType [Fintype Deme] [Fintype Locus] [∀ ℓ, Fintype (Allele ℓ)] :
+    Nat.card (PartialType Deme Locus Allele) =
+      Fintype.card Deme * (∏ ℓ, (1 + Fintype.card (Allele ℓ)) - 1) := by
+  rw [Nat.card_congr (partialTypeEquiv (Deme := Deme) (Allele := Allele)), Nat.card_prod,
+    Nat.card_eq_fintype_card (α := Deme), card_retainingAssignment]
+
+/-- Padding a configuration with empty slots up to `bound` slots: the stars-and-bars encoding
+behind the loose configuration count. -/
+def padConfiguration {Carrier : Type*} (bound : ℕ) (ξ : Multiset Carrier) :
+    Multiset (Option Carrier) :=
+  ξ.map some + Multiset.replicate (bound - Multiset.card ξ) none
+
+/-- A configuration of at most `bound` carriers pads to exactly `bound` slots. -/
+theorem card_padConfiguration {Carrier : Type*} (bound : ℕ) (ξ : Multiset Carrier)
+    (hle : Multiset.card ξ ≤ bound) : Multiset.card (padConfiguration bound ξ) = bound := by
+  simp only [padConfiguration, Multiset.card_add, Multiset.card_map, Multiset.card_replicate]
+  omega
+
+/-- Padding keeps the multiplicity of every carrier, so the padded slots determine the
+configuration. -/
+theorem count_some_padConfiguration {Carrier : Type*} [DecidableEq Carrier] (bound : ℕ)
+    (ξ : Multiset Carrier) (τ : Carrier) :
+    Multiset.count (some τ) (padConfiguration bound ξ) = Multiset.count τ ξ := by
+  rw [padConfiguration, Multiset.count_add,
+    Multiset.count_map_eq_count' _ _ (Option.some_injective Carrier), Multiset.count_replicate]
+  simp
+
+/-- The stars-and-bars encoding of a budget-respecting configuration: its carriers, padded
+with empty slots to exactly `B = Σ_ℓ n_ℓ` slots. -/
+def padWithinBudget [Fintype Locus] (capacity : Locus → ℕ)
+    (ξ : {ξ : Multiset (PartialType Deme Locus Allele) // WithinBudget capacity ξ}) :
+    Sym (Option (PartialType Deme Locus Allele)) (∑ ℓ, capacity ℓ) :=
+  Sym.mk (padConfiguration (∑ ℓ, capacity ℓ) ξ.1)
+    (card_padConfiguration _ ξ.1 (card_le_capacity_total capacity ξ.1 ξ.2))
+
+/-- Distinct budget-respecting configurations pad to distinct slot multisets. -/
+theorem padWithinBudget_injective [Fintype Locus] (capacity : Locus → ℕ) :
+    Function.Injective (padWithinBudget (Deme := Deme) (Allele := Allele) capacity) := by
+  classical
+  intro ξ ζ hpad
+  have hslots : padConfiguration (∑ ℓ, capacity ℓ) ξ.1 =
+      padConfiguration (∑ ℓ, capacity ℓ) ζ.1 := by
+    have hval := congrArg Subtype.val hpad
+    exact hval
+  refine Subtype.ext (Multiset.ext.mpr fun τ ↦ ?_)
+  rw [← count_some_padConfiguration (∑ ℓ, capacity ℓ) ξ.1 τ,
+    ← count_some_padConfiguration (∑ ℓ, capacity ℓ) ζ.1 τ, hslots]
+
+/-- **The loose configuration bound of NOTE1 §4.1, over the carrier-type count.**  At most
+`C(K + B, B)` configurations respect the budget, where `K` is the number of partial types and
+`B = Σ_ℓ n_ℓ`: padding embeds them into the multisets of `B` slots over the `K` types and the
+empty slot, of which there are `C(K + 1 + B - 1, B)`. -/
+theorem card_withinBudget_le_choose_card [Fintype Deme] [Fintype Locus]
+    [∀ ℓ, Fintype (Allele ℓ)] (capacity : Locus → ℕ) :
+    Nat.card {ξ : Multiset (PartialType Deme Locus Allele) // WithinBudget capacity ξ} ≤
+      (Nat.card (PartialType Deme Locus Allele) + ∑ ℓ, capacity ℓ).choose (∑ ℓ, capacity ℓ) := by
+  classical
+  have hfintype : Fintype (PartialType Deme Locus Allele) := Fintype.ofFinite _
+  refine (Nat.card_le_card_of_injective _
+    (padWithinBudget_injective (Deme := Deme) (Allele := Allele) capacity)).trans_eq ?_
+  rw [Nat.card_eq_fintype_card
+      (α := Sym (Option (PartialType Deme Locus Allele)) (∑ ℓ, capacity ℓ)),
+    Sym.card_sym_eq_choose, Fintype.card_option,
+    Nat.card_eq_fintype_card (α := PartialType Deme Locus Allele)]
+  congr 1
+  omega
+
+/-- **The loose configuration bound of NOTE1 §4.1.**  With `K = d [∏_ℓ (1 + |A_ℓ|) - 1]` and
+`B = Σ_ℓ n_ℓ`, at most `C(K + B, B)` configurations respect the retention budget (18).  The
+cemetery state of §4.1 is one state more. -/
+theorem card_withinBudget_le_choose [Fintype Deme] [Fintype Locus] [∀ ℓ, Fintype (Allele ℓ)]
+    (capacity : Locus → ℕ) :
+    Nat.card {ξ : Multiset (PartialType Deme Locus Allele) // WithinBudget capacity ξ} ≤
+      (Fintype.card Deme * (∏ ℓ, (1 + Fintype.card (Allele ℓ)) - 1) + ∑ ℓ, capacity ℓ).choose
+        (∑ ℓ, capacity ℓ) := by
+  have hbound := card_withinBudget_le_choose_card (Deme := Deme) (Allele := Allele) capacity
+  rwa [card_partialType] at hbound
+
+end Counting
 
 section Transitions
 

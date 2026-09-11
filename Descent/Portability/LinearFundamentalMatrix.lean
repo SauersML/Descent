@@ -46,6 +46,10 @@ variation-of-constants bound `‖U_A(T) - U_B(T)‖ ≤ e^{2 K T} ∫₀ᵀ ‖A
 iterate (`norm_picardIterate_sub_le`), and `eventually_integral_norm_sample_sub_le` is the
 `L¹` convergence of the left-endpoint step approximation `sampleTime`.
 
+`fundamentalMatrix_const` checks the construction against the corpus: for a constant
+generator the fundamental matrix is the exact matrix exponential, term by term
+(`picardIterate_const`).
+
 Scope.  The generator path is assumed continuous.  NOTE1 section 2.4 allows measurable rates
 with integrable norm, whose fundamental matrix is absolutely continuous and solves the equation
 only almost everywhere; that Carathéodory case is not formalized here.  Uniqueness of the
@@ -707,6 +711,48 @@ theorem eventually_integral_norm_sample_sub_le {ι : Type*} [Fintype ι] [Decida
   have hbound := intervalIntegral.norm_integral_le_of_norm_le_const hpointwise
   rw [sub_zero, abs_of_nonneg hT] at hbound
   exact (Real.le_norm_self _).trans hbound
+
+
+/-! ## Constant generators -/
+
+/-- For a constant generator the Picard iterates are the terms of the exponential series in the
+clamped time. -/
+theorem picardIterate_const {ι : Type*} [Fintype ι] [DecidableEq ι] (X : Matrix ι ι ℝ)
+    {T : ℝ} (hT : 0 ≤ T) :
+    ∀ n t, picardIterate (fun _ ↦ X) T n t = ((clampTime T t) ^ n / n.factorial) • X ^ n
+  | 0, t => by simp [picardIterate]
+  | n + 1, t => by
+      have hmem := clampTime_mem hT t
+      have hcongr : ∫ s in (0 : ℝ)..clampTime T t, X * picardIterate (fun _ ↦ X) T n s =
+          ∫ s in (0 : ℝ)..clampTime T t, (s ^ n / n.factorial) • X ^ (n + 1) := by
+        refine intervalIntegral.integral_congr fun s hs ↦ ?_
+        rw [Set.uIcc_of_le hmem.1] at hs
+        have hsmem : s ∈ Set.Icc 0 T := ⟨hs.1, hs.2.trans hmem.2⟩
+        simp only [picardIterate_const X hT n s, clampTime_of_mem hsmem, mul_smul_comm,
+          pow_succ']
+      show ∫ s in (0 : ℝ)..clampTime T t, X * picardIterate (fun _ ↦ X) T n s = _
+      rw [hcongr, intervalIntegral.integral_smul_const, intervalIntegral.integral_div,
+        integral_pow, zero_pow (Nat.succ_ne_zero n), sub_zero]
+      congr 1
+      have hsucc : ((n + 1).factorial : ℝ) = ((n : ℝ) + 1) * n.factorial := by
+        rw [Nat.factorial_succ]
+        push_cast
+        ring
+      rw [hsucc]
+      generalize ((n : ℝ) + 1) = next
+      ring
+
+/-- **A constant generator recovers the exact matrix exponential.**  The fundamental matrix of the
+constant path at `X` over the horizon `[0, T]` is the corpus matrix exponential of `X` at time
+`T`, so the time-varying construction extends the constant-rate epoch rather than replacing
+it. -/
+theorem fundamentalMatrix_const {ι : Type*} [Fintype ι] [DecidableEq ι] (X : Matrix ι ι ℝ)
+    {T : ℝ} (hT : 0 ≤ T) :
+    fundamentalMatrix (fun _ ↦ X) T T = Coalescent.matrixExponential X T := by
+  rw [fundamentalMatrix, Coalescent.matrixExponential]
+  refine tsum_congr fun n ↦ ?_
+  rw [picardIterate_const X hT n T, clampTime_of_mem ⟨hT, le_rfl⟩, smul_pow, smul_smul,
+    div_eq_inv_mul]
 
 end
 

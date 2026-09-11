@@ -50,10 +50,16 @@ within `11 / N ^ 2` and `3 / N ^ 2` (`abs_descFactorial_div_pow_sub_le`,
 `|E (Z / N) ^ b - x ^ b - monomialFirstOrder x b / N| ≤ (11 + 4 totalStirlingWeight b) / N ^ 2`
 uniformly over the category law, with the constant read off the Stirling weights of `b`.
 
-What is NOT proved in this module: the identification of `monomialFirstOrder x b` with the
-second-order operator `(1 / 2) Σ_{a, c} (x_a δ_ac - x_a x_c) ∂_a ∂_c x ^ b` of (10), the extension
-to linear combinations of monomials, and the multinomial drift stage that would replace the
-single-draw drift stage of the microscopic kernel.
+The first-order coefficient has the closed form (10) predicts.
+`firstOrderStirlingSum_eq_sum_choose` shows that the sub-multi-indices exactly one degree below `b`
+are `b` with a single coordinate lowered by one, and that lowering coordinate `a` carries the
+Stirling weight `S(b_a, b_a - 1) = C(b_a, 2)`; hence `monomialFirstOrder_eq_sum_choose`,
+`monomialFirstOrder x b = Σ_a C(b_a, 2) x ^ (b - e_a) - C(|b|, 2) x ^ b`.
+
+What is NOT proved in this module: that this closed form is the second-order operator
+`(1 / 2) Σ_{a, c} (x_a δ_ac - x_a x_c) ∂_a ∂_c x ^ b` computed from the partial derivatives of the
+polynomial, the extension to linear combinations of monomials, and the multinomial drift stage
+that would replace the single-draw drift stage of the microscopic kernel.
 
 ## Empirical status
 
@@ -422,7 +428,7 @@ theorem mem_subIndices_self {H : Type*} [Fintype H] [DecidableEq H] (b : H → �
 /-- Stirling weights are nonnegative. -/
 theorem stirlingWeight_nonneg {H : Type*} [Fintype H] (b j : H → ℕ) :
     0 ≤ stirlingWeight b j :=
-  Finset.prod_nonneg fun a _ ↦ Nat.cast_nonneg _
+  Finset.prod_nonneg fun _ _ ↦ Nat.cast_nonneg _
 
 /-- The Stirling weight of a multi-index against itself is one. -/
 theorem stirlingWeight_self {H : Type*} [Fintype H] (b : H → ℕ) : stirlingWeight b b = 1 := by
@@ -614,6 +620,106 @@ theorem abs_expectation_monomial_sub_le {H : Type*} [Fintype H] [DecidableEq H]
         + totalStirlingWeight b / (N : ℝ) ^ 2 :=
         add_le_add (add_le_add (mul_le_mul hT1 hm1 hm0 (by positivity)) hT2) hG
     _ = (11 + 4 * totalStirlingWeight b) / (N : ℝ) ^ 2 := by ring
+
+/-- **The first-order Stirling sum is the diagonal term of (10).** The sub-multi-indices exactly
+one degree below `b` are `b` with one coordinate lowered by one, and lowering coordinate `a` has
+Stirling weight `S(b_a, b_a - 1) = C(b_a, 2)`. -/
+theorem firstOrderStirlingSum_eq_sum_choose {H : Type*} [Fintype H] [DecidableEq H]
+    (x : H → ℝ) (b : H → ℕ) :
+    firstOrderStirlingSum x b
+      = ∑ a, ((b a).choose 2 : ℝ) * ∏ c, x c ^ Function.update b a (b a - 1) c := by
+  have hzero : ∀ a ∈ (Finset.univ : Finset H),
+      ((b a).choose 2 : ℝ) * ∏ c, x c ^ Function.update b a (b a - 1) c ≠ 0 → 1 ≤ b a := by
+    intro a _ hne
+    by_contra hlt
+    apply hne
+    have hb0 : b a = 0 := by omega
+    rw [hb0]
+    simp
+  have hweight : ∀ a, 1 ≤ b a →
+      stirlingWeight b (Function.update b a (b a - 1)) = ((b a).choose 2 : ℝ) := by
+    intro a ha
+    rw [stirlingWeight, ← Finset.mul_prod_erase Finset.univ _ (Finset.mem_univ a)]
+    have hrest : ∏ c ∈ Finset.univ.erase a,
+        (Nat.stirlingSecond (b c) (Function.update b a (b a - 1) c) : ℝ) = 1 := by
+      refine Finset.prod_eq_one fun c hc ↦ ?_
+      rw [Function.update_of_ne (Finset.ne_of_mem_erase hc), Nat.stirlingSecond_self,
+        Nat.cast_one]
+    rw [hrest, mul_one, Function.update_self]
+    obtain ⟨n, hn⟩ : ∃ n, b a = n + 1 := ⟨b a - 1, by omega⟩
+    rw [hn, Nat.add_sub_cancel, Nat.stirlingSecond_succ_self_left]
+  have hinj : ∀ a ∈ Finset.univ.filter (fun a ↦ 1 ≤ b a),
+      ∀ a' ∈ Finset.univ.filter (fun a ↦ 1 ≤ b a),
+        Function.update b a (b a - 1) = Function.update b a' (b a' - 1) → a = a' := by
+    intro a ha a' _ heq
+    by_contra hne
+    have hval := congrFun heq a
+    rw [Function.update_self, Function.update_of_ne hne] at hval
+    have hpos := (Finset.mem_filter.mp ha).2
+    omega
+  have himage : (Finset.univ.filter (fun a ↦ 1 ≤ b a)).image
+        (fun a ↦ Function.update b a (b a - 1))
+      = (subIndices b).filter (fun j ↦ ∑ a, j a + 1 = ∑ a, b a) := by
+    ext j
+    simp only [Finset.mem_image, Finset.mem_filter, Finset.mem_univ, true_and]
+    constructor
+    · rintro ⟨a, ha, rfl⟩
+      refine ⟨Fintype.mem_piFinset.mpr fun c ↦ Finset.mem_range.mpr ?_, ?_⟩
+      · by_cases hc : c = a
+        · subst hc
+          rw [Function.update_self]
+          omega
+        · rw [Function.update_of_ne hc]
+          omega
+      · rw [Finset.sum_update_of_mem (Finset.mem_univ a), Finset.sdiff_singleton_eq_erase,
+          ← Finset.add_sum_erase Finset.univ b (Finset.mem_univ a)]
+        omega
+    · rintro ⟨hjP, hjsum⟩
+      have hjle : ∀ c, j c ≤ b c := subIndices_le hjP
+      obtain ⟨a, ha⟩ : ∃ a, j a < b a := by
+        by_contra hnone
+        push_neg at hnone
+        have heq : ∑ c, j c = ∑ c, b c :=
+          Finset.sum_congr rfl fun c _ ↦ le_antisymm (hjle c) (hnone c)
+        omega
+      have hj := Finset.add_sum_erase Finset.univ j (Finset.mem_univ a)
+      have hb := Finset.add_sum_erase Finset.univ b (Finset.mem_univ a)
+      have hle' : ∑ c ∈ Finset.univ.erase a, j c ≤ ∑ c ∈ Finset.univ.erase a, b c :=
+        Finset.sum_le_sum fun c _ ↦ hjle c
+      have hrest : ∑ c ∈ Finset.univ.erase a, j c = ∑ c ∈ Finset.univ.erase a, b c := by
+        omega
+      have hja : j a = b a - 1 := by omega
+      have heqc : ∀ c ∈ Finset.univ.erase a, j c = b c :=
+        (Finset.sum_eq_sum_iff_of_le fun c _ ↦ hjle c).mp hrest
+      refine ⟨a, by omega, ?_⟩
+      funext c
+      by_cases hc : c = a
+      · subst hc
+        rw [Function.update_self, hja]
+      · rw [Function.update_of_ne hc, heqc c (Finset.mem_erase.mpr ⟨hc, Finset.mem_univ c⟩)]
+  calc firstOrderStirlingSum x b
+      = ∑ j ∈ (Finset.univ.filter (fun a ↦ 1 ≤ b a)).image
+            (fun a ↦ Function.update b a (b a - 1)),
+          stirlingWeight b j * ∏ c, x c ^ j c := by
+        rw [firstOrderStirlingSum, himage]
+    _ = ∑ a ∈ Finset.univ.filter (fun a ↦ 1 ≤ b a),
+          stirlingWeight b (Function.update b a (b a - 1))
+            * ∏ c, x c ^ Function.update b a (b a - 1) c :=
+        Finset.sum_image hinj
+    _ = ∑ a ∈ Finset.univ.filter (fun a ↦ 1 ≤ b a),
+          ((b a).choose 2 : ℝ) * ∏ c, x c ^ Function.update b a (b a - 1) c :=
+        Finset.sum_congr rfl fun a ha ↦ by rw [hweight a (Finset.mem_filter.mp ha).2]
+    _ = ∑ a, ((b a).choose 2 : ℝ) * ∏ c, x c ^ Function.update b a (b a - 1) c :=
+        Finset.sum_filter_of_ne hzero
+
+/-- **The closed form of the first-order coefficient.** The first-order coefficient of the
+multinomial expansion of `x ^ b` is `Σ_a C(b_a, 2) x ^ (b - e_a) - C(|b|, 2) x ^ b`. -/
+theorem monomialFirstOrder_eq_sum_choose {H : Type*} [Fintype H] [DecidableEq H]
+    (x : H → ℝ) (b : H → ℕ) :
+    monomialFirstOrder x b
+      = ∑ a, ((b a).choose 2 : ℝ) * ∏ c, x c ^ Function.update b a (b a - 1) c
+        - ((∑ a, b a).choose 2 : ℝ) * ∏ a, x a ^ b a := by
+  rw [monomialFirstOrder, firstOrderStirlingSum_eq_sum_choose]
 
 end
 

@@ -33,3 +33,5 @@ open Descent.Portability.LinearFundamentalMatrix
 #print axioms norm_fundamentalMatrix_sub_le
 #print axioms sampleTime
 #print axioms eventually_integral_norm_sample_sub_le
+#print axioms picardIterate_const
+#print axioms fundamentalMatrix_const

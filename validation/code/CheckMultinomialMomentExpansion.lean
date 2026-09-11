@@ -39,5 +39,7 @@ namespace Descent.Portability.MultinomialMomentExpansion
 #print axioms expectation_monomial_eq
 #print axioms sum_subIndices_split
 #print axioms abs_expectation_monomial_sub_le
+#print axioms firstOrderStirlingSum_eq_sum_choose
+#print axioms monomialFirstOrder_eq_sum_choose
 
 end Descent.Portability.MultinomialMomentExpansion

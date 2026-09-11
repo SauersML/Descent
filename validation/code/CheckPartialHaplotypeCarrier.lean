@@ -16,6 +16,17 @@ open Descent.Portability.PartialHaplotypeCarrier
 #print axioms card_le_sum_load
 #print axioms card_le_capacity_total
 #print axioms withinBudget_finite
+#print axioms partialTypeEquiv
+#print axioms retains_iff_ne_empty
+#print axioms card_retainingAssignment
+#print axioms card_partialType
+#print axioms padConfiguration
+#print axioms card_padConfiguration
+#print axioms count_some_padConfiguration
+#print axioms padWithinBudget
+#print axioms padWithinBudget_injective
+#print axioms card_withinBudget_le_choose_card
+#print axioms card_withinBudget_le_choose
 #print axioms load_migrate
 #print axioms withinBudget_migrate
 #print axioms load_mutate

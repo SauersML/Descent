@@ -211,12 +211,12 @@ namespace ParametricTree
 /-- The complete traces of the topology, which do not depend on the parameters. -/
 def Trace : ParametricTree σ Guard Report → Type
   | .leaf _ => Unit
-  | .node Branch _ child => Σ branch : Branch, Trace (child branch)
+  | @ParametricTree.node _ _ _ Branch _ _ child => Σ branch : Branch, Trace (child branch)
 
 /-- A topology has finitely many complete traces. -/
 instance traceFintype : (tree : ParametricTree σ Guard Report) → Fintype (Trace tree)
   | .leaf _ => inferInstanceAs (Fintype Unit)
-  | .node Branch _ child => by
+  | @ParametricTree.node _ _ _ Branch _ _ child => by
       letI : ∀ branch, Fintype (Trace (child branch)) :=
         fun branch ↦ traceFintype (child branch)
       exact inferInstanceAs (Fintype (Σ branch : Branch, Trace (child branch)))
@@ -224,14 +224,14 @@ instance traceFintype : (tree : ParametricTree σ Guard Report) → Fintype (Tra
 /-- The report at the end of a complete trace. -/
 def traceReport : (tree : ParametricTree σ Guard Report) → Trace tree → Report
   | .leaf report, _ => report
-  | .node _ _ child, trace => traceReport (child trace.1) trace.2
+  | @ParametricTree.node _ _ _ _ _ _ child, trace => traceReport (child trace.1) trace.2
 
 /-- The chain-rule weight of a trace at a parameter point: the product of the branch
 probabilities selected by the sign pattern at that point. -/
 def traceWeight (guard : Guard → MvPolynomial σ ℝ) (θ : σ → ℝ) :
     (tree : ParametricTree σ Guard Report) → Trace tree → ℝ
   | .leaf _, _ => 1
-  | .node _ probability child, trace =>
+  | @ParametricTree.node _ _ _ _ _ probability child, trace =>
       (probability (signPattern guard θ) trace.1).eval θ *
         traceWeight guard θ (child trace.1) trace.2
 
@@ -239,14 +239,14 @@ def traceWeight (guard : Guard → MvPolynomial σ ℝ) (θ : σ → ℝ) :
 def weightQuotient (pattern : Guard → SignType) :
     (tree : ParametricTree σ Guard Report) → Trace tree → PolynomialQuotient σ
   | .leaf _, _ => PolynomialQuotient.ofPolynomial 1
-  | .node _ probability child, trace =>
+  | @ParametricTree.node _ _ _ _ _ probability child, trace =>
       (probability pattern trace.1).mul (weightQuotient pattern (child trace.1) trace.2)
 
 /-- Every branch probability presented for the pattern has a denominator that does not vanish at
 θ. -/
 def RegularAt (pattern : Guard → SignType) (θ : σ → ℝ) : ParametricTree σ Guard Report → Prop
   | .leaf _ => True
-  | .node _ probability child =>
+  | @ParametricTree.node _ _ _ _ _ probability child =>
       (∀ branch, MvPolynomial.eval θ (probability pattern branch).denominator ≠ 0) ∧
         ∀ branch, RegularAt pattern θ (child branch)
 
@@ -356,7 +356,7 @@ theorem conditionalMean_eq_eval_div (guard : Guard → MvPolynomial σ ℝ)
 def ValidAt (guard : Guard → MvPolynomial σ ℝ) (θ : σ → ℝ) :
     ParametricTree σ Guard Report → Prop
   | .leaf _ => True
-  | .node _ probability child =>
+  | @ParametricTree.node _ _ _ _ _ probability child =>
       (∀ branch, 0 ≤ (probability (signPattern guard θ) branch).eval θ) ∧
         (∑ branch, (probability (signPattern guard θ) branch).eval θ) = 1 ∧
           ∀ branch, ValidAt guard θ (child branch)
@@ -365,7 +365,7 @@ def ValidAt (guard : Guard → MvPolynomial σ ℝ) (θ : σ → ℝ) :
 def experimentAt (guard : Guard → MvPolynomial σ ℝ) (θ : σ → ℝ) :
     (tree : ParametricTree σ Guard Report) → ValidAt guard θ tree → TraceTree Report
   | .leaf report, _ => .leaf report
-  | .node Branch probability child, hvalid =>
+  | @ParametricTree.node _ _ _ Branch _ probability child, hvalid =>
       .node Branch
         { mass := fun branch ↦ (probability (signPattern guard θ) branch).eval θ
           mass_nonneg := hvalid.1
@@ -551,8 +551,9 @@ theorem attainableRegion_eq_iUnion_image_cells {J : Type} (guard : Guard → MvP
       (∀ j, 0 < ParametricTree.accumulation guard tree (definedness j) θ) →
         (fun j ↦ ParametricTree.accumulation guard tree (numerator j) θ /
           ParametricTree.accumulation guard tree (definedness j) θ) =
-        fun j ↦ ((ParametricTree.accumulationQuotient tree (numerator j) (signPattern guard θ)).div
-          (ParametricTree.accumulationQuotient tree (definedness j) (signPattern guard θ))).eval θ :=
+        fun j ↦ ((ParametricTree.accumulationQuotient tree (numerator j)
+            (signPattern guard θ)).div (ParametricTree.accumulationQuotient tree (definedness j)
+              (signPattern guard θ))).eval θ :=
     fun θ hθ hpositive ↦ funext fun j ↦
       (ParametricTree.conditionalMean_eq_eval_div guard _ (mem_signCell_signPattern guard θ) tree
         _ _ (hregular θ hθ) (fun report ↦ (haccumulators θ hθ j report).1)

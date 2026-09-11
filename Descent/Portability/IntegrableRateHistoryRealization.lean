@@ -22,6 +22,7 @@ each time, with time clamped into the horizon, and `rateHistoryPropagator rates 
 fundamental matrix at `T` from `Descent.Portability.LinearFundamentalMatrix`.
 `hasDerivWithinAt_rateHistory` is NOTE1's `U' = A(t) U` on the horizon, with `A(t)` the corpus
 generator at time `t`, and `fundamentalMatrix_generatorPath_zero` is `U(0) = 1`.
+`rateHistoryPropagator_const` shows that a constant history recovers the corpus epoch.
 
 The realizability theorem.  `sampledRateEvents` lists the rate epochs of the left-endpoint
 sampling of the history at step `T / n`, and `propagate_sampledRateEvents` identifies their
@@ -130,6 +131,13 @@ theorem hasDerivWithinAt_rateHistory {D : ℕ} {rates : ℝ → ManyDemeLDRates 
   have hderiv := fundamentalMatrix_hasDerivWithinAt (continuous_generatorPath hT hcontinuous)
     hT hK hbound ht
   rwa [generatorPath_of_mem rates ht] at hderiv
+
+/-- **Constant rates recover the corpus epoch.**  The propagator of the constant rate history at
+a rate law over `[0, T]` is the propagator of the corpus epoch of that law, so the time-varying
+propagator extends the epoch theorem rather than competing with it. -/
+theorem rateHistoryPropagator_const {D : ℕ} (rates : ManyDemeLDRates D) {T : ℝ} (hT : 0 ≤ T) :
+    rateHistoryPropagator (fun _ ↦ rates) T = (rates.epoch T hT).propagator :=
+  fundamentalMatrix_const _ hT
 
 /-! ## Sampled rate epochs -/
 
