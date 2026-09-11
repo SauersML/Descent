@@ -1,7 +1,7 @@
 {
  "_NOT_AUTHORITATIVE": "The committed copy of this file is STALE BY CONSTRUCTION: the Lean corpus moves every few minutes and this is a cache of it. Do not consume a committed copy -- run validation/extract/emit.py in your own worktree immediately before use, and call api.require_fresh(), which raises if the table does not describe the Lean on disk.",
- "source_digest": "sha256:974c789b24652ddebc28c16ed0025a21",
- "source_files": 572,
+ "source_digest": "sha256:2637dd80515f70129c8ad94a3a9f6fe0",
+ "source_files": 575,
  "collisions": {},
  "theorems": [
   {
@@ -20401,6 +20401,7 @@
    "line": 957,
    "statement": "(law : TwoDemePresentDayLaw) (ns nt i j : ℕ) (h : ¬ (i ≤ ns ∧ j ≤ nt)) : twoDemeJointSampleCount law ns nt i j = 0",
    "mentions": [
+    "law",
     "twoDemeJointSampleCount"
    ]
   },
@@ -33837,7 +33838,8 @@
    "statement": "{Input Completion Coordinate Value : Type*} (law : CompletionLaw Input Completion Coordinate Value) (baseInput : Input) (baseCompletion : Completion) : HasExactReadout law ↔ IdentifiedBy (fun completed : Input × Completion ↦ completed.1) (fun completed ↦ law.value completed.1 completed.2)",
    "mentions": [
     "HasExactReadout",
-    "IdentifiedBy"
+    "IdentifiedBy",
+    "law"
    ]
   },
   {
@@ -33849,6 +33851,7 @@
    "mentions": [
     "coordinate",
     "halfWidth",
+    "law",
     "midpointLaw"
    ]
   },
@@ -33860,7 +33863,8 @@
    "statement": "{Input Completion Coordinate : Type*} {law : CompletionLaw Input Completion Coordinate ℝ} (envelope : SharpFiberEnvelope law) (candidate : Input → Coordinate → ℝ) (input : Input) (coordinate : Coordinate) : envelope.halfWidth input coordinate ≤ max |law.value input (envelope.lowerWitness input coordinate) coordinate - candidate input coordinate| |law.value input (envelope.upperWitness input coordinate) coordinate - candidate input coordinate|",
    "mentions": [
     "coordinate",
-    "halfWidth"
+    "halfWidth",
+    "law"
    ]
   },
   {
@@ -33871,7 +33875,8 @@
    "statement": "{Input Completion Coordinate : Type*} {law : CompletionLaw Input Completion Coordinate ℝ} (envelope : SharpFiberEnvelope law) (coordinate : Coordinate) : law.CoordinateIdentified coordinate ↔ ∀ input, envelope.lower input coordinate = envelope.upper input coordinate",
    "mentions": [
     "CoordinateIdentified",
-    "coordinate"
+    "coordinate",
+    "law"
    ]
   },
   {
@@ -33883,6 +33888,7 @@
    "mentions": [
     "CoordinateIdentified",
     "coordinate",
+    "law",
     "midpointLaw"
    ]
   },
@@ -33894,7 +33900,8 @@
    "statement": "{Input Completion Coordinate : Type*} {law : CompletionLaw Input Completion Coordinate ℝ} (envelope : SharpFiberEnvelope law) : HasExactReadout law ↔ ∀ input coordinate, envelope.lower input coordinate = envelope.upper input coordinate",
    "mentions": [
     "HasExactReadout",
-    "coordinate"
+    "coordinate",
+    "law"
    ]
   },
   {
@@ -33905,7 +33912,8 @@
    "statement": "{Input Completion Coordinate : Type*} {law : CompletionLaw Input Completion Coordinate ℝ} (envelope : SharpFiberEnvelope law) (input : Input) (coordinate : Coordinate) (hwidth : envelope.lower input coordinate < envelope.upper input coordinate) : ¬ HasExactReadout law",
    "mentions": [
     "HasExactReadout",
-    "coordinate"
+    "coordinate",
+    "law"
    ]
   },
   {
@@ -37355,6 +37363,7 @@
    "mentions": [
     "FinitePrior",
     "constantObservationExperiment",
+    "law",
     "mixture",
     "moment"
    ]
@@ -37368,6 +37377,7 @@
    "mentions": [
     "FinitePrior",
     "constantObservationExperiment",
+    "law",
     "moment",
     "totalVariation"
    ]
@@ -37382,6 +37392,7 @@
     "FinitePrior",
     "SeparatedBy",
     "constantObservationExperiment",
+    "law",
     "moment"
    ]
   },
@@ -37396,6 +37407,7 @@
     "FinitePrior",
     "MomentMatched",
     "constantObservationExperiment",
+    "law",
     "moment"
    ]
   },
@@ -37408,6 +37420,7 @@
    "mentions": [
     "FinitePrior",
     "constantObservationExperiment",
+    "law",
     "modulus",
     "moment"
    ]
@@ -57995,7 +58008,8 @@
    "line": 106,
    "statement": "(law : FiniteReportLaw (WholeGenome L n)) (genome : WholeGenome L n) : 0 ≤ law.mass genome ∧ law.mass genome ≤ 1",
    "mentions": [
-    "WholeGenome"
+    "WholeGenome",
+    "law"
    ]
   },
   {
@@ -58146,6 +58160,7 @@
    "line": 30,
    "statement": "{A B : Type*} [Fintype A] [Fintype B] (law : FiniteReportLaw A) (map : A → B) (property : B → Prop) (hmap : ∀ source, property (map source)) (target : B) (htarget : ¬ property target) : (law.pushforward map).mass target = 0",
    "mentions": [
+    "law",
     "pushforward"
    ]
   },
@@ -58157,7 +58172,8 @@
    "statement": "{A B : Type*} [Fintype A] [Fintype B] (law : FiniteReportLaw A) (kernel : A → FiniteReportLaw B) (sourceProperty : A → Prop) (targetProperty : B → Prop) (hlaw : ∀ source, ¬ sourceProperty source → law.mass source = 0) (hkernel : ∀ source, sourceProperty source → ∀ target, ¬ targetProperty target → (kernel source).mass target = 0) (target : B) (htarget : ¬ targetProperty target) : (law.bind kernel).mass target = 0",
    "mentions": [
     "bind",
-    "kernel"
+    "kernel",
+    "law"
    ]
   },
   {
@@ -59338,6 +59354,7 @@
     "SupportedAt",
     "count",
     "iterateLaw",
+    "law",
     "limitLaw",
     "mutationRate",
     "rowDistance"
@@ -59830,6 +59847,7 @@
     "Genome",
     "Mark",
     "State",
+    "law",
     "postcomposeArray",
     "postcomposeMark"
    ]
@@ -60073,6 +60091,7 @@
    "line": 306,
    "statement": "(law : FiniteReportLaw A) : rowDistance law law = 0",
    "mentions": [
+    "law",
     "rowDistance"
    ]
   },
@@ -64741,7 +64760,8 @@
    "mentions": [
     "dependentJoint",
     "expectation",
-    "kernel"
+    "kernel",
+    "law"
    ]
   },
   {
@@ -69370,6 +69390,7 @@
    "statement": "(law : DemeScoreLaw) (domain : LiabilityDiscriminationDomain law) : crossDemeCaseControlAUCOn law law domain domain = law.withinAUC domain",
    "mentions": [
     "crossDemeCaseControlAUCOn",
+    "law",
     "withinAUC"
    ]
   },
@@ -69982,6 +70003,7 @@
     "caseWeight",
     "controlWeight",
     "crossDemeCaseControlAUCOn",
+    "law",
     "pooledAUC"
    ]
   },
@@ -70022,7 +70044,9 @@
    "file": "Descent/Portability/DiscriminationLaw.lean",
    "line": 1600,
    "statement": "(g : AdministrativePHGenerator) (law : SurvivalScoreLaw) (h : g.horizon = 0) : ¬ AdministrativeHarrellDomain g law",
-   "mentions": []
+   "mentions": [
+    "law"
+   ]
   },
   {
    "name": "Descent.Portability.firstObserved_ext",
@@ -71569,6 +71593,7 @@
    "line": 3773,
    "statement": "(law : DemeScoreLaw) (tail : GaussianTopDecile) : law.topDecileRMSE tail = Real.sqrt law.linearErrorVariance",
    "mentions": [
+    "law",
     "linearErrorVariance",
     "topDecileRMSE"
    ]
@@ -71637,6 +71662,7 @@
    "statement": "(law : DemeScoreLaw) (input : PhenotypeLadderInput) (rung : PhenotypeRung) : law.linearCalibrationSlope = law.moments.calibrationSlope",
    "mentions": [
     "calibrationSlope",
+    "law",
     "linearCalibrationSlope"
    ]
   },
@@ -72251,6 +72277,7 @@
     "S",
     "bound",
     "expectation",
+    "law",
     "metric"
    ]
   },
@@ -73297,6 +73324,7 @@
    "mentions": [
     "S",
     "kernel",
+    "law",
     "report",
     "risk"
    ]
@@ -73310,6 +73338,7 @@
    "mentions": [
     "S",
     "energy",
+    "law",
     "report"
    ]
   },
@@ -73325,6 +73354,7 @@
     "energy",
     "inner",
     "kernel",
+    "law",
     "predict",
     "report",
     "risk"
@@ -73342,6 +73372,7 @@
     "energy",
     "inner",
     "kernel",
+    "law",
     "predict",
     "report",
     "risk"
@@ -73356,7 +73387,8 @@
    "mentions": [
     "S",
     "energy",
-    "inner"
+    "inner",
+    "law"
    ]
   },
   {
@@ -73370,6 +73402,7 @@
     "Stationary",
     "energy",
     "kernel",
+    "law",
     "predict",
     "report",
     "risk"
@@ -73386,6 +73419,7 @@
     "Stationary",
     "energy",
     "kernel",
+    "law",
     "predict",
     "report",
     "risk"
@@ -73401,6 +73435,7 @@
     "S",
     "Stationary",
     "kernel",
+    "law",
     "predict",
     "report",
     "risk"
@@ -73417,6 +73452,7 @@
     "Stationary",
     "inner",
     "kernel",
+    "law",
     "predict",
     "reverseKernel"
    ]
@@ -73432,6 +73468,7 @@
     "Stationary",
     "inner",
     "kernel",
+    "law",
     "lossMatrix",
     "report",
     "risk"
@@ -73448,6 +73485,7 @@
     "Stationary",
     "inner",
     "kernel",
+    "law",
     "lossMatrix",
     "report"
    ]
@@ -73703,7 +73741,8 @@
    "statement": "(law : FiniteReportLaw S) (f g : S → ℝ) : law.expectation (fun state ↦ f state - g state) = law.expectation f - law.expectation g",
    "mentions": [
     "S",
-    "expectation"
+    "expectation",
+    "law"
    ]
   },
   {
@@ -73715,7 +73754,8 @@
    "mentions": [
     "S",
     "bound",
-    "expectation"
+    "expectation",
+    "law"
    ]
   },
   {
@@ -73728,6 +73768,7 @@
     "BoundedMetric",
     "S",
     "expectation",
+    "law",
     "metric"
    ]
   },
@@ -76860,7 +76901,7 @@
    "name": "Descent.Portability.HWELogCoordinates.coordinate_slope",
    "kind": "theorem",
    "file": "Descent/Portability/HWELogCoordinates.lean",
-   "line": 44,
+   "line": 45,
    "statement": "(δ : ℝ) : δ * dslope coordinate 0 δ = coordinate δ",
    "mentions": [
     "coordinate"
@@ -76870,7 +76911,7 @@
    "name": "Descent.Portability.HWELogCoordinates.coordinate_square",
    "kind": "theorem",
    "file": "Descent/Portability/HWELogCoordinates.lean",
-   "line": 47,
+   "line": 48,
    "statement": "(δ : ℝ) : coordinate δ ^ 2 = δ ^ 2 * dslope coordinate 0 δ ^ 2",
    "mentions": [
     "coordinate"
@@ -76880,7 +76921,7 @@
    "name": "Descent.Portability.HWELogCoordinates.squared_coordinate_limit",
    "kind": "theorem",
    "file": "Descent/Portability/HWELogCoordinates.lean",
-   "line": 52,
+   "line": 53,
    "statement": "(δ : (m : ℕ) → Fin m → ℝ) (ε : ℕ → ℝ) (hδ : ∀ m i, |δ m i| ≤ ε m) (hε : Tendsto ε atTop (𝓝 0)) (K : ℝ) (hK : Tendsto (fun m ↦ ∑ i, δ m i ^ 2) atTop (𝓝 K)) : Tendsto (fun m ↦ ∑ i, coordinate (δ m i) ^ 2) atTop (𝓝 (4 * K))",
    "mentions": [
     "coordinate"
@@ -76890,7 +76931,7 @@
    "name": "Descent.Portability.HWELogCoordinates.maximal_coordinate_limit",
    "kind": "theorem",
    "file": "Descent/Portability/HWELogCoordinates.lean",
-   "line": 64,
+   "line": 65,
    "statement": "(δ : (m : ℕ) → Fin m → ℝ) (ε : ℕ → ℝ) (hδ : ∀ m i, |δ m i| ≤ ε m) (hε : Tendsto ε atTop (𝓝 0)) : Tendsto (fun m ↦ ‖fun i : Fin m ↦ coordinate (δ m i)‖) atTop (𝓝 0)",
    "mentions": [
     "coordinate"
@@ -76900,7 +76941,7 @@
    "name": "Descent.Portability.HWELogCoordinates.fair_log_profile_limit",
    "kind": "theorem",
    "file": "Descent/Portability/HWELogCoordinates.lean",
-   "line": 81,
+   "line": 83,
    "statement": "(δ : (m : ℕ) → Fin m → ℝ) (ε : ℕ → ℝ) (hδ : ∀ m i, |δ m i| ≤ ε m) (hε : Tendsto ε atTop (𝓝 0)) (K : ℝ≥0) (hK : Tendsto (fun m ↦ ∑ i, δ m i ^ 2) atTop (𝓝 (K : ℝ))) : Tendsto (fun m ↦ rowProbability (fun i ↦ coordinate (δ m i))) atTop (𝓝 (centeredGaussian (4 * K)))",
    "mentions": [
     "centeredGaussian",
@@ -78120,7 +78161,8 @@
    "mentions": [
     "SiteState",
     "expectation",
-    "factor"
+    "factor",
+    "law"
    ]
   },
   {
@@ -78324,7 +78366,8 @@
    "mentions": [
     "SiteState",
     "bound",
-    "expectation"
+    "expectation",
+    "law"
    ]
   },
   {
@@ -78352,7 +78395,8 @@
    "mentions": [
     "State",
     "bind",
-    "kernel"
+    "kernel",
+    "law"
    ]
   },
   {
@@ -88479,6 +88523,7 @@
    "mentions": [
     "binaryAUC",
     "labels",
+    "law",
     "scale",
     "score",
     "shift"
@@ -88633,6 +88678,7 @@
     "cleanedScore",
     "decoded",
     "labels",
+    "law",
     "squaredCorrelation"
    ]
   },
@@ -88775,6 +88821,7 @@
    "mentions": [
     "constant",
     "jointMeasure",
+    "law",
     "metric",
     "outcome",
     "pair"
@@ -95790,6 +95837,170 @@
    ]
   },
   {
+   "name": "Descent.Portability.RademacherParityConditioning.parity_factor_bounds",
+   "kind": "theorem",
+   "file": "Descent/Portability/RademacherParityConditioning.lean",
+   "line": 25,
+   "statement": "(b : Bool) (x : ι → Bool) : 0 ≤ 1 + signValue b * parity x ∧ 1 + signValue b * parity x ≤ 2",
+   "mentions": [
+    "parity",
+    "signValue"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RademacherParityConditioning.law_mass",
+   "kind": "theorem",
+   "file": "Descent/Portability/RademacherParityConditioning.lean",
+   "line": 46,
+   "statement": "(b : Bool) (x : ι → Bool) : (law b).mass x = if parity x = signValue b then 2 * (independentLaw (fun _ : ι ↦ signLaw)).mass x else 0",
+   "mentions": [
+    "independentLaw",
+    "law",
+    "parity",
+    "signLaw",
+    "signValue"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RademacherParityConditioning.expectation_law",
+   "kind": "theorem",
+   "file": "Descent/Portability/RademacherParityConditioning.lean",
+   "line": 54,
+   "statement": "(b : Bool) (f : (ι → Bool) → ℝ) : (law b).expectation f = (independentLaw (fun _ : ι ↦ signLaw)).expectation f + signValue b * (independentLaw (fun _ : ι ↦ signLaw)).expectation (fun x ↦ parity x * f x)",
+   "mentions": [
+    "expectation",
+    "independentLaw",
+    "law",
+    "parity",
+    "signLaw",
+    "signValue"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RademacherParityConditioning.complexExpectation_law",
+   "kind": "theorem",
+   "file": "Descent/Portability/RademacherParityConditioning.lean",
+   "line": 64,
+   "statement": "(b : Bool) (f : (ι → Bool) → ℂ) : complexExpectation (law b) f = complexExpectation (independentLaw (fun _ : ι ↦ signLaw)) f + (signValue b : ℂ) * complexExpectation (independentLaw (fun _ : ι ↦ signLaw)) (fun x ↦ (parity x : ℂ) * f x)",
+   "mentions": [
+    "complexExpectation",
+    "independentLaw",
+    "law",
+    "parity",
+    "signLaw",
+    "signValue"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RademacherParityConditioning.expectation_law_le_twice",
+   "kind": "theorem",
+   "file": "Descent/Portability/RademacherParityConditioning.lean",
+   "line": 76,
+   "statement": "(b : Bool) (f : (ι → Bool) → ℝ) (hf : ∀ x, 0 ≤ f x) : (law b).expectation f ≤ 2 * (independentLaw (fun _ : ι ↦ signLaw)).expectation f",
+   "mentions": [
+    "expectation",
+    "independentLaw",
+    "law",
+    "signLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RademacherParityConditioning.second_moment_bound",
+   "kind": "theorem",
+   "file": "Descent/Portability/RademacherParityConditioning.lean",
+   "line": 87,
+   "statement": "(b : Bool) (a : ι → ℝ) : (law b).expectation (fun x ↦ weightedSum a x ^ 2) ≤ 2 * ∑ i, a i ^ 2",
+   "mentions": [
+    "expectation",
+    "law",
+    "weightedSum"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RademacherParityLaw.parity_square",
+   "kind": "theorem",
+   "file": "Descent/Portability/RademacherParityLaw.lean",
+   "line": 26,
+   "statement": "{ι : Type*} [Fintype ι] (x : ι → Bool) : parity x ^ 2 = 1",
+   "mentions": [
+    "parity"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RademacherParityLaw.parity_mean",
+   "kind": "theorem",
+   "file": "Descent/Portability/RademacherParityLaw.lean",
+   "line": 33,
+   "statement": "{ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι] : (independentLaw (fun _ : ι ↦ signLaw)).expectation parity = 0",
+   "mentions": [
+    "expectation",
+    "independentLaw",
+    "parity",
+    "signLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RademacherParityLaw.mixed_sign_characteristic",
+   "kind": "theorem",
+   "file": "Descent/Portability/RademacherParityLaw.lean",
+   "line": 43,
+   "statement": "(a t : ℝ) : complexExpectation signLaw (fun b ↦ (signValue b : ℂ) * Complex.exp ((t * (a * signValue b) : ℝ) * Complex.I)) = Complex.I * (Real.sin (t * a) : ℂ)",
+   "mentions": [
+    "complexExpectation",
+    "signLaw",
+    "signValue"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RademacherParityLaw.mixed_characteristic",
+   "kind": "theorem",
+   "file": "Descent/Portability/RademacherParityLaw.lean",
+   "line": 55,
+   "statement": "{ι : Type*} [Fintype ι] [DecidableEq ι] (a : ι → ℝ) (t : ℝ) : complexExpectation (independentLaw (fun _ : ι ↦ signLaw)) (fun x ↦ (parity x : ℂ) * Complex.exp ((t * weightedSum a x : ℝ) * Complex.I)) = ∏ i, (Complex.I * (Real.sin (t * a i) : ℂ))",
+   "mentions": [
+    "complexExpectation",
+    "independentLaw",
+    "parity",
+    "signLaw",
+    "weightedSum"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RademacherParityLaw.mixed_characteristic_limit",
+   "kind": "theorem",
+   "file": "Descent/Portability/RademacherParityLaw.lean",
+   "line": 66,
+   "statement": "(a : (m : ℕ) → Fin m → ℝ) (ε : ℕ → ℝ) (ha : ∀ m i, |a m i| ≤ ε m) (hε : Tendsto ε atTop (𝓝 0)) (t : ℝ) : Tendsto (fun m ↦ complexExpectation (independentLaw (fun _ : Fin m ↦ signLaw)) (fun x ↦ (parity x : ℂ) * Complex.exp ((t * weightedSum (a m) x : ℝ) * Complex.I))) atTop (𝓝 0)",
+   "mentions": [
+    "complexExpectation",
+    "independentLaw",
+    "parity",
+    "signLaw",
+    "weightedSum"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RademacherParityWeakLimit.conditional_rows_tight",
+   "kind": "theorem",
+   "file": "Descent/Portability/RademacherParityWeakLimit.lean",
+   "line": 30,
+   "statement": "(a : (m : ℕ) → Fin m → ℝ) (s : ℝ) (hs : Tendsto (fun m ↦ ∑ i, a m i ^ 2) atTop (𝓝 s)) (b : Bool) : IsTightMeasureSet (Set.range (fun m ↦ (conditionalProbability m (a (m + 1)) b : Measure ℝ)))",
+   "mentions": [
+    "conditionalProbability"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit",
+   "kind": "theorem",
+   "file": "Descent/Portability/RademacherParityWeakLimit.lean",
+   "line": 47,
+   "statement": "(a : (m : ℕ) → Fin m → ℝ) (ε : ℕ → ℝ) (ha : ∀ m i, |a m i| ≤ ε m) (hε : Tendsto ε atTop (𝓝 0)) (s : ℝ≥0) (hs : Tendsto (fun m ↦ ∑ i, a m i ^ 2) atTop (𝓝 (s : ℝ))) (b : Bool) : Tendsto (fun m ↦ conditionalProbability m (a (m + 1)) b) atTop (𝓝 (centeredGaussian s))",
+   "mentions": [
+    "centeredGaussian",
+    "conditionalProbability"
+   ]
+  },
+  {
    "name": "Descent.Portability.RadialPotentialLaw.update_hasDerivAt",
    "kind": "theorem",
    "file": "Descent/Portability/RadialPotentialLaw.lean",
@@ -99706,6 +99917,7 @@
     "Stationary",
     "count",
     "kernel",
+    "law",
     "powerLaw"
    ]
   },
@@ -99719,6 +99931,7 @@
     "S",
     "Stationary",
     "kernel",
+    "law",
     "poissonLaw"
    ]
   },
@@ -99732,6 +99945,7 @@
     "S",
     "Stationary",
     "kernel",
+    "law",
     "rate",
     "stateLaw"
    ]
@@ -100534,7 +100748,8 @@
    "mentions": [
     "WholeGenome",
     "bound",
-    "expectation"
+    "expectation",
+    "law"
    ]
   },
   {
@@ -100559,6 +100774,7 @@
    "line": 32,
    "statement": "{A B : Type*} [Fintype A] [Fintype B] (law : FiniteReportLaw A) (map : A → B) (property : B → Prop) (hmap : ∀ source, property (map source)) (target : B) (htarget : ¬ property target) : (law.pushforward map).mass target = 0",
    "mentions": [
+    "law",
     "pushforward"
    ]
   },
@@ -100570,7 +100786,8 @@
    "statement": "{A B : Type*} [Fintype A] [Fintype B] (law : FiniteReportLaw A) (kernel : A → FiniteReportLaw B) (sourceProperty : A → Prop) (targetProperty : B → Prop) (hlaw : ∀ source, ¬ sourceProperty source → law.mass source = 0) (hkernel : ∀ source, sourceProperty source → ∀ target, ¬ targetProperty target → (kernel source).mass target = 0) (target : B) (htarget : ¬ targetProperty target) : (law.bind kernel).mass target = 0",
    "mentions": [
     "bind",
-    "kernel"
+    "kernel",
+    "law"
    ]
   },
   {
@@ -104401,6 +104618,7 @@
     "BoundedMetric",
     "IdentifiedBy",
     "expectation",
+    "law",
     "metric"
    ]
   },
@@ -160329,6 +160547,12 @@
      "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero": [],
      "Descent.Portability.RademacherArrayWeakLimit.rows_tight": [],
      "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit": [],
+     "Descent.Portability.RademacherParityConditioning.expectation_law": [],
+     "Descent.Portability.RademacherParityConditioning.complexExpectation_law": [],
+     "Descent.Portability.RademacherParityConditioning.expectation_law_le_twice": [],
+     "Descent.Portability.RademacherParityLaw.mixed_characteristic_limit": [],
+     "Descent.Portability.RademacherParityWeakLimit.conditional_rows_tight": [],
+     "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit": [],
      "Descent.Portability.RadialPotentialLaw.update_hasDerivAt": [],
      "Descent.Portability.RadialPotentialLaw.radialDensity_coordinate_hasDerivAt": [],
      "Descent.Portability.RadialPotentialLaw.radialDensity_joint_continuous": [],
@@ -161480,6 +161704,12 @@
     "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero",
     "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit",
     "Descent.Portability.RademacherArrayWeakLimit.rows_tight",
+    "Descent.Portability.RademacherParityConditioning.complexExpectation_law",
+    "Descent.Portability.RademacherParityConditioning.expectation_law",
+    "Descent.Portability.RademacherParityConditioning.expectation_law_le_twice",
+    "Descent.Portability.RademacherParityLaw.mixed_characteristic_limit",
+    "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit",
+    "Descent.Portability.RademacherParityWeakLimit.conditional_rows_tight",
     "Descent.Portability.RadialPotentialLaw.coordinateDerivative_closed",
     "Descent.Portability.RadialPotentialLaw.coordinateDerivative_joint_continuous",
     "Descent.Portability.RadialPotentialLaw.potential_coordinate_hasDerivAt",
@@ -169658,6 +169888,7 @@
      "Descent.Portability.HWELogCoordinates.coordinate_derivative": [],
      "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable": [],
      "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero": [],
+     "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit": [],
      "Descent.Portability.RadialPotentialLaw.radialDensity_joint_continuous": [],
      "Descent.Portability.RadialPotentialLaw.coordinateDerivative_joint_continuous": [],
      "Descent.Portability.RadialPotentialLaw.radial_endpoint_integral": [],
@@ -169722,6 +169953,7 @@
     "Descent.Portability.HWELogCoordinates.coordinate_derivative",
     "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable",
     "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero",
+    "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit",
     "Descent.Portability.RadialPotentialLaw.coordinateDerivative_joint_continuous",
     "Descent.Portability.RadialPotentialLaw.radialDensity_joint_continuous",
     "Descent.Portability.RadialPotentialLaw.radial_endpoint_integral",
@@ -174221,6 +174453,12 @@
      "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero": [],
      "Descent.Portability.RademacherArrayWeakLimit.rows_tight": [],
      "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit": [],
+     "Descent.Portability.RademacherParityConditioning.expectation_law": [],
+     "Descent.Portability.RademacherParityConditioning.complexExpectation_law": [],
+     "Descent.Portability.RademacherParityConditioning.expectation_law_le_twice": [],
+     "Descent.Portability.RademacherParityLaw.mixed_characteristic_limit": [],
+     "Descent.Portability.RademacherParityWeakLimit.conditional_rows_tight": [],
+     "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit": [],
      "Descent.Portability.RadialPotentialLaw.update_hasDerivAt": [],
      "Descent.Portability.RadialPotentialLaw.radialDensity_coordinate_hasDerivAt": [],
      "Descent.Portability.RadialPotentialLaw.radialDensity_joint_continuous": [],
@@ -175368,6 +175606,12 @@
     "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero",
     "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit",
     "Descent.Portability.RademacherArrayWeakLimit.rows_tight",
+    "Descent.Portability.RademacherParityConditioning.complexExpectation_law",
+    "Descent.Portability.RademacherParityConditioning.expectation_law",
+    "Descent.Portability.RademacherParityConditioning.expectation_law_le_twice",
+    "Descent.Portability.RademacherParityLaw.mixed_characteristic_limit",
+    "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit",
+    "Descent.Portability.RademacherParityWeakLimit.conditional_rows_tight",
     "Descent.Portability.RadialPotentialLaw.coordinateDerivative_closed",
     "Descent.Portability.RadialPotentialLaw.coordinateDerivative_joint_continuous",
     "Descent.Portability.RadialPotentialLaw.potential_coordinate_hasDerivAt",
@@ -196673,6 +196917,12 @@
      ],
      "Descent.Portability.RademacherArrayWeakLimit.rows_tight": [],
      "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit": [],
+     "Descent.Portability.RademacherParityConditioning.expectation_law": [],
+     "Descent.Portability.RademacherParityConditioning.complexExpectation_law": [],
+     "Descent.Portability.RademacherParityConditioning.expectation_law_le_twice": [],
+     "Descent.Portability.RademacherParityLaw.mixed_characteristic_limit": [],
+     "Descent.Portability.RademacherParityWeakLimit.conditional_rows_tight": [],
+     "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit": [],
      "Descent.Portability.RadialPotentialLaw.update_hasDerivAt": [],
      "Descent.Portability.RadialPotentialLaw.radialDensity_coordinate_hasDerivAt": [],
      "Descent.Portability.RadialPotentialLaw.radialDensity_joint_continuous": [],
@@ -197811,6 +198061,12 @@
     "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero",
     "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit",
     "Descent.Portability.RademacherArrayWeakLimit.rows_tight",
+    "Descent.Portability.RademacherParityConditioning.complexExpectation_law",
+    "Descent.Portability.RademacherParityConditioning.expectation_law",
+    "Descent.Portability.RademacherParityConditioning.expectation_law_le_twice",
+    "Descent.Portability.RademacherParityLaw.mixed_characteristic_limit",
+    "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit",
+    "Descent.Portability.RademacherParityWeakLimit.conditional_rows_tight",
     "Descent.Portability.RadialPotentialLaw.coordinateDerivative_closed",
     "Descent.Portability.RadialPotentialLaw.coordinateDerivative_joint_continuous",
     "Descent.Portability.RadialPotentialLaw.potential_coordinate_hasDerivAt",
@@ -199657,6 +199913,8 @@
      "Descent.Portability.no_score_side_summary_determines_r2": [],
      "Descent.Portability.PortabilityRatioGeometry.certified_innerValue_integrable": [],
      "Descent.Portability.RademacherArrayWeakLimit.rows_tight": [],
+     "Descent.Portability.RademacherParityLaw.mixed_characteristic_limit": [],
+     "Descent.Portability.RademacherParityWeakLimit.conditional_rows_tight": [],
      "Descent.Portability.RatioPoleLaw.ratio_lintegral_top_of_local_slab_mass": [],
      "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass": [],
      "Descent.Portability.ReportCalibrationTransport.weighted_conditional_mean": [],
@@ -199879,6 +200137,8 @@
     "Descent.Portability.PipelineDemographicHistory.manyDemeSampleCountProjection_eq_momentMass",
     "Descent.Portability.PortabilityRatioGeometry.certified_innerValue_integrable",
     "Descent.Portability.RademacherArrayWeakLimit.rows_tight",
+    "Descent.Portability.RademacherParityLaw.mixed_characteristic_limit",
+    "Descent.Portability.RademacherParityWeakLimit.conditional_rows_tight",
     "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass",
     "Descent.Portability.RatioPoleLaw.ratio_lintegral_top_of_local_slab_mass",
     "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan",
@@ -230849,6 +231109,7 @@
      "Descent.Portability.auc_invariant_and_citl_shifts_under_score_offset": [],
      "Descent.Portability.logistic_recalibration_preserves_auc": [],
      "Descent.Portability.recalibration_preserves_auc": [],
+     "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit": [],
      "Descent.Portability.RadialPotentialLaw.radialDensity_joint_continuous": [],
      "Descent.Portability.RadialPotentialLaw.coordinateDerivative_joint_continuous": [],
      "Descent.Portability.RadialPotentialLaw.radial_endpoint_integral": [],
@@ -230975,6 +231236,7 @@
     "Descent.Portability.MatrixOperatorBridge.operator_mul",
     "Descent.Portability.ObservableClosureLaw.autonomy_iff_linear_update",
     "Descent.Portability.ObservableClosureLaw.linear_factorization_iff",
+    "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit",
     "Descent.Portability.RadialPotentialLaw.coordinateDerivative_joint_continuous",
     "Descent.Portability.RadialPotentialLaw.radialDensity_joint_continuous",
     "Descent.Portability.RadialPotentialLaw.radial_endpoint_integral",
@@ -272138,7 +272400,9 @@
      "Descent.Portability.HWEHeterozygosityWeakLimit.count_absolute_moment": [],
      "Descent.Portability.HWEHeterozygosityWeakLimit.poisson_weak_limit": [],
      "Descent.Portability.RademacherArrayWeakLimit.rows_tight": [],
-     "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit": []
+     "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit": [],
+     "Descent.Portability.RademacherParityWeakLimit.conditional_rows_tight": [],
+     "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit": []
     }
    },
    "mentioned_by": [
@@ -272154,7 +272418,9 @@
     "Descent.Portability.HWEHeterozygosityWeakLimit.count_absolute_moment",
     "Descent.Portability.HWEHeterozygosityWeakLimit.poisson_weak_limit",
     "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit",
-    "Descent.Portability.RademacherArrayWeakLimit.rows_tight"
+    "Descent.Portability.RademacherArrayWeakLimit.rows_tight",
+    "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit",
+    "Descent.Portability.RademacherParityWeakLimit.conditional_rows_tight"
    ]
   },
   {
@@ -272184,7 +272450,16 @@
      "Descent.Portability.RademacherArrayWeakLimit.sign_characteristic": [],
      "Descent.Portability.RademacherArrayWeakLimit.row_second": [],
      "Descent.Portability.RademacherArrayWeakLimit.row_characteristic": [],
-     "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit": []
+     "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit": [],
+     "Descent.Portability.RademacherParityConditioning.law_mass": [],
+     "Descent.Portability.RademacherParityConditioning.expectation_law": [],
+     "Descent.Portability.RademacherParityConditioning.complexExpectation_law": [],
+     "Descent.Portability.RademacherParityConditioning.expectation_law_le_twice": [],
+     "Descent.Portability.RademacherParityLaw.parity_mean": [],
+     "Descent.Portability.RademacherParityLaw.mixed_sign_characteristic": [],
+     "Descent.Portability.RademacherParityLaw.mixed_characteristic": [],
+     "Descent.Portability.RademacherParityLaw.mixed_characteristic_limit": [],
+     "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit": []
     }
    },
    "mentioned_by": [
@@ -272195,7 +272470,16 @@
     "Descent.Portability.RademacherArrayWeakLimit.row_second",
     "Descent.Portability.RademacherArrayWeakLimit.sign_characteristic",
     "Descent.Portability.RademacherArrayWeakLimit.sign_mean",
-    "Descent.Portability.RademacherArrayWeakLimit.sign_second"
+    "Descent.Portability.RademacherArrayWeakLimit.sign_second",
+    "Descent.Portability.RademacherParityConditioning.complexExpectation_law",
+    "Descent.Portability.RademacherParityConditioning.expectation_law",
+    "Descent.Portability.RademacherParityConditioning.expectation_law_le_twice",
+    "Descent.Portability.RademacherParityConditioning.law_mass",
+    "Descent.Portability.RademacherParityLaw.mixed_characteristic",
+    "Descent.Portability.RademacherParityLaw.mixed_characteristic_limit",
+    "Descent.Portability.RademacherParityLaw.mixed_sign_characteristic",
+    "Descent.Portability.RademacherParityLaw.parity_mean",
+    "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit"
    ]
   },
   {
@@ -272233,7 +272517,16 @@
      "Descent.Portability.RademacherArrayWeakLimit.sign_second": [],
      "Descent.Portability.RademacherArrayWeakLimit.sign_characteristic": [],
      "Descent.Portability.RademacherArrayWeakLimit.row_second": [],
-     "Descent.Portability.RademacherArrayWeakLimit.row_characteristic": []
+     "Descent.Portability.RademacherArrayWeakLimit.row_characteristic": [],
+     "Descent.Portability.RademacherParityConditioning.parity_factor_bounds": [],
+     "Descent.Portability.RademacherParityConditioning.law_mass": [],
+     "Descent.Portability.RademacherParityConditioning.expectation_law": [],
+     "Descent.Portability.RademacherParityConditioning.complexExpectation_law": [],
+     "Descent.Portability.RademacherParityLaw.parity_square": [],
+     "Descent.Portability.RademacherParityLaw.parity_mean": [],
+     "Descent.Portability.RademacherParityLaw.mixed_sign_characteristic": [],
+     "Descent.Portability.RademacherParityLaw.mixed_characteristic": [],
+     "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit": []
     }
    },
    "mentioned_by": [
@@ -272243,7 +272536,16 @@
     "Descent.Portability.RademacherArrayWeakLimit.row_second",
     "Descent.Portability.RademacherArrayWeakLimit.sign_characteristic",
     "Descent.Portability.RademacherArrayWeakLimit.sign_mean",
-    "Descent.Portability.RademacherArrayWeakLimit.sign_second"
+    "Descent.Portability.RademacherArrayWeakLimit.sign_second",
+    "Descent.Portability.RademacherParityConditioning.complexExpectation_law",
+    "Descent.Portability.RademacherParityConditioning.expectation_law",
+    "Descent.Portability.RademacherParityConditioning.law_mass",
+    "Descent.Portability.RademacherParityConditioning.parity_factor_bounds",
+    "Descent.Portability.RademacherParityLaw.mixed_characteristic",
+    "Descent.Portability.RademacherParityLaw.mixed_sign_characteristic",
+    "Descent.Portability.RademacherParityLaw.parity_mean",
+    "Descent.Portability.RademacherParityLaw.parity_square",
+    "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit"
    ]
   },
   {
@@ -297876,6 +298178,10 @@
      "Descent.Portability.RademacherArrayWeakLimit.sign_mean": [],
      "Descent.Portability.RademacherArrayWeakLimit.sign_second": [],
      "Descent.Portability.RademacherArrayWeakLimit.row_second": [],
+     "Descent.Portability.RademacherParityConditioning.expectation_law": [],
+     "Descent.Portability.RademacherParityConditioning.expectation_law_le_twice": [],
+     "Descent.Portability.RademacherParityConditioning.second_moment_bound": [],
+     "Descent.Portability.RademacherParityLaw.parity_mean": [],
      "Descent.Portability.ReportFiniteCalibrationLaw.interaction_risk_decomposition": [],
      "Descent.Portability.ReportFiniteCalibrationLaw.interaction_projection_risk": [],
      "Descent.Portability.ReportFiniteCalibrationLaw.witness_matching_observations": [],
@@ -297927,10 +298233,10 @@
      "Descent.Portability.FiniteReportLaw.binary_pointMass_separation": []
     },
     "range_hi_thm": [
-     "Descent.Portability.FiniteNumericalCertificate.expectation_bounded",
+     "Descent.Portability.RademacherParityConditioning.expectation_law_le_twice",
      1
     ],
-    "range_hi": 1
+    "range_hi": 2
    },
    "mentioned_by": [
     "Descent.Coalescent.LocusExchangeableLowOrderLDHaplotypeRealization.pi2LeftMutationVelocity_expectation",
@@ -298191,6 +298497,10 @@
     "Descent.Portability.RademacherArrayWeakLimit.row_second",
     "Descent.Portability.RademacherArrayWeakLimit.sign_mean",
     "Descent.Portability.RademacherArrayWeakLimit.sign_second",
+    "Descent.Portability.RademacherParityConditioning.expectation_law",
+    "Descent.Portability.RademacherParityConditioning.expectation_law_le_twice",
+    "Descent.Portability.RademacherParityConditioning.second_moment_bound",
+    "Descent.Portability.RademacherParityLaw.parity_mean",
     "Descent.Portability.ReportFiniteCalibrationLaw.interaction_projection_minimizes",
     "Descent.Portability.ReportFiniteCalibrationLaw.interaction_projection_risk",
     "Descent.Portability.ReportFiniteCalibrationLaw.interaction_residual_mean_zero",
@@ -307079,6 +307389,14 @@
      "Descent.Portability.RademacherArrayWeakLimit.row_second": [],
      "Descent.Portability.RademacherArrayWeakLimit.row_characteristic": [],
      "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit": [],
+     "Descent.Portability.RademacherParityConditioning.law_mass": [],
+     "Descent.Portability.RademacherParityConditioning.expectation_law": [],
+     "Descent.Portability.RademacherParityConditioning.complexExpectation_law": [],
+     "Descent.Portability.RademacherParityConditioning.expectation_law_le_twice": [],
+     "Descent.Portability.RademacherParityLaw.parity_mean": [],
+     "Descent.Portability.RademacherParityLaw.mixed_characteristic": [],
+     "Descent.Portability.RademacherParityLaw.mixed_characteristic_limit": [],
+     "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit": [],
      "Descent.Portability.StoppedGenotypeRenewal.genomeCountMass_zero": [],
      "Descent.Portability.WholeGenomeMutationSemigroup.independent_bind": [],
      "Descent.Portability.WholeGenomeMutationSemigroup.independent_pointMass": [],
@@ -307122,6 +307440,14 @@
     "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit",
     "Descent.Portability.RademacherArrayWeakLimit.row_characteristic",
     "Descent.Portability.RademacherArrayWeakLimit.row_second",
+    "Descent.Portability.RademacherParityConditioning.complexExpectation_law",
+    "Descent.Portability.RademacherParityConditioning.expectation_law",
+    "Descent.Portability.RademacherParityConditioning.expectation_law_le_twice",
+    "Descent.Portability.RademacherParityConditioning.law_mass",
+    "Descent.Portability.RademacherParityLaw.mixed_characteristic",
+    "Descent.Portability.RademacherParityLaw.mixed_characteristic_limit",
+    "Descent.Portability.RademacherParityLaw.parity_mean",
+    "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit",
     "Descent.Portability.StoppedGenotypeRenewal.genomeCountMass_zero",
     "Descent.Portability.WholeGenomeMutationSemigroup.independent_bind",
     "Descent.Portability.WholeGenomeMutationSemigroup.independent_pointMass",
@@ -318128,6 +318454,14 @@
      "Descent.Portability.RademacherArrayWeakLimit.row_second": [],
      "Descent.Portability.RademacherArrayWeakLimit.row_characteristic": [],
      "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit": [],
+     "Descent.Portability.RademacherParityConditioning.law_mass": [],
+     "Descent.Portability.RademacherParityConditioning.expectation_law": [],
+     "Descent.Portability.RademacherParityConditioning.complexExpectation_law": [],
+     "Descent.Portability.RademacherParityConditioning.expectation_law_le_twice": [],
+     "Descent.Portability.RademacherParityLaw.parity_mean": [],
+     "Descent.Portability.RademacherParityLaw.mixed_characteristic": [],
+     "Descent.Portability.RademacherParityLaw.mixed_characteristic_limit": [],
+     "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit": [],
      "Descent.Portability.StoppedGenotypeRenewal.genomeCountMass_zero": [],
      "Descent.Portability.WholeGenomeMutationSemigroup.independent_bind": [],
      "Descent.Portability.WholeGenomeMutationSemigroup.independent_pointMass": [],
@@ -318171,6 +318505,14 @@
     "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit",
     "Descent.Portability.RademacherArrayWeakLimit.row_characteristic",
     "Descent.Portability.RademacherArrayWeakLimit.row_second",
+    "Descent.Portability.RademacherParityConditioning.complexExpectation_law",
+    "Descent.Portability.RademacherParityConditioning.expectation_law",
+    "Descent.Portability.RademacherParityConditioning.expectation_law_le_twice",
+    "Descent.Portability.RademacherParityConditioning.law_mass",
+    "Descent.Portability.RademacherParityLaw.mixed_characteristic",
+    "Descent.Portability.RademacherParityLaw.mixed_characteristic_limit",
+    "Descent.Portability.RademacherParityLaw.parity_mean",
+    "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit",
     "Descent.Portability.StoppedGenotypeRenewal.genomeCountMass_zero",
     "Descent.Portability.WholeGenomeMutationSemigroup.independent_bind",
     "Descent.Portability.WholeGenomeMutationSemigroup.independent_pointMass",
@@ -318245,7 +318587,12 @@
      "Descent.Portability.HWEInteractionLaw.characteristic_re": [],
      "Descent.Portability.HWEInteractionLaw.characteristic_im": [],
      "Descent.Portability.RademacherArrayWeakLimit.sign_characteristic": [],
-     "Descent.Portability.RademacherArrayWeakLimit.row_characteristic": []
+     "Descent.Portability.RademacherArrayWeakLimit.row_characteristic": [],
+     "Descent.Portability.RademacherParityConditioning.complexExpectation_law": [],
+     "Descent.Portability.RademacherParityLaw.mixed_sign_characteristic": [],
+     "Descent.Portability.RademacherParityLaw.mixed_characteristic": [],
+     "Descent.Portability.RademacherParityLaw.mixed_characteristic_limit": [],
+     "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit": []
     }
    },
    "mentioned_by": [
@@ -318261,7 +318608,12 @@
     "Descent.Portability.HWEInteractionLaw.characteristic_re",
     "Descent.Portability.HWEInteractionLaw.complexExpectation_independent_product",
     "Descent.Portability.RademacherArrayWeakLimit.row_characteristic",
-    "Descent.Portability.RademacherArrayWeakLimit.sign_characteristic"
+    "Descent.Portability.RademacherArrayWeakLimit.sign_characteristic",
+    "Descent.Portability.RademacherParityConditioning.complexExpectation_law",
+    "Descent.Portability.RademacherParityLaw.mixed_characteristic",
+    "Descent.Portability.RademacherParityLaw.mixed_characteristic_limit",
+    "Descent.Portability.RademacherParityLaw.mixed_sign_characteristic",
+    "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit"
    ]
   },
   {
@@ -363442,6 +363794,18 @@
      "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit": [
       "∀ m i, |a m i| ≤ ε m",
       "Tendsto (fun m ↦ ∑ i, a m i ^ 2"
+     ],
+     "Descent.Portability.RademacherParityConditioning.second_moment_bound": [],
+     "Descent.Portability.RademacherParityLaw.mixed_characteristic": [],
+     "Descent.Portability.RademacherParityLaw.mixed_characteristic_limit": [
+      "∀ m i, |a m i| ≤ ε m"
+     ],
+     "Descent.Portability.RademacherParityWeakLimit.conditional_rows_tight": [
+      "Tendsto (fun m ↦ ∑ i, a m i ^ 2"
+     ],
+     "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit": [
+      "∀ m i, |a m i| ≤ ε m",
+      "Tendsto (fun m ↦ ∑ i, a m i ^ 2"
      ]
     }
    },
@@ -363449,7 +363813,12 @@
     "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit",
     "Descent.Portability.RademacherArrayWeakLimit.row_characteristic",
     "Descent.Portability.RademacherArrayWeakLimit.row_second",
-    "Descent.Portability.RademacherArrayWeakLimit.rows_tight"
+    "Descent.Portability.RademacherArrayWeakLimit.rows_tight",
+    "Descent.Portability.RademacherParityConditioning.second_moment_bound",
+    "Descent.Portability.RademacherParityLaw.mixed_characteristic",
+    "Descent.Portability.RademacherParityLaw.mixed_characteristic_limit",
+    "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit",
+    "Descent.Portability.RademacherParityWeakLimit.conditional_rows_tight"
    ]
   },
   {
@@ -363569,12 +363938,314 @@
     "hypotheses": [],
     "hypotheses_by_theorem": {
      "Descent.Portability.HWELogCoordinates.fair_log_profile_limit": [],
-     "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit": []
+     "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit": [],
+     "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit": []
     }
    },
    "mentioned_by": [
     "Descent.Portability.HWELogCoordinates.fair_log_profile_limit",
-    "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit"
+    "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit",
+    "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RademacherParityConditioning.law",
+   "decl_name": "law",
+   "short": "law",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/RademacherParityConditioning.lean",
+   "line": 31,
+   "signature": "(b : Bool) : FiniteReportLaw (ι → Bool) where mass x",
+   "args": [
+    {
+     "names": [
+      "b"
+     ],
+     "type": "Bool",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "FiniteReportLaw (ι → Bool) where mass x",
+   "body": " (independentLaw (fun _ : ι ↦ signLaw)).mass x * (1 + signValue b * parity x)\n  mass_nonneg x := mul_nonneg (FiniteReportLaw.mass_nonneg _ _) (parity_factor_bounds b x).1\n  mass_sum := by\n    simp only [mul_add, mul_one, Finset.sum_add_distrib, FiniteReportLaw.mass_sum]\n    have he : (∑ x : ι → Bool, (independentLaw (fun _ : ι ↦ signLaw)).mass x *\n        (signValue b * parity x)) = signValue b *\n          (independentLaw (fun _ : ι ↦ signLaw)).expectation parity := by\n      simp only [FiniteReportLaw.expectation, Finset.mul_sum]\n      apply Finset.sum_congr rfl\n      intro x _\n      ring\n    rw [he, parity_mean, mul_zero, add_zero]",
+   "docstring": "The genuine conditional law, multiplying each accepted row's probability by two.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.RademacherParityConditioning",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "probability",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0,
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Coalescent.twoDemeJointSampleCount_outside": [],
+     "Descent.Core.hasExactReadout_iff_identifiedBy": [],
+     "Descent.Core.SharpFiberEnvelope.midpoint_error_le_halfWidth": [],
+     "Descent.Core.SharpFiberEnvelope.halfWidth_le_worstEndpointError": [],
+     "Descent.Core.SharpFiberEnvelope.coordinateIdentified_iff_endpoints_eq": [],
+     "Descent.Core.SharpFiberEnvelope.midpoint_exact_of_coordinateIdentified": [],
+     "Descent.Core.SharpFiberEnvelope.hasExactReadout_iff_all_endpoints_eq": [],
+     "Descent.Core.SharpFiberEnvelope.no_exactReadout_of_lt": [],
+     "Descent.Decision.CertificateGrading.FiniteMixtureExperiment.constantObservationExperiment_mixture": [],
+     "Descent.Decision.CertificateGrading.FiniteMixtureExperiment.constantObservationExperiment_totalVariation": [],
+     "Descent.Decision.CertificateGrading.FiniteMixtureExperiment.constantObservationExperiment_not_separatesAtRadius": [],
+     "Descent.Decision.CertificateGrading.FiniteMixtureExperiment.constantObservationExperiment_feasible_iff": [],
+     "Descent.Decision.CertificateGrading.FiniteMixtureExperiment.constantObservationExperiment_modulus_eq": [],
+     "Descent.Portability.AncestralEpochGenotypeLaw.genome_mass_bounds": [],
+     "Descent.Portability.AncestralEpochGenotypeSupport.pushforward_excludes": [],
+     "Descent.Portability.AncestralEpochGenotypeSupport.bind_excludes": [],
+     "Descent.Portability.AncestralMutationLimit.distance_tendsto": [],
+     "Descent.Portability.AncestralMutationResolvent.postcomposeArray_law": [],
+     "Descent.Portability.AncestralMutationTransfer.rowDistance_self": [],
+     "Descent.Portability.ChunkedGenotypeLaw.dependentJoint_expectation": [],
+     "Descent.Portability.crossDemeCaseControlAUC_diagonal": [],
+     "Descent.Portability.DemeMixture.pooledAUC_diagonal_offDiagonal": [],
+     "Descent.Portability.noAdministrativeHarrellDomain_at_zero_horizon": [],
+     "Descent.Portability.DemeScoreLaw.topDecileRMSE_eq_residualRMSE": [],
+     "Descent.Portability.phenotype_ladder_slope_is_score_slope": [],
+     "Descent.Portability.EvolutionaryObservability.expectation_abs_le": [],
+     "Descent.Portability.FiniteHorizonLoss.risk_nonneg": [],
+     "Descent.Portability.FiniteHorizonLoss.energy_nonneg": [],
+     "Descent.Portability.FiniteHorizonLoss.risk_expansion": [],
+     "Descent.Portability.FiniteHorizonLoss.stale_loss": [],
+     "Descent.Portability.FiniteHorizonLoss.energy_difference": [],
+     "Descent.Portability.FiniteHorizonLoss.optimal_prediction_decomposition": [],
+     "Descent.Portability.FiniteHorizonLoss.optimal_prediction_risk": [],
+     "Descent.Portability.FiniteHorizonLoss.optimal_prediction_minimizes": [],
+     "Descent.Portability.FiniteHorizonLoss.reverse_adjoint": [],
+     "Descent.Portability.FiniteHorizonLoss.stale_loss_operator": [],
+     "Descent.Portability.FiniteHorizonLoss.lossMatrix_positive": [],
+     "Descent.Portability.FiniteNumericalCertificate.expectation_difference": [],
+     "Descent.Portability.FiniteNumericalCertificate.abs_expectation_le": [],
+     "Descent.Portability.FiniteNumericalCertificate.expectation_bounded": [],
+     "Descent.Portability.FiniteProductExponential.productMatrix_one": [],
+     "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit": [],
+     "Descent.Portability.InterleavedMutationLaw.expectation_const_mul": [],
+     "Descent.Portability.InterleavedMutationMeasurability.abs_expectation_le": [],
+     "Descent.Portability.InterleavedMutationMeasurability.bind_mass_measurable": [],
+     "Descent.Portability.PThresholdTrainingLaw.binaryAUC_affine_positive": [],
+     "Descent.Portability.PThresholdTrainingLaw.cleanedScore_squaredCorrelation": [],
+     "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integral_constant_kernel": [],
+     "Descent.Portability.RademacherParityConditioning.law_mass": [],
+     "Descent.Portability.RademacherParityConditioning.expectation_law": [],
+     "Descent.Portability.RademacherParityConditioning.complexExpectation_law": [],
+     "Descent.Portability.RademacherParityConditioning.expectation_law_le_twice": [],
+     "Descent.Portability.RademacherParityConditioning.second_moment_bound": [],
+     "Descent.Portability.RademacherParityWeakLimit.conditional_rows_tight": [],
+     "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit": [],
+     "Descent.Portability.StationaryPoissonLaw.stationary_power": [],
+     "Descent.Portability.StationaryPoissonLaw.stationary_poisson": [],
+     "Descent.Portability.StationaryPoissonLaw.stationary_stateLaw": [],
+     "Descent.Portability.StoppedGenotypeLaw.finite_expectation_bounds": [],
+     "Descent.Portability.StoppedGenotypeReadiness.pushforward_excludes": [],
+     "Descent.Portability.StoppedGenotypeReadiness.bind_excludes": [],
+     "Descent.Portability.FiniteReportLaw.identified_iff_all_bounded_metrics_identified": []
+    },
+    "range_lo_thm": [
+     "Descent.Portability.AncestralEpochGenotypeLaw.genome_mass_bounds",
+     0
+    ],
+    "range_hi_thm": [
+     "Descent.Portability.AncestralEpochGenotypeLaw.genome_mass_bounds",
+     0
+    ],
+    "range_lo": 0,
+    "range_hi": 1
+   },
+   "mentioned_by": [
+    "Descent.Coalescent.twoDemeJointSampleCount_outside",
+    "Descent.Core.SharpFiberEnvelope.coordinateIdentified_iff_endpoints_eq",
+    "Descent.Core.SharpFiberEnvelope.halfWidth_le_worstEndpointError",
+    "Descent.Core.SharpFiberEnvelope.hasExactReadout_iff_all_endpoints_eq",
+    "Descent.Core.SharpFiberEnvelope.midpoint_error_le_halfWidth",
+    "Descent.Core.SharpFiberEnvelope.midpoint_exact_of_coordinateIdentified",
+    "Descent.Core.SharpFiberEnvelope.no_exactReadout_of_lt",
+    "Descent.Core.hasExactReadout_iff_identifiedBy",
+    "Descent.Decision.CertificateGrading.FiniteMixtureExperiment.constantObservationExperiment_feasible_iff",
+    "Descent.Decision.CertificateGrading.FiniteMixtureExperiment.constantObservationExperiment_mixture",
+    "Descent.Decision.CertificateGrading.FiniteMixtureExperiment.constantObservationExperiment_modulus_eq",
+    "Descent.Decision.CertificateGrading.FiniteMixtureExperiment.constantObservationExperiment_not_separatesAtRadius",
+    "Descent.Decision.CertificateGrading.FiniteMixtureExperiment.constantObservationExperiment_totalVariation",
+    "Descent.Portability.AncestralEpochGenotypeLaw.genome_mass_bounds",
+    "Descent.Portability.AncestralEpochGenotypeSupport.bind_excludes",
+    "Descent.Portability.AncestralEpochGenotypeSupport.pushforward_excludes",
+    "Descent.Portability.AncestralMutationLimit.distance_tendsto",
+    "Descent.Portability.AncestralMutationResolvent.postcomposeArray_law",
+    "Descent.Portability.AncestralMutationTransfer.rowDistance_self",
+    "Descent.Portability.ChunkedGenotypeLaw.dependentJoint_expectation",
+    "Descent.Portability.DemeMixture.pooledAUC_diagonal_offDiagonal",
+    "Descent.Portability.DemeScoreLaw.topDecileRMSE_eq_residualRMSE",
+    "Descent.Portability.EvolutionaryObservability.expectation_abs_le",
+    "Descent.Portability.FiniteHorizonLoss.energy_difference",
+    "Descent.Portability.FiniteHorizonLoss.energy_nonneg",
+    "Descent.Portability.FiniteHorizonLoss.lossMatrix_positive",
+    "Descent.Portability.FiniteHorizonLoss.optimal_prediction_decomposition",
+    "Descent.Portability.FiniteHorizonLoss.optimal_prediction_minimizes",
+    "Descent.Portability.FiniteHorizonLoss.optimal_prediction_risk",
+    "Descent.Portability.FiniteHorizonLoss.reverse_adjoint",
+    "Descent.Portability.FiniteHorizonLoss.risk_expansion",
+    "Descent.Portability.FiniteHorizonLoss.risk_nonneg",
+    "Descent.Portability.FiniteHorizonLoss.stale_loss",
+    "Descent.Portability.FiniteHorizonLoss.stale_loss_operator",
+    "Descent.Portability.FiniteNumericalCertificate.abs_expectation_le",
+    "Descent.Portability.FiniteNumericalCertificate.expectation_bounded",
+    "Descent.Portability.FiniteNumericalCertificate.expectation_difference",
+    "Descent.Portability.FiniteProductExponential.productMatrix_one",
+    "Descent.Portability.FiniteReportLaw.identified_iff_all_bounded_metrics_identified",
+    "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit",
+    "Descent.Portability.InterleavedMutationLaw.expectation_const_mul",
+    "Descent.Portability.InterleavedMutationMeasurability.abs_expectation_le",
+    "Descent.Portability.InterleavedMutationMeasurability.bind_mass_measurable",
+    "Descent.Portability.PThresholdTrainingLaw.binaryAUC_affine_positive",
+    "Descent.Portability.PThresholdTrainingLaw.cleanedScore_squaredCorrelation",
+    "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integral_constant_kernel",
+    "Descent.Portability.RademacherParityConditioning.complexExpectation_law",
+    "Descent.Portability.RademacherParityConditioning.expectation_law",
+    "Descent.Portability.RademacherParityConditioning.expectation_law_le_twice",
+    "Descent.Portability.RademacherParityConditioning.law_mass",
+    "Descent.Portability.RademacherParityConditioning.second_moment_bound",
+    "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit",
+    "Descent.Portability.RademacherParityWeakLimit.conditional_rows_tight",
+    "Descent.Portability.StationaryPoissonLaw.stationary_poisson",
+    "Descent.Portability.StationaryPoissonLaw.stationary_power",
+    "Descent.Portability.StationaryPoissonLaw.stationary_stateLaw",
+    "Descent.Portability.StoppedGenotypeLaw.finite_expectation_bounds",
+    "Descent.Portability.StoppedGenotypeReadiness.bind_excludes",
+    "Descent.Portability.StoppedGenotypeReadiness.pushforward_excludes",
+    "Descent.Portability.crossDemeCaseControlAUC_diagonal",
+    "Descent.Portability.noAdministrativeHarrellDomain_at_zero_horizon",
+    "Descent.Portability.phenotype_ladder_slope_is_score_slope"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RademacherParityLaw.parity",
+   "decl_name": "parity",
+   "short": "parity",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/RademacherParityLaw.lean",
+   "line": 23,
+   "signature": "{ι : Type*} [Fintype ι] (x : ι → Bool) : ℝ",
+   "args": [
+    {
+     "names": [
+      "ι"
+     ],
+     "type": "Type*",
+     "binder": "{}",
+     "implicit": true
+    },
+    {
+     "names": [
+      "Fintype",
+      "ι"
+     ],
+     "type": "",
+     "binder": "[]",
+     "implicit": true
+    },
+    {
+     "names": [
+      "x"
+     ],
+     "type": "ι → Bool",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  ∏ i, signValue (x i)",
+   "docstring": "",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.RademacherParityLaw",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.RademacherParityConditioning.parity_factor_bounds": [],
+     "Descent.Portability.RademacherParityConditioning.law_mass": [],
+     "Descent.Portability.RademacherParityConditioning.expectation_law": [],
+     "Descent.Portability.RademacherParityConditioning.complexExpectation_law": [],
+     "Descent.Portability.RademacherParityLaw.parity_square": [],
+     "Descent.Portability.RademacherParityLaw.parity_mean": [],
+     "Descent.Portability.RademacherParityLaw.mixed_characteristic": [],
+     "Descent.Portability.RademacherParityLaw.mixed_characteristic_limit": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.RademacherParityConditioning.complexExpectation_law",
+    "Descent.Portability.RademacherParityConditioning.expectation_law",
+    "Descent.Portability.RademacherParityConditioning.law_mass",
+    "Descent.Portability.RademacherParityConditioning.parity_factor_bounds",
+    "Descent.Portability.RademacherParityLaw.mixed_characteristic",
+    "Descent.Portability.RademacherParityLaw.mixed_characteristic_limit",
+    "Descent.Portability.RademacherParityLaw.parity_mean",
+    "Descent.Portability.RademacherParityLaw.parity_square"
+   ]
+  },
+  {
+   "name": "Descent.Portability.RademacherParityWeakLimit.conditionalProbability",
+   "decl_name": "conditionalProbability",
+   "short": "conditionalProbability",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/RademacherParityWeakLimit.lean",
+   "line": 25,
+   "signature": "(m : ℕ) (a : Fin (m + 1) → ℝ) (b : Bool) : ProbabilityMeasure ℝ",
+   "args": [
+    {
+     "names": [
+      "m"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "a"
+     ],
+     "type": "Fin (m + 1) → ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "b"
+     ],
+     "type": "Bool",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ProbabilityMeasure ℝ",
+   "body": "  ⟨finiteMeasure (law b) (weightedSum a), inferInstance⟩",
+   "docstring": "A nonempty row conditioned on its realized product sign.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.RademacherParityWeakLimit",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "Tendsto (fun m ↦ ∑ i, a m i ^ 2",
+     "∀ m i, |a m i| ≤ ε m"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.RademacherParityWeakLimit.conditional_rows_tight": [
+      "Tendsto (fun m ↦ ∑ i, a m i ^ 2"
+     ],
+     "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit": [
+      "∀ m i, |a m i| ≤ ε m",
+      "Tendsto (fun m ↦ ∑ i, a m i ^ 2"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit",
+    "Descent.Portability.RademacherParityWeakLimit.conditional_rows_tight"
    ]
   },
   {
@@ -386825,6 +387496,10 @@
      "Descent.Portability.RademacherArrayWeakLimit.sign_mean": [],
      "Descent.Portability.RademacherArrayWeakLimit.sign_second": [],
      "Descent.Portability.RademacherArrayWeakLimit.row_second": [],
+     "Descent.Portability.RademacherParityConditioning.expectation_law": [],
+     "Descent.Portability.RademacherParityConditioning.expectation_law_le_twice": [],
+     "Descent.Portability.RademacherParityConditioning.second_moment_bound": [],
+     "Descent.Portability.RademacherParityLaw.parity_mean": [],
      "Descent.Portability.ReportFiniteCalibrationLaw.interaction_risk_decomposition": [],
      "Descent.Portability.ReportFiniteCalibrationLaw.interaction_projection_risk": [],
      "Descent.Portability.ReportFiniteCalibrationLaw.witness_matching_observations": [],
@@ -386880,10 +387555,10 @@
      "Descent.Portability.FiniteReportLaw.binary_pointMass_separation": []
     },
     "range_hi_thm": [
-     "Descent.Portability.FiniteNumericalCertificate.expectation_bounded",
+     "Descent.Portability.RademacherParityConditioning.expectation_law_le_twice",
      1
     ],
-    "range_hi": 1
+    "range_hi": 2
    },
    "mentioned_by": [
     "Descent.Coalescent.LocusExchangeableLowOrderLDHaplotypeRealization.pi2LeftMutationVelocity_expectation",
@@ -387144,6 +387819,10 @@
     "Descent.Portability.RademacherArrayWeakLimit.row_second",
     "Descent.Portability.RademacherArrayWeakLimit.sign_mean",
     "Descent.Portability.RademacherArrayWeakLimit.sign_second",
+    "Descent.Portability.RademacherParityConditioning.expectation_law",
+    "Descent.Portability.RademacherParityConditioning.expectation_law_le_twice",
+    "Descent.Portability.RademacherParityConditioning.second_moment_bound",
+    "Descent.Portability.RademacherParityLaw.parity_mean",
     "Descent.Portability.ReportFiniteCalibrationLaw.interaction_projection_minimizes",
     "Descent.Portability.ReportFiniteCalibrationLaw.interaction_projection_risk",
     "Descent.Portability.ReportFiniteCalibrationLaw.interaction_residual_mean_zero",
@@ -388049,6 +388728,14 @@
      "Descent.Portability.RademacherArrayWeakLimit.row_second": [],
      "Descent.Portability.RademacherArrayWeakLimit.row_characteristic": [],
      "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit": [],
+     "Descent.Portability.RademacherParityConditioning.law_mass": [],
+     "Descent.Portability.RademacherParityConditioning.expectation_law": [],
+     "Descent.Portability.RademacherParityConditioning.complexExpectation_law": [],
+     "Descent.Portability.RademacherParityConditioning.expectation_law_le_twice": [],
+     "Descent.Portability.RademacherParityLaw.parity_mean": [],
+     "Descent.Portability.RademacherParityLaw.mixed_characteristic": [],
+     "Descent.Portability.RademacherParityLaw.mixed_characteristic_limit": [],
+     "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit": [],
      "Descent.Portability.StoppedGenotypeRenewal.genomeCountMass_zero": [],
      "Descent.Portability.WholeGenomeMutationSemigroup.independent_bind": [],
      "Descent.Portability.WholeGenomeMutationSemigroup.independent_pointMass": [],
@@ -388092,6 +388779,14 @@
     "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit",
     "Descent.Portability.RademacherArrayWeakLimit.row_characteristic",
     "Descent.Portability.RademacherArrayWeakLimit.row_second",
+    "Descent.Portability.RademacherParityConditioning.complexExpectation_law",
+    "Descent.Portability.RademacherParityConditioning.expectation_law",
+    "Descent.Portability.RademacherParityConditioning.expectation_law_le_twice",
+    "Descent.Portability.RademacherParityConditioning.law_mass",
+    "Descent.Portability.RademacherParityLaw.mixed_characteristic",
+    "Descent.Portability.RademacherParityLaw.mixed_characteristic_limit",
+    "Descent.Portability.RademacherParityLaw.parity_mean",
+    "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit",
     "Descent.Portability.StoppedGenotypeRenewal.genomeCountMass_zero",
     "Descent.Portability.WholeGenomeMutationSemigroup.independent_bind",
     "Descent.Portability.WholeGenomeMutationSemigroup.independent_pointMass",

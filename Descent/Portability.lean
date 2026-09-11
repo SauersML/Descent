@@ -264,6 +264,10 @@ import Descent.Portability.SmallArrayContinuity
 import Descent.Portability.SmallRealProduct
 import Descent.Portability.CosineArrayLimit
 import Descent.Portability.RademacherArrayWeakLimit
+import Descent.Portability.HWELogCoordinates
+import Descent.Portability.RademacherParityLaw
+import Descent.Portability.RademacherParityConditioning
+import Descent.Portability.RademacherParityWeakLimit
 assert_below Descent.Program
 
 /-!
