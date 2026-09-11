@@ -53,8 +53,9 @@ constant.  No deme is needed as data, because a step with no stages is the idle 
 Scope.  Resampling is the corpus's single-draw stage calibrated by
 `RandomStageKernel.driftChromosomeCount`, not NOTE1's multinomial sample of `ceil (1 / (c h))`
 chromosomes, and migration is one pulse per ordered pair rather than one simultaneous convex
-mixture.  Both change the step by higher-order terms only.  The error bound is crude and
-explicit; no rate of convergence beyond "vanishes with `h`" is claimed.
+mixture.  How far those two choices move the step is not quantified here; the approximation is
+proved for the stages as formalized.  The error bound is crude and explicit; no rate of
+convergence beyond "vanishes with `h`" is claimed.
 
 ## Empirical status
 
