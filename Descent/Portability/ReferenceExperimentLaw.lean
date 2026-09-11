@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.MeiosisGameteLaw
 import Descent.Portability.ExactMetricEvaluation
 import Descent.Portability.ArchitectureEnvironmentRegion
+import Descent.Portability.ReportFiniteCalibrationLaw
 
 assert_below Descent.Decision Descent.Program
 
@@ -82,6 +83,11 @@ def carrier (genotype : Genotype) (locus : Fin 2) : Bool :=
 
 /-- A bit read as a rational number. -/
 def bitValue (bit : Bool) : ℚ := if bit then 1 else 0
+
+/-- The rational bit value is the corpus's real allele indicator of a finite calibration law. -/
+theorem bitValue_cast_eq_allele (bit : Bool) :
+    (bitValue bit : ℝ) = ReportFiniteCalibrationLaw.allele bit := by
+  cases bit <;> simp [bitValue, ReportFiniteCalibrationLaw.allele]
 
 /-! ## The shared architecture and environment context -/
 
