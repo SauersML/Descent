@@ -85,6 +85,15 @@ import Descent.Portability.CylinderHaltingLaw
 import Descent.Portability.ReferenceExperimentLaw
 import Descent.Portability.PartialHaplotypeDualSemigroup
 import Descent.Portability.InterleavedHistoryRealization
+import Descent.Portability.MultinomialDriftStage
+import Descent.Portability.SimultaneousMigrationPulse
+import Descent.Portability.IntegralEquationDerivative
+import Descent.Portability.NeutralFellerGenerator
+import Descent.Portability.RationalParameterReports
+import Descent.Portability.ReplicaMetricInstances
+import Descent.Portability.ContinuousExampleCertificate
+import Descent.Portability.ReferenceLogLossCertificate
+import Descent.Portability.UniformPenetranceCertificate
 
 namespace Descent.Program
 
@@ -121,9 +130,11 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
   `ResamplingJetExpansion`, `RandomStageKernel`, `PulseJetExpansion`, `PulseStageKernel`,
   `TwoLocusMicroscopicKernel`, `Pi2GeneratorBridges`, `EnlargedGeneratorBridges`; the
   multinomial moments of equation (10): `MultinomialMomentExpansion`; composing finitely many
-  stages into one step with an explicit O(h²) remainder: `StageCompositionKernel`; the literal
-  composition of the two-locus physical stages as a second microscopic approximation of the
-  enlarged generator, with nothing assumed: `TwoLocusStageComposition`.
+  stages into one step with an explicit remainder for the cross terms: `StageCompositionKernel`;
+  the literal composition of the two-locus physical stages as a second microscopic approximation
+  of the enlarged generator, with nothing assumed: `TwoLocusStageComposition`; the note's
+  multinomial drift stage with `⌈1/(c h)⌉` chromosomes and the simultaneous migration stage,
+  each with its first-order expansion: `MultinomialDriftStage`, `SimultaneousMigrationPulse`.
 * Theorem 2 and Corollary 2.1, with no hypotheses: `TwoLocusMicroscopicApproximation`
   (`enlargedMicroscopicApproximation`, `rateEpoch_preserves_locusExchangeable_realization`,
   `history_present_locusExchangeable_realization`, `history_LDPairDomain`); the closedness-taking
@@ -137,7 +148,8 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
   continuous in time); rate histories with integrable rate coordinates, with the generator
   Lipschitz in the rates and the propagator the unique continuous solution of the integral
   equation: `RateGeneratorLipschitz`, `IntegrableGeneratorPropagator`,
-  `IntegrableRateRealization`.
+  `IntegrableRateRealization`; the almost-everywhere derivative `U' = A(t) U` and absolute
+  continuity of that propagator: `IntegralEquationDerivative`.
 * §3 Theorem 3 and equations (14)-(16): `StationaryRealization`,
   `StationaryHaplotypeRealization`, `AncestralHaplotypeRealization`.
 * §4.1 per-locus material grading and the loose configuration bound `C(K+B,B)`:
@@ -149,7 +161,9 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
   `PoissonTruncationCertificate`. §4.2a, the extension of a positive constant-preserving
   semigroup from polynomials and its representation by Markov kernels obeying
   Chapman-Kolmogorov: `PolynomialFellerExtension`, `FellerKernelRepresentation`,
-  `FellerMarkovKernel`. §4.3 equation (21) is `FiniteReportLaw.expectation_bind` of
+  `FellerMarkovKernel`; Markov kernels whose generator on polynomials is the neutral diffusion
+  generator, given the polynomial semigroup: `NeutralFellerGenerator`. §4.3 equation (21) is
+  `FiniteReportLaw.expectation_bind` of
   `ExactFiniteHistoryLaw`; equations (22)-(23): `ConditionalReportCompilation`.
 * §5 equations (24)-(25): `SublawReportCertificate`.
 * §6 equations (27)-(36), chronology to metrics: `AdmixtureChronologyLaw`,
@@ -166,14 +180,17 @@ Equation (10) is proved for every polynomial of total degree at most four, with 
 operator (7) enters through the resampling jet certificates rather than as a displayed identity.
 Both microscopic approximations behind Theorem 2 use a single-draw resampling stage with
 `N = ⌈(c h)^(-1/2)⌉` and a step error of order o(h), not the note's multinomial sample of size
-`⌈1/(c h)⌉`, and `TwoLocusStageComposition` runs migration as one pulse per ordered pair. The
+`⌈1/(c h)⌉`, and `TwoLocusStageComposition` runs migration as one pulse per ordered pair; the
+multinomial and simultaneous stages are proved at stage level but not yet assembled into a
+microscopic approximation. The
 rate laws have strictly positive coalescence, where the note allows `c_i ≥ 0`. §2.4 is proved for
 rate histories with integrable rate coordinates; the propagator is characterized by the integral
 equation. Theorem 2 covers histories of rate epochs, splits and admixture pulses; the pipeline
 compiler emits nothing else. Of §4.2, mutation is symmetric, and (20) takes the forward moment
 equation of the expectation family as a hypothesis that no module yet discharges. The §4.2a
-modules are abstract: they assume the semigroup, its positivity and its Euler limit, and are not
-yet applied to the neutral two-locus model; their kernels are Markov kernels on pseudo-metrizable
+modules assume the polynomial semigroup, its positivity and its Euler limit;
+`NeutralFellerGenerator` identifies its generator but does not construct the semigroup from the
+neutral two-locus kernels; their kernels are Markov kernels on pseudo-metrizable
 compact spaces, which include the haplotype-frequency simplex. In §6 the coupling bounds of
 NOTE1 Theorem 5 are proved for continuous rates and attainment for lists of discrete events, so
 neither class is shown to trace exactly the displayed curve. The finite-cohort intercept and
@@ -188,14 +205,17 @@ from a deme count.
 * Theorem 1 and equation (7), the complete report law of a finite dependent trace tree, with
   forward propagation, backward evaluation and trace enumeration agreeing: `FiniteTraceTreeLaw`.
   The rational clause and equations (3)-(6): `RationalReportClosure`, `MeiosisGameteLaw`.
-* §3.2 equations (9)-(10): `ArchitectureEnvironmentRegion`.
+* §3.2 equations (9)-(10): `ArchitectureEnvironmentRegion`. Theorem 2 as rational parameter
+  reports on the sign-condition cells of supplied polynomial guards, with the report graph and
+  attainable region of worked trees: `RationalParameterReports`.
 * Theorem 3 and §4.1 equations (12)-(14): `ReplicaMomentCompleteness`,
   `ReplicaFiniteOrderNecessity`, `ThetaFamilyNonclosure`; §4, the tagged source/target mixture
   determining the joint population law: `TaggedMixtureCompleteness`.
 * §5 equations (15)-(20): `PositiveRatioExpansion`, `ReplicaDomainCertificate`,
   `SmallDenominatorRates`; Theorem 4 over an arbitrary probability measure, with convergence of
   both certificate endpoints: `ReplicaMeasureCertificate`; the sharp gamma constant of (20) and
-  equations (28)-(29): `SmallDenominatorLayerCake`. §6.1 equations (24)-(26):
+  equations (28)-(29): `SmallDenominatorLayerCake`; §5.4, concrete population metrics as bounded
+  replica ratios: `ReplicaMetricInstances`. §6.1 equations (24)-(26):
   `JointRatioFailureMasks`; joint moments determining the joint and masked metric laws:
   `JointMetricMomentDeterminacy`. §6.2:
   `PortabilityRatioQueries`. §6.3 example: `UnboundedSlopeExample`. §6.4 equation (30):
@@ -214,12 +234,17 @@ from a deme count.
 * §9, the executed reference experiment: the model in corpus vocabulary, its exact source-side
   report law matching the attached results, the 220 architecture, environment and census states
   of both histories, and the early-migration target squared-correlation definedness probability:
-  `ReferenceExperimentLaw`.
-* §9.1, the uniform penetrance architecture: `UniformPenetranceArchitecture`.
+  `ReferenceExperimentLaw`; eighty-term log-loss certificates for any rational law of the
+  experiment's observations: `ReferenceLogLossCertificate`.
+* §9.1, the uniform penetrance architecture: `UniformPenetranceArchitecture`; its eighty-term
+  replica certificate, of width below `10^-24`: `ContinuousExampleCertificate`; executed
+  Theorem 5 on it, with cylinder certificates converging to the squared-correlation and AUC
+  integrals: `UniformPenetranceCertificate`.
 * §10, the halting boundary: `HaltingExpectationBoundary`.
 
-Scope. No semialgebraic partition is stated for Theorem 2; what is proved is the
-architecture/environment reweighting of (9)-(10) with positive corner denominators. The mixing
+Scope. Theorem 2 partitions the parameters by the signs of supplied polynomial guards; Mathlib's
+semialgebraic sets and real quantifier elimination, which the note uses to eliminate parameters
+from (8), are not available at this pin. The mixing
 law of (31) ranges over finitely many contexts, and its Lipschitz class is taken on all of the
 coordinate space. Equations (20), (28) and (29) take the pointwise bounds `0 ≤ D ≤ 1`, as the corpus
 certificates do. Theorem 1 makes no complexity claim and covers no infinite branch set. The
