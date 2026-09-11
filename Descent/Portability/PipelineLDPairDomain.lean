@@ -27,6 +27,19 @@ next epoch, and every rate law the pipeline builds is a genuine `ManyDemeLDRates
 admixture instruction is ever emitted, so no new event kind is needed.
 `lowOrderLDHistory_instructions` appends the terminal epoch.
 
+Admixture pulses.  `Descent.Portability.PulseHistoryRealization` proves NOTE1 Theorem 2 and
+Corollary 2.1 for histories that also contain admixture pulses (`PulseHistoryEvent`,
+`pulseHistory_LDPairDomain`), but no pipeline history contains one, for a structural reason.
+`PipelineDemographicHistory.events` is a list of `DemographicEvent`, whose five constructors
+`split`, `sizeChange`, `migrationChange`, `mutationRateChange` and `recombinationRateChange` each
+evolve for an elapsed time and then split a deme or change a rate.  None is an instantaneous
+admixture pulse, and `compileLowOrderLDEvents` has no pulse branch.  Every history the pipeline
+can express is therefore pulse-free, and `PipelineDemographicHistory.ldPairDomain` below covers
+all of them.  Carrying pulses would need a new `DemographicEvent` constructor in
+`EndToEndScoreLaw`, handled by `compileLowOrderLDEvents` and `runCommonDiffusionEvents` alike,
+and the synchronized one-locus state would then need the pulse analogue of
+`lowOrderLDHProjection_split`, which the corpus does not have.
+
 The initial state is the unsplit ancestral boundary `commonAncestralLowOrderLDState`, whose
 locus-exchangeable haplotype realization is
 `AncestralHaplotypeRealization.ancestralLocusExchangeableRealization`, NOTE1 Theorem 3 copied
