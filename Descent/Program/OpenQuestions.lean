@@ -1,6 +1,11 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.FourthMomentMinimizer
+import Descent.Portability.JointReportFeasibility
+import Descent.Portability.NonaffineRepair
+import Descent.Portability.SparseExtremalLaws
+import Descent.Portability.UniversalReportMonotonicity
 import Descent.Portability.AngularExtremalReports
 import Descent.Portability.FourthMomentAttainableRange
 import Descent.Portability.GaussianCeilingBound

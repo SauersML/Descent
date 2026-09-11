@@ -18,3 +18,17 @@ import Descent.Portability.BinomialAggregateEnvelope
 #print axioms Descent.Portability.BinomialAggregateEnvelope.binMoment_id
 #print axioms Descent.Portability.BinomialAggregateEnvelope.binMoment_sq
 #print axioms Descent.Portability.BinomialAggregateEnvelope.binomialExp_eq_binMoment
+#print axioms Descent.Portability.BinomialAggregateEnvelope.countR2_eq_architecture_r2
+#print axioms Descent.Portability.BinomialAggregateEnvelope.countMse_eq_architecture_mse
+#print axioms Descent.Portability.BinomialAggregateEnvelope.countR2_top
+#print axioms Descent.Portability.BinomialAggregateEnvelope.countR2_bot
+#print axioms Descent.Portability.BinomialAggregateEnvelope.countMse_top
+#print axioms Descent.Portability.BinomialAggregateEnvelope.countMse_bot
+#print axioms Descent.Portability.BinomialAggregateEnvelope.binomial_envelope_lower
+#print axioms Descent.Portability.BinomialAggregateEnvelope.sync_envelope_upper
+#print axioms Descent.Portability.BinomialAggregateEnvelope.binomial_envelope_mse
+#print axioms Descent.Portability.BinomialAggregateEnvelope.sync_envelope_mse
+#print axioms Descent.Portability.BinomialAggregateEnvelope.mixTwo_apply
+#print axioms Descent.Portability.BinomialAggregateEnvelope.envelope_mixture_r2
+#print axioms Descent.Portability.BinomialAggregateEnvelope.envelope_mixture_mse
+#print axioms Descent.Portability.BinomialAggregateEnvelope.envelope_attains
