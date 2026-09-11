@@ -289,6 +289,7 @@ theorem iterate_apply_sub_le {B Y : Type*} [Fintype B] (K : FiniteMixtureKernel 
     rw [Function.iterate_succ_apply', Function.iterate_succ_apply']
     exact K.apply_sub_le _ _ M ih x
 
+omit [CompactSpace X] in
 /-- The positivity half of NOTE1 §4.2a for the corpus kernels. If iterates `K_i^{n_i}` of
 finite mixture kernels converge pointwise to `T f` for every observable `f` of the subspace,
 along a nontrivial filter, then `T` is positive and fixes the constants. -/

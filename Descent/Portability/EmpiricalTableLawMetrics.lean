@@ -133,8 +133,8 @@ theorem tableLaw_calibrationSlope {n : ℕ} (sample : Fin n → Bool × Bool)
   have hsquare : (∑ member, scoreOf (sample member) ^ 2) = scoreCount sample true := by
     rw [← hscore]
     refine Finset.sum_congr rfl fun member _ ↦ ?_
-    simp only [scoreOf, alleleValue]
-    split_ifs <;> norm_num
+    simp only [scoreOf]
+    cases (sample member).1 <;> simp
   have houtcome : (∑ member, outcomeOf (sample member)) =
       outcomeTotal sample true + outcomeTotal sample false := by
     simp only [outcomeTotal, ← Finset.sum_add_distrib]
@@ -146,7 +146,6 @@ theorem tableLaw_calibrationSlope {n : ℕ} (sample : Fin n → Bool × Bool)
       expectation_tableLaw_cellCount, hsquare, hscore,
       show scoreCount sample false = n - scoreCount sample true by linarith]
     field_simp
-    ring
   have hcovariance : (tableLaw (cellCount sample) hpos).covariance scoreOf outcomeOf =
       (scoreCount sample false * outcomeTotal sample true -
         scoreCount sample true * outcomeTotal sample false) / (n : ℝ) ^ 2 := by
