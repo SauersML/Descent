@@ -333,6 +333,7 @@ import Descent.Portability.CompoundPoissonIntegrability
 import Descent.Portability.BoundedConvolutionMoments
 import Descent.Portability.CompoundPoissonMoments
 import Descent.Portability.GaussianCompoundMoments
+import Descent.Portability.HWECriticalMoments
 assert_below Descent.Program
 
 /-!
