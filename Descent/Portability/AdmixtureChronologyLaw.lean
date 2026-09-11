@@ -29,9 +29,10 @@ the pointwise statements `hasDerivAt_donorFraction_of_hasDerivAt` and
 `hasDerivAt_admixtureLinkage_of_hasDerivAt`. The integral forms of (29) and (30) hold for
 arbitrary rates. Not formalised: uniqueness of (28) among absolutely continuous solutions of (27)
 for integrable rates. The pushforward of the immigration-increment measure by the remaining
-recombination exposure, which NOTE1 (29) states measure-theoretically, is formalised here only in
-the equivalent integral form on `[0, T]`; the finitely supported pushforward is carried by
-`ExposureLaplaceConstraints` and `FinitePulseExposure`.
+recombination exposure, which NOTE1 (29) states measure-theoretically, is formalised here in the
+equivalent integral form on `[0, T]` and in measure form by
+`AttainableChronologyCurve.scaled_normalisedCoupling_eq_measureLaplace`; the finitely supported
+pushforward is carried by `ExposureLaplaceConstraints` and `FinitePulseExposure`.
 
 The module also fixes the ordered-event recursion that NOTE1 Theorem 5 needs. An event is
 either a block of pure recombination with a given exposure or a block of pure migration with a

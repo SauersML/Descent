@@ -50,3 +50,11 @@ open Descent.Portability.FinitePulseExposure
 #print axioms Descent.Portability.FinitePulseExposure.recombinationTotal_realisingHistory
 #print axioms Descent.Portability.FinitePulseExposure.eventTotals_nonneg_realisingHistory
 #print axioms Descent.Portability.FinitePulseExposure.exists_chronology_eq_exposureLaplace
+#print axioms Descent.Portability.FinitePulseExposure.measurable_gridIndex
+#print axioms Descent.Portability.FinitePulseExposure.gridExposure_mem_Icc
+#print axioms Descent.Portability.FinitePulseExposure.gridExposure_gridIndex_le
+#print axioms Descent.Portability.FinitePulseExposure.exposureLaplace_quantizedLaw
+#print axioms Descent.Portability.FinitePulseExposure.tendsto_exposureLaplace_quantizedLaw
+#print axioms
+  Descent.Portability.FinitePulseExposure.tendsto_couplingOfState_quantizedHistory
+#print axioms Descent.Portability.FinitePulseExposure.eventTotals_nonneg_quantizedHistory

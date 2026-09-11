@@ -6,6 +6,7 @@ import Descent.Portability.AttainableChronologyCurve
 import Descent.Portability.ExposureLaplaceConstraints
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Data.Fin.Tuple.Sort
+import Mathlib.MeasureTheory.Function.Floor
 
 assert_below Descent.Decision Descent.Program
 
@@ -61,8 +62,19 @@ totals, migration total `-log(1 - p)`, recombination total `λ R`, final donor f
 normalised coupling `exposureLaplace law exposure λ`. The existence statement of NOTE1 section
 6.3 is the corollary `exists_chronology_eq_exposureLaplace`.
 
-Not formalised: exposure laws that are not finitely supported, and the claim that knowing
-`C(λ)` for every `λ` determines `ν`. Nothing here identifies an exposure law from data.
+A general exposure law is a limit of finite-pulse histories. For a probability measure `ν`
+carried by `[0, R]`, rounding every exposure down to the grid `k R / n` (`gridIndex`,
+`gridExposure`) gives the finite law `quantizedLaw`, whose transform is that of `ν` with rounded
+exposures; rounding moves an exposure by at most one grid step, so the transforms converge to
+`∫ e^{-λ b} ν(db)` for every `λ ≥ 0` (`tendsto_exposureLaplace_quantizedLaw`), and so do the
+couplings of the chronologies realising the quantized laws
+(`tendsto_couplingOfState_quantizedHistory`), each a chronology with nonnegative event totals
+(`eventTotals_nonneg_quantizedHistory`). The limit is stated for `C(λ)` at each `λ`, which for
+laws on `[0, R]` determines the law (`ExposureLaplaceConstraints.measure_eq_of_measureLaplace_eq`).
+
+Not formalised: weak convergence of the quantized laws against every bounded continuous test
+function, and a measure-driven schedule realising `ν` exactly rather than as a limit. Nothing
+here identifies an exposure law from data.
 
 ## Empirical status
 
@@ -725,6 +737,212 @@ theorem exists_chronology_eq_exposureLaplace {n : ℕ} (law : FiniteReportLaw (F
     recombinationTotal_realisingHistory law exposure donor lam bound,
     fst_runEvents_realisingHistory law exposure donor lam bound hdonor.le hlt,
     couplingOfState_realisingHistory law exposure donor lam bound hdonor hlt⟩
+
+open MeasureTheory Filter Topology
+open Descent.Portability.ExposureLaplaceConstraints (measureLaplace)
+
+/-- The grid cell of an exposure on the grid of `n + 1` points `k R / n`: `⌊n b / R⌋`, capped at
+`n`. -/
+def gridIndex (bound : ℝ) (count : ℕ) (exposure : ℝ) : Fin (count + 1) :=
+  ⟨min count ⌊(count : ℝ) * exposure / bound⌋₊, Nat.lt_succ_of_le (min_le_left _ _)⟩
+
+/-- The grid points `k R / n`. -/
+def gridExposure (bound : ℝ) (count : ℕ) (index : Fin (count + 1)) : ℝ :=
+  bound * (index : ℝ) / count
+
+/-- Rounding down to the grid is measurable. -/
+theorem measurable_gridIndex (bound : ℝ) (count : ℕ) : Measurable (gridIndex bound count) := by
+  have hfloor : Measurable fun exposure : ℝ ↦ min count ⌊(count : ℝ) * exposure / bound⌋₊ :=
+    (measurable_from_top (f := fun value : ℕ ↦ min count value)).comp
+      (Nat.measurable_floor.comp
+        (by fun_prop : Measurable fun exposure : ℝ ↦ (count : ℝ) * exposure / bound))
+  refine measurable_to_countable' fun index ↦ ?_
+  have hpreimage : gridIndex bound count ⁻¹' {index} =
+      (fun exposure : ℝ ↦ min count ⌊(count : ℝ) * exposure / bound⌋₊) ⁻¹' {(index : ℕ)} := by
+    ext exposure
+    simp [gridIndex, Fin.ext_iff]
+  rw [hpreimage]
+  exact hfloor (measurableSet_singleton _)
+
+/-- Assumes: `R ≥ 0`. Every grid point lies in `[0, R]`. -/
+theorem gridExposure_mem_Icc (bound : ℝ) (hbound : 0 ≤ bound) (count : ℕ)
+    (index : Fin (count + 1)) : gridExposure bound count index ∈ Set.Icc 0 bound := by
+  unfold gridExposure
+  rcases Nat.eq_zero_or_pos count with hzero | hpositive
+  · subst hzero
+    simp [hbound]
+  · have hcount : (0 : ℝ) < count := Nat.cast_pos.mpr hpositive
+    have hindex : (index : ℝ) ≤ count := by exact_mod_cast Nat.lt_succ_iff.mp index.isLt
+    refine Set.mem_Icc.mpr ⟨div_nonneg (mul_nonneg hbound (Nat.cast_nonneg _)) hcount.le, ?_⟩
+    rw [div_le_iff₀ hcount]
+    nlinarith [hindex, hbound]
+
+/-- Assumes: `R > 0`, at least one grid step and an exposure in `[0, R]`. Rounding the exposure
+down to the grid moves it by at most one grid step `R / n`, and never upward. -/
+theorem gridExposure_gridIndex_le (bound : ℝ) (hbound : 0 < bound) (count : ℕ)
+    (hcount : 0 < count) (exposure : ℝ) (hexposure : exposure ∈ Set.Icc 0 bound) :
+    gridExposure bound count (gridIndex bound count exposure) ≤ exposure ∧
+      exposure - bound / count ≤ gridExposure bound count (gridIndex bound count exposure) := by
+  have hcountpos : (0 : ℝ) < count := Nat.cast_pos.mpr hcount
+  have hscaled : 0 ≤ (count : ℝ) * exposure / bound :=
+    div_nonneg (mul_nonneg hcountpos.le hexposure.1) hbound.le
+  have hcapped : ⌊(count : ℝ) * exposure / bound⌋₊ ≤ count := by
+    refine Nat.floor_le_of_le ?_
+    rw [div_le_iff₀ hbound]
+    nlinarith [hexposure.2]
+  have hbelow := Nat.floor_le hscaled
+  have habove := Nat.lt_floor_add_one ((count : ℝ) * exposure / bound)
+  have hvalue : gridExposure bound count (gridIndex bound count exposure) =
+      bound * (⌊(count : ℝ) * exposure / bound⌋₊ : ℝ) / count := by
+    simp only [gridExposure, gridIndex, min_eq_right hcapped]
+  rw [hvalue]
+  rw [le_div_iff₀ hbound] at hbelow
+  rw [div_lt_iff₀ hbound] at habove
+  constructor
+  · rw [div_le_iff₀ hcountpos]
+    nlinarith [hbelow]
+  · rw [le_div_iff₀ hcountpos, sub_mul, div_mul_cancel₀ _ (ne_of_gt hcountpos)]
+    nlinarith [habove]
+
+/-- Assumes: a nonnegative scale and `0 ≤ l ≤ u`. The survival factors at `l` and `u` differ by
+at most `λ (u - l)`. -/
+private theorem exp_neg_sub_exp_neg_le (lam lower upper : ℝ) (hlam : 0 ≤ lam)
+    (hlower : 0 ≤ lower) (hle : lower ≤ upper) :
+    |Real.exp (-(lam * upper)) - Real.exp (-(lam * lower))| ≤ lam * (upper - lower) := by
+  have hmono : Real.exp (-(lam * upper)) ≤ Real.exp (-(lam * lower)) :=
+    Real.exp_le_exp.mpr (by nlinarith)
+  rw [abs_sub_comm, abs_of_nonneg (by linarith)]
+  have hfactor : Real.exp (-(lam * upper)) =
+      Real.exp (-(lam * lower)) * Real.exp (-(lam * (upper - lower))) := by
+    rw [← Real.exp_add]
+    congr 1
+    ring
+  have hone : Real.exp (-(lam * lower)) ≤ 1 := Real.exp_le_one_iff.mpr (by nlinarith)
+  have htangent := Real.add_one_le_exp (-(lam * (upper - lower)))
+  have hgap : 0 ≤ lam * (upper - lower) := mul_nonneg hlam (by linarith)
+  rw [hfactor]
+  nlinarith [Real.exp_pos (-(lam * lower)), Real.exp_pos (-(lam * (upper - lower)))]
+
+/-- The exposure law rounded down to the grid of `n + 1` points: the mass of each grid cell. -/
+def quantizedLaw (exposureLaw : Measure ℝ) [IsProbabilityMeasure exposureLaw] (bound : ℝ)
+    (count : ℕ) : FiniteReportLaw (Fin (count + 1)) where
+  mass index := (exposureLaw.map (gridIndex bound count)).real {index}
+  mass_nonneg _ := measureReal_nonneg
+  mass_sum := by
+    haveI := Measure.isProbabilityMeasure_map (μ := exposureLaw)
+      (measurable_gridIndex bound count).aemeasurable
+    rw [sum_measureReal_singleton, Finset.coe_univ, measureReal_univ_eq_one]
+
+/-- The transform of the quantized law is the transform of the original law with every exposure
+rounded down to the grid. -/
+theorem exposureLaplace_quantizedLaw (exposureLaw : Measure ℝ)
+    [IsProbabilityMeasure exposureLaw] (bound lam : ℝ) (count : ℕ) :
+    exposureLaplace (quantizedLaw exposureLaw bound count) (gridExposure bound count) lam =
+      ∫ exposure, Real.exp (-(lam * gridExposure bound count (gridIndex bound count exposure)))
+        ∂exposureLaw := by
+  haveI := Measure.isProbabilityMeasure_map (μ := exposureLaw)
+    (measurable_gridIndex bound count).aemeasurable
+  rw [← integral_map (measurable_gridIndex bound count).aemeasurable
+      (f := fun index ↦ Real.exp (-(lam * gridExposure bound count index)))
+      measurable_from_top.aestronglyMeasurable,
+    integral_fintype _ Integrable.of_finite]
+  unfold exposureLaplace FiniteReportLaw.expectation quantizedLaw
+  simp only [smul_eq_mul]
+
+/-- NOTE1 section 6.3, the weak-limit realisation at the level of the transform. Assumes: a
+probability measure carried by `[0, R]` with `R > 0` and a nonnegative scale `λ`. The transforms
+of the laws quantized on finer and finer grids converge to the transform of the law: rounding
+down moves every exposure by at most one grid step, so the transforms differ by at most
+`λ R / (n + 1)`. -/
+theorem tendsto_exposureLaplace_quantizedLaw (exposureLaw : Measure ℝ)
+    [IsProbabilityMeasure exposureLaw] (bound lam : ℝ) (hbound : 0 < bound) (hlam : 0 ≤ lam)
+    (hsupport : ∀ᵐ exposure ∂exposureLaw, exposure ∈ Set.Icc 0 bound) :
+    Tendsto (fun count : ℕ ↦ exposureLaplace (quantizedLaw exposureLaw bound (count + 1))
+      (gridExposure bound (count + 1)) lam) atTop (𝓝 (measureLaplace exposureLaw lam)) := by
+  have hstep : ∀ count : ℕ, |exposureLaplace (quantizedLaw exposureLaw bound (count + 1))
+      (gridExposure bound (count + 1)) lam - measureLaplace exposureLaw lam| ≤
+        lam * (bound / ((count : ℝ) + 1)) := by
+    intro count
+    have hgrid : Measurable fun exposure ↦ Real.exp (-(lam *
+        gridExposure bound (count + 1) (gridIndex bound (count + 1) exposure))) :=
+      (measurable_from_top (f := fun index : Fin (count + 1 + 1) ↦
+        Real.exp (-(lam * gridExposure bound (count + 1) index)))).comp
+        (measurable_gridIndex bound (count + 1))
+    have hgridint : Integrable (fun exposure ↦ Real.exp (-(lam *
+        gridExposure bound (count + 1) (gridIndex bound (count + 1) exposure)))) exposureLaw := by
+      refine Integrable.of_bound hgrid.aestronglyMeasurable 1 (ae_of_all _ fun exposure ↦ ?_)
+      have hmem := gridExposure_mem_Icc bound hbound.le (count + 1)
+        (gridIndex bound (count + 1) exposure)
+      rw [Real.norm_eq_abs, Real.abs_exp, Real.exp_le_one_iff]
+      nlinarith [hmem.1]
+    have hsurvival : Integrable (fun exposure ↦ Real.exp (-(lam * exposure))) exposureLaw := by
+      have hcontinuous : Continuous fun exposure : ℝ ↦ Real.exp (-(lam * exposure)) := by
+        fun_prop
+      refine Integrable.of_bound hcontinuous.aestronglyMeasurable 1
+        (hsupport.mono fun exposure hexposure ↦ ?_)
+      rw [Real.norm_eq_abs, Real.abs_exp, Real.exp_le_one_iff]
+      nlinarith [hexposure.1]
+    have hpoint : ∀ᵐ exposure ∂exposureLaw,
+        ‖Real.exp (-(lam *
+            gridExposure bound (count + 1) (gridIndex bound (count + 1) exposure))) -
+          Real.exp (-(lam * exposure))‖ ≤ lam * (bound / ((count : ℝ) + 1)) := by
+      refine hsupport.mono fun exposure hexposure ↦ ?_
+      obtain ⟨hbelow, habove⟩ := gridExposure_gridIndex_le bound hbound (count + 1)
+        (Nat.succ_pos count) exposure hexposure
+      have hmem := gridExposure_mem_Icc bound hbound.le (count + 1)
+        (gridIndex bound (count + 1) exposure)
+      have hlipschitz := exp_neg_sub_exp_neg_le lam _ exposure hlam hmem.1 hbelow
+      rw [Real.norm_eq_abs, abs_sub_comm]
+      push_cast at habove
+      nlinarith [hlipschitz, habove]
+    rw [exposureLaplace_quantizedLaw]
+    unfold measureLaplace
+    rw [← integral_sub hgridint hsurvival, ← Real.norm_eq_abs]
+    calc ‖∫ exposure, (Real.exp (-(lam *
+            gridExposure bound (count + 1) (gridIndex bound (count + 1) exposure))) -
+          Real.exp (-(lam * exposure))) ∂exposureLaw‖
+        ≤ lam * (bound / ((count : ℝ) + 1)) * exposureLaw.real Set.univ :=
+          norm_integral_le_of_norm_le_const hpoint
+      _ = lam * (bound / ((count : ℝ) + 1)) := by rw [measureReal_univ_eq_one, mul_one]
+  rw [Metric.tendsto_atTop]
+  intro ε hε
+  obtain ⟨threshold, hthreshold⟩ := exists_nat_gt (lam * bound / ε)
+  refine ⟨threshold, fun count hcount ↦ ?_⟩
+  rw [Real.dist_eq]
+  refine lt_of_le_of_lt (hstep count) ?_
+  have hcountcast : (threshold : ℝ) ≤ count := Nat.cast_le.mpr hcount
+  have hdenominator : (0 : ℝ) < (count : ℝ) + 1 := by positivity
+  rw [mul_div_assoc', div_lt_iff₀ hdenominator]
+  rw [div_lt_iff₀ hε] at hthreshold
+  nlinarith [hthreshold, hcountcast, hε]
+
+/-- NOTE1 section 6.3: a general exposure law on `[0, R]` is a limit of finite-pulse histories.
+Assumes: a probability measure carried by `[0, R]` with `R > 0`, a target donor fraction in
+`(0, 1)` and a nonnegative scale `λ`. The couplings of the chronologies realising the quantized
+laws converge to the transform `∫ e^{-λ b} ν(db)` of the law. -/
+theorem tendsto_couplingOfState_quantizedHistory (exposureLaw : Measure ℝ)
+    [IsProbabilityMeasure exposureLaw] (donor lam bound : ℝ) (hdonor : 0 < donor)
+    (hlt : donor < 1) (hbound : 0 < bound) (hlam : 0 ≤ lam)
+    (hsupport : ∀ᵐ exposure ∂exposureLaw, exposure ∈ Set.Icc 0 bound) :
+    Tendsto (fun count : ℕ ↦ couplingOfState (runEvents (realisingHistory
+      (quantizedLaw exposureLaw bound (count + 1)) (gridExposure bound (count + 1)) donor lam
+        bound) (0, 0))) atTop (𝓝 (measureLaplace exposureLaw lam)) :=
+  Tendsto.congr (fun count ↦ (couplingOfState_realisingHistory
+      (quantizedLaw exposureLaw bound (count + 1)) (gridExposure bound (count + 1)) donor lam
+        bound hdonor hlt).symm)
+    (tendsto_exposureLaplace_quantizedLaw exposureLaw bound lam hbound hlam hsupport)
+
+/-- Assumes: a target donor fraction in `[0, 1)`, a nonnegative scale and `R ≥ 0`. Every
+chronology realising a quantized law is a chronology with nonnegative event totals. -/
+theorem eventTotals_nonneg_quantizedHistory (exposureLaw : Measure ℝ)
+    [IsProbabilityMeasure exposureLaw] (donor lam bound : ℝ) (hdonor : 0 ≤ donor)
+    (hlt : donor < 1) (hlam : 0 ≤ lam) (hbound : 0 ≤ bound) (count : ℕ) :
+    ∀ event ∈ realisingHistory (quantizedLaw exposureLaw bound count)
+        (gridExposure bound count) donor lam bound,
+      0 ≤ eventMigration event ∧ 0 ≤ eventRecombination event :=
+  eventTotals_nonneg_realisingHistory _ _ donor lam bound hdonor hlt hlam
+    (fun index ↦ (gridExposure_mem_Icc bound hbound count index).1)
+    (fun index ↦ (gridExposure_mem_Icc bound hbound count index).2)
 
 end
 
