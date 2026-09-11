@@ -445,6 +445,9 @@ import Descent.Portability.AuditSelectionSafety
 import Descent.Portability.BernsteinTailBound
 import Descent.Portability.BinomialAggregateEnvelope
 import Descent.Portability.FiniteAuditConfidence
+import Descent.Portability.ConditionalOscillationDuality
+import Descent.Portability.VectorAuditConfidence
+
 assert_below Descent.Program
 
 /-!

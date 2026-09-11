@@ -3180,6 +3180,15 @@ def effectiveRate(π, r, Λ):
 def shiftPolynomial(δ):
     return eval_2Hom(C, ((lambda i: _rt.add(X(i), C((δ[int(i)]))))))
 
+def Descent_Portability_AuditCovarianceSpectrum_covariance(w, u):
+    return sum((_rt.mul(w[int(i)], _rt._proj(_rt._proj((innerSL(ℝ, (u(i)))), 'toLinearMap'), 'smulRight')((u(i))))) for i in range(int(len(w))))
+
+def eigenvalues(w, u):
+    return _rt._proj((symmetric(w, u)), 'eigenvalues')(rfl)
+
+def Descent_Portability_AuditCovarianceSpectrum_basis(w, u):
+    return _rt._proj((symmetric(w, u)), 'eigenvectorBasis')(rfl)
+
 def clip(lo, hi, t):
     return _rt.rmax(lo, (_rt.rmin(hi, t)))
 
@@ -3258,6 +3267,15 @@ def upperValue(step, terminal, k):
 
 def Descent_Portability_BernsteinTailBound_radius(M, v, x):
     return (_rt.rsqrt((((2.0 * v) * x))) + _rt.rdiv(((2.0 * M) * x), 3.0))
+
+def countR2(n, ν, k):
+    return _rt.rdiv(_rt.lpow((_rt.rdiv((((2.0 * (k)) - (n))), (n))), 2.0), ((1.0 + ν)))
+
+def countMse(n, ν, k):
+    return (ν + (2.0 * ((1.0 - _rt.rdiv((((2.0 * (k)) - (n))), (n))))))
+
+def syncCount(n):
+    return _rt.VecFn([0.0, n])
 
 def upperMass(L, U, m):
     return _rt.rdiv(((m - L)), ((U - L)))
@@ -3384,6 +3402,12 @@ def imaginaryPart(t, y):
 
 def momentCompletionValue(b, a, δ, x):
     return ((b + zeroMeanNoiseValue(((a - _rt.lpow(b, 2.0))), ((((-2.0) * b) + _rt.rsqrt((_rt.rdiv(δ, ((a - _rt.lpow(b, 2.0)))))))), x)) if (_rt.lpow(b, 2.0) < a) else b)
+
+def featureCombo(g, lam):
+    return (lambda z: sum((_rt.mul(lam[int(i)], g(i, z))) for i in range(int(len(lam)))))
+
+def Descent_Portability_ConditionalOscillationDuality_jointLaw(μ, K):
+    return (lambda z: _rt.mul(μ[int(_rt._proj(z, '1'))], K[int(_rt._proj(z, '1'))][int(_rt._proj(z, '2'))]))
 
 def phaseMean(p, z):
     return sum((((_rt._proj(p, 'mass')(x)) * z(x))) for x in range(int(_rt.sumdim('x', len(_rt._proj(p, 'mass')), len(z)))))
@@ -3559,6 +3583,12 @@ def Descent_Portability_DemographyAccuracyFiber_phenotype(r, report):
 
 def Descent_Portability_DemographyAccuracyFiber_accuracy(r):
     return _rt.rdiv(_rt.lpow(Descent_Portability_DemographyAccuracyFiber_predictiveCovariance(r), 2.0), ((Descent_Portability_DemographyAccuracyFiber_scoreVariance() * Descent_Portability_DemographyAccuracyFiber_outcomeVariance(r))))
+
+def chebC(M, δ):
+    return _rt.rdiv(((M + δ)), ((M - δ)))
+
+def chebRho(M, δ):
+    return _rt.rdiv(((_rt.rsqrt((_rt.rdiv(M, δ))) - 1.0)), ((_rt.rsqrt((_rt.rdiv(M, δ))) + 1.0)))
 
 def inverseEntry(g, x):
     return (((1.0 if (x == 0.0) else 0.0)) if (g == 0.0) else (((2.0 if (x == 1.0) else _rt.rdiv((-1.0), 2.0))) if (g == 1.0) else ((1.0 if (x == 2.0) else 0.0))))
@@ -4201,6 +4231,21 @@ def Converged(iteration, state, current):
 def exactRun(x, labels):
     return Descent_Portability_FirthFiniteIterationLaw_run(exactMatrixChecks(), x, labels)
 
+def backgroundLaw(G):
+    return Descent_Portability_IndividualLossMoments_mixture(G, ((lambda _: uniformExp(Bool))))
+
+def curveA(v, q, d):
+    return _rt.mul(_rt.rsqrt((v[int(d)])), _rt.rsqrt((q[int(d)])))
+
+def curveB(v, H, q, d):
+    return _rt.mul(_rt.rsqrt((v[int(d)])), _rt.rsqrt((_rt.sub(H[int(d)], q[int(d)]))))
+
+def curveC(v, H, d):
+    return _rt.mul(_rt.rsqrt((v[int(d)])), _rt.rsqrt((_rt.sub(1.0, H[int(d)]))))
+
+def curvePhenotype(T, U, v, H, q, d):
+    return (lambda z: _rt.add(_rt.add(_rt.mul(curveA(v, q, d), T[int(_rt._proj(z, '1'))]), _rt.mul(curveB(v, H, q, d), U[int(_rt._proj(z, '1'))])), envValue((curveC(v, H, d)), _rt._proj(z, '2'))))
+
 def Descent_Portability_FixedBinHoeffdingLaw_radius(K, count, α):
     return _rt.rsqrt((_rt.rdiv(_rt.rlog((_rt.rdiv((2.0 * K), α))), ((2.0 * count)))))
 
@@ -4246,13 +4291,10 @@ def spreadWeights(ep):
 def spreadOffset(s):
     return _rt.VecFn([(-_rt.rsqrt(s)), 0.0, _rt.rsqrt(s)])
 
-def rangeKernel(b, a, hab, θ, ep):
-    return (lambda ω: splitExp(θ, (twoPointExp((b[int(ω)]), (a[int(ω)]), (hab(ω)))), (spreadExp(ep))))
-
 def twoPointWeight(b, a):
     return (_rt.rdiv(1.0, 2.0) if (a <= 0.0) else _rt.rdiv(((1.0 + _rt.rdiv(b, _rt.rsqrt(a)))), 2.0))
 
-def twoPointExp(b, a, hab):
+def Descent_Portability_FourthMomentDuality_twoPointExp(b, a, hab):
     return weightedExp((twoPointWeights(b, a)), (twoPointWeights_nonneg(hab)), (twoPointWeights_sum(b, a)))
 
 def twoPointKernel(a):
@@ -4306,7 +4348,7 @@ def quadraticValue(A, v):
 def gaussianFourier(A, v):
     return _rt.rexp((_rt.rdiv(_rt.neg(quadraticValue(A, v)), 2.0)))
 
-def jointLaw():
+def Descent_Portability_GaussianEffectPortabilityLaw_jointLaw():
     return _rt._proj((labelKernel(Descent_Portability_SimulationDesignDecoder_design())), 'jointMeasure')((effectLaw(K)))
 
 def clippedReport(cap, effects, outcome):
@@ -4581,6 +4623,9 @@ def closureStep(K, V_0, j):
         _prev = enlarge(K, (_prev))
     return _prev
 
+def reportExpectation(p, hp, hs, g):
+    return (lambda j: weightedExp(p, hp, hs, ((lambda ω: g[int(ω)][int(j)]))))
+
 def portabilityAtTime(r2_initial, lambda_total, t):
     return (r2_initial * _rt.rexp((((-lambda_total) * t))))
 
@@ -4671,6 +4716,15 @@ def synergyLoss(c, w):
 def Descent_Portability_LowMomentObstruction_sign(bit):
     return ((-1.0) if bit else 1.0)
 
+def couplingObserve(i, a, ω):
+    return (1.0 if (ω(i) == a) else 0.0)
+
+def couplingObserved(marginal, i, a):
+    return _rt._proj((marginal(i)), 'mass')(a)
+
+def MarginalFeasible(n, mrg, p):
+    return (((all(((0.0 <= p(z))) for z in range(int(len(mrg))))) and (sum(((p(z) == 1.0)) for z in range(int(len(mrg)))))) and all((sum(((_rt.mul(p(z), sgn((z(i)))) == mrg[int(i)])) for z in range(int(len(mrg))))) for i in range(int(len(mrg)))))
+
 def matrixDefect(fine, coarse, lift):
     return _rt.sub(_rt.mul(fine, lift), _rt.mul(lift, coarse))
 
@@ -4715,6 +4769,36 @@ def popgenDrivenTagScale():
 
 def popgenDrivenProxyScale():
     return (_rt.rexp(((-(1.0)))) * (_rt.rdiv(1.0, 2.0)))
+
+def lawExp(Q, h):
+    return sum((_rt.mul(Q[int(ω)], h[int(ω)])) for ω in range(int(len(Q))))
+
+def perturbedLaw(P, f, ε):
+    return (lambda ω: _rt.mul(P[int(ω)], (_rt.add(1.0, _rt.mul(ε, f[int(ω)])))))
+
+def lawCov(Q, S, Y):
+    return _rt.sub(lawExp(Q, ((lambda ω: _rt.mul(S[int(ω)], Y[int(ω)])))), _rt.mul(lawExp(Q, S), lawExp(Q, Y)))
+
+def cellInd(D, d):
+    return (lambda ω: (1.0 if (D(ω) == d) else 0.0))
+
+def cellMass(Q, D, d):
+    return lawExp(Q, (cellInd(D, d)))
+
+def cellLoss(Q, L, D, d):
+    return lawExp(Q, ((lambda ω: _rt.mul(L[int(ω)], cellInd(D, d, ω)))))
+
+def condCellMean(Q, L, D, d):
+    return _rt.rdiv(cellLoss(Q, L, D, d), cellMass(Q, D, d))
+
+def secondMomentOfMeans(Q, L, D):
+    return sum((_rt.rdiv(_rt.mul(cellLoss(Q, L, D, d), cellLoss(Q, L, D, d)), cellMass(Q, D, d))) for d in range(int(len(Q))))
+
+def betweenVar(Q, L, D):
+    return _rt.sub(secondMomentOfMeans(Q, L, D), _rt.mul(lawExp(Q, L), lawExp(Q, L)))
+
+def etaD(Q, L, D):
+    return _rt.rdiv(betweenVar(Q, L, D), lawCov(Q, L, L))
 
 def wInner(P, f, g):
     return sum((_rt.mul(_rt.mul(P[int(ω)], f[int(ω)]), g[int(ω)])) for ω in range(int(len(P))))
@@ -4979,6 +5063,21 @@ def portabilityGap(r2_source, r2_target):
 
 def portabilityNoiseVariance(variantCount, varianceScale):
     return _rt.rdiv(varianceScale, (variantCount))
+
+def rademacherScore():
+    return _rt.VecFn([(-1.0), 0.0, 1.0])
+
+def rademacherOutcome():
+    return (lambda i: _rt.lpow(rademacherScore(i), 2.0))
+
+def squareReport(n, k):
+    return _rt.lpow((((2.0 * (k)) - (n))), 2.0)
+
+def twoPointCount(a):
+    return _rt.VecFn([a, (a + 1.0)])
+
+def tripleConfig(j):
+    return (lambda i: decide(((i != j))))
 
 def Nucleotide():
     return Fin(4.0)
@@ -6641,6 +6740,12 @@ def transplantDefect():
 def transplantExcess(ε):
     return transplantSqNorm((transplantModuleProjection(((lambda i: (transplantTarget(i) - transplantEstimate(ε, i)))))))
 
+def crossMomentVector(E, X, Y):
+    return (lambda i: E(((lambda ω: _rt.mul(X[int(ω)][int(i)], Y[int(ω)])))))
+
+def outcomeSecondMoment(E, Y):
+    return E(((lambda ω: _rt.lpow(Y[int(ω)], 2.0))))
+
 def Descent_Portability_TurnoverArchitectureMetrics_signValue(b):
     return (1.0 if b else (-1.0))
 
@@ -6703,6 +6808,9 @@ def independentTurnoverAccuracy(n, w, b, sigma, lam, t):
     n = float(len(w))
     return _rt.rdiv((_rt.add(alignedPower(n, w, b), _rt.mul(_rt.lpow(Descent_Portability_TurnoverDependence_retention(lam, t), 2.0), crossPower(n, w, b)))), (_rt.mul((sum((_rt.lpow(w[int(i)], 2.0)) for i in range(int(len(w))))), (_rt.add((sum((_rt.lpow(b[int(i)], 2.0)) for i in range(int(len(w))))), _rt.lpow(sigma, 2.0))))))
 
+def flipWeight(w, s, s_p):
+    return sum(((((0.0) if (s_p(i) == s(i)) else w[int(i)]))) for i in range(int(len(w))))
+
 def classMass(prior, summary, cls):
     return sum(((_rt._proj(prior, 'mass')(w) if (summary(w) == cls) else 0.0)) for w in range(int(_rt.sumdim('w', len(summary), len(_rt._proj(prior, 'mass'))))))
 
@@ -6723,6 +6831,9 @@ def separatingMetric(p, q):
 
 def singletonMetric(selected):
     return by(classical, exact, (lambda report: (1.0 if (Descent_Portability_FourCyclePrediction_report() == selected) else 0.0)))
+
+def pushLaw(K, p):
+    return (lambda y: sum((_rt.mul(p[int(x)], K[int(x)][int(y)])) for x in range(int(len(K)))))
 
 def proposalRate(rates):
     return (1.0 + sum((rates(index)) for index in range(int(_rt.sumdim('index', len(rates))))))

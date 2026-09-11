@@ -51,7 +51,8 @@ theorem directional_range (a u : E) (ha : ‖a‖ ≤ 1) (L U p : ℝ)
     |inner ℝ a u| * (U - L) / p ≤ ‖u‖ * (U - L) / p := by
   have hh : |inner ℝ a u| ≤ ‖u‖ := by
     calc
-      |inner ℝ a u| ≤ ‖a‖ * ‖u‖ := by simpa only [Real.norm_eq_abs] using norm_inner_le_norm a u
+      |inner ℝ a u| ≤ ‖a‖ * ‖u‖ := by
+        simpa only [Real.norm_eq_abs] using norm_inner_le_norm (𝕜 := ℝ) a u
       _ ≤ 1 * ‖u‖ := mul_le_mul_of_nonneg_right ha (norm_nonneg u)
       _ = ‖u‖ := one_mul _
   exact div_le_div_of_nonneg_right
@@ -82,6 +83,7 @@ theorem vector_confidence (μ : ι → Measure ℝ) [∀ i, IsProbabilityMeasure
     {z | radius M (varianceBound L U p q lo hi (fun i ↦ inner ℝ a (u i))) x <
       |contrast (fun i ↦ inner ℝ a (u i)) z - ∑ i, inner ℝ a (u i) * ∫ y, y ∂μ i|} from ?_)) ht
   intro z hz
+  change radius M v x < |inner ℝ a (error μ u z)| at hz
   rw [directional_error] at hz
   exact lt_of_le_of_lt hr hz
 
