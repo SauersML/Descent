@@ -441,7 +441,7 @@ def simplexLowOrderLDFeature (D : ℕ) (x : multiDemeSimplex D) :
 /-- Each haplotype coordinate is a continuous function of the multi-deme simplex point. -/
 theorem continuous_simplexEntry (D : ℕ) (d : Fin D) (k : Fin 4) :
     Continuous fun x : multiDemeSimplex D ↦ (x : Fin D → Fin 4 → ℝ) d k :=
-  ((continuous_apply k).comp (continuous_apply d)).comp continuous_subtype_val
+  (continuous_apply k).comp' ((continuous_apply d).comp' continuous_subtype_val)
 
 /-- The left-locus allele frequency is a continuous coordinate of the simplex point. -/
 theorem continuous_leftFrequency (D : ℕ) (d : Fin D) :
