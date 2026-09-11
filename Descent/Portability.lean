@@ -1,6 +1,11 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.AuditDesignNumericalCertificate
+import Descent.Portability.FourthMomentStrongDuality
+import Descent.Portability.MinimaxAuditDesignLaw
+import Descent.Portability.NearestDriftConfigurationCoupling
+import Descent.Portability.RangeAwareAuditSearch
 import Descent.Portability.GeometricAuditCaps
 import Descent.Portability.AuditRangeCaps
 import Descent.Portability.FiniteDualityNoGap

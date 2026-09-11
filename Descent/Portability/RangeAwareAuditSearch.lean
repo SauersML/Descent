@@ -67,6 +67,9 @@ theorem exact_solvers_guarantee (a : J → ι → ℝ) (floor c h : ι → ℝ)
     have hcap : 0 < cap := (hlow.trans_le (hranges p hp).1).trans_le hmc
     exact ⟨⟨⟨cap, hc⟩, p, (capped_feasible_iff floor c h p B cap hf hcap).mpr ⟨hp, hmc⟩⟩⟩
   letI := hvalid
+  letI : Finite (ValidCap floor c h B low high rate N) := by
+    unfold ValidCap
+    infer_instance
   obtain ⟨j, hj⟩ := Finite.exists_min (fun k ↦ fullRadius a h (solve k) x)
   refine ⟨j, hj, ?_⟩
   intro p hp
