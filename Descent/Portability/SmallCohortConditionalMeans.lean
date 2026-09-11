@@ -23,8 +23,9 @@ the mass in the `n!/(a! b! c! d!)` form of `FourCellCohortLaw.fourCell_census_ma
 (`multinomialLaw_mass_eq_censusWeight`). It is derived from
 `FourCellCohortLaw.cohortReport_expectation` by reindexing the corpus count type along an
 explicit bijection (`censusOf`), so no second counting argument is introduced. Evaluating
-that sum at `n = 3` and `n = 4` gives the definedness-weighted empirical squared correlation of an arbitrary four-cell law as an explicit polynomial in its four cell
-masses (`expectation_cohortCorrelation_three`, `expectation_cohortCorrelation_four`); dividing
+that sum at `n = 3` and `n = 4` gives the definedness-weighted empirical squared correlation
+of an arbitrary four-cell law as an explicit polynomial in its four cell masses
+(`expectation_cohortCorrelation_three`, `expectation_cohortCorrelation_four`); dividing
 by the definedness probabilities of `SmallCohortCorrelation` at the chronology cells of NOTE1
 (31) gives (41) and the tabulated values.
 
