@@ -3872,6 +3872,9 @@ def phenotypePrevalence(*_a):
 def phenotypeMarginalLogitShift(input, predictedPrevalence, rung):
     return _rt._proj(prevalenceCITLShift, 'value')(_rt._proj(predictedPrevalence, 'value'), (phenotypePrevalence(input, rung)))
 
+def quadraticFactor(r):
+    return (_rt.rdiv(1.0, 2.0) if (r == 1.0) else _rt.rdiv(klFun(r), _rt.lpow(((r - 1.0)), 2.0)))
+
 def expectedR2FromN(n, h2, M):
     return (h2 * (_rt.rdiv((n * h2), (((n * h2) + M)))))
 
@@ -4122,6 +4125,9 @@ def linearForm(a, x):
 
 def graphCenter(a, k, x):
     return _rt.sub(x[int(k)], _rt.rdiv(linearForm(a, x), a[int(k)]))
+
+def Descent_Portability_GaussianVarianceDensity_ratio(a, x):
+    return (_rt.rinv((_rt.rsqrt(a))) * _rt.rexp((_rt.rdiv((((1.0 - _rt.rinv(a))) * _rt.lpow(x, 2.0)), 2.0))))
 
 def branchKernel(branch, leaves):
     return _rt._proj((branchLaw(_rt._proj(branch, 'exposure'), (leaves(_rt._proj(branch, 'representative'))))), 'pushforward')((overwrite(branch, leaves)))

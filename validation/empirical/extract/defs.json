@@ -1,7 +1,7 @@
 {
  "_NOT_AUTHORITATIVE": "The committed copy of this file is STALE BY CONSTRUCTION: the Lean corpus moves every few minutes and this is a cache of it. Do not consume a committed copy -- run validation/extract/emit.py in your own worktree immediately before use, and call api.require_fresh(), which raises if the table does not describe the Lean on disk.",
- "source_digest": "sha256:fedb1026ff33a6a88ec1de0367a6932a",
- "source_files": 648,
+ "source_digest": "sha256:7a3fb2286eb04e9774b764359dc1962f",
+ "source_files": 653,
  "collisions": {},
  "theorems": [
   {
@@ -68950,6 +68950,64 @@
    ]
   },
   {
+   "name": "Descent.Portability.DensityRelativeEntropy.densityLaw_probability",
+   "kind": "theorem",
+   "file": "Descent/Portability/DensityRelativeEntropy.lean",
+   "line": 31,
+   "statement": "(μ : Measure Ω) (r : Ω → ℝ) (hr : Integrable r μ) (hp : ∀ᵐ x ∂μ, 0 ≤ r x) (hn : (∫ x, r x ∂μ) = 1) : IsProbabilityMeasure (densityLaw μ r)",
+   "mentions": [
+    "densityLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.DensityRelativeEntropy.densityLaw_rnDeriv",
+   "kind": "theorem",
+   "file": "Descent/Portability/DensityRelativeEntropy.lean",
+   "line": 40,
+   "statement": "(μ : Measure Ω) [SigmaFinite μ] (r : Ω → ℝ) (hr : Measurable r) (hp : ∀ᵐ x ∂μ, 0 ≤ r x) : (fun x ↦ ((densityLaw μ r).rnDeriv μ x).toReal) =ᵐ[μ] r",
+   "mentions": [
+    "densityLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.DensityRelativeEntropy.klFun_integrable_of_square",
+   "kind": "theorem",
+   "file": "Descent/Portability/DensityRelativeEntropy.lean",
+   "line": 47,
+   "statement": "(μ : Measure Ω) (r : Ω → ℝ) (hr : AEStronglyMeasurable r μ) (hp : ∀ᵐ x ∂μ, 0 ≤ r x) (hs : Integrable (fun x ↦ (r x - 1) ^ 2) μ) : Integrable (fun x ↦ klFun (r x)) μ",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Portability.DensityRelativeEntropy.densityLaw_klDiv",
+   "kind": "theorem",
+   "file": "Descent/Portability/DensityRelativeEntropy.lean",
+   "line": 56,
+   "statement": "(μ : Measure Ω) [IsProbabilityMeasure μ] (r : Ω → ℝ) (hr : Measurable r) (hi : Integrable r μ) (hp : ∀ᵐ x ∂μ, 0 ≤ r x) (hn : (∫ x, r x ∂μ) = 1) (hs : Integrable (fun x ↦ (r x - 1) ^ 2) μ) : klDiv (densityLaw μ r) μ = ENNReal.ofReal (∫ x, klFun (r x) ∂μ)",
+   "mentions": [
+    "densityLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.DensityRelativeEntropy.densityLaw_klDiv_ne_top",
+   "kind": "theorem",
+   "file": "Descent/Portability/DensityRelativeEntropy.lean",
+   "line": 75,
+   "statement": "(μ : Measure Ω) [IsProbabilityMeasure μ] (r : Ω → ℝ) (hr : Measurable r) (hi : Integrable r μ) (hp : ∀ᵐ x ∂μ, 0 ≤ r x) (hn : (∫ x, r x ∂μ) = 1) (hs : Integrable (fun x ↦ (r x - 1) ^ 2) μ) : klDiv (densityLaw μ r) μ ≠ ∞",
+   "mentions": [
+    "densityLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.DensityRelativeEntropy.densityLaw_klDiv_toReal",
+   "kind": "theorem",
+   "file": "Descent/Portability/DensityRelativeEntropy.lean",
+   "line": 83,
+   "statement": "(μ : Measure Ω) [IsProbabilityMeasure μ] (r : Ω → ℝ) (hr : Measurable r) (hi : Integrable r μ) (hp : ∀ᵐ x ∂μ, 0 ≤ r x) (hn : (∫ x, r x ∂μ) = 1) (hs : Integrable (fun x ↦ (r x - 1) ^ 2) μ) : (klDiv (densityLaw μ r) μ).toReal = ∫ x, klFun (r x) ∂μ",
+   "mentions": [
+    "densityLaw"
+   ]
+  },
+  {
    "name": "Descent.Portability.DiploidBernsteinLaw.inverseEntry_contract",
    "kind": "theorem",
    "file": "Descent/Portability/DiploidBernsteinLaw.lean",
@@ -72210,6 +72268,86 @@
     "calibrationSlope",
     "law",
     "linearCalibrationSlope"
+   ]
+  },
+  {
+   "name": "Descent.Portability.EntropyDensityExpansion.scaled_factorization",
+   "kind": "theorem",
+   "file": "Descent/Portability/EntropyDensityExpansion.lean",
+   "line": 26,
+   "statement": "(r ε : ℝ) : klFun r / ε ^ 4 = quadraticFactor r * ((r - 1) / ε ^ 2) ^ 2",
+   "mentions": [
+    "quadraticFactor"
+   ]
+  },
+  {
+   "name": "Descent.Portability.EntropyDensityExpansion.pointwise_quartic_limit",
+   "kind": "theorem",
+   "file": "Descent/Portability/EntropyDensityExpansion.lean",
+   "line": 33,
+   "statement": "(r : ℝ → ℝ) (h : ℝ) (hr : Tendsto (fun ε ↦ (r ε - 1) / ε ^ 2) (𝓝[≠] 0) (𝓝 h)) : Tendsto (fun ε ↦ klFun (r ε) / ε ^ 4) (𝓝[≠] 0) (𝓝 ((1 / 2 : ℝ) * h ^ 2))",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Portability.EntropyDensityExpansion.scaled_entropy_bound",
+   "kind": "theorem",
+   "file": "Descent/Portability/EntropyDensityExpansion.lean",
+   "line": 51,
+   "statement": "(r ε H : ℝ) (hr : 0 ≤ r) (hH : |(r - 1) / ε ^ 2| ≤ H) : ‖klFun r / ε ^ 4‖ ≤ H ^ 2",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Portability.EntropyDensityExpansion.entropy_integral_quartic_limit",
+   "kind": "theorem",
+   "file": "Descent/Portability/EntropyDensityExpansion.lean",
+   "line": 62,
+   "statement": "{Ω : Type*} [MeasurableSpace Ω] (μ : Measure Ω) (r : ℝ → Ω → ℝ) (h H : Ω → ℝ) (hmeas : ∀ᶠ ε in 𝓝[≠] 0, AEStronglyMeasurable (r ε) μ) (hpos : ∀ᶠ ε in 𝓝[≠] 0, ∀ᵐ x ∂μ, 0 ≤ r ε x) (hdom : ∀ᶠ ε in 𝓝[≠] 0, ∀ᵐ x ∂μ, |(r ε x - 1) / ε ^ 2| ≤ H x) (hH : Integrable (fun x ↦ H x ^ 2) μ) (hlim : ∀ᵐ x ∂μ, Tendsto (fun ε ↦ (r ε x - 1) / ε ^ 2) (𝓝[≠] 0) (𝓝 (h x))) : Tendsto (fun ε ↦ (∫ x, klFun (r ε x) ∂μ) / ε ^ 4) (𝓝[≠] 0) (𝓝 ((1 / 2 : ℝ) * ∫ x, h x ^ 2 ∂μ))",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Portability.EntropyQuadraticFactor.klFun_le_square",
+   "kind": "theorem",
+   "file": "Descent/Portability/EntropyQuadraticFactor.lean",
+   "line": 33,
+   "statement": "(r : ℝ) (hr : 0 ≤ r) : klFun r ≤ (r - 1) ^ 2",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Portability.EntropyQuadraticFactor.quadraticFactor_bounds",
+   "kind": "theorem",
+   "file": "Descent/Portability/EntropyQuadraticFactor.lean",
+   "line": 42,
+   "statement": "(r : ℝ) (hr : 0 ≤ r) : 0 ≤ quadraticFactor r ∧ quadraticFactor r ≤ 1",
+   "mentions": [
+    "quadraticFactor"
+   ]
+  },
+  {
+   "name": "Descent.Portability.EntropyQuadraticFactor.klFun_factorization",
+   "kind": "theorem",
+   "file": "Descent/Portability/EntropyQuadraticFactor.lean",
+   "line": 52,
+   "statement": "(r : ℝ) : klFun r = quadraticFactor r * (r - 1) ^ 2",
+   "mentions": [
+    "quadraticFactor"
+   ]
+  },
+  {
+   "name": "Descent.Portability.EntropyQuadraticFactor.quadratic_ratio_limit",
+   "kind": "theorem",
+   "file": "Descent/Portability/EntropyQuadraticFactor.lean",
+   "line": 59,
+   "statement": ": Tendsto (fun r : ℝ ↦ klFun r / (r - 1) ^ 2) (𝓝[≠] 1) (𝓝 (1 / 2 : ℝ))",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Portability.EntropyQuadraticFactor.quadraticFactor_continuousAt_one",
+   "kind": "theorem",
+   "file": "Descent/Portability/EntropyQuadraticFactor.lean",
+   "line": 87,
+   "statement": ": ContinuousAt quadraticFactor 1",
+   "mentions": [
+    "quadraticFactor"
    ]
   },
   {
@@ -77095,6 +77233,67 @@
     "effects",
     "innerValue",
     "outcome"
+   ]
+  },
+  {
+   "name": "Descent.Portability.GaussianVarianceDensity.ratio_pos",
+   "kind": "theorem",
+   "file": "Descent/Portability/GaussianVarianceDensity.lean",
+   "line": 29,
+   "statement": "(a x : ℝ) (ha : 0 < a) : 0 < ratio a x",
+   "mentions": [
+    "ratio"
+   ]
+  },
+  {
+   "name": "Descent.Portability.GaussianVarianceDensity.ratio_continuous",
+   "kind": "theorem",
+   "file": "Descent/Portability/GaussianVarianceDensity.lean",
+   "line": 33,
+   "statement": "(a : ℝ) : Continuous (ratio a)",
+   "mentions": [
+    "ratio"
+   ]
+  },
+  {
+   "name": "Descent.Portability.GaussianVarianceDensity.density_identity",
+   "kind": "theorem",
+   "file": "Descent/Portability/GaussianVarianceDensity.lean",
+   "line": 38,
+   "statement": "(a : ℝ) (ha : 0 < a) (x : ℝ) : gaussianPDFReal 0 1 x * ratio a x = gaussianPDFReal 0 ⟨a, ha.le⟩ x",
+   "mentions": [
+    "ratio"
+   ]
+  },
+  {
+   "name": "Descent.Portability.GaussianVarianceDensity.densityLaw_eq_gaussian",
+   "kind": "theorem",
+   "file": "Descent/Portability/GaussianVarianceDensity.lean",
+   "line": 53,
+   "statement": "(a : ℝ) (ha : 0 < a) : densityLaw (gaussianReal 0 1) (ratio a) = gaussianReal 0 ⟨a, ha.le⟩",
+   "mentions": [
+    "densityLaw",
+    "ratio"
+   ]
+  },
+  {
+   "name": "Descent.Portability.GaussianVarianceDensity.ratio_integrable",
+   "kind": "theorem",
+   "file": "Descent/Portability/GaussianVarianceDensity.lean",
+   "line": 70,
+   "statement": "(a : ℝ) (ha : 0 < a) : Integrable (ratio a) (gaussianReal 0 1)",
+   "mentions": [
+    "ratio"
+   ]
+  },
+  {
+   "name": "Descent.Portability.GaussianVarianceDensity.ratio_integral",
+   "kind": "theorem",
+   "file": "Descent/Portability/GaussianVarianceDensity.lean",
+   "line": 78,
+   "statement": "(a : ℝ) (ha : 0 < a) : (∫ x, ratio a x ∂gaussianReal 0 1) = 1",
+   "mentions": [
+    "ratio"
    ]
   },
   {
@@ -99511,6 +99710,32 @@
    "line": 47,
    "statement": "(f : ℝ → ℝ) {a b c : ℝ} (hc : c ∈ Ioo a b) (hf : ContDiffOn ℝ 3 f (Ioo a b)) (hzero : ∀ x ∈ Ioo a b, deriv (deriv (deriv f)) x = 0) : ∀ x ∈ Ioo a b, f x = f c + deriv f c * (x - c) + (deriv (deriv f) c / 2) * (x - c) ^ 2",
    "mentions": []
+  },
+  {
+   "name": "Descent.Portability.QuarticRelativeEntropy.perturbation_square_bound",
+   "kind": "theorem",
+   "file": "Descent/Portability/QuarticRelativeEntropy.lean",
+   "line": 26,
+   "statement": "(r ε H : ℝ) (hε : ε ≠ 0) (hH : |(r - 1) / ε ^ 2| ≤ H) : (r - 1) ^ 2 ≤ ε ^ 4 * H ^ 2",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Portability.QuarticRelativeEntropy.perturbation_square_integrable",
+   "kind": "theorem",
+   "file": "Descent/Portability/QuarticRelativeEntropy.lean",
+   "line": 37,
+   "statement": "{Ω : Type*} [MeasurableSpace Ω] (μ : Measure Ω) (r H : Ω → ℝ) (ε : ℝ) (hε : ε ≠ 0) (hr : AEStronglyMeasurable r μ) (hdom : ∀ᵐ x ∂μ, |(r x - 1) / ε ^ 2| ≤ H x) (hH : Integrable (fun x ↦ H x ^ 2) μ) : Integrable (fun x ↦ (r x - 1) ^ 2) μ",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Portability.QuarticRelativeEntropy.klDiv_quartic_limit",
+   "kind": "theorem",
+   "file": "Descent/Portability/QuarticRelativeEntropy.lean",
+   "line": 50,
+   "statement": "{Ω : Type*} [MeasurableSpace Ω] (μ : Measure Ω) [IsProbabilityMeasure μ] (r : ℝ → Ω → ℝ) (h H : Ω → ℝ) (hmeas : ∀ᶠ ε in 𝓝[≠] 0, Measurable (r ε)) (hint : ∀ᶠ ε in 𝓝[≠] 0, Integrable (r ε) μ) (hpos : ∀ᶠ ε in 𝓝[≠] 0, ∀ᵐ x ∂μ, 0 ≤ r ε x) (hnorm : ∀ᶠ ε in 𝓝[≠] 0, (∫ x, r ε x ∂μ) = 1) (hdom : ∀ᶠ ε in 𝓝[≠] 0, ∀ᵐ x ∂μ, |(r ε x - 1) / ε ^ 2| ≤ H x) (hH : Integrable (fun x ↦ H x ^ 2) μ) (hlim : ∀ᵐ x ∂μ, Tendsto (fun ε ↦ (r ε x - 1) / ε ^ 2) (𝓝[≠] 0) (𝓝 (h x))) : (∀ᶠ ε in 𝓝[≠] 0, klDiv (densityLaw μ (r ε)) μ ≠ ∞) ∧ Tendsto (fun ε ↦ (klDiv (densityLaw μ (r ε)) μ).toReal / ε ^ 4) (𝓝[≠] 0) (𝓝 ((1 / 2 : ℝ) * ∫ x, h x ^ 2 ∂μ))",
+   "mentions": [
+    "densityLaw"
+   ]
   },
   {
    "name": "Descent.Portability.RademacherArrayWeakLimit.sign_mean",
@@ -164486,6 +164711,8 @@
      "Descent.Portability.finite_postprocessors_adaptive_span_small": [],
      "Descent.Portability.CountTailConvergence.tendsto_of_layer_truncation": [],
      "Descent.Portability.CrossCoordinateRigidityLaw.closed_field_foreign_quadratic": [],
+     "Descent.Portability.DensityRelativeEntropy.klFun_integrable_of_square": [],
+     "Descent.Portability.DensityRelativeEntropy.densityLaw_klDiv": [],
      "Descent.Portability.DiploidBernsteinLaw.recover_phenotypeMean": [],
      "Descent.Portability.DiploidBernsteinLaw.realizingMap_mean": [],
      "Descent.Portability.DiploidBernsteinLaw.realizingMap_unique": [],
@@ -164567,6 +164794,9 @@
      "Descent.Portability.FiniteLiabilityPanel.prevalenceIntercept_shift": [],
      "Descent.Portability.FiniteLiabilityPanel.risk_shift": [],
      "Descent.Portability.RealizedPTGWASDraw.exists_phenotypeRisk_ne_of_baseline_not_common_shift": [],
+     "Descent.Portability.EntropyDensityExpansion.pointwise_quartic_limit": [],
+     "Descent.Portability.EntropyDensityExpansion.entropy_integral_quartic_limit": [],
+     "Descent.Portability.EntropyQuadraticFactor.quadratic_ratio_limit": [],
      "Descent.Portability.disparity_increases_with_distance": [],
      "Descent.Portability.chouldechova_impossibility": [],
      "Descent.Portability.equal_fpr_requires_different_thresholds": [],
@@ -164707,6 +164937,7 @@
      "Descent.Portability.GaussianSlabLaw.local_slab_mass": [],
      "Descent.Portability.GaussianSlabLaw.witnessed_ratio_gaussian_integral_top": [],
      "Descent.Portability.GaussianSlabLaw.witnessed_gaussian_label_numerator_top": [],
+     "Descent.Portability.GaussianVarianceDensity.ratio_integral": [],
      "Descent.Portability.GenealogyGenotypeLaw.branchKernel_commute": [],
      "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation": [
       "FullNeighborLocal adj K",
@@ -164960,6 +165191,8 @@
      "Descent.Portability.ProbitTrainingLaw.reportedAccuracy_eq_moment_sum": [],
      "Descent.Portability.QuadraticRigidityLaw.affine_of_second_derivative_zero": [],
      "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero": [],
+     "Descent.Portability.QuarticRelativeEntropy.perturbation_square_integrable": [],
+     "Descent.Portability.QuarticRelativeEntropy.klDiv_quartic_limit": [],
      "Descent.Portability.RademacherArrayWeakLimit.rows_tight": [],
      "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit": [],
      "Descent.Portability.RademacherJointLimit.parity_decomposition": [],
@@ -165865,6 +166098,8 @@
     "Descent.Portability.DemeMixture.pooledAUC_diagonal_offDiagonal",
     "Descent.Portability.DemeRiskPredictionPanel.metricDefinedMass_le_one",
     "Descent.Portability.DemeRiskPredictionPanel.outcomeWeight_nonneg",
+    "Descent.Portability.DensityRelativeEntropy.densityLaw_klDiv",
+    "Descent.Portability.DensityRelativeEntropy.klFun_integrable_of_square",
     "Descent.Portability.DiploidBernsteinLaw.phenotypeMean_polynomial",
     "Descent.Portability.DiploidBernsteinLaw.realizingMap_mean",
     "Descent.Portability.DiploidBernsteinLaw.realizingMap_unique",
@@ -165911,6 +166146,9 @@
     "Descent.Portability.DistanceBinnedPortabilityLaw.weighted_integrable",
     "Descent.Portability.DynamicBlindness.finite_powers_iff_all",
     "Descent.Portability.EllipsoidTargetRadius.weighted_fiber_minimax",
+    "Descent.Portability.EntropyDensityExpansion.entropy_integral_quartic_limit",
+    "Descent.Portability.EntropyDensityExpansion.pointwise_quartic_limit",
+    "Descent.Portability.EntropyQuadraticFactor.quadratic_ratio_limit",
     "Descent.Portability.EscapingCharacteristicKernel.kernel_inverse_bound",
     "Descent.Portability.EscapingCharacteristicKernel.kernel_tendsto_zero_of_abs_tendsto_atTop",
     "Descent.Portability.EvolutionaryForecastMinimax.adaptive_forecast_minimax",
@@ -166038,6 +166276,7 @@
     "Descent.Portability.GaussianSlabLaw.section_lower",
     "Descent.Portability.GaussianSlabLaw.witnessed_gaussian_label_numerator_top",
     "Descent.Portability.GaussianSlabLaw.witnessed_ratio_gaussian_integral_top",
+    "Descent.Portability.GaussianVarianceDensity.ratio_integral",
     "Descent.Portability.GenealogyGenotypeLaw.branchKernel_commute",
     "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation",
     "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation",
@@ -166217,6 +166456,8 @@
     "Descent.Portability.ProbitTrainingLaw.threshold_probability",
     "Descent.Portability.QuadraticRigidityLaw.affine_of_second_derivative_zero",
     "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero",
+    "Descent.Portability.QuarticRelativeEntropy.klDiv_quartic_limit",
+    "Descent.Portability.QuarticRelativeEntropy.perturbation_square_integrable",
     "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit",
     "Descent.Portability.RademacherArrayWeakLimit.rows_tight",
     "Descent.Portability.RademacherJointLimit.parity_decomposition",
@@ -174704,6 +174945,7 @@
      "Descent.Portability.DistanceBinnedPortabilityLaw.binInner_measurable": [],
      "Descent.Portability.DistanceBinnedPortabilityLaw.binClippedInner_measurable": [],
      "Descent.Portability.DistanceBinnedPortabilityLaw.finite_bin_expectation": [],
+     "Descent.Portability.EntropyDensityExpansion.pointwise_quartic_limit": [],
      "Descent.Portability.ExponentialPoissonRace.poisson_coefficient_integrable": [],
      "Descent.Portability.FiniteL1WeakStability.varying_scale_limit": [],
      "Descent.Portability.FiniteMetricIdentification.continuous_pairing": [],
@@ -174805,6 +175047,7 @@
     "Descent.Portability.DistanceBinnedPortabilityLaw.binInner_measurable",
     "Descent.Portability.DistanceBinnedPortabilityLaw.finite_bin_expectation",
     "Descent.Portability.DistanceBinnedPortabilityLaw.weighted_integrable",
+    "Descent.Portability.EntropyDensityExpansion.pointwise_quartic_limit",
     "Descent.Portability.ExponentialPoissonRace.poisson_coefficient_integrable",
     "Descent.Portability.FiniteL1WeakStability.varying_scale_limit",
     "Descent.Portability.FiniteMetricIdentification.continuous_pairing",
@@ -178666,6 +178909,8 @@
      "Descent.Portability.finite_postprocessors_adaptive_span_small": [],
      "Descent.Portability.CountTailConvergence.tendsto_of_layer_truncation": [],
      "Descent.Portability.CrossCoordinateRigidityLaw.closed_field_foreign_quadratic": [],
+     "Descent.Portability.DensityRelativeEntropy.klFun_integrable_of_square": [],
+     "Descent.Portability.DensityRelativeEntropy.densityLaw_klDiv": [],
      "Descent.Portability.DiploidBernsteinLaw.recover_phenotypeMean": [],
      "Descent.Portability.DiploidBernsteinLaw.realizingMap_mean": [],
      "Descent.Portability.DiploidBernsteinLaw.realizingMap_unique": [],
@@ -178747,6 +178992,9 @@
      "Descent.Portability.FiniteLiabilityPanel.prevalenceIntercept_shift": [],
      "Descent.Portability.FiniteLiabilityPanel.risk_shift": [],
      "Descent.Portability.RealizedPTGWASDraw.exists_phenotypeRisk_ne_of_baseline_not_common_shift": [],
+     "Descent.Portability.EntropyDensityExpansion.pointwise_quartic_limit": [],
+     "Descent.Portability.EntropyDensityExpansion.entropy_integral_quartic_limit": [],
+     "Descent.Portability.EntropyQuadraticFactor.quadratic_ratio_limit": [],
      "Descent.Portability.disparity_increases_with_distance": [],
      "Descent.Portability.chouldechova_impossibility": [],
      "Descent.Portability.equal_fpr_requires_different_thresholds": [],
@@ -178885,6 +179133,7 @@
      "Descent.Portability.GaussianSlabLaw.local_slab_mass": [],
      "Descent.Portability.GaussianSlabLaw.witnessed_ratio_gaussian_integral_top": [],
      "Descent.Portability.GaussianSlabLaw.witnessed_gaussian_label_numerator_top": [],
+     "Descent.Portability.GaussianVarianceDensity.ratio_integral": [],
      "Descent.Portability.GenealogyGenotypeLaw.branchKernel_commute": [],
      "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation": [],
      "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation": [],
@@ -179122,6 +179371,8 @@
      "Descent.Portability.ProbitTrainingLaw.reportedAccuracy_eq_moment_sum": [],
      "Descent.Portability.QuadraticRigidityLaw.affine_of_second_derivative_zero": [],
      "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero": [],
+     "Descent.Portability.QuarticRelativeEntropy.perturbation_square_integrable": [],
+     "Descent.Portability.QuarticRelativeEntropy.klDiv_quartic_limit": [],
      "Descent.Portability.RademacherArrayWeakLimit.rows_tight": [],
      "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit": [],
      "Descent.Portability.RademacherJointLimit.parity_decomposition": [],
@@ -180023,6 +180274,8 @@
     "Descent.Portability.DemeMixture.pooledAUC_diagonal_offDiagonal",
     "Descent.Portability.DemeRiskPredictionPanel.metricDefinedMass_le_one",
     "Descent.Portability.DemeRiskPredictionPanel.outcomeWeight_nonneg",
+    "Descent.Portability.DensityRelativeEntropy.densityLaw_klDiv",
+    "Descent.Portability.DensityRelativeEntropy.klFun_integrable_of_square",
     "Descent.Portability.DiploidBernsteinLaw.phenotypeMean_polynomial",
     "Descent.Portability.DiploidBernsteinLaw.realizingMap_mean",
     "Descent.Portability.DiploidBernsteinLaw.realizingMap_unique",
@@ -180069,6 +180322,9 @@
     "Descent.Portability.DistanceBinnedPortabilityLaw.weighted_integrable",
     "Descent.Portability.DynamicBlindness.finite_powers_iff_all",
     "Descent.Portability.EllipsoidTargetRadius.weighted_fiber_minimax",
+    "Descent.Portability.EntropyDensityExpansion.entropy_integral_quartic_limit",
+    "Descent.Portability.EntropyDensityExpansion.pointwise_quartic_limit",
+    "Descent.Portability.EntropyQuadraticFactor.quadratic_ratio_limit",
     "Descent.Portability.EscapingCharacteristicKernel.kernel_inverse_bound",
     "Descent.Portability.EscapingCharacteristicKernel.kernel_tendsto_zero_of_abs_tendsto_atTop",
     "Descent.Portability.EvolutionaryForecastMinimax.adaptive_forecast_minimax",
@@ -180196,6 +180452,7 @@
     "Descent.Portability.GaussianSlabLaw.section_lower",
     "Descent.Portability.GaussianSlabLaw.witnessed_gaussian_label_numerator_top",
     "Descent.Portability.GaussianSlabLaw.witnessed_ratio_gaussian_integral_top",
+    "Descent.Portability.GaussianVarianceDensity.ratio_integral",
     "Descent.Portability.GenealogyGenotypeLaw.branchKernel_commute",
     "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation",
     "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation",
@@ -180375,6 +180632,8 @@
     "Descent.Portability.ProbitTrainingLaw.threshold_probability",
     "Descent.Portability.QuadraticRigidityLaw.affine_of_second_derivative_zero",
     "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero",
+    "Descent.Portability.QuarticRelativeEntropy.klDiv_quartic_limit",
+    "Descent.Portability.QuarticRelativeEntropy.perturbation_square_integrable",
     "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit",
     "Descent.Portability.RademacherArrayWeakLimit.rows_tight",
     "Descent.Portability.RademacherJointLimit.parity_decomposition",
@@ -201563,6 +201822,8 @@
       "∀ x ∈ Ioo a b, ∀ y ∈ Ioo c d, deriv (bi x",
       "x ∈ Ioo a b"
      ],
+     "Descent.Portability.DensityRelativeEntropy.klFun_integrable_of_square": [],
+     "Descent.Portability.DensityRelativeEntropy.densityLaw_klDiv": [],
      "Descent.Portability.DiploidBernsteinLaw.recover_phenotypeMean": [],
      "Descent.Portability.DiploidBernsteinLaw.realizingMap_mean": [],
      "Descent.Portability.DiploidBernsteinLaw.realizingMap_unique": [],
@@ -201650,6 +201911,9 @@
      "Descent.Portability.FiniteLiabilityPanel.prevalenceIntercept_shift": [],
      "Descent.Portability.FiniteLiabilityPanel.risk_shift": [],
      "Descent.Portability.RealizedPTGWASDraw.exists_phenotypeRisk_ne_of_baseline_not_common_shift": [],
+     "Descent.Portability.EntropyDensityExpansion.pointwise_quartic_limit": [],
+     "Descent.Portability.EntropyDensityExpansion.entropy_integral_quartic_limit": [],
+     "Descent.Portability.EntropyQuadraticFactor.quadratic_ratio_limit": [],
      "Descent.Portability.disparity_increases_with_distance": [],
      "Descent.Portability.chouldechova_impossibility": [],
      "Descent.Portability.equal_fpr_requires_different_thresholds": [],
@@ -201776,6 +202040,7 @@
      "Descent.Portability.GaussianSlabLaw.local_slab_mass": [],
      "Descent.Portability.GaussianSlabLaw.witnessed_ratio_gaussian_integral_top": [],
      "Descent.Portability.GaussianSlabLaw.witnessed_gaussian_label_numerator_top": [],
+     "Descent.Portability.GaussianVarianceDensity.ratio_integral": [],
      "Descent.Portability.GenealogyGenotypeLaw.branchKernel_commute": [],
      "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation": [],
      "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation": [],
@@ -202010,6 +202275,8 @@
       "ContDiffOn ℝ 3 f (Ioo a b",
       "∀ x ∈ Ioo a b, deriv (deriv (deriv f"
      ],
+     "Descent.Portability.QuarticRelativeEntropy.perturbation_square_integrable": [],
+     "Descent.Portability.QuarticRelativeEntropy.klDiv_quartic_limit": [],
      "Descent.Portability.RademacherArrayWeakLimit.rows_tight": [],
      "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit": [],
      "Descent.Portability.RademacherJointLimit.parity_decomposition": [],
@@ -202902,6 +203169,8 @@
     "Descent.Portability.DemeMixture.pooledAUC_diagonal_offDiagonal",
     "Descent.Portability.DemeRiskPredictionPanel.metricDefinedMass_le_one",
     "Descent.Portability.DemeRiskPredictionPanel.outcomeWeight_nonneg",
+    "Descent.Portability.DensityRelativeEntropy.densityLaw_klDiv",
+    "Descent.Portability.DensityRelativeEntropy.klFun_integrable_of_square",
     "Descent.Portability.DiploidBernsteinLaw.phenotypeMean_polynomial",
     "Descent.Portability.DiploidBernsteinLaw.realizingMap_mean",
     "Descent.Portability.DiploidBernsteinLaw.realizingMap_unique",
@@ -202948,6 +203217,9 @@
     "Descent.Portability.DistanceBinnedPortabilityLaw.weighted_integrable",
     "Descent.Portability.DynamicBlindness.finite_powers_iff_all",
     "Descent.Portability.EllipsoidTargetRadius.weighted_fiber_minimax",
+    "Descent.Portability.EntropyDensityExpansion.entropy_integral_quartic_limit",
+    "Descent.Portability.EntropyDensityExpansion.pointwise_quartic_limit",
+    "Descent.Portability.EntropyQuadraticFactor.quadratic_ratio_limit",
     "Descent.Portability.EscapingCharacteristicKernel.kernel_inverse_bound",
     "Descent.Portability.EscapingCharacteristicKernel.kernel_tendsto_zero_of_abs_tendsto_atTop",
     "Descent.Portability.EvolutionaryForecastMinimax.adaptive_forecast_minimax",
@@ -203075,6 +203347,7 @@
     "Descent.Portability.GaussianSlabLaw.section_lower",
     "Descent.Portability.GaussianSlabLaw.witnessed_gaussian_label_numerator_top",
     "Descent.Portability.GaussianSlabLaw.witnessed_ratio_gaussian_integral_top",
+    "Descent.Portability.GaussianVarianceDensity.ratio_integral",
     "Descent.Portability.GenealogyGenotypeLaw.branchKernel_commute",
     "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation",
     "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation",
@@ -203254,6 +203527,8 @@
     "Descent.Portability.ProbitTrainingLaw.threshold_probability",
     "Descent.Portability.QuadraticRigidityLaw.affine_of_second_derivative_zero",
     "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero",
+    "Descent.Portability.QuarticRelativeEntropy.klDiv_quartic_limit",
+    "Descent.Portability.QuarticRelativeEntropy.perturbation_square_integrable",
     "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit",
     "Descent.Portability.RademacherArrayWeakLimit.rows_tight",
     "Descent.Portability.RademacherJointLimit.parity_decomposition",
@@ -204175,6 +204450,7 @@
       "∀ x ∈ Ioo a b, ∀ y ∈ Ioo c d, deriv (bi x",
       "x ∈ Ioo a b"
      ],
+     "Descent.Portability.DensityRelativeEntropy.densityLaw_klDiv": [],
      "Descent.Portability.DiploidBoxCompatibilityLaw.realized_field_conditions": [],
      "Descent.Portability.DiploidBoxUniquenessLaw.box_mean_difference_determines_map": [],
      "Descent.Portability.DiploidEffectFieldLaw.erased_product_update": [],
@@ -204201,6 +204477,7 @@
      "Descent.Portability.PipelineDemographicHistory.commonDiffusionProjection_exact": [],
      "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
      "Descent.Portability.FiniteLiabilityPanel.risk_eq_iff_liability_eq_up_to_common_shift": [],
+     "Descent.Portability.EntropyQuadraticFactor.klFun_factorization": [],
      "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure": [],
      "Descent.Portability.FiniteBinCalibrationLaw.rate_bounds": [],
      "Descent.Portability.FiniteCovarianceMoments.coefficients_zero": [],
@@ -204589,6 +204866,7 @@
     "Descent.Portability.CrossCoordinateRigidityLaw.affine_two_point",
     "Descent.Portability.CrossCoordinateRigidityLaw.closed_field_foreign_quadratic",
     "Descent.Portability.DemeRiskPredictionPanel.outcomeWeight_sum_one",
+    "Descent.Portability.DensityRelativeEntropy.densityLaw_klDiv",
     "Descent.Portability.DiploidBoxCompatibilityLaw.realized_field_conditions",
     "Descent.Portability.DiploidBoxUniquenessLaw.box_mean_difference_determines_map",
     "Descent.Portability.DiploidEffectFieldLaw.effectField_cross_derivatives",
@@ -204599,6 +204877,7 @@
     "Descent.Portability.DistanceBinnedPortabilityLaw.binInner_eq_iSup_clipped",
     "Descent.Portability.DistanceBinnedPortabilityLaw.finite_bin_expectation",
     "Descent.Portability.EllipsoidTargetRadius.weighted_ellipsoid_minimax",
+    "Descent.Portability.EntropyQuadraticFactor.klFun_factorization",
     "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure",
     "Descent.Portability.FiniteBinCalibrationLaw.rate_bounds",
     "Descent.Portability.FiniteCovarianceMoments.coefficients_zero",
@@ -205111,6 +205390,7 @@
      "Descent.Portability.PipelineDemographicHistory.manyDemeSampleCountProjection_eq_momentMass": [],
      "Descent.Portability.FiniteLiabilityPanel.abs_liability_le_liabilityAbsSum": [],
      "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
+     "Descent.Portability.EntropyDensityExpansion.scaled_entropy_bound": [],
      "Descent.Portability.ExactFiniteHistoryLaw.report_path_sum_eq_backward": [],
      "Descent.Portability.FiniteCountTail.tail_bound": [],
      "Descent.Portability.FiniteCovarianceMoments.orbit_eq_of_variance_moments": [],
@@ -205355,6 +205635,7 @@
     "Descent.Portability.DiscountedForecastMinimax.symmetric_eq_of_quadratic",
     "Descent.Portability.DistanceBinnedPortabilityLaw.binInner_eq_iSup_clipped",
     "Descent.Portability.DistanceBinnedPortabilityLaw.weighted_integrable",
+    "Descent.Portability.EntropyDensityExpansion.scaled_entropy_bound",
     "Descent.Portability.ExactFiniteHistoryLaw.report_path_sum_eq_backward",
     "Descent.Portability.FiniteCountTail.tail_bound",
     "Descent.Portability.FiniteCovarianceMoments.orbit_eq_of_variance_moments",
@@ -206512,6 +206793,7 @@
     "declared_lo": 0.0,
     "declared_hi": 1.0,
     "hypotheses": [
+     "0 < a",
      "a ≠ 0"
     ],
     "hypotheses_by_theorem": {
@@ -206592,6 +206874,22 @@
      "Descent.Portability.portable_fraction_le_one": [],
      "Descent.Portability.portableFraction_residual_eq_complement": [],
      "Descent.Portability.GaussianEffectPortabilityLaw.report_eq_ratio": [],
+     "Descent.Portability.GaussianVarianceDensity.ratio_pos": [
+      "0 < a"
+     ],
+     "Descent.Portability.GaussianVarianceDensity.ratio_continuous": [],
+     "Descent.Portability.GaussianVarianceDensity.density_identity": [
+      "0 < a"
+     ],
+     "Descent.Portability.GaussianVarianceDensity.densityLaw_eq_gaussian": [
+      "0 < a"
+     ],
+     "Descent.Portability.GaussianVarianceDensity.ratio_integrable": [
+      "0 < a"
+     ],
+     "Descent.Portability.GaussianVarianceDensity.ratio_integral": [
+      "0 < a"
+     ],
      "Descent.Portability.neutralDriftR2Ratio_eq_core": [],
      "Descent.Portability.fstFromGenerations_le_coalescentTau": [],
      "Descent.Portability.sourceSquaredEffectMass_at_reference_point": [],
@@ -206665,7 +206963,12 @@
      "Descent.Spectral.informationPerUnitCost_cost_scaling": [],
      "Descent.Spectral.augmented_informationPerUnitCost_gt_iff": [],
      "Descent.Spectral.detectionWeight_eq_ratio_reconstructionWeight": []
-    }
+    },
+    "range_lo_thm": [
+     "Descent.Portability.GaussianVarianceDensity.ratio_pos",
+     1
+    ],
+    "range_lo": 0
    },
    "mentioned_by": [
     "Descent.Blindness.dropout_floor_caps_explainable_fraction",
@@ -206742,6 +207045,12 @@
     "Descent.PopGen.snp_h2_le_narrow_h2",
     "Descent.PopGen.stabilizingSelectedArchitectureVariance_at_reference_point",
     "Descent.Portability.GaussianEffectPortabilityLaw.report_eq_ratio",
+    "Descent.Portability.GaussianVarianceDensity.densityLaw_eq_gaussian",
+    "Descent.Portability.GaussianVarianceDensity.density_identity",
+    "Descent.Portability.GaussianVarianceDensity.ratio_continuous",
+    "Descent.Portability.GaussianVarianceDensity.ratio_integrable",
+    "Descent.Portability.GaussianVarianceDensity.ratio_integral",
+    "Descent.Portability.GaussianVarianceDensity.ratio_pos",
     "Descent.Portability.ProbitTrainingLaw.fixedData_reportedRatio_bounded",
     "Descent.Portability.ProbitTrainingLaw.reportedRatio_bounds",
     "Descent.Portability.ProbitTrainingLaw.reportedSourceRatio_eq_one",
@@ -236568,6 +236877,7 @@
      ],
      "Descent.Portability.EllipsoidTargetRadius.zero_radius_iff_kernel": [],
      "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
+     "Descent.Portability.EntropyDensityExpansion.pointwise_quartic_limit": [],
      "Descent.Portability.ErasedSampleObservation.erasure_measurable": [],
      "Descent.Portability.EscapingCharacteristicKernel.kernel_tendsto_zero_of_abs_tendsto_atTop": [],
      "Descent.Portability.EvolutionaryForecastMinimax.euclideanOperator_comp": [],
@@ -236726,6 +237036,7 @@
     "Descent.Portability.EllipsoidTargetRadius.weighted_ellipsoid_minimax",
     "Descent.Portability.EllipsoidTargetRadius.weighted_fiber_minimax",
     "Descent.Portability.EllipsoidTargetRadius.zero_radius_iff_kernel",
+    "Descent.Portability.EntropyDensityExpansion.pointwise_quartic_limit",
     "Descent.Portability.ErasedSampleObservation.erasure_measurable",
     "Descent.Portability.EscapingCharacteristicKernel.kernel_tendsto_zero_of_abs_tendsto_atTop",
     "Descent.Portability.EvolutionaryForecastMinimax.euclideanOperator_comp",
@@ -290000,6 +290311,106 @@
    ]
   },
   {
+   "name": "Descent.Portability.DensityRelativeEntropy.densityLaw",
+   "decl_name": "densityLaw",
+   "short": "densityLaw",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/DensityRelativeEntropy.lean",
+   "line": 27,
+   "signature": "(μ : Measure Ω) (r : Ω → ℝ) : Measure Ω",
+   "args": [
+    {
+     "names": [
+      "μ"
+     ],
+     "type": "Measure Ω",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "r"
+     ],
+     "type": "Ω → ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "Measure Ω",
+   "body": "  μ.withDensity (fun x ↦ ENNReal.ofReal (r x))",
+   "docstring": "The actual measure obtained by changing density relative to the specified reference law.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.DensityRelativeEntropy",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "Integrable r μ",
+     "∀ᵐ x ∂μ, 0 ≤ r x",
+     "(∫ x, r x ∂μ",
+     "Measurable r",
+     "Integrable (fun x ↦ (r x - 1",
+     "∀ᶠ ε in 𝓝[≠] 0, Measurable (r ε",
+     "∀ᶠ ε in 𝓝[≠] 0, Integrable (r ε",
+     "∀ᶠ ε in 𝓝[≠] 0, ∀ᵐ x ∂μ, 0 ≤ r ε x",
+     "∀ᶠ ε in 𝓝[≠] 0, (∫ x, r ε x ∂μ",
+     "∀ᶠ ε in 𝓝[≠] 0, ∀ᵐ x ∂μ, |(r ε x - 1",
+     "∀ᵐ x ∂μ, Tendsto (fun ε ↦ (r ε x - 1"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.DensityRelativeEntropy.densityLaw_probability": [
+      "Integrable r μ",
+      "∀ᵐ x ∂μ, 0 ≤ r x",
+      "(∫ x, r x ∂μ"
+     ],
+     "Descent.Portability.DensityRelativeEntropy.densityLaw_rnDeriv": [
+      "Measurable r",
+      "∀ᵐ x ∂μ, 0 ≤ r x"
+     ],
+     "Descent.Portability.DensityRelativeEntropy.densityLaw_klDiv": [
+      "Measurable r",
+      "Integrable r μ",
+      "∀ᵐ x ∂μ, 0 ≤ r x",
+      "(∫ x, r x ∂μ",
+      "Integrable (fun x ↦ (r x - 1"
+     ],
+     "Descent.Portability.DensityRelativeEntropy.densityLaw_klDiv_ne_top": [
+      "Measurable r",
+      "Integrable r μ",
+      "∀ᵐ x ∂μ, 0 ≤ r x",
+      "(∫ x, r x ∂μ",
+      "Integrable (fun x ↦ (r x - 1"
+     ],
+     "Descent.Portability.DensityRelativeEntropy.densityLaw_klDiv_toReal": [
+      "Measurable r",
+      "Integrable r μ",
+      "∀ᵐ x ∂μ, 0 ≤ r x",
+      "(∫ x, r x ∂μ",
+      "Integrable (fun x ↦ (r x - 1"
+     ],
+     "Descent.Portability.GaussianVarianceDensity.densityLaw_eq_gaussian": [],
+     "Descent.Portability.QuarticRelativeEntropy.klDiv_quartic_limit": [
+      "∀ᶠ ε in 𝓝[≠] 0, Measurable (r ε",
+      "∀ᶠ ε in 𝓝[≠] 0, Integrable (r ε",
+      "∀ᶠ ε in 𝓝[≠] 0, ∀ᵐ x ∂μ, 0 ≤ r ε x",
+      "∀ᶠ ε in 𝓝[≠] 0, (∫ x, r ε x ∂μ",
+      "∀ᶠ ε in 𝓝[≠] 0, ∀ᵐ x ∂μ, |(r ε x - 1",
+      "∀ᵐ x ∂μ, Tendsto (fun ε ↦ (r ε x - 1"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.DensityRelativeEntropy.densityLaw_klDiv",
+    "Descent.Portability.DensityRelativeEntropy.densityLaw_klDiv_ne_top",
+    "Descent.Portability.DensityRelativeEntropy.densityLaw_klDiv_toReal",
+    "Descent.Portability.DensityRelativeEntropy.densityLaw_probability",
+    "Descent.Portability.DensityRelativeEntropy.densityLaw_rnDeriv",
+    "Descent.Portability.GaussianVarianceDensity.densityLaw_eq_gaussian",
+    "Descent.Portability.QuarticRelativeEntropy.klDiv_quartic_limit"
+   ]
+  },
+  {
    "name": "Descent.Portability.DiploidBernsteinLaw.inverseEntry",
    "decl_name": "inverseEntry",
    "short": "inverseEntry",
@@ -309799,6 +310210,67 @@
    ]
   },
   {
+   "name": "Descent.Portability.EntropyQuadraticFactor.quadraticFactor",
+   "decl_name": "quadraticFactor",
+   "short": "quadraticFactor",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/EntropyQuadraticFactor.lean",
+   "line": 29,
+   "signature": "(r : ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "r"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  if r = 1 then 1 / 2 else klFun r / (r - 1) ^ 2",
+   "docstring": "The continuous quadratic coefficient of relative entropy at density ratio one.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.EntropyQuadraticFactor",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "Tendsto (fun ε ↦ (r ε - 1",
+     "0 ≤ r"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.EntropyDensityExpansion.scaled_factorization": [],
+     "Descent.Portability.EntropyDensityExpansion.pointwise_quartic_limit": [
+      "Tendsto (fun ε ↦ (r ε - 1"
+     ],
+     "Descent.Portability.EntropyQuadraticFactor.quadraticFactor_bounds": [
+      "0 ≤ r"
+     ],
+     "Descent.Portability.EntropyQuadraticFactor.klFun_factorization": [],
+     "Descent.Portability.EntropyQuadraticFactor.quadraticFactor_continuousAt_one": []
+    },
+    "range_lo_thm": [
+     "Descent.Portability.EntropyQuadraticFactor.quadraticFactor_bounds",
+     1
+    ],
+    "range_hi_thm": [
+     "Descent.Portability.EntropyQuadraticFactor.quadraticFactor_bounds",
+     1
+    ],
+    "range_lo": 0,
+    "range_hi": 1
+   },
+   "mentioned_by": [
+    "Descent.Portability.EntropyDensityExpansion.pointwise_quartic_limit",
+    "Descent.Portability.EntropyDensityExpansion.scaled_factorization",
+    "Descent.Portability.EntropyQuadraticFactor.klFun_factorization",
+    "Descent.Portability.EntropyQuadraticFactor.quadraticFactor_bounds",
+    "Descent.Portability.EntropyQuadraticFactor.quadraticFactor_continuousAt_one"
+   ]
+  },
+  {
    "name": "Descent.Portability.expectedR2FromN",
    "decl_name": "expectedR2FromN",
    "short": "expectedR2FromN",
@@ -323880,6 +324352,370 @@
     "Descent.Portability.GaussianSlabLaw.local_slab_mass",
     "Descent.Portability.GaussianSlabLaw.nontrivial_local_slab_mass",
     "Descent.Portability.GaussianSlabLaw.section_lower"
+   ]
+  },
+  {
+   "name": "Descent.Portability.GaussianVarianceDensity.ratio",
+   "decl_name": "ratio",
+   "short": "ratio",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/GaussianVarianceDensity.lean",
+   "line": 25,
+   "signature": "(a x : ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "a",
+      "x"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  (Real.sqrt a)⁻¹ * Real.exp ((1 - a⁻¹) * x ^ 2 / 2)",
+   "docstring": "Density ratio of a centered Gaussian of variance a against the standard Gaussian.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.GaussianVarianceDensity",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "ratio",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0,
+    "hypotheses": [
+     "0 < a",
+     "a ≠ 0"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Blindness.dropout_floor_caps_explainable_fraction": [],
+     "Descent.Blindness.frontSpeedBiasParameter_at_zero_scale_is_junk": [],
+     "Descent.Blindness.frontSpeedBias_tripleMergerRate": [],
+     "Descent.Blindness.frontSpeedBias_tripleMergerRate_injective": [],
+     "Descent.Blindness.frontSpeedTiltFromTripleRate_recovers": [],
+     "Descent.Core.OperatingPoint.f1_at_perfect": [],
+     "Descent.Core.OperatingPoint.f1_treatNone_is_junk": [],
+     "Descent.Core.OperatingPoint.thresholdOdds_at_half": [],
+     "Descent.Core.OperatingPoint.thresholdOdds_at_zero": [],
+     "Descent.Core.OperatingPoint.thresholdOdds_at_one_is_junk": [],
+     "Descent.Core.OperatingPoint.thresholdOdds_pos": [],
+     "Descent.Core.OperatingPoint.thresholdOdds_nonneg": [],
+     "Descent.Core.OperatingPoint.thresholdOdds_lt_of_lt": [],
+     "Descent.Core.islandDemeCorrection_one_is_junk": [],
+     "Descent.Core.islandDemeCorrection_two": [],
+     "Descent.Core.islandDemeCorrection_twenty": [],
+     "Descent.Core.islandDemeCorrection_sub_one": [],
+     "Descent.Core.islandDemeCorrection_tendsto_one": [],
+     "Descent.Core.ScoreMoments.calibrationSlope_eq_one_iff": [],
+     "Descent.Core.ScoreMoments.r2_eq_slope_mul": [],
+     "Descent.Core.ScoreMoments.calibrationSlope_momentsUnderDrift_at_zero": [],
+     "Descent.Core.ScoreMoments.calibrationSlope_momentsUnderDrift": [],
+     "Descent.Core.ScoreMoments.portabilityRatio_mem_unit": [],
+     "Descent.Core.ScoreMoments.portabilityRatio_at_source": [],
+     "Descent.Core.ScoreMoments.aucArgument_mono": [],
+     "Descent.Core.ScoreMoments.portabilityRatioFromTau_anti": [],
+     "Descent.Core.ScoreMoments.deployedPortabilityRatio_lt_of_fstEquilibrium_lt": [],
+     "Descent.Core.PopGenParameters.fstEquilibrium_ne_island_manyDemes": [],
+     "Descent.Core.PopGenParameters.fstEquilibrium_lt_of_nDemes_lt": [],
+     "Descent.Core.ratio_zero_denominator_is_junk": [],
+     "Descent.Core.ratio_at_reference_point": [],
+     "Descent.Core.Tau.value_ofGenerations": [],
+     "Descent.Core.demeCorrection_at_two": [],
+     "Descent.Core.demeCorrection_at_twenty": [],
+     "Descent.Core.demeCorrection_gt_one": [],
+     "Descent.Decision.heritabilityFractionFromN_odds": [],
+     "Descent.Foundations.explainableFraction_zero_total_is_junk": [],
+     "Descent.Foundations.explainableFraction_eq_complement_within": [],
+     "Descent.Foundations.explainable_fraction_bound_of_noise_floor": [],
+     "Descent.Pangenome.Growth.expectedPanSize_step": [],
+     "Descent.Pangenome.Growth.expectedPanSize_step_antitone": [],
+     "Descent.Pangenome.Growth.expectedPanSize_step_pos": [],
+     "Descent.Pangenome.Register.orbitAverage_eq_ratio": [],
+     "Descent.PopGen.crossPopulationGeneTransferFraction_eq_complement": [],
+     "Descent.PopGen.fstDemeCorrectedFlowStep_uses_coalescentTimeScale": [],
+     "Descent.PopGen.fstDemeCorrectedFlowStep_constants_named": [],
+     "Descent.PopGen.islandFstFiniteDemes_eq_scaled": [],
+     "Descent.PopGen.linearNormOfReaction_slope_identified": [],
+     "Descent.PopGen.perCausalLocusSignal_zero_k_is_junk": [],
+     "Descent.PopGen.perCausalLocusSignal_mul_count": [],
+     "Descent.PopGen.perCausalLocusSignal_dilution": [],
+     "Descent.PopGen.estimation_trait_interaction": [],
+     "Descent.PopGen.expectedSquaredEffect_zero_m_is_junk": [],
+     "Descent.PopGen.per_variant_h2_decreases_with_M": [],
+     "Descent.PopGen.expectedSquaredEffect_mul_count": [],
+     "Descent.PopGen.coalFst_eq_fstFromTau": [],
+     "Descent.PopGen.islandDemeCorrection_at_reference_point": [],
+     "Descent.PopGen.one_lt_islandDemeCorrection": [],
+     "Descent.PopGen.equilibriumEffectVariance_zero_s_is_junk": [],
+     "Descent.PopGen.equilibriumEffectVariance_mul_selection": [],
+     "Descent.PopGen.equilibriumEffectVariance_inverse_in_selection": [],
+     "Descent.PopGen.equilibriumEffectVariance_eq_zero_iff": [],
+     "Descent.PopGen.effectVarianceRecurrence_eq_self_iff": [],
+     "Descent.PopGen.equilibriumEffectVariance_lt_of_selection_lt": [],
+     "Descent.PopGen.polygenicAveragingVariance_at_reference_point": [],
+     "Descent.PopGen.polygenicAveragingVariance_add": [],
+     "Descent.PopGen.stabilizingSelectedArchitectureVariance_at_reference_point": [],
+     "Descent.PopGen.fluctuatingSelectedArchitectureVariance_at_reference_point": [],
+     "Descent.PopGen.fluctuatingSelectedArchitectureVariance_gt_stabilizing": [],
+     "Descent.PopGen.snpH2_zero_vp_is_junk": [],
+     "Descent.PopGen.snp_h2_le_narrow_h2": [],
+     "Descent.PopGen.narrow_h2_sub_snp_h2_eq": [],
+     "Descent.PopGen.snpH2_add_tagged": [],
+     "Descent.Portability.portableFraction_zero_r2total_is_junk": [],
+     "Descent.Portability.portable_fraction_le_one": [],
+     "Descent.Portability.portableFraction_residual_eq_complement": [],
+     "Descent.Portability.GaussianEffectPortabilityLaw.report_eq_ratio": [],
+     "Descent.Portability.GaussianVarianceDensity.ratio_pos": [
+      "0 < a"
+     ],
+     "Descent.Portability.GaussianVarianceDensity.ratio_continuous": [],
+     "Descent.Portability.GaussianVarianceDensity.density_identity": [
+      "0 < a"
+     ],
+     "Descent.Portability.GaussianVarianceDensity.densityLaw_eq_gaussian": [
+      "0 < a"
+     ],
+     "Descent.Portability.GaussianVarianceDensity.ratio_integrable": [
+      "0 < a"
+     ],
+     "Descent.Portability.GaussianVarianceDensity.ratio_integral": [
+      "0 < a"
+     ],
+     "Descent.Portability.neutralDriftR2Ratio_eq_core": [],
+     "Descent.Portability.fstFromGenerations_le_coalescentTau": [],
+     "Descent.Portability.sourceSquaredEffectMass_at_reference_point": [],
+     "Descent.Portability.identityDirectMetricModel_source_weights": [],
+     "Descent.Portability.identityDirectMetricModel_metrics": [],
+     "Descent.Portability.target_metric_profile_auc_uses_explicit_target_moments": [],
+     "Descent.Portability.target_ld_shift_changes_liability_auc": [],
+     "Descent.Portability.nondegenerateGenerationalPopGen_fstDecay_eq_zero": [],
+     "Descent.Portability.nondegenerateGenerationalPopGen_coordinates_at_one": [],
+     "Descent.Portability.popgenDrivenProxyGenerationalModel_source_weights": [],
+     "Descent.Portability.popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one": [],
+     "Descent.Portability.target_r2_changes_along_generation_indexed_af_path": [],
+     "Descent.Portability.target_effect_heterogeneity_changes_generation_path_without_ld_or_af_change": [],
+     "Descent.Portability.target_metric_profile_at_generation_reads_explicit_target_r2": [],
+     "Descent.Portability.adaptationDifficultyIndex_no_information_is_junk": [],
+     "Descent.Portability.adaptationDifficultyIndex_mul_info": [],
+     "Descent.Portability.adaptationDifficultyIndex_scale_invariant": [],
+     "Descent.Portability.fisherTraceMSELowerBound_le_target_iff": [],
+     "Descent.Portability.adaptationDifficultyIndex_recal_lt_rediscovery": [],
+     "Descent.Portability.recalibratedCalibrationSlope_inflates_when_fit_shallow": [],
+     "Descent.Portability.recalibratedCalibrationSlope_null_fit_is_junk": [],
+     "Descent.Portability.recalibratedCalibrationSlope_compose": [],
+     "Descent.Portability.target_linear_predictor_eq_affine_in_logistic_recalibrated": [],
+     "Descent.Portability.logistic_recalibration_corrects_slope": [],
+     "Descent.Portability.requiredEventsForRecalibration_scales_with_information": [],
+     "Descent.Portability.ProbitTrainingLaw.reportedRatio_bounds": [],
+     "Descent.Portability.ProbitTrainingLaw.reportedSourceRatio_eq_one": [],
+     "Descent.Portability.ProbitTrainingLaw.fixedData_reportedRatio_bounded": [],
+     "Descent.Portability.rareVariantCountRatio_gt_iff": [],
+     "Descent.Portability.rareVariantCountRatio_eq_variance_ratio_of_shared_contribution": [],
+     "Descent.Portability.effectiveBlockCount_zero_correlationlength_is_junk": [],
+     "Descent.Portability.effectiveBlockCount_unit_invariant": [],
+     "Descent.Portability.effectiveBlockCount_mul_correlationLength": [],
+     "Descent.Portability.effectiveBlockCount_longer_blocks": [],
+     "Descent.Portability.effectiveBlockCount_of_blocks": [],
+     "Descent.Portability.SimulationAccuracy.ratio_eq_formRatio": [],
+     "Descent.Portability.SimulationAccuracy.ratio_affine_eq_formRatio": [
+      "a ≠ 0"
+     ],
+     "Descent.Portability.SimulationAccuracy.reportedRatio_eq_form_sum": [
+      "a ≠ 0"
+     ],
+     "Descent.Portability.portabilityRatio_zero_dr2source_is_junk": [],
+     "Descent.Portability.portabilityRatio_le_one": [],
+     "Descent.Portability.portabilityRatio_eq_one_iff": [],
+     "Descent.Portability.portabilityRatio_eq_zero_iff": [],
+     "Descent.Portability.sampleOverlapBias_at_reference_point": [],
+     "Descent.Portability.sampleOverlapBias_pos": [],
+     "Descent.Portability.sampleOverlapBias_lt_one_iff": [],
+     "Descent.Portability.sampleOverlapBias_scales_inversely_with_overlap": [],
+     "Descent.Portability.TrainingNoiseAccuracy.ratio_nonneg": [],
+     "Descent.Portability.TrainingNoiseAccuracy.ratio_self_value": [],
+     "Descent.Portability.TrainingNoiseAccuracy.ratio_le_inverse_floor": [],
+     "Descent.Portability.TrainingNoiseAccuracy.conditionalRatio_bounds": [],
+     "Descent.Portability.TrainingNoiseAccuracy.conditionalSourceRatio_eq_one": [],
+     "Descent.Program.effectShare_zero_totaleffect_is_junk": [],
+     "Descent.Program.r2FromMSE_eq_one_sub_effectShare": [],
+     "Descent.Program.effectShare_mem_unit": [],
+     "Descent.Program.costEffectiveness_zero_cost_is_junk": [],
+     "Descent.Program.costEffectiveness_unit_invariant": [],
+     "Descent.Program.costEffectiveness_mul_cost": [],
+     "Descent.Program.costEffectiveness_add_improvement": [],
+     "Descent.Program.mul_lt_mul_of_costEffectiveness_lt": [],
+     "Descent.Spectral.delocalizedTransferVariance_zero_blocks_is_junk": [],
+     "Descent.Spectral.delocalizedTransferVariance_strictAnti": [],
+     "Descent.Spectral.delocalizedTransferVariance_mul_sites": [],
+     "Descent.Spectral.localizedTransferVariance_eq_delocalized_one": [],
+     "Descent.Spectral.informationPerUnitCost_zero_cost_is_junk": [],
+     "Descent.Spectral.informationPerUnitCost_scale_invariant": [],
+     "Descent.Spectral.informationPerUnitCost_mul_cost": [],
+     "Descent.Spectral.informationPerUnitCost_cost_scaling": [],
+     "Descent.Spectral.augmented_informationPerUnitCost_gt_iff": [],
+     "Descent.Spectral.detectionWeight_eq_ratio_reconstructionWeight": []
+    },
+    "range_lo_thm": [
+     "Descent.Portability.GaussianVarianceDensity.ratio_pos",
+     1
+    ],
+    "range_lo": 0
+   },
+   "mentioned_by": [
+    "Descent.Blindness.dropout_floor_caps_explainable_fraction",
+    "Descent.Blindness.frontSpeedBiasParameter_at_zero_scale_is_junk",
+    "Descent.Blindness.frontSpeedBias_tripleMergerRate",
+    "Descent.Blindness.frontSpeedBias_tripleMergerRate_injective",
+    "Descent.Blindness.frontSpeedTiltFromTripleRate_recovers",
+    "Descent.Core.OperatingPoint.f1_at_perfect",
+    "Descent.Core.OperatingPoint.f1_treatNone_is_junk",
+    "Descent.Core.OperatingPoint.thresholdOdds_at_half",
+    "Descent.Core.OperatingPoint.thresholdOdds_at_one_is_junk",
+    "Descent.Core.OperatingPoint.thresholdOdds_at_zero",
+    "Descent.Core.OperatingPoint.thresholdOdds_lt_of_lt",
+    "Descent.Core.OperatingPoint.thresholdOdds_nonneg",
+    "Descent.Core.OperatingPoint.thresholdOdds_pos",
+    "Descent.Core.PopGenParameters.fstEquilibrium_lt_of_nDemes_lt",
+    "Descent.Core.PopGenParameters.fstEquilibrium_ne_island_manyDemes",
+    "Descent.Core.ScoreMoments.aucArgument_mono",
+    "Descent.Core.ScoreMoments.calibrationSlope_eq_one_iff",
+    "Descent.Core.ScoreMoments.calibrationSlope_momentsUnderDrift",
+    "Descent.Core.ScoreMoments.calibrationSlope_momentsUnderDrift_at_zero",
+    "Descent.Core.ScoreMoments.deployedPortabilityRatio_lt_of_fstEquilibrium_lt",
+    "Descent.Core.ScoreMoments.portabilityRatioFromTau_anti",
+    "Descent.Core.ScoreMoments.portabilityRatio_at_source",
+    "Descent.Core.ScoreMoments.portabilityRatio_mem_unit",
+    "Descent.Core.ScoreMoments.r2_eq_slope_mul",
+    "Descent.Core.Tau.value_ofGenerations",
+    "Descent.Core.demeCorrection_at_twenty",
+    "Descent.Core.demeCorrection_at_two",
+    "Descent.Core.demeCorrection_gt_one",
+    "Descent.Core.islandDemeCorrection_one_is_junk",
+    "Descent.Core.islandDemeCorrection_sub_one",
+    "Descent.Core.islandDemeCorrection_tendsto_one",
+    "Descent.Core.islandDemeCorrection_twenty",
+    "Descent.Core.islandDemeCorrection_two",
+    "Descent.Core.ratio_at_reference_point",
+    "Descent.Core.ratio_zero_denominator_is_junk",
+    "Descent.Decision.heritabilityFractionFromN_odds",
+    "Descent.Foundations.explainableFraction_eq_complement_within",
+    "Descent.Foundations.explainableFraction_zero_total_is_junk",
+    "Descent.Foundations.explainable_fraction_bound_of_noise_floor",
+    "Descent.Pangenome.Growth.expectedPanSize_step",
+    "Descent.Pangenome.Growth.expectedPanSize_step_antitone",
+    "Descent.Pangenome.Growth.expectedPanSize_step_pos",
+    "Descent.Pangenome.Register.orbitAverage_eq_ratio",
+    "Descent.PopGen.coalFst_eq_fstFromTau",
+    "Descent.PopGen.crossPopulationGeneTransferFraction_eq_complement",
+    "Descent.PopGen.effectVarianceRecurrence_eq_self_iff",
+    "Descent.PopGen.equilibriumEffectVariance_eq_zero_iff",
+    "Descent.PopGen.equilibriumEffectVariance_inverse_in_selection",
+    "Descent.PopGen.equilibriumEffectVariance_lt_of_selection_lt",
+    "Descent.PopGen.equilibriumEffectVariance_mul_selection",
+    "Descent.PopGen.equilibriumEffectVariance_zero_s_is_junk",
+    "Descent.PopGen.estimation_trait_interaction",
+    "Descent.PopGen.expectedSquaredEffect_mul_count",
+    "Descent.PopGen.expectedSquaredEffect_zero_m_is_junk",
+    "Descent.PopGen.fluctuatingSelectedArchitectureVariance_at_reference_point",
+    "Descent.PopGen.fluctuatingSelectedArchitectureVariance_gt_stabilizing",
+    "Descent.PopGen.fstDemeCorrectedFlowStep_constants_named",
+    "Descent.PopGen.fstDemeCorrectedFlowStep_uses_coalescentTimeScale",
+    "Descent.PopGen.islandDemeCorrection_at_reference_point",
+    "Descent.PopGen.islandFstFiniteDemes_eq_scaled",
+    "Descent.PopGen.linearNormOfReaction_slope_identified",
+    "Descent.PopGen.narrow_h2_sub_snp_h2_eq",
+    "Descent.PopGen.one_lt_islandDemeCorrection",
+    "Descent.PopGen.perCausalLocusSignal_dilution",
+    "Descent.PopGen.perCausalLocusSignal_mul_count",
+    "Descent.PopGen.perCausalLocusSignal_zero_k_is_junk",
+    "Descent.PopGen.per_variant_h2_decreases_with_M",
+    "Descent.PopGen.polygenicAveragingVariance_add",
+    "Descent.PopGen.polygenicAveragingVariance_at_reference_point",
+    "Descent.PopGen.snpH2_add_tagged",
+    "Descent.PopGen.snpH2_zero_vp_is_junk",
+    "Descent.PopGen.snp_h2_le_narrow_h2",
+    "Descent.PopGen.stabilizingSelectedArchitectureVariance_at_reference_point",
+    "Descent.Portability.GaussianEffectPortabilityLaw.report_eq_ratio",
+    "Descent.Portability.GaussianVarianceDensity.densityLaw_eq_gaussian",
+    "Descent.Portability.GaussianVarianceDensity.density_identity",
+    "Descent.Portability.GaussianVarianceDensity.ratio_continuous",
+    "Descent.Portability.GaussianVarianceDensity.ratio_integrable",
+    "Descent.Portability.GaussianVarianceDensity.ratio_integral",
+    "Descent.Portability.GaussianVarianceDensity.ratio_pos",
+    "Descent.Portability.ProbitTrainingLaw.fixedData_reportedRatio_bounded",
+    "Descent.Portability.ProbitTrainingLaw.reportedRatio_bounds",
+    "Descent.Portability.ProbitTrainingLaw.reportedSourceRatio_eq_one",
+    "Descent.Portability.SimulationAccuracy.ratio_affine_eq_formRatio",
+    "Descent.Portability.SimulationAccuracy.ratio_eq_formRatio",
+    "Descent.Portability.SimulationAccuracy.reportedRatio_eq_form_sum",
+    "Descent.Portability.TrainingNoiseAccuracy.conditionalRatio_bounds",
+    "Descent.Portability.TrainingNoiseAccuracy.conditionalSourceRatio_eq_one",
+    "Descent.Portability.TrainingNoiseAccuracy.ratio_le_inverse_floor",
+    "Descent.Portability.TrainingNoiseAccuracy.ratio_nonneg",
+    "Descent.Portability.TrainingNoiseAccuracy.ratio_self_value",
+    "Descent.Portability.adaptationDifficultyIndex_mul_info",
+    "Descent.Portability.adaptationDifficultyIndex_no_information_is_junk",
+    "Descent.Portability.adaptationDifficultyIndex_recal_lt_rediscovery",
+    "Descent.Portability.adaptationDifficultyIndex_scale_invariant",
+    "Descent.Portability.effectiveBlockCount_longer_blocks",
+    "Descent.Portability.effectiveBlockCount_mul_correlationLength",
+    "Descent.Portability.effectiveBlockCount_of_blocks",
+    "Descent.Portability.effectiveBlockCount_unit_invariant",
+    "Descent.Portability.effectiveBlockCount_zero_correlationlength_is_junk",
+    "Descent.Portability.fisherTraceMSELowerBound_le_target_iff",
+    "Descent.Portability.fstFromGenerations_le_coalescentTau",
+    "Descent.Portability.identityDirectMetricModel_metrics",
+    "Descent.Portability.identityDirectMetricModel_source_weights",
+    "Descent.Portability.logistic_recalibration_corrects_slope",
+    "Descent.Portability.neutralDriftR2Ratio_eq_core",
+    "Descent.Portability.nondegenerateGenerationalPopGen_coordinates_at_one",
+    "Descent.Portability.nondegenerateGenerationalPopGen_fstDecay_eq_zero",
+    "Descent.Portability.popgenDrivenProxyGenerationalModel_source_weights",
+    "Descent.Portability.popgenDrivenProxyGenerationalModel_target_r2_strictly_decreases_at_one",
+    "Descent.Portability.portabilityRatio_eq_one_iff",
+    "Descent.Portability.portabilityRatio_eq_zero_iff",
+    "Descent.Portability.portabilityRatio_le_one",
+    "Descent.Portability.portabilityRatio_zero_dr2source_is_junk",
+    "Descent.Portability.portableFraction_residual_eq_complement",
+    "Descent.Portability.portableFraction_zero_r2total_is_junk",
+    "Descent.Portability.portable_fraction_le_one",
+    "Descent.Portability.rareVariantCountRatio_eq_variance_ratio_of_shared_contribution",
+    "Descent.Portability.rareVariantCountRatio_gt_iff",
+    "Descent.Portability.recalibratedCalibrationSlope_compose",
+    "Descent.Portability.recalibratedCalibrationSlope_inflates_when_fit_shallow",
+    "Descent.Portability.recalibratedCalibrationSlope_null_fit_is_junk",
+    "Descent.Portability.requiredEventsForRecalibration_scales_with_information",
+    "Descent.Portability.sampleOverlapBias_at_reference_point",
+    "Descent.Portability.sampleOverlapBias_lt_one_iff",
+    "Descent.Portability.sampleOverlapBias_pos",
+    "Descent.Portability.sampleOverlapBias_scales_inversely_with_overlap",
+    "Descent.Portability.sourceSquaredEffectMass_at_reference_point",
+    "Descent.Portability.target_effect_heterogeneity_changes_generation_path_without_ld_or_af_change",
+    "Descent.Portability.target_ld_shift_changes_liability_auc",
+    "Descent.Portability.target_linear_predictor_eq_affine_in_logistic_recalibrated",
+    "Descent.Portability.target_metric_profile_at_generation_reads_explicit_target_r2",
+    "Descent.Portability.target_metric_profile_auc_uses_explicit_target_moments",
+    "Descent.Portability.target_r2_changes_along_generation_indexed_af_path",
+    "Descent.Program.costEffectiveness_add_improvement",
+    "Descent.Program.costEffectiveness_mul_cost",
+    "Descent.Program.costEffectiveness_unit_invariant",
+    "Descent.Program.costEffectiveness_zero_cost_is_junk",
+    "Descent.Program.effectShare_mem_unit",
+    "Descent.Program.effectShare_zero_totaleffect_is_junk",
+    "Descent.Program.mul_lt_mul_of_costEffectiveness_lt",
+    "Descent.Program.r2FromMSE_eq_one_sub_effectShare",
+    "Descent.Spectral.augmented_informationPerUnitCost_gt_iff",
+    "Descent.Spectral.delocalizedTransferVariance_mul_sites",
+    "Descent.Spectral.delocalizedTransferVariance_strictAnti",
+    "Descent.Spectral.delocalizedTransferVariance_zero_blocks_is_junk",
+    "Descent.Spectral.detectionWeight_eq_ratio_reconstructionWeight",
+    "Descent.Spectral.informationPerUnitCost_cost_scaling",
+    "Descent.Spectral.informationPerUnitCost_mul_cost",
+    "Descent.Spectral.informationPerUnitCost_scale_invariant",
+    "Descent.Spectral.informationPerUnitCost_zero_cost_is_junk",
+    "Descent.Spectral.localizedTransferVariance_eq_delocalized_one"
    ]
   },
   {
@@ -397277,6 +398113,12 @@
      "Descent.Portability.portable_fraction_le_one": [],
      "Descent.Portability.portableFraction_residual_eq_complement": [],
      "Descent.Portability.GaussianEffectPortabilityLaw.report_eq_ratio": [],
+     "Descent.Portability.GaussianVarianceDensity.ratio_pos": [],
+     "Descent.Portability.GaussianVarianceDensity.ratio_continuous": [],
+     "Descent.Portability.GaussianVarianceDensity.density_identity": [],
+     "Descent.Portability.GaussianVarianceDensity.densityLaw_eq_gaussian": [],
+     "Descent.Portability.GaussianVarianceDensity.ratio_integrable": [],
+     "Descent.Portability.GaussianVarianceDensity.ratio_integral": [],
      "Descent.Portability.neutralDriftR2Ratio_eq_core": [],
      "Descent.Portability.fstFromGenerations_le_coalescentTau": [],
      "Descent.Portability.sourceSquaredEffectMass_at_reference_point": [],
@@ -397361,7 +398203,12 @@
      "Descent.Spectral.informationPerUnitCost_cost_scaling": [],
      "Descent.Spectral.augmented_informationPerUnitCost_gt_iff": [],
      "Descent.Spectral.detectionWeight_eq_ratio_reconstructionWeight": []
-    }
+    },
+    "range_lo_thm": [
+     "Descent.Portability.GaussianVarianceDensity.ratio_pos",
+     1
+    ],
+    "range_lo": 0
    },
    "mentioned_by": [
     "Descent.Blindness.dropout_floor_caps_explainable_fraction",
@@ -397438,6 +398285,12 @@
     "Descent.PopGen.snp_h2_le_narrow_h2",
     "Descent.PopGen.stabilizingSelectedArchitectureVariance_at_reference_point",
     "Descent.Portability.GaussianEffectPortabilityLaw.report_eq_ratio",
+    "Descent.Portability.GaussianVarianceDensity.densityLaw_eq_gaussian",
+    "Descent.Portability.GaussianVarianceDensity.density_identity",
+    "Descent.Portability.GaussianVarianceDensity.ratio_continuous",
+    "Descent.Portability.GaussianVarianceDensity.ratio_integrable",
+    "Descent.Portability.GaussianVarianceDensity.ratio_integral",
+    "Descent.Portability.GaussianVarianceDensity.ratio_pos",
     "Descent.Portability.ProbitTrainingLaw.fixedData_reportedRatio_bounded",
     "Descent.Portability.ProbitTrainingLaw.reportedRatio_bounds",
     "Descent.Portability.ProbitTrainingLaw.reportedSourceRatio_eq_one",

@@ -205,6 +205,11 @@ import Descent.Portability.ContinuousObservabilityGramian
 import Descent.Portability.MarkovSeparatorLaw
 import Descent.Portability.BalancedHWEVanishingLaw
 import Descent.Portability.ThreeLocusInformation
+import Descent.Portability.EntropyQuadraticFactor
+import Descent.Portability.EntropyDensityExpansion
+import Descent.Portability.DensityRelativeEntropy
+import Descent.Portability.QuarticRelativeEntropy
+import Descent.Portability.GaussianVarianceDensity
 import Descent.Portability.GaussianEvenMoments
 import Descent.Portability.GraphColoringLaw
 import Descent.Portability.BalancedHWEJumpOperator
