@@ -65,7 +65,10 @@ theorem exact_cap_reduction (κ floor c h p : ι → ℝ) (u : ι → E) (B x : 
       {q | Feasible floor c B q} p := by
     intro q hq
     have hh := hopt hq
-    change 2 * _ ≤ 2 * _ at hh
+    change fullRadius κ h p u x ≤ fullRadius κ h q u x at hh
+    unfold fullRadius at hh
+    change ContinuousAuditCapSearch.designRadius (objective κ u) h p x ≤
+      ContinuousAuditCapSearch.designRadius (objective κ u) h q x
     linarith
   obtain ⟨q, hq, hqmin, he, he'⟩ := ContinuousAuditCapSearch.exact_cap_reduction
     (objective κ u) floor c h p B x hf hh hx

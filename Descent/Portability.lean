@@ -1,6 +1,9 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.OptimizedFrameRepairAudit
+import Descent.Portability.SpectralMinimaxAuditDesign
+import Descent.Portability.SpectralRangeAuditDesign
 import Descent.Portability.ContinuousAuditCapSearch
 import Descent.Portability.DecisionInformationRank
 import Descent.Portability.FrameOutcomeMeasure
