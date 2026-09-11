@@ -268,6 +268,19 @@ def outcomeIndicator (value : Bool) (cell : Bool × Bool) : ℝ :=
 /-- The indicator of one cell. -/
 def cellIndicator (target cell : Bool × Bool) : ℝ := if cell = target then 1 else 0
 
+/-- A product of zero-one member indicators over the cohort is one exactly when every member
+satisfies the test, and zero otherwise. -/
+theorem prod_member_indicator {n : ℕ} (test : Fin n → Prop) [DecidablePred test] :
+    (∏ member, if test member then (1 : ℝ) else 0) =
+      if ∀ member, test member then 1 else 0 := by
+  by_cases hall : ∀ member, test member
+  · rw [if_pos hall]
+    exact Finset.prod_eq_one fun member _ ↦ if_pos (hall member)
+  · rw [if_neg hall]
+    push_neg at hall
+    obtain ⟨member, hmember⟩ := hall
+    exact Finset.prod_eq_zero (Finset.mem_univ member) (if_neg hmember)
+
 /-- The definedness indicator of a cohort sample, from its four cell counts. -/
 noncomputable def definedIndicator {n : ℕ} (sample : Fin n → Bool × Bool) : ℝ :=
   if Defined (cellCount sample (false, false)) (cellCount sample (false, true))
@@ -388,20 +401,17 @@ theorem definedIndicator_expand {n : ℕ} (hn : 0 < n) (sample : Fin n → Bool 
       if ∀ member, (sample member).1 = value then (1 : ℝ) else 0 := by
     intro value
     simp only [scoreIndicator]
-    rw [Fintype.prod_boole (p := fun member ↦ (sample member).1 = value)]
-    exact if_congr Iff.rfl rfl rfl
+    exact prod_member_indicator fun member ↦ (sample member).1 = value
   have hprodOutcome : ∀ value : Bool, (∏ member, outcomeIndicator value (sample member)) =
       if ∀ member, (sample member).2 = value then (1 : ℝ) else 0 := by
     intro value
     simp only [outcomeIndicator]
-    rw [Fintype.prod_boole (p := fun member ↦ (sample member).2 = value)]
-    exact if_congr Iff.rfl rfl rfl
+    exact prod_member_indicator fun member ↦ (sample member).2 = value
   have hprodCell : ∀ target : Bool × Bool, (∏ member, cellIndicator target (sample member)) =
       if ∀ member, sample member = target then (1 : ℝ) else 0 := by
     intro target
     simp only [cellIndicator]
-    rw [Fintype.prod_boole (p := fun member ↦ sample member = target)]
-    exact if_congr Iff.rfl rfl rfl
+    exact prod_member_indicator fun member ↦ sample member = target
   have hcellSplit : ∀ first second : Bool, (∀ member, sample member = (first, second)) ↔
       (∀ member, (sample member).1 = first) ∧ (∀ member, (sample member).2 = second) := by
     intro first second

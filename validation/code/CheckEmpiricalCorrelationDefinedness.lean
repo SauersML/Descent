@@ -24,6 +24,7 @@ open Descent.Portability.EmpiricalCorrelationDefinedness
 #print axioms cellCount_score_pos
 #print axioms cellCount_outcome_pos
 #print axioms defined_iff_not_constant
+#print axioms prod_member_indicator
 #print axioms inclusion_exclusion_two_pairs
 #print axioms definedIndicator_expand
 #print axioms definedness_probability

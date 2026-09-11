@@ -185,6 +185,273 @@ def resamplingExpansionConst {D : ℕ} (level : ℝ) :
     simp only [TwoLocusDiffusionJet.const, twoLocusHaplotypeMean]
     ring
 
+namespace ResamplingExpansion
+
+/-- Expansions add: the second-order coefficients, the bounds and the remainders add. -/
+def add {D : ℕ} {firstJet secondJet : TwoLocusDiffusionJet D}
+    (firstExpansion : ResamplingExpansion firstJet)
+    (secondExpansion : ResamplingExpansion secondJet) :
+    ResamplingExpansion (firstJet.add secondJet) where
+  second deme state drawn :=
+    firstExpansion.second deme state drawn + secondExpansion.second deme state drawn
+  bound := firstExpansion.bound + secondExpansion.bound
+  remainder := firstExpansion.remainder + secondExpansion.remainder
+  value_le state := by
+    have hfirst := firstExpansion.value_le state
+    have hsecond := secondExpansion.value_le state
+    have htriangle := abs_add_le (firstJet.value state) (secondJet.value state)
+    simp only [TwoLocusDiffusionJet.add]
+    linarith
+  gradient_le deme state drawn := by
+    have hfirst := firstExpansion.gradient_le deme state drawn
+    have hsecond := secondExpansion.gradient_le deme state drawn
+    have htriangle := abs_add_le (firstJet.gradientAt deme state drawn)
+      (secondJet.gradientAt deme state drawn)
+    simp only [TwoLocusDiffusionJet.add]
+    linarith
+  second_le deme state drawn := by
+    have hfirst := firstExpansion.second_le deme state drawn
+    have hsecond := secondExpansion.second_le deme state drawn
+    have htriangle := abs_add_le (firstExpansion.second deme state drawn)
+      (secondExpansion.second deme state drawn)
+    show |firstExpansion.second deme state drawn +
+      secondExpansion.second deme state drawn| ≤ _
+    linarith
+  expansion N hN state deme drawn := by
+    have hfirst := firstExpansion.expansion N hN state deme drawn
+    have hsecond := secondExpansion.expansion N hN state deme drawn
+    have hresidual : expansionResidual (firstJet.add secondJet)
+        (fun innerDeme innerState innerDrawn ↦
+          firstExpansion.second innerDeme innerState innerDrawn +
+            secondExpansion.second innerDeme innerState innerDrawn)
+        N state deme drawn =
+        expansionResidual firstJet firstExpansion.second N state deme drawn +
+          expansionResidual secondJet secondExpansion.second N state deme drawn := by
+      simp only [expansionResidual, centeredGradient, TwoLocusDiffusionJet.add,
+        twoLocusHaplotypeMean]
+      ring
+    rw [hresidual]
+    have htriangle := abs_add_le
+      (expansionResidual firstJet firstExpansion.second N state deme drawn)
+      (expansionResidual secondJet secondExpansion.second N state deme drawn)
+    have hcollect : firstExpansion.remainder / (N : ℝ) ^ 3 +
+        secondExpansion.remainder / (N : ℝ) ^ 3 =
+        (firstExpansion.remainder + secondExpansion.remainder) / (N : ℝ) ^ 3 := by
+      ring
+    linarith
+  second_mean deme state := by
+    have hfirst := firstExpansion.second_mean deme state
+    have hsecond := secondExpansion.second_mean deme state
+    simp only [TwoLocusDiffusionJet.add, twoLocusHaplotypeMean] at hfirst hsecond ⊢
+    linear_combination hfirst + hsecond
+
+/-- Expansions rescale: the second-order coefficient, the bound and the remainder all pick up
+the factor. -/
+def smul {D : ℕ} {jet : TwoLocusDiffusionJet D} (scalar : ℝ)
+    (resampling : ResamplingExpansion jet) :
+    ResamplingExpansion (TwoLocusDiffusionJet.smul scalar jet) where
+  second deme state drawn := scalar * resampling.second deme state drawn
+  bound := |scalar| * resampling.bound
+  remainder := |scalar| * resampling.remainder
+  value_le state := by
+    simp only [TwoLocusDiffusionJet.smul]
+    exact abs_mul_le_of_abs_le_of_abs_le (le_refl |scalar|) (resampling.value_le state)
+  gradient_le deme state drawn := by
+    simp only [TwoLocusDiffusionJet.smul]
+    exact abs_mul_le_of_abs_le_of_abs_le (le_refl |scalar|)
+      (resampling.gradient_le deme state drawn)
+  second_le deme state drawn :=
+    abs_mul_le_of_abs_le_of_abs_le (le_refl |scalar|)
+      (resampling.second_le deme state drawn)
+  expansion N hN state deme drawn := by
+    have hresidual : expansionResidual (TwoLocusDiffusionJet.smul scalar jet)
+        (fun innerDeme innerState innerDrawn ↦
+          scalar * resampling.second innerDeme innerState innerDrawn)
+        N state deme drawn =
+        scalar * expansionResidual jet resampling.second N state deme drawn := by
+      simp only [expansionResidual, centeredGradient, TwoLocusDiffusionJet.smul,
+        twoLocusHaplotypeMean]
+      ring
+    rw [hresidual, abs_mul]
+    have hbase := mul_le_mul_of_nonneg_left (resampling.expansion N hN state deme drawn)
+      (abs_nonneg scalar)
+    have hcollect : |scalar| * (resampling.remainder / (N : ℝ) ^ 3) =
+        |scalar| * resampling.remainder / (N : ℝ) ^ 3 := by
+      ring
+    linarith
+  second_mean deme state := by
+    have hbase := resampling.second_mean deme state
+    simp only [TwoLocusDiffusionJet.smul, twoLocusHaplotypeMean] at hbase ⊢
+    linear_combination scalar * hbase
+
+end ResamplingExpansion
+
+/-- Second-order coefficient of a product jet: the two Leibniz terms plus the product of the
+two centred gradients.  That last term is the multinomial covariance contribution which makes
+the Wright--Fisher product rule exact. -/
+def mulSecondOrder {D : ℕ} (firstJet secondJet : TwoLocusDiffusionJet D)
+    (firstSecond secondSecond :
+      Fin D → (Fin D → TwoLocusHaplotypeFrequencies) → TwoLocusHaplotype → ℝ)
+    (deme : Fin D) (state : Fin D → TwoLocusHaplotypeFrequencies)
+    (drawn : TwoLocusHaplotype) : ℝ :=
+  firstJet.value state * secondSecond deme state drawn +
+    secondJet.value state * firstSecond deme state drawn +
+    centeredGradient firstJet deme state drawn * centeredGradient secondJet deme state drawn
+
+/-- Exact algebraic decomposition of a product jet's residual: everything of total order at
+least three in `1 / N`, plus the two factors' own residuals carried by bounded companions. -/
+theorem expansionResidual_mul {D : ℕ} (firstJet secondJet : TwoLocusDiffusionJet D)
+    (firstSecond secondSecond :
+      Fin D → (Fin D → TwoLocusHaplotypeFrequencies) → TwoLocusHaplotype → ℝ)
+    (N : ℕ) (state : Fin D → TwoLocusHaplotypeFrequencies) (deme : Fin D)
+    (drawn : TwoLocusHaplotype) :
+    expansionResidual (firstJet.mul secondJet)
+        (mulSecondOrder firstJet secondJet firstSecond secondSecond) N state deme drawn =
+      (1 / (N : ℝ)) ^ 3 * (centeredGradient firstJet deme state drawn *
+          secondSecond deme state drawn +
+        firstSecond deme state drawn * centeredGradient secondJet deme state drawn) +
+      (1 / (N : ℝ)) ^ 4 * (firstSecond deme state drawn * secondSecond deme state drawn) +
+      expansionResidual firstJet firstSecond N state deme drawn *
+        secondJet.value (resampleStepAt state deme N drawn) +
+      expansionResidual secondJet secondSecond N state deme drawn *
+        (firstJet.value state + 1 / (N : ℝ) * centeredGradient firstJet deme state drawn +
+          (1 / (N : ℝ)) ^ 2 * firstSecond deme state drawn) := by
+  simp only [expansionResidual, mulSecondOrder, centeredGradient,
+    TwoLocusDiffusionJet.mul, twoLocusHaplotypeMean]
+  ring
+
+namespace ResamplingExpansion
+
+/-- Expansions multiply.  The second-order coefficient is `mulSecondOrder`, whose mean is the
+corpus product-rule drift, and the remainder collects every term of total order at least three
+in `1 / N`. -/
+def mul {D : ℕ} {firstJet secondJet : TwoLocusDiffusionJet D}
+    (firstExpansion : ResamplingExpansion firstJet)
+    (secondExpansion : ResamplingExpansion secondJet) :
+    ResamplingExpansion (firstJet.mul secondJet) where
+  second := mulSecondOrder firstJet secondJet firstExpansion.second secondExpansion.second
+  bound := 6 * firstExpansion.bound * secondExpansion.bound
+  remainder := 5 * firstExpansion.bound * secondExpansion.bound +
+    firstExpansion.remainder * secondExpansion.bound +
+    4 * secondExpansion.remainder * firstExpansion.bound
+  value_le state := by
+    have hproduct := abs_mul_le_of_abs_le_of_abs_le (firstExpansion.value_le state)
+      (secondExpansion.value_le state)
+    have hnonneg := mul_nonneg firstExpansion.bound_nonneg secondExpansion.bound_nonneg
+    simp only [TwoLocusDiffusionJet.mul]
+    linarith
+  gradient_le deme state drawn := by
+    have hleft := abs_mul_le_of_abs_le_of_abs_le (firstExpansion.value_le state)
+      (secondExpansion.gradient_le deme state drawn)
+    have hright := abs_mul_le_of_abs_le_of_abs_le (secondExpansion.value_le state)
+      (firstExpansion.gradient_le deme state drawn)
+    have htriangle := abs_add_le (firstJet.value state * secondJet.gradientAt deme state drawn)
+      (secondJet.value state * firstJet.gradientAt deme state drawn)
+    have hnonneg := mul_nonneg firstExpansion.bound_nonneg secondExpansion.bound_nonneg
+    simp only [TwoLocusDiffusionJet.mul]
+    linarith
+  second_le deme state drawn := by
+    have hleft := abs_mul_le_of_abs_le_of_abs_le (firstExpansion.value_le state)
+      (secondExpansion.second_le deme state drawn)
+    have hright := abs_mul_le_of_abs_le_of_abs_le (secondExpansion.value_le state)
+      (firstExpansion.second_le deme state drawn)
+    have hcross := abs_mul_le_of_abs_le_of_abs_le
+      (abs_centeredGradient_le firstJet deme state drawn firstExpansion.bound
+        (firstExpansion.gradient_le deme state))
+      (abs_centeredGradient_le secondJet deme state drawn secondExpansion.bound
+        (secondExpansion.gradient_le deme state))
+    have houter := abs_add_le (firstJet.value state *
+        secondExpansion.second deme state drawn +
+      secondJet.value state * firstExpansion.second deme state drawn)
+      (centeredGradient firstJet deme state drawn *
+        centeredGradient secondJet deme state drawn)
+    have hinner := abs_add_le (firstJet.value state * secondExpansion.second deme state drawn)
+      (secondJet.value state * firstExpansion.second deme state drawn)
+    simp only [mulSecondOrder]
+    linarith
+  expansion N hN state deme drawn := by
+    have hpositive : 0 < N := hN
+    have hcast : (0 : ℝ) < (N : ℝ) := by exact_mod_cast hpositive
+    have hone : (1 : ℝ) ≤ (N : ℝ) := by exact_mod_cast hN
+    have hstep : (1 : ℝ) / (N : ℝ) ≤ 1 := by
+      rw [div_le_one hcast]
+      exact hone
+    have hstepnn : (0 : ℝ) ≤ 1 / (N : ℝ) := by positivity
+    have hMfirst := firstExpansion.bound_nonneg
+    have hMsecond := secondExpansion.bound_nonneg
+    have hcollect : ∀ level : ℝ, level / (N : ℝ) ^ 3 = (1 / (N : ℝ)) ^ 3 * level := by
+      intro level
+      ring
+    have hRfirst := firstExpansion.expansion N hN state deme drawn
+    have hRsecond := secondExpansion.expansion N hN state deme drawn
+    rw [expansionResidual_mul]
+    rw [hcollect] at hRfirst hRsecond ⊢
+    have hGfirst := abs_centeredGradient_le firstJet deme state drawn firstExpansion.bound
+      (firstExpansion.gradient_le deme state)
+    have hGsecond := abs_centeredGradient_le secondJet deme state drawn secondExpansion.bound
+      (secondExpansion.gradient_le deme state)
+    have hSfirst := firstExpansion.second_le deme state drawn
+    have hSsecond := secondExpansion.second_le deme state drawn
+    have habsthird : |(1 / (N : ℝ)) ^ 3| = (1 / (N : ℝ)) ^ 3 :=
+      abs_of_nonneg (by positivity)
+    have habsfourth : |(1 / (N : ℝ)) ^ 4| = (1 / (N : ℝ)) ^ 4 :=
+      abs_of_nonneg (by positivity)
+    have hcrossinner : |centeredGradient firstJet deme state drawn *
+        secondExpansion.second deme state drawn +
+        firstExpansion.second deme state drawn *
+          centeredGradient secondJet deme state drawn| ≤
+        4 * firstExpansion.bound * secondExpansion.bound := by
+      have hleft := abs_mul_le_of_abs_le_of_abs_le hGfirst hSsecond
+      have hright := abs_mul_le_of_abs_le_of_abs_le hSfirst hGsecond
+      have htriangle := abs_add_le (centeredGradient firstJet deme state drawn *
+          secondExpansion.second deme state drawn)
+        (firstExpansion.second deme state drawn *
+          centeredGradient secondJet deme state drawn)
+      linarith
+    have hthird := abs_mul_le_of_abs_le_of_abs_le (le_of_eq habsthird) hcrossinner
+    have hfourth := abs_mul_le_of_abs_le_of_abs_le (le_of_eq habsfourth)
+      (abs_mul_le_of_abs_le_of_abs_le hSfirst hSsecond)
+    have hcarry := abs_mul_le_of_abs_le_of_abs_le hRfirst
+      (secondExpansion.value_le (resampleStepAt state deme N drawn))
+    have hcompanion : |firstJet.value state +
+        1 / (N : ℝ) * centeredGradient firstJet deme state drawn +
+        (1 / (N : ℝ)) ^ 2 * firstExpansion.second deme state drawn| ≤
+        4 * firstExpansion.bound := by
+      have hsquare : |(1 / (N : ℝ)) ^ 2| ≤ 1 := by
+        rw [abs_of_nonneg (by positivity : (0 : ℝ) ≤ (1 / (N : ℝ)) ^ 2)]
+        nlinarith
+      have hlinear : |1 / (N : ℝ) * centeredGradient firstJet deme state drawn| ≤
+          1 * (2 * firstExpansion.bound) :=
+        abs_mul_le_of_abs_le_of_abs_le (by rwa [abs_of_nonneg hstepnn]) hGfirst
+      have hquadratic : |(1 / (N : ℝ)) ^ 2 *
+          firstExpansion.second deme state drawn| ≤ 1 * firstExpansion.bound :=
+        abs_mul_le_of_abs_le_of_abs_le hsquare hSfirst
+      have houter := abs_add_le (firstJet.value state +
+        1 / (N : ℝ) * centeredGradient firstJet deme state drawn)
+        ((1 / (N : ℝ)) ^ 2 * firstExpansion.second deme state drawn)
+      have hinner := abs_add_le (firstJet.value state)
+        (1 / (N : ℝ) * centeredGradient firstJet deme state drawn)
+      have hvalue := firstExpansion.value_le state
+      linarith
+    have hcompanionbound := abs_mul_le_of_abs_le_of_abs_le hRsecond hcompanion
+    have hslack : (1 / (N : ℝ)) ^ 4 * (firstExpansion.bound * secondExpansion.bound) ≤
+        (1 / (N : ℝ)) ^ 3 * (firstExpansion.bound * secondExpansion.bound) := by
+      have hcube : (0 : ℝ) < (1 / (N : ℝ)) ^ 3 := by positivity
+      nlinarith [mul_nonneg (le_of_lt hcube) (mul_nonneg hMfirst hMsecond), hstep]
+    refine le_trans (abs_add_four_le _ _ _ _) ?_
+    linarith
+  second_mean deme state := by
+    have hfirst := firstExpansion.second_mean deme state
+    have hsecond := secondExpansion.second_mean deme state
+    have hcovariance := twoLocusHaplotypeMean_centered_mul (state deme)
+      (firstJet.gradientAt deme state) (secondJet.gradientAt deme state)
+    simp only [TwoLocusDiffusionJet.mul, mulSecondOrder, centeredGradient,
+      twoLocusHaplotypeCovariance, twoLocusHaplotypeMean] at hfirst hsecond hcovariance ⊢
+    linear_combination firstJet.value state * hsecond +
+      secondJet.value state * hfirst + hcovariance
+
+end ResamplingExpansion
+
 end
 
 end Descent.Portability.ResamplingJetExpansion
