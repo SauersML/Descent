@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.MultinomialMomentExpansion
 import Descent.Portability.LowOrderLDWitnesses
 import Descent.Portability.SmallCohortConditionalMeans
 import Descent.Portability.PipelineLDPairDomain
