@@ -79,50 +79,58 @@ structure IntervalEvaluator (integrand : Ω → ℝ) (bound : ℝ) where
   width_tendsto : ∀ state,
     Tendsto (fun stage ↦ upper stage state - lower stage state) atTop (nhds 0)
 
+/-- The stage-indexed slack of the inhabiting evaluator. -/
+def slack (stage : ℕ) : ℝ := 1 / ((stage : ℝ) + 1)
+
+theorem slack_pos (stage : ℕ) : 0 < slack stage := by
+  rw [slack]
+  positivity
+
+theorem slack_le_one (stage : ℕ) : slack stage ≤ 1 := by
+  rw [slack, div_le_one (by positivity)]
+  have hcast : (0:ℝ) ≤ (stage : ℝ) := Nat.cast_nonneg stage
+  linarith
+
+theorem tendsto_slack : Tendsto (fun stage : ℕ ↦ 2 * slack stage) atTop (nhds 0) := by
+  simpa [slack] using tendsto_one_div_add_atTop_nhds_zero_nat.const_mul (2:ℝ)
+
 /-- Every bounded measurable integrand carries an evaluator whose brackets are strictly
 wider than it at every stage and close only in the limit, so the hypothesis class is
 inhabited by a nondegenerate evaluator rather than merely assumed nonempty. -/
 def slackEvaluator (integrand : Ω → ℝ) (bound : ℝ) (hmeasurable : Measurable integrand)
     (hbound : ∀ state, |integrand state| ≤ bound) :
     IntervalEvaluator integrand (bound + 1) where
-  lower := fun stage state ↦ integrand state - 1 / ((stage : ℝ) + 1)
-  upper := fun stage state ↦ integrand state + 1 / ((stage : ℝ) + 1)
+  lower := fun stage state ↦ integrand state - slack stage
+  upper := fun stage state ↦ integrand state + slack stage
   integrand_measurable := hmeasurable
   lower_measurable := fun _ ↦ hmeasurable.sub measurable_const
   upper_measurable := fun _ ↦ hmeasurable.add measurable_const
   lower_le := fun stage state ↦ by
-    have hpos : (0:ℝ) < 1 / ((stage : ℝ) + 1) := by positivity
+    show integrand state - slack stage ≤ integrand state
+    have hpos := slack_pos stage
     linarith
   le_upper := fun stage state ↦ by
-    have hpos : (0:ℝ) < 1 / ((stage : ℝ) + 1) := by positivity
+    show integrand state ≤ integrand state + slack stage
+    have hpos := slack_pos stage
     linarith
   lower_abs_le := fun stage state ↦ by
-    have hpos : (0:ℝ) < 1 / ((stage : ℝ) + 1) := by positivity
-    have hle : 1 / ((stage : ℝ) + 1) ≤ 1 := by
-      rw [div_le_one (by positivity)]
-      have : (0:ℝ) ≤ (stage : ℝ) := Nat.cast_nonneg stage
-      linarith
+    show |integrand state - slack stage| ≤ bound + 1
+    have hpos := slack_pos stage
+    have hle := slack_le_one stage
     have habs := hbound state
     rw [abs_le] at habs ⊢
     constructor <;> linarith
   upper_abs_le := fun stage state ↦ by
-    have hpos : (0:ℝ) < 1 / ((stage : ℝ) + 1) := by positivity
-    have hle : 1 / ((stage : ℝ) + 1) ≤ 1 := by
-      rw [div_le_one (by positivity)]
-      have : (0:ℝ) ≤ (stage : ℝ) := Nat.cast_nonneg stage
-      linarith
+    show |integrand state + slack stage| ≤ bound + 1
+    have hpos := slack_pos stage
+    have hle := slack_le_one stage
     have habs := hbound state
     rw [abs_le] at habs ⊢
     constructor <;> linarith
   width_tendsto := fun state ↦ by
-    have hfun : (fun stage : ℕ ↦
-        (integrand state + 1 / ((stage : ℝ) + 1)) -
-          (integrand state - 1 / ((stage : ℝ) + 1))) =
-        fun stage : ℕ ↦ 2 * (1 / ((stage : ℝ) + 1)) := by
-      funext stage
-      ring
-    rw [hfun]
-    simpa using tendsto_one_div_add_atTop_nhds_zero_nat.const_mul (2:ℝ)
+    refine tendsto_slack.congr fun stage ↦ ?_
+    show 2 * slack stage = integrand state + slack stage - (integrand state - slack stage)
+    ring
 
 /-- A measurable function bounded in absolute value is integrable against a finite
 measure. -/
@@ -249,10 +257,10 @@ theorem bracketed_ratio_bounds (numerator denominator numeratorLower numeratorUp
   have hnumUp : 0 ≤ numeratorUpper := le_trans hnum hnumeratorUpper
   constructor
   · rw [div_le_div_iff₀ hdenUp hden]
-    nlinarith [mul_le_mul_of_nonneg_right hnumeratorLower hden.le,
+    linarith [mul_le_mul_of_nonneg_right hnumeratorLower hden.le,
       mul_le_mul_of_nonneg_left hdenominatorUpper hnum]
   · rw [div_le_div_iff₀ hden hdenominatorPos]
-    nlinarith [mul_le_mul_of_nonneg_right hnumeratorUpper hdenominatorPos.le,
+    linarith [mul_le_mul_of_nonneg_right hnumeratorUpper hdenominatorPos.le,
       mul_le_mul_of_nonneg_left hdenominatorLower hnumUp]
 
 /-- NOTE2 Theorem 5 for a partial metric: evaluating the definedness indicator and the
@@ -392,7 +400,12 @@ theorem dyadic_sum_le_one_of_length_le : ∀ (depth : ℕ) (words : Finset (List
         (Finset.filter_subset _ _) fun word hword ↦ (Finset.mem_filter.mp hword).2
       have htrue := hbranch true (words.filter (fun word ↦ ¬ (word.headI = false)))
         (Finset.filter_subset _ _) hother
-      rw [← Finset.sum_filter_add_sum_filter_not words (fun word ↦ word.headI = false)]
+      have hsplit : ∑ word ∈ words.filter (fun word ↦ word.headI = false),
+            (1 / 2 : ℝ) ^ word.length +
+          ∑ word ∈ words.filter (fun word ↦ ¬ (word.headI = false)),
+            (1 / 2 : ℝ) ^ word.length =
+          ∑ word ∈ words, (1 / 2 : ℝ) ^ word.length :=
+        Finset.sum_filter_add_sum_filter_not words (fun word ↦ word.headI = false) _
       linarith
 
 /-- Kraft's inequality: the dyadic weights of a finite prefix-free set of bit strings sum to

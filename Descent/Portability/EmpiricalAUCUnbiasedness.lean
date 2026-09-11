@@ -36,8 +36,13 @@ fibre every ordered case-control pair contributes the same two-replica moment
 (`outcome_fiber_numerator`). The identity is proved in cleared form,
 `auc_numerator_identity`, so that no positivity premise is needed until the ratio is taken.
 
-Not formalised in this module: the empirical calibration slope of NOTE1 (42), which needs the
-same conditioning on the score vector instead of the outcome vector.
+The empirical calibration slope of NOTE1 (42) is `conditional_empiricalSlope`, proved the
+same way with the roles of the two coordinates exchanged: the cohort sum is reindexed over
+score vectors, both group sizes are constant on a score fibre, and each group mean is unbiased
+for the conditional cell mean (`score_fiber_mean`). `linearSlope_cleared` ties the corpus
+population slope, a ratio of a covariance to a variance, to the same cleared numerator.
+
+Not formalised in this module: the intercept and the accuracy of a finite cohort.
 
 ## Empirical status
 
@@ -738,5 +743,405 @@ theorem conditional_empiricalAUC_chronologyLaw (p C : ℝ) (hp0 : 0 ≤ p) (hp1 
   rw [conditional_empiricalAUC _ n (by rw [hcase]; exact hlow) (by rw [hcontrol]; linarith)
       hdefined,
     populationAUC_chronologyLaw p C hp0 hp1 hC0 hC1 hlow hhigh]
+
+/-- A product over the cohort splits off one member. -/
+theorem prod_split_one {n : ℕ} (index : Fin n) (weight : Fin n → ℝ) :
+    (∏ member, weight member) =
+      weight index * ∏ member ∈ Finset.univ.erase index, weight member :=
+  (Finset.mul_prod_erase Finset.univ weight (Finset.mem_univ index)).symm
+
+/-- Two products over the cohort that agree away from one member are exchanged by their values
+at that member. -/
+theorem prod_exchange_one {n : ℕ} (index : Fin n) (base modified : Fin n → ℝ)
+    (hagree : ∀ member, member ≠ index → modified member = base member) :
+    (∏ member, modified member) * base index = (∏ member, base member) * modified index := by
+  have hrest : (∏ member ∈ Finset.univ.erase index, modified member) =
+      ∏ member ∈ Finset.univ.erase index, base member :=
+    Finset.prod_congr rfl fun member hmember ↦ hagree member (Finset.mem_erase.mp hmember).1
+  rw [prod_split_one index modified, prod_split_one index base, hrest]
+  ring
+
+/-- The zero-one marker that pins one cohort coordinate to a prescribed value. -/
+def singleMarker {n : ℕ} (index : Fin n) (pinned : Bool) (member : Fin n) (value : Bool) : ℝ :=
+  if member = index then (if value = pinned then 1 else 0) else 1
+
+/-- At the pinned member the single marker tests the prescribed value. -/
+theorem singleMarker_index {n : ℕ} (index : Fin n) (pinned value : Bool) :
+    singleMarker index pinned index value = if value = pinned then 1 else 0 := if_pos rfl
+
+/-- Away from the pinned member the single marker is one. -/
+theorem singleMarker_other {n : ℕ} (index member : Fin n) (hne : member ≠ index)
+    (pinned value : Bool) : singleMarker index pinned member value = 1 := if_neg hne
+
+/-- The single marker product over the cohort collapses to the pinned test. -/
+theorem prod_singleMarker {n : ℕ} (index : Fin n) (pinned : Bool) (values : Fin n → Bool) :
+    (∏ member, singleMarker index pinned member (values member)) =
+      if values index = pinned then (1 : ℝ) else 0 := by
+  have hexchange := prod_exchange_one index (fun _ ↦ (1 : ℝ))
+    (fun member ↦ singleMarker index pinned member (values member))
+    fun member hne ↦ singleMarker_other index member hne _ _
+  simp only [] at hexchange
+  rw [Finset.prod_const_one, singleMarker_index] at hexchange
+  simpa using hexchange
+
+/-- Marginalising a coordinatewise weight with one coordinate pinned, in cleared form. -/
+theorem sum_prod_pinned_one {n : ℕ} (index : Fin n) (weight : Fin n → Bool → ℝ)
+    (pinned : Bool) :
+    (∑ values : Fin n → Bool, (∏ member, weight member (values member)) *
+          (if values index = pinned then (1 : ℝ) else 0)) *
+        (∑ value : Bool, weight index value) =
+      (∏ member, ∑ value : Bool, weight member value) * weight index pinned := by
+  have hpointwise : ∀ values : Fin n → Bool,
+      (∏ member, weight member (values member)) *
+          (if values index = pinned then (1 : ℝ) else 0) =
+        ∏ member, weight member (values member) *
+          singleMarker index pinned member (values member) := by
+    intro values
+    rw [Finset.prod_mul_distrib, prod_singleMarker index pinned]
+  have hmarginal : (∑ values : Fin n → Bool, ∏ member, weight member (values member) *
+      singleMarker index pinned member (values member)) =
+      ∏ member, ∑ value : Bool,
+        weight member value * singleMarker index pinned member value := by
+    have hexpand := Finset.prod_univ_sum (fun _ : Fin n ↦ (Finset.univ : Finset Bool))
+      fun (member : Fin n) (value : Bool) ↦ weight member value *
+        singleMarker index pinned member value
+    rw [Fintype.piFinset_univ] at hexpand
+    exact hexpand.symm
+  have hpinnedIndex : (∑ value : Bool,
+      weight index value * singleMarker index pinned index value) = weight index pinned := by
+    simp only [singleMarker_index]
+    cases pinned <;> simp
+  have hexchange := prod_exchange_one index (fun member ↦ ∑ value : Bool, weight member value)
+    (fun member ↦ ∑ value : Bool, weight member value * singleMarker index pinned member value)
+    (fun member hne ↦ Finset.sum_congr rfl fun value _ ↦ by
+      rw [singleMarker_other index member hne, mul_one])
+  simp only [] at hexchange
+  rw [hpinnedIndex] at hexchange
+  rw [Finset.sum_congr rfl fun values _ ↦ hpointwise values, hmarginal]
+  exact hexchange
+
+/-- Splitting a cohort sample into its score vector and its outcome vector. -/
+def scoreSplitEquiv (n : ℕ) : ((Fin n → Bool) × (Fin n → Bool)) ≃ (Fin n → Bool × Bool) where
+  toFun pair := fun member ↦ (pair.1 member, pair.2 member)
+  invFun sample := (fun member ↦ (sample member).1, fun member ↦ (sample member).2)
+  left_inv _ := rfl
+  right_inv _ := rfl
+
+/-- The cohort expectation as an iterated sum over score vectors and outcome vectors. -/
+theorem cohort_expectation_split_score (law : FiniteReportLaw (Bool × Bool)) (n : ℕ)
+    (statistic : (Fin n → Bool × Bool) → ℝ) :
+    (cohortLaw law n).expectation statistic =
+      ∑ scores : Fin n → Bool, ∑ outcomes : Fin n → Bool,
+        (∏ member, law.mass (scores member, outcomes member)) *
+          statistic (fun member ↦ (scores member, outcomes member)) := by
+  have hequiv := Fintype.sum_equiv (scoreSplitEquiv n)
+    (fun pair : (Fin n → Bool) × (Fin n → Bool) ↦
+      (∏ member, law.mass (pair.1 member, pair.2 member)) *
+        statistic fun member ↦ (pair.1 member, pair.2 member))
+    (fun sample ↦ (cohortLaw law n).mass sample * statistic sample) fun _ ↦ rfl
+  show (∑ sample, (cohortLaw law n).mass sample * statistic sample) = _
+  rw [← hequiv, Fintype.sum_prod_type]
+
+/-- The outcome marginal sum of a four-cell law at a fixed score is the score marginal. -/
+theorem sum_mass_eq_scoreMass (law : FiniteReportLaw (Bool × Bool)) (value : Bool) :
+    (∑ outcome : Bool, law.mass (value, outcome)) = scoreMass law value := by
+  rw [Fintype.sum_bool, scoreMass]
+  ring
+
+/-- Marginalising the four-cell masses over all outcome vectors at a fixed score vector leaves
+the product of the score marginals. -/
+theorem sum_prod_mass_score (law : FiniteReportLaw (Bool × Bool)) {n : ℕ}
+    (scores : Fin n → Bool) :
+    (∑ outcomes : Fin n → Bool, ∏ member, law.mass (scores member, outcomes member)) =
+      ∏ member, scoreMass law (scores member) := by
+  have hexpand := Finset.prod_univ_sum (fun _ : Fin n ↦ (Finset.univ : Finset Bool))
+    fun (member : Fin n) (value : Bool) ↦ law.mass (scores member, value)
+  rw [Fintype.piFinset_univ] at hexpand
+  rw [← hexpand]
+  exact Finset.prod_congr rfl fun member _ ↦ sum_mass_eq_scoreMass law (scores member)
+
+/-- The number of cohort members carrying a given score, as a real number. -/
+noncomputable def scoreCount {n : ℕ} (sample : Fin n → Bool × Bool) (value : Bool) : ℝ :=
+  ∑ member, if (sample member).1 = value then 1 else 0
+
+/-- The total outcome carried by one score group of a cohort. -/
+noncomputable def outcomeTotal {n : ℕ} (sample : Fin n → Bool × Bool) (value : Bool) : ℝ :=
+  ∑ member, (if (sample member).1 = value then (1 : ℝ) else 0) * outcomeOf (sample member)
+
+/-- The empirical least-squares slope of a cohort with a Boolean score: the difference of the
+two score-group outcome means. -/
+noncomputable def empiricalSlope {n : ℕ} (sample : Fin n → Bool × Bool) : ℝ :=
+  outcomeTotal sample true / scoreCount sample true -
+    outcomeTotal sample false / scoreCount sample false
+
+/-- The empirical slope is defined exactly when the cohort score varies. -/
+noncomputable def slopeDefinedIndicator {n : ℕ} (sample : Fin n → Bool × Bool) : ℝ :=
+  if (¬ ∀ member, (sample member).1 = false) ∧ ¬ ∀ member, (sample member).1 = true then 1
+  else 0
+
+/-- The group size determined by the score vector of a cohort. -/
+noncomputable def scoreGroupSize {n : ℕ} (scores : Fin n → Bool) (value : Bool) : ℝ :=
+  ∑ member, if scores member = value then 1 else 0
+
+/-- The slope definedness indicator determined by the score vector of a cohort. -/
+noncomputable def scoreDefinedIndicator {n : ℕ} (scores : Fin n → Bool) : ℝ :=
+  if (¬ ∀ member, scores member = false) ∧ ¬ ∀ member, scores member = true then 1 else 0
+
+/-- On a split cohort the group size reads only the score vector. -/
+theorem scoreCount_split {n : ℕ} (scores outcomes : Fin n → Bool) (value : Bool) :
+    scoreCount (fun member ↦ (scores member, outcomes member)) value =
+      scoreGroupSize scores value := rfl
+
+/-- On a split cohort the slope definedness indicator reads only the score vector. -/
+theorem slopeDefinedIndicator_split {n : ℕ} (scores outcomes : Fin n → Bool) :
+    slopeDefinedIndicator (fun member ↦ (scores member, outcomes member)) =
+      scoreDefinedIndicator scores := rfl
+
+/-- A score group is nonempty exactly when some member carries that score. -/
+theorem scoreGroupSize_pos {n : ℕ} (scores : Fin n → Bool) (value : Bool) :
+    0 < scoreGroupSize scores value ↔ ∃ member, scores member = value := by
+  rw [scoreGroupSize, Finset.sum_boole, Nat.cast_pos, Finset.card_pos,
+    Finset.filter_nonempty_iff]
+  constructor
+  · rintro ⟨member, _, hmember⟩
+    exact ⟨member, hmember⟩
+  · rintro ⟨member, hmember⟩
+    exact ⟨member, Finset.mem_univ member, hmember⟩
+
+/-- Both score groups are nonempty exactly when the score vector is not constant. -/
+theorem scoreGroupSize_pos_of_defined {n : ℕ} (scores : Fin n → Bool)
+    (hdefined : (¬ ∀ member, scores member = false) ∧ ¬ ∀ member, scores member = true)
+    (value : Bool) : 0 < scoreGroupSize scores value := by
+  rw [scoreGroupSize_pos]
+  cases value
+  · by_contra hnone
+    exact hdefined.2 fun member ↦ by
+      cases hvalue : scores member
+      · exact absurd ⟨member, hvalue⟩ hnone
+      · rfl
+  · by_contra hnone
+    exact hdefined.1 fun member ↦ by
+      cases hvalue : scores member
+      · rfl
+      · exact absurd ⟨member, hvalue⟩ hnone
+
+/-- Inside one score fibre the total outcome of a score group is the group size times the
+joint cell mass, cleared of the score marginal. -/
+theorem score_fiber_total (law : FiniteReportLaw (Bool × Bool)) {n : ℕ}
+    (scores : Fin n → Bool) (value : Bool) :
+    scoreMass law value *
+        ∑ outcomes : Fin n → Bool, (∏ member, law.mass (scores member, outcomes member)) *
+          outcomeTotal (fun member ↦ (scores member, outcomes member)) value =
+      law.mass (value, true) *
+        (scoreGroupSize scores value * ∏ member, scoreMass law (scores member)) := by
+  have hterm : ∀ index : Fin n,
+      scoreMass law value *
+          ∑ outcomes : Fin n → Bool, (∏ member, law.mass (scores member, outcomes member)) *
+            ((if scores index = value then (1 : ℝ) else 0) *
+              if outcomes index = true then (1 : ℝ) else 0) =
+        (if scores index = value then (1 : ℝ) else 0) *
+          (law.mass (value, true) * ∏ member, scoreMass law (scores member)) := by
+    intro index
+    by_cases hindex : scores index = value
+    · have hpinned := sum_prod_pinned_one index
+        (fun member outcome ↦ law.mass (scores member, outcome)) true
+      simp only [] at hpinned
+      rw [Finset.prod_congr rfl fun member (_ : member ∈ Finset.univ) ↦
+          sum_mass_eq_scoreMass law (scores member),
+        sum_mass_eq_scoreMass, hindex] at hpinned
+      have hone : (∑ outcomes : Fin n → Bool,
+          (∏ member, law.mass (scores member, outcomes member)) *
+            ((if scores index = value then (1 : ℝ) else 0) *
+              if outcomes index = true then (1 : ℝ) else 0)) =
+          ∑ outcomes : Fin n → Bool,
+            (∏ member, law.mass (scores member, outcomes member)) *
+              if outcomes index = true then (1 : ℝ) else 0 :=
+        Finset.sum_congr rfl fun outcomes _ ↦ by rw [if_pos hindex, one_mul]
+      rw [hone, if_pos hindex, one_mul]
+      linear_combination hpinned
+    · have hzero : (∑ outcomes : Fin n → Bool,
+          (∏ member, law.mass (scores member, outcomes member)) *
+            ((if scores index = value then (1 : ℝ) else 0) *
+              if outcomes index = true then (1 : ℝ) else 0)) = 0 := by
+        refine Finset.sum_eq_zero fun outcomes _ ↦ ?_
+        rw [if_neg hindex, zero_mul, mul_zero]
+      rw [hzero, mul_zero, if_neg hindex, zero_mul]
+  have htotal : ∀ outcomes : Fin n → Bool,
+      outcomeTotal (fun member ↦ (scores member, outcomes member)) value =
+        ∑ index, ((if scores index = value then (1 : ℝ) else 0) *
+          if outcomes index = true then (1 : ℝ) else 0) := fun _ ↦ rfl
+  have hswap : (∑ outcomes : Fin n → Bool,
+      (∏ member, law.mass (scores member, outcomes member)) *
+        outcomeTotal (fun member ↦ (scores member, outcomes member)) value) =
+      ∑ index : Fin n, ∑ outcomes : Fin n → Bool,
+        (∏ member, law.mass (scores member, outcomes member)) *
+          ((if scores index = value then (1 : ℝ) else 0) *
+            if outcomes index = true then (1 : ℝ) else 0) := by
+    simp only [htotal, Finset.mul_sum]
+    rw [Finset.sum_comm]
+  have hfactor : (∑ index : Fin n, (if scores index = value then (1 : ℝ) else 0) *
+      (law.mass (value, true) * ∏ member, scoreMass law (scores member))) =
+      scoreGroupSize scores value *
+        (law.mass (value, true) * ∏ member, scoreMass law (scores member)) := by
+    rw [scoreGroupSize, Finset.sum_mul]
+  rw [hswap, Finset.mul_sum,
+    Finset.sum_congr rfl fun index (_ : index ∈ Finset.univ) ↦ hterm index, hfactor]
+  ring
+
+/-- Inside one score fibre the group mean is unbiased for the conditional cell mean. -/
+theorem score_fiber_mean (law : FiniteReportLaw (Bool × Bool)) {n : ℕ}
+    (scores : Fin n → Bool) (value : Bool) (hgroup : scoreGroupSize scores value ≠ 0) :
+    scoreMass law value *
+        ∑ outcomes : Fin n → Bool, (∏ member, law.mass (scores member, outcomes member)) *
+          (outcomeTotal (fun member ↦ (scores member, outcomes member)) value /
+            scoreGroupSize scores value) =
+      law.mass (value, true) * ∏ member, scoreMass law (scores member) := by
+  have hsplit : (∑ outcomes : Fin n → Bool,
+      (∏ member, law.mass (scores member, outcomes member)) *
+        (outcomeTotal (fun member ↦ (scores member, outcomes member)) value /
+          scoreGroupSize scores value)) =
+      (∑ outcomes : Fin n → Bool, (∏ member, law.mass (scores member, outcomes member)) *
+        outcomeTotal (fun member ↦ (scores member, outcomes member)) value) /
+        scoreGroupSize scores value := by
+    rw [Finset.sum_div]
+    exact Finset.sum_congr rfl fun outcomes _ ↦ (mul_div_assoc _ _ _).symm
+  rw [hsplit, mul_div_assoc', score_fiber_total law scores value, div_eq_iff hgroup]
+  ring
+
+/-- The fibrewise form of the slope statement of NOTE1 (42). -/
+theorem score_fiber_slope (law : FiniteReportLaw (Bool × Bool)) {n : ℕ}
+    (scores : Fin n → Bool) :
+    scoreMass law true * scoreMass law false *
+        ∑ outcomes : Fin n → Bool, (∏ member, law.mass (scores member, outcomes member)) *
+          (empiricalSlope (fun member ↦ (scores member, outcomes member)) *
+            slopeDefinedIndicator fun member ↦ (scores member, outcomes member)) =
+      (law.mass (true, true) * scoreMass law false -
+          law.mass (false, true) * scoreMass law true) *
+        ((∏ member, scoreMass law (scores member)) * scoreDefinedIndicator scores) := by
+  by_cases hdefined : (¬ ∀ member, scores member = false) ∧ ¬ ∀ member, scores member = true
+  · have hdonor : scoreGroupSize scores true ≠ 0 :=
+      ne_of_gt (scoreGroupSize_pos_of_defined scores hdefined true)
+    have hrecipient : scoreGroupSize scores false ≠ 0 :=
+      ne_of_gt (scoreGroupSize_pos_of_defined scores hdefined false)
+    have hsplit : (∑ outcomes : Fin n → Bool,
+        (∏ member, law.mass (scores member, outcomes member)) *
+          (empiricalSlope (fun member ↦ (scores member, outcomes member)) *
+            slopeDefinedIndicator fun member ↦ (scores member, outcomes member))) =
+        (∑ outcomes : Fin n → Bool, (∏ member, law.mass (scores member, outcomes member)) *
+          (outcomeTotal (fun member ↦ (scores member, outcomes member)) true /
+            scoreGroupSize scores true)) -
+          ∑ outcomes : Fin n → Bool, (∏ member, law.mass (scores member, outcomes member)) *
+            (outcomeTotal (fun member ↦ (scores member, outcomes member)) false /
+              scoreGroupSize scores false) := by
+      rw [← Finset.sum_sub_distrib]
+      refine Finset.sum_congr rfl fun outcomes _ ↦ ?_
+      rw [slopeDefinedIndicator_split, scoreDefinedIndicator, if_pos hdefined, mul_one,
+        empiricalSlope, scoreCount_split, scoreCount_split]
+      ring
+    have hdonorMean := score_fiber_mean law scores true hdonor
+    have hrecipientMean := score_fiber_mean law scores false hrecipient
+    rw [scoreDefinedIndicator, if_pos hdefined, mul_one, hsplit]
+    linear_combination scoreMass law false * hdonorMean - scoreMass law true * hrecipientMean
+  · have hzero : (∑ outcomes : Fin n → Bool,
+        (∏ member, law.mass (scores member, outcomes member)) *
+          (empiricalSlope (fun member ↦ (scores member, outcomes member)) *
+            slopeDefinedIndicator fun member ↦ (scores member, outcomes member))) = 0 := by
+      refine Finset.sum_eq_zero fun outcomes _ ↦ ?_
+      rw [slopeDefinedIndicator_split, scoreDefinedIndicator, if_neg hdefined, mul_zero,
+        mul_zero]
+    rw [hzero, scoreDefinedIndicator, if_neg hdefined, mul_zero, mul_zero, mul_zero]
+
+/-- NOTE1 (42) in cleared form for the empirical slope: the definedness-weighted empirical
+least-squares slope of an independent cohort carries exactly the population covariance. -/
+theorem slope_numerator_identity (law : FiniteReportLaw (Bool × Bool)) (n : ℕ) :
+    scoreMass law true * scoreMass law false *
+        (cohortLaw law n).expectation
+          (fun sample ↦ empiricalSlope sample * slopeDefinedIndicator sample) =
+      (law.mass (true, true) * scoreMass law false -
+          law.mass (false, true) * scoreMass law true) *
+        (cohortLaw law n).expectation slopeDefinedIndicator := by
+  rw [cohort_expectation_split_score law n
+      (fun sample ↦ empiricalSlope sample * slopeDefinedIndicator sample),
+    cohort_expectation_split_score law n slopeDefinedIndicator, Finset.mul_sum, Finset.mul_sum]
+  refine Finset.sum_congr rfl fun scores _ ↦ ?_
+  have hdelta : (∑ outcomes : Fin n → Bool,
+      (∏ member, law.mass (scores member, outcomes member)) *
+        slopeDefinedIndicator fun member ↦ (scores member, outcomes member)) =
+      (∏ member, scoreMass law (scores member)) * scoreDefinedIndicator scores := by
+    rw [← sum_prod_mass_score law scores, Finset.sum_mul]
+    rfl
+  rw [hdelta]
+  exact score_fiber_slope law scores
+
+/-- The population least-squares slope of a four-cell law, in cleared form. -/
+theorem linearSlope_cleared (law : FiniteReportLaw (Bool × Bool))
+    (hdonor : 0 < scoreMass law true) (hrecipient : 0 < scoreMass law false) :
+    linearSlope law * (scoreMass law true * scoreMass law false) =
+      law.mass (true, true) * scoreMass law false -
+        law.mass (false, true) * scoreMass law true := by
+  have htotal := law.mass_sum
+  simp only [Fintype.sum_prod_type, Fintype.sum_bool] at htotal
+  have hrecipientCell : law.mass (false, false) =
+      1 - law.mass (false, true) - law.mass (true, false) - law.mass (true, true) := by
+    linarith
+  have hvariance : law.variance scoreOf = scoreMass law true * scoreMass law false := by
+    rw [FiniteReportLaw.variance_eq_rawMoments]
+    simp only [expectation_cells, scoreOf_false, scoreOf_true, scoreMass, hrecipientCell]
+    ring
+  have hcovariance : law.covariance scoreOf outcomeOf =
+      law.mass (true, true) * scoreMass law false -
+        law.mass (false, true) * scoreMass law true := by
+    rw [FiniteReportLaw.covariance_eq_rawMoments]
+    simp only [expectation_cells, scoreOf_false, scoreOf_true, outcomeOf_false, outcomeOf_true,
+      scoreMass, hrecipientCell]
+    ring
+  rw [linearSlope, hvariance, hcovariance,
+    div_mul_cancel₀ _ (ne_of_gt (mul_pos hdonor hrecipient))]
+
+/-- NOTE1 (42): conditional on the cohort score varying, the empirical least-squares slope of
+an independent cohort is exactly the population slope.
+
+Assumes: both score classes carry positive mass, and the cohort is large enough that a varying
+score has positive probability. -/
+theorem conditional_empiricalSlope (law : FiniteReportLaw (Bool × Bool)) (n : ℕ)
+    (hdonor : 0 < scoreMass law true) (hrecipient : 0 < scoreMass law false)
+    (hdefined : 0 < (cohortLaw law n).expectation slopeDefinedIndicator) :
+    (cohortLaw law n).expectation
+          (fun sample ↦ empiricalSlope sample * slopeDefinedIndicator sample) /
+        (cohortLaw law n).expectation slopeDefinedIndicator = linearSlope law := by
+  have hkey := slope_numerator_identity law n
+  have hcleared := linearSlope_cleared law hdonor hrecipient
+  have hpositive : scoreMass law true * scoreMass law false ≠ 0 :=
+    ne_of_gt (mul_pos hdonor hrecipient)
+  rw [div_eq_iff (ne_of_gt hdefined)]
+  apply mul_left_cancel₀ hpositive
+  linear_combination hkey -
+    (cohortLaw law n).expectation slopeDefinedIndicator * hcleared
+
+/-- The score marginals of the chronology law of NOTE1 (31) are the donor ancestry fraction and
+its complement. -/
+theorem scoreMass_chronologyLaw (p C : ℝ) (hp0 : 0 ≤ p) (hp1 : p ≤ 1) (hC0 : 0 ≤ C)
+    (hC1 : C ≤ 1) :
+    scoreMass (chronologyLaw p C hp0 hp1 hC0 hC1) true = p ∧
+      scoreMass (chronologyLaw p C hp0 hp1 hC0 hC1) false = 1 - p := by
+  constructor <;> · simp only [scoreMass, chronologyLaw_mass, chronologyMass_false_false,
+                      chronologyMass_false_true, chronologyMass_true_false,
+                      chronologyMass_true_true]
+                    ring
+
+/-- NOTE1 (42) for the chronology cells: conditional on the cohort score varying, the empirical
+least-squares slope is the coupling parameter itself. -/
+theorem conditional_empiricalSlope_chronologyLaw (p C : ℝ) (hp0 : 0 ≤ p) (hp1 : p ≤ 1)
+    (hC0 : 0 ≤ C) (hC1 : C ≤ 1) (hlow : 0 < p) (hhigh : p < 1) (n : ℕ)
+    (hdefined : 0 < (cohortLaw (chronologyLaw p C hp0 hp1 hC0 hC1) n).expectation
+      slopeDefinedIndicator) :
+    (cohortLaw (chronologyLaw p C hp0 hp1 hC0 hC1) n).expectation
+          (fun sample ↦ empiricalSlope sample * slopeDefinedIndicator sample) /
+        (cohortLaw (chronologyLaw p C hp0 hp1 hC0 hC1) n).expectation
+          slopeDefinedIndicator = C := by
+  obtain ⟨hdonor, hrecipient⟩ := scoreMass_chronologyLaw p C hp0 hp1 hC0 hC1
+  rw [conditional_empiricalSlope _ n (by rw [hdonor]; exact hlow)
+      (by rw [hrecipient]; linarith) hdefined,
+    linearSlope_chronologyLaw p C hp0 hp1 hC0 hC1 hlow hhigh]
 
 end Descent.Portability.EmpiricalAUCUnbiasedness

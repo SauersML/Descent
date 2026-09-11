@@ -305,6 +305,12 @@ theorem sum_stage {D : ℕ} (summand : Stage D → ℝ) :
   simp only [Fintype.sum_sum_type, stageStructure, Equiv.coe_fn_mk]
   ring
 
+/-- A rate-weighted sum against an index indicator reads the rate at that index. -/
+private theorem sum_rate_indicator {D : ℕ} (weight : Fin D → ℝ) (target : Fin D) :
+    ∑ deme : Fin D, weight deme * (if target = deme then (1 : ℝ) else 0) = weight target := by
+  classical
+  simp
+
 /-! ## The drift stage reproduces the corpus coalescence row -/
 
 /-- The drift stages sum to the corpus's coalescence generator row on every stored
@@ -433,6 +439,146 @@ theorem migrationStage_sum_rightHeterozygosity {D : ℕ} (rates : ManyDemeLDRate
     rightHeterozygosityMoment_heterozygosity, mul_add, Finset.sum_add_distrib, mul_ite,
     mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
 
+/-! ## The mutation stages reproduce the corpus heterozygosity mutation rows -/
+
+/-- A right-locus mutation pulse moves no left marginal, so the stored heterozygosity has
+zero right-mutation velocity. -/
+theorem rightMutationLeftHeterozygosity_velocity {D : ℕ} (target first second : Fin D)
+    (state : DemeHaplotypeState D) :
+    ((rightMutationCoordinateExpansion target).leftHeterozygosity first second).velocity
+      state = 0 := by
+  simp [PulseCoordinateExpansion.leftHeterozygosity, PulseExpansion.ofEq, PulseExpansion.add,
+    PulseExpansion.mul, PulseExpansion.smul, PulseExpansion.const,
+    rightMutationCoordinateExpansion, rightMutationLeftExpansion]
+
+/-- A left-locus mutation pulse moves no right marginal, so the right-locus heterozygosity
+has zero left-mutation velocity. -/
+theorem leftMutationRightHeterozygosity_velocity {D : ℕ} (target first second : Fin D)
+    (state : DemeHaplotypeState D) :
+    ((leftMutationCoordinateExpansion target).rightHeterozygosity first second).velocity
+      state = 0 := by
+  simp [PulseCoordinateExpansion.rightHeterozygosity, PulseExpansion.ofEq, PulseExpansion.add,
+    PulseExpansion.mul, PulseExpansion.smul, PulseExpansion.const,
+    leftMutationCoordinateExpansion, leftMutationRightExpansion]
+
+/-- The right-locus heterozygosity obeys the same affine mutation law as the stored one, with
+the right-locus contrasts in place of the left: an influx of one half against a decay of the
+current heterozygosity, per lineage sitting in the mutating deme. -/
+theorem rightMutationRightHeterozygosity_velocity {D : ℕ} (target first second : Fin D)
+    (state : DemeHaplotypeState D) :
+    ((rightMutationCoordinateExpansion target).rightHeterozygosity first second).velocity
+        state =
+      2 * ((if first = target then (1 : ℝ) else 0) +
+          (if second = target then (1 : ℝ) else 0)) *
+        (1 / 2 - twoLocusRightHeterozygosity (state first) (state second)) := by
+  by_cases hfirst : first = target <;> by_cases hsecond : second = target <;>
+    simp [PulseCoordinateExpansion.rightHeterozygosity, PulseExpansion.ofEq,
+      PulseExpansion.add, PulseExpansion.mul, PulseExpansion.smul, PulseExpansion.const,
+      rightMutationCoordinateExpansion, rightMutationRightExpansion,
+      twoLocusRightHeterozygosity, TwoLocusHaplotypeFrequencies.rightContrast,
+      hfirst, hsecond] <;> ring
+
+/-- The two mutation stage families sum to the corpus's complete affine mutation row on the
+stored heterozygosity coordinate: the coupling, the recurrent damping and the constant
+influx. -/
+theorem mutationStage_sum_leftHeterozygosity {D : ℕ} (rates : ManyDemeLDRates D)
+    (first second : Fin D) (state : DemeHaplotypeState D) :
+    (∑ deme : Fin D, stageRate rates (Stage.mutationLeft deme) *
+        stageVelocity (enlargedStageExpansion (some (.inl (.H first second))))
+          (Stage.mutationLeft deme) state) +
+      (∑ deme : Fin D, stageRate rates (Stage.mutationRight deme) *
+        stageVelocity (enlargedStageExpansion (some (.inl (.H first second))))
+          (Stage.mutationRight deme) state) =
+      lowOrderLDMutationCoupling rates (twoLocusJetMoment state) (.H first second) +
+        lowOrderLDRecurrentMutationDamping rates (twoLocusJetMoment state)
+          (.H first second) +
+        lowOrderLDMutationForcing rates (.H first second) := by
+  classical
+  have hright : ∀ deme : Fin D,
+      stageRate rates (Stage.mutationRight deme) *
+        stageVelocity (enlargedStageExpansion (some (.inl (.H first second))))
+          (Stage.mutationRight deme) state = 0 := by
+    intro deme
+    have hzero : ((rightMutationCoordinateExpansion deme).leftHeterozygosity first
+        second).velocity state = 0 := rightMutationLeftHeterozygosity_velocity deme first
+      second state
+    show rates.mutation deme / 2 * _ = 0
+    rw [hzero, mul_zero]
+  have hleft : ∀ deme : Fin D,
+      stageRate rates (Stage.mutationLeft deme) *
+        stageVelocity (enlargedStageExpansion (some (.inl (.H first second))))
+          (Stage.mutationLeft deme) state =
+      (1 / 2 - twoLocusLeftHeterozygosity (state first) (state second)) *
+          (rates.mutation deme * (if first = deme then (1 : ℝ) else 0)) +
+        (1 / 2 - twoLocusLeftHeterozygosity (state first) (state second)) *
+          (rates.mutation deme * (if second = deme then (1 : ℝ) else 0)) := by
+    intro deme
+    have hvelocity : stageVelocity (enlargedStageExpansion (some (.inl (.H first second))))
+        (Stage.mutationLeft deme) state =
+        2 * ((if first = deme then (1 : ℝ) else 0) +
+            (if second = deme then (1 : ℝ) else 0)) *
+          twoLocusHMutationVelocity (state first) (state second) :=
+      leftMutationLeftHeterozygosity_velocity deme first second state
+    show rates.mutation deme / 2 * _ = _
+    rw [hvelocity, twoLocusHMutationVelocity_eq]
+    ring
+  simp only [hright, Finset.sum_const_zero, add_zero, hleft, Finset.sum_add_distrib,
+    ← Finset.mul_sum, sum_rate_indicator]
+  simp only [lowOrderLDMutationCoupling, lowOrderLDRecurrentMutationDamping,
+    lowOrderLDMutationForcing, jetMoment_heterozygosity, twoLocusHJet_value]
+  ring
+
+/-- The same affine mutation row holds on the right-locus heterozygosity coordinate, which is
+NOTE1's statement that both heterozygosity families obey one system with one forcing. -/
+theorem mutationStage_sum_rightHeterozygosity {D : ℕ} (rates : ManyDemeLDRates D)
+    (first second : Fin D) (state : DemeHaplotypeState D) :
+    (∑ deme : Fin D, stageRate rates (Stage.mutationLeft deme) *
+        stageVelocity (enlargedStageExpansion (some (.inr (first, second))))
+          (Stage.mutationLeft deme) state) +
+      (∑ deme : Fin D, stageRate rates (Stage.mutationRight deme) *
+        stageVelocity (enlargedStageExpansion (some (.inr (first, second))))
+          (Stage.mutationRight deme) state) =
+      lowOrderLDMutationCoupling rates
+          (rightHeterozygosityMoment (enlargedLowOrderLDFeature state)) (.H first second) +
+        lowOrderLDRecurrentMutationDamping rates
+          (rightHeterozygosityMoment (enlargedLowOrderLDFeature state)) (.H first second) +
+        lowOrderLDMutationForcing rates (.H first second) := by
+  classical
+  have hleft : ∀ deme : Fin D,
+      stageRate rates (Stage.mutationLeft deme) *
+        stageVelocity (enlargedStageExpansion (some (.inr (first, second))))
+          (Stage.mutationLeft deme) state = 0 := by
+    intro deme
+    have hzero : ((leftMutationCoordinateExpansion deme).rightHeterozygosity first
+        second).velocity state = 0 := leftMutationRightHeterozygosity_velocity deme first
+      second state
+    show rates.mutation deme / 2 * _ = 0
+    rw [hzero, mul_zero]
+  have hright : ∀ deme : Fin D,
+      stageRate rates (Stage.mutationRight deme) *
+        stageVelocity (enlargedStageExpansion (some (.inr (first, second))))
+          (Stage.mutationRight deme) state =
+      (1 / 2 - twoLocusRightHeterozygosity (state first) (state second)) *
+          (rates.mutation deme * (if first = deme then (1 : ℝ) else 0)) +
+        (1 / 2 - twoLocusRightHeterozygosity (state first) (state second)) *
+          (rates.mutation deme * (if second = deme then (1 : ℝ) else 0)) := by
+    intro deme
+    have hvelocity : stageVelocity (enlargedStageExpansion (some (.inr (first, second))))
+        (Stage.mutationRight deme) state =
+        2 * ((if first = deme then (1 : ℝ) else 0) +
+            (if second = deme then (1 : ℝ) else 0)) *
+          (1 / 2 - twoLocusRightHeterozygosity (state first) (state second)) :=
+      rightMutationRightHeterozygosity_velocity deme first second state
+    show rates.mutation deme / 2 * _ = _
+    rw [hvelocity]
+    ring
+  simp only [hleft, Finset.sum_const_zero, zero_add, hright, Finset.sum_add_distrib,
+    ← Finset.mul_sum, sum_rate_indicator]
+  simp only [lowOrderLDMutationCoupling, lowOrderLDRecurrentMutationDamping,
+    lowOrderLDMutationForcing, rightHeterozygosityMoment_heterozygosity,
+    twoLocusRightHJet_value]
+  ring
+
 /-! ## The recombination stages reproduce the corpus recombination row -/
 
 /-- Recombination moves no marginal allele frequency, so the left heterozygosity has zero
@@ -482,12 +628,6 @@ theorem recombinationDzObservable_velocity {D : ℕ} (deme first second third : 
       TwoLocusDiffusionJet.const, twoLocusLinkageJet, twoLocusLeftContrastJet,
       twoLocusRightContrastJet, twoLocusLeftFrequencyJet, twoLocusRightFrequencyJet,
       hfirst] <;> ring
-
-/-- A rate-weighted sum against an index indicator reads the rate at that index. -/
-private theorem sum_rate_indicator {D : ℕ} (weight : Fin D → ℝ) (target : Fin D) :
-    ∑ deme : Fin D, weight deme * (if target = deme then (1 : ℝ) else 0) = weight target := by
-  classical
-  simp
 
 /-- The recombination stages sum to the corpus's recombination generator row on every stored
 coordinate. -/
