@@ -76,7 +76,7 @@ theorem multinomial_mul_prod_descFactorial {H : Type*} [Fintype H] [DecidableEq 
       = (∑ a, z a).factorial :=
     Nat.factorial_mul_descFactorial (Finset.sum_le_sum fun a _ ↦ hle a)
   refine Nat.eq_of_mul_eq_mul_right hpos ?_
-  calc Nat.multinomial Finset.univ z * ∏ a, (z a).descFactorial (b a)
+  calc Nat.multinomial Finset.univ z * (∏ a, (z a).descFactorial (b a))
         * ∏ a, (z a - b a).factorial
       = (∏ a, (z a).factorial) * Nat.multinomial Finset.univ z := by
         rw [mul_assoc, hprod, mul_comm]
@@ -111,12 +111,14 @@ theorem sum_piAntidiag_prod_descFactorial {H : Type*} [Fintype H] [DecidableEq H
     rw [← Finset.sum_filter_of_ne hterm, Finset.sum_pow_eq_sum_piAntidiag, Finset.mul_sum]
     refine Finset.sum_bij' (fun z _ ↦ z - b) (fun w _ ↦ w + b) ?_ ?_ ?_ ?_ ?_
     · intro z hz
+      dsimp only
       obtain ⟨hmem, hle⟩ := Finset.mem_filter.mp hz
       have hsumz := (Finset.mem_piAntidiag.mp hmem).1
-      refine Finset.mem_piAntidiag.mpr ⟨?_, fun a _ ↦ Finset.mem_univ a⟩
-      refine Nat.eq_sub_of_add_eq ?_
-      rw [← hsumz, ← Finset.sum_add_distrib]
-      exact Finset.sum_congr rfl fun a _ ↦ Nat.sub_add_cancel (hle a)
+      refine Finset.mem_piAntidiag.mpr ⟨Nat.eq_sub_of_add_eq ?_, fun a _ ↦ Finset.mem_univ a⟩
+      calc Finset.univ.sum (z - b) + ∑ a, b a = ∑ a, (z a - b a + b a) :=
+            Finset.sum_add_distrib.symm
+        _ = Finset.univ.sum z := Finset.sum_congr rfl fun a _ ↦ Nat.sub_add_cancel (hle a)
+        _ = N := hsumz
     · intro w hw
       have hsumw := (Finset.mem_piAntidiag.mp hw).1
       refine Finset.mem_filter.mpr ⟨Finset.mem_piAntidiag.mpr ⟨?_, fun a _ ↦ Finset.mem_univ a⟩,
@@ -128,7 +130,7 @@ theorem sum_piAntidiag_prod_descFactorial {H : Type*} [Fintype H] [DecidableEq H
       exact Nat.sub_add_cancel ((Finset.mem_filter.mp hz).2 a)
     · intro w _
       funext a
-      exact Nat.add_sub_cancel
+      exact Nat.add_sub_cancel (w a) (b a)
     · intro z hz
       dsimp only
       have hle := (Finset.mem_filter.mp hz).2
