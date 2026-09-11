@@ -34,7 +34,8 @@ open Foundations
 
 noncomputable section
 
-variable {W Y F : Type*} [Fintype W] [Fintype Y] [Fintype F] [DecidableEq W] [DecidableEq Y]
+variable {W Y F : Type*} [Fintype W] [Fintype Y] [Fintype F]
+variable [DecidableEq W] [DecidableEq Y] [DecidableEq F]
 variable [Nonempty Y]
 
 /-- The `μ`-weighted total conditional oscillation of an observable. -/
@@ -299,6 +300,430 @@ theorem notMem_oscNbhd (μ : W → ℝ) (hμ : ∀ w, 0 ≤ μ w) (g : F → W �
       Finset.le_inf' _ _ fun y _ ↦ by simpa [Pi.sub_apply] using hl w y
     linarith
   linarith [hr lam]
+
+/-- The row-indicator pairing with a signed weight. -/
+theorem sum_row_indicator (σ : W × Y → ℝ) (w : W) (t : ℝ) :
+    ∑ z : W × Y, (if z.1 = w then t else 0) * σ z = t * ∑ y, σ (w, y) := by
+  rw [Fintype.sum_prod_type]
+  have h : ∀ w' : W, (∑ y, (if ((w', y) : W × Y).1 = w then t else 0) * σ (w', y)) =
+      if w' = w then t * ∑ y, σ (w, y) else 0 := by
+    intro w'
+    by_cases hw : w' = w
+    · subst hw; simp [Finset.mul_sum]
+    · simp [hw]
+  rw [Finset.sum_congr rfl fun w' _ ↦ h w', Finset.sum_ite_eq' Finset.univ w]
+  simp
+
+/-- The positive-part bump pairing with a signed weight. -/
+theorem sum_pos_bump (σ : W × Y → ℝ) (w : W) (a : ℝ) :
+    ∑ z : W × Y, (if z.1 = w then a * (if 0 ≤ σ z then 1 else 0) else 0) * σ z =
+      a * ∑ y, (|σ (w, y)| + σ (w, y)) / 2 := by
+  have hterm : ∀ x : ℝ, (if 0 ≤ x then (1 : ℝ) else 0) * x = (|x| + x) / 2 := by
+    intro x
+    by_cases hx : 0 ≤ x
+    · rw [if_pos hx, one_mul, abs_of_nonneg hx]; ring
+    · rw [if_neg hx, zero_mul, abs_of_neg (not_le.mp hx)]; ring
+  rw [Fintype.sum_prod_type]
+  have h : ∀ w' : W, (∑ y, (if ((w', y) : W × Y).1 = w then
+      a * (if 0 ≤ σ (w', y) then 1 else 0) else 0) * σ (w', y)) =
+      if w' = w then a * ∑ y, (|σ (w, y)| + σ (w, y)) / 2 else 0 := by
+    intro w'
+    by_cases hw : w' = w
+    · subst hw
+      rw [if_pos rfl, Finset.mul_sum]
+      refine Finset.sum_congr rfl fun y _ ↦ ?_
+      rw [if_pos (rfl : ((w, y) : W × Y).1 = w), mul_assoc, hterm]
+    · simp [hw]
+  rw [Finset.sum_congr rfl fun w' _ ↦ h w', Finset.sum_ite_eq' Finset.univ w]
+  simp
+
+/-- The single-feature pairing with a signed weight. -/
+theorem sum_feature_combo (σ : W × Y → ℝ) (g : F → W × Y → ℝ) (i : F) (t : ℝ) :
+    ∑ z : W × Y, featureCombo g (fun j ↦ if j = i then t else 0) z * σ z =
+      t * ∑ z : W × Y, g i z * σ z := by
+  rw [Finset.mul_sum]
+  refine Finset.sum_congr rfl fun z _ ↦ ?_
+  simp only [featureCombo, Finset.sum_mul]
+  rw [Finset.sum_eq_single_of_mem i (Finset.mem_univ i)]
+  · simp
+  · intro b _ hb
+    simp [hb]
+
+/-- The total conditional oscillation is nonnegative. -/
+theorem oscTotal_nonneg (μ : W → ℝ) (hμ : ∀ w, 0 ≤ μ w) (h : W × Y → ℝ) :
+    0 ≤ oscTotal μ h := by
+  refine Finset.sum_nonneg fun w _ ↦ mul_nonneg (hμ w) ?_
+  have h1 := Finset.inf'_le (fun y ↦ h (w, y)) (Finset.mem_univ (Classical.arbitrary Y))
+  have h2 := Finset.le_sup' (fun y ↦ h (w, y)) (Finset.mem_univ (Classical.arbitrary Y))
+  linarith
+
+/-- A kernel pair whose weighted difference is a prescribed signed weight reproduces that
+weight's pairing with every observable. -/
+theorem kernel_pair_difference (μ : W → ℝ) (K L : W → Y → ℝ) (τ : W × Y → ℝ)
+    (hdiff : ∀ w y, μ w * (K w y - L w y) = τ (w, y)) (G : W × Y → ℝ) :
+    (∑ w, μ w * ∑ y, K w y * G (w, y)) - ∑ w, μ w * ∑ y, L w y * G (w, y) =
+      ∑ z : W × Y, τ z * G z := by
+  rw [Fintype.sum_prod_type, ← Finset.sum_sub_distrib]
+  refine Finset.sum_congr rfl fun w _ ↦ ?_
+  rw [← mul_sub, ← Finset.sum_sub_distrib, Finset.mul_sum]
+  refine Finset.sum_congr rfl fun y _ ↦ ?_
+  rw [← sub_mul, ← mul_assoc, hdiff w y]
+
+/-- **PL Theorem 8.2, lower bound.** If the dual objective is bounded below by `r`, then
+every `c` in `(0, r)` is attained by an explicit feasible pair of conditional kernels,
+built from the separating functional. -/
+theorem exists_kernelGap_ge (μ : W → ℝ) (hμ : ∀ w, 0 < μ w) (g : F → W × Y → ℝ)
+    (f : W × Y → ℝ) (ε : ℝ) (hε : 0 ≤ ε) {c r : ℝ} (hc : 0 < c) (hcr : c < r)
+    (hr : ∀ lam : F → ℝ,
+      r ≤ oscTotal μ (f - featureCombo g lam) + 2 * ε * ∑ i, |lam i|) :
+    ∃ t ∈ kernelGaps μ g f ε, c ≤ t := by
+  classical
+  obtain ⟨y₀⟩ := ‹Nonempty Y›
+  have hμ0 : ∀ w, 0 ≤ μ w := fun w ↦ (hμ w).le
+  obtain ⟨φ, hφ⟩ := geometric_hahn_banach_open_point
+    (convex_oscNbhd μ hμ0 g ε hε r) (isOpen_oscNbhd μ hμ0 g ε r)
+    (notMem_oscNbhd μ hμ0 g f ε r hr)
+  have hcombo0 : ∀ z : W × Y, featureCombo g (fun _ : F ↦ (0 : ℝ)) z = 0 := by
+    intro z; simp [featureCombo]
+  obtain ⟨σ, hφeval⟩ : ∃ σ : W × Y → ℝ, ∀ h : W × Y → ℝ, φ h = ∑ z, h z * σ z :=
+    ⟨fun z ↦ φ (ApproximationDuality.stdBasis z),
+      fun h ↦ ApproximationDuality.eval_as_sum φ h⟩
+  have hzero : (0 : W × Y → ℝ) ∈ oscNbhd μ g ε r := by
+    refine ⟨fun _ ↦ 0, fun _ ↦ 0, fun _ ↦ 0, ?_, ?_, ?_⟩
+    · intro w y; simp [hcombo0]
+    · intro w y; simp [hcombo0]
+    · simp
+      linarith
+  have hpos : 0 < φ f := by simpa using hφ 0 hzero
+  have hrow : ∀ w, ∑ y, σ (w, y) = 0 := by
+    intro w
+    have hmem : ∀ t : ℝ, (fun z : W × Y ↦ if z.1 = w then t else 0) ∈ oscNbhd μ g ε r := by
+      intro t
+      refine ⟨fun _ ↦ 0, fun w' ↦ if w' = w then t else 0,
+        fun w' ↦ if w' = w then t else 0, ?_, ?_, ?_⟩
+      · intro w' y; simp [hcombo0]
+      · intro w' y; simp [hcombo0]
+      · simp
+        linarith
+    have hall : ∀ t : ℝ, t * (∑ y, σ (w, y)) < φ f := by
+      intro t
+      have h1 := hφ _ (hmem t)
+      rw [hφeval, sum_row_indicator σ w t] at h1
+      exact h1
+    by_contra hne
+    have h := hall ((φ f + 1) / (∑ y, σ (w, y)))
+    rw [div_mul_cancel₀ _ hne] at h
+    linarith
+  have hfeat : ∀ i : F, |∑ z, g i z * σ z| ≤ 2 * ε * (φ f / c) := by
+    intro i
+    have hmem : ∀ t : ℝ, 2 * ε * |t| < r →
+        featureCombo g (fun j ↦ if j = i then t else 0) ∈ oscNbhd μ g ε r := by
+      intro t ht
+      refine ⟨fun j ↦ if j = i then t else 0, fun _ ↦ 0, fun _ ↦ 0, ?_, ?_, ?_⟩
+      · intro w y; simp
+      · intro w y; simp
+      · have hnorm : (∑ j, |if j = i then t else 0|) = |t| := by
+          rw [Finset.sum_eq_single_of_mem i (Finset.mem_univ i)]
+          · simp
+          · intro b _ hb; simp [hb]
+        rw [hnorm]
+        simp
+        linarith
+    have hall : ∀ t : ℝ, 2 * ε * |t| < r → t * (∑ z, g i z * σ z) < φ f := by
+      intro t ht
+      have h1 := hφ _ (hmem t ht)
+      rw [hφeval, sum_feature_combo σ g i t] at h1
+      exact h1
+    by_contra hcon
+    push_neg at hcon
+    have hdiv : (0 : ℝ) ≤ φ f / c := (div_pos hpos hc).le
+    have hnn : (0 : ℝ) ≤ 2 * ε * (φ f / c) := by nlinarith
+    have hAabs : 0 < |∑ z, g i z * σ z| := lt_of_le_of_lt hnn hcon
+    have hAne : (∑ z, g i z * σ z) ≠ 0 := by
+      intro h0
+      rw [h0] at hAabs
+      simp at hAabs
+    have hta : (φ f / (∑ z, g i z * σ z)) * (∑ z, g i z * σ z) = φ f :=
+      div_mul_cancel₀ _ hAne
+    have htbound : 2 * ε * |φ f / (∑ z, g i z * σ z)| < r := by
+      have habs : |φ f / (∑ z, g i z * σ z)| = φ f / |∑ z, g i z * σ z| := by
+        rw [abs_div, abs_of_pos hpos]
+      rcases eq_or_lt_of_le hε with h0 | h0
+      · rw [← h0]
+        simp
+        linarith
+      · rw [habs]
+        have hmul : 2 * ε * φ f < c * |∑ z, g i z * σ z| := by
+          have h2 := mul_lt_mul_of_pos_right hcon hc
+          rw [mul_assoc, div_mul_cancel₀ _ hc.ne'] at h2
+          linarith
+        have hkey : 2 * ε * (φ f / |∑ z, g i z * σ z|) * |∑ z, g i z * σ z| <
+            c * |∑ z, g i z * σ z| := by
+          rw [mul_assoc, div_mul_cancel₀ _ hAabs.ne']
+          exact hmul
+        have hlt := lt_of_mul_lt_mul_right hkey hAabs.le
+        linarith
+    have hfin := hall (φ f / (∑ z, g i z * σ z)) htbound
+    rw [hta] at hfin
+    linarith
+  have hpospart : ∀ w, (∑ y, (|σ (w, y)| + σ (w, y)) / 2) ≤ μ w * (φ f / c) := by
+    intro w
+    have hμne : μ w ≠ 0 := (hμ w).ne'
+    have hcμ : 0 < c / μ w := div_pos hc (hμ w)
+    have hmem : (fun z : W × Y ↦ if z.1 = w then (c / μ w) * (if 0 ≤ σ z then 1 else 0)
+        else 0) ∈ oscNbhd μ g ε r := by
+      refine ⟨fun _ ↦ 0, fun w' ↦ if w' = w then c / μ w else 0, fun _ ↦ 0, ?_, ?_, ?_⟩
+      · intro w' y
+        simp only [hcombo0, sub_zero]
+        split_ifs <;> simp <;> linarith
+      · intro w' y
+        simp only [hcombo0, sub_zero]
+        by_cases hw : w' = w
+        · subst hw
+          simp only [if_pos rfl]
+          split_ifs <;> simp <;> linarith
+        · simp [hw]
+      · have hs : (∑ w', μ w' * ((if w' = w then c / μ w else 0) - 0)) = c := by
+          have hterm : ∀ w' : W, μ w' * ((if w' = w then c / μ w else 0) - 0) =
+              if w' = w then c else 0 := by
+            intro w'
+            by_cases hw : w' = w
+            · subst hw; simp; field_simp
+            · simp [hw]
+          rw [Finset.sum_congr rfl fun w' _ ↦ hterm w',
+            Finset.sum_ite_eq' Finset.univ w]
+          simp
+        rw [hs]
+        simp
+        linarith
+    have h1 := hφ _ hmem
+    rw [hφeval, sum_pos_bump σ w (c / μ w)] at h1
+    have hmul := mul_lt_mul_of_pos_right h1 (div_pos (hμ w) hc)
+    have hid : c / μ w * (∑ y, (|σ (w, y)| + σ (w, y)) / 2) * (μ w / c) =
+        ∑ y, (|σ (w, y)| + σ (w, y)) / 2 := by field_simp
+    rw [hid] at hmul
+    have hcomm : φ f * (μ w / c) = μ w * (φ f / c) := by ring
+    linarith [hmul, hcomm]
+  have hKpos : 0 < φ f / c := div_pos hpos hc
+  obtain ⟨τ, hτrow, hτpos, hτfeat, hτf⟩ :
+      ∃ τ : W × Y → ℝ, (∀ w, ∑ y, τ (w, y) = 0) ∧
+        (∀ w, (∑ y, (|τ (w, y)| + τ (w, y)) / 2) ≤ μ w) ∧
+        (∀ i, |∑ z, g i z * τ z| ≤ 2 * ε) ∧ (∑ z, f z * τ z) = c := by
+    refine ⟨fun z ↦ σ z / (φ f / c), fun w ↦ ?_, fun w ↦ ?_, fun i ↦ ?_, ?_⟩
+    · have hid : (∑ y, σ (w, y) / (φ f / c)) = (∑ y, σ (w, y)) / (φ f / c) := by
+        rw [Finset.sum_div]
+      rw [hid, hrow w, zero_div]
+    · have hKne : (φ f / c) ≠ 0 := hKpos.ne'
+      have hid : (∑ y, (|σ (w, y) / (φ f / c)| + σ (w, y) / (φ f / c)) / 2) =
+          (∑ y, (|σ (w, y)| + σ (w, y)) / 2) / (φ f / c) := by
+        rw [Finset.sum_div]
+        refine Finset.sum_congr rfl fun y _ ↦ ?_
+        rw [abs_div, abs_of_pos hKpos]
+        field_simp
+      rw [hid, div_le_iff₀ hKpos]
+      have h := hpospart w
+      linarith
+    · have hid : (∑ z, g i z * (σ z / (φ f / c))) = (∑ z, g i z * σ z) / (φ f / c) := by
+        rw [Finset.sum_div]
+        exact Finset.sum_congr rfl fun z _ ↦ (mul_div_assoc _ _ _).symm
+      rw [hid, abs_div, abs_of_pos hKpos, div_le_iff₀ hKpos]
+      have h := hfeat i
+      linarith
+    · have hfne : φ f ≠ 0 := hpos.ne'
+      have hcne : c ≠ 0 := hc.ne'
+      have hid : (∑ z, f z * (σ z / (φ f / c))) = (∑ z, f z * σ z) / (φ f / c) := by
+        rw [Finset.sum_div]
+        exact Finset.sum_congr rfl fun z _ ↦ (mul_div_assoc _ _ _).symm
+      rw [hid, ← hφeval f]
+      field_simp
+  have hτneg : ∀ w, (∑ y, (|τ (w, y)| - τ (w, y)) / 2) =
+      ∑ y, (|τ (w, y)| + τ (w, y)) / 2 := by
+    intro w
+    have hsplit : ∀ y : Y, (|τ (w, y)| - τ (w, y)) / 2 =
+        (|τ (w, y)| + τ (w, y)) / 2 - τ (w, y) := by intro y; ring
+    rw [Finset.sum_congr rfl fun y _ ↦ hsplit y, Finset.sum_sub_distrib, hτrow w, sub_zero]
+  obtain ⟨Kk, Ll, hKnn, hLnn, hKsum, hLsum, hdiff⟩ :
+      ∃ Kk Ll : W → Y → ℝ, (∀ w y, 0 ≤ Kk w y) ∧ (∀ w y, 0 ≤ Ll w y) ∧
+        (∀ w, ∑ y, Kk w y = 1) ∧ (∀ w, ∑ y, Ll w y = 1) ∧
+        (∀ w y, μ w * (Kk w y - Ll w y) = τ (w, y)) := by
+    refine ⟨fun w y ↦ ((|τ (w, y)| + τ (w, y)) / 2 +
+        (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) * (if y = y₀ then 1 else 0)) / μ w,
+      fun w y ↦ ((|τ (w, y)| - τ (w, y)) / 2 +
+        (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) * (if y = y₀ then 1 else 0)) / μ w,
+      ?_, ?_, ?_, ?_, ?_⟩
+    · intro w y
+      have h1 : (0 : ℝ) ≤ (|τ (w, y)| + τ (w, y)) / 2 := by
+        linarith [neg_abs_le (τ (w, y))]
+      have h2 : (0 : ℝ) ≤ μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2 := by
+        linarith [hτpos w]
+      have h3 : (0 : ℝ) ≤ (if y = y₀ then (1 : ℝ) else 0) := by split_ifs <;> norm_num
+      exact div_nonneg (by nlinarith) (hμ w).le
+    · intro w y
+      have h1 : (0 : ℝ) ≤ (|τ (w, y)| - τ (w, y)) / 2 := by
+        linarith [le_abs_self (τ (w, y))]
+      have h2 : (0 : ℝ) ≤ μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2 := by
+        linarith [hτpos w]
+      have h3 : (0 : ℝ) ≤ (if y = y₀ then (1 : ℝ) else 0) := by split_ifs <;> norm_num
+      exact div_nonneg (by nlinarith) (hμ w).le
+    · intro w
+      have hμne : μ w ≠ 0 := (hμ w).ne'
+      have hid : (∑ y, ((|τ (w, y)| + τ (w, y)) / 2 +
+          (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) * (if y = y₀ then 1 else 0)) / μ w) =
+          ((∑ y, (|τ (w, y)| + τ (w, y)) / 2) +
+            (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) *
+              ∑ y, (if y = y₀ then (1 : ℝ) else 0)) / μ w := by
+        rw [Finset.sum_div, Finset.sum_add_distrib, ← Finset.mul_sum, Finset.sum_div]
+      rw [hid, Finset.sum_ite_eq' Finset.univ y₀]
+      simp only [Finset.mem_univ, if_true, mul_one]
+      field_simp
+    · intro w
+      have hμne : μ w ≠ 0 := (hμ w).ne'
+      have hid : (∑ y, ((|τ (w, y)| - τ (w, y)) / 2 +
+          (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) * (if y = y₀ then 1 else 0)) / μ w) =
+          ((∑ y, (|τ (w, y)| - τ (w, y)) / 2) +
+            (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) *
+              ∑ y, (if y = y₀ then (1 : ℝ) else 0)) / μ w := by
+        rw [Finset.sum_div, Finset.sum_add_distrib, ← Finset.mul_sum, Finset.sum_div]
+      rw [hid, Finset.sum_ite_eq' Finset.univ y₀, hτneg w]
+      simp only [Finset.mem_univ, if_true, mul_one]
+      field_simp
+    · intro w y
+      have hμne : μ w ≠ 0 := (hμ w).ne'
+      field_simp
+      ring
+  refine ⟨∑ z, τ z * f z, ⟨Kk, Ll, hKnn, hLnn, hKsum, hLsum, ?_, ?_⟩, ?_⟩
+  · intro i
+    rw [kernel_pair_difference μ Kk Ll τ hdiff (g i)]
+    have hcomm : (∑ z, τ z * g i z) = ∑ z, g i z * τ z :=
+      Finset.sum_congr rfl fun z _ ↦ by ring
+    rw [hcomm]
+    exact hτfeat i
+  · exact (kernel_pair_difference μ Kk Ll τ hdiff f).symm
+  · have hcomm : (∑ z, τ z * f z) = ∑ z, f z * τ z :=
+      Finset.sum_congr rfl fun z _ ↦ by ring
+    rw [hcomm, hτf]
+
+/-- **PL Theorem 8.2 and Corollary 8.3.** The report diameter over conditional kernel
+pairs whose supplied feature expectations agree coordinatewise to within `2ε` is exactly
+the infimum of the dual objective. With `ε = 0` this is equation (8.2); with `ε > 0`
+it is equation (8.4). -/
+theorem conditional_oscillation_duality (μ : W → ℝ) (hμ : ∀ w, 0 < μ w)
+    (g : F → W × Y → ℝ) (f : W × Y → ℝ) (ε : ℝ) (hε : 0 ≤ ε) :
+    IsLUB (kernelGaps μ g f ε) (sInf (dualValues μ g f ε)) := by
+  classical
+  obtain ⟨y₀⟩ := ‹Nonempty Y›
+  have hμ0 : ∀ w, 0 ≤ μ w := fun w ↦ (hμ w).le
+  have hne : (dualValues μ g f ε).Nonempty := ⟨_, ⟨fun _ ↦ 0, rfl⟩⟩
+  have hbdd : BddBelow (dualValues μ g f ε) := by
+    refine ⟨0, ?_⟩
+    rintro s ⟨lam, rfl⟩
+    have h1 := oscTotal_nonneg μ hμ0 (f - featureCombo g lam)
+    have hs : (0 : ℝ) ≤ ∑ i, |lam i| := Finset.sum_nonneg fun i _ ↦ abs_nonneg _
+    nlinarith
+  constructor
+  · intro t ht
+    refine le_csInf hne ?_
+    rintro s ⟨lam, rfl⟩
+    exact kernelGap_le_dual μ hμ0 g f ε ht lam
+  · intro ub hub
+    have hzeroGap : (0 : ℝ) ∈ kernelGaps μ g f ε := by
+      refine ⟨fun _ y ↦ if y = y₀ then 1 else 0, fun _ y ↦ if y = y₀ then 1 else 0,
+        fun w y ↦ by split_ifs <;> norm_num, fun w y ↦ by split_ifs <;> norm_num,
+        fun w ↦ by rw [Finset.sum_ite_eq' Finset.univ y₀]; simp,
+        fun w ↦ by rw [Finset.sum_ite_eq' Finset.univ y₀]; simp, fun i ↦ ?_, by ring⟩
+      simp
+      linarith
+    have hub0 : 0 ≤ ub := hub hzeroGap
+    by_contra hcon
+    push_neg at hcon
+    obtain ⟨c, hc1, hc2⟩ := exists_between hcon
+    have hcpos : 0 < c := lt_of_le_of_lt hub0 hc1
+    have hr : ∀ lam : F → ℝ, sInf (dualValues μ g f ε) ≤
+        oscTotal μ (f - featureCombo g lam) + 2 * ε * ∑ i, |lam i| :=
+      fun lam ↦ csInf_le hbdd ⟨lam, rfl⟩
+    obtain ⟨t, ht, hge⟩ := exists_kernelGap_ge μ hμ g f ε hε hcpos hc2 hr
+    have hle := hub ht
+    linarith
+
+/-- The midpoint of the conditional range, the constant in PL equation (8.3). -/
+def oscMidpoint (μ : W → ℝ) (h : W × Y → ℝ) : ℝ :=
+  ∑ w, μ w * (Finset.univ.sup' Finset.univ_nonempty (fun y ↦ h (w, y)) +
+    Finset.univ.inf' Finset.univ_nonempty (fun y ↦ h (w, y))) / 2
+
+/-- The report expectation splits into the residual expectation and the supplied feature
+moments. -/
+theorem kernel_report_split (μ : W → ℝ) (g : F → W × Y → ℝ) (f : W × Y → ℝ)
+    (lam : F → ℝ) (M : W → Y → ℝ) :
+    (∑ w, μ w * ∑ y, M w y * f (w, y)) =
+      (∑ w, μ w * ∑ y, M w y * (f - featureCombo g lam) (w, y)) +
+        ∑ i, lam i * ∑ w, μ w * ∑ y, M w y * g i (w, y) := by
+  rw [← combo_expectation μ g lam M, ← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl fun w _ ↦ ?_
+  rw [← mul_add, ← Finset.sum_add_distrib]
+  refine congrArg (fun s ↦ μ w * s) (Finset.sum_congr rfl fun y _ ↦ ?_)
+  simp [Pi.sub_apply]
+  ring
+
+/-- **PL equation (8.3).** The affine rule built from a multiplier vector has worst-case
+absolute error at most half the dual objective at that vector, uniformly over conditional
+kernels. -/
+theorem oscillation_rule_error (μ : W → ℝ) (hμ : ∀ w, 0 ≤ μ w) (g : F → W × Y → ℝ)
+    (f : W × Y → ℝ) (lam : F → ℝ) (K : W → Y → ℝ) (hK : ∀ w y, 0 ≤ K w y)
+    (hKs : ∀ w, ∑ y, K w y = 1) :
+    |(∑ w, μ w * ∑ y, K w y * f (w, y)) -
+        ((∑ i, lam i * ∑ w, μ w * ∑ y, K w y * g i (w, y)) +
+          oscMidpoint μ (f - featureCombo g lam))| ≤
+      oscTotal μ (f - featureCombo g lam) / 2 := by
+  have hsup : (∑ w, μ w * ∑ y, K w y * (f - featureCombo g lam) (w, y)) ≤
+      ∑ w, μ w * Finset.univ.sup' Finset.univ_nonempty
+        (fun y ↦ (f - featureCombo g lam) (w, y)) :=
+    Finset.sum_le_sum fun w _ ↦ mul_le_mul_of_nonneg_left
+      (kernel_average_le_sup (K w) (fun y ↦ hK w y) (hKs w) _) (hμ w)
+  have hinf : (∑ w, μ w * Finset.univ.inf' Finset.univ_nonempty
+        (fun y ↦ (f - featureCombo g lam) (w, y))) ≤
+      ∑ w, μ w * ∑ y, K w y * (f - featureCombo g lam) (w, y) :=
+    Finset.sum_le_sum fun w _ ↦ mul_le_mul_of_nonneg_left
+      (inf_le_kernel_average (K w) (fun y ↦ hK w y) (hKs w) _) (hμ w)
+  have hmid : oscMidpoint μ (f - featureCombo g lam) =
+      ((∑ w, μ w * Finset.univ.sup' Finset.univ_nonempty
+          (fun y ↦ (f - featureCombo g lam) (w, y))) +
+        ∑ w, μ w * Finset.univ.inf' Finset.univ_nonempty
+          (fun y ↦ (f - featureCombo g lam) (w, y))) / 2 := by
+    rw [oscMidpoint, ← Finset.sum_add_distrib, Finset.sum_div]
+    exact Finset.sum_congr rfl fun w _ ↦ by ring
+  have hosc : oscTotal μ (f - featureCombo g lam) =
+      (∑ w, μ w * Finset.univ.sup' Finset.univ_nonempty
+          (fun y ↦ (f - featureCombo g lam) (w, y))) -
+        ∑ w, μ w * Finset.univ.inf' Finset.univ_nonempty
+          (fun y ↦ (f - featureCombo g lam) (w, y)) := by
+    rw [oscTotal, ← Finset.sum_sub_distrib]
+    exact Finset.sum_congr rfl fun w _ ↦ by ring
+  rw [kernel_report_split μ g f lam K, hmid, hosc, abs_le]
+  constructor <;> linarith
+
+/-- **PL Theorem 8.2, exact-moment form.** At `ε = 0` the feasible pairs are exactly the
+kernel pairs with identical supplied feature expectations. -/
+theorem kernelGaps_zero_iff (μ : W → ℝ) (g : F → W × Y → ℝ) (f : W × Y → ℝ) (t : ℝ) :
+    t ∈ kernelGaps μ g f 0 ↔ ∃ K L : W → Y → ℝ, (∀ w y, 0 ≤ K w y) ∧ (∀ w y, 0 ≤ L w y) ∧
+      (∀ w, ∑ y, K w y = 1) ∧ (∀ w, ∑ y, L w y = 1) ∧
+      (∀ i, (∑ w, μ w * ∑ y, K w y * g i (w, y)) =
+        ∑ w, μ w * ∑ y, L w y * g i (w, y)) ∧
+      t = (∑ w, μ w * ∑ y, K w y * f (w, y)) - ∑ w, μ w * ∑ y, L w y * f (w, y) := by
+  constructor
+  · rintro ⟨K, L, hK, hL, hKs, hLs, hmom, ht⟩
+    refine ⟨K, L, hK, hL, hKs, hLs, fun i ↦ ?_, ht⟩
+    have h := hmom i
+    rw [mul_zero] at h
+    have h2 := abs_nonneg ((∑ w, μ w * ∑ y, K w y * g i (w, y)) -
+      ∑ w, μ w * ∑ y, L w y * g i (w, y))
+    have h3 : |(∑ w, μ w * ∑ y, K w y * g i (w, y)) -
+      ∑ w, μ w * ∑ y, L w y * g i (w, y)| = 0 := le_antisymm h h2
+    have := abs_eq_zero.mp h3
+    linarith
+  · rintro ⟨K, L, hK, hL, hKs, hLs, hmom, ht⟩
+    refine ⟨K, L, hK, hL, hKs, hLs, fun i ↦ ?_, ht⟩
+    rw [hmom i]
+    simp
 
 end
 

@@ -15,3 +15,13 @@ import Descent.Portability.ConditionalOscillationDuality
 #print axioms Descent.Portability.ConditionalOscillationDuality.exists_radius
 #print axioms Descent.Portability.ConditionalOscillationDuality.isOpen_oscNbhd
 #print axioms Descent.Portability.ConditionalOscillationDuality.notMem_oscNbhd
+#print axioms Descent.Portability.ConditionalOscillationDuality.sum_row_indicator
+#print axioms Descent.Portability.ConditionalOscillationDuality.sum_pos_bump
+#print axioms Descent.Portability.ConditionalOscillationDuality.sum_feature_combo
+#print axioms Descent.Portability.ConditionalOscillationDuality.oscTotal_nonneg
+#print axioms Descent.Portability.ConditionalOscillationDuality.kernel_pair_difference
+#print axioms Descent.Portability.ConditionalOscillationDuality.exists_kernelGap_ge
+#print axioms Descent.Portability.ConditionalOscillationDuality.conditional_oscillation_duality
+#print axioms Descent.Portability.ConditionalOscillationDuality.kernel_report_split
+#print axioms Descent.Portability.ConditionalOscillationDuality.oscillation_rule_error
+#print axioms Descent.Portability.ConditionalOscillationDuality.kernelGaps_zero_iff
