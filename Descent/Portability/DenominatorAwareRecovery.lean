@@ -64,7 +64,7 @@ theorem chebyshev_eval_half_add_inv (z : ℝ) (hz : 0 < z) (n : ℕ) :
   have hpow : Real.exp ((n : ℝ) * Real.log z) = z ^ n := by
     rw [mul_comm, ← Real.rpow_def_of_pos hz, Real.rpow_natCast]
   have hcast : ((n : ℤ) : ℝ) * Real.log z = (n : ℝ) * Real.log z := by push_cast; ring
-  rw [← hcosh, Polynomial.Chebyshev.T_real_cosh, Real.cosh_eq, hcast, hpow, neg_mul,
+  rw [← hcosh, Polynomial.Chebyshev.T_real_cosh, Real.cosh_eq, hcast, hpow,
     Real.exp_neg, hpow, ← inv_pow]
 
 /-- The Chebyshev degree grows at most linearly. -/
@@ -141,7 +141,7 @@ theorem chebPeak_eq (hδ : 0 < δ) (hM : δ < M) (j : ℕ) :
 theorem one_le_chebPeak (hδ : 0 < δ) (hM : δ < M) (j : ℕ) : 1 ≤ chebPeak M δ j := by
   have hρ := chebRho_pos M δ hδ hM
   have hpow : 0 < chebRho M δ ^ j := pow_pos hρ j
-  rw [chebPeak_eq M δ hδ hM j, ← inv_pow]
+  rw [chebPeak_eq M δ hδ hM j, inv_pow]
   rw [le_div_iff₀ (by norm_num : (0 : ℝ) < 2), ← sub_nonneg]
   have hid : chebRho M δ ^ j + (chebRho M δ ^ j)⁻¹ - 1 * 2 =
       (chebRho M δ ^ j - 1) ^ 2 / chebRho M δ ^ j := by
@@ -158,7 +158,7 @@ theorem chebPeak_inv_eq (hδ : 0 < δ) (hM : δ < M) (j : ℕ) :
   have hpow : 0 < chebRho M δ ^ j := pow_pos hρ j
   have h2 : chebRho M δ ^ (2 * j) = (chebRho M δ ^ j) ^ 2 := by
     rw [← pow_mul, mul_comm]
-  rw [chebPeak_eq M δ hδ hM j, ← inv_pow, h2]
+  rw [chebPeak_eq M δ hδ hM j, inv_pow, h2]
   rw [div_eq_div_iff (by positivity) (by positivity)]
   field_simp
   ring
@@ -199,7 +199,9 @@ theorem residualPoly_eval_zero (hδ : 0 < δ) (hM : δ < M) (j : ℕ) :
     linarith
   unfold residualPoly
   rw [Polynomial.eval_mul, Polynomial.eval_C, Polynomial.eval_comp, chebArgPoly_eval]
-  have harg : (M + δ - 2 * 0) / (M - δ) = chebC M δ := by unfold chebC; ring_nf
+  have harg : (M + δ - 2 * 0) / (M - δ) = chebC M δ := by
+    unfold chebC
+    norm_num
   rw [harg]
   exact inv_mul_cancel₀ hpeak
 
@@ -210,8 +212,11 @@ theorem recoveryPoly_factor (hδ : 0 < δ) (hM : δ < M) (j : ℕ) :
   have hdvd : Polynomial.X ∣ (1 - residualPoly M δ j) := by
     rw [Polynomial.X_dvd_iff, Polynomial.coeff_zero_eq_eval_zero]
     simp [residualPoly_eval_zero M δ hδ hM j]
-  have h := Polynomial.modByMonic_add_div (1 - residualPoly M δ j) Polynomial.monic_X
-  rw [(Polynomial.dvd_iff_modByMonic_eq_zero Polynomial.monic_X).mpr hdvd, zero_add] at h
+  have hmonic : (Polynomial.X : Polynomial ℝ).Monic := Polynomial.monic_X
+  have hmod : (1 - residualPoly M δ j) %ₘ (Polynomial.X : Polynomial ℝ) = 0 :=
+    (Polynomial.modByMonic_eq_zero_iff_dvd hmonic).mpr hdvd
+  have h := Polynomial.modByMonic_add_div (1 - residualPoly M δ j) hmonic
+  rw [hmod, zero_add] at h
   exact h.symm
 
 /-- **PL Theorem 9.1, degree bound.** The recovery polynomial has degree at most
@@ -238,7 +243,7 @@ theorem recovery_error_bound (hδ : 0 < δ) (hM : δ < M) (j : ℕ) (A B : ℝ)
     rw [eq_div_iff hB.ne']
     linarith
   rw [hrec, show A / B - A * ((1 - (residualPoly M δ j).eval B) / B) =
-      A / B * (residualPoly M δ j).eval B by field_simp, abs_mul]
+      A / B * (residualPoly M δ j).eval B by field_simp; ring, abs_mul]
   have h1 : |A / B| ≤ 1 := by
     rw [abs_of_nonneg (div_nonneg hA hB.le)]
     exact (div_le_one hB).mpr hAB
@@ -267,11 +272,13 @@ theorem natDegree_approximant_le (j : ℕ) (hj : 1 ≤ j) (d : ℕ) (A B : Polyn
   have hcomp : ((recoveryPoly M δ j).comp B).natDegree ≤ (j - 1) * d :=
     Polynomial.natDegree_comp_le.trans
       (Nat.mul_le_mul (natDegree_recoveryPoly_le M δ j) hBd)
-  have := Nat.add_le_add hAd hcomp
-  calc A.natDegree + ((recoveryPoly M δ j).comp B).natDegree ≤ d + (j - 1) * d := this
-    _ = d * j := by cases j with
-      | zero => omega
-      | succ m => simp [Nat.succ_sub_one]; ring
+  have hsum := Nat.add_le_add hAd hcomp
+  have harith : d + (j - 1) * d = d * j := by
+    obtain ⟨m, rfl⟩ := Nat.exists_eq_add_of_le hj
+    simp only [Nat.add_sub_cancel_left]
+    ring
+  calc A.natDegree + ((recoveryPoly M δ j).comp B).natDegree ≤ d + (j - 1) * d := hsum
+    _ = d * j := harith
 
 end Window
 
