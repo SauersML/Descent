@@ -41,9 +41,9 @@ noncomputable def contribution (a : J → ι → ℝ) (η : J → ℝ) (i : ι) 
 
 /-- The exact dual bound, evaluated by the proved clipped square-root coordinate formula. -/
 noncomputable def dualBound (a : J → ι → ℝ) (floor c : ι → ℝ) (B : ℝ)
-    (η : J → ℝ) (λ : ℝ) : ℝ :=
-  -λ * B + ∑ i, AuditAllocationCoordinate.objective (contribution a η i) (λ * c i)
-    (AuditAllocationCoordinate.choice (contribution a η i) (λ * c i) (floor i))
+    (η : J → ℝ) (lam : ℝ) : ℝ :=
+  -lam * B + ∑ i, AuditAllocationCoordinate.objective (contribution a η i) (lam * c i)
+    (AuditAllocationCoordinate.choice (contribution a η i) (lam * c i) (floor i))
 
 /-- Every contrast variance is bounded by the actual maximum objective. -/
 theorem row_le_worst (a : J → ι → ℝ) (p : ι → ℝ) (j : J) :
@@ -71,31 +71,32 @@ theorem weighted_le_worst (a : J → ι → ℝ) (η : J → ℝ) (p : ι → �
     _ = worstVariance a p := by rw [← Finset.sum_mul, hsum, one_mul]
 
 /-- The Lagrangian separates exactly into the weighted variance and the budget term. -/
-theorem lagrangian_identity (a : J → ι → ℝ) (η : J → ℝ) (c p : ι → ℝ) (λ B : ℝ) :
-    -λ * B + (∑ i, AuditAllocationCoordinate.objective (contribution a η i) (λ * c i) (p i)) =
-      (∑ j, η j * rowVariance a p j) + λ * (spending c p - B) := by
+theorem lagrangian_identity (a : J → ι → ℝ) (η : J → ℝ) (c p : ι → ℝ) (lam B : ℝ) :
+    -lam * B + (∑ i, AuditAllocationCoordinate.objective (contribution a η i) (lam * c i) (p i)) =
+      (∑ j, η j * rowVariance a p j) + lam * (spending c p - B) := by
   simp only [AuditAllocationCoordinate.objective, Finset.sum_add_distrib, weighted_identity,
     mul_assoc, ← Finset.mul_sum, spending]
   ring
 
 /-- Every valid dual choice gives a certified lower bound for every feasible audit allocation. -/
 theorem weak_duality (a : J → ι → ℝ) (floor c : ι → ℝ) (B : ℝ)
-    (η : J → ℝ) (λ : ℝ) (p : ι → ℝ)
+    (η : J → ℝ) (lam : ℝ) (p : ι → ℝ)
     (ha : ∀ j i, 0 ≤ a j i) (hf : ∀ i, 0 < floor i) (hc : ∀ i, 0 ≤ c i)
-    (hη : ∀ j, 0 ≤ η j) (hsum : ∑ j, η j = 1) (hλ : 0 ≤ λ)
-    (hp : Feasible floor c B p) : dualBound a floor c B η λ ≤ worstVariance a p := by
+    (hη : ∀ j, 0 ≤ η j) (hsum : ∑ j, η j = 1) (hlam : 0 ≤ lam)
+    (hp : Feasible floor c B p) : dualBound a floor c B η lam ≤ worstVariance a p := by
   unfold dualBound
   calc
-    _ ≤ -λ * B + ∑ i, AuditAllocationCoordinate.objective (contribution a η i) (λ * c i) (p i) := by
+    _ ≤ -lam * B + ∑ i,
+        AuditAllocationCoordinate.objective (contribution a η i) (lam * c i) (p i) := by
       apply add_le_add_left
       exact Finset.sum_le_sum (fun i _ ↦ AuditAllocationCoordinate.choice_minimum
-        (contribution a η i) (λ * c i) (floor i) (p i)
-        (contribution_nonneg a η ha hη i) (mul_nonneg hλ (hc i)) (hf i) (hp.1 i))
-    _ = (∑ j, η j * rowVariance a p j) + λ * (spending c p - B) :=
-      lagrangian_identity a η c p λ B
+        (contribution a η i) (lam * c i) (floor i) (p i)
+        (contribution_nonneg a η ha hη i) (mul_nonneg hlam (hc i)) (hf i) (hp.1 i))
+    _ = (∑ j, η j * rowVariance a p j) + lam * (spending c p - B) :=
+      lagrangian_identity a η c p lam B
     _ ≤ worstVariance a p := by
-      have hb : λ * (spending c p - B) ≤ 0 :=
-        mul_nonpos_of_nonneg_of_nonpos hλ (sub_nonpos.mpr hp.2)
+      have hb : lam * (spending c p - B) ≤ 0 :=
+        mul_nonpos_of_nonneg_of_nonpos hlam (sub_nonpos.mpr hp.2)
       linarith [weighted_le_worst a η p hη hsum]
 
 /-- Multipliers supported on active contrasts make the variance averaging bound an equality. -/
@@ -114,29 +115,29 @@ theorem active_weighted_eq (a : J → ι → ℝ) (η : J → ℝ) (p : ι → �
 
 /-- Coordinate minimization and complementarity produce an exact primal-dual value match. -/
 theorem certificate_equality (a : J → ι → ℝ) (floor c : ι → ℝ) (B : ℝ)
-    (η : J → ℝ) (λ : ℝ) (p : ι → ℝ) (hsum : ∑ j, η j = 1)
+    (η : J → ℝ) (lam : ℝ) (p : ι → ℝ) (hsum : ∑ j, η j = 1)
     (hchoice : ∀ i, p i =
-      AuditAllocationCoordinate.choice (contribution a η i) (λ * c i) (floor i))
+      AuditAllocationCoordinate.choice (contribution a η i) (lam * c i) (floor i))
     (hactive : ∀ j, η j ≠ 0 → rowVariance a p j = worstVariance a p)
-    (hbudget : λ * (spending c p - B) = 0) :
-    dualBound a floor c B η λ = worstVariance a p := by
+    (hbudget : lam * (spending c p - B) = 0) :
+    dualBound a floor c B η lam = worstVariance a p := by
   unfold dualBound
   simp_rw [← hchoice]
   rw [lagrangian_identity, active_weighted_eq a η p hsum hactive, hbudget, add_zero]
 
 /-- The explicit certificate proves optimality against every feasible competing allocation. -/
 theorem certified_optimum (a : J → ι → ℝ) (floor c : ι → ℝ) (B : ℝ)
-    (η : J → ℝ) (λ : ℝ) (p : ι → ℝ)
+    (η : J → ℝ) (lam : ℝ) (p : ι → ℝ)
     (ha : ∀ j i, 0 ≤ a j i) (hf : ∀ i, 0 < floor i) (hc : ∀ i, 0 ≤ c i)
-    (hη : ∀ j, 0 ≤ η j) (hsum : ∑ j, η j = 1) (hλ : 0 ≤ λ)
+    (hη : ∀ j, 0 ≤ η j) (hsum : ∑ j, η j = 1) (hlam : 0 ≤ lam)
     (hp : Feasible floor c B p)
     (hchoice : ∀ i, p i =
-      AuditAllocationCoordinate.choice (contribution a η i) (λ * c i) (floor i))
+      AuditAllocationCoordinate.choice (contribution a η i) (lam * c i) (floor i))
     (hactive : ∀ j, η j ≠ 0 → rowVariance a p j = worstVariance a p)
-    (hbudget : λ * (spending c p - B) = 0) :
+    (hbudget : lam * (spending c p - B) = 0) :
     IsMinOn (worstVariance a) {q | Feasible floor c B q} p := by
   intro q hq
-  rw [← certificate_equality a floor c B η λ p hsum hchoice hactive hbudget]
-  exact weak_duality a floor c B η λ q ha hf hc hη hsum hλ hq
+  rw [← certificate_equality a floor c B η lam p hsum hchoice hactive hbudget]
+  exact weak_duality a floor c B η lam q ha hf hc hη hsum hlam hq
 
 end Descent.Portability.FiniteAuditDesign

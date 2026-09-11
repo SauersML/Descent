@@ -1,6 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.AuditRangeCaps
+import Descent.Portability.FiniteDualityNoGap
 import Descent.Portability.AuditAllocationCoordinate
 import Descent.Portability.ContinuousTurnoverSemigroup
 import Descent.Portability.TurnoverTrajectoryRegion
@@ -466,6 +468,11 @@ import Descent.Portability.ClippedFrameRepair
 import Descent.Portability.SquaredCorrelationZeroTest
 
 import Descent.Portability.AngularExtremePoints
+
+import Descent.Portability.FiniteAuditDesign
+import Descent.Portability.FiniteAuditDesignConvexity
+import Descent.Portability.IndependentRadialLaws
+import Descent.Portability.MarginalSupportBound
 
 assert_below Descent.Program
 

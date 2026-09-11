@@ -13,3 +13,10 @@ open Descent.Portability.ContinuousTurnoverSemigroup
 #print axioms gridEmbed_pred
 #print axioms nearestDriftMatrix_mulVec
 #print axioms nearestDriftMatrix_mulVec_le
+#print axioms step_mulVec_eq
+#print axioms gridEmbed_step
+#print axioms gridEmbed_step_gridConvex
+#print axioms pow_mulVec_succ
+#print axioms gridEmbed_pow_gridConvex
+#print axioms step_mulVec_mono
+#print axioms euler_iterate_le

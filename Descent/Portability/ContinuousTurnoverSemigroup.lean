@@ -220,6 +220,115 @@ theorem nearestDriftMatrix_mulVec_le (n : ℕ) (α β : ℝ) (hα : 0 ≤ α) (h
   rw [nearestDriftMatrix_mulVec, ← hrhs]
   linarith [hgen]
 
+/-! ## The Euler step and its iterates -/
+
+/-- One Euler step acts as the identity plus `τ` times the generator. -/
+theorem step_mulVec_eq (n : ℕ) (τ : ℝ) (M : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ)
+    (u : Fin (n + 1) → ℝ) (k : Fin (n + 1)) :
+    (1 + τ • M).mulVec u k = u k + τ * M.mulVec u k := by
+  rw [Matrix.add_mulVec, Matrix.one_mulVec, Matrix.smul_mulVec]
+  simp
+
+/-- The Euler step of the nearest-drift matrix is the skeleton step of
+`Descent.Portability.ConvexOrderCoupling` on the embedded vector. -/
+theorem gridEmbed_step (n : ℕ) (α β τ : ℝ) (v : Fin (n + 1) → ℝ) (j : ℤ)
+    (hj0 : 0 ≤ j) (hjn : j ≤ (n : ℤ)) :
+    gridEmbed n ((1 + τ • nearestDriftMatrix n α β).mulVec v) j
+      = ConvexOrderCoupling.driftStep n α β τ (gridEmbed n v) j := by
+  obtain ⟨k, hk⟩ : ∃ k : Fin (n + 1), ((k : ℕ) : ℤ) = j :=
+    ⟨⟨j.toNat, by omega⟩, by
+      show ((j.toNat : ℕ) : ℤ) = j
+      omega⟩
+  subst hk
+  rw [gridEmbed_coe, step_mulVec_eq, nearestDriftMatrix_mulVec,
+    ConvexOrderCoupling.driftStep, gridEmbed_coe]
+
+/-- Grid convexity survives one Euler step of the nearest-drift matrix. -/
+theorem gridEmbed_step_gridConvex (n : ℕ) (α β τ : ℝ) (hα : 0 ≤ α) (hβ : 0 ≤ β) (hτ : 0 ≤ τ)
+    (hshort : τ * (2 * (n : ℝ) * (α + β)) ≤ 1) (v : Fin (n + 1) → ℝ)
+    (hv : ∀ j : ℤ, 1 ≤ j → j + 1 ≤ (n : ℤ) →
+      0 ≤ gridEmbed n v (j - 1) - 2 * gridEmbed n v j + gridEmbed n v (j + 1))
+    (j : ℤ) (hj1 : 1 ≤ j) (hjn : j + 1 ≤ (n : ℤ)) :
+    0 ≤ gridEmbed n ((1 + τ • nearestDriftMatrix n α β).mulVec v) (j - 1)
+      - 2 * gridEmbed n ((1 + τ • nearestDriftMatrix n α β).mulVec v) j
+      + gridEmbed n ((1 + τ • nearestDriftMatrix n α β).mulVec v) (j + 1) := by
+  rw [gridEmbed_step n α β τ v (j - 1) (by omega) (by omega),
+    gridEmbed_step n α β τ v j (by omega) (by omega),
+    gridEmbed_step n α β τ v (j + 1) (by omega) (by omega)]
+  exact ConvexOrderCoupling.driftStep_gridConvex n α β τ hα hβ hτ hshort (gridEmbed n v) hv j
+    hj1 hjn
+
+/-- A matrix power acts by iterating the matrix. -/
+theorem pow_mulVec_succ {N : ℕ} (A : Matrix (Fin N) (Fin N) ℝ) (v : Fin N → ℝ) (m : ℕ) :
+    (A ^ (m + 1)).mulVec v = A.mulVec ((A ^ m).mulVec v) := by
+  rw [pow_succ']
+  simp [Matrix.mulVec_mulVec]
+
+/-- Every iterate of the Euler step of the nearest-drift matrix stays grid convex. -/
+theorem gridEmbed_pow_gridConvex (n : ℕ) (α β τ : ℝ) (hα : 0 ≤ α) (hβ : 0 ≤ β) (hτ : 0 ≤ τ)
+    (hshort : τ * (2 * (n : ℝ) * (α + β)) ≤ 1) (v : Fin (n + 1) → ℝ)
+    (hv : ∀ j : ℤ, 1 ≤ j → j + 1 ≤ (n : ℤ) →
+      0 ≤ gridEmbed n v (j - 1) - 2 * gridEmbed n v j + gridEmbed n v (j + 1)) (m : ℕ) :
+    ∀ j : ℤ, 1 ≤ j → j + 1 ≤ (n : ℤ) →
+      0 ≤ gridEmbed n (((1 + τ • nearestDriftMatrix n α β) ^ m).mulVec v) (j - 1)
+        - 2 * gridEmbed n (((1 + τ • nearestDriftMatrix n α β) ^ m).mulVec v) j
+        + gridEmbed n (((1 + τ • nearestDriftMatrix n α β) ^ m).mulVec v) (j + 1) := by
+  induction m with
+  | zero => simpa using hv
+  | succ m ih =>
+    intro j hj1 hjn
+    rw [pow_mulVec_succ]
+    exact gridEmbed_step_gridConvex n α β τ hα hβ hτ hshort _ ih j hj1 hjn
+
+/-- A short Euler step of an admissible generator has nonnegative entries, so it is
+monotone on vectors. -/
+theorem step_mulVec_mono (n : ℕ) (τ : ℝ) (hτ : 0 ≤ τ)
+    (L : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ) (hoff : ∀ k j, j ≠ k → 0 ≤ L k j)
+    (hdiag : ∀ k, 0 ≤ 1 + τ * L k k) (u w : Fin (n + 1) → ℝ) (huw : ∀ j, u j ≤ w j)
+    (k : Fin (n + 1)) :
+    (1 + τ • L).mulVec u k ≤ (1 + τ • L).mulVec w k := by
+  have hentry : ∀ j, 0 ≤ (1 + τ • L) k j := by
+    intro j
+    have h1 : (1 + τ • L) k j = (if k = j then (1 : ℝ) else 0) + τ * L k j := by
+      simp [Matrix.one_apply]
+    rw [h1]
+    by_cases h : k = j
+    · rw [if_pos h, ← h]
+      exact hdiag k
+    · rw [if_neg h, zero_add]
+      exact mul_nonneg hτ (hoff k j fun hc ↦ h hc.symm)
+  show ∑ j, (1 + τ • L) k j * u j ≤ ∑ j, (1 + τ • L) k j * w j
+  exact Finset.sum_le_sum fun j _ ↦ mul_le_mul_of_nonneg_left (huw j) (hentry j)
+
+/-- **The Euler approximants are ordered.**  For a short step, every iterate of the
+nearest-drift Euler step is below the corresponding iterate for any admissible generator. -/
+theorem euler_iterate_le (n : ℕ) (α β τ : ℝ) (hα : 0 ≤ α) (hβ : 0 ≤ β) (hτ : 0 ≤ τ)
+    (hshort : τ * (2 * (n : ℝ) * (α + β)) ≤ 1)
+    (L : Matrix (Fin (n + 1)) (Fin (n + 1)) ℝ) (hoff : ∀ k j, j ≠ k → 0 ≤ L k j)
+    (hrow : ∀ k, ∑ j, L k j = 0)
+    (hdrift : ∀ k : Fin (n + 1), ∑ j, L k j * (((j : ℕ) : ℝ) - ((k : ℕ) : ℝ))
+      = ConvexOrderCoupling.countDrift n α β ((k : ℕ) : ℤ))
+    (hdiag : ∀ k, 0 ≤ 1 + τ * L k k) (v : Fin (n + 1) → ℝ)
+    (hv : ∀ j : ℤ, 1 ≤ j → j + 1 ≤ (n : ℤ) →
+      0 ≤ gridEmbed n v (j - 1) - 2 * gridEmbed n v j + gridEmbed n v (j + 1)) (m : ℕ) :
+    ∀ k : Fin (n + 1), ((1 + τ • nearestDriftMatrix n α β) ^ m).mulVec v k
+      ≤ ((1 + τ • L) ^ m).mulVec v k := by
+  induction m with
+  | zero => intro k; simp
+  | succ m ih =>
+    intro k
+    rw [pow_mulVec_succ, pow_mulVec_succ]
+    have hstar : (1 + τ • nearestDriftMatrix n α β).mulVec
+          (((1 + τ • nearestDriftMatrix n α β) ^ m).mulVec v) k
+        ≤ (1 + τ • L).mulVec (((1 + τ • nearestDriftMatrix n α β) ^ m).mulVec v) k := by
+      have hgen := nearestDriftMatrix_mulVec_le n α β hα hβ L hoff hrow hdrift
+        (((1 + τ • nearestDriftMatrix n α β) ^ m).mulVec v)
+        (gridEmbed_pow_gridConvex n α β τ hα hβ hτ hshort v hv m) k
+      have hscaled := mul_le_mul_of_nonneg_left hgen hτ
+      rw [step_mulVec_eq, step_mulVec_eq]
+      linarith
+    exact le_trans hstar (step_mulVec_mono n τ hτ L hoff hdiag _ _ ih k)
+
 end
 
 end Descent.Portability.ContinuousTurnoverSemigroup

@@ -3183,6 +3183,12 @@ def effectiveRate(π, r, Λ):
 def shiftPolynomial(δ):
     return eval_2Hom(C, ((lambda i: _rt.add(X(i), C((δ[int(i)]))))))
 
+def objective(A, b, p):
+    return (_rt.rdiv(A, p) + (b * p))
+
+def Descent_Portability_AuditAllocationCoordinate_choice(A, b, floor):
+    return (1.0 if (b == 0.0) else clip(floor, 1.0, (_rt.rsqrt((_rt.rdiv(A, b))))))
+
 def Descent_Portability_AuditCovarianceSpectrum_covariance(w, u):
     return sum((_rt.mul(w[int(i)], _rt._proj(_rt._proj((innerSL(ℝ, (u(i)))), 'toLinearMap'), 'smulRight')((u(i))))) for i in range(int(len(w))))
 
@@ -3191,6 +3197,9 @@ def eigenvalues(w, u):
 
 def Descent_Portability_AuditCovarianceSpectrum_basis(w, u):
     return _rt._proj((symmetric(w, u)), 'eigenvectorBasis')(rfl)
+
+def cappedFloor(floor, h, m, i):
+    return _rt.rmax((floor[int(i)]), (_rt.rdiv(h[int(i)], m)))
 
 def clip(lo, hi, t):
     return _rt.rmax(lo, (_rt.rmin(hi, t)))
@@ -4122,6 +4131,15 @@ def raceCoefficient(ancestry, mutation, count):
 def varianceBound(L, U, p, q, lo, hi, w):
     return sum((_rt.mul(_rt.lpow(w[int(i)], 2.0), envelope((L[int(i)]), (U[int(i)]), (p[int(i)]), (q[int(i)]), (clip((lo[int(i)]), (hi[int(i)]), (vertex((L[int(i)]), (U[int(i)]), (p[int(i)]), (q[int(i)])))))))) for i in range(int(len(L))))
 
+def Descent_Portability_FiniteAuditDesign_spending(c, p):
+    return sum((_rt.mul(c[int(i)], p[int(i)])) for i in range(int(len(c))))
+
+def rowVariance(a, p, j):
+    return sum((_rt.rdiv(a[int(j)][int(i)], p[int(i)])) for i in range(int(_rt.sumdim('i', len(a[0]), len(p)))))
+
+def Descent_Portability_FiniteAuditDesign_contribution(a, η, i):
+    return sum((_rt.mul(η[int(j)], a[int(j)][int(i)])) for j in range(int(len(a))))
+
 def parentalFrequency(counts, deme):
     return _rt.rdiv(_rt._proj((counts(deme)), 'val'), (N))
 
@@ -4143,6 +4161,12 @@ def Descent_Portability_FiniteDemographicSampling_offspringLaw(step, hN, counts)
 
 def Descent_Portability_FiniteDemographicSampling_transition(step, hN, counts):
     return _rt._proj((Descent_Portability_FiniteDemographicSampling_offspringLaw(step, hN, counts)), 'pushforward')(countOffspring)
+
+def dualValue(observed, level, potential):
+    return _rt.add(level, pairing(potential, observed))
+
+def pointVector(state):
+    return (lambda other: (1.0 if (state == other) else 0.0))
 
 def segregatedHaplotype(parent, strand):
     return (lambda locus: parent((strand(locus)), locus))
@@ -4305,6 +4329,9 @@ def Descent_Portability_FourthMomentDuality_twoPointExp(b, a, hab):
 
 def twoPointKernel(a):
     return (lambda z: twoPointResidual((a[int(_rt._proj(z, '1'))]), _rt._proj(z, '2')))
+
+def slackValue(E, X, β, k, m):
+    return E(((lambda ω: _rt.lpow(slackSecond(β, k, X, m, ω), 2.0))))
 
 def effectSign(b):
     return (1.0 if b else (-1.0))
@@ -4608,6 +4635,18 @@ def total_portability_loss(loss_genetic, loss_technical):
 def contrast(w, x):
     return sum((_rt.mul(w[int(i)], x[int(i)])) for i in range(int(len(w))))
 
+def coordValue(r, a, b, z):
+    return ((r(_rt._proj(z, '1')) * a) if _rt._proj(z, '2') else (r(_rt._proj(z, '1')) * b))
+
+def productExp(r, hinj, s):
+    return weightedExp((productLaw(r, s)), (productLaw_nonneg(r, s)), (productLaw_sum(r, hinj, s)))
+
+def productOutcome(r, u, v, ω):
+    return (lambda i: coordValue(r, (u[int(i)]), (v[int(i)]), (ω(i))))
+
+def Descent_Portability_IndependentRadialLaws_cellMass(k, t):
+    return _rt.rdiv(_rt.rdiv(((_rt.rabs(radialWeight((radii(k, t)), 0.0)) + radialWeight((radii(k, t)), 0.0))), 2.0), radialTotal((radii(k, t))))
+
 def Descent_Portability_IndependentShiftOperator_shift(p, g):
     return sum((_rt.mul(_rt._proj(p, 'mass')(a), translate((g[int(a)])))) for a in range(int(len(g))))
 
@@ -4791,17 +4830,17 @@ def lawCov(Q, S, Y):
 def cellInd(D, d):
     return (lambda ω: (1.0 if (D(ω) == d) else 0.0))
 
-def cellMass(Q, D, d):
+def Descent_Portability_MetricInfluenceFunctions_cellMass(Q, D, d):
     return lawExp(Q, (cellInd(D, d)))
 
 def cellLoss(Q, L, D, d):
     return lawExp(Q, ((lambda ω: _rt.mul(L[int(ω)], cellInd(D, d, ω)))))
 
 def condCellMean(Q, L, D, d):
-    return _rt.rdiv(cellLoss(Q, L, D, d), cellMass(Q, D, d))
+    return _rt.rdiv(cellLoss(Q, L, D, d), Descent_Portability_MetricInfluenceFunctions_cellMass(Q, D, d))
 
 def secondMomentOfMeans(Q, L, D):
-    return sum((_rt.rdiv(_rt.mul(cellLoss(Q, L, D, d), cellLoss(Q, L, D, d)), cellMass(Q, D, d))) for d in range(int(len(Q))))
+    return sum((_rt.rdiv(_rt.mul(cellLoss(Q, L, D, d), cellLoss(Q, L, D, d)), Descent_Portability_MetricInfluenceFunctions_cellMass(Q, D, d))) for d in range(int(len(Q))))
 
 def betweenVar(Q, L, D):
     return _rt.sub(secondMomentOfMeans(Q, L, D), _rt.mul(lawExp(Q, L), lawExp(Q, L)))
@@ -5118,7 +5157,7 @@ def truePositive(w, d, μ):
 def Descent_Portability_OptimalMeasurementAllocation_variance(amplitude, effort):
     return sum((_rt.rdiv(_rt.lpow(amplitude[int(mode)], 2.0), effort[int(mode)])) for mode in range(int(len(amplitude))))
 
-def spending(cost, effort):
+def Descent_Portability_OptimalMeasurementAllocation_spending(cost, effort):
     return sum((_rt.mul(cost[int(mode)], effort[int(mode)])) for mode in range(int(len(cost))))
 
 def weightedAmplitude(amplitude, cost):
@@ -5994,6 +6033,9 @@ def radialPoint(r, u, v, z):
 def radialExp(r, hinj, s):
     return weightedExp((radialLaw(r, s)), (radialLaw_nonneg(r, s)), (radialLaw_sum(r, hinj, s)))
 
+def radii(k, t):
+    return (lambda i: (t if (i == 0.0) else ((i))))
+
 def segment(a, p, t):
     return _rt.add(a, _rt.mul(t, (_rt.sub(p, a))))
 
@@ -6109,7 +6151,7 @@ def priorOddsMultiplier(sourcePrior, targetPrior):
     return _rt.rdiv((_rt.rdiv(targetPrior, ((1.0 - targetPrior)))), (_rt.rdiv(sourcePrior, ((1.0 - sourcePrior)))))
 
 def choiceLaw(capacity, seen):
-    return _rt._proj((uniformDraw(seen)), 'pushforward')((choice(capacity, seen)))
+    return _rt._proj((uniformDraw(seen)), 'pushforward')((Descent_Portability_ReservoirSamplingLaw_choice(capacity, seen)))
 
 def Descent_Portability_ReservoirSamplingLaw_kernel(slots):
     return _rt._proj((choiceLaw(capacity, seen)), 'pushforward')((nextSlots(slots)))
@@ -6843,6 +6885,15 @@ def flipKernel(p, _t, i, z, b):
 
 def stepAgree(J, v):
     return sum(((J(v, a) * agree(a))) for a in range(int(_rt.sumdim('a', len(J[0])))))
+
+def trajU(A, t):
+    return (((0.0 if (A(t) == 0.0) else _rt.rdiv(((A(t) - A(((t + 1.0))))), A(t)))) if (A(((t + 1.0))) <= A(t)) else 0.0)
+
+def trajV(A, t):
+    return (0.0 if (A(((t + 1.0))) <= A(t)) else _rt.rdiv(((A(((t + 1.0))) - A(t))), ((1.0 - A(t)))))
+
+def mixTrajectory(p, θ, t):
+    return ((θ * _rt.lpow(((1.0 - (2.0 * p))), t)) + ((1.0 - θ)))
 
 def classMass(prior, summary, cls):
     return sum(((_rt._proj(prior, 'mass')(w) if (summary(w) == cls) else 0.0)) for w in range(int(_rt.sumdim('w', len(summary), len(_rt._proj(prior, 'mass'))))))

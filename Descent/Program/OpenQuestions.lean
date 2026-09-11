@@ -1,6 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.AuditRangeCaps
+import Descent.Portability.FiniteDualityNoGap
 import Descent.Portability.AuditAllocationCoordinate
 import Descent.Portability.ContinuousTurnoverSemigroup
 import Descent.Portability.TurnoverTrajectoryRegion

@@ -378,6 +378,293 @@ theorem extremePoint_unique_positive_eigenvalue (G : Matrix (Fin d) (Fin d) ℝ)
   · subst hEq1
     exact ⟨min_le_right _ _, min_le_right _ _⟩
 
+/-! ## The symmetric directions carried by an index set -/
+
+/-- The inner sum against a standard basis vector reads off a coordinate. -/
+theorem dot_single_left (i : Fin d) (v : Fin d → ℝ) : dot (Pi.single i (1 : ℝ)) v = v i := by
+  simp only [dot, Descent.Core.innerSum, Pi.single_apply]
+  rw [Finset.sum_eq_single i]
+  · simp
+  · intro b _ hb
+    simp [hb]
+  · intro h
+    exact absurd (Finset.mem_univ i) h
+
+/-- The trace of an outer product is the inner sum of its factors. -/
+theorem trace_vecMulVec (x y : Fin d → ℝ) :
+    Matrix.trace (Matrix.vecMulVec x y) = dot x y := by
+  simp [Matrix.trace, Matrix.diag_apply, Matrix.vecMulVec_apply, dot, Descent.Core.innerSum]
+
+/-- The quadratic form of an outer product factors. -/
+theorem quadForm_vecMulVec_pair (x y v : Fin d → ℝ) :
+    quadForm (Matrix.vecMulVec x y) v = dot x v * dot y v := by
+  rw [quadForm, vecMulVec_mulVec, dot_smul_right, dot_comm v x]
+  ring
+
+/-- The quadratic form of a finite sum of matrices. -/
+theorem quadForm_sum {ι : Type*} (s : Finset ι) (M : ι → Matrix (Fin d) (Fin d) ℝ)
+    (v : Fin d → ℝ) : quadForm (∑ z ∈ s, M z) v = ∑ z ∈ s, quadForm (M z) v := by
+  classical
+  induction s using Finset.induction with
+  | empty => simp [quadForm, dot, Descent.Core.innerSum, Matrix.zero_mulVec]
+  | insert a s ha ih =>
+    rw [Finset.sum_insert ha, Finset.sum_insert ha, quadForm_add_matrix, ih]
+
+/-- The symmetric direction attached to an ordered pair of coordinates. -/
+def pairBasis (i j : Fin d) : Matrix (Fin d) (Fin d) ℝ :=
+  Matrix.vecMulVec (Pi.single i 1) (Pi.single j 1)
+    + Matrix.vecMulVec (Pi.single j 1) (Pi.single i 1)
+
+/-- The pair direction does not depend on the order of its two coordinates. -/
+theorem pairBasis_comm (i j : Fin d) : pairBasis i j = pairBasis j i := by
+  rw [pairBasis, pairBasis, add_comm]
+
+/-- The pair direction is symmetric. -/
+theorem pairBasis_transpose (i j : Fin d) : (pairBasis i j)ᵀ = pairBasis i j := by
+  ext p q
+  simp only [pairBasis, Matrix.transpose_apply, Matrix.add_apply, Matrix.vecMulVec_apply]
+  ring
+
+/-- The trace of a pair direction. -/
+theorem trace_pairBasis (i j : Fin d) :
+    Matrix.trace (pairBasis i j) = 2 * (if i = j then (1 : ℝ) else 0) := by
+  rw [pairBasis, Matrix.trace_add, trace_vecMulVec, trace_vecMulVec, dot_single_left,
+    dot_single_left, Pi.single_apply, Pi.single_apply]
+  by_cases h : i = j <;> (simp [h, eq_comm]; norm_num)
+
+/-- The quadratic form of a pair direction. -/
+theorem quadForm_pairBasis (i j : Fin d) (w : Fin d → ℝ) :
+    quadForm (pairBasis i j) w = 2 * (w i * w j) := by
+  rw [pairBasis, quadForm_add_matrix, quadForm_vecMulVec_pair, quadForm_vecMulVec_pair,
+    dot_single_left, dot_single_left]
+  ring
+
+/-- An entry of a pair direction, read off explicitly. -/
+theorem pairBasis_apply (i j p q : Fin d) :
+    pairBasis i j p q = (if p = i then (1 : ℝ) else 0) * (if q = j then (1 : ℝ) else 0)
+      + (if p = j then (1 : ℝ) else 0) * (if q = i then (1 : ℝ) else 0) := by
+  simp [pairBasis, Matrix.vecMulVec_apply, Pi.single_apply]
+
+/-- The symmetric direction attached to an unordered pair of coordinates. -/
+def sym2Basis (z : Sym2 (Fin d)) : Matrix (Fin d) (Fin d) ℝ :=
+  Sym2.lift ⟨fun i j ↦ pairBasis i j, fun i j ↦ pairBasis_comm i j⟩ z
+
+/-- The unordered pair direction at a represented pair. -/
+theorem sym2Basis_mk (i j : Fin d) : sym2Basis s(i, j) = pairBasis i j :=
+  Sym2.lift_mk _ i j
+
+/-- The unordered pair direction is symmetric. -/
+theorem sym2Basis_transpose (z : Sym2 (Fin d)) : (sym2Basis z)ᵀ = sym2Basis z := by
+  refine Sym2.ind (fun i j ↦ ?_) z
+  rw [sym2Basis_mk, pairBasis_transpose]
+
+/-- A nonzero entry of an unordered pair direction pins the pair. -/
+theorem sym2Basis_apply_ne_zero (z : Sym2 (Fin d)) (p q : Fin d) (h : sym2Basis z p q ≠ 0) :
+    z = s(p, q) := by
+  revert h
+  refine Sym2.ind (fun i j h ↦ ?_) z
+  rw [sym2Basis_mk, pairBasis_apply] at h
+  have hcase : (p = i ∧ q = j) ∨ (p = j ∧ q = i) := by
+    by_contra hcon
+    push_neg at hcon
+    apply h
+    rcases eq_or_ne p i with hp | hp
+    · rw [if_pos hp, if_neg (hcon.1 hp)]
+      simp only [one_mul, zero_add]
+      rcases eq_or_ne p j with hp' | hp'
+      · rw [if_pos hp', if_neg (hcon.2 hp'), mul_zero]
+      · rw [if_neg hp', zero_mul]
+    · rw [if_neg hp, zero_mul, zero_add]
+      rcases eq_or_ne p j with hp' | hp'
+      · rw [if_pos hp', if_neg (hcon.2 hp'), mul_zero]
+      · rw [if_neg hp', zero_mul]
+  rcases hcase with ⟨h1, h2⟩ | ⟨h1, h2⟩
+  · rw [h1, h2]
+  · rw [h1, h2, Sym2.eq_swap]
+
+/-- The diagonal-pair entry of an unordered pair direction is positive. -/
+theorem sym2Basis_apply_self (i j : Fin d) : sym2Basis s(i, j) i j ≠ 0 := by
+  rw [sym2Basis_mk, pairBasis_apply]
+  by_cases h : i = j <;> simp [h]
+
+/-! ## The dimension count -/
+
+/-- The constraint coefficients of the symmetric directions carried by an index set: the trace
+in the first row, and the report in each prescribed test direction in the remaining rows. -/
+def constraintMatrix (V : Fin mm → Fin d → ℝ) (G : Matrix (Fin d) (Fin d) ℝ)
+    (hG : Matrix.IsHermitian G) (S : Finset (Fin d)) :
+    Matrix (Fin (mm + 1)) ↥(S.sym2) ℝ :=
+  Matrix.of fun k z ↦ Fin.cases (Matrix.trace (sym2Basis (z : Sym2 (Fin d))))
+    (fun k' ↦ quadForm (sym2Basis (z : Sym2 (Fin d)))
+      ((eigenUnitary G hG)ᵀ.mulVec (V k'))) k
+
+/-- The constraint coefficients as a linear map on coefficient vectors. -/
+def constraintMap (V : Fin mm → Fin d → ℝ) (G : Matrix (Fin d) (Fin d) ℝ)
+    (hG : Matrix.IsHermitian G) (S : Finset (Fin d)) :
+    (↥(S.sym2) → ℝ) →ₗ[ℝ] (Fin (mm + 1) → ℝ) where
+  toFun f := (constraintMatrix V G hG S).mulVec f
+  map_add' f g := by
+    funext k
+    simp only [Matrix.mulVec, dotProduct, Pi.add_apply, mul_add]
+    rw [Finset.sum_add_distrib]
+  map_smul' c f := by
+    funext k
+    simp only [Matrix.mulVec, dotProduct, Pi.smul_apply, smul_eq_mul, RingHom.id_apply,
+      Finset.mul_sum]
+    exact Finset.sum_congr rfl fun _ _ ↦ by ring
+
+/-- **More symmetric directions than constraints leaves a nonzero direction annihilating all of
+them.**  This is the rank-nullity step of the Barvinok-Pataki argument. -/
+theorem exists_nonzero_kernel (V : Fin mm → Fin d → ℝ) (G : Matrix (Fin d) (Fin d) ℝ)
+    (hG : Matrix.IsHermitian G) (S : Finset (Fin d))
+    (hcard : mm + 1 < Fintype.card ↥(S.sym2)) :
+    ∃ f : ↥(S.sym2) → ℝ, f ≠ 0 ∧ (constraintMatrix V G hG S).mulVec f = 0 := by
+  have hrange : Module.finrank ℝ (LinearMap.range (constraintMap V G hG S)) ≤ mm + 1 := by
+    have hle := Submodule.finrank_le (LinearMap.range (constraintMap V G hG S))
+    rwa [Module.finrank_fin_fun (R := ℝ)] at hle
+  have hsplit := LinearMap.finrank_range_add_finrank_ker (constraintMap V G hG S)
+  rw [Module.finrank_pi] at hsplit
+  have hpos : 0 < Module.finrank ℝ (LinearMap.ker (constraintMap V G hG S)) := by omega
+  have hne : LinearMap.ker (constraintMap V G hG S) ≠ ⊥ := by
+    intro hbot
+    rw [hbot, finrank_bot] at hpos
+    exact lt_irrefl 0 hpos
+  obtain ⟨f, hfmem, hfne⟩ := (Submodule.ne_bot_iff _).mp hne
+  exact ⟨f, hfne, hfmem⟩
+
+/-! ## The rank bound -/
+
+/-- **PL Corollary 6.3, the Barvinok-Pataki rank bound.**  An extreme point of the feasible
+angular set with `m` prescribed reports has `r` positive eigenvalues with `r(r+1)/2 ≤ m + 1`,
+written with the binomial coefficient `(r+1).choose 2`, which `Nat.choose_two_right` identifies
+with `(r+1)r/2`.  The proof is the perturbation criterion above fed by a rank-nullity count: the
+symmetric directions carried by the positive eigenspace outnumber the `m + 1` linear conditions
+on trace and reports, so one of them annihilates all of them, and perturbing along it in both
+signs exhibits the point as a midpoint of two feasible matrices. -/
+theorem extremePoint_rank_bound (V : Fin mm → Fin d → ℝ) (a : Fin mm → ℝ)
+    (G : Matrix (Fin d) (Fin d) ℝ) (hG : Matrix.IsHermitian G)
+    (hext : G ∈ (feasibleAngular V a).extremePoints ℝ) :
+    Nat.choose ((Finset.univ.filter fun i ↦ 0 < hG.eigenvalues i).card + 1) 2 ≤ mm + 1 := by
+  classical
+  by_contra hcon
+  push_neg at hcon
+  set S : Finset (Fin d) := Finset.univ.filter fun i ↦ 0 < hG.eigenvalues i with hSdef
+  have hSne : S.Nonempty := by
+    rcases Finset.eq_empty_or_nonempty S with hemp | hne
+    · rw [hemp] at hcon
+      simp at hcon
+    · exact hne
+  have hSpos : ∀ i ∈ S, 0 < hG.eigenvalues i := by
+    intro i hi
+    rw [hSdef, Finset.mem_filter] at hi
+    exact hi.2
+  have hcard : mm + 1 < Fintype.card ↥(S.sym2) := by
+    rw [Fintype.card_coe, Finset.card_sym2]
+    exact hcon
+  obtain ⟨f, hfne, hfker⟩ := exists_nonzero_kernel V G hG S hcard
+  set C : Matrix (Fin d) (Fin d) ℝ :=
+    ∑ z : ↥(S.sym2), f z • sym2Basis (z : Sym2 (Fin d)) with hCdef
+  have hCentry : ∀ p q, C p q = ∑ z : ↥(S.sym2), f z * sym2Basis (z : Sym2 (Fin d)) p q := by
+    intro p q
+    rw [hCdef]
+    simp [Matrix.sum_apply]
+  have hCsym : Cᵀ = C := by
+    ext p q
+    rw [Matrix.transpose_apply, hCentry, hCentry]
+    refine Finset.sum_congr rfl fun z _ ↦ ?_
+    have hz := congrFun (congrFun (sym2Basis_transpose (z : Sym2 (Fin d))) p) q
+    rw [Matrix.transpose_apply] at hz
+    rw [hz]
+  have hCne : C ≠ 0 := by
+    obtain ⟨z₀, hz₀⟩ : ∃ z₀ : ↥(S.sym2), f z₀ ≠ 0 := by
+      by_contra hall
+      push_neg at hall
+      exact hfne (funext hall)
+    have key : ∀ w : Sym2 (Fin d), w = (z₀ : Sym2 (Fin d)) → C ≠ 0 := by
+      refine Sym2.ind fun i j hw ↦ ?_
+      have hij : C i j ≠ 0 := by
+        rw [hCentry]
+        rw [Finset.sum_eq_single z₀]
+        · rw [← hw]
+          exact mul_ne_zero hz₀ (sym2Basis_apply_self i j)
+        · intro b _ hb
+          by_contra hbne
+          apply hb
+          have hb2 : sym2Basis (b : Sym2 (Fin d)) i j ≠ 0 := fun h ↦ hbne (by rw [h, mul_zero])
+          have hbeq : (b : Sym2 (Fin d)) = s(i, j) := sym2Basis_apply_ne_zero _ i j hb2
+          exact Subtype.ext (by rw [hbeq, hw])
+        · intro hmem
+          exact absurd (Finset.mem_univ z₀) hmem
+      intro hzero
+      apply hij
+      rw [hzero, Matrix.zero_apply]
+    exact key _ rfl
+  have hmemS : ∀ p q, C p q ≠ 0 → p ∈ S ∧ q ∈ S := by
+    intro p q hpq
+    rw [hCentry] at hpq
+    obtain ⟨z, -, hz⟩ := Finset.exists_ne_zero_of_sum_ne_zero hpq
+    have hbne : sym2Basis (z : Sym2 (Fin d)) p q ≠ 0 := fun h ↦ hz (by rw [h, mul_zero])
+    have hzeq : (z : Sym2 (Fin d)) = s(p, q) := sym2Basis_apply_ne_zero _ p q hbne
+    have hmem := z.2
+    rw [hzeq, Finset.mk_mem_sym2_iff] at hmem
+    exact hmem
+  set mu : ℝ := S.inf' hSne hG.eigenvalues with hmudef
+  have hmupos : 0 < mu := by
+    rw [hmudef, Finset.lt_inf'_iff]
+    exact hSpos
+  have hsuppmu : ∀ p q, C p q ≠ 0 → mu ≤ hG.eigenvalues p ∧ mu ≤ hG.eigenvalues q := by
+    intro p q hpq
+    obtain ⟨hp, hq⟩ := hmemS p q hpq
+    exact ⟨Finset.inf'_le _ hp, Finset.inf'_le _ hq⟩
+  set B : ℝ := (∑ p, ∑ q, |C p q|) + 1 with hBdef
+  have hsumnn : 0 ≤ ∑ p, ∑ q, |C p q| :=
+    Finset.sum_nonneg fun _ _ ↦ Finset.sum_nonneg fun _ _ ↦ abs_nonneg _
+  have hBpos : 0 < B := by
+    rw [hBdef]
+    linarith
+  have hBrow : ∀ i, ∑ q, |C i q| ≤ B := by
+    intro i
+    have hle : ∑ q, |C i q| ≤ ∑ p, ∑ q, |C p q| :=
+      Finset.single_le_sum (f := fun p ↦ ∑ q, |C p q|)
+        (fun _ _ ↦ Finset.sum_nonneg fun _ _ ↦ abs_nonneg _) (Finset.mem_univ i)
+    rw [hBdef]
+    linarith
+  have hBcol : ∀ j, ∑ p, |C p j| ≤ B := by
+    intro j
+    have hle : ∑ p, |C p j| ≤ ∑ p, ∑ q, |C p q| :=
+      Finset.sum_le_sum fun p _ ↦
+        Finset.single_le_sum (f := fun q ↦ |C p q|) (fun _ _ ↦ abs_nonneg _) (Finset.mem_univ j)
+    rw [hBdef]
+    linarith
+  have htrC : Matrix.trace C = 0 := by
+    have hexp : Matrix.trace C
+        = ∑ z : ↥(S.sym2), f z * Matrix.trace (sym2Basis (z : Sym2 (Fin d))) := by
+      rw [hCdef, Matrix.trace_sum]
+      exact Finset.sum_congr rfl fun z _ ↦ by rw [Matrix.trace_smul, smul_eq_mul]
+    have hmv : ∑ z : ↥(S.sym2), f z * Matrix.trace (sym2Basis (z : Sym2 (Fin d)))
+        = (constraintMatrix V G hG S).mulVec f 0 := by
+      simp only [Matrix.mulVec, dotProduct, constraintMatrix, Matrix.of_apply, Fin.cases_zero]
+      exact Finset.sum_congr rfl fun _ _ ↦ mul_comm _ _
+    rw [hexp, hmv, hfker]
+    rfl
+  have hrepC : ∀ k, quadForm (conjPerturb G hG C) (V k) = 0 := by
+    intro k
+    rw [quadForm_conjPerturb]
+    have hexp : quadForm C ((eigenUnitary G hG)ᵀ.mulVec (V k))
+        = ∑ z : ↥(S.sym2), f z * quadForm (sym2Basis (z : Sym2 (Fin d)))
+            ((eigenUnitary G hG)ᵀ.mulVec (V k)) := by
+      rw [hCdef, quadForm_sum]
+      exact Finset.sum_congr rfl fun z _ ↦ quadForm_smul_matrix _ _ _
+    have hmv : ∑ z : ↥(S.sym2), f z * quadForm (sym2Basis (z : Sym2 (Fin d)))
+          ((eigenUnitary G hG)ᵀ.mulVec (V k))
+        = (constraintMatrix V G hG S).mulVec f k.succ := by
+      simp only [Matrix.mulVec, dotProduct, constraintMatrix, Matrix.of_apply, Fin.cases_succ]
+      exact Finset.sum_congr rfl fun _ _ ↦ mul_comm _ _
+    rw [hexp, hmv, hfker]
+    rfl
+  exact extremePoint_no_supported_direction V a G hG hext C hCsym hCne mu B hmupos hBpos
+    hsuppmu hBrow hBcol htrC hrepC
+
 end
 
 end Descent.Portability.AngularExtremePoints
