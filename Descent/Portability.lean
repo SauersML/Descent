@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.SmallCohortConditionalMeans
 import Descent.Portability.PipelineLDPairDomain
 import Descent.Portability.AncestralHaplotypeRealization
 import Descent.Portability.AffineCaratheodoryCount
