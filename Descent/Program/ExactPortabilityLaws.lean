@@ -114,8 +114,9 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
   `FiniteMixtureKernel`.
 * Theorem 1 (positive microscopic approximation preserves the body): `EulerInvariantSet`,
   `KernelRealizationPreservation`.
-* §2.2, equations (6)-(9) and (12), the enlarged left/right heterozygosity family, its generator
-  and the embedding intertwining: `EnlargedLowOrderLDGenerator`, `EnlargedBodyClosedness`.
+* §2.2, equations (6) and (12), the enlarged left/right heterozygosity family, its generator
+  and the embedding intertwining: `EnlargedLowOrderLDGenerator`, `EnlargedBodyClosedness`; the
+  migration, mutation and recombination velocities of (8)-(9) as pulse jets: `PulseJetExpansion`.
 * §2.3, equations (10)-(11), the physical kernels: `SimplexResamplingKernel`,
   `ResamplingJetExpansion`, `RandomStageKernel`, `PulseJetExpansion`, `PulseStageKernel`,
   `TwoLocusMicroscopicKernel`, `Pi2GeneratorBridges`, `EnlargedGeneratorBridges`; the
@@ -129,7 +130,9 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
   forms are `TwoLocusRealizabilityPreservation`; histories that also carry admixture pulses:
   `PulseHistoryRealization`; finite interleavings of continuous-rate and integrable-rate segments
   with splits and pulses: `InterleavedHistoryRealization`.
-* §2.4 time-varying rates: `PiecewiseConstantBodyPreservation` (piecewise-constant),
+* §2.4 time-varying rates: piecewise-constant rates through the rate epochs of
+  `TwoLocusMicroscopicApproximation`, with `PiecewiseConstantBodyPreservation` the per-epoch
+  form that takes an approximation as a hypothesis;
   `LinearFundamentalMatrix` and `IntegrableRateHistoryRealization` (rate paths whose generator is
   continuous in time); rate histories with integrable rate coordinates, with the generator
   Lipschitz in the rates and the propagator the unique continuous solution of the integral
@@ -146,8 +149,8 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
   `PoissonTruncationCertificate`. §4.2a, the extension of a positive constant-preserving
   semigroup from polynomials and its representation by Markov kernels obeying
   Chapman-Kolmogorov: `PolynomialFellerExtension`, `FellerKernelRepresentation`,
-  `FellerMarkovKernel`. §4.3 equations
-  (21)-(23): `ConditionalReportCompilation`.
+  `FellerMarkovKernel`. §4.3 equation (21) is `FiniteReportLaw.expectation_bind` of
+  `ExactFiniteHistoryLaw`; equations (22)-(23): `ConditionalReportCompilation`.
 * §5 equations (24)-(25): `SublawReportCertificate`.
 * §6 equations (27)-(36), chronology to metrics: `AdmixtureChronologyLaw`,
   `ChronologyReportLaw`, `AttainableChronologyCurve`, `ExposureLaplaceConstraints`,
@@ -157,17 +160,24 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
   `EmpiricalAUCUnbiasedness`, with (42) restated for the corpus metrics of the empirical table
   law: `EmpiricalTableLawMetrics`.
 
-Scope. Equation (10) is proved for every monomial of degree at most four with remainder at
-most 71/N², but both microscopic approximations behind Theorem 2 use the single-draw resampling
-step of §2.3, and `TwoLocusStageComposition` runs migration as one pulse per ordered pair rather
-than one simultaneous mixture. §2.4 is proved for rate histories with integrable rate
-coordinates; the propagator is characterized by the integral equation, and its
-almost-everywhere derivative is not stated. Theorem 2 covers histories of rate epochs, splits
-and admixture pulses; the pipeline compiler emits nothing else. Of §4.2, mutation is symmetric,
-and (20) takes the forward moment equation of the expectation family as a hypothesis. The §4.2a
-kernels are Markov kernels on pseudo-metrizable compact spaces, which include the
-haplotype-frequency simplex; the general compact Hausdorff case is not formalized. The
-finite-cohort intercept and accuracy of §7 are not formalized.
+Scope. Theorem 1 is proved for microscopic kernels with finitely many deterministic branches.
+Equation (10) is proved for every polynomial of total degree at most four, with remainder
+`(11 + 4 · totalStirlingWeight) / N²` per monomial; no uniform 71/N² constant is stated. The drift
+operator (7) enters through the resampling jet certificates rather than as a displayed identity.
+Both microscopic approximations behind Theorem 2 use a single-draw resampling stage with
+`N = ⌈(c h)^(-1/2)⌉` and a step error of order o(h), not the note's multinomial sample of size
+`⌈1/(c h)⌉`, and `TwoLocusStageComposition` runs migration as one pulse per ordered pair. The
+rate laws have strictly positive coalescence, where the note allows `c_i ≥ 0`. §2.4 is proved for
+rate histories with integrable rate coordinates; the propagator is characterized by the integral
+equation. Theorem 2 covers histories of rate epochs, splits and admixture pulses; the pipeline
+compiler emits nothing else. Of §4.2, mutation is symmetric, and (20) takes the forward moment
+equation of the expectation family as a hypothesis that no module yet discharges. The §4.2a
+modules are abstract: they assume the semigroup, its positivity and its Euler limit, and are not
+yet applied to the neutral two-locus model; their kernels are Markov kernels on pseudo-metrizable
+compact spaces, which include the haplotype-frequency simplex. In §6 the coupling bounds of
+NOTE1 Theorem 5 are proved for continuous rates and attainment for lists of discrete events, so
+neither class is shown to trace exactly the displayed curve. The finite-cohort intercept and
+accuracy of §7 are not formalized.
 
 Guard witnesses: `LowOrderLDWitnesses` inhabits the corpus rate, epoch and history structures
 from data alone, and `PipelineWitnesses` inhabits the pipeline structures of `EndToEndScoreLaw`
@@ -191,26 +201,31 @@ from a deme count.
   `PortabilityRatioQueries`. §6.3 example: `UnboundedSlopeExample`. §6.4 equation (30):
   `LogLossSeriesCertificate`.
 * §7.1 equation (31): `EmpiricalLawLipschitzBound`; the modulus-of-continuity extension to every
-  continuous functional: `EmpiricalLawContinuityBound`. §7.2 Theorem 5 and equation (32):
-  `IntervalEvaluatorCertificate`; Theorem 5 on genuine fair-bit cylinders with the coupled
-  bracket (18) at every stage: `CylinderIntervalCertificate`; the executed uniform draw:
+  continuous functional: `EmpiricalLawContinuityBound`. §7.2, interval evaluators without nesting
+  and Kraft's inequality for prefix enumerations: `IntervalEvaluatorCertificate`; Theorem 5 on
+  genuine fair-bit cylinders, with nested certificates and a bracket of the shape of (18) at every
+  stage: `CylinderIntervalCertificate`; the executed uniform draw:
   `CylinderUniformDraw`; threshold comparisons with unresolved boundary mass and coordinate
   rounding: `CylinderThresholdCertificate`; equation (32), the report law of an almost surely
   terminating random-bit program: `CylinderHaltingLaw`.
 * §8 equations (33)-(35): `FrontierCompletionRegion`, with (35) in `SublawReportCertificate`;
   the conditional-mean image of a convex set of completions need not be convex:
   `FrontierCompletionRegion.exists_convex_not_convex_conditionalMeans`.
-* §9, the executed reference experiment: the model in corpus vocabulary and its exact
-  source-side report law, including the defined probability `4051/6750` of the source squared
-  correlation: `ReferenceExperimentLaw`.
+* §9, the executed reference experiment: the model in corpus vocabulary, its exact source-side
+  report law matching the attached results, the 220 architecture, environment and census states
+  of both histories, and the early-migration target squared-correlation definedness probability:
+  `ReferenceExperimentLaw`.
 * §9.1, the uniform penetrance architecture: `UniformPenetranceArchitecture`.
 * §10, the halting boundary: `HaltingExpectationBoundary`.
 
-Scope. Theorem 2's semialgebraic partition is proved only for the architecture/environment
-square. Equations (20), (28) and (29) take the pointwise bounds `0 ≤ D ≤ 1`, as the corpus
+Scope. No semialgebraic partition is stated for Theorem 2; what is proved is the
+architecture/environment reweighting of (9)-(10) with positive corner denominators. The mixing
+law of (31) ranges over finitely many contexts, and its Lipschitz class is taken on all of the
+coordinate space. Equations (20), (28) and (29) take the pointwise bounds `0 ≤ D ≤ 1`, as the corpus
 certificates do. Theorem 1 makes no complexity claim and covers no infinite branch set. The
-model and source rows of the §9 reference experiment are proved; its target histories and the
-target rows of its table are not formalized yet. `IntervalEvaluatorCertificate` assumes a
+only §9 table row proved so far is the early target squared-correlation definedness; the other
+rows, the late migration rows, the 3960 count and the range table are not formalized yet.
+`IntervalEvaluatorCertificate` assumes a
 finite measure, a common bound and pointwise vanishing widths;
 `CylinderIntervalCertificate` needs only almost sure vanishing widths on fair-bit streams but
 does not show that its rational values are computed by an algorithm. (32) takes almost sure
