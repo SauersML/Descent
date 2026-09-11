@@ -1,0 +1,36 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.ChronologyReportLaw
+
+/-! Axiom audit of the individual-level admixture chronology report law. -/
+
+open Descent.Portability.ChronologyReportLaw
+
+#print axioms Descent.Portability.ChronologyReportLaw.expectation_cells
+#print axioms Descent.Portability.ChronologyReportLaw.expectation_scoreOf_chronologyLaw
+#print axioms Descent.Portability.ChronologyReportLaw.expectation_outcomeOf_chronologyLaw
+#print axioms Descent.Portability.ChronologyReportLaw.calibration_gap_chronologyLaw
+#print axioms Descent.Portability.ChronologyReportLaw.variance_scoreOf_chronologyLaw
+#print axioms Descent.Portability.ChronologyReportLaw.variance_outcomeOf_chronologyLaw
+#print axioms Descent.Portability.ChronologyReportLaw.covariance_chronologyLaw
+#print axioms Descent.Portability.ChronologyReportLaw.squaredCorrelation_chronologyLaw
+#print axioms Descent.Portability.ChronologyReportLaw.calibrationSlope_eq_some_linearSlope
+#print axioms Descent.Portability.ChronologyReportLaw.linearSlope_chronologyLaw
+#print axioms Descent.Portability.ChronologyReportLaw.calibrationSlope_chronologyLaw
+#print axioms Descent.Portability.ChronologyReportLaw.linearIntercept_chronologyLaw
+#print axioms Descent.Portability.ChronologyReportLaw.scoreCellMass_eq_cells
+#print axioms Descent.Portability.ChronologyReportLaw.conditionalOutcomeMean_chronologyLaw
+#print axioms Descent.Portability.ChronologyReportLaw.binaryCaseMass_chronologyLaw
+#print axioms Descent.Portability.ChronologyReportLaw.binaryAUCNumerator_chronologyLaw
+#print axioms Descent.Portability.ChronologyReportLaw.binaryAUC_eq_some_populationAUC
+#print axioms Descent.Portability.ChronologyReportLaw.populationAUC_chronologyLaw
+#print axioms Descent.Portability.ChronologyReportLaw.meanSquaredError_chronologyLaw
+#print axioms Descent.Portability.ChronologyReportLaw.thresholdAccuracy_chronologyLaw
+#print axioms Descent.Portability.ChronologyReportLaw.discreteECE_chronologyLaw
+#print axioms Descent.Portability.ChronologyReportLaw.repairedBrier_chronologyLaw
+#print axioms Descent.Portability.ChronologyReportLaw.linearSlope_sq_eq_auc_contrast
+#print axioms Descent.Portability.ChronologyReportLaw.meanSquaredError_eq_auc_deficit
+#print axioms Descent.Portability.ChronologyReportLaw.expectedLogLoss_chronologyLaw_eq_top
+#print axioms Descent.Portability.ChronologyReportLaw.metric_values_halvedCoupling
+#print axioms Descent.Portability.ChronologyReportLaw.metric_values_coupled

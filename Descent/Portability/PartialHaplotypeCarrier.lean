@@ -24,23 +24,25 @@ then follows from finiteness of the carrier type together with that cardinality 
 budget-respecting configurations with equal clamped multiplicities are equal.
 
 Migration replaces the deme label and leaves every load unchanged.  Mutation rewrites one
-already-retained allele label and leaves every load unchanged.  Recombination splits one
-carrier's retained loci along a selector into two carriers, and leaves every locus load
-unchanged; this is the key claim of §4.1, since recombination does increase the number of
-carriers.  Coalescence merges two carriers into one whose retained set is the union, so no
-load increases; the degenerate cemetery transition, which simply discards carriers, is covered
-by monotonicity of the budget under multiset inclusion.
+already retained allele label and leaves every load unchanged.  Recombination splits one
+carrier's retained loci along a selector into two carriers and leaves every locus load
+unchanged; this is the key claim of §4.1, since recombination does raise the number of
+carriers.  A cut at `c` is the selector `ℓ ↦ ℓ < c`, so the selector form is the general one.
+Coalescence merges two carriers into one whose retained set is the union, so no load
+increases; the cemetery transition, which discards carriers outright, is covered by
+monotonicity of the budget under multiset inclusion.
 
-The configuration moment `H_ξ(x)` of (17) is defined as the product over the carriers of the
-marginal frequency that a haplotype drawn from the carrier's deme agrees with the carrier on
-its retained loci.  This is the product form of (17) by construction, and it lies in the unit
+The configuration moment `H_ξ(x)` of (17) is the product over the carriers of the marginal
+frequency that a haplotype drawn from the carrier's deme agrees with the carrier on its
+retained loci.  This is the product form of (17) by construction, and it lies in the unit
 interval whenever each deme carries a `Descent.Portability.FiniteReportLaw` on haplotypes.  A
-fully retained carrier has marginal frequency equal to the mass of its haplotype.
+fully retained carrier has marginal frequency equal to the mass of its own haplotype, which is
+the seed evaluation of the sampled-genotype representation (22).
 
-Not formalized here: the generator identity (19), i.e. the coalescent duality with
-recombination that identifies the rates `q_{ξη}` of the jump chain on configurations; it is
-classical and is stated in NOTE1 §4.2 without proof.  The loose counting bound `C(K+B, B)` of
-§4.1 is also not formalized, since the finiteness theorem below does not use it.
+Not formalized here: the generator identity (19), that is, the coalescent duality with
+recombination that identifies the jump rates `q_{ξη}` on configurations.  It is classical and
+NOTE1 §4.2 states it without proof.  The loose counting bound `C(K+B, B)` of §4.1 is also not
+formalized, since the finiteness theorem below does not use it.
 
 ## Empirical status
 
@@ -90,7 +92,7 @@ instance instFinite : Finite (PartialType Deme Locus Allele) := by
 end PartialType
 
 /-- The carrier fully retaining a haplotype in a deme: the seed configuration entry of (22).
-The locus argument witnesses that the locus type is inhabited. -/
+The locus argument is the explicit witness that loci exist. -/
 def fullType (i : Deme) (hap : ∀ ℓ, Allele ℓ) (ℓ₀ : Locus) : PartialType Deme Locus Allele where
   deme := i
   allele := fun ℓ ↦ some (hap ℓ)
@@ -115,7 +117,7 @@ def WithinBudget (capacity : Locus → ℕ) (ξ : Multiset (PartialType Deme Loc
 
 /-- The empty configuration respects every budget. -/
 theorem withinBudget_zero (capacity : Locus → ℕ) :
-    WithinBudget (Deme := Deme) (Allele := Allele) capacity 0 := by
+    WithinBudget capacity (0 : Multiset (PartialType Deme Locus Allele)) := by
   intro ℓ
   simp [load]
 
@@ -123,12 +125,11 @@ theorem withinBudget_zero (capacity : Locus → ℕ) :
 every locus has at least one chromosome copy. -/
 theorem withinBudget_fullType (capacity : Locus → ℕ) (i : Deme) (hap : ∀ ℓ, Allele ℓ)
     (ℓ₀ : Locus) (hcap : ∀ ℓ, 1 ≤ capacity ℓ) :
-    WithinBudget capacity ({fullType i hap ℓ₀} : Multiset (PartialType Deme Locus Allele)) := by
+    WithinBudget capacity
+      (fullType i hap ℓ₀ ::ₘ (0 : Multiset (PartialType Deme Locus Allele))) := by
   intro ℓ
-  have hone : load ({fullType i hap ℓ₀} : Multiset (PartialType Deme Locus Allele)) ℓ = 1 := by
-    simp [load, fullType]
-  rw [hone]
-  exact hcap ℓ
+  rw [load_cons]
+  simpa [load, fullType] using hcap ℓ
 
 /-- The budget is inherited by subconfigurations, so discarding carriers into the cemetery of
 NOTE1 §4.2 can never violate it. -/
@@ -171,7 +172,7 @@ already determine such a configuration. -/
 theorem withinBudget_finite (capacity : Locus → ℕ) :
     {ξ : Multiset (PartialType Deme Locus Allele) | WithinBudget capacity ξ}.Finite := by
   classical
-  set bound : ℕ := ∑ ℓ, capacity ℓ with hbound
+  set bound : ℕ := ∑ ℓ, capacity ℓ
   refine Set.Finite.of_finite_image
     (f := fun ξ ↦ fun τ ↦ (⟨min (Multiset.count τ ξ) bound, by omega⟩ : Fin (bound + 1)))
     (Set.toFinite _) ?_
@@ -259,7 +260,7 @@ def splitRejected (τ : PartialType Deme Locus Allele) (selector : Locus → Boo
     exact ⟨ℓ, by simp [hs, hr]⟩
 
 /-- **Recombination changes no locus load.**  This is the key claim of NOTE1 §4.1: a split
-raises the number of carriers but every locus is retained by exactly one of the two halves. -/
+raises the number of carriers, but every locus is retained by exactly one of the two halves. -/
 theorem load_split (τ : PartialType Deme Locus Allele) (selector : Locus → Bool)
     (hsel : ∃ ℓ, selector ℓ = true ∧ (τ.allele ℓ).isSome = true)
     (hrej : ∃ ℓ, selector ℓ = false ∧ (τ.allele ℓ).isSome = true)
@@ -267,7 +268,7 @@ theorem load_split (τ : PartialType Deme Locus Allele) (selector : Locus → Bo
     load (splitSelected τ selector hsel ::ₘ splitRejected τ selector hrej ::ₘ rest) ℓ =
       load (τ ::ₘ rest) ℓ := by
   simp only [load_cons, splitSelected, splitRejected]
-  rcases Bool.eq_false_or_eq_true (selector ℓ) with h | h <;> simp [h]
+  cases hs : selector ℓ <;> simp [hs]
 
 /-- Recombination preserves the retention budget. -/
 theorem withinBudget_split (capacity : Locus → ℕ) (τ : PartialType Deme Locus Allele)
@@ -296,7 +297,7 @@ theorem compatible_of_disjoint (τ σ : PartialType Deme Locus Allele)
     Compatible τ σ := by
   intro ℓ hτ hσ
   rw [hdisj ℓ hτ] at hσ
-  exact absurd hσ (by simp)
+  simp at hσ
 
 /-- Coalescence of NOTE1 §4.2: two carriers in one deme merge into a carrier whose retained
 set is the union of theirs. -/
@@ -317,20 +318,13 @@ second carrier retains material, so no allele label is silently overwritten. -/
 theorem coalesce_allele_eq_of_compatible (τ σ : PartialType Deme Locus Allele)
     (hcompat : Compatible τ σ) (ℓ : Locus) (hσ : (σ.allele ℓ).isSome = true) :
     (coalesce τ σ).allele ℓ = σ.allele ℓ := by
-  by_cases hτ : (τ.allele ℓ).isSome = true
-  · have hagree := hcompat ℓ hτ hσ
-    cases hcase : τ.allele ℓ with
-    | none =>
-      rw [hcase] at hτ
-      simp at hτ
-    | some a =>
-      simp only [coalesce, hcase, Option.elim]
-      rw [← hcase, hagree]
-  · cases hcase : τ.allele ℓ with
-    | none => simp [coalesce, hcase]
-    | some a =>
-      rw [hcase] at hτ
-      simp at hτ
+  cases hτ : τ.allele ℓ with
+  | none => simp [coalesce, hτ]
+  | some a =>
+    have hsome : (τ.allele ℓ).isSome = true := by simp [hτ]
+    have hagree := hcompat ℓ hsome hσ
+    simp only [coalesce, hτ, Option.elim]
+    rw [← hτ, hagree]
 
 /-- **Coalescence never raises a locus load.**  The merged carrier retains a locus exactly
 when at least one of the two carriers did. -/
@@ -342,12 +336,8 @@ theorem load_coalesce_le (τ σ : PartialType Deme Locus Allele)
       (if (σ.allele ℓ).isSome = true then 1 else 0) +
         (if (τ.allele ℓ).isSome = true then 1 else 0) := by
     cases hτ : τ.allele ℓ with
-    | none =>
-      simp only [hτ, Option.elim, Option.isSome_none, Bool.false_eq_true, if_false]
-      omega
-    | some a =>
-      simp only [hτ, Option.elim, Option.isSome_some, if_true]
-      omega
+    | none => simp [hτ]
+    | some a => simp [hτ]
   omega
 
 /-- Coalescence preserves the retention budget. -/
@@ -373,9 +363,7 @@ instance decidableAgrees (τ : PartialType Deme Locus Allele) (hap : ∀ ℓ, Al
 
 /-- Every haplotype agrees with the fully retained carrier built from it. -/
 theorem agrees_fullType (i : Deme) (hap : ∀ ℓ, Allele ℓ) (ℓ₀ : Locus) :
-    Agrees (fullType i hap ℓ₀) hap := by
-  intro ℓ
-  exact Or.inr rfl
+    Agrees (fullType i hap ℓ₀) hap := fun _ ↦ Or.inr rfl
 
 noncomputable section
 
@@ -391,7 +379,7 @@ def configurationMoment (law : Deme → FiniteReportLaw (∀ ℓ, Allele ℓ))
     (ξ : Multiset (PartialType Deme Locus Allele)) : ℝ :=
   (ξ.map (marginalFrequency law)).prod
 
-/-- A marginal frequency is a probability mass, hence nonnegative. -/
+/-- A marginal frequency is a sum of probability masses, hence nonnegative. -/
 theorem marginalFrequency_nonneg (law : Deme → FiniteReportLaw (∀ ℓ, Allele ℓ))
     (τ : PartialType Deme Locus Allele) : 0 ≤ marginalFrequency law τ :=
   Finset.sum_nonneg fun hap _ ↦ (law τ.deme).mass_nonneg hap
@@ -399,28 +387,29 @@ theorem marginalFrequency_nonneg (law : Deme → FiniteReportLaw (∀ ℓ, Allel
 /-- A marginal frequency never exceeds one. -/
 theorem marginalFrequency_le_one (law : Deme → FiniteReportLaw (∀ ℓ, Allele ℓ))
     (τ : PartialType Deme Locus Allele) : marginalFrequency law τ ≤ 1 := by
-  simp only [marginalFrequency]
-  calc ∑ hap ∈ Finset.univ.filter (Agrees τ), (law τ.deme).mass hap
-      ≤ ∑ hap, (law τ.deme).mass hap :=
-        Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset _ _)
-          (fun hap _ _ ↦ (law τ.deme).mass_nonneg hap)
-    _ = 1 := (law τ.deme).mass_sum
+  have hsub : marginalFrequency law τ ≤ ∑ hap, (law τ.deme).mass hap :=
+    Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset _ _)
+      (fun hap _ _ ↦ (law τ.deme).mass_nonneg hap)
+  rwa [(law τ.deme).mass_sum] at hsub
 
-/-- A fully retained carrier has marginal frequency equal to the mass of its haplotype, which
-is the seed evaluation used by the sampled-genotype representation (22). -/
+/-- A fully retained carrier has marginal frequency equal to the mass of its haplotype, the
+seed evaluation used by the sampled-genotype representation (22). -/
 theorem marginalFrequency_fullType (law : Deme → FiniteReportLaw (∀ ℓ, Allele ℓ)) (i : Deme)
     (hap : ∀ ℓ, Allele ℓ) (ℓ₀ : Locus) :
     marginalFrequency law (fullType i hap ℓ₀) = (law i).mass hap := by
   have hfilter : Finset.univ.filter (Agrees (fullType i hap ℓ₀)) = {hap} := by
     ext g
-    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_singleton, Agrees,
-      fullType, reduceCtorEq, false_or, Option.some.injEq]
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_singleton]
     constructor
     · intro h
       funext ℓ
-      exact (h ℓ).symm
-    · intro h ℓ
-      rw [h]
+      rcases h ℓ with hc | hc
+      · simp [fullType] at hc
+      · simp only [fullType, Option.some.injEq] at hc
+        exact hc.symm
+    · intro h
+      subst h
+      exact agrees_fullType i g ℓ₀
   simp [marginalFrequency, hfilter, fullType]
 
 /-- The moment of a configuration with one more carrier is (17) read as a recursion. -/
@@ -430,7 +419,7 @@ theorem configurationMoment_cons (law : Deme → FiniteReportLaw (∀ ℓ, Allel
       marginalFrequency law τ * configurationMoment law ξ := by
   simp [configurationMoment]
 
-/-- Configuration moments multiply over disjoint unions of configurations. -/
+/-- Configuration moments multiply over unions of configurations. -/
 theorem configurationMoment_add (law : Deme → FiniteReportLaw (∀ ℓ, Allele ℓ))
     (ξ ζ : Multiset (PartialType Deme Locus Allele)) :
     configurationMoment law (ξ + ζ) =
