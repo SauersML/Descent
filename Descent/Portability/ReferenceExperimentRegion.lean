@@ -94,6 +94,27 @@ def ratioDefined (context : Bool × Bool) (atom : LearnerAtom) (terminal : Termi
     ℚ :=
   definedIndicator (r2Portability context atom terminal)
 
+/-- A corner accumulator computed from a tabled terminal law. -/
+def cornerTableReport (entries : List ((Bool × Bool) × TerminalTypes × ℚ))
+    (report : Bool × Bool → LearnerAtom → TerminalTypes → ℚ) (context : Bool × Bool) : ℚ :=
+  ∑ atom, if atomMass context atom = 0 then 0
+    else atomMass context atom * ∑ terminal, terminalTable entries context terminal *
+      report context atom terminal
+
+/-- Every early migration corner accumulator is computed from the tabled early terminal law. -/
+theorem early_cornerReport_table (report : Bool × Bool → LearnerAtom → TerminalTypes → ℚ)
+    (context : Bool × Bool) :
+    cornerReport earlyMigration report context =
+      cornerTableReport earlyTerminalEntries report context := by
+  simp only [cornerReport, cornerTableReport, early_terminalMass_table]
+
+/-- Every late migration corner accumulator is computed from the tabled late terminal law. -/
+theorem late_cornerReport_table (report : Bool × Bool → LearnerAtom → TerminalTypes → ℚ)
+    (context : Bool × Bool) :
+    cornerReport lateMigration report context =
+      cornerTableReport lateTerminalEntries report context := by
+  simp only [cornerReport, cornerTableReport, late_terminalMass_table]
+
 /-- NOTE2 section 9, early migration: the exact corner accumulators of the target squared
 correlation and of the target to source ratio, context by context. -/
 theorem early_corner_values :
@@ -129,6 +150,7 @@ theorem early_corner_values :
       61277721092998762608592682195 / 585597412389882077953835139072 ∧
     cornerReport earlyMigration ratioDefined (true, true) =
       4892584425047299 / 37737506808004608 := by
+  simp only [early_cornerReport_table]
   decide +kernel
 
 /-- NOTE2 section 9, late migration: the exact corner accumulators of the target squared
@@ -166,6 +188,7 @@ theorem late_corner_values :
       26734360594894384452151930418545 / 127477236709622454844575486836736 ∧
     cornerReport lateMigration ratioDefined (true, true) =
       53938343310218201845309 / 248683980913633853964288 := by
+  simp only [late_cornerReport_table]
   decide +kernel
 
 /-! ## The ranges on the whole square -/
