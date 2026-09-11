@@ -156,7 +156,7 @@ theorem migrationTotal_threeBlockHistory (bexp mtot rtot : ℝ) :
 /-- The three-block history supplies exactly the prescribed recombination total. -/
 theorem recombinationTotal_threeBlockHistory (bexp mtot rtot : ℝ) :
     ((threeBlockHistory bexp mtot rtot).map eventRecombination).sum = rtot := by
-  simp [threeBlockHistory, eventRecombination] <;> ring
+  simp [threeBlockHistory, eventRecombination]
 
 /-- The normalised coupling read off an ordered-event state `(p, D)`, the counterpart for the
 piecewise chronology of `normalisedCoupling` for the continuous one. -/
@@ -180,7 +180,7 @@ theorem couplingOfState_threeBlockHistory (bexp mtot rtot : ℝ) (hmpos : 0 < mt
 
 /-- NOTE1 Theorem 5 with (33): at fixed totals the couplings attainable by an ordered
 three-block history are exactly the interval `[e^{-R}, 1]`. -/
-theorem attainable_coupling_range (mtot rtot : ℝ) (hmpos : 0 < mtot) (hrnn : 0 ≤ rtot) :
+theorem attainable_coupling_range (mtot rtot : ℝ) (hmpos : 0 < mtot) :
     {coupling : ℝ | ∃ bexp ∈ Set.Icc (0 : ℝ) rtot,
         couplingOfState (runEvents (threeBlockHistory bexp mtot rtot) (0, 0)) = coupling} =
       Set.Icc (Real.exp (-rtot)) 1 := by
@@ -236,12 +236,12 @@ theorem reportMetrics_chronologyLaw (p C : ℝ) (hp0 : 0 ≤ p) (hp1 : p ≤ 1) 
 /-- NOTE1 Theorem 5, the curve statement: at fixed totals the attainable metric vectors are
 exactly the image of the coupling interval `[e^{-R}, 1]` under the table map, in both
 directions. -/
-theorem attainable_metric_curve (mtot rtot : ℝ) (hmpos : 0 < mtot) (hrnn : 0 ≤ rtot) :
+theorem attainable_metric_curve (mtot rtot : ℝ) (hmpos : 0 < mtot) :
     metricTable (1 - Real.exp (-mtot)) ''
         {coupling : ℝ | ∃ bexp ∈ Set.Icc (0 : ℝ) rtot,
           couplingOfState (runEvents (threeBlockHistory bexp mtot rtot) (0, 0)) = coupling} =
       metricTable (1 - Real.exp (-mtot)) '' Set.Icc (Real.exp (-rtot)) 1 := by
-  rw [attainable_coupling_range mtot rtot hmpos hrnn]
+  rw [attainable_coupling_range mtot rtot hmpos]
 
 /-- The survival factor of the worked example's totals. -/
 theorem exp_neg_log_two : Real.exp (-Real.log 2) = 1 / 2 := by
