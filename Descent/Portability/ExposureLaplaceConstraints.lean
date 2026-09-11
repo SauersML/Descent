@@ -14,7 +14,10 @@ import Mathlib.Analysis.Normed.Group.Bounded
 import Mathlib.LinearAlgebra.LinearIndependent.Basic
 import Mathlib.MeasureTheory.Group.Convolution
 import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.MeasureTheory.Integral.BoundedContinuousFunction
 import Mathlib.MeasureTheory.Integral.Prod
+import Mathlib.MeasureTheory.Measure.HasOuterApproxClosed
+import Mathlib.Topology.ContinuousMap.Weierstrass
 
 assert_below Descent.Decision Descent.Program
 
@@ -59,11 +62,15 @@ integral (`hasDerivAt_momentLaplace`) gives every iterated derivative as a momen
 (`iteratedDeriv_measureLaplace`), hence complete monotonicity
 (`sign_iteratedDeriv_measureLaplace`), and a nonnegative quadratic gives midpoint log-convexity
 (`measureLaplace_sq_le_mul`). The squared transform is the transform of the convolution
-`ν ∗ ν` (`measureLaplace_conv`).
-
-Not formalised: identifiability for measures that are not finitely supported (it is proved
-above for finite laws), and the remark that `m` and `r` are not separately identified in calendar
-time. Nothing here identifies `ν` from data.
+`ν ∗ ν` (`measureLaplace_conv`). Identifiability holds for every finite measure carried by
+`[0, R]`: two such laws whose transforms agree at the integer scales `λ = 0, 1, 2, …`
+(`measure_eq_of_measureLaplace_natCast_eq`), or at every `λ ≥ 0`
+(`measure_eq_of_measureLaplace_eq`), are equal. A polynomial in `e^{-b}` integrates to a
+combination of transforms at integer scales (`integral_eval_exp_neg`), and by Weierstrass on
+`[e^{-R}, 1]` such polynomials approximate every bounded continuous function uniformly on
+`[0, R]`; this replaces the moment argument of NOTE1 section 6.3 by the same density argument
+in the variable `e^{-b}`. That calendar-time rates are not identified is proved in
+`AdmixtureChronologyLaw`. Nothing here identifies `ν` from data.
 
 ## Empirical status
 
@@ -772,6 +779,113 @@ theorem sign_iteratedDeriv_measureLaplace (exposureLaw : Measure ℝ)
   show 0 ≤ (-1 : ℝ) ^ order * ((-exposure) ^ order * Real.exp (-(lam * exposure)))
   rw [← mul_assoc, hpow]
   exact mul_nonneg (pow_nonneg hexposure.1 order) (Real.exp_pos _).le
+
+/-- Assumes: a finite measure carried by `[0, R]`. A polynomial in the survival factor `e^{-b}`
+integrates to the combination of transforms at integer scales with the polynomial's
+coefficients: `∫ ∑ₖ cₖ e^{-k b} ν(db) = ∑ₖ cₖ C(k)`. -/
+theorem integral_eval_exp_neg (exposureLaw : Measure ℝ) [IsFiniteMeasure exposureLaw]
+    (bound : ℝ) (hsupport : ∀ᵐ exposure ∂exposureLaw, exposure ∈ Set.Icc 0 bound)
+    (polynomial : Polynomial ℝ) :
+    ∫ exposure, polynomial.eval (Real.exp (-exposure)) ∂exposureLaw =
+      ∑ index ∈ Finset.range (polynomial.natDegree + 1),
+        polynomial.coeff index * measureLaplace exposureLaw index := by
+  have hintegrable : ∀ index ∈ Finset.range (polynomial.natDegree + 1),
+      Integrable (fun exposure ↦ polynomial.coeff index * Real.exp (-exposure) ^ index)
+        exposureLaw :=
+    fun index _ ↦ integrable_of_ae_mem_Icc exposureLaw bound hsupport _ (by fun_prop)
+  simp only [Polynomial.eval_eq_sum_range]
+  rw [integral_finset_sum _ hintegrable]
+  refine Finset.sum_congr rfl (fun index _ ↦ ?_)
+  rw [integral_const_mul]
+  unfold measureLaplace
+  congr 1
+  refine integral_congr_ae (ae_of_all _ fun exposure ↦ ?_)
+  show Real.exp (-exposure) ^ index = Real.exp (-((index : ℝ) * exposure))
+  rw [← Real.exp_nat_mul]
+  congr 1
+  ring
+
+/-- NOTE1 section 6.3, identifiability for exposure laws that are not finitely supported.
+Assumes: two finite measures carried by `[0, R]` whose transforms agree at every integer scale.
+Then the measures are equal. Every polynomial in `e^{-b}` has the same integral under both laws
+(`integral_eval_exp_neg`); by Weierstrass on `[e^{-R}, 1]` every bounded continuous function is
+within any `ε` of such a polynomial on `[0, R]`; and a finite measure is determined by its
+integrals of bounded continuous functions. -/
+theorem measure_eq_of_measureLaplace_natCast_eq (first second : Measure ℝ)
+    [IsFiniteMeasure first] [IsFiniteMeasure second] (bound : ℝ)
+    (hfirst : ∀ᵐ exposure ∂first, exposure ∈ Set.Icc 0 bound)
+    (hsecond : ∀ᵐ exposure ∂second, exposure ∈ Set.Icc 0 bound)
+    (hlaplace : ∀ scale : ℕ, measureLaplace first scale = measureLaplace second scale) :
+    first = second := by
+  have hmass : 0 < first.real Set.univ + second.real Set.univ + 1 := by
+    have h1 : (0 : ℝ) ≤ first.real Set.univ := measureReal_nonneg
+    have h2 : (0 : ℝ) ≤ second.real Set.univ := measureReal_nonneg
+    linarith
+  refine ext_of_forall_integral_eq_of_IsFiniteMeasure fun bounded ↦ ?_
+  have hclose : ∀ ε > 0,
+      |∫ exposure, bounded exposure ∂first - ∫ exposure, bounded exposure ∂second| ≤ ε := by
+    intro ε hε
+    set tolerance := ε / (first.real Set.univ + second.real Set.univ + 1) with htolerance
+    have hpositive : 0 < tolerance := div_pos hε hmass
+    have hscale : tolerance * (first.real Set.univ + second.real Set.univ + 1) = ε :=
+      div_mul_cancel₀ ε (ne_of_gt hmass)
+    have hcontinuous : ContinuousOn (fun u ↦ bounded (-Real.log u))
+        (Set.Icc (Real.exp (-bound)) 1) := by
+      refine bounded.continuous.comp_continuousOn (Real.continuousOn_log.mono ?_).neg
+      intro u hu
+      exact ne_of_gt ((Real.exp_pos _).trans_le hu.1)
+    obtain ⟨near, hnear⟩ :=
+      exists_polynomial_near_of_continuousOn (Real.exp (-bound)) 1 _ hcontinuous _ hpositive
+    have hpoint : ∀ law : Measure ℝ, (∀ᵐ exposure ∂law, exposure ∈ Set.Icc 0 bound) →
+        ∀ᵐ exposure ∂law,
+          ‖bounded exposure - near.eval (Real.exp (-exposure))‖ ≤ tolerance := by
+      intro law hlaw
+      refine hlaw.mono fun exposure hexposure ↦ ?_
+      have hmem : Real.exp (-exposure) ∈ Set.Icc (Real.exp (-bound)) 1 :=
+        Set.mem_Icc.mpr ⟨Real.exp_le_exp.mpr (by linarith [hexposure.2]),
+          Real.exp_le_one_iff.mpr (by linarith [hexposure.1])⟩
+      have hvalue := hnear _ hmem
+      rw [Real.log_exp, neg_neg] at hvalue
+      rw [Real.norm_eq_abs, abs_sub_comm]
+      exact hvalue.le
+    have hfirstbound := norm_integral_le_of_norm_le_const (hpoint first hfirst)
+    have hsecondbound := norm_integral_le_of_norm_le_const (hpoint second hsecond)
+    rw [integral_sub (bounded.integrable first) (integrable_of_ae_mem_Icc first bound hfirst
+        (fun exposure ↦ near.eval (Real.exp (-exposure))) (by fun_prop)),
+      Real.norm_eq_abs] at hfirstbound
+    rw [integral_sub (bounded.integrable second) (integrable_of_ae_mem_Icc second bound hsecond
+        (fun exposure ↦ near.eval (Real.exp (-exposure))) (by fun_prop)),
+      Real.norm_eq_abs] at hsecondbound
+    have hpolynomial : ∫ exposure, near.eval (Real.exp (-exposure)) ∂first =
+        ∫ exposure, near.eval (Real.exp (-exposure)) ∂second := by
+      rw [integral_eval_exp_neg first bound hfirst near,
+        integral_eval_exp_neg second bound hsecond near]
+      exact Finset.sum_congr rfl fun index _ ↦ by rw [hlaplace index]
+    have htriangle := abs_sub
+      (∫ exposure, bounded exposure ∂first - ∫ exposure, near.eval (Real.exp (-exposure)) ∂first)
+      (∫ exposure, bounded exposure ∂second -
+        ∫ exposure, near.eval (Real.exp (-exposure)) ∂second)
+    rw [hpolynomial, sub_sub_sub_cancel_right] at htriangle
+    rw [hpolynomial] at hfirstbound
+    nlinarith [htriangle, hfirstbound, hsecondbound, hscale, hpositive,
+      measureReal_nonneg (μ := first) (s := Set.univ),
+      measureReal_nonneg (μ := second) (s := Set.univ)]
+  have hzero :
+      |∫ exposure, bounded exposure ∂first - ∫ exposure, bounded exposure ∂second| = 0 :=
+    le_antisymm (le_of_forall_pos_le_add fun ε hε ↦ by linarith [hclose ε hε]) (abs_nonneg _)
+  exact sub_eq_zero.mp (abs_eq_zero.mp hzero)
+
+/-- NOTE1 section 6.3: knowing the transform `C(λ)` for every `λ ≥ 0` determines the exposure
+law. Assumes: two finite measures carried by `[0, R]` whose transforms agree at every
+nonnegative scale. Then the measures are equal. -/
+theorem measure_eq_of_measureLaplace_eq (first second : Measure ℝ)
+    [IsFiniteMeasure first] [IsFiniteMeasure second] (bound : ℝ)
+    (hfirst : ∀ᵐ exposure ∂first, exposure ∈ Set.Icc 0 bound)
+    (hsecond : ∀ᵐ exposure ∂second, exposure ∈ Set.Icc 0 bound)
+    (hlaplace : ∀ lam : ℝ, 0 ≤ lam → measureLaplace first lam = measureLaplace second lam) :
+    first = second :=
+  measure_eq_of_measureLaplace_natCast_eq first second bound hfirst hsecond
+    fun scale ↦ hlaplace scale (Nat.cast_nonneg scale)
 
 end
 

@@ -44,3 +44,7 @@ open Descent.Portability.ExposureLaplaceConstraints
 #print axioms Descent.Portability.ExposureLaplaceConstraints.iteratedDeriv_measureLaplace
 #print axioms
   Descent.Portability.ExposureLaplaceConstraints.sign_iteratedDeriv_measureLaplace
+#print axioms Descent.Portability.ExposureLaplaceConstraints.integral_eval_exp_neg
+#print axioms
+  Descent.Portability.ExposureLaplaceConstraints.measure_eq_of_measureLaplace_natCast_eq
+#print axioms Descent.Portability.ExposureLaplaceConstraints.measure_eq_of_measureLaplace_eq
