@@ -28,9 +28,10 @@ law, and it is the corpus epoch at positive coalescence (`epoch_ofRates`).
 `tendsto_perturbedEpoch_mulVec` is continuity of the epoch propagator in the rates: the matrix
 exponential is continuous, so the propagated states of the perturbed corpus epochs converge to
 the propagated state of the limit epoch. Each perturbed epoch preserves locus-exchangeable
-realizability by `TwoLocusMicroscopicApproximation.rateEpoch_preserves_locusExchangeable_realization`,
-and the realizable states form the closed set `IntegrableRateHistoryRealization.exchangeableStates`,
-so `nonnegativeEpoch_preserves_locusExchangeable_realization` holds with no hypothesis beyond an
+realizability by
+`TwoLocusMicroscopicApproximation.rateEpoch_preserves_locusExchangeable_realization`, and the
+realizable states form the closed set `IntegrableRateHistoryRealization.exchangeableStates`, so
+`nonnegativeEpoch_preserves_locusExchangeable_realization` holds with no hypothesis beyond an
 initial realization. `NonnegativeRateEvent` names epochs at nonnegative coalescence and splits,
 `nonnegativePropagate_preserves_locusExchangeable_realization` is the theorem for any finite
 list of them, and `nonnegativeHistory_present_locusExchangeable_realization` reads it at the
@@ -279,7 +280,8 @@ def coalescenceFreeEvent : NonnegativeRateEvent 2 :=
 /-- At positive coalescence an epoch event compiles to the instruction of the corpus event. -/
 theorem instruction_evolve_ofRates (rates : ManyDemeLDRates D) (duration : ℝ)
     (hduration : 0 ≤ duration) :
-    (NonnegativeRateEvent.evolve (NonnegativeLDRates.ofRates rates) duration hduration).instruction =
+    (NonnegativeRateEvent.evolve (NonnegativeLDRates.ofRates rates) duration
+        hduration).instruction =
       (RateHistoryEvent.evolve rates duration hduration).instruction :=
   congrArg LowOrderLDInstruction.evolve (epoch_ofRates rates duration hduration)
 
