@@ -39786,6 +39786,8 @@
    "Descent.Portability.StoppedGenotypeRenewal.stoppedMass_renewal",
    "Descent.Portability.SymmetricScoreFourthMoment.sparse_symmetric_value",
    "Descent.Portability.SynchronyEnvelope.grid_gap_nonneg",
+   "Descent.Portability.TailRepairCertification.exponential_bound",
+   "Descent.Portability.TailRepairCertification.positive_repair_certificate",
    "Descent.Portability.TargetUncertainty.affine_minimax_radius",
    "Descent.Portability.TargetUncertainty.opposite_points_lower",
    "Descent.Portability.TargetUncertainty.uniform_bound_lower",
@@ -41537,6 +41539,8 @@
     "Descent.Portability.sqrt_scaled_variance_decreasing_in_n": [],
     "Descent.Portability.SymmetricScoreFourthMoment.sparse_symmetric_value": [],
     "Descent.Portability.SynchronyEnvelope.grid_gap_nonneg": [],
+    "Descent.Portability.TailRepairCertification.exponential_bound": [],
+    "Descent.Portability.TailRepairCertification.positive_repair_certificate": [],
     "Descent.Portability.TargetUncertainty.opposite_points_lower": [],
     "Descent.Portability.TargetUncertainty.uniform_bound_lower": [],
     "Descent.Portability.TargetUncertainty.affine_minimax_radius": [],
@@ -51000,6 +51004,8 @@
    "Descent.Portability.StoppedGenotypeRenewal.stoppedMass_renewal",
    "Descent.Portability.SymmetricScoreFourthMoment.sparse_symmetric_value",
    "Descent.Portability.SynchronyEnvelope.grid_gap_nonneg",
+   "Descent.Portability.TailRepairCertification.exponential_bound",
+   "Descent.Portability.TailRepairCertification.positive_repair_certificate",
    "Descent.Portability.TargetUncertainty.affine_minimax_radius",
    "Descent.Portability.TargetUncertainty.opposite_points_lower",
    "Descent.Portability.TargetUncertainty.uniform_bound_lower",
@@ -52697,6 +52703,8 @@
     "Descent.Portability.sqrt_scaled_variance_decreasing_in_n": [],
     "Descent.Portability.SymmetricScoreFourthMoment.sparse_symmetric_value": [],
     "Descent.Portability.SynchronyEnvelope.grid_gap_nonneg": [],
+    "Descent.Portability.TailRepairCertification.exponential_bound": [],
+    "Descent.Portability.TailRepairCertification.positive_repair_certificate": [],
     "Descent.Portability.TargetUncertainty.opposite_points_lower": [],
     "Descent.Portability.TargetUncertainty.uniform_bound_lower": [],
     "Descent.Portability.TargetUncertainty.affine_minimax_radius": [],
@@ -71538,6 +71546,8 @@
    "Descent.Portability.StoppedGenotypeRenewal.stoppedMass_renewal",
    "Descent.Portability.SymmetricScoreFourthMoment.sparse_symmetric_value",
    "Descent.Portability.SynchronyEnvelope.grid_gap_nonneg",
+   "Descent.Portability.TailRepairCertification.exponential_bound",
+   "Descent.Portability.TailRepairCertification.positive_repair_certificate",
    "Descent.Portability.TargetUncertainty.affine_minimax_radius",
    "Descent.Portability.TargetUncertainty.opposite_points_lower",
    "Descent.Portability.TargetUncertainty.uniform_bound_lower",
@@ -73391,6 +73401,8 @@
     "Descent.Portability.sqrt_scaled_variance_decreasing_in_n": [],
     "Descent.Portability.SymmetricScoreFourthMoment.sparse_symmetric_value": [],
     "Descent.Portability.SynchronyEnvelope.grid_gap_nonneg": [],
+    "Descent.Portability.TailRepairCertification.exponential_bound": [],
+    "Descent.Portability.TailRepairCertification.positive_repair_certificate": [],
     "Descent.Portability.TargetUncertainty.opposite_points_lower": [],
     "Descent.Portability.TargetUncertainty.uniform_bound_lower": [],
     "Descent.Portability.TargetUncertainty.affine_minimax_radius": [],
@@ -75186,6 +75198,8 @@
    "Descent.Portability.SpectralAuditConfidence.range_nonneg",
    "Descent.Portability.SpectralMeasurementMinimax.adaptive_minimax_all_budgets",
    "Descent.Portability.StoppedGenotypeReadiness.conditionalSite_unsupported_ready",
+   "Descent.Portability.TailRepairCertification.positive_repair_certificate",
+   "Descent.Portability.TailRepairCertification.study_confidence",
    "Descent.Portability.TargetUncertainty.center_upper_bound",
    "Descent.Portability.TargetUncertainty.uniform_bound_lower",
    "Descent.Portability.ToeplitzPanelIdentification.lag_card",
@@ -75626,6 +75640,8 @@
     "Descent.Portability.SpectralAuditConfidence.confidence": [],
     "Descent.Portability.SpectralMeasurementMinimax.adaptive_minimax_all_budgets": [],
     "Descent.Portability.StoppedGenotypeReadiness.conditionalSite_unsupported_ready": [],
+    "Descent.Portability.TailRepairCertification.study_confidence": [],
+    "Descent.Portability.TailRepairCertification.positive_repair_certificate": [],
     "Descent.Portability.TargetUncertainty.center_upper_bound": [],
     "Descent.Portability.TargetUncertainty.uniform_bound_lower": [],
     "Descent.Portability.ToeplitzPanelIdentification.lag_card": [],
@@ -147489,6 +147505,8 @@
    "Descent.Portability.PairedGainTailExperiment.exact_moment_packet",
    "Descent.Portability.PairedGainTailExperiment.improvement_moments",
    "Descent.Portability.SecondMomentFrameRepair.harm_probability",
+   "Descent.Portability.TailRepairCertification.positive_repair_certificate",
+   "Descent.Portability.TailRepairCertification.study_confidence",
    "Descent.Program.costEffectiveness_mul_cost",
    "Descent.Program.costEffectiveness_unit_invariant",
    "Descent.Program.costEffectiveness_zero_cost_is_junk"
@@ -147524,6 +147542,8 @@
     "Descent.Portability.SecondMomentFrameRepair.harm_probability": [
      "(gram w φ"
     ],
+    "Descent.Portability.TailRepairCertification.study_confidence": [],
+    "Descent.Portability.TailRepairCertification.positive_repair_certificate": [],
     "Descent.Program.costEffectiveness_zero_cost_is_junk": [],
     "Descent.Program.costEffectiveness_unit_invariant": [],
     "Descent.Program.costEffectiveness_mul_cost": []
@@ -152677,7 +152697,9 @@
    "Descent.Portability.PairedGainTailExperiment.joint_probability",
    "Descent.Portability.PairedGainTailExperiment.loss_moments",
    "Descent.Portability.PortabilityRatioGeometry.certified_bin_expectation",
-   "Descent.Portability.PortabilityRatioGeometry.certified_expected_ratio"
+   "Descent.Portability.PortabilityRatioGeometry.certified_expected_ratio",
+   "Descent.Portability.TailRepairCertification.positive_repair_certificate",
+   "Descent.Portability.TailRepairCertification.study_confidence"
   ],
   "constraints": {
    "hypotheses": [
@@ -152726,7 +152748,9 @@
     "Descent.Portability.PairedGainTailExperiment.joint_memLp": [],
     "Descent.Portability.PairedGainTailExperiment.exact_moment_packet": [],
     "Descent.Portability.PortabilityRatioGeometry.certified_expected_ratio": [],
-    "Descent.Portability.PortabilityRatioGeometry.certified_bin_expectation": []
+    "Descent.Portability.PortabilityRatioGeometry.certified_bin_expectation": [],
+    "Descent.Portability.TailRepairCertification.study_confidence": [],
+    "Descent.Portability.TailRepairCertification.positive_repair_certificate": []
    }
   }
  },
@@ -189599,7 +189623,9 @@
    "Descent.Portability.PairedGainTailExperiment.joint_probability",
    "Descent.Portability.PairedGainTailExperiment.loss_moments",
    "Descent.Portability.PortabilityRatioGeometry.certified_bin_expectation",
-   "Descent.Portability.PortabilityRatioGeometry.certified_expected_ratio"
+   "Descent.Portability.PortabilityRatioGeometry.certified_expected_ratio",
+   "Descent.Portability.TailRepairCertification.positive_repair_certificate",
+   "Descent.Portability.TailRepairCertification.study_confidence"
   ],
   "constraints": {
    "hypotheses": [],
@@ -189631,7 +189657,9 @@
     "Descent.Portability.PairedGainTailExperiment.joint_memLp": [],
     "Descent.Portability.PairedGainTailExperiment.exact_moment_packet": [],
     "Descent.Portability.PortabilityRatioGeometry.certified_expected_ratio": [],
-    "Descent.Portability.PortabilityRatioGeometry.certified_bin_expectation": []
+    "Descent.Portability.PortabilityRatioGeometry.certified_bin_expectation": [],
+    "Descent.Portability.TailRepairCertification.study_confidence": [],
+    "Descent.Portability.TailRepairCertification.positive_repair_certificate": []
    }
   }
  },
@@ -206472,7 +206500,9 @@
    "Descent.Portability.PairedGainTailExperiment.joint_probability",
    "Descent.Portability.PairedGainTailExperiment.loss_moments",
    "Descent.Portability.PortabilityRatioGeometry.certified_bin_expectation",
-   "Descent.Portability.PortabilityRatioGeometry.certified_expected_ratio"
+   "Descent.Portability.PortabilityRatioGeometry.certified_expected_ratio",
+   "Descent.Portability.TailRepairCertification.positive_repair_certificate",
+   "Descent.Portability.TailRepairCertification.study_confidence"
   ],
   "constraints": {
    "hypotheses": [
@@ -206563,7 +206593,13 @@
      "0 < p ∧ p ≤ 1"
     ],
     "Descent.Portability.PortabilityRatioGeometry.certified_expected_ratio": [],
-    "Descent.Portability.PortabilityRatioGeometry.certified_bin_expectation": []
+    "Descent.Portability.PortabilityRatioGeometry.certified_bin_expectation": [],
+    "Descent.Portability.TailRepairCertification.study_confidence": [
+     "0 < p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.TailRepairCertification.positive_repair_certificate": [
+     "0 < p ∧ p ≤ 1"
+    ]
    }
   }
  },
@@ -235489,7 +235525,9 @@
    "Descent.Portability.PairedGainTailExperiment.joint_probability",
    "Descent.Portability.PairedGainTailExperiment.loss_moments",
    "Descent.Portability.PortabilityRatioGeometry.certified_bin_expectation",
-   "Descent.Portability.PortabilityRatioGeometry.certified_expected_ratio"
+   "Descent.Portability.PortabilityRatioGeometry.certified_expected_ratio",
+   "Descent.Portability.TailRepairCertification.positive_repair_certificate",
+   "Descent.Portability.TailRepairCertification.study_confidence"
   ],
   "constraints": {
    "hypotheses": [
@@ -235567,7 +235605,13 @@
      "0 < p ∧ p ≤ 1"
     ],
     "Descent.Portability.PortabilityRatioGeometry.certified_expected_ratio": [],
-    "Descent.Portability.PortabilityRatioGeometry.certified_bin_expectation": []
+    "Descent.Portability.PortabilityRatioGeometry.certified_bin_expectation": [],
+    "Descent.Portability.TailRepairCertification.study_confidence": [
+     "0 < p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.TailRepairCertification.positive_repair_certificate": [
+     "0 < p ∧ p ≤ 1"
+    ]
    }
   }
  },
@@ -235796,6 +235840,8 @@
    "Descent.Portability.PairedGainTailExperiment.exact_moment_packet",
    "Descent.Portability.PairedGainTailExperiment.improvement_moments",
    "Descent.Portability.SecondMomentFrameRepair.harm_probability",
+   "Descent.Portability.TailRepairCertification.positive_repair_certificate",
+   "Descent.Portability.TailRepairCertification.study_confidence",
    "Descent.Program.costEffectiveness_mul_cost",
    "Descent.Program.costEffectiveness_unit_invariant",
    "Descent.Program.costEffectiveness_zero_cost_is_junk"
@@ -235814,6 +235860,8 @@
     "Descent.Portability.PairedGainTailExperiment.improvement_moments": [],
     "Descent.Portability.PairedGainTailExperiment.exact_moment_packet": [],
     "Descent.Portability.SecondMomentFrameRepair.harm_probability": [],
+    "Descent.Portability.TailRepairCertification.study_confidence": [],
+    "Descent.Portability.TailRepairCertification.positive_repair_certificate": [],
     "Descent.Program.costEffectiveness_zero_cost_is_junk": [],
     "Descent.Program.costEffectiveness_unit_invariant": [],
     "Descent.Program.costEffectiveness_mul_cost": []
@@ -267458,7 +267506,10 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Portability.CertifiedFrameRepair.auditRadius_nonneg",
-   "Descent.Portability.SpectralAuditConfidence.confidence"
+   "Descent.Portability.SpectralAuditConfidence.confidence",
+   "Descent.Portability.TailRepairCertification.positive_repair_certificate",
+   "Descent.Portability.TailRepairCertification.radius_lt",
+   "Descent.Portability.TailRepairCertification.study_confidence"
   ],
   "constraints": {
    "hypotheses": [
@@ -267468,7 +267519,8 @@
     "∀ i, 0 < p i ∧ p i ≤ 1",
     "∀ i, q i ∈ Set.Icc (L i",
     "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i",
-    "∀ i, lo i ≤ (∫ y, y ∂μ i"
+    "∀ i, lo i ≤ (∫ y, y ∂μ i",
+    "0 < p ∧ p ≤ 1"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.CertifiedFrameRepair.auditRadius_nonneg": [
@@ -267482,8 +267534,20 @@
      "∀ i, q i ∈ Set.Icc (L i",
      "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i",
      "∀ i, lo i ≤ (∫ y, y ∂μ i"
+    ],
+    "Descent.Portability.TailRepairCertification.radius_lt": [],
+    "Descent.Portability.TailRepairCertification.study_confidence": [
+     "0 < p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.TailRepairCertification.positive_repair_certificate": [
+     "0 < p ∧ p ≤ 1"
     ]
-   }
+   },
+   "range_hi_thm": [
+    "Descent.Portability.TailRepairCertification.radius_lt",
+    0
+   ],
+   "range_hi": 49
   }
  },
  "Descent.Portability.SpectralMeasurementMinimax.coordinate": {
@@ -273394,6 +273458,124 @@
      "theta ≤ 1"
     ]
    }
+  }
+ },
+ "Descent.Portability.TailRepairCertification.studyLaw": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name Measure.pi",
+  "file": "Descent/Portability/TailRepairCertification.lean",
+  "line": 25,
+  "short": "studyLaw",
+  "ret_type": "Measure (Fin 25 → Fin 100 → Bool × Fin 3)",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "p": [
+    0.02,
+    0.98
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.TailRepairCertification.positive_repair_certificate",
+   "Descent.Portability.TailRepairCertification.study_confidence"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "0 < p ∧ p ≤ 1"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.TailRepairCertification.study_confidence": [
+     "0 < p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.TailRepairCertification.positive_repair_certificate": [
+     "0 < p ∧ p ≤ 1"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.TailRepairCertification.estimatedGain": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "ambiguous call to 'improvement' with 0 argument(s): ['Descent.Portability.CertifiedFrameRepair.improvement', 'Descent.Portability.PairedGainTailExperiment.improvement']",
+  "file": "Descent/Portability/TailRepairCertification.lean",
+  "line": 29,
+  "short": "estimatedGain",
+  "ret_type": "(Fin 25 → Fin 100 → Bool × Fin 3) → ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "p": [
+    0.02,
+    0.98
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.TailRepairCertification.positive_repair_certificate",
+   "Descent.Portability.TailRepairCertification.study_confidence"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "0 < p ∧ p ≤ 1"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.TailRepairCertification.study_confidence": [
+     "0 < p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.TailRepairCertification.positive_repair_certificate": [
+     "0 < p ∧ p ≤ 1"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.TailRepairCertification.confidenceRadius": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/TailRepairCertification.lean",
+  "line": 33,
+  "short": "confidenceRadius",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "Descent_Portability_TailRepairCertification_confidenceRadius",
+  "args": [],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.CertifiedFrameRepair.auditRadius_nonneg",
+   "Descent.Portability.SpectralAuditConfidence.confidence",
+   "Descent.Portability.TailRepairCertification.positive_repair_certificate",
+   "Descent.Portability.TailRepairCertification.radius_lt",
+   "Descent.Portability.TailRepairCertification.study_confidence"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.CertifiedFrameRepair.auditRadius_nonneg": [],
+    "Descent.Portability.SpectralAuditConfidence.confidence": [],
+    "Descent.Portability.TailRepairCertification.radius_lt": [],
+    "Descent.Portability.TailRepairCertification.study_confidence": [],
+    "Descent.Portability.TailRepairCertification.positive_repair_certificate": []
+   },
+   "range_hi_thm": [
+    "Descent.Portability.TailRepairCertification.radius_lt",
+    0
+   ],
+   "range_hi": 49
   }
  },
  "Descent.Portability.TargetUncertainty.UniformBound": {

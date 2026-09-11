@@ -64,24 +64,27 @@ theorem majority_tail (μ : Measure Ω) [IsProbabilityMeasure μ]
   have hsub (i : Fin K) : HasSubgaussianMGF (X i) (1 / 4)
       (Measure.pi (fun _ : Fin K ↦ μ)) := by
     have hc := hasSubgaussianMGF_of_mem_Icc
+      (μ := Measure.pi (fun _ : Fin K ↦ μ))
       (hm.comp (measurable_pi_apply i)).aemeasurable
       (Filter.Eventually.of_forall (fun z : Fin K → Ω ↦ failure_bounded f γ r (z i)))
     have he : (∫ z : Fin K → Ω, failure f γ r (z i) ∂Measure.pi (fun _ : Fin K ↦ μ)) = q :=
       integral_comp_eval (μ := fun _ : Fin K ↦ μ) hi.aestronglyMeasurable
+    simp only [Function.comp_apply] at hc
     rw [he] at hc
     norm_num at hc
     exact hc
   have ht := HasSubgaussianMGF.measure_sum_ge_le_of_iIndepFun hind
-    (s := Finset.univ) (c := fun _ ↦ (1 / 4 : ℝ≥0)) (fun i _ ↦ hsub i)
+    (s := Finset.univ) (c := fun _ ↦ (1 / 4 : NNReal)) (fun i _ ↦ hsub i)
     (show 0 ≤ (K : ℝ) / 4 by positivity)
   have hk : (K : ℝ) ≠ 0 := by exact_mod_cast hK.ne'
   have hexp : Real.exp (-((K : ℝ) / 4) ^ 2 /
-      (2 * ∑ _i : Fin K, ((1 / 4 : ℝ≥0) : ℝ))) = Real.exp (-(K : ℝ) / 8) := by
+      (2 * ∑ _i : Fin K, ((1 / 4 : NNReal) : ℝ))) = Real.exp (-(K : ℝ) / 8) := by
     congr 1
     simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
     norm_num
     field_simp
     ring
+  simp only [NNReal.coe_sum] at ht
   rw [hexp] at ht
   apply (measureReal_mono (show
     {z : Fin K → Ω | (K : ℝ) / 2 ≤ ∑ i, failure f γ r (z i)} ⊆

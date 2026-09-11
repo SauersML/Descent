@@ -26,7 +26,7 @@ variable {Ω : Type*} [MeasurableSpace Ω]
 /-- The actual block mean is measurable. -/
 theorem average_measurable (f : Ω → ℝ) (hf : Measurable f) (s : ℕ) :
     Measurable (average f s) := by
-  unfold average
+  unfold IIDAverageLaw.average
   fun_prop
 
 /-- The mean of a finite iid block has finite second moment. -/

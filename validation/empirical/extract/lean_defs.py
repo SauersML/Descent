@@ -6655,6 +6655,9 @@ def lowerWeight(n, k, m):
 def envelopeLaw(N, k, m, theta, hm, hm_p, hk1, hk2, ht0, ht1):
     return weightedExp((envelopeWeight(N, k, m, theta)), (envelopeWeight_nonneg(N, k, hm, hm_p, (lowerWeight_nonneg(((N + 1.0)), k, m, hk2)), (lowerWeight_le_one((succ_pos_p(N)), k, m, hk1)), ht0, ht1)), (sum_envelopeWeight(N, k, m, theta)))
 
+def Descent_Portability_TailRepairCertification_confidenceRadius():
+    return (2.0 * _rt.rsqrt((_rt.rdiv(6.0, 100.0))))
+
 def lagrange(q, x, k):
     return (_rt.rdiv(_rt.mul((_rt.sub(x, q[int(1.0)])), (_rt.sub(x, q[int(2.0)]))), (_rt.mul((_rt.sub(q[int(0.0)], q[int(1.0)])), (_rt.sub(q[int(0.0)], q[int(2.0)]))))) if (k == 0.0) else (_rt.rdiv(_rt.mul((_rt.sub(x, q[int(0.0)])), (_rt.sub(x, q[int(2.0)]))), (_rt.mul((_rt.sub(q[int(1.0)], q[int(0.0)])), (_rt.sub(q[int(1.0)], q[int(2.0)]))))) if (k == 1.0) else _rt.rdiv(_rt.mul((_rt.sub(x, q[int(0.0)])), (_rt.sub(x, q[int(1.0)]))), (_rt.mul((_rt.sub(q[int(2.0)], q[int(0.0)])), (_rt.sub(q[int(2.0)], q[int(1.0)])))))))
 

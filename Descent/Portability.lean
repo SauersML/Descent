@@ -504,6 +504,8 @@ import Descent.Portability.LossExplainabilitySeparation
 import Descent.Portability.MedianAuditConcentration
 import Descent.Portability.PairedMedianOfMeans
 
+import Descent.Portability.TailRepairCertification
+
 assert_below Descent.Program
 
 /-!
