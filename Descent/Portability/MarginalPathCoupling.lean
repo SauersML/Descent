@@ -188,6 +188,102 @@ theorem coupling_reportRegion_nonempty {ReportIdx : Type*}
   ReportRegionCertificates.reportRegion_nonempty _ _ _
     ⟨_, productCoupling_mem_feasible marginal⟩
 
+section Bridge
+
+variable {Detail : Type*} [Fintype Detail] [DecidableEq Detail]
+
+/-- A sum over refined coordinate assignments splits into the skeleton and the refinement. -/
+theorem sum_skeleton_detail {M : Type*} [AddCommMonoid M]
+    (summand : (Coord → Path × Detail) → M) :
+    ∑ w : Coord → Path × Detail, summand w =
+      ∑ ω : Coord → Path, ∑ d : Coord → Detail, summand fun i ↦ (ω i, d i) := by
+  classical
+  rw [← Equiv.sum_comp
+    (Equiv.arrowProdEquivProdArrow Coord (fun _ ↦ Path) (fun _ ↦ Detail)).symm summand,
+    Fintype.sum_prod_type]
+  rfl
+
+/-- The refined joint mass of DC Proposition 2.3: the skeleton completion followed by
+independent coordinatewise refinement. -/
+def bridgeMass (joint : FiniteReportLaw (Coord → Path))
+    (bridge : Coord → Path → FiniteReportLaw Detail) (w : Coord → Path × Detail) : ℝ :=
+  joint.mass (fun i ↦ (w i).1) * ∏ i, (bridge i (w i).1).mass (w i).2
+
+/-- The refined joint mass is a probability law. -/
+theorem bridgeMass_sum (joint : FiniteReportLaw (Coord → Path))
+    (bridge : Coord → Path → FiniteReportLaw Detail) :
+    ∑ w : Coord → Path × Detail, bridgeMass joint bridge w = 1 := by
+  rw [sum_skeleton_detail]
+  have hinner : ∀ ω : Coord → Path,
+      (∑ d : Coord → Detail, bridgeMass joint bridge fun i ↦ (ω i, d i)) =
+        joint.mass ω := by
+    intro ω
+    have hbeta : ∀ d : Coord → Detail,
+        bridgeMass joint bridge (fun i ↦ (ω i, d i)) =
+          joint.mass ω * ∏ i, (bridge i (ω i)).mass (d i) := fun _ ↦ rfl
+    rw [Finset.sum_congr rfl fun d _ ↦ hbeta d, ← Finset.mul_sum, ← Fintype.prod_sum]
+    simp [FiniteReportLaw.mass_sum]
+  rw [Finset.sum_congr rfl fun ω _ ↦ hinner ω]
+  exact joint.mass_sum
+
+/-- DC Proposition 2.3 in finite form: the bridge extension of a joint completion. -/
+def bridgeExtension (joint : FiniteReportLaw (Coord → Path))
+    (bridge : Coord → Path → FiniteReportLaw Detail) :
+    FiniteReportLaw (Coord → Path × Detail) where
+  mass := bridgeMass joint bridge
+  mass_nonneg := fun w ↦ mul_nonneg (joint.mass_nonneg _)
+    (Finset.prod_nonneg fun i _ ↦ (bridge i (w i).1).mass_nonneg (w i).2)
+  mass_sum := bridgeMass_sum joint bridge
+
+/-- DC Proposition 2.3: every coordinate's refined path law is preserved exactly. Its
+marginal under the bridge extension is its skeleton marginal under the completion multiplied
+by its own conditional refinement, so no coordinate's specified law is disturbed. -/
+theorem bridgeExtension_marginal (joint : FiniteReportLaw (Coord → Path))
+    (bridge : Coord → Path → FiniteReportLaw Detail) (i : Coord) (a : Path) (e : Detail) :
+    (∑ w : Coord → Path × Detail,
+        if w i = (a, e) then (bridgeExtension joint bridge).mass w else 0) =
+      (∑ ω : Coord → Path, if ω i = a then joint.mass ω else 0) * (bridge i a).mass e := by
+  classical
+  have hstep : ∀ ω : Coord → Path,
+      (∑ d : Coord → Detail,
+        if (ω i, d i) = (a, e) then bridgeMass joint bridge (fun j ↦ (ω j, d j)) else 0) =
+      (if ω i = a then joint.mass ω else 0) * (bridge i a).mass e := by
+    intro ω
+    by_cases hω : ω i = a
+    · have hterm : ∀ d : Coord → Detail,
+          (if (ω i, d i) = (a, e) then bridgeMass joint bridge (fun j ↦ (ω j, d j)) else 0) =
+            joint.mass ω * ((∏ j, (bridge j (ω j)).mass (d j)) *
+              (if d i = e then (1 : ℝ) else 0)) := by
+        intro d
+        by_cases hd : d i = e
+        · rw [if_pos (by rw [hω, hd]), if_pos hd]
+          show joint.mass ω * ∏ j, (bridge j (ω j)).mass (d j) = _
+          ring
+        · rw [if_neg (by simp [hd]), if_neg hd]
+          ring
+      rw [Finset.sum_congr rfl fun d _ ↦ hterm d, ← Finset.mul_sum,
+        sum_prod_mul_coordinate (fun j x ↦ (bridge j (ω j)).mass x)
+          (fun j ↦ (bridge j (ω j)).mass_sum) i (fun x ↦ if x = e then (1 : ℝ) else 0),
+        if_pos hω, hω]
+      simp
+    · have hterm : ∀ d : Coord → Detail,
+          (if (ω i, d i) = (a, e) then bridgeMass joint bridge (fun j ↦ (ω j, d j)) else 0) =
+            0 := by
+        intro d
+        exact if_neg (by simp [hω])
+      rw [Finset.sum_congr rfl fun d _ ↦ hterm d, if_neg hω]
+      simp
+  have hbeta : ∀ (ω : Coord → Path) (d : Coord → Detail),
+      (if (fun j ↦ (ω j, d j)) i = (a, e) then
+        (bridgeExtension joint bridge).mass (fun j ↦ (ω j, d j)) else 0) =
+      (if (ω i, d i) = (a, e) then bridgeMass joint bridge (fun j ↦ (ω j, d j)) else 0) :=
+    fun _ _ ↦ rfl
+  rw [sum_skeleton_detail,
+    Finset.sum_congr rfl fun ω _ ↦ Finset.sum_congr rfl fun d _ ↦ hbeta ω d,
+    Finset.sum_congr rfl fun ω _ ↦ hstep ω, Finset.sum_mul]
+
+end Bridge
+
 end
 
 end Descent.Portability.MarginalPathCoupling

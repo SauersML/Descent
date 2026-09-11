@@ -14,3 +14,6 @@ open Descent.Portability.MarginalPathCoupling
 #print axioms couplingObserved_potential_value
 #print axioms coupling_report_contrast_le_potential_value
 #print axioms coupling_reportRegion_nonempty
+#print axioms sum_skeleton_detail
+#print axioms bridgeMass_sum
+#print axioms bridgeExtension_marginal
