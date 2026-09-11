@@ -25,3 +25,14 @@ open Descent.Portability.RealizationBody
 #print axioms Descent.Portability.RealizationBody.exists_law_of_mem_realizationBody
 #print axioms Descent.Portability.RealizationBody.isCompact_realizationBody
 #print axioms Descent.Portability.RealizationBody.isClosed_realizationBody
+#print axioms Descent.Portability.RealizationBody.frequenciesOfSimplex
+#print axioms Descent.Portability.RealizationBody.multiDemeSimplex
+#print axioms Descent.Portability.RealizationBody.isCompact_multiDemeSimplex
+#print axioms Descent.Portability.RealizationBody.demeFrequencies
+#print axioms Descent.Portability.RealizationBody.simplexLowOrderLDFeature
+#print axioms Descent.Portability.RealizationBody.continuous_simplexLowOrderLDFeature
+#print axioms Descent.Portability.RealizationBody.range_simplexLowOrderLDFeature
+#print axioms
+  Descent.Portability.RealizationBody.isCompact_realizationBody_lowOrderLDFeature
+#print axioms
+  Descent.Portability.RealizationBody.isClosed_realizationBody_lowOrderLDFeature

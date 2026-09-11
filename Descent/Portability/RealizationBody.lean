@@ -401,6 +401,189 @@ theorem isClosed_realizationBody {X ι : Type*} [Fintype ι] [TopologicalSpace X
     IsClosed (realizationBody φ) :=
   (isCompact_realizationBody φ hφ).isClosed
 
+/-- The haplotype-frequency vector read off a point of the standard three-simplex. This is
+the parametrisation that gives `TwoLocusHaplotypeFrequencies` a topology: the corpus
+structure carries its own nonnegativity and normalisation proofs, so it is not itself a
+topological space, but it is the image of a compact simplex under this map. -/
+def frequenciesOfSimplex (v : Fin 4 → ℝ) (hv : v ∈ stdSimplex ℝ (Fin 4)) :
+    TwoLocusHaplotypeFrequencies where
+  AB := v 0
+  Ab := v 1
+  aB := v 2
+  ab := v 3
+  AB_nonneg := hv.1 0
+  Ab_nonneg := hv.1 1
+  aB_nonneg := hv.1 2
+  ab_nonneg := hv.1 3
+  total_eq_one := by
+    have hsum := hv.2
+    rwa [Fin.sum_univ_four] at hsum
+
+/-- Multi-deme haplotype-frequency vectors: one point of the standard three-simplex per
+deme. -/
+def multiDemeSimplex (D : ℕ) : Set (Fin D → Fin 4 → ℝ) :=
+  Set.pi Set.univ fun _ ↦ stdSimplex ℝ (Fin 4)
+
+/-- The multi-deme simplex is compact, being a product of standard simplices. -/
+theorem isCompact_multiDemeSimplex (D : ℕ) : IsCompact (multiDemeSimplex D) :=
+  isCompact_univ_pi fun _ ↦ isCompact_stdSimplex _
+
+/-- The haplotype frequencies of one deme at a point of the multi-deme simplex. -/
+def demeFrequencies (D : ℕ) (x : multiDemeSimplex D) (d : Fin D) :
+    TwoLocusHaplotypeFrequencies :=
+  frequenciesOfSimplex ((x : Fin D → Fin 4 → ℝ) d) (x.2 d (Set.mem_univ d))
+
+/-- The corpus feature map read off the compact multi-deme simplex. -/
+def simplexLowOrderLDFeature (D : ℕ) (x : multiDemeSimplex D) :
+    AffineLowOrderLDCoordinate D → ℝ :=
+  lowOrderLDFeature D (demeFrequencies D x)
+
+/-- Each haplotype coordinate is a continuous function of the multi-deme simplex point. -/
+theorem continuous_simplexEntry (D : ℕ) (d : Fin D) (k : Fin 4) :
+    Continuous fun x : multiDemeSimplex D ↦ (x : Fin D → Fin 4 → ℝ) d k :=
+  ((continuous_apply k).comp (continuous_apply d)).comp continuous_subtype_val
+
+/-- The left-locus allele frequency is a continuous coordinate of the simplex point. -/
+theorem continuous_leftFrequency (D : ℕ) (d : Fin D) :
+    Continuous fun x : multiDemeSimplex D ↦ (demeFrequencies D x d).leftFrequency :=
+  (continuous_simplexEntry D d 0).add (continuous_simplexEntry D d 1)
+
+/-- The right-locus allele frequency is a continuous coordinate of the simplex point. -/
+theorem continuous_rightFrequency (D : ℕ) (d : Fin D) :
+    Continuous fun x : multiDemeSimplex D ↦ (demeFrequencies D x d).rightFrequency :=
+  (continuous_simplexEntry D d 0).add (continuous_simplexEntry D d 2)
+
+/-- Linkage disequilibrium is a continuous coordinate of the simplex point. -/
+theorem continuous_linkage (D : ℕ) (d : Fin D) :
+    Continuous fun x : multiDemeSimplex D ↦ (demeFrequencies D x d).linkage :=
+  ((continuous_simplexEntry D d 0).mul (continuous_simplexEntry D d 3)).sub
+    ((continuous_simplexEntry D d 1).mul (continuous_simplexEntry D d 2))
+
+/-- The centered left-locus contrast is continuous. -/
+theorem continuous_leftContrast (D : ℕ) (d : Fin D) :
+    Continuous fun x : multiDemeSimplex D ↦ (demeFrequencies D x d).leftContrast :=
+  continuous_const.sub (continuous_const.mul (continuous_leftFrequency D d))
+
+/-- The centered right-locus contrast is continuous. -/
+theorem continuous_rightContrast (D : ℕ) (d : Fin D) :
+    Continuous fun x : multiDemeSimplex D ↦ (demeFrequencies D x d).rightContrast :=
+  continuous_const.sub (continuous_const.mul (continuous_rightFrequency D d))
+
+/-- Cross-deme left heterozygosity is continuous on the multi-deme simplex. -/
+theorem continuous_leftHeterozygosity (D : ℕ) (first second : Fin D) :
+    Continuous fun x : multiDemeSimplex D ↦
+      twoLocusLeftHeterozygosity (demeFrequencies D x first)
+        (demeFrequencies D x second) :=
+  ((continuous_leftFrequency D first).mul
+      (continuous_const.sub (continuous_leftFrequency D second))).add
+    ((continuous_leftFrequency D second).mul
+      (continuous_const.sub (continuous_leftFrequency D first)))
+
+/-- Cross-deme right heterozygosity is continuous on the multi-deme simplex. -/
+theorem continuous_rightHeterozygosity (D : ℕ) (first second : Fin D) :
+    Continuous fun x : multiDemeSimplex D ↦
+      twoLocusRightHeterozygosity (demeFrequencies D x first)
+        (demeFrequencies D x second) :=
+  ((continuous_rightFrequency D first).mul
+      (continuous_const.sub (continuous_rightFrequency D second))).add
+    ((continuous_rightFrequency D second).mul
+      (continuous_const.sub (continuous_rightFrequency D first)))
+
+/-- The corpus feature map is continuous on the compact multi-deme simplex: every low-order
+coordinate is a polynomial in the haplotype frequencies. -/
+theorem continuous_simplexLowOrderLDFeature (D : ℕ) :
+    Continuous (simplexLowOrderLDFeature D) := by
+  refine continuous_pi fun c ↦ ?_
+  match c with
+  | none => exact continuous_const
+  | some (.H first second) =>
+    have heq : (fun x : multiDemeSimplex D ↦ simplexLowOrderLDFeature D x
+          (some (.H first second)))
+        = fun x : multiDemeSimplex D ↦ twoLocusLeftHeterozygosity
+          (demeFrequencies D x first) (demeFrequencies D x second) := by
+      funext x
+      simp only [simplexLowOrderLDFeature, lowOrderLDFeature_some, twoLocusJetMoment,
+        twoLocusCoordinateJet, twoLocusHJet_value]
+    rw [heq]
+    exact continuous_leftHeterozygosity D first second
+  | some (.DD first second) =>
+    have heq : (fun x : multiDemeSimplex D ↦ simplexLowOrderLDFeature D x
+          (some (.DD first second)))
+        = fun x : multiDemeSimplex D ↦ (demeFrequencies D x first).linkage
+          * (demeFrequencies D x second).linkage := by
+      funext x
+      simp only [simplexLowOrderLDFeature, lowOrderLDFeature_some, twoLocusJetMoment,
+        twoLocusCoordinateJet, twoLocusDDJet_value]
+    rw [heq]
+    exact (continuous_linkage D first).mul (continuous_linkage D second)
+  | some (.Dz first second third) =>
+    have heq : (fun x : multiDemeSimplex D ↦ simplexLowOrderLDFeature D x
+          (some (.Dz first second third)))
+        = fun x : multiDemeSimplex D ↦ (demeFrequencies D x first).linkage
+          * (demeFrequencies D x second).leftContrast
+          * (demeFrequencies D x third).rightContrast := by
+      funext x
+      simp only [simplexLowOrderLDFeature, lowOrderLDFeature_some, twoLocusJetMoment,
+        twoLocusCoordinateJet, twoLocusDzJet_value, twoLocusDzObservable]
+    rw [heq]
+    exact ((continuous_linkage D first).mul (continuous_leftContrast D second)).mul
+      (continuous_rightContrast D third)
+  | some (.pi2 first second third fourth) =>
+    have heq : (fun x : multiDemeSimplex D ↦ simplexLowOrderLDFeature D x
+          (some (.pi2 first second third fourth)))
+        = fun x : multiDemeSimplex D ↦
+          twoLocusLeftHeterozygosity (demeFrequencies D x first)
+              (demeFrequencies D x second)
+            * twoLocusRightHeterozygosity (demeFrequencies D x third)
+              (demeFrequencies D x fourth) / 4 := by
+      funext x
+      simp only [simplexLowOrderLDFeature, lowOrderLDFeature_some, twoLocusJetMoment,
+        twoLocusCoordinateJet, twoLocusPi2Jet_value, twoLocusJointHeterozygosity]
+    rw [heq]
+    exact (((continuous_leftHeterozygosity D first second).mul
+      (continuous_rightHeterozygosity D third fourth)).div_const 4)
+
+/-- The corpus feature map and its simplex parametrisation have the same range, so they have
+the same realization body. -/
+theorem range_simplexLowOrderLDFeature (D : ℕ) :
+    Set.range (simplexLowOrderLDFeature D) = Set.range (lowOrderLDFeature D) := by
+  apply Set.Subset.antisymm
+  · rintro _ ⟨x, rfl⟩
+    exact Set.mem_range_self _
+  · rintro _ ⟨state, rfl⟩
+    refine ⟨⟨fun d ↦ ![(state d).AB, (state d).Ab, (state d).aB, (state d).ab], ?_⟩, ?_⟩
+    · intro d _
+      refine ⟨fun k ↦ ?_, ?_⟩
+      · fin_cases k
+        · exact (state d).AB_nonneg
+        · exact (state d).Ab_nonneg
+        · exact (state d).aB_nonneg
+        · exact (state d).ab_nonneg
+      · rw [Fin.sum_univ_four]
+        simpa using (state d).total_eq_one
+    · rfl
+
+/-- **NOTE1 §2.1 for the corpus coordinates.** The realization body of the corpus feature map
+is compact, hence closed. This discharges the closedness hypothesis carried by the invariance
+theorems: the body is the convex hull of the range of a continuous map on the compact
+multi-deme simplex. -/
+theorem isCompact_realizationBody_lowOrderLDFeature (D : ℕ) :
+    IsCompact (realizationBody (lowOrderLDFeature D)) := by
+  haveI : CompactSpace (multiDemeSimplex D) :=
+    isCompact_iff_compactSpace.mp (isCompact_multiDemeSimplex D)
+  have hbody : realizationBody (lowOrderLDFeature D)
+      = realizationBody (simplexLowOrderLDFeature D) := by
+    rw [realizationBody, realizationBody, range_simplexLowOrderLDFeature]
+  rw [hbody]
+  exact isCompact_realizationBody (simplexLowOrderLDFeature D)
+    (continuous_simplexLowOrderLDFeature D)
+
+/-- The corpus realization body is closed, which is the hypothesis every invariance theorem
+about it needs. -/
+theorem isClosed_realizationBody_lowOrderLDFeature (D : ℕ) :
+    IsClosed (realizationBody (lowOrderLDFeature D)) :=
+  (isCompact_realizationBody_lowOrderLDFeature D).isClosed
+
 end
 
 end Descent.Portability.RealizationBody
