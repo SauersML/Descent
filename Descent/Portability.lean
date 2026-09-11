@@ -1,6 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.ChannelComparison
+import Descent.Portability.FourthMomentDuality
 import Descent.Portability.AncestryCalibration
 import Descent.Portability.AncientPrediction
 import Descent.Portability.ArchaicPrediction

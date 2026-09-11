@@ -1,0 +1,30 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.LossNoiseCompletion
+
+/-! Axiom audit of LossNoiseCompletion. -/
+
+#print axioms Descent.Portability.LossNoiseCompletion.twoPointLaw_apply
+#print axioms Descent.Portability.LossNoiseCompletion.twoPointLaw_mean
+#print axioms Descent.Portability.LossNoiseCompletion.twoPointLaw_second
+#print axioms Descent.Portability.LossNoiseCompletion.twoPointLaw_third
+#print axioms Descent.Portability.LossNoiseCompletion.twoPointLaw_fourth
+#print axioms Descent.Portability.LossNoiseCompletion.gapRoot_bounds
+#print axioms Descent.Portability.LossNoiseCompletion.gapRoot_mul
+#print axioms Descent.Portability.LossNoiseCompletion.zeroMeanNoise_mean
+#print axioms Descent.Portability.LossNoiseCompletion.zeroMeanNoise_second
+#print axioms Descent.Portability.LossNoiseCompletion.zeroMeanNoise_third
+#print axioms Descent.Portability.LossNoiseCompletion.zeroMeanNoise_fourth
+#print axioms Descent.Portability.LossNoiseCompletion.noise_shift_second_moment
+#print axioms Descent.Portability.LossNoiseCompletion.noise_shift_fourth_moment
+#print axioms Descent.Portability.LossNoiseCompletion.additive_noise_cell_mean_loss
+#print axioms Descent.Portability.LossNoiseCompletion.additive_noise_cell_fourth_moment
+#print axioms Descent.Portability.LossNoiseCompletion.additive_noise_cell_loss_variance
+#print axioms Descent.Portability.LossNoiseCompletion.noise_fourth_moment_projection_nonneg
+#print axioms Descent.Portability.LossNoiseCompletion.additive_noise_cell_loss_variance_completed
+#print axioms Descent.Portability.LossNoiseCompletion.minCellLossVariance_eq_raw_moments
+#print axioms Descent.Portability.LossNoiseCompletion.minCellLossVariance_nonneg
+#print axioms Descent.Portability.LossNoiseCompletion.additive_noise_cell_loss_variance_lower_bound
+#print axioms Descent.Portability.LossNoiseCompletion.zeroMeanNoise_cell_loss_variance_general
+#print axioms Descent.Portability.LossNoiseCompletion.zeroMeanNoise_cell_loss_variance

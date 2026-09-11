@@ -1,0 +1,25 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.AlignmentFactorization
+
+/-! Axiom audit of AlignmentFactorization. -/
+
+#print axioms Descent.Portability.AlignmentFactorization.mixture_eval_liftGenotype
+#print axioms Descent.Portability.AlignmentFactorization.mixture_variance_liftGenotype
+#print axioms Descent.Portability.AlignmentFactorization.mixture_covariance_liftGenotype
+#print axioms Descent.Portability.AlignmentFactorization.variance_nonneg
+#print axioms Descent.Portability.AlignmentFactorization.covariance_sq_le
+#print axioms Descent.Portability.AlignmentFactorization.alignment_defect_expand
+#print axioms Descent.Portability.AlignmentFactorization.alignment_defect_score_inner
+#print axioms Descent.Portability.AlignmentFactorization.alignment_defect_regression_inner
+#print axioms Descent.Portability.AlignmentFactorization.alignment_factorisation
+#print axioms Descent.Portability.AlignmentFactorization.genotypeExplainedFraction_nonneg
+#print axioms Descent.Portability.AlignmentFactorization.genotypeExplainedFraction_le_one
+#print axioms Descent.Portability.AlignmentFactorization.alignmentSquared_nonneg
+#print axioms Descent.Portability.AlignmentFactorization.alignmentSquared_le_one
+#print axioms Descent.Portability.AlignmentFactorization.scoreAccuracy_nonneg
+#print axioms Descent.Portability.AlignmentFactorization.scoreAccuracy_eq_zero_of_no_genotype_signal
+#print axioms Descent.Portability.AlignmentFactorization.scoreAccuracy_le_genotypeExplainedFraction
+#print axioms Descent.Portability.AlignmentFactorization.alignment_equality_iff
+#print axioms Descent.Portability.AlignmentFactorization.accuracy_attains_genotype_fraction_iff

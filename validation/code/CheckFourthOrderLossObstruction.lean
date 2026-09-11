@@ -1,0 +1,33 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.FourthOrderLossObstruction
+
+/-! Axiom audit of FourthOrderLossObstruction. -/
+
+#print axioms Descent.Portability.FourthOrderLossObstruction.parityWeight_sum
+#print axioms Descent.Portability.FourthOrderLossObstruction.contextWeight_nonneg
+#print axioms Descent.Portability.FourthOrderLossObstruction.contextWeight_sum
+#print axioms Descent.Portability.FourthOrderLossObstruction.cellTheta_mem
+#print axioms Descent.Portability.FourthOrderLossObstruction.effectMean_sq_le_one
+#print axioms Descent.Portability.FourthOrderLossObstruction.sqrt_residual_sq
+#print axioms Descent.Portability.FourthOrderLossObstruction.noise_loss_mean
+#print axioms Descent.Portability.FourthOrderLossObstruction.noise_loss_second_moment
+#print axioms Descent.Portability.FourthOrderLossObstruction.parity_effectMean
+#print axioms Descent.Portability.FourthOrderLossObstruction.parity_effectMean_sq
+#print axioms Descent.Portability.FourthOrderLossObstruction.parity_effectMean_fourth
+#print axioms Descent.Portability.FourthOrderLossObstruction.parity_lossSecondMoment
+#print axioms Descent.Portability.FourthOrderLossObstruction.three_sign_marginals_agree
+#print axioms Descent.Portability.FourthOrderLossObstruction.cellExp_apply
+#print axioms Descent.Portability.FourthOrderLossObstruction.cell_loss_mean
+#print axioms Descent.Portability.FourthOrderLossObstruction.cell_loss_second_moment
+#print axioms Descent.Portability.FourthOrderLossObstruction.total_loss_mean
+#print axioms Descent.Portability.FourthOrderLossObstruction.total_loss_second_moment
+#print axioms Descent.Portability.FourthOrderLossObstruction.total_loss_variance
+#print axioms Descent.Portability.FourthOrderLossObstruction.between_cell_variance
+#print axioms Descent.Portability.FourthOrderLossObstruction.loss_variance_split
+#print axioms Descent.Portability.FourthOrderLossObstruction.fourth_order_loss_obstruction
+#print axioms Descent.Portability.FourthOrderLossObstruction.cell_score_mean
+#print axioms Descent.Portability.FourthOrderLossObstruction.cell_outcome_mean
+#print axioms Descent.Portability.FourthOrderLossObstruction.cell_second_moments
+#print axioms Descent.Portability.FourthOrderLossObstruction.cell_squared_correlations

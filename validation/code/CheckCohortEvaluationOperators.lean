@@ -1,0 +1,49 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.CohortEvaluationOperators
+
+/-! Axiom audit of CohortEvaluationOperators. -/
+
+#print axioms Descent.Portability.CohortEvaluationOperators.dot_eq_dotProduct
+#print axioms Descent.Portability.CohortEvaluationOperators.dot_comm
+#print axioms Descent.Portability.CohortEvaluationOperators.dot_self_nonneg
+#print axioms Descent.Portability.CohortEvaluationOperators.dot_add_left'
+#print axioms Descent.Portability.CohortEvaluationOperators.dot_smul_left
+#print axioms Descent.Portability.CohortEvaluationOperators.dot_smul_right
+#print axioms Descent.Portability.CohortEvaluationOperators.dot_mulVec_left
+#print axioms Descent.Portability.CohortEvaluationOperators.dot_mulVec_self
+#print axioms Descent.Portability.CohortEvaluationOperators.quadForm_sub
+#print axioms Descent.Portability.CohortEvaluationOperators.quadForm_smul
+#print axioms Descent.Portability.CohortEvaluationOperators.quadForm_one
+#print axioms Descent.Portability.CohortEvaluationOperators.quadForm_add
+#print axioms Descent.Portability.CohortEvaluationOperators.dot_single_mulVec_single
+#print axioms Descent.Portability.CohortEvaluationOperators.eq_zero_of_quadForm_eq_zero
+#print axioms Descent.Portability.CohortEvaluationOperators.quadForm_ext_iff
+#print axioms Descent.Portability.CohortEvaluationOperators.residualMaker_transpose
+#print axioms Descent.Portability.CohortEvaluationOperators.residualMaker_mul_self
+#print axioms Descent.Portability.CohortEvaluationOperators.residualMaker_mul
+#print axioms Descent.Portability.CohortEvaluationOperators.mul_residualMaker
+#print axioms Descent.Portability.CohortEvaluationOperators.quadForm_proj_eq_sq_norm
+#print axioms Descent.Portability.CohortEvaluationOperators.quadForm_proj_nonneg
+#print axioms Descent.Portability.CohortEvaluationOperators.dot_proj_mulVec
+#print axioms Descent.Portability.CohortEvaluationOperators.residual_quadForm_isLeast
+#print axioms Descent.Portability.CohortEvaluationOperators.vecMulVec_mul_self
+#print axioms Descent.Portability.CohortEvaluationOperators.rankOneProj_transpose
+#print axioms Descent.Portability.CohortEvaluationOperators.rankOneProj_mul_self
+#print axioms Descent.Portability.CohortEvaluationOperators.rankOneProj_mulVec
+#print axioms Descent.Portability.CohortEvaluationOperators.quadForm_rankOneProj
+#print axioms Descent.Portability.CohortEvaluationOperators.rankOneProj_zero
+#print axioms Descent.Portability.CohortEvaluationOperators.partialR2_eq_angular_ratio
+#print axioms Descent.Portability.CohortEvaluationOperators.augmentedProj_transpose
+#print axioms Descent.Portability.CohortEvaluationOperators.mul_vecMulVec
+#print axioms Descent.Portability.CohortEvaluationOperators.vecMulVec_mul
+#print axioms Descent.Portability.CohortEvaluationOperators.vecMulVec_zero_left
+#print axioms Descent.Portability.CohortEvaluationOperators.proj_mul_rankOneProj
+#print axioms Descent.Portability.CohortEvaluationOperators.rankOneProj_mul_proj
+#print axioms Descent.Portability.CohortEvaluationOperators.augmentedProj_mul_self
+#print axioms Descent.Portability.CohortEvaluationOperators.residualMaker_augmentedProj
+#print axioms Descent.Portability.CohortEvaluationOperators.partialR2_eq_sse_reduction_ratio
+#print axioms Descent.Portability.CohortEvaluationOperators.partialR2_nonneg
+#print axioms Descent.Portability.CohortEvaluationOperators.dot_sq_le
+#print axioms Descent.Portability.CohortEvaluationOperators.partialR2_le_one
