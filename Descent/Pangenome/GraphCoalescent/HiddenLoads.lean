@@ -183,7 +183,9 @@ theorem card_image_mk_merge {n : ℕ} (ξ : ER n) (a b : Quotient ξ) (S : Finse
   rw [image_image]
   have hlift : S.image (mergeMap ξ a b ∘ Quotient.mk ξ) =
       (S.image (Quotient.mk (merge ξ a b))).image
-        (Quotient.lift (fun x ↦ mergeMap ξ a b (Quotient.mk ξ x)) fun _ _ h ↦ h) := by
+        (Quotient.lift (fun x ↦ mergeMap ξ a b (Quotient.mk ξ x))
+          fun u v (h : (merge ξ a b).r u v) ↦
+            (h : mergeMap ξ a b (Quotient.mk ξ u) = mergeMap ξ a b (Quotient.mk ξ v))) := by
     rw [image_image]
     rfl
   rw [hlift, card_image_of_injective _ (Setoid.ker_lift_injective _)]
@@ -425,7 +427,7 @@ exactly `L_C L_D` visible covers joining them. -/
 theorem card_visibleCovers {n : ℕ} (s : Fin n → Fin n) (ξ : ER n)
     {C D : Quotient (observed s ξ)} (hCD : C ≠ D) :
     Nat.card (visibleCovers s ξ C D) = hiddenLoad s ξ C * hiddenLoad s ξ D :=
-  card_merges_across ξ (disjoint_left.mpr fun block hC hD ↦
+  card_merges_across ξ (disjoint_left.mpr fun _ hC hD ↦
     hCD ((mem_filter.mp hC).2.symm.trans (mem_filter.mp hD).2))
 
 /-- **The exact visible count from the bottom**: two graph states with fiber sizes `c_A` and
