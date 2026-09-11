@@ -32,3 +32,4 @@ import Descent.Portability.RadialInterpolation
 #print axioms Descent.Portability.RadialInterpolation.exists_radii_total_lt
 #print axioms Descent.Portability.RadialInterpolation.radial_gap_approaches_range
 #print axioms Descent.Portability.RadialInterpolation.radialExp_eq_weightedExp
+#print axioms Descent.Portability.RadialInterpolation.radial_gap_general

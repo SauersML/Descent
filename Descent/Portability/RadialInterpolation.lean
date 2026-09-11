@@ -150,13 +150,12 @@ theorem radialExp_eq_weightedExp (r : Fin (k + 1) → ℝ) (hinj : Function.Inje
     radialExp r hinj s =
       weightedExp (radialLaw r s) (radialLaw_nonneg r s) (radialLaw_sum r hinj s) := rfl
 
-/-- **The master gap identity.** For any observable of the outcome vector, the two laws
-differ by the radial-weight average of its values on the two rays. -/
-theorem radial_gap (r : Fin (k + 1) → ℝ) (hinj : Function.Injective r) (u v : N → ℝ)
-    (g : (N → ℝ) → ℝ) :
-    radialExp r hinj false (fun z ↦ g (radialPoint r u v z)) -
-        radialExp r hinj true (fun z ↦ g (radialPoint r u v z)) =
-      (∑ i, radialWeight r i * (g (r i • u) - g (r i • v))) / radialTotal r := by
+/-- **The master gap identity, general form.** For any observable of the support point,
+the two laws differ by the radial-weight average of its values on the two branches. -/
+theorem radial_gap_general (r : Fin (k + 1) → ℝ) (hinj : Function.Injective r)
+    (G : Fin (k + 1) × Bool → ℝ) :
+    radialExp r hinj false G - radialExp r hinj true G =
+      (∑ i, radialWeight r i * (G (i, true) - G (i, false))) / radialTotal r := by
   simp only [radialExp, weightedExp_apply]
   rw [Fintype.sum_prod_type, Fintype.sum_prod_type, ← Finset.sum_sub_distrib,
     Finset.sum_div]
@@ -169,10 +168,17 @@ theorem radial_gap (r : Fin (k + 1) → ℝ) (hinj : Function.Injective r) (u v 
       (|radialWeight r i| + radialWeight r i) / 2 / radialTotal r := rfl
   have hQ1 : radialLaw r true (i, true) =
       (|radialWeight r i| - radialWeight r i) / 2 / radialTotal r := rfl
-  have hU : radialPoint r u v (i, true) = r i • u := rfl
-  have hV : radialPoint r u v (i, false) = r i • v := rfl
-  simp only [Fintype.sum_bool, hP0, hP1, hQ0, hQ1, hU, hV]
+  simp only [Fintype.sum_bool, hP0, hP1, hQ0, hQ1]
   ring
+
+/-- **The master gap identity.** For any observable of the outcome vector, the two laws
+differ by the radial-weight average of its values on the two rays. -/
+theorem radial_gap (r : Fin (k + 1) → ℝ) (hinj : Function.Injective r) (u v : N → ℝ)
+    (g : (N → ℝ) → ℝ) :
+    radialExp r hinj false (fun z ↦ g (radialPoint r u v z)) -
+        radialExp r hinj true (fun z ↦ g (radialPoint r u v z)) =
+      (∑ i, radialWeight r i * (g (r i • u) - g (r i • v))) / radialTotal r :=
+  radial_gap_general r hinj (fun z ↦ g (radialPoint r u v z))
 
 /-- The raw monomial of a multi-index. -/
 def monomialEval (α : N → ℕ) (y : N → ℝ) : ℝ := ∏ i, y i ^ α i

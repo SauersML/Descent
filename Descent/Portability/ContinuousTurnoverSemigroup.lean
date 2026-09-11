@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.BanachEulerExponential
 import Descent.Portability.ConvexOrderCoupling
+import Descent.Portability.BinomialAggregateEnvelope
 import Mathlib.Analysis.Matrix
 import Mathlib.Analysis.Normed.Module.FiniteDimension
 
@@ -640,6 +641,82 @@ theorem exp_linearDeath_falling (m : ℕ) (gamma t : ℝ) (r : ℕ) (j : Fin (m 
         (fun i ↦ fallingFactorial ((i : ℕ) : ℝ) r) j
       = NormedSpace.exp ℝ (t * (-(gamma * (r : ℝ)))) * fallingFactorial ((j : ℕ) : ℝ) r :=
   exp_mulVec_eigen _ _ _ t (linearDeathMatrix_eigen_falling m gamma r) j
+
+/-! ## The binomial law has exactly those factorial moments -/
+
+/-- The shift identity `(x+1)_{r+1} = (x)_{r+1} + (r+1)(x)_r`. -/
+theorem fallingFactorial_shift (x : ℝ) (r : ℕ) :
+    fallingFactorial (x + 1) (r + 1)
+      = fallingFactorial x (r + 1) + ((r : ℝ) + 1) * fallingFactorial x r := by
+  show (x + 1) * fallingFactorial ((x + 1) - 1) r = _
+  rw [show (x + 1) - 1 = x from by ring, fallingFactorial_succ_right r x]
+  ring
+
+/-- **The binomial law's falling-factorial moments**: `E (X)_r = (m)_r p^r`, proved from the
+Pascal recursion of `Descent.Portability.BinomialAggregateEnvelope.binWeight`. -/
+theorem binMoment_falling (p : ℝ) (m : ℕ) :
+    ∀ r : ℕ, BinomialAggregateEnvelope.binMoment p
+        (fun k ↦ fallingFactorial ((k : ℕ) : ℝ) r) m
+      = fallingFactorial ((m : ℕ) : ℝ) r * p ^ r := by
+  induction m with
+  | zero =>
+    intro r
+    have hb : BinomialAggregateEnvelope.binMoment p
+        (fun k ↦ fallingFactorial ((k : ℕ) : ℝ) r) 0
+        = fallingFactorial ((0 : ℕ) : ℝ) r := by
+      simp [BinomialAggregateEnvelope.binMoment, BinomialAggregateEnvelope.binWeight]
+    rw [hb]
+    cases r with
+    | zero => simp [fallingFactorial]
+    | succ r =>
+      rw [Nat.cast_zero, fallingFactorial_zero r]
+      ring
+  | succ m ih =>
+    intro r
+    cases r with
+    | zero =>
+      rw [BinomialAggregateEnvelope.binMoment_congr p
+        (g1 := fun k : ℕ ↦ fallingFactorial ((k : ℕ) : ℝ) 0) (g2 := fun _ ↦ (1 : ℝ))
+        (fun k ↦ rfl) (m + 1),
+        BinomialAggregateEnvelope.binMoment_one]
+      simp [fallingFactorial]
+    | succ r =>
+      rw [BinomialAggregateEnvelope.binMoment_succ p
+        (fun k ↦ fallingFactorial ((k : ℕ) : ℝ) (r + 1))
+        (fun k ↦ fallingFactorial ((k : ℕ) : ℝ) (r + 1)
+          + ((r : ℝ) + 1) * fallingFactorial ((k : ℕ) : ℝ) r)
+        (fun k ↦ by
+          push_cast
+          exact (fallingFactorial_shift _ r).symm) m,
+        BinomialAggregateEnvelope.binMoment_add p
+          (fun k ↦ fallingFactorial ((k : ℕ) : ℝ) (r + 1))
+          (fun k ↦ ((r : ℝ) + 1) * fallingFactorial ((k : ℕ) : ℝ) r) m,
+        BinomialAggregateEnvelope.binMoment_smul p ((r : ℝ) + 1)
+          (fun k ↦ fallingFactorial ((k : ℕ) : ℝ) r) m, ih (r + 1), ih r]
+      have hshift := fallingFactorial_shift ((m : ℕ) : ℝ) r
+      push_cast
+      push_cast at hshift
+      rw [hshift]
+      ring
+
+/-- **DC Corollary 3.5 at the level of factorial moments.**  Started from the top state, the
+pure-death semigroup and the explicit binomial law with `p = e^{-γ t}` return the same value
+on every falling factorial of the count.  Since the falling factorials of order `0, …, m`
+span every report on `{0, …, m}`, this is the moment identification of the minimizing
+aggregate law; upgrading it to equality of the laws themselves is not done here. -/
+theorem exp_linearDeath_falling_eq_binomial (m : ℕ) (gamma t : ℝ) (r : ℕ) :
+    (NormedSpace.exp ℝ (t • linearDeathMatrix m gamma)).mulVec
+        (fun i ↦ fallingFactorial ((i : ℕ) : ℝ) r) ⟨m, Nat.lt_succ_self m⟩
+      = BinomialAggregateEnvelope.binMoment (NormedSpace.exp ℝ (t * (-gamma)))
+          (fun k ↦ fallingFactorial ((k : ℕ) : ℝ) r) m := by
+  have hval : (((⟨m, Nat.lt_succ_self m⟩ : Fin (m + 1)) : ℕ) : ℝ) = ((m : ℕ) : ℝ) := rfl
+  have hpow : NormedSpace.exp ℝ (t * (-(gamma * (r : ℝ))))
+      = NormedSpace.exp ℝ (t * (-gamma)) ^ r := by
+    rw [show t * (-(gamma * (r : ℝ))) = r • (t * (-gamma)) from by
+      simp only [nsmul_eq_mul]
+      ring, NormedSpace.exp_nsmul]
+  rw [exp_linearDeath_falling, binMoment_falling, hval, hpow]
+  ring
 
 end
 
