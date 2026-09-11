@@ -26,12 +26,14 @@ open Descent.Portability.JointMetricMomentDeterminacy
 #print axioms measurable_multiIndexNumerator
 #print axioms measurable_multiIndexDenominator
 #print axioms moment_eq_tsum_expansion
+#print axioms conditional_map_eq_of_restricted_map_eq
 #print axioms jointMetricLaw_eq_of_expansion_eq
 #print axioms definedDomain_subfamilyDenominator
 #print axioms subfamily_moment_eq_tsum
 #print axioms maskStatistic_definedIndicators
 #print axioms prod_definedIndicators
 #print axioms masked_moment_expansion
+#print axioms maskProbability_expansion
 #print axioms masked_moment_eq_zero
 #print axioms maskMetricLaw_eq_of_masked_moments_eq
 #print axioms maskMetricLaw_eq_of_subfamily_moments_eq

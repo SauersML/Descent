@@ -39,9 +39,10 @@ and the same conditional law given `E_*` in Mathlib's conditional measure.
 
 For failure masks, `maskEvent den A` is the event on which exactly the metrics of `A` are
 defined. `maskStatistic_definedIndicators` identifies the mask statistic of
-`JointRatioFailureMasks` with the indicator of that event, `masked_moment_expansion` is (26)
-applied to metric monomials, and `maskMetricLaw_eq_of_masked_moments_eq` shows that masked
-moments determine the law of the vector on the mask. `masked_moment_eq_zero` records that a
+`JointRatioFailureMasks` with the indicator of that event, `maskProbability_expansion` is (26)
+itself under a measure, `masked_moment_expansion` is (26) applied to metric monomials, and
+`maskMetricLaw_eq_of_masked_moments_eq` shows that masked moments determine the law of the
+vector on the mask and its conditional law given the mask. `masked_moment_eq_zero` records that a
 monomial with a positive exponent outside the mask has zero masked moment, which is why only
 the monomials supported on the mask carry information. `subfamily_moment_eq_tsum` exhibits
 each subfamily moment entering (26) as the expansion (15) of the family whose denominators
@@ -338,6 +339,7 @@ theorem measurableSet_maskEvent (den : Metric → Ω → ℝ)
     rw [hcomplement]
     exact (measurableSet_lt measurable_const (hdenMeasurable index)).compl
 
+omit [DecidableEq Metric] in
 /-- The joint moment of a pushed-forward metric vector law is the population integral of the
 product of the metrics raised to the multi-index. -/
 theorem integral_cubeMonomial_map (ρ : Measure Ω) (num den : Metric → Ω → ℝ)
@@ -426,6 +428,20 @@ theorem moment_eq_tsum_expansion (μ : Measure Ω) [IsProbabilityMeasure μ]
     (multiIndexDenominator_le_one den
       (fun index point ↦ le_trans (hnum index point) (hle index point)) hden order)
 
+/-- Two laws of the population whose restricted laws of a measurable map coincide have the same
+conditional laws of that map given the restricting events: the restricted laws have the same
+total mass, and conditioning only rescales by its inverse. -/
+theorem conditional_map_eq_of_restricted_map_eq {Point : Type*} [MeasurableSpace Point]
+    (μ ν : Measure Ω) (first second : Set Ω) (vector : Ω → Point) (hvector : Measurable vector)
+    (hrestricted : (μ.restrict first).map vector = (ν.restrict second).map vector) :
+    (μ[|first]).map vector = (ν[|second]).map vector := by
+  have hmass : μ first = ν second := by
+    have hunivMass := congrArg (fun law : Measure Point ↦ law Set.univ) hrestricted
+    simpa only [Measure.map_apply hvector MeasurableSet.univ, Set.preimage_univ,
+      Measure.restrict_apply_univ] using hunivMass
+  rw [ProbabilityTheory.cond, ProbabilityTheory.cond, Measure.map_smul, Measure.map_smul,
+    hrestricted, hmass]
+
 /-- **NOTE 2 section 6.1, joint law determinacy.** Two laws of the population under which the
 positive ratio expansions (15) of every multi-index pair (25) agree give the metric vector the
 same law on the common defined event, and the same conditional law given that event. -/
@@ -461,14 +477,7 @@ theorem jointMetricLaw_eq_of_expansion_eq (μ ν : Measure Ω) [IsProbabilityMea
       moment_eq_tsum_expansion μ num den hnumMeasurable hdenMeasurable hnum hle hden order,
       moment_eq_tsum_expansion ν num den hnumMeasurable hdenMeasurable hnum hle hden order]
     exact hexpansion order
-  refine ⟨hjoint, ?_⟩
-  have hmass : μ (definedDomain den Finset.univ) = ν (definedDomain den Finset.univ) := by
-    have hunivMass :=
-      congrArg (fun law : Measure ↥(metricCube Metric) ↦ law Set.univ) hjoint
-    simpa only [Measure.map_apply hvector MeasurableSet.univ, Set.preimage_univ,
-      Measure.restrict_apply_univ] using hunivMass
-  rw [ProbabilityTheory.cond, ProbabilityTheory.cond, Measure.map_smul, Measure.map_smul,
-    hjoint, hmass]
+  exact ⟨hjoint, conditional_map_eq_of_restricted_map_eq μ ν _ _ _ hvector hjoint⟩
 
 /-- The family with every denominator outside a subfamily replaced by one. -/
 def subfamilyDenominator (den : Metric → Ω → ℝ) (subfamily : Finset Metric) :
@@ -669,6 +678,21 @@ theorem masked_moment_expansion (μ : Measure Ω) [IsProbabilityMeasure μ]
   rw [integral_const_mul,
     integral_indicator (measurableSet_definedDomain den hdenMeasurable (selected ∪ subset))]
 
+/-- **NOTE 2 equation (26) under a measure.** The probability that exactly the metrics of `A`
+are defined is the alternating sum, over subsets `B` of the complementary family, of the
+probabilities that every metric of `A ∪ B` is defined. It is the zero multi-index case of
+`masked_moment_expansion`. -/
+theorem maskProbability_expansion (μ : Measure Ω) [IsProbabilityMeasure μ]
+    (den : Metric → Ω → ℝ) (hdenMeasurable : ∀ index, Measurable (den index))
+    (hdenNonneg : ∀ index point, 0 ≤ den index point) (selected : Finset Metric) :
+    μ.real (maskEvent den selected) =
+      ∑ subset ∈ selectedᶜ.powerset, (-1 : ℝ) ^ subset.card *
+        μ.real (definedDomain den (selected ∪ subset)) := by
+  have hexpansion := masked_moment_expansion μ (fun _ _ ↦ 0) den (fun _ ↦ measurable_const)
+    hdenMeasurable (fun _ _ ↦ le_rfl) hdenNonneg (fun _ ↦ 0) selected
+  simpa only [pow_zero, Finset.prod_const_one, setIntegral_const, smul_eq_mul, mul_one]
+    using hexpansion
+
 omit [DecidableEq Metric] in
 /-- On a failure mask every metric outside the mask reads zero, so a metric monomial with a
 positive exponent outside the mask has zero moment on the mask. -/
@@ -687,7 +711,7 @@ theorem masked_moment_eq_zero (μ : Measure Ω) (num den : Metric → Ω → ℝ
 
 /-- **NOTE 2 section 6.1, laws on a failure mask.** Two laws of the population under which
 every metric monomial has the same moment on the failure mask `A` give the metric vector the
-same law on that mask. -/
+same law on that mask, and the same conditional law given the mask. -/
 theorem maskMetricLaw_eq_of_masked_moments_eq (μ ν : Measure Ω) [IsFiniteMeasure μ]
     [IsFiniteMeasure ν] (num den : Metric → Ω → ℝ)
     (hnumMeasurable : ∀ index, Measurable (num index))
@@ -700,23 +724,31 @@ theorem maskMetricLaw_eq_of_masked_moments_eq (μ ν : Measure Ω) [IsFiniteMeas
         ∫ point in maskEvent den selected,
           ∏ index, ratioOnDefined (num index) (den index) point ^ order index ∂ν) :
     (μ.restrict (maskEvent den selected)).map (metricVector num den hnum hle) =
-      (ν.restrict (maskEvent den selected)).map (metricVector num den hnum hle) := by
+        (ν.restrict (maskEvent den selected)).map (metricVector num den hnum hle) ∧
+      (μ[|maskEvent den selected]).map (metricVector num den hnum hle) =
+        (ν[|maskEvent den selected]).map (metricVector num den hnum hle) := by
   haveI : IsFiniteMeasure
       ((μ.restrict (maskEvent den selected)).map (metricVector num den hnum hle)) :=
     Measure.isFiniteMeasure_map _ _
   haveI : IsFiniteMeasure
       ((ν.restrict (maskEvent den selected)).map (metricVector num den hnum hle)) :=
     Measure.isFiniteMeasure_map _ _
-  refine measure_eq_of_cube_moments_eq _ _ fun order ↦ ?_
-  rw [integral_cubeMonomial_map _ num den hnumMeasurable hdenMeasurable hnum hle order,
-    integral_cubeMonomial_map _ num den hnumMeasurable hdenMeasurable hnum hle order]
-  exact hmoment order
+  have hmask :
+      (μ.restrict (maskEvent den selected)).map (metricVector num den hnum hle) =
+        (ν.restrict (maskEvent den selected)).map (metricVector num den hnum hle) := by
+    refine measure_eq_of_cube_moments_eq _ _ fun order ↦ ?_
+    rw [integral_cubeMonomial_map _ num den hnumMeasurable hdenMeasurable hnum hle order,
+      integral_cubeMonomial_map _ num den hnumMeasurable hdenMeasurable hnum hle order]
+    exact hmoment order
+  exact ⟨hmask, conditional_map_eq_of_restricted_map_eq μ ν _ _ _
+    (measurable_metricVector num den hnumMeasurable hdenMeasurable hnum hle) hmask⟩
 
 /-- **NOTE 2 section 6.1, the mask law from subfamily moments.** If two laws of the population
 give every metric monomial supported on the mask `A` the same moments on the events where every
 metric of `A ∪ B` is defined, for every subset `B` of the complement, then the metric vector has
-the same law on the failure mask `A` under both. Monomials with a positive exponent outside the
-mask carry no information there, by `masked_moment_eq_zero`. -/
+the same law on the failure mask `A` under both, and the same conditional law given the mask.
+Monomials with a positive exponent outside the mask carry no information there, by
+`masked_moment_eq_zero`. -/
 theorem maskMetricLaw_eq_of_subfamily_moments_eq (μ ν : Measure Ω) [IsProbabilityMeasure μ]
     [IsProbabilityMeasure ν] (num den : Metric → Ω → ℝ)
     (hnumMeasurable : ∀ index, Measurable (num index))
@@ -730,7 +762,9 @@ theorem maskMetricLaw_eq_of_subfamily_moments_eq (μ ν : Measure Ω) [IsProbabi
           ∫ point in definedDomain den (selected ∪ subset),
             ∏ index, ratioOnDefined (num index) (den index) point ^ order index ∂ν) :
     (μ.restrict (maskEvent den selected)).map (metricVector num den hnum hle) =
-      (ν.restrict (maskEvent den selected)).map (metricVector num den hnum hle) := by
+        (ν.restrict (maskEvent den selected)).map (metricVector num den hnum hle) ∧
+      (μ[|maskEvent den selected]).map (metricVector num den hnum hle) =
+        (ν[|maskEvent den selected]).map (metricVector num den hnum hle) := by
   refine maskMetricLaw_eq_of_masked_moments_eq μ ν num den hnumMeasurable hdenMeasurable hnum
     hle selected fun order ↦ ?_
   by_cases hsupport : ∀ index ∉ selected, order index = 0
