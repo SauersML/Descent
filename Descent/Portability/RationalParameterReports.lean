@@ -1184,7 +1184,7 @@ def selectionBox : Set (Fin 2 → ℝ) :=
 theorem mem_selectionBox_iff (θ : Fin 2 → ℝ) :
     θ ∈ selectionBox ↔ (0 ≤ θ 0 ∧ θ 0 ≤ 1 / 2) ∧ 3 / 2 ≤ θ 1 ∧ θ 1 ≤ 2 := by
   simp only [selectionBox, Set.mem_Icc, Pi.le_def, Fin.forall_fin_two, Matrix.cons_val_zero,
-    Matrix.cons_val_one, Matrix.head_cons]
+    Matrix.cons_val_one]
   constructor
   · rintro ⟨⟨h0x, h0w⟩, h1x, h1w⟩
     exact ⟨⟨h0x, h1x⟩, h0w, h1w⟩
@@ -1213,7 +1213,7 @@ theorem selectionBox_subset_signCell : selectionBox ⊆ signCell selectionGuard 
   · simp only [selectionGuard, Bool.false_eq_true, if_false, map_sub, map_add, map_mul, map_one,
       MvPolynomial.eval_X]
     nlinarith
-  · simp only [selectionGuard, eq_self_iff_true, if_true, map_sub, map_one, MvPolynomial.eval_X]
+  · simp only [selectionGuard, if_true, map_sub, map_one, MvPolynomial.eval_X]
     linarith
 
 /-- The selection experiment is valid at every point of the box. -/
