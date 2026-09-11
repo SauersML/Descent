@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.StageCompositionKernel
 import Descent.Portability.Pi2GeneratorBridges
+import Descent.Portability.SimultaneousMigrationPulse
 
 assert_below Descent.Decision Descent.Program
 
@@ -78,6 +79,7 @@ open Descent.Portability.EnlargedLowOrderLDGenerator
 open Descent.Portability.TwoLocusMicroscopicKernel
 open Descent.Portability.Pi2GeneratorBridges
 open Descent.Portability.StageCompositionKernel
+open Descent.Portability.SimultaneousMigrationPulse
 
 noncomputable section
 
