@@ -23,6 +23,7 @@ import Descent.Portability.SimultaneousMigrationPulse
 import Descent.Portability.UniformPenetranceCertificate
 import Descent.Portability.NeutralFellerGenerator
 import Descent.Portability.InterleavedHistoryRealization
+import Descent.Portability.ChronologyIntegralEquation
 import Descent.Portability.ReplicaMetricInstances
 import Descent.Portability.IntegralEquationDerivative
 import Descent.Portability.ReferenceLogLossCertificate
