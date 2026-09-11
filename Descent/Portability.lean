@@ -257,6 +257,9 @@ import Descent.Portability.InfiniteIdentityMinimax
 import Descent.Portability.FiniteDiscreteMeasure
 import Descent.Portability.IIDBinExperiment
 import Descent.Portability.FiniteBinCalibrationLaw
+import Descent.Portability.FirstMomentTightness
+import Descent.Portability.PoissonRealCharacteristic
+import Descent.Portability.HWEHeterozygosityWeakLimit
 assert_below Descent.Program
 
 /-!
