@@ -23,6 +23,13 @@ open Descent.Portability.CylinderThresholdCertificate
 #print axioms tieEvaluator
 #print axioms unresolvedMass_tieEvaluator
 #print axioms resolvedMass_tieEvaluator
+#print axioms length_take_of_le
+#print axioms take_mem_cylinder
+#print axioms take_max_mem_cylinder
+#print axioms differenceEvaluator
+#print axioms setOf_le_eq_threshold
+#print axioms comparison_certificate
+#print axioms tendsto_comparison_resolvedMass
 #print axioms bitMeasure_singleton
 #print axioms discretization_event_gap
 #print axioms measurable_roundToResolution

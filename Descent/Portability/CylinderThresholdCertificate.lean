@@ -37,9 +37,14 @@ rounded law reproduces the mass of every cylinder of depth at most the resolutio
 `roundedLaw_range_gap` that it is nevertheless at event distance one from the stream law, at
 every resolution.
 
-Not formalized here: optimizer comparisons between two scores other than through the threshold
-certificate of their difference, and total variation as a supremum over events; the gap is
-exhibited on one event, which bounds that supremum below by one.
+An optimizer comparison between two scores is the threshold certificate of their difference at
+zero. `differenceEvaluator` evaluates the difference on the finer of the two cylinder
+partitions, `comparison_certificate` brackets the probability that the first score is at least
+the second, and `tendsto_comparison_resolvedMass` shows that the bracket converges when ties are
+null.
+
+Not formalized here: total variation as a supremum over events; the gap is exhibited on one
+event, which bounds that supremum below by one.
 
 ## Empirical status
 
@@ -389,6 +394,137 @@ theorem resolvedMass_tieEvaluator (threshold : ℚ) (stage : ℕ) :
       ext stream
       simp
     rw [hall, measureReal_univ_eq_one]
+
+/-! ### Optimizer comparisons -/
+
+/-- A truncation of a word to a length at most its own has that length. -/
+theorem length_take_of_le {word : List Bool} {length : ℕ} (hle : length ≤ word.length) :
+    (word.take length).length = length := by
+  rw [List.length_take, min_eq_left hle]
+
+/-- A stream in the cylinder of a word lies in the cylinder of every truncation of the
+word. -/
+theorem take_mem_cylinder {word : List Bool} {stream : ℕ → Bool}
+    (hstream : stream ∈ cylinder word) {length : ℕ} (hle : length ≤ word.length) :
+    stream ∈ cylinder (word.take length) := by
+  have hprefix := (mem_cylinder_iff word stream).mp hstream
+  rw [mem_cylinder_iff, length_take_of_le hle, ← hprefix, take_prefixOf stream hle]
+
+/-- A stream in the cylinder of a word of length `max left right` lies in the cylinders of the
+truncations of the word to `left` and to `right`, and those truncations have those lengths. -/
+theorem take_max_mem_cylinder {word : List Bool} {stream : ℕ → Bool}
+    (hstream : stream ∈ cylinder word) {left right : ℕ}
+    (hlength : word.length = max left right) :
+    ((word.take left).length = left ∧ stream ∈ cylinder (word.take left)) ∧
+      ((word.take right).length = right ∧ stream ∈ cylinder (word.take right)) := by
+  have hleft : left ≤ word.length := le_of_le_of_eq (le_max_left left right) hlength.symm
+  have hright : right ≤ word.length := le_of_le_of_eq (le_max_right left right) hlength.symm
+  exact ⟨⟨length_take_of_le hleft, take_mem_cylinder hstream hleft⟩,
+    ⟨length_take_of_le hright, take_mem_cylinder hstream hright⟩⟩
+
+/-- NOTE2 §7.2 for an optimizer comparison: the cylinder evaluator of the difference of two
+scores, on the finer of their two cylinder partitions. Its lower value is the lower value of
+the first score minus the upper value of the second, and its upper value is the upper value of
+the first minus the lower value of the second. -/
+def differenceEvaluator {first second : (ℕ → Bool) → ℝ}
+    (firstEvaluator : CylinderEvaluator first) (secondEvaluator : CylinderEvaluator second) :
+    CylinderEvaluator fun stream ↦ first stream - second stream where
+  depth := fun stage ↦ max (firstEvaluator.depth stage) (secondEvaluator.depth stage)
+  lower := fun stage word ↦ firstEvaluator.lower stage (word.take (firstEvaluator.depth stage)) -
+    secondEvaluator.upper stage (word.take (secondEvaluator.depth stage))
+  upper := fun stage word ↦ firstEvaluator.upper stage (word.take (firstEvaluator.depth stage)) -
+    secondEvaluator.lower stage (word.take (secondEvaluator.depth stage))
+  depth_mono := fun _ _ hle ↦
+    max_le_max (firstEvaluator.depth_mono hle) (secondEvaluator.depth_mono hle)
+  lower_le := fun stage word hlength stream hstream ↦ by
+    obtain ⟨⟨hfirstLength, hfirst⟩, ⟨hsecondLength, hsecond⟩⟩ :=
+      take_max_mem_cylinder hstream hlength
+    have hlow := firstEvaluator.lower_le stage _ hfirstLength stream hfirst
+    have hhigh := secondEvaluator.le_upper stage _ hsecondLength stream hsecond
+    show ((firstEvaluator.lower stage (word.take (firstEvaluator.depth stage)) -
+      secondEvaluator.upper stage (word.take (secondEvaluator.depth stage)) : ℚ) : ℝ) ≤
+        first stream - second stream
+    push_cast
+    linarith
+  le_upper := fun stage word hlength stream hstream ↦ by
+    obtain ⟨⟨hfirstLength, hfirst⟩, ⟨hsecondLength, hsecond⟩⟩ :=
+      take_max_mem_cylinder hstream hlength
+    have hhigh := firstEvaluator.le_upper stage _ hfirstLength stream hfirst
+    have hlow := secondEvaluator.lower_le stage _ hsecondLength stream hsecond
+    show first stream - second stream ≤
+      ((firstEvaluator.upper stage (word.take (firstEvaluator.depth stage)) -
+        secondEvaluator.lower stage (word.take (secondEvaluator.depth stage)) : ℚ) : ℝ)
+    push_cast
+    linarith
+  lower_nested := fun stage word hlength ↦ by
+    dsimp only
+    rw [List.take_take, List.take_take, min_eq_left (le_max_left _ _),
+      min_eq_left (le_max_right _ _)]
+    have hfirstNested := firstEvaluator.lower_nested stage _
+      (length_take_of_le (le_of_le_of_eq (le_max_left _ _) hlength.symm))
+    have hsecondNested := secondEvaluator.upper_nested stage _
+      (length_take_of_le (le_of_le_of_eq (le_max_right _ _) hlength.symm))
+    rw [List.take_take, min_eq_left (firstEvaluator.depth_mono (Nat.le_succ stage))]
+      at hfirstNested
+    rw [List.take_take, min_eq_left (secondEvaluator.depth_mono (Nat.le_succ stage))]
+      at hsecondNested
+    linarith
+  upper_nested := fun stage word hlength ↦ by
+    dsimp only
+    rw [List.take_take, List.take_take, min_eq_left (le_max_left _ _),
+      min_eq_left (le_max_right _ _)]
+    have hfirstNested := firstEvaluator.upper_nested stage _
+      (length_take_of_le (le_of_le_of_eq (le_max_left _ _) hlength.symm))
+    have hsecondNested := secondEvaluator.lower_nested stage _
+      (length_take_of_le (le_of_le_of_eq (le_max_right _ _) hlength.symm))
+    rw [List.take_take, min_eq_left (firstEvaluator.depth_mono (Nat.le_succ stage))]
+      at hfirstNested
+    rw [List.take_take, min_eq_left (secondEvaluator.depth_mono (Nat.le_succ stage))]
+      at hsecondNested
+    linarith
+  width_ae := by
+    filter_upwards [firstEvaluator.width_ae, secondEvaluator.width_ae] with stream hfirst hsecond
+    have hsum := hfirst.add hsecond
+    rw [add_zero] at hsum
+    refine hsum.congr fun stage ↦ ?_
+    simp only [take_prefixOf stream (le_max_left _ _), take_prefixOf stream (le_max_right _ _)]
+    push_cast
+    ring
+
+/-- The event that the first score is at least the second is the event that their difference
+reaches zero. -/
+theorem setOf_le_eq_threshold (first second : (ℕ → Bool) → ℝ) :
+    {stream : ℕ → Bool | second stream ≤ first stream} =
+      {stream | ((0 : ℚ) : ℝ) ≤ first stream - second stream} := by
+  ext stream
+  simp [sub_nonneg]
+
+/-- NOTE2 §7.2 for an optimizer comparison: at every stage the probability that the first score
+is at least the second lies between the resolved mass of the difference evaluator at zero and
+that mass plus its unresolved boundary mass. -/
+theorem comparison_certificate {first second : (ℕ → Bool) → ℝ}
+    (firstEvaluator : CylinderEvaluator first) (secondEvaluator : CylinderEvaluator second)
+    (stage : ℕ) :
+    (resolvedMass (differenceEvaluator firstEvaluator secondEvaluator) 0 stage : ℝ) ≤
+        bitMeasure.real {stream | second stream ≤ first stream} ∧
+      bitMeasure.real {stream | second stream ≤ first stream} ≤
+        (resolvedMass (differenceEvaluator firstEvaluator secondEvaluator) 0 stage : ℝ) +
+          unresolvedMass (differenceEvaluator firstEvaluator secondEvaluator) 0 stage := by
+  rw [setOf_le_eq_threshold]
+  exact resolvedMass_le_and_le_add (differenceEvaluator firstEvaluator secondEvaluator) 0 stage
+
+/-- NOTE2 §7.2 for an optimizer comparison: when ties between the two scores are null, the
+resolved mass of the difference evaluator converges to the probability that the first score is
+at least the second. Assumes: the fair-bit probability of a tie is zero. -/
+theorem tendsto_comparison_resolvedMass {first second : (ℕ → Bool) → ℝ}
+    (firstEvaluator : CylinderEvaluator first) (secondEvaluator : CylinderEvaluator second)
+    (hties : bitMeasure {stream | first stream = second stream} = 0) :
+    Tendsto (fun stage ↦
+        (resolvedMass (differenceEvaluator firstEvaluator secondEvaluator) 0 stage : ℝ)) atTop
+      (𝓝 (bitMeasure.real {stream | second stream ≤ first stream})) := by
+  rw [setOf_le_eq_threshold]
+  exact tendsto_resolvedMass (differenceEvaluator firstEvaluator secondEvaluator) 0
+    (by simpa [sub_eq_zero] using hties)
 
 /-! ### Atomic discretizations are far from the stream law -/
 
