@@ -2,6 +2,8 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.SimultaneousRealization
+import Descent.Portability.AlignmentFactorization
+import Descent.Portability.TraitPortabilityRange
 
 assert_below Descent.Decision Descent.Program
 
@@ -417,6 +419,28 @@ theorem slack_identity (q m : D → ℝ) (d : D) (hq0 : 0 ≤ q d) (hm : 1 ≤ m
   have hmid := mse_identity q m d hq0 hm
   unfold shiftK outcomeVar
   linear_combination hmid - scaleX q m d ^ 2 * hq
+
+/-- **The two curve packages agree on mean individual loss.**  When the target outcome
+variance is one, the prescribed mean squared error of UPT Theorem 7.1 is exactly TQ
+equation (8.2)'s mean individual loss at heritability one, namely `2 − 2√q_d`.
+Equation (7.3) and equation (8.2) are one relation read in opposite directions:
+`SimultaneousRealization.lossMean` prescribes the loss from the curve, and `scaleX`
+inverts it. -/
+theorem mse_eq_lossMean_of_unit_variance (q m : D → ℝ) (d : D) (hq0 : 0 ≤ q d)
+    (hm : 1 < m d) (hv : outcomeVar q m d = 1) :
+    m d = SimultaneousRealization.lossMean 1 q d := by
+  have hx := scaleX_pos q m d hq0 hm
+  have hsq : scaleX q m d ^ 2 = 1 := hv
+  have hx1 : scaleX q m d = 1 := by
+    have hfac : (scaleX q m d - 1) * (scaleX q m d + 1) = 0 := by
+      linear_combination hsq
+    rcases mul_eq_zero.mp hfac with h | h
+    · linarith
+    · linarith
+  have hmid := mse_identity q m d hq0 hm.le
+  unfold SimultaneousRealization.lossMean
+  rw [Real.sqrt_one]
+  linear_combination hmid + (scaleX q m d + 1 - 2 * Real.sqrt (q d)) * hx1
 
 /-- The prescribed moments leave strict slack in every cell. -/
 theorem shiftK_sq_lt (q m : D → ℝ) (d : D) (hq0 : 0 ≤ q d) (hq1 : q d < 1)

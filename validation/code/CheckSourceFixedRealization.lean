@@ -40,6 +40,7 @@ open Descent.Portability.SourceFixedRealization
 #print axioms mse_identity
 #print axioms slack_identity
 #print axioms shiftK_sq_lt
+#print axioms mse_eq_lossMean_of_unit_variance
 #print axioms residual_slack
 #print axioms targetPhenotype_apply
 #print axioms targetPhenotype_sub_score

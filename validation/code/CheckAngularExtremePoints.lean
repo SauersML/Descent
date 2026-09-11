@@ -1,0 +1,18 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.AngularExtremePoints
+
+/-! Axiom audit of AngularExtremePoints. -/
+
+#print axioms Descent.Portability.AngularExtremePoints.quadForm_add_matrix
+#print axioms Descent.Portability.AngularExtremePoints.quadForm_smul_matrix
+#print axioms Descent.Portability.AngularExtremePoints.quadForm_entries
+#print axioms Descent.Portability.AngularExtremePoints.not_mem_extremePoints_of_perturbation
+#print axioms Descent.Portability.AngularExtremePoints.diagonal_perturb_quadForm_nonneg
+#print axioms Descent.Portability.AngularExtremePoints.conjPerturb_transpose
+#print axioms Descent.Portability.AngularExtremePoints.trace_conjPerturb
+#print axioms Descent.Portability.AngularExtremePoints.quadForm_conjPerturb
+#print axioms Descent.Portability.AngularExtremePoints.quadForm_eq_diagonal_conj
+#print axioms Descent.Portability.AngularExtremePoints.conjPerturb_ne_zero
+#print axioms Descent.Portability.AngularExtremePoints.extremePoint_no_supported_direction

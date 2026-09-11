@@ -1,6 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.ContinuousTurnoverSemigroup
+import Descent.Portability.TurnoverTrajectoryRegion
 import Descent.Portability.GramRepairOptimality
 import Descent.Portability.AuditCovarianceSpectrum
 import Descent.Portability.ExtraInformationRank
@@ -458,6 +460,9 @@ import Descent.Portability.VectorAuditConfidence
 import Descent.Portability.CertifiedFrameRepair
 import Descent.Portability.NonlinearMetricGridBound
 import Descent.Portability.ScoreMomentZonoid
+
+import Descent.Portability.ClippedFrameRepair
+import Descent.Portability.SquaredCorrelationZeroTest
 
 assert_below Descent.Program
 
