@@ -23,7 +23,9 @@ definedness weight and the zero-extended numerator of a requested quantity) are 
 same way.
 
 The cells `signCell` of the sign patterns are pairwise disjoint (`disjoint_signCell`), cover the
-parameter space (`iUnion_signCell`), and are finitely many (`finite_range_signCell`). Presented
+parameter space (`iUnion_signCell`), and are finitely many (`finite_range_signCell`); the
+partition claim of Theorem 2, that the report map is rational on every cell, is stated in one
+theorem as `signCell_partition_rational_reports`. Presented
 quotients are closed under products, quotients and finite sums through explicit polynomial
 presentations (`eval_mul`, `eval_div`, `eval_sum`). On each cell every trace weight is the value
 of the explicit presentation `weightQuotient` (`traceWeight_eq_eval_weightQuotient`, with no
@@ -524,6 +526,54 @@ theorem conditionalMetric_experimentAt_eq_eval [Fintype Report]
 
 end ParametricTree
 
+/-! ### The rational partition of parameter space -/
+
+/-- **NOTE2 Theorem 2, the rational partition of parameter space.** The sign-condition cells of the
+guards partition the parameter space: they cover it, the cells of distinct patterns are disjoint,
+and there are finitely many. On each cell, at every regular point, every trace weight, the
+definedness probability `d_j(θ)` and the numerator `n_j(θ)` of every requested quantity, and,
+where `d_j(θ) > 0`, its conditional mean `n_j(θ) / d_j(θ)`, are the values of explicit presented
+quotients of polynomials that depend only on the cell, with nonvanishing denominators. Assumes:
+`RegularAt pattern θ tree` at the points it is applied to. -/
+theorem signCell_partition_rational_reports [Finite Guard] {J : Type}
+    (guard : Guard → MvPolynomial σ ℝ) (tree : ParametricTree σ Guard Report)
+    (definedness numerator : J → Report → (Guard → SignType) → PolynomialQuotient σ) :
+    (⋃ pattern, signCell guard pattern) = Set.univ ∧
+      (∀ first second : Guard → SignType, first ≠ second →
+        Disjoint (signCell guard first) (signCell guard second)) ∧
+      (Set.range (signCell guard)).Finite ∧
+      ∀ pattern, ∀ θ ∈ signCell guard pattern, ParametricTree.RegularAt pattern θ tree →
+        (∀ j report, MvPolynomial.eval θ (definedness j report pattern).denominator ≠ 0 ∧
+          MvPolynomial.eval θ (numerator j report pattern).denominator ≠ 0) →
+        (∀ trace, ParametricTree.traceWeight guard θ tree trace =
+            (ParametricTree.weightQuotient pattern tree trace).eval θ ∧
+          MvPolynomial.eval θ (ParametricTree.weightQuotient pattern tree trace).denominator ≠
+            0) ∧
+        ∀ j, ParametricTree.accumulation guard tree (definedness j) θ =
+              (ParametricTree.accumulationQuotient tree (definedness j) pattern).eval θ ∧
+            ParametricTree.accumulation guard tree (numerator j) θ =
+              (ParametricTree.accumulationQuotient tree (numerator j) pattern).eval θ ∧
+            (0 < ParametricTree.accumulation guard tree (definedness j) θ →
+              ParametricTree.accumulation guard tree (numerator j) θ /
+                  ParametricTree.accumulation guard tree (definedness j) θ =
+                ((ParametricTree.accumulationQuotient tree (numerator j) pattern).div
+                  (ParametricTree.accumulationQuotient tree (definedness j) pattern)).eval θ ∧
+              MvPolynomial.eval θ
+                ((ParametricTree.accumulationQuotient tree (numerator j) pattern).div
+                  (ParametricTree.accumulationQuotient tree (definedness j) pattern)).denominator ≠
+                0) := by
+  refine ⟨iUnion_signCell guard, fun _ _ hne ↦ disjoint_signCell guard hne,
+    finite_range_signCell guard, fun pattern θ hcell hregular haccumulators ↦ ⟨fun trace ↦
+      ⟨ParametricTree.traceWeight_eq_eval_weightQuotient guard pattern hcell tree trace,
+        ParametricTree.denominator_weightQuotient_ne_zero pattern tree hregular trace⟩,
+      fun j ↦ ⟨ParametricTree.accumulation_eq_eval_accumulationQuotient guard pattern hcell tree
+          (definedness j) hregular fun report ↦ (haccumulators j report).1,
+        ParametricTree.accumulation_eq_eval_accumulationQuotient guard pattern hcell tree
+          (numerator j) hregular fun report ↦ (haccumulators j report).2,
+        fun hpositive ↦ ParametricTree.conditionalMean_eq_eval_div guard pattern hcell tree
+          (definedness j) (numerator j) hregular (fun report ↦ (haccumulators j report).1)
+          (fun report ↦ (haccumulators j report).2) hpositive⟩⟩⟩
+
 /-! ### The joint attainable region (8) -/
 
 /-- **NOTE2 (8).** The exact joint attainable region: the report vectors `r` for which one
@@ -934,7 +984,7 @@ theorem validAt_selectionTree {θ : Fin 2 → ℝ} (h0x : 0 ≤ θ 0) (h1x : θ 
     · simp only [eval_selectionQuotient_true]
       exact div_nonneg (mul_nonneg h0x h0w) htotal.le
   · simp only [Fintype.sum_bool, eval_selectionQuotient_true, eval_selectionQuotient_false]
-    rw [div_add_div_same, div_eq_one_iff_eq htotal.ne']
+    rw [← add_div, div_eq_one_iff_eq htotal.ne']
     ring
   · simp only [eval_decisionQuotient]
     split_ifs <;> norm_num
@@ -956,8 +1006,8 @@ theorem accumulation_selectionTree_selected (θ : Fin 2 → ℝ) :
       ∃ decision, decide (signPattern selectionGuard θ true = 1) = decision := ⟨_, rfl⟩
   rw [hdecision]
   cases decision <;>
-    simp [Fintype.sum_sigma, Fintype.sum_bool, Finset.univ_unique, Finset.sum_singleton,
-      eval_decisionQuotient, PolynomialQuotient.eval_ofPolynomial, eval_selectionQuotient_true]
+    simp [Fintype.sum_sigma, Finset.univ_unique, Finset.sum_singleton, eval_decisionQuotient,
+      PolynomialQuotient.eval_ofPolynomial, eval_selectionQuotient_true]
 
 /-- **NOTE2 Theorem 2, a non-degenerate instance.** For the selection experiment with its
 decision guard and any finite family of requested quantities with polynomial accumulators, the

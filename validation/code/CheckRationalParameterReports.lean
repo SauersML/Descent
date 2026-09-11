@@ -30,6 +30,7 @@ open Descent.Portability.RationalParameterReports
 #print axioms ParametricTree.definedMass_experimentAt
 #print axioms ParametricTree.weightedDefinedMetric_experimentAt
 #print axioms ParametricTree.conditionalMetric_experimentAt_eq_eval
+#print axioms signCell_partition_rational_reports
 #print axioms attainableRegion_eq_image
 #print axioms attainableRegion_eq_iUnion_image_cells
 #print axioms attainableRegion_eq_image_reportGraph
