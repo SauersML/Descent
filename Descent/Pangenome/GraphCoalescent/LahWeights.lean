@@ -213,6 +213,7 @@ theorem notMem_of_mem_parts (P : Finpartition s) (ha : a ∉ s) {t : Finset α}
     (ht : t ∈ P.parts) : a ∉ t :=
   fun hat ↦ ha (P.le ht hat)
 
+omit [DecidableEq α] in
 /-- A nonempty set avoiding `a` is not contained in `{a}`. -/
 theorem not_subset_singleton_of_notMem {t : Finset α} (hne : t.Nonempty) (hat : a ∉ t) :
     ¬t ⊆ {a} := by
@@ -362,6 +363,7 @@ theorem sum_finpartition_insert {M : Type*} [AddCommMonoid M] (ha : a ∉ s)
       Σ _ : Finpartition s, Finset α)) (fun x ↦ insertAt x.1 ha x.2) ?_ ?_ ?_ ?_ ?_
   · intro Q _
     refine mem_sigma.mpr ⟨mem_univ _, ?_⟩
+    show (Q.part a).erase a ∈ insert ∅ (removeElement ha Q).parts
     by_cases hempty : (Q.part a).erase a = ∅
     · rw [hempty]
       exact mem_insert_self _ _
@@ -496,18 +498,18 @@ parts as it has blocks. -/
 theorem card_parts_ofSetoid {n : ℕ} (ξ : Coalescent.ER n) [DecidableRel ξ.r] :
     #(Finpartition.ofSetoid ξ).parts = Coalescent.blocks ξ := by
   have hclass : ∀ x y : Fin n, ξ.r x y →
-      ({z ∈ univ | ξ.r x z} : Finset (Fin n)) = {z ∈ univ | ξ.r y z} := by
+      ({z ∈ (univ : Finset (Fin n)) | ξ.r x z} : Finset (Fin n)) = {z ∈ (univ : Finset (Fin n)) | ξ.r y z} := by
     intro x y hxy
     ext z
     simp only [mem_filter, mem_univ, true_and]
     exact ⟨fun h ↦ ξ.trans (ξ.symm hxy) h, fun h ↦ ξ.trans hxy h⟩
   have hmem : ∀ x : Fin n,
-      ({z ∈ univ | ξ.r x z} : Finset (Fin n)) ∈ (Finpartition.ofSetoid ξ).parts := by
+      ({z ∈ (univ : Finset (Fin n)) | ξ.r x z} : Finset (Fin n)) ∈ (Finpartition.ofSetoid ξ).parts := by
     intro x
     rw [Finpartition.ofSetoid_parts]
     exact mem_image_of_mem _ (mem_univ x)
   let toPart : Quotient ξ → (Finpartition.ofSetoid ξ).parts :=
-    Quotient.lift (fun x ↦ ⟨{z ∈ univ | ξ.r x z}, hmem x⟩)
+    Quotient.lift (fun x ↦ ⟨{z ∈ (univ : Finset (Fin n)) | ξ.r x z}, hmem x⟩)
       (fun x y hxy ↦ Subtype.ext (hclass x y hxy))
   have hinj : Function.Injective toPart := by
     intro p q hpq
@@ -516,8 +518,8 @@ theorem card_parts_ofSetoid {n : ℕ} (ξ : Coalescent.ER n) [DecidableRel ξ.r]
       induction q using Quotient.inductionOn with
       | h y =>
         have hsets := congrArg Subtype.val hpq
-        have hy : y ∈ ({z ∈ univ | ξ.r x z} : Finset (Fin n)) := by
-          rw [show ({z ∈ univ | ξ.r x z} : Finset (Fin n)) = {z ∈ univ | ξ.r y z} from hsets]
+        have hy : y ∈ ({z ∈ (univ : Finset (Fin n)) | ξ.r x z} : Finset (Fin n)) := by
+          rw [show ({z ∈ (univ : Finset (Fin n)) | ξ.r x z} : Finset (Fin n)) = {z ∈ (univ : Finset (Fin n)) | ξ.r y z} from hsets]
           simp only [mem_filter, mem_univ, true_and]
           exact ξ.refl y
         exact Quotient.sound (by simpa using hy)
