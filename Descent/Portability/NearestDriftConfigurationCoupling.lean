@@ -36,6 +36,15 @@ lower endpoint from a bound into an attained value, and
 
 Domain conditions: nonnegative rates, and a step short enough that the row is a probability
 vector.  Nothing is assumed about the coordinates beyond their prescribed flip rates.
+
+## Empirical status
+
+None.  The kernel here is an exhibited coupling, not a measurement: its rates are inputs, and
+what it asserts is that a joint process with those rates exists and induces the nearest-drift
+count chain.  Nothing is fitted, and no cohort is described.  What could carry an empirical
+status is a named quantity in a downstream module claiming that this coupling is the one some
+population realizes; such a name keeps its own docstring, its own regime, and its own ledger
+row.
 -/
 
 set_option autoImplicit false
