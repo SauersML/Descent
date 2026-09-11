@@ -60,10 +60,13 @@ theorem portabilityRatio_eq_cross (sourceNum sourceDen targetNum targetDen : Ω 
     (hsd : 0 < sourceDen ω) (htd : 0 < targetDen ω) (hsn : 0 < sourceNum ω) :
     portabilityRatio sourceNum sourceDen targetNum targetDen ω =
       targetNum ω * sourceDen ω / (targetDen ω * sourceNum ω) := by
+  have hs : sourceDen ω ≠ 0 := hsd.ne'
+  have ht : targetDen ω ≠ 0 := htd.ne'
+  have hn : sourceNum ω ≠ 0 := hsn.ne'
   unfold portabilityRatio
-  rw [div_div_div_cancel_right₀]
-  rw [div_div_eq_mul_div, div_div]
+  field_simp <;> ring
 
+omit [Fintype Ω] in
 /-- **The comparison event is the same event either way.** On the definedness domain the
 portability ratio exceeds one exactly when the target metric exceeds the source metric. -/
 theorem one_lt_portabilityRatio_iff (sourceNum sourceDen targetNum targetDen : Ω → ℝ) (ω : Ω)
@@ -152,11 +155,13 @@ def exampleTargetDen : Fin 3 → ℝ := ![1, 1, 4]
 
 /-- The separating example's masses are nonnegative. -/
 theorem exampleMass_nonneg (ω : Fin 3) : 0 ≤ exampleMass ω := by
-  fin_cases ω <;> norm_num [exampleMass]
+  fin_cases ω <;> norm_num [exampleMass, Matrix.cons_val_zero, Matrix.cons_val_one,
+    Matrix.cons_val_two, Matrix.head_cons, Matrix.tail_cons]
 
 /-- The separating example's masses sum to one. -/
 theorem exampleMass_sum : ∑ ω, exampleMass ω = 1 := by
-  norm_num [Fin.sum_univ_three, exampleMass]
+  norm_num [Fin.sum_univ_three, exampleMass, Matrix.cons_val_zero, Matrix.cons_val_one,
+    Matrix.cons_val_two, Matrix.head_cons, Matrix.tail_cons]
 
 /-- The separating example as a finite report law. -/
 def exampleLaw : FiniteReportLaw (Fin 3) where
@@ -167,11 +172,16 @@ def exampleLaw : FiniteReportLaw (Fin 3) where
 /-- The definedness domain of the separating example: the second and third reports. -/
 def exampleDomain : Finset (Fin 3) := {1, 2}
 
-/-- The first report is outside the domain because its source numerator vanishes, and the
-other two are inside it. -/
-theorem exampleDomain_spec (ω : Fin 3) :
-    ω ∈ exampleDomain ↔ 0 < exampleSourceNum ω := by
-  fin_cases ω <;> norm_num [exampleDomain, exampleSourceNum]
+/-- The first report lies outside the domain, because its source numerator vanishes, and the
+other two lie inside it. -/
+theorem exampleDomain_membership :
+    (0 : Fin 3) ∉ exampleDomain ∧ (1 : Fin 3) ∈ exampleDomain ∧
+      (2 : Fin 3) ∈ exampleDomain := by
+  refine ⟨by decide, by decide, by decide⟩
+
+/-- The excluded report has source numerator zero, which is the definedness failure of
+NOTE2 (27). -/
+theorem exampleSourceNum_first : exampleSourceNum 0 = 0 := rfl
 
 /-- Sums over the example domain are two-term sums. -/
 theorem exampleDomain_sum (summand : Fin 3 → ℝ) :
@@ -193,20 +203,25 @@ theorem exampleQueries :
           exampleTargetNum exampleTargetDen = 1 / 2 := by
   have hmass : definedMass exampleLaw exampleDomain = 1 / 2 := by
     rw [definedMass, exampleDomain_sum]
-    norm_num [exampleLaw, exampleMass]
+    norm_num [exampleLaw, exampleMass, Matrix.cons_val_zero, Matrix.cons_val_one,
+      Matrix.cons_val_two, Matrix.head_cons, Matrix.tail_cons]
   refine ⟨?_, ?_, ?_, ?_⟩
   · rw [meanOfRatio, exampleDomain_sum, hmass]
     norm_num [exampleLaw, exampleMass, portabilityRatio, exampleSourceNum, exampleSourceDen,
-      exampleTargetNum, exampleTargetDen]
+      exampleTargetNum, exampleTargetDen, Matrix.cons_val_zero, Matrix.cons_val_one,
+      Matrix.cons_val_two, Matrix.head_cons, Matrix.tail_cons]
   · rw [ratioOfMeans, exampleDomain_sum, exampleDomain_sum]
     norm_num [exampleLaw, exampleMass, exampleSourceNum, exampleSourceDen,
-      exampleTargetNum, exampleTargetDen]
+      exampleTargetNum, exampleTargetDen, Matrix.cons_val_zero, Matrix.cons_val_one,
+      Matrix.cons_val_two, Matrix.head_cons, Matrix.tail_cons]
   · rw [massTargetExceeds, exampleDomain_sum]
     norm_num [exampleLaw, exampleMass, exampleSourceNum, exampleSourceDen,
-      exampleTargetNum, exampleTargetDen]
+      exampleTargetNum, exampleTargetDen, Matrix.cons_val_zero, Matrix.cons_val_one,
+      Matrix.cons_val_two, Matrix.head_cons, Matrix.tail_cons]
   · rw [probRatioExceedsOne, exampleDomain_sum, hmass]
     norm_num [exampleLaw, exampleMass, portabilityRatio, exampleSourceNum, exampleSourceDen,
-      exampleTargetNum, exampleTargetDen]
+      exampleTargetNum, exampleTargetDen, Matrix.cons_val_zero, Matrix.cons_val_one,
+      Matrix.cons_val_two, Matrix.head_cons, Matrix.tail_cons]
 
 /-- The four query values of the separating example are pairwise different. -/
 theorem exampleQueries_pairwise_ne :
