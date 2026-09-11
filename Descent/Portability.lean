@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.BregmanAuditContrasts
 import Descent.Portability.SpectralAuditAllocationLaw
 import Descent.Portability.SpectralAuditStrongDuality
 import Descent.Portability.SpectralOperatorEpigraph

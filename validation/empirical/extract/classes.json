@@ -47679,6 +47679,7 @@
    "Descent.Portability.BinaryRiskCohort.continuous_calibrationIndividualLoss",
    "Descent.Portability.BinaryRiskCohort.continuous_citlEquation",
    "Descent.Portability.BinaryRiskCohort.continuous_logisticCalibrationObjective",
+   "Descent.Portability.BregmanAuditContrasts.contrast_integrable",
    "Descent.Portability.CalibrationLaw.calibrated_caseProbability_measurable",
    "Descent.Portability.CalibrationLaw.normalCDF_continuous",
    "Descent.Portability.CalibrationLaw.normalized_prevalence_continuous",
@@ -47772,6 +47773,7 @@
     "Descent.Portability.AugmentedAuditLaw.affine_second": [],
     "Descent.Portability.BalancedHWEJumpOperator.generator_power_continuous": [],
     "Descent.Portability.BernsteinMomentBound.centered_mgf_bound": [],
+    "Descent.Portability.BregmanAuditContrasts.contrast_integrable": [],
     "Descent.Portability.CalibrationLaw.normalCDF_continuous": [],
     "Descent.Portability.CalibrationLaw.prevalence_continuous": [],
     "Descent.Portability.CalibrationLaw.standardize_coordinate_continuous": [],
@@ -160832,11 +160834,23 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.BregmanAuditContrasts.contrast_integrable",
+   "Descent.Portability.BregmanAuditContrasts.expected_contrast",
+   "Descent.Portability.BregmanAuditContrasts.expected_risk_difference",
+   "Descent.Portability.BregmanAuditContrasts.same_mean_contrast",
    "Descent.Portability.DecisionLossContrasts.bregman_difference"
   ],
   "constraints": {
-   "hypotheses": [],
+   "hypotheses": [
+    "Integrable (fun ω ↦ bregman F D (Y ω"
+   ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.BregmanAuditContrasts.contrast_integrable": [],
+    "Descent.Portability.BregmanAuditContrasts.expected_contrast": [],
+    "Descent.Portability.BregmanAuditContrasts.expected_risk_difference": [
+     "Integrable (fun ω ↦ bregman F D (Y ω"
+    ],
+    "Descent.Portability.BregmanAuditContrasts.same_mean_contrast": [],
     "Descent.Portability.DecisionLossContrasts.bregman_difference": []
    }
   }

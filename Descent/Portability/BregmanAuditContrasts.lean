@@ -71,6 +71,7 @@ theorem binary_expected_contrast (μ : Measure Bool) [IsProbabilityMeasure μ] (
       have hu : ({false, true} : Set Bool) = Set.univ := by
         ext b
         cases b <;> simp
-      simp [integral_fintype, hu]
+      simp [integral_fintype]
+      rw [hu, measureReal_univ_eq_one, one_mul]
 
 end Descent.Portability.BregmanAuditContrasts
