@@ -1,0 +1,29 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.PolynomialFellerExtension
+
+/-! Axiom audit of PolynomialFellerExtension. -/
+
+open Descent.Portability.PolynomialFellerExtension
+
+#print axioms Descent.Portability.PolynomialFellerExtension.norm_le_of_nonneg_of_map_unit
+#print axioms Descent.Portability.PolynomialFellerExtension.nonneg_of_norm_le_of_map_unit
+#print axioms Descent.Portability.PolynomialFellerExtension.nonneg_iff_norm_le_of_map_unit
+#print axioms Descent.Portability.PolynomialFellerExtension.denseExtension
+#print axioms Descent.Portability.PolynomialFellerExtension.denseExtension_coe
+#print axioms Descent.Portability.PolynomialFellerExtension.denseExtension_norm_le
+#print axioms Descent.Portability.PolynomialFellerExtension.denseExtension_one
+#print axioms Descent.Portability.PolynomialFellerExtension.denseExtension_nonneg
+#print axioms Descent.Portability.PolynomialFellerExtension.denseExtension_unique
+#print axioms Descent.Portability.PolynomialFellerExtension.denseExtension_eq_of_contraction
+#print axioms Descent.Portability.PolynomialFellerExtension.denseExtension_add
+#print axioms Descent.Portability.PolynomialFellerExtension.denseExtension_eq_id
+#print axioms Descent.Portability.PolynomialFellerExtension.denseExtension_tendsto_zero
+#print axioms Descent.Portability.PolynomialFellerExtension.dense_toSubmodule_of_separatesPoints
+#print axioms Descent.Portability.PolynomialFellerExtension.exists_unique_extension_semigroup
+#print axioms Descent.Portability.PolynomialFellerExtension.iterate_apply_nonneg
+#print axioms Descent.Portability.PolynomialFellerExtension.iterate_apply_sub_le
+#print axioms Descent.Portability.PolynomialFellerExtension.nonneg_and_map_one_of_iterate_tendsto
+#print axioms Descent.Portability.PolynomialFellerExtension.markov_of_euler_tendstoUniformly
+#print axioms Descent.Portability.PolynomialFellerExtension.tendsto_iterate_extension

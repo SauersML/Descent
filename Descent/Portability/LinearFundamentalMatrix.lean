@@ -98,7 +98,7 @@ its argument. -/
 theorem norm_exp_matrix_le {ι : Type*} [Fintype ι] [DecidableEq ι] (X : Matrix ι ι ℝ) :
     ‖NormedSpace.exp ℝ X‖ ≤ Real.exp ‖X‖ := by
   have hsplit : NormedSpace.exp ℝ X = 1 + X + (NormedSpace.exp ℝ X - 1 - X) := by abel
-  have hremainder := Descent.norm_exp_sub_one_sub_self_le X
+  have hremainder := Descent.Coalescent.norm_exp_sub_one_sub_self_le X
   have hone := norm_identityMatrix_le_one (ι := ι)
   have htriangle : ‖1 + X + (NormedSpace.exp ℝ X - 1 - X)‖ ≤
       ‖(1 : Matrix ι ι ℝ)‖ + ‖X‖ + ‖NormedSpace.exp ℝ X - 1 - X‖ :=
@@ -153,8 +153,13 @@ theorem norm_picardIterate_le {ι : Type*} [Fintype ι] [DecidableEq ι]
       have hvalue : ∫ s in (0 : ℝ)..clampTime T t, K ^ (n + 1) / n.factorial * s ^ n =
           (K * clampTime T t) ^ (n + 1) / (n + 1).factorial := by
         rw [intervalIntegral.integral_const_mul, integral_pow, zero_pow (Nat.succ_ne_zero n),
-          sub_zero, Nat.factorial_succ]
-        push_cast
+          sub_zero]
+        have hsucc : ((n + 1).factorial : ℝ) = ((n : ℝ) + 1) * n.factorial := by
+          rw [Nat.factorial_succ]
+          push_cast
+          ring
+        rw [hsucc]
+        generalize ((n : ℝ) + 1) = next
         ring
       exact hstep.trans_eq hvalue
 
@@ -307,7 +312,7 @@ theorem norm_fundamentalMatrix_step_sub_le {ι : Type*} [Fintype ι] [DecidableE
         ((-1 : ℝ) • (NormedSpace.exp ℝ ((t + h - s) • A t) * A t)) s :=
       HasDerivAt.scomp (g₁ := fun u : ℝ ↦ NormedSpace.exp ℝ (u • A t))
         (h := fun r : ℝ ↦ t + h - r)
-        (hg := hasDerivAt_exp_smul_const' (A t) (t + h - s))
+        (hg := hasDerivAt_exp_smul_const (A t) (t + h - s))
         (hh := (hasDerivAt_id s).const_sub (t + h))
     have hU := (fundamentalMatrix_hasDerivWithinAt hA hT hK hbound (hsub hs)).mono hsub
     refine (hexp.hasDerivWithinAt.fun_mul hU).congr_deriv ?_
@@ -589,8 +594,12 @@ theorem norm_picardIterate_sub_le {ι : Type*} [Fintype ι] [DecidableEq ι]
               (s ^ (n + 1) / (n + 1)) =
           (∫ u in (0 : ℝ)..s, ‖A u - B u‖) * (K * s) ^ (n + 1) / (n + 1).factorial *
             (1 + 2 ^ (n + 1) / 2) := by
-        rw [Nat.factorial_succ]
-        push_cast
+        have hsucc : ((n + 1).factorial : ℝ) = ((n : ℝ) + 1) * n.factorial := by
+          rw [Nat.factorial_succ]
+          push_cast
+          ring
+        rw [hsucc]
+        generalize ((n : ℝ) + 1) = next
         ring
       have htarget : (∫ u in (0 : ℝ)..s, ‖A u - B u‖) * (2 * K * s) ^ (n + 1) /
             (n + 1).factorial =

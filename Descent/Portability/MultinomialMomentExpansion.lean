@@ -39,10 +39,21 @@ every mixed power moment of the census exactly,
 `E ∏_a Z_a ^ b_a = Σ_{j ≤ b} (∏_a S(b_a, j_a)) (N)_{Σ j} ∏_a x_a ^ j_a`, an explicit polynomial in
 `N` and `x` with no remainder.
 
-What is NOT proved in this module: the expansion (10) of `E f(Z / N)` for polynomials `f` of
-degree at most four with its `O(N⁻²)` remainder, and the multinomial drift stage that would
-replace the single-draw drift stage of the microscopic kernel. The exact power moments here are
-the input both of those need.
+The expansion (10) is proved for every monomial of degree at most four.
+`expectation_monomial_eq` reads the moment of `∏_a (Z_a / N) ^ b_a` off the power moments, and
+`sum_subIndices_split` separates the sub-multi-indices `j ≤ b` by degree: `j = b` itself, the
+Stirling-weighted monomials one degree below (`firstOrderStirlingSum`), and those at least two
+degrees below (`lowOrderStirlingSum`). When `|b| ≤ 4` the descending factorial ratios
+`(N)_{|b|} / N ^ |b|` and `(N)_{|b| - 1} / N ^ |b|` agree with `1 - C(|b|, 2) / N` and `1 / N` to
+within `11 / N ^ 2` and `3 / N ^ 2` (`abs_descFactorial_div_pow_sub_le`,
+`abs_descFactorial_pred_div_pow_sub_le`), so `abs_expectation_monomial_sub_le` gives
+`|E (Z / N) ^ b - x ^ b - monomialFirstOrder x b / N| ≤ (11 + 4 totalStirlingWeight b) / N ^ 2`
+uniformly over the category law, with the constant read off the Stirling weights of `b`.
+
+What is NOT proved in this module: the identification of `monomialFirstOrder x b` with the
+second-order operator `(1 / 2) Σ_{a, c} (x_a δ_ac - x_a x_c) ∂_a ∂_c x ^ b` of (10), the extension
+to linear combinations of monomials, and the multinomial drift stage that would replace the
+single-draw drift stage of the microscopic kernel.
 
 ## Empirical status
 
@@ -266,6 +277,343 @@ theorem expectation_prod_pow {H : Type*} [Fintype H] [DecidableEq H]
         rw [Finset.sum_comm]
         exact Finset.sum_congr rfl fun j _ ↦ Finset.sum_congr rfl fun counts _ ↦ by ring
     _ = _ := Finset.sum_congr rfl fun j _ ↦ by rw [expectation_prod_descFactorial]; ring
+
+/-! ## The expansion (10) for monomials of degree at most four -/
+
+/-- The descending factorial one step further, read in the reals: `(n)_{k + 1} = (n - k) (n)_k`
+with genuine subtraction. When `n < k` both sides vanish. -/
+theorem cast_descFactorial_succ (n k : ℕ) :
+    (n.descFactorial (k + 1) : ℝ) = ((n : ℝ) - k) * n.descFactorial k := by
+  rw [Nat.descFactorial_succ, Nat.cast_mul]
+  by_cases hk : k ≤ n
+  · rw [Nat.cast_sub hk]
+  · rw [Nat.descFactorial_eq_zero_iff_lt.mpr (not_le.mp hk)]
+    simp
+
+/-- The third descending factorial as a real polynomial. -/
+theorem cast_descFactorial_three (n : ℕ) :
+    (n.descFactorial 3 : ℝ) = n * (n - 1) * (n - 2) := by
+  have hstep : (n.descFactorial 3 : ℝ) = ((n : ℝ) - (2 : ℕ)) * n.descFactorial 2 :=
+    cast_descFactorial_succ n 2
+  rw [hstep, Nat.cast_descFactorial_two]
+  push_cast
+  ring
+
+/-- The fourth descending factorial as a real polynomial. -/
+theorem cast_descFactorial_four (n : ℕ) :
+    (n.descFactorial 4 : ℝ) = n * (n - 1) * (n - 2) * (n - 3) := by
+  have hstep : (n.descFactorial 4 : ℝ) = ((n : ℝ) - (3 : ℕ)) * n.descFactorial 3 :=
+    cast_descFactorial_succ n 3
+  rw [hstep, cast_descFactorial_three]
+  push_cast
+  ring
+
+/-- **The leading descending factorial ratio.** For `N ≥ 1` and `B ≤ 4`, the ratio
+`(N)_B / N ^ B` is `1 - C(B, 2) / N` to within `11 / N ^ 2`. -/
+theorem abs_descFactorial_div_pow_sub_le (N B : ℕ) (hN : 1 ≤ N) (hB : B ≤ 4) :
+    |(N.descFactorial B : ℝ) / (N : ℝ) ^ B - 1 + (B.choose 2 : ℝ) / N|
+      ≤ 11 / (N : ℝ) ^ 2 := by
+  have hNpos : (0 : ℝ) < N := by exact_mod_cast hN
+  have hNne : (N : ℝ) ≠ 0 := hNpos.ne'
+  have hN1 : (1 : ℝ) ≤ N := by exact_mod_cast hN
+  have hbound : (0 : ℝ) ≤ 11 / (N : ℝ) ^ 2 := by positivity
+  interval_cases B
+  · simpa using hbound
+  · simpa [hNne] using hbound
+  · have hval : (N.descFactorial 2 : ℝ) / (N : ℝ) ^ 2 - 1 + ((Nat.choose 2 2 : ℕ) : ℝ) / N
+        = 0 := by
+      rw [Nat.cast_descFactorial_two, Nat.choose_self, Nat.cast_one]
+      field_simp
+      ring
+    rw [hval, abs_zero]
+    exact hbound
+  · have hval : (N.descFactorial 3 : ℝ) / (N : ℝ) ^ 3 - 1 + ((Nat.choose 3 2 : ℕ) : ℝ) / N
+        = 2 / (N : ℝ) ^ 2 := by
+      rw [cast_descFactorial_three, show Nat.choose 3 2 = 3 by decide]
+      push_cast
+      field_simp
+      ring
+    rw [hval, abs_of_nonneg (by positivity), div_le_div_iff₀ (by positivity) (by positivity)]
+    nlinarith [sq_nonneg (N : ℝ)]
+  · have hval : (N.descFactorial 4 : ℝ) / (N : ℝ) ^ 4 - 1 + ((Nat.choose 4 2 : ℕ) : ℝ) / N
+        = (11 * (N : ℝ) - 6) / (N : ℝ) ^ 3 := by
+      rw [cast_descFactorial_four, show Nat.choose 4 2 = 6 by decide]
+      push_cast
+      field_simp
+      ring
+    rw [hval, abs_of_nonneg (div_nonneg (by linarith) (by positivity)),
+      div_le_div_iff₀ (by positivity) (by positivity)]
+    nlinarith [sq_nonneg (N : ℝ)]
+
+/-- **The subleading descending factorial ratio.** For `N ≥ 1` and `1 ≤ B ≤ 4`, the ratio
+`(N)_{B - 1} / N ^ B` is `1 / N` to within `3 / N ^ 2`. -/
+theorem abs_descFactorial_pred_div_pow_sub_le (N B : ℕ) (hN : 1 ≤ N) (hB1 : 1 ≤ B)
+    (hB : B ≤ 4) :
+    |(N.descFactorial (B - 1) : ℝ) / (N : ℝ) ^ B - 1 / N| ≤ 3 / (N : ℝ) ^ 2 := by
+  have hNpos : (0 : ℝ) < N := by exact_mod_cast hN
+  have hNne : (N : ℝ) ≠ 0 := hNpos.ne'
+  have hN1 : (1 : ℝ) ≤ N := by exact_mod_cast hN
+  have hbound : (0 : ℝ) ≤ 3 / (N : ℝ) ^ 2 := by positivity
+  interval_cases B
+  · simpa using hbound
+  · have hval : (N.descFactorial (2 - 1) : ℝ) / (N : ℝ) ^ 2 - 1 / N = 0 := by
+      rw [show 2 - 1 = 1 by rfl, Nat.descFactorial_one]
+      field_simp
+      ring
+    rw [hval, abs_zero]
+    exact hbound
+  · have hval : (N.descFactorial (3 - 1) : ℝ) / (N : ℝ) ^ 3 - 1 / N = -(1 / (N : ℝ) ^ 2) := by
+      rw [show 3 - 1 = 2 by rfl, Nat.cast_descFactorial_two]
+      field_simp
+      ring
+    rw [hval, abs_neg, abs_of_nonneg (by positivity),
+      div_le_div_iff₀ (by positivity) (by positivity)]
+    nlinarith [sq_nonneg (N : ℝ)]
+  · have hval : (N.descFactorial (4 - 1) : ℝ) / (N : ℝ) ^ 4 - 1 / N
+        = -((3 * (N : ℝ) - 2) / (N : ℝ) ^ 3) := by
+      rw [show 4 - 1 = 3 by rfl, cast_descFactorial_three]
+      field_simp
+      ring
+    rw [hval, abs_neg, abs_of_nonneg (div_nonneg (by linarith) (by positivity)),
+      div_le_div_iff₀ (by positivity) (by positivity)]
+    nlinarith [sq_nonneg (N : ℝ)]
+
+/-- The sub-multi-indices `j ≤ b`, over which the power moment of `b` is summed. -/
+def subIndices {H : Type*} [Fintype H] [DecidableEq H] (b : H → ℕ) : Finset (H → ℕ) :=
+  Fintype.piFinset fun a ↦ Finset.range (b a + 1)
+
+/-- The Stirling weight `∏_a S(b_a, j_a)` of a sub-multi-index `j` of `b`. -/
+def stirlingWeight {H : Type*} [Fintype H] (b j : H → ℕ) : ℝ :=
+  ∏ a, (Nat.stirlingSecond (b a) (j a) : ℝ)
+
+/-- The total Stirling weight below `b`, which controls the uniform remainder constant. -/
+def totalStirlingWeight {H : Type*} [Fintype H] [DecidableEq H] (b : H → ℕ) : ℝ :=
+  ∑ j ∈ subIndices b, stirlingWeight b j
+
+/-- The Stirling-weighted monomials exactly one degree below `b`. -/
+def firstOrderStirlingSum {H : Type*} [Fintype H] [DecidableEq H] (x : H → ℝ)
+    (b : H → ℕ) : ℝ :=
+  ∑ j ∈ (subIndices b).filter (fun j ↦ ∑ a, j a + 1 = ∑ a, b a),
+    stirlingWeight b j * ∏ a, x a ^ j a
+
+/-- The Stirling-weighted descending factorial moments at least two degrees below `b`. -/
+def lowOrderStirlingSum {H : Type*} [Fintype H] [DecidableEq H] (x : H → ℝ) (N : ℕ)
+    (b : H → ℕ) : ℝ :=
+  ∑ j ∈ ((subIndices b).filter (fun j ↦ ¬ ∑ a, j a + 1 = ∑ a, b a)).filter
+      (fun j ↦ ¬ ∑ a, j a = ∑ a, b a),
+    stirlingWeight b j * (N.descFactorial (∑ a, j a) : ℝ) * ∏ a, x a ^ j a
+
+/-- The first-order coefficient of the multinomial expansion of the monomial `x ^ b`: the
+Stirling-weighted monomials one degree below `b`, less `C(|b|, 2) x ^ b`. -/
+def monomialFirstOrder {H : Type*} [Fintype H] [DecidableEq H] (x : H → ℝ) (b : H → ℕ) :
+    ℝ :=
+  firstOrderStirlingSum x b - ((∑ a, b a).choose 2 : ℝ) * ∏ a, x a ^ b a
+
+/-- A sub-multi-index lies below its multi-index coordinatewise. -/
+theorem subIndices_le {H : Type*} [Fintype H] [DecidableEq H] {b j : H → ℕ}
+    (hj : j ∈ subIndices b) (a : H) : j a ≤ b a :=
+  Nat.lt_succ_iff.mp (Finset.mem_range.mp (Fintype.mem_piFinset.mp hj a))
+
+/-- A multi-index is one of its own sub-multi-indices. -/
+theorem mem_subIndices_self {H : Type*} [Fintype H] [DecidableEq H] (b : H → ℕ) :
+    b ∈ subIndices b :=
+  Fintype.mem_piFinset.mpr fun a ↦ Finset.mem_range.mpr (Nat.lt_succ_self (b a))
+
+/-- Stirling weights are nonnegative. -/
+theorem stirlingWeight_nonneg {H : Type*} [Fintype H] (b j : H → ℕ) :
+    0 ≤ stirlingWeight b j :=
+  Finset.prod_nonneg fun a _ ↦ Nat.cast_nonneg _
+
+/-- The Stirling weight of a multi-index against itself is one. -/
+theorem stirlingWeight_self {H : Type*} [Fintype H] (b : H → ℕ) : stirlingWeight b b = 1 := by
+  simp [stirlingWeight, Nat.stirlingSecond_self]
+
+/-- A monomial in the category probabilities is nonnegative. -/
+theorem categoryMonomial_nonneg {H : Type*} [Fintype H] (offspring : FiniteReportLaw H)
+    (j : H → ℕ) : 0 ≤ ∏ a, offspring.mass a ^ j a :=
+  Finset.prod_nonneg fun a _ ↦ pow_nonneg (offspring.mass_nonneg a) _
+
+/-- A monomial in the category probabilities is at most one. -/
+theorem categoryMonomial_le_one {H : Type*} [Fintype H] (offspring : FiniteReportLaw H)
+    (j : H → ℕ) : ∏ a, offspring.mass a ^ j a ≤ 1 := by
+  refine Finset.prod_le_one (fun a _ ↦ pow_nonneg (offspring.mass_nonneg a) _) fun a _ ↦ ?_
+  refine pow_le_one₀ (offspring.mass_nonneg a) ?_
+  rw [← offspring.mass_sum]
+  exact Finset.single_le_sum (fun c _ ↦ offspring.mass_nonneg c) (Finset.mem_univ a)
+
+/-- The first-order Stirling sum is nonnegative. -/
+theorem firstOrderStirlingSum_nonneg {H : Type*} [Fintype H] [DecidableEq H]
+    (offspring : FiniteReportLaw H) (b : H → ℕ) :
+    0 ≤ firstOrderStirlingSum offspring.mass b :=
+  Finset.sum_nonneg fun j _ ↦
+    mul_nonneg (stirlingWeight_nonneg b j) (categoryMonomial_nonneg offspring j)
+
+/-- The first-order Stirling sum is at most the total Stirling weight. -/
+theorem firstOrderStirlingSum_le {H : Type*} [Fintype H] [DecidableEq H]
+    (offspring : FiniteReportLaw H) (b : H → ℕ) :
+    firstOrderStirlingSum offspring.mass b ≤ totalStirlingWeight b := by
+  calc firstOrderStirlingSum offspring.mass b
+      ≤ ∑ j ∈ (subIndices b).filter (fun j ↦ ∑ a, j a + 1 = ∑ a, b a), stirlingWeight b j :=
+        Finset.sum_le_sum fun j _ ↦ mul_le_of_le_one_right (stirlingWeight_nonneg b j)
+          (categoryMonomial_le_one offspring j)
+    _ ≤ totalStirlingWeight b :=
+        Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset _ _)
+          fun j _ _ ↦ stirlingWeight_nonneg b j
+
+/-- A multi-index of degree zero has no sub-multi-index one degree below it. -/
+theorem firstOrderStirlingSum_of_sum_eq_zero {H : Type*} [Fintype H] [DecidableEq H]
+    (x : H → ℝ) (b : H → ℕ) (hb : ∑ a, b a = 0) : firstOrderStirlingSum x b = 0 := by
+  refine Finset.sum_eq_zero fun j hj ↦ ?_
+  have hsucc := (Finset.mem_filter.mp hj).2
+  exfalso
+  omega
+
+/-- The low-order Stirling sum is nonnegative. -/
+theorem lowOrderStirlingSum_nonneg {H : Type*} [Fintype H] [DecidableEq H]
+    (offspring : FiniteReportLaw H) (N : ℕ) (b : H → ℕ) :
+    0 ≤ lowOrderStirlingSum offspring.mass N b :=
+  Finset.sum_nonneg fun j _ ↦ mul_nonneg (mul_nonneg (stirlingWeight_nonneg b j)
+    (Nat.cast_nonneg _)) (categoryMonomial_nonneg offspring j)
+
+/-- Every term of the low-order Stirling sum is at least two degrees below `b`, so the sum is at
+most `N ^ (|b| - 2)` times the total Stirling weight. -/
+theorem lowOrderStirlingSum_mul_sq_le {H : Type*} [Fintype H] [DecidableEq H]
+    (offspring : FiniteReportLaw H) (N : ℕ) (hN : 1 ≤ N) (b : H → ℕ) :
+    lowOrderStirlingSum offspring.mass N b * (N : ℝ) ^ 2
+      ≤ totalStirlingWeight b * (N : ℝ) ^ (∑ a, b a) := by
+  have hN1 : (1 : ℝ) ≤ N := by exact_mod_cast hN
+  have hNnn : (0 : ℝ) ≤ N := by linarith
+  rw [lowOrderStirlingSum, totalStirlingWeight, Finset.sum_mul, Finset.sum_mul]
+  refine (Finset.sum_le_sum fun j hj ↦ ?_).trans
+    (Finset.sum_le_sum_of_subset_of_nonneg
+      ((Finset.filter_subset _ _).trans (Finset.filter_subset _ _))
+      fun j _ _ ↦ mul_nonneg (stirlingWeight_nonneg b j) (pow_nonneg hNnn _))
+  obtain ⟨hj', hjB⟩ := Finset.mem_filter.mp hj
+  obtain ⟨hjP, hj1⟩ := Finset.mem_filter.mp hj'
+  have hjle : ∑ a, j a ≤ ∑ a, b a := Finset.sum_le_sum fun a _ ↦ subIndices_le hjP a
+  have hj2 : ∑ a, j a + 2 ≤ ∑ a, b a := by omega
+  have hdesc : (N.descFactorial (∑ a, j a) : ℝ) ≤ (N : ℝ) ^ (∑ a, j a) := by
+    exact_mod_cast Nat.descFactorial_le_pow N _
+  calc stirlingWeight b j * (N.descFactorial (∑ a, j a) : ℝ) * (∏ a, offspring.mass a ^ j a)
+        * (N : ℝ) ^ 2
+      ≤ stirlingWeight b j * (N : ℝ) ^ (∑ a, j a) * 1 * (N : ℝ) ^ 2 := by
+        refine mul_le_mul_of_nonneg_right (mul_le_mul (mul_le_mul_of_nonneg_left hdesc
+          (stirlingWeight_nonneg b j)) (categoryMonomial_le_one offspring j)
+          (categoryMonomial_nonneg offspring j)
+          (mul_nonneg (stirlingWeight_nonneg b j) (pow_nonneg hNnn _))) (pow_nonneg hNnn _)
+    _ = stirlingWeight b j * (N : ℝ) ^ (∑ a, j a + 2) := by
+        rw [pow_add]
+        ring
+    _ ≤ stirlingWeight b j * (N : ℝ) ^ (∑ a, b a) :=
+        mul_le_mul_of_nonneg_left (pow_le_pow_right₀ hN1 hj2) (stirlingWeight_nonneg b j)
+
+/-- The monomial moment of the census proportions is the power moment divided by `N ^ |b|`. -/
+theorem expectation_monomial_eq {H : Type*} [Fintype H] [DecidableEq H]
+    (offspring : FiniteReportLaw H) (N : ℕ) (b : H → ℕ) :
+    (multinomialLaw offspring N).expectation
+        (fun counts ↦ ∏ a, ((counts.val a : ℝ) / N) ^ b a)
+      = (∑ j ∈ subIndices b, stirlingWeight b j * (N.descFactorial (∑ a, j a) : ℝ)
+          * ∏ a, offspring.mass a ^ j a) / (N : ℝ) ^ (∑ a, b a) := by
+  have hpoint : ∀ counts : Counts H N, ∏ a, ((counts.val a : ℝ) / N) ^ b a
+      = (∏ a, (counts.val a : ℝ) ^ b a) / (N : ℝ) ^ (∑ a, b a) := by
+    intro counts
+    rw [← Finset.prod_pow_eq_pow_sum, ← Finset.prod_div_distrib]
+    exact Finset.prod_congr rfl fun a _ ↦ div_pow _ _ _
+  calc (multinomialLaw offspring N).expectation
+        (fun counts ↦ ∏ a, ((counts.val a : ℝ) / N) ^ b a)
+      = (multinomialLaw offspring N).expectation
+          (fun counts ↦ ∏ a, (counts.val a : ℝ) ^ b a) / (N : ℝ) ^ (∑ a, b a) := by
+        simp only [FiniteReportLaw.expectation, hpoint, Finset.sum_div, mul_div_assoc]
+    _ = _ := by
+        rw [expectation_prod_pow]
+        rfl
+
+/-- The power moment sum separated by degree: the multi-index itself, the sub-multi-indices one
+degree below it, and the rest. -/
+theorem sum_subIndices_split {H : Type*} [Fintype H] [DecidableEq H] (x : H → ℝ) (N : ℕ)
+    (b : H → ℕ) :
+    ∑ j ∈ subIndices b, stirlingWeight b j * (N.descFactorial (∑ a, j a) : ℝ)
+        * ∏ a, x a ^ j a
+      = (N.descFactorial (∑ a, b a - 1) : ℝ) * firstOrderStirlingSum x b
+        + ((N.descFactorial (∑ a, b a) : ℝ) * ∏ a, x a ^ b a + lowOrderStirlingSum x N b) := by
+  rw [← Finset.sum_filter_add_sum_filter_not (subIndices b)
+      (fun j ↦ ∑ a, j a + 1 = ∑ a, b a),
+    ← Finset.sum_filter_add_sum_filter_not
+      ((subIndices b).filter (fun j ↦ ¬ ∑ a, j a + 1 = ∑ a, b a))
+      (fun j ↦ ∑ a, j a = ∑ a, b a)]
+  refine congrArg₂ (· + ·) ?_ (congrArg₂ (· + ·) ?_ rfl)
+  · rw [firstOrderStirlingSum, Finset.mul_sum]
+    refine Finset.sum_congr rfl fun j hj ↦ ?_
+    have hj1 : ∑ a, j a = ∑ a, b a - 1 := by
+      have hsucc := (Finset.mem_filter.mp hj).2
+      omega
+    rw [hj1]
+    ring
+  · rw [Finset.sum_eq_single_of_mem b]
+    · rw [stirlingWeight_self, one_mul]
+    · refine Finset.mem_filter.mpr ⟨Finset.mem_filter.mpr ⟨mem_subIndices_self b, ?_⟩, rfl⟩
+      omega
+    · intro j hj hne
+      exfalso
+      obtain ⟨hj', hjB⟩ := Finset.mem_filter.mp hj
+      have hjP := (Finset.mem_filter.mp hj').1
+      have heq := (Finset.sum_eq_sum_iff_of_le fun a _ ↦ subIndices_le hjP a).mp hjB
+      exact hne (funext fun a ↦ heq a (Finset.mem_univ a))
+
+/-- **NOTE1 (10) for monomials of degree at most four.** Under the multinomial census with `N`
+draws from the category law `x`, the expected monomial of the census proportions is
+`x ^ b + monomialFirstOrder x b / N` up to `(11 + 4 · totalStirlingWeight b) / N ^ 2`, uniformly
+in `x`, for every multi-index `b` of degree at most four. -/
+theorem abs_expectation_monomial_sub_le {H : Type*} [Fintype H] [DecidableEq H]
+    (offspring : FiniteReportLaw H) (N : ℕ) (hN : 1 ≤ N) (b : H → ℕ) (hb : ∑ a, b a ≤ 4) :
+    |(multinomialLaw offspring N).expectation
+          (fun counts ↦ ∏ a, ((counts.val a : ℝ) / N) ^ b a)
+        - ∏ a, offspring.mass a ^ b a - monomialFirstOrder offspring.mass b / N|
+      ≤ (11 + 4 * totalStirlingWeight b) / (N : ℝ) ^ 2 := by
+  have hNpos : (0 : ℝ) < N := by exact_mod_cast hN
+  have hm0 := categoryMonomial_nonneg offspring b
+  have hm1 := categoryMonomial_le_one offspring b
+  have hF0 := firstOrderStirlingSum_nonneg offspring b
+  have hF1 := firstOrderStirlingSum_le offspring b
+  have hG0 := lowOrderStirlingSum_nonneg offspring N b
+  have hG1 := lowOrderStirlingSum_mul_sq_le offspring N hN b
+  have hT1 := abs_descFactorial_div_pow_sub_le N (∑ a, b a) hN hb
+  have hT2 : |(N.descFactorial (∑ a, b a - 1) : ℝ) / (N : ℝ) ^ (∑ a, b a) - 1 / N|
+        * firstOrderStirlingSum offspring.mass b
+      ≤ 3 / (N : ℝ) ^ 2 * totalStirlingWeight b := by
+    by_cases hB0 : ∑ a, b a = 0
+    · rw [firstOrderStirlingSum_of_sum_eq_zero offspring.mass b hB0, mul_zero]
+      exact mul_nonneg (by positivity) (hF0.trans hF1)
+    · exact mul_le_mul (abs_descFactorial_pred_div_pow_sub_le N _ hN
+        (Nat.one_le_iff_ne_zero.mpr hB0) hb) hF1 hF0 (by positivity)
+  have hG : lowOrderStirlingSum offspring.mass N b / (N : ℝ) ^ (∑ a, b a)
+      ≤ totalStirlingWeight b / (N : ℝ) ^ 2 := by
+    rw [div_le_div_iff₀ (by positivity) (by positivity)]
+    exact hG1
+  have hidentity : (multinomialLaw offspring N).expectation
+          (fun counts ↦ ∏ a, ((counts.val a : ℝ) / N) ^ b a)
+        - ∏ a, offspring.mass a ^ b a - monomialFirstOrder offspring.mass b / N
+      = ((N.descFactorial (∑ a, b a) : ℝ) / (N : ℝ) ^ (∑ a, b a) - 1
+            + ((∑ a, b a).choose 2 : ℝ) / N) * ∏ a, offspring.mass a ^ b a
+        + ((N.descFactorial (∑ a, b a - 1) : ℝ) / (N : ℝ) ^ (∑ a, b a) - 1 / N)
+            * firstOrderStirlingSum offspring.mass b
+        + lowOrderStirlingSum offspring.mass N b / (N : ℝ) ^ (∑ a, b a) := by
+    rw [expectation_monomial_eq, sum_subIndices_split, monomialFirstOrder]
+    ring
+  rw [hidentity]
+  refine (abs_add_le _ _).trans ?_
+  refine (add_le_add_right (abs_add_le _ _) _).trans ?_
+  rw [abs_mul, abs_mul, abs_of_nonneg hm0, abs_of_nonneg hF0,
+    abs_of_nonneg (div_nonneg hG0 (by positivity))]
+  calc |(N.descFactorial (∑ a, b a) : ℝ) / (N : ℝ) ^ (∑ a, b a) - 1
+          + ((∑ a, b a).choose 2 : ℝ) / N| * ∏ a, offspring.mass a ^ b a
+        + |(N.descFactorial (∑ a, b a - 1) : ℝ) / (N : ℝ) ^ (∑ a, b a) - 1 / N|
+          * firstOrderStirlingSum offspring.mass b
+        + lowOrderStirlingSum offspring.mass N b / (N : ℝ) ^ (∑ a, b a)
+      ≤ 11 / (N : ℝ) ^ 2 * 1 + 3 / (N : ℝ) ^ 2 * totalStirlingWeight b
+        + totalStirlingWeight b / (N : ℝ) ^ 2 :=
+        add_le_add (add_le_add (mul_le_mul hT1 hm1 hm0 (by positivity)) hT2) hG
+    _ = (11 + 4 * totalStirlingWeight b) / (N : ℝ) ^ 2 := by ring
 
 end
 
