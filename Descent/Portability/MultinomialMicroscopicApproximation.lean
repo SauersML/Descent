@@ -67,6 +67,7 @@ open Coalescent
 open Descent.Portability.FiniteMixtureKernel
 open Descent.Portability.FiniteReproductiveKernel
 open Descent.Portability.RealizationBody
+open Descent.Portability.PulseJetExpansion
 open Descent.Portability.PulseStageKernel
 open Descent.Portability.EnlargedLowOrderLDGenerator
 open Descent.Portability.TwoLocusMicroscopicKernel
@@ -177,12 +178,13 @@ theorem exp_mulVec_mem_realizationBody_of_stepIndexed {ι X : Type*} [Fintype ι
       w ∈ realizationBody φ ∧ ‖w - (u + h • A.mulVec u)‖ ≤ h * approx.error h := by
     intro h u
     by_cases hcase : 0 < h ∧ u ∈ realizationBody φ
-    · obtain ⟨Ω, hΩ, p, point, hp, hsum, hfeature⟩ := (mem_realizationBody_iff φ u).mp hcase.2
-      refine ⟨pushforwardFeature (approx.kernel h hcase.1) p point φ, fun _ _ ↦
+    · obtain ⟨hpositive, hmember⟩ := hcase
+      obtain ⟨Ω, hΩ, p, point, hp, hsum, hfeature⟩ := (mem_realizationBody_iff φ u).mp hmember
+      refine ⟨pushforwardFeature (approx.kernel h hpositive) p point φ, fun _ _ ↦
         ⟨pushforwardFeature_mem_realizationBody _ p hp hsum point φ, ?_⟩⟩
-      rw [← hfeature]
+      subst hfeature
       exact pushforwardFeature_sub_euler_le _ p hp hsum point φ A h _
-        (mul_nonneg hcase.1.le (approx.error_nonneg h)) (approx.expansion h hcase.1)
+        (mul_nonneg hpositive.le (approx.error_nonneg h)) (approx.expansion h hpositive)
     · exact ⟨u, fun hpositive hmember ↦ absurd ⟨hpositive, hmember⟩ hcase⟩
   choose step hstepspec using hstep
   exact EulerInvariantSet.exp_mulVec_mem_of_euler_approx (realizationBody φ) hclosed A step
@@ -203,23 +205,26 @@ def reindexKernel {B C X : Type*} [Fintype B] [Fintype C] (K : FiniteMixtureKern
     · obtain ⟨b, rfl⟩ := hc
       rw [hembedding.extend_apply]
       exact K.weight_nonneg x b
-    · rw [Function.extend_apply' _ _ _ hc]
-      exact le_refl 0
+    · simp only [Function.extend_apply' _ _ _ hc, Pi.zero_apply, le_refl]
   weight_sum x := by
     rw [← K.weight_sum x]
-    exact (Fintype.sum_of_injective embedding hembedding (K.weight x) _
-      (fun c hc ↦ Function.extend_apply' _ _ _ hc)
-      (fun b ↦ (hembedding.extend_apply _ _ b).symm)).symm
+    refine (Fintype.sum_of_injective embedding hembedding (K.weight x)
+      (Function.extend embedding (K.weight x) 0) (fun c hc ↦ ?_)
+      (fun b ↦ (hembedding.extend_apply (K.weight x) 0 b).symm)).symm
+    rw [Set.mem_range] at hc
+    rw [Function.extend_apply' (K.weight x) 0 c hc, Pi.zero_apply]
 
 /-- Reindexing the branches does not change the kernel action. -/
 theorem apply_reindexKernel {B C X : Type*} [Fintype B] [Fintype C] (K : FiniteMixtureKernel B X)
     (embedding : B → C) (hembedding : Function.Injective embedding) (f : X → ℝ) (x : X) :
     (reindexKernel K embedding hembedding).apply f x = K.apply f x := by
   simp only [FiniteMixtureKernel.apply]
-  refine (Fintype.sum_of_injective embedding hembedding _ _ (fun c hc ↦ ?_) (fun b ↦ ?_)).symm
-  · show Function.extend embedding (K.weight x) 0 c *
-        f (Function.extend embedding K.move (fun _ ↦ id) c x) = 0
-    rw [Function.extend_apply' _ _ _ hc, Pi.zero_apply, zero_mul]
+  refine (Fintype.sum_of_injective embedding hembedding
+    (fun b ↦ K.weight x b * f (K.move b x))
+    (fun c ↦ Function.extend embedding (K.weight x) 0 c *
+      f (Function.extend embedding K.move (fun _ ↦ id) c x)) (fun c hc ↦ ?_) (fun b ↦ ?_)).symm
+  · rw [Set.mem_range] at hc
+    simp only [Function.extend_apply' (K.weight x) 0 c hc, Pi.zero_apply, zero_mul]
   · show K.weight x b * f (K.move b x) = Function.extend embedding (K.weight x) 0 (embedding b) *
         f (Function.extend embedding K.move (fun _ ↦ id) (embedding b) x)
     rw [hembedding.extend_apply, hembedding.extend_apply]
@@ -412,13 +417,15 @@ theorem multinomialMicroscopicKernel_expansion {D : ℕ} (rates : ManyDemeLDRate
         step * ∑ stage : Stage D,
           stageDrift rates (enlargedStageExpansion coordinate) stage state| ≤
       step * ∑ stage : Stage D,
-        multinomialStageSlack rates coordinate stage (Fintype.card (Stage D) * step) :=
-  apply_uniformSigmaMixture_expansion _
+        multinomialStageSlack rates coordinate stage (Fintype.card (Stage D) * step) := by
+  have htau : 0 < (Fintype.card (Stage D) : ℝ) * step := mul_pos (card_stage_real_pos deme) hstep
+  simp only [multinomialMicroscopicKernel]
+  refine apply_uniformSigmaMixture_expansion
+    (multinomialStageKernel rates (Fintype.card (Stage D) * step) htau)
     (fun stage ↦ stageDrift rates (enlargedStageExpansion coordinate) stage)
     (fun stage ↦ multinomialStageSlack rates coordinate stage (Fintype.card (Stage D) * step))
-    (card_stage_pos deme) _ state step fun stage ↦
-      apply_multinomialStageKernel_expansion rates coordinate stage _
-        (mul_pos (card_stage_real_pos deme) hstep) state
+    (card_stage_pos deme) (enlargedCoordinateJet coordinate).value state step fun stage ↦ ?_
+  exact apply_multinomialStageKernel_expansion rates coordinate stage _ htau state
 
 /-- The total slack of one multinomial microscopic step over every enlarged coordinate and every
 stage, made nonnegative by the absolute value. -/
