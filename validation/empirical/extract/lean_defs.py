@@ -2136,7 +2136,7 @@ def treeDistance(_t, a, b):
 def expectedPanSize(θ, base, mSample):
     return (base + expectedSegregatingSites(θ, mSample))
 
-def Compatible(P, z):
+def Descent_Pangenome_HaplotypeGluing_TwoChartPanel_Compatible(P, z):
     return (_rt._proj(P, 'leftOverlap')(_rt._proj(z, '1')) == _rt._proj(P, 'rightOverlap')(_rt._proj(z, '2')))
 
 def probabilisticGluingResidual(joint, leftMarginal, rightMarginal):
