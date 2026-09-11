@@ -185,9 +185,10 @@ def exampleDefined : Fin 3 → Prop := fun value ↦ value ≠ 0
 
 instance : DecidablePred exampleDefined := fun value ↦ inferInstanceAs (Decidable (value ≠ 0))
 
-/-- The reported metric of the compiled example: the defined outcomes carry the values zero
-and one, and the undefined outcome carries no value. -/
-def exampleMetric : Fin 3 → ℝ := ![0, 0, 1]
+/-- The reported metric of the compiled example: one on the successful defined outcome and
+zero on the other two reports, so the conditional mean is the success rate among the defined
+reports. -/
+def exampleMetric : Fin 3 → ℝ := fun value ↦ if value = 2 then 1 else 0
 
 /-- The first genotype reports the undefined outcome half the time and the value zero
 otherwise. -/
@@ -228,7 +229,8 @@ theorem exampleStratumMean_values : exampleStratumMean 0 = 0 ∧ exampleStratumM
       FiniteReportLaw.expectation, exampleReportKernel, exampleHalfDefinedReport,
       exampleCertainReport, exampleDefined, exampleMetric, Fin.sum_univ_three,
       Matrix.cons_val_two, Matrix.head_cons, Matrix.tail_cons,
-      (show (2 : Fin 3) ≠ 0 by decide)]
+      (show (2 : Fin 3) ≠ 0 by decide), (show (0 : Fin 3) ≠ 2 by decide),
+      (show (1 : Fin 3) ≠ 2 by decide)]
 
 /-- The compiled conditional mean of the example is six sevenths. -/
 theorem examplePooledMean_eq : examplePooledMean = 6 / 7 := by
@@ -237,7 +239,8 @@ theorem examplePooledMean_eq : examplePooledMean = 6 / 7 := by
     exampleReportKernel, exampleHalfDefinedReport, exampleCertainReport, exampleDefined,
     exampleMetric, Fin.sum_univ_three, Fin.sum_univ_two,
     Matrix.cons_val_two, Matrix.head_cons, Matrix.tail_cons,
-    (show (2 : Fin 3) ≠ 0 by decide)]
+    (show (2 : Fin 3) ≠ 0 by decide), (show (0 : Fin 3) ≠ 2 by decide),
+    (show (1 : Fin 3) ≠ 2 by decide)]
 
 /-- **The compiled conditional mean is not the unweighted average of the within-stratum
 conditional means**; NOTE1 §4.3. -/

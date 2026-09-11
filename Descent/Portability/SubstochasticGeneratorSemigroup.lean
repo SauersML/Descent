@@ -363,7 +363,7 @@ theorem substochastic_absEpochProduct (epochs : List ((ι → ι → ℝ) × ℝ
     SubstochasticMatrix
       (epochs.map fun epoch ↦
         matrixExponential (jumpGenerator fun source target ↦ |epoch.1 source target|)
-          |epoch.2|).prod := by
+          (|epoch.2|)).prod := by
   refine substochastic_listProd _ ?_
   intro P hP
   obtain ⟨epoch, _, rfl⟩ := List.mem_map.mp hP

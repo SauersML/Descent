@@ -107,7 +107,7 @@ needs. -/
 def singleLocusType [DecidableEq Locus] (i : Deme) (ℓ₀ : Locus) (a : Allele ℓ₀) :
     PartialType Deme Locus Allele where
   deme := i
-  allele := Function.update (fun _ ↦ none) ℓ₀ (some a)
+  allele := Function.update (fun ℓ ↦ (none : Option (Allele ℓ))) ℓ₀ (some a)
   retained := ⟨ℓ₀, by simp⟩
 
 /-- The material load of a configuration at a locus: the number of carriers retaining it.

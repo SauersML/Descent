@@ -9,6 +9,7 @@ open Descent.Portability.PartialHaplotypeCarrier
 
 #print axioms PartialType.eq_of_fields
 #print axioms load_cons
+#print axioms load_singleLocusType
 #print axioms withinBudget_zero
 #print axioms withinBudget_fullType
 #print axioms withinBudget_of_le

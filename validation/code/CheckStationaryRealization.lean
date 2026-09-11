@@ -20,6 +20,9 @@ namespace Descent.Portability.StationaryRealization
 #print axioms oneDemeStationaryVector
 #print axioms oneDemeStationaryVector_solves
 #print axioms oneDemeStationaryVector_eq_neg_inv_mulVec
+#print axioms oneDemeCoordinate
+#print axioms augmentedGenerator_eq_stationaryMatrix
+#print axioms augmentedGenerator_none_eq_stationaryForcing
 #print axioms stationary_mem_of_orbit_mem
 #print axioms oneDemeStationaryVector_mem_of_orbit_mem
 

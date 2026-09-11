@@ -12,6 +12,7 @@ open Descent.Portability.SubstochasticGeneratorSemigroup
 #print axioms substochastic_pow
 #print axioms substochastic_listProd
 #print axioms killingGenerator_jumpGenerator
+#print axioms killingGenerator_absJumpGenerator
 #print axioms killingGenerator_uniformKilling
 #print axioms exponential_rowSum_eq_tsum
 #print axioms exponential_rowSum_summable
@@ -21,6 +22,7 @@ open Descent.Portability.SubstochasticGeneratorSemigroup
 #print axioms matrixExponential_scalar_shift
 #print axioms matrixExponential_substochastic
 #print axioms substochastic_epochProduct
+#print axioms substochastic_absEpochProduct
 #print axioms exponential_rowSum_eq_one
 #print axioms matrixExponential_mulVec_const
 #print axioms substochastic_uniformization

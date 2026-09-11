@@ -45,6 +45,12 @@ turns the affine equation into `B (average) + b = (w T - w 0)/T`; the orbit is b
 it stays in a bounded set, so the right side tends to zero and the averages converge to
 `-B⁻¹ b`, which the set contains because it is closed.
 
+`augmentedGenerator_eq_stationaryMatrix` and `augmentedGenerator_none_eq_stationaryForcing`
+identify (14) with the corpus generator itself: the homogeneous block of
+`Coalescent.augmentedLowOrderLDGenerator` at one deme, read in the order `(H, DD, Dz, pi2)`,
+is `B`, and its affine column is `b`. So (14) is not a separate model of the one-deme system
+but a transcription of the corpus one.
+
 `oneDemeStationaryVector_mem_of_orbit_mem` is NOTE1 Theorem 3 for the corpus vector: any
 convex closed bounded set containing a forward orbit of the one-deme system (14) contains the
 corpus stationary state. In the intended application that set is the one-deme realization
@@ -187,6 +193,47 @@ theorem oneDemeStationaryVector_eq_neg_inv_mulVec (rates : ManyDemeLDRates 1) :
     _ = -((oneDemeStationaryMatrix rates)⁻¹.mulVec
           (stationaryForcing (rates.mutation 0))) := by
         rw [hsolve, Matrix.mulVec_neg]
+
+/-- The four non-constant coordinates of the one-deme low-order family, in the order
+`(H, DD, Dz, pi2)` of NOTE1 (14). -/
+def oneDemeCoordinate : Fin 4 → LowOrderLDCoordinate 1
+  | 0 => .H 0 0
+  | 1 => .DD 0 0
+  | 2 => .Dz 0 0 0
+  | 3 => .pi2 0 0 0 0
+
+/-- **NOTE1 (14) is the corpus generator.** The homogeneous block of the corpus augmented
+one-deme generator, read in the coordinate order `(H, DD, Dz, pi2)`, is exactly the matrix
+`B` of NOTE1 (14). Nothing is postulated: the corpus drift, migration, recombination,
+mutation-coupling and recurrent-damping rows are evaluated on the coordinate basis and the
+entries agree. -/
+theorem augmentedGenerator_eq_stationaryMatrix (rates : ManyDemeLDRates 1)
+    (row col : Fin 4) :
+    augmentedLowOrderLDGenerator rates (some (oneDemeCoordinate row))
+        (some (oneDemeCoordinate col))
+      = oneDemeStationaryMatrix rates row col := by
+  have hmig : ∀ i j : Fin 1, rates.migration i j = 0 := by
+    intro i j
+    have hij : i = j := Subsingleton.elim i j
+    subst hij
+    exact rates.migration_self i
+  fin_cases row <;> fin_cases col <;>
+    simp [augmentedLowOrderLDGenerator, lowOrderLDHomogeneousGenerator, lowOrderLDDrift,
+      lowOrderLDMigration, lowOrderLDRecombination, lowOrderLDMutationCoupling,
+      lowOrderLDRecurrentMutationDamping, lowOrderLDBasis, oneDemeCoordinate,
+      oneDemeStationaryMatrix, stationaryMatrix, hmig] <;>
+    ring
+
+/-- The affine column of the corpus augmented one-deme generator is exactly the forcing
+vector `b` of NOTE1 (14): mutation influx into the heterozygosity coordinate only. -/
+theorem augmentedGenerator_none_eq_stationaryForcing (rates : ManyDemeLDRates 1)
+    (row : Fin 4) :
+    augmentedLowOrderLDGenerator rates (some (oneDemeCoordinate row)) none
+      = stationaryForcing (rates.mutation 0) row := by
+  fin_cases row <;>
+    simp [augmentedLowOrderLDGenerator, lowOrderLDMutationForcing, oneDemeCoordinate,
+      stationaryForcing] <;>
+    ring
 
 section CesaroLimit
 
