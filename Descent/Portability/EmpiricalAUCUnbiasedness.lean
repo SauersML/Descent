@@ -391,6 +391,7 @@ theorem prod_pinMarker {n : ℕ} (first second : Fin n) (hne : first ≠ second)
   have hexchange := prod_exchange_two first second hne (fun _ ↦ (1 : ℝ))
     (fun member ↦ pinMarker first second firstValue secondValue member (scores member))
     fun member hfirst hsecond ↦ pinMarker_other first second member hfirst hsecond _ _ _
+  simp only [] at hexchange
   rw [Finset.prod_const_one, pinMarker_first, pinMarker_second first second hne] at hexchange
   simpa using hexchange
 
@@ -436,6 +437,7 @@ theorem sum_prod_pinned {n : ℕ} (first second : Fin n) (hne : first ≠ second
       weight member value * pinMarker first second firstValue secondValue member value)
     (fun member hfirst hsecond ↦ Finset.sum_congr rfl fun value _ ↦ by
       rw [pinMarker_other first second member hfirst hsecond, mul_one])
+  simp only [] at hexchange
   rw [hpinnedFirst, hpinnedSecond] at hexchange
   rw [Finset.sum_congr rfl fun scores _ ↦ hpointwise scores, hmarginal]
   exact hexchange
@@ -479,10 +481,14 @@ theorem sum_prod_pair {n : ℕ} (first second : Fin n) (hne : first ≠ second)
     intro u v
     have hpinned := sum_prod_pinned first second hne weight u v
     linear_combination pairValue u v * hpinned
-  rw [hswap, Finset.sum_mul, Finset.mul_sum]
-  refine Finset.sum_congr rfl fun u _ ↦ ?_
-  rw [Finset.sum_mul, Finset.mul_sum]
-  exact Finset.sum_congr rfl fun v _ ↦ hterm u v
+  have hone := hterm true true
+  have htwo := hterm true false
+  have hthree := hterm false true
+  have hfour := hterm false false
+  simp only [Fintype.sum_bool] at hone htwo hthree hfour
+  rw [hswap]
+  simp only [Fintype.sum_bool]
+  linear_combination hone + htwo + hthree + hfour
 
 /-- The pair count determined by the outcome vector of a cohort. -/
 noncomputable def outcomePairMass {n : ℕ} (outcomes : Fin n → Bool) : ℝ :=
@@ -516,7 +522,7 @@ theorem outcome_fiber_numerator (law : FiniteReportLaw (Bool × Bool)) {n : ℕ}
     (outcomes : Fin n → Bool) :
     outcomeMass law true * outcomeMass law false *
         ∑ scores : Fin n → Bool, (∏ member, law.mass (scores member, outcomes member)) *
-          empiricalAUCNumerator fun member ↦ (scores member, outcomes member) =
+          empiricalAUCNumerator (fun member ↦ (scores member, outcomes member)) =
       law.binaryAUCNumerator scoreOf caseOf * outcomePairMass outcomes *
         ∏ member, outcomeMass law (outcomes member) := by
   have hmarginal : ∀ member : Fin n,
@@ -534,7 +540,7 @@ theorem outcome_fiber_numerator (law : FiniteReportLaw (Bool × Bool)) {n : ℕ}
           (law.binaryAUCNumerator scoreOf caseOf *
             ∏ member, outcomeMass law (outcomes member)) := by
     intro caseMember controlMember
-    by_cases hpair : outcomes caseMember && !outcomes controlMember = true
+    by_cases hpair : (outcomes caseMember && !outcomes controlMember) = true
     · obtain ⟨hcase, hcontrol⟩ := (caseControl_iff _ _).mp hpair
       have hne : caseMember ≠ controlMember := by
         intro heq
@@ -590,15 +596,16 @@ theorem outcome_fiber_numerator (law : FiniteReportLaw (Bool × Bool)) {n : ℕ}
           else 0) := by
     simp only [hnumerator, Finset.mul_sum]
     rw [Finset.sum_comm]
-    exact Finset.sum_congr rfl fun caseMember _ ↦ Finset.sum_comm _ _ _
+    refine Finset.sum_congr rfl fun caseMember _ ↦ ?_
+    rw [Finset.sum_comm]
   have houter : ∀ caseMember : Fin n,
       outcomeMass law true * outcomeMass law false *
-          ∑ controlMember : Fin n, ∑ scores : Fin n → Bool,
+          (∑ controlMember : Fin n, ∑ scores : Fin n → Bool,
             (∏ member, law.mass (scores member, outcomes member)) *
               (if outcomes caseMember && !outcomes controlMember then
                 empiricalAUCComparison (alleleValue (scores caseMember))
                   (alleleValue (scores controlMember))
-              else 0) =
+              else 0)) =
         ∑ controlMember : Fin n,
           (if outcomes caseMember && !outcomes controlMember then (1 : ℝ) else 0) *
             (law.binaryAUCNumerator scoreOf caseOf *
@@ -606,6 +613,17 @@ theorem outcome_fiber_numerator (law : FiniteReportLaw (Bool × Bool)) {n : ℕ}
     intro caseMember
     rw [Finset.mul_sum]
     exact Finset.sum_congr rfl fun controlMember _ ↦ hterm caseMember controlMember
+  have hfactorInner : ∀ caseMember : Fin n,
+      (∑ controlMember : Fin n,
+        (if outcomes caseMember && !outcomes controlMember then (1 : ℝ) else 0) *
+          (law.binaryAUCNumerator scoreOf caseOf *
+            ∏ member, outcomeMass law (outcomes member))) =
+      (∑ controlMember : Fin n,
+        if outcomes caseMember && !outcomes controlMember then (1 : ℝ) else 0) *
+        (law.binaryAUCNumerator scoreOf caseOf *
+          ∏ member, outcomeMass law (outcomes member)) := by
+    intro caseMember
+    rw [Finset.sum_mul]
   have hfactor : (∑ caseMember : Fin n, ∑ controlMember : Fin n,
       (if outcomes caseMember && !outcomes controlMember then (1 : ℝ) else 0) *
         (law.binaryAUCNumerator scoreOf caseOf *
@@ -615,7 +633,7 @@ theorem outcome_fiber_numerator (law : FiniteReportLaw (Bool × Bool)) {n : ℕ}
         (law.binaryAUCNumerator scoreOf caseOf *
           ∏ member, outcomeMass law (outcomes member)) := by
     rw [Finset.sum_mul]
-    exact Finset.sum_congr rfl fun caseMember _ ↦ (Finset.sum_mul _ _ _).symm
+    exact Finset.sum_congr rfl fun caseMember _ ↦ hfactorInner caseMember
   rw [hswap, Finset.mul_sum, Finset.sum_congr rfl fun caseMember (_ : caseMember ∈ Finset.univ) ↦
     houter caseMember, hfactor, hcount]
   ring
@@ -672,7 +690,7 @@ theorem auc_numerator_identity (law : FiniteReportLaw (Bool × Bool)) (n : ℕ) 
       law.binaryAUCNumerator scoreOf caseOf *
         (cohortLaw law n).expectation aucDefinedIndicator := by
   rw [cohort_expectation_split law n
-      fun sample ↦ empiricalAUC sample * aucDefinedIndicator sample,
+      (fun sample ↦ empiricalAUC sample * aucDefinedIndicator sample),
     cohort_expectation_split law n aucDefinedIndicator, Finset.mul_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun outcomes _ ↦ ?_
   have hdelta : (∑ scores : Fin n → Bool,
@@ -680,6 +698,7 @@ theorem auc_numerator_identity (law : FiniteReportLaw (Bool × Bool)) (n : ℕ) 
         aucDefinedIndicator fun member ↦ (scores member, outcomes member)) =
       (∏ member, outcomeMass law (outcomes member)) * outcomeDefinedIndicator outcomes := by
     rw [← sum_prod_mass law outcomes, Finset.sum_mul]
+    rfl
   rw [hdelta]
   exact outcome_fiber_identity law outcomes
 
