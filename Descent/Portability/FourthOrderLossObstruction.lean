@@ -59,7 +59,7 @@ def contextWeight (par : Bool) (θ : ℝ) (z : EffectContext) : ℝ :=
 /-- Both parity classes carry total mass one. -/
 theorem parityWeight_sum (par : Bool) : ∑ z, parityWeight par z = 1 := by
   cases par <;>
-    simp [parityWeight, evenParity, Fintype.sum_prod_type, Fintype.sum_bool] <;> norm_num
+    simp [parityWeight, evenParity, Fintype.sum_prod_type] <;> norm_num
 
 /-- Each latent context weight is nonnegative when the mixing weight is a probability. -/
 theorem contextWeight_nonneg (par : Bool) (θ : ℝ) (h0 : 0 ≤ θ) (h1 : θ ≤ 1)
@@ -74,8 +74,7 @@ theorem contextWeight_nonneg (par : Bool) (θ : ℝ) (h0 : 0 ≤ θ) (h1 : θ �
 /-- The latent context weights sum to one. -/
 theorem contextWeight_sum (par : Bool) (θ : ℝ) : ∑ z, contextWeight par θ z = 1 := by
   cases par <;>
-    simp [contextWeight, parityWeight, evenParity, Fintype.sum_prod_type,
-      Fintype.sum_bool] <;> ring
+    simp [contextWeight, parityWeight, evenParity, Fintype.sum_prod_type] <;> ring
 
 /-- The conditional latent-context expectation inside one distance cell. -/
 def contextExp (par : Bool) (θ : ℝ) (h0 : 0 ≤ θ) (h1 : θ ≤ 1) :
@@ -155,31 +154,31 @@ theorem noise_loss_second_moment (d : Fin 2) (z : EffectContext) :
 theorem parity_effectMean (par : Bool) :
     ∑ z, parityWeight par z * effectMean z = 0 := by
   cases par <;>
-    simp [parityWeight, evenParity, effectMean, effectSign, Fintype.sum_prod_type,
-      Fintype.sum_bool] <;> norm_num
+    simp [parityWeight, evenParity, effectMean, effectSign,
+      Fintype.sum_prod_type] <;> norm_num
 
 /-- Second moment of the mean effect sign is `1/4` under either parity class: the two
 models share every second-order effect summary. -/
 theorem parity_effectMean_sq (par : Bool) :
     ∑ z, parityWeight par z * effectMean z ^ 2 = 1 / 4 := by
   cases par <;>
-    simp [parityWeight, evenParity, effectMean, effectSign, Fintype.sum_prod_type,
-      Fintype.sum_bool] <;> norm_num
+    simp [parityWeight, evenParity, effectMean, effectSign,
+      Fintype.sum_prod_type] <;> norm_num
 
 /-- Fourth moments of the mean effect sign separate the two parity classes: `1/4`
 against `1/16`. This is the fourth-order coordinate the report depends on. -/
 theorem parity_effectMean_fourth (par : Bool) :
     ∑ z, parityWeight par z * effectMean z ^ 4 = if par then 1 / 4 else 1 / 16 := by
   cases par <;>
-    simp [parityWeight, evenParity, effectMean, effectSign, Fintype.sum_prod_type,
-      Fintype.sum_bool] <;> norm_num
+    simp [parityWeight, evenParity, effectMean, effectSign,
+      Fintype.sum_prod_type] <;> norm_num
 
 /-- Conditional second moment of loss under a parity class: `8` against `35/4`. -/
 theorem parity_lossSecondMoment (par : Bool) :
     ∑ z, parityWeight par z * lossSecondMoment z = if par then 8 else 35 / 4 := by
   cases par <;>
     simp [parityWeight, evenParity, lossSecondMoment, effectMean, effectSign,
-      Fintype.sum_prod_type, Fintype.sum_bool] <;> norm_num
+      Fintype.sum_prod_type] <;> norm_num
 
 /-- **Every joint law of at most three effect signs agrees between the two models.**
 Each of the four three-coordinate marginals is uniform under both parity classes, so
@@ -194,7 +193,7 @@ theorem three_sign_marginals_agree (g : Bool → Bool → Bool → ℝ) :
       (∑ z, parityWeight true z * g z.2.1 z.2.2.1 z.2.2.2 =
         ∑ z, parityWeight false z * g z.2.1 z.2.2.1 z.2.2.2) := by
   refine ⟨?_, ?_, ?_, ?_⟩ <;>
-    simp [parityWeight, evenParity, Fintype.sum_prod_type, Fintype.sum_bool] <;> ring
+    simp [parityWeight, evenParity, Fintype.sum_prod_type] <;> ring
 
 /-- Expectation against the cell context law of a function vanishing at the
 all-positive state reduces to `θ` times its parity-class average. -/
@@ -203,9 +202,16 @@ theorem cellExp_apply (par : Bool) (d : Fin 2) (f : EffectContext → ℝ) :
       (1 - cellTheta d) * f (true, true, true, true) +
         cellTheta d * ∑ z, parityWeight par z * f z := by
   show ∑ z, contextWeight par (cellTheta d) z * f z = _
-  simp only [contextWeight, add_mul, Finset.sum_add_distrib, ← Finset.mul_sum,
-    ite_mul, one_mul, zero_mul]
-  rw [Finset.sum_ite_eq' Finset.univ ((true, true, true, true) : EffectContext) f]
+  have hsplit : ∀ z : EffectContext, contextWeight par (cellTheta d) z * f z =
+      (1 - cellTheta d) *
+          (if z = ((true, true, true, true) : EffectContext) then f z else 0) +
+        cellTheta d * (parityWeight par z * f z) := by
+    intro z
+    unfold contextWeight
+    split_ifs <;> ring
+  rw [Finset.sum_congr rfl fun z _ ↦ hsplit z, Finset.sum_add_distrib,
+    ← Finset.mul_sum, ← Finset.mul_sum,
+    Finset.sum_ite_eq' Finset.univ ((true, true, true, true) : EffectContext) f]
   simp
 
 /-- Cellwise mean individual loss is `2θ_d` in both models: identical mean squared
@@ -227,7 +233,10 @@ theorem cell_loss_mean (par : Bool) (d : Fin 2) :
       exact Finset.sum_congr rfl fun z _ ↦ by ring
     rw [this, h1, h2]; ring
   rw [hsum]
-  norm_num [effectMean, effectSign]
+  have h1 : effectMean (true, true, true, true) = 1 := by
+    norm_num [effectMean, effectSign]
+  rw [h1]
+  ring
 
 /-- Cellwise second moment of individual loss: `8θ_d` in model `E`, `(35/4)θ_d` in
 model `O`. This is the first summary at which the two models separate. -/
@@ -315,7 +324,8 @@ theorem cell_score_mean (par : Bool) (d : Fin 2) :
   have hfun : (fun z ↦ uniformExp (Bool × Bool)
       (fun p ↦ score (d, (z, p)))) = fun _ : EffectContext ↦ (0 : ℝ) := by
     funext z
-    simp [uniformExp_apply, Fintype.sum_prod_type, Fintype.sum_bool, score, effectSign]
+    simp [uniformExp_apply, Fintype.sum_prod_type, score, effectSign]
+    norm_num
   rw [hfun, cellExp_apply]
   simp
 
@@ -327,7 +337,7 @@ theorem cell_outcome_mean (par : Bool) (d : Fin 2) :
   have hfun : (fun z ↦ uniformExp (Bool × Bool)
       (fun p ↦ outcome (d, (z, p)))) = fun _ : EffectContext ↦ (0 : ℝ) := by
     funext z
-    simp [uniformExp_apply, Fintype.sum_prod_type, Fintype.sum_bool, outcome, effectSign]
+    simp [uniformExp_apply, Fintype.sum_prod_type, outcome, effectSign]
     ring
   rw [hfun, cellExp_apply]
   simp
@@ -345,7 +355,7 @@ theorem cell_second_moments (par : Bool) (d : Fin 2) :
     have hfun : (fun z ↦ uniformExp (Bool × Bool)
         (fun p ↦ score (d, (z, p)) ^ 2)) = fun _ : EffectContext ↦ (1 : ℝ) := by
       funext z
-      simp [uniformExp_apply, Fintype.sum_prod_type, Fintype.sum_bool, score, effectSign]
+      simp [uniformExp_apply, score, effectSign]
     rw [hfun, cellExp_apply, ← Finset.sum_mul, parityWeight_sum]
     ring
   · show cellExp par d (fun z ↦ uniformExp (Bool × Bool)
