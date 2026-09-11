@@ -1,6 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.PartialHaplotypeLinearFlow
+import Descent.Portability.MixingLawReplicaBias
 import Descent.Portability.MultinomialRemainderConstant
 import Descent.Portability.PartialHaplotypePanelLikelihood
 import Descent.Portability.PartialHaplotypePulseKernel
