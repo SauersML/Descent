@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.AncestryCalibration
 import Descent.Portability.AncientPrediction
+import Descent.Portability.ArchaicPrediction
 import Descent.Portability.AncestrySpecificPower
 import Descent.Portability.BayesianPGSTheory
 import Descent.Portability.ClinicalUtilityFairness
@@ -245,6 +246,11 @@ import Descent.Portability.EvolutionaryMeasurementRank
 import Descent.Portability.FixedBinHoeffdingLaw
 import Descent.Portability.ComplexBernoulliProduct
 import Descent.Portability.CompactTargetDirection
+import Descent.Portability.HWEHeterozygosityLaw
+import Descent.Portability.HWEHeterozygosityLimit
+import Descent.Portability.CompactSingularSequence
+import Descent.Portability.CompactTargetDeflation
+import Descent.Portability.CompactMeasurementMinimax
 assert_below Descent.Program
 
 /-!

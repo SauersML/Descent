@@ -3165,6 +3165,9 @@ def phaseSign(x, i):
 def fourLogit(x):
     return ((-3.0) + (2.0 * (((phaseSign(x, 0.0) * phaseSign(x, 1.0)) + (phaseSign(x, 2.0) * phaseSign(x, 3.0))))))
 
+def comparisonAdjacent(source, target, u, v):
+    return any((((((source(e) == u) and (target(e) == v))) or (((source(e) == v) and (target(e) == u))))) for e in range(int(_rt.sumdim('e', len(source), len(target)))))
+
 def mixtureSurvival(π, r, Λ):
     return sum((_rt.mul(π[int(h)], _rt.rexp((_rt.mul(_rt.neg(Λ), r[int(h)]))))) for h in range(int(len(π))))
 
@@ -3303,6 +3306,9 @@ def numberNeededToScreen(sens, π, _hsens, _hπ):
 
 def populationAttributableFraction(p_high, rr):
     return (p_high * ((1.0 - _rt.rdiv(1.0, rr))))
+
+def Descent_Portability_CompactSingularSequence_direction(L, hc, n):
+    return _rt._proj(_rt._proj(leading, '1'), '2')((Descent_Portability_CompactSingularSequence_residual(L, hc, n)), (Descent_Portability_CompactSingularSequence_residual(L, hc, n)))
 
 def phaseMean(p, z):
     return sum((((_rt._proj(p, 'mass')(x)) * z(x))) for x in range(int(_rt.sumdim('x', len(_rt._proj(p, 'mass')), len(z)))))
@@ -5828,7 +5834,7 @@ def lagrangeCoefficient(q, k, degree):
     den = _rt.mul((_rt.sub(q[int(k)], q[int(a)])), (_rt.sub(q[int(k)], q[int(b)])))
     return (_rt.rdiv(_rt.mul(q[int(a)], q[int(b)]), den) if (degree == 0.0) else (_rt.rdiv(_rt.neg((_rt.add(q[int(a)], q[int(b)]))), den) if (degree == 1.0) else _rt.rdiv(1.0, den)))
 
-def direction():
+def Descent_Portability_ThreeLocusInformation_direction():
     return _rt.VecFn([_rt.VecFn([0.0, 1.0, (-2.0)]), _rt.VecFn([1.0, 0.0, 1.0]), _rt.VecFn([(-2.0), 1.0, 0.0])])
 
 def degrees():
@@ -5844,7 +5850,7 @@ def permuted(A, π):
     return (lambda i, j: A[int((π(i)))][int((π(j)))])
 
 def densitySecondCoefficient(x):
-    return _rt.mul((_rt.rdiv(1.0, 6.0)), sum(((_rt.add(_rt.sub(_rt.rdiv(_rt.trace((_rt.mul(direction(), direction()))), 4.0), _rt.rdiv(quadraticValue((permuted((_rt.mul(direction(), direction())), π)), x), 2.0)), _rt.rdiv(_rt.lpow(quadraticValue((permuted(direction(), π)), x), 2.0), 8.0)))) for π in range(int(len(x)))))
+    return _rt.mul((_rt.rdiv(1.0, 6.0)), sum(((_rt.add(_rt.sub(_rt.rdiv(_rt.trace((_rt.mul(Descent_Portability_ThreeLocusInformation_direction(), Descent_Portability_ThreeLocusInformation_direction()))), 4.0), _rt.rdiv(quadraticValue((permuted((_rt.mul(Descent_Portability_ThreeLocusInformation_direction(), Descent_Portability_ThreeLocusInformation_direction())), π)), x), 2.0)), _rt.rdiv(_rt.lpow(quadraticValue((permuted(Descent_Portability_ThreeLocusInformation_direction(), π)), x), 2.0), 8.0)))) for π in range(int(len(x)))))
 
 def thresholdCells(E, score, outcome, cutoff):
     return decisionCells(E, ((lambda ω: decide(((cutoff <= score[int(ω)]))))), outcome)

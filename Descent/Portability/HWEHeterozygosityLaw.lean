@@ -32,7 +32,7 @@ noncomputable def count {ι : Type*} [Fintype ι] (x : ι → DiploidGenotype) :
   ∑ i, heterozygote (x i)
 
 /-- The square-biased success probability, in the original frequency parameter. -/
-def probability (h : HardyWeinbergModel) : ℝ := 4 * (h.altFreq - 1 / 2) ^ 2
+noncomputable def probability (h : HardyWeinbergModel) : ℝ := 4 * (h.altFreq - 1 / 2) ^ 2
 
 theorem probability_nonneg (h : HardyWeinbergModel) : 0 ≤ probability h := by
   unfold probability
@@ -59,8 +59,9 @@ theorem locus_characteristic (h : HardyWeinbergModel)
       1 + (probability h : ℂ) * (Complex.exp ((t : ℂ) * Complex.I) - 1) := by
   rw [complexExpectation, Core.Genotype.sum_univ]
   simp only [squareBiasedLocus_mass, heterozygote, mul_zero, mul_one,
-    Complex.ofReal_zero, Complex.exp_zero, probability]
+    Complex.ofReal_zero, probability]
   push_cast
+  simp only [zero_mul, Complex.exp_zero]
   ring
 
 /-- The block count has exactly the sum of the locus intensities. -/
@@ -69,7 +70,9 @@ theorem count_mean {ι : Type*} [Fintype ι] [DecidableEq ι]
     (h0 : ∀ i, 0 < (h i).altFreq) (h1 : ∀ i, (h i).altFreq < 1) :
     (independentLaw (fun i ↦ squareBiasedLocus (h i) (h0 i) (h1 i))).expectation
       count = ∑ i, probability (h i) := by
-  rw [count, FiniteIndependentMoments.independent_sum_mean]
+  change (independentLaw (fun i ↦ squareBiasedLocus (h i) (h0 i) (h1 i))).expectation
+    (fun x ↦ ∑ i, heterozygote (x i)) = _
+  rw [FiniteIndependentMoments.independent_sum_mean]
   simp only [locus_mean]
 
 /-- Every count characteristic is the actual finite Bernoulli product. -/
@@ -79,7 +82,8 @@ theorem count_characteristic {ι : Type*} [Fintype ι] [DecidableEq ι]
     complexExpectation (independentLaw (fun i ↦ squareBiasedLocus (h i) (h0 i) (h1 i)))
       (fun x ↦ Complex.exp ((t * count x : ℝ) * Complex.I)) =
       ∏ i, (1 + (probability (h i) : ℂ) * (Complex.exp ((t : ℂ) * Complex.I) - 1)) := by
-  rw [count, characteristic_independent_sum]
+  simp only [count]
+  rw [characteristic_independent_sum]
   simp only [locus_characteristic]
 
 /-- The count is nonnegative on every realized genotype vector. -/
