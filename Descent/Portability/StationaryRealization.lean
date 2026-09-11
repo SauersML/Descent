@@ -69,15 +69,43 @@ def stationaryForcing (theta : ℝ) : Fin 4 → ℝ := ![theta, 0, 0, 0]
 def oneDemeStationaryMatrix (rates : ManyDemeLDRates 1) : Matrix (Fin 4) (Fin 4) ℝ :=
   stationaryMatrix (rates.coalescence 0) (rates.mutation 0) (rates.recombination 0)
 
+/-- The three-by-three minor of NOTE1 (14) left after deleting the heterozygosity row and
+column. The heterozygosity row of `B` has a single nonzero entry, so the whole determinant
+is carried by this minor. -/
+def stationaryMinor (c theta rho : ℝ) : Matrix (Fin 3) (Fin 3) ℝ :=
+  !![-(3 * c + rho + 4 * theta), c, c;
+     4 * c, -(5 * c + rho / 2 + 4 * theta), 0;
+     0, c, -(2 * c + 4 * theta)]
+
+/-- Deleting the heterozygosity row and column of NOTE1 (14) leaves the stated minor. -/
+theorem submatrix_stationaryMatrix (c theta rho : ℝ) :
+    (stationaryMatrix c theta rho).submatrix Fin.succ (Fin.succAbove 0)
+      = stationaryMinor c theta rho := by
+  funext i j
+  fin_cases i <;> fin_cases j <;> rfl
+
+/-- Cofactor expansion of NOTE1 (14) along the heterozygosity row: only one term survives. -/
+theorem det_stationaryMatrix_eq_minor (c theta rho : ℝ) :
+    (stationaryMatrix c theta rho).det
+      = -(c + 2 * theta) * (stationaryMinor c theta rho).det := by
+  rw [Matrix.det_succ_row_zero, Fin.sum_univ_four, submatrix_stationaryMatrix]
+  simp [stationaryMatrix] <;> ring
+
+/-- The minor of NOTE1 (14) has determinant exactly minus the corpus stationary
+denominator. -/
+theorem det_stationaryMinor (rates : ManyDemeLDRates 1) :
+    (stationaryMinor (rates.coalescence 0) (rates.mutation 0)
+        (rates.recombination 0)).det
+      = -oneDemeLDStationaryDenominator rates := by
+  simp [stationaryMinor, Matrix.det_fin_three, oneDemeLDStationaryDenominator] <;> ring
+
 /-- **NOTE1 (15).** The determinant of the one-deme system matrix is exactly
 `(c + 2 theta)` times the corpus stationary denominator, with no sign correction. -/
 theorem det_stationaryMatrix (rates : ManyDemeLDRates 1) :
     (oneDemeStationaryMatrix rates).det
       = (rates.coalescence 0 + 2 * rates.mutation 0)
         * oneDemeLDStationaryDenominator rates := by
-  simp only [oneDemeStationaryMatrix, stationaryMatrix, oneDemeLDStationaryDenominator,
-    Matrix.det_succ_row_zero, Matrix.det_fin_three, Fin.sum_univ_succ]
-  norm_num
+  rw [oneDemeStationaryMatrix, det_stationaryMatrix_eq_minor, det_stationaryMinor]
   ring
 
 /-- The determinant of NOTE1 (14) is strictly positive on the physical rate domain, so the
@@ -113,7 +141,7 @@ theorem oneDemeStationaryVector_solves (rates : ManyDemeLDRates 1) :
   funext i
   fin_cases i <;>
     simp [oneDemeStationaryMatrix, stationaryMatrix, stationaryForcing,
-      oneDemeStationaryVector, Matrix.mulVec, dotProduct, Fin.sum_univ_four] <;>
+      oneDemeStationaryVector] <;>
     linarith
 
 /-- **NOTE1 (16).** The corpus stationary state is the unique solution `-B⁻¹ b` of the

@@ -10,6 +10,10 @@ namespace Descent.Portability.StationaryRealization
 #print axioms stationaryMatrix
 #print axioms stationaryForcing
 #print axioms oneDemeStationaryMatrix
+#print axioms stationaryMinor
+#print axioms submatrix_stationaryMatrix
+#print axioms det_stationaryMatrix_eq_minor
+#print axioms det_stationaryMinor
 #print axioms det_stationaryMatrix
 #print axioms det_stationaryMatrix_pos
 #print axioms isUnit_det_stationaryMatrix
