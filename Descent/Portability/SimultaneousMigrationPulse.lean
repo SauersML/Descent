@@ -50,6 +50,7 @@ set_option relaxedAutoImplicit false
 namespace Descent.Portability.SimultaneousMigrationPulse
 
 open Coalescent
+open Coalescent.TwoLocusHaplotypeFrequencies
 open Descent.Portability.PulseJetExpansion
 open Descent.Portability.PulseStageKernel
 open Descent.Portability.EnlargedLowOrderLDGenerator
@@ -517,7 +518,7 @@ theorem enlargedPulseExpansion_velocity {D : ℕ}
       PulseCoordinateExpansion.leftHeterozygosity, PulseCoordinateExpansion.rightHeterozygosity,
       PulseCoordinateExpansion.linkageProduct, PulseCoordinateExpansion.dzObservable,
       PulseCoordinateExpansion.jointHeterozygosity, PulseExpansion.ofEq, PulseExpansion.add,
-      PulseExpansion.smul, PulseExpansion.mul, PulseExpansion.const]
+      PulseExpansion.smul, PulseExpansion.mul, PulseExpansion.const] <;>
     ring
 
 /-- **The linear form commutes with finite weighted sums of base velocities.** -/
