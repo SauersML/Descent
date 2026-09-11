@@ -354,9 +354,12 @@ theorem integratingFactorSolution_eq_integral {a b : ℝ → ℝ} {T : ℝ} (hT 
       rw [hsplit]
       refine (abs_add_le _ _).trans ?_
       rw [abs_mul, abs_mul, abs_of_pos (Real.exp_pos (-cumulativeRate α s))]
-      have hfirst := mul_le_mul (hexpNegDiff s hs)
-        ((abs_add_le _ _).trans (add_le_add le_rfl (hforcingBound s hs))) (abs_nonneg _)
-        (mul_nonneg hexpL hε.le)
+      have hfirst : |Real.exp (-cumulativeRate a s) - Real.exp (-cumulativeRate α s)| *
+          |initial + ∫ u in (0 : ℝ)..s, Real.exp (cumulativeRate a u) * b u| ≤
+          Real.exp L * ε * (|initial| + Real.exp L * Ib) :=
+        mul_le_mul (hexpNegDiff s hs)
+          ((abs_add_le _ _).trans (add_le_add le_rfl (hforcingBound s hs))) (abs_nonneg _)
+          (mul_nonneg hexpL hε.le)
       have hsecond := mul_le_mul
         (Real.exp_le_exp.mpr ((neg_le_abs (cumulativeRate α s)).trans (hAc s hs)))
         (hforcingDiff s hs) (abs_nonneg _) hexpL
@@ -467,11 +470,14 @@ theorem eq_of_linear_integral_eq {a b : ℝ → ℝ} {T : ℝ} (hT : 0 ≤ T)
       intro r hr
       have har := intervalIntegrable_of_mem_horizon ha hr
       have hbr := intervalIntegrable_of_mem_horizon hb hr
+      have hurint : IntervalIntegrable (fun s ↦ -a s * u s + b s) volume 0 r :=
+        (har.neg.mul_continuousOn hu.continuousOn).add hbr
+      have hvrint : IntervalIntegrable (fun s ↦ -a s * v s + b s) volume 0 r :=
+        (har.neg.mul_continuousOn hv.continuousOn).add hbr
       have hsplit : u r - v r = -((∫ s in (0 : ℝ)..r, α s * (u s - v s)) +
           ∫ s in (0 : ℝ)..r, (a s - α s) * (u s - v s)) := by
         rw [hueq r hr, hveq r hr, add_sub_add_left_eq_sub,
-          ← intervalIntegral.integral_sub ((har.neg.mul_continuousOn hu.continuousOn).add hbr)
-            ((har.neg.mul_continuousOn hv.continuousOn).add hbr),
+          ← intervalIntegral.integral_sub hurint hvrint,
           ← intervalIntegral.integral_add ((hα.mul (hu.sub hv)).intervalIntegrable _ _)
             ((intervalIntegrable_of_mem_horizon (ha.sub hαint) hr).mul_continuousOn
               (hu.sub hv).continuousOn),
