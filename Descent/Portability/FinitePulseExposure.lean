@@ -954,6 +954,55 @@ theorem eventTotals_nonneg_quantizedHistory (exposureLaw : Measure ℝ)
     (fun index ↦ (gridExposure_mem_Icc bound hbound count index).1)
     (fun index ↦ (gridExposure_mem_Icc bound hbound count index).2)
 
+/-- Assumes: `R > 0` and an exposure in `[0, R]`. Rounding the exposure down to finer and finer
+grids converges to the exposure. -/
+theorem tendsto_gridExposure_gridIndex (bound : ℝ) (hbound : 0 < bound) (exposure : ℝ)
+    (hexposure : exposure ∈ Set.Icc 0 bound) :
+    Tendsto (fun count : ℕ ↦ gridExposure bound (count + 1) (gridIndex bound (count + 1) exposure))
+      atTop (𝓝 exposure) := by
+  rw [Metric.tendsto_atTop]
+  intro ε hε
+  obtain ⟨threshold, hthreshold⟩ := exists_nat_gt (bound / ε)
+  refine ⟨threshold, fun count hcount ↦ ?_⟩
+  obtain ⟨hbelow, habove⟩ := gridExposure_gridIndex_le bound hbound (count + 1)
+    (Nat.succ_pos count) exposure hexposure
+  have hcountcast : (threshold : ℝ) ≤ count := Nat.cast_le.mpr hcount
+  have hdenominator : (0 : ℝ) < (count : ℝ) + 1 := by positivity
+  push_cast at habove
+  rw [Real.dist_eq, abs_sub_comm, abs_of_nonneg (by linarith)]
+  rw [div_lt_iff₀ hε] at hthreshold
+  have hstep : bound / ((count : ℝ) + 1) < ε := by
+    rw [div_lt_iff₀ hdenominator]
+    nlinarith
+  linarith
+
+/-- NOTE1 section 6.3, the weak limit. Assumes: a probability measure carried by `[0, R]` with
+`R > 0`. The quantized laws converge weakly to the law: the integral of every bounded continuous
+test function against them converges to its integral against the law, by dominated convergence
+along the rounded exposures. -/
+theorem tendsto_integral_lawMeasure_quantizedLaw (exposureLaw : Measure ℝ)
+    [IsProbabilityMeasure exposureLaw] (bound : ℝ) (hbound : 0 < bound)
+    (hsupport : ∀ᵐ exposure ∂exposureLaw, exposure ∈ Set.Icc 0 bound) (test : ℝ →ᵇ ℝ) :
+    Tendsto (fun count : ℕ ↦ ∫ exposure, test exposure
+        ∂ExposureLaplaceConstraints.lawMeasure (quantizedLaw exposureLaw bound (count + 1))
+          (gridExposure bound (count + 1))) atTop (𝓝 (∫ exposure, test exposure ∂exposureLaw)) := by
+  have hrewrite : ∀ count : ℕ, ∫ exposure, test exposure
+      ∂ExposureLaplaceConstraints.lawMeasure (quantizedLaw exposureLaw bound (count + 1))
+        (gridExposure bound (count + 1)) =
+      ∫ exposure, test (gridExposure bound (count + 1) (gridIndex bound (count + 1) exposure))
+        ∂exposureLaw := fun count ↦
+    (ExposureLaplaceConstraints.integral_lawMeasure _ _ test).trans
+      (expectation_quantizedLaw exposureLaw bound (count + 1) test)
+  simp only [hrewrite]
+  refine tendsto_integral_of_dominated_convergence (fun _ ↦ ‖test‖) (fun count ↦ ?_)
+    (integrable_const _) (fun count ↦ ae_of_all _ fun exposure ↦ test.norm_coe_le_norm _)
+    (hsupport.mono fun exposure hexposure ↦ ?_)
+  · exact (test.continuous.measurable.comp
+      ((measurable_from_top (f := gridExposure bound (count + 1))).comp
+        (measurable_gridIndex bound (count + 1)))).aestronglyMeasurable
+  · exact (test.continuous.tendsto exposure).comp
+      (tendsto_gridExposure_gridIndex bound hbound exposure hexposure)
+
 end
 
 end Descent.Portability.FinitePulseExposure
