@@ -3138,6 +3138,24 @@ def certifiedBound(u, V, εu, εV, a):
     I = float(len(u))
     return _rt.add(_rt.add(coordinateRisk(u, V, a), _rt.mul(_rt.mul((_rt.sumdim('I', len(u), len(V), len(a))), εV), (sum((_rt.lpow(a[int(i)], 2.0)) for i in range(int(len(u))))))), _rt.mul(_rt.mul(2.0, εu), sum((_rt.rabs(a[int(i)])) for i in range(int(len(u))))))
 
+def Descent_Portability_ArchaicPrediction_allele(b):
+    return (1.0 if b else 0.0)
+
+def cubeMean(p, f):
+    return sum((_rt.mul(cubeWeight(p, x), f(x))) for x in range(int(len(p))))
+
+def plusPhases():
+    return _rt.VecFn([_rt.VecFn([true, true, true, true]), _rt.VecFn([true, true, false, false]), _rt.VecFn([true, false, true, false]), _rt.VecFn([true, false, false, true])])
+
+def minusPhases():
+    return _rt.VecFn([_rt.VecFn([true, false, true, true]), _rt.VecFn([true, true, false, true]), _rt.VecFn([true, true, true, false]), _rt.VecFn([true, false, false, false])])
+
+def phaseSign(x, i):
+    return ((2.0 * Descent_Portability_ArchaicPrediction_allele((x(i)))) - 1.0)
+
+def fourLogit(x):
+    return ((-3.0) + (2.0 * (((phaseSign(x, 0.0) * phaseSign(x, 1.0)) + (phaseSign(x, 2.0) * phaseSign(x, 3.0))))))
+
 def shiftPolynomial(δ):
     return eval_2Hom(C, ((lambda i: _rt.add(X(i), C((δ[int(i)]))))))
 
@@ -3436,6 +3454,9 @@ def Trajectory(I):
 
 def Descent_Portability_DiscountedForecastMinimax_forecastOperator(kernel, reports, discount, hnonneg, hlt, residual):
     return _rt._proj((forecastLinear(kernel, reports, discount, hnonneg, hlt, residual)), 'toContinuousLinearMap')
+
+def lawTrajectory(kernel, reports, discount, hnonneg, hlt, initial):
+    return trajectory(kernel, reports, discount, hnonneg, hlt, _rt._proj(initial, 'mass'))
 
 def transported(kernel, matrix, time):
     return _rt.mul(_rt.mul(_rt.lpow(kernelMatrix(kernel), time), matrix), _rt._proj((_rt.lpow(kernelMatrix(kernel), time)), 'transpose'))
@@ -4012,6 +4033,9 @@ def Converged(iteration, state, current):
 def exactRun(x, labels):
     return Descent_Portability_FirthFiniteIterationLaw_run(exactMatrixChecks(), x, labels)
 
+def radius(K, count, α):
+    return _rt.rsqrt((_rt.rdiv(_rt.rlog((_rt.rdiv((2.0 * K), α))), ((2.0 * count)))))
+
 def directed():
     return _rt.VecFn([_rt.VecFn([(-1.0), 1.0, 0.0, 0.0]), _rt.VecFn([0.0, (-1.0), 1.0, 0.0]), _rt.VecFn([0.0, 0.0, (-1.0), 1.0]), _rt.VecFn([1.0, 0.0, 0.0, (-1.0)])])
 
@@ -4113,6 +4137,19 @@ def classWeight(color, w, c):
 
 def Descent_Portability_GuardedMetricOptimization_recover(problem):
     return ((_rt.rdiv(1.0, _rt._proj(problem, 'scale'))) * _rt._proj(problem, 'weights'))
+
+def heterozygote(*_a):
+    if len(_a) < 1:
+        return lambda *_b: heterozygote(*(_a + _b))
+    _e, = _a[:1]
+    _t = [0.0, 1.0, 0.0]
+    return _t[_rt._ix(_e, 3, 'heterozygote')]
+
+def Descent_Portability_HWEHeterozygosityLaw_count(x):
+    return sum((heterozygote((x(i)))) for i in range(int(_rt.sumdim('i', len(x)))))
+
+def Descent_Portability_HWEHeterozygosityLaw_probability(h):
+    return (4.0 * _rt.lpow(((_rt._proj(h, 'altFreq') - _rt.rdiv(1.0, 2.0))), 2.0))
 
 def complexExpectation(p, f):
     return sum((((_rt._proj(p, 'mass')(x)) * f(x))) for x in range(int(_rt.sumdim('x', len(_rt._proj(p, 'mass')), len(f)))))
@@ -5470,23 +5507,23 @@ def fiberMean(p, score, a, f):
 def fiberCovariance(p, score, a, f, g):
     return _rt.sub(fiberMean(p, score, a, ((lambda x: _rt.mul(f[int(x)], g[int(x)])))), _rt.mul(fiberMean(p, score, a, f), fiberMean(p, score, a, g)))
 
-def allele(b):
+def Descent_Portability_ReportFiniteCalibrationLaw_allele(b):
     return (1.0 if b else 0.0)
 
 def Descent_Portability_ReportFiniteCalibrationLaw_interaction(x):
-    return (allele(_rt._proj(x, '1')) * allele(_rt._proj(x, '2')))
+    return (Descent_Portability_ReportFiniteCalibrationLaw_allele(_rt._proj(x, '1')) * Descent_Portability_ReportFiniteCalibrationLaw_allele(_rt._proj(x, '2')))
 
 def additiveFit(p1, p2, x):
-    return ((((-p1) * p2) + (p2 * allele(_rt._proj(x, '1')))) + (p1 * allele(_rt._proj(x, '2'))))
+    return ((((-p1) * p2) + (p2 * Descent_Portability_ReportFiniteCalibrationLaw_allele(_rt._proj(x, '1')))) + (p1 * Descent_Portability_ReportFiniteCalibrationLaw_allele(_rt._proj(x, '2'))))
 
 def witnessSource():
     return twoLocusLaw((_rt.rdiv(1.0, 2.0)), (_rt.rdiv(1.0, 2.0)), (by(norm_num)), (by(norm_num)))
 
 def witnessRisk(x):
-    return _rt.rdiv(((allele(_rt._proj(x, '1')) + allele(_rt._proj(x, '2')))), 2.0)
+    return _rt.rdiv(((Descent_Portability_ReportFiniteCalibrationLaw_allele(_rt._proj(x, '1')) + Descent_Portability_ReportFiniteCalibrationLaw_allele(_rt._proj(x, '2')))), 2.0)
 
 def witnessScore(b):
-    return (_rt.rdiv(1.0, 4.0) + _rt.rdiv(allele(b), 2.0))
+    return (_rt.rdiv(1.0, 4.0) + _rt.rdiv(Descent_Portability_ReportFiniteCalibrationLaw_allele(b), 2.0))
 
 def posterior(prior, likelihood0, likelihood1):
     return _rt.rdiv((prior * likelihood1), (((((1.0 - prior)) * likelihood0) + (prior * likelihood1))))

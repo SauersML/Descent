@@ -235,6 +235,12 @@ import Descent.Portability.FiniteAtomicReportMeasure
 import Descent.Portability.BalancedHWEGaussianWeakLimit
 import Descent.Portability.BoxPolynomialExtensionLaw
 
+import Descent.Portability.FiniteMemoryCertificate
+import Descent.Portability.DiscountedForecastMinimax
+import Descent.Portability.DiploidBoxCompatibilityLaw
+import Descent.Portability.DiploidBoxUniquenessLaw
+import Descent.Portability.EvolutionaryForecastMinimax
+
 assert_below Descent.Program
 
 /-!
