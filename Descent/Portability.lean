@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.GuardedRepairDeployment
 import Descent.Portability.ContinuousTrajectoryRegion
 import Descent.Portability.RadialReportLaws
 import Descent.Portability.AuditDesignNumericalCertificate
@@ -485,6 +486,13 @@ import Descent.Portability.MarginalSupportBound
 import Descent.Portability.CouplingPolytopeExtrema
 
 import Descent.Portability.DecisionDirectedAuditDesign
+
+import Descent.Portability.BernoulliBudgetLaw
+import Descent.Portability.BernsteinUpperConfidence
+import Descent.Portability.ConditionalGuardError
+import Descent.Portability.HardBudgetAuditGuard
+import Descent.Portability.JointAuditExperiment
+import Descent.Portability.OddLocusReportSolutions
 
 assert_below Descent.Program
 

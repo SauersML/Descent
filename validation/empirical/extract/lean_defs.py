@@ -3280,6 +3280,12 @@ def upperValue(step, terminal, k):
         _prev = upperStep(step, (_prev))
     return _prev
 
+def centeredCost(p, c, a):
+    return (c * ((a - p)))
+
+def costVariance(c, p):
+    return sum((_rt.mul(_rt.mul(_rt.lpow(c[int(i)], 2.0), p[int(i)]), (_rt.sub(1.0, p[int(i)])))) for i in range(int(len(c))))
+
 def Descent_Portability_BernsteinTailBound_radius(M, v, x):
     return (_rt.rsqrt((((2.0 * v) * x))) + _rt.rdiv(((2.0 * M) * x), 3.0))
 
@@ -3435,6 +3441,15 @@ def gibbsNormalizer(ν, U):
 
 def hiddenIntegrand(coupling, hidden, retained, horizon, time):
     return evolution(hidden, ((horizon - time)), (coupling((retained(time)))))
+
+def growth(lam, t):
+    return _rt.rexp((((2.0 * lam) * t)))
+
+def mixPath(lam, θ, t):
+    return ((θ * _rt.rexp(((-(((2.0 * lam) * t)))))) + ((1.0 - θ)))
+
+def mixPathDeriv(lam, θ, t):
+    return ((-((2.0 * lam))) * ((θ * _rt.rexp(((-(((2.0 * lam) * t))))))))
 
 def linearDeathMatrix(m, gamma):
     return _rt.identity((lambda j, i: ((gamma * ((j))) * (((((1.0) if (i == gridPred(m, j)) else 0.0)) - (((1.0) if (i == j) else 0.0)))))))
@@ -4507,6 +4522,12 @@ def classWeight(color, w, c):
 def Descent_Portability_GuardedMetricOptimization_recover(problem):
     return ((_rt.rdiv(1.0, _rt._proj(problem, 'scale'))) * _rt._proj(problem, 'weights'))
 
+def Descent_Portability_GuardedRepairDeployment_coefficient(w, f, φ, ε, p, q, c, hard, z):
+    return by(classical, exact, (repair((Descent_Portability_DecisionLossContrasts_gram(w, φ)), (estimate(w, f, φ, (observations(p, q, z)))), ε) if Proceed(c, hard, (requests(z))) else 0.0))
+
+def deployedGain(μ, w, f, φ, ε, p, q, c, hard, z):
+    return _rt.sub(frameRisk(μ, w, f), frameRisk(μ, w, (Descent_Portability_DecisionLossContrasts_predict(f, φ, (Descent_Portability_GuardedRepairDeployment_coefficient(w, f, φ, ε, p, q, c, hard, z))))))
+
 def locusAmplitude(h, g):
     return _rt.rdiv(standardizedGenotype(h, g), _rt.rsqrt(2.0))
 
@@ -4581,8 +4602,14 @@ def Descent_Portability_HWEInteractionLaw_blockLaw(h):
 def Descent_Portability_HWELogCoordinates_coordinate(δ):
     return ((_rt.rdiv(1.0, 2.0)) * ((_rt.rlog(((_rt.rdiv(1.0, 2.0) + δ))) - _rt.rlog(((_rt.rdiv(1.0, 2.0) - δ))))))
 
-def coefficient(h, m, N, r, α):
+def Descent_Portability_HWEPolynomialLayerScale_coefficient(h, m, N, r, α):
     return ((_rt.rdiv(1.0, _rt.rsqrt((adjustedIntensity(m, N, α))))) * _rt.lpow(((_rt.rsqrt((m)) * (_rt.rdiv(_rt._proj(standardizedGenotype(h), 'het'), _rt.rsqrt(2.0))))), r))
+
+def Proceed(c, hard, a):
+    return (contrast(c, a) <= hard)
+
+def performed(c, hard, a):
+    return by(classical, exact, (a if Proceed(c, hard, a) else 0.0))
 
 def IsStationaryKernel(π, P):
     return all((sum(((_rt.mul(π[int(x)], P[int(x)][int(y)]) == π[int(y)])) for x in range(int(len(π))))) for y in range(int(len(π))))
@@ -4676,6 +4703,21 @@ def closureStep(K, V_0, j):
     for _ in range(int(j)):
         _prev = enlarge(K, (_prev))
     return _prev
+
+def requestLaw(p):
+    return endpointLaw(0.0, 1.0, p)
+
+def unitLaw(μ, p):
+    return _rt._proj((requestLaw(p)), 'prod')(μ)
+
+def augmented(p, q, z):
+    return (q + _rt.rdiv((_rt._proj(z, '1') * ((_rt._proj(z, '2') - q))), p))
+
+def observations(p, q, z):
+    return (lambda i: augmented((p[int(i)]), (q[int(i)]), (z(i))))
+
+def requests(z):
+    return (lambda i: _rt._proj((z(i)), '1'))
 
 def reportExpectation(p, hp, hs, g):
     return (lambda j: weightedExp(p, hp, hs, ((lambda ω: g[int(ω)][int(j)]))))
@@ -5171,6 +5213,15 @@ def observationJet(readout, generator, direction, report, order, time):
 
 def visibleCoefficient(readout, generator, direction, order):
     return sum((_rt.lpow((_rt.mul(_rt.mul(readout, _v((_rt.lpow(generator, order)))), _v(direction)))(report), 2.0)) for report in range(int(_rt.sumdim('report', len((_rt.mul(_rt.mul(readout, _v((_rt.lpow(generator, order)))), _v(direction))))))))
+
+def dexp(q):
+    return (0.0 if (q == 0.0) else ((2.0 * (q)) + 1.0))
+
+def oddShift(r, prev, q):
+    return _rt.rdiv(((((2.0 * (((r) + 1.0))) + 1.0)) * prev(q)), (((((2.0 * (((r) + 1.0))) + 1.0)) - dexp(q))))
+
+def oddLevelMatrix(m, lam):
+    return _rt.identity((lambda r, i: ((lam * (((2.0 * (((r)))) + 1.0))) * (((((1.0) if (i == gridPred(m, r)) else 0.0)) - (((1.0) if (i == r) else 0.0)))))))
 
 def scalarMean(values, p):
     return sum((_rt.mul(hweMass(p, g), values[int(g)])) for g in range(int(len(values))))
@@ -6074,6 +6125,18 @@ def segment(a, p, t):
 
 def radialDensity(B, a, p, t):
     return sum((_rt.mul((_rt.sub(p[int(i)], a[int(i)])), B(i, (segment(a, p, t))))) for i in range(int(len(a))))
+
+def posShare(r):
+    return _rt.rdiv(((radialTotal(r) + 1.0)), ((2.0 * radialTotal(r))))
+
+def negShare(r):
+    return _rt.rdiv(((radialTotal(r) - 1.0)), ((2.0 * radialTotal(r))))
+
+def radialDirectionLaw(r, P_0, Q_0, s, z):
+    return (radialLaw(r, s, _rt._proj(z, '1')) * ((_rt._proj(P_0, 'mass')(_rt._proj(z, '2')) if _rt._proj(_rt._proj(z, '1'), '2') else _rt._proj(Q_0, 'mass')(_rt._proj(z, '2')))))
+
+def radialDirectionExp(r, hinj, P_0, Q_0, s):
+    return weightedExp((radialDirectionLaw(r, P_0, Q_0, s)), (radialDirectionLaw_nonneg(r, P_0, Q_0, s)), (radialDirectionLaw_sum(r, hinj, P_0, Q_0, s)))
 
 def lowerCap(h):
     return maxRange(h, ((lambda _: 1.0)))

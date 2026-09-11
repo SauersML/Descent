@@ -38,3 +38,11 @@ import Descent.Portability.MomentOrderObstruction
 #print axioms Descent.Portability.MomentOrderObstruction.dot_vec6
 #print axioms Descent.Portability.MomentOrderObstruction.explainedSum_vec6
 #print axioms Descent.Portability.MomentOrderObstruction.centeredSum_vec6
+#print axioms Descent.Portability.MomentOrderObstruction.fwdDiff_double_step
+#print axioms Descent.Portability.MomentOrderObstruction.abs_fwdDiff_iter_le
+#print axioms Descent.Portability.MomentOrderObstruction.fwdDiff_descend
+#print axioms Descent.Portability.MomentOrderObstruction.const_of_fwdDiff_iter_eq_zero
+#print axioms Descent.Portability.MomentOrderObstruction.exists_fwdDiff_ne_zero
+#print axioms Descent.Portability.MomentOrderObstruction.fwdDiff_iter_eq_alternating
+#print axioms Descent.Portability.MomentOrderObstruction.bounded_nonconstant_separates
+#print axioms Descent.Portability.MomentOrderObstruction.one_le_two_pow_real

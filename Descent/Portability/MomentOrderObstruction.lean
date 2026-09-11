@@ -510,6 +510,210 @@ theorem loss_report_no_finite_moment_order {k : ℕ} (r : Fin (k + 1) → ℝ)
 
 end IndividualReport
 
+section FiniteDifferenceRigidity
+
+/-- Doubling the step multiplies the top-order forward difference by `2^k`, whenever the
+next-order difference vanishes at the original step. -/
+theorem fwdDiff_double_step (k : ℕ) :
+    ∀ (f : ℝ → ℝ) (step : ℝ), Δ_[step]^[k + 1] f = 0 →
+      ∀ a : ℝ, Δ_[2 * step]^[k] f a = 2 ^ k * Δ_[step]^[k] f a := by
+  induction k with
+  | zero => intro f step _ a; simp
+  | succ m ih =>
+    intro f step hvan a
+    have hsplit : Δ_[2 * step] f =
+        Δ_[step] (fun r : ℝ ↦ f (r + step)) + Δ_[step] f := by
+      funext x
+      simp only [fwdDiff, Pi.add_apply]
+      rw [show x + 2 * step = x + step + step by ring]
+      ring
+    have hshift : ∀ n : ℕ, Δ_[step]^[n] (fun r : ℝ ↦ f (r + step)) =
+        fun y ↦ (Δ_[step]^[n] f) (y + step) := by
+      intro n
+      funext y
+      exact fwdDiff_iter_comp_add step f step n y
+    have hvan' : Δ_[step]^[m + 1 + 1] f = 0 := hvan
+    have hF : Δ_[step]^[m + 1] (Δ_[2 * step] f) = 0 := by
+      rw [hsplit, fwdDiff_iter_add, ← Function.iterate_succ_apply,
+        ← Function.iterate_succ_apply, hshift (m + 1 + 1), hvan']
+      funext y
+      simp
+    have hkey := ih (Δ_[2 * step] f) step hF a
+    have hlhs : Δ_[2 * step]^[m] (Δ_[2 * step] f) a = Δ_[2 * step]^[m + 1] f a := by
+      rw [← Function.iterate_succ_apply]
+    have hper : (Δ_[step]^[m + 1] f) (a + step) = (Δ_[step]^[m + 1] f) a := by
+      have h0 := congrFun hvan' a
+      rw [Function.iterate_succ_apply'] at h0
+      simp only [Pi.zero_apply, fwdDiff] at h0
+      linarith
+    have e1 : Δ_[step]^[m] (Δ_[step] (fun r : ℝ ↦ f (r + step))) a =
+        (Δ_[step]^[m + 1] f) (a + step) := by
+      rw [← Function.iterate_succ_apply, hshift (m + 1)]
+    have e2 : Δ_[step]^[m] (Δ_[step] f) a = Δ_[step]^[m + 1] f a := by
+      rw [← Function.iterate_succ_apply]
+    have hrhs : Δ_[step]^[m] (Δ_[2 * step] f) a = 2 * Δ_[step]^[m + 1] f a := by
+      rw [hsplit, fwdDiff_iter_add]
+      simp only [Pi.add_apply]
+      rw [e1, e2, hper]
+      ring
+    rw [hlhs, hrhs] at hkey
+    rw [hkey]
+    ring
+
+/-- A forward difference of order `k` of a uniformly bounded function is at most `2^k`
+times the bound. -/
+theorem abs_fwdDiff_iter_le (k : ℕ) (f : ℝ → ℝ) (M : ℝ) (hM : ∀ x, |f x| ≤ M)
+    (step a : ℝ) : |Δ_[step]^[k] f a| ≤ 2 ^ k * M := by
+  rw [fwdDiff_iter_eq_sum_shift]
+  have hterm : ∀ j ∈ Finset.range (k + 1),
+      |(((-1 : ℤ) ^ (k - j) * (k.choose j : ℤ)) • f (a + j • step))| ≤
+        (k.choose j : ℝ) * M := by
+    intro j _
+    rw [zsmul_eq_mul, abs_mul]
+    have hsign : |((((-1 : ℤ) ^ (k - j) * (k.choose j : ℤ)) : ℤ) : ℝ)| =
+        (k.choose j : ℝ) := by
+      push_cast
+      rw [abs_mul, abs_pow, abs_neg, abs_one, one_pow, one_mul]
+      exact abs_of_nonneg (by positivity)
+    rw [hsign]
+    exact mul_le_mul_of_nonneg_left (hM _) (by positivity)
+  calc |∑ j ∈ Finset.range (k + 1),
+        (((-1 : ℤ) ^ (k - j) * (k.choose j : ℤ)) • f (a + j • step))|
+      ≤ ∑ j ∈ Finset.range (k + 1),
+          |(((-1 : ℤ) ^ (k - j) * (k.choose j : ℤ)) • f (a + j • step))| :=
+        Finset.abs_sum_le_sum_abs _ _
+    _ ≤ ∑ j ∈ Finset.range (k + 1), (k.choose j : ℝ) * M :=
+        Finset.sum_le_sum hterm
+    _ = 2 ^ k * M := by
+        rw [← Finset.sum_mul]
+        congr 1
+        exact_mod_cast Nat.sum_range_choose k
+
+/-- Powers of two are at least one. -/
+theorem one_le_two_pow_real (j : ℕ) : (1 : ℝ) ≤ 2 ^ j := by
+  induction j with
+  | zero => norm_num
+  | succ p ihp =>
+    rw [pow_succ]
+    linarith
+
+/-- **The descent step.** For a bounded function, vanishing of every order-`(k+1)`
+forward difference forces every order-`k` forward difference to vanish as well. -/
+theorem fwdDiff_descend (k : ℕ) (hk : 1 ≤ k) (f : ℝ → ℝ) (M : ℝ)
+    (hM : ∀ x, |f x| ≤ M) (hvan : ∀ t : ℝ, Δ_[t]^[k + 1] f = 0) :
+    ∀ t : ℝ, Δ_[t]^[k] f = 0 := by
+  intro t
+  funext a
+  simp only [Pi.zero_apply]
+  have hiter : ∀ n : ℕ, Δ_[2 ^ n * t]^[k] f a = (2 ^ k) ^ n * Δ_[t]^[k] f a := by
+    intro n
+    induction n with
+    | zero => simp
+    | succ p ihp =>
+      have hd := fwdDiff_double_step k f (2 ^ p * t) (hvan _) a
+      rw [show (2 : ℝ) ^ (p + 1) * t = 2 * (2 ^ p * t) by ring, hd, ihp]
+      ring
+  by_contra hne
+  have habs : 0 < |Δ_[t]^[k] f a| := abs_pos.mpr hne
+  have h2k : (2 : ℝ) ≤ 2 ^ k := by
+    obtain ⟨j, rfl⟩ := Nat.exists_eq_add_of_le hk
+    rw [pow_add, pow_one]
+    have hj := one_le_two_pow_real j
+    linarith
+  have hgrow : ∀ n : ℕ, (2 : ℝ) ^ n ≤ ((2 : ℝ) ^ k) ^ n := by
+    intro n
+    induction n with
+    | zero => norm_num
+    | succ p ihp =>
+      rw [pow_succ, pow_succ]
+      have hp : (0 : ℝ) < (2 : ℝ) ^ p := by positivity
+      have hq : (0 : ℝ) < ((2 : ℝ) ^ k) ^ p := by positivity
+      nlinarith [ihp, h2k, hp, hq]
+  obtain ⟨n, hn⟩ := exists_nat_gt (2 ^ k * M / |Δ_[t]^[k] f a|)
+  have hbound := abs_fwdDiff_iter_le k f M hM (2 ^ n * t) a
+  rw [hiter n, abs_mul, abs_of_nonneg (by positivity : (0 : ℝ) ≤ ((2 : ℝ) ^ k) ^ n)]
+    at hbound
+  have hge : (n : ℝ) ≤ (2 : ℝ) ^ n := by
+    have hnat : n < 2 ^ n := Nat.lt_two_pow_self
+    have hc : (n : ℝ) < (2 : ℝ) ^ n := by exact_mod_cast hnat
+    linarith
+  rw [div_lt_iff₀ habs] at hn
+  have hmul1 : (n : ℝ) * |Δ_[t]^[k] f a| ≤ (2 : ℝ) ^ n * |Δ_[t]^[k] f a| :=
+    mul_le_mul_of_nonneg_right hge habs.le
+  have hmul2 : (2 : ℝ) ^ n * |Δ_[t]^[k] f a| ≤ ((2 : ℝ) ^ k) ^ n * |Δ_[t]^[k] f a| :=
+    mul_le_mul_of_nonneg_right (hgrow n) habs.le
+  linarith
+
+/-- **A bounded function killed by some order of forward differences is constant.** -/
+theorem const_of_fwdDiff_iter_eq_zero (f : ℝ → ℝ) (M : ℝ) (hM : ∀ x, |f x| ≤ M) :
+    ∀ n : ℕ, (∀ t : ℝ, Δ_[t]^[n] f = 0) → ∀ x, f x = f 0 := by
+  intro n
+  induction n with
+  | zero =>
+    intro hv x
+    have h1 := congrFun (hv 1) x
+    have h2 := congrFun (hv 1) 0
+    simp only [Function.iterate_zero, id_eq, Pi.zero_apply] at h1 h2
+    rw [h1, h2]
+  | succ m ih =>
+    intro hv x
+    rcases Nat.eq_zero_or_pos m with hm | hm
+    · subst hm
+      have h1 := congrFun (hv x) 0
+      simp only [Function.iterate_one, fwdDiff, Pi.zero_apply, zero_add] at h1
+      linarith
+    · exact ih (fwdDiff_descend m hm f M hM hv) x
+
+/-- **DC Lemma 8.2, bounded form.** A bounded nonconstant report has, at every finite
+order, a nonzero forward difference. The manuscript deduces this from real analyticity by
+a Taylor estimate; boundedness with nonconstancy is weaker and suffices, and the proof
+below is elementary: doubling the step multiplies the top-order difference by `2^k`,
+which a uniform bound cannot survive. -/
+theorem exists_fwdDiff_ne_zero (k : ℕ) (f : ℝ → ℝ) (M : ℝ) (hM : ∀ x, |f x| ≤ M)
+    (hnc : ∃ x, f x ≠ f 0) : ∃ a step : ℝ, Δ_[step]^[k + 1] f a ≠ 0 := by
+  by_contra hcon
+  push_neg at hcon
+  obtain ⟨x, hx⟩ := hnc
+  exact hx (const_of_fwdDiff_iter_eq_zero f M hM (k + 1)
+    (fun t ↦ funext fun a ↦ hcon a t) x)
+
+/-- The forward difference is the alternating binomial sum, up to the overall sign. -/
+theorem fwdDiff_iter_eq_alternating (k : ℕ) (a step : ℝ) (f : ℝ → ℝ) :
+    Δ_[step]^[k + 1] f a = (-1 : ℝ) ^ (k + 1) *
+      ∑ j ∈ Finset.range (k + 2),
+        (-1 : ℝ) ^ j * ((k + 1).choose j : ℝ) * f (a + j * step) := by
+  rw [fwdDiff_iter_eq_sum_shift, Finset.mul_sum]
+  refine Finset.sum_congr rfl fun j hj ↦ ?_
+  have hjle : j ≤ k + 1 := Nat.lt_succ_iff.mp (Finset.mem_range.mp hj)
+  have hsq : ((-1 : ℝ) ^ j) * ((-1 : ℝ) ^ j) = 1 := by
+    rw [← pow_add]
+    exact Even.neg_one_pow ⟨j, rfl⟩
+  have hcancel : (-1 : ℝ) ^ (k + 1 - j) * (-1 : ℝ) ^ j = (-1 : ℝ) ^ (k + 1) := by
+    rw [← pow_add, Nat.sub_add_cancel hjle]
+  have hkey : (-1 : ℝ) ^ (k + 1 - j) = (-1 : ℝ) ^ (k + 1) * (-1 : ℝ) ^ j := by
+    calc (-1 : ℝ) ^ (k + 1 - j)
+        = (-1 : ℝ) ^ (k + 1 - j) * ((-1 : ℝ) ^ j * (-1 : ℝ) ^ j) := by rw [hsq, mul_one]
+      _ = ((-1 : ℝ) ^ (k + 1 - j) * (-1 : ℝ) ^ j) * (-1 : ℝ) ^ j := by ring
+      _ = (-1 : ℝ) ^ (k + 1) * (-1 : ℝ) ^ j := by rw [hcancel]
+  rw [zsmul_eq_mul, nsmul_eq_mul]
+  push_cast
+  rw [hkey]
+  ring
+
+/-- **DC Lemma 8.2.** For every finite order, a bounded nonconstant report separates the
+two parity laws of DC Lemma 8.1. -/
+theorem bounded_nonconstant_separates (k : ℕ) (f : ℝ → ℝ) (M : ℝ)
+    (hM : ∀ x, |f x| ≤ M) (hnc : ∃ x, f x ≠ f 0) :
+    ∃ a step : ℝ, parityExp k false (fun j ↦ f (a + (j : ℕ) * step)) ≠
+      parityExp k true (fun j ↦ f (a + (j : ℕ) * step)) := by
+  obtain ⟨a, step, hne⟩ := exists_fwdDiff_ne_zero k f M hM hnc
+  refine ⟨a, step, parity_separates k a step f ?_⟩
+  intro hzero
+  rw [fwdDiff_iter_eq_alternating k a step f, hzero, mul_zero] at hne
+  exact hne rfl
+
+end FiniteDifferenceRigidity
+
 end
 
 end Descent.Portability.MomentOrderObstruction
