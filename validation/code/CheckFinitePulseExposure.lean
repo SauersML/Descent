@@ -58,3 +58,7 @@ open Descent.Portability.FinitePulseExposure
 #print axioms
   Descent.Portability.FinitePulseExposure.tendsto_couplingOfState_quantizedHistory
 #print axioms Descent.Portability.FinitePulseExposure.eventTotals_nonneg_quantizedHistory
+#print axioms Descent.Portability.FinitePulseExposure.expectation_quantizedLaw
+#print axioms Descent.Portability.FinitePulseExposure.tendsto_gridExposure_gridIndex
+#print axioms
+  Descent.Portability.FinitePulseExposure.tendsto_integral_lawMeasure_quantizedLaw

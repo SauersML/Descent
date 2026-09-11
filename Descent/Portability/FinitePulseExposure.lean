@@ -833,21 +833,31 @@ def quantizedLaw (exposureLaw : Measure ℝ) [IsProbabilityMeasure exposureLaw] 
       (measurable_gridIndex bound count).aemeasurable
     rw [sum_measureReal_singleton, Finset.coe_univ, measureReal_univ_eq_one]
 
+/-- The expectation under the quantized law of a function of the grid point is the expectation
+under the original law of the same function of the rounded exposure. -/
+theorem expectation_quantizedLaw (exposureLaw : Measure ℝ) [IsProbabilityMeasure exposureLaw]
+    (bound : ℝ) (count : ℕ) (integrand : ℝ → ℝ) :
+    (quantizedLaw exposureLaw bound count).expectation
+        (fun index ↦ integrand (gridExposure bound count index)) =
+      ∫ exposure, integrand (gridExposure bound count (gridIndex bound count exposure))
+        ∂exposureLaw := by
+  haveI := Measure.isProbabilityMeasure_map (μ := exposureLaw)
+    (measurable_gridIndex bound count).aemeasurable
+  rw [← integral_map (measurable_gridIndex bound count).aemeasurable
+      (f := fun index ↦ integrand (gridExposure bound count index))
+      measurable_from_top.aestronglyMeasurable,
+    integral_fintype _ Integrable.of_finite]
+  unfold FiniteReportLaw.expectation quantizedLaw
+  simp only [smul_eq_mul]
+
 /-- The transform of the quantized law is the transform of the original law with every exposure
 rounded down to the grid. -/
 theorem exposureLaplace_quantizedLaw (exposureLaw : Measure ℝ)
     [IsProbabilityMeasure exposureLaw] (bound lam : ℝ) (count : ℕ) :
     exposureLaplace (quantizedLaw exposureLaw bound count) (gridExposure bound count) lam =
       ∫ exposure, Real.exp (-(lam * gridExposure bound count (gridIndex bound count exposure)))
-        ∂exposureLaw := by
-  haveI := Measure.isProbabilityMeasure_map (μ := exposureLaw)
-    (measurable_gridIndex bound count).aemeasurable
-  rw [← integral_map (measurable_gridIndex bound count).aemeasurable
-      (f := fun index ↦ Real.exp (-(lam * gridExposure bound count index)))
-      measurable_from_top.aestronglyMeasurable,
-    integral_fintype _ Integrable.of_finite]
-  unfold exposureLaplace FiniteReportLaw.expectation quantizedLaw
-  simp only [smul_eq_mul]
+        ∂exposureLaw :=
+  expectation_quantizedLaw exposureLaw bound count (fun point ↦ Real.exp (-(lam * point)))
 
 /-- NOTE1 section 6.3, the weak-limit realisation at the level of the transform. Assumes: a
 probability measure carried by `[0, R]` with `R > 0` and a nonnegative scale `λ`. The transforms
