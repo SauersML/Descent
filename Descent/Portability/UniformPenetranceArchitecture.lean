@@ -833,7 +833,7 @@ theorem integral_replica_partial (K : ℕ) :
 
 /-- The truncated positive ratio expansion of NOTE2 (15) with its exact remainder: the
 reduced ratio is the `K`-term sum plus the `K`-th replica weight times the ratio itself. -/
-theorem ratio_eq_partial_add_remainder (θ : ℝ) (hlo : 0 ≤ θ) (hhi : θ ≤ 1) (K : ℕ) :
+theorem ratio_eq_partial_add_remainder (θ : ℝ) (hhi : θ ≤ 1) (K : ℕ) :
     θ / (2 - θ) = (∑ k ∈ Finset.range K, (θ / 2) ^ (k + 1)) +
       (θ / 2) ^ K * (θ / (2 - θ)) := by
   have hpos : (0:ℝ) < 2 - θ := by linarith
@@ -876,7 +876,7 @@ theorem replica_certificate (K : ℕ) :
       intervalIntegrable_unit_ratio ?_
     intro θ hθ
     simp only [Set.mem_Icc] at hθ
-    have hexp := ratio_eq_partial_add_remainder θ hθ.1 hθ.2 K
+    have hexp := ratio_eq_partial_add_remainder θ hθ.2 K
     have hr := ratio_mem_unitInterval θ hθ.1 hθ.2
     have hx : (0:ℝ) ≤ (θ / 2) ^ K := pow_nonneg (by linarith [hθ.1]) K
     have hprod : 0 ≤ (θ / 2) ^ K * (θ / (2 - θ)) := mul_nonneg hx hr.1
@@ -889,7 +889,7 @@ theorem replica_certificate (K : ℕ) :
       (hpart.add hpow) ?_
     intro θ hθ
     simp only [Set.mem_Icc] at hθ
-    have hexp := ratio_eq_partial_add_remainder θ hθ.1 hθ.2 K
+    have hexp := ratio_eq_partial_add_remainder θ hθ.2 K
     have hr := ratio_mem_unitInterval θ hθ.1 hθ.2
     have hx : (0:ℝ) ≤ (θ / 2) ^ K := pow_nonneg (by linarith [hθ.1]) K
     have hprod : (θ / 2) ^ K * (θ / (2 - θ)) ≤ (θ / 2) ^ K * 1 :=
