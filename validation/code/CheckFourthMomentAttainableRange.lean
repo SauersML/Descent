@@ -18,3 +18,4 @@ import Descent.Portability.FourthMomentAttainableRange
 #print axioms Descent.Portability.FourthMomentAttainableRange.reducedValues_bddBelow
 #print axioms Descent.Portability.FourthMomentAttainableRange.kernel_fourth_moment_ge_min
 #print axioms Descent.Portability.FourthMomentAttainableRange.attains_every_larger_fourth_moment
+#print axioms Descent.Portability.FourthMomentAttainableRange.boundary_kernel_fourth_moment

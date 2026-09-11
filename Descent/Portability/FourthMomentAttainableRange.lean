@@ -28,6 +28,11 @@ in the spread scale `s`. Solving those two linear equations hits any prescribed
 
 This is what UPT Theorem 3.5 needs in a cell with strict slack, and it is the step that
 makes the range in UPT (3.21) exact rather than merely bounded.
+
+The complementary endpoint is `boundary_kernel_fourth_moment`: on the equality face of
+(3.4) there is no freedom at all. For a finitely supported law with strictly positive
+weights the residual equals `β + kᵀX` at every point of the outcome space, so the fourth
+moment is the singleton `E[(β + kᵀX)⁴]` of UPT (3.11).
 -/
 
 set_option autoImplicit false
@@ -389,6 +394,85 @@ theorem attains_every_larger_fourth_moment (E : ExpFunctional Ω) (X : Ω → ι
       ring
     rw [hFsdef] at hmix
     linarith [hmix]
+
+/-! ## The deterministic boundary: a singleton rather than a ray -/
+
+/-- **UPT (3.11) at the level of outcome kernels.** On the equality face
+`m = β² + ‖k‖²`, for a finitely supported pre-outcome law and finitely supported
+conditional laws, all with strictly positive weights, the residual equals the feature
+regression `β + kᵀX` at every point, so its fourth moment is forced to the single value
+`E[(β + kᵀX)⁴]`. -/
+theorem boundary_kernel_fourth_moment {Ψ : Type*} [Fintype Ω] [Fintype Ψ]
+    (p : Ω → ℝ) (hp : ∀ ω, 0 < p ω) (hsum : ∑ ω, p ω = 1)
+    (q : Ω → Ψ → ℝ) (hq : ∀ ω ψ, 0 < q ω ψ) (hqsum : ∀ ω, ∑ ψ, q ω ψ = 1)
+    (X : Ω → ι → ℝ) (β : ℝ) (k : ι → ℝ) (m : ℝ) (res : Ω × Ψ → ℝ)
+    (hmean : ∀ i, weightedExp p (fun ω ↦ (hp ω).le) hsum (fun ω ↦ X ω i) = 0)
+    (horth : ∀ i j, weightedExp p (fun ω ↦ (hp ω).le) hsum
+      (fun ω ↦ X ω i * X ω j) = if i = j then 1 else 0)
+    (hb : mixture (weightedExp p (fun ω ↦ (hp ω).le) hsum)
+      (fun ω ↦ weightedExp (q ω) (fun ψ ↦ (hq ω ψ).le) (hqsum ω)) res = β)
+    (hk : ∀ i, mixture (weightedExp p (fun ω ↦ (hp ω).le) hsum)
+      (fun ω ↦ weightedExp (q ω) (fun ψ ↦ (hq ω ψ).le) (hqsum ω))
+      (fun z ↦ X z.1 i * res z) = k i)
+    (ha : mixture (weightedExp p (fun ω ↦ (hp ω).le) hsum)
+      (fun ω ↦ weightedExp (q ω) (fun ψ ↦ (hq ω ψ).le) (hqsum ω))
+      (fun z ↦ res z ^ 2) = m)
+    (hbdry : m = β ^ 2 + dot k k) :
+    mixture (weightedExp p (fun ω ↦ (hp ω).le) hsum)
+        (fun ω ↦ weightedExp (q ω) (fun ψ ↦ (hq ω ψ).le) (hqsum ω))
+        (fun z ↦ res z ^ 4)
+      = weightedExp p (fun ω ↦ (hp ω).le) hsum
+        (fun ω ↦ featureMean β k X ω ^ 4) := by
+  set E := weightedExp p (fun ω ↦ (hp ω).le) hsum with hEdef
+  set K : Ω → ExpFunctional Ψ :=
+    fun ω ↦ weightedExp (q ω) (fun ψ ↦ (hq ω ψ).le) (hqsum ω) with hKdef
+  have hab : ∀ ω, condMean K res ω ^ 2 ≤ condSecond K res ω :=
+    fun ω ↦ condMean_sq_le_condSecond K res ω
+  have hb' : E (condMean K res) = β := by
+    rw [← mixture_mean E K res]
+    exact hb
+  have hk' : ∀ i, E (fun ω ↦ X ω i * condMean K res ω) = k i := by
+    intro i
+    rw [← mixture_cross E K res X i]
+    exact hk i
+  have ha' : E (condSecond K res) = m := by
+    rw [← mixture_second E K res]
+    exact ha
+  have hpt := boundary_pointwise p hp hsum X β k m (condMean K res) (condSecond K res)
+    hmean horth hab hb' hk' ha' hbdry
+  have hres : ∀ ω ψ, res (ω, ψ) = featureMean β k X ω := by
+    intro ω ψ
+    have hz : K ω (fun ψ' ↦ (res (ω, ψ') - condMean K res ω) ^ 2) = 0 := by
+      rw [eval_sq_sub (K ω) (fun ψ' ↦ res (ω, ψ')) (fun _ ↦ condMean K res ω)]
+      have h1 : K ω (fun ψ' ↦ res (ω, ψ') * condMean K res ω)
+          = condMean K res ω * condMean K res ω := by
+        have hfun : (fun ψ' ↦ res (ω, ψ') * condMean K res ω)
+            = (condMean K res ω) • fun ψ' ↦ res (ω, ψ') := by
+          funext ψ'
+          simp only [Pi.smul_apply, smul_eq_mul]
+          ring
+        rw [hfun, (K ω).smul_eval]
+        rfl
+      have h2 : K ω (fun _ : Ψ ↦ condMean K res ω ^ 2) = condMean K res ω ^ 2 :=
+        (K ω).eval_const _
+      have h3 : K ω (fun ψ' ↦ res (ω, ψ') ^ 2) = condSecond K res ω := rfl
+      rw [h1, h2, h3, (hpt ω).2, (hpt ω).1]
+      ring
+    have hzero : (res (ω, ψ) - condMean K res ω) ^ 2 = 0 :=
+      eq_of_weightedExp_eq_zero (q ω) (hq ω) (hqsum ω) _ (fun ψ' ↦ sq_nonneg _) hz ψ
+    have := pow_eq_zero_iff (n := 2) (by norm_num) |>.mp hzero
+    have heq : res (ω, ψ) = condMean K res ω := by linarith [this]
+    rw [heq, (hpt ω).1]
+  show E (fun ω ↦ K ω (fun ψ ↦ res (ω, ψ) ^ 4)) = _
+  have hfun : (fun ω ↦ K ω (fun ψ ↦ res (ω, ψ) ^ 4))
+      = fun ω ↦ featureMean β k X ω ^ 4 := by
+    funext ω
+    have hinner : (fun ψ ↦ res (ω, ψ) ^ 4)
+        = fun _ : Ψ ↦ featureMean β k X ω ^ 4 := by
+      funext ψ
+      rw [hres ω ψ]
+    rw [hinner, (K ω).eval_const]
+  rw [hfun]
 
 end
 
