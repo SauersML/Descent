@@ -30,7 +30,9 @@ duration, computable to any precision without touching the matrix.
 The substochastic theory this rests on, including that `1 + rate⁻¹ • Q` and all its powers are
 substochastic, is `Descent.Portability.SubstochasticGeneratorSemigroup`; nothing of it is
 restated here. What is added is the mixture identity, the truncation and its two positivity
-statements, and the omitted-mass bound.
+statements, and the omitted-mass bound. The two entrywise series lemmas it needs,
+`expSeries_entry_summable` and `expSeries_rowSum_term`, are taken from that module rather than
+restated; `partialSum_apply` and `exponential_apply_tsum` have no equivalent there.
 
 Scope: one epoch. NOTE 1 observes that over several epochs the retained mass is the product of
 the per-epoch retained masses; that product statement is not formalized here. Nor is the
@@ -106,15 +108,6 @@ theorem partialSum_apply (A : Matrix ι ι ℝ) (time : ℝ) (terms : ℕ) (row 
   unfold matrixExponentialPartialSum
   rw [Matrix.sum_apply]
 
-/-- The entrywise exponential series converges. -/
-theorem expSeries_entry_summable (A : Matrix ι ι ℝ) (time : ℝ) (row column : ι) :
-    Summable (fun power : ℕ ↦
-      (((power.factorial : ℝ)⁻¹) • ((time • A) ^ power)) row column) := by
-  have hmatrix : Summable (fun power : ℕ ↦
-      ((power.factorial : ℝ)⁻¹) • ((time • A) ^ power)) :=
-    NormedSpace.expSeries_summable' (time • A)
-  exact Pi.summable.mp (Pi.summable.mp hmatrix row) column
-
 /-- Each entry of the exact matrix exponential is the sum of the entrywise series. -/
 theorem exponential_apply_tsum (A : Matrix ι ι ℝ) (time : ℝ) (row column : ι) :
     matrixExponential A time row column =
@@ -124,13 +117,6 @@ theorem exponential_apply_tsum (A : Matrix ι ι ℝ) (time : ℝ) (row column :
     NormedSpace.expSeries_summable' (time • A)
   unfold matrixExponential
   rw [tsum_apply hmatrix, tsum_apply (Pi.summable.mp hmatrix row)]
-
-/-- The row mass of one term of the entrywise exponential series. -/
-theorem rowSum_expSeries_term (A : Matrix ι ι ℝ) (time : ℝ) (row : ι) (power : ℕ) :
-    ∑ column, (((power.factorial : ℝ)⁻¹) • ((time • A) ^ power)) row column
-      = ((power.factorial : ℝ)⁻¹) * (time ^ power * ∑ column, (A ^ power) row column) := by
-  rw [smul_pow]
-  simp [Finset.mul_sum]
 
 /-- The scaled uniformization kernel is entrywise nonnegative at a nonnegative duration. -/
 theorem scaled_uniformization_nonneg (Q : Matrix ι ι ℝ) (hQ : KillingGenerator Q)
@@ -219,7 +205,7 @@ theorem rowSum_deficit_le (Q : Matrix ι ι ℝ) (hQ : KillingGenerator Q) (unif
     simp only [partialSum_apply]
     rw [Finset.sum_comm]
     exact Finset.sum_congr rfl fun power _ ↦
-      rowSum_expSeries_term (uniformization Q uniformRate) (uniformRate * time) row power
+      expSeries_rowSum_term (uniformization Q uniformRate) (uniformRate * time) row power
   have hsummable := exponential_rowSum_summable (uniformization Q uniformRate)
     (uniformRate * time) row
   have hmajorant : Summable (fun power : ℕ ↦
