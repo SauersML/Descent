@@ -135,7 +135,7 @@ theorem enlargedGenerator_mulVec_constant {D : ℕ} (rates : ManyDemeLDRates D)
 
 /-- The constant coordinate of the enlarged family carries the five stage certificates: no
 stage moves a constant.  These are the kernel's certificates for the affine coordinate. -/
-def constantStageExpansion (D : ℕ) :
+def constantRowStageExpansion (D : ℕ) :
     StageExpansion (TwoLocusDiffusionJet.const (1 : ℝ) : TwoLocusDiffusionJet D) :=
   TwoLocusMicroscopicKernel.constantStageExpansion
 
@@ -145,7 +145,7 @@ the enlarged generator's constant row vanishes.  This is the kernel's
 `stage_generator_constant` read from the stage side. -/
 theorem stageSum_constant {D : ℕ} (rates : ManyDemeLDRates D)
     (state : DemeHaplotypeState D) :
-    (∑ stage : Stage D, stageDrift rates (constantStageExpansion D) stage state) =
+    (∑ stage : Stage D, stageDrift rates (constantRowStageExpansion D) stage state) =
       (enlargedLowOrderLDGenerator rates).mulVec (enlargedLowOrderLDFeature state) none :=
   (stage_generator_constant rates state).symm
 
