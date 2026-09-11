@@ -110,13 +110,14 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
   continuous in time).
 * §3 Theorem 3 and equations (14)-(16): `StationaryRealization`,
   `StationaryHaplotypeRealization`, `AncestralHaplotypeRealization`.
-* §4.1 per-locus material grading: `PartialHaplotypeCarrier`. §4.2 equation (19), the neutral
-  diffusion generator on partial-haplotype moments and its carrier-by-carrier Leibniz
-  expansion: `PartialHaplotypeDualGenerator`. §4.2 and §5.1 substochastic semigroups and
-  uniformization: `SubstochasticGeneratorSemigroup`, `PoissonTruncationCertificate`. §4.2a, the
-  extension of a positive constant-preserving semigroup from polynomials and its representation
-  by continuous probability kernels obeying Chapman-Kolmogorov: `PolynomialFellerExtension`,
-  `FellerKernelRepresentation`. §4.3 equations (21)-(23): `ConditionalReportCompilation`.
+* §4.1 per-locus material grading: `PartialHaplotypeCarrier`. §4.2, the derivation of (19): the
+  neutral diffusion generator on partial-haplotype moments, its Leibniz expansion over carriers,
+  and the same-deme merger and killing terms: `PartialHaplotypeDualGenerator`. §4.2 and §5.1
+  substochastic semigroups and uniformization: `SubstochasticGeneratorSemigroup`,
+  `PoissonTruncationCertificate`. §4.2a, the extension of a positive constant-preserving
+  semigroup from polynomials and its representation by continuous probability kernels obeying
+  Chapman-Kolmogorov: `PolynomialFellerExtension`, `FellerKernelRepresentation`. §4.3 equations
+  (21)-(23): `ConditionalReportCompilation`.
 * §5 equations (24)-(25): `SublawReportCertificate`.
 * §6 equations (27)-(36), chronology to metrics: `AdmixtureChronologyLaw`,
   `ChronologyReportLaw`, `AttainableChronologyCurve`, `ExposureLaplaceConstraints`,
@@ -129,10 +130,10 @@ Scope. Equation (10) is proved for every monomial of degree at most four with re
 most 71/N², but the microscopic approximation behind Theorem 2 uses the single-draw
 resampling step of §2.3. §2.4 is proved for rate paths whose generator is continuous in time,
 not for merely integrable rates. Theorem 2 covers histories of rate epochs and splits; the
-pipeline compiler emits nothing else. Of §4.2, equation (19) is proved and equation (20) is not
-claimed by these modules. The §4.2a kernels are continuous into the weak topology but are not
-packaged as measurable kernels, and the representing measure is proved unique only on
-pseudo-metrizable spaces, which include the haplotype-frequency simplex.
+pipeline compiler emits nothing else. Of §4.2, the migration, recombination and mutation rates
+of (19) and equation (20) are not formalized. The §4.2a kernels are continuous into the weak
+topology but are not packaged as measurable kernels, and the representing measure is proved
+unique only on pseudo-metrizable spaces, which include the haplotype-frequency simplex.
 
 Guard witnesses: `LowOrderLDWitnesses` inhabits the corpus rate, epoch and history structures
 from data alone, and `PipelineWitnesses` inhabits the pipeline structures of `EndToEndScoreLaw`
