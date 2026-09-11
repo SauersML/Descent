@@ -784,6 +784,341 @@ def migrationCoordinateExpansion {D : ℕ} (source recipient : Fin D) :
   rightMarginal := migrationRightExpansion source recipient
   linkageDeterminant := migrationLinkageExpansion source recipient
 
+/-- Uniform bound on a centered left-locus allele contrast. -/
+private theorem abs_leftContrast_le_one (frequency : TwoLocusHaplotypeFrequencies) :
+    |frequency.leftContrast| ≤ 1 := by
+  simp only [leftContrast]
+  rw [abs_le]
+  exact ⟨by linarith [frequency.leftFrequency_le_one],
+    by linarith [frequency.leftFrequency_nonneg]⟩
+
+/-- Uniform bound on a centered right-locus allele contrast. -/
+private theorem abs_rightContrast_le_one (frequency : TwoLocusHaplotypeFrequencies) :
+    |frequency.rightContrast| ≤ 1 := by
+  simp only [rightContrast]
+  rw [abs_le]
+  exact ⟨by linarith [frequency.rightFrequency_le_one],
+    by linarith [frequency.rightFrequency_nonneg]⟩
+
+/-- Uniform bound on the mutation damping velocity of the linkage determinant. -/
+private theorem abs_two_linkage_le_half (frequency : TwoLocusHaplotypeFrequencies) :
+    |(-2) * frequency.linkage| ≤ 1 / 2 := by
+  have hquarter := frequency.linkage_abs_le_quarter
+  rw [abs_le] at hquarter ⊢
+  constructor <;> linarith [hquarter.1, hquarter.2]
+
+/-- Uniform bound on the recombination velocity of the linkage determinant. -/
+private theorem abs_recombinationLinkageVelocity_le_quarter
+    (frequency : TwoLocusHaplotypeFrequencies) :
+    |recombinationLinkageVelocity frequency| ≤ 1 / 4 := by
+  simp only [recombinationLinkageVelocity]
+  rw [abs_neg]
+  exact frequency.linkage_abs_le_quarter
+
+/-- The left marginal of any deme is fixed by a recombination pulse. -/
+def recombinationLeftExpansion {D : ℕ} (target index : Fin D) :
+    PulseExpansion (recombinationPulseAt target)
+      (fun state ↦ (state index).leftFrequency) where
+  velocity _ := 0
+  valueBound := 1
+  velocityBound := 0
+  remainder := 0
+  value_abs_le state := abs_leftFrequency_le_one state index
+  velocity_abs_le _ := by rw [abs_zero]
+  expansion tau _ _ state := by
+    rw [recombinationPulseAt_leftFrequency target index tau state]
+    exact abs_affine_residual_le _ _ _ (by norm_num)
+
+/-- The right marginal of any deme is fixed by a recombination pulse. -/
+def recombinationRightExpansion {D : ℕ} (target index : Fin D) :
+    PulseExpansion (recombinationPulseAt target)
+      (fun state ↦ (state index).rightFrequency) where
+  velocity _ := 0
+  valueBound := 1
+  velocityBound := 0
+  remainder := 0
+  value_abs_le state := abs_rightFrequency_le_one state index
+  velocity_abs_le _ := by rw [abs_zero]
+  expansion tau _ _ state := by
+    rw [recombinationPulseAt_rightFrequency target index tau state]
+    exact abs_affine_residual_le _ _ _ (by norm_num)
+
+/-- The linkage determinant decays exactly linearly in the recombination fraction. -/
+def recombinationLinkageExpansion {D : ℕ} (target index : Fin D) :
+    PulseExpansion (recombinationPulseAt target) (fun state ↦ (state index).linkage) where
+  velocity state := if index = target then recombinationLinkageVelocity (state target) else 0
+  valueBound := 1 / 4
+  velocityBound := 1 / 4
+  remainder := 0
+  value_abs_le state := (state index).linkage_abs_le_quarter
+  velocity_abs_le state := by
+    by_cases hindex : index = target
+    · rw [if_pos hindex]
+      exact abs_recombinationLinkageVelocity_le_quarter (state target)
+    · rw [if_neg hindex, abs_zero]
+      norm_num
+  expansion tau h0 h1 state := by
+    rw [recombinationPulseAt_linkage target index h0 h1 state]
+    exact abs_affine_residual_le _ _ _ (by norm_num)
+
+/-- The base coordinate expansions of a recombination pulse. -/
+def recombinationCoordinateExpansion {D : ℕ} (target : Fin D) :
+    PulseCoordinateExpansion (recombinationPulseAt target) where
+  leftMarginal := recombinationLeftExpansion target
+  rightMarginal := recombinationRightExpansion target
+  linkageDeterminant := recombinationLinkageExpansion target
+
+/-- The left marginal under a left-locus mutation pulse moves by the centered contrast. -/
+def leftMutationLeftExpansion {D : ℕ} (target index : Fin D) :
+    PulseExpansion (leftMutationPulseAt target)
+      (fun state ↦ (state index).leftFrequency) where
+  velocity state := if index = target then (state target).leftContrast else 0
+  valueBound := 1
+  velocityBound := 1
+  remainder := 0
+  value_abs_le state := abs_leftFrequency_le_one state index
+  velocity_abs_le state := by
+    by_cases hindex : index = target
+    · rw [if_pos hindex]
+      exact abs_leftContrast_le_one (state target)
+    · rw [if_neg hindex, abs_zero]
+      norm_num
+  expansion tau h0 h1 state := by
+    rw [leftMutationPulseAt_leftFrequency target index h0 h1 state]
+    exact abs_affine_residual_le _ _ _ (by norm_num)
+
+/-- The right marginal is fixed by a left-locus mutation pulse. -/
+def leftMutationRightExpansion {D : ℕ} (target index : Fin D) :
+    PulseExpansion (leftMutationPulseAt target)
+      (fun state ↦ (state index).rightFrequency) where
+  velocity _ := 0
+  valueBound := 1
+  velocityBound := 0
+  remainder := 0
+  value_abs_le state := abs_rightFrequency_le_one state index
+  velocity_abs_le _ := by rw [abs_zero]
+  expansion tau _ _ state := by
+    rw [leftMutationPulseAt_rightFrequency target index tau state]
+    exact abs_affine_residual_le _ _ _ (by norm_num)
+
+/-- The linkage determinant decays exactly linearly under a left-locus mutation pulse. -/
+def leftMutationLinkageExpansion {D : ℕ} (target index : Fin D) :
+    PulseExpansion (leftMutationPulseAt target) (fun state ↦ (state index).linkage) where
+  velocity state := if index = target then (-2) * (state target).linkage else 0
+  valueBound := 1 / 4
+  velocityBound := 1 / 2
+  remainder := 0
+  value_abs_le state := (state index).linkage_abs_le_quarter
+  velocity_abs_le state := by
+    by_cases hindex : index = target
+    · rw [if_pos hindex]
+      exact abs_two_linkage_le_half (state target)
+    · rw [if_neg hindex, abs_zero]
+      norm_num
+  expansion tau h0 h1 state := by
+    rw [leftMutationPulseAt_linkage target index h0 h1 state]
+    exact abs_affine_residual_le _ _ _ (by norm_num)
+
+/-- The base coordinate expansions of a left-locus mutation pulse. -/
+def leftMutationCoordinateExpansion {D : ℕ} (target : Fin D) :
+    PulseCoordinateExpansion (leftMutationPulseAt target) where
+  leftMarginal := leftMutationLeftExpansion target
+  rightMarginal := leftMutationRightExpansion target
+  linkageDeterminant := leftMutationLinkageExpansion target
+
+/-- The left marginal is fixed by a right-locus mutation pulse. -/
+def rightMutationLeftExpansion {D : ℕ} (target index : Fin D) :
+    PulseExpansion (rightMutationPulseAt target)
+      (fun state ↦ (state index).leftFrequency) where
+  velocity _ := 0
+  valueBound := 1
+  velocityBound := 0
+  remainder := 0
+  value_abs_le state := abs_leftFrequency_le_one state index
+  velocity_abs_le _ := by rw [abs_zero]
+  expansion tau _ _ state := by
+    rw [rightMutationPulseAt_leftFrequency target index tau state]
+    exact abs_affine_residual_le _ _ _ (by norm_num)
+
+/-- The right marginal under a right-locus mutation pulse moves by the centered contrast. -/
+def rightMutationRightExpansion {D : ℕ} (target index : Fin D) :
+    PulseExpansion (rightMutationPulseAt target)
+      (fun state ↦ (state index).rightFrequency) where
+  velocity state := if index = target then (state target).rightContrast else 0
+  valueBound := 1
+  velocityBound := 1
+  remainder := 0
+  value_abs_le state := abs_rightFrequency_le_one state index
+  velocity_abs_le state := by
+    by_cases hindex : index = target
+    · rw [if_pos hindex]
+      exact abs_rightContrast_le_one (state target)
+    · rw [if_neg hindex, abs_zero]
+      norm_num
+  expansion tau h0 h1 state := by
+    rw [rightMutationPulseAt_rightFrequency target index h0 h1 state]
+    exact abs_affine_residual_le _ _ _ (by norm_num)
+
+/-- The linkage determinant decays exactly linearly under a right-locus mutation pulse. -/
+def rightMutationLinkageExpansion {D : ℕ} (target index : Fin D) :
+    PulseExpansion (rightMutationPulseAt target) (fun state ↦ (state index).linkage) where
+  velocity state := if index = target then (-2) * (state target).linkage else 0
+  valueBound := 1 / 4
+  velocityBound := 1 / 2
+  remainder := 0
+  value_abs_le state := (state index).linkage_abs_le_quarter
+  velocity_abs_le state := by
+    by_cases hindex : index = target
+    · rw [if_pos hindex]
+      exact abs_two_linkage_le_half (state target)
+    · rw [if_neg hindex, abs_zero]
+      norm_num
+  expansion tau h0 h1 state := by
+    rw [rightMutationPulseAt_linkage target index h0 h1 state]
+    exact abs_affine_residual_le _ _ _ (by norm_num)
+
+/-- The base coordinate expansions of a right-locus mutation pulse. -/
+def rightMutationCoordinateExpansion {D : ℕ} (target : Fin D) :
+    PulseCoordinateExpansion (rightMutationPulseAt target) where
+  leftMarginal := rightMutationLeftExpansion target
+  rightMarginal := rightMutationRightExpansion target
+  linkageDeterminant := rightMutationLinkageExpansion target
+
+/-! ## Every low-order coordinate expands under every pulse -/
+
+namespace PulseCoordinateExpansion
+
+variable {D : ℕ} {pulse : ℝ → DemeHaplotypeState D → DemeHaplotypeState D}
+
+/-- Cross-deme left heterozygosity, assembled from the two left marginals by the Leibniz
+rule. -/
+def leftHeterozygosity (base : PulseCoordinateExpansion pulse) (first second : Fin D) :
+    PulseExpansion pulse (twoLocusHJet first second).value :=
+  PulseExpansion.ofEq
+    (((base.leftMarginal first).mul
+        ((PulseExpansion.const D pulse 1).add ((base.leftMarginal second).smul (-1)))).add
+      ((base.leftMarginal second).mul
+        ((PulseExpansion.const D pulse 1).add ((base.leftMarginal first).smul (-1)))))
+    (fun _ ↦ rfl)
+
+/-- Cross-deme right-locus heterozygosity, the coordinate family that NOTE1 equation (6)
+adds to the stored low-order state. -/
+def rightHeterozygosity (base : PulseCoordinateExpansion pulse) (first second : Fin D) :
+    PulseExpansion pulse (twoLocusRightHJet first second).value :=
+  PulseExpansion.ofEq
+    (((base.rightMarginal first).mul
+        ((PulseExpansion.const D pulse 1).add ((base.rightMarginal second).smul (-1)))).add
+      ((base.rightMarginal second).mul
+        ((PulseExpansion.const D pulse 1).add ((base.rightMarginal first).smul (-1)))))
+    (fun _ ↦ rfl)
+
+/-- The cross-deme product of linkage determinants. -/
+def linkageProduct (base : PulseCoordinateExpansion pulse) (first second : Fin D) :
+    PulseExpansion pulse (twoLocusDDJet first second).value :=
+  PulseExpansion.ofEq
+    ((base.linkageDeterminant first).mul (base.linkageDeterminant second)) (fun _ ↦ rfl)
+
+/-- The generalized three-index `Dz` observable. -/
+def dzObservable (base : PulseCoordinateExpansion pulse) (first second third : Fin D) :
+    PulseExpansion pulse (twoLocusDzJet first second third).value :=
+  PulseExpansion.ofEq
+    (((base.linkageDeterminant first).mul
+        ((PulseExpansion.const D pulse 1).add ((base.leftMarginal second).smul (-2)))).mul
+      ((PulseExpansion.const D pulse 1).add ((base.rightMarginal third).smul (-2))))
+    (fun _ ↦ rfl)
+
+/-- The generalized four-index joint heterozygosity, a quarter of the product of one left
+and one right heterozygosity. -/
+def jointHeterozygosity (base : PulseCoordinateExpansion pulse)
+    (first second third fourth : Fin D) :
+    PulseExpansion pulse (twoLocusPi2Jet first second third fourth).value :=
+  PulseExpansion.ofEq
+    (((base.leftHeterozygosity first second).mul
+      (base.rightHeterozygosity third fourth)).smul (1 / 4)) (fun _ ↦ rfl)
+
+/-- Every coordinate of the closed low-order family has a second-order pulse expansion. -/
+def coordinate (base : PulseCoordinateExpansion pulse) :
+    ∀ feature : LowOrderLDCoordinate D,
+      PulseExpansion pulse (twoLocusCoordinateJet feature).value
+  | .H first second => base.leftHeterozygosity first second
+  | .DD first second => base.linkageProduct first second
+  | .Dz first second third => base.dzObservable first second third
+  | .pi2 first second third fourth => base.jointHeterozygosity first second third fourth
+
+end PulseCoordinateExpansion
+
+/-! ## Velocity bridges to the corpus generator rows -/
+
+/-- The migration velocity of cross-deme left heterozygosity is exactly the lineage
+replacement stencil of the corpus's `lowOrderLDMigration` row at `H`: each lineage sitting in
+the recipient deme is replaced by the source deme's lineage. -/
+theorem migrationLeftHeterozygosity_velocity {D : ℕ}
+    (source recipient first second : Fin D) (state : DemeHaplotypeState D) :
+    ((migrationCoordinateExpansion source recipient).leftHeterozygosity first
+        second).velocity state =
+      (if first = recipient then
+        (twoLocusHJet source second).value state -
+          (twoLocusHJet first second).value state else 0) +
+      (if second = recipient then
+        (twoLocusHJet first source).value state -
+          (twoLocusHJet first second).value state else 0) := by
+  by_cases hfirst : first = recipient <;> by_cases hsecond : second = recipient <;>
+    simp [PulseCoordinateExpansion.leftHeterozygosity, PulseExpansion.ofEq,
+      PulseExpansion.add, PulseExpansion.mul, PulseExpansion.smul, PulseExpansion.const,
+      migrationCoordinateExpansion, migrationLeftExpansion, twoLocusHJet,
+      TwoLocusDiffusionJet.add, TwoLocusDiffusionJet.mul, TwoLocusDiffusionJet.const,
+      TwoLocusDiffusionJet.smul, twoLocusLeftFrequencyJet, hfirst, hsecond] <;> ring
+
+/-- The migration velocity of cross-deme right-locus heterozygosity obeys the same
+replacement stencil.  This is the row that the stored low-order generator does not carry and
+that the enlarged feature family must supply. -/
+theorem migrationRightHeterozygosity_velocity {D : ℕ}
+    (source recipient first second : Fin D) (state : DemeHaplotypeState D) :
+    ((migrationCoordinateExpansion source recipient).rightHeterozygosity first
+        second).velocity state =
+      (if first = recipient then
+        (twoLocusRightHJet source second).value state -
+          (twoLocusRightHJet first second).value state else 0) +
+      (if second = recipient then
+        (twoLocusRightHJet first source).value state -
+          (twoLocusRightHJet first second).value state else 0) := by
+  by_cases hfirst : first = recipient <;> by_cases hsecond : second = recipient <;>
+    simp [PulseCoordinateExpansion.rightHeterozygosity, PulseExpansion.ofEq,
+      PulseExpansion.add, PulseExpansion.mul, PulseExpansion.smul, PulseExpansion.const,
+      migrationCoordinateExpansion, migrationRightExpansion, twoLocusRightHJet,
+      TwoLocusDiffusionJet.add, TwoLocusDiffusionJet.mul, TwoLocusDiffusionJet.const,
+      TwoLocusDiffusionJet.smul, twoLocusRightFrequencyJet, hfirst, hsecond] <;> ring
+
+/-- The recombination velocity of a cross-deme linkage product counts how many of its two
+lineages sit in the recombining deme, matching the corpus's `lowOrderLDRecombination` row at
+`DD` once the pulse fraction carries the per-lineage rate. -/
+theorem recombinationLinkageProduct_velocity {D : ℕ} (target first second : Fin D)
+    (state : DemeHaplotypeState D) :
+    ((recombinationCoordinateExpansion target).linkageProduct first second).velocity state =
+      -((if first = target then 1 else 0) + (if second = target then 1 else 0)) *
+        (twoLocusDDJet first second).value state := by
+  by_cases hfirst : first = target <;> by_cases hsecond : second = target <;>
+    simp [PulseCoordinateExpansion.linkageProduct, PulseExpansion.ofEq, PulseExpansion.mul,
+      recombinationCoordinateExpansion, recombinationLinkageExpansion,
+      recombinationLinkageVelocity, twoLocusDDJet, TwoLocusDiffusionJet.mul,
+      twoLocusLinkageJet, hfirst, hsecond] <;> ring
+
+/-- The mutation velocity of cross-deme left heterozygosity is the corpus's
+`twoLocusHMutationVelocity`, scaled by the number of its lineages sitting in the mutating
+deme and by the two-to-one conversion between allele-flip probability and the repository's
+mutation rate coordinate. -/
+theorem leftMutationLeftHeterozygosity_velocity {D : ℕ} (target first second : Fin D)
+    (state : DemeHaplotypeState D) :
+    ((leftMutationCoordinateExpansion target).leftHeterozygosity first second).velocity
+        state =
+      2 * ((if first = target then 1 else 0) + (if second = target then 1 else 0)) *
+        twoLocusHMutationVelocity (state first) (state second) := by
+  by_cases hfirst : first = target <;> by_cases hsecond : second = target <;>
+    simp [PulseCoordinateExpansion.leftHeterozygosity, PulseExpansion.ofEq,
+      PulseExpansion.add, PulseExpansion.mul, PulseExpansion.smul, PulseExpansion.const,
+      leftMutationCoordinateExpansion, leftMutationLeftExpansion,
+      twoLocusHMutationVelocity, leftContrast, hfirst, hsecond] <;> ring
+
 end
 
 end Descent.Portability.PulseJetExpansion
