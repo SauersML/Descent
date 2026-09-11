@@ -481,6 +481,304 @@ theorem nearestDrift_generator_le_weightedExp (n : ℕ) (α β τ : ℝ) (hα : 
       ≤ weightedExp p hp hsum (fun A ↦ f (k + Δ A) - f k) := by
   simpa using nearestDrift_generator_le n α β τ hα hβ f hf k hk0 hkn p hp Δ hΔ0 hΔn hdrift
 
+
+/-! ## Coadapted discrete-time couplings on the configuration space -/
+
+/-- The occupied count `N = ∑ᵢ Bᵢ` of a configuration of `n` binary coordinates. -/
+def occupiedCount {n : ℕ} (s : Fin n → Bool) : ℕ :=
+  (Finset.univ.filter fun i ↦ s i = true).card
+
+/-- The count never leaves the grid `{0, …, n}`. -/
+theorem occupiedCount_le {n : ℕ} (s : Fin n → Bool) : occupiedCount s ≤ n := by
+  simpa using Finset.card_filter_le Finset.univ (fun i ↦ s i = true)
+
+/-- The count is the sum of the coordinate indicators. -/
+theorem occupiedCount_eq_sum {n : ℕ} (s : Fin n → Bool) :
+    ((occupiedCount s : ℕ) : ℝ) = ∑ i, (if s i = true then (1 : ℝ) else 0) := by
+  simp [occupiedCount, Finset.sum_boole]
+
+/-- The complementary count. -/
+theorem occupiedCount_compl {n : ℕ} (s : Fin n → Bool) :
+    ∑ i, (if s i = true then (0 : ℝ) else 1) = (n : ℝ) - ((occupiedCount s : ℕ) : ℝ) := by
+  have hpt : ∀ i : Fin n,
+      (if s i = true then (0 : ℝ) else 1) = 1 - (if s i = true then (1 : ℝ) else 0) := by
+    intro i
+    cases hsi : s i <;> simp
+  rw [Finset.sum_congr rfl fun i _ ↦ hpt i, Finset.sum_sub_distrib, ← occupiedCount_eq_sum]
+  simp
+
+/-- **The count drift is forced by the coordinate rates, DC (3.3) / PL Theorem 5.3.**
+
+If a one-step kernel row `K s ·` changes coordinate `i` with total probability
+`τ α` when `sᵢ = 1` and `τ β` when `sᵢ = 0` -- which is DC (3.2) / PL (5.7) written for a
+discrete skeleton -- then the mean change of the count is exactly `τ b(k)`, whatever the
+joint geometry of the simultaneous flips. -/
+theorem kernel_count_drift {n : ℕ} (α β τ : ℝ) (K : (Fin n → Bool) → (Fin n → Bool) → ℝ)
+    (s : Fin n → Bool)
+    (hflip : ∀ i : Fin n, ∑ s', (if s' i = s i then (0 : ℝ) else K s s')
+      = τ * (if s i = true then α else β)) :
+    ∑ s', K s s' * (((occupiedCount s' : ℕ) : ℝ) - ((occupiedCount s : ℕ) : ℝ))
+      = τ * (β * ((n : ℝ) - ((occupiedCount s : ℕ) : ℝ))
+        - α * ((occupiedCount s : ℕ) : ℝ)) := by
+  have hexp : ∀ s' : Fin n → Bool,
+      K s s' * (((occupiedCount s' : ℕ) : ℝ) - ((occupiedCount s : ℕ) : ℝ))
+        = ∑ i, K s s' * ((if s' i = true then (1 : ℝ) else 0)
+          - (if s i = true then (1 : ℝ) else 0)) := by
+    intro s'
+    rw [← Finset.mul_sum, Finset.sum_sub_distrib, ← occupiedCount_eq_sum, ← occupiedCount_eq_sum]
+  have hterm : ∀ (i : Fin n) (s' : Fin n → Bool),
+      K s s' * ((if s' i = true then (1 : ℝ) else 0) - (if s i = true then (1 : ℝ) else 0))
+        = (if s' i = s i then (0 : ℝ) else K s s') * (if s i = true then (-1 : ℝ) else 1) := by
+    intro i s'
+    cases hsi : s i <;> cases hsi' : s' i <;> simp
+  have hi : ∀ i : Fin n,
+      ∑ s' : Fin n → Bool, K s s' * ((if s' i = true then (1 : ℝ) else 0)
+        - (if s i = true then (1 : ℝ) else 0))
+      = (if s i = true then (-1 : ℝ) else 1) * (τ * (if s i = true then α else β)) := by
+    intro i
+    rw [Finset.sum_congr rfl fun s' _ ↦ hterm i s', ← Finset.sum_mul, hflip i]
+    ring
+  rw [Finset.sum_congr rfl fun s' _ ↦ hexp s', Finset.sum_comm,
+    Finset.sum_congr rfl fun i _ ↦ hi i]
+  have hsplit : ∀ i : Fin n,
+      (if s i = true then (-1 : ℝ) else 1) * (τ * (if s i = true then α else β))
+        = (if s i = true then (1 : ℝ) else 0) * (-(τ * α))
+          + (if s i = true then (0 : ℝ) else 1) * (τ * β) := by
+    intro i
+    cases hsi : s i <;> simp
+  rw [Finset.sum_congr rfl fun i _ ↦ hsplit i, Finset.sum_add_distrib, ← Finset.sum_mul,
+    ← Finset.sum_mul, ← occupiedCount_eq_sum, occupiedCount_compl]
+  ring
+
+/-- The expected report of a possibly history-dependent joint turnover process.
+`pathExp K m hist s g` is `E[g(S_m)]` for a process currently at configuration `s` with
+past `hist`, running `m` further skeleton steps under the kernel family `K`.  The kernel
+may depend on the whole past, so this covers non-Markov, non-exchangeable couplings. -/
+def pathExp {n : ℕ} (K : List (Fin n → Bool) → (Fin n → Bool) → (Fin n → Bool) → ℝ) :
+    ℕ → List (Fin n → Bool) → (Fin n → Bool) → ((Fin n → Bool) → ℝ) → ℝ
+  | 0, _, s, g => g s
+  | (m + 1), hist, s, g => ∑ s', K hist s s' * pathExp K m (s :: hist) s' g
+
+/-- A path expectation is monotone in its report. -/
+theorem pathExp_mono {n : ℕ} (K : List (Fin n → Bool) → (Fin n → Bool) → (Fin n → Bool) → ℝ)
+    (hK0 : ∀ hist s s', 0 ≤ K hist s s') (g g' : (Fin n → Bool) → ℝ) (hg : ∀ x, g x ≤ g' x)
+    (m : ℕ) : ∀ (hist : List (Fin n → Bool)) (s : Fin n → Bool),
+      pathExp K m hist s g ≤ pathExp K m hist s g' := by
+  induction m with
+  | zero => intro hist s; simpa [pathExp] using hg s
+  | succ m ih =>
+    intro hist s
+    simp only [pathExp]
+    exact Finset.sum_le_sum fun s' _ ↦
+      mul_le_mul_of_nonneg_left (ih (s :: hist) s') (hK0 hist s s')
+
+/-- A path expectation commutes with affine maps of its report. -/
+theorem pathExp_affine {n : ℕ} (K : List (Fin n → Bool) → (Fin n → Bool) → (Fin n → Bool) → ℝ)
+    (hK1 : ∀ hist s, ∑ s', K hist s s' = 1) (a c : ℝ) (g : (Fin n → Bool) → ℝ) (m : ℕ) :
+    ∀ (hist : List (Fin n → Bool)) (s : Fin n → Bool),
+      pathExp K m hist s (fun x ↦ a + c * g x) = a + c * pathExp K m hist s g := by
+  induction m with
+  | zero => intro hist s; simp [pathExp]
+  | succ m ih =>
+    intro hist s
+    have hpt : ∀ s' : Fin n → Bool,
+        K hist s s' * pathExp K m (s :: hist) s' (fun x ↦ a + c * g x)
+          = a * K hist s s' + c * (K hist s s' * pathExp K m (s :: hist) s' g) := by
+      intro s'
+      rw [ih (s :: hist) s']
+      ring
+    simp only [pathExp]
+    rw [Finset.sum_congr rfl fun s' _ ↦ hpt s', Finset.sum_add_distrib, ← Finset.mul_sum,
+      ← Finset.mul_sum, hK1 hist s, mul_one]
+
+/-- **One skeleton step of an admissible coupling dominates the nearest-drift step.**
+
+This is DC Lemma 3.4 transported from rates to a one-step kernel on `{0,1}ⁿ`: the only
+facts used about `K` are that its row is a probability vector and that it flips each
+coordinate with the prescribed probability. -/
+theorem step_le_kernel {n : ℕ} (α β τ : ℝ) (hα : 0 ≤ α) (hβ : 0 ≤ β) (f : ℤ → ℝ)
+    (hf : ∀ j : ℤ, 1 ≤ j → j + 1 ≤ (n : ℤ) → 0 ≤ f (j - 1) - 2 * f j + f (j + 1))
+    (K : (Fin n → Bool) → (Fin n → Bool) → ℝ) (s : Fin n → Bool)
+    (hK0 : ∀ s', 0 ≤ K s s') (hK1 : ∑ s', K s s' = 1)
+    (hflip : ∀ i : Fin n, ∑ s', (if s' i = s i then (0 : ℝ) else K s s')
+      = τ * (if s i = true then α else β)) :
+    driftStep n α β τ f ((occupiedCount s : ℕ) : ℤ)
+      ≤ ∑ s', K s s' * f ((occupiedCount s' : ℕ) : ℤ) := by
+  set k : ℤ := ((occupiedCount s : ℕ) : ℤ) with hkdef
+  have hidx : ∀ s' : Fin n → Bool,
+      k + (((occupiedCount s' : ℕ) : ℤ) - k) = ((occupiedCount s' : ℕ) : ℤ) := by
+    intro s'
+    ring
+  have hdrift : ∑ s' : Fin n → Bool,
+      K s s' * ((((k + (((occupiedCount s' : ℕ) : ℤ) - k)) : ℤ) : ℝ) - (k : ℝ))
+      = τ * countDrift n α β k := by
+    have hpt : ∀ s' : Fin n → Bool,
+        K s s' * ((((k + (((occupiedCount s' : ℕ) : ℤ) - k)) : ℤ) : ℝ) - (k : ℝ))
+          = K s s' * (((occupiedCount s' : ℕ) : ℝ) - ((occupiedCount s : ℕ) : ℝ)) := by
+      intro s'
+      rw [hidx s', hkdef]
+      push_cast
+      ring
+    rw [Finset.sum_congr rfl fun s' _ ↦ hpt s', kernel_count_drift α β τ K s hflip, hkdef]
+    simp only [countDrift]
+    push_cast
+    ring
+  have hgen := nearestDrift_generator_le n α β τ hα hβ f hf k (by positivity)
+    (by rw [hkdef]; exact_mod_cast occupiedCount_le s) (K s) hK0
+    (fun s' ↦ ((occupiedCount s' : ℕ) : ℤ) - k)
+    (fun s' ↦ by rw [hidx s']; positivity)
+    (fun s' ↦ by rw [hidx s']; exact_mod_cast occupiedCount_le s') hdrift
+  have hrhs : ∑ s' : Fin n → Bool,
+      K s s' * (f (k + (((occupiedCount s' : ℕ) : ℤ) - k)) - f k)
+      = (∑ s' : Fin n → Bool, K s s' * f ((occupiedCount s' : ℕ) : ℤ)) - f k := by
+    have hpt : ∀ s' : Fin n → Bool,
+        K s s' * (f (k + (((occupiedCount s' : ℕ) : ℤ) - k)) - f k)
+          = K s s' * f ((occupiedCount s' : ℕ) : ℤ) - K s s' * f k := by
+      intro s'
+      rw [hidx s']
+      ring
+    rw [Finset.sum_congr rfl fun s' _ ↦ hpt s', Finset.sum_sub_distrib, ← Finset.sum_mul, hK1,
+      one_mul]
+  rw [hrhs] at hgen
+  simp only [driftStep]
+  linarith
+
+/-- **The sharp dynamic convex-order theorem, DC Theorem 3.1 / PL Theorem 5.3, proved in
+discrete skeleton form.**
+
+For every family of one-step kernels indexed by the entire past -- so for every possibly
+history-dependent, non-Markov, non-exchangeable coadapted coupling whose coordinates flip
+with the prescribed probabilities `τ α` and `τ β` -- and for every grid-convex report `f`
+and every horizon `m`, the iterated nearest-drift step is a lower bound:
+`(I + τ L_*)^m f (N₀) ≤ E f(N_m)`.  One and the same comparison chain works for every
+convex `f` and every `m` simultaneously, which is the content of DC (3.5).
+
+The step length enters only through `τ · 2 n (α + β) ≤ 1`, the condition making
+`I + τ L_*` substochastic; the continuous-time statement is its `τ → 0` limit and is not
+claimed here. -/
+theorem pathExp_nearestDrift_le {n : ℕ} (α β τ : ℝ) (hα : 0 ≤ α) (hβ : 0 ≤ β) (hτ : 0 ≤ τ)
+    (hshort : τ * (2 * (n : ℝ) * (α + β)) ≤ 1)
+    (K : List (Fin n → Bool) → (Fin n → Bool) → (Fin n → Bool) → ℝ)
+    (hK0 : ∀ hist s s', 0 ≤ K hist s s') (hK1 : ∀ hist s, ∑ s', K hist s s' = 1)
+    (hflip : ∀ (hist : List (Fin n → Bool)) (s : Fin n → Bool) (i : Fin n),
+      ∑ s', (if s' i = s i then (0 : ℝ) else K hist s s')
+        = τ * (if s i = true then α else β)) (f : ℤ → ℝ)
+    (hf : ∀ j : ℤ, 1 ≤ j → j + 1 ≤ (n : ℤ) → 0 ≤ f (j - 1) - 2 * f j + f (j + 1)) (m : ℕ) :
+    ∀ (hist : List (Fin n → Bool)) (s : Fin n → Bool),
+      (driftStep n α β τ)^[m] f ((occupiedCount s : ℕ) : ℤ)
+        ≤ pathExp K m hist s (fun s' ↦ f ((occupiedCount s' : ℕ) : ℤ)) := by
+  induction m with
+  | zero => intro hist s; simp [pathExp]
+  | succ m ih =>
+    intro hist s
+    rw [Function.iterate_succ_apply']
+    have hconv := driftStep_iterate_gridConvex n α β τ hα hβ hτ hshort f hf m
+    have h1 : driftStep n α β τ ((driftStep n α β τ)^[m] f) ((occupiedCount s : ℕ) : ℤ)
+        ≤ ∑ s', K hist s s' * (driftStep n α β τ)^[m] f ((occupiedCount s' : ℕ) : ℤ) :=
+      step_le_kernel α β τ hα hβ _ hconv (K hist) s (hK0 hist s) (hK1 hist s) (hflip hist s)
+    have h2 : ∑ s' : Fin n → Bool,
+        K hist s s' * (driftStep n α β τ)^[m] f ((occupiedCount s' : ℕ) : ℤ)
+        ≤ ∑ s' : Fin n → Bool,
+          K hist s s' * pathExp K m (s :: hist) s' (fun x ↦ f ((occupiedCount x : ℕ) : ℤ)) :=
+      Finset.sum_le_sum fun s' _ ↦
+        mul_le_mul_of_nonneg_left (ih (s :: hist) s') (hK0 hist s s')
+    simp only [pathExp]
+    linarith
+
+/-! ## The common mean and the endpoint chord upper bound -/
+
+/-- One step of the count-mean recursion forced by the coordinate-rate constraints:
+`x ↦ x + τ (β (n - x) - α x)`.  Every admissible coupling obeys it, so all of them share
+one mean-count trajectory (DC Theorem 3.1, "every admissible process has mean determined
+by `m' = nβ - (α+β)m`"). -/
+def meanStep (n : ℕ) (α β τ : ℝ) (x : ℝ) : ℝ := x + τ * (β * ((n : ℝ) - x) - α * x)
+
+/-- Iterates of an affine map are affine. -/
+theorem meanStep_iterate_affine (n : ℕ) (α β τ : ℝ) (m : ℕ) :
+    ∃ a c : ℝ, ∀ x : ℝ, (meanStep n α β τ)^[m] x = a + c * x := by
+  induction m with
+  | zero => exact ⟨0, 1, fun x ↦ by simp⟩
+  | succ m ih =>
+    obtain ⟨a, c, hac⟩ := ih
+    refine ⟨a + c * (τ * β * (n : ℝ)), c * (1 - τ * (α + β)), fun x ↦ ?_⟩
+    rw [Function.iterate_succ_apply, hac (meanStep n α β τ x)]
+    simp only [meanStep]
+    ring
+
+/-- **The mean count is the same for every admissible coupling.**
+
+The coordinate-rate constraints alone pin the whole mean-count trajectory, which is what
+makes the two extremal couplings comparable and is used for the chord bound. -/
+theorem pathExp_count_mean {n : ℕ} (α β τ : ℝ)
+    (K : List (Fin n → Bool) → (Fin n → Bool) → (Fin n → Bool) → ℝ)
+    (hK1 : ∀ hist s, ∑ s', K hist s s' = 1)
+    (hflip : ∀ (hist : List (Fin n → Bool)) (s : Fin n → Bool) (i : Fin n),
+      ∑ s', (if s' i = s i then (0 : ℝ) else K hist s s')
+        = τ * (if s i = true then α else β)) (m : ℕ) :
+    ∀ (hist : List (Fin n → Bool)) (s : Fin n → Bool),
+      pathExp K m hist s (fun s' ↦ ((occupiedCount s' : ℕ) : ℝ))
+        = (meanStep n α β τ)^[m] ((occupiedCount s : ℕ) : ℝ) := by
+  induction m with
+  | zero => intro hist s; simp [pathExp]
+  | succ m ih =>
+    intro hist s
+    obtain ⟨a, c, hac⟩ := meanStep_iterate_affine n α β τ m
+    have hone : ∑ s' : Fin n → Bool, K hist s s' * ((occupiedCount s' : ℕ) : ℝ)
+        = meanStep n α β τ ((occupiedCount s : ℕ) : ℝ) := by
+      have hd := kernel_count_drift α β τ (K hist) s (hflip hist s)
+      have hpt : ∀ s' : Fin n → Bool,
+          K hist s s' * (((occupiedCount s' : ℕ) : ℝ) - ((occupiedCount s : ℕ) : ℝ))
+            = K hist s s' * ((occupiedCount s' : ℕ) : ℝ)
+              - K hist s s' * ((occupiedCount s : ℕ) : ℝ) := fun s' ↦ by ring
+      rw [Finset.sum_congr rfl fun s' _ ↦ hpt s', Finset.sum_sub_distrib, ← Finset.sum_mul,
+        hK1 hist s, one_mul] at hd
+      simp only [meanStep]
+      linarith
+    have hpt : ∀ s' : Fin n → Bool,
+        K hist s s' * pathExp K m (s :: hist) s' (fun x ↦ ((occupiedCount x : ℕ) : ℝ))
+          = a * K hist s s' + c * (K hist s s' * ((occupiedCount s' : ℕ) : ℝ)) := by
+      intro s'
+      rw [ih (s :: hist) s', hac]
+      ring
+    simp only [pathExp]
+    rw [Finset.sum_congr rfl fun s' _ ↦ hpt s', Finset.sum_add_distrib, ← Finset.mul_sum,
+      ← Finset.mul_sum, hK1 hist s, mul_one, hone, Function.iterate_succ_apply,
+      hac (meanStep n α β τ ((occupiedCount s : ℕ) : ℝ))]
+
+/-- **The endpoint chord upper bound, DC (3.6) / PL (5.10).**
+
+Every admissible coupling reports at most the chord value at the common mean count. Since
+all admissible couplings share that mean, the synchronous all-coordinate coupling -- whose
+count is supported on `{0, n}` -- attains this bound. -/
+theorem pathExp_le_chord {n : ℕ} (α β τ : ℝ)
+    (K : List (Fin n → Bool) → (Fin n → Bool) → (Fin n → Bool) → ℝ)
+    (hK0 : ∀ hist s s', 0 ≤ K hist s s') (hK1 : ∀ hist s, ∑ s', K hist s s' = 1)
+    (hflip : ∀ (hist : List (Fin n → Bool)) (s : Fin n → Bool) (i : Fin n),
+      ∑ s', (if s' i = s i then (0 : ℝ) else K hist s s')
+        = τ * (if s i = true then α else β)) (f : ℤ → ℝ)
+    (hf : ∀ j : ℤ, 1 ≤ j → j + 1 ≤ (n : ℤ) → 0 ≤ f (j - 1) - 2 * f j + f (j + 1)) (m : ℕ)
+    (hist : List (Fin n → Bool)) (s : Fin n → Bool) :
+    (n : ℝ) * pathExp K m hist s (fun s' ↦ f ((occupiedCount s' : ℕ) : ℤ))
+      ≤ ((n : ℝ) - (meanStep n α β τ)^[m] ((occupiedCount s : ℕ) : ℝ)) * f 0
+        + ((meanStep n α β τ)^[m] ((occupiedCount s : ℕ) : ℝ)) * f ((n : ℤ)) := by
+  have hpt : ∀ x : Fin n → Bool,
+      (0 : ℝ) + (n : ℝ) * f ((occupiedCount x : ℕ) : ℤ)
+        ≤ (n : ℝ) * f 0 + (f ((n : ℤ)) - f 0) * ((occupiedCount x : ℕ) : ℝ) := by
+    intro x
+    have hc := chord_bound n f hf (k := ((occupiedCount x : ℕ) : ℤ)) (by positivity)
+      (by exact_mod_cast occupiedCount_le x)
+    have hcast : (((((occupiedCount x : ℕ) : ℤ)) : ℝ)) = ((occupiedCount x : ℕ) : ℝ) := by
+      push_cast
+      ring
+    rw [hcast] at hc
+    nlinarith [hc]
+  have hmono := pathExp_mono K hK0 _ _ hpt m hist s
+  rw [pathExp_affine K hK1 0 (n : ℝ) (fun x ↦ f ((occupiedCount x : ℕ) : ℤ)) m hist s,
+    pathExp_affine K hK1 ((n : ℝ) * f 0) (f ((n : ℤ)) - f 0)
+      (fun x ↦ ((occupiedCount x : ℕ) : ℝ)) m hist s,
+    pathExp_count_mean α β τ K hK1 hflip m hist s] at hmono
+  linarith
+
 end
 
 end Descent.Portability.ConvexOrderCoupling

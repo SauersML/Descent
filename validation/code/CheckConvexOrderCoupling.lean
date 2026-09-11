@@ -24,3 +24,14 @@ import Descent.Portability.ConvexOrderCoupling
 #print axioms Descent.Portability.ConvexOrderCoupling.sum_rate_secant_bound
 #print axioms Descent.Portability.ConvexOrderCoupling.nearestDrift_generator_le
 #print axioms Descent.Portability.ConvexOrderCoupling.nearestDrift_generator_le_weightedExp
+#print axioms Descent.Portability.ConvexOrderCoupling.occupiedCount_le
+#print axioms Descent.Portability.ConvexOrderCoupling.occupiedCount_eq_sum
+#print axioms Descent.Portability.ConvexOrderCoupling.occupiedCount_compl
+#print axioms Descent.Portability.ConvexOrderCoupling.kernel_count_drift
+#print axioms Descent.Portability.ConvexOrderCoupling.pathExp_mono
+#print axioms Descent.Portability.ConvexOrderCoupling.pathExp_affine
+#print axioms Descent.Portability.ConvexOrderCoupling.step_le_kernel
+#print axioms Descent.Portability.ConvexOrderCoupling.pathExp_nearestDrift_le
+#print axioms Descent.Portability.ConvexOrderCoupling.meanStep_iterate_affine
+#print axioms Descent.Portability.ConvexOrderCoupling.pathExp_count_mean
+#print axioms Descent.Portability.ConvexOrderCoupling.pathExp_le_chord
