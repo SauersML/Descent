@@ -20,3 +20,4 @@ import Descent.Portability.RadialReportLaws
 #print axioms Descent.Portability.RadialReportLaws.directionMarginal_totalVariation_le
 #print axioms Descent.Portability.RadialReportLaws.radial_report_law_totalVariation
 #print axioms Descent.Portability.RadialReportLaws.exists_radii_report_law_close
+#print axioms Descent.Portability.RadialReportLaws.directionMarginal_mass

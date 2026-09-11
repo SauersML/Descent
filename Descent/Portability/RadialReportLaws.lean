@@ -33,7 +33,7 @@ open Foundations RadialInterpolation
 
 noncomputable section
 
-variable {k : ℕ} {N D : Type*} [Fintype N] [Fintype D] [DecidableEq D]
+variable {k : ℕ} {N D : Type*} [Fintype N] [Fintype D]
 
 /-- The share `a/(a+b)` of the radial mass that keeps its own direction law. -/
 def posShare (r : Fin (k + 1) → ℝ) : ℝ := (radialTotal r + 1) / (2 * radialTotal r)
@@ -68,11 +68,13 @@ theorem posShare_nonneg (r : Fin (k + 1) → ℝ) (hinj : Function.Injective r) 
 /-- The positive part of the radial weights totals `(c+1)/2`. -/
 theorem sum_pos_part (r : Fin (k + 1) → ℝ) (hinj : Function.Injective r) :
     (∑ i, (|radialWeight r i| + radialWeight r i) / 2) = (radialTotal r + 1) / 2 := by
+  unfold radialTotal
   rw [← Finset.sum_div, Finset.sum_add_distrib, radialWeight_sum r hinj]
 
 /-- The negative part of the radial weights totals `(c-1)/2`. -/
 theorem sum_neg_part (r : Fin (k + 1) → ℝ) (hinj : Function.Injective r) :
     (∑ i, (|radialWeight r i| - radialWeight r i) / 2) = (radialTotal r - 1) / 2 := by
+  unfold radialTotal
   rw [← Finset.sum_div, Finset.sum_sub_distrib, radialWeight_sum r hinj]
 
 /-- The joint law of PL Corollary 7.3: a radial support point together with a direction
@@ -126,16 +128,20 @@ theorem radialDirectionExp_eq (r : Fin (k + 1) → ℝ) (hinj : Function.Injecti
   simp only [radialDirectionExp, radialExp, weightedExp_apply]
   rw [Fintype.sum_prod_type]
   refine Finset.sum_congr rfl fun zb _ ↦ ?_
-  by_cases hb : zb.2 = true
-  · simp only [hb, if_true, Finset.mul_sum]
-    refine Finset.sum_congr rfl fun d _ ↦ ?_
-    simp only [radialDirectionLaw, radialDirectionPoint, hb, if_true]
-    ring
-  · simp only [hb, if_false, Bool.not_eq_true.mp hb, Finset.mul_sum]
-    refine Finset.sum_congr rfl fun d _ ↦ ?_
-    simp only [radialDirectionLaw, radialDirectionPoint, hb, if_false,
-      Bool.not_eq_true.mp hb]
-    ring
+  have key : ∀ (c : ℝ) (m : D → ℝ),
+      (∑ d, c * m d * g (r zb.1 • dir d)) = c * ∑ d, m d * g (r zb.1 • dir d) := by
+    intro c m
+    rw [Finset.mul_sum]
+    exact Finset.sum_congr rfl fun d _ ↦ by ring
+  cases hz : zb.2
+  · have hif : ∀ a b : ℝ, (if zb.2 then a else b) = b := by
+      intro a b; rw [hz]; rfl
+    simp only [radialDirectionLaw, radialDirectionPoint, hif]
+    exact key (radialLaw r s zb) (fun d ↦ Q₀.mass d)
+  · have hif : ∀ a b : ℝ, (if zb.2 then a else b) = a := by
+      intro a b; rw [hz]; rfl
+    simp only [radialDirectionLaw, radialDirectionPoint, hif]
+    exact key (radialLaw r s zb) (fun d ↦ P₀.mass d)
 
 /-- **The master gap identity with direction laws.** -/
 theorem radialDirection_gap (r : Fin (k + 1) → ℝ) (hinj : Function.Injective r)
@@ -208,14 +214,21 @@ def directionMarginal (r : Fin (k + 1) → ℝ) (hinj : Function.Injective r) (s
   mass_sum := by
     have hpn := posShare_add_negShare r hinj
     cases s
-    · simp only [Bool.false_eq_true, if_false]
+    · show (∑ d, (posShare r * P₀.mass d + negShare r * Q₀.mass d)) = 1
       rw [Finset.sum_add_distrib, ← Finset.mul_sum, ← Finset.mul_sum,
         P₀.mass_sum, Q₀.mass_sum]
       linarith
-    · simp only [if_true]
+    · show (∑ d, (negShare r * P₀.mass d + posShare r * Q₀.mass d)) = 1
       rw [Finset.sum_add_distrib, ← Finset.mul_sum, ← Finset.mul_sum,
         P₀.mass_sum, Q₀.mass_sum]
       linarith
+
+/-- The direction marginal's mass, branch by branch. -/
+theorem directionMarginal_mass (r : Fin (k + 1) → ℝ) (hinj : Function.Injective r)
+    (s : Bool) (P₀ Q₀ : FiniteReportLaw D) (d : D) :
+    (directionMarginal r hinj s P₀ Q₀).mass d =
+      if s then negShare r * P₀.mass d + posShare r * Q₀.mass d
+      else posShare r * P₀.mass d + negShare r * Q₀.mass d := rfl
 
 /-- **PL equation (7.6).** The direction marginal of the joint law is exactly the
 mixture `(a P₀ + b Q₀)/(a+b)`, with the roles exchanged under the second law. -/
@@ -224,53 +237,58 @@ theorem directionMarginal_mass_eq (r : Fin (k + 1) → ℝ) (hinj : Function.Inj
     (∑ zb : Fin (k + 1) × Bool,
       radialLaw r s zb * (if zb.2 then P₀.mass d else Q₀.mass d)) =
       (directionMarginal r hinj s P₀ Q₀).mass d := by
-  have hA : (if (true : Bool) then P₀.mass d else Q₀.mass d) = P₀.mass d := rfl
-  have hB : (if (false : Bool) then P₀.mass d else Q₀.mass d) = Q₀.mass d := rfl
   have hpos := sum_pos_part r hinj
   have hneg := sum_neg_part r hinj
   have hc : (1 : ℝ) ≤ radialTotal r := one_le_radialTotal r hinj
   have hc0 : radialTotal r ≠ 0 := by linarith
   rw [Fintype.sum_prod_type]
   cases s
-  · have h0 : ∀ i : Fin (k + 1), radialLaw r false (i, false) =
-        (|radialWeight r i| - radialWeight r i) / 2 / radialTotal r := fun _ ↦ rfl
-    have h1 : ∀ i : Fin (k + 1), radialLaw r false (i, true) =
-        (|radialWeight r i| + radialWeight r i) / 2 / radialTotal r := fun _ ↦ rfl
-    have hstep : ∀ i : Fin (k + 1),
+  · have hstep : ∀ i : Fin (k + 1),
         (∑ bb : Bool, radialLaw r false (i, bb) *
           (if bb then P₀.mass d else Q₀.mass d)) =
-        (|radialWeight r i| + radialWeight r i) / 2 * P₀.mass d / radialTotal r +
-          (|radialWeight r i| - radialWeight r i) / 2 * Q₀.mass d / radialTotal r := by
+        ((|radialWeight r i| + radialWeight r i) / 2) * (P₀.mass d / radialTotal r) +
+          ((|radialWeight r i| - radialWeight r i) / 2) *
+            (Q₀.mass d / radialTotal r) := by
       intro i
-      simp only [Fintype.sum_bool, h0 i, h1 i, hA, hB]
+      have hb : (∑ bb : Bool, radialLaw r false (i, bb) *
+          (if bb then P₀.mass d else Q₀.mass d)) =
+          (|radialWeight r i| + radialWeight r i) / 2 / radialTotal r * P₀.mass d +
+            (|radialWeight r i| - radialWeight r i) / 2 / radialTotal r * Q₀.mass d :=
+        Fintype.sum_bool _
+      rw [hb]
       ring
-    rw [Finset.sum_congr rfl fun i _ ↦ hstep i, Finset.sum_add_distrib]
-    simp only [div_eq_mul_inv, ← Finset.sum_mul]
-    rw [← Finset.sum_mul, ← Finset.sum_mul, hpos, hneg]
-    show _ = posShare r * P₀.mass d + negShare r * Q₀.mass d
+    have hm : (directionMarginal r hinj false P₀ Q₀).mass d =
+        posShare r * P₀.mass d + negShare r * Q₀.mass d := rfl
+    rw [Finset.sum_congr rfl fun i _ ↦ hstep i, Finset.sum_add_distrib,
+      ← Finset.sum_mul, ← Finset.sum_mul, hpos, hneg, hm]
     unfold posShare negShare
-    field_simp
-    ring
-  · have h0 : ∀ i : Fin (k + 1), radialLaw r true (i, false) =
-        (|radialWeight r i| + radialWeight r i) / 2 / radialTotal r := fun _ ↦ rfl
-    have h1 : ∀ i : Fin (k + 1), radialLaw r true (i, true) =
-        (|radialWeight r i| - radialWeight r i) / 2 / radialTotal r := fun _ ↦ rfl
-    have hstep : ∀ i : Fin (k + 1),
+    first
+      | (field_simp; ring)
+      | field_simp
+  · have hstep : ∀ i : Fin (k + 1),
         (∑ bb : Bool, radialLaw r true (i, bb) *
           (if bb then P₀.mass d else Q₀.mass d)) =
-        (|radialWeight r i| - radialWeight r i) / 2 * P₀.mass d / radialTotal r +
-          (|radialWeight r i| + radialWeight r i) / 2 * Q₀.mass d / radialTotal r := by
+        ((|radialWeight r i| - radialWeight r i) / 2) * (P₀.mass d / radialTotal r) +
+          ((|radialWeight r i| + radialWeight r i) / 2) *
+            (Q₀.mass d / radialTotal r) := by
       intro i
-      simp only [Fintype.sum_bool, h0 i, h1 i, hA, hB]
+      have hb : (∑ bb : Bool, radialLaw r true (i, bb) *
+          (if bb then P₀.mass d else Q₀.mass d)) =
+          (|radialWeight r i| - radialWeight r i) / 2 / radialTotal r * P₀.mass d +
+            (|radialWeight r i| + radialWeight r i) / 2 / radialTotal r * Q₀.mass d :=
+        Fintype.sum_bool _
+      rw [hb]
       ring
-    rw [Finset.sum_congr rfl fun i _ ↦ hstep i, Finset.sum_add_distrib]
-    simp only [div_eq_mul_inv, ← Finset.sum_mul]
-    rw [← Finset.sum_mul, ← Finset.sum_mul, hpos, hneg]
-    show _ = negShare r * P₀.mass d + posShare r * Q₀.mass d
+    have hm : (directionMarginal r hinj true P₀ Q₀).mass d =
+        negShare r * P₀.mass d + posShare r * Q₀.mass d := rfl
+    rw [Finset.sum_congr rfl fun i _ ↦ hstep i, Finset.sum_add_distrib,
+      ← Finset.sum_mul, ← Finset.sum_mul, hneg, hpos, hm]
     unfold posShare negShare
-    field_simp
-    ring
+    first
+      | (field_simp; ring)
+      | field_simp
 
+omit [Fintype N] in
 /-- A scale-invariant observable of the outcome integrates against the direction
 marginal alone. -/
 theorem radialDirection_scale_invariant_exp (r : Fin (k + 1) → ℝ)
@@ -286,7 +304,6 @@ theorem radialDirection_scale_invariant_exp (r : Fin (k + 1) → ℝ)
   refine Finset.sum_congr rfl fun zb _ ↦ ?_
   simp only [radialDirectionLaw, radialDirectionPoint]
   rw [hh (r zb.1) (hpos zb.1) (dir d)]
-  ring
 
 /-- **PL Corollary 7.3, the boxed bound.** Each report-law mixture is within `b/(a+b)`
 of its target direction law in total variation. -/
@@ -340,7 +357,7 @@ theorem radial_report_law_totalVariation (r : Fin (k + 1) → ℝ)
 radii whose two moment-matched direction-law outcome laws have report laws within `η` of
 their respective targets in total variation. -/
 theorem exists_radii_report_law_close (k : ℕ) (η : ℝ) (hη : 0 < η) :
-    ∃ (t : ℝ) (ht : 0 < t) (ht1 : t < 1), negShare (radii k t) ≤ η := by
+    ∃ t : ℝ, 0 < t ∧ t < 1 ∧ negShare (radii k t) ≤ η := by
   obtain ⟨t, ht, ht1, htot⟩ := exists_radii_total_lt k (2 * η) (by linarith)
   refine ⟨t, ht, ht1, ?_⟩
   have hinj := radii_injective k t ht ht1
