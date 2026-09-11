@@ -268,6 +268,8 @@ import Descent.Portability.HWELogCoordinates
 import Descent.Portability.RademacherParityLaw
 import Descent.Portability.RademacherParityConditioning
 import Descent.Portability.RademacherParityWeakLimit
+import Descent.Portability.HWEHomozygoteConditioning
+import Descent.Portability.RademacherJointLimit
 assert_below Descent.Program
 
 /-!

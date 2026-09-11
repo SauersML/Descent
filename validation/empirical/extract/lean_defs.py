@@ -4157,6 +4157,16 @@ def Descent_Portability_HWEHeterozygosityLaw_count(x):
 def Descent_Portability_HWEHeterozygosityLaw_probability(h):
     return (4.0 * _rt.lpow(((_rt._proj(h, 'altFreq') - _rt.rdiv(1.0, 2.0))), 2.0))
 
+def Descent_Portability_HWEHomozygoteConditioning_encode(*_a):
+    if len(_a) < 1:
+        return lambda *_b: Descent_Portability_HWEHomozygoteConditioning_encode(*(_a + _b))
+    _e, = _a[:1]
+    _t = [false, false, true]
+    return _t[_rt._ix(_e, 3, 'encode')]
+
+def homoVector(b):
+    return (lambda i: homozygote((b(i))))
+
 def complexExpectation(p, f):
     return sum((((_rt._proj(p, 'mass')(x)) * f(x))) for x in range(int(_rt.sumdim('x', len(_rt._proj(p, 'mass')), len(f)))))
 
