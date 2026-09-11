@@ -1,0 +1,20 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.UniversalReportMonotonicity
+
+/-! Axiom audit of UniversalReportMonotonicity. -/
+
+#print axioms Descent.Portability.UniversalReportMonotonicity.pushLaw_isLaw
+#print axioms Descent.Portability.UniversalReportMonotonicity.pushLaw_expectation
+#print axioms Descent.Portability.UniversalReportMonotonicity.universal_one_step_monotone_iff
+#print axioms Descent.Portability.UniversalReportMonotonicity.universal_generator_monotone_iff
+#print axioms Descent.Portability.UniversalReportMonotonicity.minimizer_successor
+#print axioms Descent.Portability.UniversalReportMonotonicity.pow_nonneg_entries
+#print axioms Descent.Portability.UniversalReportMonotonicity.irreducible_forces_constant
+#print axioms Descent.Portability.UniversalReportMonotonicity.recurrent_evolution_obstruction
+#print axioms Descent.Portability.UniversalReportMonotonicity.generator_minimizer_successor
+#print axioms Descent.Portability.UniversalReportMonotonicity.generator_irreducible_forces_constant
+#print axioms Descent.Portability.UniversalReportMonotonicity.flipSemigroup_is_transition_semigroup
+#print axioms Descent.Portability.UniversalReportMonotonicity.flipGenerator_is_irreducible_generator
+#print axioms Descent.Portability.UniversalReportMonotonicity.flip_report_monotone_iff
