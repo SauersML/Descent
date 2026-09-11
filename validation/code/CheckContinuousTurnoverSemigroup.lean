@@ -22,3 +22,10 @@ open Descent.Portability.ContinuousTurnoverSemigroup
 #print axioms euler_iterate_le
 #print axioms diag_nonpos
 #print axioms exp_nearestDriftMatrix_mulVec_le
+#print axioms mulVec_smul_comm
+#print axioms euler_pow_mulVec_eigen
+#print axioms exp_mulVec_eigen
+#print axioms linearDeathMatrix_mulVec
+#print axioms linearDeathMatrix_eigen_id
+#print axioms linearDeathMatrix_eigen_quad
+#print axioms exp_linearDeath_sq

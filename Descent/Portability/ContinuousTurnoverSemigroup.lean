@@ -422,6 +422,129 @@ theorem exp_nearestDriftMatrix_mulVec_le (n : ℕ) (α β t : ℝ) (hα : 0 ≤ 
     have hkey : (m : ℝ)⁻¹ * t * (-(L k' k')) < 1 := lt_of_le_of_lt hstep hfin
     linarith
 
+/-! ## Eigenvectors of a generator are eigenvectors of its semigroup -/
+
+/-- Scaling commutes with a matrix acting on a vector. -/
+theorem mulVec_smul_comm {N : ℕ} (M : Matrix (Fin N) (Fin N) ℝ) (r : ℝ) (u : Fin N → ℝ) :
+    M.mulVec (r • u) = r • M.mulVec u := by
+  funext i
+  simp only [Matrix.mulVec, dotProduct, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
+  exact Finset.sum_congr rfl fun l _ ↦ by ring
+
+/-- Euler approximants act on an eigenvector by the scalar Euler approximant. -/
+theorem euler_pow_mulVec_eigen {N : ℕ} (A : Matrix (Fin N) (Fin N) ℝ) (w : Fin N → ℝ)
+    (c τ : ℝ) (hAw : A.mulVec w = c • w) (m : ℕ) :
+    ((1 + τ • A) ^ m).mulVec w = ((1 + τ * c) ^ m) • w := by
+  induction m with
+  | zero => simp
+  | succ m ih =>
+    have h2 : (1 + τ • A).mulVec w = (1 + τ * c) • w := by
+      rw [Matrix.add_mulVec, Matrix.one_mulVec, Matrix.smul_mulVec, hAw, smul_smul, add_smul,
+        one_smul]
+    rw [pow_mulVec_succ, ih, mulVec_smul_comm, h2, smul_smul, pow_succ]
+
+/-- **An eigenvector of a generator is an eigenvector of the semigroup it generates**, with
+eigenvalue exponentiated.  Proved through the Euler limit, not through an ODE. -/
+theorem exp_mulVec_eigen {N : ℕ} (A : Matrix (Fin N) (Fin N) ℝ) (w : Fin N → ℝ) (c t : ℝ)
+    (hAw : A.mulVec w = c • w) (j : Fin N) :
+    (NormedSpace.exp ℝ (t • A)).mulVec w j = NormedSpace.exp ℝ (t * c) * w j := by
+  have hcont : Continuous (mulVecEntry N w j) :=
+    (mulVecEntry N w j).continuous_of_finiteDimensional
+  have hA := (hcont.tendsto (NormedSpace.exp ℝ (t • A))).comp
+    (BanachEulerExponential.euler_tends_exp (t • A))
+  have hB : Filter.Tendsto (fun m : ℕ ↦ ((1 + (m : ℝ)⁻¹ • (t * c)) ^ m) * w j) Filter.atTop
+      (nhds (NormedSpace.exp ℝ (t * c) * w j)) :=
+    (BanachEulerExponential.euler_tends_exp (t * c)).mul_const (w j)
+  have heq : ∀ m : ℕ, (mulVecEntry N w j) ((1 + (m : ℝ)⁻¹ • (t • A)) ^ m)
+      = ((1 + (m : ℝ)⁻¹ • (t * c)) ^ m) * w j := by
+    intro m
+    show (((1 + (m : ℝ)⁻¹ • (t • A)) ^ m).mulVec w) j = _
+    rw [show (m : ℝ)⁻¹ • (t • A) = ((m : ℝ)⁻¹ * t) • A from smul_smul _ _ _,
+      euler_pow_mulVec_eigen A w c ((m : ℝ)⁻¹ * t) hAw]
+    simp only [Pi.smul_apply, smul_eq_mul]
+    ring
+  exact tendsto_nhds_unique (Filter.Tendsto.congr heq hA) hB
+
+/-! ## The linear pure-death chain of DC Corollary 3.5 -/
+
+/-- The linear pure-death generator of DC Corollary 3.5: from `j` surviving coordinates the
+count falls to `j - 1` at rate `γ j`, and `0` is absorbing. -/
+def linearDeathMatrix (m : ℕ) (gamma : ℝ) : Matrix (Fin (m + 1)) (Fin (m + 1)) ℝ :=
+  Matrix.of fun j i ↦ gamma * ((j : ℕ) : ℝ)
+    * ((if i = gridPred m j then (1 : ℝ) else 0) - (if i = j then (1 : ℝ) else 0))
+
+/-- The pure-death generator acts by the scaled down-difference. -/
+theorem linearDeathMatrix_mulVec (m : ℕ) (gamma : ℝ) (v : Fin (m + 1) → ℝ)
+    (j : Fin (m + 1)) :
+    (linearDeathMatrix m gamma).mulVec v j
+      = gamma * ((j : ℕ) : ℝ) * (v (gridPred m j) - v j) := by
+  have hsum : ∀ c : Fin (m + 1),
+      ∑ i : Fin (m + 1), (if i = c then (1 : ℝ) else 0) * v i = v c := by
+    intro c
+    simp only [ite_mul, one_mul, zero_mul]
+    rw [Finset.sum_ite_eq' Finset.univ c v, if_pos (Finset.mem_univ c)]
+  have hpt : ∀ i : Fin (m + 1), linearDeathMatrix m gamma j i * v i
+      = gamma * ((j : ℕ) : ℝ) * ((if i = gridPred m j then (1 : ℝ) else 0) * v i
+        - (if i = j then (1 : ℝ) else 0) * v i) := by
+    intro i
+    simp only [linearDeathMatrix, Matrix.of_apply]
+    ring
+  show ∑ i : Fin (m + 1), linearDeathMatrix m gamma j i * v i = _
+  rw [Finset.sum_congr rfl fun i _ ↦ hpt i, ← Finset.mul_sum, Finset.sum_sub_distrib]
+  simp only [hsum]
+
+/-- The count itself is an eigenvector of the pure-death generator, eigenvalue `-γ`. -/
+theorem linearDeathMatrix_eigen_id (m : ℕ) (gamma : ℝ) :
+    (linearDeathMatrix m gamma).mulVec (fun j ↦ ((j : ℕ) : ℝ))
+      = (-gamma) • (fun j : Fin (m + 1) ↦ ((j : ℕ) : ℝ)) := by
+  funext j
+  rw [linearDeathMatrix_mulVec]
+  simp only [Pi.smul_apply, smul_eq_mul]
+  rcases Nat.eq_zero_or_pos (j : ℕ) with h | h
+  · rw [h]
+    simp
+  · have hc : (((gridPred m j : Fin (m + 1)) : ℕ) : ℝ) = ((j : ℕ) : ℝ) - 1 := by
+      show (((j : ℕ) - 1 : ℕ) : ℝ) = ((j : ℕ) : ℝ) - 1
+      rw [Nat.cast_sub h]
+      norm_num
+    rw [hc]
+    ring
+
+/-- The falling square is an eigenvector of the pure-death generator, eigenvalue `-2γ`. -/
+theorem linearDeathMatrix_eigen_quad (m : ℕ) (gamma : ℝ) :
+    (linearDeathMatrix m gamma).mulVec (fun j ↦ ((j : ℕ) : ℝ) ^ 2 - ((j : ℕ) : ℝ))
+      = (-(2 * gamma)) • (fun j : Fin (m + 1) ↦ ((j : ℕ) : ℝ) ^ 2 - ((j : ℕ) : ℝ)) := by
+  funext j
+  rw [linearDeathMatrix_mulVec]
+  simp only [Pi.smul_apply, smul_eq_mul]
+  rcases Nat.eq_zero_or_pos (j : ℕ) with h | h
+  · rw [h]
+    simp
+  · have hc : (((gridPred m j : Fin (m + 1)) : ℕ) : ℝ) = ((j : ℕ) : ℝ) - 1 := by
+      show (((j : ℕ) - 1 : ℕ) : ℝ) = ((j : ℕ) : ℝ) - 1
+      rw [Nat.cast_sub h]
+      norm_num
+    rw [hc]
+    ring
+
+/-- **DC Corollary 3.5's report, in continuous time and in closed form.**  The exact value
+of the squared count under the pure-death semigroup, from any starting state. -/
+theorem exp_linearDeath_sq (m : ℕ) (gamma t : ℝ) (j : Fin (m + 1)) :
+    (NormedSpace.exp ℝ (t • linearDeathMatrix m gamma)).mulVec
+        (fun i ↦ ((i : ℕ) : ℝ) ^ 2) j
+      = NormedSpace.exp ℝ (t * (-(2 * gamma))) * (((j : ℕ) : ℝ) ^ 2 - ((j : ℕ) : ℝ))
+        + NormedSpace.exp ℝ (t * (-gamma)) * ((j : ℕ) : ℝ) := by
+  have hsplit : (fun i : Fin (m + 1) ↦ ((i : ℕ) : ℝ) ^ 2)
+      = (fun i : Fin (m + 1) ↦ ((i : ℕ) : ℝ) ^ 2 - ((i : ℕ) : ℝ))
+        + (fun i : Fin (m + 1) ↦ ((i : ℕ) : ℝ)) := by
+    funext i
+    simp only [Pi.add_apply]
+    ring
+  rw [hsplit, Matrix.mulVec_add]
+  simp only [Pi.add_apply]
+  rw [exp_mulVec_eigen (linearDeathMatrix m gamma) _ _ t (linearDeathMatrix_eigen_quad m gamma) j,
+    exp_mulVec_eigen (linearDeathMatrix m gamma) _ _ t (linearDeathMatrix_eigen_id m gamma) j]
+
 end
 
 end Descent.Portability.ContinuousTurnoverSemigroup
