@@ -88,7 +88,7 @@ theorem integral_truncatedDraw_curve (curve : ℝ → ℝ) (stage : ℕ) :
     ∫ stream, curve (truncatedDraw stage stream) ∂bitMeasure =
       ∑ index ∈ Finset.range (2 ^ stage),
         (1 / 2 : ℝ) ^ stage * curve ((index : ℝ) / 2 ^ stage) := by
-  rw [curve_truncatedDraw_eq, integral_prefix,
+  rw [curve_truncatedDraw_eq, integral_prefix stage fun word ↦ curve (wordDraw stage word : ℝ),
     sum_wordsOfLength_wordDraw stage fun draw ↦ (1 / 2 : ℝ) ^ stage * curve (draw : ℝ)]
   refine Finset.sum_congr rfl fun index _ ↦ ?_
   first
@@ -130,7 +130,7 @@ theorem integral_uniformDraw_of_antitoneOn (curve : ℝ → ℝ)
   have hmeasurable : ∀ stage, AEStronglyMeasurable
       (fun stream ↦ curve (truncatedDraw stage stream)) bitMeasure := fun stage ↦ by
     rw [curve_truncatedDraw_eq]
-    exact (measurable_prefix stage _).aestronglyMeasurable
+    exact (measurable_prefix stage fun word ↦ curve (wordDraw stage word : ℝ)).aestronglyMeasurable
   have hdominated := tendsto_integral_of_dominated_convergence
     (fun _ ↦ |curve 0| + |curve 1|) hmeasurable (integrable_const _)
     (fun stage ↦ ae_of_all _ fun stream ↦ hbound _ (hmember stage stream)) hlimit
@@ -278,14 +278,14 @@ theorem logUpper_succ_le (terms : ℕ) {rate : ℚ} (hpos : 0 < rate) (hle : rat
   have hpower : (0:ℚ) ≤ (1 - rate) ^ (terms + 1) := pow_nonneg hdeficit _
   have horder : (0:ℚ) < (terms : ℚ) + 1 := by positivity
   have hkey : (1 - rate) ^ (terms + 1) / ((terms : ℚ) + 1) +
-      (1 - rate) ^ (terms + 1) * (1 - rate) / (((terms : ℚ) + 1 + 1) * rate) ≤
+      (1 - rate) ^ (terms + 1 + 1) / (((terms : ℚ) + 1 + 1) * rate) ≤
       (1 - rate) ^ (terms + 1) / (((terms : ℚ) + 1) * rate) := by
-    rw [div_add_div _ _ horder.ne' (by positivity), div_le_div_iff₀ (by positivity)
-      (by positivity)]
+    rw [pow_succ (1 - rate) (terms + 1), div_add_div _ _ horder.ne' (by positivity),
+      div_le_div_iff₀ (by positivity) (by positivity)]
     nlinarith [mul_nonneg (mul_nonneg (mul_nonneg hpower horder.le) hpos.le) hdeficit,
       mul_nonneg (mul_nonneg hpower horder.le) hpos.le]
   unfold logUpper
-  rw [hsplit, pow_succ]
+  rw [hsplit]
   push_cast
   linarith
 
@@ -293,16 +293,16 @@ theorem logUpper_succ_le (terms : ℕ) {rate : ℚ} (hpos : 0 < rate) (hle : rat
 theorem logUpper_antitone_rate (terms : ℕ) {first second : ℚ} (hpos : 0 < first)
     (hle : first ≤ second) (hsecond : second ≤ 1) :
     logUpper terms second ≤ logUpper terms first := by
+  have hsecondPos : 0 < second := lt_of_lt_of_le hpos hle
   have hlower := logLower_antitone_rate terms hle hsecond
   have hnumerator : (1 - second) ^ (terms + 1) ≤ (1 - first) ^ (terms + 1) :=
     pow_le_pow_left₀ (by linarith) (by linarith) _
-  have hnumeratorNonneg : (0:ℚ) ≤ (1 - second) ^ (terms + 1) := pow_nonneg (by linarith) _
   have horder : (0:ℚ) < (terms : ℚ) + 1 := by positivity
   have hproduct : (1 - second) ^ (terms + 1) * first ≤ (1 - first) ^ (terms + 1) * second :=
     mul_le_mul hnumerator hle hpos.le (pow_nonneg (by linarith) _)
   have htail : (1 - second) ^ (terms + 1) / (((terms : ℚ) + 1) * second) ≤
       (1 - first) ^ (terms + 1) / (((terms : ℚ) + 1) * first) := by
-    rw [div_le_div_iff₀ (by positivity) (by positivity)]
+    rw [div_le_div_iff₀ (mul_pos horder hsecondPos) (mul_pos horder hpos)]
     nlinarith [mul_le_mul_of_nonneg_left hproduct horder.le]
   unfold logUpper
   linarith
@@ -402,7 +402,9 @@ theorem exponentialWidth_le (stage : ℕ) {left floor : ℝ} (hfloor : 0 < floor
     rw [← Real.log_div hrightPos.ne' hleftPos.ne']
     calc Real.log ((left + (1 / 2) ^ stage) / left)
         ≤ (left + (1 / 2) ^ stage) / left - 1 := Real.log_le_sub_one_of_pos (by positivity)
-      _ = (1 / 2) ^ stage / left := by field_simp
+      _ = (1 / 2) ^ stage / left := by
+          field_simp
+          ring
       _ ≤ (1 / 2) ^ stage / floor := div_le_div_of_nonneg_left hpower.le hfloor hleft
   have hsplit : logUpper stage left = logLower stage left +
       (1 - left) ^ (stage + 1) / (((stage : ℝ) + 1) * left) := rfl
@@ -489,9 +491,9 @@ def exponentialEvaluator : CylinderEvaluator fun stream ↦ exponentialCap (unif
       have hpower := (tendsto_pow_atTop_nhds_zero_of_lt_one (r := (1 / 2 : ℝ)) (by norm_num)
         (by norm_num)).div_const ((1 / 2 : ℝ) ^ (index + 1))
       have hsum := hharmonic.add hpower
-      rw [mul_zero, zero_div, zero_div, add_zero] at hsum
+      rw [mul_zero, zero_div, add_zero] at hsum
       refine hsum.congr fun stage ↦ ?_
-      field_simp
+      rw [mul_one_div, div_div]
     have hconst : Tendsto (fun _ : ℕ ↦ (0:ℝ)) atTop (𝓝 0) := tendsto_const_nhds
     refine tendsto_of_tendsto_of_tendsto_of_le_of_le' hconst hmajorant ?_ ?_
     · refine Eventually.of_forall fun stage ↦ ?_
