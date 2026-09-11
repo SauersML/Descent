@@ -106,23 +106,23 @@ theorem lahPolynomial_one : lahPolynomial 1 = X := by
 /-- `A_2(z) = 2z + z^2`. -/
 theorem lahPolynomial_two : lahPolynomial 2 = 2 * X + X ^ 2 := by
   simp only [lahPolynomial, lahCoefficient, Finset.sum_range_succ, Finset.sum_range_zero]
-  norm_num [Nat.factorial, Nat.choose]
+  norm_num [Nat.factorial, Nat.choose, Polynomial.C_ofNat]
 
 /-- `A_3(z) = 6z + 6z^2 + z^3`. -/
 theorem lahPolynomial_three : lahPolynomial 3 = 6 * X + 6 * X ^ 2 + X ^ 3 := by
   simp only [lahPolynomial, lahCoefficient, Finset.sum_range_succ, Finset.sum_range_zero]
-  norm_num [Nat.factorial, Nat.choose]
+  norm_num [Nat.factorial, Nat.choose, Polynomial.C_ofNat]
 
 /-- `A_4(z) = 24z + 36z^2 + 12z^3 + z^4`. -/
 theorem lahPolynomial_four : lahPolynomial 4 = 24 * X + 36 * X ^ 2 + 12 * X ^ 3 + X ^ 4 := by
   simp only [lahPolynomial, lahCoefficient, Finset.sum_range_succ, Finset.sum_range_zero]
-  norm_num [Nat.factorial, Nat.choose]
+  norm_num [Nat.factorial, Nat.choose, Polynomial.C_ofNat]
 
 /-- `A_6(z) = 720z + 1800z^2 + 1200z^3 + 300z^4 + 30z^5 + z^6`. -/
 theorem lahPolynomial_six :
     lahPolynomial 6 = 720 * X + 1800 * X ^ 2 + 1200 * X ^ 3 + 300 * X ^ 4 + 30 * X ^ 5 + X ^ 6 := by
   simp only [lahPolynomial, lahCoefficient, Finset.sum_range_succ, Finset.sum_range_zero]
-  norm_num [Nat.factorial, Nat.choose]
+  norm_num [Nat.factorial, Nat.choose, Polynomial.C_ofNat]
 
 /-! ## The connectivity cumulants of the table -/
 
