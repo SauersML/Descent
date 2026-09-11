@@ -69,11 +69,12 @@ exposures; rounding moves an exposure by at most one grid step, so the transform
 `∫ e^{-λ b} ν(db)` for every `λ ≥ 0` (`tendsto_exposureLaplace_quantizedLaw`), and so do the
 couplings of the chronologies realising the quantized laws
 (`tendsto_couplingOfState_quantizedHistory`), each a chronology with nonnegative event totals
-(`eventTotals_nonneg_quantizedHistory`). The limit is stated for `C(λ)` at each `λ`, which for
-laws on `[0, R]` determines the law (`ExposureLaplaceConstraints.measure_eq_of_measureLaplace_eq`).
+(`eventTotals_nonneg_quantizedHistory`). The quantized laws also converge to `ν` weakly: the
+integral of every bounded continuous test function against them converges to its integral
+against `ν` (`tendsto_integral_lawMeasure_quantizedLaw`), by dominated convergence, since the
+rounded exposures converge to the exposure (`tendsto_gridExposure_gridIndex`).
 
-Not formalised: weak convergence of the quantized laws against every bounded continuous test
-function, and a measure-driven schedule realising `ν` exactly rather than as a limit. Nothing
+Not formalised: a measure-driven schedule realising `ν` exactly rather than as a limit. Nothing
 here identifies an exposure law from data.
 
 ## Empirical status
