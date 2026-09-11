@@ -27,16 +27,22 @@ moment formula, and the density realizing it, `smoothDensity`, is nonnegative, b
 absolutely continuous with bounded densities and really do share their raw moments through
 degree `k`.
 
+Third, the product of these marginals over the coordinates is `MeasureTheory.Measure.pi`,
+and its joint raw moments factor into the coordinate moments, so the two product laws
+share every joint raw moment whose coordinate exponents are at most `k`. That is equation
+(7.7) for genuinely independent, absolutely continuous, bounded-density coordinates.
+
 ## Scope
 
-What is NOT proved here, and is the single open item of the obstruction package: the
-product of these smoothed marginals over the coordinates, and the convergence of the
-expected fitted report under that product law to the finitely supported value. The first
-is `MeasureTheory.Measure.pi` together with the factorization of a coordinatewise product
-integral; the second needs the report's continuity at each atom of the finitely supported
-law, which holds because the denominator is nonzero there, together with dominated
-convergence as `ε → 0`. Neither is formalized. The finitely supported, genuinely
-independent core is `IndependentRadialLaws.independent_radial_obstruction`.
+One step is NOT proved here, and it is the single open item of the obstruction package:
+the convergence of the expected fitted report under the smoothed product law to its value
+under the finitely supported product law as `ε → 0`. Conditioning on the finitely
+supported atom reduces it to a finite sum of averages of the report over small cubes, so
+no null-set argument is needed: the report is continuous at each atom because its
+denominator is nonzero there, which is the definedness condition the finite theorems
+already carry. What remains unformalized is that reduction together with dominated
+convergence. The finitely supported, genuinely independent core is
+`IndependentRadialLaws.independent_radial_obstruction`.
 
 ## Empirical status
 
@@ -309,6 +315,53 @@ theorem radial_smoothedLaw_univ {k : ℕ} (r : Fin (k + 1) → ℝ)
     smoothedLaw (radialLaw r s) (coordValue r a b) ε Set.univ = 1 :=
   smoothedLaw_univ (radialLaw r s) (coordValue r a b) (radialLaw_nonneg r s)
     (radialLaw_sum r hinj s) ε hε
+
+/-- The smoothed law is finite, hence sigma-finite, so product measures over the
+coordinates are available. -/
+instance smoothedLaw_isFiniteMeasure {p v : Z → ℝ} {ε : ℝ} :
+    MeasureTheory.IsFiniteMeasure (smoothedLaw p v ε) := by
+  constructor
+  unfold smoothedLaw
+  rw [MeasureTheory.Measure.finset_sum_apply]
+  refine ENNReal.sum_lt_top.mpr fun z _ ↦ ?_
+  rw [MeasureTheory.Measure.smul_apply, MeasureTheory.Measure.restrict_apply_univ,
+    Real.volume_Icc, smul_eq_mul]
+  exact ENNReal.mul_lt_top ENNReal.ofReal_lt_top ENNReal.ofReal_lt_top
+
+/-- **PL equation (7.7) for the product law.** The joint raw moments of a product of
+smoothed coordinate laws factor into the coordinate moments, so two product laws built
+from coordinatewise matched laws share every joint raw moment whose coordinate exponents
+are at most `k`. -/
+theorem smoothedProduct_moment_match {N : Type*} [Fintype N] (p q v : N → Z → ℝ)
+    (hp : ∀ i z, 0 ≤ p i z) (hq : ∀ i z, 0 ≤ q i z) (k : ℕ)
+    (hmatch : ∀ i r, r ≤ k → (∑ z, p i z * v i z ^ r) = ∑ z, q i z * v i z ^ r)
+    (ε : ℝ) (hε : 0 < ε) (α : N → ℕ) (hα : ∀ i, α i ≤ k) :
+    ∫ y : N → ℝ, ∏ i, y i ^ α i
+        ∂(MeasureTheory.Measure.pi fun i ↦ smoothedLaw (p i) (v i) ε) =
+      ∫ y : N → ℝ, ∏ i, y i ^ α i
+        ∂(MeasureTheory.Measure.pi fun i ↦ smoothedLaw (q i) (v i) ε) := by
+  rw [MeasureTheory.integral_fintype_prod_eq_prod (fun i (t : ℝ) ↦ t ^ α i),
+    MeasureTheory.integral_fintype_prod_eq_prod (fun i (t : ℝ) ↦ t ^ α i)]
+  exact Finset.prod_congr rfl fun i _ ↦
+    smoothedLaw_moment_match (p i) (q i) (v i) (hp i) (hq i) k
+      (fun r hr ↦ hmatch i r hr) ε hε (α i) (hα i)
+
+/-- **PL Theorem 7.4, product level.** The two product laws built from the smoothed radial
+coordinate laws have absolutely continuous marginals with densities bounded by `1/(2ε)`
+and share every joint raw moment whose coordinate exponents are at most `k`. -/
+theorem radial_smoothedProduct_moment_match {k : ℕ} {N : Type*} [Fintype N]
+    (r : Fin (k + 1) → ℝ) (hinj : Function.Injective r) (u w : N → ℝ) (ε : ℝ)
+    (hε : 0 < ε) (α : N → ℕ) (hα : ∀ i, α i ≤ k) :
+    ∫ y : N → ℝ, ∏ i, y i ^ α i
+        ∂(MeasureTheory.Measure.pi fun i ↦
+          smoothedLaw (radialLaw r false) (coordValue r (u i) (w i)) ε) =
+      ∫ y : N → ℝ, ∏ i, y i ^ α i
+        ∂(MeasureTheory.Measure.pi fun i ↦
+          smoothedLaw (radialLaw r true) (coordValue r (u i) (w i)) ε) :=
+  smoothedProduct_moment_match (fun _ ↦ radialLaw r false) (fun _ ↦ radialLaw r true)
+    (fun i ↦ coordValue r (u i) (w i)) (fun _ ↦ radialLaw_nonneg r false)
+    (fun _ ↦ radialLaw_nonneg r true) k
+    (fun i m hm ↦ coord_moment_match r hinj (u i) (w i) m hm) ε hε α hα
 
 end
 

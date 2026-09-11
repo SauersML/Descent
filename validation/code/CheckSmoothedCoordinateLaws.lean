@@ -21,3 +21,5 @@ import Descent.Portability.SmoothedCoordinateLaws
 #print axioms Descent.Portability.SmoothedCoordinateLaws.smoothedLaw_moment_match
 #print axioms Descent.Portability.SmoothedCoordinateLaws.radial_smoothedLaw_moment_match
 #print axioms Descent.Portability.SmoothedCoordinateLaws.radial_smoothedLaw_univ
+#print axioms Descent.Portability.SmoothedCoordinateLaws.smoothedProduct_moment_match
+#print axioms Descent.Portability.SmoothedCoordinateLaws.radial_smoothedProduct_moment_match
