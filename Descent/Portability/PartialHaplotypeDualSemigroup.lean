@@ -32,9 +32,15 @@ solves `v' = Q v`; the exact orbit `e^{tQ} v(0)` solves the same system; and a L
 vector field has at most one solution with a given initial value.  Hence the expected moment
 vector is `e^{tQ} v(0)` at every `t ≥ 0` (`expectedMomentVector_eq_matrixExponential`).
 
+A changing demographic history composes the epoch generators in chronological order.
+`expectedMomentVector_epoch` runs one epoch from any start time, and
+`expectedMomentVector_history` composes a list of epochs into `historyPropagator`, the product of
+the epoch exponentials with the latest epoch leftmost; it is substochastic whenever every duration
+is nonnegative (`historyPropagator_substochastic`).
+
 Scope.  The forward moment equation is a hypothesis on the expectation family; it is not derived
-here from a constructed diffusion process, whose construction is NOTE1 §4.2a.  Changing
-demographic histories, splits and admixture pulses are not composed here.
+here from a constructed diffusion process, whose construction is NOTE1 §4.2a.  Splits and
+admixture pulses are not composed here.
 
 ## Empirical status
 
@@ -210,6 +216,63 @@ theorem expectedGenerator_eq_mulVec (rates : NeutralRates Deme Locus Allele)
   rw [hpoint, ExpFunctional.eval_sum]
   simp only [ExpFunctional.smul_eval, Matrix.mulVec, dotProduct, expectedMomentVector]
 
+/-- **NOTE1 (20) on one epoch.**  If the expected moment vector is continuous on
+`[start, finish]` and, at every time of `[start, finish)`, has right derivative equal to the
+expected neutral generator of the moment polynomials, then
+`v(finish) = e^{(finish − start) Q} v(start)`. -/
+theorem expectedMomentVector_epoch (rates : NeutralRates Deme Locus Allele)
+    (capacity : Locus → ℕ)
+    (expectationAt : ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele)))
+    (start finish : ℝ) (hduration : start ≤ finish)
+    (hcont : ContinuousOn (expectedMomentVector capacity expectationAt) (Set.Icc start finish))
+    (hforward : ∀ ξ : BudgetConfiguration Deme Locus Allele capacity,
+      ∀ t ∈ Set.Ico start finish,
+        HasDerivWithinAt (fun s ↦ expectedMomentVector capacity expectationAt s ξ)
+          (expectationAt t fun law ↦
+            eval (lawPoint law) (neutralGenerator rates (momentPolynomial ξ.1)))
+          (Set.Ici t) t) :
+    expectedMomentVector capacity expectationAt finish
+      = (matrixExponential (dualGenerator rates capacity) (finish - start)).mulVec
+          (expectedMomentVector capacity expectationAt start) := by
+  have hmoment : ∀ t ∈ Set.Ico start finish,
+      HasDerivWithinAt (expectedMomentVector capacity expectationAt)
+        ((dualGenerator rates capacity).mulVec (expectedMomentVector capacity expectationAt t))
+        (Set.Ici t) t := by
+    intro t ht
+    refine hasDerivWithinAt_pi.mpr fun ξ ↦ ?_
+    rw [← expectedGenerator_eq_mulVec]
+    exact hforward ξ t ht
+  have horbit : ∀ s : ℝ, HasDerivAt
+      (fun r ↦ (matrixExponential (dualGenerator rates capacity) (r - start)).mulVec
+        (expectedMomentVector capacity expectationAt start))
+      ((dualGenerator rates capacity).mulVec
+        ((matrixExponential (dualGenerator rates capacity) (s - start)).mulVec
+          (expectedMomentVector capacity expectationAt start))) s := by
+    intro s
+    have h := HasDerivAt.scomp (x := s)
+      (StationaryHaplotypeRealization.hasDerivAt_matrixExponential_mulVec
+        (dualGenerator rates capacity) (expectedMomentVector capacity expectationAt start)
+        (s - start))
+      ((hasDerivAt_id (x := s)).sub_const start)
+    simpa only [one_smul, Function.comp_def, id_eq] using h
+  have hlip : LipschitzWith
+      ‖LinearMap.toContinuousLinearMap (Matrix.mulVecLin (dualGenerator rates capacity))‖₊
+      fun w : BudgetConfiguration Deme Locus Allele capacity → ℝ ↦
+        (dualGenerator rates capacity).mulVec w := by
+    have h := (LinearMap.toContinuousLinearMap
+      (Matrix.mulVecLin (dualGenerator rates capacity))).lipschitz
+    rwa [LinearMap.coe_toContinuousLinearMap', Matrix.coe_mulVecLin] at h
+  have hunique := ODE_solution_unique_of_mem_Icc_right
+    (v := fun _ w ↦ (dualGenerator rates capacity).mulVec w) (s := fun _ ↦ Set.univ)
+    (a := start) (b := finish)
+    (fun _ _ ↦ hlip.lipschitzOnWith) hcont hmoment
+    (fun _ _ ↦ Set.mem_univ _)
+    (fun s _ ↦ (horbit s).continuousAt.continuousWithinAt)
+    (fun s _ ↦ (horbit s).hasDerivWithinAt)
+    (fun _ _ ↦ Set.mem_univ _)
+    (by simp only [sub_self, matrixExponential_zero, Matrix.one_mulVec])
+  exact hunique ⟨hduration, le_rfl⟩
+
 /-- **NOTE1 (20): the finite likelihood representation.**  Suppose the expected configuration
 moments of a family of expectation functionals over per-deme haplotype laws satisfy the forward
 moment equation on `[0, ∞)`: their right derivative is the expected neutral generator of the
@@ -227,40 +290,87 @@ theorem expectedMomentVector_eq_matrixExponential (rates : NeutralRates Deme Loc
     expectedMomentVector capacity expectationAt t
       = (matrixExponential (dualGenerator rates capacity) t).mulVec
           (expectedMomentVector capacity expectationAt 0) := by
-  have hmoment : ∀ s ∈ Set.Ici (0 : ℝ),
+  have hderiv : ∀ s ∈ Set.Ici (0 : ℝ),
       HasDerivWithinAt (expectedMomentVector capacity expectationAt)
-        ((dualGenerator rates capacity).mulVec (expectedMomentVector capacity expectationAt s))
-        (Set.Ici 0) s := by
-    intro s hs
-    refine hasDerivWithinAt_pi.mpr fun ξ ↦ ?_
-    rw [← expectedGenerator_eq_mulVec]
-    exact hforward ξ s hs
-  have horbit : ∀ s : ℝ, HasDerivAt
-      (fun r ↦ (matrixExponential (dualGenerator rates capacity) r).mulVec
-        (expectedMomentVector capacity expectationAt 0))
-      ((dualGenerator rates capacity).mulVec
-        ((matrixExponential (dualGenerator rates capacity) s).mulVec
-          (expectedMomentVector capacity expectationAt 0))) s :=
-    fun s ↦ StationaryHaplotypeRealization.hasDerivAt_matrixExponential_mulVec _ _ s
-  have hlip : LipschitzWith
-      ‖LinearMap.toContinuousLinearMap (Matrix.mulVecLin (dualGenerator rates capacity))‖₊
-      fun w : BudgetConfiguration Deme Locus Allele capacity → ℝ ↦
-        (dualGenerator rates capacity).mulVec w := by
-    have h := (LinearMap.toContinuousLinearMap
-      (Matrix.mulVecLin (dualGenerator rates capacity))).lipschitz
-    rwa [LinearMap.coe_toContinuousLinearMap', Matrix.coe_mulVecLin] at h
-  have hunique := ODE_solution_unique_of_mem_Icc_right
-    (v := fun _ w ↦ (dualGenerator rates capacity).mulVec w) (s := fun _ ↦ Set.univ)
-    (a := 0) (b := t)
-    (fun _ _ ↦ hlip.lipschitzOnWith)
-    (fun s hs ↦ (hmoment s hs.1).continuousWithinAt.mono Set.Icc_subset_Ici_self)
-    (fun s hs ↦ (hmoment s hs.1).mono (Set.Ici_subset_Ici.mpr hs.1))
-    (fun _ _ ↦ Set.mem_univ _)
-    (fun s _ ↦ (horbit s).continuousAt.continuousWithinAt)
-    (fun s _ ↦ (horbit s).hasDerivWithinAt)
-    (fun _ _ ↦ Set.mem_univ _)
-    (by simp only [matrixExponential_zero, Matrix.one_mulVec])
-  exact hunique ⟨ht, le_rfl⟩
+        (fun ξ ↦ expectationAt s fun law ↦
+          eval (lawPoint law) (neutralGenerator rates (momentPolynomial ξ.1)))
+        (Set.Ici 0) s :=
+    fun s hs ↦ hasDerivWithinAt_pi.mpr fun ξ ↦ hforward ξ s hs
+  have hcont : ContinuousOn (expectedMomentVector capacity expectationAt) (Set.Icc 0 t) :=
+    fun s hs ↦ (hderiv s hs.1).continuousWithinAt.mono Set.Icc_subset_Ici_self
+  have h := expectedMomentVector_epoch rates capacity expectationAt 0 t ht hcont
+    fun ξ s hs ↦ (hforward ξ s hs.1).mono (Set.Ici_subset_Ici.mpr hs.1)
+  rwa [sub_zero] at h
+
+/-- The forward moment equation along a chronological history of epochs, each epoch a rate table
+and a duration: on every epoch, from where the previous epoch ended, the expected moment vector
+is continuous and has right derivative equal to the expected generator of that epoch's rates.
+
+Assumes: the expectation family is the moment table of a process run through the epochs in
+chronological order. -/
+def ForwardOnHistory (capacity : Locus → ℕ)
+    (expectationAt : ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele))) :
+    List (NeutralRates Deme Locus Allele × ℝ) → ℝ → Prop
+  | [], _ => True
+  | epoch :: rest, start =>
+      (ContinuousOn (expectedMomentVector capacity expectationAt)
+          (Set.Icc start (start + epoch.2))
+        ∧ ∀ ξ : BudgetConfiguration Deme Locus Allele capacity,
+          ∀ t ∈ Set.Ico start (start + epoch.2),
+            HasDerivWithinAt (fun s ↦ expectedMomentVector capacity expectationAt s ξ)
+              (expectationAt t fun law ↦
+                eval (lawPoint law) (neutralGenerator epoch.1 (momentPolynomial ξ.1)))
+              (Set.Ici t) t)
+        ∧ ForwardOnHistory capacity expectationAt rest (start + epoch.2)
+
+/-- The empty history carries no forward obligation, so `ForwardOnHistory` is inhabited. -/
+theorem forwardOnHistory_nil (capacity : Locus → ℕ)
+    (expectationAt : ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele)))
+    (start : ℝ) : ForwardOnHistory capacity expectationAt [] start :=
+  trivial
+
+/-- The chronological propagator of a history of epochs: the product of the epoch exponentials,
+the latest epoch leftmost. -/
+def historyPropagator (capacity : Locus → ℕ) :
+    List (NeutralRates Deme Locus Allele × ℝ) →
+      Matrix (BudgetConfiguration Deme Locus Allele capacity)
+        (BudgetConfiguration Deme Locus Allele capacity) ℝ
+  | [] => 1
+  | epoch :: rest =>
+      historyPropagator capacity rest * matrixExponential (dualGenerator epoch.1 capacity) epoch.2
+
+/-- The chronological propagator of a history with nonnegative durations is substochastic. -/
+theorem historyPropagator_substochastic (capacity : Locus → ℕ) :
+    ∀ epochs : List (NeutralRates Deme Locus Allele × ℝ), (∀ epoch ∈ epochs, 0 ≤ epoch.2) →
+      SubstochasticMatrix (historyPropagator capacity epochs)
+  | [], _ => substochastic_one
+  | epoch :: rest, hdurations =>
+    substochastic_mul
+      (historyPropagator_substochastic capacity rest fun e he ↦
+        hdurations e (List.mem_cons.mpr (Or.inr he)))
+      (dualPropagator_substochastic epoch.1 capacity epoch.2
+        (hdurations epoch (List.mem_cons.mpr (Or.inl rfl))))
+
+/-- **Chronological composition of NOTE1 (20).**  Along a history of epochs with nonnegative
+durations that satisfies the forward moment equation epoch by epoch, the expected moment vector at
+the end of the history is the chronological product of the epoch exponentials applied to its
+value at the start. -/
+theorem expectedMomentVector_history (capacity : Locus → ℕ)
+    (expectationAt : ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele))) :
+    ∀ (epochs : List (NeutralRates Deme Locus Allele × ℝ)) (start : ℝ),
+      (∀ epoch ∈ epochs, 0 ≤ epoch.2) → ForwardOnHistory capacity expectationAt epochs start →
+      expectedMomentVector capacity expectationAt (start + (epochs.map Prod.snd).sum)
+        = (historyPropagator capacity epochs).mulVec
+            (expectedMomentVector capacity expectationAt start)
+  | [], start, _, _ => by simp [historyPropagator]
+  | epoch :: rest, start, hdurations, hforward => by
+    have hfirst := expectedMomentVector_epoch epoch.1 capacity expectationAt start
+      (start + epoch.2) (by linarith [hdurations epoch (List.mem_cons.mpr (Or.inl rfl))])
+      hforward.1.1 hforward.1.2
+    have hrest := expectedMomentVector_history capacity expectationAt rest (start + epoch.2)
+      (fun e he ↦ hdurations e (List.mem_cons.mpr (Or.inr he))) hforward.2
+    rw [List.map_cons, List.sum_cons, ← add_assoc, hrest, historyPropagator,
+      ← Matrix.mulVec_mulVec, hfirst, add_sub_cancel_left]
 
 end
 

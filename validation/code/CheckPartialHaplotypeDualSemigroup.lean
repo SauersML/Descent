@@ -14,3 +14,7 @@ open Descent.Portability.PartialHaplotypeDualSemigroup
 #print axioms dualGenerator_mulVec_configurationMoment
 #print axioms expectedGenerator_eq_mulVec
 #print axioms expectedMomentVector_eq_matrixExponential
+#print axioms expectedMomentVector_epoch
+#print axioms forwardOnHistory_nil
+#print axioms historyPropagator_substochastic
+#print axioms expectedMomentVector_history
