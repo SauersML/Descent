@@ -17,3 +17,7 @@ import Descent.Portability.MetricInfluenceFunctions
 #print axioms Descent.Portability.MetricInfluenceFunctions.precision_influence
 #print axioms Descent.Portability.MetricInfluenceFunctions.recall_influence
 #print axioms Descent.Portability.MetricInfluenceFunctions.f1_influence
+#print axioms Descent.Portability.MetricInfluenceFunctions.wInner_four_term
+#print axioms Descent.Portability.MetricInfluenceFunctions.lawCov_influence
+#print axioms Descent.Portability.MetricInfluenceFunctions.lawVar_influence
+#print axioms Descent.Portability.MetricInfluenceFunctions.log_squared_correlation_influence

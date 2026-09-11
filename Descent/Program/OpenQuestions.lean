@@ -1,6 +1,11 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.DenominatorAwareRecovery
+import Descent.Portability.FixedBackgroundCurveRegion
+import Descent.Portability.MechanismReportDerivative
+import Descent.Portability.MetricInfluenceFunctions
+import Descent.Portability.NonanticipationCost
 import Descent.Portability.FourthMomentMinimizer
 import Descent.Portability.JointReportFeasibility
 import Descent.Portability.NonaffineRepair

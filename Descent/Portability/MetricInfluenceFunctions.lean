@@ -202,6 +202,103 @@ theorem f1_influence (P f A Y : Ω → ℝ)
             (A ω + Y ω)) / lawExp P (fun ν ↦ A ν + Y ν)) f) 0 :=
   ratio_influence P f (fun ω ↦ 2 * (A ω * Y ω)) (fun ω ↦ A ω + Y ω) hsum
 
+/-- Four-term linear expansion of the inner product in the left slot. -/
+theorem wInner_four_term (P f A B C D : Ω → ℝ) (p q r t : ℝ) :
+    wInner P (fun ω ↦ p * A ω - q * B ω - r * C ω + t * D ω) f =
+      p * wInner P A f - q * wInner P B f - r * wInner P C f + t * wInner P D f := by
+  rw [wInner_add_left, wInner_sub_left, wInner_sub_left, wInner_smul_left,
+    wInner_smul_left, wInner_smul_left, wInner_smul_left]
+
+/-- The covariance of two observables under an arbitrary finite weight vector. -/
+def lawCov (Q S Y : Ω → ℝ) : ℝ :=
+  lawExp Q (fun ω ↦ S ω * Y ω) - lawExp Q S * lawExp Q Y
+
+/-- **The covariance influence function.** Differentiating the centred
+covariance along an information-preserving path gives the centred product, which
+is the intermediate influence function the manuscript's proof of (5.4) uses. -/
+theorem lawCov_influence (P f S Y : Ω → ℝ)
+    (hf : wInner P (fun _ ↦ (1 : ℝ)) f = 0) :
+    HasDerivAt (fun ε ↦ lawCov (perturbedLaw P f ε) S Y)
+      (wInner P (fun ω ↦ (S ω - lawExp P S) * (Y ω - lawExp P Y)) f) 0 := by
+  have hz := perturbedLaw_zero P f
+  have hSY := hasDerivAt_perturbed_exp P f (fun ω ↦ S ω * Y ω)
+  have hS := hasDerivAt_perturbed_exp P f S
+  have hY := hasDerivAt_perturbed_exp P f Y
+  have hsub := hSY.sub (hS.mul hY)
+  rw [hz] at hsub
+  have hpsi : (fun ω ↦ (S ω - lawExp P S) * (Y ω - lawExp P Y)) =
+      fun ω ↦ (1 : ℝ) * (S ω * Y ω) - lawExp P Y * S ω - lawExp P S * Y ω +
+        lawExp P S * lawExp P Y * (1 : ℝ) := by
+    funext ω
+    ring
+  rw [hpsi, wInner_four_term, hf]
+  have hval : (1 : ℝ) * wInner P (fun ω ↦ S ω * Y ω) f -
+      lawExp P Y * wInner P S f - lawExp P S * wInner P Y f +
+        lawExp P S * lawExp P Y * 0 =
+      wInner P (fun ω ↦ S ω * Y ω) f -
+        (wInner P S f * lawExp P Y + lawExp P S * wInner P Y f) := by
+    ring
+  rw [hval]
+  exact hsub
+
+/-- **The variance influence function.** The squared centred observable is a
+valid influence function for the variance. -/
+theorem lawVar_influence (P f S : Ω → ℝ) (hf : wInner P (fun _ ↦ (1 : ℝ)) f = 0) :
+    HasDerivAt (fun ε ↦ lawCov (perturbedLaw P f ε) S S)
+      (wInner P (fun ω ↦ (S ω - lawExp P S) ^ 2) f) 0 := by
+  have h := lawCov_influence P f S S hf
+  have hpsi : (fun ω ↦ (S ω - lawExp P S) * (S ω - lawExp P S)) =
+      fun ω ↦ (S ω - lawExp P S) ^ 2 := by
+    funext ω
+    ring
+  rwa [hpsi] at h
+
+/-- **TQ equation (5.4).** The log squared correlation is `2 log |c| - log u -
+log v`, and its centred influence function is the manuscript's boxed formula.
+The hypotheses are exactly the manuscript's nondegeneracy conditions: a nonzero
+covariance and two nonzero variances. -/
+theorem log_squared_correlation_influence (P f S Y : Ω → ℝ)
+    (hf : wInner P (fun _ ↦ (1 : ℝ)) f = 0) (hc : lawCov P S Y ≠ 0)
+    (hu : lawCov P S S ≠ 0) (hv : lawCov P Y Y ≠ 0) :
+    HasDerivAt
+      (fun ε ↦ 2 * Real.log (lawCov (perturbedLaw P f ε) S Y) -
+        Real.log (lawCov (perturbedLaw P f ε) S S) -
+        Real.log (lawCov (perturbedLaw P f ε) Y Y))
+      (wInner P
+        (fun ω ↦ 2 * ((S ω - lawExp P S) * (Y ω - lawExp P Y)) / lawCov P S Y -
+          (S ω - lawExp P S) ^ 2 / lawCov P S S -
+          (Y ω - lawExp P Y) ^ 2 / lawCov P Y Y) f) 0 := by
+  have hz := perturbedLaw_zero P f
+  have hcov := lawCov_influence P f S Y hf
+  have hvS := lawVar_influence P f S hf
+  have hvY := lawVar_influence P f Y hf
+  have hlogc := hcov.log (by rw [hz]; exact hc)
+  have hlogu := hvS.log (by rw [hz]; exact hu)
+  have hlogv := hvY.log (by rw [hz]; exact hv)
+  rw [hz] at hlogc hlogu hlogv
+  have hchain := ((HasDerivAt.const_mul (2 : ℝ) hlogc).sub hlogu).sub hlogv
+  have hpsi :
+      (fun ω ↦ 2 * ((S ω - lawExp P S) * (Y ω - lawExp P Y)) / lawCov P S Y -
+        (S ω - lawExp P S) ^ 2 / lawCov P S S -
+        (Y ω - lawExp P Y) ^ 2 / lawCov P Y Y) =
+      fun ω ↦ 2 / lawCov P S Y * ((S ω - lawExp P S) * (Y ω - lawExp P Y)) -
+        (lawCov P S S)⁻¹ * (S ω - lawExp P S) ^ 2 -
+        (lawCov P Y Y)⁻¹ * (Y ω - lawExp P Y) ^ 2 := by
+    funext ω
+    ring
+  rw [hpsi, wInner_three_term]
+  have hval : 2 / lawCov P S Y *
+        wInner P (fun ω ↦ (S ω - lawExp P S) * (Y ω - lawExp P Y)) f -
+      (lawCov P S S)⁻¹ * wInner P (fun ω ↦ (S ω - lawExp P S) ^ 2) f -
+      (lawCov P Y Y)⁻¹ * wInner P (fun ω ↦ (Y ω - lawExp P Y) ^ 2) f =
+      2 * (wInner P (fun ω ↦ (S ω - lawExp P S) * (Y ω - lawExp P Y)) f /
+          lawCov P S Y) -
+        wInner P (fun ω ↦ (S ω - lawExp P S) ^ 2) f / lawCov P S S -
+        wInner P (fun ω ↦ (Y ω - lawExp P Y) ^ 2) f / lawCov P Y Y := by
+    ring
+  rw [hval]
+  exact hchain
+
 end
 
 end Descent.Portability.MetricInfluenceFunctions
