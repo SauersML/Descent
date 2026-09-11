@@ -1,0 +1,29 @@
+import Descent.Portability.ArchaicPrediction
+
+#print axioms Descent.Portability.ArchaicPrediction.transport_comp
+#print axioms Descent.Portability.ArchaicPrediction.evaluate_transport
+#print axioms Descent.Portability.ArchaicPrediction.exact_transport_debt
+#print axioms Descent.Portability.ArchaicPrediction.no_uniform_source_variance_bound
+#print axioms Descent.Portability.ArchaicPrediction.factorial_recovery
+#print axioms Descent.Portability.ArchaicPrediction.degree_panel_identifies
+#print axioms Descent.Portability.ArchaicPrediction.invariant_phase_expansion
+#print axioms Descent.Portability.ArchaicPrediction.phase_parseval
+#print axioms Descent.Portability.ArchaicPrediction.response_specific_mean
+#print axioms Descent.Portability.ArchaicPrediction.phase_covariance
+#print axioms Descent.Portability.ArchaicPrediction.pairwise_phase_risk_not_identified
+#print axioms Descent.Portability.ArchaicPrediction.sharp_phase_risk_interval
+#print axioms Descent.Portability.ArchaicPrediction.two_state_logistic_bound
+#print axioms Descent.Portability.ArchaicPrediction.effectiveRate_derivative
+#print axioms Descent.Portability.ArchaicPrediction.contrast_integrable_iff
+#print axioms Descent.Portability.ArchaicPrediction.weighted_cycle_defect
+#print axioms Descent.Portability.ArchaicPrediction.graph_contrast_precision
+#print axioms Descent.Portability.ArchaicPrediction.pairing_identified_iff_odd
+#print axioms Descent.Portability.ArchaicPrediction.pairing_kernel_one_dimension
+#print axioms Descent.Portability.ArchaicPrediction.factorial_panel_card
+#print axioms Descent.Portability.ArchaicPrediction.phase_mode_count
+#print axioms Descent.Portability.ArchaicPrediction.dosage_only_phase_minimum
+#print axioms Descent.Portability.ArchaicPrediction.four_pair_moment_risk_bounds
+#print axioms Descent.Portability.ArchaicPrediction.zero_cycles_iff_response_map
+#print axioms Descent.Portability.ArchaicPrediction.exact_multiple_cycle_residual
+#print axioms Descent.Portability.ArchaicPrediction.arbitrary_ld_additive_optimum
+#print axioms Descent.Portability.ArchaicPrediction.arbitrary_ld_export_formula
