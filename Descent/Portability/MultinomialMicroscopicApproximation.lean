@@ -212,7 +212,7 @@ def reindexKernel {B C X : Type*} [Fintype B] [Fintype C] (K : FiniteMixtureKern
       (Function.extend embedding (K.weight x) 0) (fun c hc ↦ ?_)
       (fun b ↦ (hembedding.extend_apply (K.weight x) 0 b).symm)).symm
     rw [Set.mem_range] at hc
-    rw [Function.extend_apply' (K.weight x) 0 c hc, Pi.zero_apply]
+    exact Function.extend_apply' (f := embedding) (K.weight x) (0 : C → ℝ) c hc
 
 /-- Reindexing the branches does not change the kernel action. -/
 theorem apply_reindexKernel {B C X : Type*} [Fintype B] [Fintype C] (K : FiniteMixtureKernel B X)
@@ -224,7 +224,8 @@ theorem apply_reindexKernel {B C X : Type*} [Fintype B] [Fintype C] (K : FiniteM
     (fun c ↦ Function.extend embedding (K.weight x) 0 c *
       f (Function.extend embedding K.move (fun _ ↦ id) c x)) (fun c hc ↦ ?_) (fun b ↦ ?_)).symm
   · rw [Set.mem_range] at hc
-    simp only [Function.extend_apply' (K.weight x) 0 c hc, Pi.zero_apply, zero_mul]
+    rw [Function.extend_apply' (f := embedding) (K.weight x) (0 : C → ℝ) c hc, Pi.zero_apply,
+      zero_mul]
   · show K.weight x b * f (K.move b x) = Function.extend embedding (K.weight x) 0 (embedding b) *
         f (Function.extend embedding K.move (fun _ ↦ id) (embedding b) x)
     rw [hembedding.extend_apply, hembedding.extend_apply]
