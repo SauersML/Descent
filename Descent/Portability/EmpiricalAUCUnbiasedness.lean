@@ -303,7 +303,7 @@ theorem binaryAUCNumerator_eq_pairSum (law : FiniteReportLaw (Bool × Bool)) :
   simp only [FiniteReportLaw.binaryAUCNumerator, expectation_cells, Fintype.sum_bool,
     caseOf_mk, scoreOf_false, scoreOf_true, alleleValue_false, alleleValue_true]
   norm_num [empiricalAUCComparison]
-  ring
+  all_goals ring
 
 /-- Splitting a cohort sample into its outcome vector and its score vector. -/
 def splitEquiv (n : ℕ) : ((Fin n → Bool) × (Fin n → Bool)) ≃ (Fin n → Bool × Bool) where
@@ -1095,8 +1095,10 @@ theorem linearSlope_cleared (law : FiniteReportLaw (Bool × Bool))
     simp only [expectation_cells, scoreOf_false, scoreOf_true, outcomeOf_false, outcomeOf_true,
       scoreMass, hrecipientCell]
     ring
-  rw [linearSlope, hvariance, hcovariance,
-    div_mul_cancel₀ _ (ne_of_gt (mul_pos hdonor hrecipient))]
+  have hpositive : scoreMass law true * scoreMass law false ≠ 0 :=
+    ne_of_gt (mul_pos hdonor hrecipient)
+  rw [linearSlope, hvariance, hcovariance, div_mul_eq_mul_div, mul_div_assoc,
+    div_self hpositive, mul_one]
 
 /-- NOTE1 (42): conditional on the cohort score varying, the empirical least-squares slope of
 an independent cohort is exactly the population slope.
