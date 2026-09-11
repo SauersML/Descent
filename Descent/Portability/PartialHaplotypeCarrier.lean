@@ -55,8 +55,7 @@ set_option relaxedAutoImplicit false
 
 namespace Descent.Portability.PartialHaplotypeCarrier
 
-variable {Deme Locus : Type*} [Fintype Deme] [Fintype Locus] [DecidableEq Locus]
-variable {Allele : Locus → Type*} [∀ ℓ, Fintype (Allele ℓ)] [∀ ℓ, DecidableEq (Allele ℓ)]
+variable {Deme Locus : Type*} {Allele : Locus → Type*}
 
 /-- A partial haplotype type of NOTE1 §4.1: a deme label together with an allele assignment
 defined on a nonempty set of loci.  The retained set is the support of the assignment. -/
@@ -82,7 +81,8 @@ theorem eq_of_fields {τ σ : PartialType Deme Locus Allele} (hdeme : τ.deme = 
   subst ha
   rfl
 
-instance instFinite : Finite (PartialType Deme Locus Allele) := by
+instance instFinite [Fintype Deme] [Fintype Locus] [∀ ℓ, Fintype (Allele ℓ)] :
+    Finite (PartialType Deme Locus Allele) := by
   have hinj : Function.Injective
       (fun τ : PartialType Deme Locus Allele ↦ (τ.deme, τ.allele)) := by
     intro τ σ h
@@ -140,7 +140,7 @@ theorem withinBudget_of_le (capacity : Locus → ℕ)
 
 /-- Every carrier retains at least one locus, so the number of carriers never exceeds the
 total load. -/
-theorem card_le_sum_load (ξ : Multiset (PartialType Deme Locus Allele)) :
+theorem card_le_sum_load [Fintype Locus] (ξ : Multiset (PartialType Deme Locus Allele)) :
     Multiset.card ξ ≤ ∑ ℓ, load ξ ℓ := by
   refine Multiset.induction_on ξ ?_ ?_
   · simp [load]
@@ -161,7 +161,7 @@ theorem card_le_sum_load (ξ : Multiset (PartialType Deme Locus Allele)) :
 
 /-- The cardinality bound of NOTE1 §4.1: a budget-respecting configuration has at most
 `B = Σ_ℓ n_ℓ` carriers. -/
-theorem card_le_capacity_total (capacity : Locus → ℕ)
+theorem card_le_capacity_total [Fintype Locus] (capacity : Locus → ℕ)
     (ξ : Multiset (PartialType Deme Locus Allele)) (hξ : WithinBudget capacity ξ) :
     Multiset.card ξ ≤ ∑ ℓ, capacity ℓ :=
   le_trans (card_le_sum_load ξ) (Finset.sum_le_sum fun ℓ _ ↦ hξ ℓ)
@@ -169,7 +169,8 @@ theorem card_le_capacity_total (capacity : Locus → ℕ)
 /-- **The retained state space of NOTE1 §4.1 is finite.**  Budget-respecting configurations
 have at most `B` carriers, the carrier type is finite, and multiplicities clamped at `B`
 already determine such a configuration. -/
-theorem withinBudget_finite (capacity : Locus → ℕ) :
+theorem withinBudget_finite [Fintype Deme] [Fintype Locus] [∀ ℓ, Fintype (Allele ℓ)]
+    (capacity : Locus → ℕ) :
     {ξ : Multiset (PartialType Deme Locus Allele) | WithinBudget capacity ξ}.Finite := by
   classical
   set bound : ℕ := ∑ ℓ, capacity ℓ
@@ -211,15 +212,15 @@ theorem withinBudget_migrate (capacity : Locus → ℕ) (τ : PartialType Deme L
   exact h ℓ
 
 /-- Mutation of NOTE1 §4.2: one retained allele label is replaced. -/
-def mutate (τ : PartialType Deme Locus Allele) (ℓ₀ : Locus) (a : Allele ℓ₀) :
-    PartialType Deme Locus Allele where
+def mutate [DecidableEq Locus] (τ : PartialType Deme Locus Allele) (ℓ₀ : Locus)
+    (a : Allele ℓ₀) : PartialType Deme Locus Allele where
   deme := τ.deme
   allele := Function.update τ.allele ℓ₀ (some a)
   retained := ⟨ℓ₀, by simp⟩
 
 /-- Relabelling an allele at an already retained locus changes no locus load. -/
-theorem load_mutate (τ : PartialType Deme Locus Allele) (ℓ₀ : Locus) (a : Allele ℓ₀)
-    (hret : (τ.allele ℓ₀).isSome = true)
+theorem load_mutate [DecidableEq Locus] (τ : PartialType Deme Locus Allele) (ℓ₀ : Locus)
+    (a : Allele ℓ₀) (hret : (τ.allele ℓ₀).isSome = true)
     (rest : Multiset (PartialType Deme Locus Allele)) (ℓ : Locus) :
     load (mutate τ ℓ₀ a ::ₘ rest) ℓ = load (τ ::ₘ rest) ℓ := by
   simp only [load_cons, mutate]
@@ -229,8 +230,9 @@ theorem load_mutate (τ : PartialType Deme Locus Allele) (ℓ₀ : Locus) (a : A
   · simp [Function.update_of_ne hℓ]
 
 /-- Mutation at a retained locus preserves the retention budget. -/
-theorem withinBudget_mutate (capacity : Locus → ℕ) (τ : PartialType Deme Locus Allele)
-    (ℓ₀ : Locus) (a : Allele ℓ₀) (hret : (τ.allele ℓ₀).isSome = true)
+theorem withinBudget_mutate [DecidableEq Locus] (capacity : Locus → ℕ)
+    (τ : PartialType Deme Locus Allele) (ℓ₀ : Locus) (a : Allele ℓ₀)
+    (hret : (τ.allele ℓ₀).isSome = true)
     (rest : Multiset (PartialType Deme Locus Allele))
     (h : WithinBudget capacity (τ ::ₘ rest)) :
     WithinBudget capacity (mutate τ ℓ₀ a ::ₘ rest) := by
@@ -268,7 +270,7 @@ theorem load_split (τ : PartialType Deme Locus Allele) (selector : Locus → Bo
     load (splitSelected τ selector hsel ::ₘ splitRejected τ selector hrej ::ₘ rest) ℓ =
       load (τ ::ₘ rest) ℓ := by
   simp only [load_cons, splitSelected, splitRejected]
-  cases hs : selector ℓ <;> simp [hs]
+  by_cases hs : selector ℓ = true <;> simp [hs]
 
 /-- Recombination preserves the retention budget. -/
 theorem withinBudget_split (capacity : Locus → ℕ) (τ : PartialType Deme Locus Allele)
@@ -311,7 +313,7 @@ def coalesce (τ σ : PartialType Deme Locus Allele) : PartialType Deme Locus Al
     | none =>
       rw [hτ] at h
       simp at h
-    | some a => simp [hτ]
+    | some a => simp
 
 /-- On a compatible pair the merged assignment agrees with the second carrier wherever the
 second carrier retains material, so no allele label is silently overwritten. -/
@@ -336,8 +338,8 @@ theorem load_coalesce_le (τ σ : PartialType Deme Locus Allele)
       (if (σ.allele ℓ).isSome = true then 1 else 0) +
         (if (τ.allele ℓ).isSome = true then 1 else 0) := by
     cases hτ : τ.allele ℓ with
-    | none => simp [hτ]
-    | some a => simp [hτ]
+    | none => simp
+    | some a => simp
   omega
 
 /-- Coalescence preserves the retention budget. -/
@@ -356,7 +358,8 @@ retained locus. -/
 def Agrees (τ : PartialType Deme Locus Allele) (hap : ∀ ℓ, Allele ℓ) : Prop :=
   ∀ ℓ, τ.allele ℓ = none ∨ τ.allele ℓ = some (hap ℓ)
 
-instance decidableAgrees (τ : PartialType Deme Locus Allele) (hap : ∀ ℓ, Allele ℓ) :
+instance decidableAgrees [Fintype Locus] [∀ ℓ, DecidableEq (Allele ℓ)]
+    (τ : PartialType Deme Locus Allele) (hap : ∀ ℓ, Allele ℓ) :
     Decidable (Agrees τ hap) := by
   unfold Agrees
   infer_instance
@@ -364,6 +367,9 @@ instance decidableAgrees (τ : PartialType Deme Locus Allele) (hap : ∀ ℓ, Al
 /-- Every haplotype agrees with the fully retained carrier built from it. -/
 theorem agrees_fullType (i : Deme) (hap : ∀ ℓ, Allele ℓ) (ℓ₀ : Locus) :
     Agrees (fullType i hap ℓ₀) hap := fun _ ↦ Or.inr rfl
+
+variable [Fintype Locus] [DecidableEq Locus] [∀ ℓ, Fintype (Allele ℓ)]
+variable [∀ ℓ, DecidableEq (Allele ℓ)]
 
 noncomputable section
 
@@ -410,7 +416,9 @@ theorem marginalFrequency_fullType (law : Deme → FiniteReportLaw (∀ ℓ, All
     · intro h
       subst h
       exact agrees_fullType i g ℓ₀
-  simp [marginalFrequency, hfilter, fullType]
+  unfold marginalFrequency
+  rw [hfilter]
+  simp [fullType]
 
 /-- The moment of a configuration with one more carrier is (17) read as a recursion. -/
 theorem configurationMoment_cons (law : Deme → FiniteReportLaw (∀ ℓ, Allele ℓ))
