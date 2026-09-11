@@ -85,7 +85,7 @@ theorem bitMeasure_real_prefix (length : ℕ) (property : List Bool → Prop)
     ← integral_indicator_one (measurableSet_prefix length property)]
   refine integral_congr_ae (ae_of_all _ fun stream ↦ ?_)
   by_cases hproperty : property (prefixOf stream length) <;>
-    simp [Set.indicator_apply, hproperty]
+    simp [hproperty]
 
 /-! ### The threshold certificate -/
 
@@ -135,7 +135,7 @@ theorem resolvedMass_cast (evaluator : CylinderEvaluator score) (threshold : ℚ
   have hmass := bitMeasure_real_prefix (evaluator.depth stage)
     fun word ↦ threshold ≤ evaluator.lower stage word
   rw [resolvedMass]
-  push_cast
+  push_cast [apply_ite (Rat.cast : ℚ → ℝ)]
   exact hmass.symm
 
 /-- The unresolved mass is the fair-bit probability that the cylinder of the stream straddles
@@ -148,7 +148,7 @@ theorem unresolvedMass_cast (evaluator : CylinderEvaluator score) (threshold : �
   have hmass := bitMeasure_real_prefix (evaluator.depth stage)
     fun word ↦ evaluator.lower stage word < threshold ∧ threshold ≤ evaluator.upper stage word
   rw [unresolvedMass]
-  push_cast
+  push_cast [apply_ite (Rat.cast : ℚ → ℝ)]
   exact hmass.symm
 
 /-- NOTE2 §7.2, validity of the threshold certificate: at every stage the probability that the
@@ -257,7 +257,7 @@ theorem unresolvedMass_integral (evaluator : CylinderEvaluator score) (threshold
       ∫ stream, (if lowerValue evaluator stage stream < threshold ∧
         threshold ≤ upperValue evaluator stage stream then (1 : ℝ) else 0) ∂bitMeasure := by
   rw [unresolvedMass]
-  push_cast
+  push_cast [apply_ite (Rat.cast : ℚ → ℝ)]
   exact (integral_prefix (evaluator.depth stage) fun word ↦
     if evaluator.lower stage word < threshold ∧ threshold ≤ evaluator.upper stage word then
       (1 : ℝ) else 0).symm
@@ -461,7 +461,7 @@ theorem countable_range_roundToResolution (resolution : ℕ) :
     (Set.range (roundToResolution resolution)).Countable := by
   have hsubset : Set.range (roundToResolution resolution) ⊆
       Set.range fun word : wordsOfLength resolution ↦
-        fun index : ℕ ↦ (word : List Bool).getD index false := by
+        roundToResolution resolution fun index ↦ (word : List Bool).getD index false := by
     rintro _ ⟨stream, rfl⟩
     refine ⟨⟨prefixOf stream resolution,
       mem_wordsOfLength.mpr (length_prefixOf stream resolution)⟩, ?_⟩
@@ -470,9 +470,6 @@ theorem countable_range_roundToResolution (resolution : ℕ) :
     · simp only [roundToResolution, if_pos hindex]
       exact getD_prefixOf stream hindex
     · simp only [roundToResolution, if_neg hindex]
-      rw [List.getD_eq_default]
-      rw [length_prefixOf]
-      exact not_lt.mp hindex
   exact (Set.finite_range _).countable.mono hsubset
 
 /-- NOTE2 §7.2: coordinate rounding is at event distance one from the stream law at every
