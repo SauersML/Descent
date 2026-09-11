@@ -38,10 +38,12 @@ corpus quantity `ReplicaDomainCertificate.unresolvedMass`. Inserting the power l
 `Γ(α) + Γ(α-1) = α Γ(α-1)` (`remainderDensity_beta_bound`).
 
 Over an s-finite measure Tonelli's theorem gives the same identities as upper integrals
-(`lintegral_profile_eq_lintegral`), and the three bounds follow with the rate stated in
+(`lintegral_profile_eq_lintegral`). Over a probability measure, with a measurable
+profile, they hold as real expectations against `P(0 < D ≤ t)`
+(`integral_profile_eq_integral`). The three bounds follow with the rate stated in
 extended nonnegative reals (`lintegral_truncation_le_gamma`, `lintegral_inverse_le`,
-`lintegral_unresolvedNumerator_le_gamma`). The divergence criterion of NOTE 2 section 6.3 is
-`lintegral_ratioOnDefined_eq_top`: over a finite measure, a matching lower bound
+`lintegral_unresolvedNumerator_le_gamma`). The divergence criterion of NOTE 2 section 6.3
+is `lintegral_ratioOnDefined_eq_top`: over a finite measure, a matching lower bound
 `μ(0 < D ≤ t) ≥ c t^α` with `c > 0` and exponent `α ≤ 1` for `0 < t ≤ θ`, together with a
 numerator at least `ν > 0` on `0 < D ≤ θ`, makes the upper integral of the ratio infinite. The
 note's caveat that denominator bounds alone decide nothing is
@@ -662,6 +664,49 @@ theorem lintegral_profile_eq_lintegral (μ : Measure Ω) [SFinite μ] (den : Ω 
         lintegral_lintegral_swap hjoint.aemeasurable
     _ = ∫⁻ t in Ioc (0 : ℝ) 1, ENNReal.ofReal (density t) * μ {ω | 0 < den ω ∧ den ω ≤ t} :=
         lintegral_congr hsection
+
+/-- **NOTE 2 section 5.3, the layer cake as a real expectation.** For a probability measure, a
+measurable denominator in `[0, 1]` and a measurable profile with a layer-cake representation
+against a measurable density that is continuous and nonnegative on `(0, 1]`, the expectation of
+the profile on the defined event is `∫_0^1 density(t) P(0 < D ≤ t) dt`. -/
+theorem integral_profile_eq_integral (μ : Measure Ω) [IsProbabilityMeasure μ] (den : Ω → ℝ)
+    (hmeas : Measurable den) (hnonneg : ∀ ω, 0 ≤ den ω) (hone : ∀ ω, den ω ≤ 1)
+    (density profile : ℝ → ℝ) (hdensityMeasurable : Measurable density)
+    (hprofileMeasurable : Measurable profile) (hcont : ContinuousOn density (Ioc 0 1))
+    (hdensity : ∀ t ∈ Ioc (0 : ℝ) 1, 0 ≤ density t)
+    (hprofile : ∀ D : ℝ, D ≤ 1 → (if 0 < D then profile D else 0) =
+      ∫ t in (0 : ℝ)..1, density t * (if 0 < D ∧ D ≤ t then 1 else 0)) :
+    ∫ ω, (if 0 < den ω then profile (den ω) else 0) ∂μ =
+      ∫ t in (0 : ℝ)..1, density t * μ.real {ω | 0 < den ω ∧ den ω ≤ t} := by
+  have hprofileNonneg : ∀ ω, 0 ≤ (if 0 < den ω then profile (den ω) else 0) := by
+    intro ω
+    rw [hprofile (den ω) (hone ω), intervalIntegral.integral_of_le zero_le_one]
+    exact setIntegral_nonneg measurableSet_Ioc fun t ht ↦
+      mul_nonneg (hdensity t ht) (by split_ifs <;> norm_num)
+  have hprofileIte : Measurable fun ω ↦ if 0 < den ω then profile (den ω) else 0 :=
+    Measurable.ite (measurableSet_lt measurable_const hmeas) (hprofileMeasurable.comp hmeas)
+      measurable_const
+  have hmono : Monotone fun t : ℝ ↦ μ.real {ω | 0 < den ω ∧ den ω ≤ t} := fun s t hst ↦
+    measureReal_mono fun ω hω ↦ ⟨hω.1, hω.2.trans hst⟩
+  have hleft : ∫ ω, (if 0 < den ω then profile (den ω) else 0) ∂μ =
+      (∫⁻ ω, ENNReal.ofReal (if 0 < den ω then profile (den ω) else 0) ∂μ).toReal :=
+    integral_eq_lintegral_of_nonneg_ae (ae_of_all _ hprofileNonneg)
+      hprofileIte.aestronglyMeasurable
+  have hright : ∫ t in (0 : ℝ)..1, density t * μ.real {ω | 0 < den ω ∧ den ω ≤ t} =
+      (∫⁻ t in Ioc (0 : ℝ) 1,
+        ENNReal.ofReal (density t) * μ {ω | 0 < den ω ∧ den ω ≤ t}).toReal := by
+    have hnn : 0 ≤ᵐ[volume.restrict (Ioc (0 : ℝ) 1)]
+        fun t ↦ density t * μ.real {ω | 0 < den ω ∧ den ω ≤ t} := by
+      filter_upwards [ae_restrict_mem measurableSet_Ioc] with t ht
+      show (0 : ℝ) ≤ density t * μ.real {ω | 0 < den ω ∧ den ω ≤ t}
+      exact mul_nonneg (hdensity t ht) measureReal_nonneg
+    rw [intervalIntegral.integral_of_le zero_le_one, integral_eq_lintegral_of_nonneg_ae hnn
+      (hdensityMeasurable.mul hmono.measurable).aestronglyMeasurable]
+    congr 1
+    refine setLIntegral_congr_fun measurableSet_Ioc fun t ht ↦ ?_
+    rw [ENNReal.ofReal_mul (hdensity t ht), ofReal_measureReal]
+  rw [hleft, hright, lintegral_profile_eq_lintegral μ den hmeas hnonneg hone density profile
+    hdensityMeasurable hcont hdensity hprofile]
 
 /-- **Power-law insertion over a measure.** Under `μ(0 < D ≤ t) ≤ C t^α` for `0 < t ≤ 1` with
 `C ≥ 0`, the layer-cake integral of a density nonnegative on `(0, 1]` is at most the integral of

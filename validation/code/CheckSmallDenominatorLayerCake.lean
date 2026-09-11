@@ -30,6 +30,7 @@ open Descent.Portability.SmallDenominatorLayerCake
 #print axioms expectation_inverse_le
 #print axioms unresolvedNumerator_le_gamma
 #print axioms lintegral_profile_eq_lintegral
+#print axioms integral_profile_eq_integral
 #print axioms lintegral_density_mul_measure_le
 #print axioms lintegral_truncation_le_gamma
 #print axioms lintegral_inverse_le
