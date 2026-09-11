@@ -45,7 +45,10 @@ For conservative generators, as after the cemetery extension of (26),
 `poissonTruncation_epochProduct_rowSum_eq` proves that the product of truncations retains
 exactly that mass while the exact product carries mass one, so the certified missed mass is
 attained. An exactly computed substochastic instantaneous event certifies itself with full
-mass (`retainedMassCertificate_of_substochastic`) and composes by the same product step.
+mass (`retainedMassCertificate_of_substochastic`) and composes by the same product step. A
+history is a list of `TruncatedEpoch`s, or of `ConservativeEpoch`s, each epoch carrying its own
+properties, so the product statements take no side condition on the list; `idleTruncatedEpoch`
+and `idleConservativeEpoch` inhabit both structures.
 
 Scope. The choice of a truncation order is not formalized: every bound is stated for every
 order and every dominating rate, and selecting them is the caller's business.
@@ -456,27 +459,59 @@ theorem poissonTruncation_certificate (Q : Matrix ι ι ℝ) (hQ : KillingGenera
     poissonTruncation_rowSum_le_retained Q hQ uniformRate hpos hdominates time htime terms
   deficit_le := rowSum_deficit_le Q hQ uniformRate hpos hdominates time htime terms
 
+/-- One truncated epoch of a history: a killing generator, a uniformization rate dominating
+every exit rate, a nonnegative duration and a truncation order.  The epoch carries these
+properties, so a history is any list of epochs, with no side condition on the list. -/
+structure TruncatedEpoch (states : Type*) [Fintype states] where
+  /-- The generator of the epoch. -/
+  generator : Matrix states states ℝ
+  /-- The uniformization rate. -/
+  uniformRate : ℝ
+  /-- How long the epoch runs. -/
+  duration : ℝ
+  /-- How many Poisson terms the truncation keeps. -/
+  terms : ℕ
+  /-- The generator moves and absorbs mass but never creates it. -/
+  killing : KillingGenerator generator
+  /-- The uniformization rate is positive. -/
+  uniformRate_pos : 0 < uniformRate
+  /-- The uniformization rate dominates every exit rate. -/
+  dominates : ∀ row, -generator row row ≤ uniformRate
+  /-- The epoch runs forward in time. -/
+  duration_nonneg : 0 ≤ duration
+
+/-- The idle truncated epoch: the zero generator at unit uniformization rate, run for no time
+and truncated at no terms.  It inhabits `TruncatedEpoch` on every finite state space with no
+hypothesis. -/
+def idleTruncatedEpoch (states : Type*) [Fintype states] : TruncatedEpoch states where
+  generator := (idleKillingEpoch states).generator
+  uniformRate := 1
+  duration := 0
+  terms := 0
+  killing := (idleKillingEpoch states).killing
+  uniformRate_pos := zero_lt_one
+  dominates := fun _ ↦ by simp [idleKillingEpoch]
+  duration_nonneg := le_rfl
+
 /-- **NOTE 1 equation (26), several epochs.**  A chronological history of epochs, each with its
 own killing generator, dominating uniformization rate, nonnegative duration and truncation
 order, gives a product of truncations that is a positive suboperator of the exact multi-epoch
 semigroup; its rows carry at most the product of the per-epoch retained Poisson masses and miss
 at most one minus that product. -/
-theorem poissonTruncation_epochProduct_certificate
-    (epochs : List (Matrix ι ι ℝ × ℝ × ℝ × ℕ))
-    (hepochs : ∀ epoch ∈ epochs, KillingGenerator epoch.1 ∧ 0 < epoch.2.1 ∧
-      (∀ row, -epoch.1 row row ≤ epoch.2.1) ∧ 0 ≤ epoch.2.2.1) :
+theorem poissonTruncation_epochProduct_certificate (epochs : List (TruncatedEpoch ι)) :
     RetainedMassCertificate
       (epochs.map fun epoch ↦
-        poissonTruncation epoch.1 epoch.2.1 epoch.2.2.1 epoch.2.2.2).prod
-      (epochs.map fun epoch ↦ matrixExponential epoch.1 epoch.2.2.1).prod
-      (epochs.map fun epoch ↦ retainedPoissonMass epoch.2.1 epoch.2.2.1 epoch.2.2.2).prod := by
+        poissonTruncation epoch.generator epoch.uniformRate epoch.duration epoch.terms).prod
+      (epochs.map fun epoch ↦ matrixExponential epoch.generator epoch.duration).prod
+      (epochs.map fun epoch ↦
+        retainedPoissonMass epoch.uniformRate epoch.duration epoch.terms).prod := by
   induction epochs with
   | nil => simpa using retainedMassCertificate_one
   | cons epoch rest ih =>
     simp only [List.map_cons, List.prod_cons]
-    obtain ⟨hgenerator, hpos, hdominates, htime⟩ := hepochs epoch (by simp)
-    exact (poissonTruncation_certificate epoch.1 hgenerator epoch.2.1 hpos hdominates
-      epoch.2.2.1 htime epoch.2.2.2).mul (ih fun other hother ↦ hepochs other (by simp [hother]))
+    exact (poissonTruncation_certificate epoch.generator epoch.killing epoch.uniformRate
+      epoch.uniformRate_pos epoch.dominates epoch.duration epoch.duration_nonneg
+      epoch.terms).mul ih
 
 /-- For a conservative generator every power of the uniformization kernel carries row mass one,
 so the rows of a truncation carry exactly the retained Poisson mass. -/
@@ -505,31 +540,55 @@ theorem poissonTruncation_rowSum_eq_retained (Q : Matrix ι ι ℝ)
   congr 1
   exact Finset.sum_congr rfl fun power _ ↦ by rw [hpow power row, mul_one]
 
+/-- One conservative epoch of a history: a generator whose rows sum to zero, as after the
+cemetery extension of (26), with a uniformization rate, a duration and a truncation order. -/
+structure ConservativeEpoch (states : Type*) [Fintype states] where
+  /-- The generator of the epoch. -/
+  generator : Matrix states states ℝ
+  /-- The uniformization rate. -/
+  uniformRate : ℝ
+  /-- How long the epoch runs. -/
+  duration : ℝ
+  /-- How many Poisson terms the truncation keeps. -/
+  terms : ℕ
+  /-- The generator neither creates nor absorbs mass. -/
+  rowSum_zero : ∀ row, ∑ column, generator row column = 0
+
+/-- The idle conservative epoch: the zero generator.  It inhabits `ConservativeEpoch` on every
+finite state space with no hypothesis. -/
+def idleConservativeEpoch (states : Type*) [Fintype states] : ConservativeEpoch states where
+  generator := 0
+  uniformRate := 1
+  duration := 0
+  terms := 0
+  rowSum_zero := fun _ ↦ by simp
+
 /-- **NOTE 1 equation (26), several epochs, conservative case.**  When every epoch's generator
 is conservative, as it is after the cemetery extension, the exact multi-epoch semigroup carries
 row mass exactly one and the product of truncations carries exactly the product of the
 per-epoch retained Poisson masses, so the certified missed mass is attained. -/
-theorem poissonTruncation_epochProduct_rowSum_eq
-    (epochs : List (Matrix ι ι ℝ × ℝ × ℝ × ℕ))
-    (hzero : ∀ epoch ∈ epochs, ∀ row, ∑ column, epoch.1 row column = 0) :
+theorem poissonTruncation_epochProduct_rowSum_eq (epochs : List (ConservativeEpoch ι)) :
     (∀ row, ∑ column, (epochs.map fun epoch ↦
-        poissonTruncation epoch.1 epoch.2.1 epoch.2.2.1 epoch.2.2.2).prod row column
-      = (epochs.map fun epoch ↦ retainedPoissonMass epoch.2.1 epoch.2.2.1 epoch.2.2.2).prod) ∧
+        poissonTruncation epoch.generator epoch.uniformRate epoch.duration epoch.terms).prod
+          row column
+      = (epochs.map fun epoch ↦
+          retainedPoissonMass epoch.uniformRate epoch.duration epoch.terms).prod) ∧
     (∀ row, ∑ column,
-      (epochs.map fun epoch ↦ matrixExponential epoch.1 epoch.2.2.1).prod row column = 1) := by
+      (epochs.map fun epoch ↦ matrixExponential epoch.generator epoch.duration).prod row column =
+        1) := by
   induction epochs with
   | nil => simp [Matrix.one_apply]
   | cons epoch rest ih =>
     simp only [List.map_cons, List.prod_cons]
-    have hhead := hzero epoch (by simp)
-    obtain ⟨hrestTruncation, hrestExact⟩ := ih fun other hother ↦ hzero other (by simp [hother])
+    obtain ⟨hrestTruncation, hrestExact⟩ := ih
     refine ⟨fun row ↦ ?_, fun row ↦ ?_⟩
     · exact rowMass_mul_of_constant
-        (fun source ↦ poissonTruncation_rowSum_eq_retained epoch.1 hhead epoch.2.1 epoch.2.2.1
-          epoch.2.2.2 source)
+        (fun source ↦ poissonTruncation_rowSum_eq_retained epoch.generator epoch.rowSum_zero
+          epoch.uniformRate epoch.duration epoch.terms source)
         hrestTruncation row
     · rw [rowMass_mul_of_constant
-        (fun source ↦ exponential_rowSum_eq_one epoch.1 hhead epoch.2.2.1 source)
+        (fun source ↦ exponential_rowSum_eq_one epoch.generator epoch.rowSum_zero epoch.duration
+          source)
         hrestExact row, one_mul]
 
 end Descent.Portability.PoissonTruncationCertificate

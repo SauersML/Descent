@@ -76,6 +76,29 @@ structure KillingGenerator (Q : Matrix ι ι ℝ) : Prop where
   /-- The row deficit is the absorption rate. -/
   rowSum_nonpos : ∀ row, ∑ column, Q row column ≤ 0
 
+/-- One epoch of a history: a killing generator together with the nonnegative duration it runs
+for.  The epoch carries both properties, so a history is any list of epochs, with no side
+condition on the list. -/
+structure KillingEpoch (states : Type*) [Fintype states] where
+  /-- The generator of the epoch. -/
+  generator : Matrix states states ℝ
+  /-- How long the epoch runs. -/
+  duration : ℝ
+  /-- The generator moves and absorbs mass but never creates it. -/
+  killing : KillingGenerator generator
+  /-- The epoch runs forward in time. -/
+  duration_nonneg : 0 ≤ duration
+
+/-- The idle epoch: the zero generator run for no time.  It inhabits `KillingEpoch` on every
+finite state space with no hypothesis. -/
+def idleKillingEpoch (states : Type*) [Fintype states] : KillingEpoch states where
+  generator := 0
+  duration := 0
+  killing :=
+    { metzler := fun _ _ _ ↦ by simp
+      rowSum_nonpos := fun _ ↦ by simp }
+  duration_nonneg := le_rfl
+
 /-- Composing two defective steps is a defective step. -/
 theorem substochastic_mul {P R : Matrix ι ι ℝ} (hP : SubstochasticMatrix P)
     (hR : SubstochasticMatrix R) : SubstochasticMatrix (P * R) where
@@ -117,15 +140,16 @@ theorem substochastic_pow [DecidableEq ι] {P : Matrix ι ι ℝ} (hP : Substoch
     rw [pow_succ]
     exact substochastic_mul ih hP
 
-/-- A chronological list of defective steps composes to a defective step. -/
-theorem substochastic_listProd [DecidableEq ι] (operators : List (Matrix ι ι ℝ))
-    (hoperators : ∀ P ∈ operators, SubstochasticMatrix P) :
-    SubstochasticMatrix operators.prod := by
+/-- A chronological list of defective steps composes to a defective step.  The list carries
+each step together with its substochasticity, so no side condition on the list is needed. -/
+theorem substochastic_listProd [DecidableEq ι]
+    (operators : List {P : Matrix ι ι ℝ // SubstochasticMatrix P}) :
+    SubstochasticMatrix (operators.map Subtype.val).prod := by
   induction operators with
   | nil => simpa using substochastic_one
   | cons P rest ih =>
-    rw [List.prod_cons]
-    exact substochastic_mul (hoperators P (by simp)) (ih fun R hR ↦ hoperators R (by simp [hR]))
+    rw [List.map_cons, List.prod_cons]
+    exact substochastic_mul P.2 ih
 
 section Witnesses
 
@@ -353,14 +377,14 @@ theorem matrixExponential_substochastic (Q : Matrix ι ι ℝ) (hQ : KillingGene
 
 /-- A chronological history of epochs, each an exponential of its own killing generator run
 for its own nonnegative duration, composes to a substochastic operator. -/
-theorem substochastic_epochProduct (epochs : List (Matrix ι ι ℝ × ℝ))
-    (hepochs : ∀ epoch ∈ epochs, KillingGenerator epoch.1 ∧ 0 ≤ epoch.2) :
-    SubstochasticMatrix (epochs.map (fun epoch ↦ matrixExponential epoch.1 epoch.2)).prod := by
-  refine substochastic_listProd _ ?_
-  intro P hP
-  obtain ⟨epoch, hmem, rfl⟩ := List.mem_map.mp hP
-  obtain ⟨hgen, hduration⟩ := hepochs epoch hmem
-  exact matrixExponential_substochastic epoch.1 hgen epoch.2 hduration
+theorem substochastic_epochProduct (epochs : List (KillingEpoch ι)) :
+    SubstochasticMatrix
+      (epochs.map fun epoch ↦ matrixExponential epoch.generator epoch.duration).prod := by
+  have hproduct := substochastic_listProd (epochs.map fun epoch ↦
+    (⟨matrixExponential epoch.generator epoch.duration,
+      matrixExponential_substochastic epoch.generator epoch.killing epoch.duration
+        epoch.duration_nonneg⟩ : {P : Matrix ι ι ℝ // SubstochasticMatrix P}))
+  simpa only [List.map_map, Function.comp_def] using hproduct
 
 /-- A chronological history built from an arbitrary rate table and an arbitrary length per
 epoch, with the rates made nonnegative and the lengths made forward in time, composes to a
@@ -370,11 +394,12 @@ theorem substochastic_absEpochProduct (epochs : List ((ι → ι → ℝ) × ℝ
       (epochs.map fun epoch ↦
         matrixExponential (jumpGenerator fun source target ↦ |epoch.1 source target|)
           (|epoch.2|)).prod := by
-  refine substochastic_listProd _ ?_
-  intro P hP
-  obtain ⟨epoch, _, rfl⟩ := List.mem_map.mp hP
-  exact matrixExponential_substochastic _ (killingGenerator_absJumpGenerator epoch.1) _
-    (abs_nonneg _)
+  have hproduct := substochastic_epochProduct (epochs.map fun epoch ↦
+    ({ generator := jumpGenerator fun source target ↦ |epoch.1 source target|
+       duration := |epoch.2|
+       killing := killingGenerator_absJumpGenerator epoch.1
+       duration_nonneg := abs_nonneg _ } : KillingEpoch ι))
+  simpa only [List.map_map, Function.comp_def] using hproduct
 
 /-- **A conservative generator loses no mass.**  When every row of `Q` sums to zero, every row
 of the exact exponential sums to one at every time, so the constant vector is preserved. -/
