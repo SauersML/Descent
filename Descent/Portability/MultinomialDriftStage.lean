@@ -323,12 +323,9 @@ def leftFrequencyObservable {D : ℕ} (deme : Fin D) :
       + MvPolynomial.X TwoLocusHaplotype.Ab : MvPolynomial TwoLocusHaplotype ℝ).support,
     |(MvPolynomial.X TwoLocusHaplotype.AB + MvPolynomial.X TwoLocusHaplotype.Ab
       : MvPolynomial TwoLocusHaplotype ℝ).coeff s| * (11 + 4 * totalStirlingWeight ⇑s)
-  coefficient_le _ := by
-    dsimp only
-    exact le_rfl
+  coefficient_le _ := le_rfl
   driftBound := 0
   drift_le _ := by
-    dsimp only
     rw [resamplingOperator_add, resamplingOperator_X, resamplingOperator_X, add_zero, abs_zero]
 
 end
