@@ -13,8 +13,10 @@ NOTE1 §2.4 reduces a time-varying demographic history to a piecewise-constant o
 many epochs, each with its own constant rate matrix, interleaved with finitely many
 instantaneous events.  In the corpus that is exactly a list of
 `Descent.Coalescent.LowOrderLDInstruction`, composed by `propagateLowOrderLDInstructions`.
-This module closes NOTE1 Theorem 2 on that list: the present state of a compiled history is
-haplotype realizable whenever its initial state is.
+This module proves NOTE1 Theorem 2 on that list for histories whose epochs admit a microscopic
+approximation on the stored features, which rules out positive mutation (see the scope paragraph
+below): the present state of such a compiled history is haplotype realizable whenever its
+initial state is.
 
 The list induction itself is not here.  It is
 `Descent.Portability.KernelRealizationPreservation.propagate_mem_realizationBody`, which takes
@@ -39,8 +41,19 @@ each instantaneous instruction, assumed to be a physically realized split, by
 `split_mulVec_mem_realizationBody_of_mem`, neither of which needs a closedness hypothesis any
 more: closedness of the corpus body is now the theorem
 `RealizationBody.isClosed_realizationBody_lowOrderLDFeature`.  A history made only of splits
-therefore preserves realizability outright, recorded separately so the hypothesis family of
-the general theorem is known to be satisfiable.
+therefore preserves realizability outright, and that is recorded separately.
+
+Scope of the history-level theorem.  Its approximations are for the stored feature map
+`lowOrderLDFeature D`.  No such approximation exists for an epoch whose generator is the corpus
+rate law's `augmentedLowOrderLDGenerator` at a positive mutation rate: the stored `pi2` mutation
+row reads the left heterozygosity `H` where the physical velocity reads the right
+heterozygosity `H^R`, which is why NOTE1 (6) enlarges the observable family.  The theorem is
+true as stated, but its approximation family can be supplied only when every epoch of the
+history is mutation-free, so that is the only case in which it has content.  The general
+statement, with positive mutation and no supplied approximation, is over locus-exchangeable
+realizations:
+`TwoLocusMicroscopicApproximation.history_present_locusExchangeable_realization`, with body
+membership in `TwoLocusMicroscopicApproximation.history_present_mem_realizationBody_of_events`.
 
 Not formalized here: the L¹ limit of NOTE1 §2.4, in which general nonnegative integrable rates
 are approximated by step functions and the propagator difference is bounded by a constant times
@@ -103,11 +116,16 @@ theorem propagateInstructions_append_mem
   rw [propagateLowOrderLDInstructions_append]
   exact hrest _ (hfront _ hinitial)
 
-/-- **NOTE1 Theorem 2, closing sentence.**  A compiled low-order history keeps a
-haplotype-realizable state realizable: every epoch whose generator admits a microscopic
-approximation preserves the corpus realization body, every instantaneous instruction that is a
-physically realized split preserves it, and the composed history therefore does too.  No
-closedness hypothesis is needed; the corpus body is closed. -/
+/-- **NOTE1 Theorem 2, closing sentence, for mutation-free epochs.**  A compiled low-order
+history keeps a haplotype-realizable state realizable: every epoch whose generator admits a
+microscopic approximation on the stored features preserves the corpus realization body, every
+instantaneous instruction that is a physically realized split preserves it, and the composed
+history therefore does too.  No closedness hypothesis is needed; the corpus body is closed.
+Scope: a stored-feature approximation cannot exist for an epoch with a positive mutation rate,
+because the stored `pi2` mutation row reads `H` where the physical velocity reads `H^R`, so
+this has content only when every epoch is mutation-free.  The general history statement, with
+mutation and no supplied approximation, is
+`TwoLocusMicroscopicApproximation.history_present_locusExchangeable_realization`. -/
 theorem history_present_mem_realizationBody {B : Type*} [Fintype B]
     (history : LowOrderLDHistory D)
     (approximation : ∀ epoch : LowOrderLDEpoch D,
@@ -130,7 +148,7 @@ theorem history_present_mem_realizationBody {B : Type*} [Fintype B]
 
 /-- A history built only from physically realized splits preserves the corpus realization body
 outright, with no microscopic approximation and no limit.  This shows the hypothesis family of
-the previous theorem is satisfiable. -/
+the previous theorem is satisfiable, vacuously in the epochs. -/
 theorem splitInstructions_mem_realizationBody (splits : List (Fin D × Fin D))
     (initial : AffineLowOrderLDCoordinate D → ℝ)
     (hinitial : initial ∈ realizationBody (lowOrderLDFeature D)) :
