@@ -44,6 +44,7 @@ open Descent.Portability.RationalParameterReports
 #print axioms validAt_architectureTree
 #print axioms accumulation_architectureTree
 #print axioms attainableRegion_architectureTree_eq_jointRegion
+#print axioms eval_selectionQuotient
 #print axioms eval_selectionQuotient_true
 #print axioms eval_selectionQuotient_false
 #print axioms eval_decisionQuotient
