@@ -66,6 +66,11 @@ import Descent.Portability.PartialHaplotypeDualGenerator
 import Descent.Portability.SmallDenominatorLayerCake
 import Descent.Portability.FiniteTraceTreeLaw
 import Descent.Portability.PipelineWitnesses
+import Descent.Portability.StageCompositionKernel
+import Descent.Portability.EmpiricalTableLawMetrics
+import Descent.Portability.ReplicaMeasureCertificate
+import Descent.Portability.EmpiricalLawContinuityBound
+import Descent.Portability.CylinderIntervalCertificate
 
 namespace Descent.Program
 
@@ -100,7 +105,8 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
 * §2.3, equations (10)-(11), the physical kernels: `SimplexResamplingKernel`,
   `ResamplingJetExpansion`, `RandomStageKernel`, `PulseJetExpansion`, `PulseStageKernel`,
   `TwoLocusMicroscopicKernel`, `Pi2GeneratorBridges`, `EnlargedGeneratorBridges`; the
-  multinomial moments of equation (10): `MultinomialMomentExpansion`.
+  multinomial moments of equation (10): `MultinomialMomentExpansion`; composing finitely many
+  stages into one step with an explicit O(h²) remainder: `StageCompositionKernel`.
 * Theorem 2 and Corollary 2.1, with no hypotheses: `TwoLocusMicroscopicApproximation`
   (`enlargedMicroscopicApproximation`, `rateEpoch_preserves_locusExchangeable_realization`,
   `history_present_locusExchangeable_realization`, `history_LDPairDomain`); the closedness-taking
@@ -124,16 +130,20 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
   `FinitePulseExposure`.
 * §7 equations (37)-(42), finite cohorts: `FourCellCohortLaw`,
   `EmpiricalCorrelationDefinedness`, `SmallCohortCorrelation`, `SmallCohortConditionalMeans`,
-  `EmpiricalAUCUnbiasedness`.
+  `EmpiricalAUCUnbiasedness`, with (42) restated for the corpus metrics of the empirical table
+  law: `EmpiricalTableLawMetrics`.
 
 Scope. Equation (10) is proved for every monomial of degree at most four with remainder at
 most 71/N², but the microscopic approximation behind Theorem 2 uses the single-draw
-resampling step of §2.3. §2.4 is proved for rate paths whose generator is continuous in time,
-not for merely integrable rates. Theorem 2 covers histories of rate epochs and splits; the
-pipeline compiler emits nothing else. Of §4.2, the migration, recombination and mutation rates
-of (19) and equation (20) are not formalized. The §4.2a kernels are continuous into the weak
-topology but are not packaged as measurable kernels, and the representing measure is proved
-unique only on pseudo-metrizable spaces, which include the haplotype-frequency simplex.
+resampling step of §2.3, and `StageCompositionKernel` takes each stage's matrix-form expansion
+as a hypothesis whose two-locus discharge is not yet registered. §2.4 is proved for rate paths
+whose generator is continuous in time, not for merely integrable rates. Theorem 2 covers
+histories of rate epochs and splits; the pipeline compiler emits nothing else. Of §4.2, the
+migration, recombination and mutation rates of (19) and equation (20) are not formalized. The
+§4.2a kernels are continuous into the weak topology but are not packaged as measurable kernels,
+and the representing measure is proved unique only on pseudo-metrizable spaces, which include
+the haplotype-frequency simplex. The finite-cohort intercept and accuracy of §7 are not
+formalized.
 
 Guard witnesses: `LowOrderLDWitnesses` inhabits the corpus rate, epoch and history structures
 from data alone, and `PipelineWitnesses` inhabits the pipeline structures of `EndToEndScoreLaw`
@@ -148,12 +158,16 @@ from a deme count.
 * Theorem 3 and §4.1 equations (12)-(14): `ReplicaMomentCompleteness`,
   `ReplicaFiniteOrderNecessity`, `ThetaFamilyNonclosure`.
 * §5 equations (15)-(20): `PositiveRatioExpansion`, `ReplicaDomainCertificate`,
-  `SmallDenominatorRates`; the sharp gamma constant of (20) and equations (28)-(29):
-  `SmallDenominatorLayerCake`. §6.1 equations (24)-(26): `JointRatioFailureMasks`. §6.2:
+  `SmallDenominatorRates`; Theorem 4 over an arbitrary probability measure, with convergence of
+  both certificate endpoints: `ReplicaMeasureCertificate`; the sharp gamma constant of (20) and
+  equations (28)-(29): `SmallDenominatorLayerCake`. §6.1 equations (24)-(26):
+  `JointRatioFailureMasks`. §6.2:
   `PortabilityRatioQueries`. §6.3 example: `UnboundedSlopeExample`. §6.4 equation (30):
   `LogLossSeriesCertificate`.
-* §7.1 equation (31): `EmpiricalLawLipschitzBound`. §7.2 Theorem 5 and equation (32):
-  `IntervalEvaluatorCertificate`.
+* §7.1 equation (31): `EmpiricalLawLipschitzBound`; the modulus-of-continuity extension to every
+  continuous functional: `EmpiricalLawContinuityBound`. §7.2 Theorem 5 and equation (32):
+  `IntervalEvaluatorCertificate`; Theorem 5 on genuine fair-bit cylinders with the coupled
+  bracket (18) at every stage: `CylinderIntervalCertificate`.
 * §8 equations (33)-(35): `FrontierCompletionRegion`, with (35) in `SublawReportCertificate`.
 * §9.1, the uniform penetrance architecture: `UniformPenetranceArchitecture`.
 * §10, the halting boundary: `HaltingExpectationBoundary`.
@@ -161,9 +175,11 @@ from a deme count.
 Scope. Theorem 2's semialgebraic partition is proved only for the architecture/environment
 square. Equations (20), (28) and (29) take the pointwise bounds `0 ≤ D ≤ 1`, as the corpus
 certificates do. Theorem 1 makes no complexity claim and covers no infinite branch set. The
-executed reference experiment of §9 is not formalized yet.
-Theorem 5 assumes a finite measure, a common bound and pointwise vanishing widths; (32) covers
-finite prefix enumerations. Frontier attainment (33) is proved per cell.
+executed reference experiment of §9 is not formalized yet. `IntervalEvaluatorCertificate`
+assumes a finite measure, a common bound and pointwise vanishing widths;
+`CylinderIntervalCertificate` needs only almost sure vanishing widths on fair-bit streams but
+does not show that its rational values are computed by an algorithm. (32) covers finite prefix
+enumerations. Frontier attainment (33) is proved per cell.
 -/
 
 end Descent.Program
