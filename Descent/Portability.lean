@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.CylinderIntervalCertificate
 import Descent.Portability.EmpiricalTableLawMetrics
 import Descent.Portability.ReplicaMeasureCertificate
 import Descent.Portability.PartialHaplotypeDualGenerator
