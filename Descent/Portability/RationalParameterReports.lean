@@ -603,13 +603,19 @@ def attainableRegion {Parameter J : Type} (admissible : Set Parameter)
   {report | ∃ θ ∈ admissible, ∀ j, 0 < definedness j θ ∧
     definedness j θ * report j = numerator j θ}
 
+/-- The report map of NOTE2 (8): a parameter point's vector of requested conditional means
+`θ ↦ (n_j(θ) / d_j(θ))_j`. -/
+abbrev attainableReportMap {Parameter J : Type} (definedness numerator : J → Parameter → ℝ)
+    (θ : Parameter) : J → ℝ :=
+  fun j ↦ numerator j θ / definedness j θ
+
 /-- **NOTE2 (8) is an image.** The attainable region is the image, under the report map
-`θ ↦ (n_j(θ) / d_j(θ))_j`, of the admissible points at which every definedness probability is
+`attainableReportMap`, of the admissible points at which every definedness probability is
 positive. -/
 theorem attainableRegion_eq_image {Parameter J : Type} (admissible : Set Parameter)
     (definedness numerator : J → Parameter → ℝ) :
     attainableRegion admissible definedness numerator =
-      (fun θ j ↦ numerator j θ / definedness j θ) ''
+      attainableReportMap definedness numerator ''
         {θ | θ ∈ admissible ∧ ∀ j, 0 < definedness j θ} := by
   ext report
   constructor
