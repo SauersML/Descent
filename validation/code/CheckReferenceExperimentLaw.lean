@@ -31,6 +31,11 @@ open Descent.Portability.ReferenceExperimentLaw
 #print axioms late_offspringMass_pos
 #print axioms early_stateCount
 #print axioms late_stateCount
+#print axioms atomMass_pos_iff
+#print axioms reachableAtoms_card
+#print axioms contextStateCount_of_pos
+#print axioms early_contextStateCount
+#print axioms late_contextStateCount
 #print axioms targetMass_nonneg
 #print axioms targetMass_sum
 #print axioms early_target_r2_definedProbability

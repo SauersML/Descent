@@ -35,14 +35,15 @@ that the population source squared correlation is defined, its weighted numerato
 `41454281977/498841200000`, the weighted calibration slope numerator `197447/337500`, the
 expected Brier loss `5972333/24300000` and the expected accuracy `418409/759375`. Beyond the
 source side: the 18 learner atoms of every context; the target deme through its bottleneck
-and growth generations under both migration histories, with its 55 census classes and 220
-architecture, environment and census states per history; and, for early migration, the
-probability
+and growth generations under both migration histories, with its 55 census classes, 220
+architecture, environment and census states per history, and 3960 shared-context states after
+learner selection; and, for early migration, the probability
 `371745151991563462629371512245851/2820650730645240044657068474368000`
 that the population target squared correlation is defined.
 
-Not formalized here yet: the remaining target rows of the section 9 table, the late migration
-rows, the 3960 shared-context state count, and the full-square range table.
+The remaining target rows of the section 9 table, for both histories, are decided in
+`ReferenceExperimentTable`, and the full-square range table is proved in
+`ReferenceExperimentRegion`.
 
 ## Empirical status
 
@@ -558,6 +559,67 @@ theorem late_stateCount :
       isCensusClass state.2 = true ∧ 0 < censusClassMass lateMigration state.1 state.2).card =
       220 :=
   stateCount_of_pos lateMigration late_bottleneckMass_pos late_offspringMass_pos
+
+/-- The learner atoms that some training and validation draws select. -/
+def reachableAtoms : Finset LearnerAtom :=
+  Finset.univ.image fun draws : Training × (Fin 3 × Bool) ↦ learnerAtom draws.1 draws.2
+
+/-- In every context a learner atom carries positive mass exactly when some draws select it. -/
+theorem atomMass_pos_iff :
+    ∀ context atom, 0 < atomMass context atom ↔ atom ∈ reachableAtoms := by
+  decide +kernel
+
+/-- Exactly 18 learner atoms are reachable. -/
+theorem reachableAtoms_card : reachableAtoms.card = 18 := by
+  decide +kernel
+
+/-- NOTE2 section 9: a history whose bottleneck and offspring masses are positive has 3960
+shared-context states after learner selection, the 220 architecture, environment and census
+states times the 18 learner atoms. Assumes: the two positivity facts, decided for both
+reference histories above. -/
+theorem contextStateCount_of_pos (history : History)
+    (hbottleneck : ∀ context parent, 0 < bottleneckMass history context parent)
+    (hoffspring : ∀ context parent individual,
+      0 < offspringMass history context parent individual) :
+    (Finset.univ.filter fun state : (Bool × Bool) × (Individual × Individual) × LearnerAtom ↦
+      isCensusClass state.2.1 = true ∧
+        0 < censusClassMass history state.1 state.2.1 * atomMass state.1 state.2.2).card =
+      3960 := by
+  have hfilter : (Finset.univ.filter
+      fun state : (Bool × Bool) × (Individual × Individual) × LearnerAtom ↦
+        isCensusClass state.2.1 = true ∧
+          0 < censusClassMass history state.1 state.2.1 * atomMass state.1 state.2.2) =
+      (Finset.univ : Finset (Bool × Bool)) ×ˢ
+        ((Finset.univ.filter fun census : Individual × Individual ↦ isCensusClass census) ×ˢ
+          reachableAtoms) := by
+    ext ⟨context, census, atom⟩
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_product]
+    constructor
+    · rintro ⟨hclass, hmass⟩
+      exact ⟨hclass, (atomMass_pos_iff context atom).mp ((mul_pos_iff_of_pos_left
+        (censusClassMass_pos history context census hclass (hbottleneck context)
+          (hoffspring context))).mp hmass)⟩
+    · rintro ⟨hclass, hatom⟩
+      exact ⟨hclass, mul_pos (censusClassMass_pos history context census hclass
+        (hbottleneck context) (hoffspring context)) ((atomMass_pos_iff context atom).mpr hatom)⟩
+  rw [hfilter, Finset.card_product, Finset.card_product, censusClass_count, reachableAtoms_card]
+  decide
+
+/-- NOTE2 section 9: the early migration history has 3960 shared-context states. -/
+theorem early_contextStateCount :
+    (Finset.univ.filter fun state : (Bool × Bool) × (Individual × Individual) × LearnerAtom ↦
+      isCensusClass state.2.1 = true ∧
+        0 < censusClassMass earlyMigration state.1 state.2.1 * atomMass state.1 state.2.2).card =
+      3960 :=
+  contextStateCount_of_pos earlyMigration early_bottleneckMass_pos early_offspringMass_pos
+
+/-- NOTE2 section 9: the late migration history has 3960 shared-context states. -/
+theorem late_contextStateCount :
+    (Finset.univ.filter fun state : (Bool × Bool) × (Individual × Individual) × LearnerAtom ↦
+      isCensusClass state.2.1 = true ∧
+        0 < censusClassMass lateMigration state.1 state.2.1 * atomMass state.1 state.2.2).card =
+      3960 :=
+  contextStateCount_of_pos lateMigration late_bottleneckMass_pos late_offspringMass_pos
 
 /-! ## The terminal target law and the target reports -/
 
