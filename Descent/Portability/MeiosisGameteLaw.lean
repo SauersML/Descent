@@ -120,6 +120,7 @@ theorem independentSiteKernel_mass
     (independentSiteKernel mutate strand).mass gamete =
       ∏ locus, (mutate locus (strand locus)).mass (gamete locus) := rfl
 
+omit [(locus : Locus) → DecidableEq (Allele locus)] in
 /-- NOTE2 (3) at the two supplied default primitives: the gamete probability is a uniform
 average over masks of a product of per-locus mutation probabilities. -/
 theorem meiosisGameteLaw_default_mass
@@ -133,6 +134,7 @@ theorem meiosisGameteLaw_default_mass
   exact Finset.sum_congr rfl fun mask _ ↦ by
     rw [fairMaskLaw_mass, independentSiteKernel_mass]
 
+omit [(locus : Locus) → DecidableEq (Allele locus)] in
 /-- A parent whose two strands agree transmits the same law whatever mask law is supplied:
 without heterozygosity the meiosis randomization is invisible in the gamete law. -/
 theorem meiosisGameteLaw_of_homozygous
