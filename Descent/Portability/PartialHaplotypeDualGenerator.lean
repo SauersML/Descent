@@ -1016,7 +1016,7 @@ theorem recombinantDrift_selector (x : FrequencyVariable Deme Locus Allele → �
         cases hs : selector ℓ
         · simp [restrictAssignment, hs]
         · cases hτ : τ.allele ℓ with
-          | none => simp [restrictAssignment, hs, hτ]
+          | none => simp [restrictAssignment, hs]
           | some a => exact (hsel ⟨ℓ, hs, by simp [hτ]⟩).elim
       rw [hnone, hall, sum_satisfies_none x hsimplex τ.deme]
       ring
@@ -1024,7 +1024,7 @@ theorem recombinantDrift_selector (x : FrequencyVariable Deme Locus Allele → �
         funext ℓ
         cases hs : selector ℓ
         · cases hτ : τ.allele ℓ with
-          | none => simp [restrictAssignment, hs, hτ]
+          | none => simp [restrictAssignment, hs]
           | some a => exact (hrej ⟨ℓ, hs, by simp [hτ]⟩).elim
         · simp [restrictAssignment, hs]
       have hnone : restrictAssignment τ.allele (fun ℓ ↦ !selector ℓ) = fun ℓ ↦ none := by
@@ -1175,6 +1175,9 @@ theorem eval_neutralGenerator_marginal (rates : NeutralRates Deme Locus Allele)
     sum_recombinationDrift rates x hsimplex τ, sum_mutationDrift, carrierMoves, Multiset.map_add,
     Multiset.map_add, Multiset.sum_add, Multiset.sum_add, sum_migrationMoves, sum_mutationMoves,
     sum_recombinationMoves]
+  have hmarginal :
+      eval x (marginalPolynomial τ) = eval x (assignmentPolynomial τ.deme τ.allele) := rfl
+  rw [hmarginal]
   ring
 
 /-- **NOTE1 (19): the generator identity.**  At the frequency point of any per-deme haplotype
