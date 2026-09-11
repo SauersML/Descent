@@ -20,7 +20,6 @@ open Descent.Portability.ReplicaMetricInstances
 #print axioms expectation_squaredCorrelation_eq_tsum
 #print axioms squaredCorrelation_certificate
 #print axioms replicaCohortLaw_mass
-#print axioms empiricalAUCComparison_mem_unit
 #print axioms rankingCredit_bounds
 #print axioms binaryAUCNumerator_eq_twoReplica
 #print axioms binaryCaseMass_mem_unit

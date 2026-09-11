@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.ReplicaDomainCertificate
 import Descent.Portability.ChronologyReportLaw
 import Descent.Portability.FiniteGeneticTransition
+import Descent.Portability.PThresholdTrainingLaw
 import Descent.Portability.ReplicaMomentCompleteness
 import Mathlib.Algebra.MvPolynomial.CommRing
 
@@ -355,13 +356,6 @@ section AUC
 
 variable {State : Type*} [Fintype State]
 
-/-- The half-credit comparison credit lies in the unit interval. -/
-theorem empiricalAUCComparison_mem_unit (caseRisk controlRisk : ℝ) :
-    0 ≤ empiricalAUCComparison caseRisk controlRisk ∧
-      empiricalAUCComparison caseRisk controlRisk ≤ 1 := by
-  unfold empiricalAUCComparison
-  split_ifs <;> norm_num
-
 omit [Fintype State] in
 /-- The ranking credit of an ordered pair of replicas: the half-credit comparison when the
 first is a case and the second a control, and nothing otherwise. It is nonnegative and at most
@@ -373,7 +367,7 @@ theorem rankingCredit_bounds (score : State → ℝ) (outcome : State → Bool)
       (if outcome first && !outcome second then
           empiricalAUCComparison (score first) (score second) else 0) ≤
         (if outcome first then 1 else 0) * (1 - if outcome second then 1 else 0) := by
-  have hunit := empiricalAUCComparison_mem_unit (score first) (score second)
+  have hunit := PThresholdTrainingLaw.comparison_bounds (score first) (score second)
   by_cases hfirst : outcome first <;> by_cases hsecond : outcome second <;>
     simp [hfirst, hsecond, hunit.1, hunit.2]
 
@@ -1146,6 +1140,7 @@ theorem totalDegree_correlationDenominatorPolynomial_le (score outcome : State �
   rw [totalDegree_C, zero_add]
   exact (totalDegree_mul _ _).trans (by omega)
 
+omit [Fintype State] in
 /-- **NOTE 2 section 5.4, degree accounting.** If a numerator polynomial has degree at most `a`
 and a denominator polynomial degree at most `b`, the `power`-th expansion term
 `num * (1 - den) ^ power` has degree at most `a + power * b`. -/
