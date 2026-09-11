@@ -28,11 +28,21 @@ mass.
 
 The certificate is closed under the corpus jet algebra: `JetPolynomialCertificate.const`,
 `JetPolynomialCertificate.add` and `JetPolynomialCertificate.smul` certify the constant jet, sums
-and scalar multiples, adding degrees by maximum and masses by sum.
+and scalar multiples, adding degrees by maximum and masses by sum. `JetPolynomialCertificate.mul`
+certifies products, adding degrees and multiplying masses. Its drift rests on
+`resamplingOperator_mul`, the product rule of the second-order operator `p L q + q L p` plus the
+carré du champ `Σ_{a,c} (x_a δ_ac - x_a x_c) ∂_a p ∂_c q`, and on
+`twoLocusHaplotypeCovariance_eq_sum`, which identifies that carré du champ with the corpus
+multinomial covariance of the two gradients that `TwoLocusDiffusionJet.mul` adds.
 
-What is NOT proved in this module yet: the product closure, which needs the product rule of the
-second-order operator against the corpus's multinomial covariance; the base certificates for the
-marginal frequency and linkage jets; and the certificates of the enlarged coordinate jets.
+The base jets are certified directly. `JetPolynomialCertificate.leftFrequency` and
+`JetPolynomialCertificate.rightFrequency` are the linear polynomials `X_AB + X_Ab` and
+`X_AB + X_aB` in their own deme and constants elsewhere; `JetPolynomialCertificate.linkage` is the
+determinant `X_AB X_ab - X_Ab X_aB`, whose second-order operator is `-D` by
+`resamplingOperator_X_mul_X`, matching the corpus `twoLocusLinkageDrift_eq_neg_linkage`.
+
+What is NOT proved in this module yet: the certificates of the enlarged coordinate jets built
+from these by the jet algebra, and their use in a multinomial microscopic approximation.
 
 ## Empirical status
 
@@ -178,6 +188,95 @@ theorem sum_coeff_remainder_le {H : Type*} [Fintype H] [DecidableEq H] (p : MvPo
   have hweight := totalStirlingWeight_le (⇑s) hdeg
   nlinarith [abs_nonneg (p.coeff s)]
 
+/-! ## The product rule of the second-order operator -/
+
+/-- The coefficient `x_a δ_ac - x_a x_c` of the second-order operator is symmetric. -/
+theorem resamplingCoefficient_symm {H : Type*} [DecidableEq H] (x : H → ℝ) (a c : H) :
+    (if c = a then x c else 0) - x c * x a = (if a = c then x a else 0) - x a * x c := by
+  by_cases hac : a = c
+  · subst hac
+    rfl
+  · rw [if_neg (Ne.symm hac), if_neg hac, mul_comm]
+
+/-- **The product rule of the second-order operator of (10).** On a product the operator is
+`p L q + q L p` plus the carré du champ `Σ_{a,c} (x_a δ_ac - x_a x_c) ∂_a p ∂_c q`. -/
+theorem resamplingOperator_mul {H : Type*} [Fintype H] [DecidableEq H] (x : H → ℝ)
+    (p q : MvPolynomial H ℝ) :
+    resamplingOperator x (p * q)
+      = MvPolynomial.eval x p * resamplingOperator x q
+        + MvPolynomial.eval x q * resamplingOperator x p
+        + ∑ a, ∑ c, ((if a = c then x a else 0) - x a * x c)
+            * (MvPolynomial.eval x (MvPolynomial.pderiv a p)
+              * MvPolynomial.eval x (MvPolynomial.pderiv c q)) := by
+  have hpoint : ∀ a c,
+      MvPolynomial.eval x (MvPolynomial.pderiv a (MvPolynomial.pderiv c (p * q)))
+        = MvPolynomial.eval x (MvPolynomial.pderiv a (MvPolynomial.pderiv c p))
+            * MvPolynomial.eval x q
+          + MvPolynomial.eval x (MvPolynomial.pderiv c p)
+            * MvPolynomial.eval x (MvPolynomial.pderiv a q)
+          + MvPolynomial.eval x (MvPolynomial.pderiv a p)
+            * MvPolynomial.eval x (MvPolynomial.pderiv c q)
+          + MvPolynomial.eval x p
+            * MvPolynomial.eval x (MvPolynomial.pderiv a (MvPolynomial.pderiv c q)) := by
+    intro a c
+    rw [MvPolynomial.pderiv_mul, map_add, MvPolynomial.pderiv_mul, MvPolynomial.pderiv_mul]
+    simp only [map_add, map_mul]
+    ring
+  have hswap : ∑ a, ∑ c, ((if a = c then x a else 0) - x a * x c)
+        * (MvPolynomial.eval x (MvPolynomial.pderiv c p)
+          * MvPolynomial.eval x (MvPolynomial.pderiv a q))
+      = ∑ a, ∑ c, ((if a = c then x a else 0) - x a * x c)
+        * (MvPolynomial.eval x (MvPolynomial.pderiv a p)
+          * MvPolynomial.eval x (MvPolynomial.pderiv c q)) := by
+    rw [Finset.sum_comm]
+    refine Finset.sum_congr rfl fun a _ ↦ Finset.sum_congr rfl fun c _ ↦ ?_
+    rw [resamplingCoefficient_symm]
+  have hsplit : ∀ a c, ((if a = c then x a else 0) - x a * x c)
+        * (MvPolynomial.eval x (MvPolynomial.pderiv a (MvPolynomial.pderiv c p))
+            * MvPolynomial.eval x q
+          + MvPolynomial.eval x (MvPolynomial.pderiv c p)
+            * MvPolynomial.eval x (MvPolynomial.pderiv a q)
+          + MvPolynomial.eval x (MvPolynomial.pderiv a p)
+            * MvPolynomial.eval x (MvPolynomial.pderiv c q)
+          + MvPolynomial.eval x p
+            * MvPolynomial.eval x (MvPolynomial.pderiv a (MvPolynomial.pderiv c q)))
+      = MvPolynomial.eval x q * (((if a = c then x a else 0) - x a * x c)
+          * MvPolynomial.eval x (MvPolynomial.pderiv a (MvPolynomial.pderiv c p)))
+        + ((if a = c then x a else 0) - x a * x c)
+          * (MvPolynomial.eval x (MvPolynomial.pderiv c p)
+            * MvPolynomial.eval x (MvPolynomial.pderiv a q))
+        + ((if a = c then x a else 0) - x a * x c)
+          * (MvPolynomial.eval x (MvPolynomial.pderiv a p)
+            * MvPolynomial.eval x (MvPolynomial.pderiv c q))
+        + MvPolynomial.eval x p * (((if a = c then x a else 0) - x a * x c)
+          * MvPolynomial.eval x (MvPolynomial.pderiv a (MvPolynomial.pderiv c q))) := by
+    intro a c
+    ring
+  simp only [resamplingOperator, hpoint, hsplit, Finset.sum_add_distrib, ← Finset.mul_sum]
+  rw [hswap]
+  ring
+
+/-- The corpus multinomial covariance of two haplotype scores is the carré du champ form
+`Σ_{a,c} (x_a δ_ac - x_a x_c) u_a v_c` at the deme's haplotype frequencies. -/
+theorem twoLocusHaplotypeCovariance_eq_sum (frequency : TwoLocusHaplotypeFrequencies)
+    (first second : TwoLocusHaplotype → ℝ) :
+    twoLocusHaplotypeCovariance frequency first second
+      = ∑ a, ∑ c, ((if a = c then haplotypeCoordinate frequency a else 0)
+          - haplotypeCoordinate frequency a * haplotypeCoordinate frequency c)
+          * (first a * second c) := by
+  simp only [RandomStageKernel.sum_haplotype, twoLocusHaplotypeCovariance, twoLocusHaplotypeMean,
+    haplotypeCoordinate, eq_self_iff_true, if_true, if_false, reduceCtorEq]
+  ring
+
+/-- The second-order operator of (10) on a product of two coordinates is the coefficient
+`x_a δ_ab - x_a x_b`. -/
+theorem resamplingOperator_X_mul_X {H : Type*} [Fintype H] [DecidableEq H] (x : H → ℝ)
+    (a b : H) :
+    resamplingOperator x (MvPolynomial.X a * MvPolynomial.X b)
+      = (if a = b then x a else 0) - x a * x b := by
+  simp [resamplingOperator_mul, resamplingOperator_X, MvPolynomial.pderiv_X, Pi.single_apply,
+    apply_ite, Finset.sum_ite_eq, ite_mul, mul_ite]
+
 /-! ## Certificates and their algebra -/
 
 /-- **A polynomial certificate for a corpus diffusion jet.** For every deme and state, a
@@ -279,6 +378,189 @@ def smul {D : ℕ} {observable : TwoLocusDiffusionJet D} (scalar : ℝ)
   drift_eq deme state := by
     simp only [TwoLocusDiffusionJet.smul, resamplingOperator_smul,
       hobservable.drift_eq deme state]
+
+/-- A product of certified jets is certified by the product of the polynomials: the gradient
+follows the Leibniz rule, and the drift follows the product rule of the second-order operator,
+whose carré du champ is the corpus multinomial covariance of the two gradients. -/
+def mul {D : ℕ} {first second : TwoLocusDiffusionJet D}
+    (hfirst : JetPolynomialCertificate first) (hsecond : JetPolynomialCertificate second) :
+    JetPolynomialCertificate (first.mul second) where
+  polynomial deme state := hfirst.polynomial deme state * hsecond.polynomial deme state
+  degree := hfirst.degree + hsecond.degree
+  totalDegree_le deme state := (MvPolynomial.totalDegree_mul _ _).trans
+    (add_le_add (hfirst.totalDegree_le deme state) (hsecond.totalDegree_le deme state))
+  massBound := hfirst.massBound * hsecond.massBound
+  mass_le deme state := (coefficientMass_mul_le _ _).trans
+    (mul_le_mul (hfirst.mass_le deme state) (hsecond.mass_le deme state)
+      (coefficientMass_nonneg _) ((coefficientMass_nonneg _).trans (hfirst.mass_le deme state)))
+  polynomial_update deme state frequency := by
+    simp only [hfirst.polynomial_update, hsecond.polynomial_update]
+  value_eq deme state := by
+    simp only [TwoLocusDiffusionJet.mul, map_mul, hfirst.value_eq deme state,
+      hsecond.value_eq deme state]
+  gradient_eq deme state observed := by
+    simp only [TwoLocusDiffusionJet.mul, MvPolynomial.pderiv_mul, map_add, map_mul,
+      hfirst.value_eq deme state, hsecond.value_eq deme state,
+      hfirst.gradient_eq deme state observed, hsecond.gradient_eq deme state observed]
+    ring
+  drift_eq deme state := by
+    simp only [TwoLocusDiffusionJet.mul, resamplingOperator_mul,
+      twoLocusHaplotypeCovariance_eq_sum, hfirst.value_eq deme state,
+      hsecond.value_eq deme state, hfirst.drift_eq deme state, hsecond.drift_eq deme state,
+      hfirst.gradient_eq deme state, hsecond.gradient_eq deme state]
+    try ring
+
+/-- The left marginal frequency of deme `index` is certified: in its own deme it is the linear
+polynomial `X_AB + X_Ab`, in any other deme a constant. -/
+def leftFrequency {D : ℕ} (index : Fin D) :
+    JetPolynomialCertificate (twoLocusLeftFrequencyJet index) where
+  polynomial deme state := if deme = index then MvPolynomial.X .AB + MvPolynomial.X .Ab
+    else MvPolynomial.C (state index).leftFrequency
+  degree := 1
+  totalDegree_le deme state := by
+    split_ifs
+    · exact (MvPolynomial.totalDegree_add _ _).trans (by simp [MvPolynomial.totalDegree_X])
+    · simp [MvPolynomial.totalDegree_C]
+  massBound := 2
+  mass_le deme state := by
+    split_ifs
+    · refine (coefficientMass_add_le _ _).trans ?_
+      simp [MvPolynomial.X, coefficientMass_monomial]
+      norm_num
+    · rw [MvPolynomial.C_apply, coefficientMass_monomial,
+        abs_of_nonneg (state index).leftFrequency_nonneg]
+      linarith [(state index).leftFrequency_le_one]
+  polynomial_update deme state frequency := by
+    by_cases hdeme : deme = index
+    · simp only [if_pos hdeme]
+    · simp only [if_neg hdeme, Function.update_of_ne (Ne.symm hdeme)]
+  value_eq deme state := by
+    by_cases hdeme : deme = index
+    · subst hdeme
+      simp [twoLocusLeftFrequencyJet, TwoLocusHaplotypeFrequencies.leftFrequency,
+        haplotypeCoordinate]
+    · rw [if_neg hdeme]
+      exact (MvPolynomial.eval_C _).symm
+  gradient_eq deme state observed := by
+    by_cases hdeme : deme = index
+    · subst hdeme
+      cases observed <;>
+        simp [twoLocusLeftFrequencyJet, twoLocusLeftAlleleIndicator, MvPolynomial.pderiv_X,
+          Pi.single_apply]
+    · simp [twoLocusLeftFrequencyJet, hdeme, MvPolynomial.pderiv_C]
+  drift_eq deme state := by
+    by_cases hdeme : deme = index
+    · subst hdeme
+      simp [twoLocusLeftFrequencyJet, resamplingOperator_add, resamplingOperator_X]
+    · simp [twoLocusLeftFrequencyJet, hdeme, resamplingOperator, MvPolynomial.pderiv_C]
+
+/-- The right marginal frequency of deme `index` is certified: in its own deme it is the linear
+polynomial `X_AB + X_aB`, in any other deme a constant. -/
+def rightFrequency {D : ℕ} (index : Fin D) :
+    JetPolynomialCertificate (twoLocusRightFrequencyJet index) where
+  polynomial deme state := if deme = index then MvPolynomial.X .AB + MvPolynomial.X .aB
+    else MvPolynomial.C (state index).rightFrequency
+  degree := 1
+  totalDegree_le deme state := by
+    split_ifs
+    · exact (MvPolynomial.totalDegree_add _ _).trans (by simp [MvPolynomial.totalDegree_X])
+    · simp [MvPolynomial.totalDegree_C]
+  massBound := 2
+  mass_le deme state := by
+    split_ifs
+    · refine (coefficientMass_add_le _ _).trans ?_
+      simp [MvPolynomial.X, coefficientMass_monomial]
+      norm_num
+    · rw [MvPolynomial.C_apply, coefficientMass_monomial,
+        abs_of_nonneg (state index).rightFrequency_nonneg]
+      linarith [(state index).rightFrequency_le_one]
+  polynomial_update deme state frequency := by
+    by_cases hdeme : deme = index
+    · simp only [if_pos hdeme]
+    · simp only [if_neg hdeme, Function.update_of_ne (Ne.symm hdeme)]
+  value_eq deme state := by
+    by_cases hdeme : deme = index
+    · subst hdeme
+      simp [twoLocusRightFrequencyJet, TwoLocusHaplotypeFrequencies.rightFrequency,
+        haplotypeCoordinate]
+    · rw [if_neg hdeme]
+      exact (MvPolynomial.eval_C _).symm
+  gradient_eq deme state observed := by
+    by_cases hdeme : deme = index
+    · subst hdeme
+      cases observed <;>
+        simp [twoLocusRightFrequencyJet, twoLocusRightAlleleIndicator, MvPolynomial.pderiv_X,
+          Pi.single_apply]
+    · simp [twoLocusRightFrequencyJet, hdeme, MvPolynomial.pderiv_C]
+  drift_eq deme state := by
+    by_cases hdeme : deme = index
+    · subst hdeme
+      simp [twoLocusRightFrequencyJet, resamplingOperator_add, resamplingOperator_X]
+    · simp [twoLocusRightFrequencyJet, hdeme, resamplingOperator, MvPolynomial.pderiv_C]
+
+/-- The linkage determinant of deme `index` is certified: in its own deme it is the quadratic
+polynomial `X_AB X_ab - X_Ab X_aB`, whose second-order operator is `-D`, in any other deme a
+constant. -/
+def linkage {D : ℕ} (index : Fin D) : JetPolynomialCertificate (twoLocusLinkageJet index) where
+  polynomial deme state := if deme = index then
+      MvPolynomial.X .AB * MvPolynomial.X .ab
+        + (-1 : ℝ) • (MvPolynomial.X .Ab * MvPolynomial.X .aB)
+    else MvPolynomial.C (state index).linkage
+  degree := 2
+  totalDegree_le deme state := by
+    split_ifs
+    · refine (MvPolynomial.totalDegree_add _ _).trans (max_le ?_ ?_)
+      · exact (MvPolynomial.totalDegree_mul _ _).trans (by simp [MvPolynomial.totalDegree_X])
+      · exact (MvPolynomial.totalDegree_smul_le _ _).trans
+          ((MvPolynomial.totalDegree_mul _ _).trans (by simp [MvPolynomial.totalDegree_X]))
+    · simp [MvPolynomial.totalDegree_C]
+  massBound := 2
+  mass_le deme state := by
+    split_ifs
+    · refine (coefficientMass_add_le _ _).trans ?_
+      have hfirst : coefficientMass (MvPolynomial.X TwoLocusHaplotype.AB
+          * MvPolynomial.X TwoLocusHaplotype.ab : MvPolynomial TwoLocusHaplotype ℝ) ≤ 1 :=
+        (coefficientMass_mul_le _ _).trans (by simp [MvPolynomial.X, coefficientMass_monomial])
+      have hsecond : coefficientMass (MvPolynomial.X TwoLocusHaplotype.Ab
+          * MvPolynomial.X TwoLocusHaplotype.aB : MvPolynomial TwoLocusHaplotype ℝ) ≤ 1 :=
+        (coefficientMass_mul_le _ _).trans (by simp [MvPolynomial.X, coefficientMass_monomial])
+      have habs : |(-1 : ℝ)| = 1 := by norm_num
+      rw [coefficientMass_smul, habs]
+      linarith
+    · rw [MvPolynomial.C_apply, coefficientMass_monomial]
+      linarith [(state index).linkage_abs_le_quarter]
+  polynomial_update deme state frequency := by
+    by_cases hdeme : deme = index
+    · simp only [if_pos hdeme]
+    · simp only [if_neg hdeme, Function.update_of_ne (Ne.symm hdeme)]
+  value_eq deme state := by
+    by_cases hdeme : deme = index
+    · subst hdeme
+      rw [if_pos rfl]
+      simp only [twoLocusLinkageJet, map_add, map_mul, eval_smul, MvPolynomial.eval_X,
+        haplotypeCoordinate, TwoLocusHaplotypeFrequencies.linkage]
+      ring
+    · rw [if_neg hdeme]
+      exact (MvPolynomial.eval_C _).symm
+  gradient_eq deme state observed := by
+    by_cases hdeme : deme = index
+    · subst hdeme
+      rw [if_pos rfl]
+      cases observed <;>
+        simp [twoLocusLinkageJet, twoLocusLinkageGradient, MvPolynomial.pderiv_mul,
+          MvPolynomial.pderiv_X, Pi.single_apply, eval_smul, haplotypeCoordinate]
+    · rw [if_neg hdeme]
+      simp [twoLocusLinkageJet, hdeme, MvPolynomial.pderiv_C]
+  drift_eq deme state := by
+    by_cases hdeme : deme = index
+    · subst hdeme
+      rw [if_pos rfl]
+      simp only [twoLocusLinkageJet, if_pos rfl, twoLocusLinkageDrift_eq_neg_linkage,
+        resamplingOperator_add, resamplingOperator_smul, resamplingOperator_X_mul_X,
+        TwoLocusHaplotypeFrequencies.linkage, haplotypeCoordinate, reduceCtorEq, if_false]
+      ring
+    · rw [if_neg hdeme]
+      simp [twoLocusLinkageJet, hdeme, resamplingOperator, MvPolynomial.pderiv_C]
 
 end JetPolynomialCertificate
 
