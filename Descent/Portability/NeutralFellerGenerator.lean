@@ -244,7 +244,7 @@ theorem hasDerivWithinAt_integral_momentPolynomial (rates : NeutralRates Deme Lo
   rw [hgen]
   refine hderiv.hasDerivWithinAt.congr (fun s hs ↦ ?_) ?_
   · rw [hmoment, Real.coe_toNNReal s hs]
-  · rw [hmoment, Real.coe_toNNReal _ t.2]
+  · rw [hmoment, Real.coe_toNNReal _ (NNReal.coe_nonneg t)]
 
 /-- **NOTE1 §4.2a with the generator identified.** A positive, constant-preserving semigroup
 of linear operators on the polynomial observables whose action on budget-respecting
