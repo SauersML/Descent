@@ -664,6 +664,109 @@ theorem simultaneous_curve_and_loss_fraction (E : ExpFunctional D) (H : ℝ) (q 
     (spikeValue H (spikeParameter E H q eta)) d hH0 (hq0 d) (hqH d)
     (spike_mean H _ hp hp1) (spike_second_moment H _ hp hp1 hH1.le)
 
+/-! ### The four-cell worked example of TQ §8.2 -/
+
+/-- The nonmonotone curve `q = (0.36, 0.16, 0.04, 0.25)` of TQ §8.2, at heritability
+`H = 2/5`. -/
+def workedCurve : Fin 4 → ℝ := ![9 / 25, 4 / 25, 1 / 25, 1 / 4]
+
+/-- The worked curve is nonnegative. -/
+theorem workedCurve_nonneg (d : Fin 4) : 0 ≤ workedCurve d := by
+  fin_cases d
+  · show (0:ℝ) ≤ 9 / 25
+    norm_num
+  · show (0:ℝ) ≤ 4 / 25
+    norm_num
+  · show (0:ℝ) ≤ 1 / 25
+    norm_num
+  · show (0:ℝ) ≤ 1 / 4
+    norm_num
+
+/-- The worked curve stays below the heritability. -/
+theorem workedCurve_le (d : Fin 4) : workedCurve d ≤ 2 / 5 := by
+  fin_cases d
+  · show (9:ℝ) / 25 ≤ 2 / 5
+    norm_num
+  · show (4:ℝ) / 25 ≤ 2 / 5
+    norm_num
+  · show (1:ℝ) / 25 ≤ 2 / 5
+    norm_num
+  · show (1:ℝ) / 4 ≤ 2 / 5
+    norm_num
+
+/-- Mean individual loss in the first cell of the worked example. -/
+theorem lossMean_worked_zero :
+    lossMean (2 / 5) workedCurve 0 = 7 / 5 - 6 / 5 * Real.sqrt (2 / 5) := by
+  have h : Real.sqrt (workedCurve 0) = 3 / 5 := by
+    show Real.sqrt (9 / 25) = 3 / 5
+    rw [show (9:ℝ) / 25 = (3 / 5) ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
+  unfold lossMean
+  rw [h]
+  ring
+
+/-- Mean individual loss in the second cell of the worked example. -/
+theorem lossMean_worked_one :
+    lossMean (2 / 5) workedCurve 1 = 7 / 5 - 4 / 5 * Real.sqrt (2 / 5) := by
+  have h : Real.sqrt (workedCurve 1) = 2 / 5 := by
+    show Real.sqrt (4 / 25) = 2 / 5
+    rw [show (4:ℝ) / 25 = (2 / 5) ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
+  unfold lossMean
+  rw [h]
+  ring
+
+/-- Mean individual loss in the third cell of the worked example. -/
+theorem lossMean_worked_two :
+    lossMean (2 / 5) workedCurve 2 = 7 / 5 - 2 / 5 * Real.sqrt (2 / 5) := by
+  have h : Real.sqrt (workedCurve 2) = 1 / 5 := by
+    show Real.sqrt (1 / 25) = 1 / 5
+    rw [show (1:ℝ) / 25 = (1 / 5) ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
+  unfold lossMean
+  rw [h]
+  ring
+
+/-- Mean individual loss in the fourth cell of the worked example. -/
+theorem lossMean_worked_three :
+    lossMean (2 / 5) workedCurve 3 = 7 / 5 - Real.sqrt (2 / 5) := by
+  have h : Real.sqrt (workedCurve 3) = 1 / 2 := by
+    show Real.sqrt (1 / 4) = 1 / 2
+    rw [show (1:ℝ) / 4 = (1 / 2) ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
+  unfold lossMean
+  rw [h]
+  ring
+
+/-- **The between-cell loss variance of the worked example is exactly `7/200`.**  The
+irrational `√H` cancels: `B = 4H · Var(√q)`. -/
+theorem worked_lossMeanVariance :
+    lossMeanVariance (uniformExp (Fin 4)) (2 / 5) workedCurve = 7 / 200 := by
+  have hr : Real.sqrt (2 / 5) ^ 2 = 2 / 5 := Real.sq_sqrt (by norm_num)
+  unfold lossMeanVariance
+  rw [variance_eq_expect_sq_sub_sq_mean]
+  simp only [uniformExp_apply, Fintype.card_fin, Fin.sum_univ_four]
+  rw [lossMean_worked_zero, lossMean_worked_one, lossMean_worked_two,
+    lossMean_worked_three]
+  linear_combination (35 / 400 : ℝ) * hr
+
+/-- **The hypothesis `B > 0` of TQ Theorem 8.1 is satisfiable**, so the theorem is not
+vacuous: the manuscript's own four-cell example supplies a positive value. -/
+theorem worked_example_positive_variance :
+    0 < lossMeanVariance (uniformExp (Fin 4)) (2 / 5) workedCurve := by
+  rw [worked_lossMeanVariance]
+  norm_num
+
+/-- **TQ §8.2: the sharp interval at the manuscript's own four-cell example**, with the
+between-cell variance evaluated exactly. -/
+theorem worked_example_sharp_interval (eta : ℝ) :
+    (∃ (p : ℝ) (hp : 0 < p) (hp1 : p ≤ 1),
+        lossExplainedFraction (uniformExp (Fin 4)) (spikeLaw p hp hp1) (2 / 5)
+          workedCurve (spikeValue (2 / 5) p) = eta)
+      ↔ 0 < eta ∧ eta ≤ 7 / 200
+          / (7 / 200 + minimalWithinVariance (uniformExp (Fin 4)) (2 / 5) workedCurve) := by
+  have h := sharp_loss_fraction_interval (uniformExp (Fin 4)) (2 / 5) workedCurve eta
+    (by norm_num) (by norm_num) workedCurve_nonneg workedCurve_le
+    worked_example_positive_variance
+  rw [worked_lossMeanVariance] at h
+  exact h
+
 end
 
 end Descent.Portability.SimultaneousRealization

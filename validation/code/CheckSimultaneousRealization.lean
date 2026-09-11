@@ -46,3 +46,12 @@ open Descent.Portability.SimultaneousRealization
 #print axioms spike_realizes_fraction
 #print axioms sharp_loss_fraction_interval
 #print axioms simultaneous_curve_and_loss_fraction
+#print axioms workedCurve_nonneg
+#print axioms workedCurve_le
+#print axioms lossMean_worked_zero
+#print axioms lossMean_worked_one
+#print axioms lossMean_worked_two
+#print axioms lossMean_worked_three
+#print axioms worked_lossMeanVariance
+#print axioms worked_example_positive_variance
+#print axioms worked_example_sharp_interval

@@ -1,6 +1,12 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.AuditCovarianceSpectrum
+import Descent.Portability.ExtraInformationRank
+import Descent.Portability.GramAuditGeometry
+import Descent.Portability.SpectralAuditConfidence
+import Descent.Portability.TurnoverCouplingPolytope
+import Descent.Portability.TurnoverExtremalCouplings
 import Descent.Portability.FiniteNetConfidence
 import Descent.Portability.FiniteSphereNet
 import Descent.Portability.MarginalPathCoupling
