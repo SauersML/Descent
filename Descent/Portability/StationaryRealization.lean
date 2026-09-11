@@ -20,9 +20,9 @@ solution is the recurrent-biallelic one-deme stationary low-order vector, its de
 identity (15), and the identification of the corpus closed form (16) with the solution of
 that system.
 
-`stationaryMatrix c theta rho` is the four-by-four matrix `B` of NOTE1 (14) in the
-coordinate order `(H, DD, Dz, pi2)`, and `stationaryForcing theta` is the vector `b` of the
-same equation. `det_stationaryMatrix` is NOTE1 (15): the determinant is exactly
+`affineMomentMatrix c theta rho` is the four-by-four matrix `B` of NOTE1 (14) in the
+coordinate order `(H, DD, Dz, pi2)`, and `affineMomentForcing theta` is the vector `b` of the
+same equation. `det_affineMomentMatrix` is NOTE1 (15): the determinant is exactly
 `(c + 2 theta)` times the corpus polynomial `oneDemeLDStationaryDenominator`, with no sign
 correction; since that polynomial is strictly positive on the physical rate domain and
 coalescence is strictly positive, the determinant is strictly positive and the system has a
@@ -45,7 +45,7 @@ turns the affine equation into `B (average) + b = (w T - w 0)/T`; the orbit is b
 it stays in a bounded set, so the right side tends to zero and the averages converge to
 `-B⁻¹ b`, which the set contains because it is closed.
 
-`augmentedGenerator_eq_stationaryMatrix` and `augmentedGenerator_none_eq_stationaryForcing`
+`augmentedGenerator_eq_affineMomentMatrix` and `augmentedGenerator_none_eq_affineMomentForcing`
 identify (14) with the corpus generator itself: the homogeneous block of
 `Coalescent.augmentedLowOrderLDGenerator` at one deme, read in the order `(H, DD, Dz, pi2)`,
 is `B`, and its affine column is `b`. So (14) is not a separate model of the one-deme system
@@ -57,11 +57,15 @@ corpus stationary state. In the intended application that set is the one-deme re
 body intersected with the coordinates of (14), and the orbit is supplied by NOTE1 Theorem 1
 from a microscopic approximation of the augmented one-deme generator.
 
-What is NOT proved in this module: that such an orbit exists for the corpus generator. That
-needs a microscopic approximation for the augmented one-deme generator, the closedness and
-boundedness of the one-deme realization body, and the derivative of the matrix-exponential
-orbit; none of those is available here. The hypothesis is therefore stated explicitly rather
-than discharged, and the theorem is exactly as strong as the orbit it is given.
+The matrix, the forcing and the minor are named for the affine moment system they describe,
+not for its rest point: the only stationary object here is `oneDemeStationaryVector`, the
+corpus closed form, and `oneDemeStationaryVector_solves` is the statement that it is the rest
+point of the flow `w' = B w + b`.
+
+The orbit is not constructed in this module, so the theorem above takes it as a hypothesis.
+`StationaryHaplotypeRealization` constructs it from the exact one-deme semigroup, with the
+closed enlarged body of `EnlargedBodyClosedness` and the microscopic approximation of
+`TwoLocusMicroscopicApproximation`, and proves NOTE1 Theorem 3 with no hypotheses.
 
 ## Empirical status
 
@@ -82,7 +86,7 @@ noncomputable section
 /-- The matrix `B` of NOTE1 (14), in the coordinate order `(H, DD, Dz, pi2)`: the
 homogeneous part of the one-deme recurrent-biallelic low-order system at coalescence rate
 `c`, scaled mutation `theta` and recombination `rho`. -/
-def stationaryMatrix (c theta rho : ℝ) : Matrix (Fin 4) (Fin 4) ℝ :=
+def affineMomentMatrix (c theta rho : ℝ) : Matrix (Fin 4) (Fin 4) ℝ :=
   !![-(c + 2 * theta), 0, 0, 0;
      0, -(3 * c + rho + 4 * theta), c, c;
      0, 4 * c, -(5 * c + rho / 2 + 4 * theta), 0;
@@ -90,65 +94,65 @@ def stationaryMatrix (c theta rho : ℝ) : Matrix (Fin 4) (Fin 4) ℝ :=
 
 /-- The affine forcing vector `b` of NOTE1 (14): mutation influx into the heterozygosity
 coordinate and nothing else. -/
-def stationaryForcing (theta : ℝ) : Fin 4 → ℝ := ![theta, 0, 0, 0]
+def affineMomentForcing (theta : ℝ) : Fin 4 → ℝ := ![theta, 0, 0, 0]
 
 /-- The matrix of NOTE1 (14) at the rates of a one-deme rate law. -/
-def oneDemeStationaryMatrix (rates : ManyDemeLDRates 1) : Matrix (Fin 4) (Fin 4) ℝ :=
-  stationaryMatrix (rates.coalescence 0) (rates.mutation 0) (rates.recombination 0)
+def oneDemeAffineMomentMatrix (rates : ManyDemeLDRates 1) : Matrix (Fin 4) (Fin 4) ℝ :=
+  affineMomentMatrix (rates.coalescence 0) (rates.mutation 0) (rates.recombination 0)
 
 /-- The three-by-three minor of NOTE1 (14) left after deleting the heterozygosity row and
 column. The heterozygosity row of `B` has a single nonzero entry, so the whole determinant
 is carried by this minor. -/
-def stationaryMinor (c theta rho : ℝ) : Matrix (Fin 3) (Fin 3) ℝ :=
+def affineMomentMinor (c theta rho : ℝ) : Matrix (Fin 3) (Fin 3) ℝ :=
   !![-(3 * c + rho + 4 * theta), c, c;
      4 * c, -(5 * c + rho / 2 + 4 * theta), 0;
      0, c, -(2 * c + 4 * theta)]
 
 /-- Deleting the heterozygosity row and column of NOTE1 (14) leaves the stated minor. -/
-theorem submatrix_stationaryMatrix (c theta rho : ℝ) :
-    (stationaryMatrix c theta rho).submatrix Fin.succ (Fin.succAbove 0)
-      = stationaryMinor c theta rho := by
+theorem submatrix_affineMomentMatrix (c theta rho : ℝ) :
+    (affineMomentMatrix c theta rho).submatrix Fin.succ (Fin.succAbove 0)
+      = affineMomentMinor c theta rho := by
   funext i j
   fin_cases i <;> fin_cases j <;> rfl
 
 /-- Cofactor expansion of NOTE1 (14) along the heterozygosity row: only one term survives. -/
-theorem det_stationaryMatrix_eq_minor (c theta rho : ℝ) :
-    (stationaryMatrix c theta rho).det
-      = -(c + 2 * theta) * (stationaryMinor c theta rho).det := by
-  rw [Matrix.det_succ_row_zero, Fin.sum_univ_four, submatrix_stationaryMatrix]
-  simp [stationaryMatrix]
+theorem det_affineMomentMatrix_eq_minor (c theta rho : ℝ) :
+    (affineMomentMatrix c theta rho).det
+      = -(c + 2 * theta) * (affineMomentMinor c theta rho).det := by
+  rw [Matrix.det_succ_row_zero, Fin.sum_univ_four, submatrix_affineMomentMatrix]
+  simp [affineMomentMatrix]
 
 /-- The minor of NOTE1 (14) has determinant exactly minus the corpus stationary
 denominator. -/
-theorem det_stationaryMinor (rates : ManyDemeLDRates 1) :
-    (stationaryMinor (rates.coalescence 0) (rates.mutation 0)
+theorem det_affineMomentMinor (rates : ManyDemeLDRates 1) :
+    (affineMomentMinor (rates.coalescence 0) (rates.mutation 0)
         (rates.recombination 0)).det
       = -oneDemeLDStationaryDenominator rates := by
-  simp [stationaryMinor, Matrix.det_fin_three, oneDemeLDStationaryDenominator]
+  simp [affineMomentMinor, Matrix.det_fin_three, oneDemeLDStationaryDenominator]
   ring
 
 /-- **NOTE1 (15).** The determinant of the one-deme system matrix is exactly
 `(c + 2 theta)` times the corpus stationary denominator, with no sign correction. -/
-theorem det_stationaryMatrix (rates : ManyDemeLDRates 1) :
-    (oneDemeStationaryMatrix rates).det
+theorem det_affineMomentMatrix (rates : ManyDemeLDRates 1) :
+    (oneDemeAffineMomentMatrix rates).det
       = (rates.coalescence 0 + 2 * rates.mutation 0)
         * oneDemeLDStationaryDenominator rates := by
-  rw [oneDemeStationaryMatrix, det_stationaryMatrix_eq_minor, det_stationaryMinor]
+  rw [oneDemeAffineMomentMatrix, det_affineMomentMatrix_eq_minor, det_affineMomentMinor]
   ring
 
 /-- The determinant of NOTE1 (14) is strictly positive on the physical rate domain, so the
 stationary system has exactly one solution. -/
-theorem det_stationaryMatrix_pos (rates : ManyDemeLDRates 1) :
-    0 < (oneDemeStationaryMatrix rates).det := by
-  rw [det_stationaryMatrix]
+theorem det_affineMomentMatrix_pos (rates : ManyDemeLDRates 1) :
+    0 < (oneDemeAffineMomentMatrix rates).det := by
+  rw [det_affineMomentMatrix]
   have hc := rates.coalescence_pos 0
   have ht := rates.mutation_nonneg 0
   exact mul_pos (by linarith) (oneDemeLDStationaryDenominator_pos rates)
 
 /-- The one-deme system matrix is invertible on the physical rate domain. -/
-theorem isUnit_det_stationaryMatrix (rates : ManyDemeLDRates 1) :
-    IsUnit (oneDemeStationaryMatrix rates).det :=
-  (det_stationaryMatrix_pos rates).ne'.isUnit
+theorem isUnit_det_affineMomentMatrix (rates : ManyDemeLDRates 1) :
+    IsUnit (oneDemeAffineMomentMatrix rates).det :=
+  (det_affineMomentMatrix_pos rates).ne'.isUnit
 
 /-- The corpus closed-form stationary state of NOTE1 (16), read in the coordinate order
 `(H, DD, Dz, pi2)` of NOTE1 (14). -/
@@ -162,13 +166,13 @@ def oneDemeStationaryVector (rates : ManyDemeLDRates 1) : Fin 4 → ℝ :=
 corpus theorem `oneDemeStationaryLowOrderLDState_equations` in matrix form, not a second
 verification of the closed form. -/
 theorem oneDemeStationaryVector_solves (rates : ManyDemeLDRates 1) :
-    (oneDemeStationaryMatrix rates).mulVec (oneDemeStationaryVector rates)
-      + stationaryForcing (rates.mutation 0) = 0 := by
+    (oneDemeAffineMomentMatrix rates).mulVec (oneDemeStationaryVector rates)
+      + affineMomentForcing (rates.mutation 0) = 0 := by
   obtain ⟨heterozygosity, linkage, cross, joint⟩ :=
     oneDemeStationaryLowOrderLDState_equations rates
   funext i
   fin_cases i <;>
-    simp [oneDemeStationaryMatrix, stationaryMatrix, stationaryForcing,
+    simp [oneDemeAffineMomentMatrix, affineMomentMatrix, affineMomentForcing,
       oneDemeStationaryVector] <;>
     linarith
 
@@ -176,22 +180,22 @@ theorem oneDemeStationaryVector_solves (rates : ManyDemeLDRates 1) :
 affine system (14): the closed form is an inversion, not a fit. -/
 theorem oneDemeStationaryVector_eq_neg_inv_mulVec (rates : ManyDemeLDRates 1) :
     oneDemeStationaryVector rates
-      = -((oneDemeStationaryMatrix rates)⁻¹.mulVec
-          (stationaryForcing (rates.mutation 0))) := by
-  have hinv : (oneDemeStationaryMatrix rates)⁻¹ * oneDemeStationaryMatrix rates = 1 :=
-    Matrix.nonsing_inv_mul _ (isUnit_det_stationaryMatrix rates)
-  have hsolve : (oneDemeStationaryMatrix rates).mulVec (oneDemeStationaryVector rates)
-      = -stationaryForcing (rates.mutation 0) :=
+      = -((oneDemeAffineMomentMatrix rates)⁻¹.mulVec
+          (affineMomentForcing (rates.mutation 0))) := by
+  have hinv : (oneDemeAffineMomentMatrix rates)⁻¹ * oneDemeAffineMomentMatrix rates = 1 :=
+    Matrix.nonsing_inv_mul _ (isUnit_det_affineMomentMatrix rates)
+  have hsolve : (oneDemeAffineMomentMatrix rates).mulVec (oneDemeStationaryVector rates)
+      = -affineMomentForcing (rates.mutation 0) :=
     eq_neg_of_add_eq_zero_left (oneDemeStationaryVector_solves rates)
   calc oneDemeStationaryVector rates
-      = ((oneDemeStationaryMatrix rates)⁻¹ * oneDemeStationaryMatrix rates).mulVec
+      = ((oneDemeAffineMomentMatrix rates)⁻¹ * oneDemeAffineMomentMatrix rates).mulVec
           (oneDemeStationaryVector rates) := by
         rw [hinv, Matrix.one_mulVec]
-    _ = (oneDemeStationaryMatrix rates)⁻¹.mulVec
-          ((oneDemeStationaryMatrix rates).mulVec (oneDemeStationaryVector rates)) :=
+    _ = (oneDemeAffineMomentMatrix rates)⁻¹.mulVec
+          ((oneDemeAffineMomentMatrix rates).mulVec (oneDemeStationaryVector rates)) :=
         (Matrix.mulVec_mulVec _ _ _).symm
-    _ = -((oneDemeStationaryMatrix rates)⁻¹.mulVec
-          (stationaryForcing (rates.mutation 0))) := by
+    _ = -((oneDemeAffineMomentMatrix rates)⁻¹.mulVec
+          (affineMomentForcing (rates.mutation 0))) := by
         rw [hsolve, Matrix.mulVec_neg]
 
 /-- The four non-constant coordinates of the one-deme low-order family, in the order
@@ -207,11 +211,11 @@ one-deme generator, read in the coordinate order `(H, DD, Dz, pi2)`, is exactly 
 `B` of NOTE1 (14). Nothing is postulated: the corpus drift, migration, recombination,
 mutation-coupling and recurrent-damping rows are evaluated on the coordinate basis and the
 entries agree. -/
-theorem augmentedGenerator_eq_stationaryMatrix (rates : ManyDemeLDRates 1)
+theorem augmentedGenerator_eq_affineMomentMatrix (rates : ManyDemeLDRates 1)
     (row col : Fin 4) :
     augmentedLowOrderLDGenerator rates (some (oneDemeCoordinate row))
         (some (oneDemeCoordinate col))
-      = oneDemeStationaryMatrix rates row col := by
+      = oneDemeAffineMomentMatrix rates row col := by
   have hmig : ∀ i j : Fin 1, rates.migration i j = 0 := by
     intro i j
     have hij : i = j := Subsingleton.elim i j
@@ -221,18 +225,18 @@ theorem augmentedGenerator_eq_stationaryMatrix (rates : ManyDemeLDRates 1)
     simp [augmentedLowOrderLDGenerator, lowOrderLDHomogeneousGenerator, lowOrderLDDrift,
       lowOrderLDMigration, lowOrderLDRecombination, lowOrderLDMutationCoupling,
       lowOrderLDRecurrentMutationDamping, lowOrderLDBasis, oneDemeCoordinate,
-      oneDemeStationaryMatrix, stationaryMatrix, hmig] <;>
+      oneDemeAffineMomentMatrix, affineMomentMatrix, hmig] <;>
     ring
 
 /-- The affine column of the corpus augmented one-deme generator is exactly the forcing
 vector `b` of NOTE1 (14): mutation influx into the heterozygosity coordinate only. -/
-theorem augmentedGenerator_none_eq_stationaryForcing (rates : ManyDemeLDRates 1)
+theorem augmentedGenerator_none_eq_affineMomentForcing (rates : ManyDemeLDRates 1)
     (row : Fin 4) :
     augmentedLowOrderLDGenerator rates (some (oneDemeCoordinate row)) none
-      = stationaryForcing (rates.mutation 0) row := by
+      = affineMomentForcing (rates.mutation 0) row := by
   fin_cases row <;>
     simp [augmentedLowOrderLDGenerator, lowOrderLDMutationForcing, oneDemeCoordinate,
-      stationaryForcing] <;>
+      affineMomentForcing] <;>
     ring
 
 section CesaroLimit
@@ -354,13 +358,13 @@ has a common haplotype realization. Assumes: the orbit is given. -/
 theorem oneDemeStationaryVector_mem_of_orbit_mem (rates : ManyDemeLDRates 1)
     (K : Set (Fin 4 → ℝ)) (hKconv : Convex ℝ K) (hKclosed : IsClosed K)
     (hKbdd : Bornology.IsBounded K) (w : ℝ → Fin 4 → ℝ)
-    (hw : ∀ t, HasDerivAt w ((oneDemeStationaryMatrix rates).mulVec (w t)
-      + stationaryForcing (rates.mutation 0)) t)
+    (hw : ∀ t, HasDerivAt w ((oneDemeAffineMomentMatrix rates).mulVec (w t)
+      + affineMomentForcing (rates.mutation 0)) t)
     (hmem : ∀ t, 0 ≤ t → w t ∈ K) :
     oneDemeStationaryVector rates ∈ K := by
   rw [oneDemeStationaryVector_eq_neg_inv_mulVec]
-  exact stationary_mem_of_orbit_mem K hKconv hKclosed hKbdd (oneDemeStationaryMatrix rates)
-    (isUnit_det_stationaryMatrix rates) (stationaryForcing (rates.mutation 0)) w hw hmem
+  exact stationary_mem_of_orbit_mem K hKconv hKclosed hKbdd (oneDemeAffineMomentMatrix rates)
+    (isUnit_det_affineMomentMatrix rates) (affineMomentForcing (rates.mutation 0)) w hw hmem
 
 end CesaroLimit
 

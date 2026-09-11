@@ -34,3 +34,4 @@ open Descent.Portability.ChronologyReportLaw
 #print axioms Descent.Portability.ChronologyReportLaw.expectedLogLoss_chronologyLaw_eq_top
 #print axioms Descent.Portability.ChronologyReportLaw.metric_values_halvedCoupling
 #print axioms Descent.Portability.ChronologyReportLaw.metric_values_coupled
+#print axioms Descent.Portability.ChronologyReportLaw.metric_values_chronologyLaw

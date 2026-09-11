@@ -484,6 +484,32 @@ recombination happens, so the two loci arrive fully coupled. -/
 def coupledLaw : FiniteReportLaw (Bool × Bool) :=
   chronologyLaw (1 / 2) 1 (by norm_num) (by norm_num) (by norm_num) (by norm_num)
 
+/-- NOTE1 section 6.2, the report table of the chronology law at an interior donor fraction:
+squared correlation `C²`, AUC `(1 + C) / 2`, slope `C`, intercept `p (1 - C)`, Brier
+`2h(1 - C)`, repaired Brier `h (1 - C²)`, accuracy `1 - 2h(1 - C)` at threshold one half, and
+calibration error `2h(1 - C)`, where `h = p (1 - p)`. -/
+theorem metric_values_chronologyLaw (p C : ℝ) (hp0 : 0 ≤ p) (hp1 : p ≤ 1) (hC0 : 0 ≤ C)
+    (hC1 : C ≤ 1) (hlow : 0 < p) (hhigh : p < 1) :
+    (chronologyLaw p C hp0 hp1 hC0 hC1).squaredCorrelation scoreOf outcomeOf = some (C ^ 2) ∧
+      populationAUC (chronologyLaw p C hp0 hp1 hC0 hC1) = (1 + C) / 2 ∧
+        linearSlope (chronologyLaw p C hp0 hp1 hC0 hC1) = C ∧
+          linearIntercept (chronologyLaw p C hp0 hp1 hC0 hC1) = p * (1 - C) ∧
+            (chronologyLaw p C hp0 hp1 hC0 hC1).meanSquaredError scoreOf outcomeOf =
+                2 * (p * (1 - p)) * (1 - C) ∧
+              repairedBrier (chronologyLaw p C hp0 hp1 hC0 hC1) = p * (1 - p) * (1 - C ^ 2) ∧
+                thresholdAccuracy (chronologyLaw p C hp0 hp1 hC0 hC1) (1 / 2) =
+                    1 - 2 * (p * (1 - p)) * (1 - C) ∧
+                  discreteECE (chronologyLaw p C hp0 hp1 hC0 hC1) =
+                    2 * (p * (1 - p)) * (1 - C) :=
+  ⟨squaredCorrelation_chronologyLaw p C hp0 hp1 hC0 hC1 hlow hhigh,
+    populationAUC_chronologyLaw p C hp0 hp1 hC0 hC1 hlow hhigh,
+    linearSlope_chronologyLaw p C hp0 hp1 hC0 hC1 hlow hhigh,
+    linearIntercept_chronologyLaw p C hp0 hp1 hC0 hC1 hlow hhigh,
+    meanSquaredError_chronologyLaw p C hp0 hp1 hC0 hC1,
+    repairedBrier_chronologyLaw p C hp0 hp1 hC0 hC1 hlow hhigh,
+    thresholdAccuracy_chronologyLaw p C (1 / 2) hp0 hp1 hC0 hC1 (by norm_num) (by norm_num),
+    discreteECE_chronologyLaw p C hp0 hp1 hC0 hC1 hlow hhigh⟩
+
 /-- The first column of the NOTE1 section 6.2 table: squared correlation one quarter, AUC
 three quarters, slope one half, intercept one quarter, Brier one quarter, repaired Brier three
 sixteenths, accuracy three quarters, calibration error one quarter. -/
@@ -496,17 +522,13 @@ theorem metric_values_halvedCoupling :
               repairedBrier halvedCouplingLaw = 3 / 16 ∧
                 thresholdAccuracy halvedCouplingLaw (1 / 2) = 3 / 4 ∧
                   discreteECE halvedCouplingLaw = 1 / 4 := by
-  unfold halvedCouplingLaw
-  refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
-  · rw [squaredCorrelation_chronologyLaw] <;> norm_num
-  · rw [populationAUC_chronologyLaw] <;> norm_num
-  · rw [linearSlope_chronologyLaw] <;> norm_num
-  · rw [linearIntercept_chronologyLaw] <;> norm_num
-  · rw [meanSquaredError_chronologyLaw]
-    norm_num
-  · rw [repairedBrier_chronologyLaw] <;> norm_num
-  · rw [thresholdAccuracy_chronologyLaw] <;> norm_num
-  · rw [discreteECE_chronologyLaw] <;> norm_num
+  obtain ⟨hcorrelation, hauc, hslope, hoffset, hbrier, hrepaired, haccuracy,
+    hcalibration⟩ := metric_values_chronologyLaw (1 / 2) (1 / 2) (by norm_num) (by norm_num)
+      (by norm_num) (by norm_num) (by norm_num) (by norm_num)
+  exact ⟨hcorrelation.trans (by norm_num), hauc.trans (by norm_num),
+    hslope.trans (by norm_num), hoffset.trans (by norm_num), hbrier.trans (by norm_num),
+    hrepaired.trans (by norm_num), haccuracy.trans (by norm_num),
+    hcalibration.trans (by norm_num)⟩
 
 /-- The second column of the NOTE1 section 6.2 table: a perfectly coupled pair of loci gives
 squared correlation one, AUC one, slope one, intercept zero, and vanishing Brier, repaired
@@ -519,17 +541,13 @@ theorem metric_values_coupled :
             coupledLaw.meanSquaredError scoreOf outcomeOf = 0 ∧
               repairedBrier coupledLaw = 0 ∧
                 thresholdAccuracy coupledLaw (1 / 2) = 1 ∧ discreteECE coupledLaw = 0 := by
-  unfold coupledLaw
-  refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
-  · rw [squaredCorrelation_chronologyLaw] <;> norm_num
-  · rw [populationAUC_chronologyLaw] <;> norm_num
-  · rw [linearSlope_chronologyLaw] <;> norm_num
-  · rw [linearIntercept_chronologyLaw] <;> norm_num
-  · rw [meanSquaredError_chronologyLaw]
-    norm_num
-  · rw [repairedBrier_chronologyLaw] <;> norm_num
-  · rw [thresholdAccuracy_chronologyLaw] <;> norm_num
-  · rw [discreteECE_chronologyLaw] <;> norm_num
+  obtain ⟨hcorrelation, hauc, hslope, hoffset, hbrier, hrepaired, haccuracy,
+    hcalibration⟩ := metric_values_chronologyLaw (1 / 2) 1 (by norm_num) (by norm_num)
+      (by norm_num) (by norm_num) (by norm_num) (by norm_num)
+  exact ⟨hcorrelation.trans (by norm_num), hauc.trans (by norm_num),
+    hslope.trans (by norm_num), hoffset.trans (by norm_num), hbrier.trans (by norm_num),
+    hrepaired.trans (by norm_num), haccuracy.trans (by norm_num),
+    hcalibration.trans (by norm_num)⟩
 
 end
 

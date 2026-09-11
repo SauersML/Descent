@@ -35,9 +35,11 @@ zero with the exposure law.
 Identifiability, the last claim of NOTE1 section 6.3, is proved for finite laws. At an integer
 scale `k` the transform is `∑_b ν{b} (e^{-b})^k`, where `exposureMass` is the mass the law places
 at the level `b`. The characters `k ↦ (e^{-b})^k` of the additive monoid of natural numbers are
-distinct for distinct `b`, hence linearly independent (Dedekind). So two finite laws whose
-transforms agree at every integer scale, or at every scale `λ ≥ 0`, place the same mass at
-every exposure level.
+distinct for distinct `b`, hence linearly independent (Dedekind). Two forms are proved: two
+finite laws whose transforms agree at every integer scale `λ = 0, 1, 2, …`
+(`exposureMass_eq_of_exposureLaplace_natCast_eq`), or at every scale `λ ≥ 0`
+(`exposureMass_eq_of_exposureLaplace_eq`), place the same mass at every exposure level. No
+support bound is used, so this covers every finitely supported law on `[0, R]` as in the note.
 
 Not formalised: the general-measure versions. NOTE1 (35) and (36) are stated there for an
 arbitrary probability measure on `[0, R]`, with differentiation under the integral sign and

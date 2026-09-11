@@ -26,7 +26,7 @@ family of NOTE1 (6) exactly because both loci are monomorphic
 `hasDerivAt_matrixExponential_mulVec` differentiates the orbit through Mathlib's
 `hasDerivAt_exp_smul_const'`, and `augmentedGenerator_mulVec_oneDeme` reads the corpus
 generator applied to a vector as `B w + b` of NOTE1 (14), using the corpus row identifications
-`augmentedGenerator_eq_stationaryMatrix` and `augmentedGenerator_none_eq_stationaryForcing`
+`augmentedGenerator_eq_affineMomentMatrix` and `augmentedGenerator_none_eq_affineMomentForcing`
 together with the bijection `oneDemeCoordinateEquiv` between the coordinate list of (14) and
 the corpus coordinate type at one deme. So `hasDerivAt_oneDemeOrbit`: the four coordinates of
 the orbit solve (14) at every time.
@@ -151,16 +151,16 @@ coordinate. -/
 theorem augmentedGenerator_mulVec_oneDeme (rates : ManyDemeLDRates 1)
     (state : AffineLowOrderLDCoordinate 1 → ℝ) (row : Fin 4) :
     (augmentedLowOrderLDGenerator rates).mulVec state (some (oneDemeCoordinate row))
-      = (oneDemeStationaryMatrix rates).mulVec (oneDemeProjection state) row
-        + stationaryForcing (rates.mutation 0) row * state none := by
+      = (oneDemeAffineMomentMatrix rates).mulVec (oneDemeProjection state) row
+        + affineMomentForcing (rates.mutation 0) row * state none := by
   have hexpand :
       (augmentedLowOrderLDGenerator rates).mulVec state (some (oneDemeCoordinate row))
         = ∑ column : AffineLowOrderLDCoordinate 1,
             augmentedLowOrderLDGenerator rates (some (oneDemeCoordinate row)) column
               * state column := rfl
   rw [hexpand, Fintype.sum_option, ← oneDemeCoordinateEquiv.sum_comp,
-    augmentedGenerator_none_eq_stationaryForcing]
-  simp only [oneDemeCoordinateEquiv_apply, augmentedGenerator_eq_stationaryMatrix]
+    augmentedGenerator_none_eq_affineMomentForcing]
+  simp only [oneDemeCoordinateEquiv_apply, augmentedGenerator_eq_affineMomentMatrix]
   exact add_comm _ _
 
 /-! ## The orbit solves the affine system -/
@@ -199,9 +199,9 @@ theorem hasDerivAt_oneDemeOrbit (rates : ManyDemeLDRates 1)
     (initial : AffineLowOrderLDCoordinate 1 → ℝ) (hinitial : initial none = 1) (t : ℝ) :
     HasDerivAt (fun time ↦ oneDemeProjection
         ((matrixExponential (augmentedLowOrderLDGenerator rates) time).mulVec initial))
-      ((oneDemeStationaryMatrix rates).mulVec (oneDemeProjection
+      ((oneDemeAffineMomentMatrix rates).mulVec (oneDemeProjection
           ((matrixExponential (augmentedLowOrderLDGenerator rates) t).mulVec initial))
-        + stationaryForcing (rates.mutation 0)) t := by
+        + affineMomentForcing (rates.mutation 0)) t := by
   have horbit :=
     hasDerivAt_matrixExponential_mulVec (augmentedLowOrderLDGenerator rates) initial t
   have hnone :

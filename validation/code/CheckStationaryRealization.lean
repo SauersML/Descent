@@ -7,22 +7,22 @@ import Descent.Portability.StationaryRealization
 
 namespace Descent.Portability.StationaryRealization
 
-#print axioms stationaryMatrix
-#print axioms stationaryForcing
-#print axioms oneDemeStationaryMatrix
-#print axioms stationaryMinor
-#print axioms submatrix_stationaryMatrix
-#print axioms det_stationaryMatrix_eq_minor
-#print axioms det_stationaryMinor
-#print axioms det_stationaryMatrix
-#print axioms det_stationaryMatrix_pos
-#print axioms isUnit_det_stationaryMatrix
+#print axioms affineMomentMatrix
+#print axioms affineMomentForcing
+#print axioms oneDemeAffineMomentMatrix
+#print axioms affineMomentMinor
+#print axioms submatrix_affineMomentMatrix
+#print axioms det_affineMomentMatrix_eq_minor
+#print axioms det_affineMomentMinor
+#print axioms det_affineMomentMatrix
+#print axioms det_affineMomentMatrix_pos
+#print axioms isUnit_det_affineMomentMatrix
 #print axioms oneDemeStationaryVector
 #print axioms oneDemeStationaryVector_solves
 #print axioms oneDemeStationaryVector_eq_neg_inv_mulVec
 #print axioms oneDemeCoordinate
-#print axioms augmentedGenerator_eq_stationaryMatrix
-#print axioms augmentedGenerator_none_eq_stationaryForcing
+#print axioms augmentedGenerator_eq_affineMomentMatrix
+#print axioms augmentedGenerator_none_eq_affineMomentForcing
 #print axioms stationary_mem_of_orbit_mem
 #print axioms oneDemeStationaryVector_mem_of_orbit_mem
 
