@@ -18,4 +18,5 @@ open Descent.Portability.NeutralMomentSemigroup
 #print axioms Descent.Portability.NeutralMomentSemigroup.budgetInclusion_mul_dualGenerator
 #print axioms Descent.Portability.NeutralMomentSemigroup.budgetInclusion_mul_matrixExponential
 #print axioms Descent.Portability.NeutralMomentSemigroup.matrixExponential_mulVec_budget
+#print axioms Descent.Portability.NeutralMomentSemigroup.configurationMoment_nonneg
 #print axioms Descent.Portability.NeutralMomentSemigroup.momentVector_nonneg

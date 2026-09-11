@@ -51,6 +51,7 @@ namespace Descent.Portability.NeutralMomentSemigroup
 open MvPolynomial Filter Topology Descent.Coalescent PartialHaplotypeCarrier
   PartialHaplotypeDualGenerator PartialHaplotypeDualSemigroup SubstochasticGeneratorSemigroup
   NeutralFellerGenerator NeutralStateTangency
+open scoped Matrix
 
 noncomputable section
 
@@ -85,11 +86,11 @@ theorem eval_neutralGenerator_combination (rates : NeutralRates Deme Locus Allel
       neutralGenerator rates (C r * p) = C r * neutralGenerator rates p := by
     intro r p
     have hL : neutralGenerator rates (C r) = 0 := by
-      simp [neutralGenerator, demeSecondOrder, pderiv_C]
+      simp [neutralGenerator, demeSecondOrder]
     have hl : halfCovariance rates (C r) p = 0 := by
-      simp [halfCovariance, demeCovarianceForm, pderiv_C]
+      simp [halfCovariance, demeCovarianceForm]
     have hr : halfCovariance rates p (C r) = 0 := by
-      simp [halfCovariance, demeCovarianceForm, pderiv_C]
+      simp [halfCovariance, demeCovarianceForm]
     rw [neutralGenerator_mul, hL, hl, hr]
     ring
   rw [← Matrix.dotProduct_mulVec, ← neutralGeneratorAddHom_apply, map_sum, map_sum, dotProduct]
@@ -191,9 +192,11 @@ theorem budgetInclusion_mul_dualGenerator (rates : NeutralRates Deme Locus Allel
     budgetInclusion capacity capacity' * dualGenerator rates capacity'
       = dualGenerator rates capacity * budgetInclusion capacity capacity' := by
   ext ξ η
-  have hleft : (budgetInclusion capacity capacity' * dualGenerator rates capacity') ξ η
-      = dualGenerator rates capacity' ⟨ξ.1, withinBudget_of_capacity_le hle ξ.2⟩ η := by
-    simp only [Matrix.mul_apply, budgetInclusion, ite_mul, one_mul, zero_mul]
+  rw [Matrix.mul_apply, Matrix.mul_apply]
+  have hleft : ∑ ζ : BudgetConfiguration Deme Locus Allele capacity',
+      budgetInclusion capacity capacity' ξ ζ * dualGenerator rates capacity' ζ η
+        = dualGenerator rates capacity' ⟨ξ.1, withinBudget_of_capacity_le hle ξ.2⟩ η := by
+    simp only [budgetInclusion, ite_mul, one_mul, zero_mul]
     rw [Finset.sum_eq_single ⟨ξ.1, withinBudget_of_capacity_le hle ξ.2⟩]
     · simp
     · intro ζ _ hne
@@ -201,7 +204,7 @@ theorem budgetInclusion_mul_dualGenerator (rates : NeutralRates Deme Locus Allel
     · intro hnot
       exact absurd (Finset.mem_univ _) hnot
   rw [hleft]
-  simp only [Matrix.mul_apply, budgetInclusion, mul_ite, mul_one, mul_zero]
+  simp only [budgetInclusion, mul_ite, mul_one, mul_zero]
   by_cases hη : WithinBudget capacity η.1
   · rw [Finset.sum_eq_single ⟨η.1, hη⟩]
     · rw [if_pos rfl]
@@ -249,15 +252,21 @@ theorem matrixExponential_mulVec_budget (rates : NeutralRates Deme Locus Allele)
   rw [hmoment] at h
   exact h
 
+/-- Configuration moments of per-deme haplotype laws are nonnegative. -/
+theorem configurationMoment_nonneg (law : Deme → FiniteReportLaw (FullHaplotype Locus Allele))
+    (ξ : Multiset (PartialType Deme Locus Allele)) : 0 ≤ configurationMoment law ξ := by
+  induction ξ using Multiset.induction_on with
+  | empty => simp [configurationMoment]
+  | cons τ ξ ih =>
+    rw [configurationMoment, Multiset.map_cons, Multiset.prod_cons]
+    exact mul_nonneg (Finset.sum_nonneg fun hap _ ↦ (law τ.deme).mass_nonneg hap) ih
+
 /-- Configuration moments are nonnegative on the frequency states. -/
 theorem momentVector_nonneg (capacity : Locus → ℕ) (x : FrequencyState Deme Locus Allele)
     (η : BudgetConfiguration Deme Locus Allele capacity) : 0 ≤ momentVector capacity x η := by
   simp only [momentVector]
-  rw [← lawPoint_stateLaw x, eval_momentPolynomial, configurationMoment]
-  refine Multiset.prod_nonneg fun r hr ↦ ?_
-  obtain ⟨τ, _, rfl⟩ := Multiset.mem_map.mp hr
-  rw [marginalFrequency]
-  exact Finset.sum_nonneg fun hap _ ↦ (stateLaw x τ.deme).mass_nonneg hap
+  rw [← lawPoint_stateLaw x, eval_momentPolynomial]
+  exact configurationMoment_nonneg _ _
 
 end
 
