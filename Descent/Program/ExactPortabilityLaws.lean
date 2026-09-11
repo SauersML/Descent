@@ -55,6 +55,12 @@ import Descent.Portability.IntervalEvaluatorCertificate
 import Descent.Portability.FrontierCompletionRegion
 import Descent.Portability.UniformPenetranceArchitecture
 import Descent.Portability.HaltingExpectationBoundary
+import Descent.Portability.LowOrderLDWitnesses
+import Descent.Portability.EnlargedGeneratorBridges
+import Descent.Portability.MultinomialMomentExpansion
+import Descent.Portability.LinearFundamentalMatrix
+import Descent.Portability.IntegrableRateHistoryRealization
+import Descent.Portability.PolynomialFellerExtension
 
 namespace Descent.Program
 
@@ -88,17 +94,22 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
   and the embedding intertwining: `EnlargedLowOrderLDGenerator`, `EnlargedBodyClosedness`.
 * §2.3, equations (10)-(11), the physical kernels: `SimplexResamplingKernel`,
   `ResamplingJetExpansion`, `RandomStageKernel`, `PulseJetExpansion`, `PulseStageKernel`,
-  `TwoLocusMicroscopicKernel`, `Pi2GeneratorBridges`.
+  `TwoLocusMicroscopicKernel`, `Pi2GeneratorBridges`, `EnlargedGeneratorBridges`; the
+  multinomial moments of equation (10): `MultinomialMomentExpansion`.
 * Theorem 2 and Corollary 2.1, with no hypotheses: `TwoLocusMicroscopicApproximation`
   (`enlargedMicroscopicApproximation`, `rateEpoch_preserves_locusExchangeable_realization`,
   `history_present_locusExchangeable_realization`, `history_LDPairDomain`); the closedness-taking
   forms are `TwoLocusRealizabilityPreservation`.
-* §2.4 piecewise-constant histories: `PiecewiseConstantBodyPreservation`.
+* §2.4 time-varying rates: `PiecewiseConstantBodyPreservation` (piecewise-constant),
+  `LinearFundamentalMatrix` and `IntegrableRateHistoryRealization` (rate paths whose generator is
+  continuous in time).
 * §3 Theorem 3 and equations (14)-(16): `StationaryRealization`,
   `StationaryHaplotypeRealization`, `AncestralHaplotypeRealization`.
 * §4.1 per-locus material grading: `PartialHaplotypeCarrier`. §4.2 and §5.1 substochastic
   semigroups and uniformization: `SubstochasticGeneratorSemigroup`,
-  `PoissonTruncationCertificate`. §4.3 equations (21)-(23): `ConditionalReportCompilation`.
+  `PoissonTruncationCertificate`. §4.2a, the extension of a positive constant-preserving
+  semigroup from polynomials: `PolynomialFellerExtension`. §4.3 equations (21)-(23):
+  `ConditionalReportCompilation`.
 * §5 equations (24)-(25): `SublawReportCertificate`.
 * §6 equations (27)-(36), chronology to metrics: `AdmixtureChronologyLaw`,
   `ChronologyReportLaw`, `AttainableChronologyCurve`, `ExposureLaplaceConstraints`,
@@ -107,11 +118,16 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
   `EmpiricalCorrelationDefinedness`, `SmallCohortCorrelation`, `SmallCohortConditionalMeans`,
   `EmpiricalAUCUnbiasedness`.
 
-Scope. Multinomial resampling, equation (10), is replaced by the single-draw resampling step of
-§2.3. §2.4 is proved for piecewise-constant rates, not integrable ones. Theorem 2 covers
+Scope. Equation (10) is proved for every monomial of degree at most four with remainder at
+most 71/N², but the microscopic approximation behind Theorem 2 uses the single-draw
+resampling step of §2.3. §2.4 is proved for rate paths whose generator is continuous in time,
+not for merely integrable rates. Theorem 2 covers
 histories of rate epochs and splits; the pipeline compiler emits nothing else. The generator
 identity (19) of the partial-haplotype dual and the Feller semigroup of §4.2a are not
 formalized.
+
+Guard witnesses: `LowOrderLDWitnesses` inhabits the corpus rate, epoch and history structures
+from data alone.
 
 ## NOTE2: the input-to-output report law
 
