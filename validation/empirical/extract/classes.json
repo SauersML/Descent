@@ -39796,6 +39796,9 @@
    "Descent.Portability.SmallRealProduct.product_limit",
    "Descent.Portability.SourceDesignLaw.gridSourceLaw_eq_integer_draw",
    "Descent.Portability.SourceFixedRealization.two_point_fourth_moment",
+   "Descent.Portability.SparseBinaryAudit.unbiased",
+   "Descent.Portability.SparseBinaryAudit.variance_attained",
+   "Descent.Portability.SparseBinaryAudit.variance_upper",
    "Descent.Portability.SpectralAuditConfidence.directional_variance",
    "Descent.Portability.SpectralAuditCost.attained_cost_bound",
    "Descent.Portability.SpectralAuditCost.cost_lower_bound",
@@ -41565,6 +41568,9 @@
     "Descent.Portability.SmallRealProduct.product_limit": [],
     "Descent.Portability.SourceDesignLaw.gridSourceLaw_eq_integer_draw": [],
     "Descent.Portability.SourceFixedRealization.two_point_fourth_moment": [],
+    "Descent.Portability.SparseBinaryAudit.unbiased": [],
+    "Descent.Portability.SparseBinaryAudit.variance_upper": [],
+    "Descent.Portability.SparseBinaryAudit.variance_attained": [],
     "Descent.Portability.SpectralAuditConfidence.directional_variance": [],
     "Descent.Portability.SpectralAuditCost.trace_cost_lower": [],
     "Descent.Portability.SpectralAuditCost.cost_lower_bound": [],
@@ -51074,6 +51080,9 @@
    "Descent.Portability.SmallRealProduct.product_limit",
    "Descent.Portability.SourceDesignLaw.gridSourceLaw_eq_integer_draw",
    "Descent.Portability.SourceFixedRealization.two_point_fourth_moment",
+   "Descent.Portability.SparseBinaryAudit.unbiased",
+   "Descent.Portability.SparseBinaryAudit.variance_attained",
+   "Descent.Portability.SparseBinaryAudit.variance_upper",
    "Descent.Portability.SpectralAuditConfidence.directional_variance",
    "Descent.Portability.SpectralAuditCost.attained_cost_bound",
    "Descent.Portability.SpectralAuditCost.cost_lower_bound",
@@ -52789,6 +52798,9 @@
     "Descent.Portability.SmallRealProduct.product_limit": [],
     "Descent.Portability.SourceDesignLaw.gridSourceLaw_eq_integer_draw": [],
     "Descent.Portability.SourceFixedRealization.two_point_fourth_moment": [],
+    "Descent.Portability.SparseBinaryAudit.unbiased": [],
+    "Descent.Portability.SparseBinaryAudit.variance_upper": [],
+    "Descent.Portability.SparseBinaryAudit.variance_attained": [],
     "Descent.Portability.SpectralAuditConfidence.directional_variance": [],
     "Descent.Portability.SpectralAuditCost.trace_cost_lower": [],
     "Descent.Portability.SpectralAuditCost.cost_lower_bound": [],
@@ -71674,6 +71686,9 @@
    "Descent.Portability.SmallRealProduct.product_limit",
    "Descent.Portability.SourceDesignLaw.gridSourceLaw_eq_integer_draw",
    "Descent.Portability.SourceFixedRealization.two_point_fourth_moment",
+   "Descent.Portability.SparseBinaryAudit.unbiased",
+   "Descent.Portability.SparseBinaryAudit.variance_attained",
+   "Descent.Portability.SparseBinaryAudit.variance_upper",
    "Descent.Portability.SpectralAuditConfidence.directional_variance",
    "Descent.Portability.SpectralAuditCost.attained_cost_bound",
    "Descent.Portability.SpectralAuditCost.cost_lower_bound",
@@ -72066,6 +72081,7 @@
     "∀ x ∈ Ioo a b, deriv (deriv (deriv f",
     "∀ i, (∫ y, (y - q i",
     "b ^ 2 < a",
+    "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (0 : ℝ",
     "∀ i b, 0 ≤ weight i b",
     "∑ i, ∑ b, weight i b * (target i b - predictor i b"
    ],
@@ -73548,6 +73564,13 @@
     "Descent.Portability.SourceFixedRealization.two_point_fourth_moment": [
      "b ^ 2 < a"
     ],
+    "Descent.Portability.SparseBinaryAudit.unbiased": [
+     "∀ i, MemLp (fun y : ℝ ↦ y"
+    ],
+    "Descent.Portability.SparseBinaryAudit.variance_upper": [
+     "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (0 : ℝ"
+    ],
+    "Descent.Portability.SparseBinaryAudit.variance_attained": [],
     "Descent.Portability.SpectralAuditConfidence.directional_variance": [],
     "Descent.Portability.SpectralAuditCost.trace_cost_lower": [],
     "Descent.Portability.SpectralAuditCost.cost_lower_bound": [],
@@ -75310,6 +75333,8 @@
    "Descent.Portability.DiploidBoxCompatibilityLaw.compatible_field_realization",
    "Descent.Portability.DiploidBoxCompatibilityLaw.potential_separately_quadratic",
    "Descent.Portability.DiploidBoxCompatibilityLaw.realized_field_conditions",
+   "Descent.Portability.DisagreementAuditPayoff.simultaneous_attainment",
+   "Descent.Portability.DisagreementAuditPayoff.uniform_admissible",
    "Descent.Portability.DiscountedForecastMinimax.symmetric_eq_of_quadratic",
    "Descent.Portability.DistanceBinnedPortabilityLaw.binInner_eq_iSup_clipped",
    "Descent.Portability.DistanceBinnedPortabilityLaw.weighted_integrable",
@@ -75477,6 +75502,7 @@
     "∀ i, ContDiffOn ℝ 2 (b i",
     "ClosedOnBox lo hi b",
     "OwnAffineOnBox lo hi b",
+    "∀ i, b i ^ 2 = if i ∈ D then 1 else 0",
     "AuditAllocationCoordinate.objective A b p = AuditAllocationCoordinate.objective A b (clip floor 1 (Real.sqrt (A / b",
     "spending c p₀ < B",
     "0 ≤ b",
@@ -75739,6 +75765,10 @@
      "OwnAffineOnBox lo hi b"
     ],
     "Descent.Portability.DiploidBoxCompatibilityLaw.realized_field_conditions": [],
+    "Descent.Portability.DisagreementAuditPayoff.uniform_admissible": [],
+    "Descent.Portability.DisagreementAuditPayoff.simultaneous_attainment": [
+     "∀ i, b i ^ 2 = if i ∈ D then 1 else 0"
+    ],
     "Descent.Portability.DiscountedForecastMinimax.symmetric_eq_of_quadratic": [],
     "Descent.Portability.BinaryRiskCohort.isBounded_logisticCalibration_baselineSublevel": [],
     "Descent.Portability.BinaryRiskCohort.CITLDomain.existsUniqueBracketedRoot": [],
@@ -90013,6 +90043,11 @@
   "mentioned_by": [
    "Descent.Foundations.HWEScoreModel.scoreMean_uniform",
    "Descent.Foundations.HWEScoreModel.scoreVariance_uniform",
+   "Descent.Portability.DisagreementAuditPayoff.envelope_values",
+   "Descent.Portability.DisagreementAuditPayoff.equal_expected_budgets",
+   "Descent.Portability.DisagreementAuditPayoff.prospective_bounds",
+   "Descent.Portability.DisagreementAuditPayoff.simultaneous_attainment",
+   "Descent.Portability.DisagreementAuditPayoff.uniform_admissible",
    "Descent.Portability.FourCycleIntegratedCorrelation.directed_integrated_correlation",
    "Descent.Portability.FourCycleIntegratedCorrelation.reversible_integrated_correlation",
    "Descent.Portability.FourCyclePrediction.directedLaw_stationary",
@@ -90047,6 +90082,11 @@
    "hypotheses_by_theorem": {
     "Descent.Foundations.HWEScoreModel.scoreMean_uniform": [],
     "Descent.Foundations.HWEScoreModel.scoreVariance_uniform": [],
+    "Descent.Portability.DisagreementAuditPayoff.uniform_admissible": [],
+    "Descent.Portability.DisagreementAuditPayoff.equal_expected_budgets": [],
+    "Descent.Portability.DisagreementAuditPayoff.envelope_values": [],
+    "Descent.Portability.DisagreementAuditPayoff.prospective_bounds": [],
+    "Descent.Portability.DisagreementAuditPayoff.simultaneous_attainment": [],
     "Descent.Portability.FourCycleIntegratedCorrelation.directed_integrated_correlation": [],
     "Descent.Portability.FourCycleIntegratedCorrelation.reversible_integrated_correlation": [],
     "Descent.Portability.FourCyclePrediction.directed_stationary": [],
@@ -107495,8 +107535,7 @@
    "Descent.Portability.ConvexOrderCoupling.sum_rate_secant_bound",
    "Descent.Portability.CouplingPolytopeExtrema.horizonPolytope_isClosed",
    "Descent.Portability.CouplingPolytopeExtrema.truncate_inPolytope",
-   "Descent.Portability.CubeAverageConvergence.windowLaw_Icc",
-   "Descent.Portability.CubeAverageConvergence.windowLaw_univ",
+   "Descent.Portability.CubeAverageConvergence.window_mass",
    "Descent.Portability.DenominatorAwareRecovery.chebPeak_inv_eq",
    "Descent.Portability.DenominatorAwareRecovery.matched_report_gap_le",
    "Descent.Portability.DenominatorAwareRecovery.natDegree_T_le",
@@ -107959,8 +107998,7 @@
     "Descent.Portability.ConvexOrderCoupling.pathExp_nearestDrift_le": [],
     "Descent.Portability.CouplingPolytopeExtrema.truncate_inPolytope": [],
     "Descent.Portability.CouplingPolytopeExtrema.horizonPolytope_isClosed": [],
-    "Descent.Portability.CubeAverageConvergence.windowLaw_univ": [],
-    "Descent.Portability.CubeAverageConvergence.windowLaw_Icc": [],
+    "Descent.Portability.CubeAverageConvergence.window_mass": [],
     "Descent.Portability.DenominatorAwareRecovery.natDegree_T_le": [],
     "Descent.Portability.DenominatorAwareRecovery.chebPeak_inv_eq": [],
     "Descent.Portability.DenominatorAwareRecovery.recovery_error_bound": [],
@@ -142185,6 +142223,7 @@
    "Descent.Portability.MinimaxAuditDesignLaw.proxy_envelope_value",
    "Descent.Portability.SharedAuditCompletion.frame_variance_upper",
    "Descent.Portability.SharedAuditCompletion.simultaneous_attainment",
+   "Descent.Portability.SparseBinaryAudit.variance_upper",
    "Descent.Portability.SpectralAuditDualCertificate.positive_multiplier_choice"
   ],
   "constraints": {
@@ -142241,6 +142280,7 @@
     "Descent.Portability.SharedAuditCompletion.simultaneous_attainment": [
      "∀ i, L i ≤ lo i ∧ lo i ≤ hi i ∧ hi i ≤ U i"
     ],
+    "Descent.Portability.SparseBinaryAudit.variance_upper": [],
     "Descent.Portability.SpectralAuditDualCertificate.positive_multiplier_choice": []
    }
   }
@@ -142308,7 +142348,8 @@
    "Descent.Portability.BoundedAuditCompletion.worst_case_upper",
    "Descent.Portability.MinimaxAuditDesignLaw.proxy_envelope_value",
    "Descent.Portability.SharedAuditCompletion.frame_variance_upper",
-   "Descent.Portability.SharedAuditCompletion.simultaneous_attainment"
+   "Descent.Portability.SharedAuditCompletion.simultaneous_attainment",
+   "Descent.Portability.SparseBinaryAudit.variance_attained"
   ],
   "constraints": {
    "declared_kind": "nonnegative",
@@ -142328,7 +142369,8 @@
     "∀ i, 0 < p i ∧ p i ≤ 1",
     "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i",
     "∀ i, L i < U i",
-    "∀ i, L i ≤ lo i ∧ lo i ≤ hi i ∧ hi i ≤ U i"
+    "∀ i, L i ≤ lo i ∧ lo i ≤ hi i ∧ hi i ≤ U i",
+    "Admissible p w"
    ],
    "hypotheses_by_theorem": {
     "Descent.Core.SharpFiberEnvelope.midpoint_error_le_halfWidth": [],
@@ -142392,6 +142434,9 @@
      "∀ i, L i < U i",
      "∀ i, 0 < p i ∧ p i ≤ 1",
      "∀ i, L i ≤ lo i ∧ lo i ≤ hi i ∧ hi i ≤ U i"
+    ],
+    "Descent.Portability.SparseBinaryAudit.variance_attained": [
+     "Admissible p w"
     ]
    }
   }
@@ -142566,7 +142611,8 @@
    "Descent.Portability.MinimaxAuditDesignLaw.common_confidence",
    "Descent.Portability.MinimaxAuditDesignLaw.proxy_envelope_value",
    "Descent.Portability.MinimaxAuditDesignLaw.variance_identity",
-   "Descent.Portability.SharedAuditCompletion.minimax_frame_upper"
+   "Descent.Portability.SharedAuditCompletion.minimax_frame_upper",
+   "Descent.Portability.SparseBinaryAudit.variance_upper"
   ],
   "constraints": {
    "declared_kind": "nonnegative",
@@ -142626,7 +142672,8 @@
     "Descent.Portability.SharedAuditCompletion.minimax_frame_upper": [
      "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i",
      "∀ i, lo i ≤ (∫ y, y ∂μ i"
-    ]
+    ],
+    "Descent.Portability.SparseBinaryAudit.variance_upper": []
    }
   }
  },
@@ -142957,6 +143004,7 @@
    "Descent.Portability.SecondMomentAuditConfidence.direction_memLp",
    "Descent.Portability.SecondMomentAuditConfidence.direction_second",
    "Descent.Portability.SecondMomentAuditConfidence.error_second",
+   "Descent.Portability.SparseBinaryAudit.variance_attained",
    "Descent.Portability.SpectralAuditConfidence.marginal_nonneg"
   ],
   "constraints": {
@@ -142975,7 +143023,8 @@
     "∀ i, q i ∈ Set.Icc (L i",
     "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i",
     "∀ i, lo i ≤ (∫ y, y ∂μ i",
-    "(∫ y, (y - q"
+    "(∫ y, (y - q",
+    "Admissible p w"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.AuditCenteredObservations.audit_support": [
@@ -143062,6 +143111,9 @@
     ],
     "Descent.Portability.SecondMomentAuditConfidence.error_second": [
      "∀ i, 0 < p i ∧ p i ≤ 1"
+    ],
+    "Descent.Portability.SparseBinaryAudit.variance_attained": [
+     "Admissible p w"
     ],
     "Descent.Portability.SpectralAuditConfidence.marginal_nonneg": [
      "∀ i, 0 < p i ∧ p i ≤ 1",
@@ -146745,9 +146797,11 @@
    "Descent.Portability.BoundedAuditCompletion.endpoint_variance",
    "Descent.Portability.BoundedAuditCompletion.minimax_attaining_law",
    "Descent.Portability.BoundedAuditCompletion.worst_case_attained",
+   "Descent.Portability.DisagreementAuditPayoff.simultaneous_attainment",
    "Descent.Portability.JointAuditExperiment.unit_map_augmented",
    "Descent.Portability.MeanDriftRepair.attained_drift_penalty",
-   "Descent.Portability.SharedAuditCompletion.simultaneous_attainment"
+   "Descent.Portability.SharedAuditCompletion.simultaneous_attainment",
+   "Descent.Portability.SparseBinaryAudit.variance_attained"
   ],
   "constraints": {
    "declared_kind": "nonnegative",
@@ -146796,6 +146850,7 @@
      "L < U",
      "L ≤ lo ∧ lo ≤ hi ∧ hi ≤ U"
     ],
+    "Descent.Portability.DisagreementAuditPayoff.simultaneous_attainment": [],
     "Descent.Portability.JointAuditExperiment.unit_map_augmented": [],
     "Descent.Portability.MeanDriftRepair.attained_drift_penalty": [
      "∀ i, L i < U i",
@@ -146804,7 +146859,8 @@
     "Descent.Portability.SharedAuditCompletion.simultaneous_attainment": [
      "∀ i, L i < U i",
      "∀ i, L i ≤ lo i ∧ lo i ≤ hi i ∧ hi i ≤ U i"
-    ]
+    ],
+    "Descent.Portability.SparseBinaryAudit.variance_attained": []
    }
   }
  },
@@ -159536,7 +159592,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name ENNReal.ofReal",
   "file": "Descent/Portability/CubeAverageConvergence.lean",
-  "line": 209,
+  "line": 210,
   "short": "mixtureLaw",
   "ret_type": "MeasureTheory.Measure (N → ℝ)",
   "empirical_status": "",
@@ -162352,6 +162408,630 @@
      "∀ i, 0 ≤ p i ∧ p i ≤ 1",
      "∀ i, 0 < p i ∧ p i < 1",
      "∀ i, (∑ j, weights j * (genotypeLaw p hp"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.DisagreementAuditPayoff.uniform": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name Fintype.card",
+  "file": "Descent/Portability/DisagreementAuditPayoff.lean",
+  "line": 28,
+  "short": "uniform",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "B": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Foundations.HWEScoreModel.scoreMean_uniform",
+   "Descent.Foundations.HWEScoreModel.scoreVariance_uniform",
+   "Descent.Portability.DisagreementAuditPayoff.envelope_values",
+   "Descent.Portability.DisagreementAuditPayoff.equal_expected_budgets",
+   "Descent.Portability.DisagreementAuditPayoff.prospective_bounds",
+   "Descent.Portability.DisagreementAuditPayoff.simultaneous_attainment",
+   "Descent.Portability.DisagreementAuditPayoff.uniform_admissible",
+   "Descent.Portability.FourCycleIntegratedCorrelation.directed_integrated_correlation",
+   "Descent.Portability.FourCycleIntegratedCorrelation.reversible_integrated_correlation",
+   "Descent.Portability.FourCyclePrediction.directedLaw_stationary",
+   "Descent.Portability.FourCyclePrediction.directed_correlation",
+   "Descent.Portability.FourCyclePrediction.directed_prediction_energy",
+   "Descent.Portability.FourCyclePrediction.directed_stale_risk",
+   "Descent.Portability.FourCyclePrediction.directed_stationary",
+   "Descent.Portability.FourCyclePrediction.optimal_risks_equal",
+   "Descent.Portability.FourCyclePrediction.report_energy",
+   "Descent.Portability.FourCyclePrediction.report_mean_zero",
+   "Descent.Portability.FourCyclePrediction.reversibleLaw_stationary",
+   "Descent.Portability.FourCyclePrediction.reversible_correlation",
+   "Descent.Portability.FourCyclePrediction.reversible_prediction_energy",
+   "Descent.Portability.FourCyclePrediction.reversible_stale_risk",
+   "Descent.Portability.FourCyclePrediction.reversible_stationary",
+   "Descent.Portability.FourCyclePrediction.same_instantaneous_energy",
+   "Descent.Portability.FourCyclePrediction.stale_risks_differ_at_half_pi",
+   "Descent.Portability.PThresholdTrainingLaw.evaluate_spec",
+   "Descent.Portability.PThresholdTrainingLaw.flipSign_iff_negative_correlation",
+   "Descent.Portability.SamplingDesignLaw.causalChoice_mass",
+   "Descent.Portability.SamplingDesignLaw.demePermutations_mass",
+   "Descent.Portability.SamplingDesignLaw.permutationLaw_mass",
+   "Descent.Portability.SamplingDesignLaw.uniform_expectation",
+   "Descent.Portability.SourceDesignLaw.gridSourceLaw_eq_integer_draw",
+   "Descent.Portability.SourceDesignLaw.sourceLaw_mass"
+  ],
+  "constraints": {
+   "declared_kind": "probability",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [
+    "0 < B",
+    "B ≤ D.card"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Foundations.HWEScoreModel.scoreMean_uniform": [],
+    "Descent.Foundations.HWEScoreModel.scoreVariance_uniform": [],
+    "Descent.Portability.DisagreementAuditPayoff.uniform_admissible": [
+     "0 < B",
+     "B ≤ D.card"
+    ],
+    "Descent.Portability.DisagreementAuditPayoff.equal_expected_budgets": [
+     "0 < B",
+     "B ≤ D.card"
+    ],
+    "Descent.Portability.DisagreementAuditPayoff.envelope_values": [
+     "0 < B",
+     "B ≤ D.card"
+    ],
+    "Descent.Portability.DisagreementAuditPayoff.prospective_bounds": [
+     "0 < B",
+     "B ≤ D.card"
+    ],
+    "Descent.Portability.DisagreementAuditPayoff.simultaneous_attainment": [
+     "0 < B",
+     "B ≤ D.card"
+    ],
+    "Descent.Portability.FourCycleIntegratedCorrelation.directed_integrated_correlation": [],
+    "Descent.Portability.FourCycleIntegratedCorrelation.reversible_integrated_correlation": [],
+    "Descent.Portability.FourCyclePrediction.directed_stationary": [],
+    "Descent.Portability.FourCyclePrediction.reversible_stationary": [],
+    "Descent.Portability.FourCyclePrediction.directedLaw_stationary": [],
+    "Descent.Portability.FourCyclePrediction.reversibleLaw_stationary": [],
+    "Descent.Portability.FourCyclePrediction.report_mean_zero": [],
+    "Descent.Portability.FourCyclePrediction.report_energy": [],
+    "Descent.Portability.FourCyclePrediction.directed_correlation": [],
+    "Descent.Portability.FourCyclePrediction.reversible_correlation": [],
+    "Descent.Portability.FourCyclePrediction.directed_prediction_energy": [],
+    "Descent.Portability.FourCyclePrediction.reversible_prediction_energy": [],
+    "Descent.Portability.FourCyclePrediction.same_instantaneous_energy": [],
+    "Descent.Portability.FourCyclePrediction.directed_stale_risk": [],
+    "Descent.Portability.FourCyclePrediction.reversible_stale_risk": [],
+    "Descent.Portability.FourCyclePrediction.optimal_risks_equal": [],
+    "Descent.Portability.FourCyclePrediction.stale_risks_differ_at_half_pi": [],
+    "Descent.Portability.PThresholdTrainingLaw.evaluate_spec": [],
+    "Descent.Portability.PThresholdTrainingLaw.flipSign_iff_negative_correlation": [],
+    "Descent.Portability.SamplingDesignLaw.uniform_expectation": [],
+    "Descent.Portability.SamplingDesignLaw.causalChoice_mass": [],
+    "Descent.Portability.SamplingDesignLaw.permutationLaw_mass": [],
+    "Descent.Portability.SamplingDesignLaw.demePermutations_mass": [],
+    "Descent.Portability.SourceDesignLaw.sourceLaw_mass": [],
+    "Descent.Portability.SourceDesignLaw.gridSourceLaw_eq_integer_draw": []
+   }
+  }
+ },
+ "Descent.Portability.DisagreementAuditPayoff.targeted": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "expected 'then', found op:∈",
+  "file": "Descent/Portability/DisagreementAuditPayoff.lean",
+  "line": 31,
+  "short": "targeted",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "B": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.DisagreementAuditPayoff.envelope_values",
+   "Descent.Portability.DisagreementAuditPayoff.equal_expected_budgets",
+   "Descent.Portability.DisagreementAuditPayoff.prospective_bounds",
+   "Descent.Portability.DisagreementAuditPayoff.simultaneous_attainment",
+   "Descent.Portability.DisagreementAuditPayoff.targeted_admissible"
+  ],
+  "constraints": {
+   "declared_kind": "probability",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [
+    "0 < B",
+    "B ≤ D.card",
+    "∀ i, b i ^ 2 = if i ∈ D then 1 else 0",
+    "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (0 : ℝ"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.DisagreementAuditPayoff.targeted_admissible": [
+     "0 < B",
+     "B ≤ D.card",
+     "∀ i, b i ^ 2 = if i ∈ D then 1 else 0"
+    ],
+    "Descent.Portability.DisagreementAuditPayoff.equal_expected_budgets": [
+     "0 < B",
+     "B ≤ D.card"
+    ],
+    "Descent.Portability.DisagreementAuditPayoff.envelope_values": [
+     "0 < B",
+     "B ≤ D.card",
+     "∀ i, b i ^ 2 = if i ∈ D then 1 else 0"
+    ],
+    "Descent.Portability.DisagreementAuditPayoff.prospective_bounds": [
+     "0 < B",
+     "B ≤ D.card",
+     "∀ i, b i ^ 2 = if i ∈ D then 1 else 0",
+     "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (0 : ℝ"
+    ],
+    "Descent.Portability.DisagreementAuditPayoff.simultaneous_attainment": [
+     "0 < B",
+     "B ≤ D.card",
+     "∀ i, b i ^ 2 = if i ∈ D then 1 else 0"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.DisagreementAuditPayoff.weight": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/DisagreementAuditPayoff.lean",
+  "line": 35,
+  "short": "weight",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "weight",
+  "args": [
+   "b",
+   "i"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": {
+   "b": {
+    "dim": "ι",
+    "rank": 1
+   }
+  },
+  "mentioned_by": [
+   "Descent.Blindness.TrafficInvariantSeparation.biasedBinomialTypeWeight_magnetizationSecondMoment",
+   "Descent.Blindness.TrafficInvariantSeparation.exists_probabilityWeights_matchingMoments_through_degree",
+   "Descent.Blindness.TrafficInvariantSeparation.exists_truncatedMoment_annihilator",
+   "Descent.Blindness.TrafficInvariantSeparation.finiteCWPressureGap_ge_cwObjective",
+   "Descent.Blindness.TrafficInvariantSeparation.finiteCWTypeMass_eq_matchedWeight_mul_expObjective",
+   "Descent.Blindness.TrafficInvariantSeparation.finiteCWTypeMass_interior_le_one_of_subcritical",
+   "Descent.Blindness.TrafficInvariantSeparation.finiteCWTypeMass_le_exp_variationalPressure",
+   "Descent.Blindness.TrafficInvariantSeparation.finiteLogSum_ge_weightedLogRatio",
+   "Descent.Blindness.TrafficInvariantSeparation.momentPerturbationScale_pos",
+   "Descent.Blindness.TrafficInvariantSeparation.momentPerturbation_abs_lt_uniform",
+   "Descent.Blindness.TrafficInvariantSeparation.perturbedMomentWeight_pos",
+   "Descent.Blindness.TrafficInvariantSeparation.perturbedMomentWeight_sum_one",
+   "Descent.Blindness.TrafficInvariantSeparation.perturbedMoment_eq_referenceMoment",
+   "Descent.Blindness.TrafficInvariantSeparation.perturbedMoment_ne_referenceMoment",
+   "Descent.Blindness.XiFromMarks.distinctPairParetoExceedanceMass_le_blockScale_sq",
+   "Descent.Blindness.XiFromMarks.distinctPairParetoExceedanceMass_le_flux_sq",
+   "Descent.Blindness.XiFromMarks.weightedParetoExceedanceMass_eq_flux",
+   "Descent.Blindness.alignmentEnergy_const",
+   "Descent.Blindness.alignmentEnergy_perm_invariant",
+   "Descent.Blindness.alignmentEnergy_swap_twin_invariant",
+   "Descent.Blindness.alignmentEnergy_zero_divergence",
+   "Descent.Blindness.configurationWeight_flipLocus",
+   "Descent.Blindness.forbiddenInterval_of_levelResolved_cover",
+   "Descent.Blindness.forbiddenOverlap_of_levelResolved_cover",
+   "Descent.Blindness.hwe_symmetricCoding_forces_half",
+   "Descent.Blindness.hwe_symmetricCoding_iff_half",
+   "Descent.Blindness.kernel_vanishes_at_singly_covered",
+   "Descent.Blindness.levelResolvedForbiddenCore_eq_compl_envelope",
+   "Descent.Blindness.levelResolvedForbiddenCore_subset_superposedComplement",
+   "Descent.Blindness.marginEnergy_const",
+   "Descent.Blindness.marginEnergy_eq",
+   "Descent.Blindness.marginEnergy_ge_separated_population",
+   "Descent.Blindness.marginEnergy_perm_invariant",
+   "Descent.Blindness.nearOptimalSet_superposition_eq_levelResolvedUnion",
+   "Descent.Blindness.nearOptimal_superposition_iff_exists_levels",
+   "Descent.Blindness.panels_agree_of_modulus_law_agree",
+   "Descent.Blindness.spectrum_determined_of_separating",
+   "Descent.Blindness.standardizedGenotype_symmetric_iff",
+   "Descent.Blindness.superposedAchievableOverlap_subset_levelResolved",
+   "Descent.Blindness.superposedAchievableOverlaps_subset_levelResolvedEnvelope",
+   "Descent.Blindness.symmetricCoding_third_moment_zero",
+   "Descent.Blindness.weight_swap_invariant",
+   "Descent.Coalescent.LowOrderLDDDRealization.dd_quadraticForm_nonneg",
+   "Descent.Coalescent.sum_mul_conditionalDemeIndicator",
+   "Descent.Coalescent.sum_mul_demeIndicator",
+   "Descent.Conditionals.FiniteBoundedDeviation.secondMoment_le_radius_sq",
+   "Descent.Conditionals.dynamicsContrast_obstructions",
+   "Descent.Conditionals.pooledCohort_forbiddenOverlap_of_levelResolved_cover",
+   "Descent.Conditionals.selectedDerivativeFlux_controlsBreakouts",
+   "Descent.Conditionals.singleMode_errorEnergy_forward_eq",
+   "Descent.Conditionals.targetOnlyTransportPerformance_eq_onePoint",
+   "Descent.PopGen.MafSpectrum.fourthMoment_eq",
+   "Descent.PopGen.MafSpectrum.sixthMoment_eq_floorOne_plus_dispersion",
+   "Descent.PopGen.hweLevelOne_symmetry",
+   "Descent.PopGen.hwe_rigidity_hypotheses_unsatisfiable",
+   "Descent.PopGen.no_signSymmetric_nondegenerate_locus",
+   "Descent.PopGen.phase_strict_iff_not_symmetric",
+   "Descent.PopGen.standardizedSquare_never_symmetric",
+   "Descent.Portability.AcceptedBinIntegrability.acceptedContribution_eq_pair_ae",
+   "Descent.Portability.AcceptedBinIntegrability.bin_integrable_iff_pairwise",
+   "Descent.Portability.DisagreementAuditPayoff.cell_variance_identity",
+   "Descent.Portability.DisagreementAuditPayoff.envelope_values",
+   "Descent.Portability.DisagreementAuditPayoff.prospective_bounds",
+   "Descent.Portability.DisagreementAuditPayoff.simultaneous_attainment",
+   "Descent.Portability.DisagreementAuditPayoff.targeted_admissible",
+   "Descent.Portability.DisagreementAuditPayoff.uniform_admissible",
+   "Descent.Portability.DistanceBinnedPortabilityLaw.clipped_bin_expectation",
+   "Descent.Portability.DistanceBinnedPortabilityLaw.finite_bin_expectation",
+   "Descent.Portability.DistanceBinnedPortabilityLaw.weighted_integrable",
+   "Descent.Portability.FrequencyResolvedCohort.informationMatchedWeight_optimal",
+   "Descent.Portability.FrequencyResolvedCohort.weightedSignal_sq_le_information_mul_noise",
+   "Descent.Portability.GaussianEffectPortabilityLaw.clippedExpectation_formula",
+   "Descent.Portability.GaussianEffectPortabilityLaw.clippedNumerator_eq_sum_integrals",
+   "Descent.Portability.GaussianEffectPortabilityLaw.labelWeight_le_one",
+   "Descent.Portability.GaussianEffectPortabilityLaw.weighted_clipped_integrable",
+   "Descent.Portability.GaussianEffectPortabilityLaw.weighted_defined_integrable",
+   "Descent.Portability.GaussianEffectPortabilityLaw.weighted_observable_integrable",
+   "Descent.Portability.GaussianEffectPortabilityLaw.weighted_report_integrable",
+   "Descent.Portability.MarginalPathCoupling.sum_prod_mul_coordinate",
+   "Descent.Portability.MechanismReportDerivative.centred_tilt_row",
+   "Descent.Portability.MechanismReportDerivative.hasDerivAt_tiltedRow",
+   "Descent.Portability.MechanismReportDerivative.tilt_term_eq_row_covariance",
+   "Descent.Portability.NonlinearMetricGridBound.exists_grid_mixture_near",
+   "Descent.Portability.NonlinearMetricGridBound.mixture_mem_feasible",
+   "Descent.Portability.NonlinearMetricGridBound.roundedWeights_castSucc",
+   "Descent.Portability.NonlinearMetricGridBound.roundedWeights_close",
+   "Descent.Portability.NonlinearMetricGridBound.roundedWeights_last",
+   "Descent.Portability.NonlinearMetricGridBound.roundedWeights_valid",
+   "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.branchMeasure_univ",
+   "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integrable_branchMeasure",
+   "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integrable_jointMeasure",
+   "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integral_branchMeasure",
+   "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integral_jointMeasure",
+   "Descent.Portability.PartialMetricMixture.conditionalMetric_jointMeasure",
+   "Descent.Portability.PartialMetricMixture.definedMass_jointMeasure",
+   "Descent.Portability.PartialMetricMixture.weightedMetric_jointMeasure",
+   "Descent.Portability.RatioPoleLaw.calibrated_label_weight_continuous",
+   "Descent.Portability.RatioPoleLaw.calibrated_label_weight_pos",
+   "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass",
+   "Descent.Portability.RealizedPTGWASDraw.winningR2True_eq_full_selected_moments",
+   "Descent.Portability.TensorInterpolationLaw.tensor_interpolation",
+   "Descent.Portability.cellBalanced_cross_term_eq_zero",
+   "Descent.Portability.cellBalanced_energy_eq_add_gap",
+   "Descent.Portability.cellBalanced_energy_refine_eq_add_gap",
+   "Descent.Portability.cellBalanced_representative_energy_le_of_refine",
+   "Descent.Portability.cellBalanced_sum_residual_eq_zero",
+   "Descent.Portability.cellBalanced_total_energy_eq",
+   "Descent.Portability.cellMean_of_mass_zero",
+   "Descent.Portability.isCellBalanced_cellMean",
+   "Descent.Portability.one_div_card_le_sum_sq_of_affine_weights",
+   "Descent.Portability.weightedMetaSourceWeights_eq_weightedPopulationEffectAverage",
+   "Descent.Portability.weightedMetaTransferGapSq_eq_irreducible_plus_populationSpecificGap_mul_sum_sq",
+   "Descent.Portability.weightedMetaTransferGapSq_eq_weightedPopulationEffectAverageGapSq",
+   "Descent.Portability.weightedMetaTransferGapSq_ge_uniform_of_affine_weights",
+   "Descent.Portability.weightedPopulationDeviation_squaredNorm_eq_populationSpecificGap_mul_sum_sq",
+   "Descent.Spectral.PhasePanel.intensity_singleton",
+   "Descent.Spectral.PhasePanel.resonance_at_zero",
+   "Descent.Spectral.PhasePanel.resonance_blind_to_sign_flip",
+   "Descent.Spectral.PhasePanel.resonance_of_aligned",
+   "Descent.Spectral._root_.Descent.Blindness.LocusSpectrum.fold_idempotent",
+   "Descent.Spectral._root_.Descent.Blindness.LocusSpectrum.reflect_fold",
+   "Descent.Spectral.finiteEnvironmentCovariancePool_energy",
+   "Descent.Spectral.finiteEnvironmentCovariancePool_energy_eq_zero_iff_active",
+   "Descent.Spectral.finiteEnvironmentCovariancePool_energy_nonneg",
+   "Descent.Spectral.finiteEnvironmentCovariancePool_energy_pos_iff_exists_active",
+   "Descent.Spectral.finiteEnvironmentCovariancePool_kernel_ssubset",
+   "Descent.Spectral.finiteEnvironmentCovariancePool_kernel_ssubset_active",
+   "Descent.Spectral.finiteEnvironmentCovariancePool_mulVec",
+   "Descent.Spectral.finiteEnvironmentCovariancePool_mulVec_eq_zero_iff",
+   "Descent.Spectral.finiteEnvironmentCovariancePool_mulVec_eq_zero_iff_active",
+   "Descent.Spectral.finiteEnvironmentCovariancePool_mulVec_ne_zero_of_exists",
+   "Descent.Spectral.finiteEnvironmentCovariancePool_mulVec_ne_zero_of_exists_active",
+   "Descent.Spectral.frequencyTie_gives_kernel",
+   "Descent.Spectral.maf_spectrum_identifiable",
+   "Descent.Spectral.matched_functionals_give_equal_estimates",
+   "Descent.Spectral.no_uniformQuadraticPortabilityBound_to_activeEnvironmentPool",
+   "Descent.Spectral.no_uniformQuadraticPortabilityBound_to_finiteEnvironmentPool",
+   "Descent.Spectral.portability_gap_not_attributable_to_spectrum",
+   "Descent.Spectral.readsThroughFunctionals_of_linearCombination",
+   "Descent.Spectral.spectrum_recoverable_architecture_not",
+   "Descent.Spectral.tied_pair_invisible",
+   "Descent.Spectral.weightedBandEnsembleLoss_decomposition",
+   "Descent.Spectral.weightedBandPredictorLoss_le_source",
+   "Descent.intensity_eq_charFnSq"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "SinglyCoveredBy family panel i v",
+    "∀ a b, divergence (relabel a",
+    "∀ a b, divergence a b = divergence b a",
+    "∀ i, b i ^ 2 = if i ∈ D then 1 else 0",
+    "∀ i ∈ D, p i = t",
+    "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (0 : ℝ",
+    "∀ i j, 0 ≤ transition i j",
+    "∀ i, ∑ j, transition i j = 1",
+    "∀ i k, node i k ∈ S i",
+    "∀ p, (∀ i, p i ∈ S i",
+    "∀ i, p i ∈ S i",
+    "∀ j, dotProduct (fun i ↦ wShared i - wTarget i",
+    "∑ i, ∑ b, weight i b * (target i b - predictor i b",
+    "∀ i b, 0 ≤ weight i b",
+    "∀ i, 0 ≤ panel.support i",
+    "∀ i, panel.support i ≤ 1",
+    "i ≠ l",
+    "panel.support i = panel.support l",
+    "w i = c",
+    "∀ m : Fin n, m ≠ i → m ≠ l → w m = 0",
+    "∀ a : Fin m, ∑ i : Fin n, panel.weight i * φ a (panel.support i",
+    "∀ i : Fin n, Real.cos (s * P.phase i"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Blindness.kernel_vanishes_at_singly_covered": [
+     "SinglyCoveredBy family panel i v"
+    ],
+    "Descent.Blindness.spectrum_determined_of_separating": [],
+    "Descent.Blindness.panels_agree_of_modulus_law_agree": [],
+    "Descent.Blindness.marginEnergy_eq": [],
+    "Descent.Blindness.marginEnergy_const": [],
+    "Descent.Blindness.alignmentEnergy_const": [],
+    "Descent.Blindness.alignmentEnergy_zero_divergence": [],
+    "Descent.Blindness.marginEnergy_perm_invariant": [],
+    "Descent.Blindness.alignmentEnergy_perm_invariant": [
+     "∀ a b, divergence (relabel a"
+    ],
+    "Descent.Blindness.weight_swap_invariant": [],
+    "Descent.Blindness.alignmentEnergy_swap_twin_invariant": [
+     "∀ a b, divergence a b = divergence b a"
+    ],
+    "Descent.Blindness.marginEnergy_ge_separated_population": [],
+    "Descent.Blindness.configurationWeight_flipLocus": [],
+    "Descent.Blindness.symmetricCoding_third_moment_zero": [],
+    "Descent.Blindness.hwe_symmetricCoding_forces_half": [],
+    "Descent.Blindness.hwe_symmetricCoding_iff_half": [],
+    "Descent.Blindness.standardizedGenotype_symmetric_iff": [],
+    "Descent.Blindness.nearOptimal_superposition_iff_exists_levels": [],
+    "Descent.Blindness.nearOptimalSet_superposition_eq_levelResolvedUnion": [],
+    "Descent.Blindness.levelResolvedForbiddenCore_eq_compl_envelope": [],
+    "Descent.Blindness.superposedAchievableOverlap_subset_levelResolved": [],
+    "Descent.Blindness.superposedAchievableOverlaps_subset_levelResolvedEnvelope": [],
+    "Descent.Blindness.forbiddenOverlap_of_levelResolved_cover": [],
+    "Descent.Blindness.levelResolvedForbiddenCore_subset_superposedComplement": [],
+    "Descent.Blindness.forbiddenInterval_of_levelResolved_cover": [],
+    "Descent.Blindness.TrafficInvariantSeparation.finiteLogSum_ge_weightedLogRatio": [],
+    "Descent.Blindness.TrafficInvariantSeparation.biasedBinomialTypeWeight_magnetizationSecondMoment": [],
+    "Descent.Blindness.TrafficInvariantSeparation.finiteCWTypeMass_eq_matchedWeight_mul_expObjective": [],
+    "Descent.Blindness.TrafficInvariantSeparation.finiteCWTypeMass_interior_le_one_of_subcritical": [],
+    "Descent.Blindness.TrafficInvariantSeparation.finiteCWTypeMass_le_exp_variationalPressure": [],
+    "Descent.Blindness.TrafficInvariantSeparation.finiteCWPressureGap_ge_cwObjective": [],
+    "Descent.Blindness.TrafficInvariantSeparation.exists_truncatedMoment_annihilator": [],
+    "Descent.Blindness.TrafficInvariantSeparation.momentPerturbationScale_pos": [],
+    "Descent.Blindness.TrafficInvariantSeparation.momentPerturbation_abs_lt_uniform": [],
+    "Descent.Blindness.TrafficInvariantSeparation.perturbedMomentWeight_pos": [],
+    "Descent.Blindness.TrafficInvariantSeparation.perturbedMomentWeight_sum_one": [],
+    "Descent.Blindness.TrafficInvariantSeparation.perturbedMoment_eq_referenceMoment": [],
+    "Descent.Blindness.TrafficInvariantSeparation.perturbedMoment_ne_referenceMoment": [],
+    "Descent.Blindness.TrafficInvariantSeparation.exists_probabilityWeights_matchingMoments_through_degree": [],
+    "Descent.Blindness.XiFromMarks.weightedParetoExceedanceMass_eq_flux": [],
+    "Descent.Blindness.XiFromMarks.distinctPairParetoExceedanceMass_le_flux_sq": [],
+    "Descent.Blindness.XiFromMarks.distinctPairParetoExceedanceMass_le_blockScale_sq": [],
+    "Descent.Coalescent.LowOrderLDDDRealization.dd_quadraticForm_nonneg": [],
+    "Descent.Coalescent.sum_mul_demeIndicator": [],
+    "Descent.Coalescent.sum_mul_conditionalDemeIndicator": [],
+    "Descent.Conditionals.FiniteBoundedDeviation.secondMoment_le_radius_sq": [],
+    "Descent.Conditionals.singleMode_errorEnergy_forward_eq": [],
+    "Descent.Conditionals.pooledCohort_forbiddenOverlap_of_levelResolved_cover": [],
+    "Descent.Conditionals.selectedDerivativeFlux_controlsBreakouts": [],
+    "Descent.Conditionals.targetOnlyTransportPerformance_eq_onePoint": [],
+    "Descent.Conditionals.dynamicsContrast_obstructions": [],
+    "Descent.PopGen.no_signSymmetric_nondegenerate_locus": [],
+    "Descent.PopGen.standardizedSquare_never_symmetric": [],
+    "Descent.PopGen.hweLevelOne_symmetry": [],
+    "Descent.PopGen.MafSpectrum.fourthMoment_eq": [],
+    "Descent.PopGen.MafSpectrum.sixthMoment_eq_floorOne_plus_dispersion": [],
+    "Descent.PopGen.phase_strict_iff_not_symmetric": [],
+    "Descent.PopGen.hwe_rigidity_hypotheses_unsatisfiable": [],
+    "Descent.Portability.AcceptedBinIntegrability.acceptedContribution_eq_pair_ae": [],
+    "Descent.Portability.AcceptedBinIntegrability.bin_integrable_iff_pairwise": [],
+    "Descent.Portability.cellBalanced_cross_term_eq_zero": [],
+    "Descent.Portability.cellMean_of_mass_zero": [],
+    "Descent.Portability.isCellBalanced_cellMean": [],
+    "Descent.Portability.cellBalanced_sum_residual_eq_zero": [],
+    "Descent.Portability.cellBalanced_energy_eq_add_gap": [],
+    "Descent.Portability.cellBalanced_total_energy_eq": [],
+    "Descent.Portability.cellBalanced_energy_refine_eq_add_gap": [],
+    "Descent.Portability.cellBalanced_representative_energy_le_of_refine": [],
+    "Descent.Portability.DisagreementAuditPayoff.uniform_admissible": [],
+    "Descent.Portability.DisagreementAuditPayoff.targeted_admissible": [
+     "∀ i, b i ^ 2 = if i ∈ D then 1 else 0"
+    ],
+    "Descent.Portability.DisagreementAuditPayoff.cell_variance_identity": [
+     "∀ i, b i ^ 2 = if i ∈ D then 1 else 0",
+     "∀ i ∈ D, p i = t"
+    ],
+    "Descent.Portability.DisagreementAuditPayoff.envelope_values": [
+     "∀ i, b i ^ 2 = if i ∈ D then 1 else 0"
+    ],
+    "Descent.Portability.DisagreementAuditPayoff.prospective_bounds": [
+     "∀ i, b i ^ 2 = if i ∈ D then 1 else 0",
+     "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (0 : ℝ"
+    ],
+    "Descent.Portability.DisagreementAuditPayoff.simultaneous_attainment": [
+     "∀ i, b i ^ 2 = if i ∈ D then 1 else 0"
+    ],
+    "Descent.Portability.DistanceBinnedPortabilityLaw.weighted_integrable": [],
+    "Descent.Portability.DistanceBinnedPortabilityLaw.clipped_bin_expectation": [],
+    "Descent.Portability.DistanceBinnedPortabilityLaw.finite_bin_expectation": [],
+    "Descent.Portability.RealizedPTGWASDraw.winningR2True_eq_full_selected_moments": [],
+    "Descent.Portability.GaussianEffectPortabilityLaw.labelWeight_le_one": [],
+    "Descent.Portability.GaussianEffectPortabilityLaw.weighted_observable_integrable": [],
+    "Descent.Portability.GaussianEffectPortabilityLaw.weighted_clipped_integrable": [],
+    "Descent.Portability.GaussianEffectPortabilityLaw.weighted_defined_integrable": [],
+    "Descent.Portability.GaussianEffectPortabilityLaw.clippedExpectation_formula": [],
+    "Descent.Portability.GaussianEffectPortabilityLaw.clippedNumerator_eq_sum_integrals": [],
+    "Descent.Portability.GaussianEffectPortabilityLaw.weighted_report_integrable": [],
+    "Descent.Portability.MarginalPathCoupling.sum_prod_mul_coordinate": [],
+    "Descent.Portability.MechanismReportDerivative.hasDerivAt_tiltedRow": [],
+    "Descent.Portability.MechanismReportDerivative.centred_tilt_row": [],
+    "Descent.Portability.MechanismReportDerivative.tilt_term_eq_row_covariance": [
+     "∀ i j, 0 ≤ transition i j",
+     "∀ i, ∑ j, transition i j = 1"
+    ],
+    "Descent.Portability.NonlinearMetricGridBound.roundedWeights_castSucc": [],
+    "Descent.Portability.NonlinearMetricGridBound.roundedWeights_last": [],
+    "Descent.Portability.NonlinearMetricGridBound.roundedWeights_valid": [],
+    "Descent.Portability.NonlinearMetricGridBound.roundedWeights_close": [],
+    "Descent.Portability.NonlinearMetricGridBound.mixture_mem_feasible": [],
+    "Descent.Portability.NonlinearMetricGridBound.exists_grid_mixture_near": [],
+    "Descent.Portability.FrequencyResolvedCohort.weightedSignal_sq_le_information_mul_noise": [],
+    "Descent.Portability.FrequencyResolvedCohort.informationMatchedWeight_optimal": [],
+    "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.branchMeasure_univ": [],
+    "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integrable_branchMeasure": [],
+    "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integral_branchMeasure": [],
+    "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integrable_jointMeasure": [],
+    "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integral_jointMeasure": [],
+    "Descent.Portability.PartialMetricMixture.definedMass_jointMeasure": [],
+    "Descent.Portability.PartialMetricMixture.weightedMetric_jointMeasure": [],
+    "Descent.Portability.PartialMetricMixture.conditionalMetric_jointMeasure": [],
+    "Descent.Portability.RatioPoleLaw.calibrated_label_weight_pos": [],
+    "Descent.Portability.RatioPoleLaw.calibrated_label_weight_continuous": [],
+    "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass": [],
+    "Descent.Portability.TensorInterpolationLaw.tensor_interpolation": [
+     "∀ i k, node i k ∈ S i",
+     "∀ p, (∀ i, p i ∈ S i",
+     "∀ i, p i ∈ S i"
+    ],
+    "Descent.Portability.weightedMetaSourceWeights_eq_weightedPopulationEffectAverage": [],
+    "Descent.Portability.weightedMetaTransferGapSq_eq_weightedPopulationEffectAverageGapSq": [],
+    "Descent.Portability.weightedPopulationDeviation_squaredNorm_eq_populationSpecificGap_mul_sum_sq": [],
+    "Descent.Portability.weightedMetaTransferGapSq_eq_irreducible_plus_populationSpecificGap_mul_sum_sq": [
+     "∀ j, dotProduct (fun i ↦ wShared i - wTarget i"
+    ],
+    "Descent.Portability.one_div_card_le_sum_sq_of_affine_weights": [],
+    "Descent.Portability.weightedMetaTransferGapSq_ge_uniform_of_affine_weights": [
+     "∀ j, dotProduct (fun i ↦ wShared i - wTarget i"
+    ],
+    "Descent.Spectral.weightedBandEnsembleLoss_decomposition": [
+     "∑ i, ∑ b, weight i b * (target i b - predictor i b"
+    ],
+    "Descent.Spectral.weightedBandPredictorLoss_le_source": [
+     "∀ i b, 0 ≤ weight i b",
+     "∑ i, ∑ b, weight i b * (target i b - predictor i b"
+    ],
+    "Descent.Spectral._root_.Descent.Blindness.LocusSpectrum.reflect_fold": [],
+    "Descent.Spectral._root_.Descent.Blindness.LocusSpectrum.fold_idempotent": [
+     "∀ i, 0 ≤ panel.support i",
+     "∀ i, panel.support i ≤ 1"
+    ],
+    "Descent.Spectral.frequencyTie_gives_kernel": [
+     "i ≠ l",
+     "panel.support i = panel.support l",
+     "w i = c",
+     "∀ m : Fin n, m ≠ i → m ≠ l → w m = 0"
+    ],
+    "Descent.Spectral.tied_pair_invisible": [],
+    "Descent.Spectral.readsThroughFunctionals_of_linearCombination": [],
+    "Descent.Spectral.matched_functionals_give_equal_estimates": [
+     "∀ a : Fin m, ∑ i : Fin n, panel.weight i * φ a (panel.support i"
+    ],
+    "Descent.Spectral.portability_gap_not_attributable_to_spectrum": [],
+    "Descent.Spectral.spectrum_recoverable_architecture_not": [],
+    "Descent.Spectral.maf_spectrum_identifiable": [],
+    "Descent.Spectral.finiteEnvironmentCovariancePool_mulVec": [],
+    "Descent.Spectral.finiteEnvironmentCovariancePool_energy": [],
+    "Descent.Spectral.finiteEnvironmentCovariancePool_energy_pos_iff_exists_active": [],
+    "Descent.Spectral.finiteEnvironmentCovariancePool_energy_nonneg": [],
+    "Descent.Spectral.finiteEnvironmentCovariancePool_energy_eq_zero_iff_active": [],
+    "Descent.Spectral.finiteEnvironmentCovariancePool_mulVec_eq_zero_iff_active": [],
+    "Descent.Spectral.finiteEnvironmentCovariancePool_mulVec_eq_zero_iff": [],
+    "Descent.Spectral.finiteEnvironmentCovariancePool_mulVec_ne_zero_of_exists_active": [],
+    "Descent.Spectral.finiteEnvironmentCovariancePool_mulVec_ne_zero_of_exists": [],
+    "Descent.Spectral.finiteEnvironmentCovariancePool_kernel_ssubset_active": [],
+    "Descent.Spectral.finiteEnvironmentCovariancePool_kernel_ssubset": [],
+    "Descent.Spectral.no_uniformQuadraticPortabilityBound_to_activeEnvironmentPool": [],
+    "Descent.Spectral.no_uniformQuadraticPortabilityBound_to_finiteEnvironmentPool": [],
+    "Descent.Spectral.PhasePanel.resonance_at_zero": [],
+    "Descent.Spectral.PhasePanel.resonance_of_aligned": [
+     "∀ i : Fin n, Real.cos (s * P.phase i"
+    ],
+    "Descent.Spectral.PhasePanel.resonance_blind_to_sign_flip": [],
+    "Descent.Spectral.PhasePanel.intensity_singleton": [],
+    "Descent.intensity_eq_charFnSq": []
+   },
+   "range_hi_thm": [
+    "Descent.Portability.GaussianEffectPortabilityLaw.labelWeight_le_one",
+    0
+   ],
+   "range_hi": 1,
+   "range_lo_thm": [
+    "Descent.Spectral.finiteEnvironmentCovariancePool_energy_pos_iff_exists_active",
+    0
+   ],
+   "range_lo": 0
+  }
+ },
+ "Descent.Portability.DisagreementAuditPayoff.fraction": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name D.card",
+  "file": "Descent/Portability/DisagreementAuditPayoff.lean",
+  "line": 38,
+  "short": "fraction",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Coalescent.lambdaCoalescentMergerRate_dirac_three_three",
+   "Descent.Portability.DisagreementAuditPayoff.envelope_values",
+   "Descent.Portability.DisagreementAuditPayoff.prospective_bounds",
+   "Descent.Portability.DisagreementAuditPayoff.simultaneous_attainment",
+   "Descent.Portability.DisagreementAuditPayoff.variance_ratio"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "B ≤ D.card",
+    "∀ i, b i ^ 2 = if i ∈ D then 1 else 0"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Coalescent.lambdaCoalescentMergerRate_dirac_three_three": [],
+    "Descent.Portability.DisagreementAuditPayoff.envelope_values": [
+     "B ≤ D.card",
+     "∀ i, b i ^ 2 = if i ∈ D then 1 else 0"
+    ],
+    "Descent.Portability.DisagreementAuditPayoff.prospective_bounds": [
+     "B ≤ D.card",
+     "∀ i, b i ^ 2 = if i ∈ D then 1 else 0"
+    ],
+    "Descent.Portability.DisagreementAuditPayoff.simultaneous_attainment": [
+     "B ≤ D.card",
+     "∀ i, b i ^ 2 = if i ∈ D then 1 else 0"
+    ],
+    "Descent.Portability.DisagreementAuditPayoff.variance_ratio": [
+     "B ≤ D.card"
     ]
    }
   }
@@ -173135,9 +173815,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 5,
+   "finite_points": 7,
    "total_points": 8,
-   "error": "ValueError('expected a number in range from -1 up to 1, got 1.3101897721574798')"
+   "error": "ValueError('expected a number in range from -1 up to 1, got 1.2504691881674868')"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -173189,9 +173869,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 7,
+   "finite_points": 6,
    "total_points": 8,
-   "error": "ValueError('expected a number in range from -1 up to 1, got 1.1478195192639808')"
+   "error": "ValueError('expected a number in range from -1 up to 1, got 1.1430754740893918')"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -187459,6 +188139,11 @@
   "mentioned_by": [
    "Descent.Foundations.HWEScoreModel.scoreMean_uniform",
    "Descent.Foundations.HWEScoreModel.scoreVariance_uniform",
+   "Descent.Portability.DisagreementAuditPayoff.envelope_values",
+   "Descent.Portability.DisagreementAuditPayoff.equal_expected_budgets",
+   "Descent.Portability.DisagreementAuditPayoff.prospective_bounds",
+   "Descent.Portability.DisagreementAuditPayoff.simultaneous_attainment",
+   "Descent.Portability.DisagreementAuditPayoff.uniform_admissible",
    "Descent.Portability.FourCycleIntegratedCorrelation.directed_integrated_correlation",
    "Descent.Portability.FourCycleIntegratedCorrelation.reversible_integrated_correlation",
    "Descent.Portability.FourCyclePrediction.directedLaw_stationary",
@@ -187490,6 +188175,11 @@
    "hypotheses_by_theorem": {
     "Descent.Foundations.HWEScoreModel.scoreMean_uniform": [],
     "Descent.Foundations.HWEScoreModel.scoreVariance_uniform": [],
+    "Descent.Portability.DisagreementAuditPayoff.uniform_admissible": [],
+    "Descent.Portability.DisagreementAuditPayoff.equal_expected_budgets": [],
+    "Descent.Portability.DisagreementAuditPayoff.envelope_values": [],
+    "Descent.Portability.DisagreementAuditPayoff.prospective_bounds": [],
+    "Descent.Portability.DisagreementAuditPayoff.simultaneous_attainment": [],
     "Descent.Portability.FourCycleIntegratedCorrelation.directed_integrated_correlation": [],
     "Descent.Portability.FourCycleIntegratedCorrelation.reversible_integrated_correlation": [],
     "Descent.Portability.FourCyclePrediction.directed_stationary": [],
@@ -192033,7 +192723,7 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 1,
+   "finite_points": 4,
    "total_points": 8,
    "error": "NameError(\"name 'X' is not defined\")"
   },
@@ -192057,7 +192747,7 @@
  },
  "Descent.Portability.GaussianHermiteLaw.hermite": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: calls untranslated definition X",
+  "note": "self-check: structure projection unavailable (AttributeError(\"'float' object has no attribute 'eval'\"))",
   "file": "Descent/Portability/GaussianHermiteLaw.lean",
   "line": 59,
   "short": "hermite",
@@ -192077,7 +192767,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "NameError(\"name 'X' is not defined\")"
+   "error": "AttributeError(\"'float' object has no attribute 'eval'\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -205950,6 +206640,8 @@
    "Descent.Portability.ConditionalGuardError.conditional_repair_certificate",
    "Descent.Portability.ConditionalGuardError.proceed_measurable",
    "Descent.Portability.DecisionDirectedAuditDesign.design_exists",
+   "Descent.Portability.DisagreementAuditPayoff.prospective_bounds",
+   "Descent.Portability.DisagreementAuditPayoff.simultaneous_attainment",
    "Descent.Portability.FiniteAuditConfidence.contrast_error",
    "Descent.Portability.FiniteAuditConfidence.contrast_tail",
    "Descent.Portability.FiniteAuditConfidence.finite_library",
@@ -205970,6 +206662,9 @@
    "Descent.Portability.SharedAuditCompletion.frame_variance_upper",
    "Descent.Portability.SharedAuditCompletion.minimax_frame_upper",
    "Descent.Portability.SharedAuditCompletion.simultaneous_attainment",
+   "Descent.Portability.SparseBinaryAudit.unbiased",
+   "Descent.Portability.SparseBinaryAudit.variance_attained",
+   "Descent.Portability.SparseBinaryAudit.variance_upper",
    "Descent.Portability.VectorAuditConfidence.directional_error",
    "Descent.Portability.VectorAuditConfidence.vector_confidence"
   ],
@@ -205980,7 +206675,8 @@
     "(DecisionLossContrasts.gram w φ",
     "∀ i, 0 < ranges L U w i",
     "∀ i, |w i| * (U i - L i",
-    "∀ j i, |w j i| * (U i - L i"
+    "∀ j i, |w j i| * (U i - L i",
+    "Admissible p w"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.AuditSelectionSafety.certified_selection": [
@@ -205998,6 +206694,8 @@
     "Descent.Portability.DecisionDirectedAuditDesign.design_exists": [
      "∀ i, 0 < ranges L U w i"
     ],
+    "Descent.Portability.DisagreementAuditPayoff.prospective_bounds": [],
+    "Descent.Portability.DisagreementAuditPayoff.simultaneous_attainment": [],
     "Descent.Portability.FiniteAuditConfidence.contrast_error": [],
     "Descent.Portability.FiniteAuditConfidence.contrast_tail": [
      "∀ i, |w i| * (U i - L i",
@@ -206023,6 +206721,15 @@
     "Descent.Portability.SharedAuditCompletion.frame_variance_upper": [],
     "Descent.Portability.SharedAuditCompletion.simultaneous_attainment": [],
     "Descent.Portability.SharedAuditCompletion.minimax_frame_upper": [],
+    "Descent.Portability.SparseBinaryAudit.unbiased": [
+     "Admissible p w"
+    ],
+    "Descent.Portability.SparseBinaryAudit.variance_upper": [
+     "Admissible p w"
+    ],
+    "Descent.Portability.SparseBinaryAudit.variance_attained": [
+     "Admissible p w"
+    ],
     "Descent.Portability.VectorAuditConfidence.directional_error": [],
     "Descent.Portability.VectorAuditConfidence.vector_confidence": []
    }
@@ -259457,6 +260164,11 @@
   "mentioned_by": [
    "Descent.Foundations.HWEScoreModel.scoreMean_uniform",
    "Descent.Foundations.HWEScoreModel.scoreVariance_uniform",
+   "Descent.Portability.DisagreementAuditPayoff.envelope_values",
+   "Descent.Portability.DisagreementAuditPayoff.equal_expected_budgets",
+   "Descent.Portability.DisagreementAuditPayoff.prospective_bounds",
+   "Descent.Portability.DisagreementAuditPayoff.simultaneous_attainment",
+   "Descent.Portability.DisagreementAuditPayoff.uniform_admissible",
    "Descent.Portability.FourCycleIntegratedCorrelation.directed_integrated_correlation",
    "Descent.Portability.FourCycleIntegratedCorrelation.reversible_integrated_correlation",
    "Descent.Portability.FourCyclePrediction.directedLaw_stationary",
@@ -259488,6 +260200,11 @@
    "hypotheses_by_theorem": {
     "Descent.Foundations.HWEScoreModel.scoreMean_uniform": [],
     "Descent.Foundations.HWEScoreModel.scoreVariance_uniform": [],
+    "Descent.Portability.DisagreementAuditPayoff.uniform_admissible": [],
+    "Descent.Portability.DisagreementAuditPayoff.equal_expected_budgets": [],
+    "Descent.Portability.DisagreementAuditPayoff.envelope_values": [],
+    "Descent.Portability.DisagreementAuditPayoff.prospective_bounds": [],
+    "Descent.Portability.DisagreementAuditPayoff.simultaneous_attainment": [],
     "Descent.Portability.FourCycleIntegratedCorrelation.directed_integrated_correlation": [],
     "Descent.Portability.FourCycleIntegratedCorrelation.reversible_integrated_correlation": [],
     "Descent.Portability.FourCyclePrediction.directed_stationary": [],
@@ -260924,6 +261641,8 @@
    "Descent.Portability.CertifiedFrameRepair.false_certificate_probability",
    "Descent.Portability.ClippedFrameRepair.false_gain_probability",
    "Descent.Portability.DecisionDirectedAuditDesign.design_exists",
+   "Descent.Portability.DisagreementAuditPayoff.prospective_bounds",
+   "Descent.Portability.DisagreementAuditPayoff.simultaneous_attainment",
    "Descent.Portability.FiniteAuditConfidence.contrast_tail",
    "Descent.Portability.FiniteAuditConfidence.finite_library",
    "Descent.Portability.FiniteAuditConfidence.finite_library_exact_range",
@@ -260946,6 +261665,9 @@
    "Descent.Portability.SharedAuditCompletion.frame_variance_upper",
    "Descent.Portability.SharedAuditCompletion.minimax_frame_upper",
    "Descent.Portability.SharedAuditCompletion.simultaneous_attainment",
+   "Descent.Portability.SparseBinaryAudit.unbiased",
+   "Descent.Portability.SparseBinaryAudit.variance_attained",
+   "Descent.Portability.SparseBinaryAudit.variance_upper",
    "Descent.Portability.SpectralAuditConfidence.confidence",
    "Descent.Portability.VectorAuditConfidence.vector_confidence"
   ],
@@ -260956,8 +261678,10 @@
     "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i",
     "∀ i, lo i ≤ (∫ y, y ∂μ i",
     "∃ p, Feasible floor c B p",
+    "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (0 : ℝ",
     "∀ i, 0 ≤ p i ∧ p i ≤ 1",
     "∀ i, (∫ y, (y - q i",
+    "Admissible p w",
     "∀ a : E, ‖a‖ ≤ 1 → varianceBound L U p q lo hi (fun i ↦ inner ℝ a (u i"
    ],
    "hypotheses_by_theorem": {
@@ -260988,6 +261712,10 @@
     "Descent.Portability.DecisionDirectedAuditDesign.design_exists": [
      "∃ p, Feasible floor c B p"
     ],
+    "Descent.Portability.DisagreementAuditPayoff.prospective_bounds": [
+     "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (0 : ℝ"
+    ],
+    "Descent.Portability.DisagreementAuditPayoff.simultaneous_attainment": [],
     "Descent.Portability.FiniteAuditConfidence.contrast_tail": [
      "∀ i, 0 < p i ∧ p i ≤ 1",
      "∀ i, q i ∈ Set.Icc (L i",
@@ -261073,6 +261801,16 @@
      "∀ i, 0 < p i ∧ p i ≤ 1",
      "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i",
      "∀ i, lo i ≤ (∫ y, y ∂μ i"
+    ],
+    "Descent.Portability.SparseBinaryAudit.unbiased": [
+     "Admissible p w"
+    ],
+    "Descent.Portability.SparseBinaryAudit.variance_upper": [
+     "Admissible p w",
+     "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (0 : ℝ"
+    ],
+    "Descent.Portability.SparseBinaryAudit.variance_attained": [
+     "Admissible p w"
     ],
     "Descent.Portability.SpectralAuditConfidence.confidence": [
      "∀ i, 0 < p i ∧ p i ≤ 1",
@@ -265709,7 +266447,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "integral",
   "file": "Descent/Portability/SmoothedCoordinateLaws.lean",
-  "line": 66,
+  "line": 68,
   "short": "uniformMoment",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -265752,7 +266490,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name Set.indicator",
   "file": "Descent/Portability/SmoothedCoordinateLaws.lean",
-  "line": 133,
+  "line": 135,
   "short": "smoothDensity",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -265807,7 +266545,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name ENNReal.ofReal",
   "file": "Descent/Portability/SmoothedCoordinateLaws.lean",
-  "line": 215,
+  "line": 217,
   "short": "smoothedLaw",
   "ret_type": "MeasureTheory.Measure ℝ",
   "empirical_status": "",
@@ -268117,6 +268855,72 @@
      "0 < variance E m",
      "0 < eta",
      "eta ≤ 1"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.SparseBinaryAudit.Admissible": {
+  "class": "STRUCTURAL",
+  "note": "Prop-valued / set-valued",
+  "file": "Descent/Portability/SparseBinaryAudit.lean",
+  "line": 30,
+  "short": "Admissible",
+  "ret_type": "Prop",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Core.OperatingPoint.chance_admissible",
+   "Descent.Core.OperatingPoint.namedPoints_admissible",
+   "Descent.Core.OperatingPoint.negativePredictiveValue_mem_unit",
+   "Descent.Core.OperatingPoint.netBenefit_le_prevalence",
+   "Descent.Core.OperatingPoint.nriFromOperatingPoints_mem_Icc",
+   "Descent.Core.OperatingPoint.perfect_admissible",
+   "Descent.Core.OperatingPoint.positivePredictiveValue_mem_unit",
+   "Descent.Core.OperatingPoint.treatAll_admissible",
+   "Descent.Core.OperatingPoint.treatNone_admissible",
+   "Descent.Core.ScoreMoments.aucArgument_momentsUnderDrift_anti",
+   "Descent.Core.ScoreMoments.r2_mem_unit",
+   "Descent.Core.ScoreMoments.witness_admissible",
+   "Descent.Core.momentsUnderDrift_admissible",
+   "Descent.Portability.DisagreementAuditPayoff.targeted_admissible",
+   "Descent.Portability.DisagreementAuditPayoff.uniform_admissible",
+   "Descent.Portability.SparseBinaryAudit.unbiased",
+   "Descent.Portability.SparseBinaryAudit.variance_attained",
+   "Descent.Portability.SparseBinaryAudit.variance_upper"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "Admissible p w"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Core.OperatingPoint.namedPoints_admissible": [],
+    "Descent.Core.OperatingPoint.treatAll_admissible": [],
+    "Descent.Core.OperatingPoint.treatNone_admissible": [],
+    "Descent.Core.OperatingPoint.perfect_admissible": [],
+    "Descent.Core.OperatingPoint.chance_admissible": [],
+    "Descent.Core.OperatingPoint.positivePredictiveValue_mem_unit": [],
+    "Descent.Core.OperatingPoint.negativePredictiveValue_mem_unit": [],
+    "Descent.Core.OperatingPoint.netBenefit_le_prevalence": [],
+    "Descent.Core.OperatingPoint.nriFromOperatingPoints_mem_Icc": [],
+    "Descent.Core.momentsUnderDrift_admissible": [],
+    "Descent.Core.ScoreMoments.witness_admissible": [],
+    "Descent.Core.ScoreMoments.r2_mem_unit": [],
+    "Descent.Core.ScoreMoments.aucArgument_momentsUnderDrift_anti": [],
+    "Descent.Portability.DisagreementAuditPayoff.uniform_admissible": [],
+    "Descent.Portability.DisagreementAuditPayoff.targeted_admissible": [],
+    "Descent.Portability.SparseBinaryAudit.unbiased": [
+     "Admissible p w"
+    ],
+    "Descent.Portability.SparseBinaryAudit.variance_upper": [
+     "Admissible p w"
+    ],
+    "Descent.Portability.SparseBinaryAudit.variance_attained": [
+     "Admissible p w"
     ]
    }
   }

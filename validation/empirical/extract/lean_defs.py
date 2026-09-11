@@ -3653,6 +3653,10 @@ def phenotypeMean(f, p):
 def additiveEffect(f, p, hp, i):
     return _rt.rdiv(_rt._proj((Descent_Portability_DiploidEffectLaw_genotypeLaw(p, hp)), 'covariance')(((lambda g: (g(i)))), f), (_rt.mul(_rt.mul(2.0, p[int(i)]), (_rt.sub(1.0, p[int(i)])))))
 
+def weight(b, i):
+    ι = float(len(b))
+    return _rt.rdiv(b[int(i)], _rt.sumdim('ι', len(b)))
+
 def Trajectory(I):
     return lp(((lambda _, ℕ: EuclideanSpace(ℝ, I))), 2.0)
 
