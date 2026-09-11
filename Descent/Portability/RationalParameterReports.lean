@@ -909,9 +909,8 @@ theorem regularAt_selectionTree (pattern : Bool → SignType) (hpattern : patter
     rw [hpattern, sign_eq_one_iff] at h
     simpa only [selectionGuard, Bool.false_eq_true, if_false, map_sub, map_add, map_mul, map_one,
       MvPolynomial.eval_X] using h
-  have hden : MvPolynomial.eval θ
-      (MvPolynomial.X 0 * MvPolynomial.X 1 + 1 - MvPolynomial.X 0 : MvPolynomial (Fin 2) ℝ) ≠ 0 := by
-    simp only [map_sub, map_add, map_mul, map_one, MvPolynomial.eval_X]
+  have hden : MvPolynomial.eval θ (selectionQuotient true).denominator ≠ 0 := by
+    simp only [selectionQuotient, map_sub, map_add, map_mul, map_one, MvPolynomial.eval_X]
     exact htotal.ne'
   have hselection : ∀ selected,
       MvPolynomial.eval θ (selectionQuotient selected).denominator ≠ 0 := by
