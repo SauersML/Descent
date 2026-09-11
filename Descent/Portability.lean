@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.CylinderExponentialDraw
 import Descent.Portability.MeasureKernelRealization
 import Descent.Portability.PortabilityRemainsJoint
 import Descent.Portability.PartialHaplotypeLinearFlow
