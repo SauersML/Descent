@@ -1,0 +1,41 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.MultinomialMicroscopicApproximation
+
+/-! Axiom audit of MultinomialMicroscopicApproximation. -/
+
+open Descent.Portability.MultinomialMicroscopicApproximation
+
+namespace Descent.Portability.MultinomialMicroscopicApproximation
+
+#print axioms StepIndexedApproximation
+#print axioms StepIndexedApproximation.instFintypeBranch
+#print axioms StepIndexedApproximation.ofApproximation
+#print axioms trivialStepIndexedApproximation
+#print axioms pushforwardFeature
+#print axioms pushforwardFeature_mem_realizationBody
+#print axioms pushforwardFeature_sub_euler_le
+#print axioms exp_mulVec_mem_realizationBody_of_stepIndexed
+#print axioms reindexKernel
+#print axioms apply_reindexKernel
+#print axioms uniformSigmaMixture
+#print axioms apply_uniformSigmaMixture_expansion
+#print axioms multinomialStageBranch
+#print axioms multinomialStageBranchFintype
+#print axioms multinomialStageKernel
+#print axioms multinomialStageSlack
+#print axioms multinomialStageSlack_drift
+#print axioms multinomialStageSlack_nonneg
+#print axioms multinomialStageSlack_tendsto
+#print axioms apply_multinomialStageKernel_expansion
+#print axioms card_stage_real_pos
+#print axioms multinomialMicroscopicKernel
+#print axioms multinomialMicroscopicKernel_expansion
+#print axioms multinomialMicroscopicError
+#print axioms multinomialMicroscopicError_tendsto
+#print axioms multinomialMicroscopicApproximation
+#print axioms multinomialPropagator_mulVec_mem_realizationBody
+#print axioms multinomialEpoch_preserves_locusExchangeable_realization
+
+end Descent.Portability.MultinomialMicroscopicApproximation
