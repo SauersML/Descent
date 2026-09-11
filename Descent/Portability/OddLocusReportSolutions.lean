@@ -566,6 +566,242 @@ theorem driftStep_iterate_lump (c : ℕ) (lam tau : ℝ) (hlam : 0 ≤ lam) (g :
       exact ih j
     rw [hfun, driftStep_lump c lam tau hlam ((oddStepZ lam tau)^[m] g) k]
 
+/-! ## The lumping as a matrix intertwiner -/
+
+/-- The odd level of a count on the grid: `k ↦ (|2k − n| − 1)/2` for `n = 2c + 1`. -/
+def aggLevel (c : ℕ) (k : Fin (2 * c + 1 + 1)) : Fin (c + 1) :=
+  ⟨if (k : ℕ) ≤ c then c - (k : ℕ) else (k : ℕ) - c - 1, by
+    have := k.isLt
+    split <;> omega⟩
+
+/-- The level below the balance point. -/
+theorem aggLevel_of_le (c : ℕ) (k : Fin (2 * c + 1 + 1)) (h : (k : ℕ) ≤ c) :
+    ((aggLevel c k : Fin (c + 1)) : ℕ) = c - (k : ℕ) := by
+  simp [aggLevel, h]
+
+/-- The level above the balance point. -/
+theorem aggLevel_of_gt (c : ℕ) (k : Fin (2 * c + 1 + 1)) (h : ¬ ((k : ℕ) ≤ c)) :
+    ((aggLevel c k : Fin (c + 1)) : ℕ) = (k : ℕ) - c - 1 := by
+  simp [aggLevel, h]
+
+/-- Stepping the count up below the balance point steps the level down. -/
+theorem aggLevel_gridSucc (c : ℕ) (k : Fin (2 * c + 1 + 1)) (h : (k : ℕ) ≤ c) :
+    aggLevel c (ContinuousTurnoverSemigroup.gridSucc (2 * c + 1) k)
+      = ContinuousTurnoverSemigroup.gridPred c (aggLevel c k) := by
+  apply Fin.ext
+  have hk := k.isLt
+  simp only [aggLevel, ContinuousTurnoverSemigroup.gridSucc,
+    ContinuousTurnoverSemigroup.gridPred]
+  split_ifs <;> omega
+
+/-- Stepping the count down above the balance point steps the level down. -/
+theorem aggLevel_gridPred (c : ℕ) (k : Fin (2 * c + 1 + 1)) (h : ¬ ((k : ℕ) ≤ c)) :
+    aggLevel c (ContinuousTurnoverSemigroup.gridPred (2 * c + 1) k)
+      = ContinuousTurnoverSemigroup.gridPred c (aggLevel c k) := by
+  apply Fin.ext
+  have hk := k.isLt
+  simp only [aggLevel, ContinuousTurnoverSemigroup.gridPred]
+  split_ifs <;> omega
+
+/-- The pullback matrix of the lumping: row `k` selects the level of `k`. -/
+def pullbackMatrix (c : ℕ) : Matrix (Fin (2 * c + 1 + 1)) (Fin (c + 1)) ℝ :=
+  Matrix.of fun k j ↦ if aggLevel c k = j then (1 : ℝ) else 0
+
+/-- The pullback matrix reads a level report at the level of the count. -/
+theorem pullbackMatrix_mulVec (c : ℕ) (v : Fin (c + 1) → ℝ) (k : Fin (2 * c + 1 + 1)) :
+    (pullbackMatrix c).mulVec v k = v (aggLevel c k) := by
+  simp only [Matrix.mulVec, dotProduct, pullbackMatrix, Matrix.of_apply, ite_mul, one_mul,
+    zero_mul]
+  rw [Finset.sum_ite_eq Finset.univ (aggLevel c k) v, if_pos (Finset.mem_univ _)]
+
+/-- The nearest-drift matrix in grid form, with the clamped neighbours made explicit. -/
+theorem nearestDriftMatrix_mulVec_grid (n : ℕ) (α β : ℝ) (v : Fin (n + 1) → ℝ)
+    (k : Fin (n + 1)) :
+    (ContinuousTurnoverSemigroup.nearestDriftMatrix n α β).mulVec v k
+      = ConvexOrderCoupling.upRate n α β ((k : ℕ) : ℤ)
+          * (v (ContinuousTurnoverSemigroup.gridSucc n k) - v k)
+        + ConvexOrderCoupling.downRate n α β ((k : ℕ) : ℤ)
+          * (v (ContinuousTurnoverSemigroup.gridPred n k) - v k) := by
+  rw [ContinuousTurnoverSemigroup.nearestDriftMatrix_mulVec,
+    ConvexOrderCoupling.nearestDriftGen, ContinuousTurnoverSemigroup.gridEmbed_succ,
+    ContinuousTurnoverSemigroup.gridEmbed_pred, ContinuousTurnoverSemigroup.gridEmbed_coe]
+
+/-- The count drift at symmetric rates, on the grid. -/
+theorem countDrift_grid (c : ℕ) (lam : ℝ) (k : Fin (2 * c + 1 + 1)) :
+    ConvexOrderCoupling.countDrift (2 * c + 1) lam lam ((k : ℕ) : ℤ)
+      = lam * ((2 * (c : ℝ) + 1) - 2 * ((k : ℕ) : ℝ)) := by
+  rw [ConvexOrderCoupling.countDrift]
+  push_cast
+  ring
+
+/-- Below the balance point the whole drift is upward, at the level's own rate. -/
+theorem upRate_grid_le (c : ℕ) (lam : ℝ) (hlam : 0 ≤ lam) (k : Fin (2 * c + 1 + 1))
+    (h : (k : ℕ) ≤ c) :
+    ConvexOrderCoupling.upRate (2 * c + 1) lam lam ((k : ℕ) : ℤ)
+      = lam * (2 * (((aggLevel c k : Fin (c + 1)) : ℕ) : ℝ) + 1) := by
+  have hcast : (((c - (k : ℕ) : ℕ)) : ℝ) = (c : ℝ) - ((k : ℕ) : ℝ) := by
+    exact Nat.cast_sub h
+  have hval : lam * ((2 * (c : ℝ) + 1) - 2 * ((k : ℕ) : ℝ))
+      = lam * (2 * (((aggLevel c k : Fin (c + 1)) : ℕ) : ℝ) + 1) := by
+    rw [aggLevel_of_le c k h, hcast]
+    ring
+  have hnn : 0 ≤ lam * ((2 * (c : ℝ) + 1) - 2 * ((k : ℕ) : ℝ)) := by
+    have : ((k : ℕ) : ℝ) ≤ (c : ℝ) := by exact_mod_cast h
+    nlinarith
+  rw [ConvexOrderCoupling.upRate, countDrift_grid, max_eq_left hnn, hval]
+
+/-- Below the balance point there is no downward rate. -/
+theorem downRate_grid_le (c : ℕ) (lam : ℝ) (hlam : 0 ≤ lam) (k : Fin (2 * c + 1 + 1))
+    (h : (k : ℕ) ≤ c) :
+    ConvexOrderCoupling.downRate (2 * c + 1) lam lam ((k : ℕ) : ℤ) = 0 := by
+  have hnn : 0 ≤ lam * ((2 * (c : ℝ) + 1) - 2 * ((k : ℕ) : ℝ)) := by
+    have : ((k : ℕ) : ℝ) ≤ (c : ℝ) := by exact_mod_cast h
+    nlinarith
+  rw [ConvexOrderCoupling.downRate, countDrift_grid, max_eq_right (by linarith)]
+
+/-- Above the balance point the whole drift is downward, at the level's own rate. -/
+theorem downRate_grid_gt (c : ℕ) (lam : ℝ) (hlam : 0 ≤ lam) (k : Fin (2 * c + 1 + 1))
+    (h : ¬ ((k : ℕ) ≤ c)) :
+    ConvexOrderCoupling.downRate (2 * c + 1) lam lam ((k : ℕ) : ℤ)
+      = lam * (2 * (((aggLevel c k : Fin (c + 1)) : ℕ) : ℝ) + 1) := by
+  have hle : c + 1 ≤ (k : ℕ) := by omega
+  have hcast : ((((k : ℕ) - c - 1 : ℕ)) : ℝ) = ((k : ℕ) : ℝ) - (c : ℝ) - 1 := by
+    have h1 : (((k : ℕ) - c - 1 : ℕ) : ℝ) = (((k : ℕ) - c : ℕ) : ℝ) - 1 := by
+      have : 1 ≤ (k : ℕ) - c := by omega
+      exact Nat.cast_sub this
+    have h2 : ((((k : ℕ) - c : ℕ)) : ℝ) = ((k : ℕ) : ℝ) - (c : ℝ) := by
+      exact Nat.cast_sub (by omega : c ≤ (k : ℕ))
+    rw [h1, h2]
+  have hval : -(lam * ((2 * (c : ℝ) + 1) - 2 * ((k : ℕ) : ℝ)))
+      = lam * (2 * (((aggLevel c k : Fin (c + 1)) : ℕ) : ℝ) + 1) := by
+    rw [aggLevel_of_gt c k h, hcast]
+    ring
+  have hnn : 0 ≤ -(lam * ((2 * (c : ℝ) + 1) - 2 * ((k : ℕ) : ℝ))) := by
+    have : (c : ℝ) + 1 ≤ ((k : ℕ) : ℝ) := by exact_mod_cast hle
+    nlinarith
+  rw [ConvexOrderCoupling.downRate, countDrift_grid, max_eq_left hnn, hval]
+
+/-- Above the balance point there is no upward rate. -/
+theorem upRate_grid_gt (c : ℕ) (lam : ℝ) (hlam : 0 ≤ lam) (k : Fin (2 * c + 1 + 1))
+    (h : ¬ ((k : ℕ) ≤ c)) :
+    ConvexOrderCoupling.upRate (2 * c + 1) lam lam ((k : ℕ) : ℤ) = 0 := by
+  have hle : c + 1 ≤ (k : ℕ) := by omega
+  have hnn : 0 ≤ -(lam * ((2 * (c : ℝ) + 1) - 2 * ((k : ℕ) : ℝ))) := by
+    have : (c : ℝ) + 1 ≤ ((k : ℕ) : ℝ) := by exact_mod_cast hle
+    nlinarith
+  rw [ConvexOrderCoupling.upRate, countDrift_grid, max_eq_right (by linarith)]
+
+/-- **The lumping as an intertwining, in acting form.** -/
+theorem nearestDrift_lump_mulVec (c : ℕ) (lam : ℝ) (hlam : 0 ≤ lam) (v : Fin (c + 1) → ℝ)
+    (k : Fin (2 * c + 1 + 1)) :
+    (ContinuousTurnoverSemigroup.nearestDriftMatrix (2 * c + 1) lam lam).mulVec
+        ((pullbackMatrix c).mulVec v) k
+      = (pullbackMatrix c).mulVec ((oddLevelMatrix c lam).mulVec v) k := by
+  rw [nearestDriftMatrix_mulVec_grid]
+  simp only [pullbackMatrix_mulVec]
+  rw [oddLevelMatrix_mulVec]
+  by_cases h : (k : ℕ) ≤ c
+  · rw [upRate_grid_le c lam hlam k h, downRate_grid_le c lam hlam k h,
+      aggLevel_gridSucc c k h]
+    ring
+  · rw [upRate_grid_gt c lam hlam k h, downRate_grid_gt c lam hlam k h,
+      aggLevel_gridPred c k h]
+    ring
+
+/-- **The lumping as a matrix intertwiner.** -/
+theorem nearestDrift_pullback_intertwine (c : ℕ) (lam : ℝ) (hlam : 0 ≤ lam) :
+    ContinuousTurnoverSemigroup.nearestDriftMatrix (2 * c + 1) lam lam * pullbackMatrix c
+      = pullbackMatrix c * oddLevelMatrix c lam := by
+  ext k j
+  have hL : ((ContinuousTurnoverSemigroup.nearestDriftMatrix (2 * c + 1) lam lam
+      * pullbackMatrix c).mulVec (Pi.single j 1)) k
+      = (ContinuousTurnoverSemigroup.nearestDriftMatrix (2 * c + 1) lam lam).mulVec
+          ((pullbackMatrix c).mulVec (Pi.single j 1)) k := by
+    rw [Matrix.mulVec_mulVec]
+  have hR : ((pullbackMatrix c * oddLevelMatrix c lam).mulVec (Pi.single j 1)) k
+      = (pullbackMatrix c).mulVec ((oddLevelMatrix c lam).mulVec (Pi.single j 1)) k := by
+    rw [Matrix.mulVec_mulVec]
+  have hmain := nearestDrift_lump_mulVec c lam hlam (Pi.single j 1) k
+  rw [← hL, ← hR] at hmain
+  rw [Matrix.mulVec_single_one, Matrix.mulVec_single_one] at hmain
+  simpa [Matrix.transpose_apply] using hmain
+
+/-! ## The transfer to the semigroups -/
+
+/-- An intertwining survives powers. -/
+theorem pow_intertwine {N P : ℕ} (A : Matrix (Fin N) (Fin N) ℝ) (B : Matrix (Fin P) (Fin P) ℝ)
+    (Q : Matrix (Fin N) (Fin P) ℝ) (h : A * Q = Q * B) (r : ℕ) : A ^ r * Q = Q * B ^ r := by
+  induction r with
+  | zero => simp
+  | succ r ih =>
+    rw [pow_succ, pow_succ, Matrix.mul_assoc, h, ← Matrix.mul_assoc, ih, Matrix.mul_assoc]
+
+/-- An intertwining survives the Euler approximants. -/
+theorem euler_intertwine {N P : ℕ} (A : Matrix (Fin N) (Fin N) ℝ)
+    (B : Matrix (Fin P) (Fin P) ℝ) (Q : Matrix (Fin N) (Fin P) ℝ) (h : A * Q = Q * B)
+    (tau : ℝ) (r : ℕ) : (1 + tau • A) ^ r * Q = Q * (1 + tau • B) ^ r := by
+  refine pow_intertwine _ _ _ ?_ r
+  rw [Matrix.add_mul, Matrix.mul_add, Matrix.one_mul, Matrix.mul_one, Matrix.smul_mul,
+    Matrix.mul_smul, h]
+
+/-- Multiplying on the right by a fixed matrix and reading one entry is linear. -/
+def mulRightEntry {N P : ℕ} (Q : Matrix (Fin N) (Fin P) ℝ) (k : Fin N) (j : Fin P) :
+    Matrix (Fin N) (Fin N) ℝ →ₗ[ℝ] ℝ where
+  toFun M := (M * Q) k j
+  map_add' M M' := by simp [Matrix.add_mul]
+  map_smul' a M := by simp [Matrix.smul_mul]
+
+/-- Multiplying on the left by a fixed matrix and reading one entry is linear. -/
+def mulLeftEntry {N P : ℕ} (Q : Matrix (Fin N) (Fin P) ℝ) (k : Fin N) (j : Fin P) :
+    Matrix (Fin P) (Fin P) ℝ →ₗ[ℝ] ℝ where
+  toFun M := (Q * M) k j
+  map_add' M M' := by simp [Matrix.mul_add]
+  map_smul' a M := by simp [Matrix.mul_smul]
+
+/-- **An intertwining passes to the semigroups**, through the same Euler limit that
+`Descent.Portability.ContinuousTurnoverSemigroup` uses to build its exponential. -/
+theorem exp_intertwine {N P : ℕ} (A : Matrix (Fin N) (Fin N) ℝ) (B : Matrix (Fin P) (Fin P) ℝ)
+    (Q : Matrix (Fin N) (Fin P) ℝ) (h : A * Q = Q * B) :
+    NormedSpace.exp ℝ A * Q = Q * NormedSpace.exp ℝ B := by
+  ext k j
+  have hcL : Continuous (mulRightEntry Q k j) :=
+    (mulRightEntry Q k j).continuous_of_finiteDimensional
+  have hcR : Continuous (mulLeftEntry Q k j) :=
+    (mulLeftEntry Q k j).continuous_of_finiteDimensional
+  have hA := (hcL.tendsto (NormedSpace.exp ℝ A)).comp
+    (BanachEulerExponential.euler_tends_exp A)
+  have hB := (hcR.tendsto (NormedSpace.exp ℝ B)).comp
+    (BanachEulerExponential.euler_tends_exp B)
+  have heq : ∀ r : ℕ, (mulRightEntry Q k j) ((1 + (r : ℝ)⁻¹ • A) ^ r)
+      = (mulLeftEntry Q k j) ((1 + (r : ℝ)⁻¹ • B) ^ r) := by
+    intro r
+    show ((1 + (r : ℝ)⁻¹ • A) ^ r * Q) k j = (Q * (1 + (r : ℝ)⁻¹ • B) ^ r) k j
+    rw [euler_intertwine A B Q h ((r : ℝ)⁻¹) r]
+  exact tendsto_nhds_unique (Filter.Tendsto.congr heq hA) hB
+
+/-- **DC Corollary 4.3 for the minimising count chain, in continuous time.**  Running the
+nearest-drift count semigroup at symmetric rates on the squared aggregate report `(2k − n)²`
+produces exactly `a_n(t)` at the aggregate's own level.  The chain is: the lumping intertwines
+the two generators, the intertwining passes to the semigroups through the Euler limit, and
+`exp_oddLevelMatrix_square_report` evaluates the odd-level side. -/
+theorem exp_nearestDrift_square_report (c : ℕ) (lam t : ℝ) (hlam : 0 ≤ lam)
+    (k : Fin (2 * c + 1 + 1)) :
+    (NormedSpace.exp ℝ
+        (t • ContinuousTurnoverSemigroup.nearestDriftMatrix (2 * c + 1) lam lam)).mulVec
+        (fun k' ↦ (2 * (((aggLevel c k' : Fin (c + 1)) : ℕ) : ℝ) + 1) ^ 2) k
+      = oddSolution lam ((aggLevel c k : Fin (c + 1)) : ℕ) t := by
+  have hint : (t • ContinuousTurnoverSemigroup.nearestDriftMatrix (2 * c + 1) lam lam)
+      * pullbackMatrix c = pullbackMatrix c * (t • oddLevelMatrix c lam) := by
+    rw [Matrix.smul_mul, Matrix.mul_smul, nearestDrift_pullback_intertwine c lam hlam]
+  have hexp := exp_intertwine _ _ _ hint
+  have hpull : (fun k' : Fin (2 * c + 1 + 1) ↦
+      (2 * (((aggLevel c k' : Fin (c + 1)) : ℕ) : ℝ) + 1) ^ 2)
+      = (pullbackMatrix c).mulVec (fun r : Fin (c + 1) ↦ (2 * ((r : ℕ) : ℝ) + 1) ^ 2) := by
+    funext k'
+    rw [pullbackMatrix_mulVec]
+  rw [hpull, Matrix.mulVec_mulVec, hexp, ← Matrix.mulVec_mulVec, pullbackMatrix_mulVec,
+    exp_oddLevelMatrix_square_report]
+
 end
 
 end Descent.Portability.OddLocusReportSolutions
