@@ -295,6 +295,35 @@ import Descent.Portability.SymmetricImageLaw
 import Descent.Portability.HWETiltedKernelLaw
 import Descent.Portability.HWECriticalLimitLaw
 import Descent.Portability.HWENearBalancedTheorem
+import Descent.Portability.HWEJumpRepresentation
+import Descent.Portability.AncientPrediction.Certificate
+import Descent.Portability.AncientPrediction.Correction
+import Descent.Portability.AncientPrediction.Identification
+import Descent.Portability.AncientPrediction.Information
+import Descent.Portability.AncientPrediction.Mixture
+import Descent.Portability.AncientPrediction.Risk
+import Descent.Portability.AncientPrediction.Sampling
+import Descent.Portability.ArchaicPrediction.Contrast
+import Descent.Portability.ArchaicPrediction.ContrastWalk
+import Descent.Portability.ArchaicPrediction.Cube
+import Descent.Portability.ArchaicPrediction.CycleResidual
+import Descent.Portability.ArchaicPrediction.Debt
+import Descent.Portability.ArchaicPrediction.Dimension
+import Descent.Portability.ArchaicPrediction.DosageLoss
+import Descent.Portability.ArchaicPrediction.Factorial
+import Descent.Portability.ArchaicPrediction.IdentifiedRisk
+import Descent.Portability.ArchaicPrediction.LDExport
+import Descent.Portability.ArchaicPrediction.Logistic
+import Descent.Portability.ArchaicPrediction.Moments
+import Descent.Portability.ArchaicPrediction.Pairing
+import Descent.Portability.ArchaicPrediction.PairingPrecision
+import Descent.Portability.ArchaicPrediction.Phase
+import Descent.Portability.ArchaicPrediction.PhaseRisk
+import Descent.Portability.ArchaicPrediction.ResponseGraph
+import Descent.Portability.ArchaicPrediction.ResponsePanels
+import Descent.Portability.ArchaicPrediction.Survival
+import Descent.Portability.ArchaicPrediction.TranslationAlgebra
+import Descent.Portability.ArchaicPrediction.Transport
 assert_below Descent.Program
 
 /-!
