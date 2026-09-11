@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.PiecewiseConstantBodyPreservation
 import Descent.Portability.StationaryRealization
 import Descent.Portability.AttainableChronologyCurve
 import Descent.Portability.ArchitectureEnvironmentRegion
