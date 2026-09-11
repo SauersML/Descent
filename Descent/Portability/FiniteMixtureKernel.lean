@@ -82,6 +82,12 @@ def featureVector {Ω X ι : Type*} [Fintype Ω] (p : Ω → ℝ) (point : Ω �
     (φ : X → ι → ℝ) : ι → ℝ :=
   ∑ ω, p ω • φ (point ω)
 
+/-- Each coordinate of the feature vector is the law's average of that coordinate. -/
+theorem featureVector_apply {Ω X ι : Type*} [Fintype Ω] (p : Ω → ℝ) (point : Ω → X)
+    (φ : X → ι → ℝ) (i : ι) :
+    featureVector p point φ i = ∑ ω, p ω * φ (point ω) i := by
+  simp [featureVector, Finset.sum_apply]
+
 /-- The feature vector of a finitely supported probability law lies in the realization body
 `conv (range φ)` of NOTE1 (2). This is the easy inclusion; no topology is used. -/
 theorem featureVector_mem_convexHull {Ω X ι : Type*} [Fintype Ω] (p : Ω → ℝ)
