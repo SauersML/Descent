@@ -915,7 +915,15 @@ theorem attainableRegion_architectureTree_eq_jointRegion {J : Type} [Fintype J]
         (fun j ↦ ParametricTree.accumulation guard architectureTree (cornerAccumulator (den j)))
         (fun j ↦ ParametricTree.accumulation guard architectureTree (cornerAccumulator (num j))) =
       ArchitectureEnvironmentRegion.jointRegion num den := by
-  rw [attainableRegion_eq_image, ArchitectureEnvironmentRegion.jointRegion_eq_image num den hden]
+  have hmap : attainableReportMap
+      (fun j ↦ ParametricTree.accumulation guard architectureTree (cornerAccumulator (den j)))
+      (fun j ↦ ParametricTree.accumulation guard architectureTree (cornerAccumulator (num j))) =
+        fun θ j ↦
+          ParametricTree.accumulation guard architectureTree (cornerAccumulator (num j)) θ /
+            ParametricTree.accumulation guard architectureTree (cornerAccumulator (den j)) θ :=
+    rfl
+  rw [attainableRegion_eq_image, hmap,
+    ArchitectureEnvironmentRegion.jointRegion_eq_image num den hden]
   simp only [accumulation_architectureTree]
   ext report
   constructor
