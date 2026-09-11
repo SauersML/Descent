@@ -94,6 +94,11 @@ import Descent.Portability.ReplicaMetricInstances
 import Descent.Portability.ContinuousExampleCertificate
 import Descent.Portability.ReferenceLogLossCertificate
 import Descent.Portability.UniformPenetranceCertificate
+import Descent.Portability.PartialHaplotypePanelLikelihood
+import Descent.Portability.PartialHaplotypePulseKernel
+import Descent.Portability.ConvergentEventProduct
+import Descent.Portability.PortabilityMeasureQueries
+import Descent.Portability.ReferenceExperimentTable
 
 namespace Descent.Program
 
@@ -149,14 +154,18 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
   Lipschitz in the rates and the propagator the unique continuous solution of the integral
   equation: `RateGeneratorLipschitz`, `IntegrableGeneratorPropagator`,
   `IntegrableRateRealization`; the almost-everywhere derivative `U' = A(t) U` and absolute
-  continuity of that propagator: `IntegralEquationDerivative`.
+  continuity of that propagator: `IntegralEquationDerivative`; realizability at the limit of a
+  convergent event product, the note's countable accumulation of events, with the convergence
+  as a hypothesis: `ConvergentEventProduct`.
 * §3 Theorem 3 and equations (14)-(16): `StationaryRealization`,
   `StationaryHaplotypeRealization`, `AncestralHaplotypeRealization`.
 * §4.1 per-locus material grading and the loose configuration bound `C(K+B,B)`:
   `PartialHaplotypeCarrier`. §4.2 equation (19) in transition-rate form, with nonnegative rates
   and every transition preserving the budget (18): `PartialHaplotypeDualGenerator`; equation
   (20), the expected moment vector as the matrix exponential of the dual generator:
-  `PartialHaplotypeDualSemigroup`. §4.2 and §5.1
+  `PartialHaplotypeDualSemigroup`; sampled-panel likelihoods at the seed configurations:
+  `PartialHaplotypePanelLikelihood`; the finite substitution kernels of splits and admixture
+  pulses: `PartialHaplotypePulseKernel`. §4.2 and §5.1
   substochastic semigroups and uniformization: `SubstochasticGeneratorSemigroup`,
   `PoissonTruncationCertificate`. §4.2a, the extension of a positive constant-preserving
   semigroup from polynomials and its representation by Markov kernels obeying
@@ -219,7 +228,8 @@ from a deme count.
   replica ratios: `ReplicaMetricInstances`. §6.1 equations (24)-(26):
   `JointRatioFailureMasks`; joint moments determining the joint and masked metric laws:
   `JointMetricMomentDeterminacy`. §6.2:
-  `PortabilityRatioQueries`. §6.3 example: `UnboundedSlopeExample`. §6.4 equation (30):
+  `PortabilityRatioQueries`, and under an arbitrary probability measure:
+  `PortabilityMeasureQueries`. §6.3 example: `UnboundedSlopeExample`. §6.4 equation (30):
   `LogLossSeriesCertificate`.
 * §7.1 equation (31): `EmpiricalLawLipschitzBound`; the modulus-of-continuity extension to every
   continuous functional: `EmpiricalLawContinuityBound`. §7.2, interval evaluators without nesting
@@ -233,10 +243,11 @@ from a deme count.
   the conditional-mean image of a convex set of completions need not be convex:
   `FrontierCompletionRegion.exists_convex_not_convex_conditionalMeans`.
 * §9, the executed reference experiment: the model in corpus vocabulary, its exact source-side
-  report law matching the attached results, the 220 architecture, environment and census states
-  of both histories, and the early-migration target squared-correlation definedness probability:
-  `ReferenceExperimentLaw`; eighty-term log-loss certificates for any rational law of the
-  experiment's observations: `ReferenceLogLossCertificate`.
+  report law matching the attached results, and the 220 architecture, environment and census
+  states of both histories: `ReferenceExperimentLaw`; every row of the section 9 table for both
+  migration histories, as exact rationals: `ReferenceExperimentTable`; eighty-term log-loss
+  certificates for any rational law of the experiment's observations:
+  `ReferenceLogLossCertificate`.
 * §9.1, the uniform penetrance architecture: `UniformPenetranceArchitecture`; its eighty-term
   replica certificate, of width below `10^-24`: `ContinuousExampleCertificate`; executed
   Theorem 5 on it, with cylinder certificates converging to the squared-correlation and AUC
@@ -249,9 +260,8 @@ real quantifier elimination, which the note uses to eliminate parameters from (8
 available at this pin. The mixing
 law of (31) ranges over finitely many contexts, and its Lipschitz class is taken on all of the
 coordinate space. Equations (20), (28) and (29) take the pointwise bounds `0 ≤ D ≤ 1`, as the corpus
-certificates do. Theorem 1 makes no complexity claim and covers no infinite branch set. The
-only §9 table row proved so far is the early target squared-correlation definedness; the other
-rows, the late migration rows, the 3960 count and the range table are not formalized yet.
+certificates do. Theorem 1 makes no complexity claim and covers no infinite branch set. Of §9,
+the 3960 shared-context count and the full-square range table are not formalized yet.
 `IntervalEvaluatorCertificate` assumes a
 finite measure, a common bound and pointwise vanishing widths;
 `CylinderIntervalCertificate` needs only almost sure vanishing widths on fair-bit streams but
