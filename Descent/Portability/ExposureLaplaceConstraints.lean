@@ -196,9 +196,10 @@ theorem expectation_endpointExposure (bound mean : ℝ) (hlow : 0 ≤ mean)
     (hhigh : mean ≤ bound) (hbound : 0 < bound) :
     (endpointMixture bound mean hlow hhigh hbound).expectation (endpointExposure bound) =
       mean := by
+  have hne : bound ≠ 0 := ne_of_gt hbound
   unfold FiniteReportLaw.expectation endpointMixture endpointExposure
   rw [Fin.sum_univ_two]
-  field_simp
+  field_simp [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
 
 /-- The chord bound is sharp: the endpoint law attains it with equality. -/
 theorem exposureLaplace_endpointMixture (bound mean lam : ℝ) (hlow : 0 ≤ mean)
@@ -296,14 +297,20 @@ theorem exposureLaplace_joint_add {n : ℕ} (law : FiniteReportLaw (Fin n))
     (law.joint fun _ ↦ law).expectation
         (fun pair ↦ Real.exp (-(lam * (exposure pair.1 + exposure pair.2)))) =
       exposureLaplace law exposure lam ^ 2 := by
+  have hterm : ∀ first second : Fin n,
+      Real.exp (-(lam * (exposure first + exposure second))) =
+        Real.exp (-(lam * exposure first)) * Real.exp (-(lam * exposure second)) := by
+    intro first second
+    rw [← Real.exp_add]
+    congr 1
+    ring
   rw [FiniteReportLaw.expectation_joint]
-  unfold exposureLaplace FiniteReportLaw.expectation
+  simp only [exposureLaplace, FiniteReportLaw.expectation]
   rw [pow_two, Finset.sum_mul]
   refine Finset.sum_congr rfl fun first _ ↦ ?_
   rw [Finset.mul_sum, Finset.mul_sum]
   refine Finset.sum_congr rfl fun second _ ↦ ?_
-  rw [show -(lam * (exposure first + exposure second)) =
-    -(lam * exposure first) + -(lam * exposure second) from by ring, Real.exp_add]
+  rw [hterm first second]
   ring
 
 /-- The half-and-half mixture of the point mass at exposure zero with a finite exposure law,
@@ -358,7 +365,7 @@ theorem exposureLaplace_zeroMixture {n : ℕ} (law : FiniteReportLaw (Fin n))
         law.mass component * Real.exp (-(lam * exposure component)) / 2 := by
     intro component
     ring
-  unfold FiniteReportLaw.expectation exposureLaplace
+  simp only [exposureLaplace, FiniteReportLaw.expectation]
   rw [Fintype.sum_option]
   simp only [zeroMixture_mass_none, zeroMixture_mass_some, zeroMixtureExposure_none,
     zeroMixtureExposure_some, mul_zero, neg_zero, Real.exp_zero, mul_one]
