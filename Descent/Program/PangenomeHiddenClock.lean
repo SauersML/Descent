@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.GraphCoalescent.MinimalRefinement
+import Descent.Pangenome.GraphCoalescent.MultiInterfaceClosure
 
 namespace Descent.Program
 
@@ -34,15 +35,21 @@ inside it.
   determine the unordered pair of loads and not its order: `twoComponentGenerator_one`,
   `twoComponentGenerator_twice_one`, `survivalDerivatives_eq_iff`. Sufficiency at two components:
   `twoComponentGenerator_swap`. Minimality: `refines_loads`, `refines_unorderedPair`.
+* §10, several interfaces sharing one genealogy: `MultiInterfaceClosure`. The common refinement
+  of the reports determines every report (`observed_commonRefinement`), and two labeled
+  configurations with the same hidden load in every cell of the common refinement offer equally
+  many mergers into every lumped target: `card_mergers_eq_of_cellLoad_eq`, and with the corpus
+  setoids `card_blockMergers_eq`.
 
 Scope. Theorem B is proved as the algebra of the visible rates and of the survival derivatives
 through the killed generator. The step from a strong lumping for every initial labeled state to
 these rates, which is Rosenblatt's criterion applied to the chain of Theorem A, and the survival
-function as a semigroup are not formalized. Theorem A (the load closure (A1)-(A4)), Theorem C
-(conservation (C1), the domination (C2), the Dynkin identity (C3), the bounds (C4) and the
-monotonicity (C5)), Theorem D (the Lah weights (D1), the connectivity cumulant (D2)-(D3), the
+function as a semigroup are not formalized. In §10 the dependence of a merger's outcome on the two
+merging cells alone is a hypothesis on the outcome map. Theorem A (the load closure (A1)-(A4)),
+Theorem C (conservation (C1), the domination (C2), the Dynkin identity (C3), the bounds (C4) and
+the monotonicity (C5)), Theorem D (the Lah weights (D1), the connectivity cumulant (D2)-(D3), the
 stopping law (D4)-(D9) and the exact table), Theorem E, Theorem F, the filter of §9 and the
-extensions of §10 are not yet proof-checked.
+Λ-coalescent extension of §10 are not yet proof-checked.
 -/
 
 end Descent.Program

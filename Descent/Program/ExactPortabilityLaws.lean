@@ -193,8 +193,8 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
 * §5 equations (24)-(25): `SublawReportCertificate`.
 * §6 equations (27)-(36), chronology to metrics: `AdmixtureChronologyLaw`,
   with (27) in integral form for locally integrable rates and unique among continuous solutions:
-  `ChronologyIntegralEquation`; `ChronologyReportLaw`, `AttainableChronologyCurve`, `ExposureLaplaceConstraints`,
-  `FinitePulseExposure`.
+  `ChronologyIntegralEquation`; `ChronologyReportLaw`, `AttainableChronologyCurve`,
+  `ExposureLaplaceConstraints`, `FinitePulseExposure`.
 * §7 equations (37)-(42), finite cohorts: `FourCellCohortLaw`,
   `EmpiricalCorrelationDefinedness`, `SmallCohortCorrelation`, `SmallCohortConditionalMeans`,
   `EmpiricalAUCUnbiasedness`, with (42) and the finite-cohort intercept, accuracy and Brier laws
