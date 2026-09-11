@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.AdmixtureChronologyLaw
 import Descent.Portability.ExposureLaplaceConstraints
 import Mathlib.MeasureTheory.Integral.Bochner.ContinuousLinearMap
+import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 
 assert_below Descent.Decision Descent.Program
 
@@ -54,6 +55,18 @@ the donor increment it produces and a recombination block damps it, so the linka
 that one class of histories the attainable couplings at fixed totals are therefore exactly
 `[e^{-R}, 1]` (`attainable_coupling_range_events`), and the attainable metric vectors are exactly
 the image of that interval under the table map (`attainable_metric_curve_events`).
+
+Attainment is also proved within the continuous chronologies themselves, so the exact curve holds
+in that class too. `unitPulse` is the continuous shape `6 s (1 - s)` on `[0, 1]`, zero elsewhere,
+with unit mass. The smoothed three-block history spends exposure `R - b` in a pulse on `[0, 1]`,
+the whole migration total in a pulse on `[1, 2]` and the exposure `b` in a pulse on `[2, 3]`.
+Every arrival then meets exactly `b`, so the coupling at time `3` is `e^{-b}`
+(`normalisedCoupling_pulseHistory`), and a change of calendar speed moves the horizon to any
+`T > 0` (`exists_continuous_chronology_at_horizon`). With the continuous bounds, the couplings at
+horizon `T` of the chronologies with continuous nonnegative rates and totals `M` and `R` are
+exactly `[e^{-R}, 1]` (`attainable_coupling_range_continuous`). Their report metrics, read off
+`chronologyReportLaw`, are exactly the image of that interval under the table map at donor
+fraction `1 - e^{-M}` (`attainable_metric_curve_continuous`).
 
 Not proved here: that every chronology with the given totals is equivalent to a three-block
 one. The exact-curve theorem needs only that both halves hold for the ordered chronologies.
@@ -590,6 +603,265 @@ theorem chronologyExposureLaw_ae_mem_Icc (m r : ℝ → ℝ) (hr : Continuous r)
     exact intervalIntegral.integral_nonneg hs.2 fun u _ ↦ hrnonneg u
   · show cumulativeRate r T - cumulativeRate r s ≤ cumulativeRate r T
     linarith [cumulativeRate_nonneg r hrnonneg s hs.1.le]
+
+/-- A continuous pulse shape carried by the unit interval: `6 s (1 - s)` on `[0, 1]` and zero
+outside it, so that its mass is one. -/
+def unitPulse (s : ℝ) : ℝ := 6 * max 0 (s * (1 - s))
+
+/-- The pulse shape is continuous. -/
+theorem continuous_unitPulse : Continuous unitPulse :=
+  continuous_const.mul
+    (continuous_const.max (continuous_id.mul (continuous_const.sub continuous_id)))
+
+/-- The pulse shape is nonnegative. -/
+theorem unitPulse_nonneg (s : ℝ) : 0 ≤ unitPulse s :=
+  mul_nonneg (by norm_num) (le_max_left _ _)
+
+/-- The pulse shape vanishes off the open unit interval. -/
+theorem unitPulse_eq_zero {s : ℝ} (hs : s ≤ 0 ∨ 1 ≤ s) : unitPulse s = 0 := by
+  have hnonpos : s * (1 - s) ≤ 0 := by
+    rcases hs with hs | hs
+    · nlinarith [sq_nonneg s]
+    · nlinarith [sq_nonneg (s - 1)]
+  unfold unitPulse
+  rw [max_eq_left hnonpos, mul_zero]
+
+/-- The pulse shape has no mass over an interval that avoids the open unit interval. -/
+theorem integral_unitPulse_eq_zero {a b : ℝ} (hab : ∀ s ∈ Set.uIcc a b, s ≤ 0 ∨ 1 ≤ s) :
+    ∫ s in a..b, unitPulse s = 0 := by
+  have hzero : Set.EqOn unitPulse (fun _ ↦ (0 : ℝ)) (Set.uIcc a b) :=
+    fun s hs ↦ unitPulse_eq_zero (hab s hs)
+  rw [intervalIntegral.integral_congr hzero]
+  simp
+
+/-- The pulse shape has unit mass over the unit interval. -/
+theorem integral_unitPulse_unit : ∫ s in (0 : ℝ)..1, unitPulse s = 1 := by
+  have hpolynomial : Set.EqOn unitPulse (fun s ↦ 6 * s - 6 * s ^ 2) (Set.uIcc 0 1) := by
+    intro s hs
+    rw [Set.uIcc_of_le (zero_le_one : (0 : ℝ) ≤ 1)] at hs
+    have hnonneg : 0 ≤ s * (1 - s) := mul_nonneg hs.1 (sub_nonneg.mpr hs.2)
+    show 6 * max 0 (s * (1 - s)) = 6 * s - 6 * s ^ 2
+    rw [max_eq_right hnonneg]
+    ring
+  have hlinear : IntervalIntegrable (fun s : ℝ ↦ 6 * s) volume 0 1 :=
+    (by fun_prop : Continuous fun s : ℝ ↦ 6 * s).intervalIntegrable 0 1
+  have hquadratic : IntervalIntegrable (fun s : ℝ ↦ 6 * s ^ 2) volume 0 1 :=
+    (by fun_prop : Continuous fun s : ℝ ↦ 6 * s ^ 2).intervalIntegrable 0 1
+  rw [intervalIntegral.integral_congr hpolynomial,
+    intervalIntegral.integral_sub hlinear hquadratic, intervalIntegral.integral_const_mul,
+    intervalIntegral.integral_const_mul, _root_.integral_id, _root_.integral_pow]
+  norm_num
+
+/-- The pulse shape has unit mass over any interval containing the unit interval. -/
+theorem integral_unitPulse_eq_one {a b : ℝ} (ha : a ≤ 0) (hb : 1 ≤ b) :
+    ∫ s in a..b, unitPulse s = 1 := by
+  have hintegrable : ∀ c d : ℝ, IntervalIntegrable unitPulse volume c d :=
+    fun c d ↦ continuous_unitPulse.intervalIntegrable c d
+  have hbefore : ∀ s ∈ Set.uIcc a 0, s ≤ 0 ∨ 1 ≤ s := fun s hs ↦
+    Or.inl (by rw [Set.uIcc_of_le ha] at hs; exact hs.2)
+  have hafter : ∀ s ∈ Set.uIcc 1 b, s ≤ 0 ∨ 1 ≤ s := fun s hs ↦
+    Or.inr (by rw [Set.uIcc_of_le hb] at hs; exact hs.1)
+  rw [← intervalIntegral.integral_add_adjacent_intervals (hintegrable a 0) (hintegrable 0 b),
+    ← intervalIntegral.integral_add_adjacent_intervals (hintegrable 0 1) (hintegrable 1 b),
+    integral_unitPulse_eq_zero hbefore, integral_unitPulse_eq_zero hafter,
+    integral_unitPulse_unit]
+  norm_num
+
+/-- A translated pulse shape is continuous. -/
+theorem continuous_unitPulse_sub (shift : ℝ) : Continuous fun s ↦ unitPulse (s - shift) :=
+  continuous_unitPulse.comp (continuous_id.sub continuous_const)
+
+/-- The migration rate of the smoothed three-block history: the whole migration total `M` in
+one continuous pulse on `[1, 2]`. -/
+def pulseMigrationRate (mtot : ℝ) (s : ℝ) : ℝ := mtot * unitPulse (s - 1)
+
+/-- The recombination rate of the smoothed three-block history: exposure `R - b` in a continuous
+pulse on `[0, 1]`, before the migration, and exposure `b` in a pulse on `[2, 3]`, after it. -/
+def pulseRecombinationRate (bexp rtot : ℝ) (s : ℝ) : ℝ :=
+  (rtot - bexp) * unitPulse s + bexp * unitPulse (s - 2)
+
+/-- The smoothed migration rate is continuous. -/
+theorem continuous_pulseMigrationRate (mtot : ℝ) : Continuous (pulseMigrationRate mtot) :=
+  continuous_const.mul (continuous_unitPulse_sub 1)
+
+/-- The smoothed recombination rate is continuous. -/
+theorem continuous_pulseRecombinationRate (bexp rtot : ℝ) :
+    Continuous (pulseRecombinationRate bexp rtot) :=
+  (continuous_const.mul continuous_unitPulse).add
+    (continuous_const.mul (continuous_unitPulse_sub 2))
+
+/-- A nonnegative migration total gives a nonnegative smoothed migration rate. -/
+theorem pulseMigrationRate_nonneg {mtot : ℝ} (hmtot : 0 ≤ mtot) (s : ℝ) :
+    0 ≤ pulseMigrationRate mtot s :=
+  mul_nonneg hmtot (unitPulse_nonneg _)
+
+/-- An exposure `b` with `0 ≤ b ≤ R` gives a nonnegative smoothed recombination rate. -/
+theorem pulseRecombinationRate_nonneg {bexp rtot : ℝ} (hbexp : 0 ≤ bexp) (hbelow : bexp ≤ rtot)
+    (s : ℝ) : 0 ≤ pulseRecombinationRate bexp rtot s :=
+  add_nonneg (mul_nonneg (sub_nonneg.mpr hbelow) (unitPulse_nonneg _))
+    (mul_nonneg hbexp (unitPulse_nonneg _))
+
+/-- The migration pulse of the smoothed history is silent outside `[1, 2]`. -/
+theorem pulseMigrationRate_eq_zero (mtot s : ℝ) (hs : s ∉ Set.Icc (1 : ℝ) 2) :
+    pulseMigrationRate mtot s = 0 := by
+  have hout : s - 1 ≤ 0 ∨ 1 ≤ s - 1 := by
+    by_contra hin
+    push_neg at hin
+    exact hs ⟨by linarith [hin.1], by linarith [hin.2]⟩
+  unfold pulseMigrationRate
+  rw [unitPulse_eq_zero hout, mul_zero]
+
+/-- The smoothed history supplies the migration total `M` by time `3`. -/
+theorem cumulativeRate_pulseMigrationRate (mtot : ℝ) :
+    cumulativeRate (pulseMigrationRate mtot) 3 = mtot := by
+  unfold cumulativeRate pulseMigrationRate
+  rw [intervalIntegral.integral_const_mul,
+    intervalIntegral.integral_comp_sub_right (f := unitPulse) 1,
+    integral_unitPulse_eq_one (a := 0 - 1) (b := 3 - 1) (by norm_num) (by norm_num), mul_one]
+
+/-- The recombination the smoothed history supplies over any interval, pulse by pulse. -/
+theorem integral_pulseRecombinationRate (bexp rtot a b : ℝ) :
+    ∫ s in a..b, pulseRecombinationRate bexp rtot s =
+      (rtot - bexp) * (∫ s in a..b, unitPulse s) + bexp * ∫ s in a - 2..b - 2, unitPulse s := by
+  have hbefore : IntervalIntegrable (fun s ↦ (rtot - bexp) * unitPulse s) volume a b :=
+    (continuous_const.mul continuous_unitPulse).intervalIntegrable a b
+  have hafter : IntervalIntegrable (fun s ↦ bexp * unitPulse (s - 2)) volume a b :=
+    (continuous_const.mul (continuous_unitPulse_sub 2)).intervalIntegrable a b
+  unfold pulseRecombinationRate
+  rw [intervalIntegral.integral_add hbefore hafter, intervalIntegral.integral_const_mul,
+    intervalIntegral.integral_const_mul,
+    intervalIntegral.integral_comp_sub_right (f := unitPulse) 2]
+
+/-- The smoothed history supplies the recombination total `R` by time `3`. -/
+theorem cumulativeRate_pulseRecombinationRate (bexp rtot : ℝ) :
+    cumulativeRate (pulseRecombinationRate bexp rtot) 3 = rtot := by
+  unfold cumulativeRate
+  rw [integral_pulseRecombinationRate,
+    integral_unitPulse_eq_one (a := 0) (b := 3) le_rfl (by norm_num),
+    integral_unitPulse_eq_one (a := 0 - 2) (b := 3 - 2) (by norm_num) (by norm_num)]
+  ring
+
+/-- Material arriving during the migration pulse of the smoothed history still meets exactly
+the exposure `b` of the final recombination pulse. Assumes: an arrival time in `[1, 2]`. -/
+theorem remaining_pulseRecombinationRate (bexp rtot s : ℝ) (hs : s ∈ Set.Icc (1 : ℝ) 2) :
+    cumulativeRate (pulseRecombinationRate bexp rtot) 3 -
+        cumulativeRate (pulseRecombinationRate bexp rtot) s = bexp := by
+  have hlater : ∀ u ∈ Set.uIcc s 3, u ≤ 0 ∨ 1 ≤ u := fun u hu ↦
+    Or.inr (by rw [Set.uIcc_of_le (by linarith [hs.2] : s ≤ 3)] at hu; linarith [hs.1, hu.1])
+  rw [cumulativeRate_sub_eq_integral _ (continuous_pulseRecombinationRate bexp rtot),
+    integral_pulseRecombinationRate, integral_unitPulse_eq_zero hlater,
+    integral_unitPulse_eq_one (a := s - 2) (b := 3 - 2) (by linarith [hs.2]) (by norm_num)]
+  ring
+
+/-- The smoothed three-block history realises coupling exactly `e^{-b}` at time `3`. Assumes: a
+positive migration total. Every arrival falls in the migration pulse, after all of the exposure
+`R - b` and before all of the exposure `b`. -/
+theorem normalisedCoupling_pulseHistory (bexp mtot rtot : ℝ) (hmpos : 0 < mtot) :
+    normalisedCoupling (pulseMigrationRate mtot) (pulseRecombinationRate bexp rtot) 3 =
+      Real.exp (-bexp) := by
+  have hpos : 0 < donorFraction (pulseMigrationRate mtot) 3 :=
+    donorFraction_pos _ 3 (by rw [cumulativeRate_pulseMigrationRate]; exact hmpos)
+  have hweights : ∀ s, pulseMigrationRate mtot s *
+      Real.exp (-cumulativeRate (pulseMigrationRate mtot) s) *
+        Real.exp (-(cumulativeRate (pulseRecombinationRate bexp rtot) 3 -
+          cumulativeRate (pulseRecombinationRate bexp rtot) s)) =
+      Real.exp (-bexp) *
+        (pulseMigrationRate mtot s * Real.exp (-cumulativeRate (pulseMigrationRate mtot) s)) := by
+    intro s
+    by_cases hs : s ∈ Set.Icc (1 : ℝ) 2
+    · rw [remaining_pulseRecombinationRate bexp rtot s hs]
+      ring
+    · rw [pulseMigrationRate_eq_zero mtot s hs]
+      ring
+  rw [normalisedCoupling_eq_exposure_integral _ _ 3 hpos,
+    intervalIntegral.integral_congr fun s _ ↦ hweights s, intervalIntegral.integral_const_mul,
+    ← donorFraction_eq_integral _ (continuous_pulseMigrationRate mtot) 3, one_div,
+    mul_comm (Real.exp (-bexp)), inv_mul_cancel_left₀ hpos.ne']
+
+/-- NOTE1 Theorem 5, attainment within continuous-rate histories. Assumes: a positive migration
+total and a coupling in `[e^{-R}, 1]`. That coupling is the coupling at time `3` of a chronology
+with continuous nonnegative rates supplying the totals `M` and `R`: the smoothed three-block
+history placing the exposure `b = -log C` after its migration pulse. -/
+theorem exists_continuous_chronology_of_mem_Icc (mtot rtot coupling : ℝ) (hmpos : 0 < mtot)
+    (hcoupling : coupling ∈ Set.Icc (Real.exp (-rtot)) 1) :
+    ∃ m r : ℝ → ℝ, Continuous m ∧ Continuous r ∧ (∀ s, 0 ≤ m s) ∧ (∀ s, 0 ≤ r s) ∧
+      cumulativeRate m 3 = mtot ∧ cumulativeRate r 3 = rtot ∧
+        normalisedCoupling m r 3 = coupling := by
+  have hcpos : 0 < coupling := lt_of_lt_of_le (Real.exp_pos _) hcoupling.1
+  have hbexp : 0 ≤ -Real.log coupling := by
+    have hnonpos : Real.log coupling ≤ 0 := Real.log_nonpos hcpos.le hcoupling.2
+    linarith
+  have hbelow : -Real.log coupling ≤ rtot := by
+    have hlower : -rtot ≤ Real.log coupling := (Real.le_log_iff_exp_le hcpos).mpr hcoupling.1
+    linarith
+  refine ⟨pulseMigrationRate mtot, pulseRecombinationRate (-Real.log coupling) rtot,
+    continuous_pulseMigrationRate mtot, continuous_pulseRecombinationRate _ rtot,
+    pulseMigrationRate_nonneg hmpos.le, pulseRecombinationRate_nonneg hbexp hbelow,
+    cumulativeRate_pulseMigrationRate mtot, cumulativeRate_pulseRecombinationRate _ rtot, ?_⟩
+  rw [normalisedCoupling_pulseHistory _ mtot rtot hmpos, neg_neg, Real.exp_log hcpos]
+
+/-- NOTE1 Theorem 5, attainment within continuous-rate histories at any horizon. Assumes: a
+positive migration total, a positive horizon `T` and a coupling in `[e^{-R}, 1]`. Running the
+smoothed three-block history at calendar speed `3 / T` attains that coupling at time `T` with the
+same totals. -/
+theorem exists_continuous_chronology_at_horizon (mtot rtot coupling T : ℝ) (hmpos : 0 < mtot)
+    (hT : 0 < T) (hcoupling : coupling ∈ Set.Icc (Real.exp (-rtot)) 1) :
+    ∃ m r : ℝ → ℝ, Continuous m ∧ Continuous r ∧ (∀ s, 0 ≤ m s) ∧ (∀ s, 0 ≤ r s) ∧
+      cumulativeRate m T = mtot ∧ cumulativeRate r T = rtot ∧
+        normalisedCoupling m r T = coupling := by
+  obtain ⟨m, r, hm, hr, hmnonneg, hrnonneg, hmtotal, hrtotal, hvalue⟩ :=
+    exists_continuous_chronology_of_mem_Icc mtot rtot coupling hmpos hcoupling
+  have hspeed : 3 / T * T = 3 := by
+    rw [div_mul_eq_mul_div, mul_div_assoc, div_self hT.ne', mul_one]
+  have hnonneg : 0 ≤ 3 / T := div_nonneg (by norm_num) hT.le
+  refine ⟨fun s ↦ 3 / T * m (3 / T * s), fun s ↦ 3 / T * r (3 / T * s),
+    continuous_const.mul (hm.comp (continuous_const.mul continuous_id)),
+    continuous_const.mul (hr.comp (continuous_const.mul continuous_id)),
+    fun s ↦ mul_nonneg hnonneg (hmnonneg (3 / T * s)),
+    fun s ↦ mul_nonneg hnonneg (hrnonneg (3 / T * s)), ?_, ?_, ?_⟩
+  · rw [cumulativeRate_timeRescaled m (3 / T) T, hspeed, hmtotal]
+  · rw [cumulativeRate_timeRescaled r (3 / T) T, hspeed, hrtotal]
+  · rw [normalisedCoupling_timeRescaled m r (3 / T) T, hspeed, hvalue]
+
+/-- NOTE1 Theorem 5 with (33), within continuous-rate histories. Assumes: a positive migration
+total and a positive horizon `T`. The couplings at time `T` of the chronologies with continuous
+nonnegative rates, migration total `M` and recombination total `R` are exactly `[e^{-R}, 1]`:
+every such chronology lands in it, and the smoothed three-block histories attain all of it. -/
+theorem attainable_coupling_range_continuous (mtot rtot T : ℝ) (hmpos : 0 < mtot) (hT : 0 < T) :
+    {coupling : ℝ | ∃ m r : ℝ → ℝ, Continuous m ∧ Continuous r ∧ (∀ s, 0 ≤ m s) ∧
+        (∀ s, 0 ≤ r s) ∧ cumulativeRate m T = mtot ∧ cumulativeRate r T = rtot ∧
+          normalisedCoupling m r T = coupling} =
+      Set.Icc (Real.exp (-rtot)) 1 := by
+  apply Set.Subset.antisymm
+  · rintro coupling ⟨m, r, hm, hr, hmnonneg, hrnonneg, hmtotal, hrtotal, rfl⟩
+    have hpos : 0 < donorFraction m T := donorFraction_pos m T (by rw [hmtotal]; exact hmpos)
+    have hlow := exp_neg_le_normalisedCoupling m r hm hr hmnonneg hrnonneg T hT.le hpos
+    rw [hrtotal] at hlow
+    exact ⟨hlow, normalisedCoupling_le_one m r hm hr hmnonneg hrnonneg T hT.le hpos⟩
+  · intro coupling hcoupling
+    exact exists_continuous_chronology_at_horizon mtot rtot coupling T hmpos hT hcoupling
+
+/-- NOTE1 Theorem 5, the curve statement within continuous-rate histories. Assumes: a positive
+migration total and a positive horizon `T`. The report metrics at time `T` of the chronologies
+with continuous nonnegative rates, migration total `M` and recombination total `R` are exactly
+the image of `[e^{-R}, 1]` under the table map at donor fraction `1 - e^{-M}`. -/
+theorem attainable_metric_curve_continuous (mtot rtot T : ℝ) (hmpos : 0 < mtot) (hT : 0 < T) :
+    {metrics : ℝ × ℝ × ℝ × ℝ × ℝ × ℝ × ℝ | ∃ (m r : ℝ → ℝ) (hm : Continuous m)
+        (hr : Continuous r) (hmnonneg : ∀ s, 0 ≤ m s) (hrnonneg : ∀ s, 0 ≤ r s)
+        (hmig : 0 < cumulativeRate m T), cumulativeRate m T = mtot ∧ cumulativeRate r T = rtot ∧
+          reportMetrics (chronologyReportLaw m r hm hr hmnonneg hrnonneg T hT.le hmig) =
+            metrics} =
+      metricTable (1 - Real.exp (-mtot)) '' Set.Icc (Real.exp (-rtot)) 1 := by
+  rw [← attainable_coupling_range_continuous mtot rtot T hmpos hT]
+  ext metrics
+  constructor
+  · rintro ⟨m, r, hm, hr, hmnonneg, hrnonneg, hmig, hmtotal, hrtotal, rfl⟩
+    refine ⟨normalisedCoupling m r T, ⟨m, r, hm, hr, hmnonneg, hrnonneg, hmtotal, hrtotal, rfl⟩,
+      ?_⟩
+    rw [reportMetrics_chronologyReportLaw, donorFraction, hmtotal]
+  · rintro ⟨coupling, ⟨m, r, hm, hr, hmnonneg, hrnonneg, hmtotal, hrtotal, rfl⟩, rfl⟩
+    refine ⟨m, r, hm, hr, hmnonneg, hrnonneg, by rw [hmtotal]; exact hmpos, hmtotal, hrtotal, ?_⟩
+    rw [reportMetrics_chronologyReportLaw, donorFraction, hmtotal]
 
 end
 
