@@ -5,6 +5,7 @@ import Descent.Portability.AdmixtureChronologyLaw
 import Descent.Portability.AttainableChronologyCurve
 import Descent.Portability.ExposureLaplaceConstraints
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Data.Fin.Tuple.Sort
 
 assert_below Descent.Decision Descent.Program
 
@@ -51,10 +52,17 @@ a nonnegative migration total and a nonnegative recombination exposure, and the 
 `b₀` in total. A block placed before the first pulse acts on a monomorphic recipient and changes
 nothing, so any recombination total `R ≥ b₀` is reached without moving the state.
 
-Not formalised: sorting an unsorted law (the identities above hold in any order; only the signs
-of the blocks need the sorted order), exposure laws that are not finitely supported, and the
-claim that knowing `C(λ)` for every `λ` determines `ν`. Nothing here identifies an exposure law
-from data.
+Finally the support of an arbitrary finite law is sorted. `decreasingOrder` lists the positions
+by decreasing exposure (through `Tuple.sort` and a reversal), `reorderedLaw` relists the law
+along it without changing its transform, and `realisingHistory` is the chronology built from
+the sorted support with a leading block `λ (R - b₀)`. For every law on `Fin n` with exposures
+in `[0, R]`, every `p ∈ (0, 1)` and every `λ ≥ 0`, that chronology has nonnegative event
+totals, migration total `-log(1 - p)`, recombination total `λ R`, final donor fraction `p`, and
+normalised coupling `exposureLaplace law exposure λ`. The existence statement of NOTE1 section
+6.3 is the corollary `exists_chronology_eq_exposureLaplace`.
+
+Not formalised: exposure laws that are not finitely supported, and the claim that knowing
+`C(λ)` for every `λ` determines `ν`. Nothing here identifies an exposure law from data.
 
 ## Empirical status
 
@@ -564,6 +572,159 @@ theorem runEvents_leading_recombination (exposure : ℝ) (events : List Chronolo
     runEvents (ChronologyEvent.recombination exposure :: events) (0, 0) =
       runEvents events (0, 0) := by
   simp
+
+/-- The positions of a finite support listed by decreasing exposure: `Tuple.sort` lists them by
+increasing exposure, and reversing the positions turns that order around. -/
+def decreasingOrder {n : ℕ} (exposure : Fin n → ℝ) : Equiv.Perm (Fin n) :=
+  Fin.revPerm.trans (Tuple.sort exposure)
+
+/-- The exposures relisted by decreasing size. -/
+def sortedExposure {n : ℕ} (exposure : Fin n → ℝ) : Fin n → ℝ :=
+  fun position ↦ exposure (decreasingOrder exposure position)
+
+/-- The relisted exposures decrease along the positions. -/
+theorem antitone_sortedExposure {n : ℕ} (exposure : Fin n → ℝ) :
+    Antitone (sortedExposure exposure) := by
+  intro first second hle
+  simp only [sortedExposure, decreasingOrder, Equiv.trans_apply, Fin.revPerm_apply]
+  exact Tuple.monotone_sort exposure (Fin.rev_le_rev.mpr hle)
+
+/-- A finite law relisted along a permutation of its support. -/
+def reorderedLaw {n : ℕ} (law : FiniteReportLaw (Fin n)) (order : Equiv.Perm (Fin n)) :
+    FiniteReportLaw (Fin n) where
+  mass := fun position ↦ law.mass (order position)
+  mass_nonneg := fun position ↦ law.mass_nonneg (order position)
+  mass_sum := (Equiv.sum_comp order law.mass).trans law.mass_sum
+
+/-- Relisting the support along any permutation leaves the exposure transform unchanged. -/
+theorem exposureLaplace_reorderedLaw {n : ℕ} (law : FiniteReportLaw (Fin n))
+    (exposure : Fin n → ℝ) (order : Equiv.Perm (Fin n)) (lam : ℝ) :
+    exposureLaplace (reorderedLaw law order) (fun position ↦ exposure (order position)) lam =
+      exposureLaplace law exposure lam := by
+  unfold exposureLaplace FiniteReportLaw.expectation
+  exact Equiv.sum_comp order
+    (fun position ↦ law.mass position * Real.exp (-(lam * exposure position)))
+
+/-- Assumes: the vector is antitone and nonnegative. The padded vector then does not increase
+from any index to the next over the first `n + 1` indices. -/
+theorem padByZero_succ_le {n : ℕ} (value : Fin n → ℝ) (hanti : Antitone value)
+    (hnonneg : ∀ position, 0 ≤ value position) (index : ℕ) (hle : index + 1 ≤ n) :
+    padByZero value (index + 1) ≤ padByZero value index := by
+  have hindex : index < n := Nat.lt_of_succ_le hle
+  unfold padByZero
+  rw [dif_pos hindex]
+  split_ifs with hnext
+  · exact hanti (Fin.mk_le_mk.mpr (Nat.le_succ index))
+  · exact hnonneg _
+
+/-- The chronology realising a finite exposure law on `[0, R]` with every recombination block
+scaled by `λ`: a leading block `λ (R - b₀)`, then the pulses with the support listed by
+decreasing exposure, each followed by the scaled gap to the next exposure and the last by its
+own scaled exposure. -/
+def realisingHistory {n : ℕ} (law : FiniteReportLaw (Fin n)) (exposure : Fin n → ℝ)
+    (donor lam bound : ℝ) : List ChronologyEvent :=
+  ChronologyEvent.recombination (lam * (bound - padByZero (sortedExposure exposure) 0)) ::
+    pulseHistory donor (padByZero (reorderedLaw law (decreasingOrder exposure)).mass)
+      (fun index ↦ lam * padByZero (sortedExposure exposure) index -
+        lam * padByZero (sortedExposure exposure) (index + 1)) n
+
+/-- NOTE1 (30) for the realising chronology. Assumes: a target donor fraction in `(0, 1)`. Its
+normalised coupling is the exposure transform of the supplied law at `λ`, in whatever order the
+law lists its support. -/
+theorem couplingOfState_realisingHistory {n : ℕ} (law : FiniteReportLaw (Fin n))
+    (exposure : Fin n → ℝ) (donor lam bound : ℝ) (hdonor : 0 < donor) (hlt : donor < 1) :
+    couplingOfState (runEvents (realisingHistory law exposure donor lam bound) (0, 0)) =
+      exposureLaplace law exposure lam := by
+  unfold realisingHistory
+  rw [runEvents_leading_recombination]
+  exact (couplingOfState_pulseHistory_eq_exposureLaplace
+    (reorderedLaw law (decreasingOrder exposure)) (sortedExposure exposure) donor lam hdonor
+    hlt).trans (exposureLaplace_reorderedLaw law exposure (decreasingOrder exposure) lam)
+
+/-- The realising chronology drives the donor fraction from zero to exactly the target. -/
+theorem fst_runEvents_realisingHistory {n : ℕ} (law : FiniteReportLaw (Fin n))
+    (exposure : Fin n → ℝ) (donor lam bound : ℝ) (hdonor : 0 ≤ donor) (hlt : donor < 1) :
+    (runEvents (realisingHistory law exposure donor lam bound) (0, 0)).1 = donor := by
+  unfold realisingHistory
+  rw [runEvents_leading_recombination]
+  exact fst_runEvents_pulseHistory_total donor _ _
+    (padByZero_mass_nonneg (reorderedLaw law (decreasingOrder exposure))) hdonor hlt n
+    (sum_range_padByZero_mass (reorderedLaw law (decreasingOrder exposure)))
+
+/-- The realising chronology has migration total exactly `-log(1 - p)`. -/
+theorem migrationTotal_realisingHistory {n : ℕ} (law : FiniteReportLaw (Fin n))
+    (exposure : Fin n → ℝ) (donor lam bound : ℝ) (hdonor : 0 ≤ donor) (hlt : donor < 1) :
+    ((realisingHistory law exposure donor lam bound).map eventMigration).sum =
+      -Real.log (1 - donor) := by
+  unfold realisingHistory
+  rw [List.map_cons, List.sum_cons, migrationTotal_pulseHistory_total donor _ _
+    (padByZero_mass_nonneg (reorderedLaw law (decreasingOrder exposure))) hdonor hlt n
+    (sum_range_padByZero_mass (reorderedLaw law (decreasingOrder exposure)))]
+  simp [eventMigration]
+
+/-- The realising chronology has recombination total exactly `λ R`. -/
+theorem recombinationTotal_realisingHistory {n : ℕ} (law : FiniteReportLaw (Fin n))
+    (exposure : Fin n → ℝ) (donor lam bound : ℝ) :
+    ((realisingHistory law exposure donor lam bound).map eventRecombination).sum =
+      lam * bound := by
+  unfold realisingHistory
+  rw [List.map_cons, List.sum_cons, recombinationTotal_supportGaps donor _
+    (fun index ↦ lam * padByZero (sortedExposure exposure) index) n]
+  simp only [eventRecombination, padByZero_self]
+  ring
+
+/-- Assumes: exposures in `[0, R]` and a nonnegative scale `λ`. Every event of the realising
+chronology supplies a nonnegative migration total and a nonnegative recombination exposure. -/
+theorem eventTotals_nonneg_realisingHistory {n : ℕ} (law : FiniteReportLaw (Fin n))
+    (exposure : Fin n → ℝ) (donor lam bound : ℝ) (hdonor : 0 ≤ donor) (hlt : donor < 1)
+    (hlam : 0 ≤ lam) (hexposure : ∀ position, 0 ≤ exposure position)
+    (hbound : ∀ position, exposure position ≤ bound) :
+    ∀ event ∈ realisingHistory law exposure donor lam bound,
+      0 ≤ eventMigration event ∧ 0 ≤ eventRecombination event := by
+  have hleading : padByZero (sortedExposure exposure) 0 ≤ bound := by
+    unfold padByZero
+    split_ifs with hpositive
+    · exact hbound _
+    · rcases Nat.eq_zero_or_pos n with hzero | hpos
+      · subst hzero
+        have hmass := law.mass_sum
+        simp at hmass
+      · exact absurd hpos hpositive
+  intro event hevent
+  unfold realisingHistory at hevent
+  rcases List.mem_cons.mp hevent with rfl | hrest
+  · exact ⟨le_rfl, mul_nonneg hlam (sub_nonneg.mpr hleading)⟩
+  · exact eventTotals_nonneg_pulseHistory donor
+      (padByZero (reorderedLaw law (decreasingOrder exposure)).mass)
+      (fun index ↦ lam * padByZero (sortedExposure exposure) index)
+      (padByZero_mass_nonneg (reorderedLaw law (decreasingOrder exposure))) hdonor hlt n
+      (sum_range_padByZero_mass (reorderedLaw law (decreasingOrder exposure)))
+      (fun index hnext ↦ mul_le_mul_of_nonneg_left
+        (padByZero_succ_le (sortedExposure exposure) (antitone_sortedExposure exposure)
+          (fun position ↦ hexposure _) index hnext) hlam) n le_rfl event hrest
+
+/-- NOTE1 section 6.3: every finitely supported exposure law on `[0, R]` is realised by finitely
+many ordered migration pulses. Assumes: exposures in `[0, R]`, a target donor fraction in
+`(0, 1)`, and a nonnegative scale `λ`. Some ordered chronology with nonnegative event totals has
+migration total `-log(1 - p)`, recombination total `λ R`, final donor fraction `p`, and
+normalised coupling equal to the exposure transform of the law at `λ`. -/
+theorem exists_chronology_eq_exposureLaplace {n : ℕ} (law : FiniteReportLaw (Fin n))
+    (exposure : Fin n → ℝ) (donor lam bound : ℝ) (hdonor : 0 < donor) (hlt : donor < 1)
+    (hlam : 0 ≤ lam) (hexposure : ∀ position, 0 ≤ exposure position)
+    (hbound : ∀ position, exposure position ≤ bound) :
+    ∃ events : List ChronologyEvent,
+      (∀ event ∈ events, 0 ≤ eventMigration event ∧ 0 ≤ eventRecombination event) ∧
+        (events.map eventMigration).sum = -Real.log (1 - donor) ∧
+        (events.map eventRecombination).sum = lam * bound ∧
+        (runEvents events (0, 0)).1 = donor ∧
+        couplingOfState (runEvents events (0, 0)) = exposureLaplace law exposure lam :=
+  ⟨realisingHistory law exposure donor lam bound,
+    eventTotals_nonneg_realisingHistory law exposure donor lam bound hdonor.le hlt hlam
+      hexposure hbound,
+    migrationTotal_realisingHistory law exposure donor lam bound hdonor.le hlt,
+    recombinationTotal_realisingHistory law exposure donor lam bound,
+    fst_runEvents_realisingHistory law exposure donor lam bound hdonor.le hlt,
+    couplingOfState_realisingHistory law exposure donor lam bound hdonor hlt⟩
 
 end
 

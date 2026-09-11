@@ -41,3 +41,12 @@ open Descent.Portability.FinitePulseExposure
 #print axioms Descent.Portability.FinitePulseExposure.eventTotals_nonneg_pulseHistory
 #print axioms Descent.Portability.FinitePulseExposure.recombinationTotal_supportGaps
 #print axioms Descent.Portability.FinitePulseExposure.runEvents_leading_recombination
+#print axioms Descent.Portability.FinitePulseExposure.antitone_sortedExposure
+#print axioms Descent.Portability.FinitePulseExposure.exposureLaplace_reorderedLaw
+#print axioms Descent.Portability.FinitePulseExposure.padByZero_succ_le
+#print axioms Descent.Portability.FinitePulseExposure.couplingOfState_realisingHistory
+#print axioms Descent.Portability.FinitePulseExposure.fst_runEvents_realisingHistory
+#print axioms Descent.Portability.FinitePulseExposure.migrationTotal_realisingHistory
+#print axioms Descent.Portability.FinitePulseExposure.recombinationTotal_realisingHistory
+#print axioms Descent.Portability.FinitePulseExposure.eventTotals_nonneg_realisingHistory
+#print axioms Descent.Portability.FinitePulseExposure.exists_chronology_eq_exposureLaplace
