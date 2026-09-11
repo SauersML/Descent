@@ -220,20 +220,24 @@ theorem abs_one_div_multinomialChromosomeCount_sub_le (rate step : ℝ) (hrate :
   · nlinarith [hprod, hwnu, hwu]
   · nlinarith [hwle, hu]
 
-/-- Combining a first-order expansion in `w = 1 / N` with the rounding of `w` against `u`. -/
-theorem abs_sub_mul_le_of_rounding (change drift coefficientBound driftBound u w : ℝ)
-    (hK : 0 ≤ coefficientBound) (hB : |drift| ≤ driftBound) (hw0 : 0 ≤ w) (hwu : w ≤ u)
-    (hround : |w - u| ≤ u ^ 2) (hbase : |change - drift * w| ≤ coefficientBound * w ^ 2) :
+/-- Combining a first-order expansion in `1 / n` with the rounding of `1 / n` against `u`. -/
+theorem abs_sub_mul_le_of_rounding (change drift coefficientBound driftBound u n : ℝ)
+    (hn : 0 < n) (hK : 0 ≤ coefficientBound) (hB : |drift| ≤ driftBound) (hwu : 1 / n ≤ u)
+    (hround : |1 / n - u| ≤ u ^ 2) (hbase : |change - drift / n| ≤ coefficientBound / n ^ 2) :
     |change - u * drift| ≤ (coefficientBound + driftBound) * u ^ 2 := by
   have hB0 : 0 ≤ driftBound := (abs_nonneg _).trans hB
-  have hw2 : w ^ 2 ≤ u ^ 2 := by nlinarith
-  calc |change - u * drift| = |(change - drift * w) + drift * (w - u)| := by
+  have hw0 : 0 ≤ 1 / n := by positivity
+  have hw2 : (1 / n) ^ 2 ≤ u ^ 2 := by nlinarith
+  have hdiv : drift / n = drift * (1 / n) := by ring
+  have hsq : coefficientBound / n ^ 2 = coefficientBound * (1 / n) ^ 2 := by ring
+  rw [hdiv, hsq] at hbase
+  calc |change - u * drift| = |(change - drift * (1 / n)) + drift * (1 / n - u)| := by
         congr 1
         ring
-    _ ≤ |change - drift * w| + |drift| * |w - u| := by
+    _ ≤ |change - drift * (1 / n)| + |drift| * |1 / n - u| := by
         rw [← abs_mul]
         exact abs_add_le _ _
-    _ ≤ coefficientBound * w ^ 2 + driftBound * u ^ 2 :=
+    _ ≤ coefficientBound * (1 / n) ^ 2 + driftBound * u ^ 2 :=
         add_le_add hbase (mul_le_mul hB hround (abs_nonneg _) hB0)
     _ ≤ coefficientBound * u ^ 2 + driftBound * u ^ 2 := by
         nlinarith [mul_le_mul_of_nonneg_left hw2 hK]
@@ -256,13 +260,6 @@ theorem apply_multinomialDriftStage_expansion {D : ℕ} {deme : Fin D}
     exact_mod_cast one_le_multinomialChromosomeCount rate step hrate hstep
   have hbase := apply_multinomialDriftKernel_expansion certificate
     (one_le_multinomialChromosomeCount rate step hrate hstep) state
-  have hbase' : |((multinomialDriftKernel deme
-          (one_le_multinomialChromosomeCount rate step hrate hstep)).apply observable state
-        - observable state)
-        - resamplingOperator (haplotypeCoordinate (state deme)) (certificate.polynomial state)
-          * (1 / (multinomialChromosomeCount rate step : ℝ))|
-      ≤ certificate.coefficientBound * (1 / (multinomialChromosomeCount rate step : ℝ)) ^ 2 := by
-    convert hbase using 2 <;> ring
   have hK : 0 ≤ certificate.coefficientBound :=
     le_trans (Finset.sum_nonneg fun s _ ↦ mul_nonneg (abs_nonneg _)
       (by
@@ -274,9 +271,9 @@ theorem apply_multinomialDriftStage_expansion {D : ℕ} {deme : Fin D}
       observable state - observable state)
     (resamplingOperator (haplotypeCoordinate (state deme)) (certificate.polynomial state))
     certificate.coefficientBound certificate.driftBound (rate * step)
-    (1 / (multinomialChromosomeCount rate step : ℝ)) hK (certificate.drift_le state)
-    (by positivity) (one_div_multinomialChromosomeCount_le rate step hrate hstep)
-    (abs_one_div_multinomialChromosomeCount_sub_le rate step hrate hstep) hbase'
+    (multinomialChromosomeCount rate step : ℝ) hNpos hK (certificate.drift_le state)
+    (one_div_multinomialChromosomeCount_le rate step hrate hstep)
+    (abs_one_div_multinomialChromosomeCount_sub_le rate step hrate hstep) hbase
   calc |(multinomialDriftKernel deme
             (one_le_multinomialChromosomeCount rate step hrate hstep)).apply observable state
           - observable state
@@ -308,7 +305,7 @@ theorem pderiv_pderiv_X {H : Type*} [DecidableEq H] (a c observed : H) :
 /-- The second-order operator of (10) vanishes on a coordinate polynomial. -/
 theorem resamplingOperator_X {H : Type*} [Fintype H] [DecidableEq H] (x : H → ℝ)
     (observed : H) : resamplingOperator x (MvPolynomial.X observed) = 0 := by
-  simp [resamplingOperator, pderiv_pderiv_X]
+  simp only [resamplingOperator, pderiv_pderiv_X, map_zero, mul_zero, Finset.sum_const_zero]
 
 /-- **A certified observable: the left-locus allele frequency of a deme.** It is the linear
 polynomial `X_AB + X_Ab` in the deme's haplotype frequencies, with a constant coefficient mass
@@ -319,16 +316,19 @@ def leftFrequencyObservable {D : ℕ} (deme : Fin D) :
   totalDegree_le _ := le_trans (MvPolynomial.totalDegree_add _ _) (by
     rw [MvPolynomial.totalDegree_X, MvPolynomial.totalDegree_X]
     norm_num)
-  polynomial_update _ _ := rfl
+  polynomial_update _ _ := by dsimp only
   observable_eq state := by
     simp [TwoLocusHaplotypeFrequencies.leftFrequency, haplotypeCoordinate]
   coefficientBound := ∑ s ∈ (MvPolynomial.X TwoLocusHaplotype.AB
       + MvPolynomial.X TwoLocusHaplotype.Ab : MvPolynomial TwoLocusHaplotype ℝ).support,
     |(MvPolynomial.X TwoLocusHaplotype.AB + MvPolynomial.X TwoLocusHaplotype.Ab
       : MvPolynomial TwoLocusHaplotype ℝ).coeff s| * (11 + 4 * totalStirlingWeight ⇑s)
-  coefficient_le _ := le_rfl
+  coefficient_le _ := by
+    dsimp only
+    exact le_rfl
   driftBound := 0
-  drift_le state := by
+  drift_le _ := by
+    dsimp only
     rw [resamplingOperator_add, resamplingOperator_X, resamplingOperator_X, add_zero, abs_zero]
 
 end
