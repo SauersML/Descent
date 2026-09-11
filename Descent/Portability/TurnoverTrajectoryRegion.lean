@@ -319,7 +319,7 @@ def flipCoupling (p : ℝ) (uu vv : ℕ → ℝ) : List (Fin 2 → Bool) → (Fi
 
 /-- **The explicit coupling is coadapted**: after every history each locus flips with
 probability exactly `p`. -/
-theorem flipCoupling_coadapted (p : ℝ) (hp0 : 0 ≤ p) (hp2 : p ≤ 1 / 2) (uu vv : ℕ → ℝ)
+theorem flipCoupling_coadapted (p : ℝ) (hp2 : p ≤ 1 / 2) (uu vv : ℕ → ℝ)
     (huu : ∀ t, 0 ≤ uu t ∧ uu t ≤ 2 * p) (hvv : ∀ t, 0 ≤ vv t ∧ vv t ≤ 2 * p) :
     Coadapted (flipKernel p) (flipCoupling p uu vv) := by
   intro z h
@@ -330,11 +330,11 @@ theorem flipCoupling_coadapted (p : ℝ) (hp0 : 0 ≤ p) (hp2 : p ≤ 1 / 2) (uu
     rw [flipCoupling_cons]
     split_ifs <;> linarith
   · rw [sum_pi_two]
-    cases hz0 : z 0 <;> cases hz1 : z 1 <;> simp [flipCoupling, hz0, hz1] <;> ring
+    cases hz0 : z 0 <;> cases hz1 : z 1 <;> simp [flipCoupling, hz0, hz1]
   · intro i b
     rw [Finset.sum_filter, sum_pi_two]
     fin_cases i <;> cases b <;> cases hz0 : z 0 <;> cases hz1 : z 1 <;>
-      simp [flipCoupling, flipKernel, hz0, hz1] <;> ring
+      simp [flipCoupling, flipKernel, hz0, hz1]
 
 /-- **Exact one-step agreement transition of the explicit coupling**, UPT (5.9). -/
 theorem stepAgree_flipCoupling (p : ℝ) (uu vv : ℕ → ℝ) (z : Fin 2 → Bool)
@@ -456,11 +456,13 @@ theorem traj_recursion (p : ℝ) (hp0 : 0 ≤ p) (hp2 : p ≤ 1 / 2) (A : ℕ �
     · rw [if_neg hz]
       have hpos : 0 < A t := lt_of_le_of_ne hA0t (Ne.symm hz)
       field_simp
+      ring
   · rw [if_neg hcase, if_neg hcase]
     push_neg at hcase
     have hlt : A t < 1 := by nlinarith
     have hne : (1 : ℝ) - A t ≠ 0 := by linarith
     field_simp
+    ring
 
 /-- **UPT Theorem 5.4, sufficiency.**  Every sequence obeying the trajectory inequalities
 (5.7) is exactly the agreement trajectory of a coadapted coupling with one-locus flip
@@ -471,7 +473,7 @@ theorem trajectory_attained (p : ℝ) (hp0 : 0 ≤ p) (hp2 : p ≤ 1 / 2) (A : �
     Coadapted (flipKernel p) (flipCoupling p (trajU A) (trajV A)) ∧
       ∀ t, agreeProb startLaw (flipCoupling p (trajU A) (trajV A)) t = A t := by
   have hcoad : Coadapted (flipKernel p) (flipCoupling p (trajU A) (trajV A)) :=
-    flipCoupling_coadapted p hp0 hp2 (trajU A) (trajV A)
+    flipCoupling_coadapted p hp2 (trajU A) (trajV A)
       (trajU_bounds p hp0 hp2 A hA0 hA) (trajV_bounds p hp0 hp2 A hA0 hA)
   refine ⟨hcoad, ?_⟩
   intro t
