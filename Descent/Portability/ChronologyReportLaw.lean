@@ -178,20 +178,23 @@ theorem calibration_gap_chronologyLaw (p C : ℝ) (hp0 : 0 ≤ p) (hp1 : p ≤ 1
 theorem variance_scoreOf_chronologyLaw (p C : ℝ) (hp0 : 0 ≤ p) (hp1 : p ≤ 1) (hC0 : 0 ≤ C)
     (hC1 : C ≤ 1) :
     (chronologyLaw p C hp0 hp1 hC0 hC1).variance scoreOf = p * (1 - p) := by
-  simp [FiniteReportLaw.variance_eq_rawMoments, expectation_cells] <;> ring
+  simp [FiniteReportLaw.variance_eq_rawMoments, expectation_cells]
+  ring
 
 /-- The outcome variance is the same `h = p * (1 - p)`. -/
 theorem variance_outcomeOf_chronologyLaw (p C : ℝ) (hp0 : 0 ≤ p) (hp1 : p ≤ 1) (hC0 : 0 ≤ C)
     (hC1 : C ≤ 1) :
     (chronologyLaw p C hp0 hp1 hC0 hC1).variance outcomeOf = p * (1 - p) := by
-  simp [FiniteReportLaw.variance_eq_rawMoments, expectation_cells] <;> ring
+  simp [FiniteReportLaw.variance_eq_rawMoments, expectation_cells]
+  ring
 
 /-- The score-outcome covariance is `h * C`: the coupling parameter is exactly the covariance
 in units of the common variance. -/
 theorem covariance_chronologyLaw (p C : ℝ) (hp0 : 0 ≤ p) (hp1 : p ≤ 1) (hC0 : 0 ≤ C)
     (hC1 : C ≤ 1) :
     (chronologyLaw p C hp0 hp1 hC0 hC1).covariance scoreOf outcomeOf = p * (1 - p) * C := by
-  simp [FiniteReportLaw.covariance_eq_rawMoments, expectation_cells] <;> ring
+  simp [FiniteReportLaw.covariance_eq_rawMoments, expectation_cells]
+  ring
 
 /-- The population squared correlation is exactly `C ^ 2` (NOTE1 section 6.2). The
 nondegeneracy premise `0 < p < 1` is what makes both variances positive, so the corpus
@@ -266,7 +269,7 @@ def scoreCellMass (law : FiniteReportLaw (Bool × Bool)) (allele : Bool) : ℝ :
 /-- A score cell is the union of its two outcome cells. -/
 theorem scoreCellMass_eq_cells (law : FiniteReportLaw (Bool × Bool)) (allele : Bool) :
     scoreCellMass law allele = law.mass (allele, false) + law.mass (allele, true) := by
-  cases allele <;> simp [scoreCellMass, expectation_cells] <;> ring
+  cases allele <;> simp [scoreCellMass, expectation_cells]
 
 /-- The exact conditional outcome mean in one score cell: the joint mass of that cell with a
 donor outcome divided by the mass of the cell. -/
@@ -299,7 +302,8 @@ theorem conditionalOutcomeMean_chronologyLaw (p C : ℝ) (hp0 : 0 ≤ p) (hp1 : 
 theorem binaryCaseMass_chronologyLaw (p C : ℝ) (hp0 : 0 ≤ p) (hp1 : p ≤ 1) (hC0 : 0 ≤ C)
     (hC1 : C ≤ 1) :
     (chronologyLaw p C hp0 hp1 hC0 hC1).binaryCaseMass caseOf = p := by
-  simp [FiniteReportLaw.binaryCaseMass, expectation_cells] <;> ring
+  simp [FiniteReportLaw.binaryCaseMass, expectation_cells]
+  ring
 
 /-- The unnormalised case-control ranking credit of the chronology law, with half credit for
 ties, is `h * (1 + C) / 2`. -/
@@ -308,7 +312,8 @@ theorem binaryAUCNumerator_chronologyLaw (p C : ℝ) (hp0 : 0 ≤ p) (hp1 : p �
     (chronologyLaw p C hp0 hp1 hC0 hC1).binaryAUCNumerator scoreOf caseOf =
       p * (1 - p) * (1 + C) / 2 := by
   norm_num [FiniteReportLaw.binaryAUCNumerator, expectation_cells,
-    empiricalAUCComparison] <;> ring
+    empiricalAUCComparison]
+  ring
 
 /-- Population AUC with half credit for ties: the corpus independent case-control numerator
 divided by the product of the case and control masses. -/
@@ -340,7 +345,8 @@ theorem meanSquaredError_chronologyLaw (p C : ℝ) (hp0 : 0 ≤ p) (hp1 : p ≤ 
     (hC1 : C ≤ 1) :
     (chronologyLaw p C hp0 hp1 hC0 hC1).meanSquaredError scoreOf outcomeOf =
       2 * (p * (1 - p)) * (1 - C) := by
-  simp [FiniteReportLaw.meanSquaredError, expectation_cells] <;> ring
+  simp [FiniteReportLaw.meanSquaredError, expectation_cells]
+  ring
 
 /-- Accuracy of the rule that predicts the donor outcome exactly when the score exceeds a
 threshold. -/
@@ -359,7 +365,8 @@ theorem thresholdAccuracy_chronologyLaw (p C threshold : ℝ) (hp0 : 0 ≤ p) (h
   have habove : ∀ x y : ℝ, (if threshold < (1 : ℝ) then x else y) = x :=
     fun x y ↦ if_pos ht1
   unfold thresholdAccuracy
-  simp [expectation_cells, hbelow, habove] <;> ring
+  simp [expectation_cells, hbelow, habove]
+  ring
 
 /-- Exact discrete calibration error: the mass-weighted distance between the conditional
 outcome mean of each score cell and the score value of that cell. -/
@@ -459,12 +466,12 @@ theorem expectedLogLoss_chronologyLaw_eq_top (p C : ℝ) (hp0 : 0 ≤ p) (hp1 : 
       extendedLogLoss (reportedProbability ((true, false) : Bool × Bool)) = ⊤ := by
     rw [hloss, chronologyLaw_mass, chronologyMass_true_false]
     exact ENNReal.mul_top (ne_of_gt (ENNReal.ofReal_pos.mpr hmass))
-  have hbound := Finset.single_le_sum
+  refine top_le_iff.mp ?_
+  rw [← hcell]
+  exact Finset.single_le_sum
     (f := fun report ↦ ENNReal.ofReal ((chronologyLaw p C hp0 hp1 hC0 hC1).mass report) *
       extendedLogLoss (reportedProbability report))
     (fun report _ ↦ zero_le _) (Finset.mem_univ ((true, false) : Bool × Bool))
-  rw [hcell] at hbound
-  exact top_le_iff.mp hbound
 
 /-- The worked example of NOTE1 section 6.2 with `M = R = log 2` taken in the order migration
 then recombination: half the target genome is donor derived and half the initial coupling
@@ -495,7 +502,8 @@ theorem metric_values_halvedCoupling :
   · rw [populationAUC_chronologyLaw] <;> norm_num
   · rw [linearSlope_chronologyLaw] <;> norm_num
   · rw [linearIntercept_chronologyLaw] <;> norm_num
-  · rw [meanSquaredError_chronologyLaw] <;> norm_num
+  · rw [meanSquaredError_chronologyLaw]
+    norm_num
   · rw [repairedBrier_chronologyLaw] <;> norm_num
   · rw [thresholdAccuracy_chronologyLaw] <;> norm_num
   · rw [discreteECE_chronologyLaw] <;> norm_num
@@ -517,7 +525,8 @@ theorem metric_values_coupled :
   · rw [populationAUC_chronologyLaw] <;> norm_num
   · rw [linearSlope_chronologyLaw] <;> norm_num
   · rw [linearIntercept_chronologyLaw] <;> norm_num
-  · rw [meanSquaredError_chronologyLaw] <;> norm_num
+  · rw [meanSquaredError_chronologyLaw]
+    norm_num
   · rw [repairedBrier_chronologyLaw] <;> norm_num
   · rw [thresholdAccuracy_chronologyLaw] <;> norm_num
   · rw [discreteECE_chronologyLaw] <;> norm_num
