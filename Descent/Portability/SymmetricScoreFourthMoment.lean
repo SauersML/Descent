@@ -405,7 +405,7 @@ theorem sparse_symmetric_value (κ m p : ℝ) (hp0 : 0 < p) (hp1 : p < 1)
     simp [dot, Descent.Core.innerSum]
   have hx : ∀ i : Fin 3, sparseScore p i 0 = 0 ∨ sparseScore p i 0 ^ 2 = 1 / p := by
     intro i
-    fin_cases i <;> simp [sparseScore, div_pow, hs]
+    fin_cases i <;> simp [sparseScore, hs]
   have haff : ∀ i : Fin 3,
       (0 : ℝ) + dot (fun _ : Fin 1 ↦
           4 * (max (κ ^ 2 / p) (sparseLevel κ m p) - sparseLevel κ m p) * κ)
