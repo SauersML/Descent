@@ -25,10 +25,17 @@ strictly above the attained maximum, is not in that image; separating it produce
 functional whose weight on the report coordinate is proved positive, and normalizing by that
 weight turns the separating functional into a dual certificate of value below the tolerance.
 
-Attainment of the dual minimum is not proved. The equality is stated as a greatest lower
-bound, which is what the no-gap claim asserts; a minimizing certificate would need a vertex
-argument on an unbounded dual polyhedron. The hypotheses are the manuscript's domain
-conditions: the specified information is consistent, so a compatible law exists.
+Dual attainment is proved separately, under an interior condition on the specified
+information: every summary vector within a fixed radius of the observed one is attainable by
+some probability law. That condition makes the certificates of bounded value uniformly
+bounded, because testing dual feasibility against the laws realizing the nearby summary
+vectors bounds each potential, so the bounded dual certificates form a compact set and the
+infimum is a minimum. The condition is not vacuous: a two-state space reporting the mass of
+one state satisfies it, and that witness is proved here.
+
+The hypotheses are the manuscript's domain conditions. The no-gap equality needs only that
+the specified information is consistent, so a compatible law exists; the interior condition
+is needed only for attainment, and every statement says which of the two it uses.
 -/
 
 set_option autoImplicit false
@@ -308,6 +315,237 @@ theorem isGLB_dualValue_reportRegion {J : Type*} [Fintype J] (observe : O → S 
     exact hmax q hq
   · rw [ReportRegionCertificates.pairing_contrast_reportRegion]
     exact hglb
+
+/-- Every probability law's report value is bounded below by the total size of the
+statistic, with no reference to any minimiser. -/
+theorem neg_sum_abs_le_pairing (metric : S → ℝ) (q : S → ℝ) (hq : q ∈ stdSimplex ℝ S) :
+    -(∑ s, |metric s|) ≤ pairing metric q := by
+  have hle : ∀ s : S, q s ≤ 1 := by
+    intro s
+    have hsingle := Finset.single_le_sum (f := q) (fun t _ ↦ hq.1 t) (Finset.mem_univ s)
+    rw [hq.2] at hsingle
+    exact hsingle
+  have hterm : ∀ s : S, -|metric s| ≤ metric s * q s := by
+    intro s
+    rcases le_or_gt 0 (metric s) with hm | hm
+    · rw [abs_of_nonneg hm]
+      nlinarith [hq.1 s]
+    · rw [abs_of_neg hm]
+      nlinarith [hle s]
+  have hsum := Finset.sum_le_sum (s := (Finset.univ : Finset S))
+    (f := fun s ↦ -|metric s|) (g := fun s ↦ metric s * q s) fun s _ ↦ hterm s
+  simpa [pairing] using hsum
+
+/-- Under the interior condition, the potentials of every dual certificate of bounded value
+are bounded, uniformly in the certificate. -/
+theorem abs_potential_le (observe : O → S → ℝ) (observed : O → ℝ) (metric : S → ℝ)
+    (radius : ℝ) (hradius : 0 < radius)
+    (hslater : ∀ d : O → ℝ, (∀ o, |d o| ≤ radius) →
+      ∃ q ∈ stdSimplex ℝ S, ∀ o, pairing (observe o) q = observed o + d o)
+    (bound level : ℝ) (potential : O → ℝ)
+    (hdual : ∀ s, metric s ≤ level + ∑ o, potential o * observe o s)
+    (hvalue : dualValue observed level potential ≤ bound) (target : O) :
+    |potential target| ≤ (|bound| + ∑ s, |metric s|) / radius := by
+  classical
+  have hstep : ∀ sign : ℝ, |sign| = 1 →
+      -(∑ s, |metric s|) ≤ bound + potential target * (sign * radius) := by
+    intro sign hsign
+    obtain ⟨q, hq, hqsum⟩ :=
+      hslater (fun o ↦ if o = target then sign * radius else 0) (by
+        intro o
+        show |(if o = target then sign * radius else 0)| ≤ radius
+        by_cases ho : o = target
+        · rw [if_pos ho, abs_mul, hsign, one_mul, abs_of_pos hradius]
+        · rw [if_neg ho, abs_zero]
+          linarith)
+    have hle := le_dual_at_law observe metric level potential hdual q hq
+    have hexpand : ∑ o, potential o * pairing (observe o) q =
+        (∑ o, potential o * observed o) + potential target * (sign * radius) := by
+      have hpoint : ∀ o : O, potential o * pairing (observe o) q =
+          potential o * observed o +
+            potential o * (if o = target then sign * radius else 0) := by
+        intro o
+        rw [hqsum o]
+        ring
+      rw [Finset.sum_congr rfl fun o _ ↦ hpoint o, Finset.sum_add_distrib]
+      refine congrArg (fun x ↦ (∑ o, potential o * observed o) + x) ?_
+      rw [Finset.sum_eq_single target]
+      · rw [if_pos rfl]
+      · intro o _ ho
+        rw [if_neg ho, mul_zero]
+      · intro hno
+        exact absurd (Finset.mem_univ target) hno
+    have hlow := neg_sum_abs_le_pairing metric q hq
+    have hval : dualValue observed level potential =
+        level + ∑ o, potential o * observed o := by rw [dualValue, pairing]
+    rw [hexpand] at hle
+    linarith
+  have h1 := hstep 1 (by norm_num)
+  have h2 := hstep (-1) (by norm_num)
+  have habs := le_abs_self bound
+  have hup : potential target * radius ≤ |bound| + ∑ s, |metric s| := by nlinarith [h2]
+  have hdown : -potential target * radius ≤ |bound| + ∑ s, |metric s| := by nlinarith [h1]
+  rw [abs_le]
+  refine ⟨?_, (le_div_iff₀ hradius).2 hup⟩
+  rw [neg_le, le_div_iff₀ hradius]
+  linarith
+
+/-- The dual certificates whose value is at most a given bound. -/
+def boundedDualSet (observe : O → S → ℝ) (observed : O → ℝ) (metric : S → ℝ) (bound : ℝ) :
+    Set (ℝ × (O → ℝ)) :=
+  {z | ∀ s, metric s ≤ z.1 + ∑ o, z.2 o * observe o s} ∩
+    {z | dualValue observed z.1 z.2 ≤ bound}
+
+/-- The dual feasibility expression at a state is continuous in the certificate. -/
+theorem continuous_dualExpr (observe : O → S → ℝ) (s : S) :
+    Continuous fun z : ℝ × (O → ℝ) ↦ z.1 + ∑ o, z.2 o * observe o s :=
+  continuous_fst.add (continuous_finset_sum _ fun o _ ↦
+    ((continuous_apply o).comp continuous_snd).mul continuous_const)
+
+/-- The dual value is continuous in the certificate. -/
+theorem continuous_dualValueProd (observed : O → ℝ) :
+    Continuous fun z : ℝ × (O → ℝ) ↦ dualValue observed z.1 z.2 :=
+  continuous_fst.add (continuous_finset_sum _ fun o _ ↦
+    ((continuous_apply o).comp continuous_snd).mul continuous_const)
+
+/-- The bounded dual set is closed. -/
+theorem isClosed_boundedDualSet (observe : O → S → ℝ) (observed : O → ℝ) (metric : S → ℝ)
+    (bound : ℝ) : IsClosed (boundedDualSet observe observed metric bound) := by
+  refine IsClosed.inter ?_ (isClosed_le (continuous_dualValueProd observed) continuous_const)
+  have hrw : {z : ℝ × (O → ℝ) | ∀ s, metric s ≤ z.1 + ∑ o, z.2 o * observe o s} =
+      ⋂ s : S, {z : ℝ × (O → ℝ) | metric s ≤ z.1 + ∑ o, z.2 o * observe o s} := by
+    ext z
+    simp
+  rw [hrw]
+  exact isClosed_iInter fun s ↦ isClosed_le continuous_const (continuous_dualExpr observe s)
+
+/-- Under the interior condition the bounded dual set is compact, so a minimising certificate
+exists inside it. -/
+theorem isCompact_boundedDualSet (observe : O → S → ℝ) (observed : O → ℝ) (metric : S → ℝ)
+    (radius : ℝ) (hradius : 0 < radius)
+    (hslater : ∀ d : O → ℝ, (∀ o, |d o| ≤ radius) →
+      ∃ q ∈ stdSimplex ℝ S, ∀ o, pairing (observe o) q = observed o + d o)
+    (bound : ℝ) : IsCompact (boundedDualSet observe observed metric bound) := by
+  classical
+  obtain ⟨base, hbase, hbasesum⟩ := hslater (fun _ ↦ 0) (fun _ ↦ by simpa using hradius.le)
+  set potBound : ℝ := (|bound| + ∑ s, |metric s|) / radius with hpotBound
+  have hpotNonneg : 0 ≤ potBound := by
+    refine div_nonneg ?_ hradius.le
+    have : (0 : ℝ) ≤ ∑ s, |metric s| := Finset.sum_nonneg fun s _ ↦ abs_nonneg _
+    linarith [abs_nonneg bound]
+  set levelBound : ℝ :=
+    |bound| + (∑ s, |metric s|) + potBound * ∑ o, |observed o| with hlevelBound
+  refine IsCompact.of_isClosed_subset
+    (IsCompact.prod (isCompact_Icc (a := -levelBound) (b := levelBound))
+      (isCompact_univ_pi fun _ : O ↦ isCompact_Icc (a := -potBound) (b := potBound)))
+    (isClosed_boundedDualSet observe observed metric bound) ?_
+  rintro ⟨level, potential⟩ ⟨hdual, hvalue⟩
+  simp only [Set.mem_setOf_eq] at hdual hvalue
+  have hpot : ∀ o, |potential o| ≤ potBound := fun o ↦
+    abs_potential_le observe observed metric radius hradius hslater bound level potential
+      hdual hvalue o
+  have hcross : |∑ o, potential o * observed o| ≤ potBound * ∑ o, |observed o| := by
+    refine le_trans (Finset.abs_sum_le_sum_abs _ _) ?_
+    rw [Finset.mul_sum]
+    refine Finset.sum_le_sum fun o _ ↦ ?_
+    rw [abs_mul]
+    exact mul_le_mul_of_nonneg_right (hpot o) (abs_nonneg _)
+  have hcrossbounds := abs_le.1 hcross
+  have hval : dualValue observed level potential =
+      level + ∑ o, potential o * observed o := by rw [dualValue, pairing]
+  have hbaselow := neg_sum_abs_le_pairing metric base hbase
+  have hbasedual := le_dual_at_law observe metric level potential hdual base hbase
+  have hbaseobs : ∑ o, potential o * pairing (observe o) base =
+      ∑ o, potential o * observed o :=
+    Finset.sum_congr rfl fun o _ ↦ by rw [hbasesum o]; ring
+  rw [hbaseobs] at hbasedual
+  have habsb := le_abs_self bound
+  have hsumnn : (0 : ℝ) ≤ ∑ s, |metric s| := Finset.sum_nonneg fun s _ ↦ abs_nonneg _
+  constructor
+  · simp only [Set.mem_Icc]
+    constructor
+    · rw [hlevelBound]
+      linarith [hcrossbounds.2, abs_nonneg bound]
+    · rw [hlevelBound]
+      linarith [hcrossbounds.1]
+  · refine Set.mem_univ_pi.2 fun o ↦ ?_
+    exact Set.mem_Icc.2 (abs_le.1 (hpot o))
+
+/-- Dual attainment under the interior condition: the attained primal maximum is attained by
+a dual certificate as well, so the no-gap equality of DC (2.5) and PL (10.4) is a genuine
+maximum equal to a genuine minimum. -/
+theorem exists_optimal_dual_certificate (observe : O → S → ℝ) (observed : O → ℝ)
+    (metric : S → ℝ) (radius : ℝ) (hradius : 0 < radius)
+    (hslater : ∀ d : O → ℝ, (∀ o, |d o| ≤ radius) →
+      ∃ q ∈ stdSimplex ℝ S, ∀ o, pairing (observe o) q = observed o + d o) :
+    ∃ p ∈ feasible observe observed,
+      (∀ q ∈ feasible observe observed, pairing metric q ≤ pairing metric p) ∧
+        ∃ (level : ℝ) (potential : O → ℝ),
+          (∀ s, metric s ≤ level + ∑ o, potential o * observe o s) ∧
+            dualValue observed level potential = pairing metric p ∧
+            ∀ other : ℝ × (O → ℝ),
+              (∀ s, metric s ≤ other.1 + ∑ o, other.2 o * observe o s) →
+                dualValue observed level potential ≤ dualValue observed other.1 other.2 := by
+  classical
+  obtain ⟨base, hbase, hbasesum⟩ := hslater (fun _ ↦ 0) (fun _ ↦ by simpa using hradius.le)
+  have hne : (feasible observe observed).Nonempty := by
+    refine ⟨base, hbase, fun o ↦ ?_⟩
+    rw [hbasesum o, add_zero]
+  obtain ⟨p, hp, hmax, hnear⟩ := exists_dual_certificate_near observe observed metric hne
+  obtain ⟨level0, potential0, hdual0, hvalue0⟩ := hnear 1 one_pos
+  have hmemK : (level0, potential0) ∈
+      boundedDualSet observe observed metric (pairing metric p + 1) :=
+    ⟨hdual0, le_of_lt hvalue0⟩
+  obtain ⟨z, hz, hminon⟩ :=
+    (isCompact_boundedDualSet observe observed metric radius hradius hslater
+      (pairing metric p + 1)).exists_isMinOn ⟨_, hmemK⟩
+      (continuous_dualValueProd observed).continuousOn
+  have hmin : ∀ w ∈ boundedDualSet observe observed metric (pairing metric p + 1),
+      dualValue observed z.1 z.2 ≤ dualValue observed w.1 w.2 := fun w hw ↦ hminon hw
+  have hge : pairing metric p ≤ dualValue observed z.1 z.2 :=
+    le_dualValue observe observed metric z.1 z.2 hz.1 p hp
+  have hle : dualValue observed z.1 z.2 ≤ pairing metric p := by
+    by_contra hcon
+    push_neg at hcon
+    obtain ⟨level, potential, hdual, hvalue⟩ :=
+      hnear (min ((dualValue observed z.1 z.2 - pairing metric p) / 2) (1 / 2))
+        (lt_min (by linarith) (by norm_num))
+    have hsmall : min ((dualValue observed z.1 z.2 - pairing metric p) / 2) (1 / 2) ≤
+        (dualValue observed z.1 z.2 - pairing metric p) / 2 := min_le_left _ _
+    have hhalf : min ((dualValue observed z.1 z.2 - pairing metric p) / 2) (1 / 2) ≤ 1 / 2 :=
+      min_le_right _ _
+    have hmemw : (level, potential) ∈
+        boundedDualSet observe observed metric (pairing metric p + 1) := by
+      refine ⟨hdual, ?_⟩
+      show dualValue observed level potential ≤ pairing metric p + 1
+      linarith
+    have := hmin (level, potential) hmemw
+    linarith
+  refine ⟨p, hp, hmax, z.1, z.2, hz.1, le_antisymm hle hge, fun other hother ↦ ?_⟩
+  by_cases hmemother : dualValue observed other.1 other.2 ≤ pairing metric p + 1
+  · exact hmin other ⟨hother, hmemother⟩
+  · push_neg at hmemother
+    linarith [le_antisymm hle hge]
+
+/-- The interior condition is satisfiable: a two-state space reporting the mass of one state
+admits every observed value in the middle half, so the hypothesis of dual attainment is not
+vacuous. -/
+theorem slater_witness :
+    ∀ d : Unit → ℝ, (∀ o, |d o| ≤ (1 : ℝ) / 4) →
+      ∃ q ∈ stdSimplex ℝ Bool,
+        ∀ o : Unit, pairing (fun s : Bool ↦ if s then (1 : ℝ) else 0) q =
+          (fun _ : Unit ↦ (1 : ℝ) / 2) o + d o := by
+  intro d hd
+  have hbound := abs_le.1 (hd ())
+  refine ⟨fun s ↦ if s then 1 / 2 + d () else 1 / 2 - d (), ⟨fun s ↦ ?_, ?_⟩, fun o ↦ ?_⟩
+  · cases s
+    · simp only [Bool.false_eq_true, if_false]
+      linarith [hbound.2]
+    · simp only [if_true]
+      linarith [hbound.1]
+  · simp [Fintype.sum_bool]
+    ring
+  · simp [pairing, Fintype.sum_bool]
 
 end
 

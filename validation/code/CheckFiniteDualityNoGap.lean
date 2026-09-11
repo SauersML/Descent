@@ -7,6 +7,7 @@ import Descent.Portability.FiniteDualityNoGap
 
 open Descent.Portability.FiniteDualityNoGap
 
+#print axioms le_dual_at_law
 #print axioms le_dualValue
 #print axioms pointVector_mem_stdSimplex
 #print axioms pairing_pointVector
@@ -19,3 +20,11 @@ open Descent.Portability.FiniteDualityNoGap
 #print axioms exists_dual_certificate_near
 #print axioms isGLB_dualValue
 #print axioms isGLB_dualValue_reportRegion
+#print axioms neg_sum_abs_le_pairing
+#print axioms abs_potential_le
+#print axioms continuous_dualExpr
+#print axioms continuous_dualValueProd
+#print axioms isClosed_boundedDualSet
+#print axioms isCompact_boundedDualSet
+#print axioms exists_optimal_dual_certificate
+#print axioms slater_witness
