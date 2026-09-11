@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.ExactMetricEvaluation
+import Descent.Portability.ThetaFamilyNonclosure
 import Mathlib.Analysis.SpecialFunctions.BinaryEntropy
 import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 import Mathlib.MeasureTheory.Measure.Lebesgue.Basic
@@ -123,6 +124,17 @@ def penetranceLaw (θ : ℝ) : FiniteReportLaw (Bool × Bool) where
 
 theorem penetranceLaw_mass (θ : ℝ) (cell : Bool × Bool) :
     (penetranceLaw θ).mass cell = penetranceMass (penetrance θ) cell := rfl
+
+/-- The conditional law built here is exactly the family `ThetaFamilyNonclosure.thetaLaw` of
+NOTE2 (12) read at the clamped parameter: the two modules carry the same four cell masses,
+so every closed form below is a statement about that family as well. -/
+theorem penetranceLaw_eq_thetaLaw (θ : ℝ) (hlo : 0 ≤ θ) (hhi : θ ≤ 1) :
+    penetranceLaw θ = ThetaFamilyNonclosure.thetaLaw θ hlo hhi := by
+  refine FiniteReportLaw.ext fun cell ↦ ?_
+  obtain ⟨score, outcome⟩ := cell
+  rw [penetranceLaw_mass, ThetaFamilyNonclosure.thetaLaw_mass, penetrance_eq_self θ hlo hhi]
+  cases score <;> cases outcome <;>
+    simp only [penetranceMass, ThetaFamilyNonclosure.thetaMass]
 
 /-- Every report metric has the same three-term exact expectation under the conditional law:
 the null-score cell carries half the mass, and the positive-score cells split the rest. -/
