@@ -114,7 +114,7 @@ theorem submeasure_threshold_cells (mu nu : S → ℝ) (h0 : ∀ s, 0 ≤ nu s)
     · simp only [ThresholdPolicyTransport.decisionCells, submeasureLaw, weightedExp_apply,
         submeasureJoint, Fintype.sum_prod_type, Fintype.sum_bool]
       refine Finset.sum_congr rfl fun s _ ↦ ?_
-      cases pred s <;> simp
+      by_cases h : pred s = true <;> simp [h]
 
 /-- Every feasible true-positive mass at a fixed prevalence and predicted-positive
 mass is realised by this confusion table. -/
@@ -226,12 +226,6 @@ theorem finite_threshold_curve_iff (n : ℕ) (pi : ℝ) (T : ℕ → ℝ) :
       · linarith
       · linarith
 
-/-- The top-`k` recall and precision of a finite threshold curve, on their
-domains. This is UPT (6.7) on the grid. -/
-theorem finite_threshold_recall_precision (n k : ℕ) (pi : ℝ) (T : ℕ → ℝ)
-    (hpi : pi ≠ 0) (hk : (k : ℝ) / n ≠ 0) :
-    T k / pi * pi = T k ∧ T k / ((k : ℝ) / n) * ((k : ℝ) / n) = T k :=
-  ⟨div_mul_cancel₀ (T k) hpi, div_mul_cancel₀ (T k) hk⟩
 
 end
 
