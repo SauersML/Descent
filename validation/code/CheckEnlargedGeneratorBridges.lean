@@ -16,7 +16,6 @@ open Descent.Portability.EnlargedGeneratorBridges
 #print axioms enlargedGenerator_mulVec_constant
 #print axioms constantStageExpansion
 #print axioms stageSum_constant
-#print axioms rightHeterozygosityMoment_heterozygosity
 #print axioms driftBlock_rightHeterozygosity
 #print axioms migrationBlock_rightHeterozygosity
 #print axioms recombinationBlock_rightHeterozygosity
