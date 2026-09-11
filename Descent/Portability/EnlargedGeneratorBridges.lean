@@ -30,16 +30,17 @@ not extend the corpus's vocabulary.
 
 `sum_stage` splits a sum over `Stage D` into its five blocks through an explicit equivalence
 with a sum type; it is bookkeeping, but nothing else can turn the per-stage expansion into a
-row.  `stageSum_rightHeterozygosity` is the bridge itself: the rate-weighted stage velocities
-of `twoLocusRightHJet first second` add up to exactly the enlarged generator applied to the
-enlarged feature vector at the coordinate `H^R (first, second)`, which by
+row.  `stageSum_constant` disposes of the constant coordinate, where both sides vanish because
+a probability kernel fixes constants.  `stageSum_rightHeterozygosity` is the bridge itself:
+the rate-weighted stage velocities of `twoLocusRightHJet first second` add up to exactly the
+enlarged generator applied to the enlarged feature vector at `H^R (first, second)`, which by
 `enlargedGenerator_mulVec_rightHeterozygosity` is the corpus `H` row read at right-locus
 indices together with its affine mutation forcing.
 
-Scope.  Only the `H^R` row is proved here.  The stored rows `H`, `DD`, `Dz` and `pi2` need the
-same treatment and are NOT done: of their twenty stage cells the corpus and
-`PulseJetExpansion` supply eight, and the rest belong to the pulse package.  In particular the
-`pi2` row is the one whose right-locus dependence the enlarged generator routes through
+Scope.  Only the constant row and the `H^R` row are proved here.  The stored rows `H`, `DD`,
+`Dz` and `pi2` need the same treatment and are NOT done: of their twenty stage cells the
+corpus and `PulseJetExpansion` supply eight, and the rest belong to the pulse package.  In
+particular the `pi2` row is the one whose right-locus dependence the generator routes through
 `rightHeterozygosityMutationCoupling`, so its bridge must read `H^R` off the enlarged vector
 rather than off the stored `H` column.  Nothing here assembles a `MicroscopicApproximation` or
 takes a limit.
@@ -138,6 +139,42 @@ theorem rightMutationRightHeterozygosity_velocity {D : ℕ} (target first second
       rightMutationCoordinateExpansion, rightMutationRightExpansion,
       twoLocusRightHeterozygosity, TwoLocusHaplotypeFrequencies.rightContrast,
       hfirst, hsecond] <;> ring
+
+/-! ## The constant row -/
+
+/-- The constant row of the enlarged generator is zero, so a constant observable is fixed. -/
+theorem enlargedGenerator_mulVec_constant {D : ℕ} (rates : ManyDemeLDRates D)
+    (vector : AffineEnlargedCoordinate D → ℝ) :
+    (enlargedLowOrderLDGenerator rates).mulVec vector none = 0 := by
+  have hsum : (enlargedLowOrderLDGenerator rates).mulVec vector none =
+      ∑ entry, enlargedLowOrderLDGenerator rates none entry * vector entry := rfl
+  rw [hsum]
+  exact Finset.sum_eq_zero fun entry _ ↦ by
+    rw [show enlargedLowOrderLDGenerator rates none entry = 0 from rfl, zero_mul]
+
+/-- The constant coordinate of the enlarged family carries the five stage certificates: no
+stage moves a constant. -/
+def constantStageExpansion (D : ℕ) :
+    StageExpansion (TwoLocusDiffusionJet.const (1 : ℝ) : TwoLocusDiffusionJet D) where
+  drift := resamplingExpansionConst 1
+  migration source recipient :=
+    PulseExpansion.const D (migrationPulse source recipient) 1
+  recombination deme := PulseExpansion.const D (recombinationPulseAt deme) 1
+  mutationLeft deme := PulseExpansion.const D (leftMutationPulseAt deme) 1
+  mutationRight deme := PulseExpansion.const D (rightMutationPulseAt deme) 1
+
+/-- **The constant row of the enlarged generator is the sum of its stage velocities.**  Both
+sides are zero: every stage is a probability kernel and so fixes the constant observable, and
+the enlarged generator's constant row vanishes. -/
+theorem stageSum_constant {D : ℕ} (rates : ManyDemeLDRates D)
+    (state : DemeHaplotypeState D) :
+    (∑ stage : Stage D, stageDrift rates (constantStageExpansion D) stage state) =
+      (enlargedLowOrderLDGenerator rates).mulVec (enlargedLowOrderLDFeature state) none := by
+  rw [enlargedGenerator_mulVec_constant]
+  refine Finset.sum_eq_zero fun stage _ ↦ ?_
+  cases stage <;>
+    simp [stageDrift, stageVelocity, constantStageExpansion, TwoLocusDiffusionJet.const,
+      PulseExpansion.const]
 
 /-! ## The five stage blocks of the right-locus heterozygosity row -/
 
