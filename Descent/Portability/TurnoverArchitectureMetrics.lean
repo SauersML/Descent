@@ -404,6 +404,269 @@ theorem exp_lin_noise_quartic {n : ℕ} {V : Type*} [Fintype V] (noise : ExpFunc
   field_simp
   ring
 
+
+/-! ## The realized architecture and its three report laws -/
+
+/-- `A_σ = ∑ᵢ wᵢσᵢ` with `wᵢ = aᵢ²`, the weighted alignment of the deployed architecture
+with the source architecture (PL (5.1)). -/
+def alignment {n : ℕ} (a : Fin n → ℝ) (σ : Fin n → Bool) : ℝ :=
+  ∑ i, a i ^ 2 * signValue (σ i)
+
+/-- `∑_{σᵢ = -1} wᵢ²`, the reversed-effect weight concentration of PL (5.3), written with
+the `(1 - σᵢ)/2` indicator of a reversed locus. -/
+def reversedWeightSq {n : ℕ} (a : Fin n → ℝ) (σ : Fin n → Bool) : ℝ :=
+  ∑ i, (a i ^ 2) ^ 2 * ((1 - signValue (σ i)) / 2)
+
+/-- The reversed-effect weight concentration is the sum over the reversed loci. -/
+theorem reversedWeightSq_eq_filter {n : ℕ} (a : Fin n → ℝ) (σ : Fin n → Bool) :
+    reversedWeightSq a σ
+      = ∑ i ∈ Finset.univ.filter (fun i ↦ σ i = false), (a i ^ 2) ^ 2 := by
+  rw [Finset.sum_filter]
+  refine Finset.sum_congr rfl fun i _ ↦ ?_
+  cases h : σ i
+  · simp [signValue]
+  · simp [signValue]
+
+/-- The residual coefficient vector `dᵢ = aᵢ(σᵢ - 1)` of PL Theorem 5.1. -/
+def residualCoeff {n : ℕ} (a : Fin n → ℝ) (σ : Fin n → Bool) : Fin n → ℝ :=
+  fun i ↦ a i * signValue (σ i) - a i
+
+/-- `∑ dᵢ² = 2(∑ aᵢ² - A_σ)`: the genetic residual variance `v_g` of PL Theorem 5.1. -/
+theorem residualCoeff_sq_sum {n : ℕ} (a : Fin n → ℝ) (σ : Fin n → Bool) :
+    ∑ i, residualCoeff a σ i ^ 2 = 2 * (∑ i, a i ^ 2) - 2 * alignment a σ := by
+  have hpt : ∀ i : Fin n,
+      residualCoeff a σ i ^ 2 = 2 * a i ^ 2 - 2 * (a i ^ 2 * signValue (σ i)) := by
+    intro i
+    have hs : signValue (σ i) ^ 2 = 1 := signValue_sq _
+    simp only [residualCoeff]
+    linear_combination (a i ^ 2) * hs
+  rw [Finset.sum_congr rfl fun i _ ↦ hpt i, Finset.sum_sub_distrib, ← Finset.mul_sum,
+    ← Finset.mul_sum]
+  rfl
+
+/-- `∑ dᵢ⁴ = 16 ∑_{σᵢ = -1} wᵢ²`, the correction term of PL (5.3). -/
+theorem residualCoeff_quartic_sum {n : ℕ} (a : Fin n → ℝ) (σ : Fin n → Bool) :
+    ∑ i, residualCoeff a σ i ^ 4 = 16 * reversedWeightSq a σ := by
+  have hpt : ∀ i : Fin n,
+      residualCoeff a σ i ^ 4 = 16 * ((a i ^ 2) ^ 2 * ((1 - signValue (σ i)) / 2)) := by
+    intro i
+    have hs : signValue (σ i) ^ 2 = 1 := signValue_sq _
+    simp only [residualCoeff]
+    linear_combination
+      (a i ^ 4 * (signValue (σ i) ^ 2 - 4 * signValue (σ i) + 7)) * hs
+  rw [Finset.sum_congr rfl fun i _ ↦ hpt i, ← Finset.mul_sum]
+  rfl
+
+/-- Reversing effect signs does not change the genetic variance. -/
+theorem sum_effect_sq {n : ℕ} (a : Fin n → ℝ) (σ : Fin n → Bool) :
+    ∑ i, (a i * signValue (σ i)) ^ 2 = ∑ i, a i ^ 2 := by
+  refine Finset.sum_congr rfl fun i _ ↦ ?_
+  have hs : signValue (σ i) ^ 2 = 1 := signValue_sq _
+  linear_combination (a i ^ 2) * hs
+
+/-- Block scores are additive in their coefficient vectors. -/
+theorem blockScore_add {n : ℕ} (d1 d2 : Fin n → ℝ) (t : Finset (Fin n)) (s : Fin n → Bool) :
+    blockScore d1 t s + blockScore d2 t s = blockScore (fun i ↦ d1 i + d2 i) t s := by
+  simp only [blockScore, ← Finset.sum_add_distrib]
+  exact Finset.sum_congr rfl fun i _ ↦ by ring
+
+/-- Polarization: the cross moment of two linear genotype scores. -/
+theorem sum_blockScore_cross {n : ℕ} (d1 d2 : Fin n → ℝ) :
+    ∑ s : Fin n → Bool, blockScore d1 Finset.univ s * blockScore d2 Finset.univ s
+      = ((2 : ℝ) ^ n) * ((∑ i, d1 i ^ 2) + (∑ i, d2 i ^ 2) - ∑ i, (d1 i - d2 i) ^ 2) / 2 := by
+  have hpt : ∀ s : Fin n → Bool,
+      blockScore d1 Finset.univ s * blockScore d2 Finset.univ s
+        = (blockScore d1 Finset.univ s ^ 2 + blockScore d2 Finset.univ s ^ 2
+          - blockScore (fun i ↦ d1 i - d2 i) Finset.univ s ^ 2) / 2 := by
+    intro s
+    rw [← blockScore_sub]
+    ring
+  rw [Finset.sum_congr rfl fun s _ ↦ hpt s, ← Finset.sum_div, Finset.sum_sub_distrib,
+    Finset.sum_add_distrib, sum_blockScore_sq, sum_blockScore_sq, sum_blockScore_sq]
+  ring
+
+/-- A genotype-linear score has mean zero under the genotype-and-noise law. -/
+theorem exp_blockScore_mean {n : ℕ} {V : Type*} [Fintype V] (noise : ExpFunctional V)
+    (d : Fin n → ℝ) :
+    genotypeNoiseExp n noise (fun p ↦ blockScore d Finset.univ p.1) = 0 := by
+  rw [exp_geno, uniform_geno_eq, sum_blockScore_mean]
+  ring
+
+/-- Second moment of a genotype-linear score under the genotype-and-noise law. -/
+theorem exp_blockScore_sq {n : ℕ} {V : Type*} [Fintype V] (noise : ExpFunctional V)
+    (d : Fin n → ℝ) :
+    genotypeNoiseExp n noise (fun p ↦ blockScore d Finset.univ p.1 ^ 2) = ∑ i, d i ^ 2 := by
+  rw [exp_geno noise (fun s ↦ blockScore d Finset.univ s ^ 2), uniform_geno_eq,
+    sum_blockScore_sq]
+  have h2 : ((2 : ℝ) ^ n) ≠ 0 := by positivity
+  field_simp
+
+/-- Cross moment of two genotype-linear scores under the genotype-and-noise law. -/
+theorem exp_blockScore_cross {n : ℕ} {V : Type*} [Fintype V] (noise : ExpFunctional V)
+    (d1 d2 : Fin n → ℝ) :
+    genotypeNoiseExp n noise
+        (fun p ↦ blockScore d1 Finset.univ p.1 * blockScore d2 Finset.univ p.1)
+      = ((∑ i, d1 i ^ 2) + (∑ i, d2 i ^ 2) - ∑ i, (d1 i - d2 i) ^ 2) / 2 := by
+  rw [exp_geno noise (fun s ↦ blockScore d1 Finset.univ s * blockScore d2 Finset.univ s),
+    uniform_geno_eq, sum_blockScore_cross]
+  have h2 : ((2 : ℝ) ^ n) ≠ 0 := by positivity
+  field_simp
+
+/-- **The deployed population generated by one realized effect architecture**, PL (5.1) /
+DC (4.1).  The expectation is the exhibited product of `n` fair signs with the noise law;
+the scored and causal codings are the `±1` genotypes; the causal effects are `aᵢσᵢ`; and
+the residual is the environmental noise `ε`.  Nothing about the reports is built in. -/
+def architecturePop (n : ℕ) {V : Type*} [Fintype V] (noise : ExpFunctional V)
+    (a : Fin n → ℝ) (σ : Fin n → Bool) (ξ : V → ℝ) :
+    DeploymentPopulation ((Fin n → Bool) × V) (Fin n) (Fin n) where
+  E := genotypeNoiseExp n noise
+  X := fun p i ↦ signValue (p.1 i)
+  C := fun p i ↦ signValue (p.1 i)
+  β := fun i ↦ a i * signValue (σ i)
+  h := fun p ↦ ξ p.2
+
+/-- The population expectation is the genotype-and-noise law. -/
+theorem architecturePop_exp {n : ℕ} {V : Type*} [Fintype V] (noise : ExpFunctional V)
+    (a : Fin n → ℝ) (σ : Fin n → Bool) (ξ : V → ℝ) :
+    (architecturePop n noise a σ ξ).E = genotypeNoiseExp n noise := rfl
+
+/-- The deployed score is `S = ∑ aᵢGᵢ`. -/
+theorem architecturePop_score {n : ℕ} {V : Type*} [Fintype V] (noise : ExpFunctional V)
+    (a : Fin n → ℝ) (σ : Fin n → Bool) (ξ : V → ℝ) :
+    (architecturePop n noise a σ ξ).score a = fun p ↦ blockScore a Finset.univ p.1 := rfl
+
+/-- The phenotype is `Y_σ = ∑ aᵢσᵢGᵢ + ε`. -/
+theorem architecturePop_phenotype {n : ℕ} {V : Type*} [Fintype V] (noise : ExpFunctional V)
+    (a : Fin n → ℝ) (σ : Fin n → Bool) (ξ : V → ℝ) :
+    (architecturePop n noise a σ ξ).phenotype
+      = fun p ↦ blockScore (fun i ↦ a i * signValue (σ i)) Finset.univ p.1 + ξ p.2 := rfl
+
+/-- The residual is the reversed-effect block score plus the noise. -/
+theorem architecturePop_residual {n : ℕ} {V : Type*} [Fintype V] (noise : ExpFunctional V)
+    (a : Fin n → ℝ) (σ : Fin n → Bool) (ξ : V → ℝ) :
+    (fun p ↦ (architecturePop n noise a σ ξ).phenotype p
+        - (architecturePop n noise a σ ξ).score a p)
+      = fun p ↦ blockScore (residualCoeff a σ) Finset.univ p.1 + ξ p.2 := by
+  funext p
+  have h3 : blockScore (residualCoeff a σ) Finset.univ p.1
+      = blockScore (fun i ↦ a i * signValue (σ i)) Finset.univ p.1
+        - blockScore a Finset.univ p.1 := (blockScore_sub _ _ _ _).symm
+  rw [architecturePop_phenotype, architecturePop_score, h3]
+  ring
+
+/-- **Unit genetic variance**: the deployed score has variance one. -/
+theorem architecture_score_variance {n : ℕ} {V : Type*} [Fintype V] (noise : ExpFunctional V)
+    (a : Fin n → ℝ) (σ : Fin n → Bool) (ξ : V → ℝ) (hnorm : ∑ i, a i ^ 2 = 1) :
+    (architecturePop n noise a σ ξ).scoreVariance a = 1 := by
+  rw [DeploymentPopulation.scoreVariance, variance_eq_expect_sq_sub_sq_mean,
+    architecturePop_exp, architecturePop_score, exp_blockScore_mean, exp_blockScore_sq,
+    hnorm]
+  ring
+
+/-- **Outcome variance** `1 + ν`, for every architecture. -/
+theorem architecture_outcome_variance {n : ℕ} {V : Type*} [Fintype V]
+    (noise : ExpFunctional V) (a : Fin n → ℝ) (σ : Fin n → Bool) (ξ : V → ℝ)
+    (hnorm : ∑ i, a i ^ 2 = 1) (hmean : noise ξ = 0) :
+    (architecturePop n noise a σ ξ).outcomeVariance = 1 + noise (fun e ↦ ξ e ^ 2) := by
+  rw [DeploymentPopulation.outcomeVariance, variance_eq_expect_sq_sub_sq_mean,
+    architecturePop_exp, architecturePop_phenotype, exp_lin_noise_mean,
+    exp_lin_noise_sq noise _ ξ hmean, sum_effect_sq, hnorm, hmean]
+  ring
+
+/-- **Predictive covariance** `Cov(S, Y_σ) = A_σ`. -/
+theorem architecture_predictive_covariance {n : ℕ} {V : Type*} [Fintype V]
+    (noise : ExpFunctional V) (a : Fin n → ℝ) (σ : Fin n → Bool) (ξ : V → ℝ)
+    (hmean : noise ξ = 0) :
+    (architecturePop n noise a σ ξ).predictiveCovariance a = alignment a σ := by
+  have hsplit : (fun p : (Fin n → Bool) × V ↦ blockScore a Finset.univ p.1
+        * (blockScore (fun i ↦ a i * signValue (σ i)) Finset.univ p.1 + ξ p.2))
+      = (fun p : (Fin n → Bool) × V ↦ blockScore a Finset.univ p.1
+          * blockScore (fun i ↦ a i * signValue (σ i)) Finset.univ p.1)
+        + (fun p : (Fin n → Bool) × V ↦ blockScore a Finset.univ p.1 * ξ p.2) := by
+    funext p
+    simp only [Pi.add_apply]
+    ring
+  rw [DeploymentPopulation.predictiveCovariance, covariance_eq_expect_mul_sub_means,
+    architecturePop_exp, architecturePop_score, architecturePop_phenotype, hsplit,
+    (genotypeNoiseExp n noise).add_eval, exp_blockScore_cross,
+    exp_mul noise (fun s ↦ blockScore a Finset.univ s) ξ, uniform_geno_eq,
+    sum_blockScore_mean, exp_blockScore_mean, exp_lin_noise_mean, hmean, sum_effect_sq]
+  have hres : ∑ i, (a i - a i * signValue (σ i)) ^ 2
+      = 2 * (∑ i, a i ^ 2) - 2 * alignment a σ := by
+    have hpt : ∀ i : Fin n,
+        (a i - a i * signValue (σ i)) ^ 2
+          = 2 * a i ^ 2 - 2 * (a i ^ 2 * signValue (σ i)) := by
+      intro i
+      have hs : signValue (σ i) ^ 2 = 1 := signValue_sq _
+      linear_combination (a i ^ 2) * hs
+    rw [Finset.sum_congr rfl fun i _ ↦ hpt i, Finset.sum_sub_distrib, ← Finset.mul_sum,
+      ← Finset.mul_sum]
+    rfl
+  rw [hres]
+  ring
+
+/-- **PL (5.2), first boxed formula / DC (4.2), first boxed formula**: the conditional
+squared correlation of one realized architecture is `A_σ² / (1 + ν)`. -/
+theorem architecture_r2 {n : ℕ} {V : Type*} [Fintype V] (noise : ExpFunctional V)
+    (a : Fin n → ℝ) (σ : Fin n → Bool) (ξ : V → ℝ) (hnorm : ∑ i, a i ^ 2 = 1)
+    (hmean : noise ξ = 0) :
+    (architecturePop n noise a σ ξ).r2 a
+      = alignment a σ ^ 2 / (1 + noise (fun e ↦ ξ e ^ 2)) := by
+  rw [DeploymentPopulation.r2, architecture_predictive_covariance noise a σ ξ hmean,
+    architecture_score_variance noise a σ ξ hnorm,
+    architecture_outcome_variance noise a σ ξ hnorm hmean]
+  ring
+
+/-- **PL (5.2), second boxed formula / DC (4.2), second boxed formula**: the conditional
+mean squared error is `ν + 2(1 - A_σ)`. -/
+theorem architecture_mse {n : ℕ} {V : Type*} [Fintype V] (noise : ExpFunctional V)
+    (a : Fin n → ℝ) (σ : Fin n → Bool) (ξ : V → ℝ) (hnorm : ∑ i, a i ^ 2 = 1)
+    (hmean : noise ξ = 0) :
+    (architecturePop n noise a σ ξ).deployedMse a
+      = noise (fun e ↦ ξ e ^ 2) + 2 * (1 - alignment a σ) := by
+  have hres := architecturePop_residual noise a σ ξ
+  have hfun : (fun p : (Fin n → Bool) × V ↦ ((architecturePop n noise a σ ξ).phenotype p
+        - (architecturePop n noise a σ ξ).score a p) ^ 2)
+      = fun p ↦ (blockScore (residualCoeff a σ) Finset.univ p.1 + ξ p.2) ^ 2 := by
+    funext p
+    rw [show (architecturePop n noise a σ ξ).phenotype p
+        - (architecturePop n noise a σ ξ).score a p
+        = blockScore (residualCoeff a σ) Finset.univ p.1 + ξ p.2 from congrFun hres p]
+  rw [DeploymentPopulation.deployedMse, expMse, architecturePop_exp, hfun,
+    exp_lin_noise_sq noise _ ξ hmean, residualCoeff_sq_sum, hnorm]
+  ring
+
+/-- **PL (5.3) / DC (4.3)**: the exact variance of the individual squared loss generated by
+one realized architecture.  Only `E ε = 0` is assumed about the noise beyond the finite
+moments it has by construction; the third noise moment cancels against the vanishing first
+genotype moment. -/
+theorem architecture_loss_variance {n : ℕ} {V : Type*} [Fintype V] (noise : ExpFunctional V)
+    (a : Fin n → ℝ) (σ : Fin n → Bool) (ξ : V → ℝ) (hnorm : ∑ i, a i ^ 2 = 1)
+    (hmean : noise ξ = 0) :
+    variance (architecturePop n noise a σ ξ).E
+        (fun p ↦ ((architecturePop n noise a σ ξ).phenotype p
+          - (architecturePop n noise a σ ξ).score a p) ^ 2)
+      = 2 * (2 * (1 - alignment a σ)) ^ 2 - 32 * reversedWeightSq a σ
+        + 4 * noise (fun e ↦ ξ e ^ 2) * (2 * (1 - alignment a σ))
+        + noise (fun e ↦ ξ e ^ 4) - noise (fun e ↦ ξ e ^ 2) ^ 2 := by
+  have hres := architecturePop_residual noise a σ ξ
+  have hfun : (fun p : (Fin n → Bool) × V ↦ ((architecturePop n noise a σ ξ).phenotype p
+        - (architecturePop n noise a σ ξ).score a p) ^ 2)
+      = fun p ↦ (blockScore (residualCoeff a σ) Finset.univ p.1 + ξ p.2) ^ 2 := by
+    funext p
+    rw [show (architecturePop n noise a σ ξ).phenotype p
+        - (architecturePop n noise a σ ξ).score a p
+        = blockScore (residualCoeff a σ) Finset.univ p.1 + ξ p.2 from congrFun hres p]
+  have hfour : (fun p : (Fin n → Bool) × V ↦
+        ((blockScore (residualCoeff a σ) Finset.univ p.1 + ξ p.2) ^ 2) ^ 2)
+      = fun p ↦ (blockScore (residualCoeff a σ) Finset.univ p.1 + ξ p.2) ^ 4 := by
+    funext p
+    ring
+  rw [architecturePop_exp, hfun, variance_eq_expect_sq_sub_sq_mean, hfour,
+    exp_lin_noise_quartic noise _ ξ hmean, exp_lin_noise_sq noise _ ξ hmean,
+    residualCoeff_sq_sum, residualCoeff_quartic_sum, hnorm]
+  ring
+
 end
 
 end Descent.Portability.TurnoverArchitectureMetrics
