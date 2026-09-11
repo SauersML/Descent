@@ -1,7 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Portability.AngularExtremalReports
+import Descent.Portability.AngularReportClosure
 import Mathlib.Analysis.Convex.Caratheodory
 import Mathlib.Analysis.Convex.Topology
 import Mathlib.LinearAlgebra.AffineSpace.FiniteDimensional
@@ -34,7 +34,9 @@ valid for every feasible law.  The manuscript emphasizes exactly this reading, t
 inequality is a verifiable certificate rather than a plug-in estimate.
 
 The equality of values in PL (9.6), and the primal attainment statement, are proved in the
-companion results below when the feasible set is nonempty.
+companion results below when the feasible set is nonempty.  The closing result applies PL (9.5)
+to the group report of PL (6.6) in `Descent.Portability.AngularReportClosure`: the angular trace
+pairing that evaluates the expected report lies in the convex hull of the pointwise reports.
 -/
 
 set_option autoImplicit false
