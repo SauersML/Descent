@@ -51,18 +51,19 @@ polynomial sign conditions `graphGuard` with signs `graphPattern`: the guards, t
 `D_num D_den > 0` of every presented definedness probability, and the polynomial equation
 `D_num N_den r_j = N_num D_den` of every report coordinate
 (`reportGraph_eq_iUnion_signCell`). This is the defining presentation of a semialgebraic set,
-for every finite algebraic experiment, obtained without quantifier elimination. The two-by-two architecture and
-environment region of NOTE2 §3.2 is an instance: `architectureTree` enumerates the mixture
-averages of `ArchitectureEnvironmentRegion` (`accumulation_architectureTree`), and its attainable
-region over the unit square is the corpus region `jointRegion` of NOTE2 (10)
+for every finite algebraic experiment, obtained without quantifier elimination. The two-by-two
+architecture and environment region of NOTE2 §3.2 is an instance: `architectureTree` enumerates
+the mixture averages of `ArchitectureEnvironmentRegion` (`accumulation_architectureTree`), and
+its attainable region over the unit square is the corpus region `jointRegion` of NOTE2 (10)
 (`attainableRegion_architectureTree_eq_jointRegion`).
 
 Not formalized: Mathlib's notion of a semialgebraic set, and real quantifier elimination, which
 the note uses to eliminate the parameters from the graph and so describe (8) without them,
-establish sharp bounds, and decide attainment; neither is available at this Mathlib pin. The partition here is by the
-signs of the supplied guards, and regularity of the presented denominators at a point is a
-supplied hypothesis, not a refinement the module computes. Algebraic roots, optimizers and
-transcendental primitives are outside the rational conclusion, as the note states.
+establish sharp bounds, and decide attainment; neither is available at this Mathlib pin. The
+partition here is by the signs of the supplied guards, and regularity of the presented
+denominators at a point is a supplied hypothesis, not a refinement the module computes.
+Algebraic roots, optimizers and transcendental primitives are outside the rational conclusion,
+as the note states.
 
 ## Empirical status
 
@@ -188,6 +189,13 @@ def signCell (guard : Guard → MvPolynomial σ ℝ) (pattern : Guard → SignTy
 theorem mem_signCell_signPattern (guard : Guard → MvPolynomial σ ℝ) (θ : σ → ℝ) :
     θ ∈ signCell guard (signPattern guard θ) :=
   rfl
+
+/-- Membership in a cell, written out guard by guard. -/
+theorem mem_signCell_iff (guard : Guard → MvPolynomial σ ℝ) (pattern : Guard → SignType)
+    (θ : σ → ℝ) :
+    θ ∈ signCell guard pattern ↔
+      ∀ index, SignType.sign (MvPolynomial.eval θ (guard index)) = pattern index :=
+  ⟨fun hcell index ↦ congrFun hcell index, fun hsigns ↦ funext hsigns⟩
 
 /-- The cells of distinct sign patterns are disjoint. -/
 theorem disjoint_signCell (guard : Guard → MvPolynomial σ ℝ) {first second : Guard → SignType}
@@ -656,9 +664,9 @@ theorem mem_signCell_graphGuard_iff {J : Type} (guard : Guard → MvPolynomial �
                 (ParametricTree.accumulationQuotient tree (numerator j) pattern).numerator *
               MvPolynomial.eval (point ∘ Sum.inl)
                 (ParametricTree.accumulationQuotient tree (definedness j) pattern).denominator := by
-  simp only [signCell, Set.mem_setOf_eq, funext_iff, Sum.forall, signPattern, graphGuard,
-    graphPattern, map_sub, map_mul, MvPolynomial.eval_rename, MvPolynomial.eval_X,
-    sign_eq_one_iff, sign_eq_zero_iff, sub_eq_zero, forall_and]
+  simp only [mem_signCell_iff, Sum.forall, graphGuard, graphPattern, map_sub, map_mul,
+    MvPolynomial.eval_rename, MvPolynomial.eval_X, sign_eq_one_iff, sign_eq_zero_iff, sub_eq_zero,
+    forall_and]
 
 /-- On the cell of a pattern, at a regular point, a report value satisfies the definedness and
 defining equation of one requested quantity exactly when the presented polynomials satisfy the

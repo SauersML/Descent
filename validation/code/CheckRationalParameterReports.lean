@@ -16,6 +16,7 @@ open Descent.Portability.RationalParameterReports
 #print axioms PolynomialQuotient.denominator_sum_ne_zero
 #print axioms PolynomialQuotient.eval_sum
 #print axioms mem_signCell_signPattern
+#print axioms mem_signCell_iff
 #print axioms disjoint_signCell
 #print axioms iUnion_signCell
 #print axioms finite_range_signCell
