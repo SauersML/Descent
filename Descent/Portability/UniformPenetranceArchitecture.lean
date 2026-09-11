@@ -239,7 +239,6 @@ theorem binaryCaseMass_penetranceLaw (θ : ℝ) (hlo : 0 ≤ θ) (hhi : θ ≤ 1
     (penetranceLaw θ).binaryCaseMass outcomeFlag = θ / 2 := by
   rw [FiniteReportLaw.binaryCaseMass, expectation_penetranceLaw θ hlo hhi]
   norm_num [outcomeFlag]
-  all_goals ring
 
 /-- The unnormalized case-control ranking credit of NOTE2 section 5.4, with half credit
 for the ties that a binary score necessarily produces. -/
@@ -292,23 +291,27 @@ def repairedBrier (law : FiniteReportLaw (Bool × Bool)) : ℝ :=
 def accuracyRate (law : FiniteReportLaw (Bool × Bool)) : ℝ :=
   law.expectation fun cell ↦ agreement cell.1 cell.2
 
-theorem scoreGroupMass_penetranceLaw_true (θ : ℝ) (hlo : 0 ≤ θ) (hhi : θ ≤ 1) :
+/-- The binary score is fair at every parameter, so each score group carries half the mass. -/
+theorem scoreGroupMass_penetranceLaw_true (θ : ℝ) :
     scoreGroupMass (penetranceLaw θ) true = 1 / 2 := by
-  simp only [scoreGroupMass, penetranceLaw_mass, penetrance_eq_self θ hlo hhi, penetranceMass]
+  simp only [scoreGroupMass, penetranceLaw_mass, penetranceMass]
   ring
 
-theorem scoreGroupMass_penetranceLaw_false (θ : ℝ) (hlo : 0 ≤ θ) (hhi : θ ≤ 1) :
+/-- The null-score group also carries half the mass. -/
+theorem scoreGroupMass_penetranceLaw_false (θ : ℝ) :
     scoreGroupMass (penetranceLaw θ) false = 1 / 2 := by
-  simp only [scoreGroupMass, penetranceLaw_mass, penetrance_eq_self θ hlo hhi, penetranceMass]
+  simp only [scoreGroupMass, penetranceLaw_mass, penetranceMass]
   ring
 
+/-- Positive outcomes occur only in the positive score group, there with chance `θ`. -/
 theorem scoreSuccessMass_penetranceLaw_true (θ : ℝ) (hlo : 0 ≤ θ) (hhi : θ ≤ 1) :
     scoreSuccessMass (penetranceLaw θ) true = θ / 2 := by
   simp only [scoreSuccessMass, penetranceLaw_mass, penetrance_eq_self θ hlo hhi, penetranceMass]
 
-theorem scoreSuccessMass_penetranceLaw_false (θ : ℝ) (hlo : 0 ≤ θ) (hhi : θ ≤ 1) :
+/-- The null-score group contains no positive outcomes at all. -/
+theorem scoreSuccessMass_penetranceLaw_false (θ : ℝ) :
     scoreSuccessMass (penetranceLaw θ) false = 0 := by
-  simp only [scoreSuccessMass, penetranceLaw_mass, penetrance_eq_self θ hlo hhi, penetranceMass]
+  simp only [scoreSuccessMass, penetranceLaw_mass, penetranceMass]
 
 /-- NOTE2 section 9.1: the calibration error equals the Brier score for this family, both
 being the error rate of the raw binary forecast. -/
@@ -317,13 +320,13 @@ theorem discreteECE_penetranceLaw (θ : ℝ) (hlo : 0 ≤ θ) (hhi : θ ≤ 1) :
   have htrue : scoreSuccessMass (penetranceLaw θ) true -
       numeric true * scoreGroupMass (penetranceLaw θ) true = -((1 - θ) / 2) := by
     rw [scoreSuccessMass_penetranceLaw_true θ hlo hhi,
-      scoreGroupMass_penetranceLaw_true θ hlo hhi]
+      scoreGroupMass_penetranceLaw_true θ]
     simp only [numeric]
     ring
   have hfalse : scoreSuccessMass (penetranceLaw θ) false -
       numeric false * scoreGroupMass (penetranceLaw θ) false = 0 := by
-    rw [scoreSuccessMass_penetranceLaw_false θ hlo hhi,
-      scoreGroupMass_penetranceLaw_false θ hlo hhi]
+    rw [scoreSuccessMass_penetranceLaw_false θ,
+      scoreGroupMass_penetranceLaw_false θ]
     simp only [numeric]
     ring
   rw [discreteECE, Fintype.sum_bool, htrue, hfalse, abs_neg, abs_zero,
@@ -334,9 +337,9 @@ theorem discreteECE_penetranceLaw (θ : ℝ) (hlo : 0 ≤ θ) (hhi : θ ≤ 1) :
 theorem repairedBrier_penetranceLaw (θ : ℝ) (hlo : 0 ≤ θ) (hhi : θ ≤ 1) :
     repairedBrier (penetranceLaw θ) = θ * (1 - θ) / 2 := by
   rw [repairedBrier, Fintype.sum_bool, expectation_cellOutcome_penetranceLaw θ hlo hhi,
-    scoreGroupMass_penetranceLaw_true θ hlo hhi, scoreGroupMass_penetranceLaw_false θ hlo hhi,
+    scoreGroupMass_penetranceLaw_true θ, scoreGroupMass_penetranceLaw_false θ,
     scoreSuccessMass_penetranceLaw_true θ hlo hhi,
-    scoreSuccessMass_penetranceLaw_false θ hlo hhi,
+    scoreSuccessMass_penetranceLaw_false θ,
     if_neg (by norm_num : ¬((1:ℝ) / 2 = 0)), if_neg (by norm_num : ¬((1:ℝ) / 2 = 0))]
   ring
 
@@ -357,9 +360,9 @@ def repairedLogLoss (law : FiniteReportLaw (Bool × Bool)) : ℝ :=
 the null-score group contributing nothing because its realized rate is zero. -/
 theorem repairedLogLoss_penetranceLaw (θ : ℝ) (hlo : 0 ≤ θ) (hhi : θ ≤ 1) :
     repairedLogLoss (penetranceLaw θ) = Real.binEntropy θ / 2 := by
-  rw [repairedLogLoss, Fintype.sum_bool, scoreGroupMass_penetranceLaw_true θ hlo hhi,
-    scoreGroupMass_penetranceLaw_false θ hlo hhi, scoreSuccessMass_penetranceLaw_true θ hlo hhi,
-    scoreSuccessMass_penetranceLaw_false θ hlo hhi]
+  rw [repairedLogLoss, Fintype.sum_bool, scoreGroupMass_penetranceLaw_true θ,
+    scoreGroupMass_penetranceLaw_false θ, scoreSuccessMass_penetranceLaw_true θ hlo hhi,
+    scoreSuccessMass_penetranceLaw_false θ]
   rw [show θ / 2 / (1 / 2) = θ by ring, show (0:ℝ) / (1 / 2) = 0 by norm_num]
   rw [Real.binEntropy_zero]
   ring
@@ -403,7 +406,10 @@ theorem rawLogLoss_penetranceLaw (θ : ℝ) (hlo : 0 ≤ θ) (hhi : θ < 1) :
         logLossTerm (forecastOfOutcome (true, false)) := hterm.symm
     _ ≤ ∑ cell, ENNReal.ofReal ((penetranceLaw θ).mass cell) *
           logLossTerm (forecastOfOutcome cell) :=
-        Finset.single_le_sum (fun cell _ ↦ zero_le _) (Finset.mem_univ _)
+        Finset.single_le_sum
+          (f := fun cell ↦ ENNReal.ofReal ((penetranceLaw θ).mass cell) *
+            logLossTerm (forecastOfOutcome cell))
+          (fun cell _ ↦ zero_le _) (Finset.mem_univ _)
 
 /-- The four cell masses of the pooled individual law of NOTE2 section 9.1, obtained by
 averaging the conditional cells over a uniform penetrance. -/
