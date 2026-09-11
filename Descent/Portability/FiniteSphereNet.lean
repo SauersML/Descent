@@ -22,6 +22,8 @@ set_option relaxedAutoImplicit false
 
 namespace Descent.Portability.FiniteSphereNet
 
+section Packing
+
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
 
 /-- A half-separated finite subset of the unit ball. -/
@@ -59,7 +61,7 @@ theorem packing_card_bound (s : Finset E) (hs : HalfPacking s) :
 
 /-- A largest finite packing exists because its cardinalities have a proved finite upper bound. -/
 theorem exists_maximum_packing :
-    ∃ s : Finset E, HalfPacking s ∧ ∀ t, HalfPacking t → t.card ≤ s.card := by
+    ∃ s : Finset E, HalfPacking s ∧ ∀ t : Finset E, HalfPacking t → t.card ≤ s.card := by
   let A : Set ℕ := {n | ∃ s : Finset E, HalfPacking s ∧ s.card = n}
   have hne : A.Nonempty := by
     refine ⟨0, ∅, ?_, rfl⟩
@@ -76,7 +78,7 @@ theorem exists_maximum_packing :
 
 /-- A maximum-cardinality packing covers the unit ball within distance one half. -/
 theorem maximum_packing_covers (s : Finset E) (hs : HalfPacking s)
-    (hmax : ∀ t, HalfPacking t → t.card ≤ s.card) (x : E) (hx : ‖x‖ ≤ 1) :
+    (hmax : ∀ t : Finset E, HalfPacking t → t.card ≤ s.card) (x : E) (hx : ‖x‖ ≤ 1) :
     ∃ a ∈ s, ‖x - a‖ < (1 : ℝ) / 2 := by
   classical
   by_contra hn
@@ -92,13 +94,15 @@ theorem maximum_packing_covers (s : Finset E) (hs : HalfPacking s)
       · exact hx
       · exact hs.1 u hu
     · intro u hu v hv hne
-      rcases Finset.mem_insert.mp hu with rfl | hu
-      · rcases Finset.mem_insert.mp hv with rfl | hv
-        · exact (hne rfl).elim
-        · exact hn v hv
-      · rcases Finset.mem_insert.mp hv with rfl | hv
-        · simpa only [norm_sub_rev] using hn u hu
-        · exact hs.2 u hu v hv hne
+      rcases Finset.mem_insert.mp hu with hux | hus
+      · subst u
+        rcases Finset.mem_insert.mp hv with hvx | hvs
+        · exact (hne hvx.symm).elim
+        · exact hn v hvs
+      · rcases Finset.mem_insert.mp hv with hvx | hvs
+        · subst v
+          simpa only [norm_sub_rev] using hn u hus
+        · exact hs.2 u hus v hvs hne
   have hc := hmax (insert x s) hins
   rw [Finset.card_insert_of_notMem hnot] at hc
   omega
@@ -114,9 +118,11 @@ theorem exists_half_net :
     exact ⟨a, ha⟩
   exact ⟨s, hne, packing_card_bound s hs, hs.1, hcover⟩
 
+end Packing
+
 section InnerProduct
 
-variable [InnerProductSpace ℝ E]
+variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
 
 /-- Controlling the finite net controls every direction, with the exact factor two. -/
 theorem norm_le_twice (s : Finset E)

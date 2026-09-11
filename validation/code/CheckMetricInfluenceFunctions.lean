@@ -21,3 +21,7 @@ import Descent.Portability.MetricInfluenceFunctions
 #print axioms Descent.Portability.MetricInfluenceFunctions.lawCov_influence
 #print axioms Descent.Portability.MetricInfluenceFunctions.lawVar_influence
 #print axioms Descent.Portability.MetricInfluenceFunctions.log_squared_correlation_influence
+#print axioms Descent.Portability.MetricInfluenceFunctions.wInner_two_term
+#print axioms Descent.Portability.MetricInfluenceFunctions.secondMomentOfMeans_influence
+#print axioms Descent.Portability.MetricInfluenceFunctions.betweenVar_influence
+#print axioms Descent.Portability.MetricInfluenceFunctions.etaD_influence

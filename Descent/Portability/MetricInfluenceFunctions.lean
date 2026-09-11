@@ -301,6 +301,227 @@ theorem log_squared_correlation_influence (P f S Y : Ω → ℝ)
   rw [hval]
   exact hchain
 
+/-- Two-term linear expansion of the inner product in the left slot. -/
+theorem wInner_two_term (P f A B : Ω → ℝ) (p q : ℝ) :
+    wInner P (fun ω ↦ p * A ω - q * B ω) f =
+      p * wInner P A f - q * wInner P B f := by
+  rw [wInner_sub_left, wInner_smul_left, wInner_smul_left]
+
+variable {Dt : Type*} [Fintype Dt] [DecidableEq Dt]
+
+/-- The indicator of a distance cell. -/
+def cellInd (D : Ω → Dt) (d : Dt) : Ω → ℝ := fun ω ↦ if D ω = d then 1 else 0
+
+/-- The mass of a distance cell under an arbitrary finite weight vector. -/
+def cellMass (Q : Ω → ℝ) (D : Ω → Dt) (d : Dt) : ℝ := lawExp Q (cellInd D d)
+
+/-- The unnormalised loss mean on a distance cell. -/
+def cellLoss (Q L : Ω → ℝ) (D : Ω → Dt) (d : Dt) : ℝ :=
+  lawExp Q (fun ω ↦ L ω * cellInd D d ω)
+
+/-- The conditional loss mean on a distance cell. -/
+def condCellMean (Q L : Ω → ℝ) (D : Ω → Dt) (d : Dt) : ℝ :=
+  cellLoss Q L D d / cellMass Q D d
+
+/-- The second moment of the conditional loss means, written as the manuscript's
+`C = ∑ u_d ^ 2 / p_d`. -/
+def secondMomentOfMeans (Q L : Ω → ℝ) (D : Ω → Dt) : ℝ :=
+  ∑ d, cellLoss Q L D d * cellLoss Q L D d / cellMass Q D d
+
+/-- The between-cell variance of the loss. -/
+def betweenVar (Q L : Ω → ℝ) (D : Ω → Dt) : ℝ :=
+  secondMomentOfMeans Q L D - lawExp Q L * lawExp Q L
+
+/-- The between-cell explainable fraction of the loss. -/
+def etaD (Q L : Ω → ℝ) (D : Ω → Dt) : ℝ := betweenVar Q L D / lawCov Q L L
+
+/-- **The manuscript's `C'` step for TQ (5.7).** The second moment of the
+conditional means has `2 m L - m ^ 2` as an influence function, where `m` is the
+conditional mean of the cell containing the point. The cell masses are positive,
+which is the manuscript's stated domain condition. -/
+theorem secondMomentOfMeans_influence (P f L : Ω → ℝ) (D : Ω → Dt)
+    (hpos : ∀ d, cellMass P D d ≠ 0) :
+    HasDerivAt (fun ε ↦ secondMomentOfMeans (perturbedLaw P f ε) L D)
+      (wInner P (fun ω ↦ 2 * condCellMean P L D (D ω) * L ω -
+        condCellMean P L D (D ω) ^ 2) f) 0 := by
+  have hz := perturbedLaw_zero P f
+  have hterm : ∀ d : Dt, HasDerivAt
+      (fun ε ↦ cellLoss (perturbedLaw P f ε) L D d *
+        cellLoss (perturbedLaw P f ε) L D d / cellMass (perturbedLaw P f ε) D d)
+      (2 * condCellMean P L D d * wInner P (fun ω ↦ L ω * cellInd D d ω) f -
+        condCellMean P L D d ^ 2 * wInner P (cellInd D d) f) 0 := by
+    intro d
+    have hu := hasDerivAt_perturbed_exp P f (fun ω ↦ L ω * cellInd D d ω)
+    have hp := hasDerivAt_perturbed_exp P f (cellInd D d)
+    have hmul : HasDerivAt
+        (fun ε ↦ lawExp (perturbedLaw P f ε) (fun ω ↦ L ω * cellInd D d ω) *
+          lawExp (perturbedLaw P f ε) (fun ω ↦ L ω * cellInd D d ω))
+        (wInner P (fun ω ↦ L ω * cellInd D d ω) f *
+            lawExp P (fun ω ↦ L ω * cellInd D d ω) +
+          lawExp P (fun ω ↦ L ω * cellInd D d ω) *
+            wInner P (fun ω ↦ L ω * cellInd D d ω) f) 0 := by
+      have h := hu.mul hu
+      rw [hz] at h
+      exact h
+    have hdiv := hmul.div hp (by rw [hz]; exact hpos d)
+    rw [hz] at hdiv
+    have hval : 2 * condCellMean P L D d *
+          wInner P (fun ω ↦ L ω * cellInd D d ω) f -
+        condCellMean P L D d ^ 2 * wInner P (cellInd D d) f =
+        ((wInner P (fun ω ↦ L ω * cellInd D d ω) f *
+            lawExp P (fun ω ↦ L ω * cellInd D d ω) +
+          lawExp P (fun ω ↦ L ω * cellInd D d ω) *
+            wInner P (fun ω ↦ L ω * cellInd D d ω) f) *
+          lawExp P (cellInd D d) -
+          lawExp P (fun ω ↦ L ω * cellInd D d ω) *
+            lawExp P (fun ω ↦ L ω * cellInd D d ω) *
+            wInner P (cellInd D d) f) / lawExp P (cellInd D d) ^ 2 := by
+      simp only [condCellMean, cellLoss, cellMass]
+      field_simp
+      ring
+    rw [hval]
+    exact hdiv
+  have hsum : HasDerivAt (fun ε ↦ secondMomentOfMeans (perturbedLaw P f ε) L D)
+      (∑ d, (2 * condCellMean P L D d * wInner P (fun ω ↦ L ω * cellInd D d ω) f -
+        condCellMean P L D d ^ 2 * wInner P (cellInd D d) f)) 0 := by
+    have h := HasDerivAt.sum (fun d (_ : d ∈ Finset.univ) ↦ hterm d)
+    have hfun : (fun ε ↦ secondMomentOfMeans (perturbedLaw P f ε) L D) =
+        ∑ d : Dt, (fun ε ↦ cellLoss (perturbedLaw P f ε) L D d *
+          cellLoss (perturbedLaw P f ε) L D d /
+            cellMass (perturbedLaw P f ε) D d) := by
+      funext ε
+      simp only [secondMomentOfMeans, Finset.sum_apply]
+    rw [hfun]
+    exact h
+  have hpt : ∀ ω : Ω, 2 * condCellMean P L D (D ω) * L ω -
+      condCellMean P L D (D ω) ^ 2 =
+      ∑ d, (1 : ℝ) * (2 * condCellMean P L D d * (L ω * cellInd D d ω) -
+        condCellMean P L D d ^ 2 * cellInd D d ω) := by
+    intro ω
+    have hstep : ∀ d : Dt, (1 : ℝ) *
+        (2 * condCellMean P L D d * (L ω * cellInd D d ω) -
+          condCellMean P L D d ^ 2 * cellInd D d ω) =
+        if D ω = d then
+          2 * condCellMean P L D (D ω) * L ω - condCellMean P L D (D ω) ^ 2 else 0 := by
+      intro d
+      by_cases h : D ω = d <;> simp [cellInd, h]
+    rw [Finset.sum_congr rfl fun d _ ↦ hstep d, Finset.sum_ite_eq]
+    simp
+  have hpsi : wInner P (fun ω ↦ 2 * condCellMean P L D (D ω) * L ω -
+      condCellMean P L D (D ω) ^ 2) f =
+      ∑ d, (2 * condCellMean P L D d * wInner P (fun ω ↦ L ω * cellInd D d ω) f -
+        condCellMean P L D d ^ 2 * wInner P (cellInd D d) f) := by
+    rw [funext hpt, wInner_weighted_sum_left]
+    refine Finset.sum_congr rfl fun d _ ↦ ?_
+    rw [one_mul, wInner_two_term]
+  rw [hpsi]
+  exact hsum
+
+/-- **TQ equation (5.7), the between-cell influence `psi_B`.** -/
+theorem betweenVar_influence (P f L : Ω → ℝ) (D : Ω → Dt)
+    (hpos : ∀ d, cellMass P D d ≠ 0) (hf : wInner P (fun _ ↦ (1 : ℝ)) f = 0) :
+    HasDerivAt (fun ε ↦ betweenVar (perturbedLaw P f ε) L D)
+      (wInner P (fun ω ↦
+        2 * (condCellMean P L D (D ω) - lawExp P L) *
+            (L ω - condCellMean P L D (D ω)) +
+          (condCellMean P L D (D ω) - lawExp P L) ^ 2 - betweenVar P L D) f) 0 := by
+  have hz := perturbedLaw_zero P f
+  have hC := secondMomentOfMeans_influence P f L D hpos
+  have hmu := hasDerivAt_perturbed_exp P f L
+  have hmul : HasDerivAt
+      (fun ε ↦ lawExp (perturbedLaw P f ε) L * lawExp (perturbedLaw P f ε) L)
+      (wInner P L f * lawExp P L + lawExp P L * wInner P L f) 0 := by
+    have h := hmu.mul hmu
+    rw [hz] at h
+    exact h
+  have hsub : HasDerivAt (fun ε ↦ betweenVar (perturbedLaw P f ε) L D)
+      (wInner P (fun ω ↦ 2 * condCellMean P L D (D ω) * L ω -
+          condCellMean P L D (D ω) ^ 2) f -
+        (wInner P L f * lawExp P L + lawExp P L * wInner P L f)) 0 := hC.sub hmul
+  have hpsi : (fun ω ↦
+      2 * (condCellMean P L D (D ω) - lawExp P L) *
+          (L ω - condCellMean P L D (D ω)) +
+        (condCellMean P L D (D ω) - lawExp P L) ^ 2 - betweenVar P L D) =
+      fun ω ↦ (1 : ℝ) * (2 * condCellMean P L D (D ω) * L ω -
+          condCellMean P L D (D ω) ^ 2) -
+        (2 * lawExp P L) * L ω -
+        (betweenVar P L D - lawExp P L * lawExp P L) * (fun _ : Ω ↦ (1 : ℝ)) ω := by
+    funext ω
+    ring
+  rw [hpsi, wInner_three_term, hf]
+  have hval : (1 : ℝ) * wInner P (fun ω ↦ 2 * condCellMean P L D (D ω) * L ω -
+        condCellMean P L D (D ω) ^ 2) f -
+      2 * lawExp P L * wInner P L f -
+      (betweenVar P L D - lawExp P L * lawExp P L) * 0 =
+      wInner P (fun ω ↦ 2 * condCellMean P L D (D ω) * L ω -
+          condCellMean P L D (D ω) ^ 2) f -
+        (wInner P L f * lawExp P L + lawExp P L * wInner P L f) := by
+    ring
+  rw [hval]
+  exact hsub
+
+/-- **TQ equation (5.7).** The between-cell explainable fraction has centred
+influence function `(psi_B - eta_D psi_T) / T`, with `psi_B` the between-cell
+influence and `psi_T` the centred squared loss. The hypotheses are the
+manuscript's: positive cell masses and a positive total loss variance. -/
+theorem etaD_influence (P f L : Ω → ℝ) (D : Ω → Dt)
+    (hpos : ∀ d, cellMass P D d ≠ 0) (hf : wInner P (fun _ ↦ (1 : ℝ)) f = 0)
+    (hT : lawCov P L L ≠ 0) :
+    HasDerivAt (fun ε ↦ etaD (perturbedLaw P f ε) L D)
+      (wInner P (fun ω ↦
+        ((2 * (condCellMean P L D (D ω) - lawExp P L) *
+              (L ω - condCellMean P L D (D ω)) +
+            (condCellMean P L D (D ω) - lawExp P L) ^ 2 - betweenVar P L D) -
+          etaD P L D * ((L ω - lawExp P L) ^ 2 - lawCov P L L)) /
+        lawCov P L L) f) 0 := by
+  have hz := perturbedLaw_zero P f
+  have hB := betweenVar_influence P f L D hpos hf
+  have hTd := lawVar_influence P f L hf
+  have hdiv := hB.div hTd (by rw [hz]; exact hT)
+  rw [hz] at hdiv
+  have hTpsi : wInner P (fun ω ↦ (L ω - lawExp P L) ^ 2 - lawCov P L L) f =
+      wInner P (fun ω ↦ (L ω - lawExp P L) ^ 2) f := by
+    have h1 : (fun ω ↦ (L ω - lawExp P L) ^ 2 - lawCov P L L) =
+        fun ω ↦ (1 : ℝ) * (L ω - lawExp P L) ^ 2 -
+          lawCov P L L * (fun _ : Ω ↦ (1 : ℝ)) ω := by
+      funext ω
+      ring
+    rw [h1, wInner_two_term, hf]
+    ring
+  have hpsi : (fun ω ↦
+      ((2 * (condCellMean P L D (D ω) - lawExp P L) *
+            (L ω - condCellMean P L D (D ω)) +
+          (condCellMean P L D (D ω) - lawExp P L) ^ 2 - betweenVar P L D) -
+        etaD P L D * ((L ω - lawExp P L) ^ 2 - lawCov P L L)) / lawCov P L L) =
+      fun ω ↦ (lawCov P L L)⁻¹ *
+          (2 * (condCellMean P L D (D ω) - lawExp P L) *
+              (L ω - condCellMean P L D (D ω)) +
+            (condCellMean P L D (D ω) - lawExp P L) ^ 2 - betweenVar P L D) -
+        (etaD P L D * (lawCov P L L)⁻¹) *
+          ((L ω - lawExp P L) ^ 2 - lawCov P L L) -
+        (0 : ℝ) * (L ω - lawExp P L) ^ 2 := by
+    funext ω
+    ring
+  rw [hpsi, wInner_three_term, hTpsi]
+  have hval : (lawCov P L L)⁻¹ *
+        wInner P (fun ω ↦ 2 * (condCellMean P L D (D ω) - lawExp P L) *
+            (L ω - condCellMean P L D (D ω)) +
+          (condCellMean P L D (D ω) - lawExp P L) ^ 2 - betweenVar P L D) f -
+      etaD P L D * (lawCov P L L)⁻¹ *
+        wInner P (fun ω ↦ (L ω - lawExp P L) ^ 2) f -
+      0 * wInner P (fun ω ↦ (L ω - lawExp P L) ^ 2) f =
+      (wInner P (fun ω ↦ 2 * (condCellMean P L D (D ω) - lawExp P L) *
+            (L ω - condCellMean P L D (D ω)) +
+          (condCellMean P L D (D ω) - lawExp P L) ^ 2 - betweenVar P L D) f *
+          lawCov P L L -
+        betweenVar P L D * wInner P (fun ω ↦ (L ω - lawExp P L) ^ 2) f) /
+        lawCov P L L ^ 2 := by
+    simp only [etaD]
+    field_simp
+    ring
+  rw [hval]
+  exact hdiv
+
 end
 
 end Descent.Portability.MetricInfluenceFunctions
