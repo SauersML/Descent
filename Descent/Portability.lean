@@ -459,6 +459,9 @@ import Descent.Portability.CertifiedFrameRepair
 import Descent.Portability.NonlinearMetricGridBound
 import Descent.Portability.ScoreMomentZonoid
 
+import Descent.Portability.ClippedFrameRepair
+import Descent.Portability.SquaredCorrelationZeroTest
+
 assert_below Descent.Program
 
 /-!

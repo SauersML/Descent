@@ -3117,6 +3117,9 @@ def certifiedBound(u, V, εu, εV, a):
     I = float(len(u))
     return _rt.add(_rt.add(coordinateRisk(u, V, a), _rt.mul(_rt.mul((_rt.sumdim('I', len(u), len(V), len(a))), εV), (sum((_rt.lpow(a[int(i)], 2.0)) for i in range(int(len(u))))))), _rt.mul(_rt.mul(2.0, εu), sum((_rt.rabs(a[int(i)])) for i in range(int(len(u))))))
 
+def conjPerturb(G, hG, C):
+    return _rt.mul(_rt.mul(eigenUnitary(G, hG), C), (eigenUnitary(G, hG))(ᵀ))
+
 def plusDirection():
     return (lambda _: _rt.rinv((_rt.rsqrt(2.0))))
 
@@ -6336,7 +6339,7 @@ def residualLaw(a, b, delta, hab, hd):
 def scaleX(q, m, d):
     return _rt.add(_rt.rsqrt((q[int(d)])), _rt.rsqrt((_rt.add(_rt.sub(m[int(d)], 1.0), q[int(d)]))))
 
-def outcomeVar(q, m, d):
+def Descent_Portability_SourceFixedRealization_outcomeVar(q, m, d):
     return _rt.lpow(scaleX(q, m, d), 2.0)
 
 def shiftK(q, m, d):
@@ -6828,6 +6831,18 @@ def independentTurnoverAccuracy(n, w, b, sigma, lam, t):
 
 def flipWeight(w, s, s_p):
     return sum(((((0.0) if (s_p(i) == s(i)) else w[int(i)]))) for i in range(int(len(w))))
+
+def agree(z):
+    return (1.0 if (z(0.0) == z(1.0)) else 0.0)
+
+def startLaw():
+    return (lambda a: (1.0 if ((a(0.0) == true) and (a(1.0) == true)) else 0.0))
+
+def flipKernel(p, _t, i, z, b):
+    return ((1.0 - p) if (b == z(i)) else p)
+
+def stepAgree(J, v):
+    return sum(((J(v, a) * agree(a))) for a in range(int(_rt.sumdim('a', len(J[0])))))
 
 def classMass(prior, summary, cls):
     return sum(((_rt._proj(prior, 'mass')(w) if (summary(w) == cls) else 0.0)) for w in range(int(_rt.sumdim('w', len(summary), len(_rt._proj(prior, 'mass'))))))
