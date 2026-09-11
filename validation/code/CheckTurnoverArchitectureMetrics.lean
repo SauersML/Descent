@@ -6,7 +6,7 @@ import Descent.Portability.TurnoverArchitectureMetrics
 /-! Axiom audit of TurnoverArchitectureMetrics. -/
 
 #print axioms Descent.Portability.TurnoverArchitectureMetrics.signValue_sq
-#print axioms Descent.Portability.TurnoverArchitectureMetrics.signValue_not
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.signValue_eq_sign
 #print axioms Descent.Portability.TurnoverArchitectureMetrics.flipCoord_self
 #print axioms Descent.Portability.TurnoverArchitectureMetrics.flipCoord_ne
 #print axioms Descent.Portability.TurnoverArchitectureMetrics.flipCoord_invol
@@ -41,6 +41,7 @@ import Descent.Portability.TurnoverArchitectureMetrics
 #print axioms Descent.Portability.TurnoverArchitectureMetrics.architecturePop_score
 #print axioms Descent.Portability.TurnoverArchitectureMetrics.architecturePop_phenotype
 #print axioms Descent.Portability.TurnoverArchitectureMetrics.architecturePop_residual
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.architecturePop_residual_sq
 #print axioms Descent.Portability.TurnoverArchitectureMetrics.architecture_score_variance
 #print axioms Descent.Portability.TurnoverArchitectureMetrics.architecture_outcome_variance
 #print axioms Descent.Portability.TurnoverArchitectureMetrics.architecture_predictive_covariance

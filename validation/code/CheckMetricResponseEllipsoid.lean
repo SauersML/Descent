@@ -5,26 +5,26 @@ import Descent.Portability.MetricResponseEllipsoid
 
 /-! Axiom audit of MetricResponseEllipsoid. -/
 
-#print axioms Descent.Portability.MetricResponseEllipsoid.wInner_eq_weightedExp
-#print axioms Descent.Portability.MetricResponseEllipsoid.wInner_comm
-#print axioms Descent.Portability.MetricResponseEllipsoid.wInner_add_left
-#print axioms Descent.Portability.MetricResponseEllipsoid.wInner_sub_left
-#print axioms Descent.Portability.MetricResponseEllipsoid.wInner_sub_right
-#print axioms Descent.Portability.MetricResponseEllipsoid.wInner_smul_right
-#print axioms Descent.Portability.MetricResponseEllipsoid.wInner_weighted_sum_left
-#print axioms Descent.Portability.MetricResponseEllipsoid.wInner_self_nonneg
-#print axioms Descent.Portability.MetricResponseEllipsoid.wInner_self_split
-#print axioms Descent.Portability.MetricResponseEllipsoid.wInner_left_zero_of_self_zero
+#print axioms Descent.Portability.MetricResponseEllipsoid.weightedInner_eq_weightedExp
+#print axioms Descent.Portability.MetricResponseEllipsoid.weightedInner_comm
+#print axioms Descent.Portability.MetricResponseEllipsoid.weightedInner_add_left
+#print axioms Descent.Portability.MetricResponseEllipsoid.weightedInner_sub_left
+#print axioms Descent.Portability.MetricResponseEllipsoid.weightedInner_sub_right
+#print axioms Descent.Portability.MetricResponseEllipsoid.weightedInner_smul_right
+#print axioms Descent.Portability.MetricResponseEllipsoid.weightedInner_weighted_sum_left
+#print axioms Descent.Portability.MetricResponseEllipsoid.weightedInner_self_nonneg
+#print axioms Descent.Portability.MetricResponseEllipsoid.weightedInner_self_split
+#print axioms Descent.Portability.MetricResponseEllipsoid.weightedInner_left_zero_of_self_zero
 #print axioms Descent.Portability.MetricResponseEllipsoid.exists_projection_coefficients
 #print axioms Descent.Portability.MetricResponseEllipsoid.gramMatrix_symm
-#print axioms Descent.Portability.MetricResponseEllipsoid.wInner_comb_eq_gram
-#print axioms Descent.Portability.MetricResponseEllipsoid.wInner_comb_self
+#print axioms Descent.Portability.MetricResponseEllipsoid.weightedInner_comb_eq_gram
+#print axioms Descent.Portability.MetricResponseEllipsoid.weightedInner_comb_self
 #print axioms Descent.Portability.MetricResponseEllipsoid.constrained_response_ellipsoid
 #print axioms Descent.Portability.MetricResponseEllipsoid.minimum_norm_direction
-#print axioms Descent.Portability.MetricResponseEllipsoid.wInner_smul_left
-#print axioms Descent.Portability.MetricResponseEllipsoid.wInner_add_right
-#print axioms Descent.Portability.MetricResponseEllipsoid.wInner_smul_self
-#print axioms Descent.Portability.MetricResponseEllipsoid.wInner_cauchy_schwarz
+#print axioms Descent.Portability.MetricResponseEllipsoid.weightedInner_smul_left
+#print axioms Descent.Portability.MetricResponseEllipsoid.weightedInner_add_right
+#print axioms Descent.Portability.MetricResponseEllipsoid.weightedInner_smul_self
+#print axioms Descent.Portability.MetricResponseEllipsoid.weightedInner_cauchy_schwarz
 #print axioms Descent.Portability.MetricResponseEllipsoid.sharp_summary_invisible_sensitivity
 #print axioms Descent.Portability.MetricResponseEllipsoid.proportional_residual_derivative_product
 #print axioms Descent.Portability.MetricResponseEllipsoid.proportional_residual_sign_agreement

@@ -28,6 +28,14 @@ the convexity of the evolved function, or any intermediate identity.
 Built on `Descent.Portability.PortabilityMasterTheorem`: the generator inequality is
 also stated against `weightedExp`, the expectation attached to a finite rate/probability
 vector there.
+
+## Empirical status
+
+None. The bodies here are algebra: `countDrift`, `nearestDriftGen` and `driftStep` are the
+drift, the generator and the one-step operator of a model, and the theorems are identities
+and inequalities about them. What would carry an empirical status is a named quantity in a
+subsystem module asserting that this algebra computes a measured turnover rate; no such
+claim is made here, and no rate in this file is fitted to anything.
 -/
 
 set_option autoImplicit false

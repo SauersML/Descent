@@ -29,6 +29,12 @@ the manuscript draws from them.
 turns the constraint `E a = m` into the closed form. It is stated for real numbers and
 used for both corollaries, in the two-point case directly and in the sparse case through
 the pair `(k²/p, 0)` of forced lower bounds.
+
+## Empirical status
+
+None. The two score laws are hypothetical designs whose only job is to make the closed
+forms exact, and `symmetricLevel` and `sparseLevel` are the water levels those designs
+force. No cohort, panel or measured allele frequency enters this module.
 -/
 
 set_option autoImplicit false

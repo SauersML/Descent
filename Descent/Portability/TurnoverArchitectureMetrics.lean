@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.ConvexOrderCoupling
 import Descent.Portability.IndividualLossMoments
+import Descent.Portability.TraitPortabilityRange
 
 assert_below Descent.Decision Descent.Program
 
@@ -28,9 +29,17 @@ normalization) and `E ε = 0` (centered noise). Nothing assumes a Gaussian law, 
 `E ε³`, or any of the identities proved.
 
 Built on `Descent.Portability.PortabilityMasterTheorem` (`DeploymentPopulation`,
-`weightedExp`, `uniformExp`), `Descent.Portability.IndividualLossMoments` (`mixture`), and
+`weightedExp`, `uniformExp`), `Descent.Portability.IndividualLossMoments` (`mixture`),
 `Descent.Portability.ConvexOrderCoupling` (`occupiedCount`, for the equal-weight
-specialization DC (4.2)).
+specialization DC (4.2)), and `Descent.Portability.TraitPortabilityRange`, whose `sign` is
+the same `±1` coding as `signValue` here.
+
+## Empirical status
+
+None. The bodies here are algebra: `genotypeNoiseExp` is an exhibited product law, not an
+estimate of any population's genotype or noise distribution, and the report formulas are
+identities of that exhibited law. A claim that these compute something measured would live
+in a subsystem module with its own regime and its own ledger row.
 -/
 
 set_option autoImplicit false
@@ -51,9 +60,9 @@ def signValue (b : Bool) : ℝ := if b then 1 else -1
 @[simp] theorem signValue_sq (b : Bool) : signValue b ^ 2 = 1 := by
   cases b <;> norm_num [signValue]
 
-/-- Negating a coordinate negates its sign. -/
-@[simp] theorem signValue_not (b : Bool) : signValue (!b) = -signValue b := by
-  cases b <;> norm_num [signValue]
+/-- The `±1` coding here is the one already carried by
+`Descent.Portability.TraitPortabilityRange.sign`: the two names denote one function. -/
+theorem signValue_eq_sign : signValue = TraitPortabilityRange.sign := rfl
 
 /-- Flip one coordinate of a configuration. -/
 def flipCoord {n : ℕ} (j : Fin n) (s : Fin n → Bool) : Fin n → Bool :=
@@ -101,7 +110,7 @@ theorem sum_odd_vanishes {n : ℕ} (j : Fin n) (P : (Fin n → Bool) → ℝ)
       P (flipCoord j s) * signValue (flipCoord j s j) = -(P s * signValue (s j)) := by
     intro s
     rw [hP s, flipCoord_self]
-    simp
+    rcases Bool.eq_false_or_eq_true (s j) with hb | hb <;> simp [hb, signValue]
   rw [Finset.sum_congr rfl fun s _ ↦ hpt s, Finset.sum_neg_distrib] at h
   linarith
 
@@ -554,6 +563,19 @@ theorem architecturePop_residual {n : ℕ} {V : Type*} [Fintype V] (noise : ExpF
   rw [architecturePop_phenotype, architecturePop_score, h3]
   ring
 
+/-- The squared residual of the realized architecture, written through the reversed-effect
+block score and the noise.  Shared by the mean-squared-error and loss-variance laws. -/
+theorem architecturePop_residual_sq {n : ℕ} {V : Type*} [Fintype V] (noise : ExpFunctional V)
+    (a : Fin n → ℝ) (σ : Fin n → Bool) (ξ : V → ℝ) :
+    (fun p : (Fin n → Bool) × V ↦ ((architecturePop n noise a σ ξ).phenotype p
+        - (architecturePop n noise a σ ξ).score a p) ^ 2)
+      = fun p ↦ (blockScore (residualCoeff a σ) Finset.univ p.1 + ξ p.2) ^ 2 := by
+  have hres := architecturePop_residual noise a σ ξ
+  funext p
+  rw [show (architecturePop n noise a σ ξ).phenotype p
+      - (architecturePop n noise a σ ξ).score a p
+      = blockScore (residualCoeff a σ) Finset.univ p.1 + ξ p.2 from congrFun hres p]
+
 /-- **Unit genetic variance**: the deployed score has variance one. -/
 theorem architecture_score_variance {n : ℕ} {V : Type*} [Fintype V] (noise : ExpFunctional V)
     (a : Fin n → ℝ) (σ : Fin n → Bool) (ξ : V → ℝ) (hnorm : ∑ i, a i ^ 2 = 1) :
@@ -624,14 +646,7 @@ theorem architecture_mse {n : ℕ} {V : Type*} [Fintype V] (noise : ExpFunctiona
     (hmean : noise ξ = 0) :
     (architecturePop n noise a σ ξ).deployedMse a
       = noise (fun e ↦ ξ e ^ 2) + 2 * (1 - alignment a σ) := by
-  have hres := architecturePop_residual noise a σ ξ
-  have hfun : (fun p : (Fin n → Bool) × V ↦ ((architecturePop n noise a σ ξ).phenotype p
-        - (architecturePop n noise a σ ξ).score a p) ^ 2)
-      = fun p ↦ (blockScore (residualCoeff a σ) Finset.univ p.1 + ξ p.2) ^ 2 := by
-    funext p
-    rw [show (architecturePop n noise a σ ξ).phenotype p
-        - (architecturePop n noise a σ ξ).score a p
-        = blockScore (residualCoeff a σ) Finset.univ p.1 + ξ p.2 from congrFun hres p]
+  have hfun := architecturePop_residual_sq noise a σ ξ
   rw [DeploymentPopulation.deployedMse, expMse, architecturePop_exp, hfun,
     exp_lin_noise_sq noise _ ξ hmean, residualCoeff_sq_sum, hnorm]
   ring
@@ -649,14 +664,7 @@ theorem architecture_loss_variance {n : ℕ} {V : Type*} [Fintype V] (noise : Ex
       = 2 * (2 * (1 - alignment a σ)) ^ 2 - 32 * reversedWeightSq a σ
         + 4 * noise (fun e ↦ ξ e ^ 2) * (2 * (1 - alignment a σ))
         + noise (fun e ↦ ξ e ^ 4) - noise (fun e ↦ ξ e ^ 2) ^ 2 := by
-  have hres := architecturePop_residual noise a σ ξ
-  have hfun : (fun p : (Fin n → Bool) × V ↦ ((architecturePop n noise a σ ξ).phenotype p
-        - (architecturePop n noise a σ ξ).score a p) ^ 2)
-      = fun p ↦ (blockScore (residualCoeff a σ) Finset.univ p.1 + ξ p.2) ^ 2 := by
-    funext p
-    rw [show (architecturePop n noise a σ ξ).phenotype p
-        - (architecturePop n noise a σ ξ).score a p
-        = blockScore (residualCoeff a σ) Finset.univ p.1 + ξ p.2 from congrFun hres p]
+  have hfun := architecturePop_residual_sq noise a σ ξ
   have hfour : (fun p : (Fin n → Bool) × V ↦
         ((blockScore (residualCoeff a σ) Finset.univ p.1 + ξ p.2) ^ 2) ^ 2)
       = fun p ↦ (blockScore (residualCoeff a σ) Finset.univ p.1 + ξ p.2) ^ 4 := by

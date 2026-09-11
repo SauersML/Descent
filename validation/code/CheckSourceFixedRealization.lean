@@ -65,4 +65,4 @@ open Descent.Portability.SourceFixedRealization
 #print axioms lossFraction_eq
 #print axioms lossSlack_nonneg
 #print axioms lossFraction_eq_eta
-#print axioms simultaneous_source_fixed_construction
+#print axioms simultaneous_source_fixed_realization

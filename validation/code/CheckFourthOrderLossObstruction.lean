@@ -33,3 +33,5 @@ import Descent.Portability.FourthOrderLossObstruction
 #print axioms Descent.Portability.FourthOrderLossObstruction.cell_squared_correlations
 #print axioms Descent.Portability.FourthOrderLossObstruction.innerExp_eq_mixture
 #print axioms Descent.Portability.FourthOrderLossObstruction.jointExp_eq_mixture
+#print axioms Descent.Portability.FourthOrderLossObstruction.effectSign_eq_sign
+#print axioms Descent.Portability.FourthOrderLossObstruction.parity_expectation

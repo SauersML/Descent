@@ -5,7 +5,7 @@ import Descent.Portability.FourthMomentStrongDuality
 
 /-! Axiom audit of FourthMomentStrongDuality. -/
 
-#print axioms Descent.Portability.FourthMomentStrongDuality.eval_convex_comb
+#print axioms Descent.Portability.FourthMomentStrongDuality.spike_eq_basis
 #print axioms Descent.Portability.FourthMomentStrongDuality.convex_attainableSet
 #print axioms Descent.Portability.FourthMomentStrongDuality.minFourthMoment_le_of_mem
 #print axioms Descent.Portability.FourthMomentStrongDuality.slackRegion_subset

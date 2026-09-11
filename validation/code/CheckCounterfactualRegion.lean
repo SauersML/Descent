@@ -13,6 +13,7 @@ open Descent.Portability.CounterfactualRegion
 #print axioms expectation_offIndicator_nonneg
 #print axioms counterfactual_mean_mem_interval
 #print axioms counterfactual_mean_attains
+#print axioms signOf_eq_sign
 #print axioms observational_laws_agree
 #print axioms intervened_mean_first_model
 #print axioms intervened_mean_second_model

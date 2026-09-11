@@ -217,8 +217,9 @@ theorem pairing_eq_expectation_difference (dir : S → ℝ) (first second : Fini
 /-- TQ Theorem 7.2, closing claim: a proposed summary whose feature span retains total mass
 and determines every word observable's expectation for every initial probability law has a
 feature span containing the whole minimal invariant space. The two laws exhibited when it
-fails are genuine probability laws, not signed rows. -/
-theorem wordSpan_le_of_determines_expectations [DecidableEq S] [Nonempty S]
+fails are genuine probability laws, not signed rows, which is why a state is supplied
+explicitly rather than through an instance. -/
+theorem wordSpan_le_of_determines_expectations [DecidableEq S] (witness : S)
     (K : A → Matrix S S ℝ)
     (V₀ W : Submodule ℝ (S → ℝ)) (hmass : (fun _ ↦ (1 : ℝ)) ∈ W)
     (hdet : ∀ first second : FiniteReportLaw S,
@@ -226,6 +227,7 @@ theorem wordSpan_le_of_determines_expectations [DecidableEq S] [Nonempty S]
       ∀ h ∈ wordSpan K V₀, first.expectation h = second.expectation h) :
     wordSpan K V₀ ≤ W := by
   classical
+  haveI : Nonempty S := ⟨witness⟩
   intro h hh
   by_contra hnot
   obtain ⟨dual, hdualne, hdualW⟩ := W.exists_dual_map_eq_bot_of_notMem hnot inferInstance

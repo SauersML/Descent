@@ -57,6 +57,13 @@ entire past. DC Corollary 4.3's `a_j(t)` for odd `n` is NOT proved. Its generato
 `0, -3λ, …, -λ n`, so the falling factorials are no longer eigenvectors -- they are for the
 linear rate `γ j`, not the affine rate `λ(2i+1)`. Closing 4.3 needs that chain's own
 eigenvector family constructed from scratch, or genuine ODE uniqueness.
+
+## Empirical status
+
+None. The bodies here are algebra: `nearestDriftMatrix` and `linearDeathMatrix` are
+generators of a model written as matrices, and the semigroup results are identities about
+them. Nothing here asserts that this algebra computes a measured quantity, and no entry of
+either matrix is estimated.
 -/
 
 set_option autoImplicit false
@@ -512,81 +519,6 @@ theorem linearDeathMatrix_mulVec (m : ℕ) (gamma : ℝ) (v : Fin (m + 1) → �
   rw [Finset.sum_congr rfl fun i _ ↦ hpt i, ← Finset.mul_sum, Finset.sum_sub_distrib]
   simp only [hsum]
 
-/-- The count itself is an eigenvector of the pure-death generator, eigenvalue `-γ`. -/
-theorem linearDeathMatrix_eigen_id (m : ℕ) (gamma : ℝ) :
-    (linearDeathMatrix m gamma).mulVec (fun j ↦ ((j : ℕ) : ℝ))
-      = (-gamma) • (fun j : Fin (m + 1) ↦ ((j : ℕ) : ℝ)) := by
-  funext j
-  rw [linearDeathMatrix_mulVec]
-  simp only [Pi.smul_apply, smul_eq_mul]
-  rcases Nat.eq_zero_or_pos (j : ℕ) with h | h
-  · rw [h]
-    simp
-  · have hc : (((gridPred m j : Fin (m + 1)) : ℕ) : ℝ) = ((j : ℕ) : ℝ) - 1 := by
-      show (((j : ℕ) - 1 : ℕ) : ℝ) = ((j : ℕ) : ℝ) - 1
-      rw [Nat.cast_sub h]
-      norm_num
-    rw [hc]
-    ring
-
-/-- The falling square is an eigenvector of the pure-death generator, eigenvalue `-2γ`. -/
-theorem linearDeathMatrix_eigen_quad (m : ℕ) (gamma : ℝ) :
-    (linearDeathMatrix m gamma).mulVec (fun j ↦ ((j : ℕ) : ℝ) ^ 2 - ((j : ℕ) : ℝ))
-      = (-(2 * gamma)) • (fun j : Fin (m + 1) ↦ ((j : ℕ) : ℝ) ^ 2 - ((j : ℕ) : ℝ)) := by
-  funext j
-  rw [linearDeathMatrix_mulVec]
-  simp only [Pi.smul_apply, smul_eq_mul]
-  rcases Nat.eq_zero_or_pos (j : ℕ) with h | h
-  · rw [h]
-    simp
-  · have hc : (((gridPred m j : Fin (m + 1)) : ℕ) : ℝ) = ((j : ℕ) : ℝ) - 1 := by
-      show (((j : ℕ) - 1 : ℕ) : ℝ) = ((j : ℕ) : ℝ) - 1
-      rw [Nat.cast_sub h]
-      norm_num
-    rw [hc]
-    ring
-
-/-- **DC Corollary 3.5's report, in continuous time and in closed form.**  The exact value
-of the squared count under the pure-death semigroup, from any starting state. -/
-theorem exp_linearDeath_sq (m : ℕ) (gamma t : ℝ) (j : Fin (m + 1)) :
-    (NormedSpace.exp ℝ (t • linearDeathMatrix m gamma)).mulVec
-        (fun i ↦ ((i : ℕ) : ℝ) ^ 2) j
-      = NormedSpace.exp ℝ (t * (-(2 * gamma))) * (((j : ℕ) : ℝ) ^ 2 - ((j : ℕ) : ℝ))
-        + NormedSpace.exp ℝ (t * (-gamma)) * ((j : ℕ) : ℝ) := by
-  have hsplit : (fun i : Fin (m + 1) ↦ ((i : ℕ) : ℝ) ^ 2)
-      = (fun i : Fin (m + 1) ↦ ((i : ℕ) : ℝ) ^ 2 - ((i : ℕ) : ℝ))
-        + (fun i : Fin (m + 1) ↦ ((i : ℕ) : ℝ)) := by
-    funext i
-    simp only [Pi.add_apply]
-    ring
-  rw [hsplit, Matrix.mulVec_add]
-  simp only [Pi.add_apply]
-  rw [exp_mulVec_eigen (linearDeathMatrix m gamma) _ _ t (linearDeathMatrix_eigen_quad m gamma) j,
-    exp_mulVec_eigen (linearDeathMatrix m gamma) _ _ t (linearDeathMatrix_eigen_id m gamma) j]
-
-/-- **PL (5.13) / DC (4.4), lower endpoint, in continuous time.**  Starting from the top
-state `m`, the pure-death semigroup's normalized squared count is exactly
-`(1 - 2/n) p² + (2/n) p` with `n = 2m` and `p = e^{-γt}` -- the same closed form that
-`Descent.Portability.BinomialAggregateEnvelope.binomial_envelope_lower` evaluates on the
-explicit binomial law, now as a value of the semigroup itself. -/
-theorem exp_linearDeath_lower_endpoint (m : ℕ) (hm : 0 < m) (gamma t ν : ℝ) (hν : 0 ≤ ν) :
-    (NormedSpace.exp ℝ (t • linearDeathMatrix m gamma)).mulVec
-          (fun i ↦ ((i : ℕ) : ℝ) ^ 2) ⟨m, Nat.lt_succ_self m⟩ / ((m : ℝ) ^ 2 * (1 + ν))
-      = ((1 - 2 / (2 * (m : ℝ))) * NormedSpace.exp ℝ (t * (-gamma)) ^ 2
-          + (2 / (2 * (m : ℝ))) * NormedSpace.exp ℝ (t * (-gamma))) / (1 + ν) := by
-  have hmne : (m : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hm.ne'
-  have hcne : (1 + ν) ≠ 0 := by
-    intro h
-    linarith
-  have hsq : NormedSpace.exp ℝ (t * (-(2 * gamma)))
-      = NormedSpace.exp ℝ (t * (-gamma)) ^ 2 := by
-    rw [show t * (-(2 * gamma)) = t * (-gamma) + t * (-gamma) from by ring,
-      NormedSpace.exp_add]
-    ring
-  have hval : (((⟨m, Nat.lt_succ_self m⟩ : Fin (m + 1)) : ℕ) : ℝ) = (m : ℝ) := rfl
-  rw [exp_linearDeath_sq m gamma t ⟨m, Nat.lt_succ_self m⟩, hsq, hval]
-  field_simp
-
 /-! ## Every falling factorial is an eigenvector: DC Corollary 3.5's factorial moments -/
 
 /-- The falling factorial `(x)_r = x (x-1) ⋯ (x - r + 1)`, peeled from the left. -/
@@ -649,6 +581,83 @@ theorem linearDeathMatrix_eigen_falling (m : ℕ) (gamma : ℝ) (r : ℕ) :
             * fallingFactorial (((j : ℕ) : ℝ) - 1) r)
       push_cast
       ring
+
+/-- `(x)_1 = x`. -/
+theorem fallingFactorial_one (x : ℝ) : fallingFactorial x 1 = x := by
+  show x * fallingFactorial (x - 1) 0 = x
+  show x * 1 = x
+  ring
+
+/-- `(x)_2 = x² - x`. -/
+theorem fallingFactorial_two (x : ℝ) : fallingFactorial x 2 = x ^ 2 - x := by
+  show x * fallingFactorial (x - 1) 1 = x ^ 2 - x
+  rw [fallingFactorial_one]
+  ring
+
+/-- The count itself is an eigenvector of the pure-death generator, eigenvalue `-γ`: the
+order-one case of `linearDeathMatrix_eigen_falling`. -/
+theorem linearDeathMatrix_eigen_id (m : ℕ) (gamma : ℝ) :
+    (linearDeathMatrix m gamma).mulVec (fun j ↦ ((j : ℕ) : ℝ))
+      = (-gamma) • (fun j : Fin (m + 1) ↦ ((j : ℕ) : ℝ)) := by
+  have h := linearDeathMatrix_eigen_falling m gamma 1
+  simp only [fallingFactorial_one] at h
+  rw [show (-gamma) = -(gamma * ((1 : ℕ) : ℝ)) from by
+    push_cast
+    ring]
+  exact h
+
+/-- The falling square is an eigenvector of the pure-death generator, eigenvalue `-2γ`: the
+order-two case of `linearDeathMatrix_eigen_falling`. -/
+theorem linearDeathMatrix_eigen_quad (m : ℕ) (gamma : ℝ) :
+    (linearDeathMatrix m gamma).mulVec (fun j ↦ ((j : ℕ) : ℝ) ^ 2 - ((j : ℕ) : ℝ))
+      = (-(2 * gamma)) • (fun j : Fin (m + 1) ↦ ((j : ℕ) : ℝ) ^ 2 - ((j : ℕ) : ℝ)) := by
+  have h := linearDeathMatrix_eigen_falling m gamma 2
+  simp only [fallingFactorial_two] at h
+  rw [show (-(2 * gamma)) = -(gamma * ((2 : ℕ) : ℝ)) from by
+    push_cast
+    ring]
+  exact h
+
+/-- **DC Corollary 3.5's report, in continuous time and in closed form.**  The exact value
+of the squared count under the pure-death semigroup, from any starting state. -/
+theorem exp_linearDeath_sq (m : ℕ) (gamma t : ℝ) (j : Fin (m + 1)) :
+    (NormedSpace.exp ℝ (t • linearDeathMatrix m gamma)).mulVec
+        (fun i ↦ ((i : ℕ) : ℝ) ^ 2) j
+      = NormedSpace.exp ℝ (t * (-(2 * gamma))) * (((j : ℕ) : ℝ) ^ 2 - ((j : ℕ) : ℝ))
+        + NormedSpace.exp ℝ (t * (-gamma)) * ((j : ℕ) : ℝ) := by
+  have hsplit : (fun i : Fin (m + 1) ↦ ((i : ℕ) : ℝ) ^ 2)
+      = (fun i : Fin (m + 1) ↦ ((i : ℕ) : ℝ) ^ 2 - ((i : ℕ) : ℝ))
+        + (fun i : Fin (m + 1) ↦ ((i : ℕ) : ℝ)) := by
+    funext i
+    simp only [Pi.add_apply]
+    ring
+  rw [hsplit, Matrix.mulVec_add]
+  simp only [Pi.add_apply]
+  rw [exp_mulVec_eigen (linearDeathMatrix m gamma) _ _ t (linearDeathMatrix_eigen_quad m gamma) j,
+    exp_mulVec_eigen (linearDeathMatrix m gamma) _ _ t (linearDeathMatrix_eigen_id m gamma) j]
+
+/-- **PL (5.13) / DC (4.4), lower endpoint, in continuous time.**  Starting from the top
+state `m`, the pure-death semigroup's normalized squared count is exactly
+`(1 - 2/n) p² + (2/n) p` with `n = 2m` and `p = e^{-γt}` -- the same closed form that
+`Descent.Portability.BinomialAggregateEnvelope.binomial_envelope_lower` evaluates on the
+explicit binomial law, now as a value of the semigroup itself. -/
+theorem exp_linearDeath_lower_endpoint (m : ℕ) (hm : 0 < m) (gamma t ν : ℝ) (hν : 0 ≤ ν) :
+    (NormedSpace.exp ℝ (t • linearDeathMatrix m gamma)).mulVec
+          (fun i ↦ ((i : ℕ) : ℝ) ^ 2) ⟨m, Nat.lt_succ_self m⟩ / ((m : ℝ) ^ 2 * (1 + ν))
+      = ((1 - 2 / (2 * (m : ℝ))) * NormedSpace.exp ℝ (t * (-gamma)) ^ 2
+          + (2 / (2 * (m : ℝ))) * NormedSpace.exp ℝ (t * (-gamma))) / (1 + ν) := by
+  have hmne : (m : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hm.ne'
+  have hcne : (1 + ν) ≠ 0 := by
+    intro h
+    linarith
+  have hsq : NormedSpace.exp ℝ (t * (-(2 * gamma)))
+      = NormedSpace.exp ℝ (t * (-gamma)) ^ 2 := by
+    rw [show t * (-(2 * gamma)) = t * (-gamma) + t * (-gamma) from by ring,
+      NormedSpace.exp_add]
+    ring
+  have hval : (((⟨m, Nat.lt_succ_self m⟩ : Fin (m + 1)) : ℕ) : ℝ) = (m : ℝ) := rfl
+  rw [exp_linearDeath_sq m gamma t ⟨m, Nat.lt_succ_self m⟩, hsq, hval]
+  field_simp
 
 /-- **DC Corollary 3.5's factorial moments, exactly, in continuous time.**  Under the
 pure-death semigroup every falling factorial of the count decays by its own exponential:

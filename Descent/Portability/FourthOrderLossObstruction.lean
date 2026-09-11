@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.IndividualLossMoments
+import Descent.Portability.TraitPortabilityRange
 
 assert_below Descent.Decision Descent.Program
 
@@ -20,7 +21,15 @@ sampled effect state. They nevertheless report distance-explainable loss fractio
 The laws are finitely supported and built with `Portability.weightedExp` and
 `Portability.uniformExp`; the hierarchy is `IndividualLossMoments.mixture`, and the
 between/within split is `IndividualLossMoments.total_variance`. The reported fraction is
-`Foundations.explainableFraction` of `Foundations.variance`.
+`Foundations.explainableFraction` of `Foundations.variance`, and the effect sign is the
+corpus' `TraitPortabilityRange.sign`.
+
+## Empirical status
+
+None. The bodies here are algebra: a four-sign parity law, a squared-loss expansion and a
+between-over-total ratio are claims about a model, and what carries an empirical status is
+a named quantity in a subsystem module asserting that this algebra computes something
+measurable.
 -/
 
 set_option autoImplicit false
@@ -37,6 +46,9 @@ abbrev EffectContext : Type := Bool × Bool × Bool × Bool
 
 /-- The `±1` effect sign carried by one Boolean coordinate. -/
 def effectSign (b : Bool) : ℝ := if b then 1 else -1
+
+/-- The effect sign is the corpus' `TraitPortabilityRange.sign`. -/
+theorem effectSign_eq_sign : effectSign = TraitPortabilityRange.sign := rfl
 
 /-- `true` exactly when the product of the four effect signs is `+1`. -/
 def evenParity (z : EffectContext) : Bool :=
@@ -160,35 +172,64 @@ theorem noise_loss_second_moment (d : Fin 2) (z : EffectContext) :
     (6 * (effectMean z - 1) ^ 2 + (1 - effectMean z ^ 2) +
       Real.sqrt (1 - effectMean z ^ 2) ^ 2) * hb
 
+/-- **The law of the mean effect sign.** Under `P₊` it is `1, 0, -1` with probabilities
+`1/8, 6/8, 1/8`; under `P₋` it is `±1/2` with probability `1/2` each. Every parity
+average below is an instance of this one identity. -/
+theorem parity_expectation (par : Bool) (g : ℝ → ℝ) :
+    ∑ z, parityWeight par z * g (effectMean z) =
+      if par then (g 1 + 6 * g 0 + g (-1)) / 8 else (g (1 / 2) + g (-1 / 2)) / 2 := by
+  cases par <;>
+    simp [parityWeight, evenParity, effectMean, effectSign,
+      Fintype.sum_prod_type] <;> ring
+
 /-- Mean effect sign under either parity class is zero. -/
 theorem parity_effectMean (par : Bool) :
     ∑ z, parityWeight par z * effectMean z = 0 := by
-  cases par <;>
-    simp [parityWeight, evenParity, effectMean, effectSign,
-      Fintype.sum_prod_type] <;> norm_num
+  cases par
+  · have h := parity_expectation false (fun x : ℝ ↦ x)
+    norm_num at h
+    exact h
+  · have h := parity_expectation true (fun x : ℝ ↦ x)
+    norm_num at h
+    exact h
 
 /-- Second moment of the mean effect sign is `1/4` under either parity class: the two
 models share every second-order effect summary. -/
 theorem parity_effectMean_sq (par : Bool) :
     ∑ z, parityWeight par z * effectMean z ^ 2 = 1 / 4 := by
-  cases par <;>
-    simp [parityWeight, evenParity, effectMean, effectSign,
-      Fintype.sum_prod_type] <;> norm_num
+  cases par
+  · have h := parity_expectation false (fun x : ℝ ↦ x ^ 2)
+    norm_num at h
+    exact h
+  · have h := parity_expectation true (fun x : ℝ ↦ x ^ 2)
+    norm_num at h
+    exact h
 
 /-- Fourth moments of the mean effect sign separate the two parity classes: `1/4`
 against `1/16`. This is the fourth-order coordinate the report depends on. -/
 theorem parity_effectMean_fourth (par : Bool) :
     ∑ z, parityWeight par z * effectMean z ^ 4 = if par then 1 / 4 else 1 / 16 := by
-  cases par <;>
-    simp [parityWeight, evenParity, effectMean, effectSign,
-      Fintype.sum_prod_type] <;> norm_num
+  cases par
+  · have h := parity_expectation false (fun x : ℝ ↦ x ^ 4)
+    norm_num at h
+    exact h
+  · have h := parity_expectation true (fun x : ℝ ↦ x ^ 4)
+    norm_num at h
+    exact h
 
 /-- Conditional second moment of loss under a parity class: `8` against `35/4`. -/
 theorem parity_lossSecondMoment (par : Bool) :
     ∑ z, parityWeight par z * lossSecondMoment z = if par then 8 else 35 / 4 := by
-  cases par <;>
-    simp [parityWeight, evenParity, lossSecondMoment, effectMean, effectSign,
-      Fintype.sum_prod_type] <;> norm_num
+  simp only [lossSecondMoment]
+  cases par
+  · have h := parity_expectation false
+      (fun x : ℝ ↦ 4 * (1 - x) ^ 2 + 4 * (1 - x) ^ 2 * (1 - x ^ 2))
+    norm_num at h
+    exact h
+  · have h := parity_expectation true
+      (fun x : ℝ ↦ 4 * (1 - x) ^ 2 + 4 * (1 - x) ^ 2 * (1 - x ^ 2))
+    norm_num at h
+    exact h
 
 /-- **Every joint law of at most three effect signs agrees between the two models.**
 Each of the four three-coordinate marginals is uniform under both parity classes, so

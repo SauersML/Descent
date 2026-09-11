@@ -31,6 +31,13 @@ The hypotheses are the manuscript's domain conditions: finitely many loci, indiv
 offspring, and strictly positive fitness. Continuous exposures, continuous effect values and
 unbounded mutation-created genomes are not covered by this finite construction, exactly as
 the manuscript states.
+
+## Empirical status
+
+None. The bodies here are algebra: the fitnesses, the recombination law and the mutation
+kernels are supplied inputs, and what carries an empirical status is a named quantity in a
+subsystem module asserting that this algebra computes something measurable. Those names keep
+their own docstrings, their own regimes, and their own ledger rows.
 -/
 
 set_option autoImplicit false

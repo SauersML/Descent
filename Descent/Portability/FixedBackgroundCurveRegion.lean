@@ -34,6 +34,13 @@ Builds on `AlignmentFactorization.scoreAccuracy`,
 `AlignmentFactorization.regressionFunction`, `IndividualLossMoments.mixture`,
 `SimultaneousRealization.shift_one`, `SimultaneousRealization.shift_sq`,
 `SourceFixedRealization.uniformBool_eval` and `TraitPortabilityRange.sign`.
+
+## Empirical status
+
+None. The bodies here are algebra: a phenotype law with prescribed cellwise moments is written
+down and its moments computed.  What carries an empirical status is a named
+quantity in a subsystem module asserting that this algebra computes something
+measurable, and such names keep their own docstrings, regimes and ledger rows.
 -/
 
 set_option autoImplicit false

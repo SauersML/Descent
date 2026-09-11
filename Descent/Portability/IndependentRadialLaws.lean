@@ -38,26 +38,14 @@ variable {k : ℕ} {N : Type*} [Fintype N] [DecidableEq N]
 def coordValue (r : Fin (k + 1) → ℝ) (a b : ℝ) (z : Fin (k + 1) × Bool) : ℝ :=
   if z.2 then r z.1 * a else r z.1 * b
 
-/-- The master gap identity for a single coordinate. -/
-theorem radial_scalar_gap (r : Fin (k + 1) → ℝ) (a b : ℝ) (g : ℝ → ℝ) :
+/-- The master gap identity for a single coordinate, an instance of
+`RadialInterpolation.radial_gap_general`. -/
+theorem radial_scalar_gap (r : Fin (k + 1) → ℝ) (hinj : Function.Injective r)
+    (a b : ℝ) (g : ℝ → ℝ) :
     (∑ z, radialLaw r false z * g (coordValue r a b z)) -
         ∑ z, radialLaw r true z * g (coordValue r a b z) =
-      (∑ i, radialWeight r i * (g (r i * a) - g (r i * b))) / radialTotal r := by
-  rw [Fintype.sum_prod_type, Fintype.sum_prod_type, ← Finset.sum_sub_distrib,
-    Finset.sum_div]
-  refine Finset.sum_congr rfl fun i _ ↦ ?_
-  have hP0 : radialLaw r false (i, false) =
-      (|radialWeight r i| - radialWeight r i) / 2 / radialTotal r := rfl
-  have hP1 : radialLaw r false (i, true) =
-      (|radialWeight r i| + radialWeight r i) / 2 / radialTotal r := rfl
-  have hQ0 : radialLaw r true (i, false) =
-      (|radialWeight r i| + radialWeight r i) / 2 / radialTotal r := rfl
-  have hQ1 : radialLaw r true (i, true) =
-      (|radialWeight r i| - radialWeight r i) / 2 / radialTotal r := rfl
-  have hU : coordValue r a b (i, true) = r i * a := rfl
-  have hV : coordValue r a b (i, false) = r i * b := rfl
-  simp only [Fintype.sum_bool, hP0, hP1, hQ0, hQ1, hU, hV]
-  ring
+      (∑ i, radialWeight r i * (g (r i * a) - g (r i * b))) / radialTotal r :=
+  radial_gap_general r hinj (fun z ↦ g (coordValue r a b z))
 
 /-- **PL equation (7.7), one coordinate.** The two one-coordinate laws share every raw
 moment through degree `k`. -/
@@ -65,7 +53,7 @@ theorem coord_moment_match (r : Fin (k + 1) → ℝ) (hinj : Function.Injective 
     (a b : ℝ) (m : ℕ) (hm : m ≤ k) :
     (∑ z, radialLaw r false z * coordValue r a b z ^ m) =
       ∑ z, radialLaw r true z * coordValue r a b z ^ m := by
-  have hgap := radial_scalar_gap r a b (fun x ↦ x ^ m)
+  have hgap := radial_scalar_gap r hinj a b (fun x ↦ x ^ m)
   have hzero : (∑ i, radialWeight r i * ((r i * a) ^ m - (r i * b) ^ m)) = 0 := by
     have hterm : ∀ i : Fin (k + 1),
         radialWeight r i * ((r i * a) ^ m - (r i * b) ^ m) =

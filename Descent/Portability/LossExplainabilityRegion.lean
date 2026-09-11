@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.HorizonCurve
 import Descent.Portability.SymmetricScoreFourthMoment
 
 assert_below Descent.Decision Descent.Program
@@ -33,7 +34,9 @@ bounds each of those below by `V_d` and attains the bound, which pins the fracti
 * `sparse_example_cell_values` and `sparse_example_max_fraction` are the manuscript's exact
   example: two equally weighted cells carrying the sparse score with `p = 1/2`, `β = 0`,
   `k = 1` and `m₁ = 1`, `m₂ = 2` give `V₁ = 2`, `V₂ = 4` from
-  `SymmetricScoreFourthMoment.sparse_symmetric_value`, hence `η_max = 1/3`.
+  `SymmetricScoreFourthMoment.sparse_symmetric_value`, hence `η_max = 1/3`. The two cells
+  are equally weighted, so the cell law is `HorizonCurve.uniformTwo` rather than a second
+  copy of it.
 -/
 
 set_option autoImplicit false
@@ -215,30 +218,31 @@ theorem sparse_example_cell_values :
   · rw [(sparse_symmetric_value 1 2 (1 / 2) (by norm_num) (by norm_num) (by norm_num)).1]
     norm_num
 
-/-- The two equally weighted cells of the UPT example. -/
-def exampleWeights : Bool → ℝ := fun _ ↦ 1 / 2
-
 /-- The two prescribed cell second moments of the UPT example. -/
-def exampleSecond : Bool → ℝ := fun d ↦ if d then 2 else 1
+def exampleSecond : Fin 2 → ℝ
+  | 0 => 1
+  | 1 => 2
 
 /-- The two cell minima of the UPT example. -/
-def exampleMinima : Bool → ℝ := fun d ↦ if d then 4 else 2
+def exampleMinima : Fin 2 → ℝ
+  | 0 => 2
+  | 1 => 4
 
 /-- **The exact maximal explained fraction of the UPT example is `1/3`.** With
 `B = 1/4` and `J₀ − m̄² = 3 − 9/4 = 3/4`, the sharp ceiling is `1/3`, and it is a ceiling
 over every phenotype coupling preserving the score law and the stated moments. -/
 theorem sparse_example_max_fraction :
-    betweenLossVariance exampleWeights exampleSecond = 1 / 4 ∧
-      totalLossVariance exampleWeights exampleSecond exampleMinima = 3 / 4 ∧
-      lossExplainedFraction exampleWeights exampleSecond exampleMinima = 1 / 3 := by
-  have hB : betweenLossVariance exampleWeights exampleSecond = 1 / 4 := by
-    unfold betweenLossVariance exampleWeights exampleSecond
-    rw [Fintype.sum_bool, Fintype.sum_bool]
-    norm_num
-  have hT : totalLossVariance exampleWeights exampleSecond exampleMinima = 3 / 4 := by
-    unfold totalLossVariance exampleWeights exampleSecond exampleMinima
-    rw [Fintype.sum_bool, Fintype.sum_bool]
-    norm_num
+    betweenLossVariance uniformTwo exampleSecond = 1 / 4 ∧
+      totalLossVariance uniformTwo exampleSecond exampleMinima = 3 / 4 ∧
+      lossExplainedFraction uniformTwo exampleSecond exampleMinima = 1 / 3 := by
+  have hB : betweenLossVariance uniformTwo exampleSecond = 1 / 4 := by
+    unfold betweenLossVariance
+    rw [Fin.sum_univ_two, Fin.sum_univ_two]
+    norm_num [uniformTwo, exampleSecond]
+  have hT : totalLossVariance uniformTwo exampleSecond exampleMinima = 3 / 4 := by
+    unfold totalLossVariance
+    rw [Fin.sum_univ_two, Fin.sum_univ_two]
+    norm_num [uniformTwo, exampleSecond, exampleMinima]
   refine ⟨hB, hT, ?_⟩
   unfold lossExplainedFraction
   rw [hB, hT]

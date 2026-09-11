@@ -11,4 +11,3 @@ import Descent.Portability.FourthMomentMinimizer
 #print axioms Descent.Portability.FourthMomentMinimizer.minFourthMoment_attained
 #print axioms Descent.Portability.FourthMomentMinimizer.feasibleSet_nonempty
 #print axioms Descent.Portability.FourthMomentMinimizer.exists_minimizer
-#print axioms Descent.Portability.FourthMomentMinimizer.weightedExp_repr

@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.AlignmentFactorization
 import Descent.Portability.TraitPortabilityRange
+import Descent.Portability.NonaffineRepair
 
 assert_below Descent.Decision Descent.Program
 
@@ -30,6 +31,13 @@ built on it.
 Builds on `IndividualLossMoments.mixture`, `Portability.uniformExp`,
 `AlignmentFactorization.scoreAccuracy`, `AlignmentFactorization.genotypeExplainedFraction`
 and `TraitPortabilityRange.sign`.
+
+## Empirical status
+
+None. The bodies here are algebra: a construction exhibits a law with prescribed moments, and
+asserts nothing about any population.  What carries an empirical status is a named
+quantity in a subsystem module asserting that this algebra computes something
+measurable, and such names keep their own docstrings, regimes and ledger rows.
 -/
 
 set_option autoImplicit false
@@ -468,6 +476,11 @@ def spikeWeights (p : ℝ) : Fin 3 → ℝ := ![p / 2, 1 - p, p / 2]
 /-- The three-point sign pattern of the explicit noise family. -/
 def spikeSign : Fin 3 → ℝ := ![-1, 0, 1]
 
+/-- The noise sign pattern is the symmetric three-point score of
+`NonaffineRepair.rademacherScore`: one shape, used there as a score and here as a
+noise carrier. -/
+theorem spikeSign_eq_rademacherScore : spikeSign = NonaffineRepair.rademacherScore := rfl
+
 /-- **The explicit noise family of TQ Theorem 8.1**: mass `1 − p` at zero and `p/2` at
 each spike.  Its mean and variance are the same for every `p`; only its fourth moment
 moves. -/
@@ -548,6 +561,22 @@ theorem spike_loss_fraction (E : ExpFunctional D) (H : ℝ) (q : D → ℝ) (p :
   congr 1
   ring
 
+/-- **The prescribed explainability leaves nonnegative slack in the loss budget.**
+`η ≤ B/(B+W₀)` is exactly `B + W₀ ≤ B/η`, which is what makes the shape parameter
+admissible. -/
+theorem lossBudget_slack (E : ExpFunctional D) (H : ℝ) (q : D → ℝ) (eta : ℝ)
+    (hW : 0 ≤ minimalWithinVariance E H q) (hB : 0 < lossMeanVariance E H q)
+    (heta0 : 0 < eta)
+    (heta : eta ≤ lossMeanVariance E H q
+      / (lossMeanVariance E H q + minimalWithinVariance E H q)) :
+    lossMeanVariance E H q + minimalWithinVariance E H q
+      ≤ lossMeanVariance E H q / eta := by
+  have hsum : 0 < lossMeanVariance E H q + minimalWithinVariance E H q := by linarith
+  have hmul : eta * (lossMeanVariance E H q + minimalWithinVariance E H q)
+      ≤ lossMeanVariance E H q := (le_div_iff₀ hsum).mp heta
+  rw [le_div_iff₀ heta0]
+  nlinarith
+
 /-- The shape parameter realizing a prescribed loss-explainability: TQ Theorem 8.1's
 explicit inverse `p = τ²/(τ² + B/η − B − W₀)`. -/
 def spikeParameter (E : ExpFunctional D) (H : ℝ) (q : D → ℝ) (eta : ℝ) : ℝ :=
@@ -561,14 +590,8 @@ theorem spikeParameter_mem_unit (E : ExpFunctional D) (H : ℝ) (q : D → ℝ) 
     (heta : eta ≤ lossMeanVariance E H q
       / (lossMeanVariance E H q + minimalWithinVariance E H q)) :
     0 < spikeParameter E H q eta ∧ spikeParameter E H q eta ≤ 1 := by
-  have hsum : 0 < lossMeanVariance E H q + minimalWithinVariance E H q := by linarith
   have htau : 0 < (1 - H) ^ 2 := pow_pos (by linarith) 2
-  have hmul : eta * (lossMeanVariance E H q + minimalWithinVariance E H q)
-      ≤ lossMeanVariance E H q := (le_div_iff₀ hsum).mp heta
-  have hslack : lossMeanVariance E H q + minimalWithinVariance E H q
-      ≤ lossMeanVariance E H q / eta := by
-    rw [le_div_iff₀ heta0]
-    nlinarith
+  have hslack := lossBudget_slack E H q eta hW hB heta0 heta
   have hden : 0 < (1 - H) ^ 2 + lossMeanVariance E H q / eta
       - lossMeanVariance E H q - minimalWithinVariance E H q := by linarith
   unfold spikeParameter
@@ -584,14 +607,8 @@ theorem spike_realizes_fraction (E : ExpFunctional D) (H : ℝ) (q : D → ℝ) 
     lossExplainedFraction E (spikeLaw (spikeParameter E H q eta) hp hp1) H q
         (spikeValue H (spikeParameter E H q eta)) = eta := by
   have hW : 0 ≤ minimalWithinVariance E H q := minimalWithinVariance_nonneg E H q hH1.le
-  have hsum : 0 < lossMeanVariance E H q + minimalWithinVariance E H q := by linarith
   have htau : 0 < (1 - H) ^ 2 := pow_pos (by linarith) 2
-  have hmul : eta * (lossMeanVariance E H q + minimalWithinVariance E H q)
-      ≤ lossMeanVariance E H q := (le_div_iff₀ hsum).mp heta
-  have hslack : lossMeanVariance E H q + minimalWithinVariance E H q
-      ≤ lossMeanVariance E H q / eta := by
-    rw [le_div_iff₀ heta0]
-    nlinarith
+  have hslack := lossBudget_slack E H q eta hW hB heta0 heta
   have hden : 0 < (1 - H) ^ 2 + lossMeanVariance E H q / eta
       - lossMeanVariance E H q - minimalWithinVariance E H q := by linarith
   have hinv : (spikeParameter E H q eta)⁻¹

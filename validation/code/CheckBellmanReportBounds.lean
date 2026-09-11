@@ -7,7 +7,6 @@ import Descent.Portability.BellmanReportBounds
 
 open Descent.Portability.BellmanReportBounds
 
-#print axioms expectation_const
 #print axioms expectation_mono
 #print axioms abs_expectation_sub_le
 #print axioms abs_inf'_sub_le
@@ -17,6 +16,11 @@ open Descent.Portability.BellmanReportBounds
 #print axioms policyValue_succ_eq_bind
 #print axioms lowerValue_le_policyValue
 #print axioms policyValue_le_upperValue
+#print axioms policyValue_eq_of_step
+#print axioms lowerPolicy_attains
+#print axioms upperPolicy_attains
+#print axioms policyValue_lowerPolicy
+#print axioms policyValue_upperPolicy
 #print axioms exists_lower_optimal_policy
 #print axioms exists_upper_optimal_policy
 #print axioms lowerValue_mem_range

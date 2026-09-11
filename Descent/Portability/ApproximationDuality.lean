@@ -1,7 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Portability.IndividualLossMoments
+import Descent.Portability.PortabilityMasterTheorem
 import Mathlib.Analysis.NormedSpace.HahnBanach.Separation
 
 assert_below Descent.Decision Descent.Program
@@ -21,7 +21,14 @@ constant function among them.
 PL Theorem 8.1's optimal-recovery half is proved here too: no rule reading only the
 `V`-expectations beats half the diameter, and the affine rule `E v` attains the uniform
 residual. The laws are `Portability.weightedExp` probability vectors, tied to the
-report-gap set by `weightedExp_report_gap_mem`.
+report-gap set by `weightedExp_report_gap_mem`. Nonemptiness of the state space enters as
+an explicit state, never as an instance.
+
+## Empirical status
+
+None. The bodies here are algebra: a diameter over a class of laws and a distance to a
+subspace are claims about a model, and what carries an empirical status is a named
+quantity in a subsystem module asserting that this algebra computes something measurable.
 -/
 
 set_option autoImplicit false
@@ -50,10 +57,9 @@ theorem reportGaps_neg (V : Submodule ℝ (S → ℝ)) (f : S → ℝ) {t : ℝ}
   obtain ⟨p, q, hp, hq, hps, hqs, hmatch, rfl⟩ := ht
   exact ⟨q, p, hq, hp, hqs, hps, fun v hv ↦ (hmatch v hv).symm, by ring⟩
 
-/-- The zero gap is always realized, by taking the two laws equal. -/
-theorem zero_mem_reportGaps [Nonempty S] (V : Submodule ℝ (S → ℝ)) (f : S → ℝ) :
+/-- The zero gap is always realized, by taking the two laws equal at a named state. -/
+theorem zero_mem_reportGaps (s₀ : S) (V : Submodule ℝ (S → ℝ)) (f : S → ℝ) :
     (0 : ℝ) ∈ reportGaps V f := by
-  obtain ⟨s₀⟩ := ‹Nonempty S›
   refine ⟨fun s ↦ if s = s₀ then 1 else 0, fun s ↦ if s = s₀ then 1 else 0,
     fun s ↦ by by_cases h : s = s₀ <;> simp [h],
     fun s ↦ by by_cases h : s = s₀ <;> simp [h], by simp, by simp,
@@ -267,14 +273,14 @@ theorem exists_reportGap_ge (V : Submodule ℝ (S → ℝ))
 
 /-- **PL Theorem 8.1.** The information diameter of a bounded report over laws matched on
 `V` is exactly twice the best uniform approximation error of the report by `V`. -/
-theorem information_diameter_duality [Nonempty S]
+theorem information_diameter_duality (s₀ : S)
     (V : Submodule ℝ (S → ℝ)) (hconst : ∀ a : ℝ, (fun _ : S ↦ a) ∈ V) (f : S → ℝ) :
     IsLUB (reportGaps V f) (2 * Metric.infDist f (V : Set (S → ℝ))) := by
   constructor
   · intro t ht
     exact reportGap_le_two_mul_infDist V f ht
   · intro ub hub
-    have hub0 : 0 ≤ ub := hub (zero_mem_reportGaps V f)
+    have hub0 : 0 ≤ ub := hub (zero_mem_reportGaps s₀ V f)
     by_contra hcon
     push_neg at hcon
     have he0 : 0 < Metric.infDist f (V : Set (S → ℝ)) := by
@@ -296,11 +302,11 @@ theorem information_diameter_duality [Nonempty S]
     linarith
 
 /-- The information diameter as a supremum. -/
-theorem information_diameter_sSup [Nonempty S] (V : Submodule ℝ (S → ℝ))
+theorem information_diameter_sSup (s₀ : S) (V : Submodule ℝ (S → ℝ))
     (hconst : ∀ a : ℝ, (fun _ : S ↦ a) ∈ V) (f : S → ℝ) :
     sSup (reportGaps V f) = 2 * Metric.infDist f (V : Set (S → ℝ)) :=
-  (information_diameter_duality V hconst f).csSup_eq
-    ⟨0, zero_mem_reportGaps V f⟩
+  (information_diameter_duality s₀ V hconst f).csSup_eq
+    ⟨0, zero_mem_reportGaps s₀ V f⟩
 
 /-- A report gap between two `weightedExp` laws matched on `V` lies in `reportGaps`,
 which is what ties the duality to the corpus' finitely supported expectations. -/

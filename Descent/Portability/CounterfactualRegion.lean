@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PortabilityMasterTheorem
+import Descent.Portability.TraitPortabilityRange
 
 assert_below Descent.Decision Descent.Program
 
@@ -26,6 +27,13 @@ is exactly the probability that it does not.
 The hypotheses are the manuscript's domain conditions: the outcome lies in the unit
 interval, the filling constants lie in the unit interval, and the observational law is
 given. Nothing here assumes latent confounding is absent; the construction allows it.
+
+## Empirical status
+
+None. The bodies here are algebra: a structural equation and an expectation functional are
+claims about a model class, and what carries an empirical status is a named quantity in a
+subsystem module asserting that this algebra computes something measurable. Those names keep
+their own docstrings, their own regimes, and their own ledger rows.
 -/
 
 set_option autoImplicit false
@@ -121,31 +129,35 @@ theorem counterfactual_mean_attains (E : ExpFunctional Ω) (xval : Ω → X) (yv
 /-- The sign attached to a fair exogenous draw in the two-model construction. -/
 def signOf (draw : Bool) : ℝ := if draw then 1 else -1
 
-/-- The first structural model's outcome equation: the outcome copies the exposure. -/
-def outcomeFromExposure (exposure : ℝ) (_exogenous : ℝ) : ℝ := exposure
+/-- The sign map here is the corpus sign map, not a second convention. -/
+theorem signOf_eq_sign : signOf = TraitPortabilityRange.sign := rfl
 
-/-- The second structural model's outcome equation: the outcome copies the exogenous
-variable directly, bypassing the exposure. -/
-def outcomeFromExogenous (_exposure : ℝ) (exogenous : ℝ) : ℝ := exogenous
+/-- The first structural model's outcome equation, read on the pair of exposure and exogenous
+draw: the outcome copies the exposure. -/
+def outcomeFromExposure (input : ℝ × ℝ) : ℝ := input.1
+
+/-- The second structural model's outcome equation on the same pair: the outcome copies the
+exogenous variable directly, bypassing the exposure. -/
+def outcomeFromExogenous (input : ℝ × ℝ) : ℝ := input.2
 
 /-- PL Theorem 11.1: the two models agree pointwise on the observed exposure-outcome pair,
 so every observational report of either model, deterministic or randomised, has the same
 law. Nothing is left to a distributional argument here: the observed pairs are equal. -/
 theorem observational_laws_agree (exogenous : ℝ) :
-    (exogenous, outcomeFromExposure exogenous exogenous) =
-      (exogenous, outcomeFromExogenous exogenous exogenous) := by
+    (exogenous, outcomeFromExposure (exogenous, exogenous)) =
+      (exogenous, outcomeFromExogenous (exogenous, exogenous)) := by
   simp [outcomeFromExposure, outcomeFromExogenous]
 
 /-- PL Theorem 11.1: under the intervention setting the exposure to one, the first model's
 mean outcome is one. -/
 theorem intervened_mean_first_model :
-    uniformExp Bool (fun draw ↦ outcomeFromExposure 1 (signOf draw)) = 1 := by
+    uniformExp Bool (fun draw ↦ outcomeFromExposure (1, signOf draw)) = 1 := by
   simp [uniformExp_apply, outcomeFromExposure, Fintype.card_bool]
 
 /-- PL Theorem 11.1: under the same intervention the second model's mean outcome is zero,
 so complete agreement of every observational report does not imply agreement of causes. -/
 theorem intervened_mean_second_model :
-    uniformExp Bool (fun draw ↦ outcomeFromExogenous 1 (signOf draw)) = 0 := by
+    uniformExp Bool (fun draw ↦ outcomeFromExogenous (1, signOf draw)) = 0 := by
   simp [uniformExp_apply, outcomeFromExogenous, signOf, Fintype.card_bool]
 
 end

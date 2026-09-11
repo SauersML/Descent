@@ -30,6 +30,13 @@ Builds on `IndividualLossMoments.mixture`, `Portability.weightedExp`,
 `SimultaneousRealization.shift_one`, `SimultaneousRealization.shift_sq`,
 `AlignmentFactorization.scoreAccuracy`, `Foundations.expMse` and
 `TraitPortabilityRange.sign`.
+
+## Empirical status
+
+None. The bodies here are algebra: a residual law with prescribed moments is exhibited, not
+measured.  What carries an empirical status is a named
+quantity in a subsystem module asserting that this algebra computes something
+measurable, and such names keep their own docstrings, regimes and ledger rows.
 -/
 
 set_option autoImplicit false
@@ -558,7 +565,7 @@ theorem kernel_residual_fourth (q m : D → ℝ) (delta : ℝ)
     residualKernel q m delta hk hd d s
         (fun r ↦ targetResidual q m delta (d, (s, r)) ^ 4)
       = m d ^ 2 + delta :=
-  residual_fourth_moment (m d) (shiftK q m d * sign s) delta (hk d s) hd
+  kernel_fourth q m delta hk hd d s
 
 /-- The conditional individual loss has mean `m_d` in the joint coordinates. -/
 theorem kernel_residual_second (q m : D → ℝ) (delta : ℝ)
@@ -567,7 +574,7 @@ theorem kernel_residual_second (q m : D → ℝ) (delta : ℝ)
     residualKernel q m delta hk hd d s
         (fun r ↦ targetResidual q m delta (d, (s, r)) ^ 2)
       = m d :=
-  residual_second_moment (m d) (shiftK q m d * sign s) delta (hk d s) hd
+  kernel_second q m delta hk hd d s
 
 /-- **The conditional phenotype moments given the entire genotype and distance.**  Both
 right-hand sides are free of `δ`: varying the prescribed loss-explainability changes
@@ -783,7 +790,7 @@ arbitrary prescribed loss-explainability `η ∈ (0,1]` hold simultaneously.  Th
 law, the deployed score and the distance variable do not depend on any of the three
 prescriptions, and `conditional_phenotype_moments` shows that varying `η` leaves the
 conditional phenotype mean and variance given the entire genotype untouched. -/
-theorem simultaneous_source_fixed_construction (E : ExpFunctional D) (q m : D → ℝ)
+theorem simultaneous_source_fixed_realization (E : ExpFunctional D) (q m : D → ℝ)
     (eta : ℝ) (hq0 : ∀ d, 0 ≤ q d) (hq1 : ∀ d, q d < 1) (hm : ∀ d, 1 < m d)
     (hB : 0 < variance E m) (heta0 : 0 < eta) (heta1 : eta ≤ 1) :
     lossFraction E q m (lossSlack E m eta) (residual_slack q m hq0 hq1 hm)

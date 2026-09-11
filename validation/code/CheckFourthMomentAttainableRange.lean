@@ -7,6 +7,8 @@ import Descent.Portability.FourthMomentAttainableRange
 
 #print axioms Descent.Portability.FourthMomentAttainableRange.eval_lin2
 #print axioms Descent.Portability.FourthMomentAttainableRange.eval_lin3_const
+#print axioms Descent.Portability.FourthMomentAttainableRange.clampTo_bounds
+#print axioms Descent.Portability.FourthMomentAttainableRange.clampTo_eq
 #print axioms Descent.Portability.FourthMomentAttainableRange.clamp01_eq
 #print axioms Descent.Portability.FourthMomentAttainableRange.clamp01_bounds
 #print axioms Descent.Portability.FourthMomentAttainableRange.splitExp_apply

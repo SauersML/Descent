@@ -8,6 +8,7 @@ import Descent.Portability.TransportCoordinates
 open Descent.Portability.TransportCoordinates
 
 #print axioms exact_transport_coordinates
+#print axioms crossMomentVector_eq_rawCrossMoment
 #print axioms crossMoment_dot
 #print axioms coordinate_secondMoment
 #print axioms normal_equations_iff
@@ -23,7 +24,6 @@ open Descent.Portability.TransportCoordinates
 #print axioms oracle_risk_eq
 #print axioms training_risk_decomposition
 #print axioms excess_risk_law
-#print axioms expand_sq_diff
 #print axioms expand_mul_sub
 #print axioms oracle_value_unique
 #print axioms linScore_mean_zero

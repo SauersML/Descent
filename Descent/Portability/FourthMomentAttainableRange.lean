@@ -71,17 +71,33 @@ theorem eval_lin3_const (E : ExpFunctional Ω) (c₁ c₂ c₃ c₀ : ℝ) (f₁
 
 /-! ## Convex combinations of outcome laws -/
 
-/-- A mixing weight clamped to `[0, 1]`, so that the combined law below is total. -/
-def clamp01 (θ : ℝ) : ℝ := max 0 (min 1 θ)
+/-- Clamp a real into the interval `[0, u]`. Both the mixing weight and the spreading
+weight below are instances, which is why the two share one pair of lemmas. -/
+def clampTo (u x : ℝ) : ℝ := max 0 (min u x)
 
-/-- The clamp is the identity on `[0, 1]`. -/
-theorem clamp01_eq {θ : ℝ} (h0 : 0 ≤ θ) (h1 : θ ≤ 1) : clamp01 θ = θ := by
-  unfold clamp01
+omit [Fintype ι] [DecidableEq ι] in
+/-- The clamp always lands in `[0, u]`. -/
+theorem clampTo_bounds (u x : ℝ) (hu : 0 ≤ u) : 0 ≤ clampTo u x ∧ clampTo u x ≤ u :=
+  ⟨le_max_left _ _, max_le hu (min_le_left _ _)⟩
+
+omit [Fintype ι] [DecidableEq ι] in
+/-- The clamp is the identity on `[0, u]`. -/
+theorem clampTo_eq {u x : ℝ} (h0 : 0 ≤ x) (h1 : x ≤ u) : clampTo u x = x := by
+  unfold clampTo
   rw [min_eq_right h1, max_eq_right h0]
 
+/-- A mixing weight clamped to `[0, 1]`, so that the combined law below is total. -/
+def clamp01 (θ : ℝ) : ℝ := clampTo 1 θ
+
+omit [Fintype ι] [DecidableEq ι] in
+/-- The clamp is the identity on `[0, 1]`. -/
+theorem clamp01_eq {θ : ℝ} (h0 : 0 ≤ θ) (h1 : θ ≤ 1) : clamp01 θ = θ :=
+  clampTo_eq h0 h1
+
+omit [Fintype ι] [DecidableEq ι] in
 /-- The clamp always lands in `[0, 1]`. -/
-theorem clamp01_bounds (θ : ℝ) : 0 ≤ clamp01 θ ∧ clamp01 θ ≤ 1 := by
-  refine ⟨le_max_left _ _, max_le (by norm_num) (min_le_left _ _)⟩
+theorem clamp01_bounds (θ : ℝ) : 0 ≤ clamp01 θ ∧ clamp01 θ ≤ 1 :=
+  clampTo_bounds 1 θ zero_le_one
 
 /-- **The convex combination of two outcome laws**, living on the disjoint union of their
 outcome spaces. Every moment constraint is linear in the law, so a combination of two laws
@@ -127,16 +143,17 @@ theorem splitExp_apply {α γ : Type*} {θ : ℝ} (h0 : 0 ≤ θ) (h1 : θ ≤ 1
 /-! ## The symmetric spreading law -/
 
 /-- A spreading weight clamped to `[0, 1/2]`. -/
-def spreadWeight (ep : ℝ) : ℝ := max 0 (min (1 / 2) ep)
+def spreadWeight (ep : ℝ) : ℝ := clampTo (1 / 2) ep
 
+omit [Fintype ι] [DecidableEq ι] in
 /-- The spreading weight always lands in `[0, 1/2]`. -/
-theorem spreadWeight_bounds (ep : ℝ) : 0 ≤ spreadWeight ep ∧ spreadWeight ep ≤ 1 / 2 := by
-  refine ⟨le_max_left _ _, max_le (by norm_num) (min_le_left _ _)⟩
+theorem spreadWeight_bounds (ep : ℝ) : 0 ≤ spreadWeight ep ∧ spreadWeight ep ≤ 1 / 2 :=
+  clampTo_bounds (1 / 2) ep (by norm_num)
 
+omit [Fintype ι] [DecidableEq ι] in
 /-- The clamp is the identity on `[0, 1/2]`. -/
-theorem spreadWeight_eq {ep : ℝ} (h0 : 0 ≤ ep) (h1 : ep ≤ 1 / 2) : spreadWeight ep = ep := by
-  unfold spreadWeight
-  rw [min_eq_right h1, max_eq_right h0]
+theorem spreadWeight_eq {ep : ℝ} (h0 : 0 ≤ ep) (h1 : ep ≤ 1 / 2) : spreadWeight ep = ep :=
+  clampTo_eq h0 h1
 
 /-- The three-point probability vector `(ε, 1 − 2ε, ε)`. -/
 def spreadWeights (ep : ℝ) : Fin 3 → ℝ :=

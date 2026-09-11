@@ -42,3 +42,5 @@ open Descent.Portability.ContinuousTurnoverSemigroup
 #print axioms fallingFactorial_self_ne_zero
 #print axioms weights_eq_of_falling_moments_eq
 #print axioms exp_linearDeath_row_eq_binomial
+#print axioms fallingFactorial_one
+#print axioms fallingFactorial_two

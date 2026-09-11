@@ -216,6 +216,20 @@ theorem reducedValues_nonempty (E : ExpFunctional Ω) (X : Ω → ι → ℝ) (�
   obtain ⟨h1, h2, h3, h4⟩ := slackPair_feasible E X β k m hmean horth hfeas
   exact ⟨_, featureMean β k X, slackSecond β k X m, h1, h2, h3, h4, rfl⟩
 
+/-- The cross-moment of any admissible conditional mean with the forced regression
+`β + kᵀX` is `β² + ‖k‖²`, the second moment of that regression itself. This is what makes
+the mean square deviation between the two equal to `E[b²] − β² − ‖k‖²`. -/
+theorem eval_mul_featureMean (E : ExpFunctional Ω) (X : Ω → ι → ℝ) (β : ℝ) (k : ι → ℝ)
+    (b : Ω → ℝ) (hb : E b = β) (hk : ∀ i, E (fun ω ↦ X ω i * b ω) = k i) :
+    E (fun ω ↦ b ω * featureMean β k X ω) = β ^ 2 + dot k k := by
+  have hcomm : (fun ω ↦ b ω * featureMean β k X ω)
+      = fun ω ↦ (β + dot k (X ω)) * b ω := by
+    funext ω
+    simp [featureMean, mul_comm]
+  rw [hcomm, eval_affine_form E X b β k, hb]
+  simp only [hk]
+  ring
+
 /-- **Necessity in UPT (3.4).** With orthonormal features, every feasible reduced pair
 forces `m ≥ β² + ‖k‖²`; there is no hypothesis here beyond the constraints themselves. -/
 theorem feasible_second_moment_bound (E : ExpFunctional Ω) (X : Ω → ι → ℝ)
@@ -226,14 +240,7 @@ theorem feasible_second_moment_bound (E : ExpFunctional Ω) (X : Ω → ι → �
     (hk : ∀ i, E (fun ω ↦ X ω i * b ω) = k i) (ha : E a = m) :
     β ^ 2 + dot k k ≤ m := by
   obtain ⟨_, _, hsq⟩ := featureMean_moments (X := X) E β k hmean horth
-  have hbg : E (fun ω ↦ b ω * featureMean β k X ω) = β ^ 2 + dot k k := by
-    have hcomm : (fun ω ↦ b ω * featureMean β k X ω)
-        = fun ω ↦ (β + dot k (X ω)) * b ω := by
-      funext ω
-      simp [featureMean, mul_comm]
-    rw [hcomm, eval_affine_form E X b β k, hb]
-    simp only [hk]
-    ring
+  have hbg := eval_mul_featureMean E X β k b hb hk
   have hnn : 0 ≤ E (fun ω ↦ (b ω - featureMean β k X ω) ^ 2) :=
     E.nonneg_eval _ fun ω ↦ sq_nonneg _
   rw [eval_sq_sub E b (featureMean β k X), hbg, hsq] at hnn
@@ -257,14 +264,7 @@ theorem boundary_mean_square_rigidity (E : ExpFunctional Ω) (X : Ω → ι → 
     E (fun ω ↦ (b ω - featureMean β k X ω) ^ 2) = 0 ∧
       E (fun ω ↦ a ω - b ω ^ 2) = 0 := by
   obtain ⟨_, _, hsq⟩ := featureMean_moments (X := X) E β k hmean horth
-  have hbg : E (fun ω ↦ b ω * featureMean β k X ω) = β ^ 2 + dot k k := by
-    have hcomm : (fun ω ↦ b ω * featureMean β k X ω)
-        = fun ω ↦ (β + dot k (X ω)) * b ω := by
-      funext ω
-      simp [featureMean, mul_comm]
-    rw [hcomm, eval_affine_form E X b β k, hb]
-    simp only [hk]
-    ring
+  have hbg := eval_mul_featureMean E X β k b hb hk
   have hnn : 0 ≤ E (fun ω ↦ (b ω - featureMean β k X ω) ^ 2) :=
     E.nonneg_eval _ fun ω ↦ sq_nonneg _
   have hexp := eval_sq_sub E b (featureMean β k X)

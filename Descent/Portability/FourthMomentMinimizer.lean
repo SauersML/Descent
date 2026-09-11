@@ -23,6 +23,10 @@ it is compact; the objective `E[a²]` is continuous, hence attains its minimum t
 * `exists_minimizer` combines this with `GlobalFourthMomentRegion.slackPair_feasible`, so
   the only hypotheses left are UPT (3.1) orthonormality and UPT (3.4) feasibility.
 
+The finitely supported laws of the corpus satisfy the representation hypothesis used
+throughout: `weightedExp` is literally a weighted sum, which is
+`PortabilityMasterTheorem.weightedExp_apply`.
+
 Together with `GlobalFourthMomentRegion.minFourthMoment_eq_of_certificate` this separates
 the two things Theorem 3.1(a) claims: that a minimizer exists, proved here for finite
 support, and that a particular pair is one, proved there by a dual certificate for an
@@ -200,11 +204,6 @@ theorem exists_minimizer (E : ExpFunctional Ω) (p : Ω → ℝ) (hp : ∀ ω, 0
       minFourthMoment E X β k m = E (fun ω ↦ a ω ^ 2) :=
   minFourthMoment_attained E p hp hE X β k m
     (feasibleSet_nonempty E X β k m hmean horth hfeas)
-
-/-- The finitely supported laws of the corpus satisfy the representation hypothesis above:
-`weightedExp` is literally a weighted sum. -/
-theorem weightedExp_repr (p : Ω → ℝ) (hp : ∀ ω, 0 ≤ p ω) (hsum : ∑ ω, p ω = 1)
-    (f : Ω → ℝ) : weightedExp p hp hsum f = ∑ ω, p ω * f ω := rfl
 
 end
 

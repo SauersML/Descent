@@ -26,6 +26,13 @@ functional supports.
 Builds on `Foundations.variance`, `Foundations.covariance`,
 `Foundations.ExpFunctional.cauchy_schwarz`, `Foundations.explainableFraction` and
 `IndividualLossMoments.total_variance`.
+
+## Empirical status
+
+None. The bodies here are algebra: a factorization of a squared correlation is a statement about a
+law, not about a cohort.  What carries an empirical status is a named
+quantity in a subsystem module asserting that this algebra computes something
+measurable, and such names keep their own docstrings, regimes and ledger rows.
 -/
 
 set_option autoImplicit false

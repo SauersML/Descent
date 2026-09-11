@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.ExactFiniteHistoryLaw
+import Descent.Portability.FiniteIndependentMoments
 
 assert_below Descent.Decision Descent.Program
 
@@ -40,11 +41,6 @@ namespace Descent.Portability.BellmanReportBounds
 noncomputable section
 
 variable {S Ctrl : Type*} [Fintype S] [Fintype Ctrl] [Nonempty Ctrl]
-
-/-- The expectation of a constant report is that constant. -/
-theorem expectation_const (p : FiniteReportLaw S) (c : ℝ) :
-    p.expectation (fun _ ↦ c) = c := by
-  simp only [FiniteReportLaw.expectation, ← Finset.sum_mul, p.mass_sum, one_mul]
 
 /-- Expectation is monotone in the report statistic. -/
 theorem expectation_mono (p : FiniteReportLaw S) (f g : S → ℝ) (h : ∀ s, f s ≤ g s) :
@@ -183,44 +179,81 @@ theorem policyValue_le_upperValue (step : S → Ctrl → FiniteReportLaw S) (ter
             (fun c ↦ (step s c).expectation (upperValue step terminal k))
             (Finset.mem_univ (policy k s))
 
-/-- DC Theorem 6.1: the lower bound is attained by an explicit admissible policy, so it is a
-minimum over admissible policies and not merely an infimum. -/
+/-- A policy reproduces a candidate value function exactly when each of its steps does. This
+is the one induction behind both attainment results. -/
+theorem policyValue_eq_of_step (step : S → Ctrl → FiniteReportLaw S) (terminal : S → ℝ)
+    (policy : ℕ → S → Ctrl) (value : ℕ → S → ℝ) (hzero : ∀ s, value 0 s = terminal s)
+    (hstep : ∀ (k : ℕ) (s : S),
+      (step s (policy k s)).expectation (value k) = value (k + 1) s) :
+    ∀ (k : ℕ) (s : S), policyValue step terminal policy k s = value k s := by
+  intro k
+  induction k with
+  | zero => exact fun s ↦ (hzero s).symm
+  | succ k ih =>
+    intro s
+    show (step s (policy k s)).expectation (policyValue step terminal policy k) = value _ s
+    rw [funext ih]
+    exact hstep k s
+
+/-- The greedy minimising control: an admissible local coupling attaining the lower Bellman
+step at that state and horizon. -/
+def lowerPolicy (step : S → Ctrl → FiniteReportLaw S) (terminal : S → ℝ) (k : ℕ) (s : S) :
+    Ctrl :=
+  (Finset.exists_mem_eq_inf' (Finset.univ_nonempty (α := Ctrl))
+    fun c ↦ (step s c).expectation (lowerValue step terminal k)).choose
+
+/-- The greedy maximising control at that state and horizon. -/
+def upperPolicy (step : S → Ctrl → FiniteReportLaw S) (terminal : S → ℝ) (k : ℕ) (s : S) :
+    Ctrl :=
+  (Finset.exists_mem_eq_sup' (Finset.univ_nonempty (α := Ctrl))
+    fun c ↦ (step s c).expectation (upperValue step terminal k)).choose
+
+/-- The greedy minimising control attains the lower Bellman step exactly. -/
+theorem lowerPolicy_attains (step : S → Ctrl → FiniteReportLaw S) (terminal : S → ℝ)
+    (k : ℕ) (s : S) :
+    (step s (lowerPolicy step terminal k s)).expectation (lowerValue step terminal k) =
+      lowerValue step terminal (k + 1) s :=
+  ((Finset.exists_mem_eq_inf' (Finset.univ_nonempty (α := Ctrl))
+    fun c ↦ (step s c).expectation (lowerValue step terminal k)).choose_spec.2).symm
+
+/-- The greedy maximising control attains the upper Bellman step exactly. -/
+theorem upperPolicy_attains (step : S → Ctrl → FiniteReportLaw S) (terminal : S → ℝ)
+    (k : ℕ) (s : S) :
+    (step s (upperPolicy step terminal k s)).expectation (upperValue step terminal k) =
+      upperValue step terminal (k + 1) s :=
+  ((Finset.exists_mem_eq_sup' (Finset.univ_nonempty (α := Ctrl))
+    fun c ↦ (step s c).expectation (upperValue step terminal k)).choose_spec.2).symm
+
+/-- DC Theorem 6.1: the greedy minimising policy realises the lower value at every horizon,
+so the lower bound is a minimum over admissible policies and not merely an infimum. -/
+theorem policyValue_lowerPolicy (step : S → Ctrl → FiniteReportLaw S) (terminal : S → ℝ) :
+    ∀ (k : ℕ) (s : S),
+      policyValue step terminal (lowerPolicy step terminal) k s =
+        lowerValue step terminal k s :=
+  policyValue_eq_of_step step terminal (lowerPolicy step terminal)
+    (lowerValue step terminal) (fun _ ↦ rfl) (lowerPolicy_attains step terminal)
+
+/-- DC Theorem 6.1: the greedy maximising policy realises the upper value at every horizon. -/
+theorem policyValue_upperPolicy (step : S → Ctrl → FiniteReportLaw S) (terminal : S → ℝ) :
+    ∀ (k : ℕ) (s : S),
+      policyValue step terminal (upperPolicy step terminal) k s =
+        upperValue step terminal k s :=
+  policyValue_eq_of_step step terminal (upperPolicy step terminal)
+    (upperValue step terminal) (fun _ ↦ rfl) (upperPolicy_attains step terminal)
+
+/-- The lower bound is attained by an admissible policy. -/
 theorem exists_lower_optimal_policy (step : S → Ctrl → FiniteReportLaw S)
     (terminal : S → ℝ) :
     ∃ policy : ℕ → S → Ctrl, ∀ (k : ℕ) (s : S),
-      policyValue step terminal policy k s = lowerValue step terminal k s := by
-  classical
-  choose policy hmem hvalue using fun (k : ℕ) (s : S) ↦
-    Finset.exists_mem_eq_inf' (Finset.univ_nonempty (α := Ctrl))
-      fun c ↦ (step s c).expectation (lowerValue step terminal k)
-  refine ⟨policy, ?_⟩
-  intro k
-  induction k with
-  | zero => exact fun s ↦ rfl
-  | succ k ih =>
-    intro s
-    show (step s (policy k s)).expectation (policyValue step terminal policy k) = _
-    rw [funext ih]
-    exact (hvalue k s).symm
+      policyValue step terminal policy k s = lowerValue step terminal k s :=
+  ⟨lowerPolicy step terminal, policyValue_lowerPolicy step terminal⟩
 
-/-- DC Theorem 6.1: the upper bound is attained by an explicit admissible policy. -/
+/-- The upper bound is attained by an admissible policy. -/
 theorem exists_upper_optimal_policy (step : S → Ctrl → FiniteReportLaw S)
     (terminal : S → ℝ) :
     ∃ policy : ℕ → S → Ctrl, ∀ (k : ℕ) (s : S),
-      policyValue step terminal policy k s = upperValue step terminal k s := by
-  classical
-  choose policy hmem hvalue using fun (k : ℕ) (s : S) ↦
-    Finset.exists_mem_eq_sup' (Finset.univ_nonempty (α := Ctrl))
-      fun c ↦ (step s c).expectation (upperValue step terminal k)
-  refine ⟨policy, ?_⟩
-  intro k
-  induction k with
-  | zero => exact fun s ↦ rfl
-  | succ k ih =>
-    intro s
-    show (step s (policy k s)).expectation (policyValue step terminal policy k) = _
-    rw [funext ih]
-    exact (hvalue k s).symm
+      policyValue step terminal policy k s = upperValue step terminal k s :=
+  ⟨upperPolicy step terminal, policyValue_upperPolicy step terminal⟩
 
 /-- The values stay inside the range of the terminal report at every horizon. -/
 theorem lowerValue_mem_range (step : S → Ctrl → FiniteReportLaw S) (terminal : S → ℝ)
@@ -237,14 +270,15 @@ theorem lowerValue_mem_range (step : S → Ctrl → FiniteReportLaw S) (terminal
     constructor
     · rw [lowerValue_succ]
       refine (Finset.le_inf'_iff _ _).2 fun c _ ↦ ?_
-      calc lo = (step s c).expectation (fun _ ↦ lo) := (expectation_const _ lo).symm
+      calc lo = (step s c).expectation (fun _ ↦ lo) :=
+            (FiniteIndependentMoments.expectation_const _ lo).symm
         _ ≤ (step s c).expectation (lowerValue step terminal k) :=
             expectation_mono _ _ _ fun t ↦ (ih t).1
     · rw [lowerValue_succ, hcs]
       calc (step s cs).expectation (lowerValue step terminal k)
           ≤ (step s cs).expectation (fun _ ↦ hi) :=
             expectation_mono _ _ _ fun t ↦ (ih t).2
-        _ = hi := expectation_const _ hi
+        _ = hi := FiniteIndependentMoments.expectation_const _ hi
 
 /-- The lower Bellman operator is nonexpansive in the uniform norm. -/
 theorem abs_lowerStep_sub_le (step : S → Ctrl → FiniteReportLaw S) (v w : S → ℝ) (d : ℝ)

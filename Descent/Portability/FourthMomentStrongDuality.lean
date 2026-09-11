@@ -1,7 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Portability.GlobalFourthMomentRegion
+import Descent.Portability.FourthMomentAttainableRange
+import Descent.Portability.RadialPotentialLaw
 
 assert_below Descent.Decision Descent.Program
 
@@ -37,6 +38,13 @@ feasible pair, which is what turns the separation into a bound on the dual objec
 * `isGreatest_dual` and `dual_sup_eq_minFourthMoment` are UPT (3.8): the supremum over all
   multipliers is a maximum and equals `V(β, k, m)`. `exists_near_optimal_multipliers` is
   the `ε` corollary.
+
+## Empirical status
+
+None. Every object here is algebra: a convex set of moment vectors, a functional separating
+a point from its interior, and the multipliers read off that functional. No quantity in
+this module is measured, and `spike` is the coordinate spike of
+`RadialPotentialLaw.basis` under another name, tied to it by `spike_eq_basis`.
 -/
 
 set_option autoImplicit false
@@ -45,6 +53,7 @@ set_option relaxedAutoImplicit false
 namespace Descent.Portability.FourthMomentStrongDuality
 
 open Foundations IndividualLossMoments FourthMomentDuality GlobalFourthMomentRegion
+open FourthMomentAttainableRange
 
 noncomputable section
 
@@ -62,6 +71,11 @@ def momentVector (β : ℝ) (k : ι → ℝ) (m t : ℝ) : Option ι ⊕ Bool �
 /-- The unit spike at one coordinate of the moment space. -/
 def spike (j : Option ι ⊕ Bool) : (Option ι ⊕ Bool) → ℝ := Pi.single j 1
 
+/-- The spike is the coordinate basis vector of `RadialPotentialLaw.basis`, at the moment
+space's index type. -/
+theorem spike_eq_basis : (spike : (Option ι ⊕ Bool) → (Option ι ⊕ Bool) → ℝ)
+    = RadialPotentialLaw.basis := rfl
+
 /-- The attainable set of UPT Step 5: moment vectors of feasible conditional-moment pairs,
 thickened upward in the objective coordinate. -/
 def attainableSet (E : ExpFunctional Ω) (X : Ω → ι → ℝ) :
@@ -69,15 +83,6 @@ def attainableSet (E : ExpFunctional Ω) (X : Ω → ι → ℝ) :
   {v | ∃ b a : Ω → ℝ, (∀ ω, b ω ^ 2 ≤ a ω) ∧ v (Sum.inl none) = E b ∧
     (∀ i, v (Sum.inl (some i)) = E (fun ω ↦ X ω i * b ω)) ∧ v (Sum.inr false) = E a ∧
     E (fun ω ↦ a ω ^ 2) ≤ v (Sum.inr true)}
-
-omit [Fintype Ω] [Fintype ι] [DecidableEq ι] in
-/-- Linearity of an expectation on a convex combination. -/
-theorem eval_convex_comb (E : ExpFunctional Ω) (s t : ℝ) (f g : Ω → ℝ) :
-    E (fun ω ↦ s * f ω + t * g ω) = s * E f + t * E g := by
-  have hsplit : (fun ω ↦ s * f ω + t * g ω) = s • f + t • g := by
-    funext ω
-    simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
-  rw [hsplit, E.add_eval, E.smul_eval, E.smul_eval]
 
 omit [Fintype Ω] [Fintype ι] [DecidableEq ι] in
 /-- The mixing defect of the square: `s x² + t y² − (s x + t y)² = s t (x − y)²`. -/
@@ -103,7 +108,7 @@ theorem convex_attainableSet (E : ExpFunctional Ω) (X : Ω → ι → ℝ) :
     have hb2 : t * b' ω ^ 2 ≤ t * a' ω := mul_le_mul_of_nonneg_left (hab' ω) ht
     linarith
   · show s * v (Sum.inl none) + t * w (Sum.inl none) = _
-    rw [h1, h1', eval_convex_comb]
+    rw [h1, h1', eval_lin2]
   · intro i
     show s * v (Sum.inl (some i)) + t * w (Sum.inl (some i)) = _
     rw [h2 i, h2' i]
@@ -111,9 +116,9 @@ theorem convex_attainableSet (E : ExpFunctional Ω) (X : Ω → ι → ℝ) :
         = fun ω ↦ s * (X ω i * b ω) + t * (X ω i * b' ω) := by
       funext ω
       ring
-    rw [hfun, eval_convex_comb]
+    rw [hfun, eval_lin2]
   · show s * v (Sum.inr false) + t * w (Sum.inr false) = _
-    rw [h3, h3', eval_convex_comb]
+    rw [h3, h3', eval_lin2]
   · show E (fun ω ↦ (s * a ω + t * a' ω) ^ 2)
       ≤ s * v (Sum.inr true) + t * w (Sum.inr true)
     have hmono : E (fun ω ↦ (s * a ω + t * a' ω) ^ 2)
@@ -123,7 +128,7 @@ theorem convex_attainableSet (E : ExpFunctional Ω) (X : Ω → ι → ℝ) :
       have hnn : 0 ≤ s * t * (a ω - a' ω) ^ 2 :=
         mul_nonneg (mul_nonneg hs ht) (sq_nonneg _)
       linarith
-    rw [eval_convex_comb] at hmono
+    rw [eval_lin2] at hmono
     have hs4 : s * E (fun ω ↦ a ω ^ 2) ≤ s * v (Sum.inr true) :=
       mul_le_mul_of_nonneg_left h4 hs
     have ht4 : t * E (fun ω ↦ a' ω ^ 2) ≤ t * w (Sum.inr true) :=

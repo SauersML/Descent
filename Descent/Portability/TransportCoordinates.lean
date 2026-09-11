@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PortabilityMasterTheorem
+import Descent.Spectral.SecondMomentShift
 import Mathlib.LinearAlgebra.Matrix.ToLin
 import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 
@@ -35,6 +36,13 @@ Builds on `Foundations.secondMomentMatrix`, `Foundations.secondMoment_quadratic_
 `Foundations.mse_transport_decomposition_general`, `Foundations.expMse`,
 `Foundations.linScore`, `Foundations.dot` and
 `Foundations.ExpFunctional.cauchy_schwarz`.
+
+## Empirical status
+
+None. The bodies here are algebra: a least-squares decomposition is an identity between moments,
+not a measurement of any.  What carries an empirical status is a named
+quantity in a subsystem module asserting that this algebra computes something
+measurable, and such names keep their own docstrings, regimes and ledger rows.
 -/
 
 set_option autoImplicit false
@@ -77,6 +85,12 @@ means: TQ §3.2 works after a specified exact mean adjustment, so the second mom
 the objects in play. -/
 def crossMomentVector (E : ExpFunctional Ω) (X : Ω → J → ℝ) (Y : Ω → ℝ) : J → ℝ :=
   fun i ↦ E (fun ω ↦ X ω i * Y ω)
+
+/-- The cross-moment vector is the raw cross moment of `Spectral.SecondMomentShift`:
+one object, used there to move a linear projection and here to state the normal
+equations. -/
+theorem crossMomentVector_eq_rawCrossMoment (E : ExpFunctional Ω) (X : Ω → J → ℝ)
+    (Y : Ω → ℝ) : crossMomentVector E X Y = Descent.Spectral.rawCrossMoment E X Y := rfl
 
 /-- The outcome second moment `v = E[Y²]`. -/
 def outcomeSecondMoment (E : ExpFunctional Ω) (Y : Ω → ℝ) : ℝ := E (fun ω ↦ Y ω ^ 2)
@@ -332,18 +346,6 @@ theorem excess_risk_law (E : ExpFunctional Ω) (X : Ω → J → ℝ) (Y : Ω �
 
 /-! ### The oracle value is well defined -/
 
-/-- Expansion of the mean square of a difference. -/
-theorem expand_sq_diff (E : ExpFunctional Ω) (a b : Ω → ℝ) :
-    E (fun ω ↦ (a ω - b ω) ^ 2)
-      = E (fun ω ↦ a ω ^ 2) - 2 * E (fun ω ↦ a ω * b ω) + E (fun ω ↦ b ω ^ 2) := by
-  have hsplit : (fun ω ↦ (a ω - b ω) ^ 2)
-      = (fun ω ↦ a ω ^ 2) + ((-2 : ℝ) • fun ω ↦ a ω * b ω) + (fun ω ↦ b ω ^ 2) := by
-    funext ω
-    simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
-    ring
-  rw [hsplit, E.add_eval, E.add_eval, E.smul_eval]
-  ring
-
 /-- Expansion of a product against a difference. -/
 theorem expand_mul_sub (E : ExpFunctional Ω) (a b : Ω → ℝ) :
     E (fun ω ↦ a ω * (a ω - b ω))
@@ -371,7 +373,14 @@ theorem oracle_value_unique (E : ExpFunctional Ω) (X : Ω → J → ℝ) (Y : �
   have hpol := secondMoment_polarization E X w1 w2
   rw [h1, h2] at hpol
   have hdiff : E (fun ω ↦ (dot w1 (X ω) - dot w2 (X ω)) ^ 2) = 0 := by
-    rw [expand_sq_diff, hq1, hq2]
+    have hsplit : (fun ω ↦ (dot w1 (X ω) - dot w2 (X ω)) ^ 2)
+        = (fun ω ↦ dot w1 (X ω) ^ 2)
+          + ((-2 : ℝ) • fun ω ↦ dot w1 (X ω) * dot w2 (X ω))
+          + (fun ω ↦ dot w2 (X ω) ^ 2) := by
+      funext ω
+      simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
+      ring
+    rw [hsplit, E.add_eval, E.add_eval, E.smul_eval, hq1, hq2]
     linarith
   have hcs1 := ExpFunctional.cauchy_schwarz E (fun ω ↦ dot w1 (X ω))
     (fun ω ↦ dot w1 (X ω) - dot w2 (X ω))

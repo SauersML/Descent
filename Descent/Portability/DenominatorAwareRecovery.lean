@@ -1,7 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Portability.ApproximationDuality
+import Descent.Portability.PortabilityMasterTheorem
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Chebyshev
 
 assert_below Descent.Decision Descent.Program
@@ -18,9 +18,15 @@ degree `d·j` therefore determine the expectation of the approximant, and two la
 agreeing on it report expectations at most `2ε_j` apart. The hypotheses are exactly the
 manuscript's domain conditions (9.1).
 
-This is the counterpart to `ApproximationDuality.information_diameter_duality` and
-`RadialInterpolation.radial_report_gap`, which show that without a denominator bound no
-finite moment order helps at all. Laws are `Portability.weightedExp` probability vectors.
+This is the counterpart to the diameter duality and the radial gap formula elsewhere in
+this directory, which show that without a denominator bound no finite moment order helps
+at all. Laws are `Portability.weightedExp` probability vectors.
+
+## Empirical status
+
+None. The bodies here are algebra: a Chebyshev approximation and its uniform residual are
+claims about a model, and what carries an empirical status is a named quantity in a
+subsystem module asserting that this algebra computes something measurable.
 -/
 
 set_option autoImplicit false

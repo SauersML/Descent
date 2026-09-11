@@ -42,6 +42,8 @@ open Descent.Portability.SimultaneousRealization
 #print axioms spike_second_moment
 #print axioms spike_fourth_moment
 #print axioms spike_loss_fraction
+#print axioms spikeSign_eq_rademacherScore
+#print axioms lossBudget_slack
 #print axioms spikeParameter_mem_unit
 #print axioms spike_realizes_fraction
 #print axioms sharp_loss_fraction_interval
