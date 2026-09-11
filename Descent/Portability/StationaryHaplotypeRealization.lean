@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.EnlargedBodyClosedness
 import Descent.Portability.StationaryRealization
+import Descent.Portability.TwoLocusMicroscopicApproximation
 import Mathlib.Analysis.Calculus.Deriv.Prod
 import Mathlib.Analysis.SpecialFunctions.Exponential
 
@@ -42,9 +43,20 @@ which is `embed_oneDemeStationaryLowOrderLDState_mem_of_approx`, and a point of 
 body whose heterozygosity coordinates agree carries a locus-exchangeable realization,
 `nonempty_stationaryLocusExchangeableRealization_of_approx`.
 
-What is NOT proved here: the microscopic approximation of the enlarged one-deme generator,
-NOTE1 (11). The theorems take it as data and are exactly as strong as the approximation they
-are given; the hypothesis-free statement is its specialisation to the constructed kernel.
+The approximation is constructed, not assumed. `TwoLocusMicroscopicApproximation` builds the
+stage-choosing microscopic kernel of NOTE1 §2.3 and proves its expansion (11) for every enlarged
+coordinate, so `enlargedMicroscopicApproximation rates 0` supplies it at the single deme. The
+three statements `embed_oneDemeStationaryLowOrderLDState_mem`,
+`nonempty_stationaryLocusExchangeableRealization` and
+`oneDemeStationaryLowOrderLDState_mem_realizationBody` are NOTE1 Theorem 3 with no hypotheses
+beyond the physical rate domain carried by `ManyDemeLDRates 1`. `oneDemeStationary_dd_nonneg`
+shows the kind of consequence this licenses: the stationary `DD` coordinate is nonnegative
+because it is a second moment under the common law, with no appeal to the closed form.
+
+The `_of_approx` forms are kept because they state exactly which input the argument uses: any
+genuine positive approximation of the enlarged one-deme generator gives the same conclusion.
+Uniqueness of the stationary vector is the determinant identity (15) of `StationaryRealization`
+and is not restated here.
 
 ## Empirical status
 
@@ -383,6 +395,43 @@ theorem oneDemeStationaryLowOrderLDState_mem_realizationBody_of_approx {Branch :
     nonempty_stationaryLocusExchangeableRealization_of_approx rates approximation
   exact KernelRealizationPreservation.lowOrderLDState_mem_realizationBody_of_realization
     realization.toLowOrderLDHaplotypeRealization
+
+/-! ## NOTE1 Theorem 3 with no hypotheses -/
+
+/-- **NOTE1 Theorem 3, the enlarged body form, with no hypotheses.** The locus-exchangeable
+embedding of the corpus one-deme stationary low-order state lies in the enlarged realization
+body. The microscopic approximation is the constructed stage-choosing kernel at the single
+deme. -/
+theorem embed_oneDemeStationaryLowOrderLDState_mem (rates : ManyDemeLDRates 1) :
+    embedLowOrderLDState (oneDemeStationaryLowOrderLDState rates)
+      ∈ realizationBody (EnlargedLowOrderLDGenerator.enlargedLowOrderLDFeature (D := 1)) :=
+  embed_oneDemeStationaryLowOrderLDState_mem_of_approx rates
+    (TwoLocusMicroscopicApproximation.enlargedMicroscopicApproximation rates 0)
+
+/-- **NOTE1 Theorem 3, with no hypotheses.** The unique stationary low-order vector of the
+one-deme recurrent-biallelic system has a common haplotype realization: the corpus closed form
+carries one probability law on the haplotype simplex whose moments are all of its coordinates,
+with the expected left- and right-locus heterozygosities equal. -/
+theorem nonempty_stationaryLocusExchangeableRealization (rates : ManyDemeLDRates 1) :
+    Nonempty (LocusExchangeableLowOrderLDHaplotypeRealization
+      (oneDemeStationaryLowOrderLDState rates)) :=
+  nonempty_stationaryLocusExchangeableRealization_of_approx rates
+    (TwoLocusMicroscopicApproximation.enlargedMicroscopicApproximation rates 0)
+
+/-- The corpus one-deme stationary low-order state lies in the stored realization body, with
+no hypotheses, so every inequality valid on that body holds at the ancestral boundary. -/
+theorem oneDemeStationaryLowOrderLDState_mem_realizationBody (rates : ManyDemeLDRates 1) :
+    oneDemeStationaryLowOrderLDState rates ∈ realizationBody (lowOrderLDFeature 1) :=
+  oneDemeStationaryLowOrderLDState_mem_realizationBody_of_approx rates
+    (TwoLocusMicroscopicApproximation.enlargedMicroscopicApproximation rates 0)
+
+/-- The within-deme `DD` coordinate of the stationary state is nonnegative because it is a
+second moment under the common haplotype law. The sign is derived from realizability, not read
+off the closed form. -/
+theorem oneDemeStationary_dd_nonneg (rates : ManyDemeLDRates 1) :
+    0 ≤ oneDemeStationaryLowOrderLDState rates (some (.DD 0 0)) :=
+  KernelRealizationPreservation.dd_diagonal_nonneg_of_mem
+    (oneDemeStationaryLowOrderLDState_mem_realizationBody rates) 0
 
 end
 
