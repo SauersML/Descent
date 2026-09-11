@@ -121,10 +121,10 @@ theorem cost_tail (c p : ι → ℝ) (M x : ℝ) (hp : ∀ i, 0 ≤ p i ∧ p i 
   have he : {a | contrast c p + radius M (costVariance c p) x < contrast c a} =
       {a | radius M (costVariance c p) x < ∑ i, X i a} := by
     ext a
-    change (_ < _) ↔ (_ < _)
-    change (_ < _) ↔ (radius M (costVariance c p) x < ∑ i, centeredCost (p i) (c i) (a i))
+    change (contrast c p + radius M (costVariance c p) x < contrast c a) ↔
+      (radius M (costVariance c p) x < ∑ i, centeredCost (p i) (c i) (a i))
     rw [← cost_error]
-    linarith
+    constructor <;> intro ha <;> linarith
   rw [he]
   exact ht
 
