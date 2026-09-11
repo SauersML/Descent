@@ -248,6 +248,7 @@ theorem reducedValues_bddBelow (E : ExpFunctional Ω) (X : Ω → ι → ℝ) (�
   rintro v ⟨b, a, hab, hb, hk, ha, rfl⟩
   exact second_moment_sq_le E a m ha
 
+omit [Fintype ι] [DecidableEq ι] in
 /-- **The lower half of UPT (3.10).** The fourth moment of any outcome kernel meeting the
 constraints (3.2) is at least `V(β, k, m)`. -/
 theorem kernel_fourth_moment_ge_min {Ψ : Type*} (E : ExpFunctional Ω) (X : Ω → ι → ℝ)
