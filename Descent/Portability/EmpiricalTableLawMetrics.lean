@@ -57,7 +57,7 @@ set_option relaxedAutoImplicit false
 namespace Descent.Portability.EmpiricalTableLawMetrics
 
 open FourCellCohortLaw EmpiricalCorrelationDefinedness ChronologyReportLaw
-  EmpiricalAUCUnbiasedness
+  EmpiricalAUCUnbiasedness SmallCohortConditionalMeans
 
 /-- The two classes of a Boolean vector over a cohort of size `n` together count `n`
 members. -/
