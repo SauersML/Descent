@@ -511,6 +511,9 @@ import Descent.Portability.AuditRayleighGeometry
 import Descent.Portability.SpectralAuditDesign
 import Descent.Portability.SpectralAuditTrace
 
+import Descent.Portability.SpectralAuditCost
+import Descent.Portability.SpectralAuditDualCertificate
+
 assert_below Descent.Program
 
 /-!

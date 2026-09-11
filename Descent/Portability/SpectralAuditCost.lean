@@ -58,6 +58,7 @@ theorem cost_lower_bound (κ p : ι → ℝ) (u : ι → E) (B : ℝ)
   apply (div_le_iff₀ (mul_pos hdim hB)).mpr
   have he := (div_le_iff₀ hB).mp hh
   change leverageSum κ u ^ 2 ≤ objective κ u p * ((Module.finrank ℝ E : ℝ) * B)
+  unfold objective
   nlinarith
 
 /-- An isotropic covariance attains equality between trace and dimension times top variance. -/
@@ -65,11 +66,11 @@ theorem isotropic_trace (w : ι → ℝ) (u : ι → E) (α : ℝ)
     (hd : 0 < Module.finrank ℝ E) (hiso : covariance w u = α • LinearMap.id) :
     (∑ i, w i * ‖u i‖ ^ 2) = (Module.finrank ℝ E : ℝ) * largest w u := by
   obtain ⟨a, ha, he⟩ := largest_attained w u hd
-  have hλ : largest w u = α := by
+  have htop : largest w u = α := by
     rw [← he, ← quadratic, hiso, LinearMap.smul_apply, LinearMap.id_apply,
       inner_smul_right, real_inner_self_eq_norm_sq, ha]
     ring
-  rw [← covariance_trace, hiso, map_smul, hλ]
+  rw [← covariance_trace, hiso, map_smul, htop]
   simp [mul_comm]
 
 /-- Proportional positive probabilities attain equality in the weighted Cauchy-Schwarz step. -/
@@ -92,7 +93,6 @@ theorem proportional_trace (κ p : ι → ℝ) (u : ι → E) (t B : ℝ)
   rw [← Finset.sum_div, hsum]
   change leverageSum κ u / t * (t * leverageSum κ u) = leverageSum κ u ^ 2
   field_simp
-  ring
 
 /-- Feasible isotropic, proportional allocations achieve the cost lower bound exactly. -/
 theorem attained_cost_bound (κ p : ι → ℝ) (u : ι → E) (B t α : ℝ)
@@ -107,6 +107,7 @@ theorem attained_cost_bound (κ p : ι → ℝ) (u : ι → E) (B t α : ℝ)
   apply (eq_div_iff (mul_pos hdim hB).ne').mpr
   rw [hi] at hc
   change objective κ u p * ((Module.finrank ℝ E : ℝ) * B) = leverageSum κ u ^ 2
+  unfold objective
   nlinarith
 
 end Descent.Portability.SpectralAuditCost
