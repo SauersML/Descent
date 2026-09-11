@@ -24,6 +24,7 @@ import Descent.Portability.EnlargedGeneratorBridges
 import Descent.Portability.IntegrableRateHistoryRealization
 import Descent.Portability.RateGeneratorLipschitz
 import Descent.Portability.IntegrableGeneratorPropagator
+import Descent.Portability.IntegrableRateRealization
 import Descent.Portability.LinearFundamentalMatrix
 import Descent.Portability.MultinomialMomentExpansion
 import Descent.Portability.LowOrderLDWitnesses
