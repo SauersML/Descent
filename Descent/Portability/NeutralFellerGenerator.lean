@@ -121,6 +121,7 @@ def stateLaw (x : FrequencyState Deme Locus Allele) (i : Deme) :
   mass_nonneg hap := x.2.1 (i, hap)
   mass_sum := x.2.2 i
 
+omit [Fintype Deme] [DecidableEq Deme] [∀ ℓ, DecidableEq (Allele ℓ)] in
 /-- Every state is the frequency point of its per-deme haplotype laws. -/
 theorem lawPoint_stateLaw (x : FrequencyState Deme Locus Allele) :
     lawPoint (stateLaw x) = x.1 :=
@@ -132,6 +133,7 @@ def polynomialFunction (p : FrequencyPolynomial Deme Locus Allele) :
   toFun x := eval x.1 p
   continuous_toFun := (MvPolynomial.continuous_eval p).comp continuous_subtype_val
 
+omit [Fintype Deme] [DecidableEq Deme] [∀ ℓ, DecidableEq (Allele ℓ)] in
 /-- A polynomial observable evaluates its polynomial at the frequency vector of the state. -/
 theorem polynomialFunction_apply (p : FrequencyPolynomial Deme Locus Allele)
     (x : FrequencyState Deme Locus Allele) : polynomialFunction p x = eval x.1 p :=
@@ -164,6 +166,7 @@ theorem one_mem_polynomialSubspace :
     (1 : C(FrequencyState Deme Locus Allele, ℝ)) ∈ PolynomialSubspace Deme Locus Allele :=
   Subalgebra.one_mem _
 
+omit [DecidableEq Deme] [∀ ℓ, DecidableEq (Allele ℓ)] in
 /-- The polynomial observables separate states: two distinct states differ in some haplotype
 frequency, and that frequency is a coordinate polynomial. -/
 theorem polynomialAlgebra_separatesPoints :
