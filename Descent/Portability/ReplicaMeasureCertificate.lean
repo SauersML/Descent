@@ -165,11 +165,11 @@ theorem integrable_unresolvedWeight (μ : Measure Ω) [IsProbabilityMeasure μ] 
   · by_cases hpos : 0 < den point
     · simp only [Set.indicator_apply, Set.mem_setOf_eq, hpos, ↓reduceIte]
       exact pow_nonneg (by linarith [hden point]) terms
-    · simp [Set.indicator_apply, hpos]
+    · simp [hpos]
   · by_cases hpos : 0 < den point
     · simp only [Set.indicator_apply, Set.mem_setOf_eq, hpos, ↓reduceIte]
       exact pow_le_one₀ (by linarith [hden point]) (by linarith)
-    · simp [Set.indicator_apply, hpos]
+    · simp [hpos]
 
 /-- **NOTE 2 equation (16), measure form.** The expectation of the ratio metric is the retained
 replica numerator plus the unresolved numerator, with no approximation. The pointwise identity
@@ -212,9 +212,9 @@ theorem definedProbability_partition (μ : Measure Ω) [IsProbabilityMeasure μ]
         Set.indicator {point | 0 < den point} (fun point ↦ (1 - den point) ^ terms) point := by
     intro point
     by_cases hpos : 0 < den point
-    · simp [Set.indicator_apply, hpos]
+    · simp [hpos]
     · have hzero : den point = 0 := le_antisymm (not_lt.mp hpos) (hdenNonneg point)
-      simp [Set.indicator_apply, hpos, hzero]
+      simp [hzero]
   rw [← integral_indicator_one hset, integral_congr_ae (ae_of_all μ hpoint),
     integral_add (integrable_retainedWeight μ den hdenMeasurable hdenNonneg hden terms)
       (integrable_unresolvedWeight μ den hdenMeasurable hden terms),
@@ -275,14 +275,14 @@ theorem unresolvedNumerator_le_unresolvedMass (μ : Measure Ω) [IsProbabilityMe
   show ratioOnDefined num den point * (1 - den point) ^ terms ≤ _
   by_cases hpos : 0 < den point
   · have hweight : Set.indicator {point | 0 < den point} (fun point ↦ (1 - den point) ^ terms)
-        point = (1 - den point) ^ terms := by simp [Set.indicator_apply, hpos]
+        point = (1 - den point) ^ terms := by simp [hpos]
     rw [hweight]
     calc ratioOnDefined num den point * (1 - den point) ^ terms
         ≤ 1 * (1 - den point) ^ terms :=
           mul_le_mul_of_nonneg_right (ratioOnDefined_le_one num den hle point) hpowNonneg
       _ = (1 - den point) ^ terms := one_mul _
   · have hweight : Set.indicator {point | 0 < den point} (fun point ↦ (1 - den point) ^ terms)
-        point = 0 := by simp [Set.indicator_apply, hpos]
+        point = 0 := by simp [hpos]
     have hratio : ratioOnDefined num den point = 0 := by simp [ratioOnDefined, hpos]
     rw [hweight, hratio, zero_mul]
 
@@ -411,7 +411,7 @@ theorem tendsto_unresolvedMass (μ : Measure Ω) [IsProbabilityMeasure μ] (den 
       · simp only [Set.indicator_apply, Set.mem_setOf_eq, hpos, ↓reduceIte, Real.norm_eq_abs]
         rw [abs_of_nonneg (pow_nonneg (by linarith [hden point]) terms)]
         exact pow_le_one₀ (by linarith [hden point]) (by linarith)
-      · simp [Set.indicator_apply, hpos]
+      · simp [hpos]
     · by_cases hpos : 0 < den point
       · simp only [Set.indicator_apply, Set.mem_setOf_eq, hpos, ↓reduceIte]
         exact tendsto_pow_atTop_nhds_zero_of_lt_one (by linarith [hden point]) (by linarith)
@@ -533,7 +533,7 @@ theorem unresolvedMass_measure_eq {Report : Type*} [Fintype Report] [MeasurableS
     FiniteDiscreteMeasure.integral_observable, ReplicaDomainCertificate.unresolvedMass]
   refine congrArg law.expectation (funext fun report ↦ ?_)
   by_cases hpos : 0 < den report <;>
-    simp [Set.indicator_apply, SublawReportCertificate.definedIndicator, hpos]
+    simp [SublawReportCertificate.definedIndicator, hpos]
 
 end
 
