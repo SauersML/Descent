@@ -173,8 +173,10 @@ def uniformEvaluator : CylinderEvaluator uniformDraw where
 
 /-- The streams whose bit at an index is true form a measurable event. -/
 theorem measurableSet_bit_true (index : ℕ) :
-    MeasurableSet {stream : ℕ → Bool | stream index = true} :=
-  measurable_pi_apply index (measurableSet_singleton true)
+    MeasurableSet {stream : ℕ → Bool | stream index = true} := by
+  have hpreimage : MeasurableSet ((fun stream : ℕ → Bool ↦ stream index) ⁻¹' {true}) :=
+    measurable_pi_apply index (measurableSet_singleton true)
+  exact hpreimage
 
 /-- A fair bit is true with probability one half. -/
 theorem bitMeasure_real_bit_true (index : ℕ) :
@@ -192,7 +194,7 @@ theorem binaryDigit_eq_indicator (index : ℕ) :
     (fun stream ↦ binaryDigit stream index) =
       {stream : ℕ → Bool | stream index = true}.indicator fun _ ↦ (1 / 2 : ℝ) ^ (index + 1) := by
   funext stream
-  by_cases hbit : stream index = true <;> simp [binaryDigit, Set.indicator_apply, hbit]
+  by_cases hbit : stream index = true <;> simp [binaryDigit, hbit]
 
 /-- Each binary digit is integrable. -/
 theorem integrable_binaryDigit (index : ℕ) :
