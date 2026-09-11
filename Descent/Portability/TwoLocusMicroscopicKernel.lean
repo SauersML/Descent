@@ -209,10 +209,11 @@ theorem microscopicError_nonneg {D : ℕ} (rates : ManyDemeLDRates D) (step : �
 of NOTE1 equation (3). -/
 theorem microscopicError_tendsto {D : ℕ} (rates : ManyDemeLDRates D) :
     Filter.Tendsto (microscopicError rates) (nhdsWithin 0 (Set.Ioi 0)) (nhds 0) := by
-  have hidentity : Filter.Tendsto (fun step : ℝ ↦ step) (nhds 0) (nhds 0) := tendsto_id
   have hscale : Filter.Tendsto
       (fun step : ℝ ↦ (Fintype.card (Stage D) : ℝ) * step) (nhds 0) (nhds 0) := by
-    simpa using hidentity.const_mul ((Fintype.card (Stage D) : ℝ))
+    have hcontinuous : Continuous fun step : ℝ ↦ (Fintype.card (Stage D) : ℝ) * step :=
+      continuous_const.mul continuous_id
+    simpa using hcontinuous.tendsto 0
   have hterms : Filter.Tendsto
       (fun step ↦ ∑ coordinate : AffineEnlargedCoordinate D, ∑ stage : Stage D,
         stageSlack rates (enlargedStageExpansion coordinate) stage
@@ -222,8 +223,11 @@ theorem microscopicError_tendsto {D : ℕ} (rates : ManyDemeLDRates D) :
     exact (stageSlack_tendsto rates (enlargedStageExpansion coordinate) stage).comp hscale
   have hwhole : Filter.Tendsto (microscopicSlack rates) (nhds 0) (nhds 0) := by
     simpa only [Finset.sum_const_zero] using hterms
-  have habs := (hwhole.mono_left nhdsWithin_le_nhds).abs
-  simpa [microscopicError] using habs
+  have habs : Filter.Tendsto (fun step ↦ |microscopicSlack rates step|) (nhds 0)
+      (nhds |0|) :=
+    (continuous_abs.tendsto 0).comp hwhole
+  rw [abs_zero] at habs
+  exact habs.mono_left nhdsWithin_le_nhds
 
 /-- **One microscopic step advances every enlarged coordinate by the summed stage drift.**
 This is NOTE1 equation (11) with the sum of rate-weighted stage velocities in place of the
@@ -354,10 +358,10 @@ theorem driftStage_sum_stored {D : ℕ} (rates : ManyDemeLDRates D)
       twoLocusWeightedJetDrift rates.coalescence state feature := rfl
   rw [hsum]
   cases feature with
-  | H first second => exact twoLocusWeightedJetDrift_H_eq_lowOrderLDDrift rates state first
-      second
-  | DD first second => exact twoLocusWeightedJetDrift_DD_eq_lowOrderLDDrift rates state first
-      second
+  | H first second =>
+      exact twoLocusWeightedJetDrift_H_eq_lowOrderLDDrift rates state first second
+  | DD first second =>
+      exact twoLocusWeightedJetDrift_DD_eq_lowOrderLDDrift rates state first second
   | Dz first second third =>
       exact twoLocusWeightedJetDrift_Dz_eq_lowOrderLDDrift rates state first second third
   | pi2 first second third fourth =>
@@ -411,8 +415,7 @@ theorem driftStage_sum_constant {D : ℕ} (rates : ManyDemeLDRates D)
     ∑ deme : Fin D, stageRate rates (Stage.drift deme) *
         stageVelocity (enlargedStageExpansion (none : AffineEnlargedCoordinate D))
           (Stage.drift deme) state = 0 := by
-  simp [stageVelocity, enlargedStageExpansion, enlargedCoordinateJet,
-    TwoLocusDiffusionJet.const]
+  simp [stageVelocity, enlargedCoordinateJet, TwoLocusDiffusionJet.const]
 
 /-! ## The migration stages reproduce the corpus heterozygosity migration rows -/
 
