@@ -7,6 +7,11 @@ import Descent.Portability.SmallDenominatorLayerCake
 
 open Descent.Portability.SmallDenominatorLayerCake
 
+#print axioms integral_rpow_mul_one_sub_pow
+#print axioms integral_truncationDensity_mul_rpow
+#print axioms truncationDensity_beta_bound
+#print axioms inverseDensity_beta_bound
+#print axioms remainderDensity_beta_bound
 #print axioms selector_eq_indicator
 #print axioms integral_density_mul_selector
 #print axioms intervalIntegrable_density_mul_selector
@@ -14,8 +19,6 @@ open Descent.Portability.SmallDenominatorLayerCake
 #print axioms truncation_layerCake
 #print axioms inverse_layerCake
 #print axioms remainder_layerCake
-#print axioms integral_rpow_mul_one_sub_pow
-#print axioms integral_truncationDensity_mul_rpow
 #print axioms density_mul_smallDenominatorMass
 #print axioms intervalIntegrable_density_mul_smallDenominatorMass
 #print axioms expectation_profile_eq_integral
