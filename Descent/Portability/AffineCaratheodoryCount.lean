@@ -45,12 +45,12 @@ noncomputable section
 /-- The feature map with the coordinate `i₀` deleted: the same map read only at the remaining
 coordinates. -/
 def reducedFeature {X ι : Type*} [Fintype ι] [DecidableEq ι] (φ : X → ι → ℝ) (i₀ : ι) :
-    X → (Finset.univ.erase i₀ : Finset ι) → ℝ :=
+    X → ↥(Finset.univ.erase i₀) → ℝ :=
   fun x i ↦ φ x i
 
 /-- Deleting one coordinate leaves exactly one coordinate fewer. -/
 theorem card_reducedCoordinates {ι : Type*} [Fintype ι] [DecidableEq ι] (i₀ : ι) :
-    Fintype.card (Finset.univ.erase i₀ : Finset ι) + 1 = Fintype.card ι := by
+    Fintype.card ↥(Finset.univ.erase i₀) + 1 = Fintype.card ι := by
   rw [Fintype.card_coe, Finset.card_erase_of_mem (Finset.mem_univ i₀), Finset.card_univ]
   have hpos : 0 < Fintype.card ι := Fintype.card_pos_iff.mpr ⟨i₀⟩
   omega
@@ -73,14 +73,14 @@ theorem exists_law_card_of_constant_coordinate {X ι : Type*} [Fintype ι] [Deci
     ∃ p : Fin (Fintype.card ι) → ℝ, ∃ point : Fin (Fintype.card ι) → X,
       (∀ k, 0 ≤ p k) ∧ ∑ k, p k = 1 ∧ featureVector p point φ = v := by
   obtain ⟨Ω, hΩ, p, point, hp, hsum, hfeat⟩ := (mem_realizationBody_iff φ v).mp hv
-  have hreduced : (fun i : (Finset.univ.erase i₀ : Finset ι) ↦ v i)
+  have hreduced : (fun i : ↥(Finset.univ.erase i₀) ↦ v i)
       ∈ realizationBody (reducedFeature φ i₀) := by
     refine (mem_realizationBody_iff _ _).mpr ⟨Ω, hΩ, p, point, hp, hsum, ?_⟩
     rw [featureVector_reducedFeature, hfeat]
   obtain ⟨q, atom, hq, hqsum, hqfeat⟩ :=
     exists_law_of_mem_realizationBody (reducedFeature φ i₀) _ hreduced
-  have hlaw : ∃ q : Fin (Fintype.card (Finset.univ.erase i₀ : Finset ι) + 1) → ℝ,
-      ∃ atom : Fin (Fintype.card (Finset.univ.erase i₀ : Finset ι) + 1) → X,
+  have hlaw : ∃ q : Fin (Fintype.card ↥(Finset.univ.erase i₀) + 1) → ℝ,
+      ∃ atom : Fin (Fintype.card ↥(Finset.univ.erase i₀) + 1) → X,
         (∀ k, 0 ≤ q k) ∧ ∑ k, q k = 1 ∧ featureVector q atom φ = v := by
     refine ⟨q, atom, hq, hqsum, ?_⟩
     funext i
