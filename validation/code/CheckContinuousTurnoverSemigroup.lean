@@ -20,3 +20,5 @@ open Descent.Portability.ContinuousTurnoverSemigroup
 #print axioms gridEmbed_pow_gridConvex
 #print axioms step_mulVec_mono
 #print axioms euler_iterate_le
+#print axioms diag_nonpos
+#print axioms exp_nearestDriftMatrix_mulVec_le
