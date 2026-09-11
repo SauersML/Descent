@@ -4,13 +4,17 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.BinomialAggregateEnvelope
 import Descent.Portability.ChronologyReportLaw
 import Mathlib.Algebra.Group.Nat.Hom
+import Mathlib.Algebra.QuadraticDiscriminant
+import Mathlib.Analysis.Calculus.ParametricIntegral
 import Mathlib.Analysis.SpecialFunctions.ExpDeriv
 import Mathlib.Analysis.Calculus.IteratedDeriv.Lemmas
 import Mathlib.Analysis.Convex.Integral
 import Mathlib.Analysis.Convex.SpecificFunctions.Basic
 import Mathlib.Analysis.Normed.Group.Bounded
 import Mathlib.LinearAlgebra.LinearIndependent.Basic
+import Mathlib.MeasureTheory.Group.Convolution
 import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.MeasureTheory.Integral.Prod
 
 assert_below Descent.Decision Descent.Program
 
@@ -50,11 +54,16 @@ finite law enters through `lawMeasure`, whose transform is `exposureLaplace`. NO
 proved in that generality: for a probability measure carried by `[0, R]`, Jensen's lower bound
 (`exp_neg_mean_le_measureLaplace`, through `ConvexOn.map_integral_le`) and the chord upper
 bound (`measureLaplace_le_chord`), attained by the point mass at the mean and by the endpoint
-mixture.
+mixture. So is NOTE1 (35) for a finite measure carried by `[0, R]`: differentiating under the
+integral (`hasDerivAt_momentLaplace`) gives every iterated derivative as a moment transform
+(`iteratedDeriv_measureLaplace`), hence complete monotonicity
+(`sign_iteratedDeriv_measureLaplace`), and a nonnegative quadratic gives midpoint log-convexity
+(`measureLaplace_sq_le_mul`). The squared transform is the transform of the convolution
+`ν ∗ ν` (`measureLaplace_conv`).
 
-Not formalised: NOTE1 (35), the convolution identity and identifiability for measures that are
-not finitely supported (they are proved above for finite laws), and the remark that `m` and `r`
-are not separately identified in calendar time. Nothing here identifies `ν` from data.
+Not formalised: identifiability for measures that are not finitely supported (it is proved
+above for finite laws), and the remark that `m` and `r` are not separately identified in calendar
+time. Nothing here identifies `ν` from data.
 
 ## Empirical status
 
@@ -608,6 +617,161 @@ theorem measureLaplace_endpointMixture (bound mean lam : ℝ) (hlow : 0 ≤ mean
       (expectation_endpointExposure bound mean hlow hhigh hbound),
     (measureLaplace_lawMeasure _ _ lam).trans
       (exposureLaplace_endpointMixture bound mean lam hlow hhigh hbound)⟩
+
+/-- NOTE1 section 6.3 for measures: the squared transform is the transform of the convolution
+`ν ∗ ν`, the law of the sum of two independent exposures drawn from `ν`. -/
+theorem measureLaplace_conv (exposureLaw : Measure ℝ) [IsFiniteMeasure exposureLaw] (lam : ℝ) :
+    measureLaplace (Measure.conv exposureLaw exposureLaw) lam =
+      measureLaplace exposureLaw lam ^ 2 := by
+  have hsplit : ∀ pair : ℝ × ℝ, Real.exp (-(lam * (pair.1 + pair.2))) =
+      Real.exp (-(lam * pair.1)) * Real.exp (-(lam * pair.2)) := by
+    intro pair
+    rw [← Real.exp_add]
+    congr 1
+    ring
+  unfold measureLaplace Measure.conv
+  rw [integral_map (by fun_prop : Measurable fun pair : ℝ × ℝ ↦ pair.1 + pair.2).aemeasurable
+    (by fun_prop : Continuous fun point : ℝ ↦ Real.exp (-(lam * point))).aestronglyMeasurable]
+  simp only [hsplit]
+  rw [integral_prod_mul (fun point ↦ Real.exp (-(lam * point)))
+    (fun point ↦ Real.exp (-(lam * point))), pow_two]
+
+/-- NOTE1 (35), log-convexity, for measures. Assumes: a finite measure carried by `[0, R]`. The
+transform at a midpoint is dominated in square by the product of its endpoint values: the
+quadratic `t ↦ ∫ (t e^{-λ b / 2} + e^{-μ b / 2})² ν(db)` is nonnegative, so its discriminant is
+not positive. -/
+theorem measureLaplace_sq_le_mul (exposureLaw : Measure ℝ) [IsFiniteMeasure exposureLaw]
+    (bound lam mu : ℝ) (hsupport : ∀ᵐ exposure ∂exposureLaw, exposure ∈ Set.Icc 0 bound) :
+    measureLaplace exposureLaw ((lam + mu) / 2) ^ 2 ≤
+      measureLaplace exposureLaw lam * measureLaplace exposureLaw mu := by
+  have hintegrable : ∀ scale : ℝ,
+      Integrable (fun exposure ↦ Real.exp (-(scale * exposure))) exposureLaw :=
+    fun scale ↦ integrable_of_ae_mem_Icc exposureLaw bound hsupport _ (by fun_prop)
+  have hquadratic : ∀ t : ℝ, 0 ≤ measureLaplace exposureLaw lam * (t * t) +
+      2 * measureLaplace exposureLaw ((lam + mu) / 2) * t + measureLaplace exposureLaw mu := by
+    intro t
+    have hpoint : ∀ exposure : ℝ,
+        (t * Real.exp (-(lam * exposure) / 2) + Real.exp (-(mu * exposure) / 2)) ^ 2 =
+          t * t * Real.exp (-(lam * exposure)) +
+            2 * t * Real.exp (-((lam + mu) / 2 * exposure)) + Real.exp (-(mu * exposure)) := by
+      intro exposure
+      have hleft : Real.exp (-(lam * exposure) / 2) ^ 2 = Real.exp (-(lam * exposure)) := by
+        rw [← Real.exp_nat_mul]
+        congr 1
+        push_cast
+        ring
+      have hright : Real.exp (-(mu * exposure) / 2) ^ 2 = Real.exp (-(mu * exposure)) := by
+        rw [← Real.exp_nat_mul]
+        congr 1
+        push_cast
+        ring
+      have hcross : Real.exp (-(lam * exposure) / 2) * Real.exp (-(mu * exposure) / 2) =
+          Real.exp (-((lam + mu) / 2 * exposure)) := by
+        rw [← Real.exp_add]
+        congr 1
+        ring
+      linear_combination t * t * hleft + 2 * t * hcross + hright
+    have hfirst : Integrable (fun exposure ↦ t * t * Real.exp (-(lam * exposure))) exposureLaw :=
+      (hintegrable lam).const_mul (t * t)
+    have hsecond : Integrable
+        (fun exposure ↦ 2 * t * Real.exp (-((lam + mu) / 2 * exposure))) exposureLaw :=
+      (hintegrable ((lam + mu) / 2)).const_mul (2 * t)
+    have hsum : Integrable (fun exposure ↦ t * t * Real.exp (-(lam * exposure)) +
+        2 * t * Real.exp (-((lam + mu) / 2 * exposure))) exposureLaw := hfirst.add hsecond
+    have hvalue : ∫ exposure, (t * Real.exp (-(lam * exposure) / 2) +
+        Real.exp (-(mu * exposure) / 2)) ^ 2 ∂exposureLaw =
+        measureLaplace exposureLaw lam * (t * t) +
+          2 * measureLaplace exposureLaw ((lam + mu) / 2) * t +
+            measureLaplace exposureLaw mu := by
+      rw [integral_congr_ae (ae_of_all _ hpoint), integral_add hsum (hintegrable mu),
+        integral_add hfirst hsecond, integral_const_mul, integral_const_mul]
+      unfold measureLaplace
+      ring
+    rw [← hvalue]
+    exact integral_nonneg fun exposure ↦ sq_nonneg _
+  have hdiscrim := discrim_le_zero hquadratic
+  unfold discrim at hdiscrim
+  nlinarith [hdiscrim]
+
+/-- Assumes: a finite measure carried by `[0, R]`. The moment transform
+`λ ↦ ∫ (-b)^k e^{-λ b} ν(db)` is differentiable with derivative the next moment transform; the
+derivative passes under the integral because on `[0, R]` the differentiated integrand is bounded
+uniformly for scales within distance one of `λ`. -/
+theorem hasDerivAt_momentLaplace (exposureLaw : Measure ℝ) [IsFiniteMeasure exposureLaw]
+    (bound : ℝ) (hsupport : ∀ᵐ exposure ∂exposureLaw, exposure ∈ Set.Icc 0 bound) (order : ℕ)
+    (lam : ℝ) :
+    HasDerivAt
+      (fun scale ↦ ∫ exposure, (-exposure) ^ order * Real.exp (-(scale * exposure)) ∂exposureLaw)
+      (∫ exposure, (-exposure) ^ (order + 1) * Real.exp (-(lam * exposure)) ∂exposureLaw)
+      lam := by
+  have hbound : ∀ᵐ exposure ∂exposureLaw, ∀ scale ∈ Metric.ball lam 1,
+      ‖(-exposure) ^ (order + 1) * Real.exp (-(scale * exposure))‖ ≤
+        bound ^ (order + 1) * Real.exp ((|lam| + 1) * bound) := by
+    refine hsupport.mono fun exposure hexposure scale hscale ↦ ?_
+    have hdist : |scale - lam| < 1 := by
+      rw [← Real.dist_eq]
+      exact Metric.mem_ball.mp hscale
+    have hscaleabs : |scale| ≤ |lam| + 1 := by
+      linarith [abs_sub_abs_le_abs_sub scale lam]
+    have hpower : |(-exposure) ^ (order + 1)| ≤ bound ^ (order + 1) := by
+      rw [abs_pow, abs_neg, abs_of_nonneg hexposure.1]
+      exact pow_le_pow_left₀ hexposure.1 hexposure.2 _
+    have hexponent : -(scale * exposure) ≤ (|lam| + 1) * bound := by
+      nlinarith [neg_le_abs scale, abs_nonneg scale, hexposure.1, hexposure.2, hscaleabs]
+    rw [Real.norm_eq_abs, abs_mul, Real.abs_exp]
+    exact mul_le_mul hpower (Real.exp_le_exp.mpr hexponent) (Real.exp_pos _).le
+      ((abs_nonneg _).trans hpower)
+  have hdiff : ∀ᵐ exposure ∂exposureLaw, ∀ scale ∈ Metric.ball lam 1,
+      HasDerivAt (fun value ↦ (-exposure) ^ order * Real.exp (-(value * exposure)))
+        ((-exposure) ^ (order + 1) * Real.exp (-(scale * exposure))) scale := by
+    refine ae_of_all _ fun exposure scale _ ↦ ?_
+    have hlinear : HasDerivAt (fun value : ℝ ↦ -(value * exposure)) (-exposure) scale := by
+      have hstep := ((hasDerivAt_id scale).mul_const exposure).neg
+      simpa using hstep
+    refine (hlinear.exp.const_mul ((-exposure) ^ order)).congr_deriv ?_
+    ring
+  exact (hasDerivAt_integral_of_dominated_loc_of_deriv_le (μ := exposureLaw) (x₀ := lam)
+    (F := fun value exposure ↦ (-exposure) ^ order * Real.exp (-(value * exposure)))
+    (F' := fun value exposure ↦ (-exposure) ^ (order + 1) * Real.exp (-(value * exposure)))
+    zero_lt_one
+    (Filter.Eventually.of_forall fun value ↦ (by fun_prop : Continuous fun exposure : ℝ ↦
+      (-exposure) ^ order * Real.exp (-(value * exposure))).aestronglyMeasurable)
+    (integrable_of_ae_mem_Icc exposureLaw bound hsupport _ (by fun_prop))
+    ((by fun_prop : Continuous fun exposure : ℝ ↦
+      (-exposure) ^ (order + 1) * Real.exp (-(lam * exposure))).aestronglyMeasurable)
+    hbound (integrable_const _) hdiff).2
+
+/-- NOTE1 (35) for measures. Assumes: a finite measure carried by `[0, R]`. Every iterated
+derivative of the transform is the corresponding moment transform `∫ (-b)^k e^{-λ b} ν(db)`. -/
+theorem iteratedDeriv_measureLaplace (exposureLaw : Measure ℝ) [IsFiniteMeasure exposureLaw]
+    (bound : ℝ) (hsupport : ∀ᵐ exposure ∂exposureLaw, exposure ∈ Set.Icc 0 bound) (order : ℕ) :
+    iteratedDeriv order (measureLaplace exposureLaw) =
+      fun lam ↦ ∫ exposure, (-exposure) ^ order * Real.exp (-(lam * exposure)) ∂exposureLaw := by
+  induction order with
+  | zero =>
+    funext lam
+    simp [iteratedDeriv_zero, measureLaplace]
+  | succ order ih =>
+    rw [iteratedDeriv_succ, ih]
+    funext lam
+    exact (hasDerivAt_momentLaplace exposureLaw bound hsupport order lam).deriv
+
+/-- NOTE1 (35), the sign pattern, for measures. Assumes: a finite measure carried by `[0, R]`.
+The transform is completely monotone: `(-1)^k C^{(k)}(λ) = ∫ b^k e^{-λ b} ν(db) ≥ 0`. -/
+theorem sign_iteratedDeriv_measureLaplace (exposureLaw : Measure ℝ)
+    [IsFiniteMeasure exposureLaw] (bound : ℝ)
+    (hsupport : ∀ᵐ exposure ∂exposureLaw, exposure ∈ Set.Icc 0 bound) (order : ℕ) (lam : ℝ) :
+    0 ≤ (-1 : ℝ) ^ order * iteratedDeriv order (measureLaplace exposureLaw) lam := by
+  rw [iteratedDeriv_measureLaplace exposureLaw bound hsupport order]
+  show 0 ≤ (-1 : ℝ) ^ order *
+    ∫ exposure, (-exposure) ^ order * Real.exp (-(lam * exposure)) ∂exposureLaw
+  rw [← integral_const_mul]
+  refine integral_nonneg_of_ae (hsupport.mono fun exposure hexposure ↦ ?_)
+  have hpow : (-1 : ℝ) ^ order * (-exposure) ^ order = exposure ^ order := by
+    rw [← mul_pow, show (-1 : ℝ) * -exposure = exposure from by ring]
+  show 0 ≤ (-1 : ℝ) ^ order * ((-exposure) ^ order * Real.exp (-(lam * exposure)))
+  rw [← mul_assoc, hpow]
+  exact mul_nonneg (pow_nonneg hexposure.1 order) (Real.exp_pos _).le
 
 end
 

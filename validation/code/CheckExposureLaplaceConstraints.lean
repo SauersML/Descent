@@ -38,3 +38,9 @@ open Descent.Portability.ExposureLaplaceConstraints
 #print axioms Descent.Portability.ExposureLaplaceConstraints.measureLaplace_le_chord
 #print axioms Descent.Portability.ExposureLaplaceConstraints.measureLaplace_dirac
 #print axioms Descent.Portability.ExposureLaplaceConstraints.measureLaplace_endpointMixture
+#print axioms Descent.Portability.ExposureLaplaceConstraints.measureLaplace_conv
+#print axioms Descent.Portability.ExposureLaplaceConstraints.measureLaplace_sq_le_mul
+#print axioms Descent.Portability.ExposureLaplaceConstraints.hasDerivAt_momentLaplace
+#print axioms Descent.Portability.ExposureLaplaceConstraints.iteratedDeriv_measureLaplace
+#print axioms
+  Descent.Portability.ExposureLaplaceConstraints.sign_iteratedDeriv_measureLaplace
