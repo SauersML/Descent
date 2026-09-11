@@ -544,6 +544,24 @@ def waitForTrue : HaltingProgram ℕ where
   prefixFree := waitingWords_prefixFree
   halts_ae := waitingWords_halts_ae
 
+/-- NOTE2 (32), executed: the report law of the program that waits for a true bit is the
+geometric law, with mass two to the minus count plus one on reading count false bits. -/
+theorem waitForTrue_law_singleton (count : ℕ) :
+    waitForTrue.law {count} = 2⁻¹ ^ (count + 1) := by
+  have hset : {word ∈ waitForTrue.halting | waitForTrue.report word ∈ ({count} : Set ℕ)} =
+      {List.replicate count false ++ [true]} := by
+    ext word
+    simp only [Set.mem_setOf_eq, Set.mem_singleton_iff]
+    constructor
+    · rintro ⟨⟨other, rfl⟩, hreport⟩
+      have hother : other = count := by simpa [waitForTrue] using hreport
+      rw [hother]
+    · rintro rfl
+      exact ⟨⟨count, rfl⟩, by simp [waitForTrue]⟩
+  rw [HaltingProgram.law_apply waitForTrue (measurableSet_singleton count), hset,
+    Set.biUnion_singleton, bitMeasure_cylinder]
+  simp
+
 end
 
 end Descent.Portability.CylinderHaltingLaw

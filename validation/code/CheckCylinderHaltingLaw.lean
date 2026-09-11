@@ -32,3 +32,4 @@ open Descent.Portability.CylinderHaltingLaw
 #print axioms exists_waitingWord_cylinder
 #print axioms waitingWords_halts_ae
 #print axioms waitForTrue
+#print axioms waitForTrue_law_singleton
