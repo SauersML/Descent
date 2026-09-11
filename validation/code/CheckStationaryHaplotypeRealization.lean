@@ -1,0 +1,32 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.StationaryHaplotypeRealization
+
+/-! Axiom audit of StationaryHaplotypeRealization. -/
+
+open Descent.Portability.StationaryHaplotypeRealization
+
+namespace Descent.Portability.StationaryHaplotypeRealization
+
+#print axioms oneDemeCoordinateEquiv
+#print axioms oneDemeCoordinateEquiv_apply
+#print axioms oneDemeProjection
+#print axioms oneDemeLift
+#print axioms oneDemeLift_oneDemeProjection
+#print axioms augmentedGenerator_mulVec_oneDeme
+#print axioms hasDerivAt_matrixExponential_mulVec
+#print axioms hasDerivAt_oneDemeOrbit
+#print axioms oneDemeRealizableSet
+#print axioms convex_oneDemeRealizableSet
+#print axioms isClosed_oneDemeRealizableSet
+#print axioms isBounded_oneDemeRealizableSet
+#print axioms abHaplotypeState
+#print axioms embed_lowOrderLDFeature_abHaplotypeState
+#print axioms oneDemeOrbit_mem_oneDemeRealizableSet
+#print axioms oneDemeStationaryVector_eq_oneDemeProjection
+#print axioms embed_oneDemeStationaryLowOrderLDState_mem_of_approx
+#print axioms nonempty_stationaryLocusExchangeableRealization_of_approx
+#print axioms oneDemeStationaryLowOrderLDState_mem_realizationBody_of_approx
+
+end Descent.Portability.StationaryHaplotypeRealization
