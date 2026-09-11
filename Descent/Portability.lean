@@ -210,6 +210,8 @@ import Descent.Portability.EntropyDensityExpansion
 import Descent.Portability.DensityRelativeEntropy
 import Descent.Portability.QuarticRelativeEntropy
 import Descent.Portability.GaussianVarianceDensity
+import Descent.Portability.GaussianVarianceJet
+import Descent.Portability.GaussianProductDensity
 import Descent.Portability.GaussianEvenMoments
 import Descent.Portability.GraphColoringLaw
 import Descent.Portability.BalancedHWEJumpOperator

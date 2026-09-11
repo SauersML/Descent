@@ -29298,6 +29298,8 @@
    "Descent.Coalescent.sum_ER_succ",
    "Descent.Coalescent.sum_fiber_eq_sum_seatings",
    "Descent.Portability.CompactParameterIntegralLaw.hasDerivAt_interval_integral",
+   "Descent.Portability.GaussianProductDensity.coordinate_set_integral",
+   "Descent.Portability.GaussianProductDensity.densityLaw_eq_productGaussian",
    "Descent.Portability.RareEventAbsenceRisk.experiment_absent_restriction",
    "Descent.Portability.RareEventAbsenceRisk.no_events_bayes_floor",
    "Descent.Portability.RareEventAbsenceRisk.sample_noEvents_restriction"
@@ -29362,6 +29364,8 @@
     ],
     "Descent.Coalescent.isPiSystem_cylinders": [],
     "Descent.Portability.CompactParameterIntegralLaw.hasDerivAt_interval_integral": [],
+    "Descent.Portability.GaussianProductDensity.coordinate_set_integral": [],
+    "Descent.Portability.GaussianProductDensity.densityLaw_eq_productGaussian": [],
     "Descent.Portability.RareEventAbsenceRisk.experiment_absent_restriction": [],
     "Descent.Portability.RareEventAbsenceRisk.sample_noEvents_restriction": [],
     "Descent.Portability.RareEventAbsenceRisk.no_events_bayes_floor": []
@@ -39200,6 +39204,7 @@
    "Descent.Portability.GaussianPanelLaw.projection_variance",
    "Descent.Portability.GaussianPanelLaw.symmetricPhase_continuous",
    "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral",
+   "Descent.Portability.GaussianProductDensity.densityLaw_eq_productGaussian",
    "Descent.Portability.GaussianSlabLaw.graphPoint_continuous",
    "Descent.Portability.GaussianSlabLaw.linearForm_continuous",
    "Descent.Portability.GaussianSlabLaw.linearForm_update",
@@ -40718,6 +40723,7 @@
     "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit": [],
     "Descent.Portability.GaussianPanelLaw.projection_surjective": [],
     "Descent.Portability.GaussianPanelLaw.centered_gaussian_eq_of_covariance_eq": [],
+    "Descent.Portability.GaussianProductDensity.densityLaw_eq_productGaussian": [],
     "Descent.Portability.GaussianSlabLaw.linearForm_continuous": [],
     "Descent.Portability.GaussianSlabLaw.linearForm_update": [],
     "Descent.Portability.GaussianSlabLaw.graphPoint_continuous": [],
@@ -46943,6 +46949,9 @@
    "Descent.Portability.GaussianInverseQuadratic.quotient_integrable_of_product_lower",
    "Descent.Portability.GaussianSlabLaw.graphPoint_continuous",
    "Descent.Portability.GaussianSlabLaw.local_cylinder",
+   "Descent.Portability.GaussianVarianceJet.logFirst_hasDerivAt",
+   "Descent.Portability.GaussianVarianceJet.logProfile_hasDerivAt",
+   "Descent.Portability.GaussianVarianceJet.ratio_second_hasDerivAt",
    "Descent.Portability.HWEAbsoluteMomentLimit.absolute_moment_limit",
    "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit",
    "Descent.Portability.HWELogCoordinates.coordinate_derivative",
@@ -47024,6 +47033,9 @@
     "Descent.Portability.GaussianInverseQuadratic.quotient_integrable_of_product_lower": [],
     "Descent.Portability.GaussianSlabLaw.graphPoint_continuous": [],
     "Descent.Portability.GaussianSlabLaw.local_cylinder": [],
+    "Descent.Portability.GaussianVarianceJet.logProfile_hasDerivAt": [],
+    "Descent.Portability.GaussianVarianceJet.logFirst_hasDerivAt": [],
+    "Descent.Portability.GaussianVarianceJet.ratio_second_hasDerivAt": [],
     "Descent.Portability.HWEAbsoluteMomentLimit.absolute_moment_limit": [],
     "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit": [],
     "Descent.Portability.HWELogCoordinates.coordinate_derivative": [],
@@ -47191,6 +47203,8 @@
    "Descent.Portability.GaussianEffectPortabilityLaw.weighted_report_integrable",
    "Descent.Portability.GaussianPolynomialMoments.tilted_power_moment",
    "Descent.Portability.GaussianSlabLaw.linearForm_continuous",
+   "Descent.Portability.GaussianVarianceJet.ratio_first_hasDerivAt",
+   "Descent.Portability.GaussianVarianceJet.ratio_second_hasDerivAt",
    "Descent.Portability.HWEConditionalInverseMoment.reciprocal_scaled_limit",
    "Descent.Portability.HWEExceptionalLimit.exceptional_L1_limit",
    "Descent.Portability.HWEFixedLayerKernelLimit.original_layer_kernel_limit",
@@ -47299,6 +47313,8 @@
     "Descent.Portability.GaussianEffectPortabilityLaw.weighted_report_integrable": [],
     "Descent.Portability.GaussianPolynomialMoments.tilted_power_moment": [],
     "Descent.Portability.GaussianSlabLaw.linearForm_continuous": [],
+    "Descent.Portability.GaussianVarianceJet.ratio_first_hasDerivAt": [],
+    "Descent.Portability.GaussianVarianceJet.ratio_second_hasDerivAt": [],
     "Descent.Portability.HWEConditionalInverseMoment.reciprocal_scaled_limit": [],
     "Descent.Portability.HWEExceptionalLimit.exceptional_L1_limit": [],
     "Descent.Portability.HWEFixedLayerKernelLimit.original_layer_kernel_limit": [],
@@ -49886,6 +49902,7 @@
    "Descent.Portability.GaussianPanelLaw.projection_variance",
    "Descent.Portability.GaussianPanelLaw.symmetricPhase_continuous",
    "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral",
+   "Descent.Portability.GaussianProductDensity.densityLaw_eq_productGaussian",
    "Descent.Portability.GaussianSlabLaw.graphPoint_continuous",
    "Descent.Portability.GaussianSlabLaw.linearForm_continuous",
    "Descent.Portability.GaussianSlabLaw.linearForm_update",
@@ -51376,6 +51393,7 @@
     "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit": [],
     "Descent.Portability.GaussianPanelLaw.projection_surjective": [],
     "Descent.Portability.GaussianPanelLaw.centered_gaussian_eq_of_covariance_eq": [],
+    "Descent.Portability.GaussianProductDensity.densityLaw_eq_productGaussian": [],
     "Descent.Portability.GaussianSlabLaw.linearForm_continuous": [],
     "Descent.Portability.GaussianSlabLaw.linearForm_update": [],
     "Descent.Portability.GaussianSlabLaw.graphPoint_continuous": [],
@@ -69969,6 +69987,7 @@
    "Descent.Portability.GaussianPanelLaw.projection_variance",
    "Descent.Portability.GaussianPanelLaw.symmetricPhase_continuous",
    "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral",
+   "Descent.Portability.GaussianProductDensity.densityLaw_eq_productGaussian",
    "Descent.Portability.GaussianSlabLaw.graphPoint_continuous",
    "Descent.Portability.GaussianSlabLaw.linearForm_continuous",
    "Descent.Portability.GaussianSlabLaw.linearForm_update",
@@ -71558,6 +71577,7 @@
     "Descent.Portability.GaussianPanelLaw.bag_law_identifies_covariance_orbit": [],
     "Descent.Portability.GaussianPanelLaw.projection_surjective": [],
     "Descent.Portability.GaussianPanelLaw.centered_gaussian_eq_of_covariance_eq": [],
+    "Descent.Portability.GaussianProductDensity.densityLaw_eq_productGaussian": [],
     "Descent.Portability.GaussianSlabLaw.linearForm_continuous": [],
     "Descent.Portability.GaussianSlabLaw.linearForm_update": [],
     "Descent.Portability.GaussianSlabLaw.graphPoint_continuous": [],
@@ -72517,6 +72537,7 @@
    "Descent.Portability.GaussianEvenMoments.evenConstant_pos",
    "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff",
    "Descent.Portability.GaussianPanelLaw.bag_relabel",
+   "Descent.Portability.GaussianProductDensity.densityLaw_eq_productGaussian",
    "Descent.Portability.GaussianSlabLaw.section_lower",
    "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation",
    "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation",
@@ -73039,6 +73060,7 @@
     "Descent.Portability.GaussianEvenMoments.evenConstant_pos": [],
     "Descent.Portability.GaussianPanelLaw.bag_relabel": [],
     "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff": [],
+    "Descent.Portability.GaussianProductDensity.densityLaw_eq_productGaussian": [],
     "Descent.Portability.GaussianSlabLaw.section_lower": [],
     "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation": [],
     "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation": [],
@@ -74607,12 +74629,21 @@
    "Descent.PopGen.snp_h2_le_narrow_h2",
    "Descent.PopGen.stabilizingSelectedArchitectureVariance_at_reference_point",
    "Descent.Portability.GaussianEffectPortabilityLaw.report_eq_ratio",
+   "Descent.Portability.GaussianProductDensity.coordinate_set_integral",
+   "Descent.Portability.GaussianProductDensity.densityLaw_eq_productGaussian",
    "Descent.Portability.GaussianVarianceDensity.densityLaw_eq_gaussian",
    "Descent.Portability.GaussianVarianceDensity.density_identity",
    "Descent.Portability.GaussianVarianceDensity.ratio_continuous",
    "Descent.Portability.GaussianVarianceDensity.ratio_integrable",
    "Descent.Portability.GaussianVarianceDensity.ratio_integral",
    "Descent.Portability.GaussianVarianceDensity.ratio_pos",
+   "Descent.Portability.GaussianVarianceJet.ratio_eq_exp",
+   "Descent.Portability.GaussianVarianceJet.ratio_first_at_one",
+   "Descent.Portability.GaussianVarianceJet.ratio_first_hasDerivAt",
+   "Descent.Portability.GaussianVarianceJet.ratio_hasDerivAt",
+   "Descent.Portability.GaussianVarianceJet.ratio_one",
+   "Descent.Portability.GaussianVarianceJet.ratio_second_at_one",
+   "Descent.Portability.GaussianVarianceJet.ratio_second_hasDerivAt",
    "Descent.Portability.ProbitTrainingLaw.fixedData_reportedRatio_bounded",
    "Descent.Portability.ProbitTrainingLaw.reportedRatio_bounds",
    "Descent.Portability.ProbitTrainingLaw.reportedSourceRatio_eq_one",
@@ -74692,6 +74723,7 @@
    "declared_hi": 1.0,
    "hypotheses": [
     "0 < a",
+    "∀ i, 0 < a i",
     "a ≠ 0"
    ],
    "hypotheses_by_theorem": {
@@ -74772,6 +74804,12 @@
     "Descent.Portability.portable_fraction_le_one": [],
     "Descent.Portability.portableFraction_residual_eq_complement": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.report_eq_ratio": [],
+    "Descent.Portability.GaussianProductDensity.coordinate_set_integral": [
+     "0 < a"
+    ],
+    "Descent.Portability.GaussianProductDensity.densityLaw_eq_productGaussian": [
+     "∀ i, 0 < a i"
+    ],
     "Descent.Portability.GaussianVarianceDensity.ratio_pos": [
      "0 < a"
     ],
@@ -74788,6 +74826,21 @@
     "Descent.Portability.GaussianVarianceDensity.ratio_integral": [
      "0 < a"
     ],
+    "Descent.Portability.GaussianVarianceJet.ratio_eq_exp": [
+     "0 < a"
+    ],
+    "Descent.Portability.GaussianVarianceJet.ratio_hasDerivAt": [
+     "0 < a"
+    ],
+    "Descent.Portability.GaussianVarianceJet.ratio_first_hasDerivAt": [
+     "0 < a"
+    ],
+    "Descent.Portability.GaussianVarianceJet.ratio_second_hasDerivAt": [
+     "0 < a"
+    ],
+    "Descent.Portability.GaussianVarianceJet.ratio_one": [],
+    "Descent.Portability.GaussianVarianceJet.ratio_first_at_one": [],
+    "Descent.Portability.GaussianVarianceJet.ratio_second_at_one": [],
     "Descent.Portability.neutralDriftR2Ratio_eq_core": [],
     "Descent.Portability.fstFromGenerations_le_coalescentTau": [],
     "Descent.Portability.sourceSquaredEffectMass_at_reference_point": [],
@@ -100296,6 +100349,7 @@
    "Descent.Portability.GaussianPanelLaw.projection_surjective",
    "Descent.Portability.GaussianPanelLaw.symmetricPhase_continuous",
    "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral",
+   "Descent.Portability.GaussianProductDensity.productRatio_continuous",
    "Descent.Portability.GaussianSlabLaw.graphPoint_continuous",
    "Descent.Portability.GaussianSlabLaw.local_cylinder",
    "Descent.Portability.HWEAbsoluteMomentLimit.absolute_moment_limit",
@@ -100511,6 +100565,7 @@
     "Descent.Portability.GaussianPanelLaw.symmetricPhase_continuous": [],
     "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral": [],
     "Descent.Portability.GaussianPanelLaw.projection_surjective": [],
+    "Descent.Portability.GaussianProductDensity.productRatio_continuous": [],
     "Descent.Portability.GaussianSlabLaw.graphPoint_continuous": [],
     "Descent.Portability.GaussianSlabLaw.local_cylinder": [],
     "Descent.Portability.HWEAbsoluteMomentLimit.absolute_moment_limit": [],
@@ -146470,6 +146525,8 @@
    "Descent.Portability.DensityRelativeEntropy.densityLaw_klDiv_toReal",
    "Descent.Portability.DensityRelativeEntropy.densityLaw_probability",
    "Descent.Portability.DensityRelativeEntropy.densityLaw_rnDeriv",
+   "Descent.Portability.GaussianProductDensity.coordinate_set_integral",
+   "Descent.Portability.GaussianProductDensity.densityLaw_eq_productGaussian",
    "Descent.Portability.GaussianVarianceDensity.densityLaw_eq_gaussian",
    "Descent.Portability.QuarticRelativeEntropy.klDiv_quartic_limit"
   ],
@@ -146518,6 +146575,8 @@
      "(∫ x, r x ∂μ",
      "Integrable (fun x ↦ (r x - 1"
     ],
+    "Descent.Portability.GaussianProductDensity.coordinate_set_integral": [],
+    "Descent.Portability.GaussianProductDensity.densityLaw_eq_productGaussian": [],
     "Descent.Portability.GaussianVarianceDensity.densityLaw_eq_gaussian": [],
     "Descent.Portability.QuarticRelativeEntropy.klDiv_quartic_limit": [
      "∀ᶠ ε in 𝓝[≠] 0, Measurable (r ε",
@@ -171295,6 +171354,56 @@
    }
   }
  },
+ "Descent.Portability.GaussianProductDensity.productRatio": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "indexed product",
+  "file": "Descent/Portability/GaussianProductDensity.lean",
+  "line": 27,
+  "short": "productRatio",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.GaussianProductDensity.densityLaw_eq_productGaussian",
+   "Descent.Portability.GaussianProductDensity.productRatio_continuous",
+   "Descent.Portability.GaussianProductDensity.productRatio_integrable",
+   "Descent.Portability.GaussianProductDensity.productRatio_integral",
+   "Descent.Portability.GaussianProductDensity.productRatio_pos"
+  ],
+  "constraints": {
+   "declared_kind": "ratio",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "range_lo_thm": [
+    "Descent.Portability.GaussianProductDensity.productRatio_pos",
+    1
+   ],
+   "range_lo": 0,
+   "hypotheses": [
+    "∀ i, 0 < a i"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.GaussianProductDensity.productRatio_pos": [
+     "∀ i, 0 < a i"
+    ],
+    "Descent.Portability.GaussianProductDensity.productRatio_continuous": [],
+    "Descent.Portability.GaussianProductDensity.productRatio_integrable": [
+     "∀ i, 0 < a i"
+    ],
+    "Descent.Portability.GaussianProductDensity.productRatio_integral": [
+     "∀ i, 0 < a i"
+    ],
+    "Descent.Portability.GaussianProductDensity.densityLaw_eq_productGaussian": [
+     "∀ i, 0 < a i"
+    ]
+   }
+  }
+ },
  "Descent.Portability.GaussianSlabLaw.linearForm": {
   "class": "NUMERIC",
   "note": "",
@@ -171658,12 +171767,21 @@
    "Descent.PopGen.snp_h2_le_narrow_h2",
    "Descent.PopGen.stabilizingSelectedArchitectureVariance_at_reference_point",
    "Descent.Portability.GaussianEffectPortabilityLaw.report_eq_ratio",
+   "Descent.Portability.GaussianProductDensity.coordinate_set_integral",
+   "Descent.Portability.GaussianProductDensity.densityLaw_eq_productGaussian",
    "Descent.Portability.GaussianVarianceDensity.densityLaw_eq_gaussian",
    "Descent.Portability.GaussianVarianceDensity.density_identity",
    "Descent.Portability.GaussianVarianceDensity.ratio_continuous",
    "Descent.Portability.GaussianVarianceDensity.ratio_integrable",
    "Descent.Portability.GaussianVarianceDensity.ratio_integral",
    "Descent.Portability.GaussianVarianceDensity.ratio_pos",
+   "Descent.Portability.GaussianVarianceJet.ratio_eq_exp",
+   "Descent.Portability.GaussianVarianceJet.ratio_first_at_one",
+   "Descent.Portability.GaussianVarianceJet.ratio_first_hasDerivAt",
+   "Descent.Portability.GaussianVarianceJet.ratio_hasDerivAt",
+   "Descent.Portability.GaussianVarianceJet.ratio_one",
+   "Descent.Portability.GaussianVarianceJet.ratio_second_at_one",
+   "Descent.Portability.GaussianVarianceJet.ratio_second_hasDerivAt",
    "Descent.Portability.ProbitTrainingLaw.fixedData_reportedRatio_bounded",
    "Descent.Portability.ProbitTrainingLaw.reportedRatio_bounds",
    "Descent.Portability.ProbitTrainingLaw.reportedSourceRatio_eq_one",
@@ -171743,6 +171861,7 @@
    "declared_hi": 1.0,
    "hypotheses": [
     "0 < a",
+    "∀ i, 0 < a i",
     "a ≠ 0"
    ],
    "hypotheses_by_theorem": {
@@ -171823,6 +171942,12 @@
     "Descent.Portability.portable_fraction_le_one": [],
     "Descent.Portability.portableFraction_residual_eq_complement": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.report_eq_ratio": [],
+    "Descent.Portability.GaussianProductDensity.coordinate_set_integral": [
+     "0 < a"
+    ],
+    "Descent.Portability.GaussianProductDensity.densityLaw_eq_productGaussian": [
+     "∀ i, 0 < a i"
+    ],
     "Descent.Portability.GaussianVarianceDensity.ratio_pos": [
      "0 < a"
     ],
@@ -171839,6 +171964,21 @@
     "Descent.Portability.GaussianVarianceDensity.ratio_integral": [
      "0 < a"
     ],
+    "Descent.Portability.GaussianVarianceJet.ratio_eq_exp": [
+     "0 < a"
+    ],
+    "Descent.Portability.GaussianVarianceJet.ratio_hasDerivAt": [
+     "0 < a"
+    ],
+    "Descent.Portability.GaussianVarianceJet.ratio_first_hasDerivAt": [
+     "0 < a"
+    ],
+    "Descent.Portability.GaussianVarianceJet.ratio_second_hasDerivAt": [
+     "0 < a"
+    ],
+    "Descent.Portability.GaussianVarianceJet.ratio_one": [],
+    "Descent.Portability.GaussianVarianceJet.ratio_first_at_one": [],
+    "Descent.Portability.GaussianVarianceJet.ratio_second_at_one": [],
     "Descent.Portability.neutralDriftR2Ratio_eq_core": [],
     "Descent.Portability.fstFromGenerations_le_coalescentTau": [],
     "Descent.Portability.sourceSquaredEffectMass_at_reference_point": [],
@@ -171918,6 +172058,244 @@
     1
    ],
    "range_lo": 0
+  }
+ },
+ "Descent.Portability.GaussianVarianceJet.logProfile": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/GaussianVarianceJet.lean",
+  "line": 25,
+  "short": "logProfile",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "logProfile",
+  "args": [
+   "a",
+   "x"
+  ],
+  "box": {
+   "a": [
+    0.05,
+    3.0
+   ],
+   "x": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.GaussianVarianceJet.logProfile_hasDerivAt",
+   "Descent.Portability.GaussianVarianceJet.ratio_eq_exp",
+   "Descent.Portability.GaussianVarianceJet.ratio_hasDerivAt"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "hypotheses": [
+    "0 < a",
+    "a ≠ 0"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.GaussianVarianceJet.ratio_eq_exp": [
+     "0 < a"
+    ],
+    "Descent.Portability.GaussianVarianceJet.logProfile_hasDerivAt": [
+     "a ≠ 0"
+    ],
+    "Descent.Portability.GaussianVarianceJet.ratio_hasDerivAt": [
+     "0 < a"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.GaussianVarianceJet.logFirst": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/GaussianVarianceJet.lean",
+  "line": 29,
+  "short": "logFirst",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "logFirst",
+  "args": [
+   "a",
+   "x"
+  ],
+  "box": {
+   "a": [
+    0.05,
+    3.0
+   ],
+   "x": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.GaussianVarianceJet.logFirst_hasDerivAt",
+   "Descent.Portability.GaussianVarianceJet.logProfile_hasDerivAt",
+   "Descent.Portability.GaussianVarianceJet.ratio_first_at_one",
+   "Descent.Portability.GaussianVarianceJet.ratio_first_hasDerivAt",
+   "Descent.Portability.GaussianVarianceJet.ratio_hasDerivAt",
+   "Descent.Portability.GaussianVarianceJet.ratio_second_at_one",
+   "Descent.Portability.GaussianVarianceJet.ratio_second_hasDerivAt"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "hypotheses": [
+    "a ≠ 0",
+    "0 < a"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.GaussianVarianceJet.logProfile_hasDerivAt": [
+     "a ≠ 0"
+    ],
+    "Descent.Portability.GaussianVarianceJet.logFirst_hasDerivAt": [
+     "a ≠ 0"
+    ],
+    "Descent.Portability.GaussianVarianceJet.ratio_hasDerivAt": [
+     "0 < a"
+    ],
+    "Descent.Portability.GaussianVarianceJet.ratio_first_hasDerivAt": [
+     "0 < a"
+    ],
+    "Descent.Portability.GaussianVarianceJet.ratio_second_hasDerivAt": [
+     "0 < a"
+    ],
+    "Descent.Portability.GaussianVarianceJet.ratio_first_at_one": [],
+    "Descent.Portability.GaussianVarianceJet.ratio_second_at_one": []
+   }
+  }
+ },
+ "Descent.Portability.GaussianVarianceJet.logSecond": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/GaussianVarianceJet.lean",
+  "line": 32,
+  "short": "logSecond",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "logSecond",
+  "args": [
+   "a",
+   "x"
+  ],
+  "box": {
+   "a": [
+    0.05,
+    3.0
+   ],
+   "x": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.GaussianVarianceJet.logFirst_hasDerivAt",
+   "Descent.Portability.GaussianVarianceJet.logSecond_hasDerivAt",
+   "Descent.Portability.GaussianVarianceJet.ratio_first_hasDerivAt",
+   "Descent.Portability.GaussianVarianceJet.ratio_second_at_one",
+   "Descent.Portability.GaussianVarianceJet.ratio_second_hasDerivAt"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "hypotheses": [
+    "a ≠ 0",
+    "0 < a"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.GaussianVarianceJet.logFirst_hasDerivAt": [
+     "a ≠ 0"
+    ],
+    "Descent.Portability.GaussianVarianceJet.logSecond_hasDerivAt": [
+     "a ≠ 0"
+    ],
+    "Descent.Portability.GaussianVarianceJet.ratio_first_hasDerivAt": [
+     "0 < a"
+    ],
+    "Descent.Portability.GaussianVarianceJet.ratio_second_hasDerivAt": [
+     "0 < a"
+    ],
+    "Descent.Portability.GaussianVarianceJet.ratio_second_at_one": []
+   }
+  }
+ },
+ "Descent.Portability.GaussianVarianceJet.logThird": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/GaussianVarianceJet.lean",
+  "line": 35,
+  "short": "logThird",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "logThird",
+  "args": [
+   "a",
+   "x"
+  ],
+  "box": {
+   "a": [
+    0.05,
+    3.0
+   ],
+   "x": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.GaussianVarianceJet.logSecond_hasDerivAt",
+   "Descent.Portability.GaussianVarianceJet.ratio_second_hasDerivAt"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "hypotheses": [
+    "a ≠ 0",
+    "0 < a"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.GaussianVarianceJet.logSecond_hasDerivAt": [
+     "a ≠ 0"
+    ],
+    "Descent.Portability.GaussianVarianceJet.ratio_second_hasDerivAt": [
+     "0 < a"
+    ]
+   }
   }
  },
  "Descent.Portability.GenealogyGenotypeLaw.Leaves": {
@@ -175135,7 +175513,7 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 5,
+   "finite_points": 2,
    "total_points": 8,
    "error": "IndexError('heterozygote: index 3 outside 0..2; the inhabitant does not cover this point (widen the sampled dimension rather than reading a wrapped entry)')"
   },
@@ -235058,12 +235436,21 @@
    "Descent.PopGen.snp_h2_le_narrow_h2",
    "Descent.PopGen.stabilizingSelectedArchitectureVariance_at_reference_point",
    "Descent.Portability.GaussianEffectPortabilityLaw.report_eq_ratio",
+   "Descent.Portability.GaussianProductDensity.coordinate_set_integral",
+   "Descent.Portability.GaussianProductDensity.densityLaw_eq_productGaussian",
    "Descent.Portability.GaussianVarianceDensity.densityLaw_eq_gaussian",
    "Descent.Portability.GaussianVarianceDensity.density_identity",
    "Descent.Portability.GaussianVarianceDensity.ratio_continuous",
    "Descent.Portability.GaussianVarianceDensity.ratio_integrable",
    "Descent.Portability.GaussianVarianceDensity.ratio_integral",
    "Descent.Portability.GaussianVarianceDensity.ratio_pos",
+   "Descent.Portability.GaussianVarianceJet.ratio_eq_exp",
+   "Descent.Portability.GaussianVarianceJet.ratio_first_at_one",
+   "Descent.Portability.GaussianVarianceJet.ratio_first_hasDerivAt",
+   "Descent.Portability.GaussianVarianceJet.ratio_hasDerivAt",
+   "Descent.Portability.GaussianVarianceJet.ratio_one",
+   "Descent.Portability.GaussianVarianceJet.ratio_second_at_one",
+   "Descent.Portability.GaussianVarianceJet.ratio_second_hasDerivAt",
    "Descent.Portability.ProbitTrainingLaw.fixedData_reportedRatio_bounded",
    "Descent.Portability.ProbitTrainingLaw.reportedRatio_bounds",
    "Descent.Portability.ProbitTrainingLaw.reportedSourceRatio_eq_one",
@@ -235229,12 +235616,21 @@
     "Descent.Portability.portable_fraction_le_one": [],
     "Descent.Portability.portableFraction_residual_eq_complement": [],
     "Descent.Portability.GaussianEffectPortabilityLaw.report_eq_ratio": [],
+    "Descent.Portability.GaussianProductDensity.coordinate_set_integral": [],
+    "Descent.Portability.GaussianProductDensity.densityLaw_eq_productGaussian": [],
     "Descent.Portability.GaussianVarianceDensity.ratio_pos": [],
     "Descent.Portability.GaussianVarianceDensity.ratio_continuous": [],
     "Descent.Portability.GaussianVarianceDensity.density_identity": [],
     "Descent.Portability.GaussianVarianceDensity.densityLaw_eq_gaussian": [],
     "Descent.Portability.GaussianVarianceDensity.ratio_integrable": [],
     "Descent.Portability.GaussianVarianceDensity.ratio_integral": [],
+    "Descent.Portability.GaussianVarianceJet.ratio_eq_exp": [],
+    "Descent.Portability.GaussianVarianceJet.ratio_hasDerivAt": [],
+    "Descent.Portability.GaussianVarianceJet.ratio_first_hasDerivAt": [],
+    "Descent.Portability.GaussianVarianceJet.ratio_second_hasDerivAt": [],
+    "Descent.Portability.GaussianVarianceJet.ratio_one": [],
+    "Descent.Portability.GaussianVarianceJet.ratio_first_at_one": [],
+    "Descent.Portability.GaussianVarianceJet.ratio_second_at_one": [],
     "Descent.Portability.neutralDriftR2Ratio_eq_core": [],
     "Descent.Portability.fstFromGenerations_le_coalescentTau": [],
     "Descent.Portability.sourceSquaredEffectMass_at_reference_point": [],

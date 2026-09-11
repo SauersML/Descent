@@ -4129,6 +4129,18 @@ def graphCenter(a, k, x):
 def Descent_Portability_GaussianVarianceDensity_ratio(a, x):
     return (_rt.rinv((_rt.rsqrt(a))) * _rt.rexp((_rt.rdiv((((1.0 - _rt.rinv(a))) * _rt.lpow(x, 2.0)), 2.0))))
 
+def logProfile(a, x):
+    return (_rt.rdiv((-_rt.rlog(a)), 2.0) + _rt.rdiv((((1.0 - _rt.rinv(a))) * _rt.lpow(x, 2.0)), 2.0))
+
+def logFirst(a, x):
+    return (_rt.rdiv((-_rt.rinv(a)), 2.0) + _rt.rdiv((_rt.lpow(x, 2.0) * _rt.lpow((_rt.rinv(a)), 2.0)), 2.0))
+
+def logSecond(a, x):
+    return (_rt.rdiv(_rt.lpow((_rt.rinv(a)), 2.0), 2.0) - (_rt.lpow(x, 2.0) * _rt.lpow((_rt.rinv(a)), 3.0)))
+
+def logThird(a, x):
+    return (_rt.lpow((-(_rt.rinv(a))), 3.0) + ((3.0 * _rt.lpow(x, 2.0)) * _rt.lpow((_rt.rinv(a)), 4.0)))
+
 def branchKernel(branch, leaves):
     return _rt._proj((branchLaw(_rt._proj(branch, 'exposure'), (leaves(_rt._proj(branch, 'representative'))))), 'pushforward')((overwrite(branch, leaves)))
 
