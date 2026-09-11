@@ -457,7 +457,6 @@ def differenceEvaluator {first second : (ℕ → Bool) → ℝ}
     push_cast
     linarith
   lower_nested := fun stage word hlength ↦ by
-    dsimp only
     rw [List.take_take, List.take_take, min_eq_left (le_max_left _ _),
       min_eq_left (le_max_right _ _)]
     have hfirstNested := firstEvaluator.lower_nested stage _
@@ -470,7 +469,6 @@ def differenceEvaluator {first second : (ℕ → Bool) → ℝ}
       at hsecondNested
     linarith
   upper_nested := fun stage word hlength ↦ by
-    dsimp only
     rw [List.take_take, List.take_take, min_eq_left (le_max_left _ _),
       min_eq_left (le_max_right _ _)]
     have hfirstNested := firstEvaluator.upper_nested stage _
