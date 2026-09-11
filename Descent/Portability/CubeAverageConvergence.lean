@@ -65,28 +65,28 @@ instance windowLaw_isFiniteMeasure {c ε : ℝ} :
     Real.volume_Icc, smul_eq_mul]
   exact ENNReal.mul_lt_top ENNReal.ofReal_lt_top ENNReal.ofReal_lt_top
 
-/-- The window law is a probability law. -/
-theorem windowLaw_univ (c ε : ℝ) (hε : 0 < ε) : windowLaw c ε Set.univ = 1 := by
+/-- The window carries Lebesgue mass `2ε`, so the normalization is exactly one. -/
+theorem window_mass (c ε : ℝ) (hε : 0 < ε) :
+    ENNReal.ofReal (1 / (2 * ε)) *
+      MeasureTheory.volume (Set.Icc (c - ε) (c + ε)) = 1 := by
   have harg : 1 / (2 * ε) * (c + ε - (c - ε)) = 1 := by
     rw [show c + ε - (c - ε) = 2 * ε by ring]
     have h2 : (2 : ℝ) * ε ≠ 0 := by positivity
     field_simp
+  rw [Real.volume_Icc, ← ENNReal.ofReal_mul (by positivity), harg, ENNReal.ofReal_one]
+
+/-- The window law is a probability law. -/
+theorem windowLaw_univ (c ε : ℝ) (hε : 0 < ε) : windowLaw c ε Set.univ = 1 := by
   unfold windowLaw
   rw [MeasureTheory.Measure.smul_apply, MeasureTheory.Measure.restrict_apply_univ,
-    Real.volume_Icc, smul_eq_mul, ← ENNReal.ofReal_mul (by positivity), harg,
-    ENNReal.ofReal_one]
+    smul_eq_mul, window_mass c ε hε]
 
 /-- All of the window law's mass sits in its own window. -/
 theorem windowLaw_Icc (c ε : ℝ) (hε : 0 < ε) :
     windowLaw c ε (Set.Icc (c - ε) (c + ε)) = 1 := by
-  have harg : 1 / (2 * ε) * (c + ε - (c - ε)) = 1 := by
-    rw [show c + ε - (c - ε) = 2 * ε by ring]
-    have h2 : (2 : ℝ) * ε ≠ 0 := by positivity
-    field_simp
   unfold windowLaw
   rw [MeasureTheory.Measure.smul_apply, MeasureTheory.Measure.restrict_apply_self,
-    Real.volume_Icc, smul_eq_mul, ← ENNReal.ofReal_mul (by positivity), harg,
-    ENNReal.ofReal_one]
+    smul_eq_mul, window_mass c ε hε]
 
 /-- **The smoothed coordinate law is an atom-weighted mixture of window laws.** This is
 the atom-plus-noise reading of `SmoothedCoordinateLaws.smoothedLaw`. -/
@@ -119,6 +119,7 @@ theorem cubeLaw_box (a : N → ℝ) (ε : ℝ) (hε : 0 < ε) :
   rw [MeasureTheory.Measure.pi_pi]
   exact Finset.prod_eq_one fun i _ ↦ windowLaw_Icc (a i) ε hε
 
+omit [DecidableEq N] in
 /-- Almost every point drawn from the cube law lies in the cube. -/
 theorem cubeLaw_ae_mem (a : N → ℝ) (ε : ℝ) (hε : 0 < ε) :
     ∀ᵐ y ∂(cubeLaw a ε), ∀ i, y i ∈ Set.Icc (a i - ε) (a i + ε) := by
@@ -183,14 +184,14 @@ theorem abs_integral_cubeLaw_sub_le (g : (N → ℝ) → ℝ) (hmeas : Measurabl
     |(∫ y, g y ∂(cubeLaw a ε)) - g a| ≤ δ := by
   haveI hprob : MeasureTheory.IsProbabilityMeasure (cubeLaw a ε) :=
     ⟨cubeLaw_univ a ε hε⟩
-  have hint := integrable_cubeLaw g hmeas a ε δ hε hclose
+  have hIntg := integrable_cubeLaw g hmeas a ε δ hε hclose
   have hsub : MeasureTheory.Integrable (fun y ↦ g y - g a) (cubeLaw a ε) :=
-    hint.sub (MeasureTheory.integrable_const _)
+    hIntg.sub (MeasureTheory.integrable_const _)
   have hae : ∀ᵐ y ∂(cubeLaw a ε), |g y - g a| ≤ δ := by
     filter_upwards [cubeLaw_ae_mem a ε hε] with y hy using hclose y hy
   have hkey : (∫ y, (g y - g a) ∂(cubeLaw a ε)) =
       (∫ y, g y ∂(cubeLaw a ε)) - g a := by
-    rw [MeasureTheory.integral_sub hint (MeasureTheory.integrable_const _),
+    rw [MeasureTheory.integral_sub hIntg (MeasureTheory.integrable_const _),
       MeasureTheory.integral_const]
     simp
   rw [← hkey, abs_le]
@@ -240,13 +241,13 @@ theorem pi_smoothedLaw_eq_mixtureLaw (p v : N → Z → ℝ) (hp : ∀ i z, 0 �
 averages. -/
 theorem integral_mixtureLaw (p v : N → Z → ℝ) (hp : ∀ i z, 0 ≤ p i z) (ε : ℝ)
     (g : (N → ℝ) → ℝ)
-    (hint : ∀ c : N → Z, MeasureTheory.Integrable g (cubeLaw (fun i ↦ v i (c i)) ε)) :
+    (hIntg : ∀ c : N → Z, MeasureTheory.Integrable g (cubeLaw (fun i ↦ v i (c i)) ε)) :
     ∫ y, g y ∂(mixtureLaw p v ε) =
       ∑ c : N → Z, (∏ i, p i (c i)) *
         ∫ y, g y ∂(cubeLaw (fun i ↦ v i (c i)) ε) := by
   unfold mixtureLaw
   rw [MeasureTheory.integral_finset_sum_measure
-    (fun c _ ↦ (hint c).smul_measure ENNReal.ofReal_ne_top)]
+    (fun c _ ↦ (hIntg c).smul_measure ENNReal.ofReal_ne_top)]
   refine Finset.sum_congr rfl fun c _ ↦ ?_
   rw [MeasureTheory.integral_smul_measure,
     ENNReal.toReal_ofReal (Finset.prod_nonneg fun i _ ↦ hp i (c i)), smul_eq_mul]
@@ -285,13 +286,13 @@ theorem exists_smoothing_scale (p v : N → Z → ℝ) (hp : ∀ i z, 0 ≤ p i 
     have hερ : ε ≤ ρ c := le_trans hεle (hmin c)
     simp only [Set.mem_Icc] at hi ⊢
     exact ⟨by linarith [hi.1], by linarith [hi.2]⟩
-  have hint : ∀ c : N → Z,
+  have hIntg : ∀ c : N → Z,
       MeasureTheory.Integrable g (cubeLaw (fun i ↦ v i (c i)) ε) :=
     fun c ↦ integrable_cubeLaw g hmeas _ ε δ hε (hclose c)
   have hcube : ∀ c : N → Z,
       |(∫ y, g y ∂(cubeLaw (fun i ↦ v i (c i)) ε)) - g fun i ↦ v i (c i)| ≤ δ :=
     fun c ↦ abs_integral_cubeLaw_sub_le g hmeas _ ε δ hε (hclose c)
-  rw [pi_smoothedLaw_eq_mixtureLaw p v hp ε, integral_mixtureLaw p v hp ε g hint]
+  rw [pi_smoothedLaw_eq_mixtureLaw p v hp ε, integral_mixtureLaw p v hp ε g hIntg]
   have hsum : (∑ c : N → Z, (∏ i, p i (c i)) *
         ∫ y, g y ∂(cubeLaw (fun i ↦ v i (c i)) ε)) -
       (∑ c : N → Z, (∏ i, p i (c i)) * g fun i ↦ v i (c i)) =

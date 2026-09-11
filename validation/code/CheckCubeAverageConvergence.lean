@@ -5,6 +5,7 @@ import Descent.Portability.CubeAverageConvergence
 
 /-! Axiom audit of CubeAverageConvergence. -/
 
+#print axioms Descent.Portability.CubeAverageConvergence.window_mass
 #print axioms Descent.Portability.CubeAverageConvergence.windowLaw_univ
 #print axioms Descent.Portability.CubeAverageConvergence.windowLaw_Icc
 #print axioms Descent.Portability.CubeAverageConvergence.smoothedLaw_eq_sum_windowLaw
