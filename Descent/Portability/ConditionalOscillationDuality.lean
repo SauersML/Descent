@@ -192,7 +192,10 @@ theorem convex_oscNbhd (μ : W → ℝ) (hμ : ∀ w, 0 ≤ μ w) (g : F → W �
         a * (∑ i, |lam₁ i|) + b * ∑ i, |lam₂ i| := by
       rw [Finset.mul_sum, Finset.mul_sum, ← Finset.sum_add_distrib]
       refine Finset.sum_le_sum fun i _ ↦ ?_
-      calc |a * lam₁ i + b * lam₂ i| ≤ |a * lam₁ i| + |b * lam₂ i| := abs_add _ _
+      have htri : |a * lam₁ i + b * lam₂ i| ≤ |a * lam₁ i| + |b * lam₂ i| :=
+        abs_le.mpr ⟨by linarith [neg_abs_le (a * lam₁ i), neg_abs_le (b * lam₂ i)],
+          by linarith [le_abs_self (a * lam₁ i), le_abs_self (b * lam₂ i)]⟩
+      calc |a * lam₁ i + b * lam₂ i| ≤ |a * lam₁ i| + |b * lam₂ i| := htri
         _ = a * |lam₁ i| + b * |lam₂ i| := by
             rw [abs_mul, abs_mul, abs_of_nonneg ha, abs_of_nonneg hb]
     have hsum : (∑ w, μ w * (a * u₁ w + b * u₂ w - (a * l₁ w + b * l₂ w))) =
@@ -201,53 +204,80 @@ theorem convex_oscNbhd (μ : W → ℝ) (hμ : ∀ w, 0 ≤ μ w) (g : F → W �
       exact Finset.sum_congr rfl fun w _ ↦ by ring
     rw [hsum]
     have hεn : 0 ≤ 2 * ε := by linarith
-    nlinarith [hs₁, hs₂, hnorm, hεn, ha, hb]
+    have hp3 : 2 * ε * (∑ i, |a * lam₁ i + b * lam₂ i|) ≤
+        2 * ε * (a * (∑ i, |lam₁ i|) + b * ∑ i, |lam₂ i|) :=
+      mul_le_mul_of_nonneg_left hnorm hεn
+    have hmax : max ((∑ w, μ w * (u₁ w - l₁ w)) + 2 * ε * ∑ i, |lam₁ i|)
+        ((∑ w, μ w * (u₂ w - l₂ w)) + 2 * ε * ∑ i, |lam₂ i|) < r := max_lt hs₁ hs₂
+    have hq1 : a * ((∑ w, μ w * (u₁ w - l₁ w)) + 2 * ε * ∑ i, |lam₁ i|) ≤
+        a * max ((∑ w, μ w * (u₁ w - l₁ w)) + 2 * ε * ∑ i, |lam₁ i|)
+          ((∑ w, μ w * (u₂ w - l₂ w)) + 2 * ε * ∑ i, |lam₂ i|) :=
+      mul_le_mul_of_nonneg_left (le_max_left _ _) ha
+    have hq2 : b * ((∑ w, μ w * (u₂ w - l₂ w)) + 2 * ε * ∑ i, |lam₂ i|) ≤
+        b * max ((∑ w, μ w * (u₁ w - l₁ w)) + 2 * ε * ∑ i, |lam₁ i|)
+          ((∑ w, μ w * (u₂ w - l₂ w)) + 2 * ε * ∑ i, |lam₂ i|) :=
+      mul_le_mul_of_nonneg_left (le_max_right _ _) hb
+    have hqsum : a * max ((∑ w, μ w * (u₁ w - l₁ w)) + 2 * ε * ∑ i, |lam₁ i|)
+          ((∑ w, μ w * (u₂ w - l₂ w)) + 2 * ε * ∑ i, |lam₂ i|) +
+        b * max ((∑ w, μ w * (u₁ w - l₁ w)) + 2 * ε * ∑ i, |lam₁ i|)
+          ((∑ w, μ w * (u₂ w - l₂ w)) + 2 * ε * ∑ i, |lam₂ i|) =
+        max ((∑ w, μ w * (u₁ w - l₁ w)) + 2 * ε * ∑ i, |lam₁ i|)
+          ((∑ w, μ w * (u₂ w - l₂ w)) + 2 * ε * ∑ i, |lam₂ i|) := by
+      rw [← add_mul, hab, one_mul]
+    nlinarith [hp3, hq1, hq2, hqsum, hmax]
+
+/-- Shifting the bracketing functions by a small amount keeps an observable inside the
+oscillation neighbourhood. -/
+theorem oscNbhd_mem_of_close (μ : W → ℝ) (g : F → W × Y → ℝ) (ε r : ℝ)
+    (h h' : W × Y → ℝ) (lam : F → ℝ) (u l : W → ℝ) (ρ : ℝ)
+    (hl : ∀ w y, l w ≤ h (w, y) - featureCombo g lam (w, y))
+    (hu : ∀ w y, h (w, y) - featureCombo g lam (w, y) ≤ u w)
+    (hbound : ∀ z, |h' z - h z| ≤ ρ)
+    (hsum : (∑ w, μ w * (u w - l w)) + 2 * ρ * (∑ w, μ w) +
+      2 * ε * ∑ i, |lam i| < r) :
+    h' ∈ oscNbhd μ g ε r := by
+  refine ⟨lam, fun w ↦ u w + ρ, fun w ↦ l w - ρ, ?_, ?_, ?_⟩
+  · intro w y
+    have hz := (abs_le.mp (hbound (w, y))).1
+    linarith [hl w y]
+  · intro w y
+    have hz := (abs_le.mp (hbound (w, y))).2
+    linarith [hu w y]
+  · have hexp : (∑ w, μ w * (u w + ρ - (l w - ρ))) =
+        (∑ w, μ w * (u w - l w)) + 2 * ρ * ∑ w, μ w := by
+      rw [Finset.mul_sum, ← Finset.sum_add_distrib]
+      exact Finset.sum_congr rfl fun w _ ↦ by ring
+    rw [hexp]
+    linarith
+
+/-- A positive slack admits a positive radius whose doubled weight fits inside it. -/
+theorem exists_radius (s S : ℝ) (hs : 0 < s) (hS : 0 ≤ S) :
+    ∃ ρ : ℝ, 0 < ρ ∧ 2 * ρ * S < s := by
+  refine ⟨s / (2 * S + 2), by positivity, ?_⟩
+  have hD : (0 : ℝ) < 2 * S + 2 := by linarith
+  have h1 : s / (2 * S + 2) * (2 * S) < s / (2 * S + 2) * (2 * S + 2) :=
+    mul_lt_mul_of_pos_left (by linarith) (by positivity)
+  rw [div_mul_cancel₀ _ hD.ne'] at h1
+  linarith
 
 /-- The oscillation neighbourhood is open. -/
 theorem isOpen_oscNbhd (μ : W → ℝ) (hμ : ∀ w, 0 ≤ μ w) (g : F → W × Y → ℝ)
     (ε r : ℝ) : IsOpen (oscNbhd μ g ε r) := by
   rw [Metric.isOpen_iff]
   rintro h ⟨lam, u, l, hl, hu, hs⟩
-  set S : ℝ := ∑ w, μ w with hS
-  have hSnn : 0 ≤ S := Finset.sum_nonneg fun w _ ↦ hμ w
-  set slack : ℝ := r - ((∑ w, μ w * (u w - l w)) + 2 * ε * ∑ i, |lam i|) with hslack
-  have hslackpos : 0 < slack := by rw [hslack]; linarith
-  refine ⟨slack / (2 * S + 2), by positivity, ?_⟩
-  rintro h' hh'
-  refine ⟨lam, fun w ↦ u w + slack / (2 * S + 2), fun w ↦ l w - slack / (2 * S + 2),
-    ?_, ?_, ?_⟩
-  · intro w y
-    have hb : |h' (w, y) - h (w, y)| ≤ slack / (2 * S + 2) := by
-      have := norm_le_pi_norm (h' - h) (w, y)
-      have hd : dist h' h < slack / (2 * S + 2) := Metric.mem_ball.mp hh'
-      rw [dist_eq_norm] at hd
-      simp only [Pi.sub_apply, Real.norm_eq_abs] at this
-      linarith
-    have := abs_le.mp hb
-    have := hl w y
-    linarith [(abs_le.mp hb).1, (abs_le.mp hb).2, hl w y]
-  · intro w y
-    have hb : |h' (w, y) - h (w, y)| ≤ slack / (2 * S + 2) := by
-      have := norm_le_pi_norm (h' - h) (w, y)
-      have hd : dist h' h < slack / (2 * S + 2) := Metric.mem_ball.mp hh'
-      rw [dist_eq_norm] at hd
-      simp only [Pi.sub_apply, Real.norm_eq_abs] at this
-      linarith
-    linarith [(abs_le.mp hb).1, (abs_le.mp hb).2, hu w y]
-  · have hexp : (∑ w, μ w * (u w + slack / (2 * S + 2) - (l w - slack / (2 * S + 2)))) =
-        (∑ w, μ w * (u w - l w)) + 2 * (slack / (2 * S + 2)) * S := by
-      rw [hS, Finset.sum_mul, ← Finset.sum_add_distrib]
-      exact Finset.sum_congr rfl fun w _ ↦ by ring
-    rw [hexp]
-    have hkey : 2 * (slack / (2 * S + 2)) * S < slack := by
-      rw [div_mul_eq_mul_div, mul_comm (2 : ℝ) slack, mul_div_assoc,
-        mul_div_assoc, ← mul_assoc]
-      have hlt : 2 * S / (2 * S + 2) < 1 := by
-        rw [div_lt_one (by positivity)]
-        linarith
-      nlinarith [hslackpos, hlt]
-    rw [hslack] at hkey ⊢
-    linarith
+  have hSnn : (0 : ℝ) ≤ ∑ w, μ w := Finset.sum_nonneg fun w _ ↦ hμ w
+  obtain ⟨ρ, hρpos, hρlt⟩ := exists_radius
+    (r - ((∑ w, μ w * (u w - l w)) + 2 * ε * ∑ i, |lam i|)) (∑ w, μ w)
+    (by linarith) hSnn
+  refine ⟨ρ, hρpos, ?_⟩
+  intro h' hh'
+  have hd : ‖h' - h‖ < ρ := by
+    have hdd := Metric.mem_ball.mp hh'
+    rwa [dist_eq_norm] at hdd
+  refine oscNbhd_mem_of_close μ g ε r h h' lam u l ρ hl hu (fun z ↦ ?_) (by linarith)
+  have hn := norm_le_pi_norm (h' - h) z
+  simp only [Pi.sub_apply, Real.norm_eq_abs] at hn
+  linarith
 
 /-- Feasibility of the dual objective rules out membership of the report in the
 oscillation neighbourhood. -/

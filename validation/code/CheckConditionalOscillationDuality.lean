@@ -11,5 +11,7 @@ import Descent.Portability.ConditionalOscillationDuality
 #print axioms Descent.Portability.ConditionalOscillationDuality.combo_expectation
 #print axioms Descent.Portability.ConditionalOscillationDuality.kernelGap_le_dual
 #print axioms Descent.Portability.ConditionalOscillationDuality.convex_oscNbhd
+#print axioms Descent.Portability.ConditionalOscillationDuality.oscNbhd_mem_of_close
+#print axioms Descent.Portability.ConditionalOscillationDuality.exists_radius
 #print axioms Descent.Portability.ConditionalOscillationDuality.isOpen_oscNbhd
 #print axioms Descent.Portability.ConditionalOscillationDuality.notMem_oscNbhd
