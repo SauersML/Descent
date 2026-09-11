@@ -2,6 +2,8 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.AdmixtureChronologyLaw
+import Descent.Portability.AttainableChronologyCurve
+import Descent.Portability.ExposureLaplaceConstraints
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 
 assert_below Descent.Decision Descent.Program
@@ -35,12 +37,24 @@ the recombination block that separates it from the next, taking the exposure gap
 migration totals sum to `-log(1 - p)`, its recombination totals sum to the gaps, and running it
 through the ordered-event recursion drives the donor fraction from zero to exactly `p`.
 
-Not formalised: the attribution step. That the gaps are `b_k - b_{k+1}` of a support sorted by
-decreasing remaining exposure, and that the resulting bookkeeping therefore charges exposure
-`b_k` to the material of pulse `k`, needs the sorted support as data and an argument about
-which recombination blocks each pulse's material still meets. Every identity proved here is
-independent of the ordering, so the ordering enters only there. Nothing here identifies an
-exposure law from data.
+The attribution step is proved as well. Take a support `b : ℕ → ℝ` padded by zero at index
+`n` and let the recombination block after pulse `k` supply the gap `b_k - b_{k+1}`. After `k`
+pulses the linkage is `(1 - A_k) ∑_{i < k} p wᵢ e^{-(bᵢ - b_k)}`: the material of pulse `i`
+has met exactly the blocks placed after it. At the end the linkage is `p (1 - p) ∑ wᵢ e^{-bᵢ}`,
+so the normalised coupling `couplingOfState` of `AttainableChronologyCurve` is `∑ wᵢ e^{-bᵢ}`,
+which is NOTE1 (29) for this history. Padding the weights and exposures of a
+`FiniteReportLaw (Fin n)` by zero and scaling every gap by `λ` gives NOTE1 (30): the coupling
+is `exposureLaplace` of `ExposureLaplaceConstraints` at `λ`, for every `λ`, so the interleaved
+history carries exactly the supplied exposure law. The order of the support enters only through
+the signs of the blocks. When the support is sorted by decreasing exposure, every event supplies
+a nonnegative migration total and a nonnegative recombination exposure, and the blocks supply
+`b₀` in total. A block placed before the first pulse acts on a monomorphic recipient and changes
+nothing, so any recombination total `R ≥ b₀` is reached without moving the state.
+
+Not formalised: sorting an unsorted law (the identities above hold in any order; only the signs
+of the blocks need the sorted order), exposure laws that are not finitely supported, and the
+claim that knowing `C(λ)` for every `λ` determines `ν`. Nothing here identifies an exposure law
+from data.
 
 ## Empirical status
 
@@ -54,6 +68,8 @@ set_option relaxedAutoImplicit false
 namespace Descent.Portability.FinitePulseExposure
 
 open Descent.Portability.AdmixtureChronologyLaw
+open Descent.Portability.AttainableChronologyCurve (couplingOfState)
+open Descent.Portability.ExposureLaplaceConstraints (exposureLaplace)
 
 noncomputable section
 
@@ -341,6 +357,213 @@ theorem migrationTotal_pulseHistory_total (donor : ℝ) (weight gap : ℕ → �
       -Real.log (1 - donor) := by
   rw [migrationTotal_pulseHistory,
     sum_pulseMigration donor weight hweight hdonor hlt total hsum]
+
+/-- Assumes: the state has reached the `k`-th cumulative increment and its linkage is the
+surviving recipient fraction `1 - A_k` times an accumulated coefficient. One pulse then shrinks
+the surviving recipient fraction to `1 - A_{k+1}` and adds the pulse's own immigration increment
+`p wₖ` to the coefficient. -/
+theorem snd_stepEvent_migration_pulse (donor : ℝ) (weight : ℕ → ℝ)
+    (hweight : ∀ i, 0 ≤ weight i) (hdonor : 0 ≤ donor) (hlt : donor < 1) (total index : ℕ)
+    (hle : index + 1 ≤ total)
+    (hsum : ∑ component ∈ Finset.range total, weight component = 1) (state : ℝ × ℝ)
+    (coefficient : ℝ) (hstate : state.1 = cumulativeMass donor weight index)
+    (hlinkage : state.2 = (1 - cumulativeMass donor weight index) * coefficient) :
+    (stepEvent (ChronologyEvent.migration (pulseMigration donor weight index)) state).2 =
+      (1 - cumulativeMass donor weight (index + 1)) * (coefficient + donor * weight index) := by
+  have hshare := recipientFraction_mul_pulseFraction donor weight hweight hdonor hlt total
+    index hle hsum
+  rw [recipientFraction_eq donor weight hweight hdonor hlt total hsum index
+    (Nat.le_of_succ_le hle)] at hshare
+  simp only [stepEvent_migration]
+  rw [hstate, hlinkage,
+    exp_neg_pulseMigration donor weight hweight hdonor hlt total index hle hsum]
+  linear_combination
+    (coefficient + (1 - cumulativeMass donor weight index) * pulseFraction donor weight index) *
+        cumulativeMass_succ_sub donor weight index +
+      (1 - cumulativeMass donor weight (index + 1) - coefficient -
+        (1 - cumulativeMass donor weight index) * pulseFraction donor weight index) * hshare
+
+/-- NOTE1 (28) along the interleaved history whose recombination blocks are the support gaps
+`b_j - b_{j+1}`. After `k` pulses the linkage is the surviving recipient fraction `1 - A_k`
+times the sum over the pulses `i < k` of the immigration increment `p wᵢ`, each damped by the
+exposure `b_i - b_k` its material has met since it arrived. -/
+theorem snd_runEvents_pulseHistory (donor : ℝ) (weight exposure : ℕ → ℝ)
+    (hweight : ∀ i, 0 ≤ weight i) (hdonor : 0 ≤ donor) (hlt : donor < 1) (total : ℕ)
+    (hsum : ∑ component ∈ Finset.range total, weight component = 1) :
+    ∀ count ≤ total,
+      (runEvents (pulseHistory donor weight
+          (fun index ↦ exposure index - exposure (index + 1)) count) (0, 0)).2 =
+        (1 - cumulativeMass donor weight count) *
+          ∑ index ∈ Finset.range count,
+            donor * weight index * Real.exp (-(exposure index - exposure count)) := by
+  intro count
+  induction count with
+  | zero =>
+    intro _
+    simp [runEvents]
+  | succ count ih =>
+    intro hnext
+    have hbefore : count ≤ total := Nat.le_of_succ_le hnext
+    have hdamp : ∑ index ∈ Finset.range count,
+        donor * weight index * Real.exp (-(exposure index - exposure (count + 1))) =
+          (∑ index ∈ Finset.range count,
+            donor * weight index * Real.exp (-(exposure index - exposure count))) *
+            Real.exp (-(exposure count - exposure (count + 1))) := by
+      rw [Finset.sum_mul]
+      refine Finset.sum_congr rfl (fun index _ ↦ ?_)
+      have hexp : Real.exp (-(exposure index - exposure (count + 1))) =
+          Real.exp (-(exposure index - exposure count)) *
+            Real.exp (-(exposure count - exposure (count + 1))) := by
+        rw [← Real.exp_add]
+        congr 1
+        ring
+      rw [hexp]
+      ring
+    have hfst := fst_runEvents_pulseHistory donor weight
+      (fun index ↦ exposure index - exposure (index + 1)) hweight hdonor hlt total hsum count
+      hbefore
+    rw [pulseHistory_succ, runEvents_append]
+    simp only [runEvents_cons, runEvents_nil, stepEvent_recombination]
+    rw [snd_stepEvent_migration_pulse donor weight hweight hdonor hlt total count hnext hsum _ _
+      hfst (ih hbefore), Finset.sum_range_succ, hdamp]
+    ring
+
+/-- NOTE1 section 6.3, the attribution step. Assumes: the support is padded by zero at index
+`n`. The interleaved history whose recombination blocks are the support gaps `b_j - b_{j+1}`
+ends with linkage `p (1 - p) ∑ wᵢ e^{-bᵢ}`, so the material of pulse `i` meets exactly the
+exposure `bᵢ`, in whatever order the support is listed. -/
+theorem snd_runEvents_pulseHistory_total (donor : ℝ) (weight exposure : ℕ → ℝ)
+    (hweight : ∀ i, 0 ≤ weight i) (hdonor : 0 ≤ donor) (hlt : donor < 1) (total : ℕ)
+    (hsum : ∑ component ∈ Finset.range total, weight component = 1)
+    (hterminal : exposure total = 0) :
+    (runEvents (pulseHistory donor weight
+        (fun index ↦ exposure index - exposure (index + 1)) total) (0, 0)).2 =
+      donor * (1 - donor) *
+        ∑ index ∈ Finset.range total, weight index * Real.exp (-exposure index) := by
+  rw [snd_runEvents_pulseHistory donor weight exposure hweight hdonor hlt total hsum total
+    le_rfl, hterminal]
+  unfold cumulativeMass
+  rw [hsum, mul_one, Finset.mul_sum, Finset.mul_sum]
+  refine Finset.sum_congr rfl (fun index _ ↦ ?_)
+  rw [sub_zero]
+  ring
+
+/-- NOTE1 (29) for the interleaved history. Assumes: a target donor fraction in `(0, 1)` and a
+support padded by zero at index `n`. The normalised coupling of the state the history reaches
+is `∑ wᵢ e^{-bᵢ}`, the survival factor averaged over the supplied exposure law. -/
+theorem couplingOfState_pulseHistory (donor : ℝ) (weight exposure : ℕ → ℝ)
+    (hweight : ∀ i, 0 ≤ weight i) (hdonor : 0 < donor) (hlt : donor < 1) (total : ℕ)
+    (hsum : ∑ component ∈ Finset.range total, weight component = 1)
+    (hterminal : exposure total = 0) :
+    couplingOfState (runEvents (pulseHistory donor weight
+        (fun index ↦ exposure index - exposure (index + 1)) total) (0, 0)) =
+      ∑ index ∈ Finset.range total, weight index * Real.exp (-exposure index) := by
+  have hne : donor * (1 - donor) ≠ 0 := ne_of_gt (mul_pos hdonor (by linarith))
+  unfold couplingOfState
+  rw [fst_runEvents_pulseHistory_total donor weight _ hweight hdonor.le hlt total hsum,
+    snd_runEvents_pulseHistory_total donor weight exposure hweight hdonor.le hlt total hsum
+      hterminal, div_eq_iff hne]
+  ring
+
+/-- A weight or exposure vector on `Fin n`, extended by zero to every natural index. -/
+def padByZero {n : ℕ} (value : Fin n → ℝ) (index : ℕ) : ℝ :=
+  if hindex : index < n then value ⟨index, hindex⟩ else 0
+
+/-- Padding leaves the vector alone on its own indices. -/
+@[simp] theorem padByZero_val {n : ℕ} (value : Fin n → ℝ) (index : Fin n) :
+    padByZero value index = value index := by
+  simp [padByZero]
+
+/-- The padded vector vanishes at index `n`, just past its own indices. -/
+@[simp] theorem padByZero_self {n : ℕ} (value : Fin n → ℝ) : padByZero value n = 0 := by
+  simp [padByZero]
+
+/-- The padded weights of a finite law are nonnegative at every index. -/
+theorem padByZero_mass_nonneg {n : ℕ} (law : FiniteReportLaw (Fin n)) (index : ℕ) :
+    0 ≤ padByZero law.mass index := by
+  unfold padByZero
+  split_ifs with hindex
+  · exact law.mass_nonneg _
+  · exact le_rfl
+
+/-- The padded weights of a finite law sum to one over the first `n` indices. -/
+theorem sum_range_padByZero_mass {n : ℕ} (law : FiniteReportLaw (Fin n)) :
+    ∑ index ∈ Finset.range n, padByZero law.mass index = 1 := by
+  rw [Finset.sum_range]
+  simp only [padByZero_val]
+  exact law.mass_sum
+
+/-- NOTE1 (30), the attribution step for a finitely supported exposure law. Assumes: a target
+donor fraction in `(0, 1)`. Pad the law's weights and exposures by zero beyond index `n` and
+scale every support gap by `λ`. The normalised coupling of the chronology this builds is the
+transform `exposureLaplace` of the supplied law at `λ`, for every `λ`: the interleaved history
+carries exactly the supplied exposure law. -/
+theorem couplingOfState_pulseHistory_eq_exposureLaplace {n : ℕ}
+    (law : FiniteReportLaw (Fin n)) (exposure : Fin n → ℝ) (donor lam : ℝ)
+    (hdonor : 0 < donor) (hlt : donor < 1) :
+    couplingOfState (runEvents (pulseHistory donor (padByZero law.mass)
+        (fun index ↦ lam * padByZero exposure index - lam * padByZero exposure (index + 1)) n)
+        (0, 0)) = exposureLaplace law exposure lam := by
+  refine (couplingOfState_pulseHistory donor (padByZero law.mass)
+    (fun index ↦ lam * padByZero exposure index) (padByZero_mass_nonneg law) hdonor hlt n
+    (sum_range_padByZero_mass law) (by simp)).trans ?_
+  rw [Finset.sum_range]
+  unfold exposureLaplace FiniteReportLaw.expectation
+  refine Finset.sum_congr rfl (fun index _ ↦ ?_)
+  simp only [padByZero_val]
+
+/-- Each pulse supplies a nonnegative migration total. -/
+theorem pulseMigration_nonneg (donor : ℝ) (weight : ℕ → ℝ) (hweight : ∀ i, 0 ≤ weight i)
+    (hdonor : 0 ≤ donor) (hlt : donor < 1) (total index : ℕ) (hle : index + 1 ≤ total)
+    (hsum : ∑ component ∈ Finset.range total, weight component = 1) :
+    0 ≤ pulseMigration donor weight index := by
+  have hnonneg := pulseFraction_nonneg donor weight hweight hdonor hlt total index
+    (Nat.le_of_succ_le hle) hsum
+  have hfrac := pulseFraction_lt_one donor weight hweight hdonor hlt total index hle hsum
+  unfold pulseMigration
+  exact neg_nonneg.mpr (Real.log_nonpos (by linarith) (by linarith))
+
+/-- Assumes: the support is sorted by decreasing exposure over the first `n + 1` indices. Every
+event of the interleaved history then supplies a nonnegative migration total and a nonnegative
+recombination exposure, so the history is a chronology with nonnegative rates. -/
+theorem eventTotals_nonneg_pulseHistory (donor : ℝ) (weight exposure : ℕ → ℝ)
+    (hweight : ∀ i, 0 ≤ weight i) (hdonor : 0 ≤ donor) (hlt : donor < 1) (total : ℕ)
+    (hsum : ∑ component ∈ Finset.range total, weight component = 1)
+    (hsorted : ∀ index, index + 1 ≤ total → exposure (index + 1) ≤ exposure index) :
+    ∀ count ≤ total, ∀ event ∈ pulseHistory donor weight
+        (fun index ↦ exposure index - exposure (index + 1)) count,
+      0 ≤ eventMigration event ∧ 0 ≤ eventRecombination event := by
+  intro count
+  induction count with
+  | zero =>
+    intro _ event hevent
+    simp at hevent
+  | succ count ih =>
+    intro hnext event hevent
+    rw [pulseHistory_succ, List.mem_append] at hevent
+    rcases hevent with hold | hnew
+    · exact ih (Nat.le_of_succ_le hnext) event hold
+    · simp only [List.mem_cons, List.not_mem_nil, or_false] at hnew
+      rcases hnew with rfl | rfl
+      · exact ⟨pulseMigration_nonneg donor weight hweight hdonor hlt total count hnext hsum,
+          le_rfl⟩
+      · exact ⟨le_rfl, sub_nonneg.mpr (hsorted count hnext)⟩
+
+/-- The support gaps supply `b₀ - bₙ` of recombination exposure in total, which is the largest
+exposure `b₀` when the support is padded by zero at index `n`. -/
+theorem recombinationTotal_supportGaps (donor : ℝ) (weight exposure : ℕ → ℝ) (total : ℕ) :
+    ((pulseHistory donor weight (fun index ↦ exposure index - exposure (index + 1))
+        total).map eventRecombination).sum = exposure 0 - exposure total := by
+  rw [recombinationTotal_pulseHistory]
+  exact Finset.sum_range_sub' exposure total
+
+/-- A recombination block placed before the first pulse acts on a monomorphic recipient and
+leaves the state where it was, so prefixing the block `R - b₀` raises the recombination total
+to `R` without changing the donor fraction or the linkage the history reaches. -/
+theorem runEvents_leading_recombination (exposure : ℝ) (events : List ChronologyEvent) :
+    runEvents (ChronologyEvent.recombination exposure :: events) (0, 0) =
+      runEvents events (0, 0) := by
+  simp
 
 end
 

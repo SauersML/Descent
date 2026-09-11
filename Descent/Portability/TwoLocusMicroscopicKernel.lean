@@ -32,21 +32,22 @@ the feature vector, coordinate by coordinate.  That identification is the remain
 mathematical content of NOTE1 equation (11), and it is a finite list of per-stage,
 per-coordinate polynomial identities rather than an analytic statement.
 
-Four of its six coordinate families are discharged here, and the discharges are the substance
+Five of its six coordinate families are discharged here, and the discharges are the substance
 of the second half of this file.  `stage_generator_constant` settles the affine coordinate,
 `stage_generator_leftHeterozygosity` the stored `H` coordinates,
-`stage_generator_rightHeterozygosity` the `H^R` coordinates that NOTE1 equation (6) adds, and
+`stage_generator_rightHeterozygosity` the `H^R` coordinates that NOTE1 equation (6) adds,
 `stage_generator_linkageProduct` the `DD` coordinates that the `EndToEndScoreLaw` contract
-reads.  Each matches all five stage families against the corresponding corpus row: the drift
+reads, and `stage_generator_dzObservable` the generalized `Dz` coordinates.  Each matches all
+five stage families against the corresponding corpus row: the drift
 family against `twoLocusWeightedJetDrift_*_eq_lowOrderLDDrift`, the migration family against
 `lowOrderLDMigration` (through the corpus's own expectation-level bridges, read at a point
 mass), the recombination family against `lowOrderLDRecombination`, and the two mutation
 families against the complete affine mutation row made of `lowOrderLDMutationCoupling`,
 `lowOrderLDRecurrentMutationDamping` and `lowOrderLDMutationForcing`.
 
-The `Dz` and `pi2` coordinates are NOT discharged.  Their drift and recombination stage sums
-are proved (`driftStage_sum_stored`, `recombinationStage_sum_stored`), but the migration and
-mutation velocity computations for those two families are not formalized, so for them the
+The `pi2` coordinates are NOT discharged here.  Their drift and recombination stage sums are
+proved (`driftStage_sum_stored`, `recombinationStage_sum_stored`), but the migration and
+mutation velocity computations for that family are not in this file, so for it the
 identification is what a caller must supply.  That is the whole of the remaining gap between
 this module and an unconditional `MicroscopicApproximation`.
 
@@ -183,7 +184,7 @@ theorem stageSlack_nonneg {D : ℕ} {jet : TwoLocusDiffusionJet D} (rates : Many
 stage count times the step size.  This is NOTE1 section 2.3's stage-choosing construction.
 The deme is taken as data because it is what makes the stage set nonempty. -/
 def microscopicKernel {D : ℕ} (rates : ManyDemeLDRates D) (deme : Fin D) (step : ℝ) :
-    FiniteMixtureKernel TwoLocusHaplotype (DemeHaplotypeState D) :=
+    FiniteMixtureKernel (Stage D × TwoLocusHaplotype) (DemeHaplotypeState D) :=
   FiniteMixtureKernel.uniformMixture
     (fun stage ↦ stageKernel rates stage (Fintype.card (Stage D) * step))
     (card_stage_pos deme)
@@ -220,7 +221,7 @@ theorem microscopicError_tendsto {D : ℕ} (rates : ManyDemeLDRates D) :
     refine tendsto_finset_sum _ fun coordinate _ ↦ tendsto_finset_sum _ fun stage _ ↦ ?_
     exact (stageSlack_tendsto rates (enlargedStageExpansion coordinate) stage).comp hscale
   have hwhole : Filter.Tendsto (microscopicSlack rates) (nhds 0) (nhds 0) := by
-    simpa [microscopicSlack] using hterms
+    simpa only [Finset.sum_const_zero] using hterms
   have habs := (hwhole.mono_left nhdsWithin_le_nhds).abs
   simpa [microscopicError] using habs
 
@@ -266,7 +267,7 @@ def twoLocusMicroscopicApproximation {D : ℕ} (rates : ManyDemeLDRates D) (deme
       (enlargedLowOrderLDGenerator rates).mulVec (enlargedLowOrderLDFeature state)
           coordinate =
         ∑ stage : Stage D, stageDrift rates (enlargedStageExpansion coordinate) stage state) :
-    MicroscopicApproximation (B := TwoLocusHaplotype)
+    MicroscopicApproximation (B := Stage D × TwoLocusHaplotype)
       (enlargedLowOrderLDFeature (D := D)) (enlargedLowOrderLDGenerator rates) where
   kernel := microscopicKernel rates deme
   error := microscopicError rates
@@ -435,7 +436,8 @@ theorem migrationStage_sum_leftHeterozygosity {D : ℕ} (rates : ManyDemeLDRates
           (if second = pair.2 then (twoLocusHJet first pair.1).value state -
             (twoLocusHJet first second).value state else 0)) := by
     intro pair
-    rw [migrationLeftHeterozygosity_velocity]
+    exact congrArg (fun velocity ↦ rates.migration pair.2 pair.1 * velocity)
+      (migrationLeftHeterozygosity_velocity pair.1 pair.2 first second state)
   simp only [hvelocity, Fintype.sum_prod_type, lowOrderLDMigration,
     jetMoment_heterozygosity, mul_add, Finset.sum_add_distrib, mul_ite, mul_zero,
     Finset.sum_ite_eq, Finset.mem_univ, if_true]
@@ -460,7 +462,8 @@ theorem migrationStage_sum_rightHeterozygosity {D : ℕ} (rates : ManyDemeLDRate
           (if second = pair.2 then (twoLocusRightHJet first pair.1).value state -
             (twoLocusRightHJet first second).value state else 0)) := by
     intro pair
-    rw [migrationRightHeterozygosity_velocity]
+    exact congrArg (fun velocity ↦ rates.migration pair.2 pair.1 * velocity)
+      (migrationRightHeterozygosity_velocity pair.1 pair.2 first second state)
   simp only [hvelocity, Fintype.sum_prod_type, lowOrderLDMigration,
     rightHeterozygosityMoment_heterozygosity, mul_add, Finset.sum_add_distrib, mul_ite,
     mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
@@ -525,11 +528,10 @@ theorem mutationStage_sum_leftHeterozygosity {D : ℕ} (rates : ManyDemeLDRates 
         stageVelocity (enlargedStageExpansion (some (.inl (.H first second))))
           (Stage.mutationRight deme) state = 0 := by
     intro deme
-    have hzero : ((rightMutationCoordinateExpansion deme).leftHeterozygosity first
-        second).velocity state = 0 := rightMutationLeftHeterozygosity_velocity deme first
-      second state
-    show rates.mutation deme / 2 * _ = 0
-    rw [hzero, mul_zero]
+    show rates.mutation deme / 2 *
+        ((rightMutationCoordinateExpansion deme).leftHeterozygosity first second).velocity
+          state = 0
+    rw [rightMutationLeftHeterozygosity_velocity, mul_zero]
   have hleft : ∀ deme : Fin D,
       stageRate rates (Stage.mutationLeft deme) *
         stageVelocity (enlargedStageExpansion (some (.inl (.H first second))))
@@ -550,8 +552,10 @@ theorem mutationStage_sum_leftHeterozygosity {D : ℕ} (rates : ManyDemeLDRates 
     ring
   simp only [hright, Finset.sum_const_zero, add_zero, hleft, Finset.sum_add_distrib,
     ← Finset.mul_sum, sum_rate_indicator]
-  simp only [lowOrderLDMutationCoupling, lowOrderLDRecurrentMutationDamping,
-    lowOrderLDMutationForcing, jetMoment_heterozygosity, twoLocusHJet_value]
+  have hcoupling : lowOrderLDMutationCoupling rates (twoLocusJetMoment state)
+      (.H first second) = 0 := rfl
+  simp only [hcoupling, lowOrderLDRecurrentMutationDamping, lowOrderLDMutationForcing,
+    jetMoment_heterozygosity, twoLocusHJet_value]
   ring
 
 /-- The same affine mutation row holds on the right-locus heterozygosity coordinate, which is
@@ -575,11 +579,10 @@ theorem mutationStage_sum_rightHeterozygosity {D : ℕ} (rates : ManyDemeLDRates
         stageVelocity (enlargedStageExpansion (some (.inr (first, second))))
           (Stage.mutationLeft deme) state = 0 := by
     intro deme
-    have hzero : ((leftMutationCoordinateExpansion deme).rightHeterozygosity first
-        second).velocity state = 0 := leftMutationRightHeterozygosity_velocity deme first
-      second state
-    show rates.mutation deme / 2 * _ = 0
-    rw [hzero, mul_zero]
+    show rates.mutation deme / 2 *
+        ((leftMutationCoordinateExpansion deme).rightHeterozygosity first second).velocity
+          state = 0
+    rw [leftMutationRightHeterozygosity_velocity, mul_zero]
   have hright : ∀ deme : Fin D,
       stageRate rates (Stage.mutationRight deme) *
         stageVelocity (enlargedStageExpansion (some (.inr (first, second))))
@@ -600,9 +603,11 @@ theorem mutationStage_sum_rightHeterozygosity {D : ℕ} (rates : ManyDemeLDRates
     ring
   simp only [hleft, Finset.sum_const_zero, zero_add, hright, Finset.sum_add_distrib,
     ← Finset.mul_sum, sum_rate_indicator]
-  simp only [lowOrderLDMutationCoupling, lowOrderLDRecurrentMutationDamping,
-    lowOrderLDMutationForcing, rightHeterozygosityMoment_heterozygosity,
-    twoLocusRightHJet_value]
+  have hcoupling : lowOrderLDMutationCoupling rates
+      (rightHeterozygosityMoment (enlargedLowOrderLDFeature state)) (.H first second) = 0 :=
+    rfl
+  simp only [hcoupling, lowOrderLDRecurrentMutationDamping, lowOrderLDMutationForcing,
+    rightHeterozygosityMoment_heterozygosity, twoLocusRightHJet_value]
   ring
 
 /-! ## The recombination stages reproduce the corpus recombination row -/
@@ -802,7 +807,8 @@ theorem migrationStage_sum_linkageProduct {D : ℕ} (rates : ManyDemeLDRates D)
             (state pair.1).migrationLinkageVelocity (state pair.2) *
               (state second).linkage else 0)) := by
     intro pair
-    rw [migrationLinkageProduct_velocity]
+    exact congrArg (fun velocity ↦ rates.migration pair.2 pair.1 * velocity)
+      (migrationLinkageProduct_velocity pair.1 pair.2 first second state)
   rw [lowOrderLDMigration_linkageProduct_pointwise]
   simp only [hvelocity, Fintype.sum_prod_type, mul_add, Finset.sum_add_distrib, mul_ite,
     mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
@@ -884,9 +890,12 @@ theorem mutationStage_sum_linkageProduct {D : ℕ} (rates : ManyDemeLDRates D)
     show rates.mutation deme / 2 * _ = _
     rw [hvelocity]
     ring
+  have hcoupling : lowOrderLDMutationCoupling rates (twoLocusJetMoment state)
+      (.DD first second) = 0 := rfl
+  have hforcing : lowOrderLDMutationForcing rates (.DD first second) = 0 := rfl
   simp only [hleft, hright, Finset.sum_add_distrib, ← Finset.mul_sum, sum_rate_indicator]
-  simp only [lowOrderLDMutationCoupling, lowOrderLDRecurrentMutationDamping,
-    lowOrderLDMutationForcing, twoLocusJetMoment, twoLocusCoordinateJet]
+  simp only [hcoupling, hforcing, lowOrderLDRecurrentMutationDamping, twoLocusJetMoment,
+    twoLocusCoordinateJet]
   ring
 
 /-! ## The generalized `Dz` coordinate -/
@@ -964,7 +973,8 @@ theorem migrationStage_sum_dzObservable {D : ℕ} (rates : ManyDemeLDRates D)
             (state first).linkage * (state second).leftContrast *
               ((state pair.1).rightContrast - (state third).rightContrast) else 0)) := by
     intro pair
-    rw [migrationDzObservable_velocity]
+    exact congrArg (fun velocity ↦ rates.migration pair.2 pair.1 * velocity)
+      (migrationDzObservable_velocity pair.1 pair.2 first second third state)
   rw [lowOrderLDMigration_dzObservable_pointwise]
   simp only [hvelocity, Fintype.sum_prod_type, mul_add, Finset.sum_add_distrib, mul_ite,
     mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
@@ -1060,9 +1070,12 @@ theorem mutationStage_sum_dzObservable {D : ℕ} (rates : ManyDemeLDRates D)
     show rates.mutation deme / 2 * _ = _
     rw [hvelocity]
     ring
+  have hcoupling : lowOrderLDMutationCoupling rates (twoLocusJetMoment state)
+      (.Dz first second third) = 0 := rfl
+  have hforcing : lowOrderLDMutationForcing rates (.Dz first second third) = 0 := rfl
   simp only [hleft, hright, Finset.sum_add_distrib, ← Finset.mul_sum, sum_rate_indicator]
-  simp only [lowOrderLDMutationCoupling, lowOrderLDRecurrentMutationDamping,
-    lowOrderLDMutationForcing, twoLocusJetMoment, twoLocusCoordinateJet]
+  simp only [hcoupling, hforcing, lowOrderLDRecurrentMutationDamping, twoLocusJetMoment,
+    twoLocusCoordinateJet]
   ring
 
 /-! ## The generator identification on the heterozygosity coordinates -/
@@ -1110,7 +1123,7 @@ theorem stage_generator_leftHeterozygosity {D : ℕ} (rates : ManyDemeLDRates D)
         (enlargedLowOrderLDFeature state (some (.inr pair)) -
           enlargedLowOrderLDFeature state (some (.inl (.H pair.1 pair.2)))) = 0 := by
     intro pair
-    simp [rightHeterozygosityMutationCoupling]
+    exact zero_mul _
   have hmutation := mutationStage_sum_leftHeterozygosity rates first second state
   rw [enlargedGenerator_mulVec_stored, sum_stage]
   simp only [stageDrift_eq, hredirect, Finset.sum_const_zero, add_zero,
@@ -1164,7 +1177,7 @@ theorem stage_generator_linkageProduct {D : ℕ} (rates : ManyDemeLDRates D)
         (enlargedLowOrderLDFeature state (some (.inr pair)) -
           enlargedLowOrderLDFeature state (some (.inl (.H pair.1 pair.2)))) = 0 := by
     intro pair
-    simp [rightHeterozygosityMutationCoupling]
+    exact zero_mul _
   have hmutation := mutationStage_sum_linkageProduct rates first second state
   rw [enlargedGenerator_mulVec_stored, sum_stage]
   simp only [stageDrift_eq, hredirect, Finset.sum_const_zero, add_zero,
@@ -1192,7 +1205,7 @@ theorem stage_generator_dzObservable {D : ℕ} (rates : ManyDemeLDRates D)
         (enlargedLowOrderLDFeature state (some (.inr pair)) -
           enlargedLowOrderLDFeature state (some (.inl (.H pair.1 pair.2)))) = 0 := by
     intro pair
-    simp [rightHeterozygosityMutationCoupling]
+    exact zero_mul _
   have hmutation := mutationStage_sum_dzObservable rates first second third state
   rw [enlargedGenerator_mulVec_stored, sum_stage]
   simp only [stageDrift_eq, hredirect, Finset.sum_const_zero, add_zero,

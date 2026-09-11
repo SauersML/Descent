@@ -27,3 +27,17 @@ open Descent.Portability.FinitePulseExposure
 #print axioms Descent.Portability.FinitePulseExposure.migrationTotal_pulseHistory
 #print axioms Descent.Portability.FinitePulseExposure.recombinationTotal_pulseHistory
 #print axioms Descent.Portability.FinitePulseExposure.migrationTotal_pulseHistory_total
+#print axioms Descent.Portability.FinitePulseExposure.snd_stepEvent_migration_pulse
+#print axioms Descent.Portability.FinitePulseExposure.snd_runEvents_pulseHistory
+#print axioms Descent.Portability.FinitePulseExposure.snd_runEvents_pulseHistory_total
+#print axioms Descent.Portability.FinitePulseExposure.couplingOfState_pulseHistory
+#print axioms Descent.Portability.FinitePulseExposure.padByZero_val
+#print axioms Descent.Portability.FinitePulseExposure.padByZero_self
+#print axioms Descent.Portability.FinitePulseExposure.padByZero_mass_nonneg
+#print axioms Descent.Portability.FinitePulseExposure.sum_range_padByZero_mass
+#print axioms
+  Descent.Portability.FinitePulseExposure.couplingOfState_pulseHistory_eq_exposureLaplace
+#print axioms Descent.Portability.FinitePulseExposure.pulseMigration_nonneg
+#print axioms Descent.Portability.FinitePulseExposure.eventTotals_nonneg_pulseHistory
+#print axioms Descent.Portability.FinitePulseExposure.recombinationTotal_supportGaps
+#print axioms Descent.Portability.FinitePulseExposure.runEvents_leading_recombination
