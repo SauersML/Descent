@@ -51,11 +51,13 @@ theorem tilt_identity (M v a : ℝ) (hv : 0 < v) (hd : 0 < v + M * a / 3) :
       (a / (v + M * a / 3)) ^ 2 * v /
         (2 * (1 - (a / (v + M * a / 3)) * M / 3)) =
       -a ^ 2 / (2 * (v + M * a / 3)) := by
+  have hd₃ : a * M + v * 3 ≠ 0 := by nlinarith [hd]
   have he : 1 - (a / (v + M * a / 3)) * M / 3 = v / (v + M * a / 3) := by
-    field_simp [hd.ne']
-    ring
+    field_simp [hd.ne', hd₃]
+    ring_nf
+    field_simp [hd₃] <;> ring
   rw [he]
-  field_simp [hv.ne', hd.ne']
+  field_simp [hv.ne', hd.ne', hd₃]
   ring
 
 variable {Ω ι : Type*} [MeasurableSpace Ω]
@@ -125,6 +127,7 @@ theorem two_sided_positive (X : ι → Ω → ℝ) (s : Finset ι)
       {ω | radius M v x ≤ ∑ i ∈ s, X i ω} ∪
         {ω | radius M v x ≤ -(∑ i ∈ s, X i ω)} := by
     intro ω hω
+    change radius M v x < |∑ i ∈ s, X i ω| at hω
     rcases lt_abs.mp hω with h | h
     · exact Or.inl h.le
     · exact Or.inr h.le

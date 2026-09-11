@@ -30,7 +30,7 @@ set_option relaxedAutoImplicit false
 
 namespace Descent.Portability.MomentOrderObstruction
 
-open Foundations fwdDiff
+open Foundations fwdDiff RadialInterpolation
 
 noncomputable section
 
@@ -209,6 +209,265 @@ theorem parity_separates (k : ℕ) (a step : ℝ) (f : ℝ → ℝ)
   rw [hEq, sub_self] at h
   have h2k : ((2 : ℝ) ^ k) ≠ 0 := by positivity
   exact hne (by field_simp at h; linarith [h])
+
+/-- **DC Lemma 8.1 on the unit progression.** The gap formula with `a = 0` and step `1`. -/
+theorem parity_gap_nodes (k : ℕ) (f : ℝ → ℝ) :
+    parityExp k false (fun j ↦ f ((j : ℕ) : ℝ)) -
+        parityExp k true (fun j ↦ f ((j : ℕ) : ℝ)) =
+      (∑ j ∈ Finset.range (k + 2),
+        (-1 : ℝ) ^ j * ((k + 1).choose j : ℝ) * f j) / 2 ^ k := by
+  simpa using parity_gap k 0 1 f
+
+section GroupReport
+
+variable {N : Type*} [Fintype N] [DecidableEq N]
+
+/-- Scaling the right argument scales the inner sum. -/
+theorem dot_smul_right (t : ℝ) (x y : N → ℝ) : dot x (t • y) = t * dot x y := by
+  simp only [dot, Descent.Core.innerSum, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
+  exact Finset.sum_congr rfl fun i _ ↦ by ring
+
+/-- **DC Proposition 7.1, equation (7.2).** The exact group partial squared correlation
+of a residualized phenotype against a residualized score. -/
+def partialR2 (z r : N → ℝ) : ℝ := dot z r ^ 2 / (dot z z * dot r r)
+
+/-- The group report is invariant under nonzero rescaling of the phenotype, which is
+what makes it a scale-invariant report in the sense of PL Theorem 7.2. -/
+theorem partialR2_smul (z r : N → ℝ) (t : ℝ) (ht : t ≠ 0) :
+    partialR2 z (t • r) = partialR2 z r := by
+  have ht2 : (t ^ 2) ≠ 0 := pow_ne_zero 2 ht
+  have h1 : dot z (t • r) = t * dot z r := dot_smul_right t z r
+  have h2 : dot (t • r) (t • r) = t ^ 2 * dot r r := by
+    simp only [dot, Descent.Core.innerSum, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
+    exact Finset.sum_congr rfl fun i _ ↦ by ring
+  unfold partialR2
+  rw [h1, h2,
+    show (t * dot z r) ^ 2 = t ^ 2 * dot z r ^ 2 by ring,
+    show dot z z * (t ^ 2 * dot r r) = t ^ 2 * (dot z z * dot r r) by ring]
+  exact mul_div_mul_left _ _ ht2
+
+/-- The group report of the residualized score itself is one. -/
+theorem partialR2_self (z : N → ℝ) (hz : dot z z ≠ 0) : partialR2 z z = 1 := by
+  unfold partialR2
+  rw [sq]
+  exact div_self (mul_ne_zero hz hz)
+
+/-- The group report of an orthogonal direction is zero. -/
+theorem partialR2_orthogonal (z u : N → ℝ) (hzu : dot z u = 0) : partialR2 z u = 0 := by
+  unfold partialR2
+  rw [hzu]
+  norm_num
+
+/-- The outcome line `y(x) = x z + u` of DC Theorem 8.3. -/
+def lineOutcome (z u : N → ℝ) (x : ℝ) : N → ℝ := fun i ↦ x * z i + u i
+
+/-- **DC equation (8.2).** On the outcome line through an orthogonal template of equal
+norm, the group report is exactly `x² / (1 + x²)`. -/
+theorem partialR2_line (z u : N → ℝ) (hzu : dot z u = 0) (hnorm : dot u u = dot z z)
+    (hz : dot z z ≠ 0) (x : ℝ) :
+    partialR2 z (lineOutcome z u x) = x ^ 2 / (1 + x ^ 2) := by
+  have hx : (1 : ℝ) + x ^ 2 ≠ 0 := by positivity
+  have h1 : dot z (lineOutcome z u x) = x * dot z z + dot z u := by
+    simp only [dot, Descent.Core.innerSum, lineOutcome, Finset.mul_sum,
+      ← Finset.sum_add_distrib]
+    exact Finset.sum_congr rfl fun i _ ↦ by ring
+  have h2 : dot (lineOutcome z u x) (lineOutcome z u x) =
+      x ^ 2 * dot z z + 2 * x * dot z u + dot u u := by
+    simp only [dot, Descent.Core.innerSum, lineOutcome, Finset.mul_sum,
+      ← Finset.sum_add_distrib]
+    exact Finset.sum_congr rfl fun i _ ↦ by ring
+  unfold partialR2
+  rw [h1, h2, hzu, hnorm]
+  field_simp
+  ring
+
+/-- **DC Theorem 8.3, exact fourth-order instance, equation (8.3).** The two order-four
+parity laws on `0,…,5`, pushed through the outcome line, give expected partial squared
+correlations differing by exactly `27/1768`. -/
+theorem partial_r2_fourth_order_gap (z u : N → ℝ) (hzu : dot z u = 0)
+    (hnorm : dot u u = dot z z) (hz : dot z z ≠ 0) :
+    parityExp 4 false (fun j ↦ partialR2 z (lineOutcome z u ((j : ℕ) : ℝ))) -
+        parityExp 4 true (fun j ↦ partialR2 z (lineOutcome z u ((j : ℕ) : ℝ))) =
+      27 / 1768 := by
+  have hval : ∀ x : ℝ, partialR2 z (lineOutcome z u x) = x ^ 2 / (1 + x ^ 2) :=
+    partialR2_line z u hzu hnorm hz
+  rw [parity_gap_nodes 4 (fun x ↦ partialR2 z (lineOutcome z u x))]
+  simp only [hval]
+  norm_num [Finset.sum_range_succ, Nat.choose]
+
+/-- **DC Theorem 8.3, every finite order.** For every `k` and every choice of `k+1`
+distinct positive radii, the two radial laws share every joint raw moment of total
+degree at most `k` yet report partial squared correlations differing by the reciprocal
+of the weight total variation, which is nonzero. -/
+theorem partial_r2_no_finite_moment_order {k : ℕ} (r : Fin (k + 1) → ℝ)
+    (hinj : Function.Injective r) (hpos : ∀ i, 0 < r i) (z u : N → ℝ)
+    (hzu : dot z u = 0) (hz : dot z z ≠ 0) :
+    (∀ α : N → ℕ, ∑ i, α i ≤ k →
+        radialExp r hinj false (fun w ↦ monomialEval α (radialPoint r z u w)) =
+          radialExp r hinj true (fun w ↦ monomialEval α (radialPoint r z u w))) ∧
+      radialExp r hinj false (fun w ↦ partialR2 z (radialPoint r z u w)) -
+          radialExp r hinj true (fun w ↦ partialR2 z (radialPoint r z u w)) =
+        1 / radialTotal r := by
+  refine ⟨fun α hα ↦ radial_moment_match r hinj z u α hα, ?_⟩
+  have hgap := radial_report_gap r hinj hpos z u (partialR2 z)
+    (fun t ht y ↦ partialR2_smul z y t ht.ne')
+  rw [hgap, partialR2_self z hz, partialR2_orthogonal z u hzu, sub_zero]
+
+end GroupReport
+
+section IndividualReport
+
+/-- The two-bin loss-regression projection `P_H` of DC Theorem 8.4: subjects `0,1` form
+the first bin and `2,3,4,5` the second. -/
+def binProjection (l : Fin 6 → ℝ) : Fin 6 → ℝ :=
+  fun i ↦ if (i : ℕ) < 2 then (l 0 + l 1) / 2 else (l 2 + l 3 + l 4 + l 5) / 4
+
+/-- The intercept projection `P_1`: the grand mean. -/
+def meanProjection (l : Fin 6 → ℝ) : Fin 6 → ℝ :=
+  fun _ ↦ (l 0 + l 1 + l 2 + l 3 + l 4 + l 5) / 6
+
+/-- `binProjection` really is the orthogonal projection onto the two-bin design: the
+residual is orthogonal to every vector constant on each bin. -/
+theorem binProjection_orthogonal (l : Fin 6 → ℝ) (a b : ℝ) :
+    dot (fun i ↦ l i - binProjection l i) (fun i ↦ if (i : ℕ) < 2 then a else b) = 0 := by
+  simp only [dot, Descent.Core.innerSum, binProjection, Fin.sum_univ_six]
+  norm_num
+  ring
+
+/-- `meanProjection` really is the orthogonal projection onto the intercept. -/
+theorem meanProjection_orthogonal (l : Fin 6 → ℝ) (a : ℝ) :
+    dot (fun i ↦ l i - meanProjection l i) (fun _ ↦ a) = 0 := by
+  simp only [dot, Descent.Core.innerSum, meanProjection, Fin.sum_univ_six]
+  ring
+
+/-- The explained centered sum `ℓᵀ(P_H - P_1)ℓ` of DC equation (7.4). -/
+def explainedSum (l : Fin 6 → ℝ) : ℝ := dot l (binProjection l) - dot l (meanProjection l)
+
+/-- The total centered sum `ℓᵀ(I - P_1)ℓ` of DC equation (7.4). -/
+def centeredSum (l : Fin 6 → ℝ) : ℝ := dot l l - dot l (meanProjection l)
+
+/-- **DC Proposition 7.2, equation (7.4).** The fitted individual loss-explainability
+report of a squared-loss vector. -/
+def fittedLossExplainability (l : Fin 6 → ℝ) : ℝ := explainedSum l / centeredSum l
+
+/-- The fitted individual report of an outcome vector: square the residuals, then (7.4).
+On this design every residualization in DC equation (7.3) is the identity, by
+`lineResidual_orthogonal`. -/
+def lossReport (y : Fin 6 → ℝ) : ℝ := fittedLossExplainability (fun i ↦ y i ^ 2)
+
+/-- The explained sum in closed form: bin sizes times squared bin means, minus the
+grand-mean term. -/
+theorem explainedSum_closed (l : Fin 6 → ℝ) :
+    explainedSum l = 2 * ((l 0 + l 1) / 2) ^ 2 + 4 * ((l 2 + l 3 + l 4 + l 5) / 4) ^ 2 -
+      6 * ((l 0 + l 1 + l 2 + l 3 + l 4 + l 5) / 6) ^ 2 := by
+  simp only [explainedSum, dot, Descent.Core.innerSum, binProjection, meanProjection,
+    Fin.sum_univ_six]
+  norm_num
+  ring
+
+/-- The total centered sum in closed form. -/
+theorem centeredSum_closed (l : Fin 6 → ℝ) :
+    centeredSum l = (l 0 ^ 2 + l 1 ^ 2 + l 2 ^ 2 + l 3 ^ 2 + l 4 ^ 2 + l 5 ^ 2) -
+      6 * ((l 0 + l 1 + l 2 + l 3 + l 4 + l 5) / 6) ^ 2 := by
+  simp only [centeredSum, dot, Descent.Core.innerSum, meanProjection, Fin.sum_univ_six]
+  ring
+
+/-- The outcome line of DC Theorem 8.4. -/
+def lineResidual (x : ℝ) : Fin 6 → ℝ := ![1, -1, x, -x, 0, 0]
+
+/-- The outcome line is orthogonal to the intercept, to both bin indicators, and to the
+score, so every residualization in DC equation (7.3) leaves it unchanged. -/
+theorem lineResidual_orthogonal (x : ℝ) :
+    dot (lineResidual x) (fun _ ↦ (1 : ℝ)) = 0 ∧
+      dot (lineResidual x) ![1, 1, 0, 0, 0, 0] = 0 ∧
+      dot (lineResidual x) ![0, 0, 1, 1, 1, 1] = 0 ∧
+      dot (lineResidual x) ![1, 1, -1, -1, 0, 0] = 0 := by
+  refine ⟨?_, ?_, ?_, ?_⟩ <;>
+    · simp only [dot, Descent.Core.innerSum, lineResidual, Fin.sum_univ_six]
+      norm_num
+
+/-- **DC equation (8.4).** On the outcome line the fitted individual report is exactly
+`(x² - 2)² / (4 (x⁴ - x² + 1))`. -/
+theorem lossReport_line (x : ℝ) :
+    lossReport (lineResidual x) = (x ^ 2 - 2) ^ 2 / (4 * (x ^ 4 - x ^ 2 + 1)) := by
+  have hden : (0 : ℝ) < x ^ 4 - x ^ 2 + 1 := by nlinarith [sq_nonneg (x ^ 2 - 1 / 2)]
+  have hl : (fun i ↦ lineResidual x i ^ 2) = ![1, 1, x ^ 2, x ^ 2, 0, 0] := by
+    funext i
+    fin_cases i <;> norm_num [lineResidual]
+  have hE : explainedSum ![1, 1, x ^ 2, x ^ 2, 0, 0] = (x ^ 2 - 2) ^ 2 / 3 := by
+    rw [explainedSum_closed]
+    first
+      | (norm_num; ring)
+      | norm_num
+  have hC : centeredSum ![1, 1, x ^ 2, x ^ 2, 0, 0] = 4 * (x ^ 4 - x ^ 2 + 1) / 3 := by
+    rw [centeredSum_closed]
+    first
+      | (norm_num; ring)
+      | norm_num
+  have h1 : (4 : ℝ) * (x ^ 4 - x ^ 2 + 1) / 3 ≠ 0 := by intro hc; linarith
+  have h2 : (4 : ℝ) * (x ^ 4 - x ^ 2 + 1) ≠ 0 := by intro hc; linarith
+  unfold lossReport fittedLossExplainability
+  rw [hl, hE, hC, div_eq_div_iff h1 h2]
+  ring
+
+/-- The explained centered sum is homogeneous of degree two in the loss vector. -/
+theorem explainedSum_smul (c : ℝ) (l : Fin 6 → ℝ) :
+    explainedSum (fun i ↦ c * l i) = c ^ 2 * explainedSum l := by
+  simp only [explainedSum_closed]
+  ring
+
+/-- The total centered sum is homogeneous of degree two in the loss vector. -/
+theorem centeredSum_smul (c : ℝ) (l : Fin 6 → ℝ) :
+    centeredSum (fun i ↦ c * l i) = c ^ 2 * centeredSum l := by
+  simp only [centeredSum_closed]
+  ring
+
+/-- The fitted individual report is invariant under nonzero rescaling of the outcome
+vector, which is what makes it a scale-invariant report. -/
+theorem lossReport_smul (t : ℝ) (ht : t ≠ 0) (y : Fin 6 → ℝ) :
+    lossReport (t • y) = lossReport y := by
+  have ht2 : ((t ^ 2) ^ 2 : ℝ) ≠ 0 := pow_ne_zero 2 (pow_ne_zero 2 ht)
+  have hsq : (fun i ↦ (t • y) i ^ 2) = fun i ↦ t ^ 2 * y i ^ 2 := by
+    funext i
+    simp [mul_pow]
+  unfold lossReport fittedLossExplainability
+  rw [hsq, explainedSum_smul, centeredSum_smul]
+  exact mul_div_mul_left _ _ ht2
+
+/-- **DC Theorem 8.4, every finite order.** For every `k` and every choice of `k+1`
+distinct positive radii, the two radial laws on the templates `y(0)` and `y(1)` share
+every joint raw moment of total degree at most `k` yet report fitted individual
+loss-explainability differing by `3/4` divided by the weight total variation. -/
+theorem loss_report_no_finite_moment_order {k : ℕ} (r : Fin (k + 1) → ℝ)
+    (hinj : Function.Injective r) (hpos : ∀ i, 0 < r i) :
+    (∀ α : Fin 6 → ℕ, ∑ i, α i ≤ k →
+        radialExp r hinj false (fun w ↦ monomialEval α
+            (radialPoint r (lineResidual 0) (lineResidual 1) w)) =
+          radialExp r hinj true (fun w ↦ monomialEval α
+            (radialPoint r (lineResidual 0) (lineResidual 1) w))) ∧
+      radialExp r hinj false
+          (fun w ↦ lossReport (radialPoint r (lineResidual 0) (lineResidual 1) w)) -
+        radialExp r hinj true
+          (fun w ↦ lossReport (radialPoint r (lineResidual 0) (lineResidual 1) w)) =
+        (3 / 4) / radialTotal r := by
+  refine ⟨fun α hα ↦ radial_moment_match r hinj _ _ α hα, ?_⟩
+  have hgap := radial_report_gap r hinj hpos (lineResidual 0) (lineResidual 1) lossReport
+    (fun t ht y ↦ lossReport_smul t ht.ne' y)
+  rw [hgap, lossReport_line 0, lossReport_line 1]
+  norm_num
+
+/-- **DC Theorem 8.4, exact fourth-order instance, equation (8.5).** The two order-four
+parity laws give expected fitted loss-explainability differing by exactly
+`-24900075/1099632872`. -/
+theorem loss_report_fourth_order_gap :
+    parityExp 4 false (fun j ↦ lossReport (lineResidual ((j : ℕ) : ℝ))) -
+        parityExp 4 true (fun j ↦ lossReport (lineResidual ((j : ℕ) : ℝ))) =
+      -(24900075 / 1099632872) := by
+  rw [parity_gap_nodes 4 (fun x ↦ lossReport (lineResidual x))]
+  simp only [lossReport_line]
+  norm_num [Finset.sum_range_succ, Nat.choose]
+
+end IndividualReport
 
 end
 

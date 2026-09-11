@@ -47,3 +47,16 @@ import Descent.Portability.TurnoverArchitectureMetrics
 #print axioms Descent.Portability.TurnoverArchitectureMetrics.architecture_r2
 #print axioms Descent.Portability.TurnoverArchitectureMetrics.architecture_mse
 #print axioms Descent.Portability.TurnoverArchitectureMetrics.architecture_loss_variance
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.noise_var_nonneg
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.sum_signValue_eq
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.sum_signValue_reversed
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.equalWeights_sq
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.equalWeights_norm
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.equalWeights_alignment
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.equalWeights_reversedWeightSq
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.equal_weight_r2
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.equal_weight_mse
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.equal_weight_loss_variance
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.aggregation_gap
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.pathwise_distance_variance_decomposition
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.pathwise_distance_explainability

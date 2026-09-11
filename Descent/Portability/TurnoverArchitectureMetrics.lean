@@ -667,6 +667,200 @@ theorem architecture_loss_variance {n : ℕ} {V : Type*} [Fintype V] (noise : Ex
     residualCoeff_sq_sum, residualCoeff_quartic_sum, hnorm]
   ring
 
+
+/-! ## The equal-weight specialization DC (4.2) / (4.3) -/
+
+/-- The noise variance is nonnegative, so `1 + ν` never vanishes. -/
+theorem noise_var_nonneg {V : Type*} [Fintype V] (noise : ExpFunctional V) (ξ : V → ℝ) :
+    0 ≤ noise (fun e ↦ ξ e ^ 2) := noise.nonneg_eval _ fun e ↦ sq_nonneg _
+
+/-- `M(σ) = ∑ᵢ σᵢ = 2 N(σ) - n`, tying the architecture's sign sum to the occupied count
+of `Descent.Portability.ConvexOrderCoupling`. -/
+theorem sum_signValue_eq {n : ℕ} (σ : Fin n → Bool) :
+    ∑ i, signValue (σ i)
+      = 2 * ((ConvexOrderCoupling.occupiedCount σ : ℕ) : ℝ) - (n : ℝ) := by
+  have hpt : ∀ i : Fin n, signValue (σ i) = 2 * (if σ i = true then (1 : ℝ) else 0) - 1 := by
+    intro i
+    cases h : σ i
+    · simp [signValue]
+    · simp [signValue]
+  rw [Finset.sum_congr rfl fun i _ ↦ hpt i, Finset.sum_sub_distrib, ← Finset.mul_sum,
+    ← ConvexOrderCoupling.occupiedCount_eq_sum, Finset.sum_const, Finset.card_univ,
+    Fintype.card_fin, nsmul_eq_mul, mul_one]
+
+/-- `J(σ)`, the number of reversed effects of DC §4.1. -/
+def reversedCount {n : ℕ} (σ : Fin n → Bool) : ℝ :=
+  (n : ℝ) - ((ConvexOrderCoupling.occupiedCount σ : ℕ) : ℝ)
+
+/-- `M(σ) = n - 2 J(σ)`. -/
+theorem sum_signValue_reversed {n : ℕ} (σ : Fin n → Bool) :
+    ∑ i, signValue (σ i) = (n : ℝ) - 2 * reversedCount σ := by
+  rw [sum_signValue_eq]
+  simp only [reversedCount]
+  ring
+
+/-- The equal-weight score `aᵢ = n^{-1/2}` of DC (4.1). -/
+def equalWeights (n : ℕ) : Fin n → ℝ := fun _ ↦ (Real.sqrt (n : ℝ))⁻¹
+
+/-- Each equal weight carries `wᵢ = 1/n`. -/
+theorem equalWeights_sq {n : ℕ} (hn : 0 < n) (i : Fin n) :
+    equalWeights n i ^ 2 = ((n : ℝ))⁻¹ := by
+  simp only [equalWeights]
+  rw [inv_pow, Real.sq_sqrt (Nat.cast_nonneg n)]
+
+/-- The equal-weight score has unit genetic variance. -/
+theorem equalWeights_norm {n : ℕ} (hn : 0 < n) : ∑ i, equalWeights n i ^ 2 = 1 := by
+  have hne : (n : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hn.ne'
+  rw [Finset.sum_congr rfl fun i _ ↦ equalWeights_sq hn i, Finset.sum_const, Finset.card_univ,
+    Fintype.card_fin, nsmul_eq_mul]
+  field_simp
+
+/-- With equal weights, `A_σ = M(σ)/n = (n - 2J)/n`. -/
+theorem equalWeights_alignment {n : ℕ} (hn : 0 < n) (σ : Fin n → Bool) :
+    alignment (equalWeights n) σ = ((n : ℝ) - 2 * reversedCount σ) / (n : ℝ) := by
+  have hne : (n : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hn.ne'
+  have hpt : ∀ i : Fin n, equalWeights n i ^ 2 * signValue (σ i)
+      = ((n : ℝ))⁻¹ * signValue (σ i) := by
+    intro i
+    rw [equalWeights_sq hn i]
+  simp only [alignment]
+  rw [Finset.sum_congr rfl fun i _ ↦ hpt i, ← Finset.mul_sum, sum_signValue_reversed]
+  field_simp
+
+/-- With equal weights, `∑_{σᵢ = -1} wᵢ² = J/n²`. -/
+theorem equalWeights_reversedWeightSq {n : ℕ} (hn : 0 < n) (σ : Fin n → Bool) :
+    reversedWeightSq (equalWeights n) σ = reversedCount σ / (n : ℝ) ^ 2 := by
+  have hne : (n : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hn.ne'
+  have hpt : ∀ i : Fin n, (equalWeights n i ^ 2) ^ 2 * ((1 - signValue (σ i)) / 2)
+      = (((n : ℝ))⁻¹) ^ 2 * ((1 - signValue (σ i)) / 2) := by
+    intro i
+    rw [equalWeights_sq hn i]
+  have hsum : ∑ i : Fin n, ((1 - signValue (σ i)) / 2) = reversedCount σ := by
+    have h1 : ∀ i : Fin n,
+        (1 - signValue (σ i)) / 2 = (1 : ℝ) / 2 - (1 / 2) * signValue (σ i) := fun i ↦ by ring
+    rw [Finset.sum_congr rfl fun i _ ↦ h1 i, Finset.sum_sub_distrib, ← Finset.mul_sum,
+      sum_signValue_reversed, Finset.sum_const, Finset.card_univ, Fintype.card_fin,
+      nsmul_eq_mul]
+    ring
+  simp only [reversedWeightSq]
+  rw [Finset.sum_congr rfl fun i _ ↦ hpt i, ← Finset.mul_sum, hsum]
+  field_simp
+
+/-- **DC (4.2), first boxed formula**: with equal weights the conditional squared
+correlation is `M(σ)² / (n²(1 + ν))`. -/
+theorem equal_weight_r2 {n : ℕ} {V : Type*} [Fintype V] (noise : ExpFunctional V)
+    (σ : Fin n → Bool) (ξ : V → ℝ) (hn : 0 < n) (hmean : noise ξ = 0) :
+    (architecturePop n noise (equalWeights n) σ ξ).r2 (equalWeights n)
+      = (∑ i, signValue (σ i)) ^ 2 / ((n : ℝ) ^ 2 * (1 + noise (fun e ↦ ξ e ^ 2))) := by
+  have hne : (n : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hn.ne'
+  have hc : (1 + noise (fun e ↦ ξ e ^ 2)) ≠ 0 := by
+    have := noise_var_nonneg noise ξ
+    intro hcon
+    linarith
+  rw [architecture_r2 noise _ σ ξ (equalWeights_norm hn) hmean, equalWeights_alignment hn,
+    sum_signValue_reversed]
+  field_simp
+
+/-- **DC (4.2), second boxed formula**: with equal weights the conditional mean squared
+error is `ν + 4J(σ)/n`. -/
+theorem equal_weight_mse {n : ℕ} {V : Type*} [Fintype V] (noise : ExpFunctional V)
+    (σ : Fin n → Bool) (ξ : V → ℝ) (hn : 0 < n) (hmean : noise ξ = 0) :
+    (architecturePop n noise (equalWeights n) σ ξ).deployedMse (equalWeights n)
+      = noise (fun e ↦ ξ e ^ 2) + 4 * reversedCount σ / (n : ℝ) := by
+  have hne : (n : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hn.ne'
+  rw [architecture_mse noise _ σ ξ (equalWeights_norm hn) hmean, equalWeights_alignment hn]
+  field_simp
+  ring
+
+/-- **DC (4.3)**: with equal weights the individual squared-loss variance is
+`32 J(J-1)/n² + 16 J ν/n + κ - ν²`. -/
+theorem equal_weight_loss_variance {n : ℕ} {V : Type*} [Fintype V] (noise : ExpFunctional V)
+    (σ : Fin n → Bool) (ξ : V → ℝ) (hn : 0 < n) (hmean : noise ξ = 0) :
+    variance (architecturePop n noise (equalWeights n) σ ξ).E
+        (fun p ↦ ((architecturePop n noise (equalWeights n) σ ξ).phenotype p
+          - (architecturePop n noise (equalWeights n) σ ξ).score (equalWeights n) p) ^ 2)
+      = 32 * reversedCount σ * (reversedCount σ - 1) / (n : ℝ) ^ 2
+        + 16 * reversedCount σ * noise (fun e ↦ ξ e ^ 2) / (n : ℝ)
+        + noise (fun e ↦ ξ e ^ 4) - noise (fun e ↦ ξ e ^ 2) ^ 2 := by
+  have hne : (n : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hn.ne'
+  rw [architecture_loss_variance noise _ σ ξ (equalWeights_norm hn) hmean,
+    equalWeights_alignment hn, equalWeights_reversedWeightSq hn]
+  field_simp
+  ring
+
+/-! ## Averaging architectures is not pooling them, and the pathwise report -/
+
+/-- **DC Proposition 4.6, the aggregation gap.** Mean conditional squared correlation
+exceeds the pooled squared correlation by exactly `Var(A_Σ)/(1 + ν)`.  Both sides are
+computed from the same architecture law; nothing is substituted for the pooling rule. -/
+theorem aggregation_gap {n : ℕ} {V A : Type*} [Fintype V] [Fintype A]
+    (noise : ExpFunctional V) (arch : ExpFunctional A) (arche : A → (Fin n → Bool))
+    (a : Fin n → ℝ) (ξ : V → ℝ) (hnorm : ∑ i, a i ^ 2 = 1) (hmean : noise ξ = 0) :
+    arch (fun d ↦ (architecturePop n noise a (arche d) ξ).r2 a)
+        - arch (fun d ↦ alignment a (arche d)) ^ 2 / (1 + noise (fun e ↦ ξ e ^ 2))
+      = variance arch (fun d ↦ alignment a (arche d)) / (1 + noise (fun e ↦ ξ e ^ 2)) := by
+  have hc : (1 + noise (fun e ↦ ξ e ^ 2)) ≠ 0 := by
+    have := noise_var_nonneg noise ξ
+    intro hcon
+    linarith
+  have hfun : (fun d ↦ (architecturePop n noise a (arche d) ξ).r2 a)
+      = (1 + noise (fun e ↦ ξ e ^ 2))⁻¹ • (fun d ↦ alignment a (arche d) ^ 2) := by
+    funext d
+    rw [architecture_r2 noise a (arche d) ξ hnorm hmean]
+    simp only [Pi.smul_apply, smul_eq_mul]
+    ring
+  rw [hfun, arch.smul_eval, variance_eq_expect_sq_sub_sq_mean]
+  field_simp
+
+/-- Conditional mean loss `a_d = ν + 2(1 - A_{σ_d})` in cell `d`, DC §4.4. -/
+def cellLossMean {n : ℕ} {V : Type*} [Fintype V] (noise : ExpFunctional V)
+    (a : Fin n → ℝ) (σ : Fin n → Bool) (ξ : V → ℝ) : ℝ :=
+  noise (fun e ↦ ξ e ^ 2) + 2 * (1 - alignment a σ)
+
+/-- Conditional loss variance `b_d` in cell `d`, DC §4.4. -/
+def cellLossVar {n : ℕ} {V : Type*} [Fintype V] (noise : ExpFunctional V)
+    (a : Fin n → ℝ) (σ : Fin n → Bool) (ξ : V → ℝ) : ℝ :=
+  2 * (2 * (1 - alignment a σ)) ^ 2 - 32 * reversedWeightSq a σ
+    + 4 * noise (fun e ↦ ξ e ^ 2) * (2 * (1 - alignment a σ))
+    + noise (fun e ↦ ξ e ^ 4) - noise (fun e ↦ ξ e ^ 2) ^ 2
+
+/-- **DC Theorem 4.5, the exact pathwise distance-explainability decomposition.**
+Total individual-loss variance over the realized collection of cell architectures splits
+into the mean conditional loss variance plus the variance of the conditional mean loss.
+Each cell carries its own realized architecture, so this is a function of the whole
+collection. -/
+theorem pathwise_distance_variance_decomposition {n : ℕ} {V D : Type*} [Fintype V]
+    (noise : ExpFunctional V) (cells : ExpFunctional D) (arche : D → (Fin n → Bool))
+    (a : Fin n → ℝ) (ξ : V → ℝ) (hnorm : ∑ i, a i ^ 2 = 1) (hmean : noise ξ = 0) :
+    variance (mixture cells (fun _ ↦ genotypeNoiseExp n noise))
+        (fun z ↦ ((architecturePop n noise a (arche z.1) ξ).phenotype z.2
+          - (architecturePop n noise a (arche z.1) ξ).score a z.2) ^ 2)
+      = cells (fun d ↦ cellLossVar noise a (arche d) ξ)
+        + variance cells (fun d ↦ cellLossMean noise a (arche d) ξ) := by
+  rw [total_variance]
+  congr 1
+  · exact congrArg cells.eval
+      (funext fun d ↦ architecture_loss_variance noise a (arche d) ξ hnorm hmean)
+  · exact congrArg (variance cells)
+      (funext fun d ↦ architecture_mse noise a (arche d) ξ hnorm hmean)
+
+/-- **DC (4.9)**: the explainable fraction `η_D` is the ratio of the between-cell variance
+of the conditional mean loss to that variance plus the mean conditional loss variance.
+It is a function of the whole realized collection of architectures, not a ratio of
+separately averaged numerator and denominator. -/
+theorem pathwise_distance_explainability {n : ℕ} {V D : Type*} [Fintype V]
+    (noise : ExpFunctional V) (cells : ExpFunctional D) (arche : D → (Fin n → Bool))
+    (a : Fin n → ℝ) (ξ : V → ℝ) (hnorm : ∑ i, a i ^ 2 = 1) (hmean : noise ξ = 0) :
+    explainableFraction (variance cells (fun d ↦ cellLossMean noise a (arche d) ξ))
+        (variance (mixture cells (fun _ ↦ genotypeNoiseExp n noise))
+          (fun z ↦ ((architecturePop n noise a (arche z.1) ξ).phenotype z.2
+            - (architecturePop n noise a (arche z.1) ξ).score a z.2) ^ 2))
+      = variance cells (fun d ↦ cellLossMean noise a (arche d) ξ)
+        / (variance cells (fun d ↦ cellLossMean noise a (arche d) ξ)
+          + cells (fun d ↦ cellLossVar noise a (arche d) ξ)) := by
+  rw [explainableFraction, Descent.Core.ratio,
+    pathwise_distance_variance_decomposition noise cells arche a ξ hnorm hmean, add_comm]
+
 end
 
 end Descent.Portability.TurnoverArchitectureMetrics
