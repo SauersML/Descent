@@ -32,6 +32,14 @@ corpus's `matrixExponential_intertwines`.  This is the algebraic half of NOTE1 T
 subspace `E H^L_ij = E H^R_ij` of equation (12) is invariant, and on it the restriction to the
 stored coordinates is exactly the corpus generator.
 
+Matrix application is also put back into generator-row form, which a microscopic-kernel
+expansion needs.  The corpus stores its generator by columns of `lowOrderLDBasis`, so reading
+a whole moment vector off it requires linearity: `lowOrderLDGeneratorMap` bundles
+`lowOrderLDHomogeneousGenerator` as a linear map, `homogeneousGenerator_sum_basis` expands a
+moment vector on the basis, and `augmentedGenerator_mulVec`,
+`enlargedGenerator_mulVec_stored` and `enlargedGenerator_mulVec_rightHeterozygosity` deliver
+the three row forms.
+
 The realizability half is supplied in the two directions a caller needs.
 `embed_eq_enlargedFeature_expectation` shows that every state carrying a
 `LocusExchangeableLowOrderLDHaplotypeRealization` has its embedded vector equal to the
@@ -187,6 +195,14 @@ theorem augmentedGenerator_heterozygosity_row_of_other {D : ℕ} (rates : ManyDe
     simp [augmentedLowOrderLDGenerator, lowOrderLDHomogeneousGenerator, lowOrderLDDrift,
       lowOrderLDMigration, lowOrderLDRecombination, lowOrderLDMutationCoupling,
       lowOrderLDRecurrentMutationDamping, lowOrderLDBasis]
+
+/-- The same closure statement read through the homogeneous generator, which is the form the
+basis expansion produces. -/
+theorem homogeneousGenerator_heterozygosity_row_of_other {D : ℕ} (rates : ManyDemeLDRates D)
+    (first second : Fin D) (column : LowOrderLDCoordinate D)
+    (hcolumn : ∀ leftIndex rightIndex : Fin D, column ≠ .H leftIndex rightIndex) :
+    lowOrderLDHomogeneousGenerator rates (lowOrderLDBasis column) (.H first second) = 0 :=
+  augmentedGenerator_heterozygosity_row_of_other rates first second column hcolumn
 
 /-! ## The embedding and the intertwining -/
 
@@ -646,28 +662,28 @@ theorem enlargedGenerator_mulVec_rightHeterozygosity {D : ℕ} (rates : ManyDeme
   rw [enlarged_mulVec_split]
   have hentry : ∀ pair : Fin D × Fin D,
       enlargedLowOrderLDGenerator rates (some (.inr (first, second))) (some (.inr pair)) =
-        augmentedLowOrderLDGenerator rates (some (.H first second))
-          (some (.H pair.1 pair.2)) := fun _ ↦ rfl
+        lowOrderLDHomogeneousGenerator rates (lowOrderLDBasis (.H pair.1 pair.2))
+          (.H first second) := fun _ ↦ rfl
   have hstored : ∀ coordinate : LowOrderLDCoordinate D,
       enlargedLowOrderLDGenerator rates (some (.inr (first, second)))
         (some (.inl coordinate)) = 0 := fun _ ↦ rfl
   have hconstant : enlargedLowOrderLDGenerator rates (some (.inr (first, second))) none =
       lowOrderLDMutationForcing rates (.H first second) := rfl
-  have hclosed : ∑ coordinate : LowOrderLDCoordinate D,
-      lowOrderLDHomogeneousGenerator rates (lowOrderLDBasis coordinate) (.H first second) *
-        rightHeterozygosityMoment vector coordinate =
-      ∑ pair : Fin D × Fin D,
-        augmentedLowOrderLDGenerator rates (some (.H first second))
-            (some (.H pair.1 pair.2)) * vector (some (.inr pair)) := by
-    refine sum_heterozygosity_columns _ ?_
+  have hkey : ∑ pair : Fin D × Fin D,
+      lowOrderLDHomogeneousGenerator rates (lowOrderLDBasis (.H pair.1 pair.2))
+          (.H first second) * vector (some (.inr pair)) =
+      lowOrderLDHomogeneousGenerator rates (rightHeterozygosityMoment vector)
+        (.H first second) := by
+    rw [← homogeneousGenerator_sum_basis rates (rightHeterozygosityMoment vector)
+      (.H first second)]
+    refine (sum_heterozygosity_columns
+      (fun coordinate ↦ lowOrderLDHomogeneousGenerator rates (lowOrderLDBasis coordinate)
+        (.H first second) * rightHeterozygosityMoment vector coordinate) ?_).symm
     intro coordinate hcoordinate
-    have hzero := augmentedGenerator_heterozygosity_row_of_other rates first second
-      coordinate hcoordinate
-    have hrow : lowOrderLDHomogeneousGenerator rates (lowOrderLDBasis coordinate)
-        (.H first second) = 0 := hzero
-    rw [hrow, zero_mul]
-  simp only [hentry, hstored, hconstant, zero_mul, Finset.sum_const_zero]
-  rw [← hclosed, homogeneousGenerator_sum_basis]
+    rw [homogeneousGenerator_heterozygosity_row_of_other rates first second coordinate
+      hcoordinate, zero_mul]
+  simp only [hentry, hstored, hconstant, zero_mul, Finset.sum_const_zero, zero_add]
+  rw [hkey]
   ring
 
 /-- The enlarged feature map of an actual haplotype configuration is realized by the Dirac

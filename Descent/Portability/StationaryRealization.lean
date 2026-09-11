@@ -2,8 +2,13 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.TwoLocusHistory
+import Mathlib.Analysis.Convex.Integral
+import Mathlib.Analysis.Matrix
+import Mathlib.Analysis.Normed.Module.FiniteDimension
 import Mathlib.LinearAlgebra.Matrix.Notation
 import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
+import Mathlib.MeasureTheory.Integral.IntervalAverage
+import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
 
 assert_below Descent.Decision Descent.Program
 
@@ -30,11 +35,27 @@ reproved, and `oneDemeStationaryVector_eq_neg_inv_mulVec` turns that into the cl
 inversion `w = -B⁻¹ b` of NOTE1 (16). Together these say the corpus stationary state is not a
 fitted table but the unique solution of an explicitly invertible linear system.
 
-What is NOT proved in this module: the Cesàro argument of NOTE1 Theorem 3, which needs the
-time average of a bounded orbit of the affine flow, and therefore the realizability of the
-stationary vector. That argument depends on a microscopic approximation for the augmented
-one-deme generator and on the closedness of the one-deme realization body, neither of which
-is available here; the linear algebra above is the part that stands on its own.
+`stationary_mem_of_orbit_mem` is the Cesàro argument of NOTE1 Theorem 3, in general form: if
+a convex closed bounded set contains the forward orbit of a solution of the affine system
+`w' = B w + b` with `B` invertible, then it contains the stationary point `-B⁻¹ b`. The proof
+is the one indicated in the note, with no subsequence extraction. The time average over
+`[0, T]` lies in the set because the set is convex and closed and the average of an
+integrable function into a convex closed set stays there; the fundamental theorem of calculus
+turns the affine equation into `B (average) + b = (w T - w 0)/T`; the orbit is bounded because
+it stays in a bounded set, so the right side tends to zero and the averages converge to
+`-B⁻¹ b`, which the set contains because it is closed.
+
+`oneDemeStationaryVector_mem_of_orbit_mem` is NOTE1 Theorem 3 for the corpus vector: any
+convex closed bounded set containing a forward orbit of the one-deme system (14) contains the
+corpus stationary state. In the intended application that set is the one-deme realization
+body intersected with the coordinates of (14), and the orbit is supplied by NOTE1 Theorem 1
+from a microscopic approximation of the augmented one-deme generator.
+
+What is NOT proved in this module: that such an orbit exists for the corpus generator. That
+needs a microscopic approximation for the augmented one-deme generator, the closedness and
+boundedness of the one-deme realization body, and the derivative of the matrix-exponential
+orbit; none of those is available here. The hypothesis is therefore stated explicitly rather
+than discharged, and the theorem is exactly as strong as the orbit it is given.
 
 ## Empirical status
 
@@ -165,6 +186,134 @@ theorem oneDemeStationaryVector_eq_neg_inv_mulVec (rates : ManyDemeLDRates 1) :
     _ = -((oneDemeStationaryMatrix rates)⁻¹.mulVec
           (stationaryForcing (rates.mutation 0))) := by
         rw [hsolve, Matrix.mulVec_neg]
+
+section CesaroLimit
+
+open scoped Matrix.Norms.Operator
+
+/-- **The Cesàro step of NOTE1 Theorem 3.** If a convex, closed, bounded set contains the
+whole forward orbit of a solution of the affine system `w' = B w + b` with invertible `B`,
+then it contains the stationary point `-B⁻¹ b`. No subsequence extraction is needed: the time
+averages themselves converge to the stationary point.
+Assumes: `K` convex, closed and bounded; `B` invertible; `w` differentiable everywhere with
+the stated derivative; the forward orbit inside `K`. -/
+theorem stationary_mem_of_orbit_mem {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (K : Set (ι → ℝ)) (hKconv : Convex ℝ K) (hKclosed : IsClosed K)
+    (hKbdd : Bornology.IsBounded K) (B : Matrix ι ι ℝ) (hB : IsUnit B.det) (b : ι → ℝ)
+    (w : ℝ → ι → ℝ) (hw : ∀ t, HasDerivAt w (B.mulVec (w t) + b) t)
+    (hmem : ∀ t, 0 ≤ t → w t ∈ K) :
+    -(B⁻¹.mulVec b) ∈ K := by
+  have hcont : Continuous w :=
+    continuous_iff_continuousAt.mpr fun t ↦ (hw t).continuousAt
+  have hmulcont : Continuous fun t ↦ B.mulVec (w t) := by
+    have hcomp :=
+      (LinearMap.toContinuousLinearMap (Matrix.mulVecLin B)).continuous.comp hcont
+    simpa using hcomp
+  have hleft : ∀ x : ι → ℝ, B⁻¹.mulVec (B.mulVec x) = x := by
+    intro x
+    rw [Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul _ hB, Matrix.one_mulVec]
+  have hid : ∀ T : ℝ,
+      B.mulVec (∫ t in (0 : ℝ)..T, w t) + T • b = w T - w 0 := by
+    intro T
+    have hftc : ∫ t in (0 : ℝ)..T, (B.mulVec (w t) + b) = w T - w 0 :=
+      intervalIntegral.integral_eq_sub_of_hasDerivAt (fun x _ ↦ hw x)
+        ((hmulcont.add continuous_const).intervalIntegrable 0 T)
+    have hsplit : ∫ t in (0 : ℝ)..T, (B.mulVec (w t) + b)
+        = B.mulVec (∫ t in (0 : ℝ)..T, w t) + T • b := by
+      rw [intervalIntegral.integral_add (hmulcont.intervalIntegrable 0 T)
+        (continuous_const.intervalIntegrable 0 T)]
+      congr 1
+      · have hcomm := (LinearMap.toContinuousLinearMap
+          (Matrix.mulVecLin B)).intervalIntegral_comp_comm (hcont.intervalIntegrable 0 T)
+        simpa using hcomm
+      · rw [intervalIntegral.integral_const, sub_zero]
+    rw [← hsplit, hftc]
+  have havg : ∀ T : ℝ, 0 < T → (T⁻¹ • ∫ t in (0 : ℝ)..T, w t) ∈ K := by
+    intro T hT
+    have huioc : Set.uIoc (0 : ℝ) T = Set.Ioc 0 T := Set.uIoc_of_le hT.le
+    have hvol : MeasureTheory.volume (Set.uIoc (0 : ℝ) T) ≠ 0 := by
+      rw [huioc, Real.volume_Ioc, sub_zero, Ne, ENNReal.ofReal_eq_zero, not_le]
+      exact hT
+    have hvolfin : MeasureTheory.volume (Set.uIoc (0 : ℝ) T) ≠ ⊤ := by
+      rw [huioc, Real.volume_Ioc]
+      exact ENNReal.ofReal_ne_top
+    have hae : ∀ᵐ x ∂(MeasureTheory.volume.restrict (Set.uIoc (0 : ℝ) T)), w x ∈ K := by
+      filter_upwards [MeasureTheory.ae_restrict_mem measurableSet_uIoc] with x hx
+      rw [huioc] at hx
+      exact hmem x hx.1.le
+    have hint : MeasureTheory.IntegrableOn w (Set.uIoc (0 : ℝ) T) :=
+      intervalIntegrable_iff.mp (hcont.intervalIntegrable 0 T)
+    have hrw : (T⁻¹ • ∫ t in (0 : ℝ)..T, w t) = ⨍ t in (0 : ℝ)..T, w t := by
+      rw [interval_average_eq, sub_zero]
+    rw [hrw]
+    exact hKconv.set_average_mem hKclosed hvol hvolfin hae hint
+  obtain ⟨bound, hbound⟩ := isBounded_iff_forall_norm_le.mp hKbdd
+  have hdiff : ∀ T : ℝ, 0 < T →
+      (T⁻¹ • ∫ t in (0 : ℝ)..T, w t) - -(B⁻¹.mulVec b)
+        = B⁻¹.mulVec (T⁻¹ • (w T - w 0)) := by
+    intro T hT
+    have hTne : (T : ℝ) ≠ 0 := hT.ne'
+    have hkey : B.mulVec (T⁻¹ • ∫ t in (0 : ℝ)..T, w t) + b = T⁻¹ • (w T - w 0) := by
+      have hscale : B.mulVec (T⁻¹ • ∫ t in (0 : ℝ)..T, w t)
+          = T⁻¹ • B.mulVec (∫ t in (0 : ℝ)..T, w t) := Matrix.mulVec_smul _ _ _
+      have hsolve : B.mulVec (∫ t in (0 : ℝ)..T, w t) = w T - w 0 - T • b := by
+        rw [← hid T]
+        abel
+      rw [hscale, hsolve, smul_sub, smul_smul, inv_mul_cancel₀ hTne, one_smul]
+      abel
+    calc (T⁻¹ • ∫ t in (0 : ℝ)..T, w t) - -(B⁻¹.mulVec b)
+        = B⁻¹.mulVec (B.mulVec (T⁻¹ • ∫ t in (0 : ℝ)..T, w t)) + B⁻¹.mulVec b := by
+          rw [hleft, sub_neg_eq_add]
+      _ = B⁻¹.mulVec (B.mulVec (T⁻¹ • ∫ t in (0 : ℝ)..T, w t) + b) :=
+          (Matrix.mulVec_add _ _ _).symm
+      _ = B⁻¹.mulVec (T⁻¹ • (w T - w 0)) := by rw [hkey]
+  have hnormbound : ∀ T : ℝ, 0 < T →
+      ‖(T⁻¹ • ∫ t in (0 : ℝ)..T, w t) - -(B⁻¹.mulVec b)‖
+        ≤ ‖B⁻¹‖ * (T⁻¹ * (2 * bound)) := by
+    intro T hT
+    rw [hdiff T hT]
+    refine (Matrix.linfty_opNorm_mulVec _ _).trans ?_
+    refine mul_le_mul_of_nonneg_left ?_ (norm_nonneg _)
+    rw [norm_smul, Real.norm_eq_abs, abs_of_nonneg (inv_nonneg.mpr hT.le)]
+    refine mul_le_mul_of_nonneg_left ?_ (inv_nonneg.mpr hT.le)
+    have hwT : ‖w T‖ ≤ bound := hbound _ (hmem T hT.le)
+    have hw0 : ‖w 0‖ ≤ bound := hbound _ (hmem 0 le_rfl)
+    calc ‖w T - w 0‖ ≤ ‖w T‖ + ‖w 0‖ := norm_sub_le _ _
+      _ ≤ 2 * bound := by linarith
+  have hzero : Filter.Tendsto
+      (fun T : ℝ ↦ (T⁻¹ • ∫ t in (0 : ℝ)..T, w t) - -(B⁻¹.mulVec b))
+      Filter.atTop (nhds 0) := by
+    refine squeeze_zero_norm'
+      (a := fun T : ℝ ↦ ‖B⁻¹‖ * (T⁻¹ * (2 * bound))) ?_ ?_
+    · filter_upwards [Filter.eventually_gt_atTop (0 : ℝ)] with T hT
+      exact hnormbound T hT
+    · have hscaled := (tendsto_inv_atTop_zero.mul_const (2 * bound)).const_mul ‖B⁻¹‖
+      simpa using hscaled
+  have hconst : Filter.Tendsto (fun _ : ℝ ↦ -(B⁻¹.mulVec b)) Filter.atTop
+      (nhds (-(B⁻¹.mulVec b))) := tendsto_const_nhds
+  have hlimit := hzero.add hconst
+  rw [zero_add] at hlimit
+  refine hKclosed.mem_of_tendsto (hlimit.congr fun T ↦ by abel) ?_
+  filter_upwards [Filter.eventually_gt_atTop (0 : ℝ)] with T hT
+  exact havg T hT
+
+/-- **NOTE1 Theorem 3.** Any convex closed bounded set containing a whole forward orbit of the
+one-deme affine system (14) contains the corpus stationary low-order vector. In the intended
+application the set is the one-deme realization body read in the coordinates of (14) and the
+orbit is supplied by the invariance theorem, so this says the ancestral stationary boundary
+has a common haplotype realization. Assumes: the orbit is given. -/
+theorem oneDemeStationaryVector_mem_of_orbit_mem (rates : ManyDemeLDRates 1)
+    (K : Set (Fin 4 → ℝ)) (hKconv : Convex ℝ K) (hKclosed : IsClosed K)
+    (hKbdd : Bornology.IsBounded K) (w : ℝ → Fin 4 → ℝ)
+    (hw : ∀ t, HasDerivAt w ((oneDemeStationaryMatrix rates).mulVec (w t)
+      + stationaryForcing (rates.mutation 0)) t)
+    (hmem : ∀ t, 0 ≤ t → w t ∈ K) :
+    oneDemeStationaryVector rates ∈ K := by
+  rw [oneDemeStationaryVector_eq_neg_inv_mulVec]
+  exact stationary_mem_of_orbit_mem K hKconv hKclosed hKbdd (oneDemeStationaryMatrix rates)
+    (isUnit_det_stationaryMatrix rates) (stationaryForcing (rates.mutation 0)) w hw hmem
+
+end CesaroLimit
 
 end
 

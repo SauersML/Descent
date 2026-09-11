@@ -19,3 +19,12 @@ open Descent.Portability.EnlargedLowOrderLDGenerator
 #print axioms embed_eq_enlargedFeature_expectation
 #print axioms locusExchangeableRealizationOfEnlargedFeature
 #print axioms enlargedFeature_eq_diracExpectation
+#print axioms homogeneousGenerator_heterozygosity_row_of_other
+#print axioms lowOrderLDGeneratorMap
+#print axioms lowOrderLDGeneratorMap_apply
+#print axioms moment_eq_sum_basis
+#print axioms homogeneousGenerator_sum_basis
+#print axioms augmentedGenerator_mulVec
+#print axioms rightHeterozygosityMoment
+#print axioms enlargedGenerator_mulVec_stored
+#print axioms enlargedGenerator_mulVec_rightHeterozygosity
