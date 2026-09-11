@@ -29,6 +29,13 @@ namespace Descent.Portability.MultinomialJetCertificate
 #print axioms twoLocusHaplotypeCovariance_eq_sum
 #print axioms resamplingOperator_X_mul_X
 #print axioms JetPolynomialCertificate.mul
+#print axioms JetPolynomialCertificate.ownDemePolynomial
+#print axioms JetPolynomialCertificate.ownDemePolynomial_self
+#print axioms JetPolynomialCertificate.ownDemePolynomial_of_ne
+#print axioms JetPolynomialCertificate.resamplingOperator_C
+#print axioms JetPolynomialCertificate.totalDegree_X_add_X_le
+#print axioms JetPolynomialCertificate.coefficientMass_X_add_X_le
+#print axioms JetPolynomialCertificate.ownDeme
 #print axioms JetPolynomialCertificate.leftFrequency
 #print axioms JetPolynomialCertificate.rightFrequency
 #print axioms JetPolynomialCertificate.linkage

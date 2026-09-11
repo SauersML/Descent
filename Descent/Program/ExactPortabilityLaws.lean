@@ -141,10 +141,15 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
   of the enlarged generator, with nothing assumed: `TwoLocusStageComposition`; the note's
   multinomial drift stage with `⌈1/(c h)⌉` chromosomes and the simultaneous migration stage,
   each with its first-order expansion: `MultinomialDriftStage`, `SimultaneousMigrationPulse`; the
-  uniform remainder `71 / N²` of (10): `MultinomialRemainderConstant`.
+  uniform remainder `71 / N²` of (10): `MultinomialRemainderConstant`; polynomial certificates
+  presenting every enlarged coordinate to (10): `MultinomialJetCertificate`; the stages assembled
+  into a microscopic approximation whose branch type grows as the step shrinks, with Theorem 1
+  for such approximations: `MultinomialMicroscopicApproximation`.
 * Theorem 2 and Corollary 2.1, with no hypotheses: `TwoLocusMicroscopicApproximation`
   (`enlargedMicroscopicApproximation`, `rateEpoch_preserves_locusExchangeable_realization`,
-  `history_present_locusExchangeable_realization`, `history_LDPairDomain`); the closedness-taking
+  `history_present_locusExchangeable_realization`, `history_LDPairDomain`); one epoch through
+  multinomial resampling: `MultinomialMicroscopicApproximation`
+  (`multinomialEpoch_preserves_locusExchangeable_realization`); the closedness-taking
   forms are `TwoLocusRealizabilityPreservation`; histories that also carry admixture pulses:
   `PulseHistoryRealization`; finite interleavings of continuous-rate and integrable-rate segments
   with splits and pulses: `InterleavedHistoryRealization`.
@@ -188,11 +193,11 @@ features, with the approximation hypothesis (3) in sup norm.
 Equation (10) is proved for every polynomial of total degree at most four, with remainder
 `71 · coefficientMass / N²`. The drift
 operator (7) enters through the resampling jet certificates rather than as a displayed identity.
-Both microscopic approximations behind Theorem 2 use a single-draw resampling stage with
-`N = ⌈(c h)^(-1/2)⌉` and a step error of order o(h), not the note's multinomial sample of size
-`⌈1/(c h)⌉`; `TwoLocusStageComposition` runs the simultaneous migration stage, and the
-multinomial drift stage is proved at stage level but not yet assembled into a microscopic
-approximation. The
+The epoch form of Theorem 2 is proved through the note's multinomial sample of size `⌈1/(c h)⌉`
+in `MultinomialMicroscopicApproximation`, whose microscopic kernels change branch type with the
+step size, for every deme count with at least one deme. The history forms compose the same epoch
+statement as proved in `TwoLocusMicroscopicApproximation` through a single-draw stage with
+`N = ⌈(c h)^(-1/2)⌉`, and `TwoLocusStageComposition` runs the simultaneous migration stage. The
 rate laws have strictly positive coalescence, where the note allows `c_i ≥ 0`. §2.4 is proved for
 rate histories with integrable rate coordinates; the propagator is characterized by the integral
 equation. Theorem 2 covers histories of rate epochs, splits and admixture pulses; the pipeline

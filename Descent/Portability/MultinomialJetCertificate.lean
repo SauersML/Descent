@@ -36,11 +36,13 @@ carré du champ `Σ_{a,c} (x_a δ_ac - x_a x_c) ∂_a p ∂_c q`, and on
 `twoLocusHaplotypeCovariance_eq_sum`, which identifies that carré du champ with the corpus
 multinomial covariance of the two gradients that `TwoLocusDiffusionJet.mul` adds.
 
-The base jets are certified directly. `JetPolynomialCertificate.leftFrequency` and
+The base jets read a single deme, and `JetPolynomialCertificate.ownDeme` certifies any such jet
+by a polynomial in that deme and a constant elsewhere, given the jet's value, gradient and drift
+in its own deme. `JetPolynomialCertificate.leftFrequency` and
 `JetPolynomialCertificate.rightFrequency` are the linear polynomials `X_AB + X_Ab` and
-`X_AB + X_aB` in their own deme and constants elsewhere; `JetPolynomialCertificate.linkage` is the
-determinant `X_AB X_ab - X_Ab X_aB`, whose second-order operator is `-D` by
-`resamplingOperator_X_mul_X`, matching the corpus `twoLocusLinkageDrift_eq_neg_linkage`.
+`X_AB + X_aB`; `JetPolynomialCertificate.linkage` is the determinant `X_AB X_ab - X_Ab X_aB`,
+whose second-order operator is `-D` by `resamplingOperator_X_mul_X`, matching the corpus
+`twoLocusLinkageDrift_eq_neg_linkage`.
 
 The corpus coordinate jets are built from these by the jet algebra, so their certificates are
 too: `JetPolynomialCertificate.heterozygosity`, `rightHeterozygosity`, `linkageProduct`,
@@ -53,8 +55,9 @@ consequence for NOTE1 §2.3: one multinomial drift stage at rate `rate` and step
 enlarged coordinate by `step · rate · driftAt`, up to a slack of order `step`.
 
 What is NOT proved in this module: the multinomial microscopic approximation assembled from these
-stages; its branch type depends on the step size, which the corpus `MicroscopicApproximation`
-does not allow.
+stages. Its branch type depends on the step size, so it is not a corpus
+`MicroscopicApproximation`; `MultinomialMicroscopicApproximation` builds it as a step-indexed
+approximation and proves NOTE1 Theorem 1 for that kind.
 
 ## Empirical status
 
@@ -417,114 +420,163 @@ def mul {D : ℕ} {first second : TwoLocusDiffusionJet D}
       hfirst.gradient_eq deme state, hsecond.gradient_eq deme state]
     try ring
 
-/-- The left marginal frequency of deme `index` is certified: in its own deme it is the linear
-polynomial `X_AB + X_Ab`, in any other deme a constant. -/
-def leftFrequency {D : ℕ} (index : Fin D) :
-    JetPolynomialCertificate (twoLocusLeftFrequencyJet index) where
-  polynomial deme state := if deme = index then MvPolynomial.X .AB + MvPolynomial.X .Ab
-    else MvPolynomial.C (state index).leftFrequency
-  degree := 1
+/-! ## Certificates for jets that read one deme -/
+
+/-- The polynomial `own` in deme `index`, and in every other deme the constant `value` read off
+deme `index`'s frequencies. -/
+def ownDemePolynomial {D : ℕ} (index : Fin D) (own : MvPolynomial TwoLocusHaplotype ℝ)
+    (value : TwoLocusHaplotypeFrequencies → ℝ) (deme : Fin D)
+    (state : Fin D → TwoLocusHaplotypeFrequencies) : MvPolynomial TwoLocusHaplotype ℝ :=
+  if deme = index then own else MvPolynomial.C (value (state index))
+
+/-- In its own deme the polynomial is `own`. -/
+theorem ownDemePolynomial_self {D : ℕ} (index : Fin D)
+    (own : MvPolynomial TwoLocusHaplotype ℝ) (value : TwoLocusHaplotypeFrequencies → ℝ)
+    (state : Fin D → TwoLocusHaplotypeFrequencies) :
+    ownDemePolynomial index own value index state = own :=
+  if_pos rfl
+
+/-- In every other deme the polynomial is a constant. -/
+theorem ownDemePolynomial_of_ne {D : ℕ} {index deme : Fin D} (hdeme : deme ≠ index)
+    (own : MvPolynomial TwoLocusHaplotype ℝ) (value : TwoLocusHaplotypeFrequencies → ℝ)
+    (state : Fin D → TwoLocusHaplotypeFrequencies) :
+    ownDemePolynomial index own value deme state = MvPolynomial.C (value (state index)) :=
+  if_neg hdeme
+
+/-- The second-order operator of (10) vanishes on constants. -/
+theorem resamplingOperator_C {H : Type*} [Fintype H] [DecidableEq H] (x : H → ℝ) (a : ℝ) :
+    resamplingOperator x (MvPolynomial.C a) = 0 := by
+  simp [resamplingOperator]
+
+/-- A sum of two coordinates has total degree at most one. -/
+theorem totalDegree_X_add_X_le {H : Type*} (a b : H) :
+    (MvPolynomial.X a + MvPolynomial.X b : MvPolynomial H ℝ).totalDegree ≤ 1 :=
+  (MvPolynomial.totalDegree_add _ _).trans (by simp [MvPolynomial.totalDegree_X])
+
+/-- A sum of two coordinates has coefficient mass at most two. -/
+theorem coefficientMass_X_add_X_le {H : Type*} [DecidableEq H] (a b : H) :
+    coefficientMass (MvPolynomial.X a + MvPolynomial.X b : MvPolynomial H ℝ) ≤ 2 :=
+  (coefficientMass_add_le _ _).trans
+    (by simp [MvPolynomial.X, coefficientMass_monomial] <;> norm_num)
+
+/-- **A certificate for a jet that reads one deme.** If the jet is the polynomial `own` of deme
+`index`'s frequencies, with its gradient and drift in that deme read off `own`, and its gradient
+and drift in every other deme vanish, then `ownDemePolynomial` certifies it, with the degree of
+`own` and a mass bound covering both `own` and the constant. -/
+def ownDeme {D : ℕ} {jet : TwoLocusDiffusionJet D} (index : Fin D)
+    (own : MvPolynomial TwoLocusHaplotype ℝ) (value : TwoLocusHaplotypeFrequencies → ℝ)
+    (degree : ℕ) (hdegree : own.totalDegree ≤ degree) (bound : ℝ)
+    (hmass : coefficientMass own ≤ bound) (hvalue : ∀ frequency, |value frequency| ≤ bound)
+    (value_own : ∀ state,
+      jet.value state = MvPolynomial.eval (haplotypeCoordinate (state index)) own)
+    (value_other : ∀ state, jet.value state = value (state index))
+    (gradient_own : ∀ state observed, jet.gradientAt index state observed =
+      MvPolynomial.eval (haplotypeCoordinate (state index)) (MvPolynomial.pderiv observed own))
+    (gradient_other : ∀ deme, deme ≠ index → ∀ state observed,
+      jet.gradientAt deme state observed = 0)
+    (drift_own : ∀ state,
+      jet.driftAt index state = resamplingOperator (haplotypeCoordinate (state index)) own)
+    (drift_other : ∀ deme, deme ≠ index → ∀ state, jet.driftAt deme state = 0) :
+    JetPolynomialCertificate jet where
+  polynomial := ownDemePolynomial index own value
+  degree := degree
   totalDegree_le deme state := by
-    split_ifs
-    · exact (MvPolynomial.totalDegree_add _ _).trans (by simp [MvPolynomial.totalDegree_X])
-    · simp [MvPolynomial.totalDegree_C]
-  massBound := 2
+    by_cases hdeme : deme = index
+    · rw [hdeme, ownDemePolynomial_self]
+      exact hdegree
+    · rw [ownDemePolynomial_of_ne hdeme, MvPolynomial.totalDegree_C]
+      exact Nat.zero_le degree
+  massBound := bound
   mass_le deme state := by
-    split_ifs
-    · refine (coefficientMass_add_le _ _).trans ?_
-      simp [MvPolynomial.X, coefficientMass_monomial]
-      norm_num
-    · rw [MvPolynomial.C_apply, coefficientMass_monomial,
-        abs_of_nonneg (state index).leftFrequency_nonneg]
-      linarith [(state index).leftFrequency_le_one]
+    by_cases hdeme : deme = index
+    · rw [hdeme, ownDemePolynomial_self]
+      exact hmass
+    · rw [ownDemePolynomial_of_ne hdeme, MvPolynomial.C_apply, coefficientMass_monomial]
+      exact hvalue (state index)
   polynomial_update deme state frequency := by
     by_cases hdeme : deme = index
-    · simp only [if_pos hdeme]
-    · simp only [if_neg hdeme, Function.update_of_ne (Ne.symm hdeme)]
+    · rw [hdeme, ownDemePolynomial_self, ownDemePolynomial_self]
+    · rw [ownDemePolynomial_of_ne hdeme, ownDemePolynomial_of_ne hdeme,
+        Function.update_of_ne (Ne.symm hdeme)]
   value_eq deme state := by
     by_cases hdeme : deme = index
-    · subst hdeme
-      simp [twoLocusLeftFrequencyJet, TwoLocusHaplotypeFrequencies.leftFrequency,
-        haplotypeCoordinate]
-    · rw [if_neg hdeme]
-      exact (MvPolynomial.eval_C _).symm
+    · rw [hdeme, ownDemePolynomial_self]
+      exact value_own state
+    · rw [ownDemePolynomial_of_ne hdeme, MvPolynomial.eval_C]
+      exact value_other state
   gradient_eq deme state observed := by
     by_cases hdeme : deme = index
-    · subst hdeme
+    · rw [hdeme, ownDemePolynomial_self]
+      exact gradient_own state observed
+    · rw [ownDemePolynomial_of_ne hdeme, MvPolynomial.pderiv_C, map_zero]
+      exact gradient_other deme hdeme state observed
+  drift_eq deme state := by
+    by_cases hdeme : deme = index
+    · rw [hdeme, ownDemePolynomial_self]
+      exact drift_own state
+    · rw [ownDemePolynomial_of_ne hdeme, resamplingOperator_C]
+      exact drift_other deme hdeme state
+
+/-- The left marginal frequency of deme `index` is certified by the linear polynomial
+`X_AB + X_Ab` in its own deme and by a constant in every other deme. -/
+def leftFrequency {D : ℕ} (index : Fin D) :
+    JetPolynomialCertificate (twoLocusLeftFrequencyJet index) :=
+  ownDeme index (MvPolynomial.X .AB + MvPolynomial.X .Ab)
+    TwoLocusHaplotypeFrequencies.leftFrequency 1 (totalDegree_X_add_X_le _ _) 2
+    (coefficientMass_X_add_X_le _ _)
+    (fun frequency ↦ by
+      rw [abs_of_nonneg frequency.leftFrequency_nonneg]
+      linarith [frequency.leftFrequency_le_one])
+    (fun _ ↦ by
+      simp [twoLocusLeftFrequencyJet, TwoLocusHaplotypeFrequencies.leftFrequency,
+        haplotypeCoordinate])
+    (fun _ ↦ rfl)
+    (fun _ observed ↦ by
       cases observed <;>
         simp [twoLocusLeftFrequencyJet, twoLocusLeftAlleleIndicator, MvPolynomial.pderiv_X,
-          Pi.single_apply]
-    · simp [twoLocusLeftFrequencyJet, hdeme, MvPolynomial.pderiv_C]
-  drift_eq deme state := by
-    by_cases hdeme : deme = index
-    · subst hdeme
-      simp [twoLocusLeftFrequencyJet, resamplingOperator_add, resamplingOperator_X]
-    · simp [twoLocusLeftFrequencyJet, hdeme, resamplingOperator, MvPolynomial.pderiv_C]
+          Pi.single_apply])
+    (fun _ hdeme _ _ ↦ by simp [twoLocusLeftFrequencyJet, hdeme])
+    (fun _ ↦ by simp [twoLocusLeftFrequencyJet, resamplingOperator_add, resamplingOperator_X])
+    (fun _ hdeme _ ↦ by simp [twoLocusLeftFrequencyJet, hdeme])
 
-/-- The right marginal frequency of deme `index` is certified: in its own deme it is the linear
-polynomial `X_AB + X_aB`, in any other deme a constant. -/
+/-- The right marginal frequency of deme `index` is certified by the linear polynomial
+`X_AB + X_aB` in its own deme and by a constant in every other deme. -/
 def rightFrequency {D : ℕ} (index : Fin D) :
-    JetPolynomialCertificate (twoLocusRightFrequencyJet index) where
-  polynomial deme state := if deme = index then MvPolynomial.X .AB + MvPolynomial.X .aB
-    else MvPolynomial.C (state index).rightFrequency
-  degree := 1
-  totalDegree_le deme state := by
-    split_ifs
-    · exact (MvPolynomial.totalDegree_add _ _).trans (by simp [MvPolynomial.totalDegree_X])
-    · simp [MvPolynomial.totalDegree_C]
-  massBound := 2
-  mass_le deme state := by
-    split_ifs
-    · refine (coefficientMass_add_le _ _).trans ?_
-      simp [MvPolynomial.X, coefficientMass_monomial]
-      norm_num
-    · rw [MvPolynomial.C_apply, coefficientMass_monomial,
-        abs_of_nonneg (state index).rightFrequency_nonneg]
-      linarith [(state index).rightFrequency_le_one]
-  polynomial_update deme state frequency := by
-    by_cases hdeme : deme = index
-    · simp only [if_pos hdeme]
-    · simp only [if_neg hdeme, Function.update_of_ne (Ne.symm hdeme)]
-  value_eq deme state := by
-    by_cases hdeme : deme = index
-    · subst hdeme
+    JetPolynomialCertificate (twoLocusRightFrequencyJet index) :=
+  ownDeme index (MvPolynomial.X .AB + MvPolynomial.X .aB)
+    TwoLocusHaplotypeFrequencies.rightFrequency 1 (totalDegree_X_add_X_le _ _) 2
+    (coefficientMass_X_add_X_le _ _)
+    (fun frequency ↦ by
+      rw [abs_of_nonneg frequency.rightFrequency_nonneg]
+      linarith [frequency.rightFrequency_le_one])
+    (fun _ ↦ by
       simp [twoLocusRightFrequencyJet, TwoLocusHaplotypeFrequencies.rightFrequency,
-        haplotypeCoordinate]
-    · rw [if_neg hdeme]
-      exact (MvPolynomial.eval_C _).symm
-  gradient_eq deme state observed := by
-    by_cases hdeme : deme = index
-    · subst hdeme
+        haplotypeCoordinate])
+    (fun _ ↦ rfl)
+    (fun _ observed ↦ by
       cases observed <;>
         simp [twoLocusRightFrequencyJet, twoLocusRightAlleleIndicator, MvPolynomial.pderiv_X,
-          Pi.single_apply]
-    · simp [twoLocusRightFrequencyJet, hdeme, MvPolynomial.pderiv_C]
-  drift_eq deme state := by
-    by_cases hdeme : deme = index
-    · subst hdeme
-      simp [twoLocusRightFrequencyJet, resamplingOperator_add, resamplingOperator_X]
-    · simp [twoLocusRightFrequencyJet, hdeme, resamplingOperator, MvPolynomial.pderiv_C]
+          Pi.single_apply])
+    (fun _ hdeme _ _ ↦ by simp [twoLocusRightFrequencyJet, hdeme])
+    (fun _ ↦ by simp [twoLocusRightFrequencyJet, resamplingOperator_add, resamplingOperator_X])
+    (fun _ hdeme _ ↦ by simp [twoLocusRightFrequencyJet, hdeme])
 
-/-- The linkage determinant of deme `index` is certified: in its own deme it is the quadratic
-polynomial `X_AB X_ab - X_Ab X_aB`, whose second-order operator is `-D`, in any other deme a
-constant. -/
-def linkage {D : ℕ} (index : Fin D) : JetPolynomialCertificate (twoLocusLinkageJet index) where
-  polynomial deme state := if deme = index then
-      MvPolynomial.X .AB * MvPolynomial.X .ab
-        + (-1 : ℝ) • (MvPolynomial.X .Ab * MvPolynomial.X .aB)
-    else MvPolynomial.C (state index).linkage
-  degree := 2
-  totalDegree_le deme state := by
-    split_ifs
-    · refine (MvPolynomial.totalDegree_add _ _).trans (max_le ?_ ?_)
+/-- The linkage determinant of deme `index` is certified by the quadratic polynomial
+`X_AB X_ab - X_Ab X_aB` in its own deme, whose second-order operator is `-D`, and by a constant
+in every other deme. -/
+def linkage {D : ℕ} (index : Fin D) : JetPolynomialCertificate (twoLocusLinkageJet index) :=
+  ownDeme index
+    (MvPolynomial.X .AB * MvPolynomial.X .ab
+      + (-1 : ℝ) • (MvPolynomial.X .Ab * MvPolynomial.X .aB))
+    TwoLocusHaplotypeFrequencies.linkage 2
+    (by
+      refine (MvPolynomial.totalDegree_add _ _).trans (max_le ?_ ?_)
       · exact (MvPolynomial.totalDegree_mul _ _).trans (by simp [MvPolynomial.totalDegree_X])
       · exact (MvPolynomial.totalDegree_smul_le _ _).trans
-          ((MvPolynomial.totalDegree_mul _ _).trans (by simp [MvPolynomial.totalDegree_X]))
-    · simp [MvPolynomial.totalDegree_C]
-  massBound := 2
-  mass_le deme state := by
-    split_ifs
-    · refine (coefficientMass_add_le _ _).trans ?_
+          ((MvPolynomial.totalDegree_mul _ _).trans (by simp [MvPolynomial.totalDegree_X])))
+    2
+    (by
+      refine (coefficientMass_add_le _ _).trans ?_
       have hfirst : coefficientMass (MvPolynomial.X TwoLocusHaplotype.AB
           * MvPolynomial.X TwoLocusHaplotype.ab : MvPolynomial TwoLocusHaplotype ℝ) ≤ 1 :=
         (coefficientMass_mul_le _ _).trans (by simp [MvPolynomial.X, coefficientMass_monomial])
@@ -533,42 +585,25 @@ def linkage {D : ℕ} (index : Fin D) : JetPolynomialCertificate (twoLocusLinkag
         (coefficientMass_mul_le _ _).trans (by simp [MvPolynomial.X, coefficientMass_monomial])
       have habs : |(-1 : ℝ)| = 1 := by norm_num
       rw [coefficientMass_smul, habs]
-      linarith
-    · rw [MvPolynomial.C_apply, coefficientMass_monomial]
-      linarith [(state index).linkage_abs_le_quarter]
-  polynomial_update deme state frequency := by
-    by_cases hdeme : deme = index
-    · simp only [if_pos hdeme]
-    · simp only [if_neg hdeme, Function.update_of_ne (Ne.symm hdeme)]
-  value_eq deme state := by
-    by_cases hdeme : deme = index
-    · subst hdeme
-      rw [if_pos rfl]
-      simp only [twoLocusLinkageJet, map_add, map_mul, MvPolynomial.smul_eval, MvPolynomial.eval_X,
-        haplotypeCoordinate, TwoLocusHaplotypeFrequencies.linkage]
-      ring
-    · rw [if_neg hdeme]
-      exact (MvPolynomial.eval_C _).symm
-  gradient_eq deme state observed := by
-    by_cases hdeme : deme = index
-    · subst hdeme
-      rw [if_pos rfl]
+      linarith)
+    (fun frequency ↦ by linarith [frequency.linkage_abs_le_quarter])
+    (fun _ ↦ by
+      simp only [twoLocusLinkageJet, map_add, map_mul, MvPolynomial.smul_eval,
+        MvPolynomial.eval_X, haplotypeCoordinate, TwoLocusHaplotypeFrequencies.linkage]
+      ring)
+    (fun _ ↦ rfl)
+    (fun _ observed ↦ by
       cases observed <;>
         simp [twoLocusLinkageJet, twoLocusLinkageGradient, MvPolynomial.pderiv_mul,
-          MvPolynomial.pderiv_X, Pi.single_apply, MvPolynomial.smul_eval, haplotypeCoordinate]
-    · rw [if_neg hdeme]
-      simp [twoLocusLinkageJet, hdeme, MvPolynomial.pderiv_C]
-  drift_eq deme state := by
-    by_cases hdeme : deme = index
-    · subst hdeme
-      rw [if_pos rfl]
-      simp only [twoLocusLinkageJet, if_pos rfl, twoLocusLinkageDrift_eq_neg_linkage,
+          MvPolynomial.pderiv_X, Pi.single_apply, MvPolynomial.smul_eval, haplotypeCoordinate])
+    (fun _ hdeme _ _ ↦ by simp [twoLocusLinkageJet, hdeme])
+    (fun _ ↦ by
+      simp only [twoLocusLinkageJet, twoLocusLinkageDrift_eq_neg_linkage,
         resamplingOperator_add, resamplingOperator_smul, resamplingOperator_X_mul_X,
         TwoLocusHaplotypeFrequencies.linkage, haplotypeCoordinate, reduceCtorEq, if_false,
         if_true]
-      try ring
-    · rw [if_neg hdeme]
-      simp [twoLocusLinkageJet, hdeme, resamplingOperator, MvPolynomial.pderiv_C]
+      try ring)
+    (fun _ hdeme _ ↦ by simp [twoLocusLinkageJet, hdeme])
 
 /-- The centred left-marginal contrast `1 - 2 p` of deme `index`. -/
 def leftContrast {D : ℕ} (index : Fin D) :
