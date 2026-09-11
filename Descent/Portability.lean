@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.TaggedMixtureCompleteness
 import Descent.Portability.PulseHistoryRealization
 import Descent.Portability.JointMetricMomentDeterminacy
 import Descent.Portability.TwoLocusStageComposition
