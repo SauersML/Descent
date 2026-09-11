@@ -149,8 +149,9 @@ def exampleMass : Fin 3 → ℝ := ![1 / 2, 1 / 4, 1 / 4]
 which is what puts it outside the definedness domain. -/
 def exampleSourceNum : Fin 3 → ℝ := ![0, 1, 1]
 
-/-- The source numerators of the separating example coincide with the corpus transplantation
-target vector `transplantTarget`: one zero coordinate followed by two unit coordinates. -/
+/-- The source numerators of the separating example and `transplantTarget` are the same
+vector `![0, 1, 1]`.  The two definitions are unrelated; this records only that the values
+agree. -/
 theorem exampleSourceNum_eq_transplantTarget : exampleSourceNum = transplantTarget := rfl
 
 /-- The source denominators of the separating example. -/
