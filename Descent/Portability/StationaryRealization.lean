@@ -110,7 +110,7 @@ theorem det_stationaryMatrix_eq_minor (c theta rho : ℝ) :
     (stationaryMatrix c theta rho).det
       = -(c + 2 * theta) * (stationaryMinor c theta rho).det := by
   rw [Matrix.det_succ_row_zero, Fin.sum_univ_four, submatrix_stationaryMatrix]
-  simp [stationaryMatrix] <;> ring
+  simp [stationaryMatrix]
 
 /-- The minor of NOTE1 (14) has determinant exactly minus the corpus stationary
 denominator. -/
@@ -118,7 +118,8 @@ theorem det_stationaryMinor (rates : ManyDemeLDRates 1) :
     (stationaryMinor (rates.coalescence 0) (rates.mutation 0)
         (rates.recombination 0)).det
       = -oneDemeLDStationaryDenominator rates := by
-  simp [stationaryMinor, Matrix.det_fin_three, oneDemeLDStationaryDenominator] <;> ring
+  simp [stationaryMinor, Matrix.det_fin_three, oneDemeLDStationaryDenominator]
+  ring
 
 /-- **NOTE1 (15).** The determinant of the one-deme system matrix is exactly
 `(c + 2 theta)` times the corpus stationary denominator, with no sign correction. -/
@@ -224,7 +225,8 @@ theorem stationary_mem_of_orbit_mem {ι : Type*} [Fintype ι] [DecidableEq ι]
         (continuous_const.intervalIntegrable 0 T)]
       congr 1
       · have hcomm := (LinearMap.toContinuousLinearMap
-          (Matrix.mulVecLin B)).intervalIntegral_comp_comm (hcont.intervalIntegrable 0 T)
+          (Matrix.mulVecLin B)).intervalIntegral_comp_comm
+            (hcont.intervalIntegrable (μ := MeasureTheory.volume) 0 T)
         simpa using hcomm
       · rw [intervalIntegral.integral_const, sub_zero]
     rw [← hsplit, hftc]

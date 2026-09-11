@@ -144,7 +144,8 @@ theorem exists_firstHalt (code : Code) (input : ℕ) (hdom : (Code.eval code inp
     exact absurd (Code.evaln_bound hmem0) (Nat.not_lt_zero input)
   obtain ⟨earlier, hearlier⟩ := Nat.exists_eq_succ_of_ne_zero hne
   refine ⟨earlier, (firstHalt_iff code input earlier).mpr ⟨?_, ?_⟩⟩
-  · rw [← hearlier]
+  · have hsucc : Nat.find hex = earlier + 1 := hearlier
+    rw [← hsucc]
     exact hspec
   · have hlt : earlier < Nat.find hex := by
       rw [hearlier]
@@ -261,8 +262,11 @@ theorem not_computable_rational_approximation (input : ℕ) :
   rintro ⟨numerator, denominator, hnum, hden, hpos, happrox⟩
   have hmul : Computable fun code ↦ 2 * numerator code :=
     (Primrec₂.to_comp Primrec.nat_mul).comp (Computable.const 2) hnum
+  have hltcomp : Computable fun pair : ℕ × ℕ ↦ decide (pair.1 < pair.2) := by
+    obtain ⟨_, hltprim⟩ := (Primrec.nat_lt : PrimrecRel ((· < ·) : ℕ → ℕ → Prop))
+    exact hltprim.to_comp.of_eq fun _ ↦ decide_eq_decide.mpr Iff.rfl
   have hcomp : Computable fun code ↦ decide (denominator code < 2 * numerator code) :=
-    (Primrec₂.to_comp Primrec.nat_lt).comp hden hmul
+    hltcomp.comp (hden.pair hmul)
   have hiff : ∀ code : Code,
       denominator code < 2 * numerator code ↔ (Code.eval code input).Dom := by
     intro code
