@@ -507,6 +507,10 @@ import Descent.Portability.PairedMedianOfMeans
 
 import Descent.Portability.TailRepairCertification
 
+import Descent.Portability.AuditRayleighGeometry
+import Descent.Portability.SpectralAuditDesign
+import Descent.Portability.SpectralAuditTrace
+
 assert_below Descent.Program
 
 /-!

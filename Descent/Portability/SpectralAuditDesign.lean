@@ -68,7 +68,8 @@ theorem objective_convex (κ floor c : ι → ℝ) (u : ι → E) (B : ℝ)
 theorem objective_continuous (κ floor c : ι → ℝ) (u : ι → E) (B : ℝ)
     (hκ : ∀ i, 0 ≤ κ i) (hf : ∀ i, 0 < floor i) :
     ContinuousOn (objective κ u) {p | Feasible floor c B p} := by
-  apply largest_continuousOn _ (fun p i ↦ κ i / p i) u
+  unfold objective
+  apply largest_continuousOn {p | Feasible floor c B p} (fun p i ↦ κ i / p i) u
   · intro p hp i
     exact div_nonneg (hκ i) ((hf i).trans_le (hp.1 i).1).le
   · intro i
