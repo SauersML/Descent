@@ -252,8 +252,9 @@ theorem uniform_linSign_variance {k : ℕ} (c : Fin k → ℝ) :
       = fun z ↦ linSign c z * linSign c z := by
     funext z
     ring
-  rw [variance_eq_expect_sq_sub_sq_mean, uniform_linSign_mean, hsq, uniform_linSign_mul]
-  simp only [sub_zero]
+  have hz : ((0 : ℝ)) ^ 2 = 0 := by norm_num
+  rw [variance_eq_expect_sq_sub_sq_mean, uniform_linSign_mean, hsq, uniform_linSign_mul, hz,
+    sub_zero]
   exact Finset.sum_congr rfl fun i _ ↦ (pow_two (c i)).symm
 
 /-- Splitting a `Fin.snoc` bilinear sum into its head block and its last coordinate. -/
@@ -437,7 +438,9 @@ def independentTurnover (n : ℕ) (m : ℝ) (hm : -1 ≤ m) (hm' : m ≤ 1) :
 /-- **Synchronised turnover.**  One shared sign drives every locus, with mean `m`. -/
 def synchronizedTurnover (m : ℝ) (hm : -1 ≤ m) (hm' : m ≤ 1) : ExpFunctional Bool :=
   weightedExp (fun c ↦ (1 + m * sgn c) / 2)
-    (fun c ↦ by rcases sgn_cases c with h | h <;> rw [h] <;> linarith)
+    (fun c ↦ by
+      show (0 : ℝ) ≤ (1 + m * sgn c) / 2
+      rcases sgn_cases c with h | h <;> rw [h] <;> linarith)
     (by rw [Fintype.sum_bool, sgn_true, sgn_false]; ring)
 
 /-- The effect-sign configuration of the independent mechanism. -/
@@ -463,7 +466,7 @@ theorem turnover_mechanisms_share_marginals (m : ℝ) (hm : -1 ≤ m) (hm' : m �
     simp only [independentSigns, sgn_sq, mul_one]
     exact sum_bernoulliSign n m
   · rw [synchronizedTurnover, weightedExp_apply, Fintype.sum_bool]
-    simp only [synchronizedSigns, sgn_sq]
+    simp only [synchronizedSigns, sgn_sq, sgn_true, sgn_false]
     ring
 
 /-- Cross-locus second moments of the independent mechanism. -/
@@ -757,7 +760,7 @@ theorem turnover_monotonicity_criterion (w b : Fin n → ℝ) (sigma lam s t : �
       = (Real.exp (-(4 * lam * t)) - Real.exp (-(4 * lam * s))) * crossPower n w b
           / ((∑ i, w i ^ 2) * ((∑ i, b i ^ 2) + sigma ^ 2)) := by
     unfold independentTurnoverAccuracy
-    rw [retention_sq, retention_sq, div_sub_div_same, ← sub_div]
+    rw [retention_sq, retention_sq, div_sub_div_same]
     congr 1
     ring
   have hneg : Real.exp (-(4 * lam * t)) - Real.exp (-(4 * lam * s)) < 0 := by linarith
@@ -780,7 +783,7 @@ theorem turnover_monotonicity_criterion (w b : Fin n → ℝ) (sigma lam s t : �
     · intro hB
       left
       rw [hB, mul_zero]
-  · rw [← sub_pos, ← neg_sub, neg_pos, hdiff, div_neg_iff]
+  · rw [← sub_pos, hdiff, div_pos_iff]
     constructor
     · rintro (⟨h1, h2⟩ | ⟨h1, h2⟩)
       · nlinarith
