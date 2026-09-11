@@ -1,7 +1,7 @@
 {
  "_NOT_AUTHORITATIVE": "The committed copy of this file is STALE BY CONSTRUCTION: the Lean corpus moves every few minutes and this is a cache of it. Do not consume a committed copy -- run validation/extract/emit.py in your own worktree immediately before use, and call api.require_fresh(), which raises if the table does not describe the Lean on disk.",
- "source_digest": "sha256:e89ec0057b9becdd12137cbfbe214753",
- "source_files": 644,
+ "source_digest": "sha256:fedb1026ff33a6a88ec1de0367a6932a",
+ "source_files": 648,
  "collisions": {},
  "theorems": [
   {
@@ -72442,6 +72442,58 @@
    ]
   },
   {
+   "name": "Descent.Portability.ErasedSampleObservation.erased_sample_map",
+   "kind": "theorem",
+   "file": "Descent/Portability/ErasedSampleObservation.lean",
+   "line": 28,
+   "statement": "(η : ℝ) (hη : 0 ≤ η ∧ η ≤ 1) (v : ℝ≥0) (θ : ℝ) (M : ℕ) : (Measure.pi (fun _ : Fin M ↦ experimentLaw η v θ)).map (fun x i ↦ (x i).2) = erasedSampleLaw η v θ M",
+   "mentions": [
+    "erasedSampleLaw",
+    "experimentLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ErasedSampleObservation.erasure_measurable",
+   "kind": "theorem",
+   "file": "Descent/Portability/ErasedSampleObservation.lean",
+   "line": 37,
+   "statement": "(M : ℕ) : Measurable (fun x : Fin M → Bool × ℝ ↦ fun i ↦ (x i).2)",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Portability.ErasedSampleObservation.outcome_average_measurable",
+   "kind": "theorem",
+   "file": "Descent/Portability/ErasedSampleObservation.lean",
+   "line": 42,
+   "statement": "(η : ℝ) (M : ℕ) : Measurable (average (fun y : ℝ ↦ y / η) M)",
+   "mentions": [
+    "average"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ErasedSampleObservation.erased_observation_unbiased",
+   "kind": "theorem",
+   "file": "Descent/Portability/ErasedSampleObservation.lean",
+   "line": 48,
+   "statement": "(η : ℝ) (hη : 0 < η ∧ η ≤ 1) (v : ℝ≥0) (θ : ℝ) (M : ℕ) (hM : 0 < M) : (∫ y, average (fun u : ℝ ↦ u / η) M y ∂erasedSampleLaw η v θ M) = θ",
+   "mentions": [
+    "average",
+    "erasedSampleLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ErasedSampleObservation.erased_observation_variance",
+   "kind": "theorem",
+   "file": "Descent/Portability/ErasedSampleObservation.lean",
+   "line": 57,
+   "statement": "(η : ℝ) (hη : 0 < η ∧ η ≤ 1) (v : ℝ≥0) (M : ℕ) (hM : 0 < M) : variance (average (fun u : ℝ ↦ u / η) M) (erasedSampleLaw η v 0 M) = (v : ℝ) / ((M : ℝ) * η ^ 2)",
+   "mentions": [
+    "average",
+    "erasedSampleLaw",
+    "variance"
+   ]
+  },
+  {
    "name": "Descent.Portability.EscapingCharacteristicKernel.kernel_inverse_bound",
    "kind": "theorem",
    "file": "Descent/Portability/EscapingCharacteristicKernel.lean",
@@ -87969,7 +88021,9 @@
    "file": "Descent/Portability/PCCorrectability/Diagnostic.lean",
    "line": 400,
    "statement": "{Parameter Observation : Type} (observe : Parameter → Observation) (causalTarget : Parameter → ℝ) (confoundedNull causalAlternative : Parameter) (h_observation : observe confoundedNull = observe causalAlternative) (h_target : causalTarget confoundedNull ≠ causalTarget causalAlternative) : ¬ ∃ estimator : Observation → ℝ, ∀ parameter, estimator (observe parameter) = causalTarget parameter",
-   "mentions": []
+   "mentions": [
+    "Observation"
+   ]
   },
   {
    "name": "Descent.Portability.more_exact_population_pcs_reduce_modeled_residual",
@@ -92203,6 +92257,199 @@
     "factor",
     "linearScoreFiles",
     "thresholdRows"
+   ]
+  },
+  {
+   "name": "Descent.Portability.PartialLabelAssayDesign.informationPerCost_eq",
+   "kind": "theorem",
+   "file": "Descent/Portability/PartialLabelAssayDesign.lean",
+   "line": 34,
+   "statement": "(η : ℝ) (hη : 0 < η ∧ η < 1) (v : ℝ≥0) (hv : v ≠ 0) (c₀ c₁ q : ℝ) (hq : 0 ≤ q ∧ q ≤ 1) : informationPerCost η v c₀ c₁ q = designRate η c₀ c₁ q / v",
+   "mentions": [
+    "designRate",
+    "informationPerCost"
+   ]
+  },
+  {
+   "name": "Descent.Portability.PartialLabelAssayDesign.cost_pos",
+   "kind": "theorem",
+   "file": "Descent/Portability/PartialLabelAssayDesign.lean",
+   "line": 41,
+   "statement": "(c₀ c₁ q : ℝ) (hc₀ : 0 < c₀) (hc₁ : 0 ≤ c₁) (hq : 0 ≤ q) : 0 < c₀ + q * c₁",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Portability.PartialLabelAssayDesign.designRate_difference",
+   "kind": "theorem",
+   "file": "Descent/Portability/PartialLabelAssayDesign.lean",
+   "line": 45,
+   "statement": "(η c₀ c₁ q₁ q₂ : ℝ) (hc₀ : 0 < c₀) (hc₁ : 0 ≤ c₁) (hq₁ : 0 ≤ q₁) (hq₂ : 0 ≤ q₂) : designRate η c₀ c₁ q₂ - designRate η c₀ c₁ q₁ = η * (q₂ - q₁) * ((1 - η) * c₀ - η * c₁) / ((c₀ + q₁ * c₁) * (c₀ + q₂ * c₁))",
+   "mentions": [
+    "designRate"
+   ]
+  },
+  {
+   "name": "Descent.Portability.PartialLabelAssayDesign.full_label_threshold",
+   "kind": "theorem",
+   "file": "Descent/Portability/PartialLabelAssayDesign.lean",
+   "line": 57,
+   "statement": "(η c₀ c₁ : ℝ) (hη : 0 < η) (hc₀ : 0 < c₀) : c₁ / c₀ < (1 - η) / η ↔ 0 < (1 - η) * c₀ - η * c₁",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Portability.PartialLabelAssayDesign.full_label_strictly_optimal",
+   "kind": "theorem",
+   "file": "Descent/Portability/PartialLabelAssayDesign.lean",
+   "line": 63,
+   "statement": "(η : ℝ) (hη : 0 < η ∧ η < 1) (v : ℝ≥0) (hv : v ≠ 0) (c₀ c₁ : ℝ) (hc₀ : 0 < c₀) (hc₁ : 0 ≤ c₁) (hc : c₁ / c₀ < (1 - η) / η) (q : ℝ) (hq : 0 ≤ q ∧ q < 1) : informationPerCost η v c₀ c₁ q < informationPerCost η v c₀ c₁ 1",
+   "mentions": [
+    "informationPerCost"
+   ]
+  },
+  {
+   "name": "Descent.Portability.PartialLabelAssayDesign.no_label_strictly_optimal",
+   "kind": "theorem",
+   "file": "Descent/Portability/PartialLabelAssayDesign.lean",
+   "line": 78,
+   "statement": "(η : ℝ) (hη : 0 < η ∧ η < 1) (v : ℝ≥0) (hv : v ≠ 0) (c₀ c₁ : ℝ) (hc₀ : 0 < c₀) (hc₁ : 0 ≤ c₁) (hc : (1 - η) / η < c₁ / c₀) (q : ℝ) (hq : 0 < q ∧ q ≤ 1) : informationPerCost η v c₀ c₁ q < informationPerCost η v c₀ c₁ 0",
+   "mentions": [
+    "informationPerCost"
+   ]
+  },
+  {
+   "name": "Descent.Portability.PartialLabelAssayDesign.all_fractions_tie",
+   "kind": "theorem",
+   "file": "Descent/Portability/PartialLabelAssayDesign.lean",
+   "line": 95,
+   "statement": "(η : ℝ) (hη : 0 < η ∧ η < 1) (v : ℝ≥0) (hv : v ≠ 0) (c₀ c₁ : ℝ) (hc₀ : 0 < c₀) (hc₁ : 0 ≤ c₁) (hc : c₁ / c₀ = (1 - η) / η) (q : ℝ) (hq : 0 ≤ q ∧ q ≤ 1) : informationPerCost η v c₀ c₁ q = informationPerCost η v c₀ c₁ 0",
+   "mentions": [
+    "informationPerCost"
+   ]
+  },
+  {
+   "name": "Descent.Portability.PartialLabelExperiment.observationLaw_probability",
+   "kind": "theorem",
+   "file": "Descent/Portability/PartialLabelExperiment.lean",
+   "line": 42,
+   "statement": "(q η : ℝ) (hq : 0 ≤ q ∧ q ≤ 1) (hη : 0 ≤ η ∧ η ≤ 1) (v : ℝ≥0) (θ : ℝ) : IsProbabilityMeasure (observationLaw q η v θ)",
+   "mentions": [
+    "observationLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.PartialLabelExperiment.scaled_log_score",
+   "kind": "theorem",
+   "file": "Descent/Portability/PartialLabelExperiment.lean",
+   "line": 58,
+   "statement": "(f : ℝ → ℝ) (hf : ∀ θ, f θ ≠ 0) (a s : ℝ) (ha : a ≠ 0) (hs : HasDerivAt (fun θ ↦ Real.log (f θ)) s 0) : HasDerivAt (fun θ ↦ Real.log (a * f θ)) s 0",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Portability.PartialLabelExperiment.markedDensity_pos",
+   "kind": "theorem",
+   "file": "Descent/Portability/PartialLabelExperiment.lean",
+   "line": 68,
+   "statement": "(η : ℝ) (hη : 0 < η ∧ η < 1) (v : ℝ≥0) (hv : v ≠ 0) (θ : ℝ) (z : Bool) (y : ℝ) : 0 < markedDensity η v θ z y",
+   "mentions": [
+    "markedDensity"
+   ]
+  },
+  {
+   "name": "Descent.Portability.PartialLabelExperiment.erasedDensity_pos",
+   "kind": "theorem",
+   "file": "Descent/Portability/PartialLabelExperiment.lean",
+   "line": 76,
+   "statement": "(η : ℝ) (hη : 0 < η ∧ η < 1) (v : ℝ≥0) (hv : v ≠ 0) (θ y : ℝ) : 0 < erasedDensity η v θ y",
+   "mentions": [
+    "erasedDensity"
+   ]
+  },
+  {
+   "name": "Descent.Portability.PartialLabelExperiment.observation_log_score",
+   "kind": "theorem",
+   "file": "Descent/Portability/PartialLabelExperiment.lean",
+   "line": 82,
+   "statement": "(q η : ℝ) (hη : 0 < η ∧ η < 1) (v : ℝ≥0) (hv : v ≠ 0) (o : Observation) : HasDerivAt (fun θ ↦ Real.log (observationDensity q η v θ o)) (nullScore q η v o) 0",
+   "mentions": [
+    "Observation",
+    "nullScore",
+    "observationDensity"
+   ]
+  },
+  {
+   "name": "Descent.Portability.PartialLabelExperiment.nullScore_measurable",
+   "kind": "theorem",
+   "file": "Descent/Portability/PartialLabelExperiment.lean",
+   "line": 102,
+   "statement": "(q η : ℝ) (v : ℝ≥0) : Measurable (nullScore q η v)",
+   "mentions": [
+    "nullScore"
+   ]
+  },
+  {
+   "name": "Descent.Portability.PartialLabelFisher.null_erased_law",
+   "kind": "theorem",
+   "file": "Descent/Portability/PartialLabelFisher.lean",
+   "line": 24,
+   "statement": "(η : ℝ) (hη : 0 ≤ η ∧ η ≤ 1) (v : ℝ≥0) : (experimentLaw η v 0).map Prod.snd = gaussianReal 0 v",
+   "mentions": [
+    "experimentLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.PartialLabelFisher.observation_integral",
+   "kind": "theorem",
+   "file": "Descent/Portability/PartialLabelFisher.lean",
+   "line": 35,
+   "statement": "(q η : ℝ) (hq : 0 ≤ q ∧ q ≤ 1) (v : ℝ≥0) (θ : ℝ) (f : Observation → ℝ) (hf : Measurable f) (hl : Integrable (fun zy ↦ f (.inl zy)) (experimentLaw η v θ)) (he : Integrable (fun y ↦ f (.inr y)) ((experimentLaw η v θ).map Prod.snd)) : (∫ o, f o ∂observationLaw q η v θ) = q * (∫ zy, f (.inl zy) ∂experimentLaw η v θ) + (1 - q) * (∫ y, f (.inr y) ∂(experimentLaw η v θ).map Prod.snd)",
+   "mentions": [
+    "Observation",
+    "experimentLaw",
+    "observationLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.PartialLabelFisher.labeled_score_integrable",
+   "kind": "theorem",
+   "file": "Descent/Portability/PartialLabelFisher.lean",
+   "line": 54,
+   "statement": "(q η : ℝ) (v : ℝ≥0) : Integrable (fun zy ↦ nullScore q η v (.inl zy) ^ 2) (experimentLaw η v 0)",
+   "mentions": [
+    "experimentLaw",
+    "nullScore"
+   ]
+  },
+  {
+   "name": "Descent.Portability.PartialLabelFisher.erased_score_integrable",
+   "kind": "theorem",
+   "file": "Descent/Portability/PartialLabelFisher.lean",
+   "line": 65,
+   "statement": "(q η : ℝ) (hη : 0 ≤ η ∧ η ≤ 1) (v : ℝ≥0) : Integrable (fun y ↦ nullScore q η v (.inr y) ^ 2) ((experimentLaw η v 0).map Prod.snd)",
+   "mentions": [
+    "experimentLaw",
+    "nullScore"
+   ]
+  },
+  {
+   "name": "Descent.Portability.PartialLabelFisher.nullScore_second",
+   "kind": "theorem",
+   "file": "Descent/Portability/PartialLabelFisher.lean",
+   "line": 75,
+   "statement": "(q η : ℝ) (hq : 0 ≤ q ∧ q ≤ 1) (hη : 0 < η ∧ η < 1) (v : ℝ≥0) (hv : v ≠ 0) : (∫ o, nullScore q η v o ^ 2 ∂observationLaw q η v 0) = (q * η + (1 - q) * η ^ 2) / v",
+   "mentions": [
+    "nullScore",
+    "observationLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.PartialLabelFisher.partial_fisher_information",
+   "kind": "theorem",
+   "file": "Descent/Portability/PartialLabelFisher.lean",
+   "line": 100,
+   "statement": "(q η : ℝ) (hq : 0 ≤ q ∧ q ≤ 1) (hη : 0 < η ∧ η < 1) (v : ℝ≥0) (hv : v ≠ 0) : (∫ o, (deriv (fun θ ↦ Real.log (observationDensity q η v θ o)) 0) ^ 2 ∂observationLaw q η v 0) = (q * η + (1 - q) * η ^ 2) / v",
+   "mentions": [
+    "observationDensity",
+    "observationLaw"
    ]
   },
   {
@@ -108580,6 +108827,7 @@
    "mentions": [
     "BoundedMetric",
     "IdentifiedBy",
+    "Observation",
     "expectation",
     "law",
     "metric"
@@ -164667,6 +164915,11 @@
      "Descent.Portability.citl_shift_positive_higher_prevalence": [],
      "Descent.Portability.posthoc_recalibration_cannot_reorder": [],
      "Descent.Portability.PThresholdTrainingLaw.linearScoreFiles_values": [],
+     "Descent.Portability.PartialLabelAssayDesign.full_label_strictly_optimal": [],
+     "Descent.Portability.PartialLabelAssayDesign.no_label_strictly_optimal": [],
+     "Descent.Portability.PartialLabelAssayDesign.all_fractions_tie": [],
+     "Descent.Portability.PartialLabelExperiment.nullScore_measurable": [],
+     "Descent.Portability.PartialLabelFisher.labeled_score_integrable": [],
      "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integrable_branchMeasure": [],
      "Descent.Portability.neutral_ratio_in_unit": [],
      "Descent.Portability.causalPortabilityFromLocalFst_eq_one_sub_weightedLocalFst": [],
@@ -165935,6 +166188,11 @@
     "Descent.Portability.OrderedMutationCatalogue.mutationBranch_nucleotide",
     "Descent.Portability.OrderedMutationCatalogue.mutationCount_unsupported",
     "Descent.Portability.PThresholdTrainingLaw.linearScoreFiles_values",
+    "Descent.Portability.PartialLabelAssayDesign.all_fractions_tie",
+    "Descent.Portability.PartialLabelAssayDesign.full_label_strictly_optimal",
+    "Descent.Portability.PartialLabelAssayDesign.no_label_strictly_optimal",
+    "Descent.Portability.PartialLabelExperiment.nullScore_measurable",
+    "Descent.Portability.PartialLabelFisher.labeled_score_integrable",
     "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integrable_branchMeasure",
     "Descent.Portability.PipelineDemographicHistory.manyDemeSampleCountMomentMass_eq_functional",
     "Descent.Portability.PipelineDemographicHistory.manyDemeSampleCountProjection_eq_momentMass",
@@ -174174,6 +174432,7 @@
      "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit": [],
      "Descent.Portability.HWELogCoordinates.coordinate_derivative": [],
      "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable": [],
+     "Descent.Portability.PartialLabelExperiment.scaled_log_score": [],
      "Descent.Portability.PoissonMomentSeries.poisson_quadratic": [],
      "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero": [],
      "Descent.Portability.RademacherJointLimit.joint_observable_limit": [],
@@ -174247,6 +174506,7 @@
     "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit",
     "Descent.Portability.HWELogCoordinates.coordinate_derivative",
     "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable",
+    "Descent.Portability.PartialLabelExperiment.scaled_log_score",
     "Descent.Portability.PoissonMomentSeries.poisson_quadratic",
     "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero",
     "Descent.Portability.RademacherJointLimit.joint_observable_limit",
@@ -178820,6 +179080,11 @@
      "Descent.Portability.citl_shift_positive_higher_prevalence": [],
      "Descent.Portability.posthoc_recalibration_cannot_reorder": [],
      "Descent.Portability.PThresholdTrainingLaw.linearScoreFiles_values": [],
+     "Descent.Portability.PartialLabelAssayDesign.full_label_strictly_optimal": [],
+     "Descent.Portability.PartialLabelAssayDesign.no_label_strictly_optimal": [],
+     "Descent.Portability.PartialLabelAssayDesign.all_fractions_tie": [],
+     "Descent.Portability.PartialLabelExperiment.nullScore_measurable": [],
+     "Descent.Portability.PartialLabelFisher.labeled_score_integrable": [],
      "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integrable_branchMeasure": [],
      "Descent.Portability.neutral_ratio_in_unit": [],
      "Descent.Portability.causalPortabilityFromLocalFst_eq_one_sub_weightedLocalFst": [],
@@ -180081,6 +180346,11 @@
     "Descent.Portability.OrderedMutationCatalogue.mutationBranch_nucleotide",
     "Descent.Portability.OrderedMutationCatalogue.mutationCount_unsupported",
     "Descent.Portability.PThresholdTrainingLaw.linearScoreFiles_values",
+    "Descent.Portability.PartialLabelAssayDesign.all_fractions_tie",
+    "Descent.Portability.PartialLabelAssayDesign.full_label_strictly_optimal",
+    "Descent.Portability.PartialLabelAssayDesign.no_label_strictly_optimal",
+    "Descent.Portability.PartialLabelExperiment.nullScore_measurable",
+    "Descent.Portability.PartialLabelFisher.labeled_score_integrable",
     "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integrable_branchMeasure",
     "Descent.Portability.PipelineDemographicHistory.manyDemeSampleCountMomentMass_eq_functional",
     "Descent.Portability.PipelineDemographicHistory.manyDemeSampleCountProjection_eq_momentMass",
@@ -201690,6 +201960,11 @@
      "Descent.Portability.citl_shift_positive_higher_prevalence": [],
      "Descent.Portability.posthoc_recalibration_cannot_reorder": [],
      "Descent.Portability.PThresholdTrainingLaw.linearScoreFiles_values": [],
+     "Descent.Portability.PartialLabelAssayDesign.full_label_strictly_optimal": [],
+     "Descent.Portability.PartialLabelAssayDesign.no_label_strictly_optimal": [],
+     "Descent.Portability.PartialLabelAssayDesign.all_fractions_tie": [],
+     "Descent.Portability.PartialLabelExperiment.nullScore_measurable": [],
+     "Descent.Portability.PartialLabelFisher.labeled_score_integrable": [],
      "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integrable_branchMeasure": [],
      "Descent.Portability.neutral_ratio_in_unit": [],
      "Descent.Portability.causalPortabilityFromLocalFst_eq_one_sub_weightedLocalFst": [],
@@ -202950,6 +203225,11 @@
     "Descent.Portability.OrderedMutationCatalogue.mutationBranch_nucleotide",
     "Descent.Portability.OrderedMutationCatalogue.mutationCount_unsupported",
     "Descent.Portability.PThresholdTrainingLaw.linearScoreFiles_values",
+    "Descent.Portability.PartialLabelAssayDesign.all_fractions_tie",
+    "Descent.Portability.PartialLabelAssayDesign.full_label_strictly_optimal",
+    "Descent.Portability.PartialLabelAssayDesign.no_label_strictly_optimal",
+    "Descent.Portability.PartialLabelExperiment.nullScore_measurable",
+    "Descent.Portability.PartialLabelFisher.labeled_score_integrable",
     "Descent.Portability.PartialMetricMixture.FiniteOutcomeKernel.integrable_branchMeasure",
     "Descent.Portability.PipelineDemographicHistory.manyDemeSampleCountMomentMass_eq_functional",
     "Descent.Portability.PipelineDemographicHistory.manyDemeSampleCountProjection_eq_momentMass",
@@ -203979,6 +204259,7 @@
      "Descent.Portability.prevalenceCITLShift_undercorrects_downward": [],
      "Descent.Portability.PThresholdTrainingLaw.scan_mem": [],
      "Descent.Portability.PThresholdTrainingLaw.linearScoreFiles_values": [],
+     "Descent.Portability.PartialLabelExperiment.observation_log_score": [],
      "Descent.Portability.gxe_reduces_effect_correlation": [],
      "Descent.Portability.populationAUC_optimal_of_eta_transform": [],
      "Descent.Portability.liabilityAUC_ne_equalVarianceAUC_of_prevalence_dependent": [],
@@ -204374,6 +204655,7 @@
     "Descent.Portability.ObservableClosureLaw.matrix_autonomy_iff",
     "Descent.Portability.PThresholdTrainingLaw.linearScoreFiles_values",
     "Descent.Portability.PThresholdTrainingLaw.scan_mem",
+    "Descent.Portability.PartialLabelExperiment.observation_log_score",
     "Descent.Portability.PipelineDemographicHistory.commonDiffusionProjection_exact",
     "Descent.Portability.PipelineDemographicHistory.manyDemeSampleCountMomentMass_eq_functional",
     "Descent.Portability.PipelineDemographicHistory.manyDemeSampleCountProjection_eq_momentMass",
@@ -221785,6 +222067,7 @@
      "Descent.Portability.DemographyAccuracyFiber.scoreVariance_eq_one": [],
      "Descent.Portability.DemographyAccuracyFiber.outcomeVariance_eq_squares": [],
      "Descent.Portability.DiploidEffectLaw.genotype_variance": [],
+     "Descent.Portability.ErasedSampleObservation.erased_observation_variance": [],
      "Descent.Portability.FiniteReportLaw.variance_eq_rawMoments": [],
      "Descent.Portability.FiniteReportLaw.variance_nonneg": [],
      "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul": [],
@@ -221951,6 +222234,7 @@
     "Descent.Portability.DeploymentPopulation.r2_eq",
     "Descent.Portability.DeploymentPopulation.recalibrated_mse_eq",
     "Descent.Portability.DiploidEffectLaw.genotype_variance",
+    "Descent.Portability.ErasedSampleObservation.erased_observation_variance",
     "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul",
     "Descent.Portability.FiniteReportLaw.variance_eq_rawMoments",
     "Descent.Portability.FiniteReportLaw.variance_nonneg",
@@ -236284,6 +236568,7 @@
      ],
      "Descent.Portability.EllipsoidTargetRadius.zero_radius_iff_kernel": [],
      "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
+     "Descent.Portability.ErasedSampleObservation.erasure_measurable": [],
      "Descent.Portability.EscapingCharacteristicKernel.kernel_tendsto_zero_of_abs_tendsto_atTop": [],
      "Descent.Portability.EvolutionaryForecastMinimax.euclideanOperator_comp": [],
      "Descent.Portability.FiniteCovarianceMoments.coefficients_zero": [],
@@ -236441,6 +236726,7 @@
     "Descent.Portability.EllipsoidTargetRadius.weighted_ellipsoid_minimax",
     "Descent.Portability.EllipsoidTargetRadius.weighted_fiber_minimax",
     "Descent.Portability.EllipsoidTargetRadius.zero_radius_iff_kernel",
+    "Descent.Portability.ErasedSampleObservation.erasure_measurable",
     "Descent.Portability.EscapingCharacteristicKernel.kernel_tendsto_zero_of_abs_tendsto_atTop",
     "Descent.Portability.EvolutionaryForecastMinimax.euclideanOperator_comp",
     "Descent.Portability.FactorsThroughObservation.postcomp",
@@ -296704,6 +296990,9 @@
      ],
      "Descent.Portability.DistanceBinnedPortabilityLaw.clippedBinReport_measurable": [],
      "Descent.Portability.DistanceBinnedPortabilityLaw.binReport_measurable": [],
+     "Descent.Portability.ErasedSampleObservation.outcome_average_measurable": [],
+     "Descent.Portability.ErasedSampleObservation.erased_observation_unbiased": [],
+     "Descent.Portability.ErasedSampleObservation.erased_observation_variance": [],
      "Descent.Portability.IIDAverageLaw.average_integral": [],
      "Descent.Portability.IIDAverageLaw.average_variance": [],
      "Descent.Portability.RareEventSampleLaw.marked_sample_unbiased": [],
@@ -296722,6 +297011,9 @@
     "Descent.Portability.DistanceBinnedPortabilityLaw.average_bounds",
     "Descent.Portability.DistanceBinnedPortabilityLaw.binReport_measurable",
     "Descent.Portability.DistanceBinnedPortabilityLaw.clippedBinReport_measurable",
+    "Descent.Portability.ErasedSampleObservation.erased_observation_unbiased",
+    "Descent.Portability.ErasedSampleObservation.erased_observation_variance",
+    "Descent.Portability.ErasedSampleObservation.outcome_average_measurable",
     "Descent.Portability.IIDAverageLaw.average_integral",
     "Descent.Portability.IIDAverageLaw.average_variance",
     "Descent.Portability.RareEventSampleLaw.erased_sample_unbiased",
@@ -309576,6 +309868,82 @@
    ]
   },
   {
+   "name": "Descent.Portability.ErasedSampleObservation.erasedSampleLaw",
+   "decl_name": "erasedSampleLaw",
+   "short": "erasedSampleLaw",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/ErasedSampleObservation.lean",
+   "line": 24,
+   "signature": "(η : ℝ) (v : ℝ≥0) (θ : ℝ) (M : ℕ) : Measure (Fin M → ℝ)",
+   "args": [
+    {
+     "names": [
+      "η"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "v"
+     ],
+     "type": "ℝ≥0",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "θ"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "M"
+     ],
+     "type": "ℕ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "Measure (Fin M → ℝ)",
+   "body": "  Measure.pi (fun _ ↦ (experimentLaw η v θ).map Prod.snd)",
+   "docstring": "The actual independent observation law when every genotype-event mark is hidden.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.ErasedSampleObservation",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "0 ≤ η ∧ η ≤ 1",
+     "0 < η ∧ η ≤ 1",
+     "0 < M"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.ErasedSampleObservation.erased_sample_map": [
+      "0 ≤ η ∧ η ≤ 1"
+     ],
+     "Descent.Portability.ErasedSampleObservation.erased_observation_unbiased": [
+      "0 < η ∧ η ≤ 1",
+      "0 < M"
+     ],
+     "Descent.Portability.ErasedSampleObservation.erased_observation_variance": [
+      "0 < η ∧ η ≤ 1",
+      "0 < M"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.ErasedSampleObservation.erased_observation_unbiased",
+    "Descent.Portability.ErasedSampleObservation.erased_observation_variance",
+    "Descent.Portability.ErasedSampleObservation.erased_sample_map"
+   ]
+  },
+  {
    "name": "Descent.Portability.EvolutionaryForecastMinimax.euclideanOperator",
    "decl_name": "euclideanOperator",
    "short": "euclideanOperator",
@@ -312117,6 +312485,7 @@
      "Descent.Portability.DiploidEffectLaw.genotype_variance": [
       "∀ i, 0 ≤ p i ∧ p i ≤ 1"
      ],
+     "Descent.Portability.ErasedSampleObservation.erased_observation_variance": [],
      "Descent.Portability.FiniteReportLaw.variance_eq_rawMoments": [],
      "Descent.Portability.FiniteReportLaw.variance_nonneg": [],
      "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul": [],
@@ -312280,6 +312649,7 @@
     "Descent.Portability.DeploymentPopulation.r2_eq",
     "Descent.Portability.DeploymentPopulation.recalibrated_mse_eq",
     "Descent.Portability.DiploidEffectLaw.genotype_variance",
+    "Descent.Portability.ErasedSampleObservation.erased_observation_variance",
     "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul",
     "Descent.Portability.FiniteReportLaw.variance_eq_rawMoments",
     "Descent.Portability.FiniteReportLaw.variance_nonneg",
@@ -333170,8 +333540,8 @@
    "equations": [],
    "constraints": {
     "hypotheses": [
-     "Integrable f μ",
      "0 < M",
+     "Integrable f μ",
      "MemLp f 2 μ"
     ],
     "hypotheses_by_theorem": {
@@ -333179,6 +333549,13 @@
      "Descent.Portability.DistanceBinnedPortabilityLaw.average_bounds": [],
      "Descent.Portability.DistanceBinnedPortabilityLaw.clippedBinReport_measurable": [],
      "Descent.Portability.DistanceBinnedPortabilityLaw.binReport_measurable": [],
+     "Descent.Portability.ErasedSampleObservation.outcome_average_measurable": [],
+     "Descent.Portability.ErasedSampleObservation.erased_observation_unbiased": [
+      "0 < M"
+     ],
+     "Descent.Portability.ErasedSampleObservation.erased_observation_variance": [
+      "0 < M"
+     ],
      "Descent.Portability.IIDAverageLaw.average_integral": [
       "Integrable f μ",
       "0 < M"
@@ -333211,6 +333588,9 @@
     "Descent.Portability.DistanceBinnedPortabilityLaw.average_bounds",
     "Descent.Portability.DistanceBinnedPortabilityLaw.binReport_measurable",
     "Descent.Portability.DistanceBinnedPortabilityLaw.clippedBinReport_measurable",
+    "Descent.Portability.ErasedSampleObservation.erased_observation_unbiased",
+    "Descent.Portability.ErasedSampleObservation.erased_observation_variance",
+    "Descent.Portability.ErasedSampleObservation.outcome_average_measurable",
     "Descent.Portability.IIDAverageLaw.average_integral",
     "Descent.Portability.IIDAverageLaw.average_variance",
     "Descent.Portability.RareEventSampleLaw.erased_sample_unbiased",
@@ -346285,6 +346665,7 @@
      "Descent.Portability.DemographyAccuracyFiber.scoreVariance_eq_one": [],
      "Descent.Portability.DemographyAccuracyFiber.outcomeVariance_eq_squares": [],
      "Descent.Portability.DiploidEffectLaw.genotype_variance": [],
+     "Descent.Portability.ErasedSampleObservation.erased_observation_variance": [],
      "Descent.Portability.FiniteReportLaw.variance_eq_rawMoments": [],
      "Descent.Portability.FiniteReportLaw.variance_nonneg": [],
      "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul": [],
@@ -346456,6 +346837,7 @@
     "Descent.Portability.DeploymentPopulation.r2_eq",
     "Descent.Portability.DeploymentPopulation.recalibrated_mse_eq",
     "Descent.Portability.DiploidEffectLaw.genotype_variance",
+    "Descent.Portability.ErasedSampleObservation.erased_observation_variance",
     "Descent.Portability.FiniteReportLaw.covariance_sq_le_variance_mul",
     "Descent.Portability.FiniteReportLaw.variance_eq_rawMoments",
     "Descent.Portability.FiniteReportLaw.variance_nonneg",
@@ -360726,6 +361108,420 @@
    "mentioned_by": [
     "Descent.Portability.PThresholdTrainingLaw.linearScore_rowSelectors",
     "Descent.Portability.SimulationDesignDecoder.decoded_report"
+   ]
+  },
+  {
+   "name": "Descent.Portability.PartialLabelAssayDesign.informationPerCost",
+   "decl_name": "informationPerCost",
+   "short": "informationPerCost",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/PartialLabelAssayDesign.lean",
+   "line": 25,
+   "signature": "(η : ℝ) (v : ℝ≥0) (c₀ c₁ q : ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "η"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "v"
+     ],
+     "type": "ℝ≥0",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "c₀",
+      "c₁",
+      "q"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  (∫ o, (deriv (fun θ ↦ Real.log (observationDensity q η v θ o)) 0) ^ 2\n    ∂observationLaw q η v 0) / (c₀ + q * c₁)",
+   "docstring": "Fisher information per observation cost under the actual revealed-data law.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.PartialLabelAssayDesign",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "0 < η ∧ η < 1",
+     "v ≠ 0",
+     "0 ≤ q ∧ q ≤ 1",
+     "0 < c₀",
+     "0 ≤ c₁",
+     "c₁ / c₀ < (1 - η",
+     "0 ≤ q ∧ q < 1",
+     "(1 - η",
+     "0 < q ∧ q ≤ 1",
+     "c₁ / c₀ = (1 - η"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.PartialLabelAssayDesign.informationPerCost_eq": [
+      "0 < η ∧ η < 1",
+      "v ≠ 0",
+      "0 ≤ q ∧ q ≤ 1"
+     ],
+     "Descent.Portability.PartialLabelAssayDesign.full_label_strictly_optimal": [
+      "0 < η ∧ η < 1",
+      "v ≠ 0",
+      "0 < c₀",
+      "0 ≤ c₁",
+      "c₁ / c₀ < (1 - η",
+      "0 ≤ q ∧ q < 1"
+     ],
+     "Descent.Portability.PartialLabelAssayDesign.no_label_strictly_optimal": [
+      "0 < η ∧ η < 1",
+      "v ≠ 0",
+      "0 < c₀",
+      "0 ≤ c₁",
+      "(1 - η",
+      "0 < q ∧ q ≤ 1"
+     ],
+     "Descent.Portability.PartialLabelAssayDesign.all_fractions_tie": [
+      "0 < η ∧ η < 1",
+      "v ≠ 0",
+      "0 < c₀",
+      "0 ≤ c₁",
+      "c₁ / c₀ = (1 - η",
+      "0 ≤ q ∧ q ≤ 1"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.PartialLabelAssayDesign.all_fractions_tie",
+    "Descent.Portability.PartialLabelAssayDesign.full_label_strictly_optimal",
+    "Descent.Portability.PartialLabelAssayDesign.informationPerCost_eq",
+    "Descent.Portability.PartialLabelAssayDesign.no_label_strictly_optimal"
+   ]
+  },
+  {
+   "name": "Descent.Portability.PartialLabelAssayDesign.designRate",
+   "decl_name": "designRate",
+   "short": "designRate",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/PartialLabelAssayDesign.lean",
+   "line": 30,
+   "signature": "(η c₀ c₁ q : ℝ) : ℝ",
+   "args": [
+    {
+     "names": [
+      "η",
+      "c₀",
+      "c₁",
+      "q"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  (η ^ 2 + q * η * (1 - η)) / (c₀ + q * c₁)",
+   "docstring": "The variance-normalized scalar design objective derived from that experiment.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.PartialLabelAssayDesign",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "nonnegative",
+    "declared_lo": 0.0,
+    "declared_hi": null,
+    "hypotheses": [
+     "0 < η ∧ η < 1",
+     "0 ≤ q ∧ q ≤ 1",
+     "0 < c₀",
+     "0 ≤ c₁"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.PartialLabelAssayDesign.informationPerCost_eq": [
+      "0 < η ∧ η < 1",
+      "0 ≤ q ∧ q ≤ 1"
+     ],
+     "Descent.Portability.PartialLabelAssayDesign.designRate_difference": [
+      "0 < c₀",
+      "0 ≤ c₁"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.PartialLabelAssayDesign.designRate_difference",
+    "Descent.Portability.PartialLabelAssayDesign.informationPerCost_eq"
+   ]
+  },
+  {
+   "name": "Descent.Portability.PartialLabelExperiment.Observation",
+   "decl_name": "Observation",
+   "short": "Observation",
+   "kind": "abbrev",
+   "noncomputable": false,
+   "file": "Descent/Portability/PartialLabelExperiment.lean",
+   "line": 24,
+   "signature": "",
+   "args": [],
+   "ret_type": "",
+   "body": " Sum (Bool × ℝ) ℝ",
+   "docstring": "Labeled data retain the event; unlabeled data have no event coordinate.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.PartialLabelExperiment",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.no_exact_estimator_of_two_point_collision": [],
+     "Descent.Portability.PartialLabelExperiment.observationLaw_probability": [],
+     "Descent.Portability.PartialLabelExperiment.observation_log_score": [],
+     "Descent.Portability.PartialLabelFisher.observation_integral": [],
+     "Descent.Portability.FiniteReportLaw.identified_iff_all_bounded_metrics_identified": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.FiniteReportLaw.identified_iff_all_bounded_metrics_identified",
+    "Descent.Portability.PartialLabelExperiment.observationLaw_probability",
+    "Descent.Portability.PartialLabelExperiment.observation_log_score",
+    "Descent.Portability.PartialLabelFisher.observation_integral",
+    "Descent.Portability.no_exact_estimator_of_two_point_collision"
+   ]
+  },
+  {
+   "name": "Descent.Portability.PartialLabelExperiment.observationLaw",
+   "decl_name": "observationLaw",
+   "short": "observationLaw",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/PartialLabelExperiment.lean",
+   "line": 27,
+   "signature": "(q η : ℝ) (v : ℝ≥0) (θ : ℝ) : Measure Observation",
+   "args": [
+    {
+     "names": [
+      "q",
+      "η"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "v"
+     ],
+     "type": "ℝ≥0",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "θ"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "Measure Observation",
+   "body": "  ENNReal.ofReal q • (experimentLaw η v θ).map Sum.inl +\n    ENNReal.ofReal (1 - q) • ((experimentLaw η v θ).map Prod.snd).map Sum.inr",
+   "docstring": "Actual independently randomized revelation law on the observed data.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.PartialLabelExperiment",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "0 ≤ q ∧ q ≤ 1",
+     "0 ≤ η ∧ η ≤ 1",
+     "0 < η ∧ η < 1",
+     "v ≠ 0"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.PartialLabelExperiment.observationLaw_probability": [
+      "0 ≤ q ∧ q ≤ 1",
+      "0 ≤ η ∧ η ≤ 1"
+     ],
+     "Descent.Portability.PartialLabelFisher.observation_integral": [
+      "0 ≤ q ∧ q ≤ 1"
+     ],
+     "Descent.Portability.PartialLabelFisher.nullScore_second": [
+      "0 ≤ q ∧ q ≤ 1",
+      "0 < η ∧ η < 1",
+      "v ≠ 0"
+     ],
+     "Descent.Portability.PartialLabelFisher.partial_fisher_information": [
+      "0 ≤ q ∧ q ≤ 1",
+      "0 < η ∧ η < 1",
+      "v ≠ 0"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.PartialLabelExperiment.observationLaw_probability",
+    "Descent.Portability.PartialLabelFisher.nullScore_second",
+    "Descent.Portability.PartialLabelFisher.observation_integral",
+    "Descent.Portability.PartialLabelFisher.partial_fisher_information"
+   ]
+  },
+  {
+   "name": "Descent.Portability.PartialLabelExperiment.observationDensity",
+   "decl_name": "observationDensity",
+   "short": "observationDensity",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/PartialLabelExperiment.lean",
+   "line": 32,
+   "signature": "(q η : ℝ) (v : ℝ≥0) (θ : ℝ) : Observation → ℝ",
+   "args": [
+    {
+     "names": [
+      "q",
+      "η"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "v"
+     ],
+     "type": "ℝ≥0",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "θ"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "Observation → ℝ",
+   "body": "| .inl zy => q * markedDensity η v θ zy.1 zy.2\n  | .inr y => (1 - q) * erasedDensity η v θ y",
+   "docstring": "Density of the observed data with respect to the disjoint counting-Lebesgue reference.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.PartialLabelExperiment",
+   "fields": [],
+   "equations": [
+    {
+     "pattern": ".inl zy",
+     "rhs": "q * markedDensity η v θ zy.1 zy.2"
+    },
+    {
+     "pattern": ".inr y",
+     "rhs": "(1 - q) * erasedDensity η v θ y"
+    }
+   ],
+   "constraints": {
+    "hypotheses": [
+     "0 < η ∧ η < 1",
+     "v ≠ 0",
+     "0 ≤ q ∧ q ≤ 1"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.PartialLabelExperiment.observation_log_score": [
+      "0 < η ∧ η < 1",
+      "v ≠ 0"
+     ],
+     "Descent.Portability.PartialLabelFisher.partial_fisher_information": [
+      "0 ≤ q ∧ q ≤ 1",
+      "0 < η ∧ η < 1",
+      "v ≠ 0"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.PartialLabelExperiment.observation_log_score",
+    "Descent.Portability.PartialLabelFisher.partial_fisher_information"
+   ]
+  },
+  {
+   "name": "Descent.Portability.PartialLabelExperiment.nullScore",
+   "decl_name": "nullScore",
+   "short": "nullScore",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/PartialLabelExperiment.lean",
+   "line": 37,
+   "signature": "(q η : ℝ) (v : ℝ≥0) : Observation → ℝ",
+   "args": [
+    {
+     "names": [
+      "q",
+      "η"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "v"
+     ],
+     "type": "ℝ≥0",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "Observation → ℝ",
+   "body": "| .inl zy => if q = 0 then 0 else markedEstimate (v : ℝ) zy\n  | .inr y => if q = 1 then 0 else η * y / v",
+   "docstring": "Null likelihood score, with zero scores on categories absent from endpoint designs.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.PartialLabelExperiment",
+   "fields": [],
+   "equations": [
+    {
+     "pattern": ".inl zy",
+     "rhs": "if q = 0 then 0 else markedEstimate (v : ℝ) zy"
+    },
+    {
+     "pattern": ".inr y",
+     "rhs": "if q = 1 then 0 else η * y / v"
+    }
+   ],
+   "constraints": {
+    "hypotheses": [
+     "0 < η ∧ η < 1",
+     "v ≠ 0",
+     "0 ≤ η ∧ η ≤ 1",
+     "0 ≤ q ∧ q ≤ 1"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.PartialLabelExperiment.observation_log_score": [
+      "0 < η ∧ η < 1",
+      "v ≠ 0"
+     ],
+     "Descent.Portability.PartialLabelExperiment.nullScore_measurable": [],
+     "Descent.Portability.PartialLabelFisher.labeled_score_integrable": [],
+     "Descent.Portability.PartialLabelFisher.erased_score_integrable": [
+      "0 ≤ η ∧ η ≤ 1"
+     ],
+     "Descent.Portability.PartialLabelFisher.nullScore_second": [
+      "0 ≤ q ∧ q ≤ 1",
+      "0 < η ∧ η < 1",
+      "v ≠ 0"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.PartialLabelExperiment.nullScore_measurable",
+    "Descent.Portability.PartialLabelExperiment.observation_log_score",
+    "Descent.Portability.PartialLabelFisher.erased_score_integrable",
+    "Descent.Portability.PartialLabelFisher.labeled_score_integrable",
+    "Descent.Portability.PartialLabelFisher.nullScore_second"
    ]
   },
   {
@@ -378463,6 +379259,10 @@
      "v ≠ 0"
     ],
     "hypotheses_by_theorem": {
+     "Descent.Portability.PartialLabelExperiment.markedDensity_pos": [
+      "0 < η ∧ η < 1",
+      "v ≠ 0"
+     ],
      "Descent.Portability.RareEventInformationLaw.erasedDensity_eq_sum": [],
      "Descent.Portability.RareEventInformationLaw.marked_log_score": [
       "0 < η ∧ η < 1",
@@ -378475,6 +379275,7 @@
     }
    },
    "mentioned_by": [
+    "Descent.Portability.PartialLabelExperiment.markedDensity_pos",
     "Descent.Portability.RareEventInformationLaw.erasedDensity_eq_sum",
     "Descent.Portability.RareEventInformationLaw.marked_fisher_integral",
     "Descent.Portability.RareEventInformationLaw.marked_log_score"
@@ -378525,10 +379326,15 @@
    "equations": [],
    "constraints": {
     "hypotheses": [
+     "0 < η ∧ η < 1",
      "v ≠ 0",
      "0 ≤ η ∧ η ≤ 1"
     ],
     "hypotheses_by_theorem": {
+     "Descent.Portability.PartialLabelExperiment.erasedDensity_pos": [
+      "0 < η ∧ η < 1",
+      "v ≠ 0"
+     ],
      "Descent.Portability.RareEventInformationLaw.erasedDensity_eq_sum": [],
      "Descent.Portability.RareEventInformationLaw.erasedDensity_null": [],
      "Descent.Portability.RareEventInformationLaw.erased_log_score": [
@@ -378541,6 +379347,7 @@
     }
    },
    "mentioned_by": [
+    "Descent.Portability.PartialLabelExperiment.erasedDensity_pos",
     "Descent.Portability.RareEventInformationLaw.erasedDensity_eq_sum",
     "Descent.Portability.RareEventInformationLaw.erasedDensity_null",
     "Descent.Portability.RareEventInformationLaw.erased_fisher_integral",
@@ -378698,6 +379505,21 @@
      "0 < η ∧ η ≤ 1"
     ],
     "hypotheses_by_theorem": {
+     "Descent.Portability.ErasedSampleObservation.erased_sample_map": [
+      "0 ≤ η ∧ η ≤ 1"
+     ],
+     "Descent.Portability.PartialLabelFisher.null_erased_law": [
+      "0 ≤ η ∧ η ≤ 1"
+     ],
+     "Descent.Portability.PartialLabelFisher.observation_integral": [],
+     "Descent.Portability.PartialLabelFisher.labeled_score_integrable": [],
+     "Descent.Portability.PartialLabelFisher.erased_score_integrable": [
+      "0 ≤ η ∧ η ≤ 1"
+     ],
+     "Descent.Portability.PartialLabelFisher.nullScore_second": [
+      "0 < η ∧ η < 1",
+      "v ≠ 0"
+     ],
      "Descent.Portability.RareEventAbsenceRisk.experiment_absent_restriction": [],
      "Descent.Portability.RareEventAbsenceRisk.experiment_absent_mass": [],
      "Descent.Portability.RareEventInformationLaw.experimentLaw_probability": [
@@ -378744,6 +379566,12 @@
     }
    },
    "mentioned_by": [
+    "Descent.Portability.ErasedSampleObservation.erased_sample_map",
+    "Descent.Portability.PartialLabelFisher.erased_score_integrable",
+    "Descent.Portability.PartialLabelFisher.labeled_score_integrable",
+    "Descent.Portability.PartialLabelFisher.nullScore_second",
+    "Descent.Portability.PartialLabelFisher.null_erased_law",
+    "Descent.Portability.PartialLabelFisher.observation_integral",
     "Descent.Portability.RareEventAbsenceRisk.experiment_absent_mass",
     "Descent.Portability.RareEventAbsenceRisk.experiment_absent_restriction",
     "Descent.Portability.RareEventInformationLaw.erased_fisher_integral",
@@ -378802,9 +379630,15 @@
     "declared_lo": 0.0,
     "declared_hi": 1.0,
     "hypotheses": [
+     "0 < η ∧ η < 1",
      "0 < η ∧ η ≤ 1"
     ],
     "hypotheses_by_theorem": {
+     "Descent.Portability.PartialLabelExperiment.nullScore_measurable": [],
+     "Descent.Portability.PartialLabelFisher.labeled_score_integrable": [],
+     "Descent.Portability.PartialLabelFisher.nullScore_second": [
+      "0 < η ∧ η < 1"
+     ],
      "Descent.Portability.RareEventSampleLaw.markedEstimate_measurable": [],
      "Descent.Portability.RareEventSampleLaw.markedEstimate_memLp": [],
      "Descent.Portability.RareEventSampleLaw.markedEstimate_mean": [
@@ -378822,6 +379656,9 @@
     }
    },
    "mentioned_by": [
+    "Descent.Portability.PartialLabelExperiment.nullScore_measurable",
+    "Descent.Portability.PartialLabelFisher.labeled_score_integrable",
+    "Descent.Portability.PartialLabelFisher.nullScore_second",
     "Descent.Portability.RareEventSampleLaw.markedEstimate_mean",
     "Descent.Portability.RareEventSampleLaw.markedEstimate_measurable",
     "Descent.Portability.RareEventSampleLaw.markedEstimate_memLp",

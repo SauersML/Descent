@@ -195,6 +195,10 @@ import Descent.Portability.RareEventInformationLaw
 import Descent.Portability.IIDAverageLaw
 import Descent.Portability.RareEventSampleLaw
 import Descent.Portability.RareEventAbsenceRisk
+import Descent.Portability.PartialLabelExperiment
+import Descent.Portability.PartialLabelFisher
+import Descent.Portability.PartialLabelAssayDesign
+import Descent.Portability.ErasedSampleObservation
 import Descent.Portability.GaussianHermiteLaw
 import Descent.Portability.ObservationAsymptotics
 import Descent.Portability.ContinuousObservabilityGramian

@@ -5004,6 +5004,9 @@ def learnerFromTables(cohorts, tables, files):
 def rowSelectors(row):
     return by(classical, exact, (lambda r, u: (1.0 if (row(r) == u) else 0.0)))
 
+def designRate(η, c_0, c_1, q):
+    return _rt.rdiv(((_rt.lpow(η, 2.0) + ((q * η) * ((1.0 - η))))), ((c_0 + (q * c_1))))
+
 def Descent_Portability_PartialMetricMixture_conditionalMetric(μ, metric):
     return by(classical, exact, ((none if (Descent_Portability_PartialMetricMixture_definedMass(μ, metric) == 0.0) else some((_rt.rdiv(Descent_Portability_PartialMetricMixture_weightedMetric(μ, metric), Descent_Portability_PartialMetricMixture_definedMass(μ, metric))))) if (Integrable(((lambda sample: ((1.0) if _rt._proj((metric(sample)), 'isSome') else 0.0))), μ) and Integrable(((lambda sample: _rt._proj((metric(sample)), 'getD')(0.0))), μ)) else none))
 
