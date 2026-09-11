@@ -1,6 +1,9 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.SubgroupRepairGeometry
+import Descent.Portability.NestedRepairSpans
+import Descent.Portability.FrameRepairSpans
 import Descent.Portability.SparseBinaryAudit
 import Descent.Portability.DisagreementAuditPayoff
 import Descent.Portability.AuditCellAveraging

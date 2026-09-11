@@ -39459,6 +39459,7 @@
    "Descent.Portability.FourCyclePrediction.directedOrbit_derivative",
    "Descent.Portability.FourCyclePrediction.reversibleOrbit_derivative",
    "Descent.Portability.FourthMomentAttainableRange.attains_every_larger_fourth_moment",
+   "Descent.Portability.FrameRepairSpans.frame_gain_identity",
    "Descent.Portability.FrequencyResolvedCohort.effectiveSubgroupSize_nonpos_of_inadmissible",
    "Descent.Portability.FrequencyResolvedCohort.matched_weight_signal_and_noise",
    "Descent.Portability.FrequencyResolvedCohort.weightedSignal_sq_le_information_mul_noise",
@@ -39673,6 +39674,8 @@
    "Descent.Portability.MutationChannelBridge.generator_template_sum",
    "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels",
    "Descent.Portability.MutationDriftModelAssumptions.fstTransient_nonneg",
+   "Descent.Portability.NestedRepairSpans.projection_difference",
+   "Descent.Portability.NestedRepairSpans.projection_difference_mem",
    "Descent.Portability.NucleotideMutationLaw.branch_compose",
    "Descent.Portability.NucleotideMutationLaw.branch_expectation",
    "Descent.Portability.NucleotideMutationLaw.branch_history_expectation",
@@ -41125,6 +41128,7 @@
     "Descent.Portability.FourCyclePrediction.directedOrbit_derivative": [],
     "Descent.Portability.FourCyclePrediction.reversibleOrbit_derivative": [],
     "Descent.Portability.FourthMomentAttainableRange.attains_every_larger_fourth_moment": [],
+    "Descent.Portability.FrameRepairSpans.frame_gain_identity": [],
     "Descent.Portability.GaussianCovarianceSeparation.exists_separating_evaluation": [],
     "Descent.Portability.GaussianCovarianceSeparation.quadraticValue_smul": [],
     "Descent.Portability.GaussianCovarianceSeparation.gaussianFourier_independent": [],
@@ -41378,6 +41382,8 @@
     "Descent.Portability.MutationChannelBridge.channel_sum": [],
     "Descent.Portability.MutationChannelBridge.generator_template_sum": [],
     "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels": [],
+    "Descent.Portability.NestedRepairSpans.projection_difference_mem": [],
+    "Descent.Portability.NestedRepairSpans.projection_difference": [],
     "Descent.Portability.NucleotideMutationLaw.coordinate_summable": [],
     "Descent.Portability.NucleotideMutationLaw.eigen_summable": [],
     "Descent.Portability.NucleotideMutationLaw.branch_expectation": [],
@@ -50743,6 +50749,7 @@
    "Descent.Portability.FourCyclePrediction.directedOrbit_derivative",
    "Descent.Portability.FourCyclePrediction.reversibleOrbit_derivative",
    "Descent.Portability.FourthMomentAttainableRange.attains_every_larger_fourth_moment",
+   "Descent.Portability.FrameRepairSpans.frame_gain_identity",
    "Descent.Portability.FrequencyResolvedCohort.effectiveSubgroupSize_nonpos_of_inadmissible",
    "Descent.Portability.FrequencyResolvedCohort.matched_weight_signal_and_noise",
    "Descent.Portability.FrequencyResolvedCohort.weightedSignal_sq_le_information_mul_noise",
@@ -50957,6 +50964,8 @@
    "Descent.Portability.MutationChannelBridge.generator_template_sum",
    "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels",
    "Descent.Portability.MutationDriftModelAssumptions.fstTransient_nonneg",
+   "Descent.Portability.NestedRepairSpans.projection_difference",
+   "Descent.Portability.NestedRepairSpans.projection_difference_mem",
    "Descent.Portability.NucleotideMutationLaw.branch_compose",
    "Descent.Portability.NucleotideMutationLaw.branch_expectation",
    "Descent.Portability.NucleotideMutationLaw.branch_history_expectation",
@@ -52377,6 +52386,7 @@
     "Descent.Portability.FourCyclePrediction.directedOrbit_derivative": [],
     "Descent.Portability.FourCyclePrediction.reversibleOrbit_derivative": [],
     "Descent.Portability.FourthMomentAttainableRange.attains_every_larger_fourth_moment": [],
+    "Descent.Portability.FrameRepairSpans.frame_gain_identity": [],
     "Descent.Portability.GaussianCovarianceSeparation.exists_separating_evaluation": [],
     "Descent.Portability.GaussianCovarianceSeparation.quadraticValue_smul": [],
     "Descent.Portability.GaussianCovarianceSeparation.gaussianFourier_independent": [],
@@ -52615,6 +52625,8 @@
     "Descent.Portability.MutationChannelBridge.channel_sum": [],
     "Descent.Portability.MutationChannelBridge.generator_template_sum": [],
     "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels": [],
+    "Descent.Portability.NestedRepairSpans.projection_difference_mem": [],
+    "Descent.Portability.NestedRepairSpans.projection_difference": [],
     "Descent.Portability.NucleotideMutationLaw.coordinate_summable": [],
     "Descent.Portability.NucleotideMutationLaw.eigen_summable": [],
     "Descent.Portability.NucleotideMutationLaw.branch_expectation": [],
@@ -71349,6 +71361,7 @@
    "Descent.Portability.FourCyclePrediction.directedOrbit_derivative",
    "Descent.Portability.FourCyclePrediction.reversibleOrbit_derivative",
    "Descent.Portability.FourthMomentAttainableRange.attains_every_larger_fourth_moment",
+   "Descent.Portability.FrameRepairSpans.frame_gain_identity",
    "Descent.Portability.FrequencyResolvedCohort.effectiveSubgroupSize_nonpos_of_inadmissible",
    "Descent.Portability.FrequencyResolvedCohort.matched_weight_signal_and_noise",
    "Descent.Portability.FrequencyResolvedCohort.weightedSignal_sq_le_information_mul_noise",
@@ -71563,6 +71576,8 @@
    "Descent.Portability.MutationChannelBridge.generator_template_sum",
    "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels",
    "Descent.Portability.MutationDriftModelAssumptions.fstTransient_nonneg",
+   "Descent.Portability.NestedRepairSpans.projection_difference",
+   "Descent.Portability.NestedRepairSpans.projection_difference_mem",
    "Descent.Portability.NucleotideMutationLaw.branch_compose",
    "Descent.Portability.NucleotideMutationLaw.branch_expectation",
    "Descent.Portability.NucleotideMutationLaw.branch_history_expectation",
@@ -73121,6 +73136,9 @@
      "E b = β",
      "∀ i, E (fun ω ↦ X ω i * b ω"
     ],
+    "Descent.Portability.FrameRepairSpans.frame_gain_identity": [
+     "∀ i, MemLp (fun y : ℝ ↦ y"
+    ],
     "Descent.Portability.GaussianCovarianceSeparation.exists_separating_evaluation": [],
     "Descent.Portability.GaussianCovarianceSeparation.quadraticValue_smul": [],
     "Descent.Portability.GaussianCovarianceSeparation.gaussianFourier_independent": [],
@@ -73369,6 +73387,8 @@
     "Descent.Portability.MutationChannelBridge.channel_sum": [],
     "Descent.Portability.MutationChannelBridge.generator_template_sum": [],
     "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels": [],
+    "Descent.Portability.NestedRepairSpans.projection_difference_mem": [],
+    "Descent.Portability.NestedRepairSpans.projection_difference": [],
     "Descent.Portability.NucleotideMutationLaw.coordinate_summable": [],
     "Descent.Portability.NucleotideMutationLaw.eigen_summable": [],
     "Descent.Portability.NucleotideMutationLaw.branch_expectation": [],
@@ -75444,6 +75464,8 @@
    "Descent.Portability.SpectralAuditDualCertificate.weak_duality",
    "Descent.Portability.SpectralMeasurementMinimax.adaptive_minimax_all_budgets",
    "Descent.Portability.StoppedGenotypeReadiness.conditionalSite_unsupported_ready",
+   "Descent.Portability.SubgroupRepairGeometry.safeSet_convex",
+   "Descent.Portability.SubgroupRepairGeometry.simultaneous_safety",
    "Descent.Portability.TailRepairCertification.positive_repair_certificate",
    "Descent.Portability.TailRepairCertification.study_confidence",
    "Descent.Portability.TargetUncertainty.center_upper_bound",
@@ -75922,6 +75944,8 @@
     ],
     "Descent.Portability.SpectralMeasurementMinimax.adaptive_minimax_all_budgets": [],
     "Descent.Portability.StoppedGenotypeReadiness.conditionalSite_unsupported_ready": [],
+    "Descent.Portability.SubgroupRepairGeometry.safeSet_convex": [],
+    "Descent.Portability.SubgroupRepairGeometry.simultaneous_safety": [],
     "Descent.Portability.TailRepairCertification.study_confidence": [],
     "Descent.Portability.TailRepairCertification.positive_repair_certificate": [],
     "Descent.Portability.TargetUncertainty.center_upper_bound": [],
@@ -173817,7 +173841,7 @@
   "selfcheck": {
    "finite_points": 7,
    "total_points": 8,
-   "error": "ValueError('math domain error')"
+   "error": "ValueError('expected a number in range from -1 up to 1, got 1.2504691881674868')"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -173871,7 +173895,7 @@
   "selfcheck": {
    "finite_points": 6,
    "total_points": 8,
-   "error": "ValueError('math domain error')"
+   "error": "ValueError('expected a number in range from -1 up to 1, got 1.1430754740893918')"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -191106,6 +191130,100 @@
    }
   }
  },
+ "Descent.Portability.FrameRepairSpans.meanResidual": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "measure-theoretic integral (∫ … ∂μ)",
+  "file": "Descent/Portability/FrameRepairSpans.lean",
+  "line": 29,
+  "short": "meanResidual",
+  "ret_type": "EuclideanSpace ℝ ι",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.FrameRepairSpans.frame_gain_identity",
+   "Descent.Portability.FrameRepairSpans.frame_oracle_attained",
+   "Descent.Portability.FrameRepairSpans.frame_oracle_increment",
+   "Descent.Portability.FrameRepairSpans.frame_oracle_monotone"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.FrameRepairSpans.frame_gain_identity": [],
+    "Descent.Portability.FrameRepairSpans.frame_oracle_attained": [],
+    "Descent.Portability.FrameRepairSpans.frame_oracle_increment": [],
+    "Descent.Portability.FrameRepairSpans.frame_oracle_monotone": []
+   }
+  }
+ },
+ "Descent.Portability.FrameRepairSpans.frameGain": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name MeanDriftRepair.gain",
+  "file": "Descent/Portability/FrameRepairSpans.lean",
+  "line": 33,
+  "short": "frameGain",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.FrameRepairSpans.frame_gain_identity",
+   "Descent.Portability.FrameRepairSpans.frame_oracle_attained",
+   "Descent.Portability.FrameRepairSpans.frame_oracle_increment",
+   "Descent.Portability.FrameRepairSpans.frame_oracle_monotone"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.FrameRepairSpans.frame_gain_identity": [],
+    "Descent.Portability.FrameRepairSpans.frame_oracle_attained": [],
+    "Descent.Portability.FrameRepairSpans.frame_oracle_increment": [],
+    "Descent.Portability.FrameRepairSpans.frame_oracle_monotone": []
+   }
+  }
+ },
+ "Descent.Portability.FrameRepairSpans.frameNormSq": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "norm of a vector/matrix",
+  "file": "Descent/Portability/FrameRepairSpans.lean",
+  "line": 37,
+  "short": "frameNormSq",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.FrameRepairSpans.frame_oracle_attained",
+   "Descent.Portability.FrameRepairSpans.frame_oracle_increment",
+   "Descent.Portability.FrameRepairSpans.frame_oracle_monotone"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.FrameRepairSpans.frame_oracle_attained": [],
+    "Descent.Portability.FrameRepairSpans.frame_oracle_increment": [],
+    "Descent.Portability.FrameRepairSpans.frame_oracle_monotone": []
+   }
+  }
+ },
  "Descent.Portability.GaussianCeilingBound.gaussianMomentLaw": {
   "class": "STRUCTURAL",
   "note": "builds a structure value (ExpFunctional (Fin 3))",
@@ -197504,6 +197622,8 @@
    "Descent.Portability.GuardedRepairDeployment.harm_implies_false_certificate",
    "Descent.Portability.SecondMomentFrameRepair.estimate_confidence",
    "Descent.Portability.SecondMomentFrameRepair.false_certificate_probability",
+   "Descent.Portability.SubgroupRepairGeometry.simultaneous_safety",
+   "Descent.Portability.SubgroupRepairGeometry.true_gain_lower",
    "Descent.Portability.presentDayR2_eq_statistical_rsquared_of_moments",
    "Descent.Spectral.right_whitening_removes_coloring"
   ],
@@ -197511,7 +197631,10 @@
    "hypotheses": [
     "G.PosDef",
     "signal G h ≤ ε",
-    "signal G (r - h"
+    "signal G (r - h",
+    "∀ j, (G j",
+    "∀ j, signal (G j",
+    "θ ∈ SafeSet G h ε"
    ],
    "hypotheses_by_theorem": {
     "Descent.Blindness.rankOneCovarianceBump_sampleNormalized": [],
@@ -197560,6 +197683,15 @@
     "Descent.Portability.presentDayR2_eq_statistical_rsquared_of_moments": [],
     "Descent.Portability.SecondMomentFrameRepair.estimate_confidence": [],
     "Descent.Portability.SecondMomentFrameRepair.false_certificate_probability": [],
+    "Descent.Portability.SubgroupRepairGeometry.true_gain_lower": [
+     "G.PosDef",
+     "signal G (r - h"
+    ],
+    "Descent.Portability.SubgroupRepairGeometry.simultaneous_safety": [
+     "∀ j, (G j",
+     "∀ j, signal (G j",
+     "θ ∈ SafeSet G h ε"
+    ],
     "Descent.Spectral.right_whitening_removes_coloring": []
    }
   }
@@ -197580,6 +197712,7 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Portability.DecisionLossContrasts.frame_gain",
+   "Descent.Portability.FrameRepairSpans.frame_gain_identity",
    "Descent.Portability.GramRepairOptimality.robust_optimum",
    "Descent.Portability.GramSafeRepair.induced_gain",
    "Descent.Portability.GramSafeRepair.repair_certificate",
@@ -197588,6 +197721,8 @@
    "Descent.Portability.MeanDriftRepair.gain_change",
    "Descent.Portability.MeanDriftRepair.gain_identity",
    "Descent.Portability.MeanDriftRepair.same_mean_gain",
+   "Descent.Portability.NestedRepairSpans.gain_projection",
+   "Descent.Portability.NestedRepairSpans.oracle_attained",
    "Descent.Portability.SafeRepairGeometry.ball_gain_lower",
    "Descent.Portability.SafeRepairGeometry.ball_robust_optimum",
    "Descent.Portability.SafeRepairGeometry.compact_robust_optimum",
@@ -197598,6 +197733,11 @@
    "Descent.Portability.SafeRepairGeometry.safe_gain",
    "Descent.Portability.SafeRepairGeometry.safe_lower_value",
    "Descent.Portability.SafeRepairGeometry.safe_oracle_regret",
+   "Descent.Portability.SubgroupRepairGeometry.induced_lower",
+   "Descent.Portability.SubgroupRepairGeometry.lower_concave",
+   "Descent.Portability.SubgroupRepairGeometry.lower_zero",
+   "Descent.Portability.SubgroupRepairGeometry.simultaneous_safety",
+   "Descent.Portability.SubgroupRepairGeometry.true_gain_lower",
    "Descent.Spectral.augmented_informationPerUnitCost_gt_iff",
    "Descent.Spectral.no_counting_functional"
   ],
@@ -197607,10 +197747,14 @@
    "declared_hi": null,
    "hypotheses": [
     "G.PosDef",
-    "signal G (r - h"
+    "signal G (r - h",
+    "∀ j, (G j",
+    "∀ j, signal (G j",
+    "θ ∈ SafeSet G h ε"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.DecisionLossContrasts.frame_gain": [],
+    "Descent.Portability.FrameRepairSpans.frame_gain_identity": [],
     "Descent.Portability.GramRepairOptimality.robust_optimum": [
      "G.PosDef"
     ],
@@ -197624,6 +197768,8 @@
     "Descent.Portability.MeanDriftRepair.same_mean_gain": [],
     "Descent.Portability.MeanDriftRepair.drift_lower": [],
     "Descent.Portability.MeanDriftRepair.attained_drift_penalty": [],
+    "Descent.Portability.NestedRepairSpans.gain_projection": [],
+    "Descent.Portability.NestedRepairSpans.oracle_attained": [],
     "Descent.Portability.SafeRepairGeometry.gain_eq_oracle_sub_regret": [],
     "Descent.Portability.SafeRepairGeometry.gain_le_oracle": [],
     "Descent.Portability.SafeRepairGeometry.gain_self": [],
@@ -197634,6 +197780,20 @@
     "Descent.Portability.SafeRepairGeometry.safe_gain": [],
     "Descent.Portability.SafeRepairGeometry.ball_robust_optimum": [],
     "Descent.Portability.SafeRepairGeometry.safe_oracle_regret": [],
+    "Descent.Portability.SubgroupRepairGeometry.lower_concave": [],
+    "Descent.Portability.SubgroupRepairGeometry.induced_lower": [
+     "G.PosDef"
+    ],
+    "Descent.Portability.SubgroupRepairGeometry.true_gain_lower": [
+     "G.PosDef",
+     "signal G (r - h"
+    ],
+    "Descent.Portability.SubgroupRepairGeometry.lower_zero": [],
+    "Descent.Portability.SubgroupRepairGeometry.simultaneous_safety": [
+     "∀ j, (G j",
+     "∀ j, signal (G j",
+     "θ ∈ SafeSet G h ε"
+    ],
     "Descent.Spectral.no_counting_functional": [],
     "Descent.Spectral.augmented_informationPerUnitCost_gt_iff": []
    },
@@ -197794,7 +197954,11 @@
    "Descent.Portability.GramSafeRepair.induced_signal",
    "Descent.Portability.GramSafeRepair.oracle_interval",
    "Descent.Portability.GramSafeRepair.repair_certificate",
-   "Descent.Portability.GramSafeRepair.toGram_sub"
+   "Descent.Portability.GramSafeRepair.toGram_sub",
+   "Descent.Portability.SubgroupRepairGeometry.coefficient_lower_concave",
+   "Descent.Portability.SubgroupRepairGeometry.coefficient_norm",
+   "Descent.Portability.SubgroupRepairGeometry.induced_lower",
+   "Descent.Portability.SubgroupRepairGeometry.true_gain_lower"
   ],
   "constraints": {
    "hypotheses": [
@@ -197829,6 +197993,19 @@
     "Descent.Portability.GramSafeRepair.oracle_interval": [
      "G.PosDef",
      "signal G (r - h"
+    ],
+    "Descent.Portability.SubgroupRepairGeometry.coefficient_norm": [
+     "G.PosDef"
+    ],
+    "Descent.Portability.SubgroupRepairGeometry.induced_lower": [
+     "G.PosDef"
+    ],
+    "Descent.Portability.SubgroupRepairGeometry.true_gain_lower": [
+     "G.PosDef",
+     "signal G (r - h"
+    ],
+    "Descent.Portability.SubgroupRepairGeometry.coefficient_lower_concave": [
+     "G.PosDef"
     ]
    }
   }
@@ -213946,6 +214123,7 @@
   },
   "mentioned_by": [
    "Descent.Portability.DecisionLossContrasts.frame_gain",
+   "Descent.Portability.FrameRepairSpans.frame_gain_identity",
    "Descent.Portability.GramRepairOptimality.robust_optimum",
    "Descent.Portability.GramSafeRepair.induced_gain",
    "Descent.Portability.GramSafeRepair.repair_certificate",
@@ -213954,6 +214132,8 @@
    "Descent.Portability.MeanDriftRepair.gain_change",
    "Descent.Portability.MeanDriftRepair.gain_identity",
    "Descent.Portability.MeanDriftRepair.same_mean_gain",
+   "Descent.Portability.NestedRepairSpans.gain_projection",
+   "Descent.Portability.NestedRepairSpans.oracle_attained",
    "Descent.Portability.SafeRepairGeometry.ball_gain_lower",
    "Descent.Portability.SafeRepairGeometry.ball_robust_optimum",
    "Descent.Portability.SafeRepairGeometry.compact_robust_optimum",
@@ -213964,16 +214144,23 @@
    "Descent.Portability.SafeRepairGeometry.safe_gain",
    "Descent.Portability.SafeRepairGeometry.safe_lower_value",
    "Descent.Portability.SafeRepairGeometry.safe_oracle_regret",
+   "Descent.Portability.SubgroupRepairGeometry.induced_lower",
+   "Descent.Portability.SubgroupRepairGeometry.lower_concave",
+   "Descent.Portability.SubgroupRepairGeometry.lower_zero",
+   "Descent.Portability.SubgroupRepairGeometry.simultaneous_safety",
+   "Descent.Portability.SubgroupRepairGeometry.true_gain_lower",
    "Descent.Spectral.augmented_informationPerUnitCost_gt_iff",
    "Descent.Spectral.no_counting_functional"
   ],
   "constraints": {
    "hypotheses": [
     "∀ i, 0 ≤ w i",
-    "∀ i, L i ≤ (∫ y, y ∂μ i"
+    "∀ i, L i ≤ (∫ y, y ∂μ i",
+    "d ∈ V"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.DecisionLossContrasts.frame_gain": [],
+    "Descent.Portability.FrameRepairSpans.frame_gain_identity": [],
     "Descent.Portability.GramRepairOptimality.robust_optimum": [],
     "Descent.Portability.GramSafeRepair.induced_gain": [],
     "Descent.Portability.GramSafeRepair.repair_certificate": [],
@@ -213986,6 +214173,10 @@
     "Descent.Portability.MeanDriftRepair.attained_drift_penalty": [
      "∀ i, L i ≤ (∫ y, y ∂μ i"
     ],
+    "Descent.Portability.NestedRepairSpans.gain_projection": [
+     "d ∈ V"
+    ],
+    "Descent.Portability.NestedRepairSpans.oracle_attained": [],
     "Descent.Portability.SafeRepairGeometry.gain_eq_oracle_sub_regret": [],
     "Descent.Portability.SafeRepairGeometry.gain_le_oracle": [],
     "Descent.Portability.SafeRepairGeometry.gain_self": [],
@@ -213996,6 +214187,11 @@
     "Descent.Portability.SafeRepairGeometry.safe_gain": [],
     "Descent.Portability.SafeRepairGeometry.ball_robust_optimum": [],
     "Descent.Portability.SafeRepairGeometry.safe_oracle_regret": [],
+    "Descent.Portability.SubgroupRepairGeometry.lower_concave": [],
+    "Descent.Portability.SubgroupRepairGeometry.induced_lower": [],
+    "Descent.Portability.SubgroupRepairGeometry.true_gain_lower": [],
+    "Descent.Portability.SubgroupRepairGeometry.lower_zero": [],
+    "Descent.Portability.SubgroupRepairGeometry.simultaneous_safety": [],
     "Descent.Spectral.no_counting_functional": [],
     "Descent.Spectral.augmented_informationPerUnitCost_gt_iff": []
    },
@@ -259776,6 +259972,7 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Portability.DecisionLossContrasts.frame_gain",
+   "Descent.Portability.FrameRepairSpans.frame_gain_identity",
    "Descent.Portability.GramRepairOptimality.robust_optimum",
    "Descent.Portability.GramSafeRepair.induced_gain",
    "Descent.Portability.GramSafeRepair.repair_certificate",
@@ -259784,6 +259981,8 @@
    "Descent.Portability.MeanDriftRepair.gain_change",
    "Descent.Portability.MeanDriftRepair.gain_identity",
    "Descent.Portability.MeanDriftRepair.same_mean_gain",
+   "Descent.Portability.NestedRepairSpans.gain_projection",
+   "Descent.Portability.NestedRepairSpans.oracle_attained",
    "Descent.Portability.SafeRepairGeometry.ball_gain_lower",
    "Descent.Portability.SafeRepairGeometry.ball_robust_optimum",
    "Descent.Portability.SafeRepairGeometry.compact_robust_optimum",
@@ -259794,6 +259993,11 @@
    "Descent.Portability.SafeRepairGeometry.safe_gain",
    "Descent.Portability.SafeRepairGeometry.safe_lower_value",
    "Descent.Portability.SafeRepairGeometry.safe_oracle_regret",
+   "Descent.Portability.SubgroupRepairGeometry.induced_lower",
+   "Descent.Portability.SubgroupRepairGeometry.lower_concave",
+   "Descent.Portability.SubgroupRepairGeometry.lower_zero",
+   "Descent.Portability.SubgroupRepairGeometry.simultaneous_safety",
+   "Descent.Portability.SubgroupRepairGeometry.true_gain_lower",
    "Descent.Spectral.augmented_informationPerUnitCost_gt_iff",
    "Descent.Spectral.no_counting_functional"
   ],
@@ -259806,6 +260010,7 @@
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.DecisionLossContrasts.frame_gain": [],
+    "Descent.Portability.FrameRepairSpans.frame_gain_identity": [],
     "Descent.Portability.GramRepairOptimality.robust_optimum": [],
     "Descent.Portability.GramSafeRepair.induced_gain": [],
     "Descent.Portability.GramSafeRepair.repair_certificate": [],
@@ -259814,6 +260019,8 @@
     "Descent.Portability.MeanDriftRepair.same_mean_gain": [],
     "Descent.Portability.MeanDriftRepair.drift_lower": [],
     "Descent.Portability.MeanDriftRepair.attained_drift_penalty": [],
+    "Descent.Portability.NestedRepairSpans.gain_projection": [],
+    "Descent.Portability.NestedRepairSpans.oracle_attained": [],
     "Descent.Portability.SafeRepairGeometry.gain_eq_oracle_sub_regret": [],
     "Descent.Portability.SafeRepairGeometry.gain_le_oracle": [],
     "Descent.Portability.SafeRepairGeometry.gain_self": [],
@@ -259830,6 +260037,11 @@
     "Descent.Portability.SafeRepairGeometry.safe_oracle_regret": [
      "‖s - h‖ ≤ ε"
     ],
+    "Descent.Portability.SubgroupRepairGeometry.lower_concave": [],
+    "Descent.Portability.SubgroupRepairGeometry.induced_lower": [],
+    "Descent.Portability.SubgroupRepairGeometry.true_gain_lower": [],
+    "Descent.Portability.SubgroupRepairGeometry.lower_zero": [],
+    "Descent.Portability.SubgroupRepairGeometry.simultaneous_safety": [],
     "Descent.Spectral.no_counting_functional": [],
     "Descent.Spectral.augmented_informationPerUnitCost_gt_iff": []
    },
@@ -275597,6 +275809,185 @@
     3
    ],
    "range_lo": 0
+  }
+ },
+ "Descent.Portability.SubgroupRepairGeometry.lower": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "unrecognised character '⬝'",
+  "file": "Descent/Portability/SubgroupRepairGeometry.lean",
+  "line": 61,
+  "short": "lower",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "ε": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Blindness.forbiddenInterval_of_levelResolved_cover",
+   "Descent.Blindness.pooledEnvironmentCorrelations_gt",
+   "Descent.Blindness.pooledEnvironmentCorrelations_mem_Icc",
+   "Descent.Conditionals.transportedResponse_mem_Icc",
+   "Descent.Core.SharpFiberEnvelope.coordinateIdentified_iff_endpoints_eq",
+   "Descent.Core.SharpFiberEnvelope.halfWidth_le_worstEndpointError",
+   "Descent.Core.SharpFiberEnvelope.hasExactReadout_iff_all_endpoints_eq",
+   "Descent.Core.SharpFiberEnvelope.no_exactReadout_of_lt",
+   "Descent.Decision.FiniteMinimax.Problem.indistinguishableBinaryProblem_minimaxRisk",
+   "Descent.Decision.FiniteMinimax.Problem.minimaxRisk_le_garbleObservations",
+   "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
+   "Descent.Portability.FiniteMetricIdentification.sharp_metric_interval",
+   "Descent.Portability.MarkovCoarseGraining.expectation_range_totalVariation",
+   "Descent.Portability.MarkovCoarseGraining.ranged_report_error",
+   "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass",
+   "Descent.Portability.RatioPoleLaw.inverse_square_lower",
+   "Descent.Portability.RatioPoleLaw.lintegral_top_of_quadratic_slabs",
+   "Descent.Portability.RatioPoleLaw.open_neighborhood_pole",
+   "Descent.Portability.RatioPoleLaw.ratio_lintegral_top_of_local_slab_mass",
+   "Descent.Portability.SubgroupRepairGeometry.coefficient_lower_concave",
+   "Descent.Portability.SubgroupRepairGeometry.induced_lower",
+   "Descent.Portability.SubgroupRepairGeometry.lower_zero",
+   "Descent.Portability.SubgroupRepairGeometry.safeSet_convex",
+   "Descent.Portability.SubgroupRepairGeometry.true_gain_lower",
+   "Descent.Portability.binaryPolygenicDeploymentBoundary",
+   "Descent.Portability.crossing_forces_defect_and_regret",
+   "Descent.Portability.driftDecisionRegret_pos_of_crossing",
+   "Descent.Portability.no_common_thresholdDecision_of_crossing",
+   "Descent.Portability.no_regretFree_action_of_crossing",
+   "Descent.Portability.posteriorMean_twoIndex_eq",
+   "Descent.Portability.thresholdDecision_ne_of_crossing",
+   "Descent.Portability.twoIndex_balanced_calibrationDriftDefectSq_eq_quarter_widthEnergy",
+   "Descent.Portability.twoIndex_calibrationDriftDefectSq_eq",
+   "Descent.Portability.twoIndex_calibrationDriftDefectSq_le_quarter_widthEnergy",
+   "Descent.Portability.twoIndex_posteriorDriftEnergy_eq",
+   "Descent.Portability.twoIndex_posteriorDriftEnergy_eq_zero_iff",
+   "Descent.Portability.twoIndex_posteriorDriftEnergy_ge_thresholdMargin",
+   "Descent.Portability.twoIndex_posteriorDriftEnergy_pos_of_thresholdMargin",
+   "Descent.Portability.worstIndexError_ge_half_width",
+   "Descent.Portability.worstIndexError_midrange",
+   "Descent.Portability.worstIndexError_posteriorMean_gt_half_width",
+   "Descent.Spectral.IsRankAllocation.witness",
+   "Descent.Spectral.isRankAllocation_convex",
+   "Descent.Spectral.spectralCapture_ge_of_threshold",
+   "Descent.Spectral.spectralCapture_le_of_threshold"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "G.PosDef",
+    "signal G (r - h",
+    "0 ≤ ε",
+    "∀ j, (G j",
+    "∀ j, 0 ≤ ε j"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Blindness.forbiddenInterval_of_levelResolved_cover": [],
+    "Descent.Blindness.pooledEnvironmentCorrelations_mem_Icc": [],
+    "Descent.Blindness.pooledEnvironmentCorrelations_gt": [],
+    "Descent.Conditionals.transportedResponse_mem_Icc": [],
+    "Descent.Core.SharpFiberEnvelope.halfWidth_le_worstEndpointError": [],
+    "Descent.Core.SharpFiberEnvelope.coordinateIdentified_iff_endpoints_eq": [],
+    "Descent.Core.SharpFiberEnvelope.hasExactReadout_iff_all_endpoints_eq": [],
+    "Descent.Core.SharpFiberEnvelope.no_exactReadout_of_lt": [],
+    "Descent.Decision.FiniteMinimax.Problem.minimaxRisk_le_garbleObservations": [],
+    "Descent.Decision.FiniteMinimax.Problem.indistinguishableBinaryProblem_minimaxRisk": [],
+    "Descent.Portability.posteriorMean_twoIndex_eq": [],
+    "Descent.Portability.twoIndex_posteriorDriftEnergy_eq": [],
+    "Descent.Portability.twoIndex_posteriorDriftEnergy_eq_zero_iff": [],
+    "Descent.Portability.thresholdDecision_ne_of_crossing": [],
+    "Descent.Portability.no_common_thresholdDecision_of_crossing": [],
+    "Descent.Portability.twoIndex_posteriorDriftEnergy_ge_thresholdMargin": [],
+    "Descent.Portability.twoIndex_posteriorDriftEnergy_pos_of_thresholdMargin": [],
+    "Descent.Portability.twoIndex_calibrationDriftDefectSq_eq": [],
+    "Descent.Portability.twoIndex_calibrationDriftDefectSq_le_quarter_widthEnergy": [],
+    "Descent.Portability.twoIndex_balanced_calibrationDriftDefectSq_eq_quarter_widthEnergy": [],
+    "Descent.Portability.worstIndexError_ge_half_width": [],
+    "Descent.Portability.worstIndexError_midrange": [],
+    "Descent.Portability.worstIndexError_posteriorMean_gt_half_width": [],
+    "Descent.Portability.driftDecisionRegret_pos_of_crossing": [],
+    "Descent.Portability.no_regretFree_action_of_crossing": [],
+    "Descent.Portability.crossing_forces_defect_and_regret": [],
+    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
+    "Descent.Portability.FiniteMetricIdentification.sharp_metric_interval": [],
+    "Descent.Portability.MarkovCoarseGraining.expectation_range_totalVariation": [],
+    "Descent.Portability.MarkovCoarseGraining.ranged_report_error": [],
+    "Descent.Portability.binaryPolygenicDeploymentBoundary": [],
+    "Descent.Portability.RatioPoleLaw.open_neighborhood_pole": [],
+    "Descent.Portability.RatioPoleLaw.lintegral_top_of_quadratic_slabs": [],
+    "Descent.Portability.RatioPoleLaw.inverse_square_lower": [],
+    "Descent.Portability.RatioPoleLaw.ratio_lintegral_top_of_local_slab_mass": [],
+    "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass": [],
+    "Descent.Portability.SubgroupRepairGeometry.induced_lower": [
+     "G.PosDef"
+    ],
+    "Descent.Portability.SubgroupRepairGeometry.true_gain_lower": [
+     "G.PosDef",
+     "signal G (r - h"
+    ],
+    "Descent.Portability.SubgroupRepairGeometry.coefficient_lower_concave": [
+     "G.PosDef",
+     "0 ≤ ε"
+    ],
+    "Descent.Portability.SubgroupRepairGeometry.lower_zero": [],
+    "Descent.Portability.SubgroupRepairGeometry.safeSet_convex": [
+     "∀ j, (G j",
+     "∀ j, 0 ≤ ε j"
+    ],
+    "Descent.Spectral.IsRankAllocation.witness": [],
+    "Descent.Spectral.spectralCapture_le_of_threshold": [],
+    "Descent.Spectral.spectralCapture_ge_of_threshold": [],
+    "Descent.Spectral.isRankAllocation_convex": []
+   },
+   "range_lo_thm": [
+    "Descent.Portability.RatioPoleLaw.open_neighborhood_pole",
+    1
+   ],
+   "range_lo": 0
+  }
+ },
+ "Descent.Portability.SubgroupRepairGeometry.SafeSet": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/SubgroupRepairGeometry.lean",
+  "line": 108,
+  "short": "SafeSet",
+  "ret_type": "Set (ι → ℝ)",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.SubgroupRepairGeometry.safeSet_convex",
+   "Descent.Portability.SubgroupRepairGeometry.simultaneous_safety",
+   "Descent.Portability.SubgroupRepairGeometry.zero_mem_safeSet"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "∀ j, (G j",
+    "∀ j, 0 ≤ ε j",
+    "∀ j, signal (G j",
+    "θ ∈ SafeSet G h ε"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.SubgroupRepairGeometry.safeSet_convex": [
+     "∀ j, (G j",
+     "∀ j, 0 ≤ ε j"
+    ],
+    "Descent.Portability.SubgroupRepairGeometry.zero_mem_safeSet": [],
+    "Descent.Portability.SubgroupRepairGeometry.simultaneous_safety": [
+     "∀ j, (G j",
+     "∀ j, signal (G j",
+     "θ ∈ SafeSet G h ε"
+    ]
+   }
   }
  },
  "Descent.Portability.SummaryInvisibleDiameter.summaryGap": {

@@ -45,7 +45,7 @@ theorem frame_gain_identity (μ : ι → Measure ℝ) [∀ i, IsProbabilityMeasu
   unfold SafeRepairGeometry.gain
   rw [EuclideanSpace.inner_eq_star_dotProduct, EuclideanSpace.norm_sq_eq]
   simp only [meanResidual, WithLp.ofLp_toLp, star_trivial, dotProduct,
-    Real.norm_eq_abs, sq_abs, PiLp.ofLp_apply]
+    Real.norm_eq_abs, sq_abs, PiLp.ofLp_apply, PiLp.toLp_apply]
   rw [Finset.mul_sum, ← Finset.sum_sub_distrib, Finset.sum_div]
   apply Finset.sum_congr rfl
   intro i _
