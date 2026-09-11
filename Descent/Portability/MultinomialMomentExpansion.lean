@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.FiniteReproductiveKernel
+import Mathlib.Combinatorics.Enumerative.Stirling
 
 assert_below Descent.Decision Descent.Program
 
@@ -30,10 +31,18 @@ factorial vanishes, the remaining ones are shifted by `b` onto the census vector
 `(Σ x) ^ (N - Σ b)`. When `Σ b > N` both sides are zero. `expectation_prod_descFactorial` is the
 statement for the probability law, where `Σ x = 1`.
 
+Power moments follow. `pow_eq_sum_stirlingSecond_mul_descFactorial` writes a power of a
+natural number as the Stirling-weighted sum of its descending factorials,
+`n ^ k = Σ_{j ≤ k} S(k, j) (n)_j` with `S = Nat.stirlingSecond`, by induction on `k` through the
+recurrence `S(k + 1, j + 1) = (j + 1) S(k, j + 1) + S(k, j)`. `expectation_prod_pow` then gives
+every mixed power moment of the census exactly,
+`E ∏_a Z_a ^ b_a = Σ_{j ≤ b} (∏_a S(b_a, j_a)) (N)_{Σ j} ∏_a x_a ^ j_a`, an explicit polynomial in
+`N` and `x` with no remainder.
+
 What is NOT proved in this module: the expansion (10) of `E f(Z / N)` for polynomials `f` of
 degree at most four with its `O(N⁻²)` remainder, and the multinomial drift stage that would
-replace the single-draw drift stage of the microscopic kernel. The identity here is the exact
-input both of those need.
+replace the single-draw drift stage of the microscopic kernel. The exact power moments here are
+the input both of those need.
 
 ## Empirical status
 
@@ -181,6 +190,82 @@ theorem expectation_prod_descFactorial {H : Type*} [Fintype H] [DecidableEq H]
   exact Finset.sum_coe_sort (Finset.piAntidiag Finset.univ N)
     (fun z : H → ℕ ↦ (Nat.multinomial Finset.univ z : ℝ) * (∏ a, offspring.mass a ^ z a)
       * ∏ a, ((z a).descFactorial (b a) : ℝ))
+
+/-- **Powers as Stirling sums of descending factorials.** For natural numbers,
+`n ^ k = Σ_{j ≤ k} S(k, j) (n)_j`, with `S` the Stirling numbers of the second kind. -/
+theorem pow_eq_sum_stirlingSecond_mul_descFactorial (n k : ℕ) :
+    n ^ k = ∑ j ∈ Finset.range (k + 1), Nat.stirlingSecond k j * n.descFactorial j := by
+  induction k with
+  | zero => simp
+  | succ k ih =>
+    have hmul : ∀ j, n.descFactorial j * n
+        = n.descFactorial (j + 1) + j * n.descFactorial j := by
+      intro j
+      rw [Nat.descFactorial_succ]
+      by_cases hj : j ≤ n
+      · rw [← add_mul, Nat.sub_add_cancel hj, mul_comm]
+      · rw [Nat.descFactorial_eq_zero_iff_lt.mpr (not_le.mp hj)]
+        simp
+    have hshift : ∑ j ∈ Finset.range (k + 1), Nat.stirlingSecond k j * (j * n.descFactorial j)
+        = ∑ j ∈ Finset.range (k + 1),
+            (j + 1) * Nat.stirlingSecond k (j + 1) * n.descFactorial (j + 1) := by
+      rw [Finset.sum_range_succ', Finset.sum_range_succ,
+        Nat.stirlingSecond_eq_zero_of_lt (Nat.lt_add_one k)]
+      simp only [zero_mul, mul_zero, add_zero]
+      exact Finset.sum_congr rfl fun j _ ↦ by ring
+    calc n ^ (k + 1) = n ^ k * n := pow_succ n k
+      _ = ∑ j ∈ Finset.range (k + 1), Nat.stirlingSecond k j * (n.descFactorial j * n) := by
+        rw [ih, Finset.sum_mul]
+        exact Finset.sum_congr rfl fun j _ ↦ by ring
+      _ = ∑ j ∈ Finset.range (k + 1), Nat.stirlingSecond k j * n.descFactorial (j + 1)
+          + ∑ j ∈ Finset.range (k + 1), Nat.stirlingSecond k j * (j * n.descFactorial j) := by
+        rw [← Finset.sum_add_distrib]
+        exact Finset.sum_congr rfl fun j _ ↦ by rw [hmul]; ring
+      _ = ∑ j ∈ Finset.range (k + 1),
+            Nat.stirlingSecond (k + 1) (j + 1) * n.descFactorial (j + 1) := by
+        rw [hshift, ← Finset.sum_add_distrib]
+        refine Finset.sum_congr rfl fun j _ ↦ ?_
+        rw [Nat.stirlingSecond_succ_succ]
+        ring
+      _ = ∑ j ∈ Finset.range (k + 1 + 1), Nat.stirlingSecond (k + 1) j * n.descFactorial j := by
+        rw [Finset.sum_range_succ' _ (k + 1), Nat.stirlingSecond_succ_zero, zero_mul, add_zero]
+
+/-- **Exact power moments of the multinomial census.** The expectation of `∏_a Z_a ^ b_a` is the
+Stirling-weighted sum of descending factorial moments,
+`Σ_{j ≤ b} (∏_a S(b_a, j_a)) (N)_{Σ j} ∏_a x_a ^ j_a`. -/
+theorem expectation_prod_pow {H : Type*} [Fintype H] [DecidableEq H]
+    (offspring : FiniteReportLaw H) (N : ℕ) (b : H → ℕ) :
+    (multinomialLaw offspring N).expectation (fun counts ↦ ∏ a, (counts.val a : ℝ) ^ b a)
+      = ∑ j ∈ Fintype.piFinset fun a ↦ Finset.range (b a + 1),
+          (∏ a, (Nat.stirlingSecond (b a) (j a) : ℝ)) * (N.descFactorial (∑ a, j a) : ℝ)
+            * ∏ a, offspring.mass a ^ j a := by
+  have hpoint : ∀ counts : Counts H N, ∏ a, (counts.val a : ℝ) ^ b a
+      = ∑ j ∈ Fintype.piFinset fun a ↦ Finset.range (b a + 1),
+          (∏ a, (Nat.stirlingSecond (b a) (j a) : ℝ))
+            * ∏ a, ((counts.val a).descFactorial (j a) : ℝ) := by
+    intro counts
+    have hfactor : ∀ a, (counts.val a : ℝ) ^ b a
+        = ∑ i ∈ Finset.range (b a + 1),
+            (Nat.stirlingSecond (b a) i : ℝ) * ((counts.val a).descFactorial i : ℝ) := by
+      intro a
+      exact_mod_cast pow_eq_sum_stirlingSecond_mul_descFactorial (counts.val a) (b a)
+    simp only [hfactor]
+    rw [Finset.prod_univ_sum]
+    exact Finset.sum_congr rfl fun j _ ↦ Finset.prod_mul_distrib
+  calc (multinomialLaw offspring N).expectation (fun counts ↦ ∏ a, (counts.val a : ℝ) ^ b a)
+      = ∑ counts, (multinomialLaw offspring N).mass counts
+          * ∑ j ∈ Fintype.piFinset fun a ↦ Finset.range (b a + 1),
+              (∏ a, (Nat.stirlingSecond (b a) (j a) : ℝ))
+                * ∏ a, ((counts.val a).descFactorial (j a) : ℝ) :=
+        Finset.sum_congr rfl fun counts _ ↦ by simp only [hpoint]
+    _ = ∑ j ∈ Fintype.piFinset fun a ↦ Finset.range (b a + 1),
+          (∏ a, (Nat.stirlingSecond (b a) (j a) : ℝ))
+            * (multinomialLaw offspring N).expectation
+                (fun counts ↦ ∏ a, ((counts.val a).descFactorial (j a) : ℝ)) := by
+        simp only [Finset.mul_sum, FiniteReportLaw.expectation]
+        rw [Finset.sum_comm]
+        exact Finset.sum_congr rfl fun j _ ↦ Finset.sum_congr rfl fun counts _ ↦ by ring
+    _ = _ := Finset.sum_congr rfl fun j _ ↦ by rw [expectation_prod_descFactorial]; ring
 
 end
 
