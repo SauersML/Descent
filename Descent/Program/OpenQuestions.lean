@@ -65,6 +65,7 @@ import Descent.Portability.RadialInterpolation
 import Descent.Portability.RadialReportLaws
 import Descent.Portability.IndependentRadialLaws
 import Descent.Portability.SmoothedCoordinateLaws
+import Descent.Portability.CubeAverageConvergence
 import Descent.Portability.MomentOrderObstruction
 import Descent.Portability.DenominatorAwareRecovery
 import Descent.Portability.ConditionalOscillationDuality
@@ -299,15 +300,23 @@ form, the scope line says so and the module docstring repeats it.
 * `ApproximationDuality`: PL Theorem 8.1, the largest report disagreement compatible with the
   supplied moments is exactly twice the best uniform approximation error, with the extremal
   moment-matched pair built by separation and both optimal-recovery halves.
-* `RadialInterpolation`, `RadialReportLaws`, `IndependentRadialLaws`, `SmoothedCoordinateLaws`:
-  PL Lemma 7.1,
+* `RadialInterpolation`, `RadialReportLaws`, `IndependentRadialLaws`, `SmoothedCoordinateLaws`,
+  `CubeAverageConvergence`: PL Lemma 7.1,
   Theorem 7.2 with (7.4), Corollary 7.3 in both its expectation form and its
   total-variation form ((7.6): each direction marginal is within b/(a+b) of its target in
   `FiniteReportLaw.totalVariation`, hence so is every report law), Corollary 7.5, and Theorem
   7.4's independent finite-support core (for every finite raw-moment order, matched laws
   whose expected scale-invariant report sits arbitrarily close to opposite ends of its range)
-  together with its smoothing step: convolving each coordinate with uniform noise preserves
-  exact moment matching through any degree and yields a bounded density.
+  together with its smoothing and product steps: convolving each coordinate with uniform
+  noise gives an absolutely continuous probability law with a bounded density whose moments
+  are the convolved moments, and the product of the smoothed marginals is a genuinely
+  independent bounded-density law whose joint raw moments still match through degree k,
+  which is (7.7) in the manuscript's continuous form; and the product of smoothed marginals is
+  a finite mixture of uniform cube laws about the atoms, whose expected report converges to
+  the finite-support value as the smoothing vanishes (continuity at each atom, no null-set or
+  dominated-convergence argument), so Theorem 7.4 holds in its absolutely-continuous form:
+  for every order and tolerance, two independent bounded-density product laws with matched
+  joint moments whose expected reports sit at opposite ends of the range.
 * `MomentOrderObstruction`: DC Lemmas 8.1-8.2 and Theorems 8.3-8.4, no finite joint-moment
   order identifies expected partial R² or expected fitted loss-explainability, with the exact
   instances 27/1768 and −24900075/1099632872; Lemma 8.2 is proved in a stronger form than
@@ -317,9 +326,7 @@ form, the scope line says so and the module docstring repeats it.
 * `DenominatorAwareRecovery`: PL Theorem 9.1, Chebyshev recovery with its closed-form error
   level. `ConditionalOscillationDuality`: PL Theorem 8.2 and Corollary 8.3 as one duality
   theorem in the noise level.
-  Scope: in the absolutely-continuous refinement of PL 7.4 the product of the smoothed
-  marginals and the convergence of the expected fitted report under it are not formalized;
-  the independent finite-support core and the smoothing step are.
+  Nothing in this package is proved in a narrower form than the manuscript states.
 
 ### The pipeline: finite report laws, regions and identification
 
