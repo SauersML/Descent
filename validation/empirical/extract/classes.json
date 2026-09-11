@@ -39383,6 +39383,8 @@
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.FiniteLiabilityPanel.prevalenceIntercept_shift",
    "Descent.Portability.FiniteLiabilityPanel.risk_shift",
+   "Descent.Portability.FiniteMedianGeometry.lower_failure",
+   "Descent.Portability.FiniteMedianGeometry.upper_failure",
    "Descent.Portability.FiniteMemoryCertificate.retained_memory_lags",
    "Descent.Portability.FiniteMetricIdentification.dual_lower",
    "Descent.Portability.FiniteMetricIdentification.dual_upper",
@@ -39581,6 +39583,8 @@
    "Descent.Portability.JointReportFeasibility.region_eq_convexHull_of_module",
    "Descent.Portability.JointReportFeasibility.report_region_eq_convexHull",
    "Descent.Portability.LossExplainabilityRegion.fraction_attains",
+   "Descent.Portability.LossExplainabilitySeparation.conditional_context",
+   "Descent.Portability.LossExplainabilitySeparation.explained_fraction_tendsto_zero",
    "Descent.Portability.LowMomentObstruction.character_orthogonality",
    "Descent.Portability.LowMomentObstruction.complement_mul_singleton",
    "Descent.Portability.LowMomentObstruction.complement_nonempty",
@@ -39607,6 +39611,8 @@
    "Descent.Portability.MeanDriftRepair.gain_identity",
    "Descent.Portability.MeasurementRankLaw.eigenvalue_zero_iff_rank_le",
    "Descent.Portability.MeasurementRankLaw.zero_risk_iff",
+   "Descent.Portability.MedianAuditConcentration.majority_tail",
+   "Descent.Portability.MedianAuditConcentration.median_tail",
    "Descent.Portability.MetricOrderingClassification.constant_precision_feasible_iff",
    "Descent.Portability.MinimalObservableLaw.closureStage_le_wordSpan",
    "Descent.Portability.MinimalObservableLaw.finiteOrbitSpan_eq",
@@ -39634,6 +39640,8 @@
    "Descent.Portability.ObservationAsymptotics.integral_power_limit",
    "Descent.Portability.ObservationAsymptotics.jet_leading_limit",
    "Descent.Portability.ObservationAsymptotics.visibleCoefficient_pos",
+   "Descent.Portability.OddLocusReportSolutions.aggLevel_gridPred",
+   "Descent.Portability.OddLocusReportSolutions.aggLevel_gridSucc",
    "Descent.Portability.OperationalAuditConstraints.f1_linear_target",
    "Descent.Portability.OperationalAuditConstraints.paired_true_positive",
    "Descent.Portability.OperationalAuditConstraints.recall_linear_target",
@@ -39644,6 +39652,7 @@
    "Descent.Portability.OrderedMutationCatalogue.mutationBranch_nucleotide",
    "Descent.Portability.OrderedMutationCatalogue.mutationCount_unsupported",
    "Descent.Portability.PThresholdTrainingLaw.linearScoreFiles_values",
+   "Descent.Portability.PairedMedianOfMeans.simultaneous",
    "Descent.Portability.PartialLabelAssayDesign.all_fractions_tie",
    "Descent.Portability.PartialLabelAssayDesign.full_label_strictly_optimal",
    "Descent.Portability.PartialLabelAssayDesign.no_label_strictly_optimal",
@@ -41004,6 +41013,8 @@
     "Descent.Portability.FiniteL1WeakStability.reports_tight": [],
     "Descent.Portability.FiniteL1WeakStability.weak_limit_of_L1": [],
     "Descent.Portability.FiniteL1WeakStability.varying_scale_limit": [],
+    "Descent.Portability.FiniteMedianGeometry.lower_failure": [],
+    "Descent.Portability.FiniteMedianGeometry.upper_failure": [],
     "Descent.Portability.FiniteMemoryCertificate.retained_memory_lags": [],
     "Descent.Portability.FiniteMetricIdentification.pairing_smul": [],
     "Descent.Portability.FiniteMetricIdentification.feasible_compact": [],
@@ -41229,6 +41240,8 @@
     "Descent.Portability.staleness_nonneg": [],
     "Descent.Portability.temporal_split_more_conservative": [],
     "Descent.Portability.LossExplainabilityRegion.fraction_attains": [],
+    "Descent.Portability.LossExplainabilitySeparation.conditional_context": [],
+    "Descent.Portability.LossExplainabilitySeparation.explained_fraction_tendsto_zero": [],
     "Descent.Portability.LowMomentObstruction.character_orthogonality": [],
     "Descent.Portability.LowMomentObstruction.perturbation_moment": [],
     "Descent.Portability.LowMomentObstruction.complement_mul_singleton": [],
@@ -41261,6 +41274,10 @@
     "Descent.Portability.MeanDriftRepair.attained_drift_penalty": [],
     "Descent.Portability.MeasurementRankLaw.eigenvalue_zero_iff_rank_le": [],
     "Descent.Portability.MeasurementRankLaw.zero_risk_iff": [],
+    "Descent.Portability.MedianAuditConcentration.majority_tail": [
+     "0 < K"
+    ],
+    "Descent.Portability.MedianAuditConcentration.median_tail": [],
     "Descent.Portability.MetricOrderingClassification.constant_precision_feasible_iff": [],
     "Descent.Portability.neutralAF_benchmark_discrimination_preserved_calibration_lost": [],
     "Descent.Portability.brier_portability_gap_positive_of_r2_shift": [],
@@ -41296,6 +41313,8 @@
     "Descent.Portability.ObservationAsymptotics.integral_power_limit": [],
     "Descent.Portability.ObservationAsymptotics.informationDensity_continuous": [],
     "Descent.Portability.ObservationAsymptotics.visibleCoefficient_pos": [],
+    "Descent.Portability.OddLocusReportSolutions.aggLevel_gridSucc": [],
+    "Descent.Portability.OddLocusReportSolutions.aggLevel_gridPred": [],
     "Descent.Portability.OperationalAuditConstraints.recall_linear_target": [],
     "Descent.Portability.OperationalAuditConstraints.f1_linear_target": [],
     "Descent.Portability.OperationalAuditConstraints.paired_true_positive": [],
@@ -41326,6 +41345,7 @@
     "Descent.Portability.citl_shift_positive_higher_prevalence": [],
     "Descent.Portability.posthoc_recalibration_cannot_reorder": [],
     "Descent.Portability.PThresholdTrainingLaw.linearScoreFiles_values": [],
+    "Descent.Portability.PairedMedianOfMeans.simultaneous": [],
     "Descent.Portability.PartialLabelAssayDesign.full_label_strictly_optimal": [],
     "Descent.Portability.PartialLabelAssayDesign.no_label_strictly_optimal": [],
     "Descent.Portability.PartialLabelAssayDesign.all_fractions_tie": [],
@@ -50577,6 +50597,8 @@
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.FiniteLiabilityPanel.prevalenceIntercept_shift",
    "Descent.Portability.FiniteLiabilityPanel.risk_shift",
+   "Descent.Portability.FiniteMedianGeometry.lower_failure",
+   "Descent.Portability.FiniteMedianGeometry.upper_failure",
    "Descent.Portability.FiniteMemoryCertificate.retained_memory_lags",
    "Descent.Portability.FiniteMetricIdentification.dual_lower",
    "Descent.Portability.FiniteMetricIdentification.dual_upper",
@@ -50775,6 +50797,8 @@
    "Descent.Portability.JointReportFeasibility.region_eq_convexHull_of_module",
    "Descent.Portability.JointReportFeasibility.report_region_eq_convexHull",
    "Descent.Portability.LossExplainabilityRegion.fraction_attains",
+   "Descent.Portability.LossExplainabilitySeparation.conditional_context",
+   "Descent.Portability.LossExplainabilitySeparation.explained_fraction_tendsto_zero",
    "Descent.Portability.LowMomentObstruction.character_orthogonality",
    "Descent.Portability.LowMomentObstruction.complement_mul_singleton",
    "Descent.Portability.LowMomentObstruction.complement_nonempty",
@@ -50801,6 +50825,8 @@
    "Descent.Portability.MeanDriftRepair.gain_identity",
    "Descent.Portability.MeasurementRankLaw.eigenvalue_zero_iff_rank_le",
    "Descent.Portability.MeasurementRankLaw.zero_risk_iff",
+   "Descent.Portability.MedianAuditConcentration.majority_tail",
+   "Descent.Portability.MedianAuditConcentration.median_tail",
    "Descent.Portability.MetricOrderingClassification.constant_precision_feasible_iff",
    "Descent.Portability.MinimalObservableLaw.closureStage_le_wordSpan",
    "Descent.Portability.MinimalObservableLaw.finiteOrbitSpan_eq",
@@ -50828,6 +50854,8 @@
    "Descent.Portability.ObservationAsymptotics.integral_power_limit",
    "Descent.Portability.ObservationAsymptotics.jet_leading_limit",
    "Descent.Portability.ObservationAsymptotics.visibleCoefficient_pos",
+   "Descent.Portability.OddLocusReportSolutions.aggLevel_gridPred",
+   "Descent.Portability.OddLocusReportSolutions.aggLevel_gridSucc",
    "Descent.Portability.OperationalAuditConstraints.f1_linear_target",
    "Descent.Portability.OperationalAuditConstraints.paired_true_positive",
    "Descent.Portability.OperationalAuditConstraints.recall_linear_target",
@@ -50838,6 +50866,7 @@
    "Descent.Portability.OrderedMutationCatalogue.mutationBranch_nucleotide",
    "Descent.Portability.OrderedMutationCatalogue.mutationCount_unsupported",
    "Descent.Portability.PThresholdTrainingLaw.linearScoreFiles_values",
+   "Descent.Portability.PairedMedianOfMeans.simultaneous",
    "Descent.Portability.PartialLabelAssayDesign.all_fractions_tie",
    "Descent.Portability.PartialLabelAssayDesign.full_label_strictly_optimal",
    "Descent.Portability.PartialLabelAssayDesign.no_label_strictly_optimal",
@@ -52168,6 +52197,8 @@
     "Descent.Portability.FiniteL1WeakStability.reports_tight": [],
     "Descent.Portability.FiniteL1WeakStability.weak_limit_of_L1": [],
     "Descent.Portability.FiniteL1WeakStability.varying_scale_limit": [],
+    "Descent.Portability.FiniteMedianGeometry.lower_failure": [],
+    "Descent.Portability.FiniteMedianGeometry.upper_failure": [],
     "Descent.Portability.FiniteMemoryCertificate.retained_memory_lags": [],
     "Descent.Portability.FiniteMetricIdentification.pairing_smul": [],
     "Descent.Portability.FiniteMetricIdentification.feasible_compact": [],
@@ -52381,6 +52412,8 @@
     "Descent.Portability.staleness_nonneg": [],
     "Descent.Portability.temporal_split_more_conservative": [],
     "Descent.Portability.LossExplainabilityRegion.fraction_attains": [],
+    "Descent.Portability.LossExplainabilitySeparation.conditional_context": [],
+    "Descent.Portability.LossExplainabilitySeparation.explained_fraction_tendsto_zero": [],
     "Descent.Portability.LowMomentObstruction.character_orthogonality": [],
     "Descent.Portability.LowMomentObstruction.perturbation_moment": [],
     "Descent.Portability.LowMomentObstruction.complement_mul_singleton": [],
@@ -52410,6 +52443,8 @@
     "Descent.Portability.MeanDriftRepair.attained_drift_penalty": [],
     "Descent.Portability.MeasurementRankLaw.eigenvalue_zero_iff_rank_le": [],
     "Descent.Portability.MeasurementRankLaw.zero_risk_iff": [],
+    "Descent.Portability.MedianAuditConcentration.majority_tail": [],
+    "Descent.Portability.MedianAuditConcentration.median_tail": [],
     "Descent.Portability.MetricOrderingClassification.constant_precision_feasible_iff": [],
     "Descent.Portability.neutralAF_benchmark_discrimination_preserved_calibration_lost": [],
     "Descent.Portability.brier_portability_gap_positive_of_r2_shift": [],
@@ -52445,6 +52480,8 @@
     "Descent.Portability.ObservationAsymptotics.integral_power_limit": [],
     "Descent.Portability.ObservationAsymptotics.informationDensity_continuous": [],
     "Descent.Portability.ObservationAsymptotics.visibleCoefficient_pos": [],
+    "Descent.Portability.OddLocusReportSolutions.aggLevel_gridSucc": [],
+    "Descent.Portability.OddLocusReportSolutions.aggLevel_gridPred": [],
     "Descent.Portability.OperationalAuditConstraints.recall_linear_target": [],
     "Descent.Portability.OperationalAuditConstraints.f1_linear_target": [],
     "Descent.Portability.OperationalAuditConstraints.paired_true_positive": [],
@@ -52475,6 +52512,7 @@
     "Descent.Portability.citl_shift_positive_higher_prevalence": [],
     "Descent.Portability.posthoc_recalibration_cannot_reorder": [],
     "Descent.Portability.PThresholdTrainingLaw.linearScoreFiles_values": [],
+    "Descent.Portability.PairedMedianOfMeans.simultaneous": [],
     "Descent.Portability.PartialLabelAssayDesign.full_label_strictly_optimal": [],
     "Descent.Portability.PartialLabelAssayDesign.no_label_strictly_optimal": [],
     "Descent.Portability.PartialLabelAssayDesign.all_fractions_tie": [],
@@ -57641,6 +57679,7 @@
    "Descent.Portability.OddLocusReportSolutions.driftStep_iterate_lump",
    "Descent.Portability.OddLocusReportSolutions.oddRow_eq_zero_of_lt",
    "Descent.Portability.OddLocusReportSolutions.oddSystem_unique",
+   "Descent.Portability.OddLocusReportSolutions.pow_intertwine",
    "Descent.Portability.OddLocusReportSolutions.sum_oddRow",
    "Descent.Portability.OrderedMutationCatalogue.mutationCount_nucleotide",
    "Descent.Portability.OrderedMutationCatalogue.mutationCount_presence",
@@ -57869,6 +57908,7 @@
     "Descent.Portability.OddLocusReportSolutions.oddSystem_unique": [],
     "Descent.Portability.OddLocusReportSolutions.oddRow_eq_zero_of_lt": [],
     "Descent.Portability.OddLocusReportSolutions.driftStep_iterate_lump": [],
+    "Descent.Portability.OddLocusReportSolutions.pow_intertwine": [],
     "Descent.Portability.OrderedMutationCatalogue.mutationCount_unsupported": [],
     "Descent.Portability.OrderedMutationCatalogue.mutationCount_nucleotide": [],
     "Descent.Portability.OrderedMutationCatalogue.mutationCount_presence": [],
@@ -69721,6 +69761,7 @@
    "Descent.PopGen.mutationLDErosion_at_witness",
    "Descent.Portability.OddLocusReportSolutions.driftStep_iterate_lump",
    "Descent.Portability.OddLocusReportSolutions.driftStep_lump",
+   "Descent.Portability.OddLocusReportSolutions.euler_intertwine",
    "Descent.Portability._root_.Descent.PopGen.PGSEvolutionaryModel.toGenerational_mutationSharedRetentionAt_floor",
    "Descent.Portability.amortized_per_population_adaptation_cost_falls_with_task_count",
    "Descent.Portability.deployment_meets_both_budgets",
@@ -69762,6 +69803,7 @@
     ],
     "Descent.Portability.OddLocusReportSolutions.driftStep_lump": [],
     "Descent.Portability.OddLocusReportSolutions.driftStep_iterate_lump": [],
+    "Descent.Portability.OddLocusReportSolutions.euler_intertwine": [],
     "Descent.Portability.fstFromTau_lt_coalescenceCdf": [],
     "Descent.Portability._root_.Descent.PopGen.PGSEvolutionaryModel.toGenerational_mutationSharedRetentionAt_floor": [],
     "Descent.Portability.requiredTargetSamplesForOptimalFineTuningMSE_zero_gapsq_is_junk": [],
@@ -71093,6 +71135,8 @@
    "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain",
    "Descent.Portability.FiniteLiabilityPanel.prevalenceIntercept_shift",
    "Descent.Portability.FiniteLiabilityPanel.risk_shift",
+   "Descent.Portability.FiniteMedianGeometry.lower_failure",
+   "Descent.Portability.FiniteMedianGeometry.upper_failure",
    "Descent.Portability.FiniteMemoryCertificate.retained_memory_lags",
    "Descent.Portability.FiniteMetricIdentification.dual_lower",
    "Descent.Portability.FiniteMetricIdentification.dual_upper",
@@ -71291,6 +71335,8 @@
    "Descent.Portability.JointReportFeasibility.region_eq_convexHull_of_module",
    "Descent.Portability.JointReportFeasibility.report_region_eq_convexHull",
    "Descent.Portability.LossExplainabilityRegion.fraction_attains",
+   "Descent.Portability.LossExplainabilitySeparation.conditional_context",
+   "Descent.Portability.LossExplainabilitySeparation.explained_fraction_tendsto_zero",
    "Descent.Portability.LowMomentObstruction.character_orthogonality",
    "Descent.Portability.LowMomentObstruction.complement_mul_singleton",
    "Descent.Portability.LowMomentObstruction.complement_nonempty",
@@ -71317,6 +71363,8 @@
    "Descent.Portability.MeanDriftRepair.gain_identity",
    "Descent.Portability.MeasurementRankLaw.eigenvalue_zero_iff_rank_le",
    "Descent.Portability.MeasurementRankLaw.zero_risk_iff",
+   "Descent.Portability.MedianAuditConcentration.majority_tail",
+   "Descent.Portability.MedianAuditConcentration.median_tail",
    "Descent.Portability.MetricOrderingClassification.constant_precision_feasible_iff",
    "Descent.Portability.MinimalObservableLaw.closureStage_le_wordSpan",
    "Descent.Portability.MinimalObservableLaw.finiteOrbitSpan_eq",
@@ -71344,6 +71392,8 @@
    "Descent.Portability.ObservationAsymptotics.integral_power_limit",
    "Descent.Portability.ObservationAsymptotics.jet_leading_limit",
    "Descent.Portability.ObservationAsymptotics.visibleCoefficient_pos",
+   "Descent.Portability.OddLocusReportSolutions.aggLevel_gridPred",
+   "Descent.Portability.OddLocusReportSolutions.aggLevel_gridSucc",
    "Descent.Portability.OperationalAuditConstraints.f1_linear_target",
    "Descent.Portability.OperationalAuditConstraints.paired_true_positive",
    "Descent.Portability.OperationalAuditConstraints.recall_linear_target",
@@ -71354,6 +71404,7 @@
    "Descent.Portability.OrderedMutationCatalogue.mutationBranch_nucleotide",
    "Descent.Portability.OrderedMutationCatalogue.mutationCount_unsupported",
    "Descent.Portability.PThresholdTrainingLaw.linearScoreFiles_values",
+   "Descent.Portability.PairedMedianOfMeans.simultaneous",
    "Descent.Portability.PartialLabelAssayDesign.all_fractions_tie",
    "Descent.Portability.PartialLabelAssayDesign.full_label_strictly_optimal",
    "Descent.Portability.PartialLabelAssayDesign.no_label_strictly_optimal",
@@ -72821,6 +72872,8 @@
     "Descent.Portability.FiniteL1WeakStability.reports_tight": [],
     "Descent.Portability.FiniteL1WeakStability.weak_limit_of_L1": [],
     "Descent.Portability.FiniteL1WeakStability.varying_scale_limit": [],
+    "Descent.Portability.FiniteMedianGeometry.lower_failure": [],
+    "Descent.Portability.FiniteMedianGeometry.upper_failure": [],
     "Descent.Portability.FiniteMemoryCertificate.retained_memory_lags": [],
     "Descent.Portability.FiniteMetricIdentification.pairing_smul": [],
     "Descent.Portability.FiniteMetricIdentification.feasible_compact": [],
@@ -73028,6 +73081,8 @@
     "Descent.Portability.staleness_nonneg": [],
     "Descent.Portability.temporal_split_more_conservative": [],
     "Descent.Portability.LossExplainabilityRegion.fraction_attains": [],
+    "Descent.Portability.LossExplainabilitySeparation.conditional_context": [],
+    "Descent.Portability.LossExplainabilitySeparation.explained_fraction_tendsto_zero": [],
     "Descent.Portability.LowMomentObstruction.character_orthogonality": [],
     "Descent.Portability.LowMomentObstruction.perturbation_moment": [],
     "Descent.Portability.LowMomentObstruction.complement_mul_singleton": [],
@@ -73067,6 +73122,8 @@
     ],
     "Descent.Portability.MeasurementRankLaw.eigenvalue_zero_iff_rank_le": [],
     "Descent.Portability.MeasurementRankLaw.zero_risk_iff": [],
+    "Descent.Portability.MedianAuditConcentration.majority_tail": [],
+    "Descent.Portability.MedianAuditConcentration.median_tail": [],
     "Descent.Portability.MetricOrderingClassification.constant_precision_feasible_iff": [],
     "Descent.Portability.neutralAF_benchmark_discrimination_preserved_calibration_lost": [],
     "Descent.Portability.brier_portability_gap_positive_of_r2_shift": [],
@@ -73105,6 +73162,8 @@
     "Descent.Portability.ObservationAsymptotics.integral_power_limit": [],
     "Descent.Portability.ObservationAsymptotics.informationDensity_continuous": [],
     "Descent.Portability.ObservationAsymptotics.visibleCoefficient_pos": [],
+    "Descent.Portability.OddLocusReportSolutions.aggLevel_gridSucc": [],
+    "Descent.Portability.OddLocusReportSolutions.aggLevel_gridPred": [],
     "Descent.Portability.OperationalAuditConstraints.recall_linear_target": [],
     "Descent.Portability.OperationalAuditConstraints.f1_linear_target": [],
     "Descent.Portability.OperationalAuditConstraints.paired_true_positive": [],
@@ -73131,6 +73190,7 @@
     "Descent.Portability.citl_shift_positive_higher_prevalence": [],
     "Descent.Portability.posthoc_recalibration_cannot_reorder": [],
     "Descent.Portability.PThresholdTrainingLaw.linearScoreFiles_values": [],
+    "Descent.Portability.PairedMedianOfMeans.simultaneous": [],
     "Descent.Portability.PartialLabelAssayDesign.full_label_strictly_optimal": [],
     "Descent.Portability.PartialLabelAssayDesign.no_label_strictly_optimal": [],
     "Descent.Portability.PartialLabelAssayDesign.all_fractions_tie": [],
@@ -73933,7 +73993,7 @@
    "Descent.Portability.CohortEvaluationOperators.sequential_eq_joint_witness",
    "Descent.Portability.CompactSingularSequence.directions_orthogonal",
    "Descent.Portability.CompactTargetDeflation.kernel_preserved",
-   "Descent.Portability.ConditionalOscillationDuality.exists_kernelGap_ge",
+   "Descent.Portability.ConditionalOscillationDuality.le_of_kernelGaps_upperBound",
    "Descent.Portability.ContinuousObservabilityGramian.continuousGramian_quadratic",
    "Descent.Portability.ContinuousTurnoverSemigroup.binMoment_falling",
    "Descent.Portability.ContinuousTurnoverSemigroup.step_mulVec_mono",
@@ -74012,6 +74072,7 @@
    "Descent.Portability.InvariantReportSpace.le_wordSpan",
    "Descent.Portability.JointReportFeasibility.expected_partialR2_mem_convexHull",
    "Descent.Portability.JointReportFeasibility.primal_max_eq_dual_inf",
+   "Descent.Portability.LossExplainabilitySeparation.explained_fraction_tendsto_zero",
    "Descent.Portability.LossInformationClassification.strict_information_gain_iff",
    "Descent.Portability.LowMomentObstruction.mean_fitness_one",
    "Descent.Portability.LowMomentObstruction.singleton_proper",
@@ -74525,7 +74586,7 @@
     "Descent.Portability.CohortEvaluationOperators.sequential_eq_joint_witness": [],
     "Descent.Portability.CompactSingularSequence.directions_orthogonal": [],
     "Descent.Portability.CompactTargetDeflation.kernel_preserved": [],
-    "Descent.Portability.ConditionalOscillationDuality.exists_kernelGap_ge": [],
+    "Descent.Portability.ConditionalOscillationDuality.le_of_kernelGaps_upperBound": [],
     "Descent.Portability.ContinuousObservabilityGramian.continuousGramian_quadratic": [],
     "Descent.Portability.ContinuousTurnoverSemigroup.step_mulVec_mono": [],
     "Descent.Portability.ContinuousTurnoverSemigroup.binMoment_falling": [],
@@ -74639,6 +74700,7 @@
     "Descent.Portability.JointReportFeasibility.primal_max_eq_dual_inf": [],
     "Descent.Portability.JointReportFeasibility.expected_partialR2_mem_convexHull": [],
     "Descent.Portability.ldDecayPerGeneration_eq_one_iff": [],
+    "Descent.Portability.LossExplainabilitySeparation.explained_fraction_tendsto_zero": [],
     "Descent.Portability.LossInformationClassification.strict_information_gain_iff": [],
     "Descent.Portability.LowMomentObstruction.singleton_proper": [],
     "Descent.Portability.LowMomentObstruction.mean_fitness_one": [],
@@ -75081,6 +75143,8 @@
    "Descent.Portability.MeanDriftRepair.drift_product_lower",
    "Descent.Portability.MeasurementRankLaw.residualEigenvalue_zero_iff",
    "Descent.Portability.MechanismIdentification.causal_effect_not_identified",
+   "Descent.Portability.MedianAuditConcentration.majority_tail",
+   "Descent.Portability.MedianAuditConcentration.median_tail",
    "Descent.Portability.MinimaxAuditDesignLaw.coefficients_nonneg",
    "Descent.Portability.MinimaxAuditDesignLaw.common_confidence",
    "Descent.Portability.MinimaxAuditDesignLaw.common_range_nonneg",
@@ -75090,6 +75154,7 @@
    "Descent.Portability.OptimalMeasurementAllocation.allocation_lower_bound",
    "Descent.Portability.PThresholdTrainingLaw.scan_quality_ge_incumbent",
    "Descent.Portability.PThresholdTrainingLaw.scan_quality_ge_member",
+   "Descent.Portability.PairedMedianOfMeans.simultaneous",
    "Descent.Portability.PipelineDemographicHistory.biologicalAncestralBernsteinProjection_nonneg",
    "Descent.Portability.PipelineDemographicHistory.manyDemeSampleCountProjection_eq_momentMass",
    "Descent.Portability.PortabilityRatioGeometry.certified_innerValue_integrable",
@@ -75502,6 +75567,8 @@
     "Descent.Portability.MeanDriftRepair.drift_product_lower": [],
     "Descent.Portability.MeasurementRankLaw.residualEigenvalue_zero_iff": [],
     "Descent.Portability.MechanismIdentification.causal_effect_not_identified": [],
+    "Descent.Portability.MedianAuditConcentration.majority_tail": [],
+    "Descent.Portability.MedianAuditConcentration.median_tail": [],
     "Descent.Portability.MinimaxAuditDesignLaw.coefficients_nonneg": [],
     "Descent.Portability.MinimaxAuditDesignLaw.ranges_nonneg": [],
     "Descent.Portability.MinimaxAuditDesignLaw.common_range_nonneg": [],
@@ -75518,6 +75585,7 @@
     "Descent.Portability.samplePCResidualAxisFraction_strictAntiOn_superthreshold": [],
     "Descent.Portability.PThresholdTrainingLaw.scan_quality_ge_incumbent": [],
     "Descent.Portability.PThresholdTrainingLaw.scan_quality_ge_member": [],
+    "Descent.Portability.PairedMedianOfMeans.simultaneous": [],
     "Descent.Portability.binaryPolygenicDeploymentBoundary": [],
     "Descent.Portability.two_div_sum_le_max_reciprocal": [],
     "Descent.Portability.wrightFisherBase_bounds": [],
@@ -83372,6 +83440,7 @@
    "Descent.Portability.OddLocusReportSolutions.driftStep_iterate_lump",
    "Descent.Portability.OddLocusReportSolutions.oddRow_eq_zero_of_lt",
    "Descent.Portability.OddLocusReportSolutions.oddSystem_unique",
+   "Descent.Portability.OddLocusReportSolutions.pow_intertwine",
    "Descent.Portability.OddLocusReportSolutions.sum_oddRow",
    "Descent.Portability.OrderedMutationCatalogue.mutationCount_nucleotide",
    "Descent.Portability.OrderedMutationCatalogue.mutationCount_presence",
@@ -83600,6 +83669,7 @@
     "Descent.Portability.OddLocusReportSolutions.oddSystem_unique": [],
     "Descent.Portability.OddLocusReportSolutions.oddRow_eq_zero_of_lt": [],
     "Descent.Portability.OddLocusReportSolutions.driftStep_iterate_lump": [],
+    "Descent.Portability.OddLocusReportSolutions.pow_intertwine": [],
     "Descent.Portability.OrderedMutationCatalogue.mutationCount_unsupported": [],
     "Descent.Portability.OrderedMutationCatalogue.mutationCount_nucleotide": [],
     "Descent.Portability.OrderedMutationCatalogue.mutationCount_presence": [],
@@ -96348,7 +96418,6 @@
    "Descent.Portability.ConditionalErrorCertificate.eventMass_le_one",
    "Descent.Portability.ConditionalErrorCertificate.eventMass_nonneg",
    "Descent.Portability.ConditionalErrorCertificate.totalVariation_overlap",
-   "Descent.Portability.ConditionalOscillationDuality.exists_radius",
    "Descent.Portability.ConditionalOscillationDuality.shrinkRadius_pos",
    "Descent.Portability.ConditionalOscillationDuality.shrinkRadius_spec",
    "Descent.Portability.ContinuousObservabilityGramian.continuousGramian_quadratic",
@@ -96980,7 +97049,6 @@
     "Descent.Portability.ConditionalErrorCertificate.conditional_totalVariation": [],
     "Descent.Portability.ConditionalOscillationDuality.shrinkRadius_pos": [],
     "Descent.Portability.ConditionalOscillationDuality.shrinkRadius_spec": [],
-    "Descent.Portability.ConditionalOscillationDuality.exists_radius": [],
     "Descent.Portability.ContinuousObservabilityGramian.gramianIntegrand_continuous": [],
     "Descent.Portability.ContinuousObservabilityGramian.density_eq_quadratic": [],
     "Descent.Portability.ContinuousObservabilityGramian.continuousGramian_quadratic": [],
@@ -104036,11 +104104,14 @@
    "Descent.Portability.InterleavedMutationMeasurability.mark_mass_measurable",
    "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable",
    "Descent.Portability.JointAuditExperiment.observations_measurable",
+   "Descent.Portability.LossExplainabilitySeparation.conditional_context",
    "Descent.Portability.MarkovCoarseGraining.operator_matrixError",
    "Descent.Portability.MatrixOperatorBridge.operator_mul",
+   "Descent.Portability.MedianAuditConcentration.majority_tail",
    "Descent.Portability.MomentOrderObstruction.alternating_annihilates",
    "Descent.Portability.ObservableClosureLaw.autonomy_iff_linear_update",
    "Descent.Portability.ObservableClosureLaw.linear_factorization_iff",
+   "Descent.Portability.OddLocusReportSolutions.exp_intertwine",
    "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit",
    "Descent.Portability.RadialPotentialLaw.coordinateDerivative_joint_continuous",
    "Descent.Portability.RadialPotentialLaw.radialDensity_joint_continuous",
@@ -104089,9 +104160,12 @@
     "0 ≤ R",
     "‖center‖ ≤ R",
     "∀ f : Ω → ℝ, E f = ∑ ω, p ω * f ω",
+    "Measurable f",
+    "μ.real {ω | r < |f ω - γ|} ≤ 1 / 4",
     "StrictMono g",
     "scoreTarget = g ∘ scoreSource",
-    "P.natDegree ≤ k"
+    "P.natDegree ≤ k",
+    "A * Q = Q * B"
    ],
    "hypotheses_by_theorem": {
     "Descent.Blindness.pgs_contraction_bound_tendsto_zero": [],
@@ -104276,8 +104350,13 @@
     "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable": [],
     "Descent.Portability.InterleavedMutationMeasurability.mark_mass_measurable": [],
     "Descent.Portability.JointAuditExperiment.observations_measurable": [],
+    "Descent.Portability.LossExplainabilitySeparation.conditional_context": [],
     "Descent.Portability.MarkovCoarseGraining.operator_matrixError": [],
     "Descent.Portability.MatrixOperatorBridge.operator_mul": [],
+    "Descent.Portability.MedianAuditConcentration.majority_tail": [
+     "Measurable f",
+     "μ.real {ω | r < |f ω - γ|} ≤ 1 / 4"
+    ],
     "Descent.Portability.r2_less_portable_than_auc_from_decomposition": [
      "StrictMono g",
      "scoreTarget = g ∘ scoreSource"
@@ -104287,6 +104366,9 @@
     ],
     "Descent.Portability.ObservableClosureLaw.linear_factorization_iff": [],
     "Descent.Portability.ObservableClosureLaw.autonomy_iff_linear_update": [],
+    "Descent.Portability.OddLocusReportSolutions.exp_intertwine": [
+     "A * Q = Q * B"
+    ],
     "Descent.Portability.bbpProxyThreshold_tendsto_zero": [],
     "Descent.Portability.auc_invariant_and_citl_shifts_under_score_offset": [],
     "Descent.Portability.logistic_recalibration_preserves_auc": [],
@@ -107047,9 +107129,9 @@
    "Descent.Portability.ConditionalFourthMomentLaw.conditional_loss_variance_attained",
    "Descent.Portability.ConditionalFourthMomentLaw.momentCompletionLaw_loss_variance",
    "Descent.Portability.ConditionalFourthMomentLaw.raw_moment_completion_iff",
-   "Descent.Portability.ConditionalOscillationDuality.exists_kernelGap_ge",
    "Descent.Portability.ConditionalOscillationDuality.kernelGap_le_dual",
    "Descent.Portability.ConditionalOscillationDuality.kernelGaps_zero_iff",
+   "Descent.Portability.ConditionalOscillationDuality.le_of_kernelGaps_upperBound",
    "Descent.Portability.ConditionalOscillationDuality.oscTotal_nonneg",
    "Descent.Portability.ContinuousTrajectoryRegion.admissible_path_bounds",
    "Descent.Portability.ContinuousTrajectoryRegion.ceiling_admissible_path_bounds",
@@ -107506,7 +107588,7 @@
     "Descent.Portability.ConditionalFourthMomentLaw.conditional_loss_variance_attained": [],
     "Descent.Portability.ConditionalOscillationDuality.kernelGap_le_dual": [],
     "Descent.Portability.ConditionalOscillationDuality.oscTotal_nonneg": [],
-    "Descent.Portability.ConditionalOscillationDuality.exists_kernelGap_ge": [],
+    "Descent.Portability.ConditionalOscillationDuality.le_of_kernelGaps_upperBound": [],
     "Descent.Portability.ConditionalOscillationDuality.kernelGaps_zero_iff": [],
     "Descent.Portability.ContinuousTrajectoryRegion.admissible_path_bounds": [],
     "Descent.Portability.ContinuousTrajectoryRegion.ceiling_admissible_path_bounds": [],
@@ -112818,6 +112900,7 @@
    "Descent.PopGen.mutationLDErosion_at_witness",
    "Descent.Portability.OddLocusReportSolutions.driftStep_iterate_lump",
    "Descent.Portability.OddLocusReportSolutions.driftStep_lump",
+   "Descent.Portability.OddLocusReportSolutions.euler_intertwine",
    "Descent.Portability._root_.Descent.PopGen.PGSEvolutionaryModel.toGenerational_mutationSharedRetentionAt_floor",
    "Descent.Portability.amortized_per_population_adaptation_cost_falls_with_task_count",
    "Descent.Portability.deployment_meets_both_budgets",
@@ -112858,6 +112941,7 @@
     ],
     "Descent.Portability.OddLocusReportSolutions.driftStep_lump": [],
     "Descent.Portability.OddLocusReportSolutions.driftStep_iterate_lump": [],
+    "Descent.Portability.OddLocusReportSolutions.euler_intertwine": [],
     "Descent.Portability.fstFromTau_lt_coalescenceCdf": [],
     "Descent.Portability._root_.Descent.PopGen.PGSEvolutionaryModel.toGenerational_mutationSharedRetentionAt_floor": [],
     "Descent.Portability.requiredTargetSamplesForOptimalFineTuningMSE_zero_gapsq_is_junk": [],
@@ -137890,14 +137974,14 @@
   "mentioned_by": [
    "Descent.Portability.ApproximationDuality.eval_as_sum",
    "Descent.Portability.ApproximationDuality.exists_dual_sign",
-   "Descent.Portability.ConditionalOscillationDuality.exists_kernelGap_ge"
+   "Descent.Portability.ConditionalOscillationDuality.le_of_kernelGaps_upperBound"
   ],
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
     "Descent.Portability.ApproximationDuality.eval_as_sum": [],
     "Descent.Portability.ApproximationDuality.exists_dual_sign": [],
-    "Descent.Portability.ConditionalOscillationDuality.exists_kernelGap_ge": []
+    "Descent.Portability.ConditionalOscillationDuality.le_of_kernelGaps_upperBound": []
    }
   }
  },
@@ -147380,55 +147464,30 @@
  },
  "Descent.Portability.CertifiedFrameRepair.improvement": {
   "class": "NOT-EXTRACTABLE",
-  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'Measure ℝ'\")",
+  "note": "ambiguous call to 'estimate' with 4 argument(s): ['Descent.Portability.GramAuditGeometry.estimate', 'Descent.Portability.PairedMedianOfMeans.estimate']",
   "file": "Descent/Portability/CertifiedFrameRepair.lean",
   "line": 33,
   "short": "improvement",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": "improvement",
-  "args": [
-   "μ",
-   "w",
-   "f",
-   "φ",
-   "ε",
-   "z"
-  ],
+  "python": null,
+  "args": [],
   "box": {
    "ε": [
     0.05,
     3.0
    ]
   },
-  "selfcheck": {
-   "finite_points": 0,
-   "total_points": 8,
-   "error": "Uninhabitable(\"no inhabitant modelled for the type 'Measure ℝ'\")"
-  },
+  "selfcheck": null,
   "numeric_standins": null,
-  "vector_args": {
-   "w": {
-    "dim": "ι",
-    "rank": 1
-   },
-   "f": {
-    "dim": "ι",
-    "rank": 1
-   },
-   "φ": {
-    "dim": "ι",
-    "rank": 2
-   },
-   "z": {
-    "dim": "ι",
-    "rank": 1
-   }
-  },
+  "vector_args": null,
   "mentioned_by": [
    "Descent.Portability.CertifiedFrameRepair.certificate_on_event",
    "Descent.Portability.ClippedFrameRepair.false_gain_probability",
    "Descent.Portability.GuardedRepairDeployment.proceed_gain",
+   "Descent.Portability.LossExplainabilitySeparation.separation",
+   "Descent.Portability.PairedGainTailExperiment.exact_moment_packet",
+   "Descent.Portability.PairedGainTailExperiment.improvement_moments",
    "Descent.Portability.SecondMomentFrameRepair.harm_probability",
    "Descent.Program.costEffectiveness_mul_cost",
    "Descent.Program.costEffectiveness_unit_invariant",
@@ -147459,6 +147518,9 @@
     "Descent.Portability.GuardedRepairDeployment.proceed_gain": [
      "Proceed c hard (requests z"
     ],
+    "Descent.Portability.LossExplainabilitySeparation.separation": [],
+    "Descent.Portability.PairedGainTailExperiment.improvement_moments": [],
+    "Descent.Portability.PairedGainTailExperiment.exact_moment_packet": [],
     "Descent.Portability.SecondMomentFrameRepair.harm_probability": [
      "(gram w φ"
     ],
@@ -152379,7 +152441,7 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 5,
+   "finite_points": 6,
    "total_points": 8,
    "error": "TypeError('zeroMeanNoiseValue() takes 2 positional arguments but 3 were given')"
   },
@@ -152452,8 +152514,8 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Portability.ConditionalOscillationDuality.conditional_oscillation_duality",
-   "Descent.Portability.ConditionalOscillationDuality.exists_kernelGap_ge",
    "Descent.Portability.ConditionalOscillationDuality.kernelGap_le_dual",
+   "Descent.Portability.ConditionalOscillationDuality.le_of_kernelGaps_upperBound",
    "Descent.Portability.ConditionalOscillationDuality.notMem_oscNbhd",
    "Descent.Portability.ConditionalOscillationDuality.oscTotal_nonneg",
    "Descent.Portability.ConditionalOscillationDuality.oscillation_rule_error"
@@ -152463,7 +152525,8 @@
     "∀ w, 0 ≤ μ w",
     "t ∈ kernelGaps μ g f ε",
     "∀ lam : F → ℝ, r ≤ oscTotal μ (f - featureCombo g lam",
-    "∀ w, 0 < μ w"
+    "∀ w, 0 < μ w",
+    "∀ t ∈ kernelGaps μ g f ε, t ≤ ub"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.ConditionalOscillationDuality.kernelGap_le_dual": [
@@ -152477,9 +152540,10 @@
     "Descent.Portability.ConditionalOscillationDuality.oscTotal_nonneg": [
      "∀ w, 0 ≤ μ w"
     ],
-    "Descent.Portability.ConditionalOscillationDuality.exists_kernelGap_ge": [
+    "Descent.Portability.ConditionalOscillationDuality.le_of_kernelGaps_upperBound": [
      "∀ w, 0 < μ w",
-     "∀ lam : F → ℝ, r ≤ oscTotal μ (f - featureCombo g lam"
+     "∀ lam : F → ℝ, r ≤ oscTotal μ (f - featureCombo g lam",
+     "∀ t ∈ kernelGaps μ g f ε, t ≤ ub"
     ],
     "Descent.Portability.ConditionalOscillationDuality.conditional_oscillation_duality": [
      "∀ w, 0 < μ w"
@@ -152519,10 +152583,10 @@
   "mentioned_by": [
    "Descent.Portability.ConditionalOscillationDuality.combo_expectation",
    "Descent.Portability.ConditionalOscillationDuality.conditional_oscillation_duality",
-   "Descent.Portability.ConditionalOscillationDuality.exists_kernelGap_ge",
    "Descent.Portability.ConditionalOscillationDuality.featureCombo_combo",
    "Descent.Portability.ConditionalOscillationDuality.kernelGap_le_dual",
    "Descent.Portability.ConditionalOscillationDuality.kernel_report_split",
+   "Descent.Portability.ConditionalOscillationDuality.le_of_kernelGaps_upperBound",
    "Descent.Portability.ConditionalOscillationDuality.notMem_oscNbhd",
    "Descent.Portability.ConditionalOscillationDuality.oscNbhd_mem_of_close",
    "Descent.Portability.ConditionalOscillationDuality.oscillation_rule_error",
@@ -152531,7 +152595,8 @@
   "constraints": {
    "hypotheses": [
     "t ∈ kernelGaps μ g f ε",
-    "∀ lam : F → ℝ, r ≤ oscTotal μ (f - featureCombo g lam"
+    "∀ lam : F → ℝ, r ≤ oscTotal μ (f - featureCombo g lam",
+    "∀ t ∈ kernelGaps μ g f ε, t ≤ ub"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.ConditionalOscillationDuality.featureCombo_combo": [],
@@ -152544,8 +152609,9 @@
      "∀ lam : F → ℝ, r ≤ oscTotal μ (f - featureCombo g lam"
     ],
     "Descent.Portability.ConditionalOscillationDuality.sum_feature_combo": [],
-    "Descent.Portability.ConditionalOscillationDuality.exists_kernelGap_ge": [
-     "∀ lam : F → ℝ, r ≤ oscTotal μ (f - featureCombo g lam"
+    "Descent.Portability.ConditionalOscillationDuality.le_of_kernelGaps_upperBound": [
+     "∀ lam : F → ℝ, r ≤ oscTotal μ (f - featureCombo g lam",
+     "∀ t ∈ kernelGaps μ g f ε, t ≤ ub"
     ],
     "Descent.Portability.ConditionalOscillationDuality.conditional_oscillation_duality": [],
     "Descent.Portability.ConditionalOscillationDuality.kernel_report_split": [],
@@ -152600,6 +152666,16 @@
    "Descent.Portability.JointAuditExperiment.observation_failure_le",
    "Descent.Portability.JointAuditExperiment.observations_map",
    "Descent.Portability.JointAuditExperiment.requests_map",
+   "Descent.Portability.LossExplainabilitySeparation.conditional_context",
+   "Descent.Portability.LossExplainabilitySeparation.loss_conditional_expectation",
+   "Descent.Portability.LossExplainabilitySeparation.predictable_variance",
+   "Descent.Portability.LossExplainabilitySeparation.separation",
+   "Descent.Portability.PairedGainTailExperiment.exact_moment_packet",
+   "Descent.Portability.PairedGainTailExperiment.improvement_moments",
+   "Descent.Portability.PairedGainTailExperiment.joint_integral",
+   "Descent.Portability.PairedGainTailExperiment.joint_memLp",
+   "Descent.Portability.PairedGainTailExperiment.joint_probability",
+   "Descent.Portability.PairedGainTailExperiment.loss_moments",
    "Descent.Portability.PortabilityRatioGeometry.certified_bin_expectation",
    "Descent.Portability.PortabilityRatioGeometry.certified_expected_ratio"
   ],
@@ -152639,6 +152715,16 @@
     "Descent.Portability.JointAuditExperiment.observations_map": [],
     "Descent.Portability.JointAuditExperiment.requests_map": [],
     "Descent.Portability.JointAuditExperiment.observation_failure_le": [],
+    "Descent.Portability.LossExplainabilitySeparation.conditional_context": [],
+    "Descent.Portability.LossExplainabilitySeparation.loss_conditional_expectation": [],
+    "Descent.Portability.LossExplainabilitySeparation.predictable_variance": [],
+    "Descent.Portability.LossExplainabilitySeparation.separation": [],
+    "Descent.Portability.PairedGainTailExperiment.joint_probability": [],
+    "Descent.Portability.PairedGainTailExperiment.joint_integral": [],
+    "Descent.Portability.PairedGainTailExperiment.loss_moments": [],
+    "Descent.Portability.PairedGainTailExperiment.improvement_moments": [],
+    "Descent.Portability.PairedGainTailExperiment.joint_memLp": [],
+    "Descent.Portability.PairedGainTailExperiment.exact_moment_packet": [],
     "Descent.Portability.PortabilityRatioGeometry.certified_expected_ratio": [],
     "Descent.Portability.PortabilityRatioGeometry.certified_bin_expectation": []
    }
@@ -152665,9 +152751,9 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Portability.ConditionalOscillationDuality.conditional_oscillation_duality",
-   "Descent.Portability.ConditionalOscillationDuality.exists_kernelGap_ge",
    "Descent.Portability.ConditionalOscillationDuality.kernelGap_le_dual",
-   "Descent.Portability.ConditionalOscillationDuality.kernelGaps_zero_iff"
+   "Descent.Portability.ConditionalOscillationDuality.kernelGaps_zero_iff",
+   "Descent.Portability.ConditionalOscillationDuality.le_of_kernelGaps_upperBound"
   ],
   "constraints": {
    "hypotheses": [
@@ -152675,17 +152761,19 @@
     "t ∈ kernelGaps μ g f ε",
     "∀ w, 0 < μ w",
     "0 ≤ ε",
-    "∀ lam : F → ℝ, r ≤ oscTotal μ (f - featureCombo g lam"
+    "∀ lam : F → ℝ, r ≤ oscTotal μ (f - featureCombo g lam",
+    "∀ t ∈ kernelGaps μ g f ε, t ≤ ub"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.ConditionalOscillationDuality.kernelGap_le_dual": [
      "∀ w, 0 ≤ μ w",
      "t ∈ kernelGaps μ g f ε"
     ],
-    "Descent.Portability.ConditionalOscillationDuality.exists_kernelGap_ge": [
+    "Descent.Portability.ConditionalOscillationDuality.le_of_kernelGaps_upperBound": [
      "∀ w, 0 < μ w",
      "0 ≤ ε",
-     "∀ lam : F → ℝ, r ≤ oscTotal μ (f - featureCombo g lam"
+     "∀ lam : F → ℝ, r ≤ oscTotal μ (f - featureCombo g lam",
+     "∀ t ∈ kernelGaps μ g f ε, t ≤ ub"
     ],
     "Descent.Portability.ConditionalOscillationDuality.conditional_oscillation_duality": [
      "∀ w, 0 < μ w",
@@ -152760,8 +152848,8 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Portability.ConditionalOscillationDuality.convex_oscNbhd",
-   "Descent.Portability.ConditionalOscillationDuality.exists_kernelGap_ge",
    "Descent.Portability.ConditionalOscillationDuality.isOpen_oscNbhd",
+   "Descent.Portability.ConditionalOscillationDuality.le_of_kernelGaps_upperBound",
    "Descent.Portability.ConditionalOscillationDuality.notMem_oscNbhd",
    "Descent.Portability.ConditionalOscillationDuality.oscNbhd_mem_of_close"
   ],
@@ -152772,7 +152860,8 @@
     "(∑ w, μ w * (u w - l w",
     "∀ lam : F → ℝ, r ≤ oscTotal μ (f - featureCombo g lam",
     "∀ w, 0 < μ w",
-    "c < r"
+    "c < r",
+    "∀ t ∈ kernelGaps μ g f ε, t ≤ ub"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.ConditionalOscillationDuality.convex_oscNbhd": [
@@ -152789,11 +152878,12 @@
      "∀ w, 0 ≤ μ w",
      "∀ lam : F → ℝ, r ≤ oscTotal μ (f - featureCombo g lam"
     ],
-    "Descent.Portability.ConditionalOscillationDuality.exists_kernelGap_ge": [
+    "Descent.Portability.ConditionalOscillationDuality.le_of_kernelGaps_upperBound": [
      "∀ w, 0 < μ w",
      "0 ≤ ε",
      "c < r",
-     "∀ lam : F → ℝ, r ≤ oscTotal μ (f - featureCombo g lam"
+     "∀ lam : F → ℝ, r ≤ oscTotal μ (f - featureCombo g lam",
+     "∀ t ∈ kernelGaps μ g f ε, t ≤ ub"
     ]
    }
   }
@@ -152829,7 +152919,6 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
-   "Descent.Portability.ConditionalOscillationDuality.exists_radius",
    "Descent.Portability.ConditionalOscillationDuality.isOpen_oscNbhd",
    "Descent.Portability.ConditionalOscillationDuality.shrinkRadius_pos",
    "Descent.Portability.ConditionalOscillationDuality.shrinkRadius_spec"
@@ -152853,10 +152942,6 @@
      "0 < s",
      "0 ≤ S"
     ],
-    "Descent.Portability.ConditionalOscillationDuality.exists_radius": [
-     "0 < s",
-     "0 ≤ S"
-    ],
     "Descent.Portability.ConditionalOscillationDuality.isOpen_oscNbhd": []
    }
   }
@@ -152865,7 +152950,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "tuple literal",
   "file": "Descent/Portability/ConditionalOscillationDuality.lean",
-  "line": 431,
+  "line": 426,
   "short": "extremalKernel",
   "ret_type": "W → Y → ℝ",
   "empirical_status": "",
@@ -152876,17 +152961,18 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
-   "Descent.Portability.ConditionalOscillationDuality.exists_kernelGap_ge",
    "Descent.Portability.ConditionalOscillationDuality.extremalKernel_diff",
    "Descent.Portability.ConditionalOscillationDuality.extremalKernel_nonneg",
-   "Descent.Portability.ConditionalOscillationDuality.extremalKernel_sum"
+   "Descent.Portability.ConditionalOscillationDuality.extremalKernel_sum",
+   "Descent.Portability.ConditionalOscillationDuality.le_of_kernelGaps_upperBound"
   ],
   "constraints": {
    "hypotheses": [
     "∀ w, 0 < μ w",
     "∀ w, (∑ y, (|τ (w, y",
     "∀ w, ∑ y, τ (w, y",
-    "∀ lam : F → ℝ, r ≤ oscTotal μ (f - featureCombo g lam"
+    "∀ lam : F → ℝ, r ≤ oscTotal μ (f - featureCombo g lam",
+    "∀ t ∈ kernelGaps μ g f ε, t ≤ ub"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.ConditionalOscillationDuality.extremalKernel_nonneg": [
@@ -152900,9 +152986,10 @@
     "Descent.Portability.ConditionalOscillationDuality.extremalKernel_diff": [
      "∀ w, 0 < μ w"
     ],
-    "Descent.Portability.ConditionalOscillationDuality.exists_kernelGap_ge": [
+    "Descent.Portability.ConditionalOscillationDuality.le_of_kernelGaps_upperBound": [
      "∀ w, 0 < μ w",
-     "∀ lam : F → ℝ, r ≤ oscTotal μ (f - featureCombo g lam"
+     "∀ lam : F → ℝ, r ≤ oscTotal μ (f - featureCombo g lam",
+     "∀ t ∈ kernelGaps μ g f ε, t ≤ ub"
     ]
    }
   }
@@ -152911,7 +152998,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name Finset.univ.sup'",
   "file": "Descent/Portability/ConditionalOscillationDuality.lean",
-  "line": 705,
+  "line": 703,
   "short": "oscMidpoint",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -153583,13 +153670,21 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Portability.ContinuousTurnoverSemigroup.gridEmbed_succ",
-   "Descent.Portability.ContinuousTurnoverSemigroup.nearestDriftMatrix_mulVec"
+   "Descent.Portability.ContinuousTurnoverSemigroup.nearestDriftMatrix_mulVec",
+   "Descent.Portability.OddLocusReportSolutions.aggLevel_gridSucc",
+   "Descent.Portability.OddLocusReportSolutions.nearestDriftMatrix_mulVec_grid"
   ],
   "constraints": {
-   "hypotheses": [],
+   "hypotheses": [
+    "(k : ℕ"
+   ],
    "hypotheses_by_theorem": {
     "Descent.Portability.ContinuousTurnoverSemigroup.gridEmbed_succ": [],
-    "Descent.Portability.ContinuousTurnoverSemigroup.nearestDriftMatrix_mulVec": []
+    "Descent.Portability.ContinuousTurnoverSemigroup.nearestDriftMatrix_mulVec": [],
+    "Descent.Portability.OddLocusReportSolutions.aggLevel_gridSucc": [
+     "(k : ℕ"
+    ],
+    "Descent.Portability.OddLocusReportSolutions.nearestDriftMatrix_mulVec_grid": []
    }
   }
  },
@@ -153617,18 +153712,31 @@
    "Descent.Portability.ContinuousTurnoverSemigroup.linearDeathMatrix_eigen_falling",
    "Descent.Portability.ContinuousTurnoverSemigroup.linearDeathMatrix_mulVec",
    "Descent.Portability.ContinuousTurnoverSemigroup.nearestDriftMatrix_mulVec",
+   "Descent.Portability.OddLocusReportSolutions.aggLevel_gridPred",
+   "Descent.Portability.OddLocusReportSolutions.aggLevel_gridSucc",
+   "Descent.Portability.OddLocusReportSolutions.nearestDriftMatrix_mulVec_grid",
    "Descent.Portability.OddLocusReportSolutions.oddLevelMatrix_eigen",
    "Descent.Portability.OddLocusReportSolutions.oddLevelMatrix_mulVec"
   ],
   "constraints": {
-   "hypotheses": [],
+   "hypotheses": [
+    "(k : ℕ",
+    "¬ ((k : ℕ"
+   ],
    "hypotheses_by_theorem": {
     "Descent.Portability.ContinuousTurnoverSemigroup.gridEmbed_pred": [],
     "Descent.Portability.ContinuousTurnoverSemigroup.nearestDriftMatrix_mulVec": [],
     "Descent.Portability.ContinuousTurnoverSemigroup.linearDeathMatrix_mulVec": [],
     "Descent.Portability.ContinuousTurnoverSemigroup.linearDeathMatrix_eigen_falling": [],
     "Descent.Portability.OddLocusReportSolutions.oddLevelMatrix_mulVec": [],
-    "Descent.Portability.OddLocusReportSolutions.oddLevelMatrix_eigen": []
+    "Descent.Portability.OddLocusReportSolutions.oddLevelMatrix_eigen": [],
+    "Descent.Portability.OddLocusReportSolutions.aggLevel_gridSucc": [
+     "(k : ℕ"
+    ],
+    "Descent.Portability.OddLocusReportSolutions.aggLevel_gridPred": [
+     "¬ ((k : ℕ"
+    ],
+    "Descent.Portability.OddLocusReportSolutions.nearestDriftMatrix_mulVec_grid": []
    }
   }
  },
@@ -153666,7 +153774,11 @@
    "Descent.Portability.ContinuousTurnoverSemigroup.gridEmbed_step",
    "Descent.Portability.ContinuousTurnoverSemigroup.gridEmbed_step_gridConvex",
    "Descent.Portability.ContinuousTurnoverSemigroup.nearestDriftMatrix_mulVec",
-   "Descent.Portability.ContinuousTurnoverSemigroup.nearestDriftMatrix_mulVec_le"
+   "Descent.Portability.ContinuousTurnoverSemigroup.nearestDriftMatrix_mulVec_le",
+   "Descent.Portability.OddLocusReportSolutions.exp_nearestDrift_square_report",
+   "Descent.Portability.OddLocusReportSolutions.nearestDriftMatrix_mulVec_grid",
+   "Descent.Portability.OddLocusReportSolutions.nearestDrift_lump_mulVec",
+   "Descent.Portability.OddLocusReportSolutions.nearestDrift_pullback_intertwine"
   ],
   "constraints": {
    "hypotheses": [
@@ -153714,7 +153826,11 @@
      "0 ≤ β",
      "∀ k : Fin (n + 1",
      "∀ j : ℤ, 1 ≤ j → j + 1 ≤ (n : ℤ"
-    ]
+    ],
+    "Descent.Portability.OddLocusReportSolutions.nearestDriftMatrix_mulVec_grid": [],
+    "Descent.Portability.OddLocusReportSolutions.nearestDrift_lump_mulVec": [],
+    "Descent.Portability.OddLocusReportSolutions.nearestDrift_pullback_intertwine": [],
+    "Descent.Portability.OddLocusReportSolutions.exp_nearestDrift_square_report": []
    }
   }
  },
@@ -156602,6 +156718,7 @@
    "Descent.Portability.ConvexOrderCoupling.upRate_top",
    "Descent.Portability.NearestDriftConfigurationCoupling.downRate_eq_excess",
    "Descent.Portability.NearestDriftConfigurationCoupling.upRate_eq_excess",
+   "Descent.Portability.OddLocusReportSolutions.countDrift_grid",
    "Descent.Portability.OddLocusReportSolutions.nearestDriftGen_lump",
    "Descent.Portability.TurnoverExtremalCouplings.nearestDriftGen_squareReport_symmetric"
   ],
@@ -156696,6 +156813,7 @@
     "Descent.Portability.NearestDriftConfigurationCoupling.upRate_eq_excess": [],
     "Descent.Portability.NearestDriftConfigurationCoupling.downRate_eq_excess": [],
     "Descent.Portability.OddLocusReportSolutions.nearestDriftGen_lump": [],
+    "Descent.Portability.OddLocusReportSolutions.countDrift_grid": [],
     "Descent.Portability.TurnoverExtremalCouplings.nearestDriftGen_squareReport_symmetric": []
    }
   }
@@ -156746,6 +156864,9 @@
    "Descent.Portability.ConvexOrderCoupling.upRate_top",
    "Descent.Portability.NearestDriftConfigurationCoupling.upRate_eq_excess",
    "Descent.Portability.OddLocusReportSolutions.nearestDriftGen_lump",
+   "Descent.Portability.OddLocusReportSolutions.nearestDriftMatrix_mulVec_grid",
+   "Descent.Portability.OddLocusReportSolutions.upRate_grid_gt",
+   "Descent.Portability.OddLocusReportSolutions.upRate_grid_le",
    "Descent.Portability.TurnoverExtremalCouplings.nearestDriftGen_squareReport_symmetric"
   ],
   "constraints": {
@@ -156759,7 +156880,9 @@
     "k ≤ (n : ℤ",
     "∀ A, 0 ≤ k + Δ A",
     "∀ A, k + Δ A ≤ (n : ℤ",
-    "∑ A, r A * ((((k + Δ A : ℤ"
+    "∑ A, r A * ((((k + Δ A : ℤ",
+    "(k : ℕ",
+    "¬ ((k : ℕ"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.ContinuousTurnoverSemigroup.nearestDriftMatrix_mulVec": [],
@@ -156788,6 +156911,13 @@
     ],
     "Descent.Portability.NearestDriftConfigurationCoupling.upRate_eq_excess": [],
     "Descent.Portability.OddLocusReportSolutions.nearestDriftGen_lump": [],
+    "Descent.Portability.OddLocusReportSolutions.nearestDriftMatrix_mulVec_grid": [],
+    "Descent.Portability.OddLocusReportSolutions.upRate_grid_le": [
+     "(k : ℕ"
+    ],
+    "Descent.Portability.OddLocusReportSolutions.upRate_grid_gt": [
+     "¬ ((k : ℕ"
+    ],
     "Descent.Portability.TurnoverExtremalCouplings.nearestDriftGen_squareReport_symmetric": []
    }
   }
@@ -156837,7 +156967,10 @@
    "Descent.Portability.ConvexOrderCoupling.driftStep_second_difference",
    "Descent.Portability.ConvexOrderCoupling.nearestDrift_generator_le",
    "Descent.Portability.NearestDriftConfigurationCoupling.downRate_eq_excess",
+   "Descent.Portability.OddLocusReportSolutions.downRate_grid_gt",
+   "Descent.Portability.OddLocusReportSolutions.downRate_grid_le",
    "Descent.Portability.OddLocusReportSolutions.nearestDriftGen_lump",
+   "Descent.Portability.OddLocusReportSolutions.nearestDriftMatrix_mulVec_grid",
    "Descent.Portability.TurnoverExtremalCouplings.nearestDriftGen_squareReport_symmetric"
   ],
   "constraints": {
@@ -156851,7 +156984,9 @@
     "k ≤ (n : ℤ",
     "∀ A, 0 ≤ k + Δ A",
     "∀ A, k + Δ A ≤ (n : ℤ",
-    "∑ A, r A * ((((k + Δ A : ℤ"
+    "∑ A, r A * ((((k + Δ A : ℤ",
+    "(k : ℕ",
+    "¬ ((k : ℕ"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.ContinuousTurnoverSemigroup.nearestDriftMatrix_mulVec": [],
@@ -156880,6 +157015,13 @@
     ],
     "Descent.Portability.NearestDriftConfigurationCoupling.downRate_eq_excess": [],
     "Descent.Portability.OddLocusReportSolutions.nearestDriftGen_lump": [],
+    "Descent.Portability.OddLocusReportSolutions.nearestDriftMatrix_mulVec_grid": [],
+    "Descent.Portability.OddLocusReportSolutions.downRate_grid_le": [
+     "(k : ℕ"
+    ],
+    "Descent.Portability.OddLocusReportSolutions.downRate_grid_gt": [
+     "¬ ((k : ℕ"
+    ],
     "Descent.Portability.TurnoverExtremalCouplings.nearestDriftGen_squareReport_symmetric": []
    }
   }
@@ -156928,6 +157070,7 @@
    "Descent.Portability.ConvexOrderCoupling.nearestDrift_generator_le_weightedExp",
    "Descent.Portability.NearestDriftConfigurationCoupling.nearestDriftKernel_count",
    "Descent.Portability.OddLocusReportSolutions.nearestDriftGen_lump",
+   "Descent.Portability.OddLocusReportSolutions.nearestDriftMatrix_mulVec_grid",
    "Descent.Portability.TurnoverExtremalCouplings.nearestDriftGen_squareReport_symmetric"
   ],
   "constraints": {
@@ -156970,6 +157113,7 @@
      "0 ≤ β"
     ],
     "Descent.Portability.OddLocusReportSolutions.nearestDriftGen_lump": [],
+    "Descent.Portability.OddLocusReportSolutions.nearestDriftMatrix_mulVec_grid": [],
     "Descent.Portability.TurnoverExtremalCouplings.nearestDriftGen_squareReport_symmetric": []
    }
   }
@@ -165161,6 +165305,10 @@
    "Descent.Portability.ErasedSampleObservation.outcome_average_measurable",
    "Descent.Portability.IIDAverageLaw.average_integral",
    "Descent.Portability.IIDAverageLaw.average_variance",
+   "Descent.Portability.PairedMedianOfMeans.average_measurable",
+   "Descent.Portability.PairedMedianOfMeans.average_memLp",
+   "Descent.Portability.PairedMedianOfMeans.block_failure",
+   "Descent.Portability.PairedMedianOfMeans.paired_tail",
    "Descent.Portability.RareEventSampleLaw.erased_sample_unbiased",
    "Descent.Portability.RareEventSampleLaw.erased_sample_variance",
    "Descent.Portability.RareEventSampleLaw.marked_sample_unbiased",
@@ -165184,6 +165332,10 @@
     "Descent.Portability.ErasedSampleObservation.erased_observation_variance": [],
     "Descent.Portability.IIDAverageLaw.average_integral": [],
     "Descent.Portability.IIDAverageLaw.average_variance": [],
+    "Descent.Portability.PairedMedianOfMeans.average_measurable": [],
+    "Descent.Portability.PairedMedianOfMeans.average_memLp": [],
+    "Descent.Portability.PairedMedianOfMeans.block_failure": [],
+    "Descent.Portability.PairedMedianOfMeans.paired_tail": [],
     "Descent.Portability.RareEventSampleLaw.marked_sample_unbiased": [],
     "Descent.Portability.RareEventSampleLaw.erased_sample_unbiased": [],
     "Descent.Portability.RareEventSampleLaw.marked_sample_variance": [],
@@ -181550,6 +181702,50 @@
    }
   }
  },
+ "Descent.Portability.FiniteMedianGeometry.median": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name Tuple.sort",
+  "file": "Descent/Portability/FiniteMedianGeometry.lean",
+  "line": 26,
+  "short": "median",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.FiniteMedianGeometry.failure_majority",
+   "Descent.Portability.FiniteMedianGeometry.failure_sum",
+   "Descent.Portability.FiniteMedianGeometry.lower_failure",
+   "Descent.Portability.FiniteMedianGeometry.upper_failure",
+   "Descent.Portability.MedianAuditConcentration.median_tail"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "median x < γ - r",
+    "γ + r < median x",
+    "r < |median x - γ|"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.FiniteMedianGeometry.lower_failure": [
+     "median x < γ - r"
+    ],
+    "Descent.Portability.FiniteMedianGeometry.upper_failure": [
+     "γ + r < median x"
+    ],
+    "Descent.Portability.FiniteMedianGeometry.failure_majority": [
+     "r < |median x - γ|"
+    ],
+    "Descent.Portability.FiniteMedianGeometry.failure_sum": [
+     "r < |median x - γ|"
+    ],
+    "Descent.Portability.MedianAuditConcentration.median_tail": []
+   }
+  }
+ },
  "Descent.Portability.FiniteMemoryCertificate.memoryTerm": {
   "class": "NOT-EXTRACTABLE",
   "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'L[ℝ] E'\")",
@@ -187506,52 +187702,28 @@
   }
  },
  "Descent.Portability.FourthOrderLossObstruction.effectSign": {
-  "class": "NUMERIC",
-  "note": "",
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name TraitPortabilityRange.sign",
   "file": "Descent/Portability/FourthOrderLossObstruction.lean",
-  "line": 48,
+  "line": 49,
   "short": "effectSign",
-  "ret_type": "ℝ",
+  "ret_type": "Bool → ℝ",
   "empirical_status": "",
-  "python": "effectSign",
-  "args": [
-   "b"
-  ],
+  "python": null,
+  "args": [],
   "box": {},
-  "selfcheck": {
-   "finite_points": 8,
-   "total_points": 8,
-   "error": null
-  },
+  "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
-   "Descent.Portability.FourthOrderLossObstruction.cell_loss_mean",
-   "Descent.Portability.FourthOrderLossObstruction.cell_loss_second_moment",
-   "Descent.Portability.FourthOrderLossObstruction.cell_outcome_mean",
-   "Descent.Portability.FourthOrderLossObstruction.cell_score_mean",
-   "Descent.Portability.FourthOrderLossObstruction.cell_second_moments",
-   "Descent.Portability.FourthOrderLossObstruction.cell_squared_correlations",
-   "Descent.Portability.FourthOrderLossObstruction.effectMean_sq_le_one",
-   "Descent.Portability.FourthOrderLossObstruction.effectSign_eq_sign",
-   "Descent.Portability.FourthOrderLossObstruction.noise_loss_mean",
-   "Descent.Portability.FourthOrderLossObstruction.noise_loss_second_moment",
-   "Descent.Portability.FourthOrderLossObstruction.parity_expectation"
+   "Descent.Portability.FourthOrderLossObstruction.effectSign_apply",
+   "Descent.Portability.FourthOrderLossObstruction.effectSign_eq_sign"
   ],
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
     "Descent.Portability.FourthOrderLossObstruction.effectSign_eq_sign": [],
-    "Descent.Portability.FourthOrderLossObstruction.effectMean_sq_le_one": [],
-    "Descent.Portability.FourthOrderLossObstruction.noise_loss_mean": [],
-    "Descent.Portability.FourthOrderLossObstruction.noise_loss_second_moment": [],
-    "Descent.Portability.FourthOrderLossObstruction.parity_expectation": [],
-    "Descent.Portability.FourthOrderLossObstruction.cell_loss_mean": [],
-    "Descent.Portability.FourthOrderLossObstruction.cell_loss_second_moment": [],
-    "Descent.Portability.FourthOrderLossObstruction.cell_score_mean": [],
-    "Descent.Portability.FourthOrderLossObstruction.cell_outcome_mean": [],
-    "Descent.Portability.FourthOrderLossObstruction.cell_second_moments": [],
-    "Descent.Portability.FourthOrderLossObstruction.cell_squared_correlations": []
+    "Descent.Portability.FourthOrderLossObstruction.effectSign_apply": []
    }
   }
  },
@@ -187559,7 +187731,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "unsupported token '!'",
   "file": "Descent/Portability/FourthOrderLossObstruction.lean",
-  "line": 54,
+  "line": 58,
   "short": "evenParity",
   "ret_type": "Bool",
   "empirical_status": "",
@@ -187587,9 +187759,9 @@
  },
  "Descent.Portability.FourthOrderLossObstruction.effectMean": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"'int' object is not subscriptable\"))",
+  "note": "self-check: calls untranslated definition effectSign",
   "file": "Descent/Portability/FourthOrderLossObstruction.lean",
-  "line": 58,
+  "line": 62,
   "short": "effectMean",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -187601,7 +187773,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "TypeError(\"'int' object is not subscriptable\")"
+   "error": "NameError(\"name 'effectSign' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -187641,7 +187813,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition evenParity",
   "file": "Descent/Portability/FourthOrderLossObstruction.lean",
-  "line": 63,
+  "line": 67,
   "short": "parityWeight",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -187692,7 +187864,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "tuple literal",
   "file": "Descent/Portability/FourthOrderLossObstruction.lean",
-  "line": 68,
+  "line": 72,
   "short": "contextWeight",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -187731,7 +187903,7 @@
   "class": "STRUCTURAL",
   "note": "builds a structure value (ExpFunctional EffectContext)",
   "file": "Descent/Portability/FourthOrderLossObstruction.lean",
-  "line": 92,
+  "line": 96,
   "short": "contextExp",
   "ret_type": "ExpFunctional EffectContext",
   "empirical_status": "",
@@ -187762,7 +187934,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Portability/FourthOrderLossObstruction.lean",
-  "line": 98,
+  "line": 102,
   "short": "cellTheta",
   "ret_type": "Fin 2 → ℝ",
   "empirical_status": "",
@@ -187816,7 +187988,7 @@
   "class": "STRUCTURAL",
   "note": "builds a structure value (ExpFunctional EffectContext)",
   "file": "Descent/Portability/FourthOrderLossObstruction.lean",
-  "line": 105,
+  "line": 109,
   "short": "cellExp",
   "ret_type": "ExpFunctional EffectContext",
   "empirical_status": "",
@@ -187861,7 +188033,7 @@
   "class": "STRUCTURAL",
   "note": "builds a structure value (ExpFunctional (EffectContext × (Bool × Bool)))",
   "file": "Descent/Portability/FourthOrderLossObstruction.lean",
-  "line": 109,
+  "line": 113,
   "short": "innerExp",
   "ret_type": "ExpFunctional (EffectContext × (Bool × Bool))",
   "empirical_status": "",
@@ -187907,7 +188079,7 @@
   "class": "STRUCTURAL",
   "note": "builds a structure value (ExpFunctional (Fin 2 × (EffectContext × (Bool × Bool))))",
   "file": "Descent/Portability/FourthOrderLossObstruction.lean",
-  "line": 113,
+  "line": 117,
   "short": "jointExp",
   "ret_type": "ExpFunctional (Fin 2 × (EffectContext × (Bool × Bool)))",
   "empirical_status": "",
@@ -187943,9 +188115,9 @@
  },
  "Descent.Portability.FourthOrderLossObstruction.score": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"'int' object is not subscriptable\"))",
+  "note": "self-check: calls untranslated definition effectSign",
   "file": "Descent/Portability/FourthOrderLossObstruction.lean",
-  "line": 127,
+  "line": 131,
   "short": "score",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -187957,7 +188129,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "TypeError(\"'int' object is not subscriptable\")"
+   "error": "NameError(\"name 'effectSign' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -188131,7 +188303,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: arity/type mismatch (TypeError(\"'int' object is not subscriptable\"))",
   "file": "Descent/Portability/FourthOrderLossObstruction.lean",
-  "line": 130,
+  "line": 134,
   "short": "outcome",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -188486,7 +188658,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: arity/type mismatch (TypeError(\"'int' object is not subscriptable\"))",
   "file": "Descent/Portability/FourthOrderLossObstruction.lean",
-  "line": 135,
+  "line": 139,
   "short": "individualLoss",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -188537,9 +188709,9 @@
  },
  "Descent.Portability.FourthOrderLossObstruction.lossSecondMoment": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"'int' object is not subscriptable\"))",
+  "note": "self-check: calls untranslated definition effectSign",
   "file": "Descent/Portability/FourthOrderLossObstruction.lean",
-  "line": 159,
+  "line": 164,
   "short": "lossSecondMoment",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -188551,7 +188723,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "TypeError(\"'int' object is not subscriptable\")"
+   "error": "NameError(\"name 'effectSign' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -188573,7 +188745,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "tuple literal",
   "file": "Descent/Portability/FourthOrderLossObstruction.lean",
-  "line": 355,
+  "line": 360,
   "short": "distanceExplainedLoss",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -189416,6 +189588,16 @@
    "Descent.Portability.JointAuditExperiment.observation_failure_le",
    "Descent.Portability.JointAuditExperiment.observations_map",
    "Descent.Portability.JointAuditExperiment.requests_map",
+   "Descent.Portability.LossExplainabilitySeparation.conditional_context",
+   "Descent.Portability.LossExplainabilitySeparation.loss_conditional_expectation",
+   "Descent.Portability.LossExplainabilitySeparation.predictable_variance",
+   "Descent.Portability.LossExplainabilitySeparation.separation",
+   "Descent.Portability.PairedGainTailExperiment.exact_moment_packet",
+   "Descent.Portability.PairedGainTailExperiment.improvement_moments",
+   "Descent.Portability.PairedGainTailExperiment.joint_integral",
+   "Descent.Portability.PairedGainTailExperiment.joint_memLp",
+   "Descent.Portability.PairedGainTailExperiment.joint_probability",
+   "Descent.Portability.PairedGainTailExperiment.loss_moments",
    "Descent.Portability.PortabilityRatioGeometry.certified_bin_expectation",
    "Descent.Portability.PortabilityRatioGeometry.certified_expected_ratio"
   ],
@@ -189438,6 +189620,16 @@
     "Descent.Portability.JointAuditExperiment.observations_map": [],
     "Descent.Portability.JointAuditExperiment.requests_map": [],
     "Descent.Portability.JointAuditExperiment.observation_failure_le": [],
+    "Descent.Portability.LossExplainabilitySeparation.conditional_context": [],
+    "Descent.Portability.LossExplainabilitySeparation.loss_conditional_expectation": [],
+    "Descent.Portability.LossExplainabilitySeparation.predictable_variance": [],
+    "Descent.Portability.LossExplainabilitySeparation.separation": [],
+    "Descent.Portability.PairedGainTailExperiment.joint_probability": [],
+    "Descent.Portability.PairedGainTailExperiment.joint_integral": [],
+    "Descent.Portability.PairedGainTailExperiment.loss_moments": [],
+    "Descent.Portability.PairedGainTailExperiment.improvement_moments": [],
+    "Descent.Portability.PairedGainTailExperiment.joint_memLp": [],
+    "Descent.Portability.PairedGainTailExperiment.exact_moment_packet": [],
     "Descent.Portability.PortabilityRatioGeometry.certified_expected_ratio": [],
     "Descent.Portability.PortabilityRatioGeometry.certified_bin_expectation": []
    }
@@ -194676,6 +194868,8 @@
    "Descent.Portability.GramAuditGeometry.error_norm",
    "Descent.Portability.GramAuditGeometry.error_vector",
    "Descent.Portability.GuardedRepairDeployment.harm_implies_false_certificate",
+   "Descent.Portability.PairedMedianOfMeans.paired_tail",
+   "Descent.Portability.PairedMedianOfMeans.simultaneous",
    "Descent.Portability.SecondMomentFrameRepair.estimate_confidence",
    "Descent.Portability.SecondMomentFrameRepair.false_certificate_probability",
    "Descent.Portability.SummaryInvisibleDiameter.summary_estimator_error_ge_summaryGap"
@@ -194688,7 +194882,13 @@
     "(gram w φ",
     "signal (gram w φ",
     "∀ i, 0 ≤ w i",
-    "deployedGain μ w f φ ε p q c hard z < 0"
+    "deployedGain μ w f φ ε p q c hard z < 0",
+    "Measurable f",
+    "MemLp f 2 μ",
+    "Var[f; μ] ≤ V",
+    "∀ j, Measurable (f j",
+    "∀ j, MemLp (f j",
+    "∀ j, Var[f j; μ] ≤ V j"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.CertifiedFrameRepair.estimate_confidence": [
@@ -194710,6 +194910,16 @@
     "Descent.Portability.GramAuditGeometry.error_norm": [],
     "Descent.Portability.GuardedRepairDeployment.harm_implies_false_certificate": [
      "deployedGain μ w f φ ε p q c hard z < 0"
+    ],
+    "Descent.Portability.PairedMedianOfMeans.paired_tail": [
+     "Measurable f",
+     "MemLp f 2 μ",
+     "Var[f; μ] ≤ V"
+    ],
+    "Descent.Portability.PairedMedianOfMeans.simultaneous": [
+     "∀ j, Measurable (f j",
+     "∀ j, MemLp (f j",
+     "∀ j, Var[f j; μ] ≤ V j"
     ],
     "Descent.Portability.SecondMomentFrameRepair.estimate_confidence": [
      "(gram w φ"
@@ -195543,24 +195753,14 @@
  },
  "Descent.Portability.GuardedRepairDeployment.coefficient": {
   "class": "NOT-EXTRACTABLE",
-  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'ℝ × ℝ'\")",
+  "note": "ambiguous call to 'estimate' with 4 argument(s): ['Descent.Portability.GramAuditGeometry.estimate', 'Descent.Portability.PairedMedianOfMeans.estimate']",
   "file": "Descent/Portability/GuardedRepairDeployment.lean",
   "line": 27,
   "short": "coefficient",
   "ret_type": "κ → ℝ",
   "empirical_status": "",
-  "python": "Descent_Portability_GuardedRepairDeployment_coefficient",
-  "args": [
-   "w",
-   "f",
-   "φ",
-   "ε",
-   "p",
-   "q",
-   "c",
-   "hard",
-   "z"
-  ],
+  "python": null,
+  "args": [],
   "box": {
    "ε": [
     0.05,
@@ -195571,38 +195771,9 @@
     3.0
    ]
   },
-  "selfcheck": {
-   "finite_points": 0,
-   "total_points": 8,
-   "error": "Uninhabitable(\"no inhabitant modelled for the type 'ℝ × ℝ'\")"
-  },
+  "selfcheck": null,
   "numeric_standins": null,
-  "vector_args": {
-   "w": {
-    "dim": "ι",
-    "rank": 1
-   },
-   "f": {
-    "dim": "ι",
-    "rank": 1
-   },
-   "φ": {
-    "dim": "ι",
-    "rank": 2
-   },
-   "p": {
-    "dim": "ι",
-    "rank": 1
-   },
-   "q": {
-    "dim": "ι",
-    "rank": 1
-   },
-   "c": {
-    "dim": "ι",
-    "rank": 1
-   }
-  },
+  "vector_args": null,
   "mentioned_by": [
    "Descent.Blindness.GenotypeDesign.equilibriumDesign_isFixedPoint",
    "Descent.Blindness.GenotypeDesign.flipOrientation_energy",
@@ -198211,7 +198382,7 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 2,
+   "finite_points": 3,
    "total_points": 8,
    "error": "IndexError('heterozygote: index 3 outside 0..2; the inhabitant does not cover this point (widen the sampled dimension rather than reading a wrapped entry)')"
   },
@@ -203304,6 +203475,10 @@
    "Descent.Portability.ErasedSampleObservation.outcome_average_measurable",
    "Descent.Portability.IIDAverageLaw.average_integral",
    "Descent.Portability.IIDAverageLaw.average_variance",
+   "Descent.Portability.PairedMedianOfMeans.average_measurable",
+   "Descent.Portability.PairedMedianOfMeans.average_memLp",
+   "Descent.Portability.PairedMedianOfMeans.block_failure",
+   "Descent.Portability.PairedMedianOfMeans.paired_tail",
    "Descent.Portability.RareEventSampleLaw.erased_sample_unbiased",
    "Descent.Portability.RareEventSampleLaw.erased_sample_variance",
    "Descent.Portability.RareEventSampleLaw.marked_sample_unbiased",
@@ -203313,7 +203488,9 @@
    "hypotheses": [
     "0 < M",
     "Integrable f μ",
-    "MemLp f 2 μ"
+    "MemLp f 2 μ",
+    "Measurable f",
+    "Var[f; μ] ≤ V"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.AcceptedBinIntegrability.binInner_eq_accepted_sum": [],
@@ -203334,6 +203511,21 @@
     "Descent.Portability.IIDAverageLaw.average_variance": [
      "MemLp f 2 μ",
      "0 < M"
+    ],
+    "Descent.Portability.PairedMedianOfMeans.average_measurable": [
+     "Measurable f"
+    ],
+    "Descent.Portability.PairedMedianOfMeans.average_memLp": [
+     "MemLp f 2 μ"
+    ],
+    "Descent.Portability.PairedMedianOfMeans.block_failure": [
+     "MemLp f 2 μ",
+     "Var[f; μ] ≤ V"
+    ],
+    "Descent.Portability.PairedMedianOfMeans.paired_tail": [
+     "Measurable f",
+     "MemLp f 2 μ",
+     "Var[f; μ] ≤ V"
     ],
     "Descent.Portability.RareEventSampleLaw.marked_sample_unbiased": [
      "0 < M"
@@ -206269,6 +206461,16 @@
    "Descent.Portability.JointAuditExperiment.observation_failure_le",
    "Descent.Portability.JointAuditExperiment.observations_map",
    "Descent.Portability.JointAuditExperiment.requests_map",
+   "Descent.Portability.LossExplainabilitySeparation.conditional_context",
+   "Descent.Portability.LossExplainabilitySeparation.loss_conditional_expectation",
+   "Descent.Portability.LossExplainabilitySeparation.predictable_variance",
+   "Descent.Portability.LossExplainabilitySeparation.separation",
+   "Descent.Portability.PairedGainTailExperiment.exact_moment_packet",
+   "Descent.Portability.PairedGainTailExperiment.improvement_moments",
+   "Descent.Portability.PairedGainTailExperiment.joint_integral",
+   "Descent.Portability.PairedGainTailExperiment.joint_memLp",
+   "Descent.Portability.PairedGainTailExperiment.joint_probability",
+   "Descent.Portability.PairedGainTailExperiment.loss_moments",
    "Descent.Portability.PortabilityRatioGeometry.certified_bin_expectation",
    "Descent.Portability.PortabilityRatioGeometry.certified_expected_ratio"
   ],
@@ -206280,7 +206482,9 @@
     "contrast c p + BernsteinTailBound.radius (maxCost c",
     "∀ z, 0 ≤ jointLaw μ K z",
     "∑ z, jointLaw μ K z = 1",
-    "∀ i, 0 ≤ p i ∧ p i ≤ 1"
+    "∀ i, 0 ≤ p i ∧ p i ≤ 1",
+    "0 ≤ p ∧ p ≤ 1",
+    "0 < p ∧ p ≤ 1"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.ConditionalGuardError.conditional_repair_certificate": [
@@ -206327,6 +206531,36 @@
     ],
     "Descent.Portability.JointAuditExperiment.observation_failure_le": [
      "∀ i, 0 ≤ p i ∧ p i ≤ 1"
+    ],
+    "Descent.Portability.LossExplainabilitySeparation.conditional_context": [
+     "0 ≤ p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.LossExplainabilitySeparation.loss_conditional_expectation": [
+     "0 ≤ p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.LossExplainabilitySeparation.predictable_variance": [
+     "0 ≤ p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.LossExplainabilitySeparation.separation": [
+     "0 < p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.PairedGainTailExperiment.joint_probability": [
+     "0 ≤ p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.PairedGainTailExperiment.joint_integral": [
+     "0 ≤ p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.PairedGainTailExperiment.loss_moments": [
+     "0 ≤ p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.PairedGainTailExperiment.improvement_moments": [
+     "0 ≤ p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.PairedGainTailExperiment.joint_memLp": [
+     "0 ≤ p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.PairedGainTailExperiment.exact_moment_packet": [
+     "0 < p ∧ p ≤ 1"
     ],
     "Descent.Portability.PortabilityRatioGeometry.certified_expected_ratio": [],
     "Descent.Portability.PortabilityRatioGeometry.certified_bin_expectation": []
@@ -207816,6 +208050,83 @@
    "hypotheses": [],
    "hypotheses_by_theorem": {
     "Descent.Portability.LossExplainabilityRegion.sparse_example_max_fraction": []
+   }
+  }
+ },
+ "Descent.Portability.LossExplainabilitySeparation.contextSigma": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name Prod.fst",
+  "file": "Descent/Portability/LossExplainabilitySeparation.lean",
+  "line": 26,
+  "short": "contextSigma",
+  "ret_type": "MeasurableSpace (Bool × Fin 3)",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.LossExplainabilitySeparation.conditional_context",
+   "Descent.Portability.LossExplainabilitySeparation.loss_conditional_expectation",
+   "Descent.Portability.LossExplainabilitySeparation.predictable_variance"
+  ],
+  "constraints": {
+   "declared_kind": "ratio",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.LossExplainabilitySeparation.conditional_context": [],
+    "Descent.Portability.LossExplainabilitySeparation.loss_conditional_expectation": [],
+    "Descent.Portability.LossExplainabilitySeparation.predictable_variance": []
+   }
+  }
+ },
+ "Descent.Portability.LossExplainabilitySeparation.explainedFraction": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "trailing tokens after expression: op:[",
+  "file": "Descent/Portability/LossExplainabilitySeparation.lean",
+  "line": 76,
+  "short": "explainedFraction",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "p": [
+    0.02,
+    0.98
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.LossExplainabilitySeparation.explained_fraction",
+   "Descent.Portability.LossExplainabilitySeparation.explained_fraction_continuous_form",
+   "Descent.Portability.LossExplainabilitySeparation.explained_fraction_tendsto_zero",
+   "Descent.Portability.LossExplainabilitySeparation.separation"
+  ],
+  "constraints": {
+   "declared_kind": "ratio",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [
+    "0 < p ∧ p ≤ 1"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.LossExplainabilitySeparation.explained_fraction": [
+     "0 < p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.LossExplainabilitySeparation.explained_fraction_continuous_form": [
+     "0 < p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.LossExplainabilitySeparation.explained_fraction_tendsto_zero": [],
+    "Descent.Portability.LossExplainabilitySeparation.separation": [
+     "0 < p ∧ p ≤ 1"
+    ]
    }
   }
  },
@@ -212603,6 +212914,71 @@
     "Descent.Portability.commonAndRarePortableModel_targetR2": [],
     "Descent.Portability.rare_variant_pgs_poor_portability": [],
     "Descent.Portability.combined_strategy_optimal": []
+   }
+  }
+ },
+ "Descent.Portability.MedianAuditConcentration.failure": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/MedianAuditConcentration.lean",
+  "line": 28,
+  "short": "failure",
+  "ret_type": "Ω → ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "γ": [
+    0.05,
+    3.0
+   ],
+   "r": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.FirthFiniteIterationLaw.loop_coefficient_bound",
+   "Descent.Portability.FirthFiniteIterationLaw.loop_preserves_inverse",
+   "Descent.Portability.FirthFiniteIterationLaw.loop_unfinished_iteration",
+   "Descent.Portability.FirthFiniteIterationLaw.run_inverse_defined",
+   "Descent.Portability.MedianAuditConcentration.failure_bounded",
+   "Descent.Portability.MedianAuditConcentration.failure_mean",
+   "Descent.Portability.MedianAuditConcentration.failure_measurable",
+   "Descent.Portability.MedianAuditConcentration.majority_tail",
+   "Descent.Portability.MedianAuditConcentration.median_tail"
+  ],
+  "constraints": {
+   "declared_kind": "ratio",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [
+    "Measurable f",
+    "μ.real {ω | r < |f ω - γ|} ≤ 1 / 4"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.FirthFiniteIterationLaw.loop_coefficient_bound": [],
+    "Descent.Portability.FirthFiniteIterationLaw.loop_preserves_inverse": [],
+    "Descent.Portability.FirthFiniteIterationLaw.run_inverse_defined": [],
+    "Descent.Portability.FirthFiniteIterationLaw.loop_unfinished_iteration": [],
+    "Descent.Portability.MedianAuditConcentration.failure_measurable": [
+     "Measurable f"
+    ],
+    "Descent.Portability.MedianAuditConcentration.failure_mean": [
+     "Measurable f"
+    ],
+    "Descent.Portability.MedianAuditConcentration.failure_bounded": [],
+    "Descent.Portability.MedianAuditConcentration.majority_tail": [
+     "Measurable f",
+     "μ.real {ω | r < |f ω - γ|} ≤ 1 / 4"
+    ],
+    "Descent.Portability.MedianAuditConcentration.median_tail": [
+     "Measurable f",
+     "μ.real {ω | r < |f ω - γ|} ≤ 1 / 4"
+    ]
    }
   }
  },
@@ -218694,7 +219070,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: structure projection unavailable (AttributeError(\"'float' object has no attribute 'choose'\"))",
   "file": "Descent/Portability/MomentOrderObstruction.lean",
-  "line": 133,
+  "line": 137,
   "short": "parityMass",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -218744,7 +219120,7 @@
   "class": "STRUCTURAL",
   "note": "builds a structure value (ExpFunctional (Fin (k + 2)))",
   "file": "Descent/Portability/MomentOrderObstruction.lean",
-  "line": 158,
+  "line": 162,
   "short": "parityExp",
   "ret_type": "ExpFunctional (Fin (k + 2))",
   "empirical_status": "",
@@ -218803,7 +219179,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Portability/MomentOrderObstruction.lean",
-  "line": 233,
+  "line": 237,
   "short": "partialR2",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -218911,7 +219287,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Portability/MomentOrderObstruction.lean",
-  "line": 263,
+  "line": 267,
   "short": "lineOutcome",
   "ret_type": "N → ℝ",
   "empirical_status": "",
@@ -218977,7 +219353,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Portability/MomentOrderObstruction.lean",
-  "line": 325,
+  "line": 329,
   "short": "vec6",
   "ret_type": "Fin 6 → ℝ",
   "empirical_status": "",
@@ -219049,7 +219425,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Portability/MomentOrderObstruction.lean",
-  "line": 353,
+  "line": 357,
   "short": "binProjection",
   "ret_type": "Fin 6 → ℝ",
   "empirical_status": "",
@@ -219086,7 +219462,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Portability/MomentOrderObstruction.lean",
-  "line": 357,
+  "line": 361,
   "short": "meanProjection",
   "ret_type": "Fin 6 → ℝ",
   "empirical_status": "",
@@ -219125,7 +219501,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: arity/type mismatch (TypeError(\"'function' object is not subscriptable\"))",
   "file": "Descent/Portability/MomentOrderObstruction.lean",
-  "line": 375,
+  "line": 379,
   "short": "explainedSum",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -219166,7 +219542,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: arity/type mismatch (TypeError(\"'function' object is not subscriptable\"))",
   "file": "Descent/Portability/MomentOrderObstruction.lean",
-  "line": 378,
+  "line": 382,
   "short": "centeredSum",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -219207,7 +219583,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: arity/type mismatch (TypeError(\"'function' object is not subscriptable\"))",
   "file": "Descent/Portability/MomentOrderObstruction.lean",
-  "line": 382,
+  "line": 386,
   "short": "fittedLossExplainability",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -219247,7 +219623,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: arity/type mismatch (TypeError(\"object of type 'function' has no len()\"))",
   "file": "Descent/Portability/MomentOrderObstruction.lean",
-  "line": 387,
+  "line": 391,
   "short": "lossReport",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -219290,7 +219666,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Portability/MomentOrderObstruction.lean",
-  "line": 423,
+  "line": 427,
   "short": "lineResidual",
   "ret_type": "Fin 6 → ℝ",
   "empirical_status": "",
@@ -221102,7 +221478,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Portability/OddLocusReportSolutions.lean",
-  "line": 72,
+  "line": 76,
   "short": "dexp",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -221168,7 +221544,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Portability/OddLocusReportSolutions.lean",
-  "line": 97,
+  "line": 101,
   "short": "oddShift",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -221229,7 +221605,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "step pattern '(r + 1)' is not `n + 1`",
   "file": "Descent/Portability/OddLocusReportSolutions.lean",
-  "line": 102,
+  "line": 106,
   "short": "oddRow",
   "ret_type": "ℕ → (ℕ → ℝ)",
   "empirical_status": "",
@@ -221285,7 +221661,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "∑ over the Finset `Finset.range ( r + 1 )`, not `Finset.univ`",
   "file": "Descent/Portability/OddLocusReportSolutions.lean",
-  "line": 157,
+  "line": 161,
   "short": "oddSolution",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -221309,6 +221685,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.OddLocusReportSolutions.exp_nearestDrift_square_report",
    "Descent.Portability.OddLocusReportSolutions.exp_oddLevelMatrix_square_report",
    "Descent.Portability.OddLocusReportSolutions.hasDerivAt_oddSolution",
    "Descent.Portability.OddLocusReportSolutions.oddSolution_initial",
@@ -221318,7 +221695,9 @@
    "Descent.Portability.OddLocusReportSolutions.oddSolution_two"
   ],
   "constraints": {
-   "hypotheses": [],
+   "hypotheses": [
+    "0 ≤ lam"
+   ],
    "hypotheses_by_theorem": {
     "Descent.Portability.OddLocusReportSolutions.oddSolution_level_zero": [],
     "Descent.Portability.OddLocusReportSolutions.oddSolution_initial": [],
@@ -221326,7 +221705,10 @@
     "Descent.Portability.OddLocusReportSolutions.oddSolution_ode": [],
     "Descent.Portability.OddLocusReportSolutions.oddSolution_one": [],
     "Descent.Portability.OddLocusReportSolutions.oddSolution_two": [],
-    "Descent.Portability.OddLocusReportSolutions.exp_oddLevelMatrix_square_report": []
+    "Descent.Portability.OddLocusReportSolutions.exp_oddLevelMatrix_square_report": [],
+    "Descent.Portability.OddLocusReportSolutions.exp_nearestDrift_square_report": [
+     "0 ≤ lam"
+    ]
    }
   }
  },
@@ -221334,7 +221716,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Portability/OddLocusReportSolutions.lean",
-  "line": 322,
+  "line": 326,
   "short": "oddLevelMatrix",
   "ret_type": "Matrix (Fin (m + 1)) (Fin (m + 1)) ℝ",
   "empirical_status": "",
@@ -221361,16 +221743,30 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.OddLocusReportSolutions.exp_nearestDrift_square_report",
    "Descent.Portability.OddLocusReportSolutions.exp_oddLevelMatrix_square_report",
+   "Descent.Portability.OddLocusReportSolutions.nearestDrift_lump_mulVec",
+   "Descent.Portability.OddLocusReportSolutions.nearestDrift_pullback_intertwine",
    "Descent.Portability.OddLocusReportSolutions.oddLevelMatrix_eigen",
    "Descent.Portability.OddLocusReportSolutions.oddLevelMatrix_mulVec"
   ],
   "constraints": {
-   "hypotheses": [],
+   "hypotheses": [
+    "0 ≤ lam"
+   ],
    "hypotheses_by_theorem": {
     "Descent.Portability.OddLocusReportSolutions.oddLevelMatrix_mulVec": [],
     "Descent.Portability.OddLocusReportSolutions.oddLevelMatrix_eigen": [],
-    "Descent.Portability.OddLocusReportSolutions.exp_oddLevelMatrix_square_report": []
+    "Descent.Portability.OddLocusReportSolutions.exp_oddLevelMatrix_square_report": [],
+    "Descent.Portability.OddLocusReportSolutions.nearestDrift_lump_mulVec": [
+     "0 ≤ lam"
+    ],
+    "Descent.Portability.OddLocusReportSolutions.nearestDrift_pullback_intertwine": [
+     "0 ≤ lam"
+    ],
+    "Descent.Portability.OddLocusReportSolutions.exp_nearestDrift_square_report": [
+     "0 ≤ lam"
+    ]
    }
   }
  },
@@ -221378,7 +221774,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Portability/OddLocusReportSolutions.lean",
-  "line": 449,
+  "line": 453,
   "short": "oddAggregate",
   "ret_type": "ℤ",
   "empirical_status": "",
@@ -221436,7 +221832,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Portability/OddLocusReportSolutions.lean",
-  "line": 454,
+  "line": 458,
   "short": "oddGenZ",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -221477,7 +221873,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Portability/OddLocusReportSolutions.lean",
-  "line": 538,
+  "line": 542,
   "short": "oddStepZ",
   "ret_type": "ℤ → ℝ",
   "empirical_status": "",
@@ -221518,6 +221914,165 @@
     ],
     "Descent.Portability.OddLocusReportSolutions.driftStep_iterate_lump": [
      "0 ≤ lam"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.OddLocusReportSolutions.aggLevel": {
+  "class": "STRUCTURAL",
+  "note": "structure literal",
+  "file": "Descent/Portability/OddLocusReportSolutions.lean",
+  "line": 576,
+  "short": "aggLevel",
+  "ret_type": "Fin (c + 1)",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "c": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.OddLocusReportSolutions.aggLevel_gridPred",
+   "Descent.Portability.OddLocusReportSolutions.aggLevel_gridSucc",
+   "Descent.Portability.OddLocusReportSolutions.aggLevel_of_gt",
+   "Descent.Portability.OddLocusReportSolutions.aggLevel_of_le",
+   "Descent.Portability.OddLocusReportSolutions.downRate_grid_gt",
+   "Descent.Portability.OddLocusReportSolutions.exp_nearestDrift_square_report",
+   "Descent.Portability.OddLocusReportSolutions.pullbackMatrix_mulVec",
+   "Descent.Portability.OddLocusReportSolutions.upRate_grid_le"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "(k : ℕ",
+    "¬ ((k : ℕ"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.OddLocusReportSolutions.aggLevel_of_le": [
+     "(k : ℕ"
+    ],
+    "Descent.Portability.OddLocusReportSolutions.aggLevel_of_gt": [
+     "¬ ((k : ℕ"
+    ],
+    "Descent.Portability.OddLocusReportSolutions.aggLevel_gridSucc": [
+     "(k : ℕ"
+    ],
+    "Descent.Portability.OddLocusReportSolutions.aggLevel_gridPred": [
+     "¬ ((k : ℕ"
+    ],
+    "Descent.Portability.OddLocusReportSolutions.pullbackMatrix_mulVec": [],
+    "Descent.Portability.OddLocusReportSolutions.upRate_grid_le": [
+     "(k : ℕ"
+    ],
+    "Descent.Portability.OddLocusReportSolutions.downRate_grid_gt": [
+     "¬ ((k : ℕ"
+    ],
+    "Descent.Portability.OddLocusReportSolutions.exp_nearestDrift_square_report": []
+   }
+  }
+ },
+ "Descent.Portability.OddLocusReportSolutions.pullbackMatrix": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/OddLocusReportSolutions.lean",
+  "line": 611,
+  "short": "pullbackMatrix",
+  "ret_type": "Matrix (Fin (2 * c + 1 + 1)) (Fin (c + 1)) ℝ",
+  "empirical_status": "",
+  "python": "pullbackMatrix",
+  "args": [
+   "c"
+  ],
+  "box": {
+   "c": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.OddLocusReportSolutions.exp_nearestDrift_square_report",
+   "Descent.Portability.OddLocusReportSolutions.nearestDrift_lump_mulVec",
+   "Descent.Portability.OddLocusReportSolutions.nearestDrift_pullback_intertwine",
+   "Descent.Portability.OddLocusReportSolutions.pullbackMatrix_mulVec"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.OddLocusReportSolutions.pullbackMatrix_mulVec": [],
+    "Descent.Portability.OddLocusReportSolutions.nearestDrift_lump_mulVec": [],
+    "Descent.Portability.OddLocusReportSolutions.nearestDrift_pullback_intertwine": [],
+    "Descent.Portability.OddLocusReportSolutions.exp_nearestDrift_square_report": []
+   }
+  }
+ },
+ "Descent.Portability.OddLocusReportSolutions.mulRightEntry": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "trailing tokens after expression: op::=",
+  "file": "Descent/Portability/OddLocusReportSolutions.lean",
+  "line": 751,
+  "short": "mulRightEntry",
+  "ret_type": "Matrix (Fin N) (Fin N) ℝ →ₗ[ℝ] ℝ where toFun M",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.OddLocusReportSolutions.exp_intertwine",
+   "Descent.Portability.OddLocusReportSolutions.mulRightEntry_apply"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "A * Q = Q * B"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.OddLocusReportSolutions.mulRightEntry_apply": [],
+    "Descent.Portability.OddLocusReportSolutions.exp_intertwine": [
+     "A * Q = Q * B"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.OddLocusReportSolutions.mulLeftEntry": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "trailing tokens after expression: op::=",
+  "file": "Descent/Portability/OddLocusReportSolutions.lean",
+  "line": 758,
+  "short": "mulLeftEntry",
+  "ret_type": "Matrix (Fin P) (Fin P) ℝ →ₗ[ℝ] ℝ where toFun M",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.OddLocusReportSolutions.exp_intertwine",
+   "Descent.Portability.OddLocusReportSolutions.mulLeftEntry_apply"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "A * Q = Q * B"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.OddLocusReportSolutions.mulLeftEntry_apply": [],
+    "Descent.Portability.OddLocusReportSolutions.exp_intertwine": [
+     "A * Q = Q * B"
     ]
    }
   }
@@ -234809,6 +235364,551 @@
    "hypotheses_by_theorem": {
     "Descent.Portability.PThresholdTrainingLaw.linearScore_rowSelectors": [],
     "Descent.Portability.SimulationDesignDecoder.decoded_report": []
+   }
+  }
+ },
+ "Descent.Portability.PairedGainTailExperiment.contextLaw": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name ENNReal.ofReal",
+  "file": "Descent/Portability/PairedGainTailExperiment.lean",
+  "line": 25,
+  "short": "contextLaw",
+  "ret_type": "Measure Bool",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.PairedGainTailExperiment.context_integral",
+   "Descent.Portability.PairedGainTailExperiment.context_probability"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.PairedGainTailExperiment.context_probability": [],
+    "Descent.Portability.PairedGainTailExperiment.context_integral": []
+   }
+  }
+ },
+ "Descent.Portability.PairedGainTailExperiment.noiseLaw": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name ENNReal.ofReal",
+  "file": "Descent/Portability/PairedGainTailExperiment.lean",
+  "line": 30,
+  "short": "noiseLaw",
+  "ret_type": "Measure (Fin 3)",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "p": [
+    0.02,
+    0.98
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.LossExplainabilitySeparation.conditional_context",
+   "Descent.Portability.PairedGainTailExperiment.conditional_loss",
+   "Descent.Portability.PairedGainTailExperiment.noise_integral",
+   "Descent.Portability.PairedGainTailExperiment.noise_moments",
+   "Descent.Portability.PairedGainTailExperiment.noise_probability"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "0 ≤ p ∧ p ≤ 1"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.LossExplainabilitySeparation.conditional_context": [
+     "0 ≤ p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.PairedGainTailExperiment.noise_probability": [
+     "0 ≤ p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.PairedGainTailExperiment.noise_integral": [
+     "0 ≤ p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.PairedGainTailExperiment.noise_moments": [
+     "0 ≤ p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.PairedGainTailExperiment.conditional_loss": [
+     "0 ≤ p ∧ p ≤ 1"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.PairedGainTailExperiment.jointLaw": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name contextLaw.prod",
+  "file": "Descent/Portability/PairedGainTailExperiment.lean",
+  "line": 36,
+  "short": "jointLaw",
+  "ret_type": "Measure (Bool × Fin 3)",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "p": [
+    0.02,
+    0.98
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ConditionalGuardError.conditional_repair_certificate",
+   "Descent.Portability.ConditionalOscillationDuality.jointLaw_expectation",
+   "Descent.Portability.DistanceBinnedPortabilityLaw.clipped_bin_expectation",
+   "Descent.Portability.DistanceBinnedPortabilityLaw.finite_bin_expectation",
+   "Descent.Portability.GaussianEffectPortabilityLaw.clippedExpectation_formula",
+   "Descent.Portability.GaussianEffectPortabilityLaw.finite_reportedExpectation_formula",
+   "Descent.Portability.GaussianEffectPortabilityLaw.successProbability_bounds",
+   "Descent.Portability.GaussianEffectPortabilityLaw.successProbability_eq_joint_defined",
+   "Descent.Portability.GuardedRepairDeployment.harm_probability",
+   "Descent.Portability.HardBudgetAuditGuard.guarded_failure_le",
+   "Descent.Portability.HardBudgetAuditGuard.guarded_repair_certificate",
+   "Descent.Portability.HardBudgetAuditGuard.joint_abort_probability",
+   "Descent.Portability.JointAuditExperiment.joint_probability",
+   "Descent.Portability.JointAuditExperiment.observation_failure_le",
+   "Descent.Portability.JointAuditExperiment.observations_map",
+   "Descent.Portability.JointAuditExperiment.requests_map",
+   "Descent.Portability.LossExplainabilitySeparation.conditional_context",
+   "Descent.Portability.LossExplainabilitySeparation.loss_conditional_expectation",
+   "Descent.Portability.LossExplainabilitySeparation.predictable_variance",
+   "Descent.Portability.LossExplainabilitySeparation.separation",
+   "Descent.Portability.PairedGainTailExperiment.exact_moment_packet",
+   "Descent.Portability.PairedGainTailExperiment.improvement_moments",
+   "Descent.Portability.PairedGainTailExperiment.joint_integral",
+   "Descent.Portability.PairedGainTailExperiment.joint_memLp",
+   "Descent.Portability.PairedGainTailExperiment.joint_probability",
+   "Descent.Portability.PairedGainTailExperiment.loss_moments",
+   "Descent.Portability.PortabilityRatioGeometry.certified_bin_expectation",
+   "Descent.Portability.PortabilityRatioGeometry.certified_expected_ratio"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "∀ i, 0 < p i ∧ p i ≤ 1",
+    "contrast c p + BernsteinTailBound.radius (maxCost c",
+    "∀ i, 0 ≤ p i ∧ p i ≤ 1",
+    "0 ≤ p ∧ p ≤ 1",
+    "0 < p ∧ p ≤ 1"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ConditionalGuardError.conditional_repair_certificate": [
+     "∀ i, 0 < p i ∧ p i ≤ 1",
+     "contrast c p + BernsteinTailBound.radius (maxCost c"
+    ],
+    "Descent.Portability.ConditionalOscillationDuality.jointLaw_expectation": [],
+    "Descent.Portability.DistanceBinnedPortabilityLaw.clipped_bin_expectation": [],
+    "Descent.Portability.DistanceBinnedPortabilityLaw.finite_bin_expectation": [],
+    "Descent.Portability.GaussianEffectPortabilityLaw.clippedExpectation_formula": [],
+    "Descent.Portability.GaussianEffectPortabilityLaw.successProbability_eq_joint_defined": [],
+    "Descent.Portability.GaussianEffectPortabilityLaw.successProbability_bounds": [],
+    "Descent.Portability.GaussianEffectPortabilityLaw.finite_reportedExpectation_formula": [],
+    "Descent.Portability.GuardedRepairDeployment.harm_probability": [
+     "∀ i, 0 < p i ∧ p i ≤ 1"
+    ],
+    "Descent.Portability.HardBudgetAuditGuard.guarded_failure_le": [
+     "∀ i, 0 ≤ p i ∧ p i ≤ 1"
+    ],
+    "Descent.Portability.HardBudgetAuditGuard.joint_abort_probability": [
+     "∀ i, 0 ≤ p i ∧ p i ≤ 1",
+     "contrast c p + BernsteinTailBound.radius (maxCost c"
+    ],
+    "Descent.Portability.HardBudgetAuditGuard.guarded_repair_certificate": [
+     "∀ i, 0 < p i ∧ p i ≤ 1"
+    ],
+    "Descent.Portability.JointAuditExperiment.joint_probability": [
+     "∀ i, 0 ≤ p i ∧ p i ≤ 1"
+    ],
+    "Descent.Portability.JointAuditExperiment.observations_map": [
+     "∀ i, 0 ≤ p i ∧ p i ≤ 1"
+    ],
+    "Descent.Portability.JointAuditExperiment.requests_map": [
+     "∀ i, 0 ≤ p i ∧ p i ≤ 1"
+    ],
+    "Descent.Portability.JointAuditExperiment.observation_failure_le": [
+     "∀ i, 0 ≤ p i ∧ p i ≤ 1"
+    ],
+    "Descent.Portability.LossExplainabilitySeparation.conditional_context": [
+     "0 ≤ p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.LossExplainabilitySeparation.loss_conditional_expectation": [
+     "0 ≤ p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.LossExplainabilitySeparation.predictable_variance": [
+     "0 ≤ p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.LossExplainabilitySeparation.separation": [
+     "0 < p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.PairedGainTailExperiment.joint_probability": [
+     "0 ≤ p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.PairedGainTailExperiment.joint_integral": [
+     "0 ≤ p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.PairedGainTailExperiment.loss_moments": [
+     "0 ≤ p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.PairedGainTailExperiment.improvement_moments": [
+     "0 ≤ p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.PairedGainTailExperiment.joint_memLp": [
+     "0 ≤ p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.PairedGainTailExperiment.exact_moment_packet": [
+     "0 < p ∧ p ≤ 1"
+    ],
+    "Descent.Portability.PortabilityRatioGeometry.certified_expected_ratio": [],
+    "Descent.Portability.PortabilityRatioGeometry.certified_bin_expectation": []
+   }
+  }
+ },
+ "Descent.Portability.PairedGainTailExperiment.correction": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/PairedGainTailExperiment.lean",
+  "line": 39,
+  "short": "correction",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "correction",
+  "args": [
+   "w"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.LossExplainabilitySeparation.loss_conditional_expectation",
+   "Descent.Portability.LossExplainabilitySeparation.predictable_variance",
+   "Descent.Portability.PairedGainTailExperiment.conditional_loss",
+   "Descent.Portability.PairedGainTailExperiment.improvement_moments",
+   "Descent.Portability.PairedGainTailExperiment.loss_moments",
+   "Descent.Portability.sharedCorrectionCost_eq_consensus_add_spread",
+   "Descent.Portability.sharedCorrectionSpread_le_cost"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.LossExplainabilitySeparation.loss_conditional_expectation": [],
+    "Descent.Portability.LossExplainabilitySeparation.predictable_variance": [],
+    "Descent.Portability.sharedCorrectionCost_eq_consensus_add_spread": [],
+    "Descent.Portability.sharedCorrectionSpread_le_cost": [],
+    "Descent.Portability.PairedGainTailExperiment.conditional_loss": [],
+    "Descent.Portability.PairedGainTailExperiment.loss_moments": [],
+    "Descent.Portability.PairedGainTailExperiment.improvement_moments": []
+   }
+  }
+ },
+ "Descent.Portability.PairedGainTailExperiment.noiseValue": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/PairedGainTailExperiment.lean",
+  "line": 42,
+  "short": "noiseValue",
+  "ret_type": "Fin 3 → ℝ",
+  "empirical_status": "",
+  "python": "noiseValue",
+  "args": [
+   "a"
+  ],
+  "box": {
+   "a": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.PairedGainTailExperiment.conditional_loss",
+   "Descent.Portability.PairedGainTailExperiment.improvement_moments",
+   "Descent.Portability.PairedGainTailExperiment.loss_moments",
+   "Descent.Portability.PairedGainTailExperiment.noise_moments"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.PairedGainTailExperiment.noise_moments": [],
+    "Descent.Portability.PairedGainTailExperiment.conditional_loss": [],
+    "Descent.Portability.PairedGainTailExperiment.loss_moments": [],
+    "Descent.Portability.PairedGainTailExperiment.improvement_moments": []
+   }
+  }
+ },
+ "Descent.Portability.PairedGainTailExperiment.loss": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'Bool × Fin 3'\")",
+  "file": "Descent/Portability/PairedGainTailExperiment.lean",
+  "line": 45,
+  "short": "loss",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "loss",
+  "args": [
+   "a",
+   "z"
+  ],
+  "box": {
+   "a": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'Bool × Fin 3'\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Blindness.TrafficInvariantSeparation.algorithmicallyEquivalent_iff_signature_eq",
+   "Descent.Decision.FiniteMinimax.Problem.abs_risk_le_pointRiskAbsBound",
+   "Descent.Decision.FiniteMinimax.Problem.exists_risk_lower_bound",
+   "Descent.Decision.FiniteMinimax.Problem.half_separation_le_garbled_minimaxRisk_of_observation_eq",
+   "Descent.Decision.FiniteMinimax.Problem.half_separation_le_minimaxRisk_of_observationL1Distance_eq_zero",
+   "Descent.Decision.FiniteMinimax.Problem.half_separation_le_minimaxRisk_of_observation_eq",
+   "Descent.Decision.FiniteMinimax.Problem.half_separation_le_summarized_minimaxRisk_of_observation_eq",
+   "Descent.Decision.FiniteMinimax.Problem.half_separation_le_worstRisk_of_observation_eq",
+   "Descent.Decision.FiniteMinimax.Problem.half_separation_sub_l1_le_garbled_minimaxRisk",
+   "Descent.Decision.FiniteMinimax.Problem.half_separation_sub_l1_le_minimaxRisk",
+   "Descent.Decision.FiniteMinimax.Problem.half_separation_sub_l1_le_worstRisk",
+   "Descent.Decision.FiniteMinimax.Problem.pointRiskAbsBound_at_zero_loss",
+   "Descent.Decision.FiniteMinimax.Problem.riskAbsBound_at_zero_loss",
+   "Descent.Decision.FiniteMinimax.Problem.risk_liftGarbledRule_eq",
+   "Descent.Decision.FiniteMinimax.Problem.risk_mixRule",
+   "Descent.Decision.FiniteMinimax.Problem.separation_le_risk_add_of_observation_eq",
+   "Descent.Decision.FiniteMinimax.Problem.separation_sub_l1_le_risk_add",
+   "Descent.Decision._root_.Descent.Blindness.ProbeBlindness.readoutProblem_loss_add",
+   "Descent.Decision._root_.Descent.Blindness.ProbeBlindness.risk_readoutProblem",
+   "Descent.Portability.ChannelComparison.garbling_iff_decision_dominance",
+   "Descent.Portability.ChannelComparison.garbling_no_worse",
+   "Descent.Portability.CohortEvaluationOperators.lossExplainedFraction_centered",
+   "Descent.Portability.CohortEvaluationOperators.lossExplainedFraction_nonneg",
+   "Descent.Portability.CohortEvaluationOperators.lossExplainedFraction_smul",
+   "Descent.Portability.LossExplainabilitySeparation.loss_conditional_expectation",
+   "Descent.Portability.LossExplainabilitySeparation.predictable_variance",
+   "Descent.Portability.PairedGainTailExperiment.conditional_loss",
+   "Descent.Portability.PairedGainTailExperiment.exact_moment_packet",
+   "Descent.Portability.PairedGainTailExperiment.improvement_moments",
+   "Descent.Portability.PairedGainTailExperiment.loss_moments"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "hypotheses": [
+    "∀ θ' a, E.loss θ' a = 0",
+    "∀ y z, 0 ≤ dB y z",
+    "∀ y, ∑ z, dB y z = 1"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Blindness.TrafficInvariantSeparation.algorithmicallyEquivalent_iff_signature_eq": [],
+    "Descent.Decision._root_.Descent.Blindness.ProbeBlindness.readoutProblem_loss_add": [],
+    "Descent.Decision._root_.Descent.Blindness.ProbeBlindness.risk_readoutProblem": [],
+    "Descent.Decision.FiniteMinimax.Problem.separation_sub_l1_le_risk_add": [],
+    "Descent.Decision.FiniteMinimax.Problem.risk_liftGarbledRule_eq": [],
+    "Descent.Decision.FiniteMinimax.Problem.separation_le_risk_add_of_observation_eq": [],
+    "Descent.Decision.FiniteMinimax.Problem.half_separation_sub_l1_le_worstRisk": [],
+    "Descent.Decision.FiniteMinimax.Problem.half_separation_sub_l1_le_minimaxRisk": [],
+    "Descent.Decision.FiniteMinimax.Problem.half_separation_sub_l1_le_garbled_minimaxRisk": [],
+    "Descent.Decision.FiniteMinimax.Problem.half_separation_le_worstRisk_of_observation_eq": [],
+    "Descent.Decision.FiniteMinimax.Problem.half_separation_le_minimaxRisk_of_observation_eq": [],
+    "Descent.Decision.FiniteMinimax.Problem.half_separation_le_minimaxRisk_of_observationL1Distance_eq_zero": [],
+    "Descent.Decision.FiniteMinimax.Problem.half_separation_le_garbled_minimaxRisk_of_observation_eq": [],
+    "Descent.Decision.FiniteMinimax.Problem.half_separation_le_summarized_minimaxRisk_of_observation_eq": [],
+    "Descent.Decision.FiniteMinimax.Problem.pointRiskAbsBound_at_zero_loss": [
+     "∀ θ' a, E.loss θ' a = 0"
+    ],
+    "Descent.Decision.FiniteMinimax.Problem.riskAbsBound_at_zero_loss": [
+     "∀ θ' a, E.loss θ' a = 0"
+    ],
+    "Descent.Decision.FiniteMinimax.Problem.abs_risk_le_pointRiskAbsBound": [],
+    "Descent.Decision.FiniteMinimax.Problem.exists_risk_lower_bound": [],
+    "Descent.Decision.FiniteMinimax.Problem.risk_mixRule": [],
+    "Descent.Portability.ChannelComparison.garbling_no_worse": [
+     "∀ y z, 0 ≤ dB y z",
+     "∀ y, ∑ z, dB y z = 1"
+    ],
+    "Descent.Portability.ChannelComparison.garbling_iff_decision_dominance": [],
+    "Descent.Portability.CohortEvaluationOperators.lossExplainedFraction_centered": [],
+    "Descent.Portability.CohortEvaluationOperators.lossExplainedFraction_nonneg": [],
+    "Descent.Portability.CohortEvaluationOperators.lossExplainedFraction_smul": [],
+    "Descent.Portability.LossExplainabilitySeparation.loss_conditional_expectation": [],
+    "Descent.Portability.LossExplainabilitySeparation.predictable_variance": [],
+    "Descent.Portability.PairedGainTailExperiment.conditional_loss": [],
+    "Descent.Portability.PairedGainTailExperiment.loss_moments": [],
+    "Descent.Portability.PairedGainTailExperiment.improvement_moments": [],
+    "Descent.Portability.PairedGainTailExperiment.exact_moment_packet": []
+   }
+  }
+ },
+ "Descent.Portability.PairedGainTailExperiment.improvement": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'Bool × Fin 3'\")",
+  "file": "Descent/Portability/PairedGainTailExperiment.lean",
+  "line": 48,
+  "short": "improvement",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "Descent_Portability_PairedGainTailExperiment_improvement",
+  "args": [
+   "a",
+   "z"
+  ],
+  "box": {
+   "a": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "Uninhabitable(\"no inhabitant modelled for the type 'Bool × Fin 3'\")"
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.CertifiedFrameRepair.certificate_on_event",
+   "Descent.Portability.ClippedFrameRepair.false_gain_probability",
+   "Descent.Portability.GuardedRepairDeployment.proceed_gain",
+   "Descent.Portability.LossExplainabilitySeparation.separation",
+   "Descent.Portability.PairedGainTailExperiment.exact_moment_packet",
+   "Descent.Portability.PairedGainTailExperiment.improvement_moments",
+   "Descent.Portability.SecondMomentFrameRepair.harm_probability",
+   "Descent.Program.costEffectiveness_mul_cost",
+   "Descent.Program.costEffectiveness_unit_invariant",
+   "Descent.Program.costEffectiveness_zero_cost_is_junk"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "Proceed c hard (requests z"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.CertifiedFrameRepair.certificate_on_event": [],
+    "Descent.Portability.ClippedFrameRepair.false_gain_probability": [],
+    "Descent.Portability.GuardedRepairDeployment.proceed_gain": [
+     "Proceed c hard (requests z"
+    ],
+    "Descent.Portability.LossExplainabilitySeparation.separation": [],
+    "Descent.Portability.PairedGainTailExperiment.improvement_moments": [],
+    "Descent.Portability.PairedGainTailExperiment.exact_moment_packet": [],
+    "Descent.Portability.SecondMomentFrameRepair.harm_probability": [],
+    "Descent.Program.costEffectiveness_zero_cost_is_junk": [],
+    "Descent.Program.costEffectiveness_unit_invariant": [],
+    "Descent.Program.costEffectiveness_mul_cost": []
+   }
+  }
+ },
+ "Descent.Portability.PairedMedianOfMeans.estimate": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "self-check: calls untranslated definition median",
+  "file": "Descent/Portability/PairedMedianOfMeans.lean",
+  "line": 67,
+  "short": "estimate",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "Descent_Portability_PairedMedianOfMeans_estimate",
+  "args": [
+   "f",
+   "m",
+   "s",
+   "z"
+  ],
+  "box": {
+   "m": [
+    1.0,
+    20.0
+   ],
+   "s": [
+    1.0,
+    20.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 0,
+   "total_points": 8,
+   "error": "NameError(\"name 'median' is not defined\")"
+  },
+  "numeric_standins": null,
+  "vector_args": {
+   "f": {
+    "dim": "Ω",
+    "rank": 1
+   }
+  },
+  "mentioned_by": [
+   "Descent.Portability.CertifiedFrameRepair.certificate_on_event",
+   "Descent.Portability.CertifiedFrameRepair.estimate_confidence",
+   "Descent.Portability.CertifiedFrameRepair.false_certificate_probability",
+   "Descent.Portability.ClippedFrameRepair.false_gain_probability",
+   "Descent.Portability.FiniteBinCalibrationLaw.clipped_coverage",
+   "Descent.Portability.GramAuditGeometry.error_norm",
+   "Descent.Portability.GramAuditGeometry.error_vector",
+   "Descent.Portability.GuardedRepairDeployment.harm_implies_false_certificate",
+   "Descent.Portability.PairedMedianOfMeans.paired_tail",
+   "Descent.Portability.PairedMedianOfMeans.simultaneous",
+   "Descent.Portability.SecondMomentFrameRepair.estimate_confidence",
+   "Descent.Portability.SecondMomentFrameRepair.false_certificate_probability",
+   "Descent.Portability.SummaryInvisibleDiameter.summary_estimator_error_ge_summaryGap"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "deployedGain μ w f φ ε p q c hard z < 0",
+    "Measurable f",
+    "MemLp f 2 μ",
+    "0 < s",
+    "Var[f; μ] ≤ V",
+    "∀ j, Measurable (f j",
+    "∀ j, MemLp (f j",
+    "∀ j, Var[f j; μ] ≤ V j"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.CertifiedFrameRepair.estimate_confidence": [],
+    "Descent.Portability.CertifiedFrameRepair.certificate_on_event": [],
+    "Descent.Portability.CertifiedFrameRepair.false_certificate_probability": [],
+    "Descent.Portability.ClippedFrameRepair.false_gain_probability": [],
+    "Descent.Portability.FiniteBinCalibrationLaw.clipped_coverage": [],
+    "Descent.Portability.GramAuditGeometry.error_vector": [],
+    "Descent.Portability.GramAuditGeometry.error_norm": [],
+    "Descent.Portability.GuardedRepairDeployment.harm_implies_false_certificate": [
+     "deployedGain μ w f φ ε p q c hard z < 0"
+    ],
+    "Descent.Portability.PairedMedianOfMeans.paired_tail": [
+     "Measurable f",
+     "MemLp f 2 μ",
+     "0 < s",
+     "Var[f; μ] ≤ V"
+    ],
+    "Descent.Portability.PairedMedianOfMeans.simultaneous": [
+     "∀ j, Measurable (f j",
+     "∀ j, MemLp (f j",
+     "0 < s",
+     "∀ j, Var[f j; μ] ≤ V j"
+    ],
+    "Descent.Portability.SecondMomentFrameRepair.estimate_confidence": [],
+    "Descent.Portability.SecondMomentFrameRepair.false_certificate_probability": [],
+    "Descent.Portability.SummaryInvisibleDiameter.summary_estimator_error_ge_summaryGap": []
    }
   }
  },
@@ -285910,7 +287010,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Program/OpenQuestions.lean",
-  "line": 899,
+  "line": 933,
   "short": "combinedPortability",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
@@ -285983,7 +287083,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Program/OpenQuestions.lean",
-  "line": 1010,
+  "line": 1044,
   "short": "snrPortabilityRatio",
   "ret_type": "ℝ",
   "empirical_status": "",

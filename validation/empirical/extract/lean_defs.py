@@ -3313,9 +3313,6 @@ def Descent_Portability_CalibrationLaw_prevalence(p, linear, intercept):
 def calibratedIntercept(p, baseline, epsilon, he, hb, raw):
     return _rt._proj(_rt._proj((standardized_calibrated_intercept(p, raw, baseline, epsilon, he, hb)), 'exists'), 'choose')
 
-def improvement(μ, w, f, φ, ε, z):
-    return _rt.sub(frameRisk(μ, w, f), frameRisk(μ, w, (Descent_Portability_DecisionLossContrasts_predict(f, φ, (repair((Descent_Portability_DecisionLossContrasts_gram(w, φ)), (estimate(w, f, φ, z)), ε))))))
-
 def chanCompose(A, G):
     return (lambda θ, y: sum((_rt.mul(A[int(θ)][int(x)], G[int(x)][int(y)])) for x in range(int(_rt.sumdim('x', len(A[0]), len(G))))))
 
@@ -4360,9 +4357,6 @@ def twoPointKernel(a):
 def slackValue(E, X, β, k, m):
     return E(((lambda ω: _rt.lpow(slackSecond(β, k, X, m, ω), 2.0))))
 
-def effectSign(b):
-    return (1.0 if b else (-1.0))
-
 def effectMean(z):
     return _rt.rdiv(((((effectSign(_rt._proj(z, '1')) + effectSign(_rt._proj(_rt._proj(z, '2'), '1'))) + effectSign(_rt._proj(_rt._proj(_rt._proj(z, '2'), '2'), '1'))) + effectSign(_rt._proj(_rt._proj(_rt._proj(z, '2'), '2'), '2')))), 4.0)
 
@@ -4527,9 +4521,6 @@ def classWeight(color, w, c):
 
 def Descent_Portability_GuardedMetricOptimization_recover(problem):
     return ((_rt.rdiv(1.0, _rt._proj(problem, 'scale'))) * _rt._proj(problem, 'weights'))
-
-def Descent_Portability_GuardedRepairDeployment_coefficient(w, f, φ, ε, p, q, c, hard, z):
-    return by(classical, exact, (repair((Descent_Portability_DecisionLossContrasts_gram(w, φ)), (estimate(w, f, φ, (observations(p, q, z)))), ε) if Proceed(c, hard, (requests(z))) else 0.0))
 
 def deployedGain(μ, w, f, φ, ε, p, q, c, hard, z):
     return _rt.sub(frameRisk(μ, w, f), frameRisk(μ, w, (Descent_Portability_DecisionLossContrasts_predict(f, φ, (Descent_Portability_GuardedRepairDeployment_coefficient(w, f, φ, ε, p, q, c, hard, z))))))
@@ -5232,6 +5223,9 @@ def oddGenZ(lam, g, M):
 def oddStepZ(lam, tau, g):
     return (lambda M: (g(M) + (tau * oddGenZ(lam, g, M))))
 
+def pullbackMatrix(c):
+    return _rt.identity((lambda k, j: ((1.0) if (aggLevel(c, k) == j) else 0.0)))
+
 def scalarMean(values, p):
     return sum((_rt.mul(hweMass(p, g), values[int(g)])) for g in range(int(len(values))))
 
@@ -5624,6 +5618,21 @@ def learnerFromTables(cohorts, tables, files):
 
 def rowSelectors(row):
     return by(classical, exact, (lambda r, u: (1.0 if (row(r) == u) else 0.0)))
+
+def correction(w):
+    return (_rt.rdiv(3.0, 2.0) if w else _rt.rdiv(1.0, 2.0))
+
+def noiseValue(a):
+    return _rt.VecFn([0.0, a, (-a)])
+
+def loss(a, z):
+    return _rt.lpow(((correction(_rt._proj(z, '1')) + noiseValue(a, _rt._proj(z, '2')))), 2.0)
+
+def Descent_Portability_PairedGainTailExperiment_improvement(a, z):
+    return (loss(a, z) - _rt.lpow(noiseValue(a, _rt._proj(z, '2')), 2.0))
+
+def Descent_Portability_PairedMedianOfMeans_estimate(f, m, s, z):
+    return median(((lambda j: Descent_Portability_IIDAverageLaw_average(f, s, (z(j))))))
 
 def designRate(η, c_0, c_1, q):
     return _rt.rdiv(((_rt.lpow(η, 2.0) + ((q * η) * ((1.0 - η))))), ((c_0 + (q * c_1))))
