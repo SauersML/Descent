@@ -362,11 +362,6 @@ def add {D : ℕ} {first second : TwoLocusDiffusionJet D}
     simp only [TwoLocusDiffusionJet.add, resamplingOperator_add, hfirst.drift_eq deme state,
       hsecond.drift_eq deme state]
 
-/-- Evaluation of a scalar multiple of a polynomial. -/
-theorem eval_smul {H : Type*} (x : H → ℝ) (r : ℝ) (p : MvPolynomial H ℝ) :
-    MvPolynomial.eval x (r • p) = r * MvPolynomial.eval x p := by
-  rw [MvPolynomial.smul_eq_C_mul, map_mul, MvPolynomial.eval_C]
-
 /-- A scalar multiple of a certified jet is certified by the scalar multiple of the
 polynomial. -/
 def smul {D : ℕ} {observable : TwoLocusDiffusionJet D} (scalar : ℝ)
@@ -383,9 +378,9 @@ def smul {D : ℕ} {observable : TwoLocusDiffusionJet D} (scalar : ℝ)
   polynomial_update deme state frequency := by
     simp only [hobservable.polynomial_update]
   value_eq deme state := by
-    simp only [TwoLocusDiffusionJet.smul, eval_smul, hobservable.value_eq deme state]
+    simp only [TwoLocusDiffusionJet.smul, MvPolynomial.smul_eval, hobservable.value_eq deme state]
   gradient_eq deme state observed := by
-    simp only [TwoLocusDiffusionJet.smul, Derivation.map_smul, eval_smul,
+    simp only [TwoLocusDiffusionJet.smul, Derivation.map_smul, MvPolynomial.smul_eval,
       hobservable.gradient_eq deme state observed]
   drift_eq deme state := by
     simp only [TwoLocusDiffusionJet.smul, resamplingOperator_smul,
@@ -549,7 +544,7 @@ def linkage {D : ℕ} (index : Fin D) : JetPolynomialCertificate (twoLocusLinkag
     by_cases hdeme : deme = index
     · subst hdeme
       rw [if_pos rfl]
-      simp only [twoLocusLinkageJet, map_add, map_mul, eval_smul, MvPolynomial.eval_X,
+      simp only [twoLocusLinkageJet, map_add, map_mul, MvPolynomial.smul_eval, MvPolynomial.eval_X,
         haplotypeCoordinate, TwoLocusHaplotypeFrequencies.linkage]
       ring
     · rw [if_neg hdeme]
@@ -560,7 +555,7 @@ def linkage {D : ℕ} (index : Fin D) : JetPolynomialCertificate (twoLocusLinkag
       rw [if_pos rfl]
       cases observed <;>
         simp [twoLocusLinkageJet, twoLocusLinkageGradient, MvPolynomial.pderiv_mul,
-          MvPolynomial.pderiv_X, Pi.single_apply, eval_smul, haplotypeCoordinate]
+          MvPolynomial.pderiv_X, Pi.single_apply, MvPolynomial.smul_eval, haplotypeCoordinate]
     · rw [if_neg hdeme]
       simp [twoLocusLinkageJet, hdeme, MvPolynomial.pderiv_C]
   drift_eq deme state := by

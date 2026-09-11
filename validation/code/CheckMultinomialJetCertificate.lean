@@ -23,7 +23,6 @@ namespace Descent.Portability.MultinomialJetCertificate
 #print axioms JetPolynomialCertificate
 #print axioms JetPolynomialCertificate.const
 #print axioms JetPolynomialCertificate.add
-#print axioms JetPolynomialCertificate.eval_smul
 #print axioms JetPolynomialCertificate.smul
 #print axioms resamplingCoefficient_symm
 #print axioms resamplingOperator_mul
