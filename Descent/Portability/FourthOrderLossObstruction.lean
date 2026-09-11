@@ -101,6 +101,16 @@ def innerExp (par : Bool) (d : Fin 2) : ExpFunctional (EffectContext × (Bool ×
 def jointExp (par : Bool) : ExpFunctional (Fin 2 × (EffectContext × (Bool × Bool))) :=
   mixture (uniformExp (Fin 2)) (innerExp par)
 
+/-- The cell law is the corpus' `IndividualLossMoments.mixture` of the latent-context
+law with the uniform genotype/noise draw. -/
+theorem innerExp_eq_mixture (par : Bool) (d : Fin 2) :
+    innerExp par d = mixture (cellExp par d) (fun _ ↦ uniformExp (Bool × Bool)) := rfl
+
+/-- The hierarchical law is the corpus' `IndividualLossMoments.mixture` of the uniform
+distance-cell law with the within-cell law. -/
+theorem jointExp_eq_mixture (par : Bool) :
+    jointExp par = mixture (uniformExp (Fin 2)) (innerExp par) := rfl
+
 /-- The source-frozen score: four perfectly linked copies of one fair genotype sign. -/
 def score (ω : Fin 2 × (EffectContext × (Bool × Bool))) : ℝ := effectSign ω.2.2.1
 

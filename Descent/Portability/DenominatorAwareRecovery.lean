@@ -323,6 +323,18 @@ theorem matched_report_gap_le {S : Type*} [Fintype S] (M δ : ℝ) (hδ : 0 < δ
   rw [abs_le]
   constructor <;> linarith [e1.1, e1.2, e2.1, e2.2, hmatch]
 
+/-- **PL Theorem 9.1, corpus form.** Two `Portability.weightedExp` laws that agree on the
+expectation of the degree-`d·j` approximant report expected ratios at most `2ε_j` apart. -/
+theorem weightedExp_matched_report_gap_le {S : Type*} [Fintype S] (M δ : ℝ)
+    (hδ : 0 < δ) (hM : δ < M) (j : ℕ) (A B : S → ℝ) (hA : ∀ s, 0 ≤ A s)
+    (hAB : ∀ s, A s ≤ B s) (hBl : ∀ s, δ ≤ B s) (hBu : ∀ s, B s ≤ M) (p q : S → ℝ)
+    (hp : ∀ s, 0 ≤ p s) (hq : ∀ s, 0 ≤ q s) (hps : ∑ s, p s = 1) (hqs : ∑ s, q s = 1)
+    (hmatch : weightedExp p hp hps (fun s ↦ A s * (recoveryPoly M δ j).eval (B s)) =
+      weightedExp q hq hqs (fun s ↦ A s * (recoveryPoly M δ j).eval (B s))) :
+    |weightedExp p hp hps (fun s ↦ A s / B s) -
+        weightedExp q hq hqs (fun s ↦ A s / B s)| ≤ 2 * (1 / chebPeak M δ j) :=
+  matched_report_gap_le M δ hδ hM j A B hA hAB hBl hBu p q hp hq hps hqs hmatch
+
 end
 
 end Descent.Portability.DenominatorAwareRecovery

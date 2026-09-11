@@ -24,3 +24,4 @@ import Descent.Portability.DenominatorAwareRecovery
 #print axioms Descent.Portability.DenominatorAwareRecovery.natDegree_approximant_le
 #print axioms Descent.Portability.DenominatorAwareRecovery.abs_average_le_of_bound
 #print axioms Descent.Portability.DenominatorAwareRecovery.matched_report_gap_le
+#print axioms Descent.Portability.DenominatorAwareRecovery.weightedExp_matched_report_gap_le

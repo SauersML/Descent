@@ -143,6 +143,13 @@ def radialExp (r : Fin (k + 1) → ℝ) (hinj : Function.Injective r) (s : Bool)
     ExpFunctional (Fin (k + 1) × Bool) :=
   weightedExp (radialLaw r s) (radialLaw_nonneg r s) (radialLaw_sum r hinj s)
 
+/-- The radial expectations are the corpus' `Portability.weightedExp` expectations of the
+sign-split radial masses. -/
+theorem radialExp_eq_weightedExp (r : Fin (k + 1) → ℝ) (hinj : Function.Injective r)
+    (s : Bool) :
+    radialExp r hinj s =
+      weightedExp (radialLaw r s) (radialLaw_nonneg r s) (radialLaw_sum r hinj s) := rfl
+
 /-- **The master gap identity.** For any observable of the outcome vector, the two laws
 differ by the radial-weight average of its values on the two rays. -/
 theorem radial_gap (r : Fin (k + 1) → ℝ) (hinj : Function.Injective r) (u v : N → ℝ)

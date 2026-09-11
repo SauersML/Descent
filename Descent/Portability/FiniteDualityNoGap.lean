@@ -47,6 +47,33 @@ paired with their potentials. -/
 def dualValue (observed : O → ℝ) (level : ℝ) (potential : O → ℝ) : ℝ :=
   level + pairing potential observed
 
+/-- Dual feasibility bounds the report value of every probability law by the certificate's
+level plus its potentials paired with that law's own summaries. -/
+theorem le_dual_at_law (observe : O → S → ℝ) (metric : S → ℝ) (level : ℝ)
+    (potential : O → ℝ)
+    (hdual : ∀ s, metric s ≤ level + ∑ o, potential o * observe o s)
+    (q : S → ℝ) (hq : q ∈ stdSimplex ℝ S) :
+    pairing metric q ≤ level + ∑ o, potential o * pairing (observe o) q := by
+  have hcross : ∑ s, ∑ o, potential o * observe o s * q s =
+      ∑ o, potential o * pairing (observe o) q := by
+    rw [Finset.sum_comm]
+    refine Finset.sum_congr rfl fun o _ ↦ ?_
+    rw [pairing, Finset.mul_sum]
+    exact Finset.sum_congr rfl fun s _ ↦ by ring
+  have hsplit : ∑ s, (level + ∑ o, potential o * observe o s) * q s =
+      level * (∑ s, q s) + ∑ o, potential o * pairing (observe o) q := by
+    have hpoint : ∀ s : S, (level + ∑ o, potential o * observe o s) * q s =
+        level * q s + ∑ o, potential o * observe o s * q s := by
+      intro s
+      rw [add_mul, Finset.sum_mul]
+    rw [Finset.sum_congr rfl fun s _ ↦ hpoint s, Finset.sum_add_distrib, ← Finset.mul_sum,
+      hcross]
+  calc pairing metric q
+      ≤ ∑ s, (level + ∑ o, potential o * observe o s) * q s :=
+        Finset.sum_le_sum fun s _ ↦ mul_le_mul_of_nonneg_right (hdual s) (hq.1 s)
+    _ = level * (∑ s, q s) + ∑ o, potential o * pairing (observe o) q := hsplit
+    _ = level + ∑ o, potential o * pairing (observe o) q := by rw [hq.2, mul_one]
+
 /-- Weak duality including the total-mass row: a dual certificate bounds the report statistic
 of every compatible law. -/
 theorem le_dualValue (observe : O → S → ℝ) (observed : O → ℝ) (metric : S → ℝ) (level : ℝ)
@@ -54,30 +81,9 @@ theorem le_dualValue (observe : O → S → ℝ) (observed : O → ℝ) (metric 
     (hdual : ∀ s, metric s ≤ level + ∑ o, potential o * observe o s)
     (p : S → ℝ) (hp : p ∈ feasible observe observed) :
     pairing metric p ≤ dualValue observed level potential := by
-  have hcross : ∑ s, ∑ o, potential o * observe o s * p s =
-      ∑ o, potential o * pairing (observe o) p := by
-    rw [Finset.sum_comm]
-    refine Finset.sum_congr rfl fun o _ ↦ ?_
-    rw [pairing, Finset.mul_sum]
-    exact Finset.sum_congr rfl fun s _ ↦ by ring
-  have hsplit : ∑ s, (level + ∑ o, potential o * observe o s) * p s =
-      level * (∑ s, p s) + ∑ o, potential o * pairing (observe o) p := by
-    have hpoint : ∀ s : S, (level + ∑ o, potential o * observe o s) * p s =
-        level * p s + ∑ o, potential o * observe o s * p s := by
-      intro s
-      rw [add_mul, Finset.sum_mul]
-    rw [Finset.sum_congr rfl fun s _ ↦ hpoint s, Finset.sum_add_distrib, ← Finset.mul_sum,
-      hcross]
-  have hfinal : level * (∑ s, p s) + ∑ o, potential o * pairing (observe o) p =
-      dualValue observed level potential := by
-    rw [hp.1.2, mul_one, dualValue, pairing]
-    refine congrArg (fun x ↦ level + x) (Finset.sum_congr rfl fun o _ ↦ ?_)
-    rw [hp.2 o]
-  calc pairing metric p
-      ≤ ∑ s, (level + ∑ o, potential o * observe o s) * p s :=
-        Finset.sum_le_sum fun s _ ↦ mul_le_mul_of_nonneg_right (hdual s) (hp.1.1 s)
-    _ = level * (∑ s, p s) + ∑ o, potential o * pairing (observe o) p := hsplit
-    _ = dualValue observed level potential := hfinal
+  refine le_trans (le_dual_at_law observe metric level potential hdual p hp.1) (le_of_eq ?_)
+  rw [dualValue, pairing]
+  exact congrArg (fun x ↦ level + x) (Finset.sum_congr rfl fun o _ ↦ by rw [hp.2 o])
 
 /-- The law concentrated at a single state. -/
 def pointVector (state : S) : S → ℝ := fun other ↦ if state = other then 1 else 0
