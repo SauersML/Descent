@@ -317,7 +317,8 @@ def historyTree {State : Type} [Fintype State] (initial : FiniteReportLaw State)
 /-- The history tree reports the corpus forward propagation `ExactFiniteHistoryLaw.propagate`. -/
 theorem reportLaw_historyTree {State : Type} [Fintype State] (initial : FiniteReportLaw State)
     (kernel : ℕ → State → FiniteReportLaw State) (n : ℕ) :
-    reportLaw (historyTree initial kernel n) = ExactFiniteHistoryLaw.propagate initial kernel n := by
+    reportLaw (historyTree initial kernel n) =
+      ExactFiniteHistoryLaw.propagate initial kernel n := by
   rw [historyTree, reportLaw_stagedTree]
   simp only [reportLaw_transitionTree]
 
