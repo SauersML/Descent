@@ -1,0 +1,281 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.AdmixtureChronologyLaw
+
+assert_below Descent.Decision Descent.Program
+
+/-!
+# The attainable coupling curve at fixed demographic totals
+
+NOTE1 Theorem 5 fixes the two demographic totals of an admixture chronology, the migration
+total `M > 0` and the recombination total `R ≥ 0`, and lets the chronology vary. The donor
+fraction is then pinned at `p = 1 - e^{-M}`, while the normalised coupling `C` is free in
+exactly the interval `[e^{-R}, 1]`, which is NOTE1 (33). This module proves both halves.
+
+The upper and lower bounds are proved for the continuous chronology of
+`AdmixtureChronologyLaw`, from the exposure representation (29): the coupling is the
+immigration-increment average of `e^{-b}` where the remaining recombination exposure `b`
+satisfies `0 ≤ b ≤ R` whenever the recombination rate is nonnegative and time runs forward,
+and the immigration increments themselves integrate to the donor fraction. Averaging a
+quantity confined to `[e^{-R}, 1]` against weights of total mass `p` and dividing by `p` gives
+a value confined to the same interval.
+
+Attainment is proved for the ordered-event recursion of `AdmixtureChronologyLaw`, whose two
+steps are theorems about the solutions of (27) rather than stipulations. The three-block
+history of NOTE1 Theorem 5 spends exposure `R - b` on a monomorphic recipient, then the whole
+migration total, then the remaining exposure `b`; it has the prescribed totals and coupling
+exactly `e^{-b}`. As `b` runs over `[0, R]` the coupling runs over all of `[e^{-R}, 1]`, so the
+attainable set of metric vectors is exactly the image of that interval under the NOTE1
+section 6.2 table map, in both directions. The worked example `M = R = log 2` is checked in
+both orders, giving coupling one half and coupling one.
+
+Not proved here: that every chronology with the given totals is equivalent to a three-block
+one, and the measure-valued form of the exposure law. The attainment half uses the
+three-block family only, which is all NOTE1 Theorem 5 claims, and the bounds half covers every
+continuous chronology.
+
+## Empirical status
+
+None. The bodies here are calculus and algebra: the demographic totals and the chronology are
+stated parameters of a stated mechanism, and no measurement enters any statement.
+-/
+
+set_option autoImplicit false
+set_option relaxedAutoImplicit false
+
+namespace Descent.Portability.AttainableChronologyCurve
+
+open Descent.Portability.AdmixtureChronologyLaw
+
+noncomputable section
+
+/-- The donor fraction is the total immigration increment: `p T = ∫₀ᵀ m e^{-M}`, which is the
+`dA` weight of NOTE1 Theorem 4. -/
+theorem donorFraction_eq_integral (m : ℝ → ℝ) (hm : Continuous m) (T : ℝ) :
+    donorFraction m T = ∫ s in (0 : ℝ)..T, m s * Real.exp (-cumulativeRate m s) := by
+  have hderiv : ∀ s ∈ Set.uIcc (0 : ℝ) T,
+      HasDerivAt (donorFraction m) (m s * Real.exp (-cumulativeRate m s)) s := by
+    intro s _
+    have hstep := hasDerivAt_donorFraction m hm s
+    rwa [one_sub_donorFraction] at hstep
+  have hcont : Continuous (fun s ↦ m s * Real.exp (-cumulativeRate m s)) :=
+    hm.mul (((continuous_cumulativeRate m hm).neg).rexp)
+  rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv (hcont.intervalIntegrable _ _),
+    donorFraction_zero, sub_zero]
+
+/-- The recombination exposure still to be met by material arriving at time `s` is the
+recombination accumulated after `s`. -/
+theorem cumulativeRate_sub_eq_integral (r : ℝ → ℝ) (hr : Continuous r) (s T : ℝ) :
+    cumulativeRate r T - cumulativeRate r s = ∫ u in s..T, r u := by
+  unfold cumulativeRate
+  rw [← intervalIntegral.integral_add_adjacent_intervals
+    (hr.intervalIntegrable 0 s) (hr.intervalIntegrable s T)]
+  ring
+
+/-- NOTE1 (33), upper bound: the normalised coupling never exceeds one, because the survival
+factor of a nonnegative remaining exposure never does. -/
+theorem normalisedCoupling_le_one (m r : ℝ → ℝ) (hm : Continuous m) (hr : Continuous r)
+    (hmnn : ∀ s, 0 ≤ m s) (hrnn : ∀ s, 0 ≤ r s) (T : ℝ) (hT : 0 ≤ T)
+    (hpos : 0 < donorFraction m T) : normalisedCoupling m r T ≤ 1 := by
+  have hw : Continuous (fun s ↦ m s * Real.exp (-cumulativeRate m s)) :=
+    hm.mul (((continuous_cumulativeRate m hm).neg).rexp)
+  have hwf : Continuous (fun s ↦ m s * Real.exp (-cumulativeRate m s) *
+      Real.exp (-(cumulativeRate r T - cumulativeRate r s))) :=
+    hw.mul (((continuous_const.sub (continuous_cumulativeRate r hr)).neg).rexp)
+  have hmono : (∫ s in (0 : ℝ)..T, m s * Real.exp (-cumulativeRate m s) *
+      Real.exp (-(cumulativeRate r T - cumulativeRate r s))) ≤
+      ∫ s in (0 : ℝ)..T, m s * Real.exp (-cumulativeRate m s) := by
+    refine intervalIntegral.integral_mono_on hT (hwf.intervalIntegrable _ _)
+      (hw.intervalIntegrable _ _) ?_
+    intro s hs
+    have hwnn : 0 ≤ m s * Real.exp (-cumulativeRate m s) :=
+      mul_nonneg (hmnn s) (Real.exp_pos _).le
+    have hexposure : 0 ≤ cumulativeRate r T - cumulativeRate r s := by
+      rw [cumulativeRate_sub_eq_integral r hr s T]
+      exact intervalIntegral.integral_nonneg hs.2 (fun u _ ↦ hrnn u)
+    have hsurvival : Real.exp (-(cumulativeRate r T - cumulativeRate r s)) ≤ 1 :=
+      Real.exp_le_one_iff.mpr (by linarith)
+    nlinarith [hwnn, hsurvival]
+  rw [normalisedCoupling_eq_exposure_integral m r T hpos, one_div, inv_mul_eq_div,
+    div_le_one hpos, donorFraction_eq_integral m hm T]
+  exact hmono
+
+/-- NOTE1 (33), lower bound: the normalised coupling is at least the survival factor of the
+whole recombination total, because no arrival meets more exposure than that. -/
+theorem exp_neg_le_normalisedCoupling (m r : ℝ → ℝ) (hm : Continuous m) (hr : Continuous r)
+    (hmnn : ∀ s, 0 ≤ m s) (hrnn : ∀ s, 0 ≤ r s) (T : ℝ) (hT : 0 ≤ T)
+    (hpos : 0 < donorFraction m T) :
+    Real.exp (-cumulativeRate r T) ≤ normalisedCoupling m r T := by
+  have hw : Continuous (fun s ↦ m s * Real.exp (-cumulativeRate m s)) :=
+    hm.mul (((continuous_cumulativeRate m hm).neg).rexp)
+  have hwf : Continuous (fun s ↦ m s * Real.exp (-cumulativeRate m s) *
+      Real.exp (-(cumulativeRate r T - cumulativeRate r s))) :=
+    hw.mul (((continuous_const.sub (continuous_cumulativeRate r hr)).neg).rexp)
+  have hmono : (∫ s in (0 : ℝ)..T, Real.exp (-cumulativeRate r T) *
+      (m s * Real.exp (-cumulativeRate m s))) ≤
+      ∫ s in (0 : ℝ)..T, m s * Real.exp (-cumulativeRate m s) *
+        Real.exp (-(cumulativeRate r T - cumulativeRate r s)) := by
+    refine intervalIntegral.integral_mono_on hT
+      ((continuous_const.mul hw).intervalIntegrable _ _) (hwf.intervalIntegrable _ _) ?_
+    intro s hs
+    have hwnn : 0 ≤ m s * Real.exp (-cumulativeRate m s) :=
+      mul_nonneg (hmnn s) (Real.exp_pos _).le
+    have hearlier : 0 ≤ cumulativeRate r s := cumulativeRate_nonneg r hrnn s hs.1
+    have hsurvival : Real.exp (-cumulativeRate r T) ≤
+        Real.exp (-(cumulativeRate r T - cumulativeRate r s)) :=
+      Real.exp_le_exp.mpr (by linarith)
+    nlinarith [hwnn, hsurvival]
+  rw [intervalIntegral.integral_const_mul, ← donorFraction_eq_integral m hm T] at hmono
+  rw [normalisedCoupling_eq_exposure_integral m r T hpos, one_div, inv_mul_eq_div,
+    le_div_iff₀ hpos]
+  linarith [hmono]
+
+/-- The three-block history of NOTE1 Theorem 5: recombination exposure `rtot - bexp` while the
+recipient is still monomorphic, then the whole migration total, then the remaining exposure
+`bexp`. -/
+def threeBlockHistory (bexp mtot rtot : ℝ) : List ChronologyEvent :=
+  [ChronologyEvent.recombination (rtot - bexp), ChronologyEvent.migration mtot,
+    ChronologyEvent.recombination bexp]
+
+/-- The state after the three-block history: donor fraction `1 - e^{-M}` and linkage
+`e^{-M}(1 - e^{-M}) e^{-b}`. -/
+theorem runEvents_threeBlockHistory (bexp mtot rtot : ℝ) :
+    runEvents (threeBlockHistory bexp mtot rtot) (0, 0) =
+      (1 - Real.exp (-mtot),
+        Real.exp (-mtot) * (1 - Real.exp (-mtot)) * Real.exp (-bexp)) := by
+  simp only [threeBlockHistory, runEvents_cons, runEvents_nil, stepEvent_recombination,
+    stepEvent_migration, Prod.mk.injEq]
+  constructor <;> ring
+
+/-- The three-block history supplies exactly the prescribed migration total. -/
+theorem migrationTotal_threeBlockHistory (bexp mtot rtot : ℝ) :
+    ((threeBlockHistory bexp mtot rtot).map eventMigration).sum = mtot := by
+  simp [threeBlockHistory, eventMigration]
+
+/-- The three-block history supplies exactly the prescribed recombination total. -/
+theorem recombinationTotal_threeBlockHistory (bexp mtot rtot : ℝ) :
+    ((threeBlockHistory bexp mtot rtot).map eventRecombination).sum = rtot := by
+  simp [threeBlockHistory, eventRecombination] <;> ring
+
+/-- The normalised coupling read off an ordered-event state `(p, D)`, the counterpart for the
+piecewise chronology of `normalisedCoupling` for the continuous one. -/
+def couplingOfState (state : ℝ × ℝ) : ℝ := state.2 / (state.1 * (1 - state.1))
+
+/-- The three-block history realises coupling exactly `e^{-b}`, where `b` is the recombination
+exposure it places after the migration. -/
+theorem couplingOfState_threeBlockHistory (bexp mtot rtot : ℝ) (hmpos : 0 < mtot) :
+    couplingOfState (runEvents (threeBlockHistory bexp mtot rtot) (0, 0)) =
+      Real.exp (-bexp) := by
+  have hlt : Real.exp (-mtot) < 1 := Real.exp_lt_one_iff.mpr (by linarith)
+  have hgt : (0 : ℝ) < Real.exp (-mtot) := Real.exp_pos _
+  have hne : (1 - Real.exp (-mtot)) * (1 - (1 - Real.exp (-mtot))) ≠ 0 := by
+    have hrewrite : (1 : ℝ) - (1 - Real.exp (-mtot)) = Real.exp (-mtot) := by ring
+    rw [hrewrite]
+    exact ne_of_gt (mul_pos (by linarith) hgt)
+  unfold couplingOfState
+  simp only [runEvents_threeBlockHistory]
+  rw [div_eq_iff hne]
+  ring
+
+/-- NOTE1 Theorem 5 with (33): at fixed totals the couplings attainable by an ordered
+three-block history are exactly the interval `[e^{-R}, 1]`. -/
+theorem attainable_coupling_range (mtot rtot : ℝ) (hmpos : 0 < mtot) (hrnn : 0 ≤ rtot) :
+    {coupling : ℝ | ∃ bexp ∈ Set.Icc (0 : ℝ) rtot,
+        couplingOfState (runEvents (threeBlockHistory bexp mtot rtot) (0, 0)) = coupling} =
+      Set.Icc (Real.exp (-rtot)) 1 := by
+  ext coupling
+  simp only [Set.mem_setOf_eq, Set.mem_Icc]
+  constructor
+  · rintro ⟨bexp, hmem, rfl⟩
+    rw [couplingOfState_threeBlockHistory bexp mtot rtot hmpos]
+    exact ⟨Real.exp_le_exp.mpr (by linarith [hmem.2]),
+      Real.exp_le_one_iff.mpr (by linarith [hmem.1])⟩
+  · rintro ⟨hlow, hhigh⟩
+    have hcpos : 0 < coupling := lt_of_lt_of_le (Real.exp_pos _) hlow
+    refine ⟨-Real.log coupling, ⟨?_, ?_⟩, ?_⟩
+    · have hnp : Real.log coupling ≤ 0 := Real.log_nonpos hcpos.le hhigh
+      linarith
+    · have hge : -rtot ≤ Real.log coupling := (Real.le_log_iff_exp_le hcpos).mpr hlow
+      linarith
+    · rw [couplingOfState_threeBlockHistory _ mtot rtot hmpos, neg_neg,
+        Real.exp_log hcpos]
+
+/-- The NOTE1 section 6.2 metric table as an explicit function of the donor fraction and the
+coupling: AUC, calibration slope, calibration intercept, Brier loss, repaired Brier loss,
+accuracy at an interior threshold, and discrete calibration error. -/
+def metricTable (p C : ℝ) : ℝ × ℝ × ℝ × ℝ × ℝ × ℝ × ℝ :=
+  ((1 + C) / 2, C, p * (1 - C), 2 * (p * (1 - p)) * (1 - C), p * (1 - p) * (1 - C ^ 2),
+    1 - 2 * (p * (1 - p)) * (1 - C), 2 * (p * (1 - p)) * (1 - C))
+
+/-- The same seven numbers read off a report law on the pair (score, outcome). -/
+def reportMetrics (law : FiniteReportLaw (Bool × Bool)) :
+    ℝ × ℝ × ℝ × ℝ × ℝ × ℝ × ℝ :=
+  (ChronologyReportLaw.populationAUC law, ChronologyReportLaw.linearSlope law,
+    ChronologyReportLaw.linearIntercept law,
+    law.meanSquaredError ChronologyReportLaw.scoreOf ChronologyReportLaw.outcomeOf,
+    ChronologyReportLaw.repairedBrier law,
+    ChronologyReportLaw.thresholdAccuracy law (1 / 2),
+    ChronologyReportLaw.discreteECE law)
+
+/-- The report law of NOTE1 (31) reports exactly the table entries. -/
+theorem reportMetrics_chronologyLaw (p C : ℝ) (hp0 : 0 ≤ p) (hp1 : p ≤ 1) (hC0 : 0 ≤ C)
+    (hC1 : C ≤ 1) (hlow : 0 < p) (hhigh : p < 1) :
+    reportMetrics (ChronologyReportLaw.chronologyLaw p C hp0 hp1 hC0 hC1) =
+      metricTable p C := by
+  unfold reportMetrics metricTable
+  rw [ChronologyReportLaw.populationAUC_chronologyLaw p C hp0 hp1 hC0 hC1 hlow hhigh,
+    ChronologyReportLaw.linearSlope_chronologyLaw p C hp0 hp1 hC0 hC1 hlow hhigh,
+    ChronologyReportLaw.linearIntercept_chronologyLaw p C hp0 hp1 hC0 hC1 hlow hhigh,
+    ChronologyReportLaw.meanSquaredError_chronologyLaw p C hp0 hp1 hC0 hC1,
+    ChronologyReportLaw.repairedBrier_chronologyLaw p C hp0 hp1 hC0 hC1 hlow hhigh,
+    ChronologyReportLaw.thresholdAccuracy_chronologyLaw p C (1 / 2) hp0 hp1 hC0 hC1
+      (by norm_num) (by norm_num),
+    ChronologyReportLaw.discreteECE_chronologyLaw p C hp0 hp1 hC0 hC1 hlow hhigh]
+
+/-- NOTE1 Theorem 5, the curve statement: at fixed totals the attainable metric vectors are
+exactly the image of the coupling interval `[e^{-R}, 1]` under the table map, in both
+directions. -/
+theorem attainable_metric_curve (mtot rtot : ℝ) (hmpos : 0 < mtot) (hrnn : 0 ≤ rtot) :
+    metricTable (1 - Real.exp (-mtot)) ''
+        {coupling : ℝ | ∃ bexp ∈ Set.Icc (0 : ℝ) rtot,
+          couplingOfState (runEvents (threeBlockHistory bexp mtot rtot) (0, 0)) = coupling} =
+      metricTable (1 - Real.exp (-mtot)) '' Set.Icc (Real.exp (-rtot)) 1 := by
+  rw [attainable_coupling_range mtot rtot hmpos hrnn]
+
+/-- The survival factor of the worked example's totals. -/
+theorem exp_neg_log_two : Real.exp (-Real.log 2) = 1 / 2 := by
+  rw [Real.exp_neg, Real.exp_log (by norm_num : (0 : ℝ) < 2)]
+  norm_num
+
+/-- NOTE1 section 6.2 worked example, migration first: with `M = R = log 2` and all
+recombination after the migration the state is donor fraction one half and linkage one eighth,
+so the coupling is one half. -/
+theorem threeBlock_migration_first :
+    runEvents (threeBlockHistory (Real.log 2) (Real.log 2) (Real.log 2)) (0, 0) =
+        (1 / 2, 1 / 8) ∧
+      couplingOfState
+        (runEvents (threeBlockHistory (Real.log 2) (Real.log 2) (Real.log 2)) (0, 0)) =
+          1 / 2 := by
+  have hlog : (0 : ℝ) < Real.log 2 := Real.log_pos (by norm_num)
+  constructor
+  · rw [runEvents_threeBlockHistory, exp_neg_log_two, Prod.mk.injEq]
+    constructor <;> norm_num
+  · rw [couplingOfState_threeBlockHistory _ _ _ hlog, exp_neg_log_two]
+
+/-- The same totals with all recombination before the migration leave the loci fully coupled:
+linkage one quarter and coupling one. -/
+theorem threeBlock_recombination_first :
+    runEvents (threeBlockHistory 0 (Real.log 2) (Real.log 2)) (0, 0) = (1 / 2, 1 / 4) ∧
+      couplingOfState (runEvents (threeBlockHistory 0 (Real.log 2) (Real.log 2)) (0, 0)) =
+        1 := by
+  have hlog : (0 : ℝ) < Real.log 2 := Real.log_pos (by norm_num)
+  constructor
+  · rw [runEvents_threeBlockHistory, exp_neg_log_two, Prod.mk.injEq]
+    constructor <;> norm_num
+  · rw [couplingOfState_threeBlockHistory _ _ _ hlog]
+    norm_num
+
+end
+
+end Descent.Portability.AttainableChronologyCurve

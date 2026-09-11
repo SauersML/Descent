@@ -155,7 +155,6 @@ theorem conditionalMean_eq_corner_combination (num den : Bool × Bool → ℝ)
     have hc := (hden c).ne'
     simp only [cornerWeight]
     field_simp
-    ring
   rw [Finset.sum_congr rfl fun c _ ↦ hterm c, ← Finset.sum_div]
   rfl
 
@@ -196,6 +195,13 @@ theorem conditionalMean_corner (num den : Bool × Bool → ℝ) (a e : Bool) :
 
 /-! ### The determinant characterization of independence (10) -/
 
+/-- The total mass of a two-by-two table written out over its four cells. -/
+theorem sum_cells (table : Bool × Bool → ℝ) :
+    ∑ c, table c = table (false, false) + table (false, true) +
+      (table (true, false) + table (true, true)) := by
+  simp only [Fintype.sum_prod_type, Fintype.sum_bool]
+  ring
+
 /-- A product table has vanishing determinant. -/
 theorem cellWeight_det (α η : ℝ) :
     cellWeight α η (false, false) * cellWeight α η (true, true) =
@@ -218,18 +224,16 @@ theorem det_zero_iff_eq_cellWeight (table : Bool × Bool → ℝ)
       table = cellWeight (table (true, false) + table (true, true))
         (table (false, true) + table (true, true)) := by
   have hexpand : table (false, false) + table (false, true) +
-      (table (true, false) + table (true, true)) = 1 := by
-    rw [← hsum]
-    simp only [Fintype.sum_prod_type, Fintype.sum_bool]
+      (table (true, false) + table (true, true)) = 1 := (sum_cells table).symm.trans hsum
   constructor
   · intro hdet
     funext c
     rcases c with ⟨a, e⟩
     cases a <;> cases e <;> simp only [cellWeight]
-    · linear_combination table (false, false) * hexpand - hdet
-    · linear_combination table (false, true) * hexpand + hdet
-    · linear_combination table (true, false) * hexpand + hdet
-    · linear_combination table (true, true) * hexpand - hdet
+    · linear_combination (-table (false, false)) * hexpand + hdet
+    · linear_combination (-table (false, true)) * hexpand - hdet
+    · linear_combination (-table (true, false)) * hexpand - hdet
+    · linear_combination (-table (true, true)) * hexpand + hdet
   · intro hprod
     rw [hprod]
     exact cellWeight_det _ _
@@ -243,9 +247,7 @@ theorem marginal_mem_unitInterval (table : Bool × Bool → ℝ) (hnn : ∀ c, 0
       0 ≤ table (false, true) + table (true, true) ∧
       table (false, true) + table (true, true) ≤ 1 := by
   have hexpand : table (false, false) + table (false, true) +
-      (table (true, false) + table (true, true)) = 1 := by
-    rw [← hsum]
-    simp only [Fintype.sum_prod_type, Fintype.sum_bool]
+      (table (true, false) + table (true, true)) = 1 := (sum_cells table).symm.trans hsum
   have h1 := hnn (false, false)
   have h2 := hnn (false, true)
   have h3 := hnn (true, false)
@@ -274,38 +276,31 @@ theorem jointRegion_eq_image {J : Type} [Fintype J] (num den : J → Bool × Boo
   ext report
   constructor
   · rintro ⟨table, hnn, hsum, hdet, heq⟩
-    obtain ⟨ha0, ha1, he0, he1⟩ := marginal_mem_unitInterval table hnn hsum
-    have hprod := (det_zero_iff_eq_cellWeight table hsum).mp hdet
-    refine ⟨(table (true, false) + table (true, true),
-      table (false, true) + table (true, true)), ⟨?_, ?_⟩, ?_⟩
-    · exact Set.mem_Icc.mpr ⟨ha0, ha1⟩
-    · exact Set.mem_Icc.mpr ⟨he0, he1⟩
-    · funext j
-      have hdpos := mixtureDenominator_pos (den j) (hden j) _ _ ha0 ha1 he0 he1
-      have hden' : ∑ c, table c * den j c =
-          mixtureDenominator (den j) (table (true, false) + table (true, true))
-            (table (false, true) + table (true, true)) := by
-        simp only [mixtureDenominator]
-        exact Finset.sum_congr rfl fun c _ ↦ by rw [hprod]
-      have hnum' : ∑ c, table c * num j c =
-          mixtureNumerator (num j) (table (true, false) + table (true, true))
-            (table (false, true) + table (true, true)) := by
-        simp only [mixtureNumerator]
-        exact Finset.sum_congr rfl fun c _ ↦ by rw [hprod]
-      have hj := heq j
-      rw [hden', hnum'] at hj
-      rw [conditionalMean, eq_comm, div_eq_iff hdpos.ne']
-      exact hj
-  · rintro ⟨⟨α, η⟩, hmem, rfl⟩
-    obtain ⟨hα, hη⟩ := hmem
-    obtain ⟨h0a, h1a⟩ := Set.mem_Icc.mp hα
-    obtain ⟨h0e, h1e⟩ := Set.mem_Icc.mp hη
-    refine ⟨cellWeight α η, cellWeight_nonneg α η h0a h1a h0e h1e, cellWeight_sum α η,
-      cellWeight_det α η, fun j ↦ ?_⟩
-    have hdpos := mixtureDenominator_pos (den j) (hden j) α η h0a h1a h0e h1e
-    rw [conditionalMean, div_mul_eq_mul_div, mul_comm]
-    rw [mul_div_assoc, div_self hdpos.ne', mul_one]
-    rfl
+    obtain ⟨alpha, eta, h0a, h1a, h0e, h1e, hprod⟩ :
+        ∃ alpha eta : ℝ, 0 ≤ alpha ∧ alpha ≤ 1 ∧ 0 ≤ eta ∧ eta ≤ 1 ∧
+          table = cellWeight alpha eta := by
+      obtain ⟨ha0, ha1, he0, he1⟩ := marginal_mem_unitInterval table hnn hsum
+      exact ⟨_, _, ha0, ha1, he0, he1, (det_zero_iff_eq_cellWeight table hsum).mp hdet⟩
+    refine ⟨(alpha, eta), ⟨Set.mem_Icc.mpr ⟨h0a, h1a⟩, Set.mem_Icc.mpr ⟨h0e, h1e⟩⟩, ?_⟩
+    funext j
+    have hdpos := mixtureDenominator_pos (den j) (hden j) alpha eta h0a h1a h0e h1e
+    have hj := heq j
+    rw [hprod] at hj
+    have hnum : mixtureNumerator (num j) alpha eta =
+        report j * mixtureDenominator (den j) alpha eta := hj.symm
+    show mixtureNumerator (num j) alpha eta / mixtureDenominator (den j) alpha eta =
+      report j
+    rw [hnum, mul_div_assoc, div_self hdpos.ne', mul_one]
+  · rintro ⟨⟨alpha, eta⟩, hmem, rfl⟩
+    obtain ⟨halpha, heta⟩ := hmem
+    obtain ⟨h0a, h1a⟩ := Set.mem_Icc.mp halpha
+    obtain ⟨h0e, h1e⟩ := Set.mem_Icc.mp heta
+    refine ⟨cellWeight alpha eta, cellWeight_nonneg alpha eta h0a h1a h0e h1e,
+      cellWeight_sum alpha eta, cellWeight_det alpha eta, fun j ↦ ?_⟩
+    have hdpos := mixtureDenominator_pos (den j) (hden j) alpha eta h0a h1a h0e h1e
+    show mixtureNumerator (num j) alpha eta / mixtureDenominator (den j) alpha eta *
+      mixtureDenominator (den j) alpha eta = mixtureNumerator (num j) alpha eta
+    rw [div_mul_eq_mul_div, mul_div_assoc, div_self hdpos.ne', mul_one]
 
 end
 

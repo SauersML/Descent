@@ -2,7 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.TwoLocusHistory
-import Mathlib.Data.Matrix.Notation
+import Mathlib.LinearAlgebra.Matrix.Notation
 import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 
 assert_below Descent.Decision Descent.Program

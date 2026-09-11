@@ -17,6 +17,7 @@ open Descent.Portability.ArchitectureEnvironmentRegion
 #print axioms conditionalMean_le
 #print axioms le_conditionalMean
 #print axioms conditionalMean_corner
+#print axioms sum_cells
 #print axioms cellWeight_det
 #print axioms cellWeight_marginals
 #print axioms det_zero_iff_eq_cellWeight

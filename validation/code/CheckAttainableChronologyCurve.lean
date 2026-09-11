@@ -1,0 +1,25 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.AttainableChronologyCurve
+
+/-! Axiom audit of the attainable coupling curve at fixed demographic totals. -/
+
+open Descent.Portability.AttainableChronologyCurve
+
+#print axioms Descent.Portability.AttainableChronologyCurve.donorFraction_eq_integral
+#print axioms Descent.Portability.AttainableChronologyCurve.cumulativeRate_sub_eq_integral
+#print axioms Descent.Portability.AttainableChronologyCurve.normalisedCoupling_le_one
+#print axioms Descent.Portability.AttainableChronologyCurve.exp_neg_le_normalisedCoupling
+#print axioms Descent.Portability.AttainableChronologyCurve.runEvents_threeBlockHistory
+#print axioms Descent.Portability.AttainableChronologyCurve.migrationTotal_threeBlockHistory
+#print axioms
+  Descent.Portability.AttainableChronologyCurve.recombinationTotal_threeBlockHistory
+#print axioms
+  Descent.Portability.AttainableChronologyCurve.couplingOfState_threeBlockHistory
+#print axioms Descent.Portability.AttainableChronologyCurve.attainable_coupling_range
+#print axioms Descent.Portability.AttainableChronologyCurve.reportMetrics_chronologyLaw
+#print axioms Descent.Portability.AttainableChronologyCurve.attainable_metric_curve
+#print axioms Descent.Portability.AttainableChronologyCurve.exp_neg_log_two
+#print axioms Descent.Portability.AttainableChronologyCurve.threeBlock_migration_first
+#print axioms Descent.Portability.AttainableChronologyCurve.threeBlock_recombination_first
