@@ -37,7 +37,8 @@ noncomputable def loss (f : ι → ℝ) (z : ι × ℝ) : ℝ := (z.2 - f z.1) ^
 theorem row_probability (μ : ι → Measure ℝ) [∀ i, IsProbabilityMeasure (μ i)] (i : ι) :
     IsProbabilityMeasure (rowLaw μ i) := by
   constructor
-  rw [rowLaw, Measure.map_apply (measurable_const.prodMk measurable_id) MeasurableSet.univ]
+  have hm : Measurable (fun y : ℝ ↦ (i, y)) := measurable_const.prodMk measurable_id
+  rw [rowLaw, Measure.map_apply hm MeasurableSet.univ]
   simp
 
 /-- Nonnegative normalized target weights define a genuine joint probability law. -/
@@ -74,8 +75,8 @@ theorem expected_loss (μ : ι → Measure ℝ) [∀ i, IsProbabilityMeasure (μ
   rw [frameLaw, mixture_integral w (rowLaw μ) (loss f) hw (row_loss_integrable μ f hY)]
   apply Finset.sum_congr rfl
   intro i _
-  rw [rowLaw, integral_map (measurable_const.prodMk measurable_id).aemeasurable
-    (loss_measurable f).aestronglyMeasurable]
+  have hm : Measurable (fun y : ℝ ↦ (i, y)) := measurable_const.prodMk measurable_id
+  rw [rowLaw, integral_map hm.aemeasurable (loss_measurable f).aestronglyMeasurable]
   rfl
 
 /-- The joint-law paired gain agrees with the two separate actual weighted-frame risks. -/

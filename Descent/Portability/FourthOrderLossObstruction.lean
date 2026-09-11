@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.CounterfactualRegion
 import Descent.Portability.IndividualLossMoments
 import Descent.Portability.TraitPortabilityRange
 
@@ -50,6 +51,10 @@ def effectSign : Bool → ℝ := TraitPortabilityRange.sign
 
 /-- The effect sign is the corpus' `TraitPortabilityRange.sign`. -/
 theorem effectSign_eq_sign : effectSign = TraitPortabilityRange.sign := rfl
+
+/-- The two sign codings of the obstruction and counterfactual constructions are one
+function. -/
+theorem effectSign_eq_signOf : effectSign = CounterfactualRegion.signOf := rfl
 
 /-- The effect sign takes the values `1` and `-1`. -/
 theorem effectSign_apply (b : Bool) : effectSign b = if b then 1 else -1 := rfl
