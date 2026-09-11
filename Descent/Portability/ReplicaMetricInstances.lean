@@ -107,13 +107,17 @@ variable {Context : Type*} [Fintype Context]
 
 section GuardedRatio
 
+/-- The guarded ratio partial metric: the ratio `num / den` exactly where the denominator is
+positive, and undefined elsewhere. -/
+abbrev guardedRatio (num den : Context → ℝ) (context : Context) : Option ℝ :=
+  if 0 < den context then some (num context / den context) else none
+
 omit [Fintype Context] in
 /-- A partial metric defined as a ratio exactly where its denominator is positive reads, when
 the undefined value is replaced by zero, as the corpus zero-extended ratio. -/
 theorem getD_guardedRatio (num den : Context → ℝ) (context : Context) :
-    (if 0 < den context then some (num context / den context) else none).getD 0 =
-      ratioOnDefined num den context := by
-  unfold ratioOnDefined
+    (guardedRatio num den context).getD 0 = ratioOnDefined num den context := by
+  unfold guardedRatio ratioOnDefined
   split_ifs <;> rfl
 
 /-- The corpus skip-undefined average of a guarded ratio partial metric is the conditional
@@ -151,7 +155,9 @@ theorem expectation_guardedRatio_eq_tsum (law : FiniteReportLaw Context) (num de
     law.expectation (fun context ↦
         (if 0 < den context then some (num context / den context) else none).getD 0) =
       ∑' power : ℕ, law.expectation (fun context ↦ num context * (1 - den context) ^ power) := by
-  simp only [getD_guardedRatio]
+  rw [show (fun context ↦
+      (if 0 < den context then some (num context / den context) else none).getD 0) =
+        ratioOnDefined num den from funext fun context ↦ getD_guardedRatio num den context]
   exact expectation_ratioOnDefined_eq_tsum law num den hnum hle hden
 
 /-- **NOTE 2 equation (18) for a guarded ratio partial metric.** With a tolerance dominating
