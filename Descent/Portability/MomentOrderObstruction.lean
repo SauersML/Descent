@@ -276,10 +276,13 @@ theorem partialR2_line (z u : N → ℝ) (hzu : dot z u = 0) (hnorm : dot u u = 
     simp only [dot, Descent.Core.innerSum, lineOutcome, Finset.mul_sum,
       ← Finset.sum_add_distrib]
     exact Finset.sum_congr rfl fun i _ ↦ by ring
+  have hdd : dot z z * dot z z ≠ 0 := mul_ne_zero hz hz
   unfold partialR2
-  rw [h1, h2, hzu, hnorm]
-  field_simp
-  ring
+  rw [h1, h2, hzu, hnorm,
+    show (x * dot z z + 0) ^ 2 = dot z z * dot z z * x ^ 2 by ring,
+    show dot z z * (x ^ 2 * dot z z + 2 * x * 0 + dot z z) =
+      dot z z * dot z z * (1 + x ^ 2) by ring]
+  exact mul_div_mul_left _ _ hdd
 
 /-- **DC Theorem 8.3, exact fourth-order instance, equation (8.3).** The two order-four
 parity laws on `0,…,5`, pushed through the outcome line, give expected partial squared
@@ -316,6 +319,33 @@ theorem partial_r2_no_finite_moment_order {k : ℕ} (r : Fin (k + 1) → ℝ)
 end GroupReport
 
 section IndividualReport
+
+/-- A six-subject column written coordinatewise. -/
+def vec6 (a b c d e f : ℝ) : Fin 6 → ℝ :=
+  fun i ↦ if (i : ℕ) = 0 then a else if (i : ℕ) = 1 then b else if (i : ℕ) = 2 then c
+    else if (i : ℕ) = 3 then d else if (i : ℕ) = 4 then e else f
+
+/-- Coordinatewise evaluation of a six-subject column. -/
+theorem vec6_apply (a b c d e f : ℝ) :
+    vec6 a b c d e f 0 = a ∧ vec6 a b c d e f 1 = b ∧ vec6 a b c d e f 2 = c ∧
+      vec6 a b c d e f 3 = d ∧ vec6 a b c d e f 4 = e ∧ vec6 a b c d e f 5 = f :=
+  ⟨rfl, rfl, rfl, rfl, rfl, rfl⟩
+
+/-- Coordinatewise squaring of a six-subject column. -/
+theorem vec6_sq (a b c d e f : ℝ) :
+    (fun i ↦ vec6 a b c d e f i ^ 2) =
+      vec6 (a ^ 2) (b ^ 2) (c ^ 2) (d ^ 2) (e ^ 2) (f ^ 2) := by
+  funext i
+  fin_cases i <;> rfl
+
+/-- The inner sum of two six-subject columns. -/
+theorem dot_vec6 (a b c d e f a' b' c' d' e' f' : ℝ) :
+    dot (vec6 a b c d e f) (vec6 a' b' c' d' e' f') =
+      a * a' + b * b' + c * c' + d * d' + e * e' + f * f' := by
+  obtain ⟨h0, h1, h2, h3, h4, h5⟩ := vec6_apply a b c d e f
+  obtain ⟨g0, g1, g2, g3, g4, g5⟩ := vec6_apply a' b' c' d' e' f'
+  simp only [dot, Descent.Core.innerSum, Fin.sum_univ_six, h0, h1, h2, h3, h4, h5,
+    g0, g1, g2, g3, g4, g5]
 
 /-- The two-bin loss-regression projection `P_H` of DC Theorem 8.4: subjects `0,1` form
 the first bin and `2,3,4,5` the second. -/
@@ -372,42 +402,53 @@ theorem centeredSum_closed (l : Fin 6 → ℝ) :
   simp only [centeredSum, dot, Descent.Core.innerSum, meanProjection, Fin.sum_univ_six]
   ring
 
+/-- The explained sum of a coordinatewise column. -/
+theorem explainedSum_vec6 (a b c d e f : ℝ) :
+    explainedSum (vec6 a b c d e f) =
+      2 * ((a + b) / 2) ^ 2 + 4 * ((c + d + e + f) / 4) ^ 2 -
+        6 * ((a + b + c + d + e + f) / 6) ^ 2 := by
+  obtain ⟨h0, h1, h2, h3, h4, h5⟩ := vec6_apply a b c d e f
+  rw [explainedSum_closed, h0, h1, h2, h3, h4, h5]
+
+/-- The total centered sum of a coordinatewise column. -/
+theorem centeredSum_vec6 (a b c d e f : ℝ) :
+    centeredSum (vec6 a b c d e f) =
+      (a ^ 2 + b ^ 2 + c ^ 2 + d ^ 2 + e ^ 2 + f ^ 2) -
+        6 * ((a + b + c + d + e + f) / 6) ^ 2 := by
+  obtain ⟨h0, h1, h2, h3, h4, h5⟩ := vec6_apply a b c d e f
+  rw [centeredSum_closed, h0, h1, h2, h3, h4, h5]
+
 /-- The outcome line of DC Theorem 8.4. -/
-def lineResidual (x : ℝ) : Fin 6 → ℝ := ![1, -1, x, -x, 0, 0]
+def lineResidual (x : ℝ) : Fin 6 → ℝ := vec6 1 (-1) x (-x) 0 0
 
 /-- The outcome line is orthogonal to the intercept, to both bin indicators, and to the
 score, so every residualization in DC equation (7.3) leaves it unchanged. -/
 theorem lineResidual_orthogonal (x : ℝ) :
-    dot (lineResidual x) (fun _ ↦ (1 : ℝ)) = 0 ∧
-      dot (lineResidual x) ![1, 1, 0, 0, 0, 0] = 0 ∧
-      dot (lineResidual x) ![0, 0, 1, 1, 1, 1] = 0 ∧
-      dot (lineResidual x) ![1, 1, -1, -1, 0, 0] = 0 := by
+    dot (lineResidual x) (vec6 1 1 1 1 1 1) = 0 ∧
+      dot (lineResidual x) (vec6 1 1 0 0 0 0) = 0 ∧
+      dot (lineResidual x) (vec6 0 0 1 1 1 1) = 0 ∧
+      dot (lineResidual x) (vec6 1 1 (-1) (-1) 0 0) = 0 := by
   refine ⟨?_, ?_, ?_, ?_⟩ <;>
-    · simp only [dot, Descent.Core.innerSum, lineResidual, Fin.sum_univ_six]
-      norm_num
+    · rw [lineResidual, dot_vec6]
+      ring
 
 /-- **DC equation (8.4).** On the outcome line the fitted individual report is exactly
 `(x² - 2)² / (4 (x⁴ - x² + 1))`. -/
 theorem lossReport_line (x : ℝ) :
     lossReport (lineResidual x) = (x ^ 2 - 2) ^ 2 / (4 * (x ^ 4 - x ^ 2 + 1)) := by
   have hden : (0 : ℝ) < x ^ 4 - x ^ 2 + 1 := by nlinarith [sq_nonneg (x ^ 2 - 1 / 2)]
-  have hl : (fun i ↦ lineResidual x i ^ 2) = ![1, 1, x ^ 2, x ^ 2, 0, 0] := by
-    funext i
-    fin_cases i <;> norm_num [lineResidual]
-  have hE : explainedSum ![1, 1, x ^ 2, x ^ 2, 0, 0] = (x ^ 2 - 2) ^ 2 / 3 := by
-    rw [explainedSum_closed]
-    first
-      | (norm_num; ring)
-      | norm_num
-  have hC : centeredSum ![1, 1, x ^ 2, x ^ 2, 0, 0] = 4 * (x ^ 4 - x ^ 2 + 1) / 3 := by
-    rw [centeredSum_closed]
-    first
-      | (norm_num; ring)
-      | norm_num
   have h1 : (4 : ℝ) * (x ^ 4 - x ^ 2 + 1) / 3 ≠ 0 := by intro hc; linarith
   have h2 : (4 : ℝ) * (x ^ 4 - x ^ 2 + 1) ≠ 0 := by intro hc; linarith
-  unfold lossReport fittedLossExplainability
-  rw [hl, hE, hC, div_eq_div_iff h1 h2]
+  have hE : explainedSum (vec6 ((1 : ℝ) ^ 2) ((-1 : ℝ) ^ 2) (x ^ 2) ((-x) ^ 2)
+      ((0 : ℝ) ^ 2) ((0 : ℝ) ^ 2)) = (x ^ 2 - 2) ^ 2 / 3 := by
+    rw [explainedSum_vec6]; ring
+  have hC : centeredSum (vec6 ((1 : ℝ) ^ 2) ((-1 : ℝ) ^ 2) (x ^ 2) ((-x) ^ 2)
+      ((0 : ℝ) ^ 2) ((0 : ℝ) ^ 2)) = 4 * (x ^ 4 - x ^ 2 + 1) / 3 := by
+    rw [centeredSum_vec6]; ring
+  unfold lossReport
+  rw [lineResidual, vec6_sq]
+  unfold fittedLossExplainability
+  rw [hE, hC, div_eq_div_iff h1 h2]
   ring
 
 /-- The explained centered sum is homogeneous of degree two in the loss vector. -/
@@ -434,6 +475,17 @@ theorem lossReport_smul (t : ℝ) (ht : t ≠ 0) (y : Fin 6 → ℝ) :
   rw [hsq, explainedSum_smul, centeredSum_smul]
   exact mul_div_mul_left _ _ ht2
 
+/-- **DC Theorem 8.4, exact fourth-order instance, equation (8.5).** The two order-four
+parity laws give expected fitted loss-explainability differing by exactly
+`-24900075/1099632872`. -/
+theorem loss_report_fourth_order_gap :
+    parityExp 4 false (fun j ↦ lossReport (lineResidual ((j : ℕ) : ℝ))) -
+        parityExp 4 true (fun j ↦ lossReport (lineResidual ((j : ℕ) : ℝ))) =
+      -(24900075 / 1099632872) := by
+  rw [parity_gap_nodes 4 (fun x ↦ lossReport (lineResidual x))]
+  simp only [lossReport_line]
+  norm_num [Finset.sum_range_succ, Nat.choose]
+
 /-- **DC Theorem 8.4, every finite order.** For every `k` and every choice of `k+1`
 distinct positive radii, the two radial laws on the templates `y(0)` and `y(1)` share
 every joint raw moment of total degree at most `k` yet report fitted individual
@@ -455,17 +507,6 @@ theorem loss_report_no_finite_moment_order {k : ℕ} (r : Fin (k + 1) → ℝ)
     (fun t ht y ↦ lossReport_smul t ht.ne' y)
   rw [hgap, lossReport_line 0, lossReport_line 1]
   norm_num
-
-/-- **DC Theorem 8.4, exact fourth-order instance, equation (8.5).** The two order-four
-parity laws give expected fitted loss-explainability differing by exactly
-`-24900075/1099632872`. -/
-theorem loss_report_fourth_order_gap :
-    parityExp 4 false (fun j ↦ lossReport (lineResidual ((j : ℕ) : ℝ))) -
-        parityExp 4 true (fun j ↦ lossReport (lineResidual ((j : ℕ) : ℝ))) =
-      -(24900075 / 1099632872) := by
-  rw [parity_gap_nodes 4 (fun x ↦ lossReport (lineResidual x))]
-  simp only [lossReport_line]
-  norm_num [Finset.sum_range_succ, Nat.choose]
 
 end IndividualReport
 

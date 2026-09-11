@@ -33,3 +33,8 @@ import Descent.Portability.MomentOrderObstruction
 #print axioms Descent.Portability.MomentOrderObstruction.lossReport_smul
 #print axioms Descent.Portability.MomentOrderObstruction.loss_report_fourth_order_gap
 #print axioms Descent.Portability.MomentOrderObstruction.loss_report_no_finite_moment_order
+#print axioms Descent.Portability.MomentOrderObstruction.vec6_apply
+#print axioms Descent.Portability.MomentOrderObstruction.vec6_sq
+#print axioms Descent.Portability.MomentOrderObstruction.dot_vec6
+#print axioms Descent.Portability.MomentOrderObstruction.explainedSum_vec6
+#print axioms Descent.Portability.MomentOrderObstruction.centeredSum_vec6
