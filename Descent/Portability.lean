@@ -272,6 +272,10 @@ import Descent.Portability.HWEHomozygoteConditioning
 import Descent.Portability.RademacherJointLimit
 import Descent.Portability.HWEHomozygoteAmplitude
 import Descent.Portability.HWEHomozygoteLimit
+import Descent.Portability.HWEAbsoluteLocusLaw
+import Descent.Portability.HWEAbsoluteLocusBounds
+import Descent.Portability.HWEExceptionalAmplitude
+import Descent.Portability.HWEExceptionalLimit
 assert_below Descent.Program
 
 /-!

@@ -4144,6 +4144,15 @@ def classWeight(color, w, c):
 def Descent_Portability_GuardedMetricOptimization_recover(problem):
     return ((_rt.rdiv(1.0, _rt._proj(problem, 'scale'))) * _rt._proj(problem, 'weights'))
 
+def locusAmplitude(h, g):
+    return _rt.rdiv(standardizedGenotype(h, g), _rt.rsqrt(2.0))
+
+def homoMass(h):
+    return (2.0 * _rt.rsqrt(((_rt._proj(h, 'altFreq') * ((1.0 - _rt._proj(h, 'altFreq')))))))
+
+def heteroMass(h):
+    return _rt.rdiv(((4.0 * _rt.lpow(((_rt._proj(h, 'altFreq') - _rt.rdiv(1.0, 2.0))), 2.0)) * _rt.rabs((_rt._proj(h, 'altFreq') - _rt.rdiv(1.0, 2.0)))), _rt.rsqrt(((_rt._proj(h, 'altFreq') * ((1.0 - _rt._proj(h, 'altFreq')))))))
+
 def heterozygote(*_a):
     if len(_a) < 1:
         return lambda *_b: heterozygote(*(_a + _b))
