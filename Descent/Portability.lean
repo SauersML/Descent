@@ -329,6 +329,10 @@ import Descent.Portability.HWEJumpMoments
 import Descent.Portability.ConvolutionPolynomialMoments
 import Descent.Portability.MarkSumMoments
 import Descent.Portability.PoissonMomentSeries
+import Descent.Portability.CompoundPoissonIntegrability
+import Descent.Portability.BoundedConvolutionMoments
+import Descent.Portability.CompoundPoissonMoments
+import Descent.Portability.GaussianCompoundMoments
 assert_below Descent.Program
 
 /-!

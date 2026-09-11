@@ -26699,6 +26699,10 @@
    "Descent.Coalescent.mem_support_jumpLaw_of_absorbed",
    "Descent.Portability.AncestralEventLaw.jump_expectation",
    "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw",
+   "Descent.Portability.HWECriticalMoments.critical_fourth_cumulant",
+   "Descent.Portability.HWECriticalMoments.critical_mean",
+   "Descent.Portability.HWECriticalMoments.critical_power_integrable",
+   "Descent.Portability.HWECriticalMoments.critical_second",
    "Descent.Portability.HWEJumpMoments.jump_fourth",
    "Descent.Portability.HWEJumpMoments.jump_mean",
    "Descent.Portability.HWEJumpMoments.jump_power_integrable",
@@ -26718,7 +26722,8 @@
     "blocks ξ < 2",
     "2 ≤ blocks ξ",
     "Covers ξ η",
-    "l ∈ (chainLaw n (m + 1"
+    "l ∈ (chainLaw n (m + 1",
+    "n ≤ 4"
    ],
    "hypotheses_by_theorem": {
     "Descent.Coalescent.jumpKernel_apply": [],
@@ -26740,6 +26745,12 @@
     ],
     "Descent.Portability.AncestralEventLaw.jump_expectation": [],
     "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": [],
+    "Descent.Portability.HWECriticalMoments.critical_power_integrable": [
+     "n ≤ 4"
+    ],
+    "Descent.Portability.HWECriticalMoments.critical_mean": [],
+    "Descent.Portability.HWECriticalMoments.critical_second": [],
+    "Descent.Portability.HWECriticalMoments.critical_fourth_cumulant": [],
     "Descent.Portability.HWEJumpMoments.jump_power_integrable": [],
     "Descent.Portability.HWEJumpMoments.jump_mean": [],
     "Descent.Portability.HWEJumpMoments.jump_second": [],
@@ -64678,6 +64689,7 @@
    "Descent.PopGen.targetIdentifiableUnderLinearObservation_id_iff",
    "Descent.Portability.ArchaicPrediction.shiftPolynomial_zero",
    "Descent.Portability.CompactMeasurementMinimax.prefix_parseval",
+   "Descent.Portability.HWECriticalMoments.critical_not_isGaussian",
    "Descent.Portability.InfiniteIdentityMinimax.adaptive_lower",
    "Descent.Portability.InfiniteIdentityMinimax.identity_minimax",
    "Descent.Portability.SimulationDesignDecoder.decoded_report",
@@ -64704,6 +64716,7 @@
     "Descent.Portability.ArchaicPrediction.shiftPolynomial_zero": [],
     "Descent.Portability.CompactMeasurementMinimax.prefix_parseval": [],
     "Descent.Portability.isCellBalanced_identity": [],
+    "Descent.Portability.HWECriticalMoments.critical_not_isGaussian": [],
     "Descent.Portability.InfiniteIdentityMinimax.adaptive_lower": [],
     "Descent.Portability.InfiniteIdentityMinimax.identity_minimax": [],
     "Descent.Portability.SimulationDesignDecoder.decoded_report": [],
@@ -72776,6 +72789,8 @@
    "Descent.Portability.FixedBinHoeffdingLaw.centered_sum_tail",
    "Descent.Portability.FourCycleIntegratedCorrelation.directed_integrated_correlation",
    "Descent.Portability.FourCycleIntegratedCorrelation.reversible_integrated_correlation",
+   "Descent.Portability.GaussianCompoundMoments.gaussian_compound_power_integrable",
+   "Descent.Portability.GaussianCompoundMoments.gaussian_compound_power_integral",
    "Descent.Portability.GaussianInvariantMoments.covariance_orbit_of_invariant_moments",
    "Descent.Portability.GaussianInvariantMoments.invariantPower_degree",
    "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff",
@@ -73086,6 +73101,8 @@
     "Descent.Portability.FixedBinHoeffdingLaw.centered_sum_tail": [],
     "Descent.Portability.FourCycleIntegratedCorrelation.directed_integrated_correlation": [],
     "Descent.Portability.FourCycleIntegratedCorrelation.reversible_integrated_correlation": [],
+    "Descent.Portability.GaussianCompoundMoments.gaussian_compound_power_integrable": [],
+    "Descent.Portability.GaussianCompoundMoments.gaussian_compound_power_integral": [],
     "Descent.Portability.GaussianInvariantMoments.invariantPower_degree": [],
     "Descent.Portability.GaussianInvariantMoments.covariance_orbit_of_invariant_moments": [],
     "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff": [],
@@ -87984,6 +88001,7 @@
    "Descent.Portability.GaussianPolynomialMoments.second_moment",
    "Descent.Portability.GaussianPolynomialMoments.third_moment",
    "Descent.Portability.GaussianPolynomialMoments.tilted_power_moment",
+   "Descent.Portability.HWECriticalMoments.critical_variance",
    "Descent.Portability.IndividualLossMoments.expected_square_shift",
    "Descent.Portability.IndividualLossMoments.fitted_squared_loss_r2_gap",
    "Descent.Portability.IndividualLossMoments.fitted_squared_loss_r2_le_oracle",
@@ -88128,6 +88146,7 @@
     "Descent.Portability.GaussianPolynomialMoments.second_moment": [],
     "Descent.Portability.GaussianPolynomialMoments.third_moment": [],
     "Descent.Portability.GaussianPolynomialMoments.fourth_moment": [],
+    "Descent.Portability.HWECriticalMoments.critical_variance": [],
     "Descent.Portability.IndividualLossMoments.total_variance": [],
     "Descent.Portability.IndividualLossMoments.squared_loss_between_decomposition": [],
     "Descent.Portability.IndividualLossMoments.squared_loss_total": [],
@@ -99389,6 +99408,7 @@
    "Descent.PopGen.targetIdentifiableUnderLinearObservation_id_iff",
    "Descent.Portability.ArchaicPrediction.shiftPolynomial_zero",
    "Descent.Portability.CompactMeasurementMinimax.prefix_parseval",
+   "Descent.Portability.HWECriticalMoments.critical_not_isGaussian",
    "Descent.Portability.InfiniteIdentityMinimax.adaptive_lower",
    "Descent.Portability.InfiniteIdentityMinimax.identity_minimax",
    "Descent.Portability.SimulationDesignDecoder.decoded_report",
@@ -99415,6 +99435,7 @@
     "Descent.Portability.ArchaicPrediction.shiftPolynomial_zero": [],
     "Descent.Portability.CompactMeasurementMinimax.prefix_parseval": [],
     "Descent.Portability.isCellBalanced_identity": [],
+    "Descent.Portability.HWECriticalMoments.critical_not_isGaussian": [],
     "Descent.Portability.InfiniteIdentityMinimax.adaptive_lower": [],
     "Descent.Portability.InfiniteIdentityMinimax.identity_minimax": [],
     "Descent.Portability.SimulationDesignDecoder.decoded_report": [],
@@ -127324,6 +127345,10 @@
    "Descent.Coalescent.mem_support_jumpLaw_of_absorbed",
    "Descent.Portability.AncestralEventLaw.jump_expectation",
    "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw",
+   "Descent.Portability.HWECriticalMoments.critical_fourth_cumulant",
+   "Descent.Portability.HWECriticalMoments.critical_mean",
+   "Descent.Portability.HWECriticalMoments.critical_power_integrable",
+   "Descent.Portability.HWECriticalMoments.critical_second",
    "Descent.Portability.HWEJumpMoments.jump_fourth",
    "Descent.Portability.HWEJumpMoments.jump_mean",
    "Descent.Portability.HWEJumpMoments.jump_power_integrable",
@@ -127353,6 +127378,10 @@
      "0 < totalRate rates s"
     ],
     "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": [],
+    "Descent.Portability.HWECriticalMoments.critical_power_integrable": [],
+    "Descent.Portability.HWECriticalMoments.critical_mean": [],
+    "Descent.Portability.HWECriticalMoments.critical_second": [],
+    "Descent.Portability.HWECriticalMoments.critical_fourth_cumulant": [],
     "Descent.Portability.HWEJumpMoments.jump_power_integrable": [],
     "Descent.Portability.HWEJumpMoments.jump_mean": [],
     "Descent.Portability.HWEJumpMoments.jump_second": [],
@@ -134020,11 +134049,20 @@
    "Descent.Portability.CompoundPoissonMoments.compound_fourth",
    "Descent.Portability.CompoundPoissonMoments.compound_fourth_cumulant",
    "Descent.Portability.CompoundPoissonMoments.compound_mean",
-   "Descent.Portability.CompoundPoissonMoments.compound_second"
+   "Descent.Portability.CompoundPoissonMoments.compound_second",
+   "Descent.Portability.GaussianCompoundMoments.gaussian_compound_fourth",
+   "Descent.Portability.GaussianCompoundMoments.gaussian_compound_fourth_cumulant",
+   "Descent.Portability.GaussianCompoundMoments.gaussian_compound_mean",
+   "Descent.Portability.GaussianCompoundMoments.gaussian_compound_power_integrable",
+   "Descent.Portability.GaussianCompoundMoments.gaussian_compound_power_integral",
+   "Descent.Portability.GaussianCompoundMoments.gaussian_compound_second",
+   "Descent.Portability.HWECriticalMoments.critical_fourth_cumulant",
+   "Descent.Portability.HWECriticalMoments.critical_second"
   ],
   "constraints": {
    "hypotheses": [
-    "Tendsto a atTop (nhds b"
+    "Tendsto a atTop (nhds b",
+    "0 < r"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.BalancedHWECompoundPoisson.integral_compoundMeasure": [],
@@ -134037,7 +134075,17 @@
     "Descent.Portability.CompoundPoissonMoments.compound_mean": [],
     "Descent.Portability.CompoundPoissonMoments.compound_second": [],
     "Descent.Portability.CompoundPoissonMoments.compound_fourth": [],
-    "Descent.Portability.CompoundPoissonMoments.compound_fourth_cumulant": []
+    "Descent.Portability.CompoundPoissonMoments.compound_fourth_cumulant": [],
+    "Descent.Portability.GaussianCompoundMoments.gaussian_compound_power_integrable": [],
+    "Descent.Portability.GaussianCompoundMoments.gaussian_compound_power_integral": [],
+    "Descent.Portability.GaussianCompoundMoments.gaussian_compound_mean": [],
+    "Descent.Portability.GaussianCompoundMoments.gaussian_compound_second": [],
+    "Descent.Portability.GaussianCompoundMoments.gaussian_compound_fourth": [],
+    "Descent.Portability.GaussianCompoundMoments.gaussian_compound_fourth_cumulant": [],
+    "Descent.Portability.HWECriticalMoments.critical_second": [],
+    "Descent.Portability.HWECriticalMoments.critical_fourth_cumulant": [
+     "0 < r"
+    ]
    }
   }
  },
@@ -134062,7 +134110,9 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Portability.BalancedHWECompoundPoisson.finite_intensity_weak_convergence",
-   "Descent.Portability.BalancedHWECompoundPoisson.normalized_compoundPoisson_limit"
+   "Descent.Portability.BalancedHWECompoundPoisson.normalized_compoundPoisson_limit",
+   "Descent.Portability.GaussianCompoundMoments.gaussian_compound_power_integrable",
+   "Descent.Portability.GaussianCompoundMoments.gaussian_compound_power_integral"
   ],
   "constraints": {
    "declared_kind": "probability",
@@ -134078,7 +134128,9 @@
     ],
     "Descent.Portability.BalancedHWECompoundPoisson.normalized_compoundPoisson_limit": [
      "0 < r"
-    ]
+    ],
+    "Descent.Portability.GaussianCompoundMoments.gaussian_compound_power_integrable": [],
+    "Descent.Portability.GaussianCompoundMoments.gaussian_compound_power_integral": []
    }
   }
  },
@@ -140641,14 +140693,23 @@
    "Descent.Portability.CompoundPoissonMoments.compound_fourth",
    "Descent.Portability.CompoundPoissonMoments.compound_fourth_cumulant",
    "Descent.Portability.CompoundPoissonMoments.compound_mean",
-   "Descent.Portability.CompoundPoissonMoments.compound_second"
+   "Descent.Portability.CompoundPoissonMoments.compound_second",
+   "Descent.Portability.GaussianCompoundMoments.gaussian_compound_fourth",
+   "Descent.Portability.GaussianCompoundMoments.gaussian_compound_fourth_cumulant",
+   "Descent.Portability.GaussianCompoundMoments.gaussian_compound_mean",
+   "Descent.Portability.GaussianCompoundMoments.gaussian_compound_power_integrable",
+   "Descent.Portability.GaussianCompoundMoments.gaussian_compound_power_integral",
+   "Descent.Portability.GaussianCompoundMoments.gaussian_compound_second",
+   "Descent.Portability.HWECriticalMoments.critical_fourth_cumulant",
+   "Descent.Portability.HWECriticalMoments.critical_second"
   ],
   "constraints": {
    "declared_kind": "probability",
    "declared_lo": 0.0,
    "declared_hi": 1.0,
    "hypotheses": [
-    "(∫ x : ℝ, x ∂(μ : Measure ℝ"
+    "(∫ x : ℝ, x ∂(μ : Measure ℝ",
+    "0 < r"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.BalancedHWECompoundPoisson.integral_compoundMeasure": [],
@@ -140671,6 +140732,28 @@
     ],
     "Descent.Portability.CompoundPoissonMoments.compound_fourth_cumulant": [
      "(∫ x : ℝ, x ∂(μ : Measure ℝ"
+    ],
+    "Descent.Portability.GaussianCompoundMoments.gaussian_compound_power_integrable": [
+     "(∫ x : ℝ, x ∂(μ : Measure ℝ"
+    ],
+    "Descent.Portability.GaussianCompoundMoments.gaussian_compound_power_integral": [
+     "(∫ x : ℝ, x ∂(μ : Measure ℝ"
+    ],
+    "Descent.Portability.GaussianCompoundMoments.gaussian_compound_mean": [
+     "(∫ x : ℝ, x ∂(μ : Measure ℝ"
+    ],
+    "Descent.Portability.GaussianCompoundMoments.gaussian_compound_second": [
+     "(∫ x : ℝ, x ∂(μ : Measure ℝ"
+    ],
+    "Descent.Portability.GaussianCompoundMoments.gaussian_compound_fourth": [
+     "(∫ x : ℝ, x ∂(μ : Measure ℝ"
+    ],
+    "Descent.Portability.GaussianCompoundMoments.gaussian_compound_fourth_cumulant": [
+     "(∫ x : ℝ, x ∂(μ : Measure ℝ"
+    ],
+    "Descent.Portability.HWECriticalMoments.critical_second": [],
+    "Descent.Portability.HWECriticalMoments.critical_fourth_cumulant": [
+     "0 < r"
     ]
    }
   }
@@ -140691,16 +140774,25 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Portability.BalancedHWECompoundPoisson.finite_intensity_weak_convergence",
-   "Descent.Portability.BalancedHWECompoundPoisson.normalized_compoundPoisson_limit"
+   "Descent.Portability.BalancedHWECompoundPoisson.normalized_compoundPoisson_limit",
+   "Descent.Portability.GaussianCompoundMoments.gaussian_compound_power_integrable",
+   "Descent.Portability.GaussianCompoundMoments.gaussian_compound_power_integral"
   ],
   "constraints": {
    "hypotheses": [
-    "0 < r"
+    "0 < r",
+    "(∫ x : ℝ, x ∂(μ : Measure ℝ"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.BalancedHWECompoundPoisson.finite_intensity_weak_convergence": [],
     "Descent.Portability.BalancedHWECompoundPoisson.normalized_compoundPoisson_limit": [
      "0 < r"
+    ],
+    "Descent.Portability.GaussianCompoundMoments.gaussian_compound_power_integrable": [
+     "(∫ x : ℝ, x ∂(μ : Measure ℝ"
+    ],
+    "Descent.Portability.GaussianCompoundMoments.gaussian_compound_power_integral": [
+     "(∫ x : ℝ, x ∂(μ : Measure ℝ"
     ]
    }
   }
@@ -160885,6 +160977,7 @@
    "Descent.Portability.GaussianPolynomialMoments.second_moment",
    "Descent.Portability.GaussianPolynomialMoments.third_moment",
    "Descent.Portability.GaussianPolynomialMoments.tilted_power_moment",
+   "Descent.Portability.HWECriticalMoments.critical_variance",
    "Descent.Portability.IndividualLossMoments.expected_square_shift",
    "Descent.Portability.IndividualLossMoments.fitted_squared_loss_r2_gap",
    "Descent.Portability.IndividualLossMoments.fitted_squared_loss_r2_le_oracle",
@@ -161027,6 +161120,7 @@
     "Descent.Portability.GaussianPolynomialMoments.second_moment": [],
     "Descent.Portability.GaussianPolynomialMoments.third_moment": [],
     "Descent.Portability.GaussianPolynomialMoments.fourth_moment": [],
+    "Descent.Portability.HWECriticalMoments.critical_variance": [],
     "Descent.Portability.IndividualLossMoments.total_variance": [],
     "Descent.Portability.IndividualLossMoments.squared_loss_between_decomposition": [],
     "Descent.Portability.IndividualLossMoments.squared_loss_total": [],
@@ -171867,7 +171961,11 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
-   "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw"
+   "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw",
+   "Descent.Portability.HWECriticalMoments.critical_fourth_cumulant",
+   "Descent.Portability.HWECriticalMoments.critical_mean",
+   "Descent.Portability.HWECriticalMoments.critical_power_integrable",
+   "Descent.Portability.HWECriticalMoments.critical_second"
   ],
   "constraints": {
    "declared_kind": "nonnegative",
@@ -171875,7 +171973,11 @@
    "declared_hi": null,
    "hypotheses": [],
    "hypotheses_by_theorem": {
-    "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": []
+    "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": [],
+    "Descent.Portability.HWECriticalMoments.critical_power_integrable": [],
+    "Descent.Portability.HWECriticalMoments.critical_mean": [],
+    "Descent.Portability.HWECriticalMoments.critical_second": [],
+    "Descent.Portability.HWECriticalMoments.critical_fourth_cumulant": []
    }
   }
  },
@@ -171900,6 +172002,10 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw",
+   "Descent.Portability.HWECriticalMoments.critical_fourth_cumulant",
+   "Descent.Portability.HWECriticalMoments.critical_mean",
+   "Descent.Portability.HWECriticalMoments.critical_power_integrable",
+   "Descent.Portability.HWECriticalMoments.critical_second",
    "Descent.Portability.HWEJumpMoments.weighted_jump_fourth",
    "Descent.Portability.HWEJumpMoments.weighted_jump_second",
    "Descent.Portability.HWENearBalancedTheorem.critical_jump_intensity"
@@ -171912,6 +172018,12 @@
     "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": [
      "c ≠ 0"
     ],
+    "Descent.Portability.HWECriticalMoments.critical_power_integrable": [],
+    "Descent.Portability.HWECriticalMoments.critical_mean": [],
+    "Descent.Portability.HWECriticalMoments.critical_second": [
+     "c ≠ 0"
+    ],
+    "Descent.Portability.HWECriticalMoments.critical_fourth_cumulant": [],
     "Descent.Portability.HWEJumpMoments.weighted_jump_second": [
      "c ≠ 0"
     ],
@@ -171948,6 +172060,10 @@
    "Descent.Coalescent.mem_support_jumpLaw_of_absorbed",
    "Descent.Portability.AncestralEventLaw.jump_expectation",
    "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw",
+   "Descent.Portability.HWECriticalMoments.critical_fourth_cumulant",
+   "Descent.Portability.HWECriticalMoments.critical_mean",
+   "Descent.Portability.HWECriticalMoments.critical_power_integrable",
+   "Descent.Portability.HWECriticalMoments.critical_second",
    "Descent.Portability.HWEJumpMoments.jump_fourth",
    "Descent.Portability.HWEJumpMoments.jump_mean",
    "Descent.Portability.HWEJumpMoments.jump_power_integrable",
@@ -171980,6 +172096,12 @@
     "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": [
      "c ≠ 0"
     ],
+    "Descent.Portability.HWECriticalMoments.critical_power_integrable": [],
+    "Descent.Portability.HWECriticalMoments.critical_mean": [],
+    "Descent.Portability.HWECriticalMoments.critical_second": [
+     "c ≠ 0"
+    ],
+    "Descent.Portability.HWECriticalMoments.critical_fourth_cumulant": [],
     "Descent.Portability.HWEJumpMoments.jump_power_integrable": [],
     "Descent.Portability.HWEJumpMoments.jump_mean": [],
     "Descent.Portability.HWEJumpMoments.jump_second": [],
@@ -172019,6 +172141,15 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw",
+   "Descent.Portability.HWECriticalMoments.critical_fourth",
+   "Descent.Portability.HWECriticalMoments.critical_fourth_cumulant",
+   "Descent.Portability.HWECriticalMoments.critical_mean",
+   "Descent.Portability.HWECriticalMoments.critical_ne_gaussian",
+   "Descent.Portability.HWECriticalMoments.critical_ne_standardGaussian",
+   "Descent.Portability.HWECriticalMoments.critical_not_isGaussian",
+   "Descent.Portability.HWECriticalMoments.critical_power_integrable",
+   "Descent.Portability.HWECriticalMoments.critical_second",
+   "Descent.Portability.HWECriticalMoments.critical_variance",
    "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit"
   ],
   "constraints": {
@@ -172029,6 +172160,19 @@
     "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": [
      "c ≠ 0"
     ],
+    "Descent.Portability.HWECriticalMoments.critical_power_integrable": [],
+    "Descent.Portability.HWECriticalMoments.critical_mean": [],
+    "Descent.Portability.HWECriticalMoments.critical_second": [
+     "c ≠ 0"
+    ],
+    "Descent.Portability.HWECriticalMoments.critical_variance": [
+     "c ≠ 0"
+    ],
+    "Descent.Portability.HWECriticalMoments.critical_fourth_cumulant": [],
+    "Descent.Portability.HWECriticalMoments.critical_fourth": [],
+    "Descent.Portability.HWECriticalMoments.critical_ne_standardGaussian": [],
+    "Descent.Portability.HWECriticalMoments.critical_ne_gaussian": [],
+    "Descent.Portability.HWECriticalMoments.critical_not_isGaussian": [],
     "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit": []
    }
   }
@@ -186348,6 +186492,10 @@
    "Descent.Coalescent.mem_support_jumpLaw_of_absorbed",
    "Descent.Portability.AncestralEventLaw.jump_expectation",
    "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw",
+   "Descent.Portability.HWECriticalMoments.critical_fourth_cumulant",
+   "Descent.Portability.HWECriticalMoments.critical_mean",
+   "Descent.Portability.HWECriticalMoments.critical_power_integrable",
+   "Descent.Portability.HWECriticalMoments.critical_second",
    "Descent.Portability.HWEJumpMoments.jump_fourth",
    "Descent.Portability.HWEJumpMoments.jump_mean",
    "Descent.Portability.HWEJumpMoments.jump_power_integrable",
@@ -186373,6 +186521,10 @@
     "Descent.Coalescent.mem_support_chainLaw_succ": [],
     "Descent.Portability.AncestralEventLaw.jump_expectation": [],
     "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": [],
+    "Descent.Portability.HWECriticalMoments.critical_power_integrable": [],
+    "Descent.Portability.HWECriticalMoments.critical_mean": [],
+    "Descent.Portability.HWECriticalMoments.critical_second": [],
+    "Descent.Portability.HWECriticalMoments.critical_fourth_cumulant": [],
     "Descent.Portability.HWEJumpMoments.jump_power_integrable": [],
     "Descent.Portability.HWEJumpMoments.jump_mean": [],
     "Descent.Portability.HWEJumpMoments.jump_second": [],
@@ -187001,6 +187153,7 @@
    "Descent.Portability.GaussianPolynomialMoments.second_moment",
    "Descent.Portability.GaussianPolynomialMoments.third_moment",
    "Descent.Portability.GaussianPolynomialMoments.tilted_power_moment",
+   "Descent.Portability.HWECriticalMoments.critical_variance",
    "Descent.Portability.IndividualLossMoments.expected_square_shift",
    "Descent.Portability.IndividualLossMoments.fitted_squared_loss_r2_gap",
    "Descent.Portability.IndividualLossMoments.fitted_squared_loss_r2_le_oracle",
@@ -187143,6 +187296,7 @@
     "Descent.Portability.GaussianPolynomialMoments.second_moment": [],
     "Descent.Portability.GaussianPolynomialMoments.third_moment": [],
     "Descent.Portability.GaussianPolynomialMoments.fourth_moment": [],
+    "Descent.Portability.HWECriticalMoments.critical_variance": [],
     "Descent.Portability.IndividualLossMoments.total_variance": [],
     "Descent.Portability.IndividualLossMoments.squared_loss_between_decomposition": [],
     "Descent.Portability.IndividualLossMoments.squared_loss_total": [],
