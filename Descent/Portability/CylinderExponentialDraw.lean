@@ -91,9 +91,8 @@ theorem integral_truncatedDraw_curve (curve : ℝ → ℝ) (stage : ℕ) :
   rw [curve_truncatedDraw_eq, integral_prefix stage fun word ↦ curve (wordDraw stage word : ℝ),
     sum_wordsOfLength_wordDraw stage fun draw ↦ (1 / 2 : ℝ) ^ stage * curve (draw : ℝ)]
   refine Finset.sum_congr rfl fun index _ ↦ ?_
-  first
-  | (push_cast; rfl)
-  | push_cast
+  push_cast
+  rfl
 
 /-- NOTE2 §7.2: the expectation of a continuous decreasing curve at the uniform draw of the
 fair-bit stream is its integral over the unit interval. -/
