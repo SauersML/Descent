@@ -154,8 +154,7 @@ theorem pair_cross (G : ExpFunctional Γ) (T U : Γ → ℝ)
 /-! ### The cellwise moments of the prescribed phenotype -/
 
 /-- **Conditioning on the genotype removes exactly the environmental term.** -/
-theorem curve_regression_function (G : ExpFunctional Γ) (T U : Γ → ℝ) (v H q : D → ℝ)
-    (d : D) :
+theorem curve_regression_function (T U : Γ → ℝ) (v H q : D → ℝ) (d : D) :
     regressionFunction (fun _ : Γ ↦ uniformExp Bool) (curvePhenotype T U v H q d)
       = fun g : Γ ↦ curveA v q d * T g + curveB v H q d * U g := by
   funext g
