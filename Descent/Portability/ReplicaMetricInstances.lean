@@ -1085,7 +1085,7 @@ theorem calledMass_eq_expectation (law : FiniteReportLaw (Score × Bool))
         if called report.1 = true ∧ report.2 = outcome then 1 else 0) := by
   simp only [calledMass, FiniteReportLaw.expectation, Fintype.sum_prod_type, Fintype.sum_bool]
   refine Finset.sum_congr rfl fun group _ ↦ ?_
-  cases hcall : called group <;> cases outcome <;> simp [hcall]
+  cases hcall : called group <;> cases outcome <;> simp
 
 /-- **NOTE 2 section 5.4, confusion-matrix rates.** The corpus confusion matrix of a score rule
 on a population law: true positives are called cases, false positives called controls, true
@@ -1282,7 +1282,8 @@ theorem averagePrecision_summand_bounds (law : FiniteReportLaw (Score × Bool))
       (f := fun other ↦ if atLeastRule value group other then law.mass (other, true) else 0)
       (fun other _ ↦ ?_) (Finset.mem_univ group))
     · simp [atLeastRule]
-    · split_ifs
+    · dsimp only
+      split_ifs
       · exact law.mass_nonneg _
       · exact le_refl 0
   have htpOne : calledMass law (atLeastRule value group) true ≤ 1 := by
