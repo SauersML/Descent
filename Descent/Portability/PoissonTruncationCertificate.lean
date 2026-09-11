@@ -184,6 +184,7 @@ theorem poissonTruncation_le_exponential (Q : Matrix ι ι ℝ) (hQ : KillingGen
   simp only [Matrix.smul_apply, smul_eq_mul]
   exact mul_le_mul_of_nonneg_left hpartial (Real.exp_pos _).le
 
+omit [DecidableEq ι] in
 /-- The row mass of a product is the first operator's row weighted by the second operator's
 row masses. -/
 theorem rowMass_mul (P R : Matrix ι ι ℝ) (row : ι) :
@@ -191,6 +192,7 @@ theorem rowMass_mul (P R : Matrix ι ι ℝ) (row : ι) :
   simp only [Matrix.mul_apply, Finset.mul_sum]
   rw [Finset.sum_comm]
 
+omit [DecidableEq ι] in
 /-- Two operators whose rows each carry a constant mass compose to an operator whose rows carry
 the product of the two masses. -/
 theorem rowMass_mul_of_constant {P R : Matrix ι ι ℝ} {first second : ℝ}
@@ -349,6 +351,7 @@ structure RetainedMassCertificate (retained exact : Matrix ι ι ℝ) (mass : �
   /-- The mass the retained operator misses is at most the complementary mass. -/
   deficit_le : ∀ row, ∑ column, exact row column - ∑ column, retained row column ≤ 1 - mass
 
+omit [DecidableEq ι] in
 /-- An exactly computed substochastic step certifies itself with full mass; this is how an
 instantaneous event between epochs enters a certified history. -/
 theorem retainedMassCertificate_of_substochastic {step : Matrix ι ι ℝ}
@@ -367,6 +370,7 @@ theorem retainedMassCertificate_one :
     RetainedMassCertificate (1 : Matrix ι ι ℝ) 1 1 :=
   retainedMassCertificate_of_substochastic substochastic_one
 
+omit [DecidableEq ι] in
 /-- **Certificates compose.**  Running two certified steps in sequence certifies the composed
 step with the product of the two masses: the missed mass of the composition is at most the
 first step's missed mass plus the retained part of the first step times the second step's
