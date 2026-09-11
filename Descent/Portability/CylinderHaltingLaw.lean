@@ -507,9 +507,10 @@ theorem waitingWords_prefixFree :
 
 /-- Every stream containing a `true` bit lies in the cylinder of a waiting word: its prefix
 up to and including its first `true` bit. -/
-theorem exists_waitingWord_cylinder {stream : ℕ → Bool}
-    (htrue : ∃ index, stream index = true) :
+theorem exists_waitingWord_cylinder {stream : ℕ → Bool} (position : ℕ)
+    (hposition : stream position = true) :
     ∃ word ∈ waitingWords, stream ∈ cylinder word := by
+  have htrue : ∃ index, stream index = true := ⟨position, hposition⟩
   refine ⟨List.replicate (Nat.find htrue) false ++ [true], ⟨Nat.find htrue, rfl⟩, ?_⟩
   simp only [CylinderIntervalCertificate.cylinder, Set.mem_pi, Finset.coe_range, Set.mem_Iio,
     Set.mem_singleton_iff, List.length_append, List.length_replicate, List.length_singleton]
@@ -532,7 +533,8 @@ theorem waitingWords_halts_ae : bitMeasure (⋃ word ∈ waitingWords, cylinder 
   simp only [Set.mem_compl_iff, Set.mem_iUnion, not_exists] at hstream
   simp only [Set.mem_setOf_eq]
   intro htrue
-  obtain ⟨word, hword, hmem⟩ := exists_waitingWord_cylinder htrue
+  obtain ⟨position, hposition⟩ := htrue
+  obtain ⟨word, hword, hmem⟩ := exists_waitingWord_cylinder position hposition
   exact hstream word hword hmem
 
 /-- NOTE2 (32), inhabited with no hypothesis: the program that reads fair bits until the first
