@@ -30,3 +30,6 @@ import Descent.Portability.FourthMomentDuality
 #print axioms Descent.Portability.FourthMomentDuality.twoPointWeights_sum
 #print axioms Descent.Portability.FourthMomentDuality.twoPointExp_moments
 #print axioms Descent.Portability.FourthMomentDuality.twoPointKernel_moments
+#print axioms Descent.Portability.FourthMomentDuality.exists_quartic_argmax
+#print axioms Descent.Portability.FourthMomentDuality.exists_quarticMax_argmax
+#print axioms Descent.Portability.FourthMomentDuality.quarticMax_stationary

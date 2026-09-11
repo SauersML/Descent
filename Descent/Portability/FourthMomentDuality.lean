@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.IndividualLossMoments
+import Mathlib.Analysis.Calculus.LocalExtr.Basic
 
 assert_below Descent.Decision Descent.Program
 
@@ -20,7 +21,8 @@ assumption on the shape of the feature law.
   `E[a²]`. Together these say the two infima agree and the minimizing kernel may be taken
   two-point.
 * Weak duality for the dual (3.8), whose only ingredient is the scalar quartic maximum
-  `Φ(z, r) = sup_e (z e + r e² − e⁴)` of (3.7), proved here to be a genuine supremum.
+  `Φ(z, r) = sup_e (z e + r e² − e⁴)` of (3.7), proved here to be a genuine supremum,
+  attained, and attained at a real root of the stationarity cubic (3.9).
 * A no-gap certificate: a feasible pair together with multipliers at which the pointwise
   quartic is maximized by that pair proves simultaneously that the pair is a minimizer and
   that the dual value equals it. Every closed form in UPT §3.5 is an instance.
@@ -449,6 +451,84 @@ theorem twoPointKernel_moments (E : ExpFunctional Ω) (X : Ω → ι → ℝ) (b
   · rw [mixture_second E K, hsecond, ha]
   · show E (fun ω ↦ K ω (fun s ↦ twoPointKernel a (ω, s) ^ 4)) = _
     rw [hfourth]
+
+/-! ## The quartic maximum is attained, at a stationary root -/
+
+/-- **The quartic of (3.7) attains its maximum.** Outside the interval
+`|e| ≤ 1 + |z| + |r|` the quartic is already negative, so its maximum over that compact
+interval, which is at least the value `0` at `e = 0`, is the global maximum. This is the
+manuscript's "the polynomial tends to `−∞`, so a maximum exists". -/
+theorem exists_quartic_argmax (z r : ℝ) :
+    ∃ e : ℝ, ∀ e' : ℝ, z * e' + r * e' ^ 2 - e' ^ 4 ≤ z * e + r * e ^ 2 - e ^ 4 := by
+  set M : ℝ := 1 + |z| + |r| with hM
+  have hM1 : (1 : ℝ) ≤ M := by
+    have h1 := abs_nonneg z
+    have h2 := abs_nonneg r
+    rw [hM]
+    linarith
+  have hcont : ContinuousOn (fun e : ℝ ↦ z * e + r * e ^ 2 - e ^ 4) (Set.Icc (-M) M) := by
+    fun_prop
+  obtain ⟨e₀, he₀mem, he₀max⟩ :=
+    isCompact_Icc.exists_isMaxOn (⟨0, by constructor <;> linarith⟩ : (Set.Icc (-M) M).Nonempty)
+      hcont
+  have hzero : (0 : ℝ) ≤ z * e₀ + r * e₀ ^ 2 - e₀ ^ 4 := by
+    have h := isMaxOn_iff.mp he₀max 0 ⟨by linarith, by linarith⟩
+    simpa using h
+  refine ⟨e₀, fun e ↦ ?_⟩
+  rcases le_or_gt |e| M with h | h
+  · exact isMaxOn_iff.mp he₀max e ⟨(abs_le.mp h).1, (abs_le.mp h).2⟩
+  · have hae : (1 : ℝ) < |e| := lt_of_le_of_lt hM1 h
+    have hupos : (0 : ℝ) < |e| := lt_trans zero_lt_one hae
+    have h1 : z * e ≤ |z| * |e| := le_trans (le_abs_self _) (le_of_eq (abs_mul z e))
+    have h2 : r * e ^ 2 ≤ |r| * |e| ^ 2 := by
+      have hsq : e ^ 2 = |e| ^ 2 := (sq_abs e).symm
+      rw [hsq]
+      nlinarith [le_abs_self r, sq_nonneg |e|]
+    have h3 : e ^ 4 = |e| ^ 4 := by
+      rw [show (4 : ℕ) = 2 * 2 from rfl, pow_mul, pow_mul, sq_abs]
+    have hzr : |z| + |r| < |e| := by
+      rw [hM] at h
+      linarith
+    have hk1 : |z| + |r| * |e| < |e| ^ 2 := by
+      nlinarith [mul_nonneg (by linarith : (0 : ℝ) ≤ |e| - 1) (abs_nonneg z),
+        mul_pos hupos (sub_pos.mpr hzr)]
+    have hk2 : |z| * |e| + |r| * |e| ^ 2 < |e| ^ 3 := by
+      nlinarith [mul_lt_mul_of_pos_left hk1 hupos]
+    have hk3 : |e| ^ 3 < |e| ^ 4 := by
+      nlinarith [pow_pos hupos 3]
+    linarith
+
+/-- **`Φ(z, r)` is a maximum, not merely a supremum.** -/
+theorem exists_quarticMax_argmax (z r : ℝ) :
+    ∃ e : ℝ, quarticMax z r = z * e + r * e ^ 2 - e ^ 4 := by
+  obtain ⟨e, he⟩ := exists_quartic_argmax z r
+  exact ⟨e, quarticMax_eq_of_max he⟩
+
+/-- **UPT (3.9).** The maximizer of the quartic is a real root of `4e³ − 2re − z = 0`, so
+the scalar maximization in (3.7) is solved by the real roots of the stationarity cubic. -/
+theorem quarticMax_stationary (z r : ℝ) :
+    ∃ e : ℝ, quarticMax z r = z * e + r * e ^ 2 - e ^ 4 ∧
+      4 * e ^ 3 - 2 * r * e - z = 0 := by
+  obtain ⟨e, he⟩ := exists_quartic_argmax z r
+  refine ⟨e, quarticMax_eq_of_max he, ?_⟩
+  have hderiv : HasDerivAt (fun x : ℝ ↦ z * x + r * x ^ 2 - x ^ 4)
+      (z * 1 + r * (2 * e ^ 1) - 4 * e ^ 3) e := by
+    have hz : HasDerivAt (fun x : ℝ ↦ z * x) (z * 1) e := (hasDerivAt_id e).const_mul z
+    have hr : HasDerivAt (fun x : ℝ ↦ r * x ^ 2) (r * (2 * e ^ 1)) e := by
+      have := hasDerivAt_pow 2 e
+      norm_num at this
+      simpa using this.const_mul r
+    have h4 : HasDerivAt (fun x : ℝ ↦ x ^ 4) (4 * e ^ 3) e := by
+      have := hasDerivAt_pow 4 e
+      norm_num at this
+      exact this
+    exact (hz.add hr).sub h4
+  have hlocal : IsLocalMax (fun e' : ℝ ↦ z * e' + r * e' ^ 2 - e' ^ 4) e :=
+    Filter.Eventually.of_forall he
+  have hzero := IsLocalMax.hasDerivAt_eq_zero hlocal hderiv
+  have hpow : e ^ 1 = e := pow_one e
+  rw [hpow] at hzero
+  linarith
 
 end
 
