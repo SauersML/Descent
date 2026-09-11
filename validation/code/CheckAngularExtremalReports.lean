@@ -1,0 +1,32 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.AngularExtremalReports
+
+/-! Axiom audit of AngularExtremalReports. -/
+
+#print axioms Descent.Portability.AngularExtremalReports.angularEigenVector_eq_col
+#print axioms Descent.Portability.AngularExtremalReports.eigenUnitary_transpose_mul
+#print axioms Descent.Portability.AngularExtremalReports.eigenUnitary_mul_transpose
+#print axioms Descent.Portability.AngularExtremalReports.spectral_conj
+#print axioms Descent.Portability.AngularExtremalReports.trace_mul_diagonal
+#print axioms Descent.Portability.AngularExtremalReports.quadForm_diagonal
+#print axioms Descent.Portability.AngularExtremalReports.diag_conj_eq_quadForm
+#print axioms Descent.Portability.AngularExtremalReports.trace_mul_eq_sum_eigen
+#print axioms Descent.Portability.AngularExtremalReports.eigen_coeff
+#print axioms Descent.Portability.AngularExtremalReports.sum_sq_eigen_coeff
+#print axioms Descent.Portability.AngularExtremalReports.quadForm_eq_sum_eigen
+#print axioms Descent.Portability.AngularExtremalReports.eigen_coeff_eigenVector
+#print axioms Descent.Portability.AngularExtremalReports.quadForm_at_eigenVector
+#print axioms Descent.Portability.AngularExtremalReports.quadForm_abs_isGreatest
+#print axioms Descent.Portability.AngularExtremalReports.indicator_diagonal_mul_self
+#print axioms Descent.Portability.AngularExtremalReports.eigenSubsetProj_transpose
+#print axioms Descent.Portability.AngularExtremalReports.eigenSubsetProj_mul_self
+#print axioms Descent.Portability.AngularExtremalReports.conj_eigenSubsetProj
+#print axioms Descent.Portability.AngularExtremalReports.quadForm_eigenSubsetProj_eigenVector
+#print axioms Descent.Portability.AngularExtremalReports.trace_eigenSubsetProj
+#print axioms Descent.Portability.AngularExtremalReports.trace_eigenSubsetProj_mul
+#print axioms Descent.Portability.AngularExtremalReports.sum_weight_le_powersetCard_sup
+#print axioms Descent.Portability.AngularExtremalReports.kyFan_isGreatest
+#print axioms Descent.Portability.AngularExtremalReports.sum_pos_eigen_eq_half_abs
+#print axioms Descent.Portability.AngularExtremalReports.trace_pairing_abs_isGreatest
