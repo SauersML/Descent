@@ -168,7 +168,9 @@ from a deme count.
   continuous functional: `EmpiricalLawContinuityBound`. §7.2 Theorem 5 and equation (32):
   `IntervalEvaluatorCertificate`; Theorem 5 on genuine fair-bit cylinders with the coupled
   bracket (18) at every stage: `CylinderIntervalCertificate`.
-* §8 equations (33)-(35): `FrontierCompletionRegion`, with (35) in `SublawReportCertificate`.
+* §8 equations (33)-(35): `FrontierCompletionRegion`, with (35) in `SublawReportCertificate`;
+  the conditional-mean image of a convex set of completions need not be convex:
+  `FrontierCompletionRegion.exists_convex_not_convex_conditionalMeans`.
 * §9.1, the uniform penetrance architecture: `UniformPenetranceArchitecture`.
 * §10, the halting boundary: `HaltingExpectationBoundary`.
 
