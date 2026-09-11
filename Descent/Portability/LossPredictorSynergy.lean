@@ -199,6 +199,7 @@ theorem comparable_fraction_arbitrarily_small (V W ε : ℝ) (hV : 0 < V)
   refine ⟨1 + V / (ε * W), by linarith [div_pos hV (mul_pos hε hW)], ?_⟩
   have hkey : (1 + V / (ε * W) - 1) * W = V / ε := by
     field_simp
+    ring
   rw [hkey]
   have hdiv : 0 < V / ε := div_pos hV hε
   have hden : 0 < 2 * V + V / ε := by linarith
@@ -308,7 +309,7 @@ theorem synergy_marginal_numerator (c : ℝ) (hc : 0 < c) (hc1 : c < 1) :
       funext w
       exact congrFun (synergyResidual_sq c hc hc1) (d, w.1, w.2)
     rw [hfun, doubleUniform_apply]
-    cases d <;> norm_num [synergyLoss]
+    cases d <;> norm_num [synergyLoss] <;> ring
   rw [hinner]
   norm_num [variance_eq_expect_sq_sub_sq_mean]
 
