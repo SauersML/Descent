@@ -69,7 +69,7 @@ def InterleavedSegment.matrix {D : ℕ} :
 /-- One segment applies its matrix. -/
 theorem InterleavedSegment.apply_eq_mulVec {D : ℕ} (segment : InterleavedSegment D)
     (state : AffineLowOrderLDCoordinate D → ℝ) :
-    segment.apply state = segment.matrix.mulVec state := by
+    segment.apply state = (InterleavedSegment.matrix segment).mulVec state := by
   cases segment with
   | segment event => cases event <;> rfl
   | integrable rates horizon horizon_nonneg hintegrable => rfl
@@ -79,13 +79,14 @@ theorem InterleavedSegment.apply_eq_mulVec {D : ℕ} (segment : InterleavedSegme
 so its matrix is the rightmost factor. -/
 def productMatrix {D : ℕ} (segments : List (InterleavedSegment D)) :
     Matrix (AffineLowOrderLDCoordinate D) (AffineLowOrderLDCoordinate D) ℝ :=
-  segments.foldl (fun product segment ↦ segment.matrix * product) 1
+  segments.foldl (fun product segment ↦ InterleavedSegment.matrix segment * product) 1
 
 /-- Folding the segment matrices onto an accumulated product applies the segments after it. -/
 theorem foldl_matrix_mulVec {D : ℕ} (segments : List (InterleavedSegment D))
     (accumulated : Matrix (AffineLowOrderLDCoordinate D) (AffineLowOrderLDCoordinate D) ℝ)
     (state : AffineLowOrderLDCoordinate D → ℝ) :
-    (segments.foldl (fun product segment ↦ segment.matrix * product) accumulated).mulVec state =
+    (segments.foldl (fun product segment ↦ InterleavedSegment.matrix segment * product)
+        accumulated).mulVec state =
       propagateInterleaved segments (accumulated.mulVec state) := by
   induction segments generalizing accumulated with
   | nil => rfl
