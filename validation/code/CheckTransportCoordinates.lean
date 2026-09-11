@@ -30,3 +30,8 @@ open Descent.Portability.TransportCoordinates
 #print axioms centered_score_variance
 #print axioms centered_predictive_covariance
 #print axioms centered_score_r2
+#print axioms weightCovariance_symm
+#print axioms quadratic_form_sum
+#print axioms trace_mul_symm
+#print axioms weight_second_moment
+#print axioms expected_training_risk

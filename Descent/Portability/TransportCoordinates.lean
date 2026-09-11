@@ -447,6 +447,126 @@ theorem centered_score_r2 (E : ExpFunctional Ω) (X : Ω → J → ℝ) (Y : Ω 
   rw [centered_predictive_covariance E X Y w hcentered,
     centered_score_variance E X w hcentered, hvarY, mul_comm]
 
+/-! ### The training leg with a sampling law for the learned weights -/
+
+section LearnedWeights
+
+variable {Θ : Type*}
+
+/-- The mean of a learned weight vector under its own sampling law. -/
+def weightMean (W : ExpFunctional Θ) (what : Θ → J → ℝ) : J → ℝ :=
+  fun j ↦ W (fun θ ↦ what θ j)
+
+/-- The covariance matrix of a learned weight vector under its own sampling law. -/
+def weightCovariance (W : ExpFunctional Θ) (what : Θ → J → ℝ) : Matrix J J ℝ :=
+  Matrix.of fun j k ↦
+    W (fun θ ↦ (what θ j - weightMean W what j) * (what θ k - weightMean W what k))
+
+/-- The weight covariance matrix is symmetric. -/
+theorem weightCovariance_symm (W : ExpFunctional Θ) (what : Θ → J → ℝ) (j k : J) :
+    weightCovariance W what j k = weightCovariance W what k j := by
+  unfold weightCovariance
+  simp only [Matrix.of_apply]
+  congr 1
+  funext θ
+  ring
+
+/-- A quadratic form written as a double sum. -/
+theorem quadratic_form_sum (M : Matrix J J ℝ) (u : J → ℝ) :
+    dot u (M.mulVec u) = ∑ j, ∑ k, M j k * u j * u k := by
+  unfold dot Descent.Core.innerSum
+  simp only [Matrix.mulVec, dotProduct, Finset.mul_sum]
+  exact Finset.sum_congr rfl fun j _ ↦ Finset.sum_congr rfl fun k _ ↦ by ring
+
+/-- The trace of a product against a symmetric matrix is the entrywise sum. -/
+theorem trace_mul_symm (M V : Matrix J J ℝ) (hV : ∀ j k, V j k = V k j) :
+    Matrix.trace (M * V) = ∑ j, ∑ k, M j k * V j k := by
+  simp only [Matrix.trace, Matrix.diag_apply, Matrix.mul_apply]
+  refine Finset.sum_congr rfl fun j _ ↦ Finset.sum_congr rfl fun k _ ↦ ?_
+  rw [hV k j]
+
+/-- The second moment of a weight error splits into a squared bias and a covariance
+entry, with no cross term: the sampling fluctuation has mean zero by construction. -/
+theorem weight_second_moment (W : ExpFunctional Θ) (what : Θ → J → ℝ) (wStar : J → ℝ)
+    (j k : J) :
+    W (fun θ ↦ (what θ j - wStar j) * (what θ k - wStar k))
+      = (weightMean W what j - wStar j) * (weightMean W what k - wStar k)
+        + weightCovariance W what j k := by
+  have hmj : W (fun θ ↦ what θ j - weightMean W what j) = 0 :=
+    eval_centered_zero W (fun θ ↦ what θ j)
+  have hmk : W (fun θ ↦ what θ k - weightMean W what k) = 0 :=
+    eval_centered_zero W (fun θ ↦ what θ k)
+  have hsplit : (fun θ ↦ (what θ j - wStar j) * (what θ k - wStar k))
+      = (fun θ ↦ (what θ j - weightMean W what j) * (what θ k - weightMean W what k))
+        + ((weightMean W what k - wStar k) • fun θ ↦ what θ j - weightMean W what j)
+        + ((weightMean W what j - wStar j) • fun θ ↦ what θ k - weightMean W what k)
+        + (fun _ : Θ ↦ (weightMean W what j - wStar j)
+            * (weightMean W what k - wStar k)) := by
+    funext θ
+    simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
+    ring
+  rw [hsplit, W.add_eval, W.add_eval, W.add_eval, W.smul_eval, W.smul_eval,
+    ExpFunctional.eval_const, hmj, hmk]
+  unfold weightCovariance
+  simp only [Matrix.of_apply]
+  ring
+
+/-- **TQ Theorem 3.2 equation (3.5): the expected target risk of a learned score.**
+`E R_t(ŵ) = v − c_Xᵀw* + (w̄ − w*)ᵀΣ(w̄ − w*) + tr(Σ V_w)`.  The learned weights carry
+their own sampling law on a separate space, which is the manuscript's independence of
+the learned weight from the target individual; `§3.2` warns that this independence must
+not be inserted after marginalizing shared latent parameters away, and nothing here
+does so, because the two expectations are over unrelated spaces by construction. -/
+theorem expected_training_risk (E : ExpFunctional Ω) (X : Ω → J → ℝ) (Y : Ω → ℝ)
+    (W : ExpFunctional Θ) (what : Θ → J → ℝ) (wStar : J → ℝ)
+    (hstar : (secondMomentMatrix E X).mulVec wStar = crossMomentVector E X Y) :
+    W (fun θ ↦ expMse E Y (linScore (what θ) X))
+      = outcomeSecondMoment E Y - dot wStar (crossMomentVector E X Y)
+        + dot (fun j ↦ weightMean W what j - wStar j)
+            ((secondMomentMatrix E X).mulVec (fun j ↦ weightMean W what j - wStar j))
+        + Matrix.trace (secondMomentMatrix E X * weightCovariance W what) := by
+  have hfun : (fun θ ↦ expMse E Y (linScore (what θ) X))
+      = (fun _ : Θ ↦ outcomeSecondMoment E Y - dot wStar (crossMomentVector E X Y))
+        + ∑ j, ∑ k, ((secondMomentMatrix E X j k)
+            • fun θ ↦ (what θ j - wStar j) * (what θ k - wStar k)) := by
+    funext θ
+    rw [excess_risk_law E X Y wStar (what θ) hstar, quadratic_form_sum]
+    simp only [Pi.add_apply, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
+    congr 1
+    exact Finset.sum_congr rfl fun j _ ↦ Finset.sum_congr rfl fun k _ ↦ by ring
+  have hinner : ∀ j : J,
+      W (∑ k, ((secondMomentMatrix E X j k)
+          • fun θ ↦ (what θ j - wStar j) * (what θ k - wStar k)))
+        = ∑ k, secondMomentMatrix E X j k
+            * ((weightMean W what j - wStar j) * (weightMean W what k - wStar k)
+              + weightCovariance W what j k) := by
+    intro j
+    rw [ExpFunctional.eval_sum]
+    refine Finset.sum_congr rfl fun k _ ↦ ?_
+    rw [W.smul_eval, weight_second_moment]
+  have hsum : (∑ j, W (∑ k, ((secondMomentMatrix E X j k)
+        • fun θ ↦ (what θ j - wStar j) * (what θ k - wStar k))))
+      = ∑ j, ∑ k, secondMomentMatrix E X j k
+          * ((weightMean W what j - wStar j) * (weightMean W what k - wStar k)
+            + weightCovariance W what j k) :=
+    Finset.sum_congr rfl fun j _ ↦ hinner j
+  have hsplit2 : (∑ j, ∑ k, secondMomentMatrix E X j k
+        * ((weightMean W what j - wStar j) * (weightMean W what k - wStar k)
+          + weightCovariance W what j k))
+      = (∑ j, ∑ k, secondMomentMatrix E X j k * (weightMean W what j - wStar j)
+          * (weightMean W what k - wStar k))
+        + ∑ j, ∑ k, secondMomentMatrix E X j k * weightCovariance W what j k := by
+    rw [← Finset.sum_add_distrib]
+    refine Finset.sum_congr rfl fun j _ ↦ ?_
+    rw [← Finset.sum_add_distrib]
+    exact Finset.sum_congr rfl fun k _ ↦ by ring
+  rw [hfun, W.add_eval, ExpFunctional.eval_const, ExpFunctional.eval_sum, hsum, hsplit2,
+    quadratic_form_sum, trace_mul_symm (secondMomentMatrix E X) (weightCovariance W what)
+      (weightCovariance_symm W what)]
+  ring
+
+end LearnedWeights
+
 end
 
 end Descent.Portability.TransportCoordinates
