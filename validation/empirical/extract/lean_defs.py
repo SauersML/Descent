@@ -499,9 +499,6 @@ def ExponentialProfilePoint(bound):
 def exponentialProfileDistance(left, right):
     return dist((show(ExponentialProfilePoint, bound, from_, left)), (show(ExponentialProfilePoint, bound, from_, right)))
 
-def algorithmicRiskSignature(risk, design):
-    return (lambda algorithm, model, loss: risk(algorithm, design, model, loss))
-
 def AlgorithmicallyEquivalent(risk, left, right):
     return all(all(all(((risk(algorithm, left, model, loss) == risk(algorithm, right, model, loss))) for loss in range(int(_rt.sumdim('loss', len(risk[0][0][0]))))) for model in range(int(_rt.sumdim('model', len(risk[0][0]))))) for algorithm in range(int(_rt.sumdim('algorithm', len(risk)))))
 
@@ -4283,9 +4280,6 @@ def Converged(iteration, state, current):
 def exactRun(x, labels):
     return Descent_Portability_FirthFiniteIterationLaw_run(exactMatrixChecks(), x, labels)
 
-def backgroundLaw(G):
-    return Descent_Portability_IndividualLossMoments_mixture(G, ((lambda _: uniformExp(Bool))))
-
 def curveA(v, q, d):
     return _rt.mul(_rt.rsqrt((v[int(d)])), _rt.rsqrt((q[int(d)])))
 
@@ -4373,9 +4367,6 @@ def cellTheta():
 def cellExp(par, d):
     return _rt._proj(_rt._proj(contextExp, '1'), '2')(par, (cellTheta(d)), (cellTheta_mem(d)), (cellTheta_mem(d)))
 
-def jointExp(par):
-    return Descent_Portability_IndividualLossMoments_mixture((uniformExp((Fin(2.0)))), (innerExp(par)))
-
 def Descent_Portability_FourthOrderLossObstruction_score(ω):
     return effectSign(_rt._proj(_rt._proj(_rt._proj(ω, '2'), '2'), '1'))
 
@@ -4387,6 +4378,9 @@ def Descent_Portability_FourthOrderLossObstruction_individualLoss(ω):
 
 def lossSecondMoment(z):
     return ((4.0 * _rt.lpow(((1.0 - effectMean(z))), 2.0)) + ((4.0 * _rt.lpow(((1.0 - effectMean(z))), 2.0)) * ((1.0 - _rt.lpow(effectMean(z), 2.0)))))
+
+def Descent_Portability_FrameOutcomeMeasure_loss(f, z):
+    return _rt.lpow((_rt.sub(_rt._proj(z, '2'), f[int(_rt._proj(z, '1'))])), 2.0)
 
 def gaussianMomentValue(s):
     return _rt.VecFn([(-s), 0.0, s])
@@ -4818,6 +4812,9 @@ def membership(partition):
 
 def Descent_Portability_MarkovPoissonLaw_generator(kernel, rate):
     return ((rate) * ((kernelMatrix(kernel) - 1.0)))
+
+def Descent_Portability_MatrixDecisionInformation_report(a, B, N, μ):
+    return _rt.add(a, _rt.mul(_rt.rinv(N), (_rt.mul(B, _v(μ)))))
 
 def Descent_Portability_MeanDriftRepair_gain(μ, w, f, d):
     return _rt.sub(frameRisk(μ, w, f), frameRisk(μ, w, ((lambda i: _rt.add(f[int(i)], d[int(i)])))))
@@ -5626,11 +5623,11 @@ def correction(w):
 def noiseValue(a):
     return _rt.VecFn([0.0, a, (-a)])
 
-def loss(a, z):
+def Descent_Portability_PairedGainTailExperiment_loss(a, z):
     return _rt.lpow(((correction(_rt._proj(z, '1')) + noiseValue(a, _rt._proj(z, '2')))), 2.0)
 
 def Descent_Portability_PairedGainTailExperiment_improvement(a, z):
-    return (loss(a, z) - _rt.lpow(noiseValue(a, _rt._proj(z, '2')), 2.0))
+    return (Descent_Portability_PairedGainTailExperiment_loss(a, z) - _rt.lpow(noiseValue(a, _rt._proj(z, '2')), 2.0))
 
 def Descent_Portability_PairedMedianOfMeans_estimate(f, m, s, z):
     return median(((lambda j: Descent_Portability_IIDAverageLaw_average(f, s, (z(j))))))
@@ -6442,9 +6439,6 @@ def lossMean(H, q):
 def minimalWithinVariance(E, H, q):
     return E(((lambda d: _rt.add(_rt.mul(_rt.mul(4.0, _rt.lpow(coeffA(H, q, d), 2.0)), _rt.lpow(coeffB(H, q, d), 2.0)), _rt.mul(_rt.mul(4.0, (_rt.sub(1.0, H))), (_rt.add(_rt.lpow(coeffA(H, q, d), 2.0), _rt.lpow(coeffB(H, q, d), 2.0))))))))
 
-def fullLaw(E, N):
-    return Descent_Portability_IndividualLossMoments_mixture(E, ((lambda _: cellLaw(N))))
-
 def spikeWeights(p):
     return _rt.VecFn([_rt.rdiv(p, 2.0), (1.0 - p), _rt.rdiv(p, 2.0)])
 
@@ -6496,9 +6490,6 @@ def meanMagnitude(a, b, delta):
 def Descent_Portability_SourceFixedRealization_signBias(a, b, delta):
     return _rt.rdiv(b, meanMagnitude(a, b, delta))
 
-def residualLaw(a, b, delta, hab, hd):
-    return Descent_Portability_IndividualLossMoments_mixture((_rt._proj(magnitudeLaw, 'le')((highWeight(a, b, delta)), (highWeight_pos(a, b, delta, hab, hd)), (highWeight_le_one(a, b, delta, hab, hd)))), ((lambda _: _rt._proj(_rt._proj(Descent_Portability_SourceFixedRealization_signLaw, '1'), '2')((Descent_Portability_SourceFixedRealization_signBias(a, b, delta)), (signBias_bounds(a, b, delta, hab, hd)), (signBias_bounds(a, b, delta, hab, hd))))))
-
 def scaleX(q, m, d):
     return _rt.add(_rt.rsqrt((q[int(d)])), _rt.rsqrt((_rt.add(_rt.sub(m[int(d)], 1.0), q[int(d)]))))
 
@@ -6507,12 +6498,6 @@ def Descent_Portability_SourceFixedRealization_outcomeVar(q, m, d):
 
 def shiftK(q, m, d):
     return _rt.sub(_rt.mul(_rt.rsqrt((q[int(d)])), scaleX(q, m, d)), 1.0)
-
-def cellTargetLaw(q, m, delta, hk, hd, d):
-    return Descent_Portability_IndividualLossMoments_mixture((uniformExp(Bool)), (residualKernel(q, m, delta, hk, hd, d)))
-
-def fullTargetLaw(E, q, m, delta, hk, hd):
-    return Descent_Portability_IndividualLossMoments_mixture(E, (cellTargetLaw(q, m, delta, hk, hd)))
 
 def marginal(L, U, p, q, lo, hi, i):
     return envelope((L[int(i)]), (U[int(i)]), (p[int(i)]), (q[int(i)]), (clip((lo[int(i)]), (hi[int(i)]), (vertex((L[int(i)]), (U[int(i)]), (p[int(i)]), (q[int(i)]))))))

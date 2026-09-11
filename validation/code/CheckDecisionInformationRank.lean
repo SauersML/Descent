@@ -13,3 +13,6 @@ import Descent.Portability.DecisionInformationRank
 #print axioms Descent.Portability.DecisionInformationRank.summary_dimension_lower
 #print axioms Descent.Portability.DecisionInformationRank.minimalSummary_identifies
 #print axioms Descent.Portability.DecisionInformationRank.exact_summary_count
+
+#print axioms Descent.Portability.DecisionInformationRank.identifies_iff_kernel_of_interior
+#print axioms Descent.Portability.DecisionInformationRank.identifies_iff_factorization_of_interior

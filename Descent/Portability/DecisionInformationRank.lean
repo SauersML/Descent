@@ -78,14 +78,32 @@ theorem identifies_iff_factorization (S : Set V) (hS : IsOpen S) (hne : S.Nonemp
     IdentifiesOn S A B ↔ ∃ C : E →ₗ[ℝ] F, C.comp A = B := by
   rw [identifies_iff_kernel S hS hne A B, ObservableClosureLaw.linear_factorization_iff]
 
+/-- A domain need only contain an open region; the full admissible set may be closed. -/
+theorem identifies_iff_kernel_of_interior (S : Set V) (hne : (interior S).Nonempty)
+    (A : V →ₗ[ℝ] E) (B : V →ₗ[ℝ] F) :
+    IdentifiesOn S A B ↔ LinearMap.ker A ≤ LinearMap.ker B := by
+  constructor
+  · intro hid
+    apply kernel_of_identifies (interior S) isOpen_interior hne A B
+    intro x hx y hy hxy
+    exact hid x (interior_subset hx) y (interior_subset hy) hxy
+  · exact identifies_of_kernel S A B
+
+/-- Domains with an open admissible region have the same exact linear reconstruction criterion. -/
+theorem identifies_iff_factorization_of_interior (S : Set V) (hne : (interior S).Nonempty)
+    (A : V →ₗ[ℝ] E) (B : V →ₗ[ℝ] F) :
+    IdentifiesOn S A B ↔ ∃ C : E →ₗ[ℝ] F, C.comp A = B := by
+  rw [identifies_iff_kernel_of_interior S hne A B,
+    ObservableClosureLaw.linear_factorization_iff]
+
 variable [FiniteDimensional ℝ F]
 
 /-- Every determining finite-dimensional summary has at least the rank of the decision map. -/
 theorem summary_dimension_lower [FiniteDimensional ℝ E]
-    (S : Set V) (hS : IsOpen S) (hne : S.Nonempty)
+    (S : Set V) (hne : (interior S).Nonempty)
     (A : V →ₗ[ℝ] E) (B : V →ₗ[ℝ] F) (hid : IdentifiesOn S A B) :
     Module.finrank ℝ (LinearMap.range B) ≤ Module.finrank ℝ E := by
-  obtain ⟨C, hC⟩ := (identifies_iff_factorization S hS hne A B).mp hid
+  obtain ⟨C, hC⟩ := (identifies_iff_factorization_of_interior S hne A B).mp hid
   have hrange : LinearMap.range B ≤ LinearMap.range C := by
     rw [← hC]
     exact LinearMap.range_comp_le_range _ _
@@ -105,13 +123,13 @@ theorem minimalSummary_identifies (S : Set V) (B : V →ₗ[ℝ] F) :
   exact congrArg Subtype.val he
 
 /-- The minimum number of scalar linear mean summaries is exactly the decision-map rank. -/
-theorem exact_summary_count (S : Set V) (hS : IsOpen S) (hne : S.Nonempty)
+theorem exact_summary_count (S : Set V) (hne : (interior S).Nonempty)
     (B : V →ₗ[ℝ] F) :
     IsLeast {q : ℕ | ∃ A : V →ₗ[ℝ] (Fin q → ℝ), IdentifiesOn S A B}
       (Module.finrank ℝ (LinearMap.range B)) := by
   refine ⟨⟨minimalSummary B, minimalSummary_identifies S B⟩, ?_⟩
   rintro q ⟨A, hA⟩
-  have hh := summary_dimension_lower S hS hne A B hA
+  have hh := summary_dimension_lower S hne A B hA
   simpa using hh
 
 end Descent.Portability.DecisionInformationRank

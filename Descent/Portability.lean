@@ -1,6 +1,9 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.DecisionInformationRank
+import Descent.Portability.FrameOutcomeMeasure
+import Descent.Portability.MatrixDecisionInformation
 import Descent.Portability.SubgroupFrameTransport
 import Descent.Portability.FiniteMixtureRepair
 import Descent.Portability.SubgroupRepairGeometry
