@@ -16,3 +16,5 @@ import Descent.Portability.ThresholdLawRegion
 #print axioms Descent.Portability.ThresholdLawRegion.continuous_threshold_curve_endpoints
 #print axioms Descent.Portability.ThresholdLawRegion.uniform_rank_endpoints
 #print axioms Descent.Portability.ThresholdLawRegion.continuous_threshold_curve_increment_bounds
+#print axioms Descent.Portability.ThresholdLawRegion.continuous_threshold_joint_law
+#print axioms Descent.Portability.ThresholdLawRegion.continuous_threshold_curve_iff_joint_law

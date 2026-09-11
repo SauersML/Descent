@@ -27,6 +27,10 @@ curve `T s = nu (Iic s)` comes from a submeasure of the score law with total mas
 over `Iic s`, with total integral `pi`. That is the manuscript's
 "absolutely continuous with `0 <= T' <= 1` almost everywhere" statement in the
 form Mathlib expresses it, and it is strictly stronger than the grid form.
+`continuous_threshold_joint_law` assembles the conditional disease risk into an
+actual joint law on score and outcome, so
+`continuous_threshold_curve_iff_joint_law` states the corollary against that
+joint law rather than against a bare submeasure.
 `continuous_threshold_curve_increment_bounds` and
 `continuous_threshold_curve_endpoints` give the derivative bounds and the
 boundary conditions of UPT (6.6) in integrated form, and
@@ -253,9 +257,8 @@ everywhere precisely because the submeasure is dominated; the converse builds th
 submeasure by `withDensity`. This is the manuscript's absolutely continuous
 statement with derivative in `[0, 1]`, in the form Mathlib expresses it: the
 density is exactly the manuscript's conditional disease risk `d nu / d mu`, which
-the bound puts in `[0, 1]`. Assembling that risk into a joint law on the product
-with the outcome is proved here only in the finite case,
-`threshold_law_region`. -/
+the bound puts in `[0, 1]`. `continuous_threshold_curve_iff_joint_law` restates
+this against an actual joint score/outcome law. -/
 theorem continuous_threshold_curve_iff_density (mu : Measure ℝ) [IsFiniteMeasure mu]
     (pi : ℝ≥0∞) (T : ℝ → ℝ≥0∞) :
     (∃ nu : Measure ℝ, nu ≤ mu ∧ nu Set.univ = pi ∧ ∀ s, T s = nu (Set.Iic s)) ↔
@@ -355,6 +358,91 @@ theorem uniform_rank_endpoints :
         exact h.elim
     rw [hset]
     simp
+
+/-- **The continuous Bernoulli construction of UPT Theorem 6.2.** From the score
+law and a conditional disease risk bounded by one, the joint law of score and
+outcome: sample the score from `mu`, then the outcome as a Bernoulli variable
+with that risk. Its score marginal is `mu` and its true-positive marginal is the
+submeasure with the given density. -/
+theorem continuous_threshold_joint_law (mu : Measure ℝ) (f : ℝ → ℝ≥0∞)
+    (hmeas : Measurable f) (hf1 : ∀ᵐ x ∂mu, f x ≤ 1) :
+    ∃ J : Measure (ℝ × Bool),
+      (∀ A : Set ℝ, MeasurableSet A → J (A ×ˢ (Set.univ : Set Bool)) = mu A) ∧
+        ∀ A : Set ℝ, MeasurableSet A →
+          J (A ×ˢ ({true} : Set Bool)) = mu.withDensity f A := by
+  refine ⟨(mu.withDensity f).map (fun x ↦ (x, true)) +
+    (mu.withDensity fun x ↦ 1 - f x).map (fun x ↦ (x, false)), ?_, ?_⟩
+  · intro A hA
+    have hprod : MeasurableSet (A ×ˢ (Set.univ : Set Bool)) := hA.prod MeasurableSet.univ
+    have hpre : ∀ b : Bool, (fun x ↦ (x, b)) ⁻¹' (A ×ˢ (Set.univ : Set Bool)) = A := by
+      intro b
+      ext x
+      simp
+    rw [Measure.add_apply, Measure.map_apply measurable_prodMk_right hprod,
+      Measure.map_apply measurable_prodMk_right hprod, hpre true, hpre false,
+      withDensity_apply _ hA, withDensity_apply _ hA]
+    have hae : ∀ᵐ x ∂mu, f x + (1 - f x) = 1 :=
+      hf1.mono fun x hx ↦ add_tsub_cancel_of_le hx
+    calc (∫⁻ x in A, f x ∂mu) + ∫⁻ x in A, (1 - f x) ∂mu
+        = ∫⁻ x in A, (f x + (1 - f x)) ∂mu := (lintegral_add_left hmeas _).symm
+      _ = ∫⁻ _ in A, (1 : ℝ≥0∞) ∂mu := lintegral_congr_ae (ae_restrict_of_ae hae)
+      _ = mu A := by simp
+  · intro A hA
+    have hprod : MeasurableSet (A ×ˢ ({true} : Set Bool)) :=
+      hA.prod (measurableSet_singleton true)
+    have hTrue : (fun x ↦ (x, true)) ⁻¹' (A ×ˢ ({true} : Set Bool)) = A := by
+      ext x
+      simp
+    have hFalse : (fun x ↦ (x, false)) ⁻¹' (A ×ˢ ({true} : Set Bool)) = ∅ := by
+      ext x
+      simp
+    rw [Measure.add_apply, Measure.map_apply measurable_prodMk_right hprod,
+      Measure.map_apply measurable_prodMk_right hprod, hTrue, hFalse, measure_empty,
+      add_zero]
+
+/-- **UPT Corollary 6.3, continuous form against an actual joint law.** A curve is
+the top-`s` true-positive mass of a genuine joint law of score and outcome whose
+score marginal is `mu` and whose prevalence is `pi`, exactly when it is the curve
+of a submeasure of `mu` with total mass `pi`. Combined with
+`continuous_threshold_curve_iff_density` this is the manuscript's statement in
+full: the possible curves are the lower-tail integrals of a conditional disease
+risk in `[0, 1]`, realised by an actual score and outcome. -/
+theorem continuous_threshold_curve_iff_joint_law (mu : Measure ℝ) [IsFiniteMeasure mu]
+    (pi : ℝ≥0∞) (T : ℝ → ℝ≥0∞) :
+    (∃ nu : Measure ℝ, nu ≤ mu ∧ nu Set.univ = pi ∧ ∀ s, T s = nu (Set.Iic s)) ↔
+      ∃ J : Measure (ℝ × Bool),
+        (∀ A : Set ℝ, MeasurableSet A → J (A ×ˢ (Set.univ : Set Bool)) = mu A) ∧
+          J (Set.univ ×ˢ ({true} : Set Bool)) = pi ∧
+          ∀ s, T s = J (Set.Iic s ×ˢ ({true} : Set Bool)) := by
+  constructor
+  · intro h
+    obtain ⟨f, hmeas, hf1, hmass, hTs⟩ :=
+      (continuous_threshold_curve_iff_density mu pi T).mp h
+    obtain ⟨J, hmarg, hcase⟩ := continuous_threshold_joint_law mu f hmeas hf1
+    refine ⟨J, hmarg, ?_, fun s ↦ ?_⟩
+    · rw [hcase Set.univ MeasurableSet.univ, withDensity_apply _ MeasurableSet.univ,
+        setLIntegral_univ]
+      exact hmass
+    · rw [hcase (Set.Iic s) measurableSet_Iic, withDensity_apply _ measurableSet_Iic]
+      exact hTs s
+  · rintro ⟨J, hmarg, hprev, hTs⟩
+    have hnu : ∀ A : Set ℝ, MeasurableSet A →
+        (J.restrict (Set.univ ×ˢ ({true} : Set Bool))).map Prod.fst A =
+          J (A ×ˢ ({true} : Set Bool)) := by
+      intro A hA
+      rw [Measure.map_apply measurable_fst hA, Measure.restrict_apply (measurable_fst hA)]
+      congr 1
+      ext p
+      simp
+    refine ⟨(J.restrict (Set.univ ×ˢ ({true} : Set Bool))).map Prod.fst, ?_, ?_, fun s ↦ ?_⟩
+    · rw [Measure.le_iff]
+      intro A hA
+      rw [hnu A hA, ← hmarg A hA]
+      exact measure_mono fun p hp ↦ ⟨hp.1, Set.mem_univ _⟩
+    · rw [hnu Set.univ MeasurableSet.univ]
+      exact hprev
+    · rw [hnu (Set.Iic s) measurableSet_Iic]
+      exact hTs s
 
 end ContinuousThresholdCurves
 
