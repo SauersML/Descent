@@ -7,7 +7,6 @@ import Descent.Portability.PiecewiseConstantBodyPreservation
 
 open Descent.Portability.PiecewiseConstantBodyPreservation
 
-#print axioms foldl_mem_of_steps
 #print axioms propagateInstructions_mem_of_epochs_and_transforms
 #print axioms propagateInstructions_append_mem
 #print axioms history_present_mem_realizationBody

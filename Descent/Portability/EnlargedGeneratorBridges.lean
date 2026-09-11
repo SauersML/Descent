@@ -139,6 +139,183 @@ theorem rightMutationRightHeterozygosity_velocity {D : ℕ} (target first second
       twoLocusRightHeterozygosity, TwoLocusHaplotypeFrequencies.rightContrast,
       hfirst, hsecond] <;> ring
 
+/-! ## The five stage blocks of the right-locus heterozygosity row -/
+
+/-- The enlarged feature vector reads a right-locus heterozygosity coordinate as the value of
+the corresponding corpus jet. -/
+theorem rightHeterozygosityMoment_heterozygosity {D : ℕ} (state : DemeHaplotypeState D)
+    (first second : Fin D) :
+    rightHeterozygosityMoment (enlargedLowOrderLDFeature state) (.H first second) =
+      (twoLocusRightHJet first second).value state := by
+  rw [twoLocusRightHJet_value]
+  rfl
+
+/-- The resampling block of the row is the corpus drift channel: a right-locus heterozygosity
+decays at the coalescence rate exactly when both its lineages sit in the drifting deme. -/
+theorem driftBlock_rightHeterozygosity {D : ℕ} (rates : ManyDemeLDRates D)
+    (first second : Fin D) (state : DemeHaplotypeState D) :
+    (∑ deme, stageDrift rates (rightHeterozygosityStageExpansion first second)
+        (.drift deme) state) =
+      lowOrderLDDrift rates
+        (rightHeterozygosityMoment (enlargedLowOrderLDFeature state)) (.H first second) := by
+  have hterm : ∀ deme : Fin D,
+      stageDrift rates (rightHeterozygosityStageExpansion first second)
+          (.drift deme) state =
+        rates.coalescence deme *
+          (if first = deme ∧ second = deme then
+            -(twoLocusRightHJet first second).value state else 0) := by
+    intro deme
+    simp only [stageDrift, stageRate, stageVelocity, rightHeterozygosityStageExpansion]
+    rw [twoLocusRightHJet_driftAt]
+  rw [Finset.sum_congr rfl (fun deme _ ↦ hterm deme)]
+  by_cases hpair : first = second
+  · subst hpair
+    rw [Finset.sum_eq_single first]
+    · simp only [lowOrderLDDrift, if_pos rfl, and_self,
+        rightHeterozygosityMoment_heterozygosity]
+      ring
+    · intro other _ hother
+      rw [if_neg (fun hcondition ↦ hother hcondition.1.symm), mul_zero]
+    · intro hnotmem
+      exact absurd (Finset.mem_univ first) hnotmem
+  · have hzero : ∀ deme ∈ (Finset.univ : Finset (Fin D)),
+        rates.coalescence deme *
+          (if first = deme ∧ second = deme then
+            -(twoLocusRightHJet first second).value state else 0) = 0 := by
+      intro deme _
+      have hcondition : ¬(first = deme ∧ second = deme) := by
+        rintro ⟨hleft, hright⟩
+        exact hpair (hleft.trans hright.symm)
+      rw [if_neg hcondition, mul_zero]
+    rw [Finset.sum_eq_zero hzero]
+    simp only [lowOrderLDDrift, if_neg hpair]
+
+/-- The migration block of the row is the corpus migration channel: each lineage sitting in
+the recipient deme is replaced by the source deme's lineage. -/
+theorem migrationBlock_rightHeterozygosity {D : ℕ} (rates : ManyDemeLDRates D)
+    (first second : Fin D) (state : DemeHaplotypeState D) :
+    (∑ source, ∑ recipient,
+        stageDrift rates (rightHeterozygosityStageExpansion first second)
+          (.migration source recipient) state) =
+      lowOrderLDMigration rates
+        (rightHeterozygosityMoment (enlargedLowOrderLDFeature state)) (.H first second) := by
+  have hterm : ∀ source recipient : Fin D,
+      stageDrift rates (rightHeterozygosityStageExpansion first second)
+          (.migration source recipient) state =
+        (if first = recipient then
+          rates.migration recipient source *
+            ((twoLocusRightHJet source second).value state -
+              (twoLocusRightHJet first second).value state) else 0) +
+        (if second = recipient then
+          rates.migration recipient source *
+            ((twoLocusRightHJet first source).value state -
+              (twoLocusRightHJet first second).value state) else 0) := by
+    intro source recipient
+    simp only [stageDrift, stageRate, stageVelocity, rightHeterozygosityStageExpansion,
+      migrationRightHeterozygosity_velocity]
+    by_cases hfirst : first = recipient <;> by_cases hsecond : second = recipient <;>
+      simp [hfirst, hsecond] <;> ring
+  have hinner : ∀ source : Fin D,
+      (∑ recipient, stageDrift rates (rightHeterozygosityStageExpansion first second)
+          (.migration source recipient) state) =
+        rates.migration first source *
+            ((twoLocusRightHJet source second).value state -
+              (twoLocusRightHJet first second).value state) +
+          rates.migration second source *
+            ((twoLocusRightHJet first source).value state -
+              (twoLocusRightHJet first second).value state) := by
+    intro source
+    rw [Finset.sum_congr rfl (fun recipient _ ↦ hterm source recipient),
+      Finset.sum_add_distrib, Finset.sum_ite_eq, Finset.sum_ite_eq]
+    simp
+  rw [Finset.sum_congr rfl (fun source _ ↦ hinner source), Finset.sum_add_distrib]
+  simp only [lowOrderLDMigration, rightHeterozygosityMoment_heterozygosity]
+
+/-- The recombination block of the row vanishes, matching the corpus's zero recombination row
+at a heterozygosity: a recombination pulse moves no marginal allele frequency. -/
+theorem recombinationBlock_rightHeterozygosity {D : ℕ} (rates : ManyDemeLDRates D)
+    (first second : Fin D) (state : DemeHaplotypeState D) :
+    (∑ deme, stageDrift rates (rightHeterozygosityStageExpansion first second)
+        (.recombination deme) state) =
+      lowOrderLDRecombination rates
+        (rightHeterozygosityMoment (enlargedLowOrderLDFeature state)) (.H first second) := by
+  have hzero : ∀ deme ∈ (Finset.univ : Finset (Fin D)),
+      stageDrift rates (rightHeterozygosityStageExpansion first second)
+        (.recombination deme) state = 0 := by
+    intro deme _
+    simp only [stageDrift, stageVelocity, rightHeterozygosityStageExpansion,
+      recombinationRightHeterozygosity_velocity, mul_zero]
+  rw [Finset.sum_eq_zero hzero]
+  simp only [lowOrderLDRecombination]
+
+/-- The left-locus mutation block of the row vanishes, matching the corpus's zero mutation
+coupling row at a heterozygosity.  This is the asymmetry NOTE 1 (6) is about: the right-locus
+family is not driven by the left-locus mutation stage. -/
+theorem leftMutationBlock_rightHeterozygosity {D : ℕ} (rates : ManyDemeLDRates D)
+    (first second : Fin D) (state : DemeHaplotypeState D) :
+    (∑ deme, stageDrift rates (rightHeterozygosityStageExpansion first second)
+        (.mutationLeft deme) state) =
+      lowOrderLDMutationCoupling rates
+        (rightHeterozygosityMoment (enlargedLowOrderLDFeature state)) (.H first second) := by
+  have hzero : ∀ deme ∈ (Finset.univ : Finset (Fin D)),
+      stageDrift rates (rightHeterozygosityStageExpansion first second)
+        (.mutationLeft deme) state = 0 := by
+    intro deme _
+    simp only [stageDrift, stageVelocity, rightHeterozygosityStageExpansion,
+      leftMutationRightHeterozygosity_velocity, mul_zero]
+  rw [Finset.sum_eq_zero hzero]
+  simp only [lowOrderLDMutationCoupling]
+
+/-- The right-locus mutation block of the row carries both affine mutation terms: the
+recurrent damping and the constant influx.  Their sum is the exact contrast-decay velocity
+`(theta_first + theta_second) * (1/2 - H^R)`. -/
+theorem rightMutationBlock_rightHeterozygosity {D : ℕ} (rates : ManyDemeLDRates D)
+    (first second : Fin D) (state : DemeHaplotypeState D) :
+    (∑ deme, stageDrift rates (rightHeterozygosityStageExpansion first second)
+        (.mutationRight deme) state) =
+      lowOrderLDRecurrentMutationDamping rates
+          (rightHeterozygosityMoment (enlargedLowOrderLDFeature state)) (.H first second) +
+        lowOrderLDMutationForcing rates (.H first second) *
+          enlargedLowOrderLDFeature state none := by
+  have hterm : ∀ deme : Fin D,
+      stageDrift rates (rightHeterozygosityStageExpansion first second)
+          (.mutationRight deme) state =
+        (if first = deme then
+          rates.mutation deme *
+            (1 / 2 - twoLocusRightHeterozygosity (state first) (state second)) else 0) +
+        (if second = deme then
+          rates.mutation deme *
+            (1 / 2 - twoLocusRightHeterozygosity (state first) (state second)) else 0) := by
+    intro deme
+    simp only [stageDrift, stageRate, stageVelocity, rightHeterozygosityStageExpansion,
+      rightMutationRightHeterozygosity_velocity]
+    by_cases hfirst : first = deme <;> by_cases hsecond : second = deme <;>
+      simp [hfirst, hsecond] <;> ring
+  rw [Finset.sum_congr rfl (fun deme _ ↦ hterm deme), Finset.sum_add_distrib,
+    Finset.sum_ite_eq, Finset.sum_ite_eq]
+  simp only [Finset.mem_univ, if_true, lowOrderLDRecurrentMutationDamping,
+    lowOrderLDMutationForcing, enlargedLowOrderLDFeature,
+    rightHeterozygosityMoment_heterozygosity, twoLocusRightHJet_value]
+  ring
+
+/-- **The right-locus heterozygosity row of the enlarged generator is the sum of its stage
+velocities.**  Adding the five rate-weighted stage velocities of `twoLocusRightHJet` over the
+stage index reproduces exactly the enlarged generator applied to the enlarged feature vector
+at that coordinate.  This is the row the stored corpus generator does not carry, and the one
+NOTE 1 (6) adds; with it, the `H^R` block of a `MicroscopicApproximation` of
+`enlargedLowOrderLDGenerator` is available from `apply_uniformStageMixture`. -/
+theorem stageSum_rightHeterozygosity {D : ℕ} (rates : ManyDemeLDRates D)
+    (first second : Fin D) (state : DemeHaplotypeState D) :
+    (∑ stage : Stage D,
+        stageDrift rates (rightHeterozygosityStageExpansion first second) stage state) =
+      (enlargedLowOrderLDGenerator rates).mulVec (enlargedLowOrderLDFeature state)
+        (some (.inr (first, second))) := by
+  rw [sum_stage, enlargedGenerator_mulVec_rightHeterozygosity]
+  simp only [lowOrderLDHomogeneousGenerator, driftBlock_rightHeterozygosity,
+    migrationBlock_rightHeterozygosity, recombinationBlock_rightHeterozygosity,
+    leftMutationBlock_rightHeterozygosity, rightMutationBlock_rightHeterozygosity]
+  ring
+
 end
 
 end Descent.Portability.EnlargedGeneratorBridges
