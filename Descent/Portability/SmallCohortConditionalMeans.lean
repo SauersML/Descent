@@ -112,23 +112,41 @@ theorem censusOf_index (n : ℕ) (index : ℕ × ℕ × ℕ) :
     (censusOf n index (false, false), censusOf n index (false, true),
       censusOf n index (true, false)) = index := rfl
 
+/-- The multinomial mass of a census of a cohort of size `n`, in the `n!/(a! b! c! d!)` form of
+NOTE1 (37). -/
+noncomputable def censusWeight (law : FiniteReportLaw (Bool × Bool)) (n : ℕ)
+    (census : Bool × Bool → ℕ) : ℝ :=
+  (Nat.factorial n : ℝ) /
+      ((Nat.factorial (census (false, false)) : ℝ) * (Nat.factorial (census (false, true)) : ℝ) *
+        (Nat.factorial (census (true, false)) : ℝ) * (Nat.factorial (census (true, true)) : ℝ)) *
+    (law.mass (false, false) ^ census (false, false) *
+      law.mass (false, true) ^ census (false, true) *
+      law.mass (true, false) ^ census (true, false) * law.mass (true, true) ^ census (true, true))
+
+/-- The census weight is the corpus multinomial mass of the census. -/
+theorem multinomialLaw_mass_eq_censusWeight (law : FiniteReportLaw (Bool × Bool)) (n : ℕ)
+    (census : Counts (Bool × Bool) n) :
+    (multinomialLaw law n).mass census = censusWeight law n census.val :=
+  fourCell_census_mass law n census
+
 /-- NOTE1 (37) as an explicit finite sum: the expectation of a census report of an independent
 cohort of size `n` is the multinomial-weighted sum of the report over the census vectors, each
 indexed by its first three cell counts. -/
 theorem cohort_expectation_censusIndex (law : FiniteReportLaw (Bool × Bool)) (n : ℕ)
     (report : (Bool × Bool → ℕ) → ℝ) :
     (cohortLaw law n).expectation (fun sample ↦ report (cellCount sample)) =
-      ∑ index ∈ censusIndex n, (Nat.multinomial Finset.univ (censusOf n index) : ℝ) *
-        (∏ cell, law.mass cell ^ censusOf n index cell) * report (censusOf n index) := by
+      ∑ index ∈ censusIndex n, censusWeight law n (censusOf n index) *
+        report (censusOf n index) := by
   calc (cohortLaw law n).expectation (fun sample ↦ report (cellCount sample))
       = (multinomialLaw law n).expectation (fun census ↦ report census.val) :=
         cohortReport_expectation law n fun census ↦ report census.val
+    _ = ∑ census : Counts (Bool × Bool) n, censusWeight law n census.val * report census.val :=
+        Finset.sum_congr rfl fun census _ ↦ by
+          simp only [multinomialLaw_mass_eq_censusWeight]
     _ = ∑ census ∈ Finset.piAntidiag (Finset.univ : Finset (Bool × Bool)) n,
-          (Nat.multinomial Finset.univ census : ℝ) * (∏ cell, law.mass cell ^ census cell) *
-            report census :=
+          censusWeight law n census * report census :=
         Finset.sum_coe_sort (Finset.piAntidiag Finset.univ n) fun census ↦
-          (Nat.multinomial Finset.univ census : ℝ) * (∏ cell, law.mass cell ^ census cell) *
-            report census
+          censusWeight law n census * report census
     _ = _ :=
         Finset.sum_nbij'
           (fun census ↦ (census (false, false), census (false, true), census (true, false)))
@@ -151,13 +169,13 @@ theorem cohortCorrelation_mul_definedIndicator_eq {n : ℕ} (sample : Fin n → 
 
 /-- The census polynomial of the definedness-weighted empirical squared correlation of a cohort
 of three, in the cell masses `w, x, y, z = P₀₀, P₀₁, P₁₀, P₁₁`. -/
-def cohortCorrelationThree (w x y z : ℝ) : ℝ :=
+noncomputable def cohortCorrelationThree (w x y z : ℝ) : ℝ :=
   3 * w * z * (w + z) + 3 * x * y * (x + y) +
     3 / 2 * (w * x * z + w * y * z + w * x * y + x * y * z)
 
 /-- The census polynomial of the definedness-weighted empirical squared correlation of a cohort
 of four, in the cell masses `w, x, y, z = P₀₀, P₀₁, P₁₀, P₁₁`. -/
-def cohortCorrelationFour (w x y z : ℝ) : ℝ :=
+noncomputable def cohortCorrelationFour (w x y z : ℝ) : ℝ :=
   6 * (w ^ 2 * z ^ 2 + x ^ 2 * y ^ 2) + 4 * (w ^ 3 * z + w * z ^ 3 + x ^ 3 * y + x * y ^ 3) +
     4 * (w ^ 2 * y * z + w ^ 2 * x * z + w * y * z ^ 2 + w * x * z ^ 2) +
     4 * (x ^ 2 * y * z + x * y ^ 2 * z + w * x ^ 2 * y + w * x * y ^ 2) +
@@ -175,10 +193,8 @@ theorem expectation_cohortCorrelation_three (law : FiniteReportLaw (Bool × Bool
       (cohortLaw law 3).expectation (fun sample ↦ censusCorrelation (cellCount sample)) := rfl
   rw [hcensus, cohort_expectation_censusIndex]
   simp only [censusIndex, Finset.sum_filter, Finset.sum_product, Finset.sum_range_succ,
-    Finset.sum_range_zero]
-  norm_num [censusOf, tableCounts, censusCorrelation, empiricalR2, Defined, Nat.multinomial,
-    Fintype.sum_prod_type, Fintype.prod_prod_type, Fintype.sum_bool, Fintype.prod_bool,
-    Nat.factorial, cohortCorrelationThree]
+    Finset.sum_range_zero, censusOf, tableCounts, censusWeight, censusCorrelation]
+  norm_num [empiricalR2, Defined, Nat.factorial, cohortCorrelationThree]
   ring
 
 /-- The definedness-weighted empirical squared correlation of an independent cohort of four,
@@ -193,10 +209,8 @@ theorem expectation_cohortCorrelation_four (law : FiniteReportLaw (Bool × Bool)
       (cohortLaw law 4).expectation (fun sample ↦ censusCorrelation (cellCount sample)) := rfl
   rw [hcensus, cohort_expectation_censusIndex]
   simp only [censusIndex, Finset.sum_filter, Finset.sum_product, Finset.sum_range_succ,
-    Finset.sum_range_zero]
-  norm_num [censusOf, tableCounts, censusCorrelation, empiricalR2, Defined, Nat.multinomial,
-    Fintype.sum_prod_type, Fintype.prod_prod_type, Fintype.sum_bool, Fintype.prod_bool,
-    Nat.factorial, cohortCorrelationFour]
+    Finset.sum_range_zero, censusOf, tableCounts, censusWeight, censusCorrelation]
+  norm_num [empiricalR2, Defined, Nat.factorial, cohortCorrelationFour]
   ring
 
 /-- The numerator of NOTE1 (41): at `p = 1/2` the definedness-weighted empirical squared
