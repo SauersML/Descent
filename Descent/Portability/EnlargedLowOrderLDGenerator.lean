@@ -432,14 +432,16 @@ private theorem drift_add {D : ℕ} (rates : ManyDemeLDRates D)
     (first second : LowOrderLDCoordinate D → ℝ) (row : LowOrderLDCoordinate D) :
     lowOrderLDDrift rates (first + second) row =
       lowOrderLDDrift rates first row + lowOrderLDDrift rates second row := by
-  cases row <;> simp only [lowOrderLDDrift, Pi.add_apply] <;> split_ifs <;> ring
+  cases row <;>
+    simp only [lowOrderLDDrift, Pi.add_apply, ite_add_ite] <;> split_ifs <;> ring
 
 /-- The drift row is homogeneous in the moment vector. -/
 private theorem drift_smul {D : ℕ} (rates : ManyDemeLDRates D) (scalar : ℝ)
     (moment : LowOrderLDCoordinate D → ℝ) (row : LowOrderLDCoordinate D) :
     lowOrderLDDrift rates (scalar • moment) row =
       scalar * lowOrderLDDrift rates moment row := by
-  cases row <;> simp only [lowOrderLDDrift, Pi.smul_apply, smul_eq_mul] <;>
+  cases row <;>
+    simp only [lowOrderLDDrift, Pi.smul_apply, smul_eq_mul, mul_ite, mul_zero] <;>
     split_ifs <;> ring
 
 /-- The migration row is additive in the moment vector. -/
@@ -457,9 +459,11 @@ private theorem migration_smul {D : ℕ} (rates : ManyDemeLDRates D) (scalar : �
     lowOrderLDMigration rates (scalar • moment) row =
       scalar * lowOrderLDMigration rates moment row := by
   cases row <;>
-    simp only [lowOrderLDMigration, Pi.smul_apply, smul_eq_mul, mul_add, mul_sub, add_div,
-      sub_div, mul_div_assoc, Finset.mul_sum, Finset.sum_add_distrib,
-      Finset.sum_sub_distrib, mul_comm, mul_left_comm, mul_assoc] <;> ring
+    simp only [lowOrderLDMigration, Pi.smul_apply, smul_eq_mul, mul_add, Finset.mul_sum]
+  all_goals
+    repeat' first
+      | exact Finset.sum_congr rfl fun _ _ ↦ by ring
+      | congr 1
 
 /-- The recombination row is additive in the moment vector. -/
 private theorem recombination_add {D : ℕ} (rates : ManyDemeLDRates D)
@@ -680,8 +684,8 @@ theorem enlargedGenerator_mulVec_rightHeterozygosity {D : ℕ} (rates : ManyDeme
       (fun coordinate ↦ lowOrderLDHomogeneousGenerator rates (lowOrderLDBasis coordinate)
         (.H first second) * rightHeterozygosityMoment vector coordinate) ?_).symm
     intro coordinate hcoordinate
-    rw [homogeneousGenerator_heterozygosity_row_of_other rates first second coordinate
-      hcoordinate, zero_mul]
+    exact mul_eq_zero_of_left (homogeneousGenerator_heterozygosity_row_of_other rates first
+      second coordinate hcoordinate) _
   simp only [hentry, hstored, hconstant, zero_mul, Finset.sum_const_zero, zero_add]
   rw [hkey]
   ring

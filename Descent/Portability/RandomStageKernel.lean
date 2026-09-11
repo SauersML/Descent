@@ -32,16 +32,19 @@ does.  This is hypothesis (3) of NOTE 1 Theorem 1 for the drift generator, with 
 `epsilon`.
 
 `apply_uniformStageMixture` is the generic assembly lemma, stated for an arbitrary carrier.
-Given stage kernels each of which expands to first order in its own step size with its own
-slack, the uniform mixture run at `card S * step` expands to first order in `step` with
-velocity the SUM of the stage velocities and slack the sum of the stage slacks.  This is the
-"choose one stage uniformly at random" device of NOTE 1 section 2.3: it delivers the sum of
-the generators with no composition lemma.
+Given stage kernels each of which moves an observable by `card S * step` times its own
+velocity up to `card S * step` times its own slack, the uniform mixture expands to first order
+in `step` with velocity the SUM of the stage velocities and slack the sum of the stage slacks.
+This is the "choose one stage uniformly at random" device of NOTE 1 section 2.3: it delivers
+the sum of the generators with no composition lemma.  The per-stage hypothesis is demanded
+only at the state and the step size actually used, so stage kernels that clamp their parameter
+and stage-specific rates are both handled by the caller.
 
 Scope.  Only the drift stage is instantiated here; migration, recombination and mutation
-stages are deterministic and belong to the pulse package, which can feed them into
-`apply_uniformStageMixture` through the same interface.  Nothing here forms a semigroup or
-takes a limit; Theorem 1's Euler passage is separate.  Multinomial resampling, NOTE 1 (10),
+stages are deterministic and belong to the pulse package, which feeds them into
+`apply_uniformStageMixture` through the same interface, folding its rates into the velocity
+and discharging its clamp at the single step size the lemma asks about.  Nothing here forms a
+semigroup or takes a limit; Theorem 1's Euler passage is separate.  Multinomial resampling, NOTE 1 (10),
 is still not formalized: the single-draw alternative is used throughout.
 
 ## Empirical status
@@ -269,49 +272,46 @@ theorem apply_driftStageKernel_expansion {D : ℕ} {jet : TwoLocusDiffusionJet D
   refine le_trans (abs_add_le _ _) ?_
   linarith
 
-/-- **The random-stage assembly.**  If each stage kernel, run at its own step size, moves an
-observable by that step size times its velocity up to that step size times its slack, then
-choosing one of the `card S` stages uniformly at random and running it at `card S * step`
-moves the observable by `step` times the SUM of the velocities, up to `step` times the sum of
-the slacks.  No composition lemma is needed: this is the device NOTE 1 section 2.3 offers in
-place of composing the stages. -/
+/-- **The random-stage assembly.**  If each of the `card S` stage kernels moves an observable
+by `card S * step` times its own velocity, up to `card S * step` times its own slack, then
+choosing one stage uniformly at random moves the observable by `step` times the SUM of the
+velocities, up to `step` times the sum of the slacks.  No composition lemma is needed: this is
+the device NOTE 1 section 2.3 offers in place of composing the stages.
+
+The stage kernels are taken already instantiated, and the hypothesis is required only at the
+state and the step size actually used.  A caller whose stage kernels clamp their parameter
+therefore supplies it only where it can, and a caller carrying per-stage rates `r s` folds the
+rate into `velocity`, so that the conclusion reads `step * sum over s of r s * v s`. -/
 theorem apply_uniformStageMixture {B X S : Type*} [Fintype B] [Fintype S]
-    (stage : S → ℝ → FiniteMixtureKernel B X) (velocity : S → X → ℝ)
-    (slack : S → ℝ → ℝ) (hcard : 0 < Fintype.card S) (observable : X → ℝ) (point : X)
-    (step : ℝ) (hstep : 0 < step)
-    (stage_expansion : ∀ s : S, ∀ scale : ℝ, 0 < scale → ∀ other : X,
-      |(stage s scale).apply observable other - observable other -
-        scale * velocity s other| ≤ scale * slack s scale) :
-    |(FiniteMixtureKernel.uniformMixture
-            (fun s ↦ stage s ((Fintype.card S : ℝ) * step)) hcard).apply
-          observable point - observable point - step * ∑ s, velocity s point| ≤
-      step * ∑ s, slack s ((Fintype.card S : ℝ) * step) := by
+    (stage : S → FiniteMixtureKernel B X) (velocity : S → X → ℝ) (slack : S → ℝ)
+    (hcard : 0 < Fintype.card S) (observable : X → ℝ) (point : X) (step : ℝ)
+    (stage_expansion : ∀ s : S,
+      |(stage s).apply observable point - observable point -
+        (Fintype.card S : ℝ) * step * velocity s point| ≤
+        (Fintype.card S : ℝ) * step * slack s) :
+    |(FiniteMixtureKernel.uniformMixture stage hcard).apply observable point -
+        observable point - step * ∑ s, velocity s point| ≤ step * ∑ s, slack s := by
   have hcardpos : (0 : ℝ) < (Fintype.card S : ℝ) := by exact_mod_cast hcard
   have hcardne : (Fintype.card S : ℝ) ≠ 0 := ne_of_gt hcardpos
-  have hscale : (0 : ℝ) < (Fintype.card S : ℝ) * step := mul_pos hcardpos hstep
   have hcancel : (Fintype.card S : ℝ) * (Fintype.card S : ℝ)⁻¹ = 1 :=
     mul_inv_cancel₀ hcardne
   have hsumbound : |∑ s : S,
-      ((stage s ((Fintype.card S : ℝ) * step)).apply observable point - observable point -
+      ((stage s).apply observable point - observable point -
         (Fintype.card S : ℝ) * step * velocity s point)| ≤
-      ∑ s : S, (Fintype.card S : ℝ) * step *
-        slack s ((Fintype.card S : ℝ) * step) :=
+      ∑ s : S, (Fintype.card S : ℝ) * step * slack s :=
     le_trans (Finset.abs_sum_le_sum_abs _ _)
-      (Finset.sum_le_sum (fun s _ ↦ stage_expansion s _ hscale point))
+      (Finset.sum_le_sum (fun s _ ↦ stage_expansion s))
   have hsplit : ∑ s : S,
-      ((stage s ((Fintype.card S : ℝ) * step)).apply observable point - observable point -
+      ((stage s).apply observable point - observable point -
         (Fintype.card S : ℝ) * step * velocity s point) =
       (Fintype.card S : ℝ) * ((Fintype.card S : ℝ)⁻¹ *
-          ∑ s : S, (stage s ((Fintype.card S : ℝ) * step)).apply observable point -
+          ∑ s : S, (stage s).apply observable point -
         observable point - step * ∑ s : S, velocity s point) := by
     rw [Finset.sum_sub_distrib, Finset.sum_sub_distrib, Finset.sum_const,
       ← Finset.mul_sum, Finset.card_univ, nsmul_eq_mul]
-    linear_combination (-(∑ s : S,
-      (stage s ((Fintype.card S : ℝ) * step)).apply observable point)) * hcancel
-  have hslacksum : ∑ s : S, (Fintype.card S : ℝ) * step *
-      slack s ((Fintype.card S : ℝ) * step) =
-      (Fintype.card S : ℝ) *
-        (step * ∑ s : S, slack s ((Fintype.card S : ℝ) * step)) := by
+    linear_combination (-(∑ s : S, (stage s).apply observable point)) * hcancel
+  have hslacksum : ∑ s : S, (Fintype.card S : ℝ) * step * slack s =
+      (Fintype.card S : ℝ) * (step * ∑ s : S, slack s) := by
     rw [← Finset.mul_sum]
     ring
   rw [hsplit, hslacksum, abs_mul, abs_of_pos hcardpos] at hsumbound
