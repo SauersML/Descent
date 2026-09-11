@@ -23,8 +23,9 @@ equality condition, `q = H` precisely when the centered regression function is a
 nonzero multiple of the centered score in the almost-everywhere sense a positive linear
 functional supports.
 
-Builds on `Foundations.variance`, `Foundations.covariance`, `Foundations.cauchy_schwarz`,
-`Foundations.explainableFraction` and `IndividualLossMoments.total_variance`.
+Builds on `Foundations.variance`, `Foundations.covariance`,
+`Foundations.ExpFunctional.cauchy_schwarz`, `Foundations.explainableFraction` and
+`IndividualLossMoments.total_variance`.
 -/
 
 set_option autoImplicit false
@@ -115,7 +116,7 @@ theorem variance_nonneg (E : ExpFunctional G) (f : G → ℝ) : 0 ≤ variance E
 /-- Cauchy-Schwarz in covariance form, on the centered observables. -/
 theorem covariance_sq_le (E : ExpFunctional G) (f h : G → ℝ) :
     covariance E f h ^ 2 ≤ variance E f * variance E h :=
-  cauchy_schwarz E (fun γ ↦ f γ - E f) (fun γ ↦ h γ - E h)
+  ExpFunctional.cauchy_schwarz E (fun γ ↦ f γ - E f) (fun γ ↦ h γ - E h)
 
 /-- The mean square of the alignment defect, expanded in the second moments. -/
 theorem alignment_defect_expand (E : ExpFunctional G) (S g : G → ℝ) (lam : ℝ) :
@@ -180,7 +181,6 @@ theorem alignment_factorisation (E : ExpFunctional G) (K : G → ExpFunctional �
     · rw [hY]
       simp
     · field_simp
-      ring
 
 /-- The genotype-explained fraction is nonnegative. -/
 theorem genotypeExplainedFraction_nonneg (E : ExpFunctional G) (K : G → ExpFunctional Ω)
@@ -275,8 +275,10 @@ theorem alignment_equality_iff (E : ExpFunctional G) (K : G → ExpFunctional Ω
     refine ⟨covariance E S (regressionFunction K Y) / variance E S, ?_, ?_⟩
     · have hc : covariance E S (regressionFunction K Y) ≠ 0 := by
         intro hc0
-        rw [hc0] at heq
-        rcases mul_eq_zero.mp heq.symm with h | h
+        have hz : variance E S * variance E (regressionFunction K Y) = 0 := by
+          rw [← heq, hc0]
+          ring
+        rcases mul_eq_zero.mp hz with h | h
         · exact hS h
         · exact hg h
       exact div_ne_zero hc hupos.ne'
@@ -284,10 +286,10 @@ theorem alignment_equality_iff (E : ExpFunctional G) (K : G → ExpFunctional Ω
       field_simp
       nlinarith [heq]
   · rintro ⟨lam, hlam, hzero⟩
-    have hS2 := cauchy_schwarz E (fun γ ↦ S γ - E S)
+    have hS2 := ExpFunctional.cauchy_schwarz E (fun γ ↦ S γ - E S)
       (fun γ ↦ (regressionFunction K Y γ - E (regressionFunction K Y))
         - lam * (S γ - E S))
-    have hg2 := cauchy_schwarz E
+    have hg2 := ExpFunctional.cauchy_schwarz E
       (fun γ ↦ regressionFunction K Y γ - E (regressionFunction K Y))
       (fun γ ↦ (regressionFunction K Y γ - E (regressionFunction K Y))
         - lam * (S γ - E S))
