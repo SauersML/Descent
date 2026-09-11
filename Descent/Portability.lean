@@ -327,6 +327,8 @@ import Descent.Portability.ArchaicPrediction.Transport
 import Descent.Portability.GaussianImageMoments
 import Descent.Portability.HWEJumpMoments
 import Descent.Portability.ConvolutionPolynomialMoments
+import Descent.Portability.MarkSumMoments
+import Descent.Portability.PoissonMomentSeries
 assert_below Descent.Program
 
 /-!

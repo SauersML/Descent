@@ -38893,6 +38893,9 @@
    "Descent.Portability.BinaryRiskCohort.logisticCalibrationObjective_nonneg",
    "Descent.Portability.BinaryRiskCohort.strictConvexOn_logisticCalibrationObjective",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
+   "Descent.Portability.BoundedConvolutionMoments.add_power_integrable",
+   "Descent.Portability.BoundedConvolutionMoments.convolution_power_integrable",
+   "Descent.Portability.BoundedConvolutionMoments.convolution_power_integral",
    "Descent.Portability.BoxPolynomialExtensionLaw.tensorQuadratic_contDiff",
    "Descent.Portability.CalibrationLaw.calibratedIntercept_continuous",
    "Descent.Portability.CalibrationLaw.expectation_continuous",
@@ -38922,6 +38925,8 @@
    "Descent.Portability.CompensatedCharacteristicKernel.quadratic_identity",
    "Descent.Portability.ComplexArrayPowerLimit.power_limit",
    "Descent.Portability.ComplexBernoulliProduct.bernoulli_product_limit",
+   "Descent.Portability.CompoundPoissonIntegrability.compound_fourth_integrable",
+   "Descent.Portability.CompoundPoissonIntegrability.power_integrable_of_fourth",
    "Descent.Portability.ConditionalErrorCertificate.accepted_overlap_lower",
    "Descent.Portability.ConditionalErrorCertificate.conditional_bound_of_le",
    "Descent.Portability.ConditionalErrorCertificate.conditional_mean_interval",
@@ -40255,6 +40260,9 @@
     "Descent.Portability.estimation_variance_decreases_with_n": [],
     "Descent.Portability.global_shrinkage_controls_sparsity": [],
     "Descent.Portability.ct_r2_le_prs_cs_r2_of_assumed_noise_ordering": [],
+    "Descent.Portability.BoundedConvolutionMoments.add_power_integrable": [],
+    "Descent.Portability.BoundedConvolutionMoments.convolution_power_integrable": [],
+    "Descent.Portability.BoundedConvolutionMoments.convolution_power_integral": [],
     "Descent.Portability.BoxPolynomialExtensionLaw.tensorQuadratic_contDiff": [],
     "Descent.Portability.CalibrationLaw.normalCDF_strictMono": [],
     "Descent.Portability.CalibrationLaw.gaussian_labelMass_pos": [],
@@ -40297,6 +40305,8 @@
     "Descent.Portability.CompensatedCharacteristicKernel.quadratic_identity": [],
     "Descent.Portability.ComplexArrayPowerLimit.power_limit": [],
     "Descent.Portability.ComplexBernoulliProduct.bernoulli_product_limit": [],
+    "Descent.Portability.CompoundPoissonIntegrability.power_integrable_of_fourth": [],
+    "Descent.Portability.CompoundPoissonIntegrability.compound_fourth_integrable": [],
     "Descent.Portability.ConditionalErrorCertificate.eventMass_nonneg": [],
     "Descent.Portability.ConditionalErrorCertificate.eventMass_le_one": [],
     "Descent.Portability.ConditionalErrorCertificate.accepted_overlap_lower": [],
@@ -46717,6 +46727,7 @@
    "Descent.Portability.CalibrationLaw.standardize_coordinate_continuous",
    "Descent.Portability.CompensatedCharacteristicKernel.continuous_value",
    "Descent.Portability.ComplexBernoulliProduct.bernoulli_product_limit",
+   "Descent.Portability.CompoundPoissonIntegrability.power_integrable_of_fourth",
    "Descent.Portability.CrossCoordinateRigidityLaw.closed_field_foreign_quadratic",
    "Descent.Portability.CrossCoordinateRigidityLaw.cross_derivative_interpolation",
    "Descent.Portability.DiploidBoxCompatibilityLaw.potential_separately_quadratic",
@@ -46731,6 +46742,7 @@
    "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit",
    "Descent.Portability.HWELogCoordinates.coordinate_derivative",
    "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable",
+   "Descent.Portability.PoissonMomentSeries.poisson_quadratic",
    "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero",
    "Descent.Portability.RademacherJointLimit.joint_observable_limit",
    "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit",
@@ -46788,6 +46800,7 @@
     "Descent.Portability.CalibrationLaw.calibrated_caseProbability_measurable": [],
     "Descent.Portability.CompensatedCharacteristicKernel.continuous_value": [],
     "Descent.Portability.ComplexBernoulliProduct.bernoulli_product_limit": [],
+    "Descent.Portability.CompoundPoissonIntegrability.power_integrable_of_fourth": [],
     "Descent.Portability.FactorsThroughObservation.add": [
      "FactorsThroughObservation A D"
     ],
@@ -46808,6 +46821,7 @@
     "Descent.Portability.HWEAmplitudeMixture.amplitude_mixture_limit": [],
     "Descent.Portability.HWELogCoordinates.coordinate_derivative": [],
     "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable": [],
+    "Descent.Portability.PoissonMomentSeries.poisson_quadratic": [],
     "Descent.Portability.QuadraticRigidityLaw.quadratic_of_third_derivative_zero": [],
     "Descent.Portability.RademacherJointLimit.joint_observable_limit": [],
     "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit": [],
@@ -49425,6 +49439,9 @@
    "Descent.Portability.BinaryRiskCohort.logisticCalibrationObjective_nonneg",
    "Descent.Portability.BinaryRiskCohort.strictConvexOn_logisticCalibrationObjective",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
+   "Descent.Portability.BoundedConvolutionMoments.add_power_integrable",
+   "Descent.Portability.BoundedConvolutionMoments.convolution_power_integrable",
+   "Descent.Portability.BoundedConvolutionMoments.convolution_power_integral",
    "Descent.Portability.BoxPolynomialExtensionLaw.tensorQuadratic_contDiff",
    "Descent.Portability.CalibrationLaw.calibratedIntercept_continuous",
    "Descent.Portability.CalibrationLaw.expectation_continuous",
@@ -49454,6 +49471,8 @@
    "Descent.Portability.CompensatedCharacteristicKernel.quadratic_identity",
    "Descent.Portability.ComplexArrayPowerLimit.power_limit",
    "Descent.Portability.ComplexBernoulliProduct.bernoulli_product_limit",
+   "Descent.Portability.CompoundPoissonIntegrability.compound_fourth_integrable",
+   "Descent.Portability.CompoundPoissonIntegrability.power_integrable_of_fourth",
    "Descent.Portability.ConditionalErrorCertificate.accepted_overlap_lower",
    "Descent.Portability.ConditionalErrorCertificate.conditional_bound_of_le",
    "Descent.Portability.ConditionalErrorCertificate.conditional_mean_interval",
@@ -50761,6 +50780,9 @@
     "Descent.Portability.estimation_variance_decreases_with_n": [],
     "Descent.Portability.global_shrinkage_controls_sparsity": [],
     "Descent.Portability.ct_r2_le_prs_cs_r2_of_assumed_noise_ordering": [],
+    "Descent.Portability.BoundedConvolutionMoments.add_power_integrable": [],
+    "Descent.Portability.BoundedConvolutionMoments.convolution_power_integrable": [],
+    "Descent.Portability.BoundedConvolutionMoments.convolution_power_integral": [],
     "Descent.Portability.BoxPolynomialExtensionLaw.tensorQuadratic_contDiff": [],
     "Descent.Portability.CalibrationLaw.normalCDF_strictMono": [],
     "Descent.Portability.CalibrationLaw.gaussian_labelMass_pos": [],
@@ -50803,6 +50825,8 @@
     "Descent.Portability.CompensatedCharacteristicKernel.quadratic_identity": [],
     "Descent.Portability.ComplexArrayPowerLimit.power_limit": [],
     "Descent.Portability.ComplexBernoulliProduct.bernoulli_product_limit": [],
+    "Descent.Portability.CompoundPoissonIntegrability.power_integrable_of_fourth": [],
+    "Descent.Portability.CompoundPoissonIntegrability.compound_fourth_integrable": [],
     "Descent.Portability.ConditionalErrorCertificate.eventMass_nonneg": [],
     "Descent.Portability.ConditionalErrorCertificate.eventMass_le_one": [],
     "Descent.Portability.ConditionalErrorCertificate.accepted_overlap_lower": [],
@@ -56296,6 +56320,10 @@
    "Descent.Portability.InterleavedMutationLaw.count_unsupported",
    "Descent.Portability.InterleavedMutationLaw.zero_exposure_count",
    "Descent.Portability.InterleavedMutationMeasurability.count_mass_measurable",
+   "Descent.Portability.MarkSumMoments.markSum_fourth",
+   "Descent.Portability.MarkSumMoments.markSum_mean",
+   "Descent.Portability.MarkSumMoments.markSum_power_integrable",
+   "Descent.Portability.MarkSumMoments.markSum_second",
    "Descent.Portability.MarkedAncestralLaw.backward_eq_iterate",
    "Descent.Portability.MarkedAncestralLaw.traceMass_nonneg",
    "Descent.Portability.MarkedAncestralLaw.traceMass_sum",
@@ -56470,6 +56498,10 @@
     "Descent.Portability.InterleavedMutationLaw.zero_exposure_count": [],
     "Descent.Portability.InterleavedMutationLaw.count_absence": [],
     "Descent.Portability.InterleavedMutationMeasurability.count_mass_measurable": [],
+    "Descent.Portability.MarkSumMoments.markSum_power_integrable": [],
+    "Descent.Portability.MarkSumMoments.markSum_mean": [],
+    "Descent.Portability.MarkSumMoments.markSum_second": [],
+    "Descent.Portability.MarkSumMoments.markSum_fourth": [],
     "Descent.Portability.MarkedAncestralLaw.traceMass_nonneg": [],
     "Descent.Portability.MarkedAncestralLaw.traceMass_sum": [],
     "Descent.Portability.MarkedAncestralLaw.backward_eq_iterate": [],
@@ -69260,6 +69292,9 @@
    "Descent.Portability.BinaryRiskCohort.logisticCalibrationObjective_nonneg",
    "Descent.Portability.BinaryRiskCohort.strictConvexOn_logisticCalibrationObjective",
    "Descent.Portability.BinaryRiskCohort.strictMono_citlEquation",
+   "Descent.Portability.BoundedConvolutionMoments.add_power_integrable",
+   "Descent.Portability.BoundedConvolutionMoments.convolution_power_integrable",
+   "Descent.Portability.BoundedConvolutionMoments.convolution_power_integral",
    "Descent.Portability.BoxPolynomialExtensionLaw.tensorQuadratic_contDiff",
    "Descent.Portability.CalibrationLaw.calibratedIntercept_continuous",
    "Descent.Portability.CalibrationLaw.expectation_continuous",
@@ -69289,6 +69324,8 @@
    "Descent.Portability.CompensatedCharacteristicKernel.quadratic_identity",
    "Descent.Portability.ComplexArrayPowerLimit.power_limit",
    "Descent.Portability.ComplexBernoulliProduct.bernoulli_product_limit",
+   "Descent.Portability.CompoundPoissonIntegrability.compound_fourth_integrable",
+   "Descent.Portability.CompoundPoissonIntegrability.power_integrable_of_fourth",
    "Descent.Portability.ConditionalErrorCertificate.accepted_overlap_lower",
    "Descent.Portability.ConditionalErrorCertificate.conditional_bound_of_le",
    "Descent.Portability.ConditionalErrorCertificate.conditional_mean_interval",
@@ -70681,6 +70718,9 @@
     "Descent.Portability.estimation_variance_decreases_with_n": [],
     "Descent.Portability.global_shrinkage_controls_sparsity": [],
     "Descent.Portability.ct_r2_le_prs_cs_r2_of_assumed_noise_ordering": [],
+    "Descent.Portability.BoundedConvolutionMoments.add_power_integrable": [],
+    "Descent.Portability.BoundedConvolutionMoments.convolution_power_integrable": [],
+    "Descent.Portability.BoundedConvolutionMoments.convolution_power_integral": [],
     "Descent.Portability.BoxPolynomialExtensionLaw.tensorQuadratic_contDiff": [],
     "Descent.Portability.CalibrationLaw.normalCDF_strictMono": [],
     "Descent.Portability.CalibrationLaw.gaussian_labelMass_pos": [],
@@ -70723,6 +70763,8 @@
     "Descent.Portability.CompensatedCharacteristicKernel.quadratic_identity": [],
     "Descent.Portability.ComplexArrayPowerLimit.power_limit": [],
     "Descent.Portability.ComplexBernoulliProduct.bernoulli_product_limit": [],
+    "Descent.Portability.CompoundPoissonIntegrability.power_integrable_of_fourth": [],
+    "Descent.Portability.CompoundPoissonIntegrability.compound_fourth_integrable": [],
     "Descent.Portability.ConditionalErrorCertificate.eventMass_nonneg": [],
     "Descent.Portability.ConditionalErrorCertificate.eventMass_le_one": [],
     "Descent.Portability.ConditionalErrorCertificate.accepted_overlap_lower": [],
@@ -74665,6 +74707,7 @@
    "Descent.Portability.ArchaicPrediction.survivalNumerator_derivative",
    "Descent.Portability.ArchaicPrediction.survival_derivative",
    "Descent.Portability.BoxPolynomialExtensionLaw.tensorQuadratic_contDiff",
+   "Descent.Portability.CompoundPoissonIntegrability.integrable_measure_sum",
    "Descent.Portability.DiploidEffectFieldLaw.effectField_contDiff",
    "Descent.Portability.MutationChannelBridge.compiler_sum",
    "Descent.Portability.MutationChannelBridge.template_sum",
@@ -74766,6 +74809,7 @@
     "Descent.Portability.nri_positive_when_pgs_adds_value": [],
     "Descent.Portability.nri_decreases_with_portability_loss": [],
     "Descent.Portability.nri_can_be_negative": [],
+    "Descent.Portability.CompoundPoissonIntegrability.integrable_measure_sum": [],
     "Descent.Portability.DiploidEffectFieldLaw.effectField_contDiff": [],
     "Descent.Portability.total_portability_loss_at_reference_point": [],
     "Descent.Portability.apparent_portability_loss_eq_total_of_ideal": [],
@@ -80362,6 +80406,10 @@
    "Descent.Portability.InterleavedMutationLaw.count_unsupported",
    "Descent.Portability.InterleavedMutationLaw.zero_exposure_count",
    "Descent.Portability.InterleavedMutationMeasurability.count_mass_measurable",
+   "Descent.Portability.MarkSumMoments.markSum_fourth",
+   "Descent.Portability.MarkSumMoments.markSum_mean",
+   "Descent.Portability.MarkSumMoments.markSum_power_integrable",
+   "Descent.Portability.MarkSumMoments.markSum_second",
    "Descent.Portability.MarkedAncestralLaw.backward_eq_iterate",
    "Descent.Portability.MarkedAncestralLaw.traceMass_nonneg",
    "Descent.Portability.MarkedAncestralLaw.traceMass_sum",
@@ -80536,6 +80584,10 @@
     "Descent.Portability.InterleavedMutationLaw.zero_exposure_count": [],
     "Descent.Portability.InterleavedMutationLaw.count_absence": [],
     "Descent.Portability.InterleavedMutationMeasurability.count_mass_measurable": [],
+    "Descent.Portability.MarkSumMoments.markSum_power_integrable": [],
+    "Descent.Portability.MarkSumMoments.markSum_mean": [],
+    "Descent.Portability.MarkSumMoments.markSum_second": [],
+    "Descent.Portability.MarkSumMoments.markSum_fourth": [],
     "Descent.Portability.MarkedAncestralLaw.traceMass_nonneg": [],
     "Descent.Portability.MarkedAncestralLaw.traceMass_sum": [],
     "Descent.Portability.MarkedAncestralLaw.backward_eq_iterate": [],
@@ -94229,6 +94281,7 @@
    "Descent.Portability.ArchaicPrediction.survivalNumerator_derivative",
    "Descent.Portability.ArchaicPrediction.survival_derivative",
    "Descent.Portability.BoxPolynomialExtensionLaw.tensorQuadratic_contDiff",
+   "Descent.Portability.CompoundPoissonIntegrability.integrable_measure_sum",
    "Descent.Portability.DiploidEffectFieldLaw.effectField_contDiff",
    "Descent.Portability.MutationChannelBridge.compiler_sum",
    "Descent.Portability.MutationChannelBridge.template_sum",
@@ -94268,7 +94321,10 @@
   ],
   "constraints": {
    "hypotheses": [
-    "∀ s, 0 < f s"
+    "∀ s, 0 < f s",
+    "StronglyMeasurable f",
+    "∀ k, Integrable f (μ k",
+    "Summable (fun k ↦ ∫ x, ‖f x‖ ∂μ k"
    ],
    "hypotheses_by_theorem": {
     "Descent.Coalescent.neutralFixation_add_complement": [],
@@ -94331,6 +94387,11 @@
     "Descent.Portability.nri_positive_when_pgs_adds_value": [],
     "Descent.Portability.nri_decreases_with_portability_loss": [],
     "Descent.Portability.nri_can_be_negative": [],
+    "Descent.Portability.CompoundPoissonIntegrability.integrable_measure_sum": [
+     "StronglyMeasurable f",
+     "∀ k, Integrable f (μ k",
+     "Summable (fun k ↦ ∫ x, ‖f x‖ ∂μ k"
+    ],
     "Descent.Portability.DiploidEffectFieldLaw.effectField_contDiff": [],
     "Descent.Portability.total_portability_loss_at_reference_point": [],
     "Descent.Portability.apparent_portability_loss_eq_total_of_ideal": [],
@@ -133953,7 +134014,13 @@
   "mentioned_by": [
    "Descent.Portability.BalancedHWECompoundPoisson.finite_intensity_weak_convergence",
    "Descent.Portability.BalancedHWECompoundPoisson.integral_compoundMeasure",
-   "Descent.Portability.CompoundPoissonMarkLaw.charFun_compoundMeasure"
+   "Descent.Portability.CompoundPoissonIntegrability.compound_fourth_integrable",
+   "Descent.Portability.CompoundPoissonIntegrability.compound_power_integrable",
+   "Descent.Portability.CompoundPoissonMarkLaw.charFun_compoundMeasure",
+   "Descent.Portability.CompoundPoissonMoments.compound_fourth",
+   "Descent.Portability.CompoundPoissonMoments.compound_fourth_cumulant",
+   "Descent.Portability.CompoundPoissonMoments.compound_mean",
+   "Descent.Portability.CompoundPoissonMoments.compound_second"
   ],
   "constraints": {
    "hypotheses": [
@@ -133964,7 +134031,13 @@
     "Descent.Portability.BalancedHWECompoundPoisson.finite_intensity_weak_convergence": [
      "Tendsto a atTop (nhds b"
     ],
-    "Descent.Portability.CompoundPoissonMarkLaw.charFun_compoundMeasure": []
+    "Descent.Portability.CompoundPoissonIntegrability.compound_fourth_integrable": [],
+    "Descent.Portability.CompoundPoissonIntegrability.compound_power_integrable": [],
+    "Descent.Portability.CompoundPoissonMarkLaw.charFun_compoundMeasure": [],
+    "Descent.Portability.CompoundPoissonMoments.compound_mean": [],
+    "Descent.Portability.CompoundPoissonMoments.compound_second": [],
+    "Descent.Portability.CompoundPoissonMoments.compound_fourth": [],
+    "Descent.Portability.CompoundPoissonMoments.compound_fourth_cumulant": []
    }
   }
  },
@@ -140520,12 +140593,28 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
-   "Descent.Portability.CompoundPoissonMarkLaw.charFun_markSum"
+   "Descent.Portability.CompoundPoissonMarkLaw.charFun_markSum",
+   "Descent.Portability.MarkSumMoments.markSum_fourth",
+   "Descent.Portability.MarkSumMoments.markSum_mean",
+   "Descent.Portability.MarkSumMoments.markSum_power_integrable",
+   "Descent.Portability.MarkSumMoments.markSum_second"
   ],
   "constraints": {
-   "hypotheses": [],
+   "hypotheses": [
+    "(∫ x : ℝ, x ∂(μ : Measure ℝ"
+   ],
    "hypotheses_by_theorem": {
-    "Descent.Portability.CompoundPoissonMarkLaw.charFun_markSum": []
+    "Descent.Portability.CompoundPoissonMarkLaw.charFun_markSum": [],
+    "Descent.Portability.MarkSumMoments.markSum_power_integrable": [],
+    "Descent.Portability.MarkSumMoments.markSum_mean": [
+     "(∫ x : ℝ, x ∂(μ : Measure ℝ"
+    ],
+    "Descent.Portability.MarkSumMoments.markSum_second": [
+     "(∫ x : ℝ, x ∂(μ : Measure ℝ"
+    ],
+    "Descent.Portability.MarkSumMoments.markSum_fourth": [
+     "(∫ x : ℝ, x ∂(μ : Measure ℝ"
+    ]
    }
   }
  },
@@ -140546,17 +140635,43 @@
   "mentioned_by": [
    "Descent.Portability.BalancedHWECompoundPoisson.finite_intensity_weak_convergence",
    "Descent.Portability.BalancedHWECompoundPoisson.integral_compoundMeasure",
-   "Descent.Portability.CompoundPoissonMarkLaw.charFun_compoundMeasure"
+   "Descent.Portability.CompoundPoissonIntegrability.compound_fourth_integrable",
+   "Descent.Portability.CompoundPoissonIntegrability.compound_power_integrable",
+   "Descent.Portability.CompoundPoissonMarkLaw.charFun_compoundMeasure",
+   "Descent.Portability.CompoundPoissonMoments.compound_fourth",
+   "Descent.Portability.CompoundPoissonMoments.compound_fourth_cumulant",
+   "Descent.Portability.CompoundPoissonMoments.compound_mean",
+   "Descent.Portability.CompoundPoissonMoments.compound_second"
   ],
   "constraints": {
    "declared_kind": "probability",
    "declared_lo": 0.0,
    "declared_hi": 1.0,
-   "hypotheses": [],
+   "hypotheses": [
+    "(∫ x : ℝ, x ∂(μ : Measure ℝ"
+   ],
    "hypotheses_by_theorem": {
     "Descent.Portability.BalancedHWECompoundPoisson.integral_compoundMeasure": [],
     "Descent.Portability.BalancedHWECompoundPoisson.finite_intensity_weak_convergence": [],
-    "Descent.Portability.CompoundPoissonMarkLaw.charFun_compoundMeasure": []
+    "Descent.Portability.CompoundPoissonIntegrability.compound_fourth_integrable": [
+     "(∫ x : ℝ, x ∂(μ : Measure ℝ"
+    ],
+    "Descent.Portability.CompoundPoissonIntegrability.compound_power_integrable": [
+     "(∫ x : ℝ, x ∂(μ : Measure ℝ"
+    ],
+    "Descent.Portability.CompoundPoissonMarkLaw.charFun_compoundMeasure": [],
+    "Descent.Portability.CompoundPoissonMoments.compound_mean": [
+     "(∫ x : ℝ, x ∂(μ : Measure ℝ"
+    ],
+    "Descent.Portability.CompoundPoissonMoments.compound_second": [
+     "(∫ x : ℝ, x ∂(μ : Measure ℝ"
+    ],
+    "Descent.Portability.CompoundPoissonMoments.compound_fourth": [
+     "(∫ x : ℝ, x ∂(μ : Measure ℝ"
+    ],
+    "Descent.Portability.CompoundPoissonMoments.compound_fourth_cumulant": [
+     "(∫ x : ℝ, x ∂(μ : Measure ℝ"
+    ]
    }
   }
  },
