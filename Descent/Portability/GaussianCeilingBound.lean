@@ -105,10 +105,12 @@ theorem gaussianMomentLaw_moments (v : ℝ) (hv : 0 ≤ v) :
     rw [hx, sv]
   constructor
   · norm_num [gaussianMomentLaw, gaussianMomentValue, weightedExp_apply,
-      Fin.sum_univ_three, s3, sv]
+      Fin.sum_univ_three]
+    all_goals rw [s3, sv]
     all_goals ring
   · norm_num [gaussianMomentLaw, gaussianMomentValue, weightedExp_apply,
-      Fin.sum_univ_three, s3f, svf]
+      Fin.sum_univ_three]
+    all_goals rw [s3f, svf]
     all_goals ring
 
 /-- The mean of the maximizing two-valued variance profile. -/

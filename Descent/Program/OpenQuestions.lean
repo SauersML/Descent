@@ -1,6 +1,17 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.AuditCenteredObservations
+import Descent.Portability.BernsteinConfidence
+import Descent.Portability.BernsteinExponentialBound
+import Descent.Portability.BernsteinMomentBound
+import Descent.Portability.CounterfactualRegion
+import Descent.Portability.LossExplainabilityRegion
+import Descent.Portability.LossPredictorSynergy
+import Descent.Portability.MetricResponseEllipsoid
+import Descent.Portability.SourceFixedRealization
+import Descent.Portability.SymmetricScoreFourthMoment
+import Descent.Portability.TurnoverArchitectureMetrics
 import Descent.Portability.AngularSpectralBounds
 import Descent.Portability.BellmanReportBounds
 import Descent.Portability.FiniteGeneticTransition

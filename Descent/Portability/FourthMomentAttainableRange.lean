@@ -231,13 +231,16 @@ theorem rangeKernel_moments (b a g : Ω → ℝ) (hab : ∀ ω, b ω ^ 2 ≤ a �
     show θ * twoPointExp (b ω) (a ω) (hab ω) (fun t ↦ twoPointResidual (a ω) t ^ 2)
       + (1 - θ) * spreadExp ep (fun i ↦ (g ω + spreadOffset s i) ^ 2) = _
     rw [htp2, hsp2]
-  · rw [splitExp_apply hθ0 hθ1]
+  · show splitExp θ (twoPointExp (b ω) (a ω) (hab ω)) (spreadExp ep)
+      (fun ψ ↦ rangeResidual a g s (ω, ψ) ^ 4) = _
+    rw [splitExp_apply hθ0 hθ1]
     show θ * twoPointExp (b ω) (a ω) (hab ω) (fun t ↦ twoPointResidual (a ω) t ^ 4)
       + (1 - θ) * spreadExp ep (fun i ↦ (g ω + spreadOffset s i) ^ 4) = _
     rw [htp4, hsp4]
 
 /-! ## The lower half of the range -/
 
+omit [Fintype ι] [DecidableEq ι] in
 /-- The reduced objective values are bounded below by `m²`. -/
 theorem reducedValues_bddBelow (E : ExpFunctional Ω) (X : Ω → ι → ℝ) (β : ℝ) (k : ι → ℝ)
     (m : ℝ) : BddBelow (reducedValues E X β k m) := by
