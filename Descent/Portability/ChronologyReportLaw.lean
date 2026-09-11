@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.ExactMetricEvaluation
+import Descent.Portability.ReportFiniteCalibrationLaw
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Data.ENNReal.Real
 
@@ -59,8 +60,8 @@ namespace Descent.Portability.ChronologyReportLaw
 noncomputable section
 
 /-- The numeric value of one biallelic locus: one for the donor allele, zero for the
-recipient allele. -/
-def alleleValue (allele : Bool) : ℝ := if allele then 1 else 0
+recipient allele. It is the allele value `ReportFiniteCalibrationLaw.allele` of the corpus. -/
+def alleleValue (allele : Bool) : ℝ := ReportFiniteCalibrationLaw.allele allele
 
 /-- The recipient allele contributes nothing. -/
 @[simp] theorem alleleValue_false : alleleValue false = 0 := rfl

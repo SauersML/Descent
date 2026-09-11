@@ -31,3 +31,4 @@ open Descent.Portability.ExposureLaplaceConstraints
   Descent.Portability.ExposureLaplaceConstraints.exposureMass_eq_of_exposureLaplace_natCast_eq
 #print axioms
   Descent.Portability.ExposureLaplaceConstraints.exposureMass_eq_of_exposureLaplace_eq
+#print axioms Descent.Portability.ExposureLaplaceConstraints.endpointExposure_natCast

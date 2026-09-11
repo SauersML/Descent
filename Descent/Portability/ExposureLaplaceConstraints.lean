@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.BinomialAggregateEnvelope
 import Descent.Portability.ChronologyReportLaw
 import Mathlib.Algebra.Group.Nat.Hom
 import Mathlib.Analysis.SpecialFunctions.ExpDeriv
@@ -223,6 +224,15 @@ theorem exposureLaplace_endpointMixture (bound mean lam : ℝ) (hlow : 0 ≤ mea
   unfold exposureLaplace FiniteReportLaw.expectation endpointMixture endpointExposure
   rw [Fin.sum_univ_two]
   simp
+
+/-- At an integer recombination total `n` the endpoint exposures are the aligned-locus counts of
+the synchronous coupling in `BinomialAggregateEnvelope`, read as reals: both are the
+all-or-nothing vector `(0, n)`. -/
+theorem endpointExposure_natCast (count : ℕ) :
+    endpointExposure (count : ℝ) =
+      fun index ↦ (BinomialAggregateEnvelope.syncCount count index : ℝ) := by
+  funext index
+  fin_cases index <;> simp [endpointExposure, BinomialAggregateEnvelope.syncCount]
 
 /-- NOTE1 (35): every iterated derivative of the transform is the corresponding exposure
 moment, with the sign of `(-1)^k`. -/
