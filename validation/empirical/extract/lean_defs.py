@@ -4193,6 +4193,9 @@ def Descent_Portability_HWEHeterozygosityLaw_count(x):
 def Descent_Portability_HWEHeterozygosityLaw_probability(h):
     return (4.0 * _rt.lpow(((_rt._proj(h, 'altFreq') - _rt.rdiv(1.0, 2.0))), 2.0))
 
+def seriesTerm(κ, α, C, t, r):
+    return ((poissonPMFReal(((4.0 * Descent_Portability_HWEFixedLayerInputs_energy(κ))), r)) * limitingKernel(κ, α, C, r, t))
+
 def layerAmplitude(h, m, r, c, b):
     return ((((c * _rt.lpow(_rt._proj(standardizedGenotype(h), 'het'), r)) * _rt.lpow(_rt.rsqrt(2.0), ((m - r)))) * parity(b)) * _rt.rexp(((-weightedSum(((lambda _: Descent_Portability_HWELogCoordinates_coordinate(((_rt._proj(h, 'altFreq') - _rt.rdiv(1.0, 2.0)))))), b)))))
 

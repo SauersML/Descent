@@ -352,6 +352,9 @@ import Descent.Portability.HWEActualLayerKernel
 import Descent.Portability.HWEFixedLayerInputs
 import Descent.Portability.HWEFixedLayerKernelLimit
 import Descent.Portability.FiniteCountTail
+import Descent.Portability.HWEKernelTruncation
+import Descent.Portability.CountTailConvergence
+import Descent.Portability.HWEHierarchyGenerator
 assert_below Descent.Program
 
 /-!
