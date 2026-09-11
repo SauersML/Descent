@@ -94,10 +94,14 @@ theorem thetaLaw_mass (θ : ℝ) (h0 : 0 ≤ θ) (h1 : θ ≤ 1) (cell : Bool ×
     (thetaLaw θ h0 h1).mass cell = thetaMass θ cell := rfl
 
 /-- The binary score read as a real number. -/
-def scoreValue (cell : Bool × Bool) : ℝ := if cell.1 then 1 else 0
+def scoreValue : Bool × Bool → ℝ
+  | (false, _) => 0
+  | (true, _) => 1
 
 /-- The binary outcome read as a real number. -/
-def outcomeValue (cell : Bool × Bool) : ℝ := if cell.2 then 1 else 0
+def outcomeValue : Bool × Bool → ℝ
+  | (_, false) => 0
+  | (_, true) => 1
 
 /-- Exact evaluation of the architecture law on an arbitrary statistic. -/
 theorem thetaExp_apply (θ : ℝ) (h0 : 0 ≤ θ) (h1 : θ ≤ 1) (statistic : Bool × Bool → ℝ) :
@@ -112,28 +116,27 @@ theorem thetaExp_mean_score (θ : ℝ) (h0 : 0 ≤ θ) (h1 : θ ≤ 1) :
     thetaExp θ h0 h1 scoreValue = 1 / 2 := by
   rw [thetaExp_apply]
   simp only [scoreValue]
-  norm_num
+  ring
 
 /-- The outcome has mean `θ/2`. -/
 theorem thetaExp_mean_outcome (θ : ℝ) (h0 : 0 ≤ θ) (h1 : θ ≤ 1) :
     thetaExp θ h0 h1 outcomeValue = θ / 2 := by
   rw [thetaExp_apply]
   simp only [outcomeValue]
-  norm_num
+  ring
 
 /-- The score has variance one quarter. -/
 theorem thetaExp_variance_score (θ : ℝ) (h0 : 0 ≤ θ) (h1 : θ ≤ 1) :
     variance (thetaExp θ h0 h1) scoreValue = 1 / 4 := by
   rw [variance, thetaExp_mean_score, thetaExp_apply]
   simp only [scoreValue]
-  norm_num
+  ring
 
 /-- The outcome has variance `θ(2−θ)/4`. -/
 theorem thetaExp_variance_outcome (θ : ℝ) (h0 : 0 ≤ θ) (h1 : θ ≤ 1) :
     variance (thetaExp θ h0 h1) outcomeValue = θ * (2 - θ) / 4 := by
   rw [variance, thetaExp_mean_outcome, thetaExp_apply]
   simp only [outcomeValue]
-  norm_num
   ring
 
 /-- Score and outcome have covariance `θ/4`. -/
@@ -141,7 +144,6 @@ theorem thetaExp_covariance (θ : ℝ) (h0 : 0 ≤ θ) (h1 : θ ≤ 1) :
     covariance (thetaExp θ h0 h1) scoreValue outcomeValue = θ / 4 := by
   rw [covariance, thetaExp_mean_score, thetaExp_mean_outcome, thetaExp_apply]
   simp only [scoreValue, outcomeValue]
-  norm_num
   ring
 
 /-- **NOTE2 (13).** The population squared correlation of the family of NOTE2 (12) is
@@ -155,7 +157,6 @@ theorem thetaExp_squared_correlation (θ : ℝ) (h0 : 0 < θ) (h1 : θ ≤ 1) :
   have hne : θ ≠ 0 := ne_of_gt h0
   have h2 : (2 : ℝ) - θ ≠ 0 := by intro hc; linarith
   field_simp
-  ring
 
 /-- The population squared correlation of NOTE2 (13) as a function of the parameter. -/
 def thetaReport (θ : ℝ) : ℝ := θ / (2 - θ)
@@ -221,7 +222,7 @@ theorem cohortMass_eq_piLaw_mass (θ : ℝ) (h0 : 0 ≤ θ) (h1 : θ ≤ 1) {n :
     (outcome : Fin n → Bool × Bool) :
     cohortMass θ outcome =
       (FiniteGeneticTransition.piLaw fun _ : Fin n ↦ thetaLaw θ h0 h1).mass outcome :=
-  (FiniteGeneticTransition.piLaw_mass _ outcome).symm
+  (FiniteGeneticTransition.piLaw_mass (fun _ : Fin n ↦ thetaLaw θ h0 h1) outcome).symm
 
 /-- **NOTE2 §4.1, cohort indistinguishability.** The two moment-matched parity laws of
 `MomentOrderObstruction` assign the same probability to every size-`n` cohort outcome, for
@@ -292,7 +293,6 @@ theorem fwdDiff_iter_reciprocal (c step : ℝ) :
       intro hc
       apply h
       push_cast
-      push_cast at hc
       linarith
     have hca : c - a ≠ 0 := by
       have h := hne 0 (Finset.mem_range.mpr (Nat.succ_pos _))
@@ -455,21 +455,35 @@ laws report expected population squared correlations `13/35` and `1/3`. -/
 theorem parity_thetaReport_values_one :
     parityExp 1 false (fun j ↦ thetaReport (nodeBase + (j : ℕ) * nodeStep 1)) = 13 / 35 ∧
       parityExp 1 true (fun j ↦ thetaReport (nodeBase + (j : ℕ) * nodeStep 1)) = 1 / 3 := by
+  have hstep : nodeStep 1 = 1 / 4 := by norm_num [nodeStep]
+  have w0 : alternatingWeight 1 0 = 1 / 2 := by norm_num [alternatingWeight]
+  have w1 : alternatingWeight 1 1 = -1 := by norm_num [alternatingWeight]
+  have w2 : alternatingWeight 1 2 = 1 / 2 := by norm_num [alternatingWeight]
+  have a0 : |(1 / 2 : ℝ)| = 1 / 2 := abs_of_nonneg (by norm_num)
+  have a1 : |(-1 : ℝ)| = 1 := by rw [abs_neg, abs_one]
+  have hv0 : thetaReport (nodeBase + (0 : ℝ) * nodeStep 1) = 1 / 7 := by
+    norm_num [thetaReport, nodeBase, hstep]
+  have hv1 : thetaReport (nodeBase + (1 : ℝ) * nodeStep 1) = 1 / 3 := by
+    norm_num [thetaReport, nodeBase, hstep]
+  have hv2 : thetaReport (nodeBase + (2 : ℝ) * nodeStep 1) = 3 / 5 := by
+    norm_num [thetaReport, nodeBase, hstep]
   have key : ∀ s : Bool,
       parityExp 1 s (fun j ↦ thetaReport (nodeBase + (j : ℕ) * nodeStep 1)) =
-        ∑ j ∈ Finset.range 3,
-          parityMass 1 s j * thetaReport (nodeBase + (j : ℝ) * nodeStep 1) := by
+        parityMass 1 s 0 * thetaReport (nodeBase + (0 : ℝ) * nodeStep 1) +
+          parityMass 1 s 1 * thetaReport (nodeBase + (1 : ℝ) * nodeStep 1) +
+          parityMass 1 s 2 * thetaReport (nodeBase + (2 : ℝ) * nodeStep 1) := by
     intro s
     simp only [parityExp, weightedExp_apply]
-    exact Fin.sum_univ_eq_sum_range
-      (fun j ↦ parityMass 1 s j * thetaReport (nodeBase + (j : ℝ) * nodeStep 1)) 3
-  constructor
-  · rw [key false]
-    norm_num [Finset.sum_range_succ, parityMass, alternatingWeight, thetaReport, nodeBase,
-      nodeStep]
-  · rw [key true]
-    norm_num [Finset.sum_range_succ, parityMass, alternatingWeight, thetaReport, nodeBase,
-      nodeStep]
+    rw [Fin.sum_univ_eq_sum_range
+      (fun j ↦ parityMass 1 s j * thetaReport (nodeBase + (j : ℝ) * nodeStep 1)) 3,
+      Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_succ,
+      Finset.sum_range_zero]
+    norm_num
+  refine ⟨?_, ?_⟩
+  · rw [key false, hv0, hv1, hv2]
+    norm_num [parityMass, w0, w1, w2, a0, a1]
+  · rw [key true, hv0, hv1, hv2]
+    norm_num [parityMass, w0, w1, w2, a0, a1]
 
 /-- The `n = 1` gap of NOTE2 §4.1 is exactly `4/105`. -/
 theorem parity_thetaReport_gap_one :
@@ -483,44 +497,34 @@ theorem parity_thetaReport_gap_one :
 
 /-- **NOTE2 §4.1, sign mixture.** The pooled law of the two sign studies is their equal
 mixture: on every statistic the uncorrelated four-point law is the average of the perfectly
-positively and perfectly negatively correlated ones. -/
+positively and the perfectly negatively correlated ones. -/
 theorem signPair_pooled_is_average (statistic : Bool × Bool → ℝ) :
-    SquaredCorrelationZeroTest.signPairLaw 0 (by norm_num) statistic =
-      (SquaredCorrelationZeroTest.signPairLaw 1 (by norm_num) statistic +
-        SquaredCorrelationZeroTest.signPairLaw (-1) (by norm_num) statistic) / 2 := by
+    SquaredCorrelationZeroTest.signPairLaw 0 (by norm_num [abs_le]) statistic =
+      (SquaredCorrelationZeroTest.signPairLaw 1 (by norm_num [abs_le]) statistic +
+        SquaredCorrelationZeroTest.signPairLaw (-1) (by norm_num [abs_le]) statistic) / 2 := by
   rw [SquaredCorrelationZeroTest.signPairLaw_apply,
     SquaredCorrelationZeroTest.signPairLaw_apply,
     SquaredCorrelationZeroTest.signPairLaw_apply]
   ring
 
-/-- **NOTE2 §4.1, sign mixture, reports.** Each study has population squared correlation
-one, while the pooled law has population squared correlation zero. -/
-theorem signPair_pooled_reports :
-    (covariance (SquaredCorrelationZeroTest.signPairLaw 1 (by norm_num))
-          SquaredCorrelationZeroTest.scoreVar SquaredCorrelationZeroTest.outcomeVar ^ 2 /
-        (variance (SquaredCorrelationZeroTest.signPairLaw 1 (by norm_num))
-            SquaredCorrelationZeroTest.scoreVar *
-          variance (SquaredCorrelationZeroTest.signPairLaw 1 (by norm_num))
-            SquaredCorrelationZeroTest.outcomeVar) = 1) ∧
-      (covariance (SquaredCorrelationZeroTest.signPairLaw (-1) (by norm_num))
-            SquaredCorrelationZeroTest.scoreVar SquaredCorrelationZeroTest.outcomeVar ^ 2 /
-          (variance (SquaredCorrelationZeroTest.signPairLaw (-1) (by norm_num))
-              SquaredCorrelationZeroTest.scoreVar *
-            variance (SquaredCorrelationZeroTest.signPairLaw (-1) (by norm_num))
-              SquaredCorrelationZeroTest.outcomeVar) = 1) ∧
-      (covariance (SquaredCorrelationZeroTest.signPairLaw 0 (by norm_num))
-            SquaredCorrelationZeroTest.scoreVar SquaredCorrelationZeroTest.outcomeVar ^ 2 /
-          (variance (SquaredCorrelationZeroTest.signPairLaw 0 (by norm_num))
-              SquaredCorrelationZeroTest.scoreVar *
-            variance (SquaredCorrelationZeroTest.signPairLaw 0 (by norm_num))
-              SquaredCorrelationZeroTest.outcomeVar) = 0) := by
-  refine ⟨?_, ?_, ?_⟩
-  · rw [SquaredCorrelationZeroTest.signPairLaw_squared_correlation]
-    norm_num
-  · rw [SquaredCorrelationZeroTest.signPairLaw_squared_correlation]
-    norm_num
-  · rw [SquaredCorrelationZeroTest.signPairLaw_squared_correlation]
-    norm_num
+/-- The population squared correlation of a sign-pair study with prescribed correlation. -/
+def signReport (corr : ℝ) (hcorr : |corr| ≤ 1) : ℝ :=
+  covariance (SquaredCorrelationZeroTest.signPairLaw corr hcorr)
+      SquaredCorrelationZeroTest.scoreVar SquaredCorrelationZeroTest.outcomeVar ^ 2 /
+    (variance (SquaredCorrelationZeroTest.signPairLaw corr hcorr)
+        SquaredCorrelationZeroTest.scoreVar *
+      variance (SquaredCorrelationZeroTest.signPairLaw corr hcorr)
+        SquaredCorrelationZeroTest.outcomeVar)
+
+/-- **NOTE2 §4.1, sign mixture, reports.** Each of the two studies has population squared
+correlation one while the pooled law of `signPair_pooled_is_average` has population squared
+correlation zero. -/
+theorem signReport_pooled_values :
+    signReport 1 (by norm_num [abs_le]) = 1 ∧ signReport (-1) (by norm_num [abs_le]) = 1 ∧
+      signReport 0 (by norm_num [abs_le]) = 0 := by
+  refine ⟨?_, ?_, ?_⟩ <;>
+    simp only [signReport,
+      SquaredCorrelationZeroTest.signPairLaw_squared_correlation] <;> norm_num
 
 end
 
