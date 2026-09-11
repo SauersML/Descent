@@ -30,12 +30,17 @@ weight `wₖ`, so the exposure law recovered from the pulses is the one we start
 pulse acts on the donor coordinate of the ordered-event recursion of `AdmixtureChronologyLaw`
 exactly by advancing `A_k` to `A_{k+1}`.
 
-Not formalised: the interleaving itself. The recombination blocks that separate consecutive
-pulses carry the exposure gaps `b_k - b_{k+1}` of the sorted support, and the claim that the
-resulting three-way bookkeeping attributes exposure `b_k` to the material of pulse `k` needs
-the sorted support as data; every identity proved here is independent of the ordering, so the
-ordering enters only that unformalised attribution step. Nothing here identifies an exposure
-law from data.
+The interleaved history itself is built here too. `pulseHistory` alternates each pulse with
+the recombination block that separates it from the next, taking the exposure gaps as data; its
+migration totals sum to `-log(1 - p)`, its recombination totals sum to the gaps, and running it
+through the ordered-event recursion drives the donor fraction from zero to exactly `p`.
+
+Not formalised: the attribution step. That the gaps are `b_k - b_{k+1}` of a support sorted by
+decreasing remaining exposure, and that the resulting bookkeeping therefore charges exposure
+`b_k` to the material of pulse `k`, needs the sorted support as data and an argument about
+which recombination blocks each pulse's material still meets. Every identity proved here is
+independent of the ordering, so the ordering enters only there. Nothing here identifies an
+exposure law from data.
 
 ## Empirical status
 
@@ -221,6 +226,25 @@ theorem increment_div_donor (donor : ℝ) (weight : ℕ → ℝ) (hdonor : donor
       weight index := by
   rw [cumulativeMass_succ_sub, mul_comm, mul_div_assoc, div_self hdonor, mul_one]
 
+/-- Assumes: the donor coordinate has already reached the `k`-th cumulative increment. One
+pulse then advances it to the next, whatever linkage the state carries. -/
+theorem fst_stepEvent_migration_pulse (donor : ℝ) (weight : ℕ → ℝ)
+    (hweight : ∀ i, 0 ≤ weight i) (hdonor : 0 ≤ donor) (hlt : donor < 1) (total index : ℕ)
+    (hle : index + 1 ≤ total)
+    (hsum : ∑ component ∈ Finset.range total, weight component = 1) (state : ℝ × ℝ)
+    (hstate : state.1 = cumulativeMass donor weight index) :
+    (stepEvent (ChronologyEvent.migration (pulseMigration donor weight index)) state).1 =
+      cumulativeMass donor weight (index + 1) := by
+  have hprev : index ≤ total := Nat.le_of_succ_le hle
+  have hpos := one_sub_cumulativeMass_pos donor weight hweight hdonor hlt total index
+    hprev hsum
+  have hne : (1 : ℝ) - cumulativeMass donor weight index ≠ 0 := ne_of_gt hpos
+  simp only [stepEvent_migration]
+  rw [hstate, exp_neg_pulseMigration donor weight hweight hdonor hlt total index hle hsum]
+  unfold pulseFraction
+  field_simp
+  ring
+
 /-- One pulse advances the donor coordinate of the ordered-event recursion from one cumulative
 increment to the next, so the pulse history is a chronology in the sense of
 `AdmixtureChronologyLaw`. -/
@@ -229,16 +253,94 @@ theorem stepEvent_migration_pulse (donor : ℝ) (weight : ℕ → ℝ) (hweight 
     (hsum : ∑ component ∈ Finset.range total, weight component = 1) (linkage : ℝ) :
     (stepEvent (ChronologyEvent.migration (pulseMigration donor weight index))
         (cumulativeMass donor weight index, linkage)).1 =
-      cumulativeMass donor weight (index + 1) := by
-  have hprev : index ≤ total := Nat.le_of_succ_le hle
-  have hpos := one_sub_cumulativeMass_pos donor weight hweight hdonor hlt total index
-    hprev hsum
-  have hne : (1 : ℝ) - cumulativeMass donor weight index ≠ 0 := ne_of_gt hpos
-  simp only [stepEvent_migration]
-  rw [exp_neg_pulseMigration donor weight hweight hdonor hlt total index hle hsum]
-  unfold pulseFraction
-  field_simp
-  ring
+      cumulativeMass donor weight (index + 1) :=
+  fst_stepEvent_migration_pulse donor weight hweight hdonor hlt total index hle hsum
+    (cumulativeMass donor weight index, linkage) rfl
+
+/-- The interleaved history: each pulse followed by the recombination block that separates it
+from the next pulse, with the exposure gaps supplied as data. -/
+def pulseHistory (donor : ℝ) (weight gap : ℕ → ℝ) : ℕ → List ChronologyEvent
+  | 0 => []
+  | count + 1 =>
+      pulseHistory donor weight gap count ++
+        [ChronologyEvent.migration (pulseMigration donor weight count),
+          ChronologyEvent.recombination (gap count)]
+
+/-- An empty history has no events. -/
+@[simp] theorem pulseHistory_zero (donor : ℝ) (weight gap : ℕ → ℝ) :
+    pulseHistory donor weight gap 0 = [] := rfl
+
+/-- One more pulse appends its migration block and its trailing recombination block. -/
+theorem pulseHistory_succ (donor : ℝ) (weight gap : ℕ → ℝ) (count : ℕ) :
+    pulseHistory donor weight gap (count + 1) =
+      pulseHistory donor weight gap count ++
+        [ChronologyEvent.migration (pulseMigration donor weight count),
+          ChronologyEvent.recombination (gap count)] := rfl
+
+/-- Running a concatenated history is running its two halves in order. -/
+theorem runEvents_append (first second : List ChronologyEvent) (state : ℝ × ℝ) :
+    runEvents (first ++ second) state = runEvents second (runEvents first state) := by
+  unfold runEvents
+  rw [List.foldl_append]
+
+/-- The interleaved history drives the donor fraction along the cumulative increments, so
+after all `n` pulses it is exactly the target donor fraction. -/
+theorem fst_runEvents_pulseHistory (donor : ℝ) (weight gap : ℕ → ℝ)
+    (hweight : ∀ i, 0 ≤ weight i) (hdonor : 0 ≤ donor) (hlt : donor < 1) (total : ℕ)
+    (hsum : ∑ component ∈ Finset.range total, weight component = 1) :
+    ∀ count ≤ total,
+      (runEvents (pulseHistory donor weight gap count) (0, 0)).1 =
+        cumulativeMass donor weight count := by
+  intro count
+  induction count with
+  | zero =>
+    intro _
+    simp [runEvents]
+  | succ count ih =>
+    intro hle
+    have hprev : count ≤ total := Nat.le_of_succ_le hle
+    rw [pulseHistory_succ, runEvents_append]
+    simp only [runEvents_cons, runEvents_nil, stepEvent_recombination]
+    exact fst_stepEvent_migration_pulse donor weight hweight hdonor hlt total count hle hsum
+      _ (ih hprev)
+
+/-- The interleaved history delivers exactly the target donor fraction. -/
+theorem fst_runEvents_pulseHistory_total (donor : ℝ) (weight gap : ℕ → ℝ)
+    (hweight : ∀ i, 0 ≤ weight i) (hdonor : 0 ≤ donor) (hlt : donor < 1) (total : ℕ)
+    (hsum : ∑ component ∈ Finset.range total, weight component = 1) :
+    (runEvents (pulseHistory donor weight gap total) (0, 0)).1 = donor := by
+  rw [fst_runEvents_pulseHistory donor weight gap hweight hdonor hlt total hsum total le_rfl]
+  unfold cumulativeMass
+  rw [hsum, mul_one]
+
+/-- The migration totals of the interleaved history are the pulse migration totals. -/
+theorem migrationTotal_pulseHistory (donor : ℝ) (weight gap : ℕ → ℝ) (count : ℕ) :
+    ((pulseHistory donor weight gap count).map eventMigration).sum =
+      ∑ index ∈ Finset.range count, pulseMigration donor weight index := by
+  induction count with
+  | zero => simp
+  | succ count ih =>
+    rw [pulseHistory_succ, List.map_append, List.sum_append, ih, Finset.sum_range_succ]
+    simp [eventMigration]
+
+/-- The recombination totals of the interleaved history are the supplied exposure gaps. -/
+theorem recombinationTotal_pulseHistory (donor : ℝ) (weight gap : ℕ → ℝ) (count : ℕ) :
+    ((pulseHistory donor weight gap count).map eventRecombination).sum =
+      ∑ index ∈ Finset.range count, gap index := by
+  induction count with
+  | zero => simp
+  | succ count ih =>
+    rw [pulseHistory_succ, List.map_append, List.sum_append, ih, Finset.sum_range_succ]
+    simp [eventRecombination]
+
+/-- NOTE1 section 6.3: the interleaved history has migration total exactly `-log(1 - p)`. -/
+theorem migrationTotal_pulseHistory_total (donor : ℝ) (weight gap : ℕ → ℝ)
+    (hweight : ∀ i, 0 ≤ weight i) (hdonor : 0 ≤ donor) (hlt : donor < 1) (total : ℕ)
+    (hsum : ∑ component ∈ Finset.range total, weight component = 1) :
+    ((pulseHistory donor weight gap total).map eventMigration).sum =
+      -Real.log (1 - donor) := by
+  rw [migrationTotal_pulseHistory,
+    sum_pulseMigration donor weight hweight hdonor hlt total hsum]
 
 end
 

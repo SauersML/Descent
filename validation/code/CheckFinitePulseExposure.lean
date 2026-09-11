@@ -20,3 +20,10 @@ open Descent.Portability.FinitePulseExposure
   Descent.Portability.FinitePulseExposure.recipientFraction_mul_pulseFraction
 #print axioms Descent.Portability.FinitePulseExposure.increment_div_donor
 #print axioms Descent.Portability.FinitePulseExposure.stepEvent_migration_pulse
+#print axioms Descent.Portability.FinitePulseExposure.fst_stepEvent_migration_pulse
+#print axioms Descent.Portability.FinitePulseExposure.runEvents_append
+#print axioms Descent.Portability.FinitePulseExposure.fst_runEvents_pulseHistory
+#print axioms Descent.Portability.FinitePulseExposure.fst_runEvents_pulseHistory_total
+#print axioms Descent.Portability.FinitePulseExposure.migrationTotal_pulseHistory
+#print axioms Descent.Portability.FinitePulseExposure.recombinationTotal_pulseHistory
+#print axioms Descent.Portability.FinitePulseExposure.migrationTotal_pulseHistory_total
