@@ -30,11 +30,22 @@ Theorem 1 consumes.  It carries ONE hypothesis, stated explicitly and never hidd
 existential: that the rate-weighted stage velocities sum to the enlarged generator applied to
 the feature vector, coordinate by coordinate.  That identification is the remaining
 mathematical content of NOTE1 equation (11), and it is a finite list of per-stage,
-per-coordinate identities rather than an analytic statement.  Four of them are proved in
-`PulseJetExpansion` (the two heterozygosity migration rows, the `DD` recombination row and the
-heterozygosity mutation row) and the drift stage's whole contribution is the corpus's own
-`twoLocusWeightedJetDrift_*_eq_lowOrderLDDrift` family; the rest are not yet formalized, and
-until they are the hypothesis is what a caller must supply.
+per-coordinate polynomial identities rather than an analytic statement.
+
+Three of its coordinate families are discharged here, and the discharges are the substance of
+the second half of this file.  `stage_generator_constant` settles the affine coordinate,
+`stage_generator_leftHeterozygosity` the stored `H` coordinates and
+`stage_generator_rightHeterozygosity` the `H^R` coordinates that NOTE1 equation (6) adds, each
+by matching all five stage families against the corresponding corpus row: the drift family
+against `twoLocusWeightedJetDrift_*_eq_lowOrderLDDrift`, the migration family against
+`lowOrderLDMigration`, the recombination family against the vanishing `lowOrderLDRecombination`
+heterozygosity row, and the two mutation families against the complete affine mutation row
+made of `lowOrderLDMutationCoupling`, `lowOrderLDRecurrentMutationDamping` and
+`lowOrderLDMutationForcing`.  The `DD`, `Dz` and `pi2` coordinates are NOT discharged: their
+drift and recombination stage sums are proved (`driftStage_sum_stored`,
+`recombinationStage_sum_stored`), but the migration and mutation velocity computations for
+those three families are not formalized, so for them the hypothesis is what a caller must
+supply.
 
 Scope.  `microscopicError` is a sum of per-coordinate, per-stage slacks and is therefore a
 crude but explicit bound; no attempt is made to make it sharp.  Multinomial resampling, NOTE1
@@ -310,6 +321,18 @@ private theorem sum_rate_indicator {D : ℕ} (weight : Fin D → ℝ) (target : 
     ∑ deme : Fin D, weight deme * (if target = deme then (1 : ℝ) else 0) = weight target := by
   classical
   simp
+
+/-- The rate-weighted stage velocity written out. -/
+private theorem stageDrift_eq {D : ℕ} {jet : TwoLocusDiffusionJet D}
+    (rates : ManyDemeLDRates D) (certificate : StageExpansion jet) (stage : Stage D)
+    (state : DemeHaplotypeState D) :
+    stageDrift rates certificate stage state =
+      stageRate rates stage * stageVelocity certificate stage state := rfl
+
+/-- The stored block of the enlarged feature vector is the corpus moment vector. -/
+private theorem enlargedFeature_stored {D : ℕ} (state : DemeHaplotypeState D) :
+    (fun coordinate ↦ enlargedLowOrderLDFeature state (some (.inl coordinate))) =
+      twoLocusJetMoment state := rfl
 
 /-! ## The drift stage reproduces the corpus coalescence row -/
 
@@ -700,6 +723,86 @@ theorem recombinationStage_sum_rightHeterozygosity {D : ℕ} (rates : ManyDemeLD
         ((recombinationCoordinateExpansion deme).rightHeterozygosity first second).velocity
           state := fun _ ↦ rfl
   simp [hvelocity, recombinationRightHeterozygosity_velocity]
+
+/-! ## The generator identification on the heterozygosity coordinates -/
+
+/-- The affine constant coordinate is moved by no stage, matching the enlarged generator's
+identically zero constant row. -/
+theorem stage_generator_constant {D : ℕ} (rates : ManyDemeLDRates D)
+    (state : DemeHaplotypeState D) :
+    (enlargedLowOrderLDGenerator rates).mulVec (enlargedLowOrderLDFeature state) none =
+      ∑ stage : Stage D,
+        stageDrift rates (enlargedStageExpansion (none : AffineEnlargedCoordinate D)) stage
+          state := by
+  have hrow : ∀ column : AffineEnlargedCoordinate D,
+      enlargedLowOrderLDGenerator rates none column = 0 := fun _ ↦ rfl
+  have hleft : (enlargedLowOrderLDGenerator rates).mulVec (enlargedLowOrderLDFeature state)
+      none = 0 := by
+    show ∑ column : AffineEnlargedCoordinate D,
+      enlargedLowOrderLDGenerator rates none column *
+        enlargedLowOrderLDFeature state column = 0
+    simp [hrow]
+  have hright : ∀ stage : Stage D,
+      stageDrift rates (enlargedStageExpansion (none : AffineEnlargedCoordinate D)) stage
+        state = 0 := by
+    intro stage
+    cases stage <;>
+      simp [stageDrift, stageVelocity, enlargedStageExpansion, constantStageExpansion,
+        enlargedCoordinateJet, TwoLocusDiffusionJet.const, PulseExpansion.const]
+  simp [hleft, hright]
+
+/-- **The stage velocities reproduce the enlarged generator on the stored heterozygosity
+coordinate.**  Drift, migration, recombination and the two mutation families each match the
+corresponding corpus row, and the `pi2` right-heterozygosity redirection does not reach this
+row. -/
+theorem stage_generator_leftHeterozygosity {D : ℕ} (rates : ManyDemeLDRates D)
+    (first second : Fin D) (state : DemeHaplotypeState D) :
+    (enlargedLowOrderLDGenerator rates).mulVec (enlargedLowOrderLDFeature state)
+        (some (.inl (.H first second))) =
+      ∑ stage : Stage D,
+        stageDrift rates (enlargedStageExpansion (some (.inl (.H first second)))) stage
+          state := by
+  classical
+  have hredirect : ∀ pair : Fin D × Fin D,
+      rightHeterozygosityMutationCoupling rates
+          (LowOrderLDCoordinate.H first second) pair.1 pair.2 *
+        (enlargedLowOrderLDFeature state (some (.inr pair)) -
+          enlargedLowOrderLDFeature state (some (.inl (.H pair.1 pair.2)))) = 0 := by
+    intro pair
+    simp [rightHeterozygosityMutationCoupling]
+  have hmutation := mutationStage_sum_leftHeterozygosity rates first second state
+  rw [enlargedGenerator_mulVec_stored, sum_stage]
+  simp only [stageDrift_eq, hredirect, Finset.sum_const_zero, add_zero,
+    enlargedFeature_stored, lowOrderLDHomogeneousGenerator]
+  rw [driftStage_sum_stored, migrationStage_sum_leftHeterozygosity,
+    recombinationStage_sum_stored]
+  have hone : enlargedLowOrderLDFeature state (none : AffineEnlargedCoordinate D) = 1 := rfl
+  rw [hone]
+  linarith [hmutation]
+
+/-- **The stage velocities reproduce the enlarged generator on the right-locus heterozygosity
+coordinate.**  This is the row the stored generator has none of, and the microscopic stages
+supply it with the same coalescence, migration and mutation structure the stored
+heterozygosity has. -/
+theorem stage_generator_rightHeterozygosity {D : ℕ} (rates : ManyDemeLDRates D)
+    (first second : Fin D) (state : DemeHaplotypeState D) :
+    (enlargedLowOrderLDGenerator rates).mulVec (enlargedLowOrderLDFeature state)
+        (some (.inr (first, second))) =
+      ∑ stage : Stage D,
+        stageDrift rates (enlargedStageExpansion (some (.inr (first, second)))) stage
+          state := by
+  classical
+  have hmutation := mutationStage_sum_rightHeterozygosity rates first second state
+  have hrecombination : lowOrderLDRecombination rates
+      (rightHeterozygosityMoment (enlargedLowOrderLDFeature state))
+      (LowOrderLDCoordinate.H first second) = 0 := rfl
+  rw [enlargedGenerator_mulVec_rightHeterozygosity, sum_stage]
+  simp only [stageDrift_eq, lowOrderLDHomogeneousGenerator, hrecombination]
+  rw [driftStage_sum_rightHeterozygosity, migrationStage_sum_rightHeterozygosity,
+    recombinationStage_sum_rightHeterozygosity]
+  have hone : enlargedLowOrderLDFeature state (none : AffineEnlargedCoordinate D) = 1 := rfl
+  rw [hone]
+  linarith [hmutation]
 
 end
 

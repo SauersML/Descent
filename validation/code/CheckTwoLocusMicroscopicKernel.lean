@@ -32,3 +32,11 @@ open Descent.Portability.TwoLocusMicroscopicKernel
 #print axioms recombinationStage_sum_rightHeterozygosity
 #print axioms migrationStage_sum_leftHeterozygosity
 #print axioms migrationStage_sum_rightHeterozygosity
+#print axioms rightMutationLeftHeterozygosity_velocity
+#print axioms leftMutationRightHeterozygosity_velocity
+#print axioms rightMutationRightHeterozygosity_velocity
+#print axioms mutationStage_sum_leftHeterozygosity
+#print axioms mutationStage_sum_rightHeterozygosity
+#print axioms stage_generator_constant
+#print axioms stage_generator_leftHeterozygosity
+#print axioms stage_generator_rightHeterozygosity
