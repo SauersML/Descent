@@ -27,6 +27,29 @@ attribute [local simp] Matrix.cons_val_two Matrix.cons_val_three Core.innerSum
 
 noncomputable section
 
+/-- Reassign the additive effect while compensating inside the unrestricted
+residual. This preserves every observed phenotype, even if causal genotypes
+themselves are included among the observations. -/
+def reassignEffect {Ω J L : Type*} [Fintype L]
+    (P : DeploymentPopulation Ω J L) (effects : L → ℝ) : DeploymentPopulation Ω J L where
+  E := P.E
+  X := P.X
+  C := P.C
+  β := effects
+  h := fun ω ↦ P.phenotype ω - causalSignal effects P.C ω
+
+/-- Sharp identification region: with unrestricted residual structure, every
+effect vector is compatible with the same complete genetic/phenotypic input.
+Exogeneity or an intervention semantics therefore changes the admissible class,
+rather than being recoverable from the observational distribution alone. -/
+theorem unrestricted_effect_fiber_full {Ω J L : Type*} [Fintype L]
+    (P : DeploymentPopulation Ω J L) (effects : L → ℝ) :
+    ∃ Q : DeploymentPopulation Ω J L,
+      Q.E = P.E ∧ Q.X = P.X ∧ Q.C = P.C ∧ Q.phenotype = P.phenotype ∧ Q.β = effects := by
+  refine ⟨reassignEffect P effects, rfl, rfl, rfl, ?_, rfl⟩
+  funext ω
+  simp [DeploymentPopulation.phenotype, reassignEffect]
+
 def marker : Fin 4 → ℝ := ![-1, -1, 1, 1]
 def hidden : Fin 4 → ℝ := ![-1, 1, -1, 1]
 

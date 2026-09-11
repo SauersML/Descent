@@ -3,12 +3,14 @@
 A Lean 4 formalization of genetic theory.
 
 The three PGS portability questions are developed in
-[OpenQuestions.lean](Descent/Program/OpenQuestions.lean): exact individual-loss
-moment and fitted-predictor decompositions, limits on identifying tagging versus
-effect mechanisms, and source-threshold transport with application-dependent
-decision costs. The results include the corrected sharp interval CV bound and
-an explicit counterexample to inferring squared-bias variance from signed variance.
-These proofs do not attribute the paper's empirical findings to a particular cause.
+[OpenQuestions.lean](Descent/Program/OpenQuestions.lean). The proofs classify
+individual-loss information and noise, give sharp attainable ranges at fixed
+second moments and genetic inputs, characterize finite evolutionary/reporting
+closure, and establish metric-ordering and decision-cost converses. Their domains
+include arbitrary square-integrable loss for the information theorems and explicit
+finite model classes for the sharp ranges. Gaussian loss noise is derived from
+the Gaussian measure. The combined axiom audit is
+[CheckThreeQuestions.lean](validation/code/CheckThreeQuestions.lean).
 
 For exact results and limits of demographic prediction of polygenic score accuracy,
 see [Universal portability](UNIVERSAL_PORTABILITY.md).

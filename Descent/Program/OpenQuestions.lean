@@ -5,6 +5,13 @@ import Descent.Portability.PortabilityDrift.PresentDayMetrics
 import Descent.Portability.IndividualLossMoments
 import Descent.Portability.MechanismIdentification
 import Descent.Portability.ThresholdPolicyTransport
+import Descent.Portability.LossInformationClassification
+import Descent.Portability.LossMomentRange
+import Descent.Portability.GaussianLossNoise
+import Descent.Portability.TraitPortabilityRange
+import Descent.Portability.PortabilityCurveClassification
+import Descent.Portability.EvolutionaryMetricClosure
+import Descent.Portability.MetricOrderingClassification
 
 namespace Descent.Program
 
@@ -39,13 +46,25 @@ The mathematical answers are distributed across the imported modules:
   conditional variance, squared bias, and their covariance, and derives the gap
   between a fitted predictor and the oracle. It proves the sharp interval CV
   bound and disproves recovery of squared-bias variance from signed variance alone.
+  `LossInformationClassification` gives the three-way information decomposition
+  and almost-sure sufficiency converse. `LossMomentRange` proves the sharp identified
+  set (0,1] at fixed conditional second moments. `GaussianLossNoise` derives the
+  Gaussian squared-loss variance from the actual Gaussian measure.
 * `MechanismIdentification`: constructs tagging-loss and effect-change worlds
   with identical complete scored-genotype/outcome observations and orthogonal
   residuals. Consequently those observations cannot identify the causal effect.
   A separate witness changes score construction while holding biology fixed.
+  `TraitPortabilityRange` gives the full attainable alignment range at fixed genotype
+  law and genetic variance. `PortabilityCurveClassification` classifies local
+  derivatives, including covariance zeros. `EvolutionaryMetricClosure` composes
+  finite evolutionary and stochastic reporting kernels, and gives a necessary and
+  sufficient invariant-feature condition for autonomous prediction of their summaries.
 * `ThresholdPolicyTransport`: computes confusion matrices from individual scores
   and outcomes, selects a source F1-optimal threshold, deploys it unchanged, and
   proves that clinical preferences reverse with false-positive cost.
+  `MetricOrderingClassification` supplies exact affine-MSE ordering conditions,
+  the full nondegenerate constant-precision feasibility range and its realizability,
+  and the equivalence of all-positive-cost dominance and coordinatewise error dominance.
 * `PortabilityMasterTheorem`: exact transport, metric non-equivalence, and affine
   recalibration laws. `Foundations.TransportIdentities` also gives the arbitrary
   probability-space conditional variance results.

@@ -23,10 +23,17 @@ import Descent.Portability.HorizonCurve
 import Descent.Portability.HumanDemography
 import Descent.Portability.ImputationPortability
 import Descent.Portability.IndividualLossMoments
+import Descent.Portability.LossInformationClassification
+import Descent.Portability.LossMomentRange
+import Descent.Portability.GaussianLossNoise
 import Descent.Portability.LongitudinalPortability
 import Descent.Portability.MeasurePortabilityLaw
 import Descent.Portability.MechanisticPortabilityWitnesses
 import Descent.Portability.MechanismIdentification
+import Descent.Portability.TraitPortabilityRange
+import Descent.Portability.PortabilityCurveClassification
+import Descent.Portability.EvolutionaryMetricClosure
+import Descent.Portability.MetricOrderingClassification
 import Descent.Portability.MetricSpecificPortability
 import Descent.Portability.MetricSpecificPortability.ARoneFrontier
 import Descent.Portability.MetricSpecificPortability.CalibrationVsDiscrimination

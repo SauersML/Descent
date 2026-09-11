@@ -3,6 +3,10 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.AncientPrediction.Identification
 import Descent.Portability.AncientPrediction.Correction
+import Descent.Portability.AncientPrediction.Mixture
+import Descent.Portability.AncientPrediction.Risk
+import Descent.Portability.AncientPrediction.Certificate
+import Descent.Portability.AncientPrediction.Sampling
 
 /-!
 # Ancient reference experiments for modern prediction

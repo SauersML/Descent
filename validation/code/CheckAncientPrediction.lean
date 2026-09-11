@@ -1,0 +1,8 @@
+import Descent.Portability.AncientPrediction
+
+#print axioms Descent.Portability.AncientPrediction.predictive_quotient
+#print axioms Descent.Portability.AncientPrediction.common_improvement_iff_origin_not_mem_hull
+#print axioms Descent.Portability.AncientPrediction.least_favorable_mixture
+#print axioms Descent.Portability.AncientPrediction.integral_risk_change
+#print axioms Descent.Portability.AncientPrediction.bounded_sample_mean_tail
+#print axioms Descent.Portability.AncientPrediction.selected_update_failure_bound

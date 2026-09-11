@@ -4,6 +4,13 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.IndividualLossMoments
 import Descent.Portability.MechanismIdentification
 import Descent.Portability.ThresholdPolicyTransport
+import Descent.Portability.LossInformationClassification
+import Descent.Portability.LossMomentRange
+import Descent.Portability.GaussianLossNoise
+import Descent.Portability.TraitPortabilityRange
+import Descent.Portability.PortabilityCurveClassification
+import Descent.Portability.EvolutionaryMetricClosure
+import Descent.Portability.MetricOrderingClassification
 
 /-! Kernel axiom audit of the three-question results and their probability witnesses. -/
 
@@ -13,6 +20,7 @@ import Descent.Portability.ThresholdPolicyTransport
 #print axioms Descent.Portability.IndividualLossMoments.squared_loss_risk_decomposition
 #print axioms Descent.Portability.IndividualLossMoments.fitted_squared_loss_r2_gap
 #print axioms Descent.Portability.IndividualLossMoments.fitted_squared_loss_r2_le_oracle
+#print axioms Descent.Portability.IndividualLossMoments.squared_loss_central_moments
 #print axioms Descent.Portability.IndividualLossMoments.gaussian_style_loss_variance
 #print axioms Descent.Portability.IndividualLossMoments.gaussian_style_explainable_fraction
 #print axioms Descent.Portability.IndividualLossMoments.sharp_interval_cv_squared
@@ -23,6 +31,7 @@ import Descent.Portability.ThresholdPolicyTransport
 #print axioms Descent.Portability.MechanismIdentification.different_tagging_and_effects
 #print axioms Descent.Portability.MechanismIdentification.common_accuracy
 #print axioms Descent.Portability.MechanismIdentification.causal_effect_not_identified
+#print axioms Descent.Portability.MechanismIdentification.unrestricted_effect_fiber_full
 #print axioms Descent.Portability.MechanismIdentification.causal_observation_separates
 #print axioms Descent.Portability.MechanismIdentification.matched_signal_different_flip_rates
 #print axioms Descent.Portability.MechanismIdentification.score_construction_changes_accuracy
@@ -30,3 +39,43 @@ import Descent.Portability.ThresholdPolicyTransport
 #print axioms Descent.Portability.ThresholdPolicyTransport.transported_operating_point
 #print axioms Descent.Portability.ThresholdPolicyTransport.clinical_ranking_reverses
 #print axioms Descent.Portability.ThresholdPolicyTransport.clinical_choice_iff
+
+#print axioms Descent.Portability.LossInformationClassification.captured_eq_variance
+#print axioms Descent.Portability.LossInformationClassification.variance_three_way
+#print axioms Descent.Portability.LossInformationClassification.captured_gain
+#print axioms Descent.Portability.LossInformationClassification.no_information_loss_iff
+#print axioms Descent.Portability.LossInformationClassification.explained_fraction_gain
+#print axioms Descent.Portability.LossInformationClassification.strict_information_gain_iff
+#print axioms Descent.Portability.LossMomentRange.conditional_moments
+#print axioms Descent.Portability.LossMomentRange.loss_variance
+#print axioms Descent.Portability.LossMomentRange.oracleFraction_eq
+#print axioms Descent.Portability.LossMomentRange.oracleFraction_bounds
+#print axioms Descent.Portability.LossMomentRange.every_fraction_attained
+#print axioms Descent.Portability.LossMomentRange.sharp_range
+#print axioms Descent.Portability.LossMomentRange.all_compatible_laws_bounds
+#print axioms Descent.Portability.LossMomentRange.fixed_second_moments_identified_set
+#print axioms Descent.Portability.GaussianLossNoise.gaussian_squared_loss_variance
+
+#print axioms Descent.Portability.TraitPortabilityRange.architecture_moments
+#print axioms Descent.Portability.TraitPortabilityRange.fixed_genotype_inputs
+#print axioms Descent.Portability.TraitPortabilityRange.fixed_genetic_signal
+#print axioms Descent.Portability.TraitPortabilityRange.actual_genetic_variance
+#print axioms Descent.Portability.TraitPortabilityRange.aligned_accuracy
+#print axioms Descent.Portability.TraitPortabilityRange.sharp_accuracy_range
+#print axioms Descent.Portability.PortabilityCurveClassification.r2_derivative
+#print axioms Descent.Portability.PortabilityCurveClassification.r2_declines_iff
+#print axioms Descent.Portability.PortabilityCurveClassification.r2_derivative_at_zero_covariance
+#print axioms Descent.Portability.EvolutionaryMetricClosure.metric_from_evolution_and_scoring
+#print axioms Descent.Portability.EvolutionaryMetricClosure.metricFeatures_retain_mass
+#print axioms Descent.Portability.EvolutionaryMetricClosure.scoring_features_close_iff
+#print axioms Descent.Portability.EvolutionaryMetricClosure.failure_of_closure_witness
+#print axioms Descent.Portability.EvolutionaryMetricClosure.closed_features_all_generations
+
+#print axioms Descent.Portability.MetricOrderingClassification.affine_mse_completed_square
+#print axioms Descent.Portability.MetricOrderingClassification.affine_mse_order_iff
+#print axioms Descent.Portability.MetricOrderingClassification.calibrated_equal_variance_order_iff
+#print axioms Descent.Portability.MetricOrderingClassification.precision_eq_iff_fpr
+#print axioms Descent.Portability.MetricOrderingClassification.constant_precision_feasible_iff
+#print axioms Descent.Portability.MetricOrderingClassification.realizable_constant_precision
+#print axioms Descent.Portability.MetricOrderingClassification.common_threshold_realizes
+#print axioms Descent.Portability.MetricOrderingClassification.all_costs_dominance_iff

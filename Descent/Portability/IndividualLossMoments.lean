@@ -169,7 +169,9 @@ theorem squared_loss_central_moments (E : ExpFunctional Ω) (r : Ω → ℝ) :
   simp only [← pow_mul]
   rw [hfour]
   dsimp [z, b] at *
-  nlinarith [sq_nonneg (variance E r)]
+  have he : E (fun ω ↦ r ω ^ 2) = variance E r + E r ^ 2 := by linarith
+  rw [he]
+  ring
 
 /-- The Gaussian-style expression follows from second and fourth moments alone.
 The hypotheses must be checked for the residuals from the actual analysis. -/
