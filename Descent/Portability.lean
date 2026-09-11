@@ -425,6 +425,10 @@ import Descent.Portability.SharedAuditCompletion
 import Descent.Portability.SummaryInvisibleDiameter
 import Descent.Portability.TurnoverDependence
 import Descent.Portability.ExplainabilityRay
+import Descent.Portability.AuditSelectionSafety
+import Descent.Portability.BernsteinTailBound
+import Descent.Portability.BinomialAggregateEnvelope
+import Descent.Portability.FiniteAuditConfidence
 assert_below Descent.Program
 
 /-!
