@@ -336,6 +336,11 @@ import Descent.Portability.GaussianCompoundMoments
 import Descent.Portability.HWECriticalMoments
 import Descent.Portability.EscapingCharacteristicKernel
 import Descent.Portability.HWEPatternConditioning
+import Descent.Portability.HWELayerPartition
+import Descent.Portability.HWEPatternAmplitude
+import Descent.Portability.RademacherReindex
+import Descent.Portability.HWEHomogeneousLayer
+import Descent.Portability.HWECountLayerLimit
 assert_below Descent.Program
 
 /-!
