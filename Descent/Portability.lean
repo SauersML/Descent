@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.FourCellCohortLaw
 import Descent.Portability.SublawReportCertificate
 import Descent.Portability.FiniteMixtureKernel
 import Descent.Portability.GaussianEnvelopeIntegrability
