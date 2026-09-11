@@ -1,0 +1,17 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.SmoothedCoordinateLaws
+
+/-! Axiom audit of SmoothedCoordinateLaws. -/
+
+#print axioms Descent.Portability.SmoothedCoordinateLaws.uniformMoment_eq
+#print axioms Descent.Portability.SmoothedCoordinateLaws.uniformMoment_odd
+#print axioms Descent.Portability.SmoothedCoordinateLaws.smoothed_atom_moment
+#print axioms Descent.Portability.SmoothedCoordinateLaws.smoothed_moment_match
+#print axioms Descent.Portability.SmoothedCoordinateLaws.indicator_mem_unitInterval
+#print axioms Descent.Portability.SmoothedCoordinateLaws.smoothDensity_nonneg
+#print axioms Descent.Portability.SmoothedCoordinateLaws.smoothDensity_le
+#print axioms Descent.Portability.SmoothedCoordinateLaws.smoothDensity_integral
+#print axioms Descent.Portability.SmoothedCoordinateLaws.radial_smoothed_moment_match
+#print axioms Descent.Portability.SmoothedCoordinateLaws.radial_smoothDensity_le
