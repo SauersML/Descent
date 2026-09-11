@@ -162,7 +162,8 @@ theorem deviation_probability_le (count : ℕ) (hcount : 0 < count) (witness : C
         BellmanReportBounds.expectation_mono _ _ _ hmarkov
     _ = 1 / radius * (replicaLaw count q).expectation (fun draw ↦
           ∑ category, |empiricalMass draw category - q.mass category|) := by
-        simp only [FiniteReportLaw.expectation, Finset.mul_sum]
+        simp only [FiniteReportLaw.expectation]
+        rw [Finset.mul_sum]
         exact Finset.sum_congr rfl fun draw _ ↦ by ring
     _ ≤ 1 / radius * Real.sqrt (((Fintype.card Category : ℝ) - 1) / count) :=
         mul_le_mul_of_nonneg_left (expectation_deviation_sum_le count hcount witness q)

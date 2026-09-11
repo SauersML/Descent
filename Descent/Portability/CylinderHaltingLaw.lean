@@ -129,7 +129,7 @@ theorem law_apply [MeasurableSpace Report] (program : HaltingProgram Report)
   refine tsum_congr fun word ↦ ?_
   by_cases hword : word ∈ program.halting <;>
     by_cases hreport : program.report word ∈ event <;>
-    simp [Set.indicator_apply, hword, hreport]
+    simp [hword, hreport]
 
 /-- NOTE2 (32): the halting law is a probability law, because the halting cylinders carry
 total mass one. -/
@@ -357,7 +357,6 @@ theorem expectation_bounds [MeasurableSpace Report] [MeasurableSingletonClass Re
     (fun word : ↑((enumerated : Set program.halting)ᶜ) ↦ dyadicWeight word)
     (fun _ ↦ dyadicWeight_nonneg _) (program.hasSum_dyadicWeight.summable.subtype _)
     (fun word ↦ value (program.report word)) lower upper (fun _ ↦ hlower _) (fun _ ↦ hupper _)
-  beta_reduce at htailBelow htailAbove
   rw [← program.missingMass_eq_tsum_compl] at htailBelow htailAbove
   constructor <;> linarith
 
@@ -424,7 +423,6 @@ theorem conditional_expectation_bounds [MeasurableSpace Report]
     (fun _ ↦ dyadicWeight_nonneg _) (program.hasSum_dyadicWeight.summable.subtype _)
     (fun word ↦ SublawReportCertificate.definedIndicator defined (program.report word)) 0 1
     (fun _ ↦ hindicatorBelow _) (fun _ ↦ hindicatorAbove _)
-  beta_reduce at hmassTailBelow hmassTailAbove
   rw [← program.missingMass_eq_tsum_compl] at hmassTailBelow hmassTailAbove
   have hweightedSummable : Summable fun word : ↑((enumerated : Set program.halting)ᶜ) ↦
       dyadicWeight word * SublawReportCertificate.definedIndicator defined
@@ -436,7 +434,6 @@ theorem conditional_expectation_bounds [MeasurableSpace Report]
         (program.report word))
     (fun _ ↦ mul_nonneg (dyadicWeight_nonneg _) (hindicatorBelow _)) hweightedSummable
     (fun word ↦ value (program.report word)) lower upper (fun _ ↦ hlower _) (fun _ ↦ hupper _)
-  beta_reduce at htotalTailBelow htotalTailAbove
   have hassociate : ∑' word : ↑((enumerated : Set program.halting)ᶜ),
       dyadicWeight word * SublawReportCertificate.definedIndicator defined
         (program.report word) * value (program.report word) =
@@ -535,8 +532,8 @@ theorem exists_waitingWord_cylinder {stream : ℕ → Bool}
     (htrue : ∃ index, stream index = true) :
     ∃ word ∈ waitingWords, stream ∈ cylinder word := by
   refine ⟨List.replicate (Nat.find htrue) false ++ [true], ⟨Nat.find htrue, rfl⟩, ?_⟩
-  simp only [cylinder, Set.mem_pi, Finset.coe_range, Set.mem_Iio, Set.mem_singleton_iff,
-    List.length_append, List.length_replicate, List.length_singleton]
+  simp only [CylinderIntervalCertificate.cylinder, Set.mem_pi, Finset.coe_range, Set.mem_Iio,
+    Set.mem_singleton_iff, List.length_append, List.length_replicate, List.length_singleton]
   intro index hindex
   rcases Nat.lt_succ_iff_lt_or_eq.mp hindex with hbefore | hat
   · have hfalse : stream index = false :=
