@@ -23,4 +23,3 @@ open Descent.Portability.AttainableChronologyCurve
 #print axioms Descent.Portability.AttainableChronologyCurve.exp_neg_log_two
 #print axioms Descent.Portability.AttainableChronologyCurve.threeBlock_migration_first
 #print axioms Descent.Portability.AttainableChronologyCurve.threeBlock_recombination_first
-#print axioms Descent.Portability.AttainableChronologyCurve.reportMetrics_chronologyReportLaw
