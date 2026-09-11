@@ -3183,7 +3183,7 @@ def effectiveRate(π, r, Λ):
 def shiftPolynomial(δ):
     return eval_2Hom(C, ((lambda i: _rt.add(X(i), C((δ[int(i)]))))))
 
-def objective(A, b, p):
+def Descent_Portability_AuditAllocationCoordinate_objective(A, b, p):
     return (_rt.rdiv(A, p) + (b * p))
 
 def Descent_Portability_AuditAllocationCoordinate_choice(A, b, floor):
@@ -3199,7 +3199,7 @@ def Descent_Portability_AuditCovarianceSpectrum_basis(w, u):
     return _rt._proj((symmetric(w, u)), 'eigenvectorBasis')(rfl)
 
 def dualGap(a, floor, c, p, B, η, lam):
-    return _rt.sub(worstVariance(a, p), dualBound(a, floor, c, B, η, lam))
+    return _rt.sub(worstVariance(a, p), Descent_Portability_FiniteAuditDesign_dualBound(a, floor, c, B, η, lam))
 
 def cappedFloor(floor, h, m, i):
     return _rt.rmax((floor[int(i)]), (_rt.rdiv(h[int(i)], m)))
@@ -6515,6 +6515,12 @@ def fullTargetLaw(E, q, m, delta, hk, hd):
 
 def marginal(L, U, p, q, lo, hi, i):
     return envelope((L[int(i)]), (U[int(i)]), (p[int(i)]), (q[int(i)]), (clip((lo[int(i)]), (hi[int(i)]), (vertex((L[int(i)]), (U[int(i)]), (p[int(i)]), (q[int(i)]))))))
+
+def Descent_Portability_SpectralAuditDesign_objective(κ, u, p):
+    return largest(((lambda i: _rt.rdiv(κ[int(i)], p[int(i)]))), u)
+
+def Descent_Portability_SpectralAuditDualCertificate_contribution(κ, u, W, i):
+    return _rt.mul(κ[int(i)], inner(ℝ, (u(i)), (W((u(i))))))
 
 def Descent_Portability_SpectralMeasurementMinimax_coordinate(L, i):
     return innerSL(ℝ, (rightBasis(L, i)))
