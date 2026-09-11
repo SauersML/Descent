@@ -199,7 +199,7 @@ theorem expectation_endpointExposure (bound mean : ℝ) (hlow : 0 ≤ mean)
   have hne : bound ≠ 0 := ne_of_gt hbound
   unfold FiniteReportLaw.expectation endpointMixture endpointExposure
   rw [Fin.sum_univ_two]
-  field_simp [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
+  simp [hne] <;> field_simp
 
 /-- The chord bound is sharp: the endpoint law attains it with equality. -/
 theorem exposureLaplace_endpointMixture (bound mean lam : ℝ) (hlow : 0 ≤ mean)
