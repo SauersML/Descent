@@ -23,5 +23,8 @@ namespace Descent.Portability.KernelRealizationPreservation
 #print axioms enlargedLowOrderLDFeature_inl
 #print axioms enlargedLowOrderLDFeature_inr
 #print axioms locusExchangeableRealizationOfLaw
+#print axioms propagator_mulVec_mem_realizationBody_of_approx
+#print axioms split_mulVec_mem_realizationBody_of_mem
+#print axioms lowOrderLDState_mem_realizationBody_of_realization
 
 end Descent.Portability.KernelRealizationPreservation

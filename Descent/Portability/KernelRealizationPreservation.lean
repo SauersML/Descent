@@ -48,10 +48,14 @@ is the point of NOTE1 (12): a law whose enlarged feature vector identifies `H` w
 realizes the stored state locus-exchangeably, which is the hypothesis the closed mutation
 row of the corpus generator needs.
 
-What is NOT proved here: the closedness of the corpus body (a hypothesis throughout), the
-existence of a microscopic approximation for the corpus generator (NOTE1 §2.3, built
-elsewhere), the invariance of the subspace (12) under the enlarged generator (NOTE1 Theorem
-2), and the time-varying case NOTE1 §2.4.
+The closedness of the corpus body is a hypothesis of the general lemmas above only because
+they are stated for an arbitrary feature map. For the corpus coordinates it is a theorem, so
+the three `_of_approx`, `_of_mem` and `_of_realization` corollaries at the end carry no
+closedness hypothesis at all.
+
+What is NOT proved here: the existence of a microscopic approximation for the corpus
+generator (NOTE1 §2.3, built elsewhere), the invariance of the subspace (12) under the
+enlarged generator (NOTE1 Theorem 2), and the time-varying case NOTE1 §2.4.
 
 ## Empirical status
 
@@ -283,6 +287,39 @@ def locusExchangeableRealizationOfLaw {D : ℕ} {Ω : Type} [Fintype Ω] (p : Ω
     rw [featureVector_apply]
     simpa only [enlargedLowOrderLDFeature_inl, enlargedLowOrderLDFeature_inr,
       weightedExp_apply] using hleft
+
+/-- **NOTE1 Theorem 1 for the corpus, with no closedness hypothesis.** An epoch whose
+generator admits a microscopic approximation propagates every haplotype-realizable low-order
+state to a haplotype-realizable one. The closedness of the corpus body is no longer assumed:
+it is supplied by `isClosed_realizationBody_lowOrderLDFeature`. -/
+theorem propagator_mulVec_mem_realizationBody_of_approx {D : ℕ} {B : Type*} [Fintype B]
+    (epoch : LowOrderLDEpoch D)
+    (approx : MicroscopicApproximation (B := B) (lowOrderLDFeature D) epoch.generator)
+    (v : AffineLowOrderLDCoordinate D → ℝ)
+    (hv : v ∈ realizationBody (lowOrderLDFeature D)) :
+    epoch.propagator.mulVec v ∈ realizationBody (lowOrderLDFeature D) :=
+  propagator_mulVec_mem_realizationBody (isClosed_realizationBody_lowOrderLDFeature D)
+    epoch approx v hv
+
+/-- A split preserves the corpus realization body outright, with no hypothesis at all. -/
+theorem split_mulVec_mem_realizationBody_of_mem {D : ℕ}
+    {v : AffineLowOrderLDCoordinate D → ℝ}
+    (hv : v ∈ realizationBody (lowOrderLDFeature D)) (parent child : Fin D) :
+    (lowOrderLDSplitTransform parent child).mulVec v
+      ∈ realizationBody (lowOrderLDFeature D) :=
+  split_mulVec_mem_realizationBody (isClosed_realizationBody_lowOrderLDFeature D) hv
+    parent child
+
+/-- The state vector of any haplotype realization lies in the corpus realization body, with
+no hypothesis: the body is closed because it is compact. This is the exact converse of the
+realization construction, so the body is precisely the set of haplotype-realizable low-order
+states. -/
+theorem lowOrderLDState_mem_realizationBody_of_realization {D : ℕ}
+    {v : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LowOrderLDHaplotypeRealization v) :
+    v ∈ realizationBody (lowOrderLDFeature D) :=
+  lowOrderLDState_mem_realizationBody (isClosed_realizationBody_lowOrderLDFeature D)
+    realization
 
 end
 

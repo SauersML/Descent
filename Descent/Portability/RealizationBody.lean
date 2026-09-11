@@ -56,14 +56,23 @@ continuous `φ`, the body is the image of the compact set
 vector, hence compact, hence closed. That discharges the `IsClosed` hypothesis above whenever
 the feature map is continuous on a compact space.
 
-What is NOT proved in this module: the sharpened Carathéodory count of NOTE1 §2.1 (at most
-`Fintype.card ι` atoms when a coordinate is constant, rather than the `card ι + 1` proved
-here), and the compactness of the corpus body. The latter is not a gap in the argument above
-but a missing structure: `Coalescent.TwoLocusHaplotypeFrequencies` carries no topology in the
-corpus, so `lowOrderLDFeature` is not yet a continuous map on a compact space and
-`isCompact_realizationBody` cannot be applied to it. Supplying that topology, by identifying
-the range of the corpus feature map with the image of a product of standard simplices under
-the polynomial coordinate formulas, is the remaining step.
+`Coalescent.TwoLocusHaplotypeFrequencies` carries no topology in the corpus, so the corpus
+feature map is not directly a continuous map on a compact space. `frequenciesOfSimplex`
+supplies the missing parametrisation: the haplotype frequencies of one deme are read off a
+point of the standard three-simplex, `multiDemeSimplex` is the compact product of those
+simplices over demes, and `range_simplexLowOrderLDFeature` shows the resulting map has
+exactly the same range as `lowOrderLDFeature`, hence the same realization body. Every
+low-order coordinate is a polynomial in the four haplotype frequencies, which is what
+`continuous_simplexLowOrderLDFeature` checks coordinate by coordinate against the corpus jet
+value theorems. Consequently `isCompact_realizationBody_lowOrderLDFeature` and
+`isClosed_realizationBody_lowOrderLDFeature` hold unconditionally, and the closedness
+hypotheses stated above are discharged for the corpus coordinates.
+
+What is NOT proved in this module: the sharpened Carathéodory count of NOTE1 §2.1, at most
+`Fintype.card ι` atoms when a coordinate is constant rather than the `card ι + 1` proved
+here. The constant coordinate confines the body to an affine hyperplane, so the sharper count
+follows from an affine-dimension argument in that hyperplane; only the weaker count is
+formalized.
 
 ## Empirical status
 
