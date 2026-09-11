@@ -19,8 +19,9 @@ conditions: distinct positive radii, positive scaling invariance of the report, 
 multi-index of total degree at most `k`.
 
 Corollary 7.3's expectation form and Corollary 7.5's recovery bound follow, the latter
-through `ApproximationDuality.recovery_error_lower`. The laws are
-`Portability.weightedExp` probability vectors on `Fin (k+1) × Bool`.
+through `ApproximationDuality.recovery_error_lower`; Corollary 7.3's total-variation half
+is `Descent.Portability.RadialReportLaws`. The laws are `Portability.weightedExp`
+probability vectors on `Fin (k+1) × Bool`.
 -/
 
 set_option autoImplicit false
@@ -243,8 +244,9 @@ theorem radial_report_gap (r : Fin (k + 1) → ℝ) (hinj : Function.Injective r
 
 /-- **PL Corollary 7.3, expectation form.** The same construction hides the whole report
 law, not only its mean: every bounded test function of a scale-invariant report has the
-same exact gap. This is the expectation statement; the total-variation bound on the
-pushforward laws is not proved here. -/
+same exact gap. The direction-law form and the total-variation bound on the report laws
+are `RadialReportLaws.directionMarginal_totalVariation_le` and
+`RadialReportLaws.radial_report_law_totalVariation`. -/
 theorem radial_report_law_gap (r : Fin (k + 1) → ℝ) (hinj : Function.Injective r)
     (hpos : ∀ i, 0 < r i) (u v : N → ℝ) (F : (N → ℝ) → ℝ) (φ : ℝ → ℝ)
     (hF : ∀ t : ℝ, 0 < t → ∀ y : N → ℝ, F (t • y) = F y) :
