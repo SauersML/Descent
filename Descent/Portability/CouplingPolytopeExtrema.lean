@@ -47,10 +47,12 @@ def pathReport (T : ℕ) (F : (Fin (T + 1) → ι → Z) → ℝ) (γ : List (ι
 def truncate (T : ℕ) (γ : List (ι → Z) → ℝ) : List (ι → Z) → ℝ :=
   fun v ↦ if 1 ≤ v.length ∧ v.length ≤ T + 1 then γ v else 0
 
+omit [Fintype ι] [DecidableEq ι] [Fintype Z] [DecidableEq Z] in
 /-- Value of a truncated mass vector. -/
 @[simp] theorem truncate_apply (T : ℕ) (γ : List (ι → Z) → ℝ) (v : List (ι → Z)) :
     truncate T γ v = if 1 ≤ v.length ∧ v.length ≤ T + 1 then γ v else 0 := rfl
 
+omit [DecidableEq Z] in
 /-- Each initial mass is at most one. -/
 theorem init_le_one {μ : (ι → Z) → ℝ} (hμnn : ∀ a, 0 ≤ μ a) (hμsum : ∑ a, μ a = 1)
     (a : ι → Z) : μ a ≤ 1 := by
@@ -126,6 +128,7 @@ theorem truncate_inPolytope {μ : (ι → Z) → ℝ} {K : ℕ → ι → (ι �
     simp only [List.length_cons]
     omega
 
+omit [DecidableEq Z] in
 /-- Truncation leaves every horizon report unchanged. -/
 theorem pathReport_truncate (T : ℕ) (F : (Fin (T + 1) → ι → Z) → ℝ)
     (γ : List (ι → Z) → ℝ) : pathReport T F (truncate T γ) = pathReport T F γ := by
@@ -137,6 +140,7 @@ theorem pathReport_truncate (T : ℕ) (F : (Fin (T + 1) → ι → Z) → ℝ)
   refine Finset.sum_congr rfl fun u _ ↦ ?_
   rw [truncate_apply, if_pos (hu u)]
 
+omit [DecidableEq Z] in
 /-- The horizon report is linear along mixtures. -/
 theorem pathReport_mixture (T : ℕ) (F : (Fin (T + 1) → ι → Z) → ℝ)
     (γ₁ γ₂ : List (ι → Z) → ℝ) (θ : ℝ) :
@@ -149,7 +153,9 @@ theorem pathReport_mixture (T : ℕ) (F : (Fin (T + 1) → ι → Z) → ℝ)
       (θ * γ₁ (List.ofFn u) + (1 - θ) * γ₂ (List.ofFn u)) * F u = _
   rw [Finset.sum_congr rfl fun u _ ↦ hrw u, Finset.sum_add_distrib, ← Finset.mul_sum,
     ← Finset.mul_sum]
+  rfl
 
+omit [DecidableEq Z] in
 /-- The horizon report is continuous in the history masses. -/
 theorem pathReport_continuous (T : ℕ) (F : (Fin (T + 1) → ι → Z) → ℝ) :
     Continuous (pathReport T F) := by
@@ -234,20 +240,20 @@ theorem horizonPolytope_isClosed (μ : (ι → Z) → ℝ) (K : ℕ → ι → (
     exact isClosed_iInter fun v ↦ isClosed_iInter fun _ ↦
       isClosed_eq (continuous_apply v) continuous_const
   have hsplit : horizonPolytope μ K T
-      = {γ : List (ι → Z) → ℝ |
+      = ({γ : List (ι → Z) → ℝ |
           ∀ v : List (ι → Z), 1 ≤ v.length → v.length ≤ T + 1 → 0 ≤ γ v}
-        ∩ (({γ : List (ι → Z) → ℝ | ∀ a, γ [a] = μ a}
+        ∩ ({γ : List (ι → Z) → ℝ | ∀ a, γ [a] = μ a}
           ∩ ({γ : List (ι → Z) → ℝ |
               ∀ (z : ι → Z) (h : List (ι → Z)), h.length + 1 ≤ T →
                 ∑ a, γ (a :: z :: h) = γ (z :: h)}
             ∩ {γ : List (ι → Z) → ℝ |
               ∀ (z : ι → Z) (h : List (ι → Z)) (i : ι) (b : Z), h.length + 1 ≤ T →
                 ∑ a ∈ Finset.univ.filter fun a : ι → Z ↦ a i = b, γ (a :: z :: h)
-                  = K h.length i z b * γ (z :: h)}))
+                  = K h.length i z b * γ (z :: h)})))
           ∩ {γ : List (ι → Z) → ℝ |
-              ∀ v : List (ι → Z), ¬(1 ≤ v.length ∧ v.length ≤ T + 1) → γ v = 0}) := rfl
+              ∀ v : List (ι → Z), ¬(1 ≤ v.length ∧ v.length ≤ T + 1) → γ v = 0} := rfl
   rw [hsplit]
-  exact h1.inter ((h2.inter (h3.inter h4)).inter h5)
+  exact (h1.inter (h2.inter (h3.inter h4))).inter h5
 
 /-- **The truncated polytope is compact.**  Every coordinate lies in the unit interval, so
 it is a closed subset of a Tychonoff product of compact intervals. -/
@@ -344,12 +350,13 @@ theorem inPolytope_report_range {μ : (ι → Z) → ℝ} (hμnn : ∀ a, 0 ≤ 
         linarith
       refine ⟨fun v ↦ θ * γmin v + (1 - θ) * γmax v,
         inPolytope_mixture hmin hmax hθ0 hθ1, ?_⟩
-      rw [pathReport_mixture]
       have hstep : θ * (pathReport T F γmax - pathReport T F γmin)
           = pathReport T F γmax - y := by
-        rw [hθ, div_mul_eq_mul_div, mul_comm, mul_div_assoc,
-          div_self hdenne, mul_one]
-      linarith [hstep]
+        rw [hθ, div_mul_eq_mul_div, mul_div_assoc, div_self hdenne, mul_one]
+      have hexpand : θ * pathReport T F γmin + (1 - θ) * pathReport T F γmax
+          = pathReport T F γmax - θ * (pathReport T F γmax - pathReport T F γmin) := by ring
+      rw [pathReport_mixture, hexpand, hstep]
+      ring
 
 end Extrema
 
