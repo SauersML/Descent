@@ -272,6 +272,228 @@ def twoLocusMicroscopicApproximation {D : ℕ} (rates : ManyDemeLDRates D) (deme
     refine Finset.sum_nonneg fun stage _ ↦ ?_
     exact stageSlack_nonneg rates _ stage _ (by positivity)
 
+/-! ## Splitting the stage sum -/
+
+/-- The stage index is the disjoint union of its five constructor families. -/
+def stageStructure (D : ℕ) :
+    (Fin D ⊕ (Fin D × Fin D) ⊕ Fin D ⊕ Fin D ⊕ Fin D) ≃ Stage D where
+  toFun
+    | .inl deme => .drift deme
+    | .inr (.inl pair) => .migration pair.1 pair.2
+    | .inr (.inr (.inl deme)) => .recombination deme
+    | .inr (.inr (.inr (.inl deme))) => .mutationLeft deme
+    | .inr (.inr (.inr (.inr deme))) => .mutationRight deme
+  invFun
+    | .drift deme => .inl deme
+    | .migration source recipient => .inr (.inl (source, recipient))
+    | .recombination deme => .inr (.inr (.inl deme))
+    | .mutationLeft deme => .inr (.inr (.inr (.inl deme)))
+    | .mutationRight deme => .inr (.inr (.inr (.inr deme)))
+  left_inv := by rintro (_ | (_ | (_ | (_ | _)))) <;> rfl
+  right_inv := by rintro (_ | _ | _ | _ | _) <;> rfl
+
+/-- A sum over the stages splits into the drift, migration, recombination and two mutation
+families.  This is what lets a generator row be matched family by family. -/
+theorem sum_stage {D : ℕ} (summand : Stage D → ℝ) :
+    ∑ stage : Stage D, summand stage =
+      (∑ deme : Fin D, summand (Stage.drift deme)) +
+      (∑ pair : Fin D × Fin D, summand (Stage.migration pair.1 pair.2)) +
+      (∑ deme : Fin D, summand (Stage.recombination deme)) +
+      (∑ deme : Fin D, summand (Stage.mutationLeft deme)) +
+      (∑ deme : Fin D, summand (Stage.mutationRight deme)) := by
+  rw [← Equiv.sum_comp (stageStructure D) summand]
+  simp only [Fintype.sum_sum_type, stageStructure, Equiv.coe_fn_mk]
+  ring
+
+/-! ## The drift stage reproduces the corpus coalescence row -/
+
+/-- The drift stages sum to the corpus's coalescence generator row on every stored
+coordinate.  Both sides are literally `twoLocusWeightedJetDrift`, so the corpus's own
+identification is what proves it. -/
+theorem driftStage_sum_stored {D : ℕ} (rates : ManyDemeLDRates D)
+    (feature : LowOrderLDCoordinate D) (state : DemeHaplotypeState D) :
+    ∑ deme : Fin D, stageRate rates (Stage.drift deme) *
+        stageVelocity (enlargedStageExpansion (some (.inl feature))) (Stage.drift deme)
+          state =
+      lowOrderLDDrift rates (twoLocusJetMoment state) feature := by
+  have hsum : ∑ deme : Fin D, stageRate rates (Stage.drift deme) *
+      stageVelocity (enlargedStageExpansion (some (.inl feature))) (Stage.drift deme) state =
+      twoLocusWeightedJetDrift rates.coalescence state feature := rfl
+  rw [hsum]
+  cases feature with
+  | H first second => exact twoLocusWeightedJetDrift_H_eq_lowOrderLDDrift rates state first
+      second
+  | DD first second => exact twoLocusWeightedJetDrift_DD_eq_lowOrderLDDrift rates state first
+      second
+  | Dz first second third =>
+      exact twoLocusWeightedJetDrift_Dz_eq_lowOrderLDDrift rates state first second third
+  | pi2 first second third fourth =>
+      exact twoLocusWeightedJetDrift_pi2_eq_lowOrderLDDrift rates state first second third
+        fourth
+
+/-- The drift stages on a right-locus heterozygosity coordinate reproduce the same
+coalescence row the corpus gives the stored heterozygosity: a decay at the deme's coalescence
+rate exactly when both lineages sit in that deme. -/
+theorem driftStage_sum_rightHeterozygosity {D : ℕ} (rates : ManyDemeLDRates D)
+    (first second : Fin D) (state : DemeHaplotypeState D) :
+    ∑ deme : Fin D, stageRate rates (Stage.drift deme) *
+        stageVelocity (enlargedStageExpansion (some (.inr (first, second))))
+          (Stage.drift deme) state =
+      (if first = second then
+        -rates.coalescence first *
+          twoLocusRightHeterozygosity (state first) (state second) else 0) := by
+  classical
+  have hsum : ∑ deme : Fin D, stageRate rates (Stage.drift deme) *
+      stageVelocity (enlargedStageExpansion (some (.inr (first, second))))
+        (Stage.drift deme) state =
+      ∑ deme : Fin D, rates.coalescence deme *
+        (twoLocusRightHJet first second).driftAt deme state := rfl
+  rw [hsum]
+  by_cases hsame : first = second
+  · subst hsame
+    simp [twoLocusRightHJet_driftAt, twoLocusRightHJet_value]
+  · have hnever : ∀ deme : Fin D, ¬(first = deme ∧ second = deme) := by
+      intro deme hboth
+      exact hsame (hboth.1.trans hboth.2.symm)
+    simp [twoLocusRightHJet_driftAt, hsame, hnever]
+
+/-- The drift stages move the affine constant coordinate not at all. -/
+theorem driftStage_sum_constant {D : ℕ} (rates : ManyDemeLDRates D)
+    (state : DemeHaplotypeState D) :
+    ∑ deme : Fin D, stageRate rates (Stage.drift deme) *
+        stageVelocity (enlargedStageExpansion (none : AffineEnlargedCoordinate D))
+          (Stage.drift deme) state = 0 := by
+  simp [stageVelocity, enlargedStageExpansion, enlargedCoordinateJet,
+    TwoLocusDiffusionJet.const]
+
+/-! ## The recombination stages reproduce the corpus recombination row -/
+
+/-- Recombination moves no marginal allele frequency, so the left heterozygosity has zero
+recombination velocity. -/
+theorem recombinationLeftHeterozygosity_velocity {D : ℕ} (deme first second : Fin D)
+    (state : DemeHaplotypeState D) :
+    ((recombinationCoordinateExpansion deme).leftHeterozygosity first second).velocity
+      state = 0 := by
+  simp [PulseCoordinateExpansion.leftHeterozygosity, PulseExpansion.ofEq, PulseExpansion.add,
+    PulseExpansion.mul, PulseExpansion.smul, PulseExpansion.const,
+    recombinationCoordinateExpansion, recombinationLeftExpansion]
+
+/-- The right heterozygosity likewise has zero recombination velocity. -/
+theorem recombinationRightHeterozygosity_velocity {D : ℕ} (deme first second : Fin D)
+    (state : DemeHaplotypeState D) :
+    ((recombinationCoordinateExpansion deme).rightHeterozygosity first second).velocity
+      state = 0 := by
+  simp [PulseCoordinateExpansion.rightHeterozygosity, PulseExpansion.ofEq, PulseExpansion.add,
+    PulseExpansion.mul, PulseExpansion.smul, PulseExpansion.const,
+    recombinationCoordinateExpansion, recombinationRightExpansion]
+
+/-- The joint heterozygosity is a product of two heterozygosities, so it too is unmoved by
+recombination.  This is the corpus's vanishing `pi2` recombination row. -/
+theorem recombinationJointHeterozygosity_velocity {D : ℕ} (deme first second third fourth :
+    Fin D) (state : DemeHaplotypeState D) :
+    ((recombinationCoordinateExpansion deme).jointHeterozygosity first second third
+      fourth).velocity state = 0 := by
+  simp [PulseCoordinateExpansion.jointHeterozygosity, PulseExpansion.ofEq, PulseExpansion.mul,
+    PulseExpansion.smul, recombinationLeftHeterozygosity_velocity,
+    recombinationRightHeterozygosity_velocity]
+
+/-- The generalized `Dz` observable loses its linkage factor at the recombining deme and
+nothing else, matching the corpus's `-rho/2 * Dz` row once the pulse fraction carries the
+half-rate. -/
+theorem recombinationDzObservable_velocity {D : ℕ} (deme first second third : Fin D)
+    (state : DemeHaplotypeState D) :
+    ((recombinationCoordinateExpansion deme).dzObservable first second third).velocity
+        state =
+      -(if first = deme then 1 else 0) * (twoLocusDzJet first second third).value state := by
+  by_cases hfirst : first = deme <;>
+    simp [PulseCoordinateExpansion.dzObservable, PulseExpansion.ofEq, PulseExpansion.mul,
+      PulseExpansion.add, PulseExpansion.smul, PulseExpansion.const,
+      recombinationCoordinateExpansion, recombinationLinkageExpansion,
+      recombinationLeftExpansion, recombinationRightExpansion,
+      TwoLocusHaplotypeFrequencies.recombinationLinkageVelocity, twoLocusDzJet,
+      TwoLocusDiffusionJet.mul, TwoLocusDiffusionJet.add, TwoLocusDiffusionJet.smul,
+      TwoLocusDiffusionJet.const, twoLocusLinkageJet, twoLocusLeftContrastJet,
+      twoLocusRightContrastJet, twoLocusLeftFrequencyJet, twoLocusRightFrequencyJet,
+      hfirst] <;> ring
+
+/-- A rate-weighted sum against an index indicator reads the rate at that index. -/
+private theorem sum_rate_indicator {D : ℕ} (weight : Fin D → ℝ) (target : Fin D) :
+    ∑ deme : Fin D, weight deme * (if target = deme then (1 : ℝ) else 0) = weight target := by
+  classical
+  simp
+
+/-- The recombination stages sum to the corpus's recombination generator row on every stored
+coordinate. -/
+theorem recombinationStage_sum_stored {D : ℕ} (rates : ManyDemeLDRates D)
+    (feature : LowOrderLDCoordinate D) (state : DemeHaplotypeState D) :
+    ∑ deme : Fin D, stageRate rates (Stage.recombination deme) *
+        stageVelocity (enlargedStageExpansion (some (.inl feature)))
+          (Stage.recombination deme) state =
+      lowOrderLDRecombination rates (twoLocusJetMoment state) feature := by
+  classical
+  have hvelocity : ∀ deme : Fin D,
+      stageRate rates (Stage.recombination deme) *
+        stageVelocity (enlargedStageExpansion (some (.inl feature)))
+          (Stage.recombination deme) state =
+      rates.recombination deme / 2 *
+        ((recombinationCoordinateExpansion deme).coordinate feature).velocity state :=
+    fun _ ↦ rfl
+  simp only [hvelocity]
+  cases feature with
+  | H first second =>
+      simp only [PulseCoordinateExpansion.coordinate,
+        recombinationLeftHeterozygosity_velocity, mul_zero, Finset.sum_const_zero]
+      rfl
+  | DD first second =>
+      simp only [PulseCoordinateExpansion.coordinate,
+        recombinationLinkageProduct_velocity]
+      have hsplit : ∀ deme : Fin D,
+          rates.recombination deme / 2 *
+            (-((if first = deme then (1 : ℝ) else 0) +
+                (if second = deme then (1 : ℝ) else 0)) *
+              (twoLocusDDJet first second).value state) =
+            -((twoLocusDDJet first second).value state / 2) *
+              (rates.recombination deme * (if first = deme then (1 : ℝ) else 0)) +
+            -((twoLocusDDJet first second).value state / 2) *
+              (rates.recombination deme * (if second = deme then (1 : ℝ) else 0)) :=
+        fun _ ↦ by ring
+      simp only [hsplit, Finset.sum_add_distrib, ← Finset.mul_sum, sum_rate_indicator]
+      simp only [lowOrderLDRecombination, twoLocusJetMoment, twoLocusCoordinateJet,
+        twoLocusDDJet, TwoLocusDiffusionJet.mul, twoLocusLinkageJet]
+      ring
+  | Dz first second third =>
+      simp only [PulseCoordinateExpansion.coordinate, recombinationDzObservable_velocity]
+      have hsplit : ∀ deme : Fin D,
+          rates.recombination deme / 2 *
+            (-(if first = deme then (1 : ℝ) else 0) *
+              (twoLocusDzJet first second third).value state) =
+            -((twoLocusDzJet first second third).value state / 2) *
+              (rates.recombination deme * (if first = deme then (1 : ℝ) else 0)) :=
+        fun _ ↦ by ring
+      simp only [hsplit, ← Finset.mul_sum, sum_rate_indicator]
+      simp only [lowOrderLDRecombination, twoLocusJetMoment, twoLocusCoordinateJet]
+      ring
+  | pi2 first second third fourth =>
+      simp only [PulseCoordinateExpansion.coordinate,
+        recombinationJointHeterozygosity_velocity, mul_zero, Finset.sum_const_zero]
+      rfl
+
+/-- The recombination stages leave every right-locus heterozygosity coordinate alone, which
+is why the enlarged generator's `H^R` rows carry no recombination term. -/
+theorem recombinationStage_sum_rightHeterozygosity {D : ℕ} (rates : ManyDemeLDRates D)
+    (first second : Fin D) (state : DemeHaplotypeState D) :
+    ∑ deme : Fin D, stageRate rates (Stage.recombination deme) *
+        stageVelocity (enlargedStageExpansion (some (.inr (first, second))))
+          (Stage.recombination deme) state = 0 := by
+  have hvelocity : ∀ deme : Fin D,
+      stageRate rates (Stage.recombination deme) *
+        stageVelocity (enlargedStageExpansion (some (.inr (first, second))))
+          (Stage.recombination deme) state =
+      rates.recombination deme / 2 *
+        ((recombinationCoordinateExpansion deme).rightHeterozygosity first second).velocity
+          state := fun _ ↦ rfl
+  simp [hvelocity, recombinationRightHeterozygosity_velocity]
+
 end
 
 end Descent.Portability.TwoLocusMicroscopicKernel

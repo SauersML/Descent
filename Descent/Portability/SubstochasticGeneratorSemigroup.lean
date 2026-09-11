@@ -35,11 +35,13 @@ operator `1 + λ⁻¹ • Q` of (26) is substochastic whenever `λ` dominates ev
 so is each of its powers `P ^ k`; those are the positive suboperators whose Poisson weights
 the retained-mass certificate multiplies.
 
-Scope.  This module supplies positivity and mass control only.  The omitted mass of a
-truncated Poisson mixture is bounded in `Descent.Portability.SublawReportCertificate`, which
-owns equations (24) and (25); nothing here duplicates it, and the Poisson weights themselves
-are not summed here.  The generator identity (19) of NOTE1 §4.2, which derives the rates
-`q_{ξη}` from coalescent duality with recombination, is not formalized anywhere in the corpus.
+Scope.  This module supplies positivity and mass control only.  The Poisson weights of (26)
+are not summed here: the mixture identity, the truncated operator and the bound on the row
+mass it omits are `Descent.Portability.PoissonTruncationCertificate`, and the bounds (24) and
+(25) that a retained mass certifies are `Descent.Portability.SublawReportCertificate`.
+Nothing here duplicates either.  The generator identity (19) of NOTE1 §4.2, which derives the
+rates `q_{ξη}` from coalescent duality with recombination, is not formalized anywhere in the
+corpus.
 
 ## Empirical status
 

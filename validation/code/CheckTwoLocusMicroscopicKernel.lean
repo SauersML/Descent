@@ -19,3 +19,14 @@ open Descent.Portability.TwoLocusMicroscopicKernel
 #print axioms microscopicError_tendsto
 #print axioms microscopicKernel_expansion
 #print axioms twoLocusMicroscopicApproximation
+#print axioms stageStructure
+#print axioms sum_stage
+#print axioms driftStage_sum_stored
+#print axioms driftStage_sum_rightHeterozygosity
+#print axioms driftStage_sum_constant
+#print axioms recombinationLeftHeterozygosity_velocity
+#print axioms recombinationRightHeterozygosity_velocity
+#print axioms recombinationJointHeterozygosity_velocity
+#print axioms recombinationDzObservable_velocity
+#print axioms recombinationStage_sum_stored
+#print axioms recombinationStage_sum_rightHeterozygosity
