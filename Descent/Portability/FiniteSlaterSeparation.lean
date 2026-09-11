@@ -68,11 +68,14 @@ theorem coordinate_pairing (L : (ι → ℝ) →L[ℝ] ℝ) (y : ι → ℝ) :
   classical
   have he : y = ∑ i, y i • (Pi.single i (1 : ℝ) : ι → ℝ) := by
     ext j
-    simp
-  rw [he, map_sum]
-  apply Finset.sum_congr rfl
-  intro i _
-  rw [map_smul, smul_eq_mul, mul_comm]
+    simp [Pi.single_apply]
+  calc
+    L y = L (∑ i, y i • (Pi.single i (1 : ℝ) : ι → ℝ)) := congrArg L he
+    _ = ∑ i, L (Pi.single i 1) * y i := by
+      rw [map_sum]
+      apply Finset.sum_congr rfl
+      intro i _
+      rw [map_smul, smul_eq_mul, mul_comm]
 
 /-- Every coordinate of an upward-set separator is nonnegative. -/
 theorem coefficient_nonneg (C : Set A) (F : A → ι → ℝ) (hne : C.Nonempty)

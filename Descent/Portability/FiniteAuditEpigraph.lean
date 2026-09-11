@@ -30,8 +30,8 @@ def domain (floor : ι → ℝ) : Set ((ι → ℝ) × ℝ) :=
 /-- The expected-budget constraint and the finite contrast-variance constraints. -/
 noncomputable def constraint (a : J → ι → ℝ) (c : ι → ℝ) (B : ℝ) :
     Option J → ((ι → ℝ) × ℝ) → ℝ
-  | none, x ↦ spending c x.1 - B
-  | some j, x ↦ rowVariance a x.1 j - x.2
+  | none, x => spending c x.1 - B
+  | some j, x => rowVariance a x.1 j - x.2
 
 /-- The probability box with a free epigraph coordinate is convex. -/
 theorem domain_convex (floor : ι → ℝ) : Convex ℝ (domain floor) := by
@@ -39,7 +39,7 @@ theorem domain_convex (floor : ι → ℝ) : Convex ℝ (domain floor) := by
     ext x
     simp [domain, Set.mem_Icc, Pi.le_def, forall_and]
   rw [he]
-  exact convex_Icc.prod convex_univ
+  exact (convex_Icc floor (fun _ ↦ (1 : ℝ))).prod convex_univ
 
 /-- The epigraph objective is the actual free scalar coordinate and is affine. -/
 theorem objective_convex (floor : ι → ℝ) :

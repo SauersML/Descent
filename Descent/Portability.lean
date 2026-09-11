@@ -1,6 +1,11 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.CubeAverageConvergence
+import Descent.Portability.FiniteSlaterSeparation
+import Descent.Portability.FiniteSlaterMultipliers
+import Descent.Portability.FiniteAuditEpigraph
+import Descent.Portability.FiniteAuditStrongDuality
 import Descent.Portability.SmoothedCoordinateLaws
 import Descent.Portability.FiniteMedianGeometry
 import Descent.Portability.PairedGainTailExperiment

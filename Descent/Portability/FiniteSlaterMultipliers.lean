@@ -25,8 +25,8 @@ variable {A J : Type*} [AddCommGroup A] [Module ℝ A] [Fintype J]
 
 /-- Objective excess occupies the first coordinate; the remaining coordinates are constraints. -/
 def residuals (f : A → ℝ) (g : J → A → ℝ) (v : ℝ) (x : A) : Option J → ℝ
-  | none ↦ f x - v
-  | some j ↦ g j x
+  | none => f x - v
+  | some j => g j x
 
 /-- Convex objective and constraints give a coordinatewise convex residual map. -/
 theorem residuals_convex (C : Set A) (f : A → ℝ) (g : J → A → ℝ) (v : ℝ)
