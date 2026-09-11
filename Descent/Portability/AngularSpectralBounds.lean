@@ -278,6 +278,22 @@ theorem angular_feasibility (G : Matrix (Fin d) (Fin d) ℝ) :
     exact ⟨Fin d, inferInstance, angularEigenLaw G hpsd htr, angularEigenVector G hpsd.1,
       angularEigenVector_ne_zero G hpsd.1, angularMatrix_angularEigenLaw G hpsd htr⟩
 
+/-- The realizing law of `angular_feasibility` puts mass exactly the eigenvalue on each
+eigendirection, so it puts no mass at all on a direction whose eigenvalue vanishes. -/
+theorem angularEigenLaw_weight (G : Matrix (Fin d) (Fin d) ℝ) (hG : Matrix.PosSemidef G)
+    (htr : Matrix.trace G = 1) (i : Fin d) :
+    angularEigenLaw G hG htr (fun ω ↦ if ω = i then (1 : ℝ) else 0)
+      = Matrix.IsHermitian.eigenvalues hG.1 i := by
+  simp [angularEigenLaw]
+
+/-- **The support bound of PL Corollary 6.3.**  Together with `angularEigenLaw_weight` this is
+the manuscript's "an attaining law on at most `r` residual directions": the realizing law is
+carried by the eigendirections of nonzero eigenvalue, and there are exactly `rank Γ` of those. -/
+theorem angularEigenLaw_support_card (G : Matrix (Fin d) (Fin d) ℝ)
+    (hG : Matrix.IsHermitian G) :
+    Fintype.card {i : Fin d // Matrix.IsHermitian.eigenvalues hG i ≠ 0} = Matrix.rank G :=
+  (Matrix.IsHermitian.rank_eq_card_non_zero_eigs hG).symm
+
 /-! ## PL (6.9): the two-dimensional example -/
 
 /-- The diagonal direction `v₊ = (v₁ + v₂)/√2` in two coordinates. -/

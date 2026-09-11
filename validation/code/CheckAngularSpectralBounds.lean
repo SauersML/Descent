@@ -25,3 +25,5 @@ import Descent.Portability.AngularSpectralBounds
 #print axioms Descent.Portability.AngularSpectralBounds.two_dim_plus_direction_report
 #print axioms Descent.Portability.AngularSpectralBounds.two_dim_plus_direction_bound
 #print axioms Descent.Portability.AngularSpectralBounds.two_dim_plus_direction_attained
+#print axioms Descent.Portability.AngularSpectralBounds.angularEigenLaw_weight
+#print axioms Descent.Portability.AngularSpectralBounds.angularEigenLaw_support_card
