@@ -255,6 +255,201 @@ theorem radial_recovery_error (r : Fin (k + 1) → ℝ) (hinj : Function.Injecti
   rw [← hgap]
   exact hlow
 
+/-- The radius family of PL Lemma 7.1: one small radius `t` and the integers `1,…,k`. -/
+def radii (k : ℕ) (t : ℝ) : Fin (k + 1) → ℝ := fun i ↦ if i = 0 then t else ((i : ℕ) : ℝ)
+
+/-- At `t = 0` every radius is its own index. -/
+theorem radii_zero (k : ℕ) (i : Fin (k + 1)) : radii k 0 i = ((i : ℕ) : ℝ) := by
+  unfold radii
+  by_cases hi : i = 0
+  · simp [hi]
+  · simp [hi]
+
+/-- The radii are distinct for a small positive `t`. -/
+theorem radii_injective (k : ℕ) (t : ℝ) (ht : 0 < t) (ht1 : t < 1) :
+    Function.Injective (radii k t) := by
+  intro i j hij
+  unfold radii at hij
+  by_cases hi : i = 0 <;> by_cases hj : j = 0
+  · rw [hi, hj]
+  · exfalso
+    rw [if_pos hi, if_neg hj] at hij
+    have h1 : 1 ≤ (j : ℕ) := Nat.one_le_iff_ne_zero.mpr fun hc ↦ hj (Fin.val_eq_zero_iff.mp hc)
+    have h2 : (1 : ℝ) ≤ ((j : ℕ) : ℝ) := by exact_mod_cast h1
+    linarith
+  · exfalso
+    rw [if_neg hi, if_pos hj] at hij
+    have h1 : 1 ≤ (i : ℕ) := Nat.one_le_iff_ne_zero.mpr fun hc ↦ hi (Fin.val_eq_zero_iff.mp hc)
+    have h2 : (1 : ℝ) ≤ ((i : ℕ) : ℝ) := by exact_mod_cast h1
+    linarith
+  · rw [if_neg hi, if_neg hj] at hij
+    have : (i : ℕ) = (j : ℕ) := by exact_mod_cast hij
+    exact Fin.val_injective this
+
+/-- The radii are positive for a positive `t`. -/
+theorem radii_pos (k : ℕ) (t : ℝ) (ht : 0 < t) (i : Fin (k + 1)) : 0 < radii k t i := by
+  unfold radii
+  by_cases hi : i = 0
+  · rw [if_pos hi]; exact ht
+  · rw [if_neg hi]
+    have h1 : 1 ≤ (i : ℕ) := Nat.one_le_iff_ne_zero.mpr fun hc ↦ hi (Fin.val_eq_zero_iff.mp hc)
+    have h2 : (1 : ℝ) ≤ ((i : ℕ) : ℝ) := by exact_mod_cast h1
+    linarith
+
+/-- At `t = 0` the radial weights concentrate entirely on the smallest radius. -/
+theorem radialWeight_radii_zero (k : ℕ) (i : Fin (k + 1)) :
+    radialWeight (radii k 0) i = if i = 0 then 1 else 0 := by
+  have hz : ((0 : Fin (k + 1)) : ℕ) = 0 := rfl
+  by_cases hi : i = 0
+  · subst hi
+    rw [if_pos rfl]
+    unfold radialWeight
+    refine Finset.prod_eq_one fun j hj ↦ ?_
+    have hj0 : j ≠ 0 := Finset.ne_of_mem_erase hj
+    have hval : ((j : ℕ) : ℝ) ≠ 0 := by
+      simp only [ne_eq, Nat.cast_eq_zero]
+      exact fun hc ↦ hj0 (Fin.val_eq_zero_iff.mp hc)
+    simp only [radii_zero, hz, Nat.cast_zero, zero_sub]
+    exact div_self (neg_ne_zero.mpr hval)
+  · rw [if_neg hi]
+    unfold radialWeight
+    refine Finset.prod_eq_zero
+      (Finset.mem_erase.mpr ⟨Ne.symm hi, Finset.mem_univ 0⟩) ?_
+    simp [radii_zero, hz]
+
+/-- At `t = 0` the total variation of the radial weights is exactly one. -/
+theorem radialTotal_radii_zero (k : ℕ) : radialTotal (radii k 0) = 1 := by
+  unfold radialTotal
+  have hterm : ∀ i : Fin (k + 1), |radialWeight (radii k 0) i| =
+      if i = 0 then (1 : ℝ) else 0 := by
+    intro i
+    rw [radialWeight_radii_zero]
+    by_cases hi : i = 0 <;> simp [hi]
+  rw [Finset.sum_congr rfl fun i _ ↦ hterm i, Finset.sum_ite_eq' Finset.univ (0 : Fin (k + 1))]
+  simp
+
+/-- Continuity at a point of a finite product of functions continuous there. -/
+theorem continuousAt_finset_prod {ι : Type*} (f : ι → ℝ → ℝ) (x : ℝ)
+    (h : ∀ i, ContinuousAt (f i) x) (s : Finset ι) :
+    ContinuousAt (fun t ↦ ∏ i ∈ s, f i t) x := by
+  classical
+  refine Finset.induction_on s ?_ ?_
+  · simp only [Finset.prod_empty]
+    exact continuousAt_const
+  · intro a s ha ih
+    simp only [Finset.prod_insert ha]
+    exact (h a).mul ih
+
+/-- Continuity at a point of a finite sum of functions continuous there. -/
+theorem continuousAt_finset_sum {ι : Type*} (f : ι → ℝ → ℝ) (x : ℝ)
+    (h : ∀ i, ContinuousAt (f i) x) (s : Finset ι) :
+    ContinuousAt (fun t ↦ ∑ i ∈ s, f i t) x := by
+  classical
+  refine Finset.induction_on s ?_ ?_
+  · simp only [Finset.sum_empty]
+    exact continuousAt_const
+  · intro a s ha ih
+    simp only [Finset.sum_insert ha]
+    exact (h a).add ih
+
+/-- Each radius depends continuously on the small parameter. -/
+theorem radii_continuousAt (k : ℕ) (j : Fin (k + 1)) :
+    ContinuousAt (fun t : ℝ ↦ radii k t j) 0 := by
+  unfold radii
+  by_cases hj : j = 0
+  · simp only [if_pos hj]
+    exact continuousAt_id
+  · simp only [if_neg hj]
+    exact continuousAt_const
+
+/-- Each radial weight depends continuously on the small parameter at zero. -/
+theorem radialWeight_continuousAt (k : ℕ) (i : Fin (k + 1)) :
+    ContinuousAt (fun t : ℝ ↦ radialWeight (radii k t) i) 0 := by
+  have hz : ∀ j : Fin (k + 1), radii k 0 j = ((j : ℕ) : ℝ) := radii_zero k
+  refine continuousAt_finset_prod
+    (fun j t ↦ (-(radii k t j)) / (radii k t i - radii k t j)) 0 (fun j ↦ ?_) _
+  show ContinuousAt (fun t : ℝ ↦ (-(radii k t j)) / (radii k t i - radii k t j)) 0
+  by_cases hj : j = i
+  · subst hj
+    have hfun : (fun t : ℝ ↦ (-(radii k t j)) / (radii k t j - radii k t j)) =
+        fun _ : ℝ ↦ (0 : ℝ) := by
+      funext t
+      rw [sub_self, div_zero]
+    rw [hfun]
+    exact continuousAt_const
+  · refine ContinuousAt.div ((radii_continuousAt k j).neg)
+      ((radii_continuousAt k i).sub (radii_continuousAt k j)) ?_
+    rw [hz i, hz j]
+    have hne : (i : ℕ) ≠ (j : ℕ) := fun hc ↦ hj (Fin.val_injective hc).symm
+    have : ((i : ℕ) : ℝ) ≠ ((j : ℕ) : ℝ) := by exact_mod_cast hne
+    exact sub_ne_zero.mpr this
+
+/-- The total variation of the radial weights is continuous at zero. -/
+theorem radialTotal_continuousAt (k : ℕ) :
+    ContinuousAt (fun t : ℝ ↦ radialTotal (radii k t)) 0 :=
+  continuousAt_finset_sum (fun i t ↦ |radialWeight (radii k t) i|) 0
+    (fun i ↦ (radialWeight_continuousAt k i).abs) _
+
+/-- **PL Lemma 7.1, the limit `c_ε → 1`.** For every `δ > 0` there are `k+1` distinct
+positive radii whose weights have total variation below `1 + δ`. -/
+theorem exists_radii_total_lt (k : ℕ) (δ : ℝ) (hδ : 0 < δ) :
+    ∃ t : ℝ, 0 < t ∧ t < 1 ∧ radialTotal (radii k t) < 1 + δ := by
+  have hcont := radialTotal_continuousAt k
+  rw [Metric.continuousAt_iff] at hcont
+  obtain ⟨η, hη, hball⟩ := hcont δ hδ
+  refine ⟨min (η / 2) (1 / 2), lt_min (by linarith) (by norm_num), ?_, ?_⟩
+  · exact lt_of_le_of_lt (min_le_right _ _) (by norm_num)
+  · have hpos : 0 < min (η / 2) (1 / 2) := lt_min (by linarith) (by norm_num)
+    have hdist : dist (min (η / 2) (1 / 2)) 0 < η := by
+      rw [Real.dist_eq, sub_zero, abs_of_pos hpos]
+      exact lt_of_le_of_lt (min_le_left _ _) (by linarith)
+    have hlt := hball hdist
+    rw [Real.dist_eq, radialTotal_radii_zero] at hlt
+    linarith [(abs_lt.mp hlt).2]
+
+/-- **PL Theorem 7.2, equation (7.4).** The supremum of the report gap over
+moment-matched pairs is the full template gap: for every `η > 0` there are `k+1` distinct
+positive radii whose laws share every joint raw moment of total degree at most `k` while
+their expected reports differ by more than `F u - F v - η`. -/
+theorem radial_gap_approaches_range (k : ℕ) (u v : N → ℝ) (F : (N → ℝ) → ℝ)
+    (hF : ∀ t : ℝ, 0 < t → ∀ y : N → ℝ, F (t • y) = F y) (hD : F v ≤ F u)
+    (η : ℝ) (hη : 0 < η) :
+    ∃ (t : ℝ) (ht : 0 < t) (ht1 : t < 1),
+      (∀ α : N → ℕ, ∑ i, α i ≤ k →
+          radialExp (radii k t) (radii_injective k t ht ht1) false
+              (fun w ↦ monomialEval α (radialPoint (radii k t) u v w)) =
+            radialExp (radii k t) (radii_injective k t ht ht1) true
+              (fun w ↦ monomialEval α (radialPoint (radii k t) u v w))) ∧
+        F u - F v - η ≤
+          radialExp (radii k t) (radii_injective k t ht ht1) false
+              (fun w ↦ F (radialPoint (radii k t) u v w)) -
+            radialExp (radii k t) (radii_injective k t ht ht1) true
+              (fun w ↦ F (radialPoint (radii k t) u v w)) := by
+  have hD0 : (0 : ℝ) ≤ F u - F v := by linarith
+  have hD1 : (0 : ℝ) < F u - F v + 1 := by linarith
+  have hδ : 0 < η / (F u - F v + 1) := div_pos hη hD1
+  obtain ⟨t, ht, ht1, htot⟩ := exists_radii_total_lt k (η / (F u - F v + 1)) hδ
+  have hinj := radii_injective k t ht ht1
+  have hpos := radii_pos k t ht
+  refine ⟨t, ht, ht1, fun α hα ↦ radial_moment_match (radii k t) hinj u v α hα, ?_⟩
+  rw [radial_report_gap (radii k t) hinj hpos u v F hF]
+  have hc1 : 1 ≤ radialTotal (radii k t) := one_le_radialTotal _ hinj
+  have hcpos : 0 < radialTotal (radii k t) := by linarith
+  have hden : (0 : ℝ) < 1 + η / (F u - F v + 1) := by linarith
+  have hstep : (F u - F v) / (1 + η / (F u - F v + 1)) ≤
+      (F u - F v) / radialTotal (radii k t) := by
+    gcongr
+  have hfinal : F u - F v - η ≤ (F u - F v) / (1 + η / (F u - F v + 1)) := by
+    rw [le_div_iff₀ hden]
+    have hexp : (F u - F v - η) * (1 + η / (F u - F v + 1)) =
+        (F u - F v - η) * (F u - F v + 1 + η) / (F u - F v + 1) := by
+      first
+        | (field_simp; ring)
+        | field_simp
+    rw [hexp, div_le_iff₀ hD1]
+    nlinarith
+  linarith
+
 end
 
 end Descent.Portability.RadialInterpolation
