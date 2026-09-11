@@ -8,6 +8,7 @@ import Descent.Portability.EnlargedGeneratorBridges
 open Descent.Portability.EnlargedGeneratorBridges
 
 #print axioms sumStageEquiv
+#print axioms sumStageEquiv_eq_stageStructure
 #print axioms sum_stage
 #print axioms recombinationRightHeterozygosity_velocity
 #print axioms leftMutationRightHeterozygosity_velocity
