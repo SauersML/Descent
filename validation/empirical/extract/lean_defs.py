@@ -3144,6 +3144,15 @@ def Descent_Portability_ArchaicPrediction_allele(b):
 def cubeMean(p, f):
     return sum((_rt.mul(cubeWeight(p, x), f(x))) for x in range(int(len(p))))
 
+def rareSourceVariance(γ, ε):
+    return ((_rt.lpow(γ, 2.0) * _rt.lpow(ε, 2.0)) * _rt.lpow(((1.0 - ε)), 2.0))
+
+def rareTransportDebt(γ, ε):
+    return (_rt.rdiv(_rt.lpow(γ, 2.0), 2.0) * _rt.lpow(((_rt.rdiv(1.0, 2.0) - ε)), 2.0))
+
+def Descent_Portability_ArchaicPrediction_weightedMean(w, f):
+    return sum((_rt.mul(w[int(h)], f[int(h)])) for h in range(int(len(w))))
+
 def plusPhases():
     return _rt.VecFn([_rt.VecFn([true, true, true, true]), _rt.VecFn([true, true, false, false]), _rt.VecFn([true, false, true, false]), _rt.VecFn([true, false, false, true])])
 
@@ -3155,6 +3164,18 @@ def phaseSign(x, i):
 
 def fourLogit(x):
     return ((-3.0) + (2.0 * (((phaseSign(x, 0.0) * phaseSign(x, 1.0)) + (phaseSign(x, 2.0) * phaseSign(x, 3.0))))))
+
+def mixtureSurvival(π, r, Λ):
+    return sum((_rt.mul(π[int(h)], _rt.rexp((_rt.mul(_rt.neg(Λ), r[int(h)]))))) for h in range(int(len(π))))
+
+def survivalNumerator(π, r, Λ):
+    return sum((_rt.mul(_rt.mul(π[int(h)], r[int(h)]), _rt.rexp((_rt.mul(_rt.neg(Λ), r[int(h)]))))) for h in range(int(len(π))))
+
+def survivorWeight(π, r, Λ, h):
+    return _rt.rdiv(_rt.mul(π[int(h)], _rt.rexp((_rt.mul(_rt.neg(Λ), r[int(h)])))), mixtureSurvival(π, r, Λ))
+
+def effectiveRate(π, r, Λ):
+    return _rt.rdiv(survivalNumerator(π, r, Λ), mixtureSurvival(π, r, Λ))
 
 def shiftPolynomial(δ):
     return eval_2Hom(C, ((lambda i: _rt.add(X(i), C((δ[int(i)]))))))
@@ -4676,11 +4697,11 @@ def meffFlat(n):
 def meffSize(n):
     return (n + (n * n))
 
-def weightedMean(w, c):
+def Descent_Portability_weightedMean(w, c):
     return sum((_rt.mul(w[int(t)], c[int(t)])) for t in range(int(len(w))))
 
 def energyWeightedVariance(w, c):
-    return sum((_rt.mul(w[int(t)], _rt.lpow((_rt.sub(c[int(t)], weightedMean(w, c))), 2.0))) for t in range(int(len(w))))
+    return sum((_rt.mul(w[int(t)], _rt.lpow((_rt.sub(c[int(t)], Descent_Portability_weightedMean(w, c))), 2.0))) for t in range(int(len(w))))
 
 def samplePCOverlapSq(n, M, spike):
     return (_rt.rdiv(((1.0 - _rt.rdiv((_rt.rdiv(n, M)), _rt.lpow(spike, 2.0)))), ((1.0 + _rt.rdiv((_rt.rdiv(n, M)), spike)))) if (bbpProxyThreshold(n, M) < spike) else 0.0)

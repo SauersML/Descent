@@ -51,7 +51,8 @@ def FiniteExactBudget (kernel : S → FiniteReportLaw S) (reports : Matrix S I �
   ∃ procedure : Procedure (EuclideanSpace ℝ R) (EuclideanSpace ℝ (T × I)) queries,
     ∀ vector : EuclideanSpace ℝ R, ∀ hvector : ‖vector‖ ≤ radius,
       ‖futureTrajectory kernel reports times weights
-          (initialLaw center residual radius hfeasible vector hvector) - procedure.run vector‖ ^ 2 ≤ 0
+          (initialLaw center residual radius hfeasible vector hvector) -
+        procedure.run vector‖ ^ 2 ≤ 0
 
 theorem finite_exact_budget_iff (kernel : S → FiniteReportLaw S) (reports : Matrix S I ℝ)
     (times : T → ℕ) (weights : T → ℝ) (hweights : ∀ time, 0 ≤ weights time)
@@ -79,12 +80,14 @@ theorem finite_minimal_exact_count (kernel : S → FiniteReportLaw S) (reports :
   exact (finite_exact_budget_iff kernel reports times weights hweights center residual radius
     hradius hfeasible queries).mp hqueries
 
+omit [DecidableEq S] in
 /-- The same rank is computable from the residual finite observability Gramian. -/
 theorem finite_rank_from_gramian (reports : T → Matrix S I ℝ) (weights : T → ℝ)
     (hweights : ∀ time, 0 ≤ weights time) (residual : Matrix S R ℝ) :
     targetRank (forecastOperator reports weights residual) =
       Module.finrank ℝ (LinearMap.range
-        (euclideanOperator (residual.transpose * gramian reports weights * residual)).toLinearMap) := by
+        (euclideanOperator (residual.transpose * gramian reports weights *
+          residual)).toLinearMap) := by
   rw [← gram_rank, forecastOperator_gram reports weights hweights residual]
 
 open DiscountedForecastMinimax
@@ -96,8 +99,10 @@ def DiscountedExactBudget (kernel : S → FiniteReportLaw S) (reports : Matrix S
   ∃ procedure : Procedure (EuclideanSpace ℝ R) (Trajectory I) queries,
     ∀ vector : EuclideanSpace ℝ R, ∀ hvector : ‖vector‖ ≤ radius,
       ‖lawTrajectory kernel reports discount hnonneg hlt
-          (initialLaw center residual radius hfeasible vector hvector) - procedure.run vector‖ ^ 2 ≤ 0
+          (initialLaw center residual radius hfeasible vector hvector) -
+        procedure.run vector‖ ^ 2 ≤ 0
 
+omit [DecidableEq I] in
 theorem discounted_exact_budget_iff (kernel : S → FiniteReportLaw S) (reports : Matrix S I ℝ)
     (discount : ℝ) (hnonneg : 0 ≤ discount) (hlt : discount < 1)
     (center : S → ℝ) (residual : Matrix S R ℝ) (radius : ℝ) (hradius : 0 < radius)
@@ -110,6 +115,7 @@ theorem discounted_exact_budget_iff (kernel : S → FiniteReportLaw S) (reports 
     (adaptive_discounted_minimax kernel reports discount hnonneg hlt center residual radius
       hradius.le hfeasible queries).1
 
+omit [DecidableEq I] in
 /-- The infinite trajectory requires exactly its finite residual image dimension. -/
 theorem discounted_minimal_exact_count (kernel : S → FiniteReportLaw S) (reports : Matrix S I ℝ)
     (discount : ℝ) (hnonneg : 0 ≤ discount) (hlt : discount < 1)
@@ -125,12 +131,14 @@ theorem discounted_minimal_exact_count (kernel : S → FiniteReportLaw S) (repor
   exact (discounted_exact_budget_iff kernel reports discount hnonneg hlt center residual radius
     hradius hfeasible queries).mp hqueries
 
+omit [DecidableEq I] in
 theorem discounted_rank_from_gramian (kernel : S → FiniteReportLaw S) (reports : Matrix S I ℝ)
     (discount : ℝ) (hnonneg : 0 ≤ discount) (hlt : discount < 1) (residual : Matrix S R ℝ) :
     targetRank (DiscountedForecastMinimax.forecastOperator kernel reports discount
       hnonneg hlt residual) =
       Module.finrank ℝ (LinearMap.range (euclideanOperator (residual.transpose *
-        DiscountedObservability.discountedGramian kernel reports discount * residual)).toLinearMap) := by
+        DiscountedObservability.discountedGramian kernel reports discount *
+          residual)).toLinearMap) := by
   rw [← gram_rank,
     DiscountedForecastMinimax.forecastOperator_gram kernel reports discount hnonneg hlt residual]
 

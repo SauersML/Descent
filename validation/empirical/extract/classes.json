@@ -38814,21 +38814,38 @@
    "Descent.Portability.AncientPrediction.mixture_isUnit",
    "Descent.Portability.AncientPrediction.mixture_symmetric",
    "Descent.Portability.AncientPrediction.predictive_quotient",
+   "Descent.Portability.ArchaicPrediction.additive_squared_norm",
+   "Descent.Portability.ArchaicPrediction.alternating_subset_sum",
    "Descent.Portability.ArchaicPrediction.centered_orthogonality",
    "Descent.Portability.ArchaicPrediction.centered_parseval",
+   "Descent.Portability.ArchaicPrediction.convexified_response",
    "Descent.Portability.ArchaicPrediction.cubeMean_product",
    "Descent.Portability.ArchaicPrediction.cubeWeight_nonneg",
+   "Descent.Portability.ArchaicPrediction.degree_panel_identifies",
+   "Descent.Portability.ArchaicPrediction.effectiveRate_derivative",
+   "Descent.Portability.ArchaicPrediction.effectiveRate_mean",
    "Descent.Portability.ArchaicPrediction.evaluate_transport",
-   "Descent.Portability.ArchaicPrediction.four_risks_separated",
+   "Descent.Portability.ArchaicPrediction.factorial_recovery",
+   "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_compact",
+   "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_convex",
+   "Descent.Portability.ArchaicPrediction.interaction_additive_orthogonal",
+   "Descent.Portability.ArchaicPrediction.interaction_squared_norm",
    "Descent.Portability.ArchaicPrediction.invariant_phase_expansion",
+   "Descent.Portability.ArchaicPrediction.no_uniform_source_variance_bound",
    "Descent.Portability.ArchaicPrediction.pairing_bipartite_of_no_odd",
    "Descent.Portability.ArchaicPrediction.pairing_homozygote_identifies",
+   "Descent.Portability.ArchaicPrediction.phaseCharacter_mul",
+   "Descent.Portability.ArchaicPrediction.response_covariance",
    "Descent.Portability.ArchaicPrediction.response_transport",
    "Descent.Portability.ArchaicPrediction.shiftPolynomial_comp",
    "Descent.Portability.ArchaicPrediction.shiftPolynomial_zero",
    "Descent.Portability.ArchaicPrediction.shift_product",
+   "Descent.Portability.ArchaicPrediction.subsetResponse_evaluation",
+   "Descent.Portability.ArchaicPrediction.survivalNumerator_derivative",
+   "Descent.Portability.ArchaicPrediction.survival_derivative",
    "Descent.Portability.ArchaicPrediction.transport_comp",
    "Descent.Portability.ArchaicPrediction.transport_self",
+   "Descent.Portability.ArchaicPrediction.weighted_product_expansion",
    "Descent.Portability.BalancedHWECompoundPoisson.finite_intensity_weak_convergence",
    "Descent.Portability.BalancedHWECompoundPoisson.integral_compoundMeasure",
    "Descent.Portability.BalancedHWECompoundPoisson.normalized_compoundPoisson_limit",
@@ -38884,6 +38901,7 @@
    "Descent.Portability.CalibrationLaw.variance_continuous",
    "Descent.Portability.ChunkedGenotypeLaw.dependentJoint_expectation",
    "Descent.Portability.CombinedPredictionCertificate.norm_le_of_ae_bound",
+   "Descent.Portability.CompactTargetDeflation.norm_deflate_le",
    "Descent.Portability.CompactTargetDirection.maximizer_is_singular",
    "Descent.Portability.CompactTargetDirection.maximizing_sequence_residual",
    "Descent.Portability.ComplexBernoulliProduct.bernoulli_product_limit",
@@ -39064,6 +39082,8 @@
    "Descent.Portability.GuardedMetricOptimization.recover_guard",
    "Descent.Portability.GuardedMetricOptimization.scale_pos",
    "Descent.Portability.HWEHeterozygosityLaw.count_nonneg",
+   "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability",
    "Descent.Portability.IndependentShiftOperator.independent_sum_succ",
    "Descent.Portability.IndependentShiftOperator.shift_pow_sample",
    "Descent.Portability.InterleavedMutationExponential.interval_compose",
@@ -40075,10 +40095,27 @@
     "Descent.Portability.ArchaicPrediction.cubeMean_product": [],
     "Descent.Portability.ArchaicPrediction.centered_orthogonality": [],
     "Descent.Portability.ArchaicPrediction.centered_parseval": [],
+    "Descent.Portability.ArchaicPrediction.additive_squared_norm": [],
+    "Descent.Portability.ArchaicPrediction.interaction_squared_norm": [],
+    "Descent.Portability.ArchaicPrediction.interaction_additive_orthogonal": [],
+    "Descent.Portability.ArchaicPrediction.no_uniform_source_variance_bound": [],
+    "Descent.Portability.ArchaicPrediction.alternating_subset_sum": [],
+    "Descent.Portability.ArchaicPrediction.subsetResponse_evaluation": [],
+    "Descent.Portability.ArchaicPrediction.factorial_recovery": [],
+    "Descent.Portability.ArchaicPrediction.degree_panel_identifies": [],
+    "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_compact": [],
+    "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_convex": [],
+    "Descent.Portability.ArchaicPrediction.convexified_response": [],
+    "Descent.Portability.ArchaicPrediction.weighted_product_expansion": [],
+    "Descent.Portability.ArchaicPrediction.response_covariance": [],
+    "Descent.Portability.ArchaicPrediction.phaseCharacter_mul": [],
     "Descent.Portability.ArchaicPrediction.pairing_bipartite_of_no_odd": [],
     "Descent.Portability.ArchaicPrediction.pairing_homozygote_identifies": [],
     "Descent.Portability.ArchaicPrediction.invariant_phase_expansion": [],
-    "Descent.Portability.ArchaicPrediction.four_risks_separated": [],
+    "Descent.Portability.ArchaicPrediction.effectiveRate_mean": [],
+    "Descent.Portability.ArchaicPrediction.survival_derivative": [],
+    "Descent.Portability.ArchaicPrediction.survivalNumerator_derivative": [],
+    "Descent.Portability.ArchaicPrediction.effectiveRate_derivative": [],
     "Descent.Portability.ArchaicPrediction.shiftPolynomial_comp": [],
     "Descent.Portability.ArchaicPrediction.shiftPolynomial_zero": [],
     "Descent.Portability.ArchaicPrediction.shift_product": [],
@@ -40152,6 +40189,7 @@
     "Descent.Portability.nns_higher_in_target": [],
     "Descent.Portability.paf_lower_in_target": [],
     "Descent.Portability.CombinedPredictionCertificate.norm_le_of_ae_bound": [],
+    "Descent.Portability.CompactTargetDeflation.norm_deflate_le": [],
     "Descent.Portability.CompactTargetDirection.maximizing_sequence_residual": [],
     "Descent.Portability.CompactTargetDirection.maximizer_is_singular": [],
     "Descent.Portability.ComplexBernoulliProduct.bernoulli_product_limit": [],
@@ -40415,6 +40453,8 @@
     "Descent.Portability.GuardedMetricOptimization.scale_pos": [],
     "Descent.Portability.GuardedMetricOptimization.recover_guard": [],
     "Descent.Portability.HWEHeterozygosityLaw.count_nonneg": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability": [],
+    "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit": [],
     "Descent.Portability.attenuatedVariance_eq_true_iff": [],
     "Descent.Portability.panelAdjustedImputationQuality_eq_ld_iff": [],
     "Descent.Portability.IndependentShiftOperator.independent_sum_succ": [],
@@ -46479,6 +46519,7 @@
    "Descent.PopGen.measureLinearPredictionRisk_transport_decomposition_of_orthogonality",
    "Descent.PopGen.measureVariance_eq_expect_sq_sub_sq_mean",
    "Descent.Portability.AncestralBranchExposure.occupation_continuous",
+   "Descent.Portability.ArchaicPrediction.convexified_response",
    "Descent.Portability.BalancedHWEJumpOperator.generator_power_continuous",
    "Descent.Portability.BinaryRiskCohort.continuous_calibrationIndividualLoss",
    "Descent.Portability.BinaryRiskCohort.continuous_citlEquation",
@@ -46544,6 +46585,7 @@
     "Descent.PopGen.measureLinearPredictionRisk_transport_decomposition_of_orthogonality": [],
     "Descent.PopGen._root_.Descent.Foundations.ConditionalMeanDGP.predictionRiskY_eq_irreducible_plus_approxRisk": [],
     "Descent.Portability.AncestralBranchExposure.occupation_continuous": [],
+    "Descent.Portability.ArchaicPrediction.convexified_response": [],
     "Descent.Portability.BalancedHWEJumpOperator.generator_power_continuous": [],
     "Descent.Portability.CalibrationLaw.normalCDF_continuous": [],
     "Descent.Portability.CalibrationLaw.prevalence_continuous": [],
@@ -46687,6 +46729,7 @@
    "Descent.Portability.AcceptedBinIntegrability.acceptedContribution_measurable",
    "Descent.Portability.AncestralBranchExposure.mutationFactor_measurable",
    "Descent.Portability.AncestralBranchExposure.occupation_continuous",
+   "Descent.Portability.ArchaicPrediction.sigmoid_second_derivative",
    "Descent.Portability.BalancedHWECompoundPoisson.row_size_tends_infinity",
    "Descent.Portability.BalancedHWEFiniteIntensity.finite_intensity_observable_limit",
    "Descent.Portability.BalancedHWEGaussianCharacteristic.cosine_generator_limit",
@@ -46781,6 +46824,7 @@
     "Descent.Portability.AcceptedBinIntegrability.acceptedContribution_measurable": [],
     "Descent.Portability.AncestralBranchExposure.occupation_continuous": [],
     "Descent.Portability.AncestralBranchExposure.mutationFactor_measurable": [],
+    "Descent.Portability.ArchaicPrediction.sigmoid_second_derivative": [],
     "Descent.Portability.BalancedHWECompoundPoisson.row_size_tends_infinity": [],
     "Descent.Portability.BalancedHWEFiniteIntensity.finite_intensity_observable_limit": [],
     "Descent.Portability.BalancedHWEGaussianCharacteristic.cosine_generator_limit": [],
@@ -49094,21 +49138,38 @@
    "Descent.Portability.AncientPrediction.mixture_isUnit",
    "Descent.Portability.AncientPrediction.mixture_symmetric",
    "Descent.Portability.AncientPrediction.predictive_quotient",
+   "Descent.Portability.ArchaicPrediction.additive_squared_norm",
+   "Descent.Portability.ArchaicPrediction.alternating_subset_sum",
    "Descent.Portability.ArchaicPrediction.centered_orthogonality",
    "Descent.Portability.ArchaicPrediction.centered_parseval",
+   "Descent.Portability.ArchaicPrediction.convexified_response",
    "Descent.Portability.ArchaicPrediction.cubeMean_product",
    "Descent.Portability.ArchaicPrediction.cubeWeight_nonneg",
+   "Descent.Portability.ArchaicPrediction.degree_panel_identifies",
+   "Descent.Portability.ArchaicPrediction.effectiveRate_derivative",
+   "Descent.Portability.ArchaicPrediction.effectiveRate_mean",
    "Descent.Portability.ArchaicPrediction.evaluate_transport",
-   "Descent.Portability.ArchaicPrediction.four_risks_separated",
+   "Descent.Portability.ArchaicPrediction.factorial_recovery",
+   "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_compact",
+   "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_convex",
+   "Descent.Portability.ArchaicPrediction.interaction_additive_orthogonal",
+   "Descent.Portability.ArchaicPrediction.interaction_squared_norm",
    "Descent.Portability.ArchaicPrediction.invariant_phase_expansion",
+   "Descent.Portability.ArchaicPrediction.no_uniform_source_variance_bound",
    "Descent.Portability.ArchaicPrediction.pairing_bipartite_of_no_odd",
    "Descent.Portability.ArchaicPrediction.pairing_homozygote_identifies",
+   "Descent.Portability.ArchaicPrediction.phaseCharacter_mul",
+   "Descent.Portability.ArchaicPrediction.response_covariance",
    "Descent.Portability.ArchaicPrediction.response_transport",
    "Descent.Portability.ArchaicPrediction.shiftPolynomial_comp",
    "Descent.Portability.ArchaicPrediction.shiftPolynomial_zero",
    "Descent.Portability.ArchaicPrediction.shift_product",
+   "Descent.Portability.ArchaicPrediction.subsetResponse_evaluation",
+   "Descent.Portability.ArchaicPrediction.survivalNumerator_derivative",
+   "Descent.Portability.ArchaicPrediction.survival_derivative",
    "Descent.Portability.ArchaicPrediction.transport_comp",
    "Descent.Portability.ArchaicPrediction.transport_self",
+   "Descent.Portability.ArchaicPrediction.weighted_product_expansion",
    "Descent.Portability.BalancedHWECompoundPoisson.finite_intensity_weak_convergence",
    "Descent.Portability.BalancedHWECompoundPoisson.integral_compoundMeasure",
    "Descent.Portability.BalancedHWECompoundPoisson.normalized_compoundPoisson_limit",
@@ -49164,6 +49225,7 @@
    "Descent.Portability.CalibrationLaw.variance_continuous",
    "Descent.Portability.ChunkedGenotypeLaw.dependentJoint_expectation",
    "Descent.Portability.CombinedPredictionCertificate.norm_le_of_ae_bound",
+   "Descent.Portability.CompactTargetDeflation.norm_deflate_le",
    "Descent.Portability.CompactTargetDirection.maximizer_is_singular",
    "Descent.Portability.CompactTargetDirection.maximizing_sequence_residual",
    "Descent.Portability.ComplexBernoulliProduct.bernoulli_product_limit",
@@ -49344,6 +49406,8 @@
    "Descent.Portability.GuardedMetricOptimization.recover_guard",
    "Descent.Portability.GuardedMetricOptimization.scale_pos",
    "Descent.Portability.HWEHeterozygosityLaw.count_nonneg",
+   "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability",
    "Descent.Portability.IndependentShiftOperator.independent_sum_succ",
    "Descent.Portability.IndependentShiftOperator.shift_pow_sample",
    "Descent.Portability.InterleavedMutationExponential.interval_compose",
@@ -50329,10 +50393,27 @@
     "Descent.Portability.ArchaicPrediction.cubeMean_product": [],
     "Descent.Portability.ArchaicPrediction.centered_orthogonality": [],
     "Descent.Portability.ArchaicPrediction.centered_parseval": [],
+    "Descent.Portability.ArchaicPrediction.additive_squared_norm": [],
+    "Descent.Portability.ArchaicPrediction.interaction_squared_norm": [],
+    "Descent.Portability.ArchaicPrediction.interaction_additive_orthogonal": [],
+    "Descent.Portability.ArchaicPrediction.no_uniform_source_variance_bound": [],
+    "Descent.Portability.ArchaicPrediction.alternating_subset_sum": [],
+    "Descent.Portability.ArchaicPrediction.subsetResponse_evaluation": [],
+    "Descent.Portability.ArchaicPrediction.factorial_recovery": [],
+    "Descent.Portability.ArchaicPrediction.degree_panel_identifies": [],
+    "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_compact": [],
+    "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_convex": [],
+    "Descent.Portability.ArchaicPrediction.convexified_response": [],
+    "Descent.Portability.ArchaicPrediction.weighted_product_expansion": [],
+    "Descent.Portability.ArchaicPrediction.response_covariance": [],
+    "Descent.Portability.ArchaicPrediction.phaseCharacter_mul": [],
     "Descent.Portability.ArchaicPrediction.pairing_bipartite_of_no_odd": [],
     "Descent.Portability.ArchaicPrediction.pairing_homozygote_identifies": [],
     "Descent.Portability.ArchaicPrediction.invariant_phase_expansion": [],
-    "Descent.Portability.ArchaicPrediction.four_risks_separated": [],
+    "Descent.Portability.ArchaicPrediction.effectiveRate_mean": [],
+    "Descent.Portability.ArchaicPrediction.survival_derivative": [],
+    "Descent.Portability.ArchaicPrediction.survivalNumerator_derivative": [],
+    "Descent.Portability.ArchaicPrediction.effectiveRate_derivative": [],
     "Descent.Portability.ArchaicPrediction.shiftPolynomial_comp": [],
     "Descent.Portability.ArchaicPrediction.shiftPolynomial_zero": [],
     "Descent.Portability.ArchaicPrediction.shift_product": [],
@@ -50406,6 +50487,7 @@
     "Descent.Portability.nns_higher_in_target": [],
     "Descent.Portability.paf_lower_in_target": [],
     "Descent.Portability.CombinedPredictionCertificate.norm_le_of_ae_bound": [],
+    "Descent.Portability.CompactTargetDeflation.norm_deflate_le": [],
     "Descent.Portability.CompactTargetDirection.maximizing_sequence_residual": [],
     "Descent.Portability.CompactTargetDirection.maximizer_is_singular": [],
     "Descent.Portability.ComplexBernoulliProduct.bernoulli_product_limit": [],
@@ -50661,6 +50743,8 @@
     "Descent.Portability.GuardedMetricOptimization.scale_pos": [],
     "Descent.Portability.GuardedMetricOptimization.recover_guard": [],
     "Descent.Portability.HWEHeterozygosityLaw.count_nonneg": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability": [],
+    "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit": [],
     "Descent.Portability.attenuatedVariance_eq_true_iff": [],
     "Descent.Portability.panelAdjustedImputationQuality_eq_ld_iff": [],
     "Descent.Portability.IndependentShiftOperator.independent_sum_succ": [],
@@ -63654,6 +63738,10 @@
    "Descent.Portability.HWEHeterozygosityLaw.locus_characteristic",
    "Descent.Portability.HWEHeterozygosityLaw.locus_mean",
    "Descent.Portability.HWEHeterozygosityLaw.probability_le_one",
+   "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit",
+   "Descent.Portability.HWEHeterozygosityLimit.probability_cap",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
    "Descent.Portability.HWEInteractionLaw.interaction_second_moment",
    "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass",
    "Descent.Portability.HWEInteractionLaw.squareBiasedLocus_mass",
@@ -63751,6 +63839,10 @@
     "Descent.Portability.HWEHeterozygosityLaw.locus_characteristic": [],
     "Descent.Portability.HWEHeterozygosityLaw.count_mean": [],
     "Descent.Portability.HWEHeterozygosityLaw.count_characteristic": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability": [],
+    "Descent.Portability.HWEHeterozygosityLimit.probability_cap": [],
+    "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [],
     "Descent.Portability.HWEInteractionLaw.interaction_second_moment": [],
     "Descent.Portability.HWEInteractionLaw.squareBiasedLocus_mass": [],
     "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass": [],
@@ -68591,21 +68683,38 @@
    "Descent.Portability.AncientPrediction.mixture_isUnit",
    "Descent.Portability.AncientPrediction.mixture_symmetric",
    "Descent.Portability.AncientPrediction.predictive_quotient",
+   "Descent.Portability.ArchaicPrediction.additive_squared_norm",
+   "Descent.Portability.ArchaicPrediction.alternating_subset_sum",
    "Descent.Portability.ArchaicPrediction.centered_orthogonality",
    "Descent.Portability.ArchaicPrediction.centered_parseval",
+   "Descent.Portability.ArchaicPrediction.convexified_response",
    "Descent.Portability.ArchaicPrediction.cubeMean_product",
    "Descent.Portability.ArchaicPrediction.cubeWeight_nonneg",
+   "Descent.Portability.ArchaicPrediction.degree_panel_identifies",
+   "Descent.Portability.ArchaicPrediction.effectiveRate_derivative",
+   "Descent.Portability.ArchaicPrediction.effectiveRate_mean",
    "Descent.Portability.ArchaicPrediction.evaluate_transport",
-   "Descent.Portability.ArchaicPrediction.four_risks_separated",
+   "Descent.Portability.ArchaicPrediction.factorial_recovery",
+   "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_compact",
+   "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_convex",
+   "Descent.Portability.ArchaicPrediction.interaction_additive_orthogonal",
+   "Descent.Portability.ArchaicPrediction.interaction_squared_norm",
    "Descent.Portability.ArchaicPrediction.invariant_phase_expansion",
+   "Descent.Portability.ArchaicPrediction.no_uniform_source_variance_bound",
    "Descent.Portability.ArchaicPrediction.pairing_bipartite_of_no_odd",
    "Descent.Portability.ArchaicPrediction.pairing_homozygote_identifies",
+   "Descent.Portability.ArchaicPrediction.phaseCharacter_mul",
+   "Descent.Portability.ArchaicPrediction.response_covariance",
    "Descent.Portability.ArchaicPrediction.response_transport",
    "Descent.Portability.ArchaicPrediction.shiftPolynomial_comp",
    "Descent.Portability.ArchaicPrediction.shiftPolynomial_zero",
    "Descent.Portability.ArchaicPrediction.shift_product",
+   "Descent.Portability.ArchaicPrediction.subsetResponse_evaluation",
+   "Descent.Portability.ArchaicPrediction.survivalNumerator_derivative",
+   "Descent.Portability.ArchaicPrediction.survival_derivative",
    "Descent.Portability.ArchaicPrediction.transport_comp",
    "Descent.Portability.ArchaicPrediction.transport_self",
+   "Descent.Portability.ArchaicPrediction.weighted_product_expansion",
    "Descent.Portability.BalancedHWECompoundPoisson.finite_intensity_weak_convergence",
    "Descent.Portability.BalancedHWECompoundPoisson.integral_compoundMeasure",
    "Descent.Portability.BalancedHWECompoundPoisson.normalized_compoundPoisson_limit",
@@ -68661,6 +68770,7 @@
    "Descent.Portability.CalibrationLaw.variance_continuous",
    "Descent.Portability.ChunkedGenotypeLaw.dependentJoint_expectation",
    "Descent.Portability.CombinedPredictionCertificate.norm_le_of_ae_bound",
+   "Descent.Portability.CompactTargetDeflation.norm_deflate_le",
    "Descent.Portability.CompactTargetDirection.maximizer_is_singular",
    "Descent.Portability.CompactTargetDirection.maximizing_sequence_residual",
    "Descent.Portability.ComplexBernoulliProduct.bernoulli_product_limit",
@@ -68841,6 +68951,8 @@
    "Descent.Portability.GuardedMetricOptimization.recover_guard",
    "Descent.Portability.GuardedMetricOptimization.scale_pos",
    "Descent.Portability.HWEHeterozygosityLaw.count_nonneg",
+   "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability",
    "Descent.Portability.IndependentShiftOperator.independent_sum_succ",
    "Descent.Portability.IndependentShiftOperator.shift_pow_sample",
    "Descent.Portability.InterleavedMutationExponential.interval_compose",
@@ -69309,6 +69421,8 @@
     "a ≠ b",
     "a.1 = b.1",
     "∀ a ∈ values, ∀ b ∈ values, relation a b",
+    "∀ S, d < S.card → b S = 0",
+    "∀ T, T.card ≤ d → subsetResponse a T = subsetResponse b T",
     "Tendsto a atTop (nhds b",
     "∀ y i x, η i * (ν i",
     "∀ y, ‖u y‖ ≤ 1",
@@ -69902,10 +70016,30 @@
     "Descent.Portability.ArchaicPrediction.cubeMean_product": [],
     "Descent.Portability.ArchaicPrediction.centered_orthogonality": [],
     "Descent.Portability.ArchaicPrediction.centered_parseval": [],
+    "Descent.Portability.ArchaicPrediction.additive_squared_norm": [],
+    "Descent.Portability.ArchaicPrediction.interaction_squared_norm": [],
+    "Descent.Portability.ArchaicPrediction.interaction_additive_orthogonal": [],
+    "Descent.Portability.ArchaicPrediction.no_uniform_source_variance_bound": [],
+    "Descent.Portability.ArchaicPrediction.alternating_subset_sum": [],
+    "Descent.Portability.ArchaicPrediction.subsetResponse_evaluation": [],
+    "Descent.Portability.ArchaicPrediction.factorial_recovery": [],
+    "Descent.Portability.ArchaicPrediction.degree_panel_identifies": [
+     "∀ S, d < S.card → b S = 0",
+     "∀ T, T.card ≤ d → subsetResponse a T = subsetResponse b T"
+    ],
+    "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_compact": [],
+    "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_convex": [],
+    "Descent.Portability.ArchaicPrediction.convexified_response": [],
+    "Descent.Portability.ArchaicPrediction.weighted_product_expansion": [],
+    "Descent.Portability.ArchaicPrediction.response_covariance": [],
+    "Descent.Portability.ArchaicPrediction.phaseCharacter_mul": [],
     "Descent.Portability.ArchaicPrediction.pairing_bipartite_of_no_odd": [],
     "Descent.Portability.ArchaicPrediction.pairing_homozygote_identifies": [],
     "Descent.Portability.ArchaicPrediction.invariant_phase_expansion": [],
-    "Descent.Portability.ArchaicPrediction.four_risks_separated": [],
+    "Descent.Portability.ArchaicPrediction.effectiveRate_mean": [],
+    "Descent.Portability.ArchaicPrediction.survival_derivative": [],
+    "Descent.Portability.ArchaicPrediction.survivalNumerator_derivative": [],
+    "Descent.Portability.ArchaicPrediction.effectiveRate_derivative": [],
     "Descent.Portability.ArchaicPrediction.shiftPolynomial_comp": [],
     "Descent.Portability.ArchaicPrediction.shiftPolynomial_zero": [],
     "Descent.Portability.ArchaicPrediction.shift_product": [],
@@ -69983,6 +70117,7 @@
     "Descent.Portability.nns_higher_in_target": [],
     "Descent.Portability.paf_lower_in_target": [],
     "Descent.Portability.CombinedPredictionCertificate.norm_le_of_ae_bound": [],
+    "Descent.Portability.CompactTargetDeflation.norm_deflate_le": [],
     "Descent.Portability.CompactTargetDirection.maximizing_sequence_residual": [],
     "Descent.Portability.CompactTargetDirection.maximizer_is_singular": [],
     "Descent.Portability.ComplexBernoulliProduct.bernoulli_product_limit": [],
@@ -70246,6 +70381,8 @@
     "Descent.Portability.GuardedMetricOptimization.scale_pos": [],
     "Descent.Portability.GuardedMetricOptimization.recover_guard": [],
     "Descent.Portability.HWEHeterozygosityLaw.count_nonneg": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability": [],
+    "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit": [],
     "Descent.Portability.attenuatedVariance_eq_true_iff": [],
     "Descent.Portability.panelAdjustedImputationQuality_eq_ld_iff": [],
     "Descent.Portability.IndependentShiftOperator.independent_sum_succ": [],
@@ -71047,6 +71184,7 @@
    "Descent.Portability.CalibrationLaw.calibratedIntercept_lt_iff",
    "Descent.Portability.CalibrationLaw.exists_unique_calibrated_intercept",
    "Descent.Portability.CalibrationLaw.lt_calibratedIntercept_iff",
+   "Descent.Portability.CompactTargetDeflation.kernel_preserved",
    "Descent.Portability.ContinuousObservabilityGramian.continuousGramian_quadratic",
    "Descent.Portability.ControlledCoarseGraining.defect_integral_identity",
    "Descent.Portability.CrossCoordinateRigidityLaw.affine_two_point",
@@ -71086,6 +71224,7 @@
    "Descent.Portability.GaussianSlabLaw.section_lower",
    "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation",
    "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_indicator",
    "Descent.Portability.HWEInteractionLaw.complexExpectation_independent_product",
    "Descent.Portability.HWEInteractionLaw.expectation_independent_product",
    "Descent.Portability.LossInformationClassification.strict_information_gain_iff",
@@ -71507,6 +71646,7 @@
     "Descent.Portability.CalibrationLaw.exists_unique_calibrated_intercept": [],
     "Descent.Portability.CalibrationLaw.calibratedIntercept_lt_iff": [],
     "Descent.Portability.CalibrationLaw.lt_calibratedIntercept_iff": [],
+    "Descent.Portability.CompactTargetDeflation.kernel_preserved": [],
     "Descent.Portability.ContinuousObservabilityGramian.continuousGramian_quadratic": [],
     "Descent.Portability.posteriorPairwiseDriftEnergy_eq_zero_iff_on_support": [],
     "Descent.Portability.pairwiseCalibrationDriftEnergy_eq_zero_iff_on_support": [],
@@ -71575,6 +71715,7 @@
     "Descent.Portability.GaussianSlabLaw.section_lower": [],
     "Descent.Portability.GraphColoringLaw.reindexed_independent_attenuation": [],
     "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_indicator": [],
     "Descent.Portability.HWEInteractionLaw.expectation_independent_product": [],
     "Descent.Portability.HWEInteractionLaw.complexExpectation_independent_product": [],
     "Descent.Portability.attenuatedVariance_eq_true_iff": [],
@@ -71847,6 +71988,8 @@
    "Descent.Portability.AncientPrediction.selected_update_failure_bound",
    "Descent.Portability.AncientPrediction.simultaneous_moment_tail",
    "Descent.Portability.AncientPrediction.simultaneous_no_worsening",
+   "Descent.Portability.ArchaicPrediction.alternating_subset_sum",
+   "Descent.Portability.ArchaicPrediction.degree_panel_identifies",
    "Descent.Portability.ArchaicPrediction.invariant_phase_expansion",
    "Descent.Portability.ArchaicPrediction.pairwise_phase_risk_not_identified",
    "Descent.Portability.ArchaicPrediction.phase_expansion_exists_unique",
@@ -71858,6 +72001,7 @@
    "Descent.Portability.CalibrationLaw.exists_unique_calibrated_intercept",
    "Descent.Portability.ChunkedGenotypeLaw.eligibleReservoir_expectation",
    "Descent.Portability.CombinedPredictionCertificate.combined_rmse",
+   "Descent.Portability.CompactTargetDeflation.leadingQuery_risk",
    "Descent.Portability.ComplexBernoulliProduct.bernoulli_product_limit",
    "Descent.Portability.ComplexBernoulliProduct.contraction_product_difference",
    "Descent.Portability.ConditionalErrorCertificate.conditional_bound_of_le",
@@ -71890,6 +72034,7 @@
    "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff",
    "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation",
    "Descent.Portability.GuardedMetricOptimization.scale_pos",
+   "Descent.Portability.HWEHeterozygosityLimit.probability_cap",
    "Descent.Portability.MarkovCoarseGraining.bounded_report_error",
    "Descent.Portability.MeasurementRankLaw.residualEigenvalue_zero_iff",
    "Descent.Portability.MechanismIdentification.causal_effect_not_identified",
@@ -71941,6 +72086,8 @@
     "y ∈ (b.trans c",
     "s a = s b",
     "s c ≠ s a",
+    "∀ S, d < S.card → b S = 0",
+    "∀ T, T.card ≤ d → subsetResponse a T = subsetResponse b T",
     "∀ c : ℝ, C (fun _ : Bool ↦ c",
     "s ∈ Ioo c d",
     "t ∈ Ioo c d",
@@ -72100,6 +72247,11 @@
     "Descent.Portability.AncientPrediction.clipped_squared_error": [],
     "Descent.Portability.AncientPrediction.simultaneous_moment_tail": [],
     "Descent.Portability.AncientPrediction.selected_update_failure_bound": [],
+    "Descent.Portability.ArchaicPrediction.alternating_subset_sum": [],
+    "Descent.Portability.ArchaicPrediction.degree_panel_identifies": [
+     "∀ S, d < S.card → b S = 0",
+     "∀ T, T.card ≤ d → subsetResponse a T = subsetResponse b T"
+    ],
     "Descent.Portability.ArchaicPrediction.phase_expansion_exists_unique": [],
     "Descent.Portability.ArchaicPrediction.invariant_phase_expansion": [],
     "Descent.Portability.ArchaicPrediction.pairwise_phase_risk_not_identified": [],
@@ -72109,6 +72261,7 @@
     "Descent.Portability.CalibrationLaw.exists_unique_calibrated_intercept": [],
     "Descent.Portability.ChunkedGenotypeLaw.eligibleReservoir_expectation": [],
     "Descent.Portability.CombinedPredictionCertificate.combined_rmse": [],
+    "Descent.Portability.CompactTargetDeflation.leadingQuery_risk": [],
     "Descent.Portability.ComplexBernoulliProduct.contraction_product_difference": [],
     "Descent.Portability.ComplexBernoulliProduct.bernoulli_product_limit": [],
     "Descent.Portability.ConditionalErrorCertificate.conditional_bound_of_le": [],
@@ -72168,6 +72321,7 @@
     "Descent.Portability.GaussianPanelLaw.bag_law_eq_iff": [],
     "Descent.Portability.GraphColoringLaw.proper_coloring_attenuation": [],
     "Descent.Portability.GuardedMetricOptimization.scale_pos": [],
+    "Descent.Portability.HWEHeterozygosityLimit.probability_cap": [],
     "Descent.Portability.MarkovCoarseGraining.bounded_report_error": [],
     "Descent.Portability.MeasurementRankLaw.residualEigenvalue_zero_iff": [],
     "Descent.Portability.MechanismIdentification.causal_effect_not_identified": [],
@@ -73772,6 +73926,8 @@
    "Descent.PopGen.snpH2_add_tagged",
    "Descent.PopGen.twoLocusCoalescentCovarianceMatrix_diff_lower_bound",
    "Descent.Portability.AncestralGenealogyLaw.intervalBranchesAux_exposure",
+   "Descent.Portability.ArchaicPrediction.survivalNumerator_derivative",
+   "Descent.Portability.ArchaicPrediction.survival_derivative",
    "Descent.Portability.BoxPolynomialExtensionLaw.tensorQuadratic_contDiff",
    "Descent.Portability.DiploidEffectFieldLaw.effectField_contDiff",
    "Descent.Portability.MutationChannelBridge.compiler_sum",
@@ -73860,6 +74016,8 @@
     "Descent.PopGen.snpH2_add_tagged": [],
     "Descent.Portability.AncestralGenealogyLaw.intervalBranchesAux_exposure": [],
     "Descent.Portability.fisherInformation_add_samples": [],
+    "Descent.Portability.ArchaicPrediction.survival_derivative": [],
+    "Descent.Portability.ArchaicPrediction.survivalNumerator_derivative": [],
     "Descent.Portability.posteriorPredictiveVariance_at_reference_point": [],
     "Descent.Portability.posteriorPredictiveVariance_sub_estimation": [],
     "Descent.Portability.posteriorPredictiveVariance_estimation_stages": [],
@@ -78118,6 +78276,10 @@
    "Descent.Portability.HWEHeterozygosityLaw.locus_mean",
    "Descent.Portability.HWEHeterozygosityLaw.probability_le_one",
    "Descent.Portability.HWEHeterozygosityLaw.probability_nonneg",
+   "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit",
+   "Descent.Portability.HWEHeterozygosityLimit.probability_cap",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
    "Descent.Portability.TrainingNoiseAccuracy.conditionalAccuracy_mem_unitInterval",
    "Descent.Portability.TrainingNoiseAccuracy.conditionalExpectation_bounds",
    "Descent.Portability.TrainingNoiseAccuracy.conditionalExpectation_eq_labelLaw",
@@ -78141,6 +78303,10 @@
     "P.atomCount = 1",
     "∀ i, 0 < (h i",
     "∀ i, (h i",
+    "∀ m i, 0 < (h m i",
+    "∀ m i, (h m i",
+    "∀ m i, |(h m i",
+    "Tendsto (fun m ↦ ∑ i, ((h m i",
     "∀ i, 0 ≤ probability i ∧ probability i ≤ 1"
    ],
    "hypotheses_by_theorem": {
@@ -78196,6 +78362,23 @@
      "∀ i, 0 < (h i",
      "∀ i, (h i"
     ],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability": [
+     "∀ i, 0 < (h i",
+     "∀ i, (h i"
+    ],
+    "Descent.Portability.HWEHeterozygosityLimit.probability_cap": [],
+    "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit": [
+     "∀ m i, 0 < (h m i",
+     "∀ m i, (h m i",
+     "∀ m i, |(h m i",
+     "Tendsto (fun m ↦ ∑ i, ((h m i"
+    ],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [
+     "∀ m i, 0 < (h m i",
+     "∀ m i, (h m i",
+     "∀ m i, |(h m i",
+     "Tendsto (fun m ↦ ∑ i, ((h m i"
+    ],
     "Descent.Portability.TrainingNoiseAccuracy.labelMass_nonneg": [
      "∀ i, 0 ≤ probability i ∧ probability i ≤ 1"
     ],
@@ -78229,10 +78412,10 @@
     "Descent.Spectral.StationaryTwoSliceField.coordinateLaw_preserved": []
    },
    "range_hi_thm": [
-    "Descent.Decision.CertificateGrading.FinitePrior.probability_le_one",
-    0
+    "Descent.Portability.HWEHeterozygosityLimit.probability_cap",
+    2
    ],
-   "range_hi": 1,
+   "range_hi": 4,
    "range_lo_thm": [
     "Descent.Portability.FirthFiniteIterationLaw.probability_mem_openUnit",
     0
@@ -84470,6 +84653,7 @@
    "Descent.Portability.BalancedHWEVanishingLaw.original_standardization",
    "Descent.Portability.BalancedHWEVanishingLaw.sample_observable_bound",
    "Descent.Portability.HWEHeterozygosityLaw.count_nonneg",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_indicator",
    "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass",
    "Descent.Portability.HWEInteractionLaw.squareBiasedLocus_mass",
    "Descent.Spectral.hardCall_logSquare_eq_of_latticeCondition",
@@ -84544,6 +84728,7 @@
     "Descent.Portability.BalancedHWEVanishingLaw.sample_observable_bound": [],
     "Descent.Portability.BalancedHWEVanishingLaw.original_standardization": [],
     "Descent.Portability.HWEHeterozygosityLaw.count_nonneg": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_indicator": [],
     "Descent.Portability.HWEInteractionLaw.squareBiasedLocus_mass": [],
     "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass": [],
     "Descent.Spectral.hwe_centered": [],
@@ -91201,23 +91386,37 @@
    "Descent.PopGen.linear_noise_implies_nonlinear_slope",
    "Descent.PopGen.measureBias_at_reference_point",
    "Descent.PopGen.measureExpMSE_eq_variance_add_variance_sub_two_cov_add_bias_sq",
+   "Descent.Portability.ArchaicPrediction.alternating_subset_sum",
    "Descent.Portability.ArchaicPrediction.centeredCharacter_univ",
    "Descent.Portability.ArchaicPrediction.centered_orthogonality",
    "Descent.Portability.ArchaicPrediction.centered_parseval",
+   "Descent.Portability.ArchaicPrediction.centered_response_split",
    "Descent.Portability.ArchaicPrediction.coefficient_response",
+   "Descent.Portability.ArchaicPrediction.degree_panel_identifies",
+   "Descent.Portability.ArchaicPrediction.exact_transport_debt",
+   "Descent.Portability.ArchaicPrediction.factorial_recovery",
+   "Descent.Portability.ArchaicPrediction.interaction_additive_orthogonal",
+   "Descent.Portability.ArchaicPrediction.interaction_squared_norm",
    "Descent.Portability.ArchaicPrediction.invariant_phase_expansion",
+   "Descent.Portability.ArchaicPrediction.phaseCharacter_mul",
    "Descent.Portability.ArchaicPrediction.phaseCharacter_swap",
    "Descent.Portability.ArchaicPrediction.phaseCharacter_univ",
    "Descent.Portability.ArchaicPrediction.phaseExpansion_injective",
    "Descent.Portability.ArchaicPrediction.phase_coefficient",
+   "Descent.Portability.ArchaicPrediction.phase_covariance",
+   "Descent.Portability.ArchaicPrediction.phase_covariance_nonneg",
    "Descent.Portability.ArchaicPrediction.phase_orthogonality",
    "Descent.Portability.ArchaicPrediction.phase_parseval",
+   "Descent.Portability.ArchaicPrediction.powerset_eq_filter",
    "Descent.Portability.ArchaicPrediction.responsePolynomial_injective",
    "Descent.Portability.ArchaicPrediction.response_transport",
    "Descent.Portability.ArchaicPrediction.shift_product",
    "Descent.Portability.ArchaicPrediction.squarefree_monomial",
    "Descent.Portability.ArchaicPrediction.subsetExponent_apply",
    "Descent.Portability.ArchaicPrediction.subsetExponent_injective",
+   "Descent.Portability.ArchaicPrediction.subsetResponse_evaluation",
+   "Descent.Portability.ArchaicPrediction.sum_by_interaction_order",
+   "Descent.Portability.ArchaicPrediction.sum_singleton_subsets",
    "Descent.Portability.BackgroundClass.isNull_convex",
    "Descent.Portability.CalibrationLaw.calibratedIntercept_continuous",
    "Descent.Portability.CalibrationLaw.calibratedIntercept_lt_iff",
@@ -91634,6 +91833,20 @@
     "Descent.Portability.ArchaicPrediction.centeredCharacter_univ": [],
     "Descent.Portability.ArchaicPrediction.centered_orthogonality": [],
     "Descent.Portability.ArchaicPrediction.centered_parseval": [],
+    "Descent.Portability.ArchaicPrediction.sum_singleton_subsets": [],
+    "Descent.Portability.ArchaicPrediction.sum_by_interaction_order": [],
+    "Descent.Portability.ArchaicPrediction.interaction_squared_norm": [],
+    "Descent.Portability.ArchaicPrediction.interaction_additive_orthogonal": [],
+    "Descent.Portability.ArchaicPrediction.exact_transport_debt": [],
+    "Descent.Portability.ArchaicPrediction.centered_response_split": [],
+    "Descent.Portability.ArchaicPrediction.powerset_eq_filter": [],
+    "Descent.Portability.ArchaicPrediction.alternating_subset_sum": [],
+    "Descent.Portability.ArchaicPrediction.subsetResponse_evaluation": [],
+    "Descent.Portability.ArchaicPrediction.factorial_recovery": [],
+    "Descent.Portability.ArchaicPrediction.degree_panel_identifies": [],
+    "Descent.Portability.ArchaicPrediction.phaseCharacter_mul": [],
+    "Descent.Portability.ArchaicPrediction.phase_covariance": [],
+    "Descent.Portability.ArchaicPrediction.phase_covariance_nonneg": [],
     "Descent.Portability.ArchaicPrediction.phaseCharacter_univ": [],
     "Descent.Portability.ArchaicPrediction.phaseCharacter_swap": [],
     "Descent.Portability.ArchaicPrediction.phase_orthogonality": [],
@@ -91950,7 +92163,12 @@
     "Descent.Spectral.exists_split_attaining_scalarized_optimum": [],
     "Descent.chargedTuples_one_slot_iff": [],
     "Descent.singleModulus_atom_sq_eq_realizability_atom_sq": []
-   }
+   },
+   "range_lo_thm": [
+    "Descent.Portability.ArchaicPrediction.sum_by_interaction_order",
+    0
+   ],
+   "range_lo": 2
   }
  },
  "Descent.Pangenome.unorderedPairs": {
@@ -92638,6 +92856,10 @@
    "Descent.Portability.HWEHeterozygosityLaw.count_characteristic",
    "Descent.Portability.HWEHeterozygosityLaw.count_mean",
    "Descent.Portability.HWEHeterozygosityLaw.count_nonneg",
+   "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_indicator",
    "Descent.Portability.InterleavedMutationExponential.generator_matrix",
    "Descent.Portability.InterleavedMutationExponential.interval_compose",
    "Descent.Portability.InterleavedMutationExponential.interval_matrix_exponential",
@@ -92912,6 +93134,10 @@
     "Descent.Portability.HWEHeterozygosityLaw.count_mean": [],
     "Descent.Portability.HWEHeterozygosityLaw.count_characteristic": [],
     "Descent.Portability.HWEHeterozygosityLaw.count_nonneg": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_indicator": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability": [],
+    "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [],
     "Descent.Portability.InterleavedMutationExponential.propagate_mass": [],
     "Descent.Portability.InterleavedMutationExponential.poisson_matrix_series": [],
     "Descent.Portability.InterleavedMutationExponential.poisson_matrix_exponential": [],
@@ -93102,6 +93328,8 @@
    "Descent.PopGen.snpH2_add_tagged",
    "Descent.PopGen.twoLocusCoalescentCovarianceMatrix_diff_lower_bound",
    "Descent.Portability.AncestralGenealogyLaw.intervalBranchesAux_exposure",
+   "Descent.Portability.ArchaicPrediction.survivalNumerator_derivative",
+   "Descent.Portability.ArchaicPrediction.survival_derivative",
    "Descent.Portability.BoxPolynomialExtensionLaw.tensorQuadratic_contDiff",
    "Descent.Portability.DiploidEffectFieldLaw.effectField_contDiff",
    "Descent.Portability.MutationChannelBridge.compiler_sum",
@@ -93191,6 +93419,8 @@
     "Descent.PopGen.snpH2_add_tagged": [],
     "Descent.Portability.AncestralGenealogyLaw.intervalBranchesAux_exposure": [],
     "Descent.Portability.fisherInformation_add_samples": [],
+    "Descent.Portability.ArchaicPrediction.survival_derivative": [],
+    "Descent.Portability.ArchaicPrediction.survivalNumerator_derivative": [],
     "Descent.Portability.posteriorPredictiveVariance_at_reference_point": [],
     "Descent.Portability.posteriorPredictiveVariance_sub_estimation": [],
     "Descent.Portability.posteriorPredictiveVariance_estimation_stages": [],
@@ -98294,6 +98524,8 @@
    "Descent.Portability.AncientPrediction.inverseQuadratic_fderiv",
    "Descent.Portability.AncientPrediction.predictive_quotient",
    "Descent.Portability.ArchaicPrediction.evaluate_transport",
+   "Descent.Portability.ArchaicPrediction.marginal_hazard",
+   "Descent.Portability.ArchaicPrediction.no_uniform_source_variance_bound",
    "Descent.Portability.ArchaicPrediction.shiftPolynomial_comp",
    "Descent.Portability.ArchaicPrediction.transport_comp",
    "Descent.Portability.BalancedHWECompoundPoisson.normalized_compoundPoisson_limit",
@@ -98335,6 +98567,7 @@
    "Descent.Portability.GaussianPanelLaw.symmetricPhase_integral",
    "Descent.Portability.GaussianSlabLaw.graphPoint_continuous",
    "Descent.Portability.GaussianSlabLaw.local_cylinder",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
    "Descent.Portability.HasPositiveLowerBound.comp",
    "Descent.Portability.HasPositiveLowerBound.of_postcomp",
    "Descent.Portability.HasUnitApproxKernel.postcomp",
@@ -98439,6 +98672,8 @@
     "Descent.Portability.AncientPrediction.predictive_quotient": [],
     "Descent.Portability.AncientPrediction.inverseQuadratic_fderiv": [],
     "Descent.Portability.AncientPrediction.bounded_sample_mean_tail": [],
+    "Descent.Portability.ArchaicPrediction.no_uniform_source_variance_bound": [],
+    "Descent.Portability.ArchaicPrediction.marginal_hazard": [],
     "Descent.Portability.ArchaicPrediction.shiftPolynomial_comp": [],
     "Descent.Portability.ArchaicPrediction.transport_comp": [],
     "Descent.Portability.ArchaicPrediction.evaluate_transport": [],
@@ -98508,6 +98743,7 @@
     "Descent.Portability.GaussianPanelLaw.projection_surjective": [],
     "Descent.Portability.GaussianSlabLaw.graphPoint_continuous": [],
     "Descent.Portability.GaussianSlabLaw.local_cylinder": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [],
     "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable": [],
     "Descent.Portability.InterleavedMutationMeasurability.mark_mass_measurable": [],
     "Descent.Portability.MarkovCoarseGraining.operator_matrixError": [],
@@ -123001,6 +123237,7 @@
   "mentioned_by": [
    "Descent.Portability.AdaptiveLinearMeasurements.Procedure.fixed_run",
    "Descent.Portability.AdaptiveLinearMeasurements.Procedure.run_eq_zeroPrediction",
+   "Descent.Portability.CompactTargetDeflation.leadingQuery_residual",
    "Descent.Portability.DiscountedForecastMinimax.adaptive_discounted_minimax",
    "Descent.Portability.EvolutionaryForecastMinimax.adaptive_forecast_minimax",
    "Descent.Portability.EvolutionaryForecastMinimax.translatePrediction_run",
@@ -123017,6 +123254,7 @@
    "hypotheses_by_theorem": {
     "Descent.Portability.AdaptiveLinearMeasurements.Procedure.run_eq_zeroPrediction": [],
     "Descent.Portability.AdaptiveLinearMeasurements.Procedure.fixed_run": [],
+    "Descent.Portability.CompactTargetDeflation.leadingQuery_residual": [],
     "Descent.Portability.DiscountedForecastMinimax.adaptive_discounted_minimax": [],
     "Descent.Portability.runCommonDiffusionEvents_finalCarriers": [],
     "Descent.Portability.PipelineDemographicHistory.presentCommonDiffusionState_marginal": [],
@@ -123131,6 +123369,7 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Portability.AdaptiveLinearMeasurements.adaptive_lower_of_subspace",
+   "Descent.Portability.CompactTargetDeflation.leadingQuery_risk",
    "Descent.Portability.MeasurementRankLaw.minimal_exact_measurement_count",
    "Descent.Portability.MeasurementRankLaw.zero_risk_iff",
    "Descent.Portability.SpectralMeasurementMinimax.adaptive_minimax",
@@ -123156,6 +123395,9 @@
      "0 ≤ radius",
      "∀ v : V, s * ‖v‖ ≤ ‖L v‖",
      "UniformRisk procedure L radius risk"
+    ],
+    "Descent.Portability.CompactTargetDeflation.leadingQuery_risk": [
+     "0 ≤ radius"
     ],
     "Descent.Portability.MeasurementRankLaw.zero_risk_iff": [
      "0 < radius"
@@ -130393,6 +130635,7 @@
    "Descent.Portability.ArchaicPrediction.four_mean_logit",
    "Descent.Portability.ArchaicPrediction.four_pairwise_moments",
    "Descent.Portability.ArchaicPrediction.four_risk_formulas",
+   "Descent.Portability.ArchaicPrediction.phaseCharacter_mul",
    "Descent.Portability.ArchaicPrediction.phaseCharacter_swap",
    "Descent.Portability.ArchaicPrediction.phaseCharacter_univ",
    "Descent.Portability.ArchaicPrediction.phase_orthogonality",
@@ -130412,6 +130655,7 @@
     "Descent.Blindness.chartMarginals_saturatedPanel": [],
     "Descent.Portability.ArchaicPrediction.centeredCharacter_univ": [],
     "Descent.Portability.ArchaicPrediction.centered_orthogonality": [],
+    "Descent.Portability.ArchaicPrediction.phaseCharacter_mul": [],
     "Descent.Portability.ArchaicPrediction.phaseCharacter_univ": [],
     "Descent.Portability.ArchaicPrediction.phaseCharacter_swap": [],
     "Descent.Portability.ArchaicPrediction.phase_orthogonality": [],
@@ -130493,6 +130737,7 @@
    }
   },
   "mentioned_by": [
+   "Descent.Portability.ArchaicPrediction.additive_squared_norm",
    "Descent.Portability.ArchaicPrediction.centered_orthogonality",
    "Descent.Portability.ArchaicPrediction.centered_parseval",
    "Descent.Portability.ArchaicPrediction.cubeMean_add",
@@ -130501,6 +130746,9 @@
    "Descent.Portability.ArchaicPrediction.cubeMean_smul",
    "Descent.Portability.ArchaicPrediction.cubeMean_sum",
    "Descent.Portability.ArchaicPrediction.cubeWeight_sum",
+   "Descent.Portability.ArchaicPrediction.exact_transport_debt",
+   "Descent.Portability.ArchaicPrediction.interaction_additive_orthogonal",
+   "Descent.Portability.ArchaicPrediction.interaction_squared_norm",
    "Descent.Portability.ArchaicPrediction.phaseExpansion_injective",
    "Descent.Portability.ArchaicPrediction.phase_coefficient",
    "Descent.Portability.ArchaicPrediction.phase_orthogonality",
@@ -130517,6 +130765,10 @@
     "Descent.Portability.ArchaicPrediction.cubeMean_sum": [],
     "Descent.Portability.ArchaicPrediction.centered_orthogonality": [],
     "Descent.Portability.ArchaicPrediction.centered_parseval": [],
+    "Descent.Portability.ArchaicPrediction.additive_squared_norm": [],
+    "Descent.Portability.ArchaicPrediction.interaction_squared_norm": [],
+    "Descent.Portability.ArchaicPrediction.interaction_additive_orthogonal": [],
+    "Descent.Portability.ArchaicPrediction.exact_transport_debt": [],
     "Descent.Portability.ArchaicPrediction.phase_orthogonality": [],
     "Descent.Portability.ArchaicPrediction.phase_coefficient": [],
     "Descent.Portability.ArchaicPrediction.phaseExpansion_injective": [],
@@ -130539,16 +130791,358 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.ArchaicPrediction.additive_squared_norm",
    "Descent.Portability.ArchaicPrediction.centeredCharacter_univ",
    "Descent.Portability.ArchaicPrediction.centered_orthogonality",
-   "Descent.Portability.ArchaicPrediction.centered_parseval"
+   "Descent.Portability.ArchaicPrediction.centered_parseval",
+   "Descent.Portability.ArchaicPrediction.centered_response_split",
+   "Descent.Portability.ArchaicPrediction.interaction_additive_orthogonal"
   ],
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
     "Descent.Portability.ArchaicPrediction.centeredCharacter_univ": [],
     "Descent.Portability.ArchaicPrediction.centered_orthogonality": [],
-    "Descent.Portability.ArchaicPrediction.centered_parseval": []
+    "Descent.Portability.ArchaicPrediction.centered_parseval": [],
+    "Descent.Portability.ArchaicPrediction.additive_squared_norm": [],
+    "Descent.Portability.ArchaicPrediction.interaction_additive_orthogonal": [],
+    "Descent.Portability.ArchaicPrediction.centered_response_split": []
+   }
+  }
+ },
+ "Descent.Portability.ArchaicPrediction.additiveResponse": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "trailing tokens after expression: op:{",
+  "file": "Descent/Portability/ArchaicPrediction/Debt.lean",
+  "line": 47,
+  "short": "additiveResponse",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ArchaicPrediction.additive_squared_norm",
+   "Descent.Portability.ArchaicPrediction.centered_response_split",
+   "Descent.Portability.ArchaicPrediction.exact_transport_debt",
+   "Descent.Portability.ArchaicPrediction.interaction_additive_orthogonal"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ArchaicPrediction.additive_squared_norm": [],
+    "Descent.Portability.ArchaicPrediction.interaction_additive_orthogonal": [],
+    "Descent.Portability.ArchaicPrediction.exact_transport_debt": [],
+    "Descent.Portability.ArchaicPrediction.centered_response_split": []
+   }
+  }
+ },
+ "Descent.Portability.ArchaicPrediction.interactionResponse": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name S.card",
+  "file": "Descent/Portability/ArchaicPrediction/Debt.lean",
+  "line": 50,
+  "short": "interactionResponse",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ArchaicPrediction.centered_response_split",
+   "Descent.Portability.ArchaicPrediction.exact_transport_debt",
+   "Descent.Portability.ArchaicPrediction.interaction_additive_orthogonal",
+   "Descent.Portability.ArchaicPrediction.interaction_squared_norm"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ArchaicPrediction.interaction_squared_norm": [],
+    "Descent.Portability.ArchaicPrediction.interaction_additive_orthogonal": [],
+    "Descent.Portability.ArchaicPrediction.exact_transport_debt": [],
+    "Descent.Portability.ArchaicPrediction.centered_response_split": []
+   }
+  }
+ },
+ "Descent.Portability.ArchaicPrediction.rareSourceVariance": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/ArchaicPrediction/Debt.lean",
+  "line": 114,
+  "short": "rareSourceVariance",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "rareSourceVariance",
+  "args": [
+   "γ",
+   "ε"
+  ],
+  "box": {
+   "γ": [
+    0.05,
+    3.0
+   ],
+   "ε": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ArchaicPrediction.no_uniform_source_variance_bound",
+   "Descent.Portability.ArchaicPrediction.rare_source_limits"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "hypotheses": [
+    "γ ≠ 0"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ArchaicPrediction.rare_source_limits": [],
+    "Descent.Portability.ArchaicPrediction.no_uniform_source_variance_bound": [
+     "γ ≠ 0"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.ArchaicPrediction.rareTransportDebt": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/ArchaicPrediction/Debt.lean",
+  "line": 115,
+  "short": "rareTransportDebt",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "rareTransportDebt",
+  "args": [
+   "γ",
+   "ε"
+  ],
+  "box": {
+   "γ": [
+    0.05,
+    3.0
+   ],
+   "ε": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ArchaicPrediction.no_uniform_source_variance_bound",
+   "Descent.Portability.ArchaicPrediction.rare_source_limits"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "γ ≠ 0"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ArchaicPrediction.rare_source_limits": [],
+    "Descent.Portability.ArchaicPrediction.no_uniform_source_variance_bound": [
+     "γ ≠ 0"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.ArchaicPrediction.subsetResponse": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "∑ over the Finset `T.powerset`, not `Finset.univ`",
+  "file": "Descent/Portability/ArchaicPrediction/Factorial.lean",
+  "line": 70,
+  "short": "subsetResponse",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ArchaicPrediction.degree_panel_identifies",
+   "Descent.Portability.ArchaicPrediction.factorial_recovery",
+   "Descent.Portability.ArchaicPrediction.subsetResponse_evaluation"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "∀ S, d < S.card → a S = 0",
+    "∀ T, T.card ≤ d → subsetResponse a T = subsetResponse b T"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ArchaicPrediction.subsetResponse_evaluation": [],
+    "Descent.Portability.ArchaicPrediction.factorial_recovery": [],
+    "Descent.Portability.ArchaicPrediction.degree_panel_identifies": [
+     "∀ S, d < S.card → a S = 0",
+     "∀ T, T.card ≤ d → subsetResponse a T = subsetResponse b T"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.ArchaicPrediction.riskFunctional": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "r: indexed with 4 of 1 indices (partial application of a vector is not modelled)",
+  "file": "Descent/Portability/ArchaicPrediction/IdentifiedRisk.lean",
+  "line": 26,
+  "short": "riskFunctional",
+  "ret_type": "(H → ℝ) →ₗ[ℝ] ℝ where toFun w",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_compact",
+   "Descent.Portability.ArchaicPrediction.sharp_phase_risk_interval"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_compact": [],
+    "Descent.Portability.ArchaicPrediction.sharp_phase_risk_interval": []
+   }
+  }
+ },
+ "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws": {
+  "class": "STRUCTURAL",
+  "note": "Prop-valued / set-valued",
+  "file": "Descent/Portability/ArchaicPrediction/IdentifiedRisk.lean",
+  "line": 31,
+  "short": "feasiblePhaseLaws",
+  "ret_type": "Set (H → ℝ)",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_compact",
+   "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_convex",
+   "Descent.Portability.ArchaicPrediction.sharp_phase_risk_interval"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "(feasiblePhaseLaws φ m"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_compact": [],
+    "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_convex": [],
+    "Descent.Portability.ArchaicPrediction.sharp_phase_risk_interval": [
+     "(feasiblePhaseLaws φ m"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.ArchaicPrediction.weightedMean": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/ArchaicPrediction/Moments.lean",
+  "line": 25,
+  "short": "weightedMean",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "Descent_Portability_ArchaicPrediction_weightedMean",
+  "args": [
+   "w",
+   "f"
+  ],
+  "box": {},
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": {
+   "w": {
+    "dim": "H",
+    "rank": 1
+   },
+   "f": {
+    "dim": "H",
+    "rank": 1
+   }
+  },
+  "mentioned_by": [
+   "Descent.Portability.ArchaicPrediction.best_constant_risk",
+   "Descent.Portability.ArchaicPrediction.phase_covariance",
+   "Descent.Portability.ArchaicPrediction.phase_covariance_nonneg",
+   "Descent.Portability.ArchaicPrediction.response_covariance",
+   "Descent.Portability.ArchaicPrediction.response_specific_mean",
+   "Descent.Portability.ArchaicPrediction.variance_as_second_moment",
+   "Descent.Portability.ArchaicPrediction.weightedMean_scale",
+   "Descent.Portability.ArchaicPrediction.weightedMean_sum",
+   "Descent.Portability.ArchaicPrediction.weighted_product_expansion",
+   "Descent.Portability.energyWeightedVariance_at_constant",
+   "Descent.Portability.energyWeightedVariance_attained",
+   "Descent.Portability.energyWeightedVariance_le",
+   "Descent.Portability.weightedMean_at_zero_weight",
+   "Descent.Portability.weighted_dispersion_eq"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "∑ h, w h = 1",
+    "∑ x, w x = 1",
+    "∀ x, 0 ≤ w x",
+    "weightedMean w (fun _ ↦ v",
+    "∑ t, w t = 1"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ArchaicPrediction.weightedMean_sum": [],
+    "Descent.Portability.ArchaicPrediction.weightedMean_scale": [],
+    "Descent.Portability.ArchaicPrediction.response_specific_mean": [],
+    "Descent.Portability.ArchaicPrediction.best_constant_risk": [
+     "∑ h, w h = 1"
+    ],
+    "Descent.Portability.ArchaicPrediction.variance_as_second_moment": [
+     "∑ h, w h = 1"
+    ],
+    "Descent.Portability.ArchaicPrediction.weighted_product_expansion": [],
+    "Descent.Portability.ArchaicPrediction.response_covariance": [
+     "∑ h, w h = 1"
+    ],
+    "Descent.Portability.ArchaicPrediction.phase_covariance": [
+     "∑ x, w x = 1"
+    ],
+    "Descent.Portability.ArchaicPrediction.phase_covariance_nonneg": [
+     "∑ x, w x = 1",
+     "∀ x, 0 ≤ w x"
+    ],
+    "Descent.Portability.weightedMean_at_zero_weight": [],
+    "Descent.Portability.energyWeightedVariance_at_constant": [
+     "weightedMean w (fun _ ↦ v"
+    ],
+    "Descent.Portability.weighted_dispersion_eq": [
+     "∑ t, w t = 1"
+    ],
+    "Descent.Portability.energyWeightedVariance_le": [
+     "∑ t, w t = 1"
+    ],
+    "Descent.Portability.energyWeightedVariance_attained": []
    }
   }
  },
@@ -130736,16 +131330,30 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.ArchaicPrediction.phaseCharacter_mul",
    "Descent.Portability.ArchaicPrediction.phaseCharacter_swap",
    "Descent.Portability.ArchaicPrediction.phaseCharacter_univ",
    "Descent.Portability.ArchaicPrediction.phaseExpansion_injective",
    "Descent.Portability.ArchaicPrediction.phase_coefficient",
+   "Descent.Portability.ArchaicPrediction.phase_covariance",
+   "Descent.Portability.ArchaicPrediction.phase_covariance_nonneg",
    "Descent.Portability.ArchaicPrediction.phase_orthogonality",
    "Descent.Portability.ArchaicPrediction.phase_parseval"
   ],
   "constraints": {
-   "hypotheses": [],
+   "hypotheses": [
+    "∑ x, w x = 1",
+    "∀ x, 0 ≤ w x"
+   ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ArchaicPrediction.phaseCharacter_mul": [],
+    "Descent.Portability.ArchaicPrediction.phase_covariance": [
+     "∑ x, w x = 1"
+    ],
+    "Descent.Portability.ArchaicPrediction.phase_covariance_nonneg": [
+     "∑ x, w x = 1",
+     "∀ x, 0 ≤ w x"
+    ],
     "Descent.Portability.ArchaicPrediction.phaseCharacter_univ": [],
     "Descent.Portability.ArchaicPrediction.phaseCharacter_swap": [],
     "Descent.Portability.ArchaicPrediction.phase_orthogonality": [],
@@ -130805,12 +131413,14 @@
    "Descent.Portability.ArchaicPrediction.invariant_phase_expansion",
    "Descent.Portability.ArchaicPrediction.phaseExpansion_injective",
    "Descent.Portability.ArchaicPrediction.phase_coefficient",
+   "Descent.Portability.ArchaicPrediction.phase_covariance",
    "Descent.Portability.ArchaicPrediction.phase_expansion_exists_unique",
    "Descent.Portability.ArchaicPrediction.phase_parseval"
   ],
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ArchaicPrediction.phase_covariance": [],
     "Descent.Portability.ArchaicPrediction.phase_coefficient": [],
     "Descent.Portability.ArchaicPrediction.phaseExpansion_injective": [],
     "Descent.Portability.ArchaicPrediction.phase_expansion_exists_unique": [],
@@ -130960,6 +131570,248 @@
    }
   }
  },
+ "Descent.Portability.ArchaicPrediction.mixtureSurvival": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/ArchaicPrediction/Survival.lean",
+  "line": 27,
+  "short": "mixtureSurvival",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "mixtureSurvival",
+  "args": [
+   "π",
+   "r",
+   "Λ"
+  ],
+  "box": {
+   "Λ": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": {
+   "π": {
+    "dim": "H",
+    "rank": 1
+   },
+   "r": {
+    "dim": "H",
+    "rank": 1
+   }
+  },
+  "mentioned_by": [
+   "Descent.Portability.ArchaicPrediction.effectiveRate_derivative",
+   "Descent.Portability.ArchaicPrediction.marginal_hazard",
+   "Descent.Portability.ArchaicPrediction.mixtureSurvival_pos",
+   "Descent.Portability.ArchaicPrediction.survival_derivative"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "∀ h, 0 ≤ π h",
+    "∑ h, π h = 1",
+    "HasDerivAt Λ baselineRate t"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ArchaicPrediction.mixtureSurvival_pos": [
+     "∀ h, 0 ≤ π h",
+     "∑ h, π h = 1"
+    ],
+    "Descent.Portability.ArchaicPrediction.survival_derivative": [],
+    "Descent.Portability.ArchaicPrediction.effectiveRate_derivative": [
+     "∀ h, 0 ≤ π h",
+     "∑ h, π h = 1"
+    ],
+    "Descent.Portability.ArchaicPrediction.marginal_hazard": [
+     "∀ h, 0 ≤ π h",
+     "∑ h, π h = 1",
+     "HasDerivAt Λ baselineRate t"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.ArchaicPrediction.survivalNumerator": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/ArchaicPrediction/Survival.lean",
+  "line": 30,
+  "short": "survivalNumerator",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "survivalNumerator",
+  "args": [
+   "π",
+   "r",
+   "Λ"
+  ],
+  "box": {
+   "Λ": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": {
+   "π": {
+    "dim": "H",
+    "rank": 1
+   },
+   "r": {
+    "dim": "H",
+    "rank": 1
+   }
+  },
+  "mentioned_by": [
+   "Descent.Portability.ArchaicPrediction.effectiveRate_mean",
+   "Descent.Portability.ArchaicPrediction.survivalNumerator_derivative",
+   "Descent.Portability.ArchaicPrediction.survival_derivative"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ArchaicPrediction.effectiveRate_mean": [],
+    "Descent.Portability.ArchaicPrediction.survival_derivative": [],
+    "Descent.Portability.ArchaicPrediction.survivalNumerator_derivative": []
+   }
+  }
+ },
+ "Descent.Portability.ArchaicPrediction.survivorWeight": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/ArchaicPrediction/Survival.lean",
+  "line": 33,
+  "short": "survivorWeight",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "survivorWeight",
+  "args": [
+   "π",
+   "r",
+   "Λ",
+   "h"
+  ],
+  "box": {
+   "Λ": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": {
+   "π": {
+    "dim": "H",
+    "rank": 1
+   },
+   "r": {
+    "dim": "H",
+    "rank": 1
+   }
+  },
+  "mentioned_by": [
+   "Descent.Portability.ArchaicPrediction.effectiveRate_derivative",
+   "Descent.Portability.ArchaicPrediction.effectiveRate_mean",
+   "Descent.Portability.ArchaicPrediction.survivorWeight_probability"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "∀ h, 0 ≤ π h",
+    "∑ h, π h = 1"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ArchaicPrediction.survivorWeight_probability": [
+     "∀ h, 0 ≤ π h",
+     "∑ h, π h = 1"
+    ],
+    "Descent.Portability.ArchaicPrediction.effectiveRate_mean": [],
+    "Descent.Portability.ArchaicPrediction.effectiveRate_derivative": [
+     "∀ h, 0 ≤ π h",
+     "∑ h, π h = 1"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.ArchaicPrediction.effectiveRate": {
+  "class": "NUMERIC",
+  "note": "",
+  "file": "Descent/Portability/ArchaicPrediction/Survival.lean",
+  "line": 36,
+  "short": "effectiveRate",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": "effectiveRate",
+  "args": [
+   "π",
+   "r",
+   "Λ"
+  ],
+  "box": {
+   "Λ": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": {
+   "finite_points": 8,
+   "total_points": 8,
+   "error": null
+  },
+  "numeric_standins": null,
+  "vector_args": {
+   "π": {
+    "dim": "H",
+    "rank": 1
+   },
+   "r": {
+    "dim": "H",
+    "rank": 1
+   }
+  },
+  "mentioned_by": [
+   "Descent.Portability.ArchaicPrediction.effectiveRate_deriv_nonpos",
+   "Descent.Portability.ArchaicPrediction.effectiveRate_derivative",
+   "Descent.Portability.ArchaicPrediction.effectiveRate_mean",
+   "Descent.Portability.ArchaicPrediction.marginal_hazard"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "∀ h, 0 ≤ π h",
+    "∑ h, π h = 1",
+    "HasDerivAt Λ baselineRate t"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ArchaicPrediction.effectiveRate_mean": [],
+    "Descent.Portability.ArchaicPrediction.effectiveRate_derivative": [
+     "∀ h, 0 ≤ π h",
+     "∑ h, π h = 1"
+    ],
+    "Descent.Portability.ArchaicPrediction.effectiveRate_deriv_nonpos": [
+     "∀ h, 0 ≤ π h",
+     "∑ h, π h = 1"
+    ],
+    "Descent.Portability.ArchaicPrediction.marginal_hazard": [
+     "∀ h, 0 ≤ π h",
+     "∑ h, π h = 1",
+     "HasDerivAt Λ baselineRate t"
+    ]
+   }
+  }
+ },
  "Descent.Portability.ArchaicPrediction.subsetExponent": {
   "class": "NOT-EXTRACTABLE",
   "note": "∑ over the Finset `S`, not `Finset.univ`",
@@ -131010,11 +131862,13 @@
    "Descent.Portability.ArchaicPrediction.coefficient_response",
    "Descent.Portability.ArchaicPrediction.evaluate_transport",
    "Descent.Portability.ArchaicPrediction.responsePolynomial_injective",
-   "Descent.Portability.ArchaicPrediction.response_transport"
+   "Descent.Portability.ArchaicPrediction.response_transport",
+   "Descent.Portability.ArchaicPrediction.subsetResponse_evaluation"
   ],
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ArchaicPrediction.subsetResponse_evaluation": [],
     "Descent.Portability.ArchaicPrediction.coefficient_response": [],
     "Descent.Portability.ArchaicPrediction.responsePolynomial_injective": [],
     "Descent.Portability.ArchaicPrediction.response_transport": [],
@@ -135759,6 +136613,89 @@
     "Descent.Portability.equity_gap_in_public_health": [
      "1 < rr"
     ]
+   }
+  }
+ },
+ "Descent.Portability.CompactTargetDeflation.deflate": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name L.comp",
+  "file": "Descent/Portability/CompactTargetDeflation.lean",
+  "line": 26,
+  "short": "deflate",
+  "ret_type": "E →L[ℝ] F",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.CompactTargetDeflation.compact_deflate",
+   "Descent.Portability.CompactTargetDeflation.deflate_apply",
+   "Descent.Portability.CompactTargetDeflation.deflate_self",
+   "Descent.Portability.CompactTargetDeflation.energy_identity",
+   "Descent.Portability.CompactTargetDeflation.kernel_preserved",
+   "Descent.Portability.CompactTargetDeflation.leadingQuery_residual",
+   "Descent.Portability.CompactTargetDeflation.leadingQuery_risk",
+   "Descent.Portability.CompactTargetDeflation.norm_deflate_le"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "IsCompactOperator L",
+    "‖L v‖ = ‖L‖",
+    "L.adjoint (L v",
+    "‖v‖ = 1",
+    "L x = 0"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.CompactTargetDeflation.deflate_apply": [],
+    "Descent.Portability.CompactTargetDeflation.compact_deflate": [
+     "IsCompactOperator L"
+    ],
+    "Descent.Portability.CompactTargetDeflation.energy_identity": [
+     "‖L v‖ = ‖L‖",
+     "L.adjoint (L v"
+    ],
+    "Descent.Portability.CompactTargetDeflation.norm_deflate_le": [
+     "‖L v‖ = ‖L‖",
+     "L.adjoint (L v"
+    ],
+    "Descent.Portability.CompactTargetDeflation.deflate_self": [
+     "‖v‖ = 1"
+    ],
+    "Descent.Portability.CompactTargetDeflation.kernel_preserved": [
+     "L.adjoint (L v",
+     "L x = 0"
+    ],
+    "Descent.Portability.CompactTargetDeflation.leadingQuery_residual": [],
+    "Descent.Portability.CompactTargetDeflation.leadingQuery_risk": []
+   }
+  }
+ },
+ "Descent.Portability.CompactTargetDeflation.leadingQuery": {
+  "class": "STRUCTURAL",
+  "note": "builds a structure value (Procedure E F 1)",
+  "file": "Descent/Portability/CompactTargetDeflation.lean",
+  "line": 85,
+  "short": "leadingQuery",
+  "ret_type": "Procedure E F 1",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.CompactTargetDeflation.leadingQuery_residual",
+   "Descent.Portability.CompactTargetDeflation.leadingQuery_risk"
+  ],
+  "constraints": {
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.CompactTargetDeflation.leadingQuery_residual": [],
+    "Descent.Portability.CompactTargetDeflation.leadingQuery_risk": []
    }
   }
  },
@@ -150555,6 +151492,8 @@
    "Descent.Portability.GenealogyGenotypeLaw.shared_branch_equal",
    "Descent.Portability.HWEHeterozygosityLaw.count_mean",
    "Descent.Portability.HWEHeterozygosityLaw.locus_mean",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
    "Descent.Portability.HWEInteractionLaw.characteristic_im",
    "Descent.Portability.HWEInteractionLaw.characteristic_re",
    "Descent.Portability.HWEInteractionLaw.expectation_independent_product",
@@ -150835,6 +151774,8 @@
     "Descent.Portability.GenealogyGenotypeLaw.rootedGenealogy_expectation": [],
     "Descent.Portability.HWEHeterozygosityLaw.locus_mean": [],
     "Descent.Portability.HWEHeterozygosityLaw.count_mean": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [],
     "Descent.Portability.HWEInteractionLaw.expectation_independent_product": [],
     "Descent.Portability.HWEInteractionLaw.characteristic_re": [],
     "Descent.Portability.HWEInteractionLaw.characteristic_im": [],
@@ -151845,9 +152786,9 @@
    ]
   },
   "selfcheck": {
-   "finite_points": 4,
+   "finite_points": 6,
    "total_points": 8,
-   "error": "ValueError('expected a number in range from -1 up to 1, got 1.3302982661418539')"
+   "error": "ValueError('expected a number in range from -1 up to 1, got 1.4680717150180171')"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -151899,9 +152840,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 5,
+   "finite_points": 7,
    "total_points": 8,
-   "error": "ValueError('expected a number in range from -1 up to 1, got 1.434865570000547')"
+   "error": "ValueError('expected a number in range from -1 up to 1, got 1.0539166754973934')"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -154340,7 +155281,7 @@
   "class": "STRUCTURAL",
   "note": "Prop-valued / set-valued",
   "file": "Descent/Portability/EvolutionaryMeasurementRank.lean",
-  "line": 94,
+  "line": 95,
   "short": "DiscountedExactBudget",
   "ret_type": "Prop",
   "empirical_status": "",
@@ -157472,6 +158413,9 @@
    "Descent.Portability.FiniteProductExponential.productMatrix_one",
    "Descent.Portability.HWEHeterozygosityLaw.count_characteristic",
    "Descent.Portability.HWEHeterozygosityLaw.count_mean",
+   "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
    "Descent.Portability.HWEInteractionLaw.characteristic_independent_sum",
    "Descent.Portability.HWEInteractionLaw.complexExpectation_independent_product",
    "Descent.Portability.HWEInteractionLaw.expectation_independent_product",
@@ -157502,6 +158446,9 @@
     "Descent.Portability.FiniteProductExponential.productMatrix_one": [],
     "Descent.Portability.HWEHeterozygosityLaw.count_mean": [],
     "Descent.Portability.HWEHeterozygosityLaw.count_characteristic": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability": [],
+    "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [],
     "Descent.Portability.HWEInteractionLaw.expectation_independent_product": [],
     "Descent.Portability.HWEInteractionLaw.complexExpectation_independent_product": [],
     "Descent.Portability.HWEInteractionLaw.characteristic_independent_sum": [],
@@ -157724,6 +158671,11 @@
    "Descent.Coalescent.card_two_drop_le",
    "Descent.Portability.AncientPrediction.inverseQuadratic_fderiv",
    "Descent.Portability.CombinedPredictionCertificate.orthogonal_squared_error",
+   "Descent.Portability.CompactTargetDeflation.deflate_apply",
+   "Descent.Portability.CompactTargetDeflation.energy_identity",
+   "Descent.Portability.CompactTargetDeflation.kernel_preserved",
+   "Descent.Portability.CompactTargetDeflation.norm_deflate_le",
+   "Descent.Portability.CompactTargetDeflation.singular_cross",
    "Descent.Portability.CompactTargetDirection.gram_residual_bound",
    "Descent.Portability.DiscountedForecastMinimax.forecastOperator_gram",
    "Descent.Portability.DiscountedForecastMinimax.symmetric_eq_of_quadratic",
@@ -157771,6 +158723,11 @@
     "Descent.Coalescent.card_two_drop_le": [],
     "Descent.Portability.AncientPrediction.inverseQuadratic_fderiv": [],
     "Descent.Portability.CombinedPredictionCertificate.orthogonal_squared_error": [],
+    "Descent.Portability.CompactTargetDeflation.deflate_apply": [],
+    "Descent.Portability.CompactTargetDeflation.singular_cross": [],
+    "Descent.Portability.CompactTargetDeflation.energy_identity": [],
+    "Descent.Portability.CompactTargetDeflation.norm_deflate_le": [],
+    "Descent.Portability.CompactTargetDeflation.kernel_preserved": [],
     "Descent.Portability.CompactTargetDirection.gram_residual_bound": [],
     "Descent.Portability.DiscountedForecastMinimax.symmetric_eq_of_quadratic": [
      "star first = first",
@@ -160190,6 +161147,10 @@
    "Descent.Portability.HWEHeterozygosityLaw.locus_mean",
    "Descent.Portability.HWEHeterozygosityLaw.probability_le_one",
    "Descent.Portability.HWEHeterozygosityLaw.probability_nonneg",
+   "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit",
+   "Descent.Portability.HWEHeterozygosityLimit.probability_cap",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
    "Descent.Portability.TrainingNoiseAccuracy.conditionalAccuracy_mem_unitInterval",
    "Descent.Portability.TrainingNoiseAccuracy.conditionalExpectation_bounds",
    "Descent.Portability.TrainingNoiseAccuracy.conditionalExpectation_eq_labelLaw",
@@ -160252,6 +161213,10 @@
     "Descent.Portability.HWEHeterozygosityLaw.locus_characteristic": [],
     "Descent.Portability.HWEHeterozygosityLaw.count_mean": [],
     "Descent.Portability.HWEHeterozygosityLaw.count_characteristic": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability": [],
+    "Descent.Portability.HWEHeterozygosityLimit.probability_cap": [],
+    "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [],
     "Descent.Portability.TrainingNoiseAccuracy.labelMass_nonneg": [],
     "Descent.Portability.TrainingNoiseAccuracy.labelMass_sum": [],
     "Descent.Portability.TrainingNoiseAccuracy.conditionalExpectation_eq_labelLaw": [],
@@ -160267,10 +161232,10 @@
     "Descent.Spectral.StationaryTwoSliceField.coordinateLaw_preserved": []
    },
    "range_hi_thm": [
-    "Descent.Decision.CertificateGrading.FinitePrior.probability_le_one",
-    0
+    "Descent.Portability.HWEHeterozygosityLimit.probability_cap",
+    2
    ],
-   "range_hi": 1,
+   "range_hi": 4,
    "range_lo_thm": [
     "Descent.Portability.FirthFiniteIterationLaw.probability_mem_openUnit",
     0
@@ -160848,6 +161813,7 @@
   "mentioned_by": [
    "Descent.Portability.AdaptiveLinearMeasurements.Procedure.fixed_run",
    "Descent.Portability.AdaptiveLinearMeasurements.Procedure.run_eq_zeroPrediction",
+   "Descent.Portability.CompactTargetDeflation.leadingQuery_residual",
    "Descent.Portability.DiscountedForecastMinimax.adaptive_discounted_minimax",
    "Descent.Portability.EvolutionaryForecastMinimax.adaptive_forecast_minimax",
    "Descent.Portability.EvolutionaryForecastMinimax.translatePrediction_run",
@@ -160869,6 +161835,7 @@
    "hypotheses_by_theorem": {
     "Descent.Portability.AdaptiveLinearMeasurements.Procedure.run_eq_zeroPrediction": [],
     "Descent.Portability.AdaptiveLinearMeasurements.Procedure.fixed_run": [],
+    "Descent.Portability.CompactTargetDeflation.leadingQuery_residual": [],
     "Descent.Portability.DiscountedForecastMinimax.adaptive_discounted_minimax": [],
     "Descent.Portability.runCommonDiffusionEvents_finalCarriers": [],
     "Descent.Portability.PipelineDemographicHistory.presentCommonDiffusionState_marginal": [],
@@ -160933,7 +161900,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Portability/FixedBinHoeffdingLaw.lean",
-  "line": 70,
+  "line": 73,
   "short": "radius",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -160971,6 +161938,7 @@
    "Descent.Conditionals.dynamicsContrast_obstructions",
    "Descent.Conditionals.genomicPressureProfiles_dist_le_of_tiltNet",
    "Descent.Portability.AdaptiveLinearMeasurements.adaptive_lower_of_subspace",
+   "Descent.Portability.CompactTargetDeflation.leadingQuery_risk",
    "Descent.Portability.DiscountedForecastMinimax.adaptive_discounted_minimax",
    "Descent.Portability.DiscountedForecastMinimax.lawTrajectory_affine",
    "Descent.Portability.EvolutionaryForecastMinimax.adaptive_forecast_minimax",
@@ -161030,6 +161998,7 @@
     ],
     "Descent.Conditionals.dynamicsContrast_obstructions": [],
     "Descent.Portability.AdaptiveLinearMeasurements.adaptive_lower_of_subspace": [],
+    "Descent.Portability.CompactTargetDeflation.leadingQuery_risk": [],
     "Descent.Portability.posteriorMean_swappedConditional": [],
     "Descent.Portability.indexWiseCalibrationEnergy_swappedConditional_eq": [],
     "Descent.Portability.unqueried_error_ge_radius": [],
@@ -161084,7 +162053,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name Finset.univ.filter",
   "file": "Descent/Portability/FixedBinHoeffdingLaw.lean",
-  "line": 119,
+  "line": 124,
   "short": "binRows",
   "ret_type": "Finset I",
   "empirical_status": "",
@@ -165505,9 +166474,12 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.HWEHeterozygosityLaw.count_mean",
    "Descent.Portability.HWEHeterozygosityLaw.count_nonneg",
    "Descent.Portability.HWEHeterozygosityLaw.locus_characteristic",
-   "Descent.Portability.HWEHeterozygosityLaw.locus_mean"
+   "Descent.Portability.HWEHeterozygosityLaw.locus_mean",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_indicator"
   ],
   "constraints": {
    "declared_kind": "heterozygosity",
@@ -165517,7 +166489,10 @@
    "hypotheses_by_theorem": {
     "Descent.Portability.HWEHeterozygosityLaw.locus_mean": [],
     "Descent.Portability.HWEHeterozygosityLaw.locus_characteristic": [],
-    "Descent.Portability.HWEHeterozygosityLaw.count_nonneg": []
+    "Descent.Portability.HWEHeterozygosityLaw.count_mean": [],
+    "Descent.Portability.HWEHeterozygosityLaw.count_nonneg": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_indicator": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability": []
    }
   }
  },
@@ -165535,7 +166510,7 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 5,
+   "finite_points": 4,
    "total_points": 8,
    "error": "IndexError('heterozygote: index 3 outside 0..2; the inhabitant does not cover this point (widen the sampled dimension rather than reading a wrapped entry)')"
   },
@@ -165661,6 +166636,10 @@
    "Descent.Portability.HWEHeterozygosityLaw.count_characteristic",
    "Descent.Portability.HWEHeterozygosityLaw.count_mean",
    "Descent.Portability.HWEHeterozygosityLaw.count_nonneg",
+   "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_indicator",
    "Descent.Portability.InterleavedMutationExponential.generator_matrix",
    "Descent.Portability.InterleavedMutationExponential.interval_compose",
    "Descent.Portability.InterleavedMutationExponential.interval_matrix_exponential",
@@ -165940,6 +166919,12 @@
      "ι → HardyWeinbergModel"
     ],
     "Descent.Portability.HWEHeterozygosityLaw.count_nonneg": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_indicator": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability": [
+     "ι → HardyWeinbergModel"
+    ],
+    "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [],
     "Descent.Portability.InterleavedMutationExponential.propagate_mass": [],
     "Descent.Portability.InterleavedMutationExponential.poisson_matrix_series": [],
     "Descent.Portability.InterleavedMutationExponential.poisson_matrix_exponential": [],
@@ -166135,6 +167120,10 @@
    "Descent.Portability.HWEHeterozygosityLaw.locus_mean",
    "Descent.Portability.HWEHeterozygosityLaw.probability_le_one",
    "Descent.Portability.HWEHeterozygosityLaw.probability_nonneg",
+   "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit",
+   "Descent.Portability.HWEHeterozygosityLimit.probability_cap",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
    "Descent.Portability.TrainingNoiseAccuracy.conditionalAccuracy_mem_unitInterval",
    "Descent.Portability.TrainingNoiseAccuracy.conditionalExpectation_bounds",
    "Descent.Portability.TrainingNoiseAccuracy.conditionalExpectation_eq_labelLaw",
@@ -166157,7 +167146,12 @@
     "0 < h.altFreq",
     "h.altFreq < 1",
     "∀ i, 0 < (h i",
-    "∀ i, (h i"
+    "∀ i, (h i",
+    "|h.altFreq - 1 / 2| ≤ ε",
+    "∀ m i, 0 < (h m i",
+    "∀ m i, (h m i",
+    "∀ m i, |(h m i",
+    "Tendsto (fun m ↦ ∑ i, ((h m i"
    ],
    "hypotheses_by_theorem": {
     "Descent.Decision._root_.Descent.Blindness.ProbeBlindness.risk_readoutProblem": [],
@@ -166217,6 +167211,25 @@
      "∀ i, 0 < (h i",
      "∀ i, (h i"
     ],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability": [
+     "∀ i, 0 < (h i",
+     "∀ i, (h i"
+    ],
+    "Descent.Portability.HWEHeterozygosityLimit.probability_cap": [
+     "|h.altFreq - 1 / 2| ≤ ε"
+    ],
+    "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit": [
+     "∀ m i, 0 < (h m i",
+     "∀ m i, (h m i",
+     "∀ m i, |(h m i",
+     "Tendsto (fun m ↦ ∑ i, ((h m i"
+    ],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [
+     "∀ m i, 0 < (h m i",
+     "∀ m i, (h m i",
+     "∀ m i, |(h m i",
+     "Tendsto (fun m ↦ ∑ i, ((h m i"
+    ],
     "Descent.Portability.TrainingNoiseAccuracy.labelMass_nonneg": [],
     "Descent.Portability.TrainingNoiseAccuracy.labelMass_sum": [],
     "Descent.Portability.TrainingNoiseAccuracy.conditionalExpectation_eq_labelLaw": [],
@@ -166232,10 +167245,10 @@
     "Descent.Spectral.StationaryTwoSliceField.coordinateLaw_preserved": []
    },
    "range_hi_thm": [
-    "Descent.Decision.CertificateGrading.FinitePrior.probability_le_one",
-    0
+    "Descent.Portability.HWEHeterozygosityLimit.probability_cap",
+    2
    ],
-   "range_hi": 1,
+   "range_hi": 4,
    "range_lo_thm": [
     "Descent.Portability.FirthFiniteIterationLaw.probability_mem_openUnit",
     0
@@ -166271,6 +167284,9 @@
    "Descent.Portability.FiniteProductExponential.productMatrix_one",
    "Descent.Portability.HWEHeterozygosityLaw.count_characteristic",
    "Descent.Portability.HWEHeterozygosityLaw.count_mean",
+   "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
    "Descent.Portability.HWEInteractionLaw.characteristic_independent_sum",
    "Descent.Portability.HWEInteractionLaw.complexExpectation_independent_product",
    "Descent.Portability.HWEInteractionLaw.expectation_independent_product",
@@ -166313,6 +167329,11 @@
     "Descent.Portability.HWEHeterozygosityLaw.count_characteristic": [
      "ι → HardyWeinbergModel"
     ],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability": [
+     "ι → HardyWeinbergModel"
+    ],
+    "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [],
     "Descent.Portability.HWEInteractionLaw.expectation_independent_product": [],
     "Descent.Portability.HWEInteractionLaw.complexExpectation_independent_product": [],
     "Descent.Portability.HWEInteractionLaw.characteristic_independent_sum": [],
@@ -166361,6 +167382,7 @@
    "Descent.Portability.FiniteAtomicReportMeasure.charFun_finite_report",
    "Descent.Portability.HWEHeterozygosityLaw.count_characteristic",
    "Descent.Portability.HWEHeterozygosityLaw.locus_characteristic",
+   "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit",
    "Descent.Portability.HWEInteractionLaw.characteristic_im",
    "Descent.Portability.HWEInteractionLaw.characteristic_independent_sum",
    "Descent.Portability.HWEInteractionLaw.characteristic_re",
@@ -166375,6 +167397,7 @@
     "Descent.Portability.FiniteAtomicReportMeasure.charFun_finite_report": [],
     "Descent.Portability.HWEHeterozygosityLaw.locus_characteristic": [],
     "Descent.Portability.HWEHeterozygosityLaw.count_characteristic": [],
+    "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit": [],
     "Descent.Portability.HWEInteractionLaw.complexExpectation_independent_product": [],
     "Descent.Portability.HWEInteractionLaw.characteristic_independent_sum": [],
     "Descent.Portability.HWEInteractionLaw.characteristic_re": [],
@@ -166591,6 +167614,9 @@
    "Descent.Portability.HWEHeterozygosityLaw.count_mean",
    "Descent.Portability.HWEHeterozygosityLaw.locus_characteristic",
    "Descent.Portability.HWEHeterozygosityLaw.locus_mean",
+   "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
    "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass",
    "Descent.Portability.HWEInteractionLaw.squareBiasedLocus_mass"
   ],
@@ -166602,7 +167628,11 @@
     "0 < h.altFreq",
     "h.altFreq < 1",
     "∀ i, 0 < (h i",
-    "∀ i, (h i"
+    "∀ i, (h i",
+    "∀ m i, 0 < (h m i",
+    "∀ m i, (h m i",
+    "∀ m i, |(h m i",
+    "Tendsto (fun m ↦ ∑ i, ((h m i"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.HWEHeterozygosityLaw.locus_mean": [
@@ -166620,6 +167650,22 @@
     "Descent.Portability.HWEHeterozygosityLaw.count_characteristic": [
      "∀ i, 0 < (h i",
      "∀ i, (h i"
+    ],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability": [
+     "∀ i, 0 < (h i",
+     "∀ i, (h i"
+    ],
+    "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit": [
+     "∀ m i, 0 < (h m i",
+     "∀ m i, (h m i",
+     "∀ m i, |(h m i",
+     "Tendsto (fun m ↦ ∑ i, ((h m i"
+    ],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [
+     "∀ m i, 0 < (h m i",
+     "∀ m i, (h m i",
+     "∀ m i, |(h m i",
+     "Tendsto (fun m ↦ ∑ i, ((h m i"
     ],
     "Descent.Portability.HWEInteractionLaw.squareBiasedLocus_mass": [
      "0 < h.altFreq",
@@ -183145,7 +184191,7 @@
   "short": "weightedMean",
   "ret_type": "ℝ",
   "empirical_status": "UNTESTED",
-  "python": "weightedMean",
+  "python": "Descent_Portability_weightedMean",
   "args": [
    "w",
    "c"
@@ -183168,6 +184214,15 @@
    }
   },
   "mentioned_by": [
+   "Descent.Portability.ArchaicPrediction.best_constant_risk",
+   "Descent.Portability.ArchaicPrediction.phase_covariance",
+   "Descent.Portability.ArchaicPrediction.phase_covariance_nonneg",
+   "Descent.Portability.ArchaicPrediction.response_covariance",
+   "Descent.Portability.ArchaicPrediction.response_specific_mean",
+   "Descent.Portability.ArchaicPrediction.variance_as_second_moment",
+   "Descent.Portability.ArchaicPrediction.weightedMean_scale",
+   "Descent.Portability.ArchaicPrediction.weightedMean_sum",
+   "Descent.Portability.ArchaicPrediction.weighted_product_expansion",
    "Descent.Portability.energyWeightedVariance_at_constant",
    "Descent.Portability.energyWeightedVariance_attained",
    "Descent.Portability.energyWeightedVariance_le",
@@ -183176,10 +184231,33 @@
   ],
   "constraints": {
    "hypotheses": [
+    "∑ h, w h = 1",
+    "∑ x, w x = 1",
+    "∀ x, 0 ≤ w x",
     "weightedMean w (fun _ ↦ v",
     "∑ t, w t = 1"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ArchaicPrediction.weightedMean_sum": [],
+    "Descent.Portability.ArchaicPrediction.weightedMean_scale": [],
+    "Descent.Portability.ArchaicPrediction.response_specific_mean": [],
+    "Descent.Portability.ArchaicPrediction.best_constant_risk": [
+     "∑ h, w h = 1"
+    ],
+    "Descent.Portability.ArchaicPrediction.variance_as_second_moment": [
+     "∑ h, w h = 1"
+    ],
+    "Descent.Portability.ArchaicPrediction.weighted_product_expansion": [],
+    "Descent.Portability.ArchaicPrediction.response_covariance": [
+     "∑ h, w h = 1"
+    ],
+    "Descent.Portability.ArchaicPrediction.phase_covariance": [
+     "∑ x, w x = 1"
+    ],
+    "Descent.Portability.ArchaicPrediction.phase_covariance_nonneg": [
+     "∑ x, w x = 1",
+     "∀ x, 0 ≤ w x"
+    ],
     "Descent.Portability.weightedMean_at_zero_weight": [],
     "Descent.Portability.energyWeightedVariance_at_constant": [
      "weightedMean w (fun _ ↦ v"
@@ -207224,6 +208302,7 @@
    "Descent.Portability.ArchaicPrediction.four_mean_logit",
    "Descent.Portability.ArchaicPrediction.four_pairwise_moments",
    "Descent.Portability.ArchaicPrediction.four_risk_formulas",
+   "Descent.Portability.ArchaicPrediction.phaseCharacter_mul",
    "Descent.Portability.ArchaicPrediction.phaseCharacter_swap",
    "Descent.Portability.ArchaicPrediction.phaseCharacter_univ",
    "Descent.Portability.ArchaicPrediction.phase_orthogonality",
@@ -207246,6 +208325,7 @@
     "Descent.Blindness.chartMarginals_saturatedPanel": [],
     "Descent.Portability.ArchaicPrediction.centeredCharacter_univ": [],
     "Descent.Portability.ArchaicPrediction.centered_orthogonality": [],
+    "Descent.Portability.ArchaicPrediction.phaseCharacter_mul": [],
     "Descent.Portability.ArchaicPrediction.phaseCharacter_univ": [],
     "Descent.Portability.ArchaicPrediction.phaseCharacter_swap": [],
     "Descent.Portability.ArchaicPrediction.phase_orthogonality": [],
@@ -224895,6 +225975,8 @@
    "Descent.Portability.GenealogyGenotypeLaw.shared_branch_equal",
    "Descent.Portability.HWEHeterozygosityLaw.count_mean",
    "Descent.Portability.HWEHeterozygosityLaw.locus_mean",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
    "Descent.Portability.HWEInteractionLaw.characteristic_im",
    "Descent.Portability.HWEInteractionLaw.characteristic_re",
    "Descent.Portability.HWEInteractionLaw.expectation_independent_product",
@@ -225222,6 +226304,8 @@
     "Descent.Portability.GenealogyGenotypeLaw.rootedGenealogy_expectation": [],
     "Descent.Portability.HWEHeterozygosityLaw.locus_mean": [],
     "Descent.Portability.HWEHeterozygosityLaw.count_mean": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [],
     "Descent.Portability.HWEInteractionLaw.expectation_independent_product": [],
     "Descent.Portability.HWEInteractionLaw.characteristic_re": [],
     "Descent.Portability.HWEInteractionLaw.characteristic_im": [],
@@ -226017,6 +227101,9 @@
    "Descent.Portability.FiniteProductExponential.productMatrix_one",
    "Descent.Portability.HWEHeterozygosityLaw.count_characteristic",
    "Descent.Portability.HWEHeterozygosityLaw.count_mean",
+   "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability",
+   "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
    "Descent.Portability.HWEInteractionLaw.characteristic_independent_sum",
    "Descent.Portability.HWEInteractionLaw.complexExpectation_independent_product",
    "Descent.Portability.HWEInteractionLaw.expectation_independent_product",
@@ -226047,6 +227134,9 @@
     "Descent.Portability.FiniteProductExponential.productMatrix_one": [],
     "Descent.Portability.HWEHeterozygosityLaw.count_mean": [],
     "Descent.Portability.HWEHeterozygosityLaw.count_characteristic": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability": [],
+    "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit": [],
+    "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [],
     "Descent.Portability.HWEInteractionLaw.expectation_independent_product": [],
     "Descent.Portability.HWEInteractionLaw.complexExpectation_independent_product": [],
     "Descent.Portability.HWEInteractionLaw.characteristic_independent_sum": [],
@@ -226396,6 +227486,9 @@
    "Descent.Portability.ArchaicPrediction.four_risk_formulas",
    "Descent.Portability.ArchaicPrediction.four_risks_separated",
    "Descent.Portability.ArchaicPrediction.pairwise_phase_risk_not_identified",
+   "Descent.Portability.ArchaicPrediction.sigmoid_curvature_bound",
+   "Descent.Portability.ArchaicPrediction.sigmoid_second_derivative",
+   "Descent.Portability.ArchaicPrediction.two_state_logistic_bound",
    "Descent.Portability.deriv_logisticSoftplus",
    "Descent.Portability.hasDerivAt_logisticSoftplus",
    "Descent.Portability.sigmoid_add_eq_oddsScale",
@@ -226407,6 +227500,9 @@
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ArchaicPrediction.sigmoid_second_derivative": [],
+    "Descent.Portability.ArchaicPrediction.sigmoid_curvature_bound": [],
+    "Descent.Portability.ArchaicPrediction.two_state_logistic_bound": [],
     "Descent.Portability.ArchaicPrediction.four_risk_formulas": [],
     "Descent.Portability.ArchaicPrediction.four_risks_separated": [],
     "Descent.Portability.ArchaicPrediction.pairwise_phase_risk_not_identified": [],

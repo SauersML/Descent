@@ -241,6 +241,10 @@ import Descent.Portability.DiploidBoxCompatibilityLaw
 import Descent.Portability.DiploidBoxUniquenessLaw
 import Descent.Portability.EvolutionaryForecastMinimax
 
+import Descent.Portability.EvolutionaryMeasurementRank
+import Descent.Portability.FixedBinHoeffdingLaw
+import Descent.Portability.ComplexBernoulliProduct
+import Descent.Portability.CompactTargetDirection
 assert_below Descent.Program
 
 /-!

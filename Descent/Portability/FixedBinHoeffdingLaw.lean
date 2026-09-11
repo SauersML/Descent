@@ -26,6 +26,7 @@ open scoped NNReal
 variable {Ω I : Type*} [MeasurableSpace Ω] [Fintype I] [DecidableEq I]
 variable {μ : Measure Ω} [IsProbabilityMeasure μ]
 
+omit [Fintype I] [DecidableEq I] in
 /-- Hoeffding's parameter for the actual centered sum of independent [0,1] observations. -/
 theorem centered_sum_subGaussian (X : I → Ω → ℝ) (hi : iIndepFun X μ)
     (hm : ∀ i, AEMeasurable (X i) μ) (hb : ∀ i, ∀ᵐ ω ∂μ, X i ω ∈ Icc 0 1)
@@ -41,9 +42,10 @@ theorem centered_sum_subGaussian (X : I → Ω → ℝ) (hi : iIndepFun X μ)
     exact h
   have h := HasSubgaussianMGF.sum_of_iIndepFun hic hsub
   convert h using 1
-  simp
+  simp [div_eq_mul_inv]
 
-/-- Two-sided control of the actual sum, including observations with unequal laws but common mean. -/
+omit [Fintype I] [DecidableEq I] in
+/-- Two-sided control of the actual sum, allowing unequal laws with a common mean. -/
 theorem centered_sum_tail (X : I → Ω → ℝ) (hi : iIndepFun X μ)
     (hm : ∀ i, AEMeasurable (X i) μ) (hb : ∀ i, ∀ᵐ ω ∂μ, X i ω ∈ Icc 0 1)
     (s : Finset I) (η : ℝ) (he : ∀ i ∈ s, (∫ ω, X i ω ∂μ) = η)
@@ -57,9 +59,10 @@ theorem centered_sum_tail (X : I → Ω → ℝ) (hi : iIndepFun X μ)
       {ω | δ ≤ ∑ i ∈ s, (X i ω - η)} ∪
         {ω | δ ≤ -(∑ i ∈ s, (X i ω - η))} := by
     intro ω hω
+    change δ < |∑ i ∈ s, (X i ω - η)| at hω
     rcases lt_abs.mp hω with h | h
     · exact Or.inl h.le
-    · exact Or.inr (by linarith)
+    · exact Or.inr h.le
   have hbound := (measureReal_mono hsub).trans
     (measureReal_union_le (μ := μ) _ _)
   simp only [NNReal.coe_div, NNReal.coe_natCast, NNReal.coe_ofNat,
@@ -93,6 +96,7 @@ theorem radius_tail_value (K count : ℕ) (hK : 0 < K) (hc : 0 < count)
   rw [hex, Real.exp_neg, Real.exp_log harg]
   field_simp
 
+omit [Fintype I] [DecidableEq I] in
 /-- The empirical mean in a fixed nonempty bin obeys the report's α/K error bound. -/
 theorem fixed_subset_confidence (X : I → Ω → ℝ) (hi : iIndepFun X μ)
     (hm : ∀ i, AEMeasurable (X i) μ) (hb : ∀ i, ∀ᵐ ω ∂μ, X i ω ∈ Icc 0 1)
@@ -108,6 +112,7 @@ theorem fixed_subset_confidence (X : I → Ω → ℝ) (hi : iIndepFun X μ)
   have hevent : {ω | radius K s.card α < |(∑ i ∈ s, X i ω) / s.card - η|} =
       {ω | (s.card : ℝ) * radius K s.card α < |∑ i ∈ s, (X i ω - η)|} := by
     ext ω
+    simp only [Set.mem_setOf_eq]
     rw [hsum, abs_div, abs_of_pos hsr, lt_div_iff₀ hsr, mul_comm]
   rw [hevent]
   have h := centered_sum_tail X hi hm hb s η he
@@ -119,6 +124,7 @@ theorem fixed_subset_confidence (X : I → Ω → ℝ) (hi : iIndepFun X μ)
 def binRows {K : ℕ} (assignment : I → Fin K) (j : Fin K) : Finset I :=
   Finset.univ.filter (fun i ↦ assignment i = j)
 
+omit [DecidableEq I] in
 /-- Conditional on all assignments, the probability that any nonempty bin misses is at most α. -/
 theorem fixed_assignment_confidence {K : ℕ} (hK : 0 < K)
     (assignment : I → Fin K) (η : Fin K → ℝ)
@@ -138,7 +144,7 @@ theorem fixed_assignment_confidence {K : ℕ} (hK : 0 < K)
         (fun i his ↦ by simpa only [(Finset.mem_filter.mp his).2] using he i) K hK α hα
       simpa only [bad, hc, true_and] using h
     · simp only [bad, hc, false_and, setOf_false, measureReal_empty]
-      positivity
+      exact div_nonneg hα.1.le (Nat.cast_nonneg K)
   have hevent : {ω | ∃ j : Fin K, 0 < (binRows assignment j).card ∧
       radius K (binRows assignment j).card α <
         |(∑ i ∈ binRows assignment j, X i ω) / (binRows assignment j).card - η j|} =

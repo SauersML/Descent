@@ -39,6 +39,7 @@ theorem gram_residual_bound (L : E →L[ℝ] F) (v : E) (hv : ‖v‖ ≤ 1) :
   have hmul := mul_le_mul_of_nonneg_left hvsq (sq_nonneg (‖L‖ ^ 2))
   nlinarith
 
+omit [CompleteSpace E] [CompleteSpace F] in
 theorem maximizing_sequence (L : E →L[ℝ] F) :
     ∃ u : ℕ → E, (∀ n, ‖u n‖ ≤ 1) ∧ Tendsto (fun n ↦ ‖L (u n)‖) atTop (𝓝 ‖L‖) := by
   have he (n : ℕ) : ∃ v : E, ‖v‖ < 1 ∧ ‖L‖ - 1 / ((n : ℝ) + 1) < ‖L v‖ :=
@@ -56,9 +57,11 @@ theorem maximizing_sequence_residual (L : E →L[ℝ] F) (u : ℕ → E)
     (hu : ∀ n, ‖u n‖ ≤ 1) (hmax : Tendsto (fun n ↦ ‖L (u n)‖) atTop (𝓝 ‖L‖)) :
     Tendsto (fun n ↦ L.adjoint (L (u n)) - ‖L‖ ^ 2 • u n) atTop (𝓝 0) := by
   have ht : Tendsto (fun n ↦ ‖L‖ ^ 2 * (‖L‖ ^ 2 - ‖L (u n)‖ ^ 2)) atTop (𝓝 0) := by
-    simpa only [sub_self, mul_zero] using
+    have hh : Tendsto (fun n ↦ ‖L‖ ^ 2 * (‖L‖ ^ 2 - ‖L (u n)‖ ^ 2))
+        atTop (𝓝 (‖L‖ ^ 2 * (‖L‖ ^ 2 - ‖L‖ ^ 2))) :=
       (tendsto_const_nhds (x := ‖L‖ ^ 2)).mul
         ((tendsto_const_nhds (x := ‖L‖ ^ 2)).sub (hmax.pow 2))
+    simpa only [sub_self, mul_zero] using hh
   have hs := squeeze_zero (fun n ↦ sq_nonneg ‖L.adjoint (L (u n)) - ‖L‖ ^ 2 • u n‖)
     (fun n ↦ gram_residual_bound L (u n) (hu n)) ht
   apply tendsto_zero_iff_norm_tendsto_zero.mpr
