@@ -4159,6 +4159,9 @@ def lognormal(K, c):
 def signedLognormal(K, c):
     return blend((_rt.rdiv(1.0, 2.0)), (by(norm_num)), (by(norm_num)), (lognormal(K, c)), (lognormal(K, ((-c)))))
 
+def Descent_Portability_HWECriticalAmplitudeLimit_intensity(m, N):
+    return _rt.rdiv((N), _rt.lpow(2.0, m))
+
 def heterozygote(*_a):
     if len(_a) < 1:
         return lambda *_b: heterozygote(*(_a + _b))

@@ -279,6 +279,10 @@ import Descent.Portability.HWEExceptionalLimit
 import Descent.Portability.FiniteL1BoundedTests
 import Descent.Portability.HWEAmplitudeMixture
 import Descent.Portability.HWEAmplitudeWeakLimit
+import Descent.Portability.HWEAbsoluteMomentLimit
+import Descent.Portability.FiniteCharacteristicL1
+import Descent.Portability.FiniteL1WeakStability
+import Descent.Portability.HWECriticalAmplitudeLimit
 assert_below Descent.Program
 
 /-!
