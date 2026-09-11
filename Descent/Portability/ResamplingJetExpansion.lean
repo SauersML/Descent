@@ -452,6 +452,235 @@ def mul {D : ℕ} {firstJet secondJet : TwoLocusDiffusionJet D}
 
 end ResamplingExpansion
 
+/-- The left marginal frequency in one deme expands exactly: the step moves it by `1 / N`
+times the centred left-allele indicator and by nothing else, so the second-order coefficient
+and the remainder are both zero. -/
+def resamplingExpansionLeftFrequencyJet {D : ℕ} (index : Fin D) :
+    ResamplingExpansion (twoLocusLeftFrequencyJet index) where
+  second _ _ _ := 0
+  bound := 1
+  remainder := 0
+  value_le state := by
+    simp only [twoLocusLeftFrequencyJet]
+    rw [abs_le]
+    exact ⟨by linarith [(state index).leftFrequency_nonneg],
+      (state index).leftFrequency_le_one⟩
+  gradient_le deme state drawn := by
+    simp only [twoLocusLeftFrequencyJet]
+    by_cases hdeme : deme = index
+    · rw [if_pos hdeme]
+      exact abs_twoLocusLeftAlleleIndicator_le_one drawn
+    · rw [if_neg hdeme]
+      norm_num
+  second_le _ _ _ := by norm_num
+  expansion N _ state deme drawn := abs_expansionResidual_le_of_eq_zero (by
+    simp only [expansionResidual, centeredGradient, twoLocusLeftFrequencyJet]
+    by_cases hdeme : deme = index
+    · simp only [if_pos hdeme]
+      rw [← hdeme, resampleStepAt_self, resampleStep_leftFrequency]
+      simp only [twoLocusHaplotypeMean]
+      ring
+    · simp only [if_neg hdeme]
+      rw [resampleStepAt_of_ne state deme index N drawn (fun heq ↦ hdeme heq.symm)]
+      simp only [twoLocusHaplotypeMean]
+      ring)
+  second_mean deme state := by
+    simp only [twoLocusLeftFrequencyJet, twoLocusHaplotypeMean]
+    ring
+
+/-- The right marginal frequency in one deme expands exactly, by the same linearity. -/
+def resamplingExpansionRightFrequencyJet {D : ℕ} (index : Fin D) :
+    ResamplingExpansion (twoLocusRightFrequencyJet index) where
+  second _ _ _ := 0
+  bound := 1
+  remainder := 0
+  value_le state := by
+    simp only [twoLocusRightFrequencyJet]
+    rw [abs_le]
+    exact ⟨by linarith [(state index).rightFrequency_nonneg],
+      (state index).rightFrequency_le_one⟩
+  gradient_le deme state drawn := by
+    simp only [twoLocusRightFrequencyJet]
+    by_cases hdeme : deme = index
+    · rw [if_pos hdeme]
+      exact abs_twoLocusRightAlleleIndicator_le_one drawn
+    · rw [if_neg hdeme]
+      norm_num
+  second_le _ _ _ := by norm_num
+  expansion N _ state deme drawn := abs_expansionResidual_le_of_eq_zero (by
+    simp only [expansionResidual, centeredGradient, twoLocusRightFrequencyJet]
+    by_cases hdeme : deme = index
+    · simp only [if_pos hdeme]
+      rw [← hdeme, resampleStepAt_self, resampleStep_rightFrequency]
+      simp only [twoLocusHaplotypeMean]
+      ring
+    · simp only [if_neg hdeme]
+      rw [resampleStepAt_of_ne state deme index N drawn (fun heq ↦ hdeme heq.symm)]
+      simp only [twoLocusHaplotypeMean]
+      ring)
+  second_mean deme state := by
+    simp only [twoLocusRightFrequencyJet, twoLocusHaplotypeMean]
+    ring
+
+/-- The linkage determinant in one deme expands exactly.  A determinant is quadratic, so the
+`(1 / N) ^ 2` coefficient is the quadratic form `linkageStepForm` of the step direction and
+there is no remainder; its multinomial mean is the corpus `twoLocusLinkageDrift`. -/
+def resamplingExpansionLinkageJet {D : ℕ} (index : Fin D) :
+    ResamplingExpansion (twoLocusLinkageJet index) where
+  second deme state drawn :=
+    if deme = index then linkageStepForm (state index) drawn else 0
+  bound := 2
+  remainder := 0
+  value_le state := by
+    have hquarter := (state index).linkage_abs_le_quarter
+    simp only [twoLocusLinkageJet]
+    linarith
+  gradient_le deme state drawn := by
+    simp only [twoLocusLinkageJet]
+    by_cases hdeme : deme = index
+    · rw [if_pos hdeme]
+      have hgradient := abs_twoLocusLinkageGradient_le_one (state index) drawn
+      linarith
+    · rw [if_neg hdeme]
+      norm_num
+  second_le deme state drawn := by
+    by_cases hdeme : deme = index
+    · simp only [if_pos hdeme]
+      exact abs_linkageStepForm_le_two (state index) drawn
+    · simp only [if_neg hdeme]
+      norm_num
+  expansion N _ state deme drawn := abs_expansionResidual_le_of_eq_zero (by
+    simp only [expansionResidual, centeredGradient, twoLocusLinkageJet]
+    by_cases hdeme : deme = index
+    · simp only [if_pos hdeme]
+      rw [← hdeme, resampleStepAt_self, resampleStep_linkage]
+      simp only [twoLocusHaplotypeMean]
+      ring
+    · simp only [if_neg hdeme]
+      rw [resampleStepAt_of_ne state deme index N drawn (fun heq ↦ hdeme heq.symm)]
+      simp only [twoLocusHaplotypeMean]
+      ring)
+  second_mean deme state := by
+    simp only [twoLocusLinkageJet]
+    by_cases hdeme : deme = index
+    · simp only [if_pos hdeme]
+      rw [hdeme]
+      exact twoLocusHaplotypeMean_linkageStepForm (state index)
+    · simp only [if_neg hdeme, twoLocusHaplotypeMean]
+      ring
+
+/-- Expansion of the centred left-marginal contrast jet. -/
+def resamplingExpansionLeftContrastJet {D : ℕ} (index : Fin D) :
+    ResamplingExpansion (twoLocusLeftContrastJet index) :=
+  (resamplingExpansionConst 1).add
+    ((resamplingExpansionLeftFrequencyJet index).smul (-2))
+
+/-- Expansion of the centred right-marginal contrast jet. -/
+def resamplingExpansionRightContrastJet {D : ℕ} (index : Fin D) :
+    ResamplingExpansion (twoLocusRightContrastJet index) :=
+  (resamplingExpansionConst 1).add
+    ((resamplingExpansionRightFrequencyJet index).smul (-2))
+
+/-- Expansion of the cross-deme left-locus heterozygosity jet. -/
+def resamplingExpansionHJet {D : ℕ} (first second : Fin D) :
+    ResamplingExpansion (twoLocusHJet first second) :=
+  ((resamplingExpansionLeftFrequencyJet first).mul
+      ((resamplingExpansionConst 1).add
+        ((resamplingExpansionLeftFrequencyJet second).smul (-1)))).add
+    ((resamplingExpansionLeftFrequencyJet second).mul
+      ((resamplingExpansionConst 1).add
+        ((resamplingExpansionLeftFrequencyJet first).smul (-1))))
+
+/-- Expansion of the cross-deme right-locus heterozygosity jet.  NOTE 1 (6) keeps this family
+separate from the left one, and so does this instance. -/
+def resamplingExpansionRightHJet {D : ℕ} (first second : Fin D) :
+    ResamplingExpansion (twoLocusRightHJet first second) :=
+  ((resamplingExpansionRightFrequencyJet first).mul
+      ((resamplingExpansionConst 1).add
+        ((resamplingExpansionRightFrequencyJet second).smul (-1)))).add
+    ((resamplingExpansionRightFrequencyJet second).mul
+      ((resamplingExpansionConst 1).add
+        ((resamplingExpansionRightFrequencyJet first).smul (-1))))
+
+/-- Expansion of the cross-deme product-of-linkage jet. -/
+def resamplingExpansionDDJet {D : ℕ} (first second : Fin D) :
+    ResamplingExpansion (twoLocusDDJet first second) :=
+  (resamplingExpansionLinkageJet first).mul (resamplingExpansionLinkageJet second)
+
+/-- Expansion of the generalized `Dz` jet. -/
+def resamplingExpansionDzJet {D : ℕ} (first second third : Fin D) :
+    ResamplingExpansion (twoLocusDzJet first second third) :=
+  ((resamplingExpansionLinkageJet first).mul
+    (resamplingExpansionLeftContrastJet second)).mul
+    (resamplingExpansionRightContrastJet third)
+
+/-- Expansion of the generalized four-deme joint-heterozygosity jet. -/
+def resamplingExpansionPi2Jet {D : ℕ} (first second third fourth : Fin D) :
+    ResamplingExpansion (twoLocusPi2Jet first second third fourth) :=
+  ((resamplingExpansionHJet first second).mul
+    (resamplingExpansionRightHJet third fourth)).smul (1 / 4)
+
+/-- Every coordinate of the closed low-order LD family has a second-order resampling
+expansion with explicit constants. -/
+def resamplingExpansionCoordinateJet {D : ℕ} :
+    (coordinate : LowOrderLDCoordinate D) →
+      ResamplingExpansion (twoLocusCoordinateJet coordinate)
+  | .H first second => resamplingExpansionHJet first second
+  | .DD first second => resamplingExpansionDDJet first second
+  | .Dz first second third => resamplingExpansionDzJet first second third
+  | .pi2 first second third fourth => resamplingExpansionPi2Jet first second third fourth
+
+/-- **One resampling step reproduces the corpus drift to second order.**  The first-order
+term averages away because the single-draw direction is centred, and the second-order term
+averages to `driftAt` by `second_mean`, so the expectation of a jet's value after one step in
+deme `deme` is its current value plus `driftAt / N ^ 2`, up to the uniform third-order
+remainder.  This is the drift half of NOTE 1 (11). -/
+theorem resampleExpectation_jet_expansion {D : ℕ} {jet : TwoLocusDiffusionJet D}
+    (resampling : ResamplingExpansion jet) (N : ℕ) (hN : 1 ≤ N)
+    (state : Fin D → TwoLocusHaplotypeFrequencies) (deme : Fin D) :
+    |resampleExpectation state deme N jet.value - jet.value state -
+        1 / (N : ℝ) ^ 2 * jet.driftAt deme state| ≤
+      resampling.remainder / (N : ℝ) ^ 3 := by
+  have hdecomposition : (fun drawn ↦ jet.value (resampleStepAt state deme N drawn)) =
+      fun drawn ↦ jet.value state +
+        (1 / (N : ℝ) * centeredGradient jet deme state drawn +
+          (1 / (N : ℝ)) ^ 2 * resampling.second deme state drawn +
+          expansionResidual jet resampling.second N state deme drawn) := by
+    funext drawn
+    simp only [expansionResidual]
+    ring
+  have hgradient : twoLocusHaplotypeMean (state deme)
+      (fun drawn ↦ centeredGradient jet deme state drawn) = 0 := by
+    simp only [centeredGradient]
+    rw [twoLocusHaplotypeMean_sub_const]
+    ring
+  have hsecond := resampling.second_mean deme state
+  have hexpectation : resampleExpectation state deme N jet.value =
+      jet.value state + (1 / (N : ℝ) * twoLocusHaplotypeMean (state deme)
+          (fun drawn ↦ centeredGradient jet deme state drawn) +
+        (1 / (N : ℝ)) ^ 2 * twoLocusHaplotypeMean (state deme)
+          (resampling.second deme state) +
+        twoLocusHaplotypeMean (state deme)
+          (fun drawn ↦ expansionResidual jet resampling.second N state deme drawn)) := by
+    simp only [resampleExpectation]
+    rw [hdecomposition]
+    simp only [twoLocusHaplotypeMean]
+    linear_combination jet.value state * (state deme).total_eq_one
+  rw [hexpectation, hgradient, hsecond]
+  have hsimplify : jet.value state + (1 / (N : ℝ) * 0 +
+      (1 / (N : ℝ)) ^ 2 * jet.driftAt deme state +
+      twoLocusHaplotypeMean (state deme)
+        (fun drawn ↦ expansionResidual jet resampling.second N state deme drawn)) -
+      jet.value state - 1 / (N : ℝ) ^ 2 * jet.driftAt deme state =
+      twoLocusHaplotypeMean (state deme)
+        (fun drawn ↦ expansionResidual jet resampling.second N state deme drawn) := by
+    ring
+  rw [hsimplify]
+  exact twoLocusHaplotypeMean_abs_le (state deme)
+    (fun drawn ↦ expansionResidual jet resampling.second N state deme drawn)
+    (resampling.remainder / (N : ℝ) ^ 3)
+    (fun drawn ↦ resampling.expansion N hN state deme drawn)
+
 end
 
 end Descent.Portability.ResamplingJetExpansion
