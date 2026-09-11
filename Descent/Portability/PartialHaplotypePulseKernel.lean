@@ -138,7 +138,7 @@ theorem withinBudget_relabelCarriers (capacity : Locus → ℕ)
 theorem choiceWeight_nonneg (pulse : PulseMatrix Deme)
     (carriers : List (PartialType Deme Locus Allele)) (choice : Fin carriers.length → Deme) :
     0 ≤ choiceWeight pulse carriers choice :=
-  Finset.prod_nonneg fun k _ ↦ pulse.weight_nonneg _ _
+  Finset.prod_nonneg fun _ _ ↦ pulse.weight_nonneg _ _
 
 /-- Choice probabilities sum to one. -/
 theorem sum_choiceWeight (pulse : PulseMatrix Deme)
@@ -206,7 +206,7 @@ theorem pulseKernel_rowSum (pulse : PulseMatrix Deme) (capacity : Locus → ℕ)
 
 /-- The pulse kernel is a stochastic, hence substochastic, matrix. -/
 theorem pulseKernel_substochastic (pulse : PulseMatrix Deme) (capacity : Locus → ℕ) :
-    SubstochasticMatrix (pulseKernel pulse capacity) where
+    SubstochasticMatrix (pulseKernel (Allele := Allele) pulse capacity) where
   entry_nonneg ξ η := Finset.sum_nonneg fun choice _ ↦ by
     split_ifs
     · exact choiceWeight_nonneg pulse _ choice
