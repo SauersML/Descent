@@ -62,7 +62,10 @@ integral (`hasDerivAt_momentLaplace`) gives every iterated derivative as a momen
 (`iteratedDeriv_measureLaplace`), hence complete monotonicity
 (`sign_iteratedDeriv_measureLaplace`), and a nonnegative quadratic gives midpoint log-convexity
 (`measureLaplace_sq_le_mul`). The squared transform is the transform of the convolution
-`ν ∗ ν` (`measureLaplace_conv`). Identifiability holds for every finite measure carried by
+`ν ∗ ν` (`measureLaplace_conv`). The raw Brier `2h(1 - C(λ))` and the repaired Brier
+`h(1 - C(λ)²)` of NOTE1 (31) have completely monotone derivatives, so both increase with the
+recombination multiplier (`sign_iteratedDeriv_brierCurve`,
+`sign_iteratedDeriv_repairedBrierCurve`). Identifiability holds for every finite measure carried by
 `[0, R]`: two such laws whose transforms agree at the integer scales `λ = 0, 1, 2, …`
 (`measure_eq_of_measureLaplace_natCast_eq`), or at every `λ ≥ 0`
 (`measure_eq_of_measureLaplace_eq`), are equal. A polynomial in `e^{-b}` integrates to a
