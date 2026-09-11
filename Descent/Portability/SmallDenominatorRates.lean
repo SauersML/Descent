@@ -29,15 +29,13 @@ that equation's proof also needs: a numerator bounded by a ceiling rather than b
 denominator, and a denominator bounded below on its defined event. It bounds the discarded
 numerator by the ceiling over the floor times the geometric decay.
 
-Not formalized. NOTE 2 equation (20) states the sharp constant obtained by writing the
-unresolved mass as a layer-cake integral against the density of the truncation order and then
-evaluating a beta integral, giving a ratio of gamma values. Neither the layer-cake identity
-nor that beta evaluation is proved here; what is proved is the elementary threshold split,
-which has the same content for choosing a truncation order but a larger constant. NOTE 2
-equation (28), the finiteness of the expected inverse denominator under a power law with
-exponent above one, is also not proved here: it rests on a layer cake over a half-line. Both
-gaps are about constants and integral representations, not about the certificates that use
-them.
+Elsewhere. NOTE 2 equation (20) states the sharp constant obtained by writing the unresolved
+mass as a layer-cake integral against the density of the truncation order and then evaluating
+a beta integral, giving a ratio of gamma values. What is proved here is the elementary threshold
+split, which has the same content for choosing a truncation order but a larger constant. The
+layer-cake identity, the beta evaluation and the sharp constant of (20), together with equation
+(28), the finiteness of the expected inverse denominator under a power law with exponent above
+one, and (29) are `Descent.Portability.SmallDenominatorLayerCake`.
 
 ## Empirical status
 

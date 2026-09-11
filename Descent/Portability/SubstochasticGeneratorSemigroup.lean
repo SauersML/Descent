@@ -40,8 +40,8 @@ are not summed here: the mixture identity, the truncated operator and the bound 
 mass it omits are `Descent.Portability.PoissonTruncationCertificate`, and the bounds (24) and
 (25) that a retained mass certifies are `Descent.Portability.SublawReportCertificate`.
 Nothing here duplicates either.  The generator identity (19) of NOTE1 §4.2, which derives the
-rates `q_{ξη}` from coalescent duality with recombination, is not formalized anywhere in the
-corpus.
+rates `q_{ξη}`, is `Descent.Portability.PartialHaplotypeDualGenerator`, and its killing generator
+enters this semigroup through `Descent.Portability.PartialHaplotypeDualSemigroup`.
 
 ## Empirical status
 

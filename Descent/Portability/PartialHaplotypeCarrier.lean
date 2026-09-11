@@ -55,9 +55,9 @@ the seed evaluation of the sampled-genotype representation (22).
 The carrier type is inhabited in-corpus by `singleLocusType`, the lineage retaining exactly
 one locus, and by `fullType`, the lineage retaining them all.
 
-Not formalized here: the generator identity (19), that is, the coalescent duality with
-recombination that identifies the jump rates `q_{ξη}` on configurations.  It is classical and
-NOTE1 §4.2 states it without proof.
+The generator identity (19), which identifies the jump rates `q_{ξη}` on configurations, is
+`Descent.Portability.PartialHaplotypeDualGenerator.neutralGenerator_configurationMoment`, and
+equation (20) is `Descent.Portability.PartialHaplotypeDualSemigroup`; neither is restated here.
 
 ## Empirical status
 
