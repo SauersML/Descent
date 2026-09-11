@@ -6,8 +6,11 @@ import Descent.Portability.ChronologyReportLaw
 import Mathlib.Algebra.Group.Nat.Hom
 import Mathlib.Analysis.SpecialFunctions.ExpDeriv
 import Mathlib.Analysis.Calculus.IteratedDeriv.Lemmas
+import Mathlib.Analysis.Convex.Integral
 import Mathlib.Analysis.Convex.SpecificFunctions.Basic
+import Mathlib.Analysis.Normed.Group.Bounded
 import Mathlib.LinearAlgebra.LinearIndependent.Basic
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
 
 assert_below Descent.Decision Descent.Program
 
@@ -42,13 +45,16 @@ finite laws whose transforms agree at every integer scale `λ = 0, 1, 2, …`
 (`exposureMass_eq_of_exposureLaplace_eq`), place the same mass at every exposure level. No
 support bound is used, so this covers every finitely supported law on `[0, R]` as in the note.
 
-Not formalised: the general-measure versions. NOTE1 (35) and (36) are stated there for an
-arbitrary probability measure on `[0, R]`, with differentiation under the integral sign and
-the measure-theoretic Jensen inequality. The finite case is the one the pulse realisation of
-NOTE1 section 6.3 and `FinitePulseExposure` actually uses, and no statement here assumes the
-general case. Identifiability is likewise proved only for finite laws, and the remark that `m`
-and `r` are not separately identified in calendar time is not formalised. Nothing here
-identifies `ν` from data.
+General measures. For an arbitrary measure `ν` the transform is `measureLaplace ν λ`, and a
+finite law enters through `lawMeasure`, whose transform is `exposureLaplace`. NOTE1 (36) is
+proved in that generality: for a probability measure carried by `[0, R]`, Jensen's lower bound
+(`exp_neg_mean_le_measureLaplace`, through `ConvexOn.map_integral_le`) and the chord upper
+bound (`measureLaplace_le_chord`), attained by the point mass at the mean and by the endpoint
+mixture.
+
+Not formalised: NOTE1 (35), the convolution identity and identifiability for measures that are
+not finitely supported (they are proved above for finite laws), and the remark that `m` and `r`
+are not separately identified in calendar time. Nothing here identifies `ν` from data.
 
 ## Empirical status
 
@@ -486,6 +492,122 @@ theorem exposureMass_eq_of_exposureLaplace_eq {n m : ℕ}
     exposureMass first firstExposure level = exposureMass second secondExposure level :=
   exposureMass_eq_of_exposureLaplace_natCast_eq first firstExposure second secondExposure
     (fun scale ↦ hlaplace scale (Nat.cast_nonneg scale)) level
+
+open MeasureTheory
+
+/-- NOTE1 (30) for an arbitrary exposure law: the transform `C(λ) = ∫ e^{-λ b} ν(db)` of a
+measure `ν` on the line. -/
+def measureLaplace (exposureLaw : Measure ℝ) (lam : ℝ) : ℝ :=
+  ∫ exposure, Real.exp (-(lam * exposure)) ∂exposureLaw
+
+/-- The measure carried by a finite exposure law: the point masses at its exposures, weighted by
+the law. -/
+def lawMeasure {n : ℕ} (law : FiniteReportLaw (Fin n)) (exposure : Fin n → ℝ) : Measure ℝ :=
+  ∑ index, ENNReal.ofReal (law.mass index) • Measure.dirac (exposure index)
+
+/-- Integrating against the measure of a finite law is taking the law's expectation of the
+integrand at the exposures. -/
+theorem integral_lawMeasure {n : ℕ} (law : FiniteReportLaw (Fin n)) (exposure : Fin n → ℝ)
+    (integrand : ℝ → ℝ) :
+    ∫ point, integrand point ∂lawMeasure law exposure =
+      law.expectation (fun index ↦ integrand (exposure index)) := by
+  unfold lawMeasure FiniteReportLaw.expectation
+  rw [integral_finset_sum_measure]
+  · refine Finset.sum_congr rfl (fun index _ ↦ ?_)
+    rw [integral_smul_measure, integral_dirac, ENNReal.toReal_ofReal (law.mass_nonneg index),
+      smul_eq_mul]
+  · intro index _
+    exact (integrable_dirac (by simp)).smul_measure ENNReal.ofReal_ne_top
+
+/-- The transform of the measure of a finite law is the finite transform `exposureLaplace`. -/
+theorem measureLaplace_lawMeasure {n : ℕ} (law : FiniteReportLaw (Fin n))
+    (exposure : Fin n → ℝ) (lam : ℝ) :
+    measureLaplace (lawMeasure law exposure) lam = exposureLaplace law exposure lam :=
+  integral_lawMeasure law exposure (fun point ↦ Real.exp (-(lam * point)))
+
+/-- Assumes: a finite measure carried by `[0, R]`. Every continuous function is then integrable
+against it, being bounded on `[0, R]`. -/
+private theorem integrable_of_ae_mem_Icc (exposureLaw : Measure ℝ) [IsFiniteMeasure exposureLaw]
+    (bound : ℝ) (hsupport : ∀ᵐ exposure ∂exposureLaw, exposure ∈ Set.Icc 0 bound)
+    (integrand : ℝ → ℝ) (hcontinuous : Continuous integrand) :
+    Integrable integrand exposureLaw := by
+  obtain ⟨ceiling, hceiling⟩ := (isCompact_Icc : IsCompact (Set.Icc (0 : ℝ) bound))
+    |>.exists_bound_of_continuousOn hcontinuous.continuousOn
+  exact Integrable.of_bound hcontinuous.aestronglyMeasurable ceiling
+    (hsupport.mono fun exposure hexposure ↦ hceiling exposure hexposure)
+
+/-- NOTE1 (36), lower bound, for an arbitrary probability measure. Assumes: the exposure law is
+a probability measure carried by `[0, R]`. The transform is at least the survival factor at the
+mean exposure: Jensen's inequality for the exponential. -/
+theorem exp_neg_mean_le_measureLaplace (exposureLaw : Measure ℝ)
+    [IsProbabilityMeasure exposureLaw] (bound lam : ℝ)
+    (hsupport : ∀ᵐ exposure ∂exposureLaw, exposure ∈ Set.Icc 0 bound) :
+    Real.exp (-(lam * ∫ exposure, exposure ∂exposureLaw)) ≤ measureLaplace exposureLaw lam := by
+  have hlinear := integrable_of_ae_mem_Icc exposureLaw bound hsupport
+    (fun exposure ↦ -(lam * exposure)) (by fun_prop)
+  have hsurvival := integrable_of_ae_mem_Icc exposureLaw bound hsupport
+    (fun exposure ↦ Real.exp (-(lam * exposure))) (by fun_prop)
+  have hjensen := convexOn_exp.map_integral_le Real.continuous_exp.continuousOn isClosed_univ
+    (ae_of_all _ fun _ ↦ Set.mem_univ _) hlinear hsurvival
+  rw [integral_neg, integral_const_mul] at hjensen
+  exact hjensen
+
+/-- NOTE1 (36), upper bound, for an arbitrary probability measure. Assumes: the exposure law is a
+probability measure carried by `[0, R]` with `R > 0`. The transform is at most the endpoint chord
+evaluated at the mean exposure. -/
+theorem measureLaplace_le_chord (exposureLaw : Measure ℝ) [IsProbabilityMeasure exposureLaw]
+    (bound lam : ℝ) (hbound : 0 < bound)
+    (hsupport : ∀ᵐ exposure ∂exposureLaw, exposure ∈ Set.Icc 0 bound) :
+    measureLaplace exposureLaw lam ≤
+      1 - (∫ exposure, exposure ∂exposureLaw) / bound +
+        (∫ exposure, exposure ∂exposureLaw) / bound * Real.exp (-(lam * bound)) := by
+  have hne : bound ≠ 0 := ne_of_gt hbound
+  have hidentity := integrable_of_ae_mem_Icc exposureLaw bound hsupport
+    (fun exposure ↦ exposure) continuous_id
+  have hsurvival := integrable_of_ae_mem_Icc exposureLaw bound hsupport
+    (fun exposure ↦ Real.exp (-(lam * exposure))) (by fun_prop)
+  have hmono : measureLaplace exposureLaw lam ≤ ∫ exposure,
+      (1 + (Real.exp (-(lam * bound)) - 1) / bound * exposure) ∂exposureLaw := by
+    refine integral_mono_ae hsurvival ((integrable_const 1).add (hidentity.const_mul _))
+      (hsupport.mono fun exposure hexposure ↦ ?_)
+    have hpoint := exp_chord_bound bound lam exposure hbound hexposure.1 hexposure.2
+    have hrewrite : 1 - exposure / bound + exposure / bound * Real.exp (-(lam * bound)) =
+        1 + (Real.exp (-(lam * bound)) - 1) / bound * exposure := by
+      field_simp
+      ring
+    show Real.exp (-(lam * exposure)) ≤ 1 + (Real.exp (-(lam * bound)) - 1) / bound * exposure
+    linarith [hpoint, hrewrite]
+  rw [integral_add (integrable_const 1) (hidentity.const_mul _), integral_const,
+    integral_const_mul, measureReal_univ_eq_one, smul_eq_mul, one_mul] at hmono
+  have hrewrite :
+      1 + (Real.exp (-(lam * bound)) - 1) / bound * ∫ exposure, exposure ∂exposureLaw =
+        1 - (∫ exposure, exposure ∂exposureLaw) / bound +
+          (∫ exposure, exposure ∂exposureLaw) / bound * Real.exp (-(lam * bound)) := by
+    field_simp
+    ring
+  linarith [hmono, hrewrite]
+
+/-- The lower bound of NOTE1 (36) is attained for measures: the point mass at a point has that
+point as its mean and the survival factor there as its transform. -/
+theorem measureLaplace_dirac (point lam : ℝ) :
+    ∫ exposure, exposure ∂Measure.dirac point = point ∧
+      measureLaplace (Measure.dirac point) lam = Real.exp (-(lam * point)) :=
+  ⟨integral_dirac (fun exposure ↦ exposure) point,
+    integral_dirac (fun exposure ↦ Real.exp (-(lam * exposure))) point⟩
+
+/-- The upper bound of NOTE1 (36) is attained for measures: the endpoint mixture on `{0, R}`
+with mean `b̄` has mean `b̄` and transform equal to the chord at `b̄`. -/
+theorem measureLaplace_endpointMixture (bound mean lam : ℝ) (hlow : 0 ≤ mean)
+    (hhigh : mean ≤ bound) (hbound : 0 < bound) :
+    ∫ exposure, exposure ∂lawMeasure (endpointMixture bound mean hlow hhigh hbound)
+        (endpointExposure bound) = mean ∧
+      measureLaplace (lawMeasure (endpointMixture bound mean hlow hhigh hbound)
+          (endpointExposure bound)) lam =
+        1 - mean / bound + mean / bound * Real.exp (-(lam * bound)) :=
+  ⟨(integral_lawMeasure _ _ (fun exposure ↦ exposure)).trans
+      (expectation_endpointExposure bound mean hlow hhigh hbound),
+    (measureLaplace_lawMeasure _ _ lam).trans
+      (exposureLaplace_endpointMixture bound mean lam hlow hhigh hbound)⟩
 
 end
 

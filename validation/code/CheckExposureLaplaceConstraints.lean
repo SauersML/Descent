@@ -32,3 +32,9 @@ open Descent.Portability.ExposureLaplaceConstraints
 #print axioms
   Descent.Portability.ExposureLaplaceConstraints.exposureMass_eq_of_exposureLaplace_eq
 #print axioms Descent.Portability.ExposureLaplaceConstraints.endpointExposure_natCast
+#print axioms Descent.Portability.ExposureLaplaceConstraints.integral_lawMeasure
+#print axioms Descent.Portability.ExposureLaplaceConstraints.measureLaplace_lawMeasure
+#print axioms Descent.Portability.ExposureLaplaceConstraints.exp_neg_mean_le_measureLaplace
+#print axioms Descent.Portability.ExposureLaplaceConstraints.measureLaplace_le_chord
+#print axioms Descent.Portability.ExposureLaplaceConstraints.measureLaplace_dirac
+#print axioms Descent.Portability.ExposureLaplaceConstraints.measureLaplace_endpointMixture
