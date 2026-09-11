@@ -16,3 +16,10 @@ import Descent.Portability.AngularExtremePoints
 #print axioms Descent.Portability.AngularExtremePoints.quadForm_eq_diagonal_conj
 #print axioms Descent.Portability.AngularExtremePoints.conjPerturb_ne_zero
 #print axioms Descent.Portability.AngularExtremePoints.extremePoint_no_supported_direction
+#print axioms Descent.Portability.AngularExtremePoints.pairDirection_transpose
+#print axioms Descent.Portability.AngularExtremePoints.trace_pairDirection
+#print axioms Descent.Portability.AngularExtremePoints.pairDirection_ne_zero
+#print axioms Descent.Portability.AngularExtremePoints.pairDirection_support
+#print axioms Descent.Portability.AngularExtremePoints.pairDirection_row_sum
+#print axioms Descent.Portability.AngularExtremePoints.pairDirection_col_sum
+#print axioms Descent.Portability.AngularExtremePoints.extremePoint_unique_positive_eigenvalue

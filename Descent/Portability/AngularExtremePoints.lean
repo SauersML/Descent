@@ -23,13 +23,19 @@ every scale `ε` with `|ε| B ≤ μ`.  Conjugating that bound back by the eigen
 (`conjPerturb`) gives `extremePoint_no_supported_direction`, which is the contradiction the
 Barvinok-Pataki argument needs.
 
-SCOPE.  What is proved here is the perturbation step, not the whole of the rank bound
+At `m = 0` the bound is closed outright: `extremePoint_unique_positive_eigenvalue` proves that
+an extreme point with no prescribed reports has at most one positive eigenvalue, which is
+`r(r+1)/2 ≤ 1`, by feeding the criterion the explicit two-point direction `pairDirection`.  That
+also shows the criterion is not vacuous, which matters because its conclusion is `False`.
+
+SCOPE.  For general `m` what is proved here is the perturbation step, not the whole rank bound
 `r(r+1)/2 ≤ m + 1`.  The step still missing is the counting one: the symmetric matrices carried
 by an `r`-dimensional eigenspace form a space of dimension `r(r+1)/2`, so when
 `r(r+1)/2 > m + 1` the `m + 1` linear conditions on trace and reports must vanish on some
-nonzero such direction, which `extremePoint_no_supported_direction` then rules out.  That
-counting step is not formalized here, so PL Corollary 6.3's rank bound is not closed by this
-module.  Everything below is unconditional.
+nonzero such direction, which `extremePoint_no_supported_direction` then rules out.  Producing
+that direction needs a rank-nullity count over unordered index pairs, which is not formalized
+here, so PL Corollary 6.3's rank bound is closed only at `m = 0`.  Everything below is
+unconditional.
 -/
 
 set_option autoImplicit false
@@ -293,6 +299,84 @@ theorem extremePoint_no_supported_direction (V : Fin mm → Fin d → ℝ) (a : 
     rw [hDdef, hsub]
     refine hmem (-(mu / B)) ?_
     rwa [abs_neg]
+
+/-! ## The rank bound with no prescribed reports -/
+
+/-- The trace-zero two-point direction that separates a pair of positive eigenvalues. -/
+def pairDirection (i₀ i₁ : Fin d) : Matrix (Fin d) (Fin d) ℝ :=
+  Matrix.diagonal fun i ↦ (if i = i₀ then (1 : ℝ) else 0) - (if i = i₁ then (1 : ℝ) else 0)
+
+/-- The two-point direction is symmetric. -/
+theorem pairDirection_transpose (i₀ i₁ : Fin d) :
+    (pairDirection i₀ i₁)ᵀ = pairDirection i₀ i₁ :=
+  Matrix.diagonal_transpose _
+
+/-- The two-point direction has zero trace. -/
+theorem trace_pairDirection (i₀ i₁ : Fin d) : Matrix.trace (pairDirection i₀ i₁) = 0 := by
+  rw [pairDirection, Matrix.trace_diagonal, Finset.sum_sub_distrib]
+  simp
+
+/-- The two-point direction is nonzero when the two points differ. -/
+theorem pairDirection_ne_zero (i₀ i₁ : Fin d) (hne : i₀ ≠ i₁) : pairDirection i₀ i₁ ≠ 0 := by
+  intro h
+  have hentry := congrFun (congrFun h i₀) i₀
+  rw [pairDirection, Matrix.diagonal_apply_eq] at hentry
+  simp [hne] at hentry
+
+/-- Off its two points the two-point direction vanishes. -/
+theorem pairDirection_support (i₀ i₁ i j : Fin d) (hij : pairDirection i₀ i₁ i j ≠ 0) :
+    i = j ∧ (i = i₀ ∨ i = i₁) := by
+  rw [pairDirection] at hij
+  rcases eq_or_ne i j with hEq | hEq
+  · subst hEq
+    refine ⟨rfl, ?_⟩
+    by_contra hcon
+    push_neg at hcon
+    rw [Matrix.diagonal_apply_eq] at hij
+    simp [hcon.1, hcon.2] at hij
+  · rw [Matrix.diagonal_apply_ne _ hEq] at hij
+    exact absurd rfl hij
+
+/-- Each row of the two-point direction has absolute sum at most one. -/
+theorem pairDirection_row_sum (i₀ i₁ i : Fin d) : ∑ j, |pairDirection i₀ i₁ i j| ≤ 1 := by
+  have hsingle : ∑ j, |pairDirection i₀ i₁ i j| = |pairDirection i₀ i₁ i i| := by
+    refine Finset.sum_eq_single i (fun b _ hb ↦ ?_) (fun h ↦ absurd (Finset.mem_univ i) h)
+    rw [pairDirection, Matrix.diagonal_apply_ne _ (Ne.symm hb), abs_zero]
+  rw [hsingle, pairDirection, Matrix.diagonal_apply_eq]
+  split_ifs <;> norm_num
+
+/-- Each column of the two-point direction has absolute sum at most one. -/
+theorem pairDirection_col_sum (i₀ i₁ j : Fin d) : ∑ i, |pairDirection i₀ i₁ i j| ≤ 1 := by
+  have hsingle : ∑ i, |pairDirection i₀ i₁ i j| = |pairDirection i₀ i₁ j j| := by
+    refine Finset.sum_eq_single j (fun b _ hb ↦ ?_) (fun h ↦ absurd (Finset.mem_univ j) h)
+    rw [pairDirection, Matrix.diagonal_apply_ne _ hb, abs_zero]
+  rw [hsingle, pairDirection, Matrix.diagonal_apply_eq]
+  split_ifs <;> norm_num
+
+/-- **PL Corollary 6.3 with no prescribed reports.**  An extreme point of the feasible angular
+set has at most one positive eigenvalue, which is the rank bound `r(r+1)/2 ≤ m + 1` at `m = 0`:
+it forces `r ≤ 1`, so an extreme angular matrix with no reports prescribed is a single rank-one
+projection and its attaining law lives on one residual direction.  Proving it here also shows
+that the hypotheses of `extremePoint_no_supported_direction` are satisfiable, so that criterion
+is not vacuous. -/
+theorem extremePoint_unique_positive_eigenvalue (G : Matrix (Fin d) (Fin d) ℝ)
+    (hG : Matrix.IsHermitian G)
+    (hext : G ∈ (feasibleAngular (fun _ : Fin 0 ↦ (0 : Fin d → ℝ)) (fun _ ↦ 0)).extremePoints ℝ)
+    (i₀ i₁ : Fin d) (hne : i₀ ≠ i₁) (hpos₀ : 0 < hG.eigenvalues i₀)
+    (hpos₁ : 0 < hG.eigenvalues i₁) : False := by
+  refine extremePoint_no_supported_direction _ _ G hG hext (pairDirection i₀ i₁)
+    (pairDirection_transpose i₀ i₁) (pairDirection_ne_zero i₀ i₁ hne)
+    (min (hG.eigenvalues i₀) (hG.eigenvalues i₁)) 1 (lt_min hpos₀ hpos₁) one_pos ?_
+    (pairDirection_row_sum i₀ i₁) (pairDirection_col_sum i₀ i₁) (trace_pairDirection i₀ i₁)
+    (fun k ↦ k.elim0)
+  intro i j hij
+  obtain ⟨hEq, hmem⟩ := pairDirection_support i₀ i₁ i j hij
+  subst hEq
+  rcases hmem with hEq0 | hEq1
+  · subst hEq0
+    exact ⟨min_le_left _ _, min_le_left _ _⟩
+  · subst hEq1
+    exact ⟨min_le_right _ _, min_le_right _ _⟩
 
 end
 
