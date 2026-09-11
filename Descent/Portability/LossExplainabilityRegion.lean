@@ -26,6 +26,10 @@ bounds each of those below by `V_d` and attains the bound, which pins the fracti
   moment, which UPT Theorem 3.1(c) permits in any cell with strict slack.
 * `boundary_fraction_forced` is the degenerate case: with every cell on its deterministic
   boundary the fourth moments are forced and the range is the singleton `{η_max}`.
+* `between_eq_variance`, `total_eq_variance` and `sharp_region_for_law` identify the two
+  arithmetic quantities above with the actual `Foundations.variance` of the squared loss
+  under a multi-cell law built from `IndividualLossMoments.mixture`, so the region is a
+  statement about laws and not only about numbers.
 * `sparse_example_cell_values` and `sparse_example_max_fraction` are the manuscript's exact
   example: two equally weighted cells carrying the sparse score with `p = 1/2`, `β = 0`,
   `k = 1` and `m₁ = 1`, `m₂ = 2` give `V₁ = 2`, `V₂ = 4` from
@@ -239,6 +243,69 @@ theorem sparse_example_max_fraction :
   unfold lossExplainedFraction
   rw [hB, hT]
   norm_num
+
+/-! ## The region as a statement about actual laws -/
+
+omit [DecidableEq D] in
+/-- The between-cell variance is the variance of the cell-conditional squared loss. -/
+theorem between_eq_variance (π m : D → ℝ) (hπ : ∀ d, 0 ≤ π d) (hsum : ∑ d, π d = 1) :
+    variance (weightedExp π hπ hsum) m = betweenLossVariance π m := rfl
+
+omit [DecidableEq D] in
+/-- **The total loss variance of a multi-cell law is the arithmetic quantity above.** The
+outer law is the cell distribution and each cell carries its own residual law; the second
+and fourth conditional moments are all that enter. -/
+theorem total_eq_variance {Ψ : Type*} (π : D → ℝ) (hπ : ∀ d, 0 ≤ π d)
+    (hsum : ∑ d, π d = 1) (K : D → ExpFunctional Ψ) (res : D × Ψ → ℝ) (m F : D → ℝ)
+    (hm : ∀ d, K d (fun ψ ↦ res (d, ψ) ^ 2) = m d)
+    (hF : ∀ d, K d (fun ψ ↦ res (d, ψ) ^ 4) = F d) :
+    variance (mixture (weightedExp π hπ hsum) K) (fun z ↦ res z ^ 2)
+      = totalLossVariance π m F := by
+  have hfun : (fun d ↦ K d (fun ψ ↦ res (d, ψ) ^ 4)
+      - K d (fun ψ ↦ res (d, ψ) ^ 2) ^ 2) = fun d ↦ F d - m d ^ 2 := by
+    funext d
+    rw [hm d, hF d]
+  have hfun2 : (fun d ↦ K d (fun ψ ↦ res (d, ψ) ^ 2)) = m := funext hm
+  rw [squared_loss_total, hfun, hfun2, variance_eq_expect_sq_sub_sq_mean]
+  unfold totalLossVariance
+  show (∑ d, π d * (F d - m d ^ 2))
+    + ((∑ d, π d * m d ^ 2) - (∑ d, π d * m d) ^ 2)
+    = (∑ d, π d * F d) - (∑ d, π d * m d) ^ 2
+  have hsplit : ∑ d, π d * (F d - m d ^ 2)
+      = (∑ d, π d * F d) - ∑ d, π d * m d ^ 2 := by
+    rw [eq_sub_iff_add_eq, ← Finset.sum_add_distrib]
+    exact Finset.sum_congr rfl fun d _ ↦ by ring
+  rw [hsplit]
+  ring
+
+omit [DecidableEq D] in
+/-- **UPT Theorem 3.5 for an actual law.** For a multi-cell residual law whose cell fourth
+moments respect the per-cell minima of UPT Theorem 3.1, the fraction of squared-loss
+variance explained by the cell label is positive and at most `η_max`. Both bounds are
+sharp: `FourthMomentAttainableRange.attains_every_larger_fourth_moment` moves one cell's
+fourth moment to realize any prescribed value of `(0, η_max]`. -/
+theorem sharp_region_for_law {Ψ : Type*} (π : D → ℝ) (hπ : ∀ d, 0 ≤ π d)
+    (hsum : ∑ d, π d = 1) (K : D → ExpFunctional Ψ) (res : D × Ψ → ℝ) (m F V : D → ℝ)
+    (hm : ∀ d, K d (fun ψ ↦ res (d, ψ) ^ 2) = m d)
+    (hF : ∀ d, K d (fun ψ ↦ res (d, ψ) ^ 4) = F d)
+    (hV : ∀ d, m d ^ 2 ≤ V d) (hVF : ∀ d, V d ≤ F d)
+    (hB : 0 < betweenLossVariance π m) :
+    0 < variance (weightedExp π hπ hsum) (fun d ↦ K d (fun ψ ↦ res (d, ψ) ^ 2))
+        / variance (mixture (weightedExp π hπ hsum) K) (fun z ↦ res z ^ 2) ∧
+      variance (weightedExp π hπ hsum) (fun d ↦ K d (fun ψ ↦ res (d, ψ) ^ 2))
+        / variance (mixture (weightedExp π hπ hsum) K) (fun z ↦ res z ^ 2)
+        ≤ lossExplainedFraction π m V := by
+  have hfun2 : (fun d ↦ K d (fun ψ ↦ res (d, ψ) ^ 2)) = m := funext hm
+  have hbet : variance (weightedExp π hπ hsum) (fun d ↦ K d (fun ψ ↦ res (d, ψ) ^ 2))
+      = betweenLossVariance π m := by
+    rw [hfun2]
+    exact between_eq_variance π m hπ hsum
+  have htot : variance (mixture (weightedExp π hπ hsum) K) (fun z ↦ res z ^ 2)
+      = totalLossVariance π m F :=
+    total_eq_variance π hπ hsum K res m F hm hF
+  rw [hbet, htot]
+  have hFm : ∀ d, m d ^ 2 ≤ F d := fun d ↦ le_trans (hV d) (hVF d)
+  exact ⟨fraction_pos π m F hsum hπ hFm hB, fraction_le_max π m V F hsum hπ hV hVF hB⟩
 
 end
 

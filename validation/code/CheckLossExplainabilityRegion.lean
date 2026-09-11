@@ -14,3 +14,6 @@ import Descent.Portability.LossExplainabilityRegion
 #print axioms Descent.Portability.LossExplainabilityRegion.boundary_fraction_forced
 #print axioms Descent.Portability.LossExplainabilityRegion.sparse_example_cell_values
 #print axioms Descent.Portability.LossExplainabilityRegion.sparse_example_max_fraction
+#print axioms Descent.Portability.LossExplainabilityRegion.between_eq_variance
+#print axioms Descent.Portability.LossExplainabilityRegion.total_eq_variance
+#print axioms Descent.Portability.LossExplainabilityRegion.sharp_region_for_law
