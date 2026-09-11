@@ -412,8 +412,8 @@ theorem abs_driftDirection_le (rates : NeutralRates Deme Locus Allele)
   have hprod : driftOutflow rates u * x.1 u ≤ rateScale rates :=
     (mul_le_of_le_one_right hout.1 hx1).trans hout.2
   have hprod0 : 0 ≤ driftOutflow rates u * x.1 u := mul_nonneg hout.1 hx0
-  rw [driftDirection, eval_driftPolynomial_eq, abs_div, abs_of_pos (by linarith), div_le_iff₀ (by linarith),
-    abs_le]
+  rw [driftDirection, eval_driftPolynomial_eq, abs_div, abs_of_pos (by linarith),
+    div_le_iff₀ (by linarith), abs_le]
   constructor <;> linarith
 
 /-- A drift move keeps the state in the simplex. -/
