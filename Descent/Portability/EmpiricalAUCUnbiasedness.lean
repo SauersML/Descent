@@ -106,11 +106,20 @@ theorem empiricalPairMass_eq_sum {n : ℕ} (sample : Fin n → Bool × Bool) :
     empiricalPairMass sample =
       ∑ caseMember, ∑ controlMember,
         if caseOf (sample caseMember) && !caseOf (sample controlMember) then (1 : ℝ) else 0 := by
-  simp only [empiricalPairMass, outcomeCount, Finset.sum_mul, Finset.mul_sum, caseControl_iff]
-  refine Finset.sum_congr rfl fun caseMember _ ↦ Finset.sum_congr rfl fun controlMember _ ↦ ?_
-  by_cases hcase : caseOf (sample caseMember) = true <;>
-    by_cases hcontrol : caseOf (sample controlMember) = false <;>
-    simp [hcase, hcontrol]
+  have hterm : ∀ caseMember controlMember : Fin n,
+      (if caseOf (sample caseMember) = true then (1 : ℝ) else 0) *
+          (if caseOf (sample controlMember) = false then (1 : ℝ) else 0) =
+        if caseOf (sample caseMember) && !caseOf (sample controlMember) then (1 : ℝ) else 0 := by
+    intro caseMember controlMember
+    simp only [caseControl_iff]
+    by_cases hcase : caseOf (sample caseMember) = true <;>
+      by_cases hcontrol : caseOf (sample controlMember) = false <;>
+      simp [hcase, hcontrol]
+  simp only [empiricalPairMass, outcomeCount]
+  rw [Finset.sum_mul]
+  refine Finset.sum_congr rfl fun caseMember _ ↦ ?_
+  rw [Finset.mul_sum]
+  exact Finset.sum_congr rfl fun controlMember _ ↦ hterm caseMember controlMember
 
 /-- An outcome count is positive exactly when some member carries that outcome. -/
 theorem outcomeCount_pos {n : ℕ} (sample : Fin n → Bool × Bool) (value : Bool) :
