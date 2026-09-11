@@ -66,14 +66,17 @@ theorem portabilityRatio_eq_cross (sourceNum sourceDen targetNum targetDen : Ω 
   unfold portabilityRatio
   field_simp <;> ring
 
-omit [Fintype Ω] in
 /-- **The comparison event is the same event either way.** On the definedness domain the
-portability ratio exceeds one exactly when the target metric exceeds the source metric. -/
+portability ratio exceeds one exactly when the target metric exceeds the source metric: by the
+gating identity the ratio is the cross product, and comparing the cross product with one is
+comparing the two metrics by cross-multiplication. -/
 theorem one_lt_portabilityRatio_iff (sourceNum sourceDen targetNum targetDen : Ω → ℝ) (ω : Ω)
-    (hsd : 0 < sourceDen ω) (hsn : 0 < sourceNum ω) :
+    (hsd : 0 < sourceDen ω) (htd : 0 < targetDen ω) (hsn : 0 < sourceNum ω) :
     1 < portabilityRatio sourceNum sourceDen targetNum targetDen ω ↔
-      sourceNum ω / sourceDen ω < targetNum ω / targetDen ω :=
-  one_lt_div (div_pos hsn hsd)
+      sourceNum ω / sourceDen ω < targetNum ω / targetDen ω := by
+  rw [portabilityRatio_eq_cross sourceNum sourceDen targetNum targetDen ω hsd htd hsn,
+    one_lt_div (mul_pos htd hsn), div_lt_div_iff₀ hsd htd,
+    mul_comm (targetDen ω) (sourceNum ω)]
 
 /-! ### The four queries -/
 
@@ -117,7 +120,7 @@ defined reports the two comparison events coincide, so the unconditional event m
 conditional probability scaled by the definedness mass. -/
 theorem massTargetExceeds_eq_definedMass_mul (law : FiniteReportLaw Ω) (domain : Finset Ω)
     (sourceNum sourceDen targetNum targetDen : Ω → ℝ)
-    (hdomain : ∀ ω ∈ domain, 0 < sourceDen ω ∧ 0 < sourceNum ω)
+    (hdomain : ∀ ω ∈ domain, 0 < sourceDen ω ∧ 0 < targetDen ω ∧ 0 < sourceNum ω)
     (hmass : 0 < definedMass law domain) :
     massTargetExceeds law domain sourceNum sourceDen targetNum targetDen =
       definedMass law domain *
@@ -128,9 +131,10 @@ theorem massTargetExceeds_eq_definedMass_mul (law : FiniteReportLaw Ω) (domain 
           else 0) =
       massTargetExceeds law domain sourceNum sourceDen targetNum targetDen := by
     refine Finset.sum_congr rfl fun ω hω ↦ ?_
-    obtain ⟨hsd, hsn⟩ := hdomain ω hω
+    obtain ⟨hsd, htd, hsn⟩ := hdomain ω hω
     rw [if_congr
-      (one_lt_portabilityRatio_iff sourceNum sourceDen targetNum targetDen ω hsd hsn) rfl rfl]
+      (one_lt_portabilityRatio_iff sourceNum sourceDen targetNum targetDen ω hsd htd hsn)
+      rfl rfl]
   rw [probRatioExceedsOne, hsame, mul_div_assoc', mul_comm, mul_div_assoc,
     div_self hmass.ne', mul_one]
 
