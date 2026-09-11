@@ -1,0 +1,30 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.AngularReportClosure
+
+/-! Axiom audit of AngularReportClosure. -/
+
+#print axioms Descent.Portability.AngularReportClosure.dot_self_eq_zero
+#print axioms Descent.Portability.AngularReportClosure.dot_self_ne_zero
+#print axioms Descent.Portability.AngularReportClosure.angularMatrix_transpose
+#print axioms Descent.Portability.AngularReportClosure.angularMatrix_isHermitian
+#print axioms Descent.Portability.AngularReportClosure.quadForm_eq_trace_outer
+#print axioms Descent.Portability.AngularReportClosure.vecMulVec_mulVec
+#print axioms Descent.Portability.AngularReportClosure.quadForm_vecMulVec
+#print axioms Descent.Portability.AngularReportClosure.angular_report_identity
+#print axioms Descent.Portability.AngularReportClosure.angularMatrix_trace
+#print axioms Descent.Portability.AngularReportClosure.quadForm_angularMatrix
+#print axioms Descent.Portability.AngularReportClosure.quadForm_angularMatrix_nonneg
+#print axioms Descent.Portability.AngularReportClosure.angularMatrix_posSemidef
+#print axioms Descent.Portability.AngularReportClosure.angularMatrix_eq_iff_expected_reports_eq
+#print axioms Descent.Portability.AngularReportClosure.expected_partialR2_eq_trace
+#print axioms Descent.Portability.AngularReportClosure.expected_loss_report_eq_trace
+#print axioms Descent.Portability.AngularReportClosure.rankOneProj_mulVec_self
+#print axioms Descent.Portability.AngularReportClosure.vecMulVec_smul
+#print axioms Descent.Portability.AngularReportClosure.rankOneProj_smul
+#print axioms Descent.Portability.AngularReportClosure.rankOneProj_eq_iff
+#print axioms Descent.Portability.AngularReportClosure.scale_invariant_report_factors
+#print axioms Descent.Portability.AngularReportClosure.invariant_reports_eq_iff_projective_eq
+#print axioms Descent.Portability.AngularReportClosure.outer_eq_radius_smul_projState
+#print axioms Descent.Portability.AngularReportClosure.fixed_prediction_loss_not_scale_invariant

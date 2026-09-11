@@ -88,7 +88,7 @@ theorem gram_quadratic (w : ι → ℝ) (φ : ι → κ → ℝ) (θ : κ → �
   intro i _
   rw [smul_mulVec, vecMulVec_mulVec, dotProduct_smul, dotProduct_smul]
   rw [dotProduct_comm θ (φ i)]
-  simp only [smul_eq_mul]
+  simp only [smul_eq_mul, op_smul_eq_mul]
   ring
 
 /-- The computed residual vector gives exactly the linear correction term in the gain. -/

@@ -294,6 +294,172 @@ theorem fixed_background_curve_realized (N : ExpFunctional Ω) (H : ℝ) (q : D 
     cell_genotype_fraction N H q e d hq0 hqH hmean hvar,
     cell_score_accuracy N H q e d hH0 hq0 hqH hmean hvar⟩
 
+/-! ### The individual-loss half -/
+
+/-- `m(d) = E[L ∣ D = d] = 1 + H − 2√(H q(d))`, TQ equation (8.2). -/
+def lossMean (H : ℝ) (q : D → ℝ) : D → ℝ :=
+  fun d ↦ 1 + H - 2 * Real.sqrt H * Real.sqrt (q d)
+
+/-- `B = Var(m(D))`, the between-cell variance of the mean individual squared loss. -/
+def lossMeanVariance (E : ExpFunctional D) (H : ℝ) (q : D → ℝ) : ℝ :=
+  variance E (lossMean H q)
+
+/-- `W₀ = E[4a(D)²b(D)² + 4(1−H)(a(D)² + b(D)²)]`, the mean within-cell loss variance
+that the genotype contrasts force whatever the noise shape. -/
+def minimalWithinVariance (E : ExpFunctional D) (H : ℝ) (q : D → ℝ) : ℝ :=
+  E (fun d ↦ 4 * coeffA H q d ^ 2 * coeffB H q d ^ 2
+    + 4 * (1 - H) * (coeffA H q d ^ 2 + coeffB H q d ^ 2))
+
+/-- The full law: distance cells, genotype, environmental noise. -/
+def fullLaw (E : ExpFunctional D) (N : ExpFunctional Ω) :
+    ExpFunctional (D × ((Bool × Bool) × Ω)) :=
+  mixture E (fun _ ↦ cellLaw N)
+
+/-- `η_D`: the fraction of individual squared-loss variance that the distance cell
+explains. -/
+def lossExplainedFraction (E : ExpFunctional D) (N : ExpFunctional Ω) (H : ℝ)
+    (q : D → ℝ) (e : Ω → ℝ) : ℝ :=
+  explainableFraction
+    (variance E (fun d ↦ cellLaw N (fun z ↦ cellResidual H q e (d, z) ^ 2)))
+    (variance (fullLaw E N) (fun z ↦ cellResidual H q e z ^ 2))
+
+/-- Adding a constant inside an expectation. -/
+theorem eval_add_const (E : ExpFunctional D) (f : D → ℝ) (c : ℝ) :
+    E (fun d ↦ f d + c) = E f + c := by
+  have hsplit : (fun d ↦ f d + c) = f + (fun _ : D ↦ c) := by
+    funext d
+    simp only [Pi.add_apply]
+  rw [hsplit, E.add_eval, ExpFunctional.eval_const]
+
+/-- **TQ equation (8.2): the exact conditional mean individual loss.** -/
+theorem cell_loss_mean (N : ExpFunctional Ω) (H : ℝ) (q : D → ℝ) (e : Ω → ℝ) (d : D)
+    (hH : 0 ≤ H) (hq0 : 0 ≤ q d) (hqH : q d ≤ H)
+    (hvar : N (fun ω ↦ e ω ^ 2) = 1 - H) :
+    cellLaw N (fun z ↦ cellResidual H q e (d, z) ^ 2) = lossMean H q d := by
+  have hqq : Real.sqrt (q d) ^ 2 = q d := Real.sq_sqrt hq0
+  have hHH : Real.sqrt H ^ 2 = H := Real.sq_sqrt hH
+  have hHq : Real.sqrt (H - q d) ^ 2 = H - q d :=
+    Real.sq_sqrt (by linarith)
+  have h2 : (fun z : (Bool × Bool) × Ω ↦ cellResidual H q e (d, z) ^ 2)
+      = fun z : (Bool × Bool) × Ω ↦
+        (coeffA H q d * sign z.1.1 + coeffB H q d * sign z.1.2 + e z.2) ^ 2 := by
+    funext z
+    rw [cellResidual_eq]
+  rw [h2, contrast_second_moment, hvar]
+  unfold coeffA coeffB lossMean
+  linear_combination hqq + hHH + hHq
+
+/-- **The exact conditional variance of individual squared loss in one cell.**  Only the
+noise second and fourth moments enter; the noise shape is otherwise free.  This is the
+one coordinate TQ Theorem 8.1 moves. -/
+theorem cell_loss_within (N : ExpFunctional Ω) (H : ℝ) (q : D → ℝ) (e : Ω → ℝ) (d : D) :
+    cellLaw N (fun z ↦ cellResidual H q e (d, z) ^ 4)
+        - cellLaw N (fun z ↦ cellResidual H q e (d, z) ^ 2) ^ 2
+      = 4 * coeffA H q d ^ 2 * coeffB H q d ^ 2
+        + 4 * N (fun ω ↦ e ω ^ 2) * (coeffA H q d ^ 2 + coeffB H q d ^ 2)
+        + (N (fun ω ↦ e ω ^ 4) - N (fun ω ↦ e ω ^ 2) ^ 2) := by
+  have h4 : (fun z : (Bool × Bool) × Ω ↦ cellResidual H q e (d, z) ^ 4)
+      = fun z : (Bool × Bool) × Ω ↦
+        (coeffA H q d * sign z.1.1 + coeffB H q d * sign z.1.2 + e z.2) ^ 4 := by
+    funext z
+    rw [cellResidual_eq]
+  have h2 : (fun z : (Bool × Bool) × Ω ↦ cellResidual H q e (d, z) ^ 2)
+      = fun z : (Bool × Bool) × Ω ↦
+        (coeffA H q d * sign z.1.1 + coeffB H q d * sign z.1.2 + e z.2) ^ 2 := by
+    funext z
+    rw [cellResidual_eq]
+  rw [h4, h2, contrast_fourth_moment, contrast_second_moment]
+  ring
+
+/-- The between-cell variance of individual loss is `B`. -/
+theorem loss_between_variance (E : ExpFunctional D) (N : ExpFunctional Ω) (H : ℝ)
+    (q : D → ℝ) (e : Ω → ℝ) (hH : 0 ≤ H) (hq0 : ∀ d, 0 ≤ q d) (hqH : ∀ d, q d ≤ H)
+    (hvar : N (fun ω ↦ e ω ^ 2) = 1 - H) :
+    variance E (fun d ↦ cellLaw N (fun z ↦ cellResidual H q e (d, z) ^ 2))
+      = lossMeanVariance E H q := by
+  have hfun : (fun d ↦ cellLaw N (fun z ↦ cellResidual H q e (d, z) ^ 2)) = lossMean H q :=
+    funext fun d ↦ cell_loss_mean N H q e d hH (hq0 d) (hqH d) hvar
+  unfold lossMeanVariance
+  rw [hfun]
+
+/-- **The exact total variance of individual squared loss**: between-cell `B`, plus the
+forced within-cell floor `W₀`, plus the noise fourth-moment excess. -/
+theorem loss_total_variance (E : ExpFunctional D) (N : ExpFunctional Ω) (H : ℝ)
+    (q : D → ℝ) (e : Ω → ℝ) (hH : 0 ≤ H) (hq0 : ∀ d, 0 ≤ q d) (hqH : ∀ d, q d ≤ H)
+    (hvar : N (fun ω ↦ e ω ^ 2) = 1 - H) :
+    variance (fullLaw E N) (fun z ↦ cellResidual H q e z ^ 2)
+      = minimalWithinVariance E H q + (N (fun ω ↦ e ω ^ 4) - (1 - H) ^ 2)
+        + lossMeanVariance E H q := by
+  have hint : (fun d ↦ cellLaw N (fun z ↦ cellResidual H q e (d, z) ^ 4)
+        - cellLaw N (fun z ↦ cellResidual H q e (d, z) ^ 2) ^ 2)
+      = fun d ↦ (4 * coeffA H q d ^ 2 * coeffB H q d ^ 2
+          + 4 * (1 - H) * (coeffA H q d ^ 2 + coeffB H q d ^ 2))
+        + (N (fun ω ↦ e ω ^ 4) - (1 - H) ^ 2) := by
+    funext d
+    rw [cell_loss_within, hvar]
+  unfold minimalWithinVariance
+  have hfull : fullLaw E N = mixture E (fun _ : D ↦ cellLaw N) := rfl
+  rw [hfull, squared_loss_total, hint, eval_add_const,
+    loss_between_variance E N H q e hH hq0 hqH hvar]
+
+/-- Cauchy-Schwarz: no law's fourth moment is below the square of its second. -/
+theorem noise_fourth_moment_ge (N : ExpFunctional Ω) (e : Ω → ℝ) :
+    N (fun ω ↦ e ω ^ 2) ^ 2 ≤ N (fun ω ↦ e ω ^ 4) := by
+  have h := ExpFunctional.cauchy_schwarz N (fun _ ↦ (1:ℝ)) (fun ω ↦ e ω ^ 2)
+  have h1 : (fun ω : Ω ↦ (1:ℝ) * e ω ^ 2) = fun ω ↦ e ω ^ 2 := by
+    funext ω
+    ring
+  have h2 : (fun _ : Ω ↦ (1:ℝ) ^ 2) = fun _ : Ω ↦ (1:ℝ) := by
+    funext ω
+    ring
+  have h3 : (fun ω : Ω ↦ (e ω ^ 2) ^ 2) = fun ω ↦ e ω ^ 4 := by
+    funext ω
+    ring
+  rw [h1, h2, h3, ExpFunctional.eval_const, one_mul] at h
+  exact h
+
+/-- The forced within-cell floor is nonnegative. -/
+theorem minimalWithinVariance_nonneg (E : ExpFunctional D) (H : ℝ) (q : D → ℝ)
+    (hH1 : H ≤ 1) : 0 ≤ minimalWithinVariance E H q := by
+  have h1 : (0:ℝ) ≤ 1 - H := by linarith
+  refine E.nonneg_eval _ fun d ↦ ?_
+  nlinarith [sq_nonneg (coeffA H q d), sq_nonneg (coeffB H q d),
+    mul_nonneg (sq_nonneg (coeffA H q d)) (sq_nonneg (coeffB H q d)),
+    mul_nonneg h1 (sq_nonneg (coeffA H q d)), mul_nonneg h1 (sq_nonneg (coeffB H q d))]
+
+/-- **The exact loss-explainability of the model**, for every admissible noise law. -/
+theorem lossExplainedFraction_eq (E : ExpFunctional D) (N : ExpFunctional Ω) (H : ℝ)
+    (q : D → ℝ) (e : Ω → ℝ) (hH : 0 ≤ H) (hq0 : ∀ d, 0 ≤ q d) (hqH : ∀ d, q d ≤ H)
+    (hvar : N (fun ω ↦ e ω ^ 2) = 1 - H) :
+    lossExplainedFraction E N H q e
+      = lossMeanVariance E H q
+        / (minimalWithinVariance E H q + (N (fun ω ↦ e ω ^ 4) - (1 - H) ^ 2)
+            + lossMeanVariance E H q) := by
+  unfold lossExplainedFraction explainableFraction Descent.Core.ratio
+  rw [loss_between_variance E N H q e hH hq0 hqH hvar,
+    loss_total_variance E N H q e hH hq0 hqH hvar]
+
+/-- **TQ Theorem 8.1, the bound half: `0 < η_D ≤ B/(B+W₀)` for every admissible noise
+shape**, not just for the explicit family.  The upper endpoint is the noise fourth
+moment at its Cauchy-Schwarz floor. -/
+theorem loss_fraction_bounds (E : ExpFunctional D) (N : ExpFunctional Ω) (H : ℝ)
+    (q : D → ℝ) (e : Ω → ℝ) (hH : 0 ≤ H) (hH1 : H ≤ 1) (hq0 : ∀ d, 0 ≤ q d)
+    (hqH : ∀ d, q d ≤ H) (hvar : N (fun ω ↦ e ω ^ 2) = 1 - H)
+    (hB : 0 < lossMeanVariance E H q) :
+    0 < lossExplainedFraction E N H q e ∧
+      lossExplainedFraction E N H q e
+        ≤ lossMeanVariance E H q
+          / (lossMeanVariance E H q + minimalWithinVariance E H q) := by
+  have hW : 0 ≤ minimalWithinVariance E H q := minimalWithinVariance_nonneg E H q hH1
+  have h4 : (1 - H) ^ 2 ≤ N (fun ω ↦ e ω ^ 4) := by
+    have hcs := noise_fourth_moment_ge N e
+    rw [hvar] at hcs
+    exact hcs
+  rw [lossExplainedFraction_eq E N H q e hH hq0 hqH hvar]
+  refine ⟨div_pos hB (by linarith), ?_⟩
+  rw [div_le_div_iff₀ (by linarith) (by linarith)]
+  nlinarith
+
 end
 
 end Descent.Portability.SimultaneousRealization

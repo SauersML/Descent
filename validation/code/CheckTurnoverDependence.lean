@@ -1,0 +1,54 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.TurnoverDependence
+
+/-! Axiom audit of TurnoverDependence. -/
+
+#print axioms Descent.Portability.TurnoverDependence.sgn_true
+#print axioms Descent.Portability.TurnoverDependence.sgn_false
+#print axioms Descent.Portability.TurnoverDependence.sgn_cases
+#print axioms Descent.Portability.TurnoverDependence.sgn_sq
+#print axioms Descent.Portability.TurnoverDependence.sum_prod_bool
+#print axioms Descent.Portability.TurnoverDependence.prod_one_index
+#print axioms Descent.Portability.TurnoverDependence.prod_two_indices
+#print axioms Descent.Portability.TurnoverDependence.bernoulliSign_nonneg
+#print axioms Descent.Portability.TurnoverDependence.sum_bernoulliSign
+#print axioms Descent.Portability.TurnoverDependence.sum_bernoulliSign_sgn
+#print axioms Descent.Portability.TurnoverDependence.sum_bernoulliSign_sgn_mul
+#print axioms Descent.Portability.TurnoverDependence.eval_finset_sum
+#print axioms Descent.Portability.TurnoverDependence.uniformExp_eq_bernoulli
+#print axioms Descent.Portability.TurnoverDependence.uniform_sgn
+#print axioms Descent.Portability.TurnoverDependence.uniform_sgn_mul
+#print axioms Descent.Portability.TurnoverDependence.uniform_linSign_mean
+#print axioms Descent.Portability.TurnoverDependence.uniform_linSign_mul
+#print axioms Descent.Portability.TurnoverDependence.uniform_linSign_covariance
+#print axioms Descent.Portability.TurnoverDependence.uniform_linSign_variance
+#print axioms Descent.Portability.TurnoverDependence.sum_snoc_mul
+#print axioms Descent.Portability.TurnoverDependence.sum_snoc_sq
+#print axioms Descent.Portability.TurnoverDependence.turnoverWorld_score
+#print axioms Descent.Portability.TurnoverDependence.turnoverWorld_phenotype
+#print axioms Descent.Portability.TurnoverDependence.turnoverWorld_moments
+#print axioms Descent.Portability.TurnoverDependence.turnoverWorld_r2
+#print axioms Descent.Portability.TurnoverDependence.expected_r2_turnover_law
+#print axioms Descent.Portability.TurnoverDependence.quadratic_form_equicorrelated
+#print axioms Descent.Portability.TurnoverDependence.turnover_mechanisms_share_marginals
+#print axioms Descent.Portability.TurnoverDependence.independent_second_moments
+#print axioms Descent.Portability.TurnoverDependence.synchronized_second_moments
+#print axioms Descent.Portability.TurnoverDependence.independent_turnover_expected_r2
+#print axioms Descent.Portability.TurnoverDependence.synchronized_turnover_expected_r2
+#print axioms Descent.Portability.TurnoverDependence.marginals_do_not_determine_expected_r2
+#print axioms Descent.Portability.TurnoverDependence.signState_values
+#print axioms Descent.Portability.TurnoverDependence.neg_one_le_retention
+#print axioms Descent.Portability.TurnoverDependence.retention_le_one
+#print axioms Descent.Portability.TurnoverDependence.retention_sq
+#print axioms Descent.Portability.TurnoverDependence.flipSemigroup_zero
+#print axioms Descent.Portability.TurnoverDependence.flipSemigroup_stochastic
+#print axioms Descent.Portability.TurnoverDependence.flipSemigroup_forward
+#print axioms Descent.Portability.TurnoverDependence.flip_retention
+#print axioms Descent.Portability.TurnoverDependence.independent_turnover_general_weights
+#print axioms Descent.Portability.TurnoverDependence.independentTurnoverAccuracy_eq
+#print axioms Descent.Portability.TurnoverDependence.turnover_monotonicity_criterion
+#print axioms Descent.Portability.TurnoverDependence.independentTurnoverAccuracy_hasDerivAt
+#print axioms Descent.Portability.TurnoverDependence.random_weight_turnover_law
+#print axioms Descent.Portability.TurnoverDependence.antialigned_weight_has_negative_cross_power

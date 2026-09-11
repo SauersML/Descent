@@ -10,16 +10,19 @@ assert_below Descent.Decision Descent.Program
 
 Effect turnover is carried by a sign configuration on the causal loci. Each
 configuration defines a complete finite scored-genotype/outcome population
-(`turnoverWorld`), whose `R²` is computed from the population itself by the
-master formula of `PortabilityMasterTheorem`, not postulated. The expected `R²`
+(`turnoverWorld`), whose `R²` is computed from that population by the master
+formula of `PortabilityMasterTheorem` rather than postulated. The expected `R²`
 over a joint sign law is then the exact quadratic form of TQ Theorem 3.5 in the
 cross-locus second-moment matrix, so one-locus retention values alone do not
-determine it. TQ Theorem 3.7 exhibits two joint laws — independent signs and one
-shared sign — with identical one-locus laws and different expected `R²`, and TQ
-Corollary 3.8 gives the exact arbitrary-weight time law and the sharp criterion
-for the direction of change. Hypotheses are only finiteness of the locus set,
-the sign law's own normalisation, and (where a ratio is evaluated) positivity of
-the genetic variance.
+determine it. TQ Theorem 3.7 exhibits two joint laws, independent signs and one
+shared sign, with identical one-locus laws and different expected `R²`, and TQ
+Corollary 3.8 gives the exact arbitrary-weight time law together with the sharp
+criterion for the direction of change. This module builds on `uniformExp`,
+`weightedExp`, `DeploymentPopulation` and `r2` of `PortabilityMasterTheorem`, on
+`variance` and `covariance` of `TransportIdentities`, and reuses the sign map of
+`TraitPortabilityRange`. Hypotheses are only finiteness of the locus set, the
+sign law's own normalisation, and positivity of the genetic variance wherever a
+ratio is evaluated.
 -/
 
 set_option autoImplicit false
@@ -51,7 +54,7 @@ theorem sgn_cases (b : Bool) : sgn b = 1 ∨ sgn b = -1 := by
   · exact Or.inr sgn_false
   · exact Or.inl sgn_true
 
-/-- Signs are involutive: `sgn b ^ 2 = 1`. -/
+/-- Signs square to one. -/
 @[simp] theorem sgn_sq (b : Bool) : sgn b ^ 2 = 1 := by
   cases b <;> norm_num
 
@@ -83,10 +86,10 @@ end Signs
 
 section ProductSignLaw
 
-/-- The product sign law on `k` loci whose every coordinate has mean `m`. -/
+/-- The product sign law on `k` loci, every coordinate having mean `m`. -/
 def bernoulliSign (k : ℕ) (m : ℝ) (z : Fin k → Bool) : ℝ := ∏ i, (1 + m * sgn (z i)) / 2
 
-/-- The product sign law is a nonnegative weight vector on `[-1,1]`. -/
+/-- The product sign law is a nonnegative weight vector for `m` in `[-1,1]`. -/
 theorem bernoulliSign_nonneg {k : ℕ} {m : ℝ} (hm : -1 ≤ m) (hm' : m ≤ 1)
     (z : Fin k → Bool) : 0 ≤ bernoulliSign k m z := by
   refine Finset.prod_nonneg fun i _ ↦ ?_
@@ -116,8 +119,10 @@ theorem sum_bernoulliSign_sgn {k : ℕ} (m : ℝ) (i : Fin k) :
       = if l = i then m else 1 := by
     intro l
     by_cases h : l = i
-    · rw [if_pos h, if_pos h, if_pos h, sgn_true, sgn_false]; ring
-    · rw [if_neg h, if_neg h, if_neg h, sgn_true, sgn_false]; ring
+    · rw [if_pos h, if_pos h, if_pos h, sgn_true, sgn_false]
+      ring
+    · rw [if_neg h, if_neg h, if_neg h, sgn_true, sgn_false]
+      ring
   rw [Finset.prod_congr rfl fun l _ ↦ hfac l, prod_one_index i fun _ ↦ m]
 
 /-- Exact second moments of the product sign law: unit diagonal, `m²` off the diagonal. -/
@@ -146,14 +151,24 @@ theorem sum_bernoulliSign_sgn_mul {k : ℕ} (m : ℝ) (i j : Fin k) :
         = if l = i ∨ l = j then m else 1 := by
       intro l
       by_cases h : l = i ∨ l = j
-      · rw [if_pos h, if_pos h, if_pos h, sgn_true, sgn_false]; ring
-      · rw [if_neg h, if_neg h, if_neg h, sgn_true, sgn_false]; ring
+      · rw [if_pos h, if_pos h, if_pos h, sgn_true, sgn_false]
+        ring
+      · rw [if_neg h, if_neg h, if_neg h, sgn_true, sgn_false]
+        ring
     rw [Finset.prod_congr rfl fun l _ ↦ hfac l, prod_two_indices hij fun _ ↦ m]
     ring
 
 end ProductSignLaw
 
 section UniformSigns
+
+/-- Expectation of a finite sum of observables. -/
+theorem eval_finset_sum {Ω ι : Type*} [DecidableEq ι] (E : ExpFunctional Ω) (s : Finset ι)
+    (f : ι → Ω → ℝ) : E (fun ω ↦ ∑ i ∈ s, f i ω) = ∑ i ∈ s, E (f i) := by
+  have h : (fun ω ↦ ∑ i ∈ s, f i ω) = Finset.sum s f := by
+    funext ω
+    simp [Finset.sum_apply]
+  rw [h, ExpFunctional.eval_sum]
 
 /-- The uniform law on sign configurations is the product sign law at mean zero. -/
 theorem uniformExp_eq_bernoulli {k : ℕ} (f : (Fin k → Bool) → ℝ) :
@@ -164,8 +179,8 @@ theorem uniformExp_eq_bernoulli {k : ℕ} (f : (Fin k → Bool) → ℝ) :
   have hb : bernoulliSign k 0 z = ((2 : ℝ) ^ k)⁻¹ := by
     unfold bernoulliSign
     simp only [zero_mul, add_zero]
-    rw [Finset.prod_const, Finset.card_univ, Fintype.card_fin]
-    rw [div_pow, one_pow, inv_eq_one_div]
+    rw [Finset.prod_const, Finset.card_univ, Fintype.card_fin, div_pow, one_pow,
+      inv_eq_one_div]
   have hcard : (Fintype.card (Fin k → Bool) : ℝ) = 2 ^ k := by
     simp
   rw [hb, hcard]
@@ -181,50 +196,45 @@ theorem uniform_sgn_mul {k : ℕ} (i j : Fin k) :
   rw [uniformExp_eq_bernoulli, sum_bernoulliSign_sgn_mul]
   by_cases h : i = j <;> simp [h]
 
-/-- Expectation of a finite sum of observables. -/
-theorem eval_finset_sum {Ω ι : Type*} [DecidableEq ι] (E : ExpFunctional Ω) (s : Finset ι)
-    (f : ι → Ω → ℝ) : E (fun ω ↦ ∑ i ∈ s, f i ω) = ∑ i ∈ s, E (f i) := by
-  have h : (fun ω ↦ ∑ i ∈ s, f i ω) = Finset.sum s f := by
-    funext ω
-    simp [Finset.sum_apply]
-  rw [h, ExpFunctional.eval_sum]
-
 /-- A linear form in the sign coordinates. -/
 def linSign {k : ℕ} (c : Fin k → ℝ) (z : Fin k → Bool) : ℝ := ∑ i, c i * sgn (z i)
 
 /-- A linear sign form is centred under the uniform law. -/
 theorem uniform_linSign_mean {k : ℕ} (c : Fin k → ℝ) :
     uniformExp (Fin k → Bool) (linSign c) = 0 := by
+  have h := eval_finset_sum (uniformExp (Fin k → Bool)) Finset.univ
+    fun (i : Fin k) (z : Fin k → Bool) ↦ c i * sgn (z i)
   unfold linSign
-  rw [eval_finset_sum]
+  rw [h]
   refine Finset.sum_eq_zero fun i _ ↦ ?_
-  rw [show (fun z : Fin k → Bool ↦ c i * sgn (z i)) = c i • fun z ↦ sgn (z i) by
+  have hs : (fun z : Fin k → Bool ↦ c i * sgn (z i)) = c i • fun z ↦ sgn (z i) := by
     funext z
-    simp]
-  rw [ExpFunctional.smul_eval, uniform_sgn, mul_zero]
+    simp
+  rw [hs, ExpFunctional.smul_eval, uniform_sgn, mul_zero]
 
 /-- Exact bilinear form of two linear sign forms under the uniform law. -/
 theorem uniform_linSign_mul {k : ℕ} (c d : Fin k → ℝ) :
     uniformExp (Fin k → Bool) (fun z ↦ linSign c z * linSign d z) = ∑ i, c i * d i := by
-  have hexp : ∀ z : Fin k → Bool, linSign c z * linSign d z
-      = ∑ i, ∑ j, (c i * d j) * (sgn (z i) * sgn (z j)) := by
-    intro z
+  have hexp : (fun z : Fin k → Bool ↦ linSign c z * linSign d z)
+      = fun z ↦ ∑ i, ∑ j, c i * d j * (sgn (z i) * sgn (z j)) := by
+    funext z
     unfold linSign
     rw [Finset.sum_mul_sum]
     exact Finset.sum_congr rfl fun i _ ↦ Finset.sum_congr rfl fun j _ ↦ by ring
-  simp only [hexp]
-  rw [eval_finset_sum]
+  rw [hexp, eval_finset_sum (uniformExp (Fin k → Bool)) Finset.univ
+    fun (i : Fin k) (z : Fin k → Bool) ↦ ∑ j, c i * d j * (sgn (z i) * sgn (z j))]
   refine Finset.sum_congr rfl fun i _ ↦ ?_
-  rw [eval_finset_sum]
+  rw [eval_finset_sum (uniformExp (Fin k → Bool)) Finset.univ
+    fun (j : Fin k) (z : Fin k → Bool) ↦ c i * d j * (sgn (z i) * sgn (z j))]
   have hterm : ∀ j : Fin k,
-      uniformExp (Fin k → Bool) (fun z ↦ (c i * d j) * (sgn (z i) * sgn (z j)))
-        = (c i * d j) * (if i = j then 1 else 0) := by
+      uniformExp (Fin k → Bool) (fun z ↦ c i * d j * (sgn (z i) * sgn (z j)))
+        = c i * d j * (if i = j then 1 else 0) := by
     intro j
-    rw [show (fun z : Fin k → Bool ↦ (c i * d j) * (sgn (z i) * sgn (z j)))
-      = (c i * d j) • fun z ↦ sgn (z i) * sgn (z j) by
+    have hs : (fun z : Fin k → Bool ↦ c i * d j * (sgn (z i) * sgn (z j)))
+        = (c i * d j) • fun z ↦ sgn (z i) * sgn (z j) := by
       funext z
-      simp]
-    rw [ExpFunctional.smul_eval, uniform_sgn_mul]
+      simp
+    rw [hs, ExpFunctional.smul_eval, uniform_sgn_mul]
   rw [Finset.sum_congr rfl fun j _ ↦ hterm j]
   simp
 
@@ -238,11 +248,11 @@ theorem uniform_linSign_covariance {k : ℕ} (c d : Fin k → ℝ) :
 /-- Exact variance of a linear sign form under the uniform law. -/
 theorem uniform_linSign_variance {k : ℕ} (c : Fin k → ℝ) :
     variance (uniformExp (Fin k → Bool)) (linSign c) = ∑ i, c i ^ 2 := by
-  rw [variance_eq_expect_sq_sub_sq_mean, uniform_linSign_mean,
-    show (fun z : Fin k → Bool ↦ linSign c z ^ 2) = fun z ↦ linSign c z * linSign c z by
-      funext z
-      ring,
-    uniform_linSign_mul]
+  have hsq : (fun z : Fin k → Bool ↦ linSign c z ^ 2)
+      = fun z ↦ linSign c z * linSign c z := by
+    funext z
+    ring
+  rw [variance_eq_expect_sq_sub_sq_mean, uniform_linSign_mean, hsq, uniform_linSign_mul]
   simp only [sub_zero]
   exact Finset.sum_congr rfl fun i _ ↦ (pow_two (c i)).symm
 
@@ -266,8 +276,8 @@ variable {n : ℕ}
 
 /-- **The finite turnover population.**  `n` independent standardised sign coordinates
 carry both the scored and the causal genotype, one further independent sign coordinate
-carries noise of standard deviation `sigma`, and the population's causal effect at
-locus `i` is `b i * z i` for the effect-sign configuration `z`. -/
+carries noise of standard deviation `sigma`, and the population's causal effect at locus
+`i` is `b i * z i` for the effect-sign configuration `z`. -/
 def turnoverWorld (b : Fin n → ℝ) (sigma : ℝ) (z : Fin n → ℝ) :
     DeploymentPopulation (Fin (n + 1) → Bool) (Fin n) (Fin n) where
   E := uniformExp (Fin (n + 1) → Bool)
@@ -300,31 +310,40 @@ theorem turnoverWorld_moments (b : Fin n → ℝ) (sigma : ℝ) (z w : Fin n →
       (turnoverWorld b sigma z).predictiveCovariance w = ∑ i, w i * (b i * z i) ∧
       (turnoverWorld b sigma z).outcomeVariance = (∑ i, (b i * z i) ^ 2) + sigma ^ 2 := by
   refine ⟨?_, ?_, ?_⟩
-  · rw [DeploymentPopulation.scoreVariance, turnoverWorld_score,
-      show (turnoverWorld b sigma z).E = uniformExp (Fin (n + 1) → Bool) from rfl,
-      uniform_linSign_variance, sum_snoc_sq]
+  · have h1 : (turnoverWorld b sigma z).scoreVariance w
+        = variance (uniformExp (Fin (n + 1) → Bool)) (linSign (Fin.snoc w 0)) := by
+      rw [← turnoverWorld_score b sigma z w]
+      rfl
+    rw [h1, uniform_linSign_variance, sum_snoc_sq]
     ring
-  · rw [DeploymentPopulation.predictiveCovariance, turnoverWorld_score, turnoverWorld_phenotype,
-      show (turnoverWorld b sigma z).E = uniformExp (Fin (n + 1) → Bool) from rfl,
-      uniform_linSign_covariance, sum_snoc_mul]
+  · have h1 : (turnoverWorld b sigma z).predictiveCovariance w
+        = covariance (uniformExp (Fin (n + 1) → Bool)) (linSign (Fin.snoc w 0))
+            (linSign (Fin.snoc (fun i ↦ b i * z i) sigma)) := by
+      rw [← turnoverWorld_score b sigma z w, ← turnoverWorld_phenotype b sigma z]
+      rfl
+    rw [h1, uniform_linSign_covariance, sum_snoc_mul]
     ring
-  · rw [DeploymentPopulation.outcomeVariance, turnoverWorld_phenotype,
-      show (turnoverWorld b sigma z).E = uniformExp (Fin (n + 1) → Bool) from rfl,
-      uniform_linSign_variance, sum_snoc_sq]
+  · have h1 : (turnoverWorld b sigma z).outcomeVariance
+        = variance (uniformExp (Fin (n + 1) → Bool))
+            (linSign (Fin.snoc (fun i ↦ b i * z i) sigma)) := by
+      rw [← turnoverWorld_phenotype b sigma z]
+      rfl
+    rw [h1, uniform_linSign_variance, sum_snoc_sq]
 
 /-- **Exact conditional accuracy at a fixed effect-sign configuration.**  This is the
-quantity squared and averaged in TQ (3.8); `V = H + σ²` is the outcome variance. -/
+quantity averaged in TQ (3.8); the outcome variance is `V = H + σ²`. -/
 theorem turnoverWorld_r2 (b : Fin n → ℝ) (sigma : ℝ) (z w : Fin n → ℝ)
     (hz : ∀ i, z i = 1 ∨ z i = -1) :
     (turnoverWorld b sigma z).r2 w
       = (∑ i, w i * b i * z i) ^ 2 / ((∑ i, w i ^ 2) * ((∑ i, b i ^ 2) + sigma ^ 2)) := by
   obtain ⟨hv, hc, ho⟩ := turnoverWorld_moments b sigma z w
-  rw [DeploymentPopulation.r2, hv, hc, ho]
-  congr 2
-  · exact Finset.sum_congr rfl fun i _ ↦ by ring
-  · congr 1
+  have hnum : ∑ i, w i * (b i * z i) = ∑ i, w i * b i * z i :=
+    Finset.sum_congr rfl fun i _ ↦ by ring
+  have hden : ∑ i, (b i * z i) ^ 2 = ∑ i, b i ^ 2 := by
     refine Finset.sum_congr rfl fun i _ ↦ ?_
     rcases hz i with h | h <;> rw [h] <;> ring
+  simp only [DeploymentPopulation.r2]
+  rw [hv, hc, ho, hnum, hden]
 
 end TurnoverWorlds
 
@@ -332,62 +351,76 @@ section TurnoverDependenceLaw
 
 variable {n : ℕ}
 
-/-- **TQ Theorem 3.5 — exact turnover-dependence law.**  For any joint law of the effect
-signs, the expected within-population squared correlation is the quadratic form
+/-- **TQ Theorem 3.5, exact turnover-dependence law.**  For any joint law of the effect
+signs the expected within-population squared correlation is the quadratic form
 
-`E[q] = aᵀ M a / (‖w‖² V)`,   `a i = w i * b i`,   `M i j = E[Z i Z j]`,
+`E[q] = aᵀ M a / (‖w‖² V)`,  `a i = w i * b i`,  `M i j = E[Z i Z j]`,
 
 evaluated from the populations themselves. The one-locus means `E[Z i]` appear nowhere
 on the right-hand side, so they do not determine the left-hand side. -/
 theorem expected_r2_turnover_law {Ω : Type*} (E : ExpFunctional Ω) (Z : Ω → Fin n → ℝ)
     (hZ : ∀ ω i, Z ω i = 1 ∨ Z ω i = -1) (w b : Fin n → ℝ) (sigma : ℝ) :
     E (fun ω ↦ (turnoverWorld b sigma (Z ω)).r2 w)
-      = (∑ i, ∑ j, (w i * b i) * E (fun ω ↦ Z ω i * Z ω j) * (w j * b j))
+      = (∑ i, ∑ j, w i * b i * E (fun ω ↦ Z ω i * Z ω j) * (w j * b j))
           / ((∑ i, w i ^ 2) * ((∑ i, b i ^ 2) + sigma ^ 2)) := by
-  set D := (∑ i, w i ^ 2) * ((∑ i, b i ^ 2) + sigma ^ 2) with hD
-  have hsum : E (fun ω ↦ ∑ i, ∑ j, (w i * b i) * (Z ω i * Z ω j) * (w j * b j))
-      = ∑ i, ∑ j, (w i * b i) * E (fun ω ↦ Z ω i * Z ω j) * (w j * b j) := by
-    rw [eval_finset_sum]
+  have hnum : E (fun ω ↦ ∑ i, ∑ j, w i * b i * (Z ω i * Z ω j) * (w j * b j))
+      = ∑ i, ∑ j, w i * b i * E (fun ω ↦ Z ω i * Z ω j) * (w j * b j) := by
+    rw [eval_finset_sum E Finset.univ
+      fun (i : Fin n) (ω : Ω) ↦ ∑ j, w i * b i * (Z ω i * Z ω j) * (w j * b j)]
     refine Finset.sum_congr rfl fun i _ ↦ ?_
-    rw [eval_finset_sum]
+    rw [eval_finset_sum E Finset.univ
+      fun (j : Fin n) (ω : Ω) ↦ w i * b i * (Z ω i * Z ω j) * (w j * b j)]
     refine Finset.sum_congr rfl fun j _ ↦ ?_
-    rw [show (fun ω ↦ (w i * b i) * (Z ω i * Z ω j) * (w j * b j))
-      = ((w i * b i) * (w j * b j)) • fun ω ↦ Z ω i * Z ω j by
+    have hs : (fun ω ↦ w i * b i * (Z ω i * Z ω j) * (w j * b j))
+        = (w i * b i * (w j * b j)) • fun ω ↦ Z ω i * Z ω j := by
       funext ω
       simp only [Pi.smul_apply, smul_eq_mul]
-      ring]
-    rw [ExpFunctional.smul_eval]
+      ring
+    rw [hs, ExpFunctional.smul_eval]
     ring
   have hfun : (fun ω ↦ (turnoverWorld b sigma (Z ω)).r2 w)
-      = D⁻¹ • fun ω ↦ ∑ i, ∑ j, (w i * b i) * (Z ω i * Z ω j) * (w j * b j) := by
+      = ((∑ i, w i ^ 2) * ((∑ i, b i ^ 2) + sigma ^ 2))⁻¹
+        • fun ω ↦ ∑ i, ∑ j, w i * b i * (Z ω i * Z ω j) * (w j * b j) := by
     funext ω
-    rw [turnoverWorld_r2 b sigma (Z ω) w (hZ ω), ← hD]
-    simp only [Pi.smul_apply, smul_eq_mul, div_eq_inv_mul]
-    congr 1
-    rw [pow_two, Finset.sum_mul_sum]
-    exact Finset.sum_congr rfl fun i _ ↦ Finset.sum_congr rfl fun j _ ↦ by ring
-  rw [hfun, ExpFunctional.smul_eval, hsum, div_eq_inv_mul]
+    rw [turnoverWorld_r2 b sigma (Z ω) w (hZ ω)]
+    simp only [Pi.smul_apply, smul_eq_mul]
+    have hexpand : (∑ i, w i * b i * Z ω i) ^ 2
+        = ∑ i, ∑ j, w i * b i * (Z ω i * Z ω j) * (w j * b j) := by
+      rw [pow_two, Finset.sum_mul_sum]
+      exact Finset.sum_congr rfl fun i _ ↦ Finset.sum_congr rfl fun j _ ↦ by ring
+    rw [hexpand]
+    ring
+  rw [hfun, ExpFunctional.smul_eval, hnum]
+  ring
 
 /-- The quadratic form of TQ (3.8) at a sign law with unit diagonal and constant
 off-diagonal second moment `r`. -/
 theorem quadratic_form_equicorrelated (a : Fin n → ℝ) (r : ℝ) :
     ∑ i, ∑ j, a i * (if i = j then (1 : ℝ) else r) * a j
       = r * (∑ i, a i) ^ 2 + (1 - r) * ∑ i, a i ^ 2 := by
-  have key : ∀ i j : Fin n, a i * (if i = j then (1 : ℝ) else r) * a j
-      = r * (a i * a j) + (if i = j then (1 - r) * a i ^ 2 else 0) := by
-    intro i j
-    by_cases h : i = j
-    · subst h
-      rw [if_pos rfl, if_pos rfl]
-      ring
-    · rw [if_neg h, if_neg h]
-      ring
-  rw [Finset.sum_congr rfl fun i _ ↦ Finset.sum_congr rfl fun j _ ↦ key i j]
-  simp only [Finset.sum_add_distrib, Finset.sum_ite_eq, Finset.mem_univ, if_pos]
-  rw [pow_two, Finset.sum_mul_sum, Finset.mul_sum]
-  congr 1
-  · exact Finset.sum_congr rfl fun i _ ↦ by rw [Finset.mul_sum]
-  · rw [Finset.mul_sum]
+  have hinner : ∀ i : Fin n, ∑ j, a i * (if i = j then (1 : ℝ) else r) * a j
+      = r * a i * ∑ j, a j + (1 - r) * a i ^ 2 := by
+    intro i
+    have key : ∀ j : Fin n, a i * (if i = j then (1 : ℝ) else r) * a j
+        = r * a i * a j + (if i = j then (1 - r) * a i ^ 2 else 0) := by
+      intro j
+      by_cases h : i = j
+      · subst h
+        rw [if_pos rfl, if_pos rfl]
+        ring
+      · rw [if_neg h, if_neg h]
+        ring
+    rw [Finset.sum_congr rfl fun j _ ↦ key j, Finset.sum_add_distrib,
+      Finset.sum_ite_eq_of_mem Finset.univ i (fun _ ↦ (1 - r) * a i ^ 2) (Finset.mem_univ i),
+      ← Finset.mul_sum]
+  rw [Finset.sum_congr rfl fun i _ ↦ hinner i, Finset.sum_add_distrib]
+  have h1 : ∑ i : Fin n, r * a i * ∑ j, a j = r * (∑ i, a i) ^ 2 := by
+    rw [Finset.sum_congr rfl fun i _ ↦
+      show r * a i * ∑ j, a j = r * (∑ j, a j) * a i from by ring, ← Finset.mul_sum]
+    ring
+  have h2 : ∑ i : Fin n, (1 - r) * a i ^ 2 = (1 - r) * ∑ i, a i ^ 2 :=
+    (Finset.mul_sum Finset.univ (fun i ↦ a i ^ 2) (1 - r)).symm
+  rw [h1, h2]
 
 end TurnoverDependenceLaw
 
@@ -395,8 +428,8 @@ section TwoMechanisms
 
 variable {n : ℕ}
 
-/-- **Independent equal-rate turnover.**  The `n` effect signs are independent, each
-with mean `m`. -/
+/-- **Independent equal-rate turnover.**  The `n` effect signs are independent, each with
+mean `m`. -/
 def independentTurnover (n : ℕ) (m : ℝ) (hm : -1 ≤ m) (hm' : m ≤ 1) :
     ExpFunctional (Fin n → Bool) :=
   weightedExp (bernoulliSign n m) (bernoulliSign_nonneg hm hm') (sum_bernoulliSign n m)
@@ -412,13 +445,6 @@ def independentSigns (n : ℕ) (z : Fin n → Bool) (i : Fin n) : ℝ := sgn (z 
 
 /-- The effect-sign configuration of the synchronised mechanism. -/
 def synchronizedSigns (n : ℕ) (c : Bool) (_ : Fin n) : ℝ := sgn c
-
-/-- Both mechanisms produce genuine `±1` effect signs. -/
-theorem signs_are_signs (m : ℝ) :
-    (∀ (z : Fin n → Bool) i, independentSigns n z i = 1 ∨ independentSigns n z i = -1) ∧
-      (∀ (c : Bool) (i : Fin n), synchronizedSigns n c i = 1 ∨ synchronizedSigns n c i = -1) ∧
-      m = m :=
-  ⟨fun z i ↦ sgn_cases (z i), fun c _ ↦ sgn_cases c, rfl⟩
 
 /-- **The two mechanisms have the same complete one-locus law**: the same marginal mean
 and the same unit second moment at every locus. -/
@@ -437,7 +463,7 @@ theorem turnover_mechanisms_share_marginals (m : ℝ) (hm : -1 ≤ m) (hm' : m �
     simp only [independentSigns, sgn_sq, mul_one]
     exact sum_bernoulliSign n m
   · rw [synchronizedTurnover, weightedExp_apply, Fintype.sum_bool]
-    simp only [synchronizedSigns, sgn_sq, sgn_true, sgn_false]
+    simp only [synchronizedSigns, sgn_sq]
     ring
 
 /-- Cross-locus second moments of the independent mechanism. -/
@@ -448,7 +474,7 @@ theorem independent_second_moments (m : ℝ) (hm : -1 ≤ m) (hm' : m ≤ 1) (i 
   exact sum_bernoulliSign_sgn_mul m i j
 
 /-- Cross-locus second moments of the synchronised mechanism: every pair is perfectly
-aligned. -/
+aligned at every marginal mean. -/
 theorem synchronized_second_moments (m : ℝ) (hm : -1 ≤ m) (hm' : m ≤ 1) (i j : Fin n) :
     synchronizedTurnover m hm hm' (fun c ↦ synchronizedSigns n c i * synchronizedSigns n c j)
       = 1 := by
@@ -462,29 +488,35 @@ def ceiling (H sigma : ℝ) : ℝ := H / (H + sigma ^ 2)
 /-- Effect concentration `κ_b = ∑ α_i²` with `α_i = b_i² / H`. -/
 def effectConcentration (n : ℕ) (b : Fin n → ℝ) : ℝ := ∑ i, (b i ^ 2 / ∑ j, b j ^ 2) ^ 2
 
-/-- **TQ Theorem 3.7, independent branch (3.10).**  Under independent turnover with
-oracle weights, `E q = Q₀ (κ_b + (1 - κ_b) m²)`. -/
+/-- **TQ Theorem 3.7, independent branch (3.10).**  Under independent turnover with oracle
+weights, `E q = Q₀ (κ_b + (1 - κ_b) m²)`. -/
 theorem independent_turnover_expected_r2 (b : Fin n → ℝ) (sigma m : ℝ) (hm : -1 ≤ m)
     (hm' : m ≤ 1) (hH : 0 < ∑ i, b i ^ 2) :
     independentTurnover n m hm hm'
         (fun z ↦ (turnoverWorld b sigma (independentSigns n z)).r2 b)
       = ceiling (∑ i, b i ^ 2) sigma
           * (effectConcentration n b + (1 - effectConcentration n b) * m ^ 2) := by
-  rw [expected_r2_turnover_law _ _ (fun z i ↦ sgn_cases (z i)) b b sigma]
-  have hM : ∀ i j : Fin n,
-      independentTurnover n m hm hm' (fun z ↦ independentSigns n z i * independentSigns n z j)
-        = if i = j then (1 : ℝ) else m ^ 2 := independent_second_moments m hm hm'
-  rw [Finset.sum_congr rfl fun i _ ↦ Finset.sum_congr rfl fun j _ ↦ by rw [hM i j]]
-  rw [show (fun i : Fin n ↦ ∑ j, b i * b i * (if i = j then (1 : ℝ) else m ^ 2) * (b j * b j))
-    = fun i : Fin n ↦ ∑ j, (b i ^ 2) * (if i = j then (1 : ℝ) else m ^ 2) * (b j ^ 2) by
-    funext i
-    exact Finset.sum_congr rfl fun j _ ↦ by ring]
-  rw [quadratic_form_equicorrelated (fun i ↦ b i ^ 2) (m ^ 2)]
+  rw [expected_r2_turnover_law (independentTurnover n m hm hm') (independentSigns n)
+    (fun z i ↦ sgn_cases (z i)) b b sigma]
+  have hstep : ∀ i : Fin n,
+      (∑ j, b i * b i * independentTurnover n m hm hm'
+          (fun ω ↦ independentSigns n ω i * independentSigns n ω j) * (b j * b j))
+        = ∑ j, b i ^ 2 * (if i = j then (1 : ℝ) else m ^ 2) * b j ^ 2 := by
+    intro i
+    refine Finset.sum_congr rfl fun j _ ↦ ?_
+    rw [independent_second_moments m hm hm' i j]
+    ring
+  have hquad : ∑ i, ∑ j, b i ^ 2 * (if i = j then (1 : ℝ) else m ^ 2) * b j ^ 2
+      = m ^ 2 * (∑ i, b i ^ 2) ^ 2 + (1 - m ^ 2) * ∑ i, (b i ^ 2) ^ 2 :=
+    quadratic_form_equicorrelated (fun i ↦ b i ^ 2) (m ^ 2)
   have hkappa : effectConcentration n b = (∑ i, (b i ^ 2) ^ 2) / (∑ i, b i ^ 2) ^ 2 := by
     unfold effectConcentration
     rw [Finset.sum_div]
     exact Finset.sum_congr rfl fun i _ ↦ by rw [div_pow]
-  rw [hkappa, ceiling]
+  have hHne : (∑ i, b i ^ 2) ≠ 0 := ne_of_gt hH
+  have hV : (0 : ℝ) < (∑ i, b i ^ 2) + sigma ^ 2 := by nlinarith [sq_nonneg sigma]
+  have hVne : (∑ i, b i ^ 2) + sigma ^ 2 ≠ 0 := ne_of_gt hV
+  rw [Finset.sum_congr rfl fun i _ ↦ hstep i, hquad, hkappa, ceiling]
   field_simp
   ring
 
@@ -495,38 +527,44 @@ theorem synchronized_turnover_expected_r2 (b : Fin n → ℝ) (sigma m : ℝ) (h
     synchronizedTurnover m hm hm'
         (fun c ↦ (turnoverWorld b sigma (synchronizedSigns n c)).r2 b)
       = ceiling (∑ i, b i ^ 2) sigma := by
-  rw [expected_r2_turnover_law _ _ (fun c _ ↦ sgn_cases c) b b sigma]
-  have hM : ∀ i j : Fin n,
-      synchronizedTurnover m hm hm'
-          (fun c ↦ synchronizedSigns n c i * synchronizedSigns n c j)
-        = if i = j then (1 : ℝ) else 1 := by
-    intro i j
+  rw [expected_r2_turnover_law (synchronizedTurnover m hm hm') (synchronizedSigns n)
+    (fun c _ ↦ sgn_cases c) b b sigma]
+  have hstep : ∀ i : Fin n,
+      (∑ j, b i * b i * synchronizedTurnover m hm hm'
+          (fun c ↦ synchronizedSigns n c i * synchronizedSigns n c j) * (b j * b j))
+        = ∑ j, b i ^ 2 * (if i = j then (1 : ℝ) else 1) * b j ^ 2 := by
+    intro i
+    refine Finset.sum_congr rfl fun j _ ↦ ?_
     rw [synchronized_second_moments m hm hm' i j]
-    by_cases h : i = j <;> simp [h]
-  rw [Finset.sum_congr rfl fun i _ ↦ Finset.sum_congr rfl fun j _ ↦ by rw [hM i j]]
-  rw [show (fun i : Fin n ↦ ∑ j, b i * b i * (if i = j then (1 : ℝ) else 1) * (b j * b j))
-    = fun i : Fin n ↦ ∑ j, (b i ^ 2) * (if i = j then (1 : ℝ) else 1) * (b j ^ 2) by
-    funext i
-    exact Finset.sum_congr rfl fun j _ ↦ by ring]
-  rw [quadratic_form_equicorrelated (fun i ↦ b i ^ 2) 1, ceiling]
-  have hne : (∑ i, b i ^ 2) ≠ 0 := ne_of_gt hH
+    by_cases h : i = j
+    · rw [if_pos h]
+      ring
+    · rw [if_neg h]
+      ring
+  have hquad : ∑ i, ∑ j, b i ^ 2 * (if i = j then (1 : ℝ) else 1) * b j ^ 2
+      = 1 * (∑ i, b i ^ 2) ^ 2 + (1 - 1) * ∑ i, (b i ^ 2) ^ 2 :=
+    quadratic_form_equicorrelated (fun i ↦ b i ^ 2) 1
+  have hHne : (∑ i, b i ^ 2) ≠ 0 := ne_of_gt hH
+  have hV : (0 : ℝ) < (∑ i, b i ^ 2) + sigma ^ 2 := by nlinarith [sq_nonneg sigma]
+  have hVne : (∑ i, b i ^ 2) + sigma ^ 2 ≠ 0 := ne_of_gt hV
+  rw [Finset.sum_congr rfl fun i _ ↦ hstep i, hquad, ceiling]
   field_simp
   ring
 
 /-- **One-locus retention does not determine expected accuracy.**  Two centred sign laws
-with the same one-locus law give `1/2` and `1` on two equal unit effects and noiseless
+with the same one-locus law give `1/2` and `1` on two equal unit effects with noiseless
 outcomes. -/
 theorem marginals_do_not_determine_expected_r2 :
     independentTurnover 2 0 (by norm_num) (by norm_num)
         (fun z ↦ (turnoverWorld ![1, 1] 0 (independentSigns 2 z)).r2 ![1, 1]) = 1 / 2 ∧
       synchronizedTurnover 0 (by norm_num) (by norm_num)
         (fun c ↦ (turnoverWorld ![1, 1] 0 (synchronizedSigns 2 c)).r2 ![1, 1]) = 1 := by
+  have hH : (0 : ℝ) < ∑ i, (![(1 : ℝ), 1] i) ^ 2 := by
+    norm_num [Fin.sum_univ_two]
   constructor
-  · rw [independent_turnover_expected_r2 ![1, 1] 0 0 (by norm_num) (by norm_num)
-      (by norm_num [Fin.sum_univ_two])]
+  · rw [independent_turnover_expected_r2 ![1, 1] 0 0 (by norm_num) (by norm_num) hH]
     norm_num [ceiling, effectConcentration, Fin.sum_univ_two]
-  · rw [synchronized_turnover_expected_r2 ![1, 1] 0 0 (by norm_num) (by norm_num)
-      (by norm_num [Fin.sum_univ_two])]
+  · rw [synchronized_turnover_expected_r2 ![1, 1] 0 0 (by norm_num) (by norm_num) hH]
     norm_num [ceiling, Fin.sum_univ_two]
 
 end TwoMechanisms
@@ -535,22 +573,26 @@ section FlipProcess
 
 /-- The symmetric two-state sign generator: each sign flips at rate `lam`. -/
 def flipGenerator (lam : ℝ) : Matrix (Fin 2) (Fin 2) ℝ :=
-  Matrix.of fun x y ↦ if x = y then -lam else lam
+  fun x y ↦ if x = y then -lam else lam
 
-/-- Its transition semigroup, written out. -/
+/-- The transition semigroup of the symmetric two-state sign process. -/
 def flipSemigroup (lam t : ℝ) : Matrix (Fin 2) (Fin 2) ℝ :=
-  Matrix.of fun x y ↦ if x = y then (1 + Real.exp (-(2 * lam * t))) / 2
+  fun x y ↦ if x = y then (1 + Real.exp (-(2 * lam * t))) / 2
     else (1 - Real.exp (-(2 * lam * t))) / 2
 
 /-- The signed value carried by a two-state sign coordinate. -/
 def signState (x : Fin 2) : ℝ := sgn (decide (x = 0))
+
+/-- The two signed values of the two-state coordinate. -/
+theorem signState_values : signState 0 = 1 ∧ signState 1 = -1 := by
+  constructor <;> norm_num [signState, sgn, TraitPortabilityRange.sign]
 
 /-- One-locus retention `m(t) = e^{-2λt}`. -/
 def retention (lam t : ℝ) : ℝ := Real.exp (-(2 * lam * t))
 
 /-- Retention never drops below `-1`. -/
 theorem neg_one_le_retention (lam t : ℝ) : -1 ≤ retention lam t := by
-  have := Real.exp_pos (-(2 * lam * t))
+  have h := Real.exp_pos (-(2 * lam * t))
   unfold retention
   linarith
 
@@ -560,7 +602,7 @@ theorem retention_le_one {lam t : ℝ} (h : 0 ≤ lam * t) : retention lam t ≤
   rw [Real.exp_le_one_iff]
   linarith
 
-/-- The square of retention is the four-fold exponential appearing in TQ (3.10). -/
+/-- The square of retention is the four-fold exponential of TQ (3.10). -/
 theorem retention_sq (lam t : ℝ) : retention lam t ^ 2 = Real.exp (-(4 * lam * t)) := by
   unfold retention
   rw [pow_two, ← Real.exp_add]
@@ -571,7 +613,7 @@ theorem flipSemigroup_zero (lam : ℝ) : flipSemigroup lam 0 = 1 := by
   ext x y
   by_cases h : x = y <;> simp [flipSemigroup, Matrix.one_apply, h]
 
-/-- Every row of the semigroup is a probability vector when `lam * t` is nonnegative. -/
+/-- Every row of the semigroup is a probability vector once `lam * t` is nonnegative. -/
 theorem flipSemigroup_stochastic {lam t : ℝ} (h : 0 ≤ lam * t) (x : Fin 2) :
     (∀ y, 0 ≤ flipSemigroup lam t x y) ∧ ∑ y, flipSemigroup lam t x y = 1 := by
   have h1 : Real.exp (-(2 * lam * t)) ≤ 1 := by
@@ -580,8 +622,15 @@ theorem flipSemigroup_stochastic {lam t : ℝ} (h : 0 ≤ lam * t) (x : Fin 2) :
   have h0 : 0 < Real.exp (-(2 * lam * t)) := Real.exp_pos _
   constructor
   · intro y
-    by_cases hxy : x = y <;> simp only [flipSemigroup, Matrix.of_apply, hxy, if_pos, if_neg,
-      reduceIte] <;> linarith
+    by_cases hxy : x = y
+    · have : flipSemigroup lam t x y = (1 + Real.exp (-(2 * lam * t))) / 2 := by
+        simp [flipSemigroup, hxy]
+      rw [this]
+      linarith
+    · have : flipSemigroup lam t x y = (1 - Real.exp (-(2 * lam * t))) / 2 := by
+        simp [flipSemigroup, hxy]
+      rw [this]
+      linarith
   · fin_cases x <;> simp [flipSemigroup, Fin.sum_univ_two] <;> ring
 
 /-- **The forward equation.**  The semigroup solves `P'(t) = P(t) Q` for the symmetric
@@ -595,27 +644,40 @@ theorem flipSemigroup_forward (lam t : ℝ) (x y : Fin 2) :
       (Real.exp (-(2 * lam * t)) * -(2 * lam)) t :=
     (Real.hasDerivAt_exp _).comp t hlin
   have hprod : (flipSemigroup lam t * flipGenerator lam) x y
-      = if x = y then -(lam * Real.exp (-(2 * lam * t))) else lam * Real.exp (-(2 * lam * t)) := by
+      = if x = y then -(lam * Real.exp (-(2 * lam * t)))
+        else lam * Real.exp (-(2 * lam * t)) := by
     rw [Matrix.mul_apply, Fin.sum_univ_two]
-    fin_cases x <;> fin_cases y <;>
-      simp [flipSemigroup, flipGenerator, Matrix.one_apply] <;> ring
+    fin_cases x <;> fin_cases y <;> simp [flipSemigroup, flipGenerator] <;> ring
   rw [hprod]
   by_cases hxy : x = y
-  · simp only [flipSemigroup, Matrix.of_apply, hxy, reduceIte, if_pos]
-    have := (hexp.const_add 1).div_const 2
-    convert this using 1
-    ring
-  · simp only [flipSemigroup, Matrix.of_apply, hxy, reduceIte, if_neg]
-    have := ((hexp.neg).const_add 1).div_const 2
-    convert this using 1
-    ring
+  · have hfun : (fun s ↦ flipSemigroup lam s x y)
+        = fun s ↦ (1 + Real.exp (-(2 * lam * s))) / 2 := by
+      funext s
+      simp [flipSemigroup, hxy]
+    have hval : -(lam * Real.exp (-(2 * lam * t)))
+        = Real.exp (-(2 * lam * t)) * -(2 * lam) / 2 := by ring
+    rw [hfun, if_pos hxy, hval]
+    exact (hexp.const_add 1).div_const 2
+  · have hfun : (fun s ↦ flipSemigroup lam s x y)
+        = fun s ↦ (1 - Real.exp (-(2 * lam * s))) / 2 := by
+      funext s
+      simp [flipSemigroup, hxy]
+    have hval : lam * Real.exp (-(2 * lam * t))
+        = -(Real.exp (-(2 * lam * t)) * -(2 * lam)) / 2 := by ring
+    rw [hfun, if_neg hxy, hval]
+    exact (hexp.const_sub 1).div_const 2
 
 /-- **TQ Theorem 3.7, retention.**  Started at the `+1` state, the two-state chain has
 expected sign `e^{-2λt}` at time `t`. -/
 theorem flip_retention (lam t : ℝ) :
     (flipSemigroup lam t).mulVec signState 0 = retention lam t := by
-  rw [Matrix.mulVec, dotProduct, Fin.sum_univ_two]
-  simp [flipSemigroup, signState, sgn, TraitPortabilityRange.sign, retention]
+  have h0 : signState 0 = 1 := signState_values.1
+  have h1 : signState 1 = -1 := signState_values.2
+  have hd : flipSemigroup lam t 0 0 = (1 + Real.exp (-(2 * lam * t))) / 2 := by
+    simp [flipSemigroup]
+  have ho : flipSemigroup lam t 0 1 = (1 - Real.exp (-(2 * lam * t))) / 2 := by
+    simp [flipSemigroup]
+  simp only [Matrix.mulVec, dotProduct, Fin.sum_univ_two, h0, h1, hd, ho, retention]
   ring
 
 end FlipProcess
@@ -631,24 +693,32 @@ def alignedPower (n : ℕ) (w b : Fin n → ℝ) : ℝ := ∑ i, w i ^ 2 * b i ^
 alignment rather than by single loci. -/
 def crossPower (n : ℕ) (w b : Fin n → ℝ) : ℝ := (∑ i, w i * b i) ^ 2 - alignedPower n w b
 
-/-- **TQ Corollary 3.8 (3.12) at an arbitrary weight vector.**  Under independent
-turnover with one-locus mean `m`, the expected accuracy is `(A_w + m² B_w)/(‖w‖² V)`. -/
+/-- **TQ Corollary 3.8 (3.12) at an arbitrary weight vector.**  Under independent turnover
+with one-locus mean `m` the expected accuracy is `(A_w + m² B_w)/(‖w‖² V)`. -/
 theorem independent_turnover_general_weights (w b : Fin n → ℝ) (sigma m : ℝ) (hm : -1 ≤ m)
     (hm' : m ≤ 1) :
     independentTurnover n m hm hm'
         (fun z ↦ (turnoverWorld b sigma (independentSigns n z)).r2 w)
       = (alignedPower n w b + m ^ 2 * crossPower n w b)
           / ((∑ i, w i ^ 2) * ((∑ i, b i ^ 2) + sigma ^ 2)) := by
-  rw [expected_r2_turnover_law _ _ (fun z i ↦ sgn_cases (z i)) w b sigma]
-  have hM : ∀ i j : Fin n,
-      independentTurnover n m hm hm' (fun z ↦ independentSigns n z i * independentSigns n z j)
-        = if i = j then (1 : ℝ) else m ^ 2 := independent_second_moments m hm hm'
-  rw [Finset.sum_congr rfl fun i _ ↦ Finset.sum_congr rfl fun j _ ↦ by rw [hM i j],
-    quadratic_form_equicorrelated (fun i ↦ w i * b i) (m ^ 2)]
+  rw [expected_r2_turnover_law (independentTurnover n m hm hm') (independentSigns n)
+    (fun z i ↦ sgn_cases (z i)) w b sigma]
+  have hstep : ∀ i : Fin n,
+      (∑ j, w i * b i * independentTurnover n m hm hm'
+          (fun ω ↦ independentSigns n ω i * independentSigns n ω j) * (w j * b j))
+        = ∑ j, (w i * b i) * (if i = j then (1 : ℝ) else m ^ 2) * (w j * b j) := by
+    intro i
+    refine Finset.sum_congr rfl fun j _ ↦ ?_
+    rw [independent_second_moments m hm hm' i j]
+  have hquad : ∑ i, ∑ j, (w i * b i) * (if i = j then (1 : ℝ) else m ^ 2) * (w j * b j)
+      = m ^ 2 * (∑ i, w i * b i) ^ 2 + (1 - m ^ 2) * ∑ i, (w i * b i) ^ 2 :=
+    quadratic_form_equicorrelated (fun i ↦ w i * b i) (m ^ 2)
+  have hA : ∑ i, (w i * b i) ^ 2 = alignedPower n w b := by
+    unfold alignedPower
+    exact Finset.sum_congr rfl fun i _ ↦ by ring
+  rw [Finset.sum_congr rfl fun i _ ↦ hstep i, hquad, hA]
   congr 1
-  unfold crossPower alignedPower
-  rw [show (∑ i, (w i * b i) ^ 2) = ∑ i, w i ^ 2 * b i ^ 2 from
-    Finset.sum_congr rfl fun i _ ↦ by ring]
+  unfold crossPower
   ring
 
 /-- Expected accuracy at evolutionary time `t` under independent equal-rate turnover. -/
@@ -663,7 +733,8 @@ theorem independentTurnoverAccuracy_eq (w b : Fin n → ℝ) (sigma lam t : ℝ)
     independentTurnover n (retention lam t) (neg_one_le_retention lam t) (retention_le_one ht)
         (fun z ↦ (turnoverWorld b sigma (independentSigns n z)).r2 w)
       = independentTurnoverAccuracy n w b sigma lam t :=
-  independent_turnover_general_weights w b sigma (retention lam t) _ _
+  independent_turnover_general_weights w b sigma (retention lam t)
+    (neg_one_le_retention lam t) (retention_le_one ht)
 
 /-- **TQ Corollary 3.8, the exact monotonicity criterion.**  With a positive flip rate,
 expected accuracy strictly decreases exactly when `B_w > 0`, is constant exactly when
@@ -671,12 +742,12 @@ expected accuracy strictly decreases exactly when `B_w > 0`, is constant exactly
 theorem turnover_monotonicity_criterion (w b : Fin n → ℝ) (sigma lam s t : ℝ)
     (hlam : 0 < lam) (hst : s < t) (hw : 0 < ∑ i, w i ^ 2)
     (hV : 0 < (∑ i, b i ^ 2) + sigma ^ 2) :
-    (independentTurnoverAccuracy n w b sigma lam t < independentTurnoverAccuracy n w b sigma lam s
-        ↔ 0 < crossPower n w b) ∧
+    (independentTurnoverAccuracy n w b sigma lam t
+          < independentTurnoverAccuracy n w b sigma lam s ↔ 0 < crossPower n w b) ∧
       (independentTurnoverAccuracy n w b sigma lam t
           = independentTurnoverAccuracy n w b sigma lam s ↔ crossPower n w b = 0) ∧
-      (independentTurnoverAccuracy n w b sigma lam s < independentTurnoverAccuracy n w b sigma lam t
-        ↔ crossPower n w b < 0) := by
+      (independentTurnoverAccuracy n w b sigma lam s
+          < independentTurnoverAccuracy n w b sigma lam t ↔ crossPower n w b < 0) := by
   have hD : 0 < (∑ i, w i ^ 2) * ((∑ i, b i ^ 2) + sigma ^ 2) := mul_pos hw hV
   have hexp : Real.exp (-(4 * lam * t)) < Real.exp (-(4 * lam * s)) := by
     rw [Real.exp_lt_exp]
@@ -733,11 +804,13 @@ theorem independentTurnoverAccuracy_hasDerivAt (w b : Fin n → ℝ) (sigma lam 
           / ((∑ i, w i ^ 2) * ((∑ i, b i ^ 2) + sigma ^ 2)) := by
     funext s
     rw [independentTurnoverAccuracy, retention_sq]
-  rw [hfun]
-  have := (((hexp.mul_const (crossPower n w b)).const_add (alignedPower n w b)).div_const
-    ((∑ i, w i ^ 2) * ((∑ i, b i ^ 2) + sigma ^ 2)))
-  convert this using 1
-  ring
+  have hval : -(4 * lam) * Real.exp (-(4 * lam * t)) * crossPower n w b
+        / ((∑ i, w i ^ 2) * ((∑ i, b i ^ 2) + sigma ^ 2))
+      = Real.exp (-(4 * lam * t)) * -(4 * lam) * crossPower n w b
+        / ((∑ i, w i ^ 2) * ((∑ i, b i ^ 2) + sigma ^ 2)) := by ring
+  rw [hfun, hval]
+  exact ((hexp.mul_const (crossPower n w b)).const_add (alignedPower n w b)).div_const
+    ((∑ i, w i ^ 2) * ((∑ i, b i ^ 2) + sigma ^ 2))
 
 /-- **TQ Corollary 3.8 (3.13).**  For a source-trained weight drawn independently of the
 turnover process, the time law is affine in `e^{-4λt}` with coefficient `E[B_ŵ/‖ŵ‖²]`. -/
@@ -748,42 +821,20 @@ theorem random_weight_turnover_law {W : Type*} (EW : ExpFunctional W) (wf : W �
           + Real.exp (-(4 * lam * t))
             * EW (fun u ↦ crossPower n (wf u) b / ∑ i, wf u i ^ 2))
         / ((∑ i, b i ^ 2) + sigma ^ 2) := by
-  have hpt : ∀ u : W, independentTurnoverAccuracy n (wf u) b sigma lam t
-      = (alignedPower n (wf u) b / ∑ i, wf u i ^ 2) / ((∑ i, b i ^ 2) + sigma ^ 2)
-        + (Real.exp (-(4 * lam * t)) * (crossPower n (wf u) b / ∑ i, wf u i ^ 2))
-          / ((∑ i, b i ^ 2) + sigma ^ 2) := by
-    intro u
-    rw [independentTurnoverAccuracy, retention_sq, div_add_div_same, ← add_div, ← add_div,
-      ← div_div, ← div_div]
-    congr 1
-    rw [add_div, mul_div_assoc]
-  rw [show (fun u ↦ independentTurnoverAccuracy n (wf u) b sigma lam t)
-    = (fun u ↦ (alignedPower n (wf u) b / ∑ i, wf u i ^ 2)
-        / ((∑ i, b i ^ 2) + sigma ^ 2))
-      + fun u ↦ (Real.exp (-(4 * lam * t)) * (crossPower n (wf u) b / ∑ i, wf u i ^ 2))
-        / ((∑ i, b i ^ 2) + sigma ^ 2) by
+  have hdecomp : (fun u ↦ independentTurnoverAccuracy n (wf u) b sigma lam t)
+      = ((∑ i, b i ^ 2) + sigma ^ 2)⁻¹ •
+          ((fun u ↦ alignedPower n (wf u) b / ∑ i, wf u i ^ 2)
+            + Real.exp (-(4 * lam * t)) • fun u ↦ crossPower n (wf u) b / ∑ i, wf u i ^ 2) := by
     funext u
-    exact hpt u]
-  rw [ExpFunctional.add_eval]
-  rw [show (fun u ↦ (alignedPower n (wf u) b / ∑ i, wf u i ^ 2)
-      / ((∑ i, b i ^ 2) + sigma ^ 2))
-    = (((∑ i, b i ^ 2) + sigma ^ 2)⁻¹) • fun u ↦ alignedPower n (wf u) b / ∑ i, wf u i ^ 2 by
-    funext u
-    simp only [Pi.smul_apply, smul_eq_mul, div_eq_inv_mul]]
-  rw [show (fun u ↦ (Real.exp (-(4 * lam * t)) * (crossPower n (wf u) b / ∑ i, wf u i ^ 2))
-      / ((∑ i, b i ^ 2) + sigma ^ 2))
-    = ((((∑ i, b i ^ 2) + sigma ^ 2)⁻¹) * Real.exp (-(4 * lam * t)))
-      • fun u ↦ crossPower n (wf u) b / ∑ i, wf u i ^ 2 by
-    funext u
-    simp only [Pi.smul_apply, smul_eq_mul, div_eq_inv_mul]
-    ring]
-  rw [ExpFunctional.smul_eval, ExpFunctional.smul_eval, add_div]
-  rw [div_eq_inv_mul, div_eq_inv_mul]
+    simp only [Pi.smul_apply, Pi.add_apply, smul_eq_mul]
+    rw [independentTurnoverAccuracy, retention_sq, ← div_div, add_div, mul_div_assoc]
+    ring
+  rw [hdecomp, ExpFunctional.smul_eval, ExpFunctional.add_eval, ExpFunctional.smul_eval]
   ring
 
 /-- **Turnover can raise accuracy.**  With `b = (1,1)` and the anti-aligned weight
-`w = (1,-1)` the cross power is `-2`, so independent turnover strictly increases the
-expected squared correlation from zero. -/
+`w = (1,-1)` the cross power is `-2` while the aligned power is `2`, so independent
+turnover strictly increases expected squared correlation from zero. -/
 theorem antialigned_weight_has_negative_cross_power :
     crossPower 2 ![1, -1] ![1, 1] = -2 ∧ alignedPower 2 ![1, -1] ![1, 1] = 2 := by
   constructor <;> norm_num [crossPower, alignedPower, Fin.sum_univ_two]

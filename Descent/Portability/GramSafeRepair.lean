@@ -48,53 +48,71 @@ theorem inverse_normal_equation (G : Matrix ι ι ℝ) (hG : G.PosDef) (u : ι �
     G⁻¹ *ᵥ (G *ᵥ u) = u := by
   rw [mulVec_mulVec, nonsing_inv_mul G (isUnit_iff_ne_zero.mpr hG.det_pos.ne'), one_mulVec]
 
+/-- Coefficients with the Gram norm, kept distinct from the coordinate supremum norm. -/
+def GramSpace (G : Matrix ι ι ℝ) (_hG : G.PosDef) := ι → ℝ
+
+noncomputable instance gramNormed (G : Matrix ι ι ℝ) (hG : G.PosDef) :
+    NormedAddCommGroup (GramSpace G hG) := Matrix.NormedAddCommGroup.ofMatrix hG
+
+noncomputable instance gramModule (G : Matrix ι ι ℝ) (hG : G.PosDef) :
+    Module ℝ (GramSpace G hG) := inferInstanceAs (Module ℝ (ι → ℝ))
+
+noncomputable instance gramInner (G : Matrix ι ι ℝ) (hG : G.PosDef) :
+    InnerProductSpace ℝ (GramSpace G hG) := Matrix.InnerProductSpace.ofMatrix hG
+
+/-- Put a coefficient vector in its Gram geometry without changing its coordinates. -/
+def toGram (G : Matrix ι ι ℝ) (hG : G.PosDef) (u : ι → ℝ) : GramSpace G hG := u
+
+/-- Coordinate subtraction commutes with the change of geometry. -/
+theorem toGram_sub (G : Matrix ι ι ℝ) (hG : G.PosDef) (u v : ι → ℝ) :
+    toGram G hG (u - v) = toGram G hG u - toGram G hG v := rfl
+
 section InducedGeometry
 
 variable (G : Matrix ι ι ℝ) (hG : G.PosDef)
 
-local instance : NormedAddCommGroup (ι → ℝ) := Matrix.NormedAddCommGroup.ofMatrix hG
-local instance : InnerProductSpace ℝ (ι → ℝ) := Matrix.InnerProductSpace.ofMatrix hG
-
 /-- The induced inner product is the Gram quadratic geometry itself. -/
-theorem induced_inner (u v : ι → ℝ) : ⟪u, v⟫ = u ⬝ᵥ (G *ᵥ v) := by
+theorem induced_inner (u v : GramSpace G hG) : ⟪u, v⟫ = u ⬝ᵥ (G *ᵥ v) := by
   change (G *ᵥ v) ⬝ᵥ star u = u ⬝ᵥ (G *ᵥ v)
   simp only [star_trivial]
   exact dotProduct_comm _ _
 
 /-- The induced squared norm is exactly the Gram quadratic form. -/
-theorem induced_norm_sq (u : ι → ℝ) : ‖u‖ ^ 2 = u ⬝ᵥ (G *ᵥ u) := by
+theorem induced_norm_sq (u : GramSpace G hG) : ‖u‖ ^ 2 = u ⬝ᵥ (G *ᵥ u) := by
   rw [← real_inner_self_eq_norm_sq, induced_inner]
 
 /-- The inverse quadratic signal equals the actual norm of the oracle coefficient. -/
-theorem induced_signal (r : ι → ℝ) : ‖G⁻¹ *ᵥ r‖ = signal G r := by
-  have he : ‖G⁻¹ *ᵥ r‖ ^ 2 = oracle G r := by
-    rw [induced_norm_sq G hG, normal_equation G hG]
+theorem induced_signal (r : ι → ℝ) : ‖toGram G hG (G⁻¹ *ᵥ r)‖ = signal G r := by
+  have he : ‖toGram G hG (G⁻¹ *ᵥ r)‖ ^ 2 = oracle G r := by
+    rw [induced_norm_sq G hG, toGram, normal_equation G hG]
     exact dotProduct_comm _ _
   rw [signal, ← he, Real.sqrt_sq (norm_nonneg _)]
 
 /-- The whitened gain theorem agrees exactly with the original matrix gain. -/
 theorem induced_gain (u r : ι → ℝ) :
-    SafeRepairGeometry.gain u (G⁻¹ *ᵥ r) = gain G u r := by
-  rw [SafeRepairGeometry.gain, induced_inner G hG, normal_equation G hG,
-    induced_norm_sq G hG]
+    SafeRepairGeometry.gain (toGram G hG u) (toGram G hG (G⁻¹ *ᵥ r)) = gain G u r := by
+  rw [SafeRepairGeometry.gain, induced_inner G hG, induced_norm_sq G hG]
+  simp only [toGram]
+  rw [normal_equation G hG]
   rfl
 
 /-- The coefficient error norm is exactly the specified inverse quadratic confidence metric. -/
 theorem induced_error (r h : ι → ℝ) :
-    ‖G⁻¹ *ᵥ r - G⁻¹ *ᵥ h‖ = signal G (r - h) := by
-  rw [← mulVec_sub, induced_signal G hG]
+    ‖toGram G hG (G⁻¹ *ᵥ r) - toGram G hG (G⁻¹ *ᵥ h)‖ = signal G (r - h) := by
+  rw [← toGram_sub, ← mulVec_sub, induced_signal G hG]
 
 /-- The abstract ball optimizer is precisely the explicit coefficient update. -/
 theorem induced_repair (h : ι → ℝ) (ε : ℝ) :
-    SafeRepairGeometry.safe (G⁻¹ *ᵥ h) ε = repair G h ε := by
+    SafeRepairGeometry.safe (toGram G hG (G⁻¹ *ᵥ h)) ε = toGram G hG (repair G h ε) := by
   simp only [SafeRepairGeometry.safe, induced_signal G hG, repair]
+  split_ifs <;> rfl
 
 end InducedGeometry
 
 /-- A positive-definite Gram matrix has a nonnegative oracle gain. -/
 theorem oracle_nonneg (G : Matrix ι ι ℝ) (hG : G.PosDef) (r : ι → ℝ) :
     0 ≤ oracle G r := by
-  exact hG.inv.posSemidef.dotProduct_mulVec_nonneg r
+  simpa only [oracle, star_trivial] using hG.inv.posSemidef.2 r
 
 /-- The reported repair has its exact gain certificate and its oracle-regret bound. -/
 theorem repair_certificate (G : Matrix ι ι ℝ) (hG : G.PosDef) (h r : ι → ℝ)
@@ -102,14 +120,16 @@ theorem repair_certificate (G : Matrix ι ι ℝ) (hG : G.PosDef) (h r : ι → 
     max 0 (signal G h - ε) ^ 2 ≤ gain G (repair G h ε) r ∧
       0 ≤ oracle G r - gain G (repair G h ε) r ∧
       oracle G r - gain G (repair G h ε) r ≤ 4 * ε ^ 2 := by
-  letI : NormedAddCommGroup (ι → ℝ) := Matrix.NormedAddCommGroup.ofMatrix hG
-  letI : InnerProductSpace ℝ (ι → ℝ) := Matrix.InnerProductSpace.ofMatrix hG
-  have hc : ‖G⁻¹ *ᵥ r - G⁻¹ *ᵥ h‖ ≤ ε := by rw [induced_error G hG]; exact hr
-  have hl := SafeRepairGeometry.safe_gain (G⁻¹ *ᵥ h) (G⁻¹ *ᵥ r) ε hε hc
-  have hb := SafeRepairGeometry.safe_oracle_regret (G⁻¹ *ᵥ h) (G⁻¹ *ᵥ r) ε hε hc
+  have hc : ‖toGram G hG (G⁻¹ *ᵥ r) - toGram G hG (G⁻¹ *ᵥ h)‖ ≤ ε := by
+    rw [induced_error G hG]
+    exact hr
+  have hl := SafeRepairGeometry.safe_gain (toGram G hG (G⁻¹ *ᵥ h))
+    (toGram G hG (G⁻¹ *ᵥ r)) ε hε hc
+  have hb := SafeRepairGeometry.safe_oracle_regret (toGram G hG (G⁻¹ *ᵥ h))
+    (toGram G hG (G⁻¹ *ᵥ r)) ε hε hc
   rw [induced_repair G hG, induced_gain G hG, induced_signal G hG] at hl
   rw [induced_repair G hG, induced_gain G hG, induced_norm_sq G hG,
-    normal_equation G hG, dotProduct_comm (G⁻¹ *ᵥ r) r] at hb
+    toGram, normal_equation G hG, dotProduct_comm (G⁻¹ *ᵥ r) r] at hb
   exact ⟨hl, hb⟩
 
 /-- The audit also certifies how much any repair in the same span could accomplish. -/
@@ -117,11 +137,12 @@ theorem oracle_interval (G : Matrix ι ι ℝ) (hG : G.PosDef) (h r : ι → ℝ
     (ε : ℝ) (hε : 0 ≤ ε) (hr : signal G (r - h) ≤ ε) :
     max 0 (signal G h - ε) ^ 2 ≤ oracle G r ∧
       oracle G r ≤ (signal G h + ε) ^ 2 := by
-  letI : NormedAddCommGroup (ι → ℝ) := Matrix.NormedAddCommGroup.ofMatrix hG
-  letI : InnerProductSpace ℝ (ι → ℝ) := Matrix.InnerProductSpace.ofMatrix hG
-  have hc : ‖G⁻¹ *ᵥ r - G⁻¹ *ᵥ h‖ ≤ ε := by rw [induced_error G hG]; exact hr
-  have hh := SafeRepairGeometry.oracle_interval (G⁻¹ *ᵥ h) (G⁻¹ *ᵥ r) ε hε hc
-  rw [induced_signal G hG, induced_norm_sq G hG, normal_equation G hG,
+  have hc : ‖toGram G hG (G⁻¹ *ᵥ r) - toGram G hG (G⁻¹ *ᵥ h)‖ ≤ ε := by
+    rw [induced_error G hG]
+    exact hr
+  have hh := SafeRepairGeometry.oracle_interval (toGram G hG (G⁻¹ *ᵥ h))
+    (toGram G hG (G⁻¹ *ᵥ r)) ε hε hc
+  rw [induced_signal G hG, induced_norm_sq G hG, toGram, normal_equation G hG,
     dotProduct_comm (G⁻¹ *ᵥ r) r] at hh
   exact hh
 

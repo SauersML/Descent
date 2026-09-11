@@ -7,6 +7,7 @@ import Descent.Portability.GramSafeRepair
 
 #print axioms Descent.Portability.GramSafeRepair.normal_equation
 #print axioms Descent.Portability.GramSafeRepair.inverse_normal_equation
+#print axioms Descent.Portability.GramSafeRepair.toGram_sub
 #print axioms Descent.Portability.GramSafeRepair.induced_inner
 #print axioms Descent.Portability.GramSafeRepair.induced_norm_sq
 #print axioms Descent.Portability.GramSafeRepair.induced_signal
