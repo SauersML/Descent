@@ -396,17 +396,22 @@ def boundedDualSet (observe : O → S → ℝ) (observed : O → ℝ) (metric : 
   {z | ∀ s, metric s ≤ z.1 + ∑ o, z.2 o * observe o s} ∩
     {z | dualValue observed z.1 z.2 ≤ bound}
 
+/-- Every affine functional of a dual certificate is continuous; both the feasibility
+expressions and the value are of this shape. -/
+theorem continuous_dualAffine (coefficient : O → ℝ) :
+    Continuous fun z : ℝ × (O → ℝ) ↦ z.1 + ∑ o, z.2 o * coefficient o :=
+  continuous_fst.add (continuous_finset_sum _ fun o _ ↦
+    ((continuous_apply o).comp continuous_snd).mul continuous_const)
+
 /-- The dual feasibility expression at a state is continuous in the certificate. -/
 theorem continuous_dualExpr (observe : O → S → ℝ) (s : S) :
     Continuous fun z : ℝ × (O → ℝ) ↦ z.1 + ∑ o, z.2 o * observe o s :=
-  continuous_fst.add (continuous_finset_sum _ fun o _ ↦
-    ((continuous_apply o).comp continuous_snd).mul continuous_const)
+  continuous_dualAffine fun o ↦ observe o s
 
 /-- The dual value is continuous in the certificate. -/
 theorem continuous_dualValueProd (observed : O → ℝ) :
     Continuous fun z : ℝ × (O → ℝ) ↦ dualValue observed z.1 z.2 :=
-  continuous_fst.add (continuous_finset_sum _ fun o _ ↦
-    ((continuous_apply o).comp continuous_snd).mul continuous_const)
+  continuous_dualAffine observed
 
 /-- The bounded dual set is closed. -/
 theorem isClosed_boundedDualSet (observe : O → S → ℝ) (observed : O → ℝ) (metric : S → ℝ)

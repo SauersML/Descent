@@ -9,5 +9,6 @@ open Descent.Portability.SparseExtremalLaws
 
 #print axioms mem_chargedStates
 #print axioms shift_mem_feasible
+#print axioms reportVector_mem_reportRegion
 #print axioms exists_independent_maximizer
 #print axioms card_chargedStates_le

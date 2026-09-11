@@ -22,6 +22,7 @@ open Descent.Portability.FiniteDualityNoGap
 #print axioms isGLB_dualValue_reportRegion
 #print axioms neg_sum_abs_le_pairing
 #print axioms abs_potential_le
+#print axioms continuous_dualAffine
 #print axioms continuous_dualExpr
 #print axioms continuous_dualValueProd
 #print axioms isClosed_boundedDualSet

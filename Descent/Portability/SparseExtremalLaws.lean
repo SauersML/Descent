@@ -63,6 +63,14 @@ theorem shift_mem_feasible (observe : O → S → ℝ) (observed : O → ℝ) (p
   · intro o
     rw [pairing_add, pairing_smul, hp.2 o, hobs o, mul_zero, add_zero]
 
+/-- The report vector of a compatible law is a point of the attainable report region, so the
+sparse extremizers below are extremizers of that region's linear contrasts. -/
+theorem reportVector_mem_reportRegion {J : Type*} (observe : O → S → ℝ) (observed : O → ℝ)
+    (reportTable : J → S → ℝ) (p : S → ℝ) (hp : p ∈ feasible observe observed) :
+    (fun j ↦ pairing (reportTable j) p) ∈
+      ReportRegionCertificates.reportRegion observe observed reportTable :=
+  ⟨p, hp, rfl⟩
+
 /-- TQ Theorem 7.3: a maximizing compatible law can be chosen whose charged states admit no
 nonzero summary-invisible zero-mass direction, so its active constraint columns are linearly
 independent. -/
