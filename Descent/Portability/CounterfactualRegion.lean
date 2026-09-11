@@ -140,15 +140,13 @@ theorem observational_laws_agree (exogenous : ℝ) :
 mean outcome is one. -/
 theorem intervened_mean_first_model :
     uniformExp Bool (fun draw ↦ outcomeFromExposure 1 (signOf draw)) = 1 := by
-  simp [uniformExp_apply, outcomeFromExposure, Fintype.card_bool, Fin.sum_univ_two]
-  norm_num
+  simp [uniformExp_apply, outcomeFromExposure, Fintype.card_bool]
 
 /-- PL Theorem 11.1: under the same intervention the second model's mean outcome is zero,
 so complete agreement of every observational report does not imply agreement of causes. -/
 theorem intervened_mean_second_model :
     uniformExp Bool (fun draw ↦ outcomeFromExogenous 1 (signOf draw)) = 0 := by
   simp [uniformExp_apply, outcomeFromExogenous, signOf, Fintype.card_bool]
-  norm_num
 
 end
 
