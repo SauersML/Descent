@@ -162,7 +162,6 @@ theorem compiled_conditionalExpectation_eq_weighted_stratum_average
       ne_of_gt (hstratum genotype)
     unfold conditionalExpectation
     field_simp
-    ring
   rw [Finset.sum_congr rfl fun genotype _ ↦ hterm genotype, ← Finset.sum_div]
   unfold conditionalExpectation
   rw [compiled_definedness_mass, compiled_defined_metric_mass]
@@ -198,7 +197,7 @@ def exampleHalfDefinedReport : FiniteReportLaw (Fin 3) where
     intro value
     fin_cases value <;> norm_num
   mass_sum := by
-    norm_num [Fin.sum_univ_three]
+    norm_num [Fin.sum_univ_three, Matrix.cons_val_two, Matrix.head_cons, Matrix.tail_cons]
 
 /-- The second genotype always reports the value one. -/
 def exampleCertainReport : FiniteReportLaw (Fin 3) where
@@ -207,7 +206,7 @@ def exampleCertainReport : FiniteReportLaw (Fin 3) where
     intro value
     fin_cases value <;> norm_num
   mass_sum := by
-    norm_num [Fin.sum_univ_three]
+    norm_num [Fin.sum_univ_three, Matrix.cons_val_two, Matrix.head_cons, Matrix.tail_cons]
 
 /-- The report kernel of the compiled example. -/
 def exampleReportKernel : Fin 2 → FiniteReportLaw (Fin 3) :=
@@ -227,14 +226,18 @@ theorem exampleStratumMean_values : exampleStratumMean 0 = 0 ∧ exampleStratumM
   constructor <;>
     norm_num [exampleStratumMean, conditionalExpectation, definedIndicator,
       FiniteReportLaw.expectation, exampleReportKernel, exampleHalfDefinedReport,
-      exampleCertainReport, exampleDefined, exampleMetric, Fin.sum_univ_three]
+      exampleCertainReport, exampleDefined, exampleMetric, Fin.sum_univ_three,
+      Matrix.cons_val_two, Matrix.head_cons, Matrix.tail_cons,
+      (show (2 : Fin 3) ≠ 0 by decide)]
 
 /-- The compiled conditional mean of the example is six sevenths. -/
 theorem examplePooledMean_eq : examplePooledMean = 6 / 7 := by
   norm_num [examplePooledMean, conditionalExpectation, definedIndicator,
     FiniteReportLaw.expectation, FiniteReportLaw.bind, exampleGenotypeLaw,
     exampleReportKernel, exampleHalfDefinedReport, exampleCertainReport, exampleDefined,
-    exampleMetric, Fin.sum_univ_three, Fin.sum_univ_two]
+    exampleMetric, Fin.sum_univ_three, Fin.sum_univ_two,
+    Matrix.cons_val_two, Matrix.head_cons, Matrix.tail_cons,
+    (show (2 : Fin 3) ≠ 0 by decide)]
 
 /-- **The compiled conditional mean is not the unweighted average of the within-stratum
 conditional means**; NOTE1 §4.3. -/
