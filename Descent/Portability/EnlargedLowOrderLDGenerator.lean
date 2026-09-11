@@ -427,53 +427,29 @@ def locusExchangeableRealizationOfEnlargedFeature {D : ℕ} {sampleSpace : Type}
 
 /-! ## Matrix application in generator-row form -/
 
-/-- Additivity of the fourteen-branch `pi2` drift row, separated out because its branch
-analysis exhausts the default elaboration budget when run together with the other rows. -/
-set_option maxHeartbeats 1000000 in
-private theorem drift_add_pi2 {D : ℕ} (rates : ManyDemeLDRates D)
-    (first second : LowOrderLDCoordinate D → ℝ) (a b c d : Fin D) :
-    lowOrderLDDrift rates (first + second) (.pi2 a b c d) =
-      lowOrderLDDrift rates first (.pi2 a b c d) +
-        lowOrderLDDrift rates second (.pi2 a b c d) := by
-  simp only [lowOrderLDDrift, Pi.add_apply, ite_add_ite]
-  split_ifs <;> ring
-
-/-- Homogeneity of the fourteen-branch `pi2` drift row. -/
-set_option maxHeartbeats 1000000 in
-private theorem drift_smul_pi2 {D : ℕ} (rates : ManyDemeLDRates D) (scalar : ℝ)
-    (moment : LowOrderLDCoordinate D → ℝ) (a b c d : Fin D) :
-    lowOrderLDDrift rates (scalar • moment) (.pi2 a b c d) =
-      scalar * lowOrderLDDrift rates moment (.pi2 a b c d) := by
-  simp only [lowOrderLDDrift, Pi.smul_apply, smul_eq_mul, mul_ite, mul_zero]
-  split_ifs <;> ring
-
-/-- The drift row is additive in the moment vector. -/
+/-- The drift row is additive in the moment vector.  The two right-hand branch chains are
+merged into one by `ite_add_ite`, after which the identity is checked branch by branch
+through the `if` congruence rather than by deciding the fourteen `pi2` conditions. -/
 private theorem drift_add {D : ℕ} (rates : ManyDemeLDRates D)
     (first second : LowOrderLDCoordinate D → ℝ) (row : LowOrderLDCoordinate D) :
     lowOrderLDDrift rates (first + second) row =
       lowOrderLDDrift rates first row + lowOrderLDDrift rates second row := by
-  cases row with
-  | H a b => simp only [lowOrderLDDrift, Pi.add_apply, ite_add_ite]; split_ifs <;> ring
-  | DD a b => simp only [lowOrderLDDrift, Pi.add_apply, ite_add_ite]; split_ifs <;> ring
-  | Dz a b c => simp only [lowOrderLDDrift, Pi.add_apply, ite_add_ite]; split_ifs <;> ring
-  | pi2 a b c d => exact drift_add_pi2 rates first second a b c d
+  cases row <;>
+    simp only [lowOrderLDDrift, Pi.add_apply, ite_add_ite] <;>
+    repeat' first
+      | ring
+      | refine if_congr Iff.rfl ?_ ?_
 
 /-- The drift row is homogeneous in the moment vector. -/
 private theorem drift_smul {D : ℕ} (rates : ManyDemeLDRates D) (scalar : ℝ)
     (moment : LowOrderLDCoordinate D → ℝ) (row : LowOrderLDCoordinate D) :
     lowOrderLDDrift rates (scalar • moment) row =
       scalar * lowOrderLDDrift rates moment row := by
-  cases row with
-  | H a b =>
-      simp only [lowOrderLDDrift, Pi.smul_apply, smul_eq_mul, mul_ite, mul_zero]
-      split_ifs <;> ring
-  | DD a b =>
-      simp only [lowOrderLDDrift, Pi.smul_apply, smul_eq_mul, mul_ite, mul_zero]
-      split_ifs <;> ring
-  | Dz a b c =>
-      simp only [lowOrderLDDrift, Pi.smul_apply, smul_eq_mul, mul_ite, mul_zero]
-      split_ifs <;> ring
-  | pi2 a b c d => exact drift_smul_pi2 rates scalar moment a b c d
+  cases row <;>
+    simp only [lowOrderLDDrift, Pi.smul_apply, smul_eq_mul, mul_ite, mul_zero] <;>
+    repeat' first
+      | ring
+      | refine if_congr Iff.rfl ?_ ?_
 
 /-- The migration row is additive in the moment vector. -/
 private theorem migration_add {D : ℕ} (rates : ManyDemeLDRates D)

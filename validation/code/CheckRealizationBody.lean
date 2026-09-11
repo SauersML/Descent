@@ -22,3 +22,6 @@ open Descent.Portability.RealizationBody
 #print axioms
   Descent.Portability.RealizationBody.nonempty_lowOrderLDRealization_of_mem
 #print axioms Descent.Portability.RealizationBody.lowOrderLDState_mem_realizationBody
+#print axioms Descent.Portability.RealizationBody.exists_law_of_mem_realizationBody
+#print axioms Descent.Portability.RealizationBody.isCompact_realizationBody
+#print axioms Descent.Portability.RealizationBody.isClosed_realizationBody

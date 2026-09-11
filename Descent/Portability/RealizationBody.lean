@@ -4,7 +4,11 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.FiniteMixtureKernel
 import Descent.Portability.PortabilityMasterTheorem
 import Descent.Coalescent.TwoLocusHistory
+import Mathlib.Analysis.Convex.Caratheodory
+import Mathlib.Analysis.Convex.StdSimplex
+import Mathlib.Analysis.Normed.Module.FiniteDimension
 import Mathlib.Analysis.NormedSpace.HahnBanach.Separation
+import Mathlib.LinearAlgebra.AffineSpace.FiniteDimensional
 
 assert_below Descent.Decision Descent.Program
 
@@ -42,10 +46,24 @@ what lets the two directions of the realizability correspondence be stated in co
 finitely supported law using `weightedExp`, and `lowOrderLDState_mem_realizationBody` sends
 the state vector of an arbitrary realization back into the body whenever it is closed.
 
+`exists_law_of_mem_realizationBody` is Carathéodory with the ambient dimension: every point of
+the body is the feature vector of a law on `Fin (Fintype.card ι + 1)`, obtained from Mathlib's
+`eq_pos_convex_span_of_mem_convexHull` together with the affine-independence bound
+`AffineIndependent.card_le_finrank_succ` and padding by zero weights.
+`isCompact_realizationBody` then gives NOTE1 §2.1's compactness: for a compact space `X` and a
+continuous `φ`, the body is the image of the compact set
+`stdSimplex ℝ (Fin (card ι + 1)) ×ˢ univ` under the continuous map that reads a law's feature
+vector, hence compact, hence closed. That discharges the `IsClosed` hypothesis above whenever
+the feature map is continuous on a compact space.
+
 What is NOT proved in this module: the sharpened Carathéodory count of NOTE1 §2.1 (at most
-`Fintype.card ι` atoms when a coordinate is constant, rather than the `card ι + 1` that the
-general theorem gives), the compactness of the body for a compact `X` and continuous `φ`, and
-therefore the discharge of the `IsClosed` hypotheses above. Those remain hypotheses here.
+`Fintype.card ι` atoms when a coordinate is constant, rather than the `card ι + 1` proved
+here), and the compactness of the corpus body. The latter is not a gap in the argument above
+but a missing structure: `Coalescent.TwoLocusHaplotypeFrequencies` carries no topology in the
+corpus, so `lowOrderLDFeature` is not yet a continuous map on a compact space and
+`isCompact_realizationBody` cannot be applied to it. Supplying that topology, by identifying
+the range of the corpus feature map with the image of a product of standard simplices under
+the polynomial coordinate formulas, is the remaining step.
 
 ## Empirical status
 
@@ -282,6 +300,108 @@ theorem lowOrderLDState_mem_realizationBody {D : ℕ}
         twoLocusPi2Jet_value]
   rw [hv]
   exact expFunctional_feature_mem (lowOrderLDFeature D) hclosed _ _
+
+/-- **Carathéodory with the ambient dimension.** Every point of the realization body is the
+feature vector of a finitely supported law with at most `Fintype.card ι + 1` atoms, indexed
+by `Fin (Fintype.card ι + 1)`. The affinely independent family supplied by Carathéodory has
+at most that many members because the ambient space has dimension `Fintype.card ι`; the
+remaining indices are padded with zero weight. -/
+theorem exists_law_of_mem_realizationBody {X ι : Type*} [Fintype ι] (φ : X → ι → ℝ)
+    (v : ι → ℝ) (hv : v ∈ realizationBody φ) :
+    ∃ p : Fin (Fintype.card ι + 1) → ℝ, ∃ point : Fin (Fintype.card ι + 1) → X,
+      (∀ k, 0 ≤ p k) ∧ ∑ k, p k = 1 ∧ featureVector p point φ = v := by
+  classical
+  obtain ⟨J, hJ, z, weight, hzrange, haff, hpos, hwsum, hcomb⟩ :=
+    eq_pos_convex_span_of_mem_convexHull hv
+  have hcard : Fintype.card J ≤ Fintype.card ι + 1 := by
+    refine haff.card_le_finrank_succ.trans (Nat.add_le_add_right ?_ 1)
+    have hle : Module.finrank ℝ (vectorSpan ℝ (Set.range z))
+        ≤ Module.finrank ℝ (ι → ℝ) := Submodule.finrank_le _
+    simpa [Module.finrank_pi] using hle
+  have hJne : Nonempty J := by
+    by_contra hempty
+    rw [not_nonempty_iff] at hempty
+    simp at hwsum
+  choose point₀ hpoint₀ using fun j : J ↦ hzrange (Set.mem_range_self j)
+  obtain ⟨j₀⟩ := hJne
+  have hcastinj : Function.Injective (Fin.castLE hcard) :=
+    fun a b hab ↦ Fin.val_injective (congrArg Fin.val hab)
+  have hinj : Function.Injective fun j : J ↦ Fin.castLE hcard (Fintype.equivFin J j) :=
+    hcastinj.comp (Fintype.equivFin J).injective
+  refine ⟨Function.extend (fun j : J ↦ Fin.castLE hcard (Fintype.equivFin J j)) weight 0,
+    Function.extend (fun j : J ↦ Fin.castLE hcard (Fintype.equivFin J j)) point₀
+      (fun _ ↦ point₀ j₀), ?_, ?_, ?_⟩
+  · intro k
+    by_cases hk : ∃ j, (fun j : J ↦ Fin.castLE hcard (Fintype.equivFin J j)) j = k
+    · obtain ⟨j, rfl⟩ := hk
+      rw [hinj.extend_apply]
+      exact (hpos j).le
+    · rw [Function.extend_apply' _ _ _ hk]
+      exact le_rfl
+  · have hvanish : ∀ k ∈ Finset.univ,
+        k ∉ Finset.univ.map ⟨_, hinj⟩ →
+        Function.extend (fun j : J ↦ Fin.castLE hcard (Fintype.equivFin J j)) weight 0 k
+          = 0 := by
+      intro k _ hk
+      refine Function.extend_apply' _ _ _ ?_
+      rintro ⟨j, rfl⟩
+      exact hk (Finset.mem_map_of_mem _ (Finset.mem_univ j))
+    rw [← Finset.sum_subset (Finset.subset_univ (Finset.univ.map ⟨_, hinj⟩)) hvanish,
+      Finset.sum_map]
+    rw [← hwsum]
+    exact Finset.sum_congr rfl fun j _ ↦ hinj.extend_apply weight 0 j
+  · have hvanish : ∀ k ∈ Finset.univ,
+        k ∉ Finset.univ.map ⟨_, hinj⟩ →
+        Function.extend (fun j : J ↦ Fin.castLE hcard (Fintype.equivFin J j)) weight 0 k •
+            φ (Function.extend (fun j : J ↦ Fin.castLE hcard (Fintype.equivFin J j)) point₀
+              (fun _ ↦ point₀ j₀) k) = 0 := by
+      intro k _ hk
+      have hzero : Function.extend
+          (fun j : J ↦ Fin.castLE hcard (Fintype.equivFin J j)) weight 0 k = 0 := by
+        refine Function.extend_apply' _ _ _ ?_
+        rintro ⟨j, rfl⟩
+        exact hk (Finset.mem_map_of_mem _ (Finset.mem_univ j))
+      rw [hzero, zero_smul]
+    rw [featureVector,
+      ← Finset.sum_subset (Finset.subset_univ (Finset.univ.map ⟨_, hinj⟩)) hvanish,
+      Finset.sum_map, ← hcomb]
+    refine Finset.sum_congr rfl fun j _ ↦ ?_
+    rw [Function.Embedding.coeFn_mk, hinj.extend_apply, hinj.extend_apply, hpoint₀]
+
+/-- **NOTE1 §2.1, compactness of the realization body.** For a compact space `X` and a
+continuous feature map, the body is compact: it is the image of the compact set
+`stdSimplex ℝ (Fin (card ι + 1)) ×ˢ univ` under the continuous map sending a law to its
+feature vector, by Carathéodory. Compactness gives closedness, which is the hypothesis the
+invariance theorem needs. -/
+theorem isCompact_realizationBody {X ι : Type*} [Fintype ι] [TopologicalSpace X]
+    [CompactSpace X] (φ : X → ι → ℝ) (hφ : Continuous φ) :
+    IsCompact (realizationBody φ) := by
+  have himage : realizationBody φ
+      = (fun q : (Fin (Fintype.card ι + 1) → ℝ) × (Fin (Fintype.card ι + 1) → X) ↦
+          featureVector q.1 q.2 φ) ''
+        (stdSimplex ℝ (Fin (Fintype.card ι + 1)) ×ˢ (Set.univ : Set (Fin _ → X))) := by
+    apply Set.Subset.antisymm
+    · intro v hv
+      obtain ⟨p, point, hp, hsum, hfeat⟩ := exists_law_of_mem_realizationBody φ v hv
+      exact ⟨(p, point), ⟨⟨hp, hsum⟩, Set.mem_univ _⟩, hfeat⟩
+    · rintro _ ⟨⟨p, point⟩, ⟨hp, -⟩, rfl⟩
+      exact featureVector_mem_convexHull p hp.1 hp.2 point φ
+  have hcont : Continuous
+      fun q : (Fin (Fintype.card ι + 1) → ℝ) × (Fin (Fintype.card ι + 1) → X) ↦
+        featureVector q.1 q.2 φ := by
+    simp only [featureVector]
+    exact continuous_finset_sum Finset.univ fun k _ ↦
+      ((continuous_apply k).comp continuous_fst).smul
+        (hφ.comp ((continuous_apply k).comp continuous_snd))
+  rw [himage]
+  exact (isCompact_stdSimplex _ |>.prod isCompact_univ).image hcont
+
+/-- The realization body of a continuous feature map on a compact space is closed, which is
+what the invariance theorem of NOTE1 Theorem 1 requires of it. -/
+theorem isClosed_realizationBody {X ι : Type*} [Fintype ι] [TopologicalSpace X]
+    [CompactSpace X] (φ : X → ι → ℝ) (hφ : Continuous φ) :
+    IsClosed (realizationBody φ) :=
+  (isCompact_realizationBody φ hφ).isClosed
 
 end
 
