@@ -363,10 +363,8 @@ theorem dyadic_sum_le_one_of_length_le : ∀ (depth : ℕ) (words : Finset (List
           omega
         have hfreetail : PrefixFree (branch.image List.tail) := by
           intro first hfirst second hsecond hprefix
-          obtain ⟨x, hx, hxmap⟩ := Finset.mem_image.mp hfirst
-          obtain ⟨y, hy, hymap⟩ := Finset.mem_image.mp hsecond
-          subst hxmap
-          subst hymap
+          obtain ⟨x, hx, rfl⟩ := Finset.mem_image.mp hfirst
+          obtain ⟨y, hy, rfl⟩ := Finset.mem_image.mp hsecond
           obtain ⟨suffix, hsuffix⟩ := hprefix
           have hfull : x <+: y := by
             refine ⟨suffix, ?_⟩
