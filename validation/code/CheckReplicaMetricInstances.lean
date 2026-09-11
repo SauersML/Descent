@@ -32,6 +32,7 @@ open Descent.Portability.ReplicaMetricInstances
 #print axioms expectation_binaryAUC_eq_tsum
 #print axioms binaryAUC_certificate
 #print axioms scoreGroupMass_eq_scoreCellMass
+#print axioms scoreGroupMass_bool_eq_scoreMass
 #print axioms scoreGroupMass_nonneg
 #print axioms caseMass_le_scoreGroupMass
 #print axioms scoreGroupMass_le_one
