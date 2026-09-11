@@ -375,6 +375,411 @@ theorem residual_fourth_moment (a b delta : ℝ) (hab : b ^ 2 < a) (hd : 0 ≤ d
             * (Real.sqrt (upperSquare a b delta) ^ 2 + upperSquare a b delta)) * h1
   rw [hstep, two_point_fourth_moment a b delta hab hd]
 
+/-! ### The simultaneous source-fixed construction -/
+
+/-- A genotype observable read at an explicit pair. -/
+theorem liftGenotype_apply {A B : Type*} (S : A → ℝ) (x : A) (y : B) :
+    liftGenotype (Ω := B) S (x, y) = S x := rfl
+
+/-- `x_d = √q_d + √(m_d − 1 + q_d)`, UPT equation (7.2). -/
+def scaleX (q m : D → ℝ) (d : D) : ℝ := Real.sqrt (q d) + Real.sqrt (m d - 1 + q d)
+
+/-- `v_d = x_d²`, the target conditional outcome variance. -/
+def outcomeVar (q m : D → ℝ) (d : D) : ℝ := scaleX q m d ^ 2
+
+/-- `k_d = √q_d x_d − 1`, the conditional residual mean coefficient. -/
+def shiftK (q m : D → ℝ) (d : D) : ℝ := Real.sqrt (q d) * scaleX q m d - 1
+
+/-- The scale is positive whenever the prescribed mean squared error exceeds one. -/
+theorem scaleX_pos (q m : D → ℝ) (d : D) (hq0 : 0 ≤ q d) (hm : 1 < m d) :
+    0 < scaleX q m d := by
+  have h1 : 0 < m d - 1 + q d := by linarith
+  have h2 : 0 < Real.sqrt (m d - 1 + q d) := Real.sqrt_pos.mpr h1
+  have h3 : 0 ≤ Real.sqrt (q d) := Real.sqrt_nonneg _
+  unfold scaleX
+  linarith
+
+/-- **UPT equation (7.3), first half: `m_d = 1 + v_d − 2√(q_d v_d)`.**  The scale is
+built so that the prescribed mean squared error comes out exactly. -/
+theorem mse_identity (q m : D → ℝ) (d : D) (hq0 : 0 ≤ q d) (hm : 1 ≤ m d) :
+    m d = 1 + scaleX q m d ^ 2 - 2 * Real.sqrt (q d) * scaleX q m d := by
+  have hq : Real.sqrt (q d) ^ 2 = q d := Real.sq_sqrt hq0
+  have hr : Real.sqrt (m d - 1 + q d) ^ 2 = m d - 1 + q d :=
+    Real.sq_sqrt (by linarith)
+  unfold scaleX
+  linear_combination hq - hr
+
+/-- **UPT equation (7.3), second half: `m_d − k_d² = v_d(1 − q_d)`.**  This is the strict
+conditional slack that lets the residual kernel exist. -/
+theorem slack_identity (q m : D → ℝ) (d : D) (hq0 : 0 ≤ q d) (hm : 1 ≤ m d) :
+    m d - shiftK q m d ^ 2 = outcomeVar q m d * (1 - q d) := by
+  have hq : Real.sqrt (q d) ^ 2 = q d := Real.sq_sqrt hq0
+  have hmid := mse_identity q m d hq0 hm
+  unfold shiftK outcomeVar
+  linear_combination hmid - scaleX q m d ^ 2 * hq
+
+/-- The prescribed moments leave strict slack in every cell. -/
+theorem shiftK_sq_lt (q m : D → ℝ) (d : D) (hq0 : 0 ≤ q d) (hq1 : q d < 1)
+    (hm : 1 < m d) : shiftK q m d ^ 2 < m d := by
+  have hslack := slack_identity q m d hq0 hm.le
+  have hx := scaleX_pos q m d hq0 hm
+  have hx2 : 0 < scaleX q m d ^ 2 := pow_pos hx 2
+  have hpos : 0 < outcomeVar q m d * (1 - q d) := by
+    unfold outcomeVar
+    nlinarith
+  linarith
+
+/-- The slack survives multiplication by a scored sign, which is what the residual
+kernel needs at every genotype. -/
+theorem residual_slack (q m : D → ℝ) (hq0 : ∀ d, 0 ≤ q d) (hq1 : ∀ d, q d < 1)
+    (hm : ∀ d, 1 < m d) :
+    ∀ (d : D) (t : Bool), (shiftK q m d * sign t) ^ 2 < m d := by
+  intro d t
+  rw [mul_pow, sign_sq, mul_one]
+  exact shiftK_sq_lt q m d (hq0 d) (hq1 d) (hm d)
+
+/-- The conditional residual kernel given the whole genotype: distance cell and scored
+sign. -/
+def residualKernel (q m : D → ℝ) (delta : ℝ)
+    (hk : ∀ (d : D) (t : Bool), (shiftK q m d * sign t) ^ 2 < m d) (hd : 0 ≤ delta)
+    (d : D) (s : Bool) : ExpFunctional (Bool × Bool) :=
+  residualLaw (m d) (shiftK q m d * sign s) delta (hk d s) hd
+
+/-- The within-cell target law: a conditionally symmetric scored sign and the residual
+kernel.  The scored sign law is the same for every prescribed curve and every
+prescribed loss-explainability. -/
+def cellTargetLaw (q m : D → ℝ) (delta : ℝ)
+    (hk : ∀ (d : D) (t : Bool), (shiftK q m d * sign t) ^ 2 < m d) (hd : 0 ≤ delta)
+    (d : D) : ExpFunctional (Bool × (Bool × Bool)) :=
+  mixture (uniformExp Bool) (residualKernel q m delta hk hd d)
+
+/-- The target phenotype `Y = S + E` in cell `d`. -/
+def targetPhenotype (q m : D → ℝ) (delta : ℝ) (d : D) : Bool × (Bool × Bool) → ℝ :=
+  fun z ↦ sign z.1 + residualValue (m d) (shiftK q m d * sign z.1) delta z.2
+
+/-- The individual prediction residual on the joint cell-genotype-outcome space. -/
+def targetResidual (q m : D → ℝ) (delta : ℝ) :
+    D × (Bool × (Bool × Bool)) → ℝ :=
+  fun z ↦ residualValue (m z.1) (shiftK q m z.1 * sign z.2.1) delta z.2.2
+
+/-- The target phenotype at an explicit genotype. -/
+theorem targetPhenotype_apply (q m : D → ℝ) (delta : ℝ) (d : D) (s : Bool)
+    (r : Bool × Bool) :
+    targetPhenotype q m delta d (s, r)
+      = sign s + residualValue (m d) (shiftK q m d * sign s) delta r := rfl
+
+/-- The prediction residual is the phenotype minus the deployed score. -/
+theorem targetPhenotype_sub_score (q m : D → ℝ) (delta : ℝ) (d : D)
+    (z : Bool × (Bool × Bool)) :
+    targetPhenotype q m delta d z - liftGenotype sign z
+      = targetResidual q m delta (d, z) := by
+  show sign z.1 + residualValue (m d) (shiftK q m d * sign z.1) delta z.2 - sign z.1
+    = residualValue (m d) (shiftK q m d * sign z.1) delta z.2
+  ring
+
+/-- The within-cell law in two-point form over the scored sign. -/
+theorem cellTargetLaw_eval (q m : D → ℝ) (delta : ℝ)
+    (hk : ∀ (d : D) (t : Bool), (shiftK q m d * sign t) ^ 2 < m d) (hd : 0 ≤ delta)
+    (d : D) (f : Bool × (Bool × Bool) → ℝ) :
+    cellTargetLaw q m delta hk hd d f
+      = 1 / 2 * residualKernel q m delta hk hd d false (fun r ↦ f (false, r))
+        + 1 / 2 * residualKernel q m delta hk hd d true (fun r ↦ f (true, r)) := by
+  unfold cellTargetLaw
+  rw [mixture_eval, uniformBool_eval]
+
+/-- The fair scored sign has mean zero. -/
+theorem uniformBool_sign_mean : uniformExp Bool sign = 0 := by
+  rw [uniformBool_eval, sign_false, sign_true]
+  ring
+
+/-- The fair scored sign has variance one. -/
+theorem uniformBool_sign_variance : variance (uniformExp Bool) sign = 1 := by
+  have hsq : (fun s : Bool ↦ sign s ^ 2) = fun _ : Bool ↦ (1:ℝ) := funext sign_sq
+  rw [variance_eq_expect_sq_sub_sq_mean, uniformBool_sign_mean, hsq,
+    ExpFunctional.eval_const]
+  ring
+
+/-- The conditional residual mean is `k_d S`. -/
+theorem kernel_first (q m : D → ℝ) (delta : ℝ)
+    (hk : ∀ (d : D) (t : Bool), (shiftK q m d * sign t) ^ 2 < m d) (hd : 0 ≤ delta)
+    (d : D) (s : Bool) :
+    residualKernel q m delta hk hd d s
+        (residualValue (m d) (shiftK q m d * sign s) delta)
+      = shiftK q m d * sign s :=
+  residual_first_moment (m d) (shiftK q m d * sign s) delta (hk d s) hd
+
+/-- The conditional residual second moment is `m_d`. -/
+theorem kernel_second (q m : D → ℝ) (delta : ℝ)
+    (hk : ∀ (d : D) (t : Bool), (shiftK q m d * sign t) ^ 2 < m d) (hd : 0 ≤ delta)
+    (d : D) (s : Bool) :
+    residualKernel q m delta hk hd d s
+        (fun r ↦ residualValue (m d) (shiftK q m d * sign s) delta r ^ 2)
+      = m d :=
+  residual_second_moment (m d) (shiftK q m d * sign s) delta (hk d s) hd
+
+/-- The conditional individual-loss second moment is `m_d² + δ`. -/
+theorem kernel_fourth (q m : D → ℝ) (delta : ℝ)
+    (hk : ∀ (d : D) (t : Bool), (shiftK q m d * sign t) ^ 2 < m d) (hd : 0 ≤ delta)
+    (d : D) (s : Bool) :
+    residualKernel q m delta hk hd d s
+        (fun r ↦ residualValue (m d) (shiftK q m d * sign s) delta r ^ 4)
+      = m d ^ 2 + delta :=
+  residual_fourth_moment (m d) (shiftK q m d * sign s) delta (hk d s) hd
+
+/-- The conditional individual loss has second moment `m_d² + δ` in the joint
+coordinates. -/
+theorem kernel_residual_fourth (q m : D → ℝ) (delta : ℝ)
+    (hk : ∀ (d : D) (t : Bool), (shiftK q m d * sign t) ^ 2 < m d) (hd : 0 ≤ delta)
+    (d : D) (s : Bool) :
+    residualKernel q m delta hk hd d s
+        (fun r ↦ targetResidual q m delta (d, (s, r)) ^ 4)
+      = m d ^ 2 + delta :=
+  residual_fourth_moment (m d) (shiftK q m d * sign s) delta (hk d s) hd
+
+/-- The conditional individual loss has mean `m_d` in the joint coordinates. -/
+theorem kernel_residual_second (q m : D → ℝ) (delta : ℝ)
+    (hk : ∀ (d : D) (t : Bool), (shiftK q m d * sign t) ^ 2 < m d) (hd : 0 ≤ delta)
+    (d : D) (s : Bool) :
+    residualKernel q m delta hk hd d s
+        (fun r ↦ targetResidual q m delta (d, (s, r)) ^ 2)
+      = m d :=
+  residual_second_moment (m d) (shiftK q m d * sign s) delta (hk d s) hd
+
+/-- **The conditional phenotype moments given the entire genotype and distance.**  Both
+right-hand sides are free of `δ`: varying the prescribed loss-explainability changes
+neither the conditional mean nor the conditional variance of the outcome. -/
+theorem conditional_phenotype_moments (q m : D → ℝ) (delta : ℝ)
+    (hk : ∀ (d : D) (t : Bool), (shiftK q m d * sign t) ^ 2 < m d) (hd : 0 ≤ delta)
+    (d : D) (s : Bool) :
+    residualKernel q m delta hk hd d s (fun r ↦ targetPhenotype q m delta d (s, r))
+        = (1 + shiftK q m d) * sign s ∧
+      residualKernel q m delta hk hd d s
+          (fun r ↦ targetPhenotype q m delta d (s, r) ^ 2)
+        = 1 + 2 * shiftK q m d + m d := by
+  have hs := sign_sq s
+  constructor
+  · show residualKernel q m delta hk hd d s
+        (fun r ↦ sign s + residualValue (m d) (shiftK q m d * sign s) delta r)
+      = (1 + shiftK q m d) * sign s
+    rw [shift_one, kernel_first]
+    ring
+  · show residualKernel q m delta hk hd d s
+        (fun r ↦ (sign s + residualValue (m d) (shiftK q m d * sign s) delta r) ^ 2)
+      = 1 + 2 * shiftK q m d + m d
+    rw [shift_sq, kernel_first, kernel_second]
+    linear_combination (1 + 2 * shiftK q m d) * hs
+
+/-- The conditional cross moment of the score with the phenotype. -/
+theorem kernel_score_cross (q m : D → ℝ) (delta : ℝ)
+    (hk : ∀ (d : D) (t : Bool), (shiftK q m d * sign t) ^ 2 < m d) (hd : 0 ≤ delta)
+    (d : D) (s : Bool) :
+    residualKernel q m delta hk hd d s
+        (fun r ↦ sign s * targetPhenotype q m delta d (s, r))
+      = 1 + shiftK q m d := by
+  have hs := sign_sq s
+  show residualKernel q m delta hk hd d s
+      (fun r ↦ sign s * (sign s + residualValue (m d) (shiftK q m d * sign s) delta r))
+    = 1 + shiftK q m d
+  rw [shift_mul, kernel_first]
+  linear_combination (1 + shiftK q m d) * hs
+
+/-- The cellwise phenotype mean is zero, by conditional score symmetry. -/
+theorem cell_phenotype_mean (q m : D → ℝ) (delta : ℝ)
+    (hk : ∀ (d : D) (t : Bool), (shiftK q m d * sign t) ^ 2 < m d) (hd : 0 ≤ delta)
+    (d : D) :
+    cellTargetLaw q m delta hk hd d (targetPhenotype q m delta d) = 0 := by
+  rw [cellTargetLaw_eval, (conditional_phenotype_moments q m delta hk hd d false).1,
+    (conditional_phenotype_moments q m delta hk hd d true).1, sign_false, sign_true]
+  ring
+
+/-- The cellwise score mean is zero. -/
+theorem cell_score_mean (q m : D → ℝ) (delta : ℝ)
+    (hk : ∀ (d : D) (t : Bool), (shiftK q m d * sign t) ^ 2 < m d) (hd : 0 ≤ delta)
+    (d : D) : cellTargetLaw q m delta hk hd d (liftGenotype sign) = 0 := by
+  rw [cellTargetLaw_eval]
+  show 1 / 2 * residualKernel q m delta hk hd d false (fun _ ↦ sign false)
+      + 1 / 2 * residualKernel q m delta hk hd d true (fun _ ↦ sign true) = 0
+  rw [ExpFunctional.eval_const, ExpFunctional.eval_const, sign_false, sign_true]
+  ring
+
+/-- **The cellwise outcome variance is exactly `v_d`.** -/
+theorem cell_phenotype_variance (q m : D → ℝ) (delta : ℝ)
+    (hk : ∀ (d : D) (t : Bool), (shiftK q m d * sign t) ^ 2 < m d) (hd : 0 ≤ delta)
+    (d : D) (hq0 : 0 ≤ q d) (hm : 1 ≤ m d) :
+    variance (cellTargetLaw q m delta hk hd d) (targetPhenotype q m delta d)
+      = outcomeVar q m d := by
+  have hmid := mse_identity q m d hq0 hm
+  rw [variance_eq_expect_sq_sub_sq_mean, cell_phenotype_mean, cellTargetLaw_eval,
+    (conditional_phenotype_moments q m delta hk hd d false).2,
+    (conditional_phenotype_moments q m delta hk hd d true).2]
+  unfold shiftK outcomeVar
+  linear_combination hmid
+
+/-- **The cellwise predictive covariance is exactly `1 + k_d = √(q_d v_d)`.** -/
+theorem cell_score_covariance (q m : D → ℝ) (delta : ℝ)
+    (hk : ∀ (d : D) (t : Bool), (shiftK q m d * sign t) ^ 2 < m d) (hd : 0 ≤ delta)
+    (d : D) :
+    covariance (cellTargetLaw q m delta hk hd d) (liftGenotype sign)
+        (targetPhenotype q m delta d) = 1 + shiftK q m d := by
+  have hfun : (fun z : Bool × (Bool × Bool) ↦
+      liftGenotype sign z * targetPhenotype q m delta d z)
+      = fun z : Bool × (Bool × Bool) ↦ sign z.1 * targetPhenotype q m delta d z := rfl
+  rw [covariance_eq_expect_mul_sub_means, cell_phenotype_mean, cell_score_mean, hfun,
+    cellTargetLaw_eval, kernel_score_cross, kernel_score_cross]
+  ring
+
+/-- **UPT equation (7.1), first identity: the cellwise squared correlation with the
+unchanged source-trained score is exactly the prescribed `q_d`.** -/
+theorem cell_score_accuracy (q m : D → ℝ) (delta : ℝ)
+    (hk : ∀ (d : D) (t : Bool), (shiftK q m d * sign t) ^ 2 < m d) (hd : 0 ≤ delta)
+    (d : D) (hq0 : 0 ≤ q d) (hm : 1 < m d) :
+    scoreAccuracy (uniformExp Bool) (residualKernel q m delta hk hd d) sign
+      (targetPhenotype q m delta d) = q d := by
+  have hqq : Real.sqrt (q d) ^ 2 = q d := Real.sq_sqrt hq0
+  have hx := scaleX_pos q m d hq0 hm
+  have hlaw : mixture (uniformExp Bool) (residualKernel q m delta hk hd d)
+      = cellTargetLaw q m delta hk hd d := rfl
+  unfold scoreAccuracy
+  rw [hlaw, cell_score_covariance, cell_phenotype_variance q m delta hk hd d hq0 hm.le,
+    uniformBool_sign_variance]
+  unfold shiftK outcomeVar
+  have hne : (1:ℝ) * scaleX q m d ^ 2 ≠ 0 := by
+    have hpos : 0 < scaleX q m d ^ 2 := pow_pos hx 2
+    intro hcon
+    rw [one_mul] at hcon
+    linarith
+  rw [div_eq_iff hne]
+  linear_combination scaleX q m d ^ 2 * hqq
+
+/-- **UPT equation (7.1), second identity: the cellwise mean squared error of the
+unchanged source-trained score is exactly the prescribed `m_d`.** -/
+theorem cell_expected_mse (q m : D → ℝ) (delta : ℝ)
+    (hk : ∀ (d : D) (t : Bool), (shiftK q m d * sign t) ^ 2 < m d) (hd : 0 ≤ delta)
+    (d : D) :
+    expMse (cellTargetLaw q m delta hk hd d) (targetPhenotype q m delta d)
+      (liftGenotype sign) = m d := by
+  have hfun : (fun z : Bool × (Bool × Bool) ↦
+      (targetPhenotype q m delta d z - liftGenotype sign z) ^ 2)
+      = fun z : Bool × (Bool × Bool) ↦ targetResidual q m delta (d, z) ^ 2 := by
+    funext z
+    rw [targetPhenotype_sub_score]
+  unfold expMse
+  rw [hfun, cellTargetLaw_eval, kernel_residual_second, kernel_residual_second]
+  ring
+
+/-- The conditional mean individual loss, as a function of the distance cell. -/
+def cellLossMean (q m : D → ℝ) (delta : ℝ)
+    (hk : ∀ (d : D) (t : Bool), (shiftK q m d * sign t) ^ 2 < m d) (hd : 0 ≤ delta) :
+    D → ℝ :=
+  fun d ↦ cellTargetLaw q m delta hk hd d (fun z ↦ targetResidual q m delta (d, z) ^ 2)
+
+/-- The conditional mean individual loss is exactly the prescribed `m`. -/
+theorem cellLossMean_eq (q m : D → ℝ) (delta : ℝ)
+    (hk : ∀ (d : D) (t : Bool), (shiftK q m d * sign t) ^ 2 < m d) (hd : 0 ≤ delta) :
+    cellLossMean q m delta hk hd = m := by
+  funext d
+  unfold cellLossMean
+  rw [cellTargetLaw_eval, kernel_residual_second, kernel_residual_second]
+  ring
+
+/-- The full target law: distance cells, scored signs, outcome randomness. -/
+def fullTargetLaw (E : ExpFunctional D) (q m : D → ℝ) (delta : ℝ)
+    (hk : ∀ (d : D) (t : Bool), (shiftK q m d * sign t) ^ 2 < m d) (hd : 0 ≤ delta) :
+    ExpFunctional (D × (Bool × (Bool × Bool))) :=
+  mixture E (cellTargetLaw q m delta hk hd)
+
+/-- `η_D`: the fraction of individual squared-loss variance the distance cell explains. -/
+def lossFraction (E : ExpFunctional D) (q m : D → ℝ) (delta : ℝ)
+    (hk : ∀ (d : D) (t : Bool), (shiftK q m d * sign t) ^ 2 < m d) (hd : 0 ≤ delta) : ℝ :=
+  explainableFraction (variance E (cellLossMean q m delta hk hd))
+    (variance (fullTargetLaw E q m delta hk hd) (fun z ↦ targetResidual q m delta z ^ 2))
+
+/-- **The exact total variance of individual squared loss.**  The conditional loss
+variance given the whole genotype is the constant `δ`, so the total is `δ + B`. -/
+theorem loss_total_variance (E : ExpFunctional D) (q m : D → ℝ) (delta : ℝ)
+    (hk : ∀ (d : D) (t : Bool), (shiftK q m d * sign t) ^ 2 < m d) (hd : 0 ≤ delta) :
+    variance (fullTargetLaw E q m delta hk hd) (fun z ↦ targetResidual q m delta z ^ 2)
+      = delta + variance E m := by
+  have hint : (fun d ↦ cellTargetLaw q m delta hk hd d
+          (fun z ↦ targetResidual q m delta (d, z) ^ 4)
+        - cellTargetLaw q m delta hk hd d
+            (fun z ↦ targetResidual q m delta (d, z) ^ 2) ^ 2)
+      = fun _ : D ↦ delta := by
+    funext d
+    rw [cellTargetLaw_eval, cellTargetLaw_eval, kernel_residual_fourth,
+      kernel_residual_fourth, kernel_residual_second, kernel_residual_second]
+    ring
+  have hbet : (fun d ↦ cellTargetLaw q m delta hk hd d
+      (fun z ↦ targetResidual q m delta (d, z) ^ 2)) = m := cellLossMean_eq q m delta hk hd
+  unfold fullTargetLaw
+  rw [squared_loss_total, hint, ExpFunctional.eval_const, hbet]
+
+/-- The exact loss-explainability of the construction. -/
+theorem lossFraction_eq (E : ExpFunctional D) (q m : D → ℝ) (delta : ℝ)
+    (hk : ∀ (d : D) (t : Bool), (shiftK q m d * sign t) ^ 2 < m d) (hd : 0 ≤ delta) :
+    lossFraction E q m delta hk hd = variance E m / (delta + variance E m) := by
+  unfold lossFraction explainableFraction Descent.Core.ratio
+  rw [cellLossMean_eq, loss_total_variance]
+
+/-- The conditional loss variance `δ = B(1/η − 1)` prescribed by a target
+loss-explainability. -/
+def lossSlack (E : ExpFunctional D) (m : D → ℝ) (eta : ℝ) : ℝ :=
+  variance E m * (eta⁻¹ - 1)
+
+/-- The prescribed conditional loss variance is admissible for every `η ∈ (0,1]`. -/
+theorem lossSlack_nonneg (E : ExpFunctional D) (m : D → ℝ) (eta : ℝ)
+    (hB : 0 ≤ variance E m) (heta0 : 0 < eta) (heta1 : eta ≤ 1) :
+    0 ≤ lossSlack E m eta := by
+  have h1 : 1 ≤ eta⁻¹ := by
+    have hmul := mul_le_mul_of_nonneg_right heta1 (inv_pos.mpr heta0).le
+    rw [mul_inv_cancel₀ (ne_of_gt heta0), one_mul] at hmul
+    exact hmul
+  unfold lossSlack
+  exact mul_nonneg hB (by linarith)
+
+/-- **UPT equation (7.1), third identity: the prescribed loss-explainability is
+attained exactly.** -/
+theorem lossFraction_eq_eta (E : ExpFunctional D) (q m : D → ℝ) (eta : ℝ)
+    (hk : ∀ (d : D) (t : Bool), (shiftK q m d * sign t) ^ 2 < m d)
+    (hB : 0 < variance E m) (heta0 : 0 < eta) (heta1 : eta ≤ 1) :
+    lossFraction E q m (lossSlack E m eta) hk
+        (lossSlack_nonneg E m eta hB.le heta0 heta1) = eta := by
+  have hetane : eta ≠ 0 := ne_of_gt heta0
+  have hBne : variance E m ≠ 0 := ne_of_gt hB
+  rw [lossFraction_eq]
+  unfold lossSlack
+  field_simp <;> ring
+
+/-- **UPT Theorem 7.1: the simultaneous source-fixed portability construction.**
+
+On one fixed pre-outcome law -- an arbitrary distance cell law and a conditionally
+symmetric `±1` score -- an arbitrary prescribed cellwise squared correlation
+`q_d ∈ [0,1)`, an arbitrary prescribed cellwise mean squared error `m_d > 1` and an
+arbitrary prescribed loss-explainability `η ∈ (0,1]` hold simultaneously.  The genotype
+law, the deployed score and the distance variable do not depend on any of the three
+prescriptions, and `conditional_phenotype_moments` shows that varying `η` leaves the
+conditional phenotype mean and variance given the entire genotype untouched. -/
+theorem simultaneous_source_fixed_construction (E : ExpFunctional D) (q m : D → ℝ)
+    (eta : ℝ) (hq0 : ∀ d, 0 ≤ q d) (hq1 : ∀ d, q d < 1) (hm : ∀ d, 1 < m d)
+    (hB : 0 < variance E m) (heta0 : 0 < eta) (heta1 : eta ≤ 1) :
+    lossFraction E q m (lossSlack E m eta) (residual_slack q m hq0 hq1 hm)
+          (lossSlack_nonneg E m eta hB.le heta0 heta1) = eta ∧
+      ∀ d : D,
+        scoreAccuracy (uniformExp Bool)
+            (residualKernel q m (lossSlack E m eta) (residual_slack q m hq0 hq1 hm)
+              (lossSlack_nonneg E m eta hB.le heta0 heta1) d)
+            sign (targetPhenotype q m (lossSlack E m eta) d) = q d ∧
+          expMse
+            (cellTargetLaw q m (lossSlack E m eta) (residual_slack q m hq0 hq1 hm)
+              (lossSlack_nonneg E m eta hB.le heta0 heta1) d)
+            (targetPhenotype q m (lossSlack E m eta) d) (liftGenotype sign) = m d :=
+  ⟨lossFraction_eq_eta E q m eta (residual_slack q m hq0 hq1 hm) hB heta0 heta1,
+    fun d ↦
+      ⟨cell_score_accuracy q m (lossSlack E m eta) (residual_slack q m hq0 hq1 hm)
+          (lossSlack_nonneg E m eta hB.le heta0 heta1) d (hq0 d) (hm d),
+        cell_expected_mse q m (lossSlack E m eta) (residual_slack q m hq0 hq1 hm)
+          (lossSlack_nonneg E m eta hB.le heta0 heta1) d⟩⟩
+
 end
 
 end Descent.Portability.SourceFixedRealization
