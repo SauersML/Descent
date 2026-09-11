@@ -3198,6 +3198,9 @@ def eigenvalues(w, u):
 def Descent_Portability_AuditCovarianceSpectrum_basis(w, u):
     return _rt._proj((symmetric(w, u)), 'eigenvectorBasis')(rfl)
 
+def dualGap(a, floor, c, p, B, η, lam):
+    return _rt.sub(worstVariance(a, p), dualBound(a, floor, c, B, η, lam))
+
 def cappedFloor(floor, h, m, i):
     return _rt.rmax((floor[int(i)]), (_rt.rdiv(h[int(i)], m)))
 
@@ -3432,6 +3435,9 @@ def gibbsNormalizer(ν, U):
 
 def hiddenIntegrand(coupling, hidden, retained, horizon, time):
     return evolution(hidden, ((horizon - time)), (coupling((retained(time)))))
+
+def linearDeathMatrix(m, gamma):
+    return _rt.identity((lambda j, i: ((gamma * ((j))) * (((((1.0) if (i == gridPred(m, j)) else 0.0)) - (((1.0) if (i == j) else 0.0)))))))
 
 def Descent_Portability_posteriorMean(posterior, conditional, x):
     return sum((_rt.mul(posterior[int(x)][int(t)], conditional[int(t)][int(x)])) for t in range(int(_rt.sumdim('t', len(posterior[0]), len(conditional)))))
@@ -5049,6 +5055,12 @@ def sharedCorrectionSpread(curvature, optimum):
 def sharedCorrectionCost(curvature, optimum, correction):
     return sum((_rt.mul(curvature[int(i)], _rt.lpow((_rt.sub(correction, optimum[int(i)])), 2.0))) for i in range(int(len(curvature))))
 
+def Descent_Portability_MinimaxAuditDesignLaw_kappa(L, U, lo, hi, i):
+    return _rt.mul((_rt.sub(U[int(i)], proxy((L[int(i)]), (U[int(i)]), (lo[int(i)]), (hi[int(i)])))), (_rt.sub(proxy((L[int(i)]), (U[int(i)]), (lo[int(i)]), (hi[int(i)])), L[int(i)])))
+
+def Descent_Portability_MinimaxAuditDesignLaw_coefficients(L, U, lo, hi, w, j, i):
+    return _rt.mul(Descent_Portability_MinimaxAuditDesignLaw_kappa(L, U, lo, hi, i), _rt.lpow(w[int(j)][int(i)], 2.0))
+
 def Descent_Portability_MomentAUCNonidentifiability_outcome():
     return _rt.VecFn([true, true, true, false, false, false])
 
@@ -5111,6 +5123,27 @@ def portabilityGap(r2_source, r2_target):
 
 def portabilityNoiseVariance(variantCount, varianceScale):
     return _rt.rdiv(varianceScale, (variantCount))
+
+def oneRateTotal(α, s):
+    return (α * ((occupiedCount(s))))
+
+def zeroRateTotal(β, s):
+    return (β * (((n) - ((occupiedCount(s))))))
+
+def pairProb(α, β, τ, s):
+    return _rt.rdiv((τ * _rt.rmin((oneRateTotal(α, s)), (zeroRateTotal(β, s)))), ((((occupiedCount(s))) * (((n) - ((occupiedCount(s))))))))
+
+def singleOneProb(α, β, τ, s):
+    return _rt.rdiv((τ * _rt.rmax(((oneRateTotal(α, s) - zeroRateTotal(β, s))), 0.0)), ((occupiedCount(s))))
+
+def singleZeroProb(α, β, τ, s):
+    return _rt.rdiv((τ * _rt.rmax(((zeroRateTotal(β, s) - oneRateTotal(α, s))), 0.0)), (((n) - ((occupiedCount(s))))))
+
+def stayProb(α, β, τ, s):
+    return (1.0 - (τ * _rt.rmax((oneRateTotal(α, s)), (zeroRateTotal(β, s)))))
+
+def nearestDriftKernel(α, β, τ, s, s_p):
+    return (((stayProb(α, β, τ, s) if (s_p == s) else 0.0)) + sum(((((((singleOneProb(α, β, τ, s) if (s(i) == true) else singleZeroProb(α, β, τ, s))) if (s_p == flipCoord(i, s)) else 0.0)) + sum((sum((((((pairProb(α, β, τ, s) if ((s(i) == true) and (s(j) == false)) else 0.0)) if (s_p == flipCoord(j, (flipCoord(i, s)))) else 0.0))) for j in range(int(_rt.sumdim('j', len(s)))))) for i in range(int(_rt.sumdim('i', len(s))))))) for i in range(int(_rt.sumdim('i', len(s))))))
 
 def rademacherScore():
     return _rt.VecFn([(-1.0), 0.0, 1.0])
@@ -6042,6 +6075,12 @@ def segment(a, p, t):
 def radialDensity(B, a, p, t):
     return sum((_rt.mul((_rt.sub(p[int(i)], a[int(i)])), B(i, (segment(a, p, t))))) for i in range(int(len(a))))
 
+def lowerCap(h):
+    return maxRange(h, ((lambda _: 1.0)))
+
+def upperCap(floor, h):
+    return maxRange(h, floor)
+
 def markMass(η, z):
     return (η if z else (1.0 - η))
 
@@ -6550,11 +6589,11 @@ def Descent_Portability_ThreeLocusInformation_direction():
 def degrees():
     return _rt.VecFn([_rt.VecFn([2.0, 2.0, 0.0]), _rt.VecFn([2.0, 0.0, 2.0]), _rt.VecFn([0.0, 2.0, 2.0]), _rt.VecFn([2.0, 1.0, 1.0]), _rt.VecFn([1.0, 2.0, 1.0]), _rt.VecFn([1.0, 1.0, 2.0])])
 
-def coefficients():
+def Descent_Portability_ThreeLocusInformation_coefficients():
     return _rt.VecFn([1.0, 1.0, 1.0, (-1.0), (-1.0), (-1.0)])
 
 def statistic(x):
-    return tensorCombination(degrees(), coefficients(), x)
+    return tensorCombination(degrees(), Descent_Portability_ThreeLocusInformation_coefficients(), x)
 
 def permuted(A, π):
     return (lambda i, j: A[int((π(i)))][int((π(j)))])

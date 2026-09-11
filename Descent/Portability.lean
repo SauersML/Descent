@@ -480,6 +480,10 @@ import Descent.Portability.FiniteAuditDesignConvexity
 import Descent.Portability.IndependentRadialLaws
 import Descent.Portability.MarginalSupportBound
 
+import Descent.Portability.CouplingPolytopeExtrema
+
+import Descent.Portability.DecisionDirectedAuditDesign
+
 assert_below Descent.Program
 
 /-!
