@@ -474,7 +474,7 @@ theorem turnover_mechanisms_share_marginals (m : ℝ) (hm : -1 ≤ m) (hm' : m �
     simp only [independentSigns, sgn_sq, mul_one]
     exact sum_bernoulliSign n m
   · rw [synchronizedTurnover, weightedExp_apply, Fintype.sum_bool]
-    simp only [synchronizedSigns, sgn_sq, sgn_true, sgn_false]
+    simp only [synchronizedSigns, sgn_true, sgn_false]
     ring
 
 /-- Cross-locus second moments of the independent mechanism. -/
