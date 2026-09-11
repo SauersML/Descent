@@ -282,7 +282,8 @@ theorem addRates_positivePartRates_add {D : ℕ} (x y : RateCoordinates D) :
   · funext deme
     simp only [addRates, positivePartRates, Prod.fst_add, Prod.fst_neg, Pi.add_apply,
       Pi.neg_apply]
-    linarith [rate_positivePart_sub_negativePart (x.1 deme), rate_positivePart_sub_negativePart (y.1 deme),
+    linarith [rate_positivePart_sub_negativePart (x.1 deme),
+      rate_positivePart_sub_negativePart (y.1 deme),
       rate_positivePart_sub_negativePart (x.1 deme + y.1 deme)]
   · funext source target
     simp only [addRates, positivePartRates, Prod.fst_add, Prod.snd_add, Prod.fst_neg,
@@ -295,12 +296,14 @@ theorem addRates_positivePartRates_add {D : ℕ} (x y : RateCoordinates D) :
   · funext deme
     simp only [addRates, positivePartRates, Prod.fst_add, Prod.snd_add, Prod.fst_neg,
       Prod.snd_neg, Pi.add_apply, Pi.neg_apply]
-    linarith [rate_positivePart_sub_negativePart (x.2.2.1 deme), rate_positivePart_sub_negativePart (y.2.2.1 deme),
+    linarith [rate_positivePart_sub_negativePart (x.2.2.1 deme),
+      rate_positivePart_sub_negativePart (y.2.2.1 deme),
       rate_positivePart_sub_negativePart (x.2.2.1 deme + y.2.2.1 deme)]
   · funext deme
     simp only [addRates, positivePartRates, Prod.snd_add, Prod.snd_neg, Pi.add_apply,
       Pi.neg_apply]
-    linarith [rate_positivePart_sub_negativePart (x.2.2.2 deme), rate_positivePart_sub_negativePart (y.2.2.2 deme),
+    linarith [rate_positivePart_sub_negativePart (x.2.2.2 deme),
+      rate_positivePart_sub_negativePart (y.2.2.2 deme),
       rate_positivePart_sub_negativePart (x.2.2.2 deme + y.2.2.2 deme)]
 
 /-- The positive parts of a positive multiple balance against the scaled positive parts. -/
