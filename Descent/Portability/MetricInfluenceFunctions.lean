@@ -20,7 +20,9 @@ is `|ε| < sqrt p_min`. `mse_influence` is equation (5.3). `ratio_influence` is 
 single quotient rule behind equations (5.5) and (5.6), specialised to
 `precision_influence`, `recall_influence` and `f1_influence`.
 `log_squared_correlation_influence` is equation (5.4), built from
-`lawCov_influence` and `lawVar_influence`. The geometry these
+`lawCov_influence` and `lawVar_influence`. `etaD_influence` is equation (5.7),
+built from `secondMomentOfMeans_influence`, which is the manuscript's `C'` step
+on the positive distance cells, and `betweenVar_influence`. The geometry these
 feed is `Descent.Portability.MetricResponseEllipsoid`, whose `wInner` is the
 inner product used throughout.
 -/
