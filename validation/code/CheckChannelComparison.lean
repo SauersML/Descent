@@ -24,3 +24,5 @@ import Descent.Portability.ChannelComparison
 #print axioms Descent.Portability.ChannelComparison.closestGarbling_nonneg
 #print axioms Descent.Portability.ChannelComparison.closestGarbling_row_sum
 #print axioms Descent.Portability.ChannelComparison.closestGarbling_min
+#print axioms Descent.Portability.ChannelComparison.uniformGarbling_nonneg
+#print axioms Descent.Portability.ChannelComparison.uniformGarbling_row_sum

@@ -19,7 +19,8 @@ proves both directions of TQ Theorem 4.9 / UPT Theorem 6.5: `B` is a garbling of
 `A` exactly when `A` is never worse in any finite decision problem. The converse
 is the manuscript's nearest-point argument, made unconditional here by
 `closestGarbling`, the nearest garbling handed over as data and built by
-compactness of a product of standard simplices,
+compactness of a product of standard simplices around the explicit
+`uniformGarbling`,
 `closest_garbling_variational` (the segment between garblings is a garbling), and
 the explicit separating decision problem built from the residual. The tie to the
 corpus is
@@ -145,23 +146,40 @@ theorem confusion_channel_risk_eq_decisionLoss (c : ConfusionMatrix) (lambda : �
   field_simp
   try ring
 
+/-- The garbling that ignores its input and reports a uniformly drawn signal.
+It is the explicit garbling every channel comparison starts from. -/
+def uniformGarbling (S T : Type*) [Fintype T] : S → T → ℝ :=
+  fun _ _ ↦ (Fintype.card T : ℝ)⁻¹
+
+/-- The uniform garbling has nonnegative entries. -/
+theorem uniformGarbling_nonneg (S T : Type*) [Fintype T] (x : S) (y : T) :
+    0 ≤ uniformGarbling S T x y := by
+  simp only [uniformGarbling]
+  positivity
+
+/-- The uniform garbling is row-stochastic on a nonempty signal set. -/
+theorem uniformGarbling_row_sum (S T : Type*) [Fintype T] [Nonempty T] (x : S) :
+    ∑ y, uniformGarbling S T x y = 1 := by
+  simp only [uniformGarbling]
+  rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul,
+    mul_inv_cancel₀ (Nat.cast_ne_zero.mpr Fintype.card_ne_zero)]
+
 /-- **The compactness step of the converse.** The channels reachable from `A` by
 a garbling form the continuous image of a product of standard simplices, hence a
 compact set, so the squared distance from `B` to that set is attained. No
-convexity is used here; the minimiser is what the variational argument needs. -/
-theorem exists_closest_garbling [Nonempty Y] (A : Θ → X → ℝ) (B : Θ → Y → ℝ) :
+convexity is used here; the minimiser is what the variational argument needs.
+The nonemptiness of the search set is supplied by an explicit garbling the caller
+hands over, so nothing here rests on a bare nonemptiness assumption. -/
+theorem exists_closest_garbling (A : Θ → X → ℝ) (B : Θ → Y → ℝ) (G₀ : X → Y → ℝ)
+    (h00 : ∀ x y, 0 ≤ G₀ x y) (h01 : ∀ x, ∑ y, G₀ x y = 1) :
     ∃ G : X → Y → ℝ, (∀ x y, 0 ≤ G x y) ∧ (∀ x, ∑ y, G x y = 1) ∧
       ∀ G' : X → Y → ℝ, (∀ x y, 0 ≤ G' x y) → (∀ x, ∑ y, G' x y = 1) →
         ∑ θ, ∑ y, (B θ y - chanCompose A G θ y) ^ 2 ≤
           ∑ θ, ∑ y, (B θ y - chanCompose A G' θ y) ^ 2 := by
-  classical
   have hcompact : IsCompact (Set.univ.pi (fun _ : X ↦ stdSimplex ℝ Y)) :=
     isCompact_univ_pi fun _ ↦ isCompact_stdSimplex Y
-  have hne : (Set.univ.pi (fun _ : X ↦ stdSimplex ℝ Y)).Nonempty := by
-    refine ⟨fun _ y ↦ if y = Classical.arbitrary Y then 1 else 0, Set.mem_univ_pi.mpr ?_⟩
-    intro x
-    refine ⟨fun y ↦ ?_, by simp⟩
-    by_cases hy : y = Classical.arbitrary Y <;> simp [hy]
+  have hne : (Set.univ.pi (fun _ : X ↦ stdSimplex ℝ Y)).Nonempty :=
+    ⟨G₀, Set.mem_univ_pi.mpr fun x ↦ ⟨fun y ↦ h00 x y, h01 x⟩⟩
   have hcont : Continuous (fun G : X → Y → ℝ ↦
       ∑ θ, ∑ y, (B θ y - chanCompose A G θ y) ^ 2) := by
     simp only [chanCompose]
@@ -179,17 +197,20 @@ theorem exists_closest_garbling [Nonempty Y] (A : Θ → X → ℝ) (B : Θ → 
 not merely its existence: this is the garbling of `A` whose composed channel is
 closest to `B` in squared distance. -/
 def closestGarbling [Nonempty Y] (A : Θ → X → ℝ) (B : Θ → Y → ℝ) : X → Y → ℝ :=
-  Classical.choose (exists_closest_garbling A B)
+  Classical.choose (exists_closest_garbling A B (uniformGarbling X Y)
+    (uniformGarbling_nonneg X Y) (uniformGarbling_row_sum X Y))
 
 /-- The nearest garbling has nonnegative entries. -/
 theorem closestGarbling_nonneg [Nonempty Y] (A : Θ → X → ℝ) (B : Θ → Y → ℝ)
     (x : X) (y : Y) : 0 ≤ closestGarbling A B x y :=
-  (Classical.choose_spec (exists_closest_garbling A B)).1 x y
+  (Classical.choose_spec (exists_closest_garbling A B (uniformGarbling X Y)
+    (uniformGarbling_nonneg X Y) (uniformGarbling_row_sum X Y))).1 x y
 
 /-- The rows of the nearest garbling sum to one, so it is a garbling. -/
 theorem closestGarbling_row_sum [Nonempty Y] (A : Θ → X → ℝ) (B : Θ → Y → ℝ)
     (x : X) : ∑ y, closestGarbling A B x y = 1 :=
-  (Classical.choose_spec (exists_closest_garbling A B)).2.1 x
+  (Classical.choose_spec (exists_closest_garbling A B (uniformGarbling X Y)
+    (uniformGarbling_nonneg X Y) (uniformGarbling_row_sum X Y))).2.1 x
 
 /-- **Minimality of the nearest garbling.** No garbling of `A` composes to a
 channel closer to `B`, so this value is the argument minimum the variational
@@ -198,7 +219,8 @@ theorem closestGarbling_min [Nonempty Y] (A : Θ → X → ℝ) (B : Θ → Y �
     (G : X → Y → ℝ) (h0 : ∀ x y, 0 ≤ G x y) (h1 : ∀ x, ∑ y, G x y = 1) :
     ∑ θ, ∑ y, (B θ y - chanCompose A (closestGarbling A B) θ y) ^ 2 ≤
       ∑ θ, ∑ y, (B θ y - chanCompose A G θ y) ^ 2 :=
-  (Classical.choose_spec (exists_closest_garbling A B)).2.2 G h0 h1
+  (Classical.choose_spec (exists_closest_garbling A B (uniformGarbling X Y)
+    (uniformGarbling_nonneg X Y) (uniformGarbling_row_sum X Y))).2.2 G h0 h1
 
 /-- A quadratic in `t` that is nonnegative throughout `[0, 1]` and has a
 nonnegative leading coefficient has a nonpositive linear coefficient. This is the
