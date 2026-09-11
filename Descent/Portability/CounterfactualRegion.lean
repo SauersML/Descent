@@ -126,11 +126,18 @@ theorem counterfactual_mean_attains (E : ExpFunctional Ω) (xval : Ω → X) (yv
     · rw [expectation_counterfactualOutcome, div_mul_cancel₀ _ (ne_of_gt hpos)]
       ring
 
-/-- The sign attached to a fair exogenous draw in the two-model construction. -/
-def signOf (draw : Bool) : ℝ := if draw then 1 else -1
+/-- The sign attached to a fair exogenous draw in the two-model construction. It is the
+corpus sign map itself, called rather than restated, so there is one sign convention. -/
+def signOf : Bool → ℝ := TraitPortabilityRange.sign
 
 /-- The sign map here is the corpus sign map, not a second convention. -/
 theorem signOf_eq_sign : signOf = TraitPortabilityRange.sign := rfl
+
+/-- A true draw carries the positive sign. -/
+theorem signOf_true : signOf true = 1 := rfl
+
+/-- A false draw carries the negative sign. -/
+theorem signOf_false : signOf false = -1 := rfl
 
 /-- The first structural model's outcome equation, read on the pair of exposure and exogenous
 draw: the outcome copies the exposure. -/
@@ -158,7 +165,8 @@ theorem intervened_mean_first_model :
 so complete agreement of every observational report does not imply agreement of causes. -/
 theorem intervened_mean_second_model :
     uniformExp Bool (fun draw ↦ outcomeFromExogenous (1, signOf draw)) = 0 := by
-  simp [uniformExp_apply, outcomeFromExogenous, signOf, Fintype.card_bool]
+  simp [uniformExp_apply, outcomeFromExogenous, signOf, TraitPortabilityRange.sign,
+    Fintype.card_bool]
 
 end
 

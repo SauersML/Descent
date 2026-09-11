@@ -241,20 +241,6 @@ theorem policyValue_upperPolicy (step : S → Ctrl → FiniteReportLaw S) (termi
   policyValue_eq_of_step step terminal (upperPolicy step terminal)
     (upperValue step terminal) (fun _ ↦ rfl) (upperPolicy_attains step terminal)
 
-/-- The lower bound is attained by an admissible policy. -/
-theorem exists_lower_optimal_policy (step : S → Ctrl → FiniteReportLaw S)
-    (terminal : S → ℝ) :
-    ∃ policy : ℕ → S → Ctrl, ∀ (k : ℕ) (s : S),
-      policyValue step terminal policy k s = lowerValue step terminal k s :=
-  ⟨lowerPolicy step terminal, policyValue_lowerPolicy step terminal⟩
-
-/-- The upper bound is attained by an admissible policy. -/
-theorem exists_upper_optimal_policy (step : S → Ctrl → FiniteReportLaw S)
-    (terminal : S → ℝ) :
-    ∃ policy : ℕ → S → Ctrl, ∀ (k : ℕ) (s : S),
-      policyValue step terminal policy k s = upperValue step terminal k s :=
-  ⟨upperPolicy step terminal, policyValue_upperPolicy step terminal⟩
-
 /-- The values stay inside the range of the terminal report at every horizon. -/
 theorem lowerValue_mem_range (step : S → Ctrl → FiniteReportLaw S) (terminal : S → ℝ)
     (lo hi : ℝ) (hlo : ∀ s, lo ≤ terminal s) (hhi : ∀ s, terminal s ≤ hi) :

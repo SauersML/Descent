@@ -46,12 +46,15 @@ def signPairLaw (corr : ℝ) (hcorr : |corr| ≤ 1) : ExpFunctional (Bool × Boo
       intro draw
       have habs := abs_le.1 hcorr
       by_cases hd : draw.2
-      · simp only [CounterfactualRegion.signOf, if_pos hd, mul_one]
+      · simp only [CounterfactualRegion.signOf, TraitPortabilityRange.sign, if_pos hd,
+          mul_one]
         linarith [habs.1]
-      · simp only [CounterfactualRegion.signOf, if_neg hd, mul_neg_one]
+      · simp only [CounterfactualRegion.signOf, TraitPortabilityRange.sign, if_neg hd,
+          mul_neg_one]
         linarith [habs.2])
     (by
-      simp [Fintype.sum_prod_type, Fintype.sum_bool, CounterfactualRegion.signOf]
+      simp [Fintype.sum_prod_type, Fintype.sum_bool, CounterfactualRegion.signOf,
+        TraitPortabilityRange.sign]
       ring)
 
 /-- The scored variable: the fair sign itself. -/
@@ -77,40 +80,40 @@ theorem signPairLaw_apply (corr : ℝ) (hcorr : |corr| ≤ 1) (statistic : Bool 
       ((1 + corr) * (statistic (true, true) + statistic (false, true)) +
         (1 - corr) * (statistic (true, false) + statistic (false, false))) / 4 := by
   simp [signPairLaw, weightedExp_apply, Fintype.sum_prod_type, Fintype.sum_bool,
-    CounterfactualRegion.signOf]
+    CounterfactualRegion.signOf, TraitPortabilityRange.sign]
   ring
 
 /-- The score has mean zero. -/
 theorem signPairLaw_mean_score (corr : ℝ) (hcorr : |corr| ≤ 1) :
     signPairLaw corr hcorr scoreVar = 0 := by
   rw [signPairLaw_apply]
-  simp [scoreVar, CounterfactualRegion.signOf]
+  simp [scoreVar, CounterfactualRegion.signOf, TraitPortabilityRange.sign]
 
 /-- The outcome has mean zero. -/
 theorem signPairLaw_mean_outcome (corr : ℝ) (hcorr : |corr| ≤ 1) :
     signPairLaw corr hcorr outcomeVar = 0 := by
   rw [signPairLaw_apply]
-  simp [outcomeVar, CounterfactualRegion.signOf]
+  simp [outcomeVar, CounterfactualRegion.signOf, TraitPortabilityRange.sign]
 
 /-- The score has variance one. -/
 theorem signPairLaw_variance_score (corr : ℝ) (hcorr : |corr| ≤ 1) :
     variance (signPairLaw corr hcorr) scoreVar = 1 := by
   rw [variance, signPairLaw_mean_score, signPairLaw_apply]
-  simp [scoreVar, CounterfactualRegion.signOf]
+  simp [scoreVar, CounterfactualRegion.signOf, TraitPortabilityRange.sign]
   ring
 
 /-- The outcome has variance one. -/
 theorem signPairLaw_variance_outcome (corr : ℝ) (hcorr : |corr| ≤ 1) :
     variance (signPairLaw corr hcorr) outcomeVar = 1 := by
   rw [variance, signPairLaw_mean_outcome, signPairLaw_apply]
-  simp [outcomeVar, CounterfactualRegion.signOf]
+  simp [outcomeVar, CounterfactualRegion.signOf, TraitPortabilityRange.sign]
   ring
 
 /-- The covariance of score and outcome is exactly the prescribed correlation. -/
 theorem signPairLaw_covariance (corr : ℝ) (hcorr : |corr| ≤ 1) :
     covariance (signPairLaw corr hcorr) scoreVar outcomeVar = corr := by
   rw [covariance, signPairLaw_mean_score, signPairLaw_mean_outcome, signPairLaw_apply]
-  simp [scoreVar, outcomeVar, CounterfactualRegion.signOf]
+  simp [scoreVar, outcomeVar, CounterfactualRegion.signOf, TraitPortabilityRange.sign]
   ring
 
 /-- The squared correlation of this four-point law is exactly the square of the prescribed
