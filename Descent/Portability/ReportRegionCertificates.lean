@@ -156,11 +156,15 @@ theorem not_mem_reportRegion_iff_separating_contrast [Fintype J] [DecidableEq J]
     obtain ⟨f, level, hlt, hgt⟩ :=
       geometric_hahn_banach_closed_point (reportRegion_convex observe observed reportTable)
         (reportRegion_isCompact observe observed reportTable).isClosed hr
-    refine ⟨fun j ↦ f (Pi.single j 1), fun r' hr' ↦ ?_⟩
-    have hform : ∀ x : J → ℝ, pairing (fun j ↦ f (Pi.single j 1)) x = f x := by
+    refine ⟨fun i ↦ f fun j ↦ if i = j then (1 : ℝ) else 0, fun r' hr' ↦ ?_⟩
+    have hform : ∀ x : J → ℝ,
+        pairing (fun i ↦ f fun j ↦ if i = j then (1 : ℝ) else 0) x = f x := by
       intro x
-      rw [(f : (J → ℝ) →ₗ[ℝ] ℝ).pi_apply_eq_sum_univ x]
-      simp [pairing, mul_comm]
+      have hx := LinearMap.pi_apply_eq_sum_univ (f : (J → ℝ) →ₗ[ℝ] ℝ) x
+      simp only [ContinuousLinearMap.coe_coe] at hx
+      rw [hx]
+      simp only [pairing]
+      exact Finset.sum_congr rfl fun j _ ↦ by rw [smul_eq_mul]; ring
     rw [hform, hform]
     exact lt_trans (hlt r' hr') hgt
   · rintro ⟨u, hu⟩ hr
