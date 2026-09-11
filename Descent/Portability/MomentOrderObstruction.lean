@@ -16,12 +16,13 @@ of a test function differ by exactly `2^{-k}` times its `(k+1)`-st finite differ
 The hypotheses are the manuscript's domain conditions: a polynomial of degree at most
 `k` for the matching statement, a nonzero finite difference for the separation.
 
-The annihilation step is Mathlib's `Polynomial.fwdDiff_iter_eq_zero_of_degree_lt`. The
-step from "real analytic and not a polynomial" to "some finite difference is nonzero"
-is a Taylor estimate that is NOT formalized here; instead each concrete report below
-comes with an explicit nonzero finite difference, and the "for every finite `k`" form of
-DC Theorems 8.3 and 8.4 is proved unconditionally through
-`RadialInterpolation.radial_report_gap`, which needs no analyticity at all. The laws are
+The annihilation step is Mathlib's `Polynomial.fwdDiff_iter_eq_zero_of_degree_lt`.
+Lemma 8.2's separation hypothesis is discharged here in a form stronger than the
+manuscript's: a report that is merely bounded and nonconstant, with no analyticity, has a
+nonzero forward difference at every order, because doubling the step multiplies the
+top-order difference by `2^k` and a uniform bound cannot survive that. Both concrete
+reports qualify. The "for every finite `k`" form of DC Theorems 8.3 and 8.4 is also
+available through `RadialInterpolation.radial_report_gap`. The laws are
 `Portability.weightedExp` probability vectors on `Fin (k+2)`.
 -/
 
@@ -711,6 +712,52 @@ theorem bounded_nonconstant_separates (k : ℕ) (f : ℝ → ℝ) (M : ℝ)
   intro hzero
   rw [fwdDiff_iter_eq_alternating k a step f, hzero, mul_zero] at hne
   exact hne rfl
+
+/-- **DC Theorem 8.3, finite-difference route.** The group partial squared correlation
+along the outcome line is bounded and nonconstant, so at every finite order the two
+parity laws report different expected partial squared correlations. -/
+theorem partial_r2_parity_separates (k : ℕ) {N : Type*} [Fintype N] [DecidableEq N]
+    (z u : N → ℝ) (hzu : dot z u = 0) (hnorm : dot u u = dot z z) (hz : dot z z ≠ 0) :
+    ∃ a step : ℝ,
+      parityExp k false
+          (fun j ↦ partialR2 z (lineOutcome z u (a + (j : ℕ) * step))) ≠
+        parityExp k true
+          (fun j ↦ partialR2 z (lineOutcome z u (a + (j : ℕ) * step))) := by
+  refine bounded_nonconstant_separates k
+    (fun x ↦ partialR2 z (lineOutcome z u x)) 1 (fun x ↦ ?_) ⟨1, ?_⟩
+  · show |partialR2 z (lineOutcome z u x)| ≤ 1
+    rw [partialR2_line z u hzu hnorm hz, abs_le]
+    have hd : (0 : ℝ) < 1 + x ^ 2 := by positivity
+    constructor
+    · have h0 : (0 : ℝ) ≤ x ^ 2 / (1 + x ^ 2) := div_nonneg (sq_nonneg x) hd.le
+      linarith
+    · rw [div_le_one hd]
+      nlinarith [sq_nonneg x]
+  · show partialR2 z (lineOutcome z u 1) ≠ partialR2 z (lineOutcome z u 0)
+    rw [partialR2_line z u hzu hnorm hz, partialR2_line z u hzu hnorm hz]
+    norm_num
+
+/-- **DC Theorem 8.4, finite-difference route.** The fitted individual
+loss-explainability along the outcome line is bounded and nonconstant, so at every finite
+order the two parity laws report different expected fitted reports. -/
+theorem loss_report_parity_separates (k : ℕ) :
+    ∃ a step : ℝ,
+      parityExp k false (fun j ↦ lossReport (lineResidual (a + (j : ℕ) * step))) ≠
+        parityExp k true (fun j ↦ lossReport (lineResidual (a + (j : ℕ) * step))) := by
+  refine bounded_nonconstant_separates k (fun x ↦ lossReport (lineResidual x)) 1
+    (fun x ↦ ?_) ⟨1, ?_⟩
+  · have hden : (0 : ℝ) < x ^ 4 - x ^ 2 + 1 := by nlinarith [sq_nonneg (x ^ 2 - 1 / 2)]
+    show |lossReport (lineResidual x)| ≤ 1
+    rw [lossReport_line, abs_le]
+    constructor
+    · have h0 : (0 : ℝ) ≤ (x ^ 2 - 2) ^ 2 / (4 * (x ^ 4 - x ^ 2 + 1)) :=
+        div_nonneg (sq_nonneg _) (by linarith)
+      linarith
+    · rw [div_le_one (by linarith)]
+      nlinarith [sq_nonneg (x ^ 2)]
+  · show lossReport (lineResidual 1) ≠ lossReport (lineResidual 0)
+    rw [lossReport_line, lossReport_line]
+    norm_num
 
 end FiniteDifferenceRigidity
 

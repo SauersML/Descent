@@ -260,7 +260,7 @@ theorem noise_fourth_moment_projection_nonneg (KN : ExpFunctional N) (e : N → 
 
 /-- TQ (2.9): the completed-square form, exhibiting the minimum, the skewness
 square and the nonnegative kurtosis remainder as separate terms. -/
-theorem additive_noise_cell_loss_variance_completed (KG : ExpFunctional G)
+theorem additive_noise_cell_loss_variance_square_form (KG : ExpFunctional G)
     (KN : ExpFunctional N) (g : G → ℝ) (e : N → ℝ) (a r J τ t₃ t₄ : ℝ)
     (hmean : KN e = 0) (ha : KG g = a) (hr : KG (fun γ ↦ g γ ^ 2) = r)
     (hJ : KG (fun γ ↦ g γ ^ 4) = J) (hτ : KN (fun n ↦ e n ^ 2) = τ)
@@ -308,7 +308,7 @@ theorem additive_noise_cell_loss_variance_lower_bound (KG : ExpFunctional G)
       ≤ variance (mixture KG (fun _ ↦ KN)) (fun z ↦ (g z.1 + e z.2) ^ 2) := by
   rw [minCellLossVariance_eq_raw_moments KG g (KG g) (KG (fun γ ↦ g γ ^ 2))
     (KG (fun γ ↦ g γ ^ 4)) τ rfl rfl rfl,
-    additive_noise_cell_loss_variance_completed KG KN g e (KG g)
+    additive_noise_cell_loss_variance_square_form KG KN g e (KG g)
       (KG (fun γ ↦ g γ ^ 2)) (KG (fun γ ↦ g γ ^ 4)) τ (KN (fun n ↦ e n ^ 3))
       (KN (fun n ↦ e n ^ 4)) hmean rfl rfl rfl hτ rfl rfl hτpos]
   have h1 : 0 ≤ (KN (fun n ↦ e n ^ 3) + 2 * KG g * τ) ^ 2 / τ :=
