@@ -599,7 +599,9 @@ theorem enlargedGenerator_mulVec_stored {D : ℕ} (rates : ManyDemeLDRates D)
       ∑ pair : Fin D × Fin D,
         rightHeterozygosityMutationCoupling rates row pair.1 pair.2 *
           vector (some (.inl (.H pair.1 pair.2))) := by
-    refine sum_heterozygosity_columns _ ?_
+    refine sum_heterozygosity_columns
+      (fun coordinate ↦ storedHeterozygosityMutationCoupling rates row coordinate *
+        vector (some (.inl coordinate))) ?_
     intro coordinate hcoordinate
     rcases coordinate with ⟨k, l⟩ | ⟨k, l⟩ | ⟨k, l, m⟩ | ⟨k, l, m, n⟩
     · exact absurd rfl (hcoordinate k l)
