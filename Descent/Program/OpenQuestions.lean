@@ -64,6 +64,7 @@ import Descent.Portability.ApproximationDuality
 import Descent.Portability.RadialInterpolation
 import Descent.Portability.RadialReportLaws
 import Descent.Portability.IndependentRadialLaws
+import Descent.Portability.SmoothedCoordinateLaws
 import Descent.Portability.MomentOrderObstruction
 import Descent.Portability.DenominatorAwareRecovery
 import Descent.Portability.ConditionalOscillationDuality
@@ -200,7 +201,8 @@ form, the scope line says so and the module docstring repeats it.
   extremal coadapted path laws exist at every finite horizon (truncation to the horizon and
   a Tychonoff product of unit intervals), so the attainable report set is exactly a closed
   interval. `ContinuousTrajectoryRegion`: UPT (5.10) at the level of agreement paths, every
-  admissible path trapped in [e^{−2λt}, 1] and every value attained by an explicit path.
+  admissible path trapped in [e^{−2λt}, 1] and every value attained by an explicit path, with
+  the discrete terminal bound at step t/n refining to the continuous lower endpoint as n → ∞.
   Scope: (5.10) is proved for differentiable paths and about paths rather than the
   continuous-time couplings that generate them; all loci share one state alphabet; the
   continuous-time half of UPT 5.1 takes the transition semigroup through its defining
@@ -238,10 +240,11 @@ form, the scope line says so and the module docstring repeats it.
   explicit exponential-sum solution, verified clause by clause, unique by an integrating
   factor level by level, with a₃ and a₅ evaluated exactly, and the same values obtained as
   the odd-level generator's semigroup applied to the initial square report through the Euler
-  limit.
-  Scope: the Duhamel form of DC (4.8) is stated through its generator; the identification of
-  the odd-level generator with the lumping of the minimizing count chain is stated in the
-  module's own terms.
+  limit; the odd-level generator is the lumping of the symmetric nearest-drift count generator
+  under the aggregate map, the lumping intertwines the semigroups (reusable rectangular
+  intertwining lemmas through powers, Euler approximants and the exponential), so aₙ(t) is
+  exactly the expected terminal square under the minimizing count chain in continuous time.
+  Scope: the Duhamel form of DC (4.8) is stated through its generator.
 
 ### Question 3: metric dependence
 
@@ -296,12 +299,15 @@ form, the scope line says so and the module docstring repeats it.
 * `ApproximationDuality`: PL Theorem 8.1, the largest report disagreement compatible with the
   supplied moments is exactly twice the best uniform approximation error, with the extremal
   moment-matched pair built by separation and both optimal-recovery halves.
-* `RadialInterpolation`, `RadialReportLaws`, `IndependentRadialLaws`: PL Lemma 7.1,
+* `RadialInterpolation`, `RadialReportLaws`, `IndependentRadialLaws`, `SmoothedCoordinateLaws`:
+  PL Lemma 7.1,
   Theorem 7.2 with (7.4), Corollary 7.3 in both its expectation form and its
   total-variation form ((7.6): each direction marginal is within b/(a+b) of its target in
   `FiniteReportLaw.totalVariation`, hence so is every report law), Corollary 7.5, and Theorem
-  7.4's independent finite-support core: for every finite raw-moment order, matched laws
-  whose expected scale-invariant report sits arbitrarily close to opposite ends of its range.
+  7.4's independent finite-support core (for every finite raw-moment order, matched laws
+  whose expected scale-invariant report sits arbitrarily close to opposite ends of its range)
+  together with its smoothing step: convolving each coordinate with uniform noise preserves
+  exact moment matching through any degree and yields a bounded density.
 * `MomentOrderObstruction`: DC Lemmas 8.1-8.2 and Theorems 8.3-8.4, no finite joint-moment
   order identifies expected partial R² or expected fitted loss-explainability, with the exact
   instances 27/1768 and −24900075/1099632872; Lemma 8.2 is proved in a stronger form than
@@ -311,9 +317,9 @@ form, the scope line says so and the module docstring repeats it.
 * `DenominatorAwareRecovery`: PL Theorem 9.1, Chebyshev recovery with its closed-form error
   level. `ConditionalOscillationDuality`: PL Theorem 8.2 and Corollary 8.3 as one duality
   theorem in the noise level.
-  Scope: the absolutely-continuous refinement of PL 7.4 (convolution with a uniform law,
-  the null zero set of a nonzero polynomial, and the Fubini step) is not formalized; its
-  independent finite-support core is.
+  Scope: in the absolutely-continuous refinement of PL 7.4 the product of the smoothed
+  marginals and the convergence of the expected fitted report under it are not formalized;
+  the independent finite-support core and the smoothing step are.
 
 ### The pipeline: finite report laws, regions and identification
 

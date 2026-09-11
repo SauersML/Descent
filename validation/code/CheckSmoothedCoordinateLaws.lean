@@ -15,3 +15,9 @@ import Descent.Portability.SmoothedCoordinateLaws
 #print axioms Descent.Portability.SmoothedCoordinateLaws.smoothDensity_integral
 #print axioms Descent.Portability.SmoothedCoordinateLaws.radial_smoothed_moment_match
 #print axioms Descent.Portability.SmoothedCoordinateLaws.radial_smoothDensity_le
+#print axioms Descent.Portability.SmoothedCoordinateLaws.smoothedLaw_absolutelyContinuous
+#print axioms Descent.Portability.SmoothedCoordinateLaws.smoothedLaw_univ
+#print axioms Descent.Portability.SmoothedCoordinateLaws.smoothedLaw_moment
+#print axioms Descent.Portability.SmoothedCoordinateLaws.smoothedLaw_moment_match
+#print axioms Descent.Portability.SmoothedCoordinateLaws.radial_smoothedLaw_moment_match
+#print axioms Descent.Portability.SmoothedCoordinateLaws.radial_smoothedLaw_univ

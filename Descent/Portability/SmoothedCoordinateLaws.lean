@@ -199,6 +199,112 @@ theorem radial_smoothDensity_le {k : ℕ} (r : Fin (k + 1) → ℝ)
   smoothDensity_le (radialLaw r s) (coordValue r a b) (radialLaw_nonneg r s)
     (radialLaw_sum r hinj s) ε hε y
 
+/-- **The smoothed coordinate law as a measure.** The `p`-weighted mixture of the uniform
+laws on the windows `[v z - ε, v z + ε]`. -/
+def smoothedLaw (p v : Z → ℝ) (ε : ℝ) : MeasureTheory.Measure ℝ :=
+  ∑ z, (ENNReal.ofReal (p z / (2 * ε))) •
+    MeasureTheory.volume.restrict (Set.Icc (v z - ε) (v z + ε))
+
+/-- The smoothed law is absolutely continuous: it has no mass on a Lebesgue-null set. -/
+theorem smoothedLaw_absolutelyContinuous (p v : Z → ℝ) (ε : ℝ) :
+    (smoothedLaw p v ε).AbsolutelyContinuous MeasureTheory.volume := by
+  intro t ht
+  unfold smoothedLaw
+  rw [MeasureTheory.Measure.finset_sum_apply]
+  refine Finset.sum_eq_zero fun z _ ↦ ?_
+  have hac : (MeasureTheory.volume.restrict
+      (Set.Icc (v z - ε) (v z + ε))).AbsolutelyContinuous MeasureTheory.volume :=
+    MeasureTheory.Measure.absolutelyContinuous_of_le MeasureTheory.Measure.restrict_le_self
+  rw [MeasureTheory.Measure.smul_apply, hac ht]
+  simp
+
+/-- The smoothed law is a probability measure. -/
+theorem smoothedLaw_univ (p v : Z → ℝ) (hp : ∀ z, 0 ≤ p z) (hps : ∑ z, p z = 1)
+    (ε : ℝ) (hε : 0 < ε) : smoothedLaw p v ε Set.univ = 1 := by
+  have h2 : (0 : ℝ) < 2 * ε := by linarith
+  have hεne : ε ≠ 0 := hε.ne'
+  have hterm : ∀ z : Z,
+      ((ENNReal.ofReal (p z / (2 * ε))) •
+        MeasureTheory.volume.restrict (Set.Icc (v z - ε) (v z + ε))) Set.univ =
+        ENNReal.ofReal (p z) := by
+    intro z
+    have harg : p z / (2 * ε) * (v z + ε - (v z - ε)) = p z := by
+      field_simp
+      ring
+    rw [MeasureTheory.Measure.smul_apply, MeasureTheory.Measure.restrict_apply_univ,
+      Real.volume_Icc, smul_eq_mul,
+      ← ENNReal.ofReal_mul (div_nonneg (hp z) (by linarith)), harg]
+  unfold smoothedLaw
+  rw [MeasureTheory.Measure.finset_sum_apply,
+    Finset.sum_congr rfl fun z _ ↦ hterm z,
+    ← ENNReal.ofReal_sum_of_nonneg fun z _ ↦ hp z, hps, ENNReal.ofReal_one]
+
+/-- **The moment of the smoothed law** is the convolved moment formula. -/
+theorem smoothedLaw_moment (p v : Z → ℝ) (hp : ∀ z, 0 ≤ p z) (ε : ℝ) (hε : 0 < ε)
+    (j : ℕ) :
+    ∫ y, y ^ j ∂(smoothedLaw p v ε) =
+      ∑ z, p z * ((1 / (2 * ε)) * ∫ u in (-ε)..ε, (v z + u) ^ j) := by
+  have h2 : (0 : ℝ) < 2 * ε := by linarith
+  have hInt : ∀ z ∈ (Finset.univ : Finset Z),
+      MeasureTheory.Integrable (fun y : ℝ ↦ y ^ j)
+        ((ENNReal.ofReal (p z / (2 * ε))) •
+          MeasureTheory.volume.restrict (Set.Icc (v z - ε) (v z + ε))) := by
+    intro z _
+    have hbase : MeasureTheory.Integrable (fun y : ℝ ↦ y ^ j)
+        (MeasureTheory.volume.restrict (Set.Icc (v z - ε) (v z + ε))) :=
+      (continuous_pow j).integrableOn_Icc
+    exact hbase.smul_measure (by simp)
+  have hwin : ∀ z : Z,
+      (∫ y, y ^ j ∂((ENNReal.ofReal (p z / (2 * ε))) •
+        MeasureTheory.volume.restrict (Set.Icc (v z - ε) (v z + ε)))) =
+        p z * ((1 / (2 * ε)) * ∫ u in (-ε)..ε, (v z + u) ^ j) := by
+    intro z
+    rw [MeasureTheory.integral_smul_measure,
+      ENNReal.toReal_ofReal (div_nonneg (hp z) (by linarith)), smul_eq_mul]
+    have hIcc : (∫ y, y ^ j ∂(MeasureTheory.volume.restrict
+        (Set.Icc (v z - ε) (v z + ε)))) = ∫ y in (v z - ε)..(v z + ε), y ^ j := by
+      rw [intervalIntegral.integral_of_le (by linarith),
+        MeasureTheory.integral_Icc_eq_integral_Ioc]
+    have hshift : (∫ y in (v z - ε)..(v z + ε), y ^ j) =
+        ∫ u in (-ε)..ε, (v z + u) ^ j := by
+      rw [intervalIntegral.integral_comp_add_left (fun y : ℝ ↦ y ^ j) (v z)]
+      congr 1 <;> ring
+    rw [hIcc, hshift]
+    field_simp
+  unfold smoothedLaw
+  rw [MeasureTheory.integral_finset_sum_measure hInt]
+  exact Finset.sum_congr rfl fun z _ ↦ hwin z
+
+/-- **PL Theorem 7.4, coordinate level.** Two coordinate laws whose raw moments agree
+through degree `k` become, after the same uniform smoothing, two absolutely continuous
+probability laws with densities bounded by `1/(2ε)` whose raw moments still agree
+through degree `k`. -/
+theorem smoothedLaw_moment_match (p q v : Z → ℝ) (hp : ∀ z, 0 ≤ p z)
+    (hq : ∀ z, 0 ≤ q z) (k : ℕ)
+    (hmatch : ∀ r, r ≤ k → (∑ z, p z * v z ^ r) = ∑ z, q z * v z ^ r)
+    (ε : ℝ) (hε : 0 < ε) (j : ℕ) (hj : j ≤ k) :
+    ∫ y, y ^ j ∂(smoothedLaw p v ε) = ∫ y, y ^ j ∂(smoothedLaw q v ε) := by
+  rw [smoothedLaw_moment p v hp ε hε j, smoothedLaw_moment q v hq ε hε j]
+  exact smoothed_moment_match p q v k hmatch ε j hj
+
+/-- **PL Theorem 7.4, smoothed radial coordinate laws.** The two radial coordinate laws
+smoothed by the same uniform noise are absolutely continuous probability laws whose raw
+moments agree through degree `k`. -/
+theorem radial_smoothedLaw_moment_match {k : ℕ} (r : Fin (k + 1) → ℝ)
+    (hinj : Function.Injective r) (a b ε : ℝ) (hε : 0 < ε) (j : ℕ) (hj : j ≤ k) :
+    ∫ y, y ^ j ∂(smoothedLaw (radialLaw r false) (coordValue r a b) ε) =
+      ∫ y, y ^ j ∂(smoothedLaw (radialLaw r true) (coordValue r a b) ε) :=
+  smoothedLaw_moment_match (radialLaw r false) (radialLaw r true) (coordValue r a b)
+    (radialLaw_nonneg r false) (radialLaw_nonneg r true) k
+    (fun m hm ↦ coord_moment_match r hinj a b m hm) ε hε j hj
+
+/-- The smoothed radial coordinate laws are probability measures. -/
+theorem radial_smoothedLaw_univ {k : ℕ} (r : Fin (k + 1) → ℝ)
+    (hinj : Function.Injective r) (s : Bool) (a b ε : ℝ) (hε : 0 < ε) :
+    smoothedLaw (radialLaw r s) (coordValue r a b) ε Set.univ = 1 :=
+  smoothedLaw_univ (radialLaw r s) (coordValue r a b) (radialLaw_nonneg r s)
+    (radialLaw_sum r hinj s) ε hε
+
 end
 
 end Descent.Portability.SmoothedCoordinateLaws
