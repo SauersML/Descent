@@ -5978,12 +5978,18 @@
    "Descent.Portability.HWEHierarchyGenerator.full_generator_limit",
    "Descent.Portability.HWEKernelTruncation.eventual_uniform_truncation",
    "Descent.Portability.HWEKernelTruncation.truncation_bound",
+   "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality",
+   "Descent.Portability.SpectralAuditAllocationLaw.one_row_dual",
+   "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective",
    "Descent.Portability.SpectralAuditDualCertificate.certificate_equality",
    "Descent.Portability.SpectralAuditDualCertificate.certified_optimum",
    "Descent.Portability.SpectralAuditDualCertificate.contribution_nonneg",
    "Descent.Portability.SpectralAuditDualCertificate.lagrangian_identity",
    "Descent.Portability.SpectralAuditDualCertificate.positive_multiplier_choice",
    "Descent.Portability.SpectralAuditDualCertificate.weak_duality",
+   "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality",
    "Descent.Spectral.spectrum_recoverable_architecture_not"
   ],
   "constraints": {
@@ -6032,12 +6038,18 @@
     "Descent.Portability.HWEHierarchyGenerator.full_generator_limit": [],
     "Descent.Portability.HWEKernelTruncation.truncation_bound": [],
     "Descent.Portability.HWEKernelTruncation.eventual_uniform_truncation": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.one_row_dual": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law": [],
     "Descent.Portability.SpectralAuditDualCertificate.contribution_nonneg": [],
     "Descent.Portability.SpectralAuditDualCertificate.lagrangian_identity": [],
     "Descent.Portability.SpectralAuditDualCertificate.weak_duality": [],
     "Descent.Portability.SpectralAuditDualCertificate.certificate_equality": [],
     "Descent.Portability.SpectralAuditDualCertificate.certified_optimum": [],
     "Descent.Portability.SpectralAuditDualCertificate.positive_multiplier_choice": [],
+    "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality": [],
     "Descent.Spectral.spectrum_recoverable_architecture_not": []
    }
   }
@@ -39810,6 +39822,7 @@
    "Descent.Portability.SparseBinaryAudit.unbiased",
    "Descent.Portability.SparseBinaryAudit.variance_attained",
    "Descent.Portability.SparseBinaryAudit.variance_upper",
+   "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective",
    "Descent.Portability.SpectralAuditConfidence.directional_variance",
    "Descent.Portability.SpectralAuditCost.attained_cost_bound",
    "Descent.Portability.SpectralAuditCost.cost_lower_bound",
@@ -39819,6 +39832,7 @@
    "Descent.Portability.SpectralAuditDesign.objective_convex",
    "Descent.Portability.SpectralAuditDualCertificate.lagrangian_identity",
    "Descent.Portability.SpectralAuditDualCertificate.weak_duality",
+   "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality",
    "Descent.Portability.SpectralAuditTrace.positive_trace_bound",
    "Descent.Portability.SpectralAuditTrace.trace_le_dimension",
    "Descent.Portability.SpectralCostEquality.cost_equality_iff",
@@ -39828,6 +39842,10 @@
    "Descent.Portability.SpectralMeasurementMinimax.coordinate_prefixSpan",
    "Descent.Portability.SpectralMeasurementMinimax.leadingProcedure_upper",
    "Descent.Portability.SpectralMeasurementMinimax.prefixSpan_visible",
+   "Descent.Portability.SpectralOperatorEpigraph.epigraph_multipliers",
+   "Descent.Portability.SpectralOperatorEpigraph.residual_convex",
+   "Descent.Portability.SpectralTraceComplementarity.rayleigh_equality",
+   "Descent.Portability.SpectralTraceComplementarity.support_of_trace_equality",
    "Descent.Portability.StationaryPoissonLaw.stationary_poisson",
    "Descent.Portability.StoppedAncestralTiming.arrivalTimes_measurable",
    "Descent.Portability.StoppedAncestralTiming.arrivalTimes_support",
@@ -41605,6 +41623,7 @@
     "Descent.Portability.SparseBinaryAudit.unbiased": [],
     "Descent.Portability.SparseBinaryAudit.variance_upper": [],
     "Descent.Portability.SparseBinaryAudit.variance_attained": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective": [],
     "Descent.Portability.SpectralAuditConfidence.directional_variance": [],
     "Descent.Portability.SpectralAuditCost.trace_cost_lower": [],
     "Descent.Portability.SpectralAuditCost.cost_lower_bound": [],
@@ -41614,6 +41633,7 @@
     "Descent.Portability.SpectralAuditDesign.objective_continuous": [],
     "Descent.Portability.SpectralAuditDualCertificate.lagrangian_identity": [],
     "Descent.Portability.SpectralAuditDualCertificate.weak_duality": [],
+    "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality": [],
     "Descent.Portability.SpectralAuditTrace.positive_trace_bound": [],
     "Descent.Portability.SpectralAuditTrace.trace_le_dimension": [],
     "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality": [],
@@ -41623,6 +41643,10 @@
     "Descent.Portability.SpectralMeasurementMinimax.leadingProcedure_upper": [],
     "Descent.Portability.SpectralMeasurementMinimax.coordinate_prefixSpan": [],
     "Descent.Portability.SpectralMeasurementMinimax.prefixSpan_visible": [],
+    "Descent.Portability.SpectralOperatorEpigraph.residual_convex": [],
+    "Descent.Portability.SpectralOperatorEpigraph.epigraph_multipliers": [],
+    "Descent.Portability.SpectralTraceComplementarity.rayleigh_equality": [],
+    "Descent.Portability.SpectralTraceComplementarity.support_of_trace_equality": [],
     "Descent.Portability.StationaryPoissonLaw.stationary_poisson": [],
     "Descent.Portability.effectiveSampleSizeFromSE_pos_iff": [],
     "Descent.Portability.random_effects_captures_heterogeneity": [],
@@ -51170,6 +51194,7 @@
    "Descent.Portability.SparseBinaryAudit.unbiased",
    "Descent.Portability.SparseBinaryAudit.variance_attained",
    "Descent.Portability.SparseBinaryAudit.variance_upper",
+   "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective",
    "Descent.Portability.SpectralAuditConfidence.directional_variance",
    "Descent.Portability.SpectralAuditCost.attained_cost_bound",
    "Descent.Portability.SpectralAuditCost.cost_lower_bound",
@@ -51179,6 +51204,7 @@
    "Descent.Portability.SpectralAuditDesign.objective_convex",
    "Descent.Portability.SpectralAuditDualCertificate.lagrangian_identity",
    "Descent.Portability.SpectralAuditDualCertificate.weak_duality",
+   "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality",
    "Descent.Portability.SpectralAuditTrace.positive_trace_bound",
    "Descent.Portability.SpectralAuditTrace.trace_le_dimension",
    "Descent.Portability.SpectralCostEquality.cost_equality_iff",
@@ -51188,6 +51214,10 @@
    "Descent.Portability.SpectralMeasurementMinimax.coordinate_prefixSpan",
    "Descent.Portability.SpectralMeasurementMinimax.leadingProcedure_upper",
    "Descent.Portability.SpectralMeasurementMinimax.prefixSpan_visible",
+   "Descent.Portability.SpectralOperatorEpigraph.epigraph_multipliers",
+   "Descent.Portability.SpectralOperatorEpigraph.residual_convex",
+   "Descent.Portability.SpectralTraceComplementarity.rayleigh_equality",
+   "Descent.Portability.SpectralTraceComplementarity.support_of_trace_equality",
    "Descent.Portability.StationaryPoissonLaw.stationary_poisson",
    "Descent.Portability.StoppedAncestralTiming.arrivalTimes_measurable",
    "Descent.Portability.StoppedAncestralTiming.arrivalTimes_support",
@@ -52911,6 +52941,7 @@
     "Descent.Portability.SparseBinaryAudit.unbiased": [],
     "Descent.Portability.SparseBinaryAudit.variance_upper": [],
     "Descent.Portability.SparseBinaryAudit.variance_attained": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective": [],
     "Descent.Portability.SpectralAuditConfidence.directional_variance": [],
     "Descent.Portability.SpectralAuditCost.trace_cost_lower": [],
     "Descent.Portability.SpectralAuditCost.cost_lower_bound": [],
@@ -52920,6 +52951,7 @@
     "Descent.Portability.SpectralAuditDesign.objective_continuous": [],
     "Descent.Portability.SpectralAuditDualCertificate.lagrangian_identity": [],
     "Descent.Portability.SpectralAuditDualCertificate.weak_duality": [],
+    "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality": [],
     "Descent.Portability.SpectralAuditTrace.positive_trace_bound": [],
     "Descent.Portability.SpectralAuditTrace.trace_le_dimension": [],
     "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality": [],
@@ -52929,6 +52961,10 @@
     "Descent.Portability.SpectralMeasurementMinimax.leadingProcedure_upper": [],
     "Descent.Portability.SpectralMeasurementMinimax.coordinate_prefixSpan": [],
     "Descent.Portability.SpectralMeasurementMinimax.prefixSpan_visible": [],
+    "Descent.Portability.SpectralOperatorEpigraph.residual_convex": [],
+    "Descent.Portability.SpectralOperatorEpigraph.epigraph_multipliers": [],
+    "Descent.Portability.SpectralTraceComplementarity.rayleigh_equality": [],
+    "Descent.Portability.SpectralTraceComplementarity.support_of_trace_equality": [],
     "Descent.Portability.StationaryPoissonLaw.stationary_poisson": [],
     "Descent.Portability.effectiveSampleSizeFromSE_pos_iff": [],
     "Descent.Portability.random_effects_captures_heterogeneity": [],
@@ -66504,6 +66540,8 @@
    "Descent.Portability.SpectralCostEquality.cost_equality_complete",
    "Descent.Portability.SpectralCostEquality.cost_equality_iff",
    "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality",
+   "Descent.Portability.SpectralOperatorEpigraph.functional_normalized",
+   "Descent.Portability.SpectralOperatorEpigraph.functional_residual",
    "Descent.Portability.StoppedGenotypeLaw.stateInterval_mass_measurable",
    "Descent.Portability.isCellBalanced_identity",
    "Descent.Spectral.hasScalarSummary_ofScalar"
@@ -66541,6 +66579,8 @@
     "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality": [],
     "Descent.Portability.SpectralCostEquality.cost_equality_iff": [],
     "Descent.Portability.SpectralCostEquality.cost_equality_complete": [],
+    "Descent.Portability.SpectralOperatorEpigraph.functional_residual": [],
+    "Descent.Portability.SpectralOperatorEpigraph.functional_normalized": [],
     "Descent.Portability.StoppedGenotypeLaw.stateInterval_mass_measurable": [],
     "Descent.Spectral.hasScalarSummary_ofScalar": []
    }
@@ -71838,6 +71878,7 @@
    "Descent.Portability.SparseBinaryAudit.unbiased",
    "Descent.Portability.SparseBinaryAudit.variance_attained",
    "Descent.Portability.SparseBinaryAudit.variance_upper",
+   "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective",
    "Descent.Portability.SpectralAuditConfidence.directional_variance",
    "Descent.Portability.SpectralAuditCost.attained_cost_bound",
    "Descent.Portability.SpectralAuditCost.cost_lower_bound",
@@ -71847,6 +71888,7 @@
    "Descent.Portability.SpectralAuditDesign.objective_convex",
    "Descent.Portability.SpectralAuditDualCertificate.lagrangian_identity",
    "Descent.Portability.SpectralAuditDualCertificate.weak_duality",
+   "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality",
    "Descent.Portability.SpectralAuditTrace.positive_trace_bound",
    "Descent.Portability.SpectralAuditTrace.trace_le_dimension",
    "Descent.Portability.SpectralCostEquality.cost_equality_iff",
@@ -71856,6 +71898,10 @@
    "Descent.Portability.SpectralMeasurementMinimax.coordinate_prefixSpan",
    "Descent.Portability.SpectralMeasurementMinimax.leadingProcedure_upper",
    "Descent.Portability.SpectralMeasurementMinimax.prefixSpan_visible",
+   "Descent.Portability.SpectralOperatorEpigraph.epigraph_multipliers",
+   "Descent.Portability.SpectralOperatorEpigraph.residual_convex",
+   "Descent.Portability.SpectralTraceComplementarity.rayleigh_equality",
+   "Descent.Portability.SpectralTraceComplementarity.support_of_trace_equality",
    "Descent.Portability.StationaryPoissonLaw.stationary_poisson",
    "Descent.Portability.StoppedAncestralTiming.arrivalTimes_measurable",
    "Descent.Portability.StoppedAncestralTiming.arrivalTimes_support",
@@ -73754,6 +73800,7 @@
      "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (0 : ℝ"
     ],
     "Descent.Portability.SparseBinaryAudit.variance_attained": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective": [],
     "Descent.Portability.SpectralAuditConfidence.directional_variance": [],
     "Descent.Portability.SpectralAuditCost.trace_cost_lower": [],
     "Descent.Portability.SpectralAuditCost.cost_lower_bound": [],
@@ -73763,6 +73810,7 @@
     "Descent.Portability.SpectralAuditDesign.objective_continuous": [],
     "Descent.Portability.SpectralAuditDualCertificate.lagrangian_identity": [],
     "Descent.Portability.SpectralAuditDualCertificate.weak_duality": [],
+    "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality": [],
     "Descent.Portability.SpectralAuditTrace.positive_trace_bound": [],
     "Descent.Portability.SpectralAuditTrace.trace_le_dimension": [],
     "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality": [],
@@ -73772,6 +73820,10 @@
     "Descent.Portability.SpectralMeasurementMinimax.leadingProcedure_upper": [],
     "Descent.Portability.SpectralMeasurementMinimax.coordinate_prefixSpan": [],
     "Descent.Portability.SpectralMeasurementMinimax.prefixSpan_visible": [],
+    "Descent.Portability.SpectralOperatorEpigraph.residual_convex": [],
+    "Descent.Portability.SpectralOperatorEpigraph.epigraph_multipliers": [],
+    "Descent.Portability.SpectralTraceComplementarity.rayleigh_equality": [],
+    "Descent.Portability.SpectralTraceComplementarity.support_of_trace_equality": [],
     "Descent.Portability.StationaryPoissonLaw.stationary_poisson": [],
     "Descent.Portability.effectiveSampleSizeFromSE_pos_iff": [],
     "Descent.Portability.random_effects_captures_heterogeneity": [],
@@ -74575,6 +74627,7 @@
    "Descent.Portability.SpectralCostEquality.zero_leverage_variance",
    "Descent.Portability.SpectralMeasurementMinimax.coordinate_prefix",
    "Descent.Portability.SpectralMeasurementMinimax.coordinate_repr",
+   "Descent.Portability.SpectralTraceComplementarity.support_of_trace_equality",
    "Descent.Portability.StoppedGenotypeRenewal.conditionalGenome_succ",
    "Descent.Portability.StoppedGenotypeRenewal.waiting_integral_split",
    "Descent.Portability.SummaryInvisibleDiameter.identified_iff_mem_features",
@@ -75222,6 +75275,7 @@
     "Descent.Portability.SpectralCostEquality.cost_equality_complete": [],
     "Descent.Portability.SpectralMeasurementMinimax.coordinate_repr": [],
     "Descent.Portability.SpectralMeasurementMinimax.coordinate_prefix": [],
+    "Descent.Portability.SpectralTraceComplementarity.support_of_trace_equality": [],
     "Descent.Portability.portabilityRatio_eq_zero_iff": [],
     "Descent.Portability.StoppedGenotypeRenewal.waiting_integral_split": [],
     "Descent.Portability.StoppedGenotypeRenewal.conditionalGenome_succ": [],
@@ -75662,10 +75716,12 @@
    "Descent.Portability.SpectralAuditCost.cost_lower_bound",
    "Descent.Portability.SpectralAuditDesign.objective_convex",
    "Descent.Portability.SpectralAuditDualCertificate.weak_duality",
+   "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality",
    "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality",
    "Descent.Portability.SpectralMeasurementMinimax.adaptive_minimax_all_budgets",
    "Descent.Portability.SpectralMinimaxAuditDesign.design_exists",
    "Descent.Portability.SpectralMinimaxAuditDesign.kappa_nonneg",
+   "Descent.Portability.SpectralOperatorEpigraph.epigraph_multipliers",
    "Descent.Portability.StoppedGenotypeReadiness.conditionalSite_unsupported_ready",
    "Descent.Portability.SubgroupFrameTransport.certified_mixture_transport",
    "Descent.Portability.SubgroupFrameTransport.group_frame_safety",
@@ -76171,11 +76227,19 @@
      "∀ i, 0 ≤ c i",
      "Feasible floor c B p"
     ],
+    "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality": [
+     "∀ i, 0 ≤ c i",
+     "spending c p₀ < B"
+    ],
     "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality": [],
     "Descent.Portability.SpectralMeasurementMinimax.adaptive_minimax_all_budgets": [],
     "Descent.Portability.SpectralMinimaxAuditDesign.kappa_nonneg": [],
     "Descent.Portability.SpectralMinimaxAuditDesign.design_exists": [
      "∃ p, Feasible floor c B p"
+    ],
+    "Descent.Portability.SpectralOperatorEpigraph.epigraph_multipliers": [
+     "Feasible floor c B p",
+     "spending c p₀ < B"
     ],
     "Descent.Portability.StoppedGenotypeReadiness.conditionalSite_unsupported_ready": [],
     "Descent.Portability.SubgroupFrameTransport.group_frame_safety": [],
@@ -82882,6 +82946,9 @@
    "Descent.Portability.RangeAwareAuditSearch.exact_solvers_guarantee",
    "Descent.Portability.RangeAwareAuditSearch.finite_search_exists",
    "Descent.Portability.RangeAwareAuditSearch.range_interval",
+   "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality",
    "Descent.Portability.SpectralAuditDesign.objective_continuous",
    "Descent.Portability.SpectralAuditDesign.objective_convex",
    "Descent.Portability.SpectralAuditDesign.optimum_exists",
@@ -82890,7 +82957,9 @@
    "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error",
    "Descent.Portability.SpectralAuditNumericalCertificate.certified_radius_error",
    "Descent.Portability.SpectralAuditNumericalCertificate.certified_variance_error",
+   "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality",
    "Descent.Portability.SpectralMinimaxAuditDesign.design_exists",
+   "Descent.Portability.SpectralOperatorEpigraph.epigraph_multipliers",
    "Descent.Portability.SpectralRangeAuditDesign.capped_convex",
    "Descent.Portability.SpectralRangeAuditDesign.design_exists",
    "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction",
@@ -82989,6 +83058,9 @@
     "Descent.Portability.RangeAwareAuditSearch.finite_search_exists": [
      "∀ i, 0 < h i"
     ],
+    "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law": [],
     "Descent.Portability.SpectralAuditDesign.objective_convex": [],
     "Descent.Portability.SpectralAuditDesign.objective_continuous": [],
     "Descent.Portability.SpectralAuditDesign.optimum_exists": [],
@@ -82999,7 +83071,9 @@
     "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error": [
      "Feasible (cappedFloor floor h M"
     ],
+    "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality": [],
     "Descent.Portability.SpectralMinimaxAuditDesign.design_exists": [],
+    "Descent.Portability.SpectralOperatorEpigraph.epigraph_multipliers": [],
     "Descent.Portability.SpectralRangeAuditDesign.radius_continuous": [],
     "Descent.Portability.SpectralRangeAuditDesign.radius_minimum": [],
     "Descent.Portability.SpectralRangeAuditDesign.capped_convex": [],
@@ -92443,11 +92517,16 @@
    "Descent.Portability.SimulationAccuracy.covariance_two_scores",
    "Descent.Portability.SimultaneousRealization.genotype_contrast_covariance",
    "Descent.Portability.SourceFixedRealization.cell_score_covariance",
+   "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality",
+   "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective",
    "Descent.Portability.SpectralAuditCost.attained_cost_bound",
    "Descent.Portability.SpectralAuditCost.isotropic_trace",
    "Descent.Portability.SpectralAuditDualCertificate.certificate_equality",
    "Descent.Portability.SpectralAuditDualCertificate.certified_optimum",
    "Descent.Portability.SpectralAuditDualCertificate.lagrangian_identity",
+   "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality",
    "Descent.Portability.SpectralAuditTrace.covariance_trace",
    "Descent.Portability.SpectralAuditTrace.positive_trace_bound",
    "Descent.Portability.SpectralAuditTrace.top_support_equality",
@@ -92455,6 +92534,10 @@
    "Descent.Portability.SpectralCostEquality.cost_equality_complete",
    "Descent.Portability.SpectralCostEquality.cost_equality_iff",
    "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality",
+   "Descent.Portability.SpectralOperatorEpigraph.functional_residual",
+   "Descent.Portability.SpectralOperatorEpigraph.residual_quadratic",
+   "Descent.Portability.SpectralTraceComplementarity.rayleigh_equality",
+   "Descent.Portability.SpectralTraceComplementarity.support_of_trace_equality",
    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_covariance",
    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_squared_correlation",
    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_squared_correlation_eq_zero_iff",
@@ -92526,6 +92609,7 @@
     "variance F Y ≠ 0",
     "variance (mixture E K",
     "LinearMap.trace ℝ E W = 1",
+    "LinearMap.trace ℝ E (W.comp (covariance w u",
     "∀ j, E (fun ω ↦ X ω j",
     "E Y = 0"
    ],
@@ -92659,6 +92743,16 @@
     "Descent.Portability.SimulationAccuracy.covariance_two_scores": [],
     "Descent.Portability.SimultaneousRealization.genotype_contrast_covariance": [],
     "Descent.Portability.SourceFixedRealization.cell_score_covariance": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality": [
+     "LinearMap.trace ℝ E W = 1"
+    ],
+    "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula": [
+     "LinearMap.trace ℝ E W = 1"
+    ],
+    "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law": [
+     "0 < Module.finrank ℝ E"
+    ],
     "Descent.Portability.SpectralAuditCost.isotropic_trace": [
      "0 < Module.finrank ℝ E"
     ],
@@ -92671,6 +92765,9 @@
     ],
     "Descent.Portability.SpectralAuditDualCertificate.certified_optimum": [
      "LinearMap.trace ℝ E W = 1"
+    ],
+    "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality": [
+     "0 < Module.finrank ℝ E"
     ],
     "Descent.Portability.SpectralAuditTrace.covariance_trace": [],
     "Descent.Portability.SpectralAuditTrace.trace_pairing": [],
@@ -92686,6 +92783,13 @@
     ],
     "Descent.Portability.SpectralCostEquality.cost_equality_complete": [
      "0 < Module.finrank ℝ E"
+    ],
+    "Descent.Portability.SpectralOperatorEpigraph.residual_quadratic": [],
+    "Descent.Portability.SpectralOperatorEpigraph.functional_residual": [],
+    "Descent.Portability.SpectralTraceComplementarity.rayleigh_equality": [],
+    "Descent.Portability.SpectralTraceComplementarity.support_of_trace_equality": [
+     "LinearMap.trace ℝ E W = 1",
+     "LinearMap.trace ℝ E (W.comp (covariance w u"
     ],
     "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_covariance": [],
     "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_squared_correlation": [],
@@ -104664,6 +104768,8 @@
    "Descent.Portability.SpectralCostEquality.cost_equality_complete",
    "Descent.Portability.SpectralCostEquality.cost_equality_iff",
    "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality",
+   "Descent.Portability.SpectralOperatorEpigraph.functional_normalized",
+   "Descent.Portability.SpectralOperatorEpigraph.functional_residual",
    "Descent.Portability.StoppedGenotypeLaw.stateInterval_mass_measurable",
    "Descent.Portability.isCellBalanced_identity",
    "Descent.Spectral.hasScalarSummary_ofScalar"
@@ -104701,6 +104807,8 @@
     "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality": [],
     "Descent.Portability.SpectralCostEquality.cost_equality_iff": [],
     "Descent.Portability.SpectralCostEquality.cost_equality_complete": [],
+    "Descent.Portability.SpectralOperatorEpigraph.functional_residual": [],
+    "Descent.Portability.SpectralOperatorEpigraph.functional_normalized": [],
     "Descent.Portability.StoppedGenotypeLaw.stateInterval_mass_measurable": [],
     "Descent.Spectral.hasScalarSummary_ofScalar": []
    }
@@ -104897,13 +105005,19 @@
    "Descent.Portability.RealVaryingEuler.varying_euler_limit",
    "Descent.Portability.SimulationCohortLaw.trainingIndex_strictMono",
    "Descent.Portability.SmallRealProduct.product_limit",
+   "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality",
+   "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective",
    "Descent.Portability.SpectralAuditDualCertificate.certificate_equality",
    "Descent.Portability.SpectralAuditDualCertificate.certified_optimum",
    "Descent.Portability.SpectralAuditDualCertificate.lagrangian_identity",
+   "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality",
    "Descent.Portability.SpectralAuditTrace.positive_trace_bound",
    "Descent.Portability.SpectralAuditTrace.top_support_equality",
    "Descent.Portability.SpectralAuditTrace.trace_pairing",
    "Descent.Portability.SpectralMeasurementMinimax.prefixSpan_finrank",
+   "Descent.Portability.SpectralTraceComplementarity.support_of_trace_equality",
    "Descent.Portability.StoppedGenotypeLaw.conditionalSite_mass_measurable",
    "Descent.Portability.StoppedGenotypeRenewal.conditionalGenome_integral_succ",
    "Descent.Portability.TightAlgebraConvergence.damp_tendsto_zero",
@@ -105171,13 +105285,19 @@
     "Descent.Portability.RealVaryingEuler.varying_euler_limit": [],
     "Descent.Portability.SimulationCohortLaw.trainingIndex_strictMono": [],
     "Descent.Portability.SmallRealProduct.product_limit": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law": [],
     "Descent.Portability.SpectralAuditDualCertificate.lagrangian_identity": [],
     "Descent.Portability.SpectralAuditDualCertificate.certificate_equality": [],
     "Descent.Portability.SpectralAuditDualCertificate.certified_optimum": [],
+    "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality": [],
     "Descent.Portability.SpectralAuditTrace.trace_pairing": [],
     "Descent.Portability.SpectralAuditTrace.positive_trace_bound": [],
     "Descent.Portability.SpectralAuditTrace.top_support_equality": [],
     "Descent.Portability.SpectralMeasurementMinimax.prefixSpan_finrank": [],
+    "Descent.Portability.SpectralTraceComplementarity.support_of_trace_equality": [],
     "Descent.Portability.StoppedGenotypeLaw.conditionalSite_mass_measurable": [],
     "Descent.Portability.StoppedGenotypeRenewal.conditionalGenome_integral_succ": [],
     "Descent.Portability.TightAlgebraConvergence.damp_tendsto_zero": [],
@@ -123770,6 +123890,7 @@
    "Descent.Portability.NonreversibleResolvent.resolvent_difference_norm",
    "Descent.Portability.NonreversibleResolvent.resolvent_le_reversible",
    "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality",
+   "Descent.Portability.SpectralTraceComplementarity.rayleigh_equality",
    "Descent.Spectral.balanced_locus_symmetric_component"
   ],
   "constraints": {
@@ -123800,6 +123921,7 @@
     "Descent.Portability.NonreversibleResolvent.resolvent_le_reversible": [],
     "Descent.Portability.NonreversibleResolvent.resolvent_difference_norm": [],
     "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality": [],
+    "Descent.Portability.SpectralTraceComplementarity.rayleigh_equality": [],
     "Descent.Spectral.balanced_locus_symmetric_component": []
    }
   }
@@ -141139,6 +141261,9 @@
    "Descent.Portability.IdenticalAuditCells.capped_spectral_optimum_constant",
    "Descent.Portability.IdenticalAuditCells.spectral_optimum_constant",
    "Descent.Portability.IdenticalAuditCells.spectral_variance_le",
+   "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality",
    "Descent.Portability.SpectralAuditCost.attained_cost_bound",
    "Descent.Portability.SpectralAuditCost.cost_lower_bound",
    "Descent.Portability.SpectralAuditDesign.direction_le",
@@ -141153,10 +141278,15 @@
    "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error",
    "Descent.Portability.SpectralAuditNumericalCertificate.certified_radius_error",
    "Descent.Portability.SpectralAuditNumericalCertificate.certified_variance_error",
+   "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality",
    "Descent.Portability.SpectralCostEquality.cost_equality_complete",
    "Descent.Portability.SpectralCostEquality.cost_equality_iff",
    "Descent.Portability.SpectralCostEquality.zero_leverage_variance",
    "Descent.Portability.SpectralMinimaxAuditDesign.variance_identity",
+   "Descent.Portability.SpectralOperatorEpigraph.epigraph_multipliers",
+   "Descent.Portability.SpectralOperatorEpigraph.functional_normalized",
+   "Descent.Portability.SpectralOperatorEpigraph.residual_feasible_iff",
+   "Descent.Portability.SpectralOperatorEpigraph.strict_operator_point",
    "Descent.Portability.SpectralRangeAuditDesign.capped_convex",
    "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction",
    "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists",
@@ -141176,12 +141306,16 @@
     "∀ i, 0 < p i",
     "{p | Feasible floor c B p}.Nonempty",
     "{p | Feasible floor c B p ∧ maxRange h p ≤ m}.Nonempty",
+    "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p",
+    "(covariance (fun i ↦ κ i / p i",
     "(∑ i, p i",
     "∀ i, p i = t * (Real.sqrt (κ i",
     "covariance (fun i ↦ κ i / p i",
     "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i",
-    "(covariance (fun i ↦ κ i / p i",
     "lam * (spending c p - B",
+    "∀ i, p i ∈ Set.Icc (floor i",
+    "∀ x ∈ domain floor, objective κ u p ≤ x.2 + lam * (spending c x.1 - B",
+    "R (operatorResidual κ u (p, objective κ u p",
     "∃ p, Feasible floor c B p"
    ],
    "hypotheses_by_theorem": {
@@ -141225,6 +141359,17 @@
     "Descent.Portability.IdenticalAuditCells.capped_spectral_optimum_constant": [
      "{p | Feasible floor c B p ∧ maxRange h p ≤ m}.Nonempty"
     ],
+    "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality": [
+     "Feasible floor c B p",
+     "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p",
+     "(covariance (fun i ↦ κ i / p i"
+    ],
+    "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula": [
+     "Feasible floor c B p",
+     "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p",
+     "(covariance (fun i ↦ κ i / p i"
+    ],
+    "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law": [],
     "Descent.Portability.SpectralAuditCost.cost_lower_bound": [
      "∀ i, 0 < p i",
      "(∑ i, p i"
@@ -141268,6 +141413,7 @@
      "Feasible floor c B p"
     ],
     "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error": [],
+    "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality": [],
     "Descent.Portability.SpectralCostEquality.cost_equality_iff": [
      "∀ i, 0 < p i",
      "(∑ i, p i"
@@ -141281,6 +141427,17 @@
     ],
     "Descent.Portability.SpectralMinimaxAuditDesign.variance_identity": [
      "∀ i, 0 < p i"
+    ],
+    "Descent.Portability.SpectralOperatorEpigraph.residual_feasible_iff": [],
+    "Descent.Portability.SpectralOperatorEpigraph.strict_operator_point": [],
+    "Descent.Portability.SpectralOperatorEpigraph.epigraph_multipliers": [
+     "Feasible floor c B p"
+    ],
+    "Descent.Portability.SpectralOperatorEpigraph.functional_normalized": [
+     "∀ i, p i ∈ Set.Icc (floor i",
+     "∀ x ∈ domain floor, objective κ u p ≤ x.2 + lam * (spending c x.1 - B",
+     "lam * (spending c p - B",
+     "R (operatorResidual κ u (p, objective κ u p"
     ],
     "Descent.Portability.SpectralRangeAuditDesign.radius_continuous": [],
     "Descent.Portability.SpectralRangeAuditDesign.capped_convex": [],
@@ -141349,9 +141506,13 @@
    "Descent.Portability.MarkovSeparatorLaw.local_implies_separator",
    "Descent.Portability.ReservoirSamplingLaw.choiceLaw_some_mass",
    "Descent.Portability.ReservoirSamplingLaw.choice_eq_some_iff",
+   "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality",
    "Descent.Portability.SpectralAuditDualCertificate.certificate_equality",
    "Descent.Portability.SpectralAuditDualCertificate.certified_optimum",
-   "Descent.Portability.SpectralAuditDualCertificate.positive_multiplier_choice"
+   "Descent.Portability.SpectralAuditDualCertificate.positive_multiplier_choice",
+   "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality"
   ],
   "constraints": {
    "hypotheses": [
@@ -141365,7 +141526,8 @@
     "∀ i, 0 < floor i",
     "Feasible floor c B p",
     "dualBound a floor c B η lam = worstVariance a p",
-    "∀ i, p₀ i ∈ Set.Icc (floor i"
+    "∀ i, p₀ i ∈ Set.Icc (floor i",
+    "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p"
    ],
    "hypotheses_by_theorem": {
     "Descent.Conditionals.descendsOn_iff_pairwiseCompatibleOn_of_nonempty": [],
@@ -141407,12 +141569,30 @@
     "Descent.Portability.MarkovSeparatorLaw.independent_set_attenuation": [],
     "Descent.Portability.ReservoirSamplingLaw.choice_eq_some_iff": [],
     "Descent.Portability.ReservoirSamplingLaw.choiceLaw_some_mass": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality": [
+     "∀ i, 0 < floor i",
+     "Feasible floor c B p",
+     "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p"
+    ],
+    "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula": [
+     "∀ i, 0 < floor i",
+     "Feasible floor c B p",
+     "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p"
+    ],
+    "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law": [
+     "∀ i, 0 < floor i",
+     "∀ i, p₀ i ∈ Set.Icc (floor i"
+    ],
     "Descent.Portability.SpectralAuditDualCertificate.certificate_equality": [],
     "Descent.Portability.SpectralAuditDualCertificate.certified_optimum": [
      "∀ i, 0 < floor i",
      "Feasible floor c B p"
     ],
-    "Descent.Portability.SpectralAuditDualCertificate.positive_multiplier_choice": []
+    "Descent.Portability.SpectralAuditDualCertificate.positive_multiplier_choice": [],
+    "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality": [
+     "∀ i, 0 < floor i",
+     "∀ i, p₀ i ∈ Set.Icc (floor i"
+    ]
    }
   }
  },
@@ -141765,11 +141945,16 @@
    "Descent.Portability.SimulationAccuracy.covariance_two_scores",
    "Descent.Portability.SimultaneousRealization.genotype_contrast_covariance",
    "Descent.Portability.SourceFixedRealization.cell_score_covariance",
+   "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality",
+   "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective",
    "Descent.Portability.SpectralAuditCost.attained_cost_bound",
    "Descent.Portability.SpectralAuditCost.isotropic_trace",
    "Descent.Portability.SpectralAuditDualCertificate.certificate_equality",
    "Descent.Portability.SpectralAuditDualCertificate.certified_optimum",
    "Descent.Portability.SpectralAuditDualCertificate.lagrangian_identity",
+   "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality",
    "Descent.Portability.SpectralAuditTrace.covariance_trace",
    "Descent.Portability.SpectralAuditTrace.positive_trace_bound",
    "Descent.Portability.SpectralAuditTrace.top_support_equality",
@@ -141777,6 +141962,10 @@
    "Descent.Portability.SpectralCostEquality.cost_equality_complete",
    "Descent.Portability.SpectralCostEquality.cost_equality_iff",
    "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality",
+   "Descent.Portability.SpectralOperatorEpigraph.functional_residual",
+   "Descent.Portability.SpectralOperatorEpigraph.residual_quadratic",
+   "Descent.Portability.SpectralTraceComplementarity.rayleigh_equality",
+   "Descent.Portability.SpectralTraceComplementarity.support_of_trace_equality",
    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_covariance",
    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_squared_correlation",
    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_squared_correlation_eq_zero_iff",
@@ -141836,11 +142025,14 @@
    "declared_hi": null,
    "hypotheses": [
     "∀ i, 0 ≤ w i",
+    "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p",
     "covariance w u = α • LinearMap.id",
     "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i",
     "(covariance w u",
     "(∑ i, w i * ‖u i‖ ^ 2",
-    "0 < leverageSum κ u"
+    "0 < leverageSum κ u",
+    "inner ℝ a (covariance w u a",
+    "LinearMap.trace ℝ E (W.comp (covariance w u"
    ],
    "hypotheses_by_theorem": {
     "Descent.Blindness.covarianceMatrix_addRankOneSignal": [],
@@ -141944,6 +142136,14 @@
     "Descent.Portability.SimulationAccuracy.covariance_two_scores": [],
     "Descent.Portability.SimultaneousRealization.genotype_contrast_covariance": [],
     "Descent.Portability.SourceFixedRealization.cell_score_covariance": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality": [
+     "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p"
+    ],
+    "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula": [
+     "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p"
+    ],
+    "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law": [],
     "Descent.Portability.SpectralAuditCost.isotropic_trace": [
      "covariance w u = α • LinearMap.id"
     ],
@@ -141955,6 +142155,7 @@
     "Descent.Portability.SpectralAuditDualCertificate.certified_optimum": [
      "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i"
     ],
+    "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality": [],
     "Descent.Portability.SpectralAuditTrace.covariance_trace": [],
     "Descent.Portability.SpectralAuditTrace.trace_pairing": [],
     "Descent.Portability.SpectralAuditTrace.positive_trace_bound": [
@@ -141970,6 +142171,15 @@
      "0 < leverageSum κ u"
     ],
     "Descent.Portability.SpectralCostEquality.cost_equality_complete": [],
+    "Descent.Portability.SpectralOperatorEpigraph.residual_quadratic": [],
+    "Descent.Portability.SpectralOperatorEpigraph.functional_residual": [],
+    "Descent.Portability.SpectralTraceComplementarity.rayleigh_equality": [
+     "inner ℝ a (covariance w u a"
+    ],
+    "Descent.Portability.SpectralTraceComplementarity.support_of_trace_equality": [
+     "∀ i, 0 ≤ w i",
+     "LinearMap.trace ℝ E (W.comp (covariance w u"
+    ],
     "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_covariance": [],
     "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_squared_correlation": [],
     "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_squared_correlation_eq_zero_iff": [],
@@ -142064,7 +142274,9 @@
    "Descent.Portability.AuditCovarianceSpectrum.largest_attained",
    "Descent.Portability.AuditCovarianceSpectrum.spectral_quadratic",
    "Descent.Portability.SpectralAuditTrace.positive_trace_bound",
-   "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality"
+   "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality",
+   "Descent.Portability.SpectralTraceComplementarity.rayleigh_equality",
+   "Descent.Portability.SpectralTraceComplementarity.support_of_trace_equality"
   ],
   "constraints": {
    "declared_kind": "nonnegative",
@@ -142072,7 +142284,9 @@
    "declared_hi": null,
    "hypotheses": [
     "∀ i, 0 ≤ w i",
-    "(∑ i, w i * ‖u i‖ ^ 2"
+    "(∑ i, w i * ‖u i‖ ^ 2",
+    "inner ℝ a (covariance w u a",
+    "LinearMap.trace ℝ E (W.comp (covariance w u"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.AngularExtremalReports.spectral_conj": [],
@@ -142100,6 +142314,13 @@
     ],
     "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality": [
      "(∑ i, w i * ‖u i‖ ^ 2"
+    ],
+    "Descent.Portability.SpectralTraceComplementarity.rayleigh_equality": [
+     "inner ℝ a (covariance w u a"
+    ],
+    "Descent.Portability.SpectralTraceComplementarity.support_of_trace_equality": [
+     "∀ i, 0 ≤ w i",
+     "LinearMap.trace ℝ E (W.comp (covariance w u"
     ]
    }
   }
@@ -142144,14 +142365,16 @@
    "Descent.Portability.RadialPotentialLaw.radialDensity_coordinate_hasDerivAt",
    "Descent.Portability.RadialPotentialLaw.update_hasDerivAt",
    "Descent.Portability.RatioSourceDegeneracy.nonalignment_kernel_direction",
-   "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality"
+   "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality",
+   "Descent.Portability.SpectralTraceComplementarity.rayleigh_equality"
   ],
   "constraints": {
    "declared_kind": "nonnegative",
    "declared_lo": 0.0,
    "declared_hi": null,
    "hypotheses": [
-    "(∑ i, w i * ‖u i‖ ^ 2"
+    "(∑ i, w i * ‖u i‖ ^ 2",
+    "inner ℝ a (covariance w u a"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.AuditCovarianceSpectrum.spectral_quadratic": [],
@@ -142169,6 +142392,9 @@
     "Descent.Portability.RatioSourceDegeneracy.nonalignment_kernel_direction": [],
     "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality": [
      "(∑ i, w i * ‖u i‖ ^ 2"
+    ],
+    "Descent.Portability.SpectralTraceComplementarity.rayleigh_equality": [
+     "inner ℝ a (covariance w u a"
     ]
    }
   }
@@ -142202,7 +142428,9 @@
    "Descent.Portability.SpectralAuditTrace.positive_trace_bound",
    "Descent.Portability.SpectralAuditTrace.top_support_equality",
    "Descent.Portability.SpectralAuditTrace.trace_le_dimension",
-   "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality"
+   "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality",
+   "Descent.Portability.SpectralTraceComplementarity.rayleigh_equality",
+   "Descent.Portability.SpectralTraceComplementarity.support_of_trace_equality"
   ],
   "constraints": {
    "declared_kind": "nonnegative",
@@ -142214,7 +142442,9 @@
     "∀ i, ContinuousOn (fun x ↦ w x i",
     "covariance w u = α • LinearMap.id",
     "(covariance w u",
-    "(∑ i, w i * ‖u i‖ ^ 2"
+    "(∑ i, w i * ‖u i‖ ^ 2",
+    "inner ℝ a (covariance w u a",
+    "LinearMap.trace ℝ E (W.comp (covariance w u"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.AuditCovarianceSpectrum.eigenvalue_le_largest": [],
@@ -142252,6 +142482,13 @@
     ],
     "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality": [
      "(∑ i, w i * ‖u i‖ ^ 2"
+    ],
+    "Descent.Portability.SpectralTraceComplementarity.rayleigh_equality": [
+     "inner ℝ a (covariance w u a"
+    ],
+    "Descent.Portability.SpectralTraceComplementarity.support_of_trace_equality": [
+     "∀ i, 0 ≤ w i",
+     "LinearMap.trace ℝ E (W.comp (covariance w u"
     ]
    },
    "range_lo_thm": [
@@ -142859,6 +143096,8 @@
    "Descent.Portability.SharedAuditCompletion.frame_variance_upper",
    "Descent.Portability.SharedAuditCompletion.simultaneous_attainment",
    "Descent.Portability.SparseBinaryAudit.variance_upper",
+   "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law",
    "Descent.Portability.SpectralAuditDualCertificate.positive_multiplier_choice"
   ],
   "constraints": {
@@ -142916,6 +143155,8 @@
      "∀ i, L i ≤ lo i ∧ lo i ≤ hi i ∧ hi i ≤ U i"
     ],
     "Descent.Portability.SparseBinaryAudit.variance_upper": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law": [],
     "Descent.Portability.SpectralAuditDualCertificate.positive_multiplier_choice": []
    }
   }
@@ -178882,11 +179123,16 @@
    "Descent.Portability.SimulationAccuracy.covariance_two_scores",
    "Descent.Portability.SimultaneousRealization.genotype_contrast_covariance",
    "Descent.Portability.SourceFixedRealization.cell_score_covariance",
+   "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality",
+   "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective",
    "Descent.Portability.SpectralAuditCost.attained_cost_bound",
    "Descent.Portability.SpectralAuditCost.isotropic_trace",
    "Descent.Portability.SpectralAuditDualCertificate.certificate_equality",
    "Descent.Portability.SpectralAuditDualCertificate.certified_optimum",
    "Descent.Portability.SpectralAuditDualCertificate.lagrangian_identity",
+   "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality",
    "Descent.Portability.SpectralAuditTrace.covariance_trace",
    "Descent.Portability.SpectralAuditTrace.positive_trace_bound",
    "Descent.Portability.SpectralAuditTrace.top_support_equality",
@@ -178894,6 +179140,10 @@
    "Descent.Portability.SpectralCostEquality.cost_equality_complete",
    "Descent.Portability.SpectralCostEquality.cost_equality_iff",
    "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality",
+   "Descent.Portability.SpectralOperatorEpigraph.functional_residual",
+   "Descent.Portability.SpectralOperatorEpigraph.residual_quadratic",
+   "Descent.Portability.SpectralTraceComplementarity.rayleigh_equality",
+   "Descent.Portability.SpectralTraceComplementarity.support_of_trace_equality",
    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_covariance",
    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_squared_correlation",
    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_squared_correlation_eq_zero_iff",
@@ -178960,14 +179210,15 @@
     "0 < p ∧ p < 1",
     "0 < p.variance (linearScore genotype weights",
     "0 < p.variance liability",
+    "Feasible floor c B p",
+    "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p",
+    "(covariance (fun i ↦ κ i / p i",
     "∀ i, 0 < p i",
     "∀ i, p i = t * (Real.sqrt (κ i",
     "(∑ i, p i",
     "covariance (fun i ↦ κ i / p i",
     "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i",
-    "(covariance (fun i ↦ κ i / p i",
-    "lam * (spending c p - B",
-    "Feasible floor c B p"
+    "lam * (spending c p - B"
    ],
    "hypotheses_by_theorem": {
     "Descent.Blindness.covarianceMatrix_addRankOneSignal": [],
@@ -179089,6 +179340,18 @@
     "Descent.Portability.SimulationAccuracy.covariance_two_scores": [],
     "Descent.Portability.SimultaneousRealization.genotype_contrast_covariance": [],
     "Descent.Portability.SourceFixedRealization.cell_score_covariance": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality": [
+     "Feasible floor c B p",
+     "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p",
+     "(covariance (fun i ↦ κ i / p i"
+    ],
+    "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula": [
+     "Feasible floor c B p",
+     "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p",
+     "(covariance (fun i ↦ κ i / p i"
+    ],
+    "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law": [],
     "Descent.Portability.SpectralAuditCost.isotropic_trace": [],
     "Descent.Portability.SpectralAuditCost.attained_cost_bound": [
      "∀ i, 0 < p i",
@@ -179108,6 +179371,7 @@
      "(covariance (fun i ↦ κ i / p i",
      "lam * (spending c p - B"
     ],
+    "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality": [],
     "Descent.Portability.SpectralAuditTrace.covariance_trace": [],
     "Descent.Portability.SpectralAuditTrace.trace_pairing": [],
     "Descent.Portability.SpectralAuditTrace.positive_trace_bound": [],
@@ -179121,6 +179385,10 @@
      "∀ i, 0 < p i",
      "(∑ i, p i"
     ],
+    "Descent.Portability.SpectralOperatorEpigraph.residual_quadratic": [],
+    "Descent.Portability.SpectralOperatorEpigraph.functional_residual": [],
+    "Descent.Portability.SpectralTraceComplementarity.rayleigh_equality": [],
+    "Descent.Portability.SpectralTraceComplementarity.support_of_trace_equality": [],
     "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_covariance": [],
     "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_squared_correlation": [],
     "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_squared_correlation_eq_zero_iff": [],
@@ -181455,10 +181723,14 @@
    "Descent.Portability.OptimalMeasurementAllocation.allocation_lower_bound",
    "Descent.Portability.OptimalMeasurementAllocation.optimal_among_allocations",
    "Descent.Portability.OptimalMeasurementAllocation.optimal_spending",
+   "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law",
    "Descent.Portability.SpectralAuditDualCertificate.certificate_equality",
    "Descent.Portability.SpectralAuditDualCertificate.certified_optimum",
    "Descent.Portability.SpectralAuditDualCertificate.lagrangian_identity",
-   "Descent.Portability.SpectralAuditDualCertificate.weak_duality"
+   "Descent.Portability.SpectralAuditDualCertificate.weak_duality",
+   "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality",
+   "Descent.Portability.SpectralOperatorEpigraph.epigraph_multipliers",
+   "Descent.Portability.SpectralOperatorEpigraph.functional_normalized"
   ],
   "constraints": {
    "hypotheses": [
@@ -181475,7 +181747,9 @@
     "∀ q ∈ domain floor, worstVariance a p ≤ q.2 + ∑ j, d j * constraint a c B j q",
     "∀ j, d j * constraint a c B j (p, worstVariance a p",
     "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i",
-    "(covariance (fun i ↦ κ i / p i"
+    "(covariance (fun i ↦ κ i / p i",
+    "∀ x ∈ domain floor, objective κ u p ≤ x.2 + lam * (spending c x.1 - B",
+    "R (operatorResidual κ u (p, objective κ u p"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality": [
@@ -181529,6 +181803,10 @@
     "Descent.Portability.OptimalMeasurementAllocation.allocation_lower_bound": [],
     "Descent.Portability.OptimalMeasurementAllocation.optimal_spending": [],
     "Descent.Portability.OptimalMeasurementAllocation.optimal_among_allocations": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law": [
+     "∀ i, 0 < c i",
+     "spending c p₀ < B"
+    ],
     "Descent.Portability.SpectralAuditDualCertificate.lagrangian_identity": [],
     "Descent.Portability.SpectralAuditDualCertificate.weak_duality": [
      "∀ i, 0 ≤ c i",
@@ -181545,6 +181823,20 @@
      "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i",
      "(covariance (fun i ↦ κ i / p i",
      "lam * (spending c p - B"
+    ],
+    "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality": [
+     "∀ i, 0 ≤ c i",
+     "spending c p₀ < B"
+    ],
+    "Descent.Portability.SpectralOperatorEpigraph.epigraph_multipliers": [
+     "Feasible floor c B p",
+     "spending c p₀ < B"
+    ],
+    "Descent.Portability.SpectralOperatorEpigraph.functional_normalized": [
+     "∀ i, p i ∈ Set.Icc (floor i",
+     "∀ x ∈ domain floor, objective κ u p ≤ x.2 + lam * (spending c x.1 - B",
+     "lam * (spending c p - B",
+     "R (operatorResidual κ u (p, objective κ u p"
     ]
    }
   }
@@ -181609,6 +181901,9 @@
    "Descent.Portability.RangeAwareAuditSearch.exact_solvers_guarantee",
    "Descent.Portability.RangeAwareAuditSearch.finite_search_exists",
    "Descent.Portability.RangeAwareAuditSearch.range_interval",
+   "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality",
    "Descent.Portability.SpectralAuditDesign.objective_continuous",
    "Descent.Portability.SpectralAuditDesign.objective_convex",
    "Descent.Portability.SpectralAuditDesign.optimum_exists",
@@ -181617,7 +181912,9 @@
    "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error",
    "Descent.Portability.SpectralAuditNumericalCertificate.certified_radius_error",
    "Descent.Portability.SpectralAuditNumericalCertificate.certified_variance_error",
+   "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality",
    "Descent.Portability.SpectralMinimaxAuditDesign.design_exists",
+   "Descent.Portability.SpectralOperatorEpigraph.epigraph_multipliers",
    "Descent.Portability.SpectralRangeAuditDesign.capped_convex",
    "Descent.Portability.SpectralRangeAuditDesign.design_exists",
    "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction",
@@ -181651,8 +181948,9 @@
     "∀ i ∈ s, floor i = f₀",
     "∀ i ∈ s, c i = c₀",
     "{p | Feasible floor c B p ∧ maxRange h p ≤ m}.Nonempty",
-    "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i",
+    "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p",
     "(covariance (fun i ↦ κ i / p i",
+    "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i",
     "Feasible (cappedFloor floor h M"
    ],
    "hypotheses_by_theorem": {
@@ -181819,6 +182117,26 @@
      "∀ i, 0 < floor i",
      "∃ p, Feasible floor c B p"
     ],
+    "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i",
+     "Feasible floor c B p",
+     "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p",
+     "(covariance (fun i ↦ κ i / p i"
+    ],
+    "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < c i",
+     "Feasible floor c B p",
+     "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p",
+     "(covariance (fun i ↦ κ i / p i"
+    ],
+    "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < c i",
+     "∀ i, p₀ i ∈ Set.Icc (floor i",
+     "spending c p₀ < B"
+    ],
     "Descent.Portability.SpectralAuditDesign.objective_convex": [
      "∀ i, 0 < floor i"
     ],
@@ -181858,9 +182176,21 @@
      "∀ i, 0 ≤ c i",
      "Feasible (cappedFloor floor h M"
     ],
+    "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i",
+     "∀ i, p₀ i ∈ Set.Icc (floor i",
+     "spending c p₀ < B"
+    ],
     "Descent.Portability.SpectralMinimaxAuditDesign.design_exists": [
      "∀ i, 0 < floor i",
      "∃ p, Feasible floor c B p"
+    ],
+    "Descent.Portability.SpectralOperatorEpigraph.epigraph_multipliers": [
+     "∀ i, 0 < floor i",
+     "Feasible floor c B p",
+     "∀ i, p₀ i ∈ Set.Icc (floor i",
+     "spending c p₀ < B"
     ],
     "Descent.Portability.SpectralRangeAuditDesign.radius_continuous": [
      "∀ i, 0 < floor i"
@@ -181934,7 +182264,8 @@
    "Descent.Portability.FiniteAuditStrongDuality.attained_strong_duality",
    "Descent.Portability.FiniteAuditStrongDuality.constraint_sum",
    "Descent.Portability.FiniteAuditStrongDuality.multipliers_sum_one",
-   "Descent.Portability.MinimaxAuditDesignLaw.variance_identity"
+   "Descent.Portability.MinimaxAuditDesignLaw.variance_identity",
+   "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective"
   ],
   "constraints": {
    "declared_kind": "nonnegative",
@@ -182011,7 +182342,8 @@
     ],
     "Descent.Portability.MinimaxAuditDesignLaw.variance_identity": [
      "∀ i, 0 < p i"
-    ]
+    ],
+    "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective": []
    }
   }
  },
@@ -182054,7 +182386,9 @@
    "Descent.Portability.GeometricAuditCaps.grid_design_approximation",
    "Descent.Portability.IdenticalAuditCells.finite_variance_le",
    "Descent.Portability.RangeAwareAuditSearch.exact_solvers_guarantee",
-   "Descent.Portability.RangeAwareAuditSearch.finite_search_exists"
+   "Descent.Portability.RangeAwareAuditSearch.finite_search_exists",
+   "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality",
+   "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective"
   ],
   "constraints": {
    "declared_kind": "nonnegative",
@@ -182084,7 +182418,9 @@
     "maxRange h p ∈ Set.Icc low high",
     "∀ j i, i ∈ s → a j i = a₀ j",
     "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
-    "∃ p, Feasible floor c B p"
+    "∃ p, Feasible floor c B p",
+    "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p",
+    "(covariance (fun i ↦ κ i / p i"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.AuditDesignNumericalCertificate.worst_nonneg": [
@@ -182178,6 +182514,12 @@
     ],
     "Descent.Portability.RangeAwareAuditSearch.finite_search_exists": [
      "∃ p, Feasible floor c B p"
+    ],
+    "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality": [
+     "Feasible floor c B p",
+     "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p",
+     "(covariance (fun i ↦ κ i / p i"
     ]
    }
   }
@@ -182239,12 +182581,18 @@
    "Descent.Portability.HWEHierarchyGenerator.full_generator_limit",
    "Descent.Portability.HWEKernelTruncation.eventual_uniform_truncation",
    "Descent.Portability.HWEKernelTruncation.truncation_bound",
+   "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality",
+   "Descent.Portability.SpectralAuditAllocationLaw.one_row_dual",
+   "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective",
    "Descent.Portability.SpectralAuditDualCertificate.certificate_equality",
    "Descent.Portability.SpectralAuditDualCertificate.certified_optimum",
    "Descent.Portability.SpectralAuditDualCertificate.contribution_nonneg",
    "Descent.Portability.SpectralAuditDualCertificate.lagrangian_identity",
    "Descent.Portability.SpectralAuditDualCertificate.positive_multiplier_choice",
    "Descent.Portability.SpectralAuditDualCertificate.weak_duality",
+   "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality",
    "Descent.Spectral.spectrum_recoverable_architecture_not"
   ],
   "constraints": {
@@ -182263,8 +182611,8 @@
     "∀ i, p i = AuditAllocationCoordinate.choice (contribution a η i",
     "∀ j, η j ≠ 0 → rowVariance a p j = worstVariance a p",
     "∀ i, 0 ≤ κ i",
-    "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i",
-    "(covariance (fun i ↦ κ i / p i"
+    "(covariance (fun i ↦ κ i / p i",
+    "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i"
    ],
    "hypotheses_by_theorem": {
     "Descent.Blindness.Fiber.contribution_zero_test_function_eq_zero": [],
@@ -182337,6 +182685,26 @@
     "Descent.Portability.HWEHierarchyGenerator.full_generator_limit": [],
     "Descent.Portability.HWEKernelTruncation.truncation_bound": [],
     "Descent.Portability.HWEKernelTruncation.eventual_uniform_truncation": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.one_row_dual": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality": [
+     "∀ i, 0 ≤ κ i",
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i",
+     "(covariance (fun i ↦ κ i / p i"
+    ],
+    "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula": [
+     "∀ i, 0 ≤ κ i",
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < c i",
+     "(covariance (fun i ↦ κ i / p i"
+    ],
+    "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law": [
+     "∀ i, 0 ≤ κ i",
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < c i",
+     "∀ i, p₀ i ∈ Set.Icc (floor i"
+    ],
     "Descent.Portability.SpectralAuditDualCertificate.contribution_nonneg": [
      "∀ i, 0 ≤ κ i"
     ],
@@ -182359,6 +182727,12 @@
     ],
     "Descent.Portability.SpectralAuditDualCertificate.positive_multiplier_choice": [
      "∀ i, 0 < c i"
+    ],
+    "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality": [
+     "∀ i, 0 ≤ κ i",
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i",
+     "∀ i, p₀ i ∈ Set.Icc (floor i"
     ],
     "Descent.Spectral.spectrum_recoverable_architecture_not": []
    }
@@ -182394,8 +182768,13 @@
    "Descent.Portability.FiniteAuditDesign.certificate_equality",
    "Descent.Portability.FiniteAuditDesign.weak_duality",
    "Descent.Portability.FiniteAuditStrongDuality.attained_strong_duality",
+   "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality",
+   "Descent.Portability.SpectralAuditAllocationLaw.one_row_dual",
    "Descent.Portability.SpectralAuditDualCertificate.certificate_equality",
-   "Descent.Portability.SpectralAuditDualCertificate.weak_duality"
+   "Descent.Portability.SpectralAuditDualCertificate.weak_duality",
+   "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality"
   ],
   "constraints": {
    "hypotheses": [
@@ -182413,7 +182792,8 @@
     "spending c p₀ < B",
     "∀ i, p i = AuditAllocationCoordinate.choice (contribution a η i",
     "∀ j, η j ≠ 0 → rowVariance a p j = worstVariance a p",
-    "lam * (spending c p - B"
+    "lam * (spending c p - B",
+    "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality": [
@@ -182465,6 +182845,27 @@
      "∀ i, p₀ i ∈ Set.Icc (floor i",
      "spending c p₀ < B"
     ],
+    "Descent.Portability.SpectralAuditAllocationLaw.one_row_dual": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i",
+     "0 ≤ lam",
+     "Feasible floor c B p",
+     "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p"
+    ],
+    "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < c i",
+     "0 < lam",
+     "Feasible floor c B p",
+     "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p"
+    ],
+    "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < c i",
+     "∀ i, p₀ i ∈ Set.Icc (floor i",
+     "spending c p₀ < B"
+    ],
     "Descent.Portability.SpectralAuditDualCertificate.weak_duality": [
      "∀ i, 0 < floor i",
      "∀ i, 0 ≤ c i",
@@ -182473,6 +182874,12 @@
     ],
     "Descent.Portability.SpectralAuditDualCertificate.certificate_equality": [
      "lam * (spending c p - B"
+    ],
+    "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i",
+     "∀ i, p₀ i ∈ Set.Icc (floor i",
+     "spending c p₀ < B"
     ]
    }
   }
@@ -182516,6 +182923,9 @@
    "Descent.Portability.FiniteAuditEpigraph.slater_point",
    "Descent.Portability.FiniteAuditStrongDuality.epigraph_multipliers",
    "Descent.Portability.FiniteAuditStrongDuality.multipliers_sum_one",
+   "Descent.Portability.SpectralOperatorEpigraph.epigraph_multipliers",
+   "Descent.Portability.SpectralOperatorEpigraph.functional_normalized",
+   "Descent.Portability.SpectralOperatorEpigraph.residual_convex",
    "Descent.Portability.VisiblePipelineInput.unascertainedLDCorrelationSqOn_eq",
    "Descent.Portability.VisiblePipelineInput.unascertainedLDCorrelationSq_eq_some",
    "Descent.Portability.VisiblePipelineInput.unascertainedLDCorrelationSq_mem_unitInterval",
@@ -182532,7 +182942,8 @@
     "∀ i, p i ∈ Set.Icc (floor i",
     "Feasible floor c B p",
     "∀ i, p₀ i ∈ Set.Icc (floor i",
-    "∀ q ∈ domain floor, worstVariance a p ≤ q.2 + ∑ j, d j * constraint a c B j q"
+    "∀ q ∈ domain floor, worstVariance a p ≤ q.2 + ∑ j, d j * constraint a c B j q",
+    "∀ x ∈ domain floor, objective κ u p ≤ x.2 + lam * (spending c x.1 - B"
    ],
    "hypotheses_by_theorem": {
     "Descent.Coalescent.targetCountHeterozygosity_zero": [],
@@ -182575,7 +182986,19 @@
      "∀ i, p i ∈ Set.Icc (floor i",
      "∀ q ∈ domain floor, worstVariance a p ≤ q.2 + ∑ j, d j * constraint a c B j q"
     ],
-    "Descent.Portability.unascertainedPanelMomentRatio_expansion": []
+    "Descent.Portability.unascertainedPanelMomentRatio_expansion": [],
+    "Descent.Portability.SpectralOperatorEpigraph.residual_convex": [
+     "∀ i, 0 < floor i"
+    ],
+    "Descent.Portability.SpectralOperatorEpigraph.epigraph_multipliers": [
+     "∀ i, 0 < floor i",
+     "Feasible floor c B p",
+     "∀ i, p₀ i ∈ Set.Icc (floor i"
+    ],
+    "Descent.Portability.SpectralOperatorEpigraph.functional_normalized": [
+     "∀ i, p i ∈ Set.Icc (floor i",
+     "∀ x ∈ domain floor, objective κ u p ≤ x.2 + lam * (spending c x.1 - B"
+    ]
    },
    "range_hi_thm": [
     "Descent.Coalescent.DemographicTwoLocusMoments.unascertainedLDCorrelationSq_le_one",
@@ -184398,6 +184821,12 @@
    "Descent.Portability.SpectralAuditTrace.trace_pairing",
    "Descent.Portability.SpectralCostEquality.zero_leverage_variance",
    "Descent.Portability.SpectralMeasurementMinimax.coordinate_norm",
+   "Descent.Portability.SpectralOperatorEpigraph.residual_convex",
+   "Descent.Portability.SpectralOperatorEpigraph.residual_feasible_iff",
+   "Descent.Portability.SpectralOperatorEpigraph.residual_quadratic",
+   "Descent.Portability.SpectralOperatorEpigraph.strict_operator_point",
+   "Descent.Portability.SpectralTraceComplementarity.rayleigh_equality",
+   "Descent.Portability.SpectralTraceComplementarity.support_of_trace_equality",
    "Descent.Portability.VectorAuditConfidence.directional_error",
    "Descent.Portability.VectorAuditConfidence.directional_range",
    "Descent.Portability.VectorAuditConfidence.vector_confidence",
@@ -184518,6 +184947,12 @@
     "Descent.Portability.SpectralAuditTrace.positive_trace_bound": [],
     "Descent.Portability.SpectralCostEquality.zero_leverage_variance": [],
     "Descent.Portability.SpectralMeasurementMinimax.coordinate_norm": [],
+    "Descent.Portability.SpectralOperatorEpigraph.residual_quadratic": [],
+    "Descent.Portability.SpectralOperatorEpigraph.residual_convex": [],
+    "Descent.Portability.SpectralOperatorEpigraph.residual_feasible_iff": [],
+    "Descent.Portability.SpectralOperatorEpigraph.strict_operator_point": [],
+    "Descent.Portability.SpectralTraceComplementarity.rayleigh_equality": [],
+    "Descent.Portability.SpectralTraceComplementarity.support_of_trace_equality": [],
     "Descent.Portability.VectorAuditConfidence.directional_error": [],
     "Descent.Portability.VectorAuditConfidence.directional_range": [],
     "Descent.Portability.VectorAuditConfidence.vector_confidence": [],
@@ -195548,11 +195983,16 @@
    "Descent.Portability.SimulationAccuracy.covariance_two_scores",
    "Descent.Portability.SimultaneousRealization.genotype_contrast_covariance",
    "Descent.Portability.SourceFixedRealization.cell_score_covariance",
+   "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality",
+   "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective",
    "Descent.Portability.SpectralAuditCost.attained_cost_bound",
    "Descent.Portability.SpectralAuditCost.isotropic_trace",
    "Descent.Portability.SpectralAuditDualCertificate.certificate_equality",
    "Descent.Portability.SpectralAuditDualCertificate.certified_optimum",
    "Descent.Portability.SpectralAuditDualCertificate.lagrangian_identity",
+   "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality",
    "Descent.Portability.SpectralAuditTrace.covariance_trace",
    "Descent.Portability.SpectralAuditTrace.positive_trace_bound",
    "Descent.Portability.SpectralAuditTrace.top_support_equality",
@@ -195560,6 +196000,10 @@
    "Descent.Portability.SpectralCostEquality.cost_equality_complete",
    "Descent.Portability.SpectralCostEquality.cost_equality_iff",
    "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality",
+   "Descent.Portability.SpectralOperatorEpigraph.functional_residual",
+   "Descent.Portability.SpectralOperatorEpigraph.residual_quadratic",
+   "Descent.Portability.SpectralTraceComplementarity.rayleigh_equality",
+   "Descent.Portability.SpectralTraceComplementarity.support_of_trace_equality",
    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_covariance",
    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_squared_correlation",
    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_squared_correlation_eq_zero_iff",
@@ -195750,11 +196194,16 @@
     "Descent.Portability.SimulationAccuracy.covariance_two_scores": [],
     "Descent.Portability.SimultaneousRealization.genotype_contrast_covariance": [],
     "Descent.Portability.SourceFixedRealization.cell_score_covariance": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law": [],
     "Descent.Portability.SpectralAuditCost.isotropic_trace": [],
     "Descent.Portability.SpectralAuditCost.attained_cost_bound": [],
     "Descent.Portability.SpectralAuditDualCertificate.lagrangian_identity": [],
     "Descent.Portability.SpectralAuditDualCertificate.certificate_equality": [],
     "Descent.Portability.SpectralAuditDualCertificate.certified_optimum": [],
+    "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality": [],
     "Descent.Portability.SpectralAuditTrace.covariance_trace": [],
     "Descent.Portability.SpectralAuditTrace.trace_pairing": [],
     "Descent.Portability.SpectralAuditTrace.positive_trace_bound": [],
@@ -195762,6 +196211,10 @@
     "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality": [],
     "Descent.Portability.SpectralCostEquality.cost_equality_iff": [],
     "Descent.Portability.SpectralCostEquality.cost_equality_complete": [],
+    "Descent.Portability.SpectralOperatorEpigraph.residual_quadratic": [],
+    "Descent.Portability.SpectralOperatorEpigraph.functional_residual": [],
+    "Descent.Portability.SpectralTraceComplementarity.rayleigh_equality": [],
+    "Descent.Portability.SpectralTraceComplementarity.support_of_trace_equality": [],
     "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_covariance": [],
     "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_squared_correlation": [],
     "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_squared_correlation_eq_zero_iff": [],
@@ -203253,12 +203706,18 @@
    "Descent.Portability.HWEHierarchyGenerator.full_generator_limit",
    "Descent.Portability.HWEKernelTruncation.eventual_uniform_truncation",
    "Descent.Portability.HWEKernelTruncation.truncation_bound",
+   "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality",
+   "Descent.Portability.SpectralAuditAllocationLaw.one_row_dual",
+   "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective",
    "Descent.Portability.SpectralAuditDualCertificate.certificate_equality",
    "Descent.Portability.SpectralAuditDualCertificate.certified_optimum",
    "Descent.Portability.SpectralAuditDualCertificate.contribution_nonneg",
    "Descent.Portability.SpectralAuditDualCertificate.lagrangian_identity",
    "Descent.Portability.SpectralAuditDualCertificate.positive_multiplier_choice",
    "Descent.Portability.SpectralAuditDualCertificate.weak_duality",
+   "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality",
    "Descent.Spectral.spectrum_recoverable_architecture_not"
   ],
   "constraints": {
@@ -203314,12 +203773,18 @@
      "∀ m, (h m",
      "∀ᶠ m in atTop, (h m"
     ],
+    "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.one_row_dual": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law": [],
     "Descent.Portability.SpectralAuditDualCertificate.contribution_nonneg": [],
     "Descent.Portability.SpectralAuditDualCertificate.lagrangian_identity": [],
     "Descent.Portability.SpectralAuditDualCertificate.weak_duality": [],
     "Descent.Portability.SpectralAuditDualCertificate.certificate_equality": [],
     "Descent.Portability.SpectralAuditDualCertificate.certified_optimum": [],
     "Descent.Portability.SpectralAuditDualCertificate.positive_multiplier_choice": [],
+    "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality": [],
     "Descent.Spectral.spectrum_recoverable_architecture_not": []
    }
   }
@@ -228183,7 +228648,9 @@
    "Descent.Portability.OperatorSlaterSeparation.exists_separator",
    "Descent.Portability.OperatorSlaterSeparation.upperImage_add",
    "Descent.Portability.PositiveOperatorFunctional.rank_symmetry",
-   "Descent.Portability.PositiveOperatorFunctional.representative_positive"
+   "Descent.Portability.PositiveOperatorFunctional.representative_positive",
+   "Descent.Portability.SpectralOperatorEpigraph.epigraph_multipliers",
+   "Descent.Portability.SpectralOperatorEpigraph.residual_feasible_iff"
   ],
   "constraints": {
    "hypotheses": [
@@ -228211,7 +228678,9 @@
     ],
     "Descent.Portability.PositiveOperatorFunctional.representative_positive": [
      "∀ A, Nonnegative A → 0 ≤ R A"
-    ]
+    ],
+    "Descent.Portability.SpectralOperatorEpigraph.residual_feasible_iff": [],
+    "Descent.Portability.SpectralOperatorEpigraph.epigraph_multipliers": []
    }
   }
  },
@@ -228237,7 +228706,8 @@
    "Descent.Portability.OperatorPositiveCone.strict_nonnegative",
    "Descent.Portability.OperatorSlaterMultipliers.exists_multipliers",
    "Descent.Portability.OperatorSlaterSeparation.shifted_mem",
-   "Descent.Portability.OperatorSlaterSeparation.upperImage_open"
+   "Descent.Portability.OperatorSlaterSeparation.upperImage_open",
+   "Descent.Portability.SpectralOperatorEpigraph.strict_operator_point"
   ],
   "constraints": {
    "hypotheses": [
@@ -228255,7 +228725,8 @@
     ],
     "Descent.Portability.OperatorSlaterMultipliers.exists_multipliers": [],
     "Descent.Portability.OperatorSlaterSeparation.upperImage_open": [],
-    "Descent.Portability.OperatorSlaterSeparation.shifted_mem": []
+    "Descent.Portability.OperatorSlaterSeparation.shifted_mem": [],
+    "Descent.Portability.SpectralOperatorEpigraph.strict_operator_point": []
    }
   }
  },
@@ -229077,10 +229548,14 @@
    "Descent.Portability.OptimalMeasurementAllocation.allocation_lower_bound",
    "Descent.Portability.OptimalMeasurementAllocation.optimal_among_allocations",
    "Descent.Portability.OptimalMeasurementAllocation.optimal_spending",
+   "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law",
    "Descent.Portability.SpectralAuditDualCertificate.certificate_equality",
    "Descent.Portability.SpectralAuditDualCertificate.certified_optimum",
    "Descent.Portability.SpectralAuditDualCertificate.lagrangian_identity",
-   "Descent.Portability.SpectralAuditDualCertificate.weak_duality"
+   "Descent.Portability.SpectralAuditDualCertificate.weak_duality",
+   "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality",
+   "Descent.Portability.SpectralOperatorEpigraph.epigraph_multipliers",
+   "Descent.Portability.SpectralOperatorEpigraph.functional_normalized"
   ],
   "constraints": {
    "hypotheses": [
@@ -229118,10 +229593,14 @@
      "∀ mode, 0 < effort mode",
      "spending cost effort ≤ budget"
     ],
+    "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law": [],
     "Descent.Portability.SpectralAuditDualCertificate.lagrangian_identity": [],
     "Descent.Portability.SpectralAuditDualCertificate.weak_duality": [],
     "Descent.Portability.SpectralAuditDualCertificate.certificate_equality": [],
-    "Descent.Portability.SpectralAuditDualCertificate.certified_optimum": []
+    "Descent.Portability.SpectralAuditDualCertificate.certified_optimum": [],
+    "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality": [],
+    "Descent.Portability.SpectralOperatorEpigraph.epigraph_multipliers": [],
+    "Descent.Portability.SpectralOperatorEpigraph.functional_normalized": []
    }
   }
  },
@@ -257144,6 +257623,7 @@
    "Descent.Portability.PositiveOperatorFunctional.representative_positive",
    "Descent.Portability.PositiveOperatorFunctional.representative_trace",
    "Descent.Portability.PositiveOperatorFunctional.trace_representation",
+   "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality",
    "Descent.Portability.cellBalanced_cross_term_eq_zero",
    "Descent.Portability.cellBalanced_energy_eq_add_gap",
    "Descent.Portability.cellBalanced_sum_residual_eq_zero",
@@ -257174,7 +257654,8 @@
      "∀ A, Nonnegative A → 0 ≤ R A"
     ],
     "Descent.Portability.PositiveOperatorFunctional.trace_representation": [],
-    "Descent.Portability.PositiveOperatorFunctional.representative_trace": []
+    "Descent.Portability.PositiveOperatorFunctional.representative_trace": [],
+    "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality": []
    }
   }
  },
@@ -258785,7 +259266,8 @@
    "Descent.Portability.RadialPotentialLaw.radialDensity_coordinate_hasDerivAt",
    "Descent.Portability.RadialPotentialLaw.update_hasDerivAt",
    "Descent.Portability.RatioSourceDegeneracy.nonalignment_kernel_direction",
-   "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality"
+   "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality",
+   "Descent.Portability.SpectralTraceComplementarity.rayleigh_equality"
   ],
   "constraints": {
    "hypotheses": [],
@@ -258803,7 +259285,8 @@
     "Descent.Portability.RadialPotentialLaw.coordinateDerivative_closed": [],
     "Descent.Portability.RadialPotentialLaw.potential_coordinate_hasDerivAt": [],
     "Descent.Portability.RatioSourceDegeneracy.nonalignment_kernel_direction": [],
-    "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality": []
+    "Descent.Portability.SpectralCostEquality.isotropic_of_trace_equality": [],
+    "Descent.Portability.SpectralTraceComplementarity.rayleigh_equality": []
    }
   }
  },
@@ -262588,9 +263071,13 @@
    "Descent.Portability.MarkovSeparatorLaw.local_implies_separator",
    "Descent.Portability.ReservoirSamplingLaw.choiceLaw_some_mass",
    "Descent.Portability.ReservoirSamplingLaw.choice_eq_some_iff",
+   "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality",
    "Descent.Portability.SpectralAuditDualCertificate.certificate_equality",
    "Descent.Portability.SpectralAuditDualCertificate.certified_optimum",
-   "Descent.Portability.SpectralAuditDualCertificate.positive_multiplier_choice"
+   "Descent.Portability.SpectralAuditDualCertificate.positive_multiplier_choice",
+   "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality"
   ],
   "constraints": {
    "hypotheses": [
@@ -262614,9 +263101,13 @@
     "Descent.Portability.ReservoirSamplingLaw.choiceLaw_some_mass": [
      "capacity ≤ seen"
     ],
+    "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law": [],
     "Descent.Portability.SpectralAuditDualCertificate.certificate_equality": [],
     "Descent.Portability.SpectralAuditDualCertificate.certified_optimum": [],
-    "Descent.Portability.SpectralAuditDualCertificate.positive_multiplier_choice": []
+    "Descent.Portability.SpectralAuditDualCertificate.positive_multiplier_choice": [],
+    "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality": []
    }
   }
  },
@@ -274156,6 +274647,9 @@
    "Descent.Portability.IdenticalAuditCells.capped_spectral_optimum_constant",
    "Descent.Portability.IdenticalAuditCells.spectral_optimum_constant",
    "Descent.Portability.IdenticalAuditCells.spectral_variance_le",
+   "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality",
    "Descent.Portability.SpectralAuditCost.attained_cost_bound",
    "Descent.Portability.SpectralAuditCost.cost_lower_bound",
    "Descent.Portability.SpectralAuditDesign.direction_le",
@@ -274170,10 +274664,15 @@
    "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error",
    "Descent.Portability.SpectralAuditNumericalCertificate.certified_radius_error",
    "Descent.Portability.SpectralAuditNumericalCertificate.certified_variance_error",
+   "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality",
    "Descent.Portability.SpectralCostEquality.cost_equality_complete",
    "Descent.Portability.SpectralCostEquality.cost_equality_iff",
    "Descent.Portability.SpectralCostEquality.zero_leverage_variance",
    "Descent.Portability.SpectralMinimaxAuditDesign.variance_identity",
+   "Descent.Portability.SpectralOperatorEpigraph.epigraph_multipliers",
+   "Descent.Portability.SpectralOperatorEpigraph.functional_normalized",
+   "Descent.Portability.SpectralOperatorEpigraph.residual_feasible_iff",
+   "Descent.Portability.SpectralOperatorEpigraph.strict_operator_point",
    "Descent.Portability.SpectralRangeAuditDesign.capped_convex",
    "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction",
    "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists",
@@ -274196,14 +274695,19 @@
     "∀ i ∈ s, u i = u₀",
     "{p | Feasible floor c B p}.Nonempty",
     "{p | Feasible floor c B p ∧ maxRange h p ≤ m}.Nonempty",
+    "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p",
+    "(covariance (fun i ↦ κ i / p i",
     "(∑ i, p i",
     "∀ i, p i = t * (Real.sqrt (κ i",
     "covariance (fun i ↦ κ i / p i",
     "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i",
-    "(covariance (fun i ↦ κ i / p i",
     "lam * (spending c p - B",
     "0 < leverageSum κ u",
     "leverageSum κ u = 0",
+    "IsMinOn (objective κ u",
+    "∀ i, p i ∈ Set.Icc (floor i",
+    "∀ x ∈ domain floor, objective κ u p ≤ x.2 + lam * (spending c x.1 - B",
+    "R (operatorResidual κ u (p, objective κ u p",
     "IsMinOn (fun q ↦ fullRadius κ h q u x",
     "∃ p, Feasible floor c B p"
    ],
@@ -274249,6 +274753,21 @@
      "∀ i ∈ s, κ i = κ₀",
      "∀ i ∈ s, u i = u₀",
      "{p | Feasible floor c B p ∧ maxRange h p ≤ m}.Nonempty"
+    ],
+    "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality": [
+     "∀ i, 0 ≤ κ i",
+     "Feasible floor c B p",
+     "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p",
+     "(covariance (fun i ↦ κ i / p i"
+    ],
+    "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula": [
+     "∀ i, 0 ≤ κ i",
+     "Feasible floor c B p",
+     "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p",
+     "(covariance (fun i ↦ κ i / p i"
+    ],
+    "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law": [
+     "∀ i, 0 ≤ κ i"
     ],
     "Descent.Portability.SpectralAuditCost.cost_lower_bound": [
      "∀ i, 0 ≤ κ i",
@@ -274308,6 +274827,9 @@
     "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error": [
      "∀ i, 0 ≤ κ i"
     ],
+    "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality": [
+     "∀ i, 0 ≤ κ i"
+    ],
     "Descent.Portability.SpectralCostEquality.cost_equality_iff": [
      "∀ i, 0 ≤ κ i",
      "∀ i, 0 < p i",
@@ -274326,6 +274848,19 @@
     ],
     "Descent.Portability.SpectralMinimaxAuditDesign.variance_identity": [
      "∀ i, 0 < p i"
+    ],
+    "Descent.Portability.SpectralOperatorEpigraph.residual_feasible_iff": [],
+    "Descent.Portability.SpectralOperatorEpigraph.strict_operator_point": [],
+    "Descent.Portability.SpectralOperatorEpigraph.epigraph_multipliers": [
+     "∀ i, 0 ≤ κ i",
+     "Feasible floor c B p",
+     "IsMinOn (objective κ u"
+    ],
+    "Descent.Portability.SpectralOperatorEpigraph.functional_normalized": [
+     "∀ i, p i ∈ Set.Icc (floor i",
+     "∀ x ∈ domain floor, objective κ u p ≤ x.2 + lam * (spending c x.1 - B",
+     "lam * (spending c p - B",
+     "R (operatorResidual κ u (p, objective κ u p"
     ],
     "Descent.Portability.SpectralRangeAuditDesign.radius_continuous": [
      "∀ i, 0 ≤ κ i"
@@ -274404,12 +274939,18 @@
    "Descent.Portability.HWEHierarchyGenerator.full_generator_limit",
    "Descent.Portability.HWEKernelTruncation.eventual_uniform_truncation",
    "Descent.Portability.HWEKernelTruncation.truncation_bound",
+   "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality",
+   "Descent.Portability.SpectralAuditAllocationLaw.one_row_dual",
+   "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective",
    "Descent.Portability.SpectralAuditDualCertificate.certificate_equality",
    "Descent.Portability.SpectralAuditDualCertificate.certified_optimum",
    "Descent.Portability.SpectralAuditDualCertificate.contribution_nonneg",
    "Descent.Portability.SpectralAuditDualCertificate.lagrangian_identity",
    "Descent.Portability.SpectralAuditDualCertificate.positive_multiplier_choice",
    "Descent.Portability.SpectralAuditDualCertificate.weak_duality",
+   "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality",
    "Descent.Spectral.spectrum_recoverable_architecture_not"
   ],
   "constraints": {
@@ -274424,8 +274965,9 @@
     "∀ i, 0 ≤ κ i",
     "W.IsPositive",
     "LinearMap.trace ℝ E W = 1",
-    "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i",
-    "(covariance (fun i ↦ κ i / p i"
+    "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p",
+    "(covariance (fun i ↦ κ i / p i",
+    "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i"
    ],
    "hypotheses_by_theorem": {
     "Descent.Blindness.Fiber.contribution_zero_test_function_eq_zero": [],
@@ -274488,6 +275030,32 @@
     ],
     "Descent.Portability.HWEKernelTruncation.truncation_bound": [],
     "Descent.Portability.HWEKernelTruncation.eventual_uniform_truncation": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.one_row_objective": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.one_row_dual": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality": [
+     "∀ i, 0 ≤ κ i",
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i",
+     "W.IsPositive",
+     "LinearMap.trace ℝ E W = 1",
+     "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p",
+     "(covariance (fun i ↦ κ i / p i"
+    ],
+    "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula": [
+     "∀ i, 0 ≤ κ i",
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < c i",
+     "W.IsPositive",
+     "LinearMap.trace ℝ E W = 1",
+     "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p",
+     "(covariance (fun i ↦ κ i / p i"
+    ],
+    "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law": [
+     "∀ i, 0 ≤ κ i",
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < c i",
+     "∀ i, p₀ i ∈ Set.Icc (floor i"
+    ],
     "Descent.Portability.SpectralAuditDualCertificate.contribution_nonneg": [
      "∀ i, 0 ≤ κ i",
      "W.IsPositive"
@@ -274516,6 +275084,12 @@
     ],
     "Descent.Portability.SpectralAuditDualCertificate.positive_multiplier_choice": [
      "∀ i, 0 < c i"
+    ],
+    "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality": [
+     "∀ i, 0 ≤ κ i",
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i",
+     "∀ i, p₀ i ∈ Set.Icc (floor i"
     ],
     "Descent.Spectral.spectrum_recoverable_architecture_not": []
    }
@@ -274551,8 +275125,13 @@
    "Descent.Portability.FiniteAuditDesign.certificate_equality",
    "Descent.Portability.FiniteAuditDesign.weak_duality",
    "Descent.Portability.FiniteAuditStrongDuality.attained_strong_duality",
+   "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality",
+   "Descent.Portability.SpectralAuditAllocationLaw.one_row_dual",
    "Descent.Portability.SpectralAuditDualCertificate.certificate_equality",
-   "Descent.Portability.SpectralAuditDualCertificate.weak_duality"
+   "Descent.Portability.SpectralAuditDualCertificate.weak_duality",
+   "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality"
   ],
   "constraints": {
    "hypotheses": [
@@ -274569,8 +275148,9 @@
     "∀ i, 0 ≤ κ i",
     "W.IsPositive",
     "LinearMap.trace ℝ E W = 1",
-    "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i",
-    "(covariance (fun i ↦ κ i / p i"
+    "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p",
+    "(covariance (fun i ↦ κ i / p i",
+    "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality": [
@@ -274608,6 +275188,36 @@
      "∀ i, p₀ i ∈ Set.Icc (floor i",
      "spending c p₀ < B"
     ],
+    "Descent.Portability.SpectralAuditAllocationLaw.one_row_dual": [],
+    "Descent.Portability.SpectralAuditAllocationLaw.coordinate_optimality": [
+     "∀ i, 0 ≤ κ i",
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i",
+     "0 ≤ lam",
+     "W.IsPositive",
+     "LinearMap.trace ℝ E W = 1",
+     "Feasible floor c B p",
+     "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p",
+     "(covariance (fun i ↦ κ i / p i"
+    ],
+    "Descent.Portability.SpectralAuditAllocationLaw.allocation_formula": [
+     "∀ i, 0 ≤ κ i",
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < c i",
+     "0 < lam",
+     "W.IsPositive",
+     "LinearMap.trace ℝ E W = 1",
+     "Feasible floor c B p",
+     "SpectralAuditDualCertificate.dualBound κ floor c u B lam W = objective κ u p",
+     "(covariance (fun i ↦ κ i / p i"
+    ],
+    "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law": [
+     "∀ i, 0 ≤ κ i",
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < c i",
+     "∀ i, p₀ i ∈ Set.Icc (floor i",
+     "spending c p₀ < B"
+    ],
     "Descent.Portability.SpectralAuditDualCertificate.weak_duality": [
      "∀ i, 0 ≤ κ i",
      "∀ i, 0 < floor i",
@@ -274622,6 +275232,13 @@
      "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i",
      "(covariance (fun i ↦ κ i / p i",
      "lam * (spending c p - B"
+    ],
+    "Descent.Portability.SpectralAuditStrongDuality.attained_strong_duality": [
+     "∀ i, 0 ≤ κ i",
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i",
+     "∀ i, p₀ i ∈ Set.Icc (floor i",
+     "spending c p₀ < B"
     ]
    }
   }
@@ -275369,6 +275986,58 @@
      "∀ i, 0 < floor i",
      "∀ i, L i ≤ lo i ∧ lo i ≤ hi i ∧ hi i ≤ U i",
      "∀ i, 0 < rowRange L U u i"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.SpectralOperatorEpigraph.operatorResidual": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name ContinuousLinearMap.id",
+  "file": "Descent/Portability/SpectralOperatorEpigraph.lean",
+  "line": 31,
+  "short": "operatorResidual",
+  "ret_type": "E →L[ℝ] E",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.SpectralOperatorEpigraph.epigraph_multipliers",
+   "Descent.Portability.SpectralOperatorEpigraph.functional_normalized",
+   "Descent.Portability.SpectralOperatorEpigraph.functional_residual",
+   "Descent.Portability.SpectralOperatorEpigraph.residual_convex",
+   "Descent.Portability.SpectralOperatorEpigraph.residual_feasible_iff",
+   "Descent.Portability.SpectralOperatorEpigraph.residual_quadratic",
+   "Descent.Portability.SpectralOperatorEpigraph.strict_operator_point"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "hypotheses": [
+    "∀ i, 0 ≤ κ i",
+    "IsMinOn (objective κ u",
+    "∀ x ∈ domain floor, objective κ u p ≤ x.2 + lam * (spending c x.1 - B",
+    "R (operatorResidual κ u (p, objective κ u p"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.SpectralOperatorEpigraph.residual_quadratic": [],
+    "Descent.Portability.SpectralOperatorEpigraph.residual_convex": [
+     "∀ i, 0 ≤ κ i"
+    ],
+    "Descent.Portability.SpectralOperatorEpigraph.residual_feasible_iff": [],
+    "Descent.Portability.SpectralOperatorEpigraph.strict_operator_point": [],
+    "Descent.Portability.SpectralOperatorEpigraph.epigraph_multipliers": [
+     "∀ i, 0 ≤ κ i",
+     "IsMinOn (objective κ u"
+    ],
+    "Descent.Portability.SpectralOperatorEpigraph.functional_residual": [],
+    "Descent.Portability.SpectralOperatorEpigraph.functional_normalized": [
+     "∀ x ∈ domain floor, objective κ u p ≤ x.2 + lam * (spending c x.1 - B",
+     "R (operatorResidual κ u (p, objective κ u p"
     ]
    }
   }
