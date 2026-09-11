@@ -76,6 +76,7 @@ def meiosisGameteLaw
     (parent : Haplotype Allele × Haplotype Allele) : FiniteReportLaw (Haplotype Allele) :=
   (maskLaw parent).bind fun mask ↦ transmission (selectStrand parent mask)
 
+omit [(locus : Locus) → DecidableEq (Allele locus)] in
 /-- NOTE2 (3) entrywise: the gamete probability is the mask law summed against the
 transmission probability of the strand that mask selects. -/
 theorem meiosisGameteLaw_mass
@@ -111,6 +112,7 @@ def independentSiteKernel
     (strand : Haplotype Allele) : FiniteReportLaw (Haplotype Allele) :=
   FiniteGeneticTransition.piLaw fun locus ↦ mutate locus (strand locus)
 
+omit [(locus : Locus) → DecidableEq (Allele locus)] in
 /-- The independent-site kernel factorizes exactly over the loci. -/
 theorem independentSiteKernel_mass
     (mutate : ∀ locus, Allele locus → FiniteReportLaw (Allele locus))
@@ -128,7 +130,8 @@ theorem meiosisGameteLaw_default_mass
       ∑ mask : Locus → Bool, (1 / 2) ^ Fintype.card Locus *
         ∏ locus, (mutate locus (selectStrand parent mask locus)).mass (gamete locus) := by
   rw [meiosisGameteLaw_mass]
-  exact Finset.sum_congr rfl fun mask _ ↦ by rw [fairMaskLaw_mass]
+  exact Finset.sum_congr rfl fun mask _ ↦ by
+    rw [fairMaskLaw_mass, independentSiteKernel_mass]
 
 /-- A parent whose two strands agree transmits the same law whatever mask law is supplied:
 without heterozygosity the meiosis randomization is invisible in the gamete law. -/
@@ -192,14 +195,20 @@ theorem selectedParent_ratio (population : ℕ)
     (htotal : 0 < FiniteReproductiveKernel.fitnessTotal counts fitness)
     (first second : Haplotype Allele × Haplotype Allele)
     (hsecond : 0 < (counts.val second : ℝ) * fitness second) :
-    (FiniteReproductiveKernel.selectedParent counts fitness hfitness htotal).mass first /
+    0 < (FiniteReproductiveKernel.selectedParent counts fitness hfitness htotal).mass
+        second ∧
+      (FiniteReproductiveKernel.selectedParent counts fitness hfitness htotal).mass first /
         (FiniteReproductiveKernel.selectedParent counts fitness hfitness htotal).mass
           second =
       ((counts.val first : ℝ) * fitness first) /
         ((counts.val second : ℝ) * fitness second) := by
+  constructor
+  · rw [selectedParent_mass population counts fitness hfitness htotal second]
+    exact div_pos hsecond htotal
   rw [selectedParent_mass population counts fitness hfitness htotal first,
     selectedParent_mass population counts fitness hfitness htotal second]
   rw [div_div_div_cancel_right₀]
+  exact ne_of_gt htotal
 
 /-- NOTE2 (5): the gamete pool of a deme. Draw the source deme from the gamete-migration
 row, the parent from that deme's parental law, and the gamete from that parent's meiosis
@@ -212,6 +221,7 @@ def gametePool (migration : FiniteReportLaw Deme)
   migration.bind fun source ↦
     (parentalLaw source).bind (meiosisGameteLaw maskLaw transmission)
 
+omit [(locus : Locus) → DecidableEq (Allele locus)] in
 /-- NOTE2 (5) entrywise: the migration row summed against the parental law summed against
 the gamete law of NOTE2 (3). -/
 theorem gametePool_mass (migration : FiniteReportLaw Deme)
@@ -224,6 +234,7 @@ theorem gametePool_mass (migration : FiniteReportLaw Deme)
         ∑ parent, (parentalLaw source).mass parent *
           (meiosisGameteLaw maskLaw transmission parent).mass gamete := rfl
 
+omit [(locus : Locus) → DecidableEq (Allele locus)] in
 /-- NOTE2 (5) with independent maternal and paternal gametes: the diploid offspring law is
 the product of two copies of the gamete pool. -/
 theorem independentMating_gametePool_mass (migration : FiniteReportLaw Deme)
