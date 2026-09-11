@@ -22,4 +22,5 @@ open Descent.Portability.SubstochasticGeneratorSemigroup
 #print axioms matrixExponential_substochastic
 #print axioms substochastic_epochProduct
 #print axioms exponential_rowSum_eq_one
+#print axioms matrixExponential_mulVec_const
 #print axioms substochastic_uniformization

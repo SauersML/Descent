@@ -29,7 +29,8 @@ Substochastic matrices are closed under products, powers and finite list product
 chronological list of epochs, each an exponential of its own killing generator run for its own
 nonnegative duration, composes to a substochastic operator.  When every row of `Q` sums to
 exactly zero the same series computation gives row sums exactly one, so no mass is lost: this
-is the conservative case in which the constant vector is preserved.  The uniformization
+is the conservative case, recorded both as a row-sum identity and as the statement that
+the constant vector is a fixed point.  The uniformization
 operator `1 + λ⁻¹ • Q` of (26) is substochastic whenever `λ` dominates every exit rate, and
 so is each of its powers `P ^ k`; those are the positive suboperators whose Poisson weights
 the retained-mass certificate multiplies.
@@ -373,6 +374,14 @@ theorem exponential_rowSum_eq_one (Q : Matrix ι ι ℝ)
     | succ k => simp [hpow k row]
   rw [tsum_congr hterm]
   exact tsum_ite_eq 0 (1 : ℝ)
+
+/-- The conservative case in vector form: the constant vector is a fixed point of the exact
+semigroup of a generator whose rows sum to zero, so total mass is carried forward exactly. -/
+theorem matrixExponential_mulVec_const (Q : Matrix ι ι ℝ)
+    (hzero : ∀ row, ∑ column, Q row column = 0) (time : ℝ) :
+    (matrixExponential Q time).mulVec (fun _ ↦ (1 : ℝ)) = fun _ ↦ (1 : ℝ) := by
+  funext row
+  simpa [Matrix.mulVec, dotProduct] using exponential_rowSum_eq_one Q hzero time row
 
 /-- The uniformization operator `1 + λ⁻¹ • Q` of (26) is substochastic whenever the
 uniformization rate dominates every exit rate. -/
