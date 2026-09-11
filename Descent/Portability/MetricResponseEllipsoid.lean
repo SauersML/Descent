@@ -310,6 +310,160 @@ theorem minimum_norm_direction {m : ℕ} {P : Ω → ℝ} (hP : ∀ ω, 0 < P ω
     wInner_self_nonneg (fun ω ↦ (hP ω).le) _
   linarith
 
+/-- Homogeneity in the left slot. -/
+theorem wInner_smul_left (P f g : Ω → ℝ) (c : ℝ) :
+    wInner P (fun ω ↦ c * f ω) g = c * wInner P f g := by
+  simp only [wInner, Finset.mul_sum]
+  exact Finset.sum_congr rfl fun ω _ ↦ by ring
+
+/-- Additivity in the right slot. -/
+theorem wInner_add_right (P f g h : Ω → ℝ) :
+    wInner P f (fun ω ↦ g ω + h ω) = wInner P f g + wInner P f h := by
+  simp only [wInner, ← Finset.sum_add_distrib]
+  exact Finset.sum_congr rfl fun ω _ ↦ by ring
+
+/-- Scaling a direction scales its squared norm quadratically. -/
+theorem wInner_smul_self (P u : Ω → ℝ) (c : ℝ) :
+    wInner P (fun ω ↦ c * u ω) (fun ω ↦ c * u ω) = c ^ 2 * wInner P u u := by
+  rw [wInner_smul_left, wInner_smul_right]
+  ring
+
+/-- Cauchy-Schwarz for the law-weighted inner product, obtained from the corpus
+inequality `Foundations.cauchy_schwarz` for the expectation `weightedExp`. -/
+theorem wInner_cauchy_schwarz (P : Ω → ℝ) (hp : ∀ ω, 0 ≤ P ω) (hsum : ∑ ω, P ω = 1)
+    (f g : Ω → ℝ) : wInner P f g ^ 2 ≤ wInner P f f * wInner P g g := by
+  have hcs := cauchy_schwarz (weightedExp P hp hsum) f g
+  rw [wInner_eq_weightedExp P hp hsum f g, wInner_eq_weightedExp P hp hsum f f,
+    wInner_eq_weightedExp P hp hsum g g]
+  have hf : (fun ω ↦ f ω * f ω) = fun ω ↦ f ω ^ 2 := by
+    funext ω
+    ring
+  have hg : (fun ω ↦ g ω * g ω) = fun ω ↦ g ω ^ 2 := by
+    funext ω
+    ring
+  rw [hf, hg]
+  exact hcs
+
+/-- **TQ Corollary 5.3 (sharp summary-invisible sensitivity).** The largest
+first-order move of a single metric along an information-preserving direction of
+norm at most one is exactly the norm of its residual influence function, and both
+signs are attained by an explicit direction: the normalised residual influence
+and its negative. The bound is Cauchy-Schwarz; the attainment is a construction,
+so the supremum is a maximum. -/
+theorem sharp_summary_invisible_sensitivity {k : ℕ} {P : Ω → ℝ}
+    (hp : ∀ ω, 0 ≤ P ω) (hsum : ∑ ω, P ω = 1) (feat : Fin k → Ω → ℝ) (rr : Ω → ℝ)
+    (hrconst : wInner P (fun _ ↦ (1 : ℝ)) rr = 0)
+    (hrfeat : ∀ i, wInner P (feat i) rr = 0) (hpos : 0 < wInner P rr rr) :
+    (∀ f : Ω → ℝ, wInner P (fun _ ↦ (1 : ℝ)) f = 0 → (∀ i, wInner P (feat i) f = 0) →
+        wInner P f f ≤ 1 → |wInner P rr f| ≤ Real.sqrt (wInner P rr rr)) ∧
+      ∀ sign : ℝ, sign = 1 ∨ sign = -1 →
+        ∃ f : Ω → ℝ, wInner P (fun _ ↦ (1 : ℝ)) f = 0 ∧
+          (∀ i, wInner P (feat i) f = 0) ∧ wInner P f f ≤ 1 ∧
+          wInner P rr f = sign * Real.sqrt (wInner P rr rr) := by
+  have hroot : 0 < Real.sqrt (wInner P rr rr) := Real.sqrt_pos.mpr hpos
+  have hsq : Real.sqrt (wInner P rr rr) ^ 2 = wInner P rr rr := Real.sq_sqrt hpos.le
+  constructor
+  · intro f _ _ hnorm
+    have hcs := wInner_cauchy_schwarz P hp hsum rr f
+    have hb : wInner P rr f ^ 2 ≤ wInner P rr rr := by nlinarith [hpos.le]
+    calc |wInner P rr f| = Real.sqrt (wInner P rr f ^ 2) := (Real.sqrt_sq_eq_abs _).symm
+      _ ≤ Real.sqrt (wInner P rr rr) := Real.sqrt_le_sqrt hb
+  · intro sign hsign
+    refine ⟨fun ω ↦ sign * (Real.sqrt (wInner P rr rr))⁻¹ * rr ω, ?_, ?_, ?_, ?_⟩
+    · rw [wInner_smul_right, hrconst, mul_zero]
+    · intro i
+      rw [wInner_smul_right, hrfeat i, mul_zero]
+    · rw [wInner_smul_self, hsq]
+      rcases hsign with h | h <;> rw [h] <;>
+        field_simp <;> rw [hsq]
+    · rw [wInner_smul_right]
+      field_simp
+      rcases hsign with h | h <;> rw [h] <;> nlinarith [hsq, hroot]
+
+/-- The product of the two first-order metric responses along a direction, when
+the residual influences are proportional. Its sign is the sign of the
+proportionality constant, in every permissible direction at once. -/
+theorem proportional_residual_derivative_product (P : Ω → ℝ) (r1 r2 : Ω → ℝ) (c : ℝ)
+    (hprop : ∀ ω, r2 ω = c * r1 ω) (f : Ω → ℝ) :
+    wInner P r1 f * wInner P r2 f = c * wInner P r1 f ^ 2 := by
+  have hfun : r2 = fun ω ↦ c * r1 ω := funext hprop
+  rw [hfun, wInner_smul_left]
+  ring
+
+/-- **TQ Corollary 5.4, aligned case.** A positive proportionality constant makes
+the two metric derivatives agree in sign in every permissible direction, and the
+agreement is strict whenever the first derivative is nonzero. -/
+theorem proportional_residual_sign_agreement (P : Ω → ℝ) (r1 r2 : Ω → ℝ) {c : ℝ}
+    (hc : 0 < c) (hprop : ∀ ω, r2 ω = c * r1 ω) (f : Ω → ℝ) :
+    0 ≤ wInner P r1 f * wInner P r2 f ∧
+      (wInner P r1 f ≠ 0 → 0 < wInner P r1 f * wInner P r2 f) := by
+  rw [proportional_residual_derivative_product P r1 r2 c hprop f]
+  exact ⟨mul_nonneg hc.le (sq_nonneg _), fun h ↦
+    mul_pos hc (lt_of_le_of_ne (sq_nonneg _) (Ne.symm (pow_ne_zero 2 h)))⟩
+
+/-- **TQ Corollary 5.4, reversed case.** A negative proportionality constant makes
+the two metric derivatives disagree in sign in every permissible direction, and
+the disagreement is strict whenever the first derivative is nonzero. -/
+theorem proportional_residual_sign_reversal (P : Ω → ℝ) (r1 r2 : Ω → ℝ) {c : ℝ}
+    (hc : c < 0) (hprop : ∀ ω, r2 ω = c * r1 ω) (f : Ω → ℝ) :
+    wInner P r1 f * wInner P r2 f ≤ 0 ∧
+      (wInner P r1 f ≠ 0 → wInner P r1 f * wInner P r2 f < 0) := by
+  rw [proportional_residual_derivative_product P r1 r2 c hprop f]
+  refine ⟨mul_nonpos_of_nonpos_of_nonneg hc.le (sq_nonneg _), fun h ↦ ?_⟩
+  exact mul_neg_of_neg_of_pos hc
+    (lt_of_le_of_ne (sq_nonneg _) (Ne.symm (pow_ne_zero 2 h)))
+
+/-- **TQ Corollary 5.4, independent case.** When the two residual influences have
+a positive Gram determinant, every prescribed pair of first-order responses is
+attained up to one positive scale factor by a single permissible direction. In
+particular every pair of signs is attained, so nothing about the two metrics'
+first-order behaviour is forced. The direction is written down explicitly from
+the inverse of the two-by-two Gram matrix, then rescaled into the unit ball. -/
+theorem independent_residuals_attain_response {k : ℕ} {P : Ω → ℝ}
+    (hp : ∀ ω, 0 ≤ P ω) (feat : Fin k → Ω → ℝ) (r1 r2 : Ω → ℝ)
+    (h1c : wInner P (fun _ ↦ (1 : ℝ)) r1 = 0) (h1f : ∀ i, wInner P (feat i) r1 = 0)
+    (h2c : wInner P (fun _ ↦ (1 : ℝ)) r2 = 0) (h2f : ∀ i, wInner P (feat i) r2 = 0)
+    (hdet : 0 < wInner P r1 r1 * wInner P r2 r2 - wInner P r1 r2 ^ 2) (z1 z2 : ℝ) :
+    ∃ (t : ℝ) (f : Ω → ℝ), 0 < t ∧ wInner P (fun _ ↦ (1 : ℝ)) f = 0 ∧
+      (∀ i, wInner P (feat i) f = 0) ∧ wInner P f f ≤ 1 ∧
+      wInner P r1 f = t * z1 ∧ wInner P r2 f = t * z2 := by
+  have hsym : wInner P r2 r1 = wInner P r1 r2 := wInner_comm P r2 r1
+  set d : ℝ := wInner P r1 r1 * wInner P r2 r2 - wInner P r1 r2 ^ 2 with hd
+  have hdne : d ≠ 0 := ne_of_gt hdet
+  set a1 : ℝ := (wInner P r2 r2 * z1 - wInner P r1 r2 * z2) / d with ha1
+  set a2 : ℝ := (wInner P r1 r1 * z2 - wInner P r1 r2 * z1) / d with ha2
+  have hr1 : wInner P r1 (fun ω ↦ a1 * r1 ω + a2 * r2 ω) = z1 := by
+    rw [wInner_add_right, wInner_smul_right, wInner_smul_right, ha1, ha2, hd]
+    field_simp
+    ring
+  have hr2 : wInner P r2 (fun ω ↦ a1 * r1 ω + a2 * r2 ω) = z2 := by
+    rw [wInner_add_right, wInner_smul_right, wInner_smul_right, hsym, ha1, ha2, hd]
+    field_simp
+    ring
+  have hself : wInner P (fun ω ↦ a1 * r1 ω + a2 * r2 ω)
+      (fun ω ↦ a1 * r1 ω + a2 * r2 ω) = a1 * z1 + a2 * z2 := by
+    rw [wInner_add_left, wInner_smul_left, wInner_smul_left, hr1, hr2]
+  have hq : 0 ≤ a1 * z1 + a2 * z2 := by
+    rw [← hself]
+    exact wInner_self_nonneg hp _
+  refine ⟨(a1 * z1 + a2 * z2 + 1)⁻¹,
+    fun ω ↦ (a1 * z1 + a2 * z2 + 1)⁻¹ * (a1 * r1 ω + a2 * r2 ω), ?_, ?_, ?_, ?_, ?_, ?_⟩
+  · positivity
+  · rw [wInner_smul_right, wInner_add_right, wInner_smul_right, wInner_smul_right,
+      h1c, h2c]
+    ring
+  · intro i
+    rw [wInner_smul_right, wInner_add_right, wInner_smul_right, wInner_smul_right,
+      h1f i, h2f i]
+    ring
+  · rw [wInner_smul_self, hself]
+    rw [div_le_one (by positivity), ← div_le_one (by positivity)] at *
+    have hpos : 0 < a1 * z1 + a2 * z2 + 1 := by linarith
+    rw [inv_pow, inv_mul_eq_div, div_le_one (by positivity)]
+    nlinarith
+  · rw [wInner_smul_right, hr1]
+  · rw [wInner_smul_right, hr2]
+
 end
 
 end Descent.Portability.MetricResponseEllipsoid

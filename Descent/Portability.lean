@@ -1,6 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.FiniteGeneticTransition
+import Descent.Portability.MomentOrderObstruction
 import Descent.Portability.RadialInterpolation
 import Descent.Portability.ConditionalFourthMomentLaw
 import Descent.Portability.GlobalFourthMomentRegion

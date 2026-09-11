@@ -21,3 +21,12 @@ import Descent.Portability.MetricResponseEllipsoid
 #print axioms Descent.Portability.MetricResponseEllipsoid.wInner_comb_self
 #print axioms Descent.Portability.MetricResponseEllipsoid.constrained_response_ellipsoid
 #print axioms Descent.Portability.MetricResponseEllipsoid.minimum_norm_direction
+#print axioms Descent.Portability.MetricResponseEllipsoid.wInner_smul_left
+#print axioms Descent.Portability.MetricResponseEllipsoid.wInner_add_right
+#print axioms Descent.Portability.MetricResponseEllipsoid.wInner_smul_self
+#print axioms Descent.Portability.MetricResponseEllipsoid.wInner_cauchy_schwarz
+#print axioms Descent.Portability.MetricResponseEllipsoid.sharp_summary_invisible_sensitivity
+#print axioms Descent.Portability.MetricResponseEllipsoid.proportional_residual_derivative_product
+#print axioms Descent.Portability.MetricResponseEllipsoid.proportional_residual_sign_agreement
+#print axioms Descent.Portability.MetricResponseEllipsoid.proportional_residual_sign_reversal
+#print axioms Descent.Portability.MetricResponseEllipsoid.independent_residuals_attain_response
