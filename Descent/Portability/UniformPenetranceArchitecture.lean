@@ -527,6 +527,14 @@ theorem intervalIntegrable_unit_ratio :
   have hpos : (0:ℝ) < 2 - θ := by linarith [hθ.2]
   exact ne_of_gt hpos
 
+/-- The logarithmic factor shared by the closed-form antiderivatives below: where `2 - θ` is
+positive, `t ↦ log (2 - t)` has derivative `-1 / (2 - θ)` at `θ`. -/
+theorem hasDerivAt_log_two_sub {θ : ℝ} (hpos : 0 < 2 - θ) :
+    HasDerivAt (fun t : ℝ ↦ Real.log (2 - t)) (-1 / (2 - θ)) θ := by
+  have hinner : HasDerivAt (fun t : ℝ ↦ 2 - t) (-1) θ := by
+    simpa using (hasDerivAt_id θ).const_sub (2:ℝ)
+  exact hinner.log (ne_of_gt hpos)
+
 /-- NOTE2 section 9.1: the exact expected population squared correlation in closed form. -/
 theorem integral_unit_ratio : ∫ θ in (0:ℝ)..1, θ / (2 - θ) = 2 * Real.log 2 - 1 := by
   have hderiv : ∀ θ ∈ Set.uIcc (0:ℝ) 1,
@@ -535,10 +543,7 @@ theorem integral_unit_ratio : ∫ θ in (0:ℝ)..1, θ / (2 - θ) = 2 * Real.log
     rw [Set.uIcc_of_le (by norm_num : (0:ℝ) ≤ 1)] at hθ
     have hpos : (0:ℝ) < 2 - θ := by linarith [hθ.2]
     have hne : (2:ℝ) - θ ≠ 0 := ne_of_gt hpos
-    have hinner : HasDerivAt (fun t : ℝ ↦ 2 - t) (-1) θ := by
-      simpa using (hasDerivAt_id θ).const_sub (2:ℝ)
-    have hlog : HasDerivAt (fun t : ℝ ↦ Real.log (2 - t)) (-1 / (2 - θ)) θ :=
-      hinner.log hne
+    have hlog := hasDerivAt_log_two_sub hpos
     have hfull : HasDerivAt (fun t : ℝ ↦ -(2 * Real.log (2 - t)) - t)
         (-(2 * (-1 / (2 - θ))) - 1) θ := ((hlog.const_mul 2).neg).sub (hasDerivAt_id θ)
     refine hfull.congr_deriv ?_
@@ -565,10 +570,7 @@ theorem integral_unit_auc :
     rw [Set.uIcc_of_le (by norm_num : (0:ℝ) ≤ 1)] at hθ
     have hpos : (0:ℝ) < 2 - θ := by linarith [hθ.2]
     have hne : (2:ℝ) - θ ≠ 0 := ne_of_gt hpos
-    have hinner : HasDerivAt (fun t : ℝ ↦ 2 - t) (-1) θ := by
-      simpa using (hasDerivAt_id θ).const_sub (2:ℝ)
-    have hlog : HasDerivAt (fun t : ℝ ↦ Real.log (2 - t)) (-1 / (2 - θ)) θ :=
-      hinner.log hne
+    have hlog := hasDerivAt_log_two_sub hpos
     have hfull : HasDerivAt (fun t : ℝ ↦ t / 2 - Real.log (2 - t) / 2)
         (1 / 2 - (-1 / (2 - θ)) / 2) θ :=
       ((hasDerivAt_id θ).div_const 2).sub (hlog.div_const 2)

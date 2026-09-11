@@ -21,7 +21,9 @@ known exactly. This module proves both.
 The evaluator is a structure carrying the two evaluation sequences, their measurability, the
 bracketing inequalities, a common bound, and the vanishing of the widths. It is inhabited by
 an explicit nondegenerate evaluator whose brackets are strictly wider than the integrand at
-every stage, so the hypothesis class is not vacuous. The two integral bounds are integral
+every stage, so the hypothesis class is not vacuous; `constantEvaluator` builds one from a
+real number alone, and `immediateHaltingSublaw` likewise inhabits the corpus `ReportSublaw`
+from data alone. The two integral bounds are integral
 monotonicity, and the two convergences are dominated convergence with the constant bound as
 dominating function, which is integrable because the measure is finite.
 
@@ -56,6 +58,8 @@ set_option relaxedAutoImplicit false
 namespace Descent.Portability.IntervalEvaluatorCertificate
 
 open MeasureTheory Filter
+
+open SublawReportCertificate (ReportSublaw)
 
 open scoped BigOperators
 
@@ -131,6 +135,13 @@ noncomputable def slackEvaluator (integrand : Ω → ℝ) (bound : ℝ)
     refine tendsto_slack.congr fun stage ↦ ?_
     show 2 * slack stage = integrand state + slack stage - (integrand state - slack stage)
     ring
+
+/-- A hypothesis-free inhabitant of the evaluator class: the slack evaluator of a constant
+integrand, built from a real number alone. Its brackets are strictly wider than the
+integrand at every stage and close only in the limit. -/
+noncomputable def constantEvaluator (value : ℝ) :
+    IntervalEvaluator (fun _ : Ω ↦ value) (|value| + 1) :=
+  slackEvaluator (fun _ ↦ value) (|value|) measurable_const fun _ ↦ le_rfl
 
 /-- A measurable function bounded in absolute value is integrable against a finite
 measure. -/
@@ -412,7 +423,7 @@ at most one, so the halting prefixes of NOTE2 (32) carry a genuine positive subl
 theorem kraft_sum_le_one (words : Finset (List Bool)) (hfree : PrefixFree words) :
     ∑ word ∈ words, (1 / 2 : ℝ) ^ word.length ≤ 1 :=
   dyadic_sum_le_one_of_length_le (words.sup List.length) words
-    (fun word hword ↦ Finset.le_sup hword) hfree
+    (fun _ hword ↦ Finset.le_sup hword) hfree
 
 /-- NOTE2 (32): the halting law of an almost surely terminating random-bit program,
 enumerated to a finite set of minimal halting prefixes. Each report carries the dyadic
@@ -439,5 +450,16 @@ theorem haltingSublaw_missingMass {Report : Type*} [Fintype Report] [DecidableEq
   congr 1
   exact Finset.sum_fiberwise_of_maps_to (s := words)
     (fun word _ ↦ Finset.mem_univ (report word)) fun word ↦ (1 / 2 : ℝ) ^ word.length
+
+/-- A hypothesis-free halting sublaw: the program that halts before reading any bit and
+reports `true`. Its only minimal halting prefix is the empty word, so this inhabits
+`ReportSublaw` from data alone. -/
+noncomputable def immediateHaltingSublaw : ReportSublaw Bool :=
+  haltingSublaw {[]} prefixFree_singleton_nil fun _ ↦ true
+
+/-- The immediately halting program is enumerated completely: its sublaw misses no mass. -/
+theorem immediateHaltingSublaw_missingMass : immediateHaltingSublaw.missingMass = 0 := by
+  rw [immediateHaltingSublaw, haltingSublaw_missingMass]
+  simp
 
 end Descent.Portability.IntervalEvaluatorCertificate

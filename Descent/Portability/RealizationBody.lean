@@ -68,11 +68,10 @@ value theorems. Consequently `isCompact_realizationBody_lowOrderLDFeature` and
 `isClosed_realizationBody_lowOrderLDFeature` hold unconditionally, and the closedness
 hypotheses stated above are discharged for the corpus coordinates.
 
-What is NOT proved in this module: the sharpened Carathéodory count of NOTE1 §2.1, at most
-`Fintype.card ι` atoms when a coordinate is constant rather than the `card ι + 1` proved
-here. The constant coordinate confines the body to an affine hyperplane, so the sharper count
-follows from an affine-dimension argument in that hyperplane; only the weaker count is
-formalized.
+The sharpened Carathéodory count of NOTE1 §2.1, at most `Fintype.card ι` atoms when a
+coordinate is constant rather than the `card ι + 1` proved here, is
+`AffineCaratheodoryCount.exists_law_card_of_constant_coordinate`. It deletes the constant
+coordinate and applies `exists_law_of_mem_realizationBody` to the remaining coordinates.
 
 ## Empirical status
 

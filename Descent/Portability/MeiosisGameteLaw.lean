@@ -113,12 +113,14 @@ def independentSiteKernel
   FiniteGeneticTransition.piLaw fun locus ↦ mutate locus (strand locus)
 
 omit [(locus : Locus) → DecidableEq (Allele locus)] in
-/-- The independent-site kernel factorizes exactly over the loci. -/
+/-- The independent-site kernel factorizes exactly over the loci: it is the corpus mass
+formula of the product law, read at the per-locus mutation kernels. -/
 theorem independentSiteKernel_mass
     (mutate : ∀ locus, Allele locus → FiniteReportLaw (Allele locus))
     (strand gamete : Haplotype Allele) :
     (independentSiteKernel mutate strand).mass gamete =
-      ∏ locus, (mutate locus (strand locus)).mass (gamete locus) := rfl
+      ∏ locus, (mutate locus (strand locus)).mass (gamete locus) :=
+  FiniteGeneticTransition.piLaw_mass (fun locus ↦ mutate locus (strand locus)) gamete
 
 omit [(locus : Locus) → DecidableEq (Allele locus)] in
 /-- NOTE2 (3) at the two supplied default primitives: the gamete probability is a uniform

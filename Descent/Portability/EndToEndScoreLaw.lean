@@ -71,8 +71,9 @@ prevent that construction:
 
 * `PipelineDemographicHistory.twoLocusMoments` now maps an arbitrary finite event history to
   the complete transient many-deme `H/DD/Dz/pi2` operator product.  This supplies exact
-  unascertained two-locus moments, not the selected score's linkage factor.  The tracked exact-rational
-  ancestral-configuration reference in `validation/empirical/momentsld/ldchain_reduction.py`
+  unascertained two-locus moments, not the selected score's linkage factor.  The tracked
+  exact-rational ancestral-configuration reference in
+  `validation/empirical/momentsld/ldchain_reduction.py`
   solves 2-, 3-, and 4-deme chains with verified lumpability and zero full-system residual.  It
   shows that an `F_ST`-matched two-deme surrogate is biased high and that a geometric scalar
   composition is only approximate.  This supports the full-state operator form, but no Lean
@@ -90,18 +91,24 @@ prevent that construction:
   PCs, and then runs logistic/Firth GWAS plus PLINK clumping and held-out threshold selection.
   Identifying that full joint kernel is strictly stronger than identifying `F_ST` and the
   low-order `DD` coordinate.  The latter evaluates an unascertained linkage moment but does
-  not collapse the selected-score bracket or construct the deployed score law.  The low-order operator now includes the exact recurrent
-  symmetric-biallelic damping and its recurrent one-deme stationary boundary, so it uses the
+  not collapse the selected-score bracket or construct the deployed score law.  The low-order
+  operator now includes the exact recurrent symmetric-biallelic damping and its recurrent
+  one-deme stationary boundary, so it uses the
   same mutation mechanism as the marginal ascertainment propagator.
   `PipelineDemographicHistory.commonDiffusionProjection_exact` now proves that the joint
   operator's exposed `H` coordinate equals the marginal divergence moment after every
   arbitrary compiled history: it includes the ancestral boundary, generator and exponential
   intertwinings, split commutation, reachable-state invariants, paired event induction, and
-  terminal readouts.  No fitted biological factor remains in that join.  A realizability
-  corollary must still show that the propagated `DD` kernel stays positive
-  semidefinite, thereby constructing `LDPairDomain` (and its Cauchy--Schwarz field) whenever
-  within-deme `DD` is nonzero.  The input-only linkage function returns `none` rather than
-  accepting that proof from its caller, so this formal obligation cannot be hidden;
+  terminal readouts.  No fitted biological factor remains in that join.  The realizability
+  corollary is proved in `Descent.Portability.PipelineLDPairDomain`, from the constructed
+  haplotype realization of NOTE1 Theorems 2 and 3 rather than from a caller's certificate: after
+  every compiled history the propagated `DD` kernel is positive semidefinite
+  (`PipelineDemographicHistory.twoLocusMoments_DD_quadraticForm_nonneg`), and
+  `PipelineDemographicHistory.ldPairDomain` constructs `LDPairDomain` (and its Cauchy--Schwarz
+  field) whenever within-deme `DD` is nonzero.  The input-only linkage function still returns
+  `none` on a zero within-deme `DD`, and
+  `VisiblePipelineInput.unascertainedLDCorrelationSq_some_mem_unitInterval` places every value it
+  does return in `[0,1]` with no certificate argument;
   moreover, the executable currently calls `msprime.sim_mutations` without a mutation model.
   Current msprime therefore supplies its default discrete-genome recurrent four-state JC69
   process, while `stream_geno.py` immediately adds pairs of genotype-state integers and treats
@@ -998,7 +1005,8 @@ theorem runCommonDiffusionEvents_marginal {demeCount : ℕ}
     (separationBp : ℝ) (separationBp_nonneg : 0 ≤ separationBp)
     (events : List (DemographicEvent demeCount)) (rates : PipelineRateState demeCount)
     (active : Fin demeCount → Bool) (common : CommonDiffusionState demeCount) :
-    (runCommonDiffusionEvents separationBp separationBp_nonneg events rates active common).state.marginal =
+    (runCommonDiffusionEvents separationBp separationBp_nonneg events rates active
+        common).state.marginal =
       Coalescent.propagateManyDemeMomentInstructions
         (compileMomentEvents 2 events rates active).instructions common.marginal := by
   induction events generalizing rates active common with
@@ -1016,7 +1024,8 @@ theorem runCommonDiffusionEvents_joint {demeCount : ℕ}
     (separationBp : ℝ) (separationBp_nonneg : 0 ≤ separationBp)
     (events : List (DemographicEvent demeCount)) (rates : PipelineRateState demeCount)
     (active : Fin demeCount → Bool) (common : CommonDiffusionState demeCount) :
-    (runCommonDiffusionEvents separationBp separationBp_nonneg events rates active common).state.joint =
+    (runCommonDiffusionEvents separationBp separationBp_nonneg events rates active
+        common).state.joint =
       Coalescent.propagateLowOrderLDInstructions
         (compileLowOrderLDEvents separationBp separationBp_nonneg events rates active).instructions
         common.joint := by
@@ -1037,7 +1046,8 @@ theorem runCommonDiffusionEvents_finalCarriers {demeCount : ℕ}
     (active : Fin demeCount → Bool) (common : CommonDiffusionState demeCount) :
     let run := runCommonDiffusionEvents separationBp separationBp_nonneg events rates active common
     let marginalCompiled := compileMomentEvents 2 events rates active
-    let jointCompiled := compileLowOrderLDEvents separationBp separationBp_nonneg events rates active
+    let jointCompiled := compileLowOrderLDEvents separationBp separationBp_nonneg events rates
+      active
     run.finalRateState = marginalCompiled.finalRateState ∧
       run.finalActive = marginalCompiled.finalActive ∧
       run.finalRateState = jointCompiled.finalRateState ∧
@@ -2557,8 +2567,8 @@ theorem VisiblePipelineInput.unascertainedLDCorrelationSqOn_eq
   input.demography.twoLocusMoments.unascertainedLDCorrelationSq_eq
     separation input.studyDesign.gwasDeme target domain
 
-/-- Exact input-only unascertained `DD` readout.  The normalization domain is decided from the composed
-moments rather than supplied as an extra argument.  `none` covers a zero within-deme `DD`
+/-- Exact input-only unascertained `DD` readout.  The normalization domain is decided from the
+composed moments rather than supplied as an extra argument.  `none` covers a zero within-deme `DD`
 denominator; failure of a separate Cauchy--Schwarz certificate no longer suppresses an
 otherwise exactly evaluable operator quotient. -/
 noncomputable def VisiblePipelineInput.unascertainedLDCorrelationSq
@@ -2585,8 +2595,9 @@ theorem VisiblePipelineInput.unascertainedLDCorrelationSq_eq_some
     VisiblePipelineInput.unascertainedLDCorrelationSqOn,
     Coalescent.DemographicTwoLocusMoments.unascertainedLDCorrelationSq_eq]
 
-/-- A defined input-only unascertained squared correlation with a realizable covariance certificate lies in
-`[0,1]`.  Evaluation itself requires only positive normalization denominators. -/
+/-- A defined input-only unascertained squared correlation with a realizable covariance
+certificate lies in `[0,1]`.  Evaluation itself requires only positive normalization
+denominators. -/
 theorem VisiblePipelineInput.unascertainedLDCorrelationSq_mem_unitInterval
     {demeCount : ℕ} (input : VisiblePipelineInput demeCount)
     (separation : Coalescent.MarkerSeparationBp) (target : Fin demeCount)

@@ -27,3 +27,4 @@ open Descent.Portability.IntervalEvaluatorCertificate
 #print axioms dyadic_sum_le_one_of_length_le
 #print axioms kraft_sum_le_one
 #print axioms haltingSublaw_missingMass
+#print axioms immediateHaltingSublaw_missingMass

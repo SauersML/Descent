@@ -43,6 +43,7 @@ open Descent.Portability.UniformPenetranceArchitecture
 #print axioms integral_unit_quadratic
 #print axioms integral_unit_half_pow
 #print axioms intervalIntegrable_unit_ratio
+#print axioms hasDerivAt_log_two_sub
 #print axioms integral_unit_ratio
 #print axioms integral_unit_auc
 #print axioms integral_unit_negMulLog
