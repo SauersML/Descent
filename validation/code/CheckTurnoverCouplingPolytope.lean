@@ -13,6 +13,7 @@ import Descent.Portability.TurnoverCouplingPolytope
 #print axioms Descent.Portability.TurnoverCouplingPolytope.productKernel_cons
 #print axioms Descent.Portability.TurnoverCouplingPolytope.condKernel_cons
 #print axioms Descent.Portability.TurnoverCouplingPolytope.productKernel_coadapted
+#print axioms Descent.Portability.TurnoverCouplingPolytope.productKernel_eq_productSign
 #print axioms Descent.Portability.TurnoverCouplingPolytope.pathLaw_nonneg
 #print axioms Descent.Portability.TurnoverCouplingPolytope.pathLaw_inPolytope
 #print axioms Descent.Portability.TurnoverCouplingPolytope.condKernel_coadapted

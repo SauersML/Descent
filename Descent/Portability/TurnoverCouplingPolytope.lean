@@ -182,6 +182,15 @@ theorem productKernel_coadapted (K : ℕ → ι → (ι → Z) → Z → ℝ)
     rw [Finset.sum_congr rfl fun a _ ↦ productKernel_cons K z h a]
     exact sum_prod_pi_marginal (fun j c ↦ K h.length j z c) (fun j ↦ hKsum _ _ _) i b
 
+/-- **The product coupling is the product sign law of `MarginalTurnoverRegion`** when each
+locus carries a two-point alphabet and the prescribed one-locus kernel has mean `mrg i` at
+locus `i`.  The independent coupling of the finite-horizon polytope and the independent
+sign law of the one-time marginal-turnover region are the same object. -/
+theorem productKernel_eq_productSign (m : ℕ) (mrg : Fin m → ℝ) (z : Fin m → Bool)
+    (rest : List (Fin m → Bool)) (a : Fin m → Bool) :
+    productKernel (fun _ i _ b ↦ (1 + mrg i * TurnoverDependence.sgn b) / 2) (z :: rest) a
+      = MarginalTurnoverRegion.productSign m mrg a := rfl
+
 /-- A path law built from a coadapted family is nonnegative.
 
 Assumes: `Coadapted K J`, witnessed by `productKernel_coadapted`. -/
