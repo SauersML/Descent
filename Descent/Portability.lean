@@ -1,6 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.AuditCellAveraging
+import Descent.Portability.IdenticalAuditCells
 import Descent.Portability.FiniteAuditAllocationLaw
 import Descent.Portability.CubeAverageConvergence
 import Descent.Portability.FiniteSlaterSeparation

@@ -5964,6 +5964,9 @@
    "Descent.Blindness.surgery_invisible_to_even_visible_to_odd",
    "Descent.Blindness.symmetric_prior_testable_by_odd_summaries",
    "Descent.Blindness.symmetric_prior_untestable_by_even_summaries",
+   "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality",
    "Descent.Portability.FiniteAuditDesign.certificate_equality",
    "Descent.Portability.FiniteAuditDesign.certified_optimum",
    "Descent.Portability.FiniteAuditDesign.contribution_nonneg",
@@ -6015,6 +6018,9 @@
     "Descent.Blindness.surgery_invisible_to_even_visible_to_odd": [],
     "Descent.Blindness.imbalance_identifiedBy_oddSummary": [],
     "Descent.Blindness.imbalance_blind_to_evenClass_identified_by_oddSummary": [],
+    "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality": [],
+    "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula": [],
+    "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law": [],
     "Descent.Portability.FiniteAuditDesign.contribution_nonneg": [],
     "Descent.Portability.FiniteAuditDesign.weighted_identity": [],
     "Descent.Portability.FiniteAuditDesign.lagrangian_identity": [],
@@ -39170,6 +39176,10 @@
    "Descent.Portability.ArchaicPrediction.weighted_cycle_defect",
    "Descent.Portability.ArchaicPrediction.weighted_product_expansion",
    "Descent.Portability.AuditAllocationCoordinate.zero_multiplier_minimum",
+   "Descent.Portability.AuditCellAveraging.cellMean_le",
+   "Descent.Portability.AuditCellAveraging.extend_sum_le",
+   "Descent.Portability.AuditCellAveraging.le_cellMean",
+   "Descent.Portability.AuditCellAveraging.weighted_reciprocal_le",
    "Descent.Portability.AuditCenteredObservations.audit_support",
    "Descent.Portability.AuditCovarianceSpectrum.quadratic",
    "Descent.Portability.AuditCovarianceSpectrum.spectral_quadratic",
@@ -39368,6 +39378,7 @@
    "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step",
    "Descent.Portability.ExponentialPoissonRace.race_coordinate_summable",
    "Descent.Portability.FiniteAtomicReportMeasure.finite_report_integrable",
+   "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality",
    "Descent.Portability.FiniteAuditConfidence.confidence_exponent_pos",
    "Descent.Portability.FiniteAuditConfidence.contrast_tail",
    "Descent.Portability.FiniteAuditDesign.active_weighted_eq",
@@ -39587,6 +39598,9 @@
    "Descent.Portability.HWETiltedKernelLaw.realPart_log_amplitude",
    "Descent.Portability.IIDBinExperiment.assigned_confidence",
    "Descent.Portability.IIDBinExperiment.iid_confidence",
+   "Descent.Portability.IdenticalAuditCells.finite_variance_le",
+   "Descent.Portability.IdenticalAuditCells.range_le",
+   "Descent.Portability.IdenticalAuditCells.spectral_variance_le",
    "Descent.Portability.IndependentContrastLaw.contrast_covariance",
    "Descent.Portability.IndependentContrastLaw.contrast_integral",
    "Descent.Portability.IndependentShiftOperator.independent_sum_succ",
@@ -40732,6 +40746,10 @@
     "Descent.Portability.ArchaicPrediction.transport_self": [],
     "Descent.Portability.ArchaicPrediction.evaluate_transport": [],
     "Descent.Portability.AuditAllocationCoordinate.zero_multiplier_minimum": [],
+    "Descent.Portability.AuditCellAveraging.le_cellMean": [],
+    "Descent.Portability.AuditCellAveraging.cellMean_le": [],
+    "Descent.Portability.AuditCellAveraging.extend_sum_le": [],
+    "Descent.Portability.AuditCellAveraging.weighted_reciprocal_le": [],
     "Descent.Portability.AuditCenteredObservations.audit_support": [],
     "Descent.Portability.AuditCovarianceSpectrum.quadratic": [],
     "Descent.Portability.AuditCovarianceSpectrum.symmetric": [],
@@ -41015,6 +41033,7 @@
     "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step": [],
     "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure": [],
     "Descent.Portability.FiniteAtomicReportMeasure.finite_report_integrable": [],
+    "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality": [],
     "Descent.Portability.FiniteAuditConfidence.contrast_tail": [],
     "Descent.Portability.FiniteAuditConfidence.confidence_exponent_pos": [
      "0 < K"
@@ -41251,6 +41270,9 @@
     "Descent.Portability.IIDBinExperiment.iid_confidence": [
      "0 < K"
     ],
+    "Descent.Portability.IdenticalAuditCells.finite_variance_le": [],
+    "Descent.Portability.IdenticalAuditCells.range_le": [],
+    "Descent.Portability.IdenticalAuditCells.spectral_variance_le": [],
     "Descent.Portability.attenuatedVariance_eq_true_iff": [],
     "Descent.Portability.panelAdjustedImputationQuality_eq_ld_iff": [],
     "Descent.Portability.IndependentContrastLaw.contrast_integral": [],
@@ -50432,6 +50454,10 @@
    "Descent.Portability.ArchaicPrediction.weighted_cycle_defect",
    "Descent.Portability.ArchaicPrediction.weighted_product_expansion",
    "Descent.Portability.AuditAllocationCoordinate.zero_multiplier_minimum",
+   "Descent.Portability.AuditCellAveraging.cellMean_le",
+   "Descent.Portability.AuditCellAveraging.extend_sum_le",
+   "Descent.Portability.AuditCellAveraging.le_cellMean",
+   "Descent.Portability.AuditCellAveraging.weighted_reciprocal_le",
    "Descent.Portability.AuditCenteredObservations.audit_support",
    "Descent.Portability.AuditCovarianceSpectrum.quadratic",
    "Descent.Portability.AuditCovarianceSpectrum.spectral_quadratic",
@@ -50630,6 +50656,7 @@
    "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step",
    "Descent.Portability.ExponentialPoissonRace.race_coordinate_summable",
    "Descent.Portability.FiniteAtomicReportMeasure.finite_report_integrable",
+   "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality",
    "Descent.Portability.FiniteAuditConfidence.confidence_exponent_pos",
    "Descent.Portability.FiniteAuditConfidence.contrast_tail",
    "Descent.Portability.FiniteAuditDesign.active_weighted_eq",
@@ -50849,6 +50876,9 @@
    "Descent.Portability.HWETiltedKernelLaw.realPart_log_amplitude",
    "Descent.Portability.IIDBinExperiment.assigned_confidence",
    "Descent.Portability.IIDBinExperiment.iid_confidence",
+   "Descent.Portability.IdenticalAuditCells.finite_variance_le",
+   "Descent.Portability.IdenticalAuditCells.range_le",
+   "Descent.Portability.IdenticalAuditCells.spectral_variance_le",
    "Descent.Portability.IndependentContrastLaw.contrast_covariance",
    "Descent.Portability.IndependentContrastLaw.contrast_integral",
    "Descent.Portability.IndependentShiftOperator.independent_sum_succ",
@@ -51968,6 +51998,10 @@
     "Descent.Portability.ArchaicPrediction.transport_self": [],
     "Descent.Portability.ArchaicPrediction.evaluate_transport": [],
     "Descent.Portability.AuditAllocationCoordinate.zero_multiplier_minimum": [],
+    "Descent.Portability.AuditCellAveraging.le_cellMean": [],
+    "Descent.Portability.AuditCellAveraging.cellMean_le": [],
+    "Descent.Portability.AuditCellAveraging.extend_sum_le": [],
+    "Descent.Portability.AuditCellAveraging.weighted_reciprocal_le": [],
     "Descent.Portability.AuditCenteredObservations.audit_support": [],
     "Descent.Portability.AuditCovarianceSpectrum.quadratic": [],
     "Descent.Portability.AuditCovarianceSpectrum.symmetric": [],
@@ -52249,6 +52283,7 @@
     "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step": [],
     "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure": [],
     "Descent.Portability.FiniteAtomicReportMeasure.finite_report_integrable": [],
+    "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality": [],
     "Descent.Portability.FiniteAuditConfidence.contrast_tail": [],
     "Descent.Portability.FiniteAuditConfidence.confidence_exponent_pos": [],
     "Descent.Portability.FiniteAuditDesign.weak_duality": [],
@@ -52471,6 +52506,9 @@
     "Descent.Portability.HWETiltedKernelLaw.realPart_log_amplitude": [],
     "Descent.Portability.IIDBinExperiment.assigned_confidence": [],
     "Descent.Portability.IIDBinExperiment.iid_confidence": [],
+    "Descent.Portability.IdenticalAuditCells.finite_variance_le": [],
+    "Descent.Portability.IdenticalAuditCells.range_le": [],
+    "Descent.Portability.IdenticalAuditCells.spectral_variance_le": [],
     "Descent.Portability.attenuatedVariance_eq_true_iff": [],
     "Descent.Portability.panelAdjustedImputationQuality_eq_ld_iff": [],
     "Descent.Portability.IndependentContrastLaw.contrast_integral": [],
@@ -71016,6 +71054,10 @@
    "Descent.Portability.ArchaicPrediction.weighted_cycle_defect",
    "Descent.Portability.ArchaicPrediction.weighted_product_expansion",
    "Descent.Portability.AuditAllocationCoordinate.zero_multiplier_minimum",
+   "Descent.Portability.AuditCellAveraging.cellMean_le",
+   "Descent.Portability.AuditCellAveraging.extend_sum_le",
+   "Descent.Portability.AuditCellAveraging.le_cellMean",
+   "Descent.Portability.AuditCellAveraging.weighted_reciprocal_le",
    "Descent.Portability.AuditCenteredObservations.audit_support",
    "Descent.Portability.AuditCovarianceSpectrum.quadratic",
    "Descent.Portability.AuditCovarianceSpectrum.spectral_quadratic",
@@ -71214,6 +71256,7 @@
    "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step",
    "Descent.Portability.ExponentialPoissonRace.race_coordinate_summable",
    "Descent.Portability.FiniteAtomicReportMeasure.finite_report_integrable",
+   "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality",
    "Descent.Portability.FiniteAuditConfidence.confidence_exponent_pos",
    "Descent.Portability.FiniteAuditConfidence.contrast_tail",
    "Descent.Portability.FiniteAuditDesign.active_weighted_eq",
@@ -71433,6 +71476,9 @@
    "Descent.Portability.HWETiltedKernelLaw.realPart_log_amplitude",
    "Descent.Portability.IIDBinExperiment.assigned_confidence",
    "Descent.Portability.IIDBinExperiment.iid_confidence",
+   "Descent.Portability.IdenticalAuditCells.finite_variance_le",
+   "Descent.Portability.IdenticalAuditCells.range_le",
+   "Descent.Portability.IdenticalAuditCells.spectral_variance_le",
    "Descent.Portability.IndependentContrastLaw.contrast_covariance",
    "Descent.Portability.IndependentContrastLaw.contrast_integral",
    "Descent.Portability.IndependentShiftOperator.independent_sum_succ",
@@ -72644,6 +72690,10 @@
     "Descent.Portability.ArchaicPrediction.transport_self": [],
     "Descent.Portability.ArchaicPrediction.evaluate_transport": [],
     "Descent.Portability.AuditAllocationCoordinate.zero_multiplier_minimum": [],
+    "Descent.Portability.AuditCellAveraging.le_cellMean": [],
+    "Descent.Portability.AuditCellAveraging.cellMean_le": [],
+    "Descent.Portability.AuditCellAveraging.extend_sum_le": [],
+    "Descent.Portability.AuditCellAveraging.weighted_reciprocal_le": [],
     "Descent.Portability.AuditCenteredObservations.audit_support": [
      "∀ᵐ y ∂μ, y ∈ Set.Icc L U"
     ],
@@ -72974,6 +73024,7 @@
     "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step": [],
     "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure": [],
     "Descent.Portability.FiniteAtomicReportMeasure.finite_report_integrable": [],
+    "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality": [],
     "Descent.Portability.FiniteAuditConfidence.contrast_tail": [
      "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i",
      "∀ i, lo i ≤ (∫ y, y ∂μ i"
@@ -73192,6 +73243,9 @@
     "Descent.Portability.HWETiltedKernelLaw.realPart_log_amplitude": [],
     "Descent.Portability.IIDBinExperiment.assigned_confidence": [],
     "Descent.Portability.IIDBinExperiment.iid_confidence": [],
+    "Descent.Portability.IdenticalAuditCells.finite_variance_le": [],
+    "Descent.Portability.IdenticalAuditCells.range_le": [],
+    "Descent.Portability.IdenticalAuditCells.spectral_variance_le": [],
     "Descent.Portability.attenuatedVariance_eq_true_iff": [],
     "Descent.Portability.panelAdjustedImputationQuality_eq_ld_iff": [],
     "Descent.Portability.IndependentContrastLaw.contrast_integral": [
@@ -74118,6 +74172,7 @@
    "Descent.Portability.ArchaicPrediction.phase_expansion_exists_unique",
    "Descent.Portability.ArchaicPrediction.squarefree_monomial",
    "Descent.Portability.AuditAllocationCoordinate.choice_minimum",
+   "Descent.Portability.AuditCellAveraging.weighted_sum_eq",
    "Descent.Portability.AuditVarianceGeometry.proxy_unique",
    "Descent.Portability.BalancedHWECompoundPoisson.exponential_compensation",
    "Descent.Portability.BalancedHWECounterexample.critical_cosine_limit",
@@ -74709,6 +74764,7 @@
     "Descent.Portability.AuditAllocationCoordinate.choice_minimum": [
      "0 ≤ b"
     ],
+    "Descent.Portability.AuditCellAveraging.weighted_sum_eq": [],
     "Descent.Portability.AuditVarianceGeometry.proxy_unique": [],
     "Descent.Portability.BalancedHWECompoundPoisson.exponential_compensation": [],
     "Descent.Portability.BalancedHWECounterexample.mem_blockSet": [],
@@ -75259,6 +75315,7 @@
    "Descent.Portability.DistanceBinnedPortabilityLaw.weighted_integrable",
    "Descent.Portability.EntropyDensityExpansion.scaled_entropy_bound",
    "Descent.Portability.ExactFiniteHistoryLaw.report_path_sum_eq_backward",
+   "Descent.Portability.FiniteAuditAllocationLaw.positive_multiplier_unique",
    "Descent.Portability.FiniteAuditConfidence.contrast_tail",
    "Descent.Portability.FiniteAuditConfidence.finite_library_exact_range",
    "Descent.Portability.FiniteAuditConfidence.rangeBound_nonneg",
@@ -75306,6 +75363,10 @@
    "Descent.Portability.HardBudgetAuditGuard.guarded_failure_le",
    "Descent.Portability.HardBudgetAuditGuard.guarded_repair_certificate",
    "Descent.Portability.HardBudgetAuditGuard.joint_abort_probability",
+   "Descent.Portability.IdenticalAuditCells.finite_variance_le",
+   "Descent.Portability.IdenticalAuditCells.range_le",
+   "Descent.Portability.IdenticalAuditCells.spectral_optimum_constant",
+   "Descent.Portability.IdenticalAuditCells.spectral_variance_le",
    "Descent.Portability.MarginalSupportBound.exists_small_support_min",
    "Descent.Portability.MarginalTurnoverRegion.sum_productSign",
    "Descent.Portability.MarkovCoarseGraining.bounded_report_error",
@@ -75416,11 +75477,14 @@
     "∀ i, ContDiffOn ℝ 2 (b i",
     "ClosedOnBox lo hi b",
     "OwnAffineOnBox lo hi b",
+    "AuditAllocationCoordinate.objective A b p = AuditAllocationCoordinate.objective A b (clip floor 1 (Real.sqrt (A / b",
     "spending c p₀ < B",
     "0 ≤ b",
     "∀ a ∈ s, |inner ℝ a z| ≤ b",
     "deployedGain μ w f φ ε p q c hard z < 0",
     "contrast c p + BernsteinTailBound.radius (maxCost c",
+    "∀ i ∈ s, c i = c₀",
+    "{p | Feasible floor c B p}.Nonempty",
     "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high"
    ],
    "hypotheses_by_theorem": {
@@ -75686,6 +75750,10 @@
     "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
     "Descent.Portability.EntropyDensityExpansion.scaled_entropy_bound": [],
     "Descent.Portability.ExactFiniteHistoryLaw.report_path_sum_eq_backward": [],
+    "Descent.Portability.FiniteAuditAllocationLaw.positive_multiplier_unique": [
+     "0 < b",
+     "AuditAllocationCoordinate.objective A b p = AuditAllocationCoordinate.objective A b (clip floor 1 (Real.sqrt (A / b"
+    ],
     "Descent.Portability.FiniteAuditConfidence.rangeBound_nonneg": [],
     "Descent.Portability.FiniteAuditConfidence.contrast_tail": [],
     "Descent.Portability.FiniteAuditConfidence.finite_library_exact_range": [],
@@ -75746,6 +75814,13 @@
      "contrast c p + BernsteinTailBound.radius (maxCost c"
     ],
     "Descent.Portability.HardBudgetAuditGuard.guarded_repair_certificate": [],
+    "Descent.Portability.IdenticalAuditCells.finite_variance_le": [],
+    "Descent.Portability.IdenticalAuditCells.range_le": [],
+    "Descent.Portability.IdenticalAuditCells.spectral_variance_le": [],
+    "Descent.Portability.IdenticalAuditCells.spectral_optimum_constant": [
+     "∀ i ∈ s, c i = c₀",
+     "{p | Feasible floor c B p}.Nonempty"
+    ],
     "Descent.Portability.MarginalSupportBound.exists_small_support_min": [],
     "Descent.Portability.MarginalTurnoverRegion.sum_productSign": [],
     "Descent.Portability.MarkovCoarseGraining.bounded_report_error": [],
@@ -82490,6 +82565,9 @@
    "Descent.Portability.AuditRangeCaps.fullRadius_continuous",
    "Descent.Portability.AuditRangeCaps.full_optimum_exists",
    "Descent.Portability.DecisionDirectedAuditDesign.design_exists",
+   "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality",
    "Descent.Portability.FiniteAuditDesign.certified_optimum",
    "Descent.Portability.FiniteAuditDesign.weak_duality",
    "Descent.Portability.FiniteAuditDesignConvexity.feasible_compact",
@@ -82500,6 +82578,9 @@
    "Descent.Portability.FiniteAuditStrongDuality.attained_strong_duality",
    "Descent.Portability.FiniteAuditStrongDuality.epigraph_multipliers",
    "Descent.Portability.GeometricAuditCaps.grid_design_approximation",
+   "Descent.Portability.IdenticalAuditCells.capped_spectral_optimum_constant",
+   "Descent.Portability.IdenticalAuditCells.feasible_average",
+   "Descent.Portability.IdenticalAuditCells.spectral_optimum_constant",
    "Descent.Portability.RangeAwareAuditSearch.exact_solvers_guarantee",
    "Descent.Portability.RangeAwareAuditSearch.finite_search_exists",
    "Descent.Portability.RangeAwareAuditSearch.range_interval",
@@ -82518,6 +82599,8 @@
     "∀ i, 0 < h i",
     "IsMinOn (fullRadius a h · x",
     "maxRange h p ∈ Set.Icc low high",
+    "∀ i ∈ s, h i = h₀",
+    "{p | Feasible floor c B p ∧ maxRange h p ≤ m}.Nonempty",
     "∀ i, 0 ≤ h i",
     "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
     "∀ j, Feasible (cappedFloor floor h j.val.val"
@@ -82546,6 +82629,9 @@
      "IsMinOn (fullRadius a h · x"
     ],
     "Descent.Portability.DecisionDirectedAuditDesign.design_exists": [],
+    "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality": [],
+    "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula": [],
+    "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law": [],
     "Descent.Portability.FiniteAuditDesign.weak_duality": [],
     "Descent.Portability.FiniteAuditDesign.certified_optimum": [],
     "Descent.Portability.FiniteAuditDesignConvexity.feasible_compact": [],
@@ -82557,6 +82643,12 @@
     "Descent.Portability.FiniteAuditStrongDuality.attained_strong_duality": [],
     "Descent.Portability.GeometricAuditCaps.grid_design_approximation": [
      "maxRange h p ∈ Set.Icc low high"
+    ],
+    "Descent.Portability.IdenticalAuditCells.feasible_average": [],
+    "Descent.Portability.IdenticalAuditCells.spectral_optimum_constant": [],
+    "Descent.Portability.IdenticalAuditCells.capped_spectral_optimum_constant": [
+     "∀ i ∈ s, h i = h₀",
+     "{p | Feasible floor c B p ∧ maxRange h p ≤ m}.Nonempty"
     ],
     "Descent.Portability.RangeAwareAuditSearch.range_interval": [
      "∀ i, 0 ≤ h i"
@@ -107403,6 +107495,8 @@
    "Descent.Portability.ConvexOrderCoupling.sum_rate_secant_bound",
    "Descent.Portability.CouplingPolytopeExtrema.horizonPolytope_isClosed",
    "Descent.Portability.CouplingPolytopeExtrema.truncate_inPolytope",
+   "Descent.Portability.CubeAverageConvergence.windowLaw_Icc",
+   "Descent.Portability.CubeAverageConvergence.windowLaw_univ",
    "Descent.Portability.DenominatorAwareRecovery.chebPeak_inv_eq",
    "Descent.Portability.DenominatorAwareRecovery.matched_report_gap_le",
    "Descent.Portability.DenominatorAwareRecovery.natDegree_T_le",
@@ -107865,6 +107959,8 @@
     "Descent.Portability.ConvexOrderCoupling.pathExp_nearestDrift_le": [],
     "Descent.Portability.CouplingPolytopeExtrema.truncate_inPolytope": [],
     "Descent.Portability.CouplingPolytopeExtrema.horizonPolytope_isClosed": [],
+    "Descent.Portability.CubeAverageConvergence.windowLaw_univ": [],
+    "Descent.Portability.CubeAverageConvergence.windowLaw_Icc": [],
     "Descent.Portability.DenominatorAwareRecovery.natDegree_T_le": [],
     "Descent.Portability.DenominatorAwareRecovery.chebPeak_inv_eq": [],
     "Descent.Portability.DenominatorAwareRecovery.recovery_error_bound": [],
@@ -140592,8 +140688,13 @@
    "Descent.Portability.AuditAllocationCoordinate.objective_difference",
    "Descent.Portability.AuditAllocationCoordinate.positive_multiplier_minimum",
    "Descent.Portability.AuditAllocationCoordinate.zero_multiplier_minimum",
+   "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality",
+   "Descent.Portability.FiniteAuditAllocationLaw.positive_multiplier_unique",
    "Descent.Portability.FiniteAuditDesign.lagrangian_identity",
    "Descent.Portability.FiniteAuditDesign.weak_duality",
+   "Descent.Portability.IdenticalAuditCells.capped_spectral_optimum_constant",
+   "Descent.Portability.IdenticalAuditCells.spectral_optimum_constant",
+   "Descent.Portability.IdenticalAuditCells.spectral_variance_le",
    "Descent.Portability.SpectralAuditCost.attained_cost_bound",
    "Descent.Portability.SpectralAuditCost.cost_lower_bound",
    "Descent.Portability.SpectralAuditDesign.direction_le",
@@ -140614,12 +140715,15 @@
     "p ∈ Set.Icc floor 1",
     "0 < p ∧ p ≤ 1",
     "0 ≤ b",
+    "AuditAllocationCoordinate.objective A b p = AuditAllocationCoordinate.objective A b (clip floor 1 (Real.sqrt (A / b",
     "Feasible floor c B p",
+    "dualBound a floor c B η lam = worstVariance a p",
     "∀ i, 0 < p i",
+    "{p | Feasible floor c B p}.Nonempty",
+    "{p | Feasible floor c B p ∧ maxRange h p ≤ m}.Nonempty",
     "(∑ i, p i",
     "∀ i, p i = t * (Real.sqrt (κ i",
     "covariance (fun i ↦ κ i / p i",
-    "{p | Feasible floor c B p}.Nonempty",
     "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i",
     "(covariance (fun i ↦ κ i / p i",
     "lam * (spending c p - B"
@@ -140642,9 +140746,28 @@
      "0 ≤ b",
      "p ∈ Set.Icc floor 1"
     ],
+    "Descent.Portability.FiniteAuditAllocationLaw.positive_multiplier_unique": [
+     "0 ≤ A",
+     "0 < b",
+     "p ∈ Set.Icc floor 1",
+     "AuditAllocationCoordinate.objective A b p = AuditAllocationCoordinate.objective A b (clip floor 1 (Real.sqrt (A / b"
+    ],
+    "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality": [
+     "Feasible floor c B p",
+     "dualBound a floor c B η lam = worstVariance a p"
+    ],
     "Descent.Portability.FiniteAuditDesign.lagrangian_identity": [],
     "Descent.Portability.FiniteAuditDesign.weak_duality": [
      "Feasible floor c B p"
+    ],
+    "Descent.Portability.IdenticalAuditCells.spectral_variance_le": [
+     "∀ i, 0 < p i"
+    ],
+    "Descent.Portability.IdenticalAuditCells.spectral_optimum_constant": [
+     "{p | Feasible floor c B p}.Nonempty"
+    ],
+    "Descent.Portability.IdenticalAuditCells.capped_spectral_optimum_constant": [
+     "{p | Feasible floor c B p ∧ maxRange h p ≤ m}.Nonempty"
     ],
     "Descent.Portability.SpectralAuditCost.cost_lower_bound": [
      "∀ i, 0 < p i",
@@ -140731,6 +140854,8 @@
    "Descent.Portability.AuditAllocationCoordinate.choice_mem",
    "Descent.Portability.AuditAllocationCoordinate.choice_minimum",
    "Descent.Portability.AuditAllocationCoordinate.zero_contribution",
+   "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality",
    "Descent.Portability.FiniteAuditDesign.certificate_equality",
    "Descent.Portability.FiniteAuditDesign.certified_optimum",
    "Descent.Portability.FiniteAuditStrongDuality.attained_strong_duality",
@@ -140754,6 +140879,7 @@
     "0 ≤ floor",
     "∀ i, 0 < floor i",
     "Feasible floor c B p",
+    "dualBound a floor c B η lam = worstVariance a p",
     "∀ i, p₀ i ∈ Set.Icc (floor i"
    ],
    "hypotheses_by_theorem": {
@@ -140771,6 +140897,16 @@
     "Descent.Portability.AuditAllocationCoordinate.zero_contribution": [
      "0 < b",
      "0 ≤ floor"
+    ],
+    "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality": [
+     "∀ i, 0 < floor i",
+     "Feasible floor c B p",
+     "dualBound a floor c B η lam = worstVariance a p"
+    ],
+    "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula": [
+     "∀ i, 0 < floor i",
+     "Feasible floor c B p",
+     "dualBound a floor c B η lam = worstVariance a p"
     ],
     "Descent.Portability.FiniteAuditDesign.certificate_equality": [],
     "Descent.Portability.FiniteAuditDesign.certified_optimum": [
@@ -140793,6 +140929,177 @@
     ],
     "Descent.Portability.SpectralAuditDualCertificate.positive_multiplier_choice": []
    }
+  }
+ },
+ "Descent.Portability.AuditCellAveraging.cellMean": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "∑ over the Finset `s`, not `Finset.univ`",
+  "file": "Descent/Portability/AuditCellAveraging.lean",
+  "line": 27,
+  "short": "cellMean",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.AuditCellAveraging.cellMean_le",
+   "Descent.Portability.AuditCellAveraging.cellMean_pos",
+   "Descent.Portability.AuditCellAveraging.cell_sum",
+   "Descent.Portability.AuditCellAveraging.le_cellMean",
+   "Descent.Portability.AuditCellAveraging.reciprocal_sum_le",
+   "Descent.Portability.cellMean_of_mass_zero",
+   "Descent.Portability.isCellBalanced_cellMean"
+  ],
+  "constraints": {
+   "declared_kind": "probability",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [
+    "s.Nonempty",
+    "∀ i ∈ s, l ≤ p i",
+    "∀ i ∈ s, p i ≤ u",
+    "∀ i ∈ s, 0 < p i"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.AuditCellAveraging.le_cellMean": [
+     "s.Nonempty",
+     "∀ i ∈ s, l ≤ p i"
+    ],
+    "Descent.Portability.AuditCellAveraging.cellMean_le": [
+     "s.Nonempty",
+     "∀ i ∈ s, p i ≤ u"
+    ],
+    "Descent.Portability.AuditCellAveraging.cellMean_pos": [
+     "s.Nonempty",
+     "∀ i ∈ s, 0 < p i"
+    ],
+    "Descent.Portability.AuditCellAveraging.cell_sum": [
+     "s.Nonempty"
+    ],
+    "Descent.Portability.AuditCellAveraging.reciprocal_sum_le": [
+     "s.Nonempty",
+     "∀ i ∈ s, 0 < p i"
+    ],
+    "Descent.Portability.cellMean_of_mass_zero": [],
+    "Descent.Portability.isCellBalanced_cellMean": []
+   },
+   "range_lo_thm": [
+    "Descent.Portability.AuditCellAveraging.cellMean_pos",
+    2
+   ],
+   "range_lo": 0
+  }
+ },
+ "Descent.Portability.AuditCellAveraging.averageCell": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "expected 'then', found op:∈",
+  "file": "Descent/Portability/AuditCellAveraging.lean",
+  "line": 30,
+  "short": "averageCell",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.AuditCellAveraging.cell_sum",
+   "Descent.Portability.AuditCellAveraging.reciprocal_sum_le",
+   "Descent.Portability.AuditCellAveraging.weighted_reciprocal_le",
+   "Descent.Portability.AuditCellAveraging.weighted_sum_eq",
+   "Descent.Portability.IdenticalAuditCells.average_positive",
+   "Descent.Portability.IdenticalAuditCells.feasible_average",
+   "Descent.Portability.IdenticalAuditCells.finite_variance_le",
+   "Descent.Portability.IdenticalAuditCells.range_le",
+   "Descent.Portability.IdenticalAuditCells.spectral_optimum_constant",
+   "Descent.Portability.IdenticalAuditCells.spectral_variance_le"
+  ],
+  "constraints": {
+   "declared_kind": "probability",
+   "declared_lo": 0.0,
+   "declared_hi": 1.0,
+   "hypotheses": [
+    "s.Nonempty",
+    "∀ i ∈ s, 0 < p i",
+    "∀ i ∈ s, c i = c₀",
+    "∀ i ∈ s, a i = a₀",
+    "∀ i, 0 < p i",
+    "∀ i ∈ s, floor i = f₀",
+    "Feasible floor c B p",
+    "∀ j i, i ∈ s → a j i = a₀ j",
+    "∀ i ∈ s, h i = h₀",
+    "∀ i, 0 ≤ κ i",
+    "∀ i ∈ s, κ i = κ₀",
+    "∀ i ∈ s, u i = u₀",
+    "∀ i, 0 < floor i",
+    "{p | Feasible floor c B p}.Nonempty"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.AuditCellAveraging.cell_sum": [
+     "s.Nonempty"
+    ],
+    "Descent.Portability.AuditCellAveraging.reciprocal_sum_le": [
+     "s.Nonempty",
+     "∀ i ∈ s, 0 < p i"
+    ],
+    "Descent.Portability.AuditCellAveraging.weighted_sum_eq": [
+     "s.Nonempty",
+     "∀ i ∈ s, c i = c₀"
+    ],
+    "Descent.Portability.AuditCellAveraging.weighted_reciprocal_le": [
+     "s.Nonempty",
+     "∀ i ∈ s, 0 < p i",
+     "∀ i ∈ s, a i = a₀"
+    ],
+    "Descent.Portability.IdenticalAuditCells.average_positive": [
+     "s.Nonempty",
+     "∀ i, 0 < p i"
+    ],
+    "Descent.Portability.IdenticalAuditCells.feasible_average": [
+     "s.Nonempty",
+     "∀ i ∈ s, floor i = f₀",
+     "∀ i ∈ s, c i = c₀",
+     "Feasible floor c B p"
+    ],
+    "Descent.Portability.IdenticalAuditCells.finite_variance_le": [
+     "s.Nonempty",
+     "∀ i, 0 < p i",
+     "∀ j i, i ∈ s → a j i = a₀ j"
+    ],
+    "Descent.Portability.IdenticalAuditCells.range_le": [
+     "s.Nonempty",
+     "∀ i, 0 < p i",
+     "∀ i ∈ s, h i = h₀"
+    ],
+    "Descent.Portability.IdenticalAuditCells.spectral_variance_le": [
+     "s.Nonempty",
+     "∀ i, 0 < p i",
+     "∀ i, 0 ≤ κ i",
+     "∀ i ∈ s, κ i = κ₀",
+     "∀ i ∈ s, u i = u₀"
+    ],
+    "Descent.Portability.IdenticalAuditCells.spectral_optimum_constant": [
+     "s.Nonempty",
+     "∀ i, 0 ≤ κ i",
+     "∀ i, 0 < floor i",
+     "∀ i ∈ s, κ i = κ₀",
+     "∀ i ∈ s, u i = u₀",
+     "∀ i ∈ s, floor i = f₀",
+     "∀ i ∈ s, c i = c₀",
+     "{p | Feasible floor c B p}.Nonempty"
+    ]
+   },
+   "range_lo_thm": [
+    "Descent.Portability.IdenticalAuditCells.average_positive",
+    2
+   ],
+   "range_lo": 0
   }
  },
  "Descent.Portability.AuditCenteredObservations.centered": {
@@ -141557,6 +141864,8 @@
    "Descent.Portability.AuditRangeCaps.maxRange_le_iff",
    "Descent.Portability.AuditRangeCaps.maxRange_pos",
    "Descent.Portability.GeometricAuditCaps.grid_design_approximation",
+   "Descent.Portability.IdenticalAuditCells.capped_spectral_optimum_constant",
+   "Descent.Portability.IdenticalAuditCells.range_le",
    "Descent.Portability.MinimaxAuditDesignLaw.common_confidence",
    "Descent.Portability.MinimaxAuditDesignLaw.common_range_nonneg",
    "Descent.Portability.RangeAwareAuditSearch.exact_solvers_guarantee",
@@ -141570,6 +141879,8 @@
     "Feasible floor c B p",
     "IsMinOn (fullRadius a h · x",
     "maxRange h p ∈ Set.Icc low high",
+    "∀ i ∈ s, h i = h₀",
+    "{p | Feasible floor c B p ∧ maxRange h p ≤ m}.Nonempty",
     "∀ i, 0 < p i ∧ p i ≤ 1",
     "∀ i, 0 ≤ h i",
     "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
@@ -141593,6 +141904,14 @@
     "Descent.Portability.GeometricAuditCaps.grid_design_approximation": [
      "Feasible floor c B p",
      "maxRange h p ∈ Set.Icc low high"
+    ],
+    "Descent.Portability.IdenticalAuditCells.range_le": [
+     "∀ i, 0 < p i",
+     "∀ i ∈ s, h i = h₀"
+    ],
+    "Descent.Portability.IdenticalAuditCells.capped_spectral_optimum_constant": [
+     "∀ i ∈ s, h i = h₀",
+     "{p | Feasible floor c B p ∧ maxRange h p ≤ m}.Nonempty"
     ],
     "Descent.Portability.MinimaxAuditDesignLaw.common_range_nonneg": [
      "∀ i, 0 < p i"
@@ -141658,6 +141977,7 @@
    "Descent.Portability.AuditRangeCaps.capped_optimum_exists",
    "Descent.Portability.AuditRangeCaps.exact_cap_reduction",
    "Descent.Portability.GeometricAuditCaps.grid_design_approximation",
+   "Descent.Portability.IdenticalAuditCells.capped_spectral_optimum_constant",
    "Descent.Portability.RangeAwareAuditSearch.exact_solvers_guarantee",
    "Descent.Portability.RangeAwareAuditSearch.finite_search_exists"
   ],
@@ -141673,6 +141993,13 @@
     "Feasible floor c B p",
     "IsMinOn (fullRadius a h · x",
     "maxRange h p ∈ Set.Icc low high",
+    "∀ i, 0 ≤ κ i",
+    "∀ i ∈ s, κ i = κ₀",
+    "∀ i ∈ s, u i = u₀",
+    "∀ i ∈ s, floor i = f₀",
+    "∀ i ∈ s, c i = c₀",
+    "∀ i ∈ s, h i = h₀",
+    "{p | Feasible floor c B p ∧ maxRange h p ≤ m}.Nonempty",
     "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
     "∃ p, Feasible floor c B p",
     "∀ j, Feasible (cappedFloor floor h j.val.val"
@@ -141696,6 +142023,17 @@
      "∀ i, 0 < floor i",
      "Feasible floor c B p",
      "maxRange h p ∈ Set.Icc low high"
+    ],
+    "Descent.Portability.IdenticalAuditCells.capped_spectral_optimum_constant": [
+     "0 < m",
+     "∀ i, 0 ≤ κ i",
+     "∀ i, 0 < floor i",
+     "∀ i ∈ s, κ i = κ₀",
+     "∀ i ∈ s, u i = u₀",
+     "∀ i ∈ s, floor i = f₀",
+     "∀ i ∈ s, c i = c₀",
+     "∀ i ∈ s, h i = h₀",
+     "{p | Feasible floor c B p ∧ maxRange h p ≤ m}.Nonempty"
     ],
     "Descent.Portability.RangeAwareAuditSearch.exact_solvers_guarantee": [
      "∀ i, 0 < floor i",
@@ -141841,6 +142179,9 @@
    "Descent.Portability.ClippedFrameRepair.false_gain_probability",
    "Descent.Portability.ClippedFrameRepair.frame_loss",
    "Descent.Portability.ClippedFrameRepair.pointwise_loss",
+   "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.FiniteAuditAllocationLaw.positive_multiplier_unique",
    "Descent.Portability.MinimaxAuditDesignLaw.proxy_envelope_value",
    "Descent.Portability.SharedAuditCompletion.frame_variance_upper",
    "Descent.Portability.SharedAuditCompletion.simultaneous_attainment",
@@ -141888,6 +142229,9 @@
     "Descent.Portability.ClippedFrameRepair.false_gain_probability": [
      "∀ i, lo i ≤ (∫ y, y ∂μ i"
     ],
+    "Descent.Portability.FiniteAuditAllocationLaw.positive_multiplier_unique": [],
+    "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula": [],
+    "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law": [],
     "Descent.Portability.MinimaxAuditDesignLaw.proxy_envelope_value": [
      "lo ≤ hi"
     ],
@@ -155544,7 +155888,7 @@
   "short": "cellMean",
   "ret_type": "ℝ",
   "empirical_status": "NOT AN EMPIRICAL CLAIM --",
-  "python": "cellMean",
+  "python": "Descent_Portability_cellMean",
   "args": [
    "weight",
    "value",
@@ -155569,6 +155913,11 @@
    }
   },
   "mentioned_by": [
+   "Descent.Portability.AuditCellAveraging.cellMean_le",
+   "Descent.Portability.AuditCellAveraging.cellMean_pos",
+   "Descent.Portability.AuditCellAveraging.cell_sum",
+   "Descent.Portability.AuditCellAveraging.le_cellMean",
+   "Descent.Portability.AuditCellAveraging.reciprocal_sum_le",
    "Descent.Portability.cellMean_of_mass_zero",
    "Descent.Portability.isCellBalanced_cellMean"
   ],
@@ -155578,13 +155927,23 @@
     "∀ a, 0 ≤ weight a"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.AuditCellAveraging.le_cellMean": [],
+    "Descent.Portability.AuditCellAveraging.cellMean_le": [],
+    "Descent.Portability.AuditCellAveraging.cellMean_pos": [],
+    "Descent.Portability.AuditCellAveraging.cell_sum": [],
+    "Descent.Portability.AuditCellAveraging.reciprocal_sum_le": [],
     "Descent.Portability.cellMean_of_mass_zero": [
      "(∑ a, if cell a = c then weight a else 0"
     ],
     "Descent.Portability.isCellBalanced_cellMean": [
      "∀ a, 0 ≤ weight a"
     ]
-   }
+   },
+   "range_lo_thm": [
+    "Descent.Portability.AuditCellAveraging.cellMean_pos",
+    2
+   ],
+   "range_lo": 0
   }
  },
  "Descent.Portability.stratifiedCalibrationEnergy": {
@@ -159070,17 +159429,21 @@
    }
   }
  },
- "Descent.Portability.CubeAverageConvergence.noiseLaw": {
+ "Descent.Portability.CubeAverageConvergence.windowLaw": {
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name ENNReal.ofReal",
   "file": "Descent/Portability/CubeAverageConvergence.lean",
-  "line": 47,
-  "short": "noiseLaw",
+  "line": 54,
+  "short": "windowLaw",
   "ret_type": "MeasureTheory.Measure ℝ",
   "empirical_status": "",
   "python": null,
   "args": [],
   "box": {
+   "c": [
+    0.05,
+    3.0
+   ],
    "ε": [
     0.05,
     3.0
@@ -159090,30 +159453,24 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
-   "Descent.Portability.CubeAverageConvergence.noiseLaw_Icc",
-   "Descent.Portability.CubeAverageConvergence.noiseLaw_univ",
-   "Descent.Portability.LossExplainabilitySeparation.conditional_context",
-   "Descent.Portability.PairedGainTailExperiment.conditional_loss",
-   "Descent.Portability.PairedGainTailExperiment.noise_integral",
-   "Descent.Portability.PairedGainTailExperiment.noise_moments",
-   "Descent.Portability.PairedGainTailExperiment.noise_probability"
+   "Descent.Portability.CubeAverageConvergence.pi_smoothedLaw_eq_mixtureLaw",
+   "Descent.Portability.CubeAverageConvergence.smoothedLaw_eq_sum_windowLaw",
+   "Descent.Portability.CubeAverageConvergence.windowLaw_Icc",
+   "Descent.Portability.CubeAverageConvergence.windowLaw_univ"
   ],
   "constraints": {
    "hypotheses": [
     "0 < ε"
    ],
    "hypotheses_by_theorem": {
-    "Descent.Portability.CubeAverageConvergence.noiseLaw_univ": [
+    "Descent.Portability.CubeAverageConvergence.windowLaw_univ": [
      "0 < ε"
     ],
-    "Descent.Portability.CubeAverageConvergence.noiseLaw_Icc": [
+    "Descent.Portability.CubeAverageConvergence.windowLaw_Icc": [
      "0 < ε"
     ],
-    "Descent.Portability.LossExplainabilitySeparation.conditional_context": [],
-    "Descent.Portability.PairedGainTailExperiment.noise_probability": [],
-    "Descent.Portability.PairedGainTailExperiment.noise_integral": [],
-    "Descent.Portability.PairedGainTailExperiment.noise_moments": [],
-    "Descent.Portability.PairedGainTailExperiment.conditional_loss": []
+    "Descent.Portability.CubeAverageConvergence.smoothedLaw_eq_sum_windowLaw": [],
+    "Descent.Portability.CubeAverageConvergence.pi_smoothedLaw_eq_mixtureLaw": []
    }
   }
  },
@@ -159121,7 +159478,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name MeasureTheory.Measure.pi",
   "file": "Descent/Portability/CubeAverageConvergence.lean",
-  "line": 83,
+  "line": 104,
   "short": "cubeLaw",
   "ret_type": "MeasureTheory.Measure (N → ℝ)",
   "empirical_status": "",
@@ -159137,15 +159494,19 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
-   "Descent.Portability.CubeAverageConvergence.abs_cubeAverage_sub_le",
+   "Descent.Portability.CubeAverageConvergence.abs_integral_cubeLaw_sub_le",
    "Descent.Portability.CubeAverageConvergence.cubeLaw_ae_mem",
    "Descent.Portability.CubeAverageConvergence.cubeLaw_box",
-   "Descent.Portability.CubeAverageConvergence.cubeLaw_univ"
+   "Descent.Portability.CubeAverageConvergence.cubeLaw_univ",
+   "Descent.Portability.CubeAverageConvergence.exists_smoothing_scale",
+   "Descent.Portability.CubeAverageConvergence.integrable_cubeLaw",
+   "Descent.Portability.CubeAverageConvergence.integral_mixtureLaw",
+   "Descent.Portability.CubeAverageConvergence.pi_smoothedLaw_eq_mixtureLaw"
   ],
   "constraints": {
    "hypotheses": [
     "0 < ε",
-    "∀ u : N → ℝ, (∀ i, u i ∈ Set.Icc (-ε"
+    "∀ y : N → ℝ, (∀ i, y i ∈ Set.Icc (a i - ε"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.CubeAverageConvergence.cubeLaw_univ": [
@@ -159157,9 +159518,55 @@
     "Descent.Portability.CubeAverageConvergence.cubeLaw_ae_mem": [
      "0 < ε"
     ],
-    "Descent.Portability.CubeAverageConvergence.abs_cubeAverage_sub_le": [
+    "Descent.Portability.CubeAverageConvergence.integrable_cubeLaw": [
      "0 < ε",
-     "∀ u : N → ℝ, (∀ i, u i ∈ Set.Icc (-ε"
+     "∀ y : N → ℝ, (∀ i, y i ∈ Set.Icc (a i - ε"
+    ],
+    "Descent.Portability.CubeAverageConvergence.abs_integral_cubeLaw_sub_le": [
+     "0 < ε",
+     "∀ y : N → ℝ, (∀ i, y i ∈ Set.Icc (a i - ε"
+    ],
+    "Descent.Portability.CubeAverageConvergence.pi_smoothedLaw_eq_mixtureLaw": [],
+    "Descent.Portability.CubeAverageConvergence.integral_mixtureLaw": [],
+    "Descent.Portability.CubeAverageConvergence.exists_smoothing_scale": []
+   }
+  }
+ },
+ "Descent.Portability.CubeAverageConvergence.mixtureLaw": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name ENNReal.ofReal",
+  "file": "Descent/Portability/CubeAverageConvergence.lean",
+  "line": 209,
+  "short": "mixtureLaw",
+  "ret_type": "MeasureTheory.Measure (N → ℝ)",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "ε": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.CubeAverageConvergence.integral_mixtureLaw",
+   "Descent.Portability.CubeAverageConvergence.pi_smoothedLaw_eq_mixtureLaw"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "∀ i z, 0 ≤ p i z",
+    "∀ c : N → Z, MeasureTheory.Integrable g (cubeLaw (fun i ↦ v i (c i"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.CubeAverageConvergence.pi_smoothedLaw_eq_mixtureLaw": [
+     "∀ i z, 0 ≤ p i z"
+    ],
+    "Descent.Portability.CubeAverageConvergence.integral_mixtureLaw": [
+     "∀ i z, 0 ≤ p i z",
+     "∀ c : N → Z, MeasureTheory.Integrable g (cubeLaw (fun i ↦ v i (c i"
     ]
    }
   }
@@ -179235,6 +179642,8 @@
    }
   },
   "mentioned_by": [
+   "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality",
    "Descent.Portability.FiniteAuditDesign.certificate_equality",
    "Descent.Portability.FiniteAuditDesign.certified_optimum",
    "Descent.Portability.FiniteAuditDesign.lagrangian_identity",
@@ -179260,18 +179669,29 @@
    "hypotheses": [
     "∀ i, 0 ≤ c i",
     "Feasible floor c B p",
+    "dualBound a floor c B η lam = worstVariance a p",
+    "∀ i, 0 < c i",
+    "spending c p₀ < B",
     "∀ i, p i = AuditAllocationCoordinate.choice (contribution a η i",
     "∀ j, η j ≠ 0 → rowVariance a p j = worstVariance a p",
     "lam * (spending c p - B",
     "∀ i, p i ∈ Set.Icc (floor i",
     "spending c p < B",
-    "spending c p₀ < B",
     "∀ q ∈ domain floor, worstVariance a p ≤ q.2 + ∑ j, d j * constraint a c B j q",
     "∀ j, d j * constraint a c B j (p, worstVariance a p",
     "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i",
     "(covariance (fun i ↦ κ i / p i"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality": [
+     "∀ i, 0 ≤ c i",
+     "Feasible floor c B p",
+     "dualBound a floor c B η lam = worstVariance a p"
+    ],
+    "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law": [
+     "∀ i, 0 < c i",
+     "spending c p₀ < B"
+    ],
     "Descent.Portability.FiniteAuditDesign.lagrangian_identity": [],
     "Descent.Portability.FiniteAuditDesign.weak_duality": [
      "∀ i, 0 ≤ c i",
@@ -179367,6 +179787,9 @@
    "Descent.Portability.AuditRangeCaps.fullRadius_continuous",
    "Descent.Portability.AuditRangeCaps.full_optimum_exists",
    "Descent.Portability.DecisionDirectedAuditDesign.design_exists",
+   "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality",
    "Descent.Portability.FiniteAuditDesign.certified_optimum",
    "Descent.Portability.FiniteAuditDesign.weak_duality",
    "Descent.Portability.FiniteAuditDesignConvexity.feasible_compact",
@@ -179377,6 +179800,9 @@
    "Descent.Portability.FiniteAuditStrongDuality.attained_strong_duality",
    "Descent.Portability.FiniteAuditStrongDuality.epigraph_multipliers",
    "Descent.Portability.GeometricAuditCaps.grid_design_approximation",
+   "Descent.Portability.IdenticalAuditCells.capped_spectral_optimum_constant",
+   "Descent.Portability.IdenticalAuditCells.feasible_average",
+   "Descent.Portability.IdenticalAuditCells.spectral_optimum_constant",
    "Descent.Portability.RangeAwareAuditSearch.exact_solvers_guarantee",
    "Descent.Portability.RangeAwareAuditSearch.finite_search_exists",
    "Descent.Portability.RangeAwareAuditSearch.range_interval",
@@ -179398,12 +179824,17 @@
     "{p | Feasible floor c B p}.Nonempty",
     "{p | Feasible (cappedFloor floor h m",
     "∃ p, Feasible floor c B p",
+    "dualBound a floor c B η lam = worstVariance a p",
+    "∀ i, 0 < c i",
+    "∀ i, p₀ i ∈ Set.Icc (floor i",
+    "spending c p₀ < B",
     "∀ i, p i = AuditAllocationCoordinate.choice (contribution a η i",
     "∀ j, η j ≠ 0 → rowVariance a p j = worstVariance a p",
     "lam * (spending c p - B",
-    "∀ i, p₀ i ∈ Set.Icc (floor i",
-    "spending c p₀ < B",
     "maxRange h p ∈ Set.Icc low high",
+    "∀ i ∈ s, floor i = f₀",
+    "∀ i ∈ s, c i = c₀",
+    "{p | Feasible floor c B p ∧ maxRange h p ≤ m}.Nonempty",
     "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
     "∀ j, Feasible (cappedFloor floor h j.val.val",
     "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i",
@@ -179448,6 +179879,24 @@
      "∀ i, 0 < floor i",
      "∃ p, Feasible floor c B p"
     ],
+    "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i",
+     "Feasible floor c B p",
+     "dualBound a floor c B η lam = worstVariance a p"
+    ],
+    "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < c i",
+     "Feasible floor c B p",
+     "dualBound a floor c B η lam = worstVariance a p"
+    ],
+    "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < c i",
+     "∀ i, p₀ i ∈ Set.Icc (floor i",
+     "spending c p₀ < B"
+    ],
     "Descent.Portability.FiniteAuditDesign.weak_duality": [
      "∀ i, 0 < floor i",
      "∀ i, 0 ≤ c i",
@@ -179489,6 +179938,23 @@
      "∀ i, 0 < floor i",
      "Feasible floor c B p",
      "maxRange h p ∈ Set.Icc low high"
+    ],
+    "Descent.Portability.IdenticalAuditCells.feasible_average": [
+     "∀ i ∈ s, floor i = f₀",
+     "∀ i ∈ s, c i = c₀",
+     "Feasible floor c B p"
+    ],
+    "Descent.Portability.IdenticalAuditCells.spectral_optimum_constant": [
+     "∀ i, 0 < floor i",
+     "∀ i ∈ s, floor i = f₀",
+     "∀ i ∈ s, c i = c₀",
+     "{p | Feasible floor c B p}.Nonempty"
+    ],
+    "Descent.Portability.IdenticalAuditCells.capped_spectral_optimum_constant": [
+     "∀ i, 0 < floor i",
+     "∀ i ∈ s, floor i = f₀",
+     "∀ i ∈ s, c i = c₀",
+     "{p | Feasible floor c B p ∧ maxRange h p ≤ m}.Nonempty"
     ],
     "Descent.Portability.RangeAwareAuditSearch.range_interval": [
      "∀ i, 0 < floor i",
@@ -179562,6 +180028,7 @@
    }
   },
   "mentioned_by": [
+   "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law",
    "Descent.Portability.FiniteAuditDesign.active_weighted_eq",
    "Descent.Portability.FiniteAuditDesign.certificate_equality",
    "Descent.Portability.FiniteAuditDesign.certified_optimum",
@@ -179583,9 +180050,9 @@
    "declared_lo": 0.0,
    "declared_hi": null,
    "hypotheses": [
+    "∀ j i, 0 ≤ a j i",
     "∀ j, 0 ≤ η j",
     "∑ j, η j = 1",
-    "∀ j i, 0 ≤ a j i",
     "Feasible floor c B p",
     "∀ j, η j ≠ 0 → rowVariance a p j = worstVariance a p",
     "∀ i, p i = AuditAllocationCoordinate.choice (contribution a η i",
@@ -179597,6 +180064,9 @@
     "∀ i, 0 < p i"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law": [
+     "∀ j i, 0 ≤ a j i"
+    ],
     "Descent.Portability.FiniteAuditDesign.row_le_worst": [],
     "Descent.Portability.FiniteAuditDesign.weighted_identity": [],
     "Descent.Portability.FiniteAuditDesign.weighted_le_worst": [
@@ -179674,6 +180144,9 @@
    "Descent.Portability.AuditDesignNumericalCertificate.worst_nonneg",
    "Descent.Portability.AuditRangeCaps.capped_optimum_exists",
    "Descent.Portability.AuditRangeCaps.exact_cap_reduction",
+   "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality",
    "Descent.Portability.FiniteAuditDesign.active_weighted_eq",
    "Descent.Portability.FiniteAuditDesign.certificate_equality",
    "Descent.Portability.FiniteAuditDesign.certified_optimum",
@@ -179688,6 +180161,7 @@
    "Descent.Portability.FiniteAuditStrongDuality.epigraph_multipliers",
    "Descent.Portability.FiniteAuditStrongDuality.multipliers_sum_one",
    "Descent.Portability.GeometricAuditCaps.grid_design_approximation",
+   "Descent.Portability.IdenticalAuditCells.finite_variance_le",
    "Descent.Portability.RangeAwareAuditSearch.exact_solvers_guarantee",
    "Descent.Portability.RangeAwareAuditSearch.finite_search_exists"
   ],
@@ -179706,6 +180180,7 @@
     "Feasible floor c B p",
     "{p | Feasible (cappedFloor floor h m",
     "IsMinOn (fullRadius a h · x",
+    "dualBound a floor c B η lam = worstVariance a p",
     "∀ j, η j ≠ 0 → rowVariance a p j = worstVariance a p",
     "∀ i, p i = AuditAllocationCoordinate.choice (contribution a η i",
     "lam * (spending c p - B",
@@ -179716,6 +180191,7 @@
     "∀ q ∈ domain floor, worstVariance a p ≤ q.2 + ∑ j, d j * constraint a c B j q",
     "∀ j, d j * constraint a c B j (p, worstVariance a p",
     "maxRange h p ∈ Set.Icc low high",
+    "∀ j i, i ∈ s → a j i = a₀ j",
     "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
     "∃ p, Feasible floor c B p"
    ],
@@ -179738,6 +180214,19 @@
     "Descent.Portability.AuditRangeCaps.exact_cap_reduction": [
      "Feasible floor c B p",
      "IsMinOn (fullRadius a h · x"
+    ],
+    "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality": [
+     "∀ j i, 0 ≤ a j i",
+     "Feasible floor c B p",
+     "dualBound a floor c B η lam = worstVariance a p"
+    ],
+    "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula": [
+     "∀ j i, 0 ≤ a j i",
+     "Feasible floor c B p",
+     "dualBound a floor c B η lam = worstVariance a p"
+    ],
+    "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law": [
+     "∀ j i, 0 ≤ a j i"
     ],
     "Descent.Portability.FiniteAuditDesign.row_le_worst": [],
     "Descent.Portability.FiniteAuditDesign.weighted_le_worst": [],
@@ -179787,6 +180276,10 @@
     "Descent.Portability.GeometricAuditCaps.grid_design_approximation": [
      "Feasible floor c B p",
      "maxRange h p ∈ Set.Icc low high"
+    ],
+    "Descent.Portability.IdenticalAuditCells.finite_variance_le": [
+     "∀ i, 0 < p i",
+     "∀ j i, i ∈ s → a j i = a₀ j"
     ],
     "Descent.Portability.RangeAwareAuditSearch.exact_solvers_guarantee": [
      "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
@@ -179841,6 +180334,9 @@
    "Descent.Blindness.surgery_invisible_to_even_visible_to_odd",
    "Descent.Blindness.symmetric_prior_testable_by_odd_summaries",
    "Descent.Blindness.symmetric_prior_untestable_by_even_summaries",
+   "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality",
    "Descent.Portability.FiniteAuditDesign.certificate_equality",
    "Descent.Portability.FiniteAuditDesign.certified_optimum",
    "Descent.Portability.FiniteAuditDesign.contribution_nonneg",
@@ -179866,17 +180362,18 @@
    "declared_hi": null,
    "hypotheses": [
     "∀ j i, 0 ≤ a j i",
-    "∀ j, 0 ≤ η j",
     "∀ i, 0 < floor i",
     "∀ i, 0 ≤ c i",
+    "∀ j, 0 ≤ η j",
     "∑ j, η j = 1",
+    "dualBound a floor c B η lam = worstVariance a p",
+    "∀ i, 0 < c i",
+    "∀ i, p₀ i ∈ Set.Icc (floor i",
     "∀ i, p i = AuditAllocationCoordinate.choice (contribution a η i",
     "∀ j, η j ≠ 0 → rowVariance a p j = worstVariance a p",
-    "∀ i, p₀ i ∈ Set.Icc (floor i",
     "∀ i, 0 ≤ κ i",
     "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i",
-    "(covariance (fun i ↦ κ i / p i",
-    "∀ i, 0 < c i"
+    "(covariance (fun i ↦ κ i / p i"
    ],
    "hypotheses_by_theorem": {
     "Descent.Blindness.Fiber.contribution_zero_test_function_eq_zero": [],
@@ -179890,6 +180387,28 @@
     "Descent.Blindness.surgery_invisible_to_even_visible_to_odd": [],
     "Descent.Blindness.imbalance_identifiedBy_oddSummary": [],
     "Descent.Blindness.imbalance_blind_to_evenClass_identified_by_oddSummary": [],
+    "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality": [
+     "∀ j i, 0 ≤ a j i",
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i",
+     "∀ j, 0 ≤ η j",
+     "∑ j, η j = 1",
+     "dualBound a floor c B η lam = worstVariance a p"
+    ],
+    "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula": [
+     "∀ j i, 0 ≤ a j i",
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < c i",
+     "∀ j, 0 ≤ η j",
+     "∑ j, η j = 1",
+     "dualBound a floor c B η lam = worstVariance a p"
+    ],
+    "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law": [
+     "∀ j i, 0 ≤ a j i",
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < c i",
+     "∀ i, p₀ i ∈ Set.Icc (floor i"
+    ],
     "Descent.Portability.FiniteAuditDesign.contribution_nonneg": [
      "∀ j i, 0 ≤ a j i",
      "∀ j, 0 ≤ η j"
@@ -179978,6 +180497,9 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality",
    "Descent.Portability.FiniteAuditDesign.certificate_equality",
    "Descent.Portability.FiniteAuditDesign.weak_duality",
    "Descent.Portability.FiniteAuditStrongDuality.attained_strong_duality",
@@ -179993,13 +180515,43 @@
     "∑ j, η j = 1",
     "0 ≤ lam",
     "Feasible floor c B p",
+    "dualBound a floor c B η lam = worstVariance a p",
+    "∀ i, 0 < c i",
+    "0 < lam",
+    "∀ i, p₀ i ∈ Set.Icc (floor i",
+    "spending c p₀ < B",
     "∀ i, p i = AuditAllocationCoordinate.choice (contribution a η i",
     "∀ j, η j ≠ 0 → rowVariance a p j = worstVariance a p",
-    "lam * (spending c p - B",
-    "∀ i, p₀ i ∈ Set.Icc (floor i",
-    "spending c p₀ < B"
+    "lam * (spending c p - B"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality": [
+     "∀ j i, 0 ≤ a j i",
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i",
+     "∀ j, 0 ≤ η j",
+     "∑ j, η j = 1",
+     "0 ≤ lam",
+     "Feasible floor c B p",
+     "dualBound a floor c B η lam = worstVariance a p"
+    ],
+    "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula": [
+     "∀ j i, 0 ≤ a j i",
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < c i",
+     "∀ j, 0 ≤ η j",
+     "∑ j, η j = 1",
+     "0 < lam",
+     "Feasible floor c B p",
+     "dualBound a floor c B η lam = worstVariance a p"
+    ],
+    "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law": [
+     "∀ j i, 0 ≤ a j i",
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < c i",
+     "∀ i, p₀ i ∈ Set.Icc (floor i",
+     "spending c p₀ < B"
+    ],
     "Descent.Portability.FiniteAuditDesign.weak_duality": [
      "∀ j i, 0 ≤ a j i",
      "∀ i, 0 < floor i",
@@ -181896,6 +182448,7 @@
    "Descent.Portability.FourCyclePrediction.reversible_correlation",
    "Descent.Portability.FourCyclePrediction.reversible_prediction_energy",
    "Descent.Portability.FourCyclePrediction.same_instantaneous_energy",
+   "Descent.Portability.IdenticalAuditCells.spectral_variance_le",
    "Descent.Portability.MeasurementRankLaw.gram_kernel",
    "Descent.Portability.SamplingDesignLaw.inner_fit_selection_disjoint",
    "Descent.Portability.SamplingDesignLaw.inner_fit_test_disjoint",
@@ -182003,6 +182556,7 @@
     "Descent.Portability.FourCyclePrediction.directed_prediction_energy": [],
     "Descent.Portability.FourCyclePrediction.reversible_prediction_energy": [],
     "Descent.Portability.FourCyclePrediction.same_instantaneous_energy": [],
+    "Descent.Portability.IdenticalAuditCells.spectral_variance_le": [],
     "Descent.Portability.MeasurementRankLaw.gram_kernel": [],
     "Descent.Portability.SamplingDesignLaw.inner_fit_selection_disjoint": [],
     "Descent.Portability.SamplingDesignLaw.inner_fit_test_disjoint": [],
@@ -199368,6 +199922,9 @@
    "Descent.Blindness.surgery_invisible_to_even_visible_to_odd",
    "Descent.Blindness.symmetric_prior_testable_by_odd_summaries",
    "Descent.Blindness.symmetric_prior_untestable_by_even_summaries",
+   "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality",
    "Descent.Portability.FiniteAuditDesign.certificate_equality",
    "Descent.Portability.FiniteAuditDesign.certified_optimum",
    "Descent.Portability.FiniteAuditDesign.contribution_nonneg",
@@ -199409,6 +199966,9 @@
     "Descent.Blindness.surgery_invisible_to_even_visible_to_odd": [],
     "Descent.Blindness.imbalance_identifiedBy_oddSummary": [],
     "Descent.Blindness.imbalance_blind_to_evenClass_identified_by_oddSummary": [],
+    "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality": [],
+    "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula": [],
+    "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law": [],
     "Descent.Portability.FiniteAuditDesign.contribution_nonneg": [],
     "Descent.Portability.FiniteAuditDesign.weighted_identity": [],
     "Descent.Portability.FiniteAuditDesign.lagrangian_identity": [],
@@ -205501,6 +206061,8 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.CubeAverageConvergence.independent_smoothed_obstruction",
+   "Descent.Portability.CubeAverageConvergence.radial_exists_smoothing_scale",
    "Descent.Portability.IndependentRadialLaws.coord_moment_match",
    "Descent.Portability.IndependentRadialLaws.productOutcome_cell",
    "Descent.Portability.IndependentRadialLaws.product_moment_match",
@@ -205516,6 +206078,10 @@
     "Function.Injective r"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.CubeAverageConvergence.radial_exists_smoothing_scale": [
+     "Function.Injective r"
+    ],
+    "Descent.Portability.CubeAverageConvergence.independent_smoothed_obstruction": [],
     "Descent.Portability.IndependentRadialLaws.radial_scalar_gap": [
      "Function.Injective r"
     ],
@@ -205609,6 +206175,8 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.CubeAverageConvergence.independent_smoothed_obstruction",
+   "Descent.Portability.CubeAverageConvergence.radial_exists_smoothing_scale",
    "Descent.Portability.IndependentRadialLaws.independent_radial_obstruction",
    "Descent.Portability.IndependentRadialLaws.product_concentration",
    "Descent.Portability.IndependentRadialLaws.product_moment_match"
@@ -205619,6 +206187,10 @@
     "∀ i, 0 < r i"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.CubeAverageConvergence.radial_exists_smoothing_scale": [
+     "Function.Injective r"
+    ],
+    "Descent.Portability.CubeAverageConvergence.independent_smoothed_obstruction": [],
     "Descent.Portability.IndependentRadialLaws.product_moment_match": [
      "Function.Injective r"
     ],
@@ -205663,6 +206235,8 @@
    }
   },
   "mentioned_by": [
+   "Descent.Portability.CubeAverageConvergence.independent_smoothed_obstruction",
+   "Descent.Portability.CubeAverageConvergence.radial_exists_smoothing_scale",
    "Descent.Portability.IndependentRadialLaws.independent_radial_obstruction",
    "Descent.Portability.IndependentRadialLaws.productOutcome_cell",
    "Descent.Portability.IndependentRadialLaws.product_concentration",
@@ -205671,9 +206245,18 @@
   "constraints": {
    "hypotheses": [
     "Function.Injective r",
+    "∀ ω : N → Fin (k + 1",
+    "∀ t : ℝ, 0 < t → t < 1 → ∀ ω : N → Fin (k + 1",
     "∀ i, 0 < r i"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.CubeAverageConvergence.radial_exists_smoothing_scale": [
+     "Function.Injective r",
+     "∀ ω : N → Fin (k + 1"
+    ],
+    "Descent.Portability.CubeAverageConvergence.independent_smoothed_obstruction": [
+     "∀ t : ℝ, 0 < t → t < 1 → ∀ ω : N → Fin (k + 1"
+    ],
     "Descent.Portability.IndependentRadialLaws.product_moment_match": [
      "Function.Injective r"
     ],
@@ -224359,6 +224942,8 @@
    }
   },
   "mentioned_by": [
+   "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality",
    "Descent.Portability.FiniteAuditDesign.certificate_equality",
    "Descent.Portability.FiniteAuditDesign.certified_optimum",
    "Descent.Portability.FiniteAuditDesign.lagrangian_identity",
@@ -224388,6 +224973,8 @@
     "∀ mode, 0 < cost mode"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality": [],
+    "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law": [],
     "Descent.Portability.FiniteAuditDesign.lagrangian_identity": [],
     "Descent.Portability.FiniteAuditDesign.weak_duality": [],
     "Descent.Portability.FiniteAuditDesign.certificate_equality": [],
@@ -236635,8 +237222,6 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
-   "Descent.Portability.CubeAverageConvergence.noiseLaw_Icc",
-   "Descent.Portability.CubeAverageConvergence.noiseLaw_univ",
    "Descent.Portability.LossExplainabilitySeparation.conditional_context",
    "Descent.Portability.PairedGainTailExperiment.conditional_loss",
    "Descent.Portability.PairedGainTailExperiment.noise_integral",
@@ -236648,8 +237233,6 @@
     "0 ≤ p ∧ p ≤ 1"
    ],
    "hypotheses_by_theorem": {
-    "Descent.Portability.CubeAverageConvergence.noiseLaw_univ": [],
-    "Descent.Portability.CubeAverageConvergence.noiseLaw_Icc": [],
     "Descent.Portability.LossExplainabilitySeparation.conditional_context": [
      "0 ≤ p ∧ p ≤ 1"
     ],
@@ -253480,6 +254063,8 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.CubeAverageConvergence.independent_smoothed_obstruction",
+   "Descent.Portability.CubeAverageConvergence.radial_exists_smoothing_scale",
    "Descent.Portability.IndependentRadialLaws.coord_moment_match",
    "Descent.Portability.IndependentRadialLaws.productLaw_expectation",
    "Descent.Portability.IndependentRadialLaws.product_moment_match",
@@ -253505,6 +254090,10 @@
     "∀ i, 0 < r i"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.CubeAverageConvergence.radial_exists_smoothing_scale": [
+     "Function.Injective r"
+    ],
+    "Descent.Portability.CubeAverageConvergence.independent_smoothed_obstruction": [],
     "Descent.Portability.IndependentRadialLaws.radial_scalar_gap": [
      "Function.Injective r"
     ],
@@ -253812,6 +254401,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.CubeAverageConvergence.independent_smoothed_obstruction",
    "Descent.Portability.IndependentRadialLaws.cellMass_continuousAt",
    "Descent.Portability.IndependentRadialLaws.independent_radial_obstruction",
    "Descent.Portability.RadialInterpolation.exists_radii_total_lt",
@@ -253829,10 +254419,17 @@
   "constraints": {
    "hypotheses": [
     "∀ t : ℝ, 0 < t → ∀ y : N → ℝ, F (t • y",
+    "∀ t : ℝ, 0 < t → t < 1 → ∀ ω : N → Fin (k + 1",
     "0 < t",
     "t < 1"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.CubeAverageConvergence.independent_smoothed_obstruction": [
+     "∀ t : ℝ, 0 < t → ∀ y : N → ℝ, F (t • y",
+     "∀ t : ℝ, 0 < t → t < 1 → ∀ ω : N → Fin (k + 1",
+     "0 < t",
+     "t < 1"
+    ],
     "Descent.Portability.IndependentRadialLaws.cellMass_continuousAt": [],
     "Descent.Portability.IndependentRadialLaws.independent_radial_obstruction": [
      "∀ t : ℝ, 0 < t → ∀ y : N → ℝ, F (t • y",
@@ -257645,6 +258242,8 @@
    "Descent.Portability.AuditAllocationCoordinate.choice_mem",
    "Descent.Portability.AuditAllocationCoordinate.choice_minimum",
    "Descent.Portability.AuditAllocationCoordinate.zero_contribution",
+   "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality",
    "Descent.Portability.FiniteAuditDesign.certificate_equality",
    "Descent.Portability.FiniteAuditDesign.certified_optimum",
    "Descent.Portability.FiniteAuditStrongDuality.attained_strong_duality",
@@ -257667,6 +258266,8 @@
     "Descent.Portability.AuditAllocationCoordinate.choice_mem": [],
     "Descent.Portability.AuditAllocationCoordinate.choice_minimum": [],
     "Descent.Portability.AuditAllocationCoordinate.zero_contribution": [],
+    "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality": [],
+    "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula": [],
     "Descent.Portability.FiniteAuditDesign.certificate_equality": [],
     "Descent.Portability.FiniteAuditDesign.certified_optimum": [],
     "Descent.Portability.FiniteAuditStrongDuality.attained_strong_duality": [],
@@ -265222,6 +265823,11 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.CubeAverageConvergence.exists_smoothing_scale",
+   "Descent.Portability.CubeAverageConvergence.independent_smoothed_obstruction",
+   "Descent.Portability.CubeAverageConvergence.pi_smoothedLaw_eq_mixtureLaw",
+   "Descent.Portability.CubeAverageConvergence.radial_exists_smoothing_scale",
+   "Descent.Portability.CubeAverageConvergence.smoothedLaw_eq_sum_windowLaw",
    "Descent.Portability.SmoothedCoordinateLaws.radial_smoothedLaw_moment_match",
    "Descent.Portability.SmoothedCoordinateLaws.radial_smoothedLaw_univ",
    "Descent.Portability.SmoothedCoordinateLaws.radial_smoothedProduct_moment_match",
@@ -265234,13 +265840,28 @@
   "constraints": {
    "hypotheses": [
     "∀ z, 0 ≤ p z",
+    "∀ i z, 0 ≤ p i z",
+    "∀ i, ∑ z, p i z = 1",
+    "∀ c : N → Z, ContinuousAt g fun i ↦ v i (c i",
     "∑ z, p z = 1",
     "0 < ε",
     "∀ r, r ≤ k → (∑ z, p z * v z ^ r",
-    "∀ i z, 0 ≤ p i z",
     "∀ i r, r ≤ k → (∑ z, p i z * v i z ^ r"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.CubeAverageConvergence.smoothedLaw_eq_sum_windowLaw": [
+     "∀ z, 0 ≤ p z"
+    ],
+    "Descent.Portability.CubeAverageConvergence.pi_smoothedLaw_eq_mixtureLaw": [
+     "∀ i z, 0 ≤ p i z"
+    ],
+    "Descent.Portability.CubeAverageConvergence.exists_smoothing_scale": [
+     "∀ i z, 0 ≤ p i z",
+     "∀ i, ∑ z, p i z = 1",
+     "∀ c : N → Z, ContinuousAt g fun i ↦ v i (c i"
+    ],
+    "Descent.Portability.CubeAverageConvergence.radial_exists_smoothing_scale": [],
+    "Descent.Portability.CubeAverageConvergence.independent_smoothed_obstruction": [],
     "Descent.Portability.SmoothedCoordinateLaws.smoothedLaw_absolutelyContinuous": [],
     "Descent.Portability.SmoothedCoordinateLaws.smoothedLaw_univ": [
      "∀ z, 0 ≤ p z",
@@ -269025,8 +269646,13 @@
    "Descent.Portability.AuditAllocationCoordinate.objective_difference",
    "Descent.Portability.AuditAllocationCoordinate.positive_multiplier_minimum",
    "Descent.Portability.AuditAllocationCoordinate.zero_multiplier_minimum",
+   "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality",
+   "Descent.Portability.FiniteAuditAllocationLaw.positive_multiplier_unique",
    "Descent.Portability.FiniteAuditDesign.lagrangian_identity",
    "Descent.Portability.FiniteAuditDesign.weak_duality",
+   "Descent.Portability.IdenticalAuditCells.capped_spectral_optimum_constant",
+   "Descent.Portability.IdenticalAuditCells.spectral_optimum_constant",
+   "Descent.Portability.IdenticalAuditCells.spectral_variance_le",
    "Descent.Portability.SpectralAuditCost.attained_cost_bound",
    "Descent.Portability.SpectralAuditCost.cost_lower_bound",
    "Descent.Portability.SpectralAuditDesign.direction_le",
@@ -269047,13 +269673,18 @@
     "p ≠ 0",
     "p ∈ Set.Icc floor 1",
     "0 < p ∧ p ≤ 1",
+    "AuditAllocationCoordinate.objective A b p = AuditAllocationCoordinate.objective A b (clip floor 1 (Real.sqrt (A / b",
     "Feasible floor c B p",
-    "∀ i, 0 ≤ κ i",
+    "dualBound a floor c B η lam = worstVariance a p",
     "∀ i, 0 < p i",
+    "∀ i, 0 ≤ κ i",
+    "∀ i ∈ s, κ i = κ₀",
+    "∀ i ∈ s, u i = u₀",
+    "{p | Feasible floor c B p}.Nonempty",
+    "{p | Feasible floor c B p ∧ maxRange h p ≤ m}.Nonempty",
     "(∑ i, p i",
     "∀ i, p i = t * (Real.sqrt (κ i",
     "covariance (fun i ↦ κ i / p i",
-    "{p | Feasible floor c B p}.Nonempty",
     "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i",
     "(covariance (fun i ↦ κ i / p i",
     "lam * (spending c p - B"
@@ -269071,9 +269702,35 @@
     "Descent.Portability.AuditAllocationCoordinate.choice_minimum": [
      "p ∈ Set.Icc floor 1"
     ],
+    "Descent.Portability.FiniteAuditAllocationLaw.positive_multiplier_unique": [
+     "p ∈ Set.Icc floor 1",
+     "AuditAllocationCoordinate.objective A b p = AuditAllocationCoordinate.objective A b (clip floor 1 (Real.sqrt (A / b"
+    ],
+    "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality": [
+     "Feasible floor c B p",
+     "dualBound a floor c B η lam = worstVariance a p"
+    ],
     "Descent.Portability.FiniteAuditDesign.lagrangian_identity": [],
     "Descent.Portability.FiniteAuditDesign.weak_duality": [
      "Feasible floor c B p"
+    ],
+    "Descent.Portability.IdenticalAuditCells.spectral_variance_le": [
+     "∀ i, 0 < p i",
+     "∀ i, 0 ≤ κ i",
+     "∀ i ∈ s, κ i = κ₀",
+     "∀ i ∈ s, u i = u₀"
+    ],
+    "Descent.Portability.IdenticalAuditCells.spectral_optimum_constant": [
+     "∀ i, 0 ≤ κ i",
+     "∀ i ∈ s, κ i = κ₀",
+     "∀ i ∈ s, u i = u₀",
+     "{p | Feasible floor c B p}.Nonempty"
+    ],
+    "Descent.Portability.IdenticalAuditCells.capped_spectral_optimum_constant": [
+     "∀ i, 0 ≤ κ i",
+     "∀ i ∈ s, κ i = κ₀",
+     "∀ i ∈ s, u i = u₀",
+     "{p | Feasible floor c B p ∧ maxRange h p ≤ m}.Nonempty"
     ],
     "Descent.Portability.SpectralAuditCost.cost_lower_bound": [
      "∀ i, 0 ≤ κ i",
@@ -269170,6 +269827,9 @@
    "Descent.Blindness.surgery_invisible_to_even_visible_to_odd",
    "Descent.Blindness.symmetric_prior_testable_by_odd_summaries",
    "Descent.Blindness.symmetric_prior_untestable_by_even_summaries",
+   "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality",
    "Descent.Portability.FiniteAuditDesign.certificate_equality",
    "Descent.Portability.FiniteAuditDesign.certified_optimum",
    "Descent.Portability.FiniteAuditDesign.contribution_nonneg",
@@ -269194,15 +269854,15 @@
     "∀ j i, 0 ≤ a j i",
     "∀ i, 0 < floor i",
     "∀ i, 0 ≤ c i",
-    "∀ i, p i = AuditAllocationCoordinate.choice (contribution a η i",
+    "∀ i, 0 < c i",
     "∀ i, p₀ i ∈ Set.Icc (floor i",
+    "∀ i, p i = AuditAllocationCoordinate.choice (contribution a η i",
     "κ ≠ 0",
     "∀ i, 0 ≤ κ i",
     "W.IsPositive",
     "LinearMap.trace ℝ E W = 1",
     "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i",
-    "(covariance (fun i ↦ κ i / p i",
-    "∀ i, 0 < c i"
+    "(covariance (fun i ↦ κ i / p i"
    ],
    "hypotheses_by_theorem": {
     "Descent.Blindness.Fiber.contribution_zero_test_function_eq_zero": [],
@@ -269216,6 +269876,22 @@
     "Descent.Blindness.surgery_invisible_to_even_visible_to_odd": [],
     "Descent.Blindness.imbalance_identifiedBy_oddSummary": [],
     "Descent.Blindness.imbalance_blind_to_evenClass_identified_by_oddSummary": [],
+    "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality": [
+     "∀ j i, 0 ≤ a j i",
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i"
+    ],
+    "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula": [
+     "∀ j i, 0 ≤ a j i",
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < c i"
+    ],
+    "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law": [
+     "∀ j i, 0 ≤ a j i",
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < c i",
+     "∀ i, p₀ i ∈ Set.Icc (floor i"
+    ],
     "Descent.Portability.FiniteAuditDesign.contribution_nonneg": [
      "∀ j i, 0 ≤ a j i"
     ],
@@ -269306,6 +269982,9 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula",
+   "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law",
+   "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality",
    "Descent.Portability.FiniteAuditDesign.certificate_equality",
    "Descent.Portability.FiniteAuditDesign.weak_duality",
    "Descent.Portability.FiniteAuditStrongDuality.attained_strong_duality",
@@ -269318,9 +269997,12 @@
     "∀ i, 0 ≤ c i",
     "0 ≤ lam",
     "Feasible floor c B p",
-    "lam * (spending c p - B",
+    "dualBound a floor c B η lam = worstVariance a p",
+    "∀ i, 0 < c i",
+    "0 < lam",
     "∀ i, p₀ i ∈ Set.Icc (floor i",
     "spending c p₀ < B",
+    "lam * (spending c p - B",
     "∀ i, 0 ≤ κ i",
     "W.IsPositive",
     "LinearMap.trace ℝ E W = 1",
@@ -269328,6 +270010,26 @@
     "(covariance (fun i ↦ κ i / p i"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i",
+     "0 ≤ lam",
+     "Feasible floor c B p",
+     "dualBound a floor c B η lam = worstVariance a p"
+    ],
+    "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < c i",
+     "0 < lam",
+     "Feasible floor c B p",
+     "dualBound a floor c B η lam = worstVariance a p"
+    ],
+    "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < c i",
+     "∀ i, p₀ i ∈ Set.Icc (floor i",
+     "spending c p₀ < B"
+    ],
     "Descent.Portability.FiniteAuditDesign.weak_duality": [
      "∀ i, 0 < floor i",
      "∀ i, 0 ≤ c i",

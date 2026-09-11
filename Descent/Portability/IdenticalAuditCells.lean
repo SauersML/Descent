@@ -82,7 +82,8 @@ theorem spectral_variance_le (s : Finset ι) (p κ : ι → ℝ) (u : ι → E) 
     (hs : s.Nonempty) (hp : ∀ i, 0 < p i) (hκ : ∀ i, 0 ≤ κ i)
     (hk : ∀ i ∈ s, κ i = κ₀) (hu : ∀ i ∈ s, u i = u₀) :
     SpectralAuditDesign.objective κ u (averageCell s p) ≤ SpectralAuditDesign.objective κ u p := by
-  obtain ⟨j, hj⟩ := hs
+  have hne := hs
+  obtain ⟨j, hj⟩ := hne
   have hk₀ : 0 ≤ κ₀ := by simpa only [hk j hj] using hκ j
   unfold SpectralAuditDesign.objective
   apply (AuditRayleighGeometry.largest_le_iff _ u
@@ -90,7 +91,7 @@ theorem spectral_variance_le (s : Finset ι) (p κ : ι → ℝ) (u : ι → E) 
   intro v hv
   have hh := weighted_reciprocal_le s p (fun i ↦ κ i * (inner ℝ v (u i)) ^ 2) hs
     (fun i _ ↦ hp i) (κ₀ * (inner ℝ v u₀) ^ 2) (mul_nonneg hk₀ (sq_nonneg _))
-    (fun i hi ↦ by rw [hk i hi, hu i hi])
+    (fun i hi ↦ by dsimp only; rw [hk i hi, hu i hi])
   have he (q : ι → ℝ) : (∑ i, κ i / q i * (inner ℝ v (u i)) ^ 2) =
       ∑ i, (κ i * (inner ℝ v (u i)) ^ 2) / q i := by
     apply Finset.sum_congr rfl

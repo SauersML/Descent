@@ -3496,7 +3496,7 @@ def indexWiseCalibrationMoment(covariateWeight, posterior, conditional, predicto
 def IsCellBalanced(weight, value, cell, representative):
     return all((((sum(((_rt.mul(weight[int(a)], (_rt.sub(value[int(a)], representative[int(c)]))) if (cell(a) == c) else 0.0)) for a in range(int(_rt.sumdim('a', len(cell), len(weight), len(value)))))) == 0.0)) for c in range(int(_rt.sumdim('c', len(representative)))))
 
-def cellMean(weight, value, cell, c):
+def Descent_Portability_cellMean(weight, value, cell, c):
     return _rt.rdiv((sum(((_rt.mul(weight[int(a)], value[int(a)]) if (cell(a) == c) else 0.0)) for a in range(int(len(weight))))), (sum(((weight[int(a)] if (cell(a) == c) else 0.0)) for a in range(int(len(weight))))))
 
 def stratifiedCalibrationEnergy(covariateWeight, posterior, conditional, stratify, predictor):
