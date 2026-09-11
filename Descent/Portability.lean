@@ -464,6 +464,8 @@ import Descent.Portability.ScoreMomentZonoid
 import Descent.Portability.ClippedFrameRepair
 import Descent.Portability.SquaredCorrelationZeroTest
 
+import Descent.Portability.AngularExtremePoints
+
 assert_below Descent.Program
 
 /-!
