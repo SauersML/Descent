@@ -12,7 +12,6 @@ open Descent.Portability.UniformPenetranceArchitecture
 #print axioms penetrance_le_one
 #print axioms penetrance_eq_self
 #print axioms penetranceLaw_mass
-#print axioms penetranceLaw_eq_thetaLaw
 #print axioms expectation_penetranceLaw
 #print axioms expectation_cellScore_penetranceLaw
 #print axioms expectation_cellOutcome_penetranceLaw
