@@ -25,3 +25,9 @@ open Descent.Portability.ExposureLaplaceConstraints
 #print axioms Descent.Portability.ExposureLaplaceConstraints.exposureLaplace_zeroMixture
 #print axioms
   Descent.Portability.ExposureLaplaceConstraints.populationAUC_eq_zeroMixture_laplace
+#print axioms
+  Descent.Portability.ExposureLaplaceConstraints.exposureLaplace_natCast_eq_sum_exposureMass
+#print axioms
+  Descent.Portability.ExposureLaplaceConstraints.exposureMass_eq_of_exposureLaplace_natCast_eq
+#print axioms
+  Descent.Portability.ExposureLaplaceConstraints.exposureMass_eq_of_exposureLaplace_eq

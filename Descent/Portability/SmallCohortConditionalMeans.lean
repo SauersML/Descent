@@ -18,17 +18,22 @@ means.
 
 The route is an explicit census enumeration. `cohort_expectation_censusIndex` writes the
 expectation of any census report of an independent cohort of size `n` as a finite sum, over the
-census vectors indexed by their first three counts, of the corpus multinomial mass times the
-report. It is derived from `FourCellCohortLaw.cohortReport_expectation` by reindexing the
-corpus count type along an explicit bijection (`censusOf`), so no second counting argument is
-introduced. Evaluating that sum at `n = 3` and `n = 4` gives the definedness-weighted empirical
-squared correlation of an arbitrary four-cell law as an explicit polynomial in its four cell
+census vectors indexed by their first three counts, of the multinomial mass times the report,
+the mass in the `n!/(a! b! c! d!)` form of `FourCellCohortLaw.fourCell_census_mass`
+(`multinomialLaw_mass_eq_censusWeight`). It is derived from
+`FourCellCohortLaw.cohortReport_expectation` by reindexing the corpus count type along an
+explicit bijection (`censusOf`), so no second counting argument is introduced. Evaluating
+that sum at `n = 3` and `n = 4` gives the definedness-weighted empirical squared correlation of an arbitrary four-cell law as an explicit polynomial in its four cell
 masses (`expectation_cohortCorrelation_three`, `expectation_cohortCorrelation_four`); dividing
 by the definedness probabilities of `SmallCohortCorrelation` at the chronology cells of NOTE1
 (31) gives (41) and the tabulated values.
 
-The conditional AUC value is `EmpiricalAUCUnbiasedness.conditional_empiricalAUC_chronologyLaw`
-at `p = C = 1/2`, with its definedness premise discharged for every cohort of at least two.
+The module also removes the definedness premise from the chronology forms of NOTE1 (42) for
+every cohort of at least two whenever `0 < p < 1`. `slope_definedness_probability` is the exact
+probability `1 − P_S(1)ⁿ − P_S(0)ⁿ` that the cohort score varies, `constant_class_gap` shows
+`1 − pⁿ − (1 − p)ⁿ > 0`, and `conditional_empiricalAUC_chronologyLaw_of_two_le` and
+`conditional_empiricalSlope_chronologyLaw_of_two_le` state `(1 + C) / 2` and `C` with no
+further premise. The tabulated conditional AUC `3/4` is the first of these at `p = C = 1/2`.
 
 Not formalised here: closed forms for the conditional mean at `n ≥ 5`, or at `n = 3` away from
 `p = 1/2`. The enumeration theorem holds for every `n`, and the `n = 3` and `n = 4` polynomials
@@ -269,25 +274,100 @@ theorem conditional_cohortCorrelation_halvedCoupling_four :
     definedness_probability_halvedCoupling.2.2]
   norm_num
 
-/-- The NOTE1 section 7 table at `p = C = 1/2`: for every cohort of at least two, the empirical
-AUC is defined with positive probability and, conditional on being defined, has expectation
-`3/4`, equal to the population AUC. -/
+/-- For `0 < p < 1` and a cohort of at least two, the two constant-class probabilities `pⁿ` and
+`(1 − p)ⁿ` leave positive mass. -/
+theorem constant_class_gap (p : ℝ) (hlow : 0 < p) (hhigh : p < 1) (n : ℕ) (hn : 2 ≤ n) :
+    0 < 1 - p ^ n - (1 - p) ^ n := by
+  have hfirst : p ^ n ≤ p ^ 2 := pow_le_pow_of_le_one hlow.le hhigh.le hn
+  have hsecond : (1 - p) ^ n ≤ (1 - p) ^ 2 :=
+    pow_le_pow_of_le_one (by linarith) (by linarith) hn
+  nlinarith [mul_pos hlow (sub_pos.mpr hhigh)]
+
+/-- NOTE1 (42) for the chronology cells: the empirical AUC of a cohort of at least two is defined
+with positive probability whenever `0 < p < 1`. -/
+theorem aucDefinedIndicator_pos_chronologyLaw (p C : ℝ) (hp0 : 0 ≤ p) (hp1 : p ≤ 1)
+    (hC0 : 0 ≤ C) (hC1 : C ≤ 1) (hlow : 0 < p) (hhigh : p < 1) (n : ℕ) (hn : 2 ≤ n) :
+    0 < (cohortLaw (chronologyLaw p C hp0 hp1 hC0 hC1) n).expectation aucDefinedIndicator := by
+  rw [auc_definedness_probability_chronologyLaw p C hp0 hp1 hC0 hC1 n (by omega)]
+  exact constant_class_gap p hlow hhigh n hn
+
+/-- NOTE1 (42) for the chronology cells with no definedness premise: for every cohort of at
+least two, conditional on being defined, the empirical AUC has expectation `(1 + C) / 2`. -/
+theorem conditional_empiricalAUC_chronologyLaw_of_two_le (p C : ℝ) (hp0 : 0 ≤ p) (hp1 : p ≤ 1)
+    (hC0 : 0 ≤ C) (hC1 : C ≤ 1) (hlow : 0 < p) (hhigh : p < 1) (n : ℕ) (hn : 2 ≤ n) :
+    (cohortLaw (chronologyLaw p C hp0 hp1 hC0 hC1) n).expectation
+          (fun sample ↦ empiricalAUC sample * aucDefinedIndicator sample) /
+        (cohortLaw (chronologyLaw p C hp0 hp1 hC0 hC1) n).expectation aucDefinedIndicator =
+      (1 + C) / 2 :=
+  conditional_empiricalAUC_chronologyLaw p C hp0 hp1 hC0 hC1 hlow hhigh n
+    (aucDefinedIndicator_pos_chronologyLaw p C hp0 hp1 hC0 hC1 hlow hhigh n hn)
+
+/-- The slope definedness indicator of a cohort splits into the two constant-score indicators:
+it is the AUC definedness indicator of the cohort with score and outcome exchanged. -/
+theorem slopeDefinedIndicator_expand {n : ℕ} (hn : 0 < n) (sample : Fin n → Bool × Bool) :
+    slopeDefinedIndicator sample =
+      1 - (∏ member, scoreIndicator false (sample member)) -
+        ∏ member, scoreIndicator true (sample member) :=
+  aucDefinedIndicator_expand hn fun member ↦ ((sample member).2, (sample member).1)
+
+/-- NOTE1 (42): the exact probability that the empirical least-squares slope of an independent
+cohort of size `n` is defined, that is, that the cohort score varies. -/
+theorem slope_definedness_probability (law : FiniteReportLaw (Bool × Bool)) (n : ℕ)
+    (hn : 0 < n) :
+    (cohortLaw law n).expectation slopeDefinedIndicator =
+      1 - scoreMass law true ^ n - scoreMass law false ^ n := by
+  have hstep : (∑ sample, (cohortLaw law n).mass sample * slopeDefinedIndicator sample) =
+      ∑ sample, ((cohortLaw law n).mass sample * 1 -
+        (cohortLaw law n).mass sample * ∏ member, scoreIndicator true (sample member) -
+        (cohortLaw law n).mass sample * ∏ member, scoreIndicator false (sample member)) := by
+    refine Finset.sum_congr rfl fun sample _ ↦ ?_
+    rw [slopeDefinedIndicator_expand hn sample]
+    ring
+  have hone : (∑ sample : Fin n → Bool × Bool, (cohortLaw law n).mass sample * 1) = 1 := by
+    simpa using (cohortLaw law n).mass_sum
+  have hconstant : ∀ value : Bool, (∑ sample, (cohortLaw law n).mass sample *
+      ∏ member, scoreIndicator value (sample member)) = scoreMass law value ^ n := by
+    intro value
+    have hprod := cohort_expectation_prod law n (scoreIndicator value)
+    rw [expectation_scoreIndicator] at hprod
+    exact hprod
+  show (∑ sample, (cohortLaw law n).mass sample * slopeDefinedIndicator sample) = _
+  rw [hstep, Finset.sum_sub_distrib, Finset.sum_sub_distrib, hone, hconstant true,
+    hconstant false]
+
+/-- NOTE1 (42) for the chronology cells: the empirical slope of a cohort of size `n` is defined
+with probability `1 − pⁿ − (1 − p)ⁿ`. -/
+theorem slope_definedness_probability_chronologyLaw (p C : ℝ) (hp0 : 0 ≤ p) (hp1 : p ≤ 1)
+    (hC0 : 0 ≤ C) (hC1 : C ≤ 1) (n : ℕ) (hn : 0 < n) :
+    (cohortLaw (chronologyLaw p C hp0 hp1 hC0 hC1) n).expectation slopeDefinedIndicator =
+      1 - p ^ n - (1 - p) ^ n := by
+  obtain ⟨hdonor, hrecipient⟩ := scoreMass_chronologyLaw p C hp0 hp1 hC0 hC1
+  rw [slope_definedness_probability _ n hn, hdonor, hrecipient]
+
+/-- NOTE1 (42) for the chronology cells with no definedness premise: for every cohort of at
+least two, conditional on the score varying, the empirical slope has expectation `C`. -/
+theorem conditional_empiricalSlope_chronologyLaw_of_two_le (p C : ℝ) (hp0 : 0 ≤ p)
+    (hp1 : p ≤ 1) (hC0 : 0 ≤ C) (hC1 : C ≤ 1) (hlow : 0 < p) (hhigh : p < 1) (n : ℕ)
+    (hn : 2 ≤ n) :
+    (cohortLaw (chronologyLaw p C hp0 hp1 hC0 hC1) n).expectation
+          (fun sample ↦ empiricalSlope sample * slopeDefinedIndicator sample) /
+        (cohortLaw (chronologyLaw p C hp0 hp1 hC0 hC1) n).expectation
+          slopeDefinedIndicator = C := by
+  have hdefined : 0 < (cohortLaw (chronologyLaw p C hp0 hp1 hC0 hC1) n).expectation
+      slopeDefinedIndicator := by
+    rw [slope_definedness_probability_chronologyLaw p C hp0 hp1 hC0 hC1 n (by omega)]
+    exact constant_class_gap p hlow hhigh n hn
+  exact conditional_empiricalSlope_chronologyLaw p C hp0 hp1 hC0 hC1 hlow hhigh n hdefined
+
+/-- The NOTE1 section 7 table at `p = C = 1/2`: for every cohort of at least two, conditional on
+being defined, the empirical AUC has expectation `3/4`, equal to the population AUC. -/
 theorem conditional_empiricalAUC_halvedCoupling (n : ℕ) (hn : 2 ≤ n) :
     (cohortLaw halvedCouplingLaw n).expectation
           (fun sample ↦ empiricalAUC sample * aucDefinedIndicator sample) /
         (cohortLaw halvedCouplingLaw n).expectation aucDefinedIndicator = 3 / 4 := by
-  have hpow : ((1 : ℝ) / 2) ^ n ≤ (1 / 2) ^ 2 :=
-    pow_le_pow_of_le_one (by norm_num) (by norm_num) hn
-  have hquarter : ((1 : ℝ) / 2) ^ 2 = 1 / 4 := by norm_num
-  rw [hquarter] at hpow
-  have hdefined : 0 < (cohortLaw halvedCouplingLaw n).expectation aucDefinedIndicator := by
-    unfold halvedCouplingLaw
-    rw [auc_definedness_probability_chronologyLaw (1 / 2) (1 / 2) _ _ _ _ n (by omega),
-      show (1 : ℝ) - 1 / 2 = 1 / 2 by norm_num]
-    linarith
-  unfold halvedCouplingLaw at hdefined ⊢
-  rw [conditional_empiricalAUC_chronologyLaw (1 / 2) (1 / 2) _ _ _ _ (by norm_num) (by norm_num)
-    n hdefined]
+  unfold halvedCouplingLaw
+  rw [conditional_empiricalAUC_chronologyLaw_of_two_le (1 / 2) (1 / 2) _ _ _ _ (by norm_num)
+    (by norm_num) n hn]
   norm_num
 
 end Descent.Portability.SmallCohortConditionalMeans

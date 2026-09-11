@@ -2,9 +2,11 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.ChronologyReportLaw
+import Mathlib.Algebra.Group.Nat.Hom
 import Mathlib.Analysis.SpecialFunctions.ExpDeriv
 import Mathlib.Analysis.Calculus.IteratedDeriv.Lemmas
 import Mathlib.Analysis.Convex.SpecificFunctions.Basic
+import Mathlib.LinearAlgebra.LinearIndependent.Basic
 
 assert_below Descent.Decision Descent.Program
 
@@ -30,11 +32,20 @@ independent exposures, and the population AUC of the report law of NOTE1 (31) at
 `∑ wᵢ e^{-λ bᵢ}` is the transform of the half-and-half mixture of the point mass at exposure
 zero with the exposure law.
 
+Identifiability, the last claim of NOTE1 section 6.3, is proved for finite laws. At an integer
+scale `k` the transform is `∑_b ν{b} (e^{-b})^k`, where `exposureMass` is the mass the law places
+at the level `b`. The characters `k ↦ (e^{-b})^k` of the additive monoid of natural numbers are
+distinct for distinct `b`, hence linearly independent (Dedekind). So two finite laws whose
+transforms agree at every integer scale, or at every scale `λ ≥ 0`, place the same mass at
+every exposure level.
+
 Not formalised: the general-measure versions. NOTE1 (35) and (36) are stated there for an
 arbitrary probability measure on `[0, R]`, with differentiation under the integral sign and
 the measure-theoretic Jensen inequality. The finite case is the one the pulse realisation of
 NOTE1 section 6.3 and `FinitePulseExposure` actually uses, and no statement here assumes the
-general case. Nothing here identifies `ν` from data.
+general case. Identifiability is likewise proved only for finite laws, and the remark that `m`
+and `r` are not separately identified in calendar time is not formalised. Nothing here
+identifies `ν` from data.
 
 ## Empirical status
 
@@ -388,6 +399,81 @@ theorem populationAUC_eq_zeroMixture_laplace {n : ℕ} (law : FiniteReportLaw (F
   rw [ChronologyReportLaw.populationAUC_chronologyLaw donor
     (exposureLaplace law exposure lam) hp0 hp1 hC0 hC1 hlow hhigh,
     exposureLaplace_zeroMixture]
+
+/-- The mass a finite exposure law places at the exposure level `level`. -/
+def exposureMass {n : ℕ} (law : FiniteReportLaw (Fin n)) (exposure : Fin n → ℝ)
+    (level : ℝ) : ℝ :=
+  ∑ index ∈ Finset.univ.filter (fun index ↦ exposure index = level), law.mass index
+
+/-- Assumes: a finite set of levels containing every exposure of the law. The transform at an
+integer scale `k` is `∑_b ν{b} (e^{-b})^k`: the law enters only through the mass it places at
+each level. -/
+theorem exposureLaplace_natCast_eq_sum_exposureMass {n : ℕ} (law : FiniteReportLaw (Fin n))
+    (exposure : Fin n → ℝ) (levels : Finset ℝ) (hlevels : ∀ index, exposure index ∈ levels)
+    (scale : ℕ) :
+    exposureLaplace law exposure scale =
+      ∑ level ∈ levels, exposureMass law exposure level * Real.exp (-level) ^ scale := by
+  unfold exposureLaplace FiniteReportLaw.expectation exposureMass
+  rw [← Finset.sum_fiberwise_of_maps_to (fun index _ ↦ hlevels index)
+    (fun index ↦ law.mass index * Real.exp (-((scale : ℝ) * exposure index)))]
+  refine Finset.sum_congr rfl (fun level _ ↦ ?_)
+  rw [Finset.sum_mul]
+  refine Finset.sum_congr rfl (fun index hindex ↦ ?_)
+  rw [(Finset.mem_filter.mp hindex).2, ← Real.exp_nat_mul]
+  congr 2
+  ring
+
+/-- NOTE1 section 6.3, identifiability for finite laws. Assumes: two finite exposure laws whose
+transforms agree at every integer scale `0, 1, 2, …`. They then place the same mass at every
+exposure level. The characters `k ↦ (e^{-b})^k` of the additive monoid of natural numbers are
+distinct for distinct `b`, hence linearly independent (Dedekind), and the difference of the two
+laws is a vanishing combination of them. -/
+theorem exposureMass_eq_of_exposureLaplace_natCast_eq {n m : ℕ}
+    (first : FiniteReportLaw (Fin n)) (firstExposure : Fin n → ℝ)
+    (second : FiniteReportLaw (Fin m)) (secondExposure : Fin m → ℝ)
+    (hlaplace : ∀ scale : ℕ,
+      exposureLaplace first firstExposure scale = exposureLaplace second secondExposure scale)
+    (level : ℝ) :
+    exposureMass first firstExposure level = exposureMass second secondExposure level := by
+  obtain ⟨levels, hfirst, hsecond, hlevel⟩ : ∃ levels : Finset ℝ,
+      (∀ index, firstExposure index ∈ levels) ∧ (∀ index, secondExposure index ∈ levels) ∧
+        level ∈ levels :=
+    ⟨insert level (Finset.univ.image firstExposure ∪ Finset.univ.image secondExposure),
+      fun index ↦ Finset.mem_insert_of_mem
+        (Finset.mem_union_left _ (Finset.mem_image_of_mem _ (Finset.mem_univ index))),
+      fun index ↦ Finset.mem_insert_of_mem
+        (Finset.mem_union_right _ (Finset.mem_image_of_mem _ (Finset.mem_univ index))),
+      Finset.mem_insert_self _ _⟩
+  have hinjective : Function.Injective (fun point : ℝ ↦ powersHom ℝ (Real.exp (-point))) := by
+    intro left right hsame
+    have hexp := (powersHom ℝ).injective hsame
+    simpa using hexp
+  have hindependent := (linearIndependent_monoidHom (Multiplicative ℕ) ℝ).comp _ hinjective
+  have hvanish : ∑ point ∈ levels,
+      (exposureMass first firstExposure point - exposureMass second secondExposure point) •
+        ((fun character : Multiplicative ℕ →* ℝ ↦ (character : Multiplicative ℕ → ℝ)) ∘
+          fun point : ℝ ↦ powersHom ℝ (Real.exp (-point))) point = 0 := by
+    funext scale
+    simp only [Finset.sum_apply, Pi.smul_apply, Function.comp_apply, smul_eq_mul,
+      powersHom_apply, Pi.zero_apply, sub_mul, Finset.sum_sub_distrib]
+    rw [← exposureLaplace_natCast_eq_sum_exposureMass first firstExposure levels hfirst,
+      ← exposureLaplace_natCast_eq_sum_exposureMass second secondExposure levels hsecond,
+      hlaplace, sub_self]
+  exact sub_eq_zero.mp
+    (linearIndependent_iff'.mp hindependent levels _ hvanish level hlevel)
+
+/-- NOTE1 section 6.3: knowing the transform at every scale `λ ≥ 0` determines a finite exposure
+law. Assumes: two finite exposure laws whose transforms agree at every nonnegative scale. They
+then place the same mass at every exposure level. -/
+theorem exposureMass_eq_of_exposureLaplace_eq {n m : ℕ}
+    (first : FiniteReportLaw (Fin n)) (firstExposure : Fin n → ℝ)
+    (second : FiniteReportLaw (Fin m)) (secondExposure : Fin m → ℝ)
+    (hlaplace : ∀ lam : ℝ, 0 ≤ lam →
+      exposureLaplace first firstExposure lam = exposureLaplace second secondExposure lam)
+    (level : ℝ) :
+    exposureMass first firstExposure level = exposureMass second secondExposure level :=
+  exposureMass_eq_of_exposureLaplace_natCast_eq first firstExposure second secondExposure
+    (fun scale ↦ hlaplace scale (Nat.cast_nonneg scale)) level
 
 end
 

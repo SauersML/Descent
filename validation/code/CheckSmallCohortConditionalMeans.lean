@@ -12,6 +12,7 @@ open Descent.Portability.SmallCohortConditionalMeans
 #print axioms counts_mem_censusIndex
 #print axioms censusOf_mem_piAntidiag
 #print axioms censusOf_index
+#print axioms multinomialLaw_mass_eq_censusWeight
 #print axioms cohort_expectation_censusIndex
 #print axioms cohortCorrelation_mul_definedIndicator_eq
 #print axioms expectation_cohortCorrelation_three
@@ -21,4 +22,11 @@ open Descent.Portability.SmallCohortConditionalMeans
 #print axioms conditional_cohortCorrelation_halvedCoupling_three
 #print axioms expectation_cohortCorrelation_halvedCoupling_four
 #print axioms conditional_cohortCorrelation_halvedCoupling_four
+#print axioms constant_class_gap
+#print axioms aucDefinedIndicator_pos_chronologyLaw
+#print axioms conditional_empiricalAUC_chronologyLaw_of_two_le
+#print axioms slopeDefinedIndicator_expand
+#print axioms slope_definedness_probability
+#print axioms slope_definedness_probability_chronologyLaw
+#print axioms conditional_empiricalSlope_chronologyLaw_of_two_le
 #print axioms conditional_empiricalAUC_halvedCoupling
