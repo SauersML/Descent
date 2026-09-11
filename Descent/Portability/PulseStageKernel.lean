@@ -45,8 +45,9 @@ the per-stage expansion uniform over the index.
 Scope.  The identification of each `stageRate * stageVelocity` with the matching row of
 `augmentedLowOrderLDGenerator` is NOT proved here; four such bridges live in
 `PulseJetExpansion` and the rest belong to the module that assembles the
-`MicroscopicApproximation`.  Nothing here forms a semigroup or takes a limit.  Multinomial
-resampling, NOTE 1 (10), remains unformalized; the single-draw alternative is used throughout.
+`MicroscopicApproximation`.  Nothing here forms a semigroup or takes a limit.  The single-draw
+resampling alternative is used throughout; multinomial resampling, NOTE 1 (10), is assembled in
+`MultinomialMicroscopicApproximation`.
 
 ## Empirical status
 

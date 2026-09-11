@@ -52,9 +52,10 @@ semidefinite (`history_present_dd_quadraticForm_nonneg`), obeys Cauchy--Schwarz
 (`history_present_dd_diagonal_nonneg`), and `history_LDPairDomain` constructs the
 `LDPairDomain` that the `EndToEndScoreLaw` contract asks for whenever the two within-deme `DD`
 entries are nonzero.  What is NOT proved here: the integrable time-varying rates of NOTE1
-section 2.4 beyond piecewise-constant composition, instantaneous events other than splits, and
-multinomial resampling, NOTE1 equation (10), in place of which the single-draw step of NOTE1
-section 2.3 is used.
+section 2.4 beyond piecewise-constant composition, and instantaneous events other than splits.
+The approximation here resamples by the single-draw step of NOTE1 section 2.3; the epoch theorem
+through multinomial resampling, NOTE1 equation (10), is
+`MultinomialMicroscopicApproximation.multinomialEpoch_preserves_locusExchangeable_realization`.
 
 ## Empirical status
 

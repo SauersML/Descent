@@ -99,6 +99,8 @@ import Descent.Portability.PartialHaplotypePanelLikelihood
 import Descent.Portability.PartialHaplotypePulseKernel
 import Descent.Portability.PortabilityMeasureQueries
 import Descent.Portability.MultinomialRemainderConstant
+import Descent.Portability.MultinomialJetCertificate
+import Descent.Portability.MultinomialMicroscopicApproximation
 import Descent.Portability.MeasureKernelRealization
 
 namespace Descent.Program

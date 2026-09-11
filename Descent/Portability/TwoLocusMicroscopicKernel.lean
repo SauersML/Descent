@@ -52,10 +52,10 @@ identification is what a caller must supply.  That is the whole of the remaining
 this module and an unconditional `MicroscopicApproximation`.
 
 Scope.  `microscopicError` is a sum of per-coordinate, per-stage slacks and is therefore a
-crude but explicit bound; no attempt is made to make it sharp.  Multinomial resampling, NOTE1
-equation (10), is not formalized anywhere in this package: the single-draw alternative of
-NOTE1 section 2.3 is used instead, and it is equally physical.  Nothing here forms a semigroup
-or takes a limit; that is NOTE1 Theorem 1, proved in
+crude but explicit bound; no attempt is made to make it sharp.  The drift stages here use the
+single-draw alternative of NOTE1 section 2.3, which is equally physical; multinomial resampling,
+NOTE1 equation (10), is assembled in `MultinomialMicroscopicApproximation`.  Nothing here forms
+a semigroup or takes a limit; that is NOTE1 Theorem 1, proved in
 `Descent.Portability.KernelRealizationPreservation`.
 
 ## Empirical status

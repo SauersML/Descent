@@ -43,8 +43,8 @@ assembled `pi2` row, stated in the form of the kernel module's `stage_generator_
 
 Scope.  Only velocities are identified here.  The hypothesis-free microscopic approximation,
 the propagation through epochs, and NOTE1 Theorem 2 and Corollary 2.1 belong to the assembly
-module.  Multinomial resampling, NOTE1 equation (10), is not formalized; the single-draw
-resampling stage of NOTE1 section 2.3 is used throughout.
+module.  The single-draw resampling stage of NOTE1 section 2.3 is used throughout; multinomial
+resampling, NOTE1 equation (10), is assembled in `MultinomialMicroscopicApproximation`.
 
 ## Empirical status
 

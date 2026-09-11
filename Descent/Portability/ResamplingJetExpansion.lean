@@ -41,8 +41,8 @@ by `second_mean`.
 Scope.  The constants here are explicit but not sharp; `bound` and `remainder` are whatever
 the closure rules produce, and no attempt is made to optimize them.  Nothing about a step size
 `h`, a coalescence rate, a mixture over stages or a semigroup appears here: that is
-`RandomStageKernel`.  Multinomial resampling, NOTE 1 (10), is not formalized; the single-draw
-alternative NOTE 1 licenses is used throughout.
+`RandomStageKernel`.  The single-draw alternative NOTE 1 licenses is used throughout; multinomial
+resampling, NOTE 1 (10), is expanded in `MultinomialMomentExpansion`.
 
 ## Empirical status
 

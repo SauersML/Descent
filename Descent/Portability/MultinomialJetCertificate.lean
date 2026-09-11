@@ -280,7 +280,7 @@ theorem twoLocusHaplotypeCovariance_eq_sum (frequency : TwoLocusHaplotypeFrequen
           - haplotypeCoordinate frequency a * haplotypeCoordinate frequency c)
           * (first a * second c) := by
   simp only [RandomStageKernel.sum_haplotype, twoLocusHaplotypeCovariance, twoLocusHaplotypeMean,
-    haplotypeCoordinate, eq_self_iff_true, if_true, if_false, reduceCtorEq]
+    haplotypeCoordinate, if_true, if_false, reduceCtorEq]
   ring
 
 /-- The second-order operator of (10) on a product of two coordinates is the coefficient
@@ -290,7 +290,7 @@ theorem resamplingOperator_X_mul_X {H : Type*} [Fintype H] [DecidableEq H] (x : 
     resamplingOperator x (MvPolynomial.X a * MvPolynomial.X b)
       = (if a = b then x a else 0) - x a * x b := by
   simp [resamplingOperator_mul, resamplingOperator_X, MvPolynomial.pderiv_X, Pi.single_apply,
-    apply_ite, Finset.sum_ite_eq, ite_mul, mul_ite]
+    apply_ite, Finset.sum_ite_eq]
 
 /-! ## Certificates and their algebra -/
 
@@ -339,8 +339,8 @@ def const {D : ℕ} (constant : ℝ) :
   mass_le _ _ := le_of_eq (by rw [MvPolynomial.C_apply, coefficientMass_monomial])
   polynomial_update _ _ _ := by dsimp only
   value_eq _ _ := (MvPolynomial.eval_C constant).symm
-  gradient_eq _ _ _ := by simp [TwoLocusDiffusionJet.const, MvPolynomial.pderiv_C]
-  drift_eq _ _ := by simp [TwoLocusDiffusionJet.const, resamplingOperator, MvPolynomial.pderiv_C]
+  gradient_eq _ _ _ := by simp [TwoLocusDiffusionJet.const]
+  drift_eq _ _ := by simp [TwoLocusDiffusionJet.const, resamplingOperator]
 
 /-- A sum of certified jets is certified by the sum of the polynomials. -/
 def add {D : ℕ} {first second : TwoLocusDiffusionJet D}
@@ -457,7 +457,7 @@ theorem totalDegree_X_add_X_le {H : Type*} (a b : H) :
 theorem coefficientMass_X_add_X_le {H : Type*} [DecidableEq H] (a b : H) :
     coefficientMass (MvPolynomial.X a + MvPolynomial.X b : MvPolynomial H ℝ) ≤ 2 :=
   (coefficientMass_add_le _ _).trans
-    (by simp [MvPolynomial.X, coefficientMass_monomial] <;> norm_num)
+    (by simp [MvPolynomial.X, coefficientMass_monomial]; norm_num)
 
 /-- **A certificate for a jet that reads one deme.** If the jet is the polynomial `own` of deme
 `index`'s frequencies, with its gradient and drift in that deme read off `own`, and its gradient
@@ -533,11 +533,10 @@ def leftFrequency {D : ℕ} (index : Fin D) :
     (fun _ ↦ rfl)
     (fun _ observed ↦ by
       cases observed <;>
-        simp [twoLocusLeftFrequencyJet, twoLocusLeftAlleleIndicator, MvPolynomial.pderiv_X,
-          Pi.single_apply])
+        simp [twoLocusLeftFrequencyJet, twoLocusLeftAlleleIndicator, MvPolynomial.pderiv_X])
     (fun _ hdeme _ _ ↦ by simp [twoLocusLeftFrequencyJet, hdeme])
     (fun _ ↦ by simp [twoLocusLeftFrequencyJet, resamplingOperator_add, resamplingOperator_X])
-    (fun _ hdeme _ ↦ by simp [twoLocusLeftFrequencyJet, hdeme])
+    (fun _ _ _ ↦ by simp [twoLocusLeftFrequencyJet])
 
 /-- The right marginal frequency of deme `index` is certified by the linear polynomial
 `X_AB + X_aB` in its own deme and by a constant in every other deme. -/
@@ -555,11 +554,10 @@ def rightFrequency {D : ℕ} (index : Fin D) :
     (fun _ ↦ rfl)
     (fun _ observed ↦ by
       cases observed <;>
-        simp [twoLocusRightFrequencyJet, twoLocusRightAlleleIndicator, MvPolynomial.pderiv_X,
-          Pi.single_apply])
+        simp [twoLocusRightFrequencyJet, twoLocusRightAlleleIndicator, MvPolynomial.pderiv_X])
     (fun _ hdeme _ _ ↦ by simp [twoLocusRightFrequencyJet, hdeme])
     (fun _ ↦ by simp [twoLocusRightFrequencyJet, resamplingOperator_add, resamplingOperator_X])
-    (fun _ hdeme _ ↦ by simp [twoLocusRightFrequencyJet, hdeme])
+    (fun _ _ _ ↦ by simp [twoLocusRightFrequencyJet])
 
 /-- The linkage determinant of deme `index` is certified by the quadratic polynomial
 `X_AB X_ab - X_Ab X_aB` in its own deme, whose second-order operator is `-D`, and by a constant
@@ -594,8 +592,8 @@ def linkage {D : ℕ} (index : Fin D) : JetPolynomialCertificate (twoLocusLinkag
     (fun _ ↦ rfl)
     (fun _ observed ↦ by
       cases observed <;>
-        simp [twoLocusLinkageJet, twoLocusLinkageGradient, MvPolynomial.pderiv_mul,
-          MvPolynomial.pderiv_X, Pi.single_apply, MvPolynomial.smul_eval, haplotypeCoordinate])
+        simp [twoLocusLinkageJet, twoLocusLinkageGradient, MvPolynomial.pderiv_X,
+          haplotypeCoordinate])
     (fun _ hdeme _ _ ↦ by simp [twoLocusLinkageJet, hdeme])
     (fun _ ↦ by
       simp only [twoLocusLinkageJet, twoLocusLinkageDrift_eq_neg_linkage,
