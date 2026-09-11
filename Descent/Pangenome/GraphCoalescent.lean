@@ -5,6 +5,7 @@ import Descent.Pangenome.GraphCoalescent.Deficit
 import Descent.Pangenome.GraphCoalescent.EstimatorSign
 import Descent.Pangenome.GraphCoalescent.MergerDepth
 import Descent.Pangenome.GraphCoalescent.MinimalRefinement
+import Descent.Pangenome.GraphCoalescent.MultiInterfaceClosure
 import Descent.Pangenome.GraphCoalescent.Observation
 import Descent.Pangenome.GraphCoalescent.Pinned
 import Descent.Pangenome.GraphCoalescent.Reduction
