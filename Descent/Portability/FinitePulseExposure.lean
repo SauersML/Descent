@@ -983,7 +983,8 @@ test function against them converges to its integral against the law, by dominat
 along the rounded exposures. -/
 theorem tendsto_integral_lawMeasure_quantizedLaw (exposureLaw : Measure ℝ)
     [IsProbabilityMeasure exposureLaw] (bound : ℝ) (hbound : 0 < bound)
-    (hsupport : ∀ᵐ exposure ∂exposureLaw, exposure ∈ Set.Icc 0 bound) (test : ℝ →ᵇ ℝ) :
+    (hsupport : ∀ᵐ exposure ∂exposureLaw, exposure ∈ Set.Icc 0 bound)
+    (test : BoundedContinuousFunction ℝ ℝ) :
     Tendsto (fun count : ℕ ↦ ∫ exposure, test exposure
         ∂ExposureLaplaceConstraints.lawMeasure (quantizedLaw exposureLaw bound (count + 1))
           (gridExposure bound (count + 1))) atTop (𝓝 (∫ exposure, test exposure ∂exposureLaw)) := by
