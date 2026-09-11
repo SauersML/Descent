@@ -604,7 +604,7 @@ theorem physicalStageDrift_eq_mulVec {D : ℕ} (rates : ManyDemeLDRates D)
                 then rates.mutation otherDeme / 2 else 0) +
               (if Stage.mutationLeft otherDeme = Stage.mutationRight deme
                 then rates.mutation otherDeme / 2 else 0)
-            rw [if_neg (by simp)]
+            rw [if_neg (show Stage.mutationLeft otherDeme ≠ Stage.mutationRight deme by simp)]
             by_cases hdeme : otherDeme = deme
             · rw [if_pos hdeme, if_pos (by rw [hdeme])]
               ring
@@ -617,7 +617,7 @@ theorem physicalStageDrift_eq_mulVec {D : ℕ} (rates : ManyDemeLDRates D)
                 then rates.mutation otherDeme / 2 else 0) +
               (if Stage.mutationRight otherDeme = Stage.mutationRight deme
                 then rates.mutation otherDeme / 2 else 0)
-            rw [if_neg (by simp)]
+            rw [if_neg (show Stage.mutationRight otherDeme ≠ Stage.mutationLeft deme by simp)]
             by_cases hdeme : otherDeme = deme
             · rw [if_pos hdeme, if_pos (by rw [hdeme])]
               ring
@@ -673,9 +673,10 @@ theorem physicalGenerator_row_le {D : ℕ} (rates : ManyDemeLDRates D) (stage : 
     ∑ column, |physicalGenerator rates stage row column| ≤ compositionRowBound rates := by
   have hrow : ∑ column, |physicalGenerator rates stage row column| ≤
       ∑ other, ∑ column, |physicalGenerator rates stage other column| :=
-    Finset.single_le_sum (fun other _ ↦ Finset.sum_nonneg fun column _ ↦ abs_nonneg _)
-      (Finset.mem_univ row)
+    Finset.single_le_sum (f := fun other ↦ ∑ column, |physicalGenerator rates stage other column|)
+      (fun other _ ↦ Finset.sum_nonneg fun column _ ↦ abs_nonneg _) (Finset.mem_univ row)
   exact hrow.trans (Finset.single_le_sum
+    (f := fun other ↦ ∑ row, ∑ column, |physicalGenerator rates other row column|)
     (fun other _ ↦ Finset.sum_nonneg fun row _ ↦ Finset.sum_nonneg fun column _ ↦ abs_nonneg _)
     (Finset.mem_univ stage))
 
@@ -718,7 +719,8 @@ def compositionMicroscopicApproximation {D : ℕ} (rates : ManyDemeLDRates D) :
     (Fintype.card (PhysicalStage D))
     (fun k ↦ physicalStageKernel rates ((stageOrder D).symm k))
     (fun k ↦ physicalGenerator rates ((stageOrder D).symm k)) (compositionRowBound rates)
-    ((physicalGenerator_row_le rates (PhysicalStage.drift 0) none).trans' (by positivity))
+    (Finset.sum_nonneg fun stage _ ↦ Finset.sum_nonneg fun row _ ↦
+      Finset.sum_nonneg fun column _ ↦ abs_nonneg _)
     (fun k row ↦ physicalGenerator_row_le rates ((stageOrder D).symm k) row)
     (fun k step ↦ compositionStageSlack rates ((stageOrder D).symm k) step)
     (fun k step ↦ Finset.sum_nonneg fun coordinate _ ↦ abs_nonneg _)

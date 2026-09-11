@@ -26,6 +26,7 @@ open Descent.Portability.SmallDenominatorLayerCake
 #print axioms integral_density_mul_smallDenominatorMass_le
 #print axioms unresolvedMass_eq_integral
 #print axioms unresolvedMass_le_gamma
+#print axioms replica_certificate_of_rate
 #print axioms expectation_inverse_le
 #print axioms unresolvedNumerator_le_gamma
 #print axioms lintegral_profile_eq_lintegral

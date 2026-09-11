@@ -493,6 +493,27 @@ theorem unresolvedMass_le_gamma (law : FiniteReportLaw Report) (den : Report →
   exact integral_density_mul_smallDenominatorMass_le law den hnonneg _ hcont hdensity scale α _
     hbound (fun t _ ↦ le_of_eq (by ring)) hrate
 
+/-- **NOTE 2 equations (18) and (20) together.** Under `0 ≤ N ≤ D ≤ 1` and the power law
+`P(0 < D ≤ t) ≤ C t^α` for `0 < t ≤ 1` with `α > -1`, the normalization-aware replica
+certificate holds after `K ≥ 1` terms with the sharp tolerance
+`τ_K = C Γ(α + 1) Γ(K + 1) / Γ(K + α + 1)`, whenever the retained mass is positive. -/
+theorem replica_certificate_of_rate (law : FiniteReportLaw Report) (num den : Report → ℝ)
+    (hnum : ∀ report, 0 ≤ num report) (hle : ∀ report, num report ≤ den report)
+    (hone : ∀ report, den report ≤ 1) (scale α : ℝ) (hα : -1 < α)
+    (hrate : ∀ t, 0 < t → t ≤ 1 → smallDenominatorMass law den t ≤ scale * t ^ α) (K : ℕ)
+    (hK : 1 ≤ K) (hretained : 0 < retainedMass law den K) :
+    retainedNumerator law num den K / (retainedMass law den K +
+        scale * (Real.Gamma (α + 1) * Real.Gamma (K + 1) / Real.Gamma (K + α + 1))) ≤
+        conditionalExpectation law (fun other ↦ 0 < den other) (ratioOnDefined num den) ∧
+      conditionalExpectation law (fun other ↦ 0 < den other) (ratioOnDefined num den) ≤
+        (retainedNumerator law num den K +
+            scale * (Real.Gamma (α + 1) * Real.Gamma (K + 1) / Real.Gamma (K + α + 1))) /
+          (retainedMass law den K +
+            scale * (Real.Gamma (α + 1) * Real.Gamma (K + 1) / Real.Gamma (K + α + 1))) :=
+  replica_certificate law num den hnum hle hone K _
+    (unresolvedMass_le_gamma law den (fun report ↦ (hnum report).trans (hle report)) hone scale
+      α hα hrate K hK) hretained
+
 /-- **NOTE 2 equation (28).** If `P(0 < D ≤ t) ≤ C t^α` for `0 < t ≤ 1` with `α > 1`, the
 expected inverse denominator on the defined event is at most `P(D > 0) + C / (α - 1)`. -/
 theorem expectation_inverse_le (law : FiniteReportLaw Report) (den : Report → ℝ)
