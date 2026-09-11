@@ -370,9 +370,6 @@ def rootMeanSquare(perturbation):
     Coordinate = float(len(perturbation))
     return _rt.rsqrt((_rt.rdiv((sum((_rt.lpow(perturbation[int(coordinate)], 2.0)) for coordinate in range(int(len(perturbation))))), (_rt.sumdim('Coordinate', len(perturbation))))))
 
-def localizedFamily(dimension):
-    return (lambda coordinate: (1.0 if ((coordinate) == 0.0) else 0.0))
-
 def denseFamily(dimension):
     return (lambda _coordinate: 1.0)
 
@@ -513,9 +510,6 @@ def rawNuclearDistance(spectrum):
 
 def diagonalTrafficCorrection(baseline, edges, iteration):
     return (_rt.lpow((_rt.rdiv(1.0, 4.0)), iteration) * ((_rt.lpow(((baseline + 2.0)), edges) - _rt.lpow(baseline, edges))))
-
-def mesoscopicGFOMStep(iteration, vector):
-    return (lambda coordinate: ((2.0 * vector(coordinate)) if (_rt._proj(_rt._proj(coordinate, '2'), 'val') == 0.0) else 0.0))
 
 def mesoscopicGFOMUnitInput(iteration):
     return constantOneVector()
@@ -862,9 +856,6 @@ def replaceColumn(A, b, k):
 def twoDemeMomentGenerator(r, m, i, j):
     return ((((((((_rt.rdiv((_rt._proj(r, 'sourceCoal') * (((i * ((i - 1.0)))))), 2.0) * ((m(((i - 1.0)), j) - m(i, j)))) + (_rt.rdiv((_rt._proj(r, 'targetCoal') * (((j * ((j - 1.0)))))), 2.0) * ((m(i, ((j - 1.0))) - m(i, j))))) + ((_rt._proj(r, 'sourceToTarget') * i) * ((m(((i - 1.0)), ((j + 1.0))) - m(i, j))))) + ((_rt._proj(r, 'targetToSource') * j) * ((m(((i + 1.0)), ((j - 1.0))) - m(i, j))))) + ((_rt._proj(r, 'sourceForwardMutation') * i) * ((m(((i - 1.0)), j) - m(i, j))))) - ((_rt._proj(r, 'sourceBackwardMutation') * i) * m(i, j))) + ((_rt._proj(r, 'targetForwardMutation') * j) * ((m(i, ((j - 1.0))) - m(i, j))))) - ((_rt._proj(r, 'targetBackwardMutation') * j) * m(i, j)))
 
-def momentBasisTable(K, column):
-    return momentVectorTable(K, ((lambda coordinate: (1.0 if (coordinate == column) else 0.0))))
-
 def momentConstantTable():
     return (lambda i, j: (1.0 if ((i == 0.0) and (j == 0.0)) else 0.0))
 
@@ -980,12 +971,6 @@ def splitManyDemeKilledDualState(parent, child, state, row):
 
 def Descent_Coalescent_ManyDemeMomentCoordinate_degree(coordinate):
     return sum((_rt._proj((coordinate(d)), 'val')) for d in range(int(_rt.sumdim('d', len(coordinate)))))
-
-def manyDemeMomentStateReadout(K, state, exponent):
-    return (state(none) if all(((exponent(d) == 0.0)) for d in range(int(_rt.sumdim('d', len(exponent))))) else manyDemeMomentVectorTable(K, ((lambda coordinate: state((some(coordinate))))), exponent))
-
-def manyDemeMomentBasisTable(K, column):
-    return manyDemeMomentVectorTable(K, ((lambda coordinate: (1.0 if (coordinate == column) else 0.0))))
 
 def AffineManyDemeMomentCoordinate(D, K):
     return Option((ManyDemeMomentCoordinate(D, K)))
@@ -1185,9 +1170,6 @@ def twoLocusRightHeterozygosity(first, second):
 def twoLocusJointHeterozygosity(leftFirst, leftSecond, rightFirst, rightSecond):
     return _rt.rdiv((twoLocusLeftHeterozygosity(leftFirst, leftSecond) * twoLocusRightHeterozygosity(rightFirst, rightSecond)), 4.0)
 
-def twoLocusJetMoment(state):
-    return (lambda coordinate: _rt._proj((twoLocusCoordinateJet(coordinate)), 'value')(state))
-
 def twoLocusWeightedJetDrift(coalescence, state, coordinate):
     return sum((_rt.mul(coalescence[int(deme)], _rt._proj((twoLocusCoordinateJet(coordinate)), 'driftAt')(deme, state))) for deme in range(int(len(coalescence))))
 
@@ -1205,9 +1187,6 @@ def pulseState(realization, alpha, alpha_nonneg, alpha_le_one, source, recipient
 
 def pulse(realization, alpha, alpha_nonneg, alpha_le_one, source, recipient):
     return haplotypeLowOrderLDState_realization(_rt._proj(realization, 'expectation'), (pulseHaplotype(realization, alpha, alpha_nonneg, alpha_le_one, source, recipient)))
-
-def lowOrderLDBasis(column):
-    return (lambda coordinate: (1.0 if (coordinate == column) else 0.0))
 
 def lowOrderLDHomogeneousGenerator(rates, moment, coordinate):
     return ((((lowOrderLDDrift(rates, moment, coordinate) + lowOrderLDMigration(rates, moment, coordinate)) + lowOrderLDRecombination(rates, moment, coordinate)) + lowOrderLDMutationCoupling(rates, moment, coordinate)) + lowOrderLDRecurrentMutationDamping(rates, moment, coordinate))
@@ -1645,9 +1624,6 @@ def heterozygosityLoss(Ne, t):
 
 def CoordinateIdentified(law, coordinate):
     return all(all(all(((_rt._proj(law, 'value')(input, first, coordinate) == _rt._proj(law, 'value')(input, second, coordinate))) for second in range(int(_rt.sumdim('second', len(_rt._proj(law, 'value')[0]))))) for first in range(int(_rt.sumdim('first', len(_rt._proj(law, 'value')[0]))))) for input in range(int(_rt.sumdim('input', len(_rt._proj(law, 'value'))))))
-
-def midpointLaw(envelope):
-    return (lambda input, coordinate: midpoint((_rt._proj(envelope, 'lower')(input, coordinate)), (_rt._proj(envelope, 'upper')(input, coordinate))))
 
 def halfWidth(envelope, input, coordinate):
     return _rt.rdiv(((_rt._proj(envelope, 'upper')(input, coordinate) - _rt._proj(envelope, 'lower')(input, coordinate))), 2.0)
@@ -3612,9 +3588,6 @@ def PipelineOutcomeConfiguration(design):
 def Descent_Portability_FinitePipelineKernel_jointMeasure(kernel, input):
     return _rt._proj((outcomeKernel(kernel, input)), 'jointMeasure')((_rt._proj(_rt._proj(_rt._proj(kernel, 'predictionKernel'), 'scoreKernel'), 'drawLaw')(input)))
 
-def Descent_Portability_FinitePipelineKernel_expectedCompletionLaw(kernel):
-    return (lambda input, _completion, coordinate: Descent_Portability_FinitePipelineKernel_expectedOutput(kernel, input, coordinate))
-
 def eventHazard(g, time, score):
     return (_rt._proj(g, 'baselineHazard')(time) * _rt.rexp(((_rt._proj(g, 'logHazardRatio') * score))))
 
@@ -3659,9 +3632,6 @@ def presentBiologicalKilledDualState(history, K):
 
 def presentMomentState(history, K):
     return propagateManyDemeMomentInstructions((oneLocusMomentInstructions(history, K)), (commonAncestorManyDemeMomentState(ancestralMoment(history))))
-
-def oneLocusMoment(history, K, exponent):
-    return (1.0 if all(((exponent(deme) == 0.0)) for deme in range(int(_rt.sumdim('deme', len(exponent))))) else manyDemeMomentVectorTable(K, ((lambda coordinate: presentMomentState(history, K, (some(coordinate))))), exponent))
 
 def Descent_Portability_PipelineDemographicHistory_pairMoment(history, K, train, target, sourceDegree, targetDegree):
     return oneLocusMoment(history, K, (pairExponent(train, target, sourceDegree, targetDegree)))
@@ -3759,9 +3729,6 @@ def EvaluatedPopulation(demeCount):
 
 def HasExactPipelineReadout(law):
     return HasExactReadout(law)
-
-def Descent_Portability_PartialPipelineRandomSemantics_expectedCompletionLaw(semantics):
-    return (lambda input, _completion, coordinate: Descent_Portability_PartialPipelineRandomSemantics_expectedOutput(semantics, input, coordinate))
 
 def residualVariance(design):
     return _rt.rdiv(((1.0 - _rt._proj(design, 'heritability'))), _rt._proj(design, 'heritability'))
@@ -4195,6 +4162,9 @@ def complexExpectation(p, f):
 
 def Descent_Portability_HWEInteractionLaw_blockLaw(h):
     return Descent_Portability_HWEInteractionLaw_independentLaw(((lambda i: locusLaw((h(i))))))
+
+def Descent_Portability_HWELogCoordinates_coordinate(δ):
+    return ((_rt.rdiv(1.0, 2.0)) * ((_rt.rlog(((_rt.rdiv(1.0, 2.0) + δ))) - _rt.rlog(((_rt.rdiv(1.0, 2.0) - δ))))))
 
 def IsStationaryKernel(π, P):
     return all((sum(((_rt.mul(π[int(x)], P[int(x)][int(y)]) == π[int(y)])) for x in range(int(len(π))))) for y in range(int(len(π))))
@@ -5462,6 +5432,9 @@ def covarianceVector(p, scoreGenotype, causalGenotype, weights, k):
 def labels(liabilities):
     return (lambda i: decide(((0.0 < liabilities[int(i)]))))
 
+def weightedSum(a, x):
+    return sum((_rt.mul(a[int(i)], signValue((x(i))))) for i in range(int(len(a))))
+
 def segment(a, p, t):
     return _rt.add(a, _rt.mul(t, (_rt.sub(p, a))))
 
@@ -5741,7 +5714,7 @@ def gridDistance(source, target):
 def gridRadius(source):
     return (serialRadius(_rt._proj(source, '1')) + serialRadius(_rt._proj(source, '2')))
 
-def coordinate(L, i):
+def Descent_Portability_SpectralMeasurementMinimax_coordinate(L, i):
     return innerSL(ℝ, (rightBasis(L, i)))
 
 def incrementalR2(r2_full, r2_covariates):

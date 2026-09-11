@@ -36,7 +36,6 @@ theorem sign_mean (a : ℝ) : signLaw.expectation (fun b ↦ a * signValue b) = 
 theorem sign_second (a : ℝ) :
     signLaw.expectation (fun b ↦ (a * signValue b) ^ 2) = a ^ 2 := by
   simp [FiniteReportLaw.expectation, signLaw, signValue]
-  ring
 
 theorem sign_characteristic (a t : ℝ) :
     complexExpectation signLaw (fun b ↦ Complex.exp ((t * (a * signValue b) : ℝ) * Complex.I)) =
@@ -44,9 +43,9 @@ theorem sign_characteristic (a t : ℝ) :
   have h := Complex.two_cos ((t * a : ℝ) : ℂ)
   simp only [← Complex.ofReal_cos] at h
   simp only [complexExpectation, Fintype.sum_bool, signLaw, signValue,
-    Bool.false_eq_true, if_false, if_true, mul_one, mul_neg_one,
-    mul_neg, Complex.ofReal_neg]
-  linear_combination h / 2
+    Bool.false_eq_true, if_false, if_true, mul_one, mul_neg, Complex.ofReal_neg]
+  norm_num only [Complex.ofReal_div, Complex.ofReal_one, Complex.ofReal_ofNat]
+  linear_combination -h / 2
 
 /-- The exact variance of a row comes from independence and centered coordinates. -/
 theorem row_second {ι : Type*} [Fintype ι] [DecidableEq ι] (a : ι → ℝ) :

@@ -260,6 +260,10 @@ import Descent.Portability.FiniteBinCalibrationLaw
 import Descent.Portability.FirstMomentTightness
 import Descent.Portability.PoissonRealCharacteristic
 import Descent.Portability.HWEHeterozygosityWeakLimit
+import Descent.Portability.SmallArrayContinuity
+import Descent.Portability.SmallRealProduct
+import Descent.Portability.CosineArrayLimit
+import Descent.Portability.RademacherArrayWeakLimit
 assert_below Descent.Program
 
 /-!
