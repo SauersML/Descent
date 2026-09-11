@@ -63,11 +63,13 @@ theorem le_mul_exp_integral_of_le_add_integral {a u : ℝ → ℝ} (ha : Continu
         (a t * u t - a t * ∫ s in (0 : ℝ)..t, a s * u s)) t := by
     intro t
     convert ((hprimitive t).neg.exp).mul (hweighted t) using 1
+    simp only [Pi.neg_apply]
     ring
   have hceiling : ∀ t, HasDerivAt (fun r ↦ c * (1 - Real.exp (-∫ s in (0 : ℝ)..r, a s)))
       (c * (a t * Real.exp (-∫ s in (0 : ℝ)..t, a s))) t := by
     intro t
     convert (((hprimitive t).neg.exp).const_sub 1).const_mul c using 1
+    simp only [Pi.neg_apply]
     ring
   have hslope : ∀ t ∈ Set.Ico (0 : ℝ) T,
       Real.exp (-∫ s in (0 : ℝ)..t, a s) * (a t * u t - a t * ∫ s in (0 : ℝ)..t, a s * u s) ≤
@@ -209,9 +211,10 @@ theorem exists_continuous_integral_norm_sub_le {E : Type*} [NormedAddCommGroup E
     ∃ g : ℝ → E, Continuous g ∧ ∫ s in (0 : ℝ)..T, ‖f s - g s‖ ≤ ε := by
   have hon : IntegrableOn f (Set.Ioc 0 T) volume :=
     (intervalIntegrable_iff_integrableOn_Ioc_of_le hT).mp hf
-  have hindicator := hon.integrable_indicator measurableSet_Ioc
+  have hindicator : Integrable (Set.indicator (Set.Ioc 0 T) f) volume :=
+    hon.integrable_indicator measurableSet_Ioc
   obtain ⟨g, _, hclose, hcontinuous, hintegrable⟩ :=
-    hindicator.exists_hasCompactSupport_integral_sub_le hε
+    Integrable.exists_hasCompactSupport_integral_sub_le hindicator hε
   refine ⟨g, hcontinuous, ?_⟩
   rw [intervalIntegral.integral_of_le hT]
   calc ∫ s in Set.Ioc 0 T, ‖f s - g s‖
