@@ -7,3 +7,4 @@ import Descent.Portability.ComplexBernoulliProduct
 
 #print axioms Descent.Portability.ComplexBernoulliProduct.contraction_product_difference
 #print axioms Descent.Portability.ComplexBernoulliProduct.bernoulli_product_error
+#print axioms Descent.Portability.ComplexBernoulliProduct.bernoulli_product_limit

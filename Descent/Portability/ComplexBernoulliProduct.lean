@@ -3,6 +3,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.RealVaryingEuler
 import Mathlib.Analysis.Complex.Exponential
+import Mathlib.Analysis.Complex.Trigonometric
+import Mathlib.Analysis.SpecialFunctions.Exp
 
 assert_below Descent.Decision Descent.Program
 
@@ -100,5 +102,39 @@ theorem bernoulli_product_error {ι : Type*} [Fintype ι] [DecidableEq ι]
     _ ≤ ∑ i, p i ^ 2 * ‖w - 1‖ ^ 2 :=
       Finset.sum_le_sum (fun i _ ↦ factor_error (p i) (hp0 i) (w - 1) (hsmall i))
     _ = _ := by rw [← Finset.sum_mul, mul_comm]
+
+/-- Vanishing maximal probabilities and convergent intensity imply the full
+Poisson characteristic limit for a triangular array. -/
+theorem bernoulli_product_limit (p : (m : ℕ) → Fin m → ℝ) (ε : ℕ → ℝ)
+    (hp0 : ∀ m i, 0 ≤ p m i) (hp1 : ∀ m i, p m i ≤ 1)
+    (hcap : ∀ m i, p m i ≤ ε m) (hε : Tendsto ε atTop (𝓝 0))
+    (r : ℝ) (hr : Tendsto (fun m ↦ ∑ i, p m i) atTop (𝓝 r))
+    (w : ℂ) (hw : ‖w‖ ≤ 1) :
+    Tendsto (fun m ↦ ∏ i, (1 + (p m i : ℂ) * (w - 1))) atTop
+      (𝓝 (Complex.exp ((r : ℂ) * (w - 1)))) := by
+  have hsmall : ∀ᶠ m in atTop, ε m * ‖w - 1‖ ≤ 1 :=
+    ((hε.mul_const ‖w - 1‖).eventually (gt_mem_nhds (by norm_num))).mono
+      (fun _ h ↦ le_of_lt h)
+  have hbound : ∀ᶠ m in atTop,
+      ‖(∏ i, (1 + (p m i : ℂ) * (w - 1))) -
+        Complex.exp (((∑ i, p m i : ℝ) : ℂ) * (w - 1))‖ ≤
+        ‖w - 1‖ ^ 2 * (ε m * ∑ i, p m i) := by
+    filter_upwards [hsmall] with m hm
+    refine (bernoulli_product_error (p m) (hp0 m) (hp1 m) w hw ?_).trans ?_
+    · intro i
+      exact (mul_le_mul_of_nonneg_right (hcap m i) (norm_nonneg _)).trans hm
+    · apply mul_le_mul_of_nonneg_left _ (sq_nonneg _)
+      rw [Finset.mul_sum]
+      exact Finset.sum_le_sum (fun i _ ↦ by
+        simpa only [pow_two] using mul_le_mul_of_nonneg_right (hcap m i) (hp0 m i))
+  have hzero : Tendsto (fun m ↦
+      (∏ i, (1 + (p m i : ℂ) * (w - 1))) -
+        Complex.exp (((∑ i, p m i : ℝ) : ℂ) * (w - 1))) atTop (𝓝 0) := by
+    apply tendsto_zero_iff_norm_tendsto_zero.mpr
+    apply squeeze_zero' (Filter.Eventually.of_forall (fun _ ↦ norm_nonneg _)) hbound
+    simpa only [zero_mul, mul_zero] using (hε.mul hr).const_mul (‖w - 1‖ ^ 2)
+  have hexp := Complex.continuous_exp.continuousAt.tendsto.comp
+    ((Complex.continuous_ofReal.continuousAt.tendsto.comp hr).mul_const (w - 1))
+  simpa only [Function.comp_def, sub_add_cancel, zero_add] using hzero.add hexp
 
 end Descent.Portability.ComplexBernoulliProduct

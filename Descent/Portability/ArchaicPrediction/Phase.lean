@@ -37,8 +37,8 @@ lemma phaseCharacter_univ (S : Finset I) (x : I → Bool) :
 theorem phaseCharacter_swap (S : Finset I) (x : I → Bool) :
     phaseCharacter S (homologSwap x) = (-1 : ℝ) ^ S.card * phaseCharacter S x := by
   have h (i : I) : 2 * allele (homologSwap x i) - 1 = -(2 * allele (x i) - 1) := by
-    cases hi : x i <;> simp [homologSwap, allele, hi]
-  simp only [phaseCharacter, h, Finset.prod_neg_distrib]
+    cases hi : x i <;> norm_num [homologSwap, allele, hi]
+  simp only [phaseCharacter, h, Finset.prod_neg]
 
 theorem phase_orthogonality (S T : Finset I) :
     cubeMean (fun _ : I => 1 / 2) (fun x => phaseCharacter S x * phaseCharacter T x) =
@@ -117,15 +117,11 @@ theorem invariant_phase_expansion (F : (I → Bool) → ℝ)
 /-- Uniform phase Parseval, before removing the constant coefficient. -/
 theorem phase_parseval (a : Finset I → ℝ) :
     cubeMean (fun _ : I => 1 / 2) (fun x => phaseExpansion a x ^ 2) = ∑ S, a S ^ 2 := by
-  simp only [phaseExpansion, LinearMap.coe_mk, AddHom.coe_mk, pow_two,
-    Finset.sum_mul, Finset.mul_sum]
-  rw [cubeMean_sum]
-  apply Finset.sum_congr rfl
-  intro S _
-  rw [cubeMean_sum]
-  simp_rw [show ∀ T x, a S * phaseCharacter S x * (a T * phaseCharacter T x) =
-    (a S * a T) * (phaseCharacter S x * phaseCharacter T x) by intros; ring]
-  simp_rw [cubeMean_smul, phase_orthogonality]
-  simp
+  have hp (x : I → Bool) : phaseExpansion a x ^ 2 =
+      ∑ S, a S * (phaseCharacter S x * phaseExpansion a x) := by
+    rw [pow_two]
+    change (∑ S, a S * phaseCharacter S x) * phaseExpansion a x = _
+    simp only [Finset.sum_mul, mul_assoc]
+  simp_rw [hp, cubeMean_sum, cubeMean_smul, phase_coefficient, pow_two]
 
 end Descent.Portability.ArchaicPrediction

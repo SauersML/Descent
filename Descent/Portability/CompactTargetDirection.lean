@@ -42,7 +42,9 @@ theorem gram_residual_bound (L : E →L[ℝ] F) (v : E) (hv : ‖v‖ ≤ 1) :
 theorem maximizing_sequence (L : E →L[ℝ] F) :
     ∃ u : ℕ → E, (∀ n, ‖u n‖ ≤ 1) ∧ Tendsto (fun n ↦ ‖L (u n)‖) atTop (𝓝 ‖L‖) := by
   have he (n : ℕ) : ∃ v : E, ‖v‖ < 1 ∧ ‖L‖ - 1 / ((n : ℝ) + 1) < ‖L v‖ :=
-    L.exists_lt_apply_of_lt_opNorm (by have hn : 0 < (n : ℝ) + 1 := by positivity; positivity)
+    L.exists_lt_apply_of_lt_opNorm (by
+      have hn : 0 < (n : ℝ) + 1 := by positivity
+      exact sub_lt_self _ (one_div_pos.mpr hn))
   choose u hu hl using he
   refine ⟨u, fun n ↦ (hu n).le, ?_⟩
   have hlo : Tendsto (fun n : ℕ ↦ ‖L‖ - 1 / ((n : ℝ) + 1)) atTop (𝓝 ‖L‖) := by
@@ -55,7 +57,8 @@ theorem maximizing_sequence_residual (L : E →L[ℝ] F) (u : ℕ → E)
     Tendsto (fun n ↦ L.adjoint (L (u n)) - ‖L‖ ^ 2 • u n) atTop (𝓝 0) := by
   have ht : Tendsto (fun n ↦ ‖L‖ ^ 2 * (‖L‖ ^ 2 - ‖L (u n)‖ ^ 2)) atTop (𝓝 0) := by
     simpa only [sub_self, mul_zero] using
-      tendsto_const_nhds.mul (tendsto_const_nhds.sub (hmax.pow 2))
+      (tendsto_const_nhds (x := ‖L‖ ^ 2)).mul
+        ((tendsto_const_nhds (x := ‖L‖ ^ 2)).sub (hmax.pow 2))
   have hs := squeeze_zero (fun n ↦ sq_nonneg ‖L.adjoint (L (u n)) - ‖L‖ ^ 2 • u n‖)
     (fun n ↦ gram_residual_bound L (u n) (hu n)) ht
   apply tendsto_zero_iff_norm_tendsto_zero.mpr
@@ -87,7 +90,8 @@ theorem exists_leading_direction (L : E →L[ℝ] F) (hcompact : IsCompactOperat
     (L.adjoint.continuous.tendsto w).comp hw
   have hvlimit : Tendsto (fun n ↦ u (φ n)) atTop (𝓝 v) := by
     have hh := (hadjoint.sub (hres.comp hφ.tendsto_atTop)).const_smul (‖L‖ ^ 2)⁻¹
-    simpa only [sub_zero, sub_sub_cancel, smul_smul, inv_mul_cancel₀ hs2, one_smul] using hh
+    simpa only [Function.comp_apply, sub_zero, sub_sub_cancel, smul_smul,
+      inv_mul_cancel₀ hs2, one_smul] using hh
   have hvnorm : ‖v‖ ≤ 1 := le_of_tendsto hvlimit.norm (Eventually.of_forall (fun n ↦ hu (φ n)))
   have hLv : ‖L v‖ = ‖L‖ := tendsto_nhds_unique
     ((L.continuous.tendsto v).comp hvlimit).norm (hmax.comp hφ.tendsto_atTop)
