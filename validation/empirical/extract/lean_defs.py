@@ -3150,6 +3150,18 @@ def rareSourceVariance(γ, ε):
 def rareTransportDebt(γ, ε):
     return (_rt.rdiv(_rt.lpow(γ, 2.0), 2.0) * _rt.lpow(((_rt.rdiv(1.0, 2.0) - ε)), 2.0))
 
+def regressionGram(w, X):
+    return (lambda i, j: Descent_Portability_ArchaicPrediction_weightedMean(w, ((lambda h: _rt.mul(X[int(i)][int(h)], X[int(j)][int(h)])))))
+
+def regressionAnchor(w, X, f):
+    return (lambda i: Descent_Portability_ArchaicPrediction_weightedMean(w, ((lambda h: _rt.mul(X[int(i)][int(h)], f[int(h)])))))
+
+def regressionScore(X, b, h):
+    return sum((_rt.mul(b[int(i)], X[int(i)][int(h)])) for i in range(int(len(X))))
+
+def exportedSlopes(w, X, f):
+    return _rt.mul(_rt.rinv((regressionGram(w, X))), _v(regressionAnchor, w, X, f))
+
 def Descent_Portability_ArchaicPrediction_weightedMean(w, f):
     return sum((_rt.mul(w[int(h)], f[int(h)])) for h in range(int(len(w))))
 
@@ -4210,6 +4222,9 @@ def neutralDriftR2Ratio(V_A, V_E, fst):
 
 def taggedDriftR2RatioCorrected(V_A, V_E, fst, shared_ld):
     return _rt.rdiv(((((1.0 - fst)) * shared_ld) * ((V_A + V_E))), (((((1.0 - fst)) * V_A) + V_E)))
+
+def label(b):
+    return (1.0 if b else 0.0)
 
 def attenuatedVariance(beta_sq, het, r2_imp):
     return product3(beta_sq, het, r2_imp)
@@ -5446,9 +5461,6 @@ def covarianceVector(p, scoreGenotype, causalGenotype, weights, k):
 
 def labels(liabilities):
     return (lambda i: decide(((0.0 < liabilities[int(i)]))))
-
-def Descent_Portability_ProbitTrainingLaw_outcomeLaw(mean, variance):
-    return labelLaw(((lambda i: Descent_Portability_ProbitTrainingLaw_caseProbability((mean[int(i)]), (variance(i))))), ((lambda i: caseProbability_bounds((mean[int(i)]), (variance(i))))))
 
 def segment(a, p, t):
     return _rt.add(a, _rt.mul(t, (_rt.sub(p, a))))

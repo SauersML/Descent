@@ -1,7 +1,7 @@
 {
  "_NOT_AUTHORITATIVE": "The committed copy of this file is STALE BY CONSTRUCTION: the Lean corpus moves every few minutes and this is a cache of it. Do not consume a committed copy -- run validation/extract/emit.py in your own worktree immediately before use, and call api.require_fresh(), which raises if the table does not describe the Lean on disk.",
- "source_digest": "sha256:e1bbe95cd4022ce3950c50e5b379c608",
- "source_files": 556,
+ "source_digest": "sha256:b874a24f8a09197aa46fef1fb0cf4092",
+ "source_files": 560,
  "collisions": {},
  "theorems": [
   {
@@ -2162,7 +2162,8 @@
    "line": 93,
    "statement": "(W : Witness Config Inv) : ¬ ∃ f : Inv → ℝ, ∀ cfg, f (W.count cfg) = W.rate cfg",
    "mentions": [
-    "count"
+    "count",
+    "rate"
    ]
   },
   {
@@ -2172,7 +2173,8 @@
    "line": 105,
    "statement": "(W : Witness Config Inv) (f : Inv → ℝ) : |W.rate W.left - W.rate W.right| / 2 ≤ max |f (W.count W.left) - W.rate W.left| |f (W.count W.right) - W.rate W.right|",
    "mentions": [
-    "count"
+    "count",
+    "rate"
    ]
   },
   {
@@ -2182,7 +2184,8 @@
    "line": 197,
    "statement": "(W : ApproxWitness Config Inv) (f : Inv → ℝ) (L : ℝ) (hL : 0 ≤ L) (hf : |f (W.count W.left) - f (W.count W.right)| ≤ L * W.dist (W.count W.left) (W.count W.right)) : (W.rateGap - L * W.countGap) / 2 ≤ max |f (W.count W.left) - W.rate W.left| |f (W.count W.right) - W.rate W.right|",
    "mentions": [
-    "count"
+    "count",
+    "rate"
    ]
   },
   {
@@ -7865,6 +7868,7 @@
    "line": 711,
    "statement": "{rate : ℝ} (hrate : rate ∈ Set.Ioo 0 1) : -1 < speedBiasParameterFromTripleRate rate",
    "mentions": [
+    "rate",
     "speedBiasParameterFromTripleRate"
    ]
   },
@@ -7875,6 +7879,7 @@
    "line": 723,
    "statement": "(rate : ℝ) : speedTiltBetaMergerRate (speedBiasParameterFromTripleRate rate) 3 3 = rate",
    "mentions": [
+    "rate",
     "speedBiasParameterFromTripleRate",
     "speedTiltBetaMergerRate"
    ]
@@ -7950,7 +7955,8 @@
    "line": 803,
    "statement": "{rate γ : ℝ} (hrate : rate ∈ Set.Ioo 0 1) (hγ : 0 < γ) : -γ < frontSpeedTiltFromTripleRate rate γ",
    "mentions": [
-    "frontSpeedTiltFromTripleRate"
+    "frontSpeedTiltFromTripleRate",
+    "rate"
    ]
   },
   {
@@ -7992,6 +7998,7 @@
    "line": 838,
    "statement": "(rate : ℕ → ℝ) (scale : ℝ) (hpos : ∀ n, 0 < rate n) (hle : ∀ n, rate n ≤ scale * ((n : ℝ) + 1)) : ¬ Summable fun n ↦ 1 / rate n",
    "mentions": [
+    "rate",
     "scale"
    ]
   },
@@ -8480,7 +8487,8 @@
    "statement": "{α Invariant : Type*} (label : α → Invariant) : IsCompleteCatalogue (fun x y ↦ label x = label y) label",
    "mentions": [
     "Invariant",
-    "IsCompleteCatalogue"
+    "IsCompleteCatalogue",
+    "label"
    ]
   },
   {
@@ -8491,7 +8499,8 @@
    "statement": "{α Invariant : Type*} {E : α → α → Prop} {label : α → Invariant} (h : IsCompleteCatalogue E label) {x y : α} (hne : ¬ E x y) : label x ≠ label y",
    "mentions": [
     "Invariant",
-    "IsCompleteCatalogue"
+    "IsCompleteCatalogue",
+    "label"
    ]
   },
   {
@@ -9391,6 +9400,7 @@
    "statement": "(rate : ℕ → ℝ) (scale power : ℝ) (hscale : 0 < scale) (hpower : 1 < power) (hgrowth : ∀ n : ℕ, scale * ((n : ℝ) + 1) ^ power ≤ rate n) : Summable fun n ↦ 1 / rate n",
    "mentions": [
     "power",
+    "rate",
     "scale"
    ]
   },
@@ -16007,7 +16017,8 @@
    "mentions": [
     "blockHoldMeasure",
     "coalescentLaw",
-    "coalescentLawExp"
+    "coalescentLawExp",
+    "rate"
    ]
   },
   {
@@ -28456,7 +28467,8 @@
    "line": 632,
    "statement": "(horizon : OUHorizon) (hzero : (2 * horizon.rate) = 0) : ouVariance horizon = 0",
    "mentions": [
-    "ouVariance"
+    "ouVariance",
+    "rate"
    ]
   },
   {
@@ -28519,7 +28531,8 @@
    "statement": "(a0 b0 : ℝ) (horizon : OUHorizon) (ha : a0 ≠ 0) : probitIntercept a0 b0 horizon / probitSlope a0 horizon = b0 / a0 * Real.exp (horizon.rate * horizon.time)",
    "mentions": [
     "probitIntercept",
-    "probitSlope"
+    "probitSlope",
+    "rate"
    ]
   },
   {
@@ -47556,7 +47569,8 @@
    "line": 2324,
    "statement": "{k : ℕ} (distance : (Fin k → ℝ) → ℝ) (rate : ℝ) : (LDDecayMechanism.exponentialTagging distance rate).tagging_efficiency = fun d ↦ Real.exp (-rate * d)",
    "mentions": [
-    "exponentialTagging"
+    "exponentialTagging",
+    "rate"
    ]
   },
   {
@@ -47567,7 +47581,8 @@
    "statement": "{k : ℕ} (distance : (Fin k → ℝ) → ℝ) (rate : ℝ) (c : Fin k → ℝ) : decaySlope (LDDecayMechanism.exponentialTagging distance rate) c = Real.exp (-rate * distance c)",
    "mentions": [
     "decaySlope",
-    "exponentialTagging"
+    "exponentialTagging",
+    "rate"
    ]
   },
   {
@@ -47578,7 +47593,8 @@
    "statement": "{k : ℕ} (distance : (Fin k → ℝ) → ℝ) (rate : ℝ) (c : Fin k → ℝ) : 0 < decaySlope (LDDecayMechanism.exponentialTagging distance rate) c",
    "mentions": [
     "decaySlope",
-    "exponentialTagging"
+    "exponentialTagging",
+    "rate"
    ]
   },
   {
@@ -47589,7 +47605,8 @@
    "statement": "{k : ℕ} (distance : (Fin k → ℝ) → ℝ) (rate : ℝ) (hrate : 0 < rate) (c c' : Fin k → ℝ) (hcloser : distance c < distance c') : decaySlope (LDDecayMechanism.exponentialTagging distance rate) c' < decaySlope (LDDecayMechanism.exponentialTagging distance rate) c",
    "mentions": [
     "decaySlope",
-    "exponentialTagging"
+    "exponentialTagging",
+    "rate"
    ]
   },
   {
@@ -49478,7 +49495,8 @@
    "line": 509,
    "statement": "(rate : ℝ) (F : ℝ) : ibdFlowStep 0 rate F = F - 2 * rate * F",
    "mentions": [
-    "ibdFlowStep"
+    "ibdFlowStep",
+    "rate"
    ]
   },
   {
@@ -49488,7 +49506,8 @@
    "line": 518,
    "statement": "(Ne rate : ℝ) (hNe : 0 < Ne) (hrate : 0 ≤ rate) : ibdFlowStep Ne rate (1 / (1 + 4 * Ne * rate)) = 1 / (1 + 4 * Ne * rate)",
    "mentions": [
-    "ibdFlowStep"
+    "ibdFlowStep",
+    "rate"
    ]
   },
   {
@@ -49510,7 +49529,8 @@
    "mentions": [
     "coalescentTimeScale",
     "ibdFlowStep",
-    "ploidy"
+    "ploidy",
+    "rate"
    ]
   },
   {
@@ -58187,7 +58207,8 @@
     "GenomeGood",
     "State",
     "WholeGenome",
-    "intervalGenomeKernel"
+    "intervalGenomeKernel",
+    "rate"
    ]
   },
   {
@@ -58206,7 +58227,8 @@
     "Trace",
     "WholeGenome",
     "conditionalEpochLaw",
-    "count"
+    "count",
+    "rate"
    ]
   },
   {
@@ -58225,7 +58247,8 @@
     "Trace",
     "WholeGenome",
     "conditionalEpochLaw",
-    "count"
+    "count",
+    "rate"
    ]
   },
   {
@@ -58247,7 +58270,8 @@
     "count",
     "intervalBranches",
     "intervalTemplates",
-    "proposalNext"
+    "proposalNext",
+    "rate"
    ]
   },
   {
@@ -58259,7 +58283,8 @@
    "mentions": [
     "Continuation",
     "ContinuationGood",
-    "epochGenomeLaw"
+    "epochGenomeLaw",
+    "rate"
    ]
   },
   {
@@ -58275,7 +58300,8 @@
     "Trace",
     "WholeGenome",
     "conditionalGenomeLaw",
-    "count"
+    "count",
+    "rate"
    ]
   },
   {
@@ -58291,6 +58317,7 @@
     "State",
     "SupportedAt",
     "WholeGenome",
+    "rate",
     "stoppedGenomeLaw"
    ]
   },
@@ -58303,7 +58330,8 @@
    "mentions": [
     "ContinuationGood",
     "ancestor",
-    "mergingTailContinuation"
+    "mergingTailContinuation",
+    "rate"
    ]
   },
   {
@@ -58315,7 +58343,8 @@
    "mentions": [
     "Continuation",
     "ContinuationGood",
-    "historyGenomeLaw"
+    "historyGenomeLaw",
+    "rate"
    ]
   },
   {
@@ -58330,7 +58359,8 @@
     "State",
     "WholeGenome",
     "ancestor",
-    "completeDemographyLaw"
+    "completeDemographyLaw",
+    "rate"
    ]
   },
   {
@@ -58345,7 +58375,8 @@
     "State",
     "WholeGenome",
     "ancestor",
-    "completeDemographyLaw"
+    "completeDemographyLaw",
+    "rate"
    ]
   },
   {
@@ -58360,6 +58391,7 @@
     "WholeGenome",
     "ancestor",
     "completeDemographyLaw",
+    "rate",
     "rawDiploidDosage"
    ]
   },
@@ -61669,6 +61701,79 @@
    ]
   },
   {
+   "name": "Descent.Portability.ArchaicPrediction.centeredFeatures_mean",
+   "kind": "theorem",
+   "file": "Descent/Portability/ArchaicPrediction/LDExport.lean",
+   "line": 29,
+   "statement": "(w : H → ℝ) (hw : ∑ h, w h = 1) (X : I → H → ℝ) (i : I) : weightedMean w (centeredFeatures w X i) = 0",
+   "mentions": [
+    "centeredFeatures",
+    "weightedMean"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ArchaicPrediction.export_normal_equations",
+   "kind": "theorem",
+   "file": "Descent/Portability/ArchaicPrediction/LDExport.lean",
+   "line": 45,
+   "statement": "(w : H → ℝ) (X : I → H → ℝ) (f : H → ℝ) (hdet : IsUnit (regressionGram w X).det) : regressionGram w X *ᵥ exportedSlopes w X f = regressionAnchor w X f",
+   "mentions": [
+    "exportedSlopes",
+    "regressionAnchor",
+    "regressionGram"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ArchaicPrediction.response_anchor_expansion",
+   "kind": "theorem",
+   "file": "Descent/Portability/ArchaicPrediction/LDExport.lean",
+   "line": 51,
+   "statement": "(w : H → ℝ) (X : I → H → ℝ) (θ : J → ℝ) (φ : J → H → ℝ) : regressionAnchor w X (fun h => ∑ j, θ j * φ j h) = fun i => ∑ j, θ j * weightedMean w (fun h => X i h * φ j h)",
+   "mentions": [
+    "regressionAnchor",
+    "weightedMean"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ArchaicPrediction.export_residual_orthogonal",
+   "kind": "lemma",
+   "file": "Descent/Portability/ArchaicPrediction/LDExport.lean",
+   "line": 64,
+   "statement": "(w : H → ℝ) (X : I → H → ℝ) (f : H → ℝ) (hdet : IsUnit (regressionGram w X).det) (i : I) : weightedMean w (fun h => X i h * (f h - regressionScore X (exportedSlopes w X f) h)) = 0",
+   "mentions": [
+    "exportedSlopes",
+    "regressionGram",
+    "regressionScore",
+    "weightedMean"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ArchaicPrediction.arbitrary_ld_additive_optimum",
+   "kind": "theorem",
+   "file": "Descent/Portability/ArchaicPrediction/LDExport.lean",
+   "line": 79,
+   "statement": "(w : H → ℝ) (hw : ∀ h, 0 ≤ w h) (X : I → H → ℝ) (f : H → ℝ) (hdet : IsUnit (regressionGram w X).det) (b : I → ℝ) : weightedMean w (fun h => (f h - regressionScore X (exportedSlopes w X f) h) ^ 2) ≤ weightedMean w (fun h => (f h - regressionScore X b h) ^ 2)",
+   "mentions": [
+    "exportedSlopes",
+    "regressionGram",
+    "regressionScore",
+    "weightedMean"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ArchaicPrediction.arbitrary_ld_export_formula",
+   "kind": "theorem",
+   "file": "Descent/Portability/ArchaicPrediction/LDExport.lean",
+   "line": 106,
+   "statement": "(w : H → ℝ) (X : I → H → ℝ) (θ : J → ℝ) (φ : J → H → ℝ) : exportedSlopes w (centeredFeatures w X) (fun h => ∑ j, θ j * φ j h) = (regressionGram w (centeredFeatures w X))⁻¹ *ᵥ (fun i => ∑ j, θ j * weightedMean w (fun h => centeredFeatures w X i h * φ j h))",
+   "mentions": [
+    "centeredFeatures",
+    "exportedSlopes",
+    "regressionGram",
+    "weightedMean"
+   ]
+  },
+  {
    "name": "Descent.Portability.ArchaicPrediction.convexified_response",
    "kind": "lemma",
    "file": "Descent/Portability/ArchaicPrediction/Logistic.lean",
@@ -61735,10 +61840,20 @@
    ]
   },
   {
-   "name": "Descent.Portability.ArchaicPrediction.weightedMean_sum",
+   "name": "Descent.Portability.ArchaicPrediction.weightedMean_sub",
    "kind": "lemma",
    "file": "Descent/Portability/ArchaicPrediction/Moments.lean",
    "line": 34,
+   "statement": "(w : H → ℝ) (f g : H → ℝ) : weightedMean w (fun h => f h - g h) = weightedMean w f - weightedMean w g",
+   "mentions": [
+    "weightedMean"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ArchaicPrediction.weightedMean_sum",
+   "kind": "lemma",
+   "file": "Descent/Portability/ArchaicPrediction/Moments.lean",
+   "line": 38,
    "statement": "(w : H → ℝ) (f : J → H → ℝ) : weightedMean w (fun h => ∑ j, f j h) = ∑ j, weightedMean w (f j)",
    "mentions": [
     "weightedMean"
@@ -61748,7 +61863,7 @@
    "name": "Descent.Portability.ArchaicPrediction.weightedMean_scale",
    "kind": "lemma",
    "file": "Descent/Portability/ArchaicPrediction/Moments.lean",
-   "line": 39,
+   "line": 43,
    "statement": "(w : H → ℝ) (c : ℝ) (f : H → ℝ) : weightedMean w (fun h => c * f h) = c * weightedMean w f",
    "mentions": [
     "weightedMean"
@@ -61758,7 +61873,7 @@
    "name": "Descent.Portability.ArchaicPrediction.response_specific_mean",
    "kind": "theorem",
    "file": "Descent/Portability/ArchaicPrediction/Moments.lean",
-   "line": 44,
+   "line": 48,
    "statement": "(w : H → ℝ) (c : J → ℝ) (φ : J → H → ℝ) : weightedMean w (fun h => ∑ j, c j * φ j h) = ∑ j, c j * weightedMean w (φ j)",
    "mentions": [
     "weightedMean"
@@ -61768,7 +61883,7 @@
    "name": "Descent.Portability.ArchaicPrediction.response_moment_error",
    "kind": "theorem",
    "file": "Descent/Portability/ArchaicPrediction/Moments.lean",
-   "line": 48,
+   "line": 52,
    "statement": "(c μ μhat : J → ℝ) : |(∑ j, c j * μhat j) - (∑ j, c j * μ j)| ≤ ∑ j, |c j| * |μhat j - μ j|",
    "mentions": []
   },
@@ -61776,7 +61891,7 @@
    "name": "Descent.Portability.ArchaicPrediction.best_constant_risk",
    "kind": "theorem",
    "file": "Descent/Portability/ArchaicPrediction/Moments.lean",
-   "line": 55,
+   "line": 59,
    "statement": "(w : H → ℝ) (hw : ∑ h, w h = 1) (f : H → ℝ) (b : ℝ) : weightedMean w (fun h => (f h - b) ^ 2) = weightedMean w (fun h => (f h - weightedMean w f) ^ 2) + (weightedMean w f - b) ^ 2",
    "mentions": [
     "weightedMean"
@@ -61786,7 +61901,7 @@
    "name": "Descent.Portability.ArchaicPrediction.variance_as_second_moment",
    "kind": "theorem",
    "file": "Descent/Portability/ArchaicPrediction/Moments.lean",
-   "line": 68,
+   "line": 72,
    "statement": "(w : H → ℝ) (hw : ∑ h, w h = 1) (f : H → ℝ) : weightedMean w (fun h => (f h - weightedMean w f) ^ 2) = weightedMean w (fun h => f h ^ 2) - weightedMean w f ^ 2",
    "mentions": [
     "weightedMean"
@@ -61796,7 +61911,7 @@
    "name": "Descent.Portability.ArchaicPrediction.weighted_product_expansion",
    "kind": "lemma",
    "file": "Descent/Portability/ArchaicPrediction/Moments.lean",
-   "line": 75,
+   "line": 79,
    "statement": "(w : H → ℝ) (c : J → ℝ) (φ : J → H → ℝ) : weightedMean w (fun h => (∑ j, c j * φ j h) ^ 2) = ∑ j, ∑ k, c j * c k * weightedMean w (fun h => φ j h * φ k h)",
    "mentions": [
     "weightedMean"
@@ -61806,7 +61921,7 @@
    "name": "Descent.Portability.ArchaicPrediction.response_covariance",
    "kind": "theorem",
    "file": "Descent/Portability/ArchaicPrediction/Moments.lean",
-   "line": 88,
+   "line": 92,
    "statement": "(w : H → ℝ) (hw : ∑ h, w h = 1) (c : J → ℝ) (φ : J → H → ℝ) : weightedMean w (fun h => ((∑ j, c j * φ j h) - weightedMean w (fun h => ∑ j, c j * φ j h)) ^ 2) = ∑ j, ∑ k, c j * c k * (weightedMean w (fun h => φ j h * φ k h) - weightedMean w (φ j) * weightedMean w (φ k))",
    "mentions": [
     "weightedMean"
@@ -61816,7 +61931,7 @@
    "name": "Descent.Portability.ArchaicPrediction.phaseCharacter_mul",
    "kind": "theorem",
    "file": "Descent/Portability/ArchaicPrediction/Moments.lean",
-   "line": 103,
+   "line": 107,
    "statement": "(S T : Finset I) (x : I → Bool) : phaseCharacter S x * phaseCharacter T x = phaseCharacter (S ∆ T) x",
    "mentions": [
     "S",
@@ -61827,7 +61942,7 @@
    "name": "Descent.Portability.ArchaicPrediction.phaseCharacter_abs",
    "kind": "theorem",
    "file": "Descent/Portability/ArchaicPrediction/Moments.lean",
-   "line": 112,
+   "line": 116,
    "statement": "(S : Finset I) (x : I → Bool) : |phaseCharacter S x| = 1",
    "mentions": [
     "S",
@@ -61838,7 +61953,7 @@
    "name": "Descent.Portability.ArchaicPrediction.phase_moment_abs_le_one",
    "kind": "theorem",
    "file": "Descent/Portability/ArchaicPrediction/Moments.lean",
-   "line": 118,
+   "line": 122,
    "statement": "(w : H → ℝ) (hw : ∑ h, w h = 1) (hpos : ∀ h, 0 ≤ w h) (z : H → I → Bool) (S : Finset I) : |weightedMean w (fun h => phaseCharacter S (z h))| ≤ 1",
    "mentions": [
     "S",
@@ -61850,7 +61965,7 @@
    "name": "Descent.Portability.ArchaicPrediction.phase_covariance",
    "kind": "theorem",
    "file": "Descent/Portability/ArchaicPrediction/Moments.lean",
-   "line": 127,
+   "line": 131,
    "statement": "(w : (I → Bool) → ℝ) (hw : ∑ x, w x = 1) (c : Finset I → ℝ) : weightedMean w (fun x => (phaseExpansion c x - weightedMean w (phaseExpansion c)) ^ 2) = ∑ S, ∑ T, c S * c T * (weightedMean w (phaseCharacter (S ∆ T)) - weightedMean w (phaseCharacter S) * weightedMean w (phaseCharacter T))",
    "mentions": [
     "S",
@@ -61863,7 +61978,7 @@
    "name": "Descent.Portability.ArchaicPrediction.phase_covariance_nonneg",
    "kind": "theorem",
    "file": "Descent/Portability/ArchaicPrediction/Moments.lean",
-   "line": 135,
+   "line": 139,
    "statement": "(w : (I → Bool) → ℝ) (hw : ∑ x, w x = 1) (hpos : ∀ x, 0 ≤ w x) (c : Finset I → ℝ) : 0 ≤ ∑ S, ∑ T, c S * c T * (weightedMean w (phaseCharacter (S ∆ T)) - weightedMean w (phaseCharacter S) * weightedMean w (phaseCharacter T))",
    "mentions": [
     "S",
@@ -62196,7 +62311,7 @@
    "name": "Descent.Portability.ArchaicPrediction.four_risk_from_parity",
    "kind": "theorem",
    "file": "Descent/Portability/ArchaicPrediction/PhaseRisk.lean",
-   "line": 107,
+   "line": 108,
    "statement": "{H : Type*} [Fintype H] (w : H → ℝ) (z : H → Fin 4 → Bool) (hw : ∑ h, w h = 1) (h₀₁ : weightedMean w (fun h => phaseSign (z h) 0 * phaseSign (z h) 1) = 0) (h₂₃ : weightedMean w (fun h => phaseSign (z h) 2 * phaseSign (z h) 3) = 0) : weightedMean w (fun h => Real.sigmoid (fourLogit (z h))) = fourRiskCenter + fourRiskParityCoefficient * weightedMean w (fun h => phaseCharacter Finset.univ (z h))",
    "mentions": [
     "fourLogit",
@@ -62212,7 +62327,7 @@
    "name": "Descent.Portability.ArchaicPrediction.four_pair_moment_risk_bounds",
    "kind": "theorem",
    "file": "Descent/Portability/ArchaicPrediction/PhaseRisk.lean",
-   "line": 119,
+   "line": 120,
    "statement": "{H : Type*} [Fintype H] (w : H → ℝ) (z : H → Fin 4 → Bool) (hw : ∑ h, w h = 1) (hpos : ∀ h, 0 ≤ w h) (h₀₁ : weightedMean w (fun h => phaseSign (z h) 0 * phaseSign (z h) 1) = 0) (h₂₃ : weightedMean w (fun h => phaseSign (z h) 2 * phaseSign (z h) 3) = 0) : weightedMean w (fun h => Real.sigmoid (fourLogit (z h))) ∈ Set.Icc (Real.sigmoid (-3)) ((Real.sigmoid 1 + Real.sigmoid (-7)) / 2)",
    "mentions": [
     "fourLogit",
@@ -72682,6 +72797,85 @@
    ]
   },
   {
+   "name": "Descent.Portability.FiniteBinCalibrationLaw.bin_mass",
+   "kind": "theorem",
+   "file": "Descent/Portability/FiniteBinCalibrationLaw.lean",
+   "line": 30,
+   "statement": "(p : FiniteReportLaw (Fin K × Bool)) (j : Fin K) : (binLaw p).mass j = p.mass (j, false) + p.mass (j, true)",
+   "mentions": [
+    "binLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.FiniteBinCalibrationLaw.rate_bounds",
+   "kind": "theorem",
+   "file": "Descent/Portability/FiniteBinCalibrationLaw.lean",
+   "line": 38,
+   "statement": "(p : FiniteReportLaw (Fin K × Bool)) (j : Fin K) : 0 ≤ rate p j ∧ rate p j ≤ 1",
+   "mentions": [
+    "rate"
+   ]
+  },
+  {
+   "name": "Descent.Portability.FiniteBinCalibrationLaw.mass_mul_rate",
+   "kind": "theorem",
+   "file": "Descent/Portability/FiniteBinCalibrationLaw.lean",
+   "line": 49,
+   "statement": "(p : FiniteReportLaw (Fin K × Bool)) (j : Fin K) : (binLaw p).mass j * rate p j = p.mass (j, true)",
+   "mentions": [
+    "binLaw",
+    "rate"
+   ]
+  },
+  {
+   "name": "Descent.Portability.FiniteBinCalibrationLaw.row_reconstruction",
+   "kind": "theorem",
+   "file": "Descent/Portability/FiniteBinCalibrationLaw.lean",
+   "line": 60,
+   "statement": "(p : FiniteReportLaw (Fin K × Bool)) : rowLaw (binLaw p) (rate p) (rate_bounds p) = p",
+   "mentions": [
+    "binLaw",
+    "rate",
+    "rowLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.FiniteBinCalibrationLaw.iid_miss_probability",
+   "kind": "theorem",
+   "file": "Descent/Portability/FiniteBinCalibrationLaw.lean",
+   "line": 73,
+   "statement": "(p : FiniteReportLaw (Fin K × Bool)) (hK : 0 < K) (α : ℝ) (hα : 0 < α ∧ α < 1) : (FiniteDiscreteMeasure.measure (independentLaw (fun _ : I ↦ p))).real {sample | Miss (fun i ↦ (sample i).1) (rate p) α (fun i ↦ (sample i).2)} ≤ α",
+   "mentions": [
+    "Miss",
+    "independentLaw",
+    "measure",
+    "rate"
+   ]
+  },
+  {
+   "name": "Descent.Portability.FiniteBinCalibrationLaw.simultaneous_coverage",
+   "kind": "theorem",
+   "file": "Descent/Portability/FiniteBinCalibrationLaw.lean",
+   "line": 81,
+   "statement": "(p : FiniteReportLaw (Fin K × Bool)) (hK : 0 < K) (α : ℝ) (hα : 0 < α ∧ α < 1) : 1 - α ≤ (FiniteDiscreteMeasure.measure (independentLaw (fun _ : I ↦ p))).real {sample | ∀ j : Fin K, 0 < (binRows (fun i ↦ (sample i).1) j).card → |(∑ i ∈ binRows (fun i ↦ (sample i).1) j, label (sample i).2) / (binRows (fun i ↦ (sample i).1) j).card - rate p j| ≤ radius K (binRows (fun i ↦ (sample i).1) j).card α}",
+   "mentions": [
+    "binRows",
+    "independentLaw",
+    "label",
+    "measure",
+    "radius",
+    "rate"
+   ]
+  },
+  {
+   "name": "Descent.Portability.FiniteBinCalibrationLaw.clipped_coverage",
+   "kind": "theorem",
+   "file": "Descent/Portability/FiniteBinCalibrationLaw.lean",
+   "line": 105,
+   "statement": "(η estimate δ : ℝ) (hη : 0 ≤ η ∧ η ≤ 1) (herror : |estimate - η| ≤ δ) : η ∈ Set.Icc (max 0 (estimate - δ)) (min 1 (estimate + δ))",
+   "mentions": []
+  },
+  {
    "name": "Descent.Portability.FiniteCovarianceMoments.coefficients_zero",
    "kind": "theorem",
    "file": "Descent/Portability/FiniteCovarianceMoments.lean",
@@ -72827,6 +73021,70 @@
     "pathMass",
     "terminal",
     "transition"
+   ]
+  },
+  {
+   "name": "Descent.Portability.FiniteDiscreteMeasure.measure_singleton",
+   "kind": "theorem",
+   "file": "Descent/Portability/FiniteDiscreteMeasure.lean",
+   "line": 40,
+   "statement": "(p : FiniteReportLaw α) (a : α) : measure p {a} = ENNReal.ofReal (p.mass a)",
+   "mentions": [
+    "measure"
+   ]
+  },
+  {
+   "name": "Descent.Portability.FiniteDiscreteMeasure.observable_integrable",
+   "kind": "theorem",
+   "file": "Descent/Portability/FiniteDiscreteMeasure.lean",
+   "line": 46,
+   "statement": "(p : FiniteReportLaw α) (f : α → ℝ) : Integrable f (measure p)",
+   "mentions": [
+    "measure"
+   ]
+  },
+  {
+   "name": "Descent.Portability.FiniteDiscreteMeasure.integral_observable",
+   "kind": "theorem",
+   "file": "Descent/Portability/FiniteDiscreteMeasure.lean",
+   "line": 54,
+   "statement": "(p : FiniteReportLaw α) (f : α → ℝ) : ∫ a, f a ∂measure p = p.expectation f",
+   "mentions": [
+    "expectation",
+    "measure"
+   ]
+  },
+  {
+   "name": "Descent.Portability.FiniteDiscreteMeasure.real_event",
+   "kind": "theorem",
+   "file": "Descent/Portability/FiniteDiscreteMeasure.lean",
+   "line": 62,
+   "statement": "(p : FiniteReportLaw α) (s : Set α) : (measure p).real s = p.expectation (s.indicator (fun _ ↦ 1))",
+   "mentions": [
+    "expectation",
+    "measure"
+   ]
+  },
+  {
+   "name": "Descent.Portability.FiniteDiscreteMeasure.independent_measure",
+   "kind": "theorem",
+   "file": "Descent/Portability/FiniteDiscreteMeasure.lean",
+   "line": 68,
+   "statement": "{I : Type*} [Fintype I] [DecidableEq I] (p : I → FiniteReportLaw α) : measure (independentLaw p) = Measure.pi (fun i ↦ measure (p i))",
+   "mentions": [
+    "independentLaw",
+    "measure"
+   ]
+  },
+  {
+   "name": "Descent.Portability.FiniteDiscreteMeasure.independent_observables",
+   "kind": "theorem",
+   "file": "Descent/Portability/FiniteDiscreteMeasure.lean",
+   "line": 79,
+   "statement": "{I : Type*} [Fintype I] [DecidableEq I] (p : I → FiniteReportLaw α) (f : I → α → ℝ) : iIndepFun (fun i x ↦ f i (x i)) (measure (independentLaw p))",
+   "mentions": [
+    "independentLaw",
+    "measure"
    ]
   },
   {
@@ -73440,7 +73698,8 @@
     "State",
     "WholeGenome",
     "genomeGenerator",
-    "intervalGenomeKernel"
+    "intervalGenomeKernel",
+    "rate"
    ]
   },
   {
@@ -74289,7 +74548,8 @@
    "line": 112,
    "statement": "(rate : I → ℝ) (hrate : Function.Injective rate) : LinearIndependent ℝ (fun i ↦ (exponentialCharacter (rate i) : Multiplicative NNReal → ℝ))",
    "mentions": [
-    "exponentialCharacter"
+    "exponentialCharacter",
+    "rate"
    ]
   },
   {
@@ -76667,6 +76927,55 @@
    ]
   },
   {
+   "name": "Descent.Portability.IIDBinExperiment.label_mean",
+   "kind": "theorem",
+   "file": "Descent/Portability/IIDBinExperiment.lean",
+   "line": 33,
+   "statement": "(η : ℝ) (hη : 0 ≤ η ∧ η ≤ 1) : (labelLaw η hη).expectation label = η",
+   "mentions": [
+    "expectation",
+    "label",
+    "labelLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.IIDBinExperiment.expectation_assignments",
+   "kind": "theorem",
+   "file": "Descent/Portability/IIDBinExperiment.lean",
+   "line": 63,
+   "statement": "(π : FiniteReportLaw (Fin K)) (η : Fin K → ℝ) (hη : ∀ j, 0 ≤ η j ∧ η j ≤ 1) (f : (I → Fin K × Bool) → ℝ) : (sampleLaw π η hη).expectation f = (independentLaw (fun _ : I ↦ π)).expectation (fun assignment ↦ (assignedLaw assignment η hη).expectation (fun outcomes ↦ f (fun i ↦ (assignment i, outcomes i))))",
+   "mentions": [
+    "assignedLaw",
+    "expectation",
+    "independentLaw",
+    "sampleLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.IIDBinExperiment.assigned_confidence",
+   "kind": "theorem",
+   "file": "Descent/Portability/IIDBinExperiment.lean",
+   "line": 84,
+   "statement": "(hK : 0 < K) (assignment : I → Fin K) (η : Fin K → ℝ) (hη : ∀ j, 0 ≤ η j ∧ η j ≤ 1) (α : ℝ) (hα : 0 < α ∧ α < 1) : (FiniteDiscreteMeasure.measure (assignedLaw assignment η hη)).real {outcomes | Miss assignment η α outcomes} ≤ α",
+   "mentions": [
+    "Miss",
+    "assignedLaw",
+    "measure"
+   ]
+  },
+  {
+   "name": "Descent.Portability.IIDBinExperiment.iid_confidence",
+   "kind": "theorem",
+   "file": "Descent/Portability/IIDBinExperiment.lean",
+   "line": 105,
+   "statement": "(hK : 0 < K) (π : FiniteReportLaw (Fin K)) (η : Fin K → ℝ) (hη : ∀ j, 0 ≤ η j ∧ η j ≤ 1) (α : ℝ) (hα : 0 < α ∧ α < 1) : (FiniteDiscreteMeasure.measure (sampleLaw π η hη)).real {sample : I → Fin K × Bool | Miss (fun i ↦ (sample i).1) η α (fun i ↦ (sample i).2)} ≤ α",
+   "mentions": [
+    "Miss",
+    "measure",
+    "sampleLaw"
+   ]
+  },
+  {
    "name": "Descent.Portability.attenuatedVariance_at_reference_point",
    "kind": "theorem",
    "file": "Descent/Portability/ImputationPortability.lean",
@@ -77674,7 +77983,9 @@
    "file": "Descent/Portability/InterleavedMutationMeasurability.lean",
    "line": 171,
    "statement": "(rate : ℝ≥0) (waiting : Ω → ℝ) (hwaiting : Measurable waiting) : Measurable (fun input ↦ rate * Real.toNNReal (waiting input))",
-   "mentions": []
+   "mentions": [
+    "rate"
+   ]
   },
   {
    "name": "Descent.Portability.InterleavedMutationMeasurability.abs_expectation_le",
@@ -77700,6 +78011,7 @@
     "count",
     "expectation",
     "intervalLaw",
+    "measure",
     "replaceExposure"
    ]
   },
@@ -78720,6 +79032,7 @@
     "generator",
     "kernel",
     "kernelMatrix",
+    "rate",
     "stateLaw"
    ]
   },
@@ -78867,7 +79180,8 @@
     "evolution",
     "generator",
     "kernel",
-    "operator"
+    "operator",
+    "rate"
    ]
   },
   {
@@ -82577,7 +82891,8 @@
     "genomeGenerator",
     "intervalTemplates",
     "mutationKernel",
-    "pointMass"
+    "pointMass",
+    "rate"
    ]
   },
   {
@@ -82592,7 +82907,8 @@
     "WholeGenome",
     "genomeGenerator",
     "mutationKernel",
-    "pointMass"
+    "pointMass",
+    "rate"
    ]
   },
   {
@@ -82606,6 +82922,7 @@
     "State",
     "SupportedAt",
     "limitLaw",
+    "rate",
     "stoppedGenomeLaw"
    ]
   },
@@ -89902,7 +90219,8 @@
    "line": 92,
    "statement": "(rate x : ℝ) : ibdRecurrenceStep 0 rate x = (1 - rate) ^ 2 * x",
    "mentions": [
-    "ibdRecurrenceStep"
+    "ibdRecurrenceStep",
+    "rate"
    ]
   },
   {
@@ -89923,7 +90241,8 @@
    "statement": "(Ne rate : ℝ) (hNe : 0 < Ne) (hr : 0 ≤ rate) (hr1 : rate < 1) : ibdRecurrenceStep Ne rate (ibdRecurrenceFixedPoint Ne rate) = ibdRecurrenceFixedPoint Ne rate",
    "mentions": [
     "ibdRecurrenceFixedPoint",
-    "ibdRecurrenceStep"
+    "ibdRecurrenceStep",
+    "rate"
    ]
   },
   {
@@ -89943,7 +90262,8 @@
    "line": 158,
    "statement": "(Ne rate : ℝ) (hNe : 0 < Ne) (hr : 0 ≤ rate) (hr1 : rate < 1) : ibdRecurrenceFixedPoint Ne rate - 1 / (1 + 4 * Ne * rate) = 2 * Ne * rate ^ 2 * (2 * rate - 3) / (((1 - rate) ^ 2 + 2 * Ne * rate * (2 - rate)) * (1 + 4 * Ne * rate))",
    "mentions": [
-    "ibdRecurrenceFixedPoint"
+    "ibdRecurrenceFixedPoint",
+    "rate"
    ]
   },
   {
@@ -89953,7 +90273,8 @@
    "line": 191,
    "statement": "(Ne rate : ℝ) (hNe : 0 < Ne) (hr : 0 < rate) (hr1 : rate < 1) : ibdRecurrenceFixedPoint Ne rate < 1 / (1 + 4 * Ne * rate)",
    "mentions": [
-    "ibdRecurrenceFixedPoint"
+    "ibdRecurrenceFixedPoint",
+    "rate"
    ]
   },
   {
@@ -90626,7 +90947,8 @@
    "statement": "(Ne rate x : ℝ) : ibdRecurrenceStep Ne rate x = (1 - rate) ^ 2 * (1 / Descent.Core.coalescentTimeScale Ne + (1 - 1 / Descent.Core.coalescentTimeScale Ne) * x)",
    "mentions": [
     "coalescentTimeScale",
-    "ibdRecurrenceStep"
+    "ibdRecurrenceStep",
+    "rate"
    ]
   },
   {
@@ -90638,7 +90960,8 @@
    "mentions": [
     "coalescentTimeScale",
     "ibdRecurrenceFixedPoint",
-    "ploidy"
+    "ploidy",
+    "rate"
    ]
   },
   {
@@ -97806,7 +98129,8 @@
     "State",
     "genomeGenerator",
     "mutationKernel",
-    "pointMass"
+    "pointMass",
+    "rate"
    ]
   },
   {
@@ -97824,6 +98148,7 @@
     "limitLaw",
     "mutationKernel",
     "pointMass",
+    "rate",
     "stoppedGenomeLaw"
    ]
   },
@@ -98940,6 +99265,7 @@
     "S",
     "Stationary",
     "kernel",
+    "rate",
     "stateLaw"
    ]
   },
@@ -100241,6 +100567,7 @@
     "globalKernel",
     "kernelMatrix",
     "proposalRate",
+    "rate",
     "siteProposalKernels",
     "siteProposalRates"
    ]
@@ -103708,7 +104035,8 @@
     "State",
     "WholeGenome",
     "genomeGenerator",
-    "intervalGenomeKernel"
+    "intervalGenomeKernel",
+    "rate"
    ]
   },
   {
@@ -103721,7 +104049,8 @@
     "State",
     "WholeGenome",
     "genomeWaitLaw",
-    "intervalGenomeKernel"
+    "intervalGenomeKernel",
+    "rate"
    ]
   },
   {
@@ -103738,6 +104067,7 @@
     "globalKernel",
     "pointMass",
     "proposalRate",
+    "rate",
     "siteProposalKernels",
     "siteProposalRates"
    ]
@@ -103788,6 +104118,7 @@
     "SiteState",
     "State",
     "bind",
+    "rate",
     "stateIntervalLaw"
    ]
   },
@@ -103801,7 +104132,8 @@
     "State",
     "WholeGenome",
     "bind",
-    "intervalGenomeKernel"
+    "intervalGenomeKernel",
+    "rate"
    ]
   },
   {
@@ -158981,6 +159313,9 @@
      "Descent.Portability.ArchaicPrediction.degree_panel_identifies": [],
      "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_compact": [],
      "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_convex": [],
+     "Descent.Portability.ArchaicPrediction.response_anchor_expansion": [],
+     "Descent.Portability.ArchaicPrediction.export_residual_orthogonal": [],
+     "Descent.Portability.ArchaicPrediction.arbitrary_ld_additive_optimum": [],
      "Descent.Portability.ArchaicPrediction.convexified_response": [],
      "Descent.Portability.ArchaicPrediction.weighted_product_expansion": [],
      "Descent.Portability.ArchaicPrediction.response_covariance": [],
@@ -159229,12 +159564,16 @@
      "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step": [],
      "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure": [],
      "Descent.Portability.FiniteAtomicReportMeasure.finite_report_integrable": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.rate_bounds": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.row_reconstruction": [],
      "Descent.Portability.FiniteCovarianceMoments.orbit_eq_of_variance_moments": [
       "∀ v : D → ℝ, ∀ k < 2 * Fintype.card (Equiv.Perm D"
      ],
      "Descent.Portability.FiniteDemographicSampling.parentalFrequency_le_one": [],
      "Descent.Portability.FiniteDemographicSampling.offspringLaw_mass": [],
      "Descent.Portability.FiniteDemographicSampling.transition_mass": [],
+     "Descent.Portability.FiniteDiscreteMeasure.observable_integrable": [],
+     "Descent.Portability.FiniteDiscreteMeasure.independent_measure": [],
      "Descent.Portability.FiniteHorizonLoss.risk_nonneg": [],
      "Descent.Portability.FiniteHorizonLoss.energy_nonneg": [],
      "Descent.Portability.FiniteHorizonLoss.risk_expansion": [],
@@ -159342,6 +159681,12 @@
      "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability": [],
      "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit": [],
      "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [],
+     "Descent.Portability.IIDBinExperiment.assigned_confidence": [
+      "0 < K"
+     ],
+     "Descent.Portability.IIDBinExperiment.iid_confidence": [
+      "0 < K"
+     ],
      "Descent.Portability.attenuatedVariance_eq_true_iff": [],
      "Descent.Portability.panelAdjustedImputationQuality_eq_ld_iff": [],
      "Descent.Portability.IndependentShiftOperator.independent_sum_succ": [],
@@ -160250,6 +160595,7 @@
     "Descent.Portability.AncientPrediction.predictive_quotient",
     "Descent.Portability.ArchaicPrediction.additive_squared_norm",
     "Descent.Portability.ArchaicPrediction.alternating_subset_sum",
+    "Descent.Portability.ArchaicPrediction.arbitrary_ld_additive_optimum",
     "Descent.Portability.ArchaicPrediction.centered_orthogonality",
     "Descent.Portability.ArchaicPrediction.centered_parseval",
     "Descent.Portability.ArchaicPrediction.comparison_kernel_constants",
@@ -160262,6 +160608,7 @@
     "Descent.Portability.ArchaicPrediction.effectiveRate_mean",
     "Descent.Portability.ArchaicPrediction.evaluate_transport",
     "Descent.Portability.ArchaicPrediction.exact_multiple_cycle_residual",
+    "Descent.Portability.ArchaicPrediction.export_residual_orthogonal",
     "Descent.Portability.ArchaicPrediction.factorial_recovery",
     "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_compact",
     "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_convex",
@@ -160274,6 +160621,7 @@
     "Descent.Portability.ArchaicPrediction.pairing_homozygote_identifies",
     "Descent.Portability.ArchaicPrediction.phaseCharacter_abs",
     "Descent.Portability.ArchaicPrediction.phaseCharacter_mul",
+    "Descent.Portability.ArchaicPrediction.response_anchor_expansion",
     "Descent.Portability.ArchaicPrediction.response_covariance",
     "Descent.Portability.ArchaicPrediction.response_transport",
     "Descent.Portability.ArchaicPrediction.shiftPolynomial_comp",
@@ -160430,10 +160778,14 @@
     "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step",
     "Descent.Portability.ExponentialPoissonRace.race_coordinate_summable",
     "Descent.Portability.FiniteAtomicReportMeasure.finite_report_integrable",
+    "Descent.Portability.FiniteBinCalibrationLaw.rate_bounds",
+    "Descent.Portability.FiniteBinCalibrationLaw.row_reconstruction",
     "Descent.Portability.FiniteCovarianceMoments.orbit_eq_of_variance_moments",
     "Descent.Portability.FiniteDemographicSampling.offspringLaw_mass",
     "Descent.Portability.FiniteDemographicSampling.parentalFrequency_le_one",
     "Descent.Portability.FiniteDemographicSampling.transition_mass",
+    "Descent.Portability.FiniteDiscreteMeasure.independent_measure",
+    "Descent.Portability.FiniteDiscreteMeasure.observable_integrable",
     "Descent.Portability.FiniteHorizonLoss.energy_difference",
     "Descent.Portability.FiniteHorizonLoss.energy_nonneg",
     "Descent.Portability.FiniteHorizonLoss.reverse_adjoint",
@@ -160532,6 +160884,8 @@
     "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit",
     "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability",
     "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
+    "Descent.Portability.IIDBinExperiment.assigned_confidence",
+    "Descent.Portability.IIDBinExperiment.iid_confidence",
     "Descent.Portability.IndependentShiftOperator.independent_sum_succ",
     "Descent.Portability.IndependentShiftOperator.shift_pow_sample",
     "Descent.Portability.InterleavedMutationExponential.interval_compose",
@@ -172833,6 +173187,9 @@
      "Descent.Portability.ArchaicPrediction.degree_panel_identifies": [],
      "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_compact": [],
      "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_convex": [],
+     "Descent.Portability.ArchaicPrediction.response_anchor_expansion": [],
+     "Descent.Portability.ArchaicPrediction.export_residual_orthogonal": [],
+     "Descent.Portability.ArchaicPrediction.arbitrary_ld_additive_optimum": [],
      "Descent.Portability.ArchaicPrediction.convexified_response": [],
      "Descent.Portability.ArchaicPrediction.weighted_product_expansion": [],
      "Descent.Portability.ArchaicPrediction.response_covariance": [],
@@ -173081,12 +173438,16 @@
      "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step": [],
      "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure": [],
      "Descent.Portability.FiniteAtomicReportMeasure.finite_report_integrable": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.rate_bounds": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.row_reconstruction": [],
      "Descent.Portability.FiniteCovarianceMoments.orbit_eq_of_variance_moments": [
       "∀ v : D → ℝ, ∀ k < 2 * Fintype.card (Equiv.Perm D"
      ],
      "Descent.Portability.FiniteDemographicSampling.parentalFrequency_le_one": [],
      "Descent.Portability.FiniteDemographicSampling.offspringLaw_mass": [],
      "Descent.Portability.FiniteDemographicSampling.transition_mass": [],
+     "Descent.Portability.FiniteDiscreteMeasure.observable_integrable": [],
+     "Descent.Portability.FiniteDiscreteMeasure.independent_measure": [],
      "Descent.Portability.FiniteHorizonLoss.risk_nonneg": [],
      "Descent.Portability.FiniteHorizonLoss.energy_nonneg": [],
      "Descent.Portability.FiniteHorizonLoss.risk_expansion": [],
@@ -173186,6 +173547,8 @@
      "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability": [],
      "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit": [],
      "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [],
+     "Descent.Portability.IIDBinExperiment.assigned_confidence": [],
+     "Descent.Portability.IIDBinExperiment.iid_confidence": [],
      "Descent.Portability.attenuatedVariance_eq_true_iff": [],
      "Descent.Portability.panelAdjustedImputationQuality_eq_ld_iff": [],
      "Descent.Portability.IndependentShiftOperator.independent_sum_succ": [],
@@ -174084,6 +174447,7 @@
     "Descent.Portability.AncientPrediction.predictive_quotient",
     "Descent.Portability.ArchaicPrediction.additive_squared_norm",
     "Descent.Portability.ArchaicPrediction.alternating_subset_sum",
+    "Descent.Portability.ArchaicPrediction.arbitrary_ld_additive_optimum",
     "Descent.Portability.ArchaicPrediction.centered_orthogonality",
     "Descent.Portability.ArchaicPrediction.centered_parseval",
     "Descent.Portability.ArchaicPrediction.comparison_kernel_constants",
@@ -174096,6 +174460,7 @@
     "Descent.Portability.ArchaicPrediction.effectiveRate_mean",
     "Descent.Portability.ArchaicPrediction.evaluate_transport",
     "Descent.Portability.ArchaicPrediction.exact_multiple_cycle_residual",
+    "Descent.Portability.ArchaicPrediction.export_residual_orthogonal",
     "Descent.Portability.ArchaicPrediction.factorial_recovery",
     "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_compact",
     "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_convex",
@@ -174108,6 +174473,7 @@
     "Descent.Portability.ArchaicPrediction.pairing_homozygote_identifies",
     "Descent.Portability.ArchaicPrediction.phaseCharacter_abs",
     "Descent.Portability.ArchaicPrediction.phaseCharacter_mul",
+    "Descent.Portability.ArchaicPrediction.response_anchor_expansion",
     "Descent.Portability.ArchaicPrediction.response_covariance",
     "Descent.Portability.ArchaicPrediction.response_transport",
     "Descent.Portability.ArchaicPrediction.shiftPolynomial_comp",
@@ -174264,10 +174630,14 @@
     "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step",
     "Descent.Portability.ExponentialPoissonRace.race_coordinate_summable",
     "Descent.Portability.FiniteAtomicReportMeasure.finite_report_integrable",
+    "Descent.Portability.FiniteBinCalibrationLaw.rate_bounds",
+    "Descent.Portability.FiniteBinCalibrationLaw.row_reconstruction",
     "Descent.Portability.FiniteCovarianceMoments.orbit_eq_of_variance_moments",
     "Descent.Portability.FiniteDemographicSampling.offspringLaw_mass",
     "Descent.Portability.FiniteDemographicSampling.parentalFrequency_le_one",
     "Descent.Portability.FiniteDemographicSampling.transition_mass",
+    "Descent.Portability.FiniteDiscreteMeasure.independent_measure",
+    "Descent.Portability.FiniteDiscreteMeasure.observable_integrable",
     "Descent.Portability.FiniteHorizonLoss.energy_difference",
     "Descent.Portability.FiniteHorizonLoss.energy_nonneg",
     "Descent.Portability.FiniteHorizonLoss.reverse_adjoint",
@@ -174366,6 +174736,8 @@
     "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit",
     "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability",
     "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
+    "Descent.Portability.IIDBinExperiment.assigned_confidence",
+    "Descent.Portability.IIDBinExperiment.iid_confidence",
     "Descent.Portability.IndependentShiftOperator.independent_sum_succ",
     "Descent.Portability.IndependentShiftOperator.shift_pow_sample",
     "Descent.Portability.InterleavedMutationExponential.interval_compose",
@@ -195218,6 +195590,9 @@
      ],
      "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_compact": [],
      "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_convex": [],
+     "Descent.Portability.ArchaicPrediction.response_anchor_expansion": [],
+     "Descent.Portability.ArchaicPrediction.export_residual_orthogonal": [],
+     "Descent.Portability.ArchaicPrediction.arbitrary_ld_additive_optimum": [],
      "Descent.Portability.ArchaicPrediction.convexified_response": [],
      "Descent.Portability.ArchaicPrediction.weighted_product_expansion": [],
      "Descent.Portability.ArchaicPrediction.response_covariance": [],
@@ -195494,10 +195869,14 @@
      "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step": [],
      "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure": [],
      "Descent.Portability.FiniteAtomicReportMeasure.finite_report_integrable": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.rate_bounds": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.row_reconstruction": [],
      "Descent.Portability.FiniteCovarianceMoments.orbit_eq_of_variance_moments": [],
      "Descent.Portability.FiniteDemographicSampling.parentalFrequency_le_one": [],
      "Descent.Portability.FiniteDemographicSampling.offspringLaw_mass": [],
      "Descent.Portability.FiniteDemographicSampling.transition_mass": [],
+     "Descent.Portability.FiniteDiscreteMeasure.observable_integrable": [],
+     "Descent.Portability.FiniteDiscreteMeasure.independent_measure": [],
      "Descent.Portability.FiniteHorizonLoss.risk_nonneg": [],
      "Descent.Portability.FiniteHorizonLoss.energy_nonneg": [],
      "Descent.Portability.FiniteHorizonLoss.risk_expansion": [],
@@ -195583,6 +195962,8 @@
      "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability": [],
      "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit": [],
      "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [],
+     "Descent.Portability.IIDBinExperiment.assigned_confidence": [],
+     "Descent.Portability.IIDBinExperiment.iid_confidence": [],
      "Descent.Portability.attenuatedVariance_eq_true_iff": [],
      "Descent.Portability.panelAdjustedImputationQuality_eq_ld_iff": [],
      "Descent.Portability.IndependentShiftOperator.independent_sum_succ": [],
@@ -196469,6 +196850,7 @@
     "Descent.Portability.AncientPrediction.predictive_quotient",
     "Descent.Portability.ArchaicPrediction.additive_squared_norm",
     "Descent.Portability.ArchaicPrediction.alternating_subset_sum",
+    "Descent.Portability.ArchaicPrediction.arbitrary_ld_additive_optimum",
     "Descent.Portability.ArchaicPrediction.centered_orthogonality",
     "Descent.Portability.ArchaicPrediction.centered_parseval",
     "Descent.Portability.ArchaicPrediction.comparison_kernel_constants",
@@ -196481,6 +196863,7 @@
     "Descent.Portability.ArchaicPrediction.effectiveRate_mean",
     "Descent.Portability.ArchaicPrediction.evaluate_transport",
     "Descent.Portability.ArchaicPrediction.exact_multiple_cycle_residual",
+    "Descent.Portability.ArchaicPrediction.export_residual_orthogonal",
     "Descent.Portability.ArchaicPrediction.factorial_recovery",
     "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_compact",
     "Descent.Portability.ArchaicPrediction.feasiblePhaseLaws_convex",
@@ -196493,6 +196876,7 @@
     "Descent.Portability.ArchaicPrediction.pairing_homozygote_identifies",
     "Descent.Portability.ArchaicPrediction.phaseCharacter_abs",
     "Descent.Portability.ArchaicPrediction.phaseCharacter_mul",
+    "Descent.Portability.ArchaicPrediction.response_anchor_expansion",
     "Descent.Portability.ArchaicPrediction.response_covariance",
     "Descent.Portability.ArchaicPrediction.response_transport",
     "Descent.Portability.ArchaicPrediction.shiftPolynomial_comp",
@@ -196649,10 +197033,14 @@
     "Descent.Portability.ExponentialPoissonRace.raceKernel_first_step",
     "Descent.Portability.ExponentialPoissonRace.race_coordinate_summable",
     "Descent.Portability.FiniteAtomicReportMeasure.finite_report_integrable",
+    "Descent.Portability.FiniteBinCalibrationLaw.rate_bounds",
+    "Descent.Portability.FiniteBinCalibrationLaw.row_reconstruction",
     "Descent.Portability.FiniteCovarianceMoments.orbit_eq_of_variance_moments",
     "Descent.Portability.FiniteDemographicSampling.offspringLaw_mass",
     "Descent.Portability.FiniteDemographicSampling.parentalFrequency_le_one",
     "Descent.Portability.FiniteDemographicSampling.transition_mass",
+    "Descent.Portability.FiniteDiscreteMeasure.independent_measure",
+    "Descent.Portability.FiniteDiscreteMeasure.observable_integrable",
     "Descent.Portability.FiniteHorizonLoss.energy_difference",
     "Descent.Portability.FiniteHorizonLoss.energy_nonneg",
     "Descent.Portability.FiniteHorizonLoss.reverse_adjoint",
@@ -196751,6 +197139,8 @@
     "Descent.Portability.HWEHeterozygosityLimit.count_characteristic_limit",
     "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability",
     "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
+    "Descent.Portability.IIDBinExperiment.assigned_confidence",
+    "Descent.Portability.IIDBinExperiment.iid_confidence",
     "Descent.Portability.IndependentShiftOperator.independent_sum_succ",
     "Descent.Portability.IndependentShiftOperator.shift_pow_sample",
     "Descent.Portability.InterleavedMutationExponential.interval_compose",
@@ -197697,6 +198087,7 @@
      "Descent.Portability.ArchaicPrediction.exact_multiple_cycle_residual": [],
      "Descent.Portability.ArchaicPrediction.factorial_panel_card": [],
      "Descent.Portability.ArchaicPrediction.nonconstant_phase_mode_count": [],
+     "Descent.Portability.ArchaicPrediction.export_residual_orthogonal": [],
      "Descent.Portability.ArchaicPrediction.phase_expansion_exists_unique": [],
      "Descent.Portability.ArchaicPrediction.invariant_phase_expansion": [],
      "Descent.Portability.ArchaicPrediction.comparison_kernel_constants": [],
@@ -197777,6 +198168,7 @@
      "Descent.Portability.FiniteLiabilityPanel.hasPrevalenceInterceptDomain": [],
      "Descent.Portability.FiniteLiabilityPanel.risk_eq_iff_liability_eq_up_to_common_shift": [],
      "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.rate_bounds": [],
      "Descent.Portability.FiniteCovarianceMoments.coefficients_zero": [],
      "Descent.Portability.FiniteDemographicSampling.transition_mass": [],
      "Descent.Portability.FiniteIndependentMoments.cross_expectation_zero": [],
@@ -198110,6 +198502,7 @@
     "Descent.Portability.ArchaicPrediction.comparison_kernel_constants",
     "Descent.Portability.ArchaicPrediction.contrastNormal_injective",
     "Descent.Portability.ArchaicPrediction.exact_multiple_cycle_residual",
+    "Descent.Portability.ArchaicPrediction.export_residual_orthogonal",
     "Descent.Portability.ArchaicPrediction.factorial_panel_card",
     "Descent.Portability.ArchaicPrediction.invariant_phase_expansion",
     "Descent.Portability.ArchaicPrediction.nonconstant_phase_mode_count",
@@ -198152,6 +198545,7 @@
     "Descent.Portability.DistanceBinnedPortabilityLaw.finite_bin_expectation",
     "Descent.Portability.EllipsoidTargetRadius.weighted_ellipsoid_minimax",
     "Descent.Portability.ExponentialPoissonRace.kernel_exponential_expMeasure",
+    "Descent.Portability.FiniteBinCalibrationLaw.rate_bounds",
     "Descent.Portability.FiniteCovarianceMoments.coefficients_zero",
     "Descent.Portability.FiniteDemographicSampling.transition_mass",
     "Descent.Portability.FiniteIndependentMoments.cross_expectation_zero",
@@ -267618,6 +268012,324 @@
    ]
   },
   {
+   "name": "Descent.Portability.ArchaicPrediction.centeredFeatures",
+   "decl_name": "centeredFeatures",
+   "short": "centeredFeatures",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/ArchaicPrediction/LDExport.lean",
+   "line": 26,
+   "signature": "(w : H → ℝ) (X : I → H → ℝ) (i : I) (h : H) : ℝ",
+   "args": [
+    {
+     "names": [
+      "w"
+     ],
+     "type": "H → ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "X"
+     ],
+     "type": "I → H → ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "i"
+     ],
+     "type": "I",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "h"
+     ],
+     "type": "H",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  X i h - weightedMean w (X i)",
+   "docstring": "",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.ArchaicPrediction",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "∑ h, w h = 1"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.ArchaicPrediction.centeredFeatures_mean": [
+      "∑ h, w h = 1"
+     ],
+     "Descent.Portability.ArchaicPrediction.arbitrary_ld_export_formula": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.ArchaicPrediction.arbitrary_ld_export_formula",
+    "Descent.Portability.ArchaicPrediction.centeredFeatures_mean"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ArchaicPrediction.regressionGram",
+   "decl_name": "regressionGram",
+   "short": "regressionGram",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/ArchaicPrediction/LDExport.lean",
+   "line": 34,
+   "signature": "(w : H → ℝ) (X : I → H → ℝ) : Matrix I I ℝ",
+   "args": [
+    {
+     "names": [
+      "w"
+     ],
+     "type": "H → ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "X"
+     ],
+     "type": "I → H → ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "Matrix I I ℝ",
+   "body": "  fun i j => weightedMean w (fun h => X i h * X j h)",
+   "docstring": "",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.ArchaicPrediction",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "IsUnit (regressionGram w X",
+     "∀ h, 0 ≤ w h"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.ArchaicPrediction.export_normal_equations": [
+      "IsUnit (regressionGram w X"
+     ],
+     "Descent.Portability.ArchaicPrediction.export_residual_orthogonal": [
+      "IsUnit (regressionGram w X"
+     ],
+     "Descent.Portability.ArchaicPrediction.arbitrary_ld_additive_optimum": [
+      "∀ h, 0 ≤ w h",
+      "IsUnit (regressionGram w X"
+     ],
+     "Descent.Portability.ArchaicPrediction.arbitrary_ld_export_formula": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.ArchaicPrediction.arbitrary_ld_additive_optimum",
+    "Descent.Portability.ArchaicPrediction.arbitrary_ld_export_formula",
+    "Descent.Portability.ArchaicPrediction.export_normal_equations",
+    "Descent.Portability.ArchaicPrediction.export_residual_orthogonal"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ArchaicPrediction.regressionAnchor",
+   "decl_name": "regressionAnchor",
+   "short": "regressionAnchor",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/ArchaicPrediction/LDExport.lean",
+   "line": 37,
+   "signature": "(w : H → ℝ) (X : I → H → ℝ) (f : H → ℝ) : I → ℝ",
+   "args": [
+    {
+     "names": [
+      "w"
+     ],
+     "type": "H → ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "X"
+     ],
+     "type": "I → H → ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "f"
+     ],
+     "type": "H → ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "I → ℝ",
+   "body": "  fun i => weightedMean w (fun h => X i h * f h)",
+   "docstring": "",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.ArchaicPrediction",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "IsUnit (regressionGram w X"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.ArchaicPrediction.export_normal_equations": [
+      "IsUnit (regressionGram w X"
+     ],
+     "Descent.Portability.ArchaicPrediction.response_anchor_expansion": [],
+     "Descent.Portability.ArchaicPrediction.export_residual_orthogonal": [
+      "IsUnit (regressionGram w X"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.ArchaicPrediction.export_normal_equations",
+    "Descent.Portability.ArchaicPrediction.export_residual_orthogonal",
+    "Descent.Portability.ArchaicPrediction.response_anchor_expansion"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ArchaicPrediction.regressionScore",
+   "decl_name": "regressionScore",
+   "short": "regressionScore",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/ArchaicPrediction/LDExport.lean",
+   "line": 40,
+   "signature": "(X : I → H → ℝ) (b : I → ℝ) (h : H) : ℝ",
+   "args": [
+    {
+     "names": [
+      "X"
+     ],
+     "type": "I → H → ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "b"
+     ],
+     "type": "I → ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "h"
+     ],
+     "type": "H",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": " ∑ i, b i * X i h",
+   "docstring": "",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.ArchaicPrediction",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "IsUnit (regressionGram w X",
+     "∀ h, 0 ≤ w h"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.ArchaicPrediction.export_residual_orthogonal": [
+      "IsUnit (regressionGram w X"
+     ],
+     "Descent.Portability.ArchaicPrediction.arbitrary_ld_additive_optimum": [
+      "∀ h, 0 ≤ w h",
+      "IsUnit (regressionGram w X"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.ArchaicPrediction.arbitrary_ld_additive_optimum",
+    "Descent.Portability.ArchaicPrediction.export_residual_orthogonal"
+   ]
+  },
+  {
+   "name": "Descent.Portability.ArchaicPrediction.exportedSlopes",
+   "decl_name": "exportedSlopes",
+   "short": "exportedSlopes",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/ArchaicPrediction/LDExport.lean",
+   "line": 42,
+   "signature": "(w : H → ℝ) (X : I → H → ℝ) (f : H → ℝ) : I → ℝ",
+   "args": [
+    {
+     "names": [
+      "w"
+     ],
+     "type": "H → ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "X"
+     ],
+     "type": "I → H → ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "f"
+     ],
+     "type": "H → ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "I → ℝ",
+   "body": "  (regressionGram w X)⁻¹ *ᵥ regressionAnchor w X f",
+   "docstring": "",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.ArchaicPrediction",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "IsUnit (regressionGram w X",
+     "∀ h, 0 ≤ w h"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.ArchaicPrediction.export_normal_equations": [
+      "IsUnit (regressionGram w X"
+     ],
+     "Descent.Portability.ArchaicPrediction.export_residual_orthogonal": [
+      "IsUnit (regressionGram w X"
+     ],
+     "Descent.Portability.ArchaicPrediction.arbitrary_ld_additive_optimum": [
+      "∀ h, 0 ≤ w h",
+      "IsUnit (regressionGram w X"
+     ],
+     "Descent.Portability.ArchaicPrediction.arbitrary_ld_export_formula": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.ArchaicPrediction.arbitrary_ld_additive_optimum",
+    "Descent.Portability.ArchaicPrediction.arbitrary_ld_export_formula",
+    "Descent.Portability.ArchaicPrediction.export_normal_equations",
+    "Descent.Portability.ArchaicPrediction.export_residual_orthogonal"
+   ]
+  },
+  {
    "name": "Descent.Portability.ArchaicPrediction.weightedMean",
    "decl_name": "weightedMean",
    "short": "weightedMean",
@@ -267656,6 +268368,7 @@
      "∀ v : F, weightedMean w (fun ω => ⟪v, ε ω⟫",
      "∀ v : F, weightedMean w (fun ω => ⟪v, ε ω⟫ ^ 2",
      "∑ h, w h = 1",
+     "IsUnit (regressionGram w X",
      "∀ h, 0 ≤ w h",
      "∑ x, w x = 1",
      "∀ x, 0 ≤ w x",
@@ -267669,10 +268382,23 @@
       "∀ v : F, weightedMean w (fun ω => ⟪v, ε ω⟫",
       "∀ v : F, weightedMean w (fun ω => ⟪v, ε ω⟫ ^ 2"
      ],
+     "Descent.Portability.ArchaicPrediction.centeredFeatures_mean": [
+      "∑ h, w h = 1"
+     ],
+     "Descent.Portability.ArchaicPrediction.response_anchor_expansion": [],
+     "Descent.Portability.ArchaicPrediction.export_residual_orthogonal": [
+      "IsUnit (regressionGram w X"
+     ],
+     "Descent.Portability.ArchaicPrediction.arbitrary_ld_additive_optimum": [
+      "∀ h, 0 ≤ w h",
+      "IsUnit (regressionGram w X"
+     ],
+     "Descent.Portability.ArchaicPrediction.arbitrary_ld_export_formula": [],
      "Descent.Portability.ArchaicPrediction.weightedMean_add": [],
      "Descent.Portability.ArchaicPrediction.weightedMean_const": [
       "∑ h, w h = 1"
      ],
+     "Descent.Portability.ArchaicPrediction.weightedMean_sub": [],
      "Descent.Portability.ArchaicPrediction.weightedMean_sum": [],
      "Descent.Portability.ArchaicPrediction.weightedMean_scale": [],
      "Descent.Portability.ArchaicPrediction.response_specific_mean": [],
@@ -267723,20 +268449,26 @@
     }
    },
    "mentioned_by": [
+    "Descent.Portability.ArchaicPrediction.arbitrary_ld_additive_optimum",
+    "Descent.Portability.ArchaicPrediction.arbitrary_ld_export_formula",
     "Descent.Portability.ArchaicPrediction.best_constant_risk",
+    "Descent.Portability.ArchaicPrediction.centeredFeatures_mean",
     "Descent.Portability.ArchaicPrediction.effective_resistance_variance",
+    "Descent.Portability.ArchaicPrediction.export_residual_orthogonal",
     "Descent.Portability.ArchaicPrediction.four_pair_moment_risk_bounds",
     "Descent.Portability.ArchaicPrediction.four_risk_from_parity",
     "Descent.Portability.ArchaicPrediction.graph_contrast_precision",
     "Descent.Portability.ArchaicPrediction.phase_covariance",
     "Descent.Portability.ArchaicPrediction.phase_covariance_nonneg",
     "Descent.Portability.ArchaicPrediction.phase_moment_abs_le_one",
+    "Descent.Portability.ArchaicPrediction.response_anchor_expansion",
     "Descent.Portability.ArchaicPrediction.response_covariance",
     "Descent.Portability.ArchaicPrediction.response_specific_mean",
     "Descent.Portability.ArchaicPrediction.variance_as_second_moment",
     "Descent.Portability.ArchaicPrediction.weightedMean_add",
     "Descent.Portability.ArchaicPrediction.weightedMean_const",
     "Descent.Portability.ArchaicPrediction.weightedMean_scale",
+    "Descent.Portability.ArchaicPrediction.weightedMean_sub",
     "Descent.Portability.ArchaicPrediction.weightedMean_sum",
     "Descent.Portability.ArchaicPrediction.weighted_product_expansion",
     "Descent.Portability.energyWeightedVariance_at_constant",
@@ -269908,7 +270640,9 @@
      "Descent.Portability.BalancedHWEVanishingLaw.vanishing_weak_convergence": [
       "Tendsto (fun m ↦ (N m : ℝ"
      ],
-     "Descent.Portability.BalancedHWEWeakLimit.critical_weak_convergence": []
+     "Descent.Portability.BalancedHWEWeakLimit.critical_weak_convergence": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.row_reconstruction": [],
+     "Descent.Portability.IIDBinExperiment.expectation_assignments": []
     }
    },
    "mentioned_by": [
@@ -269930,7 +270664,9 @@
     "Descent.Portability.BalancedHWEVanishingLaw.observable_error_bound",
     "Descent.Portability.BalancedHWEVanishingLaw.vanishing_observable_limit",
     "Descent.Portability.BalancedHWEVanishingLaw.vanishing_weak_convergence",
-    "Descent.Portability.BalancedHWEWeakLimit.critical_weak_convergence"
+    "Descent.Portability.BalancedHWEWeakLimit.critical_weak_convergence",
+    "Descent.Portability.FiniteBinCalibrationLaw.row_reconstruction",
+    "Descent.Portability.IIDBinExperiment.expectation_assignments"
    ]
   },
   {
@@ -274579,6 +275315,7 @@
      "Descent.PopGen._root_.Descent.Foundations.ConditionalMeanDGP.predictionRiskY_eq_irreducible_plus_approxRisk": [],
      "Descent.Portability.AncientPrediction.operator_risk_change": [],
      "Descent.Portability.AncientPrediction.integral_risk_change": [],
+     "Descent.Portability.ArchaicPrediction.arbitrary_ld_additive_optimum": [],
      "Descent.Portability.CompactMeasurementMinimax.prefix_orthonormal": [
       "IsCompactOperator L",
       "(residual L hc q"
@@ -274676,6 +275413,7 @@
     "Descent.PopGen.measureLinearPredictionRisk_transport_decomposition_of_orthogonality",
     "Descent.Portability.AncientPrediction.integral_risk_change",
     "Descent.Portability.AncientPrediction.operator_risk_change",
+    "Descent.Portability.ArchaicPrediction.arbitrary_ld_additive_optimum",
     "Descent.Portability.CompactMeasurementMinimax.adaptive_minimax",
     "Descent.Portability.CompactMeasurementMinimax.prefixSpace_finrank",
     "Descent.Portability.CompactMeasurementMinimax.prefix_orthonormal",
@@ -296182,6 +296920,8 @@
      "Descent.Portability.FiniteAtomicReportMeasure.integral_finite_report": [],
      "Descent.Portability.FiniteDemographicSampling.history_readout_exact": [],
      "Descent.Portability.FiniteDemographicSampling.history_path_sum_exact": [],
+     "Descent.Portability.FiniteDiscreteMeasure.integral_observable": [],
+     "Descent.Portability.FiniteDiscreteMeasure.real_event": [],
      "Descent.Portability.FiniteHorizonLoss.risk_expansion": [],
      "Descent.Portability.FiniteHorizonLoss.reverse_adjoint": [],
      "Descent.Portability.FiniteIndependentMoments.expectation_const": [],
@@ -296211,6 +296951,10 @@
      "Descent.Portability.HWEInteractionLaw.characteristic_im": [],
      "Descent.Portability.HWEInteractionLaw.interaction_mean_zero": [],
      "Descent.Portability.HWEInteractionLaw.interaction_second_moment": [],
+     "Descent.Portability.IIDBinExperiment.label_mean": [],
+     "Descent.Portability.IIDBinExperiment.expectation_assignments": [],
+     "Descent.Portability.IIDBinExperiment.assigned_confidence": [],
+     "Descent.Portability.IIDBinExperiment.iid_confidence": [],
      "Descent.Portability.IndependentShiftOperator.shift_apply": [],
      "Descent.Portability.IndependentShiftOperator.independent_sum_succ": [],
      "Descent.Portability.IndependentShiftOperator.shift_pow_sample": [],
@@ -296451,6 +297195,8 @@
     "Descent.Portability.FiniteAtomicReportMeasure.integral_finite_report",
     "Descent.Portability.FiniteDemographicSampling.history_path_sum_exact",
     "Descent.Portability.FiniteDemographicSampling.history_readout_exact",
+    "Descent.Portability.FiniteDiscreteMeasure.integral_observable",
+    "Descent.Portability.FiniteDiscreteMeasure.real_event",
     "Descent.Portability.FiniteHorizonLoss.reverse_adjoint",
     "Descent.Portability.FiniteHorizonLoss.risk_expansion",
     "Descent.Portability.FiniteIndependentMoments.coordinate_expectation",
@@ -296515,6 +297261,10 @@
     "Descent.Portability.HWEInteractionLaw.expectation_independent_product",
     "Descent.Portability.HWEInteractionLaw.interaction_mean_zero",
     "Descent.Portability.HWEInteractionLaw.interaction_second_moment",
+    "Descent.Portability.IIDBinExperiment.assigned_confidence",
+    "Descent.Portability.IIDBinExperiment.expectation_assignments",
+    "Descent.Portability.IIDBinExperiment.iid_confidence",
+    "Descent.Portability.IIDBinExperiment.label_mean",
     "Descent.Portability.IndependentShiftOperator.independent_sum_succ",
     "Descent.Portability.IndependentShiftOperator.shift_apply",
     "Descent.Portability.IndependentShiftOperator.shift_pow_sample",
@@ -304566,6 +305316,224 @@
    ]
   },
   {
+   "name": "Descent.Portability.FiniteBinCalibrationLaw.binLaw",
+   "decl_name": "binLaw",
+   "short": "binLaw",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/FiniteBinCalibrationLaw.lean",
+   "line": 25,
+   "signature": "(p : FiniteReportLaw (Fin K × Bool)) : FiniteReportLaw (Fin K) where mass j",
+   "args": [
+    {
+     "names": [
+      "p"
+     ],
+     "type": "FiniteReportLaw (Fin K × Bool)",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "FiniteReportLaw (Fin K) where mass j",
+   "body": " ∑ b, p.mass (j, b)\n  mass_nonneg j := Finset.sum_nonneg (fun b _ ↦ p.mass_nonneg (j, b))\n  mass_sum := by rw [← Fintype.sum_prod_type]; exact p.mass_sum",
+   "docstring": "The observed bin marginal of the supplied joint law.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.FiniteBinCalibrationLaw",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "ratio",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0,
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.FiniteBinCalibrationLaw.bin_mass": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.rate_bounds": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.mass_mul_rate": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.row_reconstruction": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.iid_miss_probability": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.FiniteBinCalibrationLaw.bin_mass",
+    "Descent.Portability.FiniteBinCalibrationLaw.iid_miss_probability",
+    "Descent.Portability.FiniteBinCalibrationLaw.mass_mul_rate",
+    "Descent.Portability.FiniteBinCalibrationLaw.rate_bounds",
+    "Descent.Portability.FiniteBinCalibrationLaw.row_reconstruction"
+   ]
+  },
+  {
+   "name": "Descent.Portability.FiniteBinCalibrationLaw.rate",
+   "decl_name": "rate",
+   "short": "rate",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/FiniteBinCalibrationLaw.lean",
+   "line": 35,
+   "signature": "(p : FiniteReportLaw (Fin K × Bool)) (j : Fin K) : ℝ",
+   "args": [
+    {
+     "names": [
+      "p"
+     ],
+     "type": "FiniteReportLaw (Fin K × Bool)",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "j"
+     ],
+     "type": "Fin K",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": "  p.mass (j, true) / (binLaw p).mass j",
+   "docstring": "On positive-mass bins this is the conditional event probability. Values on\nzero-mass bins have no effect on the reconstructed joint law or its reports.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.FiniteBinCalibrationLaw",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "probability",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0,
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Blindness.CountingInvariantBlindness.no_function_of_count_determines_rate": [],
+     "Descent.Blindness.CountingInvariantBlindness.count_predictor_error_ge": [],
+     "Descent.Blindness.CountingInvariantBlindness.lipschitz_predictor_error_ge": [],
+     "Descent.Blindness.speedBiasParameterFromTripleRate_mem_domain": [],
+     "Descent.Blindness.speedTiltBetaMergerRate_speedBiasParameterFromTripleRate": [],
+     "Descent.Blindness.frontSpeedTiltFromTripleRate_mem_domain": [],
+     "Descent.Blindness.not_summable_reciprocal_of_rate_le_scaled_natSucc": [],
+     "Descent.Blindness.SpectrumIdentifiability.summable_one_div_of_scaled_natSucc_rpow_le_rate": [],
+     "Descent.Coalescent.coalescentLawExp_eq": [],
+     "Descent.Conditionals.ouVariance_at_zero_denominator_is_junk": [],
+     "Descent.Conditionals.probitIntercept_div_probitSlope": [],
+     "Descent.PopGen.LDDecayMechanism.exponentialTagging_tagging_efficiency": [],
+     "Descent.PopGen.decaySlope_exponentialTagging": [],
+     "Descent.PopGen.decaySlope_exponentialTagging_pos": [],
+     "Descent.PopGen.decaySlope_exponentialTagging_strictAnti": [],
+     "Descent.PopGen.ibdFlowStep_at_ne0_is_junk": [],
+     "Descent.PopGen.ibdFlowStep_fixedPoint": [],
+     "Descent.PopGen.ibdFlowStep_uses_coalescentTimeScale": [],
+     "Descent.Portability.AncestralEpochGenotypeSupport.intervalGenome_excludes": [],
+     "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes": [],
+     "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_good": [],
+     "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous": [],
+     "Descent.Portability.AncestralEpochGenotypeSupport.epochGenome_good": [],
+     "Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good": [],
+     "Descent.Portability.AncestralEpochGenotypeSupport.stoppedGenome_excludes_good": [],
+     "Descent.Portability.AncestralEpochGenotypeSupport.mergingTail_good": [],
+     "Descent.Portability.AncestralEpochGenotypeSupport.historyGenome_good": [],
+     "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_good": [],
+     "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_covered": [],
+     "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_rawDosage_le_six": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.rate_bounds": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.mass_mul_rate": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.row_reconstruction": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.iid_miss_probability": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.simultaneous_coverage": [],
+     "Descent.Portability.FiniteProductExponential.intervalGenome_exponential": [],
+     "Descent.Portability.GaussianCovarianceSeparation.exponential_characters_independent": [],
+     "Descent.Portability.InterleavedMutationMeasurability.waiting_exposure_measurable": [],
+     "Descent.Portability.MarkovCoarseGraining.stateLaw_matrix": [],
+     "Descent.Portability.MarkovPoissonLaw.evolution_norm_le_one": [],
+     "Descent.Portability.MutationChannelBridge.generator_template_sum": [],
+     "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels": [],
+     "Descent.Portability.MutationChannelBridge.stoppedGenome_eq_limit": [],
+     "Descent.Portability.ibdRecurrenceStep_empty_population_is_junk": [],
+     "Descent.Portability.ibdRecurrenceFixedPoint_isFixedPoint": [],
+     "Descent.Portability.ibdRecurrenceFixedPoint_sub_linearisation": [],
+     "Descent.Portability.ibdRecurrenceFixedPoint_lt_linearisation": [],
+     "Descent.Portability.ibdRecurrenceStep_uses_coalescentTimeScale": [],
+     "Descent.Portability.ibdRecurrenceFixedPoint_uses_coalescentTimeScale": [],
+     "Descent.Portability.SignedTransferIdentification.mutation_generator_row": [],
+     "Descent.Portability.SignedTransferIdentification.stoppedGenome_eq_limit_of_generator": [],
+     "Descent.Portability.StationaryPoissonLaw.stationary_stateLaw": [],
+     "Descent.Portability.StoppedGenotypeRenewal.genomeGenerator_eq_proposal": [],
+     "Descent.Portability.WholeGenomeMutationRace.intervalGenome_exponential_real": [],
+     "Descent.Portability.WholeGenomeMutationRace.intervalGenome_expMeasure": [],
+     "Descent.Portability.WholeGenomeMutationRace.genomeWait_first_step": [],
+     "Descent.Portability.WholeGenomeMutationSemigroup.stateInterval_compose": [],
+     "Descent.Portability.WholeGenomeMutationSemigroup.intervalGenome_compose": []
+    },
+    "range_lo_thm": [
+     "Descent.Portability.FiniteBinCalibrationLaw.rate_bounds",
+     0
+    ],
+    "range_hi_thm": [
+     "Descent.Portability.FiniteBinCalibrationLaw.rate_bounds",
+     0
+    ],
+    "range_lo": 0,
+    "range_hi": 1
+   },
+   "mentioned_by": [
+    "Descent.Blindness.CountingInvariantBlindness.count_predictor_error_ge",
+    "Descent.Blindness.CountingInvariantBlindness.lipschitz_predictor_error_ge",
+    "Descent.Blindness.CountingInvariantBlindness.no_function_of_count_determines_rate",
+    "Descent.Blindness.SpectrumIdentifiability.summable_one_div_of_scaled_natSucc_rpow_le_rate",
+    "Descent.Blindness.frontSpeedTiltFromTripleRate_mem_domain",
+    "Descent.Blindness.not_summable_reciprocal_of_rate_le_scaled_natSucc",
+    "Descent.Blindness.speedBiasParameterFromTripleRate_mem_domain",
+    "Descent.Blindness.speedTiltBetaMergerRate_speedBiasParameterFromTripleRate",
+    "Descent.Coalescent.coalescentLawExp_eq",
+    "Descent.Conditionals.ouVariance_at_zero_denominator_is_junk",
+    "Descent.Conditionals.probitIntercept_div_probitSlope",
+    "Descent.PopGen.LDDecayMechanism.exponentialTagging_tagging_efficiency",
+    "Descent.PopGen.decaySlope_exponentialTagging",
+    "Descent.PopGen.decaySlope_exponentialTagging_pos",
+    "Descent.PopGen.decaySlope_exponentialTagging_strictAnti",
+    "Descent.PopGen.ibdFlowStep_at_ne0_is_junk",
+    "Descent.PopGen.ibdFlowStep_fixedPoint",
+    "Descent.PopGen.ibdFlowStep_uses_coalescentTimeScale",
+    "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_covered",
+    "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_good",
+    "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_rawDosage_le_six",
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_excludes",
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalEpoch_good",
+    "Descent.Portability.AncestralEpochGenotypeSupport.conditionalGenome_excludes_good",
+    "Descent.Portability.AncestralEpochGenotypeSupport.epochGenome_good",
+    "Descent.Portability.AncestralEpochGenotypeSupport.historyGenome_good",
+    "Descent.Portability.AncestralEpochGenotypeSupport.intervalGenome_excludes",
+    "Descent.Portability.AncestralEpochGenotypeSupport.mergingTail_good",
+    "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous",
+    "Descent.Portability.AncestralEpochGenotypeSupport.stoppedGenome_excludes_good",
+    "Descent.Portability.FiniteBinCalibrationLaw.iid_miss_probability",
+    "Descent.Portability.FiniteBinCalibrationLaw.mass_mul_rate",
+    "Descent.Portability.FiniteBinCalibrationLaw.rate_bounds",
+    "Descent.Portability.FiniteBinCalibrationLaw.row_reconstruction",
+    "Descent.Portability.FiniteBinCalibrationLaw.simultaneous_coverage",
+    "Descent.Portability.FiniteProductExponential.intervalGenome_exponential",
+    "Descent.Portability.GaussianCovarianceSeparation.exponential_characters_independent",
+    "Descent.Portability.InterleavedMutationMeasurability.waiting_exposure_measurable",
+    "Descent.Portability.MarkovCoarseGraining.stateLaw_matrix",
+    "Descent.Portability.MarkovPoissonLaw.evolution_norm_le_one",
+    "Descent.Portability.MutationChannelBridge.generator_template_sum",
+    "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels",
+    "Descent.Portability.MutationChannelBridge.stoppedGenome_eq_limit",
+    "Descent.Portability.SignedTransferIdentification.mutation_generator_row",
+    "Descent.Portability.SignedTransferIdentification.stoppedGenome_eq_limit_of_generator",
+    "Descent.Portability.StationaryPoissonLaw.stationary_stateLaw",
+    "Descent.Portability.StoppedGenotypeRenewal.genomeGenerator_eq_proposal",
+    "Descent.Portability.WholeGenomeMutationRace.genomeWait_first_step",
+    "Descent.Portability.WholeGenomeMutationRace.intervalGenome_expMeasure",
+    "Descent.Portability.WholeGenomeMutationRace.intervalGenome_exponential_real",
+    "Descent.Portability.WholeGenomeMutationSemigroup.intervalGenome_compose",
+    "Descent.Portability.WholeGenomeMutationSemigroup.stateInterval_compose",
+    "Descent.Portability.ibdRecurrenceFixedPoint_isFixedPoint",
+    "Descent.Portability.ibdRecurrenceFixedPoint_lt_linearisation",
+    "Descent.Portability.ibdRecurrenceFixedPoint_sub_linearisation",
+    "Descent.Portability.ibdRecurrenceFixedPoint_uses_coalescentTimeScale",
+    "Descent.Portability.ibdRecurrenceStep_empty_population_is_junk",
+    "Descent.Portability.ibdRecurrenceStep_uses_coalescentTimeScale"
+   ]
+  },
+  {
    "name": "Descent.Portability.FiniteDemographicSampling.Counts",
    "decl_name": "Counts",
    "short": "Counts",
@@ -305210,6 +306178,10 @@
      "Descent.Portability.BalancedHWEInteraction.row_characteristic": [],
      "Descent.Portability.BalancedHWEVanishingLaw.normalized_mean": [],
      "Descent.Portability.BalancedHWEVanishingLaw.normalized_second_moment": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.iid_miss_probability": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.simultaneous_coverage": [],
+     "Descent.Portability.FiniteDiscreteMeasure.independent_measure": [],
+     "Descent.Portability.FiniteDiscreteMeasure.independent_observables": [],
      "Descent.Portability.FiniteIndependentMoments.coordinate_expectation": [],
      "Descent.Portability.FiniteIndependentMoments.cross_expectation_zero": [],
      "Descent.Portability.FiniteIndependentMoments.independent_sum_mean": [],
@@ -305225,6 +306197,9 @@
      "Descent.Portability.HWEInteractionLaw.characteristic_independent_sum": [],
      "Descent.Portability.HWEInteractionLaw.interaction_mean_zero": [],
      "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass": [],
+     "Descent.Portability.IIDBinExperiment.expectation_assignments": [],
+     "Descent.Portability.IIDBinExperiment.assigned_confidence": [],
+     "Descent.Portability.IIDBinExperiment.iid_confidence": [],
      "Descent.Portability.IndependentShiftOperator.independent_sum_succ": [],
      "Descent.Portability.IndependentShiftOperator.shift_pow_sample": [],
      "Descent.Portability.StoppedGenotypeRenewal.genomeCountMass_zero": [],
@@ -305242,6 +306217,10 @@
     "Descent.Portability.BalancedHWEInteraction.row_characteristic",
     "Descent.Portability.BalancedHWEVanishingLaw.normalized_mean",
     "Descent.Portability.BalancedHWEVanishingLaw.normalized_second_moment",
+    "Descent.Portability.FiniteBinCalibrationLaw.iid_miss_probability",
+    "Descent.Portability.FiniteBinCalibrationLaw.simultaneous_coverage",
+    "Descent.Portability.FiniteDiscreteMeasure.independent_measure",
+    "Descent.Portability.FiniteDiscreteMeasure.independent_observables",
     "Descent.Portability.FiniteIndependentMoments.coordinate_expectation",
     "Descent.Portability.FiniteIndependentMoments.cross_expectation_zero",
     "Descent.Portability.FiniteIndependentMoments.independent_sum_mean",
@@ -305257,6 +306236,9 @@
     "Descent.Portability.HWEInteractionLaw.expectation_independent_product",
     "Descent.Portability.HWEInteractionLaw.interaction_mean_zero",
     "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass",
+    "Descent.Portability.IIDBinExperiment.assigned_confidence",
+    "Descent.Portability.IIDBinExperiment.expectation_assignments",
+    "Descent.Portability.IIDBinExperiment.iid_confidence",
     "Descent.Portability.IndependentShiftOperator.independent_sum_succ",
     "Descent.Portability.IndependentShiftOperator.shift_pow_sample",
     "Descent.Portability.StoppedGenotypeRenewal.genomeCountMass_zero",
@@ -305527,6 +306509,66 @@
     "Descent.Portability.MinimalObservableLaw.orbit_mem_finite",
     "Descent.Portability.MinimalObservableLaw.power_remainder",
     "Descent.Portability.ObservableClosureLaw.matrix_autonomy_iff"
+   ]
+  },
+  {
+   "name": "Descent.Portability.FiniteDiscreteMeasure.measure",
+   "decl_name": "measure",
+   "short": "measure",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/FiniteDiscreteMeasure.lean",
+   "line": 28,
+   "signature": "(p : FiniteReportLaw α) : Measure α",
+   "args": [
+    {
+     "names": [
+      "p"
+     ],
+     "type": "FiniteReportLaw α",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "Measure α",
+   "body": "  Measure.sum (fun a ↦ ENNReal.ofReal (p.mass a) • Measure.dirac a)",
+   "docstring": "",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.FiniteDiscreteMeasure",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Conditionals.link_stieltjes_representation": [],
+     "Descent.Foundations.continuous_Phi": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.iid_miss_probability": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.simultaneous_coverage": [],
+     "Descent.Portability.FiniteDiscreteMeasure.measure_singleton": [],
+     "Descent.Portability.FiniteDiscreteMeasure.observable_integrable": [],
+     "Descent.Portability.FiniteDiscreteMeasure.integral_observable": [],
+     "Descent.Portability.FiniteDiscreteMeasure.real_event": [],
+     "Descent.Portability.FiniteDiscreteMeasure.independent_measure": [],
+     "Descent.Portability.FiniteDiscreteMeasure.independent_observables": [],
+     "Descent.Portability.IIDBinExperiment.assigned_confidence": [],
+     "Descent.Portability.IIDBinExperiment.iid_confidence": [],
+     "Descent.Portability.InterleavedMutationMeasurability.interval_expectation_integrable": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Conditionals.link_stieltjes_representation",
+    "Descent.Foundations.continuous_Phi",
+    "Descent.Portability.FiniteBinCalibrationLaw.iid_miss_probability",
+    "Descent.Portability.FiniteBinCalibrationLaw.simultaneous_coverage",
+    "Descent.Portability.FiniteDiscreteMeasure.independent_measure",
+    "Descent.Portability.FiniteDiscreteMeasure.independent_observables",
+    "Descent.Portability.FiniteDiscreteMeasure.integral_observable",
+    "Descent.Portability.FiniteDiscreteMeasure.measure_singleton",
+    "Descent.Portability.FiniteDiscreteMeasure.observable_integrable",
+    "Descent.Portability.FiniteDiscreteMeasure.real_event",
+    "Descent.Portability.IIDBinExperiment.assigned_confidence",
+    "Descent.Portability.IIDBinExperiment.iid_confidence",
+    "Descent.Portability.InterleavedMutationMeasurability.interval_expectation_integrable"
    ]
   },
   {
@@ -306777,6 +307819,7 @@
      "Descent.PopGen._root_.Descent.Foundations.ConditionalMeanDGP.predictionRiskY_eq_irreducible_plus_approxRisk": [],
      "Descent.Portability.AncientPrediction.operator_risk_change": [],
      "Descent.Portability.AncientPrediction.integral_risk_change": [],
+     "Descent.Portability.ArchaicPrediction.arbitrary_ld_additive_optimum": [],
      "Descent.Portability.CompactMeasurementMinimax.prefix_orthonormal": [],
      "Descent.Portability.CompactMeasurementMinimax.prefixSpace_finrank": [],
      "Descent.Portability.CompactMeasurementMinimax.prefix_parseval": [],
@@ -306848,6 +307891,7 @@
     "Descent.PopGen.measureLinearPredictionRisk_transport_decomposition_of_orthogonality",
     "Descent.Portability.AncientPrediction.integral_risk_change",
     "Descent.Portability.AncientPrediction.operator_risk_change",
+    "Descent.Portability.ArchaicPrediction.arbitrary_ld_additive_optimum",
     "Descent.Portability.CompactMeasurementMinimax.adaptive_minimax",
     "Descent.Portability.CompactMeasurementMinimax.prefixSpace_finrank",
     "Descent.Portability.CompactMeasurementMinimax.prefix_orthonormal",
@@ -309763,8 +310807,8 @@
      "∀ index, LipschitzWith K (profiles index",
      "LipschitzWith K limit",
      "0 < K",
-     "0 < count",
-     "0 < α ∧ α < 1"
+     "0 < α ∧ α < 1",
+     "0 < count"
     ],
     "hypotheses_by_theorem": {
      "Descent.Blindness.TrafficInvariantSeparation.lipschitzPressureProfiles_dist_le_of_net": [
@@ -309801,6 +310845,10 @@
      "Descent.Portability.EvolutionaryMeasurementRank.finite_minimal_exact_count": [],
      "Descent.Portability.EvolutionaryMeasurementRank.discounted_exact_budget_iff": [],
      "Descent.Portability.EvolutionaryMeasurementRank.discounted_minimal_exact_count": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.simultaneous_coverage": [
+      "0 < K",
+      "0 < α ∧ α < 1"
+     ],
      "Descent.Portability.FixedBinHoeffdingLaw.radius_tail_value": [
       "0 < K",
       "0 < count",
@@ -309861,6 +310909,7 @@
     "Descent.Portability.EvolutionaryMeasurementRank.finite_exact_budget_iff",
     "Descent.Portability.EvolutionaryMeasurementRank.finite_minimal_exact_count",
     "Descent.Portability.EvolutionaryMeasurementRank.zero_mem_iff_rank",
+    "Descent.Portability.FiniteBinCalibrationLaw.simultaneous_coverage",
     "Descent.Portability.FixedBinHoeffdingLaw.fixed_assignment_confidence",
     "Descent.Portability.FixedBinHoeffdingLaw.fixed_subset_confidence",
     "Descent.Portability.FixedBinHoeffdingLaw.radius_tail_value",
@@ -309935,12 +310984,16 @@
      "0 < K"
     ],
     "hypotheses_by_theorem": {
+     "Descent.Portability.FiniteBinCalibrationLaw.simultaneous_coverage": [
+      "0 < K"
+     ],
      "Descent.Portability.FixedBinHoeffdingLaw.fixed_assignment_confidence": [
       "0 < K"
      ]
     }
    },
    "mentioned_by": [
+    "Descent.Portability.FiniteBinCalibrationLaw.simultaneous_coverage",
     "Descent.Portability.FixedBinHoeffdingLaw.fixed_assignment_confidence"
    ]
   },
@@ -315994,6 +317047,7 @@
    "equations": [],
    "constraints": {
     "hypotheses": [
+     "0 < α ∧ α < 1",
      "(p i",
      "∀ i, (p i",
      "ι → HardyWeinbergModel"
@@ -316005,6 +317059,14 @@
      "Descent.Portability.BalancedHWEInteraction.row_characteristic": [],
      "Descent.Portability.BalancedHWEVanishingLaw.normalized_mean": [],
      "Descent.Portability.BalancedHWEVanishingLaw.normalized_second_moment": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.iid_miss_probability": [
+      "0 < α ∧ α < 1"
+     ],
+     "Descent.Portability.FiniteBinCalibrationLaw.simultaneous_coverage": [
+      "0 < α ∧ α < 1"
+     ],
+     "Descent.Portability.FiniteDiscreteMeasure.independent_measure": [],
+     "Descent.Portability.FiniteDiscreteMeasure.independent_observables": [],
      "Descent.Portability.FiniteIndependentMoments.coordinate_expectation": [],
      "Descent.Portability.FiniteIndependentMoments.cross_expectation_zero": [
       "(p i"
@@ -316034,6 +317096,13 @@
      "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass": [
       "ι → HardyWeinbergModel"
      ],
+     "Descent.Portability.IIDBinExperiment.expectation_assignments": [],
+     "Descent.Portability.IIDBinExperiment.assigned_confidence": [
+      "0 < α ∧ α < 1"
+     ],
+     "Descent.Portability.IIDBinExperiment.iid_confidence": [
+      "0 < α ∧ α < 1"
+     ],
      "Descent.Portability.IndependentShiftOperator.independent_sum_succ": [],
      "Descent.Portability.IndependentShiftOperator.shift_pow_sample": [],
      "Descent.Portability.StoppedGenotypeRenewal.genomeCountMass_zero": [],
@@ -316051,6 +317120,10 @@
     "Descent.Portability.BalancedHWEInteraction.row_characteristic",
     "Descent.Portability.BalancedHWEVanishingLaw.normalized_mean",
     "Descent.Portability.BalancedHWEVanishingLaw.normalized_second_moment",
+    "Descent.Portability.FiniteBinCalibrationLaw.iid_miss_probability",
+    "Descent.Portability.FiniteBinCalibrationLaw.simultaneous_coverage",
+    "Descent.Portability.FiniteDiscreteMeasure.independent_measure",
+    "Descent.Portability.FiniteDiscreteMeasure.independent_observables",
     "Descent.Portability.FiniteIndependentMoments.coordinate_expectation",
     "Descent.Portability.FiniteIndependentMoments.cross_expectation_zero",
     "Descent.Portability.FiniteIndependentMoments.independent_sum_mean",
@@ -316066,6 +317139,9 @@
     "Descent.Portability.HWEInteractionLaw.expectation_independent_product",
     "Descent.Portability.HWEInteractionLaw.interaction_mean_zero",
     "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass",
+    "Descent.Portability.IIDBinExperiment.assigned_confidence",
+    "Descent.Portability.IIDBinExperiment.expectation_assignments",
+    "Descent.Portability.IIDBinExperiment.iid_confidence",
     "Descent.Portability.IndependentShiftOperator.independent_sum_succ",
     "Descent.Portability.IndependentShiftOperator.shift_pow_sample",
     "Descent.Portability.StoppedGenotypeRenewal.genomeCountMass_zero",
@@ -317092,6 +318168,412 @@
     "Descent.Portability.taggedDriftR2RatioCorrected_ge_retention",
     "Descent.Portability.taggedDriftR2RatioCorrected_le_sharedLD",
     "Descent.Portability.taggedDriftR2RatioCorrected_sandwich"
+   ]
+  },
+  {
+   "name": "Descent.Portability.IIDBinExperiment.labelLaw",
+   "decl_name": "labelLaw",
+   "short": "labelLaw",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/IIDBinExperiment.lean",
+   "line": 26,
+   "signature": "(η : ℝ) (hη : 0 ≤ η ∧ η ≤ 1) : FiniteReportLaw Bool where mass b",
+   "args": [
+    {
+     "names": [
+      "η"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "hη"
+     ],
+     "type": "0 ≤ η ∧ η ≤ 1",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "FiniteReportLaw Bool where mass b",
+   "body": " if b then η else 1 - η\n  mass_nonneg b := by cases b <;> simp <;> linarith [hη.1, hη.2]\n  mass_sum := by simp",
+   "docstring": "Binary outcomes with their original event probability.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.IIDBinExperiment",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "probability",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0,
+    "hypotheses": [
+     "0 ≤ η ∧ η ≤ 1"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.IIDBinExperiment.label_mean": [
+      "0 ≤ η ∧ η ≤ 1"
+     ],
+     "Descent.Portability.TrainingNoiseAccuracy.conditionalExpectation_eq_labelLaw": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.IIDBinExperiment.label_mean",
+    "Descent.Portability.TrainingNoiseAccuracy.conditionalExpectation_eq_labelLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.IIDBinExperiment.label",
+   "decl_name": "label",
+   "short": "label",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Descent/Portability/IIDBinExperiment.lean",
+   "line": 31,
+   "signature": "(b : Bool) : ℝ",
+   "args": [
+    {
+     "names": [
+      "b"
+     ],
+     "type": "Bool",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ",
+   "body": " if b then 1 else 0",
+   "docstring": "",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.IIDBinExperiment",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Blindness.isCompleteCatalogue_kernel": [],
+     "Descent.Blindness.IsCompleteCatalogue.separates": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.simultaneous_coverage": [],
+     "Descent.Portability.IIDBinExperiment.label_mean": [],
+     "Descent.Portability.IIDBinExperiment.assigned_confidence": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Blindness.IsCompleteCatalogue.separates",
+    "Descent.Blindness.isCompleteCatalogue_kernel",
+    "Descent.Portability.FiniteBinCalibrationLaw.simultaneous_coverage",
+    "Descent.Portability.IIDBinExperiment.assigned_confidence",
+    "Descent.Portability.IIDBinExperiment.label_mean"
+   ]
+  },
+  {
+   "name": "Descent.Portability.IIDBinExperiment.rowLaw",
+   "decl_name": "rowLaw",
+   "short": "rowLaw",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/IIDBinExperiment.lean",
+   "line": 38,
+   "signature": "{K : ℕ} (π : FiniteReportLaw (Fin K)) (η : Fin K → ℝ) (hη : ∀ j, 0 ≤ η j ∧ η j ≤ 1) : FiniteReportLaw (Fin K × Bool) where mass x",
+   "args": [
+    {
+     "names": [
+      "K"
+     ],
+     "type": "ℕ",
+     "binder": "{}",
+     "implicit": true
+    },
+    {
+     "names": [
+      "π"
+     ],
+     "type": "FiniteReportLaw (Fin K)",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "η"
+     ],
+     "type": "Fin K → ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "hη"
+     ],
+     "type": "∀ j, 0 ≤ η j ∧ η j ≤ 1",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "FiniteReportLaw (Fin K × Bool) where mass x",
+   "body": " π.mass x.1 * (labelLaw (η x.1) (hη x.1)).mass x.2\n  mass_nonneg x := mul_nonneg (π.mass_nonneg _) ((labelLaw _ _).mass_nonneg _)\n  mass_sum := by\n    rw [Fintype.sum_prod_type]\n    simp_rw [← Finset.mul_sum]\n    have hs (j : Fin K) : ∑ b, (labelLaw (η j) (hη j)).mass b = 1 :=\n      (labelLaw (η j) (hη j)).mass_sum\n    simp only [hs, mul_one]\n    exact π.mass_sum",
+   "docstring": "One observation records both its bin and its binary outcome.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.IIDBinExperiment",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "∀ j, 0 ≤ η j ∧ η j ≤ 1"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.BalancedHWECompoundPoisson.finite_intensity_weak_convergence": [],
+     "Descent.Portability.BalancedHWECounterexample.critical_mean": [],
+     "Descent.Portability.BalancedHWECounterexample.critical_second_moment": [],
+     "Descent.Portability.BalancedHWECounterexample.flatten_mass": [],
+     "Descent.Portability.BalancedHWECounterexample.critical_cosine_limit": [],
+     "Descent.Portability.BalancedHWECounterexample.no_gaussian_cosine_limits": [],
+     "Descent.Portability.BalancedHWEFiniteIntensity.finite_intensity_observable_limit": [],
+     "Descent.Portability.BalancedHWEGaussianCharacteristic.gaussian_characteristic_limit": [],
+     "Descent.Portability.BalancedHWEGaussianWeakLimit.normalized_rows_tight": [],
+     "Descent.Portability.BalancedHWEGaussianWeakLimit.normalized_gaussian_weak_limit": [],
+     "Descent.Portability.BalancedHWEInteraction.row_characteristic": [],
+     "Descent.Portability.BalancedHWEJumpOperator.row_euler_series": [],
+     "Descent.Portability.BalancedHWEOperatorLimit.critical_bounded_observable_limit": [],
+     "Descent.Portability.BalancedHWEVanishingLaw.observable_error_bound": [],
+     "Descent.Portability.BalancedHWEVanishingLaw.normalized_mean": [],
+     "Descent.Portability.BalancedHWEVanishingLaw.normalized_second_moment": [],
+     "Descent.Portability.BalancedHWEVanishingLaw.vanishing_observable_limit": [],
+     "Descent.Portability.BalancedHWEVanishingLaw.vanishing_weak_convergence": [],
+     "Descent.Portability.BalancedHWEWeakLimit.critical_weak_convergence": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.row_reconstruction": [],
+     "Descent.Portability.IIDBinExperiment.expectation_assignments": [
+      "∀ j, 0 ≤ η j ∧ η j ≤ 1"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.BalancedHWECompoundPoisson.finite_intensity_weak_convergence",
+    "Descent.Portability.BalancedHWECounterexample.critical_cosine_limit",
+    "Descent.Portability.BalancedHWECounterexample.critical_mean",
+    "Descent.Portability.BalancedHWECounterexample.critical_second_moment",
+    "Descent.Portability.BalancedHWECounterexample.flatten_mass",
+    "Descent.Portability.BalancedHWECounterexample.no_gaussian_cosine_limits",
+    "Descent.Portability.BalancedHWEFiniteIntensity.finite_intensity_observable_limit",
+    "Descent.Portability.BalancedHWEGaussianCharacteristic.gaussian_characteristic_limit",
+    "Descent.Portability.BalancedHWEGaussianWeakLimit.normalized_gaussian_weak_limit",
+    "Descent.Portability.BalancedHWEGaussianWeakLimit.normalized_rows_tight",
+    "Descent.Portability.BalancedHWEInteraction.row_characteristic",
+    "Descent.Portability.BalancedHWEJumpOperator.row_euler_series",
+    "Descent.Portability.BalancedHWEOperatorLimit.critical_bounded_observable_limit",
+    "Descent.Portability.BalancedHWEVanishingLaw.normalized_mean",
+    "Descent.Portability.BalancedHWEVanishingLaw.normalized_second_moment",
+    "Descent.Portability.BalancedHWEVanishingLaw.observable_error_bound",
+    "Descent.Portability.BalancedHWEVanishingLaw.vanishing_observable_limit",
+    "Descent.Portability.BalancedHWEVanishingLaw.vanishing_weak_convergence",
+    "Descent.Portability.BalancedHWEWeakLimit.critical_weak_convergence",
+    "Descent.Portability.FiniteBinCalibrationLaw.row_reconstruction",
+    "Descent.Portability.IIDBinExperiment.expectation_assignments"
+   ]
+  },
+  {
+   "name": "Descent.Portability.IIDBinExperiment.sampleLaw",
+   "decl_name": "sampleLaw",
+   "short": "sampleLaw",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/IIDBinExperiment.lean",
+   "line": 53,
+   "signature": "(π : FiniteReportLaw (Fin K)) (η : Fin K → ℝ) (hη : ∀ j, 0 ≤ η j ∧ η j ≤ 1) : FiniteReportLaw (I → Fin K × Bool)",
+   "args": [
+    {
+     "names": [
+      "π"
+     ],
+     "type": "FiniteReportLaw (Fin K)",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "η"
+     ],
+     "type": "Fin K → ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "hη"
+     ],
+     "type": "∀ j, 0 ≤ η j ∧ η j ≤ 1",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "FiniteReportLaw (I → Fin K × Bool)",
+   "body": "  independentLaw (fun _ ↦ rowLaw π η hη)",
+   "docstring": "The validation rows are independent draws from the same specified joint distribution.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.IIDBinExperiment",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "∀ j, 0 ≤ η j ∧ η j ≤ 1"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.FiniteBinCalibrationLaw.iid_miss_probability": [],
+     "Descent.Portability.IIDBinExperiment.expectation_assignments": [
+      "∀ j, 0 ≤ η j ∧ η j ≤ 1"
+     ],
+     "Descent.Portability.IIDBinExperiment.iid_confidence": [
+      "∀ j, 0 ≤ η j ∧ η j ≤ 1"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.FiniteBinCalibrationLaw.iid_miss_probability",
+    "Descent.Portability.IIDBinExperiment.expectation_assignments",
+    "Descent.Portability.IIDBinExperiment.iid_confidence"
+   ]
+  },
+  {
+   "name": "Descent.Portability.IIDBinExperiment.assignedLaw",
+   "decl_name": "assignedLaw",
+   "short": "assignedLaw",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/IIDBinExperiment.lean",
+   "line": 58,
+   "signature": "(assignment : I → Fin K) (η : Fin K → ℝ) (hη : ∀ j, 0 ≤ η j ∧ η j ≤ 1) : FiniteReportLaw (I → Bool)",
+   "args": [
+    {
+     "names": [
+      "assignment"
+     ],
+     "type": "I → Fin K",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "η"
+     ],
+     "type": "Fin K → ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "hη"
+     ],
+     "type": "∀ j, 0 ≤ η j ∧ η j ≤ 1",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "FiniteReportLaw (I → Bool)",
+   "body": "  independentLaw (fun i ↦ labelLaw (η (assignment i)) (hη (assignment i)))",
+   "docstring": "The conditional labels for a fixed assignment form an actual product experiment.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.IIDBinExperiment",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "∀ j, 0 ≤ η j ∧ η j ≤ 1"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.IIDBinExperiment.expectation_assignments": [
+      "∀ j, 0 ≤ η j ∧ η j ≤ 1"
+     ],
+     "Descent.Portability.IIDBinExperiment.assigned_confidence": [
+      "∀ j, 0 ≤ η j ∧ η j ≤ 1"
+     ],
+     "Descent.Portability.IIDBinExperiment.iid_confidence": [
+      "∀ j, 0 ≤ η j ∧ η j ≤ 1"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.IIDBinExperiment.assigned_confidence",
+    "Descent.Portability.IIDBinExperiment.expectation_assignments",
+    "Descent.Portability.IIDBinExperiment.iid_confidence"
+   ]
+  },
+  {
+   "name": "Descent.Portability.IIDBinExperiment.Miss",
+   "decl_name": "Miss",
+   "short": "Miss",
+   "kind": "def",
+   "noncomputable": false,
+   "file": "Descent/Portability/IIDBinExperiment.lean",
+   "line": 78,
+   "signature": "(assignment : I → Fin K) (η : Fin K → ℝ) (α : ℝ) (outcomes : I → Bool) : Prop",
+   "args": [
+    {
+     "names": [
+      "assignment"
+     ],
+     "type": "I → Fin K",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "η"
+     ],
+     "type": "Fin K → ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "α"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "outcomes"
+     ],
+     "type": "I → Bool",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "Prop",
+   "body": "  ∃ j : Fin K, 0 < (binRows assignment j).card ∧\n    radius K (binRows assignment j).card α <\n      |(∑ i ∈ binRows assignment j, label (outcomes i)) / (binRows assignment j).card - η j|",
+   "docstring": "Failure means at least one nonempty bin misses its stated confidence radius.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.IIDBinExperiment",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "0 < α ∧ α < 1",
+     "∀ j, 0 ≤ η j ∧ η j ≤ 1"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.FiniteBinCalibrationLaw.iid_miss_probability": [
+      "0 < α ∧ α < 1"
+     ],
+     "Descent.Portability.FiniteBinCalibrationLaw.simultaneous_coverage": [
+      "0 < α ∧ α < 1"
+     ],
+     "Descent.Portability.IIDBinExperiment.assigned_confidence": [
+      "∀ j, 0 ≤ η j ∧ η j ≤ 1",
+      "0 < α ∧ α < 1"
+     ],
+     "Descent.Portability.IIDBinExperiment.iid_confidence": [
+      "∀ j, 0 ≤ η j ∧ η j ≤ 1",
+      "0 < α ∧ α < 1"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.FiniteBinCalibrationLaw.iid_miss_probability",
+    "Descent.Portability.FiniteBinCalibrationLaw.simultaneous_coverage",
+    "Descent.Portability.IIDBinExperiment.assigned_confidence",
+    "Descent.Portability.IIDBinExperiment.iid_confidence"
    ]
   },
   {
@@ -319845,6 +321327,7 @@
      "Descent.PopGen._root_.Descent.Foundations.ConditionalMeanDGP.predictionRiskY_eq_irreducible_plus_approxRisk": [],
      "Descent.Portability.AncientPrediction.operator_risk_change": [],
      "Descent.Portability.AncientPrediction.integral_risk_change": [],
+     "Descent.Portability.ArchaicPrediction.arbitrary_ld_additive_optimum": [],
      "Descent.Portability.CompactMeasurementMinimax.prefix_orthonormal": [],
      "Descent.Portability.CompactMeasurementMinimax.prefixSpace_finrank": [],
      "Descent.Portability.CompactMeasurementMinimax.prefix_parseval": [],
@@ -319903,6 +321386,7 @@
     "Descent.PopGen.measureLinearPredictionRisk_transport_decomposition_of_orthogonality",
     "Descent.Portability.AncientPrediction.integral_risk_change",
     "Descent.Portability.AncientPrediction.operator_risk_change",
+    "Descent.Portability.ArchaicPrediction.arbitrary_ld_additive_optimum",
     "Descent.Portability.CompactMeasurementMinimax.adaptive_minimax",
     "Descent.Portability.CompactMeasurementMinimax.prefixSpace_finrank",
     "Descent.Portability.CompactMeasurementMinimax.prefix_orthonormal",
@@ -335256,6 +336740,7 @@
      "∀ v : F, weightedMean w (fun ω => ⟪v, ε ω⟫",
      "∀ v : F, weightedMean w (fun ω => ⟪v, ε ω⟫ ^ 2",
      "∑ h, w h = 1",
+     "IsUnit (regressionGram w X",
      "∀ h, 0 ≤ w h",
      "∑ x, w x = 1",
      "∀ x, 0 ≤ w x",
@@ -335269,10 +336754,23 @@
       "∀ v : F, weightedMean w (fun ω => ⟪v, ε ω⟫",
       "∀ v : F, weightedMean w (fun ω => ⟪v, ε ω⟫ ^ 2"
      ],
+     "Descent.Portability.ArchaicPrediction.centeredFeatures_mean": [
+      "∑ h, w h = 1"
+     ],
+     "Descent.Portability.ArchaicPrediction.response_anchor_expansion": [],
+     "Descent.Portability.ArchaicPrediction.export_residual_orthogonal": [
+      "IsUnit (regressionGram w X"
+     ],
+     "Descent.Portability.ArchaicPrediction.arbitrary_ld_additive_optimum": [
+      "∀ h, 0 ≤ w h",
+      "IsUnit (regressionGram w X"
+     ],
+     "Descent.Portability.ArchaicPrediction.arbitrary_ld_export_formula": [],
      "Descent.Portability.ArchaicPrediction.weightedMean_add": [],
      "Descent.Portability.ArchaicPrediction.weightedMean_const": [
       "∑ h, w h = 1"
      ],
+     "Descent.Portability.ArchaicPrediction.weightedMean_sub": [],
      "Descent.Portability.ArchaicPrediction.weightedMean_sum": [],
      "Descent.Portability.ArchaicPrediction.weightedMean_scale": [],
      "Descent.Portability.ArchaicPrediction.response_specific_mean": [],
@@ -335323,20 +336821,26 @@
     }
    },
    "mentioned_by": [
+    "Descent.Portability.ArchaicPrediction.arbitrary_ld_additive_optimum",
+    "Descent.Portability.ArchaicPrediction.arbitrary_ld_export_formula",
     "Descent.Portability.ArchaicPrediction.best_constant_risk",
+    "Descent.Portability.ArchaicPrediction.centeredFeatures_mean",
     "Descent.Portability.ArchaicPrediction.effective_resistance_variance",
+    "Descent.Portability.ArchaicPrediction.export_residual_orthogonal",
     "Descent.Portability.ArchaicPrediction.four_pair_moment_risk_bounds",
     "Descent.Portability.ArchaicPrediction.four_risk_from_parity",
     "Descent.Portability.ArchaicPrediction.graph_contrast_precision",
     "Descent.Portability.ArchaicPrediction.phase_covariance",
     "Descent.Portability.ArchaicPrediction.phase_covariance_nonneg",
     "Descent.Portability.ArchaicPrediction.phase_moment_abs_le_one",
+    "Descent.Portability.ArchaicPrediction.response_anchor_expansion",
     "Descent.Portability.ArchaicPrediction.response_covariance",
     "Descent.Portability.ArchaicPrediction.response_specific_mean",
     "Descent.Portability.ArchaicPrediction.variance_as_second_moment",
     "Descent.Portability.ArchaicPrediction.weightedMean_add",
     "Descent.Portability.ArchaicPrediction.weightedMean_const",
     "Descent.Portability.ArchaicPrediction.weightedMean_scale",
+    "Descent.Portability.ArchaicPrediction.weightedMean_sub",
     "Descent.Portability.ArchaicPrediction.weightedMean_sum",
     "Descent.Portability.ArchaicPrediction.weighted_product_expansion",
     "Descent.Portability.energyWeightedVariance_at_constant",
@@ -377916,12 +379420,14 @@
      "∀ i, 0 ≤ probability i ∧ probability i ≤ 1"
     ],
     "hypotheses_by_theorem": {
+     "Descent.Portability.IIDBinExperiment.label_mean": [],
      "Descent.Portability.TrainingNoiseAccuracy.conditionalExpectation_eq_labelLaw": [
       "∀ i, 0 ≤ probability i ∧ probability i ≤ 1"
      ]
     }
    },
    "mentioned_by": [
+    "Descent.Portability.IIDBinExperiment.label_mean",
     "Descent.Portability.TrainingNoiseAccuracy.conditionalExpectation_eq_labelLaw"
    ]
   },
@@ -383496,6 +385002,8 @@
      "Descent.Portability.FiniteAtomicReportMeasure.integral_finite_report": [],
      "Descent.Portability.FiniteDemographicSampling.history_readout_exact": [],
      "Descent.Portability.FiniteDemographicSampling.history_path_sum_exact": [],
+     "Descent.Portability.FiniteDiscreteMeasure.integral_observable": [],
+     "Descent.Portability.FiniteDiscreteMeasure.real_event": [],
      "Descent.Portability.FiniteHorizonLoss.risk_expansion": [],
      "Descent.Portability.FiniteHorizonLoss.reverse_adjoint": [],
      "Descent.Portability.FiniteIndependentMoments.expectation_const": [],
@@ -383531,6 +385039,10 @@
      "Descent.Portability.HWEInteractionLaw.characteristic_im": [],
      "Descent.Portability.HWEInteractionLaw.interaction_mean_zero": [],
      "Descent.Portability.HWEInteractionLaw.interaction_second_moment": [],
+     "Descent.Portability.IIDBinExperiment.label_mean": [],
+     "Descent.Portability.IIDBinExperiment.expectation_assignments": [],
+     "Descent.Portability.IIDBinExperiment.assigned_confidence": [],
+     "Descent.Portability.IIDBinExperiment.iid_confidence": [],
      "Descent.Portability.IndependentShiftOperator.shift_apply": [],
      "Descent.Portability.IndependentShiftOperator.independent_sum_succ": [],
      "Descent.Portability.IndependentShiftOperator.shift_pow_sample": [],
@@ -383779,6 +385291,8 @@
     "Descent.Portability.FiniteAtomicReportMeasure.integral_finite_report",
     "Descent.Portability.FiniteDemographicSampling.history_path_sum_exact",
     "Descent.Portability.FiniteDemographicSampling.history_readout_exact",
+    "Descent.Portability.FiniteDiscreteMeasure.integral_observable",
+    "Descent.Portability.FiniteDiscreteMeasure.real_event",
     "Descent.Portability.FiniteHorizonLoss.reverse_adjoint",
     "Descent.Portability.FiniteHorizonLoss.risk_expansion",
     "Descent.Portability.FiniteIndependentMoments.coordinate_expectation",
@@ -383843,6 +385357,10 @@
     "Descent.Portability.HWEInteractionLaw.expectation_independent_product",
     "Descent.Portability.HWEInteractionLaw.interaction_mean_zero",
     "Descent.Portability.HWEInteractionLaw.interaction_second_moment",
+    "Descent.Portability.IIDBinExperiment.assigned_confidence",
+    "Descent.Portability.IIDBinExperiment.expectation_assignments",
+    "Descent.Portability.IIDBinExperiment.iid_confidence",
+    "Descent.Portability.IIDBinExperiment.label_mean",
     "Descent.Portability.IndependentShiftOperator.independent_sum_succ",
     "Descent.Portability.IndependentShiftOperator.shift_apply",
     "Descent.Portability.IndependentShiftOperator.shift_pow_sample",
@@ -384777,6 +386295,10 @@
      "Descent.Portability.BalancedHWEInteraction.row_characteristic": [],
      "Descent.Portability.BalancedHWEVanishingLaw.normalized_mean": [],
      "Descent.Portability.BalancedHWEVanishingLaw.normalized_second_moment": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.iid_miss_probability": [],
+     "Descent.Portability.FiniteBinCalibrationLaw.simultaneous_coverage": [],
+     "Descent.Portability.FiniteDiscreteMeasure.independent_measure": [],
+     "Descent.Portability.FiniteDiscreteMeasure.independent_observables": [],
      "Descent.Portability.FiniteIndependentMoments.coordinate_expectation": [],
      "Descent.Portability.FiniteIndependentMoments.cross_expectation_zero": [],
      "Descent.Portability.FiniteIndependentMoments.independent_sum_mean": [],
@@ -384792,6 +386314,9 @@
      "Descent.Portability.HWEInteractionLaw.characteristic_independent_sum": [],
      "Descent.Portability.HWEInteractionLaw.interaction_mean_zero": [],
      "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass": [],
+     "Descent.Portability.IIDBinExperiment.expectation_assignments": [],
+     "Descent.Portability.IIDBinExperiment.assigned_confidence": [],
+     "Descent.Portability.IIDBinExperiment.iid_confidence": [],
      "Descent.Portability.IndependentShiftOperator.independent_sum_succ": [],
      "Descent.Portability.IndependentShiftOperator.shift_pow_sample": [],
      "Descent.Portability.StoppedGenotypeRenewal.genomeCountMass_zero": [],
@@ -384809,6 +386334,10 @@
     "Descent.Portability.BalancedHWEInteraction.row_characteristic",
     "Descent.Portability.BalancedHWEVanishingLaw.normalized_mean",
     "Descent.Portability.BalancedHWEVanishingLaw.normalized_second_moment",
+    "Descent.Portability.FiniteBinCalibrationLaw.iid_miss_probability",
+    "Descent.Portability.FiniteBinCalibrationLaw.simultaneous_coverage",
+    "Descent.Portability.FiniteDiscreteMeasure.independent_measure",
+    "Descent.Portability.FiniteDiscreteMeasure.independent_observables",
     "Descent.Portability.FiniteIndependentMoments.coordinate_expectation",
     "Descent.Portability.FiniteIndependentMoments.cross_expectation_zero",
     "Descent.Portability.FiniteIndependentMoments.independent_sum_mean",
@@ -384824,6 +386353,9 @@
     "Descent.Portability.HWEInteractionLaw.expectation_independent_product",
     "Descent.Portability.HWEInteractionLaw.interaction_mean_zero",
     "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass",
+    "Descent.Portability.IIDBinExperiment.assigned_confidence",
+    "Descent.Portability.IIDBinExperiment.expectation_assignments",
+    "Descent.Portability.IIDBinExperiment.iid_confidence",
     "Descent.Portability.IndependentShiftOperator.independent_sum_succ",
     "Descent.Portability.IndependentShiftOperator.shift_pow_sample",
     "Descent.Portability.StoppedGenotypeRenewal.genomeCountMass_zero",

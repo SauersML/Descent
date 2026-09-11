@@ -254,6 +254,9 @@ import Descent.Portability.CompactMeasurementMinimax
 import Descent.Portability.CompactSpectralIdentification
 import Descent.Portability.CompactSpectralDecay
 import Descent.Portability.InfiniteIdentityMinimax
+import Descent.Portability.FiniteDiscreteMeasure
+import Descent.Portability.IIDBinExperiment
+import Descent.Portability.FiniteBinCalibrationLaw
 assert_below Descent.Program
 
 /-!
