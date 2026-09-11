@@ -6,6 +6,10 @@ import Descent.Portability.ArchitectureEnvironmentRegion
 import Mathlib.Algebra.MvPolynomial.Eval
 import Mathlib.Algebra.MvPolynomial.Rename
 import Mathlib.Data.Sign.Defs
+import Mathlib.Topology.Algebra.MvPolynomial
+import Mathlib.Topology.Algebra.Order.Field
+import Mathlib.Topology.Instances.Real.Lemmas
+import Mathlib.Topology.Order.Compact
 
 assert_below Descent.Decision Descent.Program
 
@@ -66,6 +70,21 @@ experiment is valid for `0 ≤ x < 1` and `w ≥ 0` (`validAt_selectionTree`); i
 accumulation is the quotient of NOTE2 (4) whichever way the decision goes
 (`accumulation_selectionTree_selected`); and its joint graph over those cells is the explicit
 finite union (`reportGraph_selectionTree`).
+
+Sharp bounds without quantifier elimination. When the admissible points with every definedness
+probability positive form a compact set on which the report map is continuous, the attainable
+region is compact (`isCompact_attainableRegion`) and every requested quantity attains its largest
+and smallest attainable values (`exists_attained_bounds_attainableRegion`). The hypothesis sits on
+the constrained set, not on the admissible set, as the note requires: excluding a zero-denominator
+boundary can make the constrained set open. For a compact admissible set inside one sign cell,
+with regular presentations and positive definedness, the report map is a presented quotient with
+nonvanishing denominator, hence continuous, and the bounds are attained
+(`exists_attained_bounds_of_compact_cell`). Worked instance: over the compact box `0 ≤ x ≤ 1/2`,
+`3/2 ≤ w ≤ 2` of the selection experiment, which lies in one cell
+(`selectionBox_subset_signCell`), the attainable selected-type probability lies in `[0, 2/3]` and
+both bounds are attained, at `x = 0, w = 3/2` and at `x = 1/2, w = 2`
+(`selectionRegion_bounds_attained`); the general theorem gives compactness of that region
+(`isCompact_selectionRegion`).
 
 Not formalized: Mathlib's notion of a semialgebraic set, and real quantifier elimination, which
 the note uses to eliminate the parameters from the graph and so describe (8) without them,
@@ -1031,6 +1050,255 @@ theorem reportGraph_selectionTree {J : Type}
     fun pattern hpattern θ hcell ↦ ⟨regularAt_selectionTree pattern hpattern hcell, fun _ _ ↦
       ⟨PolynomialQuotient.denominator_ofPolynomial_ne_zero _ θ,
         PolynomialQuotient.denominator_ofPolynomial_ne_zero _ θ⟩⟩
+
+/-! ### Sharp bounds attained on compact constrained sets -/
+
+/-- A presented quotient is continuous on every set where its denominator does not vanish. -/
+theorem PolynomialQuotient.continuousOn_eval (quotient : PolynomialQuotient σ)
+    (region : Set (σ → ℝ))
+    (hden : ∀ θ ∈ region, MvPolynomial.eval θ quotient.denominator ≠ 0) :
+    ContinuousOn (fun θ ↦ quotient.eval θ) region :=
+  (MvPolynomial.continuous_eval (p := quotient.numerator)).continuousOn.div
+    (MvPolynomial.continuous_eval (p := quotient.denominator)).continuousOn hden
+
+/-- **NOTE2 (8) on a compact constrained set.** If the admissible points at which every
+definedness probability is positive form a compact set on which the report map is continuous, the
+attainable region is compact. The hypothesis is on the constrained set, not on the admissible set:
+excluding a zero-denominator boundary can make the constrained set open. -/
+theorem isCompact_attainableRegion {Parameter J : Type} [TopologicalSpace Parameter]
+    (admissible : Set Parameter) (definedness numerator : J → Parameter → ℝ)
+    (hcompact : IsCompact {θ | θ ∈ admissible ∧ ∀ j, 0 < definedness j θ})
+    (hcontinuous : ContinuousOn (fun θ j ↦ numerator j θ / definedness j θ)
+      {θ | θ ∈ admissible ∧ ∀ j, 0 < definedness j θ}) :
+    IsCompact (attainableRegion admissible definedness numerator) := by
+  rw [attainableRegion_eq_image]
+  exact hcompact.image_of_continuousOn hcontinuous
+
+/-- **Sharp bounds are attained.** Under the same hypotheses, when some admissible point has every
+definedness probability positive, every requested quantity attains both its largest and its
+smallest attainable value. -/
+theorem exists_attained_bounds_attainableRegion {Parameter J : Type} [TopologicalSpace Parameter]
+    (admissible : Set Parameter) (definedness numerator : J → Parameter → ℝ)
+    (hcompact : IsCompact {θ | θ ∈ admissible ∧ ∀ j, 0 < definedness j θ})
+    (hcontinuous : ContinuousOn (fun θ j ↦ numerator j θ / definedness j θ)
+      {θ | θ ∈ admissible ∧ ∀ j, 0 < definedness j θ})
+    (hnonempty : {θ | θ ∈ admissible ∧ ∀ j, 0 < definedness j θ}.Nonempty) (j : J) :
+    (∃ report ∈ attainableRegion admissible definedness numerator,
+        ∀ other ∈ attainableRegion admissible definedness numerator, other j ≤ report j) ∧
+      ∃ report ∈ attainableRegion admissible definedness numerator,
+        ∀ other ∈ attainableRegion admissible definedness numerator, report j ≤ other j := by
+  have hregion := isCompact_attainableRegion admissible definedness numerator hcompact
+    hcontinuous
+  have hne : (attainableRegion admissible definedness numerator).Nonempty := by
+    rw [attainableRegion_eq_image]
+    exact hnonempty.image _
+  obtain ⟨top, htop, hmax⟩ := hregion.exists_isMaxOn hne (continuous_apply j).continuousOn
+  obtain ⟨bottom, hbottom, hmin⟩ := hregion.exists_isMinOn hne (continuous_apply j).continuousOn
+  exact ⟨⟨top, htop, fun other hother ↦ hmax hother⟩,
+    ⟨bottom, hbottom, fun other hother ↦ hmin hother⟩⟩
+
+/-- **Polynomial reports on a compact cell attain their sharp bounds.** Let a nonempty compact
+admissible set lie in one sign cell, with the presented probabilities and accumulators regular and
+every definedness accumulation positive there. Then the report map is a presented quotient with
+nonvanishing denominator, hence continuous; the attainable region is compact; and every requested
+quantity attains its largest and smallest attainable values. Assumes: `RegularAt pattern θ tree`
+on the admissible set. -/
+theorem exists_attained_bounds_of_compact_cell {J : Type} (guard : Guard → MvPolynomial σ ℝ)
+    (tree : ParametricTree σ Guard Report)
+    (definedness numerator : J → Report → (Guard → SignType) → PolynomialQuotient σ)
+    (pattern : Guard → SignType) (admissible : Set (σ → ℝ))
+    (hsubset : admissible ⊆ signCell guard pattern) (hcompact : IsCompact admissible)
+    (hnonempty : admissible.Nonempty)
+    (hregular : ∀ θ ∈ admissible, ParametricTree.RegularAt pattern θ tree ∧ ∀ j report,
+      MvPolynomial.eval θ (definedness j report pattern).denominator ≠ 0 ∧
+        MvPolynomial.eval θ (numerator j report pattern).denominator ≠ 0)
+    (hpositive : ∀ θ ∈ admissible, ∀ j,
+      0 < ParametricTree.accumulation guard tree (definedness j) θ) (j : J) :
+    IsCompact (attainableRegion admissible
+        (fun quantity ↦ ParametricTree.accumulation guard tree (definedness quantity))
+        (fun quantity ↦ ParametricTree.accumulation guard tree (numerator quantity))) ∧
+      (∃ report ∈ attainableRegion admissible
+          (fun quantity ↦ ParametricTree.accumulation guard tree (definedness quantity))
+          (fun quantity ↦ ParametricTree.accumulation guard tree (numerator quantity)),
+        ∀ other ∈ attainableRegion admissible
+          (fun quantity ↦ ParametricTree.accumulation guard tree (definedness quantity))
+          (fun quantity ↦ ParametricTree.accumulation guard tree (numerator quantity)),
+          other j ≤ report j) ∧
+      ∃ report ∈ attainableRegion admissible
+          (fun quantity ↦ ParametricTree.accumulation guard tree (definedness quantity))
+          (fun quantity ↦ ParametricTree.accumulation guard tree (numerator quantity)),
+        ∀ other ∈ attainableRegion admissible
+          (fun quantity ↦ ParametricTree.accumulation guard tree (definedness quantity))
+          (fun quantity ↦ ParametricTree.accumulation guard tree (numerator quantity)),
+          report j ≤ other j := by
+  have hconstrained : {θ | θ ∈ admissible ∧
+      ∀ quantity, 0 < ParametricTree.accumulation guard tree (definedness quantity) θ} =
+        admissible :=
+    Set.ext fun θ ↦ ⟨fun hθ ↦ hθ.1, fun hθ ↦ ⟨hθ, hpositive θ hθ⟩⟩
+  have hcontinuous : ContinuousOn
+      (fun θ quantity ↦ ParametricTree.accumulation guard tree (numerator quantity) θ /
+        ParametricTree.accumulation guard tree (definedness quantity) θ) admissible := by
+    refine continuousOn_pi.mpr fun quantity ↦ ?_
+    have hmean : ∀ θ ∈ admissible,
+        ParametricTree.accumulation guard tree (numerator quantity) θ /
+            ParametricTree.accumulation guard tree (definedness quantity) θ =
+          ((ParametricTree.accumulationQuotient tree (numerator quantity) pattern).div
+            (ParametricTree.accumulationQuotient tree (definedness quantity) pattern)).eval θ ∧
+        MvPolynomial.eval θ ((ParametricTree.accumulationQuotient tree (numerator quantity)
+          pattern).div (ParametricTree.accumulationQuotient tree (definedness quantity)
+            pattern)).denominator ≠ 0 :=
+      fun θ hθ ↦ ParametricTree.conditionalMean_eq_eval_div guard pattern (hsubset hθ) tree
+        (definedness quantity) (numerator quantity) (hregular θ hθ).1
+        (fun report ↦ ((hregular θ hθ).2 quantity report).1)
+        (fun report ↦ ((hregular θ hθ).2 quantity report).2) (hpositive θ hθ quantity)
+    exact (PolynomialQuotient.continuousOn_eval
+      ((ParametricTree.accumulationQuotient tree (numerator quantity) pattern).div
+        (ParametricTree.accumulationQuotient tree (definedness quantity) pattern))
+      admissible fun θ hθ ↦ (hmean θ hθ).2).congr fun θ hθ ↦ (hmean θ hθ).1
+  rw [← hconstrained] at hcompact hnonempty hcontinuous
+  exact ⟨isCompact_attainableRegion admissible
+      (fun quantity ↦ ParametricTree.accumulation guard tree (definedness quantity))
+      (fun quantity ↦ ParametricTree.accumulation guard tree (numerator quantity))
+      hcompact hcontinuous,
+    exists_attained_bounds_attainableRegion admissible
+      (fun quantity ↦ ParametricTree.accumulation guard tree (definedness quantity))
+      (fun quantity ↦ ParametricTree.accumulation guard tree (numerator quantity))
+      hcompact hcontinuous hnonempty j⟩
+
+/-- At a valid point the trace enumeration of the constant accumulator `1` is `1`: the chain-rule
+weights sum to one. Assumes: `ValidAt guard θ tree`. -/
+theorem ParametricTree.accumulation_const_one (guard : Guard → MvPolynomial σ ℝ) (θ : σ → ℝ)
+    (tree : ParametricTree σ Guard Report) (hvalid : ParametricTree.ValidAt guard θ tree) :
+    ParametricTree.accumulation guard tree (fun _ _ ↦ PolynomialQuotient.ofPolynomial 1) θ =
+      1 := by
+  have h := ParametricTree.backwardValue_experimentAt guard θ tree hvalid fun _ ↦ 1
+  rw [TraceTree.backwardValue_const] at h
+  simp only [ParametricTree.accumulation, PolynomialQuotient.eval_ofPolynomial, map_one]
+  exact h.symm
+
+/-- The compact parameter box `0 ≤ x ≤ 1/2`, `3/2 ≤ w ≤ 2` of the selection experiment. -/
+def selectionBox : Set (Fin 2 → ℝ) :=
+  Set.Icc ![0, 3 / 2] ![1 / 2, 2]
+
+/-- Membership in the box, coordinate by coordinate. -/
+theorem mem_selectionBox_iff (θ : Fin 2 → ℝ) :
+    θ ∈ selectionBox ↔ (0 ≤ θ 0 ∧ θ 0 ≤ 1 / 2) ∧ 3 / 2 ≤ θ 1 ∧ θ 1 ≤ 2 := by
+  simp only [selectionBox, Set.mem_Icc, Pi.le_def, Fin.forall_fin_two, Matrix.cons_val_zero,
+    Matrix.cons_val_one, Matrix.head_cons]
+  constructor
+  · rintro ⟨⟨h0x, h0w⟩, h1x, h1w⟩
+    exact ⟨⟨h0x, h1x⟩, h0w, h1w⟩
+  · rintro ⟨⟨h0x, h1x⟩, h0w, h1w⟩
+    exact ⟨⟨h0x, h0w⟩, h1x, h1w⟩
+
+/-- The box is compact. -/
+theorem isCompact_selectionBox : IsCompact selectionBox :=
+  isCompact_Icc
+
+/-- The lower corner `x = 0`, `w = 3/2` lies in the box. -/
+theorem lowerCorner_mem_selectionBox : (![0, 3 / 2] : Fin 2 → ℝ) ∈ selectionBox :=
+  (mem_selectionBox_iff _).mpr ⟨⟨by norm_num, by norm_num⟩, by norm_num, by norm_num⟩
+
+/-- The upper corner `x = 1/2`, `w = 2` lies in the box. -/
+theorem upperCorner_mem_selectionBox : (![1 / 2, 2] : Fin 2 → ℝ) ∈ selectionBox :=
+  (mem_selectionBox_iff _).mpr ⟨⟨by norm_num, by norm_num⟩, by norm_num, by norm_num⟩
+
+/-- The box lies in one cell: the normalizing total and the advantage contrast are both positive
+there. -/
+theorem selectionBox_subset_signCell : selectionBox ⊆ signCell selectionGuard fun _ ↦ 1 := by
+  intro θ hθ
+  obtain ⟨⟨h0x, h1x⟩, h0w, h1w⟩ := (mem_selectionBox_iff θ).mp hθ
+  refine (mem_signCell_iff selectionGuard _ θ).mpr fun index ↦ sign_pos ?_
+  cases index
+  · simp only [selectionGuard, Bool.false_eq_true, if_false, map_sub, map_add, map_mul, map_one,
+      MvPolynomial.eval_X]
+    nlinarith
+  · simp only [selectionGuard, eq_self_iff_true, if_true, map_sub, map_one, MvPolynomial.eval_X]
+    linarith
+
+/-- The selection experiment is valid at every point of the box. -/
+theorem validAt_of_mem_selectionBox {θ : Fin 2 → ℝ} (hθ : θ ∈ selectionBox) :
+    ParametricTree.ValidAt selectionGuard θ selectionTree := by
+  obtain ⟨⟨h0x, h1x⟩, h0w, h1w⟩ := (mem_selectionBox_iff θ).mp hθ
+  exact validAt_selectionTree h0x (by linarith) (by linarith)
+
+/-- On the box the selected-type probability lies in `[0, 2/3]`. -/
+theorem selectionQuotient_true_mem_Icc {θ : Fin 2 → ℝ} (hθ : θ ∈ selectionBox) :
+    (selectionQuotient true).eval θ ∈ Set.Icc 0 (2 / 3) := by
+  obtain ⟨⟨h0x, h1x⟩, h0w, h1w⟩ := (mem_selectionBox_iff θ).mp hθ
+  have htotal : 0 < θ 0 * θ 1 + 1 - θ 0 := by nlinarith
+  rw [eval_selectionQuotient_true]
+  refine ⟨div_nonneg (by nlinarith) htotal.le, ?_⟩
+  rw [div_le_iff₀ htotal]
+  nlinarith
+
+/-- The lower bound `0` is attained at the lower corner. -/
+theorem eval_selectionQuotient_true_lowerCorner :
+    (selectionQuotient true).eval ![0, 3 / 2] = 0 := by
+  rw [eval_selectionQuotient_true]
+  norm_num
+
+/-- The upper bound `2/3` is attained at the upper corner. -/
+theorem eval_selectionQuotient_true_upperCorner :
+    (selectionQuotient true).eval ![1 / 2, 2] = 2 / 3 := by
+  rw [eval_selectionQuotient_true]
+  norm_num
+
+/-- The attainable region (8) of the selected-type probability of the selection experiment over
+the box: one requested quantity, always defined, whose numerator is the selected-type
+indicator. -/
+def selectionRegion : Set (Unit → ℝ) :=
+  attainableRegion selectionBox
+    (fun _ ↦ ParametricTree.accumulation selectionGuard selectionTree
+      fun _ _ ↦ PolynomialQuotient.ofPolynomial 1)
+    (fun _ ↦ ParametricTree.accumulation selectionGuard selectionTree
+      fun report _ ↦ PolynomialQuotient.ofPolynomial (if report.1 then 1 else 0))
+
+/-- The selected-type probability at any point of the box is an attainable report. -/
+theorem selectionQuotient_true_mem_selectionRegion {θ : Fin 2 → ℝ} (hθ : θ ∈ selectionBox) :
+    (fun _ ↦ (selectionQuotient true).eval θ) ∈ selectionRegion := by
+  refine ⟨θ, hθ, fun _ ↦ ?_⟩
+  dsimp only
+  rw [ParametricTree.accumulation_const_one selectionGuard θ selectionTree
+    (validAt_of_mem_selectionBox hθ), accumulation_selectionTree_selected,
+    eval_selectionQuotient_true]
+  exact ⟨one_pos, one_mul _⟩
+
+/-- **A worked instance of attained sharp bounds.** Over the compact box the attainable
+selected-type probability lies in `[0, 2/3]`, and both bounds are attained: `0` at `x = 0`,
+`w = 3/2`, and `2/3` at `x = 1/2`, `w = 2`. -/
+theorem selectionRegion_bounds_attained :
+    (∀ report ∈ selectionRegion, report () ∈ Set.Icc 0 (2 / 3)) ∧
+      (fun _ ↦ 0) ∈ selectionRegion ∧ (fun _ ↦ 2 / 3) ∈ selectionRegion := by
+  refine ⟨?_, ?_, ?_⟩
+  · rintro report ⟨θ, hθ, hreport⟩
+    obtain ⟨_, hequation⟩ := hreport ()
+    dsimp only at hequation
+    rw [ParametricTree.accumulation_const_one selectionGuard θ selectionTree
+      (validAt_of_mem_selectionBox hθ), one_mul, accumulation_selectionTree_selected,
+      ← eval_selectionQuotient_true] at hequation
+    rw [hequation]
+    exact selectionQuotient_true_mem_Icc hθ
+  · have h := selectionQuotient_true_mem_selectionRegion lowerCorner_mem_selectionBox
+    rwa [eval_selectionQuotient_true_lowerCorner] at h
+  · have h := selectionQuotient_true_mem_selectionRegion upperCorner_mem_selectionBox
+    rwa [eval_selectionQuotient_true_upperCorner] at h
+
+/-- The general attainment theorem applies to the worked instance: its attainable region is
+compact. -/
+theorem isCompact_selectionRegion : IsCompact selectionRegion :=
+  (exists_attained_bounds_of_compact_cell selectionGuard selectionTree
+    (fun _ _ _ ↦ PolynomialQuotient.ofPolynomial 1)
+    (fun _ report _ ↦ PolynomialQuotient.ofPolynomial (if report.1 then 1 else 0))
+    (fun _ ↦ 1) selectionBox selectionBox_subset_signCell isCompact_selectionBox
+    ⟨_, lowerCorner_mem_selectionBox⟩
+    (fun θ hθ ↦ ⟨regularAt_selectionTree _ rfl (selectionBox_subset_signCell hθ), fun _ _ ↦
+      ⟨PolynomialQuotient.denominator_ofPolynomial_ne_zero _ θ,
+        PolynomialQuotient.denominator_ofPolynomial_ne_zero _ θ⟩⟩)
+    (fun θ hθ _ ↦ by
+      rw [ParametricTree.accumulation_const_one selectionGuard θ selectionTree
+        (validAt_of_mem_selectionBox hθ)]
+      exact one_pos) ()).1
 
 end
 
