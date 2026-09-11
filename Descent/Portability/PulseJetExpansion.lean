@@ -465,6 +465,63 @@ theorem rightMutationPulse_leftFrequency (epsilon : ℝ) (h0 : 0 ≤ epsilon) (h
 
 /-! ## Exact pointwise laws of the pulses on the deme state -/
 
+/-- The recipient deme after a migration pulse is the clamped mixture of the source and the
+recipient haplotype vectors. -/
+theorem migrationPulse_recipient {D : ℕ} (source recipient : Fin D) (tau : ℝ)
+    (state : DemeHaplotypeState D) :
+    migrationPulse source recipient tau state recipient =
+      mixture (pulseFraction tau) (pulseFraction_nonneg tau) (pulseFraction_le_one tau)
+        (state source) (state recipient) := by
+  simp [migrationPulse]
+
+/-- A migration pulse leaves every deme other than the recipient unchanged. -/
+theorem migrationPulse_of_ne {D : ℕ} (source recipient index : Fin D) (tau : ℝ)
+    (state : DemeHaplotypeState D) (hindex : index ≠ recipient) :
+    migrationPulse source recipient tau state index = state index := by
+  simp [migrationPulse, hindex]
+
+/-- The target deme after a recombination pulse is the corpus pulse of its haplotype vector. -/
+theorem recombinationPulseAt_target {D : ℕ} (target : Fin D) (tau : ℝ)
+    (state : DemeHaplotypeState D) :
+    recombinationPulseAt target tau state target =
+      recombinationPulse (pulseFraction tau) (pulseFraction_nonneg tau)
+        (pulseFraction_le_one tau) (state target) := by
+  simp [recombinationPulseAt]
+
+/-- A recombination pulse leaves every other deme unchanged. -/
+theorem recombinationPulseAt_of_ne {D : ℕ} (target index : Fin D) (tau : ℝ)
+    (state : DemeHaplotypeState D) (hindex : index ≠ target) :
+    recombinationPulseAt target tau state index = state index := by
+  simp [recombinationPulseAt, hindex]
+
+/-- The target deme after a left-locus mutation pulse is the corpus left-locus flip. -/
+theorem leftMutationPulseAt_target {D : ℕ} (target : Fin D) (tau : ℝ)
+    (state : DemeHaplotypeState D) :
+    leftMutationPulseAt target tau state target =
+      leftMutationPulse (pulseFraction tau) (pulseFraction_nonneg tau)
+        (pulseFraction_le_one tau) (state target) := by
+  simp [leftMutationPulseAt]
+
+/-- A left-locus mutation pulse leaves every other deme unchanged. -/
+theorem leftMutationPulseAt_of_ne {D : ℕ} (target index : Fin D) (tau : ℝ)
+    (state : DemeHaplotypeState D) (hindex : index ≠ target) :
+    leftMutationPulseAt target tau state index = state index := by
+  simp [leftMutationPulseAt, hindex]
+
+/-- The target deme after a right-locus mutation pulse is the corpus right-locus flip. -/
+theorem rightMutationPulseAt_target {D : ℕ} (target : Fin D) (tau : ℝ)
+    (state : DemeHaplotypeState D) :
+    rightMutationPulseAt target tau state target =
+      rightMutationPulse (pulseFraction tau) (pulseFraction_nonneg tau)
+        (pulseFraction_le_one tau) (state target) := by
+  simp [rightMutationPulseAt]
+
+/-- A right-locus mutation pulse leaves every other deme unchanged. -/
+theorem rightMutationPulseAt_of_ne {D : ℕ} (target index : Fin D) (tau : ℝ)
+    (state : DemeHaplotypeState D) (hindex : index ≠ target) :
+    rightMutationPulseAt target tau state index = state index := by
+  simp [rightMutationPulseAt, hindex]
+
 /-- Left marginal frequencies are exactly affine in the migration fraction. -/
 theorem migrationPulse_leftFrequency {D : ℕ} (source recipient index : Fin D) {tau : ℝ}
     (h0 : 0 ≤ tau) (h1 : tau ≤ 1) (state : DemeHaplotypeState D) :
@@ -473,15 +530,11 @@ theorem migrationPulse_leftFrequency {D : ℕ} (source recipient index : Fin D) 
         tau * (if index = recipient then
           (state source).leftFrequency - (state recipient).leftFrequency else 0) := by
   by_cases hindex : index = recipient
-  · have himage : migrationPulse source recipient tau state index =
-        mixture (pulseFraction tau) (pulseFraction_nonneg tau) (pulseFraction_le_one tau)
-          (state source) (state recipient) := by
-      simp [migrationPulse, hindex]
-    rw [himage, mixture_leftFrequency, pulseFraction_eq_self h0 h1, if_pos hindex, hindex]
+  · subst hindex
+    rw [migrationPulse_recipient, mixture_leftFrequency, pulseFraction_eq_self h0 h1,
+      if_pos rfl]
     ring
-  · have himage : migrationPulse source recipient tau state index = state index := by
-      simp [migrationPulse, hindex]
-    rw [himage, if_neg hindex]
+  · rw [migrationPulse_of_ne source recipient index tau state hindex, if_neg hindex]
     ring
 
 /-- Right marginal frequencies are exactly affine in the migration fraction. -/
@@ -492,15 +545,11 @@ theorem migrationPulse_rightFrequency {D : ℕ} (source recipient index : Fin D)
         tau * (if index = recipient then
           (state source).rightFrequency - (state recipient).rightFrequency else 0) := by
   by_cases hindex : index = recipient
-  · have himage : migrationPulse source recipient tau state index =
-        mixture (pulseFraction tau) (pulseFraction_nonneg tau) (pulseFraction_le_one tau)
-          (state source) (state recipient) := by
-      simp [migrationPulse, hindex]
-    rw [himage, mixture_rightFrequency, pulseFraction_eq_self h0 h1, if_pos hindex, hindex]
+  · subst hindex
+    rw [migrationPulse_recipient, mixture_rightFrequency, pulseFraction_eq_self h0 h1,
+      if_pos rfl]
     ring
-  · have himage : migrationPulse source recipient tau state index = state index := by
-      simp [migrationPulse, hindex]
-    rw [himage, if_neg hindex]
+  · rw [migrationPulse_of_ne source recipient index tau state hindex, if_neg hindex]
     ring
 
 /-- The exact quadratic migration law for the linkage determinant, transported to the deme
@@ -516,16 +565,12 @@ theorem migrationPulse_linkage {D : ℕ} (source recipient index : Fin D) {tau :
           ((state source).leftFrequency - (state recipient).leftFrequency) *
             ((state source).rightFrequency - (state recipient).rightFrequency) else 0) := by
   by_cases hindex : index = recipient
-  · have himage : migrationPulse source recipient tau state index =
-        mixture (pulseFraction tau) (pulseFraction_nonneg tau) (pulseFraction_le_one tau)
-          (state source) (state recipient) := by
-      simp [migrationPulse, hindex]
-    rw [himage, mixture_linkage_eq_velocity, pulseFraction_eq_self h0 h1, if_pos hindex,
-      if_pos hindex, hindex]
+  · subst hindex
+    rw [migrationPulse_recipient, mixture_linkage_eq_velocity, pulseFraction_eq_self h0 h1,
+      if_pos rfl, if_pos rfl]
     ring
-  · have himage : migrationPulse source recipient tau state index = state index := by
-      simp [migrationPulse, hindex]
-    rw [himage, if_neg hindex, if_neg hindex]
+  · rw [migrationPulse_of_ne source recipient index tau state hindex, if_neg hindex,
+      if_neg hindex]
     ring
 
 /-- Recombination changes no marginal allele frequency at the left locus. -/
@@ -534,15 +579,10 @@ theorem recombinationPulseAt_leftFrequency {D : ℕ} (target index : Fin D) (tau
     (recombinationPulseAt target tau state index).leftFrequency =
       (state index).leftFrequency + tau * 0 := by
   by_cases hindex : index = target
-  · have himage : recombinationPulseAt target tau state index =
-        recombinationPulse (pulseFraction tau) (pulseFraction_nonneg tau)
-          (pulseFraction_le_one tau) (state target) := by
-      simp [recombinationPulseAt, hindex]
-    rw [himage, recombinationPulse_leftFrequency, hindex]
+  · subst hindex
+    rw [recombinationPulseAt_target, recombinationPulse_leftFrequency]
     ring
-  · have himage : recombinationPulseAt target tau state index = state index := by
-      simp [recombinationPulseAt, hindex]
-    rw [himage]
+  · rw [recombinationPulseAt_of_ne target index tau state hindex]
     ring
 
 /-- Recombination changes no marginal allele frequency at the right locus. -/
@@ -551,15 +591,10 @@ theorem recombinationPulseAt_rightFrequency {D : ℕ} (target index : Fin D) (ta
     (recombinationPulseAt target tau state index).rightFrequency =
       (state index).rightFrequency + tau * 0 := by
   by_cases hindex : index = target
-  · have himage : recombinationPulseAt target tau state index =
-        recombinationPulse (pulseFraction tau) (pulseFraction_nonneg tau)
-          (pulseFraction_le_one tau) (state target) := by
-      simp [recombinationPulseAt, hindex]
-    rw [himage, recombinationPulse_rightFrequency, hindex]
+  · subst hindex
+    rw [recombinationPulseAt_target, recombinationPulse_rightFrequency]
     ring
-  · have himage : recombinationPulseAt target tau state index = state index := by
-      simp [recombinationPulseAt, hindex]
-    rw [himage]
+  · rw [recombinationPulseAt_of_ne target index tau state hindex]
     ring
 
 /-- A recombination pulse retains exactly the complementary fraction of linkage, so the
@@ -571,16 +606,12 @@ theorem recombinationPulseAt_linkage {D : ℕ} (target index : Fin D) {tau : ℝ
       (state index).linkage +
         tau * (if index = target then recombinationLinkageVelocity (state target) else 0) := by
   by_cases hindex : index = target
-  · have himage : recombinationPulseAt target tau state index =
-        recombinationPulse (pulseFraction tau) (pulseFraction_nonneg tau)
-          (pulseFraction_le_one tau) (state target) := by
-      simp [recombinationPulseAt, hindex]
-    rw [himage, recombinationPulse_linkage, pulseFraction_eq_self h0 h1, if_pos hindex, hindex]
+  · subst hindex
+    rw [recombinationPulseAt_target, recombinationPulse_linkage, pulseFraction_eq_self h0 h1,
+      if_pos rfl]
     simp only [recombinationLinkageVelocity]
     ring
-  · have himage : recombinationPulseAt target tau state index = state index := by
-      simp [recombinationPulseAt, hindex]
-    rw [himage, if_neg hindex]
+  · rw [recombinationPulseAt_of_ne target index tau state hindex, if_neg hindex]
     ring
 
 /-- Left-locus mutation moves the left marginal by the centered left contrast. -/
@@ -590,15 +621,10 @@ theorem leftMutationPulseAt_leftFrequency {D : ℕ} (target index : Fin D) {tau 
       (state index).leftFrequency +
         tau * (if index = target then (state target).leftContrast else 0) := by
   by_cases hindex : index = target
-  · have himage : leftMutationPulseAt target tau state index =
-        leftMutationPulse (pulseFraction tau) (pulseFraction_nonneg tau)
-          (pulseFraction_le_one tau) (state target) := by
-      simp [leftMutationPulseAt, hindex]
-    rw [himage, leftMutationPulse_leftFrequency, pulseFraction_eq_self h0 h1, if_pos hindex,
-      hindex]
-  · have himage : leftMutationPulseAt target tau state index = state index := by
-      simp [leftMutationPulseAt, hindex]
-    rw [himage, if_neg hindex]
+  · subst hindex
+    rw [leftMutationPulseAt_target, leftMutationPulse_leftFrequency, pulseFraction_eq_self h0 h1,
+      if_pos rfl]
+  · rw [leftMutationPulseAt_of_ne target index tau state hindex, if_neg hindex]
     ring
 
 /-- Left-locus mutation leaves every right marginal alone. -/
@@ -607,15 +633,10 @@ theorem leftMutationPulseAt_rightFrequency {D : ℕ} (target index : Fin D) (tau
     (leftMutationPulseAt target tau state index).rightFrequency =
       (state index).rightFrequency + tau * 0 := by
   by_cases hindex : index = target
-  · have himage : leftMutationPulseAt target tau state index =
-        leftMutationPulse (pulseFraction tau) (pulseFraction_nonneg tau)
-          (pulseFraction_le_one tau) (state target) := by
-      simp [leftMutationPulseAt, hindex]
-    rw [himage, leftMutationPulse_rightFrequency, hindex]
+  · subst hindex
+    rw [leftMutationPulseAt_target, leftMutationPulse_rightFrequency]
     ring
-  · have himage : leftMutationPulseAt target tau state index = state index := by
-      simp [leftMutationPulseAt, hindex]
-    rw [himage]
+  · rw [leftMutationPulseAt_of_ne target index tau state hindex]
     ring
 
 /-- A single-locus mutation pulse retains exactly `1 - 2 epsilon` of linkage, so the linkage
@@ -626,15 +647,11 @@ theorem leftMutationPulseAt_linkage {D : ℕ} (target index : Fin D) {tau : ℝ}
       (state index).linkage +
         tau * (if index = target then -2 * (state target).linkage else 0) := by
   by_cases hindex : index = target
-  · have himage : leftMutationPulseAt target tau state index =
-        leftMutationPulse (pulseFraction tau) (pulseFraction_nonneg tau)
-          (pulseFraction_le_one tau) (state target) := by
-      simp [leftMutationPulseAt, hindex]
-    rw [himage, leftMutationPulse_linkage, pulseFraction_eq_self h0 h1, if_pos hindex, hindex]
+  · subst hindex
+    rw [leftMutationPulseAt_target, leftMutationPulse_linkage, pulseFraction_eq_self h0 h1,
+      if_pos rfl]
     ring
-  · have himage : leftMutationPulseAt target tau state index = state index := by
-      simp [leftMutationPulseAt, hindex]
-    rw [himage, if_neg hindex]
+  · rw [leftMutationPulseAt_of_ne target index tau state hindex, if_neg hindex]
     ring
 
 /-- Right-locus mutation moves the right marginal by the centered right contrast. -/
@@ -644,15 +661,10 @@ theorem rightMutationPulseAt_rightFrequency {D : ℕ} (target index : Fin D) {ta
       (state index).rightFrequency +
         tau * (if index = target then (state target).rightContrast else 0) := by
   by_cases hindex : index = target
-  · have himage : rightMutationPulseAt target tau state index =
-        rightMutationPulse (pulseFraction tau) (pulseFraction_nonneg tau)
-          (pulseFraction_le_one tau) (state target) := by
-      simp [rightMutationPulseAt, hindex]
-    rw [himage, rightMutationPulse_rightFrequency, pulseFraction_eq_self h0 h1, if_pos hindex,
-      hindex]
-  · have himage : rightMutationPulseAt target tau state index = state index := by
-      simp [rightMutationPulseAt, hindex]
-    rw [himage, if_neg hindex]
+  · subst hindex
+    rw [rightMutationPulseAt_target, rightMutationPulse_rightFrequency, pulseFraction_eq_self h0 h1,
+      if_pos rfl]
+  · rw [rightMutationPulseAt_of_ne target index tau state hindex, if_neg hindex]
     ring
 
 /-- Right-locus mutation leaves every left marginal alone. -/
@@ -661,15 +673,10 @@ theorem rightMutationPulseAt_leftFrequency {D : ℕ} (target index : Fin D) (tau
     (rightMutationPulseAt target tau state index).leftFrequency =
       (state index).leftFrequency + tau * 0 := by
   by_cases hindex : index = target
-  · have himage : rightMutationPulseAt target tau state index =
-        rightMutationPulse (pulseFraction tau) (pulseFraction_nonneg tau)
-          (pulseFraction_le_one tau) (state target) := by
-      simp [rightMutationPulseAt, hindex]
-    rw [himage, rightMutationPulse_leftFrequency, hindex]
+  · subst hindex
+    rw [rightMutationPulseAt_target, rightMutationPulse_leftFrequency]
     ring
-  · have himage : rightMutationPulseAt target tau state index = state index := by
-      simp [rightMutationPulseAt, hindex]
-    rw [himage]
+  · rw [rightMutationPulseAt_of_ne target index tau state hindex]
     ring
 
 /-- The right-locus mutation pulse damps linkage at the same rate as the left-locus one. -/
@@ -679,15 +686,11 @@ theorem rightMutationPulseAt_linkage {D : ℕ} (target index : Fin D) {tau : ℝ
       (state index).linkage +
         tau * (if index = target then -2 * (state target).linkage else 0) := by
   by_cases hindex : index = target
-  · have himage : rightMutationPulseAt target tau state index =
-        rightMutationPulse (pulseFraction tau) (pulseFraction_nonneg tau)
-          (pulseFraction_le_one tau) (state target) := by
-      simp [rightMutationPulseAt, hindex]
-    rw [himage, rightMutationPulse_linkage, pulseFraction_eq_self h0 h1, if_pos hindex, hindex]
+  · subst hindex
+    rw [rightMutationPulseAt_target, rightMutationPulse_linkage, pulseFraction_eq_self h0 h1,
+      if_pos rfl]
     ring
-  · have himage : rightMutationPulseAt target tau state index = state index := by
-      simp [rightMutationPulseAt, hindex]
-    rw [himage, if_neg hindex]
+  · rw [rightMutationPulseAt_of_ne target index tau state hindex, if_neg hindex]
     ring
 
 /-! ## Base expansions of the three deme coordinates under each pulse -/

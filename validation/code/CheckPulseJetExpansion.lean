@@ -43,3 +43,11 @@ open Descent.Portability.PulseJetExpansion
 #print axioms Descent.Portability.PulseJetExpansion.migrationRightHeterozygosity_velocity
 #print axioms Descent.Portability.PulseJetExpansion.recombinationLinkageProduct_velocity
 #print axioms Descent.Portability.PulseJetExpansion.leftMutationLeftHeterozygosity_velocity
+#print axioms migrationPulse_recipient
+#print axioms migrationPulse_of_ne
+#print axioms recombinationPulseAt_target
+#print axioms recombinationPulseAt_of_ne
+#print axioms leftMutationPulseAt_target
+#print axioms leftMutationPulseAt_of_ne
+#print axioms rightMutationPulseAt_target
+#print axioms rightMutationPulseAt_of_ne
