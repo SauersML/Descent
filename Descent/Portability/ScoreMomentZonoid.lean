@@ -68,7 +68,7 @@ theorem mem_contractionBox {z : Ω → ℝ} : z ∈ contractionBox Ω ↔ ∀ ω
   · intro h ω
     exact ⟨(abs_le.mp (h ω)).1, (abs_le.mp (h ω)).2⟩
 
-omit [Fintype Ω] in
+omit [Fintype Ω] [Fintype ι] [DecidableEq ι] in
 /-- The moment map is linear, so the zonoid is a linear image of a cube. -/
 theorem momentMap_isLinear (E : ExpFunctional Ω) (X : Ω → ι → ℝ) :
     IsLinearMap ℝ (momentMap E X) := by
@@ -118,25 +118,27 @@ theorem continuous_eval {α : Type*} [TopologicalSpace α] (E : ExpFunctional Ω
   rw [hfun]
   exact continuous_finset_sum _ fun ω _ ↦ continuous_const.mul (hF ω)
 
+omit [Fintype ι] [DecidableEq ι] in
 /-- The moment map is continuous for a finitely supported law. -/
 theorem continuous_momentMap (E : ExpFunctional Ω) (p : Ω → ℝ)
     (hE : ∀ f : Ω → ℝ, E f = ∑ ω, p ω * f ω) (X : Ω → ι → ℝ) :
     Continuous (momentMap E X) := by
   have h1 : Continuous fun z : Ω → ℝ ↦ E z :=
-    continuous_eval E p hE (fun z ↦ z) fun ω ↦ continuous_apply ω
+    continuous_eval E p hE (fun z : Ω → ℝ ↦ z) fun ω ↦ continuous_apply ω
   have h2 : Continuous fun z : Ω → ℝ ↦ fun i ↦ E (fun ω ↦ X ω i * z ω) :=
     continuous_pi fun i ↦
-      continuous_eval E p hE (fun z ω ↦ X ω i * z ω)
+      continuous_eval E p hE (fun (z : Ω → ℝ) ω ↦ X ω i * z ω)
         fun ω ↦ continuous_const.mul (continuous_apply ω)
   exact h1.prodMk h2
 
+omit [Fintype ι] [DecidableEq ι] in
 /-- **The zonoid is compact.** It is the continuous image of a cube. -/
 theorem isCompact_scoreZonoid (E : ExpFunctional Ω) (p : Ω → ℝ)
     (hE : ∀ f : Ω → ℝ, E f = ∑ ω, p ω * f ω) (X : Ω → ι → ℝ) :
     IsCompact (scoreZonoid E X) :=
   (isCompact_univ_pi fun _ ↦ isCompact_Icc).image (continuous_momentMap E p hE X)
 
-omit [Fintype Ω] in
+omit [Fintype Ω] [Fintype ι] [DecidableEq ι] in
 /-- **The zonoid is convex.** It is the linear image of a product of intervals. -/
 theorem convex_scoreZonoid (E : ExpFunctional Ω) (X : Ω → ι → ℝ) :
     Convex ℝ (scoreZonoid E X) :=
@@ -151,41 +153,53 @@ theorem single_decomposition (b : ι → ℝ) : b = ∑ i, Pi.single i (b i) := 
   rw [Finset.sum_apply]
   simp [Pi.single_apply, Finset.sum_ite_eq]
 
-omit [Fintype Ω] in
+omit [Fintype Ω] [Fintype ι] in
 /-- A coordinate spike is a multiple of the unit spike. -/
-theorem single_eq_smul (i : ι) (c : ℝ) : Pi.single i c = c • Pi.single i (1 : ℝ) := by
+theorem single_eq_smul (i : ι) (c : ℝ) :
+    (Pi.single i c : ι → ℝ) = c • (Pi.single i (1 : ℝ) : ι → ℝ) := by
   funext j
   by_cases h : j = i
   · subst h
     simp
-  · simp [Pi.single_apply, h]
+  · simp [h]
 
 omit [Fintype Ω] in
 /-- **Every continuous linear functional on `ℝ × ℝ^p` is an affine form in the manuscript's
 coordinates `(λ₀, λ)`.** -/
 theorem dual_representation (f : (ℝ × (ι → ℝ)) →L[ℝ] ℝ) (a : ℝ) (b : ι → ℝ) :
     f (a, b) = a * f (1, 0) + ∑ i, b i * f (0, Pi.single i (1 : ℝ)) := by
+  have hadd : ∀ x y : ι → ℝ, f (0, x + y) = f (0, x) + f (0, y) := by
+    intro x y
+    have hp : ((0 : ℝ), x + y) = ((0 : ℝ), x) + ((0 : ℝ), y) := by
+      rw [Prod.mk_add_mk, add_zero]
+    rw [hp, map_add]
+  have hsmul : ∀ (c : ℝ) (x : ι → ℝ), f (0, c • x) = c * f (0, x) := by
+    intro c x
+    have hp : ((0 : ℝ), c • x) = c • ((0 : ℝ), x) := by
+      rw [Prod.smul_mk, smul_zero]
+    rw [hp, map_smul, smul_eq_mul]
+  have hzero : f ((0 : ℝ), (0 : ι → ℝ)) = 0 := by
+    have hp : ((0 : ℝ), (0 : ι → ℝ)) = 0 := rfl
+    rw [hp, map_zero]
+  have hfin : ∀ s : Finset ι, f (0, ∑ i ∈ s, Pi.single i (b i))
+      = ∑ i ∈ s, b i * f (0, Pi.single i (1 : ℝ)) := by
+    intro s
+    induction s using Finset.induction with
+    | empty => simpa using hzero
+    | @insert c s hc ih =>
+        rw [Finset.sum_insert hc, Finset.sum_insert hc, hadd, ih,
+          single_eq_smul c (b c), hsmul]
   have hsplit : (a, b) = (a, (0 : ι → ℝ)) + ((0 : ℝ), b) := by
-    rw [Prod.mk_add_mk]
-    simp
+    rw [Prod.mk_add_mk, add_zero, zero_add]
   have hfirst : f (a, (0 : ι → ℝ)) = a * f (1, 0) := by
-    have hs : (a, (0 : ι → ℝ)) = a • ((1 : ℝ), (0 : ι → ℝ)) := by
-      rw [Prod.smul_mk]
-      simp
-    rw [hs, map_smul]
-    simp
-  have hsecond : f ((0 : ℝ), b) = ∑ i, b i * f (0, Pi.single i (1 : ℝ)) := by
-    have hb : ((0 : ℝ), b) = ∑ i, ((0 : ℝ), Pi.single i (b i)) := by
-      rw [← Prod.mk_sum_sum]
-      simp [← single_decomposition b]
-    rw [hb, map_sum]
-    refine Finset.sum_congr rfl fun i _ ↦ ?_
-    have hsm : ((0 : ℝ), Pi.single i (b i)) = b i • ((0 : ℝ), Pi.single i (1 : ℝ)) := by
-      rw [Prod.smul_mk, single_eq_smul i (b i)]
-      simp
-    rw [hsm, map_smul]
-    simp
-  rw [hsplit, map_add, hfirst, hsecond]
+    have hp : (a, (0 : ι → ℝ)) = a • ((1 : ℝ), (0 : ι → ℝ)) := by
+      rw [Prod.smul_mk, smul_zero, smul_eq_mul, mul_one]
+    rw [hp, map_smul, smul_eq_mul]
+  rw [hsplit, map_add, hfirst]
+  congr 1
+  have hall := hfin Finset.univ
+  rw [← single_decomposition b] at hall
+  exact hall
 
 /-! ## The converse of UPT (3.17) -/
 
@@ -201,15 +215,18 @@ theorem mem_scoreZonoid_of_support (E : ExpFunctional Ω) (p : Ω → ℝ)
     (convex_scoreZonoid E X) (isCompact_scoreZonoid E p hE X).isClosed hnot
   set lam0 : ℝ := f (1, 0) with hlam0
   set lam : ι → ℝ := fun i ↦ f (0, Pi.single i (1 : ℝ)) with hlam
+  have hlamapp : ∀ i, lam i = f (0, Pi.single i (1 : ℝ)) := fun i ↦ rfl
   set zsign : Ω → ℝ := fun ω ↦ if 0 ≤ lam0 + dot lam (X ω) then (1 : ℝ) else -1
     with hzsign
+  have hzapp : ∀ ω, zsign ω
+      = if 0 ≤ lam0 + dot lam (X ω) then (1 : ℝ) else -1 := fun ω ↦ rfl
   have hzmem : zsign ∈ contractionBox Ω := by
     refine mem_contractionBox.mpr fun ω ↦ ?_
-    rw [hzsign]
+    rw [hzapp ω]
     by_cases h : 0 ≤ lam0 + dot lam (X ω) <;> simp [h]
   have hzval : ∀ ω, (lam0 + dot lam (X ω)) * zsign ω = |lam0 + dot lam (X ω)| := by
     intro ω
-    rw [hzsign]
+    rw [hzapp ω]
     by_cases h : 0 ≤ lam0 + dot lam (X ω)
     · rw [if_pos h, abs_of_nonneg h]
       ring
@@ -223,7 +240,8 @@ theorem mem_scoreZonoid_of_support (E : ExpFunctional Ω) (p : Ω → ℝ)
     have hfun : (fun ω ↦ (lam0 + dot lam (X ω)) * zsign ω)
         = fun ω ↦ |lam0 + dot lam (X ω)| := funext hzval
     rw [hfun] at hlin
-    rw [hlin, ← hlam0, ← hlam]
+    rw [hlin]
+    simp only [← hlam0, ← hlamapp]
     have hdot : dot lam (fun i ↦ E (fun ω ↦ X ω i * zsign ω))
         = ∑ i, E (fun ω ↦ X ω i * zsign ω) * lam i := by
       simp only [dot, Descent.Core.innerSum]
@@ -231,7 +249,8 @@ theorem mem_scoreZonoid_of_support (E : ExpFunctional Ω) (p : Ω → ℝ)
     rw [hdot]
     ring
   have hft : f (β, k) = lam0 * β + dot lam k := by
-    rw [dual_representation f β k, ← hlam0, ← hlam]
+    rw [dual_representation f β k]
+    simp only [← hlam0, ← hlamapp]
     have hdot : dot lam k = ∑ i, k i * lam i := by
       simp only [dot, Descent.Core.innerSum]
       exact Finset.sum_congr rfl fun i _ ↦ by ring
