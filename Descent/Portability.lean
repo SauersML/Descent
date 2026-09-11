@@ -324,6 +324,9 @@ import Descent.Portability.ArchaicPrediction.ResponsePanels
 import Descent.Portability.ArchaicPrediction.Survival
 import Descent.Portability.ArchaicPrediction.TranslationAlgebra
 import Descent.Portability.ArchaicPrediction.Transport
+import Descent.Portability.GaussianImageMoments
+import Descent.Portability.HWEJumpMoments
+import Descent.Portability.ConvolutionPolynomialMoments
 assert_below Descent.Program
 
 /-!

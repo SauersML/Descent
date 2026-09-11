@@ -1,7 +1,7 @@
 {
  "_NOT_AUTHORITATIVE": "The committed copy of this file is STALE BY CONSTRUCTION: the Lean corpus moves every few minutes and this is a cache of it. Do not consume a committed copy -- run validation/extract/emit.py in your own worktree immediately before use, and call api.require_fresh(), which raises if the table does not describe the Lean on disk.",
- "source_digest": "sha256:b62a14fea3a916c5b561be6862986b53",
- "source_files": 603,
+ "source_digest": "sha256:5b0841dd03d0dbbb27522ad1f8cdaca6",
+ "source_files": 606,
  "collisions": {},
  "theorems": [
   {
@@ -67842,6 +67842,30 @@
    ]
   },
   {
+   "name": "Descent.Portability.ConvolutionPolynomialMoments.add_power_integrable",
+   "kind": "theorem",
+   "file": "Descent/Portability/ConvolutionPolynomialMoments.lean",
+   "line": 24,
+   "statement": "(μ ν : ProbabilityMeasure ℝ) (hμ : ∀ n : ℕ, Integrable (fun x : ℝ ↦ x ^ n) (μ : Measure ℝ)) (hν : ∀ n : ℕ, Integrable (fun x : ℝ ↦ x ^ n) (ν : Measure ℝ)) (n : ℕ) : Integrable (fun z : ℝ × ℝ ↦ (z.1 + z.2) ^ n) ((μ : Measure ℝ).prod (ν : Measure ℝ))",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Portability.ConvolutionPolynomialMoments.convolution_power_integrable",
+   "kind": "theorem",
+   "file": "Descent/Portability/ConvolutionPolynomialMoments.lean",
+   "line": 35,
+   "statement": "(μ ν : ProbabilityMeasure ℝ) (hμ : ∀ n : ℕ, Integrable (fun x : ℝ ↦ x ^ n) (μ : Measure ℝ)) (hν : ∀ n : ℕ, Integrable (fun x : ℝ ↦ x ^ n) (ν : Measure ℝ)) (n : ℕ) : Integrable (fun x : ℝ ↦ x ^ n) ((μ : Measure ℝ) ∗ (ν : Measure ℝ))",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Portability.ConvolutionPolynomialMoments.convolution_power_integral",
+   "kind": "theorem",
+   "file": "Descent/Portability/ConvolutionPolynomialMoments.lean",
+   "line": 44,
+   "statement": "(μ ν : ProbabilityMeasure ℝ) (hμ : ∀ n : ℕ, Integrable (fun x : ℝ ↦ x ^ n) (μ : Measure ℝ)) (hν : ∀ n : ℕ, Integrable (fun x : ℝ ↦ x ^ n) (ν : Measure ℝ)) (n : ℕ) : (∫ x : ℝ, x ^ n ∂((μ : Measure ℝ) ∗ (ν : Measure ℝ))) = ∑ k ∈ Finset.range (n + 1), (∫ x : ℝ, x ^ k ∂(μ : Measure ℝ)) * (∫ x : ℝ, x ^ (n - k) ∂(ν : Measure ℝ)) * (n.choose k : ℝ)",
+   "mentions": []
+  },
+  {
    "name": "Descent.Portability.dynamicsPooledProjector_apply",
    "kind": "theorem",
    "file": "Descent/Portability/CorrectionBiology.lean",
@@ -75972,6 +75996,78 @@
    ]
   },
   {
+   "name": "Descent.Portability.GaussianImageMoments.amplitude_power",
+   "kind": "theorem",
+   "file": "Descent/Portability/GaussianImageMoments.lean",
+   "line": 23,
+   "statement": "(c x : ℝ) (n : ℕ) : (c * Real.exp (-x)) ^ n = c ^ n * Real.exp (-(n : ℝ) * x)",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Portability.GaussianImageMoments.amplitude_power_integrable",
+   "kind": "theorem",
+   "file": "Descent/Portability/GaussianImageMoments.lean",
+   "line": 30,
+   "statement": "(mean : ℝ) (v : ℝ≥0) (c : ℝ) (n : ℕ) : Integrable (fun x ↦ (c * Real.exp (-x)) ^ n) (gaussianReal mean v)",
+   "mentions": [
+    "mean"
+   ]
+  },
+  {
+   "name": "Descent.Portability.GaussianImageMoments.amplitude_power_integral",
+   "kind": "theorem",
+   "file": "Descent/Portability/GaussianImageMoments.lean",
+   "line": 36,
+   "statement": "(mean : ℝ) (v : ℝ≥0) (c : ℝ) (n : ℕ) : (∫ x, (c * Real.exp (-x)) ^ n ∂gaussianReal mean v) = c ^ n * Real.exp (mean * (-(n : ℝ)) + (v : ℝ) * (n : ℝ) ^ 2 / 2)",
+   "mentions": [
+    "mean"
+   ]
+  },
+  {
+   "name": "Descent.Portability.GaussianImageMoments.image_power_integrable",
+   "kind": "theorem",
+   "file": "Descent/Portability/GaussianImageMoments.lean",
+   "line": 45,
+   "statement": "(mean : ℝ) (v : ℝ≥0) (c : ℝ) (n : ℕ) : Integrable (fun y : ℝ ↦ y ^ n) ((gaussianReal mean v).map (fun x ↦ c * Real.exp (-x)))",
+   "mentions": [
+    "mean"
+   ]
+  },
+  {
+   "name": "Descent.Portability.GaussianImageMoments.image_power_integral",
+   "kind": "theorem",
+   "file": "Descent/Portability/GaussianImageMoments.lean",
+   "line": 52,
+   "statement": "(mean : ℝ) (v : ℝ≥0) (c : ℝ) (n : ℕ) : (∫ y : ℝ, y ^ n ∂((gaussianReal mean v).map (fun x ↦ c * Real.exp (-x)))) = c ^ n * Real.exp (mean * (-(n : ℝ)) + (v : ℝ) * (n : ℝ) ^ 2 / 2)",
+   "mentions": [
+    "mean"
+   ]
+  },
+  {
+   "name": "Descent.Portability.GaussianImageMoments.signed_power_integrable",
+   "kind": "theorem",
+   "file": "Descent/Portability/GaussianImageMoments.lean",
+   "line": 59,
+   "statement": "(mean : ℝ) (v : ℝ≥0) (c : ℝ) (n : ℕ) : Integrable (fun y : ℝ ↦ y ^ n) (pairLaw ⟨gaussianReal mean v, inferInstance⟩ (amplitudeMap c) : Measure ℝ)",
+   "mentions": [
+    "amplitudeMap",
+    "mean",
+    "pairLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.GaussianImageMoments.signed_power_integral",
+   "kind": "theorem",
+   "file": "Descent/Portability/GaussianImageMoments.lean",
+   "line": 68,
+   "statement": "(mean : ℝ) (v : ℝ≥0) (c : ℝ) (n : ℕ) : (∫ y : ℝ, y ^ n ∂(pairLaw ⟨gaussianReal mean v, inferInstance⟩ (amplitudeMap c) : Measure ℝ)) = (c ^ n + (-c) ^ n) / 2 * Real.exp (mean * (-(n : ℝ)) + (v : ℝ) * (n : ℝ) ^ 2 / 2)",
+   "mentions": [
+    "amplitudeMap",
+    "mean",
+    "pairLaw"
+   ]
+  },
+  {
    "name": "Descent.Portability.GaussianInvariantMoments.invariantPower_eval",
    "kind": "theorem",
    "file": "Descent/Portability/GaussianInvariantMoments.lean",
@@ -78176,6 +78272,78 @@
     "independentLaw",
     "interaction",
     "squareBiasedLocus"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWEJumpMoments.jump_power_integrable",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWEJumpMoments.lean",
+   "line": 23,
+   "statement": "(K : ℝ≥0) (c : ℝ) (n : ℕ) : Integrable (fun x : ℝ ↦ x ^ n) (jumpLaw K c : Measure ℝ)",
+   "mentions": [
+    "jumpLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWEJumpMoments.jump_mean",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWEJumpMoments.lean",
+   "line": 28,
+   "statement": "(K : ℝ≥0) (c : ℝ) : (∫ x : ℝ, x ∂(jumpLaw K c : Measure ℝ)) = 0",
+   "mentions": [
+    "jumpLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWEJumpMoments.jump_second",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWEJumpMoments.lean",
+   "line": 33,
+   "statement": "(K : ℝ≥0) (c : ℝ) : (∫ x : ℝ, x ^ 2 ∂(jumpLaw K c : Measure ℝ)) = c ^ 2 * Real.exp (-8 * (K : ℝ))",
+   "mentions": [
+    "jumpLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWEJumpMoments.jump_third",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWEJumpMoments.lean",
+   "line": 42,
+   "statement": "(K : ℝ≥0) (c : ℝ) : (∫ x : ℝ, x ^ 3 ∂(jumpLaw K c : Measure ℝ)) = 0",
+   "mentions": [
+    "jumpLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWEJumpMoments.jump_fourth",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWEJumpMoments.lean",
+   "line": 49,
+   "statement": "(K : ℝ≥0) (c : ℝ) : (∫ x : ℝ, x ^ 4 ∂(jumpLaw K c : Measure ℝ)) = c ^ 4",
+   "mentions": [
+    "jumpLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWEJumpMoments.weighted_jump_second",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWEJumpMoments.lean",
+   "line": 57,
+   "statement": "(K : ℝ≥0) (c : ℝ) (hc : c ≠ 0) : (jumpIntensity K c : ℝ) * (∫ x : ℝ, x ^ 2 ∂(jumpLaw K c : Measure ℝ)) = Real.exp (-4 * (K : ℝ))",
+   "mentions": [
+    "jumpIntensity",
+    "jumpLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWEJumpMoments.weighted_jump_fourth",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWEJumpMoments.lean",
+   "line": 71,
+   "statement": "(K : ℝ≥0) (r : ℝ) (hr : 0 < r) : (jumpIntensity K (1 / Real.sqrt r) : ℝ) * (∫ x : ℝ, x ^ 4 ∂(jumpLaw K (1 / Real.sqrt r) : Measure ℝ)) = Real.exp (4 * (K : ℝ)) / r",
+   "mentions": [
+    "jumpIntensity",
+    "jumpLaw"
    ]
   },
   {
@@ -145871,6 +146039,13 @@
      ],
      "Descent.Portability.AncestralEventLaw.jump_expectation": [],
      "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": [],
+     "Descent.Portability.HWEJumpMoments.jump_power_integrable": [],
+     "Descent.Portability.HWEJumpMoments.jump_mean": [],
+     "Descent.Portability.HWEJumpMoments.jump_second": [],
+     "Descent.Portability.HWEJumpMoments.jump_third": [],
+     "Descent.Portability.HWEJumpMoments.jump_fourth": [],
+     "Descent.Portability.HWEJumpMoments.weighted_jump_second": [],
+     "Descent.Portability.HWEJumpMoments.weighted_jump_fourth": [],
      "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation": [],
      "Descent.Portability.NucleotideMutationLaw.jump_expectation": [],
      "Descent.Portability.NucleotideMutationLaw.jump_uniformMean": [],
@@ -145888,6 +146063,13 @@
     "Descent.Coalescent.mem_support_jumpLaw_of_absorbed",
     "Descent.Portability.AncestralEventLaw.jump_expectation",
     "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw",
+    "Descent.Portability.HWEJumpMoments.jump_fourth",
+    "Descent.Portability.HWEJumpMoments.jump_mean",
+    "Descent.Portability.HWEJumpMoments.jump_power_integrable",
+    "Descent.Portability.HWEJumpMoments.jump_second",
+    "Descent.Portability.HWEJumpMoments.jump_third",
+    "Descent.Portability.HWEJumpMoments.weighted_jump_fourth",
+    "Descent.Portability.HWEJumpMoments.weighted_jump_second",
     "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation",
     "Descent.Portability.NucleotideMutationLaw.branch_history_expectation",
     "Descent.Portability.NucleotideMutationLaw.count_expectation",
@@ -161810,6 +161992,9 @@
      "Descent.Portability.aggregateCalibrationMoment_one_eq_calibrationInTheLarge": [],
      "Descent.Portability.ControlledCoarseGraining.contraction_defect_bound": [],
      "Descent.Portability.ControlledCoarseGraining.exact_closure_of_zero_defect": [],
+     "Descent.Portability.ConvolutionPolynomialMoments.add_power_integrable": [],
+     "Descent.Portability.ConvolutionPolynomialMoments.convolution_power_integrable": [],
+     "Descent.Portability.ConvolutionPolynomialMoments.convolution_power_integral": [],
      "Descent.Portability.dynamicsPooledProjector_mem_uniformCorrectionFamily": [],
      "Descent.Portability.factoredDynamicsCorrection_eq_of_pooledSum_eq": [],
      "Descent.Portability.factoredDynamicsCorrection_add_contrast": [],
@@ -162009,6 +162194,7 @@
      "Descent.Portability.GaussianEvenMoments.gaussian_sqrt_scale": [],
      "Descent.Portability.GaussianExponentialTilt.integral_tilt": [],
      "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral": [],
+     "Descent.Portability.GaussianImageMoments.image_power_integrable": [],
      "Descent.Portability.GaussianInvariantMoments.invariantPower_degree": [],
      "Descent.Portability.GaussianInvariantMoments.invariantPower_integrable": [],
      "Descent.Portability.GaussianInvariantMoments.invariantPower_moment": [],
@@ -163134,6 +163320,9 @@
     "Descent.Portability.ContinuousObservabilityGramian.leading_constant_pos",
     "Descent.Portability.ControlledCoarseGraining.contraction_defect_bound",
     "Descent.Portability.ControlledCoarseGraining.exact_closure_of_zero_defect",
+    "Descent.Portability.ConvolutionPolynomialMoments.add_power_integrable",
+    "Descent.Portability.ConvolutionPolynomialMoments.convolution_power_integrable",
+    "Descent.Portability.ConvolutionPolynomialMoments.convolution_power_integral",
     "Descent.Portability.CrossCoordinateRigidityLaw.closed_field_foreign_quadratic",
     "Descent.Portability.DemeMixture.pooledAUC_diagonal_offDiagonal",
     "Descent.Portability.DemeRiskPredictionPanel.metricDefinedMass_le_one",
@@ -163280,6 +163469,7 @@
     "Descent.Portability.GaussianEvenMoments.gaussian_sqrt_scale",
     "Descent.Portability.GaussianExponentialTilt.integral_tilt",
     "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral",
+    "Descent.Portability.GaussianImageMoments.image_power_integrable",
     "Descent.Portability.GaussianInvariantMoments.covariance_orbit_of_invariant_moments",
     "Descent.Portability.GaussianInvariantMoments.invariantPower_degree",
     "Descent.Portability.GaussianInvariantMoments.invariantPower_integrable",
@@ -175846,6 +176036,9 @@
      "Descent.Portability.aggregateCalibrationMoment_one_eq_calibrationInTheLarge": [],
      "Descent.Portability.ControlledCoarseGraining.contraction_defect_bound": [],
      "Descent.Portability.ControlledCoarseGraining.exact_closure_of_zero_defect": [],
+     "Descent.Portability.ConvolutionPolynomialMoments.add_power_integrable": [],
+     "Descent.Portability.ConvolutionPolynomialMoments.convolution_power_integrable": [],
+     "Descent.Portability.ConvolutionPolynomialMoments.convolution_power_integral": [],
      "Descent.Portability.dynamicsPooledProjector_mem_uniformCorrectionFamily": [],
      "Descent.Portability.factoredDynamicsCorrection_eq_of_pooledSum_eq": [],
      "Descent.Portability.factoredDynamicsCorrection_add_contrast": [],
@@ -176043,6 +176236,7 @@
      "Descent.Portability.GaussianEvenMoments.gaussian_sqrt_scale": [],
      "Descent.Portability.GaussianExponentialTilt.integral_tilt": [],
      "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral": [],
+     "Descent.Portability.GaussianImageMoments.image_power_integrable": [],
      "Descent.Portability.GaussianInvariantMoments.invariantPower_degree": [],
      "Descent.Portability.GaussianInvariantMoments.invariantPower_integrable": [],
      "Descent.Portability.GaussianInvariantMoments.invariantPower_moment": [],
@@ -177148,6 +177342,9 @@
     "Descent.Portability.ContinuousObservabilityGramian.leading_constant_pos",
     "Descent.Portability.ControlledCoarseGraining.contraction_defect_bound",
     "Descent.Portability.ControlledCoarseGraining.exact_closure_of_zero_defect",
+    "Descent.Portability.ConvolutionPolynomialMoments.add_power_integrable",
+    "Descent.Portability.ConvolutionPolynomialMoments.convolution_power_integrable",
+    "Descent.Portability.ConvolutionPolynomialMoments.convolution_power_integral",
     "Descent.Portability.CrossCoordinateRigidityLaw.closed_field_foreign_quadratic",
     "Descent.Portability.DemeMixture.pooledAUC_diagonal_offDiagonal",
     "Descent.Portability.DemeRiskPredictionPanel.metricDefinedMass_le_one",
@@ -177294,6 +177491,7 @@
     "Descent.Portability.GaussianEvenMoments.gaussian_sqrt_scale",
     "Descent.Portability.GaussianExponentialTilt.integral_tilt",
     "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral",
+    "Descent.Portability.GaussianImageMoments.image_power_integrable",
     "Descent.Portability.GaussianInvariantMoments.covariance_orbit_of_invariant_moments",
     "Descent.Portability.GaussianInvariantMoments.invariantPower_degree",
     "Descent.Portability.GaussianInvariantMoments.invariantPower_integrable",
@@ -198494,6 +198692,9 @@
      "Descent.Portability.aggregateCalibrationMoment_one_eq_calibrationInTheLarge": [],
      "Descent.Portability.ControlledCoarseGraining.contraction_defect_bound": [],
      "Descent.Portability.ControlledCoarseGraining.exact_closure_of_zero_defect": [],
+     "Descent.Portability.ConvolutionPolynomialMoments.add_power_integrable": [],
+     "Descent.Portability.ConvolutionPolynomialMoments.convolution_power_integrable": [],
+     "Descent.Portability.ConvolutionPolynomialMoments.convolution_power_integral": [],
      "Descent.Portability.dynamicsPooledProjector_mem_uniformCorrectionFamily": [],
      "Descent.Portability.factoredDynamicsCorrection_eq_of_pooledSum_eq": [],
      "Descent.Portability.factoredDynamicsCorrection_add_contrast": [],
@@ -198688,6 +198889,7 @@
      "Descent.Portability.GaussianEvenMoments.gaussian_sqrt_scale": [],
      "Descent.Portability.GaussianExponentialTilt.integral_tilt": [],
      "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral": [],
+     "Descent.Portability.GaussianImageMoments.image_power_integrable": [],
      "Descent.Portability.GaussianInvariantMoments.invariantPower_degree": [],
      "Descent.Portability.GaussianInvariantMoments.invariantPower_integrable": [],
      "Descent.Portability.GaussianInvariantMoments.invariantPower_moment": [],
@@ -199781,6 +199983,9 @@
     "Descent.Portability.ContinuousObservabilityGramian.leading_constant_pos",
     "Descent.Portability.ControlledCoarseGraining.contraction_defect_bound",
     "Descent.Portability.ControlledCoarseGraining.exact_closure_of_zero_defect",
+    "Descent.Portability.ConvolutionPolynomialMoments.add_power_integrable",
+    "Descent.Portability.ConvolutionPolynomialMoments.convolution_power_integrable",
+    "Descent.Portability.ConvolutionPolynomialMoments.convolution_power_integral",
     "Descent.Portability.CrossCoordinateRigidityLaw.closed_field_foreign_quadratic",
     "Descent.Portability.DemeMixture.pooledAUC_diagonal_offDiagonal",
     "Descent.Portability.DemeRiskPredictionPanel.metricDefinedMass_le_one",
@@ -199927,6 +200132,7 @@
     "Descent.Portability.GaussianEvenMoments.gaussian_sqrt_scale",
     "Descent.Portability.GaussianExponentialTilt.integral_tilt",
     "Descent.Portability.GaussianHermiteLaw.tensorCombination_squared_integral",
+    "Descent.Portability.GaussianImageMoments.image_power_integrable",
     "Descent.Portability.GaussianInvariantMoments.covariance_orbit_of_invariant_moments",
     "Descent.Portability.GaussianInvariantMoments.invariantPower_degree",
     "Descent.Portability.GaussianInvariantMoments.invariantPower_integrable",
@@ -208934,6 +209140,12 @@
      "Descent.Portability.CalibrationLaw.shifted_caseProbability": [],
      "Descent.Portability.CalibrationLaw.shifted_caseProbability_upper": [],
      "Descent.Portability.CalibrationLaw.shifted_controlProbability_upper": [],
+     "Descent.Portability.GaussianImageMoments.amplitude_power_integrable": [],
+     "Descent.Portability.GaussianImageMoments.amplitude_power_integral": [],
+     "Descent.Portability.GaussianImageMoments.image_power_integrable": [],
+     "Descent.Portability.GaussianImageMoments.image_power_integral": [],
+     "Descent.Portability.GaussianImageMoments.signed_power_integrable": [],
+     "Descent.Portability.GaussianImageMoments.signed_power_integral": [],
      "Descent.Portability.MomentAUCNonidentifiability.first_jointMoments": [],
      "Descent.Portability.MomentAUCNonidentifiability.second_jointMoments": [],
      "Descent.Portability.MomentAUCNonidentifiability.prediction_variances_pos": [],
@@ -208976,6 +209188,12 @@
     "Descent.Portability.CalibrationLaw.shifted_caseProbability",
     "Descent.Portability.CalibrationLaw.shifted_caseProbability_upper",
     "Descent.Portability.CalibrationLaw.shifted_controlProbability_upper",
+    "Descent.Portability.GaussianImageMoments.amplitude_power_integrable",
+    "Descent.Portability.GaussianImageMoments.amplitude_power_integral",
+    "Descent.Portability.GaussianImageMoments.image_power_integrable",
+    "Descent.Portability.GaussianImageMoments.image_power_integral",
+    "Descent.Portability.GaussianImageMoments.signed_power_integrable",
+    "Descent.Portability.GaussianImageMoments.signed_power_integral",
     "Descent.Portability.MomentAUCNonidentifiability.first_jointMoments",
     "Descent.Portability.MomentAUCNonidentifiability.prediction_variances_pos",
     "Descent.Portability.MomentAUCNonidentifiability.second_jointMoments",
@@ -264419,6 +264637,13 @@
       "0 < totalRate rates s"
      ],
      "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": [],
+     "Descent.Portability.HWEJumpMoments.jump_power_integrable": [],
+     "Descent.Portability.HWEJumpMoments.jump_mean": [],
+     "Descent.Portability.HWEJumpMoments.jump_second": [],
+     "Descent.Portability.HWEJumpMoments.jump_third": [],
+     "Descent.Portability.HWEJumpMoments.jump_fourth": [],
+     "Descent.Portability.HWEJumpMoments.weighted_jump_second": [],
+     "Descent.Portability.HWEJumpMoments.weighted_jump_fourth": [],
      "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation": [],
      "Descent.Portability.NucleotideMutationLaw.jump_expectation": [],
      "Descent.Portability.NucleotideMutationLaw.jump_uniformMean": [],
@@ -264436,6 +264661,13 @@
     "Descent.Coalescent.mem_support_jumpLaw_of_absorbed",
     "Descent.Portability.AncestralEventLaw.jump_expectation",
     "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw",
+    "Descent.Portability.HWEJumpMoments.jump_fourth",
+    "Descent.Portability.HWEJumpMoments.jump_mean",
+    "Descent.Portability.HWEJumpMoments.jump_power_integrable",
+    "Descent.Portability.HWEJumpMoments.jump_second",
+    "Descent.Portability.HWEJumpMoments.jump_third",
+    "Descent.Portability.HWEJumpMoments.weighted_jump_fourth",
+    "Descent.Portability.HWEJumpMoments.weighted_jump_second",
     "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation",
     "Descent.Portability.NucleotideMutationLaw.branch_history_expectation",
     "Descent.Portability.NucleotideMutationLaw.count_expectation",
@@ -304492,6 +304724,12 @@
      "Descent.Portability.CalibrationLaw.shifted_caseProbability": [],
      "Descent.Portability.CalibrationLaw.shifted_caseProbability_upper": [],
      "Descent.Portability.CalibrationLaw.shifted_controlProbability_upper": [],
+     "Descent.Portability.GaussianImageMoments.amplitude_power_integrable": [],
+     "Descent.Portability.GaussianImageMoments.amplitude_power_integral": [],
+     "Descent.Portability.GaussianImageMoments.image_power_integrable": [],
+     "Descent.Portability.GaussianImageMoments.image_power_integral": [],
+     "Descent.Portability.GaussianImageMoments.signed_power_integrable": [],
+     "Descent.Portability.GaussianImageMoments.signed_power_integral": [],
      "Descent.Portability.MomentAUCNonidentifiability.first_jointMoments": [],
      "Descent.Portability.MomentAUCNonidentifiability.second_jointMoments": [],
      "Descent.Portability.MomentAUCNonidentifiability.prediction_variances_pos": [],
@@ -304534,6 +304772,12 @@
     "Descent.Portability.CalibrationLaw.shifted_caseProbability",
     "Descent.Portability.CalibrationLaw.shifted_caseProbability_upper",
     "Descent.Portability.CalibrationLaw.shifted_controlProbability_upper",
+    "Descent.Portability.GaussianImageMoments.amplitude_power_integrable",
+    "Descent.Portability.GaussianImageMoments.amplitude_power_integral",
+    "Descent.Portability.GaussianImageMoments.image_power_integrable",
+    "Descent.Portability.GaussianImageMoments.image_power_integral",
+    "Descent.Portability.GaussianImageMoments.signed_power_integrable",
+    "Descent.Portability.GaussianImageMoments.signed_power_integral",
     "Descent.Portability.MomentAUCNonidentifiability.first_jointMoments",
     "Descent.Portability.MomentAUCNonidentifiability.prediction_variances_pos",
     "Descent.Portability.MomentAUCNonidentifiability.second_jointMoments",
@@ -321557,6 +321801,8 @@
      "w ≤ 1"
     ],
     "hypotheses_by_theorem": {
+     "Descent.Portability.GaussianImageMoments.signed_power_integrable": [],
+     "Descent.Portability.GaussianImageMoments.signed_power_integral": [],
      "Descent.Portability.HWEAmplitudeWeakLimit.integral_blend": [
       "0 ≤ w",
       "w ≤ 1"
@@ -321569,6 +321815,8 @@
     }
    },
    "mentioned_by": [
+    "Descent.Portability.GaussianImageMoments.signed_power_integrable",
+    "Descent.Portability.GaussianImageMoments.signed_power_integral",
     "Descent.Portability.HWEAmplitudeWeakLimit.integral_blend",
     "Descent.Portability.HWEJumpRepresentation.pairLaw_map",
     "Descent.Portability.SymmetricImageLaw.integral_blend_complex"
@@ -322254,11 +322502,17 @@
      "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": [
       "c ≠ 0"
      ],
+     "Descent.Portability.HWEJumpMoments.weighted_jump_second": [
+      "c ≠ 0"
+     ],
+     "Descent.Portability.HWEJumpMoments.weighted_jump_fourth": [],
      "Descent.Portability.HWENearBalancedTheorem.critical_jump_intensity": []
     }
    },
    "mentioned_by": [
     "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw",
+    "Descent.Portability.HWEJumpMoments.weighted_jump_fourth",
+    "Descent.Portability.HWEJumpMoments.weighted_jump_second",
     "Descent.Portability.HWENearBalancedTheorem.critical_jump_intensity"
    ]
   },
@@ -322314,6 +322568,15 @@
      "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": [
       "c ≠ 0"
      ],
+     "Descent.Portability.HWEJumpMoments.jump_power_integrable": [],
+     "Descent.Portability.HWEJumpMoments.jump_mean": [],
+     "Descent.Portability.HWEJumpMoments.jump_second": [],
+     "Descent.Portability.HWEJumpMoments.jump_third": [],
+     "Descent.Portability.HWEJumpMoments.jump_fourth": [],
+     "Descent.Portability.HWEJumpMoments.weighted_jump_second": [
+      "c ≠ 0"
+     ],
+     "Descent.Portability.HWEJumpMoments.weighted_jump_fourth": [],
      "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation": [],
      "Descent.Portability.NucleotideMutationLaw.jump_expectation": [],
      "Descent.Portability.NucleotideMutationLaw.jump_uniformMean": [],
@@ -322331,6 +322594,13 @@
     "Descent.Coalescent.mem_support_jumpLaw_of_absorbed",
     "Descent.Portability.AncestralEventLaw.jump_expectation",
     "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw",
+    "Descent.Portability.HWEJumpMoments.jump_fourth",
+    "Descent.Portability.HWEJumpMoments.jump_mean",
+    "Descent.Portability.HWEJumpMoments.jump_power_integrable",
+    "Descent.Portability.HWEJumpMoments.jump_second",
+    "Descent.Portability.HWEJumpMoments.jump_third",
+    "Descent.Portability.HWEJumpMoments.weighted_jump_fourth",
+    "Descent.Portability.HWEJumpMoments.weighted_jump_second",
     "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation",
     "Descent.Portability.NucleotideMutationLaw.branch_history_expectation",
     "Descent.Portability.NucleotideMutationLaw.count_expectation",
@@ -325912,6 +326182,8 @@
      "c ≠ 0"
     ],
     "hypotheses_by_theorem": {
+     "Descent.Portability.GaussianImageMoments.signed_power_integrable": [],
+     "Descent.Portability.GaussianImageMoments.signed_power_integral": [],
      "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": [
       "c ≠ 0"
      ],
@@ -325920,6 +326192,8 @@
     }
    },
    "mentioned_by": [
+    "Descent.Portability.GaussianImageMoments.signed_power_integrable",
+    "Descent.Portability.GaussianImageMoments.signed_power_integral",
     "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw",
     "Descent.Portability.HWETiltedKernelLaw.mixture_kernel",
     "Descent.Portability.HWETiltedKernelLaw.signedLognormal_pair"
@@ -337345,6 +337619,12 @@
      "Descent.Portability.CalibrationLaw.shifted_caseProbability": [],
      "Descent.Portability.CalibrationLaw.shifted_caseProbability_upper": [],
      "Descent.Portability.CalibrationLaw.shifted_controlProbability_upper": [],
+     "Descent.Portability.GaussianImageMoments.amplitude_power_integrable": [],
+     "Descent.Portability.GaussianImageMoments.amplitude_power_integral": [],
+     "Descent.Portability.GaussianImageMoments.image_power_integrable": [],
+     "Descent.Portability.GaussianImageMoments.image_power_integral": [],
+     "Descent.Portability.GaussianImageMoments.signed_power_integrable": [],
+     "Descent.Portability.GaussianImageMoments.signed_power_integral": [],
      "Descent.Portability.MomentAUCNonidentifiability.first_jointMoments": [],
      "Descent.Portability.MomentAUCNonidentifiability.second_jointMoments": [],
      "Descent.Portability.MomentAUCNonidentifiability.prediction_variances_pos": [],
@@ -337389,6 +337669,12 @@
     "Descent.Portability.CalibrationLaw.shifted_caseProbability",
     "Descent.Portability.CalibrationLaw.shifted_caseProbability_upper",
     "Descent.Portability.CalibrationLaw.shifted_controlProbability_upper",
+    "Descent.Portability.GaussianImageMoments.amplitude_power_integrable",
+    "Descent.Portability.GaussianImageMoments.amplitude_power_integral",
+    "Descent.Portability.GaussianImageMoments.image_power_integrable",
+    "Descent.Portability.GaussianImageMoments.image_power_integral",
+    "Descent.Portability.GaussianImageMoments.signed_power_integrable",
+    "Descent.Portability.GaussianImageMoments.signed_power_integral",
     "Descent.Portability.MomentAUCNonidentifiability.first_jointMoments",
     "Descent.Portability.MomentAUCNonidentifiability.prediction_variances_pos",
     "Descent.Portability.MomentAUCNonidentifiability.second_jointMoments",
@@ -338718,6 +339004,13 @@
      "Descent.Coalescent.mem_support_chainLaw_succ": [],
      "Descent.Portability.AncestralEventLaw.jump_expectation": [],
      "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": [],
+     "Descent.Portability.HWEJumpMoments.jump_power_integrable": [],
+     "Descent.Portability.HWEJumpMoments.jump_mean": [],
+     "Descent.Portability.HWEJumpMoments.jump_second": [],
+     "Descent.Portability.HWEJumpMoments.jump_third": [],
+     "Descent.Portability.HWEJumpMoments.jump_fourth": [],
+     "Descent.Portability.HWEJumpMoments.weighted_jump_second": [],
+     "Descent.Portability.HWEJumpMoments.weighted_jump_fourth": [],
      "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation": [],
      "Descent.Portability.NucleotideMutationLaw.jump_expectation": [],
      "Descent.Portability.NucleotideMutationLaw.jump_uniformMean": [],
@@ -338735,6 +339028,13 @@
     "Descent.Coalescent.mem_support_jumpLaw_of_absorbed",
     "Descent.Portability.AncestralEventLaw.jump_expectation",
     "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw",
+    "Descent.Portability.HWEJumpMoments.jump_fourth",
+    "Descent.Portability.HWEJumpMoments.jump_mean",
+    "Descent.Portability.HWEJumpMoments.jump_power_integrable",
+    "Descent.Portability.HWEJumpMoments.jump_second",
+    "Descent.Portability.HWEJumpMoments.jump_third",
+    "Descent.Portability.HWEJumpMoments.weighted_jump_fourth",
+    "Descent.Portability.HWEJumpMoments.weighted_jump_second",
     "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation",
     "Descent.Portability.NucleotideMutationLaw.branch_history_expectation",
     "Descent.Portability.NucleotideMutationLaw.count_expectation",
@@ -386624,6 +386924,8 @@
    "constraints": {
     "hypotheses": [],
     "hypotheses_by_theorem": {
+     "Descent.Portability.GaussianImageMoments.signed_power_integrable": [],
+     "Descent.Portability.GaussianImageMoments.signed_power_integral": [],
      "Descent.Portability.HWEJumpRepresentation.pairLaw_map": [],
      "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation": [],
      "Descent.Portability.HWETiltedKernelLaw.signedLognormal_pair": [],
@@ -386633,6 +386935,8 @@
     }
    },
    "mentioned_by": [
+    "Descent.Portability.GaussianImageMoments.signed_power_integrable",
+    "Descent.Portability.GaussianImageMoments.signed_power_integral",
     "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation",
     "Descent.Portability.HWEJumpRepresentation.pairLaw_map",
     "Descent.Portability.HWETiltedKernelLaw.signedLognormal_pair",
