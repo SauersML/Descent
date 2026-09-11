@@ -26,3 +26,5 @@ open Descent.Portability.FrontierCompletionRegion
 #print axioms cellSupport_isGreatest
 #print axioms support_isGreatest_of_isCompact
 #print axioms support_csSup_of_isCompact
+#print axioms conditionalMeans
+#print axioms exists_convex_not_convex_conditionalMeans
