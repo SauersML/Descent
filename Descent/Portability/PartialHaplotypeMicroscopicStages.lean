@@ -156,7 +156,7 @@ theorem weighted_centered_quadratic {ι : Type*} [Fintype ι] (q : ι → ℝ) (
     ring
   rw [Finset.sum_congr rfl fun g _ ↦ hexpand g]
   simp only [Finset.sum_add_distrib, Finset.sum_sub_distrib]
-  rw [ha, hb, hc]
+  rw [hc, ha, hb]
   ring
 
 /-- Averaged over the drawn haplotype, the directional derivative along the resampling
@@ -339,11 +339,13 @@ theorem driftInflow_mem (rates : NeutralRates Deme Locus Allele)
       rates.mutation ℓ b (u.2 ℓ) * x.1 (u.1, Function.update u.2 ℓ b)
       ≤ ∑ ℓ, ∑ a : Allele ℓ, ∑ b : Allele ℓ, rates.mutation ℓ a b := by
     refine Finset.sum_le_sum fun ℓ _ ↦ ?_
-    rw [Finset.sum_comm]
-    exact Finset.single_le_sum (f := fun a ↦ ∑ b, rates.mutation ℓ a b)
-      (fun a _ ↦ Finset.sum_nonneg fun b _ ↦ rates.mutation_nonneg ℓ a b) (Finset.mem_univ _)
-      |>.trans' (Finset.sum_le_sum fun b _ ↦ mul_le_of_le_one_right
-        (rates.mutation_nonneg _ _ _) (abs_le.mp (abs_state_le_one x _)).2)
+    calc ∑ b : Allele ℓ, rates.mutation ℓ b (u.2 ℓ) * x.1 (u.1, Function.update u.2 ℓ b)
+        ≤ ∑ b : Allele ℓ, rates.mutation ℓ b (u.2 ℓ) :=
+          Finset.sum_le_sum fun b _ ↦ mul_le_of_le_one_right (rates.mutation_nonneg _ _ _)
+            (abs_le.mp (abs_state_le_one x _)).2
+      _ ≤ ∑ a : Allele ℓ, ∑ b : Allele ℓ, rates.mutation ℓ a b :=
+          Finset.sum_le_sum fun b _ ↦ Finset.single_le_sum (f := fun c ↦ rates.mutation ℓ b c)
+            (fun c _ ↦ rates.mutation_nonneg ℓ b c) (Finset.mem_univ (u.2 ℓ))
   have hm : ∑ j, rates.migration u.1 j ≤ ∑ i, ∑ j, rates.migration i j :=
     Finset.single_le_sum (f := fun i ↦ ∑ j, rates.migration i j)
       (fun i _ ↦ Finset.sum_nonneg fun j _ ↦ rates.migration_nonneg i j) (Finset.mem_univ u.1)
@@ -412,8 +414,9 @@ theorem abs_driftDirection_le (rates : NeutralRates Deme Locus Allele)
   have hprod : driftOutflow rates u * x.1 u ≤ rateScale rates :=
     (mul_le_of_le_one_right hout.1 hx1).trans hout.2
   have hprod0 : 0 ≤ driftOutflow rates u * x.1 u := mul_nonneg hout.1 hx0
-  rw [driftDirection, eval_driftPolynomial_eq, abs_div, abs_of_pos (by linarith),
-    div_le_iff₀ (by linarith), abs_le]
+  rw [driftDirection, eval_driftPolynomial_eq, abs_div,
+    abs_of_pos (show (0 : ℝ) < rateScale rates by linarith),
+    div_le_iff₀ (show (0 : ℝ) < rateScale rates by linarith), abs_le]
   constructor <;> linarith
 
 /-- A drift move keeps the state in the simplex. -/
@@ -432,8 +435,7 @@ theorem driftMove_mem (rates : NeutralRates Deme Locus Allele) (ε : ℝ) (hε0 
         = x.1 u * (1 - ε * driftOutflow rates u / rateScale rates)
           + ε * driftInflow rates x.1 u / rateScale rates := by
       rw [driftDirection, eval_driftPolynomial_eq]
-      field_simp
-      ring
+      field_simp <;> ring
     simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
     rw [hkey]
     exact add_nonneg (mul_nonneg hx0 hfrac) (div_nonneg (mul_nonneg hε0 hin) (by linarith))
@@ -469,8 +471,7 @@ theorem drift_expansion (rates : NeutralRates Deme Locus Allele) (ε : ℝ) (hε
     rw [directionalDerivative, map_sum, Finset.mul_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun u _ ↦ ?_
     rw [map_mul, driftDirection]
-    field_simp
-    ring
+    field_simp <;> ring
   have hsplit : eval (driftMove rates ε hε0 hε1 x).1 p - eval x.1 p
         - ε / rateScale rates * eval x.1 (∑ u, driftPolynomial rates u * pderiv u p)
       = ε ^ 2 / 2 * secondDirectionalDerivative p x.1 (driftDirection rates x.1)
