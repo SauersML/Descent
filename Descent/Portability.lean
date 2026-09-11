@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.MultinomialDriftStage
 import Descent.Portability.PartialHaplotypeDualSemigroup
 import Descent.Portability.RationalParameterReports
 import Descent.Portability.ContinuousExampleCertificate
