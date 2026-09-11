@@ -35,3 +35,10 @@ open Descent.Portability.AdmixtureChronologyLaw
 #print axioms
   Descent.Portability.AdmixtureChronologyLaw.scaled_normalisedCoupling_timeRescaled
 #print axioms Descent.Portability.AdmixtureChronologyLaw.calendar_rates_not_identified
+#print axioms
+  Descent.Portability.AdmixtureChronologyLaw.hasDerivAt_donorFraction_of_hasDerivAt
+#print axioms
+  Descent.Portability.AdmixtureChronologyLaw.hasDerivAt_admixtureLinkage_of_hasDerivAt
+#print axioms Descent.Portability.AdmixtureChronologyLaw.ae_hasDerivAt_cumulativeRate
+#print axioms Descent.Portability.AdmixtureChronologyLaw.ae_hasDerivAt_donorFraction
+#print axioms Descent.Portability.AdmixtureChronologyLaw.ae_hasDerivAt_admixtureLinkage

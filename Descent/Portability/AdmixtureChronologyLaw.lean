@@ -3,7 +3,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.ChronologyReportLaw
 import Mathlib.Analysis.SpecialFunctions.ExpDeriv
+import Mathlib.MeasureTheory.Integral.DominatedConvergence
 import Mathlib.MeasureTheory.Integral.IntervalIntegral.FundThmCalculus
+import Mathlib.MeasureTheory.Integral.IntervalIntegral.LebesgueDifferentiationThm
 
 assert_below Descent.Decision Descent.Program
 
@@ -19,12 +21,17 @@ system (27). This module builds `M`, `R`, `p` and the integrating-factor solutio
 proves the derivative identities (27), proves that (28) is the unique solution vanishing at
 time zero, and derives the recombination-exposure representation (29) and its scaling (30).
 
-Rates are taken continuous on all of `ℝ` rather than merely on `[0, T]`, and merely integrable
-rates are not formalised; continuity is what the fundamental theorem of calculus needs here
-and it is the weakening NOTE1 anticipates. The pushforward of the immigration-increment
-measure by the remaining recombination exposure, which NOTE1 (29) states measure-theoretically,
-is formalised only in the equivalent integral form on `[0, T]`; the finitely supported
-pushforward is carried by `ExposureLaplaceConstraints` and `FinitePulseExposure`.
+Rates are taken continuous on all of `ℝ` for the everywhere-differentiable form of (27) and for
+the uniqueness of (28). For merely locally integrable rates (27) holds at almost every time
+(`ae_hasDerivAt_donorFraction`, `ae_hasDerivAt_admixtureLinkage`), by Lebesgue's
+differentiation theorem applied to `M`, `R` and the integral in (28); both forms factor through
+the pointwise statements `hasDerivAt_donorFraction_of_hasDerivAt` and
+`hasDerivAt_admixtureLinkage_of_hasDerivAt`. The integral forms of (29) and (30) hold for
+arbitrary rates. Not formalised: uniqueness of (28) among absolutely continuous solutions of (27)
+for integrable rates. The pushforward of the immigration-increment measure by the remaining
+recombination exposure, which NOTE1 (29) states measure-theoretically, is formalised here only in
+the equivalent integral form on `[0, T]`; the finitely supported pushforward is carried by
+`ExposureLaplaceConstraints` and `FinitePulseExposure`.
 
 The module also fixes the ordered-event recursion that NOTE1 Theorem 5 needs. An event is
 either a block of pure recombination with a given exposure or a block of pure migration with a
@@ -131,14 +138,21 @@ theorem donorFraction_pos (m : ℝ → ℝ) (t : ℝ) (hpos : 0 < cumulativeRate
   unfold donorFraction
   linarith
 
+/-- NOTE1 (27), first equation, at a single time. Assumes: at time `t` the cumulative migration
+has derivative `m t`. The donor fraction then grows at the migration rate times the surviving
+recipient fraction. -/
+theorem hasDerivAt_donorFraction_of_hasDerivAt (m : ℝ → ℝ) (t : ℝ)
+    (hM : HasDerivAt (cumulativeRate m) (m t) t) :
+    HasDerivAt (donorFraction m) (m t * (1 - donorFraction m t)) t := by
+  refine (hM.fun_neg.exp.const_sub 1).congr_deriv ?_
+  rw [one_sub_donorFraction]
+  ring
+
 /-- NOTE1 (27), first equation: the donor fraction grows at the migration rate times the
 surviving recipient fraction. -/
 theorem hasDerivAt_donorFraction (m : ℝ → ℝ) (hm : Continuous m) (t : ℝ) :
-    HasDerivAt (donorFraction m) (m t * (1 - donorFraction m t)) t := by
-  have hsub := ((hasDerivAt_cumulativeRate m hm t).fun_neg).exp.const_sub 1
-  refine hsub.congr_deriv ?_
-  rw [one_sub_donorFraction]
-  ring
+    HasDerivAt (donorFraction m) (m t * (1 - donorFraction m t)) t :=
+  hasDerivAt_donorFraction_of_hasDerivAt m t (hasDerivAt_cumulativeRate m hm t)
 
 /-- The integrating-factor solution (28) of the linkage equation: the excess of the doubly
 donor haplotype over the product of the marginal frequencies. -/
@@ -150,24 +164,18 @@ def admixtureLinkage (m r : ℝ → ℝ) (t : ℝ) : ℝ :=
 @[simp] theorem admixtureLinkage_zero (m r : ℝ → ℝ) : admixtureLinkage m r 0 = 0 := by
   simp [admixtureLinkage]
 
-/-- NOTE1 (27), second equation: the linkage decays at the combined migration and
+/-- NOTE1 (27), second equation, at a single time. Assumes: at time `t` the cumulative
+migration, the cumulative recombination and the integral in (28) have derivatives `m t`, `r t`
+and the integrand of (28) at `t`. The linkage then decays at the combined migration and
 recombination rate and is fed at the migration rate times the squared recipient fraction. -/
-theorem hasDerivAt_admixtureLinkage (m r : ℝ → ℝ) (hm : Continuous m) (hr : Continuous r)
-    (t : ℝ) :
+theorem hasDerivAt_admixtureLinkage_of_hasDerivAt (m r : ℝ → ℝ) (t : ℝ)
+    (hM : HasDerivAt (cumulativeRate m) (m t) t) (hR : HasDerivAt (cumulativeRate r) (r t) t)
+    (hG : HasDerivAt
+      (fun v ↦ ∫ s in (0 : ℝ)..v, m s * Real.exp (-cumulativeRate m s + cumulativeRate r s))
+      (m t * Real.exp (-cumulativeRate m t + cumulativeRate r t)) t) :
     HasDerivAt (admixtureLinkage m r)
       (-(m t + r t) * admixtureLinkage m r t + m t * (1 - donorFraction m t) ^ 2) t := by
-  have hMc := continuous_cumulativeRate m hm
-  have hRc := continuous_cumulativeRate r hr
-  have hcont : Continuous
-      (fun s ↦ m s * Real.exp (-cumulativeRate m s + cumulativeRate r s)) :=
-    hm.mul ((hMc.neg.add hRc).rexp)
-  have hG : HasDerivAt
-      (fun v ↦ ∫ s in (0 : ℝ)..v, m s * Real.exp (-cumulativeRate m s + cumulativeRate r s))
-      (m t * Real.exp (-cumulativeRate m t + cumulativeRate r t)) t :=
-    intervalIntegral.integral_hasDerivAt_right (hcont.intervalIntegrable _ _)
-      hcont.aestronglyMeasurable.stronglyMeasurableAtFilter hcont.continuousAt
-  have hW := (((hasDerivAt_cumulativeRate m hm t).fun_neg).fun_sub
-    (hasDerivAt_cumulativeRate r hr t)).exp
+  have hW := (hM.fun_neg.fun_sub hR).exp
   refine (hW.fun_mul hG).congr_deriv ?_
   have h1 : Real.exp (cumulativeRate m t) ≠ 0 := Real.exp_ne_zero _
   have h2 : Real.exp (cumulativeRate r t) ≠ 0 := Real.exp_ne_zero _
@@ -176,6 +184,20 @@ theorem hasDerivAt_admixtureLinkage (m r : ℝ → ℝ) (hm : Continuous m) (hr 
   simp only [Real.exp_sub, Real.exp_add, Real.exp_neg]
   field_simp
   ring
+
+/-- NOTE1 (27), second equation: the linkage decays at the combined migration and
+recombination rate and is fed at the migration rate times the squared recipient fraction. -/
+theorem hasDerivAt_admixtureLinkage (m r : ℝ → ℝ) (hm : Continuous m) (hr : Continuous r)
+    (t : ℝ) :
+    HasDerivAt (admixtureLinkage m r)
+      (-(m t + r t) * admixtureLinkage m r t + m t * (1 - donorFraction m t) ^ 2) t := by
+  have hcont : Continuous
+      (fun s ↦ m s * Real.exp (-cumulativeRate m s + cumulativeRate r s)) :=
+    hm.mul (((continuous_cumulativeRate m hm).neg.add (continuous_cumulativeRate r hr)).rexp)
+  exact hasDerivAt_admixtureLinkage_of_hasDerivAt m r t (hasDerivAt_cumulativeRate m hm t)
+    (hasDerivAt_cumulativeRate r hr t)
+    (intervalIntegral.integral_hasDerivAt_right (hcont.intervalIntegrable _ _)
+      hcont.aestronglyMeasurable.stronglyMeasurableAtFilter hcont.continuousAt)
 
 /-- Assumes: the candidate satisfies (27) at every time and starts uncoupled. Then it is
 exactly the integrating-factor solution (28); the linear scalar equation has no other
@@ -509,6 +531,46 @@ theorem calendar_rates_not_identified (lam : ℝ) :
     simpa using hfast
   · have hfast := scaled_normalisedCoupling_timeRescaled (fun _ ↦ 1) (fun _ ↦ 1) 2 lam 1
     simpa using hfast
+
+open MeasureTheory
+
+/-- Lebesgue's differentiation theorem for a cumulative rate. Assumes: the rate is locally
+integrable. The cumulative total then differentiates back to the rate at almost every time. -/
+theorem ae_hasDerivAt_cumulativeRate (rate : ℝ → ℝ) (hrate : LocallyIntegrable rate volume) :
+    ∀ᵐ t, HasDerivAt (cumulativeRate rate) (rate t) t :=
+  (_root_.LocallyIntegrable.ae_hasDerivAt_integral hrate).mono fun _ hderiv ↦ hderiv 0
+
+/-- NOTE1 (27), first equation, for locally integrable migration rates: at almost every time the
+donor fraction grows at the migration rate times the surviving recipient fraction. -/
+theorem ae_hasDerivAt_donorFraction (m : ℝ → ℝ) (hm : LocallyIntegrable m volume) :
+    ∀ᵐ t, HasDerivAt (donorFraction m) (m t * (1 - donorFraction m t)) t :=
+  (ae_hasDerivAt_cumulativeRate m hm).mono fun t hderiv ↦
+    hasDerivAt_donorFraction_of_hasDerivAt m t hderiv
+
+/-- NOTE1 (27), second equation, for locally integrable rates: at almost every time the linkage
+(28) decays at the combined migration and recombination rate and is fed at the migration rate
+times the squared recipient fraction. -/
+theorem ae_hasDerivAt_admixtureLinkage (m r : ℝ → ℝ) (hm : LocallyIntegrable m volume)
+    (hr : LocallyIntegrable r volume) :
+    ∀ᵐ t, HasDerivAt (admixtureLinkage m r)
+      (-(m t + r t) * admixtureLinkage m r t + m t * (1 - donorFraction m t) ^ 2) t := by
+  have hinterval : ∀ rate : ℝ → ℝ, LocallyIntegrable rate volume →
+      ∀ a b : ℝ, IntervalIntegrable rate volume a b :=
+    fun rate hrate a b ↦ intervalIntegrable_iff.mpr
+      ((hrate.integrableOn_isCompact isCompact_uIcc).mono_set Set.uIoc_subset_uIcc)
+  have hMc : Continuous (cumulativeRate m) :=
+    intervalIntegral.continuous_primitive (hinterval m hm) 0
+  have hRc : Continuous (cumulativeRate r) :=
+    intervalIntegral.continuous_primitive (hinterval r hr) 0
+  have hintegrand : LocallyIntegrable
+      (fun s ↦ m s * Real.exp (-cumulativeRate m s + cumulativeRate r s)) volume := by
+    rw [locallyIntegrable_iff]
+    intro region hregion
+    exact (hm.integrableOn_isCompact hregion).mul_continuousOn
+      (hMc.neg.add hRc).rexp.continuousOn hregion
+  filter_upwards [ae_hasDerivAt_cumulativeRate m hm, ae_hasDerivAt_cumulativeRate r hr,
+    _root_.LocallyIntegrable.ae_hasDerivAt_integral hintegrand] with t hM hR hG
+  exact hasDerivAt_admixtureLinkage_of_hasDerivAt m r t hM hR (hG 0)
 
 end
 
