@@ -159,6 +159,7 @@ theorem exists_projection_coefficients {ι : Type*} [DecidableEq ι] {P : Ω →
         wInner P (r k) (fun ω ↦ f ω - ∑ i ∈ s', a' i * r i ω) := by
       by_cases hb : wInner P (r k) (fun ω ↦ r k ω - ∑ i ∈ s', b' i * r i ω) = 0
       · rw [hb, mul_zero]
+        symm
         have hww : wInner P (fun ω ↦ r k ω - ∑ i ∈ s', b' i * r i ω)
             (fun ω ↦ r k ω - ∑ i ∈ s', b' i * r i ω) = 0 := by
           rw [wInner_sub_left, hb, hhb, sub_zero]
@@ -216,9 +217,10 @@ theorem wInner_comb_eq_gram {m : ℕ} (P : Ω → ℝ) (r : Fin m → Ω → ℝ
     (j : Fin m) :
     wInner P (r j) (fun ω ↦ ∑ i, a i * r i ω) = ∑ i, gramMatrix P r j i * a i := by
   rw [wInner_comm, wInner_weighted_sum_left]
-  exact Finset.sum_congr rfl fun i _ ↦ by
-    rw [gramMatrix, gramMatrix, wInner_comm P (r j) (r i)]
-    ring
+  refine Finset.sum_congr rfl fun i _ ↦ ?_
+  simp only [gramMatrix]
+  rw [wInner_comm P (r j) (r i)]
+  ring
 
 /-- The squared norm of the minimum-norm direction is the Gram quadratic form.
 This is the second half of the manuscript's formula (5.10). -/
