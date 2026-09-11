@@ -473,6 +473,7 @@ theorem envelopeLaw_expected_r2 (N k : ℕ) (hk : k + 1 ≤ N + 1) (m theta : �
       Fintype.card_fin, nsmul_eq_mul]
     push_cast
     field_simp
+    ring
   have hright : ∑ c : Bool, envelopeWeight N k m theta (Sum.inr c)
       * meanSign (N + 1) (envelopeSigns N k (Sum.inr c)) ^ 2 = 1 - theta := by
     have hms : ∀ c : Bool, meanSign (N + 1) (envelopeSigns N k (Sum.inr c)) ^ 2 = 1 := by
@@ -584,33 +585,33 @@ theorem exists_grid_bracket {n : ℕ} (hn : 0 < n) (m : ℝ) (hm : -1 ≤ m) (hm
   have htn : t ≤ ((j + 1 : ℕ) : ℝ) := by
     rw [hT, div_le_iff₀ (by norm_num : (0 : ℝ) < 2)]
     nlinarith
+  have h2t : (m + 1) * ((j + 1 : ℕ) : ℝ) = 2 * t := by
+    rw [hT]
+    ring
   by_cases hcase : ⌊t⌋₊ + 1 ≤ j + 1
   · refine ⟨⌊t⌋₊, hcase, ?_, ?_⟩
-    · rw [gridPoint_le_iff hn]
+    · rw [gridPoint_le_iff hn, h2t]
       have hfl : (⌊t⌋₊ : ℝ) ≤ t := Nat.floor_le ht0
-      rw [hT, le_div_iff₀ (by norm_num : (0 : ℝ) < 2)] at hfl
       linarith
-    · rw [le_gridPoint_iff hn]
+    · rw [le_gridPoint_iff hn, h2t]
       have hfl : t < (⌊t⌋₊ : ℝ) + 1 := Nat.lt_floor_add_one t
-      rw [hT, div_lt_iff₀ (by norm_num : (0 : ℝ) < 2)] at hfl
       push_cast
       linarith
   · have hge : j + 1 ≤ ⌊t⌋₊ := by omega
     have hfloorle : ⌊t⌋₊ ≤ j + 1 := by
       have h1 : ⌊t⌋₊ ≤ ⌊((j + 1 : ℕ) : ℝ)⌋₊ := Nat.floor_le_floor htn
-      simpa using h1
+      rwa [Nat.floor_natCast] at h1
     have heq : ⌊t⌋₊ = j + 1 := le_antisymm hfloorle hge
+    have hfl : ((j + 1 : ℕ) : ℝ) ≤ t := by
+      have h1 := Nat.floor_le ht0
+      rwa [heq] at h1
     refine ⟨j, le_refl _, ?_, ?_⟩
-    · rw [gridPoint_le_iff hn]
-      have hfl : ((j + 1 : ℕ) : ℝ) ≤ t := by
-        have h1 := Nat.floor_le ht0
-        rwa [heq] at h1
-      rw [hT, le_div_iff₀ (by norm_num : (0 : ℝ) < 2)] at hfl
+    · rw [gridPoint_le_iff hn, h2t]
       push_cast at hfl ⊢
       linarith
-    · rw [le_gridPoint_iff hn]
-      push_cast
-      nlinarith
+    · rw [le_gridPoint_iff hn, h2t]
+      push_cast at hfl ⊢
+      linarith
 
 end Bracketing
 

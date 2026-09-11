@@ -150,19 +150,32 @@ theorem two_point_fourth_moment (a b delta : ℝ) (hab : b ^ 2 < a) (hd : 0 ≤ 
     (1 - highWeight a b delta) * lowerSquare a b ^ 2
       + highWeight a b delta * upperSquare a b delta ^ 2 = a ^ 2 + delta := by
   have hk := gapSquare_pos a b hab
-  have hrel : gapSquare a b = (a - lowerSquare a b) ^ 2 := by
-    unfold gapSquare lowerSquare
-    ring
-  have hkne : (a - lowerSquare a b) ^ 2 ≠ 0 := by
-    rw [← hrel]
-    exact ne_of_gt hk
-  have hkd : (a - lowerSquare a b) ^ 2 + delta ≠ 0 := by
-    rw [← hrel]
+  have hwne : highWeight a b delta ≠ 0 := ne_of_gt (highWeight_pos a b delta hab hd)
+  have hTne : gapSquare a b + delta ≠ 0 := by
     intro hcon
     linarith
-  unfold highWeight upperSquare
-  rw [hrel]
-  field_simp <;> ring
+  have hgap : gapSquare a b = (a - lowerSquare a b) ^ 2 := by
+    unfold gapSquare lowerSquare
+    ring
+  have hmean := two_point_second_moment a b delta hab hd
+  have hdiff : highWeight a b delta * (upperSquare a b delta - lowerSquare a b)
+      = a - lowerSquare a b := by
+    linear_combination hmean
+  have hratio : (1 - highWeight a b delta) * gapSquare a b
+      = highWeight a b delta * delta := by
+    unfold highWeight
+    field_simp <;> ring
+  have hvar : highWeight a b delta * (1 - highWeight a b delta)
+      * (upperSquare a b delta - lowerSquare a b) ^ 2 = delta := by
+    apply mul_left_cancel₀ hwne
+    linear_combination
+      ((1 - highWeight a b delta)
+          * (highWeight a b delta * (upperSquare a b delta - lowerSquare a b)
+            + (a - lowerSquare a b))) * hdiff
+        - (1 - highWeight a b delta) * hgap + hratio
+  linear_combination
+    (((1 - highWeight a b delta) * lowerSquare a b
+        + highWeight a b delta * upperSquare a b delta) + a) * hmean + hvar
 
 /-- The two-point magnitude weights. -/
 def magnitudeWeights (w : ℝ) : Bool → ℝ
@@ -185,7 +198,7 @@ def magnitudeLaw (w : ℝ) (h0 : 0 ≤ w) (h1 : w ≤ 1) : ExpFunctional Bool :=
       · show (0:ℝ) ≤ w
         linarith)
     (by
-      simp [Fintype.sum_bool, magnitudeWeights] <;> ring)
+      simp [magnitudeWeights] <;> ring)
 
 /-- The asymmetric sign law with mean `theta`. -/
 def signLaw (theta : ℝ) (h0 : -1 ≤ theta) (h1 : theta ≤ 1) : ExpFunctional Bool :=
@@ -198,7 +211,7 @@ def signLaw (theta : ℝ) (h0 : -1 ≤ theta) (h1 : theta ≤ 1) : ExpFunctional
       · show (0:ℝ) ≤ (1 + theta) / 2
         linarith)
     (by
-      simp [Fintype.sum_bool, signWeights] <;> ring)
+      simp [signWeights] <;> ring)
 
 /-- The magnitude law in two-point form. -/
 theorem magnitudeLaw_eval (w : ℝ) (h0 : 0 ≤ w) (h1 : w ≤ 1) (f : Bool → ℝ) :

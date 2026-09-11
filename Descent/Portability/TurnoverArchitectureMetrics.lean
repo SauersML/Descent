@@ -683,7 +683,8 @@ theorem sum_signValue_eq {n : ℕ} (σ : Fin n → Bool) :
     intro i
     cases h : σ i
     · simp [signValue]
-    · simp [signValue]
+    · simp only [signValue, if_true, if_pos]
+      norm_num
   rw [Finset.sum_congr rfl fun i _ ↦ hpt i, Finset.sum_sub_distrib, ← Finset.mul_sum,
     ← ConvexOrderCoupling.occupiedCount_eq_sum, Finset.sum_const, Finset.card_univ,
     Fintype.card_fin, nsmul_eq_mul, mul_one]
@@ -829,7 +830,7 @@ Total individual-loss variance over the realized collection of cell architecture
 into the mean conditional loss variance plus the variance of the conditional mean loss.
 Each cell carries its own realized architecture, so this is a function of the whole
 collection. -/
-theorem pathwise_distance_variance_decomposition {n : ℕ} {V D : Type*} [Fintype V]
+theorem pathwise_loss_variance_split {n : ℕ} {V D : Type*} [Fintype V]
     (noise : ExpFunctional V) (cells : ExpFunctional D) (arche : D → (Fin n → Bool))
     (a : Fin n → ℝ) (ξ : V → ℝ) (hnorm : ∑ i, a i ^ 2 = 1) (hmean : noise ξ = 0) :
     variance (mixture cells (fun _ ↦ genotypeNoiseExp n noise))
@@ -859,7 +860,7 @@ theorem pathwise_distance_explainability {n : ℕ} {V D : Type*} [Fintype V]
         / (variance cells (fun d ↦ cellLossMean noise a (arche d) ξ)
           + cells (fun d ↦ cellLossVar noise a (arche d) ξ)) := by
   rw [explainableFraction, Descent.Core.ratio,
-    pathwise_distance_variance_decomposition noise cells arche a ξ hnorm hmean, add_comm]
+    pathwise_loss_variance_split noise cells arche a ξ hnorm hmean, add_comm]
 
 end
 

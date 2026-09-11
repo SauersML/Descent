@@ -94,22 +94,21 @@ indistinguishable from a centred Gaussian at these two moments. -/
 theorem gaussianMomentLaw_moments (v : ℝ) (hv : 0 ≤ v) :
     gaussianMomentLaw (fun i ↦ gaussianMomentValue v i ^ 2) = v ∧
       gaussianMomentLaw (fun i ↦ gaussianMomentValue v i ^ 4) = 3 * v ^ 2 := by
-  have h2 : Real.sqrt (3 * v) ^ 2 = 3 * v := Real.sq_sqrt (by linarith)
-  have h4 : Real.sqrt (3 * v) ^ 4 = (3 * v) ^ 2 := by
-    have hx : Real.sqrt (3 * v) ^ 4 = (Real.sqrt (3 * v) ^ 2) ^ 2 := by ring
-    rw [hx, h2]
-  have e2 : (-Real.sqrt (3 * v)) ^ 2 = 3 * v := by
-    have hx : (-Real.sqrt (3 * v)) ^ 2 = Real.sqrt (3 * v) ^ 2 := by ring
-    rw [hx, h2]
-  have e4 : (-Real.sqrt (3 * v)) ^ 4 = (3 * v) ^ 2 := by
-    have hx : (-Real.sqrt (3 * v)) ^ 4 = Real.sqrt (3 * v) ^ 4 := by ring
-    rw [hx, h4]
+  have s3 : Real.sqrt 3 ^ 2 = 3 := Real.sq_sqrt (by norm_num)
+  have sv : Real.sqrt v ^ 2 = v := Real.sq_sqrt hv
+  have s3f : Real.sqrt 3 ^ 4 = 9 := by
+    have hx : Real.sqrt 3 ^ 4 = (Real.sqrt 3 ^ 2) ^ 2 := by ring
+    rw [hx, s3]
+    norm_num
+  have svf : Real.sqrt v ^ 4 = v ^ 2 := by
+    have hx : Real.sqrt v ^ 4 = (Real.sqrt v ^ 2) ^ 2 := by ring
+    rw [hx, sv]
   constructor
   · norm_num [gaussianMomentLaw, gaussianMomentValue, weightedExp_apply,
-      Fin.sum_univ_three, e2, h2]
+      Fin.sum_univ_three, s3, sv]
     all_goals ring
   · norm_num [gaussianMomentLaw, gaussianMomentValue, weightedExp_apply,
-      Fin.sum_univ_three, e4, h4]
+      Fin.sum_univ_three, s3f, svf]
     all_goals ring
 
 /-- The mean of the maximizing two-valued variance profile. -/
