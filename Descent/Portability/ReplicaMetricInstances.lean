@@ -18,8 +18,9 @@ NOTE 2 section 5.4 instantiates the replica-domain compiler of sections 5.1 and 
 metrics a report actually carries. Every instance is derived from the corpus definitions of
 the metrics, not from restatements of them. Scope: population laws and study contexts are
 finite report laws; the replica readouts have signed coefficients, as NOTE 2 remarks after (15),
-and are not claimed to be pointwise nonnegative; average precision, named in the last
-paragraph of section 5.4, is not formalized.
+and are not claimed to be pointwise nonnegative. Average precision is compiled as a quotient
+whose numerator is itself a finite sum of guarded ratios; no single polynomial series for it is
+claimed.
 
 Squared correlation. For a score and an outcome in the unit interval, `correlationNumerator`
 and `correlationDenominator` are `N = 16 C_SY²` and `D = 16 V_S V_Y` of NOTE 2 (21), built from
@@ -67,14 +68,21 @@ built from the corpus `ReplicaMomentCompleteness.exponentListing`, and
 finite-context replica law of NOTE 2 (11). `expectation_correlationTerm_eq_replicaReadout` and
 `expectation_aucTerm_eq_replicaReadout` are the instances.
 
-Threshold rates. `thresholdConfusion` is the corpus `Foundations.ConfusionMatrix` of the strict
-threshold rule `threshold < value`, so a score tied with the threshold is called negative. Its
-called masses are one-replica event probabilities (`calledMass_eq_expectation`) and its
-prevalence is the case probability at every threshold (`prevalence_thresholdConfusion`).
-`confusion_rate_bounds` shows the corpus recall, false positive rate and precision are bounded
-ratios, and `expectation_recallRate_eq_tsum`, `expectation_fpr_eq_tsum` and
-`expectation_precision_eq_tsum` apply (15) to them at every point of a threshold curve, through
-`expectation_div_eq_tsum` for a quotient that Lean reads as zero at a vanishing denominator.
+Rates, curves and average precision. `ruleConfusion` is the corpus
+`Foundations.ConfusionMatrix` of a score rule on a population law. Its called masses are
+one-replica event probabilities (`calledMass_eq_expectation`) and its prevalence is the case
+probability for every rule (`prevalence_ruleConfusion`). `confusion_rate_bounds` shows that the
+corpus recall, false positive rate and precision are bounded ratios, `rates_mem_unit` places
+every ROC and precision-recall point in the unit square, and `expectation_recallRate_eq_tsum`,
+`expectation_fpr_eq_tsum` and `expectation_precision_eq_tsum` apply (15) to them through
+`expectation_div_eq_tsum`, which reads a quotient with Lean's zero at a vanishing denominator.
+`thresholdRule` is the strict threshold rule, with a tied score cleared, and
+`calledMass_thresholdRule_antitone` is the monotonicity of the threshold curve.
+`averagePrecision` is average precision under a fixed finite-score definition in which tied
+score values are called together (`atLeastRule`), and `averagePrecision_eq_sum_recall_increment`
+reads it as recall increments times precision. Its numerator is a finite sum of bounded ratios
+(`averagePrecision_summand_bounds`) and at most the case probability, so (15) applies at both
+levels (`expectation_averagePrecision_eq_tsum`, `expectation_averagePrecisionSummand_eq_tsum`).
 
 ## Empirical status
 
@@ -1027,92 +1035,94 @@ theorem abs_calibrationError_sub_le (first second : FiniteReportLaw (Score × Bo
 
 end CalibrationError
 
-/-! ### Threshold confusion-matrix rates -/
+/-! ### Confusion-matrix rates, threshold curves and average precision -/
 
-section ThresholdRates
+section ScoreRules
 
 variable {Score : Type*} [Fintype Score]
 
-/-- The mass of the report cells of one outcome class whose score value passes the strict
-threshold rule `threshold < value`. The tie rule is part of the definition: a score equal to
-the threshold is not called positive. -/
-def calledMass (law : FiniteReportLaw (Score × Bool)) (value : Score → ℝ) (threshold : ℝ)
+/-- The mass of the report cells of one outcome class whose score group a rule calls
+positive. -/
+def calledMass (law : FiniteReportLaw (Score × Bool)) (called : Score → Bool)
     (outcome : Bool) : ℝ :=
-  ∑ group, if threshold < value group then law.mass (group, outcome) else 0
+  ∑ group, if called group then law.mass (group, outcome) else 0
 
-/-- The mass of the report cells of one outcome class whose score value fails the strict
-threshold rule. -/
-def clearedMass (law : FiniteReportLaw (Score × Bool)) (value : Score → ℝ) (threshold : ℝ)
+/-- The mass of the report cells of one outcome class whose score group a rule clears. -/
+def clearedMass (law : FiniteReportLaw (Score × Bool)) (called : Score → Bool)
     (outcome : Bool) : ℝ :=
-  ∑ group, if threshold < value group then 0 else law.mass (group, outcome)
+  ∑ group, if called group then 0 else law.mass (group, outcome)
 
 /-- The called and the cleared mass of one outcome class partition that class. -/
-theorem calledMass_add_clearedMass (law : FiniteReportLaw (Score × Bool)) (value : Score → ℝ)
-    (threshold : ℝ) (outcome : Bool) :
-    calledMass law value threshold outcome + clearedMass law value threshold outcome =
+theorem calledMass_add_clearedMass (law : FiniteReportLaw (Score × Bool))
+    (called : Score → Bool) (outcome : Bool) :
+    calledMass law called outcome + clearedMass law called outcome =
       ∑ group, law.mass (group, outcome) := by
   rw [calledMass, clearedMass, ← Finset.sum_add_distrib]
   exact Finset.sum_congr rfl fun group _ ↦ by split_ifs <;> ring
 
 /-- The called mass is nonnegative. -/
-theorem calledMass_nonneg (law : FiniteReportLaw (Score × Bool)) (value : Score → ℝ)
-    (threshold : ℝ) (outcome : Bool) : 0 ≤ calledMass law value threshold outcome :=
+theorem calledMass_nonneg (law : FiniteReportLaw (Score × Bool)) (called : Score → Bool)
+    (outcome : Bool) : 0 ≤ calledMass law called outcome :=
   Finset.sum_nonneg fun group _ ↦ by
     split_ifs
     · exact law.mass_nonneg _
     · exact le_refl 0
 
 /-- The cleared mass is nonnegative. -/
-theorem clearedMass_nonneg (law : FiniteReportLaw (Score × Bool)) (value : Score → ℝ)
-    (threshold : ℝ) (outcome : Bool) : 0 ≤ clearedMass law value threshold outcome :=
+theorem clearedMass_nonneg (law : FiniteReportLaw (Score × Bool)) (called : Score → Bool)
+    (outcome : Bool) : 0 ≤ clearedMass law called outcome :=
   Finset.sum_nonneg fun group _ ↦ by
     split_ifs
     · exact le_refl 0
     · exact law.mass_nonneg _
 
 /-- The called mass of an outcome class is the one-replica probability of the event that the
-score passes the threshold and the outcome is that class. -/
-theorem calledMass_eq_expectation (law : FiniteReportLaw (Score × Bool)) (value : Score → ℝ)
-    (threshold : ℝ) (outcome : Bool) :
-    calledMass law value threshold outcome =
+rule calls the score group and the outcome is that class. -/
+theorem calledMass_eq_expectation (law : FiniteReportLaw (Score × Bool))
+    (called : Score → Bool) (outcome : Bool) :
+    calledMass law called outcome =
       law.expectation (fun report ↦
-        if threshold < value report.1 ∧ report.2 = outcome then 1 else 0) := by
+        if called report.1 = true ∧ report.2 = outcome then 1 else 0) := by
   simp only [calledMass, FiniteReportLaw.expectation, Fintype.sum_prod_type, Fintype.sum_bool]
   refine Finset.sum_congr rfl fun group _ ↦ ?_
-  by_cases hcall : threshold < value group <;> cases outcome <;> simp [hcall]
+  cases hcall : called group <;> cases outcome <;> simp [hcall]
 
-/-- **NOTE 2 section 5.4, confusion matrix of a threshold rule.** The corpus confusion matrix
-of the strict threshold rule on a population law: true positives are called cases, false
-positives called controls, true negatives cleared controls and false negatives cleared cases. -/
-def thresholdConfusion (law : FiniteReportLaw (Score × Bool)) (value : Score → ℝ)
-    (threshold : ℝ) : Foundations.ConfusionMatrix where
-  tp := calledMass law value threshold true
-  fp := calledMass law value threshold false
-  tn := clearedMass law value threshold false
-  fn := clearedMass law value threshold true
-  tp_nonneg := calledMass_nonneg law value threshold true
-  fp_nonneg := calledMass_nonneg law value threshold false
-  tn_nonneg := clearedMass_nonneg law value threshold false
-  fn_nonneg := clearedMass_nonneg law value threshold true
+/-- **NOTE 2 section 5.4, confusion-matrix rates.** The corpus confusion matrix of a score rule
+on a population law: true positives are called cases, false positives called controls, true
+negatives cleared controls and false negatives cleared cases. -/
+def ruleConfusion (law : FiniteReportLaw (Score × Bool)) (called : Score → Bool) :
+    Foundations.ConfusionMatrix where
+  tp := calledMass law called true
+  fp := calledMass law called false
+  tn := clearedMass law called false
+  fn := clearedMass law called true
+  tp_nonneg := calledMass_nonneg law called true
+  fp_nonneg := calledMass_nonneg law called false
+  tn_nonneg := clearedMass_nonneg law called false
+  fn_nonneg := clearedMass_nonneg law called true
   mass_one := by
-    have hcases := calledMass_add_clearedMass law value threshold true
-    have hcontrols := calledMass_add_clearedMass law value threshold false
+    have hcases := calledMass_add_clearedMass law called true
+    have hcontrols := calledMass_add_clearedMass law called false
     have htotal := law.mass_sum
     rw [Fintype.sum_prod_type] at htotal
     simp only [Fintype.sum_bool, Finset.sum_add_distrib] at htotal
     linarith
 
-/-- The prevalence of the threshold confusion matrix is the case probability of the population
-law at every threshold. -/
-theorem prevalence_thresholdConfusion (law : FiniteReportLaw (Score × Bool))
-    (value : Score → ℝ) (threshold : ℝ) :
-    (thresholdConfusion law value threshold).prevalence =
-      law.expectation (fun report ↦ ChronologyReportLaw.alleleValue report.2) := by
-  show calledMass law value threshold true + clearedMass law value threshold true = _
-  rw [calledMass_add_clearedMass]
-  simp only [FiniteReportLaw.expectation, Fintype.sum_prod_type, Fintype.sum_bool,
-    ChronologyReportLaw.alleleValue_true, ChronologyReportLaw.alleleValue_false]
-  exact Finset.sum_congr rfl fun group _ ↦ by ring
+/-- The corpus case probability of a law on score groups and outcomes is the total case mass of
+the groups. -/
+theorem binaryCaseMass_snd_eq_sum (law : FiniteReportLaw (Score × Bool)) :
+    law.binaryCaseMass Prod.snd = ∑ group, law.mass (group, true) := by
+  simp only [FiniteReportLaw.binaryCaseMass, FiniteReportLaw.expectation, Fintype.sum_prod_type,
+    Fintype.sum_bool]
+  exact Finset.sum_congr rfl fun group _ ↦ by simp
+
+/-- The prevalence of the confusion matrix of any score rule is the case probability of the
+population law. -/
+theorem prevalence_ruleConfusion (law : FiniteReportLaw (Score × Bool))
+    (called : Score → Bool) :
+    (ruleConfusion law called).prevalence = law.binaryCaseMass Prod.snd := by
+  show calledMass law called true + clearedMass law called true = _
+  rw [calledMass_add_clearedMass, binaryCaseMass_snd_eq_sum]
 
 /-- **NOTE 2 section 5.4.** The three rates of a confusion matrix are bounded ratios: the recall
 numerator `tp`, the false positive numerator `fp` and the precision numerator `tp` are each at
@@ -1146,8 +1156,9 @@ theorem expectation_div_eq_tsum (law : FiniteReportLaw Context) (num den : Conte
   exact expectation_ratioOnDefined_eq_tsum law num den hnum hle hden
 
 /-- **NOTE 2 section 5.4, true positive rate.** Over a finite law of study contexts, the expected
-corpus recall of context-dependent confusion matrices, such as `thresholdConfusion` at one point
-of a threshold curve, is the series of expectations of `tp * (1 - (tp + fn)) ^ power`. -/
+corpus recall of context-dependent confusion matrices, such as `ruleConfusion` of a
+`thresholdRule` at one point of a threshold curve, is the series of expectations of
+`tp * (1 - (tp + fn)) ^ power`. -/
 theorem expectation_recallRate_eq_tsum (law : FiniteReportLaw Context)
     (matrix : Context → Foundations.ConfusionMatrix) :
     law.expectation (fun context ↦ (matrix context).recallRate) =
@@ -1187,7 +1198,173 @@ theorem expectation_precision_eq_tsum (law : FiniteReportLaw Context)
     (fun context ↦ (confusion_rate_bounds (matrix context)).2.2.1)
     (fun context ↦ (confusion_rate_bounds (matrix context)).2.2.2)
 
-end ThresholdRates
+/-- **NOTE 2 section 5.4, ROC curve.** The recall, the false positive rate and the precision of
+any confusion matrix lie in the unit interval, so every point of a ROC or precision-recall
+curve lies in the unit square. -/
+theorem rates_mem_unit (matrix : Foundations.ConfusionMatrix) :
+    (0 ≤ matrix.recallRate ∧ matrix.recallRate ≤ 1) ∧ (0 ≤ matrix.fpr ∧ matrix.fpr ≤ 1) ∧
+      (0 ≤ matrix.precision ∧ matrix.precision ≤ 1) := by
+  obtain ⟨⟨hrecall, _⟩, ⟨hfalse, _⟩, ⟨hprecision, _⟩⟩ := confusion_rate_bounds matrix
+  have htp := matrix.tp_nonneg
+  have hfp := matrix.fp_nonneg
+  exact ⟨⟨div_nonneg htp (htp.trans hrecall), div_le_one_of_le₀ hrecall (htp.trans hrecall)⟩,
+    ⟨div_nonneg hfp (hfp.trans hfalse), div_le_one_of_le₀ hfalse (hfp.trans hfalse)⟩,
+    ⟨div_nonneg htp (htp.trans hprecision),
+      div_le_one_of_le₀ hprecision (htp.trans hprecision)⟩⟩
+
+/-- The strict threshold rule: a score group is called positive exactly when its value exceeds
+the threshold, so a value tied with the threshold is cleared. -/
+def thresholdRule (value : Score → ℝ) (threshold : ℝ) : Score → Bool :=
+  fun group ↦ decide (threshold < value group)
+
+/-- **NOTE 2 section 5.4, threshold curves.** Raising the threshold never increases the called
+mass of either outcome class: the true and the false positive masses along the threshold curve
+are antitone in the threshold. -/
+theorem calledMass_thresholdRule_antitone (law : FiniteReportLaw (Score × Bool))
+    (value : Score → ℝ) (outcome : Bool) :
+    Antitone fun threshold ↦ calledMass law (thresholdRule value threshold) outcome := by
+  intro lower upper hle
+  simp only [calledMass]
+  refine Finset.sum_le_sum fun group _ ↦ ?_
+  by_cases hupper : upper < value group
+  · have hlower : lower < value group := lt_of_le_of_lt hle hupper
+    simp [thresholdRule, hupper, hlower]
+  · by_cases hlower : lower < value group
+    · simp [thresholdRule, hupper, hlower, law.mass_nonneg]
+    · simp [thresholdRule, hupper, hlower]
+
+/-- The rule calling every score group whose value is at least the value of a cutoff group, so
+every group tied with the cutoff is called together with it. -/
+def atLeastRule (value : Score → ℝ) (cutoff : Score) : Score → Bool :=
+  fun group ↦ decide (value cutoff ≤ value group)
+
+/-- **NOTE 2 section 5.4, average precision under a fixed finite-score definition.** Every
+score group contributes its case mass times the precision of the rule calling every group that
+scores at least as high, and the sum is divided by the case probability. Tied score values
+enter together through the rule, and the quotient is Lean's zero when the law has no cases. -/
+def averagePrecision (law : FiniteReportLaw (Score × Bool)) (value : Score → ℝ) : ℝ :=
+  (∑ group, law.mass (group, true) * (ruleConfusion law (atLeastRule value group)).precision) /
+    law.binaryCaseMass Prod.snd
+
+/-- **NOTE 2 section 5.4, average precision.** Average precision is the sum over score groups
+of the recall increment `a_s / p` that the group contributes times the precision at the
+group's cutoff. -/
+theorem averagePrecision_eq_sum_recall_increment (law : FiniteReportLaw (Score × Bool))
+    (value : Score → ℝ) :
+    averagePrecision law value =
+      ∑ group, law.mass (group, true) / law.binaryCaseMass Prod.snd *
+        (ruleConfusion law (atLeastRule value group)).precision := by
+  rw [averagePrecision, Finset.sum_div]
+  exact Finset.sum_congr rfl fun group _ ↦ by ring
+
+/-- **NOTE 2 section 5.4.** Every average-precision summand is a bounded ratio: the case mass of
+the group times the true positive mass at its cutoff is at most the called mass at that cutoff,
+which is at most one. -/
+theorem averagePrecision_summand_bounds (law : FiniteReportLaw (Score × Bool))
+    (value : Score → ℝ) (group : Score) :
+    0 ≤ law.mass (group, true) * calledMass law (atLeastRule value group) true ∧
+      law.mass (group, true) * calledMass law (atLeastRule value group) true ≤
+        calledMass law (atLeastRule value group) true +
+          calledMass law (atLeastRule value group) false ∧
+      calledMass law (atLeastRule value group) true +
+          calledMass law (atLeastRule value group) false ≤ 1 := by
+  have hcase := law.mass_nonneg (group, true)
+  have hcalled := calledMass_nonneg law (atLeastRule value group) true
+  have hprecision : calledMass law (atLeastRule value group) true ≤
+      calledMass law (atLeastRule value group) true +
+        calledMass law (atLeastRule value group) false ∧
+      calledMass law (atLeastRule value group) true +
+        calledMass law (atLeastRule value group) false ≤ 1 :=
+    (confusion_rate_bounds (ruleConfusion law (atLeastRule value group))).2.2
+  have hself : law.mass (group, true) ≤ calledMass law (atLeastRule value group) true := by
+    unfold calledMass
+    refine le_trans (le_of_eq ?_) (Finset.single_le_sum
+      (f := fun other ↦ if atLeastRule value group other then law.mass (other, true) else 0)
+      (fun other _ ↦ ?_) (Finset.mem_univ group))
+    · simp [atLeastRule]
+    · split_ifs
+      · exact law.mass_nonneg _
+      · exact le_refl 0
+  have htpOne : calledMass law (atLeastRule value group) true ≤ 1 := by
+    linarith [hprecision.1, hprecision.2]
+  have hscaled := mul_le_mul_of_nonneg_right (hself.trans htpOne) hcalled
+  refine ⟨mul_nonneg hcase hcalled, ?_, hprecision.2⟩
+  linarith [hprecision.1]
+
+/-- **NOTE 2 section 5.4.** The average-precision numerator is at least zero and at most the
+case probability, which is at most one, so average precision is a bounded ratio. -/
+theorem averagePrecision_numerator_bounds (law : FiniteReportLaw (Score × Bool))
+    (value : Score → ℝ) :
+    0 ≤ ∑ group, law.mass (group, true) *
+        (ruleConfusion law (atLeastRule value group)).precision ∧
+      ∑ group, law.mass (group, true) *
+          (ruleConfusion law (atLeastRule value group)).precision ≤
+        law.binaryCaseMass Prod.snd ∧
+      law.binaryCaseMass Prod.snd ≤ 1 := by
+  have hunit : ∀ group, 0 ≤ (ruleConfusion law (atLeastRule value group)).precision ∧
+      (ruleConfusion law (atLeastRule value group)).precision ≤ 1 := fun group ↦
+    (rates_mem_unit (ruleConfusion law (atLeastRule value group))).2.2
+  refine ⟨Finset.sum_nonneg fun group _ ↦ mul_nonneg (law.mass_nonneg _) (hunit group).1, ?_,
+    (binaryCaseMass_mem_unit law Prod.snd).2⟩
+  rw [binaryCaseMass_snd_eq_sum]
+  exact Finset.sum_le_sum fun group _ ↦
+    mul_le_of_le_one_right (law.mass_nonneg _) (hunit group).2
+
+/-- **NOTE 2 section 5.4.** Average precision lies in the unit interval. -/
+theorem averagePrecision_mem_unit (law : FiniteReportLaw (Score × Bool)) (value : Score → ℝ) :
+    0 ≤ averagePrecision law value ∧ averagePrecision law value ≤ 1 := by
+  obtain ⟨hnum, hle, _⟩ := averagePrecision_numerator_bounds law value
+  exact ⟨div_nonneg hnum (hnum.trans hle), div_le_one_of_le₀ hle (hnum.trans hle)⟩
+
+/-- **NOTE 2 equation (15) for average precision.** Over a finite law of study contexts, the
+expected average precision is the series of expectations of the precision-weighted case mass
+times `(1 - p) ^ power`. -/
+theorem expectation_averagePrecision_eq_tsum (law : FiniteReportLaw Context)
+    (population : Context → FiniteReportLaw (Score × Bool)) (value : Score → ℝ) :
+    law.expectation (fun context ↦ averagePrecision (population context) value) =
+      ∑' power : ℕ, law.expectation (fun context ↦
+        (∑ group, (population context).mass (group, true) *
+            (ruleConfusion (population context) (atLeastRule value group)).precision) *
+          (1 - (population context).binaryCaseMass Prod.snd) ^ power) :=
+  expectation_div_eq_tsum law
+    (fun context ↦ ∑ group, (population context).mass (group, true) *
+      (ruleConfusion (population context) (atLeastRule value group)).precision)
+    (fun context ↦ (population context).binaryCaseMass Prod.snd)
+    (fun context ↦ (averagePrecision_numerator_bounds (population context) value).1)
+    (fun context ↦ (averagePrecision_numerator_bounds (population context) value).2.1)
+    (fun context ↦ (averagePrecision_numerator_bounds (population context) value).2.2)
+
+/-- **NOTE 2 equation (15) for one average-precision summand.** The expected case mass of a
+score group times the precision at its cutoff is the series of expectations of
+`a_s tp_s * (1 - (tp_s + fp_s)) ^ power`, a bounded ratio of polynomial functionals. -/
+theorem expectation_averagePrecisionSummand_eq_tsum (law : FiniteReportLaw Context)
+    (population : Context → FiniteReportLaw (Score × Bool)) (value : Score → ℝ)
+    (group : Score) :
+    law.expectation (fun context ↦ (population context).mass (group, true) *
+        (ruleConfusion (population context) (atLeastRule value group)).precision) =
+      ∑' power : ℕ, law.expectation (fun context ↦
+        (population context).mass (group, true) *
+            calledMass (population context) (atLeastRule value group) true *
+          (1 - (calledMass (population context) (atLeastRule value group) true +
+            calledMass (population context) (atLeastRule value group) false)) ^ power) := by
+  have hsummand : (fun context ↦ (population context).mass (group, true) *
+      (ruleConfusion (population context) (atLeastRule value group)).precision) =
+        fun context ↦ (population context).mass (group, true) *
+            calledMass (population context) (atLeastRule value group) true /
+          (calledMass (population context) (atLeastRule value group) true +
+            calledMass (population context) (atLeastRule value group) false) :=
+    funext fun context ↦ (mul_div_assoc _ _ _).symm
+  rw [hsummand]
+  exact expectation_div_eq_tsum law
+    (fun context ↦ (population context).mass (group, true) *
+      calledMass (population context) (atLeastRule value group) true)
+    (fun context ↦ calledMass (population context) (atLeastRule value group) true +
+      calledMass (population context) (atLeastRule value group) false)
+    (fun context ↦ (averagePrecision_summand_bounds (population context) value group).1)
+    (fun context ↦ (averagePrecision_summand_bounds (population context) value group).2.1)
+    (fun context ↦ (averagePrecision_summand_bounds (population context) value group).2.2)
+
+end ScoreRules
 
 /-! ### Degree accounting -/
 
