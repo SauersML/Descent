@@ -329,10 +329,9 @@ theorem sum_pos_bump (σ : W × Y → ℝ) (w : W) (a : ℝ) :
       if w' = w then a * ∑ y, (|σ (w, y)| + σ (w, y)) / 2 else 0 := by
     intro w'
     by_cases hw : w' = w
-    · subst hw
-      rw [if_pos rfl, Finset.mul_sum]
+    · rw [if_pos hw, Finset.mul_sum]
       refine Finset.sum_congr rfl fun y _ ↦ ?_
-      rw [if_pos (rfl : ((w, y) : W × Y).1 = w), mul_assoc, hterm]
+      rw [if_pos (show ((w', y) : W × Y).1 = w from hw), mul_assoc, hterm, hw]
     · simp [hw]
   rw [Finset.sum_congr rfl fun w' _ ↦ h w', Finset.sum_ite_eq' Finset.univ w]
   simp
@@ -343,11 +342,14 @@ theorem sum_feature_combo (σ : W × Y → ℝ) (g : F → W × Y → ℝ) (i : 
       t * ∑ z : W × Y, g i z * σ z := by
   rw [Finset.mul_sum]
   refine Finset.sum_congr rfl fun z _ ↦ ?_
-  simp only [featureCombo, Finset.sum_mul]
-  rw [Finset.sum_eq_single_of_mem i (Finset.mem_univ i)]
-  · simp
-  · intro b _ hb
-    simp [hb]
+  have hc : featureCombo g (fun j ↦ if j = i then t else 0) z = t * g i z := by
+    simp only [featureCombo]
+    rw [Finset.sum_eq_single_of_mem i (Finset.mem_univ i)]
+    · simp
+    · intro b _ hb
+      simp [hb]
+  rw [hc]
+  ring
 
 /-- The total conditional oscillation is nonnegative. -/
 theorem oscTotal_nonneg (μ : W → ℝ) (hμ : ∀ w, 0 ≤ μ w) (h : W × Y → ℝ) :
@@ -567,26 +569,38 @@ theorem exists_kernelGap_ge (μ : W → ℝ) (hμ : ∀ w, 0 < μ w) (g : F → 
       exact div_nonneg (by nlinarith) (hμ w).le
     · intro w
       have hμne : μ w ≠ 0 := (hμ w).ne'
-      have hid : (∑ y, ((|τ (w, y)| + τ (w, y)) / 2 +
-          (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) * (if y = y₀ then 1 else 0)) / μ w) =
-          ((∑ y, (|τ (w, y)| + τ (w, y)) / 2) +
+      have hind : (∑ y, (if y = y₀ then (1 : ℝ) else 0)) = 1 := by
+        rw [Finset.sum_ite_eq' Finset.univ y₀]
+        simp
+      have hstep : (∑ y, ((|τ (w, y)| + τ (w, y)) / 2 +
+          (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) *
+            (if y = y₀ then 1 else 0))) = μ w := by
+        rw [Finset.sum_add_distrib, ← Finset.mul_sum, hind, mul_one]
+        ring
+      calc (∑ y, ((|τ (w, y)| + τ (w, y)) / 2 +
             (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) *
-              ∑ y, (if y = y₀ then (1 : ℝ) else 0)) / μ w := by
-        rw [Finset.sum_div, Finset.sum_add_distrib, ← Finset.mul_sum, Finset.sum_div]
-      rw [hid, Finset.sum_ite_eq' Finset.univ y₀]
-      simp only [Finset.mem_univ, if_true, mul_one]
-      field_simp
+              (if y = y₀ then 1 else 0)) / μ w)
+          = (∑ y, ((|τ (w, y)| + τ (w, y)) / 2 +
+            (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) *
+              (if y = y₀ then 1 else 0))) / μ w := by rw [Finset.sum_div]
+        _ = 1 := by rw [hstep, div_self hμne]
     · intro w
       have hμne : μ w ≠ 0 := (hμ w).ne'
-      have hid : (∑ y, ((|τ (w, y)| - τ (w, y)) / 2 +
-          (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) * (if y = y₀ then 1 else 0)) / μ w) =
-          ((∑ y, (|τ (w, y)| - τ (w, y)) / 2) +
+      have hind : (∑ y, (if y = y₀ then (1 : ℝ) else 0)) = 1 := by
+        rw [Finset.sum_ite_eq' Finset.univ y₀]
+        simp
+      have hstep : (∑ y, ((|τ (w, y)| - τ (w, y)) / 2 +
+          (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) *
+            (if y = y₀ then 1 else 0))) = μ w := by
+        rw [Finset.sum_add_distrib, ← Finset.mul_sum, hind, mul_one, hτneg w]
+        ring
+      calc (∑ y, ((|τ (w, y)| - τ (w, y)) / 2 +
             (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) *
-              ∑ y, (if y = y₀ then (1 : ℝ) else 0)) / μ w := by
-        rw [Finset.sum_div, Finset.sum_add_distrib, ← Finset.mul_sum, Finset.sum_div]
-      rw [hid, Finset.sum_ite_eq' Finset.univ y₀, hτneg w]
-      simp only [Finset.mem_univ, if_true, mul_one]
-      field_simp
+              (if y = y₀ then 1 else 0)) / μ w)
+          = (∑ y, ((|τ (w, y)| - τ (w, y)) / 2 +
+            (μ w - ∑ y', (|τ (w, y')| + τ (w, y')) / 2) *
+              (if y = y₀ then 1 else 0))) / μ w := by rw [Finset.sum_div]
+        _ = 1 := by rw [hstep, div_self hμne]
     · intro w y
       have hμne : μ w ≠ 0 := (hμ w).ne'
       field_simp
@@ -628,7 +642,8 @@ theorem conditional_oscillation_duality (μ : W → ℝ) (hμ : ∀ w, 0 < μ w)
   · intro ub hub
     have hzeroGap : (0 : ℝ) ∈ kernelGaps μ g f ε := by
       refine ⟨fun _ y ↦ if y = y₀ then 1 else 0, fun _ y ↦ if y = y₀ then 1 else 0,
-        fun w y ↦ by split_ifs <;> norm_num, fun w y ↦ by split_ifs <;> norm_num,
+        fun w y ↦ by by_cases h : y = y₀ <;> simp [h],
+        fun w y ↦ by by_cases h : y = y₀ <;> simp [h],
         fun w ↦ by rw [Finset.sum_ite_eq' Finset.univ y₀]; simp,
         fun w ↦ by rw [Finset.sum_ite_eq' Finset.univ y₀]; simp, fun i ↦ ?_, by ring⟩
       simp
