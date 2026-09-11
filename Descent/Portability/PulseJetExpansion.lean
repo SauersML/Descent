@@ -155,12 +155,13 @@ private theorem abs_product_residual_le
         firstError * secondBound) * tau ^ 2 := by
   have hfirstNonneg : 0 ≤ firstBound := le_trans (abs_nonneg _) hfirstValue
   have hsecondSpeedNonneg : 0 ≤ secondSpeedBound := le_trans (abs_nonneg _) hsecondSpeed
+  have hfirstSpeedNonneg : 0 ≤ firstSpeedBound := le_trans (abs_nonneg _) hfirstSpeed
   have hkey : firstImage * secondImage - firstValue * secondValue -
       tau * (firstValue * secondSpeed + secondValue * firstSpeed) =
       firstValue * (secondImage - secondValue - tau * secondSpeed) +
         tau * firstSpeed * (secondImage - secondValue) +
         (firstImage - firstValue - tau * firstSpeed) * secondImage := by ring
-  have htriangle := abs_add (secondImage - secondValue - tau * secondSpeed) (tau * secondSpeed)
+  have htriangle := abs_add_le (secondImage - secondValue - tau * secondSpeed) (tau * secondSpeed)
   rw [show secondImage - secondValue - tau * secondSpeed + tau * secondSpeed =
     secondImage - secondValue from by ring] at htriangle
   have hspeedTerm : |tau * secondSpeed| ≤ secondSpeedBound * tau := by
@@ -177,7 +178,7 @@ private theorem abs_product_residual_le
   have hmiddleTerm : |tau * firstSpeed * (secondImage - secondValue)| ≤
       firstSpeedBound * tau * ((secondSpeedBound + secondError) * tau) := by
     rw [abs_mul]
-    refine mul_le_mul ?_ hdifference (abs_nonneg _) (by positivity)
+    refine mul_le_mul ?_ hdifference (abs_nonneg _) (mul_nonneg hfirstSpeedNonneg htau0)
     rw [abs_mul, abs_of_nonneg htau0, mul_comm]
     exact mul_le_mul_of_nonneg_right hfirstSpeed htau0
   have hlastTerm : |(firstImage - firstValue - tau * firstSpeed) * secondImage| ≤
@@ -191,7 +192,7 @@ private theorem abs_product_residual_le
       |firstValue * (secondImage - secondValue - tau * secondSpeed)| +
         |tau * firstSpeed * (secondImage - secondValue)| +
         |(firstImage - firstValue - tau * firstSpeed) * secondImage| :=
-    le_trans (abs_add _ _) (add_le_add_right (abs_add _ _) _)
+    le_trans (abs_add_le _ _) (add_le_add_right (abs_add_le _ _) _)
   have hring : firstBound * (secondError * tau ^ 2) +
       firstSpeedBound * tau * ((secondSpeedBound + secondError) * tau) +
       firstError * tau ^ 2 * secondBound =
@@ -287,10 +288,10 @@ def add {first second : DemeHaplotypeState D → ℝ}
   velocityBound := firstCertificate.velocityBound + secondCertificate.velocityBound
   remainder := firstCertificate.remainder + secondCertificate.remainder
   value_abs_le state :=
-    le_trans (abs_add _ _)
+    le_trans (abs_add_le _ _)
       (add_le_add (firstCertificate.value_abs_le state) (secondCertificate.value_abs_le state))
   velocity_abs_le state :=
-    le_trans (abs_add _ _)
+    le_trans (abs_add_le _ _)
       (add_le_add (firstCertificate.velocity_abs_le state)
         (secondCertificate.velocity_abs_le state))
   expansion tau h0 h1 state := by
@@ -305,7 +306,7 @@ def add {first second : DemeHaplotypeState D → ℝ}
     have hring : firstCertificate.remainder * tau ^ 2 + secondCertificate.remainder * tau ^ 2 =
         (firstCertificate.remainder + secondCertificate.remainder) * tau ^ 2 := by ring
     rw [hkey]
-    have htriangle := abs_add
+    have htriangle := abs_add_le
       (first (pulse tau state) - first state - tau * firstCertificate.velocity state)
       (second (pulse tau state) - second state - tau * secondCertificate.velocity state)
     linarith
@@ -355,7 +356,7 @@ def mul {first second : DemeHaplotypeState D → ℝ}
     exact mul_le_mul (firstCertificate.value_abs_le state)
       (secondCertificate.value_abs_le state) (abs_nonneg _) firstCertificate.valueBound_nonneg
   velocity_abs_le state := by
-    refine le_trans (abs_add _ _) (add_le_add ?_ ?_)
+    refine le_trans (abs_add_le _ _) (add_le_add ?_ ?_)
     · rw [abs_mul]
       exact mul_le_mul (firstCertificate.value_abs_le state)
         (secondCertificate.velocity_abs_le state) (abs_nonneg _)

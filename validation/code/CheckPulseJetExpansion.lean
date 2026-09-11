@@ -1,0 +1,45 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.PulseJetExpansion
+
+/-! Axiom audit of the deterministic two-locus pulse expansions. -/
+
+open Descent.Portability.PulseJetExpansion
+
+#print axioms Descent.Portability.PulseJetExpansion.pulseFraction_nonneg
+#print axioms Descent.Portability.PulseJetExpansion.pulseFraction_le_one
+#print axioms Descent.Portability.PulseJetExpansion.pulseFraction_eq_self
+#print axioms Descent.Portability.PulseJetExpansion.abs_migrationLinkageVelocity_le_two
+#print axioms Descent.Portability.PulseJetExpansion.PulseExpansion.valueBound_nonneg
+#print axioms Descent.Portability.PulseJetExpansion.PulseExpansion.velocityBound_nonneg
+#print axioms Descent.Portability.PulseJetExpansion.PulseExpansion.remainder_nonneg
+#print axioms Descent.Portability.PulseJetExpansion.PulseExpansion.add
+#print axioms Descent.Portability.PulseJetExpansion.PulseExpansion.smul
+#print axioms Descent.Portability.PulseJetExpansion.PulseExpansion.mul
+#print axioms Descent.Portability.PulseJetExpansion.leftMutationPulse_leftFrequency
+#print axioms Descent.Portability.PulseJetExpansion.leftMutationPulse_rightFrequency
+#print axioms Descent.Portability.PulseJetExpansion.rightMutationPulse_rightFrequency
+#print axioms Descent.Portability.PulseJetExpansion.rightMutationPulse_leftFrequency
+#print axioms Descent.Portability.PulseJetExpansion.migrationPulse_leftFrequency
+#print axioms Descent.Portability.PulseJetExpansion.migrationPulse_rightFrequency
+#print axioms Descent.Portability.PulseJetExpansion.migrationPulse_linkage
+#print axioms Descent.Portability.PulseJetExpansion.recombinationPulseAt_leftFrequency
+#print axioms Descent.Portability.PulseJetExpansion.recombinationPulseAt_rightFrequency
+#print axioms Descent.Portability.PulseJetExpansion.recombinationPulseAt_linkage
+#print axioms Descent.Portability.PulseJetExpansion.leftMutationPulseAt_leftFrequency
+#print axioms Descent.Portability.PulseJetExpansion.leftMutationPulseAt_rightFrequency
+#print axioms Descent.Portability.PulseJetExpansion.leftMutationPulseAt_linkage
+#print axioms Descent.Portability.PulseJetExpansion.rightMutationPulseAt_rightFrequency
+#print axioms Descent.Portability.PulseJetExpansion.rightMutationPulseAt_leftFrequency
+#print axioms Descent.Portability.PulseJetExpansion.rightMutationPulseAt_linkage
+#print axioms Descent.Portability.PulseJetExpansion.migrationCoordinateExpansion
+#print axioms Descent.Portability.PulseJetExpansion.recombinationCoordinateExpansion
+#print axioms Descent.Portability.PulseJetExpansion.leftMutationCoordinateExpansion
+#print axioms Descent.Portability.PulseJetExpansion.rightMutationCoordinateExpansion
+#print axioms Descent.Portability.PulseJetExpansion.PulseCoordinateExpansion.coordinate
+#print axioms Descent.Portability.PulseJetExpansion.PulseCoordinateExpansion.rightHeterozygosity
+#print axioms Descent.Portability.PulseJetExpansion.migrationLeftHeterozygosity_velocity
+#print axioms Descent.Portability.PulseJetExpansion.migrationRightHeterozygosity_velocity
+#print axioms Descent.Portability.PulseJetExpansion.recombinationLinkageProduct_velocity
+#print axioms Descent.Portability.PulseJetExpansion.leftMutationLeftHeterozygosity_velocity
