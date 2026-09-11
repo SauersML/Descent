@@ -540,7 +540,8 @@ theorem exists_integral_solution_of_continuous_approximation {ι : Type*} [Finty
             ≤ ∫ s in (0 : ℝ)..t, ‖A s‖ *
                 (2 * (scale * (1 / ((k : ℝ) + 1))) * Real.exp mass * Real.exp mass) := by
               refine intervalIntegral.integral_mono_on ht.1
-                ((hAt.mul_continuousOn ((hsequenceContinuous k).sub hUcontinuous).continuousOn).norm)
+                ((hAt.mul_continuousOn
+                  ((hsequenceContinuous k).sub hUcontinuous).continuousOn).norm)
                 (hAt.norm.mul_const _) fun s _ ↦ ?_
               refine (norm_mul_le _ _).trans (mul_le_mul_of_nonneg_left ?_ (norm_nonneg _))
               rw [norm_sub_rev]
