@@ -90,7 +90,7 @@ theorem grid_gap_nonneg {n : ℕ} (hn : 0 < n) (c k : ℕ) :
     field_simp
     ring
   have hnum : 0 ≤ ((c : ℝ) - k) * ((c : ℝ) - k - 1) := by
-    rcases le_or_lt c k with h | h
+    rcases le_or_gt c k with h | h
     · have h1 : (c : ℝ) ≤ k := by exact_mod_cast h
       nlinarith
     · have h1 : (k : ℝ) + 1 ≤ c := by exact_mod_cast h
@@ -534,7 +534,7 @@ theorem envelope_value_attained (N k : ℕ) (hk : k + 1 ≤ N + 1) (m : ℝ) (hm
     · rw [envelopeLaw_expected_r2 N k hk m _ hm hm' hk1 hk2 _ _ H sigma hH b hb,
         ← hQdef, ← hLdef]
       have hstep : (Q - y) / (Q - Q * L) * (Q - Q * L) = Q - y := by
-        field_simp
+        rw [div_mul_eq_mul_div, mul_div_assoc, div_self hdenne, mul_one]
       have hexpand : Q * ((Q - y) / (Q - Q * L) * L + (1 - (Q - y) / (Q - Q * L)))
           = Q - (Q - y) / (Q - Q * L) * (Q - Q * L) := by ring
       rw [hexpand, hstep]
@@ -610,7 +610,7 @@ theorem exists_grid_bracket {n : ℕ} (hn : 0 < n) (m : ℝ) (hm : -1 ≤ m) (hm
       push_cast at hfl ⊢
       linarith
     · rw [le_gridPoint_iff hn, h2t]
-      push_cast at hfl ⊢
+      push_cast at htn hfl ⊢
       linarith
 
 end Bracketing
