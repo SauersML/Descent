@@ -663,6 +663,9 @@ import Descent.Portability.SpectralAuditTrace
 
 import Descent.Portability.SpectralAuditCost
 import Descent.Portability.SpectralAuditDualCertificate
+import Descent.Portability.DriftOperatorCoordinates
+import Descent.Portability.NonnegativeCoalescenceRealization
+import Descent.Portability.PartialHaplotypeMicroscopicStages
 
 assert_below Descent.Program
 
