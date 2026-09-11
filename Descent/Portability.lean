@@ -1,6 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.NeutralMomentSemigroup
+import Descent.Portability.OrderedSampleCohortLaw
 import Descent.Portability.ConvergentEventProduct
 import Descent.Portability.MultinomialStageComposition
 import Descent.Portability.MultinomialMicroscopicApproximation
