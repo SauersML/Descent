@@ -378,6 +378,17 @@ import Descent.Portability.HWEHierarchyTheorem
 import Descent.Portability.HWEHierarchyParameters
 import Descent.Portability.HWEHierarchyJumpRepresentation
 import Descent.Portability.HWEHierarchyMoments
+import Descent.Portability.GaussianProductJet
+import Descent.Portability.AuditVarianceGeometry
+import Descent.Portability.AugmentedAuditLaw
+import Descent.Portability.BoundedAuditCompletion
+import Descent.Portability.SafeRepairGeometry
+import Descent.Portability.IndependentContrastLaw
+import Descent.Portability.AlignmentFactorization
+import Descent.Portability.CohortEvaluationOperators
+import Descent.Portability.FourthOrderLossObstruction
+import Descent.Portability.LossNoiseCompletion
+import Descent.Portability.ReportRegionCertificates
 assert_below Descent.Program
 
 /-!

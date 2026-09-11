@@ -195,7 +195,7 @@ def fairTwoPointVariance(a, b):
 def gramForm(A, x, y):
     return sum((sum((_rt.mul(_rt.mul(x[int(i)], A[int(i)][int(j)]), y[int(j)])) for j in range(int(len(A))))) for i in range(int(len(A))))
 
-def quadForm(A, x):
+def Descent_Blindness_quadForm(A, x):
     return gramForm(A, x, x)
 
 def BelowCeiling(ceiling, K):
@@ -3023,6 +3023,9 @@ def additiveVariance(p, α):
 def liabilityScaleH2(h2_observed, prevalence, z_height):
     return _rt.rdiv(((h2_observed * prevalence) * ((1.0 - prevalence))), _rt.lpow(z_height, 2.0))
 
+def liftGenotype(S):
+    return (lambda z: S[int(_rt._proj(z, '1'))])
+
 def completionMass(rates, s, count):
     if count == 0:
         return (1.0 - Descent_Portability_AncestralAbsorptionLaw_survival(rates, 0.0, s))
@@ -3171,6 +3174,21 @@ def effectiveRate(π, r, Λ):
 def shiftPolynomial(δ):
     return eval_2Hom(C, ((lambda i: _rt.add(X(i), C((δ[int(i)]))))))
 
+def clip(lo, hi, t):
+    return _rt.rmax(lo, (_rt.rmin(hi, t)))
+
+def envelope(L, U, p, q, m):
+    return (_rt.rdiv((((U - m)) * ((m - L))), p) + (((_rt.rdiv(1.0, p) - 1.0)) * _rt.lpow(((m - q)), 2.0)))
+
+def vertex(L, U, p, q):
+    return _rt.rdiv((((L + U) - ((2.0 * ((1.0 - p))) * q))), ((2.0 * p)))
+
+def proxy(L, U, lo, hi):
+    return clip(lo, hi, (_rt.rdiv(((L + U)), 2.0)))
+
+def Descent_Portability_AugmentedAuditLaw_observed(p, q, y):
+    return (q + _rt.rdiv(((y - q)), p))
+
 def code(*_a):
     if len(_a) < 1:
         return lambda *_b: code(*(_a + _b))
@@ -3220,6 +3238,9 @@ def misspecExcessRisk(π, σ_β_sq):
 def posteriorPredictiveVariance(residual_var, estimation_var):
     return Descent_Core_sum(residual_var, estimation_var)
 
+def upperMass(L, U, m):
+    return _rt.rdiv(((m - L)), ((U - L)))
+
 def interiorNodes(lo, hi, i, k):
     return (_rt.rdiv((_rt.add(_rt.mul(2.0, lo[int(i)]), hi[int(i)])), 3.0) if (k == 0.0) else (_rt.rdiv((_rt.add(lo[int(i)], hi[int(i)])), 2.0) if (k == 1.0) else _rt.rdiv((_rt.add(lo[int(i)], _rt.mul(2.0, hi[int(i)]))), 3.0)))
 
@@ -3231,6 +3252,18 @@ def Descent_Portability_CalibrationLaw_prevalence(p, linear, intercept):
 
 def calibratedIntercept(p, baseline, epsilon, he, hb, raw):
     return _rt._proj(_rt._proj((standardized_calibrated_intercept(p, raw, baseline, epsilon, he, hb)), 'exists'), 'choose')
+
+def chanCompose(A, G):
+    return (lambda θ, y: sum((_rt.mul(A[int(θ)][int(x)], G[int(x)][int(y)])) for x in range(int(_rt.sumdim('x', len(A[0]), len(G))))))
+
+def decisionRisk(prior, M, loss):
+    return sum((_rt.mul(prior[int(θ)], sum((_rt.mul(M[int(θ)][int(z)], loss[int(θ)][int(z)])) for z in range(int(len(prior)))))) for θ in range(int(len(prior))))
+
+def confusionChannel(c):
+    return (lambda θ, y: (((_rt.rdiv(_rt._proj(c, 'tp'), Descent_Foundations_ConfusionMatrix_prevalence(c)) if y else _rt.rdiv(_rt._proj(c, 'fn'), Descent_Foundations_ConfusionMatrix_prevalence(c)))) if θ else ((_rt.rdiv(_rt._proj(c, 'fp'), ((1.0 - Descent_Foundations_ConfusionMatrix_prevalence(c)))) if y else _rt.rdiv(_rt._proj(c, 'tn'), ((1.0 - Descent_Foundations_ConfusionMatrix_prevalence(c))))))))
+
+def identityRule():
+    return (lambda y, z: (1.0 if (y == z) else 0.0))
 
 def genomeLaw(laws):
     return _rt._proj((chunkLaw(laws)), 'pushforward')(Descent_Portability_ChunkedGenotypeLaw_flatten)
@@ -3294,6 +3327,18 @@ def numberNeededToScreen(sens, π, _hsens, _hπ):
 
 def populationAttributableFraction(p_high, rr):
     return (p_high * ((1.0 - _rt.rdiv(1.0, rr))))
+
+def Descent_Portability_CohortEvaluationOperators_quadForm(B, v):
+    return dot(v, (_rt.mulVec(B, v)))
+
+def residualMaker(P):
+    return _rt.sub(1.0, P)
+
+def partialR2(z, r):
+    return _rt.rdiv(_rt.lpow((dot(z, r)), 2.0), (_rt.mul(dot(z, z), dot(r, r))))
+
+def augmentedProj(P, s):
+    return _rt.add(P, rankOneProj((_rt._proj((residualMaker(P)), 'mulVec')(s))))
 
 def Descent_Portability_CompactSingularSequence_direction(L, hc, n):
     return _rt._proj(_rt._proj(leading, '1'), '2')((Descent_Portability_CompactSingularSequence_residual(L, hc, n)), (Descent_Portability_CompactSingularSequence_residual(L, hc, n)))
@@ -3600,7 +3645,7 @@ def eventCumulativeHazard(g, time, score):
 def eventSurvival(g, time, score):
     return _rt.rexp(((-eventCumulativeHazard(g, time, score))))
 
-def density(law, score):
+def Descent_Portability_SurvivalScoreLaw_density(law, score):
     return _rt.rdiv(_rt.rexp((_rt.rdiv((-(_rt.lpow(((score - _rt._proj(law, 'mean'))), 2.0))), ((2.0 * _rt._proj(law, 'variance')))))), _rt.rsqrt((((2.0 * _rt.pi) * _rt._proj(law, 'variance')))))
 
 def prognosticIndex(g, score):
@@ -4078,6 +4123,48 @@ def reversibleLaw(time):
 def Descent_Portability_FourCyclePrediction_report():
     return (_rt.rsqrt(2.0) * mode())
 
+def twoPointWeight(b, a):
+    return (_rt.rdiv(1.0, 2.0) if (a <= 0.0) else _rt.rdiv(((1.0 + _rt.rdiv(b, _rt.rsqrt(a)))), 2.0))
+
+def twoPointExp(b, a, hab):
+    return weightedExp((twoPointWeights(b, a)), (twoPointWeights_nonneg(hab)), (twoPointWeights_sum(b, a)))
+
+def twoPointKernel(a):
+    return (lambda z: twoPointResidual((a[int(_rt._proj(z, '1'))]), _rt._proj(z, '2')))
+
+def effectSign(b):
+    return (1.0 if b else (-1.0))
+
+def effectMean(z):
+    return _rt.rdiv(((((effectSign(_rt._proj(z, '1')) + effectSign(_rt._proj(_rt._proj(z, '2'), '1'))) + effectSign(_rt._proj(_rt._proj(_rt._proj(z, '2'), '2'), '1'))) + effectSign(_rt._proj(_rt._proj(_rt._proj(z, '2'), '2'), '2')))), 4.0)
+
+def parityWeight(par, z):
+    return (_rt.rdiv(1.0, 8.0) if (evenParity(z) == par) else 0.0)
+
+def contextExp(par, θ, h0, h1):
+    return weightedExp((contextWeight(par, θ)), (contextWeight_nonneg(par, θ, h0, h1)), (contextWeight_sum(par, θ)))
+
+def cellTheta():
+    return (lambda d: (_rt.rdiv(1.0, 4.0) if (d == 0.0) else _rt.rdiv(3.0, 4.0)))
+
+def cellExp(par, d):
+    return _rt._proj(_rt._proj(contextExp, '1'), '2')(par, (cellTheta(d)), (cellTheta_mem(d)), (cellTheta_mem(d)))
+
+def jointExp(par):
+    return Descent_Portability_IndividualLossMoments_mixture((uniformExp((Fin(2.0)))), (innerExp(par)))
+
+def Descent_Portability_FourthOrderLossObstruction_score(ω):
+    return effectSign(_rt._proj(_rt._proj(_rt._proj(ω, '2'), '2'), '1'))
+
+def Descent_Portability_FourthOrderLossObstruction_outcome(ω):
+    return ((effectMean(_rt._proj(_rt._proj(ω, '2'), '1')) * effectSign(_rt._proj(_rt._proj(_rt._proj(ω, '2'), '2'), '1'))) + (_rt.rsqrt(((1.0 - _rt.lpow(effectMean(_rt._proj(_rt._proj(ω, '2'), '1')), 2.0)))) * effectSign(_rt._proj(_rt._proj(_rt._proj(ω, '2'), '2'), '2'))))
+
+def individualLoss(ω):
+    return _rt.lpow(((Descent_Portability_FourthOrderLossObstruction_outcome(ω) - Descent_Portability_FourthOrderLossObstruction_score(ω))), 2.0)
+
+def lossSecondMoment(z):
+    return ((4.0 * _rt.lpow(((1.0 - effectMean(z))), 2.0)) + ((4.0 * _rt.lpow(((1.0 - effectMean(z))), 2.0)) * ((1.0 - _rt.lpow(effectMean(z), 2.0)))))
+
 def quadraticValue(A, v):
     return sum((sum((_rt.mul(_rt.mul(A[int(i)][int(j)], v[int(i)]), v[int(j)])) for j in range(int(len(A))))) for i in range(int(len(A))))
 
@@ -4119,6 +4206,21 @@ def momentPolynomial(variance, n):
     for _ in range(int(n)):
         _prev = (_rt._proj((_prev), 'derivative') + ((C(variance) * X) * _prev))
     return _prev
+
+def Descent_Portability_GaussianProductJet_density(l, ε, x):
+    return productRatio(((lambda i: _rt.add(1.0, _rt.mul(ε, l[int(i)])))), x)
+
+def profile(l, ε, x):
+    return sum((logProfile((_rt.add(1.0, _rt.mul(ε, l[int(i)]))), (x[int(i)]))) for i in range(int(len(l))))
+
+def first(l, ε, x):
+    return sum((_rt.mul(l[int(i)], logFirst((_rt.add(1.0, _rt.mul(ε, l[int(i)]))), (x[int(i)])))) for i in range(int(len(l))))
+
+def second(l, ε, x):
+    return sum((_rt.mul(_rt.lpow(l[int(i)], 2.0), logSecond((_rt.add(1.0, _rt.mul(ε, l[int(i)]))), (x[int(i)])))) for i in range(int(len(l))))
+
+def third(l, ε, x):
+    return sum((_rt.mul(_rt.lpow(l[int(i)], 3.0), logThird((_rt.add(1.0, _rt.mul(ε, l[int(i)]))), (x[int(i)])))) for i in range(int(len(l))))
 
 def linearForm(a, x):
     return sum((_rt.mul(a[int(k)], x[int(k)])) for k in range(int(len(a))))
@@ -4296,6 +4398,9 @@ def ascertainment_loss(coverage, v_causal):
 def total_portability_loss(loss_genetic, loss_technical):
     return Descent_Core_sum(loss_genetic, loss_technical)
 
+def contrast(w, x):
+    return sum((_rt.mul(w[int(i)], x[int(i)])) for i in range(int(len(w))))
+
 def Descent_Portability_IndependentShiftOperator_shift(p, g):
     return sum((_rt.mul(_rt._proj(p, 'mass')(a), translate((g[int(a)])))) for a in range(int(len(g))))
 
@@ -4355,6 +4460,18 @@ def Descent_Portability_LossMomentRange_residual(s, z):
 
 def Descent_Portability_LossMomentRange_conditionalVariance():
     return (lambda d: (4.0 if d else 1.0))
+
+def twoPointValue(α, β):
+    return (lambda b: cond(b, β, ((-α))))
+
+def gapRoot(v, h):
+    return _rt.rdiv(((_rt.rsqrt(((_rt.lpow(h, 2.0) + (4.0 * v)))) - h)), 2.0)
+
+def zeroMeanNoise(v, h, hv):
+    return _rt._proj(_rt._proj(twoPointLaw, '1'), '2')((gapRoot(v, h)), ((gapRoot(v, h) + h)), (gapRoot_bounds(v, h, hv)), (gapRoot_bounds(v, h, hv)))
+
+def zeroMeanNoiseValue(v, h):
+    return twoPointValue((gapRoot(v, h)), ((gapRoot(v, h) + h)))
 
 def Descent_Portability_LowMomentObstruction_sign(bit):
     return ((-1.0) if bit else 1.0)
@@ -4602,11 +4719,11 @@ def sharedCorrectionSpread(curvature, optimum):
 def sharedCorrectionCost(curvature, optimum, correction):
     return sum((_rt.mul(curvature[int(i)], _rt.lpow((_rt.sub(correction, optimum[int(i)])), 2.0))) for i in range(int(len(curvature))))
 
-def outcome():
+def Descent_Portability_MomentAUCNonidentifiability_outcome():
     return _rt.VecFn([true, true, true, false, false, false])
 
 def Descent_Portability_MomentAUCNonidentifiability_outcomeValue(i):
-    return (1.0 if outcome(i) else 0.0)
+    return (1.0 if Descent_Portability_MomentAUCNonidentifiability_outcome(i) else 0.0)
 
 def firstScore():
     return _rt.VecFn([_rt.rdiv((-1.0), 2.0), _rt.rdiv((-1.0), 2.0), _rt.rdiv(5.0, 2.0), 0.0, 0.0, 0.0])
