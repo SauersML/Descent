@@ -39287,6 +39287,7 @@
    "Descent.Portability.ConditionalSeparatorLaw.separator_phase_bound",
    "Descent.Portability.ConditionalSeparatorLaw.separator_phase_exp_bound",
    "Descent.Portability.ConditionalSeparatorLaw.separator_phase_identity",
+   "Descent.Portability.ContinuousAuditCapSearch.radius_continuous",
    "Descent.Portability.ContinuousObservabilityGramian.leading_constant_pos",
    "Descent.Portability.ContinuousTurnoverSemigroup.gridEmbed_coe",
    "Descent.Portability.ContinuousTurnoverSemigroup.gridEmbed_pred",
@@ -40884,6 +40885,7 @@
     "Descent.Portability.ConditionalSeparatorLaw.gibbsNormalizer_pos": [],
     "Descent.Portability.ConditionalSeparatorLaw.gibbsLaw_minorization": [],
     "Descent.Portability.ConditionalSeparatorLaw.gibbs_separator_exp_bound": [],
+    "Descent.Portability.ContinuousAuditCapSearch.radius_continuous": [],
     "Descent.Portability.ContinuousObservabilityGramian.leading_constant_pos": [],
     "Descent.Portability.ContinuousTurnoverSemigroup.gridEmbed_coe": [],
     "Descent.Portability.ContinuousTurnoverSemigroup.gridEmbed_succ": [],
@@ -47639,6 +47641,7 @@
    "Descent.Portability.CompensatedCharacteristicKernel.continuous_value",
    "Descent.Portability.ComplexBernoulliProduct.bernoulli_product_limit",
    "Descent.Portability.CompoundPoissonIntegrability.power_integrable_of_fourth",
+   "Descent.Portability.ContinuousAuditCapSearch.radius_continuous",
    "Descent.Portability.CrossCoordinateRigidityLaw.closed_field_foreign_quadratic",
    "Descent.Portability.CrossCoordinateRigidityLaw.cross_derivative_interpolation",
    "Descent.Portability.DiploidBoxCompatibilityLaw.potential_separately_quadratic",
@@ -47730,6 +47733,7 @@
     "Descent.Portability.CompensatedCharacteristicKernel.continuous_value": [],
     "Descent.Portability.ComplexBernoulliProduct.bernoulli_product_limit": [],
     "Descent.Portability.CompoundPoissonIntegrability.power_integrable_of_fourth": [],
+    "Descent.Portability.ContinuousAuditCapSearch.radius_continuous": [],
     "Descent.Portability.FactorsThroughObservation.add": [
      "FactorsThroughObservation A D"
     ],
@@ -47906,6 +47910,7 @@
    "Descent.Portability.CompensatedCharacteristicKernel.continuous_value",
    "Descent.Portability.ComplexArrayPowerLimit.power_limit",
    "Descent.Portability.ComplexBernoulliProduct.bernoulli_product_limit",
+   "Descent.Portability.ContinuousAuditCapSearch.radius_continuous",
    "Descent.Portability.ContinuousTrajectoryRegion.hasDerivAt_growth_mul",
    "Descent.Portability.CouplingPolytopeExtrema.horizonPolytope_isClosed",
    "Descent.Portability.CouplingPolytopeExtrema.pathReport_continuous",
@@ -47977,6 +47982,7 @@
    "Descent.Portability.ScoreMomentZonoid.continuous_eval",
    "Descent.Portability.ScoreMomentZonoid.continuous_momentMap",
    "Descent.Portability.SmoothedCoordinateLaws.smoothed_atom_moment",
+   "Descent.Portability.SpectralRangeAuditDesign.radius_continuous",
    "Descent.Portability.StoppedGenotypeRenewal.conditionalGenome_integral_succ",
    "Descent.Portability.TightAlgebraConvergence.damp_tendsto_zero",
    "Descent.Portability.TightCharacteristicConvergence.weak_convergence_of_tight_characteristic",
@@ -48039,6 +48045,7 @@
     "Descent.Portability.CompensatedCharacteristicKernel.continuous_value": [],
     "Descent.Portability.ComplexArrayPowerLimit.power_limit": [],
     "Descent.Portability.ComplexBernoulliProduct.bernoulli_product_limit": [],
+    "Descent.Portability.ContinuousAuditCapSearch.radius_continuous": [],
     "Descent.Portability.ContinuousTrajectoryRegion.hasDerivAt_growth_mul": [],
     "Descent.Portability.CouplingPolytopeExtrema.pathReport_continuous": [],
     "Descent.Portability.CouplingPolytopeExtrema.horizonPolytope_isClosed": [],
@@ -48117,6 +48124,7 @@
     "Descent.Portability.ScoreMomentZonoid.continuous_eval": [],
     "Descent.Portability.ScoreMomentZonoid.continuous_momentMap": [],
     "Descent.Portability.SmoothedCoordinateLaws.smoothed_atom_moment": [],
+    "Descent.Portability.SpectralRangeAuditDesign.radius_continuous": [],
     "Descent.Portability.StoppedGenotypeRenewal.conditionalGenome_integral_succ": [],
     "Descent.Portability.TightAlgebraConvergence.damp_tendsto_zero": [],
     "Descent.Portability.TightCharacteristicConvergence.weak_convergence_of_tight_characteristic": [],
@@ -50609,6 +50617,7 @@
    "Descent.Portability.ConditionalSeparatorLaw.separator_phase_bound",
    "Descent.Portability.ConditionalSeparatorLaw.separator_phase_exp_bound",
    "Descent.Portability.ConditionalSeparatorLaw.separator_phase_identity",
+   "Descent.Portability.ContinuousAuditCapSearch.radius_continuous",
    "Descent.Portability.ContinuousObservabilityGramian.leading_constant_pos",
    "Descent.Portability.ContinuousTurnoverSemigroup.gridEmbed_coe",
    "Descent.Portability.ContinuousTurnoverSemigroup.gridEmbed_pred",
@@ -52178,6 +52187,7 @@
     "Descent.Portability.ConditionalSeparatorLaw.gibbsNormalizer_pos": [],
     "Descent.Portability.ConditionalSeparatorLaw.gibbsLaw_minorization": [],
     "Descent.Portability.ConditionalSeparatorLaw.gibbs_separator_exp_bound": [],
+    "Descent.Portability.ContinuousAuditCapSearch.radius_continuous": [],
     "Descent.Portability.ContinuousObservabilityGramian.leading_constant_pos": [],
     "Descent.Portability.ContinuousTurnoverSemigroup.gridEmbed_coe": [],
     "Descent.Portability.ContinuousTurnoverSemigroup.gridEmbed_succ": [],
@@ -71237,6 +71247,7 @@
    "Descent.Portability.ConditionalSeparatorLaw.separator_phase_bound",
    "Descent.Portability.ConditionalSeparatorLaw.separator_phase_exp_bound",
    "Descent.Portability.ConditionalSeparatorLaw.separator_phase_identity",
+   "Descent.Portability.ContinuousAuditCapSearch.radius_continuous",
    "Descent.Portability.ContinuousObservabilityGramian.leading_constant_pos",
    "Descent.Portability.ContinuousTurnoverSemigroup.gridEmbed_coe",
    "Descent.Portability.ContinuousTurnoverSemigroup.gridEmbed_pred",
@@ -72929,6 +72940,7 @@
      "∀ y i x x', U y i x' - U y i x ≤ R i",
      "∀ y, ‖u y‖ ≤ 1"
     ],
+    "Descent.Portability.ContinuousAuditCapSearch.radius_continuous": [],
     "Descent.Portability.ContinuousObservabilityGramian.leading_constant_pos": [],
     "Descent.Portability.ContinuousTurnoverSemigroup.gridEmbed_coe": [],
     "Descent.Portability.ContinuousTurnoverSemigroup.gridEmbed_succ": [],
@@ -75407,6 +75419,10 @@
    "Descent.Portability.ComplexBernoulliProduct.contraction_product_difference",
    "Descent.Portability.ConditionalErrorCertificate.conditional_bound_of_le",
    "Descent.Portability.ConditionalSeparatorLaw.separator_phase_exp_bound",
+   "Descent.Portability.ContinuousAuditCapSearch.capped_subset",
+   "Descent.Portability.ContinuousAuditCapSearch.exact_cap_reduction",
+   "Descent.Portability.ContinuousAuditCapSearch.exact_solvers_guarantee",
+   "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists",
    "Descent.Portability.CosineArrayLimit.cosine_product_limit",
    "Descent.Portability.CrossCoordinateRigidityLaw.cross_derivative_interpolation",
    "Descent.Portability.DecisionDirectedAuditDesign.design_exists",
@@ -75493,6 +75509,7 @@
    "Descent.Portability.MomentAUCNonidentifiability.same_jointMoments",
    "Descent.Portability.MomentOrderObstruction.alternating_annihilates",
    "Descent.Portability.OptimalMeasurementAllocation.allocation_lower_bound",
+   "Descent.Portability.OptimizedFrameRepairAudit.design_exists",
    "Descent.Portability.PThresholdTrainingLaw.scan_quality_ge_incumbent",
    "Descent.Portability.PThresholdTrainingLaw.scan_quality_ge_member",
    "Descent.Portability.PairedMedianOfMeans.simultaneous",
@@ -75529,6 +75546,8 @@
    "Descent.Portability.SpectralAuditDesign.objective_convex",
    "Descent.Portability.SpectralAuditDualCertificate.weak_duality",
    "Descent.Portability.SpectralMeasurementMinimax.adaptive_minimax_all_budgets",
+   "Descent.Portability.SpectralMinimaxAuditDesign.design_exists",
+   "Descent.Portability.SpectralMinimaxAuditDesign.kappa_nonneg",
    "Descent.Portability.StoppedGenotypeReadiness.conditionalSite_unsupported_ready",
    "Descent.Portability.SubgroupFrameTransport.certified_mixture_transport",
    "Descent.Portability.SubgroupFrameTransport.group_frame_safety",
@@ -75580,6 +75599,9 @@
     "∀ i, 0 ≤ c i",
     "∀ i, c i ≤ M",
     "contrast c p + radius (maxCost c",
+    "ContinuousOn F {p | Feasible floor c B p}",
+    "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
+    "∃ p, Feasible floor c B p",
     "∀ c : ℝ, C (fun _ : Bool ↦ c",
     "s ∈ Ioo c d",
     "t ∈ Ioo c d",
@@ -75588,7 +75610,6 @@
     "∀ y ∈ Ioo c d, DifferentiableOn ℝ (fun x ↦ f x y",
     "x ∈ Ioo a b",
     "y ∈ Ioo c d",
-    "∃ p, Feasible floor c B p",
     "∀ i, ContDiffOn ℝ 2 (b i",
     "ClosedOnBox lo hi b",
     "OwnAffineOnBox lo hi b",
@@ -75600,8 +75621,7 @@
     "deployedGain μ w f φ ε p q c hard z < 0",
     "contrast c p + BernsteinTailBound.radius (maxCost c",
     "∀ i ∈ s, c i = c₀",
-    "{p | Feasible floor c B p}.Nonempty",
-    "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high"
+    "{p | Feasible floor c B p}.Nonempty"
    ],
    "hypotheses_by_theorem": {
     "Descent.Blindness.BundleRigidity.ModulusFamily.core_subset_peel_core": [],
@@ -75818,6 +75838,19 @@
     "Descent.Portability.ComplexBernoulliProduct.bernoulli_product_limit": [],
     "Descent.Portability.ConditionalErrorCertificate.conditional_bound_of_le": [],
     "Descent.Portability.ConditionalSeparatorLaw.separator_phase_exp_bound": [],
+    "Descent.Portability.ContinuousAuditCapSearch.capped_subset": [],
+    "Descent.Portability.ContinuousAuditCapSearch.exact_cap_reduction": [
+     "ContinuousOn F {p | Feasible floor c B p}",
+     "Feasible floor c B p"
+    ],
+    "Descent.Portability.ContinuousAuditCapSearch.exact_solvers_guarantee": [
+     "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
+     "∃ p, Feasible floor c B p"
+    ],
+    "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists": [
+     "ContinuousOn F {p | Feasible floor c B p}",
+     "∃ p, Feasible floor c B p"
+    ],
     "Descent.Portability.no_common_thresholdDecision_of_crossing": [],
     "Descent.Portability.dynamicsPooledProjector_eq_of_factorsThrough_of_fixes_common": [
      "∀ c : ℝ, C (fun _ : Bool ↦ c"
@@ -75957,6 +75990,9 @@
     "Descent.Portability.MomentAUCNonidentifiability.same_jointMoments": [],
     "Descent.Portability.MomentOrderObstruction.alternating_annihilates": [],
     "Descent.Portability.OptimalMeasurementAllocation.allocation_lower_bound": [],
+    "Descent.Portability.OptimizedFrameRepairAudit.design_exists": [
+     "∃ p, Feasible floor c B p"
+    ],
     "Descent.Portability.RecentFineScaleConfounding.not_mem_topPCSpan": [],
     "Descent.Portability.pc_correction_recent_structure_lower_bound": [],
     "Descent.Portability.spectral_correction_residual_bias_lower_bound": [],
@@ -76012,6 +76048,10 @@
      "Feasible floor c B p"
     ],
     "Descent.Portability.SpectralMeasurementMinimax.adaptive_minimax_all_budgets": [],
+    "Descent.Portability.SpectralMinimaxAuditDesign.kappa_nonneg": [],
+    "Descent.Portability.SpectralMinimaxAuditDesign.design_exists": [
+     "∃ p, Feasible floor c B p"
+    ],
     "Descent.Portability.StoppedGenotypeReadiness.conditionalSite_unsupported_ready": [],
     "Descent.Portability.SubgroupFrameTransport.group_frame_safety": [],
     "Descent.Portability.SubgroupFrameTransport.certified_mixture_transport": [],
@@ -82689,6 +82729,13 @@
    "Descent.Portability.AuditRangeCaps.exact_cap_reduction",
    "Descent.Portability.AuditRangeCaps.fullRadius_continuous",
    "Descent.Portability.AuditRangeCaps.full_optimum_exists",
+   "Descent.Portability.ContinuousAuditCapSearch.capped_minimum",
+   "Descent.Portability.ContinuousAuditCapSearch.capped_subset",
+   "Descent.Portability.ContinuousAuditCapSearch.exact_cap_reduction",
+   "Descent.Portability.ContinuousAuditCapSearch.exact_solvers_guarantee",
+   "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists",
+   "Descent.Portability.ContinuousAuditCapSearch.radius_continuous",
+   "Descent.Portability.ContinuousAuditCapSearch.radius_minimum",
    "Descent.Portability.DecisionDirectedAuditDesign.design_exists",
    "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula",
    "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law",
@@ -82706,6 +82753,7 @@
    "Descent.Portability.IdenticalAuditCells.capped_spectral_optimum_constant",
    "Descent.Portability.IdenticalAuditCells.feasible_average",
    "Descent.Portability.IdenticalAuditCells.spectral_optimum_constant",
+   "Descent.Portability.OptimizedFrameRepairAudit.design_exists",
    "Descent.Portability.RangeAwareAuditSearch.exact_solvers_guarantee",
    "Descent.Portability.RangeAwareAuditSearch.finite_search_exists",
    "Descent.Portability.RangeAwareAuditSearch.range_interval",
@@ -82713,7 +82761,17 @@
    "Descent.Portability.SpectralAuditDesign.objective_convex",
    "Descent.Portability.SpectralAuditDesign.optimum_exists",
    "Descent.Portability.SpectralAuditDualCertificate.certified_optimum",
-   "Descent.Portability.SpectralAuditDualCertificate.weak_duality"
+   "Descent.Portability.SpectralAuditDualCertificate.weak_duality",
+   "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error",
+   "Descent.Portability.SpectralAuditNumericalCertificate.certified_radius_error",
+   "Descent.Portability.SpectralAuditNumericalCertificate.certified_variance_error",
+   "Descent.Portability.SpectralMinimaxAuditDesign.design_exists",
+   "Descent.Portability.SpectralRangeAuditDesign.capped_convex",
+   "Descent.Portability.SpectralRangeAuditDesign.design_exists",
+   "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction",
+   "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists",
+   "Descent.Portability.SpectralRangeAuditDesign.radius_continuous",
+   "Descent.Portability.SpectralRangeAuditDesign.radius_minimum"
   ],
   "constraints": {
    "hypotheses": [
@@ -82723,12 +82781,15 @@
     "{p | Feasible (cappedFloor floor h m",
     "∀ i, 0 < h i",
     "IsMinOn (fullRadius a h · x",
+    "IsMinOn (fun q ↦ designRadius F h q x",
+    "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
+    "∀ j, Feasible (cappedFloor floor h j.val.val",
     "maxRange h p ∈ Set.Icc low high",
     "∀ i ∈ s, h i = h₀",
     "{p | Feasible floor c B p ∧ maxRange h p ≤ m}.Nonempty",
     "∀ i, 0 ≤ h i",
-    "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
-    "∀ j, Feasible (cappedFloor floor h j.val.val"
+    "Feasible (cappedFloor floor h M",
+    "IsMinOn (fun q ↦ fullRadius κ h q u x"
    ],
    "hypotheses_by_theorem": {
     "Descent.Decision.CertificateGrading.FiniteMomentCertificateProblem.le_modulus_of_feasible": [
@@ -82753,6 +82814,23 @@
      "∀ i, 0 < h i",
      "IsMinOn (fullRadius a h · x"
     ],
+    "Descent.Portability.ContinuousAuditCapSearch.capped_subset": [],
+    "Descent.Portability.ContinuousAuditCapSearch.capped_minimum": [
+     "{p | Feasible (cappedFloor floor h m"
+    ],
+    "Descent.Portability.ContinuousAuditCapSearch.radius_continuous": [],
+    "Descent.Portability.ContinuousAuditCapSearch.radius_minimum": [],
+    "Descent.Portability.ContinuousAuditCapSearch.exact_cap_reduction": [
+     "∀ i, 0 < h i",
+     "IsMinOn (fun q ↦ designRadius F h q x"
+    ],
+    "Descent.Portability.ContinuousAuditCapSearch.exact_solvers_guarantee": [
+     "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
+     "∀ j, Feasible (cappedFloor floor h j.val.val"
+    ],
+    "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists": [
+     "∀ i, 0 < h i"
+    ],
     "Descent.Portability.DecisionDirectedAuditDesign.design_exists": [],
     "Descent.Portability.FiniteAuditAllocationLaw.coordinate_optimality": [],
     "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula": [],
@@ -82775,6 +82853,7 @@
      "∀ i ∈ s, h i = h₀",
      "{p | Feasible floor c B p ∧ maxRange h p ≤ m}.Nonempty"
     ],
+    "Descent.Portability.OptimizedFrameRepairAudit.design_exists": [],
     "Descent.Portability.RangeAwareAuditSearch.range_interval": [
      "∀ i, 0 ≤ h i"
     ],
@@ -82789,7 +82868,26 @@
     "Descent.Portability.SpectralAuditDesign.objective_continuous": [],
     "Descent.Portability.SpectralAuditDesign.optimum_exists": [],
     "Descent.Portability.SpectralAuditDualCertificate.weak_duality": [],
-    "Descent.Portability.SpectralAuditDualCertificate.certified_optimum": []
+    "Descent.Portability.SpectralAuditDualCertificate.certified_optimum": [],
+    "Descent.Portability.SpectralAuditNumericalCertificate.certified_variance_error": [],
+    "Descent.Portability.SpectralAuditNumericalCertificate.certified_radius_error": [],
+    "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error": [
+     "Feasible (cappedFloor floor h M"
+    ],
+    "Descent.Portability.SpectralMinimaxAuditDesign.design_exists": [],
+    "Descent.Portability.SpectralRangeAuditDesign.radius_continuous": [],
+    "Descent.Portability.SpectralRangeAuditDesign.radius_minimum": [],
+    "Descent.Portability.SpectralRangeAuditDesign.capped_convex": [],
+    "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction": [
+     "∀ i, 0 < h i",
+     "IsMinOn (fun q ↦ fullRadius κ h q u x"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists": [
+     "∀ i, 0 < h i"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.design_exists": [
+     "∀ i, 0 < h i"
+    ]
    }
   }
  },
@@ -91717,6 +91815,7 @@
    "Descent.Portability.SourceFixedRealization.uniformBool_sign_variance",
    "Descent.Portability.SpectralAuditConfidence.confidence",
    "Descent.Portability.SpectralAuditConfidence.directional_variance",
+   "Descent.Portability.SpectralMinimaxAuditDesign.variance_identity",
    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_squared_correlation",
    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_squared_correlation_eq_zero_iff",
    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_variance_outcome",
@@ -92063,6 +92162,7 @@
     ],
     "Descent.Portability.SpectralAuditConfidence.directional_variance": [],
     "Descent.Portability.SpectralAuditConfidence.confidence": [],
+    "Descent.Portability.SpectralMinimaxAuditDesign.variance_identity": [],
     "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_variance_score": [],
     "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_variance_outcome": [],
     "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_squared_correlation": [],
@@ -140888,7 +140988,15 @@
    "Descent.Portability.SpectralAuditDualCertificate.certificate_equality",
    "Descent.Portability.SpectralAuditDualCertificate.certified_optimum",
    "Descent.Portability.SpectralAuditDualCertificate.lagrangian_identity",
-   "Descent.Portability.SpectralAuditDualCertificate.weak_duality"
+   "Descent.Portability.SpectralAuditDualCertificate.weak_duality",
+   "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error",
+   "Descent.Portability.SpectralAuditNumericalCertificate.certified_radius_error",
+   "Descent.Portability.SpectralAuditNumericalCertificate.certified_variance_error",
+   "Descent.Portability.SpectralMinimaxAuditDesign.variance_identity",
+   "Descent.Portability.SpectralRangeAuditDesign.capped_convex",
+   "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction",
+   "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists",
+   "Descent.Portability.SpectralRangeAuditDesign.radius_continuous"
   ],
   "constraints": {
    "hypotheses": [
@@ -140909,7 +141017,8 @@
     "covariance (fun i ↦ κ i / p i",
     "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i",
     "(covariance (fun i ↦ κ i / p i",
-    "lam * (spending c p - B"
+    "lam * (spending c p - B",
+    "∃ p, Feasible floor c B p"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.AuditAllocationCoordinate.objective_difference": [
@@ -140987,6 +141096,24 @@
      "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i",
      "(covariance (fun i ↦ κ i / p i",
      "lam * (spending c p - B"
+    ],
+    "Descent.Portability.SpectralAuditNumericalCertificate.certified_variance_error": [
+     "Feasible floor c B p"
+    ],
+    "Descent.Portability.SpectralAuditNumericalCertificate.certified_radius_error": [
+     "Feasible floor c B p"
+    ],
+    "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error": [],
+    "Descent.Portability.SpectralMinimaxAuditDesign.variance_identity": [
+     "∀ i, 0 < p i"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.radius_continuous": [],
+    "Descent.Portability.SpectralRangeAuditDesign.capped_convex": [],
+    "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction": [
+     "Feasible floor c B p"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists": [
+     "∃ p, Feasible floor c B p"
     ]
    },
    "range_lo_thm": [
@@ -141939,7 +142066,7 @@
   "short": "dualGap",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": "dualGap",
+  "python": "Descent_Portability_AuditDesignNumericalCertificate_dualGap",
   "args": [
    "a",
    "floor",
@@ -141989,7 +142116,10 @@
   },
   "mentioned_by": [
    "Descent.Portability.AuditDesignNumericalCertificate.certified_radius_error",
-   "Descent.Portability.AuditDesignNumericalCertificate.certified_variance_error"
+   "Descent.Portability.AuditDesignNumericalCertificate.certified_variance_error",
+   "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error",
+   "Descent.Portability.SpectralAuditNumericalCertificate.certified_radius_error",
+   "Descent.Portability.SpectralAuditNumericalCertificate.certified_variance_error"
   ],
   "constraints": {
    "hypotheses": [
@@ -142000,7 +142130,8 @@
     "∑ j, η j = 1",
     "0 ≤ lam",
     "Feasible floor c B p",
-    "Feasible floor c B q"
+    "Feasible floor c B q",
+    "Feasible (cappedFloor floor h M"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.AuditDesignNumericalCertificate.certified_variance_error": [
@@ -142021,6 +142152,25 @@
      "0 ≤ lam",
      "Feasible floor c B p",
      "Feasible floor c B q"
+    ],
+    "Descent.Portability.SpectralAuditNumericalCertificate.certified_variance_error": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i",
+     "0 ≤ lam",
+     "Feasible floor c B p"
+    ],
+    "Descent.Portability.SpectralAuditNumericalCertificate.certified_radius_error": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i",
+     "0 ≤ lam",
+     "Feasible floor c B p",
+     "Feasible floor c B q"
+    ],
+    "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i",
+     "0 ≤ lam",
+     "Feasible (cappedFloor floor h M"
     ]
    }
   }
@@ -142046,6 +142196,10 @@
    "Descent.Portability.AuditRangeCaps.le_maxRange",
    "Descent.Portability.AuditRangeCaps.maxRange_le_iff",
    "Descent.Portability.AuditRangeCaps.maxRange_pos",
+   "Descent.Portability.ContinuousAuditCapSearch.exact_cap_reduction",
+   "Descent.Portability.ContinuousAuditCapSearch.exact_solvers_guarantee",
+   "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists",
+   "Descent.Portability.ContinuousAuditCapSearch.radius_continuous",
    "Descent.Portability.GeometricAuditCaps.grid_design_approximation",
    "Descent.Portability.IdenticalAuditCells.capped_spectral_optimum_constant",
    "Descent.Portability.IdenticalAuditCells.range_le",
@@ -142053,7 +142207,10 @@
    "Descent.Portability.MinimaxAuditDesignLaw.common_range_nonneg",
    "Descent.Portability.RangeAwareAuditSearch.exact_solvers_guarantee",
    "Descent.Portability.RangeAwareAuditSearch.finite_search_exists",
-   "Descent.Portability.RangeAwareAuditSearch.range_interval"
+   "Descent.Portability.RangeAwareAuditSearch.range_interval",
+   "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error",
+   "Descent.Portability.SpectralMinimaxAuditDesign.range_identity",
+   "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction"
   ],
   "constraints": {
    "hypotheses": [
@@ -142061,14 +142218,18 @@
     "∀ i, 0 < p i",
     "Feasible floor c B p",
     "IsMinOn (fullRadius a h · x",
+    "ContinuousOn F {p | Feasible floor c B p}",
+    "IsMinOn (fun q ↦ designRadius F h q x",
+    "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
+    "∃ p, Feasible floor c B p",
+    "∀ j, Feasible (cappedFloor floor h j.val.val",
     "maxRange h p ∈ Set.Icc low high",
     "∀ i ∈ s, h i = h₀",
     "{p | Feasible floor c B p ∧ maxRange h p ≤ m}.Nonempty",
     "∀ i, 0 < p i ∧ p i ≤ 1",
     "∀ i, 0 ≤ h i",
-    "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
-    "∃ p, Feasible floor c B p",
-    "∀ j, Feasible (cappedFloor floor h j.val.val"
+    "Feasible (cappedFloor floor h M",
+    "IsMinOn (fun q ↦ fullRadius κ h q u x"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.AuditRangeCaps.le_maxRange": [],
@@ -142083,6 +142244,25 @@
      "∀ i, 0 < h i",
      "Feasible floor c B p",
      "IsMinOn (fullRadius a h · x"
+    ],
+    "Descent.Portability.ContinuousAuditCapSearch.radius_continuous": [
+     "ContinuousOn F {p | Feasible floor c B p}"
+    ],
+    "Descent.Portability.ContinuousAuditCapSearch.exact_cap_reduction": [
+     "∀ i, 0 < h i",
+     "ContinuousOn F {p | Feasible floor c B p}",
+     "Feasible floor c B p",
+     "IsMinOn (fun q ↦ designRadius F h q x"
+    ],
+    "Descent.Portability.ContinuousAuditCapSearch.exact_solvers_guarantee": [
+     "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
+     "∃ p, Feasible floor c B p",
+     "∀ j, Feasible (cappedFloor floor h j.val.val"
+    ],
+    "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists": [
+     "∀ i, 0 < h i",
+     "ContinuousOn F {p | Feasible floor c B p}",
+     "∃ p, Feasible floor c B p"
     ],
     "Descent.Portability.GeometricAuditCaps.grid_design_approximation": [
      "Feasible floor c B p",
@@ -142114,6 +142294,15 @@
     "Descent.Portability.RangeAwareAuditSearch.finite_search_exists": [
      "∀ i, 0 < h i",
      "∃ p, Feasible floor c B p"
+    ],
+    "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error": [
+     "Feasible (cappedFloor floor h M"
+    ],
+    "Descent.Portability.SpectralMinimaxAuditDesign.range_identity": [],
+    "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction": [
+     "∀ i, 0 < h i",
+     "Feasible floor c B p",
+     "IsMinOn (fun q ↦ fullRadius κ h q u x"
     ]
    },
    "range_lo_thm": [
@@ -142159,10 +142348,19 @@
    "Descent.Portability.AuditRangeCaps.capped_feasible_iff",
    "Descent.Portability.AuditRangeCaps.capped_optimum_exists",
    "Descent.Portability.AuditRangeCaps.exact_cap_reduction",
+   "Descent.Portability.ContinuousAuditCapSearch.capped_minimum",
+   "Descent.Portability.ContinuousAuditCapSearch.capped_subset",
+   "Descent.Portability.ContinuousAuditCapSearch.exact_cap_reduction",
+   "Descent.Portability.ContinuousAuditCapSearch.exact_solvers_guarantee",
+   "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists",
    "Descent.Portability.GeometricAuditCaps.grid_design_approximation",
    "Descent.Portability.IdenticalAuditCells.capped_spectral_optimum_constant",
    "Descent.Portability.RangeAwareAuditSearch.exact_solvers_guarantee",
-   "Descent.Portability.RangeAwareAuditSearch.finite_search_exists"
+   "Descent.Portability.RangeAwareAuditSearch.finite_search_exists",
+   "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error",
+   "Descent.Portability.SpectralRangeAuditDesign.capped_convex",
+   "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction",
+   "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists"
   ],
   "constraints": {
    "declared_kind": "probability",
@@ -142175,6 +142373,11 @@
     "∀ i, 0 < h i",
     "Feasible floor c B p",
     "IsMinOn (fullRadius a h · x",
+    "ContinuousOn F {p | Feasible floor c B p}",
+    "IsMinOn (fun q ↦ designRadius F h q x",
+    "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
+    "∃ p, Feasible floor c B p",
+    "∀ j, Feasible (cappedFloor floor h j.val.val",
     "maxRange h p ∈ Set.Icc low high",
     "∀ i, 0 ≤ κ i",
     "∀ i ∈ s, κ i = κ₀",
@@ -142183,9 +142386,9 @@
     "∀ i ∈ s, c i = c₀",
     "∀ i ∈ s, h i = h₀",
     "{p | Feasible floor c B p ∧ maxRange h p ≤ m}.Nonempty",
-    "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
-    "∃ p, Feasible floor c B p",
-    "∀ j, Feasible (cappedFloor floor h j.val.val"
+    "∀ i, 0 ≤ c i",
+    "Feasible (cappedFloor floor h M",
+    "IsMinOn (fun q ↦ fullRadius κ h q u x"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.AuditRangeCaps.capped_feasible_iff": [
@@ -142201,6 +142404,30 @@
      "∀ i, 0 < h i",
      "Feasible floor c B p",
      "IsMinOn (fullRadius a h · x"
+    ],
+    "Descent.Portability.ContinuousAuditCapSearch.capped_subset": [],
+    "Descent.Portability.ContinuousAuditCapSearch.capped_minimum": [
+     "ContinuousOn F {p | Feasible floor c B p}",
+     "{p | Feasible (cappedFloor floor h m"
+    ],
+    "Descent.Portability.ContinuousAuditCapSearch.exact_cap_reduction": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < h i",
+     "ContinuousOn F {p | Feasible floor c B p}",
+     "Feasible floor c B p",
+     "IsMinOn (fun q ↦ designRadius F h q x"
+    ],
+    "Descent.Portability.ContinuousAuditCapSearch.exact_solvers_guarantee": [
+     "∀ i, 0 < floor i",
+     "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
+     "∃ p, Feasible floor c B p",
+     "∀ j, Feasible (cappedFloor floor h j.val.val"
+    ],
+    "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < h i",
+     "ContinuousOn F {p | Feasible floor c B p}",
+     "∃ p, Feasible floor c B p"
     ],
     "Descent.Portability.GeometricAuditCaps.grid_design_approximation": [
      "∀ i, 0 < floor i",
@@ -142225,6 +142452,29 @@
      "∀ j, Feasible (cappedFloor floor h j.val.val"
     ],
     "Descent.Portability.RangeAwareAuditSearch.finite_search_exists": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < h i",
+     "∃ p, Feasible floor c B p"
+    ],
+    "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error": [
+     "∀ i, 0 ≤ κ i",
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i",
+     "Feasible (cappedFloor floor h M"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.capped_convex": [
+     "∀ i, 0 ≤ κ i",
+     "∀ i, 0 < floor i"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction": [
+     "∀ i, 0 ≤ κ i",
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < h i",
+     "Feasible floor c B p",
+     "IsMinOn (fun q ↦ fullRadius κ h q u x"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists": [
+     "∀ i, 0 ≤ κ i",
      "∀ i, 0 < floor i",
      "∀ i, 0 < h i",
      "∃ p, Feasible floor c B p"
@@ -142259,7 +142509,14 @@
    "Descent.Portability.GeometricAuditCaps.grid_design_approximation",
    "Descent.Portability.MinimaxAuditDesignLaw.common_confidence",
    "Descent.Portability.RangeAwareAuditSearch.exact_solvers_guarantee",
-   "Descent.Portability.RangeAwareAuditSearch.finite_search_exists"
+   "Descent.Portability.RangeAwareAuditSearch.finite_search_exists",
+   "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error",
+   "Descent.Portability.SpectralMinimaxAuditDesign.radius_identity",
+   "Descent.Portability.SpectralRangeAuditDesign.design_exists",
+   "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction",
+   "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists",
+   "Descent.Portability.SpectralRangeAuditDesign.radius_continuous",
+   "Descent.Portability.SpectralRangeAuditDesign.radius_minimum"
   ],
   "constraints": {
    "declared_kind": "nonnegative",
@@ -142275,7 +142532,10 @@
     "maxRange h p ∈ Set.Icc low high",
     "∀ i, 0 < p i ∧ p i ≤ 1",
     "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
-    "∀ j, Feasible (cappedFloor floor h j.val.val"
+    "∀ j, Feasible (cappedFloor floor h j.val.val",
+    "Feasible (cappedFloor floor h M",
+    "∀ i, 0 < p i",
+    "IsMinOn (fun q ↦ fullRadius κ h q u x"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.AuditRangeCaps.fullRadius_continuous": [],
@@ -142306,6 +142566,33 @@
      "∀ j, Feasible (cappedFloor floor h j.val.val"
     ],
     "Descent.Portability.RangeAwareAuditSearch.finite_search_exists": [
+     "∀ i, 0 < h i",
+     "0 ≤ x",
+     "∃ p, Feasible floor c B p"
+    ],
+    "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error": [
+     "0 ≤ x",
+     "Feasible (cappedFloor floor h M"
+    ],
+    "Descent.Portability.SpectralMinimaxAuditDesign.radius_identity": [
+     "∀ i, 0 < p i"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.radius_continuous": [],
+    "Descent.Portability.SpectralRangeAuditDesign.radius_minimum": [
+     "{p | Feasible floor c B p}.Nonempty"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction": [
+     "∀ i, 0 < h i",
+     "0 ≤ x",
+     "Feasible floor c B p",
+     "IsMinOn (fun q ↦ fullRadius κ h q u x"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists": [
+     "∀ i, 0 < h i",
+     "0 ≤ x",
+     "∃ p, Feasible floor c B p"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.design_exists": [
      "∀ i, 0 < h i",
      "0 ≤ x",
      "∃ p, Feasible floor c B p"
@@ -142756,8 +143043,13 @@
    "Descent.Portability.MinimaxAuditDesignLaw.common_confidence",
    "Descent.Portability.MinimaxAuditDesignLaw.proxy_envelope_value",
    "Descent.Portability.MinimaxAuditDesignLaw.variance_identity",
+   "Descent.Portability.OptimizedFrameRepairAudit.design_exists",
    "Descent.Portability.SharedAuditCompletion.minimax_frame_upper",
-   "Descent.Portability.SparseBinaryAudit.variance_upper"
+   "Descent.Portability.SparseBinaryAudit.variance_upper",
+   "Descent.Portability.SpectralMinimaxAuditDesign.design_exists",
+   "Descent.Portability.SpectralMinimaxAuditDesign.kappa_nonneg",
+   "Descent.Portability.SpectralMinimaxAuditDesign.radius_identity",
+   "Descent.Portability.SpectralMinimaxAuditDesign.variance_identity"
   ],
   "constraints": {
    "declared_kind": "nonnegative",
@@ -142775,7 +143067,9 @@
     "∀ i, 0 < ranges L U w i",
     "∀ i, lo i ≤ hi i",
     "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i",
-    "∀ i, lo i ≤ (∫ y, y ∂μ i"
+    "∀ i, lo i ≤ (∫ y, y ∂μ i",
+    "∀ i, 0 < SpectralMinimaxAuditDesign.rowRange L U (rows (gram w φ",
+    "∀ i, 0 < rowRange L U u i"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.AuditVarianceGeometry.proxy_upper": [
@@ -142814,11 +143108,28 @@
      "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i",
      "∀ i, lo i ≤ (∫ y, y ∂μ i"
     ],
+    "Descent.Portability.OptimizedFrameRepairAudit.design_exists": [
+     "∀ i, L i ≤ lo i ∧ lo i ≤ hi i ∧ hi i ≤ U i",
+     "∀ i, 0 < SpectralMinimaxAuditDesign.rowRange L U (rows (gram w φ"
+    ],
     "Descent.Portability.SharedAuditCompletion.minimax_frame_upper": [
      "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i",
      "∀ i, lo i ≤ (∫ y, y ∂μ i"
     ],
-    "Descent.Portability.SparseBinaryAudit.variance_upper": []
+    "Descent.Portability.SparseBinaryAudit.variance_upper": [],
+    "Descent.Portability.SpectralMinimaxAuditDesign.kappa_nonneg": [
+     "∀ i, L i ≤ lo i ∧ lo i ≤ hi i ∧ hi i ≤ U i"
+    ],
+    "Descent.Portability.SpectralMinimaxAuditDesign.variance_identity": [
+     "∀ i, lo i ≤ hi i"
+    ],
+    "Descent.Portability.SpectralMinimaxAuditDesign.radius_identity": [
+     "∀ i, lo i ≤ hi i"
+    ],
+    "Descent.Portability.SpectralMinimaxAuditDesign.design_exists": [
+     "∀ i, L i ≤ lo i ∧ lo i ≤ hi i ∧ hi i ≤ U i",
+     "∀ i, 0 < rowRange L U u i"
+    ]
    }
   }
  },
@@ -146133,6 +146444,7 @@
    "Descent.Portability.CompactSpectralIdentification.adaptive_spectral_minimax",
    "Descent.Portability.CompactTargetDeflation.leadingQuery_risk",
    "Descent.Portability.ConditionalGuardError.conditional_repair_certificate",
+   "Descent.Portability.ContinuousAuditCapSearch.exact_cap_reduction",
    "Descent.Portability.DiscountedForecastMinimax.adaptive_discounted_minimax",
    "Descent.Portability.DiscountedForecastMinimax.lawTrajectory_affine",
    "Descent.Portability.EvolutionaryForecastMinimax.adaptive_forecast_minimax",
@@ -146162,12 +146474,15 @@
    "Descent.Portability.MeasurementRankLaw.minimal_exact_measurement_count",
    "Descent.Portability.MeasurementRankLaw.zero_risk_iff",
    "Descent.Portability.MinimaxAuditDesignLaw.common_confidence",
+   "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error",
+   "Descent.Portability.SpectralAuditNumericalCertificate.certified_radius_error",
    "Descent.Portability.SpectralMeasurementMinimax.adaptive_minimax",
    "Descent.Portability.SpectralMeasurementMinimax.adaptive_minimax_all_budgets",
    "Descent.Portability.SpectralMeasurementMinimax.adaptive_spectral_lower",
    "Descent.Portability.SpectralMeasurementMinimax.full_budget_achievable",
    "Descent.Portability.SpectralMeasurementMinimax.leadingProcedure_full",
    "Descent.Portability.SpectralMeasurementMinimax.leadingProcedure_upper",
+   "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction",
    "Descent.Portability.TargetUncertainty.affine_minimax_radius",
    "Descent.Portability.TargetUncertainty.center_upper_bound",
    "Descent.Portability.TargetUncertainty.minimax_radius",
@@ -146195,10 +146510,14 @@
     "0 < x",
     "∀ i ∈ s, ∀ᵐ ω ∂μ, |X i ω| ≤ M",
     "0 < v",
+    "IsMinOn (fun q ↦ designRadius F h q x",
     "∀ j, 0 ≤ M j",
     "∀ t : ℝ, 0 < t → t < radius → graphPoint a k x t ∈ U ∧ density ≤ gaussianPDFReal 0 1 (graphCenter a k x + t",
     "cap ≤ rate * M",
     "v' ≤ v",
+    "0 < M",
+    "Feasible (cappedFloor floor h M",
+    "IsMinOn (fun q ↦ fullRadius κ h q u x",
     "‖v‖ ≤ radius"
    ],
    "hypotheses_by_theorem": {
@@ -146275,6 +146594,10 @@
     "Descent.Portability.CompactSpectralIdentification.adaptive_spectral_minimax": [],
     "Descent.Portability.CompactTargetDeflation.leadingQuery_risk": [],
     "Descent.Portability.ConditionalGuardError.conditional_repair_certificate": [],
+    "Descent.Portability.ContinuousAuditCapSearch.exact_cap_reduction": [
+     "0 ≤ x",
+     "IsMinOn (fun q ↦ designRadius F h q x"
+    ],
     "Descent.Portability.posteriorMean_swappedConditional": [],
     "Descent.Portability.indexWiseCalibrationEnergy_swappedConditional_eq": [],
     "Descent.Portability.unqueried_error_ge_radius": [],
@@ -146319,12 +146642,24 @@
     "Descent.Portability.MeasurementRankLaw.zero_risk_iff": [],
     "Descent.Portability.MeasurementRankLaw.minimal_exact_measurement_count": [],
     "Descent.Portability.MinimaxAuditDesignLaw.common_confidence": [],
+    "Descent.Portability.SpectralAuditNumericalCertificate.certified_radius_error": [
+     "0 ≤ x"
+    ],
+    "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error": [
+     "0 < M",
+     "0 ≤ x",
+     "Feasible (cappedFloor floor h M"
+    ],
     "Descent.Portability.SpectralMeasurementMinimax.leadingProcedure_upper": [],
     "Descent.Portability.SpectralMeasurementMinimax.adaptive_spectral_lower": [],
     "Descent.Portability.SpectralMeasurementMinimax.adaptive_minimax": [],
     "Descent.Portability.SpectralMeasurementMinimax.leadingProcedure_full": [],
     "Descent.Portability.SpectralMeasurementMinimax.full_budget_achievable": [],
     "Descent.Portability.SpectralMeasurementMinimax.adaptive_minimax_all_budgets": [],
+    "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction": [
+     "0 ≤ x",
+     "IsMinOn (fun q ↦ fullRadius κ h q u x"
+    ],
     "Descent.Portability.TargetUncertainty.center_upper_bound": [],
     "Descent.Portability.TargetUncertainty.opposite_points_lower": [
      "‖v‖ ≤ radius"
@@ -148319,6 +148654,7 @@
    "Descent.Portability.ConditionalGuardError.conditional_repair_certificate",
    "Descent.Portability.GuardedRepairDeployment.harm_probability",
    "Descent.Portability.HardBudgetAuditGuard.guarded_repair_certificate",
+   "Descent.Portability.OptimizedFrameRepairAudit.design_exists",
    "Descent.Portability.SecondMomentFrameRepair.estimate_confidence",
    "Descent.Portability.SecondMomentFrameRepair.false_certificate_probability",
    "Descent.Portability.SecondMomentFrameRepair.harm_probability"
@@ -148336,6 +148672,9 @@
     "∀ i, 0 ≤ w i",
     "(DecisionLossContrasts.gram w φ",
     "contrast c p + BernsteinTailBound.radius (maxCost c",
+    "∀ i, L i ≤ lo i ∧ lo i ≤ hi i ∧ hi i ≤ U i",
+    "∀ i, 0 < SpectralMinimaxAuditDesign.rowRange L U (rows (gram w φ",
+    "∃ p, Feasible floor c B p",
     "0 < δ",
     "∀ i, (∫ y, (y - q i"
    ],
@@ -148395,6 +148734,13 @@
      "∀ i, q i ∈ Set.Icc (L i",
      "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i",
      "∀ i, lo i ≤ (∫ y, y ∂μ i"
+    ],
+    "Descent.Portability.OptimizedFrameRepairAudit.design_exists": [
+     "(gram w φ",
+     "0 < δ ∧ δ < 1",
+     "∀ i, L i ≤ lo i ∧ lo i ≤ hi i ∧ hi i ≤ U i",
+     "∀ i, 0 < SpectralMinimaxAuditDesign.rowRange L U (rows (gram w φ",
+     "∃ p, Feasible floor c B p"
     ],
     "Descent.Portability.SecondMomentFrameRepair.estimate_confidence": [
      "(gram w φ",
@@ -148516,6 +148862,7 @@
    "Descent.Portability.GuardedRepairDeployment.harm_implies_false_certificate",
    "Descent.Portability.GuardedRepairDeployment.harm_probability",
    "Descent.Portability.HardBudgetAuditGuard.guarded_repair_certificate",
+   "Descent.Portability.OptimizedFrameRepairAudit.design_exists",
    "Descent.Portability.SecondMomentFrameRepair.false_certificate_probability",
    "Descent.Portability.SecondMomentFrameRepair.harm_probability"
   ],
@@ -148528,7 +148875,8 @@
     "∀ i, lo i ≤ (∫ y, y ∂μ i",
     "∀ i, 0 ≤ w i",
     "(DecisionLossContrasts.gram w φ",
-    "deployedGain μ w f φ ε p q c hard z < 0"
+    "deployedGain μ w f φ ε p q c hard z < 0",
+    "∀ i, 0 < SpectralMinimaxAuditDesign.rowRange L U (rows (gram w φ"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.CertifiedFrameRepair.certificate_on_event": [
@@ -148564,6 +148912,10 @@
      "(DecisionLossContrasts.gram w φ",
      "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i",
      "∀ i, lo i ≤ (∫ y, y ∂μ i"
+    ],
+    "Descent.Portability.OptimizedFrameRepairAudit.design_exists": [
+     "(gram w φ",
+     "∀ i, 0 < SpectralMinimaxAuditDesign.rowRange L U (rows (gram w φ"
     ],
     "Descent.Portability.SecondMomentFrameRepair.false_certificate_probability": [
      "(gram w φ"
@@ -154233,6 +154585,90 @@
     ],
     "Descent.Portability.ConditionalSeparatorLaw.gibbs_separator_exp_bound": [
      "∀ y i x x', U y i x' - U y i x ≤ R i"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.ContinuousAuditCapSearch.designRadius": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "ambiguous call to 'radius' with 3 argument(s): ['Descent.Portability.BernsteinTailBound.radius', 'Descent.Portability.FixedBinHoeffdingLaw.radius']",
+  "file": "Descent/Portability/ContinuousAuditCapSearch.lean",
+  "line": 27,
+  "short": "designRadius",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "x": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ContinuousAuditCapSearch.exact_cap_reduction",
+   "Descent.Portability.ContinuousAuditCapSearch.exact_solvers_guarantee",
+   "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists",
+   "Descent.Portability.ContinuousAuditCapSearch.radius_continuous",
+   "Descent.Portability.ContinuousAuditCapSearch.radius_minimum",
+   "Descent.Portability.SpectralMinimaxAuditDesign.radius_identity",
+   "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "hypotheses": [
+    "ContinuousOn F {p | Feasible floor c B p}",
+    "{p | Feasible floor c B p}.Nonempty",
+    "∀ i, 0 < h i",
+    "0 ≤ x",
+    "Feasible floor c B p",
+    "IsMinOn (fun q ↦ designRadius F h q x",
+    "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
+    "∃ p, Feasible floor c B p",
+    "∀ j, Feasible (cappedFloor floor h j.val.val",
+    "∀ i, 0 < p i",
+    "IsMinOn (fun q ↦ fullRadius κ h q u x"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ContinuousAuditCapSearch.radius_continuous": [
+     "ContinuousOn F {p | Feasible floor c B p}"
+    ],
+    "Descent.Portability.ContinuousAuditCapSearch.radius_minimum": [
+     "ContinuousOn F {p | Feasible floor c B p}",
+     "{p | Feasible floor c B p}.Nonempty"
+    ],
+    "Descent.Portability.ContinuousAuditCapSearch.exact_cap_reduction": [
+     "∀ i, 0 < h i",
+     "0 ≤ x",
+     "ContinuousOn F {p | Feasible floor c B p}",
+     "Feasible floor c B p",
+     "IsMinOn (fun q ↦ designRadius F h q x"
+    ],
+    "Descent.Portability.ContinuousAuditCapSearch.exact_solvers_guarantee": [
+     "0 ≤ x",
+     "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
+     "∃ p, Feasible floor c B p",
+     "∀ j, Feasible (cappedFloor floor h j.val.val"
+    ],
+    "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists": [
+     "∀ i, 0 < h i",
+     "0 ≤ x",
+     "ContinuousOn F {p | Feasible floor c B p}",
+     "∃ p, Feasible floor c B p"
+    ],
+    "Descent.Portability.SpectralMinimaxAuditDesign.radius_identity": [
+     "∀ i, 0 < p i"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction": [
+     "∀ i, 0 < h i",
+     "0 ≤ x",
+     "Feasible floor c B p",
+     "IsMinOn (fun q ↦ fullRadius κ h q u x"
     ]
    }
   }
@@ -160050,6 +160486,7 @@
    "Descent.Portability.MeasurementRankLaw.gram_matrix",
    "Descent.Portability.MeasurementRankLaw.gram_rank",
    "Descent.Portability.MeasurementRankLaw.targetRank_eq_active",
+   "Descent.Portability.OptimizedFrameRepairAudit.design_exists",
    "Descent.Portability.SecondMomentFrameRepair.estimate_confidence",
    "Descent.Portability.SecondMomentFrameRepair.false_certificate_probability",
    "Descent.Portability.SecondMomentFrameRepair.harm_probability",
@@ -160067,6 +160504,7 @@
     "(DecisionLossContrasts.gram w φ",
     "GramSafeRepair.signal (gram w φ",
     "deployedGain μ w f φ ε p q c hard z < 0",
+    "∀ i, 0 < SpectralMinimaxAuditDesign.rowRange L U (rows (gram w φ",
     "∀ j, (gram (w j",
     "∀ j, GramSafeRepair.signal (gram (w j",
     "θ ∈ SafeSet (fun j ↦ gram (w j",
@@ -160121,6 +160559,10 @@
     "Descent.Portability.MeasurementRankLaw.gram_rank": [],
     "Descent.Portability.MeasurementRankLaw.gram_matrix": [],
     "Descent.Portability.MeasurementRankLaw.targetRank_eq_active": [],
+    "Descent.Portability.OptimizedFrameRepairAudit.design_exists": [
+     "(gram w φ",
+     "∀ i, 0 < SpectralMinimaxAuditDesign.rowRange L U (rows (gram w φ"
+    ],
     "Descent.Portability.SecondMomentFrameRepair.estimate_confidence": [
      "(gram w φ"
     ],
@@ -161923,6 +162365,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists",
    "Descent.Portability.DiploidBernsteinLaw.phenotypeMean_injective",
    "Descent.Portability.DiploidBernsteinLaw.recover_phenotypeMean",
    "Descent.Portability.DiploidBernsteinLaw.tensor_inverse_contract",
@@ -161934,13 +162377,17 @@
    "Descent.Portability.RangeAwareAuditSearch.finite_search_exists",
    "Descent.Portability.SimulationBaselineLaw.grid_bounds",
    "Descent.Portability.SimulationBaselineLaw.grid_closed",
-   "Descent.Portability.SimulationBaselineLaw.grid_sum_zero"
+   "Descent.Portability.SimulationBaselineLaw.grid_sum_zero",
+   "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists"
   ],
   "constraints": {
    "hypotheses": [
     "0 ≤ x"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists": [
+     "0 ≤ x"
+    ],
     "Descent.Portability.DiploidBernsteinLaw.tensor_inverse_contract": [],
     "Descent.Portability.DiploidBernsteinLaw.recover_phenotypeMean": [],
     "Descent.Portability.DiploidBernsteinLaw.phenotypeMean_injective": [],
@@ -161956,7 +162403,10 @@
     ],
     "Descent.Portability.SimulationBaselineLaw.grid_closed": [],
     "Descent.Portability.SimulationBaselineLaw.grid_bounds": [],
-    "Descent.Portability.SimulationBaselineLaw.grid_sum_zero": []
+    "Descent.Portability.SimulationBaselineLaw.grid_sum_zero": [],
+    "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists": [
+     "0 ≤ x"
+    ]
    },
    "range_lo_thm": [
     "Descent.Portability.NonlinearMetricGridBound.exists_grid_mixture_near",
@@ -178673,6 +179123,7 @@
    "Descent.Portability.SourceFixedRealization.uniformBool_sign_variance",
    "Descent.Portability.SpectralAuditConfidence.confidence",
    "Descent.Portability.SpectralAuditConfidence.directional_variance",
+   "Descent.Portability.SpectralMinimaxAuditDesign.variance_identity",
    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_squared_correlation",
    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_squared_correlation_eq_zero_iff",
    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_variance_outcome",
@@ -178710,7 +179161,8 @@
     "0 < p",
     "p ≤ 1",
     "∀ i, 0 ≤ marginal L U p q lo hi i",
-    "∀ i, 0 < p i ∧ p i ≤ 1"
+    "∀ i, 0 < p i ∧ p i ≤ 1",
+    "∀ i, 0 < p i"
    ],
    "hypotheses_by_theorem": {
     "Descent.Blindness.lowSNRFourthCoefficient_sub_of_spectral_match": [],
@@ -178955,6 +179407,9 @@
     ],
     "Descent.Portability.SpectralAuditConfidence.confidence": [
      "∀ i, 0 < p i ∧ p i ≤ 1"
+    ],
+    "Descent.Portability.SpectralMinimaxAuditDesign.variance_identity": [
+     "∀ i, 0 < p i"
     ],
     "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_variance_score": [],
     "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_variance_outcome": [],
@@ -180834,6 +181289,13 @@
    "Descent.Portability.AuditRangeCaps.exact_cap_reduction",
    "Descent.Portability.AuditRangeCaps.fullRadius_continuous",
    "Descent.Portability.AuditRangeCaps.full_optimum_exists",
+   "Descent.Portability.ContinuousAuditCapSearch.capped_minimum",
+   "Descent.Portability.ContinuousAuditCapSearch.capped_subset",
+   "Descent.Portability.ContinuousAuditCapSearch.exact_cap_reduction",
+   "Descent.Portability.ContinuousAuditCapSearch.exact_solvers_guarantee",
+   "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists",
+   "Descent.Portability.ContinuousAuditCapSearch.radius_continuous",
+   "Descent.Portability.ContinuousAuditCapSearch.radius_minimum",
    "Descent.Portability.DecisionDirectedAuditDesign.design_exists",
    "Descent.Portability.FiniteAuditAllocationLaw.allocation_formula",
    "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law",
@@ -180851,6 +181313,7 @@
    "Descent.Portability.IdenticalAuditCells.capped_spectral_optimum_constant",
    "Descent.Portability.IdenticalAuditCells.feasible_average",
    "Descent.Portability.IdenticalAuditCells.spectral_optimum_constant",
+   "Descent.Portability.OptimizedFrameRepairAudit.design_exists",
    "Descent.Portability.RangeAwareAuditSearch.exact_solvers_guarantee",
    "Descent.Portability.RangeAwareAuditSearch.finite_search_exists",
    "Descent.Portability.RangeAwareAuditSearch.range_interval",
@@ -180858,7 +181321,17 @@
    "Descent.Portability.SpectralAuditDesign.objective_convex",
    "Descent.Portability.SpectralAuditDesign.optimum_exists",
    "Descent.Portability.SpectralAuditDualCertificate.certified_optimum",
-   "Descent.Portability.SpectralAuditDualCertificate.weak_duality"
+   "Descent.Portability.SpectralAuditDualCertificate.weak_duality",
+   "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error",
+   "Descent.Portability.SpectralAuditNumericalCertificate.certified_radius_error",
+   "Descent.Portability.SpectralAuditNumericalCertificate.certified_variance_error",
+   "Descent.Portability.SpectralMinimaxAuditDesign.design_exists",
+   "Descent.Portability.SpectralRangeAuditDesign.capped_convex",
+   "Descent.Portability.SpectralRangeAuditDesign.design_exists",
+   "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction",
+   "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists",
+   "Descent.Portability.SpectralRangeAuditDesign.radius_continuous",
+   "Descent.Portability.SpectralRangeAuditDesign.radius_minimum"
   ],
   "constraints": {
    "declared_kind": "probability",
@@ -180871,7 +181344,10 @@
     "Feasible floor c B q",
     "{p | Feasible floor c B p}.Nonempty",
     "{p | Feasible (cappedFloor floor h m",
+    "ContinuousOn F {p | Feasible floor c B p}",
+    "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
     "∃ p, Feasible floor c B p",
+    "∀ j, Feasible (cappedFloor floor h j.val.val",
     "dualBound a floor c B η lam = worstVariance a p",
     "∀ i, 0 < c i",
     "∀ i, p₀ i ∈ Set.Icc (floor i",
@@ -180883,10 +181359,9 @@
     "∀ i ∈ s, floor i = f₀",
     "∀ i ∈ s, c i = c₀",
     "{p | Feasible floor c B p ∧ maxRange h p ≤ m}.Nonempty",
-    "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
-    "∀ j, Feasible (cappedFloor floor h j.val.val",
     "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i",
-    "(covariance (fun i ↦ κ i / p i"
+    "(covariance (fun i ↦ κ i / p i",
+    "Feasible (cappedFloor floor h M"
    ],
    "hypotheses_by_theorem": {
     "Descent.Decision.CertificateGrading.FiniteMomentCertificateProblem.le_modulus_of_feasible": [],
@@ -180922,6 +181397,36 @@
     "Descent.Portability.AuditRangeCaps.exact_cap_reduction": [
      "∀ i, 0 < floor i",
      "Feasible floor c B p"
+    ],
+    "Descent.Portability.ContinuousAuditCapSearch.capped_subset": [],
+    "Descent.Portability.ContinuousAuditCapSearch.capped_minimum": [
+     "ContinuousOn F {p | Feasible floor c B p}",
+     "{p | Feasible (cappedFloor floor h m"
+    ],
+    "Descent.Portability.ContinuousAuditCapSearch.radius_continuous": [
+     "∀ i, 0 < floor i",
+     "ContinuousOn F {p | Feasible floor c B p}"
+    ],
+    "Descent.Portability.ContinuousAuditCapSearch.radius_minimum": [
+     "∀ i, 0 < floor i",
+     "ContinuousOn F {p | Feasible floor c B p}",
+     "{p | Feasible floor c B p}.Nonempty"
+    ],
+    "Descent.Portability.ContinuousAuditCapSearch.exact_cap_reduction": [
+     "∀ i, 0 < floor i",
+     "ContinuousOn F {p | Feasible floor c B p}",
+     "Feasible floor c B p"
+    ],
+    "Descent.Portability.ContinuousAuditCapSearch.exact_solvers_guarantee": [
+     "∀ i, 0 < floor i",
+     "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
+     "∃ p, Feasible floor c B p",
+     "∀ j, Feasible (cappedFloor floor h j.val.val"
+    ],
+    "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists": [
+     "∀ i, 0 < floor i",
+     "ContinuousOn F {p | Feasible floor c B p}",
+     "∃ p, Feasible floor c B p"
     ],
     "Descent.Portability.DecisionDirectedAuditDesign.design_exists": [
      "∀ i, 0 < floor i",
@@ -181004,6 +181509,10 @@
      "∀ i ∈ s, c i = c₀",
      "{p | Feasible floor c B p ∧ maxRange h p ≤ m}.Nonempty"
     ],
+    "Descent.Portability.OptimizedFrameRepairAudit.design_exists": [
+     "∀ i, 0 < floor i",
+     "∃ p, Feasible floor c B p"
+    ],
     "Descent.Portability.RangeAwareAuditSearch.range_interval": [
      "∀ i, 0 < floor i",
      "Feasible floor c B p"
@@ -181040,6 +181549,48 @@
      "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i",
      "(covariance (fun i ↦ κ i / p i",
      "lam * (spending c p - B"
+    ],
+    "Descent.Portability.SpectralAuditNumericalCertificate.certified_variance_error": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i",
+     "Feasible floor c B p"
+    ],
+    "Descent.Portability.SpectralAuditNumericalCertificate.certified_radius_error": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i",
+     "Feasible floor c B p",
+     "Feasible floor c B q"
+    ],
+    "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i",
+     "Feasible (cappedFloor floor h M"
+    ],
+    "Descent.Portability.SpectralMinimaxAuditDesign.design_exists": [
+     "∀ i, 0 < floor i",
+     "∃ p, Feasible floor c B p"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.radius_continuous": [
+     "∀ i, 0 < floor i"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.radius_minimum": [
+     "∀ i, 0 < floor i",
+     "{p | Feasible floor c B p}.Nonempty"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.capped_convex": [
+     "∀ i, 0 < floor i"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction": [
+     "∀ i, 0 < floor i",
+     "Feasible floor c B p"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists": [
+     "∀ i, 0 < floor i",
+     "∃ p, Feasible floor c B p"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.design_exists": [
+     "∀ i, 0 < floor i",
+     "∃ p, Feasible floor c B p"
     ]
    }
   }
@@ -181887,6 +182438,8 @@
    "Descent.Portability.AncestralEpochGenotypeSupport.nextEpochInterval_input_homogeneous",
    "Descent.Portability.AncestralEpochGenotypeSupport.stoppedGenome_excludes_good",
    "Descent.Portability.BellmanReportBounds.accumulated_defect_eq",
+   "Descent.Portability.ContinuousAuditCapSearch.exact_solvers_guarantee",
+   "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists",
    "Descent.Portability.DecisionDirectedAuditDesign.design_exists",
    "Descent.Portability.FiniteBinCalibrationLaw.iid_miss_probability",
    "Descent.Portability.FiniteBinCalibrationLaw.mass_mul_rate",
@@ -181916,10 +182469,14 @@
    "Descent.Portability.MutationChannelBridge.generator_template_sum",
    "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels",
    "Descent.Portability.MutationChannelBridge.stoppedGenome_eq_limit",
+   "Descent.Portability.OptimizedFrameRepairAudit.design_exists",
    "Descent.Portability.RangeAwareAuditSearch.exact_solvers_guarantee",
    "Descent.Portability.RangeAwareAuditSearch.finite_search_exists",
    "Descent.Portability.SignedTransferIdentification.mutation_generator_row",
    "Descent.Portability.SignedTransferIdentification.stoppedGenome_eq_limit_of_generator",
+   "Descent.Portability.SpectralMinimaxAuditDesign.design_exists",
+   "Descent.Portability.SpectralRangeAuditDesign.design_exists",
+   "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists",
    "Descent.Portability.StationaryPoissonLaw.stationary_stateLaw",
    "Descent.Portability.StoppedGenotypeRenewal.genomeGenerator_eq_proposal",
    "Descent.Portability.WholeGenomeMutationRace.genomeWait_first_step",
@@ -181939,12 +182496,13 @@
    "declared_lo": 0.0,
    "declared_hi": 1.0,
    "hypotheses": [
+    "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
     "∃ p, Feasible floor c B p",
+    "∀ j, Feasible (cappedFloor floor h j.val.val",
+    "ContinuousOn F {p | Feasible floor c B p}",
     "Feasible floor c B p",
     "maxRange h p ∈ Set.Icc low high",
-    "∀ stage i j, HasDerivAt (fun θ ↦ kernel stage θ i j",
-    "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
-    "∀ j, Feasible (cappedFloor floor h j.val.val"
+    "∀ stage i j, HasDerivAt (fun θ ↦ kernel stage θ i j"
    ],
    "hypotheses_by_theorem": {
     "Descent.Blindness.CountingInvariantBlindness.no_function_of_count_determines_rate": [],
@@ -181978,6 +182536,15 @@
     "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_covered": [],
     "Descent.Portability.AncestralEpochGenotypeSupport.completeDemography_rawDosage_le_six": [],
     "Descent.Portability.BellmanReportBounds.accumulated_defect_eq": [],
+    "Descent.Portability.ContinuousAuditCapSearch.exact_solvers_guarantee": [
+     "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
+     "∃ p, Feasible floor c B p",
+     "∀ j, Feasible (cappedFloor floor h j.val.val"
+    ],
+    "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists": [
+     "ContinuousOn F {p | Feasible floor c B p}",
+     "∃ p, Feasible floor c B p"
+    ],
     "Descent.Portability.DecisionDirectedAuditDesign.design_exists": [
      "∃ p, Feasible floor c B p"
     ],
@@ -182018,6 +182585,9 @@
     "Descent.Portability.MutationChannelBridge.generator_template_sum": [],
     "Descent.Portability.MutationChannelBridge.genomeGenerator_eq_channels": [],
     "Descent.Portability.MutationChannelBridge.stoppedGenome_eq_limit": [],
+    "Descent.Portability.OptimizedFrameRepairAudit.design_exists": [
+     "∃ p, Feasible floor c B p"
+    ],
     "Descent.Portability.ibdRecurrenceStep_empty_population_is_junk": [],
     "Descent.Portability.ibdRecurrenceFixedPoint_isFixedPoint": [],
     "Descent.Portability.ibdRecurrenceFixedPoint_sub_linearisation": [],
@@ -182034,6 +182604,15 @@
     ],
     "Descent.Portability.SignedTransferIdentification.mutation_generator_row": [],
     "Descent.Portability.SignedTransferIdentification.stoppedGenome_eq_limit_of_generator": [],
+    "Descent.Portability.SpectralMinimaxAuditDesign.design_exists": [
+     "∃ p, Feasible floor c B p"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists": [
+     "∃ p, Feasible floor c B p"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.design_exists": [
+     "∃ p, Feasible floor c B p"
+    ],
     "Descent.Portability.StationaryPoissonLaw.stationary_stateLaw": [],
     "Descent.Portability.StoppedGenotypeRenewal.genomeGenerator_eq_proposal": [],
     "Descent.Portability.WholeGenomeMutationRace.intervalGenome_exponential_real": [],
@@ -186607,6 +187186,7 @@
    "Descent.Portability.MeasurementRankLaw.gram_matrix",
    "Descent.Portability.MeasurementRankLaw.gram_rank",
    "Descent.Portability.MeasurementRankLaw.targetRank_eq_active",
+   "Descent.Portability.OptimizedFrameRepairAudit.design_exists",
    "Descent.Portability.SecondMomentFrameRepair.estimate_confidence",
    "Descent.Portability.SecondMomentFrameRepair.false_certificate_probability",
    "Descent.Portability.SecondMomentFrameRepair.harm_probability",
@@ -186620,7 +187200,9 @@
    "hypotheses": [
     "∀ i, L i ≤ U i",
     "∀ i, q i ∈ Set.Icc (L i",
-    "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i"
+    "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i",
+    "∀ i, L i ≤ lo i ∧ lo i ≤ hi i ∧ hi i ≤ U i",
+    "∀ i, 0 < SpectralMinimaxAuditDesign.rowRange L U (rows (gram w φ"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.CertifiedFrameRepair.auditRadius_nonneg": [
@@ -186667,6 +187249,10 @@
     "Descent.Portability.MeasurementRankLaw.gram_rank": [],
     "Descent.Portability.MeasurementRankLaw.gram_matrix": [],
     "Descent.Portability.MeasurementRankLaw.targetRank_eq_active": [],
+    "Descent.Portability.OptimizedFrameRepairAudit.design_exists": [
+     "∀ i, L i ≤ lo i ∧ lo i ≤ hi i ∧ hi i ≤ U i",
+     "∀ i, 0 < SpectralMinimaxAuditDesign.rowRange L U (rows (gram w φ"
+    ],
     "Descent.Portability.SecondMomentFrameRepair.estimate_confidence": [],
     "Descent.Portability.SecondMomentFrameRepair.false_certificate_probability": [],
     "Descent.Portability.SecondMomentFrameRepair.harm_probability": [],
@@ -188373,6 +188959,7 @@
    "Descent.Portability.CompactSpectralIdentification.adaptive_spectral_minimax",
    "Descent.Portability.CompactTargetDeflation.leadingQuery_risk",
    "Descent.Portability.ConditionalGuardError.conditional_repair_certificate",
+   "Descent.Portability.ContinuousAuditCapSearch.exact_cap_reduction",
    "Descent.Portability.DiscountedForecastMinimax.adaptive_discounted_minimax",
    "Descent.Portability.DiscountedForecastMinimax.lawTrajectory_affine",
    "Descent.Portability.EvolutionaryForecastMinimax.adaptive_forecast_minimax",
@@ -188402,12 +188989,15 @@
    "Descent.Portability.MeasurementRankLaw.minimal_exact_measurement_count",
    "Descent.Portability.MeasurementRankLaw.zero_risk_iff",
    "Descent.Portability.MinimaxAuditDesignLaw.common_confidence",
+   "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error",
+   "Descent.Portability.SpectralAuditNumericalCertificate.certified_radius_error",
    "Descent.Portability.SpectralMeasurementMinimax.adaptive_minimax",
    "Descent.Portability.SpectralMeasurementMinimax.adaptive_minimax_all_budgets",
    "Descent.Portability.SpectralMeasurementMinimax.adaptive_spectral_lower",
    "Descent.Portability.SpectralMeasurementMinimax.full_budget_achievable",
    "Descent.Portability.SpectralMeasurementMinimax.leadingProcedure_full",
    "Descent.Portability.SpectralMeasurementMinimax.leadingProcedure_upper",
+   "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction",
    "Descent.Portability.TargetUncertainty.affine_minimax_radius",
    "Descent.Portability.TargetUncertainty.center_upper_bound",
    "Descent.Portability.TargetUncertainty.minimax_radius",
@@ -188469,6 +189059,7 @@
     "Descent.Portability.CompactSpectralIdentification.adaptive_spectral_minimax": [],
     "Descent.Portability.CompactTargetDeflation.leadingQuery_risk": [],
     "Descent.Portability.ConditionalGuardError.conditional_repair_certificate": [],
+    "Descent.Portability.ContinuousAuditCapSearch.exact_cap_reduction": [],
     "Descent.Portability.posteriorMean_swappedConditional": [],
     "Descent.Portability.indexWiseCalibrationEnergy_swappedConditional_eq": [],
     "Descent.Portability.unqueried_error_ge_radius": [],
@@ -188519,12 +189110,15 @@
     "Descent.Portability.MeasurementRankLaw.zero_risk_iff": [],
     "Descent.Portability.MeasurementRankLaw.minimal_exact_measurement_count": [],
     "Descent.Portability.MinimaxAuditDesignLaw.common_confidence": [],
+    "Descent.Portability.SpectralAuditNumericalCertificate.certified_radius_error": [],
+    "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error": [],
     "Descent.Portability.SpectralMeasurementMinimax.leadingProcedure_upper": [],
     "Descent.Portability.SpectralMeasurementMinimax.adaptive_spectral_lower": [],
     "Descent.Portability.SpectralMeasurementMinimax.adaptive_minimax": [],
     "Descent.Portability.SpectralMeasurementMinimax.leadingProcedure_full": [],
     "Descent.Portability.SpectralMeasurementMinimax.full_budget_achievable": [],
     "Descent.Portability.SpectralMeasurementMinimax.adaptive_minimax_all_budgets": [],
+    "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction": [],
     "Descent.Portability.TargetUncertainty.center_upper_bound": [],
     "Descent.Portability.TargetUncertainty.opposite_points_lower": [],
     "Descent.Portability.TargetUncertainty.uniform_bound_lower": [],
@@ -192009,6 +192603,7 @@
    "Descent.Portability.JointAuditExperiment.observation_failure_le",
    "Descent.Portability.JointAuditExperiment.observations_map",
    "Descent.Portability.MinimaxAuditDesignLaw.common_confidence",
+   "Descent.Portability.OptimizedFrameRepairAudit.design_exists",
    "Descent.Portability.SecondMomentAuditConfidence.confidence",
    "Descent.Portability.SecondMomentAuditConfidence.direction_memLp",
    "Descent.Portability.SecondMomentAuditConfidence.direction_second",
@@ -192028,6 +192623,7 @@
    "Descent.Portability.SparseBinaryAudit.variance_attained",
    "Descent.Portability.SparseBinaryAudit.variance_upper",
    "Descent.Portability.SpectralAuditConfidence.confidence",
+   "Descent.Portability.SpectralMinimaxAuditDesign.design_exists",
    "Descent.Portability.SubgroupFrameTransport.certified_mixture_transport",
    "Descent.Portability.SubgroupFrameTransport.joint_group_gain",
    "Descent.Portability.SubgroupFrameTransport.mixture_lower_bound",
@@ -192045,6 +192641,7 @@
     "∀ i, |w i| * (U i - L i",
     "∀ j i, |w j i| * (U i - L i",
     "∑ i, w i = 1",
+    "∀ i, 0 < SpectralMinimaxAuditDesign.rowRange L U (rows (gram w φ",
     "Admissible p w",
     "∀ j i, 0 ≤ w j i",
     "∀ j, (gram (w j",
@@ -192113,6 +192710,10 @@
      "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i",
      "∀ i, lo i ≤ (∫ y, y ∂μ i"
     ],
+    "Descent.Portability.OptimizedFrameRepairAudit.design_exists": [
+     "(gram w φ",
+     "∀ i, 0 < SpectralMinimaxAuditDesign.rowRange L U (rows (gram w φ"
+    ],
     "Descent.Portability.SecondMomentAuditConfidence.direction_memLp": [],
     "Descent.Portability.SecondMomentAuditConfidence.direction_second": [],
     "Descent.Portability.SecondMomentAuditConfidence.error_sq_integrable": [],
@@ -192154,6 +192755,7 @@
      "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i",
      "∀ i, lo i ≤ (∫ y, y ∂μ i"
     ],
+    "Descent.Portability.SpectralMinimaxAuditDesign.design_exists": [],
     "Descent.Portability.SubgroupFrameTransport.joint_group_gain": [
      "∀ i, 0 ≤ w i"
     ],
@@ -197891,6 +198493,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists",
    "Descent.Portability.DiploidBernsteinLaw.phenotypeMean_injective",
    "Descent.Portability.DiploidBernsteinLaw.recover_phenotypeMean",
    "Descent.Portability.DiploidBernsteinLaw.tensor_inverse_contract",
@@ -197902,12 +198505,13 @@
    "Descent.Portability.RangeAwareAuditSearch.finite_search_exists",
    "Descent.Portability.SimulationBaselineLaw.grid_bounds",
    "Descent.Portability.SimulationBaselineLaw.grid_closed",
-   "Descent.Portability.SimulationBaselineLaw.grid_sum_zero"
+   "Descent.Portability.SimulationBaselineLaw.grid_sum_zero",
+   "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists"
   ],
   "constraints": {
    "hypotheses": [
-    "0 < low",
     "1 < rate",
+    "0 < low",
     "high ≤ low * rate ^ N",
     "m ∈ Set.Icc low high",
     "low ≤ high",
@@ -197917,6 +198521,9 @@
     "maxRange h p ∈ Set.Icc low high"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists": [
+     "1 < rate"
+    ],
     "Descent.Portability.DiploidBernsteinLaw.tensor_inverse_contract": [],
     "Descent.Portability.DiploidBernsteinLaw.recover_phenotypeMean": [],
     "Descent.Portability.DiploidBernsteinLaw.phenotypeMean_injective": [],
@@ -197949,7 +198556,10 @@
     ],
     "Descent.Portability.SimulationBaselineLaw.grid_closed": [],
     "Descent.Portability.SimulationBaselineLaw.grid_bounds": [],
-    "Descent.Portability.SimulationBaselineLaw.grid_sum_zero": []
+    "Descent.Portability.SimulationBaselineLaw.grid_sum_zero": [],
+    "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists": [
+     "1 < rate"
+    ]
    },
    "range_lo_thm": [
     "Descent.Portability.NonlinearMetricGridBound.exists_grid_mixture_near",
@@ -198615,6 +199225,7 @@
    "Descent.Portability.GramAuditGeometry.error_norm",
    "Descent.Portability.GramAuditGeometry.error_vector",
    "Descent.Portability.GramAuditGeometry.row_norm",
+   "Descent.Portability.OptimizedFrameRepairAudit.design_exists",
    "Descent.Portability.SecondMomentFrameRepair.estimate_confidence",
    "Descent.Portability.SignedTransferIdentification.arrayTransfer_generator",
    "Descent.Portability.SignedTransferIdentification.balance_identifies_limit",
@@ -198635,6 +199246,9 @@
     "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i",
     "∀ i, lo i ≤ (∫ y, y ∂μ i",
     "G.PosDef",
+    "∀ i, 0 < floor i",
+    "∀ i, L i ≤ lo i ∧ lo i ≤ hi i ∧ hi i ≤ U i",
+    "∀ i, 0 < SpectralMinimaxAuditDesign.rowRange L U (rows (gram w φ",
     "∀ i, MemLp (fun y : ℝ ↦ y",
     "∀ i, (∫ y, (y - q i"
    ],
@@ -198655,6 +199269,12 @@
     ],
     "Descent.Portability.GramAuditGeometry.row_norm": [
      "G.PosDef"
+    ],
+    "Descent.Portability.OptimizedFrameRepairAudit.design_exists": [
+     "(gram w φ",
+     "∀ i, 0 < floor i",
+     "∀ i, L i ≤ lo i ∧ lo i ≤ hi i ∧ hi i ≤ U i",
+     "∀ i, 0 < SpectralMinimaxAuditDesign.rowRange L U (rows (gram w φ"
     ],
     "Descent.Portability.SecondMomentFrameRepair.estimate_confidence": [
      "(gram w φ",
@@ -201762,6 +202382,8 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.ContinuousAuditCapSearch.exact_solvers_guarantee",
+   "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists",
    "Descent.Portability.DecisionDirectedAuditDesign.design_exists",
    "Descent.Portability.DistanceBinnedPortabilityLaw.binClippedInner_integrable",
    "Descent.Portability.DistanceBinnedPortabilityLaw.binClippedInner_le",
@@ -201793,19 +202415,28 @@
    "Descent.Portability.HWEFixedLayerInputs.cap_limit",
    "Descent.Portability.HWEFixedLayerKernelLimit.conditional_layer_kernel_limit",
    "Descent.Portability.RangeAwareAuditSearch.exact_solvers_guarantee",
-   "Descent.Portability.RangeAwareAuditSearch.finite_search_exists"
+   "Descent.Portability.RangeAwareAuditSearch.finite_search_exists",
+   "Descent.Portability.SpectralRangeAuditDesign.design_exists",
+   "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists"
   ],
   "constraints": {
    "hypotheses": [
+    "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
+    "∀ j, Feasible (cappedFloor floor h j.val.val",
+    "∀ i, 0 < h i",
     "maxRange h p ∈ Set.Icc low high",
     "∀ᶠ m in atTop, (h m",
     "∀ m, 0 < (h m",
-    "∀ m, (h m",
-    "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
-    "∀ j, Feasible (cappedFloor floor h j.val.val",
-    "∀ i, 0 < h i"
+    "∀ m, (h m"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ContinuousAuditCapSearch.exact_solvers_guarantee": [
+     "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
+     "∀ j, Feasible (cappedFloor floor h j.val.val"
+    ],
+    "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists": [
+     "∀ i, 0 < h i"
+    ],
     "Descent.Portability.DecisionDirectedAuditDesign.design_exists": [],
     "Descent.Portability.DistanceBinnedPortabilityLaw.clippedBinReport_defined": [],
     "Descent.Portability.DistanceBinnedPortabilityLaw.clippedBinReport_bounds": [],
@@ -201853,6 +202484,12 @@
      "∀ j, Feasible (cappedFloor floor h j.val.val"
     ],
     "Descent.Portability.RangeAwareAuditSearch.finite_search_exists": [
+     "∀ i, 0 < h i"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists": [
+     "∀ i, 0 < h i"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.design_exists": [
      "∀ i, 0 < h i"
     ]
    },
@@ -222045,6 +222682,10 @@
    "Descent.Portability.DeploymentPopulation.predictiveCovariance_eq",
    "Descent.Portability.MechanismIdentification.different_tagging_and_effects",
    "Descent.Portability.MinimaxAuditDesignLaw.variance_identity",
+   "Descent.Portability.SpectralMinimaxAuditDesign.design_exists",
+   "Descent.Portability.SpectralMinimaxAuditDesign.kappa_nonneg",
+   "Descent.Portability.SpectralMinimaxAuditDesign.radius_identity",
+   "Descent.Portability.SpectralMinimaxAuditDesign.variance_identity",
    "Descent.Portability.ldBandDetectionShare_eq_sub_deficit",
    "Descent.Portability.ldBandDetectionShare_le_retention",
    "Descent.Portability.ldBandDetectionShare_lt_retention",
@@ -222069,7 +222710,10 @@
    "hypotheses": [
     "0 < L",
     "∀ i, 0 < p i",
-    "∀ i, lo i ≤ hi i"
+    "∀ i, lo i ≤ hi i",
+    "∀ i, L i ≤ lo i ∧ lo i ≤ hi i ∧ hi i ≤ U i",
+    "∀ i, 0 < floor i",
+    "∀ i, 0 < rowRange L U u i"
    ],
    "hypotheses_by_theorem": {
     "Descent.Blindness.cumulantTensorEnergy_pushedCumulantTensor": [],
@@ -222117,13 +222761,34 @@
     "Descent.Portability.DeploymentPopulation.predictiveCovariance_eq": [],
     "Descent.Portability.twoContrast_kappa": [],
     "Descent.Portability.twoContrastDeployment_channels": [],
+    "Descent.Portability.SpectralMinimaxAuditDesign.kappa_nonneg": [
+     "∀ i, L i ≤ lo i ∧ lo i ≤ hi i ∧ hi i ≤ U i"
+    ],
+    "Descent.Portability.SpectralMinimaxAuditDesign.variance_identity": [
+     "∀ i, 0 < p i",
+     "∀ i, lo i ≤ hi i"
+    ],
+    "Descent.Portability.SpectralMinimaxAuditDesign.radius_identity": [
+     "∀ i, 0 < p i",
+     "∀ i, lo i ≤ hi i"
+    ],
+    "Descent.Portability.SpectralMinimaxAuditDesign.design_exists": [
+     "∀ i, 0 < floor i",
+     "∀ i, L i ≤ lo i ∧ lo i ≤ hi i ∧ hi i ≤ U i",
+     "∀ i, 0 < rowRange L U u i"
+    ],
     "Descent.stableSieveDimension_eq_criticalDegree": []
    },
    "range_hi_thm": [
     "Descent.Portability.ldPruningDetectionDeficit_le_half_retention",
     1
    ],
-   "range_hi": 2
+   "range_hi": 2,
+   "range_lo_thm": [
+    "Descent.Portability.SpectralMinimaxAuditDesign.kappa_nonneg",
+    1
+   ],
+   "range_lo": 0
   }
  },
  "Descent.Portability.MinimaxAuditDesignLaw.coefficients": {
@@ -227092,6 +227757,7 @@
    "Descent.Portability.SourceFixedRealization.uniformBool_sign_variance",
    "Descent.Portability.SpectralAuditConfidence.confidence",
    "Descent.Portability.SpectralAuditConfidence.directional_variance",
+   "Descent.Portability.SpectralMinimaxAuditDesign.variance_identity",
    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_squared_correlation",
    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_squared_correlation_eq_zero_iff",
    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_variance_outcome",
@@ -227372,6 +228038,7 @@
     "Descent.Portability.SourceFixedRealization.simultaneous_source_fixed_realization": [],
     "Descent.Portability.SpectralAuditConfidence.directional_variance": [],
     "Descent.Portability.SpectralAuditConfidence.confidence": [],
+    "Descent.Portability.SpectralMinimaxAuditDesign.variance_identity": [],
     "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_variance_score": [],
     "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_variance_outcome": [],
     "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_squared_correlation": [],
@@ -252988,6 +253655,10 @@
    "Descent.Portability.DeploymentPopulation.predictiveCovariance_eq",
    "Descent.Portability.MechanismIdentification.different_tagging_and_effects",
    "Descent.Portability.MinimaxAuditDesignLaw.variance_identity",
+   "Descent.Portability.SpectralMinimaxAuditDesign.design_exists",
+   "Descent.Portability.SpectralMinimaxAuditDesign.kappa_nonneg",
+   "Descent.Portability.SpectralMinimaxAuditDesign.radius_identity",
+   "Descent.Portability.SpectralMinimaxAuditDesign.variance_identity",
    "Descent.Portability.ldBandDetectionShare_eq_sub_deficit",
    "Descent.Portability.ldBandDetectionShare_le_retention",
    "Descent.Portability.ldBandDetectionShare_lt_retention",
@@ -253045,13 +253716,22 @@
     "Descent.Portability.DeploymentPopulation.predictiveCovariance_eq": [],
     "Descent.Portability.twoContrast_kappa": [],
     "Descent.Portability.twoContrastDeployment_channels": [],
+    "Descent.Portability.SpectralMinimaxAuditDesign.kappa_nonneg": [],
+    "Descent.Portability.SpectralMinimaxAuditDesign.variance_identity": [],
+    "Descent.Portability.SpectralMinimaxAuditDesign.radius_identity": [],
+    "Descent.Portability.SpectralMinimaxAuditDesign.design_exists": [],
     "Descent.stableSieveDimension_eq_criticalDegree": []
    },
    "range_hi_thm": [
     "Descent.Portability.ldPruningDetectionDeficit_le_half_retention",
     1
    ],
-   "range_hi": 2
+   "range_hi": 2,
+   "range_lo_thm": [
+    "Descent.Portability.SpectralMinimaxAuditDesign.kappa_nonneg",
+    1
+   ],
+   "range_lo": 0
   }
  },
  "Descent.Portability.DeploymentPopulation.contextX": {
@@ -257622,24 +258302,32 @@
    }
   },
   "mentioned_by": [
+   "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists",
    "Descent.Portability.DecisionDirectedAuditDesign.design_exists",
    "Descent.Portability.RangeAwareAuditSearch.finite_search_exists",
-   "Descent.Portability.RangeAwareAuditSearch.range_interval"
+   "Descent.Portability.RangeAwareAuditSearch.range_interval",
+   "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists"
   ],
   "constraints": {
    "declared_kind": "probability",
    "declared_lo": 0.0,
    "declared_hi": 1.0,
    "hypotheses": [
-    "∀ i, 0 ≤ h i",
-    "∀ i, 0 < h i"
+    "∀ i, 0 < h i",
+    "∀ i, 0 ≤ h i"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists": [
+     "∀ i, 0 < h i"
+    ],
     "Descent.Portability.DecisionDirectedAuditDesign.design_exists": [],
     "Descent.Portability.RangeAwareAuditSearch.range_interval": [
      "∀ i, 0 ≤ h i"
     ],
     "Descent.Portability.RangeAwareAuditSearch.finite_search_exists": [
+     "∀ i, 0 < h i"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists": [
      "∀ i, 0 < h i"
     ]
    }
@@ -257676,9 +258364,11 @@
    }
   },
   "mentioned_by": [
+   "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists",
    "Descent.Portability.DecisionDirectedAuditDesign.design_exists",
    "Descent.Portability.RangeAwareAuditSearch.finite_search_exists",
-   "Descent.Portability.RangeAwareAuditSearch.range_interval"
+   "Descent.Portability.RangeAwareAuditSearch.range_interval",
+   "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists"
   ],
   "constraints": {
    "declared_kind": "probability",
@@ -257686,12 +258376,19 @@
    "declared_hi": 1.0,
    "hypotheses": [
     "∀ i, 0 < floor i",
+    "∀ i, 0 < h i",
+    "ContinuousOn F {p | Feasible floor c B p}",
     "∃ p, Feasible floor c B p",
     "∀ i, 0 ≤ h i",
-    "Feasible floor c B p",
-    "∀ i, 0 < h i"
+    "Feasible floor c B p"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < h i",
+     "ContinuousOn F {p | Feasible floor c B p}",
+     "∃ p, Feasible floor c B p"
+    ],
     "Descent.Portability.DecisionDirectedAuditDesign.design_exists": [
      "∀ i, 0 < floor i",
      "∃ p, Feasible floor c B p"
@@ -257702,6 +258399,11 @@
      "Feasible floor c B p"
     ],
     "Descent.Portability.RangeAwareAuditSearch.finite_search_exists": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < h i",
+     "∃ p, Feasible floor c B p"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists": [
      "∀ i, 0 < floor i",
      "∀ i, 0 < h i",
      "∃ p, Feasible floor c B p"
@@ -257745,6 +258447,8 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.ContinuousAuditCapSearch.exact_solvers_guarantee",
+   "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists",
    "Descent.Portability.RangeAwareAuditSearch.exact_solvers_guarantee",
    "Descent.Portability.RangeAwareAuditSearch.finite_search_exists"
   ],
@@ -257757,9 +258461,26 @@
     "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
     "∃ p, Feasible floor c B p",
     "∀ j, Feasible (cappedFloor floor h j.val.val",
-    "∀ i, 0 < h i"
+    "∀ i, 0 < h i",
+    "ContinuousOn F {p | Feasible floor c B p}"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ContinuousAuditCapSearch.exact_solvers_guarantee": [
+     "∀ i, 0 < floor i",
+     "0 < low",
+     "1 < rate",
+     "high ≤ low * rate ^ N",
+     "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
+     "∃ p, Feasible floor c B p",
+     "∀ j, Feasible (cappedFloor floor h j.val.val"
+    ],
+    "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 < h i",
+     "1 < rate",
+     "ContinuousOn F {p | Feasible floor c B p}",
+     "∃ p, Feasible floor c B p"
+    ],
     "Descent.Portability.RangeAwareAuditSearch.exact_solvers_guarantee": [
      "∀ i, 0 < floor i",
      "0 < low",
@@ -263370,6 +264091,7 @@
    "Descent.Portability.ConditionalGuardError.conditional_repair_certificate",
    "Descent.Portability.GuardedRepairDeployment.harm_probability",
    "Descent.Portability.HardBudgetAuditGuard.guarded_repair_certificate",
+   "Descent.Portability.OptimizedFrameRepairAudit.design_exists",
    "Descent.Portability.SecondMomentFrameRepair.estimate_confidence",
    "Descent.Portability.SecondMomentFrameRepair.false_certificate_probability",
    "Descent.Portability.SecondMomentFrameRepair.harm_probability"
@@ -263383,6 +264105,8 @@
     "∀ i, 0 ≤ w i",
     "(DecisionLossContrasts.gram w φ",
     "contrast c p + BernsteinTailBound.radius (maxCost c",
+    "∀ i, 0 < SpectralMinimaxAuditDesign.rowRange L U (rows (gram w φ",
+    "∃ p, Feasible floor c B p",
     "0 < δ"
    ],
    "hypotheses_by_theorem": {
@@ -263422,6 +264146,12 @@
      "(DecisionLossContrasts.gram w φ",
      "0 < δ ∧ δ < 1",
      "∀ i, 0 < p i ∧ p i ≤ 1"
+    ],
+    "Descent.Portability.OptimizedFrameRepairAudit.design_exists": [
+     "(gram w φ",
+     "0 < δ ∧ δ < 1",
+     "∀ i, 0 < SpectralMinimaxAuditDesign.rowRange L U (rows (gram w φ",
+     "∃ p, Feasible floor c B p"
     ],
     "Descent.Portability.SecondMomentFrameRepair.estimate_confidence": [
      "(gram w φ",
@@ -263474,6 +264204,7 @@
    "Descent.Portability.JointAuditExperiment.observation_failure_le",
    "Descent.Portability.JointAuditExperiment.observations_map",
    "Descent.Portability.MinimaxAuditDesignLaw.common_confidence",
+   "Descent.Portability.OptimizedFrameRepairAudit.design_exists",
    "Descent.Portability.SecondMomentAuditConfidence.confidence",
    "Descent.Portability.SecondMomentAuditConfidence.direction_memLp",
    "Descent.Portability.SecondMomentAuditConfidence.direction_second",
@@ -263493,6 +264224,7 @@
    "Descent.Portability.SparseBinaryAudit.variance_attained",
    "Descent.Portability.SparseBinaryAudit.variance_upper",
    "Descent.Portability.SpectralAuditConfidence.confidence",
+   "Descent.Portability.SpectralMinimaxAuditDesign.design_exists",
    "Descent.Portability.SubgroupFrameTransport.certified_mixture_transport",
    "Descent.Portability.SubgroupFrameTransport.joint_group_gain",
    "Descent.Portability.SubgroupFrameTransport.mixture_lower_bound",
@@ -263579,6 +264311,9 @@
      "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i",
      "∀ i, lo i ≤ (∫ y, y ∂μ i"
     ],
+    "Descent.Portability.OptimizedFrameRepairAudit.design_exists": [
+     "∃ p, Feasible floor c B p"
+    ],
     "Descent.Portability.SecondMomentAuditConfidence.direction_memLp": [
      "∀ i, 0 < p i ∧ p i ≤ 1"
     ],
@@ -263648,6 +264383,9 @@
      "∀ i, q i ∈ Set.Icc (L i",
      "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i",
      "∀ i, lo i ≤ (∫ y, y ∂μ i"
+    ],
+    "Descent.Portability.SpectralMinimaxAuditDesign.design_exists": [
+     "∃ p, Feasible floor c B p"
     ],
     "Descent.Portability.SubgroupFrameTransport.joint_group_gain": [],
     "Descent.Portability.SubgroupFrameTransport.mixture_lower_bound": [],
@@ -264881,6 +265619,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists",
    "Descent.Portability.DiploidBernsteinLaw.phenotypeMean_injective",
    "Descent.Portability.DiploidBernsteinLaw.recover_phenotypeMean",
    "Descent.Portability.DiploidBernsteinLaw.tensor_inverse_contract",
@@ -264892,11 +265631,13 @@
    "Descent.Portability.RangeAwareAuditSearch.finite_search_exists",
    "Descent.Portability.SimulationBaselineLaw.grid_bounds",
    "Descent.Portability.SimulationBaselineLaw.grid_closed",
-   "Descent.Portability.SimulationBaselineLaw.grid_sum_zero"
+   "Descent.Portability.SimulationBaselineLaw.grid_sum_zero",
+   "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists"
   ],
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ContinuousAuditCapSearch.finite_search_exists": [],
     "Descent.Portability.DiploidBernsteinLaw.tensor_inverse_contract": [],
     "Descent.Portability.DiploidBernsteinLaw.recover_phenotypeMean": [],
     "Descent.Portability.DiploidBernsteinLaw.phenotypeMean_injective": [],
@@ -264908,7 +265649,8 @@
     "Descent.Portability.RangeAwareAuditSearch.finite_search_exists": [],
     "Descent.Portability.SimulationBaselineLaw.grid_closed": [],
     "Descent.Portability.SimulationBaselineLaw.grid_bounds": [],
-    "Descent.Portability.SimulationBaselineLaw.grid_sum_zero": []
+    "Descent.Portability.SimulationBaselineLaw.grid_sum_zero": [],
+    "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists": []
    },
    "range_lo_thm": [
     "Descent.Portability.NonlinearMetricGridBound.exists_grid_mixture_near",
@@ -271099,6 +271841,7 @@
    "Descent.Portability.SourceFixedRealization.uniformBool_sign_variance",
    "Descent.Portability.SpectralAuditConfidence.confidence",
    "Descent.Portability.SpectralAuditConfidence.directional_variance",
+   "Descent.Portability.SpectralMinimaxAuditDesign.variance_identity",
    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_squared_correlation",
    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_squared_correlation_eq_zero_iff",
    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_variance_outcome",
@@ -271158,7 +271901,9 @@
     "∀ i, 0 < p i ∧ p i ≤ 1",
     "∀ i, q i ∈ Set.Icc (L i",
     "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i",
-    "∀ i, lo i ≤ (∫ y, y ∂μ i"
+    "∀ i, lo i ≤ (∫ y, y ∂μ i",
+    "∀ i, 0 < p i",
+    "∀ i, lo i ≤ hi i"
    ],
    "hypotheses_by_theorem": {
     "Descent.Blindness.lowSNRFourthCoefficient_sub_of_spectral_match": [],
@@ -271480,6 +272225,10 @@
      "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i",
      "∀ i, lo i ≤ (∫ y, y ∂μ i"
     ],
+    "Descent.Portability.SpectralMinimaxAuditDesign.variance_identity": [
+     "∀ i, 0 < p i",
+     "∀ i, lo i ≤ hi i"
+    ],
     "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_variance_score": [],
     "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_variance_outcome": [],
     "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_squared_correlation": [],
@@ -271738,6 +272487,7 @@
    "Descent.Portability.SpectralAuditConfidence.confidence",
    "Descent.Portability.SpectralAuditConfidence.le_range",
    "Descent.Portability.SpectralAuditConfidence.range_nonneg",
+   "Descent.Portability.SpectralMinimaxAuditDesign.range_identity",
    "Descent.Portability.StoppedAncestralTiming.stoppedExpectation_truncation",
    "Descent.Portability.StoppedGenotypeLaw.stoppedGenome_truncation",
    "Descent.Portability.ThresholdLawRegion.finite_threshold_curve_iff",
@@ -272067,6 +272817,7 @@
      "∀ i, q i ∈ Set.Icc (L i",
      "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i"
     ],
+    "Descent.Portability.SpectralMinimaxAuditDesign.range_identity": [],
     "Descent.Portability.StoppedAncestralTiming.stoppedExpectation_truncation": [],
     "Descent.Portability.StoppedGenotypeLaw.stoppedGenome_truncation": [],
     "Descent.Portability.ThresholdLawRegion.finite_threshold_curve_iff": [],
@@ -272109,6 +272860,8 @@
   "mentioned_by": [
    "Descent.Portability.CertifiedFrameRepair.auditRadius_nonneg",
    "Descent.Portability.SpectralAuditConfidence.confidence",
+   "Descent.Portability.SpectralMinimaxAuditDesign.design_exists",
+   "Descent.Portability.SpectralMinimaxAuditDesign.radius_identity",
    "Descent.Portability.TailRepairCertification.positive_repair_certificate",
    "Descent.Portability.TailRepairCertification.radius_lt",
    "Descent.Portability.TailRepairCertification.study_confidence"
@@ -272122,6 +272875,10 @@
     "∀ i, q i ∈ Set.Icc (L i",
     "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i",
     "∀ i, lo i ≤ (∫ y, y ∂μ i",
+    "∀ i, lo i ≤ hi i",
+    "∀ i, L i ≤ lo i ∧ lo i ≤ hi i ∧ hi i ≤ U i",
+    "∀ i, 0 < rowRange L U u i",
+    "∃ p, Feasible floor c B p",
     "0 < p ∧ p ≤ 1"
    ],
    "hypotheses_by_theorem": {
@@ -272136,6 +272893,16 @@
      "∀ i, q i ∈ Set.Icc (L i",
      "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i",
      "∀ i, lo i ≤ (∫ y, y ∂μ i"
+    ],
+    "Descent.Portability.SpectralMinimaxAuditDesign.radius_identity": [
+     "∀ i, 0 < p i",
+     "∀ i, lo i ≤ hi i"
+    ],
+    "Descent.Portability.SpectralMinimaxAuditDesign.design_exists": [
+     "0 < δ ∧ δ < 1",
+     "∀ i, L i ≤ lo i ∧ lo i ≤ hi i ∧ hi i ≤ U i",
+     "∀ i, 0 < rowRange L U u i",
+     "∃ p, Feasible floor c B p"
     ],
     "Descent.Portability.TailRepairCertification.radius_lt": [],
     "Descent.Portability.TailRepairCertification.study_confidence": [
@@ -272250,7 +273017,15 @@
    "Descent.Portability.SpectralAuditDualCertificate.certificate_equality",
    "Descent.Portability.SpectralAuditDualCertificate.certified_optimum",
    "Descent.Portability.SpectralAuditDualCertificate.lagrangian_identity",
-   "Descent.Portability.SpectralAuditDualCertificate.weak_duality"
+   "Descent.Portability.SpectralAuditDualCertificate.weak_duality",
+   "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error",
+   "Descent.Portability.SpectralAuditNumericalCertificate.certified_radius_error",
+   "Descent.Portability.SpectralAuditNumericalCertificate.certified_variance_error",
+   "Descent.Portability.SpectralMinimaxAuditDesign.variance_identity",
+   "Descent.Portability.SpectralRangeAuditDesign.capped_convex",
+   "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction",
+   "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists",
+   "Descent.Portability.SpectralRangeAuditDesign.radius_continuous"
   ],
   "constraints": {
    "declared_kind": "nonnegative",
@@ -272274,7 +273049,9 @@
     "covariance (fun i ↦ κ i / p i",
     "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i",
     "(covariance (fun i ↦ κ i / p i",
-    "lam * (spending c p - B"
+    "lam * (spending c p - B",
+    "IsMinOn (fun q ↦ fullRadius κ h q u x",
+    "∃ p, Feasible floor c B p"
    ],
    "hypotheses_by_theorem": {
     "Descent.Portability.AuditAllocationCoordinate.objective_difference": [
@@ -272365,6 +273142,35 @@
      "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i",
      "(covariance (fun i ↦ κ i / p i",
      "lam * (spending c p - B"
+    ],
+    "Descent.Portability.SpectralAuditNumericalCertificate.certified_variance_error": [
+     "∀ i, 0 ≤ κ i",
+     "Feasible floor c B p"
+    ],
+    "Descent.Portability.SpectralAuditNumericalCertificate.certified_radius_error": [
+     "∀ i, 0 ≤ κ i",
+     "Feasible floor c B p"
+    ],
+    "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error": [
+     "∀ i, 0 ≤ κ i"
+    ],
+    "Descent.Portability.SpectralMinimaxAuditDesign.variance_identity": [
+     "∀ i, 0 < p i"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.radius_continuous": [
+     "∀ i, 0 ≤ κ i"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.capped_convex": [
+     "∀ i, 0 ≤ κ i"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction": [
+     "∀ i, 0 ≤ κ i",
+     "Feasible floor c B p",
+     "IsMinOn (fun q ↦ fullRadius κ h q u x"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists": [
+     "∀ i, 0 ≤ κ i",
+     "∃ p, Feasible floor c B p"
     ]
    },
    "range_lo_thm": [
@@ -272646,6 +273452,93 @@
      "∀ i, p i = AuditAllocationCoordinate.choice (contribution κ u W i",
      "(covariance (fun i ↦ κ i / p i",
      "lam * (spending c p - B"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.SpectralAuditNumericalCertificate.dualGap": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "ambiguous call to 'objective' with 3 argument(s): ['Descent.Portability.AuditAllocationCoordinate.objective', 'Descent.Portability.SpectralAuditDesign.objective']",
+  "file": "Descent/Portability/SpectralAuditNumericalCertificate.lean",
+  "line": 29,
+  "short": "dualGap",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "B": [
+    0.05,
+    3.0
+   ],
+   "lam": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.AuditDesignNumericalCertificate.certified_radius_error",
+   "Descent.Portability.AuditDesignNumericalCertificate.certified_variance_error",
+   "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error",
+   "Descent.Portability.SpectralAuditNumericalCertificate.certified_radius_error",
+   "Descent.Portability.SpectralAuditNumericalCertificate.certified_variance_error"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "∀ i, 0 < floor i",
+    "∀ i, 0 ≤ c i",
+    "0 ≤ lam",
+    "Feasible floor c B p",
+    "Feasible floor c B q",
+    "∀ i, 0 ≤ κ i",
+    "W.IsPositive",
+    "LinearMap.trace ℝ E W = 1",
+    "Feasible (cappedFloor floor h M"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.AuditDesignNumericalCertificate.certified_variance_error": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i",
+     "0 ≤ lam",
+     "Feasible floor c B p"
+    ],
+    "Descent.Portability.AuditDesignNumericalCertificate.certified_radius_error": [
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i",
+     "0 ≤ lam",
+     "Feasible floor c B p",
+     "Feasible floor c B q"
+    ],
+    "Descent.Portability.SpectralAuditNumericalCertificate.certified_variance_error": [
+     "∀ i, 0 ≤ κ i",
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i",
+     "0 ≤ lam",
+     "W.IsPositive",
+     "LinearMap.trace ℝ E W = 1",
+     "Feasible floor c B p"
+    ],
+    "Descent.Portability.SpectralAuditNumericalCertificate.certified_radius_error": [
+     "∀ i, 0 ≤ κ i",
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i",
+     "0 ≤ lam",
+     "W.IsPositive",
+     "LinearMap.trace ℝ E W = 1",
+     "Feasible floor c B p",
+     "Feasible floor c B q"
+    ],
+    "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error": [
+     "∀ i, 0 ≤ κ i",
+     "∀ i, 0 < floor i",
+     "∀ i, 0 ≤ c i",
+     "0 ≤ lam",
+     "W.IsPositive",
+     "LinearMap.trace ℝ E W = 1",
+     "Feasible (cappedFloor floor h M"
     ]
    }
   }
@@ -273259,6 +274152,180 @@
     "Descent.Portability.MeasurementRankLaw.residualEigenvalue_zero_iff": [],
     "Descent.Portability.MeasurementRankLaw.zero_risk_iff": [],
     "Descent.Portability.SpectralMeasurementMinimax.adaptive_minimax_all_budgets": []
+   }
+  }
+ },
+ "Descent.Portability.SpectralMinimaxAuditDesign.rowRange": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "norm of a vector/matrix",
+  "file": "Descent/Portability/SpectralMinimaxAuditDesign.lean",
+  "line": 31,
+  "short": "rowRange",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.OptimizedFrameRepairAudit.design_exists",
+   "Descent.Portability.SpectralMinimaxAuditDesign.design_exists",
+   "Descent.Portability.SpectralMinimaxAuditDesign.radius_identity",
+   "Descent.Portability.SpectralMinimaxAuditDesign.range_identity"
+  ],
+  "constraints": {
+   "hypotheses": [
+    "∀ i, 0 < floor i",
+    "∀ i, L i ≤ lo i ∧ lo i ≤ hi i ∧ hi i ≤ U i",
+    "∀ i, 0 < SpectralMinimaxAuditDesign.rowRange L U (rows (gram w φ",
+    "∀ i, 0 < p i",
+    "∀ i, lo i ≤ hi i",
+    "∀ i, 0 < rowRange L U u i"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.OptimizedFrameRepairAudit.design_exists": [
+     "∀ i, 0 < floor i",
+     "∀ i, L i ≤ lo i ∧ lo i ≤ hi i ∧ hi i ≤ U i",
+     "∀ i, 0 < SpectralMinimaxAuditDesign.rowRange L U (rows (gram w φ"
+    ],
+    "Descent.Portability.SpectralMinimaxAuditDesign.range_identity": [],
+    "Descent.Portability.SpectralMinimaxAuditDesign.radius_identity": [
+     "∀ i, 0 < p i",
+     "∀ i, lo i ≤ hi i"
+    ],
+    "Descent.Portability.SpectralMinimaxAuditDesign.design_exists": [
+     "∀ i, 0 < floor i",
+     "∀ i, L i ≤ lo i ∧ lo i ≤ hi i ∧ hi i ≤ U i",
+     "∀ i, 0 < rowRange L U u i"
+    ]
+   }
+  }
+ },
+ "Descent.Portability.SpectralRangeAuditDesign.fullRadius": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name ContinuousAuditCapSearch.designRadius",
+  "file": "Descent/Portability/SpectralRangeAuditDesign.lean",
+  "line": 29,
+  "short": "fullRadius",
+  "ret_type": "ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {
+   "x": [
+    0.05,
+    3.0
+   ]
+  },
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.AuditRangeCaps.exact_cap_reduction",
+   "Descent.Portability.AuditRangeCaps.fullRadius_continuous",
+   "Descent.Portability.AuditRangeCaps.full_optimum_exists",
+   "Descent.Portability.DecisionDirectedAuditDesign.design_exists",
+   "Descent.Portability.GeometricAuditCaps.grid_design_approximation",
+   "Descent.Portability.MinimaxAuditDesignLaw.common_confidence",
+   "Descent.Portability.RangeAwareAuditSearch.exact_solvers_guarantee",
+   "Descent.Portability.RangeAwareAuditSearch.finite_search_exists",
+   "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error",
+   "Descent.Portability.SpectralMinimaxAuditDesign.radius_identity",
+   "Descent.Portability.SpectralRangeAuditDesign.design_exists",
+   "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction",
+   "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists",
+   "Descent.Portability.SpectralRangeAuditDesign.radius_continuous",
+   "Descent.Portability.SpectralRangeAuditDesign.radius_minimum"
+  ],
+  "constraints": {
+   "declared_kind": "nonnegative",
+   "declared_lo": 0.0,
+   "declared_hi": null,
+   "hypotheses": [
+    "{p | Feasible floor c B p}.Nonempty",
+    "∀ i, 0 < h i",
+    "0 ≤ x",
+    "Feasible floor c B p",
+    "IsMinOn (fullRadius a h · x",
+    "∃ p, Feasible floor c B p",
+    "maxRange h p ∈ Set.Icc low high",
+    "∀ i, 0 < p i ∧ p i ≤ 1",
+    "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
+    "∀ j, Feasible (cappedFloor floor h j.val.val",
+    "∀ i, 0 ≤ κ i",
+    "Feasible (cappedFloor floor h M",
+    "∀ i, 0 < p i",
+    "IsMinOn (fun q ↦ fullRadius κ h q u x"
+   ],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.AuditRangeCaps.fullRadius_continuous": [],
+    "Descent.Portability.AuditRangeCaps.full_optimum_exists": [
+     "{p | Feasible floor c B p}.Nonempty"
+    ],
+    "Descent.Portability.AuditRangeCaps.exact_cap_reduction": [
+     "∀ i, 0 < h i",
+     "0 ≤ x",
+     "Feasible floor c B p",
+     "IsMinOn (fullRadius a h · x"
+    ],
+    "Descent.Portability.DecisionDirectedAuditDesign.design_exists": [
+     "∃ p, Feasible floor c B p"
+    ],
+    "Descent.Portability.GeometricAuditCaps.grid_design_approximation": [
+     "0 ≤ x",
+     "Feasible floor c B p",
+     "maxRange h p ∈ Set.Icc low high"
+    ],
+    "Descent.Portability.MinimaxAuditDesignLaw.common_confidence": [
+     "∀ i, 0 < p i ∧ p i ≤ 1"
+    ],
+    "Descent.Portability.RangeAwareAuditSearch.exact_solvers_guarantee": [
+     "0 ≤ x",
+     "∀ p, Feasible floor c B p → maxRange h p ∈ Set.Icc low high",
+     "∃ p, Feasible floor c B p",
+     "∀ j, Feasible (cappedFloor floor h j.val.val"
+    ],
+    "Descent.Portability.RangeAwareAuditSearch.finite_search_exists": [
+     "∀ i, 0 < h i",
+     "0 ≤ x",
+     "∃ p, Feasible floor c B p"
+    ],
+    "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error": [
+     "∀ i, 0 ≤ κ i",
+     "0 ≤ x",
+     "Feasible (cappedFloor floor h M"
+    ],
+    "Descent.Portability.SpectralMinimaxAuditDesign.radius_identity": [
+     "∀ i, 0 < p i"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.radius_continuous": [
+     "∀ i, 0 ≤ κ i"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.radius_minimum": [
+     "∀ i, 0 ≤ κ i",
+     "{p | Feasible floor c B p}.Nonempty"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction": [
+     "∀ i, 0 ≤ κ i",
+     "∀ i, 0 < h i",
+     "0 ≤ x",
+     "Feasible floor c B p",
+     "IsMinOn (fun q ↦ fullRadius κ h q u x"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists": [
+     "∀ i, 0 ≤ κ i",
+     "∀ i, 0 < h i",
+     "0 ≤ x",
+     "∃ p, Feasible floor c B p"
+    ],
+    "Descent.Portability.SpectralRangeAuditDesign.design_exists": [
+     "∀ i, 0 ≤ κ i",
+     "∀ i, 0 < h i",
+     "0 ≤ x",
+     "∃ p, Feasible floor c B p"
+    ]
    }
   }
  },
@@ -278847,6 +279914,8 @@
   "mentioned_by": [
    "Descent.Portability.CertifiedFrameRepair.auditRadius_nonneg",
    "Descent.Portability.SpectralAuditConfidence.confidence",
+   "Descent.Portability.SpectralMinimaxAuditDesign.design_exists",
+   "Descent.Portability.SpectralMinimaxAuditDesign.radius_identity",
    "Descent.Portability.TailRepairCertification.positive_repair_certificate",
    "Descent.Portability.TailRepairCertification.radius_lt",
    "Descent.Portability.TailRepairCertification.study_confidence"
@@ -278859,6 +279928,8 @@
    "hypotheses_by_theorem": {
     "Descent.Portability.CertifiedFrameRepair.auditRadius_nonneg": [],
     "Descent.Portability.SpectralAuditConfidence.confidence": [],
+    "Descent.Portability.SpectralMinimaxAuditDesign.radius_identity": [],
+    "Descent.Portability.SpectralMinimaxAuditDesign.design_exists": [],
     "Descent.Portability.TailRepairCertification.radius_lt": [],
     "Descent.Portability.TailRepairCertification.study_confidence": [],
     "Descent.Portability.TailRepairCertification.positive_repair_certificate": []
@@ -290692,6 +291763,7 @@
    "Descent.Portability.SecondMomentAuditConfidence.error_second_le",
    "Descent.Portability.SecondMomentAuditConfidence.error_sq_integrable",
    "Descent.Portability.SpectralAuditConfidence.confidence",
+   "Descent.Portability.SpectralMinimaxAuditDesign.design_exists",
    "Descent.Portability.VectorAuditConfidence.directional_error",
    "Descent.Portability.VectorAuditConfidence.vector_confidence"
   ],
@@ -290704,6 +291776,7 @@
     "∀ᵐ ω ∂μ, ‖numerical ω‖ ≤ numericalBound",
     "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i",
     "∀ i, lo i ≤ (∫ y, y ∂μ i",
+    "∀ i, 0 < rowRange L U u i",
     "∀ i, ‖u i‖ * (U i - L i",
     "∀ a : E, ‖a‖ ≤ 1 → varianceBound L U p q lo hi (fun i ↦ inner ℝ a (u i"
    ],
@@ -290740,6 +291813,9 @@
     "Descent.Portability.SpectralAuditConfidence.confidence": [
      "∀ i, ∀ᵐ y ∂μ i, y ∈ Set.Icc (L i",
      "∀ i, lo i ≤ (∫ y, y ∂μ i"
+    ],
+    "Descent.Portability.SpectralMinimaxAuditDesign.design_exists": [
+     "∀ i, 0 < rowRange L U u i"
     ],
     "Descent.Portability.FiniteReportLaw.all_bounded_metric_errors_le_iff": [],
     "Descent.Portability.VectorAuditConfidence.directional_error": [],

@@ -3195,7 +3195,7 @@ def eigenvalues(w, u):
 def Descent_Portability_AuditCovarianceSpectrum_basis(w, u):
     return _rt._proj((symmetric(w, u)), 'eigenvectorBasis')(rfl)
 
-def dualGap(a, floor, c, p, B, η, lam):
+def Descent_Portability_AuditDesignNumericalCertificate_dualGap(a, floor, c, p, B, η, lam):
     return _rt.sub(worstVariance(a, p), Descent_Portability_FiniteAuditDesign_dualBound(a, floor, c, B, η, lam))
 
 def cappedFloor(floor, h, m, i):
