@@ -192,7 +192,9 @@ section Series
 
 variable [DecidableEq ι]
 
-private theorem expSeries_entry_summable (A : Matrix ι ι ℝ) (time : ℝ) (row column : ι) :
+/-- Each entry of the exponential series is a summable real sequence.  Public because the
+Poisson truncation certificate needs the same summability. -/
+theorem expSeries_entry_summable (A : Matrix ι ι ℝ) (time : ℝ) (row column : ι) :
     Summable (fun power : ℕ ↦
       (((power.factorial : ℝ)⁻¹) • ((time • A) ^ power)) row column) := by
   have hmatrix : Summable (fun power : ℕ ↦
@@ -200,7 +202,9 @@ private theorem expSeries_entry_summable (A : Matrix ι ι ℝ) (time : ℝ) (ro
     NormedSpace.expSeries_summable' (time • A)
   exact Pi.summable.mp (Pi.summable.mp hmatrix row) column
 
-private theorem expSeries_rowSum_term (A : Matrix ι ι ℝ) (time : ℝ) (row : ι) (power : ℕ) :
+/-- The row mass of one exponential-series term is the scaled row mass of the matrix power.
+Public because the Poisson truncation certificate needs the same rewriting. -/
+theorem expSeries_rowSum_term (A : Matrix ι ι ℝ) (time : ℝ) (row : ι) (power : ℕ) :
     ∑ column, (((power.factorial : ℝ)⁻¹) • ((time • A) ^ power)) row column
       = ((power.factorial : ℝ)⁻¹) * (time ^ power * ∑ column, (A ^ power) row column) := by
   rw [smul_pow]

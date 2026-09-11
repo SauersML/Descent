@@ -14,6 +14,8 @@ open Descent.Portability.SubstochasticGeneratorSemigroup
 #print axioms killingGenerator_jumpGenerator
 #print axioms killingGenerator_absJumpGenerator
 #print axioms killingGenerator_uniformKilling
+#print axioms expSeries_entry_summable
+#print axioms expSeries_rowSum_term
 #print axioms exponential_rowSum_eq_tsum
 #print axioms exponential_rowSum_summable
 #print axioms tsum_factorial_pow
