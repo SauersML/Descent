@@ -36,7 +36,8 @@ has a locus-exchangeable haplotype realization, NOTE1's invariance of the subspa
 body.  `RateHistoryEvent` names the two events Theorem 2 covers, a rate epoch and a physically
 realized split, and `propagate_preserves_locusExchangeable_realization` is the theorem for any
 finite list of them, read at the present of a compiled `LowOrderLDHistory` by
-`history_present_locusExchangeable_realization`.  These are not phrased through
+`history_present_locusExchangeable_realization`, and `locusExchangeableSplit_haplotype`
+records that a split relabels the same haplotype law.  These are not phrased through
 `PiecewiseConstantBodyPreservation.history_present_mem_realizationBody`, whose hypothesis is a
 microscopic approximation on the stored feature map.  That hypothesis cannot be discharged once
 a mutation rate is positive: the stored `pi2` mutation row reads the stored `H` column, while a
@@ -218,6 +219,18 @@ theorem history_present_mem_realizationBody_of_events {D : ℕ} (history : LowOr
     history_present_locusExchangeable_realization history events hcompiled realization
   exact KernelRealizationPreservation.lowOrderLDState_mem_realizationBody_of_realization
     propagated.toLowOrderLDHaplotypeRealization
+
+/-- **A split event relabels the same haplotype law.**  The locus-exchangeable realization
+`TwoLocusRealizabilityPreservation.locusExchangeableSplit` builds for a split keeps the
+realization's sample space and expectation, and at every deme reads the parent's haplotype
+when the deme is the child and its own haplotype otherwise. -/
+theorem locusExchangeableSplit_haplotype {D : ℕ} {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LocusExchangeableLowOrderLDHaplotypeRealization state)
+    (parent child : Fin D) (outcome : realization.sampleSpace) (deme : Fin D) :
+    (TwoLocusRealizabilityPreservation.locusExchangeableSplit realization parent
+        child).haplotype outcome deme =
+      realization.haplotype outcome (if deme = child then parent else deme) :=
+  rfl
 
 /-! ## NOTE1 Corollary 2.1 -/
 

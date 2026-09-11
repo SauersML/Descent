@@ -16,6 +16,7 @@ open Descent.Portability.TwoLocusMicroscopicApproximation
 #print axioms RateHistoryEvent.instruction
 #print axioms propagate_preserves_locusExchangeable_realization
 #print axioms history_present_locusExchangeable_realization
+#print axioms locusExchangeableSplit_haplotype
 #print axioms history_present_mem_realizationBody_of_events
 #print axioms history_present_dd_quadraticForm_nonneg
 #print axioms history_present_dd_cauchySchwarz
