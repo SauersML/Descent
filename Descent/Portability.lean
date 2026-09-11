@@ -1,6 +1,11 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.PartialHaplotypePanelLikelihood
+import Descent.Portability.PartialHaplotypePulseKernel
+import Descent.Portability.ConvergentEventProduct
+import Descent.Portability.PortabilityMeasureQueries
+import Descent.Portability.ReferenceExperimentTable
 import Descent.Portability.MultinomialJetCertificate
 import Descent.Portability.SimultaneousMigrationPulse
 import Descent.Portability.UniformPenetranceCertificate
