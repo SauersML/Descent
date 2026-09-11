@@ -61,6 +61,11 @@ import Descent.Portability.MultinomialMomentExpansion
 import Descent.Portability.LinearFundamentalMatrix
 import Descent.Portability.IntegrableRateHistoryRealization
 import Descent.Portability.PolynomialFellerExtension
+import Descent.Portability.FellerKernelRepresentation
+import Descent.Portability.PartialHaplotypeDualGenerator
+import Descent.Portability.SmallDenominatorLayerCake
+import Descent.Portability.FiniteTraceTreeLaw
+import Descent.Portability.PipelineWitnesses
 
 namespace Descent.Program
 
@@ -105,11 +110,13 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
   continuous in time).
 * §3 Theorem 3 and equations (14)-(16): `StationaryRealization`,
   `StationaryHaplotypeRealization`, `AncestralHaplotypeRealization`.
-* §4.1 per-locus material grading: `PartialHaplotypeCarrier`. §4.2 and §5.1 substochastic
-  semigroups and uniformization: `SubstochasticGeneratorSemigroup`,
-  `PoissonTruncationCertificate`. §4.2a, the extension of a positive constant-preserving
-  semigroup from polynomials: `PolynomialFellerExtension`. §4.3 equations (21)-(23):
-  `ConditionalReportCompilation`.
+* §4.1 per-locus material grading: `PartialHaplotypeCarrier`. §4.2 equation (19), the neutral
+  diffusion generator on partial-haplotype moments and its carrier-by-carrier Leibniz
+  expansion: `PartialHaplotypeDualGenerator`. §4.2 and §5.1 substochastic semigroups and
+  uniformization: `SubstochasticGeneratorSemigroup`, `PoissonTruncationCertificate`. §4.2a, the
+  extension of a positive constant-preserving semigroup from polynomials and its representation
+  by continuous probability kernels obeying Chapman-Kolmogorov: `PolynomialFellerExtension`,
+  `FellerKernelRepresentation`. §4.3 equations (21)-(23): `ConditionalReportCompilation`.
 * §5 equations (24)-(25): `SublawReportCertificate`.
 * §6 equations (27)-(36), chronology to metrics: `AdmixtureChronologyLaw`,
   `ChronologyReportLaw`, `AttainableChronologyCurve`, `ExposureLaplaceConstraints`,
@@ -121,23 +128,27 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
 Scope. Equation (10) is proved for every monomial of degree at most four with remainder at
 most 71/N², but the microscopic approximation behind Theorem 2 uses the single-draw
 resampling step of §2.3. §2.4 is proved for rate paths whose generator is continuous in time,
-not for merely integrable rates. Theorem 2 covers
-histories of rate epochs and splits; the pipeline compiler emits nothing else. The generator
-identity (19) of the partial-haplotype dual and the Feller semigroup of §4.2a are not
-formalized.
+not for merely integrable rates. Theorem 2 covers histories of rate epochs and splits; the
+pipeline compiler emits nothing else. Of §4.2, equation (19) is proved and equation (20) is not
+claimed by these modules. The §4.2a kernels are continuous into the weak topology but are not
+packaged as measurable kernels, and the representing measure is proved unique only on
+pseudo-metrizable spaces, which include the haplotype-frequency simplex.
 
 Guard witnesses: `LowOrderLDWitnesses` inhabits the corpus rate, epoch and history structures
-from data alone.
+from data alone, and `PipelineWitnesses` inhabits the pipeline structures of `EndToEndScoreLaw`
+from a deme count.
 
 ## NOTE2: the input-to-output report law
 
-* Theorem 1, rational clause, and equations (3)-(6): `RationalReportClosure`,
-  `MeiosisGameteLaw`.
+* Theorem 1 and equation (7), the complete report law of a finite dependent trace tree, with
+  forward propagation, backward evaluation and trace enumeration agreeing: `FiniteTraceTreeLaw`.
+  The rational clause and equations (3)-(6): `RationalReportClosure`, `MeiosisGameteLaw`.
 * §3.2 equations (9)-(10): `ArchitectureEnvironmentRegion`.
 * Theorem 3 and §4.1 equations (12)-(14): `ReplicaMomentCompleteness`,
   `ReplicaFiniteOrderNecessity`, `ThetaFamilyNonclosure`.
 * §5 equations (15)-(20): `PositiveRatioExpansion`, `ReplicaDomainCertificate`,
-  `SmallDenominatorRates`. §6.1 equations (24)-(26): `JointRatioFailureMasks`. §6.2:
+  `SmallDenominatorRates`; the sharp gamma constant of (20) and equations (28)-(29):
+  `SmallDenominatorLayerCake`. §6.1 equations (24)-(26): `JointRatioFailureMasks`. §6.2:
   `PortabilityRatioQueries`. §6.3 example: `UnboundedSlopeExample`. §6.4 equation (30):
   `LogLossSeriesCertificate`.
 * §7.1 equation (31): `EmpiricalLawLipschitzBound`. §7.2 Theorem 5 and equation (32):
@@ -147,7 +158,9 @@ from data alone.
 * §10, the halting boundary: `HaltingExpectationBoundary`.
 
 Scope. Theorem 2's semialgebraic partition is proved only for the architecture/environment
-square. Equation (20) is proved in its elementary threshold form and (28) is not formalized.
+square. Equations (20), (28) and (29) take the pointwise bounds `0 ≤ D ≤ 1`, as the corpus
+certificates do. Theorem 1 makes no complexity claim and covers no infinite branch set. The
+executed reference experiment of §9 is not formalized yet.
 Theorem 5 assumes a finite measure, a common bound and pointwise vanishing widths; (32) covers
 finite prefix enumerations. Frontier attainment (33) is proved per cell.
 -/
