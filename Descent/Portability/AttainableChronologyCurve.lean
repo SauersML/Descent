@@ -30,6 +30,11 @@ attainable set of metric vectors is exactly the image of that interval under the
 section 6.2 table map, in both directions. The worked example `M = R = log 2` is checked in
 both orders, giving coupling one half and coupling one.
 
+The two halves meet in `chronologyReportLaw`: for a forward-time chronology with nonnegative
+continuous rates and a positive migration total, the pair `(p, C)` is proved to lie in the unit
+square, so NOTE1 (31) applies to it and the whole section 6.2 metric table is a function of the
+chronology alone.
+
 Not proved here: that every chronology with the given totals is equivalent to a three-block
 one, and the measure-valued form of the exposure law. The attainment half uses the
 three-block family only, which is all NOTE1 Theorem 5 claims, and the bounds half covers every
@@ -242,6 +247,30 @@ theorem attainable_metric_curve (mtot rtot : ℝ) (hmpos : 0 < mtot) :
           couplingOfState (runEvents (threeBlockHistory bexp mtot rtot) (0, 0)) = coupling} =
       metricTable (1 - Real.exp (-mtot)) '' Set.Icc (Real.exp (-rtot)) 1 := by
   rw [attainable_coupling_range mtot rtot hmpos]
+
+/-- The report law of the chronology itself: NOTE1 (31) instantiated at the donor fraction and
+normalised coupling that a forward-time chronology with nonnegative continuous rates and a
+positive migration total produces. The four range hypotheses NOTE1 (31) needs are discharged
+by the bounds above rather than assumed. -/
+def chronologyReportLaw (m r : ℝ → ℝ) (hm : Continuous m) (hr : Continuous r)
+    (hmnn : ∀ s, 0 ≤ m s) (hrnn : ∀ s, 0 ≤ r s) (T : ℝ) (hT : 0 ≤ T)
+    (hmig : 0 < cumulativeRate m T) : FiniteReportLaw (Bool × Bool) :=
+  ChronologyReportLaw.chronologyLaw (donorFraction m T) (normalisedCoupling m r T)
+    (donorFraction_nonneg m hmnn T hT) (le_of_lt (donorFraction_lt_one m T))
+    (le_trans (Real.exp_pos _).le
+      (exp_neg_le_normalisedCoupling m r hm hr hmnn hrnn T hT (donorFraction_pos m T hmig)))
+    (normalisedCoupling_le_one m r hm hr hmnn hrnn T hT (donorFraction_pos m T hmig))
+
+/-- A chronology determines the whole NOTE1 section 6.2 metric table, and only through its
+donor fraction and its normalised coupling. -/
+theorem reportMetrics_chronologyReportLaw (m r : ℝ → ℝ) (hm : Continuous m)
+    (hr : Continuous r) (hmnn : ∀ s, 0 ≤ m s) (hrnn : ∀ s, 0 ≤ r s) (T : ℝ) (hT : 0 ≤ T)
+    (hmig : 0 < cumulativeRate m T) :
+    reportMetrics (chronologyReportLaw m r hm hr hmnn hrnn T hT hmig) =
+      metricTable (donorFraction m T) (normalisedCoupling m r T) := by
+  unfold chronologyReportLaw
+  exact reportMetrics_chronologyLaw _ _ _ _ _ _ (donorFraction_pos m T hmig)
+    (donorFraction_lt_one m T)
 
 /-- The survival factor of the worked example's totals. -/
 theorem exp_neg_log_two : Real.exp (-Real.log 2) = 1 / 2 := by
