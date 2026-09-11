@@ -33,5 +33,17 @@ namespace Descent.Portability.MultinomialJetCertificate
 #print axioms JetPolynomialCertificate.leftFrequency
 #print axioms JetPolynomialCertificate.rightFrequency
 #print axioms JetPolynomialCertificate.linkage
+#print axioms JetPolynomialCertificate.leftContrast
+#print axioms JetPolynomialCertificate.rightContrast
+#print axioms JetPolynomialCertificate.heterozygosity
+#print axioms JetPolynomialCertificate.rightHeterozygosity
+#print axioms JetPolynomialCertificate.linkageProduct
+#print axioms JetPolynomialCertificate.dzObservable
+#print axioms JetPolynomialCertificate.jointHeterozygosity
+#print axioms JetPolynomialCertificate.coordinate
+#print axioms JetPolynomialCertificate.enlarged
+#print axioms JetPolynomialCertificate.enlarged_degree_le
+#print axioms enlargedObservable
+#print axioms apply_multinomialDriftStage_enlarged
 
 end Descent.Portability.MultinomialJetCertificate

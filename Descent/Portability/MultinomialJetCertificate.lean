@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.MultinomialDriftStage
+import Descent.Portability.TwoLocusMicroscopicKernel
 
 assert_below Descent.Decision Descent.Program
 
@@ -41,8 +42,19 @@ The base jets are certified directly. `JetPolynomialCertificate.leftFrequency` a
 determinant `X_AB X_ab - X_Ab X_aB`, whose second-order operator is `-D` by
 `resamplingOperator_X_mul_X`, matching the corpus `twoLocusLinkageDrift_eq_neg_linkage`.
 
-What is NOT proved in this module yet: the certificates of the enlarged coordinate jets built
-from these by the jet algebra, and their use in a multinomial microscopic approximation.
+The corpus coordinate jets are built from these by the jet algebra, so their certificates are
+too: `JetPolynomialCertificate.heterozygosity`, `rightHeterozygosity`, `linkageProduct`,
+`dzObservable` and `jointHeterozygosity`, collected by `JetPolynomialCertificate.enlarged` over the
+enlarged coordinates of NOTE1 (6). Every one has total degree at most four
+(`JetPolynomialCertificate.enlarged_degree_le`), so `enlargedObservable` presents each enlarged
+coordinate as a `MultinomialDriftStage.DegreeFourObservable` in any resampled deme, with its drift
+bound read off the corpus resampling certificate. `apply_multinomialDriftStage_enlarged` is the
+consequence for NOTE1 §2.3: one multinomial drift stage at rate `rate` and step `step` moves every
+enlarged coordinate by `step · rate · driftAt`, up to a slack of order `step`.
+
+What is NOT proved in this module: the multinomial microscopic approximation assembled from these
+stages; its branch type depends on the step size, which the corpus `MicroscopicApproximation`
+does not allow.
 
 ## Empirical status
 
@@ -557,12 +569,117 @@ def linkage {D : ℕ} (index : Fin D) : JetPolynomialCertificate (twoLocusLinkag
       rw [if_pos rfl]
       simp only [twoLocusLinkageJet, if_pos rfl, twoLocusLinkageDrift_eq_neg_linkage,
         resamplingOperator_add, resamplingOperator_smul, resamplingOperator_X_mul_X,
-        TwoLocusHaplotypeFrequencies.linkage, haplotypeCoordinate, reduceCtorEq, if_false]
-      ring
+        TwoLocusHaplotypeFrequencies.linkage, haplotypeCoordinate, reduceCtorEq, if_false,
+        if_true]
+      try ring
     · rw [if_neg hdeme]
       simp [twoLocusLinkageJet, hdeme, resamplingOperator, MvPolynomial.pderiv_C]
 
+/-- The centred left-marginal contrast `1 - 2 p` of deme `index`. -/
+def leftContrast {D : ℕ} (index : Fin D) :
+    JetPolynomialCertificate (twoLocusLeftContrastJet index) :=
+  add (const 1) (smul (-2) (leftFrequency index))
+
+/-- The centred right-marginal contrast `1 - 2 q` of deme `index`. -/
+def rightContrast {D : ℕ} (index : Fin D) :
+    JetPolynomialCertificate (twoLocusRightContrastJet index) :=
+  add (const 1) (smul (-2) (rightFrequency index))
+
+/-- The cross-deme left heterozygosity `H_ij`. -/
+def heterozygosity {D : ℕ} (first second : Fin D) :
+    JetPolynomialCertificate (twoLocusHJet first second) :=
+  add (mul (leftFrequency first) (add (const 1) (smul (-1) (leftFrequency second))))
+    (mul (leftFrequency second) (add (const 1) (smul (-1) (leftFrequency first))))
+
+/-- The cross-deme right heterozygosity `H^R_ij`. -/
+def rightHeterozygosity {D : ℕ} (first second : Fin D) :
+    JetPolynomialCertificate (twoLocusRightHJet first second) :=
+  add (mul (rightFrequency first) (add (const 1) (smul (-1) (rightFrequency second))))
+    (mul (rightFrequency second) (add (const 1) (smul (-1) (rightFrequency first))))
+
+/-- The cross-deme linkage product `DD_ij`. -/
+def linkageProduct {D : ℕ} (first second : Fin D) :
+    JetPolynomialCertificate (twoLocusDDJet first second) :=
+  mul (linkage first) (linkage second)
+
+/-- The generalized `Dz_ijk` observable. -/
+def dzObservable {D : ℕ} (first second third : Fin D) :
+    JetPolynomialCertificate (twoLocusDzJet first second third) :=
+  mul (mul (linkage first) (leftContrast second)) (rightContrast third)
+
+/-- The joint heterozygosity `pi2_ijkl = H_ij H^R_kl / 4`. -/
+def jointHeterozygosity {D : ℕ} (first second third fourth : Fin D) :
+    JetPolynomialCertificate (twoLocusPi2Jet first second third fourth) :=
+  smul (1 / 4) (mul (heterozygosity first second) (rightHeterozygosity third fourth))
+
+/-- The certificate of every stored low-order coordinate jet. -/
+def coordinate {D : ℕ} :
+    (c : LowOrderLDCoordinate D) → JetPolynomialCertificate (twoLocusCoordinateJet c)
+  | .H first second => heterozygosity first second
+  | .DD first second => linkageProduct first second
+  | .Dz first second third => dzObservable first second third
+  | .pi2 first second third fourth => jointHeterozygosity first second third fourth
+
+/-- The certificate of every enlarged coordinate jet of NOTE1 (6). -/
+def enlarged {D : ℕ} :
+    (c : EnlargedLowOrderLDGenerator.AffineEnlargedCoordinate D) →
+      JetPolynomialCertificate (TwoLocusMicroscopicKernel.enlargedCoordinateJet c)
+  | none => const 1
+  | some (.inl c) => coordinate c
+  | some (.inr pair) => rightHeterozygosity pair.1 pair.2
+
+/-- Every enlarged coordinate certificate has total degree at most four. -/
+theorem enlarged_degree_le {D : ℕ} (c : EnlargedLowOrderLDGenerator.AffineEnlargedCoordinate D) :
+    (enlarged c).degree ≤ 4 := by
+  rcases c with _ | ((⟨first, second⟩ | ⟨first, second⟩ | ⟨first, second, third⟩ |
+    ⟨first, second, third, fourth⟩) | ⟨first, second⟩) <;>
+    exact Nat.le_of_ble_eq_true rfl
+
 end JetPolynomialCertificate
+
+/-! ## The multinomial drift stage on the enlarged coordinates -/
+
+/-- Every enlarged coordinate jet, read in the resampled deme `deme`, is a degree-four observable:
+the coefficient bound is read off the certificate's mass, and the drift bound off the corpus
+resampling certificate, whose second-order coefficient averages to the drift. -/
+def enlargedObservable {D : ℕ} (c : EnlargedLowOrderLDGenerator.AffineEnlargedCoordinate D)
+    (deme : Fin D) :
+    DegreeFourObservable deme (TwoLocusMicroscopicKernel.enlargedCoordinateJet c).value where
+  polynomial := (JetPolynomialCertificate.enlarged c).polynomial deme
+  totalDegree_le state := ((JetPolynomialCertificate.enlarged c).totalDegree_le deme state).trans
+    (JetPolynomialCertificate.enlarged_degree_le c)
+  polynomial_update := (JetPolynomialCertificate.enlarged c).polynomial_update deme
+  observable_eq := (JetPolynomialCertificate.enlarged c).value_eq deme
+  coefficientBound := 107 * (JetPolynomialCertificate.enlarged c).massBound
+  coefficient_le state := (sum_coeff_remainder_le _
+      (((JetPolynomialCertificate.enlarged c).totalDegree_le deme state).trans
+        (JetPolynomialCertificate.enlarged_degree_le c))).trans
+    (mul_le_mul_of_nonneg_left ((JetPolynomialCertificate.enlarged c).mass_le deme state)
+      (by norm_num))
+  driftBound := (TwoLocusMicroscopicKernel.enlargedStageExpansion c).drift.bound
+  drift_le state := by
+    rw [← (JetPolynomialCertificate.enlarged c).drift_eq deme state,
+      ← (TwoLocusMicroscopicKernel.enlargedStageExpansion c).drift.second_mean deme state]
+    exact twoLocusHaplotypeMean_abs_le _ _ _
+      ((TwoLocusMicroscopicKernel.enlargedStageExpansion c).drift.second_le deme state)
+
+/-- **One multinomial drift stage moves every enlarged coordinate by its corpus drift.** At rate
+`rate > 0` and step size `step > 0` the multinomial drift stage in deme `deme` moves the enlarged
+coordinate jet by `step · rate · driftAt`, up to `step · rate ^ 2 · step` times an explicit
+constant. -/
+theorem apply_multinomialDriftStage_enlarged {D : ℕ}
+    (c : EnlargedLowOrderLDGenerator.AffineEnlargedCoordinate D) (deme : Fin D)
+    (rate step : ℝ) (hrate : 0 < rate) (hstep : 0 < step)
+    (state : Fin D → TwoLocusHaplotypeFrequencies) :
+    |(multinomialDriftKernel deme (one_le_multinomialChromosomeCount rate step hrate hstep)).apply
+          (TwoLocusMicroscopicKernel.enlargedCoordinateJet c).value state
+        - (TwoLocusMicroscopicKernel.enlargedCoordinateJet c).value state
+        - step * (rate * (TwoLocusMicroscopicKernel.enlargedCoordinateJet c).driftAt deme state)|
+      ≤ step * (rate ^ 2 * step * (107 * (JetPolynomialCertificate.enlarged c).massBound
+          + (TwoLocusMicroscopicKernel.enlargedStageExpansion c).drift.bound)) := by
+  rw [(JetPolynomialCertificate.enlarged c).drift_eq deme state]
+  exact apply_multinomialDriftStage_expansion (enlargedObservable c deme) rate step hrate hstep
+    state
 
 end
 
