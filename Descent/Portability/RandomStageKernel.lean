@@ -156,10 +156,7 @@ theorem abs_one_div_sq_sub_le (rate step : ℝ) (hrate : 0 < rate) (hstep : 0 < 
     have hscaled := mul_lt_mul_of_pos_left hceilupper hroot
     nlinarith [hscaled, hcancel]
   have hone : 1 ≤ Real.sqrt (rate * step) * (driftChromosomeCount rate step : ℝ) := by
-    have hproduct := mul_le_mul_of_nonneg_left (Nat.le_ceil
-      ((Real.sqrt (rate * step))⁻¹) : (Real.sqrt (rate * step))⁻¹ ≤
-        (driftChromosomeCount rate step : ℝ)) hroot.le
-    linarith
+    nlinarith [hupper, hexpand, hreal]
   have hcubic : Real.sqrt (rate * step) ≤
       Real.sqrt (rate * step) ^ 2 * (driftChromosomeCount rate step : ℝ) := by
     nlinarith [hone, hroot.le]
@@ -285,7 +282,8 @@ theorem apply_uniformStageMixture {B X S : Type*} [Fintype B] [Fintype S]
     (stage_expansion : ∀ s : S, ∀ scale : ℝ, 0 < scale → ∀ other : X,
       |(stage s scale).apply observable other - observable other -
         scale * velocity s other| ≤ scale * slack s scale) :
-    |(uniformMixture (fun s ↦ stage s ((Fintype.card S : ℝ) * step)) hcard).apply
+    |(FiniteMixtureKernel.uniformMixture
+            (fun s ↦ stage s ((Fintype.card S : ℝ) * step)) hcard).apply
           observable point - observable point - step * ∑ s, velocity s point| ≤
       step * ∑ s, slack s ((Fintype.card S : ℝ) * step) := by
   have hcardpos : (0 : ℝ) < (Fintype.card S : ℝ) := by exact_mod_cast hcard
@@ -317,7 +315,7 @@ theorem apply_uniformStageMixture {B X S : Type*} [Fintype B] [Fintype S]
     rw [← Finset.mul_sum]
     ring
   rw [hsplit, hslacksum, abs_mul, abs_of_pos hcardpos] at hsumbound
-  rw [apply_uniformMixture]
+  rw [FiniteMixtureKernel.apply_uniformMixture]
   exact le_of_mul_le_mul_left hsumbound hcardpos
 
 end
