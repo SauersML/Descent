@@ -531,6 +531,7 @@ theorem integral_unit_ratio : ∫ θ in (0:ℝ)..1, θ / (2 - θ) = 2 * Real.log
         (-(2 * (-1 / (2 - θ))) - 1) θ := ((hlog.const_mul 2).neg).sub (hasDerivAt_id θ)
     refine hfull.congr_deriv ?_
     field_simp
+    ring
   rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv intervalIntegrable_unit_ratio]
   norm_num
   all_goals ring
@@ -610,18 +611,20 @@ theorem integral_unit_binEntropy : ∫ θ in (0:ℝ)..1, Real.binEntropy θ = 1 
 /-- NOTE2 section 9.1: the expected population squared correlation is `2 log 2 - 1`. -/
 theorem integral_squaredCorrelation_penetranceLaw :
     ∫ θ in (0:ℝ)..1, ((penetranceLaw θ).squaredCorrelation cellScore cellOutcome).getD 0 =
-      2 * Real.log 2 - 1 :=
-  (integral_unit_congr _ (fun θ ↦ θ / (2 - θ))
-    (fun θ hpos hhi ↦ by rw [squaredCorrelation_penetranceLaw θ hpos hhi];
-      rfl)).trans integral_unit_ratio
+      2 * Real.log 2 - 1 := by
+  refine (integral_unit_congr _ (fun θ ↦ θ / (2 - θ)) ?_).trans integral_unit_ratio
+  intro θ hpos hhi
+  rw [squaredCorrelation_penetranceLaw θ hpos hhi]
+  rfl
 
 /-- NOTE2 section 9.1: the expected population area under the curve is `(1 + log 2) / 2`. -/
 theorem integral_binaryAUC_penetranceLaw :
     ∫ θ in (0:ℝ)..1, ((penetranceLaw θ).binaryAUC cellScore outcomeFlag).getD 0 =
-      (1 + Real.log 2) / 2 :=
-  (integral_unit_congr _ (fun θ ↦ (3 - θ) / (2 * (2 - θ)))
-    (fun θ hpos hhi ↦ by rw [binaryAUC_penetranceLaw θ hpos hhi];
-      rfl)).trans integral_unit_auc
+      (1 + Real.log 2) / 2 := by
+  refine (integral_unit_congr _ (fun θ ↦ (3 - θ) / (2 * (2 - θ))) ?_).trans integral_unit_auc
+  intro θ hpos hhi
+  rw [binaryAUC_penetranceLaw θ hpos hhi]
+  rfl
 
 /-- NOTE2 section 9.1: the expected calibration slope is one half. -/
 theorem integral_calibrationSlope_penetranceLaw :
@@ -748,7 +751,7 @@ def replicaDenominator (θ : ℝ) : ℝ := 1 - θ / 2
 
 /-- The reduced pair reproduces the population squared correlation exactly, so the positive
 ratio expansion of NOTE2 (15) applies to it. -/
-theorem replicaRatio_eq_ratio (θ : ℝ) (hlo : 0 ≤ θ) (hhi : θ ≤ 1) :
+theorem replicaRatio_eq_ratio (θ : ℝ) (hhi : θ ≤ 1) :
     replicaNumerator θ / replicaDenominator θ = θ / (2 - θ) := by
   have hpos : (0:ℝ) < 2 - θ := by linarith
   have hden : (0:ℝ) < 1 - θ / 2 := by linarith

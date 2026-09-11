@@ -199,6 +199,7 @@ theorem enlargedEmbedding_mulVec {D : ℕ} (state : AffineLowOrderLDCoordinate D
   simp only [enlargedEmbedding]
   rw [Finset.sum_eq_single (storedSource row)]
   · rw [if_pos rfl, one_mul]
+    rfl
   · intro other _ hother
     rw [if_neg hother, zero_mul]
   · intro hmember
@@ -214,9 +215,7 @@ private theorem enlarged_mulVec_split {D : ℕ}
           matrix row (some (.inl coordinate)) * vector (some (.inl coordinate))) +
         ∑ pair : Fin D × Fin D,
           matrix row (some (.inr pair)) * vector (some (.inr pair))) := by
-  rw [mulVec_apply_sum, Fintype.sum_option]
-  congr 1
-  exact Fintype.sum_sum_type _
+  rw [mulVec_apply_sum, Fintype.sum_option, Fintype.sum_sum_type]
 
 /-- Expansion of a stored matrix application into its constant and stored blocks. -/
 private theorem affine_mulVec_split {D : ℕ}
