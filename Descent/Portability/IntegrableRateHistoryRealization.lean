@@ -45,10 +45,15 @@ generators.  `eventually_integral_norm_sampledGenerator_sub_le` is the step appr
 generators of the left-endpoint sampled rate laws, each a genuine nonnegative `ManyDemeLDRates`,
 converge to the history's generator in `L¹([0, T])`.
 
-Scope.  The rates are assumed to have a continuous generator on the horizon, which covers
-continuous rates and, by composing with the epoch lists of
-`TwoLocusMicroscopicApproximation`, piecewise-continuous histories with finitely many jumps and
-splits.  Measurable rates with merely integrable norm, NOTE1's full hypothesis, are not
+NOTE1 section 2.4 also interleaves finite instantaneous events.  `HistorySegment` is one segment
+of a piecewise history, either such a continuous rate history over its own horizon or a
+physically realized split, and `propagateSegments_preserves_locusExchangeable_realization` says
+every finite list of segments preserves locus-exchangeable realizability.  The rates may jump
+between consecutive segments, so piecewise-continuous histories with finitely many rate changes
+and splits are covered.
+
+Scope.  Within a segment the rates are assumed to have a continuous generator on the horizon.
+Measurable rates with merely integrable norm, NOTE1's full hypothesis, are not
 formalized: their fundamental matrix solves the equation only almost everywhere, and neither
 that Carathéodory existence theory nor the approximation of such rates by step functions is
 available here.  Uniqueness of the solution of `U' = A(t) U` is not proved.
@@ -305,6 +310,71 @@ theorem eventually_integral_norm_sampledGenerator_sub_le {D : ℕ}
     rfl
   rw [← hsame]
   exact hn
+
+/-! ## Interleaving instantaneous events -/
+
+/-- One segment of a piecewise history of the low-order system: a rate history over its own
+horizon whose corpus generator is continuous there, or a physically realized split. -/
+inductive HistorySegment (D : ℕ) where
+  /-- Evolution under a rate history over `[0, horizon]`. -/
+  | evolve (rates : ℝ → ManyDemeLDRates D) (horizon : ℝ) (horizon_nonneg : 0 ≤ horizon)
+      (continuous :
+        ContinuousOn (fun t ↦ augmentedLowOrderLDGenerator (rates t)) (Set.Icc 0 horizon))
+  /-- The child deme is founded as a copy of the parent deme. -/
+  | split (parent child : Fin D)
+
+/-- The linear map one segment applies to the stored low-order state: the propagator of the
+rate history, or the corpus split transform. -/
+def HistorySegment.apply {D : ℕ} :
+    HistorySegment D → (AffineLowOrderLDCoordinate D → ℝ) → AffineLowOrderLDCoordinate D → ℝ
+  | .evolve rates horizon _ _, state => (rateHistoryPropagator rates horizon).mulVec state
+  | .split parent child, state => (lowOrderLDSplitTransform parent child).mulVec state
+
+/-- A split of the first deme onto itself, a segment carrying no hypothesis. -/
+def splitSegmentWitness : HistorySegment 1 :=
+  .split 0 0
+
+/-- The stored low-order state after a finite list of segments, applied in order. -/
+def propagateSegments {D : ℕ} (segments : List (HistorySegment D))
+    (state : AffineLowOrderLDCoordinate D → ℝ) : AffineLowOrderLDCoordinate D → ℝ :=
+  segments.foldl (fun current segment ↦ segment.apply current) state
+
+/-- **NOTE1 section 2.4 with interleaved events.**  Every finite list of rate histories with
+continuous generators and physically realized splits carries a locus-exchangeably realizable
+stored state to a locus-exchangeably realizable one.  Each rate history is the continuous-rate
+theorem, and each split relabels the very same haplotype law. -/
+theorem propagateSegments_preserves_locusExchangeable_realization {D : ℕ}
+    (segments : List (HistorySegment D)) {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LocusExchangeableLowOrderLDHaplotypeRealization state) :
+    Nonempty (LocusExchangeableLowOrderLDHaplotypeRealization
+      (propagateSegments segments state)) := by
+  induction segments generalizing state with
+  | nil => exact ⟨realization⟩
+  | cons head rest ih =>
+      have hhead : Nonempty (LocusExchangeableLowOrderLDHaplotypeRealization
+          (head.apply state)) := by
+        cases head with
+        | evolve rates horizon horizon_nonneg continuous =>
+            exact rateHistory_preserves_locusExchangeable_realization rates horizon_nonneg
+              continuous realization
+        | split parent child =>
+            exact ⟨TwoLocusRealizabilityPreservation.locusExchangeableSplit realization parent
+              child⟩
+      obtain ⟨propagated⟩ := hhead
+      exact ih propagated
+
+/-- After every finite list of continuous rate histories and splits the propagated `DD` block is
+positive semidefinite under the common propagated haplotype law. -/
+theorem propagateSegments_dd_quadraticForm_nonneg {D : ℕ}
+    (segments : List (HistorySegment D)) {state : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LocusExchangeableLowOrderLDHaplotypeRealization state)
+    (weight : Fin D → ℝ) :
+    0 ≤ ∑ first, ∑ second, weight first *
+      propagateSegments segments state (some (.DD first second)) * weight second := by
+  obtain ⟨propagated⟩ :=
+    propagateSegments_preserves_locusExchangeable_realization segments realization
+  exact propagated.toLowOrderLDHaplotypeRealization.toDDDRealization.dd_quadraticForm_nonneg
+    weight
 
 end
 

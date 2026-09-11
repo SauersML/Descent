@@ -25,3 +25,8 @@ open Descent.Portability.IntegrableRateHistoryRealization
 #print axioms rateHistoryPropagator_dd_quadraticForm_nonneg
 #print axioms norm_rateHistoryPropagator_sub_le
 #print axioms eventually_integral_norm_sampledGenerator_sub_le
+#print axioms HistorySegment.apply
+#print axioms splitSegmentWitness
+#print axioms propagateSegments
+#print axioms propagateSegments_preserves_locusExchangeable_realization
+#print axioms propagateSegments_dd_quadraticForm_nonneg
