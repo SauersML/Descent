@@ -43,15 +43,20 @@ endpoint `(1 - 2/n) p² + (2/n) p` of PL (5.13) / DC (4.4) with `p = e^{-γ t}`.
 binomial law of `Descent.Portability.BinomialAggregateEnvelope` has exactly the same
 factorial moments, so the two agree on every falling factorial.
 
+Corollary 3.5 then closes as an identity of laws: falling factorials are triangular, so
+they determine a law on a finite grid, and `exp_linearDeath_row_eq_binomial` states that the
+semigroup row from the top state IS the `Binomial(m, e^{-γ t})` weight vector of
+`Descent.Portability.BinomialAggregateEnvelope.binWeight`. No ODE uniqueness is used
+anywhere in this module.
+
 **Scope.** This covers MARKOV admissible generators. History-dependent couplings are not
 matrices and are not covered; for those the corpus statement remains the discrete skeleton
 `ConvexOrderCoupling.pathExp_nearestDrift_le`, which is proved for kernels indexed by the
-entire past. Corollary 3.5 is closed here at the level of reports -- every falling factorial,
-hence the squared count the manuscript uses -- but NOT as an identity of laws: concluding
-that the semigroup row equals the binomial weight vector needs the triangularity argument
-that falling factorials of order `0, …, m` span, and that is not proved. DC Corollary 4.3's
-`a_j(t)` for odd `n` is not proved either; its generator carries the extra `4λ|M|` term,
-which destroys the invariant subspace the even case relies on.
+entire past. DC Corollary 4.3's `a_j(t)` for odd `n` is NOT proved. Its generator sends
+`|M| = 2i+1` down by two at rate `λ(2i+1)`, which is lower triangular with eigenvalues
+`0, -3λ, …, -λ n`, so the falling factorials are no longer eigenvectors -- they are for the
+linear rate `γ j`, not the affine rate `λ(2i+1)`. Closing 4.3 needs that chain's own
+eigenvector family constructed from scratch, or genuine ODE uniqueness.
 -/
 
 set_option autoImplicit false
@@ -730,6 +735,139 @@ theorem exp_linearDeath_falling_eq_binomial (m : ℕ) (gamma t : ℝ) (r : ℕ) 
       ring, NormedSpace.exp_nsmul]
   rw [exp_linearDeath_falling, binMoment_falling, hval, hpow]
   ring
+
+/-! ## Falling factorials determine a law, so DC Corollary 3.5 holds as an identity of laws -/
+
+/-- A falling factorial vanishes below its order. -/
+theorem fallingFactorial_natCast_eq_zero :
+    ∀ (r k : ℕ), k < r → fallingFactorial ((k : ℕ) : ℝ) r = 0 := by
+  intro r
+  induction r with
+  | zero =>
+    intro k h
+    omega
+  | succ r ih =>
+    intro k h
+    cases k with
+    | zero =>
+      show ((0 : ℕ) : ℝ) * fallingFactorial (((0 : ℕ) : ℝ) - 1) r = 0
+      simp
+    | succ k =>
+      show (((k + 1 : ℕ)) : ℝ) * fallingFactorial ((((k + 1 : ℕ)) : ℝ) - 1) r = 0
+      have hx : (((k + 1 : ℕ)) : ℝ) - 1 = ((k : ℕ) : ℝ) := by
+        push_cast
+        ring
+      rw [hx, ih k (by omega)]
+      ring
+
+/-- A falling factorial does not vanish at its own order: it is `r!`. -/
+theorem fallingFactorial_self_ne_zero : ∀ r : ℕ, fallingFactorial ((r : ℕ) : ℝ) r ≠ 0 := by
+  intro r
+  induction r with
+  | zero =>
+    show (1 : ℝ) ≠ 0
+    norm_num
+  | succ r ih =>
+    show (((r + 1 : ℕ)) : ℝ) * fallingFactorial ((((r + 1 : ℕ)) : ℝ) - 1) r ≠ 0
+    have hx : (((r + 1 : ℕ)) : ℝ) - 1 = ((r : ℕ) : ℝ) := by
+      push_cast
+      ring
+    rw [hx]
+    refine mul_ne_zero ?_ ih
+    push_cast
+    positivity
+
+/-- **Falling factorials determine a law on a finite grid.**  Two weight vectors on
+`{0, …, m}` that agree against every falling factorial are equal.  The proof is the
+triangularity of the falling factorials: `(k)_r` vanishes for `k < r` and not at `k = r`,
+so the point masses are pinned down from the top. -/
+theorem weights_eq_of_falling_moments_eq (m : ℕ) (w1 w2 : Fin (m + 1) → ℝ)
+    (h : ∀ r : ℕ, ∑ k : Fin (m + 1), w1 k * fallingFactorial ((k : ℕ) : ℝ) r
+      = ∑ k : Fin (m + 1), w2 k * fallingFactorial ((k : ℕ) : ℝ) r) :
+    ∀ k : Fin (m + 1), w1 k = w2 k := by
+  have h' : ∀ r : ℕ,
+      ∑ k : Fin (m + 1), (w1 k - w2 k) * fallingFactorial ((k : ℕ) : ℝ) r = 0 := by
+    intro r
+    have hsplit : ∑ k : Fin (m + 1), (w1 k - w2 k) * fallingFactorial ((k : ℕ) : ℝ) r
+        = (∑ k : Fin (m + 1), w1 k * fallingFactorial ((k : ℕ) : ℝ) r)
+          - ∑ k : Fin (m + 1), w2 k * fallingFactorial ((k : ℕ) : ℝ) r := by
+      rw [← Finset.sum_sub_distrib]
+      exact Finset.sum_congr rfl fun k _ ↦ by ring
+    rw [hsplit, h r]
+    ring
+  have hclaim : ∀ s : ℕ, ∀ k : Fin (m + 1), m ≤ (k : ℕ) + s → w1 k = w2 k := by
+    intro s
+    induction s with
+    | zero =>
+      intro k hk
+      have hkm : (k : ℕ) = m := by
+        have := k.isLt
+        omega
+      have hkey : ∑ j : Fin (m + 1), (w1 j - w2 j) * fallingFactorial ((j : ℕ) : ℝ) (k : ℕ)
+          = (w1 k - w2 k) * fallingFactorial ((k : ℕ) : ℝ) (k : ℕ) := by
+        refine Finset.sum_eq_single k ?_ ?_
+        · intro b _ hb
+          have hbk : (b : ℕ) ≠ (k : ℕ) := fun hc ↦ hb (Fin.ext hc)
+          have hlt : (b : ℕ) < (k : ℕ) := by
+            have := b.isLt
+            omega
+          rw [fallingFactorial_natCast_eq_zero (k : ℕ) (b : ℕ) hlt]
+          ring
+        · intro hc
+          exact absurd (Finset.mem_univ k) hc
+      rw [h' (k : ℕ)] at hkey
+      have := (mul_eq_zero.mp hkey.symm).resolve_right (fallingFactorial_self_ne_zero (k : ℕ))
+      linarith
+    | succ s ih =>
+      intro k hk
+      by_cases hcase : m ≤ (k : ℕ) + s
+      · exact ih k hcase
+      · have hexact : (k : ℕ) + s + 1 = m := by omega
+        have hkey : ∑ j : Fin (m + 1), (w1 j - w2 j) * fallingFactorial ((j : ℕ) : ℝ) (k : ℕ)
+            = (w1 k - w2 k) * fallingFactorial ((k : ℕ) : ℝ) (k : ℕ) := by
+          refine Finset.sum_eq_single k ?_ ?_
+          · intro b _ hb
+            have hbk : (b : ℕ) ≠ (k : ℕ) := fun hc ↦ hb (Fin.ext hc)
+            rcases lt_or_gt_of_ne hbk with hlt | hgt
+            · rw [fallingFactorial_natCast_eq_zero (k : ℕ) (b : ℕ) hlt]
+              ring
+            · rw [ih b (by omega)]
+              ring
+          · intro hc
+            exact absurd (Finset.mem_univ k) hc
+        rw [h' (k : ℕ)] at hkey
+        have := (mul_eq_zero.mp hkey.symm).resolve_right (fallingFactorial_self_ne_zero (k : ℕ))
+        linarith
+  intro k
+  exact hclaim m k (by omega)
+
+/-- **DC Corollary 3.5, as an identity of laws.**  Started from the top state, the row of the
+pure-death semigroup is exactly the `Binomial(m, e^{-γ t})` weight vector.  No ODE
+uniqueness is used: the falling factorials are eigenvectors of the generator, they match the
+binomial's factorial moments, and they determine the law. -/
+theorem exp_linearDeath_row_eq_binomial (m : ℕ) (gamma t : ℝ) (k : Fin (m + 1)) :
+    (NormedSpace.exp ℝ (t • linearDeathMatrix m gamma)) ⟨m, Nat.lt_succ_self m⟩ k
+      = BinomialAggregateEnvelope.binWeight (NormedSpace.exp ℝ (t * (-gamma))) m (k : ℕ) := by
+  refine weights_eq_of_falling_moments_eq m
+    (fun i ↦ (NormedSpace.exp ℝ (t • linearDeathMatrix m gamma)) ⟨m, Nat.lt_succ_self m⟩ i)
+    (fun i ↦ BinomialAggregateEnvelope.binWeight (NormedSpace.exp ℝ (t * (-gamma))) m (i : ℕ))
+    ?_ k
+  intro r
+  have hlhs : ∑ i : Fin (m + 1),
+      (NormedSpace.exp ℝ (t • linearDeathMatrix m gamma)) ⟨m, Nat.lt_succ_self m⟩ i
+        * fallingFactorial ((i : ℕ) : ℝ) r
+      = (NormedSpace.exp ℝ (t • linearDeathMatrix m gamma)).mulVec
+          (fun i ↦ fallingFactorial ((i : ℕ) : ℝ) r) ⟨m, Nat.lt_succ_self m⟩ := rfl
+  have hrhs : ∑ i : Fin (m + 1),
+      BinomialAggregateEnvelope.binWeight (NormedSpace.exp ℝ (t * (-gamma))) m (i : ℕ)
+        * fallingFactorial ((i : ℕ) : ℝ) r
+      = BinomialAggregateEnvelope.binMoment (NormedSpace.exp ℝ (t * (-gamma)))
+          (fun j ↦ fallingFactorial ((j : ℕ) : ℝ) r) m := by
+    simp only [BinomialAggregateEnvelope.binMoment]
+    rw [Fin.sum_univ_eq_sum_range (fun j ↦ BinomialAggregateEnvelope.binWeight
+      (NormedSpace.exp ℝ (t * (-gamma))) m j * fallingFactorial ((j : ℕ) : ℝ) r) (m + 1)]
+    exact Finset.sum_congr rfl fun j _ ↦ mul_comm _ _
+  rw [hlhs, hrhs, exp_linearDeath_falling_eq_binomial]
 
 end
 

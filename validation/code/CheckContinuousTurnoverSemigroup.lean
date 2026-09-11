@@ -38,3 +38,7 @@ open Descent.Portability.ContinuousTurnoverSemigroup
 #print axioms fallingFactorial_shift
 #print axioms binMoment_falling
 #print axioms exp_linearDeath_falling_eq_binomial
+#print axioms fallingFactorial_natCast_eq_zero
+#print axioms fallingFactorial_self_ne_zero
+#print axioms weights_eq_of_falling_moments_eq
+#print axioms exp_linearDeath_row_eq_binomial
