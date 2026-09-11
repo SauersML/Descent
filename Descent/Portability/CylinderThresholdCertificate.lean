@@ -159,7 +159,8 @@ theorem resolvedMass_le_and_le_add (evaluator : CylinderEvaluator score) (thresh
     (resolvedMass evaluator threshold stage : ℝ) ≤
         bitMeasure.real {stream | (threshold : ℝ) ≤ score stream} ∧
       bitMeasure.real {stream | (threshold : ℝ) ≤ score stream} ≤
-        (resolvedMass evaluator threshold stage : ℝ) + unresolvedMass evaluator threshold stage := by
+        (resolvedMass evaluator threshold stage : ℝ) +
+          unresolvedMass evaluator threshold stage := by
   rw [resolvedMass_cast, unresolvedMass_cast]
   constructor
   · refine measureReal_mono (fun stream hstream ↦ ?_) (measure_ne_top _ _)
