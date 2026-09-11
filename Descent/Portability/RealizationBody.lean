@@ -324,10 +324,8 @@ theorem exists_law_of_mem_realizationBody {X ι : Type*} [Fintype ι] (φ : X �
     simp at hwsum
   choose point₀ hpoint₀ using fun j : J ↦ hzrange (Set.mem_range_self j)
   obtain ⟨j₀⟩ := hJne
-  have hcastinj : Function.Injective (Fin.castLE hcard) :=
-    fun a b hab ↦ Fin.val_injective (congrArg Fin.val hab)
   have hinj : Function.Injective fun j : J ↦ Fin.castLE hcard (Fintype.equivFin J j) :=
-    hcastinj.comp (Fintype.equivFin J).injective
+    (Fin.castLE_injective hcard).comp (Fintype.equivFin J).injective
   refine ⟨Function.extend (fun j : J ↦ Fin.castLE hcard (Fintype.equivFin J j)) weight 0,
     Function.extend (fun j : J ↦ Fin.castLE hcard (Fintype.equivFin J j)) point₀
       (fun _ ↦ point₀ j₀), ?_, ?_, ?_⟩

@@ -162,6 +162,12 @@ theorem killingGenerator_jumpGenerator [DecidableEq ι] (rate : ι → ι → �
     rw [← hsplit, hdiag, hoff]
     simp
 
+/-- Making every entry of a rate table nonnegative yields a killing generator with no
+hypothesis at all, so the class is inhabited outright on every finite state space. -/
+theorem killingGenerator_absJumpGenerator [DecidableEq ι] (rate : ι → ι → ℝ) :
+    KillingGenerator (jumpGenerator fun source target ↦ |rate source target|) :=
+  killingGenerator_jumpGenerator _ fun _ _ ↦ abs_nonneg _
+
 /-- The purely absorbing generator with a common killing rate: no jumps, uniform decay. -/
 def uniformKilling [DecidableEq ι] (rate : ℝ) : Matrix ι ι ℝ :=
   Matrix.diagonal (fun _ ↦ -rate)
@@ -349,6 +355,20 @@ theorem substochastic_epochProduct (epochs : List (Matrix ι ι ℝ × ℝ))
   obtain ⟨epoch, hmem, rfl⟩ := List.mem_map.mp hP
   obtain ⟨hgen, hduration⟩ := hepochs epoch hmem
   exact matrixExponential_substochastic epoch.1 hgen epoch.2 hduration
+
+/-- A chronological history built from an arbitrary rate table and an arbitrary length per
+epoch, with the rates made nonnegative and the lengths made forward in time, composes to a
+substochastic operator with no hypothesis at all. -/
+theorem substochastic_absEpochProduct (epochs : List ((ι → ι → ℝ) × ℝ)) :
+    SubstochasticMatrix
+      (epochs.map fun epoch ↦
+        matrixExponential (jumpGenerator fun source target ↦ |epoch.1 source target|)
+          |epoch.2|).prod := by
+  refine substochastic_listProd _ ?_
+  intro P hP
+  obtain ⟨epoch, _, rfl⟩ := List.mem_map.mp hP
+  exact matrixExponential_substochastic _ (killingGenerator_absJumpGenerator epoch.1) _
+    (abs_nonneg _)
 
 /-- **A conservative generator loses no mass.**  When every row of `Q` sums to zero, every row
 of the exact exponential sums to one at every time, so the constant vector is preserved. -/

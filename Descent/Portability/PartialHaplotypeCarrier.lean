@@ -39,6 +39,9 @@ interval whenever each deme carries a `Descent.Portability.FiniteReportLaw` on h
 fully retained carrier has marginal frequency equal to the mass of its own haplotype, which is
 the seed evaluation of the sampled-genotype representation (22).
 
+The carrier type is inhabited in-corpus by `singleLocusType`, the lineage retaining exactly
+one locus, and by `fullType`, the lineage retaining them all.
+
 Not formalized here: the generator identity (19), that is, the coalescent duality with
 recombination that identifies the jump rates `q_{ξη}` on configurations.  It is classical and
 NOTE1 §4.2 states it without proof.  The loose counting bound `C(K+B, B)` of §4.1 is also not
@@ -98,6 +101,15 @@ def fullType (i : Deme) (hap : ∀ ℓ, Allele ℓ) (ℓ₀ : Locus) : PartialTy
   allele := fun ℓ ↦ some (hap ℓ)
   retained := ⟨ℓ₀, by simp⟩
 
+/-- The carrier retaining exactly one locus: the smallest material lineage, and the in-corpus
+inhabitant of the carrier type.  A deme, a locus and an allele at that locus are all it
+needs. -/
+def singleLocusType [DecidableEq Locus] (i : Deme) (ℓ₀ : Locus) (a : Allele ℓ₀) :
+    PartialType Deme Locus Allele where
+  deme := i
+  allele := Function.update (fun _ ↦ none) ℓ₀ (some a)
+  retained := ⟨ℓ₀, by simp⟩
+
 /-- The material load of a configuration at a locus: the number of carriers retaining it.
 This is the left-hand side of the retention constraint (18). -/
 def load (ξ : Multiset (PartialType Deme Locus Allele)) (ℓ : Locus) : ℕ :=
@@ -109,6 +121,17 @@ theorem load_cons (τ : PartialType Deme Locus Allele)
     (ξ : Multiset (PartialType Deme Locus Allele)) (ℓ : Locus) :
     load (τ ::ₘ ξ) ℓ = load ξ ℓ + (if (τ.allele ℓ).isSome = true then 1 else 0) := by
   simp only [load, Multiset.countP_cons]
+
+/-- The one-locus carrier loads its own locus once and every other locus not at all. -/
+theorem load_singleLocusType [DecidableEq Locus] (i : Deme) (ℓ₀ : Locus) (a : Allele ℓ₀)
+    (ℓ : Locus) :
+    load (singleLocusType i ℓ₀ a ::ₘ (0 : Multiset (PartialType Deme Locus Allele))) ℓ
+      = if ℓ = ℓ₀ then 1 else 0 := by
+  rw [load_cons]
+  by_cases hℓ : ℓ = ℓ₀
+  · subst hℓ
+    simp [load, singleLocusType]
+  · simp [load, singleLocusType, Function.update_of_ne hℓ, hℓ]
 
 /-- The retention constraint (18): a panel requiring `capacity ℓ` chromosome copies at locus
 `ℓ` retains only the configurations whose load never exceeds the capacity. -/
