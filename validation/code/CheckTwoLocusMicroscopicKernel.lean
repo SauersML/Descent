@@ -49,3 +49,10 @@ open Descent.Portability.TwoLocusMicroscopicKernel
 #print axioms rightMutationLinkageProduct_velocity
 #print axioms mutationStage_sum_linkageProduct
 #print axioms stage_generator_linkageProduct
+#print axioms lowOrderLDMigration_dzObservable_pointwise
+#print axioms migrationDzObservable_velocity
+#print axioms migrationStage_sum_dzObservable
+#print axioms leftMutationDzObservable_velocity
+#print axioms rightMutationDzObservable_velocity
+#print axioms mutationStage_sum_dzObservable
+#print axioms stage_generator_dzObservable
