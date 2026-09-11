@@ -25,7 +25,7 @@ noncomputable def precision (a b : ℝ) : ℝ := a⁻¹ + b⁻¹ - 1
 
 /-- The exact overlap coefficient of the two normalized Gaussian density ratios. -/
 noncomputable def overlap (a b : ℝ) : ℝ :=
-  Real.sqrt (precision a b)⁻¹ / (Real.sqrt a * Real.sqrt b)
+  Real.sqrt ((precision a b)⁻¹) / (Real.sqrt a * Real.sqrt b)
 
 /-- Positive overlap precision gives a positive normalizing coefficient. -/
 theorem overlap_pos (a b : ℝ) (ha : 0 < a) (hb : 0 < b) (ht : 0 < precision a b) :
@@ -40,7 +40,7 @@ theorem ratio_mul (a b x : ℝ) (ha : 0 < a) (hb : 0 < b) (ht : 0 < precision a 
       (1 - ((precision a b)⁻¹)⁻¹) * x ^ 2 / 2 := by
     simp only [inv_inv, precision]
     ring
-  have hv : Real.sqrt (precision a b)⁻¹ ≠ 0 :=
+  have hv : Real.sqrt ((precision a b)⁻¹) ≠ 0 :=
     (Real.sqrt_pos.mpr (inv_pos.mpr ht)).ne'
   have hsa := (Real.sqrt_pos.mpr ha).ne'
   have hsb := (Real.sqrt_pos.mpr hb).ne'
@@ -104,5 +104,39 @@ theorem product_overlap_integral (a b : ι → ℝ) (ha : ∀ i, 0 < a i)
   simp only [productRatio, ← Finset.prod_mul_distrib]
   rw [integral_fintype_prod_eq_prod (fun i x ↦ ratio (a i) x * ratio (b i) x)]
   exact Finset.prod_congr rfl (fun i _ ↦ ratio_mul_integral _ _ (ha i) (hb i) (ht i))
+
+/-- Any two positive variances below two have an integrable overlap. -/
+theorem precision_pos_of_lt_two (a b : ℝ) (ha : 0 < a) (hb : 0 < b)
+    (ha₂ : a < 2) (hb₂ : b < 2) : 0 < precision a b := by
+  have h₁ := square_precision_pos a ha ha₂
+  have h₂ := square_precision_pos b hb hb₂
+  unfold precision at *
+  linarith
+
+/-- Exact squared distance between product density ratios under the reference Gaussian law. -/
+theorem product_distance_sq (a b : ι → ℝ) (ha : ∀ i, 0 < a i)
+    (hb : ∀ i, 0 < b i) (ha₂ : ∀ i, a i < 2) (hb₂ : ∀ i, b i < 2) :
+    (∫ x, (productRatio a x - productRatio b x) ^ 2
+      ∂Measure.pi (fun _ : ι ↦ gaussianReal 0 1)) =
+      (∏ i, overlap (a i) (a i)) + (∏ i, overlap (b i) (b i)) -
+        2 * ∏ i, overlap (a i) (b i) := by
+  have haa (i : ι) := square_precision_pos (a i) (ha i) (ha₂ i)
+  have hbb (i : ι) := square_precision_pos (b i) (hb i) (hb₂ i)
+  have hab (i : ι) := precision_pos_of_lt_two (a i) (b i) (ha i) (hb i) (ha₂ i) (hb₂ i)
+  have hi₁ := product_overlap_integrable a a ha ha haa
+  have hi₂ := product_overlap_integrable b b hb hb hbb
+  have hi₃ := product_overlap_integrable a b ha hb hab
+  calc
+    _ = ∫ x, productRatio a x * productRatio a x + productRatio b x * productRatio b x -
+        2 * (productRatio a x * productRatio b x)
+        ∂Measure.pi (fun _ : ι ↦ gaussianReal 0 1) := by
+      apply integral_congr_ae
+      exact Filter.Eventually.of_forall (fun _ ↦ by ring)
+    _ = _ := by
+      have hsub := integral_sub (hi₁.add hi₂) (hi₃.const_mul 2)
+      simp only [Pi.add_apply] at hsub
+      rw [hsub, integral_add hi₁ hi₂,
+        integral_const_mul, product_overlap_integral a a ha ha haa,
+        product_overlap_integral b b hb hb hbb, product_overlap_integral a b ha hb hab]
 
 end Descent.Portability.GaussianDensityOverlap

@@ -1,0 +1,380 @@
+{
+  "manuscript": "Decision-Directed Portability",
+  "lean_version": "4.24.0",
+  "mathlib_commit": "f897ebcf72cd16f89ab4577d0c826cd14afaafc7",
+  "checker": "validation/code/CheckDecisionDirectedPortability.lean",
+  "numbered_results": 26,
+  "checked_endpoints": 84,
+  "standard_axioms": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "scope": "Lean theorem statements and proofs; not Python executable equivalence or biological input identification.",
+  "results": [
+    {
+      "number": 1,
+      "title": "Outcome-term cancellation",
+      "theorems": [
+        "Descent.Portability.DecisionLossContrasts.bregman_difference",
+        "Descent.Portability.BregmanAuditContrasts.expected_risk_difference",
+        "Descent.Portability.BregmanAuditContrasts.binary_expected_contrast"
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Exact linear information requirement",
+      "theorems": [
+        "Descent.Portability.DecisionInformationRank.identifies_iff_kernel_of_interior",
+        "Descent.Portability.MatrixDecisionInformation.report_identification_iff",
+        "Descent.Portability.MatrixDecisionInformation.exact_matrix_summary_count"
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Loss predictability versus fixed useful repair",
+      "theorems": [
+        "Descent.Portability.LossExplainabilitySeparation.separation",
+        "Descent.Portability.LossExplainabilitySeparation.explained_fraction_tendsto_zero",
+        "Descent.Portability.PairedGainTailExperiment.score_translation"
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Exact augmented-audit law",
+      "theorems": [
+        "Descent.Portability.JointAuditExperiment.observations_map",
+        "Descent.Portability.AugmentedAuditLaw.audit_mean",
+        "Descent.Portability.AugmentedAuditLaw.audit_variance",
+        "Descent.Portability.AugmentedAuditLaw.sampling_only_variance",
+        "Descent.Portability.SharedAuditCompletion.frame_covariance"
+      ]
+    },
+    {
+      "number": 5,
+      "title": "Exact support and mean-band variance completion",
+      "theorems": [
+        "Descent.Portability.AuditVarianceGeometry.maximum_attained",
+        "Descent.Portability.BoundedAuditCompletion.worst_case_upper",
+        "Descent.Portability.BoundedAuditCompletion.worst_case_attained"
+      ]
+    },
+    {
+      "number": 6,
+      "title": "Closed-form minimax proxy",
+      "theorems": [
+        "Descent.Portability.AuditVarianceGeometry.minimax_proxy",
+        "Descent.Portability.AuditVarianceGeometry.proxy_unique",
+        "Descent.Portability.AuditVarianceGeometry.full_observation",
+        "Descent.Portability.BoundedAuditCompletion.minimax_attaining_law"
+      ]
+    },
+    {
+      "number": 7,
+      "title": "Simultaneously sharp covariance envelope",
+      "theorems": [
+        "Descent.Portability.SharedAuditCompletion.frame_variance_upper",
+        "Descent.Portability.SharedAuditCompletion.simultaneous_attainment"
+      ]
+    },
+    {
+      "number": 8,
+      "title": "Bounded-increment Bernstein inequality",
+      "theorems": [
+        "Descent.Portability.BernsteinConfidence.bernstein"
+      ]
+    },
+    {
+      "number": 9,
+      "title": "Simultaneous finite decision library",
+      "theorems": [
+        "Descent.Portability.FiniteAuditConfidence.finite_library_exact_range"
+      ]
+    },
+    {
+      "number": 10,
+      "title": "Uniform confidence ball for a continuous repair span",
+      "theorems": [
+        "Descent.Portability.SpectralAuditConfidence.confidence",
+        "Descent.Portability.GramAuditGeometry.error_norm",
+        "Descent.Portability.CertifiedFrameRepair.estimate_confidence"
+      ]
+    },
+    {
+      "number": 11,
+      "title": "Exact repair geometry and oracle",
+      "theorems": [
+        "Descent.Portability.DecisionLossContrasts.frame_gain",
+        "Descent.Portability.SafeRepairGeometry.gain_eq_oracle_sub_regret",
+        "Descent.Portability.FrameConvexRepair.oracle_gain",
+        "Descent.Portability.FrameConvexRepair.gain_upper"
+      ]
+    },
+    {
+      "number": 12,
+      "title": "General compact convex confidence-set repair",
+      "theorems": [
+        "Descent.Portability.GramConvexRepair.compact_optimum",
+        "Descent.Portability.GramConvexRepair.unique_least_signal",
+        "Descent.Portability.FrameMeanImage.attained",
+        "Descent.Portability.FrameConvexRepair.compact_outcome_optimum"
+      ]
+    },
+    {
+      "number": 13,
+      "title": "Closed-form repair, oracle interval and regret",
+      "theorems": [
+        "Descent.Portability.GramRepairOptimality.soft_threshold",
+        "Descent.Portability.GramRepairOptimality.robust_optimum",
+        "Descent.Portability.GramSafeRepair.repair_certificate",
+        "Descent.Portability.GramSafeRepair.oracle_interval",
+        "Descent.Portability.GramRepairOptimality.certificate_vs_oracle",
+        "Descent.Portability.ClippedFrameRepair.false_gain_probability"
+      ]
+    },
+    {
+      "number": 14,
+      "title": "Convex audit design and attained dual allocation",
+      "theorems": [
+        "Descent.Portability.SpectralAuditDesign.objective_convex",
+        "Descent.Portability.SpectralAuditDualCertificate.weak_duality",
+        "Descent.Portability.SpectralAuditAllocationLaw.attained_allocation_law",
+        "Descent.Portability.FiniteAuditAllocationLaw.attained_allocation_law"
+      ]
+    },
+    {
+      "number": 15,
+      "title": "Labeling-cost bound and complete equality conditions",
+      "theorems": [
+        "Descent.Portability.SpectralAuditCost.cost_lower_bound",
+        "Descent.Portability.SpectralCostEquality.cost_equality_complete"
+      ]
+    },
+    {
+      "number": 16,
+      "title": "Exact range-cap reduction and geometric approximation",
+      "theorems": [
+        "Descent.Portability.SpectralRangeAuditDesign.exact_cap_reduction",
+        "Descent.Portability.SpectralRangeAuditDesign.finite_search_exists",
+        "Descent.Portability.SpectralAuditNumericalCertificate.capped_radius_error",
+        "Descent.Portability.OptimizedFrameRepairAudit.design_exists"
+      ]
+    },
+    {
+      "number": 17,
+      "title": "Exact aggregation of identical decision cells",
+      "theorems": [
+        "Descent.Portability.IdenticalAuditCells.spectral_optimum_constant",
+        "Descent.Portability.IdenticalAuditCells.capped_spectral_optimum_constant"
+      ]
+    },
+    {
+      "number": 18,
+      "title": "Linear operational requirements with defined denominators",
+      "theorems": [
+        "Descent.Portability.OperationalAuditConstraints.precision_requirement",
+        "Descent.Portability.OperationalAuditConstraints.recall_requirement",
+        "Descent.Portability.OperationalAuditConstraints.f1_requirement",
+        "Descent.Portability.OperationalAuditConstraints.false_positive_requirement",
+        "Descent.Portability.OperationalAuditConstraints.net_benefit_difference",
+        "Descent.Portability.OperationalAuditConstraints.f1_linear_target"
+      ]
+    },
+    {
+      "number": 19,
+      "title": "Certified threshold selection after the audit",
+      "theorems": [
+        "Descent.Portability.AuditSelectionSafety.certified_selection"
+      ]
+    },
+    {
+      "number": 20,
+      "title": "Exact disagreement-region variance payoff",
+      "theorems": [
+        "Descent.Portability.DisagreementAuditPayoff.equal_expected_budgets",
+        "Descent.Portability.DisagreementAuditPayoff.prospective_bounds",
+        "Descent.Portability.DisagreementAuditPayoff.simultaneous_attainment",
+        "Descent.Portability.DisagreementAuditPayoff.variance_ratio"
+      ]
+    },
+    {
+      "number": 21,
+      "title": "Exact value of expanding the repair span",
+      "theorems": [
+        "Descent.Portability.FrameRepairSpans.frame_oracle_attained",
+        "Descent.Portability.FrameRepairSpans.frame_oracle_increment"
+      ]
+    },
+    {
+      "number": 22,
+      "title": "Simultaneous subgroup safety and stable-mixture transport",
+      "theorems": [
+        "Descent.Portability.SubgroupRepairGeometry.safeSet_convex",
+        "Descent.Portability.SubgroupRepairGeometry.zero_mem_safeSet",
+        "Descent.Portability.SubgroupFrameTransport.weighted_objective_concave",
+        "Descent.Portability.SubgroupFrameTransport.certified_mixture_transport"
+      ]
+    },
+    {
+      "number": 23,
+      "title": "Exact sensitivity to conditional-mean drift",
+      "theorems": [
+        "Descent.Portability.MeanDriftRepair.gain_change",
+        "Descent.Portability.MeanDriftRepair.same_mean_gain",
+        "Descent.Portability.MeanDriftRepair.drift_lower",
+        "Descent.Portability.MeanDriftRepair.attained_drift_penalty"
+      ]
+    },
+    {
+      "number": 24,
+      "title": "Second-moment-only continuous repair confidence",
+      "theorems": [
+        "Descent.Portability.SecondMomentAuditConfidence.confidence",
+        "Descent.Portability.SecondMomentFrameRepair.false_certificate_probability"
+      ]
+    },
+    {
+      "number": 25,
+      "title": "Paired median-of-means certification",
+      "theorems": [
+        "Descent.Portability.PairedMedianOfMeans.simultaneous"
+      ]
+    },
+    {
+      "number": 26,
+      "title": "Hard-budget guard and preserved error control",
+      "theorems": [
+        "Descent.Portability.BernoulliBudgetLaw.cost_tail",
+        "Descent.Portability.HardBudgetAuditGuard.spending_le_hard",
+        "Descent.Portability.HardBudgetAuditGuard.joint_abort_probability",
+        "Descent.Portability.HardBudgetAuditGuard.guarded_repair_certificate",
+        "Descent.Portability.ConditionalGuardError.conditional_repair_certificate",
+        "Descent.Portability.GuardedRepairDeployment.harm_probability"
+      ]
+    }
+  ],
+  "rebuilt_source_sha256": {
+    "Descent/Layer.lean": "a31112b2aab52b90256bae8000f4b6031e56a2ba7e368ff3fa0fa4eddf35aa8b",
+    "Descent/Portability/AugmentedAuditLaw.lean": "1ccb3b09d8b1db15d53e69db46b4c233ef308e883430bbfb935df703618bc57e",
+    "Descent/Portability/AuditVarianceGeometry.lean": "1672eb9d4f780a33ee794065f93acdabced05f8c3a04fdc5152f527fccfed65b",
+    "Descent/Portability/BoundedAuditCompletion.lean": "f52f0b3ddf92de51a3a873284c849e1d7134a8f7b949abd03bad3d0b31ebff1b",
+    "Descent/Portability/IIDAverageLaw.lean": "582762daa2fab41cc50dacf7a872084ec232afdb62967ddb532f39d9c5c219f5",
+    "Descent/Portability/IndependentContrastLaw.lean": "027990b95cdcf429eea3cb20e16eecbbab32558d6c1e2acad21a45155603efcb",
+    "Descent/Portability/SharedAuditCompletion.lean": "3fb03b4b07bdeba823b3d9162d959ec9d7080effe9ed1dff8db510d00559ca72",
+    "Descent/Portability/AuditCenteredObservations.lean": "d40c94c3fffa8cd9b42ecfe5247e011fe2b22c4d40ad5aa5f0132a8f4eb00132",
+    "Descent/Coalescent/FiniteGenomeAncestry.lean": "b41082a736c0ef528053e91fd3959a0a03e5abc280bca0a0b984181521c1e1ab",
+    "Descent/Core/Ratios.lean": "1aa621f655e5a1acb4a3a17115c66d80ca388b59263ae3694507e466940ae1db",
+    "Descent/Core/Identifiability.lean": "47958eb071142ff2d66be2925261140e6e637f3aecd8e66cc6b0de5e185ec20a",
+    "Descent/Portability/UniversalMetricIdentification.lean": "0033d1d8c354e98737cd8742d431be335ada233ad571e2a678361f9e04527278",
+    "Descent/Portability/ExactFiniteHistoryLaw.lean": "e15ddb725d6b97f7894b5377afda9ce20b34ffa83465ef40235a2b496a1e05db",
+    "Descent/Portability/AncestralEventLaw.lean": "d06d924d30ebd718b0c9493b2862bdc90a206d377768b8c0817f3266d09b3cfc",
+    "Descent/Portability/AncestralEpochLaw.lean": "9a79b2bf7dcff869276294eaa10a420558534378d040780dbfa96ebaf385f285",
+    "Descent/Portability/MarkedAncestralLaw.lean": "15d8d0f404e182559c04ce1de9a0c64b991a9ebf00b127c333916ca888a62812",
+    "Descent/Portability/AncestralAbsorptionLaw.lean": "c2f5233bf66a030cf0d069f0464427ecc3d1e17f27f7c47bfa03beccff6eac0e",
+    "Descent/Portability/StoppedAncestralTiming.lean": "8602360bd9850fc72719049db9515bad2b3751d79da378e5f8f7a7dc55837f30",
+    "Descent/Portability/TimedAncestralLaw.lean": "b549adc629eeae19baa11cd4a1762c0c59d21c414e40e3b3d02582edd959490f",
+    "Descent/Portability/NucleotideMutationLaw.lean": "f29acaef794933c05054515c9e3cc43be275b74fb3f8c8a782e6aedd63f8b354",
+    "Descent/Portability/AncestralBranchExposure.lean": "c6cb6cceb281c88c78234c1d8e35db1489a6b55dd8005d1bbdc1b75c567c5b3c",
+    "Descent/Portability/GenealogyGenotypeLaw.lean": "6d985c58225cfd544bf059c158794290cbb209f390e084834ee9ff3c3d6db251",
+    "Descent/Portability/AncestralGenealogyLaw.lean": "1b8cd91afc16b7cff040ee2121518938635227b5336264a430d45f2cb78f34f3",
+    "Descent/Portability/OrderedMutationCatalogue.lean": "1242d4dcbc6e8ab10bff87d940e3f38c3e734c41640fb59364f4d7a543910338",
+    "Descent/Portability/InterleavedMutationLaw.lean": "486a1ec0dbe4d2a4734de3759d34915655b8a054191e2910cd20ddf6929168d3",
+    "Descent/Portability/InterleavedMutationMeasurability.lean": "c52bda582c81c121248d76143c6551fa2e58991b55cd4f350276af12c2282555",
+    "Descent/Portability/StoppedGenotypeLaw.lean": "6f531a0d99ee67026f0ff518d2e0ac088d6e2081c5598ccf6929cbcd72edf273",
+    "Descent/Portability/AncestralCladePartition.lean": "54e2b8759c6e3985a78eabb3505e9a12413d21b31bc99f7e7a39c77a823be4b0",
+    "Descent/Portability/OrderedCladeLaw.lean": "a07852d10068ea247837c6d3069580c0c46405dcadb653cc49c0d71cd94617ab",
+    "Descent/Portability/AncestralGenealogyOrdering.lean": "c068095fa7f6cf310ef9de610fc20eca2d258cdab90279c1a2616926e48a08d0",
+    "Descent/Portability/StoppedGenotypeReadiness.lean": "0f1e07a4b1ae0cde54dded94bee41fe4f68ad0c3f437a961e40b154e9ebd91e0",
+    "Descent/Portability/AncestralEpochGenotypeLaw.lean": "2480fc6a81cb24be04ac5c1a1b4f9075317b8fdc2476dc21f7290ad476d9fac5",
+    "Descent/Portability/InterleavedMutationExponential.lean": "13a0a8fa8ce037b647f92fa37c3d317a723e140a3cdf50e1d3b243779ef5ed70",
+    "Descent/Portability/ExponentialPoissonRace.lean": "d1d3f0264dc7d1e437a439df3ced6fdfb8444d0eca979d5ecb3965827b8f6d5f",
+    "Descent/Portability/AncestralMutationTransfer.lean": "786e73108ddad066eb01094bb5c04f337b80b1cb933248335a4f39feb5037034",
+    "Descent/Portability/WholeGenomeMutationSemigroup.lean": "487757e11c03d2a70ddbda6a97aa35eb2e4df66fc5902fa5592bc7e7d6f9e4cd",
+    "Descent/Portability/FiniteProductExponential.lean": "840d9636036ebda019271210d7b097a2414d28cfd01373a429ac711f934533fc",
+    "Descent/Portability/ExponentialRemainder.lean": "17990eb43961da66f72dadeeb76400bd891ba9909be0155ab69e12dff197e7af",
+    "Descent/Portability/BernsteinExponentialBound.lean": "aca145b7733b2e935903721783a5135e4badc2a3e67ced27f18c87ea5f17c656",
+    "Descent/Portability/BernsteinMomentBound.lean": "080c38692f1e99c911caf0e12f3540203643724bea68310ed7432a86b79497c6",
+    "Descent/Portability/BernsteinTailBound.lean": "d67acd38050cb92b77082e72411e3929a0e5186cd596dde89cee41454d41b9b9",
+    "Descent/Portability/BernsteinConfidence.lean": "d48ac207886b2c08080e40d8aba409421bf5562ab6f3d05da53fc4cf516565ec",
+    "Descent/Portability/FiniteAuditConfidence.lean": "ba55c95d4a751a8d67d2ae153a9612ba3cad3ffb6ded0b4bcc8dd68faa7b78b8",
+    "Descent/Portability/AuditSelectionSafety.lean": "577664760311e8a0a87a8953b90878b3a8648bdb894b1a1319f626c1dd61f603",
+    "Descent/Portability/JointAuditExperiment.lean": "ddd00312666b924ce8c1b0c0d695db7eb58b8380df63afcec39e6dc48e676a33",
+    "Descent/Portability/BernsteinUpperConfidence.lean": "f3940865b22674ff92336298c4847cdba18dfe93199231c7417a19d9f2a77b8d",
+    "Descent/Portability/BernoulliBudgetLaw.lean": "4605a14e26048457b2eb7f8db4631b583b800c22501d5f979bd33146b1451593",
+    "Descent/Portability/SafeRepairGeometry.lean": "d265462b43a4edac3e5a2f98198a6cc2ac425b79d09e8da0ce73eef89c6fba2c",
+    "Descent/Portability/GramSafeRepair.lean": "781f02178288211645979603f1ce414a2473b443f7424ddd222327a71e8701bb",
+    "Descent/Portability/DecisionLossContrasts.lean": "05ab3343b523d7998fcd280884be65fba96d68cb66ed4de4828a813dbda9f5a6",
+    "Descent/Portability/BregmanAuditContrasts.lean": "5c25039fbd580d397e3a3296d9a6ba952b778c215e41b9f04aeeb003a6b83837",
+    "Descent/Portability/FiniteSphereNet.lean": "e6deff37ba0240c06f6805d92090ec0d1240c8758951c137190ae0206aa8b5be",
+    "Descent/Portability/FiniteNetConfidence.lean": "4a43e33f4c1aebf13cbae3dec0b048a99fc1d701578bd8aa7069080905a2c00a",
+    "Descent/Portability/VectorAuditConfidence.lean": "d0a72e63778fb2d5264bce2723cde9c788d3c1f5c41ea3927a75f4ff255586aa",
+    "Descent/Portability/AuditCovarianceSpectrum.lean": "972bae28870ed99d68af57c99ee35a950231d390d793cae11be9f2049a822598",
+    "Descent/Portability/SpectralAuditConfidence.lean": "3703595f7e80a9f2948bb2afb6718db24b5eed3e81de3b4b91fec9f2cde921eb",
+    "Descent/Portability/GramAuditGeometry.lean": "25bce7f1731e00e61290d35c50e4a028e814f2cacf7739fbf780e51fadb83201",
+    "Descent/Portability/CertifiedFrameRepair.lean": "75f38c96b988515dcc121898d50ccdfb0ea2b5465495553667fa161dcd19b039",
+    "Descent/Portability/ClippedFrameRepair.lean": "538ae3327b70925f85a572c8f5197c449eeec46e2c54cfd6ec7e287a8a2c18fe",
+    "Descent/Portability/HardBudgetAuditGuard.lean": "1d7fb995f3cc49b36c0e512681bc5c45a5690c85825ac91306b906fa1df3c9fe",
+    "Descent/Portability/ConditionalGuardError.lean": "5cbd9bc4f55686e5bf76375c5ee4365b8a8d75489d04e5ea5e1f83dac0ab3098",
+    "Descent/Portability/ExactMemoryLaw.lean": "55b3fd7be91de2ecda9c5664a8b10c6615e84913f0280c404af5fa15348561ee",
+    "Descent/Portability/ObservableClosureLaw.lean": "cb5a4f9665300d4adffecfd4f251322305305a7ae628012fd9d972334418fe76",
+    "Descent/Portability/DecisionInformationRank.lean": "0a3064b86f712544c33b6c2a694d7849bffc349168cebf80a0b538c33acfd79f",
+    "Descent/Portability/SparseBinaryAudit.lean": "55a6c421adce827bd7aac46f91083b3cd7a2f2d09f60d280ba95b1c4960ebd6d",
+    "Descent/Portability/DisagreementAuditPayoff.lean": "d9db72f45bd8ce9c06dc96f9bccc3f04a59b03eaffe7a0dbde3a035e132a49ee",
+    "Descent/Portability/AuditAllocationCoordinate.lean": "5e0dccdbd8aa4287ca5a09d518939e8c8a51d6a762e50a97ff16914103a5ee12",
+    "Descent/Portability/FiniteAuditDesign.lean": "748c3f6bc47df6beed66c7f8b60fb629be78b8d903955a2ed008b66a3c55f44f",
+    "Descent/Portability/FiniteAuditDesignConvexity.lean": "bc7986210d470f8147f4d9334e46add6ed6d51a108712d937187e40dfac3bde1",
+    "Descent/Portability/FiniteSlaterSeparation.lean": "ce1a6c028ea9b140c48e9992cad1327602df5d1bc1d89e33d92bf56d06abc41e",
+    "Descent/Portability/FiniteSlaterMultipliers.lean": "ea03d4cc122999d4dae6d7a826075579cebd7655b812e31c76466f07cc6ea309",
+    "Descent/Portability/FiniteAuditEpigraph.lean": "cca7d8aab6e271aed6c572c76a3ca4a43d46124d4b94f51067f68b71d6cbf6fb",
+    "Descent/Portability/FiniteAuditStrongDuality.lean": "ccebbec5cbe2fd37870c8e52353252821c1bc59554710eac47a8474c371a1d8d",
+    "Descent/Portability/FiniteAuditAllocationLaw.lean": "9838163176e01cd45eb1e39e33bf330ad9770b42aceafb6e32071d05dd7739ce",
+    "Descent/Portability/GramConvexRepair.lean": "0acc55e34a84b116c18d9dea25a54188646070d7760135751e919a496db0cd59",
+    "Descent/Portability/FrameMeanImage.lean": "ee12c2313512f9575cc729bf70ed72b08199fc5688109e54520f6c7d282c93b0",
+    "Descent/Portability/FrameConvexRepair.lean": "69ad18ee4b761456d0d69ff93b529c7147fd36791711837f728eb0cf8d36ebe1",
+    "Descent/Portability/NestedRepairSpans.lean": "822ea1ca223f9f4fab017a3a52c0604258832744f772c2adc8bbab28b7f2554e",
+    "Descent/Portability/MeanDriftRepair.lean": "ab278db70e2c28febc4c87c8630b59dfe42c726aec4e03c8a2bf48966c66527c",
+    "Descent/Portability/FrameRepairSpans.lean": "4ad0a52b51750b71762dcfe0c1109e10bc14c5d503003d59d19fa7f3a9a2e839",
+    "Descent/Portability/GramRepairOptimality.lean": "b047d93c83586f65f28e1b12d4bcca8b720c11ad5a57149d5c1fbbb5f59d065e",
+    "Descent/Portability/GuardedRepairDeployment.lean": "15c70646fef31013ac53ff678be8c98df86166359eddc4cdd3c840076420a0b3",
+    "Descent/Portability/AuditRangeCaps.lean": "fe85b7d5867219d49d17b21d3fc7b55742ecdb553cbaec02d807691ea13f9aea",
+    "Descent/Portability/AuditCellAveraging.lean": "63fa45248daaf0b95f012455183bb78953e55818bcdca7a775f1e71de2b2d1d6",
+    "Descent/Portability/AuditRayleighGeometry.lean": "4f59a66205eeea2cac21d566ea2d43bd1c796684cacbc25473a1a32e661901b1",
+    "Descent/Portability/SpectralAuditDesign.lean": "ddd19ce62001b9eff31d44bf132ce98982ee6b59153615ecbf39535fa41e43c1",
+    "Descent/Portability/IdenticalAuditCells.lean": "ae716bbd1520d1f3d552c603a21ac9ce1173106a823a7ec80008a74147dc64c4",
+    "Descent/Portability/PairedGainTailExperiment.lean": "0db036f7ff4bfda77cddb6425b67b5090f47667939445ee2e3ae4f38109fd22e",
+    "Descent/Portability/LossExplainabilitySeparation.lean": "adfe2597f352078326d16aff8b2fed9fac105ceb836484c53b135721b57984a9",
+    "Descent/Portability/MatrixDecisionInformation.lean": "197205f0a0156cc9608717c0fcaf0cd0e1022efe41b126ad627014952e7a875a",
+    "Descent/Portability/OperationalAuditConstraints.lean": "a0057b90e5d2a7bf3cf8444fa7f8d3244cb7195012f6abc32b00630ed984473b",
+    "Descent/Portability/GeometricAuditCaps.lean": "16868c74cbba7583708ac399d67ae8941a084be0fb2535b8dc0b5fc8f3e72a20",
+    "Descent/Portability/RangeAwareAuditSearch.lean": "2f9048b83f5acffe8ce9adb7ec5d58a7618b0b66123bed13a010955e9ef2ecd6",
+    "Descent/Portability/ContinuousAuditCapSearch.lean": "a25ebdff32e0e56151a14f39a52ed51e6fd8ae9eb3c83135368eb439c6777e8d",
+    "Descent/Portability/SpectralRangeAuditDesign.lean": "1e6ffa2b08ff5426cdfd226e0628674bcb8319d15978f0668e0be9e746249a10",
+    "Descent/Portability/MinimaxAuditDesignLaw.lean": "0d6956508d0878a661e6ed6066afe2980412068fea34852d4793748ae6726e91",
+    "Descent/Portability/SpectralMinimaxAuditDesign.lean": "6d66002890d6b6952b55b5c94c701784db2729b503a92a7d1f43ab2f05d4d246",
+    "Descent/Portability/OptimizedFrameRepairAudit.lean": "c1f8e18affe2d30bd3b5c0d5a83e44b83a74f87844d6dc427263b65cfb4b8447",
+    "Descent/Portability/FiniteMedianGeometry.lean": "9bea41cb0fded42023bc125cf105dc94954bdc3a19c7eef2552f70aca576d74c",
+    "Descent/Portability/MedianAuditConcentration.lean": "61b24b11a8d6ceeaabd2cdc3d5c0bbd74de4eba3ee9beae996a32d779640787c",
+    "Descent/Portability/SecondMomentAuditConfidence.lean": "be3f07d6c3f82b380a7d673f56ba4d6467017ca2d0fa62e3d43e8389b4aece3a",
+    "Descent/Portability/PairedMedianOfMeans.lean": "7f7453d744530a63325f530057a4290e57c33c606eab3fde8c0402f91b75a0a5",
+    "Descent/Portability/SecondMomentFrameRepair.lean": "e465d7b8214976ca164d83e25e42e5c90d3a9d445fb341147784985f4907f8d8",
+    "Descent/Portability/OperatorPositiveCone.lean": "4d361c84e8aa5543047af4354e56a879608c268c78ebe973e6cf6991ef56b48e",
+    "Descent/Portability/OperatorSlaterSeparation.lean": "e8167be2ca9e07f5514257c6f5fb986a1016f976c11055b6ca07b7b5b517afeb",
+    "Descent/Portability/OperatorSlaterMultipliers.lean": "38ec041ec0b5575048314d6d10483cca8e6a639090fabf91738dbf30546a0da6",
+    "Descent/Portability/SpectralOperatorEpigraph.lean": "7ef5c85aae12c06e614b737967dd32a0eb93c8a8e2ae4782fce9380dab638f27",
+    "Descent/Portability/PositiveOperatorFunctional.lean": "11cc2df0f5ef6a320f09d3bde5f32171bdcfcdfcbfeb4be15a643d0a63970e3d",
+    "Descent/Portability/SpectralAuditTrace.lean": "673723f943aeda36a502a772a377eda484c0dd0407617ee0ae0c49adeed1df14",
+    "Descent/Portability/SpectralTraceComplementarity.lean": "f0ceba15ed915fc5c602cde33c87bab4d7f0fe0842e2177e088f63891656216f",
+    "Descent/Portability/SpectralAuditDualCertificate.lean": "41442cf322b79d0809ecad8cda2e2a21aa67c70d57b26c2bb6e2377b62f4ea11",
+    "Descent/Portability/SpectralAuditStrongDuality.lean": "8962554b34ed64ece02e7e2eb96094822603f3821ec9f535fa8b796ff8c4879c",
+    "Descent/Portability/SpectralAuditAllocationLaw.lean": "670bce6bcf1d9cffac0cf589adb7c58f3c808fc24e842f6fbd7fe7ac9c32a338",
+    "Descent/Portability/SpectralAuditCost.lean": "e2b3e8d93910be5acd64ca1036ba83d41532c3c2ef51bbad7498e274d39cb2fe",
+    "Descent/Portability/AuditDesignNumericalCertificate.lean": "840933cc5aa4d7b8d4e9dd97efde5436f78d9fc443367042e86955e573d49109",
+    "Descent/Portability/SpectralAuditNumericalCertificate.lean": "f95f7722126c6d380d60908a4bf7d04ab9259c18cd3e4d91ca3106c09a34c33d",
+    "Descent/Portability/SpectralCostEquality.lean": "7cd47122d9b0926cde159ebef6a233dac2f162f6a355339e1a4aa6ebd51b6db2",
+    "Descent/Portability/SubgroupRepairGeometry.lean": "cc9802e3374b3f4ee4d03c833ecf8b413ea2da8ecea0f2d628e2e58b5bfd916c",
+    "Descent/Portability/FiniteMixtureRepair.lean": "ab185ad4ec774c351e511dd7330569cff4ff19956ae9ff0d2a1f4b641079ea3a",
+    "Descent/Portability/FrameOutcomeMeasure.lean": "4bf72eb7f2a718b2a9002510277271aa6f721ea7cd068dd0ed9e283e9c145a5d",
+    "Descent/Portability/SubgroupFrameTransport.lean": "ce8a6d4ae185774f4a4be7ce1cb602885ab7b059f1a4fbde8d5ac80c8d148969",
+    "validation/code/CheckDecisionDirectedPortability.lean": "f0d78e60a2cac5b6f0bc3f10fef5a63a0c2e8b46fa686356c0b465819d727f66"
+  }
+}

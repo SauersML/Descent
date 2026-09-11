@@ -4397,6 +4397,12 @@ def quadraticValue(A, v):
 def gaussianFourier(A, v):
     return _rt.rexp((_rt.rdiv(_rt.neg(quadraticValue(A, v)), 2.0)))
 
+def Descent_Portability_GaussianDensityOverlap_precision(a, b):
+    return ((_rt.rinv(a) + _rt.rinv(b)) - 1.0)
+
+def overlap(a, b):
+    return _rt.rdiv(_rt.rsqrt((_rt.rinv((Descent_Portability_GaussianDensityOverlap_precision(a, b))))), ((_rt.rsqrt(a) * _rt.rsqrt(b))))
+
 def Descent_Portability_GaussianEffectPortabilityLaw_jointLaw():
     return _rt._proj((labelKernel(Descent_Portability_SimulationDesignDecoder_design())), 'jointMeasure')((effectLaw(K)))
 

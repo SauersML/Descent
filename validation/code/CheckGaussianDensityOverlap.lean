@@ -14,3 +14,5 @@ import Descent.Portability.GaussianDensityOverlap
 #print axioms Descent.Portability.GaussianDensityOverlap.ratio_sq_integral
 #print axioms Descent.Portability.GaussianDensityOverlap.product_overlap_integrable
 #print axioms Descent.Portability.GaussianDensityOverlap.product_overlap_integral
+#print axioms Descent.Portability.GaussianDensityOverlap.precision_pos_of_lt_two
+#print axioms Descent.Portability.GaussianDensityOverlap.product_distance_sq
