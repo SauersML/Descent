@@ -289,16 +289,17 @@ theorem mutationStage_sum_jointHeterozygosity {D : ℕ} (rates : ManyDemeLDRates
     show rates.mutation deme / 2 * _ = _
     rw [hvelocity]
     ring
+  have hforcing : lowOrderLDMutationForcing rates (.pi2 first second third fourth) = 0 := rfl
   rw [(Finset.sum_congr rfl fun deme _ ↦ hleft deme),
     (Finset.sum_congr rfl fun deme _ ↦ hright deme),
     rightHeterozygosityRedirect_sum_jointHeterozygosity rates first second third fourth
-      (enlargedLowOrderLDFeature state)]
+      (enlargedLowOrderLDFeature state), hforcing]
   simp only [Finset.sum_add_distrib, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq,
     Finset.mem_univ, if_true]
   simp only [lowOrderLDMutationCoupling, lowOrderLDRecurrentMutationDamping,
-    lowOrderLDMutationForcing, enlargedLowOrderLDFeature, twoLocusJetMoment,
-    twoLocusCoordinateJet, twoLocusHJet_value, twoLocusPi2Jet_value,
-    twoLocusPi2LeftMutationVelocity_eq, twoLocusPi2RightMutationVelocity_eq]
+    enlargedLowOrderLDFeature, twoLocusJetMoment, twoLocusCoordinateJet, twoLocusHJet_value,
+    twoLocusPi2Jet_value, twoLocusPi2LeftMutationVelocity_eq,
+    twoLocusPi2RightMutationVelocity_eq]
   ring
 
 /-! ## The assembled rows -/
