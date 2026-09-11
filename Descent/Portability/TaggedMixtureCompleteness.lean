@@ -84,7 +84,8 @@ def taggedPoint (ms mt : ℕ)
     (pair : ↥(stdSimplex ℝ (Fin ms)) × ↥(stdSimplex ℝ (Fin mt))) :
     ↥(stdSimplex ℝ (Fin (ms + mt))) :=
   ⟨fun letter ↦ taggedPair ms mt pair.1 pair.2 (finSumFinEquiv.symm letter),
-    ⟨fun letter ↦ (taggedPair_mem ms mt pair.1 pair.2 pair.1.2 pair.2.2).1 _,
+    ⟨fun letter ↦
+        (taggedPair_mem ms mt pair.1 pair.2 pair.1.2 pair.2.2).1 (finSumFinEquiv.symm letter),
       (Equiv.sum_comp finSumFinEquiv.symm (taggedPair ms mt pair.1 pair.2)).trans
         (taggedPair_mem ms mt pair.1 pair.2 pair.1.2 pair.2.2).2⟩⟩
 
@@ -106,7 +107,10 @@ theorem taggedPoint_injective (ms mt : ℕ) : Function.Injective (taggedPoint ms
     have hletter := congrArg
       (fun point : ↥(stdSimplex ℝ (Fin (ms + mt))) ↦
         (point : Fin (ms + mt) → ℝ) (finSumFinEquiv letter)) hequal
-    simpa only [taggedPoint, Equiv.symm_apply_apply] using hletter
+    change taggedPair ms mt first.1 first.2 (finSumFinEquiv.symm (finSumFinEquiv letter)) =
+      taggedPair ms mt second.1 second.2 (finSumFinEquiv.symm (finSumFinEquiv letter))
+      at hletter
+    rwa [Equiv.symm_apply_apply] at hletter
   have hpair : ((first.1 : Fin ms → ℝ), (first.2 : Fin mt → ℝ)) =
       ((second.1 : Fin ms → ℝ), (second.2 : Fin mt → ℝ)) :=
     taggedPair_injective ms mt hvalues
@@ -148,7 +152,11 @@ theorem replicaLaw_taggedMixture (ms mt : ℕ)
   rw [replicaLaw, taggedMixture,
     integral_map (continuous_taggedPoint ms mt).measurable.aemeasurable
       hreadout.measurable.aestronglyMeasurable]
-  simp only [taggedPoint, Equiv.symm_apply_apply]
+  refine integral_congr_ae (ae_of_all joint fun pair ↦ ?_)
+  refine Finset.prod_congr rfl fun slot _ ↦ ?_
+  show taggedPair ms mt pair.1 pair.2 (finSumFinEquiv.symm (finSumFinEquiv (letters slot))) =
+    taggedPair ms mt pair.1 pair.2 (letters slot)
+  rw [Equiv.symm_apply_apply]
 
 /-- **NOTE 2 section 4, completeness for the joint source/target law.** Two finite joint laws
 of the source/target pair with the same tagged replica laws at every cohort size are equal. The
