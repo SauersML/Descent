@@ -34,11 +34,24 @@ from `ConvexOrderCoupling.driftStep_gridConvex`), a short Euler step of `L` is e
 nonnegative hence monotone, so the Euler approximants are ordered at every `m`
 (`euler_iterate_le`), and the bridge passes that order to the limit at `τ = t/m`.
 
+The second half turns to DC Corollary 3.5. `exp_mulVec_eigen` shows an eigenvector of a
+generator is an eigenvector of the semigroup, again through the Euler limit rather than an
+ODE, and every falling factorial of the count is an eigenvector of the linear pure-death
+generator with eigenvalue `-γ r`. That gives the exact factorial-moment law
+`E_t (N)_r = e^{-γ r t} (N_0)_r` and, on the squared count, the continuous-time sharp lower
+endpoint `(1 - 2/n) p² + (2/n) p` of PL (5.13) / DC (4.4) with `p = e^{-γ t}`. The explicit
+binomial law of `Descent.Portability.BinomialAggregateEnvelope` has exactly the same
+factorial moments, so the two agree on every falling factorial.
+
 **Scope.** This covers MARKOV admissible generators. History-dependent couplings are not
 matrices and are not covered; for those the corpus statement remains the discrete skeleton
 `ConvexOrderCoupling.pathExp_nearestDrift_le`, which is proved for kernels indexed by the
-entire past. The closed forms of DC Corollary 3.5 and DC (4.6) as rows of `exp (t L_*)` are
-not proved here either; they need uniqueness of the linear ODE solution.
+entire past. Corollary 3.5 is closed here at the level of reports -- every falling factorial,
+hence the squared count the manuscript uses -- but NOT as an identity of laws: concluding
+that the semigroup row equals the binomial weight vector needs the triangularity argument
+that falling factorials of order `0, …, m` span, and that is not proved. DC Corollary 4.3's
+`a_j(t)` for odd `n` is not proved either; its generator carries the extra `4λ|M|` term,
+which destroys the invariant subspace the even case relies on.
 -/
 
 set_option autoImplicit false
