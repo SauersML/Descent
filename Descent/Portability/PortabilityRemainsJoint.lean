@@ -108,7 +108,7 @@ theorem targetMetric_same_marginal (observable : ℝ → ℝ) :
         ∂FiniteDiscreteMeasure.measure halfLaw := by
   rw [FiniteDiscreteMeasure.integral_observable, FiniteDiscreteMeasure.integral_observable]
   simp only [FiniteReportLaw.expectation, Fin.sum_univ_two, halfLaw, exampleTargetNumSecond,
-    rev_zero_one.1, rev_zero_one.2]
+    rev_zero_one.1, rev_zero_one.2, Pi.one_apply, div_one]
   ring
 
 /-- Every report of the example is in the definedness event of (27). -/
