@@ -26,6 +26,24 @@ pair by pair: one term for each carrier with the generator of its marginal frequ
 term for each ordered pair of distinct carriers with half the carré du champ.  This expansion
 is proved for every configuration by induction on the multiset.
 
+On the simplex the generator of one marginal frequency is a dual jump generator
+(`eval_neutralGenerator_marginal`): migration substitutes the deme label, mutation relabels a
+retained allele at the symmetric rate, and a crossover selector that splits the carrier replaces
+it by its selected and rejected halves.  A selector that does not split the carrier contributes
+nothing because the empty marginal equals one on the simplex, and mutation at an unretained
+locus cancels over the relabelled pairs.  Assembling the carrier terms and the pair terms gives
+(19), `neutralGenerator_configurationMoment`: `L H_ξ = Σ_η q_{ξη} (H_η − H_ξ)` with nonnegative
+rates (`dualTransitions_rate_nonneg`) and `H_† = 0`.  Ordered pairs of carriers in a common deme
+coalesce at rate `c_i / 2`, so at `c_i` per unordered pair; compatible pairs merge, disjoint pairs
+included, and incompatible pairs go to the cemetery.  Every transition from a budget-respecting
+configuration lands in a budget-respecting configuration or in the cemetery
+(`dualTransitions_withinBudget`).  The finite generator `Q`, its substochastic exponential and
+the likelihood representation (20) are `Descent.Portability.PartialHaplotypeDualSemigroup`.
+
+Scope.  Mutation is symmetric per site; the nonsymmetric case, whose dual needs a diagonal
+potential, is not covered.  Selection is not covered.  The splits and admixture pulses of the
+last paragraph of §4.2 and the loose count bound `C(K + B, B)` of §4.1 are not formalized.
+
 ## Empirical status
 
 None.  The bodies here are algebra: they differentiate polynomials in a supplied frequency
@@ -664,6 +682,639 @@ theorem eval_carreDuChamp_incompatible (rates : NeutralRates Deme Locus Allele)
   rw [carreDuChamp, map_add, eval_halfCovariance_joint, eval_halfCovariance_joint,
     if_pos hdeme, if_pos hdeme.symm, hjoint, jointFrequency_eq_coalesce, if_neg hnot, hdeme]
   ring
+
+/-! ## Drift of a marginal frequency -/
+
+/-- A haplotype satisfying an assignment that retains allele `a` at a locus carries `a` there. -/
+theorem apply_eq_of_satisfies (assignment : ∀ ℓ, Option (Allele ℓ))
+    (hap : FullHaplotype Locus Allele) (hsat : Satisfies assignment hap) (ℓ : Locus)
+    (a : Allele ℓ) (hsome : assignment ℓ = some a) : hap ℓ = a := by
+  rcases hsat ℓ with h | h
+  · rw [hsome] at h
+    exact absurd h (by simp)
+  · rw [hsome] at h
+    exact (Option.some.inj h).symm
+
+/-- Relabelling the allele at an unassigned locus preserves satisfaction. -/
+theorem satisfies_update_of_none (assignment : ∀ ℓ, Option (Allele ℓ)) (ℓ : Locus)
+    (hnone : assignment ℓ = none) (hap : FullHaplotype Locus Allele) (b : Allele ℓ)
+    (hsat : Satisfies assignment hap) : Satisfies assignment (Function.update hap ℓ b) := by
+  intro ℓ'
+  by_cases hℓ : ℓ' = ℓ
+  · subst hℓ
+    exact Or.inl hnone
+  · rw [Function.update_of_ne hℓ]
+    exact hsat ℓ'
+
+/-- The migration drift of a marginal frequency: migrants from every deme at the backward rate. -/
+theorem sum_migrationDrift (rates : NeutralRates Deme Locus Allele)
+    (x : FrequencyVariable Deme Locus Allele → ℝ) (i : Deme)
+    (assignment : ∀ ℓ, Option (Allele ℓ)) :
+    ∑ hap ∈ Finset.univ.filter (Satisfies assignment),
+        ∑ j, rates.migration i j * (x (j, hap) - x (i, hap))
+      = ∑ j, rates.migration i j *
+          (eval x (assignmentPolynomial j assignment)
+            - eval x (assignmentPolynomial i assignment)) := by
+  rw [Finset.sum_comm]
+  simp only [eval_assignmentPolynomial, ← Finset.mul_sum, Finset.sum_sub_distrib]
+
+/-- Mutation at an unassigned locus leaves a marginal frequency unchanged: inflow and outflow
+cancel over the relabelled pairs `(h[ℓ ↦ b], h_ℓ)`. -/
+theorem mutationDrift_unassigned (rates : NeutralRates Deme Locus Allele)
+    (x : FrequencyVariable Deme Locus Allele → ℝ) (i : Deme)
+    (assignment : ∀ ℓ, Option (Allele ℓ)) (ℓ : Locus) (hnone : assignment ℓ = none) :
+    ∑ hap ∈ Finset.univ.filter (Satisfies assignment), ∑ b : Allele ℓ,
+        (rates.mutation ℓ b (hap ℓ) * x (i, Function.update hap ℓ b)
+          - rates.mutation ℓ (hap ℓ) b * x (i, hap)) = 0 := by
+  simp only [Finset.sum_sub_distrib]
+  rw [sub_eq_zero, ← Finset.sum_product', ← Finset.sum_product']
+  refine Finset.sum_nbij' (fun p ↦ (Function.update p.1 ℓ p.2, p.1 ℓ))
+    (fun p ↦ (Function.update p.1 ℓ p.2, p.1 ℓ)) ?_ ?_ ?_ ?_ ?_
+  · rintro ⟨hap, b⟩ hp
+    simp only [Finset.mem_product, Finset.mem_filter, Finset.mem_univ, true_and,
+      and_true] at hp ⊢
+    exact satisfies_update_of_none assignment ℓ hnone hap b hp
+  · rintro ⟨hap, b⟩ hp
+    simp only [Finset.mem_product, Finset.mem_filter, Finset.mem_univ, true_and,
+      and_true] at hp ⊢
+    exact satisfies_update_of_none assignment ℓ hnone hap b hp
+  · rintro ⟨hap, b⟩ _
+    simp only [Function.update_idem, Function.update_self, Function.update_eq_self]
+  · rintro ⟨hap, b⟩ _
+    simp only [Function.update_idem, Function.update_self, Function.update_eq_self]
+  · rintro ⟨hap, b⟩ _
+    simp only [Function.update_self]
+
+/-- Relabelling the retained allele `a` to `b` is a bijection between the haplotypes counted by
+an assignment and those counted by the relabelled assignment. -/
+theorem sum_update_of_some (x : FrequencyVariable Deme Locus Allele → ℝ) (i : Deme)
+    (assignment : ∀ ℓ, Option (Allele ℓ)) (ℓ : Locus) (a b : Allele ℓ)
+    (hsome : assignment ℓ = some a) :
+    ∑ hap ∈ Finset.univ.filter (Satisfies assignment), x (i, Function.update hap ℓ b)
+      = ∑ k ∈ Finset.univ.filter (Satisfies (Function.update assignment ℓ (some b))),
+          x (i, k) := by
+  refine Finset.sum_nbij' (fun hap ↦ Function.update hap ℓ b) (fun k ↦ Function.update k ℓ a)
+    ?_ ?_ ?_ ?_ ?_
+  · intro hap hhap
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hhap ⊢
+    intro ℓ'
+    by_cases hℓ : ℓ' = ℓ
+    · subst hℓ
+      exact Or.inr (by simp)
+    · rw [Function.update_of_ne hℓ, Function.update_of_ne hℓ]
+      exact hhap ℓ'
+  · intro k hk
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hk ⊢
+    intro ℓ'
+    by_cases hℓ : ℓ' = ℓ
+    · subst hℓ
+      exact Or.inr (by simp [hsome])
+    · rw [Function.update_of_ne hℓ]
+      have hk' := hk ℓ'
+      rwa [Function.update_of_ne hℓ] at hk'
+  · intro hap hhap
+    have hℓ := apply_eq_of_satisfies assignment hap (Finset.mem_filter.mp hhap).2 ℓ a hsome
+    simp only [Function.update_idem]
+    rw [← hℓ, Function.update_eq_self]
+  · intro k hk
+    have hℓ := apply_eq_of_satisfies _ k (Finset.mem_filter.mp hk).2 ℓ b (by simp)
+    simp only [Function.update_idem]
+    rw [← hℓ, Function.update_eq_self]
+  · intro _ _
+    rfl
+
+/-- Mutation at a retained locus relabels the retained allele `a` to every `b` at the dual rate
+`u_ℓ(a, b)`; symmetry of mutation turns the inflow rates `u_ℓ(b, a)` into these rates. -/
+theorem mutationDrift_retained (rates : NeutralRates Deme Locus Allele)
+    (x : FrequencyVariable Deme Locus Allele → ℝ) (i : Deme)
+    (assignment : ∀ ℓ, Option (Allele ℓ)) (ℓ : Locus) (a : Allele ℓ)
+    (hsome : assignment ℓ = some a) :
+    ∑ hap ∈ Finset.univ.filter (Satisfies assignment), ∑ b : Allele ℓ,
+        (rates.mutation ℓ b (hap ℓ) * x (i, Function.update hap ℓ b)
+          - rates.mutation ℓ (hap ℓ) b * x (i, hap))
+      = ∑ b, rates.mutation ℓ a b *
+          (eval x (assignmentPolynomial i (Function.update assignment ℓ (some b)))
+            - eval x (assignmentPolynomial i assignment)) := by
+  have hstep : ∑ hap ∈ Finset.univ.filter (Satisfies assignment), ∑ b : Allele ℓ,
+        (rates.mutation ℓ b (hap ℓ) * x (i, Function.update hap ℓ b)
+          - rates.mutation ℓ (hap ℓ) b * x (i, hap))
+      = ∑ hap ∈ Finset.univ.filter (Satisfies assignment), ∑ b : Allele ℓ,
+        (rates.mutation ℓ b a * x (i, Function.update hap ℓ b)
+          - rates.mutation ℓ a b * x (i, hap)) :=
+    Finset.sum_congr rfl fun hap hhap ↦ by
+      rw [apply_eq_of_satisfies assignment hap (Finset.mem_filter.mp hhap).2 ℓ a hsome]
+  rw [hstep, Finset.sum_comm]
+  refine Finset.sum_congr rfl fun b _ ↦ ?_
+  rw [Finset.sum_sub_distrib, ← Finset.mul_sum, ← Finset.mul_sum, eval_assignmentPolynomial,
+    eval_assignmentPolynomial, sum_update_of_some x i assignment ℓ a b hsome,
+    rates.mutation_symm ℓ b a]
+  ring
+
+/-- The mutation drift of a marginal frequency, locus by locus: a retained locus relabels its
+allele and an unretained locus contributes nothing. -/
+theorem sum_mutationDrift (rates : NeutralRates Deme Locus Allele)
+    (x : FrequencyVariable Deme Locus Allele → ℝ) (τ : PartialType Deme Locus Allele) :
+    ∑ hap ∈ Finset.univ.filter (Satisfies τ.allele),
+        ∑ ℓ, ∑ b : Allele ℓ,
+          (rates.mutation ℓ b (hap ℓ) * x (τ.deme, Function.update hap ℓ b)
+            - rates.mutation ℓ (hap ℓ) b * x (τ.deme, hap))
+      = ∑ ℓ, (τ.allele ℓ).elim 0 fun a ↦ ∑ b, rates.mutation ℓ a b *
+          (eval x (assignmentPolynomial τ.deme (Function.update τ.allele ℓ (some b)))
+            - eval x (marginalPolynomial τ)) := by
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun ℓ _ ↦ ?_
+  cases h : τ.allele ℓ with
+  | none => exact mutationDrift_unassigned rates x τ.deme τ.allele ℓ h
+  | some a => exact mutationDrift_retained rates x τ.deme τ.allele ℓ a h
+
+/-- The haplotype assembled from `k` on the selected loci and from `m` on the others. -/
+def mixHaplotype (selector : Locus → Bool) (k m : FullHaplotype Locus Allele) :
+    FullHaplotype Locus Allele :=
+  fun ℓ ↦ if selector ℓ = true then k ℓ else m ℓ
+
+/-- A haplotype agrees with `k` on the selected loci and with `m` on the others exactly when it
+is their mix. -/
+theorem satisfies_restrict_full_iff (selector : Locus → Bool)
+    (hap k m : FullHaplotype Locus Allele) :
+    (Satisfies (restrictAssignment (fun ℓ ↦ some (hap ℓ)) selector) k
+      ∧ Satisfies (restrictAssignment (fun ℓ ↦ some (hap ℓ)) fun ℓ ↦ !selector ℓ) m)
+      ↔ hap = mixHaplotype selector k m := by
+  constructor
+  · rintro ⟨hk, hm⟩
+    funext ℓ
+    cases hs : selector ℓ
+    · simpa [restrictAssignment, mixHaplotype, hs] using hm ℓ
+    · simpa [restrictAssignment, mixHaplotype, hs] using hk ℓ
+  · rintro rfl
+    refine ⟨fun ℓ ↦ ?_, fun ℓ ↦ ?_⟩
+    · cases hs : selector ℓ <;> simp [restrictAssignment, mixHaplotype, hs]
+    · cases hs : selector ℓ <;> simp [restrictAssignment, mixHaplotype, hs]
+
+/-- The mix of `k` and `m` satisfies an assignment exactly when `k` satisfies its selected part
+and `m` its complementary part. -/
+theorem satisfies_mixHaplotype_iff (assignment : ∀ ℓ, Option (Allele ℓ))
+    (selector : Locus → Bool) (k m : FullHaplotype Locus Allele) :
+    Satisfies assignment (mixHaplotype selector k m)
+      ↔ Satisfies (restrictAssignment assignment selector) k
+        ∧ Satisfies (restrictAssignment assignment fun ℓ ↦ !selector ℓ) m := by
+  constructor
+  · intro h
+    refine ⟨fun ℓ ↦ ?_, fun ℓ ↦ ?_⟩
+    · cases hs : selector ℓ
+      · simp [restrictAssignment, hs]
+      · simpa [restrictAssignment, mixHaplotype, hs] using h ℓ
+    · cases hs : selector ℓ
+      · simpa [restrictAssignment, mixHaplotype, hs] using h ℓ
+      · simp [restrictAssignment, hs]
+  · rintro ⟨hk, hm⟩ ℓ
+    cases hs : selector ℓ
+    · simpa [restrictAssignment, mixHaplotype, hs] using hm ℓ
+    · simpa [restrictAssignment, mixHaplotype, hs] using hk ℓ
+
+/-- **The recombinant sum.**  Summing the product of the two marginal halves of a haplotype over
+the haplotypes counted by an assignment gives the product of the marginal frequencies of the two
+halves of the assignment. -/
+theorem sum_recombinantProduct (x : FrequencyVariable Deme Locus Allele → ℝ) (i : Deme)
+    (assignment : ∀ ℓ, Option (Allele ℓ)) (selector : Locus → Bool) :
+    ∑ hap ∈ Finset.univ.filter (Satisfies assignment),
+        (∑ k ∈ Finset.univ.filter
+            (Satisfies (restrictAssignment (fun ℓ ↦ some (hap ℓ)) selector)), x (i, k))
+          * ∑ m ∈ Finset.univ.filter
+            (Satisfies (restrictAssignment (fun ℓ ↦ some (hap ℓ)) fun ℓ ↦ !selector ℓ)),
+              x (i, m)
+      = (∑ k ∈ Finset.univ.filter (Satisfies (restrictAssignment assignment selector)),
+            x (i, k))
+          * ∑ m ∈ Finset.univ.filter
+            (Satisfies (restrictAssignment assignment fun ℓ ↦ !selector ℓ)), x (i, m) := by
+  have hcount : ∀ k m : FullHaplotype Locus Allele,
+      ∑ hap, (if Satisfies assignment hap
+          ∧ (Satisfies (restrictAssignment (fun ℓ ↦ some (hap ℓ)) selector) k
+            ∧ Satisfies (restrictAssignment (fun ℓ ↦ some (hap ℓ)) fun ℓ ↦ !selector ℓ) m)
+          then x (i, k) * x (i, m) else 0)
+        = if Satisfies (restrictAssignment assignment selector) k
+            ∧ Satisfies (restrictAssignment assignment fun ℓ ↦ !selector ℓ) m
+          then x (i, k) * x (i, m) else 0 := by
+    intro k m
+    have hpoint : ∀ hap : FullHaplotype Locus Allele,
+        (if Satisfies assignment hap
+          ∧ (Satisfies (restrictAssignment (fun ℓ ↦ some (hap ℓ)) selector) k
+            ∧ Satisfies (restrictAssignment (fun ℓ ↦ some (hap ℓ)) fun ℓ ↦ !selector ℓ) m)
+          then x (i, k) * x (i, m) else 0)
+        = if Satisfies assignment hap ∧ hap = mixHaplotype selector k m
+          then x (i, k) * x (i, m) else 0 :=
+      fun hap ↦ if_congr (and_congr Iff.rfl (satisfies_restrict_full_iff selector hap k m))
+        rfl rfl
+    rw [Finset.sum_congr rfl fun hap _ ↦ hpoint hap,
+      Finset.sum_eq_single (mixHaplotype selector k m)]
+    · exact if_congr (by rw [satisfies_mixHaplotype_iff]; simp) rfl rfl
+    · intro hap _ hne
+      exact if_neg fun h ↦ hne h.2
+    · intro hnot
+      exact absurd (Finset.mem_univ _) hnot
+  have hleft : ∑ hap ∈ Finset.univ.filter (Satisfies assignment),
+        (∑ k ∈ Finset.univ.filter
+            (Satisfies (restrictAssignment (fun ℓ ↦ some (hap ℓ)) selector)), x (i, k))
+          * ∑ m ∈ Finset.univ.filter
+            (Satisfies (restrictAssignment (fun ℓ ↦ some (hap ℓ)) fun ℓ ↦ !selector ℓ)),
+              x (i, m)
+      = ∑ hap, ∑ k, ∑ m, (if Satisfies assignment hap
+          ∧ (Satisfies (restrictAssignment (fun ℓ ↦ some (hap ℓ)) selector) k
+            ∧ Satisfies (restrictAssignment (fun ℓ ↦ some (hap ℓ)) fun ℓ ↦ !selector ℓ) m)
+          then x (i, k) * x (i, m) else 0) := by
+    rw [Finset.sum_filter]
+    refine Finset.sum_congr rfl fun hap _ ↦ ?_
+    by_cases hβ : Satisfies assignment hap
+    · rw [if_pos hβ, Finset.sum_mul_sum, Finset.sum_filter]
+      refine Finset.sum_congr rfl fun k _ ↦ ?_
+      by_cases hA : Satisfies (restrictAssignment (fun ℓ ↦ some (hap ℓ)) selector) k
+      · rw [if_pos hA, Finset.sum_filter]
+        refine Finset.sum_congr rfl fun m _ ↦ ?_
+        by_cases hB : Satisfies (restrictAssignment (fun ℓ ↦ some (hap ℓ)) fun ℓ ↦ !selector ℓ) m
+          <;> simp [hβ, hA, hB]
+      · rw [if_neg hA]
+        exact (Finset.sum_eq_zero fun m _ ↦ by simp [hA]).symm
+    · rw [if_neg hβ]
+      exact (Finset.sum_eq_zero fun k _ ↦ Finset.sum_eq_zero fun m _ ↦ by simp [hβ]).symm
+  have hright : (∑ k ∈ Finset.univ.filter (Satisfies (restrictAssignment assignment selector)),
+            x (i, k))
+          * ∑ m ∈ Finset.univ.filter
+            (Satisfies (restrictAssignment assignment fun ℓ ↦ !selector ℓ)), x (i, m)
+      = ∑ k, ∑ m, (if Satisfies (restrictAssignment assignment selector) k
+            ∧ Satisfies (restrictAssignment assignment fun ℓ ↦ !selector ℓ) m
+          then x (i, k) * x (i, m) else 0) := by
+    rw [Finset.sum_mul_sum, Finset.sum_filter]
+    refine Finset.sum_congr rfl fun k _ ↦ ?_
+    by_cases hA : Satisfies (restrictAssignment assignment selector) k
+    · rw [if_pos hA, Finset.sum_filter]
+      refine Finset.sum_congr rfl fun m _ ↦ ?_
+      by_cases hB : Satisfies (restrictAssignment assignment fun ℓ ↦ !selector ℓ) m
+        <;> simp [hA, hB]
+    · rw [if_neg hA]
+      exact (Finset.sum_eq_zero fun m _ ↦ by simp [hA]).symm
+  rw [hleft, hright]
+  refine Finset.sum_comm.trans ?_
+  refine Finset.sum_congr rfl fun k _ ↦ ?_
+  refine Finset.sum_comm.trans ?_
+  exact Finset.sum_congr rfl fun m _ ↦ hcount k m
+
+/-- On the simplex every haplotype satisfies the empty assignment, so its frequency is one. -/
+theorem sum_satisfies_none (x : FrequencyVariable Deme Locus Allele → ℝ)
+    (hsimplex : ∀ i, ∑ hap, x (i, hap) = 1) (i : Deme) :
+    ∑ hap ∈ Finset.univ.filter (Satisfies fun ℓ ↦ (none : Option (Allele ℓ))), x (i, hap)
+      = 1 := by
+  have hall : Finset.univ.filter (Satisfies fun ℓ ↦ (none : Option (Allele ℓ)))
+      = (Finset.univ : Finset (FullHaplotype Locus Allele)) :=
+    Finset.filter_true_of_mem fun _ _ _ ↦ Or.inl rfl
+  rw [hall]
+  exact hsimplex i
+
+/-- A crossover selector splits a partial type when it keeps some of the retained loci and drops
+others. -/
+def Splits (τ : PartialType Deme Locus Allele) (selector : Locus → Bool) : Prop :=
+  (∃ ℓ, selector ℓ = true ∧ (τ.allele ℓ).isSome = true)
+    ∧ ∃ ℓ, selector ℓ = false ∧ (τ.allele ℓ).isSome = true
+
+/-- Splitting is decidable over finitely many loci. -/
+instance decidableSplits (τ : PartialType Deme Locus Allele) (selector : Locus → Bool) :
+    Decidable (Splits τ selector) := by
+  unfold Splits
+  infer_instance
+
+/-- On the simplex, the recombination drift of a marginal frequency along one selector is the
+split transition when the selector splits the carrier, and zero otherwise. -/
+theorem recombinantDrift_selector (x : FrequencyVariable Deme Locus Allele → ℝ)
+    (hsimplex : ∀ i, ∑ hap, x (i, hap) = 1) (τ : PartialType Deme Locus Allele)
+    (selector : Locus → Bool) :
+    (∑ k ∈ Finset.univ.filter (Satisfies (restrictAssignment τ.allele selector)),
+          x (τ.deme, k))
+        * (∑ m ∈ Finset.univ.filter
+            (Satisfies (restrictAssignment τ.allele fun ℓ ↦ !selector ℓ)), x (τ.deme, m))
+      - ∑ hap ∈ Finset.univ.filter (Satisfies τ.allele), x (τ.deme, hap)
+      = if h : Splits τ selector then
+          eval x (marginalPolynomial (splitSelected τ selector h.1))
+            * eval x (marginalPolynomial (splitRejected τ selector h.2))
+          - eval x (marginalPolynomial τ)
+        else 0 := by
+  split_ifs with h
+  · have hrejected : (splitRejected τ selector h.2).allele
+        = restrictAssignment τ.allele fun ℓ ↦ !selector ℓ := by
+      funext ℓ
+      cases hs : selector ℓ <;> simp [splitRejected, restrictAssignment, hs]
+    rw [marginalPolynomial, marginalPolynomial, marginalPolynomial, eval_assignmentPolynomial,
+      eval_assignmentPolynomial, eval_assignmentPolynomial, hrejected]
+    rfl
+  · rcases not_and_or.mp h with hsel | hrej
+    · have hnone : restrictAssignment τ.allele selector = fun ℓ ↦ none := by
+        funext ℓ
+        cases hs : selector ℓ
+        · simp [restrictAssignment, hs]
+        · cases hτ : τ.allele ℓ with
+          | none => simp [restrictAssignment, hs, hτ]
+          | some a => exact (hsel ⟨ℓ, hs, by simp [hτ]⟩).elim
+      have hall : restrictAssignment τ.allele (fun ℓ ↦ !selector ℓ) = τ.allele := by
+        funext ℓ
+        cases hs : selector ℓ
+        · simp [restrictAssignment, hs]
+        · cases hτ : τ.allele ℓ with
+          | none => simp [restrictAssignment, hs, hτ]
+          | some a => exact (hsel ⟨ℓ, hs, by simp [hτ]⟩).elim
+      rw [hnone, hall, sum_satisfies_none x hsimplex τ.deme]
+      ring
+    · have hall : restrictAssignment τ.allele selector = τ.allele := by
+        funext ℓ
+        cases hs : selector ℓ
+        · cases hτ : τ.allele ℓ with
+          | none => simp [restrictAssignment, hs, hτ]
+          | some a => exact (hrej ⟨ℓ, hs, by simp [hτ]⟩).elim
+        · simp [restrictAssignment, hs]
+      have hnone : restrictAssignment τ.allele (fun ℓ ↦ !selector ℓ) = fun ℓ ↦ none := by
+        funext ℓ
+        cases hs : selector ℓ
+        · cases hτ : τ.allele ℓ with
+          | none => simp [restrictAssignment, hs, hτ]
+          | some a => exact (hrej ⟨ℓ, hs, by simp [hτ]⟩).elim
+        · simp [restrictAssignment, hs]
+      rw [hnone, hall, sum_satisfies_none x hsimplex τ.deme]
+      ring
+
+/-- The recombination drift of a marginal frequency: every splitting selector contributes the
+split transition at its rate, and every other selector contributes nothing on the simplex. -/
+theorem sum_recombinationDrift (rates : NeutralRates Deme Locus Allele)
+    (x : FrequencyVariable Deme Locus Allele → ℝ) (hsimplex : ∀ i, ∑ hap, x (i, hap) = 1)
+    (τ : PartialType Deme Locus Allele) :
+    ∑ hap ∈ Finset.univ.filter (Satisfies τ.allele),
+        ∑ selector : Locus → Bool, rates.recombination selector *
+          (eval x (assignmentPolynomial τ.deme
+              (restrictAssignment (fun ℓ ↦ some (hap ℓ)) selector))
+            * eval x (assignmentPolynomial τ.deme
+              (restrictAssignment (fun ℓ ↦ some (hap ℓ)) fun ℓ ↦ !selector ℓ))
+            - x (τ.deme, hap))
+      = ∑ selector, if h : Splits τ selector then rates.recombination selector *
+          (eval x (marginalPolynomial (splitSelected τ selector h.1))
+              * eval x (marginalPolynomial (splitRejected τ selector h.2))
+            - eval x (marginalPolynomial τ)) else 0 := by
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun selector _ ↦ ?_
+  rw [← Finset.mul_sum, Finset.sum_sub_distrib]
+  simp only [eval_assignmentPolynomial]
+  rw [sum_recombinantProduct, recombinantDrift_selector x hsimplex τ selector]
+  split_ifs with h
+  · rfl
+  · exact mul_zero _
+
+/-! ## The dual transitions -/
+
+/-- Migration moves of one carrier: to every deme at its backward migration rate. -/
+def migrationMoves (rates : NeutralRates Deme Locus Allele)
+    (τ : PartialType Deme Locus Allele) :
+    Multiset (ℝ × Multiset (PartialType Deme Locus Allele)) :=
+  Finset.univ.val.map fun j ↦ (rates.migration τ.deme j, {migrate τ j})
+
+/-- Mutation moves of one carrier: at every retained locus the retained allele `a` is relabelled
+to every allele `b` at rate `u_ℓ(a, b)`. -/
+def mutationMoves (rates : NeutralRates Deme Locus Allele)
+    (τ : PartialType Deme Locus Allele) :
+    Multiset (ℝ × Multiset (PartialType Deme Locus Allele)) :=
+  Finset.univ.val.bind fun ℓ ↦ (τ.allele ℓ).elim 0 fun a ↦
+    Finset.univ.val.map fun b ↦ (rates.mutation ℓ a b, {mutate τ ℓ b})
+
+/-- Recombination moves of one carrier: every splitting selector replaces the carrier by its
+selected and rejected halves at the rate of that crossover pattern. -/
+def recombinationMoves (rates : NeutralRates Deme Locus Allele)
+    (τ : PartialType Deme Locus Allele) :
+    Multiset (ℝ × Multiset (PartialType Deme Locus Allele)) :=
+  Finset.univ.val.bind fun selector ↦
+    if h : Splits τ selector then
+      {(rates.recombination selector,
+        splitSelected τ selector h.1 ::ₘ {splitRejected τ selector h.2})}
+    else 0
+
+/-- All one-carrier moves: a rate together with the carriers that replace the moving carrier. -/
+def carrierMoves (rates : NeutralRates Deme Locus Allele) (τ : PartialType Deme Locus Allele) :
+    Multiset (ℝ × Multiset (PartialType Deme Locus Allele)) :=
+  migrationMoves rates τ + mutationMoves rates τ + recombinationMoves rates τ
+
+/-- **The dual transitions of NOTE1 (19).**  Every carrier makes its one-carrier moves, and
+every ordered pair of distinct carriers in a common deme `i` coalesces at rate `c_i / 2`, so at
+rate `c_i` per unordered pair: a compatible pair merges and an incompatible pair is sent to the
+cemetery `none`.  Pairs in different demes carry rate zero. -/
+def dualTransitions (rates : NeutralRates Deme Locus Allele)
+    (ξ : Multiset (PartialType Deme Locus Allele)) :
+    Multiset (ℝ × Option (Multiset (PartialType Deme Locus Allele))) :=
+  ξ.bind (fun τ ↦ (carrierMoves rates τ).map fun move ↦ (move.1, some (move.2 + ξ.erase τ)))
+    + ξ.bind fun τ ↦ (ξ.erase τ).map fun σ ↦
+        (if τ.deme = σ.deme then rates.coalescence τ.deme / 2 else 0,
+          if Compatible τ σ then some (coalesce τ σ ::ₘ (ξ.erase τ).erase σ) else none)
+
+/-- The moment polynomial of a single carrier is its marginal frequency polynomial. -/
+theorem momentPolynomial_singleton (τ : PartialType Deme Locus Allele) :
+    momentPolynomial {τ} = marginalPolynomial τ := by
+  simp [momentPolynomial]
+
+/-- The moment polynomial of two carriers is the product of their marginal polynomials. -/
+theorem momentPolynomial_pair (τ σ : PartialType Deme Locus Allele) :
+    momentPolynomial (τ ::ₘ {σ}) = marginalPolynomial τ * marginalPolynomial σ := by
+  simp [momentPolynomial]
+
+/-- The migration moves of a carrier, summed against a moment table. -/
+theorem sum_migrationMoves (rates : NeutralRates Deme Locus Allele)
+    (x : FrequencyVariable Deme Locus Allele → ℝ) (τ : PartialType Deme Locus Allele) :
+    ((migrationMoves rates τ).map fun move ↦
+        move.1 * (eval x (momentPolynomial move.2) - eval x (marginalPolynomial τ))).sum
+      = ∑ j, rates.migration τ.deme j *
+          (eval x (assignmentPolynomial j τ.allele) - eval x (marginalPolynomial τ)) := by
+  simp only [migrationMoves, Multiset.map_map, Function.comp_def, momentPolynomial_singleton]
+  rfl
+
+/-- The mutation moves of a carrier, summed against a moment table. -/
+theorem sum_mutationMoves (rates : NeutralRates Deme Locus Allele)
+    (x : FrequencyVariable Deme Locus Allele → ℝ) (τ : PartialType Deme Locus Allele) :
+    ((mutationMoves rates τ).map fun move ↦
+        move.1 * (eval x (momentPolynomial move.2) - eval x (marginalPolynomial τ))).sum
+      = ∑ ℓ, (τ.allele ℓ).elim 0 fun a ↦ ∑ b, rates.mutation ℓ a b *
+          (eval x (assignmentPolynomial τ.deme (Function.update τ.allele ℓ (some b)))
+            - eval x (marginalPolynomial τ)) := by
+  rw [mutationMoves, Multiset.map_bind, Multiset.sum_bind, Finset.sum_eq_multiset_sum]
+  congr 1
+  refine Multiset.map_congr rfl fun ℓ _ ↦ ?_
+  cases h : τ.allele ℓ with
+  | none => simp
+  | some a =>
+    simp only [Option.elim, Multiset.map_map, Function.comp_def, momentPolynomial_singleton]
+    rfl
+
+/-- The recombination moves of a carrier, summed against a moment table. -/
+theorem sum_recombinationMoves (rates : NeutralRates Deme Locus Allele)
+    (x : FrequencyVariable Deme Locus Allele → ℝ) (τ : PartialType Deme Locus Allele) :
+    ((recombinationMoves rates τ).map fun move ↦
+        move.1 * (eval x (momentPolynomial move.2) - eval x (marginalPolynomial τ))).sum
+      = ∑ selector, if h : Splits τ selector then rates.recombination selector *
+          (eval x (marginalPolynomial (splitSelected τ selector h.1))
+              * eval x (marginalPolynomial (splitRejected τ selector h.2))
+            - eval x (marginalPolynomial τ)) else 0 := by
+  rw [recombinationMoves, Multiset.map_bind, Multiset.sum_bind, Finset.sum_eq_multiset_sum]
+  congr 1
+  refine Multiset.map_congr rfl fun selector _ ↦ ?_
+  split_ifs with h
+  · simp only [Multiset.map_singleton, Multiset.sum_singleton, momentPolynomial_pair, map_mul]
+  · simp
+
+/-- **The generator of a marginal frequency is a dual jump generator.**  On the simplex, the
+generator of `x[τ]` is the sum over the one-carrier moves of their rate times the moment of the
+replacement minus `x[τ]`: migration substitutes the deme label, mutation relabels a retained
+allele, and recombination splits the carrier. -/
+theorem eval_neutralGenerator_marginal (rates : NeutralRates Deme Locus Allele)
+    (x : FrequencyVariable Deme Locus Allele → ℝ) (hsimplex : ∀ i, ∑ hap, x (i, hap) = 1)
+    (τ : PartialType Deme Locus Allele) :
+    eval x (neutralGenerator rates (marginalPolynomial τ))
+      = ((carrierMoves rates τ).map fun move ↦
+          move.1 * (eval x (momentPolynomial move.2) - eval x (marginalPolynomial τ))).sum := by
+  conv_lhs => rw [marginalPolynomial, neutralGenerator_assignmentPolynomial, map_sum]
+  simp only [driftPolynomial, map_add, map_sum, map_sub, map_mul, eval_C, eval_X]
+  rw [Finset.sum_add_distrib, Finset.sum_add_distrib, sum_migrationDrift,
+    sum_recombinationDrift rates x hsimplex τ, sum_mutationDrift, carrierMoves, Multiset.map_add,
+    Multiset.map_add, Multiset.sum_add, Multiset.sum_add, sum_migrationMoves, sum_mutationMoves,
+    sum_recombinationMoves]
+  ring
+
+/-- **NOTE1 (19): the generator identity.**  At the frequency point of any per-deme haplotype
+laws, the neutral generator applied to the configuration moment `H_ξ` equals
+`Σ_η q_{ξη} (H_η − H_ξ)` over the dual transitions, with the cemetery moment `H_† = 0`. -/
+theorem neutralGenerator_configurationMoment (rates : NeutralRates Deme Locus Allele)
+    (law : Deme → FiniteReportLaw (FullHaplotype Locus Allele))
+    (ξ : Multiset (PartialType Deme Locus Allele)) :
+    eval (lawPoint law) (neutralGenerator rates (momentPolynomial ξ))
+      = ((dualTransitions rates ξ).map fun transition ↦ transition.1 *
+          (transition.2.elim 0 (configurationMoment law) - configurationMoment law ξ)).sum := by
+  have hsimplex : ∀ i, ∑ hap, lawPoint law (i, hap) = 1 := fun i ↦ (law i).mass_sum
+  have hcarrier : ∀ τ ∈ ξ,
+      eval (lawPoint law)
+          (neutralGenerator rates (marginalPolynomial τ) * momentPolynomial (ξ.erase τ))
+        = (((carrierMoves rates τ).map fun move ↦ (move.1, some (move.2 + ξ.erase τ))).map
+            fun transition ↦ transition.1 *
+              (transition.2.elim 0 (configurationMoment law)
+                - configurationMoment law ξ)).sum := by
+    intro τ hτ
+    have hξ : configurationMoment law ξ
+        = marginalFrequency law τ * configurationMoment law (ξ.erase τ) := by
+      rw [configurationMoment, configurationMoment, Multiset.prod_map_erase hτ]
+    rw [map_mul, eval_neutralGenerator_marginal rates _ hsimplex, eval_momentPolynomial,
+      Multiset.map_map, ← Multiset.sum_map_mul_right]
+    refine congrArg Multiset.sum (Multiset.map_congr rfl fun move _ ↦ ?_)
+    simp only [Function.comp_apply, Option.elim, configurationMoment_add, eval_momentPolynomial,
+      eval_marginalPolynomial]
+    rw [hξ]
+    ring
+  have hpair : ∀ τ ∈ ξ,
+      eval (lawPoint law) (((ξ.erase τ).map fun σ ↦
+          halfCovariance rates (marginalPolynomial τ) (marginalPolynomial σ)
+            * momentPolynomial ((ξ.erase τ).erase σ)).sum)
+        = (((ξ.erase τ).map fun σ ↦
+            (if τ.deme = σ.deme then rates.coalescence τ.deme / 2 else 0,
+              if Compatible τ σ then some (coalesce τ σ ::ₘ (ξ.erase τ).erase σ) else none)).map
+            fun transition ↦ transition.1 *
+              (transition.2.elim 0 (configurationMoment law)
+                - configurationMoment law ξ)).sum := by
+    intro τ hτ
+    rw [map_multiset_sum, Multiset.map_map, Multiset.map_map]
+    refine congrArg Multiset.sum (Multiset.map_congr rfl fun σ hσ ↦ ?_)
+    have hξ : configurationMoment law ξ = marginalFrequency law τ
+        * (marginalFrequency law σ * configurationMoment law ((ξ.erase τ).erase σ)) := by
+      rw [← configurationMoment_cons, Multiset.cons_erase hσ, ← configurationMoment_cons,
+        Multiset.cons_erase hτ]
+    simp only [Function.comp_apply, map_mul, eval_halfCovariance_joint,
+      jointFrequency_eq_coalesce, eval_momentPolynomial, eval_marginalPolynomial]
+    rw [hξ]
+    split_ifs <;> simp only [Option.elim, configurationMoment_cons] <;> ring
+  rw [neutralGenerator_momentPolynomial, map_add, map_multiset_sum, map_multiset_sum,
+    Multiset.map_map, Multiset.map_map, dualTransitions, Multiset.map_add, Multiset.sum_add,
+    Multiset.map_bind, Multiset.map_bind, Multiset.sum_bind, Multiset.sum_bind]
+  congr 1
+  · exact congrArg Multiset.sum (Multiset.map_congr rfl fun τ hτ ↦ hcarrier τ hτ)
+  · exact congrArg Multiset.sum (Multiset.map_congr rfl fun τ hτ ↦ hpair τ hτ)
+
+/-- Every dual transition has a nonnegative rate. -/
+theorem dualTransitions_rate_nonneg (rates : NeutralRates Deme Locus Allele)
+    (ξ : Multiset (PartialType Deme Locus Allele)) :
+    ∀ transition ∈ dualTransitions rates ξ, 0 ≤ transition.1 := by
+  intro transition htransition
+  rcases Multiset.mem_add.mp htransition with hmove | hpair
+  · obtain ⟨τ, _, hτ⟩ := Multiset.mem_bind.mp hmove
+    obtain ⟨move, hmove', rfl⟩ := Multiset.mem_map.mp hτ
+    rcases Multiset.mem_add.mp hmove' with hmm | hrec
+    · rcases Multiset.mem_add.mp hmm with hmig | hmut
+      · obtain ⟨j, _, rfl⟩ := Multiset.mem_map.mp hmig
+        exact rates.migration_nonneg _ _
+      · obtain ⟨ℓ, _, hℓ⟩ := Multiset.mem_bind.mp hmut
+        cases h : τ.allele ℓ with
+        | none => simp [h] at hℓ
+        | some a =>
+          simp only [h, Option.elim] at hℓ
+          obtain ⟨b, _, rfl⟩ := Multiset.mem_map.mp hℓ
+          exact rates.mutation_nonneg _ _ _
+    · obtain ⟨selector, _, hsel⟩ := Multiset.mem_bind.mp hrec
+      split_ifs at hsel with hs
+      · rw [Multiset.mem_singleton] at hsel
+        subst hsel
+        exact rates.recombination_nonneg _
+      · simp at hsel
+  · obtain ⟨τ, _, hτ⟩ := Multiset.mem_bind.mp hpair
+    obtain ⟨σ, _, rfl⟩ := Multiset.mem_map.mp hτ
+    show 0 ≤ if τ.deme = σ.deme then rates.coalescence τ.deme / 2 else 0
+    split_ifs
+    · exact div_nonneg (rates.coalescence_nonneg _) zero_le_two
+    · exact le_rfl
+
+/-- **Every dual transition preserves the per-locus budget (18).**  A budget-respecting
+configuration only jumps to budget-respecting configurations or to the cemetery. -/
+theorem dualTransitions_withinBudget (rates : NeutralRates Deme Locus Allele)
+    (capacity : Locus → ℕ) (ξ : Multiset (PartialType Deme Locus Allele))
+    (hξ : WithinBudget capacity ξ) :
+    ∀ transition ∈ dualTransitions rates ξ, ∀ η, transition.2 = some η →
+      WithinBudget capacity η := by
+  intro transition htransition η hη
+  rcases Multiset.mem_add.mp htransition with hmove | hpair
+  · obtain ⟨τ, hτ, hτmove⟩ := Multiset.mem_bind.mp hmove
+    obtain ⟨move, hmove', rfl⟩ := Multiset.mem_map.mp hτmove
+    obtain rfl : move.2 + ξ.erase τ = η := Option.some.inj hη
+    have hbudget : WithinBudget capacity (τ ::ₘ ξ.erase τ) := by
+      rw [Multiset.cons_erase hτ]
+      exact hξ
+    rcases Multiset.mem_add.mp hmove' with hmm | hrec
+    · rcases Multiset.mem_add.mp hmm with hmig | hmut
+      · obtain ⟨j, _, rfl⟩ := Multiset.mem_map.mp hmig
+        change WithinBudget capacity ({migrate τ j} + ξ.erase τ)
+        rw [Multiset.singleton_add]
+        exact withinBudget_migrate capacity τ j _ hbudget
+      · obtain ⟨ℓ, _, hℓ⟩ := Multiset.mem_bind.mp hmut
+        cases h : τ.allele ℓ with
+        | none => simp [h] at hℓ
+        | some a =>
+          simp only [h, Option.elim] at hℓ
+          obtain ⟨b, _, rfl⟩ := Multiset.mem_map.mp hℓ
+          change WithinBudget capacity ({mutate τ ℓ b} + ξ.erase τ)
+          rw [Multiset.singleton_add]
+          exact withinBudget_mutate capacity τ ℓ b (by simp [h]) _ hbudget
+    · obtain ⟨selector, _, hsel⟩ := Multiset.mem_bind.mp hrec
+      split_ifs at hsel with hs
+      · rw [Multiset.mem_singleton] at hsel
+        subst hsel
+        change WithinBudget capacity
+          ((splitSelected τ selector hs.1 ::ₘ {splitRejected τ selector hs.2}) + ξ.erase τ)
+        rw [Multiset.cons_add, Multiset.singleton_add]
+        exact withinBudget_split capacity τ selector hs.1 hs.2 _ hbudget
+      · simp at hsel
+  · obtain ⟨τ, hτ, hτpair⟩ := Multiset.mem_bind.mp hpair
+    obtain ⟨σ, hσ, rfl⟩ := Multiset.mem_map.mp hτpair
+    have hbudget : WithinBudget capacity (τ ::ₘ σ ::ₘ (ξ.erase τ).erase σ) := by
+      rw [Multiset.cons_erase hσ, Multiset.cons_erase hτ]
+      exact hξ
+    by_cases hcompat : Compatible τ σ
+    · rw [if_pos hcompat] at hη
+      obtain rfl := Option.some.inj hη
+      exact withinBudget_coalesce capacity τ σ _ hbudget
+    · rw [if_neg hcompat] at hη
+      exact absurd hη (by simp)
 
 end
 
