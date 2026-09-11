@@ -17,3 +17,4 @@ open Descent.Portability.FellerKernelRepresentation
 #print axioms Descent.Portability.FellerKernelRepresentation.integral_kernelMeasure_add
 #print axioms Descent.Portability.FellerKernelRepresentation.integral_kernelMeasure_denseExtension
 #print axioms Descent.Portability.FellerKernelRepresentation.exists_probabilityKernel_semigroup
+#print axioms Descent.Portability.FellerKernelRepresentation.dense_span_monomialMap

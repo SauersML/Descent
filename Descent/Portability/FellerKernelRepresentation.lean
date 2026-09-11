@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PolynomialFellerExtension
+import Descent.Portability.ReplicaMomentCompleteness
 import Mathlib.MeasureTheory.Integral.RieszMarkovKakutani.Real
 import Mathlib.MeasureTheory.Measure.HasOuterApproxClosed
 import Mathlib.MeasureTheory.Measure.ProbabilityMeasure
@@ -31,7 +32,9 @@ dense subspace, integration against the kernel of `denseExtension` returns the o
 operator (`integral_kernelMeasure_denseExtension`). The theorem
 `exists_probabilityKernel_semigroup` assembles NOTE1 §4.2a: a positive, constant-preserving
 semigroup on a dense subspace of `C(X, ℝ)` containing the constants is integration against
-continuous probability kernels obeying Chapman–Kolmogorov.
+continuous probability kernels obeying Chapman–Kolmogorov. On the allele-frequency simplex the
+monomial readouts of `ReplicaMomentCompleteness` span such a dense subspace
+(`dense_span_monomialMap`).
 
 Scope. Uniqueness of the representing measure on a compact Hausdorff space that is not
 pseudo-metrizable is not formalized (it holds among regular measures). The kernels are not
@@ -180,6 +183,17 @@ theorem exists_probabilityKernel_semigroup (V : Submodule ℝ C(X, ℝ))
     fun s t x g ↦ integral_kernelMeasure_add (fun t ↦ denseExtension V hV (T t) (hT t)) hS
       (denseExtension_add V hV T hT hsemi) s t x g,
     fun t ↦ continuous_kernelProbability (denseExtension V hV (T t) (hT t)) (hS t) (hS1 t)⟩
+
+/-- Polynomial observables on the allele-frequency simplex are a domain for `denseExtension`:
+the linear span of the monomial readouts `ReplicaMomentCompleteness.monomialMap` is dense in
+`C(simplex, ℝ)`, because it is the point-separating algebra `replicaAlgebra` read as a
+subspace. The simplex is metrizable, so `kernelMeasure_eq_of_integral_eq` applies there. -/
+theorem dense_span_monomialMap (m : ℕ) :
+    Dense (Submodule.span ℝ (Set.range (ReplicaMomentCompleteness.monomialMap m)) :
+      Set C(↥(stdSimplex ℝ (Fin m)), ℝ)) := by
+  rw [← ReplicaMomentCompleteness.replicaAlgebra_toSubmodule]
+  exact dense_toSubmodule_of_separatesPoints _
+    (ReplicaMomentCompleteness.replicaAlgebra_separatesPoints m)
 
 end
 

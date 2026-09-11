@@ -46,7 +46,10 @@ If iterates `K_i^{n_i}` converge pointwise to `T f` for every `f ∈ V` along a 
 filter, `T` is positive and fixes the constants (`nonneg_and_map_one_of_iterate_tendsto`);
 the uniform Euler limit `K_h^{⌊t/h⌋} f → T f` as `h ↓ 0` gives all three properties of the
 note (`markov_of_euler_tendstoUniformly`); and the iterates then converge to the extension on
-every continuous observable, not only on `V` (`tendsto_iterate_extension`).
+every continuous observable, not only on `V`, pointwise (`tendsto_iterate_extension`) and,
+when the convergence on `V` is uniform, uniformly (`tendstoUniformly_iterate_extension`). For
+the Euler iterates this is `euler_tendstoUniformly_extension`: `T_t f = lim K_h^{⌊t/h⌋} f`
+uniformly on `X` for every continuous `f`, as NOTE1 §4.2a states for polynomials.
 
 Scope. The finite matrix exponentials of NOTE1 (20), their independence of the chosen
 invariant space, and the `O(N^{-2})` remainder of the multinomial expansion at every finite
@@ -347,6 +350,56 @@ theorem tendsto_iterate_extension {ι B : Type*} [Fintype B] {l : Filter ι}
     (hequi.isClosed_setOf_tendsto (hev.comp (denseExtension V hV T hT).continuous)) fun f ↦ ?_
   rw [denseExtension_coe]
   exact hlim f x
+
+/-- The uniform microscopic approximation reaches every continuous observable. If the iterates
+`K_i^{n_i}` converge uniformly to `T f` for every `f` of the dense subspace, they converge
+uniformly to the extension on every `g ∈ C(X, ℝ)`: approximate `g` within `ε / 3` by some
+`f ∈ V`, and use that the extension and the iterates both contract uniform distances. -/
+theorem tendstoUniformly_iterate_extension {ι B : Type*} [Fintype B] {l : Filter ι}
+    (V : Submodule ℝ C(X, ℝ)) (hV : Dense (V : Set C(X, ℝ))) (T : V →ₗ[ℝ] V)
+    (hT : ∀ f : V, ‖(T f : C(X, ℝ))‖ ≤ ‖(f : C(X, ℝ))‖) (K : ι → FiniteMixtureKernel B X)
+    (n : ι → ℕ) (hlim : ∀ f : V,
+      TendstoUniformly (fun i ↦ (K i).apply^[n i] ⇑(f : C(X, ℝ))) ⇑(T f : C(X, ℝ)) l)
+    (g : C(X, ℝ)) :
+    TendstoUniformly (fun i ↦ (K i).apply^[n i] ⇑g) ⇑(denseExtension V hV T hT g) l := by
+  rw [Metric.tendstoUniformly_iff]
+  intro ε hε
+  have hε3 : (0 : ℝ) < ε / 3 := div_pos hε (by norm_num)
+  have hd : DenseRange (Subtype.val : V → C(X, ℝ)) := hV.denseRange_val
+  obtain ⟨f, hf⟩ := hd.exists_dist_lt g hε3
+  filter_upwards [Metric.tendstoUniformly_iff.mp (hlim f) (ε / 3) hε3] with i hi x
+  have hext : dist (denseExtension V hV T hT g x) ((T f : C(X, ℝ)) x) < ε / 3 := by
+    rw [← denseExtension_coe V hV T hT f]
+    refine (ContinuousMap.dist_apply_le_dist x).trans_lt (lt_of_le_of_lt ?_ hf)
+    simpa only [dist_eq_norm, map_sub] using denseExtension_norm_le V hV T hT (g - f)
+  have hiter :
+      dist ((K i).apply^[n i] ⇑(f : C(X, ℝ)) x) ((K i).apply^[n i] ⇑g x) < ε / 3 := by
+    rw [Real.dist_eq]
+    refine lt_of_le_of_lt (iterate_apply_sub_le (K i) (n i) _ _ (dist (f : C(X, ℝ)) g)
+      (fun y ↦ ?_) x) (by rwa [dist_comm])
+    rw [← Real.dist_eq]
+    exact ContinuousMap.dist_apply_le_dist y
+  calc dist (denseExtension V hV T hT g x) ((K i).apply^[n i] ⇑g x)
+      ≤ dist (denseExtension V hV T hT g x) ((T f : C(X, ℝ)) x)
+        + dist ((T f : C(X, ℝ)) x) ((K i).apply^[n i] ⇑(f : C(X, ℝ)) x)
+        + dist ((K i).apply^[n i] ⇑(f : C(X, ℝ)) x) ((K i).apply^[n i] ⇑g x) :=
+        dist_triangle4 _ _ _ _
+    _ < ε / 3 + ε / 3 + ε / 3 := add_lt_add (add_lt_add hext (hi x)) hiter
+    _ = ε := by ring
+
+/-- NOTE1 §4.2a, uniform microscopic limit on all of `C(X)`. If `K_h^{⌊t/h⌋} f → T f`
+uniformly as `h ↓ 0` for every observable of a dense subspace containing the constants, then
+`K_h^{⌊t/h⌋} g` converges uniformly to the extension of `T` at every continuous observable
+`g`, the extension being built from the contraction bound that the same limit supplies. -/
+theorem euler_tendstoUniformly_extension {B : Type*} [Fintype B] (V : Submodule ℝ C(X, ℝ))
+    (hV : Dense (V : Set C(X, ℝ))) (h1 : (1 : C(X, ℝ)) ∈ V) (T : V →ₗ[ℝ] V)
+    (K : ℝ → FiniteMixtureKernel B X) (t : ℝ)
+    (hlim : ∀ f : V, TendstoUniformly (fun h ↦ (K h).apply^[⌊t / h⌋₊] ⇑(f : C(X, ℝ)))
+      ⇑(T f : C(X, ℝ)) (𝓝[>] 0)) (g : C(X, ℝ)) :
+    TendstoUniformly (fun h ↦ (K h).apply^[⌊t / h⌋₊] ⇑g)
+      ⇑(denseExtension V hV T (markov_of_euler_tendstoUniformly V h1 T K t hlim).2.2 g)
+      (𝓝[>] 0) :=
+  tendstoUniformly_iterate_extension V hV T _ K (fun h ↦ ⌊t / h⌋₊) hlim g
 
 end
 

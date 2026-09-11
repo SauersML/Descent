@@ -27,3 +27,5 @@ open Descent.Portability.PolynomialFellerExtension
 #print axioms Descent.Portability.PolynomialFellerExtension.nonneg_and_map_one_of_iterate_tendsto
 #print axioms Descent.Portability.PolynomialFellerExtension.markov_of_euler_tendstoUniformly
 #print axioms Descent.Portability.PolynomialFellerExtension.tendsto_iterate_extension
+#print axioms Descent.Portability.PolynomialFellerExtension.tendstoUniformly_iterate_extension
+#print axioms Descent.Portability.PolynomialFellerExtension.euler_tendstoUniformly_extension
