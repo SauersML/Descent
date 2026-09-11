@@ -287,6 +287,9 @@ import Descent.Portability.SineCompensator
 import Descent.Portability.CompensatedCharacteristicKernel
 import Descent.Portability.FiniteSquareBiasCharacteristic
 import Descent.Portability.HWECriticalGenerator
+import Descent.Portability.ComplexArrayPowerLimit
+import Descent.Portability.HWECriticalScoreCharacteristic
+import Descent.Portability.GaussianExponentialTilt
 assert_below Descent.Program
 
 /-!
