@@ -106,6 +106,7 @@ import Descent.Portability.CylinderExponentialDraw
 import Descent.Portability.CylinderGaussianDraw
 import Descent.Portability.PortabilityRemainsJoint
 import Descent.Portability.DriftOperatorCoordinates
+import Descent.Portability.ChronologyIntegralEquation
 
 namespace Descent.Program
 
@@ -191,7 +192,8 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
   `ExactFiniteHistoryLaw`; equations (22)-(23): `ConditionalReportCompilation`.
 * §5 equations (24)-(25): `SublawReportCertificate`.
 * §6 equations (27)-(36), chronology to metrics: `AdmixtureChronologyLaw`,
-  `ChronologyReportLaw`, `AttainableChronologyCurve`, `ExposureLaplaceConstraints`,
+  with (27) in integral form for locally integrable rates and unique among continuous solutions:
+  `ChronologyIntegralEquation`; `ChronologyReportLaw`, `AttainableChronologyCurve`, `ExposureLaplaceConstraints`,
   `FinitePulseExposure`.
 * §7 equations (37)-(42), finite cohorts: `FourCellCohortLaw`,
   `EmpiricalCorrelationDefinedness`, `SmallCohortCorrelation`, `SmallCohortConditionalMeans`,
