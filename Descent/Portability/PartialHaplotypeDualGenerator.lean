@@ -278,7 +278,8 @@ theorem halfCovariance_one_right (rates : NeutralRates Deme Locus Allele)
 /-- Half of the carré du champ is a derivation in its second argument. -/
 theorem halfCovariance_mul_right (rates : NeutralRates Deme Locus Allele)
     (f g h : FrequencyPolynomial Deme Locus Allele) :
-    halfCovariance rates f (g * h) = g * halfCovariance rates f h + h * halfCovariance rates f g := by
+    halfCovariance rates f (g * h)
+      = g * halfCovariance rates f h + h * halfCovariance rates f g := by
   have hdiag : ∀ (i : Deme) (k : FullHaplotype Locus Allele),
       X (i, k) * (pderiv (i, k) f * pderiv (i, k) (g * h))
         = g * (X (i, k) * (pderiv (i, k) f * pderiv (i, k) h))
@@ -304,7 +305,8 @@ theorem halfCovariance_mul_right (rates : NeutralRates Deme Locus Allele)
 /-- Half of the carré du champ is a derivation in its first argument. -/
 theorem halfCovariance_mul_left (rates : NeutralRates Deme Locus Allele)
     (g h f : FrequencyPolynomial Deme Locus Allele) :
-    halfCovariance rates (g * h) f = g * halfCovariance rates h f + h * halfCovariance rates g f := by
+    halfCovariance rates (g * h) f
+      = g * halfCovariance rates h f + h * halfCovariance rates g f := by
   have hdiag : ∀ (i : Deme) (k : FullHaplotype Locus Allele),
       X (i, k) * (pderiv (i, k) (g * h) * pderiv (i, k) f)
         = g * (X (i, k) * (pderiv (i, k) h * pderiv (i, k) f))

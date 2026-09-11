@@ -28,3 +28,10 @@ open Descent.Portability.AdmixtureChronologyLaw
 #print axioms Descent.Portability.AdmixtureChronologyLaw.stepEvent_recombination_eq_solution
 #print axioms Descent.Portability.AdmixtureChronologyLaw.stepEvent_migration_eq_solution
 #print axioms Descent.Portability.AdmixtureChronologyLaw.chronology_report_slope
+#print axioms Descent.Portability.AdmixtureChronologyLaw.cumulativeRate_timeRescaled
+#print axioms Descent.Portability.AdmixtureChronologyLaw.donorFraction_timeRescaled
+#print axioms Descent.Portability.AdmixtureChronologyLaw.admixtureLinkage_timeRescaled
+#print axioms Descent.Portability.AdmixtureChronologyLaw.normalisedCoupling_timeRescaled
+#print axioms
+  Descent.Portability.AdmixtureChronologyLaw.scaled_normalisedCoupling_timeRescaled
+#print axioms Descent.Portability.AdmixtureChronologyLaw.calendar_rates_not_identified

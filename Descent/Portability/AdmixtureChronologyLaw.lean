@@ -34,9 +34,19 @@ factor of its exposure, and a constant-rate migration block sends `D` to
 `D e^{-M} + (1 - p)² e^{-M} (1 - e^{-M})` while sending `p` to `1 - (1 - p) e^{-M}`. Those two
 theorems are what makes the recursion the model rather than a definition.
 
+Calendar time is not identified by the exposure transform. Speeding both rates up by a factor
+`c`, `m ↦ c m(c ·)` and `r ↦ c r(c ·)`, gives a chronology whose cumulative totals, donor
+fraction, linkage and normalised coupling at time `t` are those of the original at time `c t`
+(`normalisedCoupling_timeRescaled`), under every recombination scale `λ`
+(`scaled_normalisedCoupling_timeRescaled`). So knowing `C(λ)` for every `λ` does not determine
+`m` and `r` in calendar time: `calendar_rates_not_identified` exhibits the constant rates `1`
+observed at time `2` and `2` observed at time `1`, which are different histories with the same
+donor fraction and the same `C(λ)` for every `λ`.
+
 Not proved here: the attainable range of the coupling at fixed totals, which is
-`AttainableChronologyCurve`, and the spectral constraints of NOTE1 (35) and (36). Nothing here
-asserts that any measured population followed such a chronology.
+`AttainableChronologyCurve`, and the spectral constraints of NOTE1 (35) and (36), which are
+`ExposureLaplaceConstraints`. Nothing here asserts that any measured population followed such a
+chronology.
 
 ## Empirical status
 
@@ -422,6 +432,83 @@ theorem chronology_report_slope (m r : ℝ → ℝ) (T : ℝ) (hp0 : 0 ≤ donor
         (ChronologyReportLaw.chronologyLaw (donorFraction m T) (normalisedCoupling m r T)
           hp0 hp1 hC0 hC1) = normalisedCoupling m r T :=
   ChronologyReportLaw.linearSlope_chronologyLaw _ _ hp0 hp1 hC0 hC1 hlow hhigh
+
+/-- A change of calendar speed: the rate `s ↦ c · rate (c s)`, sped up by the factor `c`,
+accumulates by time `t` exactly what the original rate accumulates by time `c t`. -/
+theorem cumulativeRate_timeRescaled (rate : ℝ → ℝ) (speed t : ℝ) :
+    cumulativeRate (fun s ↦ speed * rate (speed * s)) t = cumulativeRate rate (speed * t) := by
+  have hchange : speed • ∫ s in (0 : ℝ)..t, rate (speed * s) =
+      ∫ s in speed * 0..speed * t, rate s :=
+    intervalIntegral.smul_integral_comp_mul_left rate speed
+  unfold cumulativeRate
+  rw [intervalIntegral.integral_const_mul, ← smul_eq_mul, hchange, mul_zero]
+
+/-- The integrating-factor solution (28) under a change of calendar speed: the linkage of the
+sped-up chronology at time `t` is the linkage of the original chronology at time `c t`. -/
+theorem admixtureLinkage_timeRescaled (m r : ℝ → ℝ) (speed t : ℝ) :
+    admixtureLinkage (fun s ↦ speed * m (speed * s)) (fun s ↦ speed * r (speed * s)) t =
+      admixtureLinkage m r (speed * t) := by
+  have hchange : speed • ∫ s in (0 : ℝ)..t,
+      m (speed * s) * Real.exp (-cumulativeRate m (speed * s) + cumulativeRate r (speed * s)) =
+        ∫ s in speed * 0..speed * t,
+          m s * Real.exp (-cumulativeRate m s + cumulativeRate r s) :=
+    intervalIntegral.smul_integral_comp_mul_left
+      (fun u ↦ m u * Real.exp (-cumulativeRate m u + cumulativeRate r u)) speed
+  rw [mul_zero] at hchange
+  have hintegral : ∫ s in (0 : ℝ)..t, speed * m (speed * s) *
+      Real.exp (-cumulativeRate m (speed * s) + cumulativeRate r (speed * s)) =
+        ∫ s in (0 : ℝ)..speed * t,
+          m s * Real.exp (-cumulativeRate m s + cumulativeRate r s) := by
+    rw [← hchange, smul_eq_mul, ← intervalIntegral.integral_const_mul]
+    refine intervalIntegral.integral_congr (fun s _ ↦ ?_)
+    ring
+  unfold admixtureLinkage
+  simp only [cumulativeRate_timeRescaled]
+  rw [hintegral]
+
+/-- The donor fraction under a change of calendar speed: the sped-up chronology at time `t`
+has the donor fraction of the original at time `c t`. -/
+theorem donorFraction_timeRescaled (m : ℝ → ℝ) (speed t : ℝ) :
+    donorFraction (fun s ↦ speed * m (speed * s)) t = donorFraction m (speed * t) := by
+  unfold donorFraction
+  rw [cumulativeRate_timeRescaled]
+
+/-- The normalised coupling under a change of calendar speed: the sped-up chronology at time
+`t` has the coupling of the original at time `c t`. -/
+theorem normalisedCoupling_timeRescaled (m r : ℝ → ℝ) (speed t : ℝ) :
+    normalisedCoupling (fun s ↦ speed * m (speed * s)) (fun s ↦ speed * r (speed * s)) t =
+      normalisedCoupling m r (speed * t) := by
+  unfold normalisedCoupling
+  rw [admixtureLinkage_timeRescaled, donorFraction_timeRescaled]
+
+/-- NOTE1 (30) under a change of calendar speed: scaling the recombination history of the
+sped-up chronology by `λ` gives, at time `t`, the coupling of the original chronology with its
+recombination scaled by `λ`, at time `c t`. So the whole transform `C(λ)` is unchanged. -/
+theorem scaled_normalisedCoupling_timeRescaled (m r : ℝ → ℝ) (speed lam t : ℝ) :
+    normalisedCoupling (fun s ↦ speed * m (speed * s)) (fun s ↦ lam * (speed * r (speed * s)))
+        t =
+      normalisedCoupling m (fun s ↦ lam * r s) (speed * t) := by
+  have hrate : (fun s ↦ lam * (speed * r (speed * s))) =
+      fun s ↦ speed * (lam * r (speed * s)) := by
+    funext s
+    ring
+  rw [hrate]
+  exact normalisedCoupling_timeRescaled m (fun u ↦ lam * r u) speed t
+
+/-- NOTE1 section 6.3: the exposure transform does not identify the calendar-time rates. The
+constant rates `m = r = 1` observed at time `2` and the doubled constant rates `m = r = 2`
+observed at time `1` are different histories, yet they give the same donor fraction and the
+same normalised coupling under every recombination scale `λ`. -/
+theorem calendar_rates_not_identified (lam : ℝ) :
+    (fun _ : ℝ ↦ (1 : ℝ)) ≠ (fun _ : ℝ ↦ (2 : ℝ)) ∧
+      donorFraction (fun _ ↦ 2) 1 = donorFraction (fun _ ↦ 1) 2 ∧
+        normalisedCoupling (fun _ ↦ 2) (fun _ ↦ lam * 2) 1 =
+          normalisedCoupling (fun _ ↦ 1) (fun _ ↦ lam) 2 := by
+  refine ⟨fun hsame ↦ by simpa using congrFun hsame 0, ?_, ?_⟩
+  · have hfast := donorFraction_timeRescaled (fun _ ↦ 1) 2 1
+    simpa using hfast
+  · have hfast := scaled_normalisedCoupling_timeRescaled (fun _ ↦ 1) (fun _ ↦ 1) 2 lam 1
+    simpa using hfast
 
 end
 
