@@ -44,7 +44,8 @@ theorem bernstein_upper (X : ι → Ω → ℝ) (s : Finset ι)
     rw [measureReal_congr he, measureReal_empty]
     exact (Real.exp_pos _).le
   · apply le_trans (measureReal_mono (show {ω | radius M v x < ∑ i ∈ s, X i ω} ⊆
-      {ω | radius M v x ≤ ∑ i ∈ s, X i ω} from fun _ h ↦ h.le))
+      {ω | radius M v x ≤ ∑ i ∈ s, X i ω} from
+        fun ω h ↦ (show radius M v x ≤ ∑ i ∈ s, X i ω from le_of_lt h)))
       (one_sided X s hi hm M v x hM hvpos hx hb hmean hv)
 
 end Descent.Portability.BernsteinUpperConfidence
