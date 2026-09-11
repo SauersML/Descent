@@ -290,6 +290,11 @@ import Descent.Portability.HWECriticalGenerator
 import Descent.Portability.ComplexArrayPowerLimit
 import Descent.Portability.HWECriticalScoreCharacteristic
 import Descent.Portability.GaussianExponentialTilt
+import Descent.Portability.CompoundPoissonMarkLaw
+import Descent.Portability.SymmetricImageLaw
+import Descent.Portability.HWETiltedKernelLaw
+import Descent.Portability.HWECriticalLimitLaw
+import Descent.Portability.HWENearBalancedTheorem
 assert_below Descent.Program
 
 /-!

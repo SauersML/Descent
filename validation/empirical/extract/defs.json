@@ -1,7 +1,7 @@
 {
  "_NOT_AUTHORITATIVE": "The committed copy of this file is STALE BY CONSTRUCTION: the Lean corpus moves every few minutes and this is a cache of it. Do not consume a committed copy -- run validation/extract/emit.py in your own worktree immediately before use, and call api.require_fresh(), which raises if the table does not describe the Lean on disk.",
- "source_digest": "sha256:1bbc2ee21d77ebc30b56de628c6a8db6",
- "source_files": 597,
+ "source_digest": "sha256:25a06b68a04844c43ce438fa42501c76",
+ "source_files": 603,
  "collisions": {},
  "theorems": [
   {
@@ -66165,6 +66165,34 @@
    "mentions": []
   },
   {
+   "name": "Descent.Portability.CompoundPoissonMarkLaw.charFun_markSum",
+   "kind": "theorem",
+   "file": "Descent/Portability/CompoundPoissonMarkLaw.lean",
+   "line": 38,
+   "statement": "(μ : ProbabilityMeasure ℝ) (k : ℕ) (t : ℝ) : charFun (markSum μ k) t = charFun (μ : Measure ℝ) t ^ k",
+   "mentions": [
+    "markSum"
+   ]
+  },
+  {
+   "name": "Descent.Portability.CompoundPoissonMarkLaw.poisson_generating_series",
+   "kind": "theorem",
+   "file": "Descent/Portability/CompoundPoissonMarkLaw.lean",
+   "line": 61,
+   "statement": "(r : ℝ≥0) (z : ℂ) : HasSum (fun k : ℕ ↦ (poissonPMFReal r k : ℂ) * z ^ k) (Complex.exp ((r : ℂ) * (z - 1)))",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Portability.CompoundPoissonMarkLaw.charFun_compoundMeasure",
+   "kind": "theorem",
+   "file": "Descent/Portability/CompoundPoissonMarkLaw.lean",
+   "line": 80,
+   "statement": "(r : ℝ≥0) (μ : ProbabilityMeasure ℝ) (t : ℝ) : charFun (compoundMeasure r μ) t = Complex.exp ((r : ℂ) * (charFun (μ : Measure ℝ) t - 1))",
+   "mentions": [
+    "compoundMeasure"
+   ]
+  },
+  {
    "name": "Descent.Portability.ConditionalErrorCertificate.eventMass_nonneg",
    "kind": "theorem",
    "file": "Descent/Portability/ConditionalErrorCertificate.lean",
@@ -77418,6 +77446,26 @@
    ]
   },
   {
+   "name": "Descent.Portability.HWECriticalLimitLaw.cosine_integrable",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWECriticalLimitLaw.lean",
+   "line": 44,
+   "statement": "(K : ℝ≥0) (c t : ℝ) : Integrable (fun x ↦ Real.cos (t * (c * Real.exp (-x)))) (gaussianReal (8 * (K : ℝ)) (4 * K))",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWECriticalLimitLaw.lean",
+   "line": 53,
+   "statement": "(K : ℝ≥0) (c : ℝ) (hc : c ≠ 0) (t : ℝ) : charFun (criticalLaw K c : Measure ℝ) t = Complex.exp (∫ y, kernel t y ∂(amplitudeLimit K c : Measure ℝ))",
+   "mentions": [
+    "amplitudeLimit",
+    "criticalLaw",
+    "kernel"
+   ]
+  },
+  {
    "name": "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic",
    "kind": "theorem",
    "file": "Descent/Portability/HWECriticalScoreCharacteristic.lean",
@@ -78131,6 +78179,41 @@
    ]
   },
   {
+   "name": "Descent.Portability.HWEJumpRepresentation.pairLaw_map",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWEJumpRepresentation.lean",
+   "line": 24,
+   "statement": "(μ : ProbabilityMeasure ℝ) (f g : C(ℝ, ℝ)) : pairLaw (μ.map f.continuous.measurable.aemeasurable) g = pairLaw μ (g.comp f)",
+   "mentions": [
+    "comp",
+    "pairLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWEJumpRepresentation.gaussian_coordinate_image",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWEJumpRepresentation.lean",
+   "line": 37,
+   "statement": "(K : ℝ≥0) : (centeredGaussian 1).map (logCoordinateMap K).continuous.measurable.aemeasurable = (⟨gaussianReal (8 * (K : ℝ)) (4 * K), inferInstance⟩ : ProbabilityMeasure ℝ)",
+   "mentions": [
+    "centeredGaussian",
+    "logCoordinateMap"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWEJumpRepresentation.lean",
+   "line": 56,
+   "statement": "(K : ℝ≥0) (c : ℝ) : jumpLaw K c = pairLaw (centeredGaussian 1) (standardMarkMap K c)",
+   "mentions": [
+    "centeredGaussian",
+    "jumpLaw",
+    "pairLaw",
+    "standardMarkMap"
+   ]
+  },
+  {
    "name": "Descent.Portability.HWELogCoordinates.coordinate_zero",
    "kind": "theorem",
    "file": "Descent/Portability/HWELogCoordinates.lean",
@@ -78211,6 +78294,110 @@
     "centeredGaussian",
     "coordinate",
     "rowProbability"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWENearBalancedTheorem.score_second_bound",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWENearBalancedTheorem.lean",
+   "line": 25,
+   "statement": "{ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι] (h : ι → HardyWeinbergModel) (h0 : ∀ i, 0 < (h i).altFreq) (h1 : ∀ i, (h i).altFreq < 1) (N : ℕ) : (independentLaw (fun _ : Fin N ↦ blockLaw h)).expectation (fun x ↦ score h N x ^ 2) ≤ 1",
+   "mentions": [
+    "altFreq",
+    "blockLaw",
+    "expectation",
+    "independentLaw",
+    "score"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWENearBalancedTheorem.scores_tight",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWENearBalancedTheorem.lean",
+   "line": 35,
+   "statement": "(h : (m : ℕ) → Fin m → HardyWeinbergModel) (h0 : ∀ m i, 0 < (h m i).altFreq) (h1 : ∀ m i, (h m i).altFreq < 1) (N : ℕ → ℕ) : IsTightMeasureSet (Set.range (fun m ↦ (scoreProbability (h (m + 1)) (N (m + 1)) : Measure ℝ)))",
+   "mentions": [
+    "altFreq",
+    "scoreProbability"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWENearBalancedTheorem.critical_jump_intensity",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWENearBalancedTheorem.lean",
+   "line": 50,
+   "statement": "(K : ℝ≥0) (r : ℝ) (hr : 0 < r) : (jumpIntensity K (1 / Real.sqrt r) : ℝ) = r * Real.exp (4 * (K : ℝ))",
+   "mentions": [
+    "jumpIntensity"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWENearBalancedTheorem.lean",
+   "line": 57,
+   "statement": "(h : (m : ℕ) → Fin m → HardyWeinbergModel) (h0 : ∀ m i, 0 < (h m i).altFreq) (h1 : ∀ m i, (h m i).altFreq < 1) (ε : ℕ → ℝ) (hcap : ∀ m i, |(h m i).altFreq - 1 / 2| ≤ ε m) (hε : Tendsto ε atTop (𝓝 0)) (K : ℝ≥0) (hK : Tendsto (fun m ↦ ∑ i, ((h m i).altFreq - 1 / 2) ^ 2) atTop (𝓝 (K : ℝ))) (N : ℕ → ℕ) (r : ℝ) (hr : 0 < r) (hN : Tendsto (fun m ↦ intensity m (N m)) atTop (𝓝 r)) : Tendsto (fun m ↦ scoreProbability (h (m + 1)) (N (m + 1))) atTop (𝓝 (criticalLaw K (1 / Real.sqrt r)))",
+   "mentions": [
+    "altFreq",
+    "criticalLaw",
+    "intensity",
+    "scoreProbability"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWETiltedKernelLaw.signedLognormal_pair",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWETiltedKernelLaw.lean",
+   "line": 28,
+   "statement": "(K : ℝ≥0) (c : ℝ) : signedLognormal K c = pairLaw (centeredGaussian (4 * K)) (amplitudeMap c)",
+   "mentions": [
+    "amplitudeMap",
+    "centeredGaussian",
+    "pairLaw",
+    "signedLognormal"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWETiltedKernelLaw.mixture_kernel",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWETiltedKernelLaw.lean",
+   "line": 33,
+   "statement": "(K : ℝ≥0) (c t : ℝ) : (∫ y, kernel t y ∂(amplitudeLimit K c : Measure ℝ)) = (((1 - Real.exp (-4 * (K : ℝ))) * (-(t ^ 2 / 2)) + Real.exp (-4 * (K : ℝ)) * (∫ x, realPart t (c * Real.exp (-x)) ∂gaussianReal 0 (4 * K)) : ℝ) : ℂ)",
+   "mentions": [
+    "amplitudeLimit",
+    "kernel",
+    "realPart"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWETiltedKernelLaw.realPart_log_amplitude",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWETiltedKernelLaw.lean",
+   "line": 44,
+   "statement": "(c : ℝ) (hc : c ≠ 0) (t x : ℝ) : realPart t (c * Real.exp (-x)) = (c ^ 2)⁻¹ * Real.exp (2 * x) * (Real.cos (t * (c * Real.exp (-x))) - 1)",
+   "mentions": [
+    "realPart"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWETiltedKernelLaw.tilted_kernel_integral",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWETiltedKernelLaw.lean",
+   "line": 60,
+   "statement": "(K : ℝ≥0) (c : ℝ) (hc : c ≠ 0) (t : ℝ) : (∫ x, realPart t (c * Real.exp (-x)) ∂gaussianReal 0 (4 * K)) = (c ^ 2)⁻¹ * Real.exp (8 * (K : ℝ)) * (∫ x, Real.cos (t * (c * Real.exp (-x))) - 1 ∂gaussianReal (8 * (K : ℝ)) (4 * K))",
+   "mentions": [
+    "realPart"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWETiltedKernelLaw.explicit_kernel_generator",
+   "kind": "theorem",
+   "file": "Descent/Portability/HWETiltedKernelLaw.lean",
+   "line": 77,
+   "statement": "(K : ℝ≥0) (c : ℝ) (hc : c ≠ 0) (t : ℝ) : (∫ y, kernel t y ∂(amplitudeLimit K c : Measure ℝ)) = ((-(t ^ 2 / 2) * (1 - Real.exp (-4 * (K : ℝ))) + ((c ^ 2)⁻¹ * Real.exp (4 * (K : ℝ))) * (∫ x, Real.cos (t * (c * Real.exp (-x))) - 1 ∂gaussianReal (8 * (K : ℝ)) (4 * K)) : ℝ) : ℂ)",
+   "mentions": [
+    "amplitudeLimit",
+    "kernel"
    ]
   },
   {
@@ -103088,6 +103275,67 @@
    "mentions": [
     "deployedR2",
     "r2EstimatorVariance"
+   ]
+  },
+  {
+   "name": "Descent.Portability.SymmetricImageLaw.integral_blend_complex",
+   "kind": "theorem",
+   "file": "Descent/Portability/SymmetricImageLaw.lean",
+   "line": 24,
+   "statement": "(w : ℝ) (hw0 : 0 ≤ w) (hw1 : w ≤ 1) (μ ν : ProbabilityMeasure ℝ) (f : ℝ →ᵇ ℂ) : (∫ x, f x ∂(blend w hw0 hw1 μ ν : Measure ℝ)) = ((1 - w : ℝ) : ℂ) * (∫ x, f x ∂(μ : Measure ℝ)) + (w : ℂ) * (∫ x, f x ∂(ν : Measure ℝ))",
+   "mentions": [
+    "blend"
+   ]
+  },
+  {
+   "name": "Descent.Portability.SymmetricImageLaw.integral_pairLaw",
+   "kind": "theorem",
+   "file": "Descent/Portability/SymmetricImageLaw.lean",
+   "line": 44,
+   "statement": "(μ : ProbabilityMeasure ℝ) (g : C(ℝ, ℝ)) (f : ℝ →ᵇ ℂ) : (∫ x, f x ∂(pairLaw μ g : Measure ℝ)) = ∫ x, (f (g x) + f (-g x)) / 2 ∂(μ : Measure ℝ)",
+   "mentions": [
+    "pairLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.SymmetricImageLaw.paired_character",
+   "kind": "theorem",
+   "file": "Descent/Portability/SymmetricImageLaw.lean",
+   "line": 60,
+   "statement": "(t u : ℝ) : (innerProbChar t u + innerProbChar t (-u)) / 2 = (Real.cos (t * u) : ℂ)",
+   "mentions": []
+  },
+  {
+   "name": "Descent.Portability.SymmetricImageLaw.charFun_pairLaw",
+   "kind": "theorem",
+   "file": "Descent/Portability/SymmetricImageLaw.lean",
+   "line": 70,
+   "statement": "(μ : ProbabilityMeasure ℝ) (g : C(ℝ, ℝ)) (t : ℝ) : charFun (pairLaw μ g : Measure ℝ) t = ((∫ x, Real.cos (t * g x) ∂(μ : Measure ℝ)) : ℂ)",
+   "mentions": [
+    "pairLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.SymmetricImageLaw.paired_kernel",
+   "kind": "theorem",
+   "file": "Descent/Portability/SymmetricImageLaw.lean",
+   "line": 77,
+   "statement": "(t u : ℝ) : (CompensatedCharacteristicKernel.kernel t u + CompensatedCharacteristicKernel.kernel t (-u)) / 2 = (CompensatedCharacteristicKernel.realPart t u : ℂ)",
+   "mentions": [
+    "kernel",
+    "realPart"
+   ]
+  },
+  {
+   "name": "Descent.Portability.SymmetricImageLaw.integral_pair_kernel",
+   "kind": "theorem",
+   "file": "Descent/Portability/SymmetricImageLaw.lean",
+   "line": 89,
+   "statement": "(μ : ProbabilityMeasure ℝ) (g : C(ℝ, ℝ)) (t : ℝ) : (∫ x, CompensatedCharacteristicKernel.kernel t x ∂(pairLaw μ g : Measure ℝ)) = ((∫ x, CompensatedCharacteristicKernel.realPart t (g x) ∂(μ : Measure ℝ)) : ℂ)",
+   "mentions": [
+    "kernel",
+    "pairLaw",
+    "realPart"
    ]
   },
   {
@@ -145622,6 +145870,8 @@
       "l ∈ (chainLaw n (m + 1"
      ],
      "Descent.Portability.AncestralEventLaw.jump_expectation": [],
+     "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": [],
+     "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation": [],
      "Descent.Portability.NucleotideMutationLaw.jump_expectation": [],
      "Descent.Portability.NucleotideMutationLaw.jump_uniformMean": [],
      "Descent.Portability.NucleotideMutationLaw.count_expectation": [],
@@ -145637,6 +145887,8 @@
     "Descent.Coalescent.mem_support_jumpLaw",
     "Descent.Coalescent.mem_support_jumpLaw_of_absorbed",
     "Descent.Portability.AncestralEventLaw.jump_expectation",
+    "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw",
+    "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation",
     "Descent.Portability.NucleotideMutationLaw.branch_history_expectation",
     "Descent.Portability.NucleotideMutationLaw.count_expectation",
     "Descent.Portability.NucleotideMutationLaw.jump_expectation",
@@ -161819,8 +162071,14 @@
      "Descent.Portability.HWEHomozygoteConditioning.zeroMass_pos": [],
      "Descent.Portability.HWEHomozygoteConditioning.homozygote_mass": [],
      "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation": [],
+     "Descent.Portability.HWEJumpRepresentation.pairLaw_map": [],
+     "Descent.Portability.HWEJumpRepresentation.gaussian_coordinate_image": [],
+     "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation": [],
      "Descent.Portability.HWELogCoordinates.maximal_coordinate_limit": [],
      "Descent.Portability.HWELogCoordinates.fair_log_profile_limit": [],
+     "Descent.Portability.HWENearBalancedTheorem.scores_tight": [],
+     "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit": [],
+     "Descent.Portability.HWETiltedKernelLaw.realPart_log_amplitude": [],
      "Descent.Portability.IIDBinExperiment.assigned_confidence": [
       "0 < K"
      ],
@@ -163076,8 +163334,14 @@
     "Descent.Portability.HWEHomozygoteConditioning.homozygote_mass",
     "Descent.Portability.HWEHomozygoteConditioning.zeroMass_pos",
     "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation",
+    "Descent.Portability.HWEJumpRepresentation.gaussian_coordinate_image",
+    "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation",
+    "Descent.Portability.HWEJumpRepresentation.pairLaw_map",
     "Descent.Portability.HWELogCoordinates.fair_log_profile_limit",
     "Descent.Portability.HWELogCoordinates.maximal_coordinate_limit",
+    "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit",
+    "Descent.Portability.HWENearBalancedTheorem.scores_tight",
+    "Descent.Portability.HWETiltedKernelLaw.realPart_log_amplitude",
     "Descent.Portability.IIDBinExperiment.assigned_confidence",
     "Descent.Portability.IIDBinExperiment.iid_confidence",
     "Descent.Portability.IndependentShiftOperator.independent_sum_succ",
@@ -167227,7 +167491,8 @@
      "Descent.Portability.HWECriticalScoreCharacteristic.score_second": [],
      "Descent.Portability.HWEInteractionLaw.interaction_mean_zero": [],
      "Descent.Portability.HWEInteractionLaw.interaction_second_moment": [],
-     "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass": []
+     "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass": [],
+     "Descent.Portability.HWENearBalancedTheorem.score_second_bound": []
     }
    },
    "mentioned_by": [
@@ -167257,7 +167522,8 @@
     "Descent.Portability.HWECriticalScoreCharacteristic.score_second",
     "Descent.Portability.HWEInteractionLaw.interaction_mean_zero",
     "Descent.Portability.HWEInteractionLaw.interaction_second_moment",
-    "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass"
+    "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass",
+    "Descent.Portability.HWENearBalancedTheorem.score_second_bound"
    ]
   },
   {
@@ -175833,8 +176099,14 @@
      "Descent.Portability.HWEHomozygoteConditioning.zeroMass_pos": [],
      "Descent.Portability.HWEHomozygoteConditioning.homozygote_mass": [],
      "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation": [],
+     "Descent.Portability.HWEJumpRepresentation.pairLaw_map": [],
+     "Descent.Portability.HWEJumpRepresentation.gaussian_coordinate_image": [],
+     "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation": [],
      "Descent.Portability.HWELogCoordinates.maximal_coordinate_limit": [],
      "Descent.Portability.HWELogCoordinates.fair_log_profile_limit": [],
+     "Descent.Portability.HWENearBalancedTheorem.scores_tight": [],
+     "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit": [],
+     "Descent.Portability.HWETiltedKernelLaw.realPart_log_amplitude": [],
      "Descent.Portability.IIDBinExperiment.assigned_confidence": [],
      "Descent.Portability.IIDBinExperiment.iid_confidence": [],
      "Descent.Portability.attenuatedVariance_eq_true_iff": [],
@@ -177076,8 +177348,14 @@
     "Descent.Portability.HWEHomozygoteConditioning.homozygote_mass",
     "Descent.Portability.HWEHomozygoteConditioning.zeroMass_pos",
     "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation",
+    "Descent.Portability.HWEJumpRepresentation.gaussian_coordinate_image",
+    "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation",
+    "Descent.Portability.HWEJumpRepresentation.pairLaw_map",
     "Descent.Portability.HWELogCoordinates.fair_log_profile_limit",
     "Descent.Portability.HWELogCoordinates.maximal_coordinate_limit",
+    "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit",
+    "Descent.Portability.HWENearBalancedTheorem.scores_tight",
+    "Descent.Portability.HWETiltedKernelLaw.realPart_log_amplitude",
     "Descent.Portability.IIDBinExperiment.assigned_confidence",
     "Descent.Portability.IIDBinExperiment.iid_confidence",
     "Descent.Portability.IndependentShiftOperator.independent_sum_succ",
@@ -183202,6 +183480,7 @@
      "Descent.Portability.CompactSingularSequence.residual_annihilates_direction": [],
      "Descent.Portability.CompactSingularSequence.energy_decomposition": [],
      "Descent.Portability.CompactSingularSequence.residual_decomposition": [],
+     "Descent.Portability.CompoundPoissonMarkLaw.charFun_markSum": [],
      "Descent.Portability.FactorsThroughObservation.zero": [],
      "Descent.Portability.DiscountedObservability.fixed_point_iteration": [],
      "Descent.Portability.DynamicBlindness.powers_zero_of_observation": [],
@@ -183370,6 +183649,7 @@
     "Descent.Portability.CompactSingularSequence.energy_decomposition",
     "Descent.Portability.CompactSingularSequence.residual_annihilates_direction",
     "Descent.Portability.CompactSingularSequence.residual_decomposition",
+    "Descent.Portability.CompoundPoissonMarkLaw.charFun_markSum",
     "Descent.Portability.DiscountedObservability.fixed_point_iteration",
     "Descent.Portability.DynamicBlindness.powers_zero_of_observation",
     "Descent.Portability.EvolutionaryForecastMinimax.translatePrediction_run",
@@ -192277,6 +192557,9 @@
      "Descent.Portability.HWEInteractionLaw.squareBiasedLocus_mass": [],
      "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass": [],
      "Descent.Portability.HWELogCoordinates.coordinate_frequency": [],
+     "Descent.Portability.HWENearBalancedTheorem.score_second_bound": [],
+     "Descent.Portability.HWENearBalancedTheorem.scores_tight": [],
+     "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit": [],
      "Descent.Spectral.hwe_variance_eq": [],
      "Descent.Spectral.hwe_centered": [],
      "Descent.Spectral.standardizedSquare_values": [],
@@ -192421,6 +192704,9 @@
     "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass",
     "Descent.Portability.HWEInteractionLaw.squareBiasedLocus_mass",
     "Descent.Portability.HWELogCoordinates.coordinate_frequency",
+    "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit",
+    "Descent.Portability.HWENearBalancedTheorem.score_second_bound",
+    "Descent.Portability.HWENearBalancedTheorem.scores_tight",
     "Descent.Spectral._root_.Descent.Foundations.HardyWeinbergModel.mellinDrift_eq",
     "Descent.Spectral._root_.Descent.Foundations.HardyWeinbergModel.mellinJetVariance_eq",
     "Descent.Spectral._root_.Descent.Foundations.HardyWeinbergModel.standardizedFourthMoment_eq",
@@ -198458,8 +198744,14 @@
      "Descent.Portability.HWEHomozygoteConditioning.zeroMass_pos": [],
      "Descent.Portability.HWEHomozygoteConditioning.homozygote_mass": [],
      "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation": [],
+     "Descent.Portability.HWEJumpRepresentation.pairLaw_map": [],
+     "Descent.Portability.HWEJumpRepresentation.gaussian_coordinate_image": [],
+     "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation": [],
      "Descent.Portability.HWELogCoordinates.maximal_coordinate_limit": [],
      "Descent.Portability.HWELogCoordinates.fair_log_profile_limit": [],
+     "Descent.Portability.HWENearBalancedTheorem.scores_tight": [],
+     "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit": [],
+     "Descent.Portability.HWETiltedKernelLaw.realPart_log_amplitude": [],
      "Descent.Portability.IIDBinExperiment.assigned_confidence": [],
      "Descent.Portability.IIDBinExperiment.iid_confidence": [],
      "Descent.Portability.attenuatedVariance_eq_true_iff": [],
@@ -199689,8 +199981,14 @@
     "Descent.Portability.HWEHomozygoteConditioning.homozygote_mass",
     "Descent.Portability.HWEHomozygoteConditioning.zeroMass_pos",
     "Descent.Portability.HWEHomozygoteConditioning.zero_count_expectation",
+    "Descent.Portability.HWEJumpRepresentation.gaussian_coordinate_image",
+    "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation",
+    "Descent.Portability.HWEJumpRepresentation.pairLaw_map",
     "Descent.Portability.HWELogCoordinates.fair_log_profile_limit",
     "Descent.Portability.HWELogCoordinates.maximal_coordinate_limit",
+    "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit",
+    "Descent.Portability.HWENearBalancedTheorem.scores_tight",
+    "Descent.Portability.HWETiltedKernelLaw.realPart_log_amplitude",
     "Descent.Portability.IIDBinExperiment.assigned_confidence",
     "Descent.Portability.IIDBinExperiment.iid_confidence",
     "Descent.Portability.IndependentShiftOperator.independent_sum_succ",
@@ -209876,6 +210174,7 @@
      "Descent.Portability.CompactSingularSequence.residual_annihilates_direction": [],
      "Descent.Portability.CompactSingularSequence.energy_decomposition": [],
      "Descent.Portability.CompactSingularSequence.residual_decomposition": [],
+     "Descent.Portability.CompoundPoissonMarkLaw.charFun_markSum": [],
      "Descent.Portability.FactorsThroughObservation.zero": [],
      "Descent.Portability.DiscountedObservability.fixed_point_iteration": [],
      "Descent.Portability.DynamicBlindness.powers_zero_of_observation": [],
@@ -210044,6 +210343,7 @@
     "Descent.Portability.CompactSingularSequence.energy_decomposition",
     "Descent.Portability.CompactSingularSequence.residual_annihilates_direction",
     "Descent.Portability.CompactSingularSequence.residual_decomposition",
+    "Descent.Portability.CompoundPoissonMarkLaw.charFun_markSum",
     "Descent.Portability.DiscountedObservability.fixed_point_iteration",
     "Descent.Portability.DynamicBlindness.powers_zero_of_observation",
     "Descent.Portability.EvolutionaryForecastMinimax.translatePrediction_run",
@@ -232934,6 +233234,7 @@
      "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic_limit": [],
      "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit": [],
      "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit": [],
+     "Descent.Portability.HWEJumpRepresentation.pairLaw_map": [],
      "Descent.Portability.InterleavedMutationMeasurability.proposalParameter_measurable": [],
      "Descent.Portability.InterleavedMutationMeasurability.mark_mass_measurable": [],
      "Descent.Portability.MarkovCoarseGraining.operator_matrixError": [],
@@ -233075,6 +233376,7 @@
     "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic_limit",
     "Descent.Portability.HWEHeterozygosityLimit.zero_count_probability_limit",
     "Descent.Portability.HWEHomozygoteLimit.component_amplitude_limit",
+    "Descent.Portability.HWEJumpRepresentation.pairLaw_map",
     "Descent.Portability.HasPositiveLowerBound.comp",
     "Descent.Portability.HasPositiveLowerBound.of_postcomp",
     "Descent.Portability.HasUnitApproxKernel.postcomp",
@@ -233273,7 +233575,10 @@
      "Descent.Portability.HWECriticalGenerator.finite_generator": [],
      "Descent.Portability.HWECriticalGenerator.integral_critical_kernel": [],
      "Descent.Portability.HWECriticalGenerator.generator_limit": [],
+     "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": [],
      "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic_limit": [],
+     "Descent.Portability.HWETiltedKernelLaw.mixture_kernel": [],
+     "Descent.Portability.HWETiltedKernelLaw.explicit_kernel_generator": [],
      "Descent.Portability.InterleavedMutationExponential.propagate_mass": [],
      "Descent.Portability.InterleavedMutationMeasurability.bind_mass_measurable": [],
      "Descent.Portability.MarkovCoarseGraining.stateLaw_matrix": [],
@@ -233298,6 +233603,8 @@
      "Descent.Portability.StationaryPoissonLaw.stationary_stateLaw": [],
      "Descent.Portability.StoppedGenotypeReadiness.bind_excludes": [],
      "Descent.Portability.StoppedGenotypeRenewal.race_row_first_step": [],
+     "Descent.Portability.SymmetricImageLaw.paired_kernel": [],
+     "Descent.Portability.SymmetricImageLaw.integral_pair_kernel": [],
      "Descent.Portability.WholeGenomeMutationRace.coordinateKernel_mass": []
     },
     "range_lo_thm": [
@@ -233412,7 +233719,10 @@
     "Descent.Portability.HWECriticalGenerator.finite_generator",
     "Descent.Portability.HWECriticalGenerator.generator_limit",
     "Descent.Portability.HWECriticalGenerator.integral_critical_kernel",
+    "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw",
     "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic_limit",
+    "Descent.Portability.HWETiltedKernelLaw.explicit_kernel_generator",
+    "Descent.Portability.HWETiltedKernelLaw.mixture_kernel",
     "Descent.Portability.InterleavedMutationExponential.propagate_mass",
     "Descent.Portability.InterleavedMutationMeasurability.bind_mass_measurable",
     "Descent.Portability.MarkovCoarseGraining.stateLaw_matrix",
@@ -233441,6 +233751,8 @@
     "Descent.Portability.StationaryPoissonLaw.stationary_stateLaw",
     "Descent.Portability.StoppedGenotypeReadiness.bind_excludes",
     "Descent.Portability.StoppedGenotypeRenewal.race_row_first_step",
+    "Descent.Portability.SymmetricImageLaw.integral_pair_kernel",
+    "Descent.Portability.SymmetricImageLaw.paired_kernel",
     "Descent.Portability.WholeGenomeMutationRace.coordinateKernel_mass",
     "Descent.Portability.aggregateCalibrationMoment_eq_indexWiseCalibrationMoment",
     "Descent.Portability.indexWiseCalibrationMoment_at_zero_weight"
@@ -264106,6 +264418,8 @@
      "Descent.Portability.AncestralEventLaw.jump_expectation": [
       "0 < totalRate rates s"
      ],
+     "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": [],
+     "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation": [],
      "Descent.Portability.NucleotideMutationLaw.jump_expectation": [],
      "Descent.Portability.NucleotideMutationLaw.jump_uniformMean": [],
      "Descent.Portability.NucleotideMutationLaw.count_expectation": [],
@@ -264121,6 +264435,8 @@
     "Descent.Coalescent.mem_support_jumpLaw",
     "Descent.Coalescent.mem_support_jumpLaw_of_absorbed",
     "Descent.Portability.AncestralEventLaw.jump_expectation",
+    "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw",
+    "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation",
     "Descent.Portability.NucleotideMutationLaw.branch_history_expectation",
     "Descent.Portability.NucleotideMutationLaw.count_expectation",
     "Descent.Portability.NucleotideMutationLaw.jump_expectation",
@@ -267423,6 +267739,7 @@
      "Descent.Portability.HWECriticalGenerator.block_count_diverges": [],
      "Descent.Portability.HWECriticalGenerator.generator_limit": [],
      "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic_limit": [],
+     "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit": [],
      "Descent.Portability.SignedTransferIdentification.arrayTransfer_generator": [],
      "Descent.Portability.SignedTransferIdentification.positive_next_admissible": [
       "∀ destination, rates.migration deme destination = 0",
@@ -267450,6 +267767,7 @@
     "Descent.Portability.HWECriticalGenerator.block_count_diverges",
     "Descent.Portability.HWECriticalGenerator.generator_limit",
     "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic_limit",
+    "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit",
     "Descent.Portability.SignedTransferIdentification.arrayTransfer_generator",
     "Descent.Portability.SignedTransferIdentification.positive_next_admissible",
     "Descent.Spectral.PhasePanel.intensity_singleton",
@@ -272786,12 +273104,14 @@
      "Descent.Portability.BalancedHWECompoundPoisson.integral_compoundMeasure": [],
      "Descent.Portability.BalancedHWECompoundPoisson.finite_intensity_weak_convergence": [
       "Tendsto a atTop (nhds b"
-     ]
+     ],
+     "Descent.Portability.CompoundPoissonMarkLaw.charFun_compoundMeasure": []
     }
    },
    "mentioned_by": [
     "Descent.Portability.BalancedHWECompoundPoisson.finite_intensity_weak_convergence",
-    "Descent.Portability.BalancedHWECompoundPoisson.integral_compoundMeasure"
+    "Descent.Portability.BalancedHWECompoundPoisson.integral_compoundMeasure",
+    "Descent.Portability.CompoundPoissonMarkLaw.charFun_compoundMeasure"
    ]
   },
   {
@@ -274280,6 +274600,7 @@
      "Descent.Portability.HWECriticalGenerator.integral_critical_kernel": [],
      "Descent.Portability.HWEHeterozygosityWeakLimit.count_absolute_moment": [],
      "Descent.Portability.HWEHeterozygosityWeakLimit.poisson_weak_limit": [],
+     "Descent.Portability.HWENearBalancedTheorem.scores_tight": [],
      "Descent.Portability.RademacherArrayWeakLimit.rows_tight": [],
      "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit": [],
      "Descent.Portability.RademacherJointLimit.conditional_test_limit": [],
@@ -274302,6 +274623,7 @@
     "Descent.Portability.HWECriticalGenerator.integral_critical_kernel",
     "Descent.Portability.HWEHeterozygosityWeakLimit.count_absolute_moment",
     "Descent.Portability.HWEHeterozygosityWeakLimit.poisson_weak_limit",
+    "Descent.Portability.HWENearBalancedTheorem.scores_tight",
     "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit",
     "Descent.Portability.RademacherArrayWeakLimit.rows_tight",
     "Descent.Portability.RademacherJointLimit.conditional_test_limit",
@@ -279098,14 +279420,24 @@
      "Descent.Portability.CompensatedCharacteristicKernel.continuous_value": [],
      "Descent.Portability.CompensatedCharacteristicKernel.value_bound": [],
      "Descent.Portability.CompensatedCharacteristicKernel.kernel_zero": [],
-     "Descent.Portability.CompensatedCharacteristicKernel.real_quadratic": []
+     "Descent.Portability.CompensatedCharacteristicKernel.real_quadratic": [],
+     "Descent.Portability.HWETiltedKernelLaw.mixture_kernel": [],
+     "Descent.Portability.HWETiltedKernelLaw.realPart_log_amplitude": [],
+     "Descent.Portability.HWETiltedKernelLaw.tilted_kernel_integral": [],
+     "Descent.Portability.SymmetricImageLaw.paired_kernel": [],
+     "Descent.Portability.SymmetricImageLaw.integral_pair_kernel": []
     }
    },
    "mentioned_by": [
     "Descent.Portability.CompensatedCharacteristicKernel.continuous_value",
     "Descent.Portability.CompensatedCharacteristicKernel.kernel_zero",
     "Descent.Portability.CompensatedCharacteristicKernel.real_quadratic",
-    "Descent.Portability.CompensatedCharacteristicKernel.value_bound"
+    "Descent.Portability.CompensatedCharacteristicKernel.value_bound",
+    "Descent.Portability.HWETiltedKernelLaw.mixture_kernel",
+    "Descent.Portability.HWETiltedKernelLaw.realPart_log_amplitude",
+    "Descent.Portability.HWETiltedKernelLaw.tilted_kernel_integral",
+    "Descent.Portability.SymmetricImageLaw.integral_pair_kernel",
+    "Descent.Portability.SymmetricImageLaw.paired_kernel"
    ]
   },
   {
@@ -279141,14 +279473,16 @@
      "Descent.Portability.CompensatedCharacteristicKernel.continuous_value": [],
      "Descent.Portability.CompensatedCharacteristicKernel.value_bound": [],
      "Descent.Portability.CompensatedCharacteristicKernel.kernel_zero": [],
-     "Descent.Portability.CompensatedCharacteristicKernel.imaginary_quadratic": []
+     "Descent.Portability.CompensatedCharacteristicKernel.imaginary_quadratic": [],
+     "Descent.Portability.SymmetricImageLaw.paired_kernel": []
     }
    },
    "mentioned_by": [
     "Descent.Portability.CompensatedCharacteristicKernel.continuous_value",
     "Descent.Portability.CompensatedCharacteristicKernel.imaginary_quadratic",
     "Descent.Portability.CompensatedCharacteristicKernel.kernel_zero",
-    "Descent.Portability.CompensatedCharacteristicKernel.value_bound"
+    "Descent.Portability.CompensatedCharacteristicKernel.value_bound",
+    "Descent.Portability.SymmetricImageLaw.paired_kernel"
    ]
   },
   {
@@ -279529,6 +279863,7 @@
      "Descent.Portability.RatioPoleLaw.gaussian_label_numerator_top_of_slab_mass": [],
      "Descent.Portability.RatioSourceDegeneracy.factorized_ratio_bounds": [],
      "Descent.Portability.momentContinuousFunctional_ne_inverseTraceCertificate": [],
+     "Descent.Portability.SymmetricImageLaw.paired_kernel": [],
      "Descent.Portability.ThresholdPolicyTransport.source_f1_optimum": [],
      "Descent.Portability.ToeplitzPanelIdentification.offMultiplicity_permute": [],
      "Descent.Portability.TrainingNoiseAccuracy.conditionalExpectation_bounds": [],
@@ -279826,6 +280161,7 @@
     "Descent.Portability.RatioPoleLaw.open_neighborhood_pole",
     "Descent.Portability.RatioPoleLaw.ratio_lintegral_top_of_local_slab_mass",
     "Descent.Portability.RatioSourceDegeneracy.factorized_ratio_bounds",
+    "Descent.Portability.SymmetricImageLaw.paired_kernel",
     "Descent.Portability.ThresholdPolicyTransport.source_f1_optimum",
     "Descent.Portability.ToeplitzPanelIdentification.offMultiplicity_permute",
     "Descent.Portability.TrainingNoiseAccuracy.conditionalExpectation_bounds",
@@ -280009,7 +280345,10 @@
      "Descent.Portability.HWECriticalGenerator.finite_generator": [],
      "Descent.Portability.HWECriticalGenerator.integral_critical_kernel": [],
      "Descent.Portability.HWECriticalGenerator.generator_limit": [],
+     "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": [],
      "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic_limit": [],
+     "Descent.Portability.HWETiltedKernelLaw.mixture_kernel": [],
+     "Descent.Portability.HWETiltedKernelLaw.explicit_kernel_generator": [],
      "Descent.Portability.InterleavedMutationExponential.propagate_mass": [],
      "Descent.Portability.InterleavedMutationMeasurability.bind_mass_measurable": [],
      "Descent.Portability.MarkovCoarseGraining.stateLaw_matrix": [],
@@ -280034,6 +280373,8 @@
      "Descent.Portability.StationaryPoissonLaw.stationary_stateLaw": [],
      "Descent.Portability.StoppedGenotypeReadiness.bind_excludes": [],
      "Descent.Portability.StoppedGenotypeRenewal.race_row_first_step": [],
+     "Descent.Portability.SymmetricImageLaw.paired_kernel": [],
+     "Descent.Portability.SymmetricImageLaw.integral_pair_kernel": [],
      "Descent.Portability.WholeGenomeMutationRace.coordinateKernel_mass": []
     },
     "range_lo_thm": [
@@ -280148,7 +280489,10 @@
     "Descent.Portability.HWECriticalGenerator.finite_generator",
     "Descent.Portability.HWECriticalGenerator.generator_limit",
     "Descent.Portability.HWECriticalGenerator.integral_critical_kernel",
+    "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw",
     "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic_limit",
+    "Descent.Portability.HWETiltedKernelLaw.explicit_kernel_generator",
+    "Descent.Portability.HWETiltedKernelLaw.mixture_kernel",
     "Descent.Portability.InterleavedMutationExponential.propagate_mass",
     "Descent.Portability.InterleavedMutationMeasurability.bind_mass_measurable",
     "Descent.Portability.MarkovCoarseGraining.stateLaw_matrix",
@@ -280177,9 +280521,157 @@
     "Descent.Portability.StationaryPoissonLaw.stationary_stateLaw",
     "Descent.Portability.StoppedGenotypeReadiness.bind_excludes",
     "Descent.Portability.StoppedGenotypeRenewal.race_row_first_step",
+    "Descent.Portability.SymmetricImageLaw.integral_pair_kernel",
+    "Descent.Portability.SymmetricImageLaw.paired_kernel",
     "Descent.Portability.WholeGenomeMutationRace.coordinateKernel_mass",
     "Descent.Portability.aggregateCalibrationMoment_eq_indexWiseCalibrationMoment",
     "Descent.Portability.indexWiseCalibrationMoment_at_zero_weight"
+   ]
+  },
+  {
+   "name": "Descent.Portability.CompoundPoissonMarkLaw.markSum",
+   "decl_name": "markSum",
+   "short": "markSum",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/CompoundPoissonMarkLaw.lean",
+   "line": 24,
+   "signature": "(μ : ProbabilityMeasure ℝ) : ℕ → Measure ℝ",
+   "args": [
+    {
+     "names": [
+      "μ"
+     ],
+     "type": "ProbabilityMeasure ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℕ → Measure ℝ",
+   "body": "| 0 => Measure.dirac 0\n  | k + 1 => (μ : Measure ℝ) ∗ markSum μ k",
+   "docstring": "The law of k independent marks added together.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.CompoundPoissonMarkLaw",
+   "fields": [],
+   "equations": [
+    {
+     "pattern": "0",
+     "rhs": "Measure.dirac 0"
+    },
+    {
+     "pattern": "k + 1",
+     "rhs": "(μ : Measure ℝ) ∗ markSum μ k"
+    }
+   ],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.CompoundPoissonMarkLaw.charFun_markSum": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.CompoundPoissonMarkLaw.charFun_markSum"
+   ]
+  },
+  {
+   "name": "Descent.Portability.CompoundPoissonMarkLaw.compoundMeasure",
+   "decl_name": "compoundMeasure",
+   "short": "compoundMeasure",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/CompoundPoissonMarkLaw.lean",
+   "line": 45,
+   "signature": "(r : ℝ≥0) (μ : ProbabilityMeasure ℝ) : Measure ℝ",
+   "args": [
+    {
+     "names": [
+      "r"
+     ],
+     "type": "ℝ≥0",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "μ"
+     ],
+     "type": "ProbabilityMeasure ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "Measure ℝ",
+   "body": "  Measure.sum (fun k : ℕ ↦ ENNReal.ofReal (poissonPMFReal r k) • markSum μ k)",
+   "docstring": "The normalized count mixture defining a genuine compound-Poisson probability law.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.CompoundPoissonMarkLaw",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "probability",
+    "declared_lo": 0.0,
+    "declared_hi": 1.0,
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.BalancedHWECompoundPoisson.integral_compoundMeasure": [],
+     "Descent.Portability.BalancedHWECompoundPoisson.finite_intensity_weak_convergence": [],
+     "Descent.Portability.CompoundPoissonMarkLaw.charFun_compoundMeasure": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.BalancedHWECompoundPoisson.finite_intensity_weak_convergence",
+    "Descent.Portability.BalancedHWECompoundPoisson.integral_compoundMeasure",
+    "Descent.Portability.CompoundPoissonMarkLaw.charFun_compoundMeasure"
+   ]
+  },
+  {
+   "name": "Descent.Portability.CompoundPoissonMarkLaw.compoundProbability",
+   "decl_name": "compoundProbability",
+   "short": "compoundProbability",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/CompoundPoissonMarkLaw.lean",
+   "line": 57,
+   "signature": "(r : ℝ≥0) (μ : ProbabilityMeasure ℝ) : ProbabilityMeasure ℝ",
+   "args": [
+    {
+     "names": [
+      "r"
+     ],
+     "type": "ℝ≥0",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "μ"
+     ],
+     "type": "ProbabilityMeasure ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ProbabilityMeasure ℝ",
+   "body": " ⟨compoundMeasure r μ, inferInstance⟩",
+   "docstring": "",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.CompoundPoissonMarkLaw",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "0 < r"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.BalancedHWECompoundPoisson.finite_intensity_weak_convergence": [],
+     "Descent.Portability.BalancedHWECompoundPoisson.normalized_compoundPoisson_limit": [
+      "0 < r"
+     ]
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.BalancedHWECompoundPoisson.finite_intensity_weak_convergence",
+    "Descent.Portability.BalancedHWECompoundPoisson.normalized_compoundPoisson_limit"
    ]
   },
   {
@@ -285071,6 +285563,8 @@
      "Descent.Portability.FirthFiniteIterationLaw.rawUpdate_solves_information": [],
      "Descent.Portability.HWECriticalScoreCharacteristic.score_mean": [],
      "Descent.Portability.HWECriticalScoreCharacteristic.score_second": [],
+     "Descent.Portability.HWENearBalancedTheorem.score_second_bound": [],
+     "Descent.Portability.HWENearBalancedTheorem.scores_tight": [],
      "Descent.Portability.MeasurePortabilityLaw.squaredCorrelation_eq_none_of_not_memLp": [],
      "Descent.Portability.MechanismIdentification.common_accuracy": [],
      "Descent.Portability.MechanismIdentification.score_construction_changes_accuracy": [],
@@ -285144,6 +285638,8 @@
     "Descent.Portability.FirthFiniteIterationLaw.rawUpdate_solves_information",
     "Descent.Portability.HWECriticalScoreCharacteristic.score_mean",
     "Descent.Portability.HWECriticalScoreCharacteristic.score_second",
+    "Descent.Portability.HWENearBalancedTheorem.score_second_bound",
+    "Descent.Portability.HWENearBalancedTheorem.scores_tight",
     "Descent.Portability.MeasurePortabilityLaw.squaredCorrelation_eq_none_of_not_memLp",
     "Descent.Portability.MechanismIdentification.common_accuracy",
     "Descent.Portability.MechanismIdentification.score_construction_changes_accuracy",
@@ -301192,6 +301688,7 @@
      "Descent.Portability.HWEInteractionLaw.characteristic_im": [],
      "Descent.Portability.HWEInteractionLaw.interaction_mean_zero": [],
      "Descent.Portability.HWEInteractionLaw.interaction_second_moment": [],
+     "Descent.Portability.HWENearBalancedTheorem.score_second_bound": [],
      "Descent.Portability.IIDBinExperiment.label_mean": [],
      "Descent.Portability.IIDBinExperiment.expectation_assignments": [],
      "Descent.Portability.IIDBinExperiment.assigned_confidence": [],
@@ -301542,6 +302039,7 @@
     "Descent.Portability.HWEInteractionLaw.expectation_independent_product",
     "Descent.Portability.HWEInteractionLaw.interaction_mean_zero",
     "Descent.Portability.HWEInteractionLaw.interaction_second_moment",
+    "Descent.Portability.HWENearBalancedTheorem.score_second_bound",
     "Descent.Portability.IIDBinExperiment.assigned_confidence",
     "Descent.Portability.IIDBinExperiment.expectation_assignments",
     "Descent.Portability.IIDBinExperiment.iid_confidence",
@@ -310517,6 +311015,7 @@
      "Descent.Portability.HWEInteractionLaw.characteristic_independent_sum": [],
      "Descent.Portability.HWEInteractionLaw.interaction_mean_zero": [],
      "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass": [],
+     "Descent.Portability.HWENearBalancedTheorem.score_second_bound": [],
      "Descent.Portability.IIDBinExperiment.expectation_assignments": [],
      "Descent.Portability.IIDBinExperiment.assigned_confidence": [],
      "Descent.Portability.IIDBinExperiment.iid_confidence": [],
@@ -310594,6 +311093,7 @@
     "Descent.Portability.HWEInteractionLaw.expectation_independent_product",
     "Descent.Portability.HWEInteractionLaw.interaction_mean_zero",
     "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass",
+    "Descent.Portability.HWENearBalancedTheorem.score_second_bound",
     "Descent.Portability.IIDBinExperiment.assigned_confidence",
     "Descent.Portability.IIDBinExperiment.expectation_assignments",
     "Descent.Portability.IIDBinExperiment.iid_confidence",
@@ -321060,11 +321560,18 @@
      "Descent.Portability.HWEAmplitudeWeakLimit.integral_blend": [
       "0 ≤ w",
       "w ≤ 1"
+     ],
+     "Descent.Portability.HWEJumpRepresentation.pairLaw_map": [],
+     "Descent.Portability.SymmetricImageLaw.integral_blend_complex": [
+      "0 ≤ w",
+      "w ≤ 1"
      ]
     }
    },
    "mentioned_by": [
-    "Descent.Portability.HWEAmplitudeWeakLimit.integral_blend"
+    "Descent.Portability.HWEAmplitudeWeakLimit.integral_blend",
+    "Descent.Portability.HWEJumpRepresentation.pairLaw_map",
+    "Descent.Portability.SymmetricImageLaw.integral_blend_complex"
    ]
   },
   {
@@ -321104,11 +321611,13 @@
    "constraints": {
     "hypotheses": [],
     "hypotheses_by_theorem": {
-     "Descent.Portability.HWEAmplitudeWeakLimit.integral_lognormal": []
+     "Descent.Portability.HWEAmplitudeWeakLimit.integral_lognormal": [],
+     "Descent.Portability.HWETiltedKernelLaw.signedLognormal_pair": []
     }
    },
    "mentioned_by": [
-    "Descent.Portability.HWEAmplitudeWeakLimit.integral_lognormal"
+    "Descent.Portability.HWEAmplitudeWeakLimit.integral_lognormal",
+    "Descent.Portability.HWETiltedKernelLaw.signedLognormal_pair"
    ]
   },
   {
@@ -321148,11 +321657,13 @@
    "constraints": {
     "hypotheses": [],
     "hypotheses_by_theorem": {
-     "Descent.Portability.HWEAmplitudeWeakLimit.integral_amplitudeLimit": []
+     "Descent.Portability.HWEAmplitudeWeakLimit.integral_amplitudeLimit": [],
+     "Descent.Portability.HWETiltedKernelLaw.signedLognormal_pair": []
     }
    },
    "mentioned_by": [
-    "Descent.Portability.HWEAmplitudeWeakLimit.integral_amplitudeLimit"
+    "Descent.Portability.HWEAmplitudeWeakLimit.integral_amplitudeLimit",
+    "Descent.Portability.HWETiltedKernelLaw.signedLognormal_pair"
    ]
   },
   {
@@ -321190,13 +321701,22 @@
    "fields": [],
    "equations": [],
    "constraints": {
-    "hypotheses": [],
+    "hypotheses": [
+     "c ≠ 0"
+    ],
     "hypotheses_by_theorem": {
      "Descent.Portability.HWEAmplitudeWeakLimit.integral_amplitudeLimit": [],
      "Descent.Portability.HWEAmplitudeWeakLimit.amplitude_weak_limit": [],
      "Descent.Portability.HWECriticalAmplitudeLimit.critical_amplitude_weak_limit": [],
      "Descent.Portability.HWECriticalGenerator.generator_limit": [],
-     "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic_limit": []
+     "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": [
+      "c ≠ 0"
+     ],
+     "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic_limit": [],
+     "Descent.Portability.HWETiltedKernelLaw.mixture_kernel": [],
+     "Descent.Portability.HWETiltedKernelLaw.explicit_kernel_generator": [
+      "c ≠ 0"
+     ]
     }
    },
    "mentioned_by": [
@@ -321204,7 +321724,10 @@
     "Descent.Portability.HWEAmplitudeWeakLimit.integral_amplitudeLimit",
     "Descent.Portability.HWECriticalAmplitudeLimit.critical_amplitude_weak_limit",
     "Descent.Portability.HWECriticalGenerator.generator_limit",
-    "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic_limit"
+    "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw",
+    "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic_limit",
+    "Descent.Portability.HWETiltedKernelLaw.explicit_kernel_generator",
+    "Descent.Portability.HWETiltedKernelLaw.mixture_kernel"
    ]
   },
   {
@@ -321388,6 +321911,14 @@
       "Tendsto (fun m ↦ ∑ i, ((h m i",
       "Tendsto (fun m ↦ intensity m (N m"
      ],
+     "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit": [
+      "(m : ℕ",
+      "∀ m i, 0 < (h m i",
+      "∀ m i, (h m i",
+      "∀ m i, |(h m i",
+      "Tendsto (fun m ↦ ∑ i, ((h m i",
+      "Tendsto (fun m ↦ intensity m (N m"
+     ],
      "Descent.Portability.SignedTransferIdentification.arrayTransfer_generator": [],
      "Descent.Portability.SignedTransferIdentification.positive_next_admissible": [],
      "Descent.Spectral.PhasePanel.resonance_at_zero": [],
@@ -321412,6 +321943,7 @@
     "Descent.Portability.HWECriticalGenerator.block_count_diverges",
     "Descent.Portability.HWECriticalGenerator.generator_limit",
     "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic_limit",
+    "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit",
     "Descent.Portability.SignedTransferIdentification.arrayTransfer_generator",
     "Descent.Portability.SignedTransferIdentification.positive_next_admissible",
     "Descent.Spectral.PhasePanel.intensity_singleton",
@@ -321622,6 +322154,11 @@
       "∀ i, 0 < (h i",
       "∀ i, (h i",
       "0 < N"
+     ],
+     "Descent.Portability.HWENearBalancedTheorem.score_second_bound": [
+      "ι → HardyWeinbergModel",
+      "∀ i, 0 < (h i",
+      "∀ i, (h i"
      ]
     }
    },
@@ -321632,7 +322169,224 @@
     "Descent.Portability.HWECriticalGenerator.integral_critical_kernel",
     "Descent.Portability.HWECriticalGenerator.summand_centered",
     "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic",
-    "Descent.Portability.HWECriticalScoreCharacteristic.score_second"
+    "Descent.Portability.HWECriticalScoreCharacteristic.score_second",
+    "Descent.Portability.HWENearBalancedTheorem.score_second_bound"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWECriticalLimitLaw.gaussianVariance",
+   "decl_name": "gaussianVariance",
+   "short": "gaussianVariance",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/HWECriticalLimitLaw.lean",
+   "line": 27,
+   "signature": "(K : ℝ≥0) : ℝ≥0",
+   "args": [
+    {
+     "names": [
+      "K"
+     ],
+     "type": "ℝ≥0",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ≥0",
+   "body": "  ⟨1 - Real.exp (-4 * (K : ℝ)), sub_nonneg.mpr (weight_bounds K).2⟩",
+   "docstring": "The Gaussian variance created by square-biased mass collapsing to zero.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.HWECriticalLimitLaw",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "nonnegative",
+    "declared_lo": 0.0,
+    "declared_hi": null,
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWECriticalLimitLaw.jumpIntensity",
+   "decl_name": "jumpIntensity",
+   "short": "jumpIntensity",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/HWECriticalLimitLaw.lean",
+   "line": 31,
+   "signature": "(K : ℝ≥0) (c : ℝ) : ℝ≥0",
+   "args": [
+    {
+     "names": [
+      "K"
+     ],
+     "type": "ℝ≥0",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "c"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ℝ≥0",
+   "body": "  ⟨(c ^ 2)⁻¹ * Real.exp (4 * (K : ℝ)), by positivity⟩",
+   "docstring": "The original jump intensity after undoing square bias.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.HWECriticalLimitLaw",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "c ≠ 0"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": [
+      "c ≠ 0"
+     ],
+     "Descent.Portability.HWENearBalancedTheorem.critical_jump_intensity": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw",
+    "Descent.Portability.HWENearBalancedTheorem.critical_jump_intensity"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWECriticalLimitLaw.jumpLaw",
+   "decl_name": "jumpLaw",
+   "short": "jumpLaw",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/HWECriticalLimitLaw.lean",
+   "line": 35,
+   "signature": "(K : ℝ≥0) (c : ℝ) : ProbabilityMeasure ℝ",
+   "args": [
+    {
+     "names": [
+      "K"
+     ],
+     "type": "ℝ≥0",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "c"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ProbabilityMeasure ℝ",
+   "body": "  pairLaw ⟨gaussianReal (8 * (K : ℝ)) (4 * K), inferInstance⟩ (amplitudeMap c)",
+   "docstring": "Fair signed mark c exp(-X), with X Gaussian of mean 8K and variance 4K.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.HWECriticalLimitLaw",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "declared_kind": "nonnegative",
+    "declared_lo": 0.0,
+    "declared_hi": null,
+    "hypotheses": [
+     "c ≠ 0"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Coalescent.jumpKernel_apply": [],
+     "Descent.Coalescent.jumpKernel_absorbing": [],
+     "Descent.Coalescent.jumpLaw_apply_cover": [],
+     "Descent.Coalescent.mem_support_jumpLaw": [],
+     "Descent.Coalescent.mem_support_jumpLaw_of_absorbed": [],
+     "Descent.Coalescent.mem_support_chainLaw_succ": [],
+     "Descent.Portability.AncestralEventLaw.jump_expectation": [],
+     "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": [
+      "c ≠ 0"
+     ],
+     "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation": [],
+     "Descent.Portability.NucleotideMutationLaw.jump_expectation": [],
+     "Descent.Portability.NucleotideMutationLaw.jump_uniformMean": [],
+     "Descent.Portability.NucleotideMutationLaw.count_expectation": [],
+     "Descent.Portability.NucleotideMutationLaw.branch_history_expectation": [],
+     "Descent.Portability.OrderedMutationCatalogue.mutationCount_nucleotide": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Coalescent.jumpKernel_absorbing",
+    "Descent.Coalescent.jumpKernel_apply",
+    "Descent.Coalescent.jumpLaw_apply_cover",
+    "Descent.Coalescent.mem_support_chainLaw_succ",
+    "Descent.Coalescent.mem_support_jumpLaw",
+    "Descent.Coalescent.mem_support_jumpLaw_of_absorbed",
+    "Descent.Portability.AncestralEventLaw.jump_expectation",
+    "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw",
+    "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation",
+    "Descent.Portability.NucleotideMutationLaw.branch_history_expectation",
+    "Descent.Portability.NucleotideMutationLaw.count_expectation",
+    "Descent.Portability.NucleotideMutationLaw.jump_expectation",
+    "Descent.Portability.NucleotideMutationLaw.jump_uniformMean",
+    "Descent.Portability.OrderedMutationCatalogue.mutationCount_nucleotide"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWECriticalLimitLaw.criticalLaw",
+   "decl_name": "criticalLaw",
+   "short": "criticalLaw",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/HWECriticalLimitLaw.lean",
+   "line": 39,
+   "signature": "(K : ℝ≥0) (c : ℝ) : ProbabilityMeasure ℝ",
+   "args": [
+    {
+     "names": [
+      "K"
+     ],
+     "type": "ℝ≥0",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "c"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ProbabilityMeasure ℝ",
+   "body": "  ⟨gaussianReal 0 (gaussianVariance K) ∗ compoundMeasure (jumpIntensity K c) (jumpLaw K c),\n    inferInstance⟩",
+   "docstring": "Independent Gaussian plus the actual Poisson mixture of independent jump marks.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.HWECriticalLimitLaw",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "c ≠ 0"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": [
+      "c ≠ 0"
+     ],
+     "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw",
+    "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit"
    ]
   },
   {
@@ -321711,6 +322465,8 @@
      "∀ i, 0 < (h i",
      "∀ i, (h i",
      "0 < N",
+     "∀ m i, 0 < (h m i",
+     "∀ m i, (h m i",
      "∀ x : Genotype, 0 ≤ genotypeWeight x",
      "∀ x : Genotype, ∑ t, ancestryPosterior x t = 1",
      "∀ (x : Genotype",
@@ -321746,6 +322502,15 @@
       "∀ i, 0 < (h i",
       "∀ i, (h i",
       "0 < N"
+     ],
+     "Descent.Portability.HWENearBalancedTheorem.score_second_bound": [
+      "ι → HardyWeinbergModel",
+      "∀ i, 0 < (h i",
+      "∀ i, (h i"
+     ],
+     "Descent.Portability.HWENearBalancedTheorem.scores_tight": [
+      "∀ m i, 0 < (h m i",
+      "∀ m i, (h m i"
      ],
      "Descent.Portability.MeasurePortabilityLaw.squaredCorrelation_eq_none_of_not_memLp": [],
      "Descent.Portability.MechanismIdentification.common_accuracy": [],
@@ -321831,6 +322596,8 @@
     "Descent.Portability.FirthFiniteIterationLaw.rawUpdate_solves_information",
     "Descent.Portability.HWECriticalScoreCharacteristic.score_mean",
     "Descent.Portability.HWECriticalScoreCharacteristic.score_second",
+    "Descent.Portability.HWENearBalancedTheorem.score_second_bound",
+    "Descent.Portability.HWENearBalancedTheorem.scores_tight",
     "Descent.Portability.MeasurePortabilityLaw.squaredCorrelation_eq_none_of_not_memLp",
     "Descent.Portability.MechanismIdentification.common_accuracy",
     "Descent.Portability.MechanismIdentification.score_construction_changes_accuracy",
@@ -321951,12 +322718,25 @@
       "∀ m i, |(h m i",
       "Tendsto (fun m ↦ ∑ i, ((h m i",
       "Tendsto (fun m ↦ intensity m (N m"
+     ],
+     "Descent.Portability.HWENearBalancedTheorem.scores_tight": [
+      "∀ m i, 0 < (h m i",
+      "∀ m i, (h m i"
+     ],
+     "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit": [
+      "∀ m i, 0 < (h m i",
+      "∀ m i, (h m i",
+      "∀ m i, |(h m i",
+      "Tendsto (fun m ↦ ∑ i, ((h m i",
+      "Tendsto (fun m ↦ intensity m (N m"
      ]
     }
    },
    "mentioned_by": [
     "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic",
-    "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic_limit"
+    "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic_limit",
+    "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit",
+    "Descent.Portability.HWENearBalancedTheorem.scores_tight"
    ]
   },
   {
@@ -323816,6 +324596,9 @@
      "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass": [
       "ι → HardyWeinbergModel"
      ],
+     "Descent.Portability.HWENearBalancedTheorem.score_second_bound": [
+      "ι → HardyWeinbergModel"
+     ],
      "Descent.Portability.IIDBinExperiment.expectation_assignments": [],
      "Descent.Portability.IIDBinExperiment.assigned_confidence": [
       "0 < α ∧ α < 1"
@@ -323897,6 +324680,7 @@
     "Descent.Portability.HWEInteractionLaw.expectation_independent_product",
     "Descent.Portability.HWEInteractionLaw.interaction_mean_zero",
     "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass",
+    "Descent.Portability.HWENearBalancedTheorem.score_second_bound",
     "Descent.Portability.IIDBinExperiment.assigned_confidence",
     "Descent.Portability.IIDBinExperiment.expectation_assignments",
     "Descent.Portability.IIDBinExperiment.iid_confidence",
@@ -324218,6 +325002,11 @@
       "ι → HardyWeinbergModel",
       "∀ i, 0 < (h i",
       "∀ i, (h i"
+     ],
+     "Descent.Portability.HWENearBalancedTheorem.score_second_bound": [
+      "ι → HardyWeinbergModel",
+      "∀ i, 0 < (h i",
+      "∀ i, (h i"
      ]
     }
    },
@@ -324248,7 +325037,8 @@
     "Descent.Portability.HWECriticalScoreCharacteristic.score_second",
     "Descent.Portability.HWEInteractionLaw.interaction_mean_zero",
     "Descent.Portability.HWEInteractionLaw.interaction_second_moment",
-    "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass"
+    "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass",
+    "Descent.Portability.HWENearBalancedTheorem.score_second_bound"
    ]
   },
   {
@@ -324638,6 +325428,86 @@
    ]
   },
   {
+   "name": "Descent.Portability.HWEJumpRepresentation.logCoordinateMap",
+   "decl_name": "logCoordinateMap",
+   "short": "logCoordinateMap",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/HWEJumpRepresentation.lean",
+   "line": 33,
+   "signature": "(K : ℝ≥0) : C(ℝ, ℝ)",
+   "args": [
+    {
+     "names": [
+      "K"
+     ],
+     "type": "ℝ≥0",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "C(ℝ, ℝ)",
+   "body": "  ⟨fun z ↦ (-2 * Real.sqrt (K : ℝ)) * z + 8 * (K : ℝ), by fun_prop⟩",
+   "docstring": "The Gaussian coordinate whose negative gives the report's log mark.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.HWEJumpRepresentation",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.HWEJumpRepresentation.gaussian_coordinate_image": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.HWEJumpRepresentation.gaussian_coordinate_image"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWEJumpRepresentation.standardMarkMap",
+   "decl_name": "standardMarkMap",
+   "short": "standardMarkMap",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/HWEJumpRepresentation.lean",
+   "line": 52,
+   "signature": "(K : ℝ≥0) (c : ℝ) : C(ℝ, ℝ)",
+   "args": [
+    {
+     "names": [
+      "K"
+     ],
+     "type": "ℝ≥0",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "c"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "C(ℝ, ℝ)",
+   "body": "  ⟨fun z ↦ c * Real.exp (-8 * (K : ℝ) + 2 * Real.sqrt (K : ℝ) * z), by fun_prop⟩",
+   "docstring": "The exact standard-Gaussian map appearing in the report's signed jump formula.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.HWEJumpRepresentation",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation"
+   ]
+  },
+  {
    "name": "Descent.Portability.HWELogCoordinates.coordinate",
    "decl_name": "coordinate",
    "short": "coordinate",
@@ -325009,6 +325879,50 @@
     "Descent.Portability.pooledMAFKilledDualTerminalVector_dot_bernstein",
     "Descent.Portability.pooledMAFKilledDualTerminalVector_nonneg",
     "Descent.Spectral.completion_count_lower_bound"
+   ]
+  },
+  {
+   "name": "Descent.Portability.HWETiltedKernelLaw.amplitudeMap",
+   "decl_name": "amplitudeMap",
+   "short": "amplitudeMap",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/HWETiltedKernelLaw.lean",
+   "line": 25,
+   "signature": "(c : ℝ) : C(ℝ, ℝ)",
+   "args": [
+    {
+     "names": [
+      "c"
+     ],
+     "type": "ℝ",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "C(ℝ, ℝ)",
+   "body": "  ⟨fun x ↦ c * Real.exp (-x), by fun_prop⟩",
+   "docstring": "Continuous amplitude map used for both tilted and original jump marks.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.HWETiltedKernelLaw",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [
+     "c ≠ 0"
+    ],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": [
+      "c ≠ 0"
+     ],
+     "Descent.Portability.HWETiltedKernelLaw.signedLognormal_pair": [],
+     "Descent.Portability.HWETiltedKernelLaw.mixture_kernel": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw",
+    "Descent.Portability.HWETiltedKernelLaw.mixture_kernel",
+    "Descent.Portability.HWETiltedKernelLaw.signedLognormal_pair"
    ]
   },
   {
@@ -337803,6 +338717,8 @@
      "Descent.Coalescent.mem_support_jumpLaw_of_absorbed": [],
      "Descent.Coalescent.mem_support_chainLaw_succ": [],
      "Descent.Portability.AncestralEventLaw.jump_expectation": [],
+     "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": [],
+     "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation": [],
      "Descent.Portability.NucleotideMutationLaw.jump_expectation": [],
      "Descent.Portability.NucleotideMutationLaw.jump_uniformMean": [],
      "Descent.Portability.NucleotideMutationLaw.count_expectation": [],
@@ -337818,6 +338734,8 @@
     "Descent.Coalescent.mem_support_jumpLaw",
     "Descent.Coalescent.mem_support_jumpLaw_of_absorbed",
     "Descent.Portability.AncestralEventLaw.jump_expectation",
+    "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw",
+    "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation",
     "Descent.Portability.NucleotideMutationLaw.branch_history_expectation",
     "Descent.Portability.NucleotideMutationLaw.count_expectation",
     "Descent.Portability.NucleotideMutationLaw.jump_expectation",
@@ -366103,6 +367021,8 @@
      "Descent.Portability.FirthFiniteIterationLaw.rawUpdate_solves_information": [],
      "Descent.Portability.HWECriticalScoreCharacteristic.score_mean": [],
      "Descent.Portability.HWECriticalScoreCharacteristic.score_second": [],
+     "Descent.Portability.HWENearBalancedTheorem.score_second_bound": [],
+     "Descent.Portability.HWENearBalancedTheorem.scores_tight": [],
      "Descent.Portability.MeasurePortabilityLaw.squaredCorrelation_eq_none_of_not_memLp": [],
      "Descent.Portability.MechanismIdentification.common_accuracy": [],
      "Descent.Portability.MechanismIdentification.score_construction_changes_accuracy": [],
@@ -366183,6 +367103,8 @@
     "Descent.Portability.FirthFiniteIterationLaw.rawUpdate_solves_information",
     "Descent.Portability.HWECriticalScoreCharacteristic.score_mean",
     "Descent.Portability.HWECriticalScoreCharacteristic.score_second",
+    "Descent.Portability.HWENearBalancedTheorem.score_second_bound",
+    "Descent.Portability.HWENearBalancedTheorem.scores_tight",
     "Descent.Portability.MeasurePortabilityLaw.squaredCorrelation_eq_none_of_not_memLp",
     "Descent.Portability.MechanismIdentification.common_accuracy",
     "Descent.Portability.MechanismIdentification.score_construction_changes_accuracy",
@@ -369597,13 +370519,21 @@
    "constraints": {
     "hypotheses": [],
     "hypotheses_by_theorem": {
+     "Descent.Portability.HWEJumpRepresentation.gaussian_coordinate_image": [],
+     "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation": [],
      "Descent.Portability.HWELogCoordinates.fair_log_profile_limit": [],
+     "Descent.Portability.HWETiltedKernelLaw.signedLognormal_pair": [],
+     "Descent.Portability.HWETiltedKernelLaw.mixture_kernel": [],
      "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit": [],
      "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit": []
     }
    },
    "mentioned_by": [
+    "Descent.Portability.HWEJumpRepresentation.gaussian_coordinate_image",
+    "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation",
     "Descent.Portability.HWELogCoordinates.fair_log_profile_limit",
+    "Descent.Portability.HWETiltedKernelLaw.mixture_kernel",
+    "Descent.Portability.HWETiltedKernelLaw.signedLognormal_pair",
     "Descent.Portability.RademacherArrayWeakLimit.gaussian_weak_limit",
     "Descent.Portability.RademacherParityWeakLimit.conditional_gaussian_limit"
    ]
@@ -373382,7 +374312,10 @@
      "Descent.Portability.HWECriticalGenerator.finite_generator": [],
      "Descent.Portability.HWECriticalGenerator.integral_critical_kernel": [],
      "Descent.Portability.HWECriticalGenerator.generator_limit": [],
+     "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw": [],
      "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic_limit": [],
+     "Descent.Portability.HWETiltedKernelLaw.mixture_kernel": [],
+     "Descent.Portability.HWETiltedKernelLaw.explicit_kernel_generator": [],
      "Descent.Portability.InterleavedMutationExponential.propagate_mass": [],
      "Descent.Portability.InterleavedMutationMeasurability.bind_mass_measurable": [],
      "Descent.Portability.MarkovCoarseGraining.stateLaw_matrix": [],
@@ -373414,6 +374347,8 @@
      "Descent.Portability.StationaryPoissonLaw.stationary_stateLaw": [],
      "Descent.Portability.StoppedGenotypeReadiness.bind_excludes": [],
      "Descent.Portability.StoppedGenotypeRenewal.race_row_first_step": [],
+     "Descent.Portability.SymmetricImageLaw.paired_kernel": [],
+     "Descent.Portability.SymmetricImageLaw.integral_pair_kernel": [],
      "Descent.Portability.WholeGenomeMutationRace.coordinateKernel_mass": []
     },
     "range_lo_thm": [
@@ -373528,7 +374463,10 @@
     "Descent.Portability.HWECriticalGenerator.finite_generator",
     "Descent.Portability.HWECriticalGenerator.generator_limit",
     "Descent.Portability.HWECriticalGenerator.integral_critical_kernel",
+    "Descent.Portability.HWECriticalLimitLaw.charFun_criticalLaw",
     "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic_limit",
+    "Descent.Portability.HWETiltedKernelLaw.explicit_kernel_generator",
+    "Descent.Portability.HWETiltedKernelLaw.mixture_kernel",
     "Descent.Portability.InterleavedMutationExponential.propagate_mass",
     "Descent.Portability.InterleavedMutationMeasurability.bind_mass_measurable",
     "Descent.Portability.MarkovCoarseGraining.stateLaw_matrix",
@@ -373557,6 +374495,8 @@
     "Descent.Portability.StationaryPoissonLaw.stationary_stateLaw",
     "Descent.Portability.StoppedGenotypeReadiness.bind_excludes",
     "Descent.Portability.StoppedGenotypeRenewal.race_row_first_step",
+    "Descent.Portability.SymmetricImageLaw.integral_pair_kernel",
+    "Descent.Portability.SymmetricImageLaw.paired_kernel",
     "Descent.Portability.WholeGenomeMutationRace.coordinateKernel_mass",
     "Descent.Portability.aggregateCalibrationMoment_eq_indexWiseCalibrationMoment",
     "Descent.Portability.indexWiseCalibrationMoment_at_zero_weight"
@@ -385648,6 +386588,60 @@
    ]
   },
   {
+   "name": "Descent.Portability.SymmetricImageLaw.pairLaw",
+   "decl_name": "pairLaw",
+   "short": "pairLaw",
+   "kind": "def",
+   "noncomputable": true,
+   "file": "Descent/Portability/SymmetricImageLaw.lean",
+   "line": 38,
+   "signature": "(μ : ProbabilityMeasure ℝ) (g : C(ℝ, ℝ)) : ProbabilityMeasure ℝ",
+   "args": [
+    {
+     "names": [
+      "μ"
+     ],
+     "type": "ProbabilityMeasure ℝ",
+     "binder": "()",
+     "implicit": false
+    },
+    {
+     "names": [
+      "g"
+     ],
+     "type": "C(ℝ, ℝ)",
+     "binder": "()",
+     "implicit": false
+    }
+   ],
+   "ret_type": "ProbabilityMeasure ℝ",
+   "body": "  blend (1 / 2) (by norm_num) (by norm_num)\n    (μ.map g.continuous.measurable.aemeasurable)\n    (μ.map (show AEMeasurable (fun x ↦ -g x) _ by fun_prop))",
+   "docstring": "The continuous image multiplied by an independent fair sign.",
+   "empirical_status": "",
+   "namespace": "Descent.Portability.SymmetricImageLaw",
+   "fields": [],
+   "equations": [],
+   "constraints": {
+    "hypotheses": [],
+    "hypotheses_by_theorem": {
+     "Descent.Portability.HWEJumpRepresentation.pairLaw_map": [],
+     "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation": [],
+     "Descent.Portability.HWETiltedKernelLaw.signedLognormal_pair": [],
+     "Descent.Portability.SymmetricImageLaw.integral_pairLaw": [],
+     "Descent.Portability.SymmetricImageLaw.charFun_pairLaw": [],
+     "Descent.Portability.SymmetricImageLaw.integral_pair_kernel": []
+    }
+   },
+   "mentioned_by": [
+    "Descent.Portability.HWEJumpRepresentation.jumpLaw_standard_representation",
+    "Descent.Portability.HWEJumpRepresentation.pairLaw_map",
+    "Descent.Portability.HWETiltedKernelLaw.signedLognormal_pair",
+    "Descent.Portability.SymmetricImageLaw.charFun_pairLaw",
+    "Descent.Portability.SymmetricImageLaw.integral_pairLaw",
+    "Descent.Portability.SymmetricImageLaw.integral_pair_kernel"
+   ]
+  },
+  {
    "name": "Descent.Portability.TargetUncertainty.UniformBound",
    "decl_name": "UniformBound",
    "short": "UniformBound",
@@ -386665,6 +387659,8 @@
      "Descent.Portability.FirthFiniteIterationLaw.rawUpdate_solves_information": [],
      "Descent.Portability.HWECriticalScoreCharacteristic.score_mean": [],
      "Descent.Portability.HWECriticalScoreCharacteristic.score_second": [],
+     "Descent.Portability.HWENearBalancedTheorem.score_second_bound": [],
+     "Descent.Portability.HWENearBalancedTheorem.scores_tight": [],
      "Descent.Portability.MeasurePortabilityLaw.squaredCorrelation_eq_none_of_not_memLp": [],
      "Descent.Portability.MechanismIdentification.common_accuracy": [],
      "Descent.Portability.MechanismIdentification.score_construction_changes_accuracy": [],
@@ -386738,6 +387734,8 @@
     "Descent.Portability.FirthFiniteIterationLaw.rawUpdate_solves_information",
     "Descent.Portability.HWECriticalScoreCharacteristic.score_mean",
     "Descent.Portability.HWECriticalScoreCharacteristic.score_second",
+    "Descent.Portability.HWENearBalancedTheorem.score_second_bound",
+    "Descent.Portability.HWENearBalancedTheorem.scores_tight",
     "Descent.Portability.MeasurePortabilityLaw.squaredCorrelation_eq_none_of_not_memLp",
     "Descent.Portability.MechanismIdentification.common_accuracy",
     "Descent.Portability.MechanismIdentification.score_construction_changes_accuracy",
@@ -393268,6 +394266,7 @@
      "Descent.Portability.HWEInteractionLaw.characteristic_im": [],
      "Descent.Portability.HWEInteractionLaw.interaction_mean_zero": [],
      "Descent.Portability.HWEInteractionLaw.interaction_second_moment": [],
+     "Descent.Portability.HWENearBalancedTheorem.score_second_bound": [],
      "Descent.Portability.IIDBinExperiment.label_mean": [],
      "Descent.Portability.IIDBinExperiment.expectation_assignments": [],
      "Descent.Portability.IIDBinExperiment.assigned_confidence": [],
@@ -393626,6 +394625,7 @@
     "Descent.Portability.HWEInteractionLaw.expectation_independent_product",
     "Descent.Portability.HWEInteractionLaw.interaction_mean_zero",
     "Descent.Portability.HWEInteractionLaw.interaction_second_moment",
+    "Descent.Portability.HWENearBalancedTheorem.score_second_bound",
     "Descent.Portability.IIDBinExperiment.assigned_confidence",
     "Descent.Portability.IIDBinExperiment.expectation_assignments",
     "Descent.Portability.IIDBinExperiment.iid_confidence",
@@ -394618,6 +395618,7 @@
      "Descent.Portability.HWEInteractionLaw.characteristic_independent_sum": [],
      "Descent.Portability.HWEInteractionLaw.interaction_mean_zero": [],
      "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass": [],
+     "Descent.Portability.HWENearBalancedTheorem.score_second_bound": [],
      "Descent.Portability.IIDBinExperiment.expectation_assignments": [],
      "Descent.Portability.IIDBinExperiment.assigned_confidence": [],
      "Descent.Portability.IIDBinExperiment.iid_confidence": [],
@@ -394695,6 +395696,7 @@
     "Descent.Portability.HWEInteractionLaw.expectation_independent_product",
     "Descent.Portability.HWEInteractionLaw.interaction_mean_zero",
     "Descent.Portability.HWEInteractionLaw.squareBiasedBlock_mass",
+    "Descent.Portability.HWENearBalancedTheorem.score_second_bound",
     "Descent.Portability.IIDBinExperiment.assigned_confidence",
     "Descent.Portability.IIDBinExperiment.expectation_assignments",
     "Descent.Portability.IIDBinExperiment.iid_confidence",
@@ -405892,6 +406894,7 @@
      "Descent.Portability.HWECriticalGenerator.block_count_diverges": [],
      "Descent.Portability.HWECriticalGenerator.generator_limit": [],
      "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic_limit": [],
+     "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit": [],
      "Descent.Portability.SignedTransferIdentification.arrayTransfer_generator": [],
      "Descent.Portability.SignedTransferIdentification.positive_next_admissible": [],
      "Descent.Spectral.PhasePanel.resonance_at_zero": [],
@@ -405918,6 +406921,7 @@
     "Descent.Portability.HWECriticalGenerator.block_count_diverges",
     "Descent.Portability.HWECriticalGenerator.generator_limit",
     "Descent.Portability.HWECriticalScoreCharacteristic.score_characteristic_limit",
+    "Descent.Portability.HWENearBalancedTheorem.near_balanced_weak_limit",
     "Descent.Portability.SignedTransferIdentification.arrayTransfer_generator",
     "Descent.Portability.SignedTransferIdentification.positive_next_admissible",
     "Descent.Spectral.PhasePanel.intensity_singleton",
