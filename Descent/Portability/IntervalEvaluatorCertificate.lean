@@ -80,7 +80,7 @@ structure IntervalEvaluator (integrand : Ω → ℝ) (bound : ℝ) where
     Tendsto (fun stage ↦ upper stage state - lower stage state) atTop (nhds 0)
 
 /-- The stage-indexed slack of the inhabiting evaluator. -/
-def slack (stage : ℕ) : ℝ := 1 / ((stage : ℝ) + 1)
+noncomputable def slack (stage : ℕ) : ℝ := 1 / ((stage : ℝ) + 1)
 
 theorem slack_pos (stage : ℕ) : 0 < slack stage := by
   rw [slack]
@@ -97,8 +97,8 @@ theorem tendsto_slack : Tendsto (fun stage : ℕ ↦ 2 * slack stage) atTop (nhd
 /-- Every bounded measurable integrand carries an evaluator whose brackets are strictly
 wider than it at every stage and close only in the limit, so the hypothesis class is
 inhabited by a nondegenerate evaluator rather than merely assumed nonempty. -/
-def slackEvaluator (integrand : Ω → ℝ) (bound : ℝ) (hmeasurable : Measurable integrand)
-    (hbound : ∀ state, |integrand state| ≤ bound) :
+noncomputable def slackEvaluator (integrand : Ω → ℝ) (bound : ℝ)
+    (hmeasurable : Measurable integrand) (hbound : ∀ state, |integrand state| ≤ bound) :
     IntervalEvaluator integrand (bound + 1) where
   lower := fun stage state ↦ integrand state - slack stage
   upper := fun stage state ↦ integrand state + slack stage
@@ -343,7 +343,7 @@ theorem dyadic_sum_le_one_of_length_le : ∀ (depth : ℕ) (words : Finset (List
           have hflag : first = flag := by
             have hhd := hhead word hword
             rw [hshape] at hhd
-            simpa using hhd
+            exact hhd
           rw [hshape]
           simp [hflag]
         have hlen : ∀ word ∈ branch, word.length = word.tail.length + 1 := by
@@ -437,6 +437,7 @@ theorem haltingSublaw_missingMass {Report : Type*} [Fintype Report] [DecidableEq
       1 - ∑ word ∈ words, (1 / 2 : ℝ) ^ word.length := by
   rw [SublawReportCertificate.ReportSublaw.missingMass]
   congr 1
-  exact Finset.sum_fiberwise_of_maps_to (fun word _ ↦ Finset.mem_univ (report word)) _
+  exact Finset.sum_fiberwise_of_maps_to (s := words)
+    (fun word _ ↦ Finset.mem_univ (report word)) fun word ↦ (1 / 2 : ℝ) ^ word.length
 
 end Descent.Portability.IntervalEvaluatorCertificate
