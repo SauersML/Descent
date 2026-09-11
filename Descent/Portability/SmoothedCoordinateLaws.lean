@@ -19,19 +19,24 @@ noise moments, so two coordinate laws agreeing through degree `k` still agree th
 degree `k` after both are smoothed with the same `ε`. This is the manuscript's own
 binomial-expansion step for equation (7.7), and it is exact, not asymptotic.
 
-Second, the smoothed law is absolutely continuous with a density bounded by `1/(2ε)`:
-the density is the `p`-weighted sum of the indicators of the windows `[v z - ε, v z + ε]`,
-normalized, and it integrates to one.
+Second, the smoothed law is an honest measure, `smoothedLaw`: the `p`-weighted mixture of
+the uniform laws on the windows `[v z - ε, v z + ε]`. It is a probability measure,
+absolutely continuous with respect to Lebesgue measure, its raw moments are the convolved
+moment formula, and the density realizing it, `smoothDensity`, is nonnegative, bounded by
+`1/(2ε)` and integrates to one. So the two coordinate laws of PL Theorem 7.4 really are
+absolutely continuous with bounded densities and really do share their raw moments through
+degree `k`.
 
 ## Scope
 
-What is NOT proved here, and remains the single open item of the obstruction package: the
-product of the smoothed marginals over the coordinates, and the convergence of the
-expected fitted report under that product law to the finitely supported value. The latter
-needs the report's almost-everywhere continuity off the Lebesgue-null zero set of its
-denominator together with dominated convergence, neither of which is formalized. The
-finitely supported, genuinely independent core is
-`IndependentRadialLaws.independent_radial_obstruction`.
+What is NOT proved here, and is the single open item of the obstruction package: the
+product of these smoothed marginals over the coordinates, and the convergence of the
+expected fitted report under that product law to the finitely supported value. The first
+is `MeasureTheory.Measure.pi` together with the factorization of a coordinatewise product
+integral; the second needs the report's continuity at each atom of the finitely supported
+law, which holds because the denominator is nonzero there, together with dominated
+convergence as `ε → 0`. Neither is formalized. The finitely supported, genuinely
+independent core is `IndependentRadialLaws.independent_radial_obstruction`.
 
 ## Empirical status
 
