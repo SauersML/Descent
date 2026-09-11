@@ -99,6 +99,7 @@ theorem report_region_eq_convexHull (g : Ω → Fin N → ℝ) :
         rw [← Finset.sum_add_distrib]
         exact Finset.sum_congr rfl fun ω _ ↦ by ring
 
+omit [Fintype Ω] [DecidableEq Ω] in
 /-- **PL (9.5), the finite-witness clause.**  Every achievable point of the joint region is
 realized by a law on at most `N + 1` states, all with strictly positive weight.  With the
 features in the first block and the reports in the second this is the manuscript's `m + r + 1`
@@ -160,7 +161,7 @@ theorem neg_finset_sum {ι : Type*} [Fintype ι] (F : ι → ℝ) : -(∑ i, F i
 vector-valued observable are exactly the convex hull of its pointwise values.  The version for
 `Fin N → ℝ` above is this statement read coordinatewise. -/
 theorem region_eq_convexHull_of_module {E : Type*} [AddCommGroup E] [Module ℝ E] (g : Ω → E) :
-    {y : E | ∃ (p : Ω → ℝ) (hp : ∀ ω, 0 ≤ p ω) (hs : ∑ ω, p ω = 1), y = ∑ ω, p ω • g ω}
+    {y : E | ∃ (p : Ω → ℝ) (_ : ∀ ω, 0 ≤ p ω) (_ : ∑ ω, p ω = 1), y = ∑ ω, p ω • g ω}
       = convexHull ℝ (Set.range g) := by
   apply Set.Subset.antisymm
   · rintro y ⟨p, hp, hs, rfl⟩
@@ -196,6 +197,7 @@ def dualValues (h : Ω → Fin m → ℝ) (f : Ω → ℝ) (c : Fin m → ℝ)
   {v : ℝ | ∃ lam : Fin m → ℝ,
     v = dot lam c + Finset.univ.sup' hΩ fun ω ↦ f ω - dot lam (h ω)}
 
+omit [DecidableEq Ω] in
 /-- The primal achievable values form a compact set: the feasible laws are a closed subset of
 the standard simplex, and the report is a continuous function of the law. -/
 theorem isCompact_primalValues (h : Ω → Fin m → ℝ) (f : Ω → ℝ) (c : Fin m → ℝ) :
@@ -205,11 +207,11 @@ theorem isCompact_primalValues (h : Ω → Fin m → ℝ) (f : Ω → ℝ) (c : 
     exact continuous_finset_sum _ fun ω _ ↦ (continuous_apply ω).mul continuous_const
   have hclosed : IsClosed {p : Ω → ℝ | ∀ j, ∑ ω, p ω * h ω j = c j} := by
     have hset : {p : Ω → ℝ | ∀ j, ∑ ω, p ω * h ω j = c j}
-        = ⋂ j, (fun p : Ω → ℝ ↦ ∑ ω, p ω * h ω j) ⁻¹' {c j} := by
+        = ⋂ j, {p : Ω → ℝ | ∑ ω, p ω * h ω j = c j} := by
       ext p
       simp [Set.mem_iInter]
     rw [hset]
-    exact isClosed_iInter fun j ↦ (hcont fun ω ↦ h ω j).isClosed_preimage _ isClosed_singleton
+    exact isClosed_iInter fun j ↦ isClosed_eq (hcont fun ω ↦ h ω j) continuous_const
   have himage : primalValues h f c
       = (fun p : Ω → ℝ ↦ ∑ ω, p ω * f ω) ''
           (stdSimplex ℝ Ω ∩ {p : Ω → ℝ | ∀ j, ∑ ω, p ω * h ω j = c j}) := by
@@ -311,7 +313,6 @@ theorem primal_max_eq_dual_inf (h : Ω → Fin m → ℝ) (f : Ω → ℝ) (c : 
       simp only [dot, Descent.Core.innerSum, Finset.mul_sum]
       refine Finset.sum_congr rfl fun j _ ↦ ?_
       field_simp
-      ring
     obtain ⟨ω₀, -, hω₀⟩ := Finset.exists_mem_eq_sup' hΩ fun ω ↦ f ω - dot lam (h ω)
     have hbound : w ≤ dot lam c + Finset.univ.sup' hΩ (fun ω ↦ f ω - dot lam (h ω)) :=
       hw ⟨lam, rfl⟩
