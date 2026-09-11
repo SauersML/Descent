@@ -45,11 +45,13 @@ manuscript's remark that the sign can switch while the square stays one.
 `driftStep_iterate_lump` carries that to every skeleton horizon, so running the nearest-drift
 count chain on a report of the aggregate is running the odd-level chain on that report.
 
-What is not proved here is the continuous-time transfer of the lumping: that
-`exp(t L_*) (f ∘ |2·−n|) = (exp(t L_odd) f) ∘ |2·−n|`, which would chain the skeleton statement
-to `exp_oddLevelMatrix_square_report` and identify `a_n(t)` with the expected terminal square
-under the minimising coupling itself.  The generator identity and the skeleton identity are
-proved; the Euler-limit transfer between them is not.
+The lumping also transfers to continuous time.  `pullbackMatrix` is the lumping as a matrix,
+`nearestDrift_pullback_intertwine` states it as the intertwining `L_* Π = Π L_odd`,
+`exp_intertwine` carries any such intertwining to the semigroups through the same Euler limit
+`ContinuousTurnoverSemigroup` uses, and `exp_nearestDrift_square_report` concludes: running the
+nearest-drift count semigroup at symmetric rates on the squared aggregate report produces
+exactly `a_n(t)` at the aggregate's own level.  That is DC Corollary 4.3 for the minimising
+count chain itself, not only for the system it satisfies.
 
 Domain conditions: none beyond the manuscript's own.  The rate `λ` is an arbitrary real
 throughout, and nonnegativity is needed only for the lumping, where it fixes which of the two
@@ -62,6 +64,8 @@ set_option relaxedAutoImplicit false
 namespace Descent.Portability.OddLocusReportSolutions
 
 open ContinuousTurnoverSemigroup
+
+open scoped Matrix.Norms.Operator
 
 noncomputable section
 
@@ -666,12 +670,11 @@ theorem downRate_grid_gt (c : ℕ) (lam : ℝ) (hlam : 0 ≤ lam) (k : Fin (2 * 
       = lam * (2 * (((aggLevel c k : Fin (c + 1)) : ℕ) : ℝ) + 1) := by
   have hle : c + 1 ≤ (k : ℕ) := by omega
   have hcast : ((((k : ℕ) - c - 1 : ℕ)) : ℝ) = ((k : ℕ) : ℝ) - (c : ℝ) - 1 := by
-    have h1 : (((k : ℕ) - c - 1 : ℕ) : ℝ) = (((k : ℕ) - c : ℕ) : ℝ) - 1 := by
-      have : 1 ≤ (k : ℕ) - c := by omega
-      exact Nat.cast_sub this
-    have h2 : ((((k : ℕ) - c : ℕ)) : ℝ) = ((k : ℕ) : ℝ) - (c : ℝ) := by
-      exact Nat.cast_sub (by omega : c ≤ (k : ℕ))
-    rw [h1, h2]
+    have hck : c ≤ (k : ℕ) := by omega
+    have hone : 1 ≤ (k : ℕ) - c := by omega
+    rw [Nat.cast_sub hone, Nat.cast_sub hck]
+    push_cast
+    ring
   have hval : -(lam * ((2 * (c : ℝ) + 1) - 2 * ((k : ℕ) : ℝ)))
       = lam * (2 * (((aggLevel c k : Fin (c + 1)) : ℕ) : ℝ) + 1) := by
     rw [aggLevel_of_gt c k h, hcast]
@@ -758,6 +761,14 @@ def mulLeftEntry {N P : ℕ} (Q : Matrix (Fin N) (Fin P) ℝ) (k : Fin N) (j : F
   map_add' M M' := by simp [Matrix.mul_add]
   map_smul' a M := by simp [Matrix.mul_smul]
 
+/-- Evaluating the right-multiplication functional. -/
+theorem mulRightEntry_apply {N P : ℕ} (Q : Matrix (Fin N) (Fin P) ℝ) (k : Fin N) (j : Fin P)
+    (M : Matrix (Fin N) (Fin N) ℝ) : mulRightEntry Q k j M = (M * Q) k j := rfl
+
+/-- Evaluating the left-multiplication functional. -/
+theorem mulLeftEntry_apply {N P : ℕ} (Q : Matrix (Fin N) (Fin P) ℝ) (k : Fin N) (j : Fin P)
+    (M : Matrix (Fin P) (Fin P) ℝ) : mulLeftEntry Q k j M = (Q * M) k j := rfl
+
 /-- **An intertwining passes to the semigroups**, through the same Euler limit that
 `Descent.Portability.ContinuousTurnoverSemigroup` uses to build its exponential. -/
 theorem exp_intertwine {N P : ℕ} (A : Matrix (Fin N) (Fin N) ℝ) (B : Matrix (Fin P) (Fin P) ℝ)
@@ -775,8 +786,7 @@ theorem exp_intertwine {N P : ℕ} (A : Matrix (Fin N) (Fin N) ℝ) (B : Matrix 
   have heq : ∀ r : ℕ, (mulRightEntry Q k j) ((1 + (r : ℝ)⁻¹ • A) ^ r)
       = (mulLeftEntry Q k j) ((1 + (r : ℝ)⁻¹ • B) ^ r) := by
     intro r
-    show ((1 + (r : ℝ)⁻¹ • A) ^ r * Q) k j = (Q * (1 + (r : ℝ)⁻¹ • B) ^ r) k j
-    rw [euler_intertwine A B Q h ((r : ℝ)⁻¹) r]
+    rw [mulRightEntry_apply, mulLeftEntry_apply, euler_intertwine A B Q h ((r : ℝ)⁻¹) r]
   exact tendsto_nhds_unique (Filter.Tendsto.congr heq hA) hB
 
 /-- **DC Corollary 4.3 for the minimising count chain, in continuous time.**  Running the
@@ -799,8 +809,15 @@ theorem exp_nearestDrift_square_report (c : ℕ) (lam t : ℝ) (hlam : 0 ≤ lam
       = (pullbackMatrix c).mulVec (fun r : Fin (c + 1) ↦ (2 * ((r : ℕ) : ℝ) + 1) ^ 2) := by
     funext k'
     rw [pullbackMatrix_mulVec]
-  rw [hpull, Matrix.mulVec_mulVec, hexp, ← Matrix.mulVec_mulVec, pullbackMatrix_mulVec,
-    exp_oddLevelMatrix_square_report]
+  have hvec : (NormedSpace.exp ℝ
+        (t • ContinuousTurnoverSemigroup.nearestDriftMatrix (2 * c + 1) lam lam)
+        * pullbackMatrix c).mulVec (fun r : Fin (c + 1) ↦ (2 * ((r : ℕ) : ℝ) + 1) ^ 2)
+      = (pullbackMatrix c * NormedSpace.exp ℝ (t • oddLevelMatrix c lam)).mulVec
+        (fun r : Fin (c + 1) ↦ (2 * ((r : ℕ) : ℝ) + 1) ^ 2) := by
+    rw [hexp]
+  have hk := congrFun hvec k
+  rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec] at hk
+  rw [hpull, hk, pullbackMatrix_mulVec, exp_oddLevelMatrix_square_report]
 
 end
 

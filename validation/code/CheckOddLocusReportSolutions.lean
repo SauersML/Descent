@@ -58,5 +58,7 @@ open Descent.Portability.OddLocusReportSolutions
 #print axioms nearestDrift_pullback_intertwine
 #print axioms pow_intertwine
 #print axioms euler_intertwine
+#print axioms mulRightEntry_apply
+#print axioms mulLeftEntry_apply
 #print axioms exp_intertwine
 #print axioms exp_nearestDrift_square_report
