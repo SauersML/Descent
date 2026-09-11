@@ -2,6 +2,8 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.AdmixtureChronologyLaw
+import Descent.Portability.ExposureLaplaceConstraints
+import Mathlib.MeasureTheory.Integral.Bochner.ContinuousLinearMap
 
 assert_below Descent.Decision Descent.Program
 
@@ -35,10 +37,19 @@ continuous rates and a positive migration total, the pair `(p, C)` is proved to 
 square, so NOTE1 (31) applies to it and the whole section 6.2 metric table is a function of the
 chronology alone.
 
+The exposure law itself is built as a measure. `incrementMeasure m T` is the
+immigration-increment measure `dA(s) = m(s) e^{-M(s)} ds` on `(0, T]`, and
+`chronologyExposureLaw m r T` is its pushforward by the remaining recombination exposure
+`B(s) = R(T) - R(s)`, normalised by the donor fraction. For continuous rates with a nonnegative
+migration rate, a forward horizon and a positive donor fraction it is a probability measure
+(`isProbabilityMeasure_chronologyExposureLaw`); it is carried by `[0, R(T)]` when the
+recombination rate is nonnegative (`chronologyExposureLaw_ae_mem_Icc`); and the coupling of the
+recombination history scaled by `λ` is its transform `measureLaplace ν λ` for every `λ`
+(`scaled_normalisedCoupling_eq_measureLaplace`), which is NOTE1 (29) and (30) in measure form.
+
 Not proved here: that every chronology with the given totals is equivalent to a three-block
-one, and the measure-valued form of the exposure law. The attainment half uses the
-three-block family only, which is all NOTE1 Theorem 5 claims, and the bounds half covers every
-continuous chronology.
+one. The attainment half uses the three-block family only, which is all NOTE1 Theorem 5 claims,
+and the bounds half covers every continuous chronology.
 
 ## Empirical status
 
@@ -304,6 +315,100 @@ theorem threeBlock_recombination_first :
     constructor <;> norm_num
   · rw [couplingOfState_threeBlockHistory _ _ _ hlog]
     norm_num
+
+open MeasureTheory
+open scoped ENNReal NNReal
+open Descent.Portability.ExposureLaplaceConstraints (measureLaplace)
+
+/-- The immigration-increment measure `dA(s) = m(s) e^{-M(s)} ds` of NOTE1 Theorem 4 on the
+interval `(0, T]`. -/
+def incrementMeasure (m : ℝ → ℝ) (T : ℝ) : Measure ℝ :=
+  (volume.restrict (Set.Ioc 0 T)).withDensity
+    fun s ↦ ((m s * Real.exp (-cumulativeRate m s)).toNNReal : ℝ≥0∞)
+
+/-- NOTE1 Theorem 4: the exposure law `ν` of a chronology, the pushforward of the normalised
+immigration increments `dA / p` by the remaining recombination exposure `B(s) = R(T) - R(s)`. -/
+def chronologyExposureLaw (m r : ℝ → ℝ) (T : ℝ) : Measure ℝ :=
+  ENNReal.ofReal (1 / donorFraction m T) •
+    Measure.map (fun s ↦ cumulativeRate r T - cumulativeRate r s) (incrementMeasure m T)
+
+/-- NOTE1 (29) and (30) in measure form. Assumes: continuous rates, a nonnegative migration
+rate, a forward horizon `0 ≤ T` and a positive donor fraction. The coupling of the recombination
+history scaled by `λ` is the transform `∫ e^{-λ b} ν(db)` of the one exposure law `ν`. -/
+theorem scaled_normalisedCoupling_eq_measureLaplace (m r : ℝ → ℝ) (hm : Continuous m)
+    (hmnonneg : ∀ s, 0 ≤ m s) (hr : Continuous r) (lam T : ℝ) (hT : 0 ≤ T)
+    (hpos : 0 < donorFraction m T) :
+    normalisedCoupling m (fun s ↦ lam * r s) T =
+      measureLaplace (chronologyExposureLaw m r T) lam := by
+  have hremaining : Continuous fun s ↦ cumulativeRate r T - cumulativeRate r s :=
+    continuous_const.sub (continuous_cumulativeRate r hr)
+  have hdensity : Continuous fun s ↦ m s * Real.exp (-cumulativeRate m s) :=
+    hm.mul (continuous_cumulativeRate m hm).neg.rexp
+  have hmeasurable : Measurable fun s ↦ (m s * Real.exp (-cumulativeRate m s)).toNNReal :=
+    (continuous_real_toNNReal.comp hdensity).measurable
+  rw [scaled_normalisedCoupling_eq_exposure_integral m r lam T hpos]
+  unfold measureLaplace chronologyExposureLaw incrementMeasure
+  rw [integral_smul_measure, integral_map hremaining.measurable.aemeasurable
+      (by fun_prop : Continuous fun b : ℝ ↦ Real.exp (-(lam * b))).aestronglyMeasurable,
+    integral_withDensity_eq_integral_smul hmeasurable,
+    ENNReal.toReal_ofReal (one_div_pos.mpr hpos).le, smul_eq_mul,
+    intervalIntegral.integral_of_le hT]
+  congr 1
+  refine setIntegral_congr_fun measurableSet_Ioc (fun s _ ↦ ?_)
+  simp only [NNReal.smul_def, smul_eq_mul]
+  rw [Real.coe_toNNReal _ (mul_nonneg (hmnonneg s) (Real.exp_pos _).le)]
+
+/-- NOTE1 Theorem 4: the exposure law of a chronology has total mass one. Assumes: continuous
+rates, a nonnegative migration rate, a forward horizon and a positive donor fraction. The
+immigration increments integrate to the donor fraction, which the normalisation divides out. -/
+theorem chronologyExposureLaw_univ (m r : ℝ → ℝ) (hm : Continuous m) (hmnonneg : ∀ s, 0 ≤ m s)
+    (hr : Continuous r) (T : ℝ) (hT : 0 ≤ T) (hpos : 0 < donorFraction m T) :
+    chronologyExposureLaw m r T Set.univ = 1 := by
+  have hremaining : Measurable fun s ↦ cumulativeRate r T - cumulativeRate r s :=
+    (continuous_const.sub (continuous_cumulativeRate r hr)).measurable
+  have hdensity : Continuous fun s ↦ m s * Real.exp (-cumulativeRate m s) :=
+    hm.mul (continuous_cumulativeRate m hm).neg.rexp
+  have hmass : ∫⁻ s in Set.Ioc 0 T,
+      ((m s * Real.exp (-cumulativeRate m s)).toNNReal : ℝ≥0∞) =
+        ENNReal.ofReal (donorFraction m T) := by
+    rw [donorFraction_eq_integral m hm T, intervalIntegral.integral_of_le hT,
+      ofReal_integral_eq_lintegral_ofReal
+        (hdensity.integrableOn_Icc.mono_set Set.Ioc_subset_Icc_self)
+        (ae_of_all _ fun s ↦ mul_nonneg (hmnonneg s) (Real.exp_pos _).le)]
+    rfl
+  unfold chronologyExposureLaw incrementMeasure
+  rw [Measure.smul_apply, Measure.map_apply hremaining MeasurableSet.univ, Set.preimage_univ,
+    withDensity_apply _ MeasurableSet.univ, Measure.restrict_univ, hmass, smul_eq_mul,
+    ← ENNReal.ofReal_mul (one_div_pos.mpr hpos).le, one_div_mul_cancel (ne_of_gt hpos),
+    ENNReal.ofReal_one]
+
+/-- The exposure law of a forward chronology with continuous rates, a nonnegative migration
+rate and a positive donor fraction is a probability measure. -/
+theorem isProbabilityMeasure_chronologyExposureLaw (m r : ℝ → ℝ) (hm : Continuous m)
+    (hmnonneg : ∀ s, 0 ≤ m s) (hr : Continuous r) (T : ℝ) (hT : 0 ≤ T)
+    (hpos : 0 < donorFraction m T) :
+    IsProbabilityMeasure (chronologyExposureLaw m r T) :=
+  ⟨chronologyExposureLaw_univ m r hm hmnonneg hr T hT hpos⟩
+
+/-- NOTE1 Theorem 4: the exposure law is carried by `[0, R(T)]`. Assumes: a continuous
+nonnegative recombination rate. Material arriving at a time `s ∈ (0, T]` still has between none
+and all of the recombination total to meet. -/
+theorem chronologyExposureLaw_ae_mem_Icc (m r : ℝ → ℝ) (hr : Continuous r)
+    (hrnonneg : ∀ s, 0 ≤ r s) (T : ℝ) :
+    ∀ᵐ exposure ∂chronologyExposureLaw m r T, exposure ∈ Set.Icc 0 (cumulativeRate r T) := by
+  have hremaining : Measurable fun s ↦ cumulativeRate r T - cumulativeRate r s :=
+    (continuous_const.sub (continuous_cumulativeRate r hr)).measurable
+  unfold chronologyExposureLaw incrementMeasure
+  refine Measure.ae_smul_measure ?_ _
+  refine (ae_map_iff hremaining.aemeasurable
+    (measurableSet_Icc : MeasurableSet (Set.Icc (0 : ℝ) (cumulativeRate r T)))).mpr ?_
+  refine (withDensity_absolutelyContinuous _ _).ae_le ?_
+  refine (ae_restrict_mem measurableSet_Ioc).mono fun s hs ↦ Set.mem_Icc.mpr ⟨?_, ?_⟩
+  · show 0 ≤ cumulativeRate r T - cumulativeRate r s
+    rw [cumulativeRate_sub_eq_integral r hr s T]
+    exact intervalIntegral.integral_nonneg hs.2 fun u _ ↦ hrnonneg u
+  · show cumulativeRate r T - cumulativeRate r s ≤ cumulativeRate r T
+    linarith [cumulativeRate_nonneg r hrnonneg s hs.1.le]
 
 end
 

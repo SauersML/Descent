@@ -24,3 +24,9 @@ open Descent.Portability.AttainableChronologyCurve
 #print axioms Descent.Portability.AttainableChronologyCurve.threeBlock_migration_first
 #print axioms Descent.Portability.AttainableChronologyCurve.threeBlock_recombination_first
 #print axioms Descent.Portability.AttainableChronologyCurve.reportMetrics_chronologyReportLaw
+#print axioms
+  Descent.Portability.AttainableChronologyCurve.scaled_normalisedCoupling_eq_measureLaplace
+#print axioms Descent.Portability.AttainableChronologyCurve.chronologyExposureLaw_univ
+#print axioms
+  Descent.Portability.AttainableChronologyCurve.isProbabilityMeasure_chronologyExposureLaw
+#print axioms Descent.Portability.AttainableChronologyCurve.chronologyExposureLaw_ae_mem_Icc
