@@ -130,6 +130,7 @@ theorem neg_log_tail_bound (rate : ℝ) (hpos : 0 < rate) (hle : rate ≤ 1) (te
     rw [hcomplement]
   have hshape : rate⁻¹ * ((1 - rate) ^ (terms + 1) / ((terms : ℝ) + 1)) =
       (1 - rate) ^ (terms + 1) / (((terms : ℝ) + 1) * rate) := by
+    simp only [div_eq_mul_inv, mul_inv]
     ring
   linarith
 
@@ -153,14 +154,14 @@ theorem expectedLogLoss_eq_top (law : FiniteReportLaw Outcome) (forecast : Outco
     expectedLogLoss law forecast = ⊤ := by
   have hnonzero : ENNReal.ofReal (law.mass ruled) ≠ 0 :=
     (ENNReal.ofReal_pos.mpr hmass).ne'
-  have hterm : ENNReal.ofReal (law.mass ruled) *
-      (if 0 < forecast ruled then ENNReal.ofReal (-Real.log (forecast ruled)) else ⊤) = ⊤ := by
-    rw [if_neg hforecast, ENNReal.mul_top hnonzero]
   refine top_le_iff.mp ?_
+  unfold expectedLogLoss
   calc (⊤ : ℝ≥0∞) = ENNReal.ofReal (law.mass ruled) *
         (if 0 < forecast ruled then ENNReal.ofReal (-Real.log (forecast ruled))
-          else ⊤) := hterm.symm
-    _ ≤ expectedLogLoss law forecast :=
+          else ⊤) := by rw [if_neg hforecast, ENNReal.mul_top hnonzero]
+    _ ≤ ∑ outcome, ENNReal.ofReal (law.mass outcome) *
+          (if 0 < forecast outcome then ENNReal.ofReal (-Real.log (forecast outcome))
+            else ⊤) :=
         Finset.single_le_sum (fun outcome _ ↦ zero_le _) (Finset.mem_univ ruled)
 
 /-- **NOTE 2 section 6.4, finite branch.** When no outcome is ruled out, the extended-valued
