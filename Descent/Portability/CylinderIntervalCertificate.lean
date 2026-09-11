@@ -564,7 +564,7 @@ theorem ae_exists_true : ∀ᵐ stream ∂bitMeasure, ∃ index, stream index = 
           simp [hstream index, List.getD_eq_getElem?_getD, hindex]
       _ = 2⁻¹ ^ length := by rw [bitMeasure_cylinder, List.length_replicate]
   have hlimit : Tendsto (fun length : ℕ ↦ (2⁻¹ : ℝ≥0∞) ^ length) atTop (𝓝 0) :=
-    ENNReal.tendsto_pow_atTop_nhds_zero_of_lt_one (ENNReal.inv_lt_one.mpr one_lt_two)
+    ENNReal.tendsto_pow_atTop_nhds_zero_of_lt_one (ENNReal.inv_lt_one.mpr ENNReal.one_lt_two)
   exact le_antisymm (ge_of_tendsto' hlimit hbound) (zero_le _)
 
 /-- The halting indicator of the program that reads fair bits until the first `true`: one on

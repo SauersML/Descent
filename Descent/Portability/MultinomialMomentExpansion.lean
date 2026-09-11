@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.FiniteReproductiveKernel
+import Mathlib.Algebra.MvPolynomial.PDeriv
 import Mathlib.Combinatorics.Enumerative.Stirling
 
 assert_below Descent.Decision Descent.Program
@@ -56,10 +57,19 @@ are `b` with a single coordinate lowered by one, and that lowering coordinate `a
 Stirling weight `S(b_a, b_a - 1) = C(b_a, 2)`; hence `monomialFirstOrder_eq_sum_choose`,
 `monomialFirstOrder x b = Σ_a C(b_a, 2) x ^ (b - e_a) - C(|b|, 2) x ^ b`.
 
-What is NOT proved in this module: that this closed form is the second-order operator
-`(1 / 2) Σ_{a, c} (x_a δ_ac - x_a x_c) ∂_a ∂_c x ^ b` computed from the partial derivatives of the
-polynomial, the extension to linear combinations of monomials, and the multinomial drift stage
-that would replace the single-draw drift stage of the microscopic kernel.
+That closed form is the second-order operator of (10). `resamplingOperator x f` is
+`(1 / 2) Σ_{a, c} (x_a δ_ac - x_a x_c) ∂_a ∂_c f (x)` for a polynomial `f` in the category
+coordinates, with `∂` the formal partial derivative `MvPolynomial.pderiv`.
+`eval_pderiv_pderiv_monomialPolynomial` evaluates the second partial derivatives of the monomial
+`monomialPolynomial b`; multiplying by `x_a` or `x_a x_c` restores the lowered exponents whenever
+the coefficient is nonzero (`mul_eval_pderiv_diag_eq`, `mul_mul_eval_pderiv_eq`), and the
+coefficient sum is `|b| (|b| - 1)` (`sum_sum_cast_mul_cast_sub`). Hence
+`resamplingOperator_monomialPolynomial`: `resamplingOperator x (monomialPolynomial b)` equals
+`monomialFirstOrder x b`, and the monomial expansion above is (10) exactly.
+
+What is NOT proved in this module: the extension to linear combinations of monomials, and the
+multinomial drift stage that would replace the single-draw drift stage of the microscopic
+kernel.
 
 ## Empirical status
 
@@ -720,6 +730,182 @@ theorem monomialFirstOrder_eq_sum_choose {H : Type*} [Fintype H] [DecidableEq H]
       = ∑ a, ((b a).choose 2 : ℝ) * ∏ c, x c ^ Function.update b a (b a - 1) c
         - ((∑ a, b a).choose 2 : ℝ) * ∏ a, x a ^ b a := by
   rw [monomialFirstOrder, firstOrderStirlingSum_eq_sum_choose]
+
+/-! ## The second-order operator of (10) -/
+
+/-- The monomial `∏_a X_a ^ b_a` as a multivariate polynomial in the category coordinates. -/
+def monomialPolynomial {H : Type*} [Fintype H] (b : H → ℕ) : MvPolynomial H ℝ :=
+  MvPolynomial.monomial (Finsupp.equivFunOnFinite.symm b) 1
+
+/-- The second-order operator of NOTE1 (10) at the point `x`,
+`(1 / 2) Σ_{a, c} (x_a δ_ac - x_a x_c) ∂_a ∂_c f (x)`, with `∂` the formal partial derivative. -/
+def resamplingOperator {H : Type*} [Fintype H] [DecidableEq H] (x : H → ℝ)
+    (f : MvPolynomial H ℝ) : ℝ :=
+  (1 / 2) * ∑ a, ∑ c, ((if a = c then x a else 0) - x a * x c)
+    * MvPolynomial.eval x (MvPolynomial.pderiv a (MvPolynomial.pderiv c f))
+
+/-- The second partial derivative `∂_a ∂_c` of a monomial, evaluated at a point. -/
+theorem eval_pderiv_pderiv_monomialPolynomial {H : Type*} [Fintype H] [DecidableEq H]
+    (x : H → ℝ) (b : H → ℕ) (a c : H) :
+    MvPolynomial.eval x (MvPolynomial.pderiv a (MvPolynomial.pderiv c (monomialPolynomial b)))
+      = (b c : ℝ) * ((b a - if c = a then 1 else 0 : ℕ) : ℝ)
+        * ∏ i, x i ^ (b i - (if c = i then 1 else 0) - (if a = i then 1 else 0)) := by
+  simp only [monomialPolynomial, MvPolynomial.pderiv_monomial, MvPolynomial.eval_monomial]
+  rw [Finsupp.prod_fintype _ _ fun i ↦ pow_zero (x i)]
+  simp only [Finsupp.tsub_apply, Finsupp.single_apply, Finsupp.coe_equivFunOnFinite_symm,
+    one_mul]
+
+/-- A coordinate is the product of the powers of its indicator. -/
+theorem prod_pow_indicator {H : Type*} [Fintype H] [DecidableEq H] (x : H → ℝ) (a : H) :
+    ∏ i, x i ^ (if a = i then 1 else 0) = x a := by
+  rw [Finset.prod_eq_single a]
+  · simp
+  · intro i _ hi
+    rw [if_neg (Ne.symm hi), pow_zero]
+  · intro ha
+    exact absurd (Finset.mem_univ a) ha
+
+/-- The binomial coefficient `C(n, 2)` in the reals, with the truncated predecessor. -/
+theorem cast_choose_two_eq (n : ℕ) : (n.choose 2 : ℝ) = (n : ℝ) * ((n - 1 : ℕ) : ℝ) / 2 := by
+  rw [Nat.cast_choose_two]
+  rcases Nat.eq_zero_or_pos n with hn | hn
+  · simp [hn]
+  · rw [Nat.cast_sub hn, Nat.cast_one]
+
+/-- **The off-diagonal term of (10) on a monomial.** Multiplying the second partial derivative
+`∂_a ∂_c x ^ b` by `x_a x_c` restores the monomial whenever the coefficient is nonzero. -/
+theorem mul_mul_eval_pderiv_eq {H : Type*} [Fintype H] [DecidableEq H] (x : H → ℝ)
+    (b : H → ℕ) (a c : H) :
+    x a * x c * ((b c : ℝ) * ((b a - if c = a then 1 else 0 : ℕ) : ℝ)
+        * ∏ i, x i ^ (b i - (if c = i then 1 else 0) - (if a = i then 1 else 0)))
+      = (b c : ℝ) * ((b a - if c = a then 1 else 0 : ℕ) : ℝ) * ∏ i, x i ^ b i := by
+  by_cases hbc : b c = 0
+  · simp [hbc]
+  by_cases hba : b a - (if c = a then 1 else 0) = 0
+  · simp [hba]
+  have hle : ∀ i, (if c = i then 1 else 0) + (if a = i then 1 else 0) ≤ b i := by
+    intro i
+    by_cases hci : c = i
+    · by_cases hai : a = i
+      · subst hci
+        subst hai
+        rw [if_pos rfl] at hba ⊢
+        omega
+      · subst hci
+        rw [if_pos rfl, if_neg hai]
+        omega
+    · by_cases hai : a = i
+      · subst hai
+        rw [if_neg hci, if_pos rfl]
+        rw [if_neg hci] at hba
+        omega
+      · rw [if_neg hci, if_neg hai]
+        omega
+  calc x a * x c * ((b c : ℝ) * ((b a - if c = a then 1 else 0 : ℕ) : ℝ)
+          * ∏ i, x i ^ (b i - (if c = i then 1 else 0) - (if a = i then 1 else 0)))
+      = (b c : ℝ) * ((b a - if c = a then 1 else 0 : ℕ) : ℝ)
+          * ((∏ i, x i ^ (b i - (if c = i then 1 else 0) - (if a = i then 1 else 0)))
+            * (∏ i, x i ^ (if a = i then 1 else 0)) * ∏ i, x i ^ (if c = i then 1 else 0)) := by
+        rw [prod_pow_indicator, prod_pow_indicator]
+        ring
+    _ = (b c : ℝ) * ((b a - if c = a then 1 else 0 : ℕ) : ℝ) * ∏ i, x i ^ b i := by
+        rw [← Finset.prod_mul_distrib, ← Finset.prod_mul_distrib]
+        congr 1
+        refine Finset.prod_congr rfl fun i _ ↦ ?_
+        rw [← pow_add, ← pow_add]
+        congr 1
+        have hi := hle i
+        omega
+
+/-- **The diagonal term of (10) on a monomial.** Multiplying `∂_a ∂_a x ^ b` by `x_a` gives the
+monomial with coordinate `a` lowered by one, weighted by `b_a (b_a - 1)`. -/
+theorem mul_eval_pderiv_diag_eq {H : Type*} [Fintype H] [DecidableEq H] (x : H → ℝ)
+    (b : H → ℕ) (a : H) :
+    x a * ((b a : ℝ) * ((b a - 1 : ℕ) : ℝ)
+        * ∏ i, x i ^ (b i - (if a = i then 1 else 0) - (if a = i then 1 else 0)))
+      = (b a : ℝ) * ((b a - 1 : ℕ) : ℝ) * ∏ i, x i ^ Function.update b a (b a - 1) i := by
+  by_cases hba : b a ≤ 1
+  · rcases Nat.le_one_iff_eq_zero_or_eq_one.mp hba with h0 | h1
+    · simp [h0]
+    · simp [h1]
+  calc x a * ((b a : ℝ) * ((b a - 1 : ℕ) : ℝ)
+          * ∏ i, x i ^ (b i - (if a = i then 1 else 0) - (if a = i then 1 else 0)))
+      = (b a : ℝ) * ((b a - 1 : ℕ) : ℝ)
+          * ((∏ i, x i ^ (b i - (if a = i then 1 else 0) - (if a = i then 1 else 0)))
+            * ∏ i, x i ^ (if a = i then 1 else 0)) := by
+        rw [prod_pow_indicator]
+        ring
+    _ = (b a : ℝ) * ((b a - 1 : ℕ) : ℝ) * ∏ i, x i ^ Function.update b a (b a - 1) i := by
+        rw [← Finset.prod_mul_distrib]
+        congr 1
+        refine Finset.prod_congr rfl fun i _ ↦ ?_
+        rw [← pow_add]
+        congr 1
+        by_cases hai : a = i
+        · subst hai
+          rw [if_pos rfl, Function.update_self]
+          omega
+        · rw [if_neg hai, Function.update_of_ne (Ne.symm hai)]
+          omega
+
+/-- The coefficient sum of the off-diagonal term: `Σ_{a, c} b_c (b_a - δ_ca) = |b| (|b| - 1)`. -/
+theorem sum_sum_cast_mul_cast_sub {H : Type*} [Fintype H] [DecidableEq H] (b : H → ℕ) :
+    ∑ a, ∑ c, (b c : ℝ) * ((b a - if c = a then 1 else 0 : ℕ) : ℝ)
+      = ((∑ a, b a : ℕ) : ℝ) * ((∑ a, b a - 1 : ℕ) : ℝ) := by
+  have hinner : ∀ c, (b c : ℝ) * ∑ a, ((b a - if c = a then 1 else 0 : ℕ) : ℝ)
+      = (b c : ℝ) * ((∑ a, b a - 1 : ℕ) : ℝ) := by
+    intro c
+    by_cases hbc : b c = 0
+    · simp [hbc]
+    · congr 1
+      rw [← Nat.cast_sum]
+      congr 1
+      have hsplit := Finset.add_sum_erase Finset.univ
+        (fun a ↦ b a - if c = a then 1 else 0) (Finset.mem_univ c)
+      have hsplitb := Finset.add_sum_erase Finset.univ b (Finset.mem_univ c)
+      dsimp only at hsplit
+      rw [if_pos rfl] at hsplit
+      have hrest : ∑ a ∈ Finset.univ.erase c, (b a - if c = a then 1 else 0)
+          = ∑ a ∈ Finset.univ.erase c, b a :=
+        Finset.sum_congr rfl fun a ha ↦ by
+          rw [if_neg (Ne.symm (Finset.ne_of_mem_erase ha)), Nat.sub_zero]
+      omega
+  calc ∑ a, ∑ c, (b c : ℝ) * ((b a - if c = a then 1 else 0 : ℕ) : ℝ)
+      = ∑ c, (b c : ℝ) * ∑ a, ((b a - if c = a then 1 else 0 : ℕ) : ℝ) := by
+        rw [Finset.sum_comm]
+        exact Finset.sum_congr rfl fun c _ ↦ (Finset.mul_sum _ _ _).symm
+    _ = ∑ c, (b c : ℝ) * ((∑ a, b a - 1 : ℕ) : ℝ) := Finset.sum_congr rfl fun c _ ↦ hinner c
+    _ = ((∑ a, b a : ℕ) : ℝ) * ((∑ a, b a - 1 : ℕ) : ℝ) := by
+        rw [← Finset.sum_mul, Nat.cast_sum]
+
+/-- **The first-order coefficient is the second-order operator of (10).** On a monomial, the
+operator `(1 / 2) Σ_{a, c} (x_a δ_ac - x_a x_c) ∂_a ∂_c` computed from the formal partial
+derivatives is exactly the first-order coefficient of the multinomial expansion. -/
+theorem resamplingOperator_monomialPolynomial {H : Type*} [Fintype H] [DecidableEq H]
+    (x : H → ℝ) (b : H → ℕ) :
+    resamplingOperator x (monomialPolynomial b) = monomialFirstOrder x b := by
+  have hdiag : ∀ a, ∑ c, (if a = c then x a else 0)
+      * ((b c : ℝ) * ((b a - if c = a then 1 else 0 : ℕ) : ℝ)
+        * ∏ i, x i ^ (b i - (if c = i then 1 else 0) - (if a = i then 1 else 0)))
+      = (b a : ℝ) * ((b a - 1 : ℕ) : ℝ) * ∏ i, x i ^ Function.update b a (b a - 1) i := by
+    intro a
+    simp only [ite_mul, zero_mul, Finset.sum_ite_eq, Finset.mem_univ, if_true]
+    exact mul_eval_pderiv_diag_eq x b a
+  have hoff : ∑ a, ∑ c, x a * x c
+      * ((b c : ℝ) * ((b a - if c = a then 1 else 0 : ℕ) : ℝ)
+        * ∏ i, x i ^ (b i - (if c = i then 1 else 0) - (if a = i then 1 else 0)))
+      = ((∑ a, b a : ℕ) : ℝ) * ((∑ a, b a - 1 : ℕ) : ℝ) * ∏ i, x i ^ b i := by
+    simp only [mul_mul_eval_pderiv_eq]
+    rw [← sum_sum_cast_mul_cast_sub, Finset.sum_mul]
+    exact Finset.sum_congr rfl fun a _ ↦ (Finset.sum_mul _ _ _).symm
+  rw [monomialFirstOrder_eq_sum_choose, resamplingOperator]
+  simp only [eval_pderiv_pderiv_monomialPolynomial, sub_mul, Finset.sum_sub_distrib]
+  rw [Finset.sum_congr rfl fun a _ ↦ hdiag a, hoff, cast_choose_two_eq]
+  simp only [cast_choose_two_eq]
+  rw [mul_sub, Finset.mul_sum]
+  congr 1
+  · exact Finset.sum_congr rfl fun a _ ↦ by ring
+  · ring
 
 end
 

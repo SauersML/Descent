@@ -481,12 +481,12 @@ theorem conditionalMetric_experimentAt_eq_eval [Fintype Report]
   have hdefinedness : ∀ report,
       MvPolynomial.eval θ (definednessAccumulator defined report pattern).denominator ≠ 0 := by
     intro report
-    unfold definednessAccumulator
+    simp only [definednessAccumulator]
     split_ifs <;> exact PolynomialQuotient.denominator_ofPolynomial_ne_zero _ θ
   have hnumerator : ∀ report,
       MvPolynomial.eval θ (numeratorAccumulator defined value report pattern).denominator ≠ 0 := by
     intro report
-    unfold numeratorAccumulator
+    simp only [numeratorAccumulator]
     split_ifs
     · exact hvalue report
     · exact PolynomialQuotient.denominator_ofPolynomial_ne_zero _ θ
@@ -521,10 +521,12 @@ theorem attainableRegion_eq_image {Parameter J : Type} (admissible : Set Paramet
   constructor
   · rintro ⟨θ, hθ, hreport⟩
     refine ⟨θ, ⟨hθ, fun j ↦ (hreport j).1⟩, funext fun j ↦ ?_⟩
+    show numerator j θ / definedness j θ = report j
     rw [← (hreport j).2, mul_div_cancel_left₀ _ (hreport j).1.ne']
   · rintro ⟨θ, ⟨hθ, hpositive⟩, rfl⟩
-    exact ⟨θ, hθ, fun j ↦ ⟨hpositive j, by
-      rw [← mul_div_assoc, mul_div_cancel_left₀ _ (hpositive j).ne']⟩⟩
+    refine ⟨θ, hθ, fun j ↦ ⟨hpositive j, ?_⟩⟩
+    show definedness j θ * (numerator j θ / definedness j θ) = numerator j θ
+    rw [← mul_div_assoc, mul_div_cancel_left₀ _ (hpositive j).ne']
 
 /-- **NOTE2 Theorem 2, the joint input-output graph.** When the presented probabilities and
 accumulators are regular at every admissible point, the attainable region of a finite family of
@@ -603,9 +605,13 @@ def cornerAccumulator (corner : Bool × Bool → ℝ) :
 
 /-- The architecture tree has polynomial branch probabilities, so it is regular everywhere. -/
 theorem regularAt_architectureTree (pattern : Empty → SignType) (θ : Fin 2 → ℝ) :
-    ParametricTree.RegularAt pattern θ architectureTree :=
-  ⟨fun _ ↦ PolynomialQuotient.denominator_ofPolynomial_ne_zero _ θ,
-    fun _ ↦ ⟨fun _ ↦ PolynomialQuotient.denominator_ofPolynomial_ne_zero _ θ, fun _ ↦ trivial⟩⟩
+    ParametricTree.RegularAt pattern θ architectureTree := by
+  have hindicator : ∀ (index : Fin 2) (outcome : Bool),
+      MvPolynomial.eval θ (indicatorQuotient index outcome).denominator ≠ 0 := by
+    intro index outcome
+    cases outcome <;> exact PolynomialQuotient.denominator_ofPolynomial_ne_zero _ θ
+  exact ⟨fun architecture ↦ hindicator 0 architecture,
+    fun _ ↦ ⟨fun environment ↦ hindicator 1 environment, fun _ ↦ trivial⟩⟩
 
 /-- The architecture tree is a valid experiment at every point of the unit square. -/
 theorem validAt_architectureTree (guard : Empty → MvPolynomial (Fin 2) ℝ) (θ : Fin 2 → ℝ)
@@ -655,8 +661,8 @@ theorem attainableRegion_architectureTree_eq_jointRegion {J : Type} [Fintype J]
     exact ⟨(θ 0, θ 1), ⟨hα, hη⟩, rfl⟩
   · rintro ⟨⟨α, η⟩, ⟨hα, hη⟩, rfl⟩
     refine ⟨![α, η], ⟨⟨hα, hη⟩, fun j ↦ ?_⟩, rfl⟩
-    exact ArchitectureEnvironmentRegion.mixtureDenominator_pos (den j) (hden j) α η hα.1 hα.2
-      hη.1 hη.2
+    exact ArchitectureEnvironmentRegion.mixtureDenominator_pos (den j) (hden j) α η
+      (Set.mem_Icc.mp hα).1 (Set.mem_Icc.mp hα).2 (Set.mem_Icc.mp hη).1 (Set.mem_Icc.mp hη).2
 
 end
 

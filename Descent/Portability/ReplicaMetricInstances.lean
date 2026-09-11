@@ -31,6 +31,25 @@ expectation over two conditionally independent replicas under the corpus product
 `D = 4p(1 - p)`, with `0 ≤ N ≤ D ≤ 1`, and `binaryAUC_eq_guardedRatio` identifies the corpus
 `binaryAUC` with their guarded ratio, so (15) and (18) apply to it as well.
 
+Repaired Brier loss. For a law on pairs of a score group and a binary outcome, `scoreGroupMass`
+is `q_s` and the mass of the pair `(s, true)` is `a_s`. `conditionalRepairedBrier` is NOTE 2
+(23) as a finite sum of zero-extended ratios with `0 ≤ a_s² ≤ q_s ≤ 1`
+(`squaredCaseMass_le_scoreGroupMass`), so an empty group contributes zero
+(`conditionalRepairedBrier_eq_sum_filter`). It is population optimal:
+`conditionalRepairedBrier_le_meanSquaredError` bounds every recalibration of the score and
+`meanSquaredError_conditionalMean` attains the bound. `expectation_conditionalRepairedBrier_eq_tsum`
+applies (15) to every summand, and `repairedBrier_eq_conditionalRepairedBrier` ties the loss to
+the affine repair `ChronologyReportLaw.repairedBrier` of a binary score with both cells occupied.
+
+Calibration error. `calibrationError` is NOTE 2 (22) and equals the corpus
+`ChronologyReportLaw.discreteECE` for a binary score (`discreteECE_eq_calibrationError`). Its
+absolute values are resolved by finite sign strata: `calibrationError_eq_signedResidual`
+evaluates it at the law's own sign pattern, `calibrationError_isGreatest` exhibits it as the
+largest of the linear functionals `signedResidual`, each a one-replica moment
+(`signedResidual_eq_expectation`), and `expectation_calibrationError_eq_strata` is the exact
+stratum expansion over study contexts. `calibrationError_continuous` is continuity in the mass
+vector and `abs_calibrationError_sub_le` the total-variation Lipschitz bound.
+
 ## Empirical status
 
 None. The bodies here are algebra: every quantity is a finite sum or product of the masses of
@@ -539,6 +558,455 @@ theorem binaryAUC_certificate (law : FiniteReportLaw Context)
     htolerance hretained
 
 end AUC
+
+/-! ### Score groups of a finite score alphabet -/
+
+section ScoreGroups
+
+variable {Score : Type*} [Fintype Score]
+
+/-- The population mass `q_s` of one score group: the score takes the given value, whatever the
+outcome. -/
+def scoreGroupMass (law : FiniteReportLaw (Score × Bool)) (group : Score) : ℝ :=
+  law.mass (group, false) + law.mass (group, true)
+
+/-- For a binary score the score group mass is the corpus score cell mass. -/
+theorem scoreGroupMass_eq_scoreCellMass (law : FiniteReportLaw (Bool × Bool)) (allele : Bool) :
+    scoreGroupMass law allele = ChronologyReportLaw.scoreCellMass law allele :=
+  (ChronologyReportLaw.scoreCellMass_eq_cells law allele).symm
+
+/-- A score group mass is nonnegative. -/
+theorem scoreGroupMass_nonneg (law : FiniteReportLaw (Score × Bool)) (group : Score) :
+    0 ≤ scoreGroupMass law group :=
+  add_nonneg (law.mass_nonneg (group, false)) (law.mass_nonneg (group, true))
+
+/-- The case mass `a_s` of a score group never exceeds the group mass `q_s`. -/
+theorem caseMass_le_scoreGroupMass (law : FiniteReportLaw (Score × Bool)) (group : Score) :
+    law.mass (group, true) ≤ scoreGroupMass law group :=
+  le_add_of_nonneg_left (law.mass_nonneg (group, false))
+
+/-- A score group mass is at most one. -/
+theorem scoreGroupMass_le_one (law : FiniteReportLaw (Score × Bool)) (group : Score) :
+    scoreGroupMass law group ≤ 1 := by
+  calc scoreGroupMass law group = ∑ outcome : Bool, law.mass (group, outcome) := by
+        rw [Fintype.sum_bool, scoreGroupMass, add_comm]
+    _ ≤ ∑ other : Score, ∑ outcome : Bool, law.mass (other, outcome) :=
+        Finset.single_le_sum
+          (fun other _ ↦ Finset.sum_nonneg fun outcome _ ↦ law.mass_nonneg (other, outcome))
+          (Finset.mem_univ group)
+    _ = 1 := by rw [← law.mass_sum, Fintype.sum_prod_type]
+
+/-- **NOTE 2 section 5.4.** Every summand of the repaired Brier loss is a bounded ratio: the
+squared case mass of a score group is at most the group mass, which is at most one. -/
+theorem squaredCaseMass_le_scoreGroupMass (law : FiniteReportLaw (Score × Bool))
+    (group : Score) :
+    0 ≤ law.mass (group, true) ^ 2 ∧ law.mass (group, true) ^ 2 ≤ scoreGroupMass law group ∧
+      scoreGroupMass law group ≤ 1 := by
+  have hcase := law.mass_nonneg (group, true)
+  have hbelow := caseMass_le_scoreGroupMass law group
+  have hone := hbelow.trans (scoreGroupMass_le_one law group)
+  refine ⟨sq_nonneg _, ?_, scoreGroupMass_le_one law group⟩
+  nlinarith [mul_nonneg hcase (sub_nonneg.mpr hone)]
+
+end ScoreGroups
+
+/-! ### The repaired Brier loss -/
+
+section RepairedBrier
+
+variable {Score : Type*} [Fintype Score]
+
+/-- **NOTE 2 equation (23).** The population-optimal score-conditional repaired Brier loss: the
+case probability minus the sum over score groups of the squared case mass over the group mass,
+each summand read as zero on an empty group. -/
+def conditionalRepairedBrier (law : FiniteReportLaw (Score × Bool)) : ℝ :=
+  law.expectation (fun report ↦ ChronologyReportLaw.alleleValue report.2) -
+    ∑ group, ratioOnDefined (fun other ↦ law.mass (other, true) ^ 2) (scoreGroupMass law) group
+
+/-- **NOTE 2 equation (23), literally.** The repaired Brier loss is the case probability minus
+the sum of `a_s ^ 2 / q_s` over the score groups with `q_s > 0`: empty groups contribute zero
+and do not make the loss undefined. -/
+theorem conditionalRepairedBrier_eq_sum_filter (law : FiniteReportLaw (Score × Bool)) :
+    conditionalRepairedBrier law =
+      law.expectation (fun report ↦ ChronologyReportLaw.alleleValue report.2) -
+        ∑ group ∈ Finset.univ.filter (fun group ↦ 0 < scoreGroupMass law group),
+          law.mass (group, true) ^ 2 / scoreGroupMass law group := by
+  rw [conditionalRepairedBrier, Finset.sum_filter]
+  rfl
+
+/-- The mean squared error of any score recalibration decomposes over the score groups into the
+case probability plus `q_s g_s ^ 2 - 2 a_s g_s` per group. -/
+theorem meanSquaredError_recalibration (law : FiniteReportLaw (Score × Bool))
+    (recalibration : Score → ℝ) :
+    law.meanSquaredError (fun report ↦ recalibration report.1)
+        (fun report ↦ ChronologyReportLaw.alleleValue report.2) =
+      law.expectation (fun report ↦ ChronologyReportLaw.alleleValue report.2) +
+        ∑ group, (scoreGroupMass law group * recalibration group ^ 2 -
+          2 * law.mass (group, true) * recalibration group) := by
+  simp only [FiniteReportLaw.meanSquaredError, FiniteReportLaw.expectation, Fintype.sum_prod_type,
+    Fintype.sum_bool, scoreGroupMass, ChronologyReportLaw.alleleValue_true,
+    ChronologyReportLaw.alleleValue_false]
+  rw [← Finset.sum_add_distrib]
+  exact Finset.sum_congr rfl fun group _ ↦ by ring
+
+/-- **NOTE 2 equation (23), population optimality.** No recalibration of the score achieves a
+smaller Brier loss than the repaired Brier loss. -/
+theorem conditionalRepairedBrier_le_meanSquaredError (law : FiniteReportLaw (Score × Bool))
+    (recalibration : Score → ℝ) :
+    conditionalRepairedBrier law ≤
+      law.meanSquaredError (fun report ↦ recalibration report.1)
+        (fun report ↦ ChronologyReportLaw.alleleValue report.2) := by
+  have hgroup : ∀ group, -ratioOnDefined (fun other ↦ law.mass (other, true) ^ 2)
+      (scoreGroupMass law) group ≤
+        scoreGroupMass law group * recalibration group ^ 2 -
+          2 * law.mass (group, true) * recalibration group := by
+    intro group
+    unfold ratioOnDefined
+    split_ifs with hpos
+    · have hsquare : 0 ≤ scoreGroupMass law group *
+          (recalibration group - law.mass (group, true) / scoreGroupMass law group) ^ 2 :=
+        mul_nonneg hpos.le (sq_nonneg _)
+      have hexpand : scoreGroupMass law group *
+          (recalibration group - law.mass (group, true) / scoreGroupMass law group) ^ 2 =
+            scoreGroupMass law group * recalibration group ^ 2 -
+              2 * law.mass (group, true) * recalibration group +
+                law.mass (group, true) ^ 2 / scoreGroupMass law group := by
+        linear_combination (-(2 * recalibration group * law.mass (group, true)) +
+          law.mass (group, true) ^ 2 * (scoreGroupMass law group)⁻¹) *
+            mul_inv_cancel₀ hpos.ne'
+      linarith
+    · have hzero : scoreGroupMass law group = 0 :=
+        le_antisymm (not_lt.mp hpos) (scoreGroupMass_nonneg law group)
+      have hcase : law.mass (group, true) = 0 :=
+        le_antisymm (by linarith [caseMass_le_scoreGroupMass law group]) (law.mass_nonneg _)
+      rw [hzero, hcase]
+      norm_num
+  have hsum : 0 ≤ ∑ group, (scoreGroupMass law group * recalibration group ^ 2 -
+      2 * law.mass (group, true) * recalibration group +
+        ratioOnDefined (fun other ↦ law.mass (other, true) ^ 2) (scoreGroupMass law) group) :=
+    Finset.sum_nonneg fun group _ ↦ by linarith [hgroup group]
+  rw [Finset.sum_add_distrib] at hsum
+  rw [meanSquaredError_recalibration, conditionalRepairedBrier]
+  linarith
+
+/-- **NOTE 2 equation (23), attainment.** Recalibrating every score group to its conditional
+case probability, read as zero on an empty group, attains the repaired Brier loss. -/
+theorem meanSquaredError_conditionalMean (law : FiniteReportLaw (Score × Bool)) :
+    law.meanSquaredError
+        (fun report ↦ ratioOnDefined (fun other ↦ law.mass (other, true)) (scoreGroupMass law)
+          report.1)
+        (fun report ↦ ChronologyReportLaw.alleleValue report.2) =
+      conditionalRepairedBrier law := by
+  have hsum : ∑ group, (scoreGroupMass law group *
+        ratioOnDefined (fun other ↦ law.mass (other, true)) (scoreGroupMass law) group ^ 2 -
+      2 * law.mass (group, true) *
+        ratioOnDefined (fun other ↦ law.mass (other, true)) (scoreGroupMass law) group) =
+      -∑ group, ratioOnDefined (fun other ↦ law.mass (other, true) ^ 2) (scoreGroupMass law)
+        group := by
+    rw [← Finset.sum_neg_distrib]
+    refine Finset.sum_congr rfl fun group _ ↦ ?_
+    unfold ratioOnDefined
+    split_ifs with hpos
+    · linear_combination (law.mass (group, true) ^ 2 * (scoreGroupMass law group)⁻¹) *
+        mul_inv_cancel₀ hpos.ne'
+    · ring
+  rw [meanSquaredError_recalibration law
+      (ratioOnDefined (fun other ↦ law.mass (other, true)) (scoreGroupMass law)),
+    conditionalRepairedBrier, hsum]
+  ring
+
+/-- **NOTE 2 equation (15) for the repaired Brier loss.** Over a finite law of study contexts,
+the expected repaired Brier loss is the expected case probability minus, for every score group,
+the series of expectations of `a_s ^ 2 * (1 - q_s) ^ power`. -/
+theorem expectation_conditionalRepairedBrier_eq_tsum (law : FiniteReportLaw Context)
+    (population : Context → FiniteReportLaw (Score × Bool)) :
+    law.expectation (fun context ↦ conditionalRepairedBrier (population context)) =
+      law.expectation (fun context ↦ (population context).expectation
+          (fun report ↦ ChronologyReportLaw.alleleValue report.2)) -
+        ∑ group, ∑' power : ℕ, law.expectation (fun context ↦
+          (population context).mass (group, true) ^ 2 *
+            (1 - scoreGroupMass (population context) group) ^ power) := by
+  have hgroup : ∀ group, law.expectation (fun context ↦
+      ratioOnDefined (fun other ↦ (population context).mass (other, true) ^ 2)
+        (scoreGroupMass (population context)) group) =
+        ∑' power : ℕ, law.expectation (fun context ↦
+          (population context).mass (group, true) ^ 2 *
+            (1 - scoreGroupMass (population context) group) ^ power) := fun group ↦
+    expectation_ratioOnDefined_eq_tsum law
+      (fun context ↦ (population context).mass (group, true) ^ 2)
+      (fun context ↦ scoreGroupMass (population context) group)
+      (fun context ↦ (squaredCaseMass_le_scoreGroupMass (population context) group).1)
+      (fun context ↦ (squaredCaseMass_le_scoreGroupMass (population context) group).2.1)
+      (fun context ↦ (squaredCaseMass_le_scoreGroupMass (population context) group).2.2)
+  calc law.expectation (fun context ↦ conditionalRepairedBrier (population context))
+      = law.expectation (fun context ↦ (population context).expectation
+            (fun report ↦ ChronologyReportLaw.alleleValue report.2)) -
+          law.expectation (fun context ↦ ∑ group, ratioOnDefined
+            (fun other ↦ (population context).mass (other, true) ^ 2)
+            (scoreGroupMass (population context)) group) := by
+        simp only [FiniteReportLaw.expectation, ← Finset.sum_sub_distrib, ← mul_sub]
+        rfl
+    _ = _ := by
+        rw [FiniteIndependentMoments.expectation_sum law (fun group context ↦ ratioOnDefined
+          (fun other ↦ (population context).mass (other, true) ^ 2)
+          (scoreGroupMass (population context)) group)]
+        congr 1
+        exact Finset.sum_congr rfl fun group _ ↦ hgroup group
+
+/-- **NOTE 2 section 5.4 and NOTE 1 section 6.2.** For a binary score whose two score cells both
+carry mass, the affinely repaired Brier loss of the corpus equals the score-conditional repaired
+Brier loss: with two score groups the affine recalibration is already the group mean. -/
+theorem repairedBrier_eq_conditionalRepairedBrier (law : FiniteReportLaw (Bool × Bool))
+    (hrecipient : 0 < ChronologyReportLaw.scoreCellMass law false)
+    (hdonor : 0 < ChronologyReportLaw.scoreCellMass law true) :
+    ChronologyReportLaw.repairedBrier law = conditionalRepairedBrier law := by
+  rw [ChronologyReportLaw.scoreCellMass_eq_cells] at hrecipient hdonor
+  have hsum : law.mass (false, false) + law.mass (false, true) + law.mass (true, false) +
+      law.mass (true, true) = 1 := by
+    have htotal := law.mass_sum
+    simp only [Fintype.sum_prod_type, Fintype.sum_bool] at htotal
+    linarith
+  have hscore : law.variance ChronologyReportLaw.scoreOf =
+      (law.mass (false, false) + law.mass (false, true)) *
+        (law.mass (true, false) + law.mass (true, true)) := by
+    rw [FiniteReportLaw.variance_eq_rawMoments, ChronologyReportLaw.expectation_cells,
+      ChronologyReportLaw.expectation_cells]
+    simp only [ChronologyReportLaw.scoreOf_true, ChronologyReportLaw.scoreOf_false]
+    linear_combination (-(law.mass (true, false) + law.mass (true, true))) * hsum
+  have houtcome : law.variance ChronologyReportLaw.outcomeOf =
+      (law.mass (false, false) + law.mass (true, false)) *
+        (law.mass (false, true) + law.mass (true, true)) := by
+    rw [FiniteReportLaw.variance_eq_rawMoments, ChronologyReportLaw.expectation_cells,
+      ChronologyReportLaw.expectation_cells]
+    simp only [ChronologyReportLaw.outcomeOf_true, ChronologyReportLaw.outcomeOf_false]
+    linear_combination (-(law.mass (false, true) + law.mass (true, true))) * hsum
+  have hcovariance : law.covariance ChronologyReportLaw.scoreOf ChronologyReportLaw.outcomeOf =
+      law.mass (false, false) * law.mass (true, true) -
+        law.mass (false, true) * law.mass (true, false) := by
+    rw [FiniteReportLaw.covariance_eq_rawMoments, ChronologyReportLaw.expectation_cells,
+      ChronologyReportLaw.expectation_cells, ChronologyReportLaw.expectation_cells]
+    simp only [ChronologyReportLaw.scoreOf_true, ChronologyReportLaw.scoreOf_false,
+      ChronologyReportLaw.outcomeOf_true, ChronologyReportLaw.outcomeOf_false]
+    linear_combination (-law.mass (true, true)) * hsum
+  have hcase : law.expectation (fun report ↦ ChronologyReportLaw.alleleValue report.2) =
+      law.mass (false, true) + law.mass (true, true) := by
+    rw [ChronologyReportLaw.expectation_cells]
+    simp only [ChronologyReportLaw.alleleValue_true, ChronologyReportLaw.alleleValue_false]
+    ring
+  have hgroups : ∑ group, ratioOnDefined (fun other ↦ law.mass (other, true) ^ 2)
+      (scoreGroupMass law) group =
+        law.mass (true, true) ^ 2 / (law.mass (true, false) + law.mass (true, true)) +
+          law.mass (false, true) ^ 2 / (law.mass (false, false) + law.mass (false, true)) := by
+    rw [Fintype.sum_bool]
+    simp only [ratioOnDefined, scoreGroupMass, if_pos hdonor, if_pos hrecipient]
+  unfold ChronologyReportLaw.repairedBrier conditionalRepairedBrier
+  rw [hscore, houtcome, hcovariance, hcase, hgroups]
+  have hne0 : law.mass (false, false) + law.mass (false, true) ≠ 0 := hrecipient.ne'
+  have hne1 : law.mass (true, false) + law.mass (true, true) ≠ 0 := hdonor.ne'
+  have hkey : (law.mass (false, false) + law.mass (true, false)) *
+        (law.mass (false, true) + law.mass (true, true)) -
+      (law.mass (false, false) * law.mass (true, true) -
+        law.mass (false, true) * law.mass (true, false)) ^ 2 /
+          ((law.mass (false, false) + law.mass (false, true)) *
+            (law.mass (true, false) + law.mass (true, true))) -
+      (law.mass (false, true) + law.mass (true, true) -
+        (law.mass (true, true) ^ 2 / (law.mass (true, false) + law.mass (true, true)) +
+          law.mass (false, true) ^ 2 / (law.mass (false, false) + law.mass (false, true)))) =
+      (law.mass (false, false) + law.mass (false, true) + law.mass (true, false) +
+          law.mass (true, true) - 1) *
+        ((law.mass (false, true) + law.mass (true, true)) *
+            (law.mass (false, false) + law.mass (false, true)) *
+              (law.mass (true, false) + law.mass (true, true)) -
+          (law.mass (false, true) + law.mass (true, true)) ^ 2 *
+            (law.mass (true, false) + law.mass (true, true)) +
+          law.mass (true, true) ^ 2 -
+          2 * law.mass (true, true) * (law.mass (true, true) -
+            (law.mass (true, false) + law.mass (true, true)) *
+              (law.mass (false, true) + law.mass (true, true))) -
+          law.mass (true, true) ^ 2 * (law.mass (false, false) + law.mass (false, true) +
+            law.mass (true, false) + law.mass (true, true) - 1)) /
+        ((law.mass (false, false) + law.mass (false, true)) *
+          (law.mass (true, false) + law.mass (true, true))) := by
+    field_simp
+    ring
+  rw [hsum, sub_self, zero_mul, zero_div, sub_eq_zero] at hkey
+  exact hkey
+
+end RepairedBrier
+
+/-! ### Discrete calibration error -/
+
+section CalibrationError
+
+variable {Score : Type*} [Fintype Score]
+
+/-- **NOTE 2 equation (22), one group.** The calibration residual `a_s - s q_s` of a score
+group, for a numeric value `s` attached to the group. -/
+def calibrationResidual (law : FiniteReportLaw (Score × Bool)) (value : Score → ℝ)
+    (group : Score) : ℝ :=
+  law.mass (group, true) - value group * scoreGroupMass law group
+
+/-- **NOTE 2 equation (22).** The exact discrete-score calibration error `∑_s |a_s - s q_s|`. -/
+def calibrationError (law : FiniteReportLaw (Score × Bool)) (value : Score → ℝ) : ℝ :=
+  ∑ group, |calibrationResidual law value group|
+
+/-- For a binary score the calibration error of NOTE 2 (22) is the corpus discrete calibration
+error of NOTE 1 section 6.2, including where a score cell is empty. -/
+theorem discreteECE_eq_calibrationError (law : FiniteReportLaw (Bool × Bool)) :
+    ChronologyReportLaw.discreteECE law =
+      calibrationError law ChronologyReportLaw.alleleValue := by
+  unfold ChronologyReportLaw.discreteECE calibrationError
+  refine Finset.sum_congr rfl fun allele _ ↦ ?_
+  unfold ChronologyReportLaw.conditionalOutcomeMean calibrationResidual
+  rw [← scoreGroupMass_eq_scoreCellMass]
+  rcases eq_or_lt_of_le (scoreGroupMass_nonneg law allele) with hzero | hpos
+  · have hcase : law.mass (allele, true) = 0 :=
+      le_antisymm (by linarith [caseMass_le_scoreGroupMass law allele]) (law.mass_nonneg _)
+    rw [← hzero, hcase]
+    norm_num
+  · have hfactor : law.mass (allele, true) -
+        ChronologyReportLaw.alleleValue allele * scoreGroupMass law allele =
+          scoreGroupMass law allele * (law.mass (allele, true) / scoreGroupMass law allele -
+            ChronologyReportLaw.alleleValue allele) := by
+      linear_combination (-law.mass (allele, true)) * mul_inv_cancel₀ hpos.ne'
+    rw [hfactor, abs_mul, abs_of_pos hpos]
+
+/-- The sign pattern of a law: which score groups have a nonnegative calibration residual. -/
+def residualPattern (law : FiniteReportLaw (Score × Bool)) (value : Score → ℝ) :
+    Score → Bool :=
+  fun group ↦ decide (0 ≤ calibrationResidual law value group)
+
+/-- **NOTE 2 section 5.4, one sign stratum.** The signed residual of a sign pattern: the sum of
+the residuals with the signs of the pattern. It is linear in the population law. -/
+def signedResidual (law : FiniteReportLaw (Score × Bool)) (value : Score → ℝ)
+    (pattern : Score → Bool) : ℝ :=
+  ∑ group, (if pattern group then 1 else -1) * calibrationResidual law value group
+
+/-- The signed residual of a pattern is a one-replica moment: the expectation of the signed
+difference between the outcome and the score value. -/
+theorem signedResidual_eq_expectation (law : FiniteReportLaw (Score × Bool))
+    (value : Score → ℝ) (pattern : Score → Bool) :
+    signedResidual law value pattern =
+      law.expectation (fun report ↦ (if pattern report.1 then 1 else -1) *
+        (ChronologyReportLaw.alleleValue report.2 - value report.1)) := by
+  simp only [signedResidual, calibrationResidual, scoreGroupMass, FiniteReportLaw.expectation,
+    Fintype.sum_prod_type, Fintype.sum_bool, ChronologyReportLaw.alleleValue_true,
+    ChronologyReportLaw.alleleValue_false]
+  exact Finset.sum_congr rfl fun group _ ↦ by ring
+
+/-- Every sign pattern gives a lower bound on the calibration error. -/
+theorem signedResidual_le_calibrationError (law : FiniteReportLaw (Score × Bool))
+    (value : Score → ℝ) (pattern : Score → Bool) :
+    signedResidual law value pattern ≤ calibrationError law value := by
+  refine Finset.sum_le_sum fun group _ ↦ ?_
+  split_ifs
+  · rw [one_mul]
+    exact le_abs_self _
+  · rw [neg_one_mul]
+    exact neg_le_abs _
+
+/-- **NOTE 2 section 5.4, exact sign strata.** The calibration error is the signed residual of
+the law's own sign pattern. -/
+theorem calibrationError_eq_signedResidual (law : FiniteReportLaw (Score × Bool))
+    (value : Score → ℝ) :
+    calibrationError law value = signedResidual law value (residualPattern law value) := by
+  refine Finset.sum_congr rfl fun group _ ↦ ?_
+  simp only [residualPattern, decide_eq_true_eq]
+  by_cases hsign : 0 ≤ calibrationResidual law value group
+  · rw [if_pos hsign, one_mul, abs_of_nonneg hsign]
+  · rw [if_neg hsign, neg_one_mul, abs_of_neg (not_le.mp hsign)]
+
+/-- **NOTE 2 section 5.4.** The calibration error is the largest of the finitely many linear
+signed residuals, attained at the law's own sign pattern. -/
+theorem calibrationError_isGreatest (law : FiniteReportLaw (Score × Bool)) (value : Score → ℝ) :
+    IsGreatest (Set.range (signedResidual law value)) (calibrationError law value) :=
+  ⟨⟨residualPattern law value, (calibrationError_eq_signedResidual law value).symm⟩,
+    by
+      rintro _ ⟨pattern, rfl⟩
+      exact signedResidual_le_calibrationError law value pattern⟩
+
+/-- **NOTE 2 section 5.4, sign-strata expansion over study contexts.** The expected calibration
+error is the sum over sign patterns of the expectation of the stratum indicator times the linear
+signed residual of that pattern. -/
+theorem expectation_calibrationError_eq_strata [DecidableEq Score]
+    (law : FiniteReportLaw Context) (population : Context → FiniteReportLaw (Score × Bool))
+    (value : Score → ℝ) :
+    law.expectation (fun context ↦ calibrationError (population context) value) =
+      ∑ pattern : Score → Bool, law.expectation (fun context ↦
+        definedIndicator (fun other ↦ residualPattern (population other) value = pattern)
+            context *
+          signedResidual (population context) value pattern) := by
+  rw [← FiniteIndependentMoments.expectation_sum]
+  congr 1
+  funext context
+  rw [calibrationError_eq_signedResidual]
+  simp [definedIndicator]
+
+/-- **NOTE 2 section 5.4, continuity.** The calibration error is the value at the mass vector of
+a continuous functional of that vector. -/
+theorem calibrationError_continuous (value : Score → ℝ) :
+    Continuous (fun mass : Score × Bool → ℝ ↦
+        ∑ group, |mass (group, true) - value group * (mass (group, false) + mass (group, true))|) ∧
+      ∀ law : FiniteReportLaw (Score × Bool), calibrationError law value =
+        ∑ group, |law.mass (group, true) -
+          value group * (law.mass (group, false) + law.mass (group, true))| :=
+  ⟨continuous_finset_sum _ fun group _ ↦ continuous_abs.comp
+      ((continuous_apply _).sub
+        (continuous_const.mul ((continuous_apply _).add (continuous_apply _)))),
+    fun _ ↦ rfl⟩
+
+/-- A difference of two terms weighted by complementary unit-interval weights is bounded by the
+sum of the absolute values of the terms. -/
+theorem abs_convex_difference_le (first second weight : ℝ) (hlow : 0 ≤ weight)
+    (hhigh : weight ≤ 1) :
+    |(1 - weight) * first - weight * second| ≤ |first| + |second| := by
+  have hgap := sub_nonneg.mpr hhigh
+  have hfirst := abs_nonneg first
+  have hsecond := abs_nonneg second
+  rw [abs_le]
+  constructor
+  · nlinarith [mul_nonneg hgap (by linarith [neg_abs_le first] : 0 ≤ first + |first|),
+      mul_nonneg hlow (by linarith [le_abs_self second] : 0 ≤ |second| - second),
+      mul_nonneg hlow hfirst, mul_nonneg hgap hsecond]
+  · nlinarith [mul_nonneg hgap (by linarith [le_abs_self first] : 0 ≤ |first| - first),
+      mul_nonneg hlow (by linarith [neg_abs_le second] : 0 ≤ second + |second|),
+      mul_nonneg hlow hfirst, mul_nonneg hgap hsecond]
+
+/-- **NOTE 2 section 5.4 and equation (31).** For score values in the unit interval the
+calibration error is Lipschitz in total variation: two laws whose total variation distance is
+`t` have calibration errors within `2 t`. -/
+theorem abs_calibrationError_sub_le (first second : FiniteReportLaw (Score × Bool))
+    (value : Score → ℝ) (hlow : ∀ group, 0 ≤ value group) (hhigh : ∀ group, value group ≤ 1) :
+    |calibrationError first value - calibrationError second value| ≤
+      2 * first.totalVariation second := by
+  have hgroup : ∀ group, |calibrationResidual first value group -
+      calibrationResidual second value group| ≤
+        ∑ outcome : Bool, |first.mass (group, outcome) - second.mass (group, outcome)| := by
+    intro group
+    have hsplit : calibrationResidual first value group -
+        calibrationResidual second value group =
+          (1 - value group) * (first.mass (group, true) - second.mass (group, true)) -
+            value group * (first.mass (group, false) - second.mass (group, false)) := by
+      unfold calibrationResidual scoreGroupMass
+      ring
+    rw [hsplit, Fintype.sum_bool]
+    exact abs_convex_difference_le _ _ _ (hlow group) (hhigh group)
+  rw [FiniteReportLaw.totalVariation_eq_half_sum_abs, Fintype.sum_prod_type]
+  unfold calibrationError
+  rw [← Finset.sum_sub_distrib]
+  calc |∑ group, (|calibrationResidual first value group| -
+        |calibrationResidual second value group|)|
+      ≤ ∑ group, | |calibrationResidual first value group| -
+          |calibrationResidual second value group| | := Finset.abs_sum_le_sum_abs _ _
+    _ ≤ ∑ group, |calibrationResidual first value group -
+          calibrationResidual second value group| :=
+        Finset.sum_le_sum fun group _ ↦ abs_abs_sub_abs_le_abs_sub _ _
+    _ ≤ ∑ group, ∑ outcome : Bool, |first.mass (group, outcome) - second.mass (group, outcome)| :=
+        Finset.sum_le_sum fun group _ ↦ hgroup group
+    _ = 2 * ((∑ group, ∑ outcome : Bool,
+          |first.mass (group, outcome) - second.mass (group, outcome)|) / 2) := by ring
+
+end CalibrationError
 
 end
 

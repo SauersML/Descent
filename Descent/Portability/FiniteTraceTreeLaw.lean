@@ -443,32 +443,36 @@ def exampleArchitectureLaw : RationalReportLaw Bool where
   mass_nonneg := fun architecture ↦ by cases architecture <;> norm_num
   mass_sum := by norm_num [Fintype.sum_bool]
 
-/-- The three-way environment draw of the concrete experiment. -/
-def exampleEnvironmentLaw : RationalReportLaw (Fin 3) where
-  mass := fun environment ↦ if environment = 0 then 1 / 2 else 1 / 4
+/-- The three-way environment draw of the concrete experiment: absent with probability `1/2`,
+and each of the two present states with probability `1/4`. -/
+def exampleEnvironmentLaw : RationalReportLaw (Option Bool) where
+  mass := fun environment ↦ if environment.isSome then 1 / 4 else 1 / 2
   mass_nonneg := fun environment ↦ by split_ifs <;> norm_num
-  mass_sum := by norm_num [Fin.sum_univ_three]
+  mass_sum := by norm_num [Fintype.sum_option, Fintype.sum_bool]
 
 /-- A concrete dependent experiment: a binary architecture draw, and only when it is on, a
 three-way environment draw. The branch type and the depth after the first draw depend on its
 outcome. -/
-def exampleTree : RationalTraceTree (Fin 3) :=
+def exampleTree : RationalTraceTree (Option Bool) :=
   .node Bool exampleArchitectureLaw fun architecture ↦
-    if architecture then .node (Fin 3) exampleEnvironmentLaw fun environment ↦ .leaf environment
-    else .leaf 0
+    if architecture then .node (Option Bool) exampleEnvironmentLaw fun environment ↦
+      .leaf environment
+    else .leaf none
 
-/-- The algorithm running: the mean environment index of the concrete experiment, computed by
-rational arithmetic alone, is `1/3 · (0/2 + 1/4 + 2/4) = 1/4`. -/
+/-- The algorithm running: the probability that the concrete experiment reports the present
+state `some true`, computed by rational arithmetic alone, is `1/3 · 1/4 = 1/12`. -/
 theorem exampleTree_evaluate :
-    evaluate exampleTree (fun environment ↦ ((environment : ℕ) : ℚ)) = 1 / 4 := by
+    evaluate exampleTree (fun environment ↦ if environment = some true then 1 else 0) =
+      1 / 12 := by
   norm_num [evaluate, exampleTree, exampleArchitectureLaw, exampleEnvironmentLaw,
-    RationalReportLaw.expectation, Fintype.sum_bool, Fin.sum_univ_three]
+    RationalReportLaw.expectation, Fintype.sum_bool, Fintype.sum_option]
 
 /-- The real theory returns the same value on the carried experiment. -/
 theorem exampleTree_backwardValue :
-    TraceTree.backwardValue (toReal exampleTree) (fun environment ↦ ((environment : ℕ) : ℝ)) =
-      1 / 4 := by
-  have h := backwardValue_toReal exampleTree fun environment ↦ ((environment : ℕ) : ℚ)
+    TraceTree.backwardValue (toReal exampleTree)
+        (fun environment ↦ if environment = some true then 1 else 0) = 1 / 12 := by
+  have h := backwardValue_toReal exampleTree fun environment ↦
+    if environment = some true then (1 : ℚ) else 0
   rw [exampleTree_evaluate] at h
   simpa using h
 

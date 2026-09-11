@@ -263,17 +263,17 @@ theorem neutralGenerator_mul_eq_carreDuChamp (rates : NeutralRates Deme Locus Al
 /-- The generator annihilates constants. -/
 theorem neutralGenerator_one (rates : NeutralRates Deme Locus Allele) :
     neutralGenerator rates 1 = 0 := by
-  simp [neutralGenerator, demeSecondOrder, pderiv_one]
+  simp [neutralGenerator, demeSecondOrder]
 
 /-- Half of the carré du champ vanishes when its first argument is constant. -/
 theorem halfCovariance_one_left (rates : NeutralRates Deme Locus Allele)
     (h : FrequencyPolynomial Deme Locus Allele) : halfCovariance rates 1 h = 0 := by
-  simp [halfCovariance, demeCovarianceForm, pderiv_one]
+  simp [halfCovariance, demeCovarianceForm]
 
 /-- Half of the carré du champ vanishes when its second argument is constant. -/
 theorem halfCovariance_one_right (rates : NeutralRates Deme Locus Allele)
     (f : FrequencyPolynomial Deme Locus Allele) : halfCovariance rates f 1 = 0 := by
-  simp [halfCovariance, demeCovarianceForm, pderiv_one]
+  simp [halfCovariance, demeCovarianceForm]
 
 /-- Half of the carré du champ is a derivation in its second argument. -/
 theorem halfCovariance_mul_right (rates : NeutralRates Deme Locus Allele)
@@ -458,8 +458,7 @@ theorem neutralGenerator_assignmentPolynomial (rates : NeutralRates Deme Locus A
       Finset.sum_const_zero, sub_self]
   simp only [neutralGenerator, hsecond, mul_zero, Finset.sum_const_zero, add_zero]
   rw [Fintype.sum_prod_type, Finset.sum_eq_single i]
-  · simp only [pderiv_assignmentPolynomial, eq_self_iff_true, true_and, mul_ite, mul_one,
-      mul_zero]
+  · simp only [pderiv_assignmentPolynomial, true_and, mul_ite, mul_one, mul_zero]
     rw [Finset.sum_filter]
   · intro d _ hd
     refine Finset.sum_eq_zero fun hap _ ↦ ?_
@@ -481,9 +480,18 @@ theorem demeCovarianceForm_assignmentPolynomial (d i j : Deme)
   by_cases hdi : d = i
   · by_cases hdj : d = j
     · rw [if_pos ⟨hdi, hdj⟩, ← hdi, ← hdj]
-      simp only [eq_self_iff_true, true_and, ite_zero_mul_ite_zero, mul_one, mul_boole,
-        assignmentPolynomial, Finset.sum_mul_sum, Finset.sum_filter]
-      simp only [ite_and, Finset.sum_ite_irrel, Finset.sum_const_zero]
+      congr 1
+      · rw [Finset.sum_filter]
+        refine Finset.sum_congr rfl fun g _ ↦ ?_
+        by_cases h1 : Satisfies first g <;> by_cases h2 : Satisfies second g <;> simp [h1, h2]
+      · rw [assignmentPolynomial, assignmentPolynomial, Finset.sum_mul_sum, Finset.sum_filter]
+        refine Finset.sum_congr rfl fun g _ ↦ ?_
+        by_cases h1 : Satisfies first g
+        · rw [if_pos h1, Finset.sum_filter]
+          refine Finset.sum_congr rfl fun k _ ↦ ?_
+          by_cases h2 : Satisfies second k <;> simp [h1, h2]
+        · rw [if_neg h1]
+          exact Finset.sum_eq_zero fun k _ ↦ by simp [h1]
     · simp only [hdj, and_false, false_and, ↓reduceIte, mul_zero, Finset.sum_const_zero,
         sub_self]
   · simp only [hdi, false_and, ↓reduceIte, zero_mul, mul_zero, Finset.sum_const_zero, sub_self]

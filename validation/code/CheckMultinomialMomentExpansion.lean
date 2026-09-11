@@ -41,5 +41,14 @@ namespace Descent.Portability.MultinomialMomentExpansion
 #print axioms abs_expectation_monomial_sub_le
 #print axioms firstOrderStirlingSum_eq_sum_choose
 #print axioms monomialFirstOrder_eq_sum_choose
+#print axioms monomialPolynomial
+#print axioms resamplingOperator
+#print axioms eval_pderiv_pderiv_monomialPolynomial
+#print axioms prod_pow_indicator
+#print axioms cast_choose_two_eq
+#print axioms mul_mul_eval_pderiv_eq
+#print axioms mul_eval_pderiv_diag_eq
+#print axioms sum_sum_cast_mul_cast_sub
+#print axioms resamplingOperator_monomialPolynomial
 
 end Descent.Portability.MultinomialMomentExpansion
