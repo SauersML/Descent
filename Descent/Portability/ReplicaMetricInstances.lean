@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Foundations.TransportIdentities
 import Descent.Portability.ReplicaDomainCertificate
 import Descent.Portability.ChronologyReportLaw
 import Descent.Portability.FiniteGeneticTransition
@@ -17,8 +18,8 @@ NOTE 2 section 5.4 instantiates the replica-domain compiler of sections 5.1 and 
 metrics a report actually carries. Every instance is derived from the corpus definitions of
 the metrics, not from restatements of them. Scope: population laws and study contexts are
 finite report laws; the replica readouts have signed coefficients, as NOTE 2 remarks after (15),
-and are not claimed to be pointwise nonnegative; the ROC rates, predictive values, average
-precision and threshold curves of the last paragraph of section 5.4 are not formalized.
+and are not claimed to be pointwise nonnegative; average precision, named in the last
+paragraph of section 5.4, is not formalized.
 
 Squared correlation. For a score and an outcome in the unit interval, `correlationNumerator`
 and `correlationDenominator` are `N = 16 C_SY²` and `D = 16 V_S V_Y` of NOTE 2 (21), built from
@@ -65,6 +66,15 @@ built from the corpus `ReplicaMomentCompleteness.exponentListing`, and
 `expectation_eval_eq_replicaReadout` combines the two under `replicaCohortLaw`, the
 finite-context replica law of NOTE 2 (11). `expectation_correlationTerm_eq_replicaReadout` and
 `expectation_aucTerm_eq_replicaReadout` are the instances.
+
+Threshold rates. `thresholdConfusion` is the corpus `Foundations.ConfusionMatrix` of the strict
+threshold rule `threshold < value`, so a score tied with the threshold is called negative. Its
+called masses are one-replica event probabilities (`calledMass_eq_expectation`) and its
+prevalence is the case probability at every threshold (`prevalence_thresholdConfusion`).
+`confusion_rate_bounds` shows the corpus recall, false positive rate and precision are bounded
+ratios, and `expectation_recallRate_eq_tsum`, `expectation_fpr_eq_tsum` and
+`expectation_precision_eq_tsum` apply (15) to them at every point of a threshold curve, through
+`expectation_div_eq_tsum` for a quotient that Lean reads as zero at a vanishing denominator.
 
 ## Empirical status
 
@@ -1016,6 +1026,168 @@ theorem abs_calibrationError_sub_le (first second : FiniteReportLaw (Score × Bo
           |first.mass (group, outcome) - second.mass (group, outcome)|) / 2) := by ring
 
 end CalibrationError
+
+/-! ### Threshold confusion-matrix rates -/
+
+section ThresholdRates
+
+variable {Score : Type*} [Fintype Score]
+
+/-- The mass of the report cells of one outcome class whose score value passes the strict
+threshold rule `threshold < value`. The tie rule is part of the definition: a score equal to
+the threshold is not called positive. -/
+def calledMass (law : FiniteReportLaw (Score × Bool)) (value : Score → ℝ) (threshold : ℝ)
+    (outcome : Bool) : ℝ :=
+  ∑ group, if threshold < value group then law.mass (group, outcome) else 0
+
+/-- The mass of the report cells of one outcome class whose score value fails the strict
+threshold rule. -/
+def clearedMass (law : FiniteReportLaw (Score × Bool)) (value : Score → ℝ) (threshold : ℝ)
+    (outcome : Bool) : ℝ :=
+  ∑ group, if threshold < value group then 0 else law.mass (group, outcome)
+
+/-- The called and the cleared mass of one outcome class partition that class. -/
+theorem calledMass_add_clearedMass (law : FiniteReportLaw (Score × Bool)) (value : Score → ℝ)
+    (threshold : ℝ) (outcome : Bool) :
+    calledMass law value threshold outcome + clearedMass law value threshold outcome =
+      ∑ group, law.mass (group, outcome) := by
+  rw [calledMass, clearedMass, ← Finset.sum_add_distrib]
+  exact Finset.sum_congr rfl fun group _ ↦ by split_ifs <;> ring
+
+/-- The called mass is nonnegative. -/
+theorem calledMass_nonneg (law : FiniteReportLaw (Score × Bool)) (value : Score → ℝ)
+    (threshold : ℝ) (outcome : Bool) : 0 ≤ calledMass law value threshold outcome :=
+  Finset.sum_nonneg fun group _ ↦ by
+    split_ifs
+    · exact law.mass_nonneg _
+    · exact le_refl 0
+
+/-- The cleared mass is nonnegative. -/
+theorem clearedMass_nonneg (law : FiniteReportLaw (Score × Bool)) (value : Score → ℝ)
+    (threshold : ℝ) (outcome : Bool) : 0 ≤ clearedMass law value threshold outcome :=
+  Finset.sum_nonneg fun group _ ↦ by
+    split_ifs
+    · exact le_refl 0
+    · exact law.mass_nonneg _
+
+/-- The called mass of an outcome class is the one-replica probability of the event that the
+score passes the threshold and the outcome is that class. -/
+theorem calledMass_eq_expectation (law : FiniteReportLaw (Score × Bool)) (value : Score → ℝ)
+    (threshold : ℝ) (outcome : Bool) :
+    calledMass law value threshold outcome =
+      law.expectation (fun report ↦
+        if threshold < value report.1 ∧ report.2 = outcome then 1 else 0) := by
+  simp only [calledMass, FiniteReportLaw.expectation, Fintype.sum_prod_type, Fintype.sum_bool]
+  refine Finset.sum_congr rfl fun group _ ↦ ?_
+  by_cases hcall : threshold < value group <;> cases outcome <;> simp [hcall]
+
+/-- **NOTE 2 section 5.4, confusion matrix of a threshold rule.** The corpus confusion matrix
+of the strict threshold rule on a population law: true positives are called cases, false
+positives called controls, true negatives cleared controls and false negatives cleared cases. -/
+def thresholdConfusion (law : FiniteReportLaw (Score × Bool)) (value : Score → ℝ)
+    (threshold : ℝ) : Foundations.ConfusionMatrix where
+  tp := calledMass law value threshold true
+  fp := calledMass law value threshold false
+  tn := clearedMass law value threshold false
+  fn := clearedMass law value threshold true
+  tp_nonneg := calledMass_nonneg law value threshold true
+  fp_nonneg := calledMass_nonneg law value threshold false
+  tn_nonneg := clearedMass_nonneg law value threshold false
+  fn_nonneg := clearedMass_nonneg law value threshold true
+  mass_one := by
+    have hcases := calledMass_add_clearedMass law value threshold true
+    have hcontrols := calledMass_add_clearedMass law value threshold false
+    have htotal := law.mass_sum
+    rw [Fintype.sum_prod_type] at htotal
+    simp only [Fintype.sum_bool, Finset.sum_add_distrib] at htotal
+    linarith
+
+/-- The prevalence of the threshold confusion matrix is the case probability of the population
+law at every threshold. -/
+theorem prevalence_thresholdConfusion (law : FiniteReportLaw (Score × Bool))
+    (value : Score → ℝ) (threshold : ℝ) :
+    (thresholdConfusion law value threshold).prevalence =
+      law.expectation (fun report ↦ ChronologyReportLaw.alleleValue report.2) := by
+  show calledMass law value threshold true + clearedMass law value threshold true = _
+  rw [calledMass_add_clearedMass]
+  simp only [FiniteReportLaw.expectation, Fintype.sum_prod_type, Fintype.sum_bool,
+    ChronologyReportLaw.alleleValue_true, ChronologyReportLaw.alleleValue_false]
+  exact Finset.sum_congr rfl fun group _ ↦ by ring
+
+/-- **NOTE 2 section 5.4.** The three rates of a confusion matrix are bounded ratios: the recall
+numerator `tp`, the false positive numerator `fp` and the precision numerator `tp` are each at
+most their denominators `tp + fn`, `fp + tn` and `tp + fp`, which are at most one. -/
+theorem confusion_rate_bounds (matrix : Foundations.ConfusionMatrix) :
+    (matrix.tp ≤ matrix.tp + matrix.fn ∧ matrix.tp + matrix.fn ≤ 1) ∧
+      (matrix.fp ≤ matrix.fp + matrix.tn ∧ matrix.fp + matrix.tn ≤ 1) ∧
+      (matrix.tp ≤ matrix.tp + matrix.fp ∧ matrix.tp + matrix.fp ≤ 1) := by
+  have htotal := matrix.mass_one
+  have htp := matrix.tp_nonneg
+  have hfp := matrix.fp_nonneg
+  have htn := matrix.tn_nonneg
+  have hfn := matrix.fn_nonneg
+  exact ⟨⟨by linarith, by linarith⟩, ⟨by linarith, by linarith⟩, ⟨by linarith, by linarith⟩⟩
+
+/-- **NOTE 2 equation (15) for a quotient.** When `0 ≤ num ≤ den ≤ 1`, the expectation of the
+quotient `num / den`, which Lean reads as zero where `den` vanishes, is the series of
+expectations of `num * (1 - den) ^ power`. -/
+theorem expectation_div_eq_tsum (law : FiniteReportLaw Context) (num den : Context → ℝ)
+    (hnum : ∀ context, 0 ≤ num context) (hle : ∀ context, num context ≤ den context)
+    (hden : ∀ context, den context ≤ 1) :
+    law.expectation (fun context ↦ num context / den context) =
+      ∑' power : ℕ, law.expectation (fun context ↦ num context * (1 - den context) ^ power) := by
+  have hratio : (fun context ↦ num context / den context) = ratioOnDefined num den := by
+    funext context
+    unfold ratioOnDefined
+    split_ifs with hpos
+    · rfl
+    · rw [le_antisymm (not_lt.mp hpos) ((hnum context).trans (hle context)), div_zero]
+  rw [hratio]
+  exact expectation_ratioOnDefined_eq_tsum law num den hnum hle hden
+
+/-- **NOTE 2 section 5.4, true positive rate.** Over a finite law of study contexts, the expected
+corpus recall of context-dependent confusion matrices, such as `thresholdConfusion` at one point
+of a threshold curve, is the series of expectations of `tp * (1 - (tp + fn)) ^ power`. -/
+theorem expectation_recallRate_eq_tsum (law : FiniteReportLaw Context)
+    (matrix : Context → Foundations.ConfusionMatrix) :
+    law.expectation (fun context ↦ (matrix context).recallRate) =
+      ∑' power : ℕ, law.expectation (fun context ↦
+        (matrix context).tp * (1 - ((matrix context).tp + (matrix context).fn)) ^ power) :=
+  expectation_div_eq_tsum law (fun context ↦ (matrix context).tp)
+    (fun context ↦ (matrix context).tp + (matrix context).fn)
+    (fun context ↦ (matrix context).tp_nonneg)
+    (fun context ↦ (confusion_rate_bounds (matrix context)).1.1)
+    (fun context ↦ (confusion_rate_bounds (matrix context)).1.2)
+
+/-- **NOTE 2 section 5.4, false positive rate.** The expected corpus false positive rate of
+context-dependent confusion matrices is the series of expectations of
+`fp * (1 - (fp + tn)) ^ power`. -/
+theorem expectation_fpr_eq_tsum (law : FiniteReportLaw Context)
+    (matrix : Context → Foundations.ConfusionMatrix) :
+    law.expectation (fun context ↦ (matrix context).fpr) =
+      ∑' power : ℕ, law.expectation (fun context ↦
+        (matrix context).fp * (1 - ((matrix context).fp + (matrix context).tn)) ^ power) :=
+  expectation_div_eq_tsum law (fun context ↦ (matrix context).fp)
+    (fun context ↦ (matrix context).fp + (matrix context).tn)
+    (fun context ↦ (matrix context).fp_nonneg)
+    (fun context ↦ (confusion_rate_bounds (matrix context)).2.1.1)
+    (fun context ↦ (confusion_rate_bounds (matrix context)).2.1.2)
+
+/-- **NOTE 2 section 5.4, positive predictive value.** The expected corpus precision of
+context-dependent confusion matrices is the series of expectations of
+`tp * (1 - (tp + fp)) ^ power`. -/
+theorem expectation_precision_eq_tsum (law : FiniteReportLaw Context)
+    (matrix : Context → Foundations.ConfusionMatrix) :
+    law.expectation (fun context ↦ (matrix context).precision) =
+      ∑' power : ℕ, law.expectation (fun context ↦
+        (matrix context).tp * (1 - ((matrix context).tp + (matrix context).fp)) ^ power) :=
+  expectation_div_eq_tsum law (fun context ↦ (matrix context).tp)
+    (fun context ↦ (matrix context).tp + (matrix context).fp)
+    (fun context ↦ (matrix context).tp_nonneg)
+    (fun context ↦ (confusion_rate_bounds (matrix context)).2.2.1)
+    (fun context ↦ (confusion_rate_bounds (matrix context)).2.2.2)
+
+end ThresholdRates
 
 /-! ### Degree accounting -/
 

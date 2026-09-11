@@ -73,3 +73,13 @@ open Descent.Portability.ReplicaMetricInstances
 #print axioms expectation_eval_eq_replicaReadout
 #print axioms expectation_correlationTerm_eq_replicaReadout
 #print axioms expectation_aucTerm_eq_replicaReadout
+#print axioms calledMass_add_clearedMass
+#print axioms calledMass_nonneg
+#print axioms clearedMass_nonneg
+#print axioms calledMass_eq_expectation
+#print axioms prevalence_thresholdConfusion
+#print axioms confusion_rate_bounds
+#print axioms expectation_div_eq_tsum
+#print axioms expectation_recallRate_eq_tsum
+#print axioms expectation_fpr_eq_tsum
+#print axioms expectation_precision_eq_tsum
