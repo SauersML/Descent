@@ -3292,6 +3292,9 @@ def Descent_Portability_CalibrationLaw_prevalence(p, linear, intercept):
 def calibratedIntercept(p, baseline, epsilon, he, hb, raw):
     return _rt._proj(_rt._proj((standardized_calibrated_intercept(p, raw, baseline, epsilon, he, hb)), 'exists'), 'choose')
 
+def improvement(μ, w, f, φ, ε, z):
+    return _rt.sub(frameRisk(μ, w, f), frameRisk(μ, w, (Descent_Portability_DecisionLossContrasts_predict(f, φ, (repair((Descent_Portability_DecisionLossContrasts_gram(w, φ)), (estimate(w, f, φ, z)), ε))))))
+
 def chanCompose(A, G):
     return (lambda θ, y: sum((_rt.mul(A[int(θ)][int(x)], G[int(x)][int(y)])) for x in range(int(_rt.sumdim('x', len(A[0]), len(G))))))
 
@@ -4449,6 +4452,9 @@ def waterfillSecond(b, t):
 
 def waterfillForm(b, t):
     return (lambda ω: _rt.mul(_rt.mul(4.0, (_rt.sub(waterfillSecond(b, t, ω), t))), b[int(ω)]))
+
+def rows(G, hG, w, φ, i):
+    return toGram(G, hG, (_rt.mul(w[int(i)], (_rt.mul(_rt.rinv(G), _v(φ, i))))))
 
 def signal(G, r):
     return _rt.rsqrt((oracle(G, r)))
@@ -6285,6 +6291,9 @@ def spikeValue(H, p):
 def spikeParameter(E, H, q, eta):
     return _rt.rdiv(_rt.lpow((_rt.sub(1.0, H)), 2.0), (_rt.sub(_rt.sub(_rt.add(_rt.lpow((_rt.sub(1.0, H)), 2.0), _rt.rdiv(lossMeanVariance(E, H, q), eta)), lossMeanVariance(E, H, q)), minimalWithinVariance(E, H, q))))
 
+def workedCurve():
+    return _rt.VecFn([_rt.rdiv(9.0, 25.0), _rt.rdiv(4.0, 25.0), _rt.rdiv(1.0, 25.0), _rt.rdiv(1.0, 4.0)])
+
 def compensator(x):
     return _rt.rdiv(((_rt.sin(x) - x)), _rt.lpow(x, 2.0))
 
@@ -6338,6 +6347,9 @@ def cellTargetLaw(q, m, delta, hk, hd, d):
 
 def fullTargetLaw(E, q, m, delta, hk, hd):
     return Descent_Portability_IndividualLossMoments_mixture(E, (cellTargetLaw(q, m, delta, hk, hd)))
+
+def marginal(L, U, p, q, lo, hi, i):
+    return envelope((L[int(i)]), (U[int(i)]), (p[int(i)]), (q[int(i)]), (clip((lo[int(i)]), (hi[int(i)]), (vertex((L[int(i)]), (U[int(i)]), (p[int(i)]), (q[int(i)]))))))
 
 def Descent_Portability_SpectralMeasurementMinimax_coordinate(L, i):
     return innerSL(ℝ, (rightBasis(L, i)))
@@ -6745,6 +6757,12 @@ def crossMomentVector(E, X, Y):
 
 def outcomeSecondMoment(E, Y):
     return E(((lambda ω: _rt.lpow(Y[int(ω)], 2.0))))
+
+def weightMean(W, what):
+    return (lambda j: W(((lambda θ: what[int(θ)][int(j)]))))
+
+def weightCovariance(W, what):
+    return _rt.identity((lambda j, k: W(((lambda θ: _rt.mul((_rt.sub(what[int(θ)][int(j)], weightMean(W, what, j))), (_rt.sub(what[int(θ)][int(k)], weightMean(W, what, k)))))))))
 
 def Descent_Portability_TurnoverArchitectureMetrics_signValue(b):
     return (1.0 if b else (-1.0))

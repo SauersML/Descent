@@ -454,6 +454,10 @@ import Descent.Portability.FiniteAuditConfidence
 import Descent.Portability.ConditionalOscillationDuality
 import Descent.Portability.VectorAuditConfidence
 
+import Descent.Portability.CertifiedFrameRepair
+import Descent.Portability.NonlinearMetricGridBound
+import Descent.Portability.ScoreMomentZonoid
+
 assert_below Descent.Program
 
 /-!
