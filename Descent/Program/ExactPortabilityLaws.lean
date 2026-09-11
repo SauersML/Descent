@@ -102,6 +102,9 @@ import Descent.Portability.MultinomialRemainderConstant
 import Descent.Portability.MultinomialJetCertificate
 import Descent.Portability.MultinomialMicroscopicApproximation
 import Descent.Portability.MeasureKernelRealization
+import Descent.Portability.CylinderExponentialDraw
+import Descent.Portability.CylinderGaussianDraw
+import Descent.Portability.PortabilityRemainsJoint
 
 namespace Descent.Program
 
@@ -215,8 +218,9 @@ modules assume the polynomial semigroup, its positivity and its Euler limit;
 `NeutralFellerGenerator` identifies its generator but does not construct the semigroup from the
 neutral two-locus kernels; their kernels are Markov kernels on pseudo-metrizable
 compact spaces, which include the haplotype-frequency simplex. In §6 the attainable metric curve
-of NOTE1 Theorem 5 is proved exactly for lists of discrete events; for continuous rates only its
-coupling bounds are proved.
+of NOTE1 Theorem 5 is proved exactly for lists of discrete events, and for chronologies with
+continuous nonnegative rates at a positive horizon with a positive migration total:
+`AttainableChronologyCurve.attainable_metric_curve_continuous`.
 
 Guard witnesses: `LowOrderLDWitnesses` inhabits the corpus rate, epoch and history structures
 from data alone, and `PipelineWitnesses` inhabits the pipeline structures of `EndToEndScoreLaw`
@@ -242,14 +246,18 @@ from a deme count.
   `JointRatioFailureMasks`; joint moments determining the joint and masked metric laws:
   `JointMetricMomentDeterminacy`. §6.2:
   `PortabilityRatioQueries`, and under an arbitrary probability measure:
-  `PortabilityMeasureQueries`. §6.3 example: `UnboundedSlopeExample`. §6.4 equation (30):
+  `PortabilityMeasureQueries`; two couplings with the same marginal source and target laws and
+  different comparison queries: `PortabilityRemainsJoint`. §6.3 example: `UnboundedSlopeExample`. §6.4 equation (30):
   `LogLossSeriesCertificate`.
 * §7.1 equation (31): `EmpiricalLawLipschitzBound`; the modulus-of-continuity extension to every
   continuous functional: `EmpiricalLawContinuityBound`. §7.2, interval evaluators without nesting
   and Kraft's inequality for prefix enumerations: `IntervalEvaluatorCertificate`; Theorem 5 on
   genuine fair-bit cylinders, with nested certificates and a bracket of the shape of (18) at every
   stage: `CylinderIntervalCertificate`; the executed uniform draw:
-  `CylinderUniformDraw`; threshold comparisons with unresolved boundary mass and coordinate
+  `CylinderUniformDraw`; the executed exponential draw `-log U`, with certificates converging to
+  `E min(X, 1) = 1 - 1/e`: `CylinderExponentialDraw`; the Box-Muller pair on the even and odd
+  bits, with radial certificates converging to `E min(Z₁² + Z₂², 2) = 2(1 - 1/e)`:
+  `CylinderGaussianDraw`; threshold comparisons with unresolved boundary mass and coordinate
   rounding: `CylinderThresholdCertificate`; equation (32), the report law of an almost surely
   terminating random-bit program: `CylinderHaltingLaw`.
 * §8 equations (33)-(35): `FrontierCompletionRegion`, with (35) in `SublawReportCertificate`;
@@ -280,7 +288,10 @@ not yet proof-checked.
 finite measure, a common bound and pointwise vanishing widths;
 `CylinderIntervalCertificate` needs only almost sure vanishing widths on fair-bit streams but
 does not show that its rational values are computed by an algorithm. (32) takes almost sure
-termination of the program as a hypothesis; it is not decided. Equations (33) and (34) are
+termination of the program as a hypothesis; it is not decided. The exponential and Gaussian draws
+are executed for integrands of `min(X, 1)` and of the radius only; the laws of the draws as
+measures, the Box-Muller theorem and integrands depending on the angle are not formalized.
+Equations (33) and (34) are
 proved for finitely many cells and coordinates, with the whole region attained by completions.
 -/
 
