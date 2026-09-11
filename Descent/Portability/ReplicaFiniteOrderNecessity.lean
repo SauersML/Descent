@@ -205,49 +205,64 @@ theorem ker_momentMap_le_ker_reportMap (m n : ℕ)
   have hmass : ∑ q ∈ cells, positivePart q = ∑ q ∈ cells, negativePart q := by
     have h := hpair (zeroExponent m n)
     simpa only [momentVector_zeroExponent, mul_one] using h
-  set total := ∑ q ∈ cells, positivePart q with htotal
-  have htotalnn : 0 ≤ total := Finset.sum_nonneg fun q _ ↦ hposnn q
+  have htotalnn : (0 : ℝ) ≤ ∑ q ∈ cells, positivePart q :=
+    Finset.sum_nonneg fun q _ ↦ hposnn q
   have hgoal : ∑ q ∈ cells, positivePart q * report q =
       ∑ q ∈ cells, negativePart q * report q := by
     rcases eq_or_lt_of_le htotalnn with hzero | hpos
-    · have hpz : ∀ q ∈ cells, positivePart q = 0 :=
-        (Finset.sum_eq_zero_iff_of_nonneg fun q _ ↦ hposnn q).mp htotal.symm ▸
-          (Finset.sum_eq_zero_iff_of_nonneg fun q _ ↦ hposnn q).mp hzero.symm
-      have hnz : ∀ q ∈ cells, negativePart q = 0 :=
-        (Finset.sum_eq_zero_iff_of_nonneg fun q _ ↦ hnegnn q).mp (hmass ▸ hzero.symm)
-      rw [Finset.sum_congr rfl fun q hq ↦ by rw [hpz q hq]; ring,
-        Finset.sum_congr rfl fun q hq ↦ by rw [hnz q hq]; ring]
-    · have hne : total ≠ 0 := ne_of_gt hpos
-      have hsum1 : ∑ q ∈ cells, positivePart q / total = 1 := by
-        rw [← Finset.sum_div, ← htotal, div_self hne]
-      have hsum2 : ∑ q ∈ cells, negativePart q / total = 1 := by
-        rw [← Finset.sum_div, ← hmass, ← htotal, div_self hne]
+    · have hpz := (Finset.sum_eq_zero_iff_of_nonneg fun q _ ↦ hposnn q).mp hzero.symm
+      have hnz := (Finset.sum_eq_zero_iff_of_nonneg fun q _ ↦ hnegnn q).mp
+        (by rw [← hmass]; exact hzero.symm)
+      rw [Finset.sum_eq_zero fun q hq ↦ by rw [hpz q hq, zero_mul],
+        Finset.sum_eq_zero fun q hq ↦ by rw [hnz q hq, zero_mul]]
+    · have hne : (∑ q ∈ cells, positivePart q) ≠ 0 := ne_of_gt hpos
+      have hsum1 : ∑ q ∈ cells, positivePart q / (∑ r ∈ cells, positivePart r) = 1 := by
+        rw [← Finset.sum_div, div_self hne]
+      have hsum2 : ∑ q ∈ cells, negativePart q / (∑ r ∈ cells, positivePart r) = 1 := by
+        rw [← Finset.sum_div, ← hmass, div_self hne]
       have hscaled : ∀ e : ↥(degreeSet m n),
-          ∑ q ∈ cells, positivePart q / total * momentVector m n q e =
-            ∑ q ∈ cells, negativePart q / total * momentVector m n q e := by
+          ∑ q ∈ cells,
+              positivePart q / (∑ r ∈ cells, positivePart r) * momentVector m n q e =
+            ∑ q ∈ cells,
+              negativePart q / (∑ r ∈ cells, positivePart r) * momentVector m n q e := by
         intro e
-        have hl : ∑ q ∈ cells, positivePart q / total * momentVector m n q e =
-            (∑ q ∈ cells, positivePart q * momentVector m n q e) / total := by
+        have hl : ∑ q ∈ cells,
+            positivePart q / (∑ r ∈ cells, positivePart r) * momentVector m n q e =
+              (∑ q ∈ cells, positivePart q * momentVector m n q e) /
+                (∑ r ∈ cells, positivePart r) := by
           rw [Finset.sum_div]
           exact Finset.sum_congr rfl fun q _ ↦ by ring
-        have hr : ∑ q ∈ cells, negativePart q / total * momentVector m n q e =
-            (∑ q ∈ cells, negativePart q * momentVector m n q e) / total := by
+        have hr : ∑ q ∈ cells,
+            negativePart q / (∑ r ∈ cells, positivePart r) * momentVector m n q e =
+              (∑ q ∈ cells, negativePart q * momentVector m n q e) /
+                (∑ r ∈ cells, positivePart r) := by
           rw [Finset.sum_div]
           exact Finset.sum_congr rfl fun q _ ↦ by ring
         rw [hl, hr, hpair e]
-      have hdiv := hdet cells cells (fun q ↦ positivePart q / total)
-        (fun q ↦ negativePart q / total) (fun q _ ↦ div_nonneg (hposnn q) htotalnn) hsum1
+      have hdiv := hdet cells cells
+        (fun q ↦ positivePart q / (∑ r ∈ cells, positivePart r))
+        (fun q ↦ negativePart q / (∑ r ∈ cells, positivePart r))
+        (fun q _ ↦ div_nonneg (hposnn q) htotalnn) hsum1
         (fun q _ ↦ div_nonneg (hnegnn q) htotalnn) hsum2 hscaled
-      have hl : ∑ q ∈ cells, positivePart q / total * report q =
-          (∑ q ∈ cells, positivePart q * report q) / total := by
+      have hl : ∑ q ∈ cells,
+          positivePart q / (∑ r ∈ cells, positivePart r) * report q =
+            (∑ q ∈ cells, positivePart q * report q) /
+              (∑ r ∈ cells, positivePart r) := by
         rw [Finset.sum_div]
         exact Finset.sum_congr rfl fun q _ ↦ by ring
-      have hr : ∑ q ∈ cells, negativePart q / total * report q =
-          (∑ q ∈ cells, negativePart q * report q) / total := by
+      have hr : ∑ q ∈ cells,
+          negativePart q / (∑ r ∈ cells, positivePart r) * report q =
+            (∑ q ∈ cells, negativePart q * report q) /
+              (∑ r ∈ cells, positivePart r) := by
         rw [Finset.sum_div]
         exact Finset.sum_congr rfl fun q _ ↦ by ring
       rw [hl, hr] at hdiv
-      exact (div_left_injective₀ hne) hdiv
+      have hz : (∑ q ∈ cells, positivePart q * report q -
+          ∑ q ∈ cells, negativePart q * report q) /
+            (∑ r ∈ cells, positivePart r) = 0 := by
+        rw [sub_div, hdiv, sub_self]
+      have hnum := (div_eq_zero_iff.mp hz).resolve_right hne
+      linarith
   have hfinal : ∑ q ∈ cells, signed q * report q =
       ∑ q ∈ cells, positivePart q * report q -
         ∑ q ∈ cells, negativePart q * report q := by
