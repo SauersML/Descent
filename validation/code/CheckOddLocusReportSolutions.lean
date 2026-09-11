@@ -32,3 +32,8 @@ open Descent.Portability.OddLocusReportSolutions
 #print axioms oddSolution_two
 #print axioms oddSystem_unique
 #print axioms oddLevelMatrix_mulVec
+#print axioms oddRow_eq_zero_of_lt
+#print axioms oddLevelMatrix_eigen
+#print axioms mulVec_sum
+#print axioms sum_oddRow_columns
+#print axioms exp_oddLevelMatrix_square_report

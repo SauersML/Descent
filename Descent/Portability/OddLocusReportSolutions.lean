@@ -31,8 +31,11 @@ exponential-decay approximation is needed is checked rather than repeated.
 
 `oddLevelMatrix` writes the same system as a finite generator against the grid predecessor
 `gridPred` of `Descent.Portability.ContinuousTurnoverSemigroup`, in the shape that module's
-`linearDeathMatrix` uses, and `oddLevelMatrix_mulVec` evaluates it as the scaled down-difference
-that is the right-hand side of (4.6) read on the level grid.
+`linearDeathMatrix` uses.  Each coefficient column is an eigenvector of it
+(`oddLevelMatrix_eigen`), which is the matching recursion read as an eigenvector equation, so
+`exp_oddLevelMatrix_square_report` evaluates the semigroup of that generator on the initial
+square report `(2r+1)²` as exactly `a_{2r+1}(t)`.  That last step runs through
+`exp_mulVec_eigen`, hence through the Euler limit, not through a differential equation.
 
 Domain conditions: none beyond the manuscript's own.  The rate `λ` is an arbitrary real
 throughout; nonnegativity is never needed for the solution or its uniqueness.
@@ -330,6 +333,100 @@ theorem oddLevelMatrix_mulVec (m : ℕ) (lam : ℝ) (v : Fin (m + 1) → ℝ) (r
   rw [Finset.sum_congr rfl fun i _ ↦ hpt i, ← Finset.mul_sum, Finset.sum_sub_distrib,
     Finset.sum_ite_eq' Finset.univ (gridPred m r) v, Finset.sum_ite_eq' Finset.univ r v,
     if_pos (Finset.mem_univ _), if_pos (Finset.mem_univ _)]
+
+/-! ## The solution as the semigroup of the generator -/
+
+/-- Coefficients past the diagonal vanish. -/
+theorem oddRow_eq_zero_of_lt (r q : ℕ) (h : r < q) : oddRow r q = 0 := by
+  cases r with
+  | zero => rw [oddRow_zero, if_neg (by omega)]
+  | succ r =>
+    conv_lhs => rw [oddRow]
+    simp only [if_neg (show ¬ (q < r + 1) by omega), if_neg (show ¬ (q = r + 1) by omega)]
+
+/-- **Each coefficient column is an eigenvector of the odd-locus generator**, with eigenvalue
+the negated decay rate of its own slot.  This is the matching recursion read as an eigenvector
+equation, and it is why the solution is a finite combination of exponentials. -/
+theorem oddLevelMatrix_eigen (m : ℕ) (lam : ℝ) (q : ℕ) :
+    (oddLevelMatrix m lam).mulVec (fun r : Fin (m + 1) ↦ oddRow (r : ℕ) q)
+      = (-(dexp q) * lam) • (fun r : Fin (m + 1) ↦ oddRow (r : ℕ) q) := by
+  funext r
+  rw [oddLevelMatrix_mulVec]
+  simp only [Pi.smul_apply, smul_eq_mul]
+  rcases Nat.eq_zero_or_pos (r : ℕ) with h0 | hpos
+  · have hpred : ((gridPred m r : Fin (m + 1)) : ℕ) = 0 := by
+      simp [gridPred, h0]
+    rw [hpred, h0, sub_self, mul_zero]
+    rcases Nat.eq_zero_or_pos q with hq | hq
+    · rw [hq, dexp_zero]
+      ring
+    · rw [oddRow_eq_zero_of_lt 0 q hq]
+      ring
+  · obtain ⟨r', hr'⟩ : ∃ r' : ℕ, (r : ℕ) = r' + 1 := ⟨(r : ℕ) - 1, by omega⟩
+    have hpred : ((gridPred m r : Fin (m + 1)) : ℕ) = r' := by
+      simp [gridPred, hr']
+    rw [hpred, hr']
+    rcases lt_trichotomy q (r' + 1) with hq | hq | hq
+    · have hkey := oddShift_mul r' q hq
+      push_cast
+      linear_combination (-lam) * hkey
+    · rw [hq, oddRow_eq_zero_of_lt r' (r' + 1) (by omega), dexp_succ]
+      push_cast
+      ring
+    · rw [oddRow_eq_zero_of_lt r' q (by omega), oddRow_eq_zero_of_lt (r' + 1) q hq]
+      ring
+
+/-- A matrix acts on a finite sum of vectors term by term. -/
+theorem mulVec_sum {N : ℕ} (M : Matrix (Fin N) (Fin N) ℝ) (s : Finset ℕ)
+    (v : ℕ → Fin N → ℝ) : M.mulVec (∑ q ∈ s, v q) = ∑ q ∈ s, M.mulVec (v q) := by
+  classical
+  induction s using Finset.induction with
+  | empty => simp
+  | insert a s ha ih =>
+    rw [Finset.sum_insert ha, Finset.sum_insert ha, Matrix.mulVec_add, ih]
+
+/-- The coefficient columns reassemble the initial square report. -/
+theorem sum_oddRow_columns (m : ℕ) (r : Fin (m + 1)) :
+    ∑ q ∈ Finset.range (m + 1), oddRow (r : ℕ) q = (2 * (((r : ℕ) : ℝ)) + 1) ^ 2 := by
+  rw [← sum_oddRow (r : ℕ)]
+  refine (Finset.sum_subset ?_ ?_).symm
+  · intro q hq
+    exact Finset.mem_range.mpr (lt_of_lt_of_le (Finset.mem_range.mp hq) (by omega))
+  · intro q _ hq
+    exact oddRow_eq_zero_of_lt (r : ℕ) q (by
+      have := Finset.mem_range.not.mp hq
+      omega)
+
+/-- **DC Corollary 4.3 as a semigroup identity.**  Running the odd-locus generator for time `t`
+on the initial square report `(2r+1)²` produces exactly `a_{2r+1}(t)`.  The proof is the
+eigenvector action of `ContinuousTurnoverSemigroup.exp_mulVec_eigen` applied to each coefficient
+column, so it goes through the Euler limit rather than through an ODE. -/
+theorem exp_oddLevelMatrix_square_report (m : ℕ) (lam t : ℝ) (r : Fin (m + 1)) :
+    (NormedSpace.exp ℝ (t • oddLevelMatrix m lam)).mulVec
+        (fun r' ↦ (2 * (((r' : ℕ) : ℝ)) + 1) ^ 2) r
+      = oddSolution lam (r : ℕ) t := by
+  have hinit : (fun r' : Fin (m + 1) ↦ (2 * (((r' : ℕ) : ℝ)) + 1) ^ 2)
+      = ∑ q ∈ Finset.range (m + 1), fun r' : Fin (m + 1) ↦ oddRow (r' : ℕ) q := by
+    funext r'
+    rw [Finset.sum_apply, sum_oddRow_columns m r']
+  rw [hinit, mulVec_sum, Finset.sum_apply]
+  have hterm : ∀ q ∈ Finset.range (m + 1),
+      (NormedSpace.exp ℝ (t • oddLevelMatrix m lam)).mulVec
+          (fun r' : Fin (m + 1) ↦ oddRow (r' : ℕ) q) r
+        = oddRow (r : ℕ) q * Real.exp (-(dexp q) * lam * t) := by
+    intro q _
+    rw [exp_mulVec_eigen (oddLevelMatrix m lam) (fun r' : Fin (m + 1) ↦ oddRow (r' : ℕ) q)
+      (-(dexp q) * lam) t (oddLevelMatrix_eigen m lam q) r, ← Real.exp_eq_exp_ℝ,
+      show t * (-(dexp q) * lam) = -(dexp q) * lam * t from by ring]
+    ring
+  rw [Finset.sum_congr rfl hterm, oddSolution]
+  refine (Finset.sum_subset ?_ ?_).symm
+  · intro q hq
+    exact Finset.mem_range.mpr (lt_of_lt_of_le (Finset.mem_range.mp hq) (by omega))
+  · intro q _ hq
+    rw [oddRow_eq_zero_of_lt (r : ℕ) q (by
+      have := Finset.mem_range.not.mp hq
+      omega), zero_mul]
 
 end
 
