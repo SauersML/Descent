@@ -351,6 +351,181 @@ theorem zeroMeanNoise_cell_loss_variance (KG : ExpFunctional G) (g : G → ℝ)
   rw [hshift, Real.sq_sqrt (div_nonneg hδ hτ.le)]
   field_simp
 
+variable {D : Type*}
+
+/-- Total loss variance in the fixed-architecture setting of TQ §2.4: the
+between-cell variance of the conditional mean loss `r + τ` plus the mean
+conditional loss variance. `W` names the cell loss variance function. -/
+theorem fixed_architecture_total_loss_variance (E : ExpFunctional D)
+    (KG : D → ExpFunctional G) (KN : D → ExpFunctional N) (g : D × G → ℝ)
+    (e : D × N → ℝ) (τ W : D → ℝ)
+    (hmean : ∀ d, KN d (fun n ↦ e (d, n)) = 0)
+    (hτ : ∀ d, KN d (fun n ↦ e (d, n) ^ 2) = τ d)
+    (hW : ∀ d, variance (mixture (KG d) (fun _ ↦ KN d))
+      (fun z ↦ (g (d, z.1) + e (d, z.2)) ^ 2) = W d) :
+    variance (mixture E (fun d ↦ mixture (KG d) (fun _ ↦ KN d)))
+        (fun z ↦ (g (z.1, z.2.1) + e (z.1, z.2.2)) ^ 2)
+      = variance E (fun d ↦ KG d (fun γ ↦ g (d, γ) ^ 2) + τ d) + E W := by
+  have ht := total_variance E (fun d ↦ mixture (KG d) (fun _ ↦ KN d))
+    (fun z : D × (G × N) ↦ (g (z.1, z.2.1) + e (z.1, z.2.2)) ^ 2)
+  have hfun1 : (fun d ↦ variance (mixture (KG d) (fun _ ↦ KN d))
+      (fun ω : G × N ↦ (g (d, ω.1) + e (d, ω.2)) ^ 2)) = W := by
+    funext d
+    exact hW d
+  have hfun2 : (fun d ↦ mixture (KG d) (fun _ ↦ KN d)
+      (fun ω : G × N ↦ (g (d, ω.1) + e (d, ω.2)) ^ 2))
+      = (fun d ↦ KG d (fun γ ↦ g (d, γ) ^ 2) + τ d) := by
+    funext d
+    have hc := additive_noise_cell_mean_loss (KG d) (KN d) (fun γ ↦ g (d, γ))
+      (fun n ↦ e (d, n)) (hmean d)
+    calc mixture (KG d) (fun _ ↦ KN d)
+          (fun ω : G × N ↦ (g (d, ω.1) + e (d, ω.2)) ^ 2)
+        = KG d (fun γ ↦ g (d, γ) ^ 2) + KN d (fun n ↦ e (d, n) ^ 2) := hc
+      _ = KG d (fun γ ↦ g (d, γ) ^ 2) + τ d := by rw [hτ d]
+  rw [ht]
+  show E (fun d ↦ variance (mixture (KG d) (fun _ ↦ KN d))
+      (fun ω : G × N ↦ (g (d, ω.1) + e (d, ω.2)) ^ 2))
+      + variance E (fun d ↦ mixture (KG d) (fun _ ↦ KN d)
+        (fun ω : G × N ↦ (g (d, ω.1) + e (d, ω.2)) ^ 2))
+      = variance E (fun d ↦ KG d (fun γ ↦ g (d, γ) ^ 2) + τ d) + E W
+  rw [hfun1, hfun2]
+  ring
+
+/-- The fixed-architecture denominator is at least `B + W₀` for every admissible
+conditional noise shape: TQ (2.10) integrated over the cells. -/
+theorem fixed_architecture_total_variance_lower_bound (E : ExpFunctional D)
+    (KG : D → ExpFunctional G) (KN : D → ExpFunctional N) (g : D × G → ℝ)
+    (e : D × N → ℝ) (τ : D → ℝ)
+    (hmean : ∀ d, KN d (fun n ↦ e (d, n)) = 0)
+    (hτ : ∀ d, KN d (fun n ↦ e (d, n) ^ 2) = τ d) (hτpos : ∀ d, 0 < τ d) :
+    variance E (fun d ↦ KG d (fun γ ↦ g (d, γ) ^ 2) + τ d)
+        + E (fun d ↦ minCellLossVariance (KG d) (fun γ ↦ g (d, γ)) (τ d))
+      ≤ variance (mixture E (fun d ↦ mixture (KG d) (fun _ ↦ KN d)))
+          (fun z ↦ (g (z.1, z.2.1) + e (z.1, z.2.2)) ^ 2) := by
+  rw [fixed_architecture_total_loss_variance E KG KN g e τ
+    (fun d ↦ variance (mixture (KG d) (fun _ ↦ KN d))
+      (fun z ↦ (g (d, z.1) + e (d, z.2)) ^ 2)) hmean hτ (fun d ↦ rfl)]
+  have hmono : E (fun d ↦ minCellLossVariance (KG d) (fun γ ↦ g (d, γ)) (τ d))
+      ≤ E (fun d ↦ variance (mixture (KG d) (fun _ ↦ KN d))
+        (fun z ↦ (g (d, z.1) + e (d, z.2)) ^ 2)) :=
+    E.eval_mono (fun d ↦ additive_noise_cell_loss_variance_lower_bound (KG d)
+      (KN d) (fun γ ↦ g (d, γ)) (fun n ↦ e (d, n)) (τ d) (hmean d) (hτ d)
+      (hτpos d))
+  linarith
+
+/-- TQ (2.17): every admissible noise shape has a strictly positive explainable
+fraction, and none exceeds `B / (B + W₀)`. Zero is an infimum, not attained. -/
+theorem fixed_architecture_fraction_bounds (E : ExpFunctional D)
+    (KG : D → ExpFunctional G) (KN : D → ExpFunctional N) (g : D × G → ℝ)
+    (e : D × N → ℝ) (τ : D → ℝ)
+    (hmean : ∀ d, KN d (fun n ↦ e (d, n)) = 0)
+    (hτ : ∀ d, KN d (fun n ↦ e (d, n) ^ 2) = τ d) (hτpos : ∀ d, 0 < τ d)
+    (hB : 0 < variance E (fun d ↦ KG d (fun γ ↦ g (d, γ) ^ 2) + τ d)) :
+    0 < variance E (fun d ↦ KG d (fun γ ↦ g (d, γ) ^ 2) + τ d)
+        / variance (mixture E (fun d ↦ mixture (KG d) (fun _ ↦ KN d)))
+          (fun z ↦ (g (z.1, z.2.1) + e (z.1, z.2.2)) ^ 2) ∧
+      variance E (fun d ↦ KG d (fun γ ↦ g (d, γ) ^ 2) + τ d)
+          / variance (mixture E (fun d ↦ mixture (KG d) (fun _ ↦ KN d)))
+            (fun z ↦ (g (z.1, z.2.1) + e (z.1, z.2.2)) ^ 2)
+        ≤ variance E (fun d ↦ KG d (fun γ ↦ g (d, γ) ^ 2) + τ d)
+          / (variance E (fun d ↦ KG d (fun γ ↦ g (d, γ) ^ 2) + τ d)
+            + E (fun d ↦ minCellLossVariance (KG d) (fun γ ↦ g (d, γ)) (τ d))) := by
+  have hW0 : 0 ≤ E (fun d ↦ minCellLossVariance (KG d) (fun γ ↦ g (d, γ)) (τ d)) :=
+    E.nonneg_eval _ (fun d ↦ minCellLossVariance_nonneg _ _ _ (hτpos d).le)
+  have hlb := fixed_architecture_total_variance_lower_bound E KG KN g e τ hmean hτ
+    hτpos
+  have htot : 0 < variance (mixture E (fun d ↦ mixture (KG d) (fun _ ↦ KN d)))
+      (fun z ↦ (g (z.1, z.2.1) + e (z.1, z.2.2)) ^ 2) := by linarith
+  refine ⟨div_pos hB htot, ?_⟩
+  rw [div_le_div_iff₀ htot (by linarith)]
+  nlinarith
+
+/-- The cell-wise two-point noise completion with a constant prescribed excess
+`δ`, TQ (2.16): the skewness parameter is chosen per distance cell. -/
+def completionNoise (KG : D → ExpFunctional G) (g : D × G → ℝ) (τ : D → ℝ)
+    (hτpos : ∀ d, 0 < τ d) (δ : ℝ) (d : D) : ExpFunctional Bool :=
+  zeroMeanNoise (τ d) (-2 * KG d (fun γ ↦ g (d, γ)) + Real.sqrt (δ / τ d))
+    (hτpos d)
+
+/-- The support values of the cell-wise two-point noise completion. -/
+def completionNoiseValue (KG : D → ExpFunctional G) (g : D × G → ℝ) (τ : D → ℝ)
+    (δ : ℝ) (z : D × Bool) : ℝ :=
+  zeroMeanNoiseValue (τ z.1)
+    (-2 * KG z.1 (fun γ ↦ g (z.1, γ)) + Real.sqrt (δ / τ z.1)) z.2
+
+/-- The completion has the prescribed conditional noise variance in every cell,
+so the whole conditional first/second-moment architecture is unchanged. -/
+theorem completionNoise_conditional_moments (KG : D → ExpFunctional G)
+    (g : D × G → ℝ) (τ : D → ℝ) (hτpos : ∀ d, 0 < τ d) (δ : ℝ) (d : D) :
+    completionNoise KG g τ hτpos δ d
+        (fun b ↦ completionNoiseValue KG g τ δ (d, b)) = 0 ∧
+      completionNoise KG g τ hτpos δ d
+        (fun b ↦ completionNoiseValue KG g τ δ (d, b) ^ 2) = τ d :=
+  ⟨zeroMeanNoise_mean _ _ _, zeroMeanNoise_second _ _ _⟩
+
+/-- The exact total loss variance of the two-point completion: `B + W₀ + δ`. -/
+theorem completionNoise_total_loss_variance (E : ExpFunctional D)
+    (KG : D → ExpFunctional G) (g : D × G → ℝ) (τ : D → ℝ)
+    (hτpos : ∀ d, 0 < τ d) (δ : ℝ) (hδ : 0 ≤ δ) :
+    variance (mixture E (fun d ↦ mixture (KG d)
+          (fun _ ↦ completionNoise KG g τ hτpos δ d)))
+        (fun z ↦ (g (z.1, z.2.1)
+          + completionNoiseValue KG g τ δ (z.1, z.2.2)) ^ 2)
+      = variance E (fun d ↦ KG d (fun γ ↦ g (d, γ) ^ 2) + τ d)
+        + (E (fun d ↦ minCellLossVariance (KG d) (fun γ ↦ g (d, γ)) (τ d)) + δ) := by
+  have hcell : ∀ d, variance (mixture (KG d)
+      (fun _ ↦ completionNoise KG g τ hτpos δ d))
+      (fun z ↦ (g (d, z.1) + completionNoiseValue KG g τ δ (d, z.2)) ^ 2)
+      = minCellLossVariance (KG d) (fun γ ↦ g (d, γ)) (τ d) + δ := fun d ↦
+    zeroMeanNoise_cell_loss_variance (KG d) (fun γ ↦ g (d, γ)) (τ d) δ (hτpos d) hδ
+  rw [fixed_architecture_total_loss_variance E KG
+    (fun d ↦ completionNoise KG g τ hτpos δ d) g (completionNoiseValue KG g τ δ) τ
+    (fun d ↦ minCellLossVariance (KG d) (fun γ ↦ g (d, γ)) (τ d) + δ)
+    (fun d ↦ (completionNoise_conditional_moments KG g τ hτpos δ d).1)
+    (fun d ↦ (completionNoise_conditional_moments KG g τ hτpos δ d).2) hcell]
+  have hsplit : (fun d ↦ minCellLossVariance (KG d) (fun γ ↦ g (d, γ)) (τ d) + δ)
+      = (fun d ↦ minCellLossVariance (KG d) (fun γ ↦ g (d, γ)) (τ d))
+        + (fun _ : D ↦ δ) := rfl
+  rw [hsplit, E.add_eval, E.eval_const]
+
+/-- Solving for the excess that realizes a prescribed explainable fraction. -/
+theorem excess_for_fraction (b w η : ℝ) (hb : 0 < b) (hw : 0 ≤ w) (hη : 0 < η)
+    (hle : η ≤ b / (b + w)) :
+    0 ≤ b / η - b - w ∧ b / (b + (w + (b / η - b - w))) = η := by
+  have hbw : 0 < b + w := by linarith
+  have hne : η ≠ 0 := ne_of_gt hη
+  have hbne : b ≠ 0 := ne_of_gt hb
+  have h1 : η * (b + w) ≤ b := (le_div_iff₀ hbw).mp hle
+  have h2 : (b + w) * η ≤ b := by nlinarith
+  have h3 : b + w ≤ b / η := (le_div_iff₀ hη).mpr h2
+  refine ⟨by linarith, ?_⟩
+  have hd : b + (w + (b / η - b - w)) = b / η := by ring
+  rw [hd, div_div_eq_mul_div, mul_comm, mul_div_assoc, div_self hbne, mul_one]
+
+/-- TQ Corollary 2.6: every value in `(0, B/(B+W₀)]` is attained by conditional
+two-point noise, with the whole conditional first/second-moment architecture
+held fixed. Together with `fixed_architecture_fraction_bounds` this is the exact
+attainable interval, zero being an infimum that is not attained. -/
+theorem fixed_architecture_fraction_attained (E : ExpFunctional D)
+    (KG : D → ExpFunctional G) (g : D × G → ℝ) (τ : D → ℝ)
+    (hτpos : ∀ d, 0 < τ d) (η : ℝ) (hη : 0 < η)
+    (hB : 0 < variance E (fun d ↦ KG d (fun γ ↦ g (d, γ) ^ 2) + τ d))
+    (hηle : η ≤ variance E (fun d ↦ KG d (fun γ ↦ g (d, γ) ^ 2) + τ d)
+      / (variance E (fun d ↦ KG d (fun γ ↦ g (d, γ) ^ 2) + τ d)
+        + E (fun d ↦ minCellLossVariance (KG d) (fun γ ↦ g (d, γ)) (τ d)))) :
+    ∃ δ : ℝ, 0 ≤ δ ∧
+      variance E (fun d ↦ KG d (fun γ ↦ g (d, γ) ^ 2) + τ d)
+        / variance (mixture E (fun d ↦ mixture (KG d)
+            (fun _ ↦ completionNoise KG g τ hτpos δ d)))
+          (fun z ↦ (g (z.1, z.2.1)
+            + completionNoiseValue KG g τ δ (z.1, z.2.2)) ^ 2) = η := by
+  have hW0 : 0 ≤ E (fun d ↦ minCellLossVariance (KG d) (fun γ ↦ g (d, γ)) (τ d)) :=
+    E.nonneg_eval _ (fun d ↦ minCellLossVariance_nonneg _ _ _ (hτpos d).le)
+  obtain ⟨hδ, hfrac⟩ := excess_for_fraction _ _ η hB hW0 hη hηle
+  refine ⟨_, hδ, ?_⟩
+  rw [completionNoise_total_loss_variance E KG g τ hτpos _ hδ]
+  exact hfrac
+
 end
 
 end Descent.Portability.LossNoiseCompletion
