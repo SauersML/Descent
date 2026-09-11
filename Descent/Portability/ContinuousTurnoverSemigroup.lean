@@ -568,6 +568,79 @@ theorem exp_linearDeath_lower_endpoint (m : ℕ) (hm : 0 < m) (gamma t ν : ℝ)
   rw [exp_linearDeath_sq m gamma t ⟨m, Nat.lt_succ_self m⟩, hsq, hval]
   field_simp
 
+/-! ## Every falling factorial is an eigenvector: DC Corollary 3.5's factorial moments -/
+
+/-- The falling factorial `(x)_r = x (x-1) ⋯ (x - r + 1)`, peeled from the left. -/
+def fallingFactorial (x : ℝ) : ℕ → ℝ
+  | 0 => 1
+  | (r + 1) => x * fallingFactorial (x - 1) r
+
+/-- The falling factorial peeled from the right. -/
+theorem fallingFactorial_succ_right (r : ℕ) :
+    ∀ x : ℝ, fallingFactorial x (r + 1) = fallingFactorial x r * (x - (r : ℝ)) := by
+  induction r with
+  | zero =>
+    intro x
+    show x * fallingFactorial (x - 1) 0 = fallingFactorial x 0 * (x - ((0 : ℕ) : ℝ))
+    simp [fallingFactorial]
+  | succ r ih =>
+    intro x
+    show x * fallingFactorial (x - 1) (r + 1) = fallingFactorial x (r + 1) * (x - ((r + 1 : ℕ) : ℝ))
+    rw [ih (x - 1)]
+    show x * (fallingFactorial (x - 1) r * (x - 1 - (r : ℝ)))
+      = (x * fallingFactorial (x - 1) r) * (x - ((r + 1 : ℕ) : ℝ))
+    push_cast
+    ring
+
+/-- The down-difference of a falling factorial, the identity behind the eigenvalue `-γ r`. -/
+theorem fallingFactorial_down_diff (x : ℝ) (r : ℕ) :
+    fallingFactorial (x - 1) (r + 1) - fallingFactorial x (r + 1)
+      = -((r : ℝ) + 1) * fallingFactorial (x - 1) r := by
+  rw [fallingFactorial_succ_right r (x - 1)]
+  show fallingFactorial (x - 1) r * (x - 1 - (r : ℝ)) - x * fallingFactorial (x - 1) r = _
+  ring
+
+/-- The falling factorial vanishes at zero once the order is positive. -/
+theorem fallingFactorial_zero (r : ℕ) : fallingFactorial (0 : ℝ) (r + 1) = 0 := by
+  show (0 : ℝ) * fallingFactorial ((0 : ℝ) - 1) r = 0
+  ring
+
+/-- **Every falling factorial of the count is an eigenvector of the pure-death generator**,
+with eigenvalue `-γ r`.  This is the algebraic content of DC Corollary 3.5: the minimizing
+aggregate has the factorial moments of a binomial law. -/
+theorem linearDeathMatrix_eigen_falling (m : ℕ) (gamma : ℝ) (r : ℕ) :
+    (linearDeathMatrix m gamma).mulVec (fun j ↦ fallingFactorial ((j : ℕ) : ℝ) r)
+      = (-(gamma * (r : ℝ))) • (fun j : Fin (m + 1) ↦ fallingFactorial ((j : ℕ) : ℝ) r) := by
+  funext j
+  rw [linearDeathMatrix_mulVec]
+  simp only [Pi.smul_apply, smul_eq_mul]
+  cases r with
+  | zero => simp [fallingFactorial]
+  | succ r =>
+    rcases Nat.eq_zero_or_pos (j : ℕ) with h | h
+    · rw [h, Nat.cast_zero, fallingFactorial_zero r]
+      ring
+    · have hc : (((gridPred m j : Fin (m + 1)) : ℕ) : ℝ) = ((j : ℕ) : ℝ) - 1 := by
+        show (((j : ℕ) - 1 : ℕ) : ℝ) = ((j : ℕ) : ℝ) - 1
+        rw [Nat.cast_sub h]
+        norm_num
+      rw [hc, fallingFactorial_down_diff]
+      show gamma * ((j : ℕ) : ℝ) * (-((r : ℝ) + 1) * fallingFactorial (((j : ℕ) : ℝ) - 1) r)
+        = -(gamma * ((r + 1 : ℕ) : ℝ)) * (((j : ℕ) : ℝ)
+            * fallingFactorial (((j : ℕ) : ℝ) - 1) r)
+      push_cast
+      ring
+
+/-- **DC Corollary 3.5's factorial moments, exactly, in continuous time.**  Under the
+pure-death semigroup every falling factorial of the count decays by its own exponential:
+`E_t (N)_r = e^{-γ r t} (N_0)_r`, which is the factorial-moment law of
+`Binomial(N_0, e^{-γ t})`. -/
+theorem exp_linearDeath_falling (m : ℕ) (gamma t : ℝ) (r : ℕ) (j : Fin (m + 1)) :
+    (NormedSpace.exp ℝ (t • linearDeathMatrix m gamma)).mulVec
+        (fun i ↦ fallingFactorial ((i : ℕ) : ℝ) r) j
+      = NormedSpace.exp ℝ (t * (-(gamma * (r : ℝ)))) * fallingFactorial ((j : ℕ) : ℝ) r :=
+  exp_mulVec_eigen _ _ _ t (linearDeathMatrix_eigen_falling m gamma r) j
+
 end
 
 end Descent.Portability.ContinuousTurnoverSemigroup
