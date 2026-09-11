@@ -332,7 +332,7 @@ theorem wInner_smul_self (P u : Ω → ℝ) (c : ℝ) :
 inequality `Foundations.cauchy_schwarz` for the expectation `weightedExp`. -/
 theorem wInner_cauchy_schwarz (P : Ω → ℝ) (hp : ∀ ω, 0 ≤ P ω) (hsum : ∑ ω, P ω = 1)
     (f g : Ω → ℝ) : wInner P f g ^ 2 ≤ wInner P f f * wInner P g g := by
-  have hcs := cauchy_schwarz (weightedExp P hp hsum) f g
+  have hcs := ExpFunctional.cauchy_schwarz (weightedExp P hp hsum) f g
   rw [wInner_eq_weightedExp P hp hsum f g, wInner_eq_weightedExp P hp hsum f f,
     wInner_eq_weightedExp P hp hsum g g]
   have hf : (fun ω ↦ f ω * f ω) = fun ω ↦ f ω ^ 2 := by
@@ -362,23 +362,26 @@ theorem sharp_summary_invisible_sensitivity {k : ℕ} {P : Ω → ℝ}
           wInner P rr f = sign * Real.sqrt (wInner P rr rr) := by
   have hroot : 0 < Real.sqrt (wInner P rr rr) := Real.sqrt_pos.mpr hpos
   have hsq : Real.sqrt (wInner P rr rr) ^ 2 = wInner P rr rr := Real.sq_sqrt hpos.le
+  set nrm : ℝ := Real.sqrt (wInner P rr rr) with hnrm
+  have hne : nrm ≠ 0 := ne_of_gt hroot
   constructor
   · intro f _ _ hnorm
     have hcs := wInner_cauchy_schwarz P hp hsum rr f
     have hb : wInner P rr f ^ 2 ≤ wInner P rr rr := by nlinarith [hpos.le]
     calc |wInner P rr f| = Real.sqrt (wInner P rr f ^ 2) := (Real.sqrt_sq_eq_abs _).symm
-      _ ≤ Real.sqrt (wInner P rr rr) := Real.sqrt_le_sqrt hb
+      _ ≤ nrm := Real.sqrt_le_sqrt hb
   · intro sign hsign
-    refine ⟨fun ω ↦ sign * (Real.sqrt (wInner P rr rr))⁻¹ * rr ω, ?_, ?_, ?_, ?_⟩
+    have hkey : nrm⁻¹ * wInner P rr rr = nrm := by
+      rw [← hsq, sq, ← mul_assoc, inv_mul_cancel₀ hne, one_mul]
+    have hnormsq : (sign * nrm⁻¹) ^ 2 * wInner P rr rr = sign ^ 2 := by
+      rw [mul_pow, inv_pow, ← hsq, mul_assoc, inv_mul_cancel₀ (pow_ne_zero 2 hne), mul_one]
+    refine ⟨fun ω ↦ sign * nrm⁻¹ * rr ω, ?_, ?_, ?_, ?_⟩
     · rw [wInner_smul_right, hrconst, mul_zero]
     · intro i
       rw [wInner_smul_right, hrfeat i, mul_zero]
-    · rw [wInner_smul_self, hsq]
-      rcases hsign with h | h <;> rw [h] <;>
-        field_simp <;> rw [hsq]
-    · rw [wInner_smul_right]
-      field_simp
-      rcases hsign with h | h <;> rw [h] <;> nlinarith [hsq, hroot]
+    · rw [wInner_smul_self, hnormsq]
+      rcases hsign with h | h <;> rw [h] <;> norm_num
+    · rw [wInner_smul_right, mul_assoc, hkey]
 
 /-- The product of the two first-order metric responses along a direction, when
 the residual influences are proportional. Its sign is the sign of the
@@ -428,27 +431,25 @@ theorem independent_residuals_attain_response {k : ℕ} {P : Ω → ℝ}
       (∀ i, wInner P (feat i) f = 0) ∧ wInner P f f ≤ 1 ∧
       wInner P r1 f = t * z1 ∧ wInner P r2 f = t * z2 := by
   have hsym : wInner P r2 r1 = wInner P r1 r2 := wInner_comm P r2 r1
-  set d : ℝ := wInner P r1 r1 * wInner P r2 r2 - wInner P r1 r2 ^ 2 with hd
-  have hdne : d ≠ 0 := ne_of_gt hdet
-  set a1 : ℝ := (wInner P r2 r2 * z1 - wInner P r1 r2 * z2) / d with ha1
-  set a2 : ℝ := (wInner P r1 r1 * z2 - wInner P r1 r2 * z1) / d with ha2
-  have hr1 : wInner P r1 (fun ω ↦ a1 * r1 ω + a2 * r2 ω) = z1 := by
-    rw [wInner_add_right, wInner_smul_right, wInner_smul_right, ha1, ha2, hd]
-    field_simp
+  obtain ⟨a1, ha1⟩ : ∃ a : ℝ, a = wInner P r2 r2 * z1 - wInner P r1 r2 * z2 := ⟨_, rfl⟩
+  obtain ⟨a2, ha2⟩ : ∃ a : ℝ, a = wInner P r1 r1 * z2 - wInner P r1 r2 * z1 := ⟨_, rfl⟩
+  have hr1 : wInner P r1 (fun ω ↦ a1 * r1 ω + a2 * r2 ω) =
+      (wInner P r1 r1 * wInner P r2 r2 - wInner P r1 r2 ^ 2) * z1 := by
+    rw [wInner_add_right, wInner_smul_right, wInner_smul_right, ha1, ha2]
     ring
-  have hr2 : wInner P r2 (fun ω ↦ a1 * r1 ω + a2 * r2 ω) = z2 := by
-    rw [wInner_add_right, wInner_smul_right, wInner_smul_right, hsym, ha1, ha2, hd]
-    field_simp
+  have hr2 : wInner P r2 (fun ω ↦ a1 * r1 ω + a2 * r2 ω) =
+      (wInner P r1 r1 * wInner P r2 r2 - wInner P r1 r2 ^ 2) * z2 := by
+    rw [wInner_add_right, wInner_smul_right, wInner_smul_right, hsym, ha1, ha2]
     ring
-  have hself : wInner P (fun ω ↦ a1 * r1 ω + a2 * r2 ω)
-      (fun ω ↦ a1 * r1 ω + a2 * r2 ω) = a1 * z1 + a2 * z2 := by
-    rw [wInner_add_left, wInner_smul_left, wInner_smul_left, hr1, hr2]
-  have hq : 0 ≤ a1 * z1 + a2 * z2 := by
-    rw [← hself]
+  obtain ⟨q, hq⟩ : ∃ q : ℝ, q = wInner P (fun ω ↦ a1 * r1 ω + a2 * r2 ω)
+      (fun ω ↦ a1 * r1 ω + a2 * r2 ω) := ⟨_, rfl⟩
+  have hqnn : 0 ≤ q := by
+    rw [hq]
     exact wInner_self_nonneg hp _
-  refine ⟨(a1 * z1 + a2 * z2 + 1)⁻¹,
-    fun ω ↦ (a1 * z1 + a2 * z2 + 1)⁻¹ * (a1 * r1 ω + a2 * r2 ω), ?_, ?_, ?_, ?_, ?_, ?_⟩
-  · positivity
+  have hden : (0 : ℝ) < q + 1 := by linarith
+  refine ⟨(q + 1)⁻¹ * (wInner P r1 r1 * wInner P r2 r2 - wInner P r1 r2 ^ 2),
+    fun ω ↦ (q + 1)⁻¹ * (a1 * r1 ω + a2 * r2 ω), mul_pos (inv_pos.mpr hden) hdet,
+    ?_, ?_, ?_, ?_, ?_⟩
   · rw [wInner_smul_right, wInner_add_right, wInner_smul_right, wInner_smul_right,
       h1c, h2c]
     ring
@@ -456,13 +457,10 @@ theorem independent_residuals_attain_response {k : ℕ} {P : Ω → ℝ}
     rw [wInner_smul_right, wInner_add_right, wInner_smul_right, wInner_smul_right,
       h1f i, h2f i]
     ring
-  · rw [wInner_smul_self, hself]
-    rw [div_le_one (by positivity), ← div_le_one (by positivity)] at *
-    have hpos : 0 < a1 * z1 + a2 * z2 + 1 := by linarith
-    rw [inv_pow, inv_mul_eq_div, div_le_one (by positivity)]
+  · rw [wInner_smul_self, ← hq, inv_pow, inv_mul_eq_div, div_le_one (pow_pos hden 2)]
     nlinarith
-  · rw [wInner_smul_right, hr1]
-  · rw [wInner_smul_right, hr2]
+  · rw [wInner_smul_right, hr1, ← mul_assoc]
+  · rw [wInner_smul_right, hr2, ← mul_assoc]
 
 end
 
