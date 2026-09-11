@@ -85,33 +85,42 @@ def gaussianMomentLaw : ExpFunctional (Fin 3) :=
     (by intro i; fin_cases i <;> norm_num)
     (by norm_num [Fin.sum_univ_three])
 
-/-- Its support values at conditional variance `v`. -/
-def gaussianMomentValue (v : ℝ) : Fin 3 → ℝ :=
-  ![-Real.sqrt (3 * v), 0, Real.sqrt (3 * v)]
+/-- Its support values at scale `s`, namely `{-s, 0, s}`. -/
+def gaussianMomentValue (s : ℝ) : Fin 3 → ℝ := ![-s, 0, s]
+
+/-- The raw second and fourth moments of the three-point law at scale `s`. -/
+theorem gaussianMomentLaw_raw_moments (s : ℝ) :
+    gaussianMomentLaw (fun i ↦ gaussianMomentValue s i ^ 2) = s ^ 2 / 3 ∧
+      gaussianMomentLaw (fun i ↦ gaussianMomentValue s i ^ 4) = s ^ 4 / 3 := by
+  constructor
+  · norm_num [gaussianMomentLaw, gaussianMomentValue, weightedExp_apply,
+      Fin.sum_univ_three]
+    all_goals ring
+  · norm_num [gaussianMomentLaw, gaussianMomentValue, weightedExp_apply,
+      Fin.sum_univ_three]
+    all_goals ring
+
+/-- The scale matching a centred Gaussian of conditional variance `v`. -/
+def gaussianMomentScale (v : ℝ) : ℝ := Real.sqrt (3 * v)
 
 /-- The three-point law has second moment `v` and fourth moment `3v²`, so it is
 indistinguishable from a centred Gaussian at these two moments. -/
 theorem gaussianMomentLaw_moments (v : ℝ) (hv : 0 ≤ v) :
-    gaussianMomentLaw (fun i ↦ gaussianMomentValue v i ^ 2) = v ∧
-      gaussianMomentLaw (fun i ↦ gaussianMomentValue v i ^ 4) = 3 * v ^ 2 := by
-  have s3 : Real.sqrt 3 ^ 2 = 3 := Real.sq_sqrt (by norm_num)
-  have sv : Real.sqrt v ^ 2 = v := Real.sq_sqrt hv
-  have s3f : Real.sqrt 3 ^ 4 = 9 := by
-    have hx : Real.sqrt 3 ^ 4 = (Real.sqrt 3 ^ 2) ^ 2 := by ring
-    rw [hx, s3]
-    norm_num
-  have svf : Real.sqrt v ^ 4 = v ^ 2 := by
-    have hx : Real.sqrt v ^ 4 = (Real.sqrt v ^ 2) ^ 2 := by ring
-    rw [hx, sv]
-  constructor
-  · norm_num [gaussianMomentLaw, gaussianMomentValue, weightedExp_apply,
-      Fin.sum_univ_three]
-    all_goals rw [s3, sv]
-    all_goals ring
-  · norm_num [gaussianMomentLaw, gaussianMomentValue, weightedExp_apply,
-      Fin.sum_univ_three]
-    all_goals rw [s3f, svf]
-    all_goals ring
+    gaussianMomentLaw
+        (fun i ↦ gaussianMomentValue (gaussianMomentScale v) i ^ 2) = v ∧
+      gaussianMomentLaw
+        (fun i ↦ gaussianMomentValue (gaussianMomentScale v) i ^ 4) = 3 * v ^ 2 := by
+  have hs : gaussianMomentScale v ^ 2 = 3 * v := Real.sq_sqrt (by linarith)
+  have hs4 : gaussianMomentScale v ^ 4 = 9 * v ^ 2 := by
+    have hx : gaussianMomentScale v ^ 4 = (gaussianMomentScale v ^ 2) ^ 2 := by ring
+    rw [hx, hs]
+    ring
+  obtain ⟨h2, h4⟩ := gaussianMomentLaw_raw_moments (gaussianMomentScale v)
+  refine ⟨?_, ?_⟩
+  · rw [h2, hs]
+    ring
+  · rw [h4, hs4]
+    ring
 
 /-- The mean of the maximizing two-valued variance profile. -/
 theorem extremalIntervalLaw_mean (lo hi : ℝ) (hlo : 0 < lo) (hlohi : lo ≤ hi) :
@@ -129,20 +138,20 @@ theorem gaussian_fraction_interval_attained (lo hi : ℝ) (hlo : 0 < lo)
     (hlohi : lo ≤ hi) :
     variance (extremalIntervalLaw lo hi hlo hlohi)
           (fun d ↦ gaussianMomentLaw
-            (fun i ↦ gaussianMomentValue (if d then hi else lo) i ^ 2))
+            (fun i ↦ gaussianMomentValue (gaussianMomentScale (if d then hi else lo)) i ^ 2))
         / variance (mixture (extremalIntervalLaw lo hi hlo hlohi)
             (fun _ ↦ gaussianMomentLaw))
-          (fun z ↦ gaussianMomentValue (if z.1 then hi else lo) z.2 ^ 2)
+          (fun z ↦ gaussianMomentValue (gaussianMomentScale (if z.1 then hi else lo)) z.2 ^ 2)
       = (hi - lo) ^ 2 / (8 * lo * hi + 3 * (hi - lo) ^ 2) := by
   have hhi : 0 < hi := lt_of_lt_of_le hlo hlohi
   have hvnn : ∀ d : Bool, (0 : ℝ) ≤ if d then hi else lo := by
     intro d
     cases d <;> norm_num <;> linarith
   have hsecond : ∀ d : Bool, gaussianMomentLaw
-      (fun i ↦ gaussianMomentValue (if d then hi else lo) i ^ 2)
+      (fun i ↦ gaussianMomentValue (gaussianMomentScale (if d then hi else lo)) i ^ 2)
       = if d then hi else lo := fun d ↦ (gaussianMomentLaw_moments _ (hvnn d)).1
   have hfourth : ∀ d : Bool, gaussianMomentLaw
-      (fun i ↦ gaussianMomentValue (if d then hi else lo) i ^ 4)
+      (fun i ↦ gaussianMomentValue (gaussianMomentScale (if d then hi else lo)) i ^ 4)
       = 3 * (if d then hi else lo) ^ 2 :=
     fun d ↦ (gaussianMomentLaw_moments _ (hvnn d)).2
   have hmean : extremalIntervalLaw lo hi hlo hlohi
@@ -151,7 +160,7 @@ theorem gaussian_fraction_interval_attained (lo hi : ℝ) (hlo : 0 < lo)
     exact ne_of_gt (div_pos (by nlinarith) (by linarith))
   have hfrac := gaussian_style_explainable_fraction
     (extremalIntervalLaw lo hi hlo hlohi) (fun _ ↦ gaussianMomentLaw)
-    (fun z ↦ gaussianMomentValue (if z.1 then hi else lo) z.2)
+    (fun z ↦ gaussianMomentValue (gaussianMomentScale (if z.1 then hi else lo)) z.2)
     (fun d ↦ if d then hi else lo) hsecond hfourth hmean
   rw [sharp_interval_cv_attained lo hi hlo hlohi,
     interval_ratio_eq lo hi hlo hlohi] at hfrac

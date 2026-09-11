@@ -13,3 +13,4 @@ import Descent.Portability.GaussianCeilingBound
 #print axioms Descent.Portability.GaussianCeilingBound.gaussian_fraction_interval_attained
 #print axioms Descent.Portability.GaussianCeilingBound.signedResidual_sq
 #print axioms Descent.Portability.GaussianCeilingBound.signed_fraction_one
+#print axioms Descent.Portability.GaussianCeilingBound.gaussianMomentLaw_raw_moments
