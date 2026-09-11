@@ -96,9 +96,7 @@ import Descent.Portability.ReferenceLogLossCertificate
 import Descent.Portability.UniformPenetranceCertificate
 import Descent.Portability.PartialHaplotypePanelLikelihood
 import Descent.Portability.PartialHaplotypePulseKernel
-import Descent.Portability.ConvergentEventProduct
 import Descent.Portability.PortabilityMeasureQueries
-import Descent.Portability.ReferenceExperimentTable
 
 namespace Descent.Program
 
@@ -154,9 +152,7 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
   Lipschitz in the rates and the propagator the unique continuous solution of the integral
   equation: `RateGeneratorLipschitz`, `IntegrableGeneratorPropagator`,
   `IntegrableRateRealization`; the almost-everywhere derivative `U' = A(t) U` and absolute
-  continuity of that propagator: `IntegralEquationDerivative`; realizability at the limit of a
-  convergent event product, the note's countable accumulation of events, with the convergence
-  as a hypothesis: `ConvergentEventProduct`.
+  continuity of that propagator: `IntegralEquationDerivative`.
 * §3 Theorem 3 and equations (14)-(16): `StationaryRealization`,
   `StationaryHaplotypeRealization`, `AncestralHaplotypeRealization`.
 * §4.1 per-locus material grading and the loose configuration bound `C(K+B,B)`:
@@ -244,8 +240,8 @@ from a deme count.
   `FrontierCompletionRegion.exists_convex_not_convex_conditionalMeans`.
 * §9, the executed reference experiment: the model in corpus vocabulary, its exact source-side
   report law matching the attached results, and the 220 architecture, environment and census
-  states of both histories: `ReferenceExperimentLaw`; every row of the section 9 table for both
-  migration histories, as exact rationals: `ReferenceExperimentTable`; eighty-term log-loss
+  states of both histories, and the early-migration target squared-correlation definedness
+  probability: `ReferenceExperimentLaw`; eighty-term log-loss
   certificates for any rational law of the experiment's observations:
   `ReferenceLogLossCertificate`.
 * §9.1, the uniform penetrance architecture: `UniformPenetranceArchitecture`; its eighty-term
@@ -261,7 +257,8 @@ available at this pin. The mixing
 law of (31) ranges over finitely many contexts, and its Lipschitz class is taken on all of the
 coordinate space. Equations (20), (28) and (29) take the pointwise bounds `0 ≤ D ≤ 1`, as the corpus
 certificates do. Theorem 1 makes no complexity claim and covers no infinite branch set. Of §9,
-the 3960 shared-context count and the full-square range table are not formalized yet.
+the other target table rows, the 3960 shared-context count and the full-square range table are
+not yet proof-checked.
 `IntervalEvaluatorCertificate` assumes a
 finite measure, a common bound and pointwise vanishing widths;
 `CylinderIntervalCertificate` needs only almost sure vanishing widths on fair-bit streams but
