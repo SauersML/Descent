@@ -53,12 +53,13 @@ noncomputable section
 
 /-! ## Fair signs and the coordinate-flip involution -/
 
-/-- The `±1` genotype coding of a Boolean coordinate. -/
-def signValue (b : Bool) : ℝ := if b then 1 else -1
+/-- The `±1` genotype coding of a Boolean coordinate.  This is literally the coding of
+`Descent.Portability.TraitPortabilityRange.sign`, called rather than restated. -/
+def signValue (b : Bool) : ℝ := TraitPortabilityRange.sign b
 
 /-- A sign squares to one. -/
 @[simp] theorem signValue_sq (b : Bool) : signValue b ^ 2 = 1 := by
-  cases b <;> norm_num [signValue]
+  cases b <;> norm_num [signValue, TraitPortabilityRange.sign]
 
 /-- The `±1` coding here is the one already carried by
 `Descent.Portability.TraitPortabilityRange.sign`: the two names denote one function. -/
@@ -110,7 +111,8 @@ theorem sum_odd_vanishes {n : ℕ} (j : Fin n) (P : (Fin n → Bool) → ℝ)
       P (flipCoord j s) * signValue (flipCoord j s j) = -(P s * signValue (s j)) := by
     intro s
     rw [hP s, flipCoord_self]
-    rcases Bool.eq_false_or_eq_true (s j) with hb | hb <;> simp [hb, signValue]
+    rcases Bool.eq_false_or_eq_true (s j) with hb | hb <;>
+      simp [hb, signValue, TraitPortabilityRange.sign]
   rw [Finset.sum_congr rfl fun s _ ↦ hpt s, Finset.sum_neg_distrib] at h
   linarith
 
@@ -433,8 +435,8 @@ theorem reversedWeightSq_eq_filter {n : ℕ} (a : Fin n → ℝ) (σ : Fin n →
   rw [Finset.sum_filter]
   refine Finset.sum_congr rfl fun i _ ↦ ?_
   cases h : σ i
-  · simp [signValue]
-  · simp [signValue]
+  · simp [signValue, TraitPortabilityRange.sign]
+  · simp [signValue, TraitPortabilityRange.sign]
 
 /-- The residual coefficient vector `dᵢ = aᵢ(σᵢ - 1)` of PL Theorem 5.1. -/
 def residualCoeff {n : ℕ} (a : Fin n → ℝ) (σ : Fin n → Bool) : Fin n → ℝ :=
@@ -690,8 +692,8 @@ theorem sum_signValue_eq {n : ℕ} (σ : Fin n → Bool) :
   have hpt : ∀ i : Fin n, signValue (σ i) = 2 * (if σ i = true then (1 : ℝ) else 0) - 1 := by
     intro i
     cases h : σ i
-    · simp [signValue]
-    · simp only [signValue, if_true, if_pos]
+    · simp [signValue, TraitPortabilityRange.sign]
+    · simp only [signValue, TraitPortabilityRange.sign]
       norm_num
   rw [Finset.sum_congr rfl fun i _ ↦ hpt i, Finset.sum_sub_distrib, ← Finset.mul_sum,
     ← ConvexOrderCoupling.occupiedCount_eq_sum, Finset.sum_const, Finset.card_univ,

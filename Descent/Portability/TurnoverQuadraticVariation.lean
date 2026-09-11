@@ -136,7 +136,8 @@ theorem kernel_signValue_drift {n : ℕ} (q : ℝ)
       ring
     · rw [if_neg h]
       have hb : signValue (s' i) = -signValue (s i) := by
-        cases hs : s i <;> cases hs' : s' i <;> simp_all [signValue]
+        cases hs : s i <;> cases hs' : s' i <;>
+          simp_all [signValue, TraitPortabilityRange.sign]
       rw [hb]
       ring
   rw [Finset.sum_congr rfl fun s' _ ↦ hpt s', Finset.sum_add_distrib, ← Finset.sum_mul,
