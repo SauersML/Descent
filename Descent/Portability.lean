@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.CylinderUniformDraw
 import Descent.Portability.CylinderThresholdCertificate
 import Descent.Portability.FellerMarkovKernel
 import Descent.Portability.TaggedMixtureCompleteness
