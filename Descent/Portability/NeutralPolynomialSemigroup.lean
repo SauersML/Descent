@@ -253,7 +253,8 @@ theorem momentFunctional_eq_zero_of_vanishing (rates : NeutralRates Deme Locus A
 /-- The moment functional depends only on the polynomial function. -/
 theorem momentFunctional_congr (rates : NeutralRates Deme Locus Allele) (ℓ₀ : Locus)
     (hap₀ : FullHaplotype Locus Allele) (t : ℝ) (x : FrequencyState Deme Locus Allele)
-    (p q : FrequencyPolynomial Deme Locus Allele) (h : polynomialFunction p = polynomialFunction q) :
+    (p q : FrequencyPolynomial Deme Locus Allele)
+    (h : polynomialFunction p = polynomialFunction q) :
     momentFunctional rates ℓ₀ t x p = momentFunctional rates ℓ₀ t x q := by
   rw [← sub_eq_zero, ← map_sub]
   refine momentFunctional_eq_zero_of_vanishing rates ℓ₀ hap₀ t x _ fun y ↦ ?_
@@ -470,7 +471,8 @@ theorem neutralPolynomialSemigroup_one (rates : NeutralRates Deme Locus Allele) 
 theorem neutralPolynomialSemigroup_add (rates : NeutralRates Deme Locus Allele) (ℓ₀ : Locus)
     (hap₀ : FullHaplotype Locus Allele) (s t : ℝ≥0) :
     neutralPolynomialSemigroup rates ℓ₀ hap₀ (s + t)
-      = neutralPolynomialSemigroup rates ℓ₀ hap₀ s ∘ₗ neutralPolynomialSemigroup rates ℓ₀ hap₀ t := by
+      = neutralPolynomialSemigroup rates ℓ₀ hap₀ s
+          ∘ₗ neutralPolynomialSemigroup rates ℓ₀ hap₀ t := by
   refine LinearMap.ext fun f ↦ Subtype.ext (ContinuousMap.ext fun x ↦ ?_)
   rw [LinearMap.comp_apply, neutralPolynomialSemigroup_apply, neutralPolynomialSemigroup_apply,
     NNReal.coe_add, momentFunctional_add rates ℓ₀ hap₀]
