@@ -191,9 +191,9 @@ equation of the expectation family as a hypothesis that no module yet discharges
 modules assume the polynomial semigroup, its positivity and its Euler limit;
 `NeutralFellerGenerator` identifies its generator but does not construct the semigroup from the
 neutral two-locus kernels; their kernels are Markov kernels on pseudo-metrizable
-compact spaces, which include the haplotype-frequency simplex. In §6 the coupling bounds of
-NOTE1 Theorem 5 are proved for continuous rates and attainment for lists of discrete events, so
-neither class is shown to trace exactly the displayed curve. The finite-cohort intercept and
+compact spaces, which include the haplotype-frequency simplex. In §6 the attainable metric curve
+of NOTE1 Theorem 5 is proved exactly for lists of discrete events; for continuous rates only its
+coupling bounds are proved. The finite-cohort intercept and
 accuracy of §7 are not formalized.
 
 Guard witnesses: `LowOrderLDWitnesses` inhabits the corpus rate, epoch and history structures
@@ -205,9 +205,10 @@ from a deme count.
 * Theorem 1 and equation (7), the complete report law of a finite dependent trace tree, with
   forward propagation, backward evaluation and trace enumeration agreeing: `FiniteTraceTreeLaw`.
   The rational clause and equations (3)-(6): `RationalReportClosure`, `MeiosisGameteLaw`.
-* §3.2 equations (9)-(10): `ArchitectureEnvironmentRegion`. Theorem 2 as rational parameter
-  reports on the sign-condition cells of supplied polynomial guards, with the report graph and
-  attainable region of worked trees: `RationalParameterReports`.
+* §3.2 equations (9)-(10): `ArchitectureEnvironmentRegion`. Theorem 2: the joint input-output
+  graph (8) of a finite algebraic experiment is an explicit finite union of polynomial
+  sign-condition sets over its guard cells, and the attainable region is its projection:
+  `RationalParameterReports`.
 * Theorem 3 and §4.1 equations (12)-(14): `ReplicaMomentCompleteness`,
   `ReplicaFiniteOrderNecessity`, `ThetaFamilyNonclosure`; §4, the tagged source/target mixture
   determining the joint population law: `TaggedMixtureCompleteness`.
@@ -242,9 +243,10 @@ from a deme count.
   integrals: `UniformPenetranceCertificate`.
 * §10, the halting boundary: `HaltingExpectationBoundary`.
 
-Scope. Theorem 2 partitions the parameters by the signs of supplied polynomial guards; Mathlib's
-semialgebraic sets and real quantifier elimination, which the note uses to eliminate parameters
-from (8), are not available at this pin. The mixing
+Scope. Theorem 2's graph is presented through the sign cells of the experiment's supplied
+polynomial guards, with regularity on each cell as a hypothesis; Mathlib's semialgebraic sets and
+real quantifier elimination, which the note uses to eliminate parameters from (8), are not
+available at this pin. The mixing
 law of (31) ranges over finitely many contexts, and its Lipschitz class is taken on all of the
 coordinate space. Equations (20), (28) and (29) take the pointwise bounds `0 ≤ D ≤ 1`, as the corpus
 certificates do. Theorem 1 makes no complexity claim and covers no infinite branch set. The
