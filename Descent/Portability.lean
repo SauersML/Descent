@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.SimplexResamplingKernel
 import Descent.Portability.RealizationBody
 import Descent.Portability.ThetaFamilyNonclosure
 import Descent.Portability.FourCellCohortLaw
