@@ -105,6 +105,7 @@ import Descent.Portability.MeasureKernelRealization
 import Descent.Portability.CylinderExponentialDraw
 import Descent.Portability.CylinderGaussianDraw
 import Descent.Portability.PortabilityRemainsJoint
+import Descent.Portability.DriftOperatorCoordinates
 
 namespace Descent.Program
 
@@ -201,7 +202,9 @@ Scope. Theorem 1 is proved for microscopic kernels given by probability measures
 features, with the approximation hypothesis (3) in sup norm.
 Equation (10) is proved for every polynomial of total degree at most four, with remainder
 `71 · coefficientMass / N²`. The drift
-operator (7) enters through the resampling jet certificates rather than as a displayed identity.
+operator (7) is stated literally on polynomials in `p`, `q`, `D`, with its two displayed
+identities, and its sum against the coalescence rates is the drift row of the enlarged generator
+on every stored coordinate: `DriftOperatorCoordinates`.
 The epoch form of Theorem 2 is proved through the note's multinomial sample of size `⌈1/(c h)⌉`
 in `MultinomialMicroscopicApproximation`, whose microscopic kernels change branch type with the
 step size, for every deme count with at least one deme. The history forms compose the same epoch
@@ -247,8 +250,8 @@ from a deme count.
   `JointMetricMomentDeterminacy`. §6.2:
   `PortabilityRatioQueries`, and under an arbitrary probability measure:
   `PortabilityMeasureQueries`; two couplings with the same marginal source and target laws and
-  different comparison queries: `PortabilityRemainsJoint`. §6.3 example: `UnboundedSlopeExample`. §6.4 equation (30):
-  `LogLossSeriesCertificate`.
+  different comparison queries: `PortabilityRemainsJoint`. §6.3 example: `UnboundedSlopeExample`.
+  §6.4 equation (30): `LogLossSeriesCertificate`.
 * §7.1 equation (31): `EmpiricalLawLipschitzBound`; the modulus-of-continuity extension to every
   continuous functional: `EmpiricalLawContinuityBound`. §7.2, interval evaluators without nesting
   and Kraft's inequality for prefix enumerations: `IntervalEvaluatorCertificate`; Theorem 5 on
