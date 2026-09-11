@@ -1,0 +1,21 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.ConditionalFourthMomentLaw
+
+/-! Axiom audit of ConditionalFourthMomentLaw. -/
+
+#print axioms Descent.Portability.ConditionalFourthMomentLaw.shifted_law_mean
+#print axioms Descent.Portability.ConditionalFourthMomentLaw.central_third_of_second_zero
+#print axioms Descent.Portability.ConditionalFourthMomentLaw.central_fourth_of_second_zero
+#print axioms Descent.Portability.ConditionalFourthMomentLaw.degenerate_second_moment_forces_zero
+#print axioms Descent.Portability.ConditionalFourthMomentLaw.momentCompletionLaw_moments
+#print axioms Descent.Portability.ConditionalFourthMomentLaw.momentCompletionLaw_loss_variance
+#print axioms Descent.Portability.ConditionalFourthMomentLaw.raw_moment_completion_iff
+#print axioms Descent.Portability.ConditionalFourthMomentLaw.conditional_loss_variance_necessity
+#print axioms Descent.Portability.ConditionalFourthMomentLaw.conditional_loss_variance_attained
+#print axioms Descent.Portability.ConditionalFourthMomentLaw.conditional_loss_variance_exact_set
+#print axioms Descent.Portability.ConditionalFourthMomentLaw.momentCompletionLaw_pos
+#print axioms Descent.Portability.ConditionalFourthMomentLaw.momentCompletionLaw_neg
+#print axioms Descent.Portability.ConditionalFourthMomentLaw.momentCompletionValue_pos
+#print axioms Descent.Portability.ConditionalFourthMomentLaw.momentCompletionValue_neg
