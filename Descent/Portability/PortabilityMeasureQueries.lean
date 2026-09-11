@@ -576,6 +576,7 @@ theorem portabilityQueries_eq_sourceTargetLaw (μ : Measure Ω) [IsFiniteMeasure
       ← portabilityDomain_eq_preimage sourceNum sourceDen targetNum targetDen hsourceNum
         htargetNum hsourceLe htargetLe]
     refine lintegral_congr_ae ((ae_restrict_iff' hdomainSet).mpr (ae_of_all μ fun ω hω ↦ ?_))
+    dsimp only
     rw [portabilityRatio_eq_vector sourceNum sourceDen targetNum targetDen hsourceNum htargetNum
       hsourceLe htargetLe ω hω]
   · rw [ratioOfMeans_eq_setIntegral, sourceTargetLaw,
