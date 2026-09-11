@@ -1,0 +1,30 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.AdmixtureChronologyLaw
+
+/-! Axiom audit of the admixture chronology and its exposure representation. -/
+
+open Descent.Portability.AdmixtureChronologyLaw
+
+#print axioms Descent.Portability.AdmixtureChronologyLaw.hasDerivAt_cumulativeRate
+#print axioms Descent.Portability.AdmixtureChronologyLaw.continuous_cumulativeRate
+#print axioms Descent.Portability.AdmixtureChronologyLaw.cumulativeRate_const_mul
+#print axioms Descent.Portability.AdmixtureChronologyLaw.cumulativeRate_nonneg
+#print axioms Descent.Portability.AdmixtureChronologyLaw.one_sub_donorFraction
+#print axioms Descent.Portability.AdmixtureChronologyLaw.donorFraction_lt_one
+#print axioms Descent.Portability.AdmixtureChronologyLaw.donorFraction_nonneg
+#print axioms Descent.Portability.AdmixtureChronologyLaw.donorFraction_pos
+#print axioms Descent.Portability.AdmixtureChronologyLaw.hasDerivAt_donorFraction
+#print axioms Descent.Portability.AdmixtureChronologyLaw.hasDerivAt_admixtureLinkage
+#print axioms Descent.Portability.AdmixtureChronologyLaw.eq_admixtureLinkage_of_hasDerivAt
+#print axioms
+  Descent.Portability.AdmixtureChronologyLaw.normalisedCoupling_eq_exposure_integral
+#print axioms
+  Descent.Portability.AdmixtureChronologyLaw.scaled_normalisedCoupling_eq_exposure_integral
+#print axioms Descent.Portability.AdmixtureChronologyLaw.linkage_of_recombination_block
+#print axioms Descent.Portability.AdmixtureChronologyLaw.donorFraction_of_migration_block
+#print axioms Descent.Portability.AdmixtureChronologyLaw.linkage_of_migration_block
+#print axioms Descent.Portability.AdmixtureChronologyLaw.stepEvent_recombination_eq_solution
+#print axioms Descent.Portability.AdmixtureChronologyLaw.stepEvent_migration_eq_solution
+#print axioms Descent.Portability.AdmixtureChronologyLaw.chronology_report_slope
