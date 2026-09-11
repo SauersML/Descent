@@ -96544,8 +96544,6 @@
    "Descent.Portability.BellmanReportBounds.abs_expectation_sub_le",
    "Descent.Portability.BellmanReportBounds.abs_lowerStep_sub_le",
    "Descent.Portability.BellmanReportBounds.abs_upperStep_sub_le",
-   "Descent.Portability.BellmanReportBounds.exists_lower_optimal_policy",
-   "Descent.Portability.BellmanReportBounds.exists_upper_optimal_policy",
    "Descent.Portability.BellmanReportBounds.expectation_mono",
    "Descent.Portability.BellmanReportBounds.lowerPolicy_attains",
    "Descent.Portability.BellmanReportBounds.lowerValue_le_policyValue",
@@ -96579,6 +96577,8 @@
    "Descent.Portability.CalibrationLaw.standardized_mean_zero",
    "Descent.Portability.CalibrationLaw.standardized_second_moment_le_one",
    "Descent.Portability.CalibrationLaw.variance_continuous",
+   "Descent.Portability.ChannelComparison.uniformGarbling_nonneg",
+   "Descent.Portability.ChannelComparison.uniformGarbling_row_sum",
    "Descent.Portability.ConditionalErrorCertificate.accepted_overlap_lower",
    "Descent.Portability.ConditionalErrorCertificate.conditional_bound_of_le",
    "Descent.Portability.ConditionalErrorCertificate.conditional_totalVariation",
@@ -97182,8 +97182,6 @@
     "Descent.Portability.BellmanReportBounds.upperPolicy_attains": [],
     "Descent.Portability.BellmanReportBounds.policyValue_lowerPolicy": [],
     "Descent.Portability.BellmanReportBounds.policyValue_upperPolicy": [],
-    "Descent.Portability.BellmanReportBounds.exists_lower_optimal_policy": [],
-    "Descent.Portability.BellmanReportBounds.exists_upper_optimal_policy": [],
     "Descent.Portability.BellmanReportBounds.lowerValue_mem_range": [],
     "Descent.Portability.BellmanReportBounds.abs_lowerStep_sub_le": [],
     "Descent.Portability.BellmanReportBounds.abs_upperStep_sub_le": [],
@@ -97209,6 +97207,8 @@
     "Descent.Portability.CalibrationLaw.calibrated_caseProbability_measurable": [],
     "Descent.Portability.CalibrationLaw.linearScore_effects_continuous": [],
     "Descent.Portability.CalibrationLaw.calibrated_effectProbability_measurable": [],
+    "Descent.Portability.ChannelComparison.uniformGarbling_nonneg": [],
+    "Descent.Portability.ChannelComparison.uniformGarbling_row_sum": [],
     "Descent.Portability.ConditionalErrorCertificate.eventMass_nonneg": [],
     "Descent.Portability.ConditionalErrorCertificate.eventMass_le_one": [],
     "Descent.Portability.ConditionalErrorCertificate.totalVariation_overlap": [],
@@ -136143,8 +136143,6 @@
    "Descent.Portability.AncestralMutationTransfer.iterate_distance",
    "Descent.Portability.AncestralMutationTransfer.unwind_distance",
    "Descent.Portability.BellmanReportBounds.abs_approx_sub_lowerValue_le",
-   "Descent.Portability.BellmanReportBounds.exists_lower_optimal_policy",
-   "Descent.Portability.BellmanReportBounds.exists_upper_optimal_policy",
    "Descent.Portability.BellmanReportBounds.lowerPolicy_attains",
    "Descent.Portability.BellmanReportBounds.lowerValue_le_policyValue",
    "Descent.Portability.BellmanReportBounds.lowerValue_mem_range",
@@ -136217,8 +136215,6 @@
     "Descent.Portability.BellmanReportBounds.upperPolicy_attains": [],
     "Descent.Portability.BellmanReportBounds.policyValue_lowerPolicy": [],
     "Descent.Portability.BellmanReportBounds.policyValue_upperPolicy": [],
-    "Descent.Portability.BellmanReportBounds.exists_lower_optimal_policy": [],
-    "Descent.Portability.BellmanReportBounds.exists_upper_optimal_policy": [],
     "Descent.Portability.BellmanReportBounds.lowerValue_mem_range": [],
     "Descent.Portability.BellmanReportBounds.abs_approx_sub_lowerValue_le": [],
     "Descent.Portability.ExactFiniteHistoryLaw.path_sum_eq_expectation": [],
@@ -145082,7 +145078,6 @@
   },
   "mentioned_by": [
    "Descent.Portability.BellmanReportBounds.abs_approx_sub_lowerValue_le",
-   "Descent.Portability.BellmanReportBounds.exists_lower_optimal_policy",
    "Descent.Portability.BellmanReportBounds.lowerPolicy_attains",
    "Descent.Portability.BellmanReportBounds.lowerValue_le_policyValue",
    "Descent.Portability.BellmanReportBounds.lowerValue_mem_range",
@@ -145100,7 +145095,6 @@
     "Descent.Portability.BellmanReportBounds.lowerValue_le_policyValue": [],
     "Descent.Portability.BellmanReportBounds.lowerPolicy_attains": [],
     "Descent.Portability.BellmanReportBounds.policyValue_lowerPolicy": [],
-    "Descent.Portability.BellmanReportBounds.exists_lower_optimal_policy": [],
     "Descent.Portability.BellmanReportBounds.lowerValue_mem_range": [
      "∀ s, lo ≤ terminal s",
      "∀ s, terminal s ≤ hi"
@@ -145139,7 +145133,6 @@
    }
   },
   "mentioned_by": [
-   "Descent.Portability.BellmanReportBounds.exists_upper_optimal_policy",
    "Descent.Portability.BellmanReportBounds.policyValue_le_upperValue",
    "Descent.Portability.BellmanReportBounds.policyValue_upperPolicy",
    "Descent.Portability.BellmanReportBounds.upperPolicy_attains",
@@ -145151,8 +145144,7 @@
     "Descent.Portability.BellmanReportBounds.upperValue_succ": [],
     "Descent.Portability.BellmanReportBounds.policyValue_le_upperValue": [],
     "Descent.Portability.BellmanReportBounds.upperPolicy_attains": [],
-    "Descent.Portability.BellmanReportBounds.policyValue_upperPolicy": [],
-    "Descent.Portability.BellmanReportBounds.exists_upper_optimal_policy": []
+    "Descent.Portability.BellmanReportBounds.policyValue_upperPolicy": []
    }
   }
  },
@@ -145171,8 +145163,6 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
-   "Descent.Portability.BellmanReportBounds.exists_lower_optimal_policy",
-   "Descent.Portability.BellmanReportBounds.exists_upper_optimal_policy",
    "Descent.Portability.BellmanReportBounds.lowerValue_le_policyValue",
    "Descent.Portability.BellmanReportBounds.policyValue_eq_of_step",
    "Descent.Portability.BellmanReportBounds.policyValue_le_upperValue",
@@ -145192,9 +145182,7 @@
      "∀ s, value 0 s = terminal s"
     ],
     "Descent.Portability.BellmanReportBounds.policyValue_lowerPolicy": [],
-    "Descent.Portability.BellmanReportBounds.policyValue_upperPolicy": [],
-    "Descent.Portability.BellmanReportBounds.exists_lower_optimal_policy": [],
-    "Descent.Portability.BellmanReportBounds.exists_upper_optimal_policy": []
+    "Descent.Portability.BellmanReportBounds.policyValue_upperPolicy": []
    }
   }
  },
@@ -145218,7 +145206,6 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
-   "Descent.Portability.BellmanReportBounds.exists_lower_optimal_policy",
    "Descent.Portability.BellmanReportBounds.lowerPolicy_attains",
    "Descent.Portability.BellmanReportBounds.policyValue_lowerPolicy"
   ],
@@ -145226,8 +145213,7 @@
    "hypotheses": [],
    "hypotheses_by_theorem": {
     "Descent.Portability.BellmanReportBounds.lowerPolicy_attains": [],
-    "Descent.Portability.BellmanReportBounds.policyValue_lowerPolicy": [],
-    "Descent.Portability.BellmanReportBounds.exists_lower_optimal_policy": []
+    "Descent.Portability.BellmanReportBounds.policyValue_lowerPolicy": []
    }
   }
  },
@@ -145251,7 +145237,6 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
-   "Descent.Portability.BellmanReportBounds.exists_upper_optimal_policy",
    "Descent.Portability.BellmanReportBounds.policyValue_upperPolicy",
    "Descent.Portability.BellmanReportBounds.upperPolicy_attains"
   ],
@@ -145259,8 +145244,7 @@
    "hypotheses": [],
    "hypotheses_by_theorem": {
     "Descent.Portability.BellmanReportBounds.upperPolicy_attains": [],
-    "Descent.Portability.BellmanReportBounds.policyValue_upperPolicy": [],
-    "Descent.Portability.BellmanReportBounds.exists_upper_optimal_policy": []
+    "Descent.Portability.BellmanReportBounds.policyValue_upperPolicy": []
    }
   }
  },
@@ -147955,7 +147939,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Portability/ChannelComparison.lean",
-  "line": 46,
+  "line": 47,
   "short": "chanCompose",
   "ret_type": "Θ → Y → ℝ",
   "empirical_status": "",
@@ -148035,7 +148019,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Portability/ChannelComparison.lean",
-  "line": 75,
+  "line": 76,
   "short": "decisionRisk",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -148096,7 +148080,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Portability/ChannelComparison.lean",
-  "line": 95,
+  "line": 96,
   "short": "confusionChannel",
   "ret_type": "Bool → Bool → ℝ",
   "empirical_status": "",
@@ -148142,7 +148126,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Portability/ChannelComparison.lean",
-  "line": 100,
+  "line": 101,
   "short": "identityRule",
   "ret_type": "Bool → Bool → ℝ",
   "empirical_status": "",
@@ -148166,11 +148150,48 @@
    }
   }
  },
+ "Descent.Portability.ChannelComparison.uniformGarbling": {
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name Fintype.card",
+  "file": "Descent/Portability/ChannelComparison.lean",
+  "line": 151,
+  "short": "uniformGarbling",
+  "ret_type": "S → T → ℝ",
+  "empirical_status": "",
+  "python": null,
+  "args": [],
+  "box": {},
+  "selfcheck": null,
+  "numeric_standins": null,
+  "vector_args": null,
+  "mentioned_by": [
+   "Descent.Portability.ChannelComparison.closestGarbling_min",
+   "Descent.Portability.ChannelComparison.closestGarbling_nonneg",
+   "Descent.Portability.ChannelComparison.closestGarbling_row_sum",
+   "Descent.Portability.ChannelComparison.uniformGarbling_nonneg",
+   "Descent.Portability.ChannelComparison.uniformGarbling_row_sum"
+  ],
+  "constraints": {
+   "range_lo_thm": [
+    "Descent.Portability.ChannelComparison.uniformGarbling_nonneg",
+    0
+   ],
+   "range_lo": 0,
+   "hypotheses": [],
+   "hypotheses_by_theorem": {
+    "Descent.Portability.ChannelComparison.uniformGarbling_nonneg": [],
+    "Descent.Portability.ChannelComparison.uniformGarbling_row_sum": [],
+    "Descent.Portability.ChannelComparison.closestGarbling_nonneg": [],
+    "Descent.Portability.ChannelComparison.closestGarbling_row_sum": [],
+    "Descent.Portability.ChannelComparison.closestGarbling_min": []
+   }
+  }
+ },
  "Descent.Portability.ChannelComparison.closestGarbling": {
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name Classical.choose",
   "file": "Descent/Portability/ChannelComparison.lean",
-  "line": 181,
+  "line": 199,
   "short": "closestGarbling",
   "ret_type": "X → Y → ℝ",
   "empirical_status": "",
@@ -153705,7 +153726,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Portability/ContinuousTrajectoryRegion.lean",
-  "line": 51,
+  "line": 57,
   "short": "growth",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -153769,7 +153790,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Portability/ContinuousTrajectoryRegion.lean",
-  "line": 131,
+  "line": 137,
   "short": "mixPath",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -153804,8 +153825,10 @@
    "Descent.Portability.ContinuousTrajectoryRegion.ceiling_mixPath_terminal_attained",
    "Descent.Portability.ContinuousTrajectoryRegion.mixPath_admissible",
    "Descent.Portability.ContinuousTrajectoryRegion.mixPath_hasDerivAt",
+   "Descent.Portability.ContinuousTrajectoryRegion.mixPath_one",
    "Descent.Portability.ContinuousTrajectoryRegion.mixPath_terminal_attained",
-   "Descent.Portability.ContinuousTrajectoryRegion.mixPath_zero"
+   "Descent.Portability.ContinuousTrajectoryRegion.mixPath_zero",
+   "Descent.Portability.ContinuousTrajectoryRegion.refined_terminal_bound_tendsto"
   ],
   "constraints": {
    "hypotheses": [
@@ -153827,7 +153850,9 @@
     ],
     "Descent.Portability.ContinuousTrajectoryRegion.ceiling_mixPath_terminal_attained": [
      "Real.exp (-(2 * lam * T"
-    ]
+    ],
+    "Descent.Portability.ContinuousTrajectoryRegion.mixPath_one": [],
+    "Descent.Portability.ContinuousTrajectoryRegion.refined_terminal_bound_tendsto": []
    }
   }
  },
@@ -153835,7 +153860,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Portability/ContinuousTrajectoryRegion.lean",
-  "line": 134,
+  "line": 140,
   "short": "mixPathDeriv",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -158720,29 +158745,25 @@
   }
  },
  "Descent.Portability.CounterfactualRegion.signOf": {
-  "class": "NUMERIC",
-  "note": "",
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name TraitPortabilityRange.sign",
   "file": "Descent/Portability/CounterfactualRegion.lean",
-  "line": 130,
+  "line": 131,
   "short": "signOf",
-  "ret_type": "ℝ",
+  "ret_type": "Bool → ℝ",
   "empirical_status": "",
-  "python": "signOf",
-  "args": [
-   "draw"
-  ],
+  "python": null,
+  "args": [],
   "box": {},
-  "selfcheck": {
-   "finite_points": 8,
-   "total_points": 8,
-   "error": null
-  },
+  "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
    "Descent.Portability.CounterfactualRegion.intervened_mean_first_model",
    "Descent.Portability.CounterfactualRegion.intervened_mean_second_model",
    "Descent.Portability.CounterfactualRegion.signOf_eq_sign",
+   "Descent.Portability.CounterfactualRegion.signOf_false",
+   "Descent.Portability.CounterfactualRegion.signOf_true",
    "Descent.Portability.SquaredCorrelationZeroTest.outcomeVar_eq_signOf_mul",
    "Descent.Portability.SquaredCorrelationZeroTest.scoreVar_eq_signOf",
    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_apply",
@@ -158756,6 +158777,8 @@
    "hypotheses": [],
    "hypotheses_by_theorem": {
     "Descent.Portability.CounterfactualRegion.signOf_eq_sign": [],
+    "Descent.Portability.CounterfactualRegion.signOf_true": [],
+    "Descent.Portability.CounterfactualRegion.signOf_false": [],
     "Descent.Portability.CounterfactualRegion.intervened_mean_first_model": [],
     "Descent.Portability.CounterfactualRegion.intervened_mean_second_model": [],
     "Descent.Portability.SquaredCorrelationZeroTest.scoreVar_eq_signOf": [],
@@ -158773,7 +158796,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'ℝ × ℝ'\")",
   "file": "Descent/Portability/CounterfactualRegion.lean",
-  "line": 137,
+  "line": 144,
   "short": "outcomeFromExposure",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -158805,7 +158828,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "no inhabitant for an argument type: \"no inhabitant modelled for the type 'ℝ × ℝ'\")",
   "file": "Descent/Portability/CounterfactualRegion.lean",
-  "line": 141,
+  "line": 148,
   "short": "outcomeFromExogenous",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -172529,7 +172552,7 @@
   "selfcheck": {
    "finite_points": 5,
    "total_points": 8,
-   "error": "ValueError('expected a number in range from -1 up to 1, got 1.3101897721574798')"
+   "error": "ValueError('math domain error')"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -172583,7 +172606,7 @@
   "selfcheck": {
    "finite_points": 7,
    "total_points": 8,
-   "error": "ValueError('expected a number in range from -1 up to 1, got 1.1478195192639808')"
+   "error": "ValueError('math domain error')"
   },
   "numeric_standins": null,
   "vector_args": null,
@@ -176107,8 +176130,6 @@
    "Descent.Portability.AncestralMutationTransfer.iterate_distance",
    "Descent.Portability.AncestralMutationTransfer.unwind_distance",
    "Descent.Portability.BellmanReportBounds.abs_approx_sub_lowerValue_le",
-   "Descent.Portability.BellmanReportBounds.exists_lower_optimal_policy",
-   "Descent.Portability.BellmanReportBounds.exists_upper_optimal_policy",
    "Descent.Portability.BellmanReportBounds.lowerPolicy_attains",
    "Descent.Portability.BellmanReportBounds.lowerValue_le_policyValue",
    "Descent.Portability.BellmanReportBounds.lowerValue_mem_range",
@@ -176181,8 +176202,6 @@
     "Descent.Portability.BellmanReportBounds.upperPolicy_attains": [],
     "Descent.Portability.BellmanReportBounds.policyValue_lowerPolicy": [],
     "Descent.Portability.BellmanReportBounds.policyValue_upperPolicy": [],
-    "Descent.Portability.BellmanReportBounds.exists_lower_optimal_policy": [],
-    "Descent.Portability.BellmanReportBounds.exists_upper_optimal_policy": [],
     "Descent.Portability.BellmanReportBounds.lowerValue_mem_range": [],
     "Descent.Portability.BellmanReportBounds.abs_approx_sub_lowerValue_le": [],
     "Descent.Portability.ExactFiniteHistoryLaw.path_sum_eq_expectation": [],
@@ -209898,6 +209917,7 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Portability.ArchaicPrediction.pairing_kernel_one_dimension",
+   "Descent.Portability.CounterfactualRegion.intervened_mean_second_model",
    "Descent.Portability.CounterfactualRegion.signOf_eq_sign",
    "Descent.Portability.FiniteDualityNoGap.abs_potential_le",
    "Descent.Portability.FixedBackgroundCurveRegion.curvePhenotype_grouped",
@@ -209957,18 +209977,30 @@
    "Descent.Portability.SourceFixedRealization.targetPhenotype_sub_score",
    "Descent.Portability.SourceFixedRealization.uniformBool_sign_mean",
    "Descent.Portability.SourceFixedRealization.uniformBool_sign_variance",
+   "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_apply",
+   "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_covariance",
+   "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_mean_outcome",
+   "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_mean_score",
+   "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_variance_outcome",
+   "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_variance_score",
    "Descent.Portability.TraitPortabilityRange.actual_genetic_variance",
    "Descent.Portability.TraitPortabilityRange.architecture_moments",
+   "Descent.Portability.TurnoverArchitectureMetrics.reversedWeightSq_eq_filter",
    "Descent.Portability.TurnoverArchitectureMetrics.signValue_eq_sign",
+   "Descent.Portability.TurnoverArchitectureMetrics.signValue_sq",
+   "Descent.Portability.TurnoverArchitectureMetrics.sum_odd_vanishes",
+   "Descent.Portability.TurnoverArchitectureMetrics.sum_signValue_eq",
    "Descent.Portability.TurnoverDependence.sgn_false",
    "Descent.Portability.TurnoverDependence.sgn_true",
-   "Descent.Portability.TurnoverDependence.signState_values"
+   "Descent.Portability.TurnoverDependence.signState_values",
+   "Descent.Portability.TurnoverQuadraticVariation.kernel_signValue_drift"
   ],
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
     "Descent.Portability.ArchaicPrediction.pairing_kernel_one_dimension": [],
     "Descent.Portability.CounterfactualRegion.signOf_eq_sign": [],
+    "Descent.Portability.CounterfactualRegion.intervened_mean_second_model": [],
     "Descent.Portability.FiniteDualityNoGap.abs_potential_le": [],
     "Descent.Portability.FixedBackgroundCurveRegion.curvePhenotype_grouped": [],
     "Descent.Portability.FixedBackgroundCurveRegion.rademacher_pair_witness": [],
@@ -210027,12 +210059,23 @@
     "Descent.Portability.SourceFixedRealization.lossFraction_eq": [],
     "Descent.Portability.SourceFixedRealization.lossFraction_eq_eta": [],
     "Descent.Portability.SourceFixedRealization.simultaneous_source_fixed_realization": [],
+    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_apply": [],
+    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_mean_score": [],
+    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_mean_outcome": [],
+    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_variance_score": [],
+    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_variance_outcome": [],
+    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_covariance": [],
     "Descent.Portability.TraitPortabilityRange.architecture_moments": [],
     "Descent.Portability.TraitPortabilityRange.actual_genetic_variance": [],
+    "Descent.Portability.TurnoverArchitectureMetrics.signValue_sq": [],
     "Descent.Portability.TurnoverArchitectureMetrics.signValue_eq_sign": [],
+    "Descent.Portability.TurnoverArchitectureMetrics.sum_odd_vanishes": [],
+    "Descent.Portability.TurnoverArchitectureMetrics.reversedWeightSq_eq_filter": [],
+    "Descent.Portability.TurnoverArchitectureMetrics.sum_signValue_eq": [],
     "Descent.Portability.TurnoverDependence.sgn_true": [],
     "Descent.Portability.TurnoverDependence.sgn_false": [],
-    "Descent.Portability.TurnoverDependence.signState_values": []
+    "Descent.Portability.TurnoverDependence.signState_values": [],
+    "Descent.Portability.TurnoverQuadraticVariation.kernel_signValue_drift": []
    }
   }
  },
@@ -211167,8 +211210,6 @@
    "Descent.Portability.AncestralMutationTransfer.iterate_distance",
    "Descent.Portability.AncestralMutationTransfer.unwind_distance",
    "Descent.Portability.BellmanReportBounds.abs_approx_sub_lowerValue_le",
-   "Descent.Portability.BellmanReportBounds.exists_lower_optimal_policy",
-   "Descent.Portability.BellmanReportBounds.exists_upper_optimal_policy",
    "Descent.Portability.BellmanReportBounds.lowerPolicy_attains",
    "Descent.Portability.BellmanReportBounds.lowerValue_le_policyValue",
    "Descent.Portability.BellmanReportBounds.lowerValue_mem_range",
@@ -211241,8 +211282,6 @@
     "Descent.Portability.BellmanReportBounds.upperPolicy_attains": [],
     "Descent.Portability.BellmanReportBounds.policyValue_lowerPolicy": [],
     "Descent.Portability.BellmanReportBounds.policyValue_upperPolicy": [],
-    "Descent.Portability.BellmanReportBounds.exists_lower_optimal_policy": [],
-    "Descent.Portability.BellmanReportBounds.exists_upper_optimal_policy": [],
     "Descent.Portability.BellmanReportBounds.lowerValue_mem_range": [],
     "Descent.Portability.BellmanReportBounds.abs_approx_sub_lowerValue_le": [],
     "Descent.Portability.ExactFiniteHistoryLaw.path_sum_eq_expectation": [],
@@ -220472,7 +220511,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition occupiedCount",
   "file": "Descent/Portability/NearestDriftConfigurationCoupling.lean",
-  "line": 55,
+  "line": 64,
   "short": "oneRateTotal",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -220555,7 +220594,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition n",
   "file": "Descent/Portability/NearestDriftConfigurationCoupling.lean",
-  "line": 59,
+  "line": 68,
   "short": "zeroRateTotal",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -220639,7 +220678,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition occupiedCount",
   "file": "Descent/Portability/NearestDriftConfigurationCoupling.lean",
-  "line": 63,
+  "line": 72,
   "short": "pairProb",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -220732,7 +220771,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition occupiedCount",
   "file": "Descent/Portability/NearestDriftConfigurationCoupling.lean",
-  "line": 68,
+  "line": 77,
   "short": "singleOneProb",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -220814,7 +220853,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition n",
   "file": "Descent/Portability/NearestDriftConfigurationCoupling.lean",
-  "line": 72,
+  "line": 81,
   "short": "singleZeroProb",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -220896,7 +220935,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition occupiedCount",
   "file": "Descent/Portability/NearestDriftConfigurationCoupling.lean",
-  "line": 77,
+  "line": 86,
   "short": "stayProb",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -220974,7 +221013,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: calls untranslated definition occupiedCount",
   "file": "Descent/Portability/NearestDriftConfigurationCoupling.lean",
-  "line": 82,
+  "line": 91,
   "short": "nearestDriftKernel",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -235510,6 +235549,7 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Portability.ArchaicPrediction.pairing_kernel_one_dimension",
+   "Descent.Portability.CounterfactualRegion.intervened_mean_second_model",
    "Descent.Portability.CounterfactualRegion.signOf_eq_sign",
    "Descent.Portability.FiniteDualityNoGap.abs_potential_le",
    "Descent.Portability.FixedBackgroundCurveRegion.curvePhenotype_grouped",
@@ -235569,12 +235609,23 @@
    "Descent.Portability.SourceFixedRealization.targetPhenotype_sub_score",
    "Descent.Portability.SourceFixedRealization.uniformBool_sign_mean",
    "Descent.Portability.SourceFixedRealization.uniformBool_sign_variance",
+   "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_apply",
+   "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_covariance",
+   "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_mean_outcome",
+   "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_mean_score",
+   "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_variance_outcome",
+   "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_variance_score",
    "Descent.Portability.TraitPortabilityRange.actual_genetic_variance",
    "Descent.Portability.TraitPortabilityRange.architecture_moments",
+   "Descent.Portability.TurnoverArchitectureMetrics.reversedWeightSq_eq_filter",
    "Descent.Portability.TurnoverArchitectureMetrics.signValue_eq_sign",
+   "Descent.Portability.TurnoverArchitectureMetrics.signValue_sq",
+   "Descent.Portability.TurnoverArchitectureMetrics.sum_odd_vanishes",
+   "Descent.Portability.TurnoverArchitectureMetrics.sum_signValue_eq",
    "Descent.Portability.TurnoverDependence.sgn_false",
    "Descent.Portability.TurnoverDependence.sgn_true",
-   "Descent.Portability.TurnoverDependence.signState_values"
+   "Descent.Portability.TurnoverDependence.signState_values",
+   "Descent.Portability.TurnoverQuadraticVariation.kernel_signValue_drift"
   ],
   "constraints": {
    "hypotheses": [
@@ -235584,6 +235635,7 @@
    "hypotheses_by_theorem": {
     "Descent.Portability.ArchaicPrediction.pairing_kernel_one_dimension": [],
     "Descent.Portability.CounterfactualRegion.signOf_eq_sign": [],
+    "Descent.Portability.CounterfactualRegion.intervened_mean_second_model": [],
     "Descent.Portability.FiniteDualityNoGap.abs_potential_le": [],
     "Descent.Portability.FixedBackgroundCurveRegion.curvePhenotype_grouped": [],
     "Descent.Portability.FixedBackgroundCurveRegion.rademacher_pair_witness": [],
@@ -235646,12 +235698,23 @@
     "Descent.Portability.SourceFixedRealization.lossFraction_eq": [],
     "Descent.Portability.SourceFixedRealization.lossFraction_eq_eta": [],
     "Descent.Portability.SourceFixedRealization.simultaneous_source_fixed_realization": [],
+    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_apply": [],
+    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_mean_score": [],
+    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_mean_outcome": [],
+    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_variance_score": [],
+    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_variance_outcome": [],
+    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_covariance": [],
     "Descent.Portability.TraitPortabilityRange.architecture_moments": [],
     "Descent.Portability.TraitPortabilityRange.actual_genetic_variance": [],
+    "Descent.Portability.TurnoverArchitectureMetrics.signValue_sq": [],
     "Descent.Portability.TurnoverArchitectureMetrics.signValue_eq_sign": [],
+    "Descent.Portability.TurnoverArchitectureMetrics.sum_odd_vanishes": [],
+    "Descent.Portability.TurnoverArchitectureMetrics.reversedWeightSq_eq_filter": [],
+    "Descent.Portability.TurnoverArchitectureMetrics.sum_signValue_eq": [],
     "Descent.Portability.TurnoverDependence.sgn_true": [],
     "Descent.Portability.TurnoverDependence.sgn_false": [],
-    "Descent.Portability.TurnoverDependence.signState_values": []
+    "Descent.Portability.TurnoverDependence.signState_values": [],
+    "Descent.Portability.TurnoverQuadraticVariation.kernel_signValue_drift": []
    }
   }
  },
@@ -269268,7 +269331,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name CounterfactualRegion.signOf",
   "file": "Descent/Portability/SquaredCorrelationZeroTest.lean",
-  "line": 58,
+  "line": 61,
   "short": "scoreVar",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -269305,7 +269368,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name CounterfactualRegion.signOf",
   "file": "Descent/Portability/SquaredCorrelationZeroTest.lean",
-  "line": 61,
+  "line": 64,
   "short": "outcomeVar",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -277344,6 +277407,7 @@
   "vector_args": null,
   "mentioned_by": [
    "Descent.Portability.ArchaicPrediction.pairing_kernel_one_dimension",
+   "Descent.Portability.CounterfactualRegion.intervened_mean_second_model",
    "Descent.Portability.CounterfactualRegion.signOf_eq_sign",
    "Descent.Portability.FiniteDualityNoGap.abs_potential_le",
    "Descent.Portability.FixedBackgroundCurveRegion.curvePhenotype_grouped",
@@ -277403,18 +277467,30 @@
    "Descent.Portability.SourceFixedRealization.targetPhenotype_sub_score",
    "Descent.Portability.SourceFixedRealization.uniformBool_sign_mean",
    "Descent.Portability.SourceFixedRealization.uniformBool_sign_variance",
+   "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_apply",
+   "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_covariance",
+   "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_mean_outcome",
+   "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_mean_score",
+   "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_variance_outcome",
+   "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_variance_score",
    "Descent.Portability.TraitPortabilityRange.actual_genetic_variance",
    "Descent.Portability.TraitPortabilityRange.architecture_moments",
+   "Descent.Portability.TurnoverArchitectureMetrics.reversedWeightSq_eq_filter",
    "Descent.Portability.TurnoverArchitectureMetrics.signValue_eq_sign",
+   "Descent.Portability.TurnoverArchitectureMetrics.signValue_sq",
+   "Descent.Portability.TurnoverArchitectureMetrics.sum_odd_vanishes",
+   "Descent.Portability.TurnoverArchitectureMetrics.sum_signValue_eq",
    "Descent.Portability.TurnoverDependence.sgn_false",
    "Descent.Portability.TurnoverDependence.sgn_true",
-   "Descent.Portability.TurnoverDependence.signState_values"
+   "Descent.Portability.TurnoverDependence.signState_values",
+   "Descent.Portability.TurnoverQuadraticVariation.kernel_signValue_drift"
   ],
   "constraints": {
    "hypotheses": [],
    "hypotheses_by_theorem": {
     "Descent.Portability.ArchaicPrediction.pairing_kernel_one_dimension": [],
     "Descent.Portability.CounterfactualRegion.signOf_eq_sign": [],
+    "Descent.Portability.CounterfactualRegion.intervened_mean_second_model": [],
     "Descent.Portability.FiniteDualityNoGap.abs_potential_le": [],
     "Descent.Portability.FixedBackgroundCurveRegion.curvePhenotype_grouped": [],
     "Descent.Portability.FixedBackgroundCurveRegion.rademacher_pair_witness": [],
@@ -277473,12 +277549,23 @@
     "Descent.Portability.SourceFixedRealization.lossFraction_eq": [],
     "Descent.Portability.SourceFixedRealization.lossFraction_eq_eta": [],
     "Descent.Portability.SourceFixedRealization.simultaneous_source_fixed_realization": [],
+    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_apply": [],
+    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_mean_score": [],
+    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_mean_outcome": [],
+    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_variance_score": [],
+    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_variance_outcome": [],
+    "Descent.Portability.SquaredCorrelationZeroTest.signPairLaw_covariance": [],
     "Descent.Portability.TraitPortabilityRange.architecture_moments": [],
     "Descent.Portability.TraitPortabilityRange.actual_genetic_variance": [],
+    "Descent.Portability.TurnoverArchitectureMetrics.signValue_sq": [],
     "Descent.Portability.TurnoverArchitectureMetrics.signValue_eq_sign": [],
+    "Descent.Portability.TurnoverArchitectureMetrics.sum_odd_vanishes": [],
+    "Descent.Portability.TurnoverArchitectureMetrics.reversedWeightSq_eq_filter": [],
+    "Descent.Portability.TurnoverArchitectureMetrics.sum_signValue_eq": [],
     "Descent.Portability.TurnoverDependence.sgn_true": [],
     "Descent.Portability.TurnoverDependence.sgn_false": [],
-    "Descent.Portability.TurnoverDependence.signState_values": []
+    "Descent.Portability.TurnoverDependence.signState_values": [],
+    "Descent.Portability.TurnoverQuadraticVariation.kernel_signValue_drift": []
    }
   }
  },
@@ -281759,23 +281846,17 @@
   }
  },
  "Descent.Portability.TurnoverArchitectureMetrics.signValue": {
-  "class": "NUMERIC",
-  "note": "",
+  "class": "NOT-EXTRACTABLE",
+  "note": "qualified name TraitPortabilityRange.sign",
   "file": "Descent/Portability/TurnoverArchitectureMetrics.lean",
-  "line": 57,
+  "line": 58,
   "short": "signValue",
   "ret_type": "ℝ",
   "empirical_status": "",
-  "python": "Descent_Portability_TurnoverArchitectureMetrics_signValue",
-  "args": [
-   "b"
-  ],
+  "python": null,
+  "args": [],
   "box": {},
-  "selfcheck": {
-   "finite_points": 8,
-   "total_points": 8,
-   "error": null
-  },
+  "selfcheck": null,
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
@@ -281888,7 +281969,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name Function.update",
   "file": "Descent/Portability/TurnoverArchitectureMetrics.lean",
-  "line": 68,
+  "line": 69,
   "short": "flipCoord",
   "ret_type": "Fin n → Bool",
   "empirical_status": "",
@@ -281970,7 +282051,7 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Descent/Portability/TurnoverArchitectureMetrics.lean",
-  "line": 91,
+  "line": 92,
   "short": "flipEquiv",
   "ret_type": "(Fin n → Bool) ≃ (Fin n → Bool) where toFun",
   "empirical_status": "",
@@ -281994,7 +282075,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "∑ over the Finset `t`, not `Finset.univ`",
   "file": "Descent/Portability/TurnoverArchitectureMetrics.lean",
-  "line": 120,
+  "line": 122,
   "short": "blockScore",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -282064,7 +282145,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "expected ')', found op:→",
   "file": "Descent/Portability/TurnoverArchitectureMetrics.lean",
-  "line": 260,
+  "line": 262,
   "short": "genotypeNoiseExp",
   "ret_type": "ExpFunctional ((Fin n → Bool) × V)",
   "empirical_status": "",
@@ -282124,10 +282205,10 @@
   }
  },
  "Descent.Portability.TurnoverArchitectureMetrics.alignment": {
-  "class": "NUMERIC",
-  "note": "",
+  "class": "NOT-EXTRACTABLE",
+  "note": "self-check: calls untranslated definition Descent_Portability_TurnoverArchitectureMetrics_signValue",
   "file": "Descent/Portability/TurnoverArchitectureMetrics.lean",
-  "line": 421,
+  "line": 423,
   "short": "alignment",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -282138,9 +282219,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 8,
+   "finite_points": 0,
    "total_points": 8,
-   "error": null
+   "error": "NameError(\"name 'Descent_Portability_TurnoverArchitectureMetrics_signValue' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": {
@@ -282252,10 +282333,10 @@
   }
  },
  "Descent.Portability.TurnoverArchitectureMetrics.reversedWeightSq": {
-  "class": "NUMERIC",
-  "note": "",
+  "class": "NOT-EXTRACTABLE",
+  "note": "self-check: calls untranslated definition Descent_Portability_TurnoverArchitectureMetrics_signValue",
   "file": "Descent/Portability/TurnoverArchitectureMetrics.lean",
-  "line": 426,
+  "line": 428,
   "short": "reversedWeightSq",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -282266,9 +282347,9 @@
   ],
   "box": {},
   "selfcheck": {
-   "finite_points": 8,
+   "finite_points": 0,
    "total_points": 8,
-   "error": null
+   "error": "NameError(\"name 'Descent_Portability_TurnoverArchitectureMetrics_signValue' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": {
@@ -282304,7 +282385,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Portability/TurnoverArchitectureMetrics.lean",
-  "line": 440,
+  "line": 442,
   "short": "residualCoeff",
   "ret_type": "Fin n → ℝ",
   "empirical_status": "",
@@ -282352,7 +282433,7 @@
   "class": "STRUCTURAL",
   "note": "structure literal",
   "file": "Descent/Portability/TurnoverArchitectureMetrics.lean",
-  "line": 528,
+  "line": 530,
   "short": "architecturePop",
   "ret_type": "DeploymentPopulation ((Fin n → Bool) × V) (Fin n) (Fin n) where E",
   "empirical_status": "",
@@ -282461,7 +282542,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "qualified name ConvexOrderCoupling.occupiedCount",
   "file": "Descent/Portability/TurnoverArchitectureMetrics.lean",
-  "line": 701,
+  "line": 703,
   "short": "reversedCount",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -282507,7 +282588,7 @@
   "class": "NUMERIC",
   "note": "",
   "file": "Descent/Portability/TurnoverArchitectureMetrics.lean",
-  "line": 712,
+  "line": 714,
   "short": "equalWeights",
   "ret_type": "Fin n → ℝ",
   "empirical_status": "",
@@ -282578,7 +282659,7 @@
   "class": "NOT-EXTRACTABLE",
   "note": "self-check: arity/type mismatch (TypeError(\"'dict' object is not callable\"))",
   "file": "Descent/Portability/TurnoverArchitectureMetrics.lean",
-  "line": 825,
+  "line": 827,
   "short": "cellLossMean",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -282631,9 +282712,9 @@
  },
  "Descent.Portability.TurnoverArchitectureMetrics.cellLossVar": {
   "class": "NOT-EXTRACTABLE",
-  "note": "self-check: arity/type mismatch (TypeError(\"'dict' object is not callable\"))",
+  "note": "self-check: calls untranslated definition Descent_Portability_TurnoverArchitectureMetrics_signValue",
   "file": "Descent/Portability/TurnoverArchitectureMetrics.lean",
-  "line": 830,
+  "line": 832,
   "short": "cellLossVar",
   "ret_type": "ℝ",
   "empirical_status": "",
@@ -282648,7 +282729,7 @@
   "selfcheck": {
    "finite_points": 0,
    "total_points": 8,
-   "error": "TypeError(\"'dict' object is not callable\")"
+   "error": "NameError(\"name 'Descent_Portability_TurnoverArchitectureMetrics_signValue' is not defined\")"
   },
   "numeric_standins": null,
   "vector_args": {
@@ -282867,6 +282948,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.ContinuousTrajectoryRegion.refined_terminal_bounds",
    "Descent.Portability.TurnoverCouplingPolytope.coadapted_iff_inPolytope",
    "Descent.Portability.TurnoverCouplingPolytope.condKernel_coadapted",
    "Descent.Portability.TurnoverCouplingPolytope.pathLaw_inPolytope",
@@ -282890,6 +282972,7 @@
     "InPolytope μ K T γ"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ContinuousTrajectoryRegion.refined_terminal_bounds": [],
     "Descent.Portability.TurnoverCouplingPolytope.productKernel_coadapted": [
      "∀ t i z b, 0 ≤ K t i z b",
      "∀ t i z, ∑ b, K t i z b = 1"
@@ -284368,6 +284451,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.ContinuousTrajectoryRegion.refined_terminal_bounds",
    "Descent.Portability.TurnoverTrajectoryRegion.agreeProb_flipCoupling_succ",
    "Descent.Portability.TurnoverTrajectoryRegion.agreeProb_zero_startLaw",
    "Descent.Portability.TurnoverTrajectoryRegion.startLaw_isLaw",
@@ -284376,8 +284460,14 @@
    "Descent.Portability.TurnoverTrajectoryRegion.trajectory_attained"
   ],
   "constraints": {
+   "range_hi_thm": [
+    "Descent.Portability.ContinuousTrajectoryRegion.refined_terminal_bounds",
+    3
+   ],
+   "range_hi": 1,
    "hypotheses": [],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ContinuousTrajectoryRegion.refined_terminal_bounds": [],
     "Descent.Portability.TurnoverTrajectoryRegion.agreeProb_zero_startLaw": [],
     "Descent.Portability.TurnoverTrajectoryRegion.startLaw_isLaw": [],
     "Descent.Portability.TurnoverTrajectoryRegion.agreeProb_flipCoupling_succ": [],
@@ -284389,12 +284479,7 @@
     "Descent.Portability.TurnoverTrajectoryRegion.startLaw_isLaw",
     0
    ],
-   "range_lo": 0,
-   "range_hi_thm": [
-    "Descent.Portability.TurnoverTrajectoryRegion.terminal_range_bounds",
-    3
-   ],
-   "range_hi": 1
+   "range_lo": 0
   }
  },
  "Descent.Portability.TurnoverTrajectoryRegion.flipKernel": {
@@ -284431,6 +284516,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.ContinuousTrajectoryRegion.refined_terminal_bounds",
    "Descent.Portability.TurnoverTrajectoryRegion.agreeProb_flipCoupling_succ",
    "Descent.Portability.TurnoverTrajectoryRegion.agreeProb_trajectory_bounds",
    "Descent.Portability.TurnoverTrajectoryRegion.flipCoupling_coadapted",
@@ -284454,6 +284540,7 @@
     "(1 - 2 * p"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ContinuousTrajectoryRegion.refined_terminal_bounds": [],
     "Descent.Portability.TurnoverTrajectoryRegion.flipKernel_time_invariant": [],
     "Descent.Portability.TurnoverTrajectoryRegion.stepAgree_bounds": [
      "Coadapted (flipKernel p"
@@ -284626,6 +284713,7 @@
   "numeric_standins": null,
   "vector_args": null,
   "mentioned_by": [
+   "Descent.Portability.ContinuousTrajectoryRegion.refined_terminal_bounds",
    "Descent.Portability.TurnoverTrajectoryRegion.agreeProb_flipCoupling_succ",
    "Descent.Portability.TurnoverTrajectoryRegion.agreeProb_succ",
    "Descent.Portability.TurnoverTrajectoryRegion.agreeProb_trajectory_bounds",
@@ -284638,12 +284726,25 @@
    "declared_kind": "probability",
    "declared_lo": 0.0,
    "declared_hi": 1.0,
+   "range_hi_thm": [
+    "Descent.Portability.ContinuousTrajectoryRegion.refined_terminal_bounds",
+    3
+   ],
+   "range_hi": 1,
    "hypotheses": [
+    "0 ≤ lam * (t / n",
+    "lam * (t / n",
+    "TurnoverCouplingPolytope.Coadapted (TurnoverTrajectoryRegion.flipKernel (lam * (t / n",
     "∀ a, 0 ≤ μ a",
     "∑ a, μ a = 1",
     "∀ t, (1 - 2 * p"
    ],
    "hypotheses_by_theorem": {
+    "Descent.Portability.ContinuousTrajectoryRegion.refined_terminal_bounds": [
+     "0 ≤ lam * (t / n",
+     "lam * (t / n",
+     "TurnoverCouplingPolytope.Coadapted (TurnoverTrajectoryRegion.flipKernel (lam * (t / n"
+    ],
     "Descent.Portability.TurnoverTrajectoryRegion.agreeProb_succ": [],
     "Descent.Portability.TurnoverTrajectoryRegion.agreeProb_trajectory_bounds": [
      "∀ a, 0 ≤ μ a",
@@ -284656,12 +284757,7 @@
     ],
     "Descent.Portability.TurnoverTrajectoryRegion.terminal_range_bounds": [],
     "Descent.Portability.TurnoverTrajectoryRegion.terminal_range_attained": []
-   },
-   "range_hi_thm": [
-    "Descent.Portability.TurnoverTrajectoryRegion.terminal_range_bounds",
-    3
-   ],
-   "range_hi": 1
+   }
   }
  },
  "Descent.Portability.TurnoverTrajectoryRegion.totalMass": {

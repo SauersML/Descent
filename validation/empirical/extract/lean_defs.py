@@ -3593,9 +3593,6 @@ def offIndicator(xval, x):
 def counterfactualOutcome(xval, yval, fill, x):
     return (lambda ω: (yval[int(ω)] if (xval(ω) == x) else fill[int(x)]))
 
-def signOf(draw):
-    return (1.0 if draw else (-1.0))
-
 def outcomeFromExposure(input):
     return _rt._proj(input, '1')
 
@@ -6937,9 +6934,6 @@ def weightMean(W, what):
 
 def weightCovariance(W, what):
     return _rt.identity((lambda j, k: W(((lambda θ: _rt.mul((_rt.sub(what[int(θ)][int(j)], weightMean(W, what, j))), (_rt.sub(what[int(θ)][int(k)], weightMean(W, what, k)))))))))
-
-def Descent_Portability_TurnoverArchitectureMetrics_signValue(b):
-    return (1.0 if b else (-1.0))
 
 def alignment(a, σ):
     return sum((_rt.mul(_rt.lpow(a[int(i)], 2.0), Descent_Portability_TurnoverArchitectureMetrics_signValue((σ(i))))) for i in range(int(len(a))))
