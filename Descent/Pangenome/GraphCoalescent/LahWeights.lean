@@ -498,13 +498,14 @@ parts as it has blocks. -/
 theorem card_parts_ofSetoid {n : ℕ} (ξ : Coalescent.ER n) [DecidableRel ξ.r] :
     #(Finpartition.ofSetoid ξ).parts = Coalescent.blocks ξ := by
   have hclass : ∀ x y : Fin n, ξ.r x y →
-      ({z ∈ (univ : Finset (Fin n)) | ξ.r x z} : Finset (Fin n)) = {z ∈ (univ : Finset (Fin n)) | ξ.r y z} := by
+      ({z ∈ (univ : Finset (Fin n)) | ξ.r x z} : Finset (Fin n))
+        = {z ∈ (univ : Finset (Fin n)) | ξ.r y z} := by
     intro x y hxy
     ext z
     simp only [mem_filter, mem_univ, true_and]
     exact ⟨fun h ↦ ξ.trans (ξ.symm hxy) h, fun h ↦ ξ.trans hxy h⟩
-  have hmem : ∀ x : Fin n,
-      ({z ∈ (univ : Finset (Fin n)) | ξ.r x z} : Finset (Fin n)) ∈ (Finpartition.ofSetoid ξ).parts := by
+  have hmem : ∀ x : Fin n, ({z ∈ (univ : Finset (Fin n)) | ξ.r x z} : Finset (Fin n))
+      ∈ (Finpartition.ofSetoid ξ).parts := by
     intro x
     rw [Finpartition.ofSetoid_parts]
     exact mem_image_of_mem _ (mem_univ x)
@@ -517,9 +518,10 @@ theorem card_parts_ofSetoid {n : ℕ} (ξ : Coalescent.ER n) [DecidableRel ξ.r]
     | h x =>
       induction q using Quotient.inductionOn with
       | h y =>
-        have hsets := congrArg Subtype.val hpq
+        have hsets : ({z ∈ (univ : Finset (Fin n)) | ξ.r x z} : Finset (Fin n))
+            = {z ∈ (univ : Finset (Fin n)) | ξ.r y z} := congrArg Subtype.val hpq
         have hy : y ∈ ({z ∈ (univ : Finset (Fin n)) | ξ.r x z} : Finset (Fin n)) := by
-          rw [show ({z ∈ (univ : Finset (Fin n)) | ξ.r x z} : Finset (Fin n)) = {z ∈ (univ : Finset (Fin n)) | ξ.r y z} from hsets]
+          rw [hsets]
           simp only [mem_filter, mem_univ, true_and]
           exact ξ.refl y
         exact Quotient.sound (by simpa using hy)
