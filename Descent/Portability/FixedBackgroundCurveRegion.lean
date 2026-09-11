@@ -347,6 +347,7 @@ theorem curve_score_second_moment (G : ExpFunctional Γ) (T : Γ → ℝ)
   have hinner : (fun g : Γ ↦ uniformExp Bool
       (fun b ↦ liftGenotype (Ω := Bool) T (g, b) ^ 2)) = fun g : Γ ↦ T g ^ 2 := by
     funext g
+    show uniformExp Bool (fun _ : Bool ↦ T g ^ 2) = T g ^ 2
     exact ExpFunctional.eval_const _ _
   rw [background_eval, hinner, hT2]
 
@@ -370,8 +371,8 @@ theorem curve_score_cross_moment (G : ExpFunctional Γ) (T U : Γ → ℝ)
 
 /-- **The cellwise mean squared error of the deployed score on the fixed background**,
 `1 + v_d − 2√(q_d v_d)`.  This is the relation UPT equation (7.3) inverts. -/
-theorem curve_expected_mse (G : ExpFunctional Γ) (T U : Γ → ℝ) (hT : G T = 0)
-    (hU : G U = 0) (hT2 : G (fun g ↦ T g ^ 2) = 1) (hU2 : G (fun g ↦ U g ^ 2) = 1)
+theorem curve_expected_mse (G : ExpFunctional Γ) (T U : Γ → ℝ)
+    (hT2 : G (fun g ↦ T g ^ 2) = 1) (hU2 : G (fun g ↦ U g ^ 2) = 1)
     (hTU : G (fun g ↦ T g * U g) = 0) (v H q : D → ℝ) (d : D) (hv : 0 ≤ v d)
     (hq0 : 0 ≤ q d) (hqH : q d ≤ H d) (hH1 : H d ≤ 1) :
     expMse (backgroundLaw G) (curvePhenotype T U v H q d) (liftGenotype (Ω := Bool) T)
@@ -398,8 +399,8 @@ theorem curve_expected_mse (G : ExpFunctional Γ) (T U : Γ → ℝ) (hT : G T =
 prescribes.**  Taking the outcome variance to be `SourceFixedRealization.outcomeVar`,
 the cellwise pair prescribed by equation (4.2) and the pair prescribed by equation
 (7.1) are the same, related by equation (7.3). -/
-theorem curve_mse_eq_prescribed (G : ExpFunctional Γ) (T U : Γ → ℝ) (hT : G T = 0)
-    (hU : G U = 0) (hT2 : G (fun g ↦ T g ^ 2) = 1) (hU2 : G (fun g ↦ U g ^ 2) = 1)
+theorem curve_mse_eq_prescribed (G : ExpFunctional Γ) (T U : Γ → ℝ)
+    (hT2 : G (fun g ↦ T g ^ 2) = 1) (hU2 : G (fun g ↦ U g ^ 2) = 1)
     (hTU : G (fun g ↦ T g * U g) = 0) (H q m : D → ℝ) (d : D) (hq0 : 0 ≤ q d)
     (hm : 1 < m d) (hqH : q d ≤ H d) (hH1 : H d ≤ 1) :
     expMse (backgroundLaw G)
@@ -414,7 +415,7 @@ theorem curve_mse_eq_prescribed (G : ExpFunctional Γ) (T U : Γ → ℝ) (hT : 
     unfold SourceFixedRealization.outcomeVar
     exact Real.sqrt_sq hx.le
   have hmid := SourceFixedRealization.mse_identity q m d hq0 hm.le
-  rw [curve_expected_mse G T U hT hU hT2 hU2 hTU
+  rw [curve_expected_mse G T U hT2 hU2 hTU
       (SourceFixedRealization.outcomeVar q m) H q d hvpos hq0 hqH hH1, hsqrt]
   unfold SourceFixedRealization.outcomeVar
   linear_combination -hmid
