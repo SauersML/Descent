@@ -20,6 +20,7 @@ import Descent.Portability.CohortEvaluationOperators
 #print axioms Descent.Portability.CohortEvaluationOperators.dot_single_mulVec_single
 #print axioms Descent.Portability.CohortEvaluationOperators.eq_zero_of_quadForm_eq_zero
 #print axioms Descent.Portability.CohortEvaluationOperators.quadForm_ext_iff
+#print axioms Descent.Portability.CohortEvaluationOperators.residualMaker_diag
 #print axioms Descent.Portability.CohortEvaluationOperators.residualMaker_transpose
 #print axioms Descent.Portability.CohortEvaluationOperators.residualMaker_mul_self
 #print axioms Descent.Portability.CohortEvaluationOperators.residualMaker_mul

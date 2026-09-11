@@ -170,6 +170,14 @@ theorem quadForm_ext_iff (A B : Matrix (Fin n) (Fin n) ℝ) (hA : Aᵀ = A) (hB 
 def residualMaker (P : Matrix (Fin n) (Fin n) ℝ) : Matrix (Fin n) (Fin n) ℝ :=
   1 - P
 
+/-- **The residual maker is the corpus complement on the diagonal.**  `Descent.Core.complement`
+is the scalar `x ↦ 1 - x`; the residual maker `I - P` is its matrix form, carrying exactly that
+complement in each diagonal slot.  This ties the two definitions rather than leaving one an
+unconnected copy of the other. -/
+theorem residualMaker_diag (P : Matrix (Fin n) (Fin n) ℝ) (i : Fin n) :
+    residualMaker P i i = Descent.Core.complement (P i i) := by
+  rw [residualMaker, Descent.Core.complement, Matrix.sub_apply, Matrix.one_apply_eq]
+
 /-- The residual maker of a symmetric matrix is symmetric. -/
 theorem residualMaker_transpose (P : Matrix (Fin n) (Fin n) ℝ) (hs : Pᵀ = P) :
     (residualMaker P)ᵀ = residualMaker P := by
