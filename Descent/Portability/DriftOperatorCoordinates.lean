@@ -514,8 +514,8 @@ to the coordinate's feature polynomial and summed against the coalescence rates.
 theorem lowOrderLDDrift_eq_driftOperator {D : ℕ} (rates : ManyDemeLDRates D)
     (state : Fin D → TwoLocusHaplotypeFrequencies) (coordinate : LowOrderLDCoordinate D) :
     lowOrderLDDrift rates (twoLocusJetMoment state) coordinate =
-      ∑ deme, rates.coalescence deme *
-        eval (coordinates (state deme)) (driftOperator (featurePolynomial deme coordinate state)) := by
+      ∑ deme, rates.coalescence deme * eval (coordinates (state deme))
+        (driftOperator (featurePolynomial deme coordinate state)) := by
   have hweighted : lowOrderLDDrift rates (twoLocusJetMoment state) coordinate =
       twoLocusWeightedJetDrift rates.coalescence state coordinate := by
     cases coordinate with
