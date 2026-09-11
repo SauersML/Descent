@@ -15,3 +15,6 @@ import Descent.Portability.ContinuousTrajectoryRegion
 #print axioms Descent.Portability.ContinuousTrajectoryRegion.mixPath_terminal_attained
 #print axioms Descent.Portability.ContinuousTrajectoryRegion.ceiling_mixPath_terminal_attained
 #print axioms Descent.Portability.ContinuousTrajectoryRegion.ceiling_admissible_path_bounds
+#print axioms Descent.Portability.ContinuousTrajectoryRegion.mixPath_one
+#print axioms Descent.Portability.ContinuousTrajectoryRegion.refined_terminal_bounds
+#print axioms Descent.Portability.ContinuousTrajectoryRegion.refined_terminal_bound_tendsto

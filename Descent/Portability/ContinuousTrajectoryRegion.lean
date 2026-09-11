@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.TurnoverTrajectoryRegion
 import Mathlib.Analysis.Calculus.Deriv.MeanValue
+import Mathlib.Analysis.SpecialFunctions.Complex.LogBounds
 
 assert_below Descent.Decision Descent.Program
 
@@ -21,6 +22,11 @@ the terminal value of an explicit admissible path, the mixture of total decay
 with perfect synchrony. So the interval is exactly the attainable set of terminal
 agreements over admissible paths, and multiplying by the accuracy ceiling gives
 the expected-accuracy form.
+
+The two envelopes are tied together at the end: running `n` discrete steps whose
+per-step flip probability is `lam * (t/n)`, the terminal bound of
+`TurnoverTrajectoryRegion.terminal_range_bounds` converges to the lower endpoint
+of the continuous envelope as the step is refined.
 
 Scope: the paths here are differentiable on the nonnegative half line rather than
 absolutely continuous with the inequalities holding almost everywhere, and the
@@ -223,6 +229,43 @@ theorem ceiling_admissible_path_bounds (H sigma lam : ℝ) (hH : 0 < H)
     linarith
 
 end AccuracyScale
+
+section DiscreteLimit
+
+/-- The lower endpoint of the continuous envelope is the totally decaying path. -/
+theorem mixPath_one (lam t : ℝ) : mixPath lam 1 t = Real.exp (-(2 * lam * t)) := by
+  rw [mixPath]
+  ring
+
+/-- **The discrete envelope at a refined step.**  Running `n` steps whose per-step flip
+probability is `lam * (t/n)`, the terminal agreement probability of every coadapted coupling
+lies in `[(1 - 2 lam t/n)^n, 1]`.  This is
+`TurnoverTrajectoryRegion.terminal_range_bounds` at that step size. -/
+theorem refined_terminal_bounds (lam t : ℝ) (n : ℕ) (hp0 : 0 ≤ lam * (t / n))
+    (hp2 : lam * (t / n) ≤ 1 / 2)
+    {J : List (Fin 2 → Bool) → (Fin 2 → Bool) → ℝ}
+    (hJ : TurnoverCouplingPolytope.Coadapted
+      (TurnoverTrajectoryRegion.flipKernel (lam * (t / n))) J) :
+    (1 - 2 * (lam * (t / n))) ^ n
+        ≤ TurnoverTrajectoryRegion.agreeProb TurnoverTrajectoryRegion.startLaw J n ∧
+      TurnoverTrajectoryRegion.agreeProb TurnoverTrajectoryRegion.startLaw J n ≤ 1 :=
+  TurnoverTrajectoryRegion.terminal_range_bounds (lam * (t / n)) hp0 hp2 hJ n
+
+/-- **The discrete envelope converges to the continuous one.**  As the step is refined, the
+discrete terminal lower bound of `refined_terminal_bounds` converges to `mixPath lam 1 t`,
+the lower endpoint of the continuous envelope. -/
+theorem refined_terminal_bound_tendsto (lam t : ℝ) :
+    Filter.Tendsto (fun n : ℕ ↦ (1 - 2 * (lam * (t / n))) ^ n) Filter.atTop
+      (nhds (mixPath lam 1 t)) := by
+  have hrw : (fun n : ℕ ↦ (1 - 2 * (lam * (t / n))) ^ n)
+      = fun n : ℕ ↦ (1 + -(2 * lam * t) / n) ^ n := by
+    funext n
+    congr 1
+    ring
+  rw [hrw, mixPath_one]
+  exact Real.tendsto_one_add_div_pow_exp (-(2 * lam * t))
+
+end DiscreteLimit
 
 end
 
