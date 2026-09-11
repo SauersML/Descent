@@ -328,6 +328,7 @@ theorem empiricalAUCComparison_mem_unit (caseRisk controlRisk : ℝ) :
   unfold empiricalAUCComparison
   split_ifs <;> norm_num
 
+omit [Fintype State] in
 /-- The ranking credit of an ordered pair of replicas: the half-credit comparison when the
 first is a case and the second a control, and nothing otherwise. It is nonnegative and at most
 the indicator that the first is a case times the indicator that the second is a control. -/
@@ -410,8 +411,11 @@ theorem aucNumerator_le_denominator (law : FiniteReportLaw State) (score : State
     have hcomplement := law.expectation_complement fun state ↦ if outcome state then 1 else 0
     unfold FiniteReportLaw.binaryCaseMass
     rw [← hcomplement]
-    simp only [FiniteReportLaw.expectation, Finset.mul_sum, Finset.sum_mul]
-    exact Finset.sum_congr rfl fun first _ ↦ Finset.sum_congr rfl fun second _ ↦ by ring
+    simp only [FiniteReportLaw.expectation]
+    rw [Finset.sum_mul]
+    refine Finset.sum_congr rfl fun first _ ↦ ?_
+    rw [Finset.mul_sum, Finset.mul_sum]
+    exact Finset.sum_congr rfl fun second _ ↦ by ring
   unfold aucNumerator aucDenominator
   linarith
 
