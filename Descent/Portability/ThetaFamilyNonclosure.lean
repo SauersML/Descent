@@ -493,6 +493,21 @@ theorem parity_thetaReport_gap_one :
   rw [parity_thetaReport_values_one.1, parity_thetaReport_values_one.2]
   norm_num
 
+/-- **NOTE2 §4.1, the nonclosure statement in one place.** At every cohort size `n` the two
+parity laws on the progression `1/4, 1/4 + h, …, 3/4` induce identical size-`n` cohort laws
+and different expected population squared correlations. No finite cohort order identifies the
+expected report. -/
+theorem parity_cohorts_match_reports_differ (n : ℕ) :
+    (∀ outcome : Fin n → Bool × Bool,
+        parityExp n false
+            (fun j ↦ cohortMass (nodeBase + (j : ℕ) * nodeStep n) outcome) =
+          parityExp n true
+            (fun j ↦ cohortMass (nodeBase + (j : ℕ) * nodeStep n) outcome)) ∧
+      parityExp n false (fun j ↦ thetaReport (nodeBase + (j : ℕ) * nodeStep n)) ≠
+        parityExp n true (fun j ↦ thetaReport (nodeBase + (j : ℕ) * nodeStep n)) :=
+  ⟨fun outcome ↦ cohort_mass_moments_match n nodeBase (nodeStep n) outcome,
+    parity_thetaReport_gap_ne_zero n⟩
+
 /-! ### The sign-mixture example -/
 
 /-- **NOTE2 §4.1, sign mixture.** The pooled law of the two sign studies is their equal

@@ -35,5 +35,6 @@ open Descent.Portability.ThetaFamilyNonclosure
 #print axioms parity_thetaReport_gap_ne_zero
 #print axioms parity_thetaReport_values_one
 #print axioms parity_thetaReport_gap_one
+#print axioms parity_cohorts_match_reports_differ
 #print axioms signPair_pooled_is_average
 #print axioms signReport_pooled_values

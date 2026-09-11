@@ -63,7 +63,7 @@ theorem matrixExponential_smul_matrix (A : Matrix ι ι ℝ) (scale time : ℝ) 
 
 /-- **NOTE 1 equation (26).** The defective jump kernel a killing generator induces when time
 is run at a dominating uniformization rate. -/
-def uniformization (Q : Matrix ι ι ℝ) (uniformRate : ℝ) : Matrix ι ι ℝ :=
+noncomputable def uniformization (Q : Matrix ι ι ℝ) (uniformRate : ℝ) : Matrix ι ι ℝ :=
   (1 : Matrix ι ι ℝ) + uniformRate⁻¹ • Q
 
 /-- **NOTE 1 equation (26).** The exact semigroup of a killing generator is the Poisson
@@ -104,7 +104,7 @@ theorem partialSum_apply (A : Matrix ι ι ℝ) (time : ℝ) (terms : ℕ) (row 
       ∑ power ∈ Finset.range terms,
         (((power.factorial : ℝ)⁻¹) • ((time • A) ^ power)) row column := by
   unfold matrixExponentialPartialSum
-  simp [Finset.sum_apply]
+  rw [Matrix.sum_apply]
 
 /-- The entrywise exponential series converges. -/
 theorem expSeries_entry_summable (A : Matrix ι ι ℝ) (time : ℝ) (row column : ι) :
@@ -235,7 +235,15 @@ theorem rowSum_deficit_le (Q : Matrix ι ι ℝ) (hQ : KillingGenerator Q) (unif
       pow_nonneg hrateNonneg _
     have hrow : ∑ column, (uniformization Q uniformRate ^ (power + terms)) row column ≤ 1 :=
       (substochastic_pow hsub (power + terms)).rowSum_le_one row
-    nlinarith [hfactorial, hpow, hrow]
+    have hinner : (uniformRate * time) ^ (power + terms) *
+        ∑ column, (uniformization Q uniformRate ^ (power + terms)) row column ≤
+          (uniformRate * time) ^ (power + terms) := by
+      calc (uniformRate * time) ^ (power + terms) *
+            ∑ column, (uniformization Q uniformRate ^ (power + terms)) row column
+          ≤ (uniformRate * time) ^ (power + terms) * 1 :=
+            mul_le_mul_of_nonneg_left hrow hpow
+        _ = (uniformRate * time) ^ (power + terms) := mul_one _
+    exact mul_le_mul_of_nonneg_left hinner hfactorial
   have htail := ((summable_nat_add_iff terms).mpr hsummable).tsum_le_tsum hcompare
     ((summable_nat_add_iff terms).mpr hmajorant)
   have hsplit := hsummable.sum_add_tsum_nat_add terms
