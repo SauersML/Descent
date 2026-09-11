@@ -82,6 +82,7 @@ import Descent.Portability.JointMetricMomentDeterminacy
 import Descent.Portability.CylinderUniformDraw
 import Descent.Portability.CylinderThresholdCertificate
 import Descent.Portability.CylinderHaltingLaw
+import Descent.Portability.ReferenceExperimentLaw
 
 namespace Descent.Program
 
@@ -194,14 +195,18 @@ from a deme count.
 * §8 equations (33)-(35): `FrontierCompletionRegion`, with (35) in `SublawReportCertificate`;
   the conditional-mean image of a convex set of completions need not be convex:
   `FrontierCompletionRegion.exists_convex_not_convex_conditionalMeans`.
+* §9, the executed reference experiment: the model in corpus vocabulary and its exact
+  source-side report law, including the defined probability `4051/6750` of the source squared
+  correlation: `ReferenceExperimentLaw`.
 * §9.1, the uniform penetrance architecture: `UniformPenetranceArchitecture`.
 * §10, the halting boundary: `HaltingExpectationBoundary`.
 
 Scope. Theorem 2's semialgebraic partition is proved only for the architecture/environment
 square. Equations (20), (28) and (29) take the pointwise bounds `0 ≤ D ≤ 1`, as the corpus
 certificates do. Theorem 1 makes no complexity claim and covers no infinite branch set. The
-executed reference experiment of §9 is not formalized yet. `IntervalEvaluatorCertificate`
-assumes a finite measure, a common bound and pointwise vanishing widths;
+model and source rows of the §9 reference experiment are proved; its target histories and the
+target rows of its table are not formalized yet. `IntervalEvaluatorCertificate` assumes a
+finite measure, a common bound and pointwise vanishing widths;
 `CylinderIntervalCertificate` needs only almost sure vanishing widths on fair-bit streams but
 does not show that its rational values are computed by an algorithm. (32) takes almost sure
 termination of the program as a hypothesis; it is not decided. Equations (33) and (34) are
