@@ -11,6 +11,7 @@ open Descent.Portability.TwoLocusMicroscopicApproximation
 #print axioms enlargedLowOrderLDGenerator_zeroDeme
 #print axioms zeroDemeMicroscopicApproximation
 #print axioms enlargedLowOrderLDFeature_eq
+#print axioms enlargedPropagator_mulVec_mem_realizationBody
 #print axioms rateEpoch_preserves_locusExchangeable_realization
 #print axioms RateHistoryEvent.instruction
 #print axioms propagate_preserves_locusExchangeable_realization

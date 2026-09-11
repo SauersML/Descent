@@ -28,7 +28,9 @@ enlarged index set is the affine coordinate alone and the enlarged generator is 
 feature map of `EnlargedLowOrderLDGenerator` to the one of `KernelRealizationPreservation`:
 they are one function, so a statement about either body is a statement about both.
 
-Theorem 2.  `rateEpoch_preserves_locusExchangeable_realization` is one epoch
+Theorem 2.  `enlargedPropagator_mulVec_mem_realizationBody` is its first sentence: every epoch
+of the enlarged moment semigroup carries the enlarged body into itself.
+`rateEpoch_preserves_locusExchangeable_realization` is one epoch
 `rates.epoch duration hduration` at any nonnegative rates: the propagated stored vector again
 has a locus-exchangeable haplotype realization, NOTE1's invariance of the subspace (12) on the
 body.  `RateHistoryEvent` names the two events Theorem 2 covers, a rate epoch and a physically
@@ -121,6 +123,22 @@ theorem enlargedLowOrderLDFeature_eq (D : ℕ) :
   rcases coordinate with _ | (_ | _) <;> rfl
 
 /-! ## NOTE1 Theorem 2 -/
+
+/-- **NOTE1 Theorem 2, first sentence, with no hypotheses.**  For every nonnegative rate law and
+every nonnegative duration, the exact propagator of the enlarged moment system carries the
+enlarged realization body of NOTE1 equation (6) into itself. -/
+theorem enlargedPropagator_mulVec_mem_realizationBody {D : ℕ} (rates : ManyDemeLDRates D)
+    (duration : ℝ) (hduration : 0 ≤ duration) (vector : AffineEnlargedCoordinate D → ℝ)
+    (hvector : vector ∈ realizationBody (enlargedLowOrderLDFeature (D := D))) :
+    (matrixExponential (enlargedLowOrderLDGenerator rates) duration).mulVec vector ∈
+      realizationBody (enlargedLowOrderLDFeature (D := D)) := by
+  rcases Nat.eq_zero_or_pos D with hzero | hpositive
+  · subst hzero
+    exact EnlargedBodyClosedness.enlargedPropagator_mulVec_mem_of_approx rates
+      (zeroDemeMicroscopicApproximation rates) duration hduration vector hvector
+  · exact EnlargedBodyClosedness.enlargedPropagator_mulVec_mem_of_approx rates
+      (enlargedMicroscopicApproximation rates ⟨0, hpositive⟩) duration hduration vector
+      hvector
 
 /-- **NOTE1 Theorem 2 for one epoch, with no hypotheses.**  For every nonnegative rate law and
 every nonnegative duration, the epoch propagator of the arbitrary-deme low-order system maps a
