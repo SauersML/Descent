@@ -18,7 +18,9 @@ its expectation preserved for every `ε`, not only to first order, and
 of genuine positive probability laws for `ε ^ 2` below the smallest atom, which
 is `|ε| < sqrt p_min`. `mse_influence` is equation (5.3). `ratio_influence` is the
 single quotient rule behind equations (5.5) and (5.6), specialised to
-`precision_influence`, `recall_influence` and `f1_influence`. The geometry these
+`precision_influence`, `recall_influence` and `f1_influence`.
+`log_squared_correlation_influence` is equation (5.4), built from
+`lawCov_influence` and `lawVar_influence`. The geometry these
 feed is `Descent.Portability.MetricResponseEllipsoid`, whose `wInner` is the
 inner product used throughout.
 -/
