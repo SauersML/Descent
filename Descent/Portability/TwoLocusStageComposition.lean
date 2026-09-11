@@ -291,20 +291,23 @@ theorem bothMutationExpansion_velocity {D : ℕ} (target : Fin D)
 /-! ## The physical stages -/
 
 /-- The physical stages of one composed microscopic step for `demeCount` demes: resampling in
-each deme, migration along each ordered pair, recombination in each deme, and one allele-flip
-stage at both loci in each deme. -/
+each deme, one simultaneous migration stage for all ordered pairs, recombination in each deme,
+and one allele-flip stage at both loci in each deme. -/
 inductive PhysicalStage (demeCount : ℕ) where
   | drift (deme : Fin demeCount)
-  | migration (source recipient : Fin demeCount)
+  | migration
   | recombination (deme : Fin demeCount)
   | mutation (deme : Fin demeCount)
 deriving DecidableEq, Fintype
 
-/-- The kernel of each physical stage at step `step`, each at its own rate. -/
+/-- The kernel of each physical stage at step `step`, each at its own rate.  The migration
+stage runs the simultaneous convex mixture at rate `1 + M`, which gives the literal fractions
+`step · m_ij` for small steps. -/
 def physicalStageKernel {D : ℕ} (rates : ManyDemeLDRates D) :
     PhysicalStage D → ℝ → FiniteMixtureKernel TwoLocusHaplotype (DemeHaplotypeState D)
   | .drift deme => stageKernel rates (.drift deme)
-  | .migration source recipient => stageKernel rates (.migration source recipient)
+  | .migration =>
+      pulseStageKernel (simultaneousMigrationPulse rates) (1 + totalMigration rates)
   | .recombination deme => stageKernel rates (.recombination deme)
   | .mutation deme => pulseStageKernel (bothMutationPulseAt deme) (rates.mutation deme / 2)
 
@@ -312,8 +315,8 @@ def physicalStageKernel {D : ℕ} (rates : ManyDemeLDRates D) :
 def physicalStageDrift {D : ℕ} (rates : ManyDemeLDRates D)
     (coordinate : AffineEnlargedCoordinate D) : PhysicalStage D → DemeHaplotypeState D → ℝ
   | .drift deme => stageDrift rates (enlargedStageExpansion coordinate) (.drift deme)
-  | .migration source recipient =>
-      stageDrift rates (enlargedStageExpansion coordinate) (.migration source recipient)
+  | .migration => fun state ↦
+      (1 + totalMigration rates) * (simultaneousMigrationExpansion rates coordinate).velocity state
   | .recombination deme =>
       stageDrift rates (enlargedStageExpansion coordinate) (.recombination deme)
   | .mutation deme => fun state ↦
@@ -323,8 +326,11 @@ def physicalStageDrift {D : ℕ} (rates : ManyDemeLDRates D)
 def physicalStageSlack {D : ℕ} (rates : ManyDemeLDRates D)
     (coordinate : AffineEnlargedCoordinate D) : PhysicalStage D → ℝ → ℝ
   | .drift deme => stageSlack rates (enlargedStageExpansion coordinate) (.drift deme)
-  | .migration source recipient =>
-      stageSlack rates (enlargedStageExpansion coordinate) (.migration source recipient)
+  | .migration =>
+      pulseStageSlack (1 + totalMigration rates)
+        (simultaneousMigrationExpansion rates coordinate).valueBound
+        (simultaneousMigrationExpansion rates coordinate).velocityBound
+        (simultaneousMigrationExpansion rates coordinate).remainder
   | .recombination deme =>
       stageSlack rates (enlargedStageExpansion coordinate) (.recombination deme)
   | .mutation deme =>
@@ -515,16 +521,7 @@ theorem physicalStageDrift_eq_mulVec {D : ℕ} (rates : ManyDemeLDRates D)
               ring
             · rw [if_neg hdeme, if_neg fun hequal ↦ hdeme (Stage.drift.inj hequal)]
               ring
-        | migration otherSource otherRecipient =>
-            rw [if_neg (by simp)]
-            exact sub_self _
-        | recombination otherDeme =>
-            rw [if_neg (by simp)]
-            exact sub_self _
-        | mutationLeft otherDeme =>
-            rw [if_neg (by simp)]
-            exact sub_self _
-        | mutationRight otherDeme =>
+        | _ =>
             rw [if_neg (by simp)]
             exact sub_self _
       rw [physicalGenerator, generatorDifference_mulVec]
@@ -547,16 +544,7 @@ theorem physicalStageDrift_eq_mulVec {D : ℕ} (rates : ManyDemeLDRates D)
               ring
             · rw [if_neg hpair, if_neg fun hequal ↦ hpair (Stage.migration.inj hequal)]
               ring
-        | drift otherDeme =>
-            rw [if_neg (by simp)]
-            exact sub_self _
-        | recombination otherDeme =>
-            rw [if_neg (by simp)]
-            exact sub_self _
-        | mutationLeft otherDeme =>
-            rw [if_neg (by simp)]
-            exact sub_self _
-        | mutationRight otherDeme =>
+        | _ =>
             rw [if_neg (by simp)]
             exact sub_self _
       rw [physicalGenerator, generatorDifference_mulVec]
@@ -578,16 +566,7 @@ theorem physicalStageDrift_eq_mulVec {D : ℕ} (rates : ManyDemeLDRates D)
               ring
             · rw [if_neg hdeme, if_neg fun hequal ↦ hdeme (Stage.recombination.inj hequal)]
               ring
-        | drift otherDeme =>
-            rw [if_neg (by simp)]
-            exact sub_self _
-        | migration otherSource otherRecipient =>
-            rw [if_neg (by simp)]
-            exact sub_self _
-        | mutationLeft otherDeme =>
-            rw [if_neg (by simp)]
-            exact sub_self _
-        | mutationRight otherDeme =>
+        | _ =>
             rw [if_neg (by simp)]
             exact sub_self _
       rw [physicalGenerator, generatorDifference_mulVec]
@@ -626,13 +605,7 @@ theorem physicalStageDrift_eq_mulVec {D : ℕ} (rates : ManyDemeLDRates D)
               ring
             · rw [if_neg hdeme, if_neg fun hequal ↦ hdeme (Stage.mutationRight.inj hequal)]
               ring
-        | drift otherDeme =>
-            rw [if_neg (by simp), if_neg (by simp)]
-            exact sub_self _ |>.trans (add_zero 0).symm
-        | migration otherSource otherRecipient =>
-            rw [if_neg (by simp), if_neg (by simp)]
-            exact sub_self _ |>.trans (add_zero 0).symm
-        | recombination otherDeme =>
+        | _ =>
             rw [if_neg (by simp), if_neg (by simp)]
             exact sub_self _ |>.trans (add_zero 0).symm
       rw [physicalGenerator, generatorDifference_mulVec]
