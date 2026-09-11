@@ -80,13 +80,13 @@ def deterministicHaplotypeKernel {X : Type*} (move : X → X) :
     simp only [twoLocusHaplotypeIndicator]
     split <;> norm_num
   weight_sum _ := by
-    simp [sum_haplotype, twoLocusHaplotypeIndicator]
+    simp [twoLocusHaplotypeIndicator]
 
 /-- The deterministic kernel evaluates an observable at the moved state. -/
 theorem apply_deterministicHaplotypeKernel {X : Type*} (move : X → X)
     (observable : X → ℝ) (point : X) :
     (deterministicHaplotypeKernel move).apply observable point = observable (move point) := by
-  simp [FiniteMixtureKernel.apply, deterministicHaplotypeKernel, sum_haplotype,
+  simp [FiniteMixtureKernel.apply, deterministicHaplotypeKernel,
     twoLocusHaplotypeIndicator]
 
 /-! ## One deterministic pulse stage -/
