@@ -19,9 +19,9 @@ once per sample, so it lies in the budget-respecting state space whose capacity 
 (`withinBudget_seedConfiguration`, `seedState`).
 
 Combining (22) for the panel,
-`Descent.Portability.ConditionalReportCompilation.panel_compiled_expectation_eq_frequency_polynomial`,
-with (20), `Descent.Portability.PartialHaplotypeDualSemigroup.expectedMomentVector_eq_matrixExponential`,
-gives `expectedPanelReport_eq_matrixExponential`.  For any expectation family obeying the forward
+`ConditionalReportCompilation.panel_compiled_expectation_eq_frequency_polynomial`, with (20),
+`PartialHaplotypeDualSemigroup.expectedMomentVector_eq_matrixExponential`, gives
+`expectedPanelReport_eq_matrixExponential`.  For any expectation family obeying the forward
 moment equation, the expected compiled report of the panel experiment at time `t` is the finite
 sum over genotypes of the conditional readout times the seed coordinate of `e^{tQ} v(0)`.  A
 nonlinear finite-cohort metric therefore needs only finitely many coordinates of one matrix
