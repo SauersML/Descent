@@ -194,12 +194,6 @@ theorem expectation_abs_deviation_le (count : ℕ) (hcount : 0 < count)
     _ ≤ Real.sqrt (q.mass category * (1 - q.mass category) / count) :=
         Real.sqrt_le_sqrt (by linarith)
 
-/-- Every category share of a probability law is at most one. -/
-theorem mass_le_one (q : FiniteReportLaw Category) (category : Category) :
-    q.mass category ≤ 1 := by
-  rw [← q.mass_sum]
-  exact Finset.single_le_sum (f := q.mass) (fun x _ ↦ q.mass_nonneg x) (Finset.mem_univ _)
-
 /-- NOTE2 (31): the expected total deviation between the empirical law of a replica block
 and the population law it was drawn from, in the exact closed form of the note. -/
 theorem expectation_deviation_sum_le (count : ℕ) (hcount : 0 < count) (witness : Category)
@@ -213,7 +207,9 @@ theorem expectation_deviation_sum_le (count : ℕ) (hcount : 0 < count) (witness
   have hvnn : ∀ category : Category,
       0 ≤ q.mass category * (1 - q.mass category) / count := by
     intro category
-    have h1 := mass_le_one q category
+    have h1 : q.mass category ≤ 1 := by
+      rw [← q.mass_sum]
+      exact Finset.single_le_sum (f := q.mass) (fun x _ ↦ q.mass_nonneg x) (Finset.mem_univ _)
     exact div_nonneg (mul_nonneg (q.mass_nonneg category) (by linarith)) hcountpos.le
   have hsplit : (replicaLaw count q).expectation
       (fun draw ↦ ∑ category, |empiricalMass draw category - q.mass category|) =
