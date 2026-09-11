@@ -414,13 +414,19 @@ theorem binaryAUCNumerator_eq_twoReplica (law : FiniteReportLaw State) (score : 
           FiniteReportLaw.expectation, Finset.mul_sum]
 
 /-- **NOTE 2 section 5.4, AUC numerator.** `N = 4A`, four times the two-replica ranking
-credit. -/
+credit.
+
+Regime: a finite population law with the outcome read on its states; the case prevalence is
+`law.binaryCaseMass outcome`, carried by `law`, so no separate prevalence argument exists. -/
 def aucNumerator (law : FiniteReportLaw State) (score : State → ℝ) (outcome : State → Bool) :
     ℝ :=
   4 * law.binaryAUCNumerator score outcome
 
 /-- **NOTE 2 section 5.4, AUC denominator.** `D = 4p(1 - p)`, four times the case mass times
-the control mass. -/
+the control mass.
+
+Regime: a finite population law with the outcome read on its states; the prevalence `p` is
+`law.binaryCaseMass outcome`, carried by `law`. -/
 def aucDenominator (law : FiniteReportLaw State) (outcome : State → Bool) : ℝ :=
   4 * (law.binaryCaseMass outcome * (1 - law.binaryCaseMass outcome))
 
@@ -1535,14 +1541,21 @@ theorem eval_correlationTerm (law : FiniteReportLaw State) (score outcome : Stat
   rw [map_mul, map_pow, map_sub, map_one, eval_correlationNumeratorPolynomial,
     eval_correlationDenominatorPolynomial]
 
-/-- The AUC numerator polynomial `4A`: four times the pair polynomial of the ranking credit. -/
+/-- The AUC numerator polynomial `4A`: four times the pair polynomial of the ranking credit.
+
+Regime: a finite population law read through its masses; the case prevalence is the value of
+the case-indicator expectation polynomial at those masses, so it is carried by the evaluation
+point and no separate prevalence argument exists. -/
 def aucNumeratorPolynomial (score : State → ℝ) (outcome : State → Bool) :
     MvPolynomial State ℝ :=
   C 4 * pairPolynomial fun first second ↦
     if outcome first && !outcome second then
       empiricalAUCComparison (score first) (score second) else 0
 
-/-- The AUC denominator polynomial `4p(1 - p)`. -/
+/-- The AUC denominator polynomial `4p(1 - p)`.
+
+Regime: a finite population law read through its masses; the prevalence `p` is the value of the
+case-indicator expectation polynomial at those masses. -/
 def aucDenominatorPolynomial (outcome : State → Bool) : MvPolynomial State ℝ :=
   C 4 * (expectationPolynomial (fun state ↦ if outcome state then 1 else 0) *
     (1 - expectationPolynomial (fun state ↦ if outcome state then 1 else 0)))
