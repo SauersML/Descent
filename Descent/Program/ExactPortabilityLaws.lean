@@ -83,6 +83,8 @@ import Descent.Portability.CylinderUniformDraw
 import Descent.Portability.CylinderThresholdCertificate
 import Descent.Portability.CylinderHaltingLaw
 import Descent.Portability.ReferenceExperimentLaw
+import Descent.Portability.PartialHaplotypeDualSemigroup
+import Descent.Portability.InterleavedHistoryRealization
 
 namespace Descent.Program
 
@@ -125,7 +127,8 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
   (`enlargedMicroscopicApproximation`, `rateEpoch_preserves_locusExchangeable_realization`,
   `history_present_locusExchangeable_realization`, `history_LDPairDomain`); the closedness-taking
   forms are `TwoLocusRealizabilityPreservation`; histories that also carry admixture pulses:
-  `PulseHistoryRealization`.
+  `PulseHistoryRealization`; finite interleavings of continuous-rate and integrable-rate segments
+  with splits and pulses: `InterleavedHistoryRealization`.
 * §2.4 time-varying rates: `PiecewiseConstantBodyPreservation` (piecewise-constant),
   `LinearFundamentalMatrix` and `IntegrableRateHistoryRealization` (rate paths whose generator is
   continuous in time); rate histories with integrable rate coordinates, with the generator
@@ -134,9 +137,11 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
   `IntegrableRateRealization`.
 * §3 Theorem 3 and equations (14)-(16): `StationaryRealization`,
   `StationaryHaplotypeRealization`, `AncestralHaplotypeRealization`.
-* §4.1 per-locus material grading: `PartialHaplotypeCarrier`. §4.2, the derivation of (19): the
-  neutral diffusion generator on partial-haplotype moments, its Leibniz expansion over carriers,
-  and the same-deme merger and killing terms: `PartialHaplotypeDualGenerator`. §4.2 and §5.1
+* §4.1 per-locus material grading and the loose configuration bound `C(K+B,B)`:
+  `PartialHaplotypeCarrier`. §4.2 equation (19) in transition-rate form, with nonnegative rates
+  and every transition preserving the budget (18): `PartialHaplotypeDualGenerator`; equation
+  (20), the expected moment vector as the matrix exponential of the dual generator:
+  `PartialHaplotypeDualSemigroup`. §4.2 and §5.1
   substochastic semigroups and uniformization: `SubstochasticGeneratorSemigroup`,
   `PoissonTruncationCertificate`. §4.2a, the extension of a positive constant-preserving
   semigroup from polynomials and its representation by Markov kernels obeying
@@ -158,8 +163,8 @@ step of §2.3, and `TwoLocusStageComposition` runs migration as one pulse per or
 than one simultaneous mixture. §2.4 is proved for rate histories with integrable rate
 coordinates; the propagator is characterized by the integral equation, and its
 almost-everywhere derivative is not stated. Theorem 2 covers histories of rate epochs, splits
-and admixture pulses; the pipeline compiler emits nothing else. Of §4.2, the migration,
-recombination and mutation rates of (19) and equation (20) are not formalized. The §4.2a
+and admixture pulses; the pipeline compiler emits nothing else. Of §4.2, mutation is symmetric,
+and (20) takes the forward moment equation of the expectation family as a hypothesis. The §4.2a
 kernels are Markov kernels on pseudo-metrizable compact spaces, which include the
 haplotype-frequency simplex; the general compact Hausdorff case is not formalized. The
 finite-cohort intercept and accuracy of §7 are not formalized.
