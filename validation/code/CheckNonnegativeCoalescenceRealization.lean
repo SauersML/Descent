@@ -1,0 +1,25 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.NonnegativeCoalescenceRealization
+
+/-! Axiom audit of NonnegativeCoalescenceRealization. -/
+
+open Descent.Portability.NonnegativeCoalescenceRealization
+
+#print axioms ofRates_ne_coalescenceFreeRates
+#print axioms generator_ofRates
+#print axioms generator_perturb
+#print axioms tendsto_generator_perturb
+#print axioms epoch_ofRates
+#print axioms tendsto_perturbedEpoch_mulVec
+#print axioms nonnegativeEpoch_preserves_locusExchangeable_realization
+#print axioms nonnegativeEpoch_mulVec_mem_realizationBody
+#print axioms instruction_evolve_ofRates
+#print axioms NonnegativeRateEvent.preserves_locusExchangeable_realization
+#print axioms nonnegativePropagate_preserves_locusExchangeable_realization
+#print axioms nonnegativeHistory_present_locusExchangeable_realization
+#print axioms nonnegativeHistory_present_dd_quadraticForm_nonneg
+#print axioms nonnegativeHistory_present_dd_cauchySchwarz
+#print axioms nonnegativeHistory_present_dd_diagonal_nonneg
+#print axioms nonnegativeHistory_LDPairDomain
