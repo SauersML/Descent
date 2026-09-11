@@ -300,7 +300,8 @@ theorem late_r2Portability_range (α η : ℝ) (h0a : 0 ≤ α) (h1a : α ≤ 1)
 /-- NOTE2 section 9: every range above is attained, since the reported conditional mean at a
 corner of the square is the corner ratio. -/
 theorem range_attained (history : History)
-    (report defined : Bool × Bool → LearnerAtom → TerminalTypes → ℚ) (architecture environment : Bool) :
+    (report defined : Bool × Bool → LearnerAtom → TerminalTypes → ℚ)
+    (architecture environment : Bool) :
     ArchitectureEnvironmentRegion.conditionalMean (cornerAccumulator history report)
         (cornerAccumulator history defined) (if architecture then 1 else 0)
         (if environment then 1 else 0) =
