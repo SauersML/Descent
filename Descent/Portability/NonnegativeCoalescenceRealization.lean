@@ -175,7 +175,7 @@ theorem generator_perturb (rates : NonnegativeLDRates D) (amount : ℝ) (hamount
       (Prod.ext (funext fun source ↦ funext fun target ↦ ?_)
         (Prod.ext (funext fun deme ↦ ?_) (funext fun deme ↦ ?_)))
     all_goals simp [rateCoordinates, NonnegativeLDRates.perturb, NonnegativeLDRates.coordinates,
-      unitCoalescence]
+      unitCoalescenceDirection]
   rw [augmentedLowOrderLDGenerator_eq_generatorLinearMap, hcoordinates, map_add, map_smul]
   rfl
 
