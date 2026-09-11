@@ -391,9 +391,10 @@ theorem integratingFactorSolution_eq_integral {a b : ℝ → ℝ} {T : ℝ} (hT 
               integratingFactorSolution α β initial s) - (b s - β s)) := by
       rw [← hdifference, integratingFactorSolution_eq_integral_of_continuous hα hβ initial t]
       ring
-    have hintegralBound : |∫ s in (0 : ℝ)..t, ((a s - α s) * integratingFactorSolution a b initial s +
-          α s * (integratingFactorSolution a b initial s -
-            integratingFactorSolution α β initial s) - (b s - β s))| ≤
+    have hintegralBound : |∫ s in (0 : ℝ)..t,
+          ((a s - α s) * integratingFactorSolution a b initial s +
+            α s * (integratingFactorSolution a b initial s -
+              integratingFactorSolution α β initial s) - (b s - β s))| ≤
         ε * S + ε * K * L + ε := by
       rw [← Real.norm_eq_abs]
       have hfirstPart : IntervalIntegrable (fun u ↦ ‖a u - α u‖ * S) volume 0 t :=
