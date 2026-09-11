@@ -47,9 +47,16 @@ recombination rate is nonnegative (`chronologyExposureLaw_ae_mem_Icc`); and the 
 recombination history scaled by `λ` is its transform `measureLaplace ν λ` for every `λ`
 (`scaled_normalisedCoupling_eq_measureLaplace`), which is NOTE1 (29) and (30) in measure form.
 
+The bounds also hold for every ordered chronology with nonnegative event totals
+(`couplingOfState_runEvents_mem_Icc`). A migration block adds to the normalised linkage exactly
+the donor increment it produces and a recombination block damps it, so the linkage stays between
+`e^{-R}` times the donor fraction and the donor fraction (`runEvents_linkage_bounds`). Within
+that one class of histories the attainable couplings at fixed totals are therefore exactly
+`[e^{-R}, 1]` (`attainable_coupling_range_events`), and the attainable metric vectors are exactly
+the image of that interval under the table map (`attainable_metric_curve_events`).
+
 Not proved here: that every chronology with the given totals is equivalent to a three-block
-one. The attainment half uses the three-block family only, which is all NOTE1 Theorem 5 claims,
-and the bounds half covers every continuous chronology.
+one. The exact-curve theorem needs only that both halves hold for the ordered chronologies.
 
 ## Empirical status
 
@@ -258,6 +265,180 @@ theorem attainable_metric_curve (mtot rtot : ℝ) (hmpos : 0 < mtot) :
           couplingOfState (runEvents (threeBlockHistory bexp mtot rtot) (0, 0)) = coupling} =
       metricTable (1 - Real.exp (-mtot)) '' Set.Icc (Real.exp (-rtot)) 1 := by
   rw [attainable_coupling_range mtot rtot hmpos]
+
+/-- Running an ordered chronology multiplies the recipient fraction by the survival factor of its
+migration total, whatever recombination it contains. -/
+theorem one_sub_fst_runEvents (events : List ChronologyEvent) (state : ℝ × ℝ) :
+    1 - (runEvents events state).1 =
+      (1 - state.1) * Real.exp (-(events.map eventMigration).sum) := by
+  induction events generalizing state with
+  | nil => simp
+  | cons event events ih =>
+    rw [runEvents_cons, ih]
+    cases event with
+    | recombination exposure =>
+      simp only [stepEvent_recombination, List.map_cons, List.sum_cons, eventMigration, zero_add]
+    | migration total =>
+      simp only [stepEvent_migration, List.map_cons, List.sum_cons, eventMigration]
+      rw [neg_add, Real.exp_add]
+      ring
+
+/-- Assumes: an ordered chronology whose events supply nonnegative totals, started from a state
+`(p, D)` with `0 ≤ p < 1` and `D = (1 - p) E`, where `e^{-a} p ≤ E ≤ p` for some `a ≥ 0`.
+Running the chronology keeps this form, with `a` increased by the recombination it supplies: a
+migration block adds to `E` exactly the donor increment it produces and a recombination block
+multiplies `E` by its survival factor, so `E` stays between the survival factor of all
+recombination so far times the donor fraction, and the donor fraction itself. -/
+theorem runEvents_linkage_bounds (events : List ChronologyEvent)
+    (hevents : ∀ event ∈ events, 0 ≤ eventMigration event ∧ 0 ≤ eventRecombination event) :
+    ∀ (state : ℝ × ℝ) (exposure coupling : ℝ), 0 ≤ exposure → 0 ≤ state.1 → state.1 < 1 →
+      state.2 = (1 - state.1) * coupling →
+      Real.exp (-exposure) * state.1 ≤ coupling → coupling ≤ state.1 →
+      ∃ final : ℝ, 0 ≤ (runEvents events state).1 ∧ (runEvents events state).1 < 1 ∧
+        (runEvents events state).2 = (1 - (runEvents events state).1) * final ∧
+        Real.exp (-(exposure + (events.map eventRecombination).sum)) *
+            (runEvents events state).1 ≤ final ∧
+          final ≤ (runEvents events state).1 := by
+  induction events with
+  | nil =>
+    intro state exposure coupling _ hlow hhigh hlinkage hbelow habove
+    exact ⟨coupling, hlow, hhigh, hlinkage, by simpa using hbelow, habove⟩
+  | cons event events ih =>
+    intro state exposure coupling hexposure hlow hhigh hlinkage hbelow habove
+    have hrest : ∀ other ∈ events, 0 ≤ eventMigration other ∧ 0 ≤ eventRecombination other :=
+      fun other hother ↦ hevents other (List.mem_cons.mpr (Or.inr hother))
+    have hhead := hevents event (List.mem_cons.mpr (Or.inl rfl))
+    have hcouplingnonneg : 0 ≤ coupling :=
+      le_trans (mul_nonneg (Real.exp_pos _).le hlow) hbelow
+    rw [runEvents_cons]
+    cases event with
+    | recombination gap =>
+      have hgap : 0 ≤ gap := hhead.2
+      have hdecay : Real.exp (-gap) ≤ 1 := Real.exp_le_one_iff.mpr (by linarith)
+      have hpositive : 0 < Real.exp (-gap) := Real.exp_pos _
+      obtain ⟨final, hfinal⟩ := ih hrest (stepEvent (ChronologyEvent.recombination gap) state)
+        (exposure + gap) (coupling * Real.exp (-gap)) (by linarith) hlow hhigh
+        (by
+          simp only [stepEvent_recombination]
+          rw [hlinkage]
+          ring)
+        (by
+          simp only [stepEvent_recombination]
+          rw [neg_add, Real.exp_add]
+          nlinarith [hbelow, hpositive])
+        (by
+          simp only [stepEvent_recombination]
+          nlinarith [habove, hdecay, hcouplingnonneg])
+      have htotal : exposure +
+          ((ChronologyEvent.recombination gap :: events).map eventRecombination).sum =
+            exposure + gap + (events.map eventRecombination).sum := by
+        simp only [List.map_cons, List.sum_cons, eventRecombination]
+        ring
+      rw [htotal]
+      exact ⟨final, hfinal⟩
+    | migration total =>
+      have hmass : 0 ≤ total := hhead.1
+      have hdecay : Real.exp (-total) ≤ 1 := Real.exp_le_one_iff.mpr (by linarith)
+      have hpositive : 0 < Real.exp (-total) := Real.exp_pos _
+      have hsurvival : Real.exp (-exposure) ≤ 1 := Real.exp_le_one_iff.mpr (by linarith)
+      have hremaining : 0 < 1 - state.1 := by linarith
+      have hincrement : 0 ≤ (1 - Real.exp (-exposure)) *
+          ((1 - state.1) * (1 - Real.exp (-total))) :=
+        mul_nonneg (sub_nonneg.mpr hsurvival)
+          (mul_nonneg hremaining.le (sub_nonneg.mpr hdecay))
+      obtain ⟨final, hfinal⟩ := ih hrest (stepEvent (ChronologyEvent.migration total) state)
+        exposure (coupling + (1 - state.1) * (1 - Real.exp (-total))) hexposure
+        (by
+          simp only [stepEvent_migration]
+          nlinarith [mul_nonneg hlow hpositive.le])
+        (by
+          simp only [stepEvent_migration]
+          nlinarith [mul_pos hremaining hpositive])
+        (by
+          simp only [stepEvent_migration]
+          rw [hlinkage]
+          ring)
+        (by
+          simp only [stepEvent_migration]
+          nlinarith [hbelow, hincrement])
+        (by
+          simp only [stepEvent_migration]
+          nlinarith [habove])
+      have htotal : exposure +
+          ((ChronologyEvent.migration total :: events).map eventRecombination).sum =
+            exposure + (events.map eventRecombination).sum := by
+        simp only [List.map_cons, List.sum_cons, eventRecombination, zero_add]
+      rw [htotal]
+      exact ⟨final, hfinal⟩
+
+/-- NOTE1 (33) for ordered chronologies. Assumes: events with nonnegative totals and a positive
+migration total. The normalised coupling of the chronology lies in `[e^{-R}, 1]`, where `R` is
+its recombination total. -/
+theorem couplingOfState_runEvents_mem_Icc (events : List ChronologyEvent)
+    (hevents : ∀ event ∈ events, 0 ≤ eventMigration event ∧ 0 ≤ eventRecombination event)
+    (hmigration : 0 < (events.map eventMigration).sum) :
+    couplingOfState (runEvents events (0, 0)) ∈
+      Set.Icc (Real.exp (-(events.map eventRecombination).sum)) 1 := by
+  obtain ⟨final, _, hhigh, hlinkage, hbelow, habove⟩ :=
+    runEvents_linkage_bounds events hevents (0, 0) 0 0 le_rfl le_rfl zero_lt_one
+      (by simp) (by simp) le_rfl
+  have hfraction : 0 < (runEvents events (0, 0)).1 := by
+    have hsurvivors := one_sub_fst_runEvents events (0, 0)
+    have hlt : Real.exp (-(events.map eventMigration).sum) < 1 :=
+      Real.exp_lt_one_iff.mpr (by linarith)
+    simp only [sub_zero, one_mul] at hsurvivors
+    linarith
+  have hnonzero : (runEvents events (0, 0)).1 ≠ 0 := ne_of_gt hfraction
+  have hremaining : 1 - (runEvents events (0, 0)).1 ≠ 0 := by
+    have hpositive : 0 < 1 - (runEvents events (0, 0)).1 := by linarith
+    exact ne_of_gt hpositive
+  have hvalue : couplingOfState (runEvents events (0, 0)) =
+      final / (runEvents events (0, 0)).1 := by
+    unfold couplingOfState
+    rw [hlinkage, div_eq_div_iff (mul_ne_zero hnonzero hremaining) hnonzero]
+    ring
+  rw [zero_add] at hbelow
+  rw [hvalue]
+  exact ⟨(le_div_iff₀ hfraction).mpr hbelow, (div_le_one hfraction).mpr habove⟩
+
+/-- NOTE1 Theorem 5 with (33), within one class of histories. Assumes: a positive migration
+total. The couplings of the ordered chronologies with nonnegative event totals, migration total
+`M` and recombination total `R` are exactly the interval `[e^{-R}, 1]`: every such chronology
+lands in it, and the three-block histories attain all of it. -/
+theorem attainable_coupling_range_events (mtot rtot : ℝ) (hmpos : 0 < mtot) :
+    {coupling : ℝ | ∃ events : List ChronologyEvent,
+        (∀ event ∈ events, 0 ≤ eventMigration event ∧ 0 ≤ eventRecombination event) ∧
+          (events.map eventMigration).sum = mtot ∧ (events.map eventRecombination).sum = rtot ∧
+            couplingOfState (runEvents events (0, 0)) = coupling} =
+      Set.Icc (Real.exp (-rtot)) 1 := by
+  apply Set.Subset.antisymm
+  · rintro coupling ⟨events, hevents, hmigration, hrecombination, rfl⟩
+    have hmem := couplingOfState_runEvents_mem_Icc events hevents (by rw [hmigration]; exact hmpos)
+    rwa [hrecombination] at hmem
+  · rw [← attainable_coupling_range mtot rtot hmpos]
+    rintro coupling ⟨bexp, hmem, rfl⟩
+    rw [Set.mem_setOf_eq]
+    refine ⟨threeBlockHistory bexp mtot rtot, ?_, migrationTotal_threeBlockHistory bexp mtot rtot,
+      recombinationTotal_threeBlockHistory bexp mtot rtot, rfl⟩
+    intro event hevent
+    simp only [threeBlockHistory, List.mem_cons, List.not_mem_nil, or_false] at hevent
+    rcases hevent with rfl | rfl | rfl
+    · exact ⟨le_rfl, sub_nonneg.mpr hmem.2⟩
+    · exact ⟨hmpos.le, le_rfl⟩
+    · exact ⟨le_rfl, hmem.1⟩
+
+/-- NOTE1 Theorem 5, the curve statement within one class of histories. Assumes: a positive
+migration total. The metric vectors of the ordered chronologies with nonnegative event totals,
+migration total `M` and recombination total `R` are exactly the image of `[e^{-R}, 1]` under the
+table map. -/
+theorem attainable_metric_curve_events (mtot rtot : ℝ) (hmpos : 0 < mtot) :
+    metricTable (1 - Real.exp (-mtot)) ''
+        {coupling : ℝ | ∃ events : List ChronologyEvent,
+          (∀ event ∈ events, 0 ≤ eventMigration event ∧ 0 ≤ eventRecombination event) ∧
+            (events.map eventMigration).sum = mtot ∧ (events.map eventRecombination).sum = rtot ∧
+              couplingOfState (runEvents events (0, 0)) = coupling} =
+      metricTable (1 - Real.exp (-mtot)) '' Set.Icc (Real.exp (-rtot)) 1 := by
+  rw [attainable_coupling_range_events mtot rtot hmpos]
 
 /-- The report law of the chronology itself: NOTE1 (31) instantiated at the donor fraction and
 normalised coupling that a forward-time chronology with nonnegative continuous rates and a

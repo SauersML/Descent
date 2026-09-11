@@ -30,3 +30,8 @@ open Descent.Portability.AttainableChronologyCurve
 #print axioms
   Descent.Portability.AttainableChronologyCurve.isProbabilityMeasure_chronologyExposureLaw
 #print axioms Descent.Portability.AttainableChronologyCurve.chronologyExposureLaw_ae_mem_Icc
+#print axioms Descent.Portability.AttainableChronologyCurve.one_sub_fst_runEvents
+#print axioms Descent.Portability.AttainableChronologyCurve.runEvents_linkage_bounds
+#print axioms Descent.Portability.AttainableChronologyCurve.couplingOfState_runEvents_mem_Icc
+#print axioms Descent.Portability.AttainableChronologyCurve.attainable_coupling_range_events
+#print axioms Descent.Portability.AttainableChronologyCurve.attainable_metric_curve_events
