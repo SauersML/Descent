@@ -1,0 +1,24 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.GlobalFourthMomentRegion
+
+/-! Axiom audit of GlobalFourthMomentRegion. -/
+
+#print axioms Descent.Portability.GlobalFourthMomentRegion.eval_sq_sub
+#print axioms Descent.Portability.GlobalFourthMomentRegion.abs_eval_le
+#print axioms Descent.Portability.GlobalFourthMomentRegion.dot_smul_right
+#print axioms Descent.Portability.GlobalFourthMomentRegion.eval_dot_feature
+#print axioms Descent.Portability.GlobalFourthMomentRegion.minFourthMoment_eq_of_certificate
+#print axioms Descent.Portability.GlobalFourthMomentRegion.strong_duality_at_certificate
+#print axioms Descent.Portability.GlobalFourthMomentRegion.sq_le_minFourthMoment
+#print axioms Descent.Portability.GlobalFourthMomentRegion.featureMean_moments
+#print axioms Descent.Portability.GlobalFourthMomentRegion.slackPair_feasible
+#print axioms Descent.Portability.GlobalFourthMomentRegion.reducedValues_nonempty
+#print axioms Descent.Portability.GlobalFourthMomentRegion.feasible_second_moment_bound
+#print axioms Descent.Portability.GlobalFourthMomentRegion.boundary_mean_square_rigidity
+#print axioms Descent.Portability.GlobalFourthMomentRegion.eq_of_weightedExp_eq_zero
+#print axioms Descent.Portability.GlobalFourthMomentRegion.boundary_pointwise
+#print axioms Descent.Portability.GlobalFourthMomentRegion.constant_magnitude_value
+#print axioms Descent.Portability.GlobalFourthMomentRegion.constant_magnitude_of_value_eq
+#print axioms Descent.Portability.GlobalFourthMomentRegion.support_function_bound
