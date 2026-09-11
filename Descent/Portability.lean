@@ -496,6 +496,8 @@ import Descent.Portability.HardBudgetAuditGuard
 import Descent.Portability.JointAuditExperiment
 import Descent.Portability.OddLocusReportSolutions
 
+import Descent.Portability.MeanDriftRepair
+
 assert_below Descent.Program
 
 /-!

@@ -3433,6 +3433,9 @@ def featureCombo(g, lam):
 def Descent_Portability_ConditionalOscillationDuality_jointLaw(μ, K):
     return (lambda z: _rt.mul(μ[int(_rt._proj(z, '1'))], K[int(_rt._proj(z, '1'))][int(_rt._proj(z, '2'))]))
 
+def shrinkRadius(s, S):
+    return _rt.rdiv(s, (((2.0 * S) + 2.0)))
+
 def phaseMean(p, z):
     return sum((((_rt._proj(p, 'mass')(x)) * z(x))) for x in range(int(_rt.sumdim('x', len(_rt._proj(p, 'mass')), len(z)))))
 
@@ -3596,11 +3599,11 @@ def counterfactualOutcome(xval, yval, fill, x):
 def signOf(draw):
     return (1.0 if draw else (-1.0))
 
-def outcomeFromExposure(exposure, _exogenous):
-    return exposure
+def outcomeFromExposure(input):
+    return _rt._proj(input, '1')
 
-def outcomeFromExogenous(_exposure, exogenous):
-    return exogenous
+def outcomeFromExogenous(input):
+    return _rt._proj(input, '2')
 
 def bregman(F, D, y, f):
     return ((F(y) - F(f)) - (D(f) * ((y - f))))
@@ -4330,11 +4333,14 @@ def reversibleLaw(time):
 def Descent_Portability_FourCyclePrediction_report():
     return (_rt.rsqrt(2.0) * mode())
 
+def clampTo(u, x):
+    return _rt.rmax(0.0, (_rt.rmin(u, x)))
+
 def clamp01(θ):
-    return _rt.rmax(0.0, (_rt.rmin(1.0, θ)))
+    return clampTo(1.0, θ)
 
 def spreadWeight(ep):
-    return _rt.rmax(0.0, (_rt.rmin((_rt.rdiv(1.0, 2.0)), ep)))
+    return clampTo((_rt.rdiv(1.0, 2.0)), ep)
 
 def spreadWeights(ep):
     return _rt.VecFn([spreadWeight(ep), (1.0 - (2.0 * spreadWeight(ep))), spreadWeight(ep)])
@@ -4770,15 +4776,6 @@ def Descent_Portability_LossExplainabilityRegion_lossExplainedFraction(π, m, F)
 def raisedFourthMoments(V, d_0, c):
     return (lambda d: _rt.add(V[int(d)], ((c if (d == d_0) else 0.0))))
 
-def exampleWeights():
-    return (lambda _: _rt.rdiv(1.0, 2.0))
-
-def exampleSecond():
-    return (lambda d: (2.0 if d else 1.0))
-
-def exampleMinima():
-    return (lambda d: (4.0 if d else 2.0))
-
 def Descent_Portability_LossMomentRange_residual(s, z):
     return (((2.0 if _rt._proj(z, '1') else 1.0)) * (_rt.VecFn([(-_rt.rsqrt(s)), 0.0, _rt.rsqrt(s)]))(_rt._proj(z, '2')))
 
@@ -4829,6 +4826,9 @@ def membership(partition):
 
 def Descent_Portability_MarkovPoissonLaw_generator(kernel, rate):
     return ((rate) * ((kernelMatrix(kernel) - 1.0)))
+
+def Descent_Portability_MeanDriftRepair_gain(μ, w, f, d):
+    return _rt.sub(frameRisk(μ, w, f), frameRisk(μ, w, ((lambda i: _rt.add(f[int(i)], d[int(i)])))))
 
 def Descent_Portability_MeasurePortabilityLaw_linearScore(weights, genotype):
     return (lambda sample: sum((_rt.mul(weights[int(marker)], genotype[int(marker)][int(sample)])) for marker in range(int(len(weights)))))
@@ -4896,7 +4896,7 @@ def betweenVar(Q, L, D):
 def etaD(Q, L, D):
     return _rt.rdiv(betweenVar(Q, L, D), lawCov(Q, L, L))
 
-def wInner(P, f, g):
+def weightedInner(P, f, g):
     return sum((_rt.mul(_rt.mul(P[int(ω)], f[int(ω)]), g[int(ω)])) for ω in range(int(len(P))))
 
 def ldBandReconstructionShare(decay, kappa):
@@ -5222,6 +5222,15 @@ def oddShift(r, prev, q):
 
 def oddLevelMatrix(m, lam):
     return _rt.identity((lambda r, i: ((lam * (((2.0 * (((r)))) + 1.0))) * (((((1.0) if (i == gridPred(m, r)) else 0.0)) - (((1.0) if (i == r) else 0.0)))))))
+
+def oddAggregate(c, k):
+    return _rt.rabs(((2.0 * k) - ((((2.0 * c) + 1.0)))))
+
+def oddGenZ(lam, g, M):
+    return ((lam * (M)) * ((g((_rt.rmax(((M - 2.0)), 1.0))) - g(M))))
+
+def oddStepZ(lam, tau, g):
+    return (lambda M: (g(M) + (tau * oddGenZ(lam, g, M))))
 
 def scalarMean(values, p):
     return sum((_rt.mul(hweMass(p, g), values[int(g)])) for g in range(int(len(values))))
@@ -6962,16 +6971,16 @@ def signState(x):
 def Descent_Portability_TurnoverDependence_retention(lam, t):
     return _rt.rexp(((-(((2.0 * lam) * t)))))
 
-def alignedPower(n, w, b):
+def alignedSignal(n, w, b):
     return sum((_rt.mul(_rt.lpow(w[int(i)], 2.0), _rt.lpow(b[int(i)], 2.0))) for i in range(int(len(w))))
 
-def crossPower(n, w, b):
+def crossSignal(n, w, b):
     n = float(len(w))
-    return _rt.sub(_rt.lpow((sum((_rt.mul(w[int(i)], b[int(i)])) for i in range(int(len(w))))), 2.0), alignedPower(n, w, b))
+    return _rt.sub(_rt.lpow((sum((_rt.mul(w[int(i)], b[int(i)])) for i in range(int(len(w))))), 2.0), alignedSignal(n, w, b))
 
 def independentTurnoverAccuracy(n, w, b, sigma, lam, t):
     n = float(len(w))
-    return _rt.rdiv((_rt.add(alignedPower(n, w, b), _rt.mul(_rt.lpow(Descent_Portability_TurnoverDependence_retention(lam, t), 2.0), crossPower(n, w, b)))), (_rt.mul((sum((_rt.lpow(w[int(i)], 2.0)) for i in range(int(len(w))))), (_rt.add((sum((_rt.lpow(b[int(i)], 2.0)) for i in range(int(len(w))))), _rt.lpow(sigma, 2.0))))))
+    return _rt.rdiv((_rt.add(alignedSignal(n, w, b), _rt.mul(_rt.lpow(Descent_Portability_TurnoverDependence_retention(lam, t), 2.0), crossSignal(n, w, b)))), (_rt.mul((sum((_rt.lpow(w[int(i)], 2.0)) for i in range(int(len(w))))), (_rt.add((sum((_rt.lpow(b[int(i)], 2.0)) for i in range(int(len(w))))), _rt.lpow(sigma, 2.0))))))
 
 def flipWeight(w, s, s_p):
     return sum(((((0.0) if (s_p(i) == s(i)) else w[int(i)]))) for i in range(int(len(w))))

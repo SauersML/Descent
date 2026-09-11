@@ -126,7 +126,6 @@ theorem attained_drift_penalty (μ : ι → Measure ℝ) [∀ i, IsProbabilityMe
   have hm (i : ι) : (∫ y, y ∂ν i) - (∫ y, y ∂μ i) = -t i * Real.sign (d i) := by
     change (∫ y, y ∂endpointLaw (L i) (U i) (m i)) - (∫ y, y ∂μ i) = _
     rw [endpoint_mean _ _ _ (hLU i) (hmean i)]
-    dsimp [m]
     ring
   refine ⟨ν, fun i ↦ inferInstance, hs, hν, ?_, ?_⟩
   · intro i
