@@ -224,6 +224,7 @@ theorem apply_reindexKernel {B C X : Type*} [Fintype B] [Fintype C] (K : FiniteM
     (fun c ↦ Function.extend embedding (K.weight x) 0 c *
       f (Function.extend embedding K.move (fun _ ↦ id) c x)) (fun c hc ↦ ?_) (fun b ↦ ?_)).symm
   · rw [Set.mem_range] at hc
+    dsimp only
     rw [Function.extend_apply' (f := embedding) (K.weight x) (0 : C → ℝ) c hc, Pi.zero_apply,
       zero_mul]
   · show K.weight x b * f (K.move b x) = Function.extend embedding (K.weight x) 0 (embedding b) *
