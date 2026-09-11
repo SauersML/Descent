@@ -88,7 +88,8 @@ def kernelMeasure (S : C(X, ℝ) →L[ℝ] C(X, ℝ)) (hS : ∀ g, 0 ≤ g → 0
 value at `x`: the representation `S g x = ∫ g(y) K(x, dy)` of NOTE1 §4.2a. -/
 theorem integral_kernelMeasure (S : C(X, ℝ) →L[ℝ] C(X, ℝ)) (hS : ∀ g, 0 ≤ g → 0 ≤ S g)
     (x : X) (g : C(X, ℝ)) : ∫ y, g y ∂(kernelMeasure S hS x) = S g x :=
-  RealRMK.integral_rieszMeasure (evalFunctional S hS x) (ContinuousMap.liftCompactlySupported g)
+  RealRMK.integral_rieszMeasure (evalFunctional S hS x)
+    (CompactlySupportedContinuousMap.ContinuousMap.liftCompactlySupported g)
 
 /-- A positive operator fixing the constant one has probability kernels: the mass of the
 kernel at every state is `S 1 x = 1`. -/

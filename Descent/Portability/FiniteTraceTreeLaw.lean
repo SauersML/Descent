@@ -445,8 +445,8 @@ def exampleArchitectureLaw : RationalReportLaw Bool where
 
 /-- The three-way environment draw of the concrete experiment. -/
 def exampleEnvironmentLaw : RationalReportLaw (Fin 3) where
-  mass := ![1 / 2, 1 / 4, 1 / 4]
-  mass_nonneg := fun environment ↦ by fin_cases environment <;> norm_num
+  mass := fun environment ↦ if environment = 0 then 1 / 2 else 1 / 4
+  mass_nonneg := fun environment ↦ by split_ifs <;> norm_num
   mass_sum := by norm_num [Fin.sum_univ_three]
 
 /-- A concrete dependent experiment: a binary architecture draw, and only when it is on, a
