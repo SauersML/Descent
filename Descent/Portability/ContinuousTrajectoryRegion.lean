@@ -64,7 +64,7 @@ theorem hasDerivAt_growth_mul {a : ℝ → ℝ} {d : ℝ} {lam t : ℝ} (h : Has
 
 /-- **UPT (5.10), the consequence.**  An agreement path that starts at one and obeys the
 two rate inequalities on the nonnegative half line stays in `[e^{-2λt}, 1]`. -/
-theorem admissible_path_bounds (lam : ℝ) (hlam : 0 ≤ lam) (a d : ℝ → ℝ) (ha0 : a 0 = 1)
+theorem admissible_path_bounds (lam : ℝ) (a d : ℝ → ℝ) (ha0 : a 0 = 1)
     (hderiv : ∀ t, 0 ≤ t → HasDerivAt a (d t) t)
     (hlow : ∀ t, 0 ≤ t → -(2 * lam) * a t ≤ d t)
     (hhigh : ∀ t, 0 ≤ t → d t ≤ 2 * lam * (1 - a t)) (t : ℝ) (ht : 0 ≤ t) :
@@ -92,10 +92,11 @@ theorem admissible_path_bounds (lam : ℝ) (hlam : 0 ≤ lam) (a d : ℝ → ℝ
     have hg0 : growth lam 0 = 1 := by
       rw [growth]
       simp
-    rw [ha0, hg0] at hkey
-    simp only [sub_zero, one_mul] at hkey
+    simp only [ha0, hg0, sub_zero, mul_one] at hkey
     have h2 := mul_le_mul_of_nonneg_right hkey (Real.exp_pos (-(2 * lam * t))).le
-    rw [one_mul, mul_assoc, growth_mul_decay, mul_one] at h2
+    have h3 : a t * growth lam t * Real.exp (-(2 * lam * t))
+        = a t * (growth lam t * Real.exp (-(2 * lam * t))) := by ring
+    rw [one_mul, h3, growth_mul_decay, mul_one] at h2
     exact h2
   · have hanti : AntitoneOn (fun r ↦ (a r - 1) * growth lam r) (Set.Ici 0) := by
       refine antitoneOn_of_deriv_nonpos (convex_Ici 0) (hcont 1) ?_ ?_
@@ -111,8 +112,7 @@ theorem admissible_path_bounds (lam : ℝ) (hlam : 0 ≤ lam) (a d : ℝ → ℝ
     have hg0 : growth lam 0 = 1 := by
       rw [growth]
       simp
-    rw [ha0, hg0] at hkey
-    simp only [sub_self, zero_mul] at hkey
+    simp only [ha0, hg0, sub_self, zero_mul] at hkey
     nlinarith [growth_pos lam t, hkey]
 
 end Envelope
@@ -156,7 +156,7 @@ theorem mixPath_admissible (lam θ : ℝ) (hlam : 0 ≤ lam) (hθ0 : 0 ≤ θ) (
 
 /-- **UPT (5.10), attainment.**  Every value of `[e^{-2λT}, 1]` is the terminal agreement of
 an admissible path. -/
-theorem mixPath_terminal_attained (lam : ℝ) (hlam : 0 ≤ lam) (T y : ℝ)
+theorem mixPath_terminal_attained (lam : ℝ) (T y : ℝ)
     (hy1 : Real.exp (-(2 * lam * T)) ≤ y) (hy2 : y ≤ 1) :
     ∃ θ : ℝ, 0 ≤ θ ∧ θ ≤ 1 ∧ mixPath lam θ T = y := by
   have hepos : 0 < Real.exp (-(2 * lam * T)) := Real.exp_pos _
@@ -191,16 +191,16 @@ section AccuracyScale
 /-- **The expected-accuracy form of UPT (5.10).**  In the two-equal-effect architecture the
 expected accuracy is the ceiling of `TurnoverDependence` times the agreement path, so every
 accuracy of `[Q₀ e^{-2λT}, Q₀]` is attained by an admissible path and none outside it is. -/
-theorem ceiling_mixPath_terminal_attained (H sigma lam : ℝ) (hlam : 0 ≤ lam) (T y : ℝ)
+theorem ceiling_mixPath_terminal_attained (H sigma lam : ℝ) (T y : ℝ)
     (hy1 : Real.exp (-(2 * lam * T)) ≤ y) (hy2 : y ≤ 1) :
     ∃ θ : ℝ, 0 ≤ θ ∧ θ ≤ 1 ∧
       TurnoverDependence.ceiling H sigma * mixPath lam θ T
         = TurnoverDependence.ceiling H sigma * y := by
-  obtain ⟨θ, hθ0, hθ1, hval⟩ := mixPath_terminal_attained lam hlam T y hy1 hy2
+  obtain ⟨θ, hθ0, hθ1, hval⟩ := mixPath_terminal_attained lam T y hy1 hy2
   exact ⟨θ, hθ0, hθ1, by rw [hval]⟩
 
 /-- The accuracy scale of the envelope bound. -/
-theorem ceiling_admissible_path_bounds (H sigma lam : ℝ) (hH : 0 < H) (hlam : 0 ≤ lam)
+theorem ceiling_admissible_path_bounds (H sigma lam : ℝ) (hH : 0 < H)
     (a d : ℝ → ℝ) (ha0 : a 0 = 1) (hderiv : ∀ t, 0 ≤ t → HasDerivAt a (d t) t)
     (hlow : ∀ t, 0 ≤ t → -(2 * lam) * a t ≤ d t)
     (hhigh : ∀ t, 0 ≤ t → d t ≤ 2 * lam * (1 - a t)) (t : ℝ) (ht : 0 ≤ t) :
@@ -209,7 +209,7 @@ theorem ceiling_admissible_path_bounds (H sigma lam : ℝ) (hH : 0 < H) (hlam : 
       TurnoverDependence.ceiling H sigma * a t ≤ TurnoverDependence.ceiling H sigma := by
   have hV : (0 : ℝ) < H + sigma ^ 2 := by nlinarith [sq_nonneg sigma]
   have hQ : 0 < TurnoverDependence.ceiling H sigma := div_pos hH hV
-  obtain ⟨h1, h2⟩ := admissible_path_bounds lam hlam a d ha0 hderiv hlow hhigh t ht
+  obtain ⟨h1, h2⟩ := admissible_path_bounds lam a d ha0 hderiv hlow hhigh t ht
   constructor
   · exact mul_le_mul_of_nonneg_left h1 hQ.le
   · have h := mul_le_mul_of_nonneg_left h2 hQ.le
