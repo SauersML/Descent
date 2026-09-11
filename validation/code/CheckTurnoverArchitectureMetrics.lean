@@ -1,0 +1,30 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.TurnoverArchitectureMetrics
+
+/-! Axiom audit of TurnoverArchitectureMetrics. -/
+
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.signValue_sq
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.signValue_not
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.flipCoord_self
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.flipCoord_ne
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.flipCoord_invol
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.sum_flip_eq
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.sum_odd_vanishes
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.blockScore_insert
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.blockScore_flip
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.blockScore_sub
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.sum_blockScore_mean
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.card_config
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.sum_blockScore_sq
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.sum_blockScore_cube
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.sum_blockScore_quartic
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.eval_comb3
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.eval_comb5
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.uniform_geno_eq
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.exp_geno
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.exp_mul
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.exp_lin_noise_mean
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.exp_lin_noise_sq
+#print axioms Descent.Portability.TurnoverArchitectureMetrics.exp_lin_noise_quartic

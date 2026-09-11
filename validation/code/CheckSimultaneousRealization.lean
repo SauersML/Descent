@@ -36,3 +36,13 @@ open Descent.Portability.SimultaneousRealization
 #print axioms minimalWithinVariance_nonneg
 #print axioms lossExplainedFraction_eq
 #print axioms loss_fraction_bounds
+#print axioms spike_eval
+#print axioms spike_scale
+#print axioms spike_mean
+#print axioms spike_second_moment
+#print axioms spike_fourth_moment
+#print axioms spike_loss_fraction
+#print axioms spikeParameter_mem_unit
+#print axioms spike_realizes_fraction
+#print axioms sharp_loss_fraction_interval
+#print axioms simultaneous_curve_and_loss_fraction

@@ -460,6 +460,210 @@ theorem loss_fraction_bounds (E : ExpFunctional D) (N : ExpFunctional Ω) (H : �
   rw [div_le_div_iff₀ (by linarith) (by linarith)]
   nlinarith
 
+/-! ### The explicit noise family and the sharp interval -/
+
+/-- The three-point weights `(p/2, 1−p, p/2)` of the explicit noise family. -/
+def spikeWeights (p : ℝ) : Fin 3 → ℝ := ![p / 2, 1 - p, p / 2]
+
+/-- The three-point sign pattern of the explicit noise family. -/
+def spikeSign : Fin 3 → ℝ := ![-1, 0, 1]
+
+/-- **The explicit noise family of TQ Theorem 8.1**: mass `1 − p` at zero and `p/2` at
+each spike.  Its mean and variance are the same for every `p`; only its fourth moment
+moves. -/
+def spikeLaw (p : ℝ) (hp : 0 < p) (hp1 : p ≤ 1) : ExpFunctional (Fin 3) :=
+  weightedExp (spikeWeights p)
+    (by
+      intro i
+      fin_cases i
+      · show (0:ℝ) ≤ p / 2
+        linarith
+      · show (0:ℝ) ≤ 1 - p
+        linarith
+      · show (0:ℝ) ≤ p / 2
+        linarith)
+    (by
+      simp only [spikeWeights, Fin.sum_univ_three, Matrix.cons_val_zero,
+        Matrix.cons_val_one, Matrix.head_cons, Matrix.cons_val_two, Matrix.tail_cons]
+      ring)
+
+/-- The noise values `ε = √((1−H)/p) · (−1, 0, 1)`. -/
+def spikeValue (H p : ℝ) : Fin 3 → ℝ := fun i ↦ Real.sqrt ((1 - H) / p) * spikeSign i
+
+/-- The explicit noise law evaluated on an arbitrary observable. -/
+theorem spike_eval (p : ℝ) (hp : 0 < p) (hp1 : p ≤ 1) (f : Fin 3 → ℝ) :
+    spikeLaw p hp hp1 f = p / 2 * f 0 + (1 - p) * f 1 + p / 2 * f 2 := by
+  simp only [spikeLaw, weightedExp_apply, spikeWeights, Fin.sum_univ_three,
+    Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, Matrix.cons_val_two,
+    Matrix.tail_cons]
+
+/-- The spike magnitude is calibrated so that the noise variance is `1 − H` for every
+`p`: the model's conditional second moments are untouched by the shape parameter. -/
+theorem spike_scale (H p : ℝ) (hp : 0 < p) (hH : H ≤ 1) :
+    p * Real.sqrt ((1 - H) / p) ^ 2 = 1 - H := by
+  have hpne : p ≠ 0 := ne_of_gt hp
+  have hnn : (0:ℝ) ≤ (1 - H) / p := div_nonneg (by linarith) hp.le
+  rw [Real.sq_sqrt hnn]
+  field_simp
+
+/-- The explicit noise family has mean zero. -/
+theorem spike_mean (H p : ℝ) (hp : 0 < p) (hp1 : p ≤ 1) :
+    spikeLaw p hp hp1 (spikeValue H p) = 0 := by
+  rw [spike_eval]
+  simp only [spikeValue, spikeSign, Matrix.cons_val_zero, Matrix.cons_val_one,
+    Matrix.head_cons, Matrix.cons_val_two, Matrix.tail_cons]
+  ring
+
+/-- The explicit noise family has variance `1 − H`, for every shape parameter. -/
+theorem spike_second_moment (H p : ℝ) (hp : 0 < p) (hp1 : p ≤ 1) (hH : H ≤ 1) :
+    spikeLaw p hp hp1 (fun i ↦ spikeValue H p i ^ 2) = 1 - H := by
+  have hps := spike_scale H p hp hH
+  rw [spike_eval]
+  simp only [spikeValue, spikeSign, Matrix.cons_val_zero, Matrix.cons_val_one,
+    Matrix.head_cons, Matrix.cons_val_two, Matrix.tail_cons]
+  linear_combination hps
+
+/-- The explicit noise family has fourth moment `(1 − H)²/p`: the one coordinate that
+the shape parameter moves, and it sweeps `[(1−H)², ∞)`. -/
+theorem spike_fourth_moment (H p : ℝ) (hp : 0 < p) (hp1 : p ≤ 1) (hH : H ≤ 1) :
+    spikeLaw p hp hp1 (fun i ↦ spikeValue H p i ^ 4) = (1 - H) ^ 2 / p := by
+  have hpne : p ≠ 0 := ne_of_gt hp
+  have hps := spike_scale H p hp hH
+  rw [spike_eval, eq_div_iff hpne]
+  simp only [spikeValue, spikeSign, Matrix.cons_val_zero, Matrix.cons_val_one,
+    Matrix.head_cons, Matrix.cons_val_two, Matrix.tail_cons]
+  linear_combination (p * Real.sqrt ((1 - H) / p) ^ 2 + (1 - H)) * hps
+
+/-- **TQ equation (8.4): the exact loss-explainability of the explicit family.** -/
+theorem spike_loss_fraction (E : ExpFunctional D) (H : ℝ) (q : D → ℝ) (p : ℝ)
+    (hp : 0 < p) (hp1 : p ≤ 1) (hH : 0 ≤ H) (hH1 : H ≤ 1) (hq0 : ∀ d, 0 ≤ q d)
+    (hqH : ∀ d, q d ≤ H) :
+    lossExplainedFraction E (spikeLaw p hp hp1) H q (spikeValue H p)
+      = lossMeanVariance E H q
+        / (lossMeanVariance E H q + minimalWithinVariance E H q
+            + (1 - H) ^ 2 * (p⁻¹ - 1)) := by
+  rw [lossExplainedFraction_eq E (spikeLaw p hp hp1) H q (spikeValue H p) hH hq0 hqH
+      (spike_second_moment H p hp hp1 hH1),
+    spike_fourth_moment H p hp hp1 hH1]
+  congr 1
+  ring
+
+/-- The shape parameter realizing a prescribed loss-explainability: TQ Theorem 8.1's
+explicit inverse `p = τ²/(τ² + B/η − B − W₀)`. -/
+def spikeParameter (E : ExpFunctional D) (H : ℝ) (q : D → ℝ) (eta : ℝ) : ℝ :=
+  (1 - H) ^ 2 / ((1 - H) ^ 2 + lossMeanVariance E H q / eta
+    - lossMeanVariance E H q - minimalWithinVariance E H q)
+
+/-- The prescribed shape parameter is an admissible probability weight. -/
+theorem spikeParameter_mem_unit (E : ExpFunctional D) (H : ℝ) (q : D → ℝ) (eta : ℝ)
+    (hH1 : H < 1) (hW : 0 ≤ minimalWithinVariance E H q)
+    (hB : 0 < lossMeanVariance E H q) (heta0 : 0 < eta)
+    (heta : eta ≤ lossMeanVariance E H q
+      / (lossMeanVariance E H q + minimalWithinVariance E H q)) :
+    0 < spikeParameter E H q eta ∧ spikeParameter E H q eta ≤ 1 := by
+  have hsum : 0 < lossMeanVariance E H q + minimalWithinVariance E H q := by linarith
+  have htau : 0 < (1 - H) ^ 2 := pow_pos (by linarith) 2
+  have hmul : eta * (lossMeanVariance E H q + minimalWithinVariance E H q)
+      ≤ lossMeanVariance E H q := (le_div_iff₀ hsum).mp heta
+  have hslack : lossMeanVariance E H q + minimalWithinVariance E H q
+      ≤ lossMeanVariance E H q / eta := by
+    rw [le_div_iff₀ heta0]
+    nlinarith
+  have hden : 0 < (1 - H) ^ 2 + lossMeanVariance E H q / eta
+      - lossMeanVariance E H q - minimalWithinVariance E H q := by linarith
+  unfold spikeParameter
+  exact ⟨div_pos htau hden, (div_le_one hden).mpr (by linarith)⟩
+
+/-- **Every value in `(0, B/(B+W₀)]` is attained by the explicit noise family.** -/
+theorem spike_realizes_fraction (E : ExpFunctional D) (H : ℝ) (q : D → ℝ) (eta : ℝ)
+    (hH : 0 ≤ H) (hH1 : H < 1) (hq0 : ∀ d, 0 ≤ q d) (hqH : ∀ d, q d ≤ H)
+    (hB : 0 < lossMeanVariance E H q) (heta0 : 0 < eta)
+    (heta : eta ≤ lossMeanVariance E H q
+      / (lossMeanVariance E H q + minimalWithinVariance E H q))
+    (hp : 0 < spikeParameter E H q eta) (hp1 : spikeParameter E H q eta ≤ 1) :
+    lossExplainedFraction E (spikeLaw (spikeParameter E H q eta) hp hp1) H q
+        (spikeValue H (spikeParameter E H q eta)) = eta := by
+  have hW : 0 ≤ minimalWithinVariance E H q := minimalWithinVariance_nonneg E H q hH1.le
+  have hsum : 0 < lossMeanVariance E H q + minimalWithinVariance E H q := by linarith
+  have htau : 0 < (1 - H) ^ 2 := pow_pos (by linarith) 2
+  have hmul : eta * (lossMeanVariance E H q + minimalWithinVariance E H q)
+      ≤ lossMeanVariance E H q := (le_div_iff₀ hsum).mp heta
+  have hslack : lossMeanVariance E H q + minimalWithinVariance E H q
+      ≤ lossMeanVariance E H q / eta := by
+    rw [le_div_iff₀ heta0]
+    nlinarith
+  have hden : 0 < (1 - H) ^ 2 + lossMeanVariance E H q / eta
+      - lossMeanVariance E H q - minimalWithinVariance E H q := by linarith
+  have hinv : (spikeParameter E H q eta)⁻¹
+      = ((1 - H) ^ 2 + lossMeanVariance E H q / eta
+          - lossMeanVariance E H q - minimalWithinVariance E H q) / (1 - H) ^ 2 := by
+    unfold spikeParameter
+    rw [inv_div]
+  have hHne : (1:ℝ) - H ≠ 0 := ne_of_gt (by linarith)
+  have hetane : eta ≠ 0 := ne_of_gt heta0
+  have hBne : lossMeanVariance E H q ≠ 0 := ne_of_gt hB
+  have hcancel : (1 - H) ^ 2 * (((1 - H) ^ 2 + lossMeanVariance E H q / eta
+          - lossMeanVariance E H q - minimalWithinVariance E H q) / (1 - H) ^ 2)
+      = (1 - H) ^ 2 + lossMeanVariance E H q / eta
+          - lossMeanVariance E H q - minimalWithinVariance E H q := by
+    field_simp <;> ring
+  have hdenom : lossMeanVariance E H q + minimalWithinVariance E H q
+      + (1 - H) ^ 2 * (((1 - H) ^ 2 + lossMeanVariance E H q / eta
+          - lossMeanVariance E H q - minimalWithinVariance E H q) / (1 - H) ^ 2 - 1)
+      = lossMeanVariance E H q / eta := by
+    rw [mul_sub, hcancel, mul_one]
+    ring
+  rw [spike_loss_fraction E H q _ hp hp1 hH hH1.le hq0 hqH, hinv, hdenom]
+  field_simp <;> ring
+
+/-- **TQ Theorem 8.1, equation (8.3): the attainable set of the distance-explained
+fraction of individual squared loss is exactly `(0, B/(B+W₀)]`**, on one fixed genotype
+law, one fixed heritability and one fixed prescribed curve, varying only the shape of
+the environmental noise. -/
+theorem sharp_loss_fraction_interval (E : ExpFunctional D) (H : ℝ) (q : D → ℝ)
+    (eta : ℝ) (hH : 0 ≤ H) (hH1 : H < 1) (hq0 : ∀ d, 0 ≤ q d) (hqH : ∀ d, q d ≤ H)
+    (hB : 0 < lossMeanVariance E H q) :
+    (∃ (p : ℝ) (hp : 0 < p) (hp1 : p ≤ 1),
+        lossExplainedFraction E (spikeLaw p hp hp1) H q (spikeValue H p) = eta)
+      ↔ 0 < eta ∧ eta ≤ lossMeanVariance E H q
+          / (lossMeanVariance E H q + minimalWithinVariance E H q) := by
+  constructor
+  · rintro ⟨p, hp, hp1, rfl⟩
+    exact loss_fraction_bounds E (spikeLaw p hp hp1) H q (spikeValue H p) hH hH1.le hq0
+      hqH (spike_second_moment H p hp hp1 hH1.le) hB
+  · rintro ⟨heta0, heta⟩
+    obtain ⟨hp, hp1⟩ := spikeParameter_mem_unit E H q eta hH1
+      (minimalWithinVariance_nonneg E H q hH1.le) hB heta0 heta
+    exact ⟨spikeParameter E H q eta, hp, hp1,
+      spike_realizes_fraction E H q eta hH hH1 hq0 hqH hB heta0 heta hp hp1⟩
+
+/-- **TQ Theorem 8.1 in full: every admissible loss-explainability coexists with the
+originally prescribed cellwise squared-correlation curve and the same cellwise
+heritability.**  The genotype law, the deployed source-trained score, the cellwise
+outcome variance, the cellwise genotype-explained fraction and the cellwise curve are
+all fixed; only the environmental noise shape moves. -/
+theorem simultaneous_curve_and_loss_fraction (E : ExpFunctional D) (H : ℝ) (q : D → ℝ)
+    (eta : ℝ) (hH0 : 0 < H) (hH1 : H < 1) (hq0 : ∀ d, 0 ≤ q d) (hqH : ∀ d, q d ≤ H)
+    (hB : 0 < lossMeanVariance E H q) (heta0 : 0 < eta)
+    (heta : eta ≤ lossMeanVariance E H q
+      / (lossMeanVariance E H q + minimalWithinVariance E H q)) :
+    ∃ (p : ℝ) (hp : 0 < p) (hp1 : p ≤ 1),
+      lossExplainedFraction E (spikeLaw p hp hp1) H q (spikeValue H p) = eta ∧
+        ∀ d : D,
+          variance (cellLaw (spikeLaw p hp hp1))
+              (cellPhenotype H q (spikeValue H p) d) = 1 ∧
+            genotypeExplainedFraction (uniformExp (Bool × Bool))
+                (fun _ ↦ spikeLaw p hp hp1) (cellPhenotype H q (spikeValue H p) d) = H ∧
+              scoreAccuracy (uniformExp (Bool × Bool)) (fun _ ↦ spikeLaw p hp hp1)
+                (deployedScore H) (cellPhenotype H q (spikeValue H p) d) = q d := by
+  obtain ⟨hp, hp1⟩ := spikeParameter_mem_unit E H q eta hH1
+    (minimalWithinVariance_nonneg E H q hH1.le) hB heta0 heta
+  refine ⟨spikeParameter E H q eta, hp, hp1,
+    spike_realizes_fraction E H q eta hH0.le hH1 hq0 hqH hB heta0 heta hp hp1, fun d ↦ ?_⟩
+  exact fixed_background_curve_realized (spikeLaw (spikeParameter E H q eta) hp hp1) H q
+    (spikeValue H (spikeParameter E H q eta)) d hH0 (hq0 d) (hqH d)
+    (spike_mean H _ hp hp1) (spike_second_moment H _ hp hp1 hH1.le)
+
 end
 
 end Descent.Portability.SimultaneousRealization
