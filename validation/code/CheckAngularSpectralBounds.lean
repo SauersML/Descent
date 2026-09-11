@@ -1,0 +1,27 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.AngularSpectralBounds
+
+/-! Axiom audit of AngularSpectralBounds. -/
+
+#print axioms Descent.Portability.AngularSpectralBounds.posSemidef_of_quadForm_nonneg
+#print axioms Descent.Portability.AngularSpectralBounds.quadForm_nonneg_of_posSemidef
+#print axioms Descent.Portability.AngularSpectralBounds.entry_symm
+#print axioms Descent.Portability.AngularSpectralBounds.quadForm_single_pair
+#print axioms Descent.Portability.AngularSpectralBounds.eq_zero_of_quadForm_nonneg_trace_zero
+#print axioms Descent.Portability.AngularSpectralBounds.eq_of_quadForm_mono_of_trace_eq
+#print axioms Descent.Portability.AngularSpectralBounds.strict_increase_forces_decrease
+#print axioms Descent.Portability.AngularSpectralBounds.offDiag_sq_le
+#print axioms Descent.Portability.AngularSpectralBounds.conj_proj_diag
+#print axioms Descent.Portability.AngularSpectralBounds.trace_proj_mul_nonneg
+#print axioms Descent.Portability.AngularSpectralBounds.trace_proj_mul_le_one
+#print axioms Descent.Portability.AngularSpectralBounds.angularEigenVector_dot_self
+#print axioms Descent.Portability.AngularSpectralBounds.angularEigenVector_ne_zero
+#print axioms Descent.Portability.AngularSpectralBounds.eigen_entry
+#print axioms Descent.Portability.AngularSpectralBounds.sum_eigenvalues_eq_one
+#print axioms Descent.Portability.AngularSpectralBounds.angularMatrix_angularEigenLaw
+#print axioms Descent.Portability.AngularSpectralBounds.angular_feasibility
+#print axioms Descent.Portability.AngularSpectralBounds.two_dim_plus_direction_report
+#print axioms Descent.Portability.AngularSpectralBounds.two_dim_plus_direction_bound
+#print axioms Descent.Portability.AngularSpectralBounds.two_dim_plus_direction_attained
