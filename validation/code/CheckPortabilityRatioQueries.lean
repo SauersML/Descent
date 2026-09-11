@@ -12,7 +12,8 @@ open Descent.Portability.PortabilityRatioQueries
 #print axioms massTargetExceeds_eq_definedMass_mul
 #print axioms exampleMass_nonneg
 #print axioms exampleMass_sum
-#print axioms exampleDomain_spec
+#print axioms exampleDomain_membership
+#print axioms exampleSourceNum_first
 #print axioms exampleDomain_sum
 #print axioms exampleQueries
 #print axioms exampleQueries_pairwise_ne
