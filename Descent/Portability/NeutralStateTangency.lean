@@ -225,7 +225,8 @@ theorem mem_span_massDefect_of_vanishing (hap₀ : FullHaplotype Locus Allele)
       linarith
     refine MvPolynomial.funext_set
       (fun c ↦ if c.2 = hap₀ then Set.univ else Set.Ioo (0 : ℝ) ε) (fun c ↦ ?_) fun y hy ↦ ?_
-    · split_ifs
+    · dsimp only
+      split_ifs
       · exact Set.infinite_univ
       · exact Set.Ioo_infinite hε
     · have hsmall : ∀ c : FrequencyVariable Deme Locus Allele, c.2 ≠ hap₀ →
