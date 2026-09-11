@@ -110,6 +110,22 @@ theorem simultaneous_explainability_ray {ι : Type*} {Si Ti : ι → Type*}
   refine ⟨summary_between_variance_le E (ES i) (KT i) (emb i) a (hcompat i), ?_⟩
   rw [total_loss_variance_eq E K r a δ ha hδ]
 
+/-- UPT (2.9): for nested summaries the exact gain in the numerator is the mean
+squared refinement of the conditional mean loss. Here `m` is the conditional
+mean loss given the finer summary and `fun s ↦ KT1 s (fun t ↦ m (s, t))` is,
+by the tower property, the conditional mean loss given the coarser one; the
+right-hand side is by definition the mean of the squared difference. -/
+theorem nested_summary_gain (ES : ExpFunctional S) (KT1 : S → ExpFunctional T)
+    (m : S × T → ℝ) :
+    variance (mixture ES KT1) m - variance ES (fun s ↦ KT1 s (fun t ↦ m (s, t)))
+      = ES (fun s ↦ variance (KT1 s) (fun t ↦ m (s, t))) := by
+  rw [total_variance ES KT1 m]
+  show ES (fun s ↦ variance (KT1 s) (fun t ↦ m (s, t)))
+      + variance ES (fun s ↦ KT1 s (fun t ↦ m (s, t)))
+      - variance ES (fun s ↦ KT1 s (fun t ↦ m (s, t)))
+      = ES (fun s ↦ variance (KT1 s) (fun t ↦ m (s, t)))
+  ring
+
 /-- The mass of the nondegenerate region where the conditional variance is
 positive. UPT calls this `P(V)`. -/
 def nondegenerateMass (E : ExpFunctional D) (b a : D → ℝ) : ℝ :=

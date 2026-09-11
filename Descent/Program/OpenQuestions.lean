@@ -1,6 +1,12 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.AngularExtremalReports
+import Descent.Portability.FourthMomentAttainableRange
+import Descent.Portability.GaussianCeilingBound
+import Descent.Portability.SynchronyEnvelope
+import Descent.Portability.ThresholdLawRegion
+import Descent.Portability.UniversalConditionalSufficiency
 import Descent.Portability.AuditCenteredObservations
 import Descent.Portability.BernsteinConfidence
 import Descent.Portability.BernsteinExponentialBound

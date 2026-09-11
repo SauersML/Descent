@@ -18,3 +18,4 @@ import Descent.Portability.ExplainabilityRay
 #print axioms Descent.Portability.ExplainabilityRay.excessCompletion_moments
 #print axioms Descent.Portability.ExplainabilityRay.ray_excess
 #print axioms Descent.Portability.ExplainabilityRay.sharp_explainability_ray
+#print axioms Descent.Portability.ExplainabilityRay.nested_summary_gain

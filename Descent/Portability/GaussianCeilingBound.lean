@@ -78,6 +78,24 @@ theorem gaussian_fraction_interval_bound (E : ExpFunctional D)
     (div_nonneg (E.nonneg_eval _ (fun _ ↦ sq_nonneg _)) (sq_nonneg _))
     (sharp_interval_cv_squared E v lo hi hlo hlohi hv)
 
+/-- TQ (2.18): the centred-Gaussian explainable fraction in its raw
+second-moment form, the numerator and denominator of the boxed formula. -/
+theorem gaussian_fraction_second_moment_form (E : ExpFunctional D)
+    (K : D → ExpFunctional Ω) (r : D × Ω → ℝ) (v : D → ℝ)
+    (hsecond : ∀ d, K d (fun ω ↦ r (d, ω) ^ 2) = v d)
+    (hfourth : ∀ d, K d (fun ω ↦ r (d, ω) ^ 4) = 3 * v d ^ 2) :
+    variance E (fun d ↦ K d (fun ω ↦ r (d, ω) ^ 2))
+        / variance (mixture E K) (fun z ↦ r z ^ 2)
+      = variance E v / (variance E v + 2 * E (fun d ↦ v d ^ 2)) := by
+  have hfun : (fun d ↦ K d (fun ω ↦ r (d, ω) ^ 2)) = v := by
+    funext d
+    exact hsecond d
+  have hden : variance E v + 2 * E (fun d ↦ v d ^ 2)
+      = 2 * (E v) ^ 2 + 3 * variance E v := by
+    have h := variance_eq_expect_sq_sub_sq_mean E v
+    linarith
+  rw [hfun, hden, gaussian_style_loss_variance E K r v hsecond hfourth]
+
 /-- A three-point conditional law realizing the Gaussian second-to-fourth moment
 ratio exactly, for every nonnegative conditional variance. -/
 def gaussianMomentLaw : ExpFunctional (Fin 3) :=
