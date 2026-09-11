@@ -27,3 +27,12 @@ open Descent.Portability.SimultaneousRealization
 #print axioms cell_genotype_fraction
 #print axioms cell_score_accuracy
 #print axioms fixed_background_curve_realized
+#print axioms eval_add_const
+#print axioms cell_loss_mean
+#print axioms cell_loss_within
+#print axioms loss_between_variance
+#print axioms loss_total_variance
+#print axioms noise_fourth_moment_ge
+#print axioms minimalWithinVariance_nonneg
+#print axioms lossExplainedFraction_eq
+#print axioms loss_fraction_bounds
