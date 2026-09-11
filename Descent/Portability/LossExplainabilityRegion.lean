@@ -74,6 +74,7 @@ theorem between_eq_second_moment_gap (π m : D → ℝ) (hsum : ∑ d, π d = 1)
     Finset.sum_sub_distrib, ← Finset.mul_sum, ← Finset.mul_sum, hsum]
   ring
 
+omit [DecidableEq D] in
 /-- **The denominator is at least the numerator (UPT §3.6).** Since every cell fourth
 moment is at least the square of its second moment, the total loss variance dominates the
 between-cell variance, so `η_max ≤ 1`. -/
@@ -88,6 +89,7 @@ theorem between_le_total (π m F : D → ℝ) (hsum : ∑ d, π d = 1) (hπ : �
 
 /-! ## The exact attainable range of `η_D` -/
 
+omit [DecidableEq D] in
 /-- **The upper half of UPT (3.21).** Raising any cell fourth moment above its minimum
 `V_d` can only decrease the explained fraction, so `η_max` computed from the minima is the
 largest attainable value. -/
@@ -105,6 +107,7 @@ theorem fraction_le_max (π m V F : D → ℝ) (hsum : ∑ d, π d = 1) (hπ : �
   unfold lossExplainedFraction
   exact div_le_div_of_nonneg_left hB.le (by linarith) hmono
 
+omit [DecidableEq D] in
 /-- **The lower half of UPT (3.21).** With a positive between-cell variance the explained
 fraction is positive for every admissible family of cell fourth moments, so zero is an
 infimum that is never attained. -/
