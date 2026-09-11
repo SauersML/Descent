@@ -79,7 +79,7 @@ def cardinalityBudget (ξ : Multiset (PartialType Deme Locus Allele)) : Locus �
 /-- Every configuration respects its cardinality budget. -/
 theorem withinBudget_cardinalityBudget (ξ : Multiset (PartialType Deme Locus Allele)) :
     WithinBudget (cardinalityBudget ξ) ξ :=
-  fun _ ↦ Multiset.countP_le_card _
+  fun _ ↦ Multiset.countP_le_card _ _
 
 /-- The configuration of fully retained haplotypes whose moment is the monomial `x^β`. -/
 def monomialConfiguration (ℓ₀ : Locus) (β : FrequencyVariable Deme Locus Allele →₀ ℕ) :
@@ -240,7 +240,7 @@ theorem momentFunctional_eq_zero_of_vanishing (rates : NeutralRates Deme Locus A
   have hwithin : ∀ β ∈ p.support, WithinBudget
       (fun _ ↦ ∑ β ∈ p.support, Multiset.card (monomialConfiguration ℓ₀ β))
       (monomialConfiguration ℓ₀ β) := fun β hβ _ ↦
-    (Multiset.countP_le_card _).trans (Finset.single_le_sum (fun _ _ ↦ Nat.zero_le _) hβ)
+    (Multiset.countP_le_card _ _).trans (Finset.single_le_sum (fun _ _ ↦ Nat.zero_le _) hβ)
   have hmem : (fun η : BudgetConfiguration Deme Locus Allele
         (fun _ ↦ ∑ β ∈ p.support, Multiset.card (monomialConfiguration ℓ₀ β)) ↦
           ∑ β ∈ p.support, if monomialConfiguration ℓ₀ β = η.1 then coeff β p else 0)
@@ -275,7 +275,7 @@ theorem momentFunctional_momentPolynomial (rates : NeutralRates Deme Locus Allel
       (fun ℓ ↦ capacity ℓ + ∑ β ∈ (momentPolynomial η.1).support,
         Multiset.card (monomialConfiguration ℓ₀ β))
       (monomialConfiguration ℓ₀ β) := fun β hβ ℓ ↦
-    (Multiset.countP_le_card _).trans
+    (Multiset.countP_le_card _ _).trans
       ((Finset.single_le_sum (fun _ _ ↦ Nat.zero_le _) hβ).trans (Nat.le_add_left _ _))
   have hmem : (fun ζ : BudgetConfiguration Deme Locus Allele
         (fun ℓ ↦ capacity ℓ + ∑ β ∈ (momentPolynomial η.1).support,
@@ -341,8 +341,9 @@ theorem eval_momentEvolution (rates : NeutralRates Deme Locus Allele) (ℓ₀ : 
   refine Finset.sum_congr rfl fun β _ ↦ ?_
   have hmono : monomial β (coeff β p) = coeff β p • monomial β (1 : ℝ) := by
     rw [smul_monomial, smul_eq_mul, mul_one]
-  rw [hmono, map_smul, map_smul, momentEvolution_monomial, momentFunctional_monomial, smul_eq_mul,
-    smul_eq_C_mul, map_mul, eval_C, map_sum]
+  rw [hmono, map_smul (momentEvolution rates ℓ₀ t), map_smul (momentFunctional rates ℓ₀ t x),
+    momentEvolution_monomial, momentFunctional_monomial, smul_eq_mul, smul_eq_C_mul, map_mul,
+    eval_C, map_sum]
   congr 1
   simp only [map_mul, eval_C, monomialMoment, Matrix.mulVec, dotProduct, momentVector]
 
@@ -476,7 +477,8 @@ theorem neutralPolynomialSemigroup_add (rates : NeutralRates Deme Locus Allele) 
   refine LinearMap.ext fun f ↦ Subtype.ext (ContinuousMap.ext fun x ↦ ?_)
   rw [LinearMap.comp_apply, neutralPolynomialSemigroup_apply, neutralPolynomialSemigroup_apply,
     NNReal.coe_add, momentFunctional_add rates ℓ₀ hap₀]
-  exact momentFunctional_congr rates ℓ₀ hap₀ s x _ _ (polynomialFunction_representative _).symm
+  exact momentFunctional_congr rates ℓ₀ hap₀ s x _ _
+    (polynomialFunction_representative (neutralPolynomialSemigroup rates ℓ₀ hap₀ t f)).symm
 
 end
 
