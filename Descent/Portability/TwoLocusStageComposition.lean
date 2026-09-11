@@ -56,10 +56,11 @@ at step `h` in a fixed enumeration (`stageOrder`), and the error is
 `StageCompositionKernel.compositeSlack`, the total per-stage slack plus `h` times an explicit
 constant.  No deme is needed as data, because a step with no stages is the idle kernel.
 
-Scope.  Resampling is the corpus's single-draw stage calibrated by
-`RandomStageKernel.driftChromosomeCount`, not NOTE1's multinomial sample of `ceil (1 / (c h))`
-chromosomes.  How far that choice moves the step is not quantified here; the approximation is
-proved for the stages as formalized.  The error bound is crude and explicit; no rate of
+Scope.  Resampling here is the corpus's single-draw stage calibrated by
+`RandomStageKernel.driftChromosomeCount`.  The composition with NOTE1's multinomial sample of
+`ceil (1 / (c h))` chromosomes is
+`MultinomialStageComposition.multinomialCompositionApproximation`, which reuses every other
+stage and every stage matrix of this module.  The error bound is crude and explicit; no rate of
 convergence beyond "vanishes with `h`" is claimed.
 
 ## Empirical status

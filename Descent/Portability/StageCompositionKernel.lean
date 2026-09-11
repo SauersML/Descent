@@ -44,8 +44,9 @@ the summed stage matrices on the feature vectors.
 
 Scope.  The stages are arbitrary finite mixture kernels on an arbitrary state space; nothing
 about haplotypes is used.  The matrix form of each stage's expansion is a hypothesis here.
-The two-locus instance, where it is discharged, is
-`Descent.Portability.TwoLocusStageComposition`.  Nothing here forms a semigroup or takes a
+The two-locus instances, where it is discharged, are
+`Descent.Portability.TwoLocusStageComposition` and, with multinomial resampling,
+`Descent.Portability.MultinomialStageComposition`.  Nothing here forms a semigroup or takes a
 limit; that is NOTE1 Theorem 1, proved in `Descent.Portability.KernelRealizationPreservation`.
 
 ## Empirical status

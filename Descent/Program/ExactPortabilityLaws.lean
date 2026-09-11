@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.MultinomialStageComposition
 import Descent.Portability.FiniteMixtureKernel
 import Descent.Portability.RealizationBody
 import Descent.Portability.AffineCaratheodoryCount
@@ -144,7 +145,10 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
   uniform remainder `71 / N²` of (10): `MultinomialRemainderConstant`; polynomial certificates
   presenting every enlarged coordinate to (10): `MultinomialJetCertificate`; the stages assembled
   into a microscopic approximation whose branch type grows as the step shrinks, with Theorem 1
-  for such approximations: `MultinomialMicroscopicApproximation`.
+  for such approximations: `MultinomialMicroscopicApproximation`; the literal composition of the
+  physical stages, simultaneous migration and multinomial resampling among them, as a microscopic
+  approximation padded by Carathéodory's count to a fixed branch type:
+  `MultinomialStageComposition`.
 * Theorem 2 and Corollary 2.1, with no hypotheses: `TwoLocusMicroscopicApproximation`
   (`enlargedMicroscopicApproximation`, `rateEpoch_preserves_locusExchangeable_realization`,
   `history_present_locusExchangeable_realization`, `history_LDPairDomain`); one epoch through
@@ -197,8 +201,9 @@ The epoch form of Theorem 2 is proved through the note's multinomial sample of s
 in `MultinomialMicroscopicApproximation`, whose microscopic kernels change branch type with the
 step size, for every deme count with at least one deme. The history forms compose the same epoch
 statement as proved in `TwoLocusMicroscopicApproximation` through a single-draw stage with
-`N = ⌈(c h)^(-1/2)⌉`, and `TwoLocusStageComposition` runs the simultaneous migration stage. The
-rate laws have strictly positive coalescence, where the note allows `c_i ≥ 0`. §2.4 is proved for
+`N = ⌈(c h)^(-1/2)⌉`. The note's literal composition of physical stages, with simultaneous
+migration and multinomial resampling, is a microscopic approximation with a padded fixed branch
+type in `MultinomialStageComposition`. The rate laws have strictly positive coalescence, where the note allows `c_i ≥ 0`. §2.4 is proved for
 rate histories with integrable rate coordinates; the propagator is characterized by the integral
 equation. Theorem 2 covers histories of rate epochs, splits and admixture pulses; the pipeline
 compiler emits nothing else. Of §4.2, mutation is symmetric, and (20) takes the forward moment

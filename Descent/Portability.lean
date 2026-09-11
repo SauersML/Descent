@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.MultinomialStageComposition
 import Descent.Portability.MultinomialMicroscopicApproximation
 import Descent.Portability.PartialHaplotypeLineTaylor
 import Descent.Portability.CylinderGaussianDraw
