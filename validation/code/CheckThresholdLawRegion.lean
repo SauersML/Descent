@@ -12,3 +12,7 @@ import Descent.Portability.ThresholdLawRegion
 #print axioms Descent.Portability.ThresholdLawRegion.fiber_recall_eq_precision_scaled
 #print axioms Descent.Portability.ThresholdLawRegion.fiber_realized_by_threshold
 #print axioms Descent.Portability.ThresholdLawRegion.finite_threshold_curve_iff
+#print axioms Descent.Portability.ThresholdLawRegion.continuous_threshold_curve_iff_density
+#print axioms Descent.Portability.ThresholdLawRegion.continuous_threshold_curve_endpoints
+#print axioms Descent.Portability.ThresholdLawRegion.uniform_rank_endpoints
+#print axioms Descent.Portability.ThresholdLawRegion.continuous_threshold_curve_increment_bounds

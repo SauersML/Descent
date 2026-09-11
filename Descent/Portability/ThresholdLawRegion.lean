@@ -2,6 +2,8 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.MetricOrderingClassification
+import Mathlib.MeasureTheory.Measure.Decomposition.RadonNikodym
+import Mathlib.MeasureTheory.Measure.Lebesgue.Basic
 
 assert_below Descent.Decision Descent.Program
 
@@ -16,11 +18,20 @@ threshold event's four confusion cells are then determined by that one submeasur
 attainable true-positive mass is exactly the interval of UPT (6.8) and TQ (4.9)
 (`fixed_score_confusion_fiber`), with every value realised by `fiberLaw` and, via
 `MetricOrderingClassification.common_threshold_realizes`, by an actual
-thresholded score. `finite_threshold_curve_iff` is the exact finite-grid form of
-UPT Corollary 6.3: the possible top-`s` true-positive curves are exactly the
-functions starting at `0`, ending at `pi`, with increments in `[0, 1/n]`. The
-measure-theoretic absolutely-continuous form of that corollary is not proved
-here. Constant-precision feasibility, UPT (6.10) and TQ (4.13), is already
+thresholded score. UPT Corollary 6.3 is proved in two forms. `finite_threshold_curve_iff` is the
+exact finite-grid form: the possible top-`s` true-positive curves are exactly the
+functions starting at `0`, ending at `pi`, with increments in `[0, 1/n]`.
+`continuous_threshold_curve_iff_density` is the continuous form on the line: a
+curve `T s = nu (Iic s)` comes from a submeasure of the score law with total mass
+`pi` exactly when `T s` is the integral of a measurable density bounded by one
+over `Iic s`, with total integral `pi`. That is the manuscript's
+"absolutely continuous with `0 <= T' <= 1` almost everywhere" statement in the
+form Mathlib expresses it, and it is strictly stronger than the grid form.
+`continuous_threshold_curve_increment_bounds` and
+`continuous_threshold_curve_endpoints` give the derivative bounds and the
+boundary conditions of UPT (6.6) in integrated form, and
+`uniform_rank_endpoints` checks the manuscript's uniform rank law against the
+boundary hypotheses. Constant-precision feasibility, UPT (6.10) and TQ (4.13), is already
 `MetricOrderingClassification.constant_precision_feasible_iff` and is not
 restated.
 -/
@@ -226,6 +237,126 @@ theorem finite_threshold_curve_iff (n : ℕ) (pi : ℝ) (T : ℕ → ℝ) :
       · linarith
       · linarith
 
+
+section ContinuousThresholdCurves
+
+open MeasureTheory
+
+open scoped ENNReal
+
+/-- **UPT Corollary 6.3, continuous form.** On the line, with a finite score law
+`mu`, a curve is the top-`s` true-positive mass of a submeasure of `mu` with
+total mass `pi` exactly when it is the integral over `Iic s` of a measurable
+density bounded by one whose total integral is `pi`. The forward direction is the
+Radon-Nikodym derivative of the submeasure, which is at most one almost
+everywhere precisely because the submeasure is dominated; the converse builds the
+submeasure by `withDensity`. This is the manuscript's absolutely continuous
+statement with derivative in `[0, 1]`, in the form Mathlib expresses it: the
+density is exactly the manuscript's conditional disease risk `d nu / d mu`, which
+the bound puts in `[0, 1]`. Assembling that risk into a joint law on the product
+with the outcome is proved here only in the finite case,
+`threshold_law_region`. -/
+theorem continuous_threshold_curve_iff_density (mu : Measure ℝ) [IsFiniteMeasure mu]
+    (pi : ℝ≥0∞) (T : ℝ → ℝ≥0∞) :
+    (∃ nu : Measure ℝ, nu ≤ mu ∧ nu Set.univ = pi ∧ ∀ s, T s = nu (Set.Iic s)) ↔
+      ∃ f : ℝ → ℝ≥0∞, Measurable f ∧ (∀ᵐ x ∂mu, f x ≤ 1) ∧
+        ∫⁻ x, f x ∂mu = pi ∧ ∀ s, T s = ∫⁻ x in Set.Iic s, f x ∂mu := by
+  constructor
+  · rintro ⟨nu, hle, hmass, hT⟩
+    haveI : IsFiniteMeasure nu :=
+      ⟨lt_of_le_of_lt ((Measure.le_iff'.mp hle) Set.univ) (measure_lt_top mu Set.univ)⟩
+    have hac : nu ≪ mu := Measure.absolutelyContinuous_of_le hle
+    have hkey : ∀ A : Set ℝ, MeasurableSet A →
+        nu A = ∫⁻ x in A, nu.rnDeriv mu x ∂mu := by
+      intro A hA
+      conv_lhs => rw [← Measure.withDensity_rnDeriv_eq nu mu hac]
+      exact withDensity_apply _ hA
+    refine ⟨nu.rnDeriv mu, Measure.measurable_rnDeriv nu mu,
+      (Measure.rnDeriv_le_one_of_le hle).mono fun x hx ↦ hx, ?_, fun s ↦ ?_⟩
+    · rw [← setLIntegral_univ, ← hkey Set.univ MeasurableSet.univ]
+      exact hmass
+    · rw [hT s, hkey (Set.Iic s) measurableSet_Iic]
+  · rintro ⟨f, hmeas, hf1, hmass, hT⟩
+    refine ⟨mu.withDensity f, ?_, ?_, fun s ↦ ?_⟩
+    · rw [Measure.le_iff]
+      intro A hA
+      rw [withDensity_apply _ hA]
+      calc ∫⁻ x in A, f x ∂mu ≤ ∫⁻ _ in A, (1 : ℝ≥0∞) ∂mu :=
+            lintegral_mono_ae (ae_restrict_of_ae hf1)
+        _ = mu A := by simp
+    · rw [withDensity_apply _ MeasurableSet.univ, setLIntegral_univ]
+      exact hmass
+    · rw [withDensity_apply _ measurableSet_Iic]
+      exact hT s
+
+/-- **UPT (6.6), derivative bounds in integrated form.** A threshold curve is
+nondecreasing and its increment over an interval is at most the score mass of
+that interval. For the uniform rank law that increment bound is `t - s`, which is
+the manuscript's `0 <= T' <= 1`. -/
+theorem continuous_threshold_curve_increment_bounds (mu nu : Measure ℝ) (hle : nu ≤ mu)
+    (T : ℝ → ℝ≥0∞) (hT : ∀ s, T s = nu (Set.Iic s)) {s t : ℝ} (hst : s ≤ t) :
+    T s ≤ T t ∧ T t ≤ T s + mu (Set.Ioc s t) := by
+  constructor
+  · simp only [hT]
+    exact measure_mono (Set.Iic_subset_Iic.mpr hst)
+  · simp only [hT]
+    rw [← Set.Iic_union_Ioc_eq_Iic hst]
+    exact le_trans (measure_union_le _ _)
+      (add_le_add_left ((Measure.le_iff'.mp hle) (Set.Ioc s t)) _)
+
+/-- **UPT (6.6), boundary conditions.** If the score law gives no mass below the
+bottom rank and none above the top rank, the curve starts at zero and ends at the
+prevalence. -/
+theorem continuous_threshold_curve_endpoints (mu nu : Measure ℝ) (hle : nu ≤ mu)
+    (pi : ℝ≥0∞) (hmass : nu Set.univ = pi) (T : ℝ → ℝ≥0∞)
+    (hT : ∀ s, T s = nu (Set.Iic s)) (hlow : mu (Set.Iic 0) = 0)
+    (hhigh : mu (Set.Ioi 1) = 0) : T 0 = 0 ∧ T 1 = pi := by
+  have h0 : nu (Set.Iic 0) = 0 := by
+    have hb := (Measure.le_iff'.mp hle) (Set.Iic 0)
+    rw [hlow] at hb
+    exact le_antisymm hb (zero_le _)
+  have h1 : nu (Set.Ioi 1) = 0 := by
+    have hb := (Measure.le_iff'.mp hle) (Set.Ioi 1)
+    rw [hhigh] at hb
+    exact le_antisymm hb (zero_le _)
+  refine ⟨by rw [hT, h0], ?_⟩
+  have hcover : nu Set.univ ≤ nu (Set.Iic 1) + nu (Set.Ioi 1) := by
+    have hu : (Set.univ : Set ℝ) = Set.Iic 1 ∪ Set.Ioi 1 := Set.Iic_union_Ioi.symm
+    rw [hu]
+    exact measure_union_le _ _
+  rw [h1, add_zero] at hcover
+  rw [hT, ← hmass]
+  exact le_antisymm (measure_mono (Set.subset_univ _)) hcover
+
+/-- The manuscript's uniform rank law on the unit interval satisfies the boundary
+hypotheses of `continuous_threshold_curve_endpoints`, so those hypotheses are not
+vacuous. -/
+theorem uniform_rank_endpoints :
+    (volume.restrict (Set.Icc (0 : ℝ) 1)) (Set.Iic 0) = 0 ∧
+      (volume.restrict (Set.Icc (0 : ℝ) 1)) (Set.Ioi 1) = 0 := by
+  constructor
+  · rw [Measure.restrict_apply measurableSet_Iic]
+    have hset : Set.Iic (0 : ℝ) ∩ Set.Icc (0 : ℝ) 1 = {0} := by
+      ext x
+      constructor
+      · rintro ⟨hx1, hx0, _⟩
+        exact le_antisymm hx1 hx0
+      · rintro rfl
+        exact ⟨le_refl (0 : ℝ), le_refl (0 : ℝ), zero_le_one⟩
+    rw [hset]
+    simp
+  · rw [Measure.restrict_apply measurableSet_Ioi]
+    have hset : Set.Ioi (1 : ℝ) ∩ Set.Icc (0 : ℝ) 1 = ∅ := by
+      ext x
+      constructor
+      · rintro ⟨hx1, _, hx2⟩
+        exact absurd hx1 (not_lt.mpr hx2)
+      · intro h
+        exact h.elim
+    rw [hset]
+    simp
+
+end ContinuousThresholdCurves
 
 end
 
