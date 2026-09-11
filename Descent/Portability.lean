@@ -341,6 +341,8 @@ import Descent.Portability.HWEPatternAmplitude
 import Descent.Portability.RademacherReindex
 import Descent.Portability.HWEHomogeneousLayer
 import Descent.Portability.HWECountLayerLimit
+import Descent.Portability.HWEConditionalScaleLimit
+import Descent.Portability.HWEConditionalInverseMoment
 assert_below Descent.Program
 
 /-!

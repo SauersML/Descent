@@ -4162,6 +4162,9 @@ def lognormal(K, c):
 def signedLognormal(K, c):
     return blend((_rt.rdiv(1.0, 2.0)), (by(norm_num)), (by(norm_num)), (lognormal(K, c)), (lognormal(K, ((-c)))))
 
+def signAmplitude(h, b):
+    return normalized(h, (homoVector(b)))
+
 def Descent_Portability_HWECriticalAmplitudeLimit_intensity(m, N):
     return _rt.rdiv((N), _rt.lpow(2.0, m))
 
@@ -4183,6 +4186,9 @@ def Descent_Portability_HWEHeterozygosityLaw_count(x):
 
 def Descent_Portability_HWEHeterozygosityLaw_probability(h):
     return (4.0 * _rt.lpow(((_rt._proj(h, 'altFreq') - _rt.rdiv(1.0, 2.0))), 2.0))
+
+def layerAmplitude(h, m, r, c, b):
+    return ((((c * _rt.lpow(_rt._proj(standardizedGenotype(h), 'het'), r)) * _rt.lpow(_rt.rsqrt(2.0), ((m - r)))) * parity(b)) * _rt.rexp(((-weightedSum(((lambda _: Descent_Portability_HWELogCoordinates_coordinate(((_rt._proj(h, 'altFreq') - _rt.rdiv(1.0, 2.0)))))), b)))))
 
 def Descent_Portability_HWEHomozygoteConditioning_encode(*_a):
     if len(_a) < 1:
