@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.ArchitectureEnvironmentRegion
 import Descent.Portability.ConditionalReportCompilation
 import Descent.Portability.JointRatioFailureMasks
 import Descent.Portability.ResamplingJetExpansion

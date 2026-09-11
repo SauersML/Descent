@@ -230,9 +230,9 @@ theorem det_zero_iff_eq_cellWeight (table : Bool × Bool → ℝ)
     funext c
     rcases c with ⟨a, e⟩
     cases a <;> cases e <;> simp only [cellWeight]
-    · linear_combination (-table (false, false)) * hexpand + hdet
-    · linear_combination (-table (false, true)) * hexpand - hdet
-    · linear_combination (-table (true, false)) * hexpand - hdet
+    · linear_combination (1 - table (true, true)) * hexpand + hdet
+    · linear_combination table (true, true) * hexpand - hdet
+    · linear_combination table (true, true) * hexpand - hdet
     · linear_combination (-table (true, true)) * hexpand + hdet
   · intro hprod
     rw [hprod]
