@@ -94,7 +94,10 @@ noncomputable def empiricalPairMass {n : ℕ} (sample : Fin n → Bool × Bool) 
   outcomeCount sample true * outcomeCount sample false
 
 /-- The unnormalised empirical ranking credit of a cohort: the ordered case-control sum of the
-corpus comparison rule, with half credit for ties. -/
+corpus comparison rule, with half credit for ties.
+
+Regime: one realised cohort sample. No prevalence argument enters, because the sample's own
+outcome labels decide which ordered pairs are case-control pairs. -/
 noncomputable def empiricalAUCNumerator {n : ℕ} (sample : Fin n → Bool × Bool) : ℝ :=
   ∑ caseMember, ∑ controlMember,
     if caseOf (sample caseMember) && !caseOf (sample controlMember) then
@@ -102,11 +105,15 @@ noncomputable def empiricalAUCNumerator {n : ℕ} (sample : Fin n → Bool × Bo
     else 0
 
 /-- The empirical AUC of a cohort: the average of the comparison rule over ordered
-case-control pairs. -/
+case-control pairs.
+
+Regime: one realised cohort sample, whose outcome counts carry its case fraction. -/
 noncomputable def empiricalAUC {n : ℕ} (sample : Fin n → Bool × Bool) : ℝ :=
   empiricalAUCNumerator sample / empiricalPairMass sample
 
-/-- The empirical AUC is defined exactly when the cohort contains a case and a control. -/
+/-- The empirical AUC is defined exactly when the cohort contains a case and a control.
+
+Regime: one realised cohort sample; the case fraction is read from the sample itself. -/
 noncomputable def aucDefinedIndicator {n : ℕ} (sample : Fin n → Bool × Bool) : ℝ :=
   if (¬ ∀ member, caseOf (sample member) = false) ∧
       (¬ ∀ member, caseOf (sample member) = true) then 1 else 0
@@ -217,18 +224,9 @@ theorem auc_definedness_probability (law : FiniteReportLaw (Bool × Bool)) (n : 
     ring
   have hone : (∑ sample : Fin n → Bool × Bool, (cohortLaw law n).mass sample * 1) = 1 := by
     simpa using (cohortLaw law n).mass_sum
-  have htrue : (∑ sample, (cohortLaw law n).mass sample *
-      ∏ member, outcomeIndicator true (sample member)) = outcomeMass law true ^ n := by
-    have hprod := cohort_expectation_prod law n (outcomeIndicator true)
-    rw [expectation_outcomeIndicator] at hprod
-    exact hprod
-  have hfalse : (∑ sample, (cohortLaw law n).mass sample *
-      ∏ member, outcomeIndicator false (sample member)) = outcomeMass law false ^ n := by
-    have hprod := cohort_expectation_prod law n (outcomeIndicator false)
-    rw [expectation_outcomeIndicator] at hprod
-    exact hprod
   show (∑ sample, (cohortLaw law n).mass sample * aucDefinedIndicator sample) = _
-  rw [hstep, Finset.sum_sub_distrib, Finset.sum_sub_distrib, hone, htrue, hfalse]
+  rw [hstep, Finset.sum_sub_distrib, Finset.sum_sub_distrib, hone,
+    sum_mass_all_outcome law n true, sum_mass_all_outcome law n false]
 
 /-- The empirical Brier score of a cohort: the sample mean of the squared score-outcome
 difference. -/
@@ -886,9 +884,11 @@ noncomputable def slopeDefinedIndicator {n : ℕ} (sample : Fin n → Bool × Bo
 noncomputable def scoreGroupSize {n : ℕ} (scores : Fin n → Bool) (value : Bool) : ℝ :=
   ∑ member, if scores member = value then 1 else 0
 
-/-- The slope definedness indicator determined by the score vector of a cohort. -/
+/-- The slope definedness indicator determined by the score vector of a cohort: the indicator
+that a Boolean vector is not constant, which `outcomeDefinedIndicator` already carries, read on
+the score vector. -/
 noncomputable def scoreDefinedIndicator {n : ℕ} (scores : Fin n → Bool) : ℝ :=
-  if (¬ ∀ member, scores member = false) ∧ ¬ ∀ member, scores member = true then 1 else 0
+  outcomeDefinedIndicator scores
 
 /-- On a split cohort the group size reads only the score vector. -/
 theorem scoreCount_split {n : ℕ} (scores outcomes : Fin n → Bool) (value : Bool) :
@@ -1038,21 +1038,22 @@ theorem score_fiber_slope (law : FiniteReportLaw (Bool × Bool)) {n : ℕ}
               scoreGroupSize scores false) := by
       rw [← Finset.sum_sub_distrib]
       refine Finset.sum_congr rfl fun outcomes _ ↦ ?_
-      rw [slopeDefinedIndicator_split, scoreDefinedIndicator, if_pos hdefined, mul_one,
-        empiricalSlope, scoreCount_split, scoreCount_split]
+      rw [slopeDefinedIndicator_split, scoreDefinedIndicator, outcomeDefinedIndicator,
+        if_pos hdefined, mul_one, empiricalSlope, scoreCount_split, scoreCount_split]
       ring
     have hdonorMean := score_fiber_mean law scores true hdonor
     have hrecipientMean := score_fiber_mean law scores false hrecipient
-    rw [scoreDefinedIndicator, if_pos hdefined, mul_one, hsplit]
+    rw [scoreDefinedIndicator, outcomeDefinedIndicator, if_pos hdefined, mul_one, hsplit]
     linear_combination scoreMass law false * hdonorMean - scoreMass law true * hrecipientMean
   · have hzero : (∑ outcomes : Fin n → Bool,
         (∏ member, law.mass (scores member, outcomes member)) *
           (empiricalSlope (fun member ↦ (scores member, outcomes member)) *
             slopeDefinedIndicator fun member ↦ (scores member, outcomes member))) = 0 := by
       refine Finset.sum_eq_zero fun outcomes _ ↦ ?_
-      rw [slopeDefinedIndicator_split, scoreDefinedIndicator, if_neg hdefined, mul_zero,
-        mul_zero]
-    rw [hzero, scoreDefinedIndicator, if_neg hdefined, mul_zero, mul_zero, mul_zero]
+      rw [slopeDefinedIndicator_split, scoreDefinedIndicator, outcomeDefinedIndicator,
+        if_neg hdefined, mul_zero, mul_zero]
+    rw [hzero, scoreDefinedIndicator, outcomeDefinedIndicator, if_neg hdefined, mul_zero,
+      mul_zero, mul_zero]
 
 /-- NOTE1 (42) in cleared form for the empirical slope: the definedness-weighted empirical
 least-squares slope of an independent cohort carries exactly the population covariance. -/

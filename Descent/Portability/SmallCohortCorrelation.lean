@@ -28,10 +28,10 @@ specialised to the chronology cells of NOTE1 (31). `definedness_probability_chro
 the general `(p, C)` form, `definedness_probability_half` is the `p = 1/2` form of (41), and
 `definedness_probability_halvedCoupling` gives the three numerical values at `p = C = 1/2`.
 
-Not formalised here: the conditional mean `(5C² + 3)/(2(C² + 3))` at `n = 3` and the value
-`419/809` at `n = 4`. Both require summing the empirical squared correlation against the
-multinomial masses over the defined count vectors, which the count law of
-`FourCellCohortLaw` supplies but which is a finite enumeration this module does not carry out.
+Not formalised here: the conditional mean `(5C² + 3)/(2(C² + 3))` at `n = 3` and the values
+`17/26` and `419/809` at `n = 3, 4`. They require summing the empirical squared correlation
+against the multinomial masses over the defined count vectors; that enumeration is carried out
+downstream, in `SmallCohortConditionalMeans`.
 
 ## Empirical status
 

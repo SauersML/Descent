@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.FourCellCohortLaw
 import Descent.Portability.ExactMetricEvaluation
 import Descent.Portability.FiniteIndependentMoments
+import Descent.Core.Ratios
 
 assert_below Descent.Decision Descent.Program
 
@@ -29,7 +30,9 @@ with the two marginals kept separate: `1 − P_S(0)ⁿ − P_S(1)ⁿ − P_Y(0)�
 The proof is the inclusion–exclusion of the NOTE: a cohort fails definedness exactly when all
 scores agree or all outcomes agree, those two events intersect in the four all-in-one-cell
 events, and each such event has probability a single cell or marginal mass to the power `n`
-because the cohort law is a product. `definedness_probability_of_equal_marginals` is the
+because the cohort law is a product (`sum_mass_all_score`, `sum_mass_all_outcome`); the
+all-in-one-cell indicator is the corpus `Descent.Core.kronecker` delta, not a second
+convention. `definedness_probability_of_equal_marginals` is the
 displayed form of (39), `1 − 2[pⁿ + (1−p)ⁿ] + Σ P_sy ⁿ`, under the hypothesis that the score
 and outcome marginals agree, which is what the chronology law of NOTE1 (31) delivers.
 
@@ -124,6 +127,15 @@ theorem expectation_tableLaw_cellCount {n : ℕ} (sample : Fin n → Bool × Boo
   rw [Finset.sum_div]
   exact Finset.sum_congr rfl fun cell _ ↦ by ring
 
+/-- A table with a positive total has a nonzero total when its four entries are added as real
+numbers, which is the denominator every sample moment of the table divides by. -/
+theorem table_total_ne_zero (count : Bool × Bool → ℕ) (hpos : 0 < ∑ cell, count cell) :
+    ((count (false, false) : ℝ) + count (false, true) + count (true, false) +
+      count (true, true)) ≠ 0 := by
+  have hposR : (0 : ℝ) < ((∑ cell, count cell : ℕ) : ℝ) := by exact_mod_cast hpos
+  rw [← sum_count_eq]
+  exact ne_of_gt hposR
+
 /-- The sample variance of the Boolean score of a table is `(a+b)(c+d)/n²`. -/
 theorem tableLaw_variance_scoreValue (count : Bool × Bool → ℕ)
     (hpos : 0 < ∑ cell, count cell) :
@@ -131,11 +143,7 @@ theorem tableLaw_variance_scoreValue (count : Bool × Bool → ℕ)
       (((count (false, false) : ℝ) + count (false, true)) *
           ((count (true, false) : ℝ) + count (true, true))) /
         ((∑ cell, count cell : ℕ) : ℝ) ^ 2 := by
-  have hposR : (0 : ℝ) < ((∑ cell, count cell : ℕ) : ℝ) := by exact_mod_cast hpos
-  have hne : ((count (false, false) : ℝ) + count (false, true) + count (true, false) +
-      count (true, true)) ≠ 0 := by
-    rw [← sum_count_eq]
-    exact ne_of_gt hposR
+  have hne := table_total_ne_zero count hpos
   rw [FiniteReportLaw.variance_eq_rawMoments, expectation_tableLaw, expectation_tableLaw,
     sum_count_eq]
   norm_num [scoreValue]
@@ -149,11 +157,7 @@ theorem tableLaw_variance_outcomeValue (count : Bool × Bool → ℕ)
       (((count (false, false) : ℝ) + count (true, false)) *
           ((count (false, true) : ℝ) + count (true, true))) /
         ((∑ cell, count cell : ℕ) : ℝ) ^ 2 := by
-  have hposR : (0 : ℝ) < ((∑ cell, count cell : ℕ) : ℝ) := by exact_mod_cast hpos
-  have hne : ((count (false, false) : ℝ) + count (false, true) + count (true, false) +
-      count (true, true)) ≠ 0 := by
-    rw [← sum_count_eq]
-    exact ne_of_gt hposR
+  have hne := table_total_ne_zero count hpos
   rw [FiniteReportLaw.variance_eq_rawMoments, expectation_tableLaw, expectation_tableLaw,
     sum_count_eq]
   norm_num [outcomeValue]
@@ -166,11 +170,7 @@ theorem tableLaw_covariance (count : Bool × Bool → ℕ) (hpos : 0 < ∑ cell,
       ((count (false, false) : ℝ) * count (true, true) -
           (count (false, true) : ℝ) * count (true, false)) /
         ((∑ cell, count cell : ℕ) : ℝ) ^ 2 := by
-  have hposR : (0 : ℝ) < ((∑ cell, count cell : ℕ) : ℝ) := by exact_mod_cast hpos
-  have hne : ((count (false, false) : ℝ) + count (false, true) + count (true, false) +
-      count (true, true)) ≠ 0 := by
-    rw [← sum_count_eq]
-    exact ne_of_gt hposR
+  have hne := table_total_ne_zero count hpos
   rw [FiniteReportLaw.covariance_eq_rawMoments, expectation_tableLaw, expectation_tableLaw,
     expectation_tableLaw, sum_count_eq]
   norm_num [scoreValue, outcomeValue]
@@ -265,8 +265,9 @@ def scoreIndicator (value : Bool) (cell : Bool × Bool) : ℝ :=
 def outcomeIndicator (value : Bool) (cell : Bool × Bool) : ℝ :=
   if cell.2 = value then 1 else 0
 
-/-- The indicator of one cell. -/
-def cellIndicator (target cell : Bool × Bool) : ℝ := if cell = target then 1 else 0
+/-- The indicator of one cell: the corpus Kronecker delta of the cell against the target. -/
+noncomputable def cellIndicator (target cell : Bool × Bool) : ℝ :=
+  Descent.Core.kronecker cell target
 
 /-- A product of zero-one member indicators over the cohort is one exactly when every member
 satisfies the test, and zero otherwise. -/
@@ -300,7 +301,7 @@ theorem expectation_outcomeIndicator (law : FiniteReportLaw (Bool × Bool)) (val
 
 theorem expectation_cellIndicator (law : FiniteReportLaw (Bool × Bool))
     (target : Bool × Bool) : law.expectation (cellIndicator target) = law.mass target := by
-  simp [FiniteReportLaw.expectation, cellIndicator, Finset.sum_ite_eq']
+  simp [FiniteReportLaw.expectation, cellIndicator, Descent.Core.kronecker, Finset.sum_ite_eq']
 
 /-- Under the independent cohort law the expectation of a product over the members is the
 member expectation raised to the cohort size. -/
@@ -311,6 +312,22 @@ theorem cohort_expectation_prod (law : FiniteReportLaw (Bool × Bool)) (n : ℕ)
   have hlaw : cohortLaw law n = HWEInteractionLaw.independentLaw fun _ : Fin n ↦ law := rfl
   rw [hlaw, HWEInteractionLaw.expectation_independent_product (fun _ : Fin n ↦ law)
     (fun _ ↦ weight), Finset.prod_const, Finset.card_univ, Fintype.card_fin]
+
+/-- Under the independent cohort law, every member carries a given score with probability the
+score marginal raised to the cohort size. -/
+theorem sum_mass_all_score (law : FiniteReportLaw (Bool × Bool)) (n : ℕ) (value : Bool) :
+    (∑ sample, (cohortLaw law n).mass sample * ∏ member, scoreIndicator value (sample member)) =
+      scoreMass law value ^ n := by
+  rw [← expectation_scoreIndicator]
+  exact cohort_expectation_prod law n (scoreIndicator value)
+
+/-- Under the independent cohort law, every member carries a given outcome with probability
+the outcome marginal raised to the cohort size. -/
+theorem sum_mass_all_outcome (law : FiniteReportLaw (Bool × Bool)) (n : ℕ) (value : Bool) :
+    (∑ sample, (cohortLaw law n).mass sample *
+      ∏ member, outcomeIndicator value (sample member)) = outcomeMass law value ^ n := by
+  rw [← expectation_outcomeIndicator]
+  exact cohort_expectation_prod law n (outcomeIndicator value)
 
 /-- A cohort has a positive count in a score column exactly when some member carries that
 score. -/
@@ -410,7 +427,7 @@ theorem definedIndicator_expand {n : ℕ} (hn : 0 < n) (sample : Fin n → Bool 
   have hprodCell : ∀ target : Bool × Bool, (∏ member, cellIndicator target (sample member)) =
       if ∀ member, sample member = target then (1 : ℝ) else 0 := by
     intro target
-    simp only [cellIndicator]
+    simp only [cellIndicator, Descent.Core.kronecker]
     exact prod_member_indicator fun member ↦ sample member = target
   have hcellSplit : ∀ first second : Bool, (∀ member, sample member = (first, second)) ↔
       (∀ member, (sample member).1 = first) ∧ (∀ member, (sample member).2 = second) := by
@@ -473,26 +490,6 @@ theorem definedness_probability (law : FiniteReportLaw (Bool × Bool)) (n : ℕ)
     ring
   have hone : (∑ sample : Fin n → Bool × Bool, (cohortLaw law n).mass sample * 1) = 1 := by
     simpa using (cohortLaw law n).mass_sum
-  have hscoreFalse : (∑ sample, (cohortLaw law n).mass sample *
-      ∏ member, scoreIndicator false (sample member)) = scoreMass law false ^ n := by
-    have hprod := cohort_expectation_prod law n (scoreIndicator false)
-    rw [expectation_scoreIndicator] at hprod
-    exact hprod
-  have hscoreTrue : (∑ sample, (cohortLaw law n).mass sample *
-      ∏ member, scoreIndicator true (sample member)) = scoreMass law true ^ n := by
-    have hprod := cohort_expectation_prod law n (scoreIndicator true)
-    rw [expectation_scoreIndicator] at hprod
-    exact hprod
-  have houtcomeFalse : (∑ sample, (cohortLaw law n).mass sample *
-      ∏ member, outcomeIndicator false (sample member)) = outcomeMass law false ^ n := by
-    have hprod := cohort_expectation_prod law n (outcomeIndicator false)
-    rw [expectation_outcomeIndicator] at hprod
-    exact hprod
-  have houtcomeTrue : (∑ sample, (cohortLaw law n).mass sample *
-      ∏ member, outcomeIndicator true (sample member)) = outcomeMass law true ^ n := by
-    have hprod := cohort_expectation_prod law n (outcomeIndicator true)
-    rw [expectation_outcomeIndicator] at hprod
-    exact hprod
   have hcells : (∑ sample, (cohortLaw law n).mass sample *
       ∑ cell, ∏ member, cellIndicator cell (sample member)) = ∑ cell, law.mass cell ^ n := by
     have hsum := FiniteIndependentMoments.expectation_sum (cohortLaw law n)
@@ -506,8 +503,9 @@ theorem definedness_probability (law : FiniteReportLaw (Bool × Bool)) (n : ℕ)
     exact hsum
   show (∑ sample, (cohortLaw law n).mass sample * definedIndicator sample) = _
   rw [hstep, Finset.sum_add_distrib, Finset.sum_sub_distrib, Finset.sum_sub_distrib,
-    Finset.sum_sub_distrib, Finset.sum_sub_distrib, hone, hscoreFalse, hscoreTrue,
-    houtcomeFalse, houtcomeTrue, hcells]
+    Finset.sum_sub_distrib, Finset.sum_sub_distrib, hone, sum_mass_all_score law n false,
+    sum_mass_all_score law n true, sum_mass_all_outcome law n false,
+    sum_mass_all_outcome law n true, hcells]
 
 /-- NOTE1 (39) as displayed: when the score and outcome marginals agree, the definedness
 probability is `1 − 2[pⁿ + (1−p)ⁿ] + Σ P_sy ⁿ`. -/

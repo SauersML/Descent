@@ -329,10 +329,8 @@ theorem fwdDiff_iter_reciprocal (c step : ℝ) :
 
 /-! ### The exact nonclosure gap (14) -/
 
-/-- The base point of the progression of NOTE2 §4.1. -/
-def nodeBase : ℝ := 1 / 4
-
-/-- The step of the progression of NOTE2 §4.1 for a cohort of size `n`. -/
+/-- The step of the progression of NOTE2 §4.1 for a cohort of size `n`; the progression starts
+at the lower end `1/4` of the parameter window of NOTE2 (12). -/
 def nodeStep (n : ℕ) : ℝ := 1 / (2 * ((n : ℝ) + 1))
 
 /-- The step is positive. -/
@@ -343,8 +341,8 @@ theorem nodeStep_pos (n : ℕ) : 0 < nodeStep n := by
 /-- Every node of the progression lies in the parameter window `[1/4, 3/4]` of NOTE2 (12),
 so each of them is a legitimate architecture parameter. -/
 theorem node_mem_window (n j : ℕ) (hj : j ∈ Finset.range (n + 2)) :
-    1 / 4 ≤ nodeBase + (j : ℝ) * nodeStep n ∧
-      nodeBase + (j : ℝ) * nodeStep n ≤ 3 / 4 := by
+    1 / 4 ≤ 1 / 4 + (j : ℝ) * nodeStep n ∧
+      1 / 4 + (j : ℝ) * nodeStep n ≤ 3 / 4 := by
   have hjle : (j : ℝ) ≤ (n : ℝ) + 1 := by
     have := Nat.lt_succ_iff.mp (Finset.mem_range.mp hj)
     exact_mod_cast this
@@ -357,15 +355,13 @@ theorem node_mem_window (n j : ℕ) (hj : j ∈ Finset.range (n + 2)) :
   have hnonneg : (0 : ℝ) ≤ (j : ℝ) * nodeStep n :=
     mul_nonneg (Nat.cast_nonneg j) (nodeStep_pos n).le
   rw [heq] at hupper
-  unfold nodeBase
   constructor <;> linarith
 
 /-- Every denominator met on the progression is bounded below by `5/4`, which is what makes
 the nonclosure gap of NOTE2 (14) finite and nonzero. -/
 theorem node_denominator_pos (n j : ℕ) (hj : j ∈ Finset.range (n + 2)) :
-    0 < 2 - nodeBase - (j : ℝ) * nodeStep n := by
+    0 < 2 - 1 / 4 - (j : ℝ) * nodeStep n := by
   have h := (node_mem_window n j hj).2
-  unfold nodeBase at h ⊢
   linarith
 
 /-- The alternating binomial sum of the population squared correlation is twice that of the
@@ -428,15 +424,15 @@ parity laws report different expected population squared correlations, at every 
 size `n`, even though by `cohort_mass_moments_match` they induce the very same size-`n`
 cohort law. -/
 theorem parity_thetaReport_gap_ne_zero (n : ℕ) :
-    parityExp n false (fun j ↦ thetaReport (nodeBase + (j : ℕ) * nodeStep n)) ≠
-      parityExp n true (fun j ↦ thetaReport (nodeBase + (j : ℕ) * nodeStep n)) := by
+    parityExp n false (fun j ↦ thetaReport (1 / 4 + (j : ℕ) * nodeStep n)) ≠
+      parityExp n true (fun j ↦ thetaReport (1 / 4 + (j : ℕ) * nodeStep n)) := by
   intro heq
   have hne : ∀ j ∈ Finset.range (n + 2),
-      (2 : ℝ) - nodeBase - (j : ℝ) * nodeStep n ≠ 0 := fun j hj ↦
+      (2 : ℝ) - 1 / 4 - (j : ℝ) * nodeStep n ≠ 0 := fun j hj ↦
     (node_denominator_pos n j hj).ne'
-  have hgap := parity_thetaReport_gap n nodeBase (nodeStep n) hne
+  have hgap := parity_thetaReport_gap n (1 / 4) (nodeStep n) hne
   rw [heq, sub_self] at hgap
-  have hprod : 0 < nodeProduct 2 nodeBase (nodeStep n) (n + 1) :=
+  have hprod : 0 < nodeProduct 2 (1 / 4) (nodeStep n) (n + 1) :=
     Finset.prod_pos fun j hj ↦ node_denominator_pos n j hj
   have hnum : 2 * (-1 : ℝ) ^ (n + 1) * (Nat.factorial (n + 1) : ℝ) *
       nodeStep n ^ (n + 1) ≠ 0 := by
@@ -445,37 +441,37 @@ theorem parity_thetaReport_gap_ne_zero (n : ℕ) :
       Nat.cast_ne_zero.mpr (Nat.factorial_ne_zero _)
     have h3 : nodeStep n ^ (n + 1) ≠ 0 := pow_ne_zero _ (nodeStep_pos n).ne'
     exact mul_ne_zero (mul_ne_zero (mul_ne_zero two_ne_zero h1) h2) h3
-  have hden : (2 : ℝ) ^ n * nodeProduct 2 nodeBase (nodeStep n) (n + 1) ≠ 0 := by
-    have : (0 : ℝ) < 2 ^ n * nodeProduct 2 nodeBase (nodeStep n) (n + 1) := by positivity
+  have hden : (2 : ℝ) ^ n * nodeProduct 2 (1 / 4) (nodeStep n) (n + 1) ≠ 0 := by
+    have : (0 : ℝ) < 2 ^ n * nodeProduct 2 (1 / 4) (nodeStep n) (n + 1) := by positivity
     exact this.ne'
   exact (div_ne_zero hnum hden) hgap.symm
 
 /-- **NOTE2 §4.1 at `n = 1`.** The two architecture laws with identical one-person report
 laws report expected population squared correlations `13/35` and `1/3`. -/
 theorem parity_thetaReport_values_one :
-    parityExp 1 false (fun j ↦ thetaReport (nodeBase + (j : ℕ) * nodeStep 1)) = 13 / 35 ∧
-      parityExp 1 true (fun j ↦ thetaReport (nodeBase + (j : ℕ) * nodeStep 1)) = 1 / 3 := by
+    parityExp 1 false (fun j ↦ thetaReport (1 / 4 + (j : ℕ) * nodeStep 1)) = 13 / 35 ∧
+      parityExp 1 true (fun j ↦ thetaReport (1 / 4 + (j : ℕ) * nodeStep 1)) = 1 / 3 := by
   have hstep : nodeStep 1 = 1 / 4 := by norm_num [nodeStep]
   have w0 : alternatingWeight 1 0 = 1 / 2 := by norm_num [alternatingWeight]
   have w1 : alternatingWeight 1 1 = -1 := by norm_num [alternatingWeight]
   have w2 : alternatingWeight 1 2 = 1 / 2 := by norm_num [alternatingWeight]
   have a0 : |(1 / 2 : ℝ)| = 1 / 2 := abs_of_nonneg (by norm_num)
   have a1 : |(-1 : ℝ)| = 1 := by rw [abs_neg, abs_one]
-  have hv0 : thetaReport (nodeBase + (0 : ℝ) * nodeStep 1) = 1 / 7 := by
-    norm_num [thetaReport, nodeBase, hstep]
-  have hv1 : thetaReport (nodeBase + (1 : ℝ) * nodeStep 1) = 1 / 3 := by
-    norm_num [thetaReport, nodeBase, hstep]
-  have hv2 : thetaReport (nodeBase + (2 : ℝ) * nodeStep 1) = 3 / 5 := by
-    norm_num [thetaReport, nodeBase, hstep]
+  have hv0 : thetaReport (1 / 4 + (0 : ℝ) * nodeStep 1) = 1 / 7 := by
+    norm_num [thetaReport, hstep]
+  have hv1 : thetaReport (1 / 4 + (1 : ℝ) * nodeStep 1) = 1 / 3 := by
+    norm_num [thetaReport, hstep]
+  have hv2 : thetaReport (1 / 4 + (2 : ℝ) * nodeStep 1) = 3 / 5 := by
+    norm_num [thetaReport, hstep]
   have key : ∀ s : Bool,
-      parityExp 1 s (fun j ↦ thetaReport (nodeBase + (j : ℕ) * nodeStep 1)) =
-        parityMass 1 s 0 * thetaReport (nodeBase + (0 : ℝ) * nodeStep 1) +
-          parityMass 1 s 1 * thetaReport (nodeBase + (1 : ℝ) * nodeStep 1) +
-          parityMass 1 s 2 * thetaReport (nodeBase + (2 : ℝ) * nodeStep 1) := by
+      parityExp 1 s (fun j ↦ thetaReport (1 / 4 + (j : ℕ) * nodeStep 1)) =
+        parityMass 1 s 0 * thetaReport (1 / 4 + (0 : ℝ) * nodeStep 1) +
+          parityMass 1 s 1 * thetaReport (1 / 4 + (1 : ℝ) * nodeStep 1) +
+          parityMass 1 s 2 * thetaReport (1 / 4 + (2 : ℝ) * nodeStep 1) := by
     intro s
     simp only [parityExp, weightedExp_apply]
     rw [Fin.sum_univ_eq_sum_range
-      (fun j ↦ parityMass 1 s j * thetaReport (nodeBase + (j : ℝ) * nodeStep 1)) 3,
+      (fun j ↦ parityMass 1 s j * thetaReport (1 / 4 + (j : ℝ) * nodeStep 1)) 3,
       Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_succ,
       Finset.sum_range_zero]
     norm_num
@@ -487,8 +483,8 @@ theorem parity_thetaReport_values_one :
 
 /-- The `n = 1` gap of NOTE2 §4.1 is exactly `4/105`. -/
 theorem parity_thetaReport_gap_one :
-    parityExp 1 false (fun j ↦ thetaReport (nodeBase + (j : ℕ) * nodeStep 1)) -
-        parityExp 1 true (fun j ↦ thetaReport (nodeBase + (j : ℕ) * nodeStep 1)) =
+    parityExp 1 false (fun j ↦ thetaReport (1 / 4 + (j : ℕ) * nodeStep 1)) -
+        parityExp 1 true (fun j ↦ thetaReport (1 / 4 + (j : ℕ) * nodeStep 1)) =
       4 / 105 := by
   rw [parity_thetaReport_values_one.1, parity_thetaReport_values_one.2]
   norm_num
@@ -500,12 +496,12 @@ expected report. -/
 theorem parity_cohorts_match_reports_differ (n : ℕ) :
     (∀ outcome : Fin n → Bool × Bool,
         parityExp n false
-            (fun j ↦ cohortMass (nodeBase + (j : ℕ) * nodeStep n) outcome) =
+            (fun j ↦ cohortMass (1 / 4 + (j : ℕ) * nodeStep n) outcome) =
           parityExp n true
-            (fun j ↦ cohortMass (nodeBase + (j : ℕ) * nodeStep n) outcome)) ∧
-      parityExp n false (fun j ↦ thetaReport (nodeBase + (j : ℕ) * nodeStep n)) ≠
-        parityExp n true (fun j ↦ thetaReport (nodeBase + (j : ℕ) * nodeStep n)) :=
-  ⟨fun outcome ↦ cohort_mass_moments_match n nodeBase (nodeStep n) outcome,
+            (fun j ↦ cohortMass (1 / 4 + (j : ℕ) * nodeStep n) outcome)) ∧
+      parityExp n false (fun j ↦ thetaReport (1 / 4 + (j : ℕ) * nodeStep n)) ≠
+        parityExp n true (fun j ↦ thetaReport (1 / 4 + (j : ℕ) * nodeStep n)) :=
+  ⟨fun outcome ↦ cohort_mass_moments_match n (1 / 4) (nodeStep n) outcome,
     parity_thetaReport_gap_ne_zero n⟩
 
 /-! ### The sign-mixture example -/

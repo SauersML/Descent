@@ -11,6 +11,7 @@ open Descent.Portability.EmpiricalCorrelationDefinedness
 #print axioms expectation_tableLaw
 #print axioms sum_eq_sum_cellCount
 #print axioms expectation_tableLaw_cellCount
+#print axioms table_total_ne_zero
 #print axioms tableLaw_variance_scoreValue
 #print axioms tableLaw_variance_outcomeValue
 #print axioms tableLaw_covariance
@@ -21,6 +22,8 @@ open Descent.Portability.EmpiricalCorrelationDefinedness
 #print axioms expectation_outcomeIndicator
 #print axioms expectation_cellIndicator
 #print axioms cohort_expectation_prod
+#print axioms sum_mass_all_score
+#print axioms sum_mass_all_outcome
 #print axioms cellCount_score_pos
 #print axioms cellCount_outcome_pos
 #print axioms defined_iff_not_constant

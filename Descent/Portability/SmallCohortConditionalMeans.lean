@@ -326,15 +326,9 @@ theorem slope_definedness_probability (law : FiniteReportLaw (Bool × Bool)) (n 
     ring
   have hone : (∑ sample : Fin n → Bool × Bool, (cohortLaw law n).mass sample * 1) = 1 := by
     simpa using (cohortLaw law n).mass_sum
-  have hconstant : ∀ value : Bool, (∑ sample, (cohortLaw law n).mass sample *
-      ∏ member, scoreIndicator value (sample member)) = scoreMass law value ^ n := by
-    intro value
-    have hprod := cohort_expectation_prod law n (scoreIndicator value)
-    rw [expectation_scoreIndicator] at hprod
-    exact hprod
   show (∑ sample, (cohortLaw law n).mass sample * slopeDefinedIndicator sample) = _
-  rw [hstep, Finset.sum_sub_distrib, Finset.sum_sub_distrib, hone, hconstant true,
-    hconstant false]
+  rw [hstep, Finset.sum_sub_distrib, Finset.sum_sub_distrib, hone,
+    sum_mass_all_score law n true, sum_mass_all_score law n false]
 
 /-- NOTE1 (42) for the chronology cells: the empirical slope of a cohort of size `n` is defined
 with probability `1 − pⁿ − (1 − p)ⁿ`. -/
