@@ -1,0 +1,42 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.NeutralPolynomialSemigroup
+
+/-! Axiom audit of NeutralPolynomialSemigroup. -/
+
+open Descent.Portability.NeutralPolynomialSemigroup
+
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.cardinalityBudget
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.withinBudget_cardinalityBudget
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.monomialConfiguration
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.marginalPolynomial_fullType
+#print axioms
+  Descent.Portability.NeutralPolynomialSemigroup.momentPolynomial_monomialConfiguration
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.monomialMoment
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.monomialMoment_eq_budget
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.momentFunctional
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.momentFunctional_monomial
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.extendByZero
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.indicatorCoefficients_dotProduct
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.eval_eq_dotProduct
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.momentFunctional_eq_dotProduct
+#print axioms
+  Descent.Portability.NeutralPolynomialSemigroup.momentFunctional_eq_zero_of_vanishing
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.momentFunctional_congr
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.momentFunctional_momentPolynomial
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.momentFunctional_monomial_nonneg
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.momentEvolution
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.momentEvolution_monomial
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.eval_momentEvolution
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.momentFunctional_add
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.representative
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.polynomialFunction_representative
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.polynomialFunction_add
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.polynomialFunction_smul
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.neutralPolynomialSemigroup
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.neutralPolynomialSemigroup_apply
+#print axioms
+  Descent.Portability.NeutralPolynomialSemigroup.neutralPolynomialSemigroup_momentPolynomial
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.neutralPolynomialSemigroup_one
+#print axioms Descent.Portability.NeutralPolynomialSemigroup.neutralPolynomialSemigroup_add
