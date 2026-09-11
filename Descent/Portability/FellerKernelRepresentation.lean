@@ -37,11 +37,10 @@ monomial readouts of `ReplicaMomentCompleteness` span such a dense subspace
 (`dense_span_monomialMap`).
 
 Scope. Uniqueness of the representing measure on a compact Hausdorff space that is not
-pseudo-metrizable is not formalized (it holds among regular measures). The kernels are not
-packaged as a `ProbabilityTheory.Kernel`: measurability of `x ↦ K_t(x, B)` for every Borel
-set `B` needs a monotone-class passage from continuous tests to Borel sets that is not done
-here; only continuity of `x ↦ K_t(x, ·)` into the weak topology is proved. Measurable
-time-dependent rate histories (NOTE1 §2.4) are not treated.
+pseudo-metrizable is not formalized (it holds among regular measures). Here the kernels are
+a family of measures continuous in the weak topology; when `X` is pseudo-metrizable,
+`FellerMarkovKernel` packages them as a `ProbabilityTheory.Kernel` with `IsMarkovKernel` and
+`K_{s+t} = K_t ∘ₖ K_s`. Measurable time-dependent rate histories (NOTE1 §2.4) are not treated.
 
 ## Empirical status
 
