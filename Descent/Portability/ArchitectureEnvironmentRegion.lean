@@ -96,6 +96,11 @@ def mixtureDenominator (den : Bool × Bool → ℝ) (α η : ℝ) : ℝ :=
 def mixtureNumerator (num : Bool × Bool → ℝ) (α η : ℝ) : ℝ :=
   ∑ c, cellWeight α η c * num c
 
+/-- The mixture-averaged denominator and numerator of NOTE2 (9) are one functional: the
+cell-weight average of an accumulator over the four architecture-environment cells. -/
+theorem mixtureDenominator_eq_mixtureNumerator (accumulator : Bool × Bool → ℝ) (α η : ℝ) :
+    mixtureDenominator accumulator α η = mixtureNumerator accumulator α η := rfl
+
 /-- The reported conditional mean `n_j(α, η) / d_j(α, η)` of NOTE2 (9). -/
 def conditionalMean (num den : Bool × Bool → ℝ) (α η : ℝ) : ℝ :=
   mixtureNumerator num α η / mixtureDenominator den α η

@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.UniversalMetricIdentification
+import Descent.Portability.TransplantationStability
 import Mathlib.Data.Fin.VecNotation
 import Mathlib.Algebra.Order.Field.Basic
 
@@ -147,6 +148,10 @@ def exampleMass : Fin 3 → ℝ := ![1 / 2, 1 / 4, 1 / 4]
 /-- The source numerators of the separating example; the first report has numerator zero,
 which is what puts it outside the definedness domain. -/
 def exampleSourceNum : Fin 3 → ℝ := ![0, 1, 1]
+
+/-- The source numerators of the separating example coincide with the corpus transplantation
+target vector `transplantTarget`: one zero coordinate followed by two unit coordinates. -/
+theorem exampleSourceNum_eq_transplantTarget : exampleSourceNum = transplantTarget := rfl
 
 /-- The source denominators of the separating example. -/
 def exampleSourceDen : Fin 3 → ℝ := ![1, 2, 1]

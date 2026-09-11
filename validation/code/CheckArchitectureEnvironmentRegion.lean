@@ -10,6 +10,7 @@ open Descent.Portability.ArchitectureEnvironmentRegion
 #print axioms cellWeight_sum
 #print axioms cellWeight_nonneg
 #print axioms architectureLaw_mass
+#print axioms mixtureDenominator_eq_mixtureNumerator
 #print axioms mixtureDenominator_pos
 #print axioms cornerWeight_nonneg
 #print axioms cornerWeight_sum

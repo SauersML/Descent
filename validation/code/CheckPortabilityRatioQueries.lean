@@ -14,6 +14,7 @@ open Descent.Portability.PortabilityRatioQueries
 #print axioms exampleMass_sum
 #print axioms exampleDomain_membership
 #print axioms exampleSourceNum_first
+#print axioms exampleSourceNum_eq_transplantTarget
 #print axioms exampleDomain_sum
 #print axioms exampleQueries
 #print axioms exampleQueries_pairwise_ne

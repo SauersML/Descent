@@ -2,6 +2,8 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.PortabilityMasterTheorem
+import Descent.Portability.IIDBinExperiment
+import Descent.Portability.EmpiricalAUCComparison
 import Descent.Foundations.TransportIdentities
 import Mathlib.Analysis.SpecialFunctions.NonIntegrable
 import Mathlib.MeasureTheory.Integral.IntervalIntegral.Basic
@@ -59,8 +61,8 @@ def outcomeExp : ExpFunctional Bool :=
 /-- The score readout `S = u · Y` at parameter `u`. -/
 def scoreValue (parameter : ℝ) (outcome : Bool) : ℝ := if outcome then parameter else 0
 
-/-- The outcome readout `Y`. -/
-def outcomeValue (outcome : Bool) : ℝ := if outcome then 1 else 0
+/-- The outcome readout `Y`, which is the corpus binary label `IIDBinExperiment.label`. -/
+def outcomeValue (outcome : Bool) : ℝ := IIDBinExperiment.label outcome
 
 /-- Exact evaluation of the conditional law on an arbitrary statistic. -/
 theorem outcomeExp_apply (statistic : Bool → ℝ) :
@@ -78,7 +80,7 @@ theorem outcomeExp_mean_score (parameter : ℝ) :
 /-- The conditional mean outcome is one half. -/
 theorem outcomeExp_mean_outcome : outcomeExp outcomeValue = 1 / 2 := by
   rw [outcomeExp_apply]
-  simp only [outcomeValue]
+  simp only [outcomeValue, IIDBinExperiment.label]
   norm_num
 
 /-- The conditional score variance is a quarter of the squared parameter. -/
@@ -92,14 +94,14 @@ theorem outcomeExp_variance_score (parameter : ℝ) :
 /-- The conditional outcome variance is one quarter. -/
 theorem outcomeExp_variance_outcome : variance outcomeExp outcomeValue = 1 / 4 := by
   rw [variance, outcomeExp_mean_outcome, outcomeExp_apply]
-  simp only [outcomeValue]
+  simp only [outcomeValue, IIDBinExperiment.label]
   norm_num
 
 /-- The conditional covariance of score and outcome is a quarter of the parameter. -/
 theorem outcomeExp_covariance (parameter : ℝ) :
     covariance outcomeExp (scoreValue parameter) outcomeValue = parameter / 4 := by
   rw [covariance, outcomeExp_mean_score, outcomeExp_mean_outcome, outcomeExp_apply]
-  simp only [scoreValue, outcomeValue]
+  simp only [scoreValue, outcomeValue, IIDBinExperiment.label]
   norm_num
   ring
 
@@ -127,10 +129,10 @@ theorem replicaExp_apply (statistic : Bool × Bool → ℝ) :
   simp only [replicaExp, weightedExp_apply, Fintype.sum_prod_type, Fintype.sum_bool]
   ring
 
-/-- The ordering credit of NOTE2 §5.4: full credit for a strict win, half for a tie. -/
+/-- The ordering credit of NOTE2 §5.4: full credit for a strict win, half for a tie.  It is the
+corpus case-control credit `empiricalAUCComparison`, with the same half-credit convention. -/
 def comparisonScore (positiveScore negativeScore : ℝ) : ℝ :=
-  if negativeScore < positiveScore then 1 else if positiveScore = negativeScore then 1 / 2
-    else 0
+  empiricalAUCComparison positiveScore negativeScore
 
 /-- The two-replica rank statistic of NOTE2 §5.4, read on a positive/negative replica pair. -/
 def rankStatistic (parameter : ℝ) (pair : Bool × Bool) : ℝ :=
@@ -149,7 +151,7 @@ theorem rankAccuracy_eq_one (parameter : ℝ) (hparam : 0 < parameter) :
     rankAccuracy parameter = 1 := by
   have hnumer : replicaExp (rankStatistic parameter) = 1 / 4 := by
     rw [replicaExp_apply]
-    simp only [rankStatistic, scoreValue, comparisonScore]
+    simp only [rankStatistic, scoreValue, comparisonScore, empiricalAUCComparison]
     norm_num [hparam]
   rw [rankAccuracy, hnumer, outcomeExp_mean_outcome]
   norm_num
@@ -186,11 +188,11 @@ interval, so the expected slope is not a finite real number even though every st
 finite slope. -/
 theorem conditionalSlope_not_integrableOn :
     ¬IntegrableOn conditionalSlope (Set.Ioc 0 1) volume := by
-  intro hint
+  intro hintegrable
   have heqon : Set.EqOn conditionalSlope (fun parameter : ℝ ↦ parameter⁻¹) (Set.Ioc 0 1) :=
     fun parameter hparam ↦ conditionalSlope_eq_inv parameter (ne_of_gt hparam.1)
   have hinv : IntegrableOn (fun parameter : ℝ ↦ parameter⁻¹) (Set.Ioc 0 1) volume :=
-    hint.congr_fun heqon measurableSet_Ioc
+    hintegrable.congr_fun heqon measurableSet_Ioc
   have hinterval :=
     (intervalIntegrable_iff_integrableOn_Ioc_of_le (by norm_num : (0 : ℝ) ≤ 1)).mpr hinv
   rw [intervalIntegrable_inv_iff] at hinterval
