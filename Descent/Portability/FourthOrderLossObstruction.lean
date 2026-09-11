@@ -142,7 +142,8 @@ def individualLoss (ω : Fin 2 × (EffectContext × (Bool × Bool))) : ℝ :=
 /-- The average effect sign never leaves `[-1,1]`, so the outcome is real. -/
 theorem effectMean_sq_le_one (z : EffectContext) : effectMean z ^ 2 ≤ 1 := by
   obtain ⟨a, b, c, e⟩ := z
-  cases a <;> cases b <;> cases c <;> cases e <;> norm_num [effectMean, effectSign]
+  cases a <;> cases b <;> cases c <;> cases e <;>
+    norm_num [effectMean, effectSign_apply]
 
 /-- The residual scale squares back to `1 - c(Z)^2`. -/
 theorem sqrt_residual_sq (z : EffectContext) :

@@ -46,11 +46,12 @@ theorem conditional_context (p : ℝ) (hp : 0 ≤ p ∧ p ≤ 1) (f : Bool × Fi
     rw [jointLaw, integral_prod _ Integrable.of_finite, integral_prod _ Integrable.of_finite]
     apply integral_congr_ae
     filter_upwards [] with w
+    change (∫ n, (Prod.fst ⁻¹' t).indicator
+      (fun z : Bool × Fin 3 ↦ ∫ v, f (z.1, v) ∂noiseLaw p) (w, n) ∂noiseLaw p) =
+      ∫ n, (Prod.fst ⁻¹' t).indicator f (w, n) ∂noiseLaw p
     by_cases hw : w ∈ t
-    · simp only [Set.indicator_apply, Set.mem_preimage, hw, if_pos]
-      simp
-    · simp only [Set.indicator_apply, Set.mem_preimage, hw, if_false]
-      simp
+    · simp [Set.indicator, hw]
+    · simp [Set.indicator, hw]
   · have hfst : @Measurable (Bool × Fin 3) Bool contextSigma inferInstance Prod.fst :=
       measurable_iff_comap_le.mpr le_rfl
     have hg := (measurable_of_countable (fun w ↦ ∫ n, f (w, n) ∂noiseLaw p)).comp hfst
