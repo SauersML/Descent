@@ -218,9 +218,10 @@ theorem conditional_cohortCorrelation_three_half (C : ℝ) (hC0 : 0 ≤ C) (hC1 
         (cohortLaw (chronologyLaw (1 / 2) C (by norm_num) (by norm_num) hC0 hC1) 3).expectation
           definedIndicator =
       (5 * C ^ 2 + 3) / (2 * (C ^ 2 + 3)) := by
-  have hpositive : (0 : ℝ) < C ^ 2 + 3 := by positivity
+  have hdefined : (3 * (C ^ 2 + 3) / 16 : ℝ) ≠ 0 := by positivity
+  have htarget : (2 * (C ^ 2 + 3) : ℝ) ≠ 0 := by positivity
   rw [expectation_cohortCorrelation_three_half C hC0 hC1, definedness_probability_half C hC0 hC1,
-    div_eq_div_iff (by positivity) (by positivity)]
+    div_eq_div_iff hdefined htarget]
   ring
 
 /-- The NOTE1 section 7 table at `p = C = 1/2`, `n = 3`: conditional on being defined, the
@@ -263,6 +264,8 @@ theorem conditional_empiricalAUC_halvedCoupling (n : ℕ) (hn : 2 ≤ n) :
         (cohortLaw halvedCouplingLaw n).expectation aucDefinedIndicator = 3 / 4 := by
   have hpow : ((1 : ℝ) / 2) ^ n ≤ (1 / 2) ^ 2 :=
     pow_le_pow_of_le_one (by norm_num) (by norm_num) hn
+  have hquarter : ((1 : ℝ) / 2) ^ 2 = 1 / 4 := by norm_num
+  rw [hquarter] at hpow
   have hdefined : 0 < (cohortLaw halvedCouplingLaw n).expectation aucDefinedIndicator := by
     unfold halvedCouplingLaw
     rw [auc_definedness_probability_chronologyLaw (1 / 2) (1 / 2) _ _ _ _ n (by omega),

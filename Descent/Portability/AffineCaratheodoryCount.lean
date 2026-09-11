@@ -59,7 +59,8 @@ theorem card_reducedCoordinates {ι : Type*} [Fintype ι] [DecidableEq ι] (i₀
 full map, read at the remaining coordinates. -/
 theorem featureVector_reducedFeature {Ω X ι : Type*} [Fintype Ω] [Fintype ι] [DecidableEq ι]
     (p : Ω → ℝ) (point : Ω → X) (φ : X → ι → ℝ) (i₀ : ι) :
-    featureVector p point (reducedFeature φ i₀) = fun i ↦ featureVector p point φ i := by
+    featureVector p point (reducedFeature φ i₀)
+      = fun i : ↥(Finset.univ.erase i₀) ↦ featureVector p point φ i := by
   funext i
   simp only [featureVector_apply, reducedFeature]
 
@@ -76,7 +77,7 @@ theorem exists_law_card_of_constant_coordinate {X ι : Type*} [Fintype ι] [Deci
   have hreduced : (fun i : ↥(Finset.univ.erase i₀) ↦ v i)
       ∈ realizationBody (reducedFeature φ i₀) := by
     refine (mem_realizationBody_iff _ _).mpr ⟨Ω, hΩ, p, point, hp, hsum, ?_⟩
-    rw [featureVector_reducedFeature, hfeat]
+    rw [featureVector_reducedFeature p point φ i₀, hfeat]
   obtain ⟨q, atom, hq, hqsum, hqfeat⟩ :=
     exists_law_of_mem_realizationBody (reducedFeature φ i₀) _ hreduced
   have hlaw : ∃ q : Fin (Fintype.card ↥(Finset.univ.erase i₀) + 1) → ℝ,
@@ -88,7 +89,7 @@ theorem exists_law_card_of_constant_coordinate {X ι : Type*} [Fintype ι] [Deci
     · rw [hi, constant_coordinate_eq φ i₀ hconst v hv, featureVector_apply]
       simpa [hconst] using hqsum
     · have hcoordinate := congrFun hqfeat ⟨i, Finset.mem_erase.mpr ⟨hi, Finset.mem_univ i⟩⟩
-      rw [featureVector_reducedFeature] at hcoordinate
+      rw [featureVector_reducedFeature q atom φ i₀] at hcoordinate
       exact hcoordinate
   rw [card_reducedCoordinates i₀] at hlaw
   exact hlaw
