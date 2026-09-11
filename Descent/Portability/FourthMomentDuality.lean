@@ -414,6 +414,7 @@ theorem twoPointExp_moments (b a : ℝ) (hab : b ^ 2 ≤ a) :
 def twoPointKernel (a : Ω → ℝ) : Ω × Bool → ℝ :=
   fun z ↦ twoPointResidual (a z.1) z.2
 
+omit [Fintype ι] [DecidableEq ι] in
 /-- **The two-point kernel realizes the prescribed moments and the reduced objective.**
 Given a feasible pair `(b, a)`, the kernel supported on `{±√a(W)}` has outcome mean `β`,
 feature cross-moments `k`, second moment `m`, and fourth moment exactly `E[a²]`. Together
