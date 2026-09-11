@@ -345,6 +345,9 @@ import Descent.Portability.HWEConditionalScaleLimit
 import Descent.Portability.HWEConditionalInverseMoment
 import Descent.Portability.FiniteEscapingKernel
 import Descent.Portability.HWEConditionalKernelLimit
+import Descent.Portability.HWEHomogeneousFrequencyLimit
+import Descent.Portability.HWEPolynomialLayerScale
+import Descent.Portability.HWEPolynomialScaleRegimes
 assert_below Descent.Program
 
 /-!
