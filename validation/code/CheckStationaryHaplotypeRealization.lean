@@ -31,6 +31,5 @@ namespace Descent.Portability.StationaryHaplotypeRealization
 #print axioms embed_oneDemeStationaryLowOrderLDState_mem
 #print axioms nonempty_stationaryLocusExchangeableRealization
 #print axioms oneDemeStationaryLowOrderLDState_mem_realizationBody
-#print axioms oneDemeStationary_dd_nonneg
 
 end Descent.Portability.StationaryHaplotypeRealization

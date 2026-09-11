@@ -49,9 +49,7 @@ coordinate, so `enlargedMicroscopicApproximation rates 0` supplies it at the sin
 three statements `embed_oneDemeStationaryLowOrderLDState_mem`,
 `nonempty_stationaryLocusExchangeableRealization` and
 `oneDemeStationaryLowOrderLDState_mem_realizationBody` are NOTE1 Theorem 3 with no hypotheses
-beyond the physical rate domain carried by `ManyDemeLDRates 1`. `oneDemeStationary_dd_nonneg`
-shows the kind of consequence this licenses: the stationary `DD` coordinate is nonnegative
-because it is a second moment under the common law, with no appeal to the closed form.
+beyond the physical rate domain carried by `ManyDemeLDRates 1`.
 
 The `_of_approx` forms are kept because they state exactly which input the argument uses: any
 genuine positive approximation of the enlarged one-deme generator gives the same conclusion.
@@ -424,14 +422,6 @@ theorem oneDemeStationaryLowOrderLDState_mem_realizationBody (rates : ManyDemeLD
     oneDemeStationaryLowOrderLDState rates ∈ realizationBody (lowOrderLDFeature 1) :=
   oneDemeStationaryLowOrderLDState_mem_realizationBody_of_approx rates
     (TwoLocusMicroscopicApproximation.enlargedMicroscopicApproximation rates 0)
-
-/-- The within-deme `DD` coordinate of the stationary state is nonnegative because it is a
-second moment under the common haplotype law. The sign is derived from realizability, not read
-off the closed form. -/
-theorem oneDemeStationary_dd_nonneg (rates : ManyDemeLDRates 1) :
-    0 ≤ oneDemeStationaryLowOrderLDState rates (some (.DD 0 0)) :=
-  KernelRealizationPreservation.dd_diagonal_nonneg_of_mem
-    (oneDemeStationaryLowOrderLDState_mem_realizationBody rates) 0
 
 end
 

@@ -167,6 +167,22 @@ theorem abs_expansionResidual_le_of_eq_zero {D : ℕ} {jet : TwoLocusDiffusionJe
     |expansionResidual jet secondOrder N state deme drawn| ≤ 0 / (N : ℝ) ^ 3 := by
   rw [hzero, abs_zero, zero_div]
 
+/-- **Off the resampled deme the residual vanishes.** A jet that reads only deme `index`, with
+zero gradient and zero second-order coefficient in another deme `deme`, has zero expansion
+residual when `deme` is stepped: the step leaves deme `index` unchanged. -/
+theorem expansionResidual_eq_zero_of_ne {D : ℕ} (jet : TwoLocusDiffusionJet D)
+    (secondOrder : Fin D → (Fin D → TwoLocusHaplotypeFrequencies) → TwoLocusHaplotype → ℝ)
+    (observable : TwoLocusHaplotypeFrequencies → ℝ) (index : Fin D)
+    (hvalue : ∀ state, jet.value state = observable (state index)) (N : ℕ)
+    (state : Fin D → TwoLocusHaplotypeFrequencies) (deme : Fin D) (drawn : TwoLocusHaplotype)
+    (hdeme : ¬ deme = index) (hgradient : ∀ observed, jet.gradientAt deme state observed = 0)
+    (hsecond : secondOrder deme state drawn = 0) :
+    expansionResidual jet secondOrder N state deme drawn = 0 := by
+  simp only [expansionResidual, centeredGradient, hvalue, hgradient, hsecond,
+    resampleStepAt_of_ne state deme index N drawn (fun heq ↦ hdeme heq.symm),
+    twoLocusHaplotypeMean]
+  ring
+
 /-- A constant observable expands exactly: no first-order term, no second-order term and no
 remainder at all. -/
 def resamplingExpansionConst {D : ℕ} (level : ℝ) :
@@ -474,16 +490,14 @@ def resamplingExpansionLeftFrequencyJet {D : ℕ} (index : Fin D) :
       norm_num
   second_le _ _ _ := by norm_num
   expansion N _ state deme drawn := abs_expansionResidual_le_of_eq_zero (by
-    simp only [expansionResidual, centeredGradient, twoLocusLeftFrequencyJet]
     by_cases hdeme : deme = index
-    · simp only [if_pos hdeme]
+    · simp only [expansionResidual, centeredGradient, twoLocusLeftFrequencyJet, if_pos hdeme]
       rw [← hdeme, resampleStepAt_self, resampleStep_leftFrequency]
       simp only [twoLocusHaplotypeMean]
       ring
-    · simp only [if_neg hdeme]
-      rw [resampleStepAt_of_ne state deme index N drawn (fun heq ↦ hdeme heq.symm)]
-      simp only [twoLocusHaplotypeMean]
-      ring)
+    · exact expansionResidual_eq_zero_of_ne _ _ (fun frequency ↦ frequency.leftFrequency) index
+        (fun _ ↦ rfl) N state deme drawn hdeme
+        (fun _ ↦ by simp only [twoLocusLeftFrequencyJet, if_neg hdeme]) rfl)
   second_mean deme state := by
     simp only [twoLocusLeftFrequencyJet, twoLocusHaplotypeMean]
     ring
@@ -508,16 +522,14 @@ def resamplingExpansionRightFrequencyJet {D : ℕ} (index : Fin D) :
       norm_num
   second_le _ _ _ := by norm_num
   expansion N _ state deme drawn := abs_expansionResidual_le_of_eq_zero (by
-    simp only [expansionResidual, centeredGradient, twoLocusRightFrequencyJet]
     by_cases hdeme : deme = index
-    · simp only [if_pos hdeme]
+    · simp only [expansionResidual, centeredGradient, twoLocusRightFrequencyJet, if_pos hdeme]
       rw [← hdeme, resampleStepAt_self, resampleStep_rightFrequency]
       simp only [twoLocusHaplotypeMean]
       ring
-    · simp only [if_neg hdeme]
-      rw [resampleStepAt_of_ne state deme index N drawn (fun heq ↦ hdeme heq.symm)]
-      simp only [twoLocusHaplotypeMean]
-      ring)
+    · exact expansionResidual_eq_zero_of_ne _ _ (fun frequency ↦ frequency.rightFrequency) index
+        (fun _ ↦ rfl) N state deme drawn hdeme
+        (fun _ ↦ by simp only [twoLocusRightFrequencyJet, if_neg hdeme]) rfl)
   second_mean deme state := by
     simp only [twoLocusRightFrequencyJet, twoLocusHaplotypeMean]
     ring
@@ -550,16 +562,15 @@ def resamplingExpansionLinkageJet {D : ℕ} (index : Fin D) :
     · simp only [if_neg hdeme]
       norm_num
   expansion N _ state deme drawn := abs_expansionResidual_le_of_eq_zero (by
-    simp only [expansionResidual, centeredGradient, twoLocusLinkageJet]
     by_cases hdeme : deme = index
-    · simp only [if_pos hdeme]
+    · simp only [expansionResidual, centeredGradient, twoLocusLinkageJet, if_pos hdeme]
       rw [← hdeme, resampleStepAt_self, resampleStep_linkage]
       simp only [twoLocusHaplotypeMean]
       ring
-    · simp only [if_neg hdeme]
-      rw [resampleStepAt_of_ne state deme index N drawn (fun heq ↦ hdeme heq.symm)]
-      simp only [twoLocusHaplotypeMean]
-      ring)
+    · exact expansionResidual_eq_zero_of_ne _ _ (fun frequency ↦ frequency.linkage) index
+        (fun _ ↦ rfl) N state deme drawn hdeme
+        (fun _ ↦ by simp only [twoLocusLinkageJet, if_neg hdeme])
+        (by simp only [if_neg hdeme]))
   second_mean deme state := by
     simp only [twoLocusLinkageJet]
     by_cases hdeme : deme = index

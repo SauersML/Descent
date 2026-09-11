@@ -13,6 +13,7 @@ open Descent.Portability.ResamplingJetExpansion
 #print axioms abs_add_four_le
 #print axioms abs_centeredGradient_le
 #print axioms abs_expansionResidual_le_of_eq_zero
+#print axioms expansionResidual_eq_zero_of_ne
 #print axioms expansionResidual_mul
 #print axioms resamplingExpansionConst
 #print axioms ResamplingExpansion.add

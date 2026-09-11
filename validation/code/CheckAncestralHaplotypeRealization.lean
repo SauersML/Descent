@@ -11,6 +11,8 @@ namespace Descent.Portability.AncestralHaplotypeRealization
 
 #print axioms cloneLocusExchangeableRealization
 #print axioms ancestralLocusExchangeableRealization
+#print axioms cloneLocusExchangeableRealization_haplotype
+#print axioms haplotypeLowOrderLDState_ancestralLocusExchangeableRealization
 #print axioms nonempty_ancestralLocusExchangeableRealization
 #print axioms commonAncestralLowOrderLDState_mem_realizationBody
 #print axioms embed_commonAncestralLowOrderLDState_mem

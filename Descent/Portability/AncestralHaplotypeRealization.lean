@@ -30,6 +30,9 @@ the same for the `DD` block with a deterministic linkage observable, and of the 
 `ancestralLocusExchangeableRealization` applies the clone to the one-deme realization that
 `StationaryHaplotypeRealization.nonempty_stationaryLocusExchangeableRealization` provides, NOTE1
 Theorem 3 with no hypotheses; the choice of that realization is the only non-constructive step.
+`cloneLocusExchangeableRealization_haplotype` records the relabelling itself, and
+`haplotypeLowOrderLDState_ancestralLocusExchangeableRealization` reads the corpus moment map off
+the constructed law and recovers exactly `commonAncestralLowOrderLDState`.
 `nonempty_ancestralLocusExchangeableRealization`,
 `commonAncestralLowOrderLDState_mem_realizationBody` and
 `embed_commonAncestralLowOrderLDState_mem` are its consequences for the stored and the enlarged
@@ -79,6 +82,40 @@ def ancestralLocusExchangeableRealization {D : ℕ} (ancestralRates : ManyDemeLD
   cloneLocusExchangeableRealization (Classical.choice
     (StationaryHaplotypeRealization.nonempty_stationaryLocusExchangeableRealization
       ancestralRates))
+
+/-- The cloned realization reads the single ancestral haplotype of the one-deme stationary law
+at every deme label. -/
+theorem cloneLocusExchangeableRealization_haplotype {D : ℕ} {ancestralRates : ManyDemeLDRates 1}
+    (realization : LocusExchangeableLowOrderLDHaplotypeRealization
+      (oneDemeStationaryLowOrderLDState ancestralRates))
+    (outcome : realization.sampleSpace) (deme : Fin D) :
+    (cloneLocusExchangeableRealization (D := D) realization).haplotype outcome deme
+      = realization.haplotype outcome 0 := rfl
+
+/-- **The constructed ancestral law reproduces the corpus ancestral state.** Reading the corpus
+moment map `haplotypeLowOrderLDState` off the expectation and haplotype random variable of
+`ancestralLocusExchangeableRealization` gives exactly `commonAncestralLowOrderLDState`. -/
+theorem haplotypeLowOrderLDState_ancestralLocusExchangeableRealization {D : ℕ}
+    (ancestralRates : ManyDemeLDRates 1) :
+    haplotypeLowOrderLDState
+        (ancestralLocusExchangeableRealization (D := D) ancestralRates).expectation
+        (ancestralLocusExchangeableRealization (D := D) ancestralRates).haplotype
+      = commonAncestralLowOrderLDState ancestralRates := by
+  funext coordinate
+  match coordinate with
+  | none => rfl
+  | some (.H first second) =>
+    exact ((ancestralLocusExchangeableRealization (D := D) ancestralRates).H_eq
+      first second).symm
+  | some (.DD first second) =>
+    exact ((ancestralLocusExchangeableRealization (D := D) ancestralRates).DD_eq
+      first second).symm
+  | some (.Dz first second third) =>
+    exact ((ancestralLocusExchangeableRealization (D := D) ancestralRates).Dz_eq
+      first second third).symm
+  | some (.pi2 first second third fourth) =>
+    exact ((ancestralLocusExchangeableRealization (D := D) ancestralRates).pi2_eq
+      first second third fourth).symm
 
 /-- The unsplit ancestral state of every demographic history has a locus-exchangeable
 haplotype realization. -/
