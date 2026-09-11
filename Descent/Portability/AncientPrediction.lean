@@ -7,6 +7,7 @@ import Descent.Portability.AncientPrediction.Mixture
 import Descent.Portability.AncientPrediction.Risk
 import Descent.Portability.AncientPrediction.Certificate
 import Descent.Portability.AncientPrediction.Sampling
+import Descent.Portability.AncientPrediction.Information
 
 /-!
 # Ancient reference experiments for modern prediction

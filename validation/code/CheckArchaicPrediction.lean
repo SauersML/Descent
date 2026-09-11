@@ -27,3 +27,12 @@ import Descent.Portability.ArchaicPrediction
 #print axioms Descent.Portability.ArchaicPrediction.exact_multiple_cycle_residual
 #print axioms Descent.Portability.ArchaicPrediction.arbitrary_ld_additive_optimum
 #print axioms Descent.Portability.ArchaicPrediction.arbitrary_ld_export_formula
+#print axioms Descent.Portability.ArchaicPrediction.binary_multilinear_representation
+#print axioms Descent.Portability.ArchaicPrediction.factorial_contrast_noise
+#print axioms Descent.Portability.ArchaicPrediction.bounded_response_tail
+#print axioms Descent.Portability.ArchaicPrediction.integral_contrast_precision
+#print axioms Descent.Portability.ArchaicPrediction.pairing_information_positive
+#print axioms Descent.Portability.ArchaicPrediction.triangle_contribution_variance
+#print axioms Descent.Portability.ArchaicPrediction.centered_multilinear_representation
+#print axioms Descent.Portability.ArchaicPrediction.lowerCoordinate_square_zero
+#print axioms Descent.Portability.ArchaicPrediction.lowerCoordinate_commute

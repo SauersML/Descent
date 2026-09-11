@@ -6,3 +6,5 @@ import Descent.Portability.AncientPrediction
 #print axioms Descent.Portability.AncientPrediction.integral_risk_change
 #print axioms Descent.Portability.AncientPrediction.bounded_sample_mean_tail
 #print axioms Descent.Portability.AncientPrediction.selected_update_failure_bound
+#print axioms Descent.Portability.AncientPrediction.conditional_information_budget
+#print axioms Descent.Portability.AncientPrediction.conditional_information_gain
