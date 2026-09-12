@@ -1,6 +1,9 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Pangenome.GraphCoalescent.Conservation
+import Descent.Pangenome.GraphCoalescent.HiddenLoads
+import Descent.Pangenome.GraphCoalescent.HiddenLumpability
 import Descent.Pangenome.GraphCoalescent.LahWeights
 import Descent.Pangenome.GraphCoalescent.MinimalRefinement
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceClosure
@@ -29,6 +32,21 @@ inside it.
 
 ## Theorems
 
+* Theorem A, the hidden-load closure: `HiddenLoads`, `HiddenLumpability`. The load
+  `hiddenLoad s ξ C` counts the true blocks inside a report component; the loads add up to the
+  true block count (`sum_hiddenLoad`) and start at the fiber sizes (`hiddenLoad_bot`). Every
+  cover is invisible, keeping the report and lowering one load by one, or visible, merging two
+  components into the load `a + b - 1`: `observed_eq_or_covers`, `hiddenLoad_merge_of_rel_self`,
+  `hiddenLoad_merge_of_not_rel_self`. (A1) `card_invisibleCovers`, (A2) `card_visibleCovers`,
+  (A3) `sum_choose_two_hiddenLoad_add_sum_pairs`. Rosenblatt's criterion for the hidden state:
+  two coalescent states with the same hidden state have equally many covers into every hidden
+  state, `card_covers_hiddenState_eq`. (A4): the loads and rates of the three-haplotype example
+  and its mean connection time `2/3`, `example_total_rate`, `example_mean_connection_time`.
+* Theorem C, (C1) and (C5): `Conservation`. A silent merger lowers the hidden excess by one and a
+  visible merger keeps it (`hiddenExcess_of_invisible`, `hiddenExcess_of_visible`); along any
+  chain of covers from the singletons to the root exactly `n - w` steps are silent and `w - 1`
+  are visible (`card_silentSteps_visibleSteps`); a finer interface merge connects its report no
+  later, on every path (`connectedTimes_subset`).
 * Theorem B, the coarsest predictive Markov refinement: `MinimalRefinement`. (B1) with three or
   more components the visible merger rates `ρ_CD = L_C L_D` determine every load:
   `load_sq_eq_visibleRates`, `load_eq_of_visibleRates_eq`, `visibleRates_eq_iff`. (B2) with two
@@ -48,15 +66,17 @@ inside it.
   many mergers into every lumped target: `card_mergers_eq_of_cellLoad_eq`, and with the corpus
   setoids `card_blockMergers_eq`.
 
-Scope. Theorem B is proved as the algebra of the visible rates and of the survival derivatives
-through the killed generator. The step from a strong lumping for every initial labeled state to
-these rates, which is Rosenblatt's criterion applied to the chain of Theorem A, and the survival
-function as a semigroup are not formalized. In §10 the dependence of a merger's outcome on the two
-merging cells alone is a hypothesis on the outcome map. Theorem A (the load closure (A1)-(A4)),
-Theorem C (conservation (C1), the domination (C2), the Dynkin identity (C3), the bounds (C4) and
-the monotonicity (C5)), Theorem D (the connectivity cumulant (D2)-(D3), the stopping law
-(D4)-(D9) and the exact table), Theorem E, Theorem F, the filter of §9 and the
-Λ-coalescent extension of §10 are not yet proof-checked.
+Scope. Theorem A is proved as cover counts with Kingman's unit rate per cover: the
+continuous-time chain, the survival function of (A4) and the probabilistic statement of strong
+lumpability are not constructed, and the mean `2/3` of (A4) is the first-step arithmetic of the
+counted rates. Theorem B is proved as the algebra of the visible rates and of the survival
+derivatives through the killed generator. The step from a strong lumping for every initial
+labeled state to these rates, which is Rosenblatt's criterion applied to the chain of Theorem A,
+and the survival function as a semigroup are not formalized. In §10 the dependence of a merger's
+outcome on the two merging cells alone is a hypothesis on the outcome map. Theorem C (the
+domination (C2), the Dynkin identity (C3) and the bounds (C4)), Theorem D (the connectivity
+cumulant (D2)-(D3), the stopping law (D4)-(D9) and the exact table), Theorem E, Theorem F, the
+filter of §9 and the Λ-coalescent extension of §10 are not yet proof-checked.
 -/
 
 end Descent.Program
