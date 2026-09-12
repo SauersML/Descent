@@ -209,7 +209,14 @@ def founderWitnessWeights : FiniteReportLaw (Fin 3) where
   mass_nonneg j := by
     show (0 : ℝ) ≤ if j = 0 then 1 / 2 else 1 / 4
     split_ifs <;> norm_num
-  mass_sum := by norm_num [Fin.sum_univ_three]
+  mass_sum := by
+    rw [Fin.sum_univ_three]
+    show (if (0 : Fin 3) = 0 then (1 : ℝ) / 2 else 1 / 4)
+      + (if (1 : Fin 3) = 0 then 1 / 2 else 1 / 4)
+      + (if (2 : Fin 3) = 0 then 1 / 2 else 1 / 4) = 1
+    rw [if_pos (show (0 : Fin 3) = 0 from rfl), if_neg (show (1 : Fin 3) ≠ 0 by decide),
+      if_neg (show (2 : Fin 3) ≠ 0 by decide)]
+    norm_num
 
 /-! ## The witness -/
 
