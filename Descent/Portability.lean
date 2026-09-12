@@ -704,6 +704,11 @@ import Descent.Portability.NonnegativeCoalescenceRealization
 import Descent.Portability.PartialHaplotypeMicroscopicStages
 import Descent.Portability.NeutralPolynomialSemigroup
 import Descent.Portability.NonnegativeIntegrableRealization
+import Descent.Portability.ResamplingWindowSemigroup
+import Descent.Portability.ResamplingWindowConsistency
+import Descent.Portability.ReferenceExperimentRegion
+import Descent.Portability.NeutralRateLipschitz
+import Descent.Portability.NeutralIntegrableRateRealization
 
 assert_below Descent.Program
 

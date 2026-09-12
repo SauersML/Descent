@@ -28,6 +28,10 @@ import Descent.Pangenome.AncestralLocality.SamplingDuality
 import Descent.Pangenome.AncestralLocality.SupercriticalBranches
 import Descent.Pangenome.AncestralLocality.SupercriticalReach
 import Descent.Pangenome.AncestralLocality.SupportChainDynkin
+import Descent.Pangenome.AncestralLocality.AnnotatedKernel
+import Descent.Pangenome.AncestralLocality.CircuitCoupling
+import Descent.Pangenome.AncestralLocality.SupercriticalLowerBound
+import Descent.Pangenome.AncestralLocality.BreadthFirstDomination
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program

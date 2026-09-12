@@ -11,6 +11,8 @@ import Descent.Pangenome.AncestralLocality.FeatureKingmanLimit
 import Descent.Pangenome.AncestralLocality.AnnotatedKernel
 import Descent.Pangenome.AncestralLocality.DecisionDualMoments
 import Descent.Pangenome.AncestralLocality.CylinderWindowProjection
+import Descent.Pangenome.AncestralLocality.CircuitCoupling
+import Descent.Pangenome.AncestralLocality.SupercriticalLowerBound
 import Descent.Portability.ResamplingWindowSemigroup
 import Descent.Portability.ResamplingWindowConsistency
 import Descent.Pangenome.AncestralLocality.CoalescentDualSemigroup
@@ -121,6 +123,10 @@ independent complexity bounds and a quantitative light cone.
   `tendsto_graphProb_reach_giant`). With the degree-normalized rates the closure itself is the
   observation on the reach of `G(m, α/m)`, so (6.1) bounds the closure
   (`RandomClosure.iterate_refinementStep_degreeRate`, `graphExpect_card_directedReach_le`).
+  Without the giant component theorem, for `α > 1` every feature eventually lies in a component
+  of at least `K` features with probability at least `s - ε`
+  (`SupercriticalLowerBound.eventually_graphProb_card_reach_ge`), so large components hold at
+  least `(s - ε) m` features in expectation (`eventually_graphExpect_card_large_ge`).
 * §4.1 and §7.1, the diffusion generator: `AncestralForwardGenerator`. For `c = 1` the
   finite-population chain (4.5) on the `N`-generation scale has generator (7.1) on polynomial
   observables (`tendsto_nextGenerationMean`), and on the eight-state witness the derivatives of
@@ -198,7 +204,11 @@ independent complexity bounds and a quantitative light cone.
   unchanged (`truncatedRate_of_mem`) and coincides with the full circuit along every run with no
   outside-checking event (`runCircuit_truncatedStep_eq`, `totalVariation_truncated_le`). §9.1:
   `20 e³ ∈ [401.7, 401.72]` (`twenty_mul_exp_three_mem_Icc`) and
-  `20 e (2e/20)^20 ≤ 2.64 × 10⁻¹⁰` (`escapeBound_twenty_le`).
+  `20 e (2e/20)^20 ≤ 2.64 × 10⁻¹⁰` (`escapeBound_twenty_le`). For the circuit truncated after `M`
+  decisions the coupling is its own law: inputs agreeing on the ball give sample laws within the
+  escape probability (`CircuitCoupling.totalVariation_supportChainLaw_inputs_le`, at the radius of
+  (9.2) `totalVariation_supportChainLaw_inputs_le_radius`), and so does the checking graph
+  truncated to the ball (`totalVariation_truncatedSupportChain_le`).
 
 Scope. Of the single-feature Kingman limit behind Theorem 3 only the pair of lineages is proved,
 as convergence of the distribution function.

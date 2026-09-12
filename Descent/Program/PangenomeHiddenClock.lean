@@ -51,6 +51,8 @@ import Descent.Pangenome.GraphCoalescent.ConnectionClockLowerBound
 import Descent.Pangenome.GraphCoalescent.LambdaLoadOutcome
 import Descent.Pangenome.GraphCoalescent.EdgeClockConnectionLaw
 import Descent.Pangenome.GraphCoalescent.UniformizationIdentity
+import Descent.Pangenome.GraphCoalescent.LeadingCoefficientBridges
+import Descent.Pangenome.GraphCoalescent.RankedHistoryTies
 import Descent.Pangenome.GraphCoalescent.MinimalHistoryLumping
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionSpectrum
 import Descent.Pangenome.GraphCoalescent.ScaledConnectionLimit
@@ -272,7 +274,10 @@ inside it.
   `prod_hiddenLoad_bot_le_of_isBalancedFibers`; the leading coefficient is maximal exactly on
   balanced profiles
   (`LeadingCoefficientCorollaries.leadingCoefficient_maximal_iff_isBalancedFibers`), and (E1)
-  agrees with the table rows (`table_two_two_two`).
+  agrees with the table rows (`table_two_two_two`). The degree of `C_c` is exactly `n - w + 1`
+  (`LeadingCoefficientBridges.natDegree_connectivityCumulant_eq`), and the minimal connecting
+  histories number `(w - 1)! [z^{n-w+1}] C_c(z) / 2^{w-1}`
+  (`minimalHistoryCount_eq_coeff_cumulantOfSizes`).
 * Theorem E, (E2): `MinimalHistoryLumping`. Started at the singletons, the report of an interface
   of width `w ≥ 2` is connected at time `t` with probability
   `(∏_i c_i)(2n - w)!/(2^{w-2}(2n - 2w + 2)!) t^{w-1} + O(t^w)`
@@ -304,11 +309,13 @@ as the survival-function inequality
 `survivalAt_connectionTimeLaw_bot_le`); no quantile coupling is constructed. The lower bound of
 (C4) holds pathwise: the phases above `n - w + 1` sum to at most the connection time, so
 `Σ_{k=n-w+2}^n Exp(d_k) ≤_st τ_q` (`ConnectionClockLowerBound.sum_top_levels_le_connectionTime`,
-`kingmanClock_sum_top_levels_lt_le`). (D4) is proved by
-Kingman's backward
-recursion, without enumerating ranked histories. §9 is proved for a finite hidden jump process
-given by its generator, with the load chain's generator `loadGenerator` written from the rates of
-Theorem A. (E1) is proved from the Möbius sum rather than the ranked-history law. (E2) is proved
+`kingmanClock_sum_top_levels_lt_le`). (D4) is proved by Kingman's backward recursion and also by
+counting ranked merger histories, which gives (D5) and (E1) the same way
+(`RankedHistoryTies.blockLaw_toReal_eq_rankedHistoryCount`,
+`reportConnectedProbability_eq_sum_rankedHistoryCount`,
+`sum_rankedHistoryCount_mul_prod_eq_leadingCoefficient`). §9 is proved for a finite hidden jump
+process given by its generator, with the load chain's generator `loadGenerator` written from the
+rates of Theorem A. (E2) is proved
 for the weight of the connected reports in the matrix exponential of Kingman's generator; the
 continuous-time chain as a process is not constructed. The first-step law of the connection time
 is the law of the trajectory clock and of the first hitting time of `⊤`

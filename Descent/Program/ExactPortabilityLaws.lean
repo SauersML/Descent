@@ -130,6 +130,7 @@ import Descent.Portability.MixingLawReplicaBias
 import Descent.Portability.ReferenceExperimentCohortRows
 import Descent.Portability.ReferenceExperimentRows
 import Descent.Portability.ReferenceExperimentAtomTable
+import Descent.Portability.ReferenceExperimentRegion
 import Descent.Portability.CylinderGaussianQuadrant
 import Descent.Portability.CylinderComputableCertificate
 import Descent.Portability.MultinomialHistoryRealization
@@ -372,7 +373,9 @@ real quantifier elimination, which the note uses to eliminate parameters from (8
 available at this pin. Equations
 (20), (28) and (29) take the pointwise bounds `0 ≤ D ≤ 1`, as the corpus
 certificates do. Theorem 1 makes no complexity claim and covers no infinite branch set. Of §9,
-the 3960 shared-context count and the full-square range table are not yet proof-checked; the
+the 3960 shared-context count is not yet proof-checked; the full-square range table of both
+migration histories is proved in `ReferenceExperimentRegion` (`early_target_r2_range`,
+`late_r2Portability_range`, `range_attained`); the
 population target rows of both migration histories are proved in `ReferenceExperimentRows`, from
 the four corner certificates through the tabled atom masses (`ReferenceExperimentAtomTable`), and
 the size-three cohort rows in `ReferenceExperimentCohortRows`.

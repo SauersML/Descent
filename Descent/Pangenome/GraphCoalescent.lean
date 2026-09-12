@@ -26,6 +26,7 @@ import Descent.Pangenome.GraphCoalescent.HiddenStateChain
 import Descent.Pangenome.GraphCoalescent.LahWeights
 import Descent.Pangenome.GraphCoalescent.LambdaLoadClosure
 import Descent.Pangenome.GraphCoalescent.LeadingCoefficient
+import Descent.Pangenome.GraphCoalescent.LeadingCoefficientBridges
 import Descent.Pangenome.GraphCoalescent.LeadingCoefficientCorollaries
 import Descent.Pangenome.GraphCoalescent.LumpingUnorderedPair
 import Descent.Pangenome.GraphCoalescent.LumpingVisibleRates
@@ -63,6 +64,8 @@ import Descent.Pangenome.GraphCoalescent.UniformizationIdentity
 import Descent.Pangenome.GraphCoalescent.Visibility
 import Descent.Pangenome.GraphCoalescent.VisibleIntensityClock
 import Descent.Pangenome.GraphCoalescent.WidthProfile
+import Descent.Pangenome.GraphCoalescent.RankedHistoryTies
+import Descent.Pangenome.GraphCoalescent.LambdaLoadOutcome
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program
