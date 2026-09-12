@@ -35,6 +35,54 @@ the generator (`hasDerivAt_holdingSemigroup_apply`), satisfies `S_{-u} S_t = S_{
 `decisionSubstitution r T n`, `f ↦ ∑_e r_e ∑_a B_{a,e} f`, which raises the arity by one and has
 norm at most `n R` (`norm_decisionSubstitution_le`).
 
+## The Dyson terms
+
+`dysonMoment c r T p k n t f` is the expectation of `H_{f_t}(p)` on the runs of the circuit that
+take exactly `k` decisions by time `t`: `H_{S_t f}(p)` for `k = 0` (`dysonMoment_zero_apply`),
+and for `k + 1` the integral over the time of the first decision of the term of arity `n + 1`,
+`d_{k+1}(t, f) = ∫_0^t d_k(u, B S_{t-u} f) du` (`dysonMoment_succ_eq_integral`). It is written
+against the indicators of the tuples, so it is linear by construction. Every term is continuous in
+time (`continuous_dysonMoment_apply`) and has derivative `d_{k+1}(t, K f) + d_k(t, B f)`
+(`hasDerivAt_dysonMoment_zero`, `hasDerivAt_dysonMoment_succ`).
+
+## The number of decisions
+
+`yuleWeight R k n t` is the probability that a Yule process in which each argument branches at
+rate `R`, started from `n` arguments, has exactly `k` births by time `t`. Every Dyson term is at
+most its Yule weight times the sup norm (`abs_dysonMoment_le`). The weights have mass at most one
+(`sum_range_yuleWeight_le_one`), and `(n + M)(1 - ∑_{k<M} w_k) ≤ n e^{Rt}`
+(`mul_one_sub_sum_range_yuleWeight_le`): at least `M` decisions by time `t` have probability at
+most `n e^{Rt} / (n + M)`. So the weights sum to one (`tsum_yuleWeight_eq_one`), and the circuit,
+with its linear birth rate, does not explode.
+
+## The dual expectation and the moment equation
+
+`truncatedDual c r T p M n t f` is the dual expectation of the circuit killed at its `M`-th
+decision, and `decisionDual c r T p n t f`, the sum of all Dyson terms, is `E_f[H_{f_t}(p)]`. For
+`c ≥ 0`, `r ≥ 0`, a probability vector `p` and `t ≥ 0` the truncated circuits converge to it
+(`tendsto_truncatedDual`) within `n e^{Rt} ‖f‖ / (n + M)`
+(`abs_decisionDual_sub_truncatedDual_le_exp`), uniformly on `[0, τ]`, so the dual expectation is
+continuous in time (`continuousOn_decisionDual`). It is at most `‖f‖` (`abs_decisionDual_le`),
+linear (`decisionDual_add`, `decisionDual_smul`), and starts at `H_f(p)`
+(`decisionDual_zero_time`).
+
+The truncated circuits obey Dynkin's formula (`hasDerivAt_truncatedDual`), and dominated
+convergence carries its integrated form to the limit (`decisionDual_sub_eq_integral`). Read
+through the backward generator of `SamplingDuality` (`decisionDual_holdingGenerator_add`), this is
+the moment equation of Theorem 6, `D_t f - H_f(p) = ∫_0^t (c ∑_{a<b} (D_s(C_ab f) - D_s f) +
+∑_e r_e ∑_a (D_s(B_{a,e} f) - D_s f)) ds` for `t ≥ 0` (`decisionDual_moment_equation`), with its
+derivative form for `t > 0` (`hasDerivAt_decisionDual_moment_equation`).
+
+Scope. The state space and the event set are finite, `c ≥ 0`, `r ≥ 0`, and the bounds hold at a
+probability vector `p`. No path space is constructed: the circuit is represented by its expansion
+over the number of decisions, and the partial sums are the expectations on the event of fewer than
+`M` decisions, the circuit killed at its `M`-th decision, not the chain of `SupportChainDynkin`
+in which further decisions are suppressed. The Yule weights are defined by the first-birth
+recursion and are not identified with a Yule process on a probability space. The moment equation
+is proved for the dual expectation only; the duality (7.5) also needs the uniqueness of moment
+families that obey it and the forward equation of the population process, neither of which is in
+this file.
+
 ## Empirical status
 
 None. The bodies here are linear operators, their exponentials, integrals and series over a
