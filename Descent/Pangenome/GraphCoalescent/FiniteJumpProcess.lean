@@ -184,7 +184,7 @@ theorem stateAt_eq_of_mem_Ico {path : ℕ → S × ℝ} (hpos : ∀ j, 0 ≤ (pa
     stateAt path t = some (path k).1 := by
   refine stateAt_eq_some_iff.mpr
     ⟨k + 1, fuelState_of_jumpTime_le k path t (fun j hj ↦ ?_) ht.2⟩
-  exact le_trans (Finset.sum_le_sum_of_subset_of_nonneg (Finset.range_subset.mpr hj)
+  exact le_trans (Finset.sum_le_sum_of_subset_of_nonneg (Finset.range_subset_range.mpr hj)
     fun i _ _ ↦ hpos i) ht.1
 
 end Paths
@@ -235,9 +235,10 @@ theorem map_consSeq_infinitePi {X : Type*} [MeasurableSpace X] (P : Measure X)
   have hpreimage := Finset.prod_preimage (fun i : ℕ ↦ i + 1) s hinj
     (fun k ↦ if k = 0 then (1 : ℝ≥0∞) else P (t k)) hone
   simp only [Nat.add_one_ne_zero, ↓reduceIte] at hpreimage
+  have hmt : ∀ i ∈ s.preimage (fun i : ℕ ↦ i + 1) hinj, MeasurableSet (t (i + 1)) := fun i hi ↦
+    ht (i + 1) ((Finset.mem_preimage (f := fun k : ℕ ↦ k + 1)).mp hi)
   rw [Measure.map_apply measurable_consSeq (MeasurableSet.pi s.countable_toSet ht), hpre,
-    Measure.prod_prod,
-    Measure.infinitePi_pi _ fun i hi ↦ ht (i + 1) (Finset.mem_preimage.mp hi), hpreimage]
+    Measure.prod_prod, Measure.infinitePi_pi _ hmt, hpreimage]
   by_cases h0 : 0 ∈ s
   · have hset : {a : X | 0 ∈ s → a ∈ t 0} = t 0 := by
       ext a
@@ -268,6 +269,12 @@ theorem consSeq_succ_shift {X : Type*} (a : X) (ω : ℕ → X) (k : ℕ) :
     consSeq a ω (k + 1) = consSeq (ω 0) (fun j ↦ ω (j + 1)) k := by
   cases k <;> rfl
 
+theorem sum_kernel {S : Type*} [Fintype S] (kernel : S → PMF S) (x : S) :
+    ∑ z, kernel x z = 1 := by
+  have h := PMF.tsum_coe (kernel x)
+  rw [tsum_fintype] at h
+  exact h
+
 /-! ### The path measure of the jump process -/
 
 section Law
@@ -296,10 +303,6 @@ theorem stepMeasure_map_eval {rate : S → ℝ} (hrate : ∀ x, 0 < rate x) (ker
     Coalescent.holdMeasure_isProbabilityMeasure (hrate y)
   exact (measurePreserving_eval
     (fun y ↦ (kernel y).toMeasure.prod (Coalescent.holdMeasure (rate y))) x).map_eq
-
-theorem sum_kernel (kernel : S → PMF S) (x : S) : ∑ z, kernel x z = 1 := by
-  rw [← tsum_fintype]
-  exact PMF.tsum_coe (kernel x)
 
 /-- Integrating a function of the draw made for `x` sums over the target and integrates over the
 holding time. -/
@@ -407,7 +410,9 @@ theorem measurable_fuelProb_sub (rate : S → ℝ) (hrate : ∀ x, 0 < rate x) (
     (m : ℕ) (z : S) (t : ℝ) (o : Option S) :
     Measurable fun h : ℝ ↦ fuelProb rate hrate kernel m z (t - h) o := by
   haveI := pathMeasure_isProbabilityMeasure hrate kernel
-  have h1 := (measurable_jumpHoldSeq (S := S) z).comp (measurable_snd (α := ℝ))
+  have h1 : Measurable ((fun ω : ℕ → S → S × ℝ ↦ jumpHoldSeq ω z)
+      ∘ (Prod.snd : ℝ × (ℕ → S → S × ℝ) → ℕ → S → S × ℝ)) :=
+    (measurable_jumpHoldSeq z).comp measurable_snd
   have h2 : Measurable fun q : ℝ × (ℕ → S → S × ℝ) ↦ t - q.1 := by fun_prop
   have hm := h1.prodMk h2
   exact measurable_measure_prodMk_left (ν := pathMeasure rate hrate kernel)
@@ -519,6 +524,7 @@ theorem pathMeasure_jumpHold_cylinder (rate : S → ℝ) (hrate : ∀ x, 0 < rat
           = (fun b : S → S × ℝ ↦ b x) ⁻¹' ({states 0} ×ˢ sets 0) := by
         ext b
         simp [Set.mem_prod]
+      haveI := Coalescent.holdMeasure_isProbabilityMeasure (hrate x)
       rw [hset, ← Measure.map_apply (measurable_pi_apply x)
           ((measurableSet_singleton (states 0)).prod (hsets 0)),
         stepMeasure_map_eval hrate kernel x, Measure.prod_prod,
@@ -532,7 +538,8 @@ theorem pathMeasure_jumpHold_cylinder (rate : S → ℝ) (hrate : ∀ x, 0 < rat
                 (jumpHoldSeq ω (states 0) k).2 ∈ sets (k + 1)}) a := by
       intro a
       by_cases ha : (a x).1 = states 0 ∧ (a x).2 ∈ sets 0
-      · rw [Set.indicator_of_mem ha]
+      · have ha' : a ∈ {b : S → S × ℝ | (b x).1 = states 0 ∧ (b x).2 ∈ sets 0} := ha
+        rw [Set.indicator_of_mem ha']
         obtain ⟨ha1, ha2⟩ := ha
         congr 1
         ext ω'
@@ -545,7 +552,8 @@ theorem pathMeasure_jumpHold_cylinder (rate : S → ℝ) (hrate : ∀ x, 0 < rat
           cases k with
           | zero => exact ⟨ha1, ha2⟩
           | succ k => exact h k (by omega)
-      · rw [Set.indicator_of_notMem ha]
+      · have ha' : a ∉ {b : S → S × ℝ | (b x).1 = states 0 ∧ (b x).2 ∈ sets 0} := ha
+        rw [Set.indicator_of_notMem ha']
         have hempty : {ω' : ℕ → S → S × ℝ | consSeq a ω' ∈
             {ω : ℕ → S → S × ℝ | ∀ k < m + 1, jumpState ω x (k + 1) = states k ∧
               (jumpHoldSeq ω x k).2 ∈ sets k}} = ∅ := by
@@ -585,8 +593,7 @@ theorem holdJumpGenerator_isMetzler {rate : S → ℝ} (hrate : ∀ x, 0 < rate 
   exact mul_nonneg (hrate x).le ENNReal.toReal_nonneg
 
 theorem sum_toReal_kernel (kernel : S → PMF S) (x : S) : ∑ y, (kernel x y).toReal = 1 := by
-  rw [← ENNReal.toReal_sum fun y _ ↦ PMF.apply_ne_top _ _, ← tsum_fintype, PMF.tsum_coe,
-    ENNReal.toReal_one]
+  rw [← ENNReal.toReal_sum fun y _ ↦ PMF.apply_ne_top _ _, sum_kernel, ENNReal.toReal_one]
 
 /-- The rows of the generator sum to zero. -/
 theorem sum_holdJumpGenerator (rate : S → ℝ) (kernel : S → PMF S) (x : S) :
@@ -643,8 +650,8 @@ theorem exp_smul_holdJumpGenerator_nonneg {rate : S → ℝ} (hrate : ∀ x, 0 <
 /-- **The rows of `e^{tG}` sum to one.** -/
 theorem sum_exp_smul_holdJumpGenerator (rate : S → ℝ) (kernel : S → PMF S) (t : ℝ) (x : S) :
     ∑ y, NormedSpace.exp ℝ (t • holdJumpGenerator rate kernel) x y = 1 := by
-  have hderiv : ∀ u, HasDerivAt
-      (fun v ↦ ∑ y, NormedSpace.exp ℝ (v • holdJumpGenerator rate kernel) x y) 0 u := by
+  have hderiv : ∀ u : ℝ, HasDerivAt
+      (fun v : ℝ ↦ ∑ y, NormedSpace.exp ℝ (v • holdJumpGenerator rate kernel) x y) 0 u := by
     intro u
     have h := HasDerivAt.fun_sum (u := Finset.univ) fun y _ ↦
       hasDerivAt_exp_smul_apply (holdJumpGenerator rate kernel) x y u
@@ -709,7 +716,7 @@ theorem ofReal_exp_smul_apply_eq_firstJump {rate : S → ℝ} (hrate : ∀ x, 0 
         + ∑ z, kernel x z * ∫⁻ h in Set.Iic t,
             ENNReal.ofReal (NormedSpace.exp ℝ ((t - h) • holdJumpGenerator rate kernel) z y)
           ∂Coalescent.holdMeasure (rate x) := by
-  have hnonneg : ∀ u, 0 ≤ u → ∀ z,
+  have hnonneg : ∀ u : ℝ, 0 ≤ u → ∀ z,
       0 ≤ NormedSpace.exp ℝ (u • holdJumpGenerator rate kernel) z y :=
     fun u hu z ↦ exp_smul_holdJumpGenerator_nonneg hrate kernel hu z y
   have hFcont : Continuous fun h : ℝ ↦ ∑ z, (kernel x z).toReal
