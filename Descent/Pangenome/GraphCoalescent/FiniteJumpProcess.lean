@@ -264,6 +264,310 @@ theorem infinitePi_eq_lintegral_consSeq {X : Type*} [MeasurableSpace X] (P : Mea
   rw [Measure.map_apply measurable_consSeq hE, Measure.prod_apply (measurable_consSeq hE)] at h1
   exact h1.symm
 
+theorem consSeq_succ_shift {X : Type*} (a : X) (ω : ℕ → X) (k : ℕ) :
+    consSeq a ω (k + 1) = consSeq (ω 0) (fun j ↦ ω (j + 1)) k := by
+  cases k <;> rfl
+
+/-! ### The path measure of the jump process -/
+
+section Law
+
+variable {S : Type*} [Fintype S] [MeasurableSpace S] [MeasurableSingletonClass S]
+
+/-- **The randomness of one step**: for every state `x`, an independent target drawn from
+`kernel x` and an independent holding time of rate `rate x`. -/
+def stepMeasure (rate : S → ℝ) (kernel : S → PMF S) : Measure (S → S × ℝ) :=
+  Measure.pi fun x ↦ (kernel x).toMeasure.prod (Coalescent.holdMeasure (rate x))
+
+theorem stepMeasure_isProbabilityMeasure {rate : S → ℝ} (hrate : ∀ x, 0 < rate x)
+    (kernel : S → PMF S) : IsProbabilityMeasure (stepMeasure rate kernel) := by
+  haveI : ∀ x, IsProbabilityMeasure (Coalescent.holdMeasure (rate x)) := fun x ↦
+    Coalescent.holdMeasure_isProbabilityMeasure (hrate x)
+  unfold stepMeasure
+  infer_instance
+
+/-- The draw made for the state `x` at one step is a target from `kernel x` with an independent
+holding time of rate `rate x`. -/
+theorem stepMeasure_map_eval {rate : S → ℝ} (hrate : ∀ x, 0 < rate x) (kernel : S → PMF S)
+    (x : S) :
+    (stepMeasure rate kernel).map (fun a : S → S × ℝ ↦ a x)
+      = (kernel x).toMeasure.prod (Coalescent.holdMeasure (rate x)) := by
+  haveI : ∀ y, IsProbabilityMeasure (Coalescent.holdMeasure (rate y)) := fun y ↦
+    Coalescent.holdMeasure_isProbabilityMeasure (hrate y)
+  exact (measurePreserving_eval
+    (fun y ↦ (kernel y).toMeasure.prod (Coalescent.holdMeasure (rate y))) x).map_eq
+
+theorem sum_kernel (kernel : S → PMF S) (x : S) : ∑ z, kernel x z = 1 := by
+  rw [← tsum_fintype]
+  exact PMF.tsum_coe (kernel x)
+
+/-- Integrating a function of the draw made for `x` sums over the target and integrates over the
+holding time. -/
+theorem lintegral_stepMeasure_eval {rate : S → ℝ} (hrate : ∀ x, 0 < rate x)
+    (kernel : S → PMF S) (x : S) {F : S × ℝ → ℝ≥0∞} (hF : Measurable F) :
+    ∫⁻ a, F (a x) ∂stepMeasure rate kernel
+      = ∑ z, kernel x z * ∫⁻ h, F (z, h) ∂Coalescent.holdMeasure (rate x) := by
+  haveI := Coalescent.holdMeasure_isProbabilityMeasure (hrate x)
+  rw [← lintegral_map hF (measurable_pi_apply x), stepMeasure_map_eval hrate kernel x,
+    lintegral_prod _ hF.aemeasurable, lintegral_fintype (μ := (kernel x).toMeasure)]
+  refine Finset.sum_congr rfl fun z _ ↦ ?_
+  rw [PMF.toMeasure_apply_singleton _ _ (measurableSet_singleton z), mul_comm]
+
+/-- **The path measure**: an independent step at every time `k`. -/
+def pathMeasure (rate : S → ℝ) (hrate : ∀ x, 0 < rate x) (kernel : S → PMF S) :
+    Measure (ℕ → S → S × ℝ) :=
+  haveI := stepMeasure_isProbabilityMeasure hrate kernel
+  Measure.infinitePi fun _ : ℕ ↦ stepMeasure rate kernel
+
+theorem pathMeasure_isProbabilityMeasure {rate : S → ℝ} (hrate : ∀ x, 0 < rate x)
+    (kernel : S → PMF S) : IsProbabilityMeasure (pathMeasure rate hrate kernel) := by
+  haveI := stepMeasure_isProbabilityMeasure hrate kernel
+  unfold pathMeasure
+  infer_instance
+
+/-- **The state after `k` jumps from `x`**: each jump reads the target drawn at that step for the
+current state. -/
+def jumpState : (ℕ → S → S × ℝ) → S → ℕ → S
+  | _, x, 0 => x
+  | ω, x, k + 1 => jumpState (fun j ↦ ω (j + 1)) (ω 0 x).1 k
+
+/-- **The sequence of sojourns from `x`**: the state after `k` jumps with its holding time. -/
+def jumpHoldSeq (ω : ℕ → S → S × ℝ) (x : S) (k : ℕ) : S × ℝ :=
+  (jumpState ω x k, (ω k (jumpState ω x k)).2)
+
+/-- After the first step the sojourns from `x` are the sojourns of the remaining steps from the
+first target, so following `m + 1` sojourns is the first-step recursion. -/
+theorem fuelState_jumpHoldSeq_consSeq (m : ℕ) (a : S → S × ℝ) (ω : ℕ → S → S × ℝ) (x : S)
+    (t : ℝ) :
+    fuelState (m + 1) (jumpHoldSeq (consSeq a ω) x) t
+      = if t < (a x).2 then some x
+        else fuelState m (jumpHoldSeq ω (a x).1) (t - (a x).2) := rfl
+
+theorem measurable_jumpState (x : S) (k : ℕ) :
+    Measurable fun ω : ℕ → S → S × ℝ ↦ jumpState ω x k := by
+  induction k generalizing x with
+  | zero => exact measurable_const
+  | succ k ih =>
+    have hjoint : Measurable fun p : S × (ℕ → S → S × ℝ) ↦ jumpState p.2 p.1 k :=
+      measurable_from_prod_countable_right fun z ↦ ih z
+    have hpair : Measurable fun ω : ℕ → S → S × ℝ ↦ ((ω 0 x).1, fun j ↦ ω (j + 1)) := by
+      fun_prop
+    have h := hjoint.comp hpair
+    exact h
+
+theorem measurable_jumpHoldSeq (x : S) :
+    Measurable fun ω : ℕ → S → S × ℝ ↦ jumpHoldSeq ω x := by
+  refine measurable_pi_lambda _ fun k ↦ ?_
+  have hhold : Measurable fun p : S × (ℕ → S → S × ℝ) ↦ (p.2 k p.1).2 :=
+    measurable_from_prod_countable_right fun z ↦ by
+      show Measurable fun ω : ℕ → S → S × ℝ ↦ (ω k z).2
+      fun_prop
+  have hpair : Measurable fun ω : ℕ → S → S × ℝ ↦ (jumpState ω x k, ω) :=
+    (measurable_jumpState x k).prodMk measurable_id
+  have h := (measurable_jumpState x k).prodMk (hhold.comp hpair)
+  exact h
+
+theorem measurableSet_fuelState (m : ℕ) (o : Option S) :
+    MeasurableSet {p : (ℕ → S × ℝ) × ℝ | fuelState m p.1 p.2 = o} := by
+  induction m generalizing o with
+  | zero =>
+    have hset : {p : (ℕ → S × ℝ) × ℝ | fuelState 0 p.1 p.2 = o} = {_p | none = o} := rfl
+    rw [hset]
+    exact MeasurableSet.const _
+  | succ m ih =>
+    have hlt : MeasurableSet {p : (ℕ → S × ℝ) × ℝ | p.2 < (p.1 0).2} :=
+      measurableSet_lt (by fun_prop) (by fun_prop)
+    have hstate : MeasurableSet {p : (ℕ → S × ℝ) × ℝ | some (p.1 0).1 = o} := by
+      have hm : Measurable fun p : (ℕ → S × ℝ) × ℝ ↦ (p.1 0).1 := by fun_prop
+      exact hm (Set.toFinite {x : S | some x = o}).measurableSet
+    have hshift : Measurable fun p : (ℕ → S × ℝ) × ℝ ↦
+        ((fun k ↦ p.1 (k + 1)), p.2 - (p.1 0).2) := by fun_prop
+    have hset : {p : (ℕ → S × ℝ) × ℝ | fuelState (m + 1) p.1 p.2 = o}
+        = ({p | p.2 < (p.1 0).2} ∩ {p | some (p.1 0).1 = o})
+          ∪ ({p | p.2 < (p.1 0).2}ᶜ ∩ (fun p : (ℕ → S × ℝ) × ℝ ↦
+            ((fun k ↦ p.1 (k + 1)), p.2 - (p.1 0).2)) ⁻¹' {q | fuelState m q.1 q.2 = o}) := by
+      ext p
+      by_cases h : p.2 < (p.1 0).2 <;> simp [fuelState_succ, h]
+    rw [hset]
+    exact (hlt.inter hstate).union (hlt.compl.inter (hshift (ih o)))
+
+theorem measurableSet_fuelEvent (m : ℕ) (x : S) (t : ℝ) (o : Option S) :
+    MeasurableSet {ω : ℕ → S → S × ℝ | fuelState m (jumpHoldSeq ω x) t = o} := by
+  have hm : Measurable fun ω : ℕ → S → S × ℝ ↦ (jumpHoldSeq ω x, t) :=
+    (measurable_jumpHoldSeq x).prodMk measurable_const
+  exact hm (measurableSet_fuelState m o)
+
+/-- **The probability that the chain from `x`, following at most `m` sojourns, is at `o` at time
+`t`.** -/
+def fuelProb (rate : S → ℝ) (hrate : ∀ x, 0 < rate x) (kernel : S → PMF S) (m : ℕ) (x : S)
+    (t : ℝ) (o : Option S) : ℝ≥0∞ :=
+  pathMeasure rate hrate kernel {ω | fuelState m (jumpHoldSeq ω x) t = o}
+
+theorem measurable_fuelProb_sub (rate : S → ℝ) (hrate : ∀ x, 0 < rate x) (kernel : S → PMF S)
+    (m : ℕ) (z : S) (t : ℝ) (o : Option S) :
+    Measurable fun h : ℝ ↦ fuelProb rate hrate kernel m z (t - h) o := by
+  haveI := pathMeasure_isProbabilityMeasure hrate kernel
+  have h1 := (measurable_jumpHoldSeq (S := S) z).comp (measurable_snd (α := ℝ))
+  have h2 : Measurable fun q : ℝ × (ℕ → S → S × ℝ) ↦ t - q.1 := by fun_prop
+  have hm := h1.prodMk h2
+  exact measurable_measure_prodMk_left (ν := pathMeasure rate hrate kernel)
+    (hm (measurableSet_fuelState m o))
+
+/-- The value of the first-step decomposition at a jump to `p.1` after the holding time `p.2`. -/
+def firstStepValue (rate : S → ℝ) (hrate : ∀ x, 0 < rate x) (kernel : S → PMF S) (m : ℕ)
+    (x : S) (t : ℝ) (o : Option S) (p : S × ℝ) : ℝ≥0∞ :=
+  if t < p.2 then (if some x = o then 1 else 0) else fuelProb rate hrate kernel m p.1 (t - p.2) o
+
+theorem measurable_firstStepValue (rate : S → ℝ) (hrate : ∀ x, 0 < rate x)
+    (kernel : S → PMF S) (m : ℕ) (x : S) (t : ℝ) (o : Option S) :
+    Measurable (firstStepValue rate hrate kernel m x t o) := by
+  refine measurable_from_prod_countable_right fun z ↦ ?_
+  show Measurable fun h : ℝ ↦
+    if t < h then (if some x = o then (1 : ℝ≥0∞) else 0)
+    else fuelProb rate hrate kernel m z (t - h) o
+  exact Measurable.ite measurableSet_Ioi measurable_const
+    (measurable_fuelProb_sub rate hrate kernel m z t o)
+
+theorem pathMeasure_consSeq_fuelEvent (rate : S → ℝ) (hrate : ∀ x, 0 < rate x)
+    (kernel : S → PMF S) (m : ℕ) (x : S) (t : ℝ) (o : Option S) (a : S → S × ℝ) :
+    pathMeasure rate hrate kernel
+        {ω | consSeq a ω ∈ {ω' : ℕ → S → S × ℝ | fuelState (m + 1) (jumpHoldSeq ω' x) t = o}}
+      = firstStepValue rate hrate kernel m x t o (a x) := by
+  haveI := pathMeasure_isProbabilityMeasure hrate kernel
+  simp only [Set.mem_setOf_eq, fuelState_jumpHoldSeq_consSeq, firstStepValue]
+  by_cases ha : t < (a x).2
+  · by_cases hx : some x = o
+    · simp [ha, hx]
+    · simp [ha, hx]
+  · simp only [ha, ↓reduceIte] <;> rfl
+
+/-- **The first-step decomposition.** Following `m + 1` sojourns from `x`, the chain is at `o` at
+time `t` either because the first holding time exceeds `t` and `o = some x`, or because it jumps
+to `z` at a time `h ≤ t` and, following `m` sojourns from `z`, is at `o` at time `t - h`. -/
+theorem fuelProb_succ (rate : S → ℝ) (hrate : ∀ x, 0 < rate x) (kernel : S → PMF S) (m : ℕ)
+    (x : S) (t : ℝ) (o : Option S) :
+    fuelProb rate hrate kernel (m + 1) x t o
+      = (if some x = o then Coalescent.holdMeasure (rate x) (Set.Ioi t) else 0)
+        + ∑ z, kernel x z * ∫⁻ h in Set.Iic t, fuelProb rate hrate kernel m z (t - h) o
+            ∂Coalescent.holdMeasure (rate x) := by
+  haveI := stepMeasure_isProbabilityMeasure hrate kernel
+  have hsplit : fuelProb rate hrate kernel (m + 1) x t o
+      = ∫⁻ a, firstStepValue rate hrate kernel m x t o (a x) ∂stepMeasure rate kernel := by
+    rw [fuelProb, pathMeasure,
+      infinitePi_eq_lintegral_consSeq _ (measurableSet_fuelEvent (m + 1) x t o)]
+    exact lintegral_congr fun a ↦ pathMeasure_consSeq_fuelEvent rate hrate kernel m x t o a
+  have hvalue : ∀ z, ∫⁻ h, firstStepValue rate hrate kernel m x t o (z, h)
+        ∂Coalescent.holdMeasure (rate x)
+      = (if some x = o then Coalescent.holdMeasure (rate x) (Set.Ioi t) else 0)
+        + ∫⁻ h in Set.Iic t, fuelProb rate hrate kernel m z (t - h) o
+            ∂Coalescent.holdMeasure (rate x) := by
+    intro z
+    have hIoi : ∫⁻ h in Set.Ioi t, firstStepValue rate hrate kernel m x t o (z, h)
+          ∂Coalescent.holdMeasure (rate x)
+        = ∫⁻ _ in Set.Ioi t, (if some x = o then (1 : ℝ≥0∞) else 0)
+          ∂Coalescent.holdMeasure (rate x) :=
+      setLIntegral_congr_fun measurableSet_Ioi fun h hh ↦ if_pos hh
+    have hIic : ∫⁻ h in Set.Iic t, firstStepValue rate hrate kernel m x t o (z, h)
+          ∂Coalescent.holdMeasure (rate x)
+        = ∫⁻ h in Set.Iic t, fuelProb rate hrate kernel m z (t - h) o
+          ∂Coalescent.holdMeasure (rate x) :=
+      setLIntegral_congr_fun measurableSet_Iic fun h hh ↦ if_neg (not_lt.mpr hh)
+    rw [← lintegral_add_compl _ (measurableSet_Ioi (a := t)), Set.compl_Ioi, hIoi, hIic,
+      setLIntegral_const]
+    split_ifs <;> simp
+  rw [hsplit, lintegral_stepMeasure_eval hrate kernel x
+    (measurable_firstStepValue rate hrate kernel m x t o)]
+  simp only [hvalue, mul_add, Finset.sum_add_distrib]
+  rw [← Finset.sum_mul, sum_kernel, one_mul]
+
+/-- **The path measure is the jump chain with independent exponential holding times.** From `x`,
+the probability that the first `m` jumps go to `states 0, …, states (m - 1)` and the holding times
+before them lie in `sets 0, …, sets (m - 1)` is `∏_k kernel(s_k, states k) Exp(rate s_k)(sets k)`,
+with `s_0 = x` and `s_{k+1} = states k`. -/
+theorem pathMeasure_jumpHold_cylinder (rate : S → ℝ) (hrate : ∀ x, 0 < rate x)
+    (kernel : S → PMF S) (m : ℕ) :
+    ∀ (x : S) (states : ℕ → S) (sets : ℕ → Set ℝ), (∀ k, MeasurableSet (sets k)) →
+      pathMeasure rate hrate kernel {ω | ∀ k < m, jumpState ω x (k + 1) = states k ∧
+          (jumpHoldSeq ω x k).2 ∈ sets k}
+        = ∏ k ∈ Finset.range m, kernel (consSeq x states k) (states k)
+            * Coalescent.holdMeasure (rate (consSeq x states k)) (sets k) := by
+  haveI := pathMeasure_isProbabilityMeasure hrate kernel
+  haveI := stepMeasure_isProbabilityMeasure hrate kernel
+  induction m with
+  | zero =>
+    intro x states sets _
+    have hset : {ω : ℕ → S → S × ℝ | ∀ k < 0, jumpState ω x (k + 1) = states k ∧
+        (jumpHoldSeq ω x k).2 ∈ sets k} = Set.univ := by
+      ext ω
+      simp
+    rw [hset, measure_univ, Finset.range_zero, Finset.prod_empty]
+  | succ m ih =>
+    intro x states sets hsets
+    have hE : MeasurableSet {ω : ℕ → S → S × ℝ | ∀ k < m + 1,
+        jumpState ω x (k + 1) = states k ∧ (jumpHoldSeq ω x k).2 ∈ sets k} := by
+      simp only [Set.setOf_forall, Set.setOf_and]
+      refine MeasurableSet.iInter fun k ↦ MeasurableSet.iInter fun _ ↦ ?_
+      have hjump := measurable_jumpState (S := S) x (k + 1)
+      have hhold := measurable_snd.comp ((measurable_pi_apply k).comp (measurable_jumpHoldSeq x))
+      exact (hjump (measurableSet_singleton (states k))).inter (hhold (hsets k))
+    have hA : MeasurableSet {b : S → S × ℝ | (b x).1 = states 0 ∧ (b x).2 ∈ sets 0} := by
+      have hm : Measurable fun b : S → S × ℝ ↦ b x := measurable_pi_apply x
+      exact hm ((measurableSet_singleton (states 0)).prod (hsets 0))
+    have hstep : stepMeasure rate kernel {b : S → S × ℝ | (b x).1 = states 0 ∧ (b x).2 ∈ sets 0}
+        = kernel x (states 0) * Coalescent.holdMeasure (rate x) (sets 0) := by
+      have hset : {b : S → S × ℝ | (b x).1 = states 0 ∧ (b x).2 ∈ sets 0}
+          = (fun b : S → S × ℝ ↦ b x) ⁻¹' ({states 0} ×ˢ sets 0) := by
+        ext b
+        simp [Set.mem_prod]
+      rw [hset, ← Measure.map_apply (measurable_pi_apply x)
+          ((measurableSet_singleton (states 0)).prod (hsets 0)),
+        stepMeasure_map_eval hrate kernel x, Measure.prod_prod,
+        PMF.toMeasure_apply_singleton _ _ (measurableSet_singleton _)]
+    have hpoint : ∀ a : S → S × ℝ, pathMeasure rate hrate kernel {ω' | consSeq a ω' ∈
+          {ω : ℕ → S → S × ℝ | ∀ k < m + 1, jumpState ω x (k + 1) = states k ∧
+            (jumpHoldSeq ω x k).2 ∈ sets k}}
+        = {b : S → S × ℝ | (b x).1 = states 0 ∧ (b x).2 ∈ sets 0}.indicator
+            (fun _ ↦ pathMeasure rate hrate kernel {ω | ∀ k < m,
+              jumpState ω (states 0) (k + 1) = states (k + 1) ∧
+                (jumpHoldSeq ω (states 0) k).2 ∈ sets (k + 1)}) a := by
+      intro a
+      by_cases ha : (a x).1 = states 0 ∧ (a x).2 ∈ sets 0
+      · rw [Set.indicator_of_mem ha]
+        obtain ⟨ha1, ha2⟩ := ha
+        congr 1
+        ext ω'
+        simp only [Set.mem_setOf_eq]
+        rw [← ha1]
+        constructor
+        · intro h k hk
+          exact h (k + 1) (by omega)
+        · intro h k hk
+          cases k with
+          | zero => exact ⟨ha1, ha2⟩
+          | succ k => exact h k (by omega)
+      · rw [Set.indicator_of_notMem ha]
+        have hempty : {ω' : ℕ → S → S × ℝ | consSeq a ω' ∈
+            {ω : ℕ → S → S × ℝ | ∀ k < m + 1, jumpState ω x (k + 1) = states k ∧
+              (jumpHoldSeq ω x k).2 ∈ sets k}} = ∅ := by
+          ext ω'
+          simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+          intro h
+          exact ha (h 0 (by omega))
+        rw [hempty, measure_empty]
+    have hsplit : pathMeasure rate hrate kernel {ω | ∀ k < m + 1, jumpState ω x (k + 1) = states k ∧
+          (jumpHoldSeq ω x k).2 ∈ sets k}
+        = ∫⁻ a, pathMeasure rate hrate kernel {ω' | consSeq a ω' ∈
+          {ω : ℕ → S → S × ℝ | ∀ k < m + 1, jumpState ω x (k + 1) = states k ∧
+            (jumpHoldSeq ω x k).2 ∈ sets k}} ∂stepMeasure rate kernel := by
+      rw [pathMeasure, infinitePi_eq_lintegral_consSeq _ hE]
+    rw [hsplit, lintegral_congr hpoint, lintegral_indicator_const hA, hstep,
+      ih (states 0) (fun k ↦ states (k + 1)) (fun k ↦ sets (k + 1)) (fun k ↦ hsets (k + 1)),
+      Finset.prod_range_succ']
+    refine congrArg₂ (· * ·) (Finset.prod_congr rfl fun k _ ↦ ?_) rfl
+    rw [consSeq_succ_shift]
+
+end Law
+
 end
 
 end Descent.Pangenome.GraphCoalescent.FiniteJumpProcess
