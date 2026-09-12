@@ -35,7 +35,7 @@ Write `K_c(u) = u^n C_c(1/u)` for the reversed cumulant (`deficitCumulant`), so 
   formulas (`esymm_eq_of_cumulantOfSizes_eq_three`).
 - **Symmetric structure.** Every coefficient obeys the merge recursion
   (`coeff_succ_deficitCumulant`), and the cumulant is invariant under relabeling the fibers by any
-  injection (`coeff_deficitCumulant_map`, `cumulantOfSizes_map`).
+  injection (`ConnectivityCumulant.cumulantOfSizes_map`).
 - **A decided separation.** `(6, 6, 1)` and `(9, 2, 2)` on `n = 13` have the same product and
   different cumulants (`cumulantOfSizes_six_six_one_ne_nine_two_two`).
 
@@ -451,83 +451,6 @@ theorem coeff_succ_deficitCumulant (T : Finset ι) (c : ι → ℕ) (hc : ∀ i 
   have h := congrArg (fun p ↦ p.coeff d) (derivative_deficitCumulant T c hc)
   simp only [coeff_derivative, finset_sum_coeff, coeff_add, coeff_C_mul] at h
   exact h
-
-/-- Sizes transported along an embedding stay positive. -/
-theorem fiberSizes_map_pos {κ : Type*} (e : ι ↪ κ) {T : Finset ι} {c : ι → ℕ} {c' : κ → ℕ}
-    (hc : ∀ i ∈ T, 1 ≤ c i) (hcc' : ∀ i ∈ T, c' (e i) = c i) : ∀ k ∈ T.map e, 1 ≤ c' k := by
-  intro k hk
-  obtain ⟨i, hi, rfl⟩ := mem_map.mp hk
-  rw [hcc' i hi]
-  exact hc i hi
-
-/-- **Relabeling the fibers does not change the cumulant**, coefficient by coefficient: by
-induction along the merge recursion.
-
-Assumes: the fiber set is nonempty, every size is positive, and the relabeled sizes agree with the
-original ones. -/
-theorem coeff_deficitCumulant_map {κ : Type*} [DecidableEq κ] (e : ι ↪ κ) :
-    ∀ (d : ℕ) (T : Finset ι) (c : ι → ℕ) (c' : κ → ℕ), T.Nonempty → (∀ i ∈ T, 1 ≤ c i) →
-      (∀ i ∈ T, c' (e i) = c i) →
-        (deficitCumulant (T.map e) c').coeff d = (deficitCumulant T c).coeff d
-  | 0, T, c, c', hT, hc, hcc' => by
-      rw [coeff_zero_deficitCumulant _ _ hT.map (fiberSizes_map_pos e hc hcc'),
-        coeff_zero_deficitCumulant _ _ hT hc, card_map]
-  | d + 1, T, c, c', hT, hc, hcc' => by
-      have h1 := coeff_succ_deficitCumulant (T.map e) c' (fiberSizes_map_pos e hc hcc') d
-      have h2 := coeff_succ_deficitCumulant T c hc d
-      have hd : ((d : ℚ) + 1) ≠ 0 := by positivity
-      refine mul_right_cancel₀ hd (h1.trans (Eq.trans ?_ h2.symm))
-      rw [sum_map, sum_map]
-      congr 1
-      · refine sum_congr rfl fun i hi ↦ ?_
-        rw [hcc' i hi]
-        by_cases hci : c i = 1
-        · simp [hci]
-        · have hmove : ∀ k ∈ T, Function.update c' (e i) (c i - 1) (e k) =
-              Function.update c i (c i - 1) k := by
-            intro k hk
-            by_cases hki : k = i
-            · rw [hki, Function.update_self, Function.update_self]
-            · rw [Function.update_of_ne (e.injective.ne hki), Function.update_of_ne hki,
-                hcc' k hk]
-          rw [coeff_deficitCumulant_map e d T (Function.update c i (c i - 1))
-            (Function.update c' (e i) (c i - 1)) hT (update_pred_pos hc hi hci) hmove]
-      · refine sum_congr rfl fun i hi ↦ ?_
-        rw [← map_erase, sum_map]
-        refine sum_congr rfl fun j hj ↦ ?_
-        have hjT : j ∈ T := mem_of_mem_erase hj
-        have hmove : ∀ k ∈ T.erase j, Function.update c' (e i) (c i + c j - 1) (e k) =
-            Function.update c i (c i + c j - 1) k := by
-          intro k hk
-          by_cases hki : k = i
-          · rw [hki, Function.update_self, Function.update_self]
-          · rw [Function.update_of_ne (e.injective.ne hki), Function.update_of_ne hki,
-              hcc' k (mem_of_mem_erase hk)]
-        rw [hcc' i hi, hcc' j hjT, ← map_erase,
-          coeff_deficitCumulant_map e d (T.erase j) (Function.update c i (c i + c j - 1))
-            (Function.update c' (e i) (c i + c j - 1))
-            ⟨i, mem_erase.mpr ⟨(ne_of_mem_erase hj).symm, hi⟩⟩ (update_fuse_pos hc hi hjT) hmove]
-
-/-- Relabeling the fibers does not change the reversed cumulant.
-
-Assumes: the fiber set is nonempty, every size is positive, and the relabeled sizes agree with the
-original ones. -/
-theorem deficitCumulant_map {κ : Type*} [DecidableEq κ] (e : ι ↪ κ) {T : Finset ι} {c : ι → ℕ}
-    {c' : κ → ℕ} (hT : T.Nonempty) (hc : ∀ i ∈ T, 1 ≤ c i) (hcc' : ∀ i ∈ T, c' (e i) = c i) :
-    deficitCumulant (T.map e) c' = deficitCumulant T c :=
-  Polynomial.ext fun d ↦ coeff_deficitCumulant_map e d T c c' hT hc hcc'
-
-/-- **The symmetric structure.** The connectivity cumulant of the fiber sizes is invariant under
-relabeling the fibers by any injection: it is a symmetric function of the sizes.
-
-Assumes: the fiber set is nonempty, every size is positive, and the relabeled sizes agree with the
-original ones. -/
-theorem cumulantOfSizes_map {κ : Type*} [DecidableEq κ] (e : ι ↪ κ) {T : Finset ι} {c : ι → ℕ}
-    {c' : κ → ℕ} (hT : T.Nonempty) (hc : ∀ i ∈ T, 1 ≤ c i) (hcc' : ∀ i ∈ T, c' (e i) = c i) :
-    cumulantOfSizes (T.map e) c' = cumulantOfSizes T c := by
-  refine Polynomial.map_injective (f := Int.castRingHom ℚ) Int.cast_injective ?_
-  rw [map_cumulantOfSizes _ _ (fiberSizes_map_pos e hc hcc'), map_cumulantOfSizes _ _ hc, sum_map,
-    sum_congr rfl hcc', deficitCumulant_map e hT hc hcc']
 
 end
 
