@@ -461,8 +461,8 @@ theorem eventMoments_zero (capacity : Locus → ℕ) :
         eventMoments capacity events v 0 0 = v
   | [], _, _ => rfl
   | HaplotypeHistoryEvent.epoch rates time :: rest, hdurations, v => by
-    rcases (hdurations _ (List.mem_cons.mpr (Or.inl rfl)) : (0 : ℝ) ≤ time).lt_or_eq with
-      hpositive | hzero
+    have htime : 0 ≤ time := hdurations _ (List.mem_cons.mpr (Or.inl rfl))
+    rcases htime.lt_or_eq with hpositive | hzero
     · simp only [eventMoments, if_pos hpositive, max_self, matrixExponential_zero,
         Matrix.one_mulVec]
     · subst hzero
@@ -573,7 +573,7 @@ theorem forwardOnEventHistory_of_moments (capacity : Locus → ℕ)
       fun other hother ↦ hdurations other (List.mem_cons.mpr (Or.inr hother))
     have hbefore : expectedMomentVector capacity (expectationAt segment) start = v := by
       have h := hmoments 0 start le_rfl
-      simp only [add_zero, sub_self, eventMoments] at h
+      simp only [add_zero, eventMoments] at h
       exact h
     have hafter : expectedMomentVector capacity (expectationAt (segment + 1)) start
         = (pulseKernel weights capacity).mulVec v := by
