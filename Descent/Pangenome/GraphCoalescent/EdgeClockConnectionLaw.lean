@@ -275,7 +275,7 @@ theorem cdf_map_edgeConnectionTime {w : ℕ} {p : Fin w → ℝ} (hp : ∀ i, 0 
     cdf ((edgeClockLaw p).map edgeConnectionTime) x = connectionTimeCDF p x := by
   haveI := isProbabilityMeasure_edgeClockLaw hp
   haveI : IsProbabilityMeasure ((edgeClockLaw p).map edgeConnectionTime) :=
-    isProbabilityMeasure_map (measurable_edgeConnectionTime w).aemeasurable
+    Measure.isProbabilityMeasure_map (measurable_edgeConnectionTime w).aemeasurable
   rw [cdf_eq_real, measureReal_def,
     Measure.map_apply (measurable_edgeConnectionTime w) measurableSet_Iic, connectionTimeCDF]
   split_ifs with hx
@@ -294,8 +294,8 @@ theorem map_edgeConnectionTime_edgeClockLaw {w : ℕ} [NeZero w] {p : Fin w → 
     (edgeClockLaw p).map edgeConnectionTime = (randomGraphConnectionLaw p hp hp1 : Measure ℝ) := by
   haveI := isProbabilityMeasure_edgeClockLaw hp
   haveI : IsProbabilityMeasure ((edgeClockLaw p).map edgeConnectionTime) :=
-    isProbabilityMeasure_map (measurable_edgeConnectionTime w).aemeasurable
-  refine Measure.eq_of_cdf _ _ (funext fun x ↦ ?_)
+    Measure.isProbabilityMeasure_map (measurable_edgeConnectionTime w).aemeasurable
+  refine Measure.eq_of_cdf _ _ (StieltjesFunction.ext fun x ↦ ?_)
   rw [cdf_map_edgeConnectionTime hp x, cdf_randomGraphConnectionLaw]
 
 end
