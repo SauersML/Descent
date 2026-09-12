@@ -193,7 +193,11 @@ theorem resamplingFraction_of_le (rates : NeutralRates Deme Locus Allele) (i : D
     have h1 : stageCount Deme * h * rates.coalescence i
         ≤ h * (stageCount Deme * rateScale rates * (1 + ∑ j, rates.coalescence j)) := by
       have hSh : 0 ≤ stageCount Deme * h := mul_nonneg (by linarith) hh0
-      nlinarith [rates.coalescence_nonneg i]
+      have h2 : stageCount Deme * h * rates.coalescence i
+          ≤ stageCount Deme * h * (1 + ∑ j, rates.coalescence j) :=
+        mul_le_mul_of_nonneg_left (by linarith) hSh
+      nlinarith [mul_nonneg (mul_nonneg hSh (by linarith : (0 : ℝ) ≤ 1 + ∑ j, rates.coalescence j))
+        (by linarith : (0 : ℝ) ≤ rateScale rates - 1)]
     linarith
   rw [resamplingFraction, max_eq_left hh0, min_eq_left]
   rw [Real.sqrt_le_one]
@@ -240,9 +244,9 @@ theorem expansion_small (rates : NeutralRates Deme Locus Allele)
   have hh1 : h ≤ 1 := by
     have hbound := mul_denominator_le_one rates h hh0.le hsmall
     have hc := sum_coalescence_nonneg rates
-    nlinarith [mul_nonneg (by linarith : (0 : ℝ) ≤ stageCount Deme * rateScale rates - 1) hh0.le,
-      mul_nonneg (mul_nonneg (by linarith : (0 : ℝ) ≤ stageCount Deme)
-        (by linarith : (0 : ℝ) ≤ rateScale rates)) (mul_nonneg hh0.le hc)]
+    have hD1 : 1 ≤ stageCount Deme * rateScale rates * (1 + ∑ i, rates.coalescence i) :=
+      one_le_mul_of_one_le_of_one_le (one_le_mul_of_one_le_of_one_le hS hκ) (by linarith)
+    nlinarith [mul_le_mul_of_nonneg_left hD1 hh0.le]
   set εd := driftFraction rates h with hεd
   have hεd_eq : εd = stageCount Deme * h * rateScale rates :=
     driftFraction_of_le rates h hh0.le hsmall
@@ -316,8 +320,7 @@ theorem expansion_small (rates : NeutralRates Deme Locus Allele)
           + B * (∑ i, rates.coalescence i * Real.sqrt (stageCount Deme * rates.coalescence i))
             * Real.sqrt h) := by
         simp only [← Finset.mul_sum, ← Finset.sum_mul]
-        field_simp
-        ring
+        field_simp <;> ring
     _ ≤ h * (smallConstant rates B * Real.sqrt h) := by
         unfold smallConstant
         have hA : 0 ≤ 2 * B * stageCount Deme * rateScale rates ^ 2 := by
@@ -382,7 +385,7 @@ def generatorBound (rates : NeutralRates Deme Locus Allele) (capacity : Locus �
   Classical.choose (exists_lineTaylor_bound (neutralGenerator rates (momentPolynomial ξ.1)))
 
 /-- The sum of the Taylor constants of all configuration moments. -/
-def featureBound (capacity : Locus → ℕ) : ℝ :=
+def featureBound (rates : NeutralRates Deme Locus Allele) (capacity : Locus → ℕ) : ℝ :=
   ∑ ξ : BudgetConfiguration Deme Locus Allele capacity, momentBound capacity ξ
 
 /-- The sum of the Taylor constants of all generator images. -/
@@ -391,9 +394,9 @@ def generatorFeatureBound (rates : NeutralRates Deme Locus Allele) (capacity : L
 
 /-- Each moment constant is nonnegative and at most the summed constant, and bounds the
 moment's Taylor data. -/
-theorem momentBound_spec (capacity : Locus → ℕ)
+theorem momentBound_spec (rates : NeutralRates Deme Locus Allele) (capacity : Locus → ℕ)
     (ξ : BudgetConfiguration Deme Locus Allele capacity) :
-    0 ≤ momentBound capacity ξ ∧ momentBound capacity ξ ≤ featureBound capacity
+    0 ≤ momentBound capacity ξ ∧ momentBound capacity ξ ≤ featureBound rates capacity
       ∧ ∀ x v : FrequencyVariable Deme Locus Allele → ℝ, (∀ u, |x u| ≤ 1) → (∀ u, |v u| ≤ 2) →
         ∀ ε : ℝ, 0 ≤ ε → ε ≤ 1 →
           |eval x (momentPolynomial ξ.1)| ≤ momentBound capacity ξ
@@ -427,8 +430,8 @@ theorem generatorBound_spec (rates : NeutralRates Deme Locus Allele) (capacity :
 /-- The remainder bound of the microscopic approximation. -/
 def microscopicError (rates : NeutralRates Deme Locus Allele) (capacity : Locus → ℕ) (h : ℝ) :
     ℝ :=
-  if h ≤ smallStep rates then smallConstant rates (featureBound capacity) * Real.sqrt h
-  else (2 * featureBound capacity + h * generatorFeatureBound rates capacity) / h
+  if h ≤ smallStep rates then smallConstant rates (featureBound rates capacity) * Real.sqrt h
+  else (2 * featureBound rates capacity + h * generatorFeatureBound rates capacity) / h
 
 /-- **The neutral microscopic approximation of the dual generator.**  The neutral microscopic
 kernel approximates the dual generator on the budget-moment feature, as NOTE1 Theorem 1
@@ -441,8 +444,8 @@ def neutralMicroscopicApproximation (rates : NeutralRates Deme Locus Allele)
   kernel := neutralMicroscopicKernel rates
   error := microscopicError rates capacity
   error_nonneg h := by
-    have hfeature : 0 ≤ featureBound (Deme := Deme) (Locus := Locus) (Allele := Allele) capacity :=
-      Finset.sum_nonneg fun ξ _ ↦ (momentBound_spec capacity ξ).1
+    have hfeature : 0 ≤ featureBound rates capacity :=
+      Finset.sum_nonneg fun ξ _ ↦ (momentBound_spec rates capacity ξ).1
     have hgenerator : 0 ≤ generatorFeatureBound rates capacity :=
       Finset.sum_nonneg fun ξ _ ↦ (Classical.choose_spec
         (exists_lineTaylor_bound (neutralGenerator rates (momentPolynomial ξ.1)))).1
@@ -452,11 +455,11 @@ def neutralMicroscopicApproximation (rates : NeutralRates Deme Locus Allele)
     · have hpos : 0 < h := (smallStep_pos rates).trans (lt_of_not_ge hsmall)
       exact div_nonneg (add_nonneg (by linarith) (mul_nonneg hpos.le hgenerator)) hpos.le
   error_tendsto := by
-    have hsqrt : Tendsto (fun h : ℝ ↦ smallConstant rates (featureBound capacity) * Real.sqrt h)
+    have hsqrt :
+        Tendsto (fun h : ℝ ↦ smallConstant rates (featureBound rates capacity) * Real.sqrt h)
         (𝓝[>] 0) (𝓝 0) := by
       have h := ((Real.continuous_sqrt.tendsto 0).const_mul
-        (smallConstant rates (featureBound (Deme := Deme) (Locus := Locus) (Allele := Allele)
-          capacity))).mono_left nhdsWithin_le_nhds
+        (smallConstant rates (featureBound rates capacity))).mono_left nhdsWithin_le_nhds
       simpa using h
     refine hsqrt.congr' ?_
     filter_upwards [Ioo_mem_nhdsGT (smallStep_pos rates)] with h hh
@@ -472,7 +475,7 @@ def neutralMicroscopicApproximation (rates : NeutralRates Deme Locus Allele)
       rw [hfeature]
       exact dualGenerator_mulVec_configurationMoment rates capacity (stateLaw x) ξ
     rw [hQ]
-    obtain ⟨hB0, hBle, hBspec⟩ := momentBound_spec capacity ξ
+    obtain ⟨hB0, hBle, hBspec⟩ := momentBound_spec rates capacity ξ
     obtain ⟨hGle, hGspec⟩ := generatorBound_spec rates capacity ξ
     show |(neutralMicroscopicKernel rates h).apply (fun y ↦ eval y.1 (momentPolynomial ξ.1)) x
         - eval x.1 (momentPolynomial ξ.1)
@@ -480,13 +483,13 @@ def neutralMicroscopicApproximation (rates : NeutralRates Deme Locus Allele)
       ≤ h * microscopicError rates capacity h
     unfold microscopicError
     split_ifs with hsmall
-    · have hsum0 : 0 ≤ featureBound (Deme := Deme) (Locus := Locus) (Allele := Allele) capacity :=
+    · have hsum0 : 0 ≤ featureBound rates capacity :=
         hB0.trans hBle
-      refine expansion_small rates (momentPolynomial ξ.1) (featureBound capacity) hsum0
+      refine expansion_small rates (momentPolynomial ξ.1) (featureBound rates capacity) hsum0
         (fun y v hy hv ε hε0 hε1 ↦ ?_) h hh hsmall x
       obtain ⟨_, h2, h3⟩ := hBspec y v hy hv ε hε0 hε1
       exact ⟨h2.trans hBle, h3.trans (mul_le_mul_of_nonneg_right hBle (pow_nonneg hε0 3))⟩
-    · have hbound := expansion_large rates (momentPolynomial ξ.1) (featureBound capacity)
+    · have hbound := expansion_large rates (momentPolynomial ξ.1) (featureBound rates capacity)
         (generatorFeatureBound rates capacity)
         (fun y ↦ ((hBspec y.1 0 (abs_state_le_one y) (fun _ ↦ by norm_num) 0 le_rfl
           zero_le_one).1).trans hBle)
