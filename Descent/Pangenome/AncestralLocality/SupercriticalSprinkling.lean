@@ -32,7 +32,8 @@ in components of more than `κ` features, and two distinct components are disjoi
 probability at most `m² e^{-p κ²}`, by a union bound over pairs of large features
 (`graphProb_not_joined_le`). On the complement one component holds every large feature, so under
 `G(m, p)` no component has `c` features with probability at most the probability under `G(m, p₁)`
-that fewer than `c` features are large, plus `m² e^{-p₂ κ²}` (`graphProb_not_exists_card_reach_ge_le`).
+that fewer than `c` features are large, plus `m² e^{-p₂ κ²}`
+(`graphProb_not_exists_card_reach_ge_le`).
 
 ## The limit
 
