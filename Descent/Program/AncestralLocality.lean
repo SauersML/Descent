@@ -45,6 +45,7 @@ import Descent.Portability.AncestralWitnessDrift
 import Descent.Pangenome.AncestralLocality.SupercriticalReach
 import Descent.Pangenome.AncestralLocality.DecisionJumpExpansion
 import Descent.Pangenome.AncestralLocality.DecisionWindowJumps
+import Descent.Pangenome.AncestralLocality.DecisionWindowSemigroup
 
 namespace Descent.Program
 
@@ -153,7 +154,13 @@ independent complexity bounds and a quantitative light cone.
   bounds (`DecisionJumpExpansion.abs_resample_sub_le`, `abs_decision_sub_le`). On a finite window
   these jumps are positive, constant-preserving operators on the continuous observables of the
   simplex, and their generators approach (7.1) with decisions on sampling functions
-  (`DecisionWindowJumps.jumpApproximation_operator`, `abs_jumpGenerator_sub_le`).
+  (`DecisionWindowJumps.jumpApproximation_operator`, `abs_jumpGenerator_sub_le`). Their limit
+  is the semigroup of the window with decisions: the jump approximations agree with the Dyson
+  dual series on sampling functions up to `O(ε)`
+  (`DecisionWindowSemigroup.norm_jumpOperator_sub_dualSeries_le`), the limit is a Feller
+  semigroup equal to the dual series on sampling functions, which is (7.5) in Dyson form
+  (`decisionWindowSemigroup_samplingFunction`), and its generator on sampling functions is (7.1)
+  (`tendsto_decisionWindowSemigroup_slope`).
 * Theorem 6 at generator level: `SamplingDuality`. On a sampling observable the resampling term of
   (7.1) is coalescence and the drift term is decision branching, so the forward generator applied
   to `H_f` is the backward circuit applied to `f` (`forwardGenerator_samplingObservable`); the
