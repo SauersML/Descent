@@ -29,3 +29,21 @@ import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionInLaw
   Descent.Pangenome.GraphCoalescent.sum_kingmanLaw_mul_top_le_succ
 #print axioms
   Descent.Pangenome.GraphCoalescent.tendsto_sum_kingmanLaw_mul_top
+#print axioms
+  Descent.Pangenome.GraphCoalescent.connectionProbability_eq_poissonMixture
+#print axioms
+  Descent.Pangenome.GraphCoalescent.monotone_connectionTimeCDF
+#print axioms
+  Descent.Pangenome.GraphCoalescent.crossingRate_pos_of_ne_top
+#print axioms
+  Descent.Pangenome.GraphCoalescent.tendsto_connectionTimeCDF_atTop
+#print axioms
+  Descent.Pangenome.GraphCoalescent.cdf_randomGraphConnectionLaw
+#print axioms
+  Descent.Pangenome.GraphCoalescent.monotone_reportConnectionCDF
+#print axioms
+  Descent.Pangenome.GraphCoalescent.tendsto_reportConnectionCDF_atTop
+#print axioms
+  Descent.Pangenome.GraphCoalescent.cdf_reportConnectionLaw
+#print axioms
+  Descent.Pangenome.GraphCoalescent.tendsto_reportConnectionLaw

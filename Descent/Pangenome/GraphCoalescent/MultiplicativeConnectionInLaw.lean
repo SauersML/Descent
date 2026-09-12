@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionConvergence
+import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionPerturbation
 import Mathlib.Analysis.Normed.Group.FunctionSeries
 import Mathlib.MeasureTheory.Measure.Portmanteau
 import Mathlib.Probability.CDF
@@ -406,6 +407,327 @@ theorem tendsto_sum_kingmanLaw_mul_top {n : ℕ} (hn : 0 < n) (s : Fin n → Fin
   · exact (sub_le_sub_left (sum_kingmanLaw_mul_blocks_sub_one_le hn m) 1).trans
       (one_sub_sum_kingmanLaw_mul_blocks_le hn s m)
   · exact (sum_mul_ite_mem_unit (kingmanLaw_nonneg n m) (sum_kingmanLaw n m) _).2
+
+/-! ### The law of `T_p`
+
+`Pr(T_p ≤ u)` is the Poisson mixture, at mean `u`, of the probabilities that the skeleton of `Z_p`
+on the labels is connected, so it is nondecreasing; it is a finite sum of exponentials in `u`, so
+it is continuous; and with every `p_i > 0` every partition other than the top has a positive
+crossing rate, so it tends to one. -/
+
+/-- `Z` only coarsens, pointwise. -/
+theorem massStep_eq_zero_of_not_le {n : ℕ} (mass : Fin n → ℝ) {ζ ζ' : ER n} (h : ¬ ζ ≤ ζ') :
+    massStep mass ζ ζ' = 0 := by
+  unfold massStep
+  rw [Finset.sum_eq_zero fun t ht ↦ absurd
+    ((Finset.mem_filter.mp ht).2 ▸ le_mergePair ζ t) h, zero_add]
+  exact if_neg fun (heq : ζ' = ζ) ↦ h (le_of_eq heq.symm)
+
+theorem sum_massLaw {n : ℕ} (s : Fin n → Fin n) (mass : Fin n → ℝ) (m : ℕ) :
+    ∑ ζ, massLaw s mass m ζ = 1 := by
+  rw [massLaw, sum_skeletonLaw (sum_massStep mass) m]
+  simp only [Finset.sum_ite_eq', Finset.mem_univ, if_true]
+
+theorem massLaw_nonneg {n : ℕ} (s : Fin n → Fin n) {mass : Fin n → ℝ} (hmass : ∀ i, 0 ≤ mass i)
+    (htotal : ∑ i, mass i ≤ 1) (m : ℕ) (ζ : ER n) : 0 ≤ massLaw s mass m ζ :=
+  skeletonLaw_nonneg (massStep_nonneg hmass htotal) (fun _ ↦ by split_ifs <;> norm_num) m ζ
+
+/-- **`Z` only coarsens**: its connection probability after `m` steps is nondecreasing. -/
+theorem sum_massLaw_mul_top_le_succ {n : ℕ} (s : Fin n → Fin n) {mass : Fin n → ℝ}
+    (hmass : ∀ i, 0 ≤ mass i) (htotal : ∑ i, mass i ≤ 1) (m : ℕ) :
+    ∑ ζ, massLaw s mass m ζ * (if ζ = ⊤ then 1 else 0)
+      ≤ ∑ ζ, massLaw s mass (m + 1) ζ * (if ζ = ⊤ then 1 else 0) := by
+  have h1 := sum_skeletonLaw_succ (massStep mass) (fun ζ ↦ if ζ = graphKer s then 1 else 0) m
+    Finset.univ fun ζ ↦ if ζ = ⊤ then (1 : ℝ) else 0
+  rw [massLaw, massLaw, h1]
+  refine Finset.sum_le_sum fun ζ _ ↦
+    mul_le_mul_of_nonneg_left ?_ (massLaw_nonneg s hmass htotal m ζ)
+  by_cases htop : ζ = ⊤
+  · rw [if_pos htop]
+    have hall : ∀ ζ',
+        massStep mass ζ ζ' * (if ζ' = ⊤ then (1 : ℝ) else 0) = massStep mass ζ ζ' := by
+      intro ζ'
+      by_cases hz : ζ' = ⊤
+      · rw [if_pos hz, mul_one]
+      · rw [if_neg hz, mul_zero, massStep_eq_zero_of_not_le mass
+          fun hle ↦ hz (eq_top_iff.mpr ((le_of_eq htop.symm).trans hle))]
+    rw [Finset.sum_congr rfl fun ζ' _ ↦ hall ζ', sum_massStep]
+  · rw [if_neg htop]
+    exact Finset.sum_nonneg fun ζ' _ ↦
+      mul_nonneg (massStep_nonneg hmass htotal ζ ζ') (by split_ifs <;> norm_num)
+
+/-- **`Pr(T_p ≤ U)` is a Poisson mixture of the connection probabilities of `Z_p`'s skeleton on the
+labels.** -/
+theorem connectionProbability_eq_poissonMixture {w : ℕ} [NeZero w] (p : Fin w → ℝ)
+    (U : NNReal) :
+    connectionProbability p U
+      = poissonMixture U fun m ↦ ∑ ζ, massLaw id p m ζ * (if ζ = ⊤ then 1 else 0) := by
+  rw [poissonMixture, (hasSum_poissonPMFReal_mul_massTop id p U).tsum_eq,
+    connectionProbability_eq_mobius_sum]
+  refine Finset.sum_congr rfl fun σ _ ↦ ?_
+  have hκ : pairProductSum (blockMass p σ) = crossingRate p σ := by
+    have h1 := two_mul_pairProductSum_blockMass_crossing p σ
+    have h2 := two_mul_crossingRate p σ
+    linarith
+  rw [if_pos (graphKer_le_of_injective Function.injective_id σ), hκ]
+
+/-- **The distribution function of `T_p`**: the random-graph connection probability, and zero at
+negative times.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  A finite sum of exponentials, extended by zero. -/
+def connectionTimeCDF {w : ℕ} (p : Fin w → ℝ) (u : ℝ) : ℝ :=
+  if u < 0 then 0 else connectionProbability p u
+
+theorem monotone_connectionTimeCDF {w : ℕ} [NeZero w] {p : Fin w → ℝ} (hp0 : ∀ i, 0 ≤ p i)
+    (hp1 : ∑ i, p i ≤ 1) : Monotone (connectionTimeCDF p) := by
+  set b : ℕ → ℝ := fun m ↦ ∑ ζ, massLaw id p m ζ * (if ζ = ⊤ then 1 else 0) with hb
+  have hunit : ∀ m, 0 ≤ b m ∧ b m ≤ 1 := fun m ↦
+    sum_mul_ite_mem_unit (massLaw_nonneg id hp0 hp1 m) (sum_massLaw id p m) _
+  have hmono : Monotone b := monotone_nat_of_le_succ (sum_massLaw_mul_top_le_succ id hp0 hp1)
+  have heq : ∀ u : ℝ, 0 ≤ u → connectionProbability p u = poissonMixture u.toNNReal b := by
+    intro u hu
+    have h := connectionProbability_eq_poissonMixture p u.toNNReal
+    rwa [Real.coe_toNNReal u hu] at h
+  intro u v huv
+  unfold connectionTimeCDF
+  by_cases hv : v < 0
+  · rw [if_pos (lt_of_le_of_lt huv hv), if_pos hv]
+  · rw [if_neg hv, heq v (not_lt.mp hv)]
+    by_cases hu : u < 0
+    · rw [if_pos hu]
+      exact tsum_nonneg fun m ↦ mul_nonneg poissonPMFReal_nonneg (hunit m).1
+    · rw [if_neg hu, heq u (not_lt.mp hu)]
+      exact monotone_poissonMixture (fun m ↦ (hunit m).1) (fun m ↦ (hunit m).2) hmono
+        (Real.toNNReal_le_toNNReal huv)
+
+theorem continuous_connectionProbability_in_time {w : ℕ} [NeZero w] (p : Fin w → ℝ) :
+    Continuous fun u : ℝ ↦ connectionProbability p u := by
+  simp only [connectionProbability_eq_mobius_sum]
+  exact continuous_finset_sum _ fun σ _ ↦ continuous_const.mul
+    (Real.continuous_exp.comp ((continuous_id.mul continuous_const).neg))
+
+theorem connectionTimeCDF_rightContinuous {w : ℕ} [NeZero w] (p : Fin w → ℝ) (x : ℝ) :
+    ContinuousWithinAt (connectionTimeCDF p) (Ici x) x := by
+  by_cases hx : x < 0
+  · have hev : connectionTimeCDF p =ᶠ[𝓝 x] fun _ ↦ 0 := by
+      filter_upwards [Iio_mem_nhds hx] with y hy
+      exact if_pos hy
+    exact (continuousAt_const.congr hev.symm).continuousWithinAt
+  · have hx' : 0 ≤ x := not_lt.mp hx
+    refine ((continuous_connectionProbability_in_time p).continuousAt.continuousWithinAt).congr
+      (fun y hy ↦ ?_) ?_
+    · exact if_neg (not_lt.mpr (hx'.trans hy))
+    · exact if_neg hx
+
+theorem tendsto_connectionTimeCDF_atBot {w : ℕ} (p : Fin w → ℝ) :
+    Tendsto (connectionTimeCDF p) atBot (𝓝 0) :=
+  tendsto_const_nhds.congr' (by
+    filter_upwards [eventually_lt_atBot 0] with y hy
+    exact (if_pos hy).symm)
+
+/-- With every fiber of positive mass, a partition other than the top has a positive crossing
+rate. -/
+theorem crossingRate_pos_of_ne_top {w : ℕ} {p : Fin w → ℝ} (hp : ∀ i, 0 < p i) {σ : ER w}
+    (hσ : σ ≠ ⊤) : 0 < crossingRate p σ := by
+  obtain ⟨i, j, hij⟩ : ∃ i j, ¬ σ.r i j := by
+    by_contra hall
+    push_neg at hall
+    exact hσ (Setoid.ext fun a b ↦ ⟨fun _ ↦ trivial, fun _ ↦ hall a b⟩)
+  have hne : i ≠ j := fun h ↦ hij (by rw [← h]; exact σ.iseqv.refl i)
+  have hnonneg : ∀ e ∈ (Finset.univ : Finset (FiberPair w)),
+      0 ≤ (if σ e.1.1 e.1.2 then (0 : ℝ) else pairRate p e) := fun e _ ↦ by
+    split_ifs
+    · exact le_rfl
+    · exact (mul_pos (hp _) (hp _)).le
+  unfold crossingRate
+  rcases lt_or_gt_of_ne hne with hlt | hlt
+  · refine Finset.sum_pos' hnonneg ⟨⟨(i, j), hlt⟩, Finset.mem_univ _, ?_⟩
+    show 0 < (if σ i j then (0 : ℝ) else pairRate p ⟨(i, j), hlt⟩)
+    rw [if_neg hij]
+    exact mul_pos (hp i) (hp j)
+  · refine Finset.sum_pos' hnonneg ⟨⟨(j, i), hlt⟩, Finset.mem_univ _, ?_⟩
+    show 0 < (if σ j i then (0 : ℝ) else pairRate p ⟨(j, i), hlt⟩)
+    rw [if_neg fun h ↦ hij (σ.iseqv.symm h)]
+    exact mul_pos (hp j) (hp i)
+
+theorem tendsto_connectionTimeCDF_atTop {w : ℕ} [NeZero w] {p : Fin w → ℝ}
+    (hp : ∀ i, 0 < p i) : Tendsto (connectionTimeCDF p) atTop (𝓝 1) := by
+  have hterm : ∀ σ : ER w, Tendsto (fun u : ℝ ↦
+      (topMobius (blocks σ) : ℝ) * Real.exp (-(u * crossingRate p σ))) atTop
+      (𝓝 (if σ = ⊤ then 1 else 0)) := by
+    intro σ
+    by_cases htop : σ = ⊤
+    · rw [if_pos htop]
+      have hκ : crossingRate p σ = 0 := by
+        rw [htop]
+        unfold crossingRate
+        exact Finset.sum_eq_zero fun e _ ↦ if_pos trivial
+      have hμ : (topMobius (blocks σ) : ℝ) = 1 := by
+        have hb : blocks σ = 1 := by
+          rw [htop]
+          exact blocks_top w
+        rw [hb]
+        norm_num [topMobius]
+      simp only [hκ, mul_zero, neg_zero, Real.exp_zero, mul_one, hμ]
+      exact tendsto_const_nhds
+    · rw [if_neg htop]
+      have h := (Real.tendsto_exp_neg_atTop_nhds_zero.comp
+        (tendsto_id.atTop_mul_const (crossingRate_pos_of_ne_top hp htop))).const_mul
+        (topMobius (blocks σ) : ℝ)
+      simpa using h
+  have hsum := tendsto_finset_sum (Finset.univ : Finset (ER w)) fun σ _ ↦ hterm σ
+  rw [Finset.sum_ite_eq'] at hsum
+  simp only [Finset.mem_univ, if_true] at hsum
+  refine hsum.congr' ?_
+  filter_upwards [eventually_ge_atTop 0] with u hu
+  rw [connectionTimeCDF, if_neg (not_lt.mpr hu), connectionProbability_eq_mobius_sum]
+  exact Finset.sum_congr rfl fun _ _ ↦ rfl
+
+/-- **The distribution function of `T_p`, as a Stieltjes function.**
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  A distribution function. -/
+def connectionTimeStieltjes {w : ℕ} [NeZero w] (p : Fin w → ℝ) (hp0 : ∀ i, 0 ≤ p i)
+    (hp1 : ∑ i, p i ≤ 1) : StieltjesFunction where
+  toFun := connectionTimeCDF p
+  mono' := monotone_connectionTimeCDF hp0 hp1
+  right_continuous' := connectionTimeCDF_rightContinuous p
+
+/-- **The law of `T_p`**, the connection time of the random graph on the fibers with independent
+exponential edge clocks of rates `p_i p_j`.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  The probability measure of a distribution function. -/
+def randomGraphConnectionLaw {w : ℕ} [NeZero w] (p : Fin w → ℝ) (hp : ∀ i, 0 < p i)
+    (hp1 : ∑ i, p i ≤ 1) : ProbabilityMeasure ℝ :=
+  ⟨(connectionTimeStieltjes p (fun i ↦ (hp i).le) hp1).measure, ⟨by
+    rw [StieltjesFunction.measure_univ _ (tendsto_connectionTimeCDF_atBot p)
+      (tendsto_connectionTimeCDF_atTop hp), sub_zero, ENNReal.ofReal_one]⟩⟩
+
+/-- The law of `T_p` has the random-graph connection probability as its distribution function. -/
+theorem cdf_randomGraphConnectionLaw {w : ℕ} [NeZero w] (p : Fin w → ℝ) (hp : ∀ i, 0 < p i)
+    (hp1 : ∑ i, p i ≤ 1) (x : ℝ) :
+    cdf (randomGraphConnectionLaw p hp hp1 : Measure ℝ) x = connectionTimeCDF p x := by
+  show cdf (connectionTimeStieltjes p (fun i ↦ (hp i).le) hp1).measure x = _
+  rw [cdf_measure_stieltjesFunction _ (tendsto_connectionTimeCDF_atBot p)
+    (tendsto_connectionTimeCDF_atTop hp)]
+  rfl
+
+/-! ### The law of the uniformized scaled connection time -/
+
+/-- **The distribution function of the scaled connection time of the uniformized report**: the
+probability that the report is connected at scaled time `u`, and zero at negative times.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  A Poisson mixture, extended by zero. -/
+def reportConnectionCDF {n : ℕ} (s : Fin n → Fin n) (u : ℝ) : ℝ :=
+  if u < 0 then 0 else reportConnectionProbability s u.toNNReal
+
+theorem sum_kingmanLaw_mul_top_mem_unit {n : ℕ} (s : Fin n → Fin n) (m : ℕ) :
+    0 ≤ ∑ ξ, kingmanLaw n m ξ * (if observed s ξ = ⊤ then 1 else 0)
+      ∧ ∑ ξ, kingmanLaw n m ξ * (if observed s ξ = ⊤ then 1 else 0) ≤ 1 :=
+  sum_mul_ite_mem_unit (kingmanLaw_nonneg n m) (sum_kingmanLaw n m) _
+
+theorem monotone_reportConnectionCDF {n : ℕ} (s : Fin n → Fin n) :
+    Monotone (reportConnectionCDF s) := by
+  have hunit := sum_kingmanLaw_mul_top_mem_unit s
+  have hmono : Monotone fun m ↦ ∑ ξ, kingmanLaw n m ξ * (if observed s ξ = ⊤ then 1 else 0) :=
+    monotone_nat_of_le_succ (sum_kingmanLaw_mul_top_le_succ s)
+  intro u v huv
+  unfold reportConnectionCDF reportConnectionProbability
+  by_cases hv : v < 0
+  · rw [if_pos (lt_of_le_of_lt huv hv), if_pos hv]
+  · rw [if_neg hv]
+    by_cases hu : u < 0
+    · rw [if_pos hu]
+      exact tsum_nonneg fun m ↦ mul_nonneg poissonPMFReal_nonneg (hunit m).1
+    · rw [if_neg hu]
+      exact monotone_poissonMixture (fun m ↦ (hunit m).1) (fun m ↦ (hunit m).2) hmono
+        (Real.toNNReal_le_toNNReal huv)
+
+theorem reportConnectionCDF_rightContinuous {n : ℕ} (s : Fin n → Fin n) (x : ℝ) :
+    ContinuousWithinAt (reportConnectionCDF s) (Ici x) x := by
+  have hunit := sum_kingmanLaw_mul_top_mem_unit s
+  have habs : ∀ m, |∑ ξ, kingmanLaw n m ξ * (if observed s ξ = ⊤ then 1 else 0)| ≤ 1 :=
+    fun m ↦ abs_le.mpr ⟨by linarith [(hunit m).1], (hunit m).2⟩
+  by_cases hx : x < 0
+  · have hev : reportConnectionCDF s =ᶠ[𝓝 x] fun _ ↦ 0 := by
+      filter_upwards [Iio_mem_nhds hx] with y hy
+      exact if_pos hy
+    exact (continuousAt_const.congr hev.symm).continuousWithinAt
+  · have hx' : 0 ≤ x := not_lt.mp hx
+    refine ((continuous_poissonSeries habs).continuousAt.continuousWithinAt).congr
+      (fun y hy ↦ ?_) ?_
+    · rw [reportConnectionCDF, if_neg (not_lt.mpr (hx'.trans hy)), reportConnectionProbability,
+        poissonMixture_toNNReal (hx'.trans hy)]
+    · rw [reportConnectionCDF, if_neg hx, reportConnectionProbability, poissonMixture_toNNReal hx']
+
+theorem tendsto_reportConnectionCDF_atBot {n : ℕ} (s : Fin n → Fin n) :
+    Tendsto (reportConnectionCDF s) atBot (𝓝 0) :=
+  tendsto_const_nhds.congr' (by
+    filter_upwards [eventually_lt_atBot 0] with y hy
+    exact (if_pos hy).symm)
+
+theorem tendsto_reportConnectionCDF_atTop {n : ℕ} (s : Fin n → Fin n) :
+    Tendsto (reportConnectionCDF s) atTop (𝓝 1) := by
+  have hunit := sum_kingmanLaw_mul_top_mem_unit s
+  have hlim : Tendsto (fun m ↦ ∑ ξ, kingmanLaw n m ξ * (if observed s ξ = ⊤ then 1 else 0))
+      atTop (𝓝 1) := by
+    rcases Nat.eq_zero_or_pos n with rfl | hn
+    · have hone : ∀ m, ∑ ξ, kingmanLaw 0 m ξ * (if observed s ξ = ⊤ then 1 else 0) = 1 := by
+        intro m
+        have htop : ∀ ξ : ER 0, observed s ξ = ⊤ := fun ξ ↦
+          Setoid.ext fun a _ ↦ Fin.elim0 a
+        simp only [htop, if_true, mul_one]
+        exact sum_kingmanLaw 0 m
+      simp only [hone]
+      exact tendsto_const_nhds
+    · exact tendsto_sum_kingmanLaw_mul_top hn s
+  refine (tendsto_poissonMixture_atTop (fun m ↦ (hunit m).1) (fun m ↦ (hunit m).2) hlim).congr' ?_
+  filter_upwards [eventually_ge_atTop 0] with u hu
+  rw [reportConnectionCDF, if_neg (not_lt.mpr hu)]
+  rfl
+
+/-- **The distribution function of the uniformized scaled connection time, as a Stieltjes
+function.**
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  A distribution function. -/
+def reportConnectionStieltjes {n : ℕ} (s : Fin n → Fin n) : StieltjesFunction where
+  toFun := reportConnectionCDF s
+  mono' := monotone_reportConnectionCDF s
+  right_continuous' := reportConnectionCDF_rightContinuous s
+
+/-- **The law of the scaled connection time `n² τ_q` of the uniformized report.**
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  The probability measure of a distribution function. -/
+def reportConnectionLaw {n : ℕ} (s : Fin n → Fin n) : ProbabilityMeasure ℝ :=
+  ⟨(reportConnectionStieltjes s).measure, ⟨by
+    rw [StieltjesFunction.measure_univ _ (tendsto_reportConnectionCDF_atBot s)
+      (tendsto_reportConnectionCDF_atTop s), sub_zero, ENNReal.ofReal_one]⟩⟩
+
+theorem cdf_reportConnectionLaw {n : ℕ} (s : Fin n → Fin n) (x : ℝ) :
+    cdf (reportConnectionLaw s : Measure ℝ) x = reportConnectionCDF s x := by
+  show cdf (reportConnectionStieltjes s).measure x = _
+  rw [cdf_measure_stieltjesFunction _ (tendsto_reportConnectionCDF_atBot s)
+    (tendsto_reportConnectionCDF_atTop s)]
+  rfl
+
+/-! ### (F3) in law -/
+
+/-- **Theorem F, (F3), in law.**  Along panels of sizes `N k → ∞` carrying surjective labellings
+into `w` fibers whose proportions converge to `p` with every `p_i > 0`, the laws of the scaled
+connection times of the uniformized reports converge in the weak topology to the law of `T_p`. -/
+theorem tendsto_reportConnectionLaw {w : ℕ} [NeZero w] {N : ℕ → ℕ}
+    (hN : Tendsto N atTop atTop) (label : (k : ℕ) → Fin (N k) → Fin w)
+    (hsurj : ∀ k, Function.Surjective (label k)) {p : Fin w → ℝ} (hp : ∀ i, 0 < p i)
+    (hp1 : ∑ i, p i ≤ 1) (hlim : Tendsto (fun k ↦ fiberProportion (label k)) atTop (𝓝 p)) :
+    Tendsto (fun k ↦ reportConnectionLaw (labelInterface (label k) (hsurj k))) atTop
+      (𝓝 (randomGraphConnectionLaw p hp hp1)) := by
+  refine tendsto_probabilityMeasure_of_tendsto_cdf fun x ↦ ?_
+  simp only [cdf_reportConnectionLaw, cdf_randomGraphConnectionLaw]
+  by_cases hx : x < 0
+  · simp only [reportConnectionCDF, connectionTimeCDF, if_pos hx]
+    exact tendsto_const_nhds
+  · simp only [reportConnectionCDF, connectionTimeCDF, if_neg hx]
+    have h := tendsto_reportConnectionProbability hN label hsurj hlim x.toNNReal
+    rwa [Real.coe_toNNReal x (not_lt.mp hx)] at h
 
 end
 
