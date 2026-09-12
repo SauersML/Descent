@@ -2,7 +2,6 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.AncestralLocality.SelectionSemigroupPerturbation
-import Descent.Portability.EndToEndPortabilityLipschitz
 import Descent.Portability.MixingLawReplicaBias
 import Descent.Portability.PortabilityMetricCompilation
 
@@ -37,11 +36,16 @@ Which constant. For a score and an outcome in the unit interval each covariance 
 (`norm_numeratorObservation_le`, `norm_denominatorObservation_le`). With `n = 4`, every expected
 numerator and denominator moves by at most `2 · 4 · R t · 4 = 32 R t`
 (`abs_windowNumerator_sub_neutral_le`, `abs_windowDenominator_sub_neutral_le`). A Feller semigroup
-keeps `0 ≤ E N ≤ E D ≤ 1` (`operator_apply_mem_unit`), and a cross ratio of numbers in the unit
-interval whose target denominator and source numerator are at least `δ` moves by at most the sum
-of the four moves over `δ⁴` (`abs_crossRatio_sub_le_of_unit`). So for `s ≤ t`,
-`|P_r - P_0| ≤ 128 R t / δ⁴` (`abs_windowPortability_sub_neutral_le`), and `128 σ t / δ⁴` for a
-total selective rate at most `σ` (`abs_windowPortability_sub_neutral_le_of_sum_le`).
+keeps `0 ≤ E N ≤ E D ≤ 1` (`operator_apply_mem_unit`), so the four expectations lie in the unit
+box, the realization body of its own coordinates (`unitBoxFeature`, `portabilityExpectations`,
+`abs_portabilityExpectations_le`), and the portability is a cross ratio of their coordinates
+(`windowPortability_eq_dotProduct`). The rest is the corpus analysis of that cross ratio,
+`PortabilityMetricCompilation.abs_crossRatio_sub_le`, the route
+`EndToEndPortabilityRateLipschitz` takes for rate histories: with feature bound `B = 1` and unit
+coefficient vectors it moves by at most `4 / δ⁴` times the sup distance of the expectations. So
+for `s ≤ t`, `|P_r - P_0| ≤ 4 · 32 R t / δ⁴ = 128 R t / δ⁴`
+(`abs_windowPortability_sub_neutral_le`), and `128 σ t / δ⁴` for a total selective rate at most `σ`
+(`abs_windowPortability_sub_neutral_le_of_sum_le`).
 
 Significance. The portability of expected accuracies computed by the neutral window semigroup,
 whose action on sampling observables is the killed coalescence semigroup, survives weak selection
@@ -287,7 +291,7 @@ theorem windowPortability_eq_cross (semigroup : FellerSemigroup (SimplexLaw H))
 
 end Sampling
 
-/-! ## Feller semigroups and cross ratios -/
+/-! ## Feller semigroups keep the unit interval -/
 
 /-- **A Feller semigroup keeps ordered observables in the unit interval**: if `0 ≤ F ≤ G ≤ 1`
 pointwise, then `0 ≤ T_t F(x) ≤ T_t G(x) ≤ 1`. -/
@@ -308,38 +312,54 @@ theorem operator_apply_mem_unit {X : Type*} [TopologicalSpace X] [CompactSpace X
   rw [semigroup.map_one t, ContinuousMap.one_apply] at hOneG
   exact ⟨hpos F hF, by linarith, by linarith⟩
 
-/-- **A cross ratio of numbers in the unit interval is Lipschitz.** If `0 ≤ N ≤ D ≤ 1` at the
-target and at the source for two families, and the target denominators and source numerators are
-at least `δ > 0`, then `N_t D_s / (D_t N_s)` moves by at most the sum of the four moves over
-`δ⁴`. -/
-theorem abs_crossRatio_sub_le_of_unit {Nt Dt Ns Ds Nt' Dt' Ns' Ds' δ : ℝ} (hδ : 0 < δ)
-    (ht : 0 ≤ Nt ∧ Nt ≤ Dt ∧ Dt ≤ 1) (hs : 0 ≤ Ns ∧ Ns ≤ Ds ∧ Ds ≤ 1)
-    (ht' : 0 ≤ Nt' ∧ Nt' ≤ Dt' ∧ Dt' ≤ 1) (hs' : 0 ≤ Ns' ∧ Ns' ≤ Ds' ∧ Ds' ≤ 1)
-    (hDt : δ ≤ Dt) (hNs : δ ≤ Ns) (hDt' : δ ≤ Dt') (hNs' : δ ≤ Ns') :
-    |Nt * Ds / (Dt * Ns) - Nt' * Ds' / (Dt' * Ns')| ≤
-      (|Nt - Nt'| + |Ds - Ds'| + (|Dt - Dt'| + |Ns - Ns'|)) / (δ ^ 2) ^ 2 := by
-  obtain ⟨hNt0, hNtDt, hDt1⟩ := ht
-  obtain ⟨hNs0, hNsDs, hDs1⟩ := hs
-  obtain ⟨hNt0', hNtDt', hDt1'⟩ := ht'
-  obtain ⟨hNs0', hNsDs', hDs1'⟩ := hs'
-  have hnumerator : |Nt * Ds - Nt' * Ds'| ≤ |Nt - Nt'| + |Ds - Ds'| :=
-    EndToEndPortabilityLipschitz.abs_mul_sub_mul_le (abs_le.mpr ⟨by linarith, hDs1⟩)
-      (abs_le.mpr ⟨by linarith, by linarith⟩)
-  have hdenominator : |Dt * Ns - Dt' * Ns'| ≤ |Dt - Dt'| + |Ns - Ns'| :=
-    EndToEndPortabilityLipschitz.abs_mul_sub_mul_le (abs_le.mpr ⟨by linarith, by linarith⟩)
-      (abs_le.mpr ⟨by linarith, hDt1'⟩)
-  have hguard : δ ^ 2 ≤ Dt * Ns := by
-    nlinarith [mul_nonneg (sub_nonneg.mpr hDt) (sub_nonneg.mpr hNs)]
-  have hguard' : δ ^ 2 ≤ Dt' * Ns' := by
-    nlinarith [mul_nonneg (sub_nonneg.mpr hDt') (sub_nonneg.mpr hNs')]
-  have hcap : Dt' * Ns' ≤ 1 := mul_le_one₀ hDt1' hNs0' (hNsDs'.trans hDs1')
-  have hcap' : |Nt' * Ds'| ≤ 1 := by
-    rw [abs_of_nonneg (mul_nonneg hNt0' (hNs0'.trans hNsDs'))]
-    exact mul_le_one₀ (hNtDt'.trans hDt1') (hNs0'.trans hNsDs') hDs1'
-  have hq := PortabilityMetricCompilation.abs_div_sub_div_le (Nt * Ds) (Nt' * Ds')
-    (pow_pos hδ 2) hguard hguard' hcap hcap'
-  rw [one_mul, one_mul] at hq
-  exact hq.trans (div_le_div_of_nonneg_right (add_le_add hnumerator hdenominator) (by positivity))
+/-! ## The expectations on the unit box -/
+
+section Box
+
+variable {H : Type*} [Fintype H]
+
+/-- **The unit box of four coordinates, read through its own coordinates.** Its realization body is
+the box of vectors with every coordinate in `[-1, 1]`. -/
+def unitBoxFeature : {v : Bool × Bool → ℝ // ∀ i, |v i| ≤ 1} → Bool × Bool → ℝ :=
+  Subtype.val
+
+/-- **The four expectations of the window portability**: the expected correlation numerator at
+`(true, true)` and denominator at `(true, false)` at the target time `t`, and the numerator at
+`(false, true)` and denominator at `(false, false)` at the source time `s`. -/
+def portabilityExpectations (semigroup : FellerSemigroup (SimplexLaw H)) (p₀ : SimplexLaw H)
+    (s t : ℝ≥0) (S Y : H → ℝ) : Bool × Bool → ℝ :=
+  fun i ↦ semigroup.operator (if i.1 then t else s)
+    (if i.2 then windowNumerator S Y else windowDenominator S Y) p₀
+
+/-- **The window portability is a cross ratio of coordinates** of the four expectations. -/
+theorem windowPortability_eq_dotProduct (semigroup : FellerSemigroup (SimplexLaw H))
+    (p₀ : SimplexLaw H) (s t : ℝ≥0) (S Y : H → ℝ) :
+    windowPortability semigroup p₀ s t S Y =
+      (Pi.single (true, true) 1 ⬝ᵥ portabilityExpectations semigroup p₀ s t S Y) *
+          (Pi.single (false, false) 1 ⬝ᵥ portabilityExpectations semigroup p₀ s t S Y) /
+        ((Pi.single (true, false) 1 ⬝ᵥ portabilityExpectations semigroup p₀ s t S Y) *
+          (Pi.single (false, true) 1 ⬝ᵥ portabilityExpectations semigroup p₀ s t S Y)) := by
+  rw [windowPortability_eq_cross]
+  simp only [single_dotProduct, one_mul]
+  rfl
+
+/-- **The four expectations lie in the unit box** for a score and an outcome in the unit
+interval. -/
+theorem abs_portabilityExpectations_le (semigroup : FellerSemigroup (SimplexLaw H))
+    (p₀ : SimplexLaw H) (s t : ℝ≥0) {S Y : H → ℝ} (hS0 : ∀ h, 0 ≤ S h) (hS1 : ∀ h, S h ≤ 1)
+    (hY0 : ∀ h, 0 ≤ Y h) (hY1 : ∀ h, Y h ≤ 1) (i : Bool × Bool) :
+    |portabilityExpectations semigroup p₀ s t S Y i| ≤ 1 := by
+  rcases i with ⟨b₁, b₂⟩
+  obtain ⟨hN0, hND, hD1⟩ := operator_apply_mem_unit semigroup (if b₁ then t else s)
+    (windowNumerator_nonneg S Y) (windowNumerator_le_windowDenominator S Y)
+    (windowDenominator_le_one hS0 hS1 hY0 hY1) p₀
+  cases b₂
+  · show |semigroup.operator (if b₁ then t else s) (windowDenominator S Y) p₀| ≤ 1
+    exact abs_le.mpr ⟨by linarith, hD1⟩
+  · show |semigroup.operator (if b₁ then t else s) (windowNumerator S Y) p₀| ≤ 1
+    exact abs_le.mpr ⟨by linarith, by linarith⟩
+
+end Box
 
 /-! ## The error bar -/
 
@@ -416,25 +436,64 @@ theorem abs_windowPortability_sub_neutral_le {c : ℝ} (hc : 0 ≤ c) {r : E →
     |windowPortability (decisionWindowSemigroup hc hr T) p₀ s t S Y -
         windowPortability (neutralWindowSemigroup hc T) p₀ s t S Y| ≤
       128 * (∑ e, r e) * (t : ℝ) / δ ^ 4 := by
-  have hunit : ∀ (P : FellerSemigroup (SimplexLaw H)) (u : ℝ≥0),
-      0 ≤ P.operator u (windowNumerator S Y) p₀ ∧
-        P.operator u (windowNumerator S Y) p₀ ≤ P.operator u (windowDenominator S Y) p₀ ∧
-          P.operator u (windowDenominator S Y) p₀ ≤ 1 := fun P u ↦
-    operator_apply_mem_unit P u (windowNumerator_nonneg S Y)
-      (windowNumerator_le_windowDenominator S Y) (windowDenominator_le_one hS0 hS1 hY0 hY1) p₀
-  rw [windowPortability_eq_cross, windowPortability_eq_cross]
-  refine (abs_crossRatio_sub_le_of_unit hδ (hunit (decisionWindowSemigroup hc hr T) t)
-    (hunit (decisionWindowSemigroup hc hr T) s) (hunit (neutralWindowSemigroup hc T) t)
-    (hunit (neutralWindowSemigroup hc T) s) htarget hsource htarget₀ hsource₀).trans ?_
+  have hR : 0 ≤ ∑ e, r e := sum_nonneg fun e _ ↦ hr e
   have hmono : 32 * (∑ e, r e) * (s : ℝ) ≤ 32 * (∑ e, r e) * (t : ℝ) :=
-    mul_le_mul_of_nonneg_left (NNReal.coe_le_coe.mpr hst)
-      (mul_nonneg (by norm_num) (sum_nonneg fun e _ ↦ hr e))
-  have hNt := abs_windowNumerator_sub_neutral_le hc hr T t hS0 hS1 hY0 hY1 p₀
-  have hNs := abs_windowNumerator_sub_neutral_le hc hr T s hS0 hS1 hY0 hY1 p₀
-  have hDt := abs_windowDenominator_sub_neutral_le hc hr T t hS0 hS1 hY0 hY1 p₀
-  have hDs := abs_windowDenominator_sub_neutral_le hc hr T s hS0 hS1 hY0 hY1 p₀
-  calc _ ≤ 128 * (∑ e, r e) * (t : ℝ) / (δ ^ 2) ^ 2 :=
-        div_le_div_of_nonneg_right (by linarith) (by positivity)
+    mul_le_mul_of_nonneg_left (NNReal.coe_le_coe.mpr hst) (mul_nonneg (by norm_num) hR)
+  have hmove : ‖portabilityExpectations (decisionWindowSemigroup hc hr T) p₀ s t S Y -
+      portabilityExpectations (neutralWindowSemigroup hc T) p₀ s t S Y‖ ≤
+        32 * (∑ e, r e) * (t : ℝ) := by
+    refine (pi_norm_le_iff_of_nonneg (mul_nonneg (mul_nonneg (by norm_num) hR)
+      (NNReal.coe_nonneg t))).mpr fun i ↦ ?_
+    rcases i with ⟨b₁, b₂⟩
+    have htime : 32 * (∑ e, r e) * ((if b₁ then t else s : ℝ≥0) : ℝ) ≤
+        32 * (∑ e, r e) * (t : ℝ) := by
+      cases b₁
+      · exact hmono
+      · exact le_rfl
+    rw [Pi.sub_apply, Real.norm_eq_abs]
+    cases b₂
+    · exact (abs_windowDenominator_sub_neutral_le hc hr T (if b₁ then t else s) hS0 hS1 hY0 hY1
+        p₀).trans htime
+    · exact (abs_windowNumerator_sub_neutral_le hc hr T (if b₁ then t else s) hS0 hS1 hY0 hY1
+        p₀).trans htime
+  have hv : portabilityExpectations (decisionWindowSemigroup hc hr T) p₀ s t S Y ∈
+      RealizationBody.realizationBody unitBoxFeature :=
+    RealizationBody.mem_realizationBody_of_range unitBoxFeature
+      ⟨portabilityExpectations (decisionWindowSemigroup hc hr T) p₀ s t S Y,
+        abs_portabilityExpectations_le (decisionWindowSemigroup hc hr T) p₀ s t hS0 hS1 hY0 hY1⟩
+  have hv₀ : portabilityExpectations (neutralWindowSemigroup hc T) p₀ s t S Y ∈
+      RealizationBody.realizationBody unitBoxFeature :=
+    RealizationBody.mem_realizationBody_of_range unitBoxFeature
+      ⟨portabilityExpectations (neutralWindowSemigroup hc T) p₀ s t S Y,
+        abs_portabilityExpectations_le (neutralWindowSemigroup hc T) p₀ s t hS0 hS1 hY0 hY1⟩
+  have hDt : δ ≤ Pi.single (true, false) 1 ⬝ᵥ
+      portabilityExpectations (decisionWindowSemigroup hc hr T) p₀ s t S Y := by
+    rw [single_dotProduct, one_mul]
+    exact htarget
+  have hNs : δ ≤ Pi.single (false, true) 1 ⬝ᵥ
+      portabilityExpectations (decisionWindowSemigroup hc hr T) p₀ s t S Y := by
+    rw [single_dotProduct, one_mul]
+    exact hsource
+  have hDt₀ : δ ≤ Pi.single (true, false) 1 ⬝ᵥ
+      portabilityExpectations (neutralWindowSemigroup hc T) p₀ s t S Y := by
+    rw [single_dotProduct, one_mul]
+    exact htarget₀
+  have hNs₀ : δ ≤ Pi.single (false, true) 1 ⬝ᵥ
+      portabilityExpectations (neutralWindowSemigroup hc T) p₀ s t S Y := by
+    rw [single_dotProduct, one_mul]
+    exact hsource₀
+  have hcross := PortabilityMetricCompilation.abs_crossRatio_sub_le unitBoxFeature hδ
+    (fun x i ↦ x.2 i) (Pi.single (true, true) 1) (Pi.single (false, false) 1)
+    (Pi.single (true, false) 1) (Pi.single (false, true) 1) hv hv₀ hDt hNs hDt₀ hNs₀
+  have hsum : ∀ k : Bool × Bool, ∑ i, |(Pi.single k (1 : ℝ) : Bool × Bool → ℝ) i| = 1 :=
+    fun k ↦ by
+      rw [Finset.sum_eq_single k (fun i _ hik ↦ by rw [Pi.single_eq_of_ne hik, abs_zero])
+        (fun hk ↦ absurd (Finset.mem_univ k) hk), Pi.single_eq_same, abs_one]
+  rw [hsum, hsum, hsum, hsum] at hcross
+  rw [windowPortability_eq_dotProduct, windowPortability_eq_dotProduct]
+  calc _ ≤ _ := hcross
+    _ ≤ 4 * 1 ^ 3 * 1 * 1 * 1 * 1 / δ ^ 4 * (32 * (∑ e, r e) * (t : ℝ)) :=
+        mul_le_mul_of_nonneg_left hmove (by positivity)
     _ = 128 * (∑ e, r e) * (t : ℝ) / δ ^ 4 := by ring
 
 /-- **The error bar for a total selective rate at most `σ`**: under the hypotheses of
