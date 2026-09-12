@@ -214,7 +214,8 @@ theorem difference_eq_zero_of_lt (hzero : ∀ ξ, d 0 ξ = 0) {t : ℝ} (ht : 0 
     have h2 := h.const_mul 2
     rw [mul_zero] at h2
     refine h2.congr fun j ↦ ?_
-    rw [add_comm j, Nat.choose_symm_add, mul_assoc]
+    rw [add_comm j, Nat.choose_symm_add]
+    ring
   have hle : ‖restrictBudget capacity (d t)‖ ≤ 0 := ge_of_tendsto' htends fun j ↦
     norm_restrictBudget_difference_le rates model hS0 hS d hd hcont hbound hzero j capacity ht
   exact norm_le_zero_iff.mp hle
@@ -252,7 +253,7 @@ theorem difference_eq_zero (hzero : ∀ ξ, d 0 ξ = 0) {t : ℝ} (ht : 0 ≤ t)
             have hadd : HasDerivWithinAt (fun w : ℝ ↦ (k : ℝ) * (1 / (2 * S + 1)) + w) 1
                 (Set.Ici v) v :=
               ((hasDerivAt_id (x := v)).const_add _).hasDerivWithinAt
-            have h := HasDerivWithinAt.comp (hh₂ := hd capacity' _ (add_nonneg hk0 hv))
+            have h := HasDerivWithinAt.scomp (hg := hd capacity' _ (add_nonneg hk0 hv))
               (hh := hadd) (hst := fun w hw ↦ by
                 simp only [Set.mem_Ici] at hw ⊢
                 linarith)
@@ -320,7 +321,7 @@ theorem moments_eq_of_selectedMomentEquation (rates : NeutralRates Deme Locus Al
       have h1 := abs_le.mp (hbound s hs ζ)
       have h2 := abs_le.mp (hbound' s hs ζ)
       exact abs_le.mpr ⟨by linarith [h1.1, h2.2], by linarith [h1.2, h2.1]⟩)
-    (fun ζ ↦ by rw [h0, sub_self]) ht (cardinalityBudget ξ)
+    (fun ζ ↦ sub_eq_zero.mpr (h0 ζ)) ht (cardinalityBudget ξ)
   exact sub_eq_zero.mp (congrFun hdiff ⟨ξ, withinBudget_cardinalityBudget ξ⟩)
 
 /-- **Selected expectation families with equal initial moments have equal moments.** Two
