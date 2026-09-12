@@ -21,6 +21,8 @@ open Descent.Portability.EmpiricalTableLawMetrics
 #print axioms conditional_tableLaw_linearIntercept
 #print axioms conditional_tableLaw_linearIntercept_chronologyLaw
 #print axioms expectation_tableLaw_expectation
+#print axioms correctIndicator
+#print axioms thresholdAccuracy_eq_expectation_correctIndicator
 #print axioms tableLaw_thresholdAccuracy
 #print axioms expectation_tableLaw_thresholdAccuracy
 #print axioms expectation_tableLaw_thresholdAccuracy_chronologyLaw

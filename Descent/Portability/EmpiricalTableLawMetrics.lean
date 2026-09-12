@@ -414,15 +414,24 @@ theorem expectation_tableLaw_expectation (law : FiniteReportLaw (Bool × Bool)) 
   simp only [expectation_tableLaw_cellCount]
   rw [hstep, htotal, mul_comm, mul_div_assoc, div_self hnR, mul_one]
 
+/-- The correct-classification indicator at a threshold: the outcome when the score exceeds the
+threshold, and its complement otherwise. -/
+def correctIndicator (threshold : ℝ) (report : Bool × Bool) : ℝ :=
+  if threshold < scoreOf report then outcomeOf report else 1 - outcomeOf report
+
+/-- The corpus threshold accuracy is the expectation of the correct-classification indicator. -/
+theorem thresholdAccuracy_eq_expectation_correctIndicator (law : FiniteReportLaw (Bool × Bool))
+    (threshold : ℝ) :
+    thresholdAccuracy law threshold = law.expectation (correctIndicator threshold) :=
+  rfl
+
 /-- The corpus threshold accuracy of the empirical table law of a cohort is the sample mean of
 the correct-classification indicator over the cohort members. -/
 theorem tableLaw_thresholdAccuracy {n : ℕ} (sample : Fin n → Bool × Bool)
     (hpos : 0 < ∑ cell, cellCount sample cell) (threshold : ℝ) :
     thresholdAccuracy (tableLaw (cellCount sample) hpos) threshold =
-      (∑ member, if threshold < scoreOf (sample member) then outcomeOf (sample member)
-        else 1 - outcomeOf (sample member)) / n :=
-  expectation_tableLaw_cellCount sample hpos fun report ↦
-    if threshold < scoreOf report then outcomeOf report else 1 - outcomeOf report
+      (∑ member, correctIndicator threshold (sample member)) / n :=
+  expectation_tableLaw_cellCount sample hpos (correctIndicator threshold)
 
 /-- The finite-cohort accuracy law: for an independent cohort of size `n > 0`, the corpus
 threshold accuracy of the empirical table law is unbiased for the population accuracy at every
