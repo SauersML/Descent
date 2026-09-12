@@ -58,7 +58,7 @@ set_option relaxedAutoImplicit false
 namespace Descent.Portability.FundamentalMatrixParameterDerivative
 
 open MeasureTheory LinearFundamentalMatrix IntegrableGeneratorPropagator IntegrableRateRealization
-open scoped Matrix.Norms.Operator
+open scoped Matrix Matrix.Norms.Operator
 
 noncomputable section
 
@@ -169,7 +169,6 @@ theorem toBlocks₂₁_fundamentalMatrix_blockPath_eq_integral {P C D : ℝ → 
   have hsmem : s ∈ Set.Icc 0 T := by
     rw [Set.uIcc_of_le ht.1] at hs
     exact ⟨hs.1, hs.2.trans ht.2⟩
-  beta_reduce
   rw [toBlocks₂₁_blockPath_mul, toBlocks₁₁_fundamentalMatrix_blockPath hP hC hD hT s hsmem]
 
 /-! ## The exact difference along a line of paths -/
@@ -255,7 +254,8 @@ theorem norm_fundamentalMatrix_blockLine_sub_le {A B : ℝ → Matrix ι ι ℝ}
       * Real.exp ((∫ s in (0 : ℝ)..T, ‖blockPath A B A s‖)
         + ∫ s in (0 : ℝ)..T, ‖blockPath B (fun _ ↦ 0) (fun _ ↦ 0) s‖),
     mul_nonneg (mul_nonneg hEint (Real.exp_pos _).le) (Real.exp_pos _).le, fun ε hε ↦ ?_⟩
-  have hNε := continuous_blockPath (hA.add (continuous_const.smul hB)) hB hA
+  have hline : Continuous fun s ↦ A s + ε • B s := hA.add (continuous_const.smul hB)
+  have hNε := continuous_blockPath hline hB hA
   have hdiff : ∀ s, blockPath (fun s ↦ A s + ε • B s) B A s - blockPath A B A s
       = ε • blockPath B (fun _ ↦ 0) (fun _ ↦ 0) s := by
     intro s
@@ -322,8 +322,8 @@ at `0` the corresponding entry of the lower-left block of the fundamental matrix
 `[[A, 0], [B, A]]`. -/
 theorem hasDerivAt_fundamentalMatrix_line {A B : ℝ → Matrix ι ι ℝ} (hA : Continuous A)
     (hB : Continuous B) {T : ℝ} (hT : 0 ≤ T) (i j : ι) :
-    HasDerivAt (fun ε ↦ fundamentalMatrix (fun s ↦ A s + ε • B s) T T i j)
-      ((fundamentalMatrix (blockPath A B A) T T).toBlocks₂₁ i j) 0 := by
+    HasDerivAt (fun ε : ℝ ↦ fundamentalMatrix (fun s ↦ A s + ε • B s) T T i j)
+      ((fundamentalMatrix (blockPath A B A) T T).toBlocks₂₁ i j) (0 : ℝ) := by
   obtain ⟨K, hK, hbound⟩ := norm_fundamentalMatrix_blockLine_sub_le hA hB hT
   have hsmall : Filter.Tendsto (fun ε : ℝ ↦ ‖lowerLeftEntry (ι := ι) i j‖ * (|ε| * K))
       (nhds 0) (nhds 0) := by
@@ -331,8 +331,9 @@ theorem hasDerivAt_fundamentalMatrix_line {A B : ℝ → Matrix ι ι ℝ} (hA :
       continuous_const.mul (continuous_abs.mul continuous_const)
     simpa using hcont.tendsto 0
   have hlimit : Filter.Tendsto
-      (fun ε ↦ (fundamentalMatrix (blockPath (fun s ↦ A s + ε • B s) B A) T T).toBlocks₂₁ i j)
-      (nhds 0) (nhds ((fundamentalMatrix (blockPath A B A) T T).toBlocks₂₁ i j)) := by
+      (fun ε : ℝ ↦
+        (fundamentalMatrix (blockPath (fun s ↦ A s + ε • B s) B A) T T).toBlocks₂₁ i j)
+      (nhds (0 : ℝ)) (nhds ((fundamentalMatrix (blockPath A B A) T T).toBlocks₂₁ i j)) := by
     rw [tendsto_iff_norm_sub_tendsto_zero]
     refine squeeze_zero' (Filter.Eventually.of_forall fun _ ↦ norm_nonneg _) ?_ hsmall
     filter_upwards [Ioo_mem_nhds (show (-1 : ℝ) < 0 by norm_num) (show (0 : ℝ) < 1 by norm_num)]
