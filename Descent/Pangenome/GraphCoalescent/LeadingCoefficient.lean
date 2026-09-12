@@ -102,7 +102,7 @@ def leadingCoefficient (T : Finset ι) (c : ι → ℕ) : ℚ :=
 /-- The coefficients of `a_m`. -/
 theorem deficitPolynomial_coeff (m d : ℕ) :
     (deficitPolynomial m).coeff d = if d < m then (deficitWeight m d : ℚ) else 0 := by
-  simp [deficitPolynomial, finset_sum_coeff, coeff_C_mul, coeff_X_pow]
+  simp [deficitPolynomial, finset_sum_coeff, coeff_X_pow]
 
 /-- `a_m(0) = 1` for `m ≥ 1`: one partition has every individual in its own block. -/
 theorem deficitPolynomial_coeff_zero {m : ℕ} (hm : 1 ≤ m) : (deficitPolynomial m).coeff 0 = 1 := by
@@ -175,7 +175,7 @@ theorem reflect_finset_sum {κ : Type*} (t : Finset κ) (f : κ → ℚ[X]) (N :
   induction t using Finset.induction_on with
   | empty =>
       ext i
-      simp [coeff_reflect]
+      simp
   | insert b t hb ih =>
       rw [sum_insert hb, reflect_add, ih, sum_insert hb]
 
@@ -230,9 +230,8 @@ theorem map_cumulantOfSizes (T : Finset ι) (c : ι → ℕ) (hc : ∀ i ∈ T, 
     reflect_prod_deficitPolynomial _ c fun U hU ↦ one_le_block_size hc ρ hU,
     Polynomial.map_mul, Polynomial.map_C, Polynomial.map_prod]
   congr 1
-  · simp
-  · refine prod_congr rfl fun U _ ↦ ?_
-    simp [lahPolynomial, Polynomial.map_sum]
+  refine prod_congr rfl fun U _ ↦ ?_
+  simp [lahPolynomial, Polynomial.map_sum]
 
 /-! ## The Möbius identity at the bottom degree -/
 
@@ -302,7 +301,7 @@ theorem prod_parts_update_pred {T : Finset ι} (ρ : Finpartition T) (c : ι →
   · refine prod_congr rfl fun U hU ↦ ?_
     have hiU := notMem_of_mem_erase_part ρ hU
     congr 1
-    exact sum_congr rfl fun k hk ↦ Function.update_of_ne (fun hki ↦ hiU (hki ▸ hk)) _ _
+    exact sum_congr rfl fun k hk ↦ Function.update_of_ne (fun hki : k = i ↦ hiU (hki ▸ hk)) _ _
   · congr 1
     rw [sum_update_of_mem (ρ.mem_part hi), sum_eq_add_sum_diff_singleton (ρ.mem_part hi) c]
     omega
@@ -419,7 +418,8 @@ theorem fused_product (c : ι → ℕ) {T : Finset ι} {i j : ι} (hi : i ∈ T.
     have hiU := notMem_of_mem_erase_part σ hU
     rw [if_neg hiU]
     congr 1
-    exact (sum_congr rfl fun k hk ↦ Function.update_of_ne (fun hki ↦ hiU (hki ▸ hk)) _ _).symm
+    exact (sum_congr rfl fun k hk ↦
+      Function.update_of_ne (fun hki : k = i ↦ hiU (hki ▸ hk)) _ _).symm
 
 /-- **The derivative of the cumulant.**
 `K_c' = ∑_i c_i (c_i − 1) K_{c − e_i} + ∑_{i ≠ j} c_i c_j K_{c^{(ij)}}`, where `c − e_i` lowers
@@ -469,7 +469,6 @@ theorem derivative_deficitCumulant (T : Finset ι) (c : ι → ℕ) (hc : ∀ i 
       _ = _ := sum_congr rfl fun j hj ↦
           (sum_part_eq_part hi (mem_of_mem_erase hj) (ne_of_mem_erase hj).symm _).trans
             (sum_congr rfl fun σ _ ↦ by
-              dsimp only
               rw [Finpartition.copy_parts,
                 (blockWeight_insertIntoPart σ (notMem_erase j T) _).2,
                 fused_product c (mem_erase.mpr ⟨(ne_of_mem_erase hj).symm, hi⟩) (hc i hi) σ _])
@@ -488,12 +487,13 @@ theorem update_pred_pos {T : Finset ι} {c : ι → ℕ} (hc : ∀ i ∈ T, 1 �
     exact hc k hk
 
 /-- Fusing two fibers keeps every size positive. -/
-theorem update_fuse_pos {T : Finset ι} {c : ι → ℕ} (hc : ∀ i ∈ T, 1 ≤ c i) {i : ι} (hi : i ∈ T)
-    (j : ι) : ∀ k ∈ T.erase j, 1 ≤ Function.update c i (c i + c j - 1) k := by
+theorem update_fuse_pos {T : Finset ι} {c : ι → ℕ} (hc : ∀ i ∈ T, 1 ≤ c i) {i j : ι} (hi : i ∈ T)
+    (hj : j ∈ T) : ∀ k ∈ T.erase j, 1 ≤ Function.update c i (c i + c j - 1) k := by
   intro k hk
   by_cases hki : k = i
   · rw [hki, Function.update_self]
     have := hc i hi
+    have := hc j hj
     omega
   · rw [Function.update_of_ne hki]
     exact hc k (mem_of_mem_erase hk)
@@ -518,7 +518,8 @@ theorem coeff_deficitCumulant_eq_zero :
       have hsecond : ∑ i ∈ T, ∑ j ∈ T.erase i, (c i : ℚ) * (c j : ℚ) *
           (deficitCumulant (T.erase j) (Function.update c i (c i + c j - 1))).coeff d = 0 :=
         sum_eq_zero fun i hi ↦ sum_eq_zero fun j hj ↦ by
-          rw [coeff_deficitCumulant_eq_zero d (T.erase j) _ (update_fuse_pos hc hi j)
+          rw [coeff_deficitCumulant_eq_zero d (T.erase j) _
+            (update_fuse_pos hc hi (mem_of_mem_erase hj))
             (by rw [card_erase_of_mem (mem_of_mem_erase hj)]; omega), mul_zero]
       rw [hfirst, hsecond, add_zero] at hderivative
       exact (mul_eq_zero.mp hderivative).resolve_right (by positivity)
@@ -550,6 +551,7 @@ theorem coeff_deficitCumulant_recursion (T : Finset ι) (c : ι → ℕ) (hc : �
 
 /-! ## The closed form -/
 
+omit [DecidableEq ι] in
 /-- Positive fiber sizes total at least the number of fibers. -/
 theorem card_le_sum_sizes {T : Finset ι} {c : ι → ℕ} (hc : ∀ i ∈ T, 1 ≤ c i) :
     #T ≤ ∑ i ∈ T, c i := by
@@ -583,7 +585,7 @@ theorem sum_pairs_sizes {T : Finset ι} (c : ι → ℕ) (hT : 1 ≤ #T) :
   have hinner : ∀ i ∈ T, ∑ j ∈ T.erase i, ((c i : ℚ) + (c j : ℚ) - 1) =
       ((#T : ℚ) - 1) * (c i : ℚ) + (∑ k ∈ T, (c k : ℚ) - (c i : ℚ)) - ((#T : ℚ) - 1) := by
     intro i hi
-    rw [sum_sub_distrib, sum_add_distrib, sum_erase_eq_sub hi]
+    rw [sum_sub_distrib, sum_add_distrib, sum_erase_eq_sub (f := fun k ↦ (c k : ℚ)) hi]
     simp only [sum_const, card_erase_of_mem hi, nsmul_eq_mul, mul_one]
     rw [Nat.cast_sub hT, Nat.cast_one]
   rw [sum_congr rfl hinner]
@@ -651,7 +653,8 @@ theorem coeff_deficitCumulant_top :
           rw [card_erase_of_mem hjT]
           omega
         rw [show #T - 2 = #(T.erase j) - 1 by rw [hcard]; omega]
-        exact coeff_deficitCumulant_top w (T.erase j) _ hcard (update_fuse_pos hc hi j)
+        exact coeff_deficitCumulant_top w (T.erase j) _ hcard
+          (update_fuse_pos hc hi (mem_of_mem_erase hj))
       have hsum : ∑ i ∈ T, ∑ j ∈ T.erase i, (c i : ℚ) * (c j : ℚ) *
           (deficitCumulant (T.erase j) (Function.update c i (c i + c j - 1))).coeff (#T - 2) =
             ∑ i ∈ T, ∑ j ∈ T.erase i, (c i : ℚ) * (c j : ℚ) *
