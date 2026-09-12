@@ -238,7 +238,7 @@ theorem localRestriction_mul_dualGenerator (rates : NeutralRates Deme Locus Alle
   · rw [dualGenerator_eq_zero_of_not_lociWithin rates capacity s.2 hη]
     exact (Finset.sum_eq_zero fun s' _ ↦ by
       simp only [localRestriction]
-      rw [if_neg fun heq ↦ hη (heq ▸ s'.2), mul_zero]).symm
+      rw [if_neg fun (heq : η = s'.1) ↦ hη (heq ▸ s'.2), mul_zero]).symm
 
 /-- **The restriction intertwines the propagators.** -/
 theorem localRestriction_mul_matrixExponential (rates : NeutralRates Deme Locus Allele)
