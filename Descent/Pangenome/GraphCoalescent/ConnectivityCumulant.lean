@@ -46,8 +46,8 @@ cumulant has nonnegative integer coefficients. `connectivityCumulant_eq_cumulant
 depends on the interface only through its fiber sizes: it is `cumulantOfSizes q.parts card`,
 (D2) written over partitions of the fiber set with `c(C) = Σ_{i ∈ C} c_i`.
 
-Not formalized here: the degree bound `n - w + 1`, and the corpus form of (D3) over
-`Coalescent.ER n` with `observed` and `graphKer`.
+The degree bound `n - w + 1` is `ConnectivityCumulantDegree`. Not formalized here: the corpus
+form of (D3) over `Coalescent.ER n` with `observed` and `graphKer`.
 
 ## Empirical status
 
@@ -401,7 +401,7 @@ theorem bind_le (σ : Finpartition s) (fam : ∀ u ∈ σ.parts, Finpartition u)
 
 /-- Juxtaposing the restrictions of a refinement returns the refinement. -/
 theorem bind_restrictToPart {π σ : Finpartition s} (h : π ≤ σ) :
-    σ.bind (fun u hu ↦ restrictToPart h hu) = π := by
+    σ.bind (fun _ hu ↦ restrictToPart h hu) = π := by
   ext t
   rw [Finpartition.mem_bind]
   constructor
