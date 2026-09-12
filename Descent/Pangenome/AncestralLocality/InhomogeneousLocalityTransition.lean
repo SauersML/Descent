@@ -190,6 +190,7 @@ theorem mean_le_rankOneRatio {m : ℕ} {w : Fin m → ℝ} (hS : 0 < ∑ i, w i)
 /-- **The Chung–Lu edge probability** `min(1, w_i w_j / S)`. -/
 def chungLuProb {m : ℕ} (w : Fin m → ℝ) : Sym2 (Fin m) → ℝ :=
   Sym2.lift ⟨fun i j ↦ min 1 (rankOneKernel w i j), fun i j ↦ by
+    show min 1 (rankOneKernel w i j) = min 1 (rankOneKernel w j i)
     rw [rankOneKernel, rankOneKernel, mul_comm (w i)]⟩
 
 /-- The Chung–Lu probability of the pair `{i, j}`. -/
@@ -225,7 +226,7 @@ theorem productExpect_card_adj_le {m : ℕ} {q : Sym2 (Fin m) → ℝ} {w : Fin 
     have hfilter : (univ.filter fun j ↦ (edgeGraph E).Adj i j) =
         (univ.erase i).filter fun j ↦ ({s(i, j)} : Finset (Sym2 (Fin m))) ⊆ E := by
       ext j
-      simp only [mem_filter, mem_univ, true_and, mem_erase, edgeGraph_adj_iff,
+      simp only [mem_filter, mem_univ, true_and, and_true, mem_erase, edgeGraph_adj_iff,
         singleton_subset_iff]
       exact ⟨fun ⟨h1, h2⟩ ↦ ⟨h2.symm, h1⟩, fun ⟨h1, h2⟩ ↦ ⟨h2, h1.symm⟩⟩
     rw [hfilter, natCast_card_filter]
@@ -391,8 +392,8 @@ theorem productExpect_card_reach_singleton_le {m : ℕ} {q : Sym2 (Fin m) → �
     _ ≤ ∑ ℓ ∈ range m, walkWeight w ℓ r :=
         sum_le_sum fun ℓ _ ↦ productExpect_card_presentPaths_le hq0 hw hq r ℓ
     _ = 1 + w r * ∑ k ∈ range (m - 1), rankOneRatio w ^ k := by
-        obtain ⟨n, hn⟩ : ∃ n, m = n + 1 := ⟨m - 1, (Nat.succ_pred_eq_of_pos r.pos).symm⟩
-        rw [hn, sum_range_succ', Nat.add_sub_cancel]
+        obtain ⟨n, rfl⟩ : ∃ n, m = n + 1 := ⟨m - 1, (Nat.succ_pred_eq_of_pos r.pos).symm⟩
+        rw [sum_range_succ', Nat.add_sub_cancel]
         simp only [walkWeight_succ hS.ne']
         rw [show walkWeight w 0 r = 1 from rfl, mul_sum, add_comm]
 
