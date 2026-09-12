@@ -18,6 +18,7 @@ import Descent.Pangenome.GraphCoalescent.HiddenLumpability
 import Descent.Pangenome.GraphCoalescent.LahWeights
 import Descent.Pangenome.GraphCoalescent.LambdaLoadClosure
 import Descent.Pangenome.GraphCoalescent.LeadingCoefficient
+import Descent.Pangenome.GraphCoalescent.LeadingCoefficientCorollaries
 import Descent.Pangenome.GraphCoalescent.LumpingUnorderedPair
 import Descent.Pangenome.GraphCoalescent.LumpingVisibleRates
 import Descent.Pangenome.GraphCoalescent.MergerDepth
