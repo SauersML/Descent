@@ -242,7 +242,8 @@ theorem abs_samplingObservable_le [Fintype H] {n : ℕ} (f : (Fin n → H) → �
 /-- `S_{-u}` after `S_t` is `S_{t-u}`, on one observation. -/
 theorem holdingSemigroup_neg_apply_apply [Fintype H] [Fintype E] (c : ℝ) (r : E → ℝ) (n : ℕ)
     (u t : ℝ) (f : (Fin n → H) → ℝ) :
-    holdingSemigroup c r n (-u) (holdingSemigroup c r n t f) = holdingSemigroup c r n (t - u) f := by
+    holdingSemigroup c r n (-u) (holdingSemigroup c r n t f) =
+      holdingSemigroup c r n (t - u) f := by
   rw [← holdingSemigroup_neg_mul]
   rfl
 
@@ -631,6 +632,353 @@ theorem abs_dysonMoment_le [Fintype H] [DecidableEq H] [Fintype E] {c : ℝ} {r 
             Real.exp (n * (∑ e, r e) * u) * yuleWeight (∑ e, r e) k (n + 1) u) * ‖f‖ := by
           rw [intervalIntegral.integral_const_mul]
           ring
+
+/-! ### The dual expectation and the truncated circuits -/
+
+/-- **The dual expectation of the circuit killed at its `M`-th decision**: the sum of the Dyson
+terms with fewer than `M` decisions. -/
+def truncatedDual [Fintype H] [DecidableEq H] [Fintype E] (c : ℝ) (r : E → ℝ)
+    (T : E → H → H → H) (p : H → ℝ) (M n : ℕ) (t : ℝ) (f : (Fin n → H) → ℝ) : ℝ :=
+  ∑ k ∈ range M, dysonMoment c r T p k n t f
+
+/-- **The dual expectation** `E_f[H_{f_t}(p)]` of the backward decision circuit: the sum of its
+Dyson terms over the number of decisions. -/
+def decisionDual [Fintype H] [DecidableEq H] [Fintype E] (c : ℝ) (r : E → ℝ)
+    (T : E → H → H → H) (p : H → ℝ) (n : ℕ) (t : ℝ) (f : (Fin n → H) → ℝ) : ℝ :=
+  ∑' k, dysonMoment c r T p k n t f
+
+/-- The Dyson terms at a nonnegative time are summable. -/
+theorem summable_dysonMoment [Fintype H] [DecidableEq H] [Fintype E] {c : ℝ} {r : E → ℝ}
+    (hc : 0 ≤ c) (hr : ∀ e, 0 ≤ r e) (T : E → H → H → H) {p : H → ℝ} (hp0 : ∀ h, 0 ≤ p h)
+    (hp : ∑ h, p h = 1) (n : ℕ) {t : ℝ} (ht : 0 ≤ t) (f : (Fin n → H) → ℝ) :
+    Summable fun k ↦ dysonMoment c r T p k n t f :=
+  ((summable_yuleWeight (sum_nonneg fun e _ ↦ hr e) n ht).mul_right ‖f‖).of_norm_bounded
+    fun k ↦ (Real.norm_eq_abs _).trans_le (abs_dysonMoment_le hc hr T hp0 hp k n ht f)
+
+/-- The Dyson terms sum to the dual expectation. -/
+theorem hasSum_dysonMoment [Fintype H] [DecidableEq H] [Fintype E] {c : ℝ} {r : E → ℝ}
+    (hc : 0 ≤ c) (hr : ∀ e, 0 ≤ r e) (T : E → H → H → H) {p : H → ℝ} (hp0 : ∀ h, 0 ≤ p h)
+    (hp : ∑ h, p h = 1) (n : ℕ) {t : ℝ} (ht : 0 ≤ t) (f : (Fin n → H) → ℝ) :
+    HasSum (fun k ↦ dysonMoment c r T p k n t f) (decisionDual c r T p n t f) :=
+  (summable_dysonMoment hc hr T hp0 hp n ht f).hasSum
+
+/-- **The truncated circuits converge to the dual expectation** as `M → ∞`. -/
+theorem tendsto_truncatedDual [Fintype H] [DecidableEq H] [Fintype E] {c : ℝ} {r : E → ℝ}
+    (hc : 0 ≤ c) (hr : ∀ e, 0 ≤ r e) (T : E → H → H → H) {p : H → ℝ} (hp0 : ∀ h, 0 ≤ p h)
+    (hp : ∑ h, p h = 1) (n : ℕ) {t : ℝ} (ht : 0 ≤ t) (f : (Fin n → H) → ℝ) :
+    Tendsto (fun M ↦ truncatedDual c r T p M n t f) atTop (𝓝 (decisionDual c r T p n t f)) :=
+  (hasSum_dysonMoment hc hr T hp0 hp n ht f).tendsto_sum_nat
+
+/-- A truncated circuit is at most the sup norm. -/
+theorem abs_truncatedDual_le [Fintype H] [DecidableEq H] [Fintype E] {c : ℝ} {r : E → ℝ}
+    (hc : 0 ≤ c) (hr : ∀ e, 0 ≤ r e) (T : E → H → H → H) {p : H → ℝ} (hp0 : ∀ h, 0 ≤ p h)
+    (hp : ∑ h, p h = 1) (M n : ℕ) {t : ℝ} (ht : 0 ≤ t) (f : (Fin n → H) → ℝ) :
+    |truncatedDual c r T p M n t f| ≤ ‖f‖ :=
+  calc |truncatedDual c r T p M n t f| ≤ ∑ k ∈ range M, |dysonMoment c r T p k n t f| :=
+        abs_sum_le_sum_abs _ _
+    _ ≤ ∑ k ∈ range M, yuleWeight (∑ e, r e) k n t * ‖f‖ :=
+        sum_le_sum fun k _ ↦ abs_dysonMoment_le hc hr T hp0 hp k n ht f
+    _ ≤ ‖f‖ := by
+        rw [← sum_mul]
+        exact mul_le_of_le_one_left (norm_nonneg f)
+          (sum_range_yuleWeight_le_one (sum_nonneg fun e _ ↦ hr e) M n ht)
+
+/-- **The dual expectation is at most the sup norm.** -/
+theorem abs_decisionDual_le [Fintype H] [DecidableEq H] [Fintype E] {c : ℝ} {r : E → ℝ}
+    (hc : 0 ≤ c) (hr : ∀ e, 0 ≤ r e) (T : E → H → H → H) {p : H → ℝ} (hp0 : ∀ h, 0 ≤ p h)
+    (hp : ∑ h, p h = 1) (n : ℕ) {t : ℝ} (ht : 0 ≤ t) (f : (Fin n → H) → ℝ) :
+    |decisionDual c r T p n t f| ≤ ‖f‖ :=
+  le_of_tendsto' ((continuous_abs.tendsto _).comp (tendsto_truncatedDual hc hr T hp0 hp n ht f))
+    fun M ↦ abs_truncatedDual_le hc hr T hp0 hp M n ht f
+
+/-- **The truncation error.** The circuit killed at its `M`-th decision is within the mass of the
+Yule weights with at least `M` births, times the sup norm. -/
+theorem abs_decisionDual_sub_truncatedDual_le [Fintype H] [DecidableEq H] [Fintype E] {c : ℝ}
+    {r : E → ℝ} (hc : 0 ≤ c) (hr : ∀ e, 0 ≤ r e) (T : E → H → H → H) {p : H → ℝ}
+    (hp0 : ∀ h, 0 ≤ p h) (hp : ∑ h, p h = 1) (M n : ℕ) {t : ℝ} (ht : 0 ≤ t)
+    (f : (Fin n → H) → ℝ) :
+    |decisionDual c r T p n t f - truncatedDual c r T p M n t f| ≤
+      (1 - ∑ k ∈ range M, yuleWeight (∑ e, r e) k n t) * ‖f‖ := by
+  have hR : 0 ≤ ∑ e, r e := sum_nonneg fun e _ ↦ hr e
+  refine le_of_tendsto ((continuous_abs.tendsto _).comp
+    ((tendsto_truncatedDual hc hr T hp0 hp n ht f).sub_const (truncatedDual c r T p M n t f))) ?_
+  filter_upwards [eventually_ge_atTop M] with N hN
+  show |truncatedDual c r T p N n t f - truncatedDual c r T p M n t f| ≤ _
+  simp only [truncatedDual]
+  rw [sum_range_sub_sum_range hN]
+  calc |∑ k ∈ Ico M N, dysonMoment c r T p k n t f|
+      ≤ ∑ k ∈ Ico M N, |dysonMoment c r T p k n t f| := abs_sum_le_sum_abs _ _
+    _ ≤ ∑ k ∈ Ico M N, yuleWeight (∑ e, r e) k n t * ‖f‖ :=
+        sum_le_sum fun k _ ↦ abs_dysonMoment_le hc hr T hp0 hp k n ht f
+    _ = (∑ k ∈ range N, yuleWeight (∑ e, r e) k n t -
+          ∑ k ∈ range M, yuleWeight (∑ e, r e) k n t) * ‖f‖ := by
+        rw [sum_range_sub_sum_range hN, sum_mul]
+    _ ≤ (1 - ∑ k ∈ range M, yuleWeight (∑ e, r e) k n t) * ‖f‖ :=
+        mul_le_mul_of_nonneg_right (sub_le_sub_right (sum_range_yuleWeight_le_one hR N n ht) _)
+          (norm_nonneg f)
+
+/-- **The truncation error at rate `1 / M`**: the circuit killed at its `M`-th decision is within
+`n e^{Rt} ‖f‖ / (n + M)` of the dual expectation. -/
+theorem abs_decisionDual_sub_truncatedDual_le_exp [Fintype H] [DecidableEq H] [Fintype E]
+    {c : ℝ} {r : E → ℝ} (hc : 0 ≤ c) (hr : ∀ e, 0 ≤ r e) (T : E → H → H → H) {p : H → ℝ}
+    (hp0 : ∀ h, 0 ≤ p h) (hp : ∑ h, p h = 1) (M n : ℕ) {t : ℝ} (ht : 0 ≤ t)
+    (f : (Fin n → H) → ℝ) (hM : 0 < n + M) :
+    |decisionDual c r T p n t f - truncatedDual c r T p M n t f| ≤
+      n * Real.exp ((∑ e, r e) * t) / (n + M) * ‖f‖ := by
+  have hpos : (0 : ℝ) < n + M := by exact_mod_cast hM
+  refine (abs_decisionDual_sub_truncatedDual_le hc hr T hp0 hp M n ht f).trans
+    (mul_le_mul_of_nonneg_right ?_ (norm_nonneg f))
+  rw [le_div_iff₀ hpos]
+  exact (mul_comm _ _).trans_le
+    (mul_one_sub_sum_range_yuleWeight_le (sum_nonneg fun e _ ↦ hr e) M n ht)
+
+/-- A Dyson term with a decision vanishes at time zero. -/
+theorem dysonMoment_succ_zero_time [Fintype H] [DecidableEq H] [Fintype E] (c : ℝ) (r : E → ℝ)
+    (T : E → H → H → H) (p : H → ℝ) (k n : ℕ) (f : (Fin n → H) → ℝ) :
+    dysonMoment c r T p (k + 1) n 0 f = 0 := by
+  rw [dysonMoment_succ_apply]
+  simp only [intervalIntegral.integral_same, mul_zero, sum_const_zero]
+
+/-- **The dual expectation starts at the sampling observable**, `D_0 f = H_f(p)`. -/
+theorem decisionDual_zero_time [Fintype H] [DecidableEq H] [Fintype E] (c : ℝ) (r : E → ℝ)
+    (T : E → H → H → H) (p : H → ℝ) (n : ℕ) (f : (Fin n → H) → ℝ) :
+    decisionDual c r T p n 0 f = samplingObservable f p := by
+  have hzero : ∀ k ≠ 0, dysonMoment c r T p k n 0 f = 0 := by
+    intro k hk
+    cases k with
+    | zero => exact absurd rfl hk
+    | succ k => exact dysonMoment_succ_zero_time c r T p k n f
+  rw [decisionDual, tsum_eq_single 0 hzero, dysonMoment_zero_apply, holdingSemigroup_zero,
+    ContinuousLinearMap.one_apply]
+
+/-- A truncated circuit that keeps the run without decisions starts at the sampling observable. -/
+theorem truncatedDual_succ_zero_time [Fintype H] [DecidableEq H] [Fintype E] (c : ℝ)
+    (r : E → ℝ) (T : E → H → H → H) (p : H → ℝ) (M n : ℕ) (f : (Fin n → H) → ℝ) :
+    truncatedDual c r T p (M + 1) n 0 f = samplingObservable f p := by
+  rw [truncatedDual, sum_range_succ',
+    sum_eq_zero fun k _ ↦ dysonMoment_succ_zero_time c r T p k n f, zero_add,
+    dysonMoment_zero_apply, holdingSemigroup_zero, ContinuousLinearMap.one_apply]
+
+/-- **Dynkin's formula for the truncated circuits**:
+`d/dt T_{M+1}(t, f) = T_{M+1}(t, K f) + T_M(t, B f)`. -/
+theorem hasDerivAt_truncatedDual [Fintype H] [DecidableEq H] [Fintype E] (c : ℝ) (r : E → ℝ)
+    (T : E → H → H → H) (p : H → ℝ) (M n : ℕ) (f : (Fin n → H) → ℝ) (t : ℝ) :
+    HasDerivAt (fun s ↦ truncatedDual c r T p (M + 1) n s f)
+      (truncatedDual c r T p (M + 1) n t (holdingGenerator c r n f) +
+        truncatedDual c r T p M (n + 1) t (decisionSubstitution r T n f)) t := by
+  induction M with
+  | zero =>
+    simp only [truncatedDual, zero_add, sum_range_one, range_zero, sum_empty, add_zero]
+    exact hasDerivAt_dysonMoment_zero c r T p n f t
+  | succ M ih =>
+    have h := ih.add
+      (hasDerivAt_dysonMoment_succ c r T p (continuous_dysonMoment_apply c r T p M) n f t)
+    simp only [truncatedDual, sum_range_succ] at h ⊢
+    refine h.congr_deriv ?_
+    ring
+
+/-- The integrated form of Dynkin's formula for the truncated circuits. -/
+theorem truncatedDual_sub_eq_integral [Fintype H] [DecidableEq H] [Fintype E] (c : ℝ)
+    (r : E → ℝ) (T : E → H → H → H) (p : H → ℝ) (M n : ℕ) (f : (Fin n → H) → ℝ) (t : ℝ) :
+    truncatedDual c r T p (M + 1) n t f - samplingObservable f p =
+      ∫ s in (0 : ℝ)..t, (truncatedDual c r T p (M + 1) n s (holdingGenerator c r n f) +
+        truncatedDual c r T p M (n + 1) s (decisionSubstitution r T n f)) := by
+  have hcont : ∀ (N m : ℕ) (g : (Fin m → H) → ℝ),
+      Continuous fun s ↦ truncatedDual c r T p N m s g :=
+    fun N m g ↦ continuous_finset_sum _ fun k _ ↦ continuous_dysonMoment_apply c r T p k m g
+  rw [intervalIntegral.integral_eq_sub_of_hasDerivAt
+    (fun s _ ↦ hasDerivAt_truncatedDual c r T p M n f s)
+    (((hcont _ _ _).add (hcont _ _ _)).intervalIntegrable 0 t), truncatedDual_succ_zero_time]
+
+/-- **The integrated moment equation with the holding generator.** For `t ≥ 0`,
+`D_t f - H_f(p) = ∫_0^t (D_s(K f) + D_s(B f)) ds`, where `D_s(B f)` is the dual expectation at
+arity `n + 1`. The truncated circuits obey it by Dynkin's formula, and the limit `M → ∞` passes
+under the integral by dominated convergence, with the bound `‖K f‖ + ‖B f‖`. -/
+theorem decisionDual_sub_eq_integral [Fintype H] [DecidableEq H] [Fintype E] {c : ℝ} {r : E → ℝ}
+    (hc : 0 ≤ c) (hr : ∀ e, 0 ≤ r e) (T : E → H → H → H) {p : H → ℝ} (hp0 : ∀ h, 0 ≤ p h)
+    (hp : ∑ h, p h = 1) (n : ℕ) {t : ℝ} (ht : 0 ≤ t) (f : (Fin n → H) → ℝ) :
+    decisionDual c r T p n t f - samplingObservable f p =
+      ∫ s in (0 : ℝ)..t, (decisionDual c r T p n s (holdingGenerator c r n f) +
+        decisionDual c r T p (n + 1) s (decisionSubstitution r T n f)) := by
+  have hlhs : Tendsto (fun M ↦ truncatedDual c r T p (M + 1) n t f - samplingObservable f p)
+      atTop (𝓝 (decisionDual c r T p n t f - samplingObservable f p)) :=
+    ((tendsto_add_atTop_iff_nat 1).mpr (tendsto_truncatedDual hc hr T hp0 hp n ht f)).sub_const _
+  have hrhs : Tendsto (fun M ↦ ∫ s in (0 : ℝ)..t,
+      (truncatedDual c r T p (M + 1) n s (holdingGenerator c r n f) +
+        truncatedDual c r T p M (n + 1) s (decisionSubstitution r T n f))) atTop
+      (𝓝 (∫ s in (0 : ℝ)..t, (decisionDual c r T p n s (holdingGenerator c r n f) +
+        decisionDual c r T p (n + 1) s (decisionSubstitution r T n f)))) := by
+    refine intervalIntegral.tendsto_integral_filter_of_dominated_convergence
+      (fun _ ↦ ‖holdingGenerator c r n f‖ + ‖decisionSubstitution r T n f‖) ?_ ?_
+      intervalIntegrable_const ?_
+    · exact Eventually.of_forall fun M ↦
+        ((continuous_finset_sum _ fun k _ ↦ continuous_dysonMoment_apply c r T p k n _).add
+          (continuous_finset_sum _ fun k _ ↦
+            continuous_dysonMoment_apply c r T p k (n + 1) _)).aestronglyMeasurable
+    · refine Eventually.of_forall fun M ↦ ae_of_all _ fun s hs ↦ ?_
+      rw [Set.uIoc_of_le ht] at hs
+      exact (norm_add_le _ _).trans
+        (add_le_add (abs_truncatedDual_le hc hr T hp0 hp _ n hs.1.le _)
+          (abs_truncatedDual_le hc hr T hp0 hp _ (n + 1) hs.1.le _))
+    · refine ae_of_all _ fun s hs ↦ ?_
+      rw [Set.uIoc_of_le ht] at hs
+      exact ((tendsto_add_atTop_iff_nat 1).mpr
+        (tendsto_truncatedDual hc hr T hp0 hp n hs.1.le _)).add
+          (tendsto_truncatedDual hc hr T hp0 hp (n + 1) hs.1.le _)
+  exact tendsto_nhds_unique hlhs
+    (hrhs.congr fun M ↦ (truncatedDual_sub_eq_integral c r T p M n f t).symm)
+
+/-- **The dual expectation is continuous in time** on every interval `[0, τ]`: the truncated
+circuits converge to it uniformly there, within `n e^{Rτ} ‖f‖ / M`. -/
+theorem continuousOn_decisionDual [Fintype H] [DecidableEq H] [Fintype E] {c : ℝ} {r : E → ℝ}
+    (hc : 0 ≤ c) (hr : ∀ e, 0 ≤ r e) (T : E → H → H → H) {p : H → ℝ} (hp0 : ∀ h, 0 ≤ p h)
+    (hp : ∑ h, p h = 1) (n : ℕ) (f : (Fin n → H) → ℝ) (τ : ℝ) :
+    ContinuousOn (fun t ↦ decisionDual c r T p n t f) (Set.Icc 0 τ) := by
+  have hR : 0 ≤ ∑ e, r e := sum_nonneg fun e _ ↦ hr e
+  refine TendstoUniformlyOn.continuousOn (F := fun M t ↦ truncatedDual c r T p M n t f) ?_
+    (Eventually.of_forall fun M ↦
+      (continuous_finset_sum _ fun k _ ↦ continuous_dysonMoment_apply c r T p k n f).continuousOn)
+  rw [Metric.tendstoUniformlyOn_iff]
+  intro ε hε
+  have hC : Tendsto (fun M : ℕ ↦ n * Real.exp ((∑ e, r e) * τ) * ‖f‖ / M) atTop (𝓝 0) :=
+    tendsto_const_div_atTop_nhds_zero_nat _
+  filter_upwards [hC.eventually (gt_mem_nhds hε), eventually_gt_atTop 0] with M hM hM0
+  intro t ht
+  rw [Real.dist_eq]
+  calc |decisionDual c r T p n t f - truncatedDual c r T p M n t f|
+      ≤ n * Real.exp ((∑ e, r e) * t) / (n + M) * ‖f‖ :=
+        abs_decisionDual_sub_truncatedDual_le_exp hc hr T hp0 hp M n ht.1 f (by omega)
+    _ ≤ n * Real.exp ((∑ e, r e) * τ) * ‖f‖ / M := by
+        rw [div_mul_eq_mul_div]
+        refine div_le_div₀ (by positivity) ?_ (Nat.cast_pos.mpr hM0)
+          (le_add_of_nonneg_left (Nat.cast_nonneg n))
+        exact mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left
+          (Real.exp_le_exp.mpr (mul_le_mul_of_nonneg_left ht.2 hR)) (Nat.cast_nonneg n))
+          (norm_nonneg f)
+    _ < ε := hM
+
+/-- **The moment equation with the holding generator, as a derivative**: for `t > 0`,
+`d/dt D_t f = D_t(K f) + D_t(B f)`. -/
+theorem hasDerivAt_decisionDual [Fintype H] [DecidableEq H] [Fintype E] {c : ℝ} {r : E → ℝ}
+    (hc : 0 ≤ c) (hr : ∀ e, 0 ≤ r e) (T : E → H → H → H) {p : H → ℝ} (hp0 : ∀ h, 0 ≤ p h)
+    (hp : ∑ h, p h = 1) (n : ℕ) (f : (Fin n → H) → ℝ) {t : ℝ} (ht : 0 < t) :
+    HasDerivAt (fun s ↦ decisionDual c r T p n s f)
+      (decisionDual c r T p n t (holdingGenerator c r n f) +
+        decisionDual c r T p (n + 1) t (decisionSubstitution r T n f)) t := by
+  have hF : ContinuousOn (fun s ↦ decisionDual c r T p n s (holdingGenerator c r n f) +
+      decisionDual c r T p (n + 1) s (decisionSubstitution r T n f)) (Set.Icc 0 (t + 1)) :=
+    (continuousOn_decisionDual hc hr T hp0 hp n _ (t + 1)).add
+      (continuousOn_decisionDual hc hr T hp0 hp (n + 1) _ (t + 1))
+  have hint := (hF.mono (Set.Icc_subset_Icc_right (by linarith))).intervalIntegrable_of_Icc ht.le
+  have hmeas := (hF.mono Set.Ioo_subset_Icc_self).stronglyMeasurableAtFilter (μ := volume)
+    isOpen_Ioo t ⟨ht, by linarith⟩
+  have h := (intervalIntegral.integral_hasDerivAt_right hint hmeas
+    (hF.continuousAt (Icc_mem_nhds ht (by linarith)))).const_add (samplingObservable f p)
+  refine h.congr_of_eventuallyEq ?_
+  filter_upwards [Ioi_mem_nhds ht] with s hs
+  rw [← decisionDual_sub_eq_integral hc hr T hp0 hp n (le_of_lt hs) f]
+  ring
+
+/-- The dual expectation is additive at nonnegative times. -/
+theorem decisionDual_add [Fintype H] [DecidableEq H] [Fintype E] {c : ℝ} {r : E → ℝ}
+    (hc : 0 ≤ c) (hr : ∀ e, 0 ≤ r e) (T : E → H → H → H) {p : H → ℝ} (hp0 : ∀ h, 0 ≤ p h)
+    (hp : ∑ h, p h = 1) (n : ℕ) {t : ℝ} (ht : 0 ≤ t) (f g : (Fin n → H) → ℝ) :
+    decisionDual c r T p n t (f + g) = decisionDual c r T p n t f + decisionDual c r T p n t g :=
+  (hasSum_dysonMoment hc hr T hp0 hp n ht (f + g)).unique (by
+    simpa only [map_add] using
+      (hasSum_dysonMoment hc hr T hp0 hp n ht f).add (hasSum_dysonMoment hc hr T hp0 hp n ht g))
+
+/-- The dual expectation is homogeneous at nonnegative times. -/
+theorem decisionDual_smul [Fintype H] [DecidableEq H] [Fintype E] {c : ℝ} {r : E → ℝ}
+    (hc : 0 ≤ c) (hr : ∀ e, 0 ≤ r e) (T : E → H → H → H) {p : H → ℝ} (hp0 : ∀ h, 0 ≤ p h)
+    (hp : ∑ h, p h = 1) (n : ℕ) {t : ℝ} (ht : 0 ≤ t) (d : ℝ) (f : (Fin n → H) → ℝ) :
+    decisionDual c r T p n t (d • f) = d * decisionDual c r T p n t f :=
+  (hasSum_dysonMoment hc hr T hp0 hp n ht (d • f)).unique (by
+    simpa only [map_smul, smul_eq_mul] using (hasSum_dysonMoment hc hr T hp0 hp n ht f).mul_left d)
+
+/-- **The holding generator and one decision are the backward generator** inside the dual
+expectation: `D_t(K f) + D_t(B f) = c ∑_{a<b} (D_t(C_ab f) - D_t f) + ∑_e r_e ∑_a
+(D_t(B_{a,e} f) - D_t f)`, for `t ≥ 0`. -/
+theorem decisionDual_holdingGenerator_add [Fintype H] [DecidableEq H] [Fintype E] {c : ℝ}
+    {r : E → ℝ} (hc : 0 ≤ c) (hr : ∀ e, 0 ≤ r e) (T : E → H → H → H) {p : H → ℝ}
+    (hp0 : ∀ h, 0 ≤ p h) (hp : ∑ h, p h = 1) (n : ℕ) {t : ℝ} (ht : 0 ≤ t)
+    (f : (Fin n → H) → ℝ) :
+    decisionDual c r T p n t (holdingGenerator c r n f) +
+        decisionDual c r T p (n + 1) t (decisionSubstitution r T n f) =
+      c * ∑ b, ∑ a ∈ Iio b,
+          (decisionDual c r T p n t (coalesceArguments a b f) - decisionDual c r T p n t f) +
+        ∑ e, r e * ∑ a,
+          (decisionDual c r T p (n + 1) t (decisionBranch (T e) a f) -
+            decisionDual c r T p n t f) := by
+  have hs : ∀ (m : ℕ) (g : (Fin m → H) → ℝ),
+      HasSum (fun k ↦ dysonMoment c r T p k m t g) (decisionDual c r T p m t g) :=
+    fun m g ↦ hasSum_dysonMoment hc hr T hp0 hp m ht g
+  have hK : HasSum (fun k ↦ dysonMoment c r T p k n t (holdingGenerator c r n f))
+      (c * ∑ b, ∑ a ∈ Iio b, decisionDual c r T p n t (coalesceArguments a b f) -
+        dualExitRate c r n * decisionDual c r T p n t f) := by
+    have h := ((hasSum_sum fun b _ ↦ hasSum_sum fun a _ ↦ hs n (coalesceArguments a b f))
+      |>.mul_left c).sub ((hs n f).mul_left (dualExitRate c r n))
+    convert h using 1
+    funext k
+    simp only [holdingGenerator_apply, pairSubstitution, map_sub, map_smul, map_sum, smul_eq_mul,
+      LinearMap.coe_mk, AddHom.coe_mk]
+  have hB : HasSum (fun k ↦ dysonMoment c r T p k (n + 1) t (decisionSubstitution r T n f))
+      (∑ e, r e * ∑ a, decisionDual c r T p (n + 1) t (decisionBranch (T e) a f)) := by
+    have h := hasSum_sum fun e _ ↦
+      (hasSum_sum fun a _ ↦ hs (n + 1) (decisionBranch (T e) a f)).mul_left (r e)
+    convert h using 1
+    funext k
+    simp only [decisionSubstitution, map_sum, map_smul, smul_eq_mul, LinearMap.coe_mk,
+      AddHom.coe_mk]
+  have hcoal : ∀ b : Fin n, ∑ a ∈ Iio b,
+      (decisionDual c r T p n t (coalesceArguments a b f) - decisionDual c r T p n t f) =
+        ∑ a ∈ Iio b, decisionDual c r T p n t (coalesceArguments a b f) -
+          ((Iio b).card : ℝ) * decisionDual c r T p n t f := fun b ↦ by
+    rw [sum_sub_distrib, sum_const, nsmul_eq_mul]
+  have hdec : ∀ e, ∑ a : Fin n,
+      (decisionDual c r T p (n + 1) t (decisionBranch (T e) a f) - decisionDual c r T p n t f) =
+        ∑ a, decisionDual c r T p (n + 1) t (decisionBranch (T e) a f) -
+          n * decisionDual c r T p n t f := fun e ↦ by
+    rw [sum_sub_distrib, sum_const, card_univ, Fintype.card_fin, nsmul_eq_mul]
+  rw [(hs n _).unique hK, (hs (n + 1) _).unique hB, dualExitRate,
+    sum_congr rfl fun b _ ↦ hcoal b, sum_congr rfl fun e _ ↦ congrArg (r e * ·) (hdec e)]
+  simp only [mul_sub, sum_sub_distrib, ← sum_mul]
+  ring
+
+/-- **Theorem 6, existence: the integrated moment equation of the backward circuit.** For `c ≥ 0`,
+`r ≥ 0`, a probability vector `p` and `t ≥ 0`, the dual expectation `D_t f = E_f[H_{f_t}(p)]`
+obeys `D_t f - H_f(p) = ∫_0^t (L D_s)(f) ds`, where `L` is the backward generator of
+`SamplingDuality`: coalescence of every pair at rate `c` and decision branching of every argument
+by every event at its rate, each read by the dual expectation at the new arity. -/
+theorem decisionDual_moment_equation [Fintype H] [DecidableEq H] [Fintype E] {c : ℝ}
+    {r : E → ℝ} (hc : 0 ≤ c) (hr : ∀ e, 0 ≤ r e) (T : E → H → H → H) {p : H → ℝ}
+    (hp0 : ∀ h, 0 ≤ p h) (hp : ∑ h, p h = 1) (n : ℕ) {t : ℝ} (ht : 0 ≤ t)
+    (f : (Fin n → H) → ℝ) :
+    decisionDual c r T p n t f - samplingObservable f p = ∫ s in (0 : ℝ)..t,
+      (c * ∑ b, ∑ a ∈ Iio b,
+          (decisionDual c r T p n s (coalesceArguments a b f) - decisionDual c r T p n s f) +
+        ∑ e, r e * ∑ a,
+          (decisionDual c r T p (n + 1) s (decisionBranch (T e) a f) -
+            decisionDual c r T p n s f)) := by
+  rw [decisionDual_sub_eq_integral hc hr T hp0 hp n ht f]
+  refine intervalIntegral.integral_congr fun s hs ↦ ?_
+  rw [Set.uIcc_of_le ht] at hs
+  exact decisionDual_holdingGenerator_add hc hr T hp0 hp n hs.1 f
+
+/-- **Theorem 6, existence: the moment equation as a derivative.** For `t > 0`,
+`d/dt D_t f = c ∑_{a<b} (D_t(C_ab f) - D_t f) + ∑_e r_e ∑_a (D_t(B_{a,e} f) - D_t f)`. -/
+theorem hasDerivAt_decisionDual_moment_equation [Fintype H] [DecidableEq H] [Fintype E] {c : ℝ}
+    {r : E → ℝ} (hc : 0 ≤ c) (hr : ∀ e, 0 ≤ r e) (T : E → H → H → H) {p : H → ℝ}
+    (hp0 : ∀ h, 0 ≤ p h) (hp : ∑ h, p h = 1) (n : ℕ) (f : (Fin n → H) → ℝ) {t : ℝ}
+    (ht : 0 < t) :
+    HasDerivAt (fun s ↦ decisionDual c r T p n s f)
+      (c * ∑ b, ∑ a ∈ Iio b,
+          (decisionDual c r T p n t (coalesceArguments a b f) - decisionDual c r T p n t f) +
+        ∑ e, r e * ∑ a,
+          (decisionDual c r T p (n + 1) t (decisionBranch (T e) a f) -
+            decisionDual c r T p n t f)) t :=
+  (hasDerivAt_decisionDual hc hr T hp0 hp n f ht).congr_deriv
+    (decisionDual_holdingGenerator_add hc hr T hp0 hp n ht.le f)
 
 end
 
