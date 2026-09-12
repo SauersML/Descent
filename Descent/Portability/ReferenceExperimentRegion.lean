@@ -40,7 +40,9 @@ set_option relaxedAutoImplicit false
 namespace Descent.Portability.ReferenceExperimentRegion
 
 open RationalReportClosure ReferenceExperimentLaw ReferenceExperimentTable
-  ReferenceExperimentRows
+  ReferenceExperimentRows ReferenceExperimentCorners ReferenceExperimentEarlyMomentCorners
+  ReferenceExperimentEarlyLossCorners ReferenceExperimentLateMomentCorners
+  ReferenceExperimentLateLossCorners
 
 /-! ## Corner accumulators in the real numbers -/
 

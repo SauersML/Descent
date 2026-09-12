@@ -1,0 +1,33 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.ReferenceExperimentLateMomentCorners
+
+/-! Axiom audit of ReferenceExperimentLateMomentCorners. -/
+
+open Descent.Portability.ReferenceExperimentLateMomentCorners
+
+#print axioms late_r2Defined_corner_zero_zero
+#print axioms late_r2Defined_corner_zero_one
+#print axioms late_r2Defined_corner_one_zero
+#print axioms late_r2Defined_corner_one_one
+#print axioms late_r2Weighted_corner_zero_zero
+#print axioms late_r2Weighted_corner_zero_one
+#print axioms late_r2Weighted_corner_one_zero
+#print axioms late_r2Weighted_corner_one_one
+#print axioms late_aucDefined_corner_zero_zero
+#print axioms late_aucDefined_corner_zero_one
+#print axioms late_aucDefined_corner_one_zero
+#print axioms late_aucDefined_corner_one_one
+#print axioms late_aucWeighted_corner_zero_zero
+#print axioms late_aucWeighted_corner_zero_one
+#print axioms late_aucWeighted_corner_one_zero
+#print axioms late_aucWeighted_corner_one_one
+#print axioms late_slopeDefined_corner_zero_zero
+#print axioms late_slopeDefined_corner_zero_one
+#print axioms late_slopeDefined_corner_one_zero
+#print axioms late_slopeDefined_corner_one_one
+#print axioms late_slopeWeighted_corner_zero_zero
+#print axioms late_slopeWeighted_corner_zero_one
+#print axioms late_slopeWeighted_corner_one_zero
+#print axioms late_slopeWeighted_corner_one_one
