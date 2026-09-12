@@ -63,15 +63,17 @@ pair coordinates, and cross terms `a_p a_q E[D^p_S D^q_T]` between different pai
 - `rateShare_pairShare_eq_of_scorePortabilityRatio_eq`: two polygenic split histories with the same
   portability curve carry the same signal share at every pair recombination rate, whatever their
   drift rates.
-- `splitPortabilityRatio_eq_one_of_duration_eq_zero`, `splitLDRetentionAt_zero`: at split time
+- `splitPortabilityRatio_eq_one_of_duration_eq_zero`, `splitLDRetention_zero`: at split time
   zero the ratio is `1` for every demography, migration and mutation included.  The LD retention
-  surface `splitLDRetentionAt` is therefore `1` at generation `0` at every separation.
-- `splitLDRetentionAt_eq`, `splitLDRetentionAt_eq_of_mul_eq`: without migration or mutation the
+  surface `splitLDRetention` is therefore `1` at generation `0` at every separation.
+- `splitLDRetention_eq`, `splitLDRetention_eq_of_mul_eq`: without migration or mutation the
   surface at generation `t` and separation `d` is `e^{-r(d) τ(t)}`, with
   `r(d) = (ρ_S(d) + ρ_T(d))/2`.  It depends on the two only through the product `r(d) τ(t)`.
-- `splitLDRetentionAt_eq_one_of_profile_eq_zero`, `splitLDRetentionAt_antitone_generation`: at a
-  separation that recombines in neither deme the surface is `1` at every generation, and for a
-  nondecreasing time scale it decreases in the generation.
+- `splitLDRetention_eq_one_of_profile_eq_zero`: at a separation that recombines in neither deme
+  the surface is `1` at every generation.
+- `splitLDRetention_antitone_generation`, `splitLDRetention_antitone_separation`: for a
+  nondecreasing time scale the surface decreases in the generation.  For a recombination profile
+  that does not decrease with separation it decreases in the separation.
 
 ## Parent law
 
@@ -122,11 +124,11 @@ The source reference is the split-time value, as in `TwoLocusPortabilityDecay`. 
 variances use linkage equilibrium inside the tag panel and inside the causal set.  Migration and
 mutation are zero after the split, except in the zero-duration identity.
 
-`splitLDRetentionAt` has the type of `CrossPopulationGenerationalModel.ldRetentionAt`, and nothing
-here fills that field.  The field asks for a constructor from an arbitrary event history, and this
-surface is one split history read on the unascertained moment ratio.  The field's docstring
-records a measured surface below `1` at zero separation.  This module does not compare the two,
-and whether they measure one estimand is not settled here.
+`splitLDRetention` has the type of `CrossPopulationGenerationalModel.ldRetentionAt`, and nothing
+here fills that field.  The general constructor from an arbitrary event history is still owed.
+The surface is the unascertained expected squared correlation.  Its value `1` at zero
+recombination does not match the recorded surface, and its docstring names estimand mismatch as
+the likely cause.
 
 ## Empirical status
 
@@ -598,14 +600,32 @@ theorem splitPortabilityRatio_eq_one_of_duration_eq_zero (rates : ManyDemeLDRate
   exact div_self hsource
 
 /-- **The LD retention surface of a split history.**  At generation `t` and separation `d` it is
-the target-to-source ratio of the expected squared correlation of the pair at separation `d`.
+the target-to-source ratio `(E[D_S D_T] / E[π_S π_T]) / σ²_D(0)` of the pair at separation `d`.
 That pair runs the split history under the demographic rates of `rates`, with its recombination
-profile `ρ(d)` in every deme (`withRecombination`), its own ancestral moment vector, and split
-time `τ(t)`.  Applied to its data it has the type `ℕ → ℝ → ℝ` of
-`CrossPopulationGenerationalModel.ldRetentionAt`.
+profile `ρ(d)` in every deme (`withRecombination`) and its own ancestral moment vector.  Both
+maps are parameters: `profile` sends a separation to the recombination rate of each deme, and
+`timeScale` sends a generation to the split time `τ(t)`.  The chapter's time scale is
+`PopGenParameters.tauAt`, `t/(2Nₑ)`, and a caller passing it declares the rates of `rates` and
+`profile` per unit of `t/(2Nₑ)`.  It is not imported, so this module keeps its one dependency.
+
+This is the unascertained expected squared correlation.  Its value `1` at zero recombination
+(`splitLDRetention_eq_one_of_profile_eq_zero`) does not match the surface recorded on
+`CrossPopulationGenerationalModel.ldRetentionAt`, which is 0.91-0.98 at zero separation and
+0.91113 at `ρ = 0` in `CrossPopulationGenerationalModel.momentsLDWitness`.  The likely cause
+is estimand mismatch.  That value is `Corr(D) = E[D_1 D_2] / √(E[D_1²] E[D_2²])` from the
+Ragsdale-Gravel moment system, normalized by the within-deme `E[D²]`, in a two-deme split held
+at equilibrium by symmetric migration.  Without migration, drift multiplies `E[D_S D_T]` and
+`E[π_S π_T]` by one factor, which cancels here.  Drift also keeps renewing the within-deme
+`E[D²]`, so `Corr(D)` falls below one at zero separation.  The moment system is unascertained
+too, so MAF ascertainment does not explain the gap.
+
+Applied to its data it has the type `ℕ → ℝ → ℝ` of
+`CrossPopulationGenerationalModel.ldRetentionAt`, and nothing here fills that field.
+The general constructor from an arbitrary event history to the transient many-deme two-locus
+system is still owed.
 
 Empirical status: NOT AN EMPIRICAL CLAIM.  A ratio of moment coordinates of a corpus history. -/
-def splitLDRetentionAt (rates : ManyDemeLDRates D) (profile : ℝ → Fin D → ℝ)
+def splitLDRetention (rates : ManyDemeLDRates D) (profile : ℝ → Fin D → ℝ)
     (hprofile : ∀ separation deme, 0 ≤ profile separation deme) (parent child : Fin D)
     (timeScale : ℕ → ℝ) (htimeScale : ∀ generation, 0 ≤ timeScale generation)
     (ancestral : ℝ → AffineLowOrderLDCoordinate D → ℝ) (generation : ℕ) (separation : ℝ) : ℝ :=
@@ -623,10 +643,10 @@ variable (rates : ManyDemeLDRates D) (profile : ℝ → Fin D → ℝ)
 
 Assumes: `parent ≠ child`, a time scale that starts at zero, and a nonzero ancestral correlation
 at every separation. -/
-theorem splitLDRetentionAt_zero (hne : parent ≠ child) (hstart : timeScale 0 = 0)
+theorem splitLDRetention_zero (hne : parent ≠ child) (hstart : timeScale 0 = 0)
     (hsource : ∀ separation, ancestralSquaredCorrelation (ancestral separation) parent ≠ 0)
     (separation : ℝ) :
-    splitLDRetentionAt rates profile hprofile parent child timeScale htimeScale ancestral 0
+    splitLDRetention rates profile hprofile parent child timeScale htimeScale ancestral 0
       separation = 1 :=
   splitPortabilityRatio_eq_one_of_duration_eq_zero
     (withRecombination rates (profile separation) (hprofile separation)) hne (htimeScale 0)
@@ -637,11 +657,11 @@ theorem splitLDRetentionAt_zero (hne : parent ≠ child) (hstart : timeScale 0 =
 
 Assumes: no migration, no mutation, `parent ≠ child`, and a nonzero ancestral correlation at every
 separation. -/
-theorem splitLDRetentionAt_eq (hmigration : ∀ source target, rates.migration source target = 0)
+theorem splitLDRetention_eq (hmigration : ∀ source target, rates.migration source target = 0)
     (hmutation : ∀ deme, rates.mutation deme = 0) (hne : parent ≠ child)
     (hsource : ∀ separation, ancestralSquaredCorrelation (ancestral separation) parent ≠ 0)
     (generation : ℕ) (separation : ℝ) :
-    splitLDRetentionAt rates profile hprofile parent child timeScale htimeScale ancestral
+    splitLDRetention rates profile hprofile parent child timeScale htimeScale ancestral
         generation separation
       = portabilityDecay ((profile separation parent + profile separation child) / 2)
           (timeScale generation) :=
@@ -654,15 +674,15 @@ Divergence removes nothing from the moment ratio of such a pair, so this surface
 
 Assumes: no migration, no mutation, `parent ≠ child`, a nonzero ancestral correlation at every
 separation, and zero recombination at `d` in both demes. -/
-theorem splitLDRetentionAt_eq_one_of_profile_eq_zero
+theorem splitLDRetention_eq_one_of_profile_eq_zero
     (hmigration : ∀ source target, rates.migration source target = 0)
     (hmutation : ∀ deme, rates.mutation deme = 0) (hne : parent ≠ child)
     (hsource : ∀ separation, ancestralSquaredCorrelation (ancestral separation) parent ≠ 0)
     {separation : ℝ} (hparent : profile separation parent = 0)
     (hchild : profile separation child = 0) (generation : ℕ) :
-    splitLDRetentionAt rates profile hprofile parent child timeScale htimeScale ancestral
+    splitLDRetention rates profile hprofile parent child timeScale htimeScale ancestral
       generation separation = 1 := by
-  rw [splitLDRetentionAt_eq rates profile hprofile timeScale htimeScale ancestral hmigration
+  rw [splitLDRetention_eq rates profile hprofile timeScale htimeScale ancestral hmigration
       hmutation hne hsource generation separation, hparent, hchild, add_zero, zero_div,
     portabilityDecay_zero_rate]
 
@@ -672,43 +692,66 @@ generations.
 
 Assumes: no migration, no mutation, `parent ≠ child`, a nonzero ancestral correlation at every
 separation, and equal products `r(d) τ(t) = r(d') τ(t')`. -/
-theorem splitLDRetentionAt_eq_of_mul_eq
+theorem splitLDRetention_eq_of_mul_eq
     (hmigration : ∀ source target, rates.migration source target = 0)
     (hmutation : ∀ deme, rates.mutation deme = 0) (hne : parent ≠ child)
     (hsource : ∀ separation, ancestralSquaredCorrelation (ancestral separation) parent ≠ 0)
     {generation other : ℕ} {separation distance : ℝ}
     (hproduct : (profile separation parent + profile separation child) / 2 * timeScale generation
       = (profile distance parent + profile distance child) / 2 * timeScale other) :
-    splitLDRetentionAt rates profile hprofile parent child timeScale htimeScale ancestral
+    splitLDRetention rates profile hprofile parent child timeScale htimeScale ancestral
         generation separation
-      = splitLDRetentionAt rates profile hprofile parent child timeScale htimeScale ancestral
+      = splitLDRetention rates profile hprofile parent child timeScale htimeScale ancestral
         other distance := by
-  rw [splitLDRetentionAt_eq rates profile hprofile timeScale htimeScale ancestral hmigration
+  rw [splitLDRetention_eq rates profile hprofile timeScale htimeScale ancestral hmigration
       hmutation hne hsource generation separation,
-    splitLDRetentionAt_eq rates profile hprofile timeScale htimeScale ancestral hmigration
+    splitLDRetention_eq rates profile hprofile timeScale htimeScale ancestral hmigration
       hmutation hne hsource other distance, portabilityDecay, portabilityDecay, hproduct]
 
 /-- **The surface decreases in the generation** when the time scale does not decrease.
 
 Assumes: no migration, no mutation, `parent ≠ child`, a nonzero ancestral correlation at every
 separation, a nondecreasing time scale, and `earlier ≤ later`. -/
-theorem splitLDRetentionAt_antitone_generation
+theorem splitLDRetention_antitone_generation
     (hmigration : ∀ source target, rates.migration source target = 0)
     (hmutation : ∀ deme, rates.mutation deme = 0) (hne : parent ≠ child)
     (hsource : ∀ separation, ancestralSquaredCorrelation (ancestral separation) parent ≠ 0)
     (hmonotone : Monotone timeScale) (separation : ℝ) {earlier later : ℕ}
     (hlater : earlier ≤ later) :
-    splitLDRetentionAt rates profile hprofile parent child timeScale htimeScale ancestral later
+    splitLDRetention rates profile hprofile parent child timeScale htimeScale ancestral later
         separation
-      ≤ splitLDRetentionAt rates profile hprofile parent child timeScale htimeScale ancestral
+      ≤ splitLDRetention rates profile hprofile parent child timeScale htimeScale ancestral
         earlier separation := by
-  rw [splitLDRetentionAt_eq rates profile hprofile timeScale htimeScale ancestral hmigration
+  rw [splitLDRetention_eq rates profile hprofile timeScale htimeScale ancestral hmigration
       hmutation hne hsource later separation,
-    splitLDRetentionAt_eq rates profile hprofile timeScale htimeScale ancestral hmigration
+    splitLDRetention_eq rates profile hprofile timeScale htimeScale ancestral hmigration
       hmutation hne hsource earlier separation]
   exact portabilityDecay_antitone_duration
     (div_nonneg (add_nonneg (hprofile separation parent) (hprofile separation child)) zero_le_two)
     (hmonotone hlater)
+
+/-- **The surface decreases in the separation** when the recombination rate in every deme does
+not decrease with separation.
+
+Assumes: no migration, no mutation, `parent ≠ child`, a nonzero ancestral correlation at every
+separation, a nondecreasing recombination profile in every deme, and `nearer ≤ farther`. -/
+theorem splitLDRetention_antitone_separation
+    (hmigration : ∀ source target, rates.migration source target = 0)
+    (hmutation : ∀ deme, rates.mutation deme = 0) (hne : parent ≠ child)
+    (hsource : ∀ separation, ancestralSquaredCorrelation (ancestral separation) parent ≠ 0)
+    (hmonotone : ∀ deme, Monotone fun separation ↦ profile separation deme) (generation : ℕ)
+    {nearer farther : ℝ} (hcloser : nearer ≤ farther) :
+    splitLDRetention rates profile hprofile parent child timeScale htimeScale ancestral
+        generation farther
+      ≤ splitLDRetention rates profile hprofile parent child timeScale htimeScale ancestral
+        generation nearer := by
+  have hparent : profile nearer parent ≤ profile farther parent := hmonotone parent hcloser
+  have hchild : profile nearer child ≤ profile farther child := hmonotone child hcloser
+  rw [splitLDRetention_eq rates profile hprofile timeScale htimeScale ancestral hmigration
+      hmutation hne hsource generation farther,
+    splitLDRetention_eq rates profile hprofile timeScale htimeScale ancestral hmigration
+      hmutation hne hsource generation nearer]
+  exact portabilityDecay_antitone_rate (htimeScale generation) (by linarith)
 
 end RetentionSurface
 
