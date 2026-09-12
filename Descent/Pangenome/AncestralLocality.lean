@@ -9,6 +9,7 @@ import Descent.Pangenome.AncestralLocality.CoalescentDualSemigroup
 import Descent.Pangenome.AncestralLocality.CylinderSamplingAlgebra
 import Descent.Pangenome.AncestralLocality.CompatibilityNeutrality
 import Descent.Pangenome.AncestralLocality.DecisionDualMoments
+import Descent.Pangenome.AncestralLocality.FeatureKingmanLimit
 import Descent.Pangenome.AncestralLocality.HereditaryClosure
 import Descent.Pangenome.AncestralLocality.HeredityKernel
 import Descent.Pangenome.AncestralLocality.InfiniteGenomeLimit
@@ -151,6 +152,12 @@ on the bytes on main.
     moment functionals on observations of every arity, bounded by the sup norm and obeying the
     moment equation of the backward circuit, that agree at time zero agree at every time, through
     Duhamel's formula along the coalescence gain and induction on the number of branchings.
+
+21. `FeatureKingmanLimit` -- the pair Kingman limit behind Theorem 3: the finite-population law
+    (4.5) annotated with each offspring's source at one feature has the genome marginal `Q_N` and
+    a uniform source, two distinct offspring share a source with probability `1/N`, the pair
+    coalescence time over a history is geometric, and on the `N`-generation scale it converges in
+    distribution to `Exp(1)`.
 
 This file contains no declarations.
 -/
