@@ -101,11 +101,15 @@ def relabelState (parent : Deme' → Deme) (x : FrequencyState Deme Locus Allele
     FrequencyState Deme' Locus Allele :=
   ⟨fun c ↦ x.1 (parent c.1, c.2), fun c ↦ x.2.1 (parent c.1, c.2), fun i ↦ x.2.2 (parent i)⟩
 
+omit [Fintype Deme] [DecidableEq Deme] [Fintype Deme'] [DecidableEq Deme']
+  [∀ ℓ, DecidableEq (Allele ℓ)] in
 /-- The per-deme laws of the founded state are the laws of the parents. -/
 theorem stateLaw_relabelState (parent : Deme' → Deme) (x : FrequencyState Deme Locus Allele)
     (i : Deme') : stateLaw (relabelState parent x) i = stateLaw x (parent i) :=
   rfl
 
+omit [Fintype Deme] [DecidableEq Deme] [Fintype Deme'] [DecidableEq Deme']
+  [∀ ℓ, DecidableEq (Allele ℓ)] in
 /-- A split acts continuously on frequency states. -/
 theorem continuous_relabelState (parent : Deme' → Deme) :
     Continuous (relabelState (Locus := Locus) (Allele := Allele) parent) :=
@@ -126,6 +130,7 @@ theorem isMarkovKernel_relabelStateKernel (parent : Deme' → Deme) :
 
 /-! ## The split on configuration moments -/
 
+omit [Fintype Deme] [DecidableEq Deme] [Fintype Deme'] [DecidableEq Deme'] in
 /-- After a split, the marginal frequency of a carrier is the marginal frequency of the relabelled
 carrier before it. -/
 theorem marginalFrequency_stateLaw_relabelState (parent : Deme' → Deme)
@@ -134,6 +139,7 @@ theorem marginalFrequency_stateLaw_relabelState (parent : Deme' → Deme)
       = marginalFrequency (stateLaw x) (relabelCarrier parent τ) :=
   rfl
 
+omit [Fintype Deme] [DecidableEq Deme] [Fintype Deme'] [DecidableEq Deme'] in
 /-- **The substitution of a split.**  The configuration moment of the founded state is the moment
 of the relabelled configuration before the split. -/
 theorem configurationMoment_stateLaw_relabelState (parent : Deme' → Deme)
@@ -142,7 +148,6 @@ theorem configurationMoment_stateLaw_relabelState (parent : Deme' → Deme)
       = configurationMoment (stateLaw x) (ξ.map (relabelCarrier parent)) := by
   rw [configurationMoment, configurationMoment, Multiset.map_map]
   congr 1
-  exact Multiset.map_congr rfl fun τ _ ↦ marginalFrequency_stateLaw_relabelState parent x τ
 
 /-- The budget moment features of the founded state are the features of the relabelled
 configurations before the split. -/
@@ -162,6 +167,7 @@ def relabelKernel (parent : Deme' → Deme) (capacity : Locus → ℕ) :
       (BudgetConfiguration Deme Locus Allele capacity) ℝ :=
   fun ξ η ↦ if ξ.1.map (relabelCarrier parent) = η.1 then 1 else 0
 
+omit [Fintype Deme'] [DecidableEq Deme'] [DecidableEq Locus] in
 /-- The substitution matrix applied to a table of values reads the value of the relabelled
 configuration. -/
 theorem relabelKernel_mulVec (parent : Deme' → Deme) (capacity : Locus → ℕ)
@@ -187,6 +193,8 @@ theorem relabelKernel_rowSum (parent : Deme' → Deme) (capacity : Locus → ℕ
   simp only [Matrix.mulVec, dotProduct, mul_one] at h
   exact h
 
+omit [Fintype Deme] [Fintype Deme'] [DecidableEq Deme'] [DecidableEq Locus]
+  [∀ ℓ, Fintype (Allele ℓ)] in
 /-- The entries of the substitution matrix are nonnegative. -/
 theorem relabelKernel_nonneg (parent : Deme' → Deme) (capacity : Locus → ℕ)
     (ξ : BudgetConfiguration Deme' Locus Allele capacity)
@@ -209,6 +217,7 @@ theorem integral_momentPolynomial_relabelStateKernel (parent : Deme' → Deme)
 
 /-! ## Composition across deme sets -/
 
+omit [DecidableEq Deme] [DecidableEq Deme'] in
 /-- **Expected configuration moments compose by matrix product across deme sets.**  If the
 expected moments under `κ` from the old deme set to the new are `M` applied to the initial moments,
 and under `η` from the new deme set to a third are `N` applied to them, then under `η ∘ₖ κ` they
