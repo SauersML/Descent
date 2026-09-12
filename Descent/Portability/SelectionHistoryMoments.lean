@@ -410,7 +410,6 @@ theorem selectionTerms_withinBudget (model : SelectionModel Deme Locus Allele)
       rw [Multiset.cons_swap, Multiset.cons_erase hτ]
       exact hlost
     exact withinBudget_coalesce _ τ _ _ hbudget
-  · exact absurd hη (by simp)
 
 /-- **The selection matrix**: from the budget-respecting configurations to those with one more
 copy at the selected locus, the rates of the gained configurations minus those of the lost ones. -/
@@ -531,10 +530,9 @@ theorem matrixExponential_mul_comm (A : Matrix ι ι ℝ) (t : ℝ) :
 generator. -/
 theorem hasDerivAt_propagatorColumn (A : Matrix ι ι ℝ) (finish t : ℝ) (η : ι) :
     HasDerivAt (fun u ↦ matrixExponential A (finish - u) *ᵥ fun j ↦ if η = j then 1 else 0)
-      ((-1 : ℝ) • (A *ᵥ (matrixExponential A (finish - t) *ᵥ fun j ↦ if η = j then 1 else 0)))
-      t :=
-  (hasDerivAt_matrixExponential_mulVec A _ (finish - t)).scomp t
-    ((hasDerivAt_id t).const_sub finish)
+      (-(A *ᵥ (matrixExponential A (finish - t) *ᵥ fun j ↦ if η = j then 1 else 0))) t :=
+  ((StationaryHaplotypeRealization.hasDerivAt_matrixExponential_mulVec A _ (finish - t)).scomp t
+    ((hasDerivAt_id t).const_sub finish)).congr_deriv (neg_one_smul ℝ _)
 
 /-- The propagator from time `u` to `finish` applied to a vector, column by column. -/
 theorem propagator_mulVec_eq_sum (A : Matrix ι ι ℝ) (finish u : ℝ) (w : ι → ℝ) :
@@ -561,8 +559,7 @@ theorem hasDerivWithinAt_propagator_mulVec (A : Matrix ι ι ℝ) (finish : ℝ)
   rw [hfun, propagator_mulVec_eq_sum A finish t v', propagator_mulVec_eq_sum A finish t (v t),
     Matrix.mulVec_sum]
   refine hsum.congr_deriv ?_
-  simp only [Matrix.mulVec_smul, Finset.sum_add_distrib, smul_smul, mul_neg, mul_one, neg_smul,
-    Finset.sum_neg_distrib]
+  simp only [Matrix.mulVec_smul, smul_neg, Finset.sum_add_distrib, Finset.sum_neg_distrib]
   abel
 
 /-- The propagator to the end of an epoch applied to a continuous vector is continuous. -/
