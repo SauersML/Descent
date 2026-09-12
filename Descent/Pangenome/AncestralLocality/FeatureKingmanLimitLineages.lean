@@ -124,7 +124,7 @@ theorem sum_prod_mul_comp_injective {ι κ : Type*} [Fintype ι] [DecidableEq ι
     calc (if (fun j ↦ x (c j)) = y then (1 : ℝ) else 0)
         = ∏ j, (if x (c j) = y j then (1 : ℝ) else 0) := by
           rw [Fintype.prod_boole]
-          simp only [funext_iff]
+          exact if_congr funext_iff rfl rfl
       _ = ∏ i, ∏ j ∈ univ.filter (fun j ↦ c j = i), (if x (c j) = y j then (1 : ℝ) else 0) :=
           (prod_fiberwise_of_maps_to (fun j _ ↦ mem_univ (c j)) _).symm
       _ = ∏ i, ∏ j ∈ univ.filter (fun j ↦ c j = i), (if x i = y j then (1 : ℝ) else 0) :=
@@ -139,12 +139,12 @@ theorem sum_prod_mul_comp_injective {ι κ : Type*} [Fintype ι] [DecidableEq ι
         ext j
         simp only [mem_filter, mem_univ, true_and, mem_singleton]
         exact ⟨fun hj ↦ hc (hj.trans hj₀.symm), fun hj ↦ by rw [hj]; exact hj₀⟩
-      rw [hsingle, prod_singleton, prod_singleton, hj₀]
-      simp only [mul_boole, sum_ite_eq', mem_univ, ↓reduceIte]
+      rw [hsingle, prod_singleton, hj₀]
+      simp only [prod_singleton, mul_boole, sum_ite_eq', mem_univ, ↓reduceIte]
     · have hempty : univ.filter (fun j ↦ c j = i) = ∅ :=
         filter_eq_empty_iff.mpr fun j _ hj ↦ hi ⟨j, hj⟩
-      rw [hempty, prod_empty, prod_empty]
-      simp only [mul_one, hw i]
+      rw [hempty, prod_empty]
+      simp only [prod_empty, mul_one, hw i]
   have key : ∀ y : Fin n → κ, ∑ x : ι → κ, (∏ i, w i (x i)) *
       (if (fun j ↦ x (c j)) = y then (1 : ℝ) else 0) = ∏ j, w (c j) (y j) := by
     intro y
@@ -179,10 +179,15 @@ theorem sum_prod_mul_comp_injective {ι κ : Type*} [Fintype ι] [DecidableEq ι
 /-- The uniform law on source vectors has total mass one. -/
 theorem sum_uniformSources_const {N : ℕ} (hN : N ≠ 0) (n : ℕ) :
     ∑ _s : Fin n → Fin N, (N : ℝ)⁻¹ ^ n = 1 := by
-  have h := Fintype.prod_sum fun (_ : Fin n) (_ : Fin N) ↦ (N : ℝ)⁻¹
-  simp only [prod_const, card_univ, Fintype.card_fin, sum_const, nsmul_eq_mul,
-    mul_inv_cancel₀ (Nat.cast_ne_zero.mpr hN), one_pow] at h
-  exact h.symm
+  have hN' : (N : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hN
+  calc ∑ _s : Fin n → Fin N, (N : ℝ)⁻¹ ^ n
+      = ∑ _s : Fin n → Fin N, ∏ _j : Fin n, (N : ℝ)⁻¹ := by
+        simp only [prod_const, card_univ, Fintype.card_fin]
+    _ = ∏ _j : Fin n, ∑ _t : Fin N, (N : ℝ)⁻¹ :=
+        (Fintype.prod_sum fun (_ : Fin n) (_ : Fin N) ↦ (N : ℝ)⁻¹).symm
+    _ = 1 := by
+        simp only [sum_const, card_univ, Fintype.card_fin, nsmul_eq_mul, mul_inv_cancel₀ hN',
+          prod_const_one]
 
 /-- The image of a source vector has `n` elements exactly when no two lineages share a source. -/
 theorem card_image_univ_eq_iff_injective {N n : ℕ} (s : Fin n → Fin N) :
@@ -268,9 +273,11 @@ theorem sum_uniformSources_card_image {N : ℕ} (hN : N ≠ 0) (n : ℕ) :
       by_cases h : p ∈ univ.image s
       · obtain ⟨j, -, hj⟩ := mem_image.mp h
         rw [if_pos h]
-        exact (prod_eq_zero (mem_univ j) (if_pos hj)).symm
+        exact (prod_eq_zero (f := fun j ↦ if s j = p then (0 : ℝ) else 1) (mem_univ j)
+          (if_pos hj)).symm
       · rw [if_neg h]
-        exact (prod_eq_one fun j _ ↦ if_neg fun hj ↦ h (mem_image.mpr ⟨j, mem_univ j, hj⟩)).symm
+        exact (prod_eq_one (f := fun j ↦ if s j = p then (0 : ℝ) else 1) fun j _ ↦
+          if_neg fun hj ↦ h (mem_image.mpr ⟨j, mem_univ j, hj⟩)).symm
     have hone : ∑ t : Fin N, (N : ℝ)⁻¹ * (if t = p then 0 else 1) = 1 - (N : ℝ)⁻¹ := by
       have e : ∀ t : Fin N, (N : ℝ)⁻¹ * (if t = p then 0 else 1) =
           (N : ℝ)⁻¹ - (N : ℝ)⁻¹ * (if t = p then 1 else 0) := by
@@ -530,17 +537,23 @@ theorem sum_prod_annotatedLaw_sources (G : CheckingGraph V) {N : ℕ} (hN : N �
             ∏ j, (annotatedLaw G N k pop (y j) * (if (y j).1 = s j then (1 : ℝ) else 0)) := by
           refine sum_congr rfl fun y _ ↦ ?_
           rw [prod_mul_distrib, Fintype.prod_boole]
-          simp only [funext_iff]
+          congr 1
+          exact if_congr funext_iff rfl rfl
       _ = ∏ j, ∑ q : Fin N × (V → Bool),
             annotatedLaw G N k pop q * (if q.1 = s j then (1 : ℝ) else 0) :=
           (Fintype.prod_sum fun j q ↦
             annotatedLaw G N k pop q * (if q.1 = s j then (1 : ℝ) else 0)).symm
       _ = ∏ _j : Fin n, (N : ℝ)⁻¹ := by
           refine prod_congr rfl fun j _ ↦ ?_
-          rw [Fintype.sum_prod_type]
-          simp only [← sum_mul]
-          simp only [sum_annotatedLaw_snd G hN k pop, mul_boole, sum_ite_eq', mem_univ,
-            ↓reduceIte]
+          calc ∑ q : Fin N × (V → Bool),
+                annotatedLaw G N k pop q * (if q.1 = s j then (1 : ℝ) else 0)
+              = ∑ t : Fin N, (∑ z : V → Bool, annotatedLaw G N k pop (t, z)) *
+                  (if t = s j then (1 : ℝ) else 0) := by
+                rw [Fintype.sum_prod_type]
+                exact sum_congr rfl fun t _ ↦ (sum_mul _ _ _).symm
+            _ = (N : ℝ)⁻¹ := by
+                simp only [sum_annotatedLaw_snd G hN k pop, mul_boole, sum_ite_eq', mem_univ,
+                  ↓reduceIte]
       _ = (N : ℝ)⁻¹ ^ n := by rw [prod_const, card_univ, Fintype.card_fin]
   calc ∑ y : Fin n → Fin N × (V → Bool), (∏ j, annotatedLaw G N k pop (y j)) *
         h (fun j ↦ (y j).1)
