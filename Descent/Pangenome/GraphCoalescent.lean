@@ -2,8 +2,11 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.GraphCoalescent.ConnectivityClockTable
+import Descent.Pangenome.GraphCoalescent.Conservation
 import Descent.Pangenome.GraphCoalescent.Deficit
 import Descent.Pangenome.GraphCoalescent.EstimatorSign
+import Descent.Pangenome.GraphCoalescent.HiddenLoads
+import Descent.Pangenome.GraphCoalescent.HiddenLumpability
 import Descent.Pangenome.GraphCoalescent.LahWeights
 import Descent.Pangenome.GraphCoalescent.MergerDepth
 import Descent.Pangenome.GraphCoalescent.MinimalRefinement
