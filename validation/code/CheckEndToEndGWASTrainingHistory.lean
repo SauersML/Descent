@@ -1,0 +1,31 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.EndToEndGWASTrainingHistory
+
+/-! Axiom audit of EndToEndGWASTrainingHistory. -/
+
+open Descent.Portability.EndToEndGWASTrainingHistory
+
+#print axioms eval_fourthCoMomentPolynomial
+#print axioms totalDegree_fourthCoMomentPolynomial_le
+#print axioms eval_weightExcessPolynomial
+#print axioms eval_weightPairingPolynomial
+#print axioms eval_denominatorMatrixPolynomial
+#print axioms totalDegree_trainedPolynomial_le
+#print axioms polynomialFunction_populationNumerator
+#print axioms trainedNumerator_stateLaw
+#print axioms trainedDenominator_stateLaw
+#print axioms integral_trainedNumerator_antitone
+#print axioms integral_trainedDenominator_antitone
+#print axioms tendsto_momentTrainedAccuracy
+#print axioms integral_samplingForm_polynomialFunction
+#print axioms expectedTrainedAccuracy_eq_momentTrainedAccuracy
+#print axioms integral_expectation_gwasWeights_historyEventKernel
+#print axioms integral_expectation_gwasWeights_mul_historyEventKernel
+#print axioms integral_trainedNumerator_historyEventKernel
+#print axioms integral_trainedDenominator_historyEventKernel
+#print axioms expectedTrainedAccuracy_historyEventKernel
+#print axioms expectedTrainedAccuracy_eq_of_moments_eq
+#print axioms tendsto_expectedTrainedAccuracy_historyEventKernel
+#print axioms expectedTrainedAccuracy_rateHistoryKernel
