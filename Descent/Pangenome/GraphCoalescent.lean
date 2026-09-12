@@ -1,11 +1,13 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Pangenome.GraphCoalescent.BalancedFiberExtremum
 import Descent.Pangenome.GraphCoalescent.ConnectivityClockTable
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulant
 import Descent.Pangenome.GraphCoalescent.Conservation
 import Descent.Pangenome.GraphCoalescent.Deficit
 import Descent.Pangenome.GraphCoalescent.EstimatorSign
+import Descent.Pangenome.GraphCoalescent.HiddenLoadFiltering
 import Descent.Pangenome.GraphCoalescent.HiddenLoads
 import Descent.Pangenome.GraphCoalescent.HiddenLumpability
 import Descent.Pangenome.GraphCoalescent.LahWeights
@@ -13,9 +15,11 @@ import Descent.Pangenome.GraphCoalescent.MergerDepth
 import Descent.Pangenome.GraphCoalescent.MinimalRefinement
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceClosure
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceOutcome
+import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionLaw
 import Descent.Pangenome.GraphCoalescent.MultiplicativeObservation
 import Descent.Pangenome.GraphCoalescent.Observation
 import Descent.Pangenome.GraphCoalescent.Pinned
+import Descent.Pangenome.GraphCoalescent.RankedHistoryLaw
 import Descent.Pangenome.GraphCoalescent.Reduction
 import Descent.Pangenome.GraphCoalescent.Visibility
 import Descent.Pangenome.GraphCoalescent.VisibleIntensityClock
@@ -93,10 +97,9 @@ Stated so the group does not read as complete.  Not formalised: the multi-interf
 which each of a chain's separators contributes its own entrance point and the marginal
 genealogies along the chain are correlated by recombination -- `Descent.Pangenome.Linkage.Chain`
 has the chain and `Descent.Coalescent.Recombination` has the correlation, and joining them is
-the natural next module.  Not formalised: the exact per-report transition COUNT from `⊥`,
-which is `c_A · c_B` in the fiber sizes of the two states merged; `Visibility` proves the
-count is at least two, which is all the obstruction needs, and the exact count would need a
-finiteness instance on `𝓔ₙ` that the corpus does not carry.  Not formalised: the variance of
+the natural next module.  The exact per-report transition count from `⊥`, `c_A · c_B` in the
+fiber sizes of the two states merged, is now `HiddenLoads.card_visibleCovers_bot`; `Visibility`
+needs only that it is at least two.  Not formalised: the variance of
 the graph coalescent's transit time, and the site-frequency spectrum at `w`.
 
 ## The premise the group carries
