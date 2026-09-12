@@ -121,6 +121,7 @@ import Descent.Portability.NeutralMarkovKernelUniqueness
 import Descent.Portability.NeutralHistoryKernel
 import Descent.Portability.PartialHaplotypeEventHistoryRealization
 import Descent.Portability.NeutralPulseHistoryKernel
+import Descent.Portability.NeutralDemeRelabelKernel
 import Descent.Portability.NeutralFellerProperty
 import Descent.Portability.NeutralRateHistoryRealization
 import Descent.Portability.ReferenceExperimentCohortRows
@@ -265,8 +266,10 @@ realized moments compose in chronological order
 (`PartialHaplotypeHistoryRealization.exists_historyLaw`,
 `PartialHaplotypeEventHistoryRealization.expectedMomentVector_eventHistory_realized`), and so do
 the neutral Markov kernels along epochs
-(`NeutralHistoryKernel.integral_panelReport_neutralHistoryKernel`) and along splits and pulses
-(`NeutralPulseHistoryKernel.integral_momentPolynomial_historyEventKernel`). The neutral Markov
+(`NeutralHistoryKernel.integral_panelReport_neutralHistoryKernel`), along splits and pulses
+(`NeutralPulseHistoryKernel.integral_momentPolynomial_historyEventKernel`) and across a change of
+the deme set (`NeutralDemeRelabelKernel.integral_momentPolynomial_splitHistoryKernel`). The
+neutral Markov
 kernels are unique (`NeutralMarkovKernelUniqueness.existsUnique_neutralMarkovKernel`). The §4.2a
 polynomial semigroup is constructed from the dual
 matrix exponential, with its unit, semigroup law and dual representation
