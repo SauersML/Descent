@@ -150,7 +150,7 @@ def IsAutonomous (K : H → H → H → ℝ) (P : Setoid H) : Prop :=
 /-- The identity observation is hereditarily autonomous for every kernel, with `K̄ = K`. -/
 theorem hereditarilyAutonomous_id [DecidableEq H] (K : H → H → H → ℝ) :
     HereditarilyAutonomous K (id : H → H) :=
-  ⟨K, fun x y o ↦ Finset.sum_eq_single_of_mem o ((mem_fiber_iff id o o).mpr rfl)
+  ⟨K, fun _ _ o ↦ Finset.sum_eq_single_of_mem o ((mem_fiber_iff id o o).mpr rfl)
     fun z hz hzo ↦ absurd ((mem_fiber_iff id o z).mp hz) hzo⟩
 
 /-- Under autonomy of `P_π`, the mass of a fiber depends on the parents only through their
@@ -211,6 +211,7 @@ mass on `T x y` and half on `T y x`. -/
 def childKernel [DecidableEq H] (T : H → H → H) (x y z : H) : ℝ :=
   (if T x y = z then 1 / 2 else 0) + if T y x = z then 1 / 2 else 0
 
+omit [Fintype H] in
 /-- The mass of a set under a two-child kernel counts the two ordered children in it. -/
 theorem kernelMass_childKernel [DecidableEq H] (T : H → H → H) (x y : H) (B : Finset H) :
     kernelMass (childKernel T) x y B =
@@ -281,7 +282,7 @@ def pairMidpoint (x y z : H) : ℝ :=
   2⁻¹ * (pointMass x z + pointMass y z)
 
 theorem pointMass_mem_stdSimplex (x : H) : pointMass x ∈ stdSimplex ℝ H :=
-  ite_eq_mem_stdSimplex x
+  ite_eq_mem_stdSimplex (𝕜 := ℝ) (ι := H) x
 
 /-- Averaging against `δ_x` evaluates at `x`. -/
 theorem sum_pointMass_mul (x : H) (f : H → ℝ) : ∑ a, pointMass x a * f a = f x := by
