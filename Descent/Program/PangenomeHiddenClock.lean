@@ -47,6 +47,7 @@ import Descent.Pangenome.GraphCoalescent.VisibleIntensityClock
 import Descent.Pangenome.GraphCoalescent.ConnectionClockHittingTime
 import Descent.Pangenome.GraphCoalescent.MinimalHistoryLumping
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionSpectrum
+import Descent.Pangenome.GraphCoalescent.ScaledConnectionLimit
 
 namespace Descent.Program
 
@@ -189,7 +190,13 @@ inside it.
   `Σ_σ (-1)^(|σ|-1) (|σ|-1)! e^(-u κ_σ)` (`connectionProbability_eq_mobius_sum`). Two fibers give
   `1 - e^(-u p₀ p₁)` (`connectionProbability_two`), and three equal fibers give
   `Pr(T_p > u) = 3 e^(-2u/9) - 2 e^(-u/3)` (`connectionSurvival_three_equal`):
-  `MultiplicativeConnectionExamples`.
+  `MultiplicativeConnectionExamples`. The limit `u ↦ Pr(T_p ≤ u)` is continuous
+  (`ScaledConnectionLimit.continuous_connectionProbability_time`), vanishes at `u = 0` with two
+  fibers or more (`connectionProbability_zero`), and tends to one when every `p_i > 0`
+  (`tendsto_connectionProbability_atTop`), so `T_p` is finite; the crossing rate is the pair sum
+  `κ_σ = Σ_{C<D} p(C) p(D)` (`crossingRate_eq_pairProductSum`). (F2) holds for every path
+  functional with values in `[0, 1]`, within `min {1, U²/(4n) + U ‖p^(n) - p‖₁}`
+  (`abs_poissonMixture_report_sub_spread_le`).
 * Theorem B as one statistic: `CoarsestRefinement`. The report with every load (three or more
   components), with the sum and product of the loads (two), or alone (one) is a strong lumping
   that determines the report (`coarsestState_determines_report_and_lumps`,
