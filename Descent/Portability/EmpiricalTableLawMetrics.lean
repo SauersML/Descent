@@ -416,7 +416,7 @@ theorem expectation_tableLaw_expectation (law : FiniteReportLaw (Bool × Bool)) 
 
 /-- The correct-classification indicator at a threshold: the outcome when the score exceeds the
 threshold, and its complement otherwise. -/
-def correctIndicator (threshold : ℝ) (report : Bool × Bool) : ℝ :=
+noncomputable def correctIndicator (threshold : ℝ) (report : Bool × Bool) : ℝ :=
   if threshold < scoreOf report then outcomeOf report else 1 - outcomeOf report
 
 /-- The corpus threshold accuracy is the expectation of the correct-classification indicator. -/
