@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionConvergence
+import Mathlib.Analysis.Normed.Group.FunctionSeries
 import Mathlib.MeasureTheory.Measure.Portmanteau
 import Mathlib.Probability.CDF
 
@@ -93,7 +94,6 @@ theorem poissonPMFReal_add (U W : NNReal) (n : ℕ) :
   have h2 : ((n - k).factorial : ℝ) ≠ 0 := by positivity
   have h3 : (n.factorial : ℝ) ≠ 0 := by positivity
   field_simp
-  ring
 
 /-- A Poisson mixture of numbers in `[0, 1]` is summable. -/
 theorem summable_poissonPMFReal_mul {a : ℕ → ℝ} (ha0 : ∀ m, 0 ≤ a m) (ha1 : ∀ m, a m ≤ 1)
@@ -193,9 +193,10 @@ theorem tendsto_poissonMixture_atTop {a : ℕ → ℝ} (ha0 : ∀ m, 0 ≤ a m) 
     have hcoe : ((x.toNNReal : NNReal) : ℝ) = x := Real.coe_toNNReal x hx
     have hfin : HasSum (fun m ↦ if m ∈ Finset.range M then poissonPMFReal x.toNNReal m else 0)
         (∑ m ∈ Finset.range M, poissonPMFReal x.toNNReal m) := by
-      have h := hasSum_sum_of_ne_finset_zero (s := Finset.range M)
-        (f := fun m ↦ if m ∈ Finset.range M then poissonPMFReal x.toNNReal m else 0)
-        fun m hm ↦ if_neg hm
+      have h : HasSum (fun m ↦ if m ∈ Finset.range M then poissonPMFReal x.toNNReal m else 0)
+          (∑ m ∈ Finset.range M,
+            if m ∈ Finset.range M then poissonPMFReal x.toNNReal m else 0) :=
+        hasSum_sum_of_ne_finset_zero fun m hm ↦ if_neg hm
       rwa [Finset.sum_congr rfl fun m hm ↦ if_pos hm] at h
     have hB := ((poissonPMFRealSum x.toNNReal).mul_left (1 - ε)).sub hfin
     have hrange : ∑ m ∈ Finset.range M, poissonPMFReal x.toNNReal m
@@ -217,8 +218,7 @@ theorem tendsto_poissonMixture_atTop {a : ℕ → ℝ} (ha0 : ∀ m, 0 ≤ a m) 
         nlinarith [hM m hMm]
   filter_upwards [(tendsto_order.1 hS).2 ε hεpos, eventually_ge_atTop 0] with x hx1 hx2
   have := hlower x hx2
-  rw [hε] at hx1 this ⊢
-  linarith
+  linarith [hε]
 
 end
 
