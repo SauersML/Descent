@@ -2,7 +2,10 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.GraphCoalescent.BalancedFiberExtremum
+import Descent.Pangenome.GraphCoalescent.ConnectionClockPathLaw
 import Descent.Pangenome.GraphCoalescent.ConnectivityClockTable
+import Descent.Pangenome.GraphCoalescent.LeadingCoefficientCorollaries
+import Descent.Pangenome.GraphCoalescent.ReportedConnectionClock
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulant
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulantDegree
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulantCorpus
@@ -80,7 +83,11 @@ inside it.
   `two_div_sub_two_div_le_meanConnectionTime_bot`, `meanConnectionTime_bot_le_two_sub`,
   `meanConnectionTime_bot_lt`; started at `q` the clock is Kingman's `2 - 2/w`,
   `meanConnectionTime_graphKer`. (C2) in Laplace-transform order:
-  `kingmanLaplace_le_connectionLaplace`.
+  `kingmanLaplace_le_connectionLaplace`. The law of the connection time built on the corpus
+  Kingman holding and jump laws has these first-step values as its integrals, so (C2)-(C4) hold
+  for that law: `ConnectionClockPathLaw.lintegral_coe_connectionTimeLaw_bot_le`,
+  `ofReal_le_lintegral_coe_connectionTimeLaw_bot`,
+  `kingmanLaplace_width_le_lintegral_exp_connectionTimeLaw_bot`.
 * Theorem B, the coarsest predictive Markov refinement: `MinimalRefinement`. (B1) with three or
   more components the visible merger rates `ρ_CD = L_C L_D` determine every load:
   `load_sq_eq_visibleRates`, `load_eq_of_visibleRates_eq`, `visibleRates_eq_iff`. (B2) with two
@@ -119,6 +126,11 @@ inside it.
   probabilities `C(L_C, 2) / C(K, 2)` and `L_C L_D / C(K, 2)` depending on the hidden state alone
   (`hiddenKernel_invisibleTarget_toReal`, `hiddenKernel_visibleTarget_toReal`), and the hidden
   trajectory is a Markov chain with that kernel (`hiddenChainLaw_succ`).
+* Theorem D, (D5)-(D9) in continuous time: `ReportedConnectionClock`. On the product of the
+  jump-chain trajectory law and independent exponential holding times, (D5) is `connectedProb_eq`,
+  and the Laplace transform, mean and second moment of the connection time are
+  `connectionTime_laplace`, `connectionTime_mean` and `connectionTime_secondMoment`, through
+  `Σ_{k=b+1}^n 1/C(k,2) = 2/b - 2/n` (`sum_Ioc_one_div_deathRate`).
 * Theorem D, the exact table of §6: `ConnectivityClockTable`. The cumulants
   `6z + 4z²`, `24z + 30z² + 6z³`, `24z + 32z² + 8z³`, `24z + 20z²`,
   `720z + 1656z² + 928z³ + 144z⁴` and the means `2/3, 1/2, 7/18, 17/18, 92/225` of the fiber sizes
@@ -174,7 +186,10 @@ inside it.
 * Theorem E, the extremal statement: `BalancedFiberExtremum`. Among positive fiber sizes of a
   fixed total the product is maximal exactly on balanced profiles
   (`prod_maximal_iff_isBalancedFibers`), read at the loads of an interface in
-  `prod_hiddenLoad_bot_le_of_isBalancedFibers`.
+  `prod_hiddenLoad_bot_le_of_isBalancedFibers`; the leading coefficient is maximal exactly on
+  balanced profiles
+  (`LeadingCoefficientCorollaries.leadingCoefficient_maximal_iff_isBalancedFibers`), and (E1)
+  agrees with the table rows (`table_two_two_two`).
 
 Scope. Theorem A is proved as cover counts with Kingman's unit rate per cover, and under the
 corpus jump chain the hidden state is a Markov chain (`HiddenStateChain.hiddenChainLaw_succ`); the
@@ -198,7 +213,9 @@ does not imply the stochastic order of the quantile coupling. (D4) is proved by 
 recursion, without enumerating ranked histories. §9 is proved for a finite hidden jump process
 given by its generator, with the load chain's generator `loadGenerator` written from the rates of
 Theorem A. (E1) is proved from the Möbius sum rather than the ranked-history law. The stopping law
-(D7)-(D9), (E2), (F2) and (F3) are not yet proof-checked. Of (F1), the coupled skeleton chain,
+(E2), (F2) and (F3) are not yet proof-checked. (D7)-(D9) are proved for the connection time
+defined as the sum of the holding times above the stopping level; its identification with the
+first hitting time of the report path is not proved. Of (F1), the coupled skeleton chain,
 the path-level coupling inequality and the identification with path measures on càdlàg paths are
 not yet recorded here. (F4) is proved for the finite random graph
 of edges rung by time `u`, entering the clocks through their distribution functions.

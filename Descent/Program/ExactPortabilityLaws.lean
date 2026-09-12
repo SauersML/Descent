@@ -115,6 +115,7 @@ import Descent.Portability.PartialHaplotypeRealizedPanel
 import Descent.Portability.NeutralPolynomialPositivity
 import Descent.Portability.NeutralBernsteinPositivity
 import Descent.Portability.NeutralMicroscopicEulerLimit
+import Descent.Portability.NeutralKernelPanelLikelihood
 import Descent.Portability.CylinderGaussianQuadrant
 import Descent.Portability.MultinomialHistoryRealization
 import Descent.Portability.PartialHaplotypeHistoryRealization
@@ -254,7 +255,9 @@ carry the neutral generator on configuration moments (`exists_neutralMarkovKerne
 limit holds: the microscopic kernel powers along `N` steps of size `t/N` converge uniformly to the
 neutral semigroup on every continuous observable, and its Riesz kernels are Markov and compose
 (`NeutralMicroscopicEulerLimit.tendstoUniformly_neutralSemigroupExtension`,
-`neutralMarkovKernel_add`). The kernels
+`neutralMarkovKernel_add`). Under those kernels, one process for every budget, the configuration
+moments of (20) and the panel reports of (22) hold:
+`NeutralKernelPanelLikelihood.integral_panelReport_neutralMarkovKernel`. The kernels
 are Markov kernels on pseudo-metrizable compact spaces, which include the haplotype-frequency
 simplex. In §6 the attainable metric curve of NOTE1 Theorem 5 is proved exactly for lists of
 discrete events, and for chronologies with continuous nonnegative rates at a positive horizon
