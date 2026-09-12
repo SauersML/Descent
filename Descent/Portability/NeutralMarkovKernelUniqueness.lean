@@ -63,7 +63,7 @@ theorem integral_eq_neutralSemigroupExtension (rates : NeutralRates Deme Locus A
   have hi : ∀ h : C(FrequencyState Deme Locus Allele, ℝ), Integrable (fun y ↦ h y) μ :=
     fun h ↦ (BoundedContinuousFunction.mkOfCompact h).integrable μ
   have hint : Continuous fun h : C(FrequencyState Deme Locus Allele, ℝ) ↦ ∫ y, h y ∂μ := by
-    refine (LipschitzWith.of_dist_le_mul fun h₁ h₂ ↦ ?_).continuous
+    refine (LipschitzWith.of_dist_le_mul (K := 1) fun h₁ h₂ ↦ ?_).continuous
     simp only [NNReal.coe_one, one_mul, Real.dist_eq]
     rw [dist_eq_norm, ← integral_sub (hi h₁) (hi h₂), ← Real.norm_eq_abs]
     refine (norm_integral_le_of_norm_le_const
