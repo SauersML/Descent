@@ -568,6 +568,297 @@ theorem pathMeasure_jumpHold_cylinder (rate : S → ℝ) (hrate : ∀ x, 0 < rat
 
 end Law
 
+/-! ### The generator and its matrix exponential -/
+
+section Generator
+
+variable {S : Type*} [Fintype S]
+
+/-- **The generator of the jump process**: `G(x, y) = rate x (kernel x y - [x = y])`. -/
+def holdJumpGenerator (rate : S → ℝ) (kernel : S → PMF S) : Matrix S S ℝ :=
+  fun x y ↦ rate x * ((kernel x y).toReal - if x = y then 1 else 0)
+
+theorem holdJumpGenerator_isMetzler {rate : S → ℝ} (hrate : ∀ x, 0 < rate x)
+    (kernel : S → PMF S) : Coalescent.Matrix.IsMetzler (holdJumpGenerator rate kernel) := by
+  intro x y hxy
+  simp only [holdJumpGenerator, if_neg hxy, sub_zero]
+  exact mul_nonneg (hrate x).le ENNReal.toReal_nonneg
+
+theorem sum_toReal_kernel (kernel : S → PMF S) (x : S) : ∑ y, (kernel x y).toReal = 1 := by
+  rw [← ENNReal.toReal_sum fun y _ ↦ PMF.apply_ne_top _ _, ← tsum_fintype, PMF.tsum_coe,
+    ENNReal.toReal_one]
+
+/-- The rows of the generator sum to zero. -/
+theorem sum_holdJumpGenerator (rate : S → ℝ) (kernel : S → PMF S) (x : S) :
+    ∑ y, holdJumpGenerator rate kernel x y = 0 := by
+  have hdiag : ∑ y : S, (if x = y then (1 : ℝ) else 0) = 1 := by
+    rw [Finset.sum_ite_eq, if_pos (Finset.mem_univ x)]
+  simp only [holdJumpGenerator]
+  rw [← Finset.mul_sum, Finset.sum_sub_distrib, sum_toReal_kernel, hdiag, sub_self, mul_zero]
+
+theorem holdJumpGenerator_mul_apply (rate : S → ℝ) (kernel : S → PMF S) (M : Matrix S S ℝ)
+    (x y : S) :
+    (holdJumpGenerator rate kernel * M) x y
+      = rate x * ∑ z, (kernel x z).toReal * M z y - rate x * M x y := by
+  have hdiag : ∑ z : S, (if x = z then (1 : ℝ) else 0) * M z y = M x y := by
+    simp only [ite_mul, one_mul, zero_mul, Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte]
+  rw [Matrix.mul_apply, ← hdiag, Finset.mul_sum, Finset.mul_sum, ← Finset.sum_sub_distrib]
+  refine Finset.sum_congr rfl fun z _ ↦ ?_
+  simp only [holdJumpGenerator]
+  ring
+
+/-- **The forward equation of the matrix exponential**, entrywise. -/
+theorem hasDerivAt_exp_smul_apply (G : Matrix S S ℝ) (x y : S) (t : ℝ) :
+    HasDerivAt (fun u : ℝ ↦ NormedSpace.exp ℝ (u • G) x y)
+      ((NormedSpace.exp ℝ (t • G) * G) x y) t := by
+  have hentry := (LinearMap.toContinuousLinearMap
+    (Matrix.entryLinearMap ℝ ℝ x y)).hasFDerivAt.comp_hasDerivAt t
+      (hasDerivAt_exp_smul_const G t)
+  simpa only [Function.comp_def, LinearMap.coe_toContinuousLinearMap',
+    Matrix.entryLinearMap_apply] using hentry
+
+/-- **The backward equation of the matrix exponential**, entrywise. -/
+theorem hasDerivAt_exp_smul_apply' (G : Matrix S S ℝ) (x y : S) (t : ℝ) :
+    HasDerivAt (fun u : ℝ ↦ NormedSpace.exp ℝ (u • G) x y)
+      ((G * NormedSpace.exp ℝ (t • G)) x y) t := by
+  have hentry := (LinearMap.toContinuousLinearMap
+    (Matrix.entryLinearMap ℝ ℝ x y)).hasFDerivAt.comp_hasDerivAt t
+      (hasDerivAt_exp_smul_const' G t)
+  simpa only [Function.comp_def, LinearMap.coe_toContinuousLinearMap',
+    Matrix.entryLinearMap_apply] using hentry
+
+theorem continuous_exp_smul_sub_apply (G : Matrix S S ℝ) (t : ℝ) (z y : S) :
+    Continuous fun h : ℝ ↦ NormedSpace.exp ℝ ((t - h) • G) z y := by
+  have hexp : Continuous fun u : ℝ ↦ NormedSpace.exp ℝ (u • G) :=
+    continuous_iff_continuousAt.mpr fun u ↦ (hasDerivAt_exp_smul_const G u).continuousAt
+  exact (hexp.comp (continuous_const.sub continuous_id)).matrix_elem z y
+
+theorem exp_smul_holdJumpGenerator_nonneg {rate : S → ℝ} (hrate : ∀ x, 0 < rate x)
+    (kernel : S → PMF S) {t : ℝ} (ht : 0 ≤ t) (x y : S) :
+    0 ≤ NormedSpace.exp ℝ (t • holdJumpGenerator rate kernel) x y := by
+  rw [← Coalescent.matrixExponential_eq_normedSpace_exp]
+  exact Coalescent.matrixExponential_apply_nonneg_of_metzler _
+    (holdJumpGenerator_isMetzler hrate kernel) t ht x y
+
+/-- **The rows of `e^{tG}` sum to one.** -/
+theorem sum_exp_smul_holdJumpGenerator (rate : S → ℝ) (kernel : S → PMF S) (t : ℝ) (x : S) :
+    ∑ y, NormedSpace.exp ℝ (t • holdJumpGenerator rate kernel) x y = 1 := by
+  have hderiv : ∀ u, HasDerivAt
+      (fun v ↦ ∑ y, NormedSpace.exp ℝ (v • holdJumpGenerator rate kernel) x y) 0 u := by
+    intro u
+    have h := HasDerivAt.fun_sum (u := Finset.univ) fun y _ ↦
+      hasDerivAt_exp_smul_apply (holdJumpGenerator rate kernel) x y u
+    refine h.congr_deriv ?_
+    simp only [Matrix.mul_apply]
+    rw [Finset.sum_comm]
+    exact Finset.sum_eq_zero fun z _ ↦ by
+      rw [← Finset.mul_sum, sum_holdJumpGenerator, mul_zero]
+  have hconst : ∑ y, NormedSpace.exp ℝ (t • holdJumpGenerator rate kernel) x y
+      = ∑ y, NormedSpace.exp ℝ ((0 : ℝ) • holdJumpGenerator rate kernel) x y :=
+    is_const_of_deriv_eq_zero (fun u ↦ (hderiv u).differentiableAt) (fun u ↦ (hderiv u).deriv) t 0
+  rw [hconst, zero_smul, NormedSpace.exp_zero]
+  simp [Matrix.one_apply]
+
+/-- **The first-jump equation of the matrix exponential.** Holding at `x` at rate `r = rate x`
+until a time `s ≤ t` and jumping by `κ = kernel x`,
+`e^{tG}(x, y) = [x = y] e^{-rt} + ∫_0^t r e^{-rs} Σ_z κ(z) e^{(t-s)G}(z, y) ds`. -/
+theorem exp_smul_apply_eq_firstJump (rate : S → ℝ) (kernel : S → PMF S) (x y : S) (t : ℝ) :
+    NormedSpace.exp ℝ (t • holdJumpGenerator rate kernel) x y
+      = (if x = y then Real.exp (-(rate x * t)) else 0)
+        + ∫ s in (0 : ℝ)..t, rate x * Real.exp (-(rate x * s)) * ∑ z, (kernel x z).toReal
+            * NormedSpace.exp ℝ ((t - s) • holdJumpGenerator rate kernel) z y := by
+  set G := holdJumpGenerator rate kernel with hG
+  have hmatrix : ∀ s, HasDerivAt (fun u ↦ NormedSpace.exp ℝ ((t - u) • G))
+      ((-1 : ℝ) • (G * NormedSpace.exp ℝ ((t - s) • G))) s := fun s ↦
+    (hasDerivAt_exp_smul_const' G (t - s)).scomp s ((hasDerivAt_id s).const_sub t)
+  have hentry : ∀ z s, HasDerivAt (fun u ↦ NormedSpace.exp ℝ ((t - u) • G) z y)
+      (-(G * NormedSpace.exp ℝ ((t - s) • G)) z y) s := by
+    intro z s
+    have hcomposite := (LinearMap.toContinuousLinearMap
+      (Matrix.entryLinearMap ℝ ℝ z y)).hasFDerivAt.comp_hasDerivAt s (hmatrix s)
+    simpa only [Function.comp_def, LinearMap.coe_toContinuousLinearMap',
+      Matrix.entryLinearMap_apply, Matrix.smul_apply, smul_eq_mul, neg_one_mul] using hcomposite
+  have hproduct : ∀ s ∈ Set.uIcc (0 : ℝ) t, HasDerivAt
+      (fun u ↦ Real.exp (-(rate x * u)) * NormedSpace.exp ℝ ((t - u) • G) x y)
+      (-(rate x * Real.exp (-(rate x * s)) * ∑ z, (kernel x z).toReal
+        * NormedSpace.exp ℝ ((t - s) • G) z y)) s := by
+    intro s _
+    have hexp : HasDerivAt (fun u : ℝ ↦ Real.exp (-(rate x * u)))
+        (Real.exp (-(rate x * s)) * -(rate x * 1)) s :=
+      ((hasDerivAt_id s).const_mul (rate x)).neg.exp
+    refine (hexp.mul (hentry x s)).congr_deriv ?_
+    rw [hG, holdJumpGenerator_mul_apply]
+    ring
+  have hintegrand : Continuous fun s ↦ -(rate x * Real.exp (-(rate x * s)) * ∑ z,
+      (kernel x z).toReal * NormedSpace.exp ℝ ((t - s) • G) z y) :=
+    ((continuous_const.mul (continuous_const.mul continuous_id).neg.rexp).mul
+      (continuous_finset_sum _ fun z _ ↦
+        continuous_const.mul (continuous_exp_smul_sub_apply G t z y))).neg
+  have hfundamental := intervalIntegral.integral_eq_sub_of_hasDerivAt hproduct
+    (hintegrand.intervalIntegrable 0 t)
+  simp only [intervalIntegral.integral_neg, sub_self, sub_zero, zero_smul, NormedSpace.exp_zero,
+    Matrix.one_apply, mul_zero, neg_zero, Real.exp_zero, one_mul] at hfundamental
+  split_ifs at hfundamental ⊢ <;> linarith
+
+/-- **The first-jump equation against the holding law**, in the form of the first-step recursion
+of the path measure. -/
+theorem ofReal_exp_smul_apply_eq_firstJump {rate : S → ℝ} (hrate : ∀ x, 0 < rate x)
+    (kernel : S → PMF S) (x y : S) {t : ℝ} (ht : 0 ≤ t) :
+    ENNReal.ofReal (NormedSpace.exp ℝ (t • holdJumpGenerator rate kernel) x y)
+      = (if x = y then Coalescent.holdMeasure (rate x) (Set.Ioi t) else 0)
+        + ∑ z, kernel x z * ∫⁻ h in Set.Iic t,
+            ENNReal.ofReal (NormedSpace.exp ℝ ((t - h) • holdJumpGenerator rate kernel) z y)
+          ∂Coalescent.holdMeasure (rate x) := by
+  have hnonneg : ∀ u, 0 ≤ u → ∀ z,
+      0 ≤ NormedSpace.exp ℝ (u • holdJumpGenerator rate kernel) z y :=
+    fun u hu z ↦ exp_smul_holdJumpGenerator_nonneg hrate kernel hu z y
+  have hFcont : Continuous fun h : ℝ ↦ ∑ z, (kernel x z).toReal
+      * NormedSpace.exp ℝ ((t - h) • holdJumpGenerator rate kernel) z y :=
+    continuous_finset_sum _ fun z _ ↦
+      continuous_const.mul (continuous_exp_smul_sub_apply _ t z y)
+  have hcont : Continuous fun h : ℝ ↦ rate x * Real.exp (-(rate x * h)) * ∑ z,
+      (kernel x z).toReal * NormedSpace.exp ℝ ((t - h) • holdJumpGenerator rate kernel) z y :=
+    (continuous_const.mul (continuous_const.mul continuous_id).neg.rexp).mul hFcont
+  have hsum : ∑ z, kernel x z * ∫⁻ h in Set.Iic t,
+        ENNReal.ofReal (NormedSpace.exp ℝ ((t - h) • holdJumpGenerator rate kernel) z y)
+        ∂Coalescent.holdMeasure (rate x)
+      = ∫⁻ h in Set.Iic t, ENNReal.ofReal (∑ z, (kernel x z).toReal
+          * NormedSpace.exp ℝ ((t - h) • holdJumpGenerator rate kernel) z y)
+        ∂Coalescent.holdMeasure (rate x) := by
+    have hpoint : ∀ᵐ h ∂(Coalescent.holdMeasure (rate x)).restrict (Set.Iic t),
+        ENNReal.ofReal (∑ z, (kernel x z).toReal
+          * NormedSpace.exp ℝ ((t - h) • holdJumpGenerator rate kernel) z y)
+        = ∑ z, kernel x z
+          * ENNReal.ofReal (NormedSpace.exp ℝ ((t - h) • holdJumpGenerator rate kernel) z y) := by
+      refine (ae_restrict_iff' measurableSet_Iic).mpr (Filter.Eventually.of_forall fun h hh ↦ ?_)
+      rw [ENNReal.ofReal_sum_of_nonneg fun z _ ↦
+        mul_nonneg ENNReal.toReal_nonneg (hnonneg _ (sub_nonneg.mpr hh) z)]
+      refine Finset.sum_congr rfl fun z _ ↦ ?_
+      rw [ENNReal.ofReal_mul ENNReal.toReal_nonneg, ENNReal.ofReal_toReal (PMF.apply_ne_top _ _)]
+    rw [lintegral_congr_ae hpoint, lintegral_finset_sum _ fun z _ ↦
+      ((continuous_exp_smul_sub_apply _ t z y).measurable.ennreal_ofReal).const_mul _]
+    exact Finset.sum_congr rfl fun z _ ↦ (lintegral_const_mul _
+      (continuous_exp_smul_sub_apply _ t z y).measurable.ennreal_ofReal).symm
+  have hdensity : ∀ h : ℝ, Coalescent.holdDensity (rate x) h
+      * ENNReal.ofReal (∑ z, (kernel x z).toReal
+        * NormedSpace.exp ℝ ((t - h) • holdJumpGenerator rate kernel) z y)
+      = (Set.Ioi (0 : ℝ)).indicator (fun h ↦ ENNReal.ofReal (rate x * Real.exp (-(rate x * h))
+        * ∑ z, (kernel x z).toReal
+          * NormedSpace.exp ℝ ((t - h) • holdJumpGenerator rate kernel) z y)) h := by
+    intro h
+    by_cases hh : 0 < h
+    · rw [Coalescent.holdDensity, if_pos hh, Set.indicator_of_mem (Set.mem_Ioi.mpr hh),
+        ← ENNReal.ofReal_mul (mul_nonneg (hrate x).le (Real.exp_pos _).le)]
+    · rw [Coalescent.holdDensity, if_neg hh, zero_mul,
+        Set.indicator_of_notMem (by simpa using hh)]
+  have hint : IntegrableOn (fun h : ℝ ↦ rate x * Real.exp (-(rate x * h)) * ∑ z,
+      (kernel x z).toReal * NormedSpace.exp ℝ ((t - h) • holdJumpGenerator rate kernel) z y)
+      (Set.Ioc 0 t) :=
+    hcont.continuousOn.integrableOn_Icc.mono_set Set.Ioc_subset_Icc_self
+  have hnn : 0 ≤ᵐ[volume.restrict (Set.Ioc (0 : ℝ) t)] fun h : ℝ ↦
+      rate x * Real.exp (-(rate x * h)) * ∑ z, (kernel x z).toReal
+        * NormedSpace.exp ℝ ((t - h) • holdJumpGenerator rate kernel) z y :=
+    (ae_restrict_iff' measurableSet_Ioc).mpr (Filter.Eventually.of_forall fun h hh ↦
+      mul_nonneg (mul_nonneg (hrate x).le (Real.exp_pos _).le) (Finset.sum_nonneg fun z _ ↦
+        mul_nonneg ENNReal.toReal_nonneg (hnonneg _ (sub_nonneg.mpr hh.2) z)))
+  have hlaw : ∫⁻ h in Set.Iic t, ENNReal.ofReal (∑ z, (kernel x z).toReal
+        * NormedSpace.exp ℝ ((t - h) • holdJumpGenerator rate kernel) z y)
+        ∂Coalescent.holdMeasure (rate x)
+      = ENNReal.ofReal (∫ h in (0 : ℝ)..t, rate x * Real.exp (-(rate x * h)) * ∑ z,
+          (kernel x z).toReal * NormedSpace.exp ℝ ((t - h) • holdJumpGenerator rate kernel) z y) := by
+    rw [Coalescent.holdMeasure, setLIntegral_withDensity_eq_setLIntegral_mul _
+        (Coalescent.measurable_holdDensity _) hFcont.measurable.ennreal_ofReal measurableSet_Iic]
+    simp only [Pi.mul_apply, hdensity]
+    rw [lintegral_indicator measurableSet_Ioi, Measure.restrict_restrict measurableSet_Ioi,
+      Set.Ioi_inter_Iic, intervalIntegral.integral_of_le ht,
+      ofReal_integral_eq_lintegral_ofReal hint hnn]
+  have hI : 0 ≤ ∫ h in (0 : ℝ)..t, rate x * Real.exp (-(rate x * h)) * ∑ z,
+      (kernel x z).toReal * NormedSpace.exp ℝ ((t - h) • holdJumpGenerator rate kernel) z y :=
+    intervalIntegral.integral_nonneg ht fun h hh ↦
+      mul_nonneg (mul_nonneg (hrate x).le (Real.exp_pos _).le) (Finset.sum_nonneg fun z _ ↦
+        mul_nonneg ENNReal.toReal_nonneg (hnonneg _ (sub_nonneg.mpr hh.2) z))
+  rw [hsum, hlaw, holdMeasure_Ioi (hrate x) ht, exp_smul_apply_eq_firstJump rate kernel x y t]
+  split_ifs
+  · rw [ENNReal.ofReal_add (Real.exp_pos _).le hI]
+  · rw [zero_add, zero_add]
+
+/-! ### The jump chain of a generator -/
+
+/-- The holding rate of the jump chain of a generator `Q`: `q x = -Q x x`, and one at an absorbing
+state. -/
+def canonicalRate (Q : Matrix S S ℝ) (x : S) : ℝ := if Q x x = 0 then 1 else -Q x x
+
+theorem sum_erase_eq_neg_diag {Q : Matrix S S ℝ} (hrow : ∀ x, ∑ y, Q x y = 0) (x : S) :
+    ∑ y ∈ Finset.univ.erase x, Q x y = -Q x x := by
+  have h := Finset.add_sum_erase Finset.univ (Q x) (Finset.mem_univ x)
+  rw [hrow x] at h
+  linarith
+
+theorem canonicalRate_pos {Q : Matrix S S ℝ} (hoff : ∀ x y, x ≠ y → 0 ≤ Q x y)
+    (hrow : ∀ x, ∑ y, Q x y = 0) (x : S) : 0 < canonicalRate Q x := by
+  have hnn : 0 ≤ -Q x x := by
+    rw [← sum_erase_eq_neg_diag hrow x]
+    exact Finset.sum_nonneg fun y hy ↦ hoff x y (Finset.ne_of_mem_erase hy).symm
+  unfold canonicalRate
+  split_ifs with h
+  · exact one_pos
+  · exact lt_of_le_of_ne hnn fun h0 ↦ h (by linarith)
+
+theorem canonicalWeight_nonneg {Q : Matrix S S ℝ} (hoff : ∀ x y, x ≠ y → 0 ≤ Q x y)
+    (hrow : ∀ x, ∑ y, Q x y = 0) (x y : S) :
+    0 ≤ (Q x y + if x = y then canonicalRate Q x else 0) / canonicalRate Q x := by
+  refine div_nonneg ?_ (canonicalRate_pos hoff hrow x).le
+  by_cases hxy : x = y
+  · subst hxy
+    rw [if_pos (rfl : x = x), canonicalRate]
+    split_ifs with h
+    · rw [h]
+      norm_num
+    · simp
+  · rw [if_neg hxy, add_zero]
+    exact hoff x y hxy
+
+theorem canonicalWeight_sum {Q : Matrix S S ℝ} (hoff : ∀ x y, x ≠ y → 0 ≤ Q x y)
+    (hrow : ∀ x, ∑ y, Q x y = 0) (x : S) :
+    ∑ y, (Q x y + if x = y then canonicalRate Q x else 0) / canonicalRate Q x = 1 := by
+  rw [← Finset.sum_div, Finset.sum_add_distrib, hrow x, Finset.sum_ite_eq,
+    if_pos (Finset.mem_univ x), zero_add, div_self (canonicalRate_pos hoff hrow x).ne']
+
+/-- **The jump law of a generator `Q`**: `Q x y / q x` off the diagonal and, at an absorbing
+state, the point mass there. It is the kernel `I + Q / canonicalRate Q`. -/
+def canonicalKernel (Q : Matrix S S ℝ) (hoff : ∀ x y, x ≠ y → 0 ≤ Q x y)
+    (hrow : ∀ x, ∑ y, Q x y = 0) (x : S) : PMF S :=
+  PMF.ofFintype
+    (fun y ↦ ENNReal.ofReal ((Q x y + if x = y then canonicalRate Q x else 0) / canonicalRate Q x))
+    (by
+      rw [← ENNReal.ofReal_sum_of_nonneg fun y _ ↦ canonicalWeight_nonneg hoff hrow x y,
+        canonicalWeight_sum hoff hrow x, ENNReal.ofReal_one])
+
+/-- Off the diagonal of a non-absorbing state the jump law is `Q x y / q x`. -/
+theorem canonicalKernel_apply_of_ne {Q : Matrix S S ℝ} (hoff : ∀ x y, x ≠ y → 0 ≤ Q x y)
+    (hrow : ∀ x, ∑ y, Q x y = 0) {x y : S} (hxy : x ≠ y) (hq : Q x x ≠ 0) :
+    canonicalKernel Q hoff hrow x y = ENNReal.ofReal (Q x y / -Q x x) := by
+  simp only [canonicalKernel, PMF.ofFintype_apply, if_neg hxy, add_zero, canonicalRate, if_neg hq]
+
+/-- **A generator is the generator of its jump chain**: nonnegative off-diagonal rates and zero row
+sums make `Q = holdJumpGenerator (canonicalRate Q) (canonicalKernel Q)`. -/
+theorem holdJumpGenerator_canonical {Q : Matrix S S ℝ} (hoff : ∀ x y, x ≠ y → 0 ≤ Q x y)
+    (hrow : ∀ x, ∑ y, Q x y = 0) :
+    holdJumpGenerator (canonicalRate Q) (canonicalKernel Q hoff hrow) = Q := by
+  ext x y
+  have hr := (canonicalRate_pos hoff hrow x).ne'
+  simp only [holdJumpGenerator, canonicalKernel, PMF.ofFintype_apply,
+    ENNReal.toReal_ofReal (canonicalWeight_nonneg hoff hrow x y)]
+  calc canonicalRate Q x * ((Q x y + if x = y then canonicalRate Q x else 0) / canonicalRate Q x
+        - if x = y then 1 else 0)
+      = (Q x y + if x = y then canonicalRate Q x else 0) * (canonicalRate Q x / canonicalRate Q x)
+        - canonicalRate Q x * (if x = y then 1 else 0) := by ring
+    _ = Q x y := by
+      rw [div_self hr, mul_one]
+      split_ifs <;> ring
+
+end Generator
+
 end
 
 end Descent.Pangenome.GraphCoalescent.FiniteJumpProcess
