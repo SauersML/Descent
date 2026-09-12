@@ -100,9 +100,8 @@ theorem sum_halfMix_snd {α β : Type*} [DecidableEq α] [DecidableEq β] [Finty
 theorem sum_sum_halfMix {N : ℕ} (s : Fin N) : ∑ a, ∑ b, halfMix a b s = N := by
   have h : ∀ a : Fin N, ∑ b, halfMix a b s = (N : ℝ) * ((if a = s then 1 else 0) / 2) + 1 / 2 := by
     intro a
-    rw [sum_congr rfl fun b _ ↦ (rfl : halfMix a b s =
-        (if a = s then 1 else 0) / 2 + (if b = s then 1 else 0) / 2),
-      sum_add_distrib, sum_const, ← sum_div, sum_ite_eq', if_pos (mem_univ s), card_univ,
+    unfold halfMix
+    rw [sum_add_distrib, sum_const, ← sum_div, sum_ite_eq', if_pos (mem_univ s), card_univ,
       Fintype.card_fin, nsmul_eq_mul]
   simp only [h]
   rw [sum_add_distrib, ← mul_sum, ← sum_div, sum_ite_eq', if_pos (mem_univ s), sum_const,
@@ -258,8 +257,9 @@ theorem sum_copyAnnotation_snd {N : ℕ} (pop : Fin N → V → Bool) (s : Fin N
     ∑ z, copyAnnotation pop (s, z) = (N : ℝ)⁻¹ := by
   unfold copyAnnotation
   rw [sum_comm]
-  simp only [← mul_sum, sum_halfMix_snd, halfMix_self, sum_ite_eq', mem_univ, ↓reduceIte,
-    mul_one]
+  simp only [← mul_sum]
+  simp only [sum_halfMix_snd]
+  simp only [halfMix_self, sum_ite_eq', mem_univ, ↓reduceIte, mul_one]
 
 theorem sum_annotatedExchange_fst {N : ℕ} (k : V) (pop : Fin N → V → Bool) (e : V × V)
     (a b : Fin N) (z : V → Bool) :
@@ -504,8 +504,9 @@ theorem featurePairSurvival_eq (G : CheckingGraph V) {N : ℕ} (hN : N ≠ 0) (k
             split_ifs <;> ring
           simp only [hterm, sum_sub_distrib, sum_const, card_univ, Fintype.card_fin,
             nsmul_eq_mul, ← mul_sum, sum_ite_eq, mem_univ, ↓reduceIte, mul_one]
-          field_simp
-          ring
+          have h1 : (N : ℝ) * (N : ℝ)⁻¹ = 1 := mul_inv_cancel₀ hN'
+          linear_combination ((N * (N : ℝ)⁻¹ + 1) * (1 - (N : ℝ)⁻¹) ^ m -
+            (N : ℝ)⁻¹ * (1 - (N : ℝ)⁻¹) ^ m) * h1
 
 end Sources
 
