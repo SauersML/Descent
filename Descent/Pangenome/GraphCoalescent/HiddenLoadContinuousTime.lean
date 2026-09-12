@@ -577,7 +577,9 @@ theorem sum_hiddenHeadLaw_mul_hiddenKernel {n : ℕ} (s : Fin n → Fin n) (j : 
   refine (tsum_eq_sum fun x hx ↦ ?_).symm
   have hzero : hiddenHeadLaw s j x = 0 := by
     refine (PMF.apply_eq_zero_iff _ _).mpr fun hmem ↦ hx ?_
-    obtain ⟨ξ, -, rfl⟩ := PMF.mem_support_map_iff.mp hmem
+    have hmem' : x ∈ ((blockLaw n j).map (hiddenState s)).support := hmem
+    rw [PMF.support_map] at hmem'
+    obtain ⟨ξ, -, rfl⟩ := hmem'
     exact Finset.mem_image_of_mem _ (Finset.mem_univ ξ)
   rw [hzero, zero_mul]
 
