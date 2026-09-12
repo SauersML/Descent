@@ -52,6 +52,7 @@ import Descent.Pangenome.AncestralLocality.SupercriticalUnconditional
 import Descent.Pangenome.AncestralLocality.SupercriticalConcentration
 import Descent.Pangenome.AncestralLocality.SupercriticalGiantLaw
 import Descent.Pangenome.AncestralLocality.SupercriticalGiantComponentTheorem
+import Descent.Pangenome.AncestralLocality.SelectionSemigroupPerturbation
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program

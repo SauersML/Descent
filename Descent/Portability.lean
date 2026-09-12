@@ -726,6 +726,9 @@ import Descent.Portability.EndToEndPortabilityRateLipschitz
 import Descent.Portability.TwoLocusPortabilityDecay
 import Descent.Portability.PortabilityCurveIdentifiability
 import Descent.Portability.PortabilitySizeBlindness
+import Descent.Portability.SelectionPortabilityBound
+import Descent.Portability.PortabilityMinimaxRate
+import Descent.Portability.HistoryExactLocality
 
 assert_below Descent.Program
 

@@ -27,6 +27,8 @@ import Descent.Pangenome.GraphCoalescent.ConnectionLawIdentifiability
 import Descent.Pangenome.GraphCoalescent.HiddenClockCorrection
 import Descent.Pangenome.GraphCoalescent.FiberSizeMultisetRecovery
 import Descent.Pangenome.AncestralLocality.SelectionLightCone
+import Descent.Pangenome.AncestralLocality.SelectionSemigroupPerturbation
+import Descent.Portability.SelectionPortabilityBound
 import Descent.Pangenome.GraphCoalescent.PanelSizeIdentifiability
 import Descent.Pangenome.GraphCoalescent.FiberSizeIdentifiabilityFour
 import Descent.Pangenome.GraphCoalescent.ReportInhomogeneousMarkov
@@ -200,7 +202,13 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   (`supportDrift_le`). For the support chain truncated after `M` decisions and selections, the
   expectation bounds (8.2), (8.3), (9.1) and (9.2) hold under selection with constants independent
   of `M` (`SelectionLightCone.sum_selectionChainLaw_mul_tagCount_le`,
-  `sum_selectionChainLaw_escape_le_radius`).
+  `sum_selectionChainLaw_escape_le_radius`). Weak selection moves the window semigroup by at most
+  `2 n R t ‖f‖` at total event rate `R`
+  (`SelectionSemigroupPerturbation.norm_decisionWindowSemigroup_sub_neutral_le`). When `σ`
+  bounds each event's rate instead, the constant must grow with the number of events
+  (`mul_card_le_of_norm_sub_neutral_le`). The portability of expected accuracies moves from
+  its neutral value by at most `128 R t / δ⁴`
+  (`SelectionPortabilityBound.abs_windowPortability_sub_neutral_le`).
 
 Scope. The rate takes the sampling duality through the truncated circuit law, and agreement of the
 finite models until escape, as hypotheses. The state counts compare numbers of values of the two
