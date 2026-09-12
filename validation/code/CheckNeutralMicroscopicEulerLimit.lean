@@ -26,4 +26,5 @@ open Descent.Portability.NeutralMicroscopicEulerLimit
 #print axioms integral_neutralMarkovKernel
 #print axioms integral_neutralMarkovKernel_polynomial
 #print axioms neutralMarkovKernel_add
+#print axioms hasDerivWithinAt_integral_neutralMarkovKernel
 #print axioms tendstoUniformly_integral_neutralMarkovKernel

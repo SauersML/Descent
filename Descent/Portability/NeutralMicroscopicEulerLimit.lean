@@ -39,8 +39,10 @@ sup norms (`norm_neutralPolynomialSemigroup_le`) and extends continuously to `C(
 continuous observable (`tendstoUniformly_neutralSemigroupExtension`).  The Riesz kernels of the
 extension are Markov kernels (`neutralMarkovKernel`, `isMarkovKernel_neutralMarkovKernel`) that
 integrate every continuous observable to the extension (`integral_neutralMarkovKernel`), represent
-the polynomial semigroup (`integral_neutralMarkovKernel_polynomial`), and compose by
-`K_{s+t} = K_t ∘ₖ K_s` (`neutralMarkovKernel_add`).  So the microscopic chain converges in law to
+the polynomial semigroup (`integral_neutralMarkovKernel_polynomial`), compose by
+`K_{s+t} = K_t ∘ₖ K_s` (`neutralMarkovKernel_add`), and differentiate expected configuration
+moments by the neutral generator of NOTE1 (19) (`hasDerivWithinAt_integral_neutralMarkovKernel`).
+So the microscopic chain converges in law to
 the neutral diffusion, uniformly in the initial state: `K_{t/N}^N g → ∫ g dK_t` uniformly for
 every continuous observable `g` (`tendstoUniformly_integral_neutralMarkovKernel`).
 
@@ -237,7 +239,6 @@ theorem tendstoUniformly_kernelPower_dotProduct [DecidableEq ι]
       (add_le_add (norm_kernelPower_sub_euler_le_exp M t ht N hN x) ?_)
     exact (Matrix.linfty_opNorm_mulVec _ _).trans
       (mul_le_mul_of_nonneg_left (hφ x) (norm_nonneg _))
-  beta_reduce
   rw [dist_comm, Real.dist_eq, hlin, ← dotProduct_sub]
   simp only [dotProduct]
   refine (Finset.abs_sum_le_sum_abs _ _).trans ?_
@@ -412,6 +413,26 @@ theorem neutralMarkovKernel_add (rates : NeutralRates Deme Locus Allele) (ℓ₀
       (norm_neutralPolynomialSemigroup_le rates ℓ₀ hap₀)
       (neutralPolynomialSemigroup_add rates ℓ₀ hap₀))
     s t
+
+/-- **NOTE1 (19) for the neutral Markov kernels.**  The time derivative of an expected
+budget-respecting configuration moment under the neutral Markov kernels is the expected neutral
+generator of the moment polynomial, a right derivative at time zero. -/
+theorem hasDerivWithinAt_integral_neutralMarkovKernel (rates : NeutralRates Deme Locus Allele)
+    (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele) (capacity : Locus → ℕ) (t : ℝ≥0)
+    (x : FrequencyState Deme Locus Allele) (ξ : BudgetConfiguration Deme Locus Allele capacity) :
+    HasDerivWithinAt
+      (fun s : ℝ ↦ ∫ y, polynomialFunction (momentPolynomial ξ.1) y
+        ∂(neutralMarkovKernel rates ℓ₀ hap₀ s.toNNReal x))
+      (∫ y, polynomialFunction (neutralGenerator rates (momentPolynomial ξ.1)) y
+        ∂(neutralMarkovKernel rates ℓ₀ hap₀ t x))
+      (Set.Ici 0) t := by
+  haveI : ∀ t, IsMarkovKernel (neutralMarkovKernel rates ℓ₀ hap₀ t) :=
+    isMarkovKernel_neutralMarkovKernel rates ℓ₀ hap₀
+  exact hasDerivWithinAt_integral_momentPolynomial rates capacity
+    (neutralMarkovKernel rates ℓ₀ hap₀)
+    (fun t x ξ ↦ (integral_neutralMarkovKernel_polynomial rates ℓ₀ hap₀ t x
+      ⟨polynomialFunction (momentPolynomial ξ.1), polynomialFunction_mem _⟩).trans
+      (neutralPolynomialSemigroup_momentPolynomial rates ℓ₀ hap₀ capacity t ξ x)) t x ξ
 
 /-- **NOTE1 §4.2a, convergence in law.**  For every `t > 0` and every continuous observable `g`,
 the neutral microscopic chain run for `N` steps of size `t/N` has `K_{t/N}^N g` converging
