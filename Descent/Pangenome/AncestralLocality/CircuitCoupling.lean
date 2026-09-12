@@ -99,6 +99,7 @@ number of decisions taken, carries the empty support. -/
 def UnfilledSlotsEmpty (x : SupportChainState V n M) : Prop :=
   ∀ slot : Fin (n + M), n + (x.2 : ℕ) ≤ slot → x.1 slot = ∅
 
+omit [DecidableEq V] in
 /-- The initial state has empty unfilled slots. -/
 theorem unfilledSlotsEmpty_supportChainStart (A : Finset V) (n M : ℕ) :
     UnfilledSlotsEmpty (supportChainStart A n M) := by
@@ -119,7 +120,7 @@ theorem unfilledSlotsEmpty_supportChainStep {x : SupportChainState V n M}
     UnfilledSlotsEmpty (supportChainStep x event) := by
   cases event with
   | decision slot source target =>
-    unfold supportChainStep
+    simp only [supportChainStep]
     split_ifs with hsource
     · unfold supportChainBranch
       split_ifs with hcount
@@ -127,15 +128,13 @@ theorem unfilledSlotsEmpty_supportChainStep {x : SupportChainState V n M}
         change n + ((x.2 : ℕ) + 1) ≤ other at hother
         have hnew : other ≠ ⟨n + (x.2 : ℕ), by omega⟩ := by
           intro h
-          have hval := congrArg Fin.val h
-          simp only [Fin.val_mk] at hval
+          have hval : (other : ℕ) = n + (x.2 : ℕ) := congrArg Fin.val h
           omega
         have hold : other ≠ slot := by
           intro h
-          subst h
-          have hempty := hx other (by omega)
+          have hempty := hx slot (by rw [← h]; omega)
           rw [hempty] at hsource
-          exact absurd hsource (Finset.not_mem_empty source)
+          simp at hsource
         change Function.update (Function.update x.1 slot (insert target (x.1 slot)))
           ⟨n + (x.2 : ℕ), _⟩ {source, target} other = ∅
         rw [Function.update_apply, if_neg hnew, Function.update_apply, if_neg hold]
@@ -143,7 +142,7 @@ theorem unfilledSlotsEmpty_supportChainStep {x : SupportChainState V n M}
       · exact hx
     · exact hx
   | coalescence first second =>
-    unfold supportChainStep
+    simp only [supportChainStep]
     split_ifs with hcoalesce
     · intro other hother
       change n + (x.2 : ℕ) ≤ other at hother
@@ -151,15 +150,16 @@ theorem unfilledSlotsEmpty_supportChainStep {x : SupportChainState V n M}
         by_contra hlate
         have hempty := hx first (by omega)
         rw [hempty] at hcoalesce
-        exact Finset.not_nonempty_empty hcoalesce.2.1
+        simp at hcoalesce
       have hsecond : (second : ℕ) < n + (x.2 : ℕ) := by
         by_contra hlate
         have hempty := hx second (by omega)
         rw [hempty] at hcoalesce
-        exact Finset.not_nonempty_empty hcoalesce.2.2
+        simp at hcoalesce
+      have hne₁ : other ≠ first := fun h ↦ by rw [h] at hother; omega
+      have hne₂ : other ≠ second := fun h ↦ by rw [h] at hother; omega
       change coalesceTags first second x.1 other = ∅
-      rw [coalesceTags_apply, if_neg (fun h ↦ by rw [h] at hother; omega),
-        if_neg (fun h ↦ by rw [h] at hother; omega)]
+      rw [coalesceTags_apply, if_neg hne₁, if_neg hne₂]
       exact hx other hother
     · exact hx
 
@@ -196,15 +196,16 @@ theorem supportChainStep_escaped {r : V → V → ℝ} {A : Finset V} {ℓ : ℕ
   refine (mem_escapeSet_map_iff _).mpr ?_
   cases event with
   | decision a source target =>
-    unfold supportChainStep
+    simp only [supportChainStep]
     split_ifs with hsource
     · unfold supportChainBranch
       split_ifs with hcount
       · have hnew : slot ≠ ⟨n + (x.2 : ℕ), by omega⟩ := by
           intro h
-          have hempty := hx slot (by simp [h])
+          have hval : (slot : ℕ) = n + (x.2 : ℕ) := congrArg Fin.val h
+          have hempty := hx slot (by omega)
           rw [hempty] at hv
-          exact absurd hv (Finset.not_mem_empty v)
+          simp at hv
         refine ⟨slot, v, ?_, hfar⟩
         change v ∈ Function.update (Function.update x.1 a (insert target (x.1 a)))
           ⟨n + (x.2 : ℕ), _⟩ {source, target} slot
@@ -216,18 +217,18 @@ theorem supportChainStep_escaped {r : V → V → ℝ} {A : Finset V} {ℓ : ℕ
       · exact ⟨slot, v, hv, hfar⟩
     · exact ⟨slot, v, hv, hfar⟩
   | coalescence first second =>
-    unfold supportChainStep
+    simp only [supportChainStep]
     split_ifs with hcoalesce
-    · have hsecond : second ≠ first := ne_of_gt hcoalesce.1
+    · have hsecond : second ≠ first := hcoalesce.1.ne'
       change ∃ other, ∃ u ∈ coalesceTags first second x.1 other, ∀ k < ℓ, u ∉ lightBall r A k
       by_cases hfirst : slot = first
       · refine ⟨second, v, ?_, hfar⟩
-        rw [coalesceTags_apply, if_neg hsecond, if_pos rfl]
+        rw [coalesceTags_apply, if_neg hsecond, if_pos (rfl : second = second)]
         rw [hfirst] at hv
         exact Finset.mem_union_left _ hv
       · by_cases hlast : slot = second
         · refine ⟨second, v, ?_, hfar⟩
-          rw [coalesceTags_apply, if_neg hsecond, if_pos rfl]
+          rw [coalesceTags_apply, if_neg hsecond, if_pos (rfl : second = second)]
           rw [hlast] at hv
           exact Finset.mem_union_right _ hv
         · refine ⟨slot, v, ?_, hfar⟩
