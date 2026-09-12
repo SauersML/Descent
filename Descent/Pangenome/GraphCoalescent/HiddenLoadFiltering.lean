@@ -2,6 +2,8 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Layer
+import Descent.Coalescent.StructuredPresentDay
+import Descent.Pangenome.GraphCoalescent.HiddenLoads
 import Mathlib.Analysis.Matrix
 import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 import Mathlib.Analysis.SpecialFunctions.Exponential
@@ -54,6 +56,20 @@ mass from `L` to `L^{(CD)}` with weight `L_C L_D`, for every pair whose merger p
 `choose_two_sum_sub_sum_choose_two`). So between observed mergers the posterior mass decays at
 the sum over pairs of the observed-filtration intensities `λ̂_CD = E[L_C L_D | visible history]`
 (`hasDerivAt_posteriorMass_observedIntensity`).
+
+The spec's own form of the killed generator lives on the load vectors compatible with one
+report, `loadStates capacity`: every component hides at least one lineage and at most its
+capacity, and the true loads of a labeled coalescent state are one of them
+(`hiddenLoad_mem_loadStates`). There `killedLoadGenerator` has diagonal `-C(K, 2)`
+(`killedLoadGenerator_diag`), is Metzler (`killedLoadGenerator_isMetzler`), and has row sums minus
+the visible intensity `λ_vis(L) = ∑_{C < D} L_C L_D` (`killedLoadGenerator_mulVec_one`). The
+transfer `visibleTransfer` moves the mass at `L` to the merged load vector `L^{(CD)}` with weight
+`L_C L_D` (`visibleTransfer_mulVec_one`). The filter `loadFilter` is `prior e^{Q_R t}` with the
+corpus `matrixExponential` and stays nonnegative (`loadFilter_nonneg`). The intensity
+`observedIntensity`, the transferred mass per unit posterior mass, is the posterior expectation of
+`L_C L_D` (`observedIntensity_eq_posteriorMean`), and summed over pairs it is the posterior
+expected killing rate (`sum_pairs_posteriorMean`). At the true loads of `HiddenLoads` the visible
+intensity is at least `C(r, 2)` (`choose_two_le_loadVisibleIntensity_hiddenLoad`).
 
 Scope. The path measure of the continuous-time chain is not constructed. The killed propagator is
 characterized by the two equations that define the killed transition function of a finite chain,
@@ -495,7 +511,7 @@ theorem hasDerivAt_posteriorMass_loadGenerator (R : Finset (Finset α))
 
 /-- The observed-filtration intensity of a visible merger of `C` and `D`: the expectation of
 `L_C L_D` under the normalized posterior, `λ̂_CD = E[L_C L_D | visible history]`. -/
-def observedIntensity (posterior : LoadState α n → ℝ) (C D : Finset α) : ℝ :=
+def posteriorPairMean (posterior : LoadState α n → ℝ) (C D : Finset α) : ℝ :=
   (∑ x, posterior x * ((load x C : ℝ) * load x D)) / ∑ x, posterior x
 
 /-- The unnormalized posterior average of the total visible rate is the sum of the observed
@@ -504,11 +520,11 @@ mass. -/
 theorem sum_posterior_mul_visibleRate (posterior : LoadState α n → ℝ)
     (hmass : ∑ x, posterior x ≠ 0) :
     ∑ x, posterior x * ((∑ C, ∑ D ∈ univ.erase C, (load x C : ℝ) * load x D) / 2) =
-      (∑ C, ∑ D ∈ univ.erase C, observedIntensity posterior C D) / 2 * ∑ x, posterior x := by
-  have hcancel : ∀ C D, observedIntensity posterior C D * ∑ x, posterior x =
+      (∑ C, ∑ D ∈ univ.erase C, posteriorPairMean posterior C D) / 2 * ∑ x, posterior x := by
+  have hcancel : ∀ C D, posteriorPairMean posterior C D * ∑ x, posterior x =
       ∑ x, posterior x * ((load x C : ℝ) * load x D) := by
     intro C D
-    rw [observedIntensity, div_mul_eq_mul_div, mul_div_assoc, div_self hmass, mul_one]
+    rw [posteriorPairMean, div_mul_eq_mul_div, mul_div_assoc, div_self hmass, mul_one]
   have hswap : ∑ x, posterior x * ∑ C, ∑ D ∈ univ.erase C, (load x C : ℝ) * load x D =
       ∑ C, ∑ D ∈ univ.erase C, ∑ x, posterior x * ((load x C : ℝ) * load x D) := by
     simp only [Finset.mul_sum]
@@ -534,13 +550,286 @@ theorem hasDerivAt_posteriorMass_observedIntensity (R : Finset (Finset α))
     (hmass : ∑ x, (posterior ᵥ* killedPropagator (loadGenerator α n) loadReport R t) x ≠ 0) :
     HasDerivAt
       (fun u ↦ (posterior ᵥ* killedPropagator (loadGenerator α n) loadReport R u) ⬝ᵥ fun _ ↦ 1)
-      (-((∑ C, ∑ D ∈ univ.erase C, observedIntensity
+      (-((∑ C, ∑ D ∈ univ.erase C, posteriorPairMean
           (posterior ᵥ* killedPropagator (loadGenerator α n) loadReport R t) C D) / 2 *
         ∑ x, (posterior ᵥ* killedPropagator (loadGenerator α n) loadReport R t) x)) t := by
   rw [← sum_posterior_mul_visibleRate _ hmass]
   exact hasDerivAt_posteriorMass_loadGenerator R posterior hposterior t
 
 end LoadChain
+
+section LoadVectors
+
+open Coalescent Matrix
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+/-! ### Compatible load vectors -/
+
+/-- **The load vectors compatible with a report**: every component hides at least one true lineage
+and at most its capacity. -/
+def loadStates (capacity : ι → ℕ) : Finset (ι → ℕ) :=
+  Fintype.piFinset fun C ↦ Icc 1 (capacity C)
+
+theorem mem_loadStates {capacity L : ι → ℕ} :
+    L ∈ loadStates capacity ↔ ∀ C, 1 ≤ L C ∧ L C ≤ capacity C := by
+  simp only [loadStates, Fintype.mem_piFinset, mem_Icc]
+
+/-- **The visible intensity of a load vector**, `λ_vis(L) = Σ_{C<D} L_C L_D`, over unordered pairs
+of components. -/
+def loadVisibleIntensity (L : ι → ℕ) : ℕ :=
+  ∑ p ∈ univ.powersetCard 2, ∏ C ∈ p, L C
+
+/-- **(A3) for a load vector**: invisible and visible pairs together are all `C(K, 2)` pairs. -/
+theorem sum_choose_two_add_loadVisibleIntensity (L : ι → ℕ) :
+    ∑ C, (L C).choose 2 + loadVisibleIntensity L = (∑ C, L C).choose 2 :=
+  sum_choose_two_add_sum_pairs univ L
+
+/-- **`λ_vis(L) ≥ C(r, 2)`** when every component hides a lineage: each of the `C(r, 2)` pairs of
+components contributes at least one. -/
+theorem choose_two_le_loadVisibleIntensity {L : ι → ℕ} (hL : ∀ C, 1 ≤ L C) :
+    (Fintype.card ι).choose 2 ≤ loadVisibleIntensity L := by
+  rw [← card_univ, ← card_powersetCard, card_eq_sum_ones, loadVisibleIntensity]
+  exact sum_le_sum fun p _ ↦
+    Nat.succ_le_of_lt (prod_pos fun C _ ↦ Nat.lt_of_lt_of_le Nat.zero_lt_one (hL C))
+
+/-! ### The killed generator -/
+
+/-- An invisible merger inside `C` removes one hidden lineage from `C`. -/
+def internalMerge (L : ι → ℕ) (C : ι) : ι → ℕ :=
+  Function.update L C (L C - 1)
+
+theorem internalMerge_ne {L : ι → ℕ} {C : ι} (hC : 1 ≤ L C) : internalMerge L C ≠ L := by
+  intro h
+  have hCC := congrFun h C
+  rw [internalMerge, Function.update_self] at hCC
+  omega
+
+/-- **The killed generator `Q_R`** of a fixed report on its compatible load vectors: an invisible
+merger inside `C` moves `L` to `L - e_C` at rate `C(L_C, 2)`, and the diagonal is `-C(K, 2)`, the
+total rate of every merger of two true lineages. -/
+def killedLoadGenerator (capacity : ι → ℕ) :
+    Matrix (loadStates capacity) (loadStates capacity) ℝ :=
+  fun L L' ↦ (∑ C, if L'.1 = internalMerge L.1 C then ((L.1 C).choose 2 : ℝ) else 0)
+    - if L' = L then ((∑ C, L.1 C).choose 2 : ℝ) else 0
+
+/-- The diagonal of `Q_R` is `-C(K, 2)`. -/
+theorem killedLoadGenerator_diag (capacity : ι → ℕ) (L : loadStates capacity) :
+    killedLoadGenerator capacity L L = -((∑ C, L.1 C).choose 2 : ℝ) := by
+  have hL := mem_loadStates.mp L.2
+  have hzero : ∑ C, (if L.1 = internalMerge L.1 C then ((L.1 C).choose 2 : ℝ) else 0) = 0 :=
+    sum_eq_zero fun C _ ↦ if_neg fun h ↦ internalMerge_ne (hL C).1 h.symm
+  simp only [killedLoadGenerator, hzero, eq_self_iff_true, if_true, zero_sub]
+
+/-- **`Q_R` is Metzler**: its off-diagonal entries are invisible merger rates. -/
+theorem killedLoadGenerator_isMetzler (capacity : ι → ℕ) :
+    Matrix.IsMetzler (killedLoadGenerator capacity) := by
+  intro L L' hne
+  simp only [killedLoadGenerator, if_neg (Ne.symm hne), sub_zero]
+  refine sum_nonneg fun C _ ↦ ?_
+  by_cases h : L'.1 = internalMerge L.1 C
+  · simp only [if_pos h, Nat.cast_nonneg]
+  · simp only [if_neg h, le_refl]
+
+/-- Summing an indicator of one compatible load vector over all of them returns its weight. -/
+theorem sum_ite_val_eq {capacity u : ι → ℕ} (hu : u ∈ loadStates capacity) (x : ℝ) :
+    ∑ L' : loadStates capacity, (if L'.1 = u then x else 0) = x := by
+  rw [sum_eq_single ⟨u, hu⟩]
+  · exact if_pos rfl
+  · intro L' _ hne
+    exact if_neg fun h ↦ hne (Subtype.ext h)
+  · intro h
+    exact absurd (mem_univ _) h
+
+/-- The invisible mergers inside `C` leave at total rate `C(L_C, 2)`: when `L_C ≥ 2` the target is
+compatible, and when `L_C = 1` there is nothing to merge. -/
+theorem sum_killedLoadGenerator_internal (capacity : ι → ℕ) (L : loadStates capacity) (C : ι) :
+    ∑ L' : loadStates capacity,
+        (if L'.1 = internalMerge L.1 C then ((L.1 C).choose 2 : ℝ) else 0)
+      = ((L.1 C).choose 2 : ℝ) := by
+  have hL := mem_loadStates.mp L.2
+  by_cases hC : 2 ≤ L.1 C
+  · refine sum_ite_val_eq (mem_loadStates.mpr fun E ↦ ?_) _
+    by_cases hE : E = C
+    · rw [hE, internalMerge, Function.update_self]
+      have := hL C
+      omega
+    · rw [internalMerge, Function.update_of_ne hE]
+      exact hL E
+  · rw [Nat.choose_eq_zero_of_lt (show L.1 C < 2 by omega), Nat.cast_zero]
+    exact sum_eq_zero fun L' _ ↦ ite_self 0
+
+/-- **The killing rate of `Q_R` is the visible intensity**: `(Q_R 1)(L) = -λ_vis(L)`. The mass the
+filter loses while no visible merger is observed is exactly the rate of visible mergers. -/
+theorem killedLoadGenerator_mulVec_one (capacity : ι → ℕ) (L : loadStates capacity) :
+    (killedLoadGenerator capacity *ᵥ 1) L = -(loadVisibleIntensity L.1 : ℝ) := by
+  have hA3 := sum_choose_two_add_loadVisibleIntensity L.1
+  have hdiag : ∑ L' : loadStates capacity,
+      (if L' = L then ((∑ C, L.1 C).choose 2 : ℝ) else 0) = ((∑ C, L.1 C).choose 2 : ℝ) := by
+    rw [sum_ite_eq', if_pos (mem_univ L)]
+  simp only [mulVec, dotProduct, Pi.one_apply, mul_one, killedLoadGenerator]
+  rw [sum_sub_distrib, sum_comm,
+    sum_congr rfl fun C _ ↦ sum_killedLoadGenerator_internal capacity L C, hdiag, ← hA3]
+  push_cast
+  ring
+
+/-- **Killing balances the transfers**: `(Q_R 1)(L) + Σ_{C<D} L_C L_D = 0`. -/
+theorem killedLoadGenerator_mulVec_one_add_sum_pairs (capacity : ι → ℕ)
+    (L : loadStates capacity) :
+    (killedLoadGenerator capacity *ᵥ 1) L
+      + ∑ p ∈ univ.powersetCard 2, ((∏ C ∈ p, L.1 C : ℕ) : ℝ) = 0 := by
+  rw [killedLoadGenerator_mulVec_one, loadVisibleIntensity]
+  push_cast
+  ring
+
+/-! ### The transfer at a visible merger -/
+
+/-- The capacities after joining `C` and `D`: the survivors of `D`'s removal, with `C` holding
+both. -/
+def mergedCapacity (capacity : ι → ℕ) (C D : ι) : {E : ι // E ≠ D} → ℕ :=
+  fun E ↦ if E.1 = C then capacity C + capacity D else capacity E.1
+
+/-- **The merged load vector `L^{CD}`**: the joined component carries `L_C + L_D - 1`, every other
+component keeps its load. -/
+def mergedLoad (L : ι → ℕ) (C D : ι) : {E : ι // E ≠ D} → ℕ :=
+  fun E ↦ if E.1 = C then L C + L D - 1 else L E.1
+
+/-- The merged load vector is compatible with the merged report. -/
+theorem mergedLoad_mem {capacity L : ι → ℕ} (hL : L ∈ loadStates capacity) (C D : ι) :
+    mergedLoad L C D ∈ loadStates (mergedCapacity capacity C D) := by
+  have h := mem_loadStates.mp hL
+  refine mem_loadStates.mpr fun E ↦ ?_
+  by_cases hE : E.1 = C
+  · simp only [mergedLoad, mergedCapacity, if_pos hE]
+    have hC := h C
+    have hD := h D
+    omega
+  · simp only [mergedLoad, mergedCapacity, if_neg hE]
+    exact h E.1
+
+/-- **The transfer at an observed visible merger of `C` and `D`**: mass at `L` moves to `L^{CD}`
+with weight `L_C L_D`. -/
+def visibleTransfer (capacity : ι → ℕ) (C D : ι) :
+    Matrix (loadStates capacity) (loadStates (mergedCapacity capacity C D)) ℝ :=
+  fun L L' ↦ if L'.1 = mergedLoad L.1 C D then ((L.1 C * L.1 D : ℕ) : ℝ) else 0
+
+/-- **The transfer weight is `L_C L_D`.** -/
+theorem visibleTransfer_mulVec_one (capacity : ι → ℕ) (C D : ι) (L : loadStates capacity) :
+    (visibleTransfer capacity C D *ᵥ 1) L = ((L.1 C * L.1 D : ℕ) : ℝ) := by
+  simp only [mulVec, dotProduct, Pi.one_apply, mul_one, visibleTransfer]
+  exact sum_ite_val_eq (mergedLoad_mem L.2 C D) _
+
+/-- The transfer weight of two distinct components is the product over their pair, the summand of
+`loadVisibleIntensity`. -/
+theorem visibleTransfer_mulVec_one_eq_prod (capacity : ι → ℕ) {C D : ι} (hCD : C ≠ D)
+    (L : loadStates capacity) :
+    (visibleTransfer capacity C D *ᵥ 1) L = ((∏ E ∈ ({C, D} : Finset ι), L.1 E : ℕ) : ℝ) := by
+  rw [visibleTransfer_mulVec_one, prod_pair hCD]
+
+/-! ### The filter and the observed intensity -/
+
+/-- **The unnormalized posterior on hidden loads between visible mergers**,
+`α(t) = α(0) e^{Q_R t}`. -/
+def loadFilter (capacity : ι → ℕ) (prior : loadStates capacity → ℝ) (t : ℝ) :
+    loadStates capacity → ℝ :=
+  prior ᵥ* matrixExponential (killedLoadGenerator capacity) t
+
+/-- The filter starts at the prior. -/
+theorem loadFilter_zero (capacity : ι → ℕ) (prior : loadStates capacity → ℝ) :
+    loadFilter capacity prior 0 = prior := by
+  rw [loadFilter, matrixExponential_zero, vecMul_one]
+
+/-- **A nonnegative prior stays nonnegative**, because `Q_R` is Metzler. -/
+theorem loadFilter_nonneg (capacity : ι → ℕ) {prior : loadStates capacity → ℝ}
+    (hprior : ∀ L, 0 ≤ prior L) {t : ℝ} (ht : 0 ≤ t) (L : loadStates capacity) :
+    0 ≤ loadFilter capacity prior t L := by
+  simp only [loadFilter, vecMul, dotProduct]
+  exact sum_nonneg fun L' _ ↦ mul_nonneg (hprior L')
+    (matrixExponential_apply_nonneg_of_metzler _ (killedLoadGenerator_isMetzler capacity) t ht
+      L' L)
+
+/-- **The observed-filtration intensity** of a visible merger joining `C` and `D`: the mass the
+transfer carries per unit posterior mass. -/
+def observedIntensity (capacity : ι → ℕ) (C D : ι) (α : loadStates capacity → ℝ) : ℝ :=
+  (α ᵥ* visibleTransfer capacity C D) ⬝ᵥ 1 / (α ⬝ᵥ 1)
+
+/-- **The observed intensity is the posterior expectation of `L_C L_D`**:
+`λ̂_CD = Σ_L π(L) L_C L_D` with `π = α / Σ α`. -/
+theorem observedIntensity_eq_posteriorMean (capacity : ι → ℕ) (C D : ι)
+    (α : loadStates capacity → ℝ) :
+    observedIntensity capacity C D α
+      = ∑ L, α L / (∑ L', α L') * ((L.1 C * L.1 D : ℕ) : ℝ) := by
+  rw [observedIntensity, ← dotProduct_mulVec, dotProduct_one]
+  simp only [dotProduct, visibleTransfer_mulVec_one]
+  rw [sum_div]
+  exact sum_congr rfl fun L _ ↦ by ring
+
+/-- **The posterior expected killing rate**: `-⟨α, Q_R 1⟩ / ⟨α, 1⟩ = Σ_L π(L) λ_vis(L)`. -/
+theorem posteriorMean_loadVisibleIntensity (capacity : ι → ℕ) (α : loadStates capacity → ℝ) :
+    -(α ⬝ᵥ (killedLoadGenerator capacity *ᵥ 1)) / (α ⬝ᵥ 1)
+      = ∑ L, α L / (∑ L', α L') * (loadVisibleIntensity L.1 : ℝ) := by
+  have hrow : killedLoadGenerator capacity *ᵥ 1 = fun L ↦ -(loadVisibleIntensity L.1 : ℝ) :=
+    funext (killedLoadGenerator_mulVec_one capacity)
+  rw [hrow, dotProduct_one]
+  simp only [dotProduct, mul_neg, sum_neg_distrib, neg_neg]
+  rw [sum_div]
+  exact sum_congr rfl fun L _ ↦ by ring
+
+/-- **Summed over all pairs of components, the observed intensities are the posterior expected
+killing rate**: the filter loses mass at the rate at which it expects to observe a visible
+merger. -/
+theorem sum_pairs_posteriorMean (capacity : ι → ℕ) (α : loadStates capacity → ℝ) :
+    ∑ p ∈ univ.powersetCard 2, ∑ L, α L / (∑ L', α L') * ((∏ E ∈ p, L.1 E : ℕ) : ℝ)
+      = -(α ⬝ᵥ (killedLoadGenerator capacity *ᵥ 1)) / (α ⬝ᵥ 1) := by
+  rw [posteriorMean_loadVisibleIntensity, sum_comm]
+  refine sum_congr rfl fun L _ ↦ ?_
+  rw [← mul_sum, loadVisibleIntensity, Nat.cast_sum]
+
+end LoadVectors
+
+/-! ### The true loads of a labeled state -/
+
+section Labeled
+
+open Coalescent
+
+open scoped Classical
+
+/-- The haplotypes a report component holds: the most lineages it can hide. -/
+def componentSize {n : ℕ} (s : Fin n → Fin n) (ξ : ER n) (C : Quotient (observed s ξ)) : ℕ :=
+  (univ.filter fun x : Fin n ↦ Quotient.mk (observed s ξ) x = C).card
+
+/-- **The true hidden loads are a state of the filter**: every component of the report hides at
+least one lineage and no more than the haplotypes it holds. -/
+theorem hiddenLoad_mem_loadStates {n : ℕ} (s : Fin n → Fin n) (ξ : ER n) :
+    hiddenLoad s ξ ∈ loadStates (componentSize s ξ) := by
+  refine mem_loadStates.mpr fun C ↦ ⟨Nat.one_le_iff_ne_zero.mpr (hiddenLoad_pos s ξ C).ne', ?_⟩
+  obtain ⟨z, rfl⟩ := quotient_mk_surjective (observed s ξ) C
+  rw [hiddenLoad, hiddenBlocks_mk, componentSize]
+  refine card_image_le.trans (le_of_eq ?_)
+  congr 1
+  ext y
+  simp only [mem_filter, mem_univ, true_and]
+  exact Quotient.eq.symm
+
+/-- **(A3) at the true loads**: `Σ_C C(L_C, 2) + λ_vis(L) = C(K, 2)`, from
+`HiddenLoads.sum_choose_two_hiddenLoad_add_sum_pairs`. -/
+theorem sum_choose_two_hiddenLoad_add_loadVisibleIntensity {n : ℕ} (s : Fin n → Fin n)
+    (ξ : ER n) :
+    ∑ C, (hiddenLoad s ξ C).choose 2 + loadVisibleIntensity (hiddenLoad s ξ)
+      = (blocks ξ).choose 2 :=
+  sum_choose_two_hiddenLoad_add_sum_pairs s ξ
+
+/-- **At the true loads the visible intensity is at least `C(r, 2)`**, with `r` the report
+width. -/
+theorem choose_two_le_loadVisibleIntensity_hiddenLoad {n : ℕ} (s : Fin n → Fin n) (ξ : ER n) :
+    (blocks (observed s ξ)).choose 2 ≤ loadVisibleIntensity (hiddenLoad s ξ) := by
+  have h := choose_two_le_loadVisibleIntensity
+    fun C ↦ Nat.one_le_iff_ne_zero.mpr (hiddenLoad_pos s ξ C).ne'
+  rw [← Nat.card_eq_fintype_card] at h
+  exact h
+
+end Labeled
 
 end
 
