@@ -15,8 +15,8 @@ assert_below Descent.Portability Descent.Decision Descent.Program
 `minimalHistoryCount s t^{w-1}/(w-1)! + O(t^w)`, where `minimalHistoryCount s` counts the chains of
 `w - 1` visible covers from the singletons to a connected report. The note's constant is `H_w(c)`,
 defined by the merger recursion `H_w(c) = Σ_{i<j} c_i c_j H_{w-1}(c^{(ij)})` over the fiber sizes;
-in the corpus it is `historyWeight` of `LeadingCoefficient`. This module builds the lumping that
-identifies the two.
+in the corpus it is `historyWeight` of `LeadingCoefficient`. This module lumps the labeled
+histories into that recursion and states (E2) with the note's constant.
 
 ## What is proved
 
@@ -35,10 +35,22 @@ identifies the two.
   of length `k` (`connectingCount_succ`).
 * Visible covers by representative pairs. Every visible cover sits at the visible target of two
   distinct representatives (`exists_visibleTarget_of_visible`), and that target determines the
-  pair up to order (`visibleTarget_eq_iff`).
+  pair up to order (`visibleTarget_eq_iff`), so each visible cover is counted by exactly two
+  ordered pairs (`sum_pairs_ite_visibleTarget`, `two_mul_sum_visible`). The covers into the
+  visible target of `i` and `j` number `L_i L_j` (`card_filter_visibleTarget`,
+  `sum_filter_visibleTarget`).
+* **The lumping.** `connectingCount_eq_historyWeight`: from a state whose report has `k + 1`
+  components, the minimal connecting histories number `historyWeight k T L` of any representative
+  set `T` with the loads `L`. At the singletons the loads are the fiber sizes:
+  `minimalHistoryCount_eq_historyWeight`, and with `historyWeight_eq_prod_historyFactor`,
+  `minimalHistoryCount_eq_prod_historyFactor`, `H_w(c) = (∏_i c_i) g_w(n)`
+  (`sum_fiberCard_representatives` gives the panel size `n`).
+* **(E2) with the note's constant.** `reportConnectedProbability_sub_note_isBigO`:
+  `Pr(report connected at t) = (∏_i c_i) (2n - w)! / (2^{w-2} (2n - 2w + 2)!) t^{w-1} + O(t^w)`.
 
-Not yet here: counting the visible covers into each target by the loads, and the induction that
-turns `connectingCount_succ` into the recursion of `historyWeight`.
+Scope, as in `ShortTimeConnectionLaw`: the probability is the weight of the connected reports in
+the matrix exponential of Kingman's generator; the continuous-time chain as a process is not
+constructed.
 
 ## Empirical status
 
@@ -52,7 +64,7 @@ set_option relaxedAutoImplicit false
 namespace Descent.Pangenome.GraphCoalescent.MinimalHistoryLumping
 
 open Coalescent Finset ShortTimeConnectionLaw
-open scoped Classical
+open scoped Classical Nat
 
 noncomputable section
 
@@ -162,6 +174,18 @@ theorem IsRepresentativeSet.erase {n : ℕ} {s : Fin n → Fin n} {ξ η : ER n}
     · exact absurd (hT.2 t' ht'T j hj h) (ne_of_mem_erase ht')
     · exact absurd (hT.2 t htT j hj h) (ne_of_mem_erase ht)
 
+/-- The fibers of the chosen individuals at the singletons cover the panel. -/
+theorem sum_fiberCard_representatives {n : ℕ} (s : Fin n → Fin n) :
+    ∑ i ∈ representatives s ⊥, Linkage.fiberCard s i = n := by
+  have hinj : Set.InjOn (fun C : Quotient (observed s ⊥) ↦ C.out) (univ : Finset _) :=
+    fun C _ D _ hCD ↦ by
+      rw [← Quotient.out_eq C, ← Quotient.out_eq D]
+      exact congrArg _ hCD
+  have hload : ∀ C : Quotient (observed s ⊥), Linkage.fiberCard s C.out = hiddenLoad s ⊥ C :=
+    fun C ↦ by rw [← hiddenLoad_bot s C.out, Quotient.out_eq]
+  rw [representatives, sum_image hinj, sum_congr rfl fun C _ ↦ hload C, sum_hiddenLoad]
+  exact blocks_bot n
+
 /-! ### Minimal histories counted from any state -/
 
 /-- **The minimal connecting histories of length `k` from `ξ`**: the chains of `k` visible covers
@@ -256,6 +280,247 @@ theorem visibleTarget_eq_iff {n : ℕ} {s : Fin n → Fin n} {ξ η : ER n} {T :
   · rintro (⟨rfl, rfl⟩ | ⟨rfl, rfl⟩)
     · exact hstate
     · exact hstate.trans (visibleTarget_comm s ξ hnot)
+
+/-! ### Counting the visible covers -/
+
+/-- **The covers into one visible target number the product of the loads.** -/
+theorem card_filter_visibleTarget {n : ℕ} (s : Fin n → Fin n) (ξ : ER n) {x y : Fin n}
+    (hxy : ¬(observed s ξ).r x y) :
+    #(univ.filter fun η ↦ Covers ξ η ∧ hiddenState s η = visibleTarget (hiddenState s ξ) x y) =
+      hiddenLoad s ξ (Quotient.mk (observed s ξ) x) *
+        hiddenLoad s ξ (Quotient.mk (observed s ξ) y) := by
+  rw [← card_covers_visibleTarget s ξ hxy]
+  exact (Nat.subtype_card (univ.filter fun η ↦
+    Covers ξ η ∧ hiddenState s η = visibleTarget (hiddenState s ξ) x y)
+      fun η ↦ mem_filter.trans (and_iff_right (mem_univ η))).symm
+
+/-- **A function constant on the covers into a visible target** sums over them to the product of
+the loads times its value. -/
+theorem sum_filter_visibleTarget {n : ℕ} (s : Fin n → Fin n) (ξ : ER n) {x y : Fin n}
+    (hxy : ¬(observed s ξ).r x y) (f : ER n → ℝ) {value : ℝ}
+    (hvalue : ∀ η, Covers ξ η → hiddenState s η = visibleTarget (hiddenState s ξ) x y →
+      f η = value) :
+    ∑ η ∈ univ.filter (fun η ↦
+        Covers ξ η ∧ hiddenState s η = visibleTarget (hiddenState s ξ) x y), f η =
+      (hiddenLoad s ξ (Quotient.mk (observed s ξ) x) : ℝ) *
+        hiddenLoad s ξ (Quotient.mk (observed s ξ) y) * value := by
+  have hconst : ∀ η ∈ univ.filter (fun η ↦
+      Covers ξ η ∧ hiddenState s η = visibleTarget (hiddenState s ξ) x y), f η = value :=
+    fun η hη ↦ hvalue η (mem_filter.mp hη).2.1 (mem_filter.mp hη).2.2
+  rw [sum_congr rfl hconst, sum_const, card_filter_visibleTarget s ξ hxy, nsmul_eq_mul,
+    Nat.cast_mul]
+
+/-- **Each visible cover is counted by two ordered pairs of representatives**, and every other
+state by none. -/
+theorem sum_pairs_ite_visibleTarget {n : ℕ} {s : Fin n → Fin n} {ξ : ER n} {T : Finset (Fin n)}
+    (hT : IsRepresentativeSet s ξ T) (η : ER n) (value : ℝ) :
+    ∑ i ∈ T, ∑ j ∈ T.erase i,
+        (if Covers ξ η ∧ hiddenState s η = visibleTarget (hiddenState s ξ) i j then value
+          else 0) =
+      if Covers ξ η ∧ blocks (observed s η) + 1 = blocks (observed s ξ) then 2 * value
+        else 0 := by
+  by_cases hvisible : Covers ξ η ∧ blocks (observed s η) + 1 = blocks (observed s ξ)
+  · rw [if_pos hvisible]
+    obtain ⟨i₀, hi₀, j₀, hj₀, hij₀, hstate⟩ :=
+      exists_visibleTarget_of_visible hT hvisible.1 hvisible.2
+    have hpair : ∀ i ∈ T, ∀ j ∈ T.erase i,
+        (Covers ξ η ∧ hiddenState s η = visibleTarget (hiddenState s ξ) i j) ↔
+          (i = i₀ ∧ j = j₀) ∨ (i = j₀ ∧ j = i₀) := by
+      intro i hi j hj
+      rw [and_iff_right hvisible.1]
+      exact visibleTarget_eq_iff hT hi₀ hj₀ hi (mem_of_mem_erase hj) hij₀
+        (ne_of_mem_erase hj).symm hstate
+    have hj₀mem : j₀ ∈ T.erase i₀ := mem_erase.mpr ⟨hij₀.symm, hj₀⟩
+    have hi₀mem : i₀ ∈ T.erase j₀ := mem_erase.mpr ⟨hij₀, hi₀⟩
+    have hrow₀ : ∀ j ∈ T.erase i₀, j ≠ j₀ →
+        (if Covers ξ η ∧ hiddenState s η = visibleTarget (hiddenState s ξ) i₀ j then value
+          else 0) = 0 := by
+      intro j hj hjj₀
+      refine if_neg fun hP ↦ ?_
+      rcases (hpair i₀ hi₀ j hj).mp hP with ⟨_, h⟩ | ⟨h, _⟩
+      · exact hjj₀ h
+      · exact hij₀ h
+    have hrow₁ : ∀ j ∈ T.erase j₀, j ≠ i₀ →
+        (if Covers ξ η ∧ hiddenState s η = visibleTarget (hiddenState s ξ) j₀ j then value
+          else 0) = 0 := by
+      intro j hj hji₀
+      refine if_neg fun hP ↦ ?_
+      rcases (hpair j₀ hj₀ j hj).mp hP with ⟨h, _⟩ | ⟨_, h⟩
+      · exact hij₀ h.symm
+      · exact hji₀ h
+    have houter : ∀ i ∈ T, i ≠ i₀ ∧ i ≠ j₀ → ∑ j ∈ T.erase i,
+        (if Covers ξ η ∧ hiddenState s η = visibleTarget (hiddenState s ξ) i j then value
+          else 0) = 0 := by
+      intro i hi hne
+      refine sum_eq_zero fun j hj ↦ if_neg fun hP ↦ ?_
+      rcases (hpair i hi j hj).mp hP with ⟨h, _⟩ | ⟨h, _⟩
+      · exact hne.1 h
+      · exact hne.2 h
+    rw [sum_eq_add_of_mem i₀ j₀ hi₀ hj₀ hij₀ houter, sum_eq_single_of_mem j₀ hj₀mem hrow₀,
+      sum_eq_single_of_mem i₀ hi₀mem hrow₁,
+      if_pos ((hpair i₀ hi₀ j₀ hj₀mem).mpr (Or.inl ⟨rfl, rfl⟩)),
+      if_pos ((hpair j₀ hj₀ i₀ hi₀mem).mpr (Or.inr ⟨rfl, rfl⟩))]
+    ring
+  · rw [if_neg hvisible]
+    refine sum_eq_zero fun i hi ↦ sum_eq_zero fun j hj ↦ if_neg fun hP ↦ hvisible ?_
+    obtain ⟨hcovers, hstate⟩ := hP
+    have hij : i ≠ j := (ne_of_mem_erase hj).symm
+    have hnot : ¬(observed s ξ).r i j := fun hrel ↦ hij (hT.2 i hi j (mem_of_mem_erase hj) hrel)
+    have hCD : Quotient.mk (observed s ξ) i ≠ Quotient.mk (observed s ξ) j :=
+      fun hq ↦ hnot (Quotient.exact hq)
+    have hreport : observed s η = merge (observed s ξ) (Quotient.mk (observed s ξ) i)
+        (Quotient.mk (observed s ξ) j) := congrArg Prod.fst hstate
+    refine ⟨hcovers, ?_⟩
+    rw [hreport]
+    exact (merge_covers _ hCD).2
+
+/-- **Visible covers by representative pairs.** Twice the sum of a function over the visible covers
+of `ξ` is its sum over the covers into the visible targets of the ordered pairs of distinct
+representatives. -/
+theorem two_mul_sum_visible {n : ℕ} {s : Fin n → Fin n} {ξ : ER n} {T : Finset (Fin n)}
+    (hT : IsRepresentativeSet s ξ T) (f : ER n → ℝ) :
+    2 * ∑ η ∈ univ.filter (fun η ↦
+        Covers ξ η ∧ blocks (observed s η) + 1 = blocks (observed s ξ)), f η =
+      ∑ i ∈ T, ∑ j ∈ T.erase i, ∑ η ∈ univ.filter (fun η ↦
+        Covers ξ η ∧ hiddenState s η = visibleTarget (hiddenState s ξ) i j), f η := by
+  have hswap : ∑ i ∈ T, ∑ j ∈ T.erase i, ∑ η, (if Covers ξ η ∧
+      hiddenState s η = visibleTarget (hiddenState s ξ) i j then f η else 0) =
+        ∑ η, ∑ i ∈ T, ∑ j ∈ T.erase i, (if Covers ξ η ∧
+          hiddenState s η = visibleTarget (hiddenState s ξ) i j then f η else 0) :=
+    (sum_congr rfl fun i _ ↦ sum_comm).trans sum_comm
+  simp only [sum_filter]
+  rw [mul_sum, hswap]
+  refine sum_congr rfl fun η _ ↦ ?_
+  rw [sum_pairs_ite_visibleTarget hT η (f η), mul_ite, mul_zero]
+
+/-! ### The lumping -/
+
+/-- **Theorem E, the lumping of the minimal histories.** From a state whose report has `k + 1`
+components, the chains of `k` visible covers to a connected report number the history sum of the
+report components with their loads, read at any representative set. Assumes: `T` is a
+representative set of the report of `ξ` with `k + 1` members. -/
+theorem connectingCount_eq_historyWeight {n : ℕ} (s : Fin n → Fin n) :
+    ∀ (k : ℕ) (ξ : ER n) (T : Finset (Fin n)), IsRepresentativeSet s ξ T → #T = k + 1 →
+      connectingCount s k ξ = historyWeight k T (hiddenState s ξ).2
+  | 0, ξ, T, hT, hcard => by
+      rw [connectingCount_zero s (ξ := ξ) (by rw [← hT.card_eq, hcard]), historyWeight_zero,
+        Rat.cast_one]
+  | k + 1, ξ, T, hT, hcard => by
+      have hstep : ∀ i ∈ T, ∀ j ∈ T.erase i, ∀ η, Covers ξ η →
+          hiddenState s η = visibleTarget (hiddenState s ξ) i j →
+            connectingCount s k η = historyWeight k (T.erase j)
+              (Function.update (hiddenState s ξ).2 i
+                ((hiddenState s ξ).2 i + (hiddenState s ξ).2 j - 1)) := by
+        intro i hi j hj η _ hstate
+        have hjT : j ∈ T := mem_of_mem_erase hj
+        have hij : i ≠ j := (ne_of_mem_erase hj).symm
+        have hT' := hT.erase hi hjT hij (congrArg Prod.fst hstate)
+        have hcard' : #(T.erase j) = k + 1 := by
+          rw [card_erase_of_mem hjT]
+          omega
+        rw [connectingCount_eq_historyWeight k η (T.erase j) hT' hcard']
+        refine congrArg _ (historyWeight_congr k (T.erase j) _ _ fun z hz ↦ ?_)
+        rw [hstate]
+        by_cases hzi : z = i
+        · rw [hzi, Function.update_self]
+          show (if (observed s ξ).r i i ∨ (observed s ξ).r j i then
+              hiddenLoad s ξ (Quotient.mk (observed s ξ) i) +
+                hiddenLoad s ξ (Quotient.mk (observed s ξ) j) - 1
+              else hiddenLoad s ξ (Quotient.mk (observed s ξ) i)) = _
+          rw [if_pos (Or.inl ((observed s ξ).iseqv.refl i))]
+          rfl
+        · have hzT : z ∈ T := mem_of_mem_erase hz
+          have hzj : z ≠ j := ne_of_mem_erase hz
+          have hnz : ¬((observed s ξ).r i z ∨ (observed s ξ).r j z) := by
+            rintro (h | h)
+            · exact hzi (hT.2 i hi z hzT h).symm
+            · exact hzj (hT.2 j hjT z hzT h).symm
+          rw [Function.update_of_ne hzi]
+          show (if (observed s ξ).r i z ∨ (observed s ξ).r j z then
+              hiddenLoad s ξ (Quotient.mk (observed s ξ) i) +
+                hiddenLoad s ξ (Quotient.mk (observed s ξ) j) - 1
+              else hiddenLoad s ξ (Quotient.mk (observed s ξ) z)) = _
+          rw [if_neg hnz]
+          rfl
+      have hpairs : ∑ i ∈ T, ∑ j ∈ T.erase i, ∑ η ∈ univ.filter (fun η ↦
+          Covers ξ η ∧ hiddenState s η = visibleTarget (hiddenState s ξ) i j),
+            connectingCount s k η =
+          ∑ i ∈ T, ∑ j ∈ T.erase i, ((hiddenState s ξ).2 i : ℝ) * ((hiddenState s ξ).2 j : ℝ) *
+            (historyWeight k (T.erase j) (Function.update (hiddenState s ξ).2 i
+              ((hiddenState s ξ).2 i + (hiddenState s ξ).2 j - 1)) : ℝ) := by
+        refine sum_congr rfl fun i hi ↦ sum_congr rfl fun j hj ↦ ?_
+        have hnot : ¬(observed s ξ).r i j := fun hrel ↦
+          (ne_of_mem_erase hj).symm (hT.2 i hi j (mem_of_mem_erase hj) hrel)
+        exact sum_filter_visibleTarget s ξ hnot (connectingCount s k) (hstep i hi j hj)
+      have htwo := two_mul_sum_visible hT (connectingCount s k)
+      rw [hpairs] at htwo
+      rw [connectingCount_succ, historyWeight_succ]
+      push_cast
+      linarith
+
+/-- **Theorem E, (E2), the constant as a history sum.** The minimal connecting histories from the
+singletons number the history sum `H_w(c)` of the fibers with their sizes, read at the chosen
+individuals. -/
+theorem minimalHistoryCount_eq_historyWeight {n : ℕ} (s : Fin n → Fin n)
+    (hwidth : 1 ≤ Linkage.width s) :
+    minimalHistoryCount s =
+      historyWeight (Linkage.width s - 1) (representatives s ⊥) (Linkage.fiberCard s) := by
+  have hT := representatives_isRepresentativeSet s ⊥
+  have hcard : #(representatives s ⊥) = Linkage.width s - 1 + 1 := by
+    rw [hT.card_eq, observed_bot, blocks_graphKer, Nat.sub_add_cancel hwidth]
+  rw [minimalHistoryCount_eq_connectingCount,
+    connectingCount_eq_historyWeight s _ ⊥ _ hT hcard]
+  exact congrArg _ (historyWeight_congr _ _ _ _ fun i _ ↦ hiddenLoad_bot s i)
+
+/-- **Theorem E, (E2), the constant as a product.** For `w ≥ 2` fibers the minimal connecting
+histories number `(∏_i c_i) g_w(n)`. -/
+theorem minimalHistoryCount_eq_prod_historyFactor {n : ℕ} (s : Fin n → Fin n)
+    (hwidth : 2 ≤ Linkage.width s) :
+    minimalHistoryCount s =
+      (∏ i ∈ representatives s ⊥, (Linkage.fiberCard s i : ℚ)) *
+        historyFactor (Linkage.width s) n := by
+  have hT := representatives_isRepresentativeSet s ⊥
+  have hcard : #(representatives s ⊥) = Linkage.width s := by
+    rw [hT.card_eq, observed_bot, blocks_graphKer]
+  rw [minimalHistoryCount_eq_historyWeight s (by omega), ← hcard,
+    historyWeight_eq_prod_historyFactor (representatives s ⊥) (Linkage.fiberCard s)
+      (by rw [hcard]; exact hwidth) fun i _ ↦ Linkage.fiberCard_pos s i,
+    sum_fiberCard_representatives]
+
+open Asymptotics Topology in
+/-- **Theorem E, (E2).** For an interface of width `w ≥ 2` with fiber sizes `c_i` on a panel of
+`n` individuals, the probability that the report is connected at time `t`, started at the
+singletons, is `(∏_i c_i) (2n - w)! / (2^{w-2} (2n - 2w + 2)!) t^{w-1} + O(t^w)` as `t → 0`. -/
+theorem reportConnectedProbability_sub_note_isBigO {n : ℕ} (s : Fin n → Fin n)
+    (hwidth : 2 ≤ Linkage.width s) :
+    (fun t : ℝ ↦ reportConnectedProbability s t -
+        (∏ i ∈ representatives s ⊥, (Linkage.fiberCard s i : ℝ)) *
+          (2 * n - Linkage.width s)! /
+            (2 ^ (Linkage.width s - 2) * (2 * n - 2 * Linkage.width s + 2)!) *
+          t ^ (Linkage.width s - 1)) =O[𝓝 0] fun t : ℝ ↦ t ^ Linkage.width s := by
+  have hle : Linkage.width s ≤ n := by simpa using Linkage.width_le_card s
+  have hfactorial : ((Linkage.width s - 1)! : ℝ) ≠ 0 := by positivity
+  have hfactorial' : ((2 * n - 2 * Linkage.width s + 2)! : ℝ) ≠ 0 := by positivity
+  have hcount : minimalHistoryCount s =
+      (∏ i ∈ representatives s ⊥, (Linkage.fiberCard s i : ℝ)) *
+        ((Linkage.width s - 1)! / 2 ^ (Linkage.width s - 2) *
+          ((2 * n - Linkage.width s)! / (2 * n - 2 * Linkage.width s + 2)!)) := by
+    have hq := minimalHistoryCount_eq_prod_historyFactor s hwidth
+    rw [historyFactor_eq _ _ hwidth hle] at hq
+    exact_mod_cast hq
+  have hfun : (fun t : ℝ ↦ reportConnectedProbability s t -
+        (∏ i ∈ representatives s ⊥, (Linkage.fiberCard s i : ℝ)) *
+          (2 * n - Linkage.width s)! /
+            (2 ^ (Linkage.width s - 2) * (2 * n - 2 * Linkage.width s + 2)!) *
+          t ^ (Linkage.width s - 1)) =
+      fun t : ℝ ↦ reportConnectedProbability s t -
+        t ^ (Linkage.width s - 1) / (Linkage.width s - 1)! * minimalHistoryCount s := by
+    funext t
+    rw [hcount]
+    field_simp
+    ring
+  rw [hfun]
+  exact reportConnectedProbability_sub_isBigO s (by omega)
 
 end
 
