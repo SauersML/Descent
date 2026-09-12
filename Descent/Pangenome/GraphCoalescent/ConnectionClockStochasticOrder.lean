@@ -8,31 +8,43 @@ assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Condition
 assert_below Descent.Portability Descent.Decision Descent.Program
 
 /-!
-# Toward (C2) as a stochastic order: survival functions of the connection-time law
+# (C2) as a stochastic order: the report connects no later than Kingman's transit time
 
 `Descent.Pangenome.GraphCoalescent.ConnectionClockPathLaw` builds the law of the time until a
 pangenome report connects and proves the Laplace-transform order implied by (C2) of
 `PANGENOME_HIDDEN_CLOCK.md` §5. The note states (C2) as a stochastic order,
-`τ_q ≤_st Σ_{r=2}^{w} Exp(d_r)`. This file prepares that statement on survival functions.
+`τ_q ≤_st Σ_{r=2}^{w} Exp(d_r)`. This file proves it, on survival functions.
 
 ## What is proved
 
 * `survivalAt μ c = μ {y | c < y}`, the survival function of a law on durations at a real
   threshold, is antitone in the threshold (`survivalAt_antitone`) and certain below zero
-  (`survivalAt_of_neg`).
-* `survivalAt_conv`: the survival function of a convolution, `P(X + Y > c) = E_X P(Y > c - X)`.
-* `survivalAt_bind_jumpStep`: the survival function of a mixture over one uniform jump is the
-  average over the covers.
+  (`survivalAt_of_neg`). Convolution and one-jump mixtures act on it by integration and averaging
+  (`survivalAt_conv`, `survivalAt_bind_jumpStep`, `survivalAt_add_smul`).
 * `kingmanTransitLaw r`, the law of K-G's `T_r = Σ_{j=2}^{r} Exp(d_j)` built from the corpus holding
-  law, is a probability law (`kingmanTransitLaw_isProbabilityMeasure`) and is stochastically
-  increasing in `r` (`survivalAt_kingmanTransitLaw_le_succ`).
-* `holdMeasure_eq_expMeasure`: the corpus holding law is Mathlib's exponential law.
+  law, is a probability law and is stochastically increasing in `r`
+  (`survivalAt_kingmanTransitLaw_le_succ`).
+* The corpus holding law is Mathlib's exponential law (`holdMeasure_eq_expMeasure`), so its tails
+  are `e^{-dc}` and `1 - e^{-dc}` (`holdMeasure_Ioi`, `holdMeasure_Iic`,
+  `survivalAt_holdDuration`); two holding durations in sequence survive as
+  `survivalAt_holdDuration_conv` says.
+* **The thinning identity** `Exp(d_r) = p Exp(d_K) + (1 - p) Exp(d_K) ∗ Exp(d_r)` with `p = d_r/d_K`,
+  `d_r < d_K` (`holdDuration_thinning`): a slow clock is a fast clock that rings through with
+  probability `p`. Applied to `T_r = Exp(d_r) ∗ T_{r-1}` it thins Kingman's transit time at the
+  faster rate of the labeled chain (`survivalAt_kingmanTransitLaw_thinning`).
+* **(C2)**, `survivalAt_connectionTimeLaw_le`: from every labeled state `ξ`,
+  `P(τ_q > c) ≤ P(T_r > c)` for all `c`, with `r` the report width. By induction along covers: one
+  holding step at rate `d_K`, then at least `C(r, 2)` of the `C(K, 2)` covers are visible
+  (`VisibleIntensityClock.choose_two_le_visibleIntensity`), and moving weight from `T_r` to the
+  shorter `T_{r-1}` can only lower the survival (`sum_survivalAt_kingmanTransitLaw_le`); the
+  thinning identity closes the step. At the panel, `survivalAt_connectionTimeLaw_bot_le` is
+  `τ_q ≤_st T_w`.
 
-## What is not yet proved
+## What is narrower than the note
 
-The thinning identity `Exp(d_r) = Exp(d_K) ∗ (p δ₀ + (1 - p) Exp(d_r))` with `p = d_r / d_K`, and
-the stochastic domination of `connectionTimeLaw` by `kingmanTransitLaw` it gives, together with
-`VisibleIntensityClock.deathRate_le_visibleIntensity`, by induction along covers.
+The note derives (C2) through conditional quantile couplings of the continuous-time chain. What is
+proved is the survival-function inequality for `ConnectionClockPathLaw.connectionTimeLaw`, the law
+built by first-step recursion from the corpus jump and holding laws; no coupling is constructed.
 
 ## Empirical status
 
@@ -498,18 +510,19 @@ theorem survivalAt_connectionTimeLaw_le {n : ℕ} (s : Fin n → Fin n) (ξ : ER
       rw [survivalAt_conv, hm, ← survivalAt_kingmanTransitLaw_thinning hmK c]
       refine lintegral_mono fun x ↦ ?_
       rw [survivalAt_bind_jumpStep, ← choose_two_mul_inv_choose_two hmK,
-        ← choose_two_sub_mul_inv_choose_two hmK, mul_assoc, mul_assoc, mul_comm _ (_ : ℝ≥0∞)⁻¹,
-        mul_comm (((blocks ξ).choose 2 - (m + 2).choose 2 : ℕ) : ℝ≥0∞)
-          ((((blocks ξ).choose 2 : ℕ) : ℝ≥0∞)⁻¹), ← mul_add]
+        ← choose_two_sub_mul_inv_choose_two hmK]
       calc (∑ η : {η : ER n // Covers ξ η}, survivalAt (connectionTimeLaw s η.1) (c - x))
             * ((((blocks ξ).choose 2 : ℕ) : ℝ≥0∞))⁻¹
           ≤ (∑ η : {η : ER n // Covers ξ η},
               survivalAt (kingmanTransitLaw (blocks (observed s η.1))) (c - x))
             * ((((blocks ξ).choose 2 : ℕ) : ℝ≥0∞))⁻¹ :=
             mul_le_mul_right' (sum_le_sum fun η _ ↦ ih η.1 η.2 (c - x)) _
-        _ ≤ _ := by
-            rw [mul_comm]
-            exact mul_le_mul_left' (sum_survivalAt_kingmanTransitLaw_le s hm (c - x)) _
+        _ ≤ ((((m + 2).choose 2 : ℕ) : ℝ≥0∞) * survivalAt (kingmanTransitLaw (m + 1)) (c - x)
+              + (((blocks ξ).choose 2 - (m + 2).choose 2 : ℕ) : ℝ≥0∞)
+                * survivalAt (kingmanTransitLaw (m + 2)) (c - x))
+            * ((((blocks ξ).choose 2 : ℕ) : ℝ≥0∞))⁻¹ :=
+            mul_le_mul_right' (sum_survivalAt_kingmanTransitLaw_le s hm (c - x)) _
+        _ = _ := by ring
 
 /-- **(C2) at the panel**: `P(τ_q > c) ≤ P(T_w > c)`, the report of the panel's coalescent connects
 no later, in the stochastic order, than the Kingman `w`-coalescent of
