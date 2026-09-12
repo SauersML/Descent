@@ -241,6 +241,25 @@ theorem sum_mul_pointMass_left {ι : Type*} [Fintype ι] [DecidableEq ι] (coeff
     ∑ row, coeff * (if point = row then 1 else 0) * vector row = coeff * vector point := by
   simp [mul_ite, ite_mul, Finset.sum_ite_eq]
 
+/-- **The unit point mass of a coordinate**, kept as a name so that the generator rows below
+compare point masses as atoms.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  An indicator. -/
+def coordinateIndicator (point column : LowOrderLDCoordinate D) : ℝ :=
+  if point = column then 1 else 0
+
+/-- The corpus basis vector of a column reads the point mass of that column. -/
+theorem lowOrderLDBasis_eq_coordinateIndicator (column point : LowOrderLDCoordinate D) :
+    lowOrderLDBasis column point = coordinateIndicator point column :=
+  rfl
+
+/-- A point mass of the affine coordinates at a present coordinate is its coordinate point
+mass. -/
+theorem ite_some_eq_coordinateIndicator (point column : LowOrderLDCoordinate D) :
+    (if (some point : AffineLowOrderLDCoordinate D) = some column then (1 : ℝ) else 0)
+      = coordinateIndicator point column := by
+  simp [coordinateIndicator]
+
 set_option maxHeartbeats 800000 in
 /-- **The cross-population `DD` row with symmetric migration** is the diagonal row of the
 no-migration history, at rate `c_S + c_T + (ρ_S + ρ_T)/2`, plus `m` times the point masses of the
@@ -271,8 +290,9 @@ theorem withSymmetricMigration_DD_row (rates : ManyDemeLDRates D)
   | some column =>
     simp only [augmentedLowOrderLDGenerator, lowOrderLDHomogeneousGenerator, lowOrderLDDrift,
       lowOrderLDMigration, lowOrderLDRecombination, lowOrderLDMutationCoupling,
-      lowOrderLDRecurrentMutationDamping, lowOrderLDBasis, withSymmetricMigration,
-      symmetricPairMigration, crossLinkageDecayRate, hmutation, Option.some.injEq]
+      lowOrderLDRecurrentMutationDamping, lowOrderLDBasis_eq_coordinateIndicator,
+      ite_some_eq_coordinateIndicator, withSymmetricMigration, symmetricPairMigration,
+      crossLinkageDecayRate, hmutation]
     simp [hne, hne', ite_mul, Finset.sum_ite_eq'] <;> ring
 
 set_option maxHeartbeats 800000 in
@@ -299,8 +319,9 @@ theorem withSymmetricMigration_pi2_row (rates : ManyDemeLDRates D)
   | some column =>
     simp only [augmentedLowOrderLDGenerator, lowOrderLDHomogeneousGenerator, lowOrderLDDrift,
       lowOrderLDMigration, lowOrderLDRecombination, lowOrderLDMutationCoupling,
-      lowOrderLDRecurrentMutationDamping, lowOrderLDBasis, withSymmetricMigration,
-      symmetricPairMigration, crossHeterozygosityDecayRate, hmutation, Option.some.injEq]
+      lowOrderLDRecurrentMutationDamping, lowOrderLDBasis_eq_coordinateIndicator,
+      ite_some_eq_coordinateIndicator, withSymmetricMigration, symmetricPairMigration,
+      crossHeterozygosityDecayRate, hmutation]
     simp [hne, hne', ite_mul, Finset.sum_ite_eq'] <;> ring
 
 /-- **The linkage covariance moves at `-λ_D` times itself plus `m` times its migration
@@ -450,7 +471,8 @@ theorem linkageMigrationStencil_migrationHistory_zero (rates : ManyDemeLDRates D
     linkageMigrationStencil parent child
         (migrationHistory rates hne migration hmigration ancestral 0) = 0 := by
   rw [migrationHistory_zero, lowOrderLDSplitTransform_mulVec]
-  simp [linkageMigrationStencil, LowOrderLDCoordinate.mergeSplit, hne] <;> ring
+  simp [linkageMigrationStencil, LowOrderLDCoordinate.mergeSplit, hne]
+  ring
 
 /-- **Migration adds nothing to the heterozygosity product at the split.**  Right after the split
 every coordinate of the stencil is the parent's, so the stencil vanishes.
@@ -462,7 +484,8 @@ theorem heterozygosityMigrationStencil_migrationHistory_zero (rates : ManyDemeLD
     heterozygosityMigrationStencil parent child
         (migrationHistory rates hne migration hmigration ancestral 0) = 0 := by
   rw [migrationHistory_zero, lowOrderLDSplitTransform_mulVec]
-  simp [heterozygosityMigrationStencil, LowOrderLDCoordinate.mergeSplit, hne] <;> ring
+  simp [heterozygosityMigrationStencil, LowOrderLDCoordinate.mergeSplit, hne]
+  ring
 
 /-! ## The portability ratio with migration -/
 
@@ -510,7 +533,6 @@ theorem ratio_eq_decay_add_div {common decay linkage heterozygosity linkageInteg
   · simp only [hshare, hzero, mul_zero, div_zero, zero_div]
   · rw [hshare]
     field_simp
-    ring
 
 /-- **The portability ratio with symmetric migration** is `(e^{-ρ̄T} + m A_D) / (1 + m A_π)`.
 The drift factor `e^{-(c_S + c_T) T}` common to both moments cancels.
