@@ -106,11 +106,12 @@ theorem mobiusCoefficient_three : mobiusCoefficient 3 = 2 := by
 theorem cumulantOfSizes_fin_two (c : Fin 2 → ℕ) :
     cumulantOfSizes (univ : Finset (Fin 2)) c =
       lahPolynomial ℤ (c 0 + c 1) - lahPolynomial ℤ (c 0) * lahPolynomial ℤ (c 1) := by
+  have hcard : #({{0}, {1}} : Finset (Finset (Fin 2))) = 2 := by decide
   refine (sum_finpartition_fin_two
     (fun ps ↦ C (mobiusCoefficient #ps) * ∏ U ∈ ps, lahPolynomial ℤ (∑ i ∈ U, c i))).trans ?_
-  simp (disch := decide) only [card_singleton, card_insert_of_notMem, prod_singleton,
-    prod_insert, sum_singleton, Fin.sum_univ_two, mobiusCoefficient_one, mobiusCoefficient_two,
-    _root_.map_one, _root_.map_neg, one_mul, neg_one_mul]
+  simp (disch := decide) only [card_singleton, hcard, prod_singleton, prod_insert, sum_singleton,
+    Fin.sum_univ_two, mobiusCoefficient_one, mobiusCoefficient_two, _root_.map_one,
+    _root_.map_neg, one_mul, neg_one_mul]
   ring
 
 /-- **(D2) for three fibers**: the one-block partition with Möbius coefficient `1`, the three
@@ -122,9 +123,13 @@ theorem cumulantOfSizes_fin_three (c : Fin 3 → ℕ) :
           lahPolynomial ℤ (c 0 + c 2) * lahPolynomial ℤ (c 1) +
           lahPolynomial ℤ (c 1 + c 2) * lahPolynomial ℤ (c 0)) +
         2 * (lahPolynomial ℤ (c 0) * lahPolynomial ℤ (c 1) * lahPolynomial ℤ (c 2)) := by
+  have hcard₀₁ : #({{0, 1}, {2}} : Finset (Finset (Fin 3))) = 2 := by decide
+  have hcard₀₂ : #({{0, 2}, {1}} : Finset (Finset (Fin 3))) = 2 := by decide
+  have hcard₁₂ : #({{1, 2}, {0}} : Finset (Finset (Fin 3))) = 2 := by decide
+  have hcard : #({{0}, {1}, {2}} : Finset (Finset (Fin 3))) = 3 := by decide
   refine (sum_finpartition_fin_three
     (fun ps ↦ C (mobiusCoefficient #ps) * ∏ U ∈ ps, lahPolynomial ℤ (∑ i ∈ U, c i))).trans ?_
-  simp (disch := decide) only [card_singleton, card_insert_of_notMem, prod_singleton,
+  simp (disch := decide) only [card_singleton, hcard₀₁, hcard₀₂, hcard₁₂, hcard, prod_singleton,
     prod_insert, sum_singleton, sum_insert, Fin.sum_univ_three, mobiusCoefficient_one,
     mobiusCoefficient_two, mobiusCoefficient_three, _root_.map_one, _root_.map_neg, map_ofNat,
     one_mul, neg_one_mul]
@@ -181,33 +186,35 @@ theorem lahPolynomial_six : lahPolynomial ℤ 6 =
 theorem connectivityCumulant_one_two :
     cumulantOfSizes (univ : Finset (Fin 2)) ![1, 2] = 6 * X + 4 * X ^ 2 := by
   rw [cumulantOfSizes_fin_two]
-  simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, lahPolynomial_one,
-    lahPolynomial_two, lahPolynomial_three]
+  change lahPolynomial ℤ 3 - lahPolynomial ℤ 1 * lahPolynomial ℤ 2 = _
+  rw [lahPolynomial_one, lahPolynomial_two, lahPolynomial_three]
   ring
 
 /-- `C_{(1,3)}(z) = 24z + 30z^2 + 6z^3`. -/
 theorem connectivityCumulant_one_three :
     cumulantOfSizes (univ : Finset (Fin 2)) ![1, 3] = 24 * X + 30 * X ^ 2 + 6 * X ^ 3 := by
   rw [cumulantOfSizes_fin_two]
-  simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, lahPolynomial_one,
-    lahPolynomial_three, lahPolynomial_four]
+  change lahPolynomial ℤ 4 - lahPolynomial ℤ 1 * lahPolynomial ℤ 3 = _
+  rw [lahPolynomial_one, lahPolynomial_three, lahPolynomial_four]
   ring
 
 /-- `C_{(2,2)}(z) = 24z + 32z^2 + 8z^3`. -/
 theorem connectivityCumulant_two_two :
     cumulantOfSizes (univ : Finset (Fin 2)) ![2, 2] = 24 * X + 32 * X ^ 2 + 8 * X ^ 3 := by
   rw [cumulantOfSizes_fin_two]
-  simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, lahPolynomial_two,
-    lahPolynomial_four]
+  change lahPolynomial ℤ 4 - lahPolynomial ℤ 2 * lahPolynomial ℤ 2 = _
+  rw [lahPolynomial_two, lahPolynomial_four]
   ring
 
 /-- `C_{(1,1,2)}(z) = 24z + 20z^2`. -/
 theorem connectivityCumulant_one_one_two :
     cumulantOfSizes (univ : Finset (Fin 3)) ![1, 1, 2] = 24 * X + 20 * X ^ 2 := by
   rw [cumulantOfSizes_fin_three]
-  simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.cons_val_two, Matrix.head_cons,
-    Matrix.tail_cons, lahPolynomial_one, lahPolynomial_two, lahPolynomial_three,
-    lahPolynomial_four]
+  change lahPolynomial ℤ 4 -
+      (lahPolynomial ℤ 2 * lahPolynomial ℤ 2 + lahPolynomial ℤ 3 * lahPolynomial ℤ 1 +
+        lahPolynomial ℤ 3 * lahPolynomial ℤ 1) +
+      2 * (lahPolynomial ℤ 1 * lahPolynomial ℤ 1 * lahPolynomial ℤ 2) = _
+  rw [lahPolynomial_one, lahPolynomial_two, lahPolynomial_three, lahPolynomial_four]
   ring
 
 /-- `C_{(2,2,2)}(z) = 720z + 1656z^2 + 928z^3 + 144z^4`. -/
@@ -215,8 +222,11 @@ theorem connectivityCumulant_two_two_two :
     cumulantOfSizes (univ : Finset (Fin 3)) ![2, 2, 2] =
       720 * X + 1656 * X ^ 2 + 928 * X ^ 3 + 144 * X ^ 4 := by
   rw [cumulantOfSizes_fin_three]
-  simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.cons_val_two, Matrix.head_cons,
-    Matrix.tail_cons, lahPolynomial_two, lahPolynomial_four, lahPolynomial_six]
+  change lahPolynomial ℤ 6 -
+      (lahPolynomial ℤ 4 * lahPolynomial ℤ 2 + lahPolynomial ℤ 4 * lahPolynomial ℤ 2 +
+        lahPolynomial ℤ 4 * lahPolynomial ℤ 2) +
+      2 * (lahPolynomial ℤ 2 * lahPolynomial ℤ 2 * lahPolynomial ℤ 2) = _
+  rw [lahPolynomial_two, lahPolynomial_four, lahPolynomial_six]
   ring
 
 /-! ## The mean reported connection times of the table -/
