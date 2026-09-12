@@ -15,6 +15,7 @@ import Descent.Pangenome.GraphCoalescent.HiddenLoads
 import Descent.Pangenome.GraphCoalescent.HiddenLumpability
 import Descent.Pangenome.GraphCoalescent.LahWeights
 import Descent.Pangenome.GraphCoalescent.LeadingCoefficient
+import Descent.Pangenome.GraphCoalescent.LumpingUnorderedPair
 import Descent.Pangenome.GraphCoalescent.LumpingVisibleRates
 import Descent.Pangenome.GraphCoalescent.MinimalRefinement
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceClosure
@@ -173,8 +174,9 @@ rates and of the survival
 derivatives through the killed generator. With at least three components a strong lumping in
 Rosenblatt's form determines every visible rate and the hidden state
 (`LumpingVisibleRates.visibleRate_eq_of_lumping`, `hiddenState_eq_of_lumping`); at two components
-the second survival derivative is not derived from lumpability, and the survival function as a
-semigroup is not formalized. The table rows of §6 compute the cumulants from `cumulantOfSizes`
+a strong lumping determines the unordered pair of loads through their sum and product
+(`LumpingUnorderedPair.unorderedPair_eq_of_lumping`), and the survival function as a semigroup is
+not formalized. The table rows of §6 compute the cumulants from `cumulantOfSizes`
 and evaluate transcriptions of (D4)-(D6) and (D8) at the tabulated fiber sizes. In the
 Λ-coalescent closure the dependence of a merger's lumped outcome on its profile alone is a
 hypothesis on the outcome map. The

@@ -114,6 +114,8 @@ import Descent.Portability.PartialHaplotypeMicroscopicApproximation
 import Descent.Portability.PartialHaplotypeRealizedPanel
 import Descent.Portability.NeutralPolynomialPositivity
 import Descent.Portability.NeutralBernsteinPositivity
+import Descent.Portability.NeutralMicroscopicEulerLimit
+import Descent.Portability.CylinderGaussianQuadrant
 import Descent.Portability.MultinomialHistoryRealization
 import Descent.Portability.PartialHaplotypeHistoryRealization
 import Descent.Portability.NonnegativeMicroscopicApproximation
@@ -249,7 +251,10 @@ argument `NeutralBernsteinPositivity.nonneg_of_monomial_nonneg`), so every
 hypothesis of `NeutralFellerGenerator.exists_markovKernel_neutralGenerator` is proved: neutral
 Markov kernels exist for every neutral model, represent the polynomial semigroup, compose, and
 carry the neutral generator on configuration moments (`exists_neutralMarkovKernel`). The Euler
-limit route of `PolynomialFellerExtension` still takes that limit as a hypothesis. The kernels
+limit holds: the microscopic kernel powers along `N` steps of size `t/N` converge uniformly to the
+neutral semigroup on every continuous observable, and its Riesz kernels are Markov and compose
+(`NeutralMicroscopicEulerLimit.tendstoUniformly_neutralSemigroupExtension`,
+`neutralMarkovKernel_add`). The kernels
 are Markov kernels on pseudo-metrizable compact spaces, which include the haplotype-frequency
 simplex. In §6 the attainable metric curve of NOTE1 Theorem 5 is proved exactly for lists of
 discrete events, and for chronologies with continuous nonnegative rates at a positive horizon
@@ -326,8 +331,9 @@ finite measure, a common bound and pointwise vanishing widths;
 `CylinderIntervalCertificate` needs only almost sure vanishing widths on fair-bit streams but
 does not show that its rational values are computed by an algorithm. (32) takes almost sure
 termination of the program as a hypothesis; it is not decided. The exponential and Gaussian
-certificates are executed for integrands of `min(X, 1)` and of the radius; the laws of the draws
-and the Box-Muller theorem are proved as measure identities.
+certificates are executed for integrands of `min(X, 1)`, of the radius, and of the angle through
+the positive quadrant (`CylinderGaussianQuadrant.tendsto_quadrant_certificate`); the laws of the
+draws and the Box-Muller theorem are proved as measure identities.
 Equations (33) and (34) are
 proved for finitely many cells and coordinates, with the whole region attained by completions.
 -/
