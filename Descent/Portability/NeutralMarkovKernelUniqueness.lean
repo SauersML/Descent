@@ -35,7 +35,8 @@ set_option relaxedAutoImplicit false
 
 namespace Descent.Portability.NeutralMarkovKernelUniqueness
 
-open MeasureTheory ProbabilityTheory Filter Topology NeutralFellerGenerator
+open MeasureTheory ProbabilityTheory Filter Topology PartialHaplotypeCarrier
+  PartialHaplotypeDualGenerator PartialHaplotypeDualSemigroup NeutralFellerGenerator
   NeutralPolynomialSemigroup NeutralPolynomialPositivity PolynomialFellerExtension
   FellerKernelRepresentation FellerMarkovKernel NeutralMicroscopicEulerLimit
 open scoped NNReal
