@@ -1,6 +1,12 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.ReferenceExperimentRows
+import Descent.Portability.ReferenceExperimentLateLossCorners
+import Descent.Portability.ReferenceExperimentLateMomentCorners
+import Descent.Portability.ReferenceExperimentEarlyLossCorners
+import Descent.Portability.ReferenceExperimentEarlyMomentCorners
+import Descent.Portability.ReferenceExperimentCorners
 import Descent.Portability.ReferenceExperimentAtomTable
 import Descent.Portability.NeutralRateHistoryKernel
 import Descent.Portability.NeutralDemeRelabelKernel
