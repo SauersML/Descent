@@ -9,6 +9,7 @@ import Descent.Pangenome.GraphCoalescent.ConnectivityCumulantCorpus
 import Descent.Pangenome.GraphCoalescent.Conservation
 import Descent.Pangenome.GraphCoalescent.LambdaLoadClosure
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceGenerator
+import Descent.Pangenome.GraphCoalescent.HiddenClockExample
 import Descent.Pangenome.GraphCoalescent.HiddenLoadFiltering
 import Descent.Pangenome.GraphCoalescent.HiddenLoads
 import Descent.Pangenome.GraphCoalescent.HiddenLumpability
@@ -58,7 +59,10 @@ inside it.
   (A3) `sum_choose_two_hiddenLoad_add_sum_pairs`. Rosenblatt's criterion for the hidden state:
   two coalescent states with the same hidden state have equally many covers into every hidden
   state, `card_covers_hiddenState_eq`. (A4): the loads and rates of the three-haplotype example
-  and its mean connection time `2/3`, `example_total_rate`, `example_mean_connection_time`.
+  and its mean connection time `2/3`, `example_total_rate`, `example_mean_connection_time`; as a
+  continuous-time statement, `S(t) = e^{-3t}/2 + e^{-t}/2`
+  (`HiddenClockExample.exampleSurvival_eq`) with integral `2/3` (`integral_exampleSurvival`), and
+  the three clocks `2/3`, `1` and `4/3` differ (`three_clocks_differ`).
 * Theorem C, (C1) and (C5): `Conservation`. A silent merger lowers the hidden excess by one and a
   visible merger keeps it (`hiddenExcess_of_invisible`, `hiddenExcess_of_visible`); along any
   chain of covers from the singletons to the root exactly `n - w` steps are silent and `w - 1`
@@ -159,16 +163,18 @@ inside it.
   `prod_hiddenLoad_bot_le_of_isBalancedFibers`.
 
 Scope. Theorem A is proved as cover counts with Kingman's unit rate per cover: the
-continuous-time chain, the survival function of (A4) and the probabilistic statement of strong
-lumpability are not constructed, and the mean `2/3` of (A4) is the first-step arithmetic of the
-counted rates. Theorem B is proved as the algebra of the visible rates and of the survival
+continuous-time chain and the probabilistic statement of strong lumpability are not constructed.
+The survival function of (A4) is `α e^{tQ} 𝟙` of the killed generator, and the identification of
+the mean with its integral is not formalized. Theorem B is proved as the algebra of the visible
+rates and of the survival
 derivatives through the killed generator. With at least three components a strong lumping in
 Rosenblatt's form determines every visible rate and the hidden state
 (`LumpingVisibleRates.visibleRate_eq_of_lumping`, `hiddenState_eq_of_lumping`); at two components
 the second survival derivative is not derived from lumpability, and the survival function as a
-semigroup is not formalized. The table rows of §6 evaluate
-transcriptions of (D2), (D4)-(D6) and (D8) at the tabulated fiber sizes, with the Möbius
-coefficients written out for two and three fibers. The
+semigroup is not formalized. The table rows of §6 compute the cumulants from `cumulantOfSizes`
+and evaluate transcriptions of (D4)-(D6) and (D8) at the tabulated fiber sizes. In the
+Λ-coalescent closure the dependence of a merger's lumped outcome on its profile alone is a
+hypothesis on the outcome map. The
 connection clock of Theorem C is defined as the first-step solution of the backward equation, and
 (C3) is Dynkin's identity for that equation; its identification with the path expectation of the
 continuous-time chain is not formalized, and (C2) is proved in Laplace-transform order, which
