@@ -209,6 +209,7 @@ def plugInCovariance {size : ℕ} (first second : Ω → ℝ) (sample : Fin size
   (∑ member, (first (sample member) - sampleMean first sample)
       * (second (sample member) - sampleMean second sample)) / size
 
+omit [Fintype Ω] in
 /-- The plug-in sample covariance is the unbiased one times `(n − 1) / n`. -/
 theorem plugInCovariance_eq {size : ℕ} (hsize : 2 ≤ size) (first second : Ω → ℝ)
     (sample : Fin size → Ω) :
@@ -219,6 +220,7 @@ theorem plugInCovariance_eq {size : ℕ} (hsize : 2 ≤ size) (first second : Ω
   unfold plugInCovariance sampleCovariance
   rw [eq_comm, div_mul_div_comm, mul_comm (size : ℝ), mul_div_mul_left _ _ hN1]
 
+omit [Fintype Ω] in
 /-- The sum of products of deviations from the sample means, written with any centering
 constants: the sum of products minus the product of sums over `n`. -/
 theorem sum_deviation_mul_deviation {size : ℕ} (hsize : (size : ℝ) ≠ 0) (first second : Ω → ℝ)
@@ -353,7 +355,13 @@ theorem expectation_diagonal_mul_offDiagonal (law : FiniteReportLaw Ω) (size : 
       = ∑ n, ∑ k, ∑ l, if k = l then 0
           else first (sample n) * second (sample n) * third (sample k) * fourth (sample l) := by
     intro sample
-    simp only [Finset.sum_mul, Finset.mul_sum, mul_ite, mul_zero, mul_assoc]
+    rw [Finset.sum_mul]
+    refine Finset.sum_congr rfl fun n _ ↦ ?_
+    rw [Finset.mul_sum]
+    refine Finset.sum_congr rfl fun k _ ↦ ?_
+    rw [Finset.mul_sum]
+    refine Finset.sum_congr rfl fun l _ ↦ ?_
+    split_ifs <;> ring
   simp only [hexpand]
   rw [FiniteIndependentMoments.expectation_sum]
   refine Finset.sum_eq_zero fun n _ ↦ ?_
@@ -603,6 +611,7 @@ theorem expectation_sampleCovariance_mul (law : FiniteReportLaw Ω) {size : ℕ}
   field_simp
   ring
 
+omit [Fintype Ω] in
 /-- On a cohort of two, the sample covariance is the pair kernel `(f₀ − f₁)(g₀ − g₁) / 2`. -/
 theorem sampleCovariance_two (first second : Ω → ℝ) (sample : Fin 2 → Ω) :
     sampleCovariance first second sample
@@ -680,6 +689,7 @@ of a quadratic form in the GWAS weights is written. -/
 def samplingForm (population excess pairing : ℝ) (size : ℕ) : ℝ :=
   population + excess / size + pairing / (size * (size - 1))
 
+omit [Fintype J] in
 /-- **The GWAS weights are unbiased**: `E ŵ_j = w_j`. -/
 theorem expectation_gwasWeights (law : FiniteReportLaw Ω) {size : ℕ} (hsize : 2 ≤ size)
     (genotype : Ω → J → ℝ) (outcome : Ω → ℝ) (marker : J) :
@@ -687,6 +697,7 @@ theorem expectation_gwasWeights (law : FiniteReportLaw Ω) {size : ℕ} (hsize :
       = marginalWeights law genotype outcome marker :=
   expectation_sampleCovariance law hsize _ outcome
 
+omit [Fintype J] in
 /-- **The exact second moments of the GWAS weights**:
 `E[ŵ_i ŵ_j] = w_i w_j + E_ij / n + P_ij / (n (n − 1))`. -/
 theorem expectation_gwasWeights_mul (law : FiniteReportLaw Ω) {size : ℕ} (hsize : 2 ≤ size)
@@ -906,7 +917,7 @@ theorem quadraticForm_weightExcess (law : FiniteReportLaw Ω) (genotype : Ω →
             * ((genotype individual j - law.expectation fun other ↦ genotype other j)
               * (outcome individual - law.expectation outcome))) := by
       intro individual
-      rw [hdeviation, sq, Finset.sum_mul, Finset.sum_mul, Finset.sum_mul_sum]
+      rw [hdeviation, sq, Finset.sum_mul, Finset.sum_mul_sum]
       exact Finset.sum_congr rfl fun i _ ↦ Finset.sum_congr rfl fun j _ ↦ by ring
     simp only [hproduct]
     rw [FiniteIndependentMoments.expectation_sum]
@@ -1200,8 +1211,7 @@ def trainingWitnessTarget : FiniteReportLaw (Fin 4) where
     intro haplotype
     fin_cases haplotype <;> norm_num
   mass_sum := by
-    rw [Fin.sum_univ_four]
-    norm_num
+    simp [Fin.sum_univ_four] <;> norm_num
 
 /-- The witness tags: the biallelic contrasts `rad1` and `rad2` of the master theorem. -/
 def trainingWitnessGenotype (haplotype : Fin 4) (marker : Fin 2) : ℝ :=
