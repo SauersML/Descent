@@ -69,7 +69,7 @@ theorem graphExpect_sub_sq {m : ℕ} (p : ℝ) (X : Finset (Sym2 (Fin m)) → �
 
 /-- **Above the diagonal means below the giant fraction.** For `α > 1`, a positive `s'` at which
 the survival map lies strictly above the diagonal is below the giant fraction. -/
-theorem lt_giantFraction_of_lt_survivalMap {α s' : ℝ} (hα : 1 < α) (hs'0 : 0 < s')
+theorem lt_giantFraction_of_lt_survivalMap {α s' : ℝ} (hα : 1 < α)
     (h : s' < survivalMap α s') : s' < giantFraction α := by
   obtain ⟨hs0, -⟩ := giantFraction_mem_Ioo hα
   by_contra hle
@@ -98,11 +98,12 @@ theorem exists_lt_giantFraction_of_lt {α s' : ℝ} (hα : 1 < α) (hs'0 : 0 < s
     linarith
   refine ⟨max ((1 + α) / 2) ((β + α) / 2), lt_max_of_lt_left (by linarith),
     max_lt (by linarith) (by linarith),
-    lt_giantFraction_of_lt_survivalMap (lt_max_of_lt_left (by linarith)) hs'0 ?_⟩
+    lt_giantFraction_of_lt_survivalMap (lt_max_of_lt_left (by linarith)) ?_⟩
   have hβ' : β < max ((1 + α) / 2) ((β + α) / 2) := lt_max_of_lt_right (by linarith)
+  have hβs : β * s' = -Real.log (1 - s') := by
+    rw [hβ, div_mul_cancel₀ _ hs'0.ne']
   have h1 : -(max ((1 + α) / 2) ((β + α) / 2) * s') < Real.log (1 - s') := by
     have hmul := mul_lt_mul_of_pos_right hβ' hs'0
-    rw [hβ, div_mul_cancel₀ _ hs'0.ne'] at hmul
     linarith
   have h2 := (Real.lt_log_iff_exp_lt (by linarith : (0 : ℝ) < 1 - s')).mp h1
   unfold survivalMap
@@ -150,10 +151,10 @@ theorem exists_eventually_graphProb_largeCount_le {α δ η : ℝ} (hα : 1 < α
     rw [div_le_iff₀ hκ₀] at hmκ
     linarith
   have h4κ : 4 * κ * m ≤ κ₀ * m := mul_le_mul_of_nonneg_right hκκ₀ hm.le
-  have hK1 : (K : ℝ) ≤ κ₀ * m := by nlinarith
+  have hK1 : (K : ℝ) ≤ κ₀ * m := by linarith
   have hK2 : ((2 * K : ℕ) : ℝ) ≤ κ₀ * m := by
     push_cast
-    nlinarith
+    linarith
   have hq1 := hbound m K hmα hK1
   have hq2 := hbound m (2 * K) hmα hK2
   have hlow : ∀ v : Fin m, giantFraction α - η₁ ≤
@@ -201,13 +202,12 @@ theorem exists_eventually_graphProb_largeCount_le {α δ η : ℝ} (hα : 1 < α
     have h3 := mul_le_mul_of_nonneg_left h1 h2
     have h4 : 0 ≤ η₁ * m ^ 2 * (giantFraction α - η₁) :=
       mul_nonneg (mul_nonneg hη₁0.le (sq_nonneg _)) (by linarith)
-    nlinarith
+    linarith
   have hB : (giantFraction α - η₁) * m * K ≤ m * (κ * m + 1) := by
-    have h1 : (0 : ℝ) ≤ K := Nat.cast_nonneg K
-    have h2 : (giantFraction α - η₁) * m * K ≤ m * K := by
-      have h3 : 0 ≤ m * (K : ℝ) := mul_nonneg hm.le h1
-      nlinarith
-    nlinarith
+    have h3 : 0 ≤ m * (K : ℝ) := mul_nonneg hm.le (Nat.cast_nonneg K)
+    calc (giantFraction α - η₁) * m * K = (giantFraction α - η₁) * (m * K) := by ring
+      _ ≤ m * K := mul_le_of_le_one_left h3 (by linarith)
+      _ ≤ m * (κ * m + 1) := mul_le_mul_of_nonneg_left hKle.le hm.le
   have hvar : graphExpect m (α / m) (fun E ↦ (largeCount E K - (giantFraction α - η₁) * m) ^ 2) ≤
       2 * η₁ * m ^ 2 + m * (κ * m + 1) := by
     rw [hexp]
