@@ -36,6 +36,8 @@ import Descent.Pangenome.GraphCoalescent.Pinned
 import Descent.Pangenome.GraphCoalescent.RankedHistoryLaw
 import Descent.Pangenome.GraphCoalescent.Reduction
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionClock
+import Descent.Pangenome.GraphCoalescent.ReportedConnectionExamples
+import Descent.Pangenome.GraphCoalescent.ReportedConnectionFirstStep
 import Descent.Pangenome.GraphCoalescent.Visibility
 import Descent.Pangenome.GraphCoalescent.VisibleIntensityClock
 import Descent.Pangenome.GraphCoalescent.WidthProfile
