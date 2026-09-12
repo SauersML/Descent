@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.AncestralLocality.CompatibilityNeutrality
+import Descent.Pangenome.AncestralLocality.JointNonautonomy
 import Descent.Pangenome.AncestralLocality.InfiniteGenomeLimit
 import Descent.Pangenome.AncestralLocality.LocalityBounds
 import Descent.Pangenome.AncestralLocality.LocalityCoupling
@@ -37,6 +38,9 @@ independent complexity bounds and a quantitative light cone.
   has one observed law and drifts `-1/4` and `0` (`witness_drift`), so no observed transition law
   predicts both and the observation `(a, b)` is not autonomous
   (`witness_no_observed_transition_law`, `witness_not_autonomous`).
+* §3.2, autonomous observations are not closed under joins: `JointNonautonomy`. On the
+  eight-state witness both single features are autonomous and their joint observation is not
+  (`autonomous_features_joint_not_autonomous`).
 * Theorem 5, the locality transition: `LocalityTransition`. For `G(m, α/m)` as a finite law on
   edge sets, the expected reach of `A` satisfies `E|Reach(A)| ≤ |A|/(1 - α)` for `0 ≤ α < 1` and
   every genome size (`graphExpect_card_reach_le`), through the count of present simple paths
@@ -85,7 +89,7 @@ space, with the escape probability as a parameter. The supercritical limit (6.2)
 its support, conditional on the Erdős-Rényi giant component theorem as the named hypothesis
 `GiantComponentLaw` (proved only for `0 ≤ α < 1`); its weights `1 - (1 - s)^k` and `(1 - s)^k`
 are not proved. Theorems 1 and 2 (hereditary closure and its operational characterization),
-Theorem 4 (closure is reachability) and Theorem 6 (sampling duality) are not yet proof-checked.
+Theorem 4 (closure is reachability) and Theorem 6 (sampling duality) are not yet recorded here.
 Of Theorem 9, the finite-genome semigroups and the light-cone bound are hypotheses
 (`LightConeApproximation`), and the space `P({0,1}^V)` with its cylinder sampling algebra is not
 yet constructed.
