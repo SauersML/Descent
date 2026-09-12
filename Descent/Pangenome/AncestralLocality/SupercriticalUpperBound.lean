@@ -153,8 +153,6 @@ theorem eventually_poissonExtinct_sub_le_gwExtinct {α : ℝ} (hα : 1 < α) (g 
       linarith
     have hbase0 : 0 ≤ 1 + -(α * (1 - poissonExtinct α g + η')) / m := by
       have := (div_le_one hm).mpr h3
-      have hdiv' : α / m * (1 - poissonExtinct α g + η') = α * (1 - poissonExtinct α g + η') / m :=
-        by ring
       linarith
     have hpow : (1 + -(α * (1 - poissonExtinct α g + η')) / m) ^ m ≤
         gwExtinct m (α / m) (g + 1) := by
