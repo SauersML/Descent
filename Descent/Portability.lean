@@ -724,6 +724,8 @@ import Descent.Portability.PortabilityIdentification
 import Descent.Portability.EndToEndCorrelationSeries
 import Descent.Portability.EndToEndPortabilityRateLipschitz
 import Descent.Portability.TwoLocusPortabilityDecay
+import Descent.Portability.PortabilityCurveIdentifiability
+import Descent.Portability.PortabilitySizeBlindness
 
 assert_below Descent.Program
 

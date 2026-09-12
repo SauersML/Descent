@@ -18,6 +18,8 @@ import Descent.Portability.PortabilityIdentification
 import Descent.Portability.EndToEndCorrelationSeries
 import Descent.Portability.EndToEndPortabilityRateLipschitz
 import Descent.Portability.TwoLocusPortabilityDecay
+import Descent.Portability.PortabilityCurveIdentifiability
+import Descent.Portability.PortabilitySizeBlindness
 import Descent.Pangenome.GraphCoalescent.ReportNonMarkovFromSingletons
 import Descent.Pangenome.GraphCoalescent.FiberSizeIdentifiability
 import Descent.Pangenome.GraphCoalescent.FiberSizeSymmetricRecovery
@@ -95,6 +97,15 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   (`tendsto_portabilityDecay_atTop`) and is identically one without recombination
   (`portabilityDecay_zero_rate`); the cross-heterozygosity form has its own exact decay law
   (`crossHeterozygosityPortabilityRatio_eq`).
+* What a portability curve identifies: `PortabilityCurveIdentifiability`. With a random split
+  time, the split-law average of each history's ratio is the Laplace curve `E[e^{-rT}]` for any
+  drift (`meanSplitPortabilityRatio_eq`), and its values at `k r₀` determine the split-time law
+  (`splitLaw_eq_of_meanSplitPortabilityRatio_eq`). The ratio of expectations is `L(c + r)/L(c)`
+  and does depend on drift (`pooledSplitPortabilityRatio_eq`,
+  `pooledSplitPortabilityRatio_depends_on_drift`). The averaged curve is blind to population
+  size: histories with one split-time law and any size histories give one curve
+  (`PortabilitySizeBlindness.meanSizeHistoryPortabilityRatio_eq_of_splitLaw`), and no estimator
+  of the population size from it has bounded worst-case error (`populationSize_error_ge`).
 * Neutral portability is exactly local: `PortabilityExactLocality`. No dual transition adds a locus,
   so configurations on loci within `A` are invariant (`dualTransitions_lociWithin`), and two
   neutral models that agree on the rates of `A` give the same expected moments on `A` at every time
