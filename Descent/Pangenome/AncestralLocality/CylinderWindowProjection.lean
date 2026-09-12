@@ -450,7 +450,8 @@ def extendedOperator (T : WindowOperatorFamily V) :
     C(ProbabilityMeasure (V → Bool), ℝ) →L[ℝ] C(ProbabilityMeasure (V → Bool), ℝ) :=
   (continuousGluedOperator T).extend (samplingAlgebra V).toSubmodule.subtypeL
     denseRange_samplingAlgebra_subtypeL
-    (ContinuousLinearMap.isUniformEmbedding_of_bound _ norm_le_subtypeL).isUniformInducing
+    (ContinuousLinearMap.isUniformEmbedding_of_bound (samplingAlgebra V).toSubmodule.subtypeL
+      norm_le_subtypeL).isUniformInducing
 
 /-- The extended operator agrees with the glued operator on the cylinder sampling algebra. -/
 theorem extendedOperator_apply (T : WindowOperatorFamily V) (f : (samplingAlgebra V).toSubmodule) :
