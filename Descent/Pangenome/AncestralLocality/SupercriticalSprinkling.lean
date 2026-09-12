@@ -32,7 +32,7 @@ in components of more than `κ` features, and two distinct components are disjoi
 probability at most `m² e^{-p κ²}`, by a union bound over pairs of large features
 (`graphProb_not_joined_le`). On the complement one component holds every large feature, so under
 `G(m, p)` no component has `c` features with probability at most the probability under `G(m, p₁)`
-that fewer than `c` features are large, plus `m² e^{-p₂ κ²}` (`graphProb_card_reach_lt_le`).
+that fewer than `c` features are large, plus `m² e^{-p₂ κ²}` (`graphProb_not_exists_card_reach_ge_le`).
 
 ## The limit
 
@@ -295,7 +295,7 @@ theorem graphProb_not_joined_le {m : ℕ} {p : ℝ} (hp0 : 0 ≤ p) (hp1 : p ≤
 /-- **The sprinkling bound.** When `1 - p = (1 - p₁)(1 - p₂)`, the probability under `G(m, p)` that
 no component has `c` features is at most the probability under `G(m, p₁)` that fewer than `c`
 features lie in components larger than `κ`, plus `m² e^{-p₂ κ²}`. -/
-theorem graphProb_card_reach_lt_le {m : ℕ} (hm : 0 < m) {p p₁ p₂ : ℝ}
+theorem graphProb_not_exists_card_reach_ge_le {m : ℕ} (hm : 0 < m) {p p₁ p₂ : ℝ}
     (hp : 1 - p = (1 - p₁) * (1 - p₂)) (hp₁0 : 0 ≤ p₁) (hp₁1 : p₁ ≤ 1) (hp₂0 : 0 ≤ p₂)
     (hp₂1 : p₂ ≤ 1) {κ c : ℝ} (hκ : 0 ≤ κ) :
     graphProb m p (fun E ↦ ¬∃ v, c ≤ ((reach (edgeGraph E) {v}).card : ℝ))
@@ -417,7 +417,7 @@ theorem tendsto_graphProb_exists_card_reach_ge {α δ c : ℝ} (hδ : 0 < δ) (h
         refine Real.exp_le_exp.mpr (neg_le_neg ?_)
         rw [hκsq, ← mul_assoc]
         exact mul_le_mul_of_nonneg_right hp₂m (Real.rpow_nonneg hm0 _)
-      refine (graphProb_card_reach_lt_le hmpos' hp hp₁0 hp₁1 hp₂0 hp₂1 hκ).trans ?_
+      refine (graphProb_not_exists_card_reach_ge_le hmpos' hp hp₁0 hp₁1 hp₂0 hp₂1 hκ).trans ?_
       exact add_le_add_left (mul_le_mul_of_nonneg_left hexp (by positivity)) _
   have h := hbad.const_sub 1
   rw [sub_zero] at h
