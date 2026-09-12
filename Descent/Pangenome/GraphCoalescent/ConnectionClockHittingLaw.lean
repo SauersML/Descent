@@ -412,7 +412,8 @@ theorem unconnectedMix_succ {n : ℕ} (s : Fin n → Fin n) {j : ℕ} (hj : j + 
     rw [firstConnectionMass, sum_comm]
   unfold unconnectedMix
   rw [sum_congr rfl fun ξ _ ↦ hrow ξ,
-    ← conv_finset_sum univ (holdDuration (deathRate (n - j))) _ hX, hswap, sum_congr rfl fun η _ ↦ hcol η, sum_add_distrib, ← Finset.sum_smul, hmass]
+    ← conv_finset_sum univ (holdDuration (deathRate (n - j))) _ hX, hswap,
+    sum_congr rfl fun η _ ↦ hcol η, sum_add_distrib, ← Finset.sum_smul, hmass]
 
 /-- **The level-by-level unrolling from `⊥`.** After `j` jumps, the first-step law from `⊥` is the
 first-connection mixture over the levels passed, plus the descent to level `n - j` followed by the
