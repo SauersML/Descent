@@ -1,0 +1,27 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.NeutralBernsteinPositivity
+
+/-! Axiom audit of NeutralBernsteinPositivity. -/
+
+open Descent.Portability.NeutralBernsteinPositivity
+
+#print axioms Descent.Portability.NeutralBernsteinPositivity.censusFinset
+#print axioms Descent.Portability.NeutralBernsteinPositivity.censusExponent
+#print axioms Descent.Portability.NeutralBernsteinPositivity.censusPoint
+#print axioms Descent.Portability.NeutralBernsteinPositivity.censusPoint_mem
+#print axioms Descent.Portability.NeutralBernsteinPositivity.eval_monomial_one
+#print axioms Descent.Portability.NeutralBernsteinPositivity.monomial_censusExponent
+#print axioms Descent.Portability.NeutralBernsteinPositivity.bernsteinPolynomial
+#print axioms Descent.Portability.NeutralBernsteinPositivity.bernsteinMoment
+#print axioms Descent.Portability.NeutralBernsteinPositivity.map_bernsteinPolynomial
+#print axioms Descent.Portability.NeutralBernsteinPositivity.eval_bernsteinMoment
+#print axioms Descent.Portability.NeutralBernsteinPositivity.eval_bernsteinPolynomial
+#print axioms Descent.Portability.NeutralBernsteinPositivity.bernsteinMoment_eq_sum
+#print axioms Descent.Portability.NeutralBernsteinPositivity.tendsto_descFactorial_div_pow
+#print axioms Descent.Portability.NeutralBernsteinPositivity.tendsto_bernsteinCoefficient
+#print axioms Descent.Portability.NeutralBernsteinPositivity.tendsto_map_bernsteinMoment
+#print axioms Descent.Portability.NeutralBernsteinPositivity.nonneg_of_monomial_nonneg
+#print axioms Descent.Portability.NeutralBernsteinPositivity.neutralPolynomialSemigroup_nonneg
+#print axioms Descent.Portability.NeutralBernsteinPositivity.exists_neutralMarkovKernel_semigroup
