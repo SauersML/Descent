@@ -32,3 +32,9 @@ open Descent.Pangenome.AncestralLocality
 #print axioms decisionDual_holdingGenerator_add
 #print axioms decisionDual_moment_equation
 #print axioms hasDerivAt_decisionDual_moment_equation
+#print axioms continuousOn_decisionDual_Ici
+#print axioms hasDerivWithinAt_decisionDual_moment_equation
+#print axioms decisionDualMap_apply
+#print axioms decisionDualMap_zero_time
+#print axioms abs_decisionDualMap_le
+#print axioms hasDerivWithinAt_decisionDualMap

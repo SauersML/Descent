@@ -1046,6 +1046,105 @@ theorem hasDerivAt_decisionDual_moment_equation [Fintype H] [DecidableEq H] [Fin
   (hasDerivAt_decisionDual hc hr T hp0 hp n f ht).congr_deriv
     (decisionDual_holdingGenerator_add hc hr T hp0 hp n ht.le f)
 
+/-- **The dual expectation is continuous in time on `[0, ∞)`.** -/
+theorem continuousOn_decisionDual_Ici [Fintype H] [DecidableEq H] [Fintype E] {c : ℝ}
+    {r : E → ℝ} (hc : 0 ≤ c) (hr : ∀ e, 0 ≤ r e) (T : E → H → H → H) {p : H → ℝ}
+    (hp0 : ∀ h, 0 ≤ p h) (hp : ∑ h, p h = 1) (n : ℕ) (f : (Fin n → H) → ℝ) :
+    ContinuousOn (fun t ↦ decisionDual c r T p n t f) (Set.Ici 0) := by
+  intro t ht
+  refine (continuousOn_decisionDual hc hr T hp0 hp n f (t + 1) t
+    ⟨ht, by linarith⟩).mono_of_mem_nhdsWithin ?_
+  exact mem_nhdsWithin.mpr ⟨Set.Iio (t + 1), isOpen_Iio, Set.mem_Iio.mpr (by linarith),
+    fun u hu ↦ ⟨hu.2, le_of_lt hu.1⟩⟩
+
+/-- **The moment equation as a right derivative** at every `t ≥ 0`: within `[t, ∞)` the dual
+expectation has derivative
+`c ∑_{a<b} (D_t(C_ab f) - D_t f) + ∑_e r_e ∑_a (D_t(B_{a,e} f) - D_t f)`. -/
+theorem hasDerivWithinAt_decisionDual_moment_equation [Fintype H] [DecidableEq H] [Fintype E]
+    {c : ℝ} {r : E → ℝ} (hc : 0 ≤ c) (hr : ∀ e, 0 ≤ r e) (T : E → H → H → H) {p : H → ℝ}
+    (hp0 : ∀ h, 0 ≤ p h) (hp : ∑ h, p h = 1) (n : ℕ) (f : (Fin n → H) → ℝ) {t : ℝ}
+    (ht : 0 ≤ t) :
+    HasDerivWithinAt (fun s ↦ decisionDual c r T p n s f)
+      (c * ∑ b, ∑ a ∈ Iio b,
+          (decisionDual c r T p n t (coalesceArguments a b f) - decisionDual c r T p n t f) +
+        ∑ e, r e * ∑ a,
+          (decisionDual c r T p (n + 1) t (decisionBranch (T e) a f) -
+            decisionDual c r T p n t f)) (Set.Ici t) t := by
+  have hF : ContinuousOn (fun s ↦ decisionDual c r T p n s (holdingGenerator c r n f) +
+      decisionDual c r T p (n + 1) s (decisionSubstitution r T n f)) (Set.Ici 0) :=
+    (continuousOn_decisionDual_Ici hc hr T hp0 hp n _).add
+      (continuousOn_decisionDual_Ici hc hr T hp0 hp (n + 1) _)
+  have hint : IntervalIntegrable (fun s ↦ decisionDual c r T p n s (holdingGenerator c r n f) +
+      decisionDual c r T p (n + 1) s (decisionSubstitution r T n f)) volume 0 t :=
+    (hF.mono Set.Icc_subset_Ici_self).intervalIntegrable_of_Icc ht
+  have h := (intervalIntegral.integral_hasDerivWithinAt_right (s := Set.Ici t) (t := Set.Ioi t)
+    hint ((hF.mono (Set.Ioi_subset_Ici ht)).stronglyMeasurableAtFilter_nhdsWithin
+      measurableSet_Ioi t) ((hF t ht).mono (Set.Ioi_subset_Ici ht))).const_add
+    (samplingObservable f p)
+  refine (h.congr (fun s hs ↦ ?_) ?_).congr_deriv
+    (decisionDual_holdingGenerator_add hc hr T hp0 hp n ht f)
+  · beta_reduce
+    rw [← decisionDual_sub_eq_integral hc hr T hp0 hp n (ht.trans hs) f]
+    ring
+  · beta_reduce
+    rw [← decisionDual_sub_eq_integral hc hr T hp0 hp n ht f]
+    ring
+
+/-- **The dual expectation as a moment family**, read through the indicators of the tuples so
+that it is linear at every time. At `t ≥ 0` it is the dual expectation (`decisionDualMap_apply`).
+-/
+def decisionDualMap [Fintype H] [DecidableEq H] [Fintype E] (c : ℝ) (r : E → ℝ)
+    (T : E → H → H → H) (p : H → ℝ) (t : ℝ) (k : ℕ) : ((Fin k → H) → ℝ) →ₗ[ℝ] ℝ where
+  toFun g := ∑ w, g w * decisionDual c r T p k t fun j ↦ if w = j then 1 else 0
+  map_add' g g' := by simp only [Pi.add_apply, add_mul, sum_add_distrib]
+  map_smul' d g := by
+    simp only [Pi.smul_apply, smul_eq_mul, RingHom.id_apply, mul_sum, mul_assoc]
+
+/-- **The moment family is the dual expectation** at every time `t ≥ 0`. -/
+theorem decisionDualMap_apply [Fintype H] [DecidableEq H] [Fintype E] {c : ℝ} {r : E → ℝ}
+    (hc : 0 ≤ c) (hr : ∀ e, 0 ≤ r e) (T : E → H → H → H) {p : H → ℝ} (hp0 : ∀ h, 0 ≤ p h)
+    (hp : ∑ h, p h = 1) {t : ℝ} (ht : 0 ≤ t) (k : ℕ) (g : (Fin k → H) → ℝ) :
+    decisionDualMap c r T p t k g = decisionDual c r T p k t g := by
+  refine ((hasSum_dysonMoment hc hr T hp0 hp k ht g).unique ?_).symm
+  simp only [LinearMap.pi_apply_eq_sum_univ (dysonMoment c r T p _ k t) g, smul_eq_mul]
+  exact hasSum_sum fun w _ ↦
+    (hasSum_dysonMoment hc hr T hp0 hp k ht fun j ↦ if w = j then 1 else 0).mul_left (g w)
+
+/-- The moment family starts at the sampling functional. -/
+theorem decisionDualMap_zero_time [Fintype H] [DecidableEq H] [Fintype E] (c : ℝ) (r : E → ℝ)
+    (T : E → H → H → H) (p : H → ℝ) (k : ℕ) (g : (Fin k → H) → ℝ) :
+    decisionDualMap c r T p 0 k g = samplingObservable g p := by
+  have h := LinearMap.pi_apply_eq_sum_univ (samplingFunctional (n := k) p) g
+  simp only [samplingFunctional_apply, smul_eq_mul] at h
+  rw [h]
+  show ∑ w, g w * decisionDual c r T p k 0 (fun j ↦ if w = j then 1 else 0) = _
+  exact sum_congr rfl fun w _ ↦ by rw [decisionDual_zero_time]
+
+/-- The moment family is at most the sup norm at nonnegative times. -/
+theorem abs_decisionDualMap_le [Fintype H] [DecidableEq H] [Fintype E] {c : ℝ} {r : E → ℝ}
+    (hc : 0 ≤ c) (hr : ∀ e, 0 ≤ r e) (T : E → H → H → H) {p : H → ℝ} (hp0 : ∀ h, 0 ≤ p h)
+    (hp : ∑ h, p h = 1) {t : ℝ} (ht : 0 ≤ t) (k : ℕ) (g : (Fin k → H) → ℝ) :
+    |decisionDualMap c r T p t k g| ≤ ‖g‖ := by
+  rw [decisionDualMap_apply hc hr T hp0 hp ht]
+  exact abs_decisionDual_le hc hr T hp0 hp k ht g
+
+/-- **The moment family obeys the moment equation as a right derivative** at every `t ≥ 0`, with
+the backward generator read through the family itself. -/
+theorem hasDerivWithinAt_decisionDualMap [Fintype H] [DecidableEq H] [Fintype E] {c : ℝ}
+    {r : E → ℝ} (hc : 0 ≤ c) (hr : ∀ e, 0 ≤ r e) (T : E → H → H → H) {p : H → ℝ}
+    (hp0 : ∀ h, 0 ≤ p h) (hp : ∑ h, p h = 1) {t : ℝ} (ht : 0 ≤ t) (k : ℕ)
+    (g : (Fin k → H) → ℝ) :
+    HasDerivWithinAt (fun u ↦ decisionDualMap c r T p u k g)
+      (c * ∑ b, ∑ a ∈ Iio b,
+          (decisionDualMap c r T p t k (coalesceArguments a b g) - decisionDualMap c r T p t k g) +
+        ∑ e, r e * ∑ a,
+          (decisionDualMap c r T p t (k + 1) (decisionBranch (T e) a g) -
+            decisionDualMap c r T p t k g)) (Set.Ici t) t := by
+  simp only [decisionDualMap_apply hc hr T hp0 hp ht]
+  exact (hasDerivWithinAt_decisionDual_moment_equation hc hr T hp0 hp k g ht).congr
+    (fun u hu ↦ decisionDualMap_apply hc hr T hp0 hp (ht.trans hu) k g)
+    (decisionDualMap_apply hc hr T hp0 hp ht k g)
+
 end
 
 end Descent.Pangenome.AncestralLocality
