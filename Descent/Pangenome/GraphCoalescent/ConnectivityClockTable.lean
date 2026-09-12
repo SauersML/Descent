@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Layer
+import Descent.Pangenome.GraphCoalescent.LahWeights
 import Mathlib.Algebra.Polynomial.Coeff
 import Mathlib.Tactic
 
@@ -19,8 +20,10 @@ sizes `c = (1,2), (1,3), (2,2), (1,1,2), (2,2,2)` and the mean reported connecti
 them: the fiber sizes `(1,3)` and `(2,2)` have the same sample size `n = 4` and the same width
 `w = 2` but different means, so the width does not determine the clock.
 
-The definitions are transcriptions of the note's formulas.  `lahPolynomial m` is (D1),
-`A_m(z) = ∑_{j=1}^m (m!/j!) C(m-1, j-1) z^j`.  `connectivityCumulantTwo` and
+The Lah polynomial (D1) is the corpus `lahPolynomial ℚ m` of
+`Descent.Pangenome.GraphCoalescent.LahWeights`, `A_m(z) = ∑_j L(m, j) z^j`, whose coefficients
+that module ties to the note's closed form `(m!/j!) C(m-1, j-1)` (`lahNumber_mul_factorial`).
+The remaining definitions transcribe the note's formulas.  `connectivityCumulantTwo` and
 `connectivityCumulantThree` are (D2) for two and three fibers, written out over the partitions of
 the fibers with the Möbius coefficients `μ(σ, ⊤) = (-1)^{|σ|-1} (|σ|-1)!`: for two fibers the top
 partition with coefficient `1` and the bottom one with `-1`; for three fibers the top partition
@@ -28,10 +31,12 @@ with `1`, the three two-block partitions with `-1` each, and the bottom partitio
 `rankedWeight n k` is `a_{n,k}` of (D4), `connectedByLevel` is `F_k` of (D5), `firstConnectionLaw`
 is `p_b` of (D6), and `meanConnectionTime` is (D8), `E τ_q = 2 ∑_b p_b / b - 2/n`.
 
-The corpus modules of the note's Theorem D, `LahWeights` and `ConnectivityCumulant` for (D1)-(D3)
-and `RankedHistoryLaw` and `ReportedConnectionClock` for (D4)-(D9), were not yet on main when this
-file was written.  When they land, these local transcriptions are to be replaced by their
-definitions and the rows restated against them; the arithmetic below does not change.
+The corpus modules of the rest of Theorem D, `ConnectivityCumulant` for (D2)-(D3) and
+`RankedHistoryLaw` and `ReportedConnectionClock` for (D4)-(D9), were not yet on main when this
+file was written.  When they land, the local transcriptions `connectivityCumulantTwo`,
+`connectivityCumulantThree`, `rankedWeight`, `connectedByLevel`, `firstConnectionLaw` and
+`meanConnectionTime` are to be replaced by their definitions and the rows restated against them;
+the arithmetic below does not change.
 
 Scope.  Nothing here proves (D3), the combinatorial meaning of the cumulant, or (D4)-(D8), the
 ranked-history law and the first-connection law; those are the business of the modules named
@@ -54,28 +59,20 @@ noncomputable section
 
 /-! ## The formulas of Theorem D -/
 
-/-- The coefficient `(m!/j!) C(m-1, j-1)` of `z^j` in the Lah polynomial (D1). -/
-def lahCoefficient (m j : ℕ) : ℚ :=
-  (m.factorial : ℚ) / (j.factorial : ℚ) * ((m - 1).choose (j - 1) : ℚ)
-
-/-- The Lah polynomial (D1), `A_m(z) = ∑_{j=1}^m (m!/j!) C(m-1, j-1) z^j`: partitions of `m`
-individuals into `j` blocks weighted by the product of the block-size factorials. -/
-def lahPolynomial (m : ℕ) : ℚ[X] :=
-  ∑ i ∈ Finset.range m, C (lahCoefficient m (i + 1)) * X ^ (i + 1)
-
 /-- The connectivity cumulant (D2) of two fibers of sizes `c₁` and `c₂`: the top partition of the
 fibers with Möbius coefficient `1` and the bottom partition with `-1`. -/
 def connectivityCumulantTwo (c₁ c₂ : ℕ) : ℚ[X] :=
-  lahPolynomial (c₁ + c₂) - lahPolynomial c₁ * lahPolynomial c₂
+  lahPolynomial ℚ (c₁ + c₂) - lahPolynomial ℚ c₁ * lahPolynomial ℚ c₂
 
 /-- The connectivity cumulant (D2) of three fibers of sizes `c₁`, `c₂` and `c₃`: the top partition
 with Möbius coefficient `1`, the three two-block partitions with `-1` each, and the bottom
 partition with `2`. -/
 def connectivityCumulantThree (c₁ c₂ c₃ : ℕ) : ℚ[X] :=
-  lahPolynomial (c₁ + c₂ + c₃) -
-    (lahPolynomial (c₁ + c₂) * lahPolynomial c₃ + lahPolynomial (c₁ + c₃) * lahPolynomial c₂ +
-      lahPolynomial (c₂ + c₃) * lahPolynomial c₁) +
-    2 * (lahPolynomial c₁ * lahPolynomial c₂ * lahPolynomial c₃)
+  lahPolynomial ℚ (c₁ + c₂ + c₃) -
+    (lahPolynomial ℚ (c₁ + c₂) * lahPolynomial ℚ c₃ +
+      lahPolynomial ℚ (c₁ + c₃) * lahPolynomial ℚ c₂ +
+      lahPolynomial ℚ (c₂ + c₃) * lahPolynomial ℚ c₁) +
+    2 * (lahPolynomial ℚ c₁ * lahPolynomial ℚ c₂ * lahPolynomial ℚ c₃)
 
 /-- The ranked-history weight `a_{n,k} = (n-k)! k! (k-1)! / (n! (n-1)!)` of (D4). -/
 def rankedWeight (n k : ℕ) : ℚ :=
@@ -100,29 +97,25 @@ def meanConnectionTime (cumulant : ℚ[X]) (n w : ℕ) : ℚ :=
 /-! ## The Lah polynomials the table needs -/
 
 /-- `A_1(z) = z`. -/
-theorem lahPolynomial_one : lahPolynomial 1 = X := by
-  simp [lahPolynomial, lahCoefficient]
+theorem lahPolynomial_one : lahPolynomial ℚ 1 = X := by
+  norm_num [lahPolynomial, Finset.sum_range_succ, lahNumber]
 
 /-- `A_2(z) = 2z + z^2`. -/
-theorem lahPolynomial_two : lahPolynomial 2 = 2 * X + X ^ 2 := by
-  simp only [lahPolynomial, lahCoefficient, Finset.sum_range_succ, Finset.sum_range_zero]
-  norm_num [Nat.factorial, Nat.choose, map_ofNat]
+theorem lahPolynomial_two : lahPolynomial ℚ 2 = 2 * X + X ^ 2 := by
+  norm_num [lahPolynomial, Finset.sum_range_succ, lahNumber, map_ofNat]
 
 /-- `A_3(z) = 6z + 6z^2 + z^3`. -/
-theorem lahPolynomial_three : lahPolynomial 3 = 6 * X + 6 * X ^ 2 + X ^ 3 := by
-  simp only [lahPolynomial, lahCoefficient, Finset.sum_range_succ, Finset.sum_range_zero]
-  norm_num [Nat.factorial, Nat.choose, map_ofNat]
+theorem lahPolynomial_three : lahPolynomial ℚ 3 = 6 * X + 6 * X ^ 2 + X ^ 3 := by
+  norm_num [lahPolynomial, Finset.sum_range_succ, lahNumber, map_ofNat]
 
 /-- `A_4(z) = 24z + 36z^2 + 12z^3 + z^4`. -/
-theorem lahPolynomial_four : lahPolynomial 4 = 24 * X + 36 * X ^ 2 + 12 * X ^ 3 + X ^ 4 := by
-  simp only [lahPolynomial, lahCoefficient, Finset.sum_range_succ, Finset.sum_range_zero]
-  norm_num [Nat.factorial, Nat.choose, map_ofNat]
+theorem lahPolynomial_four : lahPolynomial ℚ 4 = 24 * X + 36 * X ^ 2 + 12 * X ^ 3 + X ^ 4 := by
+  norm_num [lahPolynomial, Finset.sum_range_succ, lahNumber, map_ofNat]
 
 /-- `A_6(z) = 720z + 1800z^2 + 1200z^3 + 300z^4 + 30z^5 + z^6`. -/
-theorem lahPolynomial_six :
-    lahPolynomial 6 = 720 * X + 1800 * X ^ 2 + 1200 * X ^ 3 + 300 * X ^ 4 + 30 * X ^ 5 + X ^ 6 := by
-  simp only [lahPolynomial, lahCoefficient, Finset.sum_range_succ, Finset.sum_range_zero]
-  norm_num [Nat.factorial, Nat.choose, map_ofNat]
+theorem lahPolynomial_six : lahPolynomial ℚ 6 =
+    720 * X + 1800 * X ^ 2 + 1200 * X ^ 3 + 300 * X ^ 4 + 30 * X ^ 5 + X ^ 6 := by
+  norm_num [lahPolynomial, Finset.sum_range_succ, lahNumber, map_ofNat]
 
 /-! ## The connectivity cumulants of the table -/
 

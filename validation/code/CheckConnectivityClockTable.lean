@@ -7,8 +7,6 @@ import Descent.Pangenome.GraphCoalescent.ConnectivityClockTable
 
 open Descent.Pangenome.GraphCoalescent.ConnectivityClockTable
 
-#print axioms lahCoefficient
-#print axioms lahPolynomial
 #print axioms connectivityCumulantTwo
 #print axioms connectivityCumulantThree
 #print axioms rankedWeight
