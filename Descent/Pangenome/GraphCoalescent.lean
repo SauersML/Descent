@@ -22,6 +22,7 @@ import Descent.Pangenome.GraphCoalescent.LumpingUnorderedPair
 import Descent.Pangenome.GraphCoalescent.LumpingVisibleRates
 import Descent.Pangenome.GraphCoalescent.MergerDepth
 import Descent.Pangenome.GraphCoalescent.MinimalRefinement
+import Descent.Pangenome.GraphCoalescent.MobiusTies
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceClosure
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceGenerator
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceLoads
