@@ -22,11 +22,12 @@ portability of a score (`Descent.Portability.EndToEndPortabilityLaw.expectedPort
 when the left factor acts locally (`RowsLocal.mul`, `RowsAgreeOn.mul`), and vectors equal over `A`
 stay equal over `A` (`mulVec_eq_of_rowsAgreeOn`).
 
-An epoch propagator acts locally (`rowsLocal_matrixExponential`), and two propagators whose
-generators agree on the rows over `A` agree on the rows over `A`
-(`rowsAgreeOn_matrixExponential`). Both follow from the block intertwining
-`localRestriction_mul_matrixExponential`. A pulse only relabels demes, so its substitution kernel
-acts locally (`rowsLocal_pulseKernel`).
+The row of an epoch propagator at a configuration over `A` is read through the block of
+configurations over `A` (`matrixExponential_apply_eq_local`), by the block intertwining
+`localRestriction_mul_matrixExponential`. So an epoch propagator acts locally
+(`rowsLocal_matrixExponential`), and two propagators whose generators agree on the rows over `A`
+agree on the rows over `A` (`rowsAgreeOn_matrixExponential`). A pulse only relabels demes, so its
+substitution kernel acts locally (`rowsLocal_pulseKernel`).
 
 ## Histories
 
@@ -70,8 +71,8 @@ not covered here. The model is NOTE1's neutral model; selection is not covered.
 ## Empirical status
 
 None. The bodies here are finite sums of supplied rates and mixture weights, matrix exponentials of
-supplied rate tables, and integrals of polynomials against Markov kernels, so no measurement can bear
-on them.
+supplied rate tables, and integrals of polynomials against Markov kernels, so no measurement can
+bear on them.
 -/
 
 namespace Descent.Portability.HistoryExactLocality
@@ -91,7 +92,8 @@ noncomputable section
 
 /-! ### Matrices that act locally -/
 
-/-- **A moment matrix acts locally on `A`**: its rows at configurations over `A` vanish off them. -/
+/-- **A moment matrix acts locally on `A`**: its rows at configurations over `A` vanish off
+them. -/
 def RowsLocal (A : Finset Locus) {capacity : Locus → ℕ}
     (P : Matrix (BudgetConfiguration Deme Locus Allele capacity)
       (BudgetConfiguration Deme Locus Allele capacity) ℝ) : Prop :=
@@ -161,39 +163,49 @@ theorem mulVec_eq_of_rowsAgreeOn {A : Finset Locus} {capacity : Locus → ℕ}
 
 /-! ### The events of a history -/
 
+/-- The row of an epoch propagator at a configuration over `A` is read through the block of
+configurations over `A`. -/
+theorem matrixExponential_apply_eq_local (rates : NeutralRates Deme Locus Allele)
+    (capacity : Locus → ℕ) (A : Finset Locus) (t : ℝ)
+    {ξ : BudgetConfiguration Deme Locus Allele capacity} (hξ : LociWithin A ξ.1)
+    (η : BudgetConfiguration Deme Locus Allele capacity) :
+    matrixExponential (dualGenerator rates capacity) t ξ η =
+      ∑ s : LocalConfiguration Deme Locus Allele capacity A,
+        matrixExponential (localGenerator rates capacity A) t ⟨ξ, hξ⟩ s *
+          localRestriction capacity A s η := by
+  have h := congrFun (congrFun
+    (localRestriction_mul_matrixExponential rates capacity A t) ⟨ξ, hξ⟩) η
+  rw [Matrix.mul_apply, Matrix.mul_apply] at h
+  have hleft : ∑ ζ, localRestriction capacity A ⟨ξ, hξ⟩ ζ *
+      matrixExponential (dualGenerator rates capacity) t ζ η =
+        matrixExponential (dualGenerator rates capacity) t ξ η := by
+    simp [localRestriction]
+  exact hleft.symm.trans h
+
 /-- **An epoch propagator acts locally.** -/
 theorem rowsLocal_matrixExponential (rates : NeutralRates Deme Locus Allele)
     (capacity : Locus → ℕ) (A : Finset Locus) (t : ℝ) :
     RowsLocal A (matrixExponential (dualGenerator rates capacity) t) := by
   intro ξ η hξ hη
-  have h := congrFun (congrFun
-    (localRestriction_mul_matrixExponential rates capacity A t) ⟨ξ, hξ⟩) η
-  rw [Matrix.mul_apply, Matrix.mul_apply] at h
-  simp only [localRestriction, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ,
-    ↓reduceIte] at h
-  rw [h]
+  rw [matrixExponential_apply_eq_local rates capacity A t hξ η]
   exact Finset.sum_eq_zero fun s' _ ↦ by
+    simp only [localRestriction]
     rw [if_neg fun (heq : η = s'.1) ↦ hη (heq ▸ s'.2), mul_zero]
 
-/-- **Epoch propagators whose generators agree on the rows over `A` agree on the rows over `A`.** -/
+/-- **Epoch propagators whose generators agree on the rows over `A` agree on the rows over
+`A`.** -/
 theorem rowsAgreeOn_matrixExponential {rates rates' : NeutralRates Deme Locus Allele}
     {capacity : Locus → ℕ} {A : Finset Locus}
     (hrow : ∀ ξ η : BudgetConfiguration Deme Locus Allele capacity, LociWithin A ξ.1 →
       dualGenerator rates capacity ξ η = dualGenerator rates' capacity ξ η) (t : ℝ) :
     RowsAgreeOn A (matrixExponential (dualGenerator rates capacity) t)
       (matrixExponential (dualGenerator rates' capacity) t) := by
-  intro ξ η hξ
   have hgen : localGenerator rates capacity A = localGenerator rates' capacity A := by
     ext s s'
     exact hrow s.1 s'.1 s.2
-  have h := congrFun (congrFun
-    (localRestriction_mul_matrixExponential rates capacity A t) ⟨ξ, hξ⟩) η
-  have h' := congrFun (congrFun
-    (localRestriction_mul_matrixExponential rates' capacity A t) ⟨ξ, hξ⟩) η
-  rw [Matrix.mul_apply, Matrix.mul_apply] at h h'
-  simp only [localRestriction, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ,
-    ↓reduceIte] at h h'
-  rw [h, h', hgen]
+  intro ξ η hξ
+  rw [matrixExponential_apply_eq_local rates capacity A t hξ η,
+    matrixExponential_apply_eq_local rates' capacity A t hξ η, hgen]
 
 /-- A pulse relabels demes only, so it relabels a configuration over `A` into one over `A`. -/
 theorem lociWithin_relabelCarriers {A : Finset Locus}
@@ -201,15 +213,13 @@ theorem lociWithin_relabelCarriers {A : Finset Locus}
     (choice : Fin ξ.toList.length → Deme) : LociWithin A (relabelCarriers ξ.toList choice) := by
   intro τ hτ
   obtain ⟨k, _, rfl⟩ := Multiset.mem_map.mp hτ
-  exact hξ _ (Multiset.mem_toList.mp (List.get_mem _ _))
+  exact hξ _ (Multiset.mem_toList.mp (List.get_mem _ k))
 
 /-- **A pulse acts locally.** -/
 theorem rowsLocal_pulseKernel (pulse : PulseMatrix Deme) (capacity : Locus → ℕ)
     (A : Finset Locus) : RowsLocal A (pulseKernel (Allele := Allele) pulse capacity) := by
   intro ξ η hξ hη
-  show ∑ choice : Fin ξ.1.toList.length → Deme,
-    (if relabelCarriers ξ.1.toList choice = η.1 then choiceWeight pulse ξ.1.toList choice
-      else 0) = 0
+  simp only [pulseKernel]
   exact Finset.sum_eq_zero fun choice _ ↦
     if_neg fun (heq : relabelCarriers ξ.1.toList choice = η.1) ↦
       hη (heq ▸ lociWithin_relabelCarriers hξ choice)
@@ -298,7 +308,9 @@ theorem rowsAgreeOn_historyEventPropagator (capacity : Locus → ℕ) (A : Finse
     exact ih.mul (rowsLocal_historyEventPropagator capacity A _)
       (rowsAgreeOn_eventPropagator capacity A _ _ hevent)
 
-/-- **Histories that agree on `A` carry vectors equal over `A` to vectors equal over `A`.** -/
+/-- **Histories that agree on `A` carry vectors equal over `A` to vectors equal over `A`.**
+
+Assumes: the histories agree on `A` event by event (`h`), and the vectors agree over `A` (`hv`). -/
 theorem historyEventPropagator_mulVec_eq_of_agreeOn (capacity : Locus → ℕ) (A : Finset Locus)
     {first second : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme)}
     (h : List.Forall₂ (EventAgreeOn A capacity) first second)
@@ -312,7 +324,10 @@ theorem historyEventPropagator_mulVec_eq_of_agreeOn (capacity : Locus → ℕ) (
 
 /-- **Exact locality along a whole history.** For two histories of epochs, splits and pulses that
 agree on `A` event by event, started at states with equal configuration moments over `A`, the
-expected configuration moments at the end of the history agree at every configuration over `A`. -/
+expected configuration moments at the end of the history agree at every configuration over `A`.
+
+Assumes: the histories agree on `A` event by event (`h`), and the initial states have equal
+configuration moments over `A` (`hx`). -/
 theorem integral_momentPolynomial_historyEventKernel_eq_of_agreeOn (ℓ₀ : Locus)
     (hap₀ : FullHaplotype Locus Allele) (capacity : Locus → ℕ) (A : Finset Locus)
     {first second : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme)}
@@ -333,16 +348,28 @@ theorem integral_momentPolynomial_historyEventKernel_eq_of_agreeOn (ℓ₀ : Loc
 def ReadsLoci (A : Finset Locus) (f : FullHaplotype Locus Allele → ℝ) : Prop :=
   ∀ h h' : FullHaplotype Locus Allele, (∀ ℓ ∈ A, h ℓ = h' ℓ) → f h = f h'
 
+/-- A constant reads no alleles. -/
+theorem readsLoci_const (A : Finset Locus) (c : ℝ) :
+    ReadsLoci A fun _ : FullHaplotype Locus Allele ↦ c :=
+  fun _ _ _ ↦ rfl
+
 /-- A function of the allele at one locus of `A` reads only the alleles at `A`. -/
 theorem readsLoci_eval {A : Finset Locus} {ℓ₀ : Locus} (hℓ₀ : ℓ₀ ∈ A) (g : Allele ℓ₀ → ℝ) :
     ReadsLoci A fun hap : FullHaplotype Locus Allele ↦ g (hap ℓ₀) :=
-  fun h h' hh ↦ by rw [hh ℓ₀ hℓ₀]
+  fun _ _ hh ↦ congrArg g (hh ℓ₀ hℓ₀)
 
 /-- The polynomials spanned by the configuration moments of at most `k` carriers over `A`. -/
 def localMomentSpan (A : Finset Locus) (k : ℕ) :
     Submodule ℝ (FrequencyPolynomial Deme Locus Allele) :=
   Submodule.span ℝ {p | ∃ ξ : Multiset (PartialType Deme Locus Allele),
     LociWithin A ξ ∧ Multiset.card ξ ≤ k ∧ momentPolynomial ξ = p}
+
+/-- The moment of a configuration of at most `k` carriers over `A` lies in the local span. -/
+theorem momentPolynomial_mem_localMomentSpan {A : Finset Locus} {k : ℕ}
+    {ξ : Multiset (PartialType Deme Locus Allele)} (hξ : LociWithin A ξ)
+    (hcard : Multiset.card ξ ≤ k) : momentPolynomial ξ ∈ localMomentSpan A k := by
+  rw [localMomentSpan]
+  exact Submodule.mem_span_of_mem ⟨ξ, hξ, hcard, rfl⟩
 
 /-- The moment of a sum of configurations is the product of their moments. -/
 theorem momentPolynomial_add (ξ ζ : Multiset (PartialType Deme Locus Allele)) :
@@ -360,6 +387,7 @@ theorem mul_mem_localMomentSpan {A : Finset Locus} {j k : ℕ}
     (hq : q ∈ localMomentSpan A k) : p * q ∈ localMomentSpan A (j + k) := by
   have h := Submodule.mul_mem_mul hp hq
   rw [localMomentSpan, localMomentSpan, Submodule.span_mul_span] at h
+  rw [localMomentSpan]
   refine Submodule.span_mono ?_ h
   rintro _ ⟨_, ⟨ξ, hξ, hcard, rfl⟩, _, ⟨ζ, hζ, hcard', rfl⟩, rfl⟩
   exact ⟨ξ + ζ, lociWithin_add.mpr ⟨hξ, hζ⟩, by rw [Multiset.card_add]; omega,
@@ -389,11 +417,11 @@ theorem satisfies_localType_iff (deme : Deme) {A : Finset Locus} (hA : A.Nonempt
     Satisfies (localType deme hA h).allele h' ↔ ∀ ℓ ∈ A, h' ℓ = h ℓ := by
   constructor
   · intro hs ℓ hℓ
-    have hcase := hs ℓ
-    simp only [localType, if_pos hℓ] at hcase
-    rcases hcase with hnone | hsome
-    · exact absurd hnone (by simp)
-    · exact (Option.some.inj hsome).symm
+    rcases hs ℓ with hnone | hsome
+    · simp [localType, hℓ] at hnone
+    · have hval : some (h ℓ) = some (h' ℓ) := by
+        simpa only [localType, if_pos hℓ] using hsome
+      exact (Option.some.inj hval).symm
   · intro hagree ℓ
     by_cases hℓ : ℓ ∈ A
     · right
@@ -407,51 +435,49 @@ by their alleles at `A`, the haplotype frequencies sum to one-carrier marginal f
 theorem expectation_mem_localMomentSpan (deme : Deme) {A : Finset Locus} (hA : A.Nonempty)
     {f : FullHaplotype Locus Allele → ℝ} (hf : ReadsLoci A f) :
     rename (fun hap ↦ (deme, hap)) (expectationPolynomial f) ∈ localMomentSpan A 1 := by
-  haveI : Fintype (PartialType Deme Locus Allele) := Fintype.ofFinite _
+  classical
   simp only [expectationPolynomial, map_sum, map_mul, rename_C, rename_X]
-  rw [← Finset.sum_fiberwise Finset.univ (localType deme hA)
-    fun hap ↦ (C (f hap) * X (deme, hap) : FrequencyPolynomial Deme Locus Allele)]
-  refine (localMomentSpan A 1).sum_mem fun t _ ↦ ?_
-  by_cases hne : ∃ h₀, localType deme hA h₀ = t
-  · obtain ⟨h₀, rfl⟩ := hne
-    have hfiber : ∀ hap, localType deme hA hap = localType deme hA h₀ ↔
-        ∀ ℓ ∈ A, hap ℓ = h₀ ℓ := by
-      intro hap
-      constructor
-      · intro heq ℓ hℓ
-        have hallele := congrFun (congrArg PartialType.allele heq) ℓ
-        simp only [localType, if_pos hℓ] at hallele
-        exact Option.some.inj hallele
-      · intro hagree
-        refine PartialType.eq_of_fields rfl (funext fun ℓ ↦ ?_)
-        by_cases hℓ : ℓ ∈ A
-        · simp only [localType, if_pos hℓ, hagree ℓ hℓ]
-        · simp only [localType, if_neg hℓ]
-    have hvalue : ∀ hap ∈ Finset.univ.filter fun hap ↦ localType deme hA hap = localType deme hA h₀,
-        (C (f hap) * X (deme, hap) : FrequencyPolynomial Deme Locus Allele) =
-          C (f h₀) * X (deme, hap) := by
-      intro hap hhap
-      rw [hf hap h₀ ((hfiber hap).mp (Finset.mem_filter.mp hhap).2)]
-    have hmarginal : ∑ hap ∈ Finset.univ.filter
-        fun hap ↦ localType deme hA hap = localType deme hA h₀,
-          (X (deme, hap) : FrequencyPolynomial Deme Locus Allele) =
-        momentPolynomial {localType deme hA h₀} := by
-      rw [momentPolynomial_singleton, marginalPolynomial, assignmentPolynomial]
-      refine Finset.sum_congr (Finset.filter_congr fun hap _ ↦ ?_) fun _ _ ↦ rfl
-      rw [hfiber, satisfies_localType_iff]
-    rw [Finset.sum_congr rfl hvalue, ← Finset.mul_sum, hmarginal, ← MvPolynomial.algebraMap_eq,
-      ← Algebra.smul_def]
-    exact (localMomentSpan A 1).smul_mem (f h₀)
-      (Submodule.subset_span ⟨{localType deme hA h₀}, lociWithin_localType deme hA h₀, by simp,
-        rfl⟩)
-  · rw [Finset.sum_eq_zero fun hap hhap ↦ absurd ⟨hap, (Finset.mem_filter.mp hhap).2⟩ hne]
-    exact (localMomentSpan A 1).zero_mem
+  rw [← Finset.sum_fiberwise_of_maps_to
+    (fun hap _ ↦ Finset.mem_image_of_mem (localType deme hA) (Finset.mem_univ hap))]
+  refine (localMomentSpan A 1).sum_mem fun t ht ↦ ?_
+  obtain ⟨h₀, _, rfl⟩ := Finset.mem_image.mp ht
+  have hfiber : ∀ hap, localType deme hA hap = localType deme hA h₀ ↔
+      ∀ ℓ ∈ A, hap ℓ = h₀ ℓ := by
+    intro hap
+    constructor
+    · intro heq ℓ hℓ
+      have hallele := congrFun (congrArg PartialType.allele heq) ℓ
+      have hval : some (hap ℓ) = some (h₀ ℓ) := by
+        simpa only [localType, if_pos hℓ] using hallele
+      exact Option.some.inj hval
+    · intro hagree
+      refine PartialType.eq_of_fields rfl (funext fun ℓ ↦ ?_)
+      by_cases hℓ : ℓ ∈ A
+      · simp only [localType, if_pos hℓ, hagree ℓ hℓ]
+      · simp only [localType, if_neg hℓ]
+  have hvalue : ∀ hap ∈ Finset.univ.filter
+      fun hap ↦ localType deme hA hap = localType deme hA h₀,
+      (C (f hap) * X (deme, hap) : FrequencyPolynomial Deme Locus Allele) =
+        C (f h₀) * X (deme, hap) := by
+    intro hap hhap
+    rw [hf hap h₀ ((hfiber hap).mp (Finset.mem_filter.mp hhap).2)]
+  have hmarginal : ∑ hap ∈ Finset.univ.filter
+      fun hap ↦ localType deme hA hap = localType deme hA h₀,
+        (X (deme, hap) : FrequencyPolynomial Deme Locus Allele) =
+      momentPolynomial {localType deme hA h₀} := by
+    rw [momentPolynomial_singleton, marginalPolynomial, assignmentPolynomial]
+    refine Finset.sum_congr (Finset.filter_congr fun hap _ ↦ ?_) fun _ _ ↦ rfl
+    rw [hfiber, satisfies_localType_iff]
+  rw [Finset.sum_congr rfl hvalue, ← Finset.mul_sum, hmarginal, MvPolynomial.C_mul']
+  exact (localMomentSpan A 1).smul_mem (f h₀)
+    (momentPolynomial_mem_localMomentSpan (lociWithin_localType deme hA h₀) (by simp))
 
 /-- The covariance polynomial of two functions of the alleles at `A` is local, of two carriers. -/
 theorem covariance_mem_localMomentSpan (deme : Deme) {A : Finset Locus} (hA : A.Nonempty)
     {f g : FullHaplotype Locus Allele → ℝ} (hf : ReadsLoci A f) (hg : ReadsLoci A g) :
     rename (fun hap ↦ (deme, hap)) (covariancePolynomial f g) ∈ localMomentSpan A 2 := by
   have hfg : ReadsLoci A fun hap ↦ f hap * g hap := fun h h' hh ↦ by
+    show f h * g h = f h' * g h'
     rw [hf h h' hh, hg h h' hh]
   rw [covariancePolynomial, map_sub, map_mul]
   exact (localMomentSpan A 2).sub_mem
@@ -467,7 +493,7 @@ theorem numeratorPolynomial_mem_localMomentSpan (deme : Deme) {A : Finset Locus}
     numeratorPolynomial deme score outcome ∈ localMomentSpan A 4 := by
   have hcov := covariance_mem_localMomentSpan deme hA hS hY
   rw [numeratorPolynomial, demePolynomial, correlationNumeratorPolynomial, map_mul, rename_C,
-    map_pow, pow_two, ← MvPolynomial.algebraMap_eq, ← Algebra.smul_def]
+    map_pow, pow_two, MvPolynomial.C_mul']
   exact (localMomentSpan A 4).smul_mem 16 (mul_mem_localMomentSpan hcov hcov)
 
 /-- **The correlation denominator of a score and outcome that read only `A` is local**, of at most
@@ -477,12 +503,15 @@ theorem denominatorPolynomial_mem_localMomentSpan (deme : Deme) {A : Finset Locu
     (hS : ReadsLoci A score) (hY : ReadsLoci A outcome) :
     denominatorPolynomial deme score outcome ∈ localMomentSpan A 4 := by
   rw [denominatorPolynomial, demePolynomial, correlationDenominatorPolynomial, map_mul, rename_C,
-    map_mul, ← MvPolynomial.algebraMap_eq, ← Algebra.smul_def]
+    map_mul, MvPolynomial.C_mul']
   exact (localMomentSpan A 4).smul_mem 16
     (mul_mem_localMomentSpan (covariance_mem_localMomentSpan deme hA hS hS)
       (covariance_mem_localMomentSpan deme hA hY hY))
 
-/-- **Measures with equal local moments integrate local polynomials equally.** -/
+/-- **Measures with equal local moments integrate local polynomials equally.**
+
+Assumes: the two finite measures integrate the moments of at most `k` carriers over `A` equally
+(`hmoment`). -/
 theorem integral_eq_of_mem_localMomentSpan {A : Finset Locus} {k : ℕ}
     (μ₁ μ₂ : Measure (FrequencyState Deme Locus Allele)) [IsFiniteMeasure μ₁]
     [IsFiniteMeasure μ₂]
@@ -493,8 +522,9 @@ theorem integral_eq_of_mem_localMomentSpan {A : Finset Locus} {k : ℕ}
     {p : FrequencyPolynomial Deme Locus Allele} (hp : p ∈ localMomentSpan A k) :
     ∫ y, polynomialFunction p y ∂μ₁ = ∫ y, polynomialFunction p y ∂μ₂ := by
   have hint : ∀ (μ : Measure (FrequencyState Deme Locus Allele)) [IsFiniteMeasure μ]
-      (q : FrequencyPolynomial Deme Locus Allele), Integrable (fun y ↦ eval y.1 q) μ :=
-    fun μ _ q ↦ (BoundedContinuousFunction.mkOfCompact (polynomialFunction q)).integrable μ
+      (q : FrequencyPolynomial Deme Locus Allele), Integrable (fun y ↦ eval y.1 q) μ := by
+    intro μ _ q
+    exact (BoundedContinuousFunction.mkOfCompact (polynomialFunction q)).integrable μ
   rw [localMomentSpan] at hp
   induction hp using Submodule.span_induction with
   | mem q hq =>
@@ -505,20 +535,23 @@ theorem integral_eq_of_mem_localMomentSpan {A : Finset Locus} {k : ℕ}
     simp only [polynomialFunction_apply, map_add] at hq hr ⊢
     rw [integral_add (hint μ₁ q) (hint μ₁ r), integral_add (hint μ₂ q) (hint μ₂ r), hq, hr]
   | smul c q _ hq =>
-    simp only [polynomialFunction_apply, Algebra.smul_def, MvPolynomial.algebraMap_eq, map_mul,
-      eval_C, integral_const_mul] at hq ⊢
+    simp only [polynomialFunction_apply, smul_eq_C_mul, map_mul, eval_C, integral_const_mul]
+      at hq ⊢
     rw [hq]
 
 /-- **End-to-end portability sees only the loci of the score.** For a score and an outcome that
 read only a nonempty set of loci `A`, two histories of epochs, splits and pulses that agree on `A`
 event by event, from states with equal budget-4 configuration moments over `A`, have equal expected
-portability between every source and target. -/
+portability between every source and target.
+
+Assumes: `A` is nonempty (`hA`), the histories agree on `A` event by event (`h`), the initial
+budget-4 moments over `A` agree (`hx`), and the score and outcome read only `A` (`hS`, `hY`). -/
 theorem expectedPortability_eq_of_agreeOn (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele)
     {A : Finset Locus} (hA : A.Nonempty)
     {first second : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme)}
-    (h : List.Forall₂ (EventAgreeOn A fun _ ↦ 4) first second)
+    (h : List.Forall₂ (EventAgreeOn A (fun _ ↦ 4)) first second)
     {x₁ x₂ : FrequencyState Deme Locus Allele}
-    (hx : ∀ ξ : BudgetConfiguration Deme Locus Allele fun _ ↦ 4, LociWithin A ξ.1 →
+    (hx : ∀ ξ : BudgetConfiguration Deme Locus Allele (fun _ ↦ 4), LociWithin A ξ.1 →
       budgetMomentFeature (fun _ ↦ 4) x₁ ξ = budgetMomentFeature (fun _ ↦ 4) x₂ ξ)
     (source target : Deme) {score outcome : FullHaplotype Locus Allele → ℝ}
     (hS : ReadsLoci A score) (hY : ReadsLoci A outcome) :
@@ -532,7 +565,7 @@ theorem expectedPortability_eq_of_agreeOn (ℓ₀ : Locus) (hap₀ : FullHaploty
           ∫ y, polynomialFunction (momentPolynomial ξ) y
             ∂(historyEventKernel ℓ₀ hap₀ second x₂) := by
     intro ξ hξ hcard
-    have hbudget : WithinBudget (fun _ ↦ 4) ξ := fun _ ↦ (Multiset.countP_le_card ..).trans hcard
+    have hbudget : WithinBudget (fun _ ↦ 4) ξ := fun _ ↦ (Multiset.countP_le_card ξ).trans hcard
     exact integral_momentPolynomial_historyEventKernel_eq_of_agreeOn ℓ₀ hap₀ (fun _ ↦ 4) A h hx
       (ξ := ⟨ξ, hbudget⟩) hξ
   have hpoly : ∀ p ∈ localMomentSpan A 4,
