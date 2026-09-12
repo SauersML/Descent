@@ -123,8 +123,17 @@ theorem sum_prod_mul_comp_injective {ι κ : Type*} [Fintype ι] [DecidableEq ι
     intro x y
     calc (if (fun j ↦ x (c j)) = y then (1 : ℝ) else 0)
         = ∏ j, (if x (c j) = y j then (1 : ℝ) else 0) := by
-          rw [Fintype.prod_boole]
-          exact if_congr funext_iff rfl rfl
+          by_cases h : (fun j ↦ x (c j)) = y
+          · rw [if_pos h]
+            exact (prod_eq_one (f := fun j ↦ if x (c j) = y j then (1 : ℝ) else 0)
+              fun j _ ↦ if_pos (congrFun h j)).symm
+          · rw [if_neg h]
+            obtain ⟨j, hj⟩ : ∃ j, x (c j) ≠ y j := by
+              by_contra hne
+              push_neg at hne
+              exact h (funext hne)
+            exact (prod_eq_zero (f := fun j ↦ if x (c j) = y j then (1 : ℝ) else 0)
+              (mem_univ j) (if_neg hj)).symm
       _ = ∏ i, ∏ j ∈ univ.filter (fun j ↦ c j = i), (if x (c j) = y j then (1 : ℝ) else 0) :=
           (prod_fiberwise_of_maps_to (fun j _ ↦ mem_univ (c j)) _).symm
       _ = ∏ i, ∏ j ∈ univ.filter (fun j ↦ c j = i), (if x i = y j then (1 : ℝ) else 0) :=
@@ -536,9 +545,19 @@ theorem sum_prod_annotatedLaw_sources (G : CheckingGraph V) {N : ℕ} (hN : N �
         = ∑ y : Fin n → Fin N × (V → Bool),
             ∏ j, (annotatedLaw G N k pop (y j) * (if (y j).1 = s j then (1 : ℝ) else 0)) := by
           refine sum_congr rfl fun y _ ↦ ?_
-          rw [prod_mul_distrib, Fintype.prod_boole]
+          rw [prod_mul_distrib]
           congr 1
-          exact if_congr funext_iff rfl rfl
+          by_cases hy : (fun j ↦ (y j).1) = s
+          · rw [if_pos hy]
+            exact (prod_eq_one (f := fun j ↦ if (y j).1 = s j then (1 : ℝ) else 0)
+              fun j _ ↦ if_pos (congrFun hy j)).symm
+          · rw [if_neg hy]
+            obtain ⟨j, hj⟩ : ∃ j, (y j).1 ≠ s j := by
+              by_contra hne
+              push_neg at hne
+              exact hy (funext hne)
+            exact (prod_eq_zero (f := fun j ↦ if (y j).1 = s j then (1 : ℝ) else 0)
+              (mem_univ j) (if_neg hj)).symm
       _ = ∏ j, ∑ q : Fin N × (V → Bool),
             annotatedLaw G N k pop q * (if q.1 = s j then (1 : ℝ) else 0) :=
           (Fintype.prod_sum fun j q ↦
@@ -550,7 +569,7 @@ theorem sum_prod_annotatedLaw_sources (G : CheckingGraph V) {N : ℕ} (hN : N �
               = ∑ t : Fin N, (∑ z : V → Bool, annotatedLaw G N k pop (t, z)) *
                   (if t = s j then (1 : ℝ) else 0) := by
                 rw [Fintype.sum_prod_type]
-                exact sum_congr rfl fun t _ ↦ (sum_mul _ _ _).symm
+                exact sum_congr rfl fun t _ ↦ by simp only [sum_mul]
             _ = (N : ℝ)⁻¹ := by
                 simp only [sum_annotatedLaw_snd G hN k pop, mul_boole, sum_ite_eq', mem_univ,
                   ↓reduceIte]
