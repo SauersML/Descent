@@ -5,6 +5,7 @@ import Descent.Pangenome.GraphCoalescent.ConnectionClockPathDynkin
 import Descent.Pangenome.GraphCoalescent.BalancedFiberExtremum
 import Descent.Pangenome.GraphCoalescent.ConnectionClockHittingLaw
 import Descent.Pangenome.GraphCoalescent.ConnectionClockHittingTime
+import Descent.Pangenome.GraphCoalescent.ConnectionClockLowerBound
 import Descent.Pangenome.GraphCoalescent.ConnectionClockPathLaw
 import Descent.Pangenome.GraphCoalescent.ConnectionClockStochasticOrder
 import Descent.Pangenome.GraphCoalescent.CoarsestRefinement
@@ -14,6 +15,7 @@ import Descent.Pangenome.GraphCoalescent.ConnectivityCumulantCorpus
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulantDegree
 import Descent.Pangenome.GraphCoalescent.Conservation
 import Descent.Pangenome.GraphCoalescent.Deficit
+import Descent.Pangenome.GraphCoalescent.EdgeClockConnectionLaw
 import Descent.Pangenome.GraphCoalescent.EstimatorSign
 import Descent.Pangenome.GraphCoalescent.FirstConnectionLaw
 import Descent.Pangenome.GraphCoalescent.HiddenClockExample
@@ -57,6 +59,7 @@ import Descent.Pangenome.GraphCoalescent.ReportedConnectionTies
 import Descent.Pangenome.GraphCoalescent.ShortTimeConnectionLaw
 import Descent.Pangenome.GraphCoalescent.TwoComponentSurvival
 import Descent.Pangenome.GraphCoalescent.ScaledConnectionLimit
+import Descent.Pangenome.GraphCoalescent.UniformizationIdentity
 import Descent.Pangenome.GraphCoalescent.Visibility
 import Descent.Pangenome.GraphCoalescent.VisibleIntensityClock
 import Descent.Pangenome.GraphCoalescent.WidthProfile
