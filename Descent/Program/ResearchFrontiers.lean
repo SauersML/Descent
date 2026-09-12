@@ -12,6 +12,10 @@ import Descent.Pangenome.GraphCoalescent.CompressionLoadAchievability
 import Descent.Pangenome.AncestralLocality.SelectionClosure
 import Descent.Portability.PortabilityTwoHistoryInstance
 import Descent.Portability.EndToEndPortabilityLipschitz
+import Descent.Portability.PortabilityMetricCompilation
+import Descent.Portability.PortabilityLightCone
+import Descent.Portability.EndToEndCorrelationSeries
+import Descent.Pangenome.GraphCoalescent.ReportNonMarkovFromSingletons
 
 namespace Descent.Program
 
@@ -56,7 +60,26 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   `(∫₀ᵀ ‖Q₁ - Q₂‖) e^{∫‖Q₁‖} e^{∫‖Q₂‖}`
   (`EndToEndPortabilityLipschitz.norm_rateHistoryDualPropagator_sub_le`), and so does expected
   portability, up to `1/δ⁴` where the denominators stay above `δ`
-  (`abs_expectedPortability_sub_le`).
+  (`abs_expectedPortability_sub_le`). The metric side is explicit: the squared correlation, the
+  calibration slope and the portability ratio are rational functions of five second moments, with
+  explicit Lipschitz constants on the realization body
+  (`PortabilityMetricCompilation.squaredCorrelation_eq_compiled`,
+  `abs_compiledPortabilityRatio_sub_le`, `abs_crossRatio_sub_le`). The expected squared correlation
+  itself, not only the ratio of expectations, is the series
+  `Σ_k c_k ⬝ (U · H_{4(k+1)}(x₀))` (`EndToEndCorrelationSeries.expectedSquaredCorrelation_eq_tsum`,
+  `expectedSquaredCorrelation_historyEventKernel`), so it too depends on the history only through
+  propagated moments (`expectedSquaredCorrelation_eq_of_moments_eq`).
+* Neutral portability is exactly local: `PortabilityLightCone`. No dual transition adds a locus,
+  so configurations on loci within `A` are invariant (`dualTransitions_lociWithin`), and two
+  neutral models that agree on the rates of `A` give the same expected moments on `A` at every time
+  (`expectedMomentVector_eq_of_agreeOn`): the report of a score on `A` does not depend on the model
+  outside `A` at all.
+* The compressed report is not Markov from the singletons: `ReportNonMarkovFromSingletons`. For an
+  interface of width `2 ≤ w < n`, no time-homogeneous transition law on reports reproduces the law
+  of the report history of Kingman's jump chain from the singletons (`not_isReportMarkovFromBot`),
+  while an injective interface gives a Markov report (`isReportMarkovFromBot_of_injective`); on
+  three haplotypes the report stays put with probability `1/3` after one step and `0` after two
+  (`example_stay_given_one`, `example_stay_given_two`).
 * Selection and hereditary closure: `SelectionClosure`. Selection size-biases the parents
   (`selectedReproduce_eq`); the closure predicting the selected next generation is the closure of
   the observation joined with fitness, the greatest autonomous partition below the observation on
