@@ -31,3 +31,9 @@ open Descent.Pangenome.GraphCoalescent.KilledSurvivalMean
 #print axioms integral_survival_two_one
 #print axioms integral_survival_two_one_eq_integral_exampleSurvival
 #print axioms three_clocks_differ_survival
+#print axioms eq_or_eq_of_two_components
+#print axioms blocks_eq_add_of_two_components
+#print axioms invisibleTarget_ne_of_not_rel
+#print axioms sum_covers_ite_invisibleTarget
+#print axioms meanConnectionTime_covers_split
+#print axioms meanConnectionTime_eq_loadMean

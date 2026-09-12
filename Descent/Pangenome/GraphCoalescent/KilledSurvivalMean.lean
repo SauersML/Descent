@@ -58,9 +58,15 @@ Loads `(2, 1)`: `loadMean_one_one`, `loadMean_two_one`, so `∫_0^∞ S_{2,1} = 
 `4/3` differ (`three_clocks_differ_survival`, from
 `HiddenClockExample.three_clocks_differ`).
 
-Not yet here: the identification of `loadMean` with the labeled first-step mean
-`VisibleIntensityClock.meanConnectionTime` at a coalescent state whose report has two components
-with those loads.
+## The labeled first-step mean
+
+`meanConnectionTime_eq_loadMean`: at a coalescent state whose report has two components, the mean
+connection time of `VisibleIntensityClock`, the first-step solution of the backward equation of
+Theorem C, is `loadMean` of the two hidden loads. Every cover is invisible in one of the two
+components or connects the report (`meanConnectionTime_covers_split`); the invisible covers into
+each component number `C(L, 2)` (`sum_covers_ite_invisibleTarget`), and the two loads add up to
+the block count (`blocks_eq_add_of_two_components`). So the integral of the killed survival
+function is the labeled mean connection time at every state with those loads.
 
 Scope, as in `TwoComponentSurvival`: the survival function is `α e^{tQ} 𝟙` of the killed generator;
 the continuous-time chain is not constructed as a process, and that the integral of its survival
@@ -446,6 +452,225 @@ theorem three_clocks_differ_survival :
       ∫ t in Set.Ioi 0, survival 2 1 t ≠ meanTransitTime 3 := by
   rw [integral_survival_two_one_eq_integral_exampleSurvival]
   exact three_clocks_differ
+
+/-! ### The labeled first-step mean -/
+
+section LabeledMean
+
+open scoped Classical
+
+/-- With two report components every component is the component of `x` or of `y`. -/
+theorem eq_or_eq_of_two_components {n : ℕ} {s : Fin n → Fin n} {ξ : ER n} {x y : Fin n}
+    (hxy : ¬(observed s ξ).r x y) (hr : blocks (observed s ξ) = 2)
+    (c : Quotient (observed s ξ)) :
+    c = Quotient.mk (observed s ξ) x ∨ c = Quotient.mk (observed s ξ) y := by
+  have hCD : Quotient.mk (observed s ξ) x ≠ Quotient.mk (observed s ξ) y :=
+    fun h ↦ hxy (Quotient.exact h)
+  by_contra hc
+  push_neg at hc
+  have hthree : #({Quotient.mk (observed s ξ) x, Quotient.mk (observed s ξ) y, c} :
+      Finset (Quotient (observed s ξ))) = 3 :=
+    card_eq_three.mpr ⟨_, _, _, hCD, hc.1.symm, hc.2.symm, rfl⟩
+  have hle := card_le_univ ({Quotient.mk (observed s ξ) x, Quotient.mk (observed s ξ) y, c} :
+    Finset (Quotient (observed s ξ)))
+  have hcard : Nat.card (Quotient (observed s ξ)) = 2 := hr
+  rw [hthree, ← Nat.card_eq_fintype_card, hcard] at hle
+  omega
+
+/-- With two report components the true block count is the sum of the two loads. -/
+theorem blocks_eq_add_of_two_components {n : ℕ} {s : Fin n → Fin n} {ξ : ER n} {x y : Fin n}
+    (hxy : ¬(observed s ξ).r x y) (hr : blocks (observed s ξ) = 2) :
+    (blocks ξ : ℝ) = hiddenLoad s ξ (Quotient.mk (observed s ξ) x) +
+      hiddenLoad s ξ (Quotient.mk (observed s ξ) y) := by
+  have hCD : Quotient.mk (observed s ξ) x ≠ Quotient.mk (observed s ξ) y :=
+    fun h ↦ hxy (Quotient.exact h)
+  have hsum : ∑ c, (hiddenLoad s ξ c : ℝ) = hiddenLoad s ξ (Quotient.mk (observed s ξ) x) +
+      hiddenLoad s ξ (Quotient.mk (observed s ξ) y) := by
+    refine sum_eq_add_of_mem _ _ (mem_univ _) (mem_univ _) hCD fun c _ hc ↦ ?_
+    rcases eq_or_eq_of_two_components hxy hr c with h | h
+    · exact absurd h hc.1
+    · exact absurd h hc.2
+  rw [← sum_hiddenLoad s ξ, Nat.cast_sum, hsum]
+
+/-- The invisible targets of two different components are different hidden states. -/
+theorem invisibleTarget_ne_of_not_rel {n : ℕ} (s : Fin n → Fin n) (ξ : ER n) {x y : Fin n}
+    (hxy : ¬(observed s ξ).r x y) :
+    invisibleTarget (hiddenState s ξ) x ≠ invisibleTarget (hiddenState s ξ) y := by
+  intro h
+  have hload := congrFun (congrArg Prod.snd h) x
+  change (if (observed s ξ).r x x then hiddenLoad s ξ (Quotient.mk (observed s ξ) x) - 1
+      else hiddenLoad s ξ (Quotient.mk (observed s ξ) x)) =
+    (if (observed s ξ).r y x then hiddenLoad s ξ (Quotient.mk (observed s ξ) x) - 1
+      else hiddenLoad s ξ (Quotient.mk (observed s ξ) x)) at hload
+  have hyx : ¬(observed s ξ).r y x := fun h ↦ hxy ((observed s ξ).iseqv.symm h)
+  rw [if_pos ((observed s ξ).iseqv.refl x), if_neg hyx] at hload
+  have hpos := hiddenLoad_pos s ξ (Quotient.mk (observed s ξ) x)
+  omega
+
+/-- **The covers into an invisible target.** A function constant on them sums over them to
+`C(L, 2)` times its value. -/
+theorem sum_covers_ite_invisibleTarget {n : ℕ} (s : Fin n → Fin n) (ξ : ER n) (z : Fin n)
+    (f : ER n → ℝ) {value : ℝ}
+    (hvalue : ∀ η, Covers ξ η → hiddenState s η = invisibleTarget (hiddenState s ξ) z →
+      f η = value) :
+    ∑ η ∈ univ.filter (fun η ↦ Covers ξ η),
+        (if hiddenState s η = invisibleTarget (hiddenState s ξ) z then f η else 0) =
+      ((hiddenLoad s ξ (Quotient.mk (observed s ξ) z)).choose 2 : ℝ) * value := by
+  rw [← sum_filter, filter_filter]
+  have hconst : ∀ η ∈ univ.filter (fun η ↦
+      Covers ξ η ∧ hiddenState s η = invisibleTarget (hiddenState s ξ) z), f η = value :=
+    fun η hη ↦ hvalue η (mem_filter.mp hη).2.1 (mem_filter.mp hη).2.2
+  rw [sum_congr rfl hconst, sum_const, nsmul_eq_mul, ← card_covers_invisibleTarget s ξ z]
+  congr 2
+  exact (Nat.subtype_card (univ.filter fun η ↦
+    Covers ξ η ∧ hiddenState s η = invisibleTarget (hiddenState s ξ) z)
+      fun η ↦ mem_filter.trans (and_iff_right (mem_univ η))).symm
+
+/-- **Every cover of a two-component state** is invisible in one of the two components, or it
+connects the report and the mean connection time vanishes there. -/
+theorem meanConnectionTime_covers_split {n : ℕ} (s : Fin n → Fin n) {ξ η : ER n} {x y : Fin n}
+    (hxy : ¬(observed s ξ).r x y) (hr : blocks (observed s ξ) = 2) (hcov : Covers ξ η) :
+    meanConnectionTime s η =
+      (if hiddenState s η = invisibleTarget (hiddenState s ξ) x then meanConnectionTime s η
+        else 0) +
+      (if hiddenState s η = invisibleTarget (hiddenState s ξ) y then meanConnectionTime s η
+        else 0) := by
+  have hne := invisibleTarget_ne_of_not_rel s ξ hxy
+  rcases hiddenState_of_covers s hcov with ⟨u, hu⟩ | ⟨u, v, huv, hvis⟩
+  · rcases eq_or_eq_of_two_components hxy hr (Quotient.mk (observed s ξ) u) with h | h
+    · have hstate : hiddenState s η = invisibleTarget (hiddenState s ξ) x :=
+        hu.trans (invisibleTarget_eq_of_rel s ξ (Quotient.exact h))
+      have hnot : ¬hiddenState s η = invisibleTarget (hiddenState s ξ) y :=
+        fun h' ↦ hne (hstate.symm.trans h')
+      rw [if_pos hstate, if_neg hnot, add_zero]
+    · have hstate : hiddenState s η = invisibleTarget (hiddenState s ξ) y :=
+        hu.trans (invisibleTarget_eq_of_rel s ξ (Quotient.exact h))
+      have hnot : ¬hiddenState s η = invisibleTarget (hiddenState s ξ) x :=
+        fun h' ↦ hne (h'.symm.trans hstate)
+      rw [if_neg hnot, if_pos hstate, zero_add]
+  · have hCD : Quotient.mk (observed s ξ) u ≠ Quotient.mk (observed s ξ) v :=
+      fun hq ↦ huv (Quotient.exact hq)
+    have hreport : observed s η = merge (observed s ξ) (Quotient.mk (observed s ξ) u)
+        (Quotient.mk (observed s ξ) v) := congrArg Prod.fst hvis
+    have hone : blocks (observed s η) ≤ 1 := by
+      have hblocks := (merge_covers (observed s ξ) hCD).2
+      rw [hreport]
+      omega
+    rw [meanConnectionTime_eq, if_pos hone]
+    simp
+
+/-- **The labeled first-step mean is the load mean.** At a coalescent state whose report has two
+components, the mean connection time of `VisibleIntensityClock`, the first-step solution of the
+backward equation, is `loadMean` of the two hidden loads; with `integral_survival_eq_loadMean` it
+is the integral of the killed survival function from those loads. -/
+theorem meanConnectionTime_eq_loadMean {n : ℕ} (s : Fin n → Fin n) (ξ : ER n) :
+    ∀ x y : Fin n, ¬(observed s ξ).r x y → blocks (observed s ξ) = 2 →
+      meanConnectionTime s ξ = loadMean (hiddenLoad s ξ (Quotient.mk (observed s ξ) x))
+        (hiddenLoad s ξ (Quotient.mk (observed s ξ) y)) := by
+  refine covers_induction (P := fun ξ ↦ ∀ x y : Fin n, ¬(observed s ξ).r x y →
+    blocks (observed s ξ) = 2 → meanConnectionTime s ξ =
+      loadMean (hiddenLoad s ξ (Quotient.mk (observed s ξ) x))
+        (hiddenLoad s ξ (Quotient.mk (observed s ξ) y))) (fun ξ ih ↦ ?_) ξ
+  intro x y hxy hr
+  have hyx : ¬(observed s ξ).r y x := fun h ↦ hxy ((observed s ξ).iseqv.symm h)
+  have hvalue_x : ∀ η, Covers ξ η → hiddenState s η = invisibleTarget (hiddenState s ξ) x →
+      meanConnectionTime s η = loadMean (hiddenLoad s ξ (Quotient.mk (observed s ξ) x) - 1)
+        (hiddenLoad s ξ (Quotient.mk (observed s ξ) y)) := by
+    intro η hcov hstate
+    have hreport : observed s η = observed s ξ := congrArg Prod.fst hstate
+    have hloads : ∀ z, hiddenLoad s η (Quotient.mk (observed s η) z) =
+        (invisibleTarget (hiddenState s ξ) x).2 z :=
+      fun z ↦ congrFun (congrArg Prod.snd hstate) z
+    have hxy' : ¬(observed s η).r x y := by
+      rw [hreport]
+      exact hxy
+    have hr' : blocks (observed s η) = 2 := by
+      rw [hreport]
+      exact hr
+    rw [ih η hcov x y hxy' hr', hloads x, hloads y]
+    show loadMean (if (observed s ξ).r x x then hiddenLoad s ξ (Quotient.mk (observed s ξ) x) - 1
+        else hiddenLoad s ξ (Quotient.mk (observed s ξ) x))
+      (if (observed s ξ).r x y then hiddenLoad s ξ (Quotient.mk (observed s ξ) y) - 1
+        else hiddenLoad s ξ (Quotient.mk (observed s ξ) y)) = _
+    rw [if_pos ((observed s ξ).iseqv.refl x), if_neg hxy]
+  have hvalue_y : ∀ η, Covers ξ η → hiddenState s η = invisibleTarget (hiddenState s ξ) y →
+      meanConnectionTime s η = loadMean (hiddenLoad s ξ (Quotient.mk (observed s ξ) x))
+        (hiddenLoad s ξ (Quotient.mk (observed s ξ) y) - 1) := by
+    intro η hcov hstate
+    have hreport : observed s η = observed s ξ := congrArg Prod.fst hstate
+    have hloads : ∀ z, hiddenLoad s η (Quotient.mk (observed s η) z) =
+        (invisibleTarget (hiddenState s ξ) y).2 z :=
+      fun z ↦ congrFun (congrArg Prod.snd hstate) z
+    have hxy' : ¬(observed s η).r x y := by
+      rw [hreport]
+      exact hxy
+    have hr' : blocks (observed s η) = 2 := by
+      rw [hreport]
+      exact hr
+    rw [ih η hcov x y hxy' hr', hloads x, hloads y]
+    show loadMean (if (observed s ξ).r y x then hiddenLoad s ξ (Quotient.mk (observed s ξ) x) - 1
+        else hiddenLoad s ξ (Quotient.mk (observed s ξ) x))
+      (if (observed s ξ).r y y then hiddenLoad s ξ (Quotient.mk (observed s ξ) y) - 1
+        else hiddenLoad s ξ (Quotient.mk (observed s ξ) y)) = _
+    rw [if_neg hyx, if_pos ((observed s ξ).iseqv.refl y)]
+  have hsubtype : ∑ η : {η : ER n // Covers ξ η}, meanConnectionTime s η.1 =
+      ∑ η ∈ univ.filter (fun η ↦ Covers ξ η), meanConnectionTime s η :=
+    (sum_subtype (univ.filter fun η ↦ Covers ξ η) (fun η ↦ by simp) _).symm
+  have hpoint : ∀ η ∈ univ.filter (fun η ↦ Covers ξ η), meanConnectionTime s η =
+      (if hiddenState s η = invisibleTarget (hiddenState s ξ) x then meanConnectionTime s η
+        else 0) +
+      (if hiddenState s η = invisibleTarget (hiddenState s ξ) y then meanConnectionTime s η
+        else 0) :=
+    fun η hη ↦ meanConnectionTime_covers_split s hxy hr (mem_filter.mp hη).2
+  have hsplit : ∑ η : {η : ER n // Covers ξ η}, meanConnectionTime s η.1 =
+      ((hiddenLoad s ξ (Quotient.mk (observed s ξ) x)).choose 2 : ℝ) *
+          loadMean (hiddenLoad s ξ (Quotient.mk (observed s ξ) x) - 1)
+            (hiddenLoad s ξ (Quotient.mk (observed s ξ) y)) +
+        ((hiddenLoad s ξ (Quotient.mk (observed s ξ) y)).choose 2 : ℝ) *
+          loadMean (hiddenLoad s ξ (Quotient.mk (observed s ξ) x))
+            (hiddenLoad s ξ (Quotient.mk (observed s ξ) y) - 1) := by
+    rw [hsubtype, sum_congr rfl hpoint, sum_add_distrib,
+      sum_covers_ite_invisibleTarget s ξ x _ hvalue_x,
+      sum_covers_ite_invisibleTarget s ξ y _ hvalue_y]
+  have hdeath : deathRate (blocks ξ) = ((blocks ξ).choose 2 : ℝ) := by
+    rw [← card_covers_eq_deathRate, card_covers]
+  have hK := blocks_eq_add_of_two_components hxy hr
+  have hden : (((blocks ξ).choose 2 : ℕ) : ℝ) =
+      ((hiddenLoad s ξ (Quotient.mk (observed s ξ) x)).choose 2 : ℝ) +
+        (hiddenLoad s ξ (Quotient.mk (observed s ξ) y)).choose 2 +
+        (hiddenLoad s ξ (Quotient.mk (observed s ξ) x) : ℝ) *
+          hiddenLoad s ξ (Quotient.mk (observed s ξ) y) := by
+    rw [Nat.cast_choose_two, Nat.cast_choose_two, Nat.cast_choose_two, hK]
+    ring
+  have hdite1 : ((hiddenLoad s ξ (Quotient.mk (observed s ξ) x)).choose 2 : ℝ) *
+      loadMean (hiddenLoad s ξ (Quotient.mk (observed s ξ) x) - 1)
+        (hiddenLoad s ξ (Quotient.mk (observed s ξ) y)) =
+      if h : 2 ≤ hiddenLoad s ξ (Quotient.mk (observed s ξ) x) then
+        ((hiddenLoad s ξ (Quotient.mk (observed s ξ) x)).choose 2 : ℝ) *
+          loadMean (hiddenLoad s ξ (Quotient.mk (observed s ξ) x) - 1)
+            (hiddenLoad s ξ (Quotient.mk (observed s ξ) y))
+      else 0 := by
+    by_cases h : 2 ≤ hiddenLoad s ξ (Quotient.mk (observed s ξ) x)
+    · rw [dif_pos h]
+    · rw [dif_neg h, Nat.choose_eq_zero_of_lt
+        (show hiddenLoad s ξ (Quotient.mk (observed s ξ) x) < 2 by omega), Nat.cast_zero, zero_mul]
+  have hdite2 : ((hiddenLoad s ξ (Quotient.mk (observed s ξ) y)).choose 2 : ℝ) *
+      loadMean (hiddenLoad s ξ (Quotient.mk (observed s ξ) x))
+        (hiddenLoad s ξ (Quotient.mk (observed s ξ) y) - 1) =
+      if h : 2 ≤ hiddenLoad s ξ (Quotient.mk (observed s ξ) y) then
+        ((hiddenLoad s ξ (Quotient.mk (observed s ξ) y)).choose 2 : ℝ) *
+          loadMean (hiddenLoad s ξ (Quotient.mk (observed s ξ) x))
+            (hiddenLoad s ξ (Quotient.mk (observed s ξ) y) - 1)
+      else 0 := by
+    by_cases h : 2 ≤ hiddenLoad s ξ (Quotient.mk (observed s ξ) y)
+    · rw [dif_pos h]
+    · rw [dif_neg h, Nat.choose_eq_zero_of_lt
+        (show hiddenLoad s ξ (Quotient.mk (observed s ξ) y) < 2 by omega), Nat.cast_zero, zero_mul]
+  rw [meanConnectionTime_eq, if_neg (show ¬blocks (observed s ξ) ≤ 1 by omega), loadMean, hsplit,
+    hdeath, hden, ← hdite1, ← hdite2]
+  ring
+
+end LabeledMean
 
 end
 
