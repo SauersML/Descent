@@ -140,7 +140,7 @@ theorem continuous_duhamelIntegral_apply (B : Matrix ι ι ℝ) (τ : ℝ) (i j 
   exact hentry.comp ((continuous_duhamelIntegral B τ).comp
     ((hof.comp continuous_fst).prodMk (hof.comp continuous_snd)))
 
-omit [Fintype ι] [DecidableEq ι] in
+omit [DecidableEq ι] in
 /-- The coordinates of a generator path and of its slope converge together at a point where
 every coordinate of the path is differentiable. -/
 theorem tendsto_coordinates_slope {Q : ℝ → Matrix ι ι ℝ} {Q' : Matrix ι ι ℝ} {θ₀ : ℝ}
@@ -174,10 +174,18 @@ theorem hasDerivAt_exp_smul_apply {Q : ℝ → Matrix ι ι ℝ} {Q' : Matrix ι
     HasDerivAt (fun θ ↦ NormedSpace.exp ℝ (τ • Q θ) i j)
       ((∫ s in (0 : ℝ)..τ,
         NormedSpace.exp ℝ (s • Q θ₀) * Q' * NormedSpace.exp ℝ ((τ - s) • Q θ₀)) i j) θ₀ := by
+  have hof : ∀ M : Matrix ι ι ℝ, Matrix.of (fun k l ↦ M k l) = M :=
+    fun M ↦ Matrix.ext fun _ _ ↦ rfl
+  have hlimit := ((continuous_duhamelIntegral_apply (Q θ₀) τ i j).tendsto
+      ((fun k l ↦ Q θ₀ k l : ι → ι → ℝ), (fun k l ↦ Q' k l : ι → ι → ℝ))).comp
+    (tendsto_coordinates_slope hQ)
+  simp only [Function.comp_def, hof] at hlimit
   rw [hasDerivAt_iff_tendsto_slope]
-  exact (((continuous_duhamelIntegral_apply (Q θ₀) τ i j).tendsto _).comp
-    (tendsto_coordinates_slope hQ)).congr fun θ ↦
-      (congrFun (congrFun (slope_exp_smul_eq_integral Q τ θ₀ θ) i) j).symm
+  refine hlimit.congr fun θ ↦ ?_
+  rw [← slope_exp_smul_eq_integral Q τ θ₀ θ]
+  first
+    | simp only [slope, vsub_eq_sub, Matrix.smul_apply, Matrix.sub_apply, smul_eq_mul]
+    | rfl
 
 /-- A matrix path whose entries are differentiable is differentiable. -/
 theorem hasDerivAt_of_hasDerivAt_apply {Q : ℝ → Matrix ι ι ℝ} {Q' : Matrix ι ι ℝ} {θ₀ : ℝ}
