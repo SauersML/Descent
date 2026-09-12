@@ -1,7 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Coalescent.Kernel
+import Descent.Coalescent.StateSpace
 import Mathlib.RingTheory.Polynomial.Pochhammer
 import Mathlib.Algebra.Polynomial.Roots
 import Mathlib.Data.Fintype.CardEmbedding
@@ -58,6 +58,16 @@ open Coalescent Finset
 open scoped Classical Polynomial
 
 noncomputable section
+
+/-- A partition of a finite sample is determined by its relation, so a finite sample has
+finitely many partitions. -/
+theorem finite_ER (n : ℕ) : Finite (ER n) :=
+  Finite.of_injective (fun σ : ER n ↦ σ.r) fun _ _ h ↦
+    Setoid.ext fun a b ↦ Iff.of_eq (congrFun (congrFun h a) b)
+
+/-- The partitions of a finite sample, enumerated for the sums of this module. -/
+local instance fintypeER (n : ℕ) : Fintype (ER n) :=
+  @Fintype.ofFinite _ (finite_ER n)
 
 /-- The Möbius coefficient of the partition lattice at its top element, as a function of the
 number of blocks: `μ(σ, ⊤) = (−1)^(|σ| − 1) (|σ| − 1)!`. -/

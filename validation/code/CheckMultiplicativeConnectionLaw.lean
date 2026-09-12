@@ -7,6 +7,7 @@ import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionLaw
 
 open Descent.Pangenome.GraphCoalescent
 
+#print axioms finite_ER
 #print axioms coeff_one_descPochhammer_succ
 #print axioms coeff_one_descPochhammer
 #print axioms card_kernel_eq
