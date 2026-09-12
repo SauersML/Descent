@@ -14,6 +14,8 @@ open Descent.Portability.TwoLocusMicroscopicApproximation
 #print axioms enlargedPropagator_mulVec_mem_realizationBody
 #print axioms rateEpoch_preserves_locusExchangeable_realization
 #print axioms RateHistoryEvent.instruction
+#print axioms foldl_preserves_locusExchangeable_realization
+#print axioms propagate_map_preserves_locusExchangeable_realization
 #print axioms propagate_preserves_locusExchangeable_realization
 #print axioms history_present_locusExchangeable_realization
 #print axioms locusExchangeableSplit_haplotype

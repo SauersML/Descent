@@ -313,12 +313,10 @@ theorem nonnegativePropagate_preserves_locusExchangeable_realization
     (events : List (NonnegativeRateEvent D)) {initial : AffineLowOrderLDCoordinate D → ℝ}
     (realization : LocusExchangeableLowOrderLDHaplotypeRealization initial) :
     Nonempty (LocusExchangeableLowOrderLDHaplotypeRealization
-      (propagateLowOrderLDInstructions (events.map NonnegativeRateEvent.instruction) initial)) := by
-  induction events generalizing initial with
-  | nil => exact ⟨realization⟩
-  | cons head rest ih =>
-      obtain ⟨propagated⟩ := head.preserves_locusExchangeable_realization realization
-      exact ih propagated
+      (propagateLowOrderLDInstructions (events.map NonnegativeRateEvent.instruction) initial)) :=
+  propagate_map_preserves_locusExchangeable_realization NonnegativeRateEvent.instruction
+    (fun event _ realization ↦ event.preserves_locusExchangeable_realization realization) events
+    realization
 
 /-- The present state of a history compiled from epochs at nonnegative coalescence and splits is
 locus-exchangeably realizable whenever its initial state is. -/

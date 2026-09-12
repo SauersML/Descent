@@ -423,12 +423,10 @@ theorem propagate_pulseHistory_preserves_locusExchangeable_realization {D : ℕ}
     (events : List (PulseHistoryEvent D)) {initial : AffineLowOrderLDCoordinate D → ℝ}
     (realization : LocusExchangeableLowOrderLDHaplotypeRealization initial) :
     Nonempty (LocusExchangeableLowOrderLDHaplotypeRealization
-      (propagateLowOrderLDInstructions (events.map PulseHistoryEvent.instruction) initial)) := by
-  induction events generalizing initial with
-  | nil => exact ⟨realization⟩
-  | cons head rest ih =>
-      obtain ⟨propagated⟩ := head.preserves_locusExchangeable_realization realization
-      exact ih propagated
+      (propagateLowOrderLDInstructions (events.map PulseHistoryEvent.instruction) initial)) :=
+  propagate_map_preserves_locusExchangeable_realization PulseHistoryEvent.instruction
+    (fun event _ realization ↦ event.preserves_locusExchangeable_realization realization) events
+    realization
 
 /-- The present state of a history compiled from rate epochs, splits and pulses is
 locus-exchangeably realizable whenever its initial state is. -/

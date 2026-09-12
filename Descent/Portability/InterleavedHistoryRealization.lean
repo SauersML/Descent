@@ -196,12 +196,11 @@ theorem propagateInterleaved_preserves_locusExchangeable_realization {D : ℕ}
     (segments : List (InterleavedSegment D)) {state : AffineLowOrderLDCoordinate D → ℝ}
     (realization : LocusExchangeableLowOrderLDHaplotypeRealization state) :
     Nonempty (LocusExchangeableLowOrderLDHaplotypeRealization
-      (propagateInterleaved segments state)) := by
-  induction segments generalizing state with
-  | nil => exact ⟨realization⟩
-  | cons head rest ih =>
-      obtain ⟨propagated⟩ := head.preserves_locusExchangeable_realization realization
-      exact ih propagated
+      (propagateInterleaved segments state)) :=
+  TwoLocusMicroscopicApproximation.foldl_preserves_locusExchangeable_realization
+    InterleavedSegment.apply segments
+    (fun segment _ _ realization ↦ segment.preserves_locusExchangeable_realization realization)
+    state realization
 
 /-- After every finite list of interleaved segments the propagated `DD` block is positive
 semidefinite under the common propagated haplotype law. -/

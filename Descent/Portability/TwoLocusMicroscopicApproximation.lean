@@ -174,6 +174,42 @@ def RateHistoryEvent.instruction {D : ℕ} : RateHistoryEvent D → LowOrderLDIn
   | .evolve rates duration duration_nonneg => .evolve (rates.epoch duration duration_nonneg)
   | .split parent child => LowOrderLDInstruction.split parent child
 
+/-- **Applying realizability-preserving steps in order preserves realizability.**  If every step
+of a finite list carries a locus-exchangeably realizable stored state to a locus-exchangeably
+realizable one, so does the left fold of the list. -/
+theorem foldl_preserves_locusExchangeable_realization {D : ℕ} {Step : Type*}
+    (apply : Step → (AffineLowOrderLDCoordinate D → ℝ) → AffineLowOrderLDCoordinate D → ℝ) :
+    ∀ steps : List Step, (∀ step ∈ steps, ∀ state : AffineLowOrderLDCoordinate D → ℝ,
+      LocusExchangeableLowOrderLDHaplotypeRealization state →
+        Nonempty (LocusExchangeableLowOrderLDHaplotypeRealization (apply step state))) →
+      ∀ initial : AffineLowOrderLDCoordinate D → ℝ,
+        LocusExchangeableLowOrderLDHaplotypeRealization initial →
+        Nonempty (LocusExchangeableLowOrderLDHaplotypeRealization
+          (steps.foldl (fun state step ↦ apply step state) initial))
+  | [], _, _, realization => ⟨realization⟩
+  | head :: rest, hstep, initial, realization => by
+    obtain ⟨propagated⟩ := hstep head (List.mem_cons.mpr (Or.inl rfl)) initial realization
+    exact foldl_preserves_locusExchangeable_realization apply rest
+      (fun step hmem ↦ hstep step (List.mem_cons.mpr (Or.inr hmem))) (apply head initial)
+      propagated
+
+/-- Compiling events to instructions and propagating preserves locus-exchangeable realizability
+whenever every event's instruction does. -/
+theorem propagate_map_preserves_locusExchangeable_realization {D : ℕ} {Event : Type*}
+    (instruction : Event → LowOrderLDInstruction D)
+    (hevent : ∀ (event : Event) (state : AffineLowOrderLDCoordinate D → ℝ),
+      LocusExchangeableLowOrderLDHaplotypeRealization state →
+        Nonempty (LocusExchangeableLowOrderLDHaplotypeRealization
+          ((instruction event).apply state)))
+    (events : List Event) {initial : AffineLowOrderLDCoordinate D → ℝ}
+    (realization : LocusExchangeableLowOrderLDHaplotypeRealization initial) :
+    Nonempty (LocusExchangeableLowOrderLDHaplotypeRealization
+      (propagateLowOrderLDInstructions (events.map instruction) initial)) :=
+  foldl_preserves_locusExchangeable_realization LowOrderLDInstruction.apply
+    (events.map instruction) (fun step hmem state realization ↦ by
+      obtain ⟨event, _, rfl⟩ := List.mem_map.mp hmem
+      exact hevent event state realization) initial realization
+
 /-- **NOTE1 Theorem 2 for a finite history, with no hypotheses.**  Composing any finite list of
 rate epochs and physically realized splits carries a locus-exchangeably realizable stored state
 to a locus-exchangeably realizable one.  Each epoch is the one-epoch theorem, and each split
@@ -183,20 +219,14 @@ theorem propagate_preserves_locusExchangeable_realization {D : ℕ}
     (realization : LocusExchangeableLowOrderLDHaplotypeRealization initial) :
     Nonempty (LocusExchangeableLowOrderLDHaplotypeRealization
       (propagateLowOrderLDInstructions (events.map RateHistoryEvent.instruction) initial)) := by
-  induction events generalizing initial with
-  | nil => exact ⟨realization⟩
-  | cons head rest ih =>
-      have hhead : Nonempty (LocusExchangeableLowOrderLDHaplotypeRealization
-          (head.instruction.apply initial)) := by
-        cases head with
-        | evolve rates duration duration_nonneg =>
-            exact rateEpoch_preserves_locusExchangeable_realization rates duration
-              duration_nonneg realization
-        | split parent child =>
-            exact ⟨TwoLocusRealizabilityPreservation.locusExchangeableSplit realization
-              parent child⟩
-      obtain ⟨propagated⟩ := hhead
-      exact ih propagated
+  refine propagate_map_preserves_locusExchangeable_realization RateHistoryEvent.instruction
+    (fun event state realization ↦ ?_) events realization
+  cases event with
+  | evolve rates duration duration_nonneg =>
+      exact rateEpoch_preserves_locusExchangeable_realization rates duration duration_nonneg
+        realization
+  | split parent child =>
+      exact ⟨TwoLocusRealizabilityPreservation.locusExchangeableSplit realization parent child⟩
 
 /-- The present state of a history compiled from rate epochs and splits is locus-exchangeably
 realizable whenever its initial state is. -/

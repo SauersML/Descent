@@ -86,13 +86,12 @@ theorem multinomialPulseHistory_preserves_locusExchangeable_realization {D : ℕ
     {initial : AffineLowOrderLDCoordinate D → ℝ} (events : List (PulseHistoryEvent D))
     (realization : LocusExchangeableLowOrderLDHaplotypeRealization initial) :
     Nonempty (LocusExchangeableLowOrderLDHaplotypeRealization
-      (propagateLowOrderLDInstructions (events.map PulseHistoryEvent.instruction) initial)) := by
-  induction events generalizing initial with
-  | nil => exact ⟨realization⟩
-  | cons head rest ih =>
-      obtain ⟨propagated⟩ :=
-        multinomialPulseEvent_preserves_locusExchangeable_realization deme head realization
-      exact ih propagated
+      (propagateLowOrderLDInstructions (events.map PulseHistoryEvent.instruction) initial)) :=
+  TwoLocusMicroscopicApproximation.propagate_map_preserves_locusExchangeable_realization
+    PulseHistoryEvent.instruction
+    (fun event _ realization ↦
+      multinomialPulseEvent_preserves_locusExchangeable_realization deme event realization)
+    events realization
 
 /-! ## The present state of a compiled history -/
 
