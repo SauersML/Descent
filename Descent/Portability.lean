@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.PartialHaplotypeRealizedPanel
 import Descent.Portability.NeutralPolynomialPositivity
 import Descent.Portability.NeutralPolynomialSemigroup
 import Descent.Portability.PartialHaplotypeMicroscopicApproximation
