@@ -32,6 +32,4 @@ open Descent.Pangenome.AncestralLocality
 #print axioms eq_zero_of_forall_escape_bound
 #print axioms measureReal_preimage_sub_eq
 #print axioms abs_measureReal_preimage_sub_le
-#print axioms sum_abs_measureReal_fiber_sub_le
-#print axioms support_bound_example
-#print axioms escape_bound_example
+#print axioms totalVariation_measureReal_fiber_le

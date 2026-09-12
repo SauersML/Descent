@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Layer
+import Descent.Pangenome.AncestralLocality.LocalityCoupling
 import Mathlib.Algebra.BigOperators.Ring.Multiset
 import Mathlib.Algebra.Order.BigOperators.Group.Multiset
 import Mathlib.Analysis.Complex.ExponentialBounds
@@ -57,14 +58,14 @@ Escape forces `Z^{(a)} ≥ a^ℓ` (`pow_le_weightedCount_of_mem_escapeSet`). Mar
 by the identity `exp_div_pow_eq_of_radius`. When `D T = 0`, (9.1) at every `a > 1` forces the
 escape probability to zero (`eq_zero_of_forall_escape_bound`).
 
-## Corollary 8.1 and §9.1
+## Corollary 8.1
 
 Outcomes on one probability space that agree off an event `E` differ only on `E`
 (`measureReal_preimage_sub_eq`). Their laws are therefore within `P(E)` at every set
-(`abs_measureReal_preimage_sub_le`) and in total variation (`sum_abs_measureReal_fiber_sub_le`).
-The numbers of §9.1 are `support_bound_example`, `401.7 ≤ 20 e³ ≤ 401.72`, and
-`escape_bound_example`, `20 e (2e/20)^20 ≤ 2.64 · 10⁻¹⁰`. Both are certified from Mathlib's
-ten-digit bounds on `e`.
+(`abs_measureReal_preimage_sub_le`) and within `P(E)` in the `totalVariation` of
+`Descent.Pangenome.AncestralLocality.LocalityCoupling` (`totalVariation_measureReal_fiber_le`).
+That module proves the finite-weight form of the corollary and the numbers of §9.1
+(`twenty_mul_exp_three_mem_Icc`, `escapeBound_twenty_le`), so they are not restated here.
 
 Scope. The backward tagged process has no path law in the corpus, and none is constructed here.
 There is no Markov chain on tagged states, no nonexplosion argument and no proof of Dynkin's
@@ -661,12 +662,13 @@ theorem abs_measureReal_preimage_sub_le (hE : MeasurableSet E) (hagree : ∀ ω 
   constructor <;> linarith [measureReal_nonneg (μ := μ) (s := X ⁻¹' B ∩ E),
     measureReal_nonneg (μ := μ) (s := Y ⁻¹' B ∩ E)]
 
-/-- **Corollary 8.1, the total-variation form (9.3).** For outcomes in a finite set that agree
-off `E`: `½ Σ_x |P(X = x) - P(Y = x)| ≤ P(E)`. -/
-theorem sum_abs_measureReal_fiber_sub_le [Fintype α] [MeasurableSpace α]
+/-- **Corollary 8.1, the total-variation form (9.3).** Outcomes in a finite set that agree off
+`E` have laws within `P(E)` in `totalVariation`: `½ Σ_x |P(X = x) - P(Y = x)| ≤ P(E)`. -/
+theorem totalVariation_measureReal_fiber_le [Fintype α] [MeasurableSpace α]
     [MeasurableSingletonClass α] (hX : Measurable X) (hY : Measurable Y) (hE : MeasurableSet E)
     (hagree : ∀ ω ∉ E, X ω = Y ω) :
-    (∑ x, |μ.real (X ⁻¹' {x}) - μ.real (Y ⁻¹' {x})|) / 2 ≤ μ.real E := by
+    totalVariation (fun x ↦ μ.real (X ⁻¹' {x})) (fun x ↦ μ.real (Y ⁻¹' {x})) ≤ μ.real E := by
+  show (∑ x, |μ.real (X ⁻¹' {x}) - μ.real (Y ⁻¹' {x})|) / 2 ≤ μ.real E
   have hfiber : ∀ Z : Ω → α, Measurable Z → ∑ x, μ.real (Z ⁻¹' {x} ∩ E) = μ.real E := by
     intro Z hZ
     have h := sum_measureReal_preimage_singleton (μ := μ.restrict E) Finset.univ
@@ -685,31 +687,6 @@ theorem sum_abs_measureReal_fiber_sub_le [Fintype α] [MeasurableSpace α]
   linarith
 
 end Coupling
-
-/-! ### The numbers of §9.1 -/
-
-/-- **§9.1, the expected support bound.** At `n = 10`, `|A| = 2`, `D = T = 1` the bound (8.2) is
-`20 e³`, and `401.7 ≤ 20 e³ ≤ 401.72`. -/
-theorem support_bound_example : 401.7 ≤ 20 * Real.exp 3 ∧ 20 * Real.exp 3 ≤ 401.72 := by
-  have he : Real.exp 3 = Real.exp 1 ^ 3 := by
-    rw [← Real.exp_nat_mul]
-    norm_num
-  have hlo : (2.7182818283 : ℝ) ≤ Real.exp 1 := Real.exp_one_gt_d9.le
-  have hhi : Real.exp 1 ≤ 2.7182818286 := Real.exp_one_lt_d9.le
-  rw [he]
-  constructor
-  · calc (401.7 : ℝ) ≤ 20 * (2.7182818283 : ℝ) ^ 3 := by norm_num
-      _ ≤ 20 * Real.exp 1 ^ 3 := by gcongr
-  · calc 20 * Real.exp 1 ^ 3 ≤ 20 * (2.7182818286 : ℝ) ^ 3 := by gcongr
-      _ ≤ 401.72 := by norm_num
-
-/-- **§9.1, the escape bound.** At `n = 10`, `|A| = 2`, `D = T = 1` and `ℓ = 20` the bound (9.2)
-is `20 e (2e/20)^20`, and it is at most `2.64 · 10⁻¹⁰`. -/
-theorem escape_bound_example : 20 * Real.exp 1 * (2 * Real.exp 1 / 20) ^ 20 ≤ 2.64e-10 := by
-  have hhi : Real.exp 1 ≤ 2.7182818286 := Real.exp_one_lt_d9.le
-  calc 20 * Real.exp 1 * (2 * Real.exp 1 / 20) ^ 20 = 20 * Real.exp 1 ^ 21 / 10 ^ 20 := by ring
-    _ ≤ 20 * (2.7182818286 : ℝ) ^ 21 / 10 ^ 20 := by gcongr
-    _ ≤ 2.64e-10 := by norm_num
 
 end
 
