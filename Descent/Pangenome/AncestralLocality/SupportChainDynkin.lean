@@ -539,7 +539,7 @@ theorem sum_supportChainLaw_escape_le {r : V → V → ℝ} {c D T a : ℝ} (hr 
     refine (Finset.sum_le_sum fun y _ ↦ ?_).trans
       (sum_supportChainLaw_mul_lightWeight_le hr hD hc ha A n M ℓ hT)
     split_ifs with hy
-    · have h := pow_le_weightedCount_of_mem_escapeSet (by linarith) hy
+    · have h := pow_le_weightedCount_of_mem_escapeSet (a := a) (by linarith) hy
       rw [weightedCount_map_univ] at h
       exact mul_le_mul_of_nonneg_left h (hnonneg y)
     · rw [zero_mul]
