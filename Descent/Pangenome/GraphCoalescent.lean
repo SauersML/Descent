@@ -16,6 +16,7 @@ import Descent.Pangenome.GraphCoalescent.HiddenLumpability
 import Descent.Pangenome.GraphCoalescent.LahWeights
 import Descent.Pangenome.GraphCoalescent.LambdaLoadClosure
 import Descent.Pangenome.GraphCoalescent.LeadingCoefficient
+import Descent.Pangenome.GraphCoalescent.LumpingUnorderedPair
 import Descent.Pangenome.GraphCoalescent.LumpingVisibleRates
 import Descent.Pangenome.GraphCoalescent.MergerDepth
 import Descent.Pangenome.GraphCoalescent.MinimalRefinement
@@ -24,6 +25,7 @@ import Descent.Pangenome.GraphCoalescent.MultiInterfaceGenerator
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceLoads
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceOutcome
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionLaw
+import Descent.Pangenome.GraphCoalescent.MultiplicativeCoupling
 import Descent.Pangenome.GraphCoalescent.MultiplicativeObservation
 import Descent.Pangenome.GraphCoalescent.Observation
 import Descent.Pangenome.GraphCoalescent.PartitionLatticeMobius
