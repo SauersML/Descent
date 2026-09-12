@@ -31,8 +31,8 @@ it, take queries of eventually `k` features. The reach fraction is small with pr
 to `(1 - s)^k` (`tendsto_graphProb_reach_small_of_supercritical`). It is within `ε` of `s` with
 probability tending to `1 - (1 - s)^k` (`tendsto_graphProb_reach_giant_of_supercritical`).
 
-Scope. `SupercriticalGiantComponentLaw` is a hypothesis here. The Erdős–Rényi theorem for `α > 1`
-is being proved in a sibling module, which will discharge the hypothesis once it is checked. The
+Scope. `SupercriticalGiantComponentLaw` is a hypothesis here. `SupercriticalGiantComponentTheorem`
+proves it (`supercriticalGiantComponentLaw`), which makes both limits unconditional. The
 continuity is pointwise above `1`, and the behaviour at `α = 1` is not studied.
 
 ## Empirical status

@@ -49,6 +49,9 @@ import Descent.Pangenome.AncestralLocality.DecisionWindowSemigroup
 import Descent.Pangenome.AncestralLocality.JumpFellerSemigroup
 import Descent.Pangenome.AncestralLocality.DecisionDysonDual
 import Descent.Pangenome.AncestralLocality.SupercriticalUnconditional
+import Descent.Pangenome.AncestralLocality.SupercriticalConcentration
+import Descent.Pangenome.AncestralLocality.SupercriticalGiantLaw
+import Descent.Pangenome.AncestralLocality.SupercriticalGiantComponentTheorem
 
 namespace Descent.Program
 
@@ -130,29 +133,33 @@ independent complexity bounds and a quantitative light cone.
   (`card_reach_singleton_le_sum`, `graphExpect_card_presentPaths`). §6.1: the rates `β / deg(i)`
   are positive exactly on present edges. For `α > 1` the survival equation `s = 1 - e^{-αs}` has a
   unique root in `(0, 1)` (`existsUnique_survival_root`, `giantFraction_mem_Ioo`). Given the giant
-  component theorem (`GiantComponentLaw`, proved for `0 ≤ α < 1` by `giantComponentLaw_of_lt_one`),
-  the reach fraction is near `0` or `giantFraction α` with probability tending to one
+  component theorem (`GiantComponentLaw`), the reach fraction is near `0` or `giantFraction α`
+  with probability tending to one
   (`SupercriticalReach.tendsto_graphProb_reach_near_zero_or_giant`). By exchangeability of the
   roots (`RootExchangeability.choose_mul_graphProb_disjoint_bigSet`) the two branches carry the
   weights `(1 - s)^k` and `1 - (1 - s)^k` (`SupercriticalBranches.tendsto_graphProb_reach_small`,
   `tendsto_graphProb_reach_giant`). With the degree-normalized rates the closure itself is the
   observation on the reach of `G(m, α/m)`, so (6.1) bounds the closure
   (`RandomClosure.iterate_refinementStep_degreeRate`, `graphExpect_card_directedReach_le`).
-  Without the giant component theorem, for `α > 1` every feature eventually lies in a component
-  of at least `K` features with probability at least `s - ε`
+  The giant component theorem is proved at every rate except `α = 1`. For `0 ≤ α < 1` it follows
+  from (6.1) (`giantComponentLaw_of_lt_one`). For `α > 1` every feature eventually lies in a
+  component of at least `K` features with probability at least `s - ε`
   (`SupercriticalLowerBound.eventually_graphProb_card_reach_ge`), so large components hold at
   least `(s - ε) m` features in expectation (`eventually_graphExpect_card_large_ge`). The upper
   half holds outright: for queries of at most `k` features
   `limsup_m P(|Reach(A)| ≥ εm) ≤ 1 - (1 - s)^k`
   (`SupercriticalUpperBound.limsup_graphProb_card_reach_ge_le`), and sprinkling merges the large
-  components (`SupercriticalSprinkling.tendsto_graphProb_exists_card_reach_ge`), given that the
-  number of features in large components concentrates, whose second moment is bounded
-  (`SupercriticalSecondMoment.graphExpect_largeCount_sq_le`). The giant fraction is continuous
-  above `1` (`SupercriticalUnconditional.continuousAt_giantFraction`), and under the giant
-  component theorem at every rate above `1`, one named hypothesis
-  (`SupercriticalGiantComponentLaw`), the weights of (6.2) hold at every such rate
-  (`tendsto_graphProb_reach_small_of_supercritical`,
-  `tendsto_graphProb_reach_giant_of_supercritical`).
+  components (`SupercriticalSprinkling.tendsto_graphProb_exists_card_reach_ge`). The number of
+  features in components of linear size has a bounded second moment
+  (`SupercriticalSecondMoment.graphExpect_largeCount_sq_le`), so with high probability it is at
+  least `(s - δ) m` (`SupercriticalConcentration.exists_eventually_graphProb_largeCount_le`) and
+  at most `(s + ε) m` (`SupercriticalGiantLaw.tendsto_graphProb_card_large_le`). That gives the
+  theorem for `α > 1` (`giantComponentLaw_of_one_lt`) and off the critical rate
+  (`SupercriticalGiantComponentTheorem.giantComponentLaw_of_ne_one`). The giant fraction is
+  continuous above `1` (`SupercriticalUnconditional.continuousAt_giantFraction`), and (6.2) holds
+  with both weights and no hypothesis for `α > 1`
+  (`SupercriticalGiantComponentTheorem.tendsto_graphProb_reach_small_of_one_lt`,
+  `tendsto_graphProb_reach_giant_of_one_lt`).
 * §4.1 and §7.1, the diffusion generator: `AncestralForwardGenerator`. For `c = 1` the
   finite-population chain (4.5) on the `N`-generation scale has generator (7.1) on polynomial
   observables (`tendsto_nextGenerationMean`), and on the eight-state witness the derivatives of
@@ -269,11 +276,11 @@ they hold outright; the limit `M → ∞` is not taken. Corollary 8.1 is stated 
 probability
 space; with the explicit escape bounds of Theorem 8 for the marginal laws of the circuit it reads
 `d_TV ≤ min {1, n|A| e^{DT} (2eDT/ℓ)^ℓ}`
-(`LocalityCouplingBounds.totalVariation_integralLaw_le_radius`). The supercritical limit (6.2) is
-proved for
-its support, conditional on the Erdős-Rényi giant component theorem as the named hypothesis
-`GiantComponentLaw` (proved only for `0 ≤ α < 1`), and so are its weights `1 - (1 - s)^k` and
-`(1 - s)^k`. Theorem 6 is proved at generator level, and as the uniqueness form of (7.5), for
+(`LocalityCouplingBounds.totalVariation_integralLaw_le_radius`). The supercritical limit (6.2),
+its support and its weights `1 - (1 - s)^k` and `(1 - s)^k`, is proved for `α > 1` with no
+hypothesis. The Erdős-Rényi giant component theorem is proved off the critical rate;
+`GiantComponentLaw 1` and rates of convergence are not proved. Theorem 6 is proved at generator
+level, and as the uniqueness form of (7.5), for
 `r = 0` and with decisions, with the moment equation as a hypothesis; the forward diffusion on
 `P(H)` and the backward jump process are not constructed. Theorem 1 defines `P_*` as the
 `|H|`-th iterate of `Φ_K`, which is the first fixed point, and Theorem 2 uses only the symmetry of

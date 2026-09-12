@@ -49,6 +49,9 @@ import Descent.Pangenome.AncestralLocality.DecisionWindowSemigroup
 import Descent.Pangenome.AncestralLocality.JumpFellerSemigroup
 import Descent.Pangenome.AncestralLocality.DecisionDysonDual
 import Descent.Pangenome.AncestralLocality.SupercriticalUnconditional
+import Descent.Pangenome.AncestralLocality.SupercriticalConcentration
+import Descent.Pangenome.AncestralLocality.SupercriticalGiantLaw
+import Descent.Pangenome.AncestralLocality.SupercriticalGiantComponentTheorem
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program

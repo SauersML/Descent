@@ -38,11 +38,12 @@ touches the giant component contains it and adds at most `ε m` features per roo
 features the reach fraction `|C_m(A)|/m` is, with probability tending to one, within `ε` of `0`
 or of `giantFraction α` (`tendsto_graphProb_reach_near_zero_or_giant`).
 
-Scope. The Erdős–Rényi theorem for `α > 1` is not formalized: `GiantComponentLaw α` is a
-hypothesis, proved here only for `0 ≤ α < 1`. The weights of the limit law, `1 - (1 - s)^k` on the
-giant branch and `(1 - s)^k` on the small one, need the exchangeability of the `k` roots under
-vertex permutations and are not proved. What is proved is that the limit law has no mass away
-from `0` and `s`. The reach is `reach`, not the hereditary closure itself (the note's Theorem 4).
+Scope. `GiantComponentLaw α` is a hypothesis here, proved in this file only for `0 ≤ α < 1`; the
+Erdős–Rényi theorem for `α > 1` is proved downstream in `SupercriticalGiantLaw`. The weights of
+the limit law, `1 - (1 - s)^k` on the giant branch and `(1 - s)^k` on the small one, need the
+exchangeability of the `k` roots under vertex permutations and are proved downstream in
+`SupercriticalBranches`. What is proved here is that the limit law has no mass away from `0` and
+`s`. The reach is `reach`, not the hereditary closure itself (the note's Theorem 4).
 
 ## Empirical status
 
@@ -135,7 +136,8 @@ def GiantEvent {m : ℕ} (s ε : ℝ) (G : SimpleGraph (Fin m)) : Prop :=
 /-- **The Erdős–Rényi giant component theorem for `G(m, α / m)`**, carried as a hypothesis: for
 every `ε > 0` the giant-component event at scale `ε`, with `s = giantFraction α`, has probability
 tending to one as `m → ∞`. For `α > 1` this is the classical theorem of Erdős and Rényi (1960),
-which is not proved in this corpus. For `0 ≤ α < 1` it is `giantComponentLaw_of_lt_one`. -/
+proved downstream in `SupercriticalGiantLaw` (`giantComponentLaw_of_one_lt`). For `0 ≤ α < 1` it
+is `giantComponentLaw_of_lt_one`. -/
 structure GiantComponentLaw (α : ℝ) : Prop where
   /-- The giant-component event has probability tending to one. -/
   tendsto_giantEvent : ∀ ε : ℝ, 0 < ε →
