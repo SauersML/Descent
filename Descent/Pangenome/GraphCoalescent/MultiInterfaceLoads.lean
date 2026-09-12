@@ -96,8 +96,9 @@ theorem cellLoadAt_merge (s : Fin m → Fin n → Fin n) (ξ : ER n) {x z : Fin 
           i).card := by
   have hle : ξ ≤ commonRefinement s (merge ξ (Quotient.mk ξ x) (Quotient.mk ξ z)) :=
     le_trans (le_merge ξ _ _) (le_commonRefinement s _)
-  rw [cellLoadAt, blocksInside, card_image_mk_merge, card_image_mergeMap ξ hab, ← blocksInside,
-    mk_mem_blocksInside_iff hle, mk_mem_blocksInside_iff hle]
+  rw [cellLoadAt, blocksInside, card_image_mk_merge, card_image_mergeMap ξ hab, ← blocksInside]
+  exact if_congr (and_congr (mk_mem_blocksInside_iff hle x i) (mk_mem_blocksInside_iff hle z i))
+    rfl rfl
 
 /-- **Equal cell loads give a cell-preserving bijection of blocks.** Two coalescent states with the
 same common refinement and the same cell loads have a bijection between their true blocks that
