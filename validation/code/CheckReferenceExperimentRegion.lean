@@ -7,10 +7,13 @@ import Descent.Portability.ReferenceExperimentRegion
 
 open Descent.Portability.ReferenceExperimentRegion
 
-#print axioms historyReport_eq_corners
 #print axioms mixtureNumerator_reference
-#print axioms early_corner_values
-#print axioms late_corner_values
+#print axioms early_mixtureNumerator_reference
+#print axioms late_mixtureNumerator_reference
+#print axioms r2Weighted_eq
+#print axioms r2Defined_eq
+#print axioms ratioWeighted_eq
+#print axioms ratioDefined_eq
 #print axioms early_target_r2_range
 #print axioms early_r2Portability_range
 #print axioms late_target_r2_range
