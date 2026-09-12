@@ -76,8 +76,9 @@ variable {ι : Type*} [DecidableEq ι]
 
 /-! ## The cumulant read from its top degree -/
 
-/-- The Lah weight counted from the top degree: `L(m, m − d) = C(m − 1, d) · m (m − 1) ⋯ (m − d + 1)`,
-the weighted number of partitions of `m` individuals with `m − d` blocks. -/
+/-- The Lah weight counted from the top degree,
+`L(m, m − d) = C(m − 1, d) · m (m − 1) ⋯ (m − d + 1)`, the weighted number of partitions of `m`
+individuals with `m − d` blocks. -/
 def deficitWeight (m d : ℕ) : ℕ :=
   (m - 1).choose d * m.descFactorial d
 
