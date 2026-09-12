@@ -9,3 +9,13 @@ import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionInLaw
   Descent.Pangenome.GraphCoalescent.coe_probabilityMeasure_Ioc
 #print axioms
   Descent.Pangenome.GraphCoalescent.tendsto_probabilityMeasure_of_tendsto_cdf
+#print axioms
+  Descent.Pangenome.GraphCoalescent.poissonPMFReal_add
+#print axioms
+  Descent.Pangenome.GraphCoalescent.poissonMixture_le_add
+#print axioms
+  Descent.Pangenome.GraphCoalescent.monotone_poissonMixture
+#print axioms
+  Descent.Pangenome.GraphCoalescent.continuous_poissonSeries
+#print axioms
+  Descent.Pangenome.GraphCoalescent.tendsto_poissonMixture_atTop
