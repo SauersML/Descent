@@ -3,6 +3,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Layer
 import Descent.Pangenome.AncestralLocality.CylinderSamplingAlgebra
+import Mathlib.Analysis.SpecialFunctions.Exp
+import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.Topology.ContinuousMap.StoneWeierstrass
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
@@ -27,7 +29,10 @@ it to `P({0,1}^V)` with the cylinder sampling algebra of `CylinderSamplingAlgebr
 at every time (`FellerSemigroup.continuous_operator`). `LightConeApproximation S A`
 is the uniform approximation bound, taken as a named hypothesis: the semigroups `S m` along the
 exhaustion are within `2 ‖f‖ · escape f T m` of every later member on each observable `f ∈ A` at
-every time up to `T`, and the escape bound tends to zero along the exhaustion.
+every time up to `T`, and the escape bound tends to zero along the exhaustion. `lightConeEscape` is
+the escape bound (9.1) of Theorem 8 along an exhaustion radius, it vanishes as the radius grows
+(`tendsto_lightConeEscape`), and `LightConeApproximation.ofEscapeBound` builds the approximation
+bound from an operator bound with that escape function.
 
 The limit. `dense_subalgebra_of_separatesPoints` is Stone–Weierstrass, `norm_operator_sub_le`
 moves the observable by a contraction's own bound, and `cauchySeq_operator` combines the two: on
@@ -51,7 +56,9 @@ polynomials, and `infiniteGenomeSemigroup_eq_of_tendsto` is independence of the 
 
 Scope. The finite-genome models, their transition semigroups lifted to `C(X, ℝ)`, and the light-cone
 bound are hypotheses here: `S` is data and `LightConeApproximation` carries the bound of Theorem 8
-as a named hypothesis; it is not derived from `LocalityBounds`. The space `P({0,1}^V)`, its
+as a named hypothesis. `LightConeApproximation.ofEscapeBound` fixes the escape function to the
+shape of (9.1) (`LocalityBounds.measureReal_escapeSet_le_exp`), but the operator bound itself,
+which needs the sampling duality of Theorem 6, stays a hypothesis. The space `P({0,1}^V)`, its
 compactness and the cylinder sampling algebra come from `CylinderSamplingAlgebra`. The sampling
 duality of Theorem 6 and the circuit bounds (8.2) and (9.1) are not restated.
 
@@ -163,6 +170,42 @@ theorem FellerSemigroup.continuous_operator (P : FellerSemigroup X) (g : C(X, �
     simpa using (hzero.comp hright).add (hzero.comp hleft)
   exact tendsto_iff_norm_sub_tendsto_zero.mpr
     (squeeze_zero (fun _ ↦ norm_nonneg _) (fun t ↦ hbound s t) hsum)
+
+/-- **The escape bound (9.1) along an exhaustion.** For `N = n |A|` sampled arguments on the
+observation set, rate bound `D`, weight base `a` and exhaustion radius `radius m`, the bound
+`min {1, N e^{D (1 + 2a) T} / a^{radius m}}` of Theorem 8 at horizon `T`. -/
+def lightConeEscape (N D a : ℝ) (radius : ℕ → ℕ) (T : ℝ≥0) (m : ℕ) : ℝ :=
+  min 1 (N * Real.exp (D * (1 + 2 * a) * (T : ℝ)) / a ^ radius m)
+
+/-- The escape bound vanishes along an exhaustion whose radius grows without bound, for every
+weight base `a > 1`. -/
+theorem tendsto_lightConeEscape (N D : ℝ) {a : ℝ} (ha : 1 < a) {radius : ℕ → ℕ}
+    (hradius : Tendsto radius atTop atTop) (T : ℝ≥0) :
+    Tendsto (lightConeEscape N D a radius T) atTop (𝓝 0) := by
+  have hpow : Tendsto (fun m ↦ a ^ radius m) atTop atTop :=
+    (tendsto_pow_atTop_atTop_of_one_lt ha).comp hradius
+  have hratio : Tendsto (fun m ↦ N * Real.exp (D * (1 + 2 * a) * (T : ℝ)) / a ^ radius m) atTop
+      (𝓝 0) :=
+    tendsto_const_nhds.div_atTop hpow
+  have hone : Tendsto (fun _ : ℕ ↦ (1 : ℝ)) atTop (𝓝 1) := tendsto_const_nhds
+  have hmin := hone.min hratio
+  rw [min_eq_right zero_le_one] at hmin
+  exact hmin
+
+/-- **The approximation bound from the light cone.** If on every observable `f` of the subalgebra,
+with `N f` sampled arguments on its observation set, later members of the exhaustion stay within
+`2 ‖f‖` times the escape bound (9.1) for a weight base `a > 1` and a radius growing without bound,
+then the sequence satisfies the uniform approximation bound. -/
+def LightConeApproximation.ofEscapeBound {S : ℕ → FellerSemigroup X} {A : Subalgebra ℝ C(X, ℝ)}
+    (N : C(X, ℝ) → ℝ) (D : ℝ) {a : ℝ} (ha : 1 < a) (radius : ℕ → ℕ)
+    (hradius : Tendsto radius atTop atTop)
+    (hbound : ∀ f ∈ A, ∀ T t, t ≤ T → ∀ m m', m ≤ m' →
+      ‖(S m).operator t f - (S m').operator t f‖ ≤
+        2 * ‖f‖ * lightConeEscape (N f) D a radius T m) :
+    LightConeApproximation S A where
+  escape f T m := lightConeEscape (N f) D a radius T m
+  escape_tendsto f _ T := tendsto_lightConeEscape (N f) D ha hradius T
+  norm_sub_le := hbound
 
 /-- Stone–Weierstrass: a point-separating subalgebra of `C(X, ℝ)` is dense. -/
 theorem dense_subalgebra_of_separatesPoints (A : Subalgebra ℝ C(X, ℝ))
