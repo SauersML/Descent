@@ -9,7 +9,9 @@ import Descent.Pangenome.GraphCoalescent.ConnectivityCumulantCorpus
 import Descent.Pangenome.GraphCoalescent.Conservation
 import Descent.Pangenome.GraphCoalescent.LambdaLoadClosure
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceGenerator
+import Descent.Pangenome.GraphCoalescent.FirstConnectionLaw
 import Descent.Pangenome.GraphCoalescent.HiddenClockExample
+import Descent.Pangenome.GraphCoalescent.HiddenStateChain
 import Descent.Pangenome.GraphCoalescent.HiddenLoadFiltering
 import Descent.Pangenome.GraphCoalescent.HiddenLoads
 import Descent.Pangenome.GraphCoalescent.HiddenLumpability
@@ -109,6 +111,14 @@ inside it.
   `n - k` jumps is `a_{n,k} ∏_B |B|!` (`rankedHistoryLaw`, `blockLaw_toReal_eq_absoluteProb`),
   through the weighted cover count `2 Σ_{ξ ≺ η} w(ξ) = (n - |η|) w(η)`
   (`two_mul_sum_rankWeight_covers`).
+* Theorem D, (D5)-(D6), the first-connection law: `FirstConnectionLaw`. The probability that the
+  report of the jump chain's `k`-block state is connected is `a_{n,k} [z^k] C_q(z)`
+  (`reportConnectedProbability_eq_connectedByLevel`), and the report first connects at the
+  `b`-block level with probability `F_b - F_{b+1}` (`firstConnectionProbability_eq_sub`).
+* Theorem A, the hidden jump chain: `HiddenStateChain`. The hidden state after one jump has jump
+  probabilities `C(L_C, 2) / C(K, 2)` and `L_C L_D / C(K, 2)` depending on the hidden state alone
+  (`hiddenKernel_invisibleTarget_toReal`, `hiddenKernel_visibleTarget_toReal`), and the hidden
+  trajectory is a Markov chain with that kernel (`hiddenChainLaw_succ`).
 * Theorem D, the exact table of §6: `ConnectivityClockTable`. The cumulants
   `6z + 4z²`, `24z + 30z² + 6z³`, `24z + 32z² + 8z³`, `24z + 20z²`,
   `720z + 1656z² + 928z³ + 144z⁴` and the means `2/3, 1/2, 7/18, 17/18, 92/225` of the fiber sizes
@@ -166,8 +176,9 @@ inside it.
   (`prod_maximal_iff_isBalancedFibers`), read at the loads of an interface in
   `prod_hiddenLoad_bot_le_of_isBalancedFibers`.
 
-Scope. Theorem A is proved as cover counts with Kingman's unit rate per cover: the
-continuous-time chain and the probabilistic statement of strong lumpability are not constructed.
+Scope. Theorem A is proved as cover counts with Kingman's unit rate per cover, and under the
+corpus jump chain the hidden state is a Markov chain (`HiddenStateChain.hiddenChainLaw_succ`); the
+continuous-time holding times are not constructed.
 The survival function of (A4) is `α e^{tQ} 𝟙` of the killed generator, and the identification of
 the mean with its integral is not formalized. Theorem B is proved as the algebra of the visible
 rates and of the survival
@@ -187,7 +198,7 @@ does not imply the stochastic order of the quantile coupling. (D4) is proved by 
 recursion, without enumerating ranked histories. §9 is proved for a finite hidden jump process
 given by its generator, with the load chain's generator `loadGenerator` written from the rates of
 Theorem A. (E1) is proved from the Möbius sum rather than the ranked-history law. The stopping law
-(D5)-(D9), (E2), (F2) and (F3) are not yet proof-checked. Of (F1), the coupled skeleton chain,
+(D7)-(D9), (E2), (F2) and (F3) are not yet proof-checked. Of (F1), the coupled skeleton chain,
 the path-level coupling inequality and the identification with path measures on càdlàg paths are
 not yet recorded here. (F4) is proved for the finite random graph
 of edges rung by time `u`, entering the clocks through their distribution functions.
