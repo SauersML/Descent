@@ -44,8 +44,9 @@ Corollary 2.1. After every such history the propagated `DD` block is positive se
 constructs the `LDPairDomain` wherever the two within-deme `DD` entries are nonzero.
 
 Scope. Rates are constant within an epoch here; time-varying rates with vanishing coalescence are
-treated in `NonnegativeIntegrableRealization`. No microscopic kernel at `c_i = 0` is constructed: NOTE1 section 2.3 omits the
-sampling stage there, and this module reaches the result through the limit instead.
+treated in `NonnegativeIntegrableRealization`. No microscopic kernel at `c_i = 0` is constructed:
+NOTE1 section 2.3 omits the sampling stage there, and this module reaches the result through the
+limit instead.
 
 ## Empirical status
 

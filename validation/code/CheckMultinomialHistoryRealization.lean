@@ -1,0 +1,22 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.MultinomialHistoryRealization
+
+/-! Axiom audit of MultinomialHistoryRealization. -/
+
+open Descent.Portability.MultinomialHistoryRealization
+
+namespace Descent.Portability.MultinomialHistoryRealization
+
+#print axioms multinomialPulseEvent_preserves_locusExchangeable_realization
+#print axioms multinomialPulseHistory_preserves_locusExchangeable_realization
+#print axioms multinomialPulseHistory_present_locusExchangeable_realization
+#print axioms multinomialPulseHistory_present_mem_realizationBody
+#print axioms multinomialPulseHistory_present_dd_quadraticForm_nonneg
+#print axioms multinomialPulseHistory_present_dd_cauchySchwarz
+#print axioms multinomialPulseHistory_present_dd_diagonal_nonneg
+#print axioms multinomialRateHistory_present_locusExchangeable_realization
+#print axioms multinomialPulseHistory_LDPairDomain
+
+end Descent.Portability.MultinomialHistoryRealization
