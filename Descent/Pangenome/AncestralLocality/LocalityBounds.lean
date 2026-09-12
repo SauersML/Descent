@@ -203,6 +203,7 @@ theorem supportGenerator_supportSize_le {r : V → V → ℝ} {c D : ℝ} (hr : 
   rw [show weightedCount (fun _ : V ↦ (1 : ℝ)) = supportSize from funext weightedCount_one] at h
   linarith
 
+omit [DecidableEq V] in
 /-- **The decision rate is at most `D Z`.** -/
 theorem decisionRate_le {r : V → V → ℝ} {D : ℝ} (hD : ∀ i, ∑ j, r i j ≤ D)
     (s : Multiset (Finset V)) : decisionRate r s ≤ D * supportSize s := by
@@ -213,10 +214,139 @@ theorem decisionRate_le {r : V → V → ℝ} {D : ℝ} (hD : ∀ i, ∑ j, r i 
   calc ∑ i ∈ S, ∑ j, r i j ≤ ∑ _i ∈ S, D := Finset.sum_le_sum fun i _ ↦ hD i
     _ = D * S.card := by rw [Finset.sum_const, nsmul_eq_mul, mul_comm]
 
+omit [DecidableEq V] [Fintype V] in
 /-- `n` arguments each carrying the observation set `A` have total support size `n |A|`. -/
 theorem supportSize_replicate (A : Finset V) (n : ℕ) :
     supportSize (Multiset.replicate n A) = n * A.card := by
   simp [supportSize]
+
+/-! ### The light cone -/
+
+/-- **The directed ball `B_k(A)`**: the coordinates reachable from `A` along at most `k` edges of
+positive rate. -/
+def lightBall (r : V → V → ℝ) (A : Finset V) : ℕ → Finset V
+  | 0 => A
+  | k + 1 => lightBall r A k ∪ univ.filter fun j ↦ ∃ i ∈ lightBall r A k, 0 < r i j
+
+/-- The balls grow with the radius. -/
+theorem lightBall_mono (r : V → V → ℝ) (A : Finset V) : Monotone (lightBall r A) :=
+  monotone_nat_of_le_succ fun _ ↦ Finset.subset_union_left
+
+/-- An edge of positive rate leads one radius out. -/
+theorem mem_lightBall_succ {r : V → V → ℝ} {A : Finset V} {k : ℕ} {i j : V}
+    (hi : i ∈ lightBall r A k) (hij : 0 < r i j) : j ∈ lightBall r A (k + 1) := by
+  simp only [lightBall, Finset.mem_union, Finset.mem_filter, Finset.mem_univ, true_and]
+  exact Or.inr ⟨i, hi, hij⟩
+
+/-- **The directed distance `d(v, A)`, truncated at `ℓ`**: the number of radii `k < ℓ` whose ball
+misses `v`. A coordinate of `A` has depth zero (`lightDepth_eq_zero`), and a coordinate outside
+every ball of radius below `ℓ` has depth `ℓ` (`lightDepth_eq_of_forall`). -/
+def lightDepth (r : V → V → ℝ) (A : Finset V) (ℓ : ℕ) (v : V) : ℕ :=
+  ((range ℓ).filter fun k ↦ v ∉ lightBall r A k).card
+
+/-- The observed coordinates have depth zero. -/
+theorem lightDepth_eq_zero {r : V → V → ℝ} {A : Finset V} {v : V} (hv : v ∈ A) (ℓ : ℕ) :
+    lightDepth r A ℓ v = 0 := by
+  rw [lightDepth, Finset.card_eq_zero, Finset.filter_eq_empty_iff]
+  exact fun k _ hk ↦ hk (lightBall_mono r A (Nat.zero_le k) hv)
+
+/-- A coordinate outside every ball of radius below `ℓ` has depth `ℓ`. -/
+theorem lightDepth_eq_of_forall {r : V → V → ℝ} {A : Finset V} {ℓ : ℕ} {v : V}
+    (hv : ∀ k < ℓ, v ∉ lightBall r A k) : lightDepth r A ℓ v = ℓ := by
+  rw [lightDepth, Finset.filter_true_of_mem fun k hk ↦ hv k (Finset.mem_range.mp hk),
+    Finset.card_range]
+
+/-- **The depth grows by at most one along an edge of positive rate.** -/
+theorem lightDepth_le_succ {r : V → V → ℝ} {A : Finset V} {ℓ : ℕ} {i j : V}
+    (hij : 0 < r i j) : lightDepth r A ℓ j ≤ lightDepth r A ℓ i + 1 := by
+  have hsub : (range ℓ).filter (fun k ↦ j ∉ lightBall r A k) ⊆
+      insert 0 (((range ℓ).filter fun k ↦ i ∉ lightBall r A k).image (· + 1)) := by
+    intro k hk
+    rw [Finset.mem_filter, Finset.mem_range] at hk
+    rcases k with _ | k
+    · exact Finset.mem_insert_self 0 _
+    · refine Finset.mem_insert_of_mem (Finset.mem_image.mpr ⟨k, ?_, rfl⟩)
+      rw [Finset.mem_filter, Finset.mem_range]
+      exact ⟨by omega, fun hi ↦ hk.2 (mem_lightBall_succ hi hij)⟩
+  exact (Finset.card_le_card hsub).trans ((Finset.card_insert_le _ _).trans
+    (Nat.add_le_add_right Finset.card_image_le 1))
+
+/-- **The light-cone weight `w(v) = a^{d(v, A)}`**, with the distance truncated at `ℓ`. -/
+def lightWeight (r : V → V → ℝ) (A : Finset V) (ℓ : ℕ) (a : ℝ) (v : V) : ℝ :=
+  a ^ lightDepth r A ℓ v
+
+/-- A nonnegative base gives a nonnegative weight. -/
+theorem lightWeight_nonneg {r : V → V → ℝ} {A : Finset V} {ℓ : ℕ} {a : ℝ} (ha : 0 ≤ a)
+    (v : V) : 0 ≤ lightWeight r A ℓ a v :=
+  pow_nonneg ha _
+
+/-- **The edge inequality `w(j) ≤ a w(i)`** along every edge `i → j` of positive rate. -/
+theorem lightWeight_le_mul {r : V → V → ℝ} {A : Finset V} {ℓ : ℕ} {a : ℝ} (ha : 1 ≤ a)
+    {i j : V} (hij : 0 < r i j) : lightWeight r A ℓ a j ≤ a * lightWeight r A ℓ a i := by
+  rw [lightWeight, lightWeight, ← pow_succ']
+  exact pow_le_pow_right₀ ha (lightDepth_le_succ hij)
+
+/-- **Theorem 8, the weighted drift `L_anc Z^{(a)} ≤ D (1 + 2a) Z^{(a)}`.** -/
+theorem supportGenerator_lightWeight_le {r : V → V → ℝ} {c D a : ℝ} {A : Finset V} {ℓ : ℕ}
+    (hr : ∀ i j, 0 ≤ r i j) (hD : ∀ i, ∑ j, r i j ≤ D) (hc : 0 ≤ c) (ha : 1 ≤ a)
+    (s : Multiset (Finset V)) :
+    supportGenerator r c (weightedCount (lightWeight r A ℓ a)) s ≤
+      D * (1 + 2 * a) * weightedCount (lightWeight r A ℓ a) s :=
+  supportGenerator_weightedCount_le hr hD hc (lightWeight_nonneg (by linarith)) (by linarith)
+    (fun _ _ hij ↦ lightWeight_le_mul ha hij) s
+
+/-- `n` arguments carrying `A` have light-cone count `n |A|`: every coordinate of `A` weighs one. -/
+theorem weightedCount_replicate_lightWeight (r : V → V → ℝ) (A : Finset V) (ℓ : ℕ) (a : ℝ)
+    (n : ℕ) : weightedCount (lightWeight r A ℓ a) (Multiset.replicate n A) = n * A.card := by
+  have hA : ∑ v ∈ A, lightWeight r A ℓ a v = A.card := by
+    calc ∑ v ∈ A, lightWeight r A ℓ a v = ∑ _v ∈ A, (1 : ℝ) :=
+          Finset.sum_congr rfl fun v hv ↦ by rw [lightWeight, lightDepth_eq_zero hv, pow_zero]
+      _ = A.card := by simp
+  simp only [weightedCount, Multiset.map_replicate, Multiset.sum_replicate, hA, nsmul_eq_mul]
+
+/-- **The escape event `E_ℓ`**: the circuit holds a coordinate outside every ball of radius below
+`ℓ`, that is, at directed distance at least `ℓ` from `A`. -/
+def escapeSet (r : V → V → ℝ) (A : Finset V) (ℓ : ℕ) : Set (Multiset (Finset V)) :=
+  {s | ∃ S ∈ s, ∃ v ∈ S, ∀ k < ℓ, v ∉ lightBall r A k}
+
+/-- **Escape forces `Z^{(a)} ≥ a^ℓ`.** -/
+theorem pow_le_weightedCount_of_mem_escapeSet {r : V → V → ℝ} {A : Finset V} {ℓ : ℕ} {a : ℝ}
+    (ha : 0 ≤ a) {s : Multiset (Finset V)} (hs : s ∈ escapeSet r A ℓ) :
+    a ^ ℓ ≤ weightedCount (lightWeight r A ℓ a) s := by
+  obtain ⟨S, hS, v, hv, hfar⟩ := hs
+  calc a ^ ℓ = lightWeight r A ℓ a v := by rw [lightWeight, lightDepth_eq_of_forall hfar]
+    _ ≤ ∑ u ∈ S, lightWeight r A ℓ a u :=
+      Finset.single_le_sum (fun u _ ↦ lightWeight_nonneg ha u) hv
+    _ ≤ weightedCount (lightWeight r A ℓ a) s := sum_le_weightedCount (lightWeight_nonneg ha) hS
+
+/-- The initial circuit, `n` arguments carrying `A`, has not escaped at a positive radius. -/
+theorem replicate_not_mem_escapeSet (r : V → V → ℝ) (A : Finset V) {ℓ : ℕ} (hℓ : 0 < ℓ)
+    (n : ℕ) : Multiset.replicate n A ∉ escapeSet r A ℓ := by
+  rintro ⟨S, hS, v, hv, hfar⟩
+  rw [Multiset.eq_of_mem_replicate hS] at hv
+  exact hfar 0 hℓ hv
+
+/-- **Escape is permanent under a decision**: supports only grow. -/
+theorem branchSupports_mem_escapeSet {r : V → V → ℝ} {A : Finset V} {ℓ : ℕ}
+    {s : Multiset (Finset V)} {S : Finset V} (hS : S ∈ s) (i j : V)
+    (hs : s ∈ escapeSet r A ℓ) : branchSupports s S i j ∈ escapeSet r A ℓ := by
+  obtain ⟨S', hS', v, hv, hfar⟩ := hs
+  by_cases hSS' : S' = S
+  · subst hSS'
+    exact ⟨insert j S', Multiset.mem_cons.mpr (Or.inl rfl), v, Finset.mem_insert_of_mem hv, hfar⟩
+  · refine ⟨S', Multiset.mem_cons.mpr (Or.inr (Multiset.mem_cons.mpr (Or.inr ?_))), v, hv, hfar⟩
+    exact (Multiset.mem_erase_of_ne hSS').mpr hS'
+
+/-- **Escape is permanent under a coalescence**: the merged support is the union. -/
+theorem coalesceSupports_mem_escapeSet {r : V → V → ℝ} {A : Finset V} {ℓ : ℕ}
+    {s t : Multiset (Finset V)} (hs : s ∈ escapeSet r A ℓ) :
+    coalesceSupports s t ∈ escapeSet r A ℓ := by
+  obtain ⟨S, hS, v, hv, hfar⟩ := hs
+  by_cases hSt : S ∈ t
+  · exact ⟨t.sup, Multiset.mem_cons.mpr (Or.inl rfl), v, Multiset.le_sup hSt hv, hfar⟩
+  · refine ⟨S, Multiset.mem_cons.mpr (Or.inr ?_), v, hv, hfar⟩
+    rw [← Multiset.count_pos, Multiset.count_sub, Multiset.count_eq_zero.mpr hSt, Nat.sub_zero]
+    exact Multiset.count_pos.mpr hS
 
 end Supports
 
