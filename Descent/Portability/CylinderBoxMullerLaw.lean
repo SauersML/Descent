@@ -335,7 +335,7 @@ unit interval with Jacobian `r e^(-r²/2)`. -/
 theorem lintegral_radius_substitution (G : ℝ → ℝ≥0∞) :
     ∫⁻ u in Set.Ioo 0 1, G (Real.sqrt (-2 * Real.log u)) =
       ∫⁻ radius in Set.Ioi 0, ENNReal.ofReal (radius * Real.exp (-radius ^ 2 / 2)) * G radius := by
-  have himage : (fun radius : ℝ ↦ Real.exp (-(radius * radius) / 2)) '' Set.Ioi 0 =
+  have himage : (fun radius : ℝ ↦ Real.exp (radius * radius / -2)) '' Set.Ioi 0 =
       Set.Ioo 0 1 := by
     ext u
     simp only [Set.mem_image, Set.mem_Ioi, Set.mem_Ioo]
@@ -347,16 +347,16 @@ theorem lintegral_radius_substitution (G : ℝ → ℝ≥0∞) :
     · rintro ⟨hpos, hlt⟩
       have hlog : Real.log u < 0 := Real.log_neg hpos hlt
       refine ⟨Real.sqrt (-2 * Real.log u), Real.sqrt_pos.mpr (by linarith), ?_⟩
-      rw [Real.mul_self_sqrt (by linarith), show -(-2 * Real.log u) / 2 = Real.log u by ring,
+      rw [Real.mul_self_sqrt (by linarith), show -2 * Real.log u / -2 = Real.log u by ring,
         Real.exp_log hpos]
   have hderivative : ∀ radius ∈ Set.Ioi (0 : ℝ), HasDerivWithinAt
-      (fun radius : ℝ ↦ Real.exp (-(radius * radius) / 2))
-      (-(radius * Real.exp (-(radius * radius) / 2))) (Set.Ioi 0) radius := fun radius _ ↦
-    (((((hasDerivAt_id' (x := radius)).mul (hasDerivAt_id' (x := radius))).neg.div_const
-      2).exp).congr_deriv (by ring)).hasDerivWithinAt
-  have hinjective : Set.InjOn (fun radius : ℝ ↦ Real.exp (-(radius * radius) / 2))
+      (fun radius : ℝ ↦ Real.exp (radius * radius / -2))
+      (-(radius * Real.exp (radius * radius / -2))) (Set.Ioi 0) radius := fun radius _ ↦
+    ((((hasDerivAt_id' (x := radius)).fun_mul (hasDerivAt_id' (x := radius))).div_const
+      (-2)).exp.congr_deriv (by ring)).hasDerivWithinAt
+  have hinjective : Set.InjOn (fun radius : ℝ ↦ Real.exp (radius * radius / -2))
       (Set.Ioi 0) := fun first hfirst second hsecond hequal ↦ by
-    have hsquares : -(first * first) / 2 = -(second * second) / 2 := Real.exp_injective hequal
+    have hsquares : first * first / -2 = second * second / -2 := Real.exp_injective hequal
     have hfirstPos : 0 < first := hfirst
     have hsecondPos : 0 < second := hsecond
     nlinarith
@@ -364,14 +364,15 @@ theorem lintegral_radius_substitution (G : ℝ → ℝ≥0∞) :
     lintegral_image_eq_lintegral_abs_deriv_mul measurableSet_Ioi hderivative hinjective]
   refine setLIntegral_congr_fun measurableSet_Ioi fun radius hradius ↦ ?_
   have hpos : 0 < radius := hradius
-  have hroot : Real.sqrt (-2 * Real.log (Real.exp (-(radius * radius) / 2))) = radius := by
-    rw [Real.log_exp, show -2 * (-(radius * radius) / 2) = radius * radius by ring,
+  have hroot : Real.sqrt (-2 * Real.log (Real.exp (radius * radius / -2))) = radius := by
+    rw [Real.log_exp, show -2 * (radius * radius / -2) = radius * radius by ring,
       Real.sqrt_mul_self hpos.le]
-  have habs : |-(radius * Real.exp (-(radius * radius) / 2))| =
+  have habs : |-(radius * Real.exp (radius * radius / -2))| =
       radius * Real.exp (-radius ^ 2 / 2) := by
-    rw [abs_neg, abs_of_pos (mul_pos hpos (Real.exp_pos _)), sq]
-  show ENNReal.ofReal |-(radius * Real.exp (-(radius * radius) / 2))| *
-      G (Real.sqrt (-2 * Real.log (Real.exp (-(radius * radius) / 2)))) =
+    rw [abs_neg, abs_of_pos (mul_pos hpos (Real.exp_pos _)),
+      show radius * radius / -2 = -radius ^ 2 / 2 by ring]
+  show ENNReal.ofReal |-(radius * Real.exp (radius * radius / -2))| *
+      G (Real.sqrt (-2 * Real.log (Real.exp (radius * radius / -2)))) =
     ENNReal.ofReal (radius * Real.exp (-radius ^ 2 / 2)) * G radius
   rw [hroot, habs]
 
@@ -448,11 +449,21 @@ theorem map_boxMuller :
       Real.sqrt (-2 * Real.log u) * Real.sin (2 * Real.pi * v - Real.pi)) = boxMuller (u, v) := by
     rw [Real.cos_sub_pi, Real.sin_sub_pi, Prod.neg_mk, mul_neg, mul_neg, neg_neg, neg_neg]
     rfl
-  simp only [Set.indicator_apply, Set.mem_preimage, hpoint, Pi.one_apply]
+  have hiff : (Real.sqrt (-2 * Real.log u) * Real.cos (2 * Real.pi * v - Real.pi),
+      Real.sqrt (-2 * Real.log u) * Real.sin (2 * Real.pi * v - Real.pi)) ∈
+        (fun point : ℝ × ℝ ↦ -point) ⁻¹' s ↔ (u, v) ∈ boxMuller ⁻¹' s := by
+    rw [Set.mem_preimage, Set.mem_preimage, hpoint]
+  by_cases hmember : (u, v) ∈ boxMuller ⁻¹' s
+  · simp only [Set.indicator_of_mem hmember, Set.indicator_of_mem (hiff.mpr hmember),
+      Pi.one_apply]
+  · simp only [Set.indicator_of_notMem hmember, Set.indicator_of_notMem (mt hiff.mp hmember)]
 
 /-- The Gaussian pair is measurable. -/
-theorem measurable_gaussianPair : Measurable gaussianPair :=
-  measurable_boxMuller.comp measurable_radialDraw_angularDraw
+theorem measurable_gaussianPair : Measurable gaussianPair := by
+  have hcomp : gaussianPair = boxMuller ∘ fun stream ↦ (radialDraw stream, angularDraw stream) :=
+    rfl
+  rw [hcomp]
+  exact measurable_boxMuller.comp measurable_radialDraw_angularDraw
 
 /-- NOTE2 §7.2, the Box–Muller theorem on fair bits: the law of the Gaussian pair under the
 fair-bit measure is the product of two standard Gaussian laws. -/
@@ -485,9 +496,11 @@ independent. -/
 theorem indepFun_gaussianPair :
     ProbabilityTheory.IndepFun (fun stream ↦ (gaussianPair stream).1)
       (fun stream ↦ (gaussianPair stream).2) bitMeasure := by
-  rw [ProbabilityTheory.indepFun_iff_map_prod_eq_prod_map_map
-      (measurable_fst.comp measurable_gaussianPair).aemeasurable
-      (measurable_snd.comp measurable_gaussianPair).aemeasurable,
+  have hfirst : AEMeasurable (fun stream ↦ (gaussianPair stream).1) bitMeasure :=
+    (measurable_fst.comp measurable_gaussianPair).aemeasurable
+  have hsecond : AEMeasurable (fun stream ↦ (gaussianPair stream).2) bitMeasure :=
+    (measurable_snd.comp measurable_gaussianPair).aemeasurable
+  rw [ProbabilityTheory.indepFun_iff_map_prod_eq_prod_map_map hfirst hsecond,
     map_gaussianPair_fst, map_gaussianPair_snd]
   exact map_gaussianPair
 
