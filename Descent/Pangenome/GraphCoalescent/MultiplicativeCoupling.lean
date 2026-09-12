@@ -475,11 +475,13 @@ theorem coupledHold_nonneg {n : ℕ} (hn : 0 < n) (s : Fin n → Fin n) (ξ : ER
 theorem coupledStep_nonneg {n : ℕ} (hn : 0 < n) (s : Fin n → Fin n) (X Y : CoupledState n) :
     0 ≤ coupledStep s X Y := by
   unfold coupledStep
-  split_ifs with hX
-  · refine mul_nonneg (mul_nonneg (kingmanStep_nonneg (blocks_le_card _) _)
+  by_cases hX : coupledSep s X
+  · rw [if_pos hX]
+    refine mul_nonneg (mul_nonneg (kingmanStep_nonneg (blocks_le_card _) _)
       (multiplicativeStep_nonneg _ _)) ?_
     split_ifs <;> norm_num
-  · refine add_nonneg (add_nonneg ?_ ?_) ?_
+  · rw [if_neg hX]
+    refine add_nonneg (add_nonneg ?_ ?_) ?_
     · split_ifs
       · positivity
       · exact le_rfl
@@ -516,6 +518,168 @@ theorem observed_eq_of_not_coupledSep {n : ℕ} {s : Fin n → Fin n} {X : Coupl
   unfold coupledSep at hX
   push_neg at hX
   exact hX.2.symm
+
+theorem coupledDeficit_nonneg {n : ℕ} (X : CoupledState n) : 0 ≤ coupledDeficit X := by
+  unfold coupledDeficit
+  have h : (blocks X.1 : ℝ) ≤ n := by exact_mod_cast blocks_le_card X.1
+  linarith
+
+/-- **The separation hazard of the coupled step is at most `J/n`.** -/
+theorem coupledStep_hazard {n : ℕ} (hn : 0 < n) (s : Fin n → Fin n) (X : CoupledState n)
+    (hX : ¬ coupledSep s X) :
+    ∑ Y ∈ univ.filter (coupledSep s), coupledStep s X Y ≤ 1 / (n : ℝ) * coupledDeficit X := by
+  have hagree := observed_eq_of_not_coupledSep hX
+  have hpoint : ∀ Y ∈ univ.filter (coupledSep s),
+      coupledStep s X Y = if Y.2.2 = true ∧ Y.1 = X.1 then excessStep s X.1 Y.2.1 else 0 := by
+    intro Y hY
+    have hYsep := (Finset.mem_filter.mp hY).2
+    have h1 : ¬ (Y.2.2 = false ∧ Covers X.1 Y.1 ∧ observed s Y.1 = Y.2.1) := by
+      rintro ⟨hb, -, hobs⟩
+      rcases hYsep with h | h
+      · rw [hb] at h
+        exact Bool.false_ne_true h
+      · exact h hobs.symm
+    have h2 : ¬ (Y.2.2 = false ∧ Y.1 = X.1 ∧ Y.2.1 = X.2.1) := by
+      rintro ⟨hb, hY1, hY2⟩
+      rcases hYsep with h | h
+      · rw [hb] at h
+        exact Bool.false_ne_true h
+      · exact h (by rw [hY1, hY2, hagree])
+    rw [coupledStep, if_neg hX, if_neg h1, if_neg h2, zero_add, zero_add]
+  calc ∑ Y ∈ univ.filter (coupledSep s), coupledStep s X Y
+      = ∑ Y ∈ univ.filter (coupledSep s),
+          (if Y.2.2 = true ∧ Y.1 = X.1 then excessStep s X.1 Y.2.1 else 0) :=
+        Finset.sum_congr rfl hpoint
+    _ ≤ ∑ Y, (if Y.2.2 = true ∧ Y.1 = X.1 then excessStep s X.1 Y.2.1 else 0) :=
+        Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset _ _) fun Y _ _ ↦ by
+          split_ifs
+          · exact excessStep_nonneg s X.1 Y.2.1
+          · exact le_rfl
+    _ = ∑ ζ', excessStep s X.1 ζ' := by
+        rw [sum_coupledState]
+        simp only [Bool.false_eq_true, false_and, if_false, add_zero, true_and,
+          sum_sum_ite_eq_left]
+    _ ≤ ((n : ℝ) - blocks X.1) / n := sum_excessStep_le hn s X.1
+    _ = 1 / (n : ℝ) * coupledDeficit X := by
+        unfold coupledDeficit
+        ring
+
+/-- **The deficit drifts by at most one half per step.** -/
+theorem coupledStep_drift {n : ℕ} (hn : 0 < n) (s : Fin n → Fin n) (X : CoupledState n)
+    (hX : ¬ coupledSep s X) :
+    ∑ Y ∈ univ.filter (fun Y ↦ ¬ coupledSep s Y), coupledStep s X Y * coupledDeficit Y
+      ≤ coupledDeficit X + 1 / 2 := by
+  have hpoint : ∀ Y ∈ univ.filter (fun Y ↦ ¬ coupledSep s Y),
+      coupledStep s X Y * coupledDeficit Y
+        = coupledDeficit X * coupledStep s X Y
+          + if Y.2.2 = false ∧ Covers X.1 Y.1 ∧ observed s Y.1 = Y.2.1
+            then 1 / (n : ℝ) ^ 2 else 0 := by
+    intro Y hY
+    have hYns := (Finset.mem_filter.mp hY).2
+    have hflag : ¬ (Y.2.2 = true ∧ Y.1 = X.1) := fun h ↦ hYns (Or.inl h.1)
+    rw [coupledStep, if_neg hX, if_neg hflag, add_zero]
+    unfold coupledDeficit
+    by_cases h1 : Y.2.2 = false ∧ Covers X.1 Y.1 ∧ observed s Y.1 = Y.2.1
+    · by_cases h2 : Y.2.2 = false ∧ Y.1 = X.1 ∧ Y.2.1 = X.2.1
+      · exfalso
+        have hb := h1.2.1.2
+        rw [h2.2.1] at hb
+        omega
+      · rw [if_pos h1, if_neg h2]
+        have hb : (blocks Y.1 : ℝ) + 1 = blocks X.1 := by exact_mod_cast h1.2.1.2
+        rw [← hb]
+        ring
+    · rw [if_neg h1, if_neg h1]
+      by_cases h2 : Y.2.2 = false ∧ Y.1 = X.1 ∧ Y.2.1 = X.2.1
+      · rw [if_pos h2, h2.2.1]
+        ring
+      · rw [if_neg h2]
+        ring
+  rw [Finset.sum_congr rfl hpoint, Finset.sum_add_distrib, ← Finset.mul_sum]
+  have hmass : ∑ Y ∈ univ.filter (fun Y ↦ ¬ coupledSep s Y), coupledStep s X Y ≤ 1 := by
+    rw [← sum_coupledStep s X]
+    exact Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset _ _)
+      fun Y _ _ ↦ coupledStep_nonneg hn s X Y
+  have hterm : ∑ Y ∈ univ.filter (fun Y ↦ ¬ coupledSep s Y),
+      (if Y.2.2 = false ∧ Covers X.1 Y.1 ∧ observed s Y.1 = Y.2.1
+        then 1 / (n : ℝ) ^ 2 else 0) ≤ 1 / 2 := by
+    calc _ ≤ ∑ Y : CoupledState n, (if Y.2.2 = false ∧ Covers X.1 Y.1 ∧ observed s Y.1 = Y.2.1
+          then 1 / (n : ℝ) ^ 2 else 0) :=
+          Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset _ _) fun Y _ _ ↦ by
+            split_ifs
+            · positivity
+            · exact le_rfl
+      _ = deathRate (blocks X.1) * (1 / (n : ℝ) ^ 2) := by
+          rw [sum_coupledState]
+          simp only [Bool.true_eq_false, false_and, if_false, zero_add, true_and,
+            sum_sum_ite_covers_observed, sum_ite_covers]
+      _ ≤ 1 / 2 := by
+          rw [mul_one_div]
+          exact deathRate_div_sq_le_half (blocks_le_card X.1)
+  have hJ := coupledDeficit_nonneg X
+  nlinarith [mul_le_mul_of_nonneg_left hmass hJ]
+
+/-! ### The start -/
+
+/-- **The coupled start**: the panel's singletons, `Z_p` at the interface, the flag down.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  A point of the coupled state space. -/
+def coupledStart {n : ℕ} (s : Fin n → Fin n) : CoupledState n := (⊥, observed s ⊥, false)
+
+/-- The point mass at the coupled start.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  A point mass. -/
+def coupledStartLaw {n : ℕ} (s : Fin n → Fin n) (X : CoupledState n) : ℝ :=
+  if X = coupledStart s then 1 else 0
+
+theorem coupledStartLaw_nonneg {n : ℕ} (s : Fin n → Fin n) (X : CoupledState n) :
+    0 ≤ coupledStartLaw s X := by
+  unfold coupledStartLaw
+  split_ifs <;> norm_num
+
+theorem sum_coupledStartLaw {n : ℕ} (s : Fin n → Fin n) : ∑ X, coupledStartLaw s X = 1 := by
+  simp [coupledStartLaw]
+
+theorem not_coupledSep_start {n : ℕ} (s : Fin n → Fin n) : ¬ coupledSep s (coupledStart s) := by
+  simp [coupledSep, coupledStart]
+
+theorem coupledDeficit_start {n : ℕ} (s : Fin n → Fin n) :
+    coupledDeficit (coupledStart s) = 0 := by
+  have h := blocks_bot n
+  simp only [coupledDeficit, coupledStart]
+  rw [h, sub_self]
+
+theorem separationMass_coupledStart {n : ℕ} (s : Fin n → Fin n) :
+    separationMass (coupledStep s) (coupledStartLaw s) (coupledSep s) 0 = 0 := by
+  refine Finset.sum_eq_zero fun X hX ↦ ?_
+  show coupledStartLaw s X = 0
+  refine if_neg fun h ↦ ?_
+  rw [h] at hX
+  exact not_coupledSep_start s (Finset.mem_filter.mp hX).2
+
+theorem deficitMass_coupledStart {n : ℕ} (s : Fin n → Fin n) :
+    deficitMass (coupledStep s) (coupledStartLaw s) (coupledSep s) coupledDeficit 0 ≤ 0 := by
+  refine le_of_eq (Finset.sum_eq_zero fun X _ ↦ ?_)
+  show coupledStartLaw s X * coupledDeficit X = 0
+  unfold coupledStartLaw
+  by_cases h : X = coupledStart s
+  · rw [if_pos h, h, coupledDeficit_start, mul_zero]
+  · rw [if_neg h, zero_mul]
+
+/-- **The coupled chain separates by step `m` with probability at most `m(m-1)/(4n)`.** -/
+theorem coupled_separationMass_le {n : ℕ} (hn : 0 < n) (s : Fin n → Fin n) (m : ℕ) :
+    separationMass (coupledStep s) (coupledStartLaw s) (coupledSep s) m
+      ≤ (m : ℝ) * ((m : ℝ) - 1) / (4 * n) := by
+  have h := separationMass_le (J := coupledDeficit) (h := 1 / (n : ℝ)) (ρ := 1 / 2)
+    (coupledStep_nonneg hn s) (sum_coupledStep s) (coupledStartLaw_nonneg s)
+    (sum_coupledStartLaw s) (by positivity) (by norm_num)
+    (fun X Y hX hY ↦ coupledStep_absorb s X Y hX hY) (coupledStep_hazard hn s)
+    (coupledStep_drift hn s) (separationMass_coupledStart s) (deficitMass_coupledStart s) m
+  have hnR : (0 : ℝ) < n := by exact_mod_cast hn
+  calc _ ≤ 1 / (n : ℝ) * (1 / 2) * ((m : ℝ) * ((m : ℝ) - 1) / 2) := h
+    _ = (m : ℝ) * ((m : ℝ) - 1) / (4 * n) := by
+        field_simp
+        ring
 
 end
 
