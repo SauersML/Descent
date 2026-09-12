@@ -377,9 +377,9 @@ theorem kingmanClock_eval (j : ℕ) :
   exact measurePreserving_eval_infinitePi (fun k : ℕ ↦ holdMeasure (deathRate (k + 2))) j
 
 theorem lintegral_coord_kingmanClock (j : ℕ) :
-    ∫⁻ ω, ENNReal.ofReal (ω j) ∂kingmanClock = ENNReal.ofReal (1 / deathRate (j + 2)) := by
-  rw [(kingmanClock_eval j).lintegral_comp measurable_id.ennreal_ofReal,
-    lintegral_id_holdMeasure (deathRate_add_two_pos j)]
+    ∫⁻ ω, ENNReal.ofReal (ω j) ∂kingmanClock = ENNReal.ofReal (1 / deathRate (j + 2)) :=
+  ((kingmanClock_eval j).lintegral_comp ENNReal.measurable_ofReal).trans
+    (lintegral_id_holdMeasure (deathRate_add_two_pos j))
 
 /-- **The transform of a block of holding times is the product of the per-level factors.** -/
 theorem lintegral_exp_neg_sum_kingmanClock {θ : ℝ} (hθ : 0 ≤ θ) (T : Finset ℕ) :
@@ -395,9 +395,10 @@ theorem lintegral_exp_neg_sum_kingmanClock {θ : ℝ} (hθ : 0 ≤ θ) (T : Fins
   rw [hprod, lintegral_prod_eq_prod_lintegral_of_indepFun T _ hind
     fun j ↦ ((measurable_const.mul (measurable_pi_apply j)).neg.exp).ennreal_ofReal]
   refine prod_congr rfl fun j _ ↦ ?_
-  rw [(kingmanClock_eval j).lintegral_comp
-      ((measurable_const.mul measurable_id).neg.exp).ennreal_ofReal,
-    lintegral_exp_neg_holdMeasure (deathRate_add_two_pos j) hθ]
+  have hcomp := (kingmanClock_eval j).lintegral_comp
+    (f := fun t : ℝ ↦ ENNReal.ofReal (Real.exp (-(θ * t))))
+    ((measurable_const.mul measurable_id).neg.exp).ennreal_ofReal
+  exact hcomp.trans (lintegral_exp_neg_holdMeasure (deathRate_add_two_pos j) hθ)
 
 /-- A holding time is positive: its density vanishes on the negative half-line. -/
 theorem holdMeasure_Iio_zero (d : ℝ) : holdMeasure d (Set.Iio 0) = 0 := by
@@ -409,7 +410,8 @@ theorem ae_nonneg_kingmanClock : ∀ᵐ ω ∂kingmanClock, ∀ j, 0 ≤ ω j :=
   rw [ae_all_iff]
   intro j
   rw [ae_iff]
-  have h := (kingmanClock_eval j).measure_preimage measurableSet_Iio.nullMeasurableSet
+  have h := (kingmanClock_eval j).measure_preimage
+    (measurableSet_Iio (a := (0 : ℝ))).nullMeasurableSet
   rw [holdMeasure_Iio_zero] at h
   have hset : {ω : ℕ → ℝ | ¬ 0 ≤ ω j} = (fun ω : ℕ → ℝ ↦ ω j) ⁻¹' Set.Iio 0 := by
     ext ω
@@ -448,7 +450,10 @@ theorem lintegral_sq_holdMeasure {d : ℝ} (hd : 0 < d) :
       refine (integrableOn_Ioi_comp_mul_left_iff
         (fun x : ℝ ↦ Real.exp (-x) * x ^ ((3 : ℝ) - 1)) 0 hd).mpr ?_
       simpa using hg
-    refine (hscale.const_mul d⁻¹).congr_fun (fun t _ ↦ ?_) measurableSet_Ioi
+    have hscale' : IntegrableOn
+        (fun x : ℝ ↦ d⁻¹ * (Real.exp (-(d * x)) * (d * x) ^ ((3 : ℝ) - 1))) (Set.Ioi 0) :=
+      hscale.const_mul d⁻¹
+    refine hscale'.congr_fun (fun t _ ↦ ?_) measurableSet_Ioi
     have hinv : d⁻¹ * d = 1 := inv_mul_cancel₀ hdne
     show d⁻¹ * (Real.exp (-(d * t)) * (d * t) ^ ((3 : ℝ) - 1))
       = t ^ 2 * (d * Real.exp (-(d * t)))
@@ -534,10 +539,11 @@ theorem lintegral_sq_sum_kingmanClock (T : Finset ℕ) :
     intro i j
     by_cases hij : i = j
     · subst hij
-      rw [if_pos rfl, (kingmanClock_eval i).lintegral_comp
-          (measurable_id.ennreal_ofReal.mul measurable_id.ennreal_ofReal),
-        lintegral_sq_holdMeasure (deathRate_add_two_pos i),
-        ← ENNReal.ofReal_add (mul_nonneg (ha i) (ha i)) (sq_nonneg _)]
+      have hcomp := (kingmanClock_eval i).lintegral_comp
+        (f := fun t : ℝ ↦ ENNReal.ofReal t * ENNReal.ofReal t)
+        (ENNReal.measurable_ofReal.mul ENNReal.measurable_ofReal)
+      rw [if_pos rfl, ← ENNReal.ofReal_add (mul_nonneg (ha i) (ha i)) (sq_nonneg _)]
+      refine hcomp.trans ((lintegral_sq_holdMeasure (deathRate_add_two_pos i)).trans ?_)
       congr 1
       ring
     · rw [if_neg hij, add_zero, lintegral_mul_coords_kingmanClock hij,
@@ -587,8 +593,8 @@ theorem connectionTime_laplace {n : ℕ} (hn : 2 ≤ n) (s : Fin n → Fin n) {�
   rw [ENNReal.ofReal_sum_of_nonneg hterm]
   refine sum_congr rfl fun b hb ↦ ?_
   have hb1 : 1 ≤ b := (mem_Icc.mp hb).1
-  rw [lintegral_exp_neg_sum_kingmanClock hθ, ENNReal.ofReal_mul ENNReal.toReal_nonneg,
-    stoppingProb, ENNReal.ofReal_toReal (PMF.apply_ne_top _ _),
+  rw [lintegral_exp_neg_sum_kingmanClock hθ, stoppingProb,
+    ENNReal.ofReal_mul ENNReal.toReal_nonneg, ENNReal.ofReal_toReal (PMF.apply_ne_top _ _),
     ← prod_Ico_pred (fun k ↦ deathRate k / (deathRate k + θ)) hb1 (by omega),
     ENNReal.ofReal_prod_of_nonneg fun j _ ↦
       div_nonneg (deathRate_add_two_pos j).le (add_nonneg (deathRate_add_two_pos j).le hθ)]
@@ -613,12 +619,15 @@ theorem connectionTime_mean {n : ℕ} (hn : 2 ≤ n) (s : Fin n → Fin n) :
       ring
     rw [sum_congr rfl hterm, sum_sub_distrib, ← mul_sum, ← mul_sum, sum_stoppingProb hn s,
       mul_one]
+  have hterm : ∀ b ∈ Icc 1 n,
+      0 ≤ stoppingProb s b * ∑ j ∈ Ico (b - 1) (n - 1), 1 / deathRate (j + 2) := fun b _ ↦
+    mul_nonneg ENNReal.toReal_nonneg
+      (sum_nonneg fun j _ ↦ (one_div_pos.mpr (deathRate_add_two_pos j)).le)
   rw [hform]
   refine hmix.trans ?_
-  rw [ENNReal.ofReal_sum_of_nonneg fun b _ ↦ mul_nonneg ENNReal.toReal_nonneg
-    (sum_nonneg fun j _ ↦ (one_div_pos.mpr (deathRate_add_two_pos j)).le)]
+  rw [ENNReal.ofReal_sum_of_nonneg hterm]
   refine sum_congr rfl fun b _ ↦ ?_
-  rw [lintegral_sum_kingmanClock, ENNReal.ofReal_mul ENNReal.toReal_nonneg, stoppingProb,
+  rw [lintegral_sum_kingmanClock, stoppingProb, ENNReal.ofReal_mul ENNReal.toReal_nonneg,
     ENNReal.ofReal_toReal (PMF.apply_ne_top _ _)]
 
 /-- **(D9)**: `E τ_q² = ∑_b p_b [(2/b - 2/n)² + ∑_{k=b+1}^{n} d_k⁻²]`. -/
@@ -629,12 +638,15 @@ theorem connectionTime_secondMoment {n : ℕ} (hn : 2 ≤ n) (s : Fin n → Fin 
   have hmix := lintegral_trajectoryClockLaw hn s
     (fun b ω ↦ ENNReal.ofReal ((∑ j ∈ Ico (b - 1) (n - 1), ω j) ^ 2))
     fun b ↦ ((Finset.measurable_sum _ fun j _ ↦ measurable_pi_apply j).pow_const 2).ennreal_ofReal
+  have hterm : ∀ b ∈ Icc 1 n, 0 ≤ stoppingProb s b *
+      ((2 / (b : ℝ) - 2 / n) ^ 2 + ∑ k ∈ Ioc b n, (1 / deathRate k) ^ 2) := fun b _ ↦
+    mul_nonneg ENNReal.toReal_nonneg
+      (add_nonneg (sq_nonneg _) (sum_nonneg fun k _ ↦ sq_nonneg _))
   refine hmix.trans ?_
-  rw [ENNReal.ofReal_sum_of_nonneg fun b _ ↦ mul_nonneg ENNReal.toReal_nonneg
-    (add_nonneg (sq_nonneg _) (sum_nonneg fun k _ ↦ sq_nonneg _))]
+  rw [ENNReal.ofReal_sum_of_nonneg hterm]
   refine sum_congr rfl fun b hb ↦ ?_
   have hb1 : 1 ≤ b := (mem_Icc.mp hb).1
-  rw [lintegral_sq_sum_kingmanClock, ENNReal.ofReal_mul ENNReal.toReal_nonneg, stoppingProb,
+  rw [lintegral_sq_sum_kingmanClock, stoppingProb, ENNReal.ofReal_mul ENNReal.toReal_nonneg,
     ENNReal.ofReal_toReal (PMF.apply_ne_top _ _),
     sum_Ico_pred (fun k ↦ 1 / deathRate k) hb1 (by omega),
     sum_Ico_pred (fun k ↦ (1 / deathRate k) ^ 2) hb1 (by omega),
