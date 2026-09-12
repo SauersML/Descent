@@ -6,6 +6,7 @@ import Mathlib.MeasureTheory.Integral.RieszMarkovKakutani.Real
 import Mathlib.MeasureTheory.Measure.ProbabilityMeasure
 import Mathlib.MeasureTheory.Integral.BoundedContinuousFunction
 import Mathlib.MeasureTheory.Constructions.Cylinders
+import Mathlib.MeasureTheory.Integral.Pi
 import Mathlib.Topology.ContinuousMap.StoneWeierstrass
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
@@ -323,7 +324,7 @@ end Density
 
 section Polynomials
 
-variable {V : Type*} [Countable V]
+variable {V : Type*} [Countable V] [DecidableEq V]
 
 /-- The indicator readout of one letter pattern on a finite set of features. -/
 def patternIndicator (features : Finset V) (pattern : features → Bool) :
