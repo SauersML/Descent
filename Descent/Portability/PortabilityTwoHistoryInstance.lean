@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.ReferenceExperimentRows
 import Descent.Portability.ReferenceExperimentRegion
+import Descent.Portability.PortabilityMinimaxLowerBound
 
 assert_below Descent.Decision Descent.Program
 
@@ -22,26 +23,36 @@ have one source-panel report law (`sourcePanelLaw_toReal`), at total variation d
 included, and for the panel of one architecture and environment context (`contextPanelLaw`),
 whose learner law is the learner-atom law of the experiment (`atomMass_eq_sum_panelMass`).
 
+The floor comes from the two-point bound of `PortabilityMinimaxLowerBound` at total variation
+zero. Take any number `n` of replicate source panels. Every estimator that reads them has worst
+expected absolute error over the two settings of at least half the separation of the target
+values (`half_separation_le_worstRisk`), and the estimator that reports the midpoint attains it
+(`worstRisk_midpoint`). So half the separation is the exact minimax risk (`isLeast_worstRisk`),
+and no amount of source data lowers it.
+
 The target functionals differ:
 - Pooled over the reference context law, half the separation between the settings is
   `0.00725001…` for the expected target squared correlation given definedness
-  (`half_separation_r2`), and `0.0736082…` for the target to source squared-correlation ratio
-  (`half_separation_r2Portability`).
+  (`half_separation_r2`, floor `minimax_floor_r2`), and `0.0736082…` for the target to source
+  squared-correlation ratio (`half_separation_r2Portability`, floor
+  `minimax_floor_r2Portability`).
 - Within one context, the separations are taken at the corners where
   `ReferenceExperimentRegion` attains its full-square ranges:
   - at `(A, E) = (0, 1)`, the upper endpoint of both squared-correlation ranges, half the
-    separation is `0.00639807…` (`half_separation_r2_zero_one`);
-  - at `(1, 0)`, the lower endpoint of both, it is `0.00597727…` (`half_separation_r2_one_zero`);
+    separation is `0.00639807…` (`half_separation_r2_zero_one`, floor
+    `minimax_floor_r2_zero_one`);
+  - at `(1, 0)`, the lower endpoint of both, it is `0.00597727…` (`half_separation_r2_one_zero`,
+    floor `minimax_floor_r2_one_zero`);
   - at `(0, 1)`, the lower endpoint of both ratio ranges, it is `0.0438011…`
-    (`half_separation_r2Portability_zero_one`).
+    (`half_separation_r2Portability_zero_one`, floor `minimax_floor_r2Portability_zero_one`).
 
 Every separation is an exact rational taken from the corner certificates and the population rows;
 nothing here simulates.
 
 ## Empirical status
 
-None. The bodies here are exact rational arithmetic on a completely specified finite model, so no
-measurement can bear on these values.
+None. The bodies here are exact rational arithmetic on a completely specified finite model and a
+two-point inequality, so no measurement can bear on these values.
 -/
 
 set_option autoImplicit false
@@ -53,6 +64,7 @@ open RationalReportClosure ReferenceExperimentLaw ReferenceExperimentTable
   ReferenceExperimentEarlyMomentCorners ReferenceExperimentEarlyLossCorners
   ReferenceExperimentLateMomentCorners ReferenceExperimentLateLossCorners ReferenceExperimentRows
   ReferenceExperimentRegion
+open FourCellCohortLaw (cohortLaw)
 
 /-! ## The two settings -/
 
@@ -85,7 +97,7 @@ theorem terminalTable_sum :
     ∀ late context, ∑ terminal, terminalTable (twoPointEntries late) context terminal = 1 := by
   decide +kernel
 
-/-! ## The complete experiment and its source marginal -/
+/-! ## The complete experiment, its source marginal and the two-point floor -/
 
 section Experiment
 
@@ -148,6 +160,55 @@ theorem totalVariation_sourcePanelLaw :
       (sourcePanelLaw source contextOf true).toReal = 0 := by
   simp only [sourcePanelLaw_false_eq_true, FiniteReportLaw.totalVariation, sub_self, max_self,
     Finset.sum_const_zero]
+
+/-- The worst expected absolute error over the two settings of an estimator that reads `n`
+replicate source panels, against the target values `τ`. -/
+noncomputable def worstRisk (τ : Bool → ℝ) (n : ℕ) (estimator : (Fin n → Source) → ℝ) : ℝ :=
+  max ((cohortLaw (sourcePanelLaw source contextOf false).toReal n).expectation
+      fun sample ↦ |estimator sample - τ false|)
+    ((cohortLaw (sourcePanelLaw source contextOf true).toReal n).expectation
+      fun sample ↦ |estimator sample - τ true|)
+
+/-- F2 with one source-panel report law: every estimator that reads `n` replicate source panels
+has worst risk at least half the separation of the target values, for every `n`. -/
+theorem half_separation_le_worstRisk (τ : Bool → ℝ) (n : ℕ)
+    (estimator : (Fin n → Source) → ℝ) :
+    |τ true - τ false| / 2 ≤ worstRisk source contextOf τ n estimator := by
+  have h := PortabilityMinimaxLowerBound.lowerBound_cohortLaw_totalVariation
+    (sourcePanelLaw source contextOf false).toReal (sourcePanelLaw source contextOf true).toReal
+    n (τ false) (τ true) estimator
+  rw [totalVariation_sourcePanelLaw, mul_zero, sub_zero,
+    max_eq_right (zero_le_one : (0 : ℝ) ≤ 1), mul_one, abs_sub_comm] at h
+  exact h
+
+/-- Every bound below half the separation is a strict floor on the worst risk. -/
+theorem lt_worstRisk_of_lt_half_separation (τ : Bool → ℝ) (bound : ℝ)
+    (hbound : bound < (τ true - τ false) / 2) (n : ℕ) (estimator : (Fin n → Source) → ℝ) :
+    bound < worstRisk source contextOf τ n estimator := by
+  refine hbound.trans_le
+    (le_trans ?_ (half_separation_le_worstRisk source contextOf τ n estimator))
+  linarith [le_abs_self (τ true - τ false)]
+
+/-- The floor is attained: the estimator that ignores the panels and reports the midpoint of the
+two target values has worst risk exactly half the separation. -/
+theorem worstRisk_midpoint (τ : Bool → ℝ) (n : ℕ) :
+    worstRisk source contextOf τ n (fun _ ↦ (τ false + τ true) / 2) =
+      |τ true - τ false| / 2 := by
+  have hconst : ∀ (law : FiniteReportLaw (Fin n → Source)) (value : ℝ),
+      law.expectation (fun _ ↦ value) = value := fun law value ↦ by
+    rw [FiniteReportLaw.expectation, ← Finset.sum_mul, law.mass_sum, one_mul]
+  simp only [worstRisk]
+  rw [hconst, hconst, show (τ false + τ true) / 2 - τ false = (τ true - τ false) / 2 by ring,
+    show (τ false + τ true) / 2 - τ true = -((τ true - τ false) / 2) by ring, abs_neg, max_self,
+    abs_div, abs_two]
+
+/-- Half the separation of the target values is the exact minimax risk of the two-point problem,
+for every number of replicate source panels. -/
+theorem isLeast_worstRisk (τ : Bool → ℝ) (n : ℕ) :
+    IsLeast (Set.range (worstRisk source contextOf τ n)) (|τ true - τ false| / 2) := by
+  refine ⟨⟨fun _ ↦ (τ false + τ true) / 2, worstRisk_midpoint source contextOf τ n⟩, ?_⟩
+  rintro _ ⟨estimator, rfl⟩
+  exact half_separation_le_worstRisk source contextOf τ n estimator
 
 end Experiment
 
@@ -260,5 +321,66 @@ theorem half_separation_r2Portability_zero_one :
     ratioDefined_eq, early_ratioWeighted_corner_zero_one, early_ratioDefined_corner_zero_one,
     late_ratioWeighted_corner_zero_one, late_ratioDefined_corner_zero_one]
   norm_num
+
+/-! ## The F2 floors of the reference experiment -/
+
+/-- F2 at NOTE2 section 9, pooled over the reference context law: from any number of replicate
+source studies, every estimator of the expected target squared correlation given definedness has
+worst risk above `0.00725`. -/
+theorem minimax_floor_r2 (n : ℕ) (estimator : (Fin n → SourceStudy) → ℝ) :
+    (7250008 / 10 ^ 9 : ℝ) <
+      worstRisk studyLaw Prod.fst (fun late ↦ (givenDefined late r2Weighted r2Defined : ℝ)) n
+        estimator :=
+  lt_worstRisk_of_lt_half_separation studyLaw Prod.fst
+    (fun late ↦ (givenDefined late r2Weighted r2Defined : ℝ)) _
+    (by exact_mod_cast half_separation_r2.1) n estimator
+
+/-- F2 at NOTE2 section 9, pooled over the reference context law: from any number of replicate
+source studies, every estimator of the expected target to source squared-correlation ratio given
+definedness has worst risk above `0.0736`. -/
+theorem minimax_floor_r2Portability (n : ℕ) (estimator : (Fin n → SourceStudy) → ℝ) :
+    (73608238 / 10 ^ 9 : ℝ) <
+      worstRisk studyLaw Prod.fst
+        (fun late ↦ (givenDefined late ratioWeighted ratioDefined : ℝ)) n estimator :=
+  lt_worstRisk_of_lt_half_separation studyLaw Prod.fst
+    (fun late ↦ (givenDefined late ratioWeighted ratioDefined : ℝ)) _
+    (by exact_mod_cast half_separation_r2Portability.1) n estimator
+
+/-- F2 at NOTE2 section 9 within the context `(A, E) = (0, 1)`: from any number of replicate
+panels of that context, every estimator of the target squared correlation given definedness has
+worst risk above `0.00639`. -/
+theorem minimax_floor_r2_zero_one (n : ℕ)
+    (estimator : (Fin n → Training × (Fin 3 × Bool)) → ℝ) :
+    (6398067 / 10 ^ 9 : ℝ) <
+      worstRisk (contextPanelLaw (false, true)) (fun _ ↦ (false, true))
+        (fun late ↦ contextGivenDefined late r2Weighted r2Defined (false, true)) n estimator :=
+  lt_worstRisk_of_lt_half_separation (contextPanelLaw (false, true)) (fun _ ↦ (false, true))
+    (fun late ↦ contextGivenDefined late r2Weighted r2Defined (false, true)) _
+    half_separation_r2_zero_one.1 n estimator
+
+/-- F2 at NOTE2 section 9 within the context `(A, E) = (1, 0)`: from any number of replicate
+panels of that context, every estimator of the target squared correlation given definedness has
+worst risk above `0.00597`. -/
+theorem minimax_floor_r2_one_zero (n : ℕ)
+    (estimator : (Fin n → Training × (Fin 3 × Bool)) → ℝ) :
+    (5977274 / 10 ^ 9 : ℝ) <
+      worstRisk (contextPanelLaw (true, false)) (fun _ ↦ (true, false))
+        (fun late ↦ contextGivenDefined late r2Weighted r2Defined (true, false)) n estimator :=
+  lt_worstRisk_of_lt_half_separation (contextPanelLaw (true, false)) (fun _ ↦ (true, false))
+    (fun late ↦ contextGivenDefined late r2Weighted r2Defined (true, false)) _
+    half_separation_r2_one_zero.1 n estimator
+
+/-- F2 at NOTE2 section 9 within the context `(A, E) = (0, 1)`: from any number of replicate
+panels of that context, every estimator of the target to source squared-correlation ratio given
+definedness has worst risk above `0.0438`. -/
+theorem minimax_floor_r2Portability_zero_one (n : ℕ)
+    (estimator : (Fin n → Training × (Fin 3 × Bool)) → ℝ) :
+    (43801143 / 10 ^ 9 : ℝ) <
+      worstRisk (contextPanelLaw (false, true)) (fun _ ↦ (false, true))
+        (fun late ↦ contextGivenDefined late ratioWeighted ratioDefined (false, true)) n
+        estimator :=
+  lt_worstRisk_of_lt_half_separation (contextPanelLaw (false, true)) (fun _ ↦ (false, true))
+    (fun late ↦ contextGivenDefined late ratioWeighted ratioDefined (false, true)) _
+    half_separation_r2Portability_zero_one.1 n estimator
 
 end Descent.Portability.PortabilityTwoHistoryInstance
