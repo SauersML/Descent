@@ -17,8 +17,14 @@ open Descent.Pangenome.AncestralLocality
 #print axioms gainSemigroup_zero
 #print axioms hasDerivAt_gainSemigroup_apply
 #print axioms norm_gainSemigroup_le
+#print axioms hasDerivWithinAt_duhamel
 #print axioms hasDerivAt_duhamel
+#print axioms continuousOn_duhamel
+#print axioms abs_moment_le_choose_mul_pow_right
 #print axioms abs_moment_le_choose_mul_pow
+#print axioms moment_eq_zero_of_mul_lt_one_right
 #print axioms moment_eq_zero_of_mul_lt_one
+#print axioms moment_eq_zero_right
 #print axioms moment_eq_zero
+#print axioms moments_eq_of_rightMomentEquation
 #print axioms moments_eq_of_momentEquation
