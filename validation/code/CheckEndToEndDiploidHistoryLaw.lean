@@ -1,0 +1,38 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.EndToEndDiploidHistoryLaw
+
+/-! Axiom audit of EndToEndDiploidHistoryLaw. -/
+
+open Descent.Portability.EndToEndDiploidHistoryLaw
+
+#print axioms genotypeExpectationPolynomial
+#print axioms genotypeCovariancePolynomial
+#print axioms genotypeNumeratorPolynomial
+#print axioms genotypeDenominatorPolynomial
+#print axioms eval_genotypeExpectationPolynomial
+#print axioms eval_genotypeCovariancePolynomial
+#print axioms eval_genotypeNumeratorPolynomial
+#print axioms eval_genotypeDenominatorPolynomial
+#print axioms totalDegree_genotypeExpectationPolynomial_le
+#print axioms totalDegree_genotypeCovariancePolynomial_le
+#print axioms totalDegree_genotypeNumeratorPolynomial_le
+#print axioms totalDegree_genotypeDenominatorPolynomial_le
+#print axioms diploidNumeratorPolynomial
+#print axioms diploidDenominatorPolynomial
+#print axioms polynomialFunction_diploidNumeratorPolynomial
+#print axioms polynomialFunction_diploidDenominatorPolynomial
+#print axioms totalDegree_diploidNumeratorPolynomial_le
+#print axioms totalDegree_diploidDenominatorPolynomial_le
+#print axioms integral_historyEventKernel_of_totalDegree_le
+#print axioms integral_rateHistoryKernel_of_totalDegree_le
+#print axioms integral_genotypeNumerator_historyEventKernel
+#print axioms integral_genotypeDenominator_historyEventKernel
+#print axioms integral_genotypeNumerator_rateHistoryKernel
+#print axioms integral_genotypeDenominator_rateHistoryKernel
+#print axioms diploidMomentPortability
+#print axioms expectedDiploidPortability_historyEventKernel_budgetEight
+#print axioms expectedDiploidPortability_rateHistoryKernel_budgetEight
+#print axioms expectedDiploidPortability_eq_of_budgetEight_moments_eq
+#print axioms diploidMomentPortability_diploidSum_historyEventKernel
