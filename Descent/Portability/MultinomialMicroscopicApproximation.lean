@@ -47,9 +47,9 @@ NOTE1 Theorem 2 follows with the note's resampling.
 `multinomialPropagator_mulVec_mem_realizationBody` carries the enlarged body into itself, and
 `multinomialEpoch_preserves_locusExchangeable_realization` is one epoch at any nonnegative rates.
 
-What is NOT proved here: the list induction over histories, which needs only the epoch theorem
-and is carried out for the single-draw approximation in `TwoLocusMicroscopicApproximation`; and
-the deme count zero, where the stage set is empty and nothing is resampled.
+The history forms, with every epoch through this approximation and splits and admixture pulses
+between them, are `MultinomialHistoryRealization`. What is NOT proved here: the deme count zero,
+where the stage set is empty and nothing is resampled.
 
 ## Empirical status
 
