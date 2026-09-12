@@ -384,7 +384,7 @@ theorem limitSemigroup_eq_of_tendsto {S S' : ℕ → FellerSemigroup X} {A : Sub
 
 section InfiniteGenome
 
-open CylinderSamplingAlgebra
+open MeasureTheory CylinderSamplingAlgebra
 
 variable {V : Type*} [Countable V]
 
