@@ -45,6 +45,7 @@ import Descent.Pangenome.GraphCoalescent.PartitionLatticeMobius
 import Descent.Pangenome.GraphCoalescent.RankedHistoryLaw
 import Descent.Pangenome.GraphCoalescent.VisibleIntensityClock
 import Descent.Pangenome.GraphCoalescent.ConnectionClockHittingTime
+import Descent.Pangenome.GraphCoalescent.ConnectionClockHittingLaw
 import Descent.Pangenome.GraphCoalescent.MinimalHistoryLumping
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionSpectrum
 import Descent.Pangenome.GraphCoalescent.ScaledConnectionLimit
@@ -200,11 +201,12 @@ inside it.
   `1 - e^(-u p₀ p₁)` (`connectionProbability_two`), and three equal fibers give
   `Pr(T_p > u) = 3 e^(-2u/9) - 2 e^(-u/3)` (`connectionSurvival_three_equal`):
   `MultiplicativeConnectionExamples`. The limit `u ↦ Pr(T_p ≤ u)` is continuous
-  (`ScaledConnectionLimit.continuous_connectionProbability_time`), vanishes at `u = 0` with two
-  fibers or more (`connectionProbability_zero`), and tends to one when every `p_i > 0`
-  (`tendsto_connectionProbability_atTop`), so `T_p` is finite; the crossing rate is the pair sum
-  `κ_σ = Σ_{C<D} p(C) p(D)` (`crossingRate_eq_pairProductSum`). (F2) holds for every path
-  functional with values in `[0, 1]`, within `min {1, U²/(4n) + U ‖p^(n) - p‖₁}`
+  (`MultiplicativeConnectionInLaw.continuous_connectionProbability_in_time`), vanishes at `u = 0`
+  with two fibers or more (`ScaledConnectionLimit.connectionProbability_zero`), is nondecreasing
+  without assuming `Σ p ≤ 1` (`monotoneOn_connectionProbability`), and tends to one when every
+  `p_i > 0` (`tendsto_connectionProbability_atTop`), so `T_p` is finite; the crossing rate is
+  the pair sum `κ_σ = Σ_{C<D} p(C) p(D)` (`crossingRate_eq_pairProductSum`). (F2) holds for
+  every path functional with values in `[0, 1]`, within `min {1, U²/(4n) + U ‖p^(n) - p‖₁}`
   (`abs_poissonMixture_report_sub_spread_le`). With the rate of (F2), the scaled connection
   probability is within `min {1, U²/(4n) + U ‖p^(n) - p‖₁}` of `Pr(T_p ≤ U)` on the fiber labels
   (`abs_reportConnectionProbability_sub_le_min`).
@@ -247,7 +249,10 @@ inside it.
   the visible history (`filterPosterior_dotProduct_one`, `filterPosterior_single_dotProduct_one`).
   For the load chain the killed generator carries the internal rates `C(L_C, 2)` and `-C(K, 2)`
   (`killedGenerator_mulVec_loadGenerator`), and a visible merger transfers mass with weight
-  `L_C L_D` (`transferMatrix_mulVec_loadGenerator`).
+  `L_C L_D` (`transferMatrix_mulVec_loadGenerator`). The observed intensity of a visible merger
+  of `C` and `D` is the posterior expectation of `L_C L_D` (`observedIntensity_eq_posteriorMean`),
+  and summed over pairs these are the posterior expected visible rate
+  (`sum_pairs_posteriorMean`).
 * Theorem E, (E1): `LeadingCoefficient`. For `w ≥ 2` positive fiber sizes,
   `[z^{n - w + 1}] C_c(z) = 2 (∏_i c_i) (2n - w)! / (2n - 2w + 2)!` (`coeff_cumulantOfSizes`, at an
   interface `coeff_connectivityCumulant_top`), through the derivative identity of the reflected
@@ -294,8 +299,11 @@ recursion, without enumerating ranked histories. §9 is proved for a finite hidd
 given by its generator, with the load chain's generator `loadGenerator` written from the rates of
 Theorem A. (E1) is proved from the Möbius sum rather than the ranked-history law. (E2) is proved
 for the weight of the connected reports in the matrix exponential of Kingman's generator; the
-continuous-time chain as a process is not constructed. The spectral statement of §6 is proved for
-the first-step law, whose survival function is not identified with that of the trajectory clock.
+continuous-time chain as a process is not constructed. The first-step law of the connection time
+is the law of the trajectory clock and of the first hitting time of `⊤`
+(`ConnectionClockHittingLaw.map_connectionTime_eq_connectionTimeLaw`,
+`map_reportHittingTime_eq_connectionTimeLaw`), so the spectral statement of §6 and (C2) hold for
+the hitting time (`survivalAt_reportHittingTime`, `survivalAt_reportHittingTime_le`).
 (D7)-(D9) are proved for the connection time
 defined as the sum of the holding times above the stopping level, which is almost surely the first
 time the report of the coalescent path reaches `⊤`
