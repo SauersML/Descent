@@ -125,7 +125,8 @@ theorem ofSetoid_le_ofSetoid_iff (ξ η : Coalescent.ER n) :
       ?_⟩
     intro y hy
     rw [← htx] at hy
-    exact Finpartition.mem_part_ofSetoid_iff_rel.mpr (h (Finpartition.mem_part_ofSetoid_iff_rel.mp hy))
+    exact Finpartition.mem_part_ofSetoid_iff_rel.mpr
+      (h (Finpartition.mem_part_ofSetoid_iff_rel.mp hy))
 
 /-- The top coalescent state is the one-part partition. -/
 theorem ofSetoid_top : Finpartition.ofSetoid (⊤ : Coalescent.ER n) = ⊤ := by
