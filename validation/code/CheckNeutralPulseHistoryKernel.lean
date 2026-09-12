@@ -21,3 +21,6 @@ open Descent.Portability.NeutralPulseHistoryKernel
 #print axioms historyEventPropagator
 #print axioms isMarkovKernel_historyEventKernel
 #print axioms integral_momentPolynomial_historyEventKernel
+#print axioms eventPropagator_substochastic
+#print axioms historyEventPropagator_substochastic
+#print axioms integral_panelReport_historyEventKernel

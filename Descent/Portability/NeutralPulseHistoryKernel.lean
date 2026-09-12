@@ -26,7 +26,11 @@ duration, or a pulse; each has a Markov kernel and a moment matrix (`eventKernel
 chronological order (`historyEventKernel`, `isMarkovKernel_historyEventKernel`).  For every budget
 its expected configuration moments are the chronological product of the epoch dual propagators
 and pulse substitution kernels applied to the initial moments
-(`integral_momentPolynomial_historyEventKernel`).
+(`integral_momentPolynomial_historyEventKernel`).  That chronological moment matrix is
+substochastic (`historyEventPropagator_substochastic`), and the expected compiled report of an
+independently sampled panel at the end of the history is the sum over genotypes of the readout
+times the seed coordinate of that matrix applied to the initial moments
+(`integral_panelReport_historyEventKernel`).
 
 ## Empirical status
 
@@ -43,7 +47,8 @@ namespace Descent.Portability.NeutralPulseHistoryKernel
 open MeasureTheory ProbabilityTheory MvPolynomial Descent.Coalescent PartialHaplotypeCarrier
   PartialHaplotypeDualGenerator PartialHaplotypeDualSemigroup NeutralFellerGenerator
   NeutralPolynomialSemigroup PartialHaplotypeMicroscopicApproximation PartialHaplotypePulseKernel
-  NeutralMicroscopicEulerLimit NeutralKernelPanelLikelihood
+  NeutralMicroscopicEulerLimit NeutralKernelPanelLikelihood SubstochasticGeneratorSemigroup
+  PartialHaplotypePanelLikelihood
 open scoped Matrix NNReal
 
 noncomputable section
@@ -228,6 +233,65 @@ theorem integral_momentPolynomial_historyEventKernel (ℓ₀ : Locus)
     exact integral_momentPolynomial_comp capacity _ _ _ _
       (integral_momentPolynomial_eventKernel ℓ₀ hap₀ capacity event)
       (integral_momentPolynomial_historyEventKernel ℓ₀ hap₀ capacity rest) x ξ
+
+/-- The moment matrix of an event is substochastic. -/
+theorem eventPropagator_substochastic (capacity : Locus → ℕ) :
+    ∀ event : (NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme,
+      SubstochasticMatrix (eventPropagator capacity event)
+  | Sum.inl epoch => dualPropagator_substochastic epoch.1 capacity epoch.2 (NNReal.coe_nonneg _)
+  | Sum.inr pulse => pulseKernel_substochastic (Allele := Allele) pulse capacity
+
+/-- The chronological moment matrix of a history with splits and pulses is substochastic. -/
+theorem historyEventPropagator_substochastic (capacity : Locus → ℕ) :
+    ∀ events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme),
+      SubstochasticMatrix (historyEventPropagator capacity events)
+  | [] => substochastic_one
+  | event :: rest => substochastic_mul (historyEventPropagator_substochastic capacity rest)
+      (eventPropagator_substochastic capacity event)
+
+variable {Sample Report : Type*} [Fintype Sample] [DecidableEq Sample] [Fintype Report]
+
+/-- **NOTE1 (20) with (22) along a history with splits and pulses, under the process law.**  The
+expected compiled report of an independently sampled panel at the end of a history of epochs and
+pulses, started at a frequency state, is the sum over panel genotypes of the conditional readout
+times the seed coordinate of the chronological moment matrix applied to the initial moments. -/
+theorem integral_panelReport_historyEventKernel (ℓ₀ : Locus)
+    (hap₀ : FullHaplotype Locus Allele) (deme : Sample → Deme)
+    (report : (Sample → FullHaplotype Locus Allele) → FiniteReportLaw Report)
+    (metric : Report → ℝ)
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (x0 : FrequencyState Deme Locus Allele) :
+    ∫ y, ((FiniteGeneticTransition.piLaw fun draw ↦ stateLaw y (deme draw)).bind
+        report).expectation metric ∂(historyEventKernel ℓ₀ hap₀ events x0)
+      = ∑ genotype : Sample → FullHaplotype Locus Allele,
+          (report genotype).expectation metric *
+            (historyEventPropagator (fun _ ↦ Fintype.card Sample) events
+              *ᵥ budgetMomentFeature (fun _ ↦ Fintype.card Sample) x0)
+              (seedState deme genotype ℓ₀) := by
+  haveI := isMarkovKernel_historyEventKernel ℓ₀ hap₀ events
+  have hint : ∀ genotype : Sample → FullHaplotype Locus Allele,
+      Integrable (fun y ↦ (report genotype).expectation metric
+        * polynomialFunction (momentPolynomial (seedState deme genotype ℓ₀).1) y)
+        (historyEventKernel ℓ₀ hap₀ events x0) := fun genotype ↦
+    Integrable.const_mul ((BoundedContinuousFunction.mkOfCompact
+      (polynomialFunction (momentPolynomial (seedState deme genotype ℓ₀).1))).integrable _) _
+  calc ∫ y, ((FiniteGeneticTransition.piLaw fun draw ↦ stateLaw y (deme draw)).bind
+          report).expectation metric ∂(historyEventKernel ℓ₀ hap₀ events x0)
+      = ∫ y, ∑ genotype : Sample → FullHaplotype Locus Allele,
+          (report genotype).expectation metric
+            * polynomialFunction (momentPolynomial (seedState deme genotype ℓ₀).1) y
+          ∂(historyEventKernel ℓ₀ hap₀ events x0) := by
+        congr 1
+        funext y
+        exact panelReport_eq_sum_seedMoment deme report metric ℓ₀ y
+    _ = ∑ genotype : Sample → FullHaplotype Locus Allele,
+          ∫ y, (report genotype).expectation metric
+            * polynomialFunction (momentPolynomial (seedState deme genotype ℓ₀).1) y
+          ∂(historyEventKernel ℓ₀ hap₀ events x0) :=
+        integral_finset_sum Finset.univ fun genotype _ ↦ hint genotype
+    _ = _ := by
+        refine Finset.sum_congr rfl fun genotype _ ↦ ?_
+        rw [integral_const_mul, integral_momentPolynomial_historyEventKernel]
 
 end
 
