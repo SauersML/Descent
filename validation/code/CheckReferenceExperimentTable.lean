@@ -7,6 +7,7 @@ import Descent.Portability.ReferenceExperimentTable
 
 open Descent.Portability.ReferenceExperimentTable
 
+#print axioms cast_comparisonValue
 #print axioms early_terminalMass_table
 #print axioms late_terminalMass_table
 #print axioms historyReport_eq_tableReport
