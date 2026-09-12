@@ -360,7 +360,8 @@ theorem expectedAUCPortability_rateHistoryKernel {rates : ℝ → NeutralRates D
     expectedAUCPortability (rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous) x0 source target
         score outcome
       = momentAUCPortability ℓ₀ source target score outcome
-          (rateHistoryDualPropagator rates (fun _ ↦ 2) T *ᵥ budgetMomentFeature (fun _ ↦ 2) x0) := by
+          (rateHistoryDualPropagator rates (fun _ ↦ 2) T
+            *ᵥ budgetMomentFeature (fun _ ↦ 2) x0) := by
   haveI := isMarkovKernel_rateHistoryKernel hT hcontinuous ℓ₀ hap₀
   exact expectedAUCPortability_eq_momentAUCPortability ℓ₀ _ _
     (hasDualMoments_rateHistoryKernel hT hcontinuous ℓ₀ hap₀ 2) x0 source target score outcome

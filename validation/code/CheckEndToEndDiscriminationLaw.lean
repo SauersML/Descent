@@ -1,0 +1,43 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.EndToEndDiscriminationLaw
+
+/-! Axiom audit of EndToEndDiscriminationLaw. -/
+
+open Descent.Portability.EndToEndDiscriminationLaw
+
+#print axioms eval_aucNumeratorPolynomial
+#print axioms eval_aucDenominatorPolynomial
+#print axioms totalDegree_aucNumeratorPolynomial_le
+#print axioms totalDegree_aucDenominatorPolynomial_le
+#print axioms BudgetMatrix
+#print axioms HasDualMoments
+#print axioms hasDualMoments_historyEventKernel
+#print axioms hasDualMoments_rateHistoryKernel
+#print axioms continuous_eval_stateLaw
+#print axioms integral_eval_stateLaw_eq_dotProduct
+#print axioms integral_eval_stateLaw_historyEventKernel
+#print axioms integral_eval_stateLaw_rateHistoryKernel
+#print axioms integral_aucNumerator_eq_dotProduct
+#print axioms integral_aucDenominator_eq_dotProduct
+#print axioms integral_aucNumerator_historyEventKernel
+#print axioms integral_aucDenominator_historyEventKernel
+#print axioms expectedAUCPortability
+#print axioms momentAUCPortability
+#print axioms expectedAUCPortability_eq_momentAUCPortability
+#print axioms expectedAUCPortability_historyEventKernel
+#print axioms expectedAUCPortability_rateHistoryKernel
+#print axioms expectedAUCPortability_eq_of_moments_eq
+#print axioms widenConfiguration
+#print axioms historyEventPropagator_mulVec_widenConfiguration
+#print axioms historyEventMoments_eq_of_le
+#print axioms expectedPortability_and_expectedAUCPortability_eq_of_moments_eq
+#print axioms moments_forall_four_iff_forall_two
+#print axioms expectedAUC
+#print axioms expectedAUC_eq_tsum
+#print axioms expectedAUC_eq_tsum_dotProduct
+#print axioms expectedAUC_historyEventKernel
+#print axioms expectedAUC_rateHistoryKernel
+#print axioms expectedAUC_eq_of_moments_eq
+#print axioms expectedSquaredCorrelation_and_expectedAUC_eq_of_moments_eq
