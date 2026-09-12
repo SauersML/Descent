@@ -1,0 +1,39 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.EndToEndPortabilityLaw
+
+/-! Axiom audit of EndToEndPortabilityLaw. -/
+
+open Descent.Portability.EndToEndPortabilityLaw
+
+#print axioms demePolynomial
+#print axioms eval_demePolynomial
+#print axioms numeratorPolynomial
+#print axioms denominatorPolynomial
+#print axioms polynomialFunction_numeratorPolynomial
+#print axioms polynomialFunction_denominatorPolynomial
+#print axioms totalDegree_numeratorPolynomial_le
+#print axioms totalDegree_denominatorPolynomial_le
+#print axioms withinBudget_of_totalDegree_le
+#print axioms budgetCoefficients
+#print axioms integral_polynomial_eq_dotProduct
+#print axioms integral_correlationNumerator_historyEventKernel
+#print axioms integral_correlationDenominator_historyEventKernel
+#print axioms expectedPortability
+#print axioms momentPortability
+#print axioms expectedPortability_historyEventKernel
+#print axioms expectedPortability_eq_of_moments_eq
+#print axioms jointNumeratorPolynomial
+#print axioms jointDenominatorPolynomial
+#print axioms polynomialFunction_jointNumeratorPolynomial
+#print axioms polynomialFunction_jointDenominatorPolynomial
+#print axioms totalDegree_jointNumeratorPolynomial_le
+#print axioms totalDegree_jointDenominatorPolynomial_le
+#print axioms expectedJointPortability
+#print axioms jointMomentPortability
+#print axioms expectedJointPortability_historyEventKernel
+#print axioms expectedJointPortability_eq_of_moments_eq
+#print axioms integral_correlationNumerator_rateHistoryKernel
+#print axioms integral_correlationDenominator_rateHistoryKernel
+#print axioms expectedPortability_rateHistoryKernel
