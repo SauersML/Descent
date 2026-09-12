@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Pangenome.AncestralLocality.CylinderSamplingAlgebra
 import Descent.Pangenome.AncestralLocality.CompatibilityNeutrality
 import Descent.Pangenome.AncestralLocality.InfiniteGenomeLimit
+import Descent.Pangenome.AncestralLocality.LocalityBounds
 import Descent.Pangenome.AncestralLocality.LocalityTransition
 import Descent.Pangenome.AncestralLocality.SupercriticalReach
 
@@ -38,6 +39,13 @@ on the bytes on main.
    converge on every observable, the limit is a Feller semigroup with strong continuity at every
    time, and two Feller semigroups agreeing on the subalgebra agree, so the limit does not depend
    on the exhaustion.
+
+4. `LocalityBounds` -- Theorems 7 and 8 and Corollary 8.1: a decision raises the weighted
+   support count by at most `w i + 2 w j` and a coalescence does not raise it, so
+   `L_anc Z ≤ 3 D Z` and, with light-cone weights, `L_anc Z^{(a)} ≤ D (1 + 2a) Z^{(a)}`. Along
+   marginal laws satisfying the Dynkin formula these give (8.2), (8.3) and the escape bound
+   (9.1), with the radius identity behind (9.2); outcomes equal off an event are within its
+   probability in total variation.
 
 This file contains no declarations.
 -/
