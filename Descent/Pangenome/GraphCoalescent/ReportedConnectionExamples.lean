@@ -28,7 +28,7 @@ that no class straddles is empty or everything (`observed_eq_top_iff_saturated`)
 `connectionCount_eq_minMapCount` transports the count, and `decide +kernel` evaluates it.  No
 `native_decide` is used.
 
-`coeff_connectivityCumulant_graphKer` ties the count to the corpus cumulant of
+`connectionCount_eq_coeff_connectivityCumulant` ties the count to the corpus cumulant of
 `ConnectivityCumulantCorpus`: `connectionCount s k` is the `z^k` coefficient of
 `connectivityCumulant (ofSetoid (graphKer s))`.  The polynomials of
 `ConnectivityClockTable` are `cumulantOfSizes` over `Fin 2` and `Fin 3`.  That they are these
@@ -180,15 +180,14 @@ theorem connectionCount_eq_minMapCount {n : ℕ} (hn : 0 < n) (s : Fin n → Fin
 
 open scoped Classical in
 /-- **(D5)'s count is the corpus cumulant's coefficient**: `connectionCount s k` is the `z^k`
-coefficient of `ConnectivityCumulantCorpus`'s (D3) polynomial at `graphKer s`. -/
-theorem coeff_connectivityCumulant_graphKer {n : ℕ} (hn : 0 < n) (s : Fin n → Fin n) (k : ℕ) :
-    (connectivityCumulant (Finpartition.ofSetoid (graphKer s))).coeff k
-      = (connectionCount s k : ℤ) := by
-  rw [connectivityCumulant_graphKer_eq_sum_observed s hn, finset_sum_coeff, connectionCount,
-    Nat.cast_sum, sum_filter, sum_filter]
-  refine sum_congr rfl fun π _ ↦ ?_
-  simp only [coeff_C_mul, coeff_X_pow]
-  by_cases h1 : observed s π = ⊤ <;> by_cases h2 : blocks π = k <;> simp [h1, h2, eq_comm]
+coefficient of the (D3) polynomial at `graphKer s`, which
+`ConnectivityCumulantCorpus.coeff_connectivityCumulant_graphKer` computes as the connected
+weighted count. -/
+theorem connectionCount_eq_coeff_connectivityCumulant {n : ℕ} (hn : 0 < n) (s : Fin n → Fin n)
+    (k : ℕ) :
+    (connectionCount s k : ℤ)
+      = (connectivityCumulant (Finpartition.ofSetoid (graphKer s))).coeff k :=
+  (coeff_connectivityCumulant_graphKer s hn k).symm
 
 /-! ### The interfaces of the table -/
 
@@ -328,32 +327,41 @@ theorem connectionTime_mean_oneOneTwo :
     hF4]
   norm_num
 
+/-- The connected weighted counts of the interface `(2,2,2)`, by kernel evaluation over the
+`203` class-minimum maps of `Fin 6`. -/
+theorem minMapCount_twoTwoTwo :
+    minMapCount interfaceTwoTwoTwo 2 = 1656 ∧ minMapCount interfaceTwoTwoTwo 3 = 928 ∧
+      minMapCount interfaceTwoTwoTwo 4 = 144 ∧ minMapCount interfaceTwoTwoTwo 5 = 0 := by
+  decide +kernel
+
+/-- `F_2, …, F_5` at the interface `(2,2,2)`. -/
+theorem connectedProb_twoTwoTwo :
+    connectedProb interfaceTwoTwoTwo 2 = 23 / 25 ∧
+      connectedProb interfaceTwoTwoTwo 3 = 58 / 75 ∧
+      connectedProb interfaceTwoTwoTwo 4 = 12 / 25 ∧
+      connectedProb interfaceTwoTwoTwo 5 = 0 := by
+  obtain ⟨h2, h3, h4, h5⟩ := minMapCount_twoTwoTwo
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · rw [connectedProb_eq interfaceTwoTwoTwo (k := 2) (by norm_num) (by norm_num),
+      connectionCount_eq_minMapCount (by norm_num), h2]
+    norm_num [jumpCoeff, Nat.factorial]
+  · rw [connectedProb_eq interfaceTwoTwoTwo (k := 3) (by norm_num) (by norm_num),
+      connectionCount_eq_minMapCount (by norm_num), h3]
+    norm_num [jumpCoeff, Nat.factorial]
+  · rw [connectedProb_eq interfaceTwoTwoTwo (k := 4) (by norm_num) (by norm_num),
+      connectionCount_eq_minMapCount (by norm_num), h4]
+    norm_num [jumpCoeff, Nat.factorial]
+  · rw [connectedProb_eq interfaceTwoTwoTwo (k := 5) (by norm_num) (by norm_num),
+      connectionCount_eq_minMapCount (by norm_num), h5]
+    norm_num
+
 /-- **Fiber sizes `(2,2,2)`: `E τ_q = 92/225`.** -/
 theorem connectionTime_mean_twoTwoTwo :
     ∫⁻ p, ENNReal.ofReal (connectionTime interfaceTwoTwoTwo p) ∂(trajectoryClockLaw 6)
       = ENNReal.ofReal (92 / 225) := by
   have hw : 2 ≤ Linkage.width interfaceTwoTwoTwo := by decide +kernel
-  have hc2 : minMapCount interfaceTwoTwoTwo 2 = 1656 := by decide +kernel
-  have hc3 : minMapCount interfaceTwoTwoTwo 3 = 928 := by decide +kernel
-  have hc4 : minMapCount interfaceTwoTwoTwo 4 = 144 := by decide +kernel
-  have hc5 : minMapCount interfaceTwoTwoTwo 5 = 0 := by decide +kernel
+  obtain ⟨hF2, hF3, hF4, hF5⟩ := connectedProb_twoTwoTwo
   have hF1 := connectedProb_one interfaceTwoTwoTwo (by norm_num)
-  have hF2 : connectedProb interfaceTwoTwoTwo 2 = 23 / 25 := by
-    rw [connectedProb_eq interfaceTwoTwoTwo (k := 2) (by norm_num) (by norm_num),
-      connectionCount_eq_minMapCount (by norm_num), hc2]
-    norm_num [jumpCoeff, Nat.factorial]
-  have hF3 : connectedProb interfaceTwoTwoTwo 3 = 58 / 75 := by
-    rw [connectedProb_eq interfaceTwoTwoTwo (k := 3) (by norm_num) (by norm_num),
-      connectionCount_eq_minMapCount (by norm_num), hc3]
-    norm_num [jumpCoeff, Nat.factorial]
-  have hF4 : connectedProb interfaceTwoTwoTwo 4 = 12 / 25 := by
-    rw [connectedProb_eq interfaceTwoTwoTwo (k := 4) (by norm_num) (by norm_num),
-      connectionCount_eq_minMapCount (by norm_num), hc4]
-    norm_num [jumpCoeff, Nat.factorial]
-  have hF5 : connectedProb interfaceTwoTwoTwo 5 = 0 := by
-    rw [connectedProb_eq interfaceTwoTwoTwo (k := 5) (by norm_num) (by norm_num),
-      connectionCount_eq_minMapCount (by norm_num), hc5]
-    norm_num
   have hF6 := connectedProb_self hw
   have hp1 : stoppingProb interfaceTwoTwoTwo 1
       = connectedProb interfaceTwoTwoTwo 1 - connectedProb interfaceTwoTwoTwo 2 :=
@@ -372,9 +380,9 @@ theorem connectionTime_mean_twoTwoTwo :
     stoppingProb_eq interfaceTwoTwoTwo (b := 5) (by norm_num) (by norm_num)
   have hp6 := stoppingProb_self (by norm_num) interfaceTwoTwoTwo
   rw [connectionTime_mean (by norm_num) interfaceTwoTwoTwo,
-    show Icc 1 6 = {1, 2, 3, 4, 5, 6} by decide]
-  simp (disch := decide) only [sum_insert, sum_singleton, hp1, hp2, hp3, hp4, hp5, hp6, hF1,
-    hF2, hF3, hF4, hF5, hF6]
+    show Icc 1 6 = {1, 2, 3, 4, 5, 6} by decide +kernel]
+  simp (disch := decide +kernel) only [sum_insert, sum_singleton, hp1, hp2, hp3, hp4, hp5, hp6,
+    hF1, hF2, hF3, hF4, hF5, hF6]
   norm_num
 
 /-- **The width does not determine the clock.**  The interfaces with fiber sizes `(1,3)` and

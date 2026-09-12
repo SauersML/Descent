@@ -14,10 +14,12 @@ import Descent.Pangenome.GraphCoalescent.ReportedConnectionExamples
 #print axioms Descent.Pangenome.GraphCoalescent.rankWeight_ker
 #print axioms Descent.Pangenome.GraphCoalescent.observed_eq_top_iff_saturated
 #print axioms Descent.Pangenome.GraphCoalescent.connectionCount_eq_minMapCount
-#print axioms Descent.Pangenome.GraphCoalescent.coeff_connectivityCumulant_graphKer
+#print axioms Descent.Pangenome.GraphCoalescent.connectionCount_eq_coeff_connectivityCumulant
 #print axioms Descent.Pangenome.GraphCoalescent.connectionTime_mean_oneTwo
 #print axioms Descent.Pangenome.GraphCoalescent.connectionTime_mean_oneThree
 #print axioms Descent.Pangenome.GraphCoalescent.connectionTime_mean_twoTwo
 #print axioms Descent.Pangenome.GraphCoalescent.connectionTime_mean_oneOneTwo
+#print axioms Descent.Pangenome.GraphCoalescent.minMapCount_twoTwoTwo
+#print axioms Descent.Pangenome.GraphCoalescent.connectedProb_twoTwoTwo
 #print axioms Descent.Pangenome.GraphCoalescent.connectionTime_mean_twoTwoTwo
 #print axioms Descent.Pangenome.GraphCoalescent.connectionTime_mean_oneThree_ne_twoTwo
