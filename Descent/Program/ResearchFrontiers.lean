@@ -11,6 +11,7 @@ import Descent.Portability.EndToEndPortabilityLaw
 import Descent.Pangenome.GraphCoalescent.CompressionLoadAchievability
 import Descent.Pangenome.AncestralLocality.SelectionClosure
 import Descent.Portability.PortabilityTwoHistoryInstance
+import Descent.Portability.EndToEndPortabilityLipschitz
 
 namespace Descent.Program
 
@@ -50,7 +51,12 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   (`expectedPortability_historyEventKernel`, `expectedPortability_rateHistoryKernel`), the joint
   ratio of NOTE2 (27) of `U · H₈(x₀)` (`expectedJointPortability_historyEventKernel`), and two
   histories that agree on those moments have equal portability
-  (`expectedPortability_eq_of_moments_eq`).
+  (`expectedPortability_eq_of_moments_eq`). Portability is Lipschitz in the rate path: the
+  propagators of two continuous rate paths differ by at most
+  `(∫₀ᵀ ‖Q₁ - Q₂‖) e^{∫‖Q₁‖} e^{∫‖Q₂‖}`
+  (`EndToEndPortabilityLipschitz.norm_rateHistoryDualPropagator_sub_le`), and so does expected
+  portability, up to `1/δ⁴` where the denominators stay above `δ`
+  (`abs_expectedPortability_sub_le`).
 * Selection and hereditary closure: `SelectionClosure`. Selection size-biases the parents
   (`selectedReproduce_eq`); the closure predicting the selected next generation is the closure of
   the observation joined with fitness, the greatest autonomous partition below the observation on

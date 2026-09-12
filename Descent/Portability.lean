@@ -717,6 +717,7 @@ import Descent.Portability.ResamplingInfiniteGenome
 import Descent.Portability.PortabilityMinimaxLowerBound
 import Descent.Portability.EndToEndPortabilityLaw
 import Descent.Portability.PortabilityTwoHistoryInstance
+import Descent.Portability.EndToEndPortabilityLipschitz
 
 assert_below Descent.Program
 
