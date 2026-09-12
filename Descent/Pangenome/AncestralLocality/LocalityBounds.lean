@@ -575,6 +575,92 @@ theorem eq_zero_of_forall_escape_bound {x N D T : ℝ} {ℓ : ℕ} (hDT : D * T 
     have hb := (h a ha).trans (min_le_right _ _)
     rwa [hzero, Real.exp_zero, mul_one] at hb
 
+/-! ### Corollary 8.1: the coupling inequality -/
+
+section Coupling
+
+variable {Ω α : Type*} [MeasurableSpace Ω] {μ : Measure Ω} [IsFiniteMeasure μ] {X Y : Ω → α}
+  {E : Set Ω}
+
+/-- **Outcomes equal off an event differ only on it.** If `X` and `Y` agree outside `E`, then
+`P(X ∈ B) - P(Y ∈ B) = P(X ∈ B, E) - P(Y ∈ B, E)` for every set `B`. -/
+theorem measureReal_preimage_sub_eq (hE : MeasurableSet E) (hagree : ∀ ω ∉ E, X ω = Y ω)
+    (B : Set α) : μ.real (X ⁻¹' B) - μ.real (Y ⁻¹' B) =
+      μ.real (X ⁻¹' B ∩ E) - μ.real (Y ⁻¹' B ∩ E) := by
+  have hdiff : X ⁻¹' B \ E = Y ⁻¹' B \ E := by
+    ext ω
+    simp only [Set.mem_diff, Set.mem_preimage]
+    constructor
+    · rintro ⟨hω, hωE⟩
+      exact ⟨by rwa [← hagree ω hωE], hωE⟩
+    · rintro ⟨hω, hωE⟩
+      exact ⟨by rwa [hagree ω hωE], hωE⟩
+  have hX := measureReal_inter_add_diff (μ := μ) (s := X ⁻¹' B) hE
+  have hY := measureReal_inter_add_diff (μ := μ) (s := Y ⁻¹' B) hE
+  rw [hdiff] at hX
+  linarith
+
+/-- **Corollary 8.1, the coupling inequality at a set.** Two outcomes on one probability space
+that agree off the event `E` have laws within `P(E)` at every set:
+`|P(X ∈ B) - P(Y ∈ B)| ≤ P(E)`. -/
+theorem abs_measureReal_preimage_sub_le (hE : MeasurableSet E) (hagree : ∀ ω ∉ E, X ω = Y ω)
+    (B : Set α) : |μ.real (X ⁻¹' B) - μ.real (Y ⁻¹' B)| ≤ μ.real E := by
+  rw [measureReal_preimage_sub_eq hE hagree, abs_sub_le_iff]
+  have hXE : μ.real (X ⁻¹' B ∩ E) ≤ μ.real E := measureReal_mono Set.inter_subset_right
+  have hYE : μ.real (Y ⁻¹' B ∩ E) ≤ μ.real E := measureReal_mono Set.inter_subset_right
+  constructor <;> linarith [measureReal_nonneg (μ := μ) (s := X ⁻¹' B ∩ E),
+    measureReal_nonneg (μ := μ) (s := Y ⁻¹' B ∩ E)]
+
+/-- **Corollary 8.1, the total-variation form (9.3).** For outcomes in a finite set that agree
+off `E`: `½ Σ_x |P(X = x) - P(Y = x)| ≤ P(E)`. -/
+theorem sum_abs_measureReal_fiber_sub_le [Fintype α] [MeasurableSpace α]
+    [MeasurableSingletonClass α] (hX : Measurable X) (hY : Measurable Y) (hE : MeasurableSet E)
+    (hagree : ∀ ω ∉ E, X ω = Y ω) :
+    (∑ x, |μ.real (X ⁻¹' {x}) - μ.real (Y ⁻¹' {x})|) / 2 ≤ μ.real E := by
+  have hfiber : ∀ Z : Ω → α, Measurable Z → ∑ x, μ.real (Z ⁻¹' {x} ∩ E) = μ.real E := by
+    intro Z hZ
+    have h := sum_measureReal_preimage_singleton (μ := μ.restrict E) Finset.univ
+      (f := Z) fun x _ ↦ hZ (measurableSet_singleton x)
+    simp only [Finset.coe_univ, Set.preimage_univ, measureReal_restrict_apply_univ] at h
+    rw [← h]
+    exact Finset.sum_congr rfl fun x _ ↦
+      (measureReal_restrict_apply (hZ (measurableSet_singleton x))).symm
+  have hpoint : ∀ x, |μ.real (X ⁻¹' {x}) - μ.real (Y ⁻¹' {x})| ≤
+      μ.real (X ⁻¹' {x} ∩ E) + μ.real (Y ⁻¹' {x} ∩ E) := fun x ↦ by
+    rw [measureReal_preimage_sub_eq hE hagree, abs_sub_le_iff]
+    constructor <;> linarith [measureReal_nonneg (μ := μ) (s := X ⁻¹' {x} ∩ E),
+      measureReal_nonneg (μ := μ) (s := Y ⁻¹' {x} ∩ E)]
+  have hsum := Finset.sum_le_sum fun x (_ : x ∈ Finset.univ) ↦ hpoint x
+  rw [Finset.sum_add_distrib, hfiber X hX, hfiber Y hY] at hsum
+  linarith
+
+end Coupling
+
+/-! ### The numbers of §9.1 -/
+
+/-- **§9.1, the expected support bound.** At `n = 10`, `|A| = 2`, `D = T = 1` the bound (8.2) is
+`20 e³`, and `401.7 ≤ 20 e³ ≤ 401.72`. -/
+theorem support_bound_example : 401.7 ≤ 20 * Real.exp 3 ∧ 20 * Real.exp 3 ≤ 401.72 := by
+  have he : Real.exp 3 = Real.exp 1 ^ 3 := by
+    rw [← Real.exp_nat_mul]
+    norm_num
+  have hlo : (2.7182818283 : ℝ) ≤ Real.exp 1 := Real.exp_one_gt_d9.le
+  have hhi : Real.exp 1 ≤ 2.7182818286 := Real.exp_one_lt_d9.le
+  rw [he]
+  constructor
+  · calc (401.7 : ℝ) ≤ 20 * (2.7182818283 : ℝ) ^ 3 := by norm_num
+      _ ≤ 20 * Real.exp 1 ^ 3 := by gcongr
+  · calc 20 * Real.exp 1 ^ 3 ≤ 20 * (2.7182818286 : ℝ) ^ 3 := by gcongr
+      _ ≤ 401.72 := by norm_num
+
+/-- **§9.1, the escape bound.** At `n = 10`, `|A| = 2`, `D = T = 1` and `ℓ = 20` the bound (9.2)
+is `20 e (2e/20)^20`, and it is at most `2.64 · 10⁻¹⁰`. -/
+theorem escape_bound_example : 20 * Real.exp 1 * (2 * Real.exp 1 / 20) ^ 20 ≤ 2.64e-10 := by
+  have hhi : Real.exp 1 ≤ 2.7182818286 := Real.exp_one_lt_d9.le
+  calc 20 * Real.exp 1 * (2 * Real.exp 1 / 20) ^ 20 = 20 * Real.exp 1 ^ 21 / 10 ^ 20 := by ring
+    _ ≤ 20 * (2.7182818286 : ℝ) ^ 21 / 10 ^ 20 := by gcongr
+    _ ≤ 2.64e-10 := by norm_num
+
 end
 
 end Descent.Pangenome.AncestralLocality
