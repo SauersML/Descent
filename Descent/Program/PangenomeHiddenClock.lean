@@ -4,12 +4,14 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Pangenome.GraphCoalescent.BalancedFiberExtremum
 import Descent.Pangenome.GraphCoalescent.ConnectionClockPathLaw
 import Descent.Pangenome.GraphCoalescent.ConnectionClockStochasticOrder
+import Descent.Pangenome.GraphCoalescent.CoarsestRefinement
 import Descent.Pangenome.GraphCoalescent.ConnectivityClockTable
 import Descent.Pangenome.GraphCoalescent.LeadingCoefficientCorollaries
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionClock
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionExamples
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionFirstStep
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionTies
+import Descent.Pangenome.GraphCoalescent.ShortTimeConnectionLaw
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulant
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulantDegree
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulantCorpus
@@ -32,6 +34,7 @@ import Descent.Pangenome.GraphCoalescent.MultiInterfaceLoads
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceOutcome
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionExamples
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionLaw
+import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionConvergence
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionLimit
 import Descent.Pangenome.GraphCoalescent.MultiplicativeCoupling
 import Descent.Pangenome.GraphCoalescent.MultiplicativeObservation
@@ -176,6 +179,11 @@ inside it.
   `1 - e^(-u p₀ p₁)` (`connectionProbability_two`), and three equal fibers give
   `Pr(T_p > u) = 3 e^(-2u/9) - 2 e^(-u/3)` (`connectionSurvival_three_equal`):
   `MultiplicativeConnectionExamples`.
+* Theorem B as one statistic: `CoarsestRefinement`. The report with every load (three or more
+  components), with the sum and product of the loads (two), or alone (one) is a strong lumping
+  that determines the report (`coarsestState_determines_report_and_lumps`,
+  `card_covers_coarsestState_eq`), and every such statistic refines it
+  (`coarsestState_eq_of_lumping`).
 * §10, several interfaces sharing one genealogy: `MultiInterfaceClosure`. The common refinement
   of the reports determines every report (`observed_commonRefinement`), and two labeled
   configurations with the same hidden load in every cell of the common refinement offer equally
@@ -239,14 +247,19 @@ continuous-time chain is not formalized, and (C2) is proved in Laplace-transform
 does not imply the stochastic order of the quantile coupling. (D4) is proved by Kingman's backward
 recursion, without enumerating ranked histories. §9 is proved for a finite hidden jump process
 given by its generator, with the load chain's generator `loadGenerator` written from the rates of
-Theorem A. (E1) is proved from the Möbius sum rather than the ranked-history law, and (E2) is
-not yet proof-checked. (D7)-(D9) are proved for the connection time
+Theorem A. (E1) is proved from the Möbius sum rather than the ranked-history law. (E2) is proved
+in its analytic half: the report is connected at time `t` with probability the minimal-history
+count times `t^(w-1)/(w-1)!` plus `O(t^w)`
+(`ShortTimeConnectionLaw.reportConnectedProbability_sub_isBigO`); the identification of that count
+with the note's constant is not yet proof-checked. (D7)-(D9) are proved for the connection time
 defined as the sum of the holding times above the stopping level; its identification with the
 first hitting time of the report path is not proved. (F1)-(F3) are proved for the uniformized
-skeleton paths mixed over a rate-one Poisson clock, (F3) as the quantitative bound on the
-connection probability rather than as convergence in law; the identification with path measures
-on càdlàg paths is not formalized. (F4) is proved for the finite random graph
-of edges rung by time `u`, entering the clocks through their distribution functions.
+skeleton paths mixed over a rate-one Poisson clock, and (F3) as convergence of the connection
+probability of the uniformized report to `Pr(T_p ≤ U)` along panels whose fiber proportions
+converge (`MultiplicativeConnectionConvergence.tendsto_reportConnectionProbability`); the
+identification with path measures on càdlàg paths is not formalized. (F4) is proved for the
+finite random graph of edges rung by time `u`, entering the clocks through their distribution
+functions.
 -/
 
 end Descent.Program
