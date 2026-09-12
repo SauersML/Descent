@@ -16,7 +16,6 @@ open Descent.Pangenome.GraphCoalescent.ConnectivityClockTable
 #print axioms cumulantOfSizes_fin_three
 #print axioms connectedByLevel
 #print axioms firstConnectionLaw
-#print axioms meanConnectionTime
 #print axioms lahPolynomial_one
 #print axioms lahPolynomial_two
 #print axioms lahPolynomial_three
@@ -27,9 +26,3 @@ open Descent.Pangenome.GraphCoalescent.ConnectivityClockTable
 #print axioms connectivityCumulant_two_two
 #print axioms connectivityCumulant_one_one_two
 #print axioms connectivityCumulant_two_two_two
-#print axioms meanConnectionTime_one_two
-#print axioms meanConnectionTime_one_three
-#print axioms meanConnectionTime_two_two
-#print axioms meanConnectionTime_one_one_two
-#print axioms meanConnectionTime_two_two_two
-#print axioms meanConnectionTime_one_three_ne_two_two
