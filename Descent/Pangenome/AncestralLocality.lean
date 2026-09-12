@@ -24,6 +24,7 @@ import Descent.Pangenome.AncestralLocality.RootExchangeability
 import Descent.Pangenome.AncestralLocality.SamplingDuality
 import Descent.Pangenome.AncestralLocality.SupercriticalBranches
 import Descent.Pangenome.AncestralLocality.SupercriticalReach
+import Descent.Pangenome.AncestralLocality.SupportChainDynkin
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program
@@ -138,6 +139,11 @@ on the bytes on main.
     `x^n`, its coalescence is `x^{n-1}`, and the resampling generator (7.1) on it is `c` times the
     Wright-Fisher diffusion generator on `x^n` of `Descent.Coalescent.Duality`, so the note's
     sampling duality agrees with Kingman's moment duality.
+
+19. `SupportChainDynkin` -- Theorems 7 and 8 without a Dynkin hypothesis: the support circuit
+    truncated after `M` decisions as a finite jump chain with laws `δ_{x₀} e^{tQ}`, Dynkin's
+    formula and its compensator form for those laws, and (8.2), (8.3), (9.1) and (9.2) with
+    constants that do not depend on `M`.
 
 This file contains no declarations.
 -/
