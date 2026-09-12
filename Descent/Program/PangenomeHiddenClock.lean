@@ -46,6 +46,8 @@ import Descent.Pangenome.GraphCoalescent.RankedHistoryLaw
 import Descent.Pangenome.GraphCoalescent.VisibleIntensityClock
 import Descent.Pangenome.GraphCoalescent.ConnectionClockHittingTime
 import Descent.Pangenome.GraphCoalescent.ConnectionClockHittingLaw
+import Descent.Pangenome.GraphCoalescent.ConnectionClockPathDynkin
+import Descent.Pangenome.GraphCoalescent.ConnectionClockLowerBound
 import Descent.Pangenome.GraphCoalescent.MinimalHistoryLumping
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionSpectrum
 import Descent.Pangenome.GraphCoalescent.ScaledConnectionLimit
@@ -290,10 +292,15 @@ sizes, which `FirstConnectionLaw` proves equal to the law. In the
 Λ-coalescent closure the dependence of a merger's lumped outcome on its profile alone is a
 hypothesis on the outcome map. The
 connection clock of Theorem C is defined as the first-step solution of the backward equation, and
-(C3) is Dynkin's identity for that equation; its identification with the path expectation of the
-continuous-time chain is not formalized. (C2) is proved as the survival-function inequality
+(C3) is Dynkin's identity for that equation, and it holds as a path identity on the
+trajectory-and-clock law, for the connection time and for the first hitting time of `⊤`
+(`ConnectionClockPathDynkin.clockDynkin_path`, `clockDynkin_reportHittingTime`). (C2) is proved
+as the survival-function inequality
 `P(τ_q > c) ≤ P(T_w > c)` for that law (`ConnectionClockStochasticOrder.holdDuration_thinning`,
-`survivalAt_connectionTimeLaw_bot_le`); no quantile coupling is constructed. (D4) is proved by
+`survivalAt_connectionTimeLaw_bot_le`); no quantile coupling is constructed. The lower bound of
+(C4) holds pathwise: the phases above `n - w + 1` sum to at most the connection time, so
+`Σ_{k=n-w+2}^n Exp(d_k) ≤_st τ_q` (`ConnectionClockLowerBound.sum_top_levels_le_connectionTime`,
+`kingmanClock_sum_top_levels_lt_le`). (D4) is proved by
 Kingman's backward
 recursion, without enumerating ranked histories. §9 is proved for a finite hidden jump process
 given by its generator, with the load chain's generator `loadGenerator` written from the rates of

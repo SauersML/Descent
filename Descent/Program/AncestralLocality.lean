@@ -5,6 +5,8 @@ import Descent.Pangenome.AncestralLocality.AncestralDecision
 import Descent.Pangenome.AncestralLocality.ClosureReachability
 import Descent.Pangenome.AncestralLocality.LightConeApproximationBound
 import Descent.Pangenome.AncestralLocality.ReachabilityClosureTie
+import Descent.Pangenome.AncestralLocality.OneAlleleDuality
+import Descent.Pangenome.AncestralLocality.SupportChainDynkin
 import Descent.Pangenome.AncestralLocality.CoalescentDualSemigroup
 import Descent.Pangenome.AncestralLocality.HeredityKernel
 import Descent.Pangenome.AncestralLocality.HereditaryClosure
@@ -120,7 +122,8 @@ independent complexity bounds and a quantitative light cone.
   (`CoalescentDualSemigroup.samplingFunctional_coalescenceOperator`), `t ↦ H_{S_t f}(p)` solves
   the backward equation (`hasDerivAt_samplingObservable_dualSemigroup`), and every moment family
   obeying the moment equation is `m_t(f) = m_0(S_t f)` (`moments_eq_dualSemigroup`), the
-  uniqueness form of (7.5).
+  uniqueness form of (7.5). At one allele the resampling generator on `x^n` is `c` times the corpus
+  diffusion generator on powers (`OneAlleleDuality.resamplingGenerator_allCarriers`).
 * §7, ancestral decisions: `AncestralDecision`. The sampling observable (7.2), the coalescence
   substitution (`samplingObservable_coalesceArguments`), decision branching (7.3)
   (`samplingObservable_decisionBranch`) and the sampling identity (7.4) (`sampling_identity`,
@@ -141,7 +144,12 @@ independent complexity bounds and a quantitative light cone.
   `integral_branchings_le`, through the Grönwall step `le_mul_exp_of_hasDerivWithinAt`), and (9.1)
   and (9.2) follow by Markov's inequality on the light-cone weight
   (`measureReal_escapeSet_le_exp`, `exp_div_pow_eq_of_radius`), with no escape when `DT = 0`
-  (`eq_zero_of_forall_escape_bound`).
+  (`eq_zero_of_forall_escape_bound`). For the circuit truncated after `M` decisions the laws are
+  the matrix exponential of its generator and obey Dynkin's formula
+  (`SupportChainDynkin.hasDerivAt_sum_jumpChainLaw_mul`), so (8.2), (8.3), (9.1) and (9.2) hold
+  with no hypothesis and constants independent of `M` (`sum_supportChainLaw_mul_tagCount_le`,
+  `sum_supportChainLaw_mul_count_le`, `sum_supportChainLaw_escape_le`,
+  `sum_supportChainLaw_escape_le_radius`).
 * Theorem 9, the operator half: `InfiniteGenomeLimit`. On a compact space with a point-separating
   subalgebra of observables, Feller semigroups along an exhaustion that satisfy a light-cone
   approximation bound converge on every continuous observable (`cauchySeq_operator`), and the
@@ -171,7 +179,8 @@ independent complexity bounds and a quantitative light cone.
 Scope. The single-feature Kingman limit behind Theorem 3 is classical and is not re-proved.
 Theorems 7 and 8 take Dynkin's formula for the support generator along the marginal laws, and
 for (8.3) the compensator formula, as hypotheses, together with integrability and continuity; the
-path law of the backward circuit is not constructed. Corollary 8.1 is stated on a common finite
+path law of the backward circuit is not constructed. For the circuit truncated after `M` decisions
+they hold outright; the limit `M → ∞` is not taken. Corollary 8.1 is stated on a common finite
 probability
 space; with the explicit escape bounds of Theorem 8 for the marginal laws of the circuit it reads
 `d_TV ≤ min {1, n|A| e^{DT} (2eDT/ℓ)^ℓ}`

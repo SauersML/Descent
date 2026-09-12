@@ -125,6 +125,7 @@ import Descent.Portability.NeutralDemeRelabelKernel
 import Descent.Portability.NeutralFellerProperty
 import Descent.Portability.NeutralFellerContinuity
 import Descent.Portability.NeutralRateHistoryRealization
+import Descent.Portability.NeutralRateHistoryKernel
 import Descent.Portability.ReferenceExperimentCohortRows
 import Descent.Portability.CylinderGaussianQuadrant
 import Descent.Portability.CylinderComputableCertificate
@@ -202,7 +203,11 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
   (20) with a continuous dual generator, the propagator of the rate history keeps the realization
   body invariant and is realized by a finitely supported law
   (`NeutralRateHistoryRealization.exists_rateHistoryLaw`), and the expected panel reports of the
-  sampled epochs converge to it (`tendsto_integral_panelReport_sampledEpochs`).
+  sampled epochs converge to it (`tendsto_integral_panelReport_sampledEpochs`). The sampled history
+  kernels converge uniformly in law to the Markov kernel of the time-varying history
+  (`NeutralRateHistoryKernel.tendstoUniformly_integral_sampledHistoryKernel`), under which the
+  configuration moments are `U(T) H(x)` (`integral_momentPolynomial_rateHistoryKernel`) and the
+  panel reports follow (`integral_panelReport_rateHistoryKernel`).
 * §3 Theorem 3 and equations (14)-(16): `StationaryRealization`,
   `StationaryHaplotypeRealization`, `AncestralHaplotypeRealization`.
 * §4.1 per-locus material grading and the loose configuration bound `C(K+B,B)`:
