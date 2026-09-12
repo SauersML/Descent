@@ -83,7 +83,6 @@ theorem graphKer_le_of_injective {s : Fin n → Fin n} (hs : Function.Injective 
     graphKer s ≤ ξ := by
   intro x y hxy
   rw [hs (graphKer_rel_iff.mp hxy)]
-  exact ξ.iseqv.refl y
 
 /-- With an injective interface the report is the coalescent state itself. -/
 theorem observed_of_injective {s : Fin n → Fin n} (hs : Function.Injective s) (ξ : ER n) :
