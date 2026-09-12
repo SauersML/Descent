@@ -57,6 +57,29 @@ pair coordinates, and cross terms `a_p a_q E[D^p_S D^q_T]` between different pai
 - `cancellingDecay_zero`, `cancellingDecay_log_two`, `not_antitoneOn_cancellingDecay`: for
   correlated pairs both the monotonicity and the bound by one fail.  Signed shares `2` and `-1`
   at recombination rates `0` and `2` give `1` at the split and `9/4` at `T = log 2`.
+- `coefficient_eq_zero_of_sum_portabilityDecay_eq_zero`, `rateShare_eq_of_polygenicDecay_eq`:
+  distinct decay rates are independent on `T ≥ 0`, so the curve `T ↦ ∑_p ω_p e^{-r_p T}`
+  determines the share `rateShare ω r x` at every rate `x`.
+- `rateShare_pairShare_eq_of_scorePortabilityRatio_eq`: two polygenic split histories with the same
+  portability curve carry the same signal share at every pair recombination rate, whatever their
+  drift rates.
+
+## Parent law
+
+The general law is `EndToEndPortabilityLaw`.  Under a neutral history, a polynomial of total
+degree at most four in the haplotype frequencies integrates to its coefficient vector dotted with
+the propagated moments `U · H₄(x₀)` (`EndToEndPortabilityLaw.integral_polynomial_eq_dotProduct`),
+and portability built from expectations of such polynomials is a rational function of
+`U · H₄(x₀)` (`EndToEndPortabilityLaw.expectedPortability_historyEventKernel`).  The score moments
+here, `E[C_S C_T]` and `E[V_S G_T]`, are expectations of polynomials of total degree four in the
+haplotype frequencies of the two demes.  This module evaluates the rational function in closed
+form for one family of histories, a split without migration or mutation, read on the NOTE1
+low-order coordinates of every pair.  There the propagator acts diagonally on `DD(S, T)` and on
+`pi2(S, S, T, T)`, and the rational function collapses to `∑_p ω_p e^{-r_p T}`.  The functional is
+the cross-population one of `TwoLocusPortabilityDecay`, not the within-deme `expectedPortability`
+of the parent law, and that module records how the two differ.  No theorem here restates the
+parent law or proves the identification of the low-order coordinates with its configuration
+moments.
 
 ## Significance
 
@@ -64,7 +87,8 @@ After divergence a polygenic score keeps a signal-weighted mean of the two-locus
 tag–causal pairs.  Drift cancels whatever the two drift rates are, as it does for one pair.  The
 part that no divergence time removes is the share of the signal carried by pairs at zero
 recombination, that is, by causal variants the panel tags exactly.  Portability decays toward
-causal-variant coverage, not toward zero.
+causal-variant coverage, not toward zero.  The curve in divergence time determines the whole
+spectrum of the signal over pair recombination rates, and it carries nothing about drift.
 
 The clean law needs uncorrelated linkage between different pairs, the case of pairs whose
 linkage values are independent with mean zero.  Otherwise the cross terms survive, each at the
@@ -192,6 +216,139 @@ theorem coverageFloor_le_sum {share : P → ℝ} (hshare : ∀ index, 0 ≤ shar
   split_ifs
   · exact le_rfl
   · exact hshare index
+
+/-- **The share at one rate** `∑_{p : r_p = x} s_p`: the share carried by the indices at rate `x`.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  A finite sum of shares. -/
+def rateShare (share rate : P → ℝ) (value : ℝ) : ℝ :=
+  ∑ index, (if rate index = value then share index else 0)
+
+/-- The coverage floor is the share at rate zero. -/
+theorem coverageFloor_eq_rateShare (share rate : P → ℝ) :
+    coverageFloor share rate = rateShare share rate 0 :=
+  rfl
+
+/-- Shifting the split time multiplies a decay term by its decay over the shift. -/
+theorem portabilityDecay_add_duration (rate duration shift : ℝ) :
+    portabilityDecay rate (duration + shift)
+      = portabilityDecay rate shift * portabilityDecay rate duration := by
+  rw [portabilityDecay, portabilityDecay, portabilityDecay, ← Real.exp_add]
+  congr 1
+  ring
+
+/-- **Distinct decay rates are independent on the half line.**  If `∑_{r ∈ s} c_r e^{-rT}`
+vanishes at every split time `T ≥ 0`, every coefficient vanishes.  The sum at `T + 1` minus
+`e^{-r_top}` times the sum at `T` removes the largest rate `r_top` and rescales every other
+coefficient by the nonzero factor `e^{-r} - e^{-r_top}`.
+
+Assumes: the sum vanishes at every `T ≥ 0`. -/
+theorem coefficient_eq_zero_of_sum_portabilityDecay_eq_zero (s : Finset ℝ) :
+    ∀ (coefficient : ℝ → ℝ), (∀ duration : ℝ, 0 ≤ duration →
+      ∑ rate ∈ s, coefficient rate * portabilityDecay rate duration = 0) →
+    ∀ rate ∈ s, coefficient rate = 0 := by
+  refine Finset.induction_on_max s (by simp) fun top rest hlt ih ↦ ?_
+  intro coefficient hzero
+  have hnotin : top ∉ rest := fun hmem ↦ lt_irrefl top (hlt top hmem)
+  have hshifted : ∀ duration : ℝ, 0 ≤ duration →
+      ∑ rate ∈ rest, coefficient rate * (portabilityDecay rate 1 - portabilityDecay top 1)
+        * portabilityDecay rate duration = 0 := by
+    intro duration hduration
+    have hlater := hzero (duration + 1) (by linarith)
+    have hnow := hzero duration hduration
+    rw [Finset.sum_insert hnotin] at hlater hnow
+    simp only [portabilityDecay_add_duration] at hlater
+    have hexpand : ∑ rate ∈ rest, coefficient rate
+          * (portabilityDecay rate 1 - portabilityDecay top 1) * portabilityDecay rate duration
+        = ∑ rate ∈ rest, coefficient rate
+            * (portabilityDecay rate 1 * portabilityDecay rate duration)
+          - portabilityDecay top 1
+            * ∑ rate ∈ rest, coefficient rate * portabilityDecay rate duration := by
+      rw [Finset.mul_sum, ← Finset.sum_sub_distrib]
+      refine Finset.sum_congr rfl fun rate _ ↦ ?_
+      ring
+    rw [hexpand]
+    linear_combination hlater - portabilityDecay top 1 * hnow
+  have hrest : ∀ rate ∈ rest, coefficient rate = 0 := by
+    intro rate hmem
+    have hproduct : coefficient rate * (portabilityDecay rate 1 - portabilityDecay top 1) = 0 :=
+      ih (fun other ↦ coefficient other * (portabilityDecay other 1 - portabilityDecay top 1))
+        hshifted rate hmem
+    have hdiff : portabilityDecay rate 1 - portabilityDecay top 1 ≠ 0 := by
+      intro hsame
+      have hexp : Real.exp (-(rate * 1)) = Real.exp (-(top * 1)) := by
+        rw [portabilityDecay, portabilityDecay] at hsame
+        linarith
+      rw [Real.exp_eq_exp] at hexp
+      linarith [hlt rate hmem]
+    exact (mul_eq_zero.mp hproduct).resolve_right hdiff
+  have htop : coefficient top = 0 := by
+    have hsplit := hzero 0 le_rfl
+    rw [Finset.sum_insert hnotin] at hsplit
+    simp only [portabilityDecay, mul_zero, neg_zero, Real.exp_zero, mul_one] at hsplit
+    have hsum : ∑ rate ∈ rest, coefficient rate = 0 := Finset.sum_eq_zero hrest
+    linarith
+  intro rate hmem
+  rcases Finset.mem_insert.mp hmem with htopEq | hmemRest
+  · rw [htopEq]
+    exact htop
+  · exact hrest rate hmemRest
+
+/-- **A weighted decay groups by rate**: it is the sum over its distinct rates of the share at
+each rate times the decay term. -/
+theorem polygenicDecay_eq_sum_rateShare (share rate : P → ℝ) (duration : ℝ) :
+    polygenicDecay share rate duration
+      = ∑ value ∈ Finset.univ.image rate,
+          rateShare share rate value * portabilityDecay value duration := by
+  rw [polygenicDecay, ← Finset.sum_fiberwise_of_maps_to (s := Finset.univ)
+    fun index _ ↦ Finset.mem_image_of_mem rate (Finset.mem_univ index)]
+  refine Finset.sum_congr rfl fun value _ ↦ ?_
+  rw [rateShare, ← Finset.sum_filter, Finset.sum_mul]
+  refine Finset.sum_congr rfl fun index hindex ↦ ?_
+  rw [(Finset.mem_filter.mp hindex).2]
+
+/-- A weighted decay groups by rate over any finite set of rates that contains its own. -/
+theorem polygenicDecay_eq_sum_rateShare_of_subset (share rate : P → ℝ) {rates : Finset ℝ}
+    (hrates : Finset.univ.image rate ⊆ rates) (duration : ℝ) :
+    polygenicDecay share rate duration
+      = ∑ value ∈ rates, rateShare share rate value * portabilityDecay value duration := by
+  rw [polygenicDecay_eq_sum_rateShare]
+  refine Finset.sum_subset hrates fun value _ hvalue ↦ ?_
+  have hnone : rateShare share rate value = 0 := by
+    rw [rateShare]
+    refine Finset.sum_eq_zero fun index _ ↦ if_neg fun hrate ↦ hvalue ?_
+    rw [← hrate]
+    exact Finset.mem_image_of_mem rate (Finset.mem_univ index)
+  rw [hnone, zero_mul]
+
+/-- **The portability curve identifies the spectrum of the shares over rates.**  Two weighted
+decays that agree at every split time carry the same share at every rate.
+
+Assumes: the two weighted decays agree at every `T ≥ 0`. -/
+theorem rateShare_eq_of_polygenicDecay_eq {Q : Type*} [Fintype Q] {share rate : P → ℝ}
+    {share' rate' : Q → ℝ}
+    (hcurve : ∀ duration : ℝ, 0 ≤ duration →
+      polygenicDecay share rate duration = polygenicDecay share' rate' duration)
+    (value : ℝ) : rateShare share rate value = rateShare share' rate' value := by
+  have hsource : Finset.univ.image rate
+      ⊆ insert value (Finset.univ.image rate ∪ Finset.univ.image rate') :=
+    fun other hother ↦ Finset.mem_insert_of_mem (Finset.mem_union_left _ hother)
+  have htarget : Finset.univ.image rate'
+      ⊆ insert value (Finset.univ.image rate ∪ Finset.univ.image rate') :=
+    fun other hother ↦ Finset.mem_insert_of_mem (Finset.mem_union_right _ hother)
+  have hdifference : ∀ duration : ℝ, 0 ≤ duration →
+      ∑ other ∈ insert value (Finset.univ.image rate ∪ Finset.univ.image rate'),
+        (rateShare share rate other - rateShare share' rate' other)
+          * portabilityDecay other duration = 0 := by
+    intro duration hduration
+    simp only [sub_mul, Finset.sum_sub_distrib]
+    rw [← polygenicDecay_eq_sum_rateShare_of_subset share rate hsource duration,
+      ← polygenicDecay_eq_sum_rateShare_of_subset share' rate' htarget duration,
+      hcurve duration hduration, sub_self]
+  have hvalue : rateShare share rate value - rateShare share' rate' value = 0 :=
+    coefficient_eq_zero_of_sum_portabilityDecay_eq_zero _
+      (fun other ↦ rateShare share rate other - rateShare share' rate' other) hdifference value
+      (Finset.mem_insert_self value _)
+  linarith
 
 /-- **The weighted decay over ordered pairs of indices**, `∑_{p, q} s_{pq} e^{-r_{pq} T}`.
 
@@ -750,6 +907,45 @@ theorem tendsto_scorePortabilityRatio_atTop (rates : ManyDemeLDRates D)
   refine (tendsto_polygenicDecay_atTop (pairRate_nonneg hrecombination parent child)).congr' ?_
   filter_upwards [Filter.eventually_ge_atTop 0] with duration hduration
   exact hagree duration hduration
+
+/-- **Portability curves identify the signal spectrum over pair recombination rates.**  Two
+polygenic split histories whose portability ratios agree at every split time carry the same
+signal share at every pair recombination rate, whatever their drift rates.
+
+Assumes: no migration and no mutation in both histories, `parent ≠ child`, nonzero ancestral
+heterozygosity moments of both scores, and equal ratios at every `T ≥ 0`. -/
+theorem rateShare_pairShare_eq_of_scorePortabilityRatio_eq {ι' κ' : Type*} [Fintype ι']
+    [Fintype κ'] (rates rates' : ManyDemeLDRates D)
+    (hmigration : ∀ source target, rates.migration source target = 0)
+    (hmutation : ∀ deme, rates.mutation deme = 0)
+    (hmigration' : ∀ source target, rates'.migration source target = 0)
+    (hmutation' : ∀ deme, rates'.mutation deme = 0) (recombination : ι × κ → Fin D → ℝ)
+    (hrecombination : ∀ pair deme, 0 ≤ recombination pair deme)
+    (recombination' : ι' × κ' → Fin D → ℝ)
+    (hrecombination' : ∀ pair deme, 0 ≤ recombination' pair deme) (weight : ι → ℝ)
+    (effect : κ → ℝ) (weight' : ι' → ℝ) (effect' : κ' → ℝ) {parent child : Fin D}
+    (hne : parent ≠ child) (ancestral : ι × κ → AffineLowOrderLDCoordinate D → ℝ)
+    (ancestral' : ι' × κ' → AffineLowOrderLDCoordinate D → ℝ)
+    (hheterozygosity : ancestralScoreMoment weight effect ancestral
+      (some (.pi2 parent parent parent parent)) ≠ 0)
+    (hheterozygosity' : ancestralScoreMoment weight' effect' ancestral'
+      (some (.pi2 parent parent parent parent)) ≠ 0)
+    (hcurve : ∀ {duration : ℝ} (hduration : 0 ≤ duration),
+      scorePortabilityRatio rates recombination hrecombination weight effect parent child
+          hduration ancestral
+        = scorePortabilityRatio rates' recombination' hrecombination' weight' effect' parent
+          child hduration ancestral')
+    (value : ℝ) :
+    rateShare (pairShare weight effect parent ancestral) (pairRate recombination parent child)
+        value
+      = rateShare (pairShare weight' effect' parent ancestral')
+          (pairRate recombination' parent child) value := by
+  refine rateShare_eq_of_polygenicDecay_eq (fun duration hduration ↦ ?_) value
+  rw [← scorePortabilityRatio_eq rates hmigration hmutation recombination hrecombination weight
+      effect hne hduration ancestral hheterozygosity,
+    ← scorePortabilityRatio_eq rates' hmigration' hmutation' recombination' hrecombination'
+      weight' effect' hne hduration ancestral' hheterozygosity']
+  exact hcurve hduration
 
 /-! ## Cross terms between pairs -/
 
