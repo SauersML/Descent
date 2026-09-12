@@ -117,6 +117,9 @@ import Descent.Portability.NeutralBernsteinPositivity
 import Descent.Portability.NeutralMicroscopicEulerLimit
 import Descent.Portability.NeutralMicroscopicFloorLimit
 import Descent.Portability.NeutralKernelPanelLikelihood
+import Descent.Portability.NeutralMarkovKernelUniqueness
+import Descent.Portability.NeutralHistoryKernel
+import Descent.Portability.PartialHaplotypeEventHistoryRealization
 import Descent.Portability.CylinderGaussianQuadrant
 import Descent.Portability.CylinderComputableCertificate
 import Descent.Portability.MultinomialHistoryRealization
@@ -245,9 +248,14 @@ expectation family of the neutral microscopic approximation:
 `PartialHaplotypeMicroscopicApproximation.realizedExpectation_forward`. That family matches the
 diffusion on the moments of one fixed budget and is not shown to be the marginal law of a single
 process across budgets; the exact panel reports follow with no hypothesis:
-`PartialHaplotypeRealizedPanel`. Along a history of constant-rate epochs the realized moments
-compose in chronological order (`PartialHaplotypeHistoryRealization.exists_historyLaw`); splits
-and pulses are not composed there. The §4.2a polynomial semigroup is constructed from the dual
+`PartialHaplotypeRealizedPanel`. Along a history of epochs, splits and admixture pulses the
+realized moments compose in chronological order
+(`PartialHaplotypeHistoryRealization.exists_historyLaw`,
+`PartialHaplotypeEventHistoryRealization.expectedMomentVector_eventHistory_realized`), and so do
+the neutral Markov kernels along epochs
+(`NeutralHistoryKernel.integral_panelReport_neutralHistoryKernel`). The neutral Markov
+kernels are unique (`NeutralMarkovKernelUniqueness.existsUnique_neutralMarkovKernel`). The §4.2a
+polynomial semigroup is constructed from the dual
 matrix exponential, with its unit, semigroup law and dual representation
 (`NeutralPolynomialSemigroup`), and is positive (`NeutralPolynomialPositivity`, and by a Bernstein
 argument `NeutralBernsteinPositivity.nonneg_of_monomial_nonneg`), so every

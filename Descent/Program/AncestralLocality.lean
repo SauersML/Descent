@@ -7,6 +7,7 @@ import Descent.Pangenome.AncestralLocality.JointNonautonomy
 import Descent.Pangenome.AncestralLocality.InfiniteGenomeLimit
 import Descent.Pangenome.AncestralLocality.LocalityBounds
 import Descent.Pangenome.AncestralLocality.LocalityCoupling
+import Descent.Pangenome.AncestralLocality.LocalityCouplingBounds
 import Descent.Pangenome.AncestralLocality.LocalityTransition
 import Descent.Pangenome.AncestralLocality.SupercriticalReach
 
@@ -94,7 +95,10 @@ Theorems 7 and 8 take Dynkin's formula for the support generator along the margi
 for (8.3) the compensator formula, as hypotheses, together with integrability and continuity; the
 path law of the backward circuit is not constructed. Corollary 8.1 is stated on a common finite
 probability
-space, with the escape probability as a parameter. The supercritical limit (6.2) is proved for
+space; with the explicit escape bounds of Theorem 8 for the marginal laws of the circuit it reads
+`d_TV ≤ min {1, n|A| e^{DT} (2eDT/ℓ)^ℓ}`
+(`LocalityCouplingBounds.totalVariation_integralLaw_le_radius`). The supercritical limit (6.2) is
+proved for
 its support, conditional on the Erdős-Rényi giant component theorem as the named hypothesis
 `GiantComponentLaw` (proved only for `0 ≤ α < 1`); its weights `1 - (1 - s)^k` and `(1 - s)^k`
 are not proved. Theorems 1 and 2 (hereditary closure and its operational characterization) and

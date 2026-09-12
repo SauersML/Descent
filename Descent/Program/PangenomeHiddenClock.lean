@@ -37,6 +37,7 @@ import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionLaw
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionConvergence
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionLimit
 import Descent.Pangenome.GraphCoalescent.MultiplicativeCoupling
+import Descent.Pangenome.GraphCoalescent.MultiplicativeLabelTransport
 import Descent.Pangenome.GraphCoalescent.MultiplicativeObservation
 import Descent.Pangenome.GraphCoalescent.MultiplicativePerturbation
 import Descent.Pangenome.GraphCoalescent.PartitionLatticeMobius
@@ -154,17 +155,19 @@ inside it.
   `connectionTime_mean_oneThree_ne_twoTwo`); the path-law mean equals the backward-equation mean
   (`ReportedConnectionFirstStep.connectionTime_mean_eq_meanConnectionTime`).
 * Theorem D, the exact table of §6: `ConnectivityClockTable`. The cumulants
-  `6z + 4z²`, `24z + 30z² + 6z³`, `24z + 32z² + 8z³`, `24z + 20z²`,
-  `720z + 1656z² + 928z³ + 144z⁴` and the means `2/3, 1/2, 7/18, 17/18, 92/225` of the fiber sizes
-  `(1,2), (1,3), (2,2), (1,1,2), (2,2,2)`, and the different means of `(1,3)` and `(2,2)`:
-  `meanConnectionTime_one_three_ne_two_two`.
+  `6z + 4z²`, `24z + 30z² + 6z³`, `24z + 32z² + 8z³`, `24z + 20z²` and
+  `720z + 1656z² + 928z³ + 144z⁴` of the fiber sizes `(1,2), (1,3), (2,2), (1,1,2), (2,2,2)`
+  (`connectivityCumulant_one_two`, `connectivityCumulant_two_two_two`); the table's means and the
+  contrast of `(1,3)` with `(2,2)` are the connection-time means of `ReportedConnectionExamples`.
 * Theorem F, the ingredients of (F1): `MultiplicativeObservation`. While the reports agree, the
   comparison rates exceed the visible rates by at most `J/n` in scaled time
   (`pairProductSum_sub_div_sq_le`) and Kingman's total scaled rate is at most `1/2`
   (`deathRate_div_sq_le_half`); a finite coupled chain with separation hazard at most `J/n` and
   deficit drift at most `1/2` per step separates by step `m` with probability at most
   `m(m - 1)/(4n)` (`separationMass_le`), which at the rings of a rate-one Poisson clock becomes
-  `min {1, U²/(4n)}` (`poissonMixture_le_min`). For the coupled chain of the report and `Z_p` this
+  `min {1, U²/(4n)}` (`poissonMixture_le_min`). The same bound holds for `Z_p` run on the fiber
+  labels (`MultiplicativeLabelTransport.label_report_multiplicative_poissonTotalVariation_le`).
+  For the coupled chain of the report and `Z_p` this
   is the path total-variation bound (F1),
   `MultiplicativeCoupling.report_multiplicative_poissonTotalVariation_le`; (F2) adds
   `U ‖p^(n) - p‖₁` for any mass vector on the fibers
@@ -237,14 +240,16 @@ Rosenblatt's form determines every visible rate and the hidden state
 a strong lumping determines the unordered pair of loads through their sum and product
 (`LumpingUnorderedPair.unorderedPair_eq_of_lumping`), and the survival function as a semigroup is
 not formalized. The table rows of §6 compute the cumulants from `cumulantOfSizes`
-and `Coalescent.jumpCoeff`, and evaluate transcriptions of (D5), (D6) and (D8) at the tabulated
-fiber sizes. In the
+and `Coalescent.jumpCoeff`, and evaluate transcriptions of (D5) and (D6) at the tabulated fiber
+sizes, which `FirstConnectionLaw` proves equal to the law. In the
 Λ-coalescent closure the dependence of a merger's lumped outcome on its profile alone is a
 hypothesis on the outcome map. The
 connection clock of Theorem C is defined as the first-step solution of the backward equation, and
 (C3) is Dynkin's identity for that equation; its identification with the path expectation of the
-continuous-time chain is not formalized, and (C2) is proved in Laplace-transform order, which
-does not imply the stochastic order of the quantile coupling. (D4) is proved by Kingman's backward
+continuous-time chain is not formalized. (C2) is proved as the survival-function inequality
+`P(τ_q > c) ≤ P(T_w > c)` for that law (`ConnectionClockStochasticOrder.holdDuration_thinning`,
+`survivalAt_connectionTimeLaw_bot_le`); no quantile coupling is constructed. (D4) is proved by
+Kingman's backward
 recursion, without enumerating ranked histories. §9 is proved for a finite hidden jump process
 given by its generator, with the load chain's generator `loadGenerator` written from the rates of
 Theorem A. (E1) is proved from the Möbius sum rather than the ranked-history law. (E2) is proved
