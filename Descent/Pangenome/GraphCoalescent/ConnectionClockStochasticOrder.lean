@@ -243,12 +243,12 @@ theorem survivalAt_holdDuration_conv {dK dr c : ℝ} (hr : 0 < dr) (hK : dr < dK
   have hG : Measurable fun t : ℝ ↦ survivalAt (holdDuration dr) (c - (Real.toNNReal t : ℝ)) :=
     hF.comp measurable_real_toNNReal
   have hsplit : ∫⁻ t, holdDensity dK t * survivalAt (holdDuration dr) (c - (Real.toNNReal t : ℝ))
-      = ∫⁻ t in Set.Iic c,
-          holdDensity dK t * survivalAt (holdDuration dr) (c - (Real.toNNReal t : ℝ))
+      = (∫⁻ t in Set.Iic c,
+          holdDensity dK t * survivalAt (holdDuration dr) (c - (Real.toNNReal t : ℝ)))
         + ∫⁻ t in Set.Ioi c,
           holdDensity dK t * survivalAt (holdDuration dr) (c - (Real.toNNReal t : ℝ)) := by
     rw [← Set.compl_Iic]
-    exact (lintegral_add_compl _ measurableSet_Iic).symm
+    exact (lintegral_add_compl _ (measurableSet_Iic (a := c))).symm
   have hleft : ∫⁻ t in Set.Iic c,
         holdDensity dK t * survivalAt (holdDuration dr) (c - (Real.toNNReal t : ℝ))
       = ∫⁻ t in Set.Iic c, holdDensity dK t * ENNReal.ofReal (Real.exp (-(dr * (c - t)))) := by
