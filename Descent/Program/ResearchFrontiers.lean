@@ -40,6 +40,7 @@ import Descent.Pangenome.GraphSiteFrequencySpectrum
 import Descent.Portability.PolygenicPortabilityDecay
 import Descent.Portability.EndToEndDiscriminationLaw
 import Descent.Portability.EndToEndDiploidLaw
+import Descent.Portability.EndToEndDiploidHistoryLaw
 
 namespace Descent.Program
 
@@ -106,6 +107,13 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   along any history (`EndToEndDiploidLaw.squaredCorrelation_inbredMating_diploidSum`,
   `expectedDiploidPortability_historyEventKernel`); a dominance observable breaks the transfer
   (`diploidProduct_breaks_ploidy_transfer`).
+  With dominance the law still holds at twice the budget: for any observables of the gamete
+  pair, diploid portability is a rational function of the propagated budget-8 moments along
+  event and rate histories
+  (`EndToEndDiploidHistoryLaw.expectedDiploidPortability_historyEventKernel_budgetEight`,
+  `expectedDiploidPortability_rateHistoryKernel_budgetEight`), and for additive scores that
+  function agrees with the haploid budget-4 one
+  (`diploidMomentPortability_diploidSum_historyEventKernel`).
 * The closed-form decay of portability through linkage: `TwoLocusPortabilityDecay`. On the NOTE1
   low-order moment system, for a source and a target split `T` ago with drift and recombination,
   the cross-population expected squared correlation of a tag-locus score relative to its value at
