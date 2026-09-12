@@ -795,17 +795,21 @@ open Coalescent
 
 open scoped Classical
 
+namespace HiddenLoadFiltering
+
 /-- The haplotypes a report component holds: the most lineages it can hide. -/
 def componentSize {n : ℕ} (s : Fin n → Fin n) (ξ : ER n) (C : Quotient (observed s ξ)) : ℕ :=
   (univ.filter fun x : Fin n ↦ Quotient.mk (observed s ξ) x = C).card
 
+end HiddenLoadFiltering
+
 /-- **The true hidden loads are a state of the filter**: every component of the report hides at
 least one lineage and no more than the haplotypes it holds. -/
 theorem hiddenLoad_mem_loadStates {n : ℕ} (s : Fin n → Fin n) (ξ : ER n) :
-    hiddenLoad s ξ ∈ loadStates (componentSize s ξ) := by
+    hiddenLoad s ξ ∈ loadStates (HiddenLoadFiltering.componentSize s ξ) := by
   refine mem_loadStates.mpr fun C ↦ ⟨Nat.one_le_iff_ne_zero.mpr (hiddenLoad_pos s ξ C).ne', ?_⟩
   obtain ⟨z, rfl⟩ := quotient_mk_surjective (observed s ξ) C
-  rw [hiddenLoad, hiddenBlocks_mk, componentSize]
+  rw [hiddenLoad, hiddenBlocks_mk, HiddenLoadFiltering.componentSize]
   refine card_image_le.trans (le_of_eq ?_)
   congr 1
   ext y
