@@ -151,25 +151,21 @@ theorem exp_apply_nonneg {J : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hpos : ∀ g, 0 �
     exact mul_nonneg (mul_nonneg (inv_nonneg.mpr (Nat.cast_nonneg _)) (pow_nonneg ht k)) hx
   exact nonneg_apply_of_hasSum (NormedSpace.exp_series_hasSum_exp' (𝕂 := ℝ) (t • J)) hterm
 
-/-- **A generator killing the constants fixes them.** If `G 1 = 0`, then `exp(tG) 1 = 1`: only
-the zeroth term of the series survives. -/
+/-- **A generator killing the constants fixes them.** If `G 1 = 0`, then `exp(tG) 1 = 1`: the
+time derivative `exp(tG) (G 1)` vanishes. -/
 theorem exp_apply_one {G : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hG : G 1 = 0) (t : ℝ) :
     NormedSpace.exp ℝ (t • G) 1 = 1 := by
-  have hsum : HasSum (fun k : ℕ ↦ ((k.factorial : ℝ)⁻¹ • (t • G) ^ k) 1)
-      (NormedSpace.exp ℝ (t • G) 1) :=
-    (ContinuousLinearMap.apply ℝ C(X, ℝ) (1 : C(X, ℝ))).hasSum
-      (NormedSpace.exp_series_hasSum_exp' (𝕂 := ℝ) (t • G))
-  have hzero : ∀ k ≠ 0, ((k.factorial : ℝ)⁻¹ • (t • G) ^ k) 1 = 0 := by
-    intro k hk
-    cases k with
-    | zero => exact absurd rfl hk
-    | succ j =>
-      rw [ContinuousLinearMap.smul_apply, pow_succ, ContinuousLinearMap.mul_apply,
-        ContinuousLinearMap.smul_apply, hG, smul_zero, map_zero, smul_zero]
-  have hsingle := hasSum_single 0 hzero
-  simp only [pow_zero, Nat.factorial_zero, Nat.cast_one, inv_one, one_smul,
-    ContinuousLinearMap.one_apply] at hsingle
-  exact hsum.unique hsingle
+  have hderiv : ∀ s : ℝ, HasDerivAt (fun u : ℝ ↦ NormedSpace.exp ℝ (u • G) 1) 0 s := by
+    intro s
+    have h := (hasDerivAt_exp_smul_const G s).clm_apply
+      (hasDerivAt_const (x := s) (c := (1 : C(X, ℝ))))
+    rwa [ContinuousLinearMap.map_zero, add_zero, ContinuousLinearMap.mul_apply, hG,
+      map_zero] at h
+  have hconst := is_const_of_deriv_eq_zero (fun s ↦ (hderiv s).differentiableAt)
+    fun s ↦ (hderiv s).deriv
+  refine (hconst t 0).trans ?_
+  show NormedSpace.exp ℝ ((0 : ℝ) • G) 1 = 1
+  rw [zero_smul, NormedSpace.exp_zero, ContinuousLinearMap.one_apply]
 
 /-! ## The jump semigroup -/
 
