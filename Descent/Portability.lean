@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.ReferenceExperimentAtomTable
 import Descent.Portability.NeutralRateHistoryKernel
 import Descent.Portability.NeutralDemeRelabelKernel
 import Descent.Portability.NeutralRateHistoryRealization
