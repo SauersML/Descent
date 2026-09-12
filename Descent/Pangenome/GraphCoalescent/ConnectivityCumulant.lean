@@ -697,7 +697,7 @@ theorem card_subtype_size_eq_count (T : Finset ι) (c : ι → ℕ) (n : ℕ) :
     Fintype.card {i : T // c i = n} = Multiset.count n (T.val.map c) := by
   have he : {i : T // c i = n} ≃ ↥(T.filter fun a ↦ c a = n) :=
     (Equiv.subtypeSubtypeEquivSubtypeInter (· ∈ T) fun a ↦ c a = n).trans
-      (Equiv.subtypeEquivRight fun a ↦ mem_filter.symm)
+      (Equiv.subtypeEquivRight fun a ↦ by rw [mem_filter])
   rw [Fintype.card_congr he, Fintype.card_coe, Multiset.count_map]
   exact congrArg Multiset.card (Multiset.filter_congr fun a _ ↦ eq_comm)
 
