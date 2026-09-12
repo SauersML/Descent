@@ -10,7 +10,7 @@ open Descent.Portability.EndToEndSensitivityLaw
 #print axioms continuous_exp_smul_mul_exp_smul
 #print axioms hasDerivAt_exp_smul_mul_exp_smul
 #print axioms exp_smul_sub_exp_smul_eq_integral
-#print axioms hasDerivAt_exp_smul_of_hasDerivAt
+#print axioms hasDerivAt_exp_smul_apply
 #print axioms hasDerivAt_of_hasDerivAt_apply
 #print axioms hasDerivAt_apply
 #print axioms hasDerivAt_matrixExponential_of_hasDerivAt

@@ -25,7 +25,8 @@ The proof is Duhamel's formula along the path: `e^{tA} - e^{tB}` is the integral
 `e^{sA} (A - B) e^{(t - s)B}` by the fundamental theorem of calculus
 (`exp_smul_sub_exp_smul_eq_integral`), so the slope of the propagator is a parametric integral
 of the generator slope, continuous in the pair (generator, slope), and the derivative is its value
-at `(Q(θ₀), Q')` (`hasDerivAt_exp_smul_of_hasDerivAt`).  Mathlib has no Fréchet derivative of
+at `(Q(θ₀), Q')`, a limit taken in coordinates (`hasDerivAt_exp_smul_apply`, then
+`hasDerivAt_of_hasDerivAt_apply` and `hasDerivAt_apply`).  Mathlib has no Fréchet derivative of
 the exponential of a noncommuting algebra at a general point; this is the substitute.  Paired
 with a coefficient vector and a moment vector it reads `∫₀^τ (c e^{sQ}) · Q' · (e^{(τ - s)Q} v) ds`,
 forward law times generator derivative times backward value (`dotProduct_duhamelDerivative_mulVec`).
@@ -110,14 +111,16 @@ theorem exp_smul_sub_exp_smul_eq_integral (A B : Matrix ι ι ℝ) (t : ℝ) :
     ((continuous_exp_smul_mul_exp_smul A (A - B) B t).intervalIntegrable 0 t)]
   simp only [sub_self, zero_smul, sub_zero, NormedSpace.exp_zero, mul_one, one_mul]
 
-/-- **Duhamel's formula for the derivative of a propagator in a parameter.**  If the generator
-path `Q` has derivative `Q'` at `θ₀`, then `θ ↦ e^{τQ(θ)}` has derivative
-`∫₀^τ e^{sQ(θ₀)} Q' e^{(τ - s)Q(θ₀)} ds` at `θ₀`. -/
-theorem hasDerivAt_exp_smul_of_hasDerivAt {Q : ℝ → Matrix ι ι ℝ} {Q' : Matrix ι ι ℝ} {θ₀ : ℝ}
-    (hQ : HasDerivAt Q Q' θ₀) (τ : ℝ) :
-    HasDerivAt (fun θ ↦ NormedSpace.exp ℝ (τ • Q θ))
-      (∫ s in (0 : ℝ)..τ,
-        NormedSpace.exp ℝ (s • Q θ₀) * Q' * NormedSpace.exp ℝ ((τ - s) • Q θ₀)) θ₀ := by
+/-- **Duhamel's formula for the derivative of a propagator in a parameter, entrywise.**  If every
+entry of the generator path `Q` has derivative `Q' k l` at `θ₀`, then every entry of
+`θ ↦ e^{τQ(θ)}` has as derivative at `θ₀` the corresponding entry of
+`∫₀^τ e^{sQ(θ₀)} Q' e^{(τ - s)Q(θ₀)} ds`.  The limit is taken in the coordinates of the generator
+and of its slope, so that only coordinate and real topologies meet. -/
+theorem hasDerivAt_exp_smul_apply {Q : ℝ → Matrix ι ι ℝ} {Q' : Matrix ι ι ℝ} {θ₀ : ℝ}
+    (hQ : ∀ k l, HasDerivAt (fun θ ↦ Q θ k l) (Q' k l) θ₀) (τ : ℝ) (i j : ι) :
+    HasDerivAt (fun θ ↦ NormedSpace.exp ℝ (τ • Q θ) i j)
+      ((∫ s in (0 : ℝ)..τ,
+        NormedSpace.exp ℝ (s • Q θ₀) * Q' * NormedSpace.exp ℝ ((τ - s) • Q θ₀)) i j) θ₀ := by
   have hjoint : Continuous fun q : (Matrix ι ι ℝ × Matrix ι ι ℝ) × ℝ ↦
       NormedSpace.exp ℝ (q.2 • q.1.1) * q.1.2 * NormedSpace.exp ℝ ((τ - q.2) • Q θ₀) :=
     (((NormedSpace.exp_continuous (𝕂 := ℝ)).comp (continuous_snd.smul continuous_fst.fst)).mul
@@ -130,18 +133,38 @@ theorem hasDerivAt_exp_smul_of_hasDerivAt {Q : ℝ → Matrix ι ι ℝ} {Q' : M
       (f := fun (p : Matrix ι ι ℝ × Matrix ι ι ℝ) (s : ℝ) ↦
         NormedSpace.exp ℝ (s • p.1) * p.2 * NormedSpace.exp ℝ ((τ - s) • Q θ₀))
       hjoint 0 τ
-  have hslope : slope (fun θ ↦ NormedSpace.exp ℝ (τ • Q θ)) θ₀ = fun θ ↦
-      ∫ s in (0 : ℝ)..τ, NormedSpace.exp ℝ (s • Q θ) * slope Q θ₀ θ
-        * NormedSpace.exp ℝ ((τ - s) • Q θ₀) := by
+  let entry : Matrix ι ι ℝ →ₗ[ℝ] ℝ :=
+    { toFun := fun N ↦ N i j, map_add' := fun _ _ ↦ rfl, map_smul' := fun _ _ ↦ rfl }
+  let ofEntries : (ι → ι → ℝ) →ₗ[ℝ] Matrix ι ι ℝ :=
+    { toFun := fun p ↦ Matrix.of p, map_add' := fun _ _ ↦ rfl, map_smul' := fun _ _ ↦ rfl }
+  have hentries : Continuous fun p : (ι → ι → ℝ) × (ι → ι → ℝ) ↦
+      (∫ s in (0 : ℝ)..τ, NormedSpace.exp ℝ (s • Matrix.of p.1) * Matrix.of p.2
+        * NormedSpace.exp ℝ ((τ - s) • Q θ₀)) i j :=
+    (LinearMap.continuous_of_finiteDimensional entry).comp (hparametric.comp
+      (((LinearMap.continuous_of_finiteDimensional ofEntries).comp continuous_fst).prodMk
+        ((LinearMap.continuous_of_finiteDimensional ofEntries).comp continuous_snd)))
+  have hpair : Filter.Tendsto
+      (fun θ ↦ ((fun k l ↦ Q θ k l : ι → ι → ℝ), (fun k l ↦ slope Q θ₀ θ k l : ι → ι → ℝ)))
+      (nhdsWithin θ₀ {θ₀}ᶜ)
+      (nhds ((fun k l ↦ Q θ₀ k l : ι → ι → ℝ), (fun k l ↦ Q' k l : ι → ι → ℝ))) :=
+    (tendsto_pi_nhds.mpr fun k ↦ tendsto_pi_nhds.mpr fun l ↦
+        (hQ k l).continuousAt.tendsto.mono_left nhdsWithin_le_nhds).prodMk_nhds
+      (tendsto_pi_nhds.mpr fun k ↦ tendsto_pi_nhds.mpr fun l ↦
+        hasDerivAt_iff_tendsto_slope.mp (hQ k l))
+  have hslope : slope (fun θ ↦ NormedSpace.exp ℝ (τ • Q θ) i j) θ₀ = fun θ ↦
+      (∫ s in (0 : ℝ)..τ, NormedSpace.exp ℝ (s • Q θ) * slope Q θ₀ θ
+        * NormedSpace.exp ℝ ((τ - s) • Q θ₀)) i j := by
     funext θ
-    simp only [slope, vsub_eq_sub]
-    rw [exp_smul_sub_exp_smul_eq_integral, ← intervalIntegral.integral_smul]
-    refine intervalIntegral.integral_congr fun s _ ↦ ?_
-    simp only [mul_smul_comm, smul_mul_assoc]
+    have hmatrix : slope (fun θ ↦ NormedSpace.exp ℝ (τ • Q θ)) θ₀ θ
+        = ∫ s in (0 : ℝ)..τ, NormedSpace.exp ℝ (s • Q θ) * slope Q θ₀ θ
+          * NormedSpace.exp ℝ ((τ - s) • Q θ₀) := by
+      simp only [slope, vsub_eq_sub]
+      rw [exp_smul_sub_exp_smul_eq_integral, ← intervalIntegral.integral_smul]
+      refine intervalIntegral.integral_congr fun s _ ↦ ?_
+      simp only [mul_smul_comm, smul_mul_assoc]
+    exact congrFun (congrFun hmatrix i) j
   rw [hasDerivAt_iff_tendsto_slope, hslope]
-  exact (hparametric.tendsto (Q θ₀, Q')).comp
-    ((hQ.continuousAt.tendsto.mono_left nhdsWithin_le_nhds).prodMk_nhds
-      (hasDerivAt_iff_tendsto_slope.mp hQ))
+  exact (hentries.tendsto _).comp hpair
 
 /-- A matrix path whose entries are differentiable is differentiable. -/
 theorem hasDerivAt_of_hasDerivAt_apply {Q : ℝ → Matrix ι ι ℝ} {Q' : Matrix ι ι ℝ} {θ₀ : ℝ}
@@ -170,22 +193,22 @@ theorem hasDerivAt_apply {M : ℝ → Matrix ι ι ℝ} {M' : Matrix ι ι ℝ} 
 def duhamelDerivative (Q Q' : Matrix ι ι ℝ) (τ : ℝ) : Matrix ι ι ℝ :=
   ∫ s in (0 : ℝ)..τ, matrixExponential Q s * Q' * matrixExponential Q (τ - s)
 
+/-- **The propagator derivative, entrywise.**  If every generator entry is differentiable at `θ₀`,
+every propagator entry is, with the entries of the Duhamel derivative as derivatives. -/
+theorem hasDerivAt_matrixExponential_apply {Q : ℝ → Matrix ι ι ℝ} {Q' : Matrix ι ι ℝ} {θ₀ : ℝ}
+    (hQ : ∀ i j, HasDerivAt (fun θ ↦ Q θ i j) (Q' i j) θ₀) (τ : ℝ) (i j : ι) :
+    HasDerivAt (fun θ ↦ matrixExponential (Q θ) τ i j) (duhamelDerivative (Q θ₀) Q' τ i j) θ₀ := by
+  simp only [matrixExponential_eq_normedSpace_exp, duhamelDerivative]
+  exact hasDerivAt_exp_smul_apply hQ τ i j
+
 /-- **The propagator derivative in corpus form.**  If the generator path `Q` has derivative `Q'`
 at `θ₀`, the exact propagator `matrixExponential (Q θ) τ` has derivative
 `duhamelDerivative (Q θ₀) Q' τ` there. -/
 theorem hasDerivAt_matrixExponential_of_hasDerivAt {Q : ℝ → Matrix ι ι ℝ} {Q' : Matrix ι ι ℝ}
     {θ₀ : ℝ} (hQ : HasDerivAt Q Q' θ₀) (τ : ℝ) :
-    HasDerivAt (fun θ ↦ matrixExponential (Q θ) τ) (duhamelDerivative (Q θ₀) Q' τ) θ₀ := by
-  simp only [matrixExponential_eq_normedSpace_exp, duhamelDerivative]
-  exact hasDerivAt_exp_smul_of_hasDerivAt hQ τ
-
-/-- **The propagator derivative, entrywise.**  If every generator entry is differentiable at `θ₀`,
-every propagator entry is, with the entries of the Duhamel derivative as derivatives. -/
-theorem hasDerivAt_matrixExponential_apply {Q : ℝ → Matrix ι ι ℝ} {Q' : Matrix ι ι ℝ} {θ₀ : ℝ}
-    (hQ : ∀ i j, HasDerivAt (fun θ ↦ Q θ i j) (Q' i j) θ₀) (τ : ℝ) (i j : ι) :
-    HasDerivAt (fun θ ↦ matrixExponential (Q θ) τ i j) (duhamelDerivative (Q θ₀) Q' τ i j) θ₀ :=
-  hasDerivAt_apply
-    (hasDerivAt_matrixExponential_of_hasDerivAt (hasDerivAt_of_hasDerivAt_apply hQ) τ) i j
+    HasDerivAt (fun θ ↦ matrixExponential (Q θ) τ) (duhamelDerivative (Q θ₀) Q' τ) θ₀ :=
+  hasDerivAt_of_hasDerivAt_apply fun i j ↦
+    hasDerivAt_matrixExponential_apply (hasDerivAt_apply hQ) τ i j
 
 /-- **The Duhamel derivative as forward law, generator derivative and backward value.**  Paired
 with a coefficient vector `c` and a moment vector `v` it is the integral over the epoch of the
