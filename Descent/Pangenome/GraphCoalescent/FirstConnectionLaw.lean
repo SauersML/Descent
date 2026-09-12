@@ -245,6 +245,30 @@ theorem firstConnectionProbability_eq_firstConnectionLaw {n : ℕ} (s : Fin n �
     reportConnectedProbability_eq_connectedByLevel s (by omega) hbn,
     ConnectivityClockTable.firstConnectionLaw]
 
+/-- Every first-connection probability is nonnegative: it sums products of the jump chain's
+masses against an indicator. -/
+theorem firstConnectionProbability_nonneg {n : ℕ} (s : Fin n → Fin n) (b : ℕ) :
+    0 ≤ firstConnectionProbability s b :=
+  sum_nonneg fun _ _ ↦ sum_nonneg fun _ _ ↦
+    mul_nonneg (mul_nonneg ENNReal.toReal_nonneg ENNReal.toReal_nonneg)
+      (by split_ifs <;> norm_num)
+
+/-- **(D6) is a law.** When the interface has width at least two, the report first connects at
+exactly one of the levels `b = 1, …, n − 1`: the first-connection probabilities add to one. -/
+theorem sum_firstConnectionProbability {n : ℕ} (s : Fin n → Fin n)
+    (hwidth : 2 ≤ Linkage.width s) :
+    ∑ i ∈ range (n - 1), firstConnectionProbability s (i + 1) = 1 := by
+  have hn : 2 ≤ n := by
+    have hle := blocks_graphKer_le s
+    rw [blocks_graphKer] at hle
+    omega
+  have hneZero : NeZero n := ⟨by omega⟩
+  rw [sum_congr rfl fun i hi ↦ firstConnectionProbability_eq_sub s (b := i + 1) (by omega)
+    (by have := mem_range.mp hi; omega)]
+  rw [sum_range_sub' (fun i ↦ reportConnectedProbability s (i + 1)) (n - 1)]
+  simp only [zero_add, show n - 1 + 1 = n by omega]
+  rw [reportConnectedProbability_one, reportConnectedProbability_self s hwidth, sub_zero]
+
 end
 
 end Descent.Pangenome.GraphCoalescent

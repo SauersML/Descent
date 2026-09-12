@@ -14,3 +14,5 @@ open Descent.Pangenome.GraphCoalescent
 #print axioms le_of_mem_support_jumpLaw
 #print axioms firstConnectionProbability_eq_sub
 #print axioms firstConnectionProbability_eq_firstConnectionLaw
+#print axioms firstConnectionProbability_nonneg
+#print axioms sum_firstConnectionProbability
