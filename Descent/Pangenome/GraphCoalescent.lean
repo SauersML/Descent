@@ -30,7 +30,6 @@ import Descent.Pangenome.GraphCoalescent.MultiInterfaceLoads
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceOutcome
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionLaw
 import Descent.Pangenome.GraphCoalescent.MultiplicativeObservation
-import Descent.Pangenome.GraphCoalescent.MultiplicativePerturbation
 import Descent.Pangenome.GraphCoalescent.Observation
 import Descent.Pangenome.GraphCoalescent.PartitionLatticeMobius
 import Descent.Pangenome.GraphCoalescent.Pinned
