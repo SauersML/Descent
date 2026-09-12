@@ -115,6 +115,7 @@ import Descent.Portability.PartialHaplotypeRealizedPanel
 import Descent.Portability.NeutralPolynomialPositivity
 import Descent.Portability.NeutralBernsteinPositivity
 import Descent.Portability.NeutralMicroscopicEulerLimit
+import Descent.Portability.NeutralMicroscopicFloorLimit
 import Descent.Portability.NeutralKernelPanelLikelihood
 import Descent.Portability.CylinderGaussianQuadrant
 import Descent.Portability.CylinderComputableCertificate
@@ -256,7 +257,10 @@ carry the neutral generator on configuration moments (`exists_neutralMarkovKerne
 limit holds: the microscopic kernel powers along `N` steps of size `t/N` converge uniformly to the
 neutral semigroup on every continuous observable, and its Riesz kernels are Markov and compose
 (`NeutralMicroscopicEulerLimit.tendstoUniformly_neutralSemigroupExtension`,
-`neutralMarkovKernel_add`). Under those kernels, one process for every budget, the configuration
+`neutralMarkovKernel_add`). The floor form `K_h^{⌊t/h⌋} f → T_t f` holds as well and discharges
+the hypothesis of `PolynomialFellerExtension.markov_of_euler_tendstoUniformly`
+(`NeutralMicroscopicFloorLimit.neutralPolynomialSemigroup_markov_of_euler`). Under those kernels,
+one process for every budget, the configuration
 moments of (20) and the panel reports of (22) hold:
 `NeutralKernelPanelLikelihood.integral_panelReport_neutralMarkovKernel`. The kernels
 are Markov kernels on pseudo-metrizable compact spaces, which include the haplotype-frequency

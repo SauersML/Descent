@@ -2,9 +2,11 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.AncestralLocality.CompatibilityNeutrality
+import Descent.Pangenome.AncestralLocality.InfiniteGenomeLimit
 import Descent.Pangenome.AncestralLocality.LocalityBounds
 import Descent.Pangenome.AncestralLocality.LocalityCoupling
 import Descent.Pangenome.AncestralLocality.LocalityTransition
+import Descent.Pangenome.AncestralLocality.SupercriticalReach
 
 namespace Descent.Program
 
@@ -40,7 +42,10 @@ independent complexity bounds and a quantitative light cone.
   every genome size (`graphExpect_card_reach_le`), through the count of present simple paths
   (`card_reach_singleton_le_sum`, `graphExpect_card_presentPaths`). §6.1: the rates `β / deg(i)`
   are positive exactly on present edges. For `α > 1` the survival equation `s = 1 - e^{-αs}` has a
-  unique root in `(0, 1)` (`existsUnique_survival_root`, `giantFraction_mem_Ioo`).
+  unique root in `(0, 1)` (`existsUnique_survival_root`, `giantFraction_mem_Ioo`). Given the giant
+  component theorem (`GiantComponentLaw`, proved for `0 ≤ α < 1` by `giantComponentLaw_of_lt_one`),
+  the reach fraction is near `0` or `giantFraction α` with probability tending to one
+  (`SupercriticalReach.tendsto_graphProb_reach_near_zero_or_giant`).
 * Theorems 7 and 8, the support drift: `LocalityBounds`. A decision along `i → j` raises the
   weighted support count by at most `w i + 2 w j` (`weightedCount_branchSupports_le`) and a
   coalescence does not raise it (`weightedCount_coalesceSupports_le`); with `Σ_j r i j ≤ D` and
@@ -48,6 +53,14 @@ independent complexity bounds and a quantitative light cone.
   `L Z^{(w)} ≤ D (1 + 2κ) Z^{(w)}` (`supportGenerator_weightedCount_le`), the plain count
   `L Z ≤ 3 D Z` (`supportGenerator_supportSize_le`), and the decision rate is at most `D Z`
   (`decisionRate_le`).
+* Theorem 9, the operator half: `InfiniteGenomeLimit`. On a compact space with a point-separating
+  subalgebra of observables, Feller semigroups along an exhaustion that satisfy a light-cone
+  approximation bound converge on every continuous observable (`cauchySeq_operator`), and the
+  limit is a Feller semigroup: contraction, positivity, the constant, the semigroup law and strong
+  continuity (`norm_limitValue_le`, `limitValue_nonneg`, `limitValue_one`, `limitValue_add`,
+  `tendsto_limitValue_zero`). Two Feller semigroups agreeing on a separating subalgebra agree
+  (`operator_eq_of_eqOn`), so the limit is independent of the exhaustion
+  (`limitSemigroup_eq_of_tendsto`).
 * Corollary 8.1, the light cone as a coupling: `LocalityCoupling`. Two sample laws obtained by
   evaluating one circuit on inputs that coincide off an escape event are within total variation
   the probability of escape (`totalVariation_mixtureLaw_le`); for a circuit reading only inspected
@@ -62,10 +75,14 @@ Scope. The single-feature Kingman limit behind Theorem 3 is classical and is not
 Theorems 7 and 8 are proved as generator inequalities on the tagged support state; the
 expectation bounds (8.2), (8.3) and the escape bounds (9.1), (9.2) through Grönwall and Markov's
 inequality are not yet proof-checked. Corollary 8.1 is stated on a common finite probability
-space, with the escape probability as a parameter. Theorems 1 and 2 (hereditary closure and its
-operational characterization), Theorem 4 (closure is reachability),
-the supercritical limit (6.2) of Theorem 5, Theorem 6 (sampling duality) and Theorem 9 (the
-infinite-genome semigroup) are not yet proof-checked.
+space, with the escape probability as a parameter. The supercritical limit (6.2) is proved for
+its support, conditional on the Erdős-Rényi giant component theorem as the named hypothesis
+`GiantComponentLaw` (proved only for `0 ≤ α < 1`); its weights `1 - (1 - s)^k` and `(1 - s)^k`
+are not proved. Theorems 1 and 2 (hereditary closure and its operational characterization),
+Theorem 4 (closure is reachability) and Theorem 6 (sampling duality) are not yet proof-checked.
+Of Theorem 9, the finite-genome semigroups and the light-cone bound are hypotheses
+(`LightConeApproximation`), and the space `P({0,1}^V)` with its cylinder sampling algebra is not
+yet constructed.
 -/
 
 end Descent.Program
