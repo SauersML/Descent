@@ -247,7 +247,8 @@ theorem survivalAt_holdDuration_conv {dK dr c : ℝ} (hr : 0 < dr) (hK : dr < dK
           holdDensity dK t * survivalAt (holdDuration dr) (c - (Real.toNNReal t : ℝ))
         + ∫⁻ t in Set.Ioi c,
           holdDensity dK t * survivalAt (holdDuration dr) (c - (Real.toNNReal t : ℝ)) := by
-    rw [← Set.compl_Iic, lintegral_add_compl _ (measurableSet_Iic (a := c))]
+    rw [← Set.compl_Iic]
+    exact (lintegral_add_compl _ measurableSet_Iic).symm
   have hleft : ∫⁻ t in Set.Iic c,
         holdDensity dK t * survivalAt (holdDuration dr) (c - (Real.toNNReal t : ℝ))
       = ∫⁻ t in Set.Iic c, holdDensity dK t * ENNReal.ofReal (Real.exp (-(dr * (c - t)))) := by
@@ -273,10 +274,15 @@ theorem survivalAt_holdDuration_conv {dK dr c : ℝ} (hr : 0 < dr) (hK : dr < dK
           lintegral_withDensity_eq_lintegral_mul _ (measurable_holdDensity dK) hG]
         rfl
     _ = _ := by
-        rw [hsplit, hleft, hright, setLIntegral_Iic_holdDensity_mul_exp hr hK,
-          holdMeasure_Iic (by linarith) hc, ← withDensity_apply _ measurableSet_Ioi,
-          ← show holdMeasure dK = volume.withDensity (holdDensity dK) from rfl,
-          holdMeasure_Ioi (by linarith) hc]
+        refine hsplit.trans ?_
+        have hgap : 0 < dK - dr := by linarith
+        have hdK : 0 < dK := by linarith
+        have hA := (hleft.trans (setLIntegral_Iic_holdDensity_mul_exp hr hK)).trans
+          (congrArg (fun z ↦ ENNReal.ofReal (dK / (dK - dr) * Real.exp (-(dr * c))) * z)
+            (holdMeasure_Iic hgap hc))
+        have hB : ∫⁻ t in Set.Ioi c, holdDensity dK t = ENNReal.ofReal (Real.exp (-(dK * c))) :=
+          (withDensity_apply _ measurableSet_Ioi).symm.trans (holdMeasure_Ioi hdK hc)
+        exact congrArg₂ (· + ·) hA (hright.trans hB)
 
 end
 
