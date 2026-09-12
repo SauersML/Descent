@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.CylinderGaussianQuadrant
 import Descent.Portability.NeutralKernelPanelLikelihood
 import Descent.Portability.NeutralMicroscopicEulerLimit
 import Descent.Portability.MultinomialHistoryRealization
