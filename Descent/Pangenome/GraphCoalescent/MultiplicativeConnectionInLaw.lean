@@ -36,7 +36,7 @@ distribution functions.
 
 namespace Descent.Pangenome.GraphCoalescent
 
-open MeasureTheory ProbabilityTheory Filter Topology Set
+open Coalescent MeasureTheory ProbabilityTheory Filter Topology Set
 
 noncomputable section
 
@@ -225,6 +225,182 @@ theorem tendsto_poissonMixture_atTop {a : ℕ → ℝ} (ha0 : ∀ m, 0 ≤ a m) 
   filter_upwards [(tendsto_order.1 hS).2 ε hεpos, eventually_ge_atTop 0] with x hx1 hx2
   have := hlower x hx2
   linarith [hε]
+
+/-! ### The uniformized report connects eventually
+
+The probability `a_m` that the report of the uniformized genealogy is connected after `m` steps
+is nondecreasing, because the report only coarsens, and tends to one: each step lowers the expected
+excess `K - 1` of blocks by the scaled death rate `binom(K, 2)/n² ≥ (K - 1)/n²`. -/
+
+/-- **One uniformized Kingman step lowers the expected excess of blocks by the scaled death
+rate.** -/
+theorem sum_kingmanStep_mul_blocks_sub_one {n : ℕ} (ξ : ER n) :
+    ∑ ξ', kingmanStep n ξ ξ' * ((blocks ξ' : ℝ) - 1)
+      = ((blocks ξ : ℝ) - 1) - deathRate (blocks ξ) / (n : ℝ) ^ 2 := by
+  have hpoint : ∀ ξ' : ER n, kingmanStep n ξ ξ' * ((blocks ξ' : ℝ) - 1)
+      = (if Covers ξ ξ' then 1 / (n : ℝ) ^ 2 * ((blocks ξ : ℝ) - 2) else 0)
+        + (if ξ' = ξ then
+            (1 - deathRate (blocks ξ) / (n : ℝ) ^ 2) * ((blocks ξ : ℝ) - 1) else 0) := by
+    intro ξ'
+    unfold kingmanStep
+    by_cases h : Covers ξ ξ'
+    · have hne : ξ' ≠ ξ := fun heq ↦ by
+        have hb := h.2
+        rw [heq] at hb
+        omega
+      have hb : (blocks ξ' : ℝ) + 1 = blocks ξ := by exact_mod_cast h.2
+      rw [if_pos h, if_pos h, if_neg hne, if_neg hne, ← hb]
+      ring
+    · rw [if_neg h, if_neg h]
+      by_cases he : ξ' = ξ
+      · rw [if_pos he, if_pos he, he]
+        ring
+      · rw [if_neg he, if_neg he]
+        ring
+  rw [Finset.sum_congr rfl fun ξ' _ ↦ hpoint ξ', Finset.sum_add_distrib, sum_ite_covers,
+    Finset.sum_ite_eq']
+  simp only [Finset.mem_univ, if_true]
+  ring
+
+/-- The uniformized Kingman law is a probability vector. -/
+theorem sum_kingmanLaw (n m : ℕ) : ∑ ξ, kingmanLaw n m ξ = 1 :=
+  (sum_skeletonLaw sum_kingmanStep m).trans (by simp)
+
+theorem kingmanLaw_nonneg (n m : ℕ) (ξ : ER n) : 0 ≤ kingmanLaw n m ξ :=
+  skeletonLaw_nonneg (fun a b ↦ kingmanStep_nonneg (blocks_le_card a) b)
+    (fun _ ↦ by split_ifs <;> norm_num) m ξ
+
+/-- **The expected excess of blocks decays geometrically.** -/
+theorem sum_kingmanLaw_mul_blocks_sub_one_le {n : ℕ} (hn : 0 < n) (m : ℕ) :
+    ∑ ξ, kingmanLaw n m ξ * ((blocks ξ : ℝ) - 1)
+      ≤ (1 - 1 / (n : ℝ) ^ 2) ^ m * ((n : ℝ) - 1) := by
+  haveI : NeZero n := ⟨hn.ne'⟩
+  have hnR : (1 : ℝ) ≤ n := by exact_mod_cast hn
+  have hq : 0 ≤ 1 - 1 / (n : ℝ) ^ 2 := by
+    rw [sub_nonneg, div_le_one (by positivity)]
+    nlinarith
+  induction m with
+  | zero =>
+    have hpt : ∀ ξ : ER n, (if ξ = ⊥ then (1 : ℝ) else 0) * ((blocks ξ : ℝ) - 1)
+        = if ξ = ⊥ then ((blocks ξ : ℝ) - 1) else 0 := fun ξ ↦ by
+      split_ifs <;> simp
+    have hb0 : blocks (⊥ : ER n) = n := blocks_bot n
+    have h0 : ∑ ξ, kingmanLaw n 0 ξ * ((blocks ξ : ℝ) - 1) = (n : ℝ) - 1 := by
+      show ∑ ξ : ER n, (if ξ = ⊥ then (1 : ℝ) else 0) * ((blocks ξ : ℝ) - 1) = _
+      rw [Finset.sum_congr rfl fun ξ _ ↦ hpt ξ, Finset.sum_ite_eq']
+      simp only [Finset.mem_univ, if_true]
+      rw [hb0]
+    rw [h0, pow_zero, one_mul]
+  | succ m ih =>
+    have h1 := sum_skeletonLaw_succ (kingmanStep n) (fun ξ ↦ if ξ = ⊥ then 1 else 0) m
+      Finset.univ fun ξ ↦ (blocks ξ : ℝ) - 1
+    have hstep : ∑ ξ, kingmanLaw n (m + 1) ξ * ((blocks ξ : ℝ) - 1)
+        = ∑ ξ, kingmanLaw n m ξ
+            * (((blocks ξ : ℝ) - 1) - deathRate (blocks ξ) / (n : ℝ) ^ 2) := by
+      rw [kingmanLaw, h1]
+      exact Finset.sum_congr rfl fun ξ _ ↦ by rw [sum_kingmanStep_mul_blocks_sub_one]
+    rw [hstep]
+    have hpoint : ∀ ξ : ER n,
+        kingmanLaw n m ξ * (((blocks ξ : ℝ) - 1) - deathRate (blocks ξ) / (n : ℝ) ^ 2)
+          ≤ (1 - 1 / (n : ℝ) ^ 2) * (kingmanLaw n m ξ * ((blocks ξ : ℝ) - 1)) := by
+      intro ξ
+      have hlaw := kingmanLaw_nonneg n m ξ
+      have hd : (blocks ξ : ℝ) - 1 ≤ deathRate (blocks ξ) := by
+        unfold deathRate Descent.Core.pairCount
+        rcases Nat.lt_or_ge (blocks ξ) 2 with h2 | h2
+        · have hone : blocks ξ = 1 := by
+            have := blocks_pos ξ
+            omega
+          rw [hone]
+          norm_num
+        · have h2' : (2 : ℝ) ≤ blocks ξ := by exact_mod_cast h2
+          nlinarith
+      have hdiv : ((blocks ξ : ℝ) - 1) / (n : ℝ) ^ 2 ≤ deathRate (blocks ξ) / (n : ℝ) ^ 2 :=
+        div_le_div_of_nonneg_right hd (by positivity)
+      calc kingmanLaw n m ξ * (((blocks ξ : ℝ) - 1) - deathRate (blocks ξ) / (n : ℝ) ^ 2)
+          ≤ kingmanLaw n m ξ * (((blocks ξ : ℝ) - 1) - ((blocks ξ : ℝ) - 1) / (n : ℝ) ^ 2) :=
+            mul_le_mul_of_nonneg_left (by linarith) hlaw
+        _ = (1 - 1 / (n : ℝ) ^ 2) * (kingmanLaw n m ξ * ((blocks ξ : ℝ) - 1)) := by ring
+    calc ∑ ξ, kingmanLaw n m ξ * (((blocks ξ : ℝ) - 1) - deathRate (blocks ξ) / (n : ℝ) ^ 2)
+        ≤ ∑ ξ, (1 - 1 / (n : ℝ) ^ 2) * (kingmanLaw n m ξ * ((blocks ξ : ℝ) - 1)) :=
+          Finset.sum_le_sum fun ξ _ ↦ hpoint ξ
+      _ = (1 - 1 / (n : ℝ) ^ 2) * ∑ ξ, kingmanLaw n m ξ * ((blocks ξ : ℝ) - 1) := by
+          rw [Finset.mul_sum]
+      _ ≤ (1 - 1 / (n : ℝ) ^ 2) * ((1 - 1 / (n : ℝ) ^ 2) ^ m * ((n : ℝ) - 1)) :=
+          mul_le_mul_of_nonneg_left ih hq
+      _ = (1 - 1 / (n : ℝ) ^ 2) ^ (m + 1) * ((n : ℝ) - 1) := by ring
+
+/-- The report is connected with probability at least one minus the expected excess of blocks. -/
+theorem one_sub_sum_kingmanLaw_mul_blocks_le {n : ℕ} (hn : 0 < n) (s : Fin n → Fin n) (m : ℕ) :
+    1 - ∑ ξ, kingmanLaw n m ξ * ((blocks ξ : ℝ) - 1)
+      ≤ ∑ ξ, kingmanLaw n m ξ * (if observed s ξ = ⊤ then 1 else 0) := by
+  haveI : NeZero n := ⟨hn.ne'⟩
+  have hrewrite : 1 - ∑ ξ, kingmanLaw n m ξ * ((blocks ξ : ℝ) - 1)
+      = ∑ ξ, (kingmanLaw n m ξ - kingmanLaw n m ξ * ((blocks ξ : ℝ) - 1)) := by
+    rw [Finset.sum_sub_distrib, sum_kingmanLaw]
+  rw [hrewrite]
+  refine Finset.sum_le_sum fun ξ _ ↦ ?_
+  have hlaw := kingmanLaw_nonneg n m ξ
+  by_cases hone : blocks ξ = 1
+  · have htop : observed s ξ = ⊤ := by
+      rw [(blocks_eq_one_iff ξ).mp hone]
+      exact top_sup_eq _
+    rw [if_pos htop, hone]
+    simp
+  · have h2 : (2 : ℝ) ≤ blocks ξ := by
+      have := blocks_pos ξ
+      exact_mod_cast (by omega : 2 ≤ blocks ξ)
+    have hite : (0 : ℝ) ≤ if observed s ξ = ⊤ then 1 else 0 := by split_ifs <;> norm_num
+    nlinarith
+
+/-- **The report only coarsens**: its connection probability after `m` steps is nondecreasing. -/
+theorem sum_kingmanLaw_mul_top_le_succ {n : ℕ} (s : Fin n → Fin n) (m : ℕ) :
+    ∑ ξ, kingmanLaw n m ξ * (if observed s ξ = ⊤ then 1 else 0)
+      ≤ ∑ ξ, kingmanLaw n (m + 1) ξ * (if observed s ξ = ⊤ then 1 else 0) := by
+  have h1 := sum_skeletonLaw_succ (kingmanStep n) (fun ξ ↦ if ξ = ⊥ then 1 else 0) m
+    Finset.univ fun ξ ↦ if observed s ξ = ⊤ then (1 : ℝ) else 0
+  rw [kingmanLaw, kingmanLaw, h1]
+  refine Finset.sum_le_sum fun ξ _ ↦ mul_le_mul_of_nonneg_left ?_ (kingmanLaw_nonneg n m ξ)
+  by_cases htop : observed s ξ = ⊤
+  · rw [if_pos htop]
+    have hall : ∀ ξ', kingmanStep n ξ ξ' * (if observed s ξ' = ⊤ then (1 : ℝ) else 0)
+        = kingmanStep n ξ ξ' := by
+      intro ξ'
+      by_cases hz : kingmanStep n ξ ξ' = 0
+      · rw [hz, zero_mul]
+      · have hle : ξ ≤ ξ' := by
+          unfold kingmanStep at hz
+          by_cases hc : Covers ξ ξ'
+          · exact hc.1
+          · by_cases he : ξ' = ξ
+            · exact le_of_eq he.symm
+            · simp [hc, he] at hz
+        rw [if_pos (eq_top_iff.mpr ((le_of_eq htop.symm).trans (observed_mono s hle))), mul_one]
+    rw [Finset.sum_congr rfl fun ξ' _ ↦ hall ξ', sum_kingmanStep]
+  · rw [if_neg htop]
+    exact Finset.sum_nonneg fun ξ' _ ↦
+      mul_nonneg (kingmanStep_nonneg (blocks_le_card ξ) ξ') (by split_ifs <;> norm_num)
+
+/-- **The uniformized report connects eventually.** -/
+theorem tendsto_sum_kingmanLaw_mul_top {n : ℕ} (hn : 0 < n) (s : Fin n → Fin n) :
+    Tendsto (fun m ↦ ∑ ξ, kingmanLaw n m ξ * (if observed s ξ = ⊤ then 1 else 0)) atTop
+      (𝓝 1) := by
+  have hnR : (1 : ℝ) ≤ n := by exact_mod_cast hn
+  have hq0 : 0 ≤ 1 - 1 / (n : ℝ) ^ 2 := by
+    rw [sub_nonneg, div_le_one (by positivity)]
+    nlinarith
+  have hq1 : 1 - 1 / (n : ℝ) ^ 2 < 1 := by
+    have : 0 < 1 / (n : ℝ) ^ 2 := by positivity
+    linarith
+  have hgeo : Tendsto (fun m : ℕ ↦ 1 - (1 - 1 / (n : ℝ) ^ 2) ^ m * ((n : ℝ) - 1)) atTop
+      (𝓝 1) := by
+    have h := (tendsto_pow_atTop_nhds_zero_of_lt_one hq0 hq1).mul_const ((n : ℝ) - 1)
+    simpa using (tendsto_const_nhds (x := (1 : ℝ))).sub h
+  refine tendsto_of_tendsto_of_tendsto_of_le_of_le hgeo tendsto_const_nhds (fun m ↦ ?_)
+    fun m ↦ ?_
+  · exact (sub_le_sub_left (sum_kingmanLaw_mul_blocks_sub_one_le hn m) 1).trans
+      (one_sub_sum_kingmanLaw_mul_blocks_le hn s m)
+  · exact (sum_mul_ite_mem_unit (kingmanLaw_nonneg n m) (sum_kingmanLaw n m) _).2
 
 end
 

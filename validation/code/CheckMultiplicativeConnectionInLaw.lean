@@ -19,3 +19,13 @@ import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionInLaw
   Descent.Pangenome.GraphCoalescent.continuous_poissonSeries
 #print axioms
   Descent.Pangenome.GraphCoalescent.tendsto_poissonMixture_atTop
+#print axioms
+  Descent.Pangenome.GraphCoalescent.sum_kingmanStep_mul_blocks_sub_one
+#print axioms
+  Descent.Pangenome.GraphCoalescent.sum_kingmanLaw_mul_blocks_sub_one_le
+#print axioms
+  Descent.Pangenome.GraphCoalescent.one_sub_sum_kingmanLaw_mul_blocks_le
+#print axioms
+  Descent.Pangenome.GraphCoalescent.sum_kingmanLaw_mul_top_le_succ
+#print axioms
+  Descent.Pangenome.GraphCoalescent.tendsto_sum_kingmanLaw_mul_top
