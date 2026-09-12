@@ -252,7 +252,7 @@ theorem map_consSeq_infinitePi {X : Type*} [MeasurableSpace X] (P : Measure X)
       ext a
       simp [h0]
     rw [hset, measure_univ, one_mul]
-    exact Finset.prod_congr rfl fun k hk ↦ if_neg fun hk0 ↦ h0 (hk0 ▸ hk)
+    exact Finset.prod_congr rfl fun k hk ↦ if_neg fun hk0 : k = 0 ↦ h0 (hk0 ▸ hk)
 
 /-- **The first-step decomposition of an event of an infinite product.** -/
 theorem infinitePi_eq_lintegral_consSeq {X : Type*} [MeasurableSpace X] (P : Measure X)
@@ -415,8 +415,10 @@ theorem measurable_fuelProb_sub (rate : S → ℝ) (hrate : ∀ x, 0 < rate x) (
     (measurable_jumpHoldSeq z).comp measurable_snd
   have h2 : Measurable fun q : ℝ × (ℕ → S → S × ℝ) ↦ t - q.1 := by fun_prop
   have hm := h1.prodMk h2
-  exact measurable_measure_prodMk_left (ν := pathMeasure rate hrate kernel)
-    (hm (measurableSet_fuelState m o))
+  have hs := hm (measurableSet_fuelState m o)
+  have hmeas := measurable_measure_prodMk_left (ν := pathMeasure rate hrate kernel) hs
+  unfold fuelProb
+  exact hmeas
 
 /-- The value of the first-step decomposition at a jump to `p.1` after the holding time `p.2`. -/
 def firstStepValue (rate : S → ℝ) (hrate : ∀ x, 0 < rate x) (kernel : S → PMF S) (m : ℕ)
@@ -775,7 +777,7 @@ theorem ofReal_exp_smul_apply_eq_firstJump {rate : S → ℝ} (hrate : ∀ x, 0 
           (kernel x z).toReal
             * NormedSpace.exp ℝ ((t - h) • holdJumpGenerator rate kernel) z y) := by
     rw [Coalescent.holdMeasure, setLIntegral_withDensity_eq_setLIntegral_mul _
-        (Coalescent.measurable_holdDensity _) hFcont.measurable.ennreal_ofReal measurableSet_Iic]
+        (measurable_holdDensity _) hFcont.measurable.ennreal_ofReal measurableSet_Iic]
     simp only [Pi.mul_apply, hdensity]
     rw [lintegral_indicator measurableSet_Ioi, Measure.restrict_restrict measurableSet_Ioi,
       Set.Ioi_inter_Iic, intervalIntegral.integral_of_le ht,
