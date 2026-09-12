@@ -54,8 +54,8 @@ noncomputable section
 variable {α : Type*} [DecidableEq α] {s : Finset α}
 
 /-- The partition obtained by merging two distinct parts `w₁` and `w₂` into `w₁ ∪ w₂`. -/
-def mergeParts (P : Finpartition s) {w₁ w₂ : Finset α} (h₁ : w₁ ∈ P.parts) (h₂ : w₂ ∈ P.parts)
-    (hne : w₁ ≠ w₂) : Finpartition s :=
+def mergeParts (P : Finpartition s) {w₁ w₂ : Finset α} (h₁ : w₁ ∈ P.parts) (h₂ : w₂ ∈ P.parts) :
+    Finpartition s :=
   Finpartition.ofExistsUnique (insert (w₁ ∪ w₂) ((P.parts.erase w₁).erase w₂))
     (by
       intro p hp
@@ -99,7 +99,7 @@ def mergeParts (P : Finpartition s) {w₁ w₂ : Finset α} (h₁ : w₁ ∈ P.p
 
 /-- Merging two parts loses exactly one part. -/
 theorem card_parts_mergeParts (P : Finpartition s) {w₁ w₂ : Finset α} (h₁ : w₁ ∈ P.parts)
-    (h₂ : w₂ ∈ P.parts) (hne : w₁ ≠ w₂) : #(mergeParts P h₁ h₂ hne).parts + 1 = #P.parts := by
+    (h₂ : w₂ ∈ P.parts) (hne : w₁ ≠ w₂) : #(mergeParts P h₁ h₂).parts + 1 = #P.parts := by
   show #(insert (w₁ ∪ w₂) ((P.parts.erase w₁).erase w₂)) + 1 = #P.parts
   have hnot : w₁ ∪ w₂ ∉ (P.parts.erase w₁).erase w₂ := by
     intro hmem
@@ -114,7 +114,7 @@ theorem card_parts_mergeParts (P : Finpartition s) {w₁ w₂ : Finset α} (h₁
 
 /-- Merging two parts coarsens the partition. -/
 theorem le_mergeParts (P : Finpartition s) {w₁ w₂ : Finset α} (h₁ : w₁ ∈ P.parts)
-    (h₂ : w₂ ∈ P.parts) (hne : w₁ ≠ w₂) : P ≤ mergeParts P h₁ h₂ hne := by
+    (h₂ : w₂ ∈ P.parts) : P ≤ mergeParts P h₁ h₂ := by
   intro u hu
   by_cases hu12 : u = w₁ ∨ u = w₂
   · refine ⟨w₁ ∪ w₂, mem_insert_self _ _, ?_⟩
@@ -148,7 +148,10 @@ theorem part_insertAt (P : Finpartition s) (ha : a ∉ s) {w : Finset α}
     (hw : w ∈ insert ∅ P.parts) : (insertAt P ha w).part a = insert a w := by
   have hapart : a ∈ (insertAt P ha w).part a :=
     (insertAt P ha w).mem_part_self.mpr (mem_insert_self a s)
-  rw [← part_insertAt_erase P ha hw, insert_erase hapart]
+  have herase := part_insertAt_erase P ha hw
+  calc (insertAt P ha w).part a = insert a (((insertAt P ha w).part a).erase a) :=
+        (insert_erase hapart).symm
+    _ = insert a w := by rw [herase]
 
 /-- Inserting as a new singleton part adds one part. -/
 theorem card_parts_insertAt_empty (P : Finpartition s) (ha : a ∉ s) :
@@ -226,22 +229,24 @@ theorem card_parts_add_card_parts_le (s : Finset α) :
         exact insert_subset_insert a htπw
     rw [card_insert_of_notMem ha]
     rcases mem_insert.mp hmq with hq0 | hqmem <;> rcases mem_insert.mp hmπ with hπ0 | hπmem
-    · have h := hsubset τ' ∅ (mem_insert_self _ _) hle.1 hle.2 (subset_empty.mpr hq0)
-        (subset_empty.mpr hπ0)
+    · subst hq0
+      subst hπ0
+      have h := hsubset τ' ∅ (mem_insert_self _ _) hle.1 hle.2 (empty_subset _)
+        (empty_subset _)
       rw [card_parts_insertAt_empty] at h
-      rw [hq0, hπ0, card_parts_insertAt_empty, card_parts_insertAt_empty]
+      rw [card_parts_insertAt_empty, card_parts_insertAt_empty]
       omega
-    · obtain ⟨w, hw, htπw⟩ := hle.2 hπmem
-      have h := hsubset τ' w (mem_insert_of_mem hw) hle.1 hle.2
-        (by rw [hq0]; exact empty_subset w) htπw
+    · subst hq0
+      obtain ⟨w, hw, htπw⟩ := hle.2 hπmem
+      have h := hsubset τ' w (mem_insert_of_mem hw) hle.1 hle.2 (empty_subset w) htπw
       rw [card_parts_insertAt_of_mem τ' ha hw] at h
-      rw [hq0, card_parts_insertAt_empty, card_parts_insertAt_of_mem π' ha hπmem]
+      rw [card_parts_insertAt_empty, card_parts_insertAt_of_mem π' ha hπmem]
       omega
-    · obtain ⟨w, hw, htqw⟩ := hle.1 hqmem
-      have h := hsubset τ' w (mem_insert_of_mem hw) hle.1 hle.2 htqw
-        (by rw [hπ0]; exact empty_subset w)
+    · subst hπ0
+      obtain ⟨w, hw, htqw⟩ := hle.1 hqmem
+      have h := hsubset τ' w (mem_insert_of_mem hw) hle.1 hle.2 htqw (empty_subset w)
       rw [card_parts_insertAt_of_mem τ' ha hw] at h
-      rw [hπ0, card_parts_insertAt_empty, card_parts_insertAt_of_mem q' ha hqmem]
+      rw [card_parts_insertAt_empty, card_parts_insertAt_of_mem q' ha hqmem]
       omega
     · obtain ⟨w₁, hw₁, htqw₁⟩ := hle.1 hqmem
       obtain ⟨w₂, hw₂, htπw₂⟩ := hle.2 hπmem
@@ -252,9 +257,9 @@ theorem card_parts_add_card_parts_le (s : Finset α) :
         rw [card_parts_insertAt_of_mem τ' ha hw₁] at h
         omega
       · have hmerge := card_parts_mergeParts τ' hw₁ hw₂ hw
-        have hunion : w₁ ∪ w₂ ∈ (mergeParts τ' hw₁ hw₂ hw).parts := mem_insert_self _ _
-        have h := hsubset (mergeParts τ' hw₁ hw₂ hw) (w₁ ∪ w₂) (mem_insert_of_mem hunion)
-          (hle.1.trans (le_mergeParts τ' hw₁ hw₂ hw)) (hle.2.trans (le_mergeParts τ' hw₁ hw₂ hw))
+        have hunion : w₁ ∪ w₂ ∈ (mergeParts τ' hw₁ hw₂).parts := mem_insert_self _ _
+        have h := hsubset (mergeParts τ' hw₁ hw₂) (w₁ ∪ w₂) (mem_insert_of_mem hunion)
+          (hle.1.trans (le_mergeParts τ' hw₁ hw₂)) (hle.2.trans (le_mergeParts τ' hw₁ hw₂))
           (htqw₁.trans subset_union_left) (htπw₂.trans subset_union_right)
         rw [card_parts_insertAt_of_mem _ ha hunion] at h
         omega
