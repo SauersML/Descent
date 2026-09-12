@@ -69,9 +69,9 @@ example : ((cumulantOfSizes (Finset.univ : Finset (Fin 2)) ![2, 2]).coeff 3 : �
   exact h
 
 /-- Table row `(2, 2, 2)`: `C_c(z) = 720z + 1656z^2 + 928z^3 + 144z^4`, top coefficient `144`. -/
-example : ((cumulantOfSizes (Finset.univ : Finset (Fin 3)) ![2, 2, 2]).coeff 4 : ℚ) = 144 := by
-  have h := coeff_cumulantOfSizes (Finset.univ : Finset (Fin 3)) ![2, 2, 2] (by simp)
-    (by intro i _; fin_cases i <;> simp)
-  norm_num [leadingCoefficient, Fin.sum_univ_three, Fin.prod_univ_three, factorial_eight,
-    factorial_nine] at h
+example : ((cumulantOfSizes (Finset.univ : Finset (Fin 3)) fun _ ↦ 2).coeff 4 : ℚ) = 144 := by
+  have h := coeff_cumulantOfSizes (Finset.univ : Finset (Fin 3)) (fun _ ↦ 2) (by simp)
+    (fun _ _ ↦ by norm_num)
+  norm_num [leadingCoefficient, Finset.sum_const, Finset.prod_const, Finset.card_univ,
+    Fintype.card_fin, factorial_eight, factorial_nine] at h
   exact h
