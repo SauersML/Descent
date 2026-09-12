@@ -135,8 +135,7 @@ theorem survivalAt_kingmanTransitLaw_le_succ (m : ℕ) (c : ℝ) :
 /-! ### The corpus holding law is the exponential law -/
 
 /-- **`holdMeasure d` is Mathlib's `expMeasure d`**: the two densities differ only at `t = 0`. -/
-theorem holdMeasure_eq_expMeasure {d : ℝ} (hd : 0 < d) :
-    holdMeasure d = ProbabilityTheory.expMeasure d := by
+theorem holdMeasure_eq_expMeasure (d : ℝ) : holdMeasure d = ProbabilityTheory.expMeasure d := by
   rw [holdMeasure, ProbabilityTheory.expMeasure, ProbabilityTheory.gammaMeasure]
   refine withDensity_congr_ae ?_
   have hnull : volume ({0} : Set ℝ) = 0 := Real.volume_singleton
@@ -152,6 +151,132 @@ theorem holdMeasure_eq_expMeasure {d : ℝ} (hd : 0 < d) :
   · simp only [holdDensity, if_pos hpos, ProbabilityTheory.gammaPDF,
       ProbabilityTheory.gammaPDFReal, if_pos hpos.le, Real.rpow_one, Real.Gamma_one, div_one,
       sub_self, Real.rpow_zero, mul_one]
+
+/-! ### The tails of a holding duration -/
+
+theorem measurable_holdDensity (d : ℝ) : Measurable (holdDensity d) := by
+  unfold holdDensity
+  refine Measurable.ite measurableSet_Ioi ?_ measurable_const
+  exact (measurable_const.mul ((measurable_const.mul measurable_id).neg.exp)).ennreal_ofReal
+
+/-- The left tail of the holding law: `P(H ≤ c) = 1 - e^{-dc}`, Mathlib's exponential CDF. -/
+theorem holdMeasure_Iic {d c : ℝ} (hd : 0 < d) (hc : 0 ≤ c) :
+    holdMeasure d (Set.Iic c) = ENNReal.ofReal (1 - Real.exp (-(d * c))) := by
+  haveI := ProbabilityTheory.isProbabilityMeasure_expMeasure hd
+  rw [holdMeasure_eq_expMeasure, ← ProbabilityTheory.ofReal_cdf,
+    ProbabilityTheory.cdf_expMeasure_eq hd, if_pos hc]
+
+/-- The right tail of the holding law: `P(H > c) = e^{-dc}`. -/
+theorem holdMeasure_Ioi {d c : ℝ} (hd : 0 < d) (hc : 0 ≤ c) :
+    holdMeasure d (Set.Ioi c) = ENNReal.ofReal (Real.exp (-(d * c))) := by
+  haveI := holdMeasure_isProbabilityMeasure hd
+  have hle : Real.exp (-(d * c)) ≤ 1 :=
+    Real.exp_le_one_iff.mpr (neg_nonpos.mpr (mul_nonneg hd.le hc))
+  rw [← Set.compl_Iic, prob_compl_eq_one_sub measurableSet_Iic, holdMeasure_Iic hd hc,
+    ← ENNReal.ofReal_one,
+    ← ENNReal.ofReal_sub 1 (by linarith : (0 : ℝ) ≤ 1 - Real.exp (-(d * c))), sub_sub_cancel]
+
+/-- **The survival function of a holding duration**: `P(H > c) = e^{-dc}` for `c ≥ 0`. -/
+theorem survivalAt_holdDuration {d c : ℝ} (hd : 0 < d) (hc : 0 ≤ c) :
+    survivalAt (holdDuration d) c = ENNReal.ofReal (Real.exp (-(d * c))) := by
+  have hpre : Real.toNNReal ⁻¹' {y : ℝ≥0 | c < (y : ℝ)} = Set.Ioi c := by
+    ext t
+    simp only [Set.mem_preimage, Set.mem_setOf_eq, Real.coe_toNNReal', Set.mem_Ioi]
+    constructor
+    · intro h
+      by_contra ht
+      have hmax : max t 0 ≤ c := max_le (not_lt.mp ht) hc
+      linarith
+    · intro h
+      exact lt_of_lt_of_le h (le_max_left t 0)
+  rw [survivalAt, holdDuration,
+    Measure.map_apply measurable_real_toNNReal (measurableSet_survival c), hpre,
+    holdMeasure_Ioi hd hc]
+
+/-! ### Two holding durations in sequence -/
+
+/-- A holding density at rate `dK` tilted by `e^{dr t}` is a multiple of the holding density at
+rate `dK - dr`. -/
+theorem holdDensity_mul_exp {dK dr c : ℝ} (hr : 0 < dr) (hK : dr < dK) (t : ℝ) :
+    holdDensity dK t * ENNReal.ofReal (Real.exp (-(dr * (c - t))))
+      = ENNReal.ofReal (dK / (dK - dr) * Real.exp (-(dr * c))) * holdDensity (dK - dr) t := by
+  have hgap : dK - dr ≠ 0 := by linarith
+  unfold holdDensity
+  by_cases ht : 0 < t
+  · have h1 : 0 ≤ dK * Real.exp (-(dK * t)) := mul_nonneg (by linarith) (Real.exp_pos _).le
+    have h2 : 0 ≤ dK / (dK - dr) * Real.exp (-(dr * c)) :=
+      mul_nonneg (div_nonneg (by linarith) (by linarith)) (Real.exp_pos _).le
+    rw [if_pos ht, if_pos ht, ← ENNReal.ofReal_mul h1, ← ENNReal.ofReal_mul h2]
+    congr 1
+    have e1 : Real.exp (-(dK * t)) * Real.exp (-(dr * (c - t)))
+        = Real.exp (-(dr * c)) * Real.exp (-((dK - dr) * t)) := by
+      rw [← Real.exp_add, ← Real.exp_add]
+      congr 1
+      ring
+    rw [show dK / (dK - dr) * Real.exp (-(dr * c)) * ((dK - dr) * Real.exp (-((dK - dr) * t)))
+        = dK / (dK - dr) * (dK - dr) * (Real.exp (-(dr * c)) * Real.exp (-((dK - dr) * t))) by
+          ring,
+      div_mul_cancel₀ dK hgap, ← e1]
+    ring
+  · rw [if_neg ht, if_neg ht, zero_mul, mul_zero]
+
+/-- The tilted holding density integrated up to `c`. -/
+theorem setLIntegral_Iic_holdDensity_mul_exp {dK dr c : ℝ} (hr : 0 < dr) (hK : dr < dK) :
+    ∫⁻ t in Set.Iic c, holdDensity dK t * ENNReal.ofReal (Real.exp (-(dr * (c - t))))
+      = ENNReal.ofReal (dK / (dK - dr) * Real.exp (-(dr * c)))
+        * holdMeasure (dK - dr) (Set.Iic c) := by
+  rw [holdMeasure, withDensity_apply _ measurableSet_Iic,
+    ← lintegral_const_mul _ (measurable_holdDensity _)]
+  exact setLIntegral_congr_fun measurableSet_Iic fun t _ ↦ holdDensity_mul_exp hr hK t
+
+/-- **The survival function of two holding durations in sequence**, rates `dK > dr > 0`:
+`P(H_K + H_r > c) = (dK/(dK - dr)) e^{-dr c} (1 - e^{-(dK - dr) c}) + e^{-dK c}`. -/
+theorem survivalAt_holdDuration_conv {dK dr c : ℝ} (hr : 0 < dr) (hK : dr < dK) (hc : 0 ≤ c) :
+    survivalAt (holdDuration dK ∗ holdDuration dr) c
+      = ENNReal.ofReal (dK / (dK - dr) * Real.exp (-(dr * c)))
+          * ENNReal.ofReal (1 - Real.exp (-((dK - dr) * c)))
+        + ENNReal.ofReal (Real.exp (-(dK * c))) := by
+  haveI := holdDuration_isProbabilityMeasure hr
+  have hmono : Monotone fun x : ℝ≥0 ↦ survivalAt (holdDuration dr) (c - x) := fun x x' hxx' ↦
+    survivalAt_antitone _ (by linarith [(NNReal.coe_le_coe.mpr hxx' : (x : ℝ) ≤ x')])
+  have hF := hmono.measurable
+  have hG : Measurable fun t : ℝ ↦ survivalAt (holdDuration dr) (c - (Real.toNNReal t : ℝ)) :=
+    hF.comp measurable_real_toNNReal
+  have hsplit : ∫⁻ t, holdDensity dK t * survivalAt (holdDuration dr) (c - (Real.toNNReal t : ℝ))
+      = ∫⁻ t in Set.Iic c,
+          holdDensity dK t * survivalAt (holdDuration dr) (c - (Real.toNNReal t : ℝ))
+        + ∫⁻ t in Set.Ioi c,
+          holdDensity dK t * survivalAt (holdDuration dr) (c - (Real.toNNReal t : ℝ)) := by
+    rw [← Set.compl_Iic, lintegral_add_compl _ (measurableSet_Iic (a := c))]
+  have hleft : ∫⁻ t in Set.Iic c,
+        holdDensity dK t * survivalAt (holdDuration dr) (c - (Real.toNNReal t : ℝ))
+      = ∫⁻ t in Set.Iic c, holdDensity dK t * ENNReal.ofReal (Real.exp (-(dr * (c - t)))) := by
+    refine setLIntegral_congr_fun measurableSet_Iic fun t ht ↦ ?_
+    by_cases ht0 : 0 < t
+    · rw [Real.coe_toNNReal t ht0.le, survivalAt_holdDuration hr (sub_nonneg.mpr ht)]
+    · simp only [holdDensity, if_neg ht0, zero_mul]
+  have hright : ∫⁻ t in Set.Ioi c,
+        holdDensity dK t * survivalAt (holdDuration dr) (c - (Real.toNNReal t : ℝ))
+      = ∫⁻ t in Set.Ioi c, holdDensity dK t := by
+    refine setLIntegral_congr_fun measurableSet_Ioi fun t ht ↦ ?_
+    have ht0 : 0 ≤ t := hc.trans (le_of_lt ht)
+    have hneg : c - (Real.toNNReal t : ℝ) < 0 := by
+      rw [Real.coe_toNNReal t ht0]
+      linarith [Set.mem_Ioi.mp ht]
+    rw [survivalAt_of_neg hneg, mul_one]
+  calc survivalAt (holdDuration dK ∗ holdDuration dr) c
+      = ∫⁻ x, survivalAt (holdDuration dr) (c - x) ∂(holdDuration dK) := survivalAt_conv _ _ c
+    _ = ∫⁻ t, holdDensity dK t * survivalAt (holdDuration dr) (c - (Real.toNNReal t : ℝ)) := by
+        rw [show holdDuration dK = (holdMeasure dK).map Real.toNNReal from rfl,
+          lintegral_map hF measurable_real_toNNReal,
+          show holdMeasure dK = volume.withDensity (holdDensity dK) from rfl,
+          lintegral_withDensity_eq_lintegral_mul _ (measurable_holdDensity dK) hG]
+        rfl
+    _ = _ := by
+        rw [hsplit, hleft, hright, setLIntegral_Iic_holdDensity_mul_exp hr hK,
+          holdMeasure_Iic (by linarith) hc, ← withDensity_apply _ measurableSet_Ioi,
+          ← show holdMeasure dK = volume.withDensity (holdDensity dK) from rfl,
+          holdMeasure_Ioi (by linarith) hc]
 
 end
 

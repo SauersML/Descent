@@ -15,3 +15,10 @@ open Descent.Pangenome.GraphCoalescent
 #print axioms kingmanTransitLaw_isProbabilityMeasure
 #print axioms survivalAt_kingmanTransitLaw_le_succ
 #print axioms holdMeasure_eq_expMeasure
+#print axioms measurable_holdDensity
+#print axioms holdMeasure_Iic
+#print axioms holdMeasure_Ioi
+#print axioms survivalAt_holdDuration
+#print axioms holdDensity_mul_exp
+#print axioms setLIntegral_Iic_holdDensity_mul_exp
+#print axioms survivalAt_holdDuration_conv
