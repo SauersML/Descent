@@ -23,6 +23,7 @@ import Descent.Pangenome.GraphCoalescent.MultiInterfaceOutcome
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionLaw
 import Descent.Pangenome.GraphCoalescent.MultiplicativeObservation
 import Descent.Pangenome.GraphCoalescent.Observation
+import Descent.Pangenome.GraphCoalescent.PartitionLatticeMobius
 import Descent.Pangenome.GraphCoalescent.Pinned
 import Descent.Pangenome.GraphCoalescent.RankedHistoryLaw
 import Descent.Pangenome.GraphCoalescent.Reduction
