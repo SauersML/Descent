@@ -148,7 +148,9 @@ theorem withinBudget_of_totalDegree_le (ℓ₀ : Locus) {n : ℕ}
   have hcard : Multiset.card (monomialConfiguration ℓ₀ β) = β.sum fun _ e ↦ e := by
     rw [monomialConfiguration, Multiset.card_sum]
     simp only [Multiset.card_replicate]
-    exact (Finsupp.degree_eq_sum β).symm
+    symm
+    exact Finset.sum_subset (Finset.subset_univ _) fun c _ hc ↦
+      Classical.byContradiction fun hne ↦ hc (Finsupp.mem_support_iff.mpr hne)
   have hdegree : Multiset.card (monomialConfiguration ℓ₀ β) ≤ n := by
     rw [hcard]
     exact (le_totalDegree hβ).trans hp
