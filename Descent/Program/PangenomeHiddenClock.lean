@@ -50,6 +50,7 @@ import Descent.Pangenome.GraphCoalescent.ConnectionClockPathDynkin
 import Descent.Pangenome.GraphCoalescent.ConnectionClockLowerBound
 import Descent.Pangenome.GraphCoalescent.LambdaLoadOutcome
 import Descent.Pangenome.GraphCoalescent.EdgeClockConnectionLaw
+import Descent.Pangenome.GraphCoalescent.UniformizationIdentity
 import Descent.Pangenome.GraphCoalescent.MinimalHistoryLumping
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionSpectrum
 import Descent.Pangenome.GraphCoalescent.ScaledConnectionLimit
@@ -319,7 +320,15 @@ defined as the sum of the holding times above the stopping level, which is almos
 time the report of the coalescent path reaches `⊤`
 (`ConnectionClockHittingTime.ae_reportHittingTime_eq_connectionTime`), so the two have one law
 (`map_reportHittingTime_eq_map_connectionTime`). (F1)-(F3) are proved for the uniformized
-skeleton paths mixed over a rate-one Poisson clock, and (F3) as convergence of the connection
+skeleton paths mixed over a rate-one Poisson clock; at every fixed time these mixtures are the
+laws of the continuous-time chains with generators `K - 1`
+(`UniformizationIdentity.hasSum_poissonPMFReal_smul_pow`), so (F1) bounds the time-`U` laws of the
+continuous-time report and `Z_p` by `min {1, U²/(4n)}`
+(`report_multiplicative_continuousTotalVariation_le`) and (F3) holds for the continuous-time
+connection probabilities (`reportConnectionProbability_eq`, `abs_reportContinuousLaw_top_sub_le`).
+With two fibers `T_p` is exponential of rate `p₀ p₁`
+(`EdgeClockConnectionLaw.map_edgeConnectionTime_edgeClockLaw_two`). (F3) is proved as convergence
+of the connection
 probability of the uniformized report to `Pr(T_p ≤ U)` along panels whose fiber proportions
 converge (`MultiplicativeConnectionConvergence.tendsto_reportConnectionProbability`); the
 identification with path measures on càdlàg paths is not formalized. The law of `T_p` in (F3) is

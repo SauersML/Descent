@@ -128,6 +128,8 @@ import Descent.Portability.NeutralRateHistoryRealization
 import Descent.Portability.NeutralRateHistoryKernel
 import Descent.Portability.MixingLawReplicaBias
 import Descent.Portability.ReferenceExperimentCohortRows
+import Descent.Portability.ReferenceExperimentRows
+import Descent.Portability.ReferenceExperimentAtomTable
 import Descent.Portability.CylinderGaussianQuadrant
 import Descent.Portability.CylinderComputableCertificate
 import Descent.Portability.MultinomialHistoryRealization
@@ -370,9 +372,10 @@ real quantifier elimination, which the note uses to eliminate parameters from (8
 available at this pin. Equations
 (20), (28) and (29) take the pointwise bounds `0 ≤ D ≤ 1`, as the corpus
 certificates do. Theorem 1 makes no complexity claim and covers no infinite branch set. Of §9,
-the other population target table rows, the 3960 shared-context count and the full-square range
-table are not yet proof-checked; the size-three cohort rows are proved in
-`ReferenceExperimentCohortRows`.
+the 3960 shared-context count and the full-square range table are not yet proof-checked; the
+population target rows of both migration histories are proved in `ReferenceExperimentRows`, from
+the four corner certificates through the tabled atom masses (`ReferenceExperimentAtomTable`), and
+the size-three cohort rows in `ReferenceExperimentCohortRows`.
 `IntervalEvaluatorCertificate` assumes a
 finite measure, a common bound and pointwise vanishing widths;
 `CylinderIntervalCertificate` needs only almost sure vanishing widths on fair-bit streams; its
