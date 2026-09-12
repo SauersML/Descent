@@ -121,9 +121,10 @@ theorem abs_mixedObservable_le (f : (Fin n → H) → ℝ) (S : Finset (Fin n)) 
           · exact hv.2
           · exact hq.2
   unfold mixedObservable
-  calc |∑ w, f w * ∏ a, (if a ∈ S then v (w a) else q (w a))|
-      ≤ ∑ w, |f w * ∏ a, (if a ∈ S then v (w a) else q (w a))| := abs_sum_le_sum_abs _ _
-    _ ≤ ∑ w, ‖f‖ * ∏ a, (if a ∈ S then v (w a) else q (w a)) := by
+  calc |∑ w : Fin n → H, f w * ∏ a, (if a ∈ S then v (w a) else q (w a))|
+      ≤ ∑ w : Fin n → H, |f w * ∏ a, (if a ∈ S then v (w a) else q (w a))| :=
+        abs_sum_le_sum_abs _ _
+    _ ≤ ∑ w : Fin n → H, ‖f‖ * ∏ a, (if a ∈ S then v (w a) else q (w a)) := by
         refine sum_le_sum fun w _ ↦ ?_
         rw [abs_mul, abs_of_nonneg (hnonneg w)]
         exact mul_le_mul_of_nonneg_right
@@ -166,20 +167,24 @@ theorem sum_choose_mul_tail_le (n j : ℕ) {x : ℝ} (hx0 : 0 ≤ x) (hx1 : x �
     have hbinom : ∑ i ∈ range (m + 1), (m.choose i : ℝ) * (x ^ i * (1 - x) ^ (m - i)) = 1 := by
       have h := add_pow x (1 - x) m
       rw [show x + (1 - x) = 1 by ring, one_pow] at h
-      rw [h]
-      exact sum_congr rfl fun i _ ↦ by ring
+      calc ∑ i ∈ range (m + 1), (m.choose i : ℝ) * (x ^ i * (1 - x) ^ (m - i))
+          = ∑ i ∈ range (m + 1), x ^ i * (1 - x) ^ (m - i) * (m.choose i : ℝ) :=
+            sum_congr rfl fun i _ ↦ by ring
+        _ = 1 := h.symm
     calc ∑ i ∈ range (m + 1), ((j + m).choose (j + i) : ℝ) *
           (if j ≤ j + i then x ^ (j + i) * (1 - x) ^ (j + m - (j + i)) else 0)
         ≤ ∑ i ∈ range (m + 1), ((j + m).choose j : ℝ) * x ^ j *
             ((m.choose i : ℝ) * (x ^ i * (1 - x) ^ (m - i))) := by
-          refine sum_le_sum fun i _ ↦ ?_
+          refine sum_le_sum fun i hi ↦ ?_
+          have him : i ≤ m := Nat.lt_succ_iff.mp (mem_range.mp hi)
           rw [if_pos (Nat.le_add_right j i), Nat.add_sub_add_left, pow_add]
           have hchoose :
               ((j + m).choose (j + i) : ℝ) ≤ ((j + m).choose j : ℝ) * (m.choose i : ℝ) := by
-            have hmul := Nat.choose_mul (n := j + m) (k := j + i) (s := j) (Nat.le_add_right j i)
+            have hmul := Nat.choose_mul (n := j + m) (k := j + i) (s := j)
+              (Nat.add_le_add_left him j) (Nat.le_add_right j i)
             rw [Nat.add_sub_cancel_left, Nat.add_sub_cancel_left] at hmul
             have hpos : 0 < (j + i).choose j := Nat.choose_pos (Nat.le_add_right j i)
-            exact_mod_cast (Nat.le_mul_of_pos_right _ hpos).trans hmul.le
+            exact_mod_cast (le_mul_of_one_le_right (Nat.zero_le _) hpos).trans hmul.le
           have hterm : 0 ≤ x ^ j * (x ^ i * (1 - x) ^ (m - i)) :=
             mul_nonneg (pow_nonneg hx0 j)
               (mul_nonneg (pow_nonneg hx0 i) (pow_nonneg (sub_nonneg.mpr hx1) _))
@@ -188,7 +193,7 @@ theorem sum_choose_mul_tail_le (n j : ℕ) {x : ℝ} (hx0 : 0 ≤ x) (hx1 : x �
   · have hzero : ∀ k ∈ range (n + 1), (n.choose k : ℝ) *
         (if j ≤ k then x ^ k * (1 - x) ^ (n - k) else 0) = 0 := fun k hk ↦ by
       rw [if_neg (by rw [mem_range] at hk; omega), mul_zero]
-    rw [sum_eq_zero hzero, Nat.choose_eq_zero_of_lt hj, Nat.cast_zero, zero_mul]
+    simp only [sum_eq_zero hzero, Nat.choose_eq_zero_of_lt hj, Nat.cast_zero, zero_mul, le_refl]
 
 /-- The weight of the sets of at least `j` arguments, as a binomial tail. -/
 theorem sum_powerset_tail_eq (n j : ℕ) (ε : ℝ) :
@@ -350,14 +355,14 @@ theorem sum_powersetCard_two (F : Finset (Fin n) → ℝ) :
 `|E_x H_f(ε δ_x + (1 - ε) p) - H_f(p) - ε² ∑_{a<b} (H_{C_ab f} - H_f)(p)| ≤ 4 ε³ n³ ‖f‖`. -/
 theorem abs_resample_sub_le (f : (Fin n → H) → ℝ) {p : H → ℝ} (hp : p ∈ stdSimplex ℝ H) {ε : ℝ}
     (hε0 : 0 ≤ ε) (hε1 : ε ≤ 1) :
-    |∑ x, p x * samplingObservable f (ε • Pi.single x 1 + (1 - ε) • p) -
+    |∑ x, p x * samplingObservable f (ε • (Pi.single x 1 : H → ℝ) + (1 - ε) • p) -
         samplingObservable f p - ε ^ 2 * ∑ b, ∑ a ∈ Iio b,
           (samplingObservable (coalesceArguments a b f) p - samplingObservable f p)| ≤
       4 * ε ^ 3 * (n : ℝ) ^ 3 * ‖f‖ := by
-  have hexp : ∑ x, p x * samplingObservable f (ε • Pi.single x 1 + (1 - ε) • p) -
+  have hexp : ∑ x, p x * samplingObservable f (ε • (Pi.single x 1 : H → ℝ) + (1 - ε) • p) -
       samplingObservable f p = ∑ S ∈ (univ : Finset (Fin n)).powerset,
         ε ^ S.card * (1 - ε) ^ (n - S.card) * (resampleTerm f S p - samplingObservable f p) := by
-    have hsum : ∑ x, p x * samplingObservable f (ε • Pi.single x 1 + (1 - ε) • p) =
+    have hsum : ∑ x, p x * samplingObservable f (ε • (Pi.single x 1 : H → ℝ) + (1 - ε) • p) =
         ∑ S ∈ (univ : Finset (Fin n)).powerset,
           ε ^ S.card * (1 - ε) ^ (n - S.card) * resampleTerm f S p := by
       simp only [samplingObservable_mix, mul_sum]
@@ -419,7 +424,7 @@ theorem abs_resample_sub_le (f : (Fin n → H) → ℝ) {p : H → ℝ} (hp : p 
           rcases lt_or_ge S.card 3 with h3 | h3
           · have hD : resampleTerm f S p - samplingObservable f p = 0 := by
               rcases Nat.lt_or_ge S.card 1 with h0 | h1
-              · rw [card_eq_zero.mp (by omega), resampleTerm_empty f hp.2, sub_self]
+              · rw [card_eq_zero.mp (by omega : S.card = 0), resampleTerm_empty f hp.2, sub_self]
               · obtain ⟨a, rfl⟩ := card_eq_one.mp (by omega : S.card = 1)
                 rw [resampleTerm_singleton, sub_self]
             rw [hD, mul_zero, abs_zero, if_neg (by omega), zero_mul]
@@ -569,7 +574,7 @@ theorem abs_decision_sub_le (T : H → H → H) (f : (Fin n → H) → ℝ) {p :
           rcases lt_or_ge S.card 2 with h2 | h2
           · have hD : mixedObservable f S (reproduce (ruleKernel T) p) p -
                 samplingObservable f p = 0 := by
-              rw [card_eq_zero.mp (by omega), mixedObservable_empty, sub_self]
+              rw [card_eq_zero.mp (by omega : S.card = 0), mixedObservable_empty, sub_self]
             rw [hD, mul_zero, abs_zero, if_neg (by omega), zero_mul]
           · rw [if_pos h2, abs_mul, abs_of_nonneg hw]
             refine mul_le_mul_of_nonneg_left ?_ hw
