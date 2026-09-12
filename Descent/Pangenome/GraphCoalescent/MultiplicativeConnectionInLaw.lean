@@ -155,8 +155,10 @@ theorem continuous_poissonSeries {a : ℕ → ℝ} (ha : ∀ m, |a m| ≤ 1) :
   have hcont : ContinuousOn
       (fun u : ℝ ↦ ∑' m : ℕ, Real.exp (-u) * (u ^ m / (m.factorial : ℝ)) * a m)
       (Ioo (-R) R) := by
-    refine continuousOn_tsum (u := fun m ↦ Real.exp R * (R ^ m / (m.factorial : ℝ)))
-      (fun m ↦ ?_) ((Real.summable_pow_div_factorial R).mul_left _) fun m u hu ↦ ?_
+    refine continuousOn_tsum
+      (f := fun m u ↦ Real.exp (-u) * (u ^ m / (m.factorial : ℝ)) * a m)
+      (u := fun m ↦ Real.exp R * (R ^ m / (m.factorial : ℝ)))
+      (fun m ↦ ?_) ((Real.summable_pow_div_factorial R).mul_left (Real.exp R)) fun m u hu ↦ ?_
     · exact (by fun_prop :
         Continuous fun u : ℝ ↦ Real.exp (-u) * (u ^ m / (m.factorial : ℝ)) * a m).continuousOn
     · have hu' : |u| ≤ R := abs_le.mpr ⟨hu.1.le, hu.2.le⟩
@@ -204,10 +206,11 @@ theorem tendsto_poissonMixture_atTop {a : ℕ → ℝ} (ha0 : ∀ m, 0 ≤ a m) 
       Finset.sum_congr rfl fun m _ ↦ by
         rw [poissonPMFReal, hcoe]
         ring
-    have hle := hasSum_le (fun m ↦ ?_) hB (summable_poissonPMFReal_mul ha0 ha1 _).hasSum
-    · rw [hrange, mul_one] at hle
-      exact hle
-    · have hπ : 0 ≤ poissonPMFReal x.toNNReal m := poissonPMFReal_nonneg
+    have hterm : ∀ m, (1 - ε) * poissonPMFReal x.toNNReal m
+        - (if m ∈ Finset.range M then poissonPMFReal x.toNNReal m else 0)
+        ≤ poissonPMFReal x.toNNReal m * a m := by
+      intro m
+      have hπ : 0 ≤ poissonPMFReal x.toNNReal m := poissonPMFReal_nonneg
       by_cases hm : m ∈ Finset.range M
       · rw [if_pos hm]
         nlinarith [ha0 m]
@@ -216,6 +219,9 @@ theorem tendsto_poissonMixture_atTop {a : ℕ → ℝ} (ha0 : ∀ m, 0 ≤ a m) 
           rw [Finset.mem_range, not_lt] at hm
           exact hm
         nlinarith [hM m hMm]
+    have hle := hasSum_le hterm hB (summable_poissonPMFReal_mul ha0 ha1 x.toNNReal).hasSum
+    rw [hrange, mul_one] at hle
+    exact hle
   filter_upwards [(tendsto_order.1 hS).2 ε hεpos, eventually_ge_atTop 0] with x hx1 hx2
   have := hlower x hx2
   linarith [hε]
