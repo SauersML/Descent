@@ -248,7 +248,9 @@ theorem tendsto_graphProb_card_large_le {α ε ε'' : ℝ} (hα : 1 < α) (hε :
         have hvε : ε'' * m ≤ ((reach (edgeGraph E) {v}).card : ℝ) :=
           (mul_le_mul_of_nonneg_right (by linarith) hm.le).trans hv
         have hWL := hv.trans (card_large_ge_of_mem hvε)
-        rw [if_neg (not_not.mpr ⟨v, hv⟩), mul_zero, add_zero]
+        have hnA : ¬¬∃ v, (giantFraction α - ε₁) * m ≤ ((reach (edgeGraph E) {v}).card : ℝ) :=
+          not_not.mpr ⟨v, hv⟩
+        simp only [if_neg hnA, mul_zero, add_zero]
         split_ifs with hbig
         · rw [le_div_iff₀ hdm, one_mul]
           push_neg at hbig
@@ -273,21 +275,19 @@ theorem tendsto_graphProb_card_large_le {α ε ε'' : ℝ} (hα : 1 < α) (hε :
     have hCnot : (giantFraction α / (ε + ε₁) + 1) * graphProb m (α / m)
         (fun E ↦ ¬∃ v, (giantFraction α - ε₁) * m ≤ ((reach (edgeGraph E) {v}).card : ℝ)) ≤
           (1 - a) / 4 := by
-      calc (giantFraction α / (ε + ε₁) + 1) * graphProb m (α / m)
-          (fun E ↦ ¬∃ v, (giantFraction α - ε₁) * m ≤ ((reach (edgeGraph E) {v}).card : ℝ))
-          ≤ (giantFraction α / (ε + ε₁) + 1) *
-              ((1 - a) / (4 * (giantFraction α / (ε + ε₁) + 1))) :=
-            mul_le_mul_of_nonneg_left hnotA hC.le
-        _ = (1 - a) / 4 := by
-            rw [mul_div_assoc', mul_comm (giantFraction α / (ε + ε₁) + 1),
-              mul_div_mul_right _ _ hC.ne']
+      have h := mul_le_mul_of_nonneg_left hnotA hC.le
+      have heq : (giantFraction α / (ε + ε₁) + 1) *
+          ((1 - a) / (4 * (giantFraction α / (ε + ε₁) + 1))) = (1 - a) / 4 := by
+        rw [mul_div_assoc', mul_comm (giantFraction α / (ε + ε₁) + 1),
+          mul_div_mul_right _ _ hC.ne']
+      linarith
     have hexcess : (graphExpect m (α / m) (fun E ↦
         ((univ.filter fun w ↦ ε'' * m ≤ ((reach (edgeGraph E) {w}).card : ℝ)).card : ℝ)) -
           (giantFraction α - ε₁) * m) / ((ε + ε₁) * m) ≤ (1 - a) / 4 := by
       rw [div_le_iff₀ hdm]
       have h1 := mul_le_mul_of_nonneg_right hε₁a hm.le
       have h2 := mul_nonneg (mul_nonneg h1a.le hε₁0.le) hm.le
-      nlinarith
+      linarith
     have haddW := graphProb_add_not m (α / m) (fun E ↦
       ((univ.filter fun w ↦ ε'' * m ≤ ((reach (edgeGraph E) {w}).card : ℝ)).card : ℝ) ≤
         (giantFraction α + ε) * m)
@@ -344,6 +344,7 @@ theorem giantComponentLaw_of_one_lt {α : ℝ} (hα : 1 < α) : GiantComponentLa
       (Q := fun E ↦ GiantEvent (giantFraction α) ε (edgeGraph E))
       fun _ h ↦ giantEvent_of_exists_of_card_le h4 hε₁0.le (by linarith) (by linarith)
         (by linarith) (by linarith) h.1 h.2
+    beta_reduce at hand hmono
     linarith
   · filter_upwards [tendsto_natCast_atTop_atTop.eventually_ge_atTop α, eventually_gt_atTop 0]
       with m h3 h4
