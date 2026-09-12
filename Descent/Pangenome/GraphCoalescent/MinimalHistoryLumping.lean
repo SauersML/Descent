@@ -177,7 +177,8 @@ theorem IsRepresentativeSet.erase {n : ℕ} {s : Fin n → Fin n} {ξ η : ER n}
 /-- The fibers of the chosen individuals at the singletons cover the panel. -/
 theorem sum_fiberCard_representatives {n : ℕ} (s : Fin n → Fin n) :
     ∑ i ∈ representatives s ⊥, Linkage.fiberCard s i = n := by
-  have hinj : Set.InjOn (fun C : Quotient (observed s ⊥) ↦ C.out) (univ : Finset _) :=
+  have hinj : Set.InjOn (fun C : Quotient (observed s ⊥) ↦ C.out)
+      (↑(univ : Finset (Quotient (observed s ⊥))) : Set (Quotient (observed s ⊥))) :=
     fun C _ D _ hCD ↦ by
       rw [← Quotient.out_eq C, ← Quotient.out_eq D]
       exact congrArg _ hCD
@@ -418,7 +419,7 @@ theorem connectingCount_eq_historyWeight {n : ℕ} (s : Fin n → Fin n) :
         have hcard' : #(T.erase j) = k + 1 := by
           rw [card_erase_of_mem hjT]
           omega
-        rw [connectingCount_eq_historyWeight k η (T.erase j) hT' hcard']
+        rw [connectingCount_eq_historyWeight s k η (T.erase j) hT' hcard']
         refine congrArg _ (historyWeight_congr k (T.erase j) _ _ fun z hz ↦ ?_)
         rw [hstate]
         by_cases hzi : z = i
@@ -485,7 +486,7 @@ theorem minimalHistoryCount_eq_prod_historyFactor {n : ℕ} (s : Fin n → Fin n
   rw [minimalHistoryCount_eq_historyWeight s (by omega), ← hcard,
     historyWeight_eq_prod_historyFactor (representatives s ⊥) (Linkage.fiberCard s)
       (by rw [hcard]; exact hwidth) fun i _ ↦ Linkage.fiberCard_pos s i,
-    sum_fiberCard_representatives]
+    sum_fiberCard_representatives, Rat.cast_mul]
 
 open Asymptotics Topology in
 /-- **Theorem E, (E2).** For an interface of width `w ≥ 2` with fiber sizes `c_i` on a panel of
@@ -505,9 +506,9 @@ theorem reportConnectedProbability_sub_note_isBigO {n : ℕ} (s : Fin n → Fin 
       (∏ i ∈ representatives s ⊥, (Linkage.fiberCard s i : ℝ)) *
         ((Linkage.width s - 1)! / 2 ^ (Linkage.width s - 2) *
           ((2 * n - Linkage.width s)! / (2 * n - 2 * Linkage.width s + 2)!)) := by
-    have hq := minimalHistoryCount_eq_prod_historyFactor s hwidth
-    rw [historyFactor_eq _ _ hwidth hle] at hq
-    exact_mod_cast hq
+    rw [minimalHistoryCount_eq_prod_historyFactor s hwidth, historyFactor_eq _ _ hwidth hle]
+    push_cast
+    try ring
   have hfun : (fun t : ℝ ↦ reportConnectedProbability s t -
         (∏ i ∈ representatives s ⊥, (Linkage.fiberCard s i : ℝ)) *
           (2 * n - Linkage.width s)! /
@@ -518,7 +519,6 @@ theorem reportConnectedProbability_sub_note_isBigO {n : ℕ} (s : Fin n → Fin 
     funext t
     rw [hcount]
     field_simp
-    ring
   rw [hfun]
   exact reportConnectedProbability_sub_isBigO s (by omega)
 
