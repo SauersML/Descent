@@ -470,6 +470,87 @@ theorem trajectoryClockLaw_hiddenLoadAt {n : ℕ} (hn : 1 ≤ n) (s : Fin n → 
   · exact fun k _ ↦ MeasurableSpace.measurableSet_top.prod
       (measurable_blockCountAt_clockHold n t (measurableSet_singleton k))
 
+/-! ### The lumped rates -/
+
+/-- The block count read off a hidden state: the sum of the loads over the report classes. -/
+def hiddenBlockCount {n : ℕ} (X : ER n × (Fin n → ℕ)) : ℕ :=
+  ∑ C : Quotient X.1, X.2 C.out
+
+theorem hiddenBlockCount_hiddenState {n : ℕ} (s : Fin n → Fin n) (ξ : ER n) :
+    hiddenBlockCount (hiddenState s ξ) = blocks ξ :=
+  (blocks_eq_sum_hiddenState s ξ).symm
+
+/-- **The lumped rates**: the death rate of the block count times the hidden jump kernel. -/
+def hiddenRate {n : ℕ} (s : Fin n → Fin n) (X Y : ER n × (Fin n → ℕ)) : ℝ≥0∞ :=
+  ENNReal.ofReal (deathRate (hiddenBlockCount X)) * hiddenKernel s X Y
+
+/-- The hidden states the labeled chain can occupy. -/
+def reachableHidden {n : ℕ} (s : Fin n → Fin n) : Finset (ER n × (Fin n → ℕ)) :=
+  Finset.univ.image (hiddenState s)
+
+/-- **(A1)**: an invisible merger inside a component of load `l` has rate `C(l, 2)`. -/
+theorem hiddenRate_invisibleTarget {n : ℕ} (s : Fin n → Fin n) {ξ : ER n} (hk : 2 ≤ blocks ξ)
+    (x : Fin n) :
+    hiddenRate s (hiddenState s ξ) (invisibleTarget (hiddenState s ξ) x)
+      = (((hiddenLoad s ξ (Quotient.mk (observed s ξ) x)).choose 2 : ℕ) : ℝ≥0∞) := by
+  rw [hiddenRate, hiddenBlockCount_hiddenState, hiddenKernel_invisibleTarget s hk x,
+    ← choose_two_blocks_eq_ofReal_deathRate, mul_comm, mul_assoc,
+    ENNReal.inv_mul_cancel (Nat.cast_ne_zero.mpr (Nat.choose_pos hk).ne')
+      (ENNReal.natCast_ne_top _), mul_one]
+
+/-- **(A2)**: a visible merger of components with loads `a` and `b` has rate `ab`. -/
+theorem hiddenRate_visibleTarget {n : ℕ} (s : Fin n → Fin n) {ξ : ER n} (hk : 2 ≤ blocks ξ)
+    {x y : Fin n} (hxy : ¬ (observed s ξ).r x y) :
+    hiddenRate s (hiddenState s ξ) (visibleTarget (hiddenState s ξ) x y)
+      = ((hiddenLoad s ξ (Quotient.mk (observed s ξ) x)
+          * hiddenLoad s ξ (Quotient.mk (observed s ξ) y) : ℕ) : ℝ≥0∞) := by
+  rw [hiddenRate, hiddenBlockCount_hiddenState, hiddenKernel_visibleTarget s hk hxy,
+    ← choose_two_blocks_eq_ofReal_deathRate, mul_comm, mul_assoc,
+    ENNReal.inv_mul_cancel (Nat.cast_ne_zero.mpr (Nat.choose_pos hk).ne')
+      (ENNReal.natCast_ne_top _), mul_one]
+
+/-- **(A3), the total rate**: the lumped rates out of a hidden state sum to `C(K, 2)`, the same
+for every labeled state carrying it. -/
+theorem sum_hiddenRate {n : ℕ} (s : Fin n → Fin n) (ξ : ER n) :
+    ∑ Y ∈ reachableHidden s, hiddenRate s (hiddenState s ξ) Y
+      = ENNReal.ofReal (deathRate (blocks ξ)) := by
+  simp only [hiddenRate, hiddenBlockCount_hiddenState]
+  rw [← Finset.mul_sum, ← tsum_eq_sum, PMF.tsum_coe, mul_one]
+  intro Y hY
+  refine (PMF.apply_eq_zero_iff _ _).mpr fun hmem ↦ hY ?_
+  rw [hiddenKernel_hiddenState] at hmem
+  obtain ⟨η, -, rfl⟩ := PMF.mem_support_map_iff.mp hmem
+  exact Finset.mem_image_of_mem _ (Finset.mem_univ η)
+
+/-- On the support of the hidden law after `n - k` jumps the block count is `k`, so the death
+rate there is `d_k`. -/
+theorem ofReal_deathRate_mul_hiddenHeadLaw {n k : ℕ} (s : Fin n → Fin n) (hk : 1 ≤ k)
+    (hkn : k ≤ n) (y : ER n × (Fin n → ℕ)) :
+    ENNReal.ofReal (deathRate (hiddenBlockCount y)) * hiddenHeadLaw s (n - k) y
+      = ENNReal.ofReal (deathRate k) * hiddenHeadLaw s (n - k) y := by
+  by_cases hy : hiddenHeadLaw s (n - k) y = 0
+  · rw [hy, mul_zero, mul_zero]
+  · obtain ⟨ξ, hξ, rfl⟩ := PMF.mem_support_map_iff.mp ((PMF.mem_support_iff _ _).mpr hy)
+    have hblocks := blocks_of_mem_support_blockLaw (by omega : n - k < n) hξ
+    rw [hiddenBlockCount_hiddenState, show blocks ξ = k by omega]
+
+/-- The hidden law after `j + 1` jumps is the hidden law after `j` jumps propagated by the
+hidden kernel, as a finite sum over the reachable hidden states. -/
+theorem sum_hiddenHeadLaw_mul_hiddenKernel {n : ℕ} (s : Fin n → Fin n) (j : ℕ)
+    (y : ER n × (Fin n → ℕ)) :
+    ∑ x ∈ reachableHidden s, hiddenHeadLaw s j x * hiddenKernel s x y
+      = hiddenHeadLaw s (j + 1) y := by
+  have h : hiddenHeadLaw s (j + 1) y = ∑' x, hiddenHeadLaw s j x * hiddenKernel s x y := by
+    unfold hiddenHeadLaw
+    rw [blockLaw_map_hiddenState_succ, PMF.bind_apply]
+  rw [h]
+  refine (tsum_eq_sum fun x hx ↦ ?_).symm
+  have hzero : hiddenHeadLaw s j x = 0 := by
+    refine (PMF.apply_eq_zero_iff _ _).mpr fun hmem ↦ hx ?_
+    obtain ⟨ξ, -, rfl⟩ := PMF.mem_support_map_iff.mp hmem
+    exact Finset.mem_image_of_mem _ (Finset.mem_univ ξ)
+  rw [hzero, zero_mul]
+
 end
 
 end Descent.Pangenome.GraphCoalescent
