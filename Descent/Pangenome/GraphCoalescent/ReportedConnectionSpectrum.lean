@@ -97,7 +97,7 @@ theorem survivalAt_holdDuration_conv_combination {d : ℝ} (hd : 0 < d) {ν : Me
       holdMeasure, lintegral_withDensity_eq_lintegral_mul _ (measurable_holdDensity d) hG]
     rfl
   have hsplit : ∫⁻ t, holdDensity d t * survivalAt ν (c - (Real.toNNReal t : ℝ))
-      = ∫⁻ t in Set.Iic c, holdDensity d t * survivalAt ν (c - (Real.toNNReal t : ℝ))
+      = (∫⁻ t in Set.Iic c, holdDensity d t * survivalAt ν (c - (Real.toNNReal t : ℝ)))
         + ∫⁻ t in Set.Ioi c, holdDensity d t * survivalAt ν (c - (Real.toNNReal t : ℝ)) := by
     rw [← Set.compl_Iic, lintegral_add_compl _ measurableSet_Iic]
   -- past the threshold the holding time alone exceeds it
