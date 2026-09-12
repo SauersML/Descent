@@ -1,0 +1,28 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.PortabilityIdentification
+
+/-! Axiom audit of the identification of target portability by the exposure law. -/
+
+open Descent.Portability.PortabilityIdentification
+
+#print axioms Descent.Portability.PortabilityIdentification.sum_scoreShare
+#print axioms Descent.Portability.PortabilityIdentification.sum_outcomeShare
+#print axioms Descent.Portability.PortabilityIdentification.sum_abs_scoreShare_sub_le
+#print axioms Descent.Portability.PortabilityIdentification.sum_abs_outcomeShare_sub_le
+#print axioms Descent.Portability.PortabilityIdentification.abs_transportExpectation_sub_le
+#print axioms Descent.Portability.PortabilityIdentification.expectation_abs_plugIn_sub_le
+#print axioms Descent.Portability.PortabilityIdentification.chronologyMass_eq_transportMass
+#print axioms
+  Descent.Portability.PortabilityIdentification.expectation_chronologyLaw_eq_transportExpectation
+#print axioms Descent.Portability.PortabilityIdentification.normalisedCoupling_eq_measureLaplace_one
+#print axioms Descent.Portability.PortabilityIdentification.targetLaw_metrics
+#print axioms Descent.Portability.PortabilityIdentification.squaredCorrelation_frozenSource
+#print axioms
+  Descent.Portability.PortabilityIdentification.chronologyMass_eq_of_source_eq_of_exposureLaw_eq
+#print axioms
+  Descent.Portability.PortabilityIdentification.expectation_abs_plugIn_chronologyLaw_sub_le
+#print axioms
+  Descent.Portability.PortabilityIdentification.couplingOfState_threeBlockHistory_eq_measureLaplace
+#print axioms Descent.Portability.PortabilityIdentification.logTwo_informationBoundary
