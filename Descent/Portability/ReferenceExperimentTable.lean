@@ -74,8 +74,22 @@ def rationalBrier (law : RationalReportLaw State) (score : State → ℚ)
 def comparisonValue (caseRisk controlRisk : ℚ) : ℚ :=
   if controlRisk < caseRisk then 1 else if caseRisk = controlRisk then 1 / 2 else 0
 
+/-- The rational comparison is the corpus comparison `empiricalAUCComparison` read at the real
+risks. -/
+theorem cast_comparisonValue (caseRisk controlRisk : ℚ) :
+    (comparisonValue caseRisk controlRisk : ℝ) =
+      empiricalAUCComparison (caseRisk : ℝ) (controlRisk : ℝ) := by
+  rcases lt_trichotomy controlRisk caseRisk with hlt | heq | hgt
+  · simp [comparisonValue, empiricalAUCComparison, hlt]
+  · subst heq
+    simp [comparisonValue, empiricalAUCComparison]
+  · simp [comparisonValue, empiricalAUCComparison, not_lt.mpr hgt.le, hgt.ne, hgt.ne']
+
 /-- The population AUC with half-credit ties, defined exactly when both outcome classes carry
-mass, as `FiniteReportLaw.binaryAUC` is. -/
+mass, as `FiniteReportLaw.binaryAUC` is.
+
+Regime: a finite population law with the outcome read on its states; the case prevalence is the
+expectation of the outcome bit under `law`, so no separate prevalence argument exists. -/
 def rationalAUC (law : RationalReportLaw State) (score : State → ℚ)
     (outcome : State → Bool) : Option ℚ :=
   if 0 < law.expectation (fun state ↦ bitValue (outcome state)) ∧
@@ -133,7 +147,9 @@ def targetSlope (context : Bool × Bool) (atom : LearnerAtom) (terminal : Termin
 def targetBrier (context : Bool × Bool) (atom : LearnerAtom) (terminal : TerminalTypes) : ℚ :=
   rationalBrier (targetLaw context terminal) (memberScore atom terminal) (fun state ↦ state.2)
 
-/-- The population target AUC. -/
+/-- The population target AUC.
+
+Regime: the target population law `targetLaw context terminal` carries the case prevalence. -/
 def targetAUC (context : Bool × Bool) (atom : LearnerAtom) (terminal : TerminalTypes) :
     Option ℚ :=
   rationalAUC (targetLaw context terminal) (memberScore atom terminal) (fun state ↦ state.2)

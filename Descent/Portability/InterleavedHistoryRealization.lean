@@ -178,6 +178,16 @@ def propagateInterleaved {D : ℕ} (segments : List (InterleavedSegment D))
     (state : AffineLowOrderLDCoordinate D → ℝ) : AffineLowOrderLDCoordinate D → ℝ :=
   segments.foldl (fun current segment ↦ segment.apply current) state
 
+/-- Propagating embedded plain segments is the corpus propagation of those segments,
+`IntegrableRateHistoryRealization.propagateSegments`. -/
+theorem propagateInterleaved_map_segment {D : ℕ} (segments : List (HistorySegment D))
+    (state : AffineLowOrderLDCoordinate D → ℝ) :
+    propagateInterleaved (segments.map InterleavedSegment.segment) state =
+      IntegrableRateHistoryRealization.propagateSegments segments state := by
+  induction segments generalizing state with
+  | nil => rfl
+  | cons segment rest ih => exact ih (segment.apply state)
+
 /-- **NOTE1 section 2.4 with integrable rates, splits and pulses.**  Every finite list of rate
 histories with continuous generators, rate histories with integrable rate coordinates,
 physically realized splits and admixture pulses carries a locus-exchangeably realizable stored
