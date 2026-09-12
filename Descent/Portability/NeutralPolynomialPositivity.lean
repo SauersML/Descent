@@ -64,7 +64,7 @@ def supportBudget (ℓ₀ : Locus) (p : FrequencyPolynomial Deme Locus Allele) :
 theorem withinBudget_supportBudget (ℓ₀ : Locus) (p : FrequencyPolynomial Deme Locus Allele) :
     ∀ β ∈ p.support, WithinBudget (supportBudget ℓ₀ p) (monomialConfiguration ℓ₀ β) :=
   fun β hβ _ ↦
-    (Multiset.countP_le_card _).trans (Finset.single_le_sum (fun _ _ ↦ Nat.zero_le _) hβ)
+    (Multiset.countP_le_card _ _).trans (Finset.single_le_sum (fun _ _ ↦ Nat.zero_le _) hβ)
 
 /-- **The moment functional is a law average.**  At a nonnegative time, the moment functional of
 a polynomial is the average of the polynomial over the atoms of a finitely supported probability
