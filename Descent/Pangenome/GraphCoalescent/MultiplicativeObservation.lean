@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Coalescent.Process
 import Descent.Pangenome.GraphCoalescent.Observation
 import Mathlib.Probability.Distributions.Poisson
 
@@ -132,6 +133,118 @@ theorem pairProductSum_le_half_sq {ι : Type*} [Fintype ι] (f : ι → ℝ) :
     pairProductSum f ≤ (∑ a, f a) ^ 2 / 2 := by
   have h := two_mul_pairProductSum f
   have hsq : 0 ≤ ∑ a, f a ^ 2 := Finset.sum_nonneg fun a _ ↦ sq_nonneg (f a)
+  linarith
+
+/-! ### The multiplicative coalescent on the fiber labels
+
+A state of `Z_p` is a partition `ζ` of the `w` fiber labels.  Its covers are the merges of two
+distinct components (`Descent.Coalescent.StateSpace.covers_iff_exists_merge`), indexed by the
+two-element sets of components (`Descent.Coalescent.StateSpace.coverOfPair_bijective`).  The
+rate of the merge of `C` and `D` is `p(C) p(D)`, and the merged component carries the sum of
+the two masses. -/
+
+/-- **The mass of a component**, `p(C) = ∑_{i ∈ C} p_i`.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  A finite sum of the fiber masses over a class. -/
+noncomputable def blockMass {w : ℕ} (p : Fin w → ℝ) (ζ : Coalescent.ER w) (C : Quotient ζ) :
+    ℝ :=
+  ∑ i ∈ univ.filter (fun i ↦ Quotient.mk ζ i = C), p i
+
+/-- Mass is conserved: the components partition the fiber labels. -/
+theorem sum_blockMass {w : ℕ} (p : Fin w → ℝ) (ζ : Coalescent.ER w) :
+    ∑ C, blockMass p ζ C = ∑ i, p i :=
+  Finset.sum_fiberwise univ (Quotient.mk ζ) p
+
+/-- **The two components a cover merges**, as a two-element set.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  The inverse of the cover count's bijection. -/
+noncomputable def coverPair {w : ℕ} (ζ : Coalescent.ER w)
+    (η : {η : Coalescent.ER w // Coalescent.Covers ζ η}) :
+    {s : Finset (Quotient ζ) // s.card = 2} :=
+  (Equiv.ofBijective _ (Coalescent.coverOfPair_bijective ζ)).symm η
+
+/-- **The rate structure of `Z_p`**: a cover of `ζ` fires at the product of the masses of the
+two components it merges.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  The defining rates of the finite-mass
+multiplicative coalescent. -/
+noncomputable def multiplicativeCoverRate {w : ℕ} (p : Fin w → ℝ) (ζ : Coalescent.ER w)
+    (η : {η : Coalescent.ER w // Coalescent.Covers ζ η}) : ℝ :=
+  ∏ C ∈ (coverPair ζ η).1, blockMass p ζ C
+
+/-- The merge of `C` and `D` is the cover named by `{C, D}`. -/
+theorem coverPair_merge {w : ℕ} (ζ : Coalescent.ER w) {C D : Quotient ζ} (hCD : C ≠ D) :
+    coverPair ζ ⟨Coalescent.merge ζ C D, Coalescent.merge_covers ζ hCD⟩
+      = ⟨{C, D}, Finset.card_pair hCD⟩ := by
+  have hcover : Coalescent.coverOfPair ζ ⟨{C, D}, Finset.card_pair hCD⟩
+      = ⟨Coalescent.merge ζ C D, Coalescent.merge_covers ζ hCD⟩ := by
+    apply Subtype.ext
+    have hspec := Coalescent.pair_spec (Finset.card_pair hCD)
+    exact (Coalescent.merge_eq_merge_iff ζ hspec.1 hCD).mpr hspec.2.symm
+  rw [← hcover]
+  exact (Equiv.ofBijective _ (Coalescent.coverOfPair_bijective ζ)).symm_apply_apply _
+
+/-- **`Z_p` merges `C` and `D` at rate `p(C) p(D)`.** -/
+theorem multiplicativeCoverRate_merge {w : ℕ} (p : Fin w → ℝ) (ζ : Coalescent.ER w)
+    {C D : Quotient ζ} (hCD : C ≠ D) :
+    multiplicativeCoverRate p ζ ⟨Coalescent.merge ζ C D, Coalescent.merge_covers ζ hCD⟩
+      = blockMass p ζ C * blockMass p ζ D := by
+  rw [multiplicativeCoverRate, coverPair_merge ζ hCD]
+  exact Finset.prod_pair hCD
+
+/-- **The total rate of `Z_p` is `κ_ζ = ∑_{C<D} p(C) p(D)`.** -/
+theorem sum_multiplicativeCoverRate {w : ℕ} (p : Fin w → ℝ) (ζ : Coalescent.ER w) :
+    ∑ η, multiplicativeCoverRate p ζ η = pairProductSum (blockMass p ζ) := by
+  rw [← (Equiv.ofBijective _ (Coalescent.coverOfPair_bijective ζ)).sum_comp
+    (multiplicativeCoverRate p ζ)]
+  simp only [multiplicativeCoverRate, coverPair, Equiv.symm_apply_apply]
+  unfold pairProductSum
+  exact (Finset.sum_subtype ((univ : Finset (Quotient ζ)).powersetCard 2)
+    (fun s ↦ Finset.mem_powersetCard_univ) fun t ↦ ∏ C ∈ t, blockMass p ζ C).symm
+
+/-- **Masses add.**  After `C` and `D` merge, the component containing them has mass
+`p(C) + p(D)`. -/
+theorem blockMass_merge {w : ℕ} (p : Fin w → ℝ) (ζ : Coalescent.ER w) {C D : Quotient ζ}
+    (hCD : C ≠ D) {i : Fin w} (hi : Quotient.mk ζ i = C) :
+    blockMass p (Coalescent.merge ζ C D) (Quotient.mk _ i)
+      = blockMass p ζ C + blockMass p ζ D := by
+  have hdisj : Disjoint (univ.filter fun j : Fin w ↦ Quotient.mk ζ j = C)
+      (univ.filter fun j : Fin w ↦ Quotient.mk ζ j = D) :=
+    Finset.disjoint_filter.mpr fun j _ hj1 hj2 ↦ hCD (hj1.symm.trans hj2)
+  unfold blockMass
+  rw [← Finset.sum_union hdisj]
+  refine Finset.sum_congr ?_ fun _ _ ↦ rfl
+  ext j
+  simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_union]
+  constructor
+  · intro hj
+    have hr : Coalescent.mergeMap ζ C D (Quotient.mk ζ j)
+        = Coalescent.mergeMap ζ C D (Quotient.mk ζ i) := Quotient.exact hj
+    rw [hi, Coalescent.mergeMap_apply_of_ne ζ C D C hCD] at hr
+    by_cases hjD : Quotient.mk ζ j = D
+    · exact Or.inr hjD
+    · rw [Coalescent.mergeMap_apply_of_ne ζ C D _ hjD] at hr
+      exact Or.inl hr
+  · intro hj
+    apply Quotient.sound
+    show Coalescent.mergeMap ζ C D (Quotient.mk ζ j)
+      = Coalescent.mergeMap ζ C D (Quotient.mk ζ i)
+    rw [hi, Coalescent.mergeMap_apply_of_ne ζ C D C hCD]
+    rcases hj with hj | hj
+    · rw [hj, Coalescent.mergeMap_apply_of_ne ζ C D C hCD]
+    · rw [hj, Coalescent.mergeMap_apply_self]
+
+/-- **`κ_ζ = (1 - ∑_C p(C)²)/2`**, twice over, when the fiber masses sum to one. -/
+theorem two_mul_sum_multiplicativeCoverRate {w : ℕ} {p : Fin w → ℝ} (hp : ∑ i, p i = 1)
+    (ζ : Coalescent.ER w) :
+    2 * ∑ η, multiplicativeCoverRate p ζ η = 1 - ∑ C, blockMass p ζ C ^ 2 := by
+  rw [sum_multiplicativeCoverRate, two_mul_pairProductSum, sum_blockMass, hp, one_pow]
+
+/-- The total rate of `Z_p` in scaled time is at most one half. -/
+theorem sum_multiplicativeCoverRate_le_half {w : ℕ} {p : Fin w → ℝ} (hp : ∑ i, p i = 1)
+    (ζ : Coalescent.ER w) : ∑ η, multiplicativeCoverRate p ζ η ≤ 1 / 2 := by
+  have h := two_mul_sum_multiplicativeCoverRate hp ζ
+  have hsq : 0 ≤ ∑ C, blockMass p ζ C ^ 2 := Finset.sum_nonneg fun C _ ↦ sq_nonneg _
   linarith
 
 /-! ### The rate comparison while the reports agree
@@ -449,5 +562,191 @@ theorem poissonMixture_le_min {U : NNReal} {a : ℕ → ℝ} {n : ℝ} (hn : 0 <
     (ha : ∀ m, a m ≤ (m : ℝ) * ((m : ℝ) - 1) / (4 * n)) :
     poissonMixture U a ≤ min 1 ((U : ℝ) ^ 2 / (4 * n)) :=
   le_min (poissonMixture_le_one ha0 ha1) (poissonMixture_le hn ha0 ha)
+
+/-! ### The coupling inequality at path level
+
+A coupled chain on `S` carries two observations `F G : S → X`.  The laws of the two observed
+paths are images of one law on coupled paths, so the sum of their absolute differences is at
+most twice the mass of the coupled paths along which the observations differ somewhere.  When
+the observations agree at every unseparated state and separation is absorbing, that mass is at
+most the separation mass. -/
+
+section PathCoupling
+
+variable {S : Type*} [Fintype S]
+
+/-- **The weight of an `m`-step path**: the initial mass times the transition masses along it.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  The finite-dimensional law of a Markov chain. -/
+noncomputable def skeletonPathWeight (P : S → S → ℝ) (μ₀ : S → ℝ) (m : ℕ)
+    (ω : Fin (m + 1) → S) : ℝ :=
+  μ₀ (ω 0) * ∏ k : Fin m, P (ω k.castSucc) (ω k.succ)
+
+theorem skeletonPathWeight_nonneg {P : S → S → ℝ} {μ₀ : S → ℝ} (hP : ∀ s t, 0 ≤ P s t)
+    (hμ : ∀ s, 0 ≤ μ₀ s) (m : ℕ) (ω : Fin (m + 1) → S) :
+    0 ≤ skeletonPathWeight P μ₀ m ω :=
+  mul_nonneg (hμ _) (Finset.prod_nonneg fun _ _ ↦ hP _ _)
+
+/-- Extending a path by one step multiplies its weight by the last transition. -/
+theorem skeletonPathWeight_snoc (P : S → S → ℝ) (μ₀ : S → ℝ) (m : ℕ)
+    (ω : Fin (m + 1) → S) (x : S) :
+    skeletonPathWeight P μ₀ (m + 1) (Fin.snoc ω x)
+      = skeletonPathWeight P μ₀ m ω * P (ω (Fin.last m)) x := by
+  unfold skeletonPathWeight
+  rw [Fin.prod_univ_castSucc, ← Fin.castSucc_zero' (n := m + 1)]
+  simp only [Fin.snoc_castSucc, Fin.succ_castSucc, Fin.succ_last, Fin.snoc_last]
+  ring
+
+/-- A sum over paths of one more step splits off the last state. -/
+theorem sum_pi_fin_succ {M : Type*} [AddCommMonoid M] (m : ℕ)
+    (F : (Fin (m + 1 + 1) → S) → M) :
+    ∑ ω, F ω = ∑ ω : Fin (m + 1) → S, ∑ x : S, F (Fin.snoc ω x) := by
+  rw [← (Fin.snocEquiv fun _ : Fin (m + 1 + 1) ↦ S).sum_comp F, Fintype.sum_prod_type,
+    Finset.sum_comm]
+  rfl
+
+/-- **The last coordinate of the path law is the skeleton law.** -/
+theorem sum_skeletonPathWeight_mul (P : S → S → ℝ) (μ₀ : S → ℝ) (m : ℕ) (g : S → ℝ) :
+    ∑ ω : Fin (m + 1) → S, skeletonPathWeight P μ₀ m ω * g (ω (Fin.last m))
+      = ∑ t, skeletonLaw P μ₀ m t * g t := by
+  induction m generalizing g with
+  | zero =>
+    refine Fintype.sum_equiv (Equiv.funUnique (Fin 1) S) _ _ fun ω ↦ ?_
+    rw [skeletonPathWeight, Fin.prod_univ_zero, mul_one]
+    rfl
+  | succ m ih =>
+    rw [sum_pi_fin_succ, sum_skeletonLaw_succ P μ₀ m univ g,
+      ← ih fun t ↦ ∑ t' ∈ univ, P t t' * g t']
+    refine Finset.sum_congr rfl fun ω _ ↦ ?_
+    rw [Finset.mul_sum]
+    refine Finset.sum_congr rfl fun x _ ↦ ?_
+    rw [skeletonPathWeight_snoc, Fin.snoc_last]
+    ring
+
+/-- **The coupling inequality for finite laws**: two images of one nonnegative mass differ, in
+summed absolute value, by at most twice the mass on which the two maps disagree. -/
+theorem sum_abs_sub_fiber_le {Ω X : Type*} [Fintype Ω] [Fintype X] [DecidableEq X] (wt : Ω → ℝ)
+    (hwt : ∀ ω, 0 ≤ wt ω) (F G : Ω → X) :
+    ∑ x, |∑ ω ∈ univ.filter (fun ω ↦ F ω = x), wt ω
+        - ∑ ω ∈ univ.filter (fun ω ↦ G ω = x), wt ω|
+      ≤ 2 * ∑ ω ∈ univ.filter (fun ω ↦ F ω ≠ G ω), wt ω := by
+  have hdiff : ∀ x, ∑ ω ∈ univ.filter (fun ω ↦ F ω = x), wt ω
+      - ∑ ω ∈ univ.filter (fun ω ↦ G ω = x), wt ω
+      = ∑ ω ∈ univ.filter (fun ω ↦ F ω ≠ G ω),
+          wt ω * ((if F ω = x then 1 else 0) - (if G ω = x then 1 else 0)) := by
+    intro x
+    rw [Finset.sum_filter, Finset.sum_filter, ← Finset.sum_sub_distrib, Finset.sum_filter]
+    refine Finset.sum_congr rfl fun ω _ ↦ ?_
+    by_cases h : F ω = G ω
+    · rw [h, sub_self, if_neg fun hne ↦ hne rfl]
+    · rw [if_pos h]
+      split_ifs <;> ring
+  calc ∑ x, |∑ ω ∈ univ.filter (fun ω ↦ F ω = x), wt ω
+        - ∑ ω ∈ univ.filter (fun ω ↦ G ω = x), wt ω|
+      = ∑ x, |∑ ω ∈ univ.filter (fun ω ↦ F ω ≠ G ω),
+          wt ω * ((if F ω = x then 1 else 0) - (if G ω = x then 1 else 0))| :=
+        Finset.sum_congr rfl fun x _ ↦ by rw [hdiff x]
+    _ ≤ ∑ x, ∑ ω ∈ univ.filter (fun ω ↦ F ω ≠ G ω),
+          wt ω * ((if F ω = x then 1 else 0) + (if G ω = x then 1 else 0)) := by
+        refine Finset.sum_le_sum fun x _ ↦ (Finset.abs_sum_le_sum_abs _ _).trans ?_
+        refine Finset.sum_le_sum fun ω _ ↦ ?_
+        rw [abs_mul, abs_of_nonneg (hwt ω)]
+        exact mul_le_mul_of_nonneg_left (by split_ifs <;> norm_num) (hwt ω)
+    _ = ∑ ω ∈ univ.filter (fun ω ↦ F ω ≠ G ω), wt ω * 2 := by
+        rw [Finset.sum_comm]
+        refine Finset.sum_congr rfl fun ω _ ↦ ?_
+        rw [← Finset.mul_sum, Finset.sum_add_distrib, Finset.sum_ite_eq, Finset.sum_ite_eq]
+        simp only [Finset.mem_univ, if_true]
+        ring
+    _ = 2 * ∑ ω ∈ univ.filter (fun ω ↦ F ω ≠ G ω), wt ω := by
+        rw [Finset.mul_sum]
+        exact Finset.sum_congr rfl fun ω _ ↦ mul_comm _ _
+
+/-- **Along a path of positive weight separation is absorbing**: once separated, separated at
+the end. -/
+theorem sep_last_of_skeletonPathWeight_ne_zero {P : S → S → ℝ} {μ₀ : S → ℝ} {sep : S → Prop}
+    (habsorb : ∀ s t, sep s → ¬ sep t → P s t = 0) {m : ℕ} {ω : Fin (m + 1) → S}
+    (hω : skeletonPathWeight P μ₀ m ω ≠ 0) {k : Fin (m + 1)} (hk : sep (ω k)) :
+    sep (ω (Fin.last m)) := by
+  have hstep : ∀ i : ℕ, (hi : i < m) → sep (ω ⟨i, by omega⟩) → sep (ω ⟨i + 1, by omega⟩) := by
+    intro i hi hs
+    by_contra hns
+    apply hω
+    unfold skeletonPathWeight
+    have hzero : P (ω (Fin.castSucc ⟨i, hi⟩)) (ω (Fin.succ ⟨i, hi⟩)) = 0 :=
+      habsorb _ _ hs hns
+    exact mul_eq_zero_of_right _ (Finset.prod_eq_zero (Finset.mem_univ ⟨i, hi⟩) hzero)
+  have hall : ∀ d : ℕ, (hd : k.val + d ≤ m) → sep (ω ⟨k.val + d, by omega⟩) := by
+    intro d
+    induction d with
+    | zero =>
+      intro hd
+      simpa using hk
+    | succ d ih =>
+      intro hd
+      exact hstep (k.val + d) (by omega) (ih (by omega))
+  have hend := hall (m - k.val) (by omega)
+  have hidx : (⟨k.val + (m - k.val), by omega⟩ : Fin (m + 1)) = Fin.last m := by
+    ext
+    simp only [Fin.val_last]
+    omega
+  rwa [hidx] at hend
+
+/-- **The paths along which the observations differ carry at most the separation mass.** -/
+theorem sum_filter_path_ne_le_separationMass {X : Type*} [DecidableEq X] {P : S → S → ℝ}
+    {μ₀ : S → ℝ} {sep : S → Prop} (hP : ∀ s t, 0 ≤ P s t) (hμ : ∀ s, 0 ≤ μ₀ s)
+    (habsorb : ∀ s t, sep s → ¬ sep t → P s t = 0) (F G : S → X)
+    (hagree : ∀ s, ¬ sep s → F s = G s) (m : ℕ) :
+    ∑ ω ∈ univ.filter
+        (fun ω : Fin (m + 1) → S ↦ (fun k ↦ F (ω k)) ≠ fun k ↦ G (ω k)),
+        skeletonPathWeight P μ₀ m ω
+      ≤ separationMass P μ₀ sep m := by
+  have hsm : separationMass P μ₀ sep m = ∑ ω : Fin (m + 1) → S,
+      skeletonPathWeight P μ₀ m ω * (if sep (ω (Fin.last m)) then 1 else 0) := by
+    rw [separationMass, Finset.sum_filter]
+    refine Eq.trans (Finset.sum_congr rfl fun t _ ↦ ?_)
+      (sum_skeletonPathWeight_mul P μ₀ m fun t ↦ if sep t then 1 else 0).symm
+    show (if sep t then skeletonLaw P μ₀ m t else 0)
+      = skeletonLaw P μ₀ m t * (if sep t then 1 else 0)
+    split_ifs <;> simp
+  rw [hsm, Finset.sum_filter]
+  refine Finset.sum_le_sum fun ω _ ↦ ?_
+  split_ifs with hne hsep hsep
+  · rw [mul_one]
+  · have hzero : skeletonPathWeight P μ₀ m ω = 0 := by
+      by_contra hω
+      obtain ⟨k, hk⟩ : ∃ k, F (ω k) ≠ G (ω k) := by
+        by_contra hall
+        push_neg at hall
+        exact hne (funext hall)
+      exact hsep (sep_last_of_skeletonPathWeight_ne_zero habsorb hω
+        (by_contra fun hs ↦ hk (hagree _ hs)))
+    rw [hzero, zero_mul]
+  · rw [mul_one]
+    exact skeletonPathWeight_nonneg hP hμ m ω
+  · rw [mul_zero]
+
+/-- **The coupling inequality at path level.**  The observed path laws of a coupled chain differ,
+in summed absolute value, by at most twice its separation mass; with `separationMass_le` this is
+the discrete form of (F1).
+
+Assumes: the kernel and the initial law are nonnegative, separation is absorbing, and the two
+observations agree at every unseparated state. -/
+theorem pathTotalVariation_le_separationMass {X : Type*} [Fintype X] [DecidableEq X]
+    {P : S → S → ℝ} {μ₀ : S → ℝ} {sep : S → Prop} (hP : ∀ s t, 0 ≤ P s t) (hμ : ∀ s, 0 ≤ μ₀ s)
+    (habsorb : ∀ s t, sep s → ¬ sep t → P s t = 0) (F G : S → X)
+    (hagree : ∀ s, ¬ sep s → F s = G s) (m : ℕ) :
+    ∑ y : Fin (m + 1) → X,
+        |∑ ω ∈ univ.filter (fun ω : Fin (m + 1) → S ↦ (fun k ↦ F (ω k)) = y),
+            skeletonPathWeight P μ₀ m ω
+          - ∑ ω ∈ univ.filter (fun ω : Fin (m + 1) → S ↦ (fun k ↦ G (ω k)) = y),
+            skeletonPathWeight P μ₀ m ω|
+      ≤ 2 * separationMass P μ₀ sep m :=
+  (sum_abs_sub_fiber_le (skeletonPathWeight P μ₀ m) (skeletonPathWeight_nonneg hP hμ m)
+    (fun ω k ↦ F (ω k)) fun ω k ↦ G (ω k)).trans
+    (mul_le_mul_of_nonneg_left
+      (sum_filter_path_ne_le_separationMass hP hμ habsorb F G hagree m) zero_le_two)
+
+end PathCoupling
 
 end Descent.Pangenome.GraphCoalescent
