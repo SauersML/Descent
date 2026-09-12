@@ -160,154 +160,6 @@ theorem totalDegree_interceptNumeratorPolynomial_le (deme : Deme)
   · exact (totalDegree_mul _ _).trans (by omega)
   · exact (totalDegree_mul _ _).trans (by omega)
 
-/-! ## Integrating calibration accumulators against a kernel -/
-
-section MomentKernel
-
-variable (ℓ₀ : Locus) {n : ℕ}
-  (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
-  [IsMarkovKernel κ]
-  (M : Matrix (BudgetConfiguration Deme Locus Allele (fun _ ↦ n))
-    (BudgetConfiguration Deme Locus Allele (fun _ ↦ n)) ℝ)
-  (hmoment : ∀ (x : FrequencyState Deme Locus Allele)
-    (ξ : BudgetConfiguration Deme Locus Allele (fun _ ↦ n)),
-    ∫ y, polynomialFunction (momentPolynomial ξ.1) y ∂(κ x)
-      = (M *ᵥ budgetMomentFeature (fun _ ↦ n) x) ξ)
-
-include hmoment
-
-/-- An observable that agrees with a frequency polynomial of total degree at most `n` integrates,
-under a Markov kernel whose budget-`n` configuration moments are `M` applied to the initial
-moments, to the coefficient vector of the polynomial dotted with the propagated moments. -/
-theorem integral_eq_dotProduct_of_totalDegree_le (p : FrequencyPolynomial Deme Locus Allele)
-    (hp : p.totalDegree ≤ n) (g : FrequencyState Deme Locus Allele → ℝ)
-    (hg : ∀ y, polynomialFunction p y = g y) (x0 : FrequencyState Deme Locus Allele) :
-    ∫ y, g y ∂(κ x0)
-      = budgetCoefficients ℓ₀ (fun _ ↦ n) p ⬝ᵥ (M *ᵥ budgetMomentFeature (fun _ ↦ n) x0) := by
-  rw [← integral_polynomial_eq_dotProduct ℓ₀ (fun _ ↦ n) κ M hmoment p
-    (withinBudget_of_totalDegree_le ℓ₀ p hp) x0]
-  exact integral_congr_ae (Filter.Eventually.of_forall fun y ↦ (hg y).symm)
-
-/-- Expected deme means through the moments, at every budget `n ≥ 1`. -/
-theorem integral_expectation_eq_dotProduct (hn : 1 ≤ n) (x0 : FrequencyState Deme Locus Allele)
-    (deme : Deme) (value : FullHaplotype Locus Allele → ℝ) :
-    ∫ y, (stateLaw y deme).expectation value ∂(κ x0)
-      = budgetCoefficients ℓ₀ (fun _ ↦ n) (demeMeanPolynomial deme value)
-        ⬝ᵥ (M *ᵥ budgetMomentFeature (fun _ ↦ n) x0) :=
-  integral_eq_dotProduct_of_totalDegree_le ℓ₀ κ M hmoment _
-    ((totalDegree_demeMeanPolynomial_le deme value).trans hn) _
-    (polynomialFunction_demeMeanPolynomial deme value) x0
-
-/-- Expected deme covariances through the moments, at every budget `n ≥ 2`. -/
-theorem integral_covariance_eq_dotProduct (hn : 2 ≤ n) (x0 : FrequencyState Deme Locus Allele)
-    (deme : Deme) (first second : FullHaplotype Locus Allele → ℝ) :
-    ∫ y, (stateLaw y deme).covariance first second ∂(κ x0)
-      = budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme first second)
-        ⬝ᵥ (M *ᵥ budgetMomentFeature (fun _ ↦ n) x0) :=
-  integral_eq_dotProduct_of_totalDegree_le ℓ₀ κ M hmoment _
-    ((totalDegree_demeCovariancePolynomial_le deme first second).trans hn) _
-    (polynomialFunction_demeCovariancePolynomial deme first second) x0
-
-/-- Expected deme variances through the moments, at every budget `n ≥ 2`. -/
-theorem integral_variance_eq_dotProduct (hn : 2 ≤ n) (x0 : FrequencyState Deme Locus Allele)
-    (deme : Deme) (value : FullHaplotype Locus Allele → ℝ) :
-    ∫ y, (stateLaw y deme).variance value ∂(κ x0)
-      = budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme value value)
-        ⬝ᵥ (M *ᵥ budgetMomentFeature (fun _ ↦ n) x0) :=
-  integral_covariance_eq_dotProduct ℓ₀ κ M hmoment hn x0 deme value value
-
-end MomentKernel
-
-/-! ## Propagated calibration moments along a history of epochs, splits and pulses -/
-
-/-- **Expected deme means along a history.**  For every budget `n ≥ 1`, the expected mean of a
-haplotype observable in a deme is the coefficient vector of its mean polynomial dotted with the
-chronological propagator applied to the budget-`n` moments of the initial state. -/
-theorem integral_expectation_historyEventKernel (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele)
-    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme)) {n : ℕ}
-    (hn : 1 ≤ n) (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
-    (value : FullHaplotype Locus Allele → ℝ) :
-    ∫ y, (stateLaw y deme).expectation value ∂(historyEventKernel ℓ₀ hap₀ events x0)
-      = budgetCoefficients ℓ₀ (fun _ ↦ n) (demeMeanPolynomial deme value)
-        ⬝ᵥ (historyEventPropagator (fun _ ↦ n) events *ᵥ budgetMomentFeature (fun _ ↦ n) x0) := by
-  haveI := isMarkovKernel_historyEventKernel ℓ₀ hap₀ events
-  exact integral_expectation_eq_dotProduct ℓ₀ (historyEventKernel ℓ₀ hap₀ events) _
-    (integral_momentPolynomial_historyEventKernel ℓ₀ hap₀ (fun _ ↦ n) events) hn x0 deme value
-
-/-- **Expected deme covariances along a history**, at every budget `n ≥ 2`. -/
-theorem integral_covariance_historyEventKernel (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele)
-    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme)) {n : ℕ}
-    (hn : 2 ≤ n) (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
-    (first second : FullHaplotype Locus Allele → ℝ) :
-    ∫ y, (stateLaw y deme).covariance first second ∂(historyEventKernel ℓ₀ hap₀ events x0)
-      = budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme first second)
-        ⬝ᵥ (historyEventPropagator (fun _ ↦ n) events *ᵥ budgetMomentFeature (fun _ ↦ n) x0) := by
-  haveI := isMarkovKernel_historyEventKernel ℓ₀ hap₀ events
-  exact integral_covariance_eq_dotProduct ℓ₀ (historyEventKernel ℓ₀ hap₀ events) _
-    (integral_momentPolynomial_historyEventKernel ℓ₀ hap₀ (fun _ ↦ n) events) hn x0 deme first
-    second
-
-/-- **Expected deme variances along a history**, at every budget `n ≥ 2`. -/
-theorem integral_variance_historyEventKernel (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele)
-    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme)) {n : ℕ}
-    (hn : 2 ≤ n) (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
-    (value : FullHaplotype Locus Allele → ℝ) :
-    ∫ y, (stateLaw y deme).variance value ∂(historyEventKernel ℓ₀ hap₀ events x0)
-      = budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme value value)
-        ⬝ᵥ (historyEventPropagator (fun _ ↦ n) events *ᵥ budgetMomentFeature (fun _ ↦ n) x0) :=
-  integral_covariance_historyEventKernel ℓ₀ hap₀ events hn x0 deme value value
-
-/-! ## Propagated calibration moments along a rate history -/
-
-/-- **Expected deme means along a rate history**, at every budget `n ≥ 1`. -/
-theorem integral_expectation_rateHistoryKernel {rates : ℝ → NeutralRates Deme Locus Allele}
-    {T : ℝ} (hT : 0 ≤ T)
-    (hcontinuous : ∀ capacity : Locus → ℕ,
-      ContinuousOn (fun t ↦ dualGenerator (rates t) capacity) (Set.Icc 0 T))
-    (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele) {n : ℕ} (hn : 1 ≤ n)
-    (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
-    (value : FullHaplotype Locus Allele → ℝ) :
-    ∫ y, (stateLaw y deme).expectation value ∂(rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous x0)
-      = budgetCoefficients ℓ₀ (fun _ ↦ n) (demeMeanPolynomial deme value)
-        ⬝ᵥ (rateHistoryDualPropagator rates (fun _ ↦ n) T
-          *ᵥ budgetMomentFeature (fun _ ↦ n) x0) := by
-  haveI := isMarkovKernel_rateHistoryKernel hT hcontinuous ℓ₀ hap₀
-  exact integral_expectation_eq_dotProduct ℓ₀ (rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous) _
-    (integral_momentPolynomial_rateHistoryKernel hT hcontinuous ℓ₀ hap₀ (fun _ ↦ n)) hn x0 deme
-    value
-
-/-- **Expected deme covariances along a rate history**, at every budget `n ≥ 2`. -/
-theorem integral_covariance_rateHistoryKernel {rates : ℝ → NeutralRates Deme Locus Allele}
-    {T : ℝ} (hT : 0 ≤ T)
-    (hcontinuous : ∀ capacity : Locus → ℕ,
-      ContinuousOn (fun t ↦ dualGenerator (rates t) capacity) (Set.Icc 0 T))
-    (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele) {n : ℕ} (hn : 2 ≤ n)
-    (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
-    (first second : FullHaplotype Locus Allele → ℝ) :
-    ∫ y, (stateLaw y deme).covariance first second
-        ∂(rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous x0)
-      = budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme first second)
-        ⬝ᵥ (rateHistoryDualPropagator rates (fun _ ↦ n) T
-          *ᵥ budgetMomentFeature (fun _ ↦ n) x0) := by
-  haveI := isMarkovKernel_rateHistoryKernel hT hcontinuous ℓ₀ hap₀
-  exact integral_covariance_eq_dotProduct ℓ₀ (rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous) _
-    (integral_momentPolynomial_rateHistoryKernel hT hcontinuous ℓ₀ hap₀ (fun _ ↦ n)) hn x0 deme
-    first second
-
-/-- **Expected deme variances along a rate history**, at every budget `n ≥ 2`. -/
-theorem integral_variance_rateHistoryKernel {rates : ℝ → NeutralRates Deme Locus Allele}
-    {T : ℝ} (hT : 0 ≤ T)
-    (hcontinuous : ∀ capacity : Locus → ℕ,
-      ContinuousOn (fun t ↦ dualGenerator (rates t) capacity) (Set.Icc 0 T))
-    (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele) {n : ℕ} (hn : 2 ≤ n)
-    (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
-    (value : FullHaplotype Locus Allele → ℝ) :
-    ∫ y, (stateLaw y deme).variance value ∂(rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous x0)
-      = budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme value value)
-        ⬝ᵥ (rateHistoryDualPropagator rates (fun _ ↦ n) T
-          *ᵥ budgetMomentFeature (fun _ ↦ n) x0) :=
-  integral_covariance_rateHistoryKernel hT hcontinuous ℓ₀ hap₀ hn x0 deme value value
-
 /-! ## The calibration of expectations -/
 
 /-- **The calibration slope of expectations**: the expected score–outcome covariance of a deme
@@ -465,7 +317,9 @@ theorem momentCalibrationPortability_eq_cross (ℓ₀ : Locus) (n : ℕ) (source
   rw [momentCalibrationPortability, momentCalibrationSlope, momentCalibrationSlope,
     div_div_div_eq]
 
-section MomentLaws
+/-! ## Integrating calibration accumulators against a kernel -/
+
+section MomentKernel
 
 variable (ℓ₀ : Locus) {n : ℕ}
   (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
@@ -478,6 +332,46 @@ variable (ℓ₀ : Locus) {n : ℕ}
       = (M *ᵥ budgetMomentFeature (fun _ ↦ n) x) ξ)
 
 include hmoment
+
+/-- An observable that agrees with a frequency polynomial of total degree at most `n` integrates,
+under a Markov kernel whose budget-`n` configuration moments are `M` applied to the initial
+moments, to the coefficient vector of the polynomial dotted with the propagated moments. -/
+theorem integral_eq_dotProduct_of_totalDegree_le (p : FrequencyPolynomial Deme Locus Allele)
+    (hp : p.totalDegree ≤ n) (g : FrequencyState Deme Locus Allele → ℝ)
+    (hg : ∀ y, polynomialFunction p y = g y) (x0 : FrequencyState Deme Locus Allele) :
+    ∫ y, g y ∂(κ x0)
+      = budgetCoefficients ℓ₀ (fun _ ↦ n) p ⬝ᵥ (M *ᵥ budgetMomentFeature (fun _ ↦ n) x0) := by
+  rw [← integral_polynomial_eq_dotProduct ℓ₀ (fun _ ↦ n) κ M hmoment p
+    (withinBudget_of_totalDegree_le ℓ₀ p hp) x0]
+  exact integral_congr_ae (Filter.Eventually.of_forall fun y ↦ (hg y).symm)
+
+/-- Expected deme means through the moments, at every budget `n ≥ 1`. -/
+theorem integral_expectation_eq_dotProduct (hn : 1 ≤ n) (x0 : FrequencyState Deme Locus Allele)
+    (deme : Deme) (value : FullHaplotype Locus Allele → ℝ) :
+    ∫ y, (stateLaw y deme).expectation value ∂(κ x0)
+      = budgetCoefficients ℓ₀ (fun _ ↦ n) (demeMeanPolynomial deme value)
+        ⬝ᵥ (M *ᵥ budgetMomentFeature (fun _ ↦ n) x0) :=
+  integral_eq_dotProduct_of_totalDegree_le ℓ₀ κ M hmoment _
+    ((totalDegree_demeMeanPolynomial_le deme value).trans hn) _
+    (polynomialFunction_demeMeanPolynomial deme value) x0
+
+/-- Expected deme covariances through the moments, at every budget `n ≥ 2`. -/
+theorem integral_covariance_eq_dotProduct (hn : 2 ≤ n) (x0 : FrequencyState Deme Locus Allele)
+    (deme : Deme) (first second : FullHaplotype Locus Allele → ℝ) :
+    ∫ y, (stateLaw y deme).covariance first second ∂(κ x0)
+      = budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme first second)
+        ⬝ᵥ (M *ᵥ budgetMomentFeature (fun _ ↦ n) x0) :=
+  integral_eq_dotProduct_of_totalDegree_le ℓ₀ κ M hmoment _
+    ((totalDegree_demeCovariancePolynomial_le deme first second).trans hn) _
+    (polynomialFunction_demeCovariancePolynomial deme first second) x0
+
+/-- Expected deme variances through the moments, at every budget `n ≥ 2`. -/
+theorem integral_variance_eq_dotProduct (hn : 2 ≤ n) (x0 : FrequencyState Deme Locus Allele)
+    (deme : Deme) (value : FullHaplotype Locus Allele → ℝ) :
+    ∫ y, (stateLaw y deme).variance value ∂(κ x0)
+      = budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme value value)
+        ⬝ᵥ (M *ᵥ budgetMomentFeature (fun _ ↦ n) x0) :=
+  integral_covariance_eq_dotProduct ℓ₀ κ M hmoment hn x0 deme value value
 
 /-- Under a kernel with budget-`n` moments `M`, `n ≥ 2`, the calibration slope of expectations is
 the rational slope of the propagated moments. -/
@@ -517,7 +411,97 @@ theorem expectedCalibrationIntercept_eq_momentCalibrationIntercept (hn : 3 ≤ n
       (polynomialFunction_interceptNumeratorPolynomial deme score outcome) x0,
     integral_variance_eq_dotProduct ℓ₀ κ M hmoment (by omega) x0 deme score]
 
-end MomentLaws
+end MomentKernel
+
+/-! ## Propagated calibration moments along a history of epochs, splits and pulses -/
+
+/-- **Expected deme means along a history.**  For every budget `n ≥ 1`, the expected mean of a
+haplotype observable in a deme is the coefficient vector of its mean polynomial dotted with the
+chronological propagator applied to the budget-`n` moments of the initial state. -/
+theorem integral_expectation_historyEventKernel (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele)
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme)) {n : ℕ}
+    (hn : 1 ≤ n) (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (value : FullHaplotype Locus Allele → ℝ) :
+    ∫ y, (stateLaw y deme).expectation value ∂(historyEventKernel ℓ₀ hap₀ events x0)
+      = budgetCoefficients ℓ₀ (fun _ ↦ n) (demeMeanPolynomial deme value)
+        ⬝ᵥ (historyEventPropagator (fun _ ↦ n) events *ᵥ budgetMomentFeature (fun _ ↦ n) x0) := by
+  haveI := isMarkovKernel_historyEventKernel ℓ₀ hap₀ events
+  exact integral_expectation_eq_dotProduct ℓ₀ (historyEventKernel ℓ₀ hap₀ events) _
+    (integral_momentPolynomial_historyEventKernel ℓ₀ hap₀ (fun _ ↦ n) events) hn x0 deme value
+
+/-- **Expected deme covariances along a history**, at every budget `n ≥ 2`. -/
+theorem integral_covariance_historyEventKernel (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele)
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme)) {n : ℕ}
+    (hn : 2 ≤ n) (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (first second : FullHaplotype Locus Allele → ℝ) :
+    ∫ y, (stateLaw y deme).covariance first second ∂(historyEventKernel ℓ₀ hap₀ events x0)
+      = budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme first second)
+        ⬝ᵥ (historyEventPropagator (fun _ ↦ n) events *ᵥ budgetMomentFeature (fun _ ↦ n) x0) := by
+  haveI := isMarkovKernel_historyEventKernel ℓ₀ hap₀ events
+  exact integral_covariance_eq_dotProduct ℓ₀ (historyEventKernel ℓ₀ hap₀ events) _
+    (integral_momentPolynomial_historyEventKernel ℓ₀ hap₀ (fun _ ↦ n) events) hn x0 deme first
+    second
+
+/-- **Expected deme variances along a history**, at every budget `n ≥ 2`. -/
+theorem integral_variance_historyEventKernel (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele)
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme)) {n : ℕ}
+    (hn : 2 ≤ n) (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (value : FullHaplotype Locus Allele → ℝ) :
+    ∫ y, (stateLaw y deme).variance value ∂(historyEventKernel ℓ₀ hap₀ events x0)
+      = budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme value value)
+        ⬝ᵥ (historyEventPropagator (fun _ ↦ n) events *ᵥ budgetMomentFeature (fun _ ↦ n) x0) :=
+  integral_covariance_historyEventKernel ℓ₀ hap₀ events hn x0 deme value value
+
+/-! ## Propagated calibration moments along a rate history -/
+
+/-- **Expected deme means along a rate history**, at every budget `n ≥ 1`. -/
+theorem integral_expectation_rateHistoryKernel {rates : ℝ → NeutralRates Deme Locus Allele}
+    {T : ℝ} (hT : 0 ≤ T)
+    (hcontinuous : ∀ capacity : Locus → ℕ,
+      ContinuousOn (fun t ↦ dualGenerator (rates t) capacity) (Set.Icc 0 T))
+    (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele) {n : ℕ} (hn : 1 ≤ n)
+    (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (value : FullHaplotype Locus Allele → ℝ) :
+    ∫ y, (stateLaw y deme).expectation value ∂(rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous x0)
+      = budgetCoefficients ℓ₀ (fun _ ↦ n) (demeMeanPolynomial deme value)
+        ⬝ᵥ (rateHistoryDualPropagator rates (fun _ ↦ n) T
+          *ᵥ budgetMomentFeature (fun _ ↦ n) x0) := by
+  haveI := isMarkovKernel_rateHistoryKernel hT hcontinuous ℓ₀ hap₀
+  exact integral_expectation_eq_dotProduct ℓ₀ (rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous) _
+    (integral_momentPolynomial_rateHistoryKernel hT hcontinuous ℓ₀ hap₀ (fun _ ↦ n)) hn x0 deme
+    value
+
+/-- **Expected deme covariances along a rate history**, at every budget `n ≥ 2`. -/
+theorem integral_covariance_rateHistoryKernel {rates : ℝ → NeutralRates Deme Locus Allele}
+    {T : ℝ} (hT : 0 ≤ T)
+    (hcontinuous : ∀ capacity : Locus → ℕ,
+      ContinuousOn (fun t ↦ dualGenerator (rates t) capacity) (Set.Icc 0 T))
+    (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele) {n : ℕ} (hn : 2 ≤ n)
+    (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (first second : FullHaplotype Locus Allele → ℝ) :
+    ∫ y, (stateLaw y deme).covariance first second
+        ∂(rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous x0)
+      = budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme first second)
+        ⬝ᵥ (rateHistoryDualPropagator rates (fun _ ↦ n) T
+          *ᵥ budgetMomentFeature (fun _ ↦ n) x0) := by
+  haveI := isMarkovKernel_rateHistoryKernel hT hcontinuous ℓ₀ hap₀
+  exact integral_covariance_eq_dotProduct ℓ₀ (rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous) _
+    (integral_momentPolynomial_rateHistoryKernel hT hcontinuous ℓ₀ hap₀ (fun _ ↦ n)) hn x0 deme
+    first second
+
+/-- **Expected deme variances along a rate history**, at every budget `n ≥ 2`. -/
+theorem integral_variance_rateHistoryKernel {rates : ℝ → NeutralRates Deme Locus Allele}
+    {T : ℝ} (hT : 0 ≤ T)
+    (hcontinuous : ∀ capacity : Locus → ℕ,
+      ContinuousOn (fun t ↦ dualGenerator (rates t) capacity) (Set.Icc 0 T))
+    (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele) {n : ℕ} (hn : 2 ≤ n)
+    (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (value : FullHaplotype Locus Allele → ℝ) :
+    ∫ y, (stateLaw y deme).variance value ∂(rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous x0)
+      = budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme value value)
+        ⬝ᵥ (rateHistoryDualPropagator rates (fun _ ↦ n) T
+          *ᵥ budgetMomentFeature (fun _ ↦ n) x0) :=
+  integral_covariance_rateHistoryKernel hT hcontinuous ℓ₀ hap₀ hn x0 deme value value
 
 /-! ## The end-to-end calibration law along a history of epochs, splits and pulses -/
 
