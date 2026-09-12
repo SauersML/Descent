@@ -46,8 +46,10 @@ cumulant has nonnegative integer coefficients. `connectivityCumulant_eq_cumulant
 depends on the interface only through its fiber sizes: it is `cumulantOfSizes q.parts card`,
 (D2) written over partitions of the fiber set with `c(C) = Σ_{i ∈ C} c_i`.
 
-The degree bound `n - w + 1` is `ConnectivityCumulantDegree`. Not formalized here: the corpus
-form of (D3) over `Coalescent.ER n` with `observed` and `graphKer`.
+The degree bound `n - w + 1` is `ConnectivityCumulantDegree`, the corpus form of (D3) over
+`Coalescent.ER n` with `observed` and `graphKer` is `ConnectivityCumulantCorpus`, and the
+identification of `mobiusCoefficient` with Mathlib's `IncidenceAlgebra.mu` on the partition
+lattice, together with the Stirling identity, is `PartitionLatticeMobius`.
 
 ## Empirical status
 
