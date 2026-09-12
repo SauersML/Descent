@@ -207,8 +207,11 @@ def limitOperator (hA : A.SeparatesPoints) (approx : LightConeApproximation S A)
 theorem limitValue_nonneg (hA : A.SeparatesPoints) (approx : LightConeApproximation S A)
     (t : ℝ≥0) {g : C(X, ℝ)} (hg : 0 ≤ g) : 0 ≤ limitValue S t g := by
   refine ContinuousMap.le_def.mpr fun x ↦ ?_
-  have hpoint : Tendsto (fun m ↦ (S m).operator t g x) atTop (𝓝 (limitValue S t g x)) :=
-    ((ContinuousMap.continuous_eval_const x).tendsto _).comp (tendsto_limitValue hA approx t g)
+  have hpoint : Tendsto (fun m ↦ (S m).operator t g x) atTop (𝓝 (limitValue S t g x)) := by
+    rw [tendsto_iff_norm_sub_tendsto_zero]
+    refine squeeze_zero (fun _ ↦ norm_nonneg _) (fun m ↦ ?_)
+      (tendsto_iff_norm_sub_tendsto_zero.mp (tendsto_limitValue hA approx t g))
+    exact ContinuousMap.norm_coe_le_norm ((S m).operator t g - limitValue S t g) x
   exact ge_of_tendsto hpoint
     (Eventually.of_forall fun m ↦ ContinuousMap.le_def.mp ((S m).nonneg t g hg) x)
 
@@ -232,11 +235,14 @@ theorem limitValue_add (hA : A.SeparatesPoints) (approx : LightConeApproximation
   refine tendsto_nhds_unique (tendsto_limitValue hA approx (s + t) g) ?_
   have hcompose : ∀ m, (S m).operator (s + t) g = (S m).operator s ((S m).operator t g) :=
     fun m ↦ by rw [(S m).operator_add, ContinuousLinearMap.comp_apply]
+  have hinner := tendsto_iff_norm_sub_tendsto_zero.mp (tendsto_limitValue hA approx t g)
+  have houter := tendsto_iff_norm_sub_tendsto_zero.mp
+    (tendsto_limitValue hA approx s (limitValue S t g))
+  have hsum : Tendsto (fun m ↦ ‖(S m).operator t g - limitValue S t g‖ +
+      ‖(S m).operator s (limitValue S t g) - limitValue S s (limitValue S t g)‖) atTop (𝓝 0) := by
+    simpa using hinner.add houter
   rw [tendsto_iff_norm_sub_tendsto_zero]
-  refine squeeze_zero (fun _ ↦ norm_nonneg _) (fun m ↦ ?_)
-    (by simpa using (tendsto_iff_norm_sub_tendsto_zero.mp (tendsto_limitValue hA approx t g)).add
-      (tendsto_iff_norm_sub_tendsto_zero.mp
-        (tendsto_limitValue hA approx s (limitValue S t g))))
+  refine squeeze_zero (fun _ ↦ norm_nonneg _) (fun m ↦ ?_) hsum
   rw [hcompose m]
   calc ‖(S m).operator s ((S m).operator t g) - limitValue S s (limitValue S t g)‖
       = ‖(S m).operator s ((S m).operator t g - limitValue S t g) +
