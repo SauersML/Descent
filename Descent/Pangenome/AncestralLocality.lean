@@ -8,6 +8,7 @@ import Descent.Pangenome.AncestralLocality.ClosureReachability
 import Descent.Pangenome.AncestralLocality.CoalescentDualSemigroup
 import Descent.Pangenome.AncestralLocality.CylinderSamplingAlgebra
 import Descent.Pangenome.AncestralLocality.CompatibilityNeutrality
+import Descent.Pangenome.AncestralLocality.DecisionDualMoments
 import Descent.Pangenome.AncestralLocality.HereditaryClosure
 import Descent.Pangenome.AncestralLocality.HeredityKernel
 import Descent.Pangenome.AncestralLocality.InfiniteGenomeLimit
@@ -145,6 +146,11 @@ on the bytes on main.
     truncated after `M` decisions as a finite jump chain with laws `δ_{x₀} e^{tQ}`, Dynkin's
     formula and its compensator form for those laws, and (8.2), (8.3), (9.1) and (9.2) with
     constants that do not depend on `M`.
+
+20. `DecisionDualMoments` -- the duality (7.5) with decisions, in moment form: two families of
+    moment functionals on observations of every arity, bounded by the sup norm and obeying the
+    moment equation of the backward circuit, that agree at time zero agree at every time, through
+    Duhamel's formula along the coalescence gain and induction on the number of branchings.
 
 This file contains no declarations.
 -/
