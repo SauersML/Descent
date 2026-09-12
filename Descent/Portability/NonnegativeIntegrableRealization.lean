@@ -29,11 +29,11 @@ that corpus history in `L¹` by one with continuous rates.
 generator paths of the continuous approximations are within a fixed multiple of `ε` of the
 limit generator in `L¹`, so
 `IntegrableRateRealization.exists_integral_solution_of_continuous_approximation` gives a
-continuous solution of `U(t) = 1 + ∫₀ᵗ A(s) U(s) ds`, together with convergence at the horizon of the
-approximating fundamental matrices. Each approximation preserves locus-exchangeable
-realizability by `IntegrableRateHistoryRealization.rateHistory_preserves_locusExchangeable_realization`,
-and the realizable states form the closed set `IntegrableRateHistoryRealization.exchangeableStates`,
-so the solution at `T` preserves it too.
+continuous solution of `U(t) = 1 + ∫₀ᵗ A(s) U(s) ds`, and the approximating fundamental matrices
+converge to it at the horizon. Each approximation preserves locus-exchangeable realizability by
+`IntegrableRateHistoryRealization.rateHistory_preserves_locusExchangeable_realization`, and the
+realizable states form the closed set `IntegrableRateHistoryRealization.exchangeableStates`, so
+the solution at `T` preserves it too.
 
 `nonnegativeIntegrablePropagator_preserves_locusExchangeable_realization` is NOTE1 Theorem 2 in
 this setting, for every continuous solution of the integral equation: by
