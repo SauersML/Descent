@@ -32,6 +32,7 @@ import Descent.Pangenome.GraphCoalescent.MultiInterfaceOutcome
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionConvergence
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionLaw
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionLimit
+import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionPerturbation
 import Descent.Pangenome.GraphCoalescent.MultiplicativeCoupling
 import Descent.Pangenome.GraphCoalescent.MultiplicativeObservation
 import Descent.Pangenome.GraphCoalescent.MultiplicativePerturbation
