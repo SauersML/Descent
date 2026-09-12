@@ -42,6 +42,8 @@ import Descent.Portability.EndToEndDiscriminationLaw
 import Descent.Portability.EndToEndDiploidLaw
 import Descent.Portability.EndToEndDiploidHistoryLaw
 import Descent.Portability.MigrationPortabilityFactor
+import Descent.Portability.EndToEndGWASTrainingLaw
+import Descent.Portability.EndToEndGWASTrainingHistory
 
 namespace Descent.Program
 
@@ -115,6 +117,14 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   `expectedDiploidPortability_rateHistoryKernel_budgetEight`), and for additive scores that
   function agrees with the haploid budget-4 one
   (`diploidMomentPortability_diploidSum_historyEventKernel`).
+  Training on a finite GWAS is exact as well. With marginal weights from `n` source individuals,
+  each accuracy accumulator is `a + b/n + c/(n(n-1))` and decreases in `n` to its population
+  value (`EndToEndGWASTrainingLaw.trainedNumerator_eq`, `trainedNumerator_antitone`,
+  `tendsto_trainedAccuracy`), while accuracy itself need not be monotone in `n`
+  (`populationAccuracy_lt_trainedAccuracy`). Along any history it is a rational function of the
+  budget-8 propagated moments and `n`
+  (`EndToEndGWASTrainingHistory.expectedTrainedAccuracy_historyEventKernel`,
+  `expectedTrainedAccuracy_eq_of_moments_eq`).
 * The closed-form decay of portability through linkage: `TwoLocusPortabilityDecay`. On the NOTE1
   low-order moment system, for a source and a target split `T` ago with drift and recombination,
   the cross-population expected squared correlation of a tag-locus score relative to its value at
