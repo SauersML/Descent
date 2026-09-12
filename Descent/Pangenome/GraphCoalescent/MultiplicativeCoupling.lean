@@ -373,6 +373,150 @@ theorem sum_excessStep_le {n : ℕ} (hn : 0 < n) (s : Fin n → Fin n) (ξ : ER 
     (scaledLoad_le_blockMass s ξ)
   rwa [sum_blockMass_unitMass hn, one_mul] at h
 
+/-! ### The coupled chain -/
+
+/-- A block count never exceeds the sample size. -/
+theorem blocks_le_card {n : ℕ} (ξ : ER n) : blocks ξ ≤ n := by
+  have h := Nat.card_le_card_of_surjective (Quotient.mk ξ) (quotient_mk_surjective ξ)
+  rw [Nat.card_eq_fintype_card (α := Fin n), Fintype.card_fin] at h
+  exact h
+
+/-- **A coupled state**: the labeled coalescent state, the state of `Z_p`, and the separation
+flag.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  A product of finite types. -/
+abbrev CoupledState (n : ℕ) := ER n × ER n × Bool
+
+/-- **Separated**: the flag is raised, or the report and `Z_p` disagree.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  A predicate on coupled states. -/
+def coupledSep {n : ℕ} (s : Fin n → Fin n) (X : CoupledState n) : Prop :=
+  X.2.2 = true ∨ X.2.1 ≠ observed s X.1
+
+/-- **The deficit of a coupled state**, `J = n - K`.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  The Kingman mergers so far. -/
+def coupledDeficit {n : ℕ} (X : CoupledState n) : ℝ := (n : ℝ) - blocks X.1
+
+/-- The mass with which the unseparated coupled chain holds.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  One minus the probabilities of the moves. -/
+def coupledHold {n : ℕ} (s : Fin n → Fin n) (ξ : ER n) : ℝ :=
+  1 - deathRate (blocks ξ) / (n : ℝ) ^ 2 - ∑ ζ', excessStep s ξ ζ'
+
+/-- **The coupled step.**  Separated, the coordinates move independently and the flag stays up.
+Unseparated, a cover of the coalescent moves the report and `Z_p` together, the excess moves
+`Z_p` alone and raises the flag, and otherwise nothing moves.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  A stochastic matrix built from the two kernels. -/
+def coupledStep {n : ℕ} (s : Fin n → Fin n) (X Y : CoupledState n) : ℝ :=
+  if coupledSep s X then
+    kingmanStep n X.1 Y.1 * multiplicativeStep n X.2.1 Y.2.1 * (if Y.2.2 = true then 1 else 0)
+  else
+    (if Y.2.2 = false ∧ Covers X.1 Y.1 ∧ observed s Y.1 = Y.2.1 then 1 / (n : ℝ) ^ 2 else 0)
+      + (if Y.2.2 = false ∧ Y.1 = X.1 ∧ Y.2.1 = X.2.1 then coupledHold s X.1 else 0)
+      + (if Y.2.2 = true ∧ Y.1 = X.1 then excessStep s X.1 Y.2.1 else 0)
+
+theorem sum_coupledState {n : ℕ} (f : CoupledState n → ℝ) :
+    ∑ Y, f Y = ∑ ξ', ∑ ζ', (f (ξ', ζ', true) + f (ξ', ζ', false)) := by
+  rw [Fintype.sum_prod_type]
+  refine Finset.sum_congr rfl fun ξ' _ ↦ ?_
+  rw [Fintype.sum_prod_type]
+  exact Finset.sum_congr rfl fun ζ' _ ↦ Fintype.sum_bool _
+
+theorem coupledStep_true_of_not_sep {n : ℕ} {s : Fin n → Fin n} {X : CoupledState n}
+    (hX : ¬ coupledSep s X) (ξ' ζ' : ER n) :
+    coupledStep s X (ξ', ζ', true) = if ξ' = X.1 then excessStep s X.1 ζ' else 0 := by
+  simp [coupledStep, hX]
+
+theorem coupledStep_false_of_not_sep {n : ℕ} {s : Fin n → Fin n} {X : CoupledState n}
+    (hX : ¬ coupledSep s X) (ξ' ζ' : ER n) :
+    coupledStep s X (ξ', ζ', false)
+      = (if Covers X.1 ξ' ∧ observed s ξ' = ζ' then 1 / (n : ℝ) ^ 2 else 0)
+        + if ξ' = X.1 ∧ ζ' = X.2.1 then coupledHold s X.1 else 0 := by
+  simp [coupledStep, hX]
+
+theorem coupledStep_of_sep {n : ℕ} {s : Fin n → Fin n} {X : CoupledState n}
+    (hX : coupledSep s X) (ξ' ζ' : ER n) (b : Bool) :
+    coupledStep s X (ξ', ζ', b)
+      = kingmanStep n X.1 ξ' * multiplicativeStep n X.2.1 ζ' * (if b = true then 1 else 0) := by
+  simp only [coupledStep, if_pos hX]
+
+theorem sum_sum_ite_eq_and_eq {n : ℕ} (a b : ER n) (c : ℝ) :
+    ∑ ξ' : ER n, ∑ ζ' : ER n, (if ξ' = a ∧ ζ' = b then c else 0) = c := by
+  have hinner : ∀ ξ' : ER n,
+      ∑ ζ' : ER n, (if ξ' = a ∧ ζ' = b then c else 0) = if ξ' = a then c else 0 := by
+    intro ξ'
+    by_cases h : ξ' = a <;> simp [h]
+  simp only [hinner, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+
+theorem sum_sum_ite_covers_observed {n : ℕ} (s : Fin n → Fin n) (ξ : ER n) (g : ER n → ℝ) :
+    ∑ ξ' : ER n, ∑ ζ' : ER n, (if Covers ξ ξ' ∧ observed s ξ' = ζ' then g ξ' else 0)
+      = ∑ ξ' : ER n, if Covers ξ ξ' then g ξ' else 0 := by
+  refine Finset.sum_congr rfl fun ξ' _ ↦ ?_
+  by_cases h : Covers ξ ξ' <;> simp [h]
+
+theorem sum_sum_ite_eq_left {n : ℕ} (a : ER n) (g : ER n → ℝ) :
+    ∑ ξ' : ER n, ∑ ζ' : ER n, (if ξ' = a then g ζ' else 0) = ∑ ζ', g ζ' := by
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun ζ' _ ↦ ?_
+  simp
+
+/-- The unseparated holding mass is nonnegative. -/
+theorem coupledHold_nonneg {n : ℕ} (hn : 0 < n) (s : Fin n → Fin n) (ξ : ER n) :
+    0 ≤ coupledHold s ξ := by
+  have h1 := deathRate_div_sq_le_half (blocks_le_card ξ)
+  have h2 := pairProductSum_blockMass_unitMass_le_half (observed s ξ)
+  have h3 := pairProductSum_nonneg (scaledLoad_nonneg s ξ)
+  have h4 := sum_excessStep s ξ
+  unfold coupledHold
+  linarith
+
+theorem coupledStep_nonneg {n : ℕ} (hn : 0 < n) (s : Fin n → Fin n) (X Y : CoupledState n) :
+    0 ≤ coupledStep s X Y := by
+  unfold coupledStep
+  split_ifs with hX
+  · refine mul_nonneg (mul_nonneg (kingmanStep_nonneg (blocks_le_card _) _)
+      (multiplicativeStep_nonneg _ _)) ?_
+    split_ifs <;> norm_num
+  · refine add_nonneg (add_nonneg ?_ ?_) ?_
+    · split_ifs
+      · positivity
+      · exact le_rfl
+    · split_ifs
+      · exact coupledHold_nonneg hn s X.1
+      · exact le_rfl
+    · split_ifs
+      · exact excessStep_nonneg s X.1 Y.2.1
+      · exact le_rfl
+
+/-- **The coupled step is stochastic.** -/
+theorem sum_coupledStep {n : ℕ} (s : Fin n → Fin n) (X : CoupledState n) :
+    ∑ Y, coupledStep s X Y = 1 := by
+  rw [sum_coupledState]
+  by_cases hX : coupledSep s X
+  · simp only [coupledStep_of_sep hX, if_true, Bool.false_eq_true, if_false, mul_one, mul_zero,
+      add_zero]
+    rw [← Finset.sum_mul_sum, sum_kingmanStep, sum_multiplicativeStep, one_mul]
+  · simp only [coupledStep_true_of_not_sep hX, coupledStep_false_of_not_sep hX,
+      Finset.sum_add_distrib, sum_sum_ite_eq_left, sum_sum_ite_covers_observed,
+      sum_sum_ite_eq_and_eq, sum_ite_covers]
+    unfold coupledHold
+    ring
+
+/-- **Separation is absorbing.** -/
+theorem coupledStep_absorb {n : ℕ} (s : Fin n → Fin n) (X Y : CoupledState n)
+    (hX : coupledSep s X) (hY : ¬ coupledSep s Y) : coupledStep s X Y = 0 := by
+  have hflag : Y.2.2 ≠ true := fun h ↦ hY (Or.inl h)
+  simp only [coupledStep, if_pos hX, if_neg hflag, mul_zero]
+
+/-- While unseparated, the report and `Z_p` agree. -/
+theorem observed_eq_of_not_coupledSep {n : ℕ} {s : Fin n → Fin n} {X : CoupledState n}
+    (hX : ¬ coupledSep s X) : observed s X.1 = X.2.1 := by
+  unfold coupledSep at hX
+  push_neg at hX
+  exact hX.2.symm
+
 end
 
 end Descent.Pangenome.GraphCoalescent
