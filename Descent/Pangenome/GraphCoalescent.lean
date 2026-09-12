@@ -38,6 +38,7 @@ import Descent.Pangenome.GraphCoalescent.Reduction
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionClock
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionExamples
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionFirstStep
+import Descent.Pangenome.GraphCoalescent.ReportedConnectionTies
 import Descent.Pangenome.GraphCoalescent.Visibility
 import Descent.Pangenome.GraphCoalescent.VisibleIntensityClock
 import Descent.Pangenome.GraphCoalescent.WidthProfile
