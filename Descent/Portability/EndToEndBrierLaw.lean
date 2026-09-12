@@ -311,8 +311,9 @@ theorem expectedRepairedBrier_eq_tsum
           * (1 - scoreGroupMass ((stateLaw y deme).pushforward report) group) ^ k ∂(κ x0) := by
   simp only [expectedRepairedBrier, conditionalRepairedBrier_pushforward_stateLaw]
   rw [integral_sub (integrable_caseProbability κ x0 deme report)
-      (integrable_finset_sum _ fun group _ ↦ integrable_brierRatio κ x0 deme report group),
-    integral_finset_sum _ fun group _ ↦ integrable_brierRatio κ x0 deme report group]
+      (integrable_finset_sum Finset.univ fun group _ ↦
+        integrable_brierRatio κ x0 deme report group),
+    integral_finset_sum Finset.univ fun group _ ↦ integrable_brierRatio κ x0 deme report group]
   congr 1
   exact Finset.sum_congr rfl fun group _ ↦ integral_ratioOnDefined_eq_tsum (κ x0) _ _
     (measurable_squaredCaseMass deme report group) (measurable_scoreGroupMass deme report group)
@@ -404,7 +405,8 @@ theorem expectedRepairedBrier_le_integral_recalibration
       (fun y ↦ conditionalRepairedBrier ((stateLaw y deme).pushforward report)) (κ x0) := by
     simp only [conditionalRepairedBrier_pushforward_stateLaw]
     exact (integrable_caseProbability κ x0 deme report).sub
-      (integrable_finset_sum _ fun group _ ↦ integrable_brierRatio κ x0 deme report group)
+      (integrable_finset_sum Finset.univ fun group _ ↦
+        integrable_brierRatio κ x0 deme report group)
   have hcontinuous : Continuous fun y : FrequencyState Deme Locus Allele ↦
       (stateLaw y deme).expectation (fun hap ↦
         (recalibration (report hap).1 - ChronologyReportLaw.alleleValue (report hap).2) ^ 2) := by
@@ -483,7 +485,7 @@ theorem expectedCalibrationError_eq_sum
       = ∑ group, ∫ y, |calibrationResidual ((stateLaw y deme).pushforward report) value group|
           ∂(κ x0) := by
   simp only [expectedCalibrationError, calibrationError]
-  exact integral_finset_sum _ fun group _ ↦
+  exact integral_finset_sum Finset.univ fun group _ ↦
     (integrable_continuousObservable κ x0
       (continuous_calibrationResidual deme report value group)).abs
 
