@@ -12,6 +12,7 @@ import Descent.Pangenome.GraphCoalescent.ReportedConnectionExamples
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionFirstStep
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionTies
 import Descent.Pangenome.GraphCoalescent.ShortTimeConnectionLaw
+import Descent.Pangenome.GraphCoalescent.TwoComponentSurvival
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulant
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulantDegree
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulantCorpus
@@ -43,6 +44,9 @@ import Descent.Pangenome.GraphCoalescent.MultiplicativePerturbation
 import Descent.Pangenome.GraphCoalescent.PartitionLatticeMobius
 import Descent.Pangenome.GraphCoalescent.RankedHistoryLaw
 import Descent.Pangenome.GraphCoalescent.VisibleIntensityClock
+import Descent.Pangenome.GraphCoalescent.ConnectionClockHittingTime
+import Descent.Pangenome.GraphCoalescent.MinimalHistoryLumping
+import Descent.Pangenome.GraphCoalescent.ReportedConnectionSpectrum
 
 namespace Descent.Program
 
@@ -154,6 +158,10 @@ inside it.
   (`ReportedConnectionExamples.connectionTime_mean_oneTwo`,
   `connectionTime_mean_oneThree_ne_twoTwo`); the path-law mean equals the backward-equation mean
   (`ReportedConnectionFirstStep.connectionTime_mean_eq_meanConnectionTime`).
+* §6, the spectral remark: `ReportedConnectionSpectrum`. From `⊥`, for `c ≥ 0`, the survival
+  function of the first-step connection law is `∑_{k=2}^{n} a_k e^{-d_k c}` with `d_k = C(k, 2)`
+  and coefficients given by a recursion along covers (`survivalAt_connectionTimeLaw_bot`,
+  `spectralCoeff_eq`).
 * Theorem D, the exact table of §6: `ConnectivityClockTable`. The cumulants
   `6z + 4z²`, `24z + 30z² + 6z³`, `24z + 32z² + 8z³`, `24z + 20z²` and
   `720z + 1656z² + 928z³ + 144z⁴` of the fiber sizes `(1,2), (1,3), (2,2), (1,1,2), (2,2,2)`
@@ -227,6 +235,12 @@ inside it.
   balanced profiles
   (`LeadingCoefficientCorollaries.leadingCoefficient_maximal_iff_isBalancedFibers`), and (E1)
   agrees with the table rows (`table_two_two_two`).
+* Theorem E, (E2): `MinimalHistoryLumping`. Started at the singletons, the report of an interface
+  of width `w ≥ 2` is connected at time `t` with probability
+  `(∏_i c_i)(2n - w)!/(2^{w-2}(2n - 2w + 2)!) t^{w-1} + O(t^w)`
+  (`reportConnectedProbability_sub_note_isBigO`). The short-time law counts the chains of `w - 1`
+  visible covers (`ShortTimeConnectionLaw.reportConnectedProbability_sub_isBigO`), and these lump
+  into the note's merger recursion `H_w(c)` (`minimalHistoryCount_eq_historyWeight`).
 
 Scope. Theorem A is proved as cover counts with Kingman's unit rate per cover, and under the
 corpus jump chain the hidden state is a Markov chain (`HiddenStateChain.hiddenChainLaw_succ`); the
@@ -238,8 +252,9 @@ derivatives through the killed generator. With at least three components a stron
 Rosenblatt's form determines every visible rate and the hidden state
 (`LumpingVisibleRates.visibleRate_eq_of_lumping`, `hiddenState_eq_of_lumping`); at two components
 a strong lumping determines the unordered pair of loads through their sum and product
-(`LumpingUnorderedPair.unorderedPair_eq_of_lumping`), and the survival function as a semigroup is
-not formalized. The table rows of §6 compute the cumulants from `cumulantOfSizes`
+(`LumpingUnorderedPair.unorderedPair_eq_of_lumping`), and the survival function is constructed as
+the matrix semigroup of the killed load chain (`TwoComponentSurvival.survival_eq_iff`). The table
+rows of §6 compute the cumulants from `cumulantOfSizes`
 and `Coalescent.jumpCoeff`, and evaluate transcriptions of (D5) and (D6) at the tabulated fiber
 sizes, which `FirstConnectionLaw` proves equal to the law. In the
 Λ-coalescent closure the dependence of a merger's lumped outcome on its profile alone is a
@@ -253,12 +268,14 @@ Kingman's backward
 recursion, without enumerating ranked histories. §9 is proved for a finite hidden jump process
 given by its generator, with the load chain's generator `loadGenerator` written from the rates of
 Theorem A. (E1) is proved from the Möbius sum rather than the ranked-history law. (E2) is proved
-in its analytic half: the report is connected at time `t` with probability the minimal-history
-count times `t^(w-1)/(w-1)!` plus `O(t^w)`
-(`ShortTimeConnectionLaw.reportConnectedProbability_sub_isBigO`); the identification of that count
-with the note's constant is not yet proof-checked. (D7)-(D9) are proved for the connection time
-defined as the sum of the holding times above the stopping level; its identification with the
-first hitting time of the report path is not proved. (F1)-(F3) are proved for the uniformized
+for the weight of the connected reports in the matrix exponential of Kingman's generator; the
+continuous-time chain as a process is not constructed. The spectral statement of §6 is proved for
+the first-step law, whose survival function is not identified with that of the trajectory clock.
+(D7)-(D9) are proved for the connection time
+defined as the sum of the holding times above the stopping level, which is almost surely the first
+time the report of the coalescent path reaches `⊤`
+(`ConnectionClockHittingTime.ae_reportHittingTime_eq_connectionTime`), so the two have one law
+(`map_reportHittingTime_eq_map_connectionTime`). (F1)-(F3) are proved for the uniformized
 skeleton paths mixed over a rate-one Poisson clock, and (F3) as convergence of the connection
 probability of the uniformized report to `Pr(T_p ≤ U)` along panels whose fiber proportions
 converge (`MultiplicativeConnectionConvergence.tendsto_reportConnectionProbability`); the

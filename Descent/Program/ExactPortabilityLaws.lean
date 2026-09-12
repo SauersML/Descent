@@ -120,6 +120,10 @@ import Descent.Portability.NeutralKernelPanelLikelihood
 import Descent.Portability.NeutralMarkovKernelUniqueness
 import Descent.Portability.NeutralHistoryKernel
 import Descent.Portability.PartialHaplotypeEventHistoryRealization
+import Descent.Portability.NeutralPulseHistoryKernel
+import Descent.Portability.NeutralFellerProperty
+import Descent.Portability.NeutralRateHistoryRealization
+import Descent.Portability.ReferenceExperimentCohortRows
 import Descent.Portability.CylinderGaussianQuadrant
 import Descent.Portability.CylinderComputableCertificate
 import Descent.Portability.MultinomialHistoryRealization
@@ -192,7 +196,11 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
   Lipschitz in the rates and the propagator the unique continuous solution of the integral
   equation: `RateGeneratorLipschitz`, `IntegrableGeneratorPropagator`,
   `IntegrableRateRealization`; the almost-everywhere derivative `U' = A(t) U` and absolute
-  continuity of that propagator: `IntegralEquationDerivative`.
+  continuity of that propagator: `IntegralEquationDerivative`. For the partial-haplotype dual of
+  (20) with a continuous dual generator, the propagator of the rate history keeps the realization
+  body invariant and is realized by a finitely supported law
+  (`NeutralRateHistoryRealization.exists_rateHistoryLaw`), and the expected panel reports of the
+  sampled epochs converge to it (`tendsto_integral_panelReport_sampledEpochs`).
 * §3 Theorem 3 and equations (14)-(16): `StationaryRealization`,
   `StationaryHaplotypeRealization`, `AncestralHaplotypeRealization`.
 * §4.1 per-locus material grading and the loose configuration bound `C(K+B,B)`:
@@ -207,7 +215,11 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
   semigroup from polynomials and its representation by Markov kernels obeying
   Chapman-Kolmogorov: `PolynomialFellerExtension`, `FellerKernelRepresentation`,
   `FellerMarkovKernel`; Markov kernels whose generator on polynomials is the neutral diffusion
-  generator, given the polynomial semigroup: `NeutralFellerGenerator`. §4.3 equation (21) is
+  generator, given the polynomial semigroup: `NeutralFellerGenerator`. The extended neutral
+  semigroup is a Feller semigroup, strongly continuous at every time
+  (`NeutralFellerProperty.continuous_neutralSemigroupExtension`), with a jointly continuous
+  transition function (`continuous_integral_neutralMarkovKernel_prod`) and kernels continuous in
+  the state for the weak topology (`continuous_neutralKernelProbability`). §4.3 equation (21) is
   `FiniteReportLaw.expectation_bind` of
   `ExactFiniteHistoryLaw`; equations (22)-(23): `ConditionalReportCompilation`.
 * §5 equations (24)-(25): `SublawReportCertificate`.
@@ -253,7 +265,8 @@ realized moments compose in chronological order
 (`PartialHaplotypeHistoryRealization.exists_historyLaw`,
 `PartialHaplotypeEventHistoryRealization.expectedMomentVector_eventHistory_realized`), and so do
 the neutral Markov kernels along epochs
-(`NeutralHistoryKernel.integral_panelReport_neutralHistoryKernel`). The neutral Markov
+(`NeutralHistoryKernel.integral_panelReport_neutralHistoryKernel`) and along splits and pulses
+(`NeutralPulseHistoryKernel.integral_momentPolynomial_historyEventKernel`). The neutral Markov
 kernels are unique (`NeutralMarkovKernelUniqueness.existsUnique_neutralMarkovKernel`). The §4.2a
 polynomial semigroup is constructed from the dual
 matrix exponential, with its unit, semigroup law and dual representation
@@ -342,8 +355,9 @@ available at this pin. The mixing
 law of (31) ranges over finitely many contexts, and its Lipschitz class is taken on all of the
 coordinate space. Equations (20), (28) and (29) take the pointwise bounds `0 ≤ D ≤ 1`, as the corpus
 certificates do. Theorem 1 makes no complexity claim and covers no infinite branch set. Of §9,
-the other target table rows, the 3960 shared-context count and the full-square range table are
-not yet proof-checked.
+the other population target table rows, the 3960 shared-context count and the full-square range
+table are not yet proof-checked; the size-three cohort rows are proved in
+`ReferenceExperimentCohortRows`.
 `IntervalEvaluatorCertificate` assumes a
 finite measure, a common bound and pointwise vanishing widths;
 `CylinderIntervalCertificate` needs only almost sure vanishing widths on fair-bit streams; its

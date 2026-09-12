@@ -2,6 +2,10 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.AncestralLocality.ClosureReachability
+import Descent.Pangenome.AncestralLocality.CoalescentDualSemigroup
+import Descent.Pangenome.AncestralLocality.HeredityKernel
+import Descent.Pangenome.AncestralLocality.HereditaryClosure
+import Descent.Pangenome.AncestralLocality.OperationalAutonomy
 import Descent.Pangenome.AncestralLocality.CompatibilityNeutrality
 import Descent.Pangenome.AncestralLocality.JointNonautonomy
 import Descent.Pangenome.AncestralLocality.InfiniteGenomeLimit
@@ -9,6 +13,15 @@ import Descent.Pangenome.AncestralLocality.LocalityBounds
 import Descent.Pangenome.AncestralLocality.LocalityCoupling
 import Descent.Pangenome.AncestralLocality.LocalityCouplingBounds
 import Descent.Pangenome.AncestralLocality.LocalityTransition
+import Descent.Pangenome.AncestralLocality.CylinderSamplingAlgebra
+import Descent.Pangenome.AncestralLocality.CylinderSamplingPolynomials
+import Descent.Pangenome.AncestralLocality.RandomClosure
+import Descent.Pangenome.AncestralLocality.RootExchangeability
+import Descent.Pangenome.AncestralLocality.SamplingDuality
+import Descent.Pangenome.AncestralLocality.SupercriticalBranches
+import Descent.Portability.AncestralForwardGenerator
+import Descent.Portability.AncestralSamplingLimit
+import Descent.Portability.AncestralWitnessDrift
 import Descent.Pangenome.AncestralLocality.SupercriticalReach
 
 namespace Descent.Program
@@ -32,6 +45,24 @@ independent complexity bounds and a quantitative light cone.
 
 ## Theorems
 
+* Theorem 1, the minimal hereditary context: `HereditaryClosure`, on the kernels and observations
+  of `HeredityKernel`, with hereditary autonomy (2.2) in its block form
+  (`hereditarilyAutonomous_iff`). The refinement `Φ_K` of (3.1) (`refinement_rel_iff`) reaches a
+  fixed point within `|H| - |P|` steps (3.2) (`hereditaryClosure_eq_iterate`), and `P_*` is the
+  greatest autonomous partition below `P` (`isGreatest_hereditaryClosure`). For an observation
+  `π` the closure map is hereditarily autonomous (`hereditarilyAutonomous_closureMap`), and every
+  hereditarily autonomous observation that determines `π` determines it
+  (`ker_le_hereditaryClosure_of_hereditarilyAutonomous`). §3.1: relabeling the states transports
+  the closure (`hereditaryClosure_transportKernel`). §3.2 in the vocabulary of kernels:
+  `exists_autonomous_pair_not_autonomous_join`.
+* Theorem 2, the operational characterization: `OperationalAutonomy`. For a kernel that does not
+  see the order of the parents, `π` is hereditarily autonomous exactly when `π_# R_K(p)` depends
+  only on `π_# p` (`hereditarilyAutonomous_iff_pushforward_reproduce_determined`); when autonomy
+  fails, two laws with one observed marginal have different observed next generations
+  (`exists_pushforward_eq_reproduce_ne_of_not_hereditarilyAutonomous`). Every compatibility kernel
+  is a heredity kernel (`isHeredityKernel_compatibilityKernel`), a single feature is autonomous
+  (`hereditarilyAutonomous_feature`), and the witness observation `(a, b)` is not
+  (`witness_not_hereditarilyAutonomous`).
 * Theorem 3, every feature is exactly neutral: `CompatibilityNeutrality`. (4.4) for every
   checking graph (`compatibilityKernel_marginal`) and its population form `(R_{K_G}(p))_k = p_k`
   (`featureMass_reproduce_compatibilityKernel`). §4.1: the finite-population kernel `Q_N` (4.5)
@@ -59,7 +90,27 @@ independent complexity bounds and a quantitative light cone.
   unique root in `(0, 1)` (`existsUnique_survival_root`, `giantFraction_mem_Ioo`). Given the giant
   component theorem (`GiantComponentLaw`, proved for `0 ≤ α < 1` by `giantComponentLaw_of_lt_one`),
   the reach fraction is near `0` or `giantFraction α` with probability tending to one
-  (`SupercriticalReach.tendsto_graphProb_reach_near_zero_or_giant`).
+  (`SupercriticalReach.tendsto_graphProb_reach_near_zero_or_giant`). By exchangeability of the
+  roots (`RootExchangeability.choose_mul_graphProb_disjoint_bigSet`) the two branches carry the
+  weights `(1 - s)^k` and `1 - (1 - s)^k` (`SupercriticalBranches.tendsto_graphProb_reach_small`,
+  `tendsto_graphProb_reach_giant`). With the degree-normalized rates the closure itself is the
+  observation on the reach of `G(m, α/m)`, so (6.1) bounds the closure
+  (`RandomClosure.iterate_refinementStep_degreeRate`, `graphExpect_card_directedReach_le`).
+* §4.1 and §7.1, the diffusion generator: `AncestralForwardGenerator`. For `c = 1` the
+  finite-population chain (4.5) on the `N`-generation scale has generator (7.1) on polynomial
+  observables (`tendsto_nextGenerationMean`), and on the eight-state witness the derivatives of
+  (5.5) are `-1/4` and `0` (`AncestralWitnessDrift.witness_generator`).
+* Theorem 6 at generator level: `SamplingDuality`. On a sampling observable the resampling term of
+  (7.1) is coalescence and the drift term is decision branching, so the forward generator applied
+  to `H_f` is the backward circuit applied to `f` (`forwardGenerator_samplingObservable`); the
+  formal-derivative and line-derivative generators agree on polynomial observables
+  (`AncestralSamplingLimit.forwardGenerator_eq_samplingDuality`). Without decisions, `r = 0`: the
+  coalescence operator has the exact exponential `S_t = e^{t L_c}`, the sampling functional turns
+  it into the resampling generator
+  (`CoalescentDualSemigroup.samplingFunctional_coalescenceOperator`), `t ↦ H_{S_t f}(p)` solves
+  the backward equation (`hasDerivAt_samplingObservable_dualSemigroup`), and every moment family
+  obeying the moment equation is `m_t(f) = m_0(S_t f)` (`moments_eq_dualSemigroup`), the
+  uniqueness form of (7.5).
 * Theorems 7 and 8, the support drift: `LocalityBounds`. A decision along `i → j` raises the
   weighted support count by at most `w i + 2 w j` (`weightedCount_branchSupports_le`) and a
   coalescence does not raise it (`weightedCount_coalesceSupports_le`); with `Σ_j r i j ≤ D` and
@@ -79,7 +130,11 @@ independent complexity bounds and a quantitative light cone.
   continuity (`norm_limitValue_le`, `limitValue_nonneg`, `limitValue_one`, `limitValue_add`,
   `tendsto_limitValue_zero`), at every time (`FellerSemigroup.continuous_operator`). Two Feller
   semigroups agreeing on a separating subalgebra agree (`operator_eq_of_eqOn`), so the limit is
-  independent of the exhaustion (`limitSemigroup_eq_of_tendsto`).
+  independent of the exhaustion (`limitSemigroup_eq_of_tendsto`). On `P({0,1}^V)`, `V` countable,
+  the genome laws form a compact space (`CylinderSamplingAlgebra.compactSpace_probabilityMeasure`)
+  on which the cylinder sampling algebra is dense (`samplingAlgebra_topologicalClosure_eq_top`),
+  and every sampling polynomial of several genomes lies in it
+  (`CylinderSamplingPolynomials.samplingPolynomial_mem_samplingAlgebra`).
 * Corollary 8.1, the light cone as a coupling: `LocalityCoupling`. Two sample laws obtained by
   evaluating one circuit on inputs that coincide off an escape event are within total variation
   the probability of escape (`totalVariation_mixtureLaw_le`); for a circuit reading only inspected
@@ -100,13 +155,14 @@ space; with the explicit escape bounds of Theorem 8 for the marginal laws of the
 (`LocalityCouplingBounds.totalVariation_integralLaw_le_radius`). The supercritical limit (6.2) is
 proved for
 its support, conditional on the Erdős-Rényi giant component theorem as the named hypothesis
-`GiantComponentLaw` (proved only for `0 ≤ α < 1`); its weights `1 - (1 - s)^k` and `(1 - s)^k`
-are not proved. Theorems 1 and 2 (hereditary closure and its operational characterization) and
-Theorem 6 (sampling duality) are not yet recorded here, and Theorem 4 uses its own refinement step
-rather than the general construction of Theorem 1.
+`GiantComponentLaw` (proved only for `0 ≤ α < 1`), and so are its weights `1 - (1 - s)^k` and
+`(1 - s)^k`. Theorem 6 is proved at generator level, and for `r = 0` as the uniqueness form of
+(7.5) with the moment equation as a hypothesis; the forward diffusion on `P(H)` and the backward
+jump process are not constructed. Theorem 1 defines `P_*` as the `|H|`-th iterate of `Φ_K`, which
+is the first fixed point, and Theorem 2 uses only the symmetry of the kernel. Theorem 4 uses its
+own refinement step rather than the refinement of Theorem 1.
 Of Theorem 9, the finite-genome semigroups and the light-cone bound are hypotheses
-(`LightConeApproximation`), and the space `P({0,1}^V)` with its cylinder sampling algebra is not
-yet constructed.
+(`LightConeApproximation`).
 -/
 
 end Descent.Program
