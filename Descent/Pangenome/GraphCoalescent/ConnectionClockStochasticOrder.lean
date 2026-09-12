@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.GraphCoalescent.ConnectionClockPathLaw
+import Mathlib.Probability.Distributions.Exponential
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program
@@ -60,7 +61,7 @@ theorem measurableSet_survival (c : ℝ) : MeasurableSet {y : ℝ≥0 | c < (y :
 /-- A survival function is antitone in the threshold. -/
 theorem survivalAt_antitone (μ : Measure ℝ≥0) {c c' : ℝ} (h : c ≤ c') :
     survivalAt μ c' ≤ survivalAt μ c :=
-  measure_mono fun y hy ↦ lt_of_le_of_lt h hy
+  measure_mono fun _ hy ↦ lt_of_le_of_lt h hy
 
 /-- A negative threshold is exceeded surely. -/
 theorem survivalAt_of_neg {μ : Measure ℝ≥0} [IsProbabilityMeasure μ] {c : ℝ} (hc : c < 0) :
@@ -79,7 +80,7 @@ theorem survivalAt_conv (μ ν : Measure ℝ≥0) [SFinite ν] (c : ℝ) :
   refine lintegral_congr fun x ↦ ?_
   rw [survivalAt, ← lintegral_indicator_one (measurableSet_survival (c - x))]
   refine lintegral_congr fun y ↦ ?_
-  simp only [Set.indicator, Set.mem_setOf_eq, NNReal.coe_add, sub_lt_iff_lt_add']
+  simp only [Set.indicator, Set.mem_setOf_eq, NNReal.coe_add, sub_lt_iff_lt_add', Pi.one_apply]
 
 /-- **The survival function of a mixture over one uniform jump** is the average over the covers. -/
 theorem survivalAt_bind_jumpStep {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks ξ)
@@ -129,7 +130,7 @@ theorem survivalAt_kingmanTransitLaw_le_succ (m : ℕ) (c : ℝ) :
           rw [lintegral_const, measure_univ, mul_one]
       _ ≤ ∫⁻ x, survivalAt (kingmanTransitLaw (m + 1)) (c - x)
             ∂(holdDuration (deathRate (m + 2))) :=
-          lintegral_mono fun x ↦ survivalAt_antitone _ (by linarith [x.2])
+          lintegral_mono fun x ↦ survivalAt_antitone _ (by linarith [NNReal.coe_nonneg x])
 
 /-! ### The corpus holding law is the exponential law -/
 
