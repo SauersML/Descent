@@ -32,6 +32,56 @@ A decision raises the weighted count `weightedCount w` by at most `w i + 2 w j`
 positive rate the generator obeys `L Z^{(w)} ≤ D (1 + 2κ) Z^{(w)}`
 (`supportGenerator_weightedCount_le`); the plain count gives `L Z ≤ 3 D Z`
 (`supportGenerator_supportSize_le`), and the decision rate is at most `D Z` (`decisionRate_le`).
+
+Grönwall's inequality along a right derivative is `le_mul_exp_of_hasDerivWithinAt`. Through it,
+`integral_le_mul_exp_of_supportGenerator_le` turns a pointwise bound `L_anc F ≤ K F` into
+`∫ F dμ_t ≤ C e^{K t}` for marginal laws `μ t` that start at `s₀` with `F s₀ ≤ C` and obey
+Dynkin's formula. With `F = Z` this is (8.2), `integral_supportSize_le`. With the compensator
+formula for the decision count it gives (8.3), `integral_branchings_le`, through the integrated
+bound `le_div_three_mul_exp_sub_one`.
+
+## Theorem 8
+
+`lightBall r A k` is the directed ball `B_k(A)` along edges of positive rate, `lightDepth` is the
+distance `d(v, A)` truncated at `ℓ`, and `lightWeight` is the weight `w(v) = a^{d(v, A)}`. The
+depth rises by at most one along an edge (`lightDepth_le_succ`). That gives the edge inequality
+`w(j) ≤ a w(i)` (`lightWeight_le_mul`), hence `L_anc Z^{(a)} ≤ D (1 + 2a) Z^{(a)}`
+(`supportGenerator_lightWeight_le`).
+
+`escapeSet r A ℓ` is the set of states holding a coordinate at distance at least `ℓ` from `A`.
+The initial circuit lies outside it (`replicate_not_mem_escapeSet`), and both support updates
+keep an escaped state escaped (`branchSupports_mem_escapeSet`, `coalesceSupports_mem_escapeSet`).
+Escape forces `Z^{(a)} ≥ a^ℓ` (`pow_le_weightedCount_of_mem_escapeSet`). Markov's inequality
+(`measureReal_escapeSet_le`) with the expected count (`integral_lightWeight_le`) gives (9.1),
+`measureReal_escapeSet_le_exp`. The radius choice `a = ℓ / (2 D T)` turns that bound into (9.2)
+by the identity `exp_div_pow_eq_of_radius`. When `D T = 0`, (9.1) at every `a > 1` forces the
+escape probability to zero (`eq_zero_of_forall_escape_bound`).
+
+## Corollary 8.1 and §9.1
+
+Outcomes on one probability space that agree off an event `E` differ only on `E`
+(`measureReal_preimage_sub_eq`). Their laws are therefore within `P(E)` at every set
+(`abs_measureReal_preimage_sub_le`) and in total variation (`sum_abs_measureReal_fiber_sub_le`).
+The numbers of §9.1 are `support_bound_example`, `401.7 ≤ 20 e³ ≤ 401.72`, and
+`escape_bound_example`, `20 e (2e/20)^20 ≤ 2.64 · 10⁻¹⁰`. Both are certified from Mathlib's
+ten-digit bounds on `e`.
+
+Scope. The backward tagged process has no path law in the corpus, and none is constructed here.
+There is no Markov chain on tagged states, no nonexplosion argument and no proof of Dynkin's
+formula. Theorems 7 and 8 are proved for any family of marginal laws `μ t` that starts at `n`
+arguments carrying `A`, satisfies Dynkin's formula for the count in question, and has the stated
+integrability and continuity. (8.3) also assumes the compensator formula for the decision count.
+The tagged state records only the multiset of supports, not the argument order or the function
+`f` of the sampling dual. The genome is finite (`[Fintype V]`), and the rates are real with
+`r i j ≥ 0` and row sums at most `D`. The distance is truncated at `ℓ`, which is all that escape
+reads. Corollary 8.1 is the coupling inequality for two outcomes on a common probability space.
+It is not formalized that the circuit run against `p` and against `q`, or against the truncated
+graph on `B_{ℓ-1}(A)`, is such a coupling. Theorem 9, the infinite genome, is not here.
+
+## Empirical status
+
+None. The bodies here are counts on finite multisets, calculus and measure inequalities. The
+rates, laws and outcomes are supplied, and no measurement can bear on them.
 -/
 
 namespace Descent.Pangenome.AncestralLocality
