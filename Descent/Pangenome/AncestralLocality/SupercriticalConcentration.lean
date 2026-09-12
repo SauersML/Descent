@@ -226,7 +226,10 @@ theorem exists_eventually_graphProb_largeCount_le {α δ η : ℝ} (hα : 1 < α
   have hmη' : 8 ≤ η * δ ^ 2 * m := by
     rw [div_le_iff₀ (by positivity)] at hmη
     linarith
-  have hmbig : 8 * m ≤ η * δ ^ 2 * m ^ 2 := by nlinarith
+  have hmbig : 8 * m ≤ η * δ ^ 2 * m ^ 2 := by
+    have h := mul_le_mul_of_nonneg_right hmη' hm.le
+    have hsq : η * δ ^ 2 * m * m = η * δ ^ 2 * m ^ 2 := by ring
+    linarith
   have hk : κ * m ^ 2 ≤ η₁ * m ^ 2 := mul_le_mul_of_nonneg_right hκη₁ (by positivity)
   have hη₁' : 24 * η₁ * m ^ 2 ≤ η * δ ^ 2 * m ^ 2 :=
     mul_le_mul_of_nonneg_right hη₁η (by positivity)
