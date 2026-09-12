@@ -46,6 +46,8 @@ import Descent.Pangenome.AncestralLocality.SupercriticalReach
 import Descent.Pangenome.AncestralLocality.DecisionJumpExpansion
 import Descent.Pangenome.AncestralLocality.DecisionWindowJumps
 import Descent.Pangenome.AncestralLocality.DecisionWindowSemigroup
+import Descent.Pangenome.AncestralLocality.JumpFellerSemigroup
+import Descent.Pangenome.AncestralLocality.DecisionDysonDual
 
 namespace Descent.Program
 
@@ -160,7 +162,11 @@ independent complexity bounds and a quantitative light cone.
   (`DecisionWindowSemigroup.norm_jumpOperator_sub_dualSeries_le`), the limit is a Feller
   semigroup equal to the dual series on sampling functions, which is (7.5) in Dyson form
   (`decisionWindowSemigroup_samplingFunction`), and its generator on sampling functions is (7.1)
-  (`tendsto_decisionWindowSemigroup_slope`).
+  (`tendsto_decisionWindowSemigroup_slope`). The two ingredients are the Feller semigroup
+  `e^{t(J - λ)}` of a positive bounded jump generator
+  (`JumpFellerSemigroup.jumpSemigroup_operator`) and the Dyson components of the backward circuit,
+  majorised by Yule weights with a bounded cubic moment (`DecisionDysonDual.norm_dysonTerm_le`,
+  `sum_yuleMoment_mul_le`).
 * Theorem 6 at generator level: `SamplingDuality`. On a sampling observable the resampling term of
   (7.1) is coalescence and the drift term is decision branching, so the forward generator applied
   to `H_f` is the backward circuit applied to `f` (`forwardGenerator_samplingObservable`); the
