@@ -230,12 +230,14 @@ theorem card_covers_eq_of_hiddenState_eq (s : Fin n → Fin n) {ξ ξ' : ER n}
     intro ζ
     rw [natCard_covers_eq ζ fun η ↦ coarsestState s η = v]
     congr 1
-    exact filter_congr fun η _ ↦ by rw [hg]
+    ext η
+    simp only [mem_filter, hg]
   rw [hcomp ξ, hcomp ξ']
   refine card_filter_comp_eq _ _ (hiddenState s) g v fun w _ ↦ ?_
-  exact (natCard_covers_eq ξ fun η ↦ hiddenState s η = w).symm.trans
+  have hcount := (natCard_covers_eq ξ fun η ↦ hiddenState s η = w).symm.trans
     ((card_covers_hiddenState_eq s hstate w).trans
       (natCard_covers_eq ξ' fun η ↦ hiddenState s η = w))
+  convert hcount
 
 /-- **The covers of a two-component state.** Every cover lands on the invisible target of the
 component of `x`, on that of `y`, or on the visible target joining the two. -/
@@ -290,12 +292,12 @@ theorem card_covers_coarsestState_of_two (s : Fin n → Fin n) (ξ : ER n)
     omega
   have hterm : ∀ (w : ER n × (Fin n → ℕ)) (c : ER n × (ℕ × ℕ) × (Fin n → ℕ)),
       (∀ η, Covers ξ η → hiddenState s η = w → coarsestState s η = c) →
-      (((univ.filter (Covers ξ)).filter fun η ↦ coarsestState s η = v).filter
+      ((univ.filter fun η ↦ Covers ξ η ∧ coarsestState s η = v).filter
           fun η ↦ hiddenState s η = w).card =
         if v = c then Nat.card {η : ER n // Covers ξ η ∧ hiddenState s η = w} else 0 := by
     intro w c hc
     split_ifs with hvc
-    · rw [natCard_covers_eq ξ fun η ↦ hiddenState s η = w]
+    · rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
       congr 1
       ext η
       simp only [mem_filter, mem_univ, true_and]
@@ -390,7 +392,7 @@ theorem card_covers_coarsestState_of_two (s : Fin n → Fin n) (ξ : ER n)
     fun h ↦ hmergeNe (congrArg Prod.fst h).symm
   have h23 : invisibleTarget (hiddenState s ξ) y ≠ visibleTarget (hiddenState s ξ) x y :=
     fun h ↦ hmergeNe (congrArg Prod.fst h).symm
-  have hmaps : ∀ η ∈ (univ.filter (Covers ξ)).filter fun η ↦ coarsestState s η = v,
+  have hmaps : ∀ η ∈ univ.filter fun η ↦ Covers ξ η ∧ coarsestState s η = v,
       hiddenState s η ∈ ({invisibleTarget (hiddenState s ξ) x,
         invisibleTarget (hiddenState s ξ) y, visibleTarget (hiddenState s ξ) x y} :
           Finset (ER n × (Fin n → ℕ))) := by
@@ -406,7 +408,7 @@ theorem card_covers_coarsestState_of_two (s : Fin n → Fin n) (ξ : ER n)
       ({visibleTarget (hiddenState s ξ) x y} : Finset (ER n × (Fin n → ℕ))) := by
     simp only [mem_singleton]
     exact h23
-  rw [natCard_covers_eq ξ fun η ↦ coarsestState s η = v, card_eq_sum_card_fiberwise hmaps,
+  rw [Nat.card_eq_fintype_card, Fintype.card_subtype, card_eq_sum_card_fiberwise hmaps,
     sum_insert hnotFirst, sum_insert hnotSecond, sum_singleton, hterm _ _ hc1, hterm _ _ hc2,
     hterm _ _ hc3, card_covers_invisibleTarget s ξ x, card_covers_invisibleTarget s ξ y,
     card_covers_visibleTarget s ξ hxy]
