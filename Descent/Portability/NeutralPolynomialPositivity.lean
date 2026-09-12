@@ -105,7 +105,8 @@ observable to a nonnegative polynomial observable. -/
 theorem neutralPolynomialSemigroup_nonneg (rates : NeutralRates Deme Locus Allele) (ℓ₀ : Locus)
     (hap₀ : FullHaplotype Locus Allele) (t : ℝ≥0) (f : PolynomialSubspace Deme Locus Allele)
     (hf : 0 ≤ (f : C(FrequencyState Deme Locus Allele, ℝ))) :
-    0 ≤ (neutralPolynomialSemigroup rates ℓ₀ hap₀ t f : C(FrequencyState Deme Locus Allele, ℝ)) := by
+    0 ≤ (neutralPolynomialSemigroup rates ℓ₀ hap₀ t f :
+      C(FrequencyState Deme Locus Allele, ℝ)) := by
   refine ContinuousMap.le_def.mpr fun x ↦ ?_
   rw [ContinuousMap.zero_apply, neutralPolynomialSemigroup_apply]
   refine momentFunctional_nonneg rates ℓ₀ t t.2 x (representative f) fun y ↦ ?_
