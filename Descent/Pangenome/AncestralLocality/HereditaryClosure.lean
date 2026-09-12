@@ -20,6 +20,10 @@ the least information that must be added, and characterizes autonomy operational
 they are together in `P` and give every block of `P` the same mass against every partner
 (`refinement_rel_iff`). It only refines (`refinement_le`), and its fixed points are exactly the
 partitions whose block masses are invariant in the first parent (`refinement_eq_self_iff`).
+It is the refinement step `refinementStep` of `ClosureReachability`
+(`refinement_eq_refinementStep`), and `HereditarilyAutonomous` is that module's `Autonomous`
+(`hereditarilyAutonomous_iff_autonomous`), so the reachability theorems there are statements
+about the closure here.
 
 **The iteration (3.2).** A strict refinement of a partition of a finite set adds a block
 (`card_quotient_lt_of_lt`) and no partition has more than `|H|` blocks (`card_quotient_le`), so a
@@ -109,6 +113,7 @@ theorem card_quotient_lt_of_lt {Q P : Setoid H} (hQP : Q < P) :
 
 /-! ### Iterating a refining map -/
 
+omit [Fintype H] in
 /-- Once a map fixes an iterate, the later iterates stay there. -/
 theorem iterate_add_eq_of_fixed {f : Setoid H → Setoid H} {P : Setoid H} {r : ℕ}
     (hr : f (f^[r] P) = f^[r] P) (s : ℕ) : f^[s + r] P = f^[r] P := by
