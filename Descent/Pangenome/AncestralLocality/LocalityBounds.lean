@@ -31,7 +31,7 @@ A decision raises the weighted count `weightedCount w` by at most `w i + 2 w j`
 (`weightedCount_coalesceSupports_le`). With `Σ_j r i j ≤ D` and `w j ≤ κ w i` on every edge of
 positive rate the generator obeys `L Z^{(w)} ≤ D (1 + 2κ) Z^{(w)}`
 (`supportGenerator_weightedCount_le`); the plain count gives `L Z ≤ 3 D Z`
-(`supportGenerator_supportSize_le`), and the decision rate is at most `D Z` (`decisionRate_le`).
+(`supportGenerator_supportSize_le`), and the decision rate is at most `D Z` (`supportDecisionRate_le`).
 
 Grönwall's inequality along a right derivative is `le_mul_exp_of_hasDerivWithinAt`. Through it,
 `integral_le_mul_exp_of_supportGenerator_le` turns a pointwise bound `L_anc F ≤ K F` into
@@ -195,7 +195,7 @@ def supportGenerator (r : V → V → ℝ) (c : ℝ) (F : Multiset (Finset V) �
     c * ((s.powersetCard 2).map fun t ↦ F (coalesceSupports s t) - F s).sum
 
 /-- **The total rate of decision branchings** from a tagged state. -/
-def decisionRate (r : V → V → ℝ) (s : Multiset (Finset V)) : ℝ :=
+def supportDecisionRate (r : V → V → ℝ) (s : Multiset (Finset V)) : ℝ :=
   (s.map fun S ↦ ∑ i ∈ S, ∑ j, r i j).sum
 
 /-- **The weighted drift inequality.** If every row of rates sums to at most `D` and the weight
@@ -255,11 +255,11 @@ theorem supportGenerator_supportSize_le {r : V → V → ℝ} {c D : ℝ} (hr : 
 
 omit [DecidableEq V] in
 /-- **The decision rate is at most `D Z`.** -/
-theorem decisionRate_le {r : V → V → ℝ} {D : ℝ} (hD : ∀ i, ∑ j, r i j ≤ D)
-    (s : Multiset (Finset V)) : decisionRate r s ≤ D * supportSize s := by
+theorem supportDecisionRate_le {r : V → V → ℝ} {D : ℝ} (hD : ∀ i, ∑ j, r i j ≤ D)
+    (s : Multiset (Finset V)) : supportDecisionRate r s ≤ D * supportSize s := by
   have hright : D * supportSize s = (s.map fun S ↦ D * (S.card : ℝ)).sum :=
     Multiset.sum_map_mul_left.symm
-  rw [hright, decisionRate]
+  rw [hright, supportDecisionRate]
   refine Multiset.sum_map_le_sum_map _ _ fun S _ ↦ ?_
   calc ∑ i ∈ S, ∑ j, r i j ≤ ∑ _i ∈ S, D := Finset.sum_le_sum fun i _ ↦ hD i
     _ = D * S.card := by rw [Finset.sum_const, nsmul_eq_mul, mul_comm]
@@ -492,7 +492,7 @@ theorem integral_supportSize_le [MeasurableSingletonClass (Multiset (Finset V))]
 /-- **Theorem 7, (8.3): `E B_T ≤ (n |A| / 3) (e^{3 D T} - 1)`** for the expected number `b` of
 decision branchings by time `T`.
 
-Assumes: the compensator formula `b = ∫_0^T ∫ decisionRate dμ_t dt` (`hcomp`), the decision
+Assumes: the compensator formula `b = ∫_0^T ∫ supportDecisionRate dμ_t dt` (`hcomp`), the decision
 rate integrable, and the conditions of `integral_supportSize_le`. -/
 theorem integral_branchings_le [MeasurableSingletonClass (Multiset (Finset V))]
     {r : V → V → ℝ} {c D T b : ℝ} {n : ℕ} {A : Finset V}
@@ -500,19 +500,19 @@ theorem integral_branchings_le [MeasurableSingletonClass (Multiset (Finset V))]
     {μ : ℝ → Measure (Multiset (Finset V))} (hμ0 : μ 0 = Measure.dirac (Multiset.replicate n A))
     (hint : ∀ t ∈ Set.Icc 0 T, Integrable supportSize (μ t))
     (hintL : ∀ t ∈ Set.Icc 0 T, Integrable (supportGenerator r c supportSize) (μ t))
-    (hintR : ∀ t ∈ Set.Icc 0 T, Integrable (decisionRate r) (μ t))
+    (hintR : ∀ t ∈ Set.Icc 0 T, Integrable (supportDecisionRate r) (μ t))
     (hcont : ContinuousOn (fun t ↦ ∫ s, supportSize s ∂μ t) (Set.Icc 0 T))
     (hdynkin : ∀ t ∈ Set.Ico 0 T, HasDerivWithinAt (fun t ↦ ∫ s, supportSize s ∂μ t)
       (∫ s, supportGenerator r c supportSize s ∂μ t) (Set.Ici t) t)
-    (hrate : IntervalIntegrable (fun t ↦ ∫ s, decisionRate r s ∂μ t) volume 0 T)
-    (hcomp : b = ∫ t in (0 : ℝ)..T, ∫ s, decisionRate r s ∂μ t) :
+    (hrate : IntervalIntegrable (fun t ↦ ∫ s, supportDecisionRate r s ∂μ t) volume 0 T)
+    (hcomp : b = ∫ t in (0 : ℝ)..T, ∫ s, supportDecisionRate r s ∂μ t) :
     b ≤ n * A.card / 3 * (Real.exp (3 * D * T) - 1) := by
-  have hstep : ∫ t in (0 : ℝ)..T, ∫ s, decisionRate r s ∂μ t ≤
+  have hstep : ∫ t in (0 : ℝ)..T, ∫ s, supportDecisionRate r s ∂μ t ≤
       ∫ t in (0 : ℝ)..T, D * ∫ s, supportSize s ∂μ t :=
     intervalIntegral.integral_mono_on hT hrate ((hcont.intervalIntegrable_of_Icc hT).const_mul D)
       fun t ht ↦ by
         rw [← integral_const_mul]
-        exact integral_mono (hintR t ht) ((hint t ht).const_mul _) fun s ↦ decisionRate_le hD s
+        exact integral_mono (hintR t ht) ((hint t ht).const_mul _) fun s ↦ supportDecisionRate_le hD s
   refine le_div_three_mul_exp_sub_one hD0 hT hcont
     (integral_supportSize_le hr hD hc hμ0 hint hintL hcont hdynkin) ?_
   rw [hcomp, ← intervalIntegral.integral_const_mul]

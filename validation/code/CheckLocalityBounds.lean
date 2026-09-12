@@ -11,7 +11,7 @@ open Descent.Pangenome.AncestralLocality
 #print axioms weightedCount_coalesceSupports_le
 #print axioms supportGenerator_weightedCount_le
 #print axioms supportGenerator_supportSize_le
-#print axioms decisionRate_le
+#print axioms supportDecisionRate_le
 #print axioms lightDepth_le_succ
 #print axioms lightWeight_le_mul
 #print axioms supportGenerator_lightWeight_le
