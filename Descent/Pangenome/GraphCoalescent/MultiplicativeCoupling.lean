@@ -188,22 +188,18 @@ theorem multiplicativeStep_merge_eq_multiplicativeCoverRate {n : ℕ} (ζ : ER n
 
 /-! ### Loads against component sizes -/
 
-/-- **The size of a report component**, `c(C)`: the individuals the graph reports together.
-
-Empirical status: NOT AN EMPIRICAL CLAIM.  A cardinality. -/
-def componentSize {n : ℕ} (s : Fin n → Fin n) (ξ : ER n) (C : Quotient (observed s ξ)) : ℕ :=
-  (univ.filter fun i ↦ Quotient.mk (observed s ξ) i = C).card
-
-/-- A component's mass under unit masses is its size over `n`. -/
+/-- A component's mass under unit masses is its number of individuals, `c(C)`, over `n`. -/
 theorem blockMass_unitMass_observed {n : ℕ} (s : Fin n → Fin n) (ξ : ER n)
     (C : Quotient (observed s ξ)) :
-    blockMass (unitMass n) (observed s ξ) C = (componentSize s ξ C : ℝ) / n := by
-  simp only [blockMass, unitMass, Finset.sum_const, nsmul_eq_mul, componentSize]
+    blockMass (unitMass n) (observed s ξ) C
+      = ((univ.filter fun i ↦ Quotient.mk (observed s ξ) i = C).card : ℝ) / n := by
+  simp only [blockMass, unitMass, Finset.sum_const, nsmul_eq_mul]
   rw [mul_one_div]
 
 /-- **A component hides no more lineages than it has individuals**: `L_C ≤ c(C)`. -/
-theorem hiddenLoad_le_componentSize {n : ℕ} (s : Fin n → Fin n) (ξ : ER n)
-    (C : Quotient (observed s ξ)) : hiddenLoad s ξ C ≤ componentSize s ξ C := by
+theorem hiddenLoad_le_card_component {n : ℕ} (s : Fin n → Fin n) (ξ : ER n)
+    (C : Quotient (observed s ξ)) :
+    hiddenLoad s ξ C ≤ (univ.filter fun i ↦ Quotient.mk (observed s ξ) i = C).card := by
   have hsub : hiddenBlocks s ξ C
       ⊆ (univ.filter fun i ↦ Quotient.mk (observed s ξ) i = C).image (Quotient.mk ξ) := by
     intro block hblock
@@ -212,10 +208,9 @@ theorem hiddenLoad_le_componentSize {n : ℕ} (s : Fin n → Fin n) (ξ : ER n)
       (Finset.mem_filter.mp hblock).2⟩, rfl⟩
   exact (Finset.card_le_card hsub).trans Finset.card_image_le
 
-/-- The component sizes add up to the panel. -/
-theorem sum_componentSize {n : ℕ} (s : Fin n → Fin n) (ξ : ER n) :
-    ∑ C, componentSize s ξ C = n := by
-  unfold componentSize
+/-- The individuals of the components add up to the panel. -/
+theorem sum_card_component {n : ℕ} (s : Fin n → Fin n) (ξ : ER n) :
+    ∑ C, (univ.filter fun i ↦ Quotient.mk (observed s ξ) i = C).card = n := by
   rw [← Finset.card_eq_sum_card_fiberwise (f := Quotient.mk (observed s ξ))
     (s := univ) (t := univ) fun i _ ↦ Finset.mem_univ _, Finset.card_univ, Fintype.card_fin]
 
@@ -235,7 +230,7 @@ theorem scaledLoad_le_blockMass {n : ℕ} (s : Fin n → Fin n) (ξ : ER n)
     (C : Quotient (observed s ξ)) :
     scaledLoad s ξ C ≤ blockMass (unitMass n) (observed s ξ) C := by
   rw [blockMass_unitMass_observed, scaledLoad]
-  exact div_le_div_of_nonneg_right (by exact_mod_cast hiddenLoad_le_componentSize s ξ C)
+  exact div_le_div_of_nonneg_right (by exact_mod_cast hiddenLoad_le_card_component s ξ C)
     (Nat.cast_nonneg n)
 
 /-- Under unit masses the components carry total mass one. -/
@@ -253,7 +248,8 @@ theorem sum_loadDeficit_scaled {n : ℕ} (s : Fin n → Fin n) (ξ : ER n) :
   rw [sum_loadDeficit]
   simp only [blockMass_unitMass_observed, scaledLoad, ← Finset.sum_div]
   rw [← sub_div]
-  have h1 : (∑ C, (componentSize s ξ C : ℝ)) = n := by exact_mod_cast sum_componentSize s ξ
+  have h1 : (∑ C, ((univ.filter fun i ↦ Quotient.mk (observed s ξ) i = C).card : ℝ)) = n := by
+    exact_mod_cast sum_card_component s ξ
   have h2 : (∑ C, (hiddenLoad s ξ C : ℝ)) = blocks ξ := by exact_mod_cast sum_hiddenLoad s ξ
   rw [h1, h2]
 

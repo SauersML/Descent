@@ -18,7 +18,7 @@ import Descent.Pangenome.GraphCoalescent.MultiplicativeCoupling
 #print axioms
   Descent.Pangenome.GraphCoalescent.multiplicativeStep_merge_eq_multiplicativeCoverRate
 #print axioms
-  Descent.Pangenome.GraphCoalescent.hiddenLoad_le_componentSize
+  Descent.Pangenome.GraphCoalescent.hiddenLoad_le_card_component
 #print axioms
   Descent.Pangenome.GraphCoalescent.sum_loadDeficit_scaled
 #print axioms
