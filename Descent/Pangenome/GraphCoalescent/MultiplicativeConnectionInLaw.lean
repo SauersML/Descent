@@ -38,6 +38,8 @@ namespace Descent.Pangenome.GraphCoalescent
 
 open Coalescent MeasureTheory ProbabilityTheory Filter Topology Set
 
+open scoped Classical
+
 noncomputable section
 
 /-! ### Distribution functions and convergence in law -/
@@ -263,8 +265,9 @@ theorem sum_kingmanStep_mul_blocks_sub_one {n : ℕ} (ξ : ER n) :
   ring
 
 /-- The uniformized Kingman law is a probability vector. -/
-theorem sum_kingmanLaw (n m : ℕ) : ∑ ξ, kingmanLaw n m ξ = 1 :=
-  (sum_skeletonLaw sum_kingmanStep m).trans (by simp)
+theorem sum_kingmanLaw (n m : ℕ) : ∑ ξ, kingmanLaw n m ξ = 1 := by
+  rw [kingmanLaw, sum_skeletonLaw sum_kingmanStep m]
+  simp only [Finset.sum_ite_eq', Finset.mem_univ, if_true]
 
 theorem kingmanLaw_nonneg (n m : ℕ) (ξ : ER n) : 0 ≤ kingmanLaw n m ξ :=
   skeletonLaw_nonneg (fun a b ↦ kingmanStep_nonneg (blocks_le_card a) b)
