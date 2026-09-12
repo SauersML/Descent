@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Pangenome.GraphCoalescent.LahWeights
 import Descent.Pangenome.GraphCoalescent.MinimalRefinement
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceClosure
 
@@ -35,6 +36,12 @@ inside it.
   determine the unordered pair of loads and not its order: `twoComponentGenerator_one`,
   `twoComponentGenerator_twice_one`, `survivalDerivatives_eq_iff`. Sufficiency at two components:
   `twoComponentGenerator_swap`. Minimality: `refines_loads`, `refines_unorderedPair`.
+* Theorem D, (D1), the Lah weights: `LahWeights`. The Lah numbers satisfy
+  `L(m, j) j! = m! C(m - 1, j - 1)` (`lahNumber_mul_factorial`), and the partitions of a finite
+  set weighted by `∏_B |B|!` and counted by blocks are the coefficients of `A_m`:
+  `sum_blockWeight_card_eq_lahNumber`, `sum_blockWeight_X_pow_eq_lahPolynomial`. The parts of a
+  coalescent state read as a finite partition are its `Coalescent.blocks`:
+  `card_parts_ofSetoid`.
 * §10, several interfaces sharing one genealogy: `MultiInterfaceClosure`. The common refinement
   of the reports determines every report (`observed_commonRefinement`), and two labeled
   configurations with the same hidden load in every cell of the common refinement offer equally
@@ -47,8 +54,8 @@ these rates, which is Rosenblatt's criterion applied to the chain of Theorem A, 
 function as a semigroup are not formalized. In §10 the dependence of a merger's outcome on the two
 merging cells alone is a hypothesis on the outcome map. Theorem A (the load closure (A1)-(A4)),
 Theorem C (conservation (C1), the domination (C2), the Dynkin identity (C3), the bounds (C4) and
-the monotonicity (C5)), Theorem D (the Lah weights (D1), the connectivity cumulant (D2)-(D3), the
-stopping law (D4)-(D9) and the exact table), Theorem E, Theorem F, the filter of §9 and the
+the monotonicity (C5)), Theorem D (the connectivity cumulant (D2)-(D3), the stopping law
+(D4)-(D9) and the exact table), Theorem E, Theorem F, the filter of §9 and the
 Λ-coalescent extension of §10 are not yet proof-checked.
 -/
 
