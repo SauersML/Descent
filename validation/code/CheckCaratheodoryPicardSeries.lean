@@ -1,0 +1,20 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.CaratheodoryPicardSeries
+
+/-! Axiom audit of CaratheodoryPicardSeries. -/
+
+open Descent.Portability.CaratheodoryPicardSeries
+
+#print axioms integral_norm_mul_primitive_pow
+#print axioms norm_picardIterate_le_integral
+#print axioms continuous_picardIterate_of_intervalIntegrable
+#print axioms exists_continuous_approximation
+#print axioms integral_norm_le_of_integral_norm_sub_le
+#print axioms norm_picardIterate_le_of_integral_norm_sub_le
+#print axioms tendstoUniformly_picardIterate
+#print axioms norm_picardIterate_le_integral_of_intervalIntegrable
+#print axioms summable_picardIterate_of_intervalIntegrable
+#print axioms caratheodoryFundamentalMatrix_eq_fundamentalMatrix_of_intervalIntegrable
+#print axioms hasSum_picardIterate_caratheodoryFundamentalMatrix
