@@ -89,6 +89,7 @@ theorem readout_eq_sum_patterns (n : ℕ) (features : Finset V)
       exact Finset.prod_eq_zero (Finset.mem_univ k) (by simp [patternIndicator, hk])
   simp only [hproduct, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
 
+omit [Countable V] [DecidableEq V] in
 /-- Reading the letters of one genome at finitely many features is continuous. -/
 theorem continuous_patternIndicator_restrict (n : ℕ) (features : Finset V)
     (pattern : features → Bool) (k : Fin n) :
