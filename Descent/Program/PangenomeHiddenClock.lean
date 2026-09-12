@@ -14,6 +14,7 @@ import Descent.Pangenome.GraphCoalescent.ReportedConnectionFirstStep
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionTies
 import Descent.Pangenome.GraphCoalescent.ShortTimeConnectionLaw
 import Descent.Pangenome.GraphCoalescent.TwoComponentSurvival
+import Descent.Pangenome.GraphCoalescent.KilledSurvivalMean
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulant
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulantDegree
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulantCorpus
@@ -289,8 +290,10 @@ inside it.
 Scope. Theorem A is proved as cover counts with Kingman's unit rate per cover, and under the
 corpus jump chain the hidden state is a Markov chain (`HiddenStateChain.hiddenChainLaw_succ`); the
 continuous-time holding times are not constructed.
-The survival function of (A4) is `α e^{tQ} 𝟙` of the killed generator, and the identification of
-the mean with its integral is not formalized. Theorem B is proved as the algebra of the visible
+The survival function of (A4) is `α e^{tQ} 𝟙` of the killed generator, and its integral from
+positive loads is the mean connection time of a two-component report
+(`KilledSurvivalMean.integral_survival_eq_loadMean`, `meanConnectionTime_eq_loadMean`).
+Theorem B is proved as the algebra of the visible
 rates and of the survival
 derivatives through the killed generator. With at least three components a strong lumping in
 Rosenblatt's form determines every visible rate and the hidden state
