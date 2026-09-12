@@ -1,0 +1,37 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.EndToEndAscertainedLaw
+
+/-! Axiom audit of EndToEndAscertainedLaw. -/
+
+open Descent.Portability.EndToEndAscertainedLaw
+
+#print axioms momentPolynomial_seedConfiguration
+#print axioms polynomialFunction_acceptancePolynomial
+#print axioms totalDegree_acceptancePolynomial_le
+#print axioms expectation_tagIndicator_eq_marginal
+#print axioms expectation_tagAlleleCount_eq
+#print axioms countCell_eq_manyDemeBernsteinWeight
+#print axioms expectation_windowWeight_eq
+#print axioms totalDegree_windowBernsteinPolynomial_le
+#print axioms eval_windowBernsteinPolynomial
+#print axioms polynomialFunction_acceptancePolynomial_windowWeight
+#print axioms ascertainedExpectation_historyEventKernel
+#print axioms ascertainedExpectation_rateHistoryKernel
+#print axioms acceptanceProbability_historyEventKernel
+#print axioms integral_windowProbability_historyEventKernel
+#print axioms ascertainedNumerator_historyEventKernel
+#print axioms ascertainedDenominator_rateHistoryKernel
+#print axioms ascertainedPortability_historyEventKernel
+#print axioms ascertainedPortability_rateHistoryKernel
+#print axioms ascertainedPortability_eq_of_moments_eq
+#print axioms ascertainedPortability_eq_conditionalOnPassing
+#print axioms ascertainedPortability_eq_expectedPortability_of_dirac
+#print axioms ascertainedPortability_historyEventKernel_nil
+#print axioms ascertainedPortability_lt_expectedPortability_iff
+#print axioms expectation_piLaw_prod
+#print axioms polynomialFunction_prod_acceptancePolynomial
+#print axioms integral_independentPanels_historyEventKernel
+#print axioms expectation_sharedDraw_sub_prod
+#print axioms expectation_sharedDraw_eq_prod_iff
