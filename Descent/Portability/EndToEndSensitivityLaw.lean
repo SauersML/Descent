@@ -111,6 +111,59 @@ theorem exp_smul_sub_exp_smul_eq_integral (A B : Matrix ι ι ℝ) (t : ℝ) :
     ((continuous_exp_smul_mul_exp_smul A (A - B) B t).intervalIntegrable 0 t)]
   simp only [sub_self, zero_smul, sub_zero, NormedSpace.exp_zero, mul_one, one_mul]
 
+/-- The Duhamel integral `∫₀^τ e^{sM} N e^{(τ - s)B} ds` is continuous in the pair `(M, N)`. -/
+theorem continuous_duhamelIntegral (B : Matrix ι ι ℝ) (τ : ℝ) :
+    Continuous fun p : Matrix ι ι ℝ × Matrix ι ι ℝ ↦
+      ∫ s in (0 : ℝ)..τ, NormedSpace.exp ℝ (s • p.1) * p.2 * NormedSpace.exp ℝ ((τ - s) • B) := by
+  have hjoint : Continuous fun q : (Matrix ι ι ℝ × Matrix ι ι ℝ) × ℝ ↦
+      NormedSpace.exp ℝ (q.2 • q.1.1) * q.1.2 * NormedSpace.exp ℝ ((τ - q.2) • B) :=
+    (((NormedSpace.exp_continuous (𝕂 := ℝ)).comp (continuous_snd.smul continuous_fst.fst)).mul
+      continuous_fst.snd).mul
+      ((NormedSpace.exp_continuous (𝕂 := ℝ)).comp
+        ((continuous_const.sub continuous_snd).smul continuous_const))
+  exact intervalIntegral.continuous_parametric_intervalIntegral_of_continuous'
+    (f := fun (p : Matrix ι ι ℝ × Matrix ι ι ℝ) (s : ℝ) ↦
+      NormedSpace.exp ℝ (s • p.1) * p.2 * NormedSpace.exp ℝ ((τ - s) • B))
+    hjoint 0 τ
+
+/-- Each coordinate of the Duhamel integral is continuous in the coordinates of `M` and `N`. -/
+theorem continuous_duhamelIntegral_apply (B : Matrix ι ι ℝ) (τ : ℝ) (i j : ι) :
+    Continuous fun p : (ι → ι → ℝ) × (ι → ι → ℝ) ↦
+      (∫ s in (0 : ℝ)..τ, NormedSpace.exp ℝ (s • Matrix.of p.1) * Matrix.of p.2
+        * NormedSpace.exp ℝ ((τ - s) • B)) i j := by
+  have hentry := LinearMap.continuous_of_finiteDimensional
+    ({ toFun := fun N ↦ N i j, map_add' := fun _ _ ↦ rfl, map_smul' := fun _ _ ↦ rfl } :
+      Matrix ι ι ℝ →ₗ[ℝ] ℝ)
+  have hof := LinearMap.continuous_of_finiteDimensional
+    ({ toFun := fun p ↦ Matrix.of p, map_add' := fun _ _ ↦ rfl, map_smul' := fun _ _ ↦ rfl } :
+      (ι → ι → ℝ) →ₗ[ℝ] Matrix ι ι ℝ)
+  exact hentry.comp ((continuous_duhamelIntegral B τ).comp
+    ((hof.comp continuous_fst).prodMk (hof.comp continuous_snd)))
+
+omit [Fintype ι] [DecidableEq ι] in
+/-- The coordinates of a generator path and of its slope converge together at a point where
+every coordinate of the path is differentiable. -/
+theorem tendsto_coordinates_slope {Q : ℝ → Matrix ι ι ℝ} {Q' : Matrix ι ι ℝ} {θ₀ : ℝ}
+    (hQ : ∀ k l, HasDerivAt (fun θ ↦ Q θ k l) (Q' k l) θ₀) :
+    Filter.Tendsto
+      (fun θ ↦ ((fun k l ↦ Q θ k l : ι → ι → ℝ), (fun k l ↦ slope Q θ₀ θ k l : ι → ι → ℝ)))
+      (nhdsWithin θ₀ {θ₀}ᶜ)
+      (nhds ((fun k l ↦ Q θ₀ k l : ι → ι → ℝ), (fun k l ↦ Q' k l : ι → ι → ℝ))) :=
+  (tendsto_pi_nhds.mpr fun k ↦ tendsto_pi_nhds.mpr fun l ↦
+      (hQ k l).continuousAt.tendsto.mono_left nhdsWithin_le_nhds).prodMk_nhds
+    (tendsto_pi_nhds.mpr fun k ↦ tendsto_pi_nhds.mpr fun l ↦
+      hasDerivAt_iff_tendsto_slope.mp (hQ k l))
+
+/-- **The slope of a propagator is a Duhamel integral of the generator slope.** -/
+theorem slope_exp_smul_eq_integral (Q : ℝ → Matrix ι ι ℝ) (τ θ₀ θ : ℝ) :
+    slope (fun θ ↦ NormedSpace.exp ℝ (τ • Q θ)) θ₀ θ
+      = ∫ s in (0 : ℝ)..τ, NormedSpace.exp ℝ (s • Q θ) * slope Q θ₀ θ
+          * NormedSpace.exp ℝ ((τ - s) • Q θ₀) := by
+  simp only [slope, vsub_eq_sub]
+  rw [exp_smul_sub_exp_smul_eq_integral, ← intervalIntegral.integral_smul]
+  refine intervalIntegral.integral_congr fun s _ ↦ ?_
+  simp only [mul_smul_comm, smul_mul_assoc]
+
 /-- **Duhamel's formula for the derivative of a propagator in a parameter, entrywise.**  If every
 entry of the generator path `Q` has derivative `Q' k l` at `θ₀`, then every entry of
 `θ ↦ e^{τQ(θ)}` has as derivative at `θ₀` the corresponding entry of
@@ -121,50 +174,10 @@ theorem hasDerivAt_exp_smul_apply {Q : ℝ → Matrix ι ι ℝ} {Q' : Matrix ι
     HasDerivAt (fun θ ↦ NormedSpace.exp ℝ (τ • Q θ) i j)
       ((∫ s in (0 : ℝ)..τ,
         NormedSpace.exp ℝ (s • Q θ₀) * Q' * NormedSpace.exp ℝ ((τ - s) • Q θ₀)) i j) θ₀ := by
-  have hjoint : Continuous fun q : (Matrix ι ι ℝ × Matrix ι ι ℝ) × ℝ ↦
-      NormedSpace.exp ℝ (q.2 • q.1.1) * q.1.2 * NormedSpace.exp ℝ ((τ - q.2) • Q θ₀) :=
-    (((NormedSpace.exp_continuous (𝕂 := ℝ)).comp (continuous_snd.smul continuous_fst.fst)).mul
-      continuous_fst.snd).mul
-      ((NormedSpace.exp_continuous (𝕂 := ℝ)).comp
-        ((continuous_const.sub continuous_snd).smul continuous_const))
-  have hparametric : Continuous fun p : Matrix ι ι ℝ × Matrix ι ι ℝ ↦
-      ∫ s in (0 : ℝ)..τ, NormedSpace.exp ℝ (s • p.1) * p.2 * NormedSpace.exp ℝ ((τ - s) • Q θ₀) :=
-    intervalIntegral.continuous_parametric_intervalIntegral_of_continuous'
-      (f := fun (p : Matrix ι ι ℝ × Matrix ι ι ℝ) (s : ℝ) ↦
-        NormedSpace.exp ℝ (s • p.1) * p.2 * NormedSpace.exp ℝ ((τ - s) • Q θ₀))
-      hjoint 0 τ
-  let entry : Matrix ι ι ℝ →ₗ[ℝ] ℝ :=
-    { toFun := fun N ↦ N i j, map_add' := fun _ _ ↦ rfl, map_smul' := fun _ _ ↦ rfl }
-  let ofEntries : (ι → ι → ℝ) →ₗ[ℝ] Matrix ι ι ℝ :=
-    { toFun := fun p ↦ Matrix.of p, map_add' := fun _ _ ↦ rfl, map_smul' := fun _ _ ↦ rfl }
-  have hentries : Continuous fun p : (ι → ι → ℝ) × (ι → ι → ℝ) ↦
-      (∫ s in (0 : ℝ)..τ, NormedSpace.exp ℝ (s • Matrix.of p.1) * Matrix.of p.2
-        * NormedSpace.exp ℝ ((τ - s) • Q θ₀)) i j :=
-    (LinearMap.continuous_of_finiteDimensional entry).comp (hparametric.comp
-      (((LinearMap.continuous_of_finiteDimensional ofEntries).comp continuous_fst).prodMk
-        ((LinearMap.continuous_of_finiteDimensional ofEntries).comp continuous_snd)))
-  have hpair : Filter.Tendsto
-      (fun θ ↦ ((fun k l ↦ Q θ k l : ι → ι → ℝ), (fun k l ↦ slope Q θ₀ θ k l : ι → ι → ℝ)))
-      (nhdsWithin θ₀ {θ₀}ᶜ)
-      (nhds ((fun k l ↦ Q θ₀ k l : ι → ι → ℝ), (fun k l ↦ Q' k l : ι → ι → ℝ))) :=
-    (tendsto_pi_nhds.mpr fun k ↦ tendsto_pi_nhds.mpr fun l ↦
-        (hQ k l).continuousAt.tendsto.mono_left nhdsWithin_le_nhds).prodMk_nhds
-      (tendsto_pi_nhds.mpr fun k ↦ tendsto_pi_nhds.mpr fun l ↦
-        hasDerivAt_iff_tendsto_slope.mp (hQ k l))
-  have hslope : slope (fun θ ↦ NormedSpace.exp ℝ (τ • Q θ) i j) θ₀ = fun θ ↦
-      (∫ s in (0 : ℝ)..τ, NormedSpace.exp ℝ (s • Q θ) * slope Q θ₀ θ
-        * NormedSpace.exp ℝ ((τ - s) • Q θ₀)) i j := by
-    funext θ
-    have hmatrix : slope (fun θ ↦ NormedSpace.exp ℝ (τ • Q θ)) θ₀ θ
-        = ∫ s in (0 : ℝ)..τ, NormedSpace.exp ℝ (s • Q θ) * slope Q θ₀ θ
-          * NormedSpace.exp ℝ ((τ - s) • Q θ₀) := by
-      simp only [slope, vsub_eq_sub]
-      rw [exp_smul_sub_exp_smul_eq_integral, ← intervalIntegral.integral_smul]
-      refine intervalIntegral.integral_congr fun s _ ↦ ?_
-      simp only [mul_smul_comm, smul_mul_assoc]
-    exact congrFun (congrFun hmatrix i) j
-  rw [hasDerivAt_iff_tendsto_slope, hslope]
-  exact (hentries.tendsto _).comp hpair
+  rw [hasDerivAt_iff_tendsto_slope]
+  exact (((continuous_duhamelIntegral_apply (Q θ₀) τ i j).tendsto _).comp
+    (tendsto_coordinates_slope hQ)).congr fun θ ↦
+      (congrFun (congrFun (slope_exp_smul_eq_integral Q τ θ₀ θ) i) j).symm
 
 /-- A matrix path whose entries are differentiable is differentiable. -/
 theorem hasDerivAt_of_hasDerivAt_apply {Q : ℝ → Matrix ι ι ℝ} {Q' : Matrix ι ι ℝ} {θ₀ : ℝ}
