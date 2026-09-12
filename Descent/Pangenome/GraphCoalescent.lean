@@ -12,10 +12,12 @@ import Descent.Pangenome.GraphCoalescent.MergerDepth
 import Descent.Pangenome.GraphCoalescent.MinimalRefinement
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceClosure
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceOutcome
+import Descent.Pangenome.GraphCoalescent.MultiplicativeObservation
 import Descent.Pangenome.GraphCoalescent.Observation
 import Descent.Pangenome.GraphCoalescent.Pinned
 import Descent.Pangenome.GraphCoalescent.Reduction
 import Descent.Pangenome.GraphCoalescent.Visibility
+import Descent.Pangenome.GraphCoalescent.VisibleIntensityClock
 import Descent.Pangenome.GraphCoalescent.WidthProfile
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals

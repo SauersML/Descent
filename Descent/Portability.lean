@@ -667,6 +667,8 @@ import Descent.Portability.SpectralAuditDualCertificate
 import Descent.Portability.DriftOperatorCoordinates
 import Descent.Portability.NonnegativeCoalescenceRealization
 import Descent.Portability.PartialHaplotypeMicroscopicStages
+import Descent.Portability.NeutralPolynomialSemigroup
+import Descent.Portability.NonnegativeIntegrableRealization
 
 assert_below Descent.Program
 
