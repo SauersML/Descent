@@ -3,7 +3,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.EndToEndPortabilityLaw
 import Descent.Portability.CaratheodoryFundamentalMatrix
-import Descent.Portability.PortabilityMetricCompilation
 
 assert_below Descent.Decision Descent.Program
 
@@ -32,8 +31,8 @@ a score and an outcome in the unit interval they lie in `[0, 1]`
 
 The portability.  A product of numbers in the unit interval moves by at most the sum of the moves
 of its factors (`abs_mul_sub_mul_le`), and a quotient with denominators at least `δ` moves by at
-most the moves of numerator and denominator over `δ²`
-(`PortabilityMetricCompilation.abs_div_sub_div_le`).  So wherever the
+most the moves of numerator and denominator over `δ²` (`abs_div_sub_div_le_of_le_one`).  So
+wherever the
 expected target denominator and source numerator stay at least `δ` under both histories, the
 expected portability moves by at most the sum of the moves of the four expectations over `δ⁴`
 (`abs_expectedPortability_sub_le`), and the four moves are the Lipschitz bounds above.
@@ -75,6 +74,29 @@ theorem abs_mul_sub_mul_le {a b c d : ℝ} (hb : |b| ≤ 1) (hc : |c| ≤ 1) :
     exact mul_le_of_le_one_right (abs_nonneg _) hb
   · rw [abs_mul]
     exact mul_le_of_le_one_left (abs_nonneg _) hc
+
+/-- A quotient moves by at most the moves of numerator and denominator over `δ²`, when both
+denominators are at least `δ`, one of them is at most one, and one numerator is bounded by
+one. -/
+theorem abs_div_sub_div_le_of_le_one {a b c d δ : ℝ} (hδ : 0 < δ) (hb : δ ≤ b) (hd : δ ≤ d)
+    (hd1 : d ≤ 1) (hc : |c| ≤ 1) : |a / b - c / d| ≤ (|a - c| + |b - d|) / δ ^ 2 := by
+  have hb0 : 0 < b := hδ.trans_le hb
+  have hd0 : 0 < d := hδ.trans_le hd
+  rw [div_sub_div _ _ hb0.ne' hd0.ne', abs_div, abs_of_pos (mul_pos hb0 hd0)]
+  have hnumerator : |a * d - b * c| ≤ |a - c| + |b - d| := by
+    have hsplit : a * d - b * c = (a - c) * d + c * (d - b) := by ring
+    rw [hsplit]
+    refine (abs_add_le _ _).trans (add_le_add ?_ ?_)
+    · rw [abs_mul, abs_of_pos hd0]
+      exact mul_le_of_le_one_right (abs_nonneg _) hd1
+    · rw [abs_mul, abs_sub_comm d b]
+      exact mul_le_of_le_one_left (abs_nonneg _) hc
+  have hdenominator : δ ^ 2 ≤ b * d := by
+    rw [sq]
+    exact mul_le_mul hb hd hδ.le (hδ.le.trans hb)
+  exact (div_le_div_of_nonneg_right hnumerator (mul_pos hb0 hd0).le).trans
+    (div_le_div_of_nonneg_left (add_nonneg (abs_nonneg _) (abs_nonneg _)) (by positivity)
+      hdenominator)
 
 variable {Deme Locus : Type*} {Allele : Locus → Type*}
 variable [Fintype Deme] [DecidableEq Deme] [Fintype Locus] [DecidableEq Locus]
@@ -295,9 +317,7 @@ theorem abs_expectedPortability_sub_le
       * ∫ y, correlationDenominator (stateLaw y source) score outcome ∂(κ₂ x₂)| ≤ 1 := by
     rw [abs_of_nonneg (mul_nonneg hNt₂0 hDs₂0)]
     exact mul_le_one₀ hNt₂1 hDs₂0 hDs₂1
-  refine (PortabilityMetricCompilation.abs_div_sub_div_le _ _ hδ2 hproduct₁ hproduct₂ hproductOne
-    hnumeratorOne).trans ?_
-  rw [one_mul, one_mul]
+  refine (abs_div_sub_div_le_of_le_one hδ2 hproduct₁ hproduct₂ hproductOne hnumeratorOne).trans ?_
   exact div_le_div_of_nonneg_right (add_le_add hnumeratorMove hdenominatorMove) (by positivity)
 
 end
