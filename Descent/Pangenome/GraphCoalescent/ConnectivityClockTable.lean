@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Layer
+import Descent.Coalescent.JumpChain
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulant
 import Mathlib.Tactic
 
@@ -29,16 +30,18 @@ evaluation (`sum_finpartition_fin_two`, `sum_finpartition_fin_three`), which tur
 `A_{c₀+c₁} - A_{c₀} A_{c₁}` and into the three-fiber sum with Möbius coefficients `1`, `-1` and
 `2` (`cumulantOfSizes_fin_two`, `cumulantOfSizes_fin_three`).
 
-`rankedWeight n k` is `a_{n,k}` of (D4), `connectedByLevel` is `F_k` of (D5), `firstConnectionLaw`
-is `p_b` of (D6), and `meanConnectionTime` is (D8), `E τ_q = 2 ∑_b p_b / b - 2/n`.  These four
-are local transcriptions of the note's formulas: the corpus module of (D4)-(D6),
-`RankedHistoryLaw`, was not yet proof-checked when this file was written.  When it is, they are to
-be replaced by its definitions and the rows restated against them; the arithmetic below does not
-change.
+The ranked-history weight `a_{n,k} = (n-k)! k! (k-1)! / (n! (n-1)!)` of (D4) is the corpus
+`Coalescent.jumpCoeff n k`, the prefactor of K-C (2.3) that
+`Descent.Pangenome.GraphCoalescent.RankedHistoryLaw` identifies as the law of the jump chain on
+reaching `k` blocks (`rankedHistoryLaw`).  `connectedByLevel` is `F_k = a_{n,k} [z^k] C_c(z)` of
+(D5), `firstConnectionLaw` is `p_b = F_b - F_{b+1}` of (D6), and `meanConnectionTime` is (D8),
+`E τ_q = 2 ∑_b p_b / b - 2/n`.  These three are local transcriptions of the note's formulas, to be
+replaced by the corpus definitions of (D5)-(D8) once those are proof-checked; the arithmetic below
+does not change.
 
-Scope.  Nothing here proves (D4)-(D8), the ranked-history law and the first-connection law; those
-are the business of `RankedHistoryLaw` and `ReportedConnectionClock`.  This file evaluates the
-formulas at the tabulated fiber sizes.
+Scope.  Nothing here proves (D5)-(D8), the first-connection law and the moments of the clock;
+those are the business of `ReportedConnectionClock`.  This file evaluates the formulas at the
+tabulated fiber sizes.
 
 ## Empirical status
 
@@ -135,27 +138,22 @@ theorem cumulantOfSizes_fin_three (c : Fin 3 → ℕ) :
     one_mul, neg_one_mul]
   ring
 
-/-! ## The formulas of (D4)-(D6) and (D8) -/
-
-/-- The ranked-history weight `a_{n,k} = (n-k)! k! (k-1)! / (n! (n-1)!)` of (D4). -/
-def rankedWeight (n k : ℕ) : ℚ :=
-  ((n - k).factorial * k.factorial * (k - 1).factorial : ℚ) /
-    ((n.factorial : ℚ) * ((n - 1).factorial : ℚ))
+/-! ## The formulas of (D5), (D6) and (D8) -/
 
 /-- The probability `F_k = a_{n,k} [z^k] C_c(z)` of (D5) that the report is connected by the time
-the genealogy reaches `k` blocks. -/
-def connectedByLevel (cumulant : ℤ[X]) (n k : ℕ) : ℚ :=
-  rankedWeight n k * (cumulant.coeff k : ℚ)
+the genealogy reaches `k` blocks, with `a_{n,k}` the corpus jump-chain prefactor of (D4). -/
+def connectedByLevel (cumulant : ℤ[X]) (n k : ℕ) : ℝ :=
+  Coalescent.jumpCoeff n k * (cumulant.coeff k : ℝ)
 
 /-- The law `p_b = F_b - F_{b+1}` of (D6) of the number of true lineages right after the first
 reported connection. -/
-def firstConnectionLaw (cumulant : ℤ[X]) (n b : ℕ) : ℚ :=
+def firstConnectionLaw (cumulant : ℤ[X]) (n b : ℕ) : ℝ :=
   connectedByLevel cumulant n b - connectedByLevel cumulant n (b + 1)
 
 /-- The mean reported connection time (D8), `E τ_q = 2 ∑_{b=1}^{n-w+1} p_b / b - 2/n`. -/
-def meanConnectionTime (cumulant : ℤ[X]) (n w : ℕ) : ℚ :=
-  2 * ∑ i ∈ Finset.range (n - w + 1), firstConnectionLaw cumulant n (i + 1) / ((i : ℚ) + 1) -
-    2 / (n : ℚ)
+def meanConnectionTime (cumulant : ℤ[X]) (n w : ℕ) : ℝ :=
+  2 * ∑ i ∈ Finset.range (n - w + 1), firstConnectionLaw cumulant n (i + 1) / ((i : ℝ) + 1) -
+    2 / (n : ℝ)
 
 /-! ## The Lah polynomials the table needs -/
 
@@ -235,35 +233,35 @@ theorem connectivityCumulant_two_two_two :
 theorem meanConnectionTime_one_two :
     meanConnectionTime (cumulantOfSizes (univ : Finset (Fin 2)) ![1, 2]) 3 2 = 2 / 3 := by
   rw [connectivityCumulant_one_two]
-  norm_num [meanConnectionTime, firstConnectionLaw, connectedByLevel, rankedWeight,
+  norm_num [meanConnectionTime, firstConnectionLaw, connectedByLevel, Coalescent.jumpCoeff,
     Finset.sum_range_succ, Polynomial.coeff_X, Polynomial.coeff_X_pow, Nat.factorial]
 
 /-- For fibers of sizes `(1,3)`, `E τ_q = 1/2`. -/
 theorem meanConnectionTime_one_three :
     meanConnectionTime (cumulantOfSizes (univ : Finset (Fin 2)) ![1, 3]) 4 2 = 1 / 2 := by
   rw [connectivityCumulant_one_three]
-  norm_num [meanConnectionTime, firstConnectionLaw, connectedByLevel, rankedWeight,
+  norm_num [meanConnectionTime, firstConnectionLaw, connectedByLevel, Coalescent.jumpCoeff,
     Finset.sum_range_succ, Polynomial.coeff_X, Polynomial.coeff_X_pow, Nat.factorial]
 
 /-- For fibers of sizes `(2,2)`, `E τ_q = 7/18`. -/
 theorem meanConnectionTime_two_two :
     meanConnectionTime (cumulantOfSizes (univ : Finset (Fin 2)) ![2, 2]) 4 2 = 7 / 18 := by
   rw [connectivityCumulant_two_two]
-  norm_num [meanConnectionTime, firstConnectionLaw, connectedByLevel, rankedWeight,
+  norm_num [meanConnectionTime, firstConnectionLaw, connectedByLevel, Coalescent.jumpCoeff,
     Finset.sum_range_succ, Polynomial.coeff_X, Polynomial.coeff_X_pow, Nat.factorial]
 
 /-- For fibers of sizes `(1,1,2)`, `E τ_q = 17/18`. -/
 theorem meanConnectionTime_one_one_two :
     meanConnectionTime (cumulantOfSizes (univ : Finset (Fin 3)) ![1, 1, 2]) 4 3 = 17 / 18 := by
   rw [connectivityCumulant_one_one_two]
-  norm_num [meanConnectionTime, firstConnectionLaw, connectedByLevel, rankedWeight,
+  norm_num [meanConnectionTime, firstConnectionLaw, connectedByLevel, Coalescent.jumpCoeff,
     Finset.sum_range_succ, Polynomial.coeff_X, Polynomial.coeff_X_pow, Nat.factorial]
 
 /-- For fibers of sizes `(2,2,2)`, `E τ_q = 92/225`. -/
 theorem meanConnectionTime_two_two_two :
     meanConnectionTime (cumulantOfSizes (univ : Finset (Fin 3)) ![2, 2, 2]) 6 3 = 92 / 225 := by
   rw [connectivityCumulant_two_two_two]
-  norm_num [meanConnectionTime, firstConnectionLaw, connectedByLevel, rankedWeight,
+  norm_num [meanConnectionTime, firstConnectionLaw, connectedByLevel, Coalescent.jumpCoeff,
     Finset.sum_range_succ, Polynomial.coeff_X, Polynomial.coeff_X_pow, Nat.factorial]
 
 /-- **The width does not determine the clock.**  The fiber sizes `(1,3)` and `(2,2)` give the same

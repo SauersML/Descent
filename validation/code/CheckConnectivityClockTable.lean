@@ -14,7 +14,6 @@ open Descent.Pangenome.GraphCoalescent.ConnectivityClockTable
 #print axioms mobiusCoefficient_three
 #print axioms cumulantOfSizes_fin_two
 #print axioms cumulantOfSizes_fin_three
-#print axioms rankedWeight
 #print axioms connectedByLevel
 #print axioms firstConnectionLaw
 #print axioms meanConnectionTime
