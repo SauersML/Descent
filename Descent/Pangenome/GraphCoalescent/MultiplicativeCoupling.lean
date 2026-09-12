@@ -550,15 +550,16 @@ theorem coupledStep_hazard {n : ℕ} (hn : 0 < n) (s : Fin n → Fin n) (X : Cou
       = ∑ Y ∈ univ.filter (coupledSep s),
           (if Y.2.2 = true ∧ Y.1 = X.1 then excessStep s X.1 Y.2.1 else 0) :=
         Finset.sum_congr rfl hpoint
-    _ ≤ ∑ Y, (if Y.2.2 = true ∧ Y.1 = X.1 then excessStep s X.1 Y.2.1 else 0) :=
+    _ ≤ ∑ Y : CoupledState n,
+          (if Y.2.2 = true ∧ Y.1 = X.1 then excessStep s X.1 Y.2.1 else 0) :=
         Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset _ _) fun Y _ _ ↦ by
           split_ifs
           · exact excessStep_nonneg s X.1 Y.2.1
           · exact le_rfl
     _ = ∑ ζ', excessStep s X.1 ζ' := by
-        rw [sum_coupledState]
-        simp only [Bool.false_eq_true, false_and, if_false, add_zero, true_and,
-          sum_sum_ite_eq_left]
+        rw [sum_coupledState, ← sum_sum_ite_eq_left X.1 (excessStep s X.1)]
+        refine Finset.sum_congr rfl fun ξ' _ ↦ Finset.sum_congr rfl fun ζ' _ ↦ ?_
+        by_cases h : ξ' = X.1 <;> simp [h]
     _ ≤ ((n : ℝ) - blocks X.1) / n := sum_excessStep_le hn s X.1
     _ = 1 / (n : ℝ) * coupledDeficit X := by
         unfold coupledDeficit
@@ -589,7 +590,7 @@ theorem coupledStep_drift {n : ℕ} (hn : 0 < n) (s : Fin n → Fin n) (X : Coup
         have hb : (blocks Y.1 : ℝ) + 1 = blocks X.1 := by exact_mod_cast h1.2.1.2
         rw [← hb]
         ring
-    · rw [if_neg h1, if_neg h1]
+    · rw [if_neg h1]
       by_cases h2 : Y.2.2 = false ∧ Y.1 = X.1 ∧ Y.2.1 = X.2.1
       · rw [if_pos h2, h2.2.1]
         ring
@@ -610,9 +611,10 @@ theorem coupledStep_drift {n : ℕ} (hn : 0 < n) (s : Fin n → Fin n) (X : Coup
             · positivity
             · exact le_rfl
       _ = deathRate (blocks X.1) * (1 / (n : ℝ) ^ 2) := by
-          rw [sum_coupledState]
-          simp only [Bool.true_eq_false, false_and, if_false, zero_add, true_and,
-            sum_sum_ite_covers_observed, sum_ite_covers]
+          rw [sum_coupledState, ← sum_ite_covers,
+            ← sum_sum_ite_covers_observed s X.1 fun _ ↦ 1 / (n : ℝ) ^ 2]
+          refine Finset.sum_congr rfl fun ξ' _ ↦ Finset.sum_congr rfl fun ζ' _ ↦ ?_
+          by_cases h : Covers X.1 ξ' ∧ observed s ξ' = ζ' <;> simp [h]
       _ ≤ 1 / 2 := by
           rw [mul_one_div]
           exact deathRate_div_sq_le_half (blocks_le_card X.1)
@@ -680,6 +682,289 @@ theorem coupled_separationMass_le {n : ℕ} (hn : 0 < n) (s : Fin n → Fin n) (
     _ = (m : ℝ) * ((m : ℝ) - 1) / (4 * n) := by
         field_simp
         ring
+
+/-! ### The two marginals -/
+
+theorem sum_filter_fst_coupledState {n : ℕ} (f : CoupledState n → ℝ) (ξ' : ER n) :
+    ∑ Y ∈ univ.filter (fun Y : CoupledState n ↦ Y.1 = ξ'), f Y
+      = ∑ ζ', (f (ξ', ζ', true) + f (ξ', ζ', false)) := by
+  rw [Finset.sum_filter, sum_coupledState, Finset.sum_eq_single ξ']
+  · simp
+  · intro b _ hb
+    simp [hb]
+  · intro h
+    exact absurd (Finset.mem_univ ξ') h
+
+theorem sum_filter_snd_coupledState {n : ℕ} (f : CoupledState n → ℝ) (ζ' : ER n) :
+    ∑ Y ∈ univ.filter (fun Y : CoupledState n ↦ Y.2.1 = ζ'), f Y
+      = ∑ ξ', (f (ξ', ζ', true) + f (ξ', ζ', false)) := by
+  rw [Finset.sum_filter, sum_coupledState]
+  refine Finset.sum_congr rfl fun ξ' _ ↦ ?_
+  rw [Finset.sum_eq_single ζ']
+  · simp
+  · intro b _ hb
+    simp [hb]
+  · intro h
+    exact absurd (Finset.mem_univ ζ') h
+
+/-- **The first coordinate of the coupled chain is the uniformized Kingman chain.** -/
+theorem sum_coupledStep_fst {n : ℕ} (s : Fin n → Fin n) (X : CoupledState n) (ξ' : ER n) :
+    ∑ Y ∈ univ.filter (fun Y : CoupledState n ↦ Y.1 = ξ'), coupledStep s X Y
+      = kingmanStep n X.1 ξ' := by
+  rw [sum_filter_fst_coupledState]
+  by_cases hX : coupledSep s X
+  · simp only [coupledStep_of_sep hX, if_true, Bool.false_eq_true, if_false, mul_one, mul_zero,
+      add_zero]
+    rw [← Finset.mul_sum, sum_multiplicativeStep, mul_one]
+  · simp only [coupledStep_true_of_not_sep hX, coupledStep_false_of_not_sep hX,
+      Finset.sum_add_distrib]
+    unfold kingmanStep coupledHold
+    by_cases hc : Covers X.1 ξ'
+    · have hne : ξ' ≠ X.1 := fun h ↦ by
+        have hb := hc.2
+        rw [h] at hb
+        omega
+      simp [hc, hne]
+    · by_cases he : ξ' = X.1
+      · subst he
+        simp [hc] <;> ring
+      · simp [hc, he]
+
+/-- **The second coordinate of the coupled chain is the uniformized `Z_p`.**  Off the diagonal
+the visible mass and the excess add up to `p(C) p(D)`; on it, both kernels are stochastic. -/
+theorem sum_coupledStep_snd {n : ℕ} (s : Fin n → Fin n) (X : CoupledState n) (ζ' : ER n) :
+    ∑ Y ∈ univ.filter (fun Y : CoupledState n ↦ Y.2.1 = ζ'), coupledStep s X Y
+      = multiplicativeStep n X.2.1 ζ' := by
+  rw [sum_filter_snd_coupledState]
+  by_cases hX : coupledSep s X
+  · simp only [coupledStep_of_sep hX, if_true, Bool.false_eq_true, if_false, mul_one, mul_zero,
+      add_zero]
+    rw [← Finset.sum_mul, sum_kingmanStep, one_mul]
+  · have hagree := observed_eq_of_not_coupledSep hX
+    set f : ER n → ℝ := fun ζ'' ↦
+      ∑ ξ', (coupledStep s X (ξ', ζ'', true) + coupledStep s X (ξ', ζ'', false)) with hf
+    have hoff : ∀ ζ'', ζ'' ≠ X.2.1 → f ζ'' = multiplicativeStep n X.2.1 ζ'' := by
+      intro ζ'' hne
+      have hne' : ζ'' ≠ observed s X.1 := fun h ↦ hne (h.trans hagree)
+      simp only [hf, coupledStep_true_of_not_sep hX, coupledStep_false_of_not_sep hX,
+        Finset.sum_add_distrib, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+      have hthird : ∑ ξ' : ER n, (if ξ' = X.1 ∧ ζ'' = X.2.1 then coupledHold s X.1 else 0) = 0 :=
+        Finset.sum_eq_zero fun ξ' _ ↦ if_neg fun h ↦ hne h.2
+      have hsecond : ∑ ξ' : ER n,
+          (if Covers X.1 ξ' ∧ observed s ξ' = ζ'' then 1 / (n : ℝ) ^ 2 else 0)
+          = ∑ t ∈ (univ.powersetCard 2).filter (fun t ↦ mergePair (observed s X.1) t = ζ''),
+              ∏ C ∈ t, scaledLoad s X.1 C := by
+        rw [Finset.sum_ite, Finset.sum_const, Finset.sum_const_zero, add_zero, nsmul_eq_mul,
+          mul_one_div]
+        exact card_covers_observed_eq_div s X.1 ζ'' hne'
+      rw [hthird, hsecond, add_zero, ← hagree, multiplicativeStep, if_neg hne', add_zero,
+        excessStep, ← Finset.sum_add_distrib]
+      exact Finset.sum_congr rfl fun t _ ↦ by ring
+    by_cases hζ : ζ' = X.2.1
+    · have htot : ∑ ζ'', f ζ'' = 1 := by
+        have h := sum_coupledStep s X
+        rw [sum_coupledState, Finset.sum_comm] at h
+        exact h
+      have h1 := Finset.add_sum_erase univ f (Finset.mem_univ X.2.1)
+      have h2 := Finset.add_sum_erase univ (multiplicativeStep n X.2.1) (Finset.mem_univ X.2.1)
+      have h3 : ∑ ζ'' ∈ univ.erase X.2.1, f ζ''
+          = ∑ ζ'' ∈ univ.erase X.2.1, multiplicativeStep n X.2.1 ζ'' :=
+        Finset.sum_congr rfl fun ζ'' hζ'' ↦ hoff ζ'' (Finset.ne_of_mem_erase hζ'')
+      rw [sum_multiplicativeStep] at h2
+      rw [htot] at h1
+      show f ζ' = multiplicativeStep n X.2.1 ζ'
+      rw [hζ]
+      linarith
+    · exact hoff ζ' hζ
+
+/-! ### Path laws -/
+
+/-- **Lumping at path level**: if a kernel's mass into every fiber of `π` depends only on the
+image of the source, the image of its path law is the path law of the lumped kernel. -/
+theorem sum_filter_path_comp_eq {S X : Type*} [Fintype S] [DecidableEq X]
+    (P : S → S → ℝ) (μ₀ : S → ℝ) (Q : X → X → ℝ) (ν₀ : X → ℝ) (π : S → X)
+    (hlump : ∀ s x, ∑ t ∈ univ.filter (fun t ↦ π t = x), P s t = Q (π s) x)
+    (hinit : ∀ x, ∑ s ∈ univ.filter (fun s ↦ π s = x), μ₀ s = ν₀ x) (m : ℕ)
+    (y : Fin (m + 1) → X) :
+    ∑ ω ∈ univ.filter (fun ω : Fin (m + 1) → S ↦ (fun k ↦ π (ω k)) = y),
+        skeletonPathWeight P μ₀ m ω = skeletonPathWeight Q ν₀ m y := by
+  induction m generalizing y with
+  | zero =>
+    have hiff : ∀ ω : Fin 1 → S, ((fun k ↦ π (ω k)) = y) ↔ π (ω 0) = y 0 := by
+      intro ω
+      constructor
+      · intro h
+        exact congrFun h 0
+      · intro h
+        funext k
+        rw [Subsingleton.elim k 0]
+        exact h
+    rw [Finset.sum_filter]
+    refine (Fintype.sum_equiv (Equiv.funUnique (Fin 1) S) _
+      (fun t ↦ if π t = y 0 then μ₀ t else 0) fun ω ↦ ?_).trans ?_
+    · show (if (fun k ↦ π (ω k)) = y then
+          μ₀ (ω 0) * ∏ k : Fin 0, P (ω k.castSucc) (ω k.succ) else 0)
+        = if π (ω 0) = y 0 then μ₀ (ω 0) else 0
+      rw [Fin.prod_univ_zero, mul_one]
+      by_cases h : π (ω 0) = y 0
+      · rw [if_pos ((hiff ω).mpr h), if_pos h]
+      · rw [if_neg fun h' ↦ h ((hiff ω).mp h'), if_neg h]
+    · rw [← Finset.sum_filter, hinit, skeletonPathWeight, Fin.prod_univ_zero, mul_one]
+  | succ m ih =>
+    have hiff : ∀ (ω' : Fin (m + 1) → S) (x : S),
+        ((fun k ↦ π (Fin.snoc ω' x k)) = y)
+          ↔ ((fun k ↦ π (ω' k)) = Fin.init y ∧ π x = y (Fin.last (m + 1))) := by
+      intro ω' x
+      constructor
+      · intro h
+        refine ⟨funext fun k ↦ ?_, ?_⟩
+        · have hk := congrFun h (Fin.castSucc k)
+          simpa [Fin.snoc_castSucc, Fin.init] using hk
+        · have hk := congrFun h (Fin.last (m + 1))
+          simpa [Fin.snoc_last] using hk
+      · rintro ⟨h1, h2⟩
+        funext k
+        refine Fin.lastCases ?_ (fun j ↦ ?_) k
+        · simpa [Fin.snoc_last] using h2
+        · have hj := congrFun h1 j
+          simpa [Fin.snoc_castSucc, Fin.init] using hj
+    rw [Finset.sum_filter, sum_pi_fin_succ]
+    calc ∑ ω' : Fin (m + 1) → S, ∑ x : S,
+          (if (fun k ↦ π (Fin.snoc ω' x k)) = y then
+            skeletonPathWeight P μ₀ (m + 1) (Fin.snoc ω' x) else 0)
+        = ∑ ω' : Fin (m + 1) → S,
+            (if (fun k ↦ π (ω' k)) = Fin.init y then
+              skeletonPathWeight P μ₀ m ω' * Q (π (ω' (Fin.last m))) (y (Fin.last (m + 1)))
+            else 0) := by
+          refine Finset.sum_congr rfl fun ω' _ ↦ ?_
+          by_cases h1 : (fun k ↦ π (ω' k)) = Fin.init y
+          · rw [if_pos h1, ← hlump (ω' (Fin.last m)) (y (Fin.last (m + 1))), Finset.mul_sum,
+              Finset.sum_filter]
+            refine Finset.sum_congr rfl fun x _ ↦ ?_
+            by_cases h2 : π x = y (Fin.last (m + 1))
+            · rw [if_pos ((hiff ω' x).mpr ⟨h1, h2⟩), if_pos h2, skeletonPathWeight_snoc]
+            · rw [if_neg fun h ↦ h2 ((hiff ω' x).mp h).2, if_neg h2, mul_zero]
+          · rw [if_neg h1]
+            exact Finset.sum_eq_zero fun x _ ↦ if_neg fun h ↦ h1 ((hiff ω' x).mp h).1
+      _ = ∑ ω' ∈ univ.filter (fun ω' : Fin (m + 1) → S ↦ (fun k ↦ π (ω' k)) = Fin.init y),
+            skeletonPathWeight P μ₀ m ω' * Q (Fin.init y (Fin.last m)) (y (Fin.last (m + 1))) := by
+          rw [Finset.sum_filter]
+          refine Finset.sum_congr rfl fun ω' _ ↦ ?_
+          by_cases h1 : (fun k ↦ π (ω' k)) = Fin.init y
+          · rw [if_pos h1, if_pos h1, ← congrFun h1 (Fin.last m)]
+          · rw [if_neg h1, if_neg h1]
+      _ = skeletonPathWeight Q ν₀ m (Fin.init y)
+            * Q (Fin.init y (Fin.last m)) (y (Fin.last (m + 1))) := by
+          rw [← Finset.sum_mul, ih]
+      _ = skeletonPathWeight Q ν₀ (m + 1) y := by
+          rw [← skeletonPathWeight_snoc, Fin.snoc_init_self]
+
+/-- **The law of the report's skeleton path**: the uniformized Kingman path law from the panel's
+singletons, read through `observed s`.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  The image of a finite path law. -/
+def reportPathLaw {n : ℕ} (s : Fin n → Fin n) (m : ℕ) (y : Fin (m + 1) → ER n) : ℝ :=
+  ∑ ξpath ∈ univ.filter (fun ξpath : Fin (m + 1) → ER n ↦ (fun k ↦ observed s (ξpath k)) = y),
+    skeletonPathWeight (kingmanStep n) (fun ξ ↦ if ξ = ⊥ then 1 else 0) m ξpath
+
+/-- **The law of `Z_p`'s skeleton path**, started at the interface.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  A finite path law. -/
+def multiplicativePathLaw {n : ℕ} (s : Fin n → Fin n) (m : ℕ) (y : Fin (m + 1) → ER n) : ℝ :=
+  skeletonPathWeight (multiplicativeStep n) (fun ζ ↦ if ζ = graphKer s then 1 else 0) m y
+
+theorem sum_filter_fst_coupledStartLaw {n : ℕ} (s : Fin n → Fin n) (ξ : ER n) :
+    ∑ X ∈ univ.filter (fun X : CoupledState n ↦ X.1 = ξ), coupledStartLaw s X
+      = if ξ = ⊥ then 1 else 0 := by
+  rw [sum_filter_fst_coupledState]
+  by_cases h : ξ = ⊥ <;> simp [coupledStartLaw, coupledStart, h]
+
+theorem sum_filter_snd_coupledStartLaw {n : ℕ} (s : Fin n → Fin n) (ζ : ER n) :
+    ∑ X ∈ univ.filter (fun X : CoupledState n ↦ X.2.1 = ζ), coupledStartLaw s X
+      = if ζ = graphKer s then 1 else 0 := by
+  rw [sum_filter_snd_coupledState]
+  by_cases h : ζ = graphKer s <;> simp [coupledStartLaw, coupledStart, h, observed_bot]
+
+/-- The coupled path law, read through the report, is the report's path law. -/
+theorem sum_filter_coupled_report_eq {n : ℕ} (s : Fin n → Fin n) (m : ℕ)
+    (y : Fin (m + 1) → ER n) :
+    ∑ ω ∈ univ.filter (fun ω : Fin (m + 1) → CoupledState n ↦
+        (fun k ↦ observed s (ω k).1) = y),
+      skeletonPathWeight (coupledStep s) (coupledStartLaw s) m ω = reportPathLaw s m y := by
+  unfold reportPathLaw
+  rw [← Finset.sum_fiberwise_of_maps_to (g := fun ω : Fin (m + 1) → CoupledState n ↦
+    fun k ↦ (ω k).1) (t := univ.filter fun ξpath : Fin (m + 1) → ER n ↦
+      (fun k ↦ observed s (ξpath k)) = y)]
+  · refine Finset.sum_congr rfl fun ξpath hξ ↦ ?_
+    rw [Finset.filter_filter]
+    have hcongr : univ.filter (fun ω : Fin (m + 1) → CoupledState n ↦
+        (fun k ↦ observed s (ω k).1) = y ∧ (fun k ↦ (ω k).1) = ξpath)
+        = univ.filter fun ω : Fin (m + 1) → CoupledState n ↦ (fun k ↦ (ω k).1) = ξpath := by
+      refine Finset.filter_congr fun ω _ ↦ ⟨fun h ↦ h.2, fun h ↦ ⟨?_, h⟩⟩
+      rw [← (Finset.mem_filter.mp hξ).2, ← h]
+    rw [hcongr]
+    exact sum_filter_path_comp_eq (coupledStep s) (coupledStartLaw s) (kingmanStep n)
+      (fun ξ ↦ if ξ = ⊥ then 1 else 0) Prod.fst (fun X ξ' ↦ sum_coupledStep_fst s X ξ')
+      (sum_filter_fst_coupledStartLaw s) m ξpath
+  · intro ω hω
+    exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, (Finset.mem_filter.mp hω).2⟩
+
+/-- The coupled path law, read through `Z_p`'s coordinate, is `Z_p`'s path law. -/
+theorem sum_filter_coupled_multiplicative_eq {n : ℕ} (s : Fin n → Fin n) (m : ℕ)
+    (y : Fin (m + 1) → ER n) :
+    ∑ ω ∈ univ.filter (fun ω : Fin (m + 1) → CoupledState n ↦ (fun k ↦ (ω k).2.1) = y),
+      skeletonPathWeight (coupledStep s) (coupledStartLaw s) m ω = multiplicativePathLaw s m y :=
+  sum_filter_path_comp_eq (coupledStep s) (coupledStartLaw s) (multiplicativeStep n)
+    (fun ζ ↦ if ζ = graphKer s then 1 else 0) (fun X ↦ X.2.1)
+    (fun X ζ' ↦ sum_coupledStep_snd s X ζ') (sum_filter_snd_coupledStartLaw s) m y
+
+/-! ### Theorem F -/
+
+/-- **Theorem F, (F1), for the uniformized skeleton.**  After `m` rings of the uniformizing clock
+the path of the graph's report and the path of the multiplicative coalescent `Z_p` have total
+variation at most `m(m-1)/(4n)`.
+
+Assumes: `0 < n`. -/
+theorem report_multiplicative_pathTotalVariation_le {n : ℕ} (hn : 0 < n) (s : Fin n → Fin n)
+    (m : ℕ) :
+    1 / 2 * ∑ y : Fin (m + 1) → ER n, |reportPathLaw s m y - multiplicativePathLaw s m y|
+      ≤ (m : ℝ) * ((m : ℝ) - 1) / (4 * n) := by
+  have htv := pathTotalVariation_le_separationMass (coupledStep_nonneg hn s)
+    (coupledStartLaw_nonneg s) (fun X Y hX hY ↦ coupledStep_absorb s X Y hX hY)
+    (fun X ↦ observed s X.1) (fun X ↦ X.2.1)
+    (fun X hX ↦ observed_eq_of_not_coupledSep hX) m
+  simp only [sum_filter_coupled_report_eq, sum_filter_coupled_multiplicative_eq] at htv
+  have hsep := coupled_separationMass_le hn s m
+  linarith
+
+/-- The total variation of the skeleton paths is a probability. -/
+theorem report_multiplicative_pathTotalVariation_le_one {n : ℕ} (hn : 0 < n)
+    (s : Fin n → Fin n) (m : ℕ) :
+    1 / 2 * ∑ y : Fin (m + 1) → ER n, |reportPathLaw s m y - multiplicativePathLaw s m y| ≤ 1 := by
+  have htv := pathTotalVariation_le_separationMass (coupledStep_nonneg hn s)
+    (coupledStartLaw_nonneg s) (fun X Y hX hY ↦ coupledStep_absorb s X Y hX hY)
+    (fun X ↦ observed s X.1) (fun X ↦ X.2.1)
+    (fun X hX ↦ observed_eq_of_not_coupledSep hX) m
+  simp only [sum_filter_coupled_report_eq, sum_filter_coupled_multiplicative_eq] at htv
+  have hone := sum_filter_not_skeletonLaw_le (coupledStep_nonneg hn s) (sum_coupledStep s)
+    (coupledStartLaw_nonneg s) (sum_coupledStartLaw s) (univ.filter (coupledSep s)) m
+  have hsm : separationMass (coupledStep s) (coupledStartLaw s) (coupledSep s) m ≤ 1 := hone
+  linarith
+
+/-- **Theorem F, (F1).**  Run both skeletons at the rings of a Poisson clock of rate one in scaled
+time `u = n² t`; by scaled time `U` the paths of the graph's report and of `Z_p` have total
+variation at most `min {1, U²/(4n)}`.
+
+Assumes: `0 < n`. -/
+theorem report_multiplicative_poissonTotalVariation_le {n : ℕ} (hn : 0 < n) (s : Fin n → Fin n)
+    (U : NNReal) :
+    poissonMixture U (fun m ↦
+        1 / 2 * ∑ y : Fin (m + 1) → ER n, |reportPathLaw s m y - multiplicativePathLaw s m y|)
+      ≤ min 1 ((U : ℝ) ^ 2 / (4 * n)) :=
+  poissonMixture_le_min (by exact_mod_cast hn)
+    (fun m ↦ mul_nonneg (by norm_num) (Finset.sum_nonneg fun _ _ ↦ abs_nonneg _))
+    (report_multiplicative_pathTotalVariation_le_one hn s)
+    (report_multiplicative_pathTotalVariation_le hn s)
 
 end
 
