@@ -30,3 +30,17 @@ functionals. -/
   Descent.Pangenome.GraphCoalescent.abs_poissonMixture_sub_le
 #print axioms
   Descent.Pangenome.GraphCoalescent.abs_poissonMixture_report_sub_spread_le
+#print axioms
+  Descent.Pangenome.GraphCoalescent.ite_blockMap_mul_blockMass_eq
+#print axioms
+  Descent.Pangenome.GraphCoalescent.two_mul_sum_crossing_eq_mass
+#print axioms
+  Descent.Pangenome.GraphCoalescent.sum_filter_le_massStep
+#print axioms
+  Descent.Pangenome.GraphCoalescent.sum_filter_le_massStep_of_not_le
+#print axioms
+  Descent.Pangenome.GraphCoalescent.sum_filter_le_massLaw
+#print axioms
+  Descent.Pangenome.GraphCoalescent.sum_massLaw_mul_top
+#print axioms
+  Descent.Pangenome.GraphCoalescent.hasSum_poissonPMFReal_mul_massTop
