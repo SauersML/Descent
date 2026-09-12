@@ -89,7 +89,7 @@ def holdDuration (d : ℝ) : Measure ℝ≥0 :=
 theorem holdDuration_isProbabilityMeasure {d : ℝ} (hd : 0 < d) :
     IsProbabilityMeasure (holdDuration d) := by
   haveI := holdMeasure_isProbabilityMeasure hd
-  exact isProbabilityMeasure_map measurable_real_toNNReal.aemeasurable
+  exact Measure.isProbabilityMeasure_map measurable_real_toNNReal.aemeasurable
 
 /-- The mean holding duration is `1/d`, `EntranceLaw.lintegral_id_holdMeasure`. -/
 theorem lintegral_coe_holdDuration {d : ℝ} (hd : 0 < d) :
@@ -247,7 +247,7 @@ theorem lintegral_coe_connectionTimeLaw {n : ℕ} (s : Fin n → Fin n) (ξ : ER
             / deathRate (blocks ξ)) := by
         rw [Measure.lintegral_bind (measurable_of_finite _).aemeasurable
             measurable_coe_nnreal_ennreal.aemeasurable,
-          lintegral_congr fun η ↦ ih η.1 η.2, lintegral_jumpStep ξ hk,
+          lintegral_congr fun η : {η : ER n // Covers ξ η} ↦ ih η.1 η.2, lintegral_jumpStep ξ hk,
           sum_ofReal_mul_inv_choose_two ξ hk _ hnn]
       have hconv : ∫⁻ x, (x : ℝ≥0∞)
           ∂(holdDuration (deathRate (blocks ξ)) ∗
@@ -255,7 +255,7 @@ theorem lintegral_coe_connectionTimeLaw {n : ℕ} (s : Fin n → Fin n) (ξ : ER
           = ∫⁻ x, (x : ℝ≥0∞) ∂(holdDuration (deathRate (blocks ξ)))
             + ∫⁻ y, (y : ℝ≥0∞)
               ∂((jumpStep ξ hk).toMeasure.bind fun η ↦ connectionTimeLaw s η.1) := by
-        rw [lintegral_conv measurable_coe_nnreal_ennreal]
+        rw [Measure.lintegral_conv measurable_coe_nnreal_ennreal]
         have hin : ∀ x : ℝ≥0, ∫⁻ y, ((x + y : ℝ≥0) : ℝ≥0∞)
             ∂((jumpStep ξ hk).toMeasure.bind fun η ↦ connectionTimeLaw s η.1)
             = (x : ℝ≥0∞) + ∫⁻ y, (y : ℝ≥0∞)
@@ -303,7 +303,7 @@ theorem lintegral_exp_connectionTimeLaw {n : ℕ} (s : Fin n → Fin n) {t : ℝ
           = ENNReal.ofReal ((∑ η : {η : ER n // Covers ξ η}, connectionValue s t 1 0 η.1)
             / deathRate (blocks ξ)) := by
         rw [Measure.lintegral_bind (measurable_of_finite _).aemeasurable hfm.aemeasurable,
-          lintegral_congr fun η ↦ ih η.1 η.2, lintegral_jumpStep ξ hk,
+          lintegral_congr fun η : {η : ER n // Covers ξ η} ↦ ih η.1 η.2, lintegral_jumpStep ξ hk,
           sum_ofReal_mul_inv_choose_two ξ hk _ hnn]
       have hreal : (∑ η : {η : ER n // Covers ξ η}, connectionValue s t 1 0 η.1)
             / (deathRate (blocks ξ) + t)
@@ -313,7 +313,7 @@ theorem lintegral_exp_connectionTimeLaw {n : ℕ} (s : Fin n → Fin n) {t : ℝ
         rw [div_mul_div_comm, eq_div_iff (mul_ne_zero hdt.ne' hd.ne'), div_mul_eq_mul_div,
           div_eq_iff hdt.ne']
         ring
-      rw [lintegral_conv hfm]
+      rw [Measure.lintegral_conv hfm]
       simp only [hsplit, lintegral_const_mul _ hfm]
       rw [lintegral_mul_const _ hfm, lintegral_exp_holdDuration hd ht, hnext,
         ← ENNReal.ofReal_mul (div_nonneg hd.le hdt.le), ← hreal]
