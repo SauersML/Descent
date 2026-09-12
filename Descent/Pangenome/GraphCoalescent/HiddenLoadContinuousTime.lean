@@ -277,6 +277,199 @@ theorem kingmanClock_descentTime_le (n k : ℕ) (hk : 1 ≤ k) (hkn : k + 1 ≤ 
   exact (lintegral_rate_mul_measure_between hDm (measurable_pi_apply (k - 1))
     (indepFun_descentTime_clockHold n k hk hkn) hrate hmap hD t).symm
 
+/-! ### The level probabilities -/
+
+/-- The probability that the path has `k` blocks at time `u`. -/
+def levelProb (n k : ℕ) (u : ℝ) : ℝ≥0∞ :=
+  kingmanClock {ω | blockCountAt n (clockHold ω) u = k}
+
+theorem measurable_descentTime_clockHold (n k : ℕ) :
+    Measurable fun ω : ℕ → ℝ ↦ descentTime n (clockHold ω) k := by
+  show Measurable fun ω : ℕ → ℝ ↦ ∑ j ∈ Finset.Ico (k + 1) (n + 1), ω (j - 2)
+  exact Finset.measurable_sum _ fun j _ ↦ measurable_pi_apply (j - 2)
+
+/-- The block count of the path at a fixed time is a measurable function of the clock. -/
+theorem measurable_blockCountAt_clockHold (n : ℕ) (t : ℝ) :
+    Measurable fun ω : ℕ → ℝ ↦ blockCountAt n (clockHold ω) t := by
+  have h : (fun ω : ℕ → ℝ ↦ blockCountAt n (clockHold ω) t)
+      = fun ω ↦ (∑ j ∈ Finset.Icc 1 n,
+          if t < descentTime n (clockHold ω) j then 1 else 0) + 1 := by
+    funext ω
+    rw [blockCountAt, Finset.card_filter]
+  rw [h]
+  refine (Finset.measurable_sum _ fun j _ ↦ ?_).add_const 1
+  exact Measurable.ite (measurableSet_lt measurable_const (measurable_descentTime_clockHold n j))
+    measurable_const measurable_const
+
+/-- The path has reached level `1` exactly once the descent to `1` has elapsed. -/
+theorem kingmanClock_descentTime_one_le (n : ℕ) (hn : 1 ≤ n) (t : ℝ) :
+    kingmanClock {ω | descentTime n (clockHold ω) 1 ≤ t} = levelProb n 1 t := by
+  refine measure_congr ?_
+  filter_upwards [ae_nonneg_kingmanClock] with ω hω
+  have hpos : ∀ j, 0 ≤ clockHold ω j := fun j ↦ hω (j - 2)
+  apply propext
+  constructor
+  · intro h
+    exact le_antisymm (blockCountAt_le_of_descentTime_le n hpos le_rfl hn h)
+      (one_le_blockCountAt n _ t)
+  · intro h
+    have h' : blockCountAt n (clockHold ω) t = 1 := h
+    by_contra hlt
+    have := lt_blockCountAt_of_lt_descentTime n hpos le_rfl hn (not_le.mp hlt)
+    omega
+
+/-- Having descended to `k + 1` is sitting at `k + 1` or having descended further, almost
+surely. -/
+theorem kingmanClock_descentTime_succ_le (n k : ℕ) (hk : 1 ≤ k) (hkn : k + 1 ≤ n) (t : ℝ) :
+    kingmanClock {ω | descentTime n (clockHold ω) (k + 1) ≤ t}
+      = levelProb n (k + 1) t + kingmanClock {ω | descentTime n (clockHold ω) k ≤ t} := by
+  have hnull : kingmanClock {ω : ℕ → ℝ | ¬ ∀ j, 0 ≤ ω j} = 0 := ae_iff.mp ae_nonneg_kingmanClock
+  have hae : {ω : ℕ → ℝ | descentTime n (clockHold ω) (k + 1) ≤ t}
+      =ᵐ[kingmanClock] {ω | blockCountAt n (clockHold ω) t = k + 1}
+        ∪ {ω | descentTime n (clockHold ω) k ≤ t} := by
+    filter_upwards [ae_nonneg_kingmanClock] with ω hω
+    have hsucc := descentTime_clockHold_succ n k hk (by omega) ω
+    have hstep : 0 ≤ ω (k - 1) := hω (k - 1)
+    have hiff := blockCountAt_clockHold_eq_iff hω hk hkn t
+    apply propext
+    constructor
+    · intro h
+      have h' : descentTime n (clockHold ω) (k + 1) ≤ t := h
+      by_cases hlt : t < descentTime n (clockHold ω) (k + 1) + ω (k - 1)
+      · exact Or.inl (hiff.mpr ⟨h', hlt⟩)
+      · have hle : descentTime n (clockHold ω) k ≤ t := by
+          rw [hsucc]
+          exact not_lt.mp hlt
+        exact Or.inr hle
+    · rintro (h | h)
+      · exact (hiff.mp h).1
+      · have h' : descentTime n (clockHold ω) k ≤ t := h
+        show descentTime n (clockHold ω) (k + 1) ≤ t
+        rw [hsucc] at h'
+        linarith
+  have hdisj : AEDisjoint kingmanClock {ω : ℕ → ℝ | blockCountAt n (clockHold ω) t = k + 1}
+      {ω | descentTime n (clockHold ω) k ≤ t} := by
+    refine measure_mono_null (fun ω hω ↦ ?_) hnull
+    obtain ⟨h1, h2⟩ := hω
+    have h1' : blockCountAt n (clockHold ω) t = k + 1 := h1
+    have h2' : descentTime n (clockHold ω) k ≤ t := h2
+    intro hpos
+    have := blockCountAt_le_of_descentTime_le n (fun j ↦ hpos (j - 2)) hk (by omega) h2'
+    omega
+  rw [measure_congr hae, measure_union₀
+    (measurableSet_le (measurable_descentTime_clockHold n k) measurable_const).nullMeasurableSet
+    hdisj]
+  rfl
+
+/-- **The balance of the level probabilities.** For `1 ≤ k ≤ n` and `t ≥ 0`, the probability of
+sitting at level `k` plus the rate-weighted time spent at `k` is the initial mass at `k` plus the
+rate-weighted time spent at `k + 1`. -/
+theorem levelProb_balance {n k : ℕ} (hn : 2 ≤ n) (hk : 1 ≤ k) (hkn : k ≤ n) {t : ℝ}
+    (ht : 0 ≤ t) :
+    levelProb n k t + ∫⁻ u in Set.Icc 0 t, ENNReal.ofReal (deathRate k) * levelProb n k u
+      = (if k = n then 1 else 0)
+        + if k < n then
+            ∫⁻ u in Set.Icc 0 t, ENNReal.ofReal (deathRate (k + 1)) * levelProb n (k + 1) u
+          else 0 := by
+  rcases Nat.lt_or_ge k n with hlt | hge
+  · rw [if_neg hlt.ne, if_pos hlt, zero_add]
+    rcases Nat.eq_or_lt_of_le hk with h1 | h1
+    · rw [← h1, deathRate_one, ENNReal.ofReal_zero]
+      simp only [zero_mul, lintegral_zero, add_zero]
+      rw [← kingmanClock_descentTime_one_le n (by omega) t]
+      exact kingmanClock_descentTime_le n 1 le_rfl (by omega) t
+    · obtain ⟨j, rfl⟩ : ∃ j, k = j + 1 := ⟨k - 1, by omega⟩
+      have hj1 := kingmanClock_descentTime_le n j (by omega) (by omega) t
+      have hj2 := kingmanClock_descentTime_le n (j + 1) (by omega) hlt t
+      have hj3 := kingmanClock_descentTime_succ_le n j (by omega) (by omega) t
+      calc levelProb n (j + 1) t
+            + ∫⁻ u in Set.Icc 0 t, ENNReal.ofReal (deathRate (j + 1)) * levelProb n (j + 1) u
+          = levelProb n (j + 1) t + kingmanClock {ω | descentTime n (clockHold ω) j ≤ t} := by
+            rw [hj1]
+            rfl
+        _ = kingmanClock {ω | descentTime n (clockHold ω) (j + 1) ≤ t} := hj3.symm
+        _ = _ := hj2
+  · have hkeq : k = n := le_antisymm hkn hge
+    rw [if_pos hkeq, if_neg (by omega : ¬ k < n), add_zero, hkeq]
+    obtain ⟨j, hj⟩ : ∃ j, n = j + 1 := ⟨n - 1, by omega⟩
+    have hall : kingmanClock {ω : ℕ → ℝ | descentTime n (clockHold ω) n ≤ t} = 1 := by
+      have huniv : {ω : ℕ → ℝ | descentTime n (clockHold ω) n ≤ t} = Set.univ := by
+        ext ω
+        simp only [descentTime_self, Set.mem_setOf_eq, Set.mem_univ, iff_true]
+        exact ht
+      rw [huniv, measure_univ]
+    have hj3 := kingmanClock_descentTime_succ_le n j (by omega) (by omega) t
+    have hj1 := kingmanClock_descentTime_le n j (by omega) (by omega) t
+    rw [← hj] at hj3 hj1
+    calc levelProb n n t + ∫⁻ u in Set.Icc 0 t, ENNReal.ofReal (deathRate n) * levelProb n n u
+        = levelProb n n t + kingmanClock {ω | descentTime n (clockHold ω) j ≤ t} := by
+          rw [hj1]
+          rfl
+      _ = kingmanClock {ω | descentTime n (clockHold ω) n ≤ t} := hj3.symm
+      _ = 1 := hall
+
+/-! ### The hidden-load process -/
+
+/-- **The hidden-load process**: the hidden state of the coalescent path at time `t`, on a
+trajectory and a clock. -/
+def hiddenLoadAt {n : ℕ} (s : Fin n → Fin n) (p : List (ER n) × (ℕ → ℝ)) (t : ℝ) :
+    ER n × (Fin n → ℕ) :=
+  hiddenState s (pathState n (chainOfList p.1) (clockHold p.2) t)
+
+/-- The law of the hidden state after `j` jumps of the labeled chain. -/
+def hiddenHeadLaw {n : ℕ} (s : Fin n → Fin n) (j : ℕ) : PMF (ER n × (Fin n → ℕ)) :=
+  (blockLaw n j).map (hiddenState s)
+
+/-- Reading a full trajectory at level `k` and taking the hidden state gives the hidden law after
+`n - k` jumps. -/
+theorem toMeasure_hiddenState_chainOfList {n k : ℕ} (s : Fin n → Fin n) (hk : 1 ≤ k)
+    (hkn : k ≤ n) (y : ER n × (Fin n → ℕ)) :
+    (chainLaw n (n - 1)).toMeasure {l | hiddenState s (chainOfList l k) = y}
+      = hiddenHeadLaw s (n - k) y := by
+  have hmap : (chainLaw n (n - 1)).map (fun l ↦ hiddenState s (chainOfList l k))
+      = hiddenHeadLaw s (n - k) := by
+    have h := congrArg (PMF.map (hiddenState s))
+      (chainLaw_map_getD (n := n) (n - 1) (k - 1) (by omega))
+    rw [PMF.map_comp, show n - 1 - (k - 1) = n - k by omega] at h
+    exact h
+  rw [← hmap, PMF.toMeasure_apply_eq_toOuterMeasure_apply _ MeasurableSpace.measurableSet_top,
+    PMF.toOuterMeasure_apply, PMF.map_apply]
+  refine tsum_congr fun l ↦ ?_
+  by_cases h : hiddenState s (chainOfList l k) = y
+  · rw [Set.indicator_of_mem (show l ∈ {l | hiddenState s (chainOfList l k) = y} from h),
+      if_pos h.symm]
+  · rw [Set.indicator_of_notMem (show l ∉ {l | hiddenState s (chainOfList l k) = y} from h),
+      if_neg fun h' ↦ h h'.symm]
+
+/-- **The law of the hidden-load process factorizes over the level.** At a time `t ≥ 0` the
+hidden-load process takes the value `y` with probability `Σ_k P(D(n, t) = k) μ_{n-k}(y)`, `μ_j`
+being the hidden law after `j` jumps. -/
+theorem trajectoryClockLaw_hiddenLoadAt {n : ℕ} (hn : 1 ≤ n) (s : Fin n → Fin n) {t : ℝ}
+    (ht : 0 ≤ t) (y : ER n × (Fin n → ℕ)) :
+    trajectoryClockLaw n {p | hiddenLoadAt s p t = y}
+      = ∑ k ∈ Finset.Icc 1 n, hiddenHeadLaw s (n - k) y * levelProb n k t := by
+  have hset : {p : List (ER n) × (ℕ → ℝ) | hiddenLoadAt s p t = y}
+      = ⋃ k ∈ Finset.Icc 1 n, {l : List (ER n) | hiddenState s (chainOfList l k) = y}
+          ×ˢ {ω : ℕ → ℝ | blockCountAt n (clockHold ω) t = k} := by
+    ext p
+    simp only [Set.mem_setOf_eq, Set.mem_iUnion, Set.mem_prod, Finset.mem_Icc, exists_prop,
+      hiddenLoadAt, pathState]
+    constructor
+    · intro h
+      exact ⟨blockCountAt n (clockHold p.2) t,
+        ⟨one_le_blockCountAt n _ t, blockCountAt_le n ht hn⟩, h, rfl⟩
+    · rintro ⟨k, -, h, hk⟩
+      rw [hk]
+      exact h
+  rw [hset, measure_biUnion_finset]
+  · refine Finset.sum_congr rfl fun k hk ↦ ?_
+    rw [Finset.mem_Icc] at hk
+    rw [trajectoryClockLaw_prod, toMeasure_hiddenState_chainOfList s hk.1 hk.2]
+    rfl
+  · exact fun k _ k' _ hkk' ↦ Set.disjoint_left.mpr fun p hp hp' ↦ hkk' (hp.2.symm.trans hp'.2)
+  · exact fun k _ ↦ MeasurableSpace.measurableSet_top.prod
+      (measurable_blockCountAt_clockHold n t (measurableSet_singleton k))
+
 end
 
 end Descent.Pangenome.GraphCoalescent
