@@ -244,26 +244,20 @@ theorem integral_momentPolynomial_comp_hetero {Deme'' : Type*} [Fintype Deme'']
     ∫ y, polynomialFunction (momentPolynomial ξ.1) y ∂((η ∘ₖ κ) x)
       = ((N * M) *ᵥ budgetMomentFeature capacity x) ξ := by
   have hint : ∀ ζ : BudgetConfiguration Deme' Locus Allele capacity,
-      Integrable (fun y ↦ polynomialFunction (momentPolynomial ζ.1) y) (κ x) := fun ζ ↦
-    (BoundedContinuousFunction.mkOfCompact
-      (polynomialFunction (momentPolynomial ζ.1))).integrable _
+      Integrable (fun y ↦ N ξ ζ * polynomialFunction (momentPolynomial ζ.1) y) (κ x) := fun ζ ↦
+    ((BoundedContinuousFunction.mkOfCompact
+      (polynomialFunction (momentPolynomial ζ.1))).integrable _).const_mul (N ξ ζ)
   have hcomp : Integrable (fun y ↦ polynomialFunction (momentPolynomial ξ.1) y) ((η ∘ₖ κ) x) :=
     (BoundedContinuousFunction.mkOfCompact
       (polynomialFunction (momentPolynomial ξ.1))).integrable _
-  rw [Kernel.integral_comp hcomp]
-  calc ∫ y, ∫ z, polynomialFunction (momentPolynomial ξ.1) z ∂(η y) ∂(κ x)
-      = ∫ y, ∑ ζ, N ξ ζ * polynomialFunction (momentPolynomial ζ.1) y ∂(κ x) := by
-        congr 1
-        funext y
-        rw [hη y ξ]
-        simp only [Matrix.mulVec, dotProduct]
-        rfl
-    _ = ∑ ζ, N ξ ζ * ∫ y, polynomialFunction (momentPolynomial ζ.1) y ∂(κ x) := by
-        rw [integral_finset_sum Finset.univ fun ζ _ ↦ (hint ζ).const_mul (N ξ ζ)]
-        simp only [integral_const_mul]
-    _ = _ := by
-        simp only [hκ, ← Matrix.mulVec_mulVec]
-        simp only [Matrix.mulVec, dotProduct]
+  have hinner : ∀ y, ∫ z, polynomialFunction (momentPolynomial ξ.1) z ∂(η y)
+      = ∑ ζ, N ξ ζ * polynomialFunction (momentPolynomial ζ.1) y := fun y ↦ (hη y ξ).trans rfl
+  have houter : ∀ ζ, ∫ y, N ξ ζ * polynomialFunction (momentPolynomial ζ.1) y ∂(κ x)
+      = N ξ ζ * (M *ᵥ budgetMomentFeature capacity x) ζ := fun ζ ↦ by
+    rw [integral_const_mul, hκ x ζ]
+  refine ((Kernel.integral_comp hcomp).trans (integral_congr_ae (ae_of_all _ hinner))).trans ?_
+  rw [integral_finset_sum Finset.univ fun ζ _ ↦ hint ζ, ← Matrix.mulVec_mulVec]
+  exact (Finset.sum_congr rfl fun ζ _ ↦ houter ζ).trans rfl
 
 /-- **NOTE1 §4.2 across a split that changes the deme set, under the process law.**  Run the
 constant-rate epochs `before` on the old deme set, found the new deme set by the split `parent`,
