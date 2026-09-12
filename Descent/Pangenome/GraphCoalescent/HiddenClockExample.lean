@@ -114,7 +114,7 @@ theorem smul_exampleGenerator (t : ℝ) : t • exampleGenerator = !![-3 * t, t;
 /-- A diagonal matrix with two entries, written out. -/
 theorem diagonal_fin_two (a b : ℝ) : Matrix.diagonal ![a, b] = !![a, 0; 0, b] := by
   ext i j
-  fin_cases i <;> fin_cases j <;> first | rfl | simp [Matrix.diagonal_apply]
+  fin_cases i <;> fin_cases j <;> rfl
 
 /-- `t Q` is diagonalized by its eigenvectors. -/
 theorem smul_exampleGenerator_eq_conj (t : ℝ) :
@@ -133,7 +133,7 @@ theorem exp_smul_exampleGenerator (t : ℝ) :
   have hexp : NormedSpace.exp ℝ (![-3 * t, -t] : Fin 2 → ℝ) =
       ![Real.exp (-3 * t), Real.exp (-t)] := by
     funext i
-    fin_cases i <;> simp [exp_apply_fin_two]
+    fin_cases i <;> simp [Real.exp_eq_exp_ℝ]
   rw [smul_exampleGenerator_eq_conj, Matrix.exp_conj ℝ _ _ isUnit_exampleEigenvectors,
     Matrix.exp_diagonal ℝ, hexp, diagonal_fin_two, exampleEigenvectors_inv, exampleEigenvectors,
     Matrix.mul_fin_two, Matrix.mul_fin_two]
