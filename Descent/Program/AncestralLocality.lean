@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Pangenome.AncestralLocality.ClosureReachability
 import Descent.Pangenome.AncestralLocality.CompatibilityNeutrality
 import Descent.Pangenome.AncestralLocality.JointNonautonomy
 import Descent.Pangenome.AncestralLocality.InfiniteGenomeLimit
@@ -38,6 +39,14 @@ independent complexity bounds and a quantitative light cone.
   has one observed law and drifts `-1/4` and `0` (`witness_drift`), so no observed transition law
   predicts both and the observation `(a, b)` is not autonomous
   (`witness_no_observed_transition_law`, `witness_not_autonomous`).
+* Theorem 4, closure is reachability: `ClosureReachability`. For `|A| ≥ 2` one refinement step
+  turns `P_{π_A}` into `P_{π_{A ∪ N⁺(A)}}` (`refinementStep_agreeOn`), with the difference formula
+  (5.3) (`sum_checkKernel_mixedBlocks_sub`, `mixedBlocks_sub_pos`); iterating, the closure is the
+  observation on `Reach_G(A)` (`iterate_refinementStep_agreeOn_eq_reach`), and an observation of
+  at most one feature is its own closure (`iterate_refinementStep_agreeOn_of_card_le_one`). On a
+  connected graph, the path graph included, every query of two or more features has full-genome
+  closure (`iterate_refinementStep_eq_univ_of_connected`, `iterate_refinementStep_eq_univ_path`)
+  and the pair observation is not autonomous (`not_autonomous_pair_path`).
 * §3.2, autonomous observations are not closed under joins: `JointNonautonomy`. On the
   eight-state witness both single features are autonomous and their joint observation is not
   (`autonomous_features_joint_not_autonomous`).
@@ -88,8 +97,9 @@ probability
 space, with the escape probability as a parameter. The supercritical limit (6.2) is proved for
 its support, conditional on the Erdős-Rényi giant component theorem as the named hypothesis
 `GiantComponentLaw` (proved only for `0 ≤ α < 1`); its weights `1 - (1 - s)^k` and `(1 - s)^k`
-are not proved. Theorems 1 and 2 (hereditary closure and its operational characterization),
-Theorem 4 (closure is reachability) and Theorem 6 (sampling duality) are not yet recorded here.
+are not proved. Theorems 1 and 2 (hereditary closure and its operational characterization) and
+Theorem 6 (sampling duality) are not yet recorded here, and Theorem 4 uses its own refinement step
+rather than the general construction of Theorem 1.
 Of Theorem 9, the finite-genome semigroups and the light-cone bound are hypotheses
 (`LightConeApproximation`), and the space `P({0,1}^V)` with its cylinder sampling algebra is not
 yet constructed.
