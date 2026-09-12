@@ -13,7 +13,8 @@ import Descent.Pangenome.AncestralLocality.SelectionClosure
 import Descent.Portability.PortabilityTwoHistoryInstance
 import Descent.Portability.EndToEndPortabilityLipschitz
 import Descent.Portability.PortabilityMetricCompilation
-import Descent.Portability.PortabilityLightCone
+import Descent.Portability.PortabilityExactLocality
+import Descent.Portability.PortabilityIdentification
 import Descent.Portability.EndToEndCorrelationSeries
 import Descent.Pangenome.GraphCoalescent.ReportNonMarkovFromSingletons
 import Descent.Pangenome.GraphCoalescent.FiberSizeIdentifiability
@@ -70,7 +71,7 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   `Σ_k c_k ⬝ (U · H_{4(k+1)}(x₀))` (`EndToEndCorrelationSeries.expectedSquaredCorrelation_eq_tsum`,
   `expectedSquaredCorrelation_historyEventKernel`), so it too depends on the history only through
   propagated moments (`expectedSquaredCorrelation_eq_of_moments_eq`).
-* Neutral portability is exactly local: `PortabilityLightCone`. No dual transition adds a locus,
+* Neutral portability is exactly local: `PortabilityExactLocality`. No dual transition adds a locus,
   so configurations on loci within `A` are invariant (`dualTransitions_lociWithin`), and two
   neutral models that agree on the rates of `A` give the same expected moments on `A` at every time
   (`expectedMomentVector_eq_of_agreeOn`): the report of a score on `A` does not depend on the model
@@ -104,6 +105,15 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   the target gap is the exact minimax risk for any number of source replicas
   (`PortabilityTwoHistoryInstance.isLeast_worstRisk`), with explicit floors for the target squared
   correlation and the portability ratio (`minimax_floor_r2`, `minimax_floor_r2Portability`).
+* What identifies target portability: `PortabilityIdentification`. In the NOTE1 §6 chronology
+  model the target report law is a transport of the source law by the coupling `L_ν(1)` of the
+  exposure law ν (`expectation_chronologyLaw_eq_transportExpectation`,
+  `normalisedCoupling_eq_measureLaplace_one`); two histories with one source law and one exposure
+  law have one target law (`chronologyMass_eq_of_source_eq_of_exposureLaw_eq`), and the plug-in
+  that uses ν has error at most `2B √(3/n)` from `n` source replicas
+  (`expectation_abs_plugIn_chronologyLaw_sub_le`). With the minimax bound this is an exact
+  information boundary: at `M = R = log 2` source-only estimators keep worst-case error `3/8` while
+  the ν-informed estimator has none (`logTwo_informationBoundary`).
 * The locality transition on inhomogeneous checking graphs: `InhomogeneousLocalityTransition`.
   For independent edges dominated by a rank-one kernel with weights `w`, the expected hereditary
   closure of `A` is at most `|A| + (Σ_{r∈A} w_r)/(1 - ν)` with `ν = Σ w² / Σ w < 1`, for every

@@ -719,7 +719,8 @@ import Descent.Portability.EndToEndPortabilityLaw
 import Descent.Portability.PortabilityTwoHistoryInstance
 import Descent.Portability.EndToEndPortabilityLipschitz
 import Descent.Portability.PortabilityMetricCompilation
-import Descent.Portability.PortabilityLightCone
+import Descent.Portability.PortabilityExactLocality
+import Descent.Portability.PortabilityIdentification
 import Descent.Portability.EndToEndCorrelationSeries
 
 assert_below Descent.Program
