@@ -7,5 +7,4 @@ import Descent.Pangenome.GraphCoalescent.MobiusTies
 
 open Descent.Pangenome.GraphCoalescent
 
-#print axioms topMobius_eq_mobiusCoefficient
 #print axioms topMobius_blocks_eq_mu

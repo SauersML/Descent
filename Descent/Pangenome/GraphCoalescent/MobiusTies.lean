@@ -19,10 +19,10 @@ of the partition lattice twice: in the connectivity cumulant (D2)–(D3) and in 
 `Coalescent.ER n` through a counting argument. `PartitionLatticeMobius.mu_finpartition_top`
 identifies `mobiusCoefficient` with the Möbius function of Mathlib's incidence algebra.
 
-This module records that all three are one coefficient. `topMobius_eq_mobiusCoefficient` shows
-that the two definitions agree at every block count, and `topMobius_blocks_eq_mu` shows that the
-coefficient `MultiplicativeConnectionLaw` attaches to a coalescent state is the incidence-algebra
-Möbius value of that state's partition against the top partition.
+`PartitionLatticeMobius.topMobius_eq_mobiusCoefficient` shows that the two definitions agree.
+This module adds `topMobius_blocks_eq_mu`: the coefficient `MultiplicativeConnectionLaw`
+attaches to a coalescent state is the incidence-algebra Möbius value of that state's partition
+against the top partition, so all three are one coefficient on the corpus state space.
 
 ## Empirical status
 
@@ -37,10 +37,6 @@ namespace Descent.Pangenome.GraphCoalescent
 
 open Finset Coalescent
 open scoped Classical
-
-/-- The top Möbius coefficient of `MultiplicativeConnectionLaw` is the Möbius coefficient of
-`ConnectivityCumulant` at every block count. -/
-theorem topMobius_eq_mobiusCoefficient (k : ℕ) : topMobius k = mobiusCoefficient k := rfl
 
 /-- The Möbius coefficient of a coalescent state on a nonempty sample is the Möbius function of
 Mathlib's incidence algebra on the partition lattice, evaluated at the state's partition and the
