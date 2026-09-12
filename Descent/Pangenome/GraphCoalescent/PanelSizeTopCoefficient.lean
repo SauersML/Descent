@@ -233,7 +233,6 @@ theorem spectralCoeff_bot_self_eq {n : ℕ} (hn : 2 ≤ n) (s : Fin n → Fin n)
   have h2 := hE b (n - 1) hb1 le_rfl
   rw [htop, hsplit, prod_div_distrib]
   field_simp
-  ring
 
 /-! ### The finite-difference form -/
 
