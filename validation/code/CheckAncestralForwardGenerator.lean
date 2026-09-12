@@ -1,0 +1,33 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.AncestralForwardGenerator
+
+/-! Axiom audit of AncestralForwardGenerator. -/
+
+open Descent.Portability.AncestralForwardGenerator
+
+#print axioms
+  Descent.Portability.AncestralForwardGenerator.tendsto_descFactorial_div_pow_expansion
+#print axioms Descent.Portability.AncestralForwardGenerator.eval_pderiv_X_eq_ite
+#print axioms Descent.Portability.AncestralForwardGenerator.eval_monomialPolynomial_eq_prod
+#print axioms Descent.Portability.AncestralForwardGenerator.tendsto_mul_eval_line_sub
+#print axioms Descent.Portability.AncestralForwardGenerator.forwardDrift
+#print axioms Descent.Portability.AncestralForwardGenerator.forwardGenerator
+#print axioms Descent.Portability.AncestralForwardGenerator.offspringLaw
+#print axioms Descent.Portability.AncestralForwardGenerator.nextGenerationMean
+#print axioms Descent.Portability.AncestralForwardGenerator.nextGenerationMean_eq_expectation
+#print axioms Descent.Portability.AncestralForwardGenerator.finitePopulationLaw_eq_add_drift
+#print axioms Descent.Portability.AncestralForwardGenerator.forwardGenerator_one
+#print axioms Descent.Portability.AncestralForwardGenerator.forwardGenerator_add
+#print axioms Descent.Portability.AncestralForwardGenerator.forwardGenerator_smul
+#print axioms Descent.Portability.AncestralForwardGenerator.nextGenerationMean_add
+#print axioms Descent.Portability.AncestralForwardGenerator.nextGenerationMean_smul
+#print axioms
+  Descent.Portability.AncestralForwardGenerator.tendsto_mul_lowOrderStirlingSum_div_pow
+#print axioms
+  Descent.Portability.AncestralForwardGenerator.tendsto_nextGenerationMean_monomialPolynomial
+#print axioms Descent.Portability.AncestralForwardGenerator.tendsto_nextGenerationMean
+#print axioms Descent.Portability.AncestralForwardGenerator.tendsto_nextGenerationMean_X
+#print axioms
+  Descent.Portability.AncestralForwardGenerator.tendsto_nextGenerationMean_covariance
