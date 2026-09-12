@@ -191,7 +191,7 @@ theorem massStep_comap {n w : ℕ} {label : Fin n → Fin w} (hsurj : Function.S
       hinj (hτ'.trans (comap_merge_labelBlock label τ hCD).symm)
     rw [hτ', filter_mergePair_merge _ hCD, hτ'', filter_mergePair_merge _ hne,
       Finset.sum_singleton, Finset.sum_singleton, Finset.prod_pair hCD, Finset.prod_pair hne,
-      blockMass_comap, blockMass_comap]
+      blockMass_comap label mass τ C, blockMass_comap label mass τ D]
   · have hleft : (univ.powersetCard 2).filter
         (fun t ↦ mergePair (Setoid.comap label τ) t = Setoid.comap label τ') = ∅ := by
       refine Finset.filter_eq_empty_iff.mpr fun t ht heq ↦ hmerge ?_
@@ -237,7 +237,8 @@ theorem multiplicativePathLaw_comap {n w : ℕ} (label : Fin n → Fin w)
   have hker := graphKer_labelInterface_eq_comap_bot label hsurj
   unfold multiplicativePathLaw labelMultiplicativePathLaw skeletonPathWeight
   congr 1
-  · by_cases h : y 0 = ⊥
+  · dsimp only
+    by_cases h : y 0 = ⊥
     · rw [if_pos h, if_pos (by rw [h, hker])]
     · rw [if_neg h, if_neg fun h' ↦ h (comap_label_injective hsurj (h'.trans hker))]
   · refine Finset.prod_congr rfl fun k _ ↦ ?_
