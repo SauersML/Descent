@@ -29,3 +29,33 @@ import Descent.Pangenome.GraphCoalescent.MultiplicativeCoupling
   Descent.Pangenome.GraphCoalescent.sum_excessStep
 #print axioms
   Descent.Pangenome.GraphCoalescent.sum_excessStep_le
+#print axioms
+  Descent.Pangenome.GraphCoalescent.coupledStep_nonneg
+#print axioms
+  Descent.Pangenome.GraphCoalescent.sum_coupledStep
+#print axioms
+  Descent.Pangenome.GraphCoalescent.coupledStep_absorb
+#print axioms
+  Descent.Pangenome.GraphCoalescent.observed_eq_of_not_coupledSep
+#print axioms
+  Descent.Pangenome.GraphCoalescent.coupledStep_hazard
+#print axioms
+  Descent.Pangenome.GraphCoalescent.coupledStep_drift
+#print axioms
+  Descent.Pangenome.GraphCoalescent.coupled_separationMass_le
+#print axioms
+  Descent.Pangenome.GraphCoalescent.sum_coupledStep_fst
+#print axioms
+  Descent.Pangenome.GraphCoalescent.sum_coupledStep_snd
+#print axioms
+  Descent.Pangenome.GraphCoalescent.sum_filter_path_comp_eq
+#print axioms
+  Descent.Pangenome.GraphCoalescent.sum_filter_coupled_report_eq
+#print axioms
+  Descent.Pangenome.GraphCoalescent.sum_filter_coupled_multiplicative_eq
+#print axioms
+  Descent.Pangenome.GraphCoalescent.report_multiplicative_pathTotalVariation_le
+#print axioms
+  Descent.Pangenome.GraphCoalescent.report_multiplicative_pathTotalVariation_le_one
+#print axioms
+  Descent.Pangenome.GraphCoalescent.report_multiplicative_poissonTotalVariation_le

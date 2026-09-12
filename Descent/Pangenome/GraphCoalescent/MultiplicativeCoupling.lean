@@ -781,14 +781,14 @@ theorem sum_coupledStep_snd {n : ℕ} (s : Fin n → Fin n) (X : CoupledState n)
 
 /-- **Lumping at path level**: if a kernel's mass into every fiber of `π` depends only on the
 image of the source, the image of its path law is the path law of the lumped kernel. -/
-theorem sum_filter_path_comp_eq {S X : Type*} [Fintype S] [DecidableEq X]
+theorem sum_filter_path_comp_eq {S X : Type*} [Fintype S] [Fintype X] [DecidableEq X]
     (P : S → S → ℝ) (μ₀ : S → ℝ) (Q : X → X → ℝ) (ν₀ : X → ℝ) (π : S → X)
     (hlump : ∀ s x, ∑ t ∈ univ.filter (fun t ↦ π t = x), P s t = Q (π s) x)
     (hinit : ∀ x, ∑ s ∈ univ.filter (fun s ↦ π s = x), μ₀ s = ν₀ x) (m : ℕ)
     (y : Fin (m + 1) → X) :
     ∑ ω ∈ univ.filter (fun ω : Fin (m + 1) → S ↦ (fun k ↦ π (ω k)) = y),
         skeletonPathWeight P μ₀ m ω = skeletonPathWeight Q ν₀ m y := by
-  induction m generalizing y with
+  induction m with
   | zero =>
     have hiff : ∀ ω : Fin 1 → S, ((fun k ↦ π (ω k)) = y) ↔ π (ω 0) = y 0 := by
       intro ω
@@ -812,7 +812,7 @@ theorem sum_filter_path_comp_eq {S X : Type*} [Fintype S] [DecidableEq X]
     · rw [← Finset.sum_filter, hinit, skeletonPathWeight, Fin.prod_univ_zero, mul_one]
   | succ m ih =>
     have hiff : ∀ (ω' : Fin (m + 1) → S) (x : S),
-        ((fun k ↦ π (Fin.snoc ω' x k)) = y)
+        ((fun k ↦ π (Fin.snoc (α := fun _ ↦ S) ω' x k)) = y)
           ↔ ((fun k ↦ π (ω' k)) = Fin.init y ∧ π x = y (Fin.last (m + 1))) := by
       intro ω' x
       constructor
@@ -830,7 +830,7 @@ theorem sum_filter_path_comp_eq {S X : Type*} [Fintype S] [DecidableEq X]
           simpa [Fin.snoc_castSucc, Fin.init] using hj
     rw [Finset.sum_filter, sum_pi_fin_succ]
     calc ∑ ω' : Fin (m + 1) → S, ∑ x : S,
-          (if (fun k ↦ π (Fin.snoc ω' x k)) = y then
+          (if (fun k ↦ π (Fin.snoc (α := fun _ ↦ S) ω' x k)) = y then
             skeletonPathWeight P μ₀ (m + 1) (Fin.snoc ω' x) else 0)
         = ∑ ω' : Fin (m + 1) → S,
             (if (fun k ↦ π (ω' k)) = Fin.init y then
@@ -843,7 +843,7 @@ theorem sum_filter_path_comp_eq {S X : Type*} [Fintype S] [DecidableEq X]
             refine Finset.sum_congr rfl fun x _ ↦ ?_
             by_cases h2 : π x = y (Fin.last (m + 1))
             · rw [if_pos ((hiff ω' x).mpr ⟨h1, h2⟩), if_pos h2, skeletonPathWeight_snoc]
-            · rw [if_neg fun h ↦ h2 ((hiff ω' x).mp h).2, if_neg h2, mul_zero]
+            · rw [if_neg fun h ↦ h2 ((hiff ω' x).mp h).2, if_neg h2]
           · rw [if_neg h1]
             exact Finset.sum_eq_zero fun x _ ↦ if_neg fun h ↦ h1 ((hiff ω' x).mp h).1
       _ = ∑ ω' ∈ univ.filter (fun ω' : Fin (m + 1) → S ↦ (fun k ↦ π (ω' k)) = Fin.init y),
