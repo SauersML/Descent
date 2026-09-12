@@ -28,6 +28,8 @@ import Descent.Pangenome.AncestralLocality.SelectionLightCone
 import Descent.Pangenome.GraphCoalescent.PanelSizeIdentifiability
 import Descent.Pangenome.GraphCoalescent.FiberSizeIdentifiabilityFour
 import Descent.Pangenome.GraphCoalescent.ReportInhomogeneousMarkov
+import Descent.Pangenome.GraphCoalescent.PanelSizeTopCoefficient
+import Descent.Pangenome.GraphTransitVariance
 
 namespace Descent.Program
 
@@ -127,8 +129,19 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   unknown the law does not determine the panel size: every interface of width at most one gives
   the point mass at zero (`PanelSizeIdentifiability.exists_panelSize_collision`); two first-step
   laws with nonzero top spectral coefficients come from equal panel sizes
-  (`panelSize_eq_of_survivalAt_eq`), and whether that coefficient is nonzero at every width two or
+  (`panelSize_eq_of_survivalAt_eq`). The top coefficient has a residue formula
+  (`PanelSizeTopCoefficient.spectralCoeff_bot_self_eq`), and `σ_n C(2n-2, n-1)` is an iterated
+  forward difference of weighted stopping probabilities
+  (`spectralCoeff_bot_self_mul_choose_eq_fwdDiff`). For an injective interface
+  `σ_n C(2n-2, n-1) = (-1)^n n`, so the coefficient is nonzero and the panel size is identified
+  (`spectralCoeff_bot_self_mul_choose_of_injective`,
+  `panelSize_eq_of_survivalAt_eq_of_injective`). Whether it is nonzero at every width two or
   more is open.
+* The spread of the graph coalescent's transit time: `GraphTransitVariance`. A graph entering at
+  width `w` reports a smaller transit-time variance than its panel, short by exactly the phases
+  between `w` and `n` (`graphVarianceDeficit_eq`), and a coarser construction loses more
+  (`graphVarianceDeficit_antitone`); the lower bound `1` survives compression
+  (`one_le_graphVarTransitTime`).
 * Correcting the apparent coalescence clock: `HiddenClockCorrection`. The panel's time to common
   ancestry is the connection time plus a residual time on every path
   (`panelTime_eq_connectionTime_add_residualTime`); the hidden load at connection satisfies

@@ -15,6 +15,7 @@ import Descent.Pangenome.GraphCoalescent.ReportedConnectionTies
 import Descent.Pangenome.GraphCoalescent.ShortTimeConnectionLaw
 import Descent.Pangenome.GraphCoalescent.TwoComponentSurvival
 import Descent.Pangenome.GraphCoalescent.KilledSurvivalMean
+import Descent.Pangenome.GraphCoalescent.HiddenLoadContinuousTime
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulant
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulantDegree
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulantCorpus
@@ -288,8 +289,12 @@ inside it.
   into the note's merger recursion `H_w(c)` (`minimalHistoryCount_eq_historyWeight`).
 
 Scope. Theorem A is proved as cover counts with Kingman's unit rate per cover, and under the
-corpus jump chain the hidden state is a Markov chain (`HiddenStateChain.hiddenChainLaw_succ`); the
-continuous-time holding times are not constructed.
+corpus jump chain the hidden state is a Markov chain (`HiddenStateChain.hiddenChainLaw_succ`).
+On the trajectory-and-clock law, the one-dimensional marginals of the hidden-load process factor
+over the level (`HiddenLoadContinuousTime.trajectoryClockLaw_hiddenLoadAt`) and obey the
+integrated forward equation of the lumped rates (A1)-(A3) (`hiddenLoadLaw_forward`). The
+transition function is not identified with the matrix exponential of the lumped generator, and
+the Markov property at fixed times is not proved.
 The survival function of (A4) is `α e^{tQ} 𝟙` of the killed generator, and its integral from
 positive loads is the mean connection time of a two-component report
 (`KilledSurvivalMean.integral_survival_eq_loadMean`, `meanConnectionTime_eq_loadMean`).
