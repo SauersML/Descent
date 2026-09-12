@@ -40,7 +40,8 @@ maps from the sample to `x` labels that are constant on the blocks of `τ` by th
 lifted to an identity of integer polynomials and read at the linear coefficient.
 `Descent.Pangenome.TripleGluing` records the same coefficient at order three.
 
-Not formalised in this module: the two-fiber and three-equal-fiber evaluations of (F4).
+The two-fiber and three-equal-fiber evaluations of the note are in
+`MultiplicativeConnectionExamples`.
 
 ## Empirical status
 
