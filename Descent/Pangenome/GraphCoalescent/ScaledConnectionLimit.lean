@@ -516,12 +516,12 @@ theorem sum_configMass_add_mul {w : ℕ} (p : Fin w → ℝ) (u t : ℝ)
     intro K
     calc ∑ G, ∑ H, configMass p u G * configMass p t H
           * (if (fun e ↦ G e || H e) = K then (1 : ℝ) else 0)
-        = ∑ G, ∑ H, ∏ e, edgeMass p u e (G e)
+        = ∑ G : FiberPair w → Bool, ∑ H : FiberPair w → Bool, ∏ e, edgeMass p u e (G e)
             * (edgeMass p t e (H e) * if (G e || H e) = K e then (1 : ℝ) else 0) := by
           refine Finset.sum_congr rfl fun G _ ↦ Finset.sum_congr rfl fun H _ ↦ ?_
           rw [hind G H K, configMass_eq_prod_edgeMass, configMass_eq_prod_edgeMass, mul_assoc,
             ← Finset.prod_mul_distrib, ← Finset.prod_mul_distrib]
-      _ = ∑ G, ∏ e, ∑ b, edgeMass p u e (G e)
+      _ = ∑ G : FiberPair w → Bool, ∏ e, ∑ b, edgeMass p u e (G e)
             * (edgeMass p t e b * if (G e || b) = K e then (1 : ℝ) else 0) := by
           refine Finset.sum_congr rfl fun G _ ↦ ?_
           have hexpand := Finset.prod_univ_sum (fun _ : FiberPair w ↦ (univ : Finset Bool))
