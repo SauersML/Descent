@@ -175,7 +175,7 @@ theorem summable_dualTerm {c : ℝ} (hc : 0 ≤ c) {r : E → ℝ} (hr : ∀ e, 
       fun K ↦ ?_)
   calc ∑ k ∈ range K, ‖samplingFunction (dysonTerm c r T f k t)‖
       ≤ ∑ k ∈ range (K + 1), ‖samplingFunction (dysonTerm c r T f k t)‖ :=
-        sum_le_sum_of_subset_of_nonneg (range_subset.mpr (Nat.le_succ K))
+        sum_le_sum_of_subset_of_nonneg (range_mono (Nat.le_succ K))
           fun _ _ _ ↦ norm_nonneg _
     _ ≤ ∑ k ∈ range (K + 1), yuleMoment n k * yuleWeight n (∑ e, r e) k t * ‖f‖ :=
         sum_le_sum fun k _ ↦ (norm_samplingFunction_dysonTerm_le hc hr T f k ht).trans
@@ -430,10 +430,17 @@ def decisionLightConeApproximation {c : ℝ} (hc : 0 ≤ c) {r : E → ℝ} (hr 
     have hfF : samplingFunction f = F := Classical.choose_spec (Classical.choose_spec h)
     by_cases hF0 : ‖F‖ = 0
     · have hzero : F = 0 := norm_eq_zero.mp hF0
-      rw [hzero]
+      have h0m : (decisionApproximations hc hr T m).operator t F = 0 := by rw [hzero, map_zero]
+      have h0m' : (decisionApproximations hc hr T m').operator t F = 0 := by
+        rw [hzero, map_zero]
+      rw [h0m, h0m', sub_zero, norm_zero, hF0]
       simp
     · have hpos : 0 < 2 * ‖F‖ := mul_pos two_pos ((norm_nonneg F).lt_of_ne (Ne.symm hF0))
-      rw [← mul_div_assoc, mul_div_cancel_left₀ _ hpos.ne', ← hfF]
+      have hm1 : (decisionApproximations hc hr T m).operator t F =
+          (decisionApproximations hc hr T m).operator t (samplingFunction f) := by rw [hfF]
+      have hm2 : (decisionApproximations hc hr T m').operator t F =
+          (decisionApproximations hc hr T m').operator t (samplingFunction f) := by rw [hfF]
+      rw [← mul_div_assoc, mul_div_cancel_left₀ _ hpos.ne', hm1, hm2]
       have h1 := norm_decisionApproximations_sub_le hc hr T m f htT
       have h2 := norm_decisionApproximations_sub_le hc hr T m' f htT
       have hstep := stepSize_antitone hmm'
