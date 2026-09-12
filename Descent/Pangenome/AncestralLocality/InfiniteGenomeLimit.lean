@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Layer
+import Descent.Pangenome.AncestralLocality.CylinderSamplingAlgebra
 import Mathlib.Topology.ContinuousMap.StoneWeierstrass
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
@@ -18,7 +19,8 @@ converge uniformly, with error at most `2 ‖f‖_∞ Pr(E_{ℓ,T})` from the li
 the cylinder sampling polynomials are dense in `C(P(H))`; the limiting operators extend to
 positive, constant-preserving contractions obeying the semigroup law and strong continuity; and
 the limit is unique through the separating algebra. This module proves the operator half of those
-steps on any compact space `X` with a point-separating subalgebra `A` of observables.
+steps on any compact space `X` with a point-separating subalgebra `A` of observables, and applies
+it to `P({0,1}^V)` with the cylinder sampling algebra of `CylinderSamplingAlgebra`.
 
 `FellerSemigroup X` is a family of positive, constant-preserving sup-norm contractions of
 `C(X, ℝ)` with the semigroup law and strong continuity at time zero, which gives strong continuity
@@ -40,12 +42,18 @@ Uniqueness. `operator_eq_of_eqOn` shows that two Feller semigroups agreeing on a
 subalgebra agree everywhere, and `limitSemigroup_eq_of_tendsto` is independence of the exhaustion:
 two approximating sequences whose operators approach each other on `A` have the same limit.
 
+Theorem 9. `infiniteGenomeSemigroup S approx` is the limit on the genome laws `P({0,1}^V)` of a
+countable genome, with `CylinderSamplingAlgebra.samplingAlgebra V` as the separating algebra on
+the compact space `P({0,1}^V)` (`CylinderSamplingAlgebra.compactSpace_probabilityMeasure`).
+`tendsto_infiniteGenomeSemigroup` is convergence of the finite-genome operators on every
+observable, `operator_eq_infiniteGenomeSemigroup` is uniqueness through the cylinder sampling
+polynomials, and `infiniteGenomeSemigroup_eq_of_tendsto` is independence of the exhaustion.
+
 Scope. The finite-genome models, their transition semigroups lifted to `C(X, ℝ)`, and the light-cone
 bound are hypotheses here: `S` is data and `LightConeApproximation` carries the bound of Theorem 8
-as a named hypothesis until the locality bounds are available. The space `P({0,1}^V)`, its
-compactness and the cylinder sampling algebra are not constructed in this module; the operator
-statements are proved for an arbitrary compact space and separating subalgebra. The sampling duality
-of Theorem 6 and the circuit bounds (8.2) and (9.1) are not restated.
+as a named hypothesis; it is not derived from `LocalityBounds`. The space `P({0,1}^V)`, its
+compactness and the cylinder sampling algebra come from `CylinderSamplingAlgebra`. The sampling
+duality of Theorem 6 and the circuit bounds (8.2) and (9.1) are not restated.
 
 ## Empirical status
 
@@ -371,6 +379,56 @@ theorem limitSemigroup_eq_of_tendsto {S S' : ℕ → FellerSemigroup X} {A : Sub
   operator_eq_of_eqOn _ _ hA fun t f hf ↦ sub_eq_zero.mp (tendsto_nhds_unique
     ((tendsto_limitSemigroup hA approx t f).sub (tendsto_limitSemigroup hA approx' t f))
     (hclose t f hf))
+
+/-! ## Theorem 9 on the genome laws of a countable genome -/
+
+section InfiniteGenome
+
+open CylinderSamplingAlgebra
+
+variable {V : Type*} [Countable V]
+
+/-- **Theorem 9, the limiting semigroup.** For a countable genome `V`, Feller semigroups on the
+genome laws `P({0,1}^V)` along an exhaustion that obey the light-cone approximation bound on the
+cylinder sampling polynomials converge to one Feller semigroup. -/
+def infiniteGenomeSemigroup (S : ℕ → FellerSemigroup (ProbabilityMeasure (V → Bool)))
+    (approx : LightConeApproximation S (samplingAlgebra V)) :
+    FellerSemigroup (ProbabilityMeasure (V → Bool)) :=
+  limitSemigroup samplingAlgebra_separatesPoints approx
+
+/-- The finite-genome operators converge to the limiting semigroup on every continuous observable
+of the genome law. -/
+theorem tendsto_infiniteGenomeSemigroup (S : ℕ → FellerSemigroup (ProbabilityMeasure (V → Bool)))
+    (approx : LightConeApproximation S (samplingAlgebra V)) (t : ℝ≥0)
+    (g : C(ProbabilityMeasure (V → Bool), ℝ)) :
+    Tendsto (fun m ↦ (S m).operator t g) atTop
+      (𝓝 ((infiniteGenomeSemigroup S approx).operator t g)) :=
+  tendsto_limitSemigroup samplingAlgebra_separatesPoints approx t g
+
+/-- **Uniqueness through the cylinder sampling polynomials.** A Feller semigroup on `P({0,1}^V)`
+that agrees with the limit on every cylinder sampling polynomial is the limit. -/
+theorem operator_eq_infiniteGenomeSemigroup
+    (S : ℕ → FellerSemigroup (ProbabilityMeasure (V → Bool)))
+    (approx : LightConeApproximation S (samplingAlgebra V))
+    (P : FellerSemigroup (ProbabilityMeasure (V → Bool)))
+    (h : ∀ t, ∀ f ∈ samplingAlgebra V,
+      P.operator t f = (infiniteGenomeSemigroup S approx).operator t f) :
+    P.operator = (infiniteGenomeSemigroup S approx).operator :=
+  operator_eq_of_eqOn P _ samplingAlgebra_separatesPoints h
+
+/-- **The limit on `P({0,1}^V)` does not depend on the exhaustion.** Two approximating sequences
+whose operators approach each other on the cylinder sampling polynomials have the same limit. -/
+theorem infiniteGenomeSemigroup_eq_of_tendsto
+    {S S' : ℕ → FellerSemigroup (ProbabilityMeasure (V → Bool))}
+    (approx : LightConeApproximation S (samplingAlgebra V))
+    (approx' : LightConeApproximation S' (samplingAlgebra V))
+    (hclose : ∀ t, ∀ f ∈ samplingAlgebra V,
+      Tendsto (fun m ↦ (S m).operator t f - (S' m).operator t f) atTop (𝓝 0)) :
+    (infiniteGenomeSemigroup S approx).operator =
+      (infiniteGenomeSemigroup S' approx').operator :=
+  limitSemigroup_eq_of_tendsto samplingAlgebra_separatesPoints approx approx' hclose
+
+end InfiniteGenome
 
 end
 

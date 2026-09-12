@@ -33,5 +33,9 @@ namespace Descent.Pangenome.AncestralLocality.InfiniteGenomeLimit
 #print axioms tendsto_limitSemigroup
 #print axioms operator_eq_of_eqOn
 #print axioms limitSemigroup_eq_of_tendsto
+#print axioms infiniteGenomeSemigroup
+#print axioms tendsto_infiniteGenomeSemigroup
+#print axioms operator_eq_infiniteGenomeSemigroup
+#print axioms infiniteGenomeSemigroup_eq_of_tendsto
 
 end Descent.Pangenome.AncestralLocality.InfiniteGenomeLimit
