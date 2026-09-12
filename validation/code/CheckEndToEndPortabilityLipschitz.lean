@@ -8,7 +8,6 @@ import Descent.Portability.EndToEndPortabilityLipschitz
 open Descent.Portability.EndToEndPortabilityLipschitz
 
 #print axioms abs_mul_sub_mul_le
-#print axioms abs_div_sub_div_le
 #print axioms rateHistoryDualPropagator_eq_caratheodory
 #print axioms norm_rateHistoryDualPropagator_sub_le
 #print axioms abs_integral_correlationNumerator_sub_le
