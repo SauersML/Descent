@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.Kernel
 import Descent.Pangenome.GraphCoalescent.HiddenLoads
+import Descent.Pangenome.GraphCoalescent.LumpingVisibleRates
 import Descent.Pangenome.GraphCoalescent.MultiplicativeObservation
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
@@ -256,48 +257,14 @@ theorem sum_loadDeficit_scaled {n : ℕ} (s : Fin n → Fin n) (ξ : ER n) :
 /-! ### Visible covers, counted by report state -/
 
 /-- **A cover of `ξ` reports the merge of `C` and `D` exactly when it is a visible cover joining
-them.** -/
+them.**  `LumpingVisibleRates.covers_observed_eq_merge_iff`, stated for two components rather than
+two individuals. -/
 theorem covers_observed_eq_merge_iff {n : ℕ} (s : Fin n → Fin n) (ξ : ER n)
     {C D : Quotient (observed s ξ)} (hCD : C ≠ D) (η : ER n) :
     Covers ξ η ∧ observed s η = merge (observed s ξ) C D ↔ η ∈ visibleCovers s ξ C D := by
-  constructor
-  · rintro ⟨hcov, hobs⟩
-    obtain ⟨A, B, hAB, rfl⟩ := (covers_iff_exists_merge ξ η).mp hcov
-    obtain ⟨x, rfl⟩ := quotient_mk_surjective ξ A
-    obtain ⟨y, rfl⟩ := quotient_mk_surjective ξ B
-    by_cases hxy : (observed s ξ).r x y
-    · rw [observed_merge_of_rel hAB hxy] at hobs
-      have hb := blocks_merge (observed s ξ) hCD
-      rw [← hobs] at hb
-      omega
-    · rw [observed_merge_of_not_rel hAB hxy] at hobs
-      have hxy' : Quotient.mk (observed s ξ) x ≠ Quotient.mk (observed s ξ) y :=
-        fun h ↦ hxy (Quotient.exact h)
-      have hpair := (merge_eq_merge_iff (observed s ξ) hxy' hCD).mp hobs
-      have hx : Quotient.mk (observed s ξ) x ∈ ({C, D} : Finset (Quotient (observed s ξ))) :=
-        hpair ▸ Finset.mem_insert_self _ _
-      have hy : Quotient.mk (observed s ξ) y ∈ ({C, D} : Finset (Quotient (observed s ξ))) :=
-        hpair ▸ Finset.mem_insert_of_mem (Finset.mem_singleton_self _)
-      simp only [Finset.mem_insert, Finset.mem_singleton] at hx hy
-      rcases hx with hx | hx <;> rcases hy with hy | hy
-      · exact absurd (hx.trans hy.symm) hxy'
-      · exact ⟨Quotient.mk ξ x, Finset.mem_filter.mpr ⟨Finset.mem_univ _, hx⟩,
-          Quotient.mk ξ y, Finset.mem_filter.mpr ⟨Finset.mem_univ _, hy⟩, rfl⟩
-      · exact ⟨Quotient.mk ξ y, Finset.mem_filter.mpr ⟨Finset.mem_univ _, hy⟩,
-          Quotient.mk ξ x, Finset.mem_filter.mpr ⟨Finset.mem_univ _, hx⟩, merge_comm ξ hAB⟩
-      · exact absurd (hx.trans hy.symm) hxy'
-  · intro hη
-    refine ⟨(covers_covers_of_mem_visibleCovers hCD hη).1, ?_⟩
-    obtain ⟨a, ha, b, hb, rfl⟩ := hη
-    obtain ⟨x, rfl⟩ := quotient_mk_surjective ξ a
-    obtain ⟨y, rfl⟩ := quotient_mk_surjective ξ b
-    have hxC : Quotient.mk (observed s ξ) x = C := (Finset.mem_filter.mp ha).2
-    have hyD : Quotient.mk (observed s ξ) y = D := (Finset.mem_filter.mp hb).2
-    have hxy : ¬ (observed s ξ).r x y :=
-      fun h ↦ hCD (hxC.symm.trans ((Quotient.sound h).trans hyD))
-    have hab : Quotient.mk ξ x ≠ Quotient.mk ξ y :=
-      fun h ↦ hxy (le_observed s ξ (Quotient.exact h))
-    rw [observed_merge_of_not_rel hab hxy, hxC, hyD]
+  obtain ⟨x, rfl⟩ := quotient_mk_surjective (observed s ξ) C
+  obtain ⟨y, rfl⟩ := quotient_mk_surjective (observed s ξ) D
+  exact LumpingVisibleRates.covers_observed_eq_merge_iff s ξ (fun h ↦ hCD (Quotient.sound h)) η
 
 /-- **The visible mass into a new report state is the lumped visible rate.**  The covers of `ξ`
 whose report is `ζ' ≠ Y`, at `1/n²` each, carry `L_C L_D/n²` when `ζ'` merges `C` and `D`, and
