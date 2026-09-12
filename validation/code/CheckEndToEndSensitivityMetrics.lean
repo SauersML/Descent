@@ -1,0 +1,25 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.EndToEndSensitivityMetrics
+
+/-! Axiom audit of EndToEndSensitivityMetrics. -/
+
+open Descent.Portability.EndToEndSensitivityMetrics
+
+#print axioms hasDerivAt_crossRatio
+#print axioms crossRatioDerivative_neg_iff
+#print axioms crossRatioDerivative_eq_mul
+#print axioms crossRatioDerivative_neg_iff_of_pos
+#print axioms hasDerivAt_of_eq_dotProduct
+#print axioms hasDerivAt_integral_polynomial_historyEventKernel
+#print axioms hasDerivAt_integral_correlationNumerator_historyEventKernel
+#print axioms hasDerivAt_integral_correlationDenominator_historyEventKernel
+#print axioms hasDerivAt_integral_covariance_historyEventKernel
+#print axioms hasDerivAt_integral_variance_historyEventKernel
+#print axioms hasDerivAt_integral_aucNumerator_historyEventKernel
+#print axioms hasDerivAt_integral_aucDenominator_historyEventKernel
+#print axioms hasDerivAt_expectedPortability_historyEventKernel
+#print axioms hasDerivAt_expectedCalibrationSlope_historyEventKernel
+#print axioms hasDerivAt_expectedCalibrationPortability_historyEventKernel
+#print axioms hasDerivAt_expectedAUCPortability_historyEventKernel

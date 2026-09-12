@@ -127,7 +127,8 @@ theorem hasDerivAt_exp_smul_of_hasDerivAt {Q : ℝ → Matrix ι ι ℝ} {Q' : M
   have hparametric : Continuous fun p : Matrix ι ι ℝ × Matrix ι ι ℝ ↦
       ∫ s in (0 : ℝ)..τ, NormedSpace.exp ℝ (s • p.1) * p.2 * NormedSpace.exp ℝ ((τ - s) • Q θ₀) :=
     intervalIntegral.continuous_parametric_intervalIntegral_of_continuous'
-      (f := fun p s ↦ NormedSpace.exp ℝ (s • p.1) * p.2 * NormedSpace.exp ℝ ((τ - s) • Q θ₀))
+      (f := fun (p : Matrix ι ι ℝ × Matrix ι ι ℝ) (s : ℝ) ↦
+        NormedSpace.exp ℝ (s • p.1) * p.2 * NormedSpace.exp ℝ ((τ - s) • Q θ₀))
       hjoint 0 τ
   have hslope : slope (fun θ ↦ NormedSpace.exp ℝ (τ • Q θ)) θ₀ = fun θ ↦
       ∫ s in (0 : ℝ)..τ, NormedSpace.exp ℝ (s • Q θ) * slope Q θ₀ θ
@@ -156,6 +157,7 @@ theorem hasDerivAt_of_hasDerivAt_apply {Q : ℝ → Matrix ι ι ℝ} {Q' : Matr
   exact (hsum.congr_deriv (Matrix.matrix_eq_sum_single Q').symm).congr_of_eventuallyEq
     (Filter.Eventually.of_forall fun θ ↦ Matrix.matrix_eq_sum_single (Q θ))
 
+omit [DecidableEq ι] in
 /-- A differentiable matrix path has differentiable entries. -/
 theorem hasDerivAt_apply {M : ℝ → Matrix ι ι ℝ} {M' : Matrix ι ι ℝ} {θ₀ : ℝ}
     (hM : HasDerivAt M M' θ₀) (i j : ι) : HasDerivAt (fun θ ↦ M θ i j) (M' i j) θ₀ :=
