@@ -459,7 +459,8 @@ def neutralMicroscopicApproximation (rates : NeutralRates Deme Locus Allele)
         Tendsto (fun h : ℝ ↦ smallConstant rates (featureBound rates capacity) * Real.sqrt h)
         (𝓝[>] 0) (𝓝 0) := by
       have h := ((Real.continuous_sqrt.tendsto 0).const_mul
-        (smallConstant rates (featureBound rates capacity))).mono_left nhdsWithin_le_nhds
+        (smallConstant rates (featureBound rates capacity))).mono_left
+          (nhdsWithin_le_nhds (s := Set.Ioi (0 : ℝ)))
       simpa using h
     refine hsqrt.congr' ?_
     filter_upwards [Ioo_mem_nhdsGT (smallStep_pos rates)] with h hh
