@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Layer
+import Descent.Pangenome.AncestralLocality.AncestralDecision
 import Descent.Pangenome.AncestralLocality.LocalityCoupling
 import Mathlib.Algebra.BigOperators.Ring.Multiset
 import Mathlib.Algebra.Order.BigOperators.Group.Multiset
@@ -23,7 +24,11 @@ The spec is `ANCESTRAL_LOCALITY.md` §8-9: Theorems 7 and 8, Corollary 8.1 and t
 As far as its support tags go, the backward decision circuit of the sampling dual is the
 multiset of the supports `A_a ⊆ V` of its arguments. `branchSupports` is the update (7.6) of a
 decision along `i → j`, `coalesceSupports` joins the supports of two identified arguments, and
-`supportGenerator` is the ancestral generator on functions of the state.
+`supportGenerator` is the ancestral generator on functions of the state. A tag state
+`A : Fin n → Finset V` of `Descent.Pangenome.AncestralLocality.AncestralDecision` gives the
+multiset `univ.val.map A`. Its weighted count is `tagWeight w A` (`weightedCount_map_univ`), its
+size is `tagCount A` (`supportSize_map_univ`), and its decision rate is `decisionRate r A`
+(`supportDecisionRate_map_univ`).
 
 ## Theorem 7
 
@@ -401,6 +406,32 @@ theorem coalesceSupports_mem_escapeSet {r : V → V → ℝ} {A : Finset V} {ℓ
     exact Multiset.count_pos.mpr hS
 
 end Supports
+
+/-! ### The tag form of `AncestralDecision` -/
+
+section Tags
+
+variable {V : Type*} {n : ℕ}
+
+/-- **The multiset count is the tag weight.** The supports of the arguments `A : Fin n → Finset V`,
+read as a multiset, have weighted count `tagWeight w A`. -/
+theorem weightedCount_map_univ (w : V → ℝ) (A : Fin n → Finset V) :
+    weightedCount w (univ.val.map A) = tagWeight w A := by
+  rw [weightedCount, Multiset.map_map]
+  rfl
+
+/-- **The multiset support size is the tag count** `tagCount A`. -/
+theorem supportSize_map_univ (A : Fin n → Finset V) :
+    supportSize (univ.val.map A) = tagCount A := by
+  rw [← weightedCount_one, weightedCount_map_univ, tagWeight_one]
+
+/-- **The multiset decision rate is the tag decision rate** `decisionRate r A`. -/
+theorem supportDecisionRate_map_univ [Fintype V] (r : V → V → ℝ) (A : Fin n → Finset V) :
+    supportDecisionRate r (univ.val.map A) = decisionRate r A := by
+  rw [supportDecisionRate, Multiset.map_map]
+  rfl
+
+end Tags
 
 /-! ### Grönwall's inequality along a right derivative -/
 

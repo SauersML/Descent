@@ -19,6 +19,9 @@ open Descent.Pangenome.AncestralLocality
 #print axioms replicate_not_mem_escapeSet
 #print axioms branchSupports_mem_escapeSet
 #print axioms coalesceSupports_mem_escapeSet
+#print axioms weightedCount_map_univ
+#print axioms supportSize_map_univ
+#print axioms supportDecisionRate_map_univ
 #print axioms le_mul_exp_of_hasDerivWithinAt
 #print axioms le_div_three_mul_exp_sub_one
 #print axioms integral_le_mul_exp_of_supportGenerator_le
