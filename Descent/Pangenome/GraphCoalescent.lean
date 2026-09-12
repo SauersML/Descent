@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.GraphCoalescent.BalancedFiberExtremum
+import Descent.Pangenome.GraphCoalescent.ConnectionClockPathLaw
 import Descent.Pangenome.GraphCoalescent.ConnectivityClockTable
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulant
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulantCorpus
@@ -26,7 +27,6 @@ import Descent.Pangenome.GraphCoalescent.MultiInterfaceGenerator
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceLoads
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceOutcome
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionLaw
-import Descent.Pangenome.GraphCoalescent.MultiplicativeCoupling
 import Descent.Pangenome.GraphCoalescent.MultiplicativeObservation
 import Descent.Pangenome.GraphCoalescent.Observation
 import Descent.Pangenome.GraphCoalescent.PartitionLatticeMobius
