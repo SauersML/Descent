@@ -126,6 +126,12 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   (`crossScorePortabilityRatio_eq_diagonal_add`) that vanishes for uncorrelated ancestral LD
   (`crossScorePortabilityRatio_eq_of_uncorrelated`), and sign-cancelling pairs make the ratio
   rise (`not_antitoneOn_cancellingDecay`).
+  For a split with no migration or mutation the tag-locus retention surface is
+  `e^{-r(d) τ(t)}`, one at the split and decreasing in time and in separation
+  (`splitLDRetention_eq`, `splitLDRetention_antitone_generation`,
+  `splitLDRetention_antitone_separation`). It is the unascertained expected squared correlation
+  and does not fill the model field `ldRetentionAt`, whose measured amplitude divides by the
+  within-deme `E[D²]` under ongoing migration.
 * What a portability curve identifies: `PortabilityCurveIdentifiability`. With a random split
   time, the split-law average of each history's ratio is the Laplace curve `E[e^{-rT}]` for any
   drift (`meanSplitPortabilityRatio_eq`), and its values at `k r₀` determine the split-time law
