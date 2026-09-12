@@ -213,7 +213,7 @@ theorem exists_eventually_graphProb_largeCount_le {α δ η : ℝ} (hα : 1 < α
     rw [hexp]
     linarith
   have hδη : 0 < (δ - η₁) * m := mul_pos (by linarith) hm
-  have hcheb := graphProb_le_sub_le hp0 hp1 (fun E ↦ largeCount E K)
+  have hcheb := graphProb_le_sub_le (m := m) hp0 hp1 (fun E ↦ largeCount E K)
     ((giantFraction α - η₁) * m) ((δ - η₁) * m) hδη
   have hmono : graphProb m (α / m) (fun E ↦ largeCount E K ≤ (giantFraction α - δ) * m) ≤
       graphProb m (α / m)

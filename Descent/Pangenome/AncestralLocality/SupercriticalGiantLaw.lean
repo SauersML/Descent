@@ -332,12 +332,12 @@ theorem giantComponentLaw_of_one_lt {α : ℝ} (hα : 1 < α) : GiantComponentLa
     have hm : (0 : ℝ) < m := Nat.cast_pos.mpr h4
     have hp0 : 0 ≤ α / m := div_nonneg hα0.le hm.le
     have hp1 : α / m ≤ 1 := (div_le_one hm).mpr h3
-    have hand := graphProb_add_sub_one_le_and hp0 hp1
+    have hand := graphProb_add_sub_one_le_and (m := m) hp0 hp1
       (P := fun E ↦ ∃ v, (giantFraction α - ε₁) * m ≤ ((reach (edgeGraph E) {v}).card : ℝ))
       (Q := fun E ↦
         ((univ.filter fun w ↦ ε₁ * m ≤ ((reach (edgeGraph E) {w}).card : ℝ)).card : ℝ) ≤
           (giantFraction α + ε / 2) * m)
-    have hmono := graphProb_mono hp0 hp1
+    have hmono := graphProb_mono (m := m) hp0 hp1
       (P := fun E ↦ (∃ v, (giantFraction α - ε₁) * m ≤ ((reach (edgeGraph E) {v}).card : ℝ)) ∧
         ((univ.filter fun w ↦ ε₁ * m ≤ ((reach (edgeGraph E) {w}).card : ℝ)).card : ℝ) ≤
           (giantFraction α + ε / 2) * m)
