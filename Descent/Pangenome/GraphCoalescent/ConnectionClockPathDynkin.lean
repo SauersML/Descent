@@ -328,9 +328,14 @@ theorem lintegral_integral_clockCorrectionRate {n : ℕ} (hn : 2 ≤ n) (s : Fin
     exact sum_congr rfl fun k _ ↦ ENNReal.ofReal_mul (hh0 _)
   have hmeas : ∀ k ∈ Ioc 1 n, Measurable fun p : List (ER n) × (ℕ → ℝ) ↦
       ENNReal.ofReal (unconnectedRate s (clockCorrectionRate s) (chainOfList p.1 k))
-        * ENNReal.ofReal (p.2 (k - 2)) := fun k _ ↦
-    ((measurable_of_countable _).comp measurable_fst).mul
-      ((ENNReal.measurable_ofReal.comp (measurable_pi_apply (k - 2))).comp measurable_snd)
+        * ENNReal.ofReal (p.2 (k - 2)) := by
+    intro k _
+    have hf : Measurable fun l : List (ER n) ↦
+        ENNReal.ofReal (unconnectedRate s (clockCorrectionRate s) (chainOfList l k)) :=
+      measurable_of_countable _
+    have hg : Measurable fun ω : ℕ → ℝ ↦ ENNReal.ofReal (ω (k - 2)) :=
+      ENNReal.measurable_ofReal.comp (measurable_pi_apply (k - 2))
+    exact (hf.comp measurable_fst).mul (hg.comp measurable_snd)
   have hlevel : ∀ k ∈ Ioc 1 n, ∫⁻ p, ENNReal.ofReal
         (unconnectedRate s (clockCorrectionRate s) (chainOfList p.1 k))
           * ENNReal.ofReal (p.2 (k - 2)) ∂(trajectoryClockLaw n)
