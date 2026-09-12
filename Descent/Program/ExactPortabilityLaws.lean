@@ -117,6 +117,7 @@ import Descent.Portability.NeutralBernsteinPositivity
 import Descent.Portability.NeutralMicroscopicEulerLimit
 import Descent.Portability.NeutralKernelPanelLikelihood
 import Descent.Portability.CylinderGaussianQuadrant
+import Descent.Portability.CylinderComputableCertificate
 import Descent.Portability.MultinomialHistoryRealization
 import Descent.Portability.PartialHaplotypeHistoryRealization
 import Descent.Portability.NonnegativeMicroscopicApproximation
@@ -331,8 +332,10 @@ the other target table rows, the 3960 shared-context count and the full-square r
 not yet proof-checked.
 `IntervalEvaluatorCertificate` assumes a
 finite measure, a common bound and pointwise vanishing widths;
-`CylinderIntervalCertificate` needs only almost sure vanishing widths on fair-bit streams but
-does not show that its rational values are computed by an algorithm. (32) takes almost sure
+`CylinderIntervalCertificate` needs only almost sure vanishing widths on fair-bit streams; its
+certificates are computed by recursion on word length (`CylinderComputableCertificate`,
+`lowerSum_eq_cylinderSum`, `upperSum_eq_cylinderSum`), with the uniform and quadrant instances
+evaluated in the kernel, and no efficient algorithm is given. (32) takes almost sure
 termination of the program as a hypothesis; it is not decided. The exponential and Gaussian
 certificates are executed for integrands of `min(X, 1)`, of the radius, and of the angle through
 the positive quadrant (`CylinderGaussianQuadrant.tendsto_quadrant_certificate`); the laws of the

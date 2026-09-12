@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Pangenome.AncestralLocality.CompatibilityNeutrality
 import Descent.Pangenome.AncestralLocality.LocalityBounds
 import Descent.Pangenome.AncestralLocality.LocalityCoupling
 
@@ -25,6 +26,14 @@ independent complexity bounds and a quantitative light cone.
 
 ## Theorems
 
+* Theorem 3, every feature is exactly neutral: `CompatibilityNeutrality`. (4.4) for every
+  checking graph (`compatibilityKernel_marginal`) and its population form `(R_{K_G}(p))_k = p_k`
+  (`featureMass_reproduce_compatibilityKernel`). §4.1: the finite-population kernel `Q_N` (4.5)
+  keeps every allele law and is a probability vector for `R ≤ N`, and the offspring count at a
+  feature is `Binomial(N, p_k)` (4.6) (`offspringCount_eq_binomial`). §5.2: the eight-state witness
+  has one observed law and drifts `-1/4` and `0` (`witness_drift`), so no observed transition law
+  predicts both and the observation `(a, b)` is not autonomous
+  (`witness_no_observed_transition_law`, `witness_not_autonomous`).
 * Theorems 7 and 8, the support drift: `LocalityBounds`. A decision along `i → j` raises the
   weighted support count by at most `w i + 2 w j` (`weightedCount_branchSupports_le`) and a
   coalescence does not raise it (`weightedCount_coalesceSupports_le`); with `Σ_j r i j ≤ D` and
@@ -42,11 +51,12 @@ independent complexity bounds and a quantitative light cone.
   `20 e³ ∈ [401.7, 401.72]` (`twenty_mul_exp_three_mem_Icc`) and
   `20 e (2e/20)^20 ≤ 2.64 × 10⁻¹⁰` (`escapeBound_twenty_le`).
 
-Scope. Theorems 7 and 8 are proved as generator inequalities on the tagged support state; the
+Scope. The single-feature Kingman limit behind Theorem 3 is classical and is not re-proved.
+Theorems 7 and 8 are proved as generator inequalities on the tagged support state; the
 expectation bounds (8.2), (8.3) and the escape bounds (9.1), (9.2) through Grönwall and Markov's
 inequality are not yet proof-checked. Corollary 8.1 is stated on a common finite probability
 space, with the escape probability as a parameter. Theorems 1 and 2 (hereditary closure and its
-operational characterization), Theorem 3 (neutrality), Theorem 4 (closure is reachability),
+operational characterization), Theorem 4 (closure is reachability),
 Theorem 5 (the locality transition), Theorem 6 (sampling duality) and Theorem 9 (the
 infinite-genome semigroup) are not yet proof-checked.
 -/
