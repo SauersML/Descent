@@ -91,7 +91,8 @@ theorem sum_map_abs_rate_selectionTerms (model : SelectionModel Deme Locus Allel
       = (ξ.map fun τ ↦ (∑ b, |model.fitness τ.deme b|) * c).sum := by
   rw [selectionTerms, Multiset.map_bind, Multiset.sum_bind]
   refine congrArg Multiset.sum (Multiset.map_congr rfl fun τ _ ↦ ?_)
-  simp only [Multiset.map_map, Function.comp_def, Finset.sum_mul, Finset.sum_eq_multiset_sum]
+  simp only [Multiset.map_map, Function.comp_def, Finset.sum_eq_multiset_sum,
+    Multiset.sum_map_mul_right]
 
 /-- **The selection matrix costs at most `2 B S` in sup norm**, for fitness masses
 `Σ_b |s_i(b)| ≤ S` and a budget of total size `B = Σ_ℓ n_ℓ`. -/
@@ -107,6 +108,7 @@ theorem norm_selectionMatrix_mulVec_le (model : SelectionModel Deme Locus Allele
     split_ifs with h
     · simpa only [Real.norm_eq_abs] using norm_le_pi_norm w ⟨ζ, h⟩
     · simpa using norm_nonneg w
+  refine (pi_norm_le_iff_of_nonneg (by positivity)).mpr fun ξ ↦ ?_
   have hterm : ∀ term ∈ selectionTerms model ξ.1,
       |term.1 * (term.2.1.elim 0 (extendByZero w) - extendByZero w term.2.2)|
         ≤ |term.1| * (2 * ‖w‖) := by
@@ -119,7 +121,6 @@ theorem norm_selectionMatrix_mulVec_le (model : SelectionModel Deme Locus Allele
     have hgain := abs_le.mp helim
     rw [abs_mul]
     exact mul_le_mul_of_nonneg_left (abs_le.mpr ⟨by linarith, by linarith⟩) (abs_nonneg _)
-  refine (pi_norm_le_iff_of_nonneg (by positivity)).mpr fun ξ ↦ ?_
   rw [Real.norm_eq_abs]
   conv_lhs => rw [← hw, selectionMatrix_mulVec]
   calc |((selectionTerms model ξ.1).map fun term ↦
@@ -271,8 +272,7 @@ theorem norm_expectedMomentVector_sub_firstOrder_le (rates : NeutralRates Deme L
       (bumpCapacity model capacity) expectationAt ht.1
       (hcont'.mono (Set.Icc_subset_Icc_right ht.2.le))
       (fun ξ s hs ↦ hforward' ξ s ⟨hs.1, hs.2.trans ht.2⟩)
-    rw [sum_bumpCapacity] at h
-    push_cast at h
+    rw [sum_bumpCapacity, Nat.cast_add, Nat.cast_one] at h
     simpa only [sub_zero] using h
   have h := norm_duhamel_firstOrder_le (killingGenerator_dualGenerator rates capacity)
     (dualGenerator rates (bumpCapacity model capacity)) (selectionMatrix model capacity)
