@@ -41,6 +41,7 @@ import Descent.Portability.PolygenicPortabilityDecay
 import Descent.Portability.EndToEndDiscriminationLaw
 import Descent.Portability.EndToEndDiploidLaw
 import Descent.Portability.EndToEndDiploidHistoryLaw
+import Descent.Portability.MigrationPortabilityFactor
 
 namespace Descent.Program
 
@@ -140,6 +141,11 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   `splitLDRetention_antitone_separation`). It is the unascertained expected squared correlation
   and does not fill the model field `ldRetentionAt`, whose measured amplitude divides by the
   within-deme `E[D²]` under ongoing migration.
+  Under symmetric migration `m` the split ratio has the exact form
+  `(e^{-ρ̄T} + m·A_D)/(1 + m·A_π)`, with migration stencils read on the migrating history, and
+  it reduces to the clean law at `m = 0`
+  (`MigrationPortabilityFactor.splitPortabilityRatio_withSymmetricMigration`,
+  `migrationHistory_DD`, `migrationHistory_pi2`).
 * What a portability curve identifies: `PortabilityCurveIdentifiability`. With a random split
   time, the split-law average of each history's ratio is the Laplace curve `E[e^{-rT}]` for any
   drift (`meanSplitPortabilityRatio_eq`), and its values at `k r₀` determine the split-time law

@@ -731,6 +731,7 @@ import Descent.Portability.PolygenicPortabilityDecay
 import Descent.Portability.EndToEndDiscriminationLaw
 import Descent.Portability.EndToEndDiploidLaw
 import Descent.Portability.EndToEndDiploidHistoryLaw
+import Descent.Portability.MigrationPortabilityFactor
 import Descent.Portability.PortabilityMinimaxRate
 import Descent.Portability.HistoryExactLocality
 
