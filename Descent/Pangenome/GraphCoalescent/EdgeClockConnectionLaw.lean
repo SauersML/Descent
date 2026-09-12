@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionExamples
 import Descent.Pangenome.GraphCoalescent.ScaledConnectionLimit
 import Mathlib.Probability.Distributions.Exponential
 
@@ -37,6 +38,8 @@ latest clock of `G`.
   independence of the clocks.
 - `cdf_map_edgeConnectionTime`: the distribution function of `T_p` is `connectionTimeCDF p`.
 - `map_edgeConnectionTime_edgeClockLaw`: **the law of `T_p` is `randomGraphConnectionLaw p`**.
+- `map_edgeConnectionTime_edgeClockLaw_two`: with two fibers `T_p` is exponential with rate
+  `p₀ p₁`, as a law.
 
 ## Scope
 
@@ -297,6 +300,23 @@ theorem map_edgeConnectionTime_edgeClockLaw {w : ℕ} [NeZero w] {p : Fin w → 
     Measure.isProbabilityMeasure_map (measurable_edgeConnectionTime w).aemeasurable
   refine Measure.eq_of_cdf _ _ (StieltjesFunction.ext fun x ↦ ?_)
   rw [cdf_map_edgeConnectionTime hp x, cdf_randomGraphConnectionLaw]
+
+/-- **Two fibers: `T_p` is exponential with rate `p₀ p₁`**, as a law: the connection time is the
+clock of the single edge.
+
+Assumes: every `p_i > 0`. -/
+theorem map_edgeConnectionTime_edgeClockLaw_two {p : Fin 2 → ℝ} (hp : ∀ i, 0 < p i) :
+    (edgeClockLaw p).map edgeConnectionTime = expMeasure (p 0 * p 1) := by
+  have hr : 0 < p 0 * p 1 := mul_pos (hp 0) (hp 1)
+  haveI := isProbabilityMeasure_edgeClockLaw hp
+  haveI : IsProbabilityMeasure ((edgeClockLaw p).map edgeConnectionTime) :=
+    Measure.isProbabilityMeasure_map (measurable_edgeConnectionTime 2).aemeasurable
+  haveI := isProbabilityMeasure_expMeasure hr
+  refine Measure.eq_of_cdf _ _ (StieltjesFunction.ext fun x ↦ ?_)
+  rw [cdf_map_edgeConnectionTime hp x, cdf_expMeasure_eq hr, connectionTimeCDF]
+  by_cases hx : x < 0
+  · rw [if_pos hx, if_neg (not_le.mpr hx)]
+  · rw [if_neg hx, if_pos (not_lt.mp hx), connectionProbability_two, mul_comm x]
 
 end
 

@@ -33,3 +33,5 @@ import Descent.Pangenome.GraphCoalescent.EdgeClockConnectionLaw
   Descent.Pangenome.GraphCoalescent.cdf_map_edgeConnectionTime
 #print axioms
   Descent.Pangenome.GraphCoalescent.map_edgeConnectionTime_edgeClockLaw
+#print axioms
+  Descent.Pangenome.GraphCoalescent.map_edgeConnectionTime_edgeClockLaw_two
