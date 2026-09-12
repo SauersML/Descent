@@ -63,8 +63,9 @@ squared correlations `1/4` and `1`, the bound is `(3/8) max (0, 1 - n ε / 4)`
 Source data identify at most the source report law. When a portability quantity moves by `Δ`
 while the source law moves by `δ` in total variation, no estimator from `n` source replicas has
 worst-case error below `(Δ / 2)(1 - δ)^n`. When the source law does not move, no amount of source
-data brings the error below `Δ / 2`. In the chronology model the migration and recombination
-totals, the final allele frequencies and the fixed score are shared by both histories, and the
+data brings the error below `Δ / 2` (`lowerBound_cohortLaw_of_eq`). In the chronology model the
+migration and recombination totals, the final allele frequencies and the fixed score are shared
+by both histories, and the
 target squared correlation ranges over `[e^{-2R}, 1]`. Admixed source records separate the
 histories only through `ε · 2p(1 - p)(1 - e^{-R})` per record. The total-variation bound stays
 above half its value until `n` reaches `1 / (4 ε p(1 - p)(1 - e^{-R}))`, and the Hellinger form
@@ -215,6 +216,19 @@ theorem lowerBound_cohortLaw_totalVariation (p q : FiniteReportLaw Report) (n : 
       (one_sub_mul_le_pow_one_sub_totalVariation p q n)
   exact (mul_le_mul_of_nonneg_left hpow (by positivity)).trans
     (lowerBound_cohortLaw_pow p q n τp τq estimator)
+
+/-- **Source data that do not move.** When both histories give one source law, every estimator
+from any number of source replicas has, under one of them, an expected absolute error of at least
+half the separation of the two target values. -/
+theorem lowerBound_cohortLaw_of_eq (p : FiniteReportLaw Report) (n : ℕ) (τp τq : ℝ)
+    (estimator : (Fin n → Report) → ℝ) :
+    |τp - τq| / 2 ≤
+      max ((cohortLaw p n).expectation fun sample ↦ |estimator sample - τp|)
+        ((cohortLaw p n).expectation fun sample ↦ |estimator sample - τq|) := by
+  have hself : p.totalVariation p = 0 := by
+    simp only [FiniteReportLaw.totalVariation, sub_self, max_self, Finset.sum_const_zero]
+  have h := lowerBound_cohortLaw_pow p p n τp τq estimator
+  rwa [hself, sub_zero, one_pow, mul_one] at h
 
 /-- The Hellinger affinity `ρ(p, q) = ∑ √(p q)`, equal to `1 - H²(p, q)`. -/
 def hellingerAffinity (p q : FiniteReportLaw Report) : ℝ :=

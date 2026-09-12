@@ -17,6 +17,7 @@ open Descent.Portability.PortabilityMinimaxLowerBound
   Descent.Portability.PortabilityMinimaxLowerBound.one_sub_mul_le_pow_one_sub_totalVariation
 #print axioms Descent.Portability.PortabilityMinimaxLowerBound.lowerBound_cohortLaw_pow
 #print axioms Descent.Portability.PortabilityMinimaxLowerBound.lowerBound_cohortLaw_totalVariation
+#print axioms Descent.Portability.PortabilityMinimaxLowerBound.lowerBound_cohortLaw_of_eq
 #print axioms
   Descent.Portability.PortabilityMinimaxLowerBound.hellingerAffinity_sq_le_two_mul_lawOverlap
 #print axioms Descent.Portability.PortabilityMinimaxLowerBound.hellingerAffinity_cohortLaw
