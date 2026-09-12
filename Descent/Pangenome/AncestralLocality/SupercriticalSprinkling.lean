@@ -25,9 +25,9 @@ is `G(m, (α - δ)/m)` together with an independent sprinkle at rate `p₂ = δ/
 ## Two large components are joined
 
 For disjoint feature sets `A` and `B` the sprinkle contains no pair between them with probability
-`(1 - p)^{|A| |B|}` (`graphProb_disjoint_pairsBetween`). `largeVertices E κ` collects the features
-in components of more than `κ` features, and two distinct components are disjoint
-(`disjoint_reach_singleton`). A pair between two components joins them in the union graph
+`(1 - p)^{|A| |B|}` (`graphProb_disjoint_pairsBetween`). The features in components of more than
+`κ` features are `RootExchangeability.bigSet (edgeGraph E) κ`, and two distinct components are
+disjoint (`disjoint_reach_singleton`). A pair between two components joins them in the union graph
 (`reachable_union_of_not_disjoint`). So the sprinkle fails to join all large components with
 probability at most `m² e^{-p κ²}`, by a union bound over pairs of large features
 (`graphProb_not_joined_le`). On the complement one component holds every large feature, so under
@@ -108,7 +108,7 @@ theorem card_pairsBetween {m : ℕ} {A B : Finset (Fin m)} (hAB : Disjoint A B) 
     simp only [mem_coe, mem_product] at hx hy
     rcases Sym2.eq_iff.mp hxy with ⟨h1, h2⟩ | ⟨h1, -⟩
     · exact Prod.ext h1 h2
-    · exact (disjoint_left.mp hAB hx.1) (h1 ▸ hy.2)
+    · exact ((disjoint_left.mp hAB hx.1) (h1 ▸ hy.2)).elim
   rw [pairsBetween, card_image_of_injOn hinj, card_product]
 
 /-- Pairs between disjoint sets are potential edges. -/
@@ -153,10 +153,6 @@ theorem graphProb_disjoint_pairsBetween {m : ℕ} (p : ℝ) {A B : Finset (Fin m
 
 /-! ### The large components merge -/
 
-/-- **The features in components of more than `κ` features.** -/
-def largeVertices {m : ℕ} (E : Finset (Sym2 (Fin m))) (κ : ℝ) : Finset (Fin m) :=
-  univ.filter fun v ↦ κ < ((reach (edgeGraph E) {v}).card : ℝ)
-
 /-- Two distinct components are disjoint. -/
 theorem disjoint_reach_singleton {m : ℕ} {G : SimpleGraph (Fin m)} {u w : Fin m}
     (h : reach G {u} ≠ reach G {w}) : Disjoint (reach G {u}) (reach G {w}) := by
@@ -167,7 +163,7 @@ theorem disjoint_reach_singleton {m : ℕ} {G : SimpleGraph (Fin m)} {u w : Fin 
 /-- The graph of an edge set is a subgraph of the graph of a larger one. -/
 theorem edgeGraph_le_union {m : ℕ} (E₁ E₂ : Finset (Sym2 (Fin m))) :
     edgeGraph E₁ ≤ edgeGraph (E₁ ∪ E₂) :=
-  SimpleGraph.fromEdgeSet_mono fun e he ↦ mem_coe.mpr (mem_union_left _ (mem_coe.mp he))
+  SimpleGraph.fromEdgeSet_mono fun _ he ↦ mem_coe.mpr (mem_union_left _ (mem_coe.mp he))
 
 /-- **A sprinkled pair joins two components**: if `E₂` has a pair between the components of `u`
 and `w` in `E₁`, then `u` reaches `w` in the union graph. -/
@@ -191,14 +187,14 @@ theorem reachable_union_of_not_disjoint {m : ℕ} {E₁ E₂ : Finset (Sym2 (Fin
 `(1 - p)^{|C| |C'|} ≤ e^{-p κ²}`, and there are at most `m²` pairs of large features. -/
 theorem graphProb_not_joined_le {m : ℕ} {p : ℝ} (hp0 : 0 ≤ p) (hp1 : p ≤ 1)
     (E₁ : Finset (Sym2 (Fin m))) {κ : ℝ} (hκ : 0 ≤ κ) :
-    graphProb m p (fun E₂ ↦ ¬∀ u ∈ largeVertices E₁ κ, ∀ w ∈ largeVertices E₁ κ,
+    graphProb m p (fun E₂ ↦ ¬∀ u ∈ bigSet (edgeGraph E₁) κ, ∀ w ∈ bigSet (edgeGraph E₁) κ,
         (edgeGraph (E₁ ∪ E₂)).Reachable u w)
       ≤ (m : ℝ) ^ 2 * Real.exp (-(p * κ ^ 2)) := by
   -- a failure is a pair of distinct large components with no sprinkled pair between them
   have hpoint : ∀ E₂ : Finset (Sym2 (Fin m)),
-      (if ¬∀ u ∈ largeVertices E₁ κ, ∀ w ∈ largeVertices E₁ κ,
+      (if ¬∀ u ∈ bigSet (edgeGraph E₁) κ, ∀ w ∈ bigSet (edgeGraph E₁) κ,
           (edgeGraph (E₁ ∪ E₂)).Reachable u w then (1 : ℝ) else 0)
-        ≤ ∑ u ∈ largeVertices E₁ κ, ∑ w ∈ largeVertices E₁ κ,
+        ≤ ∑ u ∈ bigSet (edgeGraph E₁) κ, ∑ w ∈ bigSet (edgeGraph E₁) κ,
           (if reach (edgeGraph E₁) {u} ≠ reach (edgeGraph E₁) {w} ∧
               Disjoint (pairsBetween (reach (edgeGraph E₁) {u}) (reach (edgeGraph E₁) {w})) E₂
             then 1 else 0) := by
@@ -207,7 +203,7 @@ theorem graphProb_not_joined_le {m : ℕ} {p : ℝ} (hp0 : 0 ≤ p) (hp1 : p ≤
         (if reach (edgeGraph E₁) {u} ≠ reach (edgeGraph E₁) {w} ∧
             Disjoint (pairsBetween (reach (edgeGraph E₁) {u}) (reach (edgeGraph E₁) {w})) E₂
           then 1 else 0) := fun u w ↦ by split_ifs <;> norm_num
-    by_cases hJ : ∀ u ∈ largeVertices E₁ κ, ∀ w ∈ largeVertices E₁ κ,
+    by_cases hJ : ∀ u ∈ bigSet (edgeGraph E₁) κ, ∀ w ∈ bigSet (edgeGraph E₁) κ,
         (edgeGraph (E₁ ∪ E₂)).Reachable u w
     · rw [if_neg (not_not.mpr hJ)]
       exact sum_nonneg fun u _ ↦ sum_nonneg fun w _ ↦ hnn u w
@@ -229,13 +225,13 @@ theorem graphProb_not_joined_le {m : ℕ} {p : ℝ} (hp0 : 0 ≤ p) (hp1 : p ≤
           = if reach (edgeGraph E₁) {u} ≠ reach (edgeGraph E₁) {w} ∧
               Disjoint (pairsBetween (reach (edgeGraph E₁) {u}) (reach (edgeGraph E₁) {w})) E₂
             then 1 else 0 := (if_pos ⟨hne, hdisj⟩).symm
-        _ ≤ ∑ w' ∈ largeVertices E₁ κ,
+        _ ≤ ∑ w' ∈ bigSet (edgeGraph E₁) κ,
             (if reach (edgeGraph E₁) {u} ≠ reach (edgeGraph E₁) {w'} ∧
               Disjoint (pairsBetween (reach (edgeGraph E₁) {u}) (reach (edgeGraph E₁) {w'})) E₂
             then 1 else 0) := single_le_sum (fun w' _ ↦ hnn u w') hw
         _ ≤ _ := single_le_sum (fun u' _ ↦ sum_nonneg fun w' _ ↦ hnn u' w') hu
   -- one pair of large features
-  have hterm : ∀ u ∈ largeVertices E₁ κ, ∀ w ∈ largeVertices E₁ κ,
+  have hterm : ∀ u ∈ bigSet (edgeGraph E₁) κ, ∀ w ∈ bigSet (edgeGraph E₁) κ,
       graphExpect m p (fun E₂ ↦ if reach (edgeGraph E₁) {u} ≠ reach (edgeGraph E₁) {w} ∧
           Disjoint (pairsBetween (reach (edgeGraph E₁) {u}) (reach (edgeGraph E₁) {w})) E₂
         then (1 : ℝ) else 0)
@@ -246,8 +242,8 @@ theorem graphProb_not_joined_le {m : ℕ} {p : ℝ} (hp0 : 0 ≤ p) (hp1 : p ≤
             graphExpect_mono hp0 hp1 fun E₂ ↦ by simp [hne]
         _ = 0 := graphExpect_const p 0
         _ ≤ Real.exp (-(p * κ ^ 2)) := (Real.exp_pos _).le
-    · have hcu : κ < ((reach (edgeGraph E₁) {u}).card : ℝ) := (mem_filter.mp hu).2
-      have hcw : κ < ((reach (edgeGraph E₁) {w}).card : ℝ) := (mem_filter.mp hw).2
+    · have hcu : κ < ((reach (edgeGraph E₁) {u}).card : ℝ) := (mem_bigSet_iff _ _ _).mp hu
+      have hcw : κ < ((reach (edgeGraph E₁) {w}).card : ℝ) := (mem_bigSet_iff _ _ _).mp hw
       have hsq : κ ^ 2
           ≤ (((reach (edgeGraph E₁) {u}).card * (reach (edgeGraph E₁) {w}).card : ℕ) : ℝ) := by
         push_cast
@@ -266,29 +262,30 @@ theorem graphProb_not_joined_le {m : ℕ} {p : ℝ} (hp0 : 0 ≤ p) (hp1 : p ≤
       calc _ ≤ graphProb m p (fun E₂ ↦ Disjoint (pairsBetween (reach (edgeGraph E₁) {u})
               (reach (edgeGraph E₁) {w})) E₂) :=
             graphExpect_mono hp0 hp1 fun E₂ ↦ by
-              split_ifs with h₁ h₂ <;> first | norm_num | exact absurd h₁.2 h₂
+              split_ifs with h₁ h₂ <;> first | exact absurd h₁.2 h₂ | norm_num
         _ = (1 - p) ^ ((reach (edgeGraph E₁) {u}).card * (reach (edgeGraph E₁) {w}).card) :=
             graphProb_disjoint_pairsBetween p (disjoint_reach_singleton hne)
         _ ≤ Real.exp (-(p * κ ^ 2)) := hbound
-  calc graphProb m p (fun E₂ ↦ ¬∀ u ∈ largeVertices E₁ κ, ∀ w ∈ largeVertices E₁ κ,
+  calc graphProb m p (fun E₂ ↦ ¬∀ u ∈ bigSet (edgeGraph E₁) κ, ∀ w ∈ bigSet (edgeGraph E₁) κ,
         (edgeGraph (E₁ ∪ E₂)).Reachable u w)
-      ≤ graphExpect m p (fun E₂ ↦ ∑ u ∈ largeVertices E₁ κ, ∑ w ∈ largeVertices E₁ κ,
+      ≤ graphExpect m p (fun E₂ ↦ ∑ u ∈ bigSet (edgeGraph E₁) κ, ∑ w ∈ bigSet (edgeGraph E₁) κ,
           (if reach (edgeGraph E₁) {u} ≠ reach (edgeGraph E₁) {w} ∧
               Disjoint (pairsBetween (reach (edgeGraph E₁) {u}) (reach (edgeGraph E₁) {w})) E₂
             then (1 : ℝ) else 0)) := graphExpect_mono hp0 hp1 hpoint
-    _ = ∑ u ∈ largeVertices E₁ κ, ∑ w ∈ largeVertices E₁ κ,
+    _ = ∑ u ∈ bigSet (edgeGraph E₁) κ, ∑ w ∈ bigSet (edgeGraph E₁) κ,
           graphExpect m p (fun E₂ ↦ if reach (edgeGraph E₁) {u} ≠ reach (edgeGraph E₁) {w} ∧
               Disjoint (pairsBetween (reach (edgeGraph E₁) {u}) (reach (edgeGraph E₁) {w})) E₂
             then (1 : ℝ) else 0) := by
         rw [graphExpect_sum]
         exact sum_congr rfl fun u _ ↦ graphExpect_sum _ _ _
-    _ ≤ ∑ _u ∈ largeVertices E₁ κ, ∑ _w ∈ largeVertices E₁ κ, Real.exp (-(p * κ ^ 2)) :=
+    _ ≤ ∑ _u ∈ bigSet (edgeGraph E₁) κ, ∑ _w ∈ bigSet (edgeGraph E₁) κ,
+          Real.exp (-(p * κ ^ 2)) :=
         sum_le_sum fun u hu ↦ sum_le_sum fun w hw ↦ hterm u hu w hw
-    _ = ((largeVertices E₁ κ).card : ℝ) ^ 2 * Real.exp (-(p * κ ^ 2)) := by
+    _ = ((bigSet (edgeGraph E₁) κ).card : ℝ) ^ 2 * Real.exp (-(p * κ ^ 2)) := by
         rw [sum_const, sum_const, nsmul_eq_mul, nsmul_eq_mul]
         ring
     _ ≤ (m : ℝ) ^ 2 * Real.exp (-(p * κ ^ 2)) := by
-        have hL : ((largeVertices E₁ κ).card : ℝ) ≤ m := by
+        have hL : ((bigSet (edgeGraph E₁) κ).card : ℝ) ≤ m := by
           exact_mod_cast (card_le_univ _).trans_eq (Fintype.card_fin m)
         exact mul_le_mul_of_nonneg_right (pow_le_pow_left₀ (Nat.cast_nonneg _) hL 2)
           (Real.exp_pos _).le
@@ -300,24 +297,24 @@ theorem graphProb_not_exists_card_reach_ge_le {m : ℕ} (hm : 0 < m) {p p₁ p�
     (hp : 1 - p = (1 - p₁) * (1 - p₂)) (hp₁0 : 0 ≤ p₁) (hp₁1 : p₁ ≤ 1) (hp₂0 : 0 ≤ p₂)
     (hp₂1 : p₂ ≤ 1) {κ c : ℝ} (hκ : 0 ≤ κ) :
     graphProb m p (fun E ↦ ¬∃ v, c ≤ ((reach (edgeGraph E) {v}).card : ℝ))
-      ≤ graphProb m p₁ (fun E₁ ↦ ¬c ≤ ((largeVertices E₁ κ).card : ℝ))
+      ≤ graphProb m p₁ (fun E₁ ↦ ¬c ≤ ((bigSet (edgeGraph E₁) κ).card : ℝ))
         + (m : ℝ) ^ 2 * Real.exp (-(p₂ * κ ^ 2)) := by
   have hexp0 : 0 ≤ (m : ℝ) ^ 2 * Real.exp (-(p₂ * κ ^ 2)) := by positivity
   -- given the first round, the sprinkle fails only by not joining the large components
   have hinner : ∀ E₁ : Finset (Sym2 (Fin m)),
       graphExpect m p₂ (fun E₂ ↦
           if ¬∃ v, c ≤ ((reach (edgeGraph (E₁ ∪ E₂)) {v}).card : ℝ) then (1 : ℝ) else 0)
-        ≤ (if ¬c ≤ ((largeVertices E₁ κ).card : ℝ) then 1 else 0)
+        ≤ (if ¬c ≤ ((bigSet (edgeGraph E₁) κ).card : ℝ) then 1 else 0)
           + (m : ℝ) ^ 2 * Real.exp (-(p₂ * κ ^ 2)) := by
     intro E₁
-    by_cases hgood : c ≤ ((largeVertices E₁ κ).card : ℝ)
+    by_cases hgood : c ≤ ((bigSet (edgeGraph E₁) κ).card : ℝ)
     · rw [if_neg (not_not.mpr hgood), zero_add]
       refine le_trans (graphExpect_mono hp₂0 hp₂1 fun E₂ ↦ ?_)
         (graphProb_not_joined_le hp₂0 hp₂1 E₁ hκ)
-      by_cases hJ : ∀ u ∈ largeVertices E₁ κ, ∀ w ∈ largeVertices E₁ κ,
+      by_cases hJ : ∀ u ∈ bigSet (edgeGraph E₁) κ, ∀ w ∈ bigSet (edgeGraph E₁) κ,
           (edgeGraph (E₁ ∪ E₂)).Reachable u w
       · have hQ : ∃ v, c ≤ ((reach (edgeGraph (E₁ ∪ E₂)) {v}).card : ℝ) := by
-          by_cases hne : (largeVertices E₁ κ).Nonempty
+          by_cases hne : (bigSet (edgeGraph E₁) κ).Nonempty
           · obtain ⟨v, hv⟩ := hne
             refine ⟨v, hgood.trans (Nat.cast_le.mpr (card_le_card fun u hu ↦ ?_))⟩
             exact (mem_reach_iff _ _ _).mpr ⟨v, mem_singleton_self v, hJ v hv u hu⟩
@@ -339,9 +336,10 @@ theorem graphProb_not_exists_card_reach_ge_le {m : ℕ} (hm : 0 < m) {p p₁ p�
   rw [graphExpect_union hp]
   calc graphExpect m p₁ (fun E₁ ↦ graphExpect m p₂ fun E₂ ↦
         if ¬∃ v, c ≤ ((reach (edgeGraph (E₁ ∪ E₂)) {v}).card : ℝ) then (1 : ℝ) else 0)
-      ≤ graphExpect m p₁ (fun E₁ ↦ (if ¬c ≤ ((largeVertices E₁ κ).card : ℝ) then (1 : ℝ) else 0)
-          + (m : ℝ) ^ 2 * Real.exp (-(p₂ * κ ^ 2))) := graphExpect_mono hp₁0 hp₁1 hinner
-    _ = graphProb m p₁ (fun E₁ ↦ ¬c ≤ ((largeVertices E₁ κ).card : ℝ))
+      ≤ graphExpect m p₁ (fun E₁ ↦
+          (if ¬c ≤ ((bigSet (edgeGraph E₁) κ).card : ℝ) then (1 : ℝ) else 0)
+            + (m : ℝ) ^ 2 * Real.exp (-(p₂ * κ ^ 2))) := graphExpect_mono hp₁0 hp₁1 hinner
+    _ = graphProb m p₁ (fun E₁ ↦ ¬c ≤ ((bigSet (edgeGraph E₁) κ).card : ℝ))
           + (m : ℝ) ^ 2 * Real.exp (-(p₂ * κ ^ 2)) := by
         rw [graphExpect_add, hconst]
         rfl
@@ -371,16 +369,16 @@ has at least `c m` features in components larger than `m^{2/3}` with probability
 then `G(m, α/m)` has a component of at least `c m` features with probability tending to one. -/
 theorem tendsto_graphProb_exists_card_reach_ge {α δ c : ℝ} (hδ : 0 < δ) (hδα : δ ≤ α)
     (hlarge : Tendsto (fun m : ℕ ↦ graphProb m ((α - δ) / m) fun E ↦
-      c * m ≤ ((largeVertices E ((m : ℝ) ^ ((2 : ℝ) / 3))).card : ℝ)) atTop (𝓝 1)) :
+      c * m ≤ ((bigSet (edgeGraph E) ((m : ℝ) ^ ((2 : ℝ) / 3))).card : ℝ)) atTop (𝓝 1)) :
     Tendsto (fun m : ℕ ↦ graphProb m (α / m) fun E ↦
       ∃ v, c * m ≤ ((reach (edgeGraph E) {v}).card : ℝ)) atTop (𝓝 1) := by
   have hbad₁ : Tendsto (fun m : ℕ ↦ graphProb m ((α - δ) / m) fun E ↦
-      ¬c * m ≤ ((largeVertices E ((m : ℝ) ^ ((2 : ℝ) / 3))).card : ℝ)) atTop (𝓝 0) := by
+      ¬c * m ≤ ((bigSet (edgeGraph E) ((m : ℝ) ^ ((2 : ℝ) / 3))).card : ℝ)) atTop (𝓝 0) := by
     have h := hlarge.const_sub 1
     rw [sub_self] at h
     refine h.congr fun m ↦ ?_
     linarith [graphProb_add_not m ((α - δ) / m) fun E ↦
-      c * m ≤ ((largeVertices E ((m : ℝ) ^ ((2 : ℝ) / 3))).card : ℝ)]
+      c * m ≤ ((bigSet (edgeGraph E) ((m : ℝ) ^ ((2 : ℝ) / 3))).card : ℝ)]
   have hsum := hbad₁.add (tendsto_sq_mul_exp_neg_rpow hδ)
   rw [add_zero] at hsum
   have hbad : Tendsto (fun m : ℕ ↦ graphProb m (α / m) fun E ↦
@@ -400,7 +398,8 @@ theorem tendsto_graphProb_exists_card_reach_ge {α δ c : ℝ} (hδ : 0 < δ) (h
       have hm' : (m : ℝ) ≠ 0 := hmpos.ne'
       have hden' : (m : ℝ) - α + δ ≠ 0 := hden.ne'
       have hp : 1 - α / m = (1 - (α - δ) / m) * (1 - δ / (m - α + δ)) := by
-        field_simp <;> ring
+        field_simp
+        ring
       have hp₁0 : 0 ≤ (α - δ) / m := div_nonneg (by linarith) hm0
       have hp₁1 : (α - δ) / m ≤ 1 := (div_le_one hmpos).mpr (by linarith)
       have hp₂0 : 0 ≤ δ / (m - α + δ) := div_nonneg hδ.le hden.le
