@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.AncestralLocality.SupercriticalReach
+import Mathlib.Logic.Equiv.Fintype
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program
@@ -167,6 +168,7 @@ theorem graphProb_disjoint_bigSet_eq {m : ℕ} (p t : ℝ) {A B : Finset (Fin m)
   symm
   rw [graphProb, graphProb, ← graphExpect_comp_mapEdges p σ]
   refine sum_congr rfl fun E _ ↦ ?_
+  dsimp only
   have hiff : Disjoint (A.image σ) (bigSet (edgeGraph (mapEdges σ E)) t) ↔
       Disjoint A (bigSet (edgeGraph E) t) := by
     rw [bigSet_mapEdges, disjoint_image σ.injective]
@@ -207,6 +209,7 @@ theorem choose_mul_graphProb_disjoint_bigSet {m k : ℕ} (p t : ℝ) {A : Finset
   simp only [graphProb]
   rw [← graphExpect_sum]
   refine sum_congr rfl fun E _ ↦ ?_
+  dsimp only
   rw [sum_powersetCard_indicator_disjoint]
 
 /-! ### Ratios of binomial coefficients -/
