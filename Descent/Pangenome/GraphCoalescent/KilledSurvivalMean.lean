@@ -151,20 +151,24 @@ theorem loadGenerator_eq_zero_of_not_pos {A B : ℕ} {x y : Fin (A + 1) × Fin (
     loadGenerator A B x y = 0 := by
   have hfirst : (if y = lowerFirst x then (Nat.choose x.1 2 : ℝ) else 0) = 0 := by
     split_ifs with h
-    · have h1 : (y.1 : ℕ) = (x.1 : ℕ) - 1 :=
-        congrArg (fun z : Fin (A + 1) × Fin (B + 1) ↦ (z.1 : ℕ)) h
-      have h2 : (y.2 : ℕ) = (x.2 : ℕ) :=
-        congrArg (fun z : Fin (A + 1) × Fin (B + 1) ↦ (z.2 : ℕ)) h
+    · have h1 : (y.1 : ℕ) = (x.1 : ℕ) - 1 := by
+        subst h
+        rfl
+      have h2 : (y.2 : ℕ) = (x.2 : ℕ) := by
+        subst h
+        rfl
       have hone : (x.1 : ℕ) = 1 := by omega
       rw [hone]
       norm_num [Nat.choose]
     · rfl
   have hsecond : (if y = lowerSecond x then (Nat.choose x.2 2 : ℝ) else 0) = 0 := by
     split_ifs with h
-    · have h1 : (y.1 : ℕ) = (x.1 : ℕ) :=
-        congrArg (fun z : Fin (A + 1) × Fin (B + 1) ↦ (z.1 : ℕ)) h
-      have h2 : (y.2 : ℕ) = (x.2 : ℕ) - 1 :=
-        congrArg (fun z : Fin (A + 1) × Fin (B + 1) ↦ (z.2 : ℕ)) h
+    · have h1 : (y.1 : ℕ) = (x.1 : ℕ) := by
+        subst h
+        rfl
+      have h2 : (y.2 : ℕ) = (x.2 : ℕ) - 1 := by
+        subst h
+        rfl
       have hone : (x.2 : ℕ) = 1 := by omega
       rw [hone]
       norm_num [Nat.choose]
@@ -364,9 +368,10 @@ theorem integral_gridSurvival_eq_loadMean_aux {A B : ℕ} (k : ℕ) :
   | _ k ih =>
     intro x hk ha hb
     have hsum := sum_loadGenerator_mul_integral (A := A) (B := B) ⟨ha, hb⟩
-    rw [← sum_loadGenerator_mul A B
-      (gridExtension A B fun y ↦ ∫ t in Set.Ioi 0, gridSurvival A B y t) x] at hsum
-    simp only [gridExtension_apply] at hsum
+    have hgen := sum_loadGenerator_mul A B
+      (gridExtension A B fun y ↦ ∫ t in Set.Ioi 0, gridSurvival A B y t) x
+    simp only [gridExtension_apply] at hgen
+    rw [hgen] at hsum
     have hself : gridExtension A B (fun y ↦ ∫ t in Set.Ioi 0, gridSurvival A B y t) x.1 x.2 =
         ∫ t in Set.Ioi 0, gridSurvival A B x t :=
       gridExtension_apply A B _ x
@@ -404,7 +409,9 @@ theorem integral_gridSurvival_eq_loadMean_aux {A B : ℕ} (k : ℕ) :
       have hprod : (1 : ℝ) ≤ ((x.1 : ℕ) : ℝ) * (x.2 : ℕ) := by
         have hnat := Nat.mul_le_mul ha hb
         exact_mod_cast hnat
-      positivity
+      have hc1 : (0 : ℝ) ≤ (Nat.choose x.1 2 : ℝ) := Nat.cast_nonneg _
+      have hc2 : (0 : ℝ) ≤ (Nat.choose x.2 2 : ℝ) := Nat.cast_nonneg _
+      linarith
     rw [loadMean, eq_div_iff hq.ne', ← hterm1, ← hterm2]
     simp only [twoComponentGenerator, hself] at hsum
     linarith
