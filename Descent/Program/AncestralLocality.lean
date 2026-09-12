@@ -52,7 +52,12 @@ independent complexity bounds and a quantitative light cone.
   `w j ≤ κ w i` on every edge of positive rate the ancestral generator obeys
   `L Z^{(w)} ≤ D (1 + 2κ) Z^{(w)}` (`supportGenerator_weightedCount_le`), the plain count
   `L Z ≤ 3 D Z` (`supportGenerator_supportSize_le`), and the decision rate is at most `D Z`
-  (`decisionRate_le`).
+  (`decisionRate_le`). (8.2) and (8.3) hold for marginal laws of the tagged support state that
+  satisfy Dynkin's formula for the support generator (`integral_supportSize_le`,
+  `integral_branchings_le`, through the Grönwall step `le_mul_exp_of_hasDerivWithinAt`), and (9.1)
+  and (9.2) follow by Markov's inequality on the light-cone weight
+  (`measureReal_escapeSet_le_exp`, `exp_div_pow_eq_of_radius`), with no escape when `DT = 0`
+  (`eq_zero_of_forall_escape_bound`).
 * Theorem 9, the operator half: `InfiniteGenomeLimit`. On a compact space with a point-separating
   subalgebra of observables, Feller semigroups along an exhaustion that satisfy a light-cone
   approximation bound converge on every continuous observable (`cauchySeq_operator`), and the
@@ -72,9 +77,10 @@ independent complexity bounds and a quantitative light cone.
   `20 e (2e/20)^20 ≤ 2.64 × 10⁻¹⁰` (`escapeBound_twenty_le`).
 
 Scope. The single-feature Kingman limit behind Theorem 3 is classical and is not re-proved.
-Theorems 7 and 8 are proved as generator inequalities on the tagged support state; the
-expectation bounds (8.2), (8.3) and the escape bounds (9.1), (9.2) through Grönwall and Markov's
-inequality are not yet proof-checked. Corollary 8.1 is stated on a common finite probability
+Theorems 7 and 8 take Dynkin's formula for the support generator along the marginal laws, and
+for (8.3) the compensator formula, as hypotheses, together with integrability and continuity; the
+path law of the backward circuit is not constructed. Corollary 8.1 is stated on a common finite
+probability
 space, with the escape probability as a parameter. The supercritical limit (6.2) is proved for
 its support, conditional on the Erdős-Rényi giant component theorem as the named hypothesis
 `GiantComponentLaw` (proved only for `0 ≤ α < 1`); its weights `1 - (1 - s)^k` and `(1 - s)^k`
