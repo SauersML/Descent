@@ -16,6 +16,7 @@ import Descent.Pangenome.AncestralLocality.LocalityBounds
 import Descent.Pangenome.AncestralLocality.LocalityCoupling
 import Descent.Pangenome.AncestralLocality.LocalityCouplingBounds
 import Descent.Pangenome.AncestralLocality.LocalityTransition
+import Descent.Pangenome.AncestralLocality.OneAlleleDuality
 import Descent.Pangenome.AncestralLocality.OperationalAutonomy
 import Descent.Pangenome.AncestralLocality.RandomClosure
 import Descent.Pangenome.AncestralLocality.ReachabilityClosureTie
@@ -132,6 +133,11 @@ on the bytes on main.
 17. `LightConeApproximationBound` -- the light-cone approximation of Theorem 9, discharged with
     the error `2 ‖f‖_∞ Pr(E_{ℓ,T})` from the sampling duality at every exhaustion index, agreement
     of the evaluations until escape, and Dynkin's formula for the marginal laws of the circuit.
+
+18. `OneAlleleDuality` -- Theorem 6 read at one allele: on `P(Bool)` the all-carriers moment is
+    `x^n`, its coalescence is `x^{n-1}`, and the resampling generator (7.1) on it is `c` times the
+    Wright-Fisher diffusion generator on `x^n` of `Descent.Coalescent.Duality`, so the note's
+    sampling duality agrees with Kingman's moment duality.
 
 This file contains no declarations.
 -/
