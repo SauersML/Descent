@@ -32,6 +32,15 @@ by one corpus epoch of `augmentedLowOrderLDGenerator` with drift `c_S, c_T`, rec
   `tendsto_portabilityDecay_atTop`, `portabilityDecay_zero_rate`: the ratio decreases in the
   split time and in the recombination rate, tends to `0` as `T → ∞` when `r > 0`, and is `1`
   when `r = 0`.
+- `splitHistoryState_pi2Cross_symmetric`: at equal rates the mixed heterozygosity
+  `pi2(S, T, S, T)` is `pi2₀ + (c/(2β)) Dz₀ (1 - E) + (c/β)² DD₀ (1 - E)²`, `E = e^{-βT}`,
+  `β = c + ρ/2`.
+- `crossHeterozygosityPortabilityRatio_eq`: the target-to-source ratio of
+  `E[D_S D_T] / pi2(S, T, S, T)` is
+  `crossHeterozygosityDecay = E² / (1 + (c/(2β)) (Dz₀/pi2₀) (1 - E) + (c/β)² (DD₀/pi2₀) (1 - E)²)`.
+- `crossHeterozygosityDecay_antitoneOn_duration`, `crossHeterozygosityDecay_antitoneOn_rate`,
+  `tendsto_crossHeterozygosityDecay_atTop`: with nonnegative ancestral ratios it decreases in
+  the split time and in the linkage rate, and tends to `0` as `T → ∞`.  Here drift enters.
 
 ## Significance
 
@@ -47,7 +56,12 @@ every trajectory of the exact matrix exponential (`matrixExponential_mulVec_appl
 through the one-row intertwining `matrixExponential_intertwines` and the scalar exponential
 `SubstochasticGeneratorSemigroup.matrixExponential_scalar_shift`.  With no migration and no
 mutation, the rows of `DD(i, j)` and `pi2(i, i, j, j)` for `i ≠ j` are of that form
-(`augmentedLowOrderLDGenerator_DD_row`, `augmentedLowOrderLDGenerator_pi2_row`).
+(`augmentedLowOrderLDGenerator_DD_row`, `augmentedLowOrderLDGenerator_pi2_row`).  The mixed
+block `DD(S, T), DD(T, S), Dz(S, T, T), Dz(T, S, S), pi2(S, T, S, T)` is triangular, and its left
+eigenvectors give one decaying combination per `Dz` coordinate
+(`matrixExponential_Dz_combination`) and one conserved combination for `pi2`
+(`matrixExponential_pi2Cross_combination`).  The monotonicity in the rate reads the secant
+slopes of the convex exponential (`exp_sub_one_mul_le`, `mul_one_sub_exp_neg_le`).
 
 ## Scope
 
