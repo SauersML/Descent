@@ -181,7 +181,7 @@ theorem eval_bernsteinMoment (N : ℕ) (x : FrequencyState Deme Locus Allele)
     _ = ∑ j ∈ Finset.piAntidiag Finset.univ N,
           ((Nat.multinomial Finset.univ j : ℝ) * ∏ h, x.1 (i, h) ^ j h)
             * ∏ h, ((j h : ℝ) / N) ^ β (i, h) := by
-        simp only [FiniteReportLaw.expectation, multinomialLaw_mass]
+        simp only [FiniteReportLaw.expectation]
         exact Finset.sum_coe_sort (Finset.piAntidiag Finset.univ N)
           (fun j ↦ ((Nat.multinomial Finset.univ j : ℝ) * ∏ h, x.1 (i, h) ^ j h)
             * ∏ h, ((j h : ℝ) / N) ^ β (i, h))
