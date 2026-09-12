@@ -7,8 +7,13 @@ import Descent.Pangenome.GraphCoalescent.ConnectivityClockTable
 
 open Descent.Pangenome.GraphCoalescent.ConnectivityClockTable
 
-#print axioms connectivityCumulantTwo
-#print axioms connectivityCumulantThree
+#print axioms sum_finpartition_eq_sum_parts
+#print axioms sum_finpartition_fin_two
+#print axioms sum_finpartition_fin_three
+#print axioms mobiusCoefficient_two
+#print axioms mobiusCoefficient_three
+#print axioms cumulantOfSizes_fin_two
+#print axioms cumulantOfSizes_fin_three
 #print axioms rankedWeight
 #print axioms connectedByLevel
 #print axioms firstConnectionLaw
