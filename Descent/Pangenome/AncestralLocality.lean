@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Pangenome.AncestralLocality.ClosureReachability
 import Descent.Pangenome.AncestralLocality.CylinderSamplingAlgebra
 import Descent.Pangenome.AncestralLocality.CompatibilityNeutrality
 import Descent.Pangenome.AncestralLocality.InfiniteGenomeLimit
@@ -51,6 +52,14 @@ on the bytes on main.
 5. `JointNonautonomy` -- §3.2: two observations can each be autonomous while their joint
    observation is not. Under the witness rule of §5.2 the features `a` and `b` each have the
    neutral observed kernel of Theorem 3, and their joint observation `(a, b)` has no kernel.
+
+6. `ClosureReachability` -- Theorem 4 and §5.1: for `|A| ≥ 2` one hereditary refinement step
+   of the checking kernel turns `P_{π_A}` into `P_{π_{A ∪ N⁺_G(A)}}` (5.2), through the
+   difference formula (5.3); iterating gives `P_{π_{Reach_G(A)}}` (5.1), and singletons and the
+   empty observation are their own closure. On a connected undirected graph, the path included,
+   every query on two or more features closes to the whole genome, and a pair observation with
+   an outside checker is not autonomous (5.4). The kernels and `Φ_K` are local transcriptions
+   until the heredity layer can be imported.
 
 This file contains no declarations.
 -/
