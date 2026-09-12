@@ -255,9 +255,11 @@ noncomputable def contextGivenDefined (late : Bool)
 /-- NOTE2 section 9: pooled over the reference context law, half the separation of the expected
 target squared correlation given definedness between the two settings, `0.00725001…`. -/
 theorem half_separation_r2 :
-    7250008 / 10 ^ 9 <
-        (givenDefined true r2Weighted r2Defined - givenDefined false r2Weighted r2Defined) / 2 ∧
-      (givenDefined true r2Weighted r2Defined - givenDefined false r2Weighted r2Defined) / 2 <
+    (7250008 / 10 ^ 9 : ℝ) <
+        ((givenDefined true r2Weighted r2Defined : ℝ) -
+          givenDefined false r2Weighted r2Defined) / 2 ∧
+      ((givenDefined true r2Weighted r2Defined : ℝ) -
+          givenDefined false r2Weighted r2Defined) / 2 <
         7250014 / 10 ^ 9 := by
   rw [show givenDefined false r2Weighted r2Defined = _ from early_target_r2_givenDefined,
     show givenDefined true r2Weighted r2Defined = _ from late_target_r2_givenDefined]
@@ -266,10 +268,10 @@ theorem half_separation_r2 :
 /-- NOTE2 section 9: pooled over the reference context law, half the separation of the expected
 target to source squared-correlation ratio given definedness, `0.0736082…`. -/
 theorem half_separation_r2Portability :
-    73608238 / 10 ^ 9 <
-        (givenDefined true ratioWeighted ratioDefined -
+    (73608238 / 10 ^ 9 : ℝ) <
+        ((givenDefined true ratioWeighted ratioDefined : ℝ) -
           givenDefined false ratioWeighted ratioDefined) / 2 ∧
-      (givenDefined true ratioWeighted ratioDefined -
+      ((givenDefined true ratioWeighted ratioDefined : ℝ) -
           givenDefined false ratioWeighted ratioDefined) / 2 <
         73608244 / 10 ^ 9 := by
   rw [show givenDefined false ratioWeighted ratioDefined = _ from
@@ -332,8 +334,7 @@ theorem minimax_floor_r2 (n : ℕ) (estimator : (Fin n → SourceStudy) → ℝ)
       worstRisk studyLaw Prod.fst (fun late ↦ (givenDefined late r2Weighted r2Defined : ℝ)) n
         estimator :=
   lt_worstRisk_of_lt_half_separation studyLaw Prod.fst
-    (fun late ↦ (givenDefined late r2Weighted r2Defined : ℝ)) _
-    (by exact_mod_cast half_separation_r2.1) n estimator
+    (fun late ↦ (givenDefined late r2Weighted r2Defined : ℝ)) _ half_separation_r2.1 n estimator
 
 /-- F2 at NOTE2 section 9, pooled over the reference context law: from any number of replicate
 source studies, every estimator of the expected target to source squared-correlation ratio given
@@ -344,7 +345,7 @@ theorem minimax_floor_r2Portability (n : ℕ) (estimator : (Fin n → SourceStud
         (fun late ↦ (givenDefined late ratioWeighted ratioDefined : ℝ)) n estimator :=
   lt_worstRisk_of_lt_half_separation studyLaw Prod.fst
     (fun late ↦ (givenDefined late ratioWeighted ratioDefined : ℝ)) _
-    (by exact_mod_cast half_separation_r2Portability.1) n estimator
+    half_separation_r2Portability.1 n estimator
 
 /-- F2 at NOTE2 section 9 within the context `(A, E) = (0, 1)`: from any number of replicate
 panels of that context, every estimator of the target squared correlation given definedness has
