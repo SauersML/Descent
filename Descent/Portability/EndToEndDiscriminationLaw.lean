@@ -487,7 +487,8 @@ theorem expectedAUC_eq_tsum
         (fun z ↦ aucDenominator (stateLaw z deme) outcome) :=
     funext fun y ↦ by
       rw [binaryAUC_eq_guardedRatio]
-      exact getD_guardedRatio _ _ y
+      exact getD_guardedRatio (fun z ↦ aucNumerator (stateLaw z deme) score outcome)
+        (fun z ↦ aucDenominator (stateLaw z deme) outcome) y
   have hnumerator : Measurable fun z : FrequencyState Deme Locus Allele ↦
       aucNumerator (stateLaw z deme) score outcome := by
     simpa only [eval_aucNumeratorPolynomial] using
