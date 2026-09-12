@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.AncestralLocality.CoalescentDualSemigroup
+import Mathlib.Analysis.SpecialFunctions.ExpDeriv
 import Mathlib.Analysis.SpecialFunctions.Exponential
 import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.MeasureTheory.Integral.DominatedConvergence
@@ -222,18 +223,17 @@ carries the exit rate. -/
 theorem norm_holdingSemigroup_apply_le [Fintype H] [Fintype E] {c : ℝ} {r : E → ℝ} (hc : 0 ≤ c)
     (n : ℕ) {t : ℝ} (ht : 0 ≤ t) (f : (Fin n → H) → ℝ) :
     ‖holdingSemigroup c r n t f‖ ≤ Real.exp (-(n * (∑ e, r e) * t)) * ‖f‖ := by
-  let P : ((Fin n → H) → ℝ) →L[ℝ] ((Fin n → H) → ℝ) :=
-    LinearMap.toContinuousLinearMap (pairSubstitution n)
-  have hP : ‖P‖ ≤ ∑ b : Fin n, ((Iio b).card : ℝ) :=
+  have hP : ‖LinearMap.toContinuousLinearMap (pairSubstitution (H := H) n)‖ ≤
+      ∑ b : Fin n, ((Iio b).card : ℝ) :=
     ContinuousLinearMap.opNorm_le_bound _ (sum_nonneg fun _ _ ↦ Nat.cast_nonneg _)
       fun g ↦ norm_pairSubstitution_le g
   have hexp : ∀ x : ((Fin n → H) → ℝ) →L[ℝ] ((Fin n → H) → ℝ),
       ‖NormedSpace.exp ℝ x‖ ≤ Real.exp ‖x‖ := by
     intro x
     rw [NormedSpace.exp_eq_tsum, Real.exp_eq_exp_ℝ, NormedSpace.exp_eq_tsum]
-    refine (norm_tsum_le_tsum_norm (NormedSpace.norm_expSeries_summable' x)).trans
-      (Summable.tsum_le_tsum (fun k ↦ ?_) (NormedSpace.norm_expSeries_summable' x)
-        (NormedSpace.expSeries_summable' ‖x‖))
+    refine (norm_tsum_le_tsum_norm (NormedSpace.norm_expSeries_summable' (𝕂 := ℝ) x)).trans
+      (Summable.tsum_le_tsum (fun k ↦ ?_) (NormedSpace.norm_expSeries_summable' (𝕂 := ℝ) x)
+        (NormedSpace.expSeries_summable' (𝕂 := ℝ) ‖x‖))
     simp only [norm_smul, smul_eq_mul, Real.norm_eq_abs]
     rw [abs_of_nonneg (inv_nonneg.mpr (Nat.cast_nonneg _))]
     refine mul_le_mul_of_nonneg_left ?_ (inv_nonneg.mpr (Nat.cast_nonneg _))
@@ -246,15 +246,19 @@ theorem norm_holdingSemigroup_apply_le [Fintype H] [Fintype E] {c : ℝ} {r : E 
         Real.exp s • (1 : ((Fin n → H) → ℝ) →L[ℝ] ((Fin n → H) → ℝ)) := fun s ↦ by
     rw [← Algebra.algebraMap_eq_smul_one s, ← NormedSpace.algebraMap_exp_comm,
       Algebra.algebraMap_eq_smul_one, ← Real.exp_eq_exp_ℝ]
-  have hsplit : t • holdingGenerator c r n = t • c • P + (-(t * dualExitRate c r n)) • 1 := by
+  have hsplit : t • holdingGenerator (H := H) c r n =
+      t • c • LinearMap.toContinuousLinearMap (pairSubstitution (H := H) n) +
+        (-(t * dualExitRate c r n)) • 1 := by
     rw [holdingGenerator, smul_sub, smul_smul t (dualExitRate c r n), neg_smul,
       ← sub_eq_add_neg]
-  have hS : holdingSemigroup c r n t =
-      Real.exp (-(t * dualExitRate c r n)) • NormedSpace.exp ℝ (t • c • P) := by
+  have hS : holdingSemigroup (H := H) c r n t =
+      Real.exp (-(t * dualExitRate c r n)) •
+        NormedSpace.exp ℝ (t • c • LinearMap.toContinuousLinearMap (pairSubstitution n)) := by
     rw [holdingSemigroup, hsplit,
       NormedSpace.exp_add_of_commute ((Commute.one_right _).smul_right _), hscalar,
       mul_smul_comm, mul_one]
-  have hnorm : ‖t • c • P‖ ≤ t * (c * ∑ b : Fin n, ((Iio b).card : ℝ)) := by
+  have hnorm : ‖t • c • LinearMap.toContinuousLinearMap (pairSubstitution (H := H) n)‖ ≤
+      t * (c * ∑ b : Fin n, ((Iio b).card : ℝ)) := by
     rw [norm_smul, norm_smul, Real.norm_eq_abs, Real.norm_eq_abs, abs_of_nonneg ht,
       abs_of_nonneg hc]
     exact mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left hP hc) ht
@@ -263,7 +267,8 @@ theorem norm_holdingSemigroup_apply_le [Fintype H] [Fintype E] {c : ℝ} {r : E 
     _ ≤ Real.exp (-(n * (∑ e, r e) * t)) * ‖f‖ := by
         refine mul_le_mul_of_nonneg_right ?_ (norm_nonneg f)
         rw [hS, norm_smul, Real.norm_eq_abs, abs_of_pos (Real.exp_pos _)]
-        calc Real.exp (-(t * dualExitRate c r n)) * ‖NormedSpace.exp ℝ (t • c • P)‖
+        calc Real.exp (-(t * dualExitRate c r n)) *
+              ‖NormedSpace.exp ℝ (t • c • LinearMap.toContinuousLinearMap (pairSubstitution n))‖
             ≤ Real.exp (-(t * dualExitRate c r n)) *
                 Real.exp (t * (c * ∑ b : Fin n, ((Iio b).card : ℝ))) :=
               mul_le_mul_of_nonneg_left ((hexp _).trans (Real.exp_le_exp.mpr hnorm))
@@ -474,6 +479,8 @@ theorem continuous_yuleWeight (R : ℝ) (k : ℕ) : ∀ n, Continuous (yuleWeigh
     intro n
     have hint : Continuous fun u ↦ n * R * Real.exp (n * R * u) * yuleWeight R k (n + 1) u :=
       (by fun_prop : Continuous fun u : ℝ ↦ (n : ℝ) * R * Real.exp (n * R * u)).mul (ih (n + 1))
+    show Continuous fun t ↦ Real.exp (-(n * R * t)) *
+      ∫ u in (0 : ℝ)..t, n * R * Real.exp (n * R * u) * yuleWeight R k (n + 1) u
     exact (by fun_prop : Continuous fun t : ℝ ↦ Real.exp (-(n * R * t))).mul
       (intervalIntegral.continuous_primitive (fun a b ↦ hint.intervalIntegrable a b) 0)
 
@@ -532,7 +539,8 @@ theorem sum_range_yuleWeight_le_one {R : ℝ} (hR : 0 ≤ R) (M : ℕ) :
         n * R * Real.exp (n * R * u) * ∑ k ∈ range M, yuleWeight R k (n + 1) u ≤
           ∫ u in (0 : ℝ)..t, n * R * Real.exp (n * R * u) := by
       refine intervalIntegral.integral_mono_on ht
-        ((hcont.mul (continuous_finset_sum _ fun k _ ↦ continuous_yuleWeight R k (n + 1)))
+        ((hcont.mul (continuous_finset_sum (range M) fun k _ ↦
+          continuous_yuleWeight R k (n + 1)))
           |>.intervalIntegrable 0 t) (hcont.intervalIntegrable 0 t) fun u hu ↦ ?_
       exact mul_le_of_le_one_right (mul_nonneg hrate (Real.exp_pos _).le) (ih (n + 1) hu.1)
     rw [integral_mul_exp_mul] at hmono
@@ -833,7 +841,8 @@ theorem truncatedDual_sub_eq_integral [Fintype H] [DecidableEq H] [Fintype E] (c
         truncatedDual c r T p M (n + 1) s (decisionSubstitution r T n f)) := by
   have hcont : ∀ (N m : ℕ) (g : (Fin m → H) → ℝ),
       Continuous fun s ↦ truncatedDual c r T p N m s g :=
-    fun N m g ↦ continuous_finset_sum _ fun k _ ↦ continuous_dysonMoment_apply c r T p k m g
+    fun N m g ↦ continuous_finset_sum (range N) fun k _ ↦
+      continuous_dysonMoment_apply c r T p k m g
   rw [intervalIntegral.integral_eq_sub_of_hasDerivAt
     (fun s _ ↦ hasDerivAt_truncatedDual c r T p M n f s)
     (((hcont _ _ _).add (hcont _ _ _)).intervalIntegrable 0 t), truncatedDual_succ_zero_time]
@@ -860,9 +869,10 @@ theorem decisionDual_sub_eq_integral [Fintype H] [DecidableEq H] [Fintype E] {c 
       (fun _ ↦ ‖holdingGenerator c r n f‖ + ‖decisionSubstitution r T n f‖) ?_ ?_
       intervalIntegrable_const ?_
     · exact Eventually.of_forall fun M ↦
-        ((continuous_finset_sum _ fun k _ ↦ continuous_dysonMoment_apply c r T p k n _).add
-          (continuous_finset_sum _ fun k _ ↦
-            continuous_dysonMoment_apply c r T p k (n + 1) _)).aestronglyMeasurable
+        ((continuous_finset_sum (range (M + 1)) fun k _ ↦
+            continuous_dysonMoment_apply c r T p k n (holdingGenerator c r n f)).add
+          (continuous_finset_sum (range M) fun k _ ↦ continuous_dysonMoment_apply c r T p k
+            (n + 1) (decisionSubstitution r T n f))).aestronglyMeasurable
     · refine Eventually.of_forall fun M ↦ ae_of_all _ fun s hs ↦ ?_
       rw [Set.uIoc_of_le ht] at hs
       exact (norm_add_le _ _).trans
@@ -885,7 +895,8 @@ theorem continuousOn_decisionDual [Fintype H] [DecidableEq H] [Fintype E] {c : �
   have hR : 0 ≤ ∑ e, r e := sum_nonneg fun e _ ↦ hr e
   refine TendstoUniformlyOn.continuousOn (F := fun M t ↦ truncatedDual c r T p M n t f) ?_
     (Eventually.of_forall fun M ↦
-      (continuous_finset_sum _ fun k _ ↦ continuous_dysonMoment_apply c r T p k n f).continuousOn)
+      (continuous_finset_sum (range M) fun k _ ↦
+        continuous_dysonMoment_apply c r T p k n f).continuousOn)
   rw [Metric.tendstoUniformlyOn_iff]
   intro ε hε
   have hC : Tendsto (fun M : ℕ ↦ n * Real.exp ((∑ e, r e) * τ) * ‖f‖ / M) atTop (𝓝 0) :=
@@ -983,13 +994,13 @@ theorem decisionDual_holdingGenerator_add [Fintype H] [DecidableEq H] [Fintype E
         ∑ a ∈ Iio b, decisionDual c r T p n t (coalesceArguments a b f) -
           ((Iio b).card : ℝ) * decisionDual c r T p n t f := fun b ↦ by
     rw [sum_sub_distrib, sum_const, nsmul_eq_mul]
-  have hdec : ∀ e, ∑ a : Fin n,
+  have hdec : ∀ e, r e * ∑ a : Fin n,
       (decisionDual c r T p (n + 1) t (decisionBranch (T e) a f) - decisionDual c r T p n t f) =
-        ∑ a, decisionDual c r T p (n + 1) t (decisionBranch (T e) a f) -
-          n * decisionDual c r T p n t f := fun e ↦ by
+        r e * (∑ a, decisionDual c r T p (n + 1) t (decisionBranch (T e) a f) -
+          n * decisionDual c r T p n t f) := fun e ↦ by
     rw [sum_sub_distrib, sum_const, card_univ, Fintype.card_fin, nsmul_eq_mul]
   rw [(hs n _).unique hK, (hs (n + 1) _).unique hB, dualExitRate,
-    sum_congr rfl fun b _ ↦ hcoal b, sum_congr rfl fun e _ ↦ congrArg (r e * ·) (hdec e)]
+    sum_congr rfl fun b _ ↦ hcoal b, sum_congr rfl fun e _ ↦ hdec e]
   simp only [mul_sub, sum_sub_distrib, ← sum_mul]
   ring
 
