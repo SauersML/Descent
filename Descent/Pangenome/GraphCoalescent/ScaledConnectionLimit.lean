@@ -146,7 +146,7 @@ theorem crossingRate_pos {w : ℕ} {p : Fin w → ℝ} (hp : ∀ i, 0 < p i) {σ
     by_contra h
     push_neg at h
     exact hσ (Setoid.ext fun i j ↦ ⟨fun _ ↦ trivial, fun _ ↦ h i j⟩)
-  have hne : i ≠ j := fun h ↦ hij (by rw [h]; exact σ.iseqv.refl j)
+  have hne : i ≠ j := fun h ↦ hij (by rw [h])
   have hnonneg : ∀ e ∈ (univ : Finset (FiberPair w)),
       0 ≤ if σ e.1.1 e.1.2 then 0 else pairRate p e := fun e _ ↦ by
     split_ifs
@@ -186,8 +186,6 @@ theorem tendsto_connectionProbability_atTop {w : ℕ} [NeZero w] {p : Fin w → 
   simp only [Finset.sum_ite_eq', Finset.mem_univ, if_true] at hsum
   refine hsum.congr fun u ↦ ?_
   rw [connectionProbability_eq_mobius_sum]
-  exact Finset.sum_congr (congrArg (@Finset.univ (ER w)) (Subsingleton.elim _ _))
-    fun _ _ ↦ rfl
 
 /-! ### Path functionals under a total variation bound -/
 
