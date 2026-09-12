@@ -765,7 +765,8 @@ theorem ofReal_exp_smul_apply_eq_firstJump {rate : S → ℝ} (hrate : ∀ x, 0 
         * NormedSpace.exp ℝ ((t - h) • holdJumpGenerator rate kernel) z y)
         ∂Coalescent.holdMeasure (rate x)
       = ENNReal.ofReal (∫ h in (0 : ℝ)..t, rate x * Real.exp (-(rate x * h)) * ∑ z,
-          (kernel x z).toReal * NormedSpace.exp ℝ ((t - h) • holdJumpGenerator rate kernel) z y) := by
+          (kernel x z).toReal
+            * NormedSpace.exp ℝ ((t - h) • holdJumpGenerator rate kernel) z y) := by
     rw [Coalescent.holdMeasure, setLIntegral_withDensity_eq_setLIntegral_mul _
         (Coalescent.measurable_holdDensity _) hFcont.measurable.ennreal_ofReal measurableSet_Iic]
     simp only [Pi.mul_apply, hdensity]
@@ -829,7 +830,8 @@ state, the point mass there. It is the kernel `I + Q / canonicalRate Q`. -/
 def canonicalKernel (Q : Matrix S S ℝ) (hoff : ∀ x y, x ≠ y → 0 ≤ Q x y)
     (hrow : ∀ x, ∑ y, Q x y = 0) (x : S) : PMF S :=
   PMF.ofFintype
-    (fun y ↦ ENNReal.ofReal ((Q x y + if x = y then canonicalRate Q x else 0) / canonicalRate Q x))
+    (fun y ↦
+      ENNReal.ofReal ((Q x y + if x = y then canonicalRate Q x else 0) / canonicalRate Q x))
     (by
       rw [← ENNReal.ofReal_sum_of_nonneg fun y _ ↦ canonicalWeight_nonneg hoff hrow x y,
         canonicalWeight_sum hoff hrow x, ENNReal.ofReal_one])
@@ -858,6 +860,302 @@ theorem holdJumpGenerator_canonical {Q : Matrix S S ℝ} (hoff : ∀ x y, x ≠ 
       split_ifs <;> ring
 
 end Generator
+
+/-! ### The marginals are the rows of the matrix exponential -/
+
+section Marginals
+
+variable {S : Type*} [Fintype S] [MeasurableSpace S] [MeasurableSingletonClass S]
+
+theorem fuelProb_zero_some (rate : S → ℝ) (hrate : ∀ x, 0 < rate x) (kernel : S → PMF S)
+    (x : S) (t : ℝ) (y : S) : fuelProb rate hrate kernel 0 x t (some y) = 0 := by
+  have hset : {ω : ℕ → S → S × ℝ | fuelState 0 (jumpHoldSeq ω x) t = some y} = ∅ := by
+    ext ω
+    simp [fuelState]
+  rw [fuelProb, hset, measure_empty]
+
+theorem fuelProb_zero_none (rate : S → ℝ) (hrate : ∀ x, 0 < rate x) (kernel : S → PMF S)
+    (x : S) (t : ℝ) : fuelProb rate hrate kernel 0 x t none = 1 := by
+  haveI := pathMeasure_isProbabilityMeasure hrate kernel
+  have hset : {ω : ℕ → S → S × ℝ | fuelState 0 (jumpHoldSeq ω x) t = none} = Set.univ := by
+    ext ω
+    simp [fuelState]
+  rw [fuelProb, hset, measure_univ]
+
+/-- **The fuel-limited probabilities stay below the matrix exponential**: they are the Picard
+iterates of the first-jump equation started from zero. -/
+theorem fuelProb_le_exp (rate : S → ℝ) (hrate : ∀ x, 0 < rate x) (kernel : S → PMF S)
+    (m : ℕ) : ∀ {t : ℝ}, 0 ≤ t → ∀ x y, fuelProb rate hrate kernel m x t (some y)
+      ≤ ENNReal.ofReal (NormedSpace.exp ℝ (t • holdJumpGenerator rate kernel) x y) := by
+  induction m with
+  | zero =>
+    intro t _ x y
+    rw [fuelProb_zero_some]
+    exact zero_le _
+  | succ m ih =>
+    intro t ht x y
+    rw [fuelProb_succ, ofReal_exp_smul_apply_eq_firstJump hrate kernel x y ht]
+    refine add_le_add ?_ (Finset.sum_le_sum fun z _ ↦ mul_le_mul_left' ?_ _)
+    · split_ifs <;> simp_all
+    · exact lintegral_mono_ae ((ae_restrict_iff' measurableSet_Iic).mpr
+        (Filter.Eventually.of_forall fun h hh ↦ ih (sub_nonneg.mpr hh) z y))
+
+/-- **The chance that `m` sojourns end by a time `t ≤ T` is at most `(1 - e^{-RT})^m`**, with `R`
+the total of the holding rates. -/
+theorem fuelProb_none_le (rate : S → ℝ) (hrate : ∀ x, 0 < rate x) (kernel : S → PMF S)
+    {T : ℝ} (hT : 0 ≤ T) (m : ℕ) :
+    ∀ {t : ℝ}, 0 ≤ t → t ≤ T → ∀ x, fuelProb rate hrate kernel m x t none
+      ≤ ENNReal.ofReal ((1 - Real.exp (-((∑ z, rate z) * T))) ^ m) := by
+  have hR : 0 ≤ ∑ z, rate z := Finset.sum_nonneg fun z _ ↦ (hrate z).le
+  have hρ : 0 ≤ 1 - Real.exp (-((∑ z, rate z) * T)) :=
+    sub_nonneg.mpr (Real.exp_le_one_iff.mpr (neg_nonpos.mpr (mul_nonneg hR hT)))
+  induction m with
+  | zero =>
+    intro t _ _ x
+    rw [fuelProb_zero_none, pow_zero, ENNReal.ofReal_one]
+  | succ m ih =>
+    intro t ht htT x
+    rw [fuelProb_succ]
+    simp only [Option.some_ne_none, ↓reduceIte, zero_add]
+    have hpos : ∀ᵐ h ∂Coalescent.holdMeasure (rate x), 0 ≤ h := by
+      rw [ae_iff]
+      have hset : {h : ℝ | ¬0 ≤ h} = Set.Iio 0 := by
+        ext h
+        simp
+      rw [hset]
+      exact holdMeasure_Iio_zero (rate x)
+    have hint : ∀ z, ∫⁻ h in Set.Iic t, fuelProb rate hrate kernel m z (t - h) none
+          ∂Coalescent.holdMeasure (rate x)
+        ≤ ENNReal.ofReal ((1 - Real.exp (-((∑ z, rate z) * T))) ^ m)
+          * ENNReal.ofReal (1 - Real.exp (-((∑ z, rate z) * T))) := by
+      intro z
+      have hr : ∀ᵐ h ∂(Coalescent.holdMeasure (rate x)).restrict (Set.Iic t), h ≤ t :=
+        (ae_restrict_iff' measurableSet_Iic).mpr (Filter.Eventually.of_forall fun h hh ↦ hh)
+      calc ∫⁻ h in Set.Iic t, fuelProb rate hrate kernel m z (t - h) none
+            ∂Coalescent.holdMeasure (rate x)
+          ≤ ∫⁻ _ in Set.Iic t, ENNReal.ofReal ((1 - Real.exp (-((∑ z, rate z) * T))) ^ m)
+            ∂Coalescent.holdMeasure (rate x) := by
+            refine lintegral_mono_ae ?_
+            filter_upwards [ae_restrict_of_ae hpos, hr] with h h0 hh
+            exact ih (sub_nonneg.mpr hh) (by linarith) z
+        _ = ENNReal.ofReal ((1 - Real.exp (-((∑ z, rate z) * T))) ^ m)
+            * Coalescent.holdMeasure (rate x) (Set.Iic t) := setLIntegral_const _ _
+        _ ≤ _ := by
+            refine mul_le_mul_left' ?_ _
+            rw [holdMeasure_Iic (hrate x) ht]
+            refine ENNReal.ofReal_le_ofReal (sub_le_sub_left (Real.exp_le_exp.mpr ?_) 1)
+            have hle : rate x ≤ ∑ z, rate z :=
+              Finset.single_le_sum (fun z _ ↦ (hrate z).le) (Finset.mem_univ x)
+            have hprod := mul_le_mul hle htT ht hR
+            linarith
+    calc ∑ z, kernel x z * ∫⁻ h in Set.Iic t, fuelProb rate hrate kernel m z (t - h) none
+          ∂Coalescent.holdMeasure (rate x)
+        ≤ ∑ z, kernel x z * (ENNReal.ofReal ((1 - Real.exp (-((∑ z, rate z) * T))) ^ m)
+          * ENNReal.ofReal (1 - Real.exp (-((∑ z, rate z) * T)))) :=
+          Finset.sum_le_sum fun z _ ↦ mul_le_mul_left' (hint z) _
+      _ = ENNReal.ofReal ((1 - Real.exp (-((∑ z, rate z) * T))) ^ (m + 1)) := by
+          rw [← Finset.sum_mul, sum_kernel, one_mul, ← ENNReal.ofReal_mul (pow_nonneg hρ m),
+            pow_succ]
+
+/-- Following `m` sojourns the chain is at some state or has not yet been located. -/
+theorem fuelProb_none_add_sum (rate : S → ℝ) (hrate : ∀ x, 0 < rate x) (kernel : S → PMF S)
+    (m : ℕ) (x : S) (t : ℝ) :
+    fuelProb rate hrate kernel m x t none + ∑ y, fuelProb rate hrate kernel m x t (some y)
+      = 1 := by
+  haveI := pathMeasure_isProbabilityMeasure hrate kernel
+  have h := sum_measure_preimage_singleton (μ := pathMeasure rate hrate kernel)
+    (Finset.univ : Finset (Option S)) (f := fun ω ↦ fuelState m (jumpHoldSeq ω x) t)
+    fun o _ ↦ measurableSet_fuelEvent m x t o
+  rw [Finset.coe_univ, Set.preimage_univ, measure_univ, Fintype.sum_option] at h
+  exact h
+
+theorem sum_ofReal_exp_smul_holdJumpGenerator {rate : S → ℝ} (hrate : ∀ x, 0 < rate x)
+    (kernel : S → PMF S) {t : ℝ} (ht : 0 ≤ t) (x : S) :
+    ∑ y, ENNReal.ofReal (NormedSpace.exp ℝ (t • holdJumpGenerator rate kernel) x y) = 1 := by
+  rw [← ENNReal.ofReal_sum_of_nonneg fun y _ ↦
+      exp_smul_holdJumpGenerator_nonneg hrate kernel ht x y,
+    sum_exp_smul_holdJumpGenerator, ENNReal.ofReal_one]
+
+theorem measurableSet_stateAt_some (x : S) (t : ℝ) (y : S) :
+    MeasurableSet {ω : ℕ → S → S × ℝ | stateAt (jumpHoldSeq ω x) t = some y} := by
+  have h : {ω : ℕ → S → S × ℝ | stateAt (jumpHoldSeq ω x) t = some y}
+      = ⋃ m, {ω | fuelState m (jumpHoldSeq ω x) t = some y} := by
+    ext ω
+    simp only [Set.mem_setOf_eq, Set.mem_iUnion]
+    exact stateAt_eq_some_iff
+  rw [h]
+  exact MeasurableSet.iUnion fun m ↦ measurableSet_fuelEvent m x t (some y)
+
+/-- **The one-dimensional marginals of the jump process**: for `t ≥ 0`, the chain from `x` is at
+`y` at time `t` with probability `e^{tG}(x, y)`. -/
+theorem pathMeasure_stateAt_eq (rate : S → ℝ) (hrate : ∀ x, 0 < rate x) (kernel : S → PMF S)
+    {t : ℝ} (ht : 0 ≤ t) (x y : S) :
+    pathMeasure rate hrate kernel {ω | stateAt (jumpHoldSeq ω x) t = some y}
+      = ENNReal.ofReal (NormedSpace.exp ℝ (t • holdJumpGenerator rate kernel) x y) := by
+  have hle : ∀ y', pathMeasure rate hrate kernel {ω | stateAt (jumpHoldSeq ω x) t = some y'}
+      ≤ ENNReal.ofReal (NormedSpace.exp ℝ (t • holdJumpGenerator rate kernel) x y') := by
+    intro y'
+    have hunion : {ω : ℕ → S → S × ℝ | stateAt (jumpHoldSeq ω x) t = some y'}
+        = ⋃ m, {ω | fuelState m (jumpHoldSeq ω x) t = some y'} := by
+      ext ω
+      simp only [Set.mem_setOf_eq, Set.mem_iUnion]
+      exact stateAt_eq_some_iff
+    have hmono : Monotone fun m ↦
+        {ω : ℕ → S → S × ℝ | fuelState m (jumpHoldSeq ω x) t = some y'} :=
+      fun m m' hm ω hω ↦ fuelState_eq_some_of_le hm hω
+    rw [hunion, hmono.measure_iUnion]
+    exact iSup_le fun m ↦ fuelProb_le_exp rate hrate kernel m ht x y'
+  have hfuel : ∀ m y', fuelProb rate hrate kernel m x t (some y')
+      ≤ pathMeasure rate hrate kernel {ω | stateAt (jumpHoldSeq ω x) t = some y'} :=
+    fun m _ ↦ measure_mono fun ω hω ↦ stateAt_eq_some_iff.mpr ⟨m, hω⟩
+  have hR : 0 ≤ ∑ z, rate z := Finset.sum_nonneg fun z _ ↦ (hrate z).le
+  have hρ0 : 0 ≤ 1 - Real.exp (-((∑ z, rate z) * t)) :=
+    sub_nonneg.mpr (Real.exp_le_one_iff.mpr (neg_nonpos.mpr (mul_nonneg hR ht)))
+  have hρ1 : 1 - Real.exp (-((∑ z, rate z) * t)) < 1 := by
+    have hexp := Real.exp_pos (-((∑ z, rate z) * t))
+    linarith
+  have hbound : ∀ m : ℕ, 1 ≤ ENNReal.ofReal ((1 - Real.exp (-((∑ z, rate z) * t))) ^ m)
+      + ∑ y', pathMeasure rate hrate kernel {ω | stateAt (jumpHoldSeq ω x) t = some y'} := by
+    intro m
+    calc (1 : ℝ≥0∞)
+        = fuelProb rate hrate kernel m x t none
+          + ∑ y', fuelProb rate hrate kernel m x t (some y') :=
+          (fuelProb_none_add_sum rate hrate kernel m x t).symm
+      _ ≤ _ := add_le_add (fuelProb_none_le rate hrate kernel ht m ht le_rfl x)
+          (Finset.sum_le_sum fun y' _ ↦ hfuel m y')
+  have hlim : Tendsto (fun m : ℕ ↦ ENNReal.ofReal ((1 - Real.exp (-((∑ z, rate z) * t))) ^ m)
+      + ∑ y', pathMeasure rate hrate kernel {ω | stateAt (jumpHoldSeq ω x) t = some y'}) atTop
+      (𝓝 (0 + ∑ y', pathMeasure rate hrate kernel
+        {ω | stateAt (jumpHoldSeq ω x) t = some y'})) := by
+    have h0 := ENNReal.tendsto_ofReal (tendsto_pow_atTop_nhds_zero_of_lt_one hρ0 hρ1)
+    rw [ENNReal.ofReal_zero] at h0
+    exact h0.add tendsto_const_nhds
+  have hone : 1 ≤ ∑ y', pathMeasure rate hrate kernel
+      {ω | stateAt (jumpHoldSeq ω x) t = some y'} := by
+    have h := ge_of_tendsto' hlim hbound
+    rwa [zero_add] at h
+  have hsum := sum_ofReal_exp_smul_holdJumpGenerator hrate kernel ht x
+  rw [← Finset.add_sum_erase _ _ (Finset.mem_univ y)] at hone
+  rw [← Finset.add_sum_erase _ _ (Finset.mem_univ y)] at hsum
+  have hrest : ∑ y' ∈ Finset.univ.erase y,
+        pathMeasure rate hrate kernel {ω | stateAt (jumpHoldSeq ω x) t = some y'}
+      ≤ ∑ y' ∈ Finset.univ.erase y,
+        ENNReal.ofReal (NormedSpace.exp ℝ (t • holdJumpGenerator rate kernel) x y') :=
+    Finset.sum_le_sum fun y' _ ↦ hle y'
+  have hne : ∑ y' ∈ Finset.univ.erase y,
+      ENNReal.ofReal (NormedSpace.exp ℝ (t • holdJumpGenerator rate kernel) x y') ≠ ⊤ :=
+    ne_top_of_le_ne_top ENNReal.one_ne_top (le_add_self.trans hsum.le)
+  refine le_antisymm (hle y) (ENNReal.le_of_add_le_add_right hne ?_)
+  calc ENNReal.ofReal (NormedSpace.exp ℝ (t • holdJumpGenerator rate kernel) x y)
+        + ∑ y' ∈ Finset.univ.erase y,
+          ENNReal.ofReal (NormedSpace.exp ℝ (t • holdJumpGenerator rate kernel) x y')
+      = 1 := hsum
+    _ ≤ _ := hone
+    _ ≤ _ := add_le_add le_rfl hrest
+
+/-- **The probability that the chain from `x` is at `y` at time `t`.** -/
+def stateProb (rate : S → ℝ) (hrate : ∀ x, 0 < rate x) (kernel : S → PMF S) (t : ℝ)
+    (x y : S) : ℝ :=
+  (pathMeasure rate hrate kernel {ω | stateAt (jumpHoldSeq ω x) t = some y}).toReal
+
+/-- **`P_x(X_t = y) = e^{tG}(x, y)`** for `t ≥ 0`. -/
+theorem stateProb_eq (rate : S → ℝ) (hrate : ∀ x, 0 < rate x) (kernel : S → PMF S) {t : ℝ}
+    (ht : 0 ≤ t) (x y : S) :
+    stateProb rate hrate kernel t x y
+      = NormedSpace.exp ℝ (t • holdJumpGenerator rate kernel) x y := by
+  rw [stateProb, pathMeasure_stateAt_eq rate hrate kernel ht x y,
+    ENNReal.toReal_ofReal (exp_smul_holdJumpGenerator_nonneg hrate kernel ht x y)]
+
+/-- The marginals are the corpus matrix exponential of the generator. -/
+theorem stateProb_eq_matrixExponential (rate : S → ℝ) (hrate : ∀ x, 0 < rate x)
+    (kernel : S → PMF S) {t : ℝ} (ht : 0 ≤ t) (x y : S) :
+    stateProb rate hrate kernel t x y
+      = Coalescent.matrixExponential (holdJumpGenerator rate kernel) t x y := by
+  rw [stateProb_eq rate hrate kernel ht, Coalescent.matrixExponential_eq_normedSpace_exp]
+
+/-- **The jump process does not explode**: at every time `t ≥ 0` the chain is at some state. -/
+theorem pathMeasure_stateAt_none (rate : S → ℝ) (hrate : ∀ x, 0 < rate x) (kernel : S → PMF S)
+    {t : ℝ} (ht : 0 ≤ t) (x : S) :
+    pathMeasure rate hrate kernel {ω | stateAt (jumpHoldSeq ω x) t = none} = 0 := by
+  haveI := pathMeasure_isProbabilityMeasure hrate kernel
+  have hnone : {ω : ℕ → S → S × ℝ | stateAt (jumpHoldSeq ω x) t = none}
+      = ⋂ m, {ω | fuelState m (jumpHoldSeq ω x) t = none} := by
+    ext ω
+    simp only [Set.mem_setOf_eq, Set.mem_iInter]
+    exact stateAt_eq_none_iff
+  have hmeas : ∀ o ∈ (Finset.univ : Finset (Option S)),
+      MeasurableSet ((fun ω ↦ stateAt (jumpHoldSeq ω x) t) ⁻¹' {o}) := by
+    intro o _
+    cases o with
+    | none =>
+      show MeasurableSet {ω : ℕ → S → S × ℝ | stateAt (jumpHoldSeq ω x) t = none}
+      rw [hnone]
+      exact MeasurableSet.iInter fun m ↦ measurableSet_fuelEvent m x t none
+    | some y => exact measurableSet_stateAt_some x t y
+  have h := sum_measure_preimage_singleton (μ := pathMeasure rate hrate kernel) Finset.univ hmeas
+  rw [Finset.coe_univ, Set.preimage_univ, measure_univ, Fintype.sum_option] at h
+  have hsum : ∑ y, pathMeasure rate hrate kernel
+      ((fun ω ↦ stateAt (jumpHoldSeq ω x) t) ⁻¹' {some y}) = 1 :=
+    (Finset.sum_congr rfl fun y _ ↦ pathMeasure_stateAt_eq rate hrate kernel ht x y).trans
+      (sum_ofReal_exp_smul_holdJumpGenerator hrate kernel ht x)
+  rw [hsum] at h
+  exact nonpos_iff_eq_zero.mp
+    (ENNReal.le_of_add_le_add_right ENNReal.one_ne_top (by rw [zero_add]; exact h.le))
+
+/-- **The forward equation for the marginals**: `d/dt P_x(X_t = y) = Σ_z P_x(X_t = z) G(z, y)`
+at `t > 0`. -/
+theorem hasDerivAt_stateProb_forward (rate : S → ℝ) (hrate : ∀ x, 0 < rate x)
+    (kernel : S → PMF S) {t : ℝ} (ht : 0 < t) (x y : S) :
+    HasDerivAt (fun u ↦ stateProb rate hrate kernel u x y)
+      (∑ z, stateProb rate hrate kernel t x z * holdJumpGenerator rate kernel z y) t := by
+  have hentry := hasDerivAt_exp_smul_apply (holdJumpGenerator rate kernel) x y t
+  rw [Matrix.mul_apply] at hentry
+  have hvalue : ∑ z, stateProb rate hrate kernel t x z * holdJumpGenerator rate kernel z y
+      = ∑ z, NormedSpace.exp ℝ (t • holdJumpGenerator rate kernel) x z
+        * holdJumpGenerator rate kernel z y :=
+    Finset.sum_congr rfl fun z _ ↦ by rw [stateProb_eq rate hrate kernel ht.le]
+  rw [hvalue]
+  exact hentry.congr_of_eventuallyEq ((eventually_gt_nhds ht).mono fun u hu ↦
+    stateProb_eq rate hrate kernel hu.le x y)
+
+/-- **The backward equation for the marginals**: `d/dt P_x(X_t = y) = Σ_z G(x, z) P_z(X_t = y)`
+at `t > 0`. -/
+theorem hasDerivAt_stateProb_backward (rate : S → ℝ) (hrate : ∀ x, 0 < rate x)
+    (kernel : S → PMF S) {t : ℝ} (ht : 0 < t) (x y : S) :
+    HasDerivAt (fun u ↦ stateProb rate hrate kernel u x y)
+      (∑ z, holdJumpGenerator rate kernel x z * stateProb rate hrate kernel t z y) t := by
+  have hentry := hasDerivAt_exp_smul_apply' (holdJumpGenerator rate kernel) x y t
+  rw [Matrix.mul_apply] at hentry
+  have hvalue : ∑ z, holdJumpGenerator rate kernel x z * stateProb rate hrate kernel t z y
+      = ∑ z, holdJumpGenerator rate kernel x z
+        * NormedSpace.exp ℝ (t • holdJumpGenerator rate kernel) z y :=
+    Finset.sum_congr rfl fun z _ ↦ by rw [stateProb_eq rate hrate kernel ht.le]
+  rw [hvalue]
+  exact hentry.congr_of_eventuallyEq ((eventually_gt_nhds ht).mono fun u hu ↦
+    stateProb_eq rate hrate kernel hu.le x y)
+
+/-- **Chapman-Kolmogorov for the marginals**: `P_x(X_{s+t} = y) = Σ_z P_x(X_s = z) P_z(X_t = y)`. -/
+theorem stateProb_add (rate : S → ℝ) (hrate : ∀ x, 0 < rate x) (kernel : S → PMF S)
+    {s t : ℝ} (hs : 0 ≤ s) (ht : 0 ≤ t) (x y : S) :
+    stateProb rate hrate kernel (s + t) x y
+      = ∑ z, stateProb rate hrate kernel s x z * stateProb rate hrate kernel t z y := by
+  have hcomm : Commute (s • holdJumpGenerator rate kernel) (t • holdJumpGenerator rate kernel) :=
+    ((Commute.refl _).smul_left s).smul_right t
+  rw [stateProb_eq rate hrate kernel (add_nonneg hs ht), add_smul,
+    Matrix.exp_add_of_commute (𝕂 := ℝ) _ _ hcomm, Matrix.mul_apply]
+  exact Finset.sum_congr rfl fun z _ ↦ by
+    rw [stateProb_eq rate hrate kernel hs, stateProb_eq rate hrate kernel ht]
+
+/-- **The chain of a generator.** For a generator `Q` with nonnegative off-diagonal rates and zero
+row sums, the chain built from its jump chain and exponential holding times is at `y` at time `t`
+with probability `e^{tQ}(x, y)`; absorbing states are allowed. -/
+theorem stateProb_canonical_eq {Q : Matrix S S ℝ} (hoff : ∀ x y, x ≠ y → 0 ≤ Q x y)
+    (hrow : ∀ x, ∑ y, Q x y = 0) {t : ℝ} (ht : 0 ≤ t) (x y : S) :
+    stateProb (canonicalRate Q) (canonicalRate_pos hoff hrow) (canonicalKernel Q hoff hrow) t x y
+      = NormedSpace.exp ℝ (t • Q) x y := by
+  rw [stateProb_eq _ _ _ ht, holdJumpGenerator_canonical hoff hrow]
+
+end Marginals
 
 end
 
