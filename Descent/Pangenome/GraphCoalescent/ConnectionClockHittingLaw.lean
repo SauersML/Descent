@@ -237,8 +237,11 @@ theorem map_connectionTime_eq_sum {n : ℕ} (hn : 2 ≤ n) (s : Fin n → Fin n)
   have hswap : Measurable fun q : (ℕ → ℝ) × List (ER n) ↦
       Real.toNNReal (∑ j ∈ Ico (stoppingLevel s q.2 - 1) (n - 1), q.1 j) :=
     measurable_from_prod_countable_left fun l ↦ hsum (stoppingLevel s l)
-  have hmeas : Measurable fun p : List (ER n) × (ℕ → ℝ) ↦ Real.toNNReal (connectionTime s p) :=
-    hswap.comp measurable_swap
+  -- composed without an expected type: propagating `Measurable (toNNReal ∘ connectionTime s)`
+  -- into `?g ∘ ?f` splits it at `toNNReal` and times out
+  have hmeas : Measurable fun p : List (ER n) × (ℕ → ℝ) ↦ Real.toNNReal (connectionTime s p) := by
+    have h := hswap.comp measurable_swap
+    exact h
   refine Measure.ext_of_lintegral _ fun g hg ↦ ?_
   rw [lintegral_map hg hmeas, lintegral_finset_sum_measure]
   refine (lintegral_trajectoryClockLaw hn s
