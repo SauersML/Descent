@@ -31,12 +31,13 @@ ordered block pairs whose merger leads to `target` number exactly that, and
 the same hidden load in every cell offer equally many mergers into every lumped target. With the
 blocks and cells of the corpus setoids this is `card_blockMergers_eq`.
 
-The module defines its own load vocabulary because the load chain of Theorem A is not on main.
+The module defines its own load vocabulary, which predates the load chain of Theorem A on main.
 
-Not formalized here: that the outcome of a merger really depends only on the two cells. In each
-report the merger joins the components containing those cells, and the new common refinement
-aggregates old cells, with loads adding and dropping by one for the merged pair. Here it is the
-hypothesis on the outcome map. Also not formalized: the Λ-coalescent extension of section 10.
+The hypothesis on the outcome map, that the outcome of a merger depends only on the two cells, is
+discharged downstream: `MultiInterfaceOutcome` and `MultiInterfaceLoads` prove it, and
+`MultiInterfaceGenerator.card_blockMergers_eq_lumpedMergerCount` is `card_blockMergers_eq` with
+the outcome map built from the mergers themselves. The Λ-coalescent extension of section 10 is not
+treated here.
 
 ## Empirical status
 

@@ -28,9 +28,9 @@ that they have the same common refinement afterwards. `commonRefinement_eq_of_re
 `commonRefinement_mono` record that the common refinement is a function of the reports and is
 monotone in the coalescent state.
 
-Not formalized here: the load part of the hypothesis, that the number of true blocks in each cell
-after the merger aggregates the old loads over the cells it contains and drops by one for the
-merged pair.
+The load part of the hypothesis, that the number of true blocks in each cell after the merger
+aggregates the old loads over the cells it contains and drops by one for the merged pair, is
+`MultiInterfaceLoads`.
 
 ## Empirical status
 
