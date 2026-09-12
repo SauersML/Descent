@@ -7,6 +7,9 @@ import Descent.Pangenome.GraphCoalescent.MarkovCompressions
 import Descent.Pangenome.AncestralLocality.InhomogeneousLocalityTransition
 import Descent.Pangenome.AncestralLocality.SelectionDecisions
 import Descent.Portability.PortabilityMinimaxLowerBound
+import Descent.Portability.EndToEndPortabilityLaw
+import Descent.Pangenome.GraphCoalescent.CompressionLoadAchievability
+import Descent.Pangenome.AncestralLocality.SelectionClosure
 
 namespace Descent.Program
 
@@ -36,7 +39,24 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   `w ≤ 1` (`isReportLumping_iff`), and the corpus criterion that also counts covers into a state's
   own report holds exactly for injective interfaces (`observablyMarkov_iff_injective`); every
   report component carries at most `|C| - w_C + 1` hidden lineages
-  (`hiddenLoad_add_componentWidth_le`).
+  (`hiddenLoad_add_componentWidth_le`), and every positive load assignment constant on components
+  within that bound is attained
+  (`CompressionLoadAchievability.exists_observed_eq_hiddenLoad_eq_iff`).
+* The end-to-end law of portability: `EndToEndPortabilityLaw`. For a neutral history of epochs,
+  splits and pulses, or a continuous rate path, the expected correlation numerator and denominator
+  of a score in each deme are coefficient vectors dotted with the propagated budget-4 moments, so
+  expected portability is an explicit rational function of `U · H₄(x₀)`
+  (`expectedPortability_historyEventKernel`, `expectedPortability_rateHistoryKernel`), the joint
+  ratio of NOTE2 (27) of `U · H₈(x₀)` (`expectedJointPortability_historyEventKernel`), and two
+  histories that agree on those moments have equal portability
+  (`expectedPortability_eq_of_moments_eq`).
+* Selection and hereditary closure: `SelectionClosure`. Selection size-biases the parents
+  (`selectedReproduce_eq`); the closure predicting the selected next generation is the closure of
+  the observation joined with fitness, the greatest autonomous partition below the observation on
+  whose blocks fitness is constant (`isGreatest_selectionClosure`), and it equals the neutral
+  closure exactly when fitness is constant on the neutral closure's blocks
+  (`selectionClosure_eq_hereditaryClosure_iff`); under unbiased copying, fitness on a hidden
+  feature breaks autonomy by hitchhiking (`selectionAutonomous_halfMix_iff`).
 * What source data cannot tell you about the target: `PortabilityMinimaxLowerBound`. Two
   histories with source report laws `P`, `Q` and target values `τ_P`, `τ_Q` force every estimator
   from `n` source replicas to worst-case error at least `(|τ_P - τ_Q|/2) (1 - TV(P, Q))^n`

@@ -715,6 +715,7 @@ import Descent.Portability.NeutralCaratheodoryRealization
 import Descent.Portability.MigrationMutationOperators
 import Descent.Portability.ResamplingInfiniteGenome
 import Descent.Portability.PortabilityMinimaxLowerBound
+import Descent.Portability.EndToEndPortabilityLaw
 
 assert_below Descent.Program
 

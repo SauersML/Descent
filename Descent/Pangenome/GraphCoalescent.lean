@@ -68,6 +68,7 @@ import Descent.Pangenome.GraphCoalescent.RankedHistoryTies
 import Descent.Pangenome.GraphCoalescent.LambdaLoadOutcome
 import Descent.Pangenome.GraphCoalescent.CompressionHiddenStateCount
 import Descent.Pangenome.GraphCoalescent.MarkovCompressions
+import Descent.Pangenome.GraphCoalescent.CompressionLoadAchievability
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program
