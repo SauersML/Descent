@@ -21,7 +21,8 @@ the limit is unique through the separating algebra. This module proves the opera
 steps on any compact space `X` with a point-separating subalgebra `A` of observables.
 
 `FellerSemigroup X` is a family of positive, constant-preserving sup-norm contractions of
-`C(X, ℝ)` with the semigroup law and strong continuity at time zero. `LightConeApproximation S A`
+`C(X, ℝ)` with the semigroup law and strong continuity at time zero, which gives strong continuity
+at every time (`FellerSemigroup.continuous_operator`). `LightConeApproximation S A`
 is the uniform approximation bound, taken as a named hypothesis: the semigroups `S m` along the
 exhaustion are within `2 ‖f‖ · escape f T m` of every later member on each observable `f ∈ A` at
 every time up to `T`, and the escape bound tends to zero along the exhaustion.
@@ -118,6 +119,42 @@ def LightConeApproximation.constant (X : Type*) [TopologicalSpace X] [CompactSpa
   norm_sub_le _ _ _ _ _ _ _ _ := by simp
 
 variable {X : Type*} [TopologicalSpace X] [CompactSpace X]
+
+/-- **A Feller semigroup is strongly continuous at every time.** For `s ≤ t` the output at `t` is
+the output at `s` of the output at `t - s`, so the contraction bound reduces the difference to
+strong continuity at time zero; the case `t ≤ s` is symmetric. -/
+theorem FellerSemigroup.continuous_operator (P : FellerSemigroup X) (g : C(X, ℝ)) :
+    Continuous fun t ↦ P.operator t g := by
+  have hbound : ∀ s t : ℝ≥0, ‖P.operator t g - P.operator s g‖ ≤
+      ‖P.operator (t - s) g - g‖ + ‖P.operator (s - t) g - g‖ := by
+    intro s t
+    rcases le_total s t with hst | hts
+    · have hsplit : P.operator t g = P.operator s (P.operator (t - s) g) := by
+        have htime : t = s + (t - s) := (add_tsub_cancel_of_le hst).symm
+        calc P.operator t g = P.operator (s + (t - s)) g := by rw [← htime]
+          _ = P.operator s (P.operator (t - s) g) := by
+            rw [P.operator_add, ContinuousLinearMap.comp_apply]
+      rw [hsplit, ← map_sub]
+      exact (P.norm_le s _).trans (le_add_of_nonneg_right (norm_nonneg _))
+    · have hsplit : P.operator s g = P.operator t (P.operator (s - t) g) := by
+        have htime : s = t + (s - t) := (add_tsub_cancel_of_le hts).symm
+        calc P.operator s g = P.operator (t + (s - t)) g := by rw [← htime]
+          _ = P.operator t (P.operator (s - t) g) := by
+            rw [P.operator_add, ContinuousLinearMap.comp_apply]
+      rw [hsplit, norm_sub_rev, ← map_sub]
+      exact (P.norm_le t _).trans (le_add_of_nonneg_left (norm_nonneg _))
+  refine continuous_iff_continuousAt.mpr fun s ↦ ?_
+  have hzero : Tendsto (fun d : ℝ≥0 ↦ ‖P.operator d g - g‖) (𝓝 0) (𝓝 0) :=
+    tendsto_iff_norm_sub_tendsto_zero.mp (P.tendsto_operator_zero g)
+  have hright : Tendsto (fun t : ℝ≥0 ↦ t - s) (𝓝 s) (𝓝 0) :=
+    (continuous_id.sub continuous_const).tendsto' s 0 (tsub_self s)
+  have hleft : Tendsto (fun t : ℝ≥0 ↦ s - t) (𝓝 s) (𝓝 0) :=
+    (continuous_const.sub continuous_id).tendsto' s 0 (tsub_self s)
+  have hsum : Tendsto (fun t : ℝ≥0 ↦ ‖P.operator (t - s) g - g‖ + ‖P.operator (s - t) g - g‖)
+      (𝓝 s) (𝓝 0) := by
+    simpa using (hzero.comp hright).add (hzero.comp hleft)
+  exact tendsto_iff_norm_sub_tendsto_zero.mpr
+    (squeeze_zero (fun _ ↦ norm_nonneg _) (fun t ↦ hbound s t) hsum)
 
 /-- Stone–Weierstrass: a point-separating subalgebra of `C(X, ℝ)` is dense. -/
 theorem dense_subalgebra_of_separatesPoints (A : Subalgebra ℝ C(X, ℝ))

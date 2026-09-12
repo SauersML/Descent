@@ -13,6 +13,7 @@ namespace Descent.Pangenome.AncestralLocality.InfiniteGenomeLimit
 #print axioms FellerSemigroup.identity
 #print axioms LightConeApproximation
 #print axioms LightConeApproximation.constant
+#print axioms FellerSemigroup.continuous_operator
 #print axioms dense_subalgebra_of_separatesPoints
 #print axioms norm_operator_sub_le
 #print axioms eventually_escape_lt
