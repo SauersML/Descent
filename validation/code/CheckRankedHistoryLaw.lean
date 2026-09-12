@@ -9,6 +9,7 @@ import Descent.Pangenome.GraphCoalescent.RankedHistoryLaw
 #print axioms Descent.Pangenome.GraphCoalescent.mem_sampleClass_self
 #print axioms Descent.Pangenome.GraphCoalescent.sampleClass_eq_of_rel
 #print axioms Descent.Pangenome.GraphCoalescent.prod_card_filter_le
+#print axioms Descent.Pangenome.GraphCoalescent.rankWeight_eq_prod_classSize
 #print axioms Descent.Pangenome.GraphCoalescent.rankWeight_eq_blockWeight
 #print axioms Descent.Pangenome.GraphCoalescent.splitRel_rel_iff
 #print axioms Descent.Pangenome.GraphCoalescent.exists_mem_notMem_of_ne
@@ -42,3 +43,5 @@ import Descent.Pangenome.GraphCoalescent.RankedHistoryLaw
 #print axioms Descent.Pangenome.GraphCoalescent.rankedHistoryLaw
 #print axioms Descent.Pangenome.GraphCoalescent.blockLaw_toReal_eq_absoluteProb
 #print axioms Descent.Pangenome.GraphCoalescent.jumpCoeff_mul_sum_blockWeight
+#print axioms Descent.Pangenome.GraphCoalescent.jumpCoeff_mul_lahNumber
+#print axioms Descent.Pangenome.GraphCoalescent.sum_blockWeight_ofSetoid_eq_lahNumber

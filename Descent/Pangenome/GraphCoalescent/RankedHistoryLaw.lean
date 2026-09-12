@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.Extend
 import Descent.Coalescent.Trajectory
+import Descent.Pangenome.GraphCoalescent.LahWeights
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program
@@ -55,7 +56,8 @@ the same work.  The number of ranked histories ending at `π` is not enumerated.
 
 ## Main results
 
-- `rankWeight`, `blockWeight`, `rankWeight_eq_blockWeight`: `∏_B |B|!`, two ways.
+- `rankWeight`, `rankWeight_eq_blockWeight`, `rankWeight_eq_prod_classSize`: `∏_B |B|!` read
+  one sample at a time, equal to `LahWeights.blockWeight` and to K-C's `∏_c λ_c!`.
 - `covers_splitRel`, `exists_canonical_split`, `splitRel_injective`: covers are splits.
 - `two_mul_sum_rankWeight_covers`: the weighted cover count below a partition.
 - `blockLaw_succ`, `chainLaw_map_getD`: the head law is a Markov chain, and every entry of
@@ -63,6 +65,8 @@ the same work.  The number of ranked histories ending at `π` is not enumerated.
 - `rankedHistoryLaw`: **(D4)**.
 - `blockLaw_toReal_eq_absoluteProb`: **K-C (2.3) for the corpus's jump-chain law.**
 - `jumpCoeff_mul_sum_blockWeight`: the normalisation, `a_{n,k} ∑_{|π| = k} ∏|B|! = 1`.
+- `jumpCoeff_mul_lahNumber`, `sum_blockWeight_ofSetoid_eq_lahNumber`: `a_{n,k} = 1/L(n,k)`,
+  and the weighted count of `k`-block states is (D1)'s Lah number.
 
 ## Empirical status
 
@@ -107,9 +111,6 @@ noncomputable def classRank {n : ℕ} (ξ : ER n) (x : Fin n) : ℕ :=
 rank inside its class, and the ranks inside a class of size `m` are `1, …, m`. -/
 noncomputable def rankWeight {n : ℕ} (ξ : ER n) : ℕ := ∏ x : Fin n, classRank ξ x
 
-/-- `∏_B |B|!`, the class-size factorials of K-C (2.3). -/
-noncomputable def blockWeight {n : ℕ} (ξ : ER n) : ℕ := ∏ c : Quotient ξ, (classSize ξ c)!
-
 /-- Inside any finite set of samples, the ranks multiply to the factorial of its size. -/
 theorem prod_card_filter_le {n : ℕ} (T : Finset (Fin n)) :
     ∏ x ∈ T, (T.filter fun y ↦ y ≤ x).card = T.card ! := by
@@ -127,12 +128,14 @@ theorem prod_card_filter_le {n : ℕ} (T : Finset (Fin n)) :
   rw [prod_insert ha, htop, prod_congr rfl hrest, ih, card_insert_of_notMem ha,
     Nat.factorial_succ]
 
-/-- **The two readings of Kingman's weight agree.** -/
-theorem rankWeight_eq_blockWeight {n : ℕ} (ξ : ER n) : rankWeight ξ = blockWeight ξ := by
+/-- **Kingman's weight is the class-size factorial product of K-C (2.3)**, `∏_c λ_c!` over the
+classes, with `λ_c` the corpus's `Coalescent.classSize`. -/
+theorem rankWeight_eq_prod_classSize {n : ℕ} (ξ : ER n) :
+    rankWeight ξ = ∏ c : Quotient ξ, (classSize ξ c)! := by
   have hfib := prod_fiberwise_eq_prod_filter (univ : Finset (Fin n))
     (univ : Finset (Quotient ξ)) (Quotient.mk ξ) (classRank ξ)
   simp only [mem_univ, filter_true] at hfib
-  rw [rankWeight, ← hfib, blockWeight]
+  rw [rankWeight, ← hfib]
   refine prod_congr rfl fun c _ ↦ ?_
   have hclass : ∀ x ∈ univ.filter (fun x : Fin n ↦ Quotient.mk ξ x = c),
       classRank ξ x
@@ -150,6 +153,29 @@ theorem rankWeight_eq_blockWeight {n : ℕ} (ξ : ER n) : rankWeight ξ = blockW
       exact Quotient.exact (hxc.trans hyc.symm)
   rw [prod_congr rfl hclass, prod_card_filter_le]
   rfl
+
+/-- **Kingman's weight is the Lah weight of the finite partition.**  `rankWeight ξ` is
+`LahWeights.blockWeight` of `ξ` read as a `Finpartition` of the sample, the weight of (D1). -/
+theorem rankWeight_eq_blockWeight {n : ℕ} (ξ : ER n) :
+    rankWeight ξ = blockWeight (Finpartition.ofSetoid ξ) := by
+  have hparts : (Finpartition.ofSetoid ξ).parts = univ.image (sampleClass ξ) := by
+    ext t
+    simp [Finpartition.ofSetoid, Finpartition.ofSetSetoid_parts, sampleClass]
+  have hfib := prod_fiberwise_of_maps_to (s := univ) (t := univ.image (sampleClass ξ))
+    (g := sampleClass ξ) (fun x _ ↦ mem_image_of_mem _ (mem_univ x)) (classRank ξ)
+  rw [rankWeight, ← hfib, blockWeight, hparts]
+  refine prod_congr rfl fun t ht ↦ ?_
+  obtain ⟨a, -, rfl⟩ := mem_image.mp ht
+  have hfilter : univ.filter (fun x ↦ sampleClass ξ x = sampleClass ξ a) = sampleClass ξ a := by
+    ext x
+    rw [mem_filter]
+    exact ⟨fun h ↦ h.2 ▸ mem_sampleClass_self ξ x,
+      fun h ↦ ⟨mem_univ x, sampleClass_eq_of_rel (mem_sampleClass.mp h)⟩⟩
+  have hrank : ∀ x ∈ sampleClass ξ a,
+      classRank ξ x = ((sampleClass ξ a).filter fun y ↦ y ≤ x).card := by
+    intro x hx
+    rw [classRank, sampleClass_eq_of_rel (mem_sampleClass.mp hx)]
+  rw [hfilter, prod_congr rfl hrank, prod_card_filter_le]
 
 /-! ### Splitting a class along a proper part -/
 
@@ -505,7 +531,7 @@ theorem two_mul_sum_splitIndex {n : ℕ} (η : ER n) (x : Fin n) :
   have hpos : 0 < (sampleClass η x).card ! := Nat.factorial_pos _
   refine Nat.eq_of_mul_eq_mul_right hpos ?_
   have h2 := two_mul_sum_split_factorial ((sampleClass η x).erase x)
-  calc 2 * ∑ T ∈ splitIndex η x, rankWeight (splitRel η (insert x T))
+  calc (2 * ∑ T ∈ splitIndex η x, rankWeight (splitRel η (insert x T)))
         * (sampleClass η x).card !
       = 2 * ∑ T ∈ splitIndex η x,
           rankWeight (splitRel η (insert x T)) * (sampleClass η x).card ! := by
@@ -548,11 +574,12 @@ theorem sum_rankWeight_splitRel {n : ℕ} (η : ER n) :
     rw [hTT]
   · intro ξ hξ
     obtain ⟨x, hx, S, hxS, hS, hne, rfl⟩ := exists_canonical_split (mem_filter.mp hξ).2
-    refine ⟨⟨x, S.erase x⟩, mem_sigma.mpr ⟨hx, mem_erase.mpr ⟨fun heq ↦ hne ?_,
-      mem_powerset.mpr (erase_subset_erase x hS)⟩⟩, ?_⟩
-    · rw [← insert_erase hxS, heq, insert_erase (mem_sampleClass_self η x)]
-    · show splitRel η (insert x (S.erase x)) = splitRel η S
-      rw [insert_erase hxS]
+    have hmemT : S.erase x ∈ splitIndex η x := by
+      refine mem_erase.mpr ⟨fun heq ↦ hne ?_, mem_powerset.mpr (erase_subset_erase x hS)⟩
+      rw [← insert_erase hxS, heq, insert_erase (mem_sampleClass_self η x)]
+    refine ⟨⟨x, S.erase x⟩, mem_sigma.mpr ⟨hx, hmemT⟩, ?_⟩
+    show splitRel η (insert x (S.erase x)) = splitRel η S
+    rw [insert_erase hxS]
 
 /-- **The weighted cover count below a partition.**  `2 ∑_{ξ ≺ η} ∏_{B∈ξ} |B|! =
 (n - |η|) ∏_{B∈η} |B|!`: the combinatorial step of K-C's proof of (2.3). -/
@@ -609,8 +636,11 @@ theorem chainLaw_map_getD {n : ℕ} :
       | cons x rest =>
         show ((jumpLaw x).map fun y ↦ y :: x :: rest).map (fun l ↦ l.getD (i + 1) (Delta n))
           = PMF.pure ((x :: rest).getD i (Delta n))
-        rw [PMF.map_comp]
-        exact PMF.map_const
+        have hconst :
+            ((fun l : List (ER n) ↦ l.getD (i + 1) (Delta n)) ∘ fun y ↦ y :: x :: rest)
+              = Function.const (ER n) ((x :: rest).getD i (Delta n)) := rfl
+        rw [PMF.map_comp, hconst]
+        exact PMF.map_const _ _
 
 /-- **The head of the trajectory is a Markov chain with kernel `jumpLaw`.** -/
 theorem blockLaw_succ (n j : ℕ) : blockLaw n (j + 1) = (blockLaw n j).bind jumpLaw := by
@@ -731,7 +761,8 @@ theorem blockLaw_toReal {n : ℕ} :
 blocks, is at the partition `π` is `a_{n,k} ∏_{B ∈ π} |B|!`,
 `a_{n,k} = (n-k)! k! (k-1)! / (n! (n-1)!)`. -/
 theorem rankedHistoryLaw {n k : ℕ} (hk : 1 ≤ k) (hkn : k ≤ n) {π : ER n} (hπ : blocks π = k) :
-    (blockLaw n (n - k) π).toReal = jumpCoeff n k * (blockWeight π : ℝ) := by
+    (blockLaw n (n - k) π).toReal
+      = jumpCoeff n k * (blockWeight (Finpartition.ofSetoid π) : ℝ) := by
   rw [blockLaw_toReal (n - k) (by omega) π, if_pos (show blocks π = n - (n - k) by omega),
     show n - (n - k) = k by omega, rankWeight_eq_blockWeight]
 
@@ -740,25 +771,62 @@ is `JumpChain.absoluteProb` at the multiset of class sizes: the formula and the 
 theorem blockLaw_toReal_eq_absoluteProb {n k : ℕ} (hk : 1 ≤ k) (hkn : k ≤ n) {π : ER n}
     (hπ : blocks π = k) :
     (blockLaw n (n - k) π).toReal = absoluteProb n k (univ.val.map (classSize π)) := by
-  rw [rankedHistoryLaw hk hkn hπ, absoluteProb, Multiset.map_map, blockWeight,
+  rw [blockLaw_toReal (n - k) (by omega) π, if_pos (show blocks π = n - (n - k) by omega),
+    show n - (n - k) = k by omega, rankWeight_eq_prod_classSize, absoluteProb, Multiset.map_map,
     prod_eq_multiset_prod]
   rfl
 
-/-- **The normalisation of (D4).**  `a_{n,k} ∑_{|π| = k} ∏_B |B|! = 1`, so the weighted count
-of `k`-block partitions is `1/a_{n,k} = n! (n-1)! / ((n-k)! k! (k-1)!)`. -/
+/-- **The normalisation of (D4).**  `a_{n,k} ∑_{|π| = k} ∏_B |B|! = 1`. -/
 theorem jumpCoeff_mul_sum_blockWeight {n k : ℕ} (hk : 1 ≤ k) (hkn : k ≤ n) :
-    jumpCoeff n k * ∑ π ∈ univ.filter (fun π : ER n ↦ blocks π = k), (blockWeight π : ℝ)
-      = 1 := by
+    jumpCoeff n k * ∑ π ∈ univ.filter (fun π : ER n ↦ blocks π = k),
+      (blockWeight (Finpartition.ofSetoid π) : ℝ) = 1 := by
+  have htsum := PMF.tsum_coe (blockLaw n (n - k))
+  rw [tsum_fintype] at htsum
   have hmass : ∑ π : ER n, (blockLaw n (n - k) π).toReal = 1 := by
-    rw [← ENNReal.toReal_sum fun π _ ↦ PMF.apply_ne_top _ _, ← tsum_fintype, PMF.tsum_coe,
-      ENNReal.toReal_one]
+    rw [← ENNReal.toReal_sum fun π _ ↦ PMF.apply_ne_top _ _, htsum, ENNReal.toReal_one]
   have hform : ∀ π ∈ (univ : Finset (ER n)), (blockLaw n (n - k) π).toReal
-      = if blocks π = k then jumpCoeff n k * (blockWeight π : ℝ) else 0 := by
+      = if blocks π = k then jumpCoeff n k * (blockWeight (Finpartition.ofSetoid π) : ℝ)
+        else 0 := by
     intro π _
     rw [blockLaw_toReal (n - k) (by omega) π, show n - (n - k) = k by omega,
       rankWeight_eq_blockWeight]
   rw [sum_congr rfl hform, ← sum_filter] at hmass
   rw [mul_sum]
   exact hmass
+
+/-- **(D4)'s prefactor inverts the Lah number.**  `a_{n,k} L(n, k) = 1`, from the closed form
+`LahWeights.lahNumber_mul_factorial`. -/
+theorem jumpCoeff_mul_lahNumber {n k : ℕ} (hk : 1 ≤ k) (hkn : k ≤ n) :
+    jumpCoeff n k * (lahNumber n k : ℝ) = 1 := by
+  have hlah := lahNumber_mul_factorial n k (by omega) hk
+  have hchoose := Nat.choose_mul_factorial_mul_factorial (show k - 1 ≤ n - 1 by omega)
+  rw [show n - 1 - (k - 1) = n - k by omega] at hchoose
+  have hnat : (n - k)! * k ! * (k - 1)! * lahNumber n k = n ! * (n - 1)! := by
+    calc (n - k)! * k ! * (k - 1)! * lahNumber n k
+        = (lahNumber n k * k !) * ((k - 1)! * (n - k)!) := by ring
+      _ = n ! * ((n - 1).choose (k - 1) * (k - 1)! * (n - k)!) := by
+          rw [hlah]
+          ring
+      _ = n ! * (n - 1)! := by rw [hchoose]
+  have hB : ((n ! * (n - 1)! : ℕ) : ℝ) ≠ 0 := by positivity
+  unfold jumpCoeff
+  rw [div_mul_eq_mul_div, div_eq_one_iff_eq hB]
+  exact_mod_cast hnat
+
+/-- **The weighted count of `k`-block states is the Lah number.**  `∑_{|π| = k} ∏_B |B|! =
+L(n, k)` over the corpus's state space `𝓔ₙ`: (D1)'s coefficient, read off (D4). -/
+theorem sum_blockWeight_ofSetoid_eq_lahNumber {n k : ℕ} (hk : 1 ≤ k) (hkn : k ≤ n) :
+    ∑ π ∈ univ.filter (fun π : ER n ↦ blocks π = k), blockWeight (Finpartition.ofSetoid π)
+      = lahNumber n k := by
+  have h1 := jumpCoeff_mul_sum_blockWeight hk hkn
+  have h2 := jumpCoeff_mul_lahNumber hk hkn
+  have hne : jumpCoeff n k ≠ 0 := by
+    intro h0
+    rw [h0, zero_mul] at h2
+    exact zero_ne_one h2
+  have hR : (∑ π ∈ univ.filter (fun π : ER n ↦ blocks π = k),
+      (blockWeight (Finpartition.ofSetoid π) : ℝ)) = (lahNumber n k : ℝ) :=
+    mul_left_cancel₀ hne (h1.trans h2.symm)
+  exact_mod_cast hR
 
 end Descent.Pangenome.GraphCoalescent
