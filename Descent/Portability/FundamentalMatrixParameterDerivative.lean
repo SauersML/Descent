@@ -370,6 +370,7 @@ theorem hasDerivAt_fundamentalMatrix_affinePath {A B : ℝ → Matrix ι ι ℝ}
     funext fun s ↦ by
       rw [sub_smul]
       abel
+  beta_reduce
   rw [hpath]
 
 /-- **Pairing an entrywise derivative.**  If every entry of a matrix path has a derivative, then
