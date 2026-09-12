@@ -12,7 +12,9 @@ open Descent.Pangenome.AncestralLocality
 #print axioms tendsto_poissonExtinct
 #print axioms eventually_poissonExtinct_sub_le_gwExtinct
 #print axioms pow_sub_pow_le_mul_sub
+#print axioms eventually_forall_graphProb_card_reach_ge_le
 #print axioms eventually_graphProb_card_reach_ge_le
+#print axioms eventually_forall_graphProb_card_reach_singleton_ge_le
 #print axioms eventually_graphProb_card_reach_singleton_ge_le
 #print axioms limsup_graphProb_card_reach_ge_le
 #print axioms limsup_graphProb_card_reach_singleton_ge_le

@@ -15,8 +15,10 @@ For `α > 1` and `s = giantFraction α`, the note's (6.2) says that `|C_m(A)|/m 
 carrying the Erdős–Rényi theorem. For every `ε > 0` and queries of at most `k` features,
 `limsup_m P(|Reach(A)| ≥ ε m) ≤ 1 - (1 - s)^k` (`limsup_graphProb_card_reach_ge_le`), and for at
 most one feature `limsup_m P(|Reach(i)| ≥ ε m) ≤ s`
-(`limsup_graphProb_card_reach_singleton_ge_le`). The eventual forms are
-`eventually_graphProb_card_reach_ge_le` and `eventually_graphProb_card_reach_singleton_ge_le`.
+(`limsup_graphProb_card_reach_singleton_ge_le`). The eventual forms hold uniformly over all
+queries of at most `k` features (`eventually_forall_graphProb_card_reach_ge_le`,
+`eventually_forall_graphProb_card_reach_singleton_ge_le`), and so along any sequence of queries
+(`eventually_graphProb_card_reach_ge_le`, `eventually_graphProb_card_reach_singleton_ge_le`).
 
 **The route.** `Descent.Pangenome.AncestralLocality.BreadthFirstDomination` gives, for every
 generation `g`, `P(|Reach(A)| ≥ ε m) ≤ 1 - q_g^|A| + |A| Σ_{t<g} α^t / (ε m)` in `G(m, α/m)`, where
@@ -154,6 +156,8 @@ theorem eventually_poissonExtinct_sub_le_gwExtinct {α : ℝ} (hα : 1 < α) (g 
       linarith
     have hbase0 : 0 ≤ 1 + -(α * (1 - poissonExtinct α g + η')) / m := by
       have := (div_le_one hm).mpr h3
+      have hneg : -(α * (1 - poissonExtinct α g + η')) / m =
+          -(α * (1 - poissonExtinct α g + η') / m) := by rw [neg_div]
       linarith
     have hpow : (1 + -(α * (1 - poissonExtinct α g + η')) / m) ^ m ≤
         gwExtinct m (α / m) (g + 1) := by
@@ -189,15 +193,15 @@ theorem pow_sub_pow_le_mul_sub {a b : ℝ} (hb : 0 ≤ b) (hba : b ≤ a) (ha : 
 
 /-! ### The upper bound -/
 
-/-- **The supercritical upper bound for `k` roots, eventually.** For `α > 1`, queries `A m` of at
-most `k` features, `ε > 0` and `η > 0`, eventually `P(|Reach(A)| ≥ ε m) ≤ 1 - (1 - s)^k + η`, with
-`s = giantFraction α`. No giant component theorem is assumed. -/
-theorem eventually_graphProb_card_reach_ge_le {α : ℝ} (hα : 1 < α) {k : ℕ}
-    (A : ∀ m : ℕ, Finset (Fin m)) (hA : ∀ m, (A m).card ≤ k) {ε : ℝ} (hε : 0 < ε) {η : ℝ}
-    (hη : 0 < η) :
-    ∀ᶠ m : ℕ in atTop, graphProb m (α / m)
-        (fun E ↦ ε * m ≤ ((reach (edgeGraph E) (A m)).card : ℝ)) ≤
-      1 - (1 - giantFraction α) ^ k + η := by
+/-- **The supercritical upper bound for `k` roots, eventually and uniformly in the roots.** For
+`α > 1`, `ε > 0` and `η > 0`, eventually every query `A` of at most `k` features has
+`P(|Reach(A)| ≥ ε m) ≤ 1 - (1 - s)^k + η`, with `s = giantFraction α`. No giant component theorem
+is assumed. -/
+theorem eventually_forall_graphProb_card_reach_ge_le {α : ℝ} (hα : 1 < α) (k : ℕ) {ε : ℝ}
+    (hε : 0 < ε) {η : ℝ} (hη : 0 < η) :
+    ∀ᶠ m : ℕ in atTop, ∀ A : Finset (Fin m), A.card ≤ k →
+      graphProb m (α / m) (fun E ↦ ε * m ≤ ((reach (edgeGraph E) A).card : ℝ)) ≤
+        1 - (1 - giantFraction α) ^ k + η := by
   obtain ⟨hs0, hs1⟩ := giantFraction_mem_Ioo hα
   have hα0 : 0 < α := by linarith
   have hk1 : (0 : ℝ) < 3 * (k + 1) := by positivity
@@ -211,16 +215,16 @@ theorem eventually_graphProb_card_reach_ge_le {α : ℝ} (hα : 1 < α) {k : ℕ
     ((k : ℝ) * (∑ t ∈ range g, α ^ t) / ε))).2 (η / 3) (by linarith)
   filter_upwards [eventually_poissonExtinct_sub_le_gwExtinct hα g hδ0, hev2,
     tendsto_natCast_atTop_atTop.eventually_ge_atTop α, eventually_gt_atTop 0]
-    with m h1 h2 h3 h4
+    with m h1 h2 h3 h4 A hAk
   have hm : (0 : ℝ) < m := Nat.cast_pos.mpr h4
   have hp0 : 0 ≤ α / m := div_nonneg hα0.le hm.le
   have hp1 : α / m ≤ 1 := (div_le_one hm).mpr h3
   have hK : 0 < ε * m := mul_pos hε hm
-  have hfin := graphProb_card_reach_ge_le hp0 hp1 (A m) g hK
+  have hfin := graphProb_card_reach_ge_le hp0 hp1 A g hK
   rw [div_mul_cancel₀ α hm.ne'] at hfin
   obtain ⟨hy0, hy1⟩ := gwExtinct_mem_Icc (m := m) hp0 hp1 g
-  have hyk : gwExtinct m (α / m) g ^ k ≤ gwExtinct m (α / m) g ^ (A m).card :=
-    pow_le_pow_of_le_one hy0 hy1 (hA m)
+  have hyk : gwExtinct m (α / m) g ^ k ≤ gwExtinct m (α / m) g ^ A.card :=
+    pow_le_pow_of_le_one hy0 hy1 hAk
   have hyk2 : (1 - giantFraction α) ^ k - 2 * k * δ ≤ gwExtinct m (α / m) g ^ k := by
     have h2kδ : 0 ≤ 2 * (k : ℝ) * δ :=
       mul_nonneg (mul_nonneg zero_le_two (Nat.cast_nonneg k)) hδ0.le
@@ -231,15 +235,36 @@ theorem eventually_graphProb_card_reach_ge_le {α : ℝ} (hα : 1 < α) {k : ℕ
       have hdiff : 1 - giantFraction α - gwExtinct m (α / m) g ≤ 2 * δ := by linarith
       have := mul_le_mul_of_nonneg_left hdiff (Nat.cast_nonneg k)
       linarith
-  have hsum : (A m).card * (∑ t ∈ range g, α ^ t) / (ε * m) ≤ η / 3 := by
+  have hsum : A.card * (∑ t ∈ range g, α ^ t) / (ε * m) ≤ η / 3 := by
     have hsum0 : 0 ≤ ∑ t ∈ range g, α ^ t := sum_nonneg fun t _ ↦ pow_nonneg hα0.le t
-    have hAk : ((A m).card : ℝ) ≤ k := by exact_mod_cast hA m
-    have hle : (A m).card * (∑ t ∈ range g, α ^ t) / (ε * m) ≤
+    have hAk' : (A.card : ℝ) ≤ k := by exact_mod_cast hAk
+    have hle : A.card * (∑ t ∈ range g, α ^ t) / (ε * m) ≤
         (k : ℝ) * (∑ t ∈ range g, α ^ t) / ε / m := by
       rw [div_div]
-      exact div_le_div_of_nonneg_right (mul_le_mul_of_nonneg_right hAk hsum0) hK.le
+      exact div_le_div_of_nonneg_right (mul_le_mul_of_nonneg_right hAk' hsum0) hK.le
     linarith
   linarith
+
+/-- **The supercritical upper bound for `k` roots, eventually.** For `α > 1`, queries `A m` of at
+most `k` features, `ε > 0` and `η > 0`, eventually `P(|Reach(A m)| ≥ ε m) ≤ 1 - (1 - s)^k + η`. -/
+theorem eventually_graphProb_card_reach_ge_le {α : ℝ} (hα : 1 < α) {k : ℕ}
+    (A : ∀ m : ℕ, Finset (Fin m)) (hA : ∀ m, (A m).card ≤ k) {ε : ℝ} (hε : 0 < ε) {η : ℝ}
+    (hη : 0 < η) :
+    ∀ᶠ m : ℕ in atTop, graphProb m (α / m)
+        (fun E ↦ ε * m ≤ ((reach (edgeGraph E) (A m)).card : ℝ)) ≤
+      1 - (1 - giantFraction α) ^ k + η :=
+  (eventually_forall_graphProb_card_reach_ge_le hα k hε hη).mono fun m hm ↦ hm (A m) (hA m)
+
+/-- **The supercritical upper bound for one root, eventually and uniformly**: eventually every
+query of at most one feature has `P(|Reach(i)| ≥ ε m) ≤ s + η`. -/
+theorem eventually_forall_graphProb_card_reach_singleton_ge_le {α : ℝ} (hα : 1 < α) {ε : ℝ}
+    (hε : 0 < ε) {η : ℝ} (hη : 0 < η) :
+    ∀ᶠ m : ℕ in atTop, ∀ A : Finset (Fin m), A.card ≤ 1 →
+      graphProb m (α / m) (fun E ↦ ε * m ≤ ((reach (edgeGraph E) A).card : ℝ)) ≤
+        giantFraction α + η := by
+  filter_upwards [eventually_forall_graphProb_card_reach_ge_le hα 1 hε hη] with m hm A hA
+  have h := hm A hA
+  rwa [pow_one, sub_sub_cancel] at h
 
 /-- **The supercritical upper bound for one root, eventually**: for queries of at most one
 feature, eventually `P(|Reach(i)| ≥ ε m) ≤ s + η`. -/
