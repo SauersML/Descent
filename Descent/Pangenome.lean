@@ -40,6 +40,7 @@ import Descent.Pangenome.Register
 import Descent.Pangenome.Strand
 import Descent.Pangenome.Symmetry
 import Descent.Pangenome.TripleGluing
+import Descent.Pangenome.GraphSiteFrequencySpectrum
 
 /-!
 # `Descent.Pangenome` -- the layer head

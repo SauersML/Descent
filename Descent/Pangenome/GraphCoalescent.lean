@@ -157,8 +157,9 @@ genealogies along the chain are correlated by recombination -- `Descent.Pangenom
 has the chain and `Descent.Coalescent.Recombination` has the correlation, and joining them is
 the natural next module.  The exact per-report transition count from `⊥`, `c_A · c_B` in the
 fiber sizes of the two states merged, is now `HiddenLoads.card_visibleCovers_bot`; `Visibility`
-needs only that it is at least two.  Not formalised: the variance of
-the graph coalescent's transit time, and the site-frequency spectrum at `w`.
+needs only that it is at least two.  The variance of the graph coalescent's transit time is
+`Descent.Pangenome.GraphTransitVariance`, and the site-frequency spectrum at `w` with its Tajima's D
+bias is `Descent.Pangenome.GraphSiteFrequencySpectrum`.
 
 ## The premise the group carries
 

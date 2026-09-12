@@ -52,6 +52,7 @@ import Descent.Pangenome.AncestralLocality.SupercriticalUnconditional
 import Descent.Pangenome.AncestralLocality.SupercriticalConcentration
 import Descent.Pangenome.AncestralLocality.SupercriticalGiantLaw
 import Descent.Pangenome.AncestralLocality.SupercriticalGiantComponentTheorem
+import Descent.Pangenome.AncestralLocality.DecisionDualProcess
 
 namespace Descent.Program
 
@@ -179,7 +180,11 @@ independent complexity bounds and a quantitative light cone.
   `e^{t(J - λ)}` of a positive bounded jump generator
   (`JumpFellerSemigroup.jumpSemigroup_operator`) and the Dyson components of the backward circuit,
   majorised by Yule weights with a bounded cubic moment (`DecisionDysonDual.norm_dysonTerm_le`,
-  `sum_yuleMoment_mul_le`).
+  `sum_yuleMoment_mul_le`). The dual expectation of the backward circuit is well defined: the
+  Yule weights sum to one, so the circuit does not explode
+  (`DecisionDualProcess.tsum_yuleWeight_eq_one`), the circuit killed at its `M`-th decision is
+  within `n e^{Rt} ‖f‖ / (n + M)` of it (`abs_decisionDual_sub_truncatedDual_le_exp`), and it
+  obeys the moment equation (`decisionDual_moment_equation`).
 * Theorem 6 at generator level: `SamplingDuality`. On a sampling observable the resampling term of
   (7.1) is coalescence and the drift term is decision branching, so the forward generator applied
   to `H_f` is the backward circuit applied to `f` (`forwardGenerator_samplingObservable`); the

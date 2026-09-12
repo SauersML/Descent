@@ -34,6 +34,9 @@ import Descent.Pangenome.GraphCoalescent.FiberSizeIdentifiabilityFour
 import Descent.Pangenome.GraphCoalescent.ReportInhomogeneousMarkov
 import Descent.Pangenome.GraphCoalescent.PanelSizeTopCoefficient
 import Descent.Pangenome.GraphTransitVariance
+import Descent.Portability.PortabilityMinimaxRate
+import Descent.Portability.HistoryExactLocality
+import Descent.Pangenome.GraphSiteFrequencySpectrum
 
 namespace Descent.Program
 
@@ -113,6 +116,10 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   neutral models that agree on the rates of `A` give the same expected moments on `A` at every time
   (`expectedMomentVector_eq_of_agreeOn`): the report of a score on `A` does not depend on the model
   outside `A` at all.
+  Along whole histories the same holds: histories that agree event by event on `A`, from states
+  with equal budget-4 moments over `A`, give equal expected portability
+  (`HistoryExactLocality.expectedPortability_eq_of_agreeOn`,
+  `integral_momentPolynomial_historyEventKernel_eq_of_agreeOn`).
 * The compressed report is not Markov from the singletons: `ReportNonMarkovFromSingletons`. For an
   interface of width `2 ≤ w < n`, no time-homogeneous transition law on reports reproduces the law
   of the report history of Kingman's jump chain from the singletons (`not_isReportMarkovFromBot`),
@@ -155,6 +162,13 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   between `w` and `n` (`graphVarianceDeficit_eq`), and a coarser construction loses more
   (`graphVarianceDeficit_antitone`); the lower bound `1` survives compression
   (`one_le_graphVarTransitTime`).
+* The site-frequency spectrum a graph reports: `GraphSiteFrequencySpectrum`. In haplotypes,
+  pairwise diversity is `θ(n² - Σ c_a²)/(n(n-1))` (`graphHaplotypeDiversity_eq`), so a graph
+  biases Tajima's D numerator by exactly `θ((n² - Σ c_a²)/(n(n-1)) - a_{w-1}/a_{n-1})`
+  (`graphHaplotypeTajimaNumerator_eq`), with no bias at `w = n` or `w ≤ 1`
+  (`graphHaplotypeTajimaNumerator_eq_zero_of_width_eq`,
+  `graphHaplotypeTajimaNumerator_eq_zero_of_width_le_one`) and a balanced-fiber bound
+  (`graphHaplotypeTajimaNumerator_le_balanced`).
 * Correcting the apparent coalescence clock: `HiddenClockCorrection`. The panel's time to common
   ancestry is the connection time plus a residual time on every path
   (`panelTime_eq_connectionTime_add_residualTime`); the hidden load at connection satisfies
@@ -179,6 +193,11 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   the target gap is the exact minimax risk for any number of source replicas
   (`PortabilityTwoHistoryInstance.isLeast_worstRisk`), with explicit floors for the target squared
   correlation and the portability ratio (`minimax_floor_r2`, `minimax_floor_r2Portability`).
+  With the coupling supplied the plug-in rate `count^(-1/2)` is optimal: for the doubly-donor
+  cell every estimator has risk at least `3/(32 √count)` at some donor fraction, through the
+  Hellinger affinity of the replica laws; an estimator that ignores the coupling has risk at
+  least `1/8` at every count (`PortabilityMinimaxRate.minimaxRate_dichotomy`,
+  `exists_le_chronologyRisk`).
 * What identifies target portability: `PortabilityIdentification`. In the NOTE1 §6 chronology
   model the target report law is a transport of the source law by the coupling `L_ν(1)` of the
   exposure law ν (`expectation_chronologyLaw_eq_transportExpectation`,
