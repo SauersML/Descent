@@ -53,19 +53,24 @@ other. So the clock can answer a question about the fiber sizes only through `C_
   transform, and one more jump either connects it, with probability `p_{m-1}`, or passes it on.
 - `lintegral_exp_connectionTimeLaw_bot_eq_laplace`: so the first-step law and the path law have
   the same Laplace transform at every `t ≥ 0`. `ReportedConnectionTies` identifies their means.
-- `connectivityCumulant_eq_of_survivalAt_eq`, `connectivityCumulant_eq_of_spectralCoeff_eq`:
-  equal survival functions of the first-step law, or equal spectral coefficients, force equal
-  cumulants. A survival function on `[0, ∞)` determines the law, and the law determines the
-  transform (`connectionTimeLaw_bot_eq_of_survivalAt_eq`).
+- `connectionLaplace_eq_one_sub_sum_spectralCoeff`: from every state the first-step transform is
+  `1 - ∑_k spectralCoeff s ξ k · t/(t + d_k)`. The induction along covers is the recursion of the
+  spectral coefficients read through the partial fractions
+  `d_K/(d_K + t) · t/(t + d_k) = d_K/(d_K - d_k) · (t/(t + d_k) - t/(t + d_K))`.
+- `eq_zero_of_sum_mul_div_add_deathRate`: the partial fractions `t/(t + d_k)`, `k = 2, …, n`, are
+  linearly independent on `t ≥ 0`, by clearing denominators and evaluating at `t = -d_m`.
+- `spectralCoeff_eq_iff_connectivityCumulant_eq`, `survivalAt_eq_iff_connectivityCumulant_eq`,
+  `connectionTimeLaw_bot_eq_iff_connectivityCumulant_eq`: the spectral coefficients, the survival
+  function and the first-step law are each equivalent to the cumulant. A survival function on
+  `[0, ∞)` determines the law (`connectionTimeLaw_bot_eq_of_survivalAt_eq`), the law determines
+  the transform, the transform determines the cumulant through (D7), and the cumulant gives back
+  the transform and so the spectral coefficients.
 
 ## What is narrower
 
 The panel size `n` is fixed: both interfaces act on `Fin n`, and whether the law of `τ_q` alone
-determines `n` is not addressed. The converse of the last item, that equal cumulants give equal
-first-step laws, needs uniqueness of the Laplace transform for laws on `[0, ∞)`, which is not
-proved here. For the path law the converse is `map_connectionTime_eq_iff_connectivityCumulant_eq`.
-Whether `C_c` determines the multiset of fiber sizes is the combinatorial half of the question
-and is not in this file.
+determines `n` is not addressed. Whether `C_c` determines the multiset of fiber sizes is the
+combinatorial half of the question and is not in this file.
 
 ## Empirical status
 
@@ -333,7 +338,8 @@ theorem measurable_connectionTime {n : ℕ} (s : Fin n → Fin n) : Measurable (
   have hswap : Measurable fun q : (ℕ → ℝ) × List (ER n) ↦
       ∑ j ∈ Ico (stoppingLevel s q.2 - 1) (n - 1), q.1 j :=
     measurable_from_prod_countable_left fun l ↦
-      Finset.measurable_sum _ fun j _ ↦ measurable_pi_apply j
+      show Measurable fun x : ℕ → ℝ ↦ ∑ j ∈ Ico (stoppingLevel s l - 1) (n - 1), x j from
+        Finset.measurable_sum _ fun j _ ↦ measurable_pi_apply j
   exact hswap.comp measurable_swap
 
 /-- **The law of `τ_q` is the mixture over `B` of the Kingman ladder laws**: a measurable set of
@@ -348,9 +354,9 @@ theorem map_connectionTime_apply {n : ℕ} (hn : 2 ≤ n) (s : Fin n → Fin n) 
     intro p
     by_cases hp : connectionTime s p ∈ A
     · have hp' : ∑ j ∈ Ico (stoppingLevel s p.1 - 1) (n - 1), p.2 j ∈ A := hp
-      simp [Set.indicator_apply, hp, hp']
+      simp [hp, hp']
     · have hp' : ∑ j ∈ Ico (stoppingLevel s p.1 - 1) (n - 1), p.2 j ∉ A := hp
-      simp [Set.indicator_apply, hp, hp']
+      simp [hp, hp']
   rw [Measure.map_apply (measurable_connectionTime s) hA,
     ← lintegral_indicator_one (measurable_connectionTime s hA), lintegral_congr hpt]
   exact lintegral_trajectoryClockLaw hn s
@@ -479,7 +485,7 @@ theorem connectionLaplace_of_observed_eq_top {n : ℕ} (hn : 0 < n) (s : Fin n �
 /-- **The backward equation's average over covers is the jump kernel**, for the transform: on an
 unconnected report with `K` blocks, `E_ξ e^{-t τ_q} = d_K/(d_K + t) ∑_η J(ξ, η) E_η e^{-t τ_q}`. -/
 theorem connectionLaplace_eq_sum_jumpLaw {n : ℕ} (hn : 0 < n) (s : Fin n → Fin n) {t : ℝ}
-    (ht : 0 ≤ t) {ξ : ER n} (hk : 2 ≤ blocks ξ) (hc : observed s ξ ≠ ⊤) :
+    {ξ : ER n} (hk : 2 ≤ blocks ξ) (hc : observed s ξ ≠ ⊤) :
     connectionLaplace s t ξ = deathRate (blocks ξ) / (deathRate (blocks ξ) + t)
       * ∑ η : ER n, (jumpLaw ξ η).toReal * connectionLaplace s t η := by
   have hd := deathRate_pos hk
@@ -503,8 +509,8 @@ theorem connectionLaplace_eq_sum_jumpLaw {n : ℕ} (hn : 0 < n) (s : Fin n → F
 /-- **One level of the first-step transform.** Averaged over the head law at `b + 1` blocks,
 the unconnected states' transforms are `d_{b+1}/(d_{b+1} + t)` times the probability of first
 connecting at `b` plus the unconnected average at `b` blocks. -/
-theorem sum_blockLaw_connectionLaplace_succ {n b : ℕ} (s : Fin n → Fin n) {t : ℝ} (ht : 0 ≤ t)
-    (hb : 1 ≤ b) (hbn : b + 1 ≤ n) :
+theorem sum_blockLaw_connectionLaplace_succ {n b : ℕ} (s : Fin n → Fin n) {t : ℝ} (hb : 1 ≤ b)
+    (hbn : b + 1 ≤ n) :
     ∑ ξ : ER n, (blockLaw n (n - (b + 1)) ξ).toReal
         * (if observed s ξ = ⊤ then 0 else connectionLaplace s t ξ)
       = deathRate (b + 1) / (deathRate (b + 1) + t)
@@ -533,7 +539,7 @@ theorem sum_blockLaw_connectionLaplace_succ {n b : ℕ} (s : Fin n → Fin n) {t
           rw [if_neg (show ¬(observed s ξ ≠ ⊤ ∧ observed s η = ⊤) from fun h ↦ h.1 hc),
             if_pos hη]
           ring
-      · rw [if_neg hc, connectionLaplace_eq_sum_jumpLaw hn s ht (by omega) hc, hξ,
+      · rw [if_neg hc, connectionLaplace_eq_sum_jumpLaw hn s (by omega) hc, hξ,
           mul_left_comm, mul_sum]
         congr 1
         refine sum_congr rfl fun η _ ↦ ?_
@@ -552,17 +558,14 @@ theorem sum_blockLaw_connectionLaplace_succ {n b : ℕ} (s : Fin n → Fin n) {t
   congr 1
   simp only [sum_add_distrib]
   congr 1
-  · unfold firstConnectionProbability
-    refine sum_congr rfl fun ξ _ ↦ sum_congr rfl fun η _ ↦ ?_
-    by_cases h1 : observed s ξ = ⊤ <;> by_cases h2 : observed s η = ⊤ <;> simp [h1, h2]
-  · rw [sum_comm]
-    refine sum_congr rfl fun η _ ↦ ?_
-    rw [← sum_mul, ← blockLaw_succ_toReal, show n - (b + 1) + 1 = n - b by omega]
+  rw [sum_comm]
+  refine sum_congr rfl fun η _ ↦ ?_
+  rw [← sum_mul, ← blockLaw_succ_toReal, show n - (b + 1) + 1 = n - b by omega]
 
-/-- **The first-step transform at `⊥` is (D7).** For `t ≥ 0`, the solution of the backward
+/-- **The first-step transform at `⊥` is (D7).** For every real `t`, the solution of the backward
 equation `connectionLaplace s t ⊥` is `∑_b p_b ∏_{k=b+1}^{n} d_k/(d_k + t)`. -/
 theorem connectionLaplace_bot_eq_sum_stoppingProb {n : ℕ} (hn : 2 ≤ n) (s : Fin n → Fin n)
-    {t : ℝ} (ht : 0 ≤ t) :
+    {t : ℝ} :
     connectionLaplace s t ⊥
       = ∑ b ∈ Icc 1 n, stoppingProb s b * ∏ k ∈ Ioc b n, deathRate k / (deathRate k + t) := by
   have hn0 : 0 < n := by omega
@@ -622,7 +625,7 @@ theorem connectionLaplace_bot_eq_sum_stoppingProb {n : ℕ} (hn : 2 ≤ n) (s : 
       ext x
       simp only [mem_sdiff, mem_Ioc, mem_singleton]
       omega
-    rw [sum_blockLaw_connectionLaplace_succ s ht hb hbn,
+    rw [sum_blockLaw_connectionLaplace_succ s hb hbn,
       ← stoppingProb_eq_firstConnectionProbability s hb (by omega), hsplit, hprod]
     ring
   have hbottom : ∑ ξ : ER n, (blockLaw n (n - 1) ξ).toReal
@@ -663,7 +666,7 @@ theorem lintegral_exp_connectionTimeLaw_bot_eq_laplace {n : ℕ} (hn : 2 ≤ n) 
     ∫⁻ x, ENNReal.ofReal (Real.exp (-(t * (x : ℝ)))) ∂(connectionTimeLaw s ⊥)
       = ∫⁻ p, ENNReal.ofReal (Real.exp (-(t * connectionTime s p))) ∂(trajectoryClockLaw n) := by
   rw [lintegral_exp_connectionTimeLaw s ht ⊥, connectionTime_laplace hn s ht,
-    connectionLaplace_bot_eq_sum_stoppingProb hn s ht]
+    connectionLaplace_bot_eq_sum_stoppingProb hn s]
 
 /-- A survival function on `[0, ∞)` determines the first-step law. -/
 theorem connectionTimeLaw_bot_eq_of_survivalAt_eq {n : ℕ} {s s' : Fin n → Fin n}
@@ -699,5 +702,224 @@ theorem connectivityCumulant_eq_of_spectralCoeff_eq {n : ℕ} (hn : 2 ≤ n) {s 
     connectivityCumulant (Finpartition.ofSetoid (graphKer s))
       = connectivityCumulant (Finpartition.ofSetoid (graphKer s')) :=
   connectivityCumulant_eq_of_survivalAt_eq hn ((spectralCoeff_eq_iff_survivalAt_eq s s').mpr h)
+
+/-! ### The cumulant gives back the spectral coefficients -/
+
+/-- **The first-step transform in spectral form.** For `t ≥ 0`, from every state,
+`E_ξ e^{-t τ_q} = 1 - ∑_{k=2}^{K} spectralCoeff s ξ k · t/(t + d_k)` with `K = blocks ξ`. -/
+theorem connectionLaplace_eq_one_sub_sum_spectralCoeff {n : ℕ} (s : Fin n → Fin n) {t : ℝ}
+    (ht : 0 ≤ t) (ξ : ER n) :
+    connectionLaplace s t ξ
+      = 1 - ∑ k ∈ Ioc 1 (blocks ξ), spectralCoeff s ξ k * (t / (t + deathRate k)) := by
+  induction ξ using covers_induction with
+  | step ξ ih =>
+    by_cases hr : blocks (observed s ξ) ≤ 1
+    · have hV := connectionValue_eq s t 1 0 ξ
+      rw [if_pos hr] at hV
+      have hvanish : ∀ k ∈ Ioc 1 (blocks ξ),
+          spectralCoeff s ξ k * (t / (t + deathRate k)) = 0 :=
+        fun k _ ↦ by rw [spectralCoeff_eq, if_pos hr, zero_mul]
+      rw [sum_eq_zero hvanish, sub_zero]
+      exact hV
+    · have hk := two_le_blocks_of_not_le_one s hr
+      have hd := deathRate_pos hk
+      have hdt : 0 < deathRate (blocks ξ) + t := by linarith
+      have hrec := connectionValue_eq s t 1 0 ξ
+      rw [if_neg hr] at hrec
+      have hV : connectionLaplace s t ξ
+          = (∑ η : {η : ER n // Covers ξ η}, connectionLaplace s t η.1)
+            / (deathRate (blocks ξ) + t) := by
+        simpa only [Pi.zero_apply, zero_add] using hrec
+      have hrow : ∀ η : {η : ER n // Covers ξ η}, connectionLaplace s t η.1
+          = 1 - ∑ j ∈ Ioc 1 (blocks ξ - 1),
+            spectralCoeff s η.1 j * (t / (t + deathRate j)) := by
+        intro η
+        have hη : blocks η.1 = blocks ξ - 1 := by
+          have := η.2.2
+          omega
+        rw [ih η.1 η.2, hη]
+      have hcard : (∑ _η : {η : ER n // Covers ξ η}, (1 : ℝ)) = deathRate (blocks ξ) := by
+        rw [sum_const, nsmul_eq_mul, card_univ, ← Nat.card_eq_fintype_card,
+          card_covers_eq_deathRate, mul_one]
+      have hsum : ∑ η : {η : ER n // Covers ξ η}, connectionLaplace s t η.1
+          = deathRate (blocks ξ)
+            - ∑ j ∈ Ioc 1 (blocks ξ - 1),
+                (∑ η : {η : ER n // Covers ξ η}, spectralCoeff s η.1 j)
+                  * (t / (t + deathRate j)) := by
+        rw [sum_congr rfl fun η _ ↦ hrow η, sum_sub_distrib, hcard, sum_comm]
+        congr 1
+        exact sum_congr rfl fun j _ ↦ (sum_mul _ _ _).symm
+      have hsplitTop : ∑ k ∈ Ioc 1 (blocks ξ), spectralCoeff s ξ k * (t / (t + deathRate k))
+          = ∑ k ∈ Ioc 1 (blocks ξ - 1), spectralCoeff s ξ k * (t / (t + deathRate k))
+            + spectralCoeff s ξ (blocks ξ) * (t / (t + deathRate (blocks ξ))) := by
+        have h := sum_Ioc_succ_top (show 1 ≤ blocks ξ - 1 by omega)
+          (fun k ↦ spectralCoeff s ξ k * (t / (t + deathRate k)))
+        rwa [Nat.sub_add_cancel (show 1 ≤ blocks ξ by omega)] at h
+      have hlow : ∀ k ∈ Ioc 1 (blocks ξ - 1), spectralCoeff s ξ k * (t / (t + deathRate k))
+          = deathRate (blocks ξ) / (deathRate (blocks ξ) - deathRate k) * coverAverage s ξ k
+            * (t / (t + deathRate k)) := by
+        intro k hk'
+        have hkK : k < blocks ξ := by
+          have := (mem_Ioc.mp hk').2
+          omega
+        rw [spectralCoeff_eq, if_neg hr, if_pos hkK]
+      have htop : spectralCoeff s ξ (blocks ξ)
+          = 1 - ∑ j ∈ Ioc 1 (blocks ξ - 1),
+            deathRate (blocks ξ) / (deathRate (blocks ξ) - deathRate j) * coverAverage s ξ j := by
+        rw [spectralCoeff_eq, if_neg hr, if_neg (lt_irrefl _), if_pos rfl]
+      have hpiece : ∀ j ∈ Ioc 1 (blocks ξ - 1),
+          (∑ η : {η : ER n // Covers ξ η}, spectralCoeff s η.1 j) * (t / (t + deathRate j))
+              / (deathRate (blocks ξ) + t)
+            = deathRate (blocks ξ) / (deathRate (blocks ξ) - deathRate j) * coverAverage s ξ j
+              * (t / (t + deathRate j) - t / (t + deathRate (blocks ξ))) := by
+        intro j hj
+        have hj2 : 2 ≤ j := by
+          have := (mem_Ioc.mp hj).1
+          omega
+        have hjK : j < blocks ξ := by
+          have := (mem_Ioc.mp hj).2
+          omega
+        have hdj := deathRate_pos hj2
+        have hgap : deathRate (blocks ξ) - deathRate j ≠ 0 :=
+          (sub_pos.mpr (deathRate_lt_deathRate (by omega) hjK)).ne'
+        have htj : t + deathRate j ≠ 0 := (show 0 < t + deathRate j by linarith).ne'
+        have htK : t + deathRate (blocks ξ) ≠ 0 :=
+          (show 0 < t + deathRate (blocks ξ) by linarith).ne'
+        rw [coverAverage]
+        field_simp
+        ring
+      have hA : ∑ j ∈ Ioc 1 (blocks ξ - 1),
+            deathRate (blocks ξ) / (deathRate (blocks ξ) - deathRate j) * coverAverage s ξ j
+              * (t / (t + deathRate j) - t / (t + deathRate (blocks ξ)))
+          = ∑ j ∈ Ioc 1 (blocks ξ - 1),
+              deathRate (blocks ξ) / (deathRate (blocks ξ) - deathRate j) * coverAverage s ξ j
+                * (t / (t + deathRate j))
+            - (∑ j ∈ Ioc 1 (blocks ξ - 1),
+                deathRate (blocks ξ) / (deathRate (blocks ξ) - deathRate j) * coverAverage s ξ j)
+              * (t / (t + deathRate (blocks ξ))) := by
+        rw [sum_mul, ← sum_sub_distrib]
+        exact sum_congr rfl fun j _ ↦ by ring
+      have hτ : 1 - t / (t + deathRate (blocks ξ))
+          = deathRate (blocks ξ) / (deathRate (blocks ξ) + t) := by
+        have htK : t + deathRate (blocks ξ) ≠ 0 :=
+          (show 0 < t + deathRate (blocks ξ) by linarith).ne'
+        field_simp
+        ring
+      rw [hV, hsum, sub_div, sum_div, sum_congr rfl hpiece, hA, hsplitTop, sum_congr rfl hlow,
+        htop, ← hτ]
+      ring
+
+/-- **The partial fractions `t/(t + d_k)` are linearly independent.** If
+`∑_{k=2}^{n} a_k t/(t + d_k)` vanishes for every `t ≥ 0`, every `a_k` is zero. -/
+theorem eq_zero_of_sum_mul_div_add_deathRate {n : ℕ} {a : ℕ → ℝ}
+    (h : ∀ t : ℝ, 0 ≤ t → ∑ k ∈ Ioc 1 n, a k * (t / (t + deathRate k)) = 0) :
+    ∀ k ∈ Ioc 1 n, a k = 0 := by
+  have hclear : ∀ t : ℝ, 0 < t →
+      ∑ k ∈ Ioc 1 n, a k * ∏ j ∈ (Ioc 1 n).erase k, (t + deathRate j) = 0 := by
+    intro t htpos
+    have hpos : ∀ j ∈ Ioc 1 n, 0 < t + deathRate j := fun j hj ↦
+      add_pos htpos (deathRate_pos (by have := (mem_Ioc.mp hj).1; omega))
+    have hterm : ∀ k ∈ Ioc 1 n,
+        a k * (t / (t + deathRate k)) * ∏ j ∈ Ioc 1 n, (t + deathRate j)
+          = t * (a k * ∏ j ∈ (Ioc 1 n).erase k, (t + deathRate j)) := by
+      intro k hk
+      have hc : t / (t + deathRate k) * (t + deathRate k) = t :=
+        div_mul_cancel₀ t (hpos k hk).ne'
+      rw [← mul_prod_erase _ _ hk]
+      calc a k * (t / (t + deathRate k))
+            * ((t + deathRate k) * ∏ j ∈ (Ioc 1 n).erase k, (t + deathRate j))
+          = a k * (∏ j ∈ (Ioc 1 n).erase k, (t + deathRate j))
+              * (t / (t + deathRate k) * (t + deathRate k)) := by ring
+        _ = t * (a k * ∏ j ∈ (Ioc 1 n).erase k, (t + deathRate j)) := by
+            rw [hc]
+            ring
+    have hmul : t * ∑ k ∈ Ioc 1 n, a k * ∏ j ∈ (Ioc 1 n).erase k, (t + deathRate j) = 0 := by
+      rw [mul_sum, ← sum_congr rfl hterm, ← sum_mul, h t htpos.le, zero_mul]
+    exact (mul_eq_zero.mp hmul).resolve_left htpos.ne'
+  have heval : ∀ t : ℝ, (∑ k ∈ Ioc 1 n, Polynomial.C (a k)
+        * ∏ j ∈ (Ioc 1 n).erase k, (Polynomial.X + Polynomial.C (deathRate j))).eval t
+      = ∑ k ∈ Ioc 1 n, a k * ∏ j ∈ (Ioc 1 n).erase k, (t + deathRate j) := by
+    intro t
+    simp only [Polynomial.eval_finset_sum, Polynomial.eval_mul, Polynomial.eval_C,
+      Polynomial.eval_prod, Polynomial.eval_add, Polynomial.eval_X]
+  have hzero : (∑ k ∈ Ioc 1 n, Polynomial.C (a k)
+      * ∏ j ∈ (Ioc 1 n).erase k, (Polynomial.X + Polynomial.C (deathRate j))) = 0 := by
+    refine Polynomial.eq_zero_of_infinite_isRoot _
+      (Set.Infinite.mono ?_ (Set.Ioi_infinite (0 : ℝ)))
+    intro t ht
+    exact (heval t).trans (hclear t ht)
+  intro m hm
+  have hev := heval (-deathRate m)
+  rw [hzero, Polynomial.eval_zero, sum_eq_single m] at hev
+  · have hP : ∏ j ∈ (Ioc 1 n).erase m, (-deathRate m + deathRate j) ≠ 0 := by
+      refine prod_ne_zero_iff.mpr fun j hj ↦ ?_
+      obtain ⟨hjm, hj'⟩ := mem_erase.mp hj
+      have hj1 := (mem_Ioc.mp hj').1
+      have hm1 := (mem_Ioc.mp hm).1
+      rcases lt_or_gt_of_ne hjm with hlt | hgt
+      · have := deathRate_lt_deathRate (show 1 ≤ j by omega) hlt
+        exact (show -deathRate m + deathRate j < 0 by linarith).ne
+      · have := deathRate_lt_deathRate (show 1 ≤ m by omega) hgt
+        exact (show 0 < -deathRate m + deathRate j by linarith).ne'
+    exact (mul_eq_zero.mp hev.symm).resolve_right hP
+  · intro k _ hne
+    have hvanish : ∏ j ∈ (Ioc 1 n).erase k, (-deathRate m + deathRate j) = 0 :=
+      prod_eq_zero (show m ∈ (Ioc 1 n).erase k from mem_erase.mpr ⟨fun h ↦ hne h.symm, hm⟩)
+        (show -deathRate m + deathRate m = 0 by ring)
+    rw [hvanish, mul_zero]
+  · intro hnot
+    exact absurd hm hnot
+
+/-- **The cumulant determines the spectral coefficients.** -/
+theorem spectralCoeff_eq_of_connectivityCumulant_eq {n : ℕ} (hn : 2 ≤ n) {s s' : Fin n → Fin n}
+    (h : connectivityCumulant (Finpartition.ofSetoid (graphKer s))
+      = connectivityCumulant (Finpartition.ofSetoid (graphKer s'))) :
+    ∀ k ∈ Ioc 1 n, spectralCoeff s ⊥ k = spectralCoeff s' ⊥ k := by
+  have hp := stoppingProb_eq_of_connectedProb_eq hn (connectedProb_eq_of_connectivityCumulant_eq h)
+  have hreal : ∀ t : ℝ, 0 ≤ t →
+      ∑ k ∈ Ioc 1 n, (spectralCoeff s ⊥ k - spectralCoeff s' ⊥ k) * (t / (t + deathRate k))
+        = 0 := by
+    intro t ht
+    have h1 := connectionLaplace_eq_one_sub_sum_spectralCoeff s ht ⊥
+    have h2 := connectionLaplace_eq_one_sub_sum_spectralCoeff s' ht ⊥
+    rw [blocks_bot] at h1 h2
+    have hlap : connectionLaplace s t ⊥ = connectionLaplace s' t ⊥ := by
+      rw [connectionLaplace_bot_eq_sum_stoppingProb hn s,
+        connectionLaplace_bot_eq_sum_stoppingProb hn s']
+      simp only [hp]
+    have heq : ∑ k ∈ Ioc 1 n, spectralCoeff s ⊥ k * (t / (t + deathRate k))
+        = ∑ k ∈ Ioc 1 n, spectralCoeff s' ⊥ k * (t / (t + deathRate k)) := by
+      linarith
+    rw [← sub_eq_zero, ← sum_sub_distrib] at heq
+    refine (sum_congr rfl fun k _ ↦ ?_).trans heq
+    ring
+  exact fun k hk ↦ sub_eq_zero.mp
+    (eq_zero_of_sum_mul_div_add_deathRate
+      (a := fun k ↦ spectralCoeff s ⊥ k - spectralCoeff s' ⊥ k) hreal k hk)
+
+/-- **The spectral coefficients of the first-step law are equivalent to the cumulant.** -/
+theorem spectralCoeff_eq_iff_connectivityCumulant_eq {n : ℕ} (hn : 2 ≤ n)
+    (s s' : Fin n → Fin n) :
+    (∀ k ∈ Ioc 1 n, spectralCoeff s ⊥ k = spectralCoeff s' ⊥ k)
+      ↔ connectivityCumulant (Finpartition.ofSetoid (graphKer s))
+        = connectivityCumulant (Finpartition.ofSetoid (graphKer s')) :=
+  ⟨connectivityCumulant_eq_of_spectralCoeff_eq hn, spectralCoeff_eq_of_connectivityCumulant_eq hn⟩
+
+/-- **The survival function of the first-step law is equivalent to the cumulant.** -/
+theorem survivalAt_eq_iff_connectivityCumulant_eq {n : ℕ} (hn : 2 ≤ n) (s s' : Fin n → Fin n) :
+    (∀ c : ℝ, 0 ≤ c →
+      survivalAt (connectionTimeLaw s ⊥) c = survivalAt (connectionTimeLaw s' ⊥) c)
+      ↔ connectivityCumulant (Finpartition.ofSetoid (graphKer s))
+        = connectivityCumulant (Finpartition.ofSetoid (graphKer s')) := by
+  rw [spectralCoeff_eq_iff_survivalAt_eq, spectralCoeff_eq_iff_connectivityCumulant_eq hn]
+
+/-- **The first-step law is equivalent to the cumulant.** -/
+theorem connectionTimeLaw_bot_eq_iff_connectivityCumulant_eq {n : ℕ} (hn : 2 ≤ n)
+    (s s' : Fin n → Fin n) :
+    connectionTimeLaw s ⊥ = connectionTimeLaw s' ⊥
+      ↔ connectivityCumulant (Finpartition.ofSetoid (graphKer s))
+        = connectivityCumulant (Finpartition.ofSetoid (graphKer s')) := by
+  rw [← survivalAt_eq_iff_connectivityCumulant_eq hn]
+  exact ⟨fun h c _ ↦ by rw [h], connectionTimeLaw_bot_eq_of_survivalAt_eq⟩
 
 end Descent.Pangenome.GraphCoalescent.ConnectionLawIdentifiability

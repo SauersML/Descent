@@ -30,3 +30,9 @@ open Descent.Pangenome.GraphCoalescent.ConnectionLawIdentifiability
 #print axioms connectionTimeLaw_bot_eq_of_survivalAt_eq
 #print axioms connectivityCumulant_eq_of_survivalAt_eq
 #print axioms connectivityCumulant_eq_of_spectralCoeff_eq
+#print axioms connectionLaplace_eq_one_sub_sum_spectralCoeff
+#print axioms eq_zero_of_sum_mul_div_add_deathRate
+#print axioms spectralCoeff_eq_of_connectivityCumulant_eq
+#print axioms spectralCoeff_eq_iff_connectivityCumulant_eq
+#print axioms survivalAt_eq_iff_connectivityCumulant_eq
+#print axioms connectionTimeLaw_bot_eq_iff_connectivityCumulant_eq
