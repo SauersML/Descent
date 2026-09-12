@@ -23,7 +23,10 @@ the corrected-clock half of `PANGENOME_HIDDEN_CLOCK.md` §5, Theorem C.
   so with Kingman's unit rate per cover it is `λ_vis(ξ)`. The report map from visible covers onto
   the covers of the report is onto (`exists_visible_cover`), which gives `λ_vis ≥ d_r`
   (`deathRate_le_visibleIntensity`), and it is not injective as soon as some component hides two
-  lineages and the report has two components (`deathRate_lt_visibleIntensity`).
+  lineages and the report has two components (`deathRate_lt_visibleIntensity`). In the loads of
+  `Descent.Pangenome.GraphCoalescent.HiddenLoads` it is the note's `Σ_{C<D} L_C L_D`
+  (`visibleIntensity_eq_sum_pairs`): the invisible covers number `Σ_C C(L_C, 2)`, one family inside
+  each component (`card_filter_not_visible`), and (A3) leaves the rest.
 * `kingmanGenerator_meanTransitTime_observed`: Kingman's generator, unit rate on every cover,
   applied to the clock function `f(r) = meanTransitTime r = 2 - 2/r` of the report width. An
   invisible cover contributes `0`, a visible one `-1/d_r` (`meanTransitTime_sub_of_covers`), so
@@ -48,7 +51,11 @@ the corrected-clock half of `PANGENOME_HIDDEN_CLOCK.md` §5, Theorem C.
   reproduces `Reduction` where `Reduction` applies and departs from it at `⊥`.
 * **(C2), in Laplace-transform order**: `kingmanLaplace_le_connectionLaplace`,
   `E_ξ e^{-t τ_q} ≥ ∏_{k=2}^{r} d_k/(d_k + t)`, the transform of the independent sum
-  `Σ_{k=2}^r Exp(d_k)`.
+  `Σ_{k=2}^r Exp(d_k)`; at the panel `kingmanLaplace_width_le_connectionLaplace_bot`.
+* **(C4), in Laplace-transform order**: `connectionLaplace_le_kingmanLaplaceIco`,
+  `E_ξ e^{-t τ_q} ≤ ∏_{k=K-r+2}^{K} d_k/(d_k + t)`, and at the panel `connectionLaplace_bot_le`. The
+  two transform bounds meet on the graph's stratum (`connectionLaplace_of_graphState`), so entered
+  at `graphKer s` the report transform is K-G (5.9) at `w` (`connectionLaplace_graphKer`).
 
 ## What is narrower than the note
 
@@ -212,6 +219,77 @@ theorem sum_ite_visible {n : ℕ} (s : Fin n → Fin n) (ξ : ER n) (c : ℝ) :
   rw [sum_ite, sum_const_zero, add_zero, sum_const, nsmul_eq_mul]
   rfl
 
+/-- **The invisible covers are counted component by component**: `Σ_C C(L_C, 2)` of them, the
+mergers of two true blocks inside one report component, `HiddenLoads.invisibleCovers`. -/
+theorem card_filter_not_visible {n : ℕ} (s : Fin n → Fin n) (ξ : ER n) :
+    (univ.filter fun η : {η : ER n // Covers ξ η} ↦
+        ¬ Covers (observed s ξ) (observed s η.1)).card
+      = ∑ C, (hiddenLoad s ξ C).choose 2 := by
+  have hnot : ∀ {η : ER n}, observed s η = observed s ξ →
+      ¬ Covers (observed s ξ) (observed s η) := by
+    intro η hobs hcov
+    rw [hobs] at hcov
+    have := hcov.2
+    omega
+  haveI : ∀ C, Finite (invisibleCovers s ξ C) := fun C ↦
+    Finite.of_injective
+      (fun η : invisibleCovers s ξ C ↦
+        (⟨η.1, (covers_observed_eq_of_mem_invisibleCovers η.2).1⟩ : {η : ER n // Covers ξ η}))
+      fun a b h ↦ by
+        have h' := congrArg Subtype.val h
+        exact Subtype.ext h'
+  let f : (Σ C : Quotient (observed s ξ), invisibleCovers s ξ C) →
+      (univ.filter fun η : {η : ER n // Covers ξ η} ↦
+        ¬ Covers (observed s ξ) (observed s η.1)) :=
+    fun p ↦ ⟨⟨p.2.1, (covers_observed_eq_of_mem_invisibleCovers p.2.2).1⟩,
+      mem_filter.mpr ⟨mem_univ _, hnot (covers_observed_eq_of_mem_invisibleCovers p.2.2).2⟩⟩
+  have hbij : Function.Bijective f := by
+    constructor
+    · rintro ⟨C, η, hη⟩ ⟨C', η', hη'⟩ heq
+      have hηη : η = η' := congrArg (fun q ↦ q.1.1) heq
+      subst hηη
+      obtain ⟨a, ha, b, hb, hab, hm⟩ := id hη
+      obtain ⟨a', ha', b', hb', hab', hm'⟩ := id hη'
+      have hpair := (merge_eq_merge_iff ξ hab hab').mp (hm.symm.trans hm')
+      have hmem : a ∈ ({a', b'} : Finset (Quotient ξ)) := by
+        rw [← hpair]
+        exact mem_insert_self _ _
+      have hCC : C = C' := by
+        rcases mem_insert.mp hmem with h | h
+        · rw [← (mem_filter.mp ha).2, ← (mem_filter.mp ha').2, h]
+        · rw [← (mem_filter.mp ha).2, ← (mem_filter.mp hb').2, mem_singleton.mp h]
+      subst hCC
+      rfl
+    · rintro ⟨⟨η, hcov⟩, hmem⟩
+      have hobs : observed s η = observed s ξ :=
+        (observed_eq_or_covers s hcov).resolve_right (mem_filter.mp hmem).2
+      obtain ⟨A, B, hAB, rfl⟩ := (covers_iff_exists_merge ξ η).mp hcov
+      obtain ⟨x, rfl⟩ := quotient_mk_surjective ξ A
+      obtain ⟨y, rfl⟩ := quotient_mk_surjective ξ B
+      have hxy : (observed s ξ).r x y := by
+        have h := le_observed s _ (merge_rel ξ (Quotient.mk ξ x) (Quotient.mk ξ y) rfl rfl)
+        rwa [hobs] at h
+      exact ⟨⟨Quotient.mk (observed s ξ) x, merge ξ (Quotient.mk ξ x) (Quotient.mk ξ y),
+        Quotient.mk ξ x, (mk_mem_hiddenBlocks_iff s ξ x x).mpr ((observed s ξ).iseqv.refl x),
+        Quotient.mk ξ y, (mk_mem_hiddenBlocks_iff s ξ y x).mpr ((observed s ξ).iseqv.symm hxy),
+        hAB, rfl⟩, rfl⟩
+  rw [← Fintype.card_coe, ← Nat.card_eq_fintype_card, ← Nat.card_eq_of_bijective f hbij,
+    Nat.card_sigma]
+  exact sum_congr rfl fun C _ ↦ card_invisibleCovers s ξ C
+
+/-- **`λ_vis = Σ_{C<D} L_C L_D`**: the visible covers of `ξ` number the sum, over unordered pairs of
+report components, of the products of their hidden loads `HiddenLoads.hiddenLoad`. The covers
+number `C(K, 2)`, the invisible ones `Σ_C C(L_C, 2)`, and (A3) is the difference. -/
+theorem visibleIntensity_eq_sum_pairs {n : ℕ} (s : Fin n → Fin n) (ξ : ER n) :
+    visibleIntensity s ξ = ∑ p ∈ univ.powersetCard 2, ∏ C ∈ p, hiddenLoad s ξ C := by
+  have hsplit := filter_card_add_filter_neg_card_eq_card
+    (s := (univ : Finset {η : ER n // Covers ξ η}))
+    fun η : {η : ER n // Covers ξ η} ↦ Covers (observed s ξ) (observed s η.1)
+  rw [card_univ, card_covers_fintype, card_filter_not_visible,
+    ← sum_choose_two_hiddenLoad_add_sum_pairs s ξ] at hsplit
+  unfold visibleIntensity
+  omega
+
 /-! ### Kingman's generator on the clock function -/
 
 /-- **Kingman's generator**, K-C (1.3): unit rate on every cover,
@@ -257,6 +335,14 @@ theorem kingmanGenerator_meanTransitTime_observed {n : ℕ} (s : Fin n → Fin n
   simp only [kingmanGenerator]
   rw [sum_congr rfl fun η _ ↦ hterm η, sum_ite_visible]
   ring
+
+/-- **The generator on the clock function, in the loads**: `𝓛 f(r)(ξ) = -Σ_{C<D} L_C L_D / d_r`. -/
+theorem kingmanGenerator_meanTransitTime_observed_eq_sum_pairs {n : ℕ} (s : Fin n → Fin n)
+    {ξ : ER n} (hr : 2 ≤ blocks (observed s ξ)) :
+    kingmanGenerator (fun ζ ↦ meanTransitTime (blocks (observed s ζ))) ξ
+      = -(((∑ p ∈ univ.powersetCard 2, ∏ C ∈ p, hiddenLoad s ξ C : ℕ) : ℝ)
+          / deathRate (blocks (observed s ξ))) := by
+  rw [kingmanGenerator_meanTransitTime_observed s hr, visibleIntensity_eq_sum_pairs]
 
 /-! ### First-step values -/
 
@@ -702,6 +788,110 @@ theorem kingmanLaplace_le_connectionLaplace {n : ℕ} (s : Fin n → Fin n) {t :
       rw [le_div_iff₀ (deathRate_add_pos s ht hr)]
       refine le_of_mul_le_mul_left ?_ hdr
       linarith
+
+/-- **`∏_{k=lo+2}^{hi+1} d_k/(d_k + t)`**, the transform of `Σ_{k=lo+2}^{hi+1} Exp(d_k)`. -/
+def kingmanLaplaceIco (t : ℝ) (lo hi : ℕ) : ℝ :=
+  ∏ k ∈ Ico lo hi, deathRate (k + 2) / (deathRate (k + 2) + t)
+
+/-- Kingman's transform at `m` lineages is the full range of levels, `k = 2, …, m`. -/
+theorem kingmanLaplace_eq_kingmanLaplaceIco (t : ℝ) (m : ℕ) :
+    kingmanLaplace t m = kingmanLaplaceIco t 0 (m - 1) := by
+  rw [kingmanLaplace, kingmanLaplaceIco, range_eq_Ico]
+
+/-- Dropping levels from the bottom can only raise the transform, because every factor lies in
+`[0, 1]`. -/
+theorem kingmanLaplaceIco_le_of_le {t : ℝ} (ht : 0 ≤ t) {lo lo' hi : ℕ} (h : lo ≤ lo') :
+    kingmanLaplaceIco t lo hi ≤ kingmanLaplaceIco t lo' hi := by
+  have hfac0 : ∀ k, 0 ≤ deathRate (k + 2) / (deathRate (k + 2) + t) := fun k ↦
+    div_nonneg (deathRate_add_two_pos k).le (add_nonneg (deathRate_add_two_pos k).le ht)
+  have hfac1 : ∀ k, deathRate (k + 2) / (deathRate (k + 2) + t) ≤ 1 := fun k ↦ by
+    have hk := deathRate_add_two_pos k
+    rw [div_le_iff₀ (by linarith)]
+    linarith
+  by_cases hhi : lo' ≤ hi
+  · rw [kingmanLaplaceIco, kingmanLaplaceIco, ← prod_Ico_consecutive _ h hhi]
+    exact mul_le_of_le_one_left (prod_nonneg fun k _ ↦ hfac0 k)
+      (prod_le_one (fun k _ ↦ hfac0 k) fun k _ ↦ hfac1 k)
+  · rw [kingmanLaplaceIco, kingmanLaplaceIco, Ico_eq_empty_of_le (show hi ≤ lo' by omega),
+      prod_empty]
+    exact prod_le_one (fun k _ ↦ hfac0 k) fun k _ ↦ hfac1 k
+
+/-- **(C4), in Laplace-transform order**: `E_ξ e^{-t τ_q} ≤ ∏_{k=K-r+2}^{K} d_k/(d_k + t)`, the
+transform of `Σ_{k=K-r+2}^{K} Exp(d_k)`. At least `r - 1` mergers precede connection, each waiting
+a holding time at the current block count. -/
+theorem connectionLaplace_le_kingmanLaplaceIco {n : ℕ} (s : Fin n → Fin n) {t : ℝ} (ht : 0 ≤ t)
+    (ξ : ER n) :
+    connectionLaplace s t ξ
+      ≤ kingmanLaplaceIco t (blocks ξ - blocks (observed s ξ)) (blocks ξ - 1) := by
+  induction ξ using covers_induction with
+  | step ξ ih =>
+    unfold connectionLaplace at ih ⊢
+    have hrK := blocks_antitone (le_observed s ξ)
+    rw [connectionValue_eq]
+    by_cases hr : blocks (observed s ξ) ≤ 1
+    · simp only [if_pos hr, Pi.one_apply, kingmanLaplaceIco,
+        Ico_eq_empty_of_le (show blocks ξ - 1 ≤ blocks ξ - blocks (observed s ξ) by omega),
+        prod_empty, le_refl]
+    · rw [if_neg hr, Pi.zero_apply, zero_add]
+      have hdt : 0 < deathRate (blocks ξ) + t := deathRate_add_pos s ht hr
+      have hstep : ∀ η : {η : ER n // Covers ξ η},
+          connectionValue s t 1 0 η.1
+            ≤ kingmanLaplaceIco t (blocks ξ - blocks (observed s ξ)) (blocks ξ - 2) := by
+        intro η
+        have hbη : blocks η.1 + 1 = blocks ξ := η.2.2
+        have hrη : blocks (observed s ξ) ≤ blocks (observed s η.1) + 1 := by
+          rcases observed_eq_or_covers s η.2 with heq | hcov
+          · rw [heq]
+            omega
+          · have := hcov.2
+            omega
+        have hrηK := blocks_antitone (le_observed s η.1)
+        have hih := ih η.1 η.2
+        rw [show blocks η.1 - 1 = blocks ξ - 2 by omega] at hih
+        exact hih.trans (kingmanLaplaceIco_le_of_le ht (by omega))
+      have hsum := sum_le_sum fun η (_ : η ∈ (univ : Finset {η : ER n // Covers ξ η})) ↦
+        hstep η
+      rw [sum_const, nsmul_eq_mul, card_univ, ← Nat.card_eq_fintype_card,
+        card_covers_eq_deathRate] at hsum
+      have hsucc : kingmanLaplaceIco t (blocks ξ - blocks (observed s ξ)) (blocks ξ - 1)
+          = kingmanLaplaceIco t (blocks ξ - blocks (observed s ξ)) (blocks ξ - 2)
+            * (deathRate (blocks ξ) / (deathRate (blocks ξ) + t)) := by
+        rw [kingmanLaplaceIco, kingmanLaplaceIco, show blocks ξ - 1 = blocks ξ - 2 + 1 by omega,
+          prod_Ico_succ_top (show blocks ξ - blocks (observed s ξ) ≤ blocks ξ - 2 by omega),
+          show blocks ξ - 2 + 2 = blocks ξ by omega]
+      rw [hsucc, div_le_iff₀ hdt, mul_assoc, div_mul_cancel₀ _ hdt.ne']
+      linarith
+
+/-- **On the graph's stratum the two transform bounds meet**, so the report transform is Kingman's
+at the block count.
+
+Assumes: `GraphState s ξ`. -/
+theorem connectionLaplace_of_graphState {n : ℕ} {s : Fin n → Fin n} {t : ℝ} (ht : 0 ≤ t)
+    {ξ : ER n} (h : GraphState s ξ) : connectionLaplace s t ξ = kingmanLaplace t (blocks ξ) := by
+  have hlow := kingmanLaplace_le_connectionLaplace s ht ξ
+  have hup := connectionLaplace_le_kingmanLaplaceIco s ht ξ
+  rw [observed_eq_of_graphState h] at hlow hup
+  rw [Nat.sub_self, ← kingmanLaplace_eq_kingmanLaplaceIco] at hup
+  exact le_antisymm hup hlow
+
+/-- **Entered at `graphKer s`, the report transform is K-G (5.9) at `w`.** -/
+theorem connectionLaplace_graphKer {n : ℕ} (s : Fin n → Fin n) {t : ℝ} (ht : 0 ≤ t) :
+    connectionLaplace s t (graphKer s) = kingmanLaplace t (Linkage.width s) := by
+  rw [connectionLaplace_of_graphState ht (graphState_graphKer s), blocks_graphKer]
+
+/-- **(C2) at the panel, in Laplace order**: `E e^{-t τ_q} ≥ E e^{-t T_w}`. -/
+theorem kingmanLaplace_width_le_connectionLaplace_bot {n : ℕ} (s : Fin n → Fin n) {t : ℝ}
+    (ht : 0 ≤ t) : kingmanLaplace t (Linkage.width s) ≤ connectionLaplace s t ⊥ := by
+  have h := kingmanLaplace_le_connectionLaplace s ht ⊥
+  rw [observed_bot, blocks_graphKer] at h
+  exact h
+
+/-- **(C4) at the panel, in Laplace order**: `E e^{-t τ_q} ≤ ∏_{k=n-w+2}^{n} d_k/(d_k + t)`. -/
+theorem connectionLaplace_bot_le {n : ℕ} (s : Fin n → Fin n) {t : ℝ} (ht : 0 ≤ t) :
+    connectionLaplace s t ⊥ ≤ kingmanLaplaceIco t (n - Linkage.width s) (n - 1) := by
+  have h := connectionLaplace_le_kingmanLaplaceIco s ht ⊥
+  rw [observed_bot, blocks_graphKer, blocks_bot] at h
+  exact h
 
 end
 

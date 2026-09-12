@@ -15,9 +15,12 @@ open Descent.Pangenome.GraphCoalescent
 #print axioms deathRate_lt_visibleIntensity
 #print axioms visibleIntensity_of_graphState
 #print axioms sum_ite_visible
+#print axioms card_filter_not_visible
+#print axioms visibleIntensity_eq_sum_pairs
 #print axioms meanTransitTime_succ_sub
 #print axioms meanTransitTime_sub_of_covers
 #print axioms kingmanGenerator_meanTransitTime_observed
+#print axioms kingmanGenerator_meanTransitTime_observed_eq_sum_pairs
 #print axioms discountedStep_succ
 #print axioms connectionValue_eq
 #print axioms covers_induction
@@ -45,3 +48,10 @@ open Descent.Pangenome.GraphCoalescent
 #print axioms kingmanLaplace_eq_one_of_le_one
 #print axioms kingmanLaplace_succ
 #print axioms kingmanLaplace_le_connectionLaplace
+#print axioms kingmanLaplace_eq_kingmanLaplaceIco
+#print axioms kingmanLaplaceIco_le_of_le
+#print axioms connectionLaplace_le_kingmanLaplaceIco
+#print axioms connectionLaplace_of_graphState
+#print axioms connectionLaplace_graphKer
+#print axioms kingmanLaplace_width_le_connectionLaplace_bot
+#print axioms connectionLaplace_bot_le
