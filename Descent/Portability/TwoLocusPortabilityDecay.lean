@@ -49,6 +49,18 @@ not enter.  Drift lowers the cross-population linkage covariance at rate `c_S + 
 cross-population heterozygosity product at the same rate, so it cancels from the ratio exactly,
 whatever the two drift rates are.  What remains is the recombination clock alone.
 
+## Relation to the end-to-end law F8
+
+`EndToEndPortabilityLaw.expectedPortability` is a within-deme ratio of expectations,
+`(E N_t · E D_s) / (E D_t · E N_s)` with `N = 16 C_SY²` and `D = 16 V_S V_Y` of NOTE2 (21).
+For a single tag-locus score with a fixed weight, after a split at equal rates with no migration
+or mutation, the source and target demes have one law, so that ratio is `1` whenever it is
+defined: a fixed single-tag score keeps its expected squared correlation.  The loss through
+linkage enters only when the score weight is the source's own linkage covariance, which brings
+in the cross moment `E[D_S D_T]`.  That cross moment is the statistic of this module, a readout
+of cross-deme coordinates rather than one of the F8 functionals.  This paragraph records the
+distinction; no theorem here states the F8 value.
+
 ## The mechanism
 
 A coordinate whose generator row is `μ` times its own unit row is multiplied by `e^{μ t}` along
@@ -189,7 +201,8 @@ theorem augmentedLowOrderLDGenerator_DD_row (rates : ManyDemeLDRates D)
     · subst hcolumn
       simp [augmentedLowOrderLDGenerator, lowOrderLDHomogeneousGenerator, lowOrderLDDrift,
         lowOrderLDMigration, lowOrderLDRecombination, lowOrderLDMutationCoupling,
-        lowOrderLDRecurrentMutationDamping, lowOrderLDBasis, hmigration, hmutation, hne] <;> ring
+        lowOrderLDRecurrentMutationDamping, lowOrderLDBasis, hmigration, hmutation, hne]
+      ring
     · simp [augmentedLowOrderLDGenerator, lowOrderLDHomogeneousGenerator, lowOrderLDDrift,
         lowOrderLDMigration, lowOrderLDRecombination, lowOrderLDMutationCoupling,
         lowOrderLDRecurrentMutationDamping, lowOrderLDBasis, hmigration, hmutation, hne,
@@ -207,7 +220,6 @@ theorem augmentedLowOrderLDGenerator_pi2_row (rates : ManyDemeLDRates D)
     augmentedLowOrderLDGenerator rates (some (.pi2 first first second second)) column
       = -(rates.coalescence first + rates.coalescence second)
         * (if column = some (.pi2 first first second second) then 1 else 0) := by
-  have hne' : second ≠ first := Ne.symm hne
   cases column with
   | none => simp [augmentedLowOrderLDGenerator, lowOrderLDMutationForcing]
   | some column =>
@@ -215,10 +227,10 @@ theorem augmentedLowOrderLDGenerator_pi2_row (rates : ManyDemeLDRates D)
     · subst hcolumn
       simp [augmentedLowOrderLDGenerator, lowOrderLDHomogeneousGenerator, lowOrderLDDrift,
         lowOrderLDMigration, lowOrderLDRecombination, lowOrderLDMutationCoupling,
-        lowOrderLDRecurrentMutationDamping, lowOrderLDBasis, hmigration, hmutation, hne, hne']
+        lowOrderLDRecurrentMutationDamping, lowOrderLDBasis, hmigration, hmutation, hne]
     · simp [augmentedLowOrderLDGenerator, lowOrderLDHomogeneousGenerator, lowOrderLDDrift,
         lowOrderLDMigration, lowOrderLDRecombination, lowOrderLDMutationCoupling,
-        lowOrderLDRecurrentMutationDamping, lowOrderLDBasis, hmigration, hmutation, hne, hne',
+        lowOrderLDRecurrentMutationDamping, lowOrderLDBasis, hmigration, hmutation, hne,
         hcolumn, Ne.symm hcolumn]
 
 /-! ## The cross moments in closed form -/
@@ -263,6 +275,11 @@ theorem sum_pointMass_mul {ι : Type*} [Fintype ι] [DecidableEq ι] (coeff : �
     ∑ row, coeff * (if row = point then 1 else 0) * vector row = coeff * vector point := by
   simp [mul_ite, ite_mul, Finset.sum_ite_eq']
 
+/-- A unit point mass reads a vector at its point. -/
+theorem sum_unitPointMass_mul {ι : Type*} [Fintype ι] [DecidableEq ι] (point : ι)
+    (vector : ι → ℝ) : ∑ row, (if row = point then 1 else 0) * vector row = vector point := by
+  simp [ite_mul, Finset.sum_ite_eq']
+
 /-- **The linkage decay rate** `c_i + ρ_i/2` of one deme.
 
 Empirical status: NOT AN EMPIRICAL CLAIM.  A sum of two rates. -/
@@ -287,7 +304,6 @@ theorem augmentedLowOrderLDGenerator_Dz_row (rates : ManyDemeLDRates D)
       = 4 * rates.coalescence second * (if column = some (.DD first second) then 1 else 0)
         - (rates.coalescence first + rates.recombination first / 2)
           * (if column = some (.Dz first second second) then 1 else 0) := by
-  have hne' : second ≠ first := Ne.symm hne
   cases column with
   | none => simp [augmentedLowOrderLDGenerator, lowOrderLDMutationForcing]
   | some column =>
@@ -295,18 +311,17 @@ theorem augmentedLowOrderLDGenerator_Dz_row (rates : ManyDemeLDRates D)
     · subst hDD
       simp [augmentedLowOrderLDGenerator, lowOrderLDHomogeneousGenerator, lowOrderLDDrift,
         lowOrderLDMigration, lowOrderLDRecombination, lowOrderLDMutationCoupling,
-        lowOrderLDRecurrentMutationDamping, lowOrderLDBasis, hmigration, hmutation, hne,
-        hne'] <;> ring
+        lowOrderLDRecurrentMutationDamping, lowOrderLDBasis, hmigration, hmutation, hne]
     · by_cases hDz : column = .Dz first second second
       · subst hDz
         simp [augmentedLowOrderLDGenerator, lowOrderLDHomogeneousGenerator, lowOrderLDDrift,
           lowOrderLDMigration, lowOrderLDRecombination, lowOrderLDMutationCoupling,
-          lowOrderLDRecurrentMutationDamping, lowOrderLDBasis, hmigration, hmutation, hne,
-          hne'] <;> ring
+          lowOrderLDRecurrentMutationDamping, lowOrderLDBasis, hmigration, hmutation, hne]
+        ring
       · simp [augmentedLowOrderLDGenerator, lowOrderLDHomogeneousGenerator, lowOrderLDDrift,
           lowOrderLDMigration, lowOrderLDRecombination, lowOrderLDMutationCoupling,
           lowOrderLDRecurrentMutationDamping, lowOrderLDBasis, hmigration, hmutation, hne,
-          hne', hDD, hDz, Ne.symm hDD, Ne.symm hDz]
+          hDD, hDz, Ne.symm hDD, Ne.symm hDz]
 
 /-- **The cross-population mixed heterozygosity row.**  With no migration and no mutation, the
 row of `pi2(i, j, i, j)` for two different demes reads
@@ -330,13 +345,13 @@ theorem augmentedLowOrderLDGenerator_pi2Cross_row (rates : ManyDemeLDRates D)
       simp [augmentedLowOrderLDGenerator, lowOrderLDHomogeneousGenerator, lowOrderLDDrift,
         lowOrderLDMigration, lowOrderLDRecombination, lowOrderLDMutationCoupling,
         lowOrderLDRecurrentMutationDamping, lowOrderLDBasis, hmigration, hmutation, hne,
-        hne'] <;> ring
+        hne']
     · by_cases hright : column = .Dz second first first
       · subst hright
         simp [augmentedLowOrderLDGenerator, lowOrderLDHomogeneousGenerator, lowOrderLDDrift,
           lowOrderLDMigration, lowOrderLDRecombination, lowOrderLDMutationCoupling,
           lowOrderLDRecurrentMutationDamping, lowOrderLDBasis, hmigration, hmutation, hne,
-          hne'] <;> ring
+          hne']
       · simp [augmentedLowOrderLDGenerator, lowOrderLDHomogeneousGenerator, lowOrderLDDrift,
           lowOrderLDMigration, lowOrderLDRecombination, lowOrderLDMutationCoupling,
           lowOrderLDRecurrentMutationDamping, lowOrderLDBasis, hmigration, hmutation, hne,
@@ -374,7 +389,8 @@ theorem matrixExponential_Dz_combination (rates : ManyDemeLDRates D)
       unfold linkageRate at hα ⊢
       linear_combination
         (-(if column = some (LowOrderLDCoordinate.DD first second) then (1 : ℝ) else 0)) * hα)
-  simp only [add_mul, Finset.sum_add_distrib, sum_pointMass_mul, one_mul] at h
+  simp only [add_mul, Finset.sum_add_distrib, sum_pointMass_mul, one_mul,
+    sum_unitPointMass_mul] at h
   rw [mul_comm duration] at h
   exact h
 
@@ -422,25 +438,21 @@ theorem matrixExponential_pi2Cross_combination (rates : ManyDemeLDRates D)
   have hγfirst : rates.coalescence first / (4 * linkageRate rates first) * linkageRate rates first
       = rates.coalescence first / 4 := by
     field_simp
-    ring
   have hγsecond : rates.coalescence second / (4 * linkageRate rates second)
         * linkageRate rates second = rates.coalescence second / 4 := by
     field_simp
-    ring
   have hδfirst : rates.coalescence first * rates.coalescence second
           / (linkageRate rates first * (linkageRate rates first + linkageRate rates second))
         * (linkageRate rates first + linkageRate rates second)
       = 4 * rates.coalescence second
         * (rates.coalescence first / (4 * linkageRate rates first)) := by
     field_simp
-    ring
   have hδsecond : rates.coalescence first * rates.coalescence second
           / (linkageRate rates second * (linkageRate rates first + linkageRate rates second))
         * (linkageRate rates first + linkageRate rates second)
       = 4 * rates.coalescence first
         * (rates.coalescence second / (4 * linkageRate rates second)) := by
     field_simp
-    ring
   have h := sum_mul_matrixExponential_mulVec_of_left_eigen (augmentedLowOrderLDGenerator rates)
     (fun row : AffineLowOrderLDCoordinate D ↦
       1 * (if row = some (LowOrderLDCoordinate.pi2 first second first second) then 1 else 0)
@@ -471,8 +483,8 @@ theorem matrixExponential_pi2Cross_combination (rates : ManyDemeLDRates D)
             * hδfirst
           - (if column = some (LowOrderLDCoordinate.DD second first) then (1 : ℝ) else 0)
             * hδsecond)
-  simp only [add_mul, Finset.sum_add_distrib, sum_pointMass_mul, one_mul, mul_zero, Real.exp_zero]
-    at h
+  simp only [add_mul, Finset.sum_add_distrib, sum_pointMass_mul, one_mul, mul_zero, Real.exp_zero,
+    sum_unitPointMass_mul] at h
   exact h
 
 /-- Right after the split, every coordinate of the cross-heterozygosity block is the matching
@@ -890,7 +902,8 @@ theorem crossHeterozygosityDecay_antitoneOn_rate {coalescence contrast linkage d
         + (coalescence / w) ^ 2 * linkage * (1 - Real.exp (-w * duration)) ^ 2) hm]
     congr 1
     · ring
-    · field_simp <;> ring
+    · set q := 1 - Real.exp (-w * duration)
+      first | (field_simp; ring) | field_simp
   have hEu := Real.exp_pos (-u * duration)
   have hEv := Real.exp_pos (-v * duration)
   have h1u : 0 < 1 - Real.exp (-u * duration) := by

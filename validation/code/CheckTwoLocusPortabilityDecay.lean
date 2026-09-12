@@ -28,6 +28,7 @@ open Descent.Portability.TwoLocusPortabilityDecay
 #print axioms tendsto_portabilityDecay_atTop
 #print axioms portabilityDecay_zero_rate
 #print axioms sum_pointMass_mul
+#print axioms sum_unitPointMass_mul
 #print axioms linkageRate
 #print axioms linkageRate_pos
 #print axioms augmentedLowOrderLDGenerator_Dz_row
