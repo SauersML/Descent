@@ -246,8 +246,12 @@ theorem measure_eq_of_samplingMonomial_eq {μ ν : ProbabilityMeasure (V → Boo
       intro ρ
       rw [← integral_indicator_one (MeasurableSet.cylinder features hS)]
       refine integral_congr_ae (Eventually.of_forall fun x ↦ ?_)
-      simp only [cylinderObservable, ContinuousMap.coe_mk, Set.indicator_apply, mem_cylinder,
-        Pi.one_apply]
+      simp only [cylinderObservable, ContinuousMap.coe_mk]
+      by_cases hmember : features.restrict x ∈ S
+      · simp only [Set.indicator_of_mem hmember,
+          Set.indicator_of_mem ((mem_cylinder features S x).mpr hmember), Pi.one_apply]
+      · simp only [Set.indicator_of_notMem hmember,
+          Set.indicator_of_notMem (mt (mem_cylinder features S x).mp hmember)]
     have hreal := h features (S.indicator 1)
     rw [hindicator, hindicator] at hreal
     exact (ENNReal.toReal_eq_toReal_iff' (measure_ne_top _ _) (measure_ne_top _ _)).mp hreal
