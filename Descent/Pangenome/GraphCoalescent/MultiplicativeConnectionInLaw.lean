@@ -301,7 +301,9 @@ theorem sum_kingmanLaw_mul_blocks_sub_one_le {n : ℕ} (hn : 0 < n) (m : ℕ) :
         = ∑ ξ, kingmanLaw n m ξ
             * (((blocks ξ : ℝ) - 1) - deathRate (blocks ξ) / (n : ℝ) ^ 2) := by
       rw [kingmanLaw, h1]
-      exact Finset.sum_congr rfl fun ξ _ ↦ by rw [sum_kingmanStep_mul_blocks_sub_one]
+      refine Finset.sum_congr rfl fun ξ _ ↦ ?_
+      rw [sum_kingmanStep_mul_blocks_sub_one]
+      rfl
     rw [hstep]
     have hpoint : ∀ ξ : ER n,
         kingmanLaw n m ξ * (((blocks ξ : ℝ) - 1) - deathRate (blocks ξ) / (n : ℝ) ^ 2)
