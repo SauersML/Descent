@@ -111,7 +111,7 @@ theorem tendsto_ramp (a x : ℝ) :
 `(-∞, a]`. -/
 theorem tendsto_integral_ramp (μ : Measure ℝ) [IsFiniteMeasure μ] (a : ℝ) :
     Tendsto (fun n ↦ ∫ x, ramp a n x ∂μ) atTop (𝓝 (μ.real (Set.Iic a))) := by
-  have hlimit := tendsto_integral_of_dominated_convergence (fun _ ↦ (1 : ℝ))
+  have hlimit := tendsto_integral_of_dominated_convergence (μ := μ) (fun _ ↦ (1 : ℝ))
     (fun n ↦ (continuous_ramp a n).aestronglyMeasurable) (integrable_const 1)
     (fun n ↦ ae_of_all _ fun x ↦ norm_ramp_le_one a n x) (ae_of_all _ fun x ↦ tendsto_ramp a x)
   rwa [integral_indicator_const _ measurableSet_Iic, smul_eq_mul, mul_one] at hlimit
