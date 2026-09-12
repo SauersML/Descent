@@ -35,8 +35,8 @@ refinement relation forbids that difference.
 
 **Closure is reachability (5.1).** Iterating, the `n`-th refinement of `agreeOn A` is
 `agreeOn ((grow r)^[n] A)` (`iterate_refinementStep_agreeOn`); the layers stabilise at
-`reach r A` once `n ≥ |V|` (`iterate_grow_eq_reach`), and `agreeOn (reach r A)` is a fixed
-point (`refinementStep_agreeOn_reach`). So `P_* = P_{π_{Reach_G(A)}}`
+`directedReach r A` once `n ≥ |V|` (`iterate_grow_eq_reach`), and `agreeOn (directedReach r A)`
+is a fixed point (`refinementStep_agreeOn_reach`). So `P_* = P_{π_{Reach_G(A)}}`
 (`iterate_refinementStep_agreeOn_eq_reach`). For `|A| ≤ 1` the observation is its own closure
 (`refinementStep_agreeOn_of_card_le_one`, `iterate_refinementStep_agreeOn_of_card_le_one`): the
 empty observation because nothing is observed, a singleton by the exact neutrality (4.4)
@@ -174,6 +174,7 @@ def agreeOn (A : Finset V) : Setoid (V → Bool) where
   iseqv := ⟨fun _ _ _ ↦ rfl, fun h l hl ↦ (h l hl).symm,
     fun h₁ h₂ l hl ↦ (h₁ l hl).trans (h₂ l hl)⟩
 
+omit [Fintype V] in
 /-- `π_A`-equivalence, unfolded. -/
 theorem agreeOn_r_iff {A : Finset V} {x x' : V → Bool} :
     (agreeOn A).r x x' ↔ ∀ l ∈ A, x l = x' l :=
@@ -183,16 +184,20 @@ theorem agreeOn_r_iff {A : Finset V} {x x' : V → Bool} :
 def outNbhd (r : V → V → ℝ) (A : Finset V) : Finset V :=
   univ.filter fun j ↦ ∃ i ∈ A, 0 < r i j
 
+omit [DecidableEq V] in
+/-- Membership in `N⁺_G(A)`, unfolded. -/
 theorem mem_outNbhd {r : V → V → ℝ} {A : Finset V} {j : V} :
     j ∈ outNbhd r A ↔ ∃ i ∈ A, 0 < r i j :=
   mem_filter.trans (and_iff_right (mem_univ j))
 
 /-- **`Reach_G(A)`**: `A` together with every feature a directed path from `A` reaches. -/
-def reach (r : V → V → ℝ) (A : Finset V) : Finset V :=
+def directedReach (r : V → V → ℝ) (A : Finset V) : Finset V :=
   univ.filter fun v ↦ ∃ a ∈ A, Relation.ReflTransGen (fun i j ↦ 0 < r i j) a v
 
-theorem mem_reach {r : V → V → ℝ} {A : Finset V} {v : V} :
-    v ∈ reach r A ↔ ∃ a ∈ A, Relation.ReflTransGen (fun i j ↦ 0 < r i j) a v :=
+omit [DecidableEq V] in
+/-- Membership in `Reach_G(A)`, unfolded. -/
+theorem mem_directedReach {r : V → V → ℝ} {A : Finset V} {v : V} :
+    v ∈ directedReach r A ↔ ∃ a ∈ A, Relation.ReflTransGen (fun i j ↦ 0 < r i j) a v :=
   mem_filter.trans (and_iff_right (mem_univ v))
 
 /-! ### Masses of the kernels -/
@@ -203,6 +208,7 @@ theorem sum_eventKernel (i j : V) (x y : V → Bool) (s : Finset (V → Bool)) :
       (if exchange i j y x ∈ s then 1 / 2 else 0) := by
   simp only [eventKernel, sum_add_distrib, sum_ite_eq]
 
+omit [DecidableEq V] in
 /-- The mass unbiased copying puts on a finite set of genomes. -/
 theorem sum_copyKernel (x y : V → Bool) (s : Finset (V → Bool)) :
     ∑ w ∈ s, copyKernel x y w =
@@ -230,11 +236,13 @@ theorem sum_checkKernel (r : V → V → ℝ) (x y : V → Bool) (s : Finset (V 
       _ = ∑ i, ∑ j, r i j * ∑ w ∈ s, eventKernel i j x y w :=
         sum_congr rfl fun i _ ↦ sum_congr rfl fun j _ ↦ (mul_sum _ _ _).symm
 
+omit [Fintype V] in
 /-- An event with parents agreeing at the checker. -/
 theorem exchange_of_eq {i j : V} {x y : V → Bool} (h : x j = y j) :
     exchange i j x y = Function.update x i (y i) :=
   if_pos h
 
+omit [Fintype V] in
 /-- An event with parents disagreeing at the checker copies the first parent. -/
 theorem exchange_of_ne {i j : V} {x y : V → Bool} (h : x j ≠ y j) : exchange i j x y = x :=
   if_neg h
@@ -299,6 +307,7 @@ theorem autonomous_coord (r : V → V → ℝ) (k : V) :
 
 /-! ### Sufficiency in (5.2) -/
 
+omit [Fintype V] in
 /-- With the parents agreeing at `A` and at every checker of a target in `A`, the child in the
 first slot agrees at `A`. -/
 theorem exchange_agree_left {A : Finset V} {i j : V} {x x' : V → Bool} (y : V → Bool)
@@ -318,6 +327,7 @@ theorem exchange_agree_left {A : Finset V} {i j : V} {x x' : V → Bool} (y : V 
     rw [exchange_apply_of_ne x y hli, exchange_apply_of_ne x' y hli]
     exact hxx' l hl
 
+omit [Fintype V] in
 /-- With the parents agreeing at `A` and at every checker of a target in `A`, the child in the
 second slot agrees at `A`. -/
 theorem exchange_agree_right {A : Finset V} {i j : V} {x x' : V → Bool} (y : V → Bool)
@@ -372,6 +382,7 @@ theorem partner_of_not_mem {A : Finset V} {x : V → Bool} {l : V} (hl : l ∉ A
 def mixedBlocks (A : Finset V) (x : V → Bool) : Finset (V → Bool) :=
   univ.filter fun w ↦ (∃ l ∈ A, w l = x l) ∧ ∃ l ∈ A, w l ≠ x l
 
+/-- Membership in `B`, unfolded. -/
 theorem mem_mixedBlocks {A : Finset V} {x w : V → Bool} :
     w ∈ mixedBlocks A x ↔ (∃ l ∈ A, w l = x l) ∧ ∃ l ∈ A, w l ≠ x l :=
   mem_filter.trans (and_iff_right (mem_univ w))
@@ -386,18 +397,21 @@ theorem mem_mixedBlocks_congr {A : Finset V} {x w w' : V → Bool} (h : ∀ l �
   · rintro ⟨⟨l, hl, h₁⟩, ⟨l', hl', h₂⟩⟩
     exact ⟨⟨l, hl, (h l hl).trans h₁⟩, ⟨l', hl', fun e ↦ h₂ ((h l' hl').symm.trans e)⟩⟩
 
+/-- A genome agreeing with `x` on all of `A` is not in `B`. -/
 theorem not_mem_mixedBlocks_of_agree {A : Finset V} {x w : V → Bool}
     (h : ∀ l ∈ A, w l = x l) : w ∉ mixedBlocks A x := by
   rw [mem_mixedBlocks]
   rintro ⟨-, l, hl, hne⟩
   exact hne (h l hl)
 
+/-- A genome disagreeing with `x` on all of `A` is not in `B`. -/
 theorem not_mem_mixedBlocks_of_disagree {A : Finset V} {x w : V → Bool}
     (h : ∀ l ∈ A, w l ≠ x l) : w ∉ mixedBlocks A x := by
   rw [mem_mixedBlocks]
   rintro ⟨⟨l, hl, heq⟩, -⟩
   exact h l hl heq
 
+omit [Fintype V] in
 /-- The partner disagrees with `x` at every member of `A`. -/
 theorem partner_ne {A : Finset V} {x : V → Bool} {l : V} (hl : l ∈ A) : partner A x l ≠ x l := by
   rw [partner_of_mem hl]
@@ -623,35 +637,35 @@ theorem subset_iterate_grow (r : V → V → ℝ) (A : Finset V) (n : ℕ) : A �
   iterate_grow_mono r A (Nat.zero_le n)
 
 /-- `A` lies in its reach. -/
-theorem subset_reach (r : V → V → ℝ) (A : Finset V) : A ⊆ reach r A :=
-  fun a ha ↦ mem_reach.mpr ⟨a, ha, Relation.ReflTransGen.refl⟩
+theorem subset_directedReach (r : V → V → ℝ) (A : Finset V) : A ⊆ directedReach r A :=
+  fun a ha ↦ mem_directedReach.mpr ⟨a, ha, Relation.ReflTransGen.refl⟩
 
 /-- The reach is closed under taking checkers. -/
 theorem outNbhd_reach_subset (r : V → V → ℝ) (A : Finset V) :
-    outNbhd r (reach r A) ⊆ reach r A := by
+    outNbhd r (directedReach r A) ⊆ directedReach r A := by
   intro v hv
   obtain ⟨i, hi, hiv⟩ := mem_outNbhd.mp hv
-  obtain ⟨a, ha, hai⟩ := mem_reach.mp hi
-  exact mem_reach.mpr ⟨a, ha, hai.tail hiv⟩
+  obtain ⟨a, ha, hai⟩ := mem_directedReach.mp hi
+  exact mem_directedReach.mpr ⟨a, ha, hai.tail hiv⟩
 
 /-- Every layer lies in the reach. -/
 theorem iterate_grow_subset_reach (r : V → V → ℝ) (A : Finset V) (n : ℕ) :
-    (grow r)^[n] A ⊆ reach r A := by
+    (grow r)^[n] A ⊆ directedReach r A := by
   induction n with
-  | zero => exact subset_reach r A
+  | zero => exact subset_directedReach r A
   | succ n ih =>
     rw [Function.iterate_succ_apply']
     intro v hv
     rcases mem_union.mp hv with hv | hv
     · exact ih hv
     · obtain ⟨i, hi, hiv⟩ := mem_outNbhd.mp hv
-      obtain ⟨a, ha, hai⟩ := mem_reach.mp (ih hi)
-      exact mem_reach.mpr ⟨a, ha, hai.tail hiv⟩
+      obtain ⟨a, ha, hai⟩ := mem_directedReach.mp (ih hi)
+      exact mem_directedReach.mpr ⟨a, ha, hai.tail hiv⟩
 
 /-- Every feature in the reach lies in some layer. -/
-theorem exists_mem_iterate_grow (r : V → V → ℝ) {A : Finset V} {v : V} (hv : v ∈ reach r A) :
-    ∃ n, v ∈ (grow r)^[n] A := by
-  obtain ⟨a, ha, hav⟩ := mem_reach.mp hv
+theorem exists_mem_iterate_grow (r : V → V → ℝ) {A : Finset V} {v : V}
+    (hv : v ∈ directedReach r A) : ∃ n, v ∈ (grow r)^[n] A := by
+  obtain ⟨a, ha, hav⟩ := mem_directedReach.mp hv
   clear hv
   induction hav with
   | refl => exact ⟨0, ha⟩
@@ -663,7 +677,7 @@ theorem exists_mem_iterate_grow (r : V → V → ℝ) {A : Finset V} {v : V} (hv
 
 /-- **The layers stabilise at the reach** once `n ≥ |V|`. -/
 theorem iterate_grow_eq_reach (r : V → V → ℝ) (A : Finset V) {n : ℕ}
-    (hn : Fintype.card V ≤ n) : (grow r)^[n] A = reach r A := by
+    (hn : Fintype.card V ≤ n) : (grow r)^[n] A = directedReach r A := by
   have hclaim : ∀ k, (∃ m < k, (grow r)^[m + 1] A = (grow r)^[m] A) ∨
       k ≤ ((grow r)^[k] A).card := by
     intro k
@@ -689,7 +703,7 @@ theorem iterate_grow_eq_reach (r : V → V → ℝ) (A : Finset V) {n : ℕ}
     | succ d ih =>
       rw [← Nat.add_assoc, Function.iterate_succ_apply', ih]
       rwa [Function.iterate_succ_apply'] at hstable
-  have hreach : reach r A ⊆ (grow r)^[m] A := by
+  have hreach : directedReach r A ⊆ (grow r)^[m] A := by
     intro v hv
     obtain ⟨d, hd⟩ := exists_mem_iterate_grow r hv
     rcases le_total d m with hdm | hmd
@@ -715,15 +729,15 @@ refinement of `P_{π_A}` from the `|V|`-th on is `P_{π_{Reach_G(A)}}`: the here
 of `π_A` is `π_{Reach_G(A)}`. -/
 theorem iterate_refinementStep_agreeOn_eq_reach {r : V → V → ℝ} (hr : ∀ i j, 0 ≤ r i j)
     {A : Finset V} (hA : 2 ≤ A.card) {n : ℕ} (hn : Fintype.card V ≤ n) :
-    (refinementStep (checkKernel r))^[n] (agreeOn A) = agreeOn (reach r A) := by
+    (refinementStep (checkKernel r))^[n] (agreeOn A) = agreeOn (directedReach r A) := by
   rw [iterate_refinementStep_agreeOn hr hA n, iterate_grow_eq_reach r A hn]
 
 /-- **The reach is the fixed point** (spec (5.1)): `P_{π_{Reach_G(A)}}` is stable under the
 hereditary refinement. -/
 theorem refinementStep_agreeOn_reach {r : V → V → ℝ} (hr : ∀ i j, 0 ≤ r i j) {A : Finset V}
     (hA : 2 ≤ A.card) :
-    refinementStep (checkKernel r) (agreeOn (reach r A)) = agreeOn (reach r A) := by
-  rw [refinementStep_agreeOn hr (hA.trans (card_le_card (subset_reach r A))),
+    refinementStep (checkKernel r) (agreeOn (directedReach r A)) = agreeOn (directedReach r A) := by
+  rw [refinementStep_agreeOn hr (hA.trans (card_le_card (subset_directedReach r A))),
     union_eq_left.mpr (outNbhd_reach_subset r A)]
 
 /-! ### §5.1: connected graphs, the path, and joins -/
@@ -737,9 +751,9 @@ theorem agreeOn_univ_r_iff {x x' : V → Bool} : (agreeOn (univ : Finset V)).r x
 every nonempty set of features reaches the whole genome. -/
 theorem reach_eq_univ_of_connected {G : SimpleGraph V} (hG : G.Connected) {r : V → V → ℝ}
     (hrG : ∀ i j, G.Adj i j → 0 < r i j) {A : Finset V} (hA : A.Nonempty) :
-    reach r A = univ := by
+    directedReach r A = univ := by
   obtain ⟨a, ha⟩ := hA
-  refine eq_univ_of_forall fun v ↦ mem_reach.mpr ⟨a, ha, ?_⟩
+  refine eq_univ_of_forall fun v ↦ mem_directedReach.mpr ⟨a, ha, ?_⟩
   exact ((SimpleGraph.reachable_iff_reflTransGen a v).mp (hG.preconnected a v)).mono hrG
 
 /-- **Spec (5.4).** On a connected undirected dependency graph with both orientations present,
@@ -755,12 +769,14 @@ theorem iterate_refinementStep_eq_univ_of_connected {G : SimpleGraph V} (hG : G.
 def pathRates (m : ℕ) (i j : Fin m) : ℝ :=
   if (SimpleGraph.pathGraph m).Adj i j then 1 else 0
 
+/-- Path rates are nonnegative. -/
 theorem pathRates_nonneg (m : ℕ) (i j : Fin m) : 0 ≤ pathRates m i j := by
   unfold pathRates
   split_ifs
   · exact zero_le_one
   · exact le_rfl
 
+/-- Every edge of the path carries a positive rate. -/
 theorem pathRates_pos {m : ℕ} {i j : Fin m} (h : (SimpleGraph.pathGraph m).Adj i j) :
     0 < pathRates m i j := by
   unfold pathRates
