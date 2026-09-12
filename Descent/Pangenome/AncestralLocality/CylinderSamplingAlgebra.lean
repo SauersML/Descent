@@ -99,6 +99,7 @@ theorem continuous_integralMap : Continuous (integralMap H) :=
   continuous_pi fun g ↦ ProbabilityMeasure.continuous_integral_boundedContinuousFunction
     (BoundedContinuousFunction.mkOfCompact g)
 
+omit [T2Space H] in
 /-- **The integral map induces the topology of weak convergence.** A filter converges to a
 probability measure exactly when every integral of a continuous observable converges. -/
 theorem isInducing_integralMap : IsInducing (integralMap H) := by
@@ -109,6 +110,7 @@ theorem isInducing_integralMap : IsInducing (integralMap H) := by
     continuous_apply f.toContinuousMap
   exact (hcoordinate.tendsto _).comp tendsto_comap
 
+omit [T2Space H] in
 /-- The integrals against a probability measure form a positive normalized functional. -/
 theorem integralMap_mem (μ : ProbabilityMeasure H) :
     integralMap H μ ∈ positiveNormalizedFunctionals H := by
@@ -149,6 +151,7 @@ theorem range_integralMap : Set.range (integralMap H) = positiveNormalizedFuncti
   Set.Subset.antisymm (Set.range_subset_iff.mpr (integralMap_mem H))
     fun _ hΛ ↦ exists_probabilityMeasure_of_mem H hΛ
 
+omit [CompactSpace H] [T2Space H] [MeasurableSpace H] [BorelSpace H] in
 /-- The positive normalized functionals form a closed set of functionals: each defining condition
 reads finitely many coordinates continuously. -/
 theorem isClosed_positiveNormalizedFunctionals : IsClosed (positiveNormalizedFunctionals H) := by
@@ -233,6 +236,7 @@ theorem measure_eq_of_samplingMonomial_eq {μ ν : ProbabilityMeasure (V → Boo
       samplingMonomial features readout μ = samplingMonomial features readout ν) :
     μ = ν := by
   haveI : IsProbabilityMeasure (μ.1 : Measure (V → Bool)) := μ.2
+  haveI : IsProbabilityMeasure (ν.1 : Measure (V → Bool)) := ν.2
   refine Subtype.ext (ext_of_generate_finite (measurableCylinders fun _ : V ↦ Bool)
     generateFrom_measurableCylinders.symm isPiSystem_measurableCylinders (fun C hC ↦ ?_) ?_)
   · obtain ⟨features, S, hS, rfl⟩ := (mem_measurableCylinders C).mp hC
@@ -240,7 +244,7 @@ theorem measure_eq_of_samplingMonomial_eq {μ ν : ProbabilityMeasure (V → Boo
         samplingMonomial features (S.indicator 1) ρ =
           (ρ : Measure (V → Bool)).real (cylinder features S) := by
       intro ρ
-      rw [← integral_indicator_one (measurableSet_cylinder features S hS)]
+      rw [← integral_indicator_one (MeasurableSet.cylinder features hS)]
       refine integral_congr_ae (Eventually.of_forall fun x ↦ ?_)
       simp only [cylinderObservable, ContinuousMap.coe_mk, Set.indicator_apply, mem_cylinder,
         Pi.one_apply]
