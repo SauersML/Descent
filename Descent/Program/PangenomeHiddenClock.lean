@@ -9,6 +9,8 @@ import Descent.Pangenome.GraphCoalescent.LahWeights
 import Descent.Pangenome.GraphCoalescent.MinimalRefinement
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceClosure
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceOutcome
+import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionLaw
+import Descent.Pangenome.GraphCoalescent.MultiplicativeObservation
 import Descent.Pangenome.GraphCoalescent.VisibleIntensityClock
 
 namespace Descent.Program
@@ -77,6 +79,17 @@ inside it.
   `720z + 1656z² + 928z³ + 144z⁴` and the means `2/3, 1/2, 7/18, 17/18, 92/225` of the fiber sizes
   `(1,2), (1,3), (2,2), (1,1,2), (2,2,2)`, and the different means of `(1,3)` and `(2,2)`:
   `meanConnectionTime_one_three_ne_two_two`.
+* Theorem F, the ingredients of (F1): `MultiplicativeObservation`. While the reports agree, the
+  comparison rates exceed the visible rates by at most `J/n` in scaled time
+  (`pairProductSum_sub_div_sq_le`) and Kingman's total scaled rate is at most `1/2`
+  (`deathRate_div_sq_le_half`); a finite coupled chain with separation hazard at most `J/n` and
+  deficit drift at most `1/2` per step separates by step `m` with probability at most
+  `m(m - 1)/(4n)` (`separationMass_le`), which at the rings of a rate-one Poisson clock becomes
+  `min {1, U²/(4n)}` (`poissonMixture_le_min`).
+* Theorem F, (F4): `MultiplicativeConnectionLaw`. The arbitrary-order Möbius identity of the
+  partition lattice, `Σ_{σ ≥ τ} (-1)^(|σ|-1) (|σ|-1)! = [τ = ⊤]` (`sum_topMobius_blocks_ge`),
+  and the probability that the edges rung by time `u` connect the fibers is
+  `Σ_σ (-1)^(|σ|-1) (|σ|-1)! e^(-u κ_σ)` (`connectionProbability_eq_mobius_sum`).
 * §10, several interfaces sharing one genealogy: `MultiInterfaceClosure`. The common refinement
   of the reports determines every report (`observed_commonRefinement`), and two labeled
   configurations with the same hidden load in every cell of the common refinement offer equally
@@ -100,8 +113,12 @@ connection clock of Theorem C is defined as the first-step solution of the backw
 (C3) is Dynkin's identity for that equation; its identification with the path expectation of the
 continuous-time chain is not formalized, and (C2) is proved in Laplace-transform order, which
 does not imply the stochastic order of the quantile coupling. Theorem D (the connectivity
-cumulant (D2)-(D3) and the stopping law (D4)-(D9)), Theorem E, Theorem F, the filter of §9 and
-the Λ-coalescent extension of §10 are not yet proof-checked.
+cumulant (D2)-(D3) and the stopping law (D4)-(D9)), Theorem E, (F2) and (F3), the filter of §9
+and the Λ-coalescent extension of §10 are not yet proof-checked. Of (F1), the construction of
+the coupled report and multiplicative-coalescent skeletons, the path-level coupling inequality
+and the identification with path measures on càdlàg paths are not formalized. (F4) is proved for
+the finite random graph of edges rung by time `u`, entering the clocks through their distribution
+functions; its two-fiber and three-equal-fiber evaluations are not yet proof-checked.
 -/
 
 end Descent.Program
