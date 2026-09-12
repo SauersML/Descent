@@ -239,6 +239,165 @@ theorem abs_samplingObservable_le [Fintype H] {n : ℕ} (f : (Fin n → H) → �
         simpa only [Real.norm_eq_abs] using norm_le_pi_norm f w
     _ = ‖f‖ := by rw [← mul_sum, hmass, mul_one]
 
+/-- `S_{-u}` after `S_t` is `S_{t-u}`, on one observation. -/
+theorem holdingSemigroup_neg_apply_apply [Fintype H] [Fintype E] (c : ℝ) (r : E → ℝ) (n : ℕ)
+    (u t : ℝ) (f : (Fin n → H) → ℝ) :
+    holdingSemigroup c r n (-u) (holdingSemigroup c r n t f) = holdingSemigroup c r n (t - u) f := by
+  rw [← holdingSemigroup_neg_mul]
+  rfl
+
+/-! ### The Dyson terms of the backward circuit -/
+
+/-- **The Dyson terms of the backward circuit.** `dysonMoment c r T p k n t f` is the expectation
+of `H_{f_t}(p)` over the runs of the circuit started from the observation `f` of arity `n` that
+take exactly `k` decisions by time `t`. With no decision it is `H_{S_t f}(p)`. With `k + 1`
+decisions the first one falls at a time `t - u`, after which the branched observation of arity
+`n + 1` runs for the time `u` with `k` decisions. The integral over `u` is taken against the
+indicators of the tuples, so that the term is linear by construction;
+`dysonMoment_succ_eq_integral` gives the integral itself. -/
+def dysonMoment [Fintype H] [DecidableEq H] [Fintype E] (c : ℝ) (r : E → ℝ)
+    (T : E → H → H → H) (p : H → ℝ) : ℕ → (n : ℕ) → ℝ → ((Fin n → H) → ℝ) →ₗ[ℝ] ℝ
+  | 0, n, t => (samplingFunctional p).comp (holdingSemigroup c r n t).toLinearMap
+  | k + 1, n, t =>
+    { toFun := fun f ↦ ∑ w, holdingSemigroup c r n t f w *
+        ∫ u in (0 : ℝ)..t, dysonMoment c r T p k (n + 1) u (decisionSubstitution r T n
+          (holdingSemigroup c r n (-u) fun j ↦ if w = j then 1 else 0))
+      map_add' := fun f g ↦ by simp only [map_add, Pi.add_apply, add_mul, sum_add_distrib]
+      map_smul' := fun d f ↦ by
+        simp only [map_smul, Pi.smul_apply, smul_eq_mul, RingHom.id_apply, mul_sum, mul_assoc] }
+
+/-- The Dyson term without decisions is the sampling observable of the holding semigroup. -/
+theorem dysonMoment_zero_apply [Fintype H] [DecidableEq H] [Fintype E] (c : ℝ) (r : E → ℝ)
+    (T : E → H → H → H) (p : H → ℝ) (n : ℕ) (t : ℝ) (f : (Fin n → H) → ℝ) :
+    dysonMoment c r T p 0 n t f = samplingObservable (holdingSemigroup c r n t f) p :=
+  rfl
+
+/-- **The integrand of a Dyson term** against the indicator of the tuple `w`: one decision on the
+indicator run backwards by `u`, followed by the Dyson term of arity `n + 1` at time `u`. -/
+def dysonIntegrand [Fintype H] [DecidableEq H] [Fintype E] (c : ℝ) (r : E → ℝ)
+    (T : E → H → H → H) (p : H → ℝ) (k n : ℕ) (w : Fin n → H) (u : ℝ) : ℝ :=
+  dysonMoment c r T p k (n + 1) u
+    (decisionSubstitution r T n (holdingSemigroup c r n (-u) fun j ↦ if w = j then 1 else 0))
+
+/-- A Dyson term with decisions, against the indicators. -/
+theorem dysonMoment_succ_apply [Fintype H] [DecidableEq H] [Fintype E] (c : ℝ) (r : E → ℝ)
+    (T : E → H → H → H) (p : H → ℝ) (k n : ℕ) (t : ℝ) (f : (Fin n → H) → ℝ) :
+    dysonMoment c r T p (k + 1) n t f =
+      ∑ w, holdingSemigroup c r n t f w * ∫ u in (0 : ℝ)..t, dysonIntegrand c r T p k n w u :=
+  rfl
+
+/-- A Dyson term that is continuous in time on every observation is continuous along every
+continuous path of observations, since it is linear. -/
+theorem continuous_dysonMoment_comp [Fintype H] [DecidableEq H] [Fintype E] {c : ℝ} {r : E → ℝ}
+    {T : E → H → H → H} {p : H → ℝ} {k n : ℕ}
+    (hk : ∀ f : (Fin n → H) → ℝ, Continuous fun t ↦ dysonMoment c r T p k n t f)
+    {g : ℝ → (Fin n → H) → ℝ} (hg : Continuous g) :
+    Continuous fun t ↦ dysonMoment c r T p k n t (g t) := by
+  have h : (fun t ↦ dysonMoment c r T p k n t (g t)) =
+      fun t ↦ ∑ w, g t w * dysonMoment c r T p k n t fun j ↦ if w = j then 1 else 0 :=
+    funext fun t ↦ by
+      rw [LinearMap.pi_apply_eq_sum_univ (dysonMoment c r T p k n t) (g t)]
+      simp only [smul_eq_mul]
+  rw [h]
+  exact continuous_finset_sum _ fun w _ ↦ ((continuous_apply w).comp hg).mul (hk _)
+
+/-- The integrand of a Dyson term is continuous once the previous term is. -/
+theorem continuous_dysonIntegrand [Fintype H] [DecidableEq H] [Fintype E] (c : ℝ) (r : E → ℝ)
+    (T : E → H → H → H) (p : H → ℝ) {k : ℕ}
+    (hk : ∀ (n : ℕ) (f : (Fin n → H) → ℝ), Continuous fun t ↦ dysonMoment c r T p k n t f)
+    (n : ℕ) (w : Fin n → H) : Continuous (dysonIntegrand c r T p k n w) := by
+  have hg : Continuous fun u ↦ decisionSubstitution r T n
+      (holdingSemigroup c r n (-u) fun j ↦ if w = j then 1 else 0) :=
+    (LinearMap.continuous_of_finiteDimensional (decisionSubstitution r T n)).comp
+      ((continuous_holdingSemigroup_apply c r n fun j ↦ if w = j then 1 else 0).comp
+        continuous_neg)
+  exact continuous_dysonMoment_comp (hk (n + 1)) hg
+
+/-- **Every Dyson term is continuous in time** on every observation. -/
+theorem continuous_dysonMoment_apply [Fintype H] [DecidableEq H] [Fintype E] (c : ℝ)
+    (r : E → ℝ) (T : E → H → H → H) (p : H → ℝ) (k : ℕ) :
+    ∀ (n : ℕ) (f : (Fin n → H) → ℝ), Continuous fun t ↦ dysonMoment c r T p k n t f := by
+  induction k with
+  | zero =>
+    intro n f
+    have hS := continuous_holdingSemigroup_apply (H := H) c r n f
+    simp only [dysonMoment_zero_apply, samplingObservable]
+    exact continuous_finset_sum _ fun w _ ↦ ((continuous_apply w).comp hS).mul continuous_const
+  | succ k ih =>
+    intro n f
+    simp only [dysonMoment_succ_apply]
+    refine continuous_finset_sum _ fun w _ ↦
+      ((continuous_apply w).comp (continuous_holdingSemigroup_apply c r n f)).mul ?_
+    exact intervalIntegral.continuous_primitive
+      (fun a b ↦ (continuous_dysonIntegrand c r T p ih n w).intervalIntegrable a b) 0
+
+/-- **The Dyson term without decisions moves along the holding generator**,
+`d/dt d_0(t, f) = d_0(t, K f)`. -/
+theorem hasDerivAt_dysonMoment_zero [Fintype H] [DecidableEq H] [Fintype E] (c : ℝ) (r : E → ℝ)
+    (T : E → H → H → H) (p : H → ℝ) (n : ℕ) (f : (Fin n → H) → ℝ) (t : ℝ) :
+    HasDerivAt (fun s ↦ dysonMoment c r T p 0 n s f)
+      (dysonMoment c r T p 0 n t (holdingGenerator c r n f)) t := by
+  have h := (LinearMap.toContinuousLinearMap (samplingFunctional (n := n) p)).hasFDerivAt
+    |>.comp_hasDerivAt t (hasDerivAt_holdingSemigroup_apply c r n t f)
+  exact h
+
+/-- **The derivative of a Dyson term with decisions**,
+`d/dt d_{k+1}(t, f) = d_{k+1}(t, K f) + d_k(t, B f)`: the holding generator at arity `n`, and
+one decision into arity `n + 1` read by the term with one decision less. -/
+theorem hasDerivAt_dysonMoment_succ [Fintype H] [DecidableEq H] [Fintype E] (c : ℝ) (r : E → ℝ)
+    (T : E → H → H → H) (p : H → ℝ) {k : ℕ}
+    (hk : ∀ (n : ℕ) (f : (Fin n → H) → ℝ), Continuous fun t ↦ dysonMoment c r T p k n t f)
+    (n : ℕ) (f : (Fin n → H) → ℝ) (t : ℝ) :
+    HasDerivAt (fun s ↦ dysonMoment c r T p (k + 1) n s f)
+      (dysonMoment c r T p (k + 1) n t (holdingGenerator c r n f) +
+        dysonMoment c r T p k (n + 1) t (decisionSubstitution r T n f)) t := by
+  have hψ := continuous_dysonIntegrand c r T p hk n
+  have hterm : ∀ w ∈ (univ : Finset (Fin n → H)), HasDerivAt
+      (fun s ↦ holdingSemigroup c r n s f w * ∫ u in (0 : ℝ)..s, dysonIntegrand c r T p k n w u)
+      (holdingSemigroup c r n t (holdingGenerator c r n f) w *
+          (∫ u in (0 : ℝ)..t, dysonIntegrand c r T p k n w u) +
+        holdingSemigroup c r n t f w * dysonIntegrand c r T p k n w t) t := fun w _ ↦
+    ((ContinuousLinearMap.proj (R := ℝ) (φ := fun _ : Fin n → H ↦ ℝ) w).hasFDerivAt
+        |>.comp_hasDerivAt t (hasDerivAt_holdingSemigroup_apply c r n t f)).mul
+      (intervalIntegral.integral_hasDerivAt_right ((hψ w).intervalIntegrable 0 t)
+        ((hψ w).stronglyMeasurableAtFilter _ _) (hψ w).continuousAt)
+  have hfun : (fun s ↦ dysonMoment c r T p (k + 1) n s f) = fun s ↦ ∑ w ∈ univ,
+      holdingSemigroup c r n s f w * ∫ u in (0 : ℝ)..s, dysonIntegrand c r T p k n w u :=
+    funext fun s ↦ dysonMoment_succ_apply c r T p k n s f
+  rw [hfun]
+  refine (HasDerivAt.fun_sum hterm).congr_deriv ?_
+  rw [sum_add_distrib, ← dysonMoment_succ_apply]
+  congr 1
+  have hlin := LinearMap.pi_apply_eq_sum_univ ((dysonMoment c r T p k (n + 1) t).comp
+    ((decisionSubstitution r T n).comp (holdingSemigroup c r n (-t)).toLinearMap))
+    (holdingSemigroup c r n t f)
+  simp only [LinearMap.comp_apply, ContinuousLinearMap.coe_coe, smul_eq_mul,
+    holdingSemigroup_neg_apply] at hlin
+  exact hlin.symm
+
+/-- **A Dyson term is the integral over the time of the first decision**,
+`d_{k+1}(t, f) = ∫_0^t d_k(u, B S_{t-u} f) du`. -/
+theorem dysonMoment_succ_eq_integral [Fintype H] [DecidableEq H] [Fintype E] (c : ℝ)
+    (r : E → ℝ) (T : E → H → H → H) (p : H → ℝ) {k : ℕ}
+    (hk : ∀ (n : ℕ) (f : (Fin n → H) → ℝ), Continuous fun t ↦ dysonMoment c r T p k n t f)
+    (n : ℕ) (t : ℝ) (f : (Fin n → H) → ℝ) :
+    dysonMoment c r T p (k + 1) n t f = ∫ u in (0 : ℝ)..t, dysonMoment c r T p k (n + 1) u
+      (decisionSubstitution r T n (holdingSemigroup c r n (t - u) f)) := by
+  have hψ := continuous_dysonIntegrand c r T p hk n
+  have hint : ∀ w ∈ (univ : Finset (Fin n → H)), IntervalIntegrable
+      (fun u ↦ holdingSemigroup c r n t f w * dysonIntegrand c r T p k n w u) volume 0 t :=
+    fun w _ ↦ (continuous_const.mul (hψ w)).intervalIntegrable 0 t
+  rw [dysonMoment_succ_apply]
+  simp only [← intervalIntegral.integral_const_mul]
+  rw [← intervalIntegral.integral_finset_sum hint]
+  refine intervalIntegral.integral_congr fun u _ ↦ ?_
+  have hlin := LinearMap.pi_apply_eq_sum_univ ((dysonMoment c r T p k (n + 1) u).comp
+    ((decisionSubstitution r T n).comp (holdingSemigroup c r n (-u)).toLinearMap))
+    (holdingSemigroup c r n t f)
+  simp only [LinearMap.comp_apply, ContinuousLinearMap.coe_coe, smul_eq_mul,
+    holdingSemigroup_neg_apply_apply] at hlin
+  exact hlin.symm
+
 end
 
 end Descent.Pangenome.AncestralLocality
