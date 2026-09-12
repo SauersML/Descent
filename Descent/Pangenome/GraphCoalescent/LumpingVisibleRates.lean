@@ -16,28 +16,31 @@ the labeled coalescent state that determines the report and is a strong lumping 
 labeled state. `MinimalRefinement.refines_loads` shows that, with at least three report
 components, a statistic determining the report-visible merger rates `ρ_CD = L_C L_D` determines
 the loads, and takes the determination of the rates as its hypothesis. This module proves that
-hypothesis from strong lumpability in Rosenblatt's form, the form in which
-`card_covers_hiddenState_eq` states Theorem A: from two states with the same value of `f`,
-equally many covers lead to every value.
+hypothesis from strong lumpability in Rosenblatt's form: from two states with the same value of
+`f`, equally many covers lead to every other value. Covers into the current value are not
+constrained, as in Rosenblatt's criterion; `card_covers_hiddenState_eq` states Theorem A in the
+stronger form that constrains them too.
 
 `card_filter_comp_eq` is the counting step: two finite sets with equally many elements at every
-value of `f` have equally many at every value of `g ∘ f`. With `g` reading the report off `f`,
-`card_covers_observed_eq_of_lumping` concludes that two states with the same value of `f` have
-equally many covers into every report. `covers_observed_eq_merge_iff` identifies the covers whose
-report merges two components reported apart with the visible covers joining them, so
+value of `f` over `z` have equally many at which `g ∘ f` is `z`. With `g` reading the report off
+`f`, `card_covers_observed_eq_of_lumping` concludes that two states with the same value of `f`
+have equally many covers into every other report. `covers_observed_eq_merge_iff` identifies the
+covers whose report merges two components reported apart with the visible covers joining them, so
 `card_covers_observed_eq_merge` counts them as `L_C L_D`. Hence `visibleRate_eq_of_lumping`: the
-statistic determines every visible rate. `load_eq_of_three_visibleRates` is (B1) at one
-component, and `hiddenState_eq_of_lumping` combines the two: while the report has at least three
-components, two states with the same value of `f` have the same hidden state, so every such
-statistic refines the report together with its loads. `hiddenState_determines_report_and_lumps`
-records that the hidden state itself meets both hypotheses.
+statistic determines every visible rate. Since an invisible merger lowers a visible rate, no cover
+keeps the value of the statistic while the report has at least two components
+(`card_covers_self_eq_zero_of_lumping`), so there the counts agree at every value, the current one
+included (`card_covers_value_eq_of_lumping`). `load_eq_of_three_visibleRates` is (B1) at one
+component, and `hiddenState_eq_of_lumping` combines it with the visible rates: while the report
+has at least three components, two states with the same value of `f` have the same hidden state,
+so every such statistic refines the report together with its loads.
+`hiddenState_determines_report_and_lumps` records that the hidden state itself meets both
+hypotheses.
 
 The states of a finite sample are enumerated by a local `Fintype` instance, since the corpus
 instance lives in the measure-theoretic kernel module.
 
-Not formalized here: the second survival derivative in the two-component case of (B2), which
-needs the law of the killed chain rather than cover counts; its first derivative is the visible
-rate, which `visibleRate_eq_of_lumping` covers.
+The two-component case of (B2) is `LumpingUnorderedPair`.
 
 ## Empirical status
 
@@ -66,10 +69,10 @@ local instance fintypeStates (n : ℕ) : Fintype (ER n) :=
 /-! ### Counting through a coarser statistic -/
 
 /-- **A coarser statistic inherits equal counts.** Two finite sets with equally many elements at
-every value of `f` have equally many elements at every value of `g ∘ f`. -/
+every value of `f` that `g` sends to `z` have equally many elements at which `g ∘ f` is `z`. -/
 theorem card_filter_comp_eq {α β γ : Type*} [DecidableEq β] [DecidableEq γ] (A B : Finset α)
-    (f : α → β) (g : β → γ)
-    (hcount : ∀ v, (A.filter fun a ↦ f a = v).card = (B.filter fun a ↦ f a = v).card) (z : γ) :
+    (f : α → β) (g : β → γ) (z : γ)
+    (hcount : ∀ v, g v = z → (A.filter fun a ↦ f a = v).card = (B.filter fun a ↦ f a = v).card) :
     (A.filter fun a ↦ g (f a) = z).card = (B.filter fun a ↦ g (f a) = z).card := by
   have hsplit : ∀ C : Finset α, (∀ a ∈ C, f a ∈ A.image f ∪ B.image f) →
       (C.filter fun a ↦ g (f a) = z).card =
@@ -92,7 +95,7 @@ theorem card_filter_comp_eq {α β γ : Type*} [DecidableEq β] [DecidableEq γ]
       exact (mem_filter.mp hv).2
   rw [hsplit A fun a ha ↦ mem_union_left _ (mem_image_of_mem f ha),
     hsplit B fun a ha ↦ mem_union_right _ (mem_image_of_mem f ha)]
-  exact sum_congr rfl fun v _ ↦ hcount v
+  exact sum_congr rfl fun v hv ↦ hcount v (mem_filter.mp hv).2
 
 /-- The covers of `ξ` with a property, counted as a filter of the covers of `ξ`. -/
 theorem natCard_covers_eq (ξ : ER n) (P : ER n → Prop) :
@@ -171,15 +174,16 @@ theorem card_covers_observed_eq_merge (s : Fin n → Fin n) (ξ : ER n) {x y : F
 
 /-! ### The Rosenblatt step -/
 
-/-- **A lumping that determines the report counts the covers into every report alike.** If a
+/-- **A lumping that determines the report counts the covers into every other report alike.** If a
 statistic determines the report and, from two states with the same value, equally many covers lead
-to every value, then from two states with the same value equally many covers lead to every report.
-Assumes: the statistic determines the report, and it is a strong lumping in Rosenblatt's form. -/
+to every other value, then from two states with the same value equally many covers lead to every
+report other than their own. Assumes: the statistic determines the report, and it is a strong
+lumping in Rosenblatt's form. -/
 theorem card_covers_observed_eq_of_lumping {Stat : Type*} (s : Fin n → Fin n) (f : ER n → Stat)
     (hreport : ∀ ξ ξ' : ER n, f ξ = f ξ' → observed s ξ = observed s ξ')
-    (hlumping : ∀ ξ ξ' : ER n, f ξ = f ξ' → ∀ v,
+    (hlumping : ∀ ξ ξ' : ER n, f ξ = f ξ' → ∀ v, v ≠ f ξ →
       Nat.card {η : ER n // Covers ξ η ∧ f η = v} = Nat.card {η : ER n // Covers ξ' η ∧ f η = v})
-    {ξ ξ' : ER n} (hsame : f ξ = f ξ') (Z : ER n) :
+    {ξ ξ' : ER n} (hsame : f ξ = f ξ') {Z : ER n} (hZ : Z ≠ observed s ξ) :
     Nat.card {η : ER n // Covers ξ η ∧ observed s η = Z} =
       Nat.card {η : ER n // Covers ξ' η ∧ observed s η = Z} := by
   obtain ⟨g, hg⟩ : ∃ g : Stat → ER n, ∀ η, g (f η) = observed s η := by
@@ -195,9 +199,13 @@ theorem card_covers_observed_eq_of_lumping {Stat : Type*} (s : Fin n → Fin n) 
     congr 1
     exact filter_congr fun η _ ↦ by rw [hg]
   rw [hcomp ξ, hcomp ξ']
-  refine card_filter_comp_eq _ _ f g (fun v ↦ ?_) Z
+  refine card_filter_comp_eq _ _ f g Z fun v hv ↦ ?_
+  have hother : v ≠ f ξ := by
+    intro h
+    apply hZ
+    rw [← hv, h, hg]
   exact (natCard_covers_eq ξ fun η ↦ f η = v).symm.trans
-    ((hlumping ξ ξ' hsame v).trans (natCard_covers_eq ξ' fun η ↦ f η = v))
+    ((hlumping ξ ξ' hsame v hother).trans (natCard_covers_eq ξ' fun η ↦ f η = v))
 
 /-- **Theorem B, the Rosenblatt step.** A statistic that determines the report and is a strong
 lumping in Rosenblatt's form determines every report-visible merger rate `ρ_CD = L_C L_D`: two
@@ -206,7 +214,7 @@ apart. Assumes: the statistic determines the report, and it is a strong lumping 
 form, as the hidden state is by `card_covers_hiddenState_eq`. -/
 theorem visibleRate_eq_of_lumping {Stat : Type*} (s : Fin n → Fin n) (f : ER n → Stat)
     (hreport : ∀ ξ ξ' : ER n, f ξ = f ξ' → observed s ξ = observed s ξ')
-    (hlumping : ∀ ξ ξ' : ER n, f ξ = f ξ' → ∀ v,
+    (hlumping : ∀ ξ ξ' : ER n, f ξ = f ξ' → ∀ v, v ≠ f ξ →
       Nat.card {η : ER n // Covers ξ η ∧ f η = v} = Nat.card {η : ER n // Covers ξ' η ∧ f η = v})
     {ξ ξ' : ER n} (hsame : f ξ = f ξ') {x y : Fin n} (hxy : ¬ (observed s ξ).r x y) :
     hiddenLoad s ξ (Quotient.mk (observed s ξ) x) *
@@ -215,8 +223,76 @@ theorem visibleRate_eq_of_lumping {Stat : Type*} (s : Fin n → Fin n) (f : ER n
         hiddenLoad s ξ' (Quotient.mk (observed s ξ') y) := by
   have hreports : observed s ξ = observed s ξ' := hreport ξ ξ' hsame
   have hxy' : ¬ (observed s ξ').r x y := hreports ▸ hxy
+  have hCD : Quotient.mk (observed s ξ) x ≠ Quotient.mk (observed s ξ) y :=
+    fun hq ↦ hxy (Quotient.exact hq)
+  have hZ : merge (observed s ξ) (Quotient.mk (observed s ξ) x) (Quotient.mk (observed s ξ) y) ≠
+      observed s ξ := by
+    intro h
+    have hcov := merge_covers (observed s ξ) hCD
+    rw [h] at hcov
+    have hblocks := hcov.2
+    omega
   rw [← card_covers_observed_eq_merge s ξ hxy, ← card_covers_observed_eq_merge s ξ' hxy',
-    card_covers_observed_eq_of_lumping s f hreport hlumping hsame, hreports]
+    card_covers_observed_eq_of_lumping s f hreport hlumping hsame hZ, hreports]
+
+/-- **No cover keeps the value.** While the report has at least two components, no cover of a state
+leads to the value of the state under a strong lumping that determines the report: an invisible
+merger lowers a visible rate, which the statistic determines, and a visible merger changes the
+report. Assumes: the statistic determines the report, and it is a strong lumping in Rosenblatt's
+form. -/
+theorem card_covers_self_eq_zero_of_lumping {Stat : Type*} (s : Fin n → Fin n) (f : ER n → Stat)
+    (hreport : ∀ ξ ξ' : ER n, f ξ = f ξ' → observed s ξ = observed s ξ')
+    (hlumping : ∀ ξ ξ' : ER n, f ξ = f ξ' → ∀ v, v ≠ f ξ →
+      Nat.card {η : ER n // Covers ξ η ∧ f η = v} = Nat.card {η : ER n // Covers ξ' η ∧ f η = v})
+    {ξ : ER n} (hcomponents : 2 ≤ blocks (observed s ξ)) :
+    Nat.card {η : ER n // Covers ξ η ∧ f η = f ξ} = 0 := by
+  rw [Nat.card_eq_zero]
+  refine Or.inl ⟨?_⟩
+  rintro ⟨η, hcov, hsame⟩
+  obtain ⟨A, B, hAB, rfl⟩ := (covers_iff_exists_merge ξ η).mp hcov
+  obtain ⟨u, rfl⟩ := quotient_mk_surjective ξ A
+  obtain ⟨v, rfl⟩ := quotient_mk_surjective ξ B
+  have hreports := hreport _ _ hsame
+  have huv : (observed s ξ).r u v := by
+    by_contra huv
+    rw [observed_merge_of_not_rel hAB huv] at hreports
+    have hcov' := merge_covers (observed s ξ) (fun hq ↦ huv (Quotient.exact hq) :
+      Quotient.mk (observed s ξ) u ≠ Quotient.mk (observed s ξ) v)
+    rw [hreports] at hcov'
+    have hblocks := hcov'.2
+    omega
+  have hcard : 1 < Fintype.card (Quotient (observed s ξ)) := by
+    rw [← Nat.card_eq_fintype_card]
+    exact hcomponents
+  obtain ⟨D, hD⟩ := Fintype.exists_ne_of_one_lt_card hcard (Quotient.mk (observed s ξ) u)
+  obtain ⟨y, rfl⟩ := quotient_mk_surjective (observed s ξ) D
+  have huy : ¬ (observed s ξ).r u y := fun h ↦ hD (Quotient.sound ((observed s ξ).iseqv.symm h))
+  have huy' : ¬ (observed s (merge ξ (Quotient.mk ξ u) (Quotient.mk ξ v))).r u y := by
+    rw [observed_merge_of_rel hAB huv]
+    exact huy
+  have hrate := visibleRate_eq_of_lumping s f hreport hlumping hsame huy'
+  rw [hiddenLoad_merge_of_rel_self hAB huv,
+    hiddenLoad_merge_of_rel_of_not_rel hAB huv huy] at hrate
+  have hload := hiddenLoad_pos s ξ (Quotient.mk (observed s ξ) u)
+  have hsub := Nat.eq_of_mul_eq_mul_right (hiddenLoad_pos s ξ (Quotient.mk (observed s ξ) y)) hrate
+  omega
+
+/-- **Equal counts at every value.** While the report has at least two components, two states with
+the same value of a strong lumping that determines the report have equally many covers into every
+value, their own included, where both counts vanish. Assumes: the statistic determines the report,
+and it is a strong lumping in Rosenblatt's form. -/
+theorem card_covers_value_eq_of_lumping {Stat : Type*} (s : Fin n → Fin n) (f : ER n → Stat)
+    (hreport : ∀ ξ ξ' : ER n, f ξ = f ξ' → observed s ξ = observed s ξ')
+    (hlumping : ∀ ξ ξ' : ER n, f ξ = f ξ' → ∀ v, v ≠ f ξ →
+      Nat.card {η : ER n // Covers ξ η ∧ f η = v} = Nat.card {η : ER n // Covers ξ' η ∧ f η = v})
+    {ξ ξ' : ER n} (hsame : f ξ = f ξ') (hcomponents : 2 ≤ blocks (observed s ξ)) (v : Stat) :
+    Nat.card {η : ER n // Covers ξ η ∧ f η = v} =
+      Nat.card {η : ER n // Covers ξ' η ∧ f η = v} := by
+  by_cases hv : v = f ξ
+  · have hcomponents' : 2 ≤ blocks (observed s ξ') := hreport ξ ξ' hsame ▸ hcomponents
+    rw [hv, card_covers_self_eq_zero_of_lumping s f hreport hlumping hcomponents, hsame,
+      card_covers_self_eq_zero_of_lumping s f hreport hlumping hcomponents']
+  · exact hlumping ξ ξ' hsame v hv
 
 /-- **(B1) at one component.** If two load assignments have the same products on the three pairs
 among `i`, `j` and `k`, and `j` and `k` carry positive loads, the assignments agree at `i`:
@@ -238,7 +314,7 @@ so the statistic refines the report together with its loads. Assumes: the statis
 report, and it is a strong lumping in Rosenblatt's form. -/
 theorem hiddenState_eq_of_lumping {Stat : Type*} (s : Fin n → Fin n) (f : ER n → Stat)
     (hreport : ∀ ξ ξ' : ER n, f ξ = f ξ' → observed s ξ = observed s ξ')
-    (hlumping : ∀ ξ ξ' : ER n, f ξ = f ξ' → ∀ v,
+    (hlumping : ∀ ξ ξ' : ER n, f ξ = f ξ' → ∀ v, v ≠ f ξ →
       Nat.card {η : ER n // Covers ξ η ∧ f η = v} = Nat.card {η : ER n // Covers ξ' η ∧ f η = v})
     {ξ ξ' : ER n} (hsame : f ξ = f ξ') (hcomponents : 3 ≤ blocks (observed s ξ)) :
     hiddenState s ξ = hiddenState s ξ' := by
@@ -267,10 +343,10 @@ strong lumping in Rosenblatt's form, so `visibleRate_eq_of_lumping` and
 `hiddenState_eq_of_lumping` constrain a nonempty family of statistics. -/
 theorem hiddenState_determines_report_and_lumps (s : Fin n → Fin n) :
     (∀ ξ ξ' : ER n, hiddenState s ξ = hiddenState s ξ' → observed s ξ = observed s ξ') ∧
-      ∀ ξ ξ' : ER n, hiddenState s ξ = hiddenState s ξ' → ∀ v,
+      ∀ ξ ξ' : ER n, hiddenState s ξ = hiddenState s ξ' → ∀ v, v ≠ hiddenState s ξ →
         Nat.card {η : ER n // Covers ξ η ∧ hiddenState s η = v} =
           Nat.card {η : ER n // Covers ξ' η ∧ hiddenState s η = v} :=
-  ⟨fun _ _ h ↦ congrArg Prod.fst h, fun _ _ h v ↦ card_covers_hiddenState_eq s h v⟩
+  ⟨fun _ _ h ↦ congrArg Prod.fst h, fun _ _ h v _ ↦ card_covers_hiddenState_eq s h v⟩
 
 end
 
