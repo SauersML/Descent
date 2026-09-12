@@ -1,16 +1,21 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Pangenome.GraphCoalescent.BalancedFiberExtremum
 import Descent.Pangenome.GraphCoalescent.ConnectivityClockTable
+import Descent.Pangenome.GraphCoalescent.ConnectivityCumulant
 import Descent.Pangenome.GraphCoalescent.Conservation
+import Descent.Pangenome.GraphCoalescent.HiddenLoadFiltering
 import Descent.Pangenome.GraphCoalescent.HiddenLoads
 import Descent.Pangenome.GraphCoalescent.HiddenLumpability
 import Descent.Pangenome.GraphCoalescent.LahWeights
 import Descent.Pangenome.GraphCoalescent.MinimalRefinement
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceClosure
+import Descent.Pangenome.GraphCoalescent.MultiInterfaceLoads
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceOutcome
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionLaw
 import Descent.Pangenome.GraphCoalescent.MultiplicativeObservation
+import Descent.Pangenome.GraphCoalescent.RankedHistoryLaw
 import Descent.Pangenome.GraphCoalescent.VisibleIntensityClock
 
 namespace Descent.Program
@@ -74,6 +79,17 @@ inside it.
   `sum_blockWeight_card_eq_lahNumber`, `sum_blockWeight_X_pow_eq_lahPolynomial`. The parts of a
   coalescent state read as a finite partition are its `Coalescent.blocks`:
   `card_parts_ofSetoid`.
+* Theorem D, (D2)-(D3), the connectivity cumulant: `ConnectivityCumulant`. The Möbius
+  coefficients over the partitions of a nonempty set sum to one on a singleton and to zero
+  otherwise (`sum_mobiusCoefficient_finpartition`); the refinements of a partition carry
+  `∏_C A_|C|(z)` (`sum_le_eq_prod_lahPolynomial`); (D3) is
+  `connectivityCumulant_eq_sum_connected`, with nonnegative integer coefficients
+  (`coeff_connectivityCumulant_nonneg`) depending only on the fiber sizes
+  (`connectivityCumulant_eq_cumulantOfSizes`).
+* Theorem D, (D4), the ranked history law: `RankedHistoryLaw`. The law of the jump chain after
+  `n - k` jumps is `a_{n,k} ∏_B |B|!` (`rankedHistoryLaw`, `blockLaw_toReal_eq_absoluteProb`),
+  through the weighted cover count `2 Σ_{ξ ≺ η} w(ξ) = (n - |η|) w(η)`
+  (`two_mul_sum_rankWeight_covers`).
 * Theorem D, the exact table of §6: `ConnectivityClockTable`. The cumulants
   `6z + 4z²`, `24z + 30z² + 6z³`, `24z + 32z² + 8z³`, `24z + 20z²`,
   `720z + 1656z² + 928z³ + 144z⁴` and the means `2/3, 1/2, 7/18, 17/18, 92/225` of the fiber sizes
@@ -96,7 +112,24 @@ inside it.
   many mergers into every lumped target: `card_mergers_eq_of_cellLoad_eq`, and with the corpus
   setoids `card_blockMergers_eq`. Two coalescent states with the same reports, merging pairs in
   the same cells, have the same reports and common refinement afterwards:
-  `MultiInterfaceOutcome.observed_merge_eq_of_cells`, `commonRefinement_merge_eq_of_cells`.
+  `MultiInterfaceOutcome.observed_merge_eq_of_cells`, `commonRefinement_merge_eq_of_cells`. With
+  the cell loads the closure holds with nothing assumed on how a merger acts: two coalescent
+  states with the same lumped state offer equally many mergers into every lumped state,
+  `MultiInterfaceLoads.card_blockMergers_eq_of_multiState_eq`, through
+  `multiState_merge_eq_of_cells`.
+* §9, exact filtering and likelihood: `HiddenLoadFiltering`. For a finite hidden jump process
+  watched through a report map, the killed propagator solves `P' = P Q_R`
+  (`hasDerivAt_killedPropagator`), carries no mass out of the report
+  (`killedPropagator_apply_eq_zero`) and satisfies the first-jump equation
+  (`killedPropagator_apply_eq_firstJump`), and the final mass of the filter is the likelihood of
+  the visible history (`filterPosterior_dotProduct_one`, `filterPosterior_single_dotProduct_one`).
+  For the load chain the killed generator carries the internal rates `C(L_C, 2)` and `-C(K, 2)`
+  (`killedGenerator_mulVec_loadGenerator`), and a visible merger transfers mass with weight
+  `L_C L_D` (`transferMatrix_mulVec_loadGenerator`).
+* Theorem E, the extremal statement: `BalancedFiberExtremum`. Among positive fiber sizes of a
+  fixed total the product is maximal exactly on balanced profiles
+  (`prod_maximal_iff_isBalancedFibers`), read at the loads of an interface in
+  `prod_hiddenLoad_bot_le_of_isBalancedFibers`.
 
 Scope. Theorem A is proved as cover counts with Kingman's unit rate per cover: the
 continuous-time chain, the survival function of (A4) and the probabilistic statement of strong
@@ -106,19 +139,21 @@ derivatives through the killed generator. The step from a strong lumping for eve
 labeled state to these rates, which is Rosenblatt's criterion applied to the chain of Theorem A,
 and the survival function as a semigroup are not formalized. The table rows of §6 evaluate
 transcriptions of (D2), (D4)-(D6) and (D8) at the tabulated fiber sizes, with the Möbius
-coefficients written out for two and three fibers. In §10 the reports after a merger are proved
-to depend on the two merging cells alone; that the cell loads after a merger aggregate the old
-loads and drop by one for the merged pair remains a hypothesis on the outcome map. The
+coefficients written out for two and three fibers. The
 connection clock of Theorem C is defined as the first-step solution of the backward equation, and
 (C3) is Dynkin's identity for that equation; its identification with the path expectation of the
 continuous-time chain is not formalized, and (C2) is proved in Laplace-transform order, which
-does not imply the stochastic order of the quantile coupling. Theorem D (the connectivity
-cumulant (D2)-(D3) and the stopping law (D4)-(D9)), Theorem E, (F2) and (F3), the filter of §9
-and the Λ-coalescent extension of §10 are not yet proof-checked. Of (F1), the construction of
-the coupled report and multiplicative-coalescent skeletons, the path-level coupling inequality
-and the identification with path measures on càdlàg paths are not formalized. (F4) is proved for
-the finite random graph of edges rung by time `u`, entering the clocks through their distribution
-functions; its two-fiber and three-equal-fiber evaluations are not yet proof-checked.
+does not imply the stochastic order of the quantile coupling. (D3) is proved over Mathlib
+`Finpartition`s, not in the corpus form over `Coalescent.ER n` with `observed` and `graphKer`,
+and its degree bound `n - w + 1` is not formalized; (D4) is proved by Kingman's backward
+recursion, without enumerating ranked histories. §9 is proved for a finite hidden jump process
+given by its generator, with the load chain's generator `loadGenerator` written from the rates of
+Theorem A. The stopping law (D5)-(D9), (E1)-(E2), (F2), (F3) and the Λ-coalescent extension of
+§10 are not yet proof-checked. Of (F1), the construction of the coupled report and
+multiplicative-coalescent skeletons, the path-level coupling inequality and the identification
+with path measures on càdlàg paths are not formalized. (F4) is proved for the finite random graph
+of edges rung by time `u`, entering the clocks through their distribution functions; its
+two-fiber and three-equal-fiber evaluations are not yet proof-checked.
 -/
 
 end Descent.Program

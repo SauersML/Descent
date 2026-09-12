@@ -110,6 +110,9 @@ import Descent.Portability.ChronologyIntegralEquation
 import Descent.Portability.NonnegativeCoalescenceRealization
 import Descent.Portability.NeutralPolynomialSemigroup
 import Descent.Portability.NonnegativeIntegrableRealization
+import Descent.Portability.PartialHaplotypeMicroscopicApproximation
+import Descent.Portability.PartialHaplotypeRealizedPanel
+import Descent.Portability.NeutralPolynomialPositivity
 
 namespace Descent.Program
 
@@ -224,12 +227,19 @@ for histories of constant-rate epochs and splits, through the limit of perturbed
 proved for
 rate histories with integrable rate coordinates; the propagator is characterized by the integral
 equation. Theorem 2 covers histories of rate epochs, splits and admixture pulses; the pipeline
-compiler emits nothing else. Of §4.2, mutation is symmetric, and (20) takes the forward moment
-equation of the expectation family as a hypothesis that no module yet discharges. The §4.2a
-polynomial semigroup is constructed from the dual matrix exponential, with its unit, semigroup
-law and dual representation, which discharges the dual, unit and semigroup hypotheses of
-`NeutralFellerGenerator.exists_markovKernel_neutralGenerator`: `NeutralPolynomialSemigroup`. Its
-positivity on nonnegative observables and its Euler limit remain hypotheses there; their kernels
+compiler emits nothing else. Of §4.2, mutation is symmetric. The forward moment
+equation that (20) takes as a hypothesis is discharged for every neutral model by the realized
+expectation family of the neutral microscopic approximation:
+`PartialHaplotypeMicroscopicApproximation.realizedExpectation_forward`. That family matches the
+diffusion on the moments of one fixed budget and is not shown to be the marginal law of a single
+process across budgets; the exact panel reports follow with no hypothesis:
+`PartialHaplotypeRealizedPanel`. The §4.2a polynomial semigroup is constructed from the dual
+matrix exponential, with its unit, semigroup law and dual representation
+(`NeutralPolynomialSemigroup`), and is positive (`NeutralPolynomialPositivity`), so every
+hypothesis of `NeutralFellerGenerator.exists_markovKernel_neutralGenerator` is proved: neutral
+Markov kernels exist for every neutral model, represent the polynomial semigroup, compose, and
+carry the neutral generator on configuration moments (`exists_neutralMarkovKernel`). The Euler
+limit route of `PolynomialFellerExtension` still takes that limit as a hypothesis. The kernels
 are Markov kernels on pseudo-metrizable compact spaces, which include the haplotype-frequency
 simplex. In §6 the attainable metric curve of NOTE1 Theorem 5 is proved exactly for lists of
 discrete events, and for chronologies with continuous nonnegative rates at a positive horizon
