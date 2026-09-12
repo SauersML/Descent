@@ -71,25 +71,23 @@ theorem ite_blockMap_mul_blockMass_mass {n : ℕ} (mass : Fin n → ℝ) {ζ σ 
       = ∑ x ∈ univ.filter (fun x ↦ Quotient.mk ζ x = C),
           ∑ y ∈ univ.filter (fun y ↦ Quotient.mk ζ y = D),
             (if σ.r x y then 0 else mass x * mass y) := by
-  unfold blockMass
-  rw [Finset.sum_mul_sum]
+  have hrel : ∀ x ∈ univ.filter (fun x ↦ Quotient.mk ζ x = C),
+      ∀ y ∈ univ.filter (fun y ↦ Quotient.mk ζ y = D),
+        (blockMap h C = blockMap h D ↔ σ.r x y) := by
+    intro x hx y hy
+    have hxy : blockMap h C = Quotient.mk σ x ∧ blockMap h D = Quotient.mk σ y := by
+      rw [← (Finset.mem_filter.mp hx).2, ← (Finset.mem_filter.mp hy).2]
+      exact ⟨rfl, rfl⟩
+    rw [hxy.1, hxy.2]
+    exact ⟨Quotient.exact, fun hr ↦ Quotient.sound hr⟩
   by_cases hφ : blockMap h C = blockMap h D
-  · rw [if_pos hφ]
+  · simp only [if_pos hφ]
     symm
-    refine Finset.sum_eq_zero fun x hx ↦ Finset.sum_eq_zero fun y hy ↦ if_pos ?_
-    have e1 : Quotient.mk σ x = blockMap h C := by
-      rw [← (Finset.mem_filter.mp hx).2]
-      rfl
-    have e2 : Quotient.mk σ y = blockMap h D := by
-      rw [← (Finset.mem_filter.mp hy).2]
-      rfl
-    exact Quotient.exact (e1.trans (hφ.trans e2.symm))
-  · rw [if_neg hφ]
-    refine Finset.sum_congr rfl fun x hx ↦ Finset.sum_congr rfl fun y hy ↦ (if_neg ?_).symm
-    intro hr
-    apply hφ
-    rw [← (Finset.mem_filter.mp hx).2, ← (Finset.mem_filter.mp hy).2]
-    exact Quotient.sound hr
+    exact Finset.sum_eq_zero fun x hx ↦ Finset.sum_eq_zero fun y hy ↦
+      if_pos ((hrel x hx y hy).mp hφ)
+  · simp only [if_neg hφ, blockMass, Finset.sum_mul_sum]
+    exact Finset.sum_congr rfl fun x hx ↦ Finset.sum_congr rfl fun y hy ↦
+      (if_neg fun hr ↦ hφ ((hrel x hx y hy).mpr hr)).symm
 
 /-- **The merges of `Z` that leave the partitions below `σ` carry the crossing mass of `σ`**, for
 any mass vector and whatever the state `ζ ≤ σ` they start from. -/
@@ -105,12 +103,10 @@ theorem two_mul_sum_crossing_eq_mass {n : ℕ} (mass : Fin n → ℝ) {ζ σ : E
     _ = ∑ C, ∑ D, if blockMap h C = blockMap h D then 0
           else blockMass mass ζ C * blockMass mass ζ D := by
         refine Finset.sum_congr rfl fun C _ ↦ Finset.sum_congr rfl fun D _ ↦ ?_
-        by_cases hCD : C = D
-        · rw [if_neg (not_not.mpr hCD), if_pos (congrArg (blockMap h) hCD)]
+        rcases eq_or_ne C D with rfl | hCD
+        · simp
         · rw [if_pos hCD, mergePair_pair ζ hCD, Finset.prod_pair hCD]
-          by_cases hφ : blockMap h C = blockMap h D
-          · rw [if_pos ((merge_le_iff_blockMap_eq h hCD).mpr hφ), if_pos hφ]
-          · rw [if_neg fun hle ↦ hφ ((merge_le_iff_blockMap_eq h hCD).mp hle), if_neg hφ]
+          exact if_congr (merge_le_iff_blockMap_eq h hCD) rfl rfl
     _ = ∑ C, ∑ D, ∑ x ∈ univ.filter (fun x ↦ Quotient.mk ζ x = C),
           ∑ y ∈ univ.filter (fun y ↦ Quotient.mk ζ y = D),
             (if σ.r x y then 0 else mass x * mass y) :=
@@ -148,20 +144,15 @@ theorem sum_filter_le_massStep {n : ℕ} (mass : Fin n → ℝ) {ζ σ : ER n} (
         (fun t ↦ mergePair ζ t = ζ'), ∏ C ∈ t, blockMass mass ζ C
       = ∑ t ∈ (univ : Finset (Quotient ζ)).powersetCard 2,
           if mergePair ζ t ≤ σ then ∏ C ∈ t, blockMass mass ζ C else 0 := by
-    rw [Finset.sum_filter]
-    have hpoint : ∀ ζ' : ER n, (if ζ' ≤ σ then ∑ t ∈ (univ.powersetCard 2).filter
-        (fun t ↦ mergePair ζ t = ζ'), ∏ C ∈ t, blockMass mass ζ C else 0)
-        = ∑ t ∈ (univ.powersetCard 2).filter (fun t ↦ mergePair ζ t = ζ'),
-            if mergePair ζ t ≤ σ then ∏ C ∈ t, blockMass mass ζ C else 0 := by
-      intro ζ'
-      by_cases hle : ζ' ≤ σ
-      · rw [if_pos hle]
-        exact Finset.sum_congr rfl fun t ht ↦ by rw [(Finset.mem_filter.mp ht).2, if_pos hle]
-      · rw [if_neg hle]
-        exact (Finset.sum_eq_zero fun t ht ↦ by
-          rw [(Finset.mem_filter.mp ht).2, if_neg hle]).symm
-    rw [Finset.sum_congr rfl fun ζ' _ ↦ hpoint ζ']
-    exact Finset.sum_fiberwise _ (mergePair ζ) _
+    rw [Finset.sum_filter, ← Finset.sum_fiberwise ((univ : Finset (Quotient ζ)).powersetCard 2)
+      (mergePair ζ) (fun t ↦ if mergePair ζ t ≤ σ then ∏ C ∈ t, blockMass mass ζ C else 0)]
+    refine Finset.sum_congr rfl fun ζ' _ ↦ ?_
+    split_ifs with hle
+    · exact Finset.sum_congr rfl fun t ht ↦
+        (if_pos ((Finset.mem_filter.mp ht).2.le.trans hle)).symm
+    · symm
+      exact Finset.sum_eq_zero fun t ht ↦
+        if_neg fun hle' ↦ hle ((Finset.mem_filter.mp ht).2.symm.le.trans hle')
   have hsplit : ∑ t ∈ (univ : Finset (Quotient ζ)).powersetCard 2,
         (if mergePair ζ t ≤ σ then ∏ C ∈ t, blockMass mass ζ C else 0)
       + ∑ t ∈ (univ : Finset (Quotient ζ)).powersetCard 2,
@@ -212,12 +203,7 @@ theorem sum_filter_le_massLaw {n : ℕ} (s : Fin n → Fin n) (mass : Fin n → 
   | zero =>
     simp only [massLaw, skeletonLaw, pow_zero]
     rw [Finset.sum_ite_eq']
-    by_cases hq : graphKer s ≤ σ
-    · have hmem : graphKer s ∈ univ.filter (· ≤ σ) :=
-        Finset.mem_filter.mpr ⟨Finset.mem_univ _, hq⟩
-      rw [if_pos hmem, if_pos hq]
-    · have hmem : graphKer s ∉ univ.filter (· ≤ σ) := fun hmem ↦ hq (Finset.mem_filter.mp hmem).2
-      rw [if_neg hmem, if_neg hq]
+    exact if_congr (by simp) rfl rfl
   | succ m ih =>
     have h1 := sum_skeletonLaw_succ (massStep mass)
       (fun ζ ↦ if ζ = graphKer s then 1 else 0) m (univ.filter (· ≤ σ)) fun _ ↦ 1

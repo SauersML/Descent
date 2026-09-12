@@ -388,39 +388,35 @@ theorem separationMass_le_mul {P : S → S → ℝ} {μ₀ : S → ℝ} {sep : S
     (hhazard : ∀ s, ¬ sep s → ∑ t ∈ univ.filter sep, P s t ≤ ε)
     (hsep0 : separationMass P μ₀ sep 0 = 0) (k : ℕ) :
     separationMass P μ₀ sep k ≤ ε * k := by
+  have hstep : ∀ j : ℕ, separationMass P μ₀ sep (j + 1) ≤ separationMass P μ₀ sep j + ε := by
+    intro j
+    have hpoint : ∀ s, skeletonLaw P μ₀ j s * ∑ t ∈ univ.filter sep, P s t
+        ≤ (if sep s then skeletonLaw P μ₀ j s else 0) + ε * skeletonLaw P μ₀ j s := by
+      intro s
+      have hlaw := skeletonLaw_nonneg hP hμ j s
+      by_cases hs : sep s
+      · have hG := (Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset sep univ)
+          fun t _ _ ↦ hP s t).trans_eq (hrow s)
+        rw [if_pos hs]
+        nlinarith [mul_le_mul_of_nonneg_left hG hlaw, mul_nonneg hε hlaw]
+      · rw [if_neg hs, zero_add]
+        nlinarith [mul_le_mul_of_nonneg_left (hhazard s hs) hlaw]
+    have hsucc := sum_skeletonLaw_succ P μ₀ j (univ.filter sep) fun _ ↦ 1
+    simp only [mul_one] at hsucc
+    calc separationMass P μ₀ sep (j + 1)
+        = ∑ s, skeletonLaw P μ₀ j s * ∑ t ∈ univ.filter sep, P s t := hsucc
+      _ ≤ ∑ s, ((if sep s then skeletonLaw P μ₀ j s else 0) + ε * skeletonLaw P μ₀ j s) :=
+        Finset.sum_le_sum fun s _ ↦ hpoint s
+      _ = separationMass P μ₀ sep j + ε * ∑ s, skeletonLaw P μ₀ j s := by
+        rw [Finset.sum_add_distrib, ← Finset.mul_sum]
+        congr 1
+        exact (Finset.sum_filter sep _).symm
+      _ = separationMass P μ₀ sep j + ε := by rw [sum_skeletonLaw hrow j, hμ1, mul_one]
   induction k with
   | zero => simp [hsep0]
   | succ k ih =>
-    set G : S → ℝ := fun s ↦ ∑ t ∈ univ.filter sep, P s t with hG
-    have hswap : separationMass P μ₀ sep (k + 1) = ∑ s, skeletonLaw P μ₀ k s * G s := by
-      have h1 := sum_skeletonLaw_succ P μ₀ k (univ.filter sep) fun _ ↦ 1
-      simp only [mul_one] at h1
-      exact h1
-    have hsplit := Finset.sum_filter_add_sum_filter_not univ sep
-      fun s ↦ skeletonLaw P μ₀ k s * G s
-    have hA : ∑ s ∈ univ.filter sep, skeletonLaw P μ₀ k s * G s
-        ≤ separationMass P μ₀ sep k := by
-      refine Finset.sum_le_sum fun s _ ↦ ?_
-      have hle1 : G s ≤ 1 := by
-        rw [hG, ← hrow s]
-        exact Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset _ _)
-          fun t _ _ ↦ hP s t
-      calc skeletonLaw P μ₀ k s * G s ≤ skeletonLaw P μ₀ k s * 1 :=
-            mul_le_mul_of_nonneg_left hle1 (skeletonLaw_nonneg hP hμ k s)
-        _ = skeletonLaw P μ₀ k s := mul_one _
-    have hB : ∑ s ∈ univ.filter (fun s ↦ ¬ sep s), skeletonLaw P μ₀ k s * G s
-        ≤ ε * ∑ s ∈ univ.filter (fun s ↦ ¬ sep s), skeletonLaw P μ₀ k s := by
-      rw [Finset.mul_sum]
-      refine Finset.sum_le_sum fun s hs ↦ ?_
-      calc skeletonLaw P μ₀ k s * G s ≤ skeletonLaw P μ₀ k s * ε :=
-            mul_le_mul_of_nonneg_left (hhazard s (Finset.mem_filter.mp hs).2)
-              (skeletonLaw_nonneg hP hμ k s)
-        _ = ε * skeletonLaw P μ₀ k s := by ring
-    have hmass := sum_filter_not_skeletonLaw_le hP hrow hμ hμ1
-      (univ.filter fun s ↦ ¬ sep s) k
-    have hεmass := mul_le_mul_of_nonneg_left hmass hε
     push_cast
-    linarith
+    linarith [hstep k]
 
 /-- The skeleton path weights of a stochastic kernel carry the initial mass. -/
 theorem sum_skeletonPathWeight {P : S → S → ℝ} {μ₀ : S → ℝ} (hrow : ∀ s, ∑ t, P s t = 1)
