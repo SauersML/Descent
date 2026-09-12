@@ -1,0 +1,32 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Pangenome.GraphCoalescent.ConnectionLawIdentifiability
+
+/-! Axiom audit of what the law of the reported connection time identifies. -/
+
+open Descent.Pangenome.GraphCoalescent.ConnectionLawIdentifiability
+
+#print axioms eq_zero_of_sum_mul_prod_Ioc
+#print axioms stoppingProb_eq_of_laplace_eq
+#print axioms laplace_eq_of_stoppingProb_eq
+#print axioms connectedProb_eq_of_stoppingProb_eq
+#print axioms stoppingProb_eq_of_connectedProb_eq
+#print axioms connectedProb_eq_jumpCoeff_mul_coeff
+#print axioms coeff_connectivityCumulant_graphKer_eq_zero
+#print axioms connectivityCumulant_eq_of_connectedProb_eq
+#print axioms connectedProb_eq_of_connectivityCumulant_eq
+#print axioms laplace_eq_iff_connectivityCumulant_eq
+#print axioms measurable_connectionTime
+#print axioms map_connectionTime_apply
+#print axioms map_connectionTime_eq_iff_connectivityCumulant_eq
+#print axioms eq_zero_of_sum_mul_exp_deathRate
+#print axioms spectralCoeff_eq_iff_survivalAt_eq
+#print axioms connectionLaplace_of_observed_eq_top
+#print axioms connectionLaplace_eq_sum_jumpLaw
+#print axioms sum_blockLaw_connectionLaplace_succ
+#print axioms connectionLaplace_bot_eq_sum_stoppingProb
+#print axioms lintegral_exp_connectionTimeLaw_bot_eq_laplace
+#print axioms connectionTimeLaw_bot_eq_of_survivalAt_eq
+#print axioms connectivityCumulant_eq_of_survivalAt_eq
+#print axioms connectivityCumulant_eq_of_spectralCoeff_eq
