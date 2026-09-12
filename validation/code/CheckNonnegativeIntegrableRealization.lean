@@ -1,0 +1,24 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.NonnegativeIntegrableRealization
+
+/-! Axiom audit of NonnegativeIntegrableRealization. -/
+
+open Descent.Portability.NonnegativeIntegrableRealization
+
+namespace Descent.Portability.NonnegativeIntegrableRealization
+
+#print axioms coordinates_ofRates
+#print axioms rateCoordinates_perturb
+#print axioms intervalIntegrable_coalescenceFree_coordinates
+#print axioms intervalIntegrable_nonnegativeGenerator
+#print axioms exists_continuous_rates_near_nonnegative
+#print axioms exists_nonnegativeIntegrablePropagator
+#print axioms nonnegativeIntegrablePropagator_preserves_locusExchangeable_realization
+#print axioms nonnegativeIntegrablePropagator_mulVec_mem_realizationBody
+#print axioms nonnegativeIntegrablePropagator_dd_quadraticForm_nonneg
+#print axioms nonnegativeIntegrablePropagator_dd_cauchySchwarz
+#print axioms nonnegativeIntegrablePropagator_dd_diagonal_nonneg
+
+end Descent.Portability.NonnegativeIntegrableRealization
