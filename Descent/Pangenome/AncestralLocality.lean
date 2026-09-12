@@ -44,6 +44,7 @@ import Descent.Pangenome.AncestralLocality.SelectionClosure
 import Descent.Pangenome.AncestralLocality.SelectionTies
 import Descent.Pangenome.AncestralLocality.SelectionLightCone
 import Descent.Pangenome.AncestralLocality.DecisionJumpExpansion
+import Descent.Pangenome.AncestralLocality.DecisionWindowJumps
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program
