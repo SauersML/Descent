@@ -81,7 +81,7 @@ theorem isLeast_reportHittingSet {n : ℕ} (hn : 2 ≤ n) (s : Fin n → Fin n) 
   · rintro t ⟨ht0, htop⟩
     by_contra hlt
     have hk := lt_blockCountAt_of_lt_descentTime n hpos hB.1 hB.2 (not_le.mp hlt)
-    have hkn := blockCountAt_le n ht0 (by omega : 1 ≤ n)
+    have hkn := blockCountAt_le n (hold := hold) ht0 (by omega : 1 ≤ n)
     exact Nat.findGreatest_is_greatest (P := fun k ↦ observed s (chainOfList l k) = ⊤) hk hkn
       htop
 
@@ -113,7 +113,7 @@ theorem reportHittingTime_clockHold {n : ℕ} (hn : 2 ≤ n) (s : Fin n → Fin 
     {p : List (ER n) × (ℕ → ℝ)} (hl : p.1 ∈ (chainLaw n (n - 1)).support)
     (hpos : ∀ j, 0 ≤ p.2 j) :
     reportHittingTime s p.1 (clockHold p.2) = connectionTime s p := by
-  rw [reportHittingTime_eq hn s hl fun j ↦ hpos (j - 2),
+  rw [reportHittingTime_eq hn s hl (hold := clockHold p.2) fun j ↦ hpos (j - 2),
     descentTime_clockHold_eq_connectionTime hn s hl]
 
 /-- Under the path law the trajectory is a full trajectory and the clock is nonnegative, almost
@@ -156,9 +156,12 @@ theorem map_reportHittingTime_eq_map_connectionTime {n : ℕ} (hn : 2 ≤ n) (s 
 theorem lintegral_reportHittingTime {n : ℕ} (hn : 2 ≤ n) (s : Fin n → Fin n) :
     ∫⁻ p, ENNReal.ofReal (reportHittingTime s p.1 (clockHold p.2)) ∂(trajectoryClockLaw n)
       = ∫⁻ x, (x : ℝ≥0∞) ∂(connectionTimeLaw s ⊥) := by
-  rw [lintegral_congr_ae ((ae_reportHittingTime_eq_connectionTime hn s).mono fun p hp ↦ by
-      simp only [hp]),
-    connectionTime_mean_eq_meanConnectionTime hn s, lintegral_coe_connectionTimeLaw]
+  have hae : (fun p : List (ER n) × (ℕ → ℝ) ↦
+        ENNReal.ofReal (reportHittingTime s p.1 (clockHold p.2)))
+      =ᵐ[trajectoryClockLaw n] fun p ↦ ENNReal.ofReal (connectionTime s p) :=
+    (ae_reportHittingTime_eq_connectionTime hn s).mono fun p hp ↦ by simp only [hp]
+  rw [lintegral_congr_ae hae, connectionTime_mean_eq_meanConnectionTime hn s,
+    lintegral_coe_connectionTimeLaw]
 
 end
 
