@@ -1,0 +1,24 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.CaratheodoryFundamentalMatrix
+
+/-! Axiom audit of CaratheodoryFundamentalMatrix. -/
+
+open Descent.Portability.CaratheodoryFundamentalMatrix
+
+#print axioms exists_continuous_integral_solution
+#print axioms caratheodoryFundamentalMatrix
+#print axioms continuous_caratheodoryFundamentalMatrix
+#print axioms caratheodoryFundamentalMatrix_eq_integral
+#print axioms caratheodoryFundamentalMatrix_zero
+#print axioms eq_caratheodoryFundamentalMatrix_of_integral_eq
+#print axioms absolutelyContinuousOnInterval_caratheodoryFundamentalMatrix
+#print axioms ae_hasDerivAt_caratheodoryFundamentalMatrix
+#print axioms caratheodoryFundamentalMatrix_eq_fundamentalMatrix
+#print axioms norm_sub_le_of_integral_eq
+#print axioms norm_caratheodoryFundamentalMatrix_le
+#print axioms norm_caratheodoryFundamentalMatrix_le_horizon
+#print axioms norm_caratheodoryFundamentalMatrix_sub_le
+#print axioms tendstoUniformlyOn_caratheodoryFundamentalMatrix
+#print axioms tendstoUniformlyOn_fundamentalMatrix_of_continuous
