@@ -249,8 +249,11 @@ theorem norm_holdingSemigroup_apply_le [Fintype H] [Fintype E] {c : ℝ} {r : E 
   have hsplit : t • holdingGenerator (H := H) c r n =
       t • c • LinearMap.toContinuousLinearMap (pairSubstitution (H := H) n) +
         (-(t * dualExitRate c r n)) • 1 := by
-    rw [holdingGenerator, smul_sub, smul_smul t (dualExitRate c r n), neg_smul,
-      ← sub_eq_add_neg]
+    ext g w
+    simp only [ContinuousLinearMap.smul_apply, ContinuousLinearMap.add_apply,
+      ContinuousLinearMap.one_apply, holdingGenerator_apply, LinearMap.coe_toContinuousLinearMap',
+      Pi.smul_apply, Pi.sub_apply, Pi.add_apply, smul_eq_mul]
+    ring
   have hS : holdingSemigroup (H := H) c r n t =
       Real.exp (-(t * dualExitRate c r n)) •
         NormedSpace.exp ℝ (t • c • LinearMap.toContinuousLinearMap (pairSubstitution n)) := by
@@ -267,8 +270,8 @@ theorem norm_holdingSemigroup_apply_le [Fintype H] [Fintype E] {c : ℝ} {r : E 
     _ ≤ Real.exp (-(n * (∑ e, r e) * t)) * ‖f‖ := by
         refine mul_le_mul_of_nonneg_right ?_ (norm_nonneg f)
         rw [hS, norm_smul, Real.norm_eq_abs, abs_of_pos (Real.exp_pos _)]
-        calc Real.exp (-(t * dualExitRate c r n)) *
-              ‖NormedSpace.exp ℝ (t • c • LinearMap.toContinuousLinearMap (pairSubstitution n))‖
+        calc Real.exp (-(t * dualExitRate c r n)) * ‖NormedSpace.exp ℝ
+              (t • c • LinearMap.toContinuousLinearMap (pairSubstitution (H := H) n))‖
             ≤ Real.exp (-(t * dualExitRate c r n)) *
                 Real.exp (t * (c * ∑ b : Fin n, ((Iio b).card : ℝ))) :=
               mul_le_mul_of_nonneg_left ((hexp _).trans (Real.exp_le_exp.mpr hnorm))
@@ -663,6 +666,7 @@ theorem abs_dysonMoment_le [Fintype H] [DecidableEq H] [Fintype E] {c : ℝ} {r 
           (decisionSubstitution r T n (holdingSemigroup c r n (t - u) f))|
         ≤ ∫ u in (0 : ℝ)..t, (Real.exp (-(n * (∑ e, r e) * t)) * ‖f‖) * ((n : ℝ) *
             (∑ e, r e) * Real.exp (n * (∑ e, r e) * u) * yuleWeight (∑ e, r e) k (n + 1) u) := by
+          rw [← Real.norm_eq_abs]
           refine intervalIntegral.norm_integral_le_of_norm_le ht (ae_of_all _ fun u hu ↦ ?_)
             ((continuous_const.mul hcont).intervalIntegrable 0 t)
           rw [Real.norm_eq_abs]
@@ -762,9 +766,9 @@ theorem abs_decisionDual_sub_truncatedDual_le [Fintype H] [DecidableEq H] [Finty
   show |truncatedDual c r T p N n t f - truncatedDual c r T p M n t f| ≤ _
   simp only [truncatedDual]
   rw [sum_range_sub_sum_range hN]
-  calc |∑ k ∈ Ico M N, dysonMoment c r T p k n t f|
-      ≤ ∑ k ∈ Ico M N, |dysonMoment c r T p k n t f| := abs_sum_le_sum_abs _ _
-    _ ≤ ∑ k ∈ Ico M N, yuleWeight (∑ e, r e) k n t * ‖f‖ :=
+  calc |∑ k ∈ range N with M ≤ k, dysonMoment c r T p k n t f|
+      ≤ ∑ k ∈ range N with M ≤ k, |dysonMoment c r T p k n t f| := abs_sum_le_sum_abs _ _
+    _ ≤ ∑ k ∈ range N with M ≤ k, yuleWeight (∑ e, r e) k n t * ‖f‖ :=
         sum_le_sum fun k _ ↦ abs_dysonMoment_le hc hr T hp0 hp k n ht f
     _ = (∑ k ∈ range N, yuleWeight (∑ e, r e) k n t -
           ∑ k ∈ range M, yuleWeight (∑ e, r e) k n t) * ‖f‖ := by
@@ -893,7 +897,8 @@ theorem continuousOn_decisionDual [Fintype H] [DecidableEq H] [Fintype E] {c : �
     (hp : ∑ h, p h = 1) (n : ℕ) (f : (Fin n → H) → ℝ) (τ : ℝ) :
     ContinuousOn (fun t ↦ decisionDual c r T p n t f) (Set.Icc 0 τ) := by
   have hR : 0 ≤ ∑ e, r e := sum_nonneg fun e _ ↦ hr e
-  refine TendstoUniformlyOn.continuousOn (F := fun M t ↦ truncatedDual c r T p M n t f) ?_
+  refine TendstoUniformlyOn.continuousOn (p := atTop)
+    (F := fun M t ↦ truncatedDual c r T p M n t f) ?_
     (Eventually.of_forall fun M ↦
       (continuous_finset_sum (range M) fun k _ ↦
         continuous_dysonMoment_apply c r T p k n f).continuousOn)
@@ -928,7 +933,9 @@ theorem hasDerivAt_decisionDual [Fintype H] [DecidableEq H] [Fintype E] {c : ℝ
       decisionDual c r T p (n + 1) s (decisionSubstitution r T n f)) (Set.Icc 0 (t + 1)) :=
     (continuousOn_decisionDual hc hr T hp0 hp n _ (t + 1)).add
       (continuousOn_decisionDual hc hr T hp0 hp (n + 1) _ (t + 1))
-  have hint := (hF.mono (Set.Icc_subset_Icc_right (by linarith))).intervalIntegrable_of_Icc ht.le
+  have hint : IntervalIntegrable (fun s ↦ decisionDual c r T p n s (holdingGenerator c r n f) +
+      decisionDual c r T p (n + 1) s (decisionSubstitution r T n f)) volume 0 t :=
+    (hF.mono (Set.Icc_subset_Icc_right (by linarith))).intervalIntegrable_of_Icc ht.le
   have hmeas := (hF.mono Set.Ioo_subset_Icc_self).stronglyMeasurableAtFilter (μ := volume)
     isOpen_Ioo t ⟨ht, by linarith⟩
   have h := (intervalIntegral.integral_hasDerivAt_right hint hmeas
@@ -975,16 +982,16 @@ theorem decisionDual_holdingGenerator_add [Fintype H] [DecidableEq H] [Fintype E
   have hK : HasSum (fun k ↦ dysonMoment c r T p k n t (holdingGenerator c r n f))
       (c * ∑ b, ∑ a ∈ Iio b, decisionDual c r T p n t (coalesceArguments a b f) -
         dualExitRate c r n * decisionDual c r T p n t f) := by
-    have h := ((hasSum_sum fun b _ ↦ hasSum_sum fun a _ ↦ hs n (coalesceArguments a b f))
-      |>.mul_left c).sub ((hs n f).mul_left (dualExitRate c r n))
+    have h := ((hasSum_sum (s := univ) fun b _ ↦ hasSum_sum (s := Iio b) fun a _ ↦
+      hs n (coalesceArguments a b f)) |>.mul_left c).sub ((hs n f).mul_left (dualExitRate c r n))
     convert h using 1
     funext k
     simp only [holdingGenerator_apply, pairSubstitution, map_sub, map_smul, map_sum, smul_eq_mul,
       LinearMap.coe_mk, AddHom.coe_mk]
   have hB : HasSum (fun k ↦ dysonMoment c r T p k (n + 1) t (decisionSubstitution r T n f))
       (∑ e, r e * ∑ a, decisionDual c r T p (n + 1) t (decisionBranch (T e) a f)) := by
-    have h := hasSum_sum fun e _ ↦
-      (hasSum_sum fun a _ ↦ hs (n + 1) (decisionBranch (T e) a f)).mul_left (r e)
+    have h := hasSum_sum (s := univ) fun e _ ↦
+      (hasSum_sum (s := univ) fun a _ ↦ hs (n + 1) (decisionBranch (T e) a f)).mul_left (r e)
     convert h using 1
     funext k
     simp only [decisionSubstitution, map_sum, map_smul, smul_eq_mul, LinearMap.coe_mk,
