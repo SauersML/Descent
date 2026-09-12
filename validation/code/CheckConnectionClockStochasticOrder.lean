@@ -22,3 +22,8 @@ open Descent.Pangenome.GraphCoalescent
 #print axioms holdDensity_mul_exp
 #print axioms setLIntegral_Iic_holdDensity_mul_exp
 #print axioms survivalAt_holdDuration_conv
+#print axioms survivalAt_add_smul
+#print axioms monotone_survivalAt_sub
+#print axioms deathRate_le_deathRate
+#print axioms holdDuration_thinning
+#print axioms survivalAt_kingmanTransitLaw_thinning

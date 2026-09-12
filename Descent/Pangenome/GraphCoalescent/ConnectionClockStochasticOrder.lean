@@ -284,6 +284,115 @@ theorem survivalAt_holdDuration_conv {dK dr c : ℝ} (hr : 0 < dr) (hK : dr < dK
           (withDensity_apply _ measurableSet_Ioi).symm.trans (holdMeasure_Ioi hdK hc)
         exact congrArg₂ (· + ·) hA (hright.trans hB)
 
+/-! ### The thinning identity -/
+
+/-- The survival function of a mixture of two laws. -/
+theorem survivalAt_add_smul (p q : ℝ≥0∞) (μ ν : Measure ℝ≥0) (c : ℝ) :
+    survivalAt (p • μ + q • ν) c = p * survivalAt μ c + q * survivalAt ν c := by
+  simp only [survivalAt, Measure.add_apply, Measure.smul_apply, smul_eq_mul]
+
+/-- Delaying the threshold by a duration can only raise the survival probability. -/
+theorem monotone_survivalAt_sub (ν : Measure ℝ≥0) (c : ℝ) :
+    Monotone fun x : ℝ≥0 ↦ survivalAt ν (c - x) := fun x x' hxx' ↦
+  survivalAt_antitone _ (by linarith [(NNReal.coe_le_coe.mpr hxx' : (x : ℝ) ≤ x')])
+
+/-- Kingman's death rate is monotone on the informative range. -/
+theorem deathRate_le_deathRate {m K : ℕ} (hmK : m + 2 ≤ K) :
+    deathRate (m + 2) ≤ deathRate K := by
+  obtain ⟨j, rfl⟩ := Nat.exists_eq_add_of_le hmK
+  rw [deathRate_succ_succ, show m + 2 + j = (m + j) + 2 by ring, deathRate_succ_succ]
+  push_cast
+  nlinarith [(Nat.cast_nonneg m : (0 : ℝ) ≤ m), (Nat.cast_nonneg j : (0 : ℝ) ≤ j)]
+
+/-- **The thinning identity.** A holding duration at rate `dr` is, with probability `p = dr/dK`,
+one holding duration at the faster rate `dK`, and otherwise one at rate `dK` followed by a fresh
+one at rate `dr`. -/
+theorem holdDuration_thinning {dK dr : ℝ} (hr : 0 < dr) (hK : dr < dK) :
+    holdDuration dr = ENNReal.ofReal (dr / dK) • holdDuration dK
+      + ENNReal.ofReal (1 - dr / dK) • (holdDuration dK ∗ holdDuration dr) := by
+  have hdK : 0 < dK := by linarith
+  have hgap : 0 < dK - dr := by linarith
+  haveI := holdDuration_isProbabilityMeasure hr
+  haveI := holdDuration_isProbabilityMeasure hdK
+  have hp0 : 0 ≤ dr / dK := div_nonneg hr.le hdK.le
+  have hq0 : 0 ≤ 1 - dr / dK := by
+    rw [sub_nonneg, div_le_one hdK]
+    exact hK.le
+  have hsurv : ∀ a : ℝ≥0, survivalAt (holdDuration dr) a
+      = survivalAt (ENNReal.ofReal (dr / dK) • holdDuration dK
+          + ENNReal.ofReal (1 - dr / dK) • (holdDuration dK ∗ holdDuration dr)) a := by
+    intro a
+    have ha : (0 : ℝ) ≤ a := NNReal.coe_nonneg a
+    rw [survivalAt_add_smul, survivalAt_holdDuration hr ha, survivalAt_holdDuration hdK ha,
+      survivalAt_holdDuration_conv hr hK ha]
+    have hEl : Real.exp (-((dK - dr) * a)) ≤ 1 :=
+      Real.exp_le_one_iff.mpr (neg_nonpos.mpr (mul_nonneg hgap.le ha))
+    have h1 : 0 ≤ dK / (dK - dr) * Real.exp (-(dr * a)) :=
+      mul_nonneg (div_nonneg hdK.le hgap.le) (Real.exp_pos _).le
+    have h2 : 0 ≤ dK / (dK - dr) * Real.exp (-(dr * a)) * (1 - Real.exp (-((dK - dr) * a))) :=
+      mul_nonneg h1 (by linarith)
+    have h3 : 0 ≤ dr / dK * Real.exp (-(dK * a)) := mul_nonneg hp0 (Real.exp_pos _).le
+    have h4 : 0 ≤ (1 - dr / dK)
+        * (dK / (dK - dr) * Real.exp (-(dr * a)) * (1 - Real.exp (-((dK - dr) * a)))
+          + Real.exp (-(dK * a))) :=
+      mul_nonneg hq0 (add_nonneg h2 (Real.exp_pos _).le)
+    rw [← ENNReal.ofReal_mul h1, ← ENNReal.ofReal_add h2 (Real.exp_pos _).le,
+      ← ENNReal.ofReal_mul hq0, ← ENNReal.ofReal_mul hp0, ← ENNReal.ofReal_add h3 h4]
+    congr 1
+    have hexp : Real.exp (-(dr * a)) * Real.exp (-((dK - dr) * a)) = Real.exp (-(dK * a)) := by
+      rw [← Real.exp_add]
+      congr 1
+      ring
+    have hi1 : dK * dK⁻¹ = 1 := mul_inv_cancel₀ hdK.ne'
+    have hi2 : (dK - dr) * (dK - dr)⁻¹ = 1 := mul_inv_cancel₀ hgap.ne'
+    linear_combination (-1 : ℝ) * hexp
+      + Real.exp (-(dr * a)) * (1 - Real.exp (-((dK - dr) * a))) * hi2
+      - Real.exp (-(dr * a)) * (1 - Real.exp (-((dK - dr) * a))) * dr * (dK - dr)⁻¹ * hi1
+  have hmass : (ENNReal.ofReal (dr / dK) • holdDuration dK
+      + ENNReal.ofReal (1 - dr / dK) • (holdDuration dK ∗ holdDuration dr)) Set.univ = 1 := by
+    rw [Measure.add_apply, Measure.smul_apply, Measure.smul_apply, measure_univ, measure_univ,
+      smul_eq_mul, smul_eq_mul, mul_one, mul_one, ← ENNReal.ofReal_add hp0 hq0,
+      show dr / dK + (1 - dr / dK) = 1 by ring, ENNReal.ofReal_one]
+  refine Measure.ext_of_Iic _ _ fun a ↦ ?_
+  have hIoi : {y : ℝ≥0 | ((a : ℝ≥0) : ℝ) < (y : ℝ)} = Set.Ioi a := by
+    ext y
+    simp only [Set.mem_setOf_eq, Set.mem_Ioi, NNReal.coe_lt_coe]
+  have hS := hsurv a
+  rw [survivalAt, survivalAt, hIoi] at hS
+  have hfin : (ENNReal.ofReal (dr / dK) • holdDuration dK
+      + ENNReal.ofReal (1 - dr / dK) • (holdDuration dK ∗ holdDuration dr)) (Set.Ioi a) ≠ ⊤ :=
+    ne_top_of_le_ne_top (by rw [hmass]; exact ENNReal.one_ne_top)
+      (measure_mono (Set.subset_univ _))
+  rw [← Set.compl_Ioi, measure_compl measurableSet_Ioi (measure_ne_top _ _),
+    measure_compl measurableSet_Ioi hfin, measure_univ, hmass, hS]
+
+/-- **Kingman's transit time, thinned at a faster rate.** For `r = m + 2 ≤ K` and `p = d_r/d_K`,
+`P(T_r > c) = E[p P(T_{r-1} > c - H) + (1 - p) P(T_r > c - H)]` with `H` a holding duration at rate
+`d_K`. -/
+theorem survivalAt_kingmanTransitLaw_thinning {K m : ℕ} (hmK : m + 2 ≤ K) (c : ℝ) :
+    ∫⁻ x, (ENNReal.ofReal (deathRate (m + 2) / deathRate K)
+          * survivalAt (kingmanTransitLaw (m + 1)) (c - x)
+        + ENNReal.ofReal (1 - deathRate (m + 2) / deathRate K)
+          * survivalAt (kingmanTransitLaw (m + 2)) (c - x)) ∂(holdDuration (deathRate K))
+      = survivalAt (kingmanTransitLaw (m + 2)) c := by
+  have hr := deathRate_add_two_pos m
+  have hdK := deathRate_pos (show 2 ≤ K by omega)
+  haveI := holdDuration_isProbabilityMeasure hr
+  haveI := holdDuration_isProbabilityMeasure hdK
+  haveI := kingmanTransitLaw_isProbabilityMeasure (m + 1)
+  haveI := kingmanTransitLaw_isProbabilityMeasure (m + 2)
+  have hT : kingmanTransitLaw (m + 2)
+      = holdDuration (deathRate (m + 2)) ∗ kingmanTransitLaw (m + 1) := rfl
+  rw [lintegral_add_left ((monotone_survivalAt_sub _ c).measurable.const_mul _),
+    lintegral_const_mul _ (monotone_survivalAt_sub _ c).measurable,
+    lintegral_const_mul _ (monotone_survivalAt_sub _ c).measurable,
+    ← survivalAt_conv, ← survivalAt_conv, ← survivalAt_add_smul]
+  rcases (deathRate_le_deathRate hmK).lt_or_eq with hlt | heq
+  · rw [hT, ← Measure.conv_assoc, ← Measure.conv_smul_left, ← Measure.conv_smul_left,
+      ← Measure.add_conv, ← holdDuration_thinning hr hlt]
+  · rw [heq, div_self hdK.ne', sub_self, ENNReal.ofReal_one, ENNReal.ofReal_zero, one_smul,
+      zero_smul, add_zero, hT]
+
 end
 
 end Descent.Pangenome.GraphCoalescent
