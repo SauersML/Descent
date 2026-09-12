@@ -276,7 +276,8 @@ theorem sum_filter_le_multiplicativeStep {n : ℕ} {ζ σ : ER n} (h : ζ ≤ σ
       (if ζ' = ζ then 1 - pairProductSum (blockMass (unitMass n) ζ) else 0)
       = 1 - pairProductSum (blockMass (unitMass n) ζ) := by
     rw [Finset.sum_ite_eq']
-    exact if_pos (Finset.mem_filter.mpr ⟨Finset.mem_univ _, h⟩)
+    have hmem : ζ ∈ univ.filter (· ≤ σ) := Finset.mem_filter.mpr ⟨Finset.mem_univ _, h⟩
+    exact if_pos hmem
   simp only [multiplicativeStep]
   rw [Finset.sum_add_distrib, hA, hhold]
   linarith
@@ -289,7 +290,7 @@ theorem sum_filter_le_multiplicativeStep_of_not_le {n : ℕ} {ζ σ : ER n} (h :
   unfold multiplicativeStep
   rw [Finset.sum_eq_zero fun t ht ↦ absurd
     (((Finset.mem_filter.mp ht).2 ▸ le_mergePair ζ t).trans hle) h, zero_add]
-  exact if_neg fun heq ↦ h (heq ▸ hle)
+  exact if_neg fun (heq : ζ' = ζ) ↦ h (heq ▸ hle)
 
 /-- **The uniformized `Z_p` law after `m` steps from the interface.**
 
@@ -307,8 +308,11 @@ theorem sum_filter_le_multiplicativeLaw {n : ℕ} (s : Fin n → Fin n) (σ : ER
     simp only [multiplicativeLaw, skeletonLaw, pow_zero]
     rw [Finset.sum_ite_eq']
     by_cases hq : graphKer s ≤ σ
-    · rw [if_pos (Finset.mem_filter.mpr ⟨Finset.mem_univ _, hq⟩), if_pos hq]
-    · rw [if_neg fun hmem ↦ hq (Finset.mem_filter.mp hmem).2, if_neg hq]
+    · have hmem : graphKer s ∈ univ.filter (· ≤ σ) :=
+        Finset.mem_filter.mpr ⟨Finset.mem_univ _, hq⟩
+      rw [if_pos hmem, if_pos hq]
+    · have hmem : graphKer s ∉ univ.filter (· ≤ σ) := fun hmem ↦ hq (Finset.mem_filter.mp hmem).2
+      rw [if_neg hmem, if_neg hq]
   | succ m ih =>
     have h1 := sum_skeletonLaw_succ (multiplicativeStep n)
       (fun ζ ↦ if ζ = graphKer s then 1 else 0) m (univ.filter (· ≤ σ)) fun _ ↦ 1
@@ -413,7 +417,7 @@ theorem sum_filter_skeletonLaw_comp_eq {S X : Type*} [Fintype S] [Fintype X] [De
     (hlump : ∀ s x, ∑ t ∈ univ.filter (fun t ↦ π t = x), P s t = Q (π s) x)
     (hinit : ∀ x, ∑ s ∈ univ.filter (fun s ↦ π s = x), μ₀ s = ν₀ x) (m : ℕ) (x : X) :
     ∑ t ∈ univ.filter (fun t ↦ π t = x), skeletonLaw P μ₀ m t = skeletonLaw Q ν₀ m x := by
-  induction m with
+  induction m generalizing x with
   | zero => exact hinit x
   | succ m ih =>
     have h1 := sum_skeletonLaw_succ P μ₀ m (univ.filter fun t ↦ π t = x) fun _ ↦ 1
@@ -495,12 +499,13 @@ theorem sum_mul_ite_mem_unit {S : Type*} [Fintype S] {μ : S → ℝ} (hμ : ∀
     (hμ1 : ∑ s, μ s = 1) (p : S → Prop) :
     0 ≤ ∑ s, μ s * (if p s then 1 else 0) ∧ ∑ s, μ s * (if p s then 1 else 0) ≤ 1 := by
   refine ⟨Finset.sum_nonneg fun s _ ↦ mul_nonneg (hμ s) (by split_ifs <;> norm_num), ?_⟩
-  rw [← hμ1]
-  exact Finset.sum_le_sum fun s _ ↦ by
-    split_ifs
-    · rw [mul_one]
-    · rw [mul_zero]
-      exact hμ s
+  calc ∑ s, μ s * (if p s then 1 else 0) ≤ ∑ s, μ s :=
+        Finset.sum_le_sum fun s _ ↦ by
+          split_ifs
+          · rw [mul_one]
+          · rw [mul_zero]
+            exact hμ s
+    _ = 1 := hμ1
 
 /-- **(F3), quantitative.**  The probability that the graph's report is connected at scaled time
 `U` is within `U²/(4n)` of the Möbius sum `Σ_{σ ≥ q} (-1)^{|σ|-1} (|σ|-1)! e^{-U κ_σ}`, which is
@@ -541,9 +546,8 @@ theorem abs_reportConnectionProbability_sub_le {n : ℕ} (hn : 0 < n) (s : Fin n
   rw [abs_sub_le_iff]
   constructor
   · exact hasSum_le (fun m ↦ (le_abs_self _).trans (hterm m)) (hA.sub hB) hD
-  · exact hasSum_le (fun m ↦ (neg_abs_le _).trans' (by
-      rw [neg_sub]
-      exact (le_abs_self _).trans (by rw [abs_sub_comm]; exact hterm m))) (hB.sub hA) hD
+  · exact hasSum_le (fun m ↦ (le_abs_self _).trans (by rw [abs_sub_comm]; exact hterm m))
+      (hB.sub hA) hD
 
 end
 
