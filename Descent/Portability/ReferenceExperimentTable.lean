@@ -24,20 +24,18 @@ size-three cohort of independent target draws. A partial metric is reported by i
 definedness probability and its weighted numerator, whose quotient is the reported mean of
 NOTE2 (2).
 
-The genetic evolution of the target deme is decided once per history against a table of the
-exact terminal carrier-type law (`early_terminalMass_table`, `late_terminalMass_table`), and
-every row is then decided from that table (`historyReport_eq_tableReport`), so no row repeats
-the evolution.
+The genetic evolution of the target deme is decided once per history and context against a
+table of the exact terminal carrier-type law (`early_terminalMass_table`,
+`late_terminalMass_table`), and any report is then computed from that table
+(`historyReport_eq_tableReport`), so no report repeats the evolution.
 
-Proved here, for both migration histories: the definedness probabilities and weighted
-numerators of the target squared correlation, the target calibration slope, the target to
-source squared-correlation ratio and the size-three empirical target squared correlation; the
-expected target AUC, Brier loss, calibration error and repaired Brier loss; and the conditional
-means of the partial rows. These are the exact rationals of the reference results, whose
-decimal renderings are the rows of the section 9 table.
+Proved here: the tabled terminal laws of both migration histories, the rewriting of every
+history report to the report of its table, and, as the first row, the weighted numerator of
+the early population target squared correlation. The remaining rows of the section 9 table and
+their conditional means are decided in `ReferenceExperimentRows`, and the full-square range
+table is in `ReferenceExperimentRegion`.
 
-Not formalized here: the log-loss certificates of section 9. The full-square range table is in
-`ReferenceExperimentRegion`.
+Not formalized here: the log-loss certificates of section 9.
 
 ## Empirical status
 
@@ -488,21 +486,67 @@ def lateTerminalEntries : List ((Bool × Bool) × TerminalTypes × ℚ) :=
     ((true, true), ((true, true), (true, true)),
       4813344100147999831186145521 / 17169649644147788118812000256)]
 
+theorem early_terminalMass_table_zero_zero :
+    ∀ terminal, terminalMass earlyMigration (false, false) terminal =
+      terminalTable earlyTerminalEntries (false, false) terminal := by
+  decide +kernel
+
+theorem early_terminalMass_table_zero_one :
+    ∀ terminal, terminalMass earlyMigration (false, true) terminal =
+      terminalTable earlyTerminalEntries (false, true) terminal := by
+  decide +kernel
+
+theorem early_terminalMass_table_one_zero :
+    ∀ terminal, terminalMass earlyMigration (true, false) terminal =
+      terminalTable earlyTerminalEntries (true, false) terminal := by
+  decide +kernel
+
+theorem early_terminalMass_table_one_one :
+    ∀ terminal, terminalMass earlyMigration (true, true) terminal =
+      terminalTable earlyTerminalEntries (true, true) terminal := by
+  decide +kernel
+
 /-- NOTE2 (6) through both generations, early migration: the evolved terminal carrier-type law
-is the tabled law. -/
+is the tabled law, decided context by context. -/
 theorem early_terminalMass_table :
     ∀ context terminal,
       terminalMass earlyMigration context terminal =
         terminalTable earlyTerminalEntries context terminal := by
+  rintro ⟨architecture, environment⟩
+  cases architecture <;> cases environment
+  exacts [early_terminalMass_table_zero_zero, early_terminalMass_table_zero_one,
+    early_terminalMass_table_one_zero, early_terminalMass_table_one_one]
+
+theorem late_terminalMass_table_zero_zero :
+    ∀ terminal, terminalMass lateMigration (false, false) terminal =
+      terminalTable lateTerminalEntries (false, false) terminal := by
+  decide +kernel
+
+theorem late_terminalMass_table_zero_one :
+    ∀ terminal, terminalMass lateMigration (false, true) terminal =
+      terminalTable lateTerminalEntries (false, true) terminal := by
+  decide +kernel
+
+theorem late_terminalMass_table_one_zero :
+    ∀ terminal, terminalMass lateMigration (true, false) terminal =
+      terminalTable lateTerminalEntries (true, false) terminal := by
+  decide +kernel
+
+theorem late_terminalMass_table_one_one :
+    ∀ terminal, terminalMass lateMigration (true, true) terminal =
+      terminalTable lateTerminalEntries (true, true) terminal := by
   decide +kernel
 
 /-- NOTE2 (6) through both generations, late migration: the evolved terminal carrier-type law
-is the tabled law. -/
+is the tabled law, decided context by context. -/
 theorem late_terminalMass_table :
     ∀ context terminal,
       terminalMass lateMigration context terminal =
         terminalTable lateTerminalEntries context terminal := by
-  decide +kernel
+  rintro ⟨architecture, environment⟩
+  cases architecture <;> cases environment
+  exacts [late_terminalMass_table_zero_zero, late_terminalMass_table_zero_one,
+    late_terminalMass_table_one_zero, late_terminalMass_table_one_one]
 
 /-- A history report computed from a tabled terminal law. -/
 def tableReport (entries : List ((Bool × Bool) × TerminalTypes × ℚ))

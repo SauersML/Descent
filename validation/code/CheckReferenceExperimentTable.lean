@@ -13,3 +13,11 @@ open Descent.Portability.ReferenceExperimentTable
 #print axioms early_historyReport_table
 #print axioms late_historyReport_table
 #print axioms early_target_r2_weightedNumerator
+#print axioms early_terminalMass_table_zero_zero
+#print axioms early_terminalMass_table_zero_one
+#print axioms early_terminalMass_table_one_zero
+#print axioms early_terminalMass_table_one_one
+#print axioms late_terminalMass_table_zero_zero
+#print axioms late_terminalMass_table_zero_one
+#print axioms late_terminalMass_table_one_zero
+#print axioms late_terminalMass_table_one_one
