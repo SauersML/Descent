@@ -30,7 +30,10 @@ import Descent.Pangenome.GraphCoalescent.MultiInterfaceLoads
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceOutcome
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionExamples
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionLaw
+import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionLimit
+import Descent.Pangenome.GraphCoalescent.MultiplicativeCoupling
 import Descent.Pangenome.GraphCoalescent.MultiplicativeObservation
+import Descent.Pangenome.GraphCoalescent.MultiplicativePerturbation
 import Descent.Pangenome.GraphCoalescent.PartitionLatticeMobius
 import Descent.Pangenome.GraphCoalescent.RankedHistoryLaw
 import Descent.Pangenome.GraphCoalescent.VisibleIntensityClock
@@ -150,7 +153,14 @@ inside it.
   (`deathRate_div_sq_le_half`); a finite coupled chain with separation hazard at most `J/n` and
   deficit drift at most `1/2` per step separates by step `m` with probability at most
   `m(m - 1)/(4n)` (`separationMass_le`), which at the rings of a rate-one Poisson clock becomes
-  `min {1, U²/(4n)}` (`poissonMixture_le_min`).
+  `min {1, U²/(4n)}` (`poissonMixture_le_min`). For the coupled chain of the report and `Z_p` this
+  is the path total-variation bound (F1),
+  `MultiplicativeCoupling.report_multiplicative_poissonTotalVariation_le`; (F2) adds
+  `U ‖p^(n) - p‖₁` for any mass vector on the fibers
+  (`MultiplicativePerturbation.report_spread_poissonTotalVariation_le`); and (F3) in quantitative
+  form, the probability that the report is connected at scaled time `U` is within `U²/(4n)` of
+  the Möbius sum over the partitions above the interface
+  (`MultiplicativeConnectionLimit.abs_reportConnectionProbability_sub_le`).
 * Theorem F, (F4): `MultiplicativeConnectionLaw`. The arbitrary-order Möbius identity of the
   partition lattice, `Σ_{σ ≥ τ} (-1)^(|σ|-1) (|σ|-1)! = [τ = ⊤]` (`sum_topMobius_blocks_ge`),
   and the probability that the edges rung by time `u` connect the fibers is
@@ -220,12 +230,13 @@ continuous-time chain is not formalized, and (C2) is proved in Laplace-transform
 does not imply the stochastic order of the quantile coupling. (D4) is proved by Kingman's backward
 recursion, without enumerating ranked histories. §9 is proved for a finite hidden jump process
 given by its generator, with the load chain's generator `loadGenerator` written from the rates of
-Theorem A. (E1) is proved from the Möbius sum rather than the ranked-history law. The stopping law
-(E2), (F2) and (F3) are not yet proof-checked. (D7)-(D9) are proved for the connection time
+Theorem A. (E1) is proved from the Möbius sum rather than the ranked-history law, and (E2) is
+not yet proof-checked. (D7)-(D9) are proved for the connection time
 defined as the sum of the holding times above the stopping level; its identification with the
-first hitting time of the report path is not proved. Of (F1), the coupled skeleton chain,
-the path-level coupling inequality and the identification with path measures on càdlàg paths are
-not yet recorded here. (F4) is proved for the finite random graph
+first hitting time of the report path is not proved. (F1)-(F3) are proved for the uniformized
+skeleton paths mixed over a rate-one Poisson clock, (F3) as the quantitative bound on the
+connection probability rather than as convergence in law; the identification with path measures
+on càdlàg paths is not formalized. (F4) is proved for the finite random graph
 of edges rung by time `u`, entering the clocks through their distribution functions.
 -/
 
