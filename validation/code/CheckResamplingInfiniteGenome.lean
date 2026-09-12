@@ -16,7 +16,10 @@ open Descent.Portability.ResamplingInfiniteGenome
 #print axioms lawFrequencyHomeomorph
 #print axioms lawOperator
 #print axioms lawOperator_apply
-#print axioms comp_symm_lawFrequency
+#print axioms lawOfFrequency
+#print axioms lawOfFrequency_lawFrequency
+#print axioms lawFrequency_lawOfFrequency
+#print axioms comp_lawOfFrequency
 #print axioms lawOperator_zero
 #print axioms lawOperator_add
 #print axioms lawOperator_one

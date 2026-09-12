@@ -19,9 +19,10 @@ semigroup.
 Laws of a window as window states. A law of finitely many genome types `G` is determined by the
 masses of the single types, so `lawFrequency` sends it to a state of the window model of
 `ResamplingWindowSemigroup`. It is continuous, injective and onto, hence a homeomorphism
-(`lawFrequencyHomeomorph`). Read through it, the window semigroup is a positive contraction
-semigroup on the continuous functions of window laws (`lawOperator`, with `lawOperator_zero`,
-`lawOperator_add`, `lawOperator_one`, `norm_lawOperator_le`, `tendsto_lawOperator_zero`).
+(`lawFrequencyHomeomorph`, with inverse `lawOfFrequency`). Read through it, the window semigroup is
+a positive contraction semigroup on the continuous functions of window laws (`lawOperator`, with
+`lawOperator_zero`, `lawOperator_add`, `lawOperator_one`, `norm_lawOperator_le`,
+`tendsto_lawOperator_zero`).
 
 Consistency. Pushing a law of the letters on a window `W'` to a smaller window `W` is the window
 marginalization of `ResamplingWindowConsistency` in the frequency coordinates
@@ -151,10 +152,24 @@ def lawFrequencyHomeomorph : ProbabilityMeasure G ≃ₜ FrequencyState Unit Uni
     (f := Equiv.ofBijective lawFrequency ⟨lawFrequency_injective, lawFrequency_surjective⟩)
     lawFrequency.continuous
 
+/-- The law of a window state, the inverse of `lawFrequency`. -/
+def lawOfFrequency : C(FrequencyState Unit Unit (fun _ ↦ G), ProbabilityMeasure G) :=
+  ⟨(lawFrequencyHomeomorph (G := G)).symm, (lawFrequencyHomeomorph (G := G)).symm.continuous⟩
+
+/-- The law of the window state of a law is the law. -/
+theorem lawOfFrequency_lawFrequency (ν : ProbabilityMeasure G) :
+    lawOfFrequency (lawFrequency ν) = ν :=
+  (lawFrequencyHomeomorph (G := G)).symm_apply_apply ν
+
+/-- The window state of the law of a window state is the state. -/
+theorem lawFrequency_lawOfFrequency (y : FrequencyState Unit Unit (fun _ ↦ G)) :
+    lawFrequency (lawOfFrequency y) = y :=
+  (lawFrequencyHomeomorph (G := G)).apply_symm_apply y
+
 /-- A function of laws, read at the law of a window state. -/
-theorem comp_symm_lawFrequency (g : C(ProbabilityMeasure G, ℝ)) (ν : ProbabilityMeasure G) :
-    (g.comp (lawFrequencyHomeomorph (G := G)).symm.toContinuousMap) (lawFrequency ν) = g ν :=
-  congrArg g ((lawFrequencyHomeomorph (G := G)).symm_apply_apply ν)
+theorem comp_lawOfFrequency (g : C(ProbabilityMeasure G, ℝ)) (ν : ProbabilityMeasure G) :
+    (g.comp lawOfFrequency) (lawFrequency ν) = g ν :=
+  congrArg g (lawOfFrequency_lawFrequency ν)
 
 variable [DecidableEq G]
 
@@ -165,13 +180,13 @@ def lawOperator (g₀ : G) (t : ℝ≥0) :
     C(ProbabilityMeasure G, ℝ) →L[ℝ] C(ProbabilityMeasure G, ℝ) :=
   (precomposeContraction (lawFrequency (G := G))).comp
     (((windowSemigroup G fun _ ↦ g₀).operator t).comp
-      (precomposeContraction (lawFrequencyHomeomorph (G := G)).symm.toContinuousMap))
+      (precomposeContraction (lawOfFrequency (G := G))))
 
 /-- The resampling operator evaluates the window semigroup at the window state of the law. -/
 theorem lawOperator_apply (g₀ : G) (t : ℝ≥0) (g : C(ProbabilityMeasure G, ℝ))
     (ν : ProbabilityMeasure G) :
     lawOperator G g₀ t g ν = (windowSemigroup G fun _ ↦ g₀).operator t
-      (g.comp (lawFrequencyHomeomorph (G := G)).symm.toContinuousMap) (lawFrequency ν) :=
+      (g.comp lawOfFrequency) (lawFrequency ν) :=
   rfl
 
 /-- The resampling operator at time zero is the identity. -/
@@ -179,20 +194,16 @@ theorem lawOperator_zero (g₀ : G) :
     lawOperator G g₀ 0 = ContinuousLinearMap.id ℝ C(ProbabilityMeasure G, ℝ) := by
   refine ContinuousLinearMap.ext fun g ↦ ContinuousMap.ext fun ν ↦ ?_
   rw [lawOperator_apply, (windowSemigroup G fun _ ↦ g₀).operator_zero,
-    ContinuousLinearMap.id_apply, comp_symm_lawFrequency, ContinuousLinearMap.id_apply]
+    ContinuousLinearMap.id_apply, comp_lawOfFrequency, ContinuousLinearMap.id_apply]
 
 /-- **The semigroup law** of the resampling operators on laws. -/
 theorem lawOperator_add (g₀ : G) (s t : ℝ≥0) :
     lawOperator G g₀ (s + t) = (lawOperator G g₀ s).comp (lawOperator G g₀ t) := by
   refine ContinuousLinearMap.ext fun g ↦ ContinuousMap.ext fun ν ↦ ?_
-  have hinner : (lawOperator G g₀ t g).comp (lawFrequencyHomeomorph (G := G)).symm.toContinuousMap
-      = (windowSemigroup G fun _ ↦ g₀).operator t
-          (g.comp (lawFrequencyHomeomorph (G := G)).symm.toContinuousMap) := by
+  have hinner : (lawOperator G g₀ t g).comp lawOfFrequency
+      = (windowSemigroup G fun _ ↦ g₀).operator t (g.comp lawOfFrequency) := by
     ext y
-    rw [ContinuousMap.comp_apply, lawOperator_apply]
-    exact congrArg (fun z ↦ (windowSemigroup G fun _ ↦ g₀).operator t
-      (g.comp (lawFrequencyHomeomorph (G := G)).symm.toContinuousMap) z)
-      ((lawFrequencyHomeomorph (G := G)).apply_symm_apply y)
+    rw [ContinuousMap.comp_apply, lawOperator_apply, lawFrequency_lawOfFrequency]
   rw [ContinuousLinearMap.comp_apply, lawOperator_apply, lawOperator_apply, hinner,
     (windowSemigroup G fun _ ↦ g₀).operator_add, ContinuousLinearMap.comp_apply]
 
@@ -215,12 +226,11 @@ theorem norm_lawOperator_le (g₀ : G) (t : ℝ≥0) (g : C(ProbabilityMeasure G
 theorem tendsto_lawOperator_zero (g₀ : G) (g : C(ProbabilityMeasure G, ℝ)) :
     Tendsto (fun t ↦ lawOperator G g₀ t g) (𝓝 0) (𝓝 g) := by
   have hwindow := tendsto_iff_norm_sub_tendsto_zero.mp
-    ((windowSemigroup G fun _ ↦ g₀).tendsto_operator_zero
-      (g.comp (lawFrequencyHomeomorph (G := G)).symm.toContinuousMap))
+    ((windowSemigroup G fun _ ↦ g₀).tendsto_operator_zero (g.comp lawOfFrequency))
   refine tendsto_iff_norm_sub_tendsto_zero.mpr
     (squeeze_zero (fun _ ↦ norm_nonneg _) (fun t ↦ ?_) hwindow)
   refine (ContinuousMap.norm_le _ (norm_nonneg _)).mpr fun ν ↦ ?_
-  rw [ContinuousMap.sub_apply, lawOperator_apply, ← comp_symm_lawFrequency g ν,
+  rw [ContinuousMap.sub_apply, lawOperator_apply, ← comp_lawOfFrequency g ν,
     ← ContinuousMap.sub_apply]
   exact ContinuousMap.norm_coe_le_norm _ _
 
@@ -232,7 +242,6 @@ section Genome
 
 variable {V : Type*} [Countable V] [DecidableEq V]
 
-omit [Countable V] [DecidableEq V] in
 /-- **Pushing a law to a smaller window is the window marginalization** in the frequency
 coordinates. -/
 theorem lawFrequency_shrinkLaw {W W' : Finset V} (h : W ⊆ W')
@@ -255,26 +264,19 @@ theorem lawFrequency_shrinkLaw {W W' : Finset V} (h : W ⊆ W')
   refine (Fintype.sum_equiv (Equiv.funUnique Unit (W' → Bool)) _ _ fun h' ↦ ?_).symm
   exact if_congr ⟨fun hequal ↦ congrFun hequal (), fun hequal ↦ funext fun _ ↦ hequal⟩ rfl rfl
 
-omit [Countable V] in
 /-- **The window operators are consistent.** Read through the pullback to a larger window, the
 resampling operator of the larger window is the pullback of the smaller window's operator. -/
 theorem lawOperator_shrinkPullback {W W' : Finset V} (h : W ⊆ W') (t : ℝ≥0)
     (g : C(ProbabilityMeasure (W → Bool), ℝ)) :
     lawOperator (W' → Bool) (fun _ ↦ false) t (shrinkPullback h g)
       = shrinkPullback h (lawOperator (W → Bool) (fun _ ↦ false) t g) := by
-  have hcomp : (shrinkPullback h g).comp
-        (lawFrequencyHomeomorph (G := W' → Bool)).symm.toContinuousMap
-      = (g.comp (lawFrequencyHomeomorph (G := W → Bool)).symm.toContinuousMap).comp
-          (windowMarginal (shrinkWindow h)) := by
+  have hcomp : (shrinkPullback h g).comp (lawOfFrequency (G := W' → Bool))
+      = (g.comp (lawOfFrequency (G := W → Bool))).comp (windowMarginal (shrinkWindow h)) := by
     ext y
     obtain ⟨ν, rfl⟩ := lawFrequency_surjective (G := W' → Bool) y
-    change g (shrinkLaw h ((lawFrequencyHomeomorph (G := W' → Bool)).symm
-        (lawFrequencyHomeomorph ν)))
-      = g ((lawFrequencyHomeomorph (G := W → Bool)).symm
-          (windowMarginal (shrinkWindow h) (lawFrequency ν)))
-    rw [Homeomorph.symm_apply_apply, ← lawFrequency_shrinkLaw]
-    exact congrArg g ((lawFrequencyHomeomorph (G := W → Bool)).symm_apply_apply
-      (shrinkLaw h ν)).symm
+    rw [ContinuousMap.comp_apply, ContinuousMap.comp_apply, ContinuousMap.comp_apply,
+      lawOfFrequency_lawFrequency, shrinkPullback_apply, ← lawFrequency_shrinkLaw,
+      lawOfFrequency_lawFrequency]
   ext ν
   rw [lawOperator_apply, hcomp,
     windowSemigroup_comp_windowMarginal (shrinkWindow h) (fun _ _ ↦ false) (fun _ _ ↦ false) t,
@@ -284,10 +286,9 @@ variable (V) in
 /-- **The resampling window operators** at time `t`, a consistent family of window operators. -/
 def resamplingWindowFamily (t : ℝ≥0) : WindowOperatorFamily V where
   operator W := (lawOperator (W → Bool) (fun _ ↦ false) t).toLinearMap
-  contraction W g := norm_lawOperator_le (fun _ ↦ false) t g
+  contraction _ g := norm_lawOperator_le (fun _ ↦ false) t g
   consistent h g _ := lawOperator_shrinkPullback h t g
 
-omit [DecidableEq V] in
 /-- The sampling algebra of a window separates the laws of the window. -/
 theorem windowAlgebra_separatesPoints (W : Finset V) : (windowAlgebra W).SeparatesPoints := by
   intro ν ν' hne
