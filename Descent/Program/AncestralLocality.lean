@@ -13,6 +13,11 @@ import Descent.Pangenome.AncestralLocality.DecisionDualMoments
 import Descent.Pangenome.AncestralLocality.CylinderWindowProjection
 import Descent.Pangenome.AncestralLocality.CircuitCoupling
 import Descent.Pangenome.AncestralLocality.SupercriticalLowerBound
+import Descent.Pangenome.AncestralLocality.SupportChainMultiset
+import Descent.Pangenome.AncestralLocality.SupercriticalUpperBound
+import Descent.Pangenome.AncestralLocality.FeatureKingmanLimitLineages
+import Descent.Pangenome.AncestralLocality.SupercriticalSprinkling
+import Descent.Pangenome.AncestralLocality.InfiniteGenomeRate
 import Descent.Portability.ResamplingWindowSemigroup
 import Descent.Portability.ResamplingWindowConsistency
 import Descent.Pangenome.AncestralLocality.CoalescentDualSemigroup
@@ -87,7 +92,9 @@ independent complexity bounds and a quantitative light cone.
   (`featureMass_reproduce_compatibilityKernel`). Two sampled lineages at one feature share a
   source with probability `1/N` per generation, so `P(T_N > m) = (1 - 1/N)^m` and
   `P(T_N > ⌊tN⌋) → e^{-t}` (`FeatureKingmanLimit.featurePairSurvival_eq`,
-  `tendsto_featurePairSurvival`). §4.1: the finite-population kernel `Q_N` (4.5)
+  `tendsto_featurePairSurvival`); for `k` lineages the block-counting chain has Kingman's rates on
+  the `N`-generation scale (`FeatureKingmanLimitLineages.tendsto_mul_blockTransition_pred`). §4.1:
+  the finite-population kernel `Q_N` (4.5)
   keeps every allele law and is a probability vector for `R ≤ N`, and the offspring count at a
   feature is `Binomial(N, p_k)` (4.6) (`offspringCount_eq_binomial`). §5.2: the eight-state witness
   has one observed law and drifts `-1/4` and `0` (`witness_drift`), so no observed transition law
@@ -126,7 +133,11 @@ independent complexity bounds and a quantitative light cone.
   Without the giant component theorem, for `α > 1` every feature eventually lies in a component
   of at least `K` features with probability at least `s - ε`
   (`SupercriticalLowerBound.eventually_graphProb_card_reach_ge`), so large components hold at
-  least `(s - ε) m` features in expectation (`eventually_graphExpect_card_large_ge`).
+  least `(s - ε) m` features in expectation (`eventually_graphExpect_card_large_ge`). The upper
+  half holds outright: for queries of at most `k` features
+  `limsup_m P(|Reach(A)| ≥ εm) ≤ 1 - (1 - s)^k`
+  (`SupercriticalUpperBound.limsup_graphProb_card_reach_ge_le`), and sprinkling merges the large
+  components (`SupercriticalSprinkling.tendsto_graphProb_exists_card_reach_ge`).
 * §4.1 and §7.1, the diffusion generator: `AncestralForwardGenerator`. For `c = 1` the
   finite-population chain (4.5) on the `N`-generation scale has generator (7.1) on polynomial
   observables (`tendsto_nextGenerationMean`), and on the eight-state witness the derivatives of
@@ -172,7 +183,10 @@ independent complexity bounds and a quantitative light cone.
   (`SupportChainDynkin.hasDerivAt_sum_jumpChainLaw_mul`), so (8.2), (8.3), (9.1) and (9.2) hold
   with no hypothesis and constants independent of `M` (`sum_supportChainLaw_mul_tagCount_le`,
   `sum_supportChainLaw_mul_count_le`, `sum_supportChainLaw_escape_le`,
-  `sum_supportChainLaw_escape_le_radius`).
+  `sum_supportChainLaw_escape_le_radius`). While fewer than `M` decisions have been taken the
+  chain's generator is `supportGenerator` on multisets of supports
+  (`SupportChainMultiset.supportChainGenerator_mulVec_comp_supportsOf`), and the mass of frozen
+  states tends to zero as `M → ∞` (`tendsto_sum_supportChainLaw_frozen`).
 * Theorem 9, the operator half: `InfiniteGenomeLimit`. On a compact space with a point-separating
   subalgebra of observables, Feller semigroups along an exhaustion that satisfy a light-cone
   approximation bound converge on every continuous observable (`cauchySeq_operator`), and the
@@ -195,7 +209,10 @@ independent complexity bounds and a quantitative light cone.
   (`ResamplingWindowConsistency.windowSemigroup_comp_windowMarginal`), and every cylinder sampling
   polynomial reads a finite window (`CylinderWindowProjection.exists_windowPullback`), where a
   consistent contracting family of window operators extends to a contraction of `C(P(H))`
-  (`norm_extendedOperator_le`).
+  (`norm_extendedOperator_le`). With a rate: along balls of radius `ℓ_m`,
+  `‖T^m_t f - T_t f‖ ≤ 2‖f‖ min {1, n|A| e^{DT} (2eDT/ℓ_m)^{ℓ_m}}`
+  (`InfiniteGenomeRate.norm_operator_sub_infiniteGenomeSemigroup_le`), given the sampling duality
+  and agreement until escape.
 * Corollary 8.1, the light cone as a coupling: `LocalityCoupling`. Two sample laws obtained by
   evaluating one circuit on inputs that coincide off an escape event are within total variation
   the probability of escape (`totalVariation_mixtureLaw_le`); for a circuit reading only inspected
@@ -210,8 +227,8 @@ independent complexity bounds and a quantitative light cone.
   (9.2) `totalVariation_supportChainLaw_inputs_le_radius`), and so does the checking graph
   truncated to the ball (`totalVariation_truncatedSupportChain_le`).
 
-Scope. Of the single-feature Kingman limit behind Theorem 3 only the pair of lineages is proved,
-as convergence of the distribution function.
+Scope. The single-feature Kingman limit behind Theorem 3 is proved for the pair survival law and
+for the one-step rates of the block-counting chain, not as convergence of path laws.
 Theorems 7 and 8 take Dynkin's formula for the support generator along the marginal laws, and
 for (8.3) the compensator formula, as hypotheses, together with integrability and continuity; the
 path law of the backward circuit is not constructed. For the circuit truncated after `M` decisions

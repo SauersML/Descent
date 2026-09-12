@@ -138,6 +138,10 @@ import Descent.Portability.PartialHaplotypeHistoryRealization
 import Descent.Portability.NonnegativeMicroscopicApproximation
 import Descent.Portability.CylinderUniformLaw
 import Descent.Portability.CylinderBoxMullerLaw
+import Descent.Portability.NeutralIntegrableRateRealization
+import Descent.Portability.CaratheodoryFundamentalMatrix
+import Descent.Portability.CaratheodoryPicardSeries
+import Descent.Portability.NeutralCaratheodoryRealization
 
 namespace Descent.Program
 
@@ -211,7 +215,13 @@ history, with no hypotheses: `present_locusExchangeable_realization`,
   kernels converge uniformly in law to the Markov kernel of the time-varying history
   (`NeutralRateHistoryKernel.tendstoUniformly_integral_sampledHistoryKernel`), under which the
   configuration moments are `U(T) H(x)` (`integral_momentPolynomial_rateHistoryKernel`) and the
-  panel reports follow (`integral_panelReport_rateHistoryKernel`).
+  panel reports follow (`integral_panelReport_rateHistoryKernel`). For rate histories that are
+  only integrable the propagator is the Carathéodory fundamental matrix, stable in the rates
+  (`CaratheodoryFundamentalMatrix.norm_caratheodoryFundamentalMatrix_sub_le`) and equal to its
+  Picard series (`CaratheodoryPicardSeries.hasSum_picardIterate_caratheodoryFundamentalMatrix`),
+  and it is realized by a finitely supported law
+  (`NeutralIntegrableRateRealization.exists_neutralIntegrableLaw`,
+  `NeutralCaratheodoryRealization`).
 * §3 Theorem 3 and equations (14)-(16): `StationaryRealization`,
   `StationaryHaplotypeRealization`, `AncestralHaplotypeRealization`.
 * §4.1 per-locus material grading and the loose configuration bound `C(K+B,B)`:

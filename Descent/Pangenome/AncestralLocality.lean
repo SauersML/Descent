@@ -32,6 +32,11 @@ import Descent.Pangenome.AncestralLocality.AnnotatedKernel
 import Descent.Pangenome.AncestralLocality.CircuitCoupling
 import Descent.Pangenome.AncestralLocality.SupercriticalLowerBound
 import Descent.Pangenome.AncestralLocality.BreadthFirstDomination
+import Descent.Pangenome.AncestralLocality.SupportChainMultiset
+import Descent.Pangenome.AncestralLocality.SupercriticalUpperBound
+import Descent.Pangenome.AncestralLocality.FeatureKingmanLimitLineages
+import Descent.Pangenome.AncestralLocality.SupercriticalSprinkling
+import Descent.Pangenome.AncestralLocality.InfiniteGenomeRate
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program

@@ -709,6 +709,9 @@ import Descent.Portability.ResamplingWindowConsistency
 import Descent.Portability.ReferenceExperimentRegion
 import Descent.Portability.NeutralRateLipschitz
 import Descent.Portability.NeutralIntegrableRateRealization
+import Descent.Portability.CaratheodoryFundamentalMatrix
+import Descent.Portability.CaratheodoryPicardSeries
+import Descent.Portability.NeutralCaratheodoryRealization
 
 assert_below Descent.Program
 

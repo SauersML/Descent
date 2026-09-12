@@ -66,6 +66,7 @@ import Descent.Pangenome.GraphCoalescent.VisibleIntensityClock
 import Descent.Pangenome.GraphCoalescent.WidthProfile
 import Descent.Pangenome.GraphCoalescent.RankedHistoryTies
 import Descent.Pangenome.GraphCoalescent.LambdaLoadOutcome
+import Descent.Pangenome.GraphCoalescent.CompressionHiddenStateCount
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program
