@@ -420,6 +420,162 @@ theorem diploidProduct_breaks_ploidy_transfer :
 
 end Dominance
 
+/-! ## The diploid law along a history -/
+
+section History
+
+variable {Deme Locus : Type*} {Allele : Locus → Type*}
+variable [Fintype Deme] [DecidableEq Deme] [Fintype Locus] [DecidableEq Locus]
+  [∀ ℓ, Fintype (Allele ℓ)] [∀ ℓ, DecidableEq (Allele ℓ)]
+
+/-- The gamete-pair law of one deme at a state, formed at that deme's inbreeding coefficient. -/
+def stateGenotypeLaw (y : FrequencyState Deme Locus Allele) (deme : Deme)
+    (inbreeding : Deme → ℝ) (hF0 : ∀ other, 0 ≤ inbreeding other)
+    (hF1 : ∀ other, inbreeding other ≤ 1) :
+    FiniteReportLaw (FullHaplotype Locus Allele × FullHaplotype Locus Allele) :=
+  inbredMating (stateLaw y deme) (inbreeding deme) (hF0 deme) (hF1 deme)
+
+/-- **Diploid expected portability**: the target-over-source ratio
+`(E N_t · E D_s) / (E D_t · E N_s)` of expected diploid squared-correlation numerators and
+denominators under a kernel started at `x₀`, each deme forming its gamete pairs at its own
+inbreeding coefficient. -/
+def expectedDiploidPortability
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    (x0 : FrequencyState Deme Locus Allele) (source target : Deme) (inbreeding : Deme → ℝ)
+    (hF0 : ∀ other, 0 ≤ inbreeding other) (hF1 : ∀ other, inbreeding other ≤ 1)
+    (score outcome : FullHaplotype Locus Allele × FullHaplotype Locus Allele → ℝ) : ℝ :=
+  ((∫ y, correlationNumerator (stateGenotypeLaw y target inbreeding hF0 hF1) score outcome
+        ∂(κ x0))
+      * ∫ y, correlationDenominator (stateGenotypeLaw y source inbreeding hF0 hF1) score outcome
+        ∂(κ x0))
+    / ((∫ y, correlationDenominator (stateGenotypeLaw y target inbreeding hF0 hF1) score outcome
+        ∂(κ x0))
+      * ∫ y, correlationNumerator (stateGenotypeLaw y source inbreeding hF0 hF1) score outcome
+        ∂(κ x0))
+
+/-- **The diploid end-to-end law transfers from the haploid one.**  For additive score and
+outcome, the diploid expected portability equals the haploid expected portability under every
+Markov kernel, whatever the source and target inbreeding coefficients: `4 (1 + F_t)²` and
+`4 (1 + F_s)²` cancel between numerator and denominator. -/
+theorem expectedDiploidPortability_diploidSum
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    (x0 : FrequencyState Deme Locus Allele) (source target : Deme) (inbreeding : Deme → ℝ)
+    (hF0 : ∀ other, 0 ≤ inbreeding other) (hF1 : ∀ other, inbreeding other ≤ 1)
+    (score outcome : FullHaplotype Locus Allele → ℝ) :
+    expectedDiploidPortability κ x0 source target inbreeding hF0 hF1 (diploidSum score)
+        (diploidSum outcome)
+      = expectedPortability κ x0 source target score outcome := by
+  have hscale : ∀ deme, 4 * (1 + inbreeding deme) ^ 2 ≠ 0 := fun deme ↦
+    (mul_pos (by norm_num) (pow_pos (by linarith [hF0 deme]) 2)).ne'
+  have hcancel : ∀ a b A B C D : ℝ, a ≠ 0 → b ≠ 0 →
+      a * A * (b * B) / (a * C * (b * D)) = A * B / (C * D) := by
+    intro a b A B C D ha hb
+    rw [show a * A * (b * B) = a * b * (A * B) by ring,
+      show a * C * (b * D) = a * b * (C * D) by ring]
+    exact mul_div_mul_left _ _ (mul_ne_zero ha hb)
+  simp only [expectedDiploidPortability, expectedPortability, stateGenotypeLaw,
+    correlationNumerator_inbredMating_diploidSum, correlationDenominator_inbredMating_diploidSum,
+    integral_const_mul]
+  exact hcancel _ _ _ _ _ _ (hscale target) (hscale source)
+
+/-- **The expected diploid numerator along a history.**  For additive score and outcome it is
+`4 (1 + F)²` times the haploid coefficient vector dotted with the chronological propagator applied
+to the budget-4 moments of `x₀`. -/
+theorem integral_diploidNumerator_historyEventKernel (ℓ₀ : Locus)
+    (hap₀ : FullHaplotype Locus Allele)
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (x0 : FrequencyState Deme Locus Allele) (deme : Deme) (inbreeding : Deme → ℝ)
+    (hF0 : ∀ other, 0 ≤ inbreeding other) (hF1 : ∀ other, inbreeding other ≤ 1)
+    (score outcome : FullHaplotype Locus Allele → ℝ) :
+    ∫ y, correlationNumerator (stateGenotypeLaw y deme inbreeding hF0 hF1) (diploidSum score)
+        (diploidSum outcome) ∂(historyEventKernel ℓ₀ hap₀ events x0)
+      = 4 * (1 + inbreeding deme) ^ 2
+        * (budgetCoefficients ℓ₀ (fun _ ↦ 4) (numeratorPolynomial deme score outcome)
+          ⬝ᵥ (historyEventPropagator (fun _ ↦ 4) events
+            *ᵥ budgetMomentFeature (fun _ ↦ 4) x0)) := by
+  simp only [stateGenotypeLaw, correlationNumerator_inbredMating_diploidSum, integral_const_mul]
+  rw [integral_correlationNumerator_historyEventKernel]
+
+/-- **The expected diploid denominator along a history.** -/
+theorem integral_diploidDenominator_historyEventKernel (ℓ₀ : Locus)
+    (hap₀ : FullHaplotype Locus Allele)
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (x0 : FrequencyState Deme Locus Allele) (deme : Deme) (inbreeding : Deme → ℝ)
+    (hF0 : ∀ other, 0 ≤ inbreeding other) (hF1 : ∀ other, inbreeding other ≤ 1)
+    (score outcome : FullHaplotype Locus Allele → ℝ) :
+    ∫ y, correlationDenominator (stateGenotypeLaw y deme inbreeding hF0 hF1) (diploidSum score)
+        (diploidSum outcome) ∂(historyEventKernel ℓ₀ hap₀ events x0)
+      = 4 * (1 + inbreeding deme) ^ 2
+        * (budgetCoefficients ℓ₀ (fun _ ↦ 4) (denominatorPolynomial deme score outcome)
+          ⬝ᵥ (historyEventPropagator (fun _ ↦ 4) events
+            *ᵥ budgetMomentFeature (fun _ ↦ 4) x0)) := by
+  simp only [stateGenotypeLaw, correlationDenominator_inbredMating_diploidSum, integral_const_mul]
+  rw [integral_correlationDenominator_historyEventKernel]
+
+/-- **The diploid end-to-end portability law along a history of epochs, splits and pulses.**  For
+additive score and outcome, diploid expected portability is the haploid rational function
+`momentPortability` of the chronological propagator applied to the budget-4 moments of `x₀`. -/
+theorem expectedDiploidPortability_historyEventKernel (ℓ₀ : Locus)
+    (hap₀ : FullHaplotype Locus Allele)
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (x0 : FrequencyState Deme Locus Allele) (source target : Deme) (inbreeding : Deme → ℝ)
+    (hF0 : ∀ other, 0 ≤ inbreeding other) (hF1 : ∀ other, inbreeding other ≤ 1)
+    (score outcome : FullHaplotype Locus Allele → ℝ) :
+    expectedDiploidPortability (historyEventKernel ℓ₀ hap₀ events) x0 source target inbreeding
+        hF0 hF1 (diploidSum score) (diploidSum outcome)
+      = momentPortability ℓ₀ source target score outcome
+          (historyEventPropagator (fun _ ↦ 4) events *ᵥ budgetMomentFeature (fun _ ↦ 4) x0) := by
+  rw [expectedDiploidPortability_diploidSum, expectedPortability_historyEventKernel]
+
+/-- **The diploid end-to-end portability law along a time-varying rate history.** -/
+theorem expectedDiploidPortability_rateHistoryKernel
+    {rates : ℝ → NeutralRates Deme Locus Allele} {T : ℝ} (hT : 0 ≤ T)
+    (hcontinuous : ∀ capacity : Locus → ℕ,
+      ContinuousOn (fun t ↦ dualGenerator (rates t) capacity) (Set.Icc 0 T))
+    (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele) (x0 : FrequencyState Deme Locus Allele)
+    (source target : Deme) (inbreeding : Deme → ℝ) (hF0 : ∀ other, 0 ≤ inbreeding other)
+    (hF1 : ∀ other, inbreeding other ≤ 1) (score outcome : FullHaplotype Locus Allele → ℝ) :
+    expectedDiploidPortability (rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous) x0 source target
+        inbreeding hF0 hF1 (diploidSum score) (diploidSum outcome)
+      = momentPortability ℓ₀ source target score outcome
+          (rateHistoryDualPropagator rates (fun _ ↦ 4) T
+            *ᵥ budgetMomentFeature (fun _ ↦ 4) x0) := by
+  rw [expectedDiploidPortability_diploidSum, expectedPortability_rateHistoryKernel]
+
+/-- **Diploid portability sees the history only through finitely many moments.**  Two histories,
+from two initial states, whose propagated budget-4 moments agree have equal diploid expected
+portability for every additive score and outcome and every pair of inbreeding coefficients. -/
+theorem expectedDiploidPortability_eq_of_moments_eq (ℓ₀ : Locus)
+    (hap₀ : FullHaplotype Locus Allele)
+    {first second : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme)}
+    {x₁ x₂ : FrequencyState Deme Locus Allele}
+    (hmoments : historyEventPropagator (fun _ ↦ 4) first *ᵥ budgetMomentFeature (fun _ ↦ 4) x₁
+      = historyEventPropagator (fun _ ↦ 4) second *ᵥ budgetMomentFeature (fun _ ↦ 4) x₂)
+    (source target : Deme) (inbreeding : Deme → ℝ) (hF0 : ∀ other, 0 ≤ inbreeding other)
+    (hF1 : ∀ other, inbreeding other ≤ 1) (score outcome : FullHaplotype Locus Allele → ℝ) :
+    expectedDiploidPortability (historyEventKernel ℓ₀ hap₀ first) x₁ source target inbreeding
+        hF0 hF1 (diploidSum score) (diploidSum outcome)
+      = expectedDiploidPortability (historyEventKernel ℓ₀ hap₀ second) x₂ source target
+          inbreeding hF0 hF1 (diploidSum score) (diploidSum outcome) := by
+  rw [expectedDiploidPortability_historyEventKernel, expectedDiploidPortability_historyEventKernel,
+    hmoments]
+
+/-- **The expected squared correlation transfers.**  For additive score and outcome the diploid
+squared correlation, read as zero where it is undefined, has the haploid expectation under every
+kernel, so the series of `EndToEndCorrelationSeries` expands it. -/
+theorem integral_squaredCorrelation_stateGenotypeLaw
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    (x0 : FrequencyState Deme Locus Allele) (deme : Deme) (inbreeding : Deme → ℝ)
+    (hF0 : ∀ other, 0 ≤ inbreeding other) (hF1 : ∀ other, inbreeding other ≤ 1)
+    (score outcome : FullHaplotype Locus Allele → ℝ) :
+    ∫ y, ((stateGenotypeLaw y deme inbreeding hF0 hF1).squaredCorrelation (diploidSum score)
+        (diploidSum outcome)).getD 0 ∂(κ x0)
+      = EndToEndCorrelationSeries.expectedSquaredCorrelation κ x0 deme score outcome := by
+  unfold EndToEndCorrelationSeries.expectedSquaredCorrelation
+  simp only [stateGenotypeLaw, squaredCorrelation_inbredMating_diploidSum]
+
+end History
+
 end
 
 end Descent.Portability.EndToEndDiploidLaw
