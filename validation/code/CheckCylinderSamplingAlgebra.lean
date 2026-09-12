@@ -30,5 +30,10 @@ namespace Descent.Pangenome.AncestralLocality.CylinderSamplingAlgebra
 #print axioms samplingAlgebra_topologicalClosure_eq_top
 #print axioms exists_samplingAlgebra_near
 #print axioms eq_of_eqOn_samplingAlgebra
+#print axioms patternIndicator
+#print axioms samplingPolynomial
+#print axioms samplingPolynomial_mem_samplingAlgebra
+#print axioms readout_eq_sum_patterns
+#print axioms samplingPolynomial_apply
 
 end Descent.Pangenome.AncestralLocality.CylinderSamplingAlgebra

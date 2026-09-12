@@ -33,11 +33,13 @@ a compact space, which Mathlib does not provide at this pin.
 
 The sampling algebra. A cylinder observable (`cylinderObservable`) reads a genome through finitely
 many features, and its integral against a genome law is a linear sampling observable
-(`samplingMonomial`). `samplingAlgebra V` is the subalgebra they generate. Its members are the
-sampling polynomials `H_f(p) = ∫ f(x_1, …, x_n) p(dx_1) … p(dx_n)` of cylinder readouts `f`:
-products of linear sampling observables are those with product readouts, and a cylinder readout
-of `n`
-genomes is a finite combination of products. Two genome laws with equal linear sampling
+(`samplingMonomial`). `samplingAlgebra V` is the subalgebra they generate. The sampling polynomial
+`samplingPolynomial n features readout` of a cylinder readout `f` of `n` genomes combines, over
+the letter patterns of the `n` genomes, the value of `f` with the product of the linear sampling
+observables of the pattern (`readout_eq_sum_patterns`). It lies in the algebra
+(`samplingPolynomial_mem_samplingAlgebra`) and is the integral against `n` independent genomes,
+`H_f(p) = ∫ f(x_1, …, x_n) p(dx_1) … p(dx_n)` (`samplingPolynomial_apply`). Two genome laws with
+equal linear sampling
 observables are equal (`measure_eq_of_samplingMonomial_eq`), because the cylinders form a π-system
 generating the product σ-algebra, so the algebra separates points
 (`samplingAlgebra_separatesPoints`).
@@ -49,8 +51,8 @@ is a uniform limit of cylinder sampling polynomials (`exists_samplingAlgebra_nea
 uniqueness step of Theorem 9: two continuous maps on `C(P(H))` into a Hausdorff space that agree
 on the sampling polynomials agree (`eq_of_eqOn_samplingAlgebra`).
 
-Scope. The sampling polynomials of `n > 1` genomes are reached through the generated algebra, not
-defined as integrals against product measures. Nothing about the dynamics is stated here.
+Scope. Every sampling polynomial lies in the generated algebra; that every member of the algebra
+is a single sampling polynomial is not formalized. Nothing about the dynamics is stated here.
 
 ## Empirical status
 
@@ -316,6 +318,82 @@ theorem eq_of_eqOn_samplingAlgebra {E : Type*} [TopologicalSpace E] [T2Space E]
   exact hfirst.ext_on hdense hsecond hagree
 
 end Density
+
+/-! ## Sampling polynomials of several genomes -/
+
+section Polynomials
+
+variable {V : Type*} [Countable V]
+
+/-- The indicator readout of one letter pattern on a finite set of features. -/
+def patternIndicator (features : Finset V) (pattern : features → Bool) :
+    (features → Bool) → ℝ :=
+  fun letters ↦ if letters = pattern then 1 else 0
+
+/-- **The cylinder sampling polynomial** of a readout of `n` genomes through finitely many
+features: over the letter patterns of the `n` genomes, the readout at the pattern times the
+product of the linear sampling observables of the pattern's letters. -/
+def samplingPolynomial (n : ℕ) (features : Finset V)
+    (readout : (Fin n → features → Bool) → ℝ) : C(ProbabilityMeasure (V → Bool), ℝ) :=
+  ∑ patterns : Fin n → features → Bool,
+    readout patterns • ∏ k, samplingMonomial features (patternIndicator features (patterns k))
+
+/-- Every cylinder sampling polynomial lies in the sampling algebra. -/
+theorem samplingPolynomial_mem_samplingAlgebra (n : ℕ) (features : Finset V)
+    (readout : (Fin n → features → Bool) → ℝ) :
+    samplingPolynomial n features readout ∈ samplingAlgebra V :=
+  sum_mem fun _ _ ↦ SMulMemClass.smul_mem _
+    (prod_mem fun _ _ ↦ samplingMonomial_mem_samplingAlgebra features _)
+
+/-- A readout of `n` genomes is the combination of its values with the pattern indicators of the
+letters it reads. -/
+theorem readout_eq_sum_patterns (n : ℕ) (features : Finset V)
+    (readout : (Fin n → features → Bool) → ℝ) (letters : Fin n → features → Bool) :
+    readout letters = ∑ patterns : Fin n → features → Bool,
+      readout patterns * ∏ k, patternIndicator features (patterns k) (letters k) := by
+  have hproduct : ∀ patterns : Fin n → features → Bool,
+      ∏ k, patternIndicator features (patterns k) (letters k) =
+        if letters = patterns then 1 else 0 := by
+    intro patterns
+    by_cases hequal : letters = patterns
+    · subst hequal
+      simp [patternIndicator]
+    · rw [if_neg hequal]
+      obtain ⟨k, hk⟩ : ∃ k, letters k ≠ patterns k := by
+        by_contra hnone
+        push_neg at hnone
+        exact hequal (funext hnone)
+      exact Finset.prod_eq_zero (Finset.mem_univ k) (by simp [patternIndicator, hk])
+  simp only [hproduct, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
+
+/-- **A sampling polynomial is the expectation of its readout over `n` independent genomes.** Its
+value at a genome law `p` is `∫ f(x_1, …, x_n) p(dx_1) … p(dx_n)`. -/
+theorem samplingPolynomial_apply (n : ℕ) (features : Finset V)
+    (readout : (Fin n → features → Bool) → ℝ) (μ : ProbabilityMeasure (V → Bool)) :
+    samplingPolynomial n features readout μ =
+      ∫ genomes, readout (fun k ↦ features.restrict (genomes k))
+        ∂(Measure.pi fun _ : Fin n ↦ (μ : Measure (V → Bool))) := by
+  have hcontinuous : ∀ patterns : Fin n → features → Bool,
+      Continuous fun genomes : Fin n → V → Bool ↦ readout patterns *
+        ∏ k, patternIndicator features (patterns k) (features.restrict (genomes k)) :=
+    fun patterns ↦ continuous_const.mul (continuous_finset_prod _ fun k _ ↦
+      continuous_of_discreteTopology.comp
+        ((continuous_pi fun v ↦ continuous_apply v.1).comp (continuous_apply k)))
+  have hexpand : (fun genomes : Fin n → V → Bool ↦
+      readout (fun k ↦ features.restrict (genomes k))) =
+        fun genomes ↦ ∑ patterns : Fin n → features → Bool, readout patterns *
+          ∏ k, patternIndicator features (patterns k) (features.restrict (genomes k)) :=
+    funext fun genomes ↦ readout_eq_sum_patterns n features readout _
+  rw [hexpand, integral_finset_sum _ fun patterns _ ↦
+    (hcontinuous patterns).integrable_of_hasCompactSupport (HasCompactSupport.of_compactSpace _)]
+  simp only [samplingPolynomial, ContinuousMap.sum_apply, ContinuousMap.smul_apply,
+    ContinuousMap.prod_apply, smul_eq_mul]
+  refine Finset.sum_congr rfl fun patterns _ ↦ ?_
+  rw [integral_const_mul, integral_fintype_prod_eq_prod fun k (genome : V → Bool) ↦
+    patternIndicator features (patterns k) (features.restrict genome)]
+  rfl
+
+end Polynomials
 
 end
 
