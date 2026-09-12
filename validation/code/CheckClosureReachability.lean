@@ -29,3 +29,9 @@ open Descent.Pangenome.AncestralLocality
 #print axioms iterate_refinementStep_eq_univ_path
 #print axioms not_autonomous_pair
 #print axioms not_autonomous_pair_path
+#print axioms sum_edgeRates_mul
+#print axioms exchange_eq_orderedChild
+#print axioms eventKernel_eq_exchangeKernel
+#print axioms checkKernel_edgeRates
+#print axioms refinementStep_compatibilityKernel_agreeOn
+#print axioms iterate_refinementStep_compatibilityKernel_eq_reach

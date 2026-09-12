@@ -8,6 +8,7 @@ import Mathlib.Combinatorics.SimpleGraph.Hasse
 import Mathlib.Data.Fintype.Pi
 import Mathlib.Tactic
 import Descent.Layer
+import Descent.Pangenome.AncestralLocality.CompatibilityNeutrality
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program
@@ -51,12 +52,21 @@ fixed point (`refinementStep_rel_of_autonomous`), so the pair `(π_i, π_k)` is 
 whenever an outside checker of `{i, k}` exists (`not_autonomous_pair`), already on the path of
 three features (`not_autonomous_pair_path`).
 
+**The compatibility kernel.** At the rate matrix `edgeRates G` of a `CheckingGraph`, the
+checking kernel here is `CompatibilityNeutrality`'s `compatibilityKernel G`
+(`checkKernel_edgeRates`, through `exchange_eq_orderedChild`, `eventKernel_eq_exchangeKernel` and
+`copyKernel_eq_halfMix`), so (5.2) and (5.1) hold for it verbatim
+(`refinementStep_compatibilityKernel_agreeOn`,
+`iterate_refinementStep_compatibilityKernel_eq_reach`).
+
 Scope. The hereditary refinement `Φ_K` (`refinementStep`), autonomy (2.2) (`Autonomous`), the
-event and checking kernels and the neutrality (4.4) are local transcriptions of the note's
-§2-§4. The layer's modules HeredityKernel, HereditaryClosure and CompatibilityNeutrality own
-those objects; until they are on main this file proves the combinatorial core on its own copies,
-and it switches to their names when they land. The hereditary closure `P_*` is read as the
-stable value of the iteration (3.2): what is proved is the value of every iterate and the fixed
+event and checking kernels and the neutrality (4.4) are this file's own transcriptions of the
+note's §2-§4, kept because the §6 and Theorem 1 modules of the layer are stated through them. The
+kernels are identified with CompatibilityNeutrality's above; the module ReachabilityClosureTie
+identifies `refinementStep` and `Autonomous` with HereditaryClosure's refinement and autonomy.
+Rates are a matrix `r : V → V → ℝ` with edges where `0 < r i j`. The hereditary closure `P_*` is
+read as the stable value of the iteration (3.2): what is proved is the value of every iterate and
+the fixed
 point, not Theorem 1's universal property, which belongs to HereditaryClosure. The difference
 formula (5.3) sums over all pairs `i ∈ A`, `j ∉ A`; restricting to edges changes nothing because
 the rates vanish off edges. The runtime remark of §5.1 is not a theorem and is not stated.
@@ -829,6 +839,105 @@ theorem not_autonomous_pair_path :
     not_autonomous_pair (v := 2) (pathRates_nonneg 3) (by decide) (by decide) (by decide)
       (mem_outNbhd.mpr ⟨1, mem_insert_of_mem (mem_singleton_self 1),
         pathRates_pos (SimpleGraph.pathGraph_adj.mpr (by decide))⟩)⟩
+
+/-! ### The compatibility kernel of `CompatibilityNeutrality` -/
+
+/-- The rates of a checking graph as a rate matrix: `r_ij` on an edge `i → j`, zero off the
+edges. -/
+def edgeRates (G : CheckingGraph V) (i j : V) : ℝ :=
+  if (i, j) ∈ G.edges then G.rate (i, j) else 0
+
+/-- The rate matrix of a checking graph is nonnegative. -/
+theorem edgeRates_nonneg (G : CheckingGraph V) (i j : V) : 0 ≤ edgeRates G i j := by
+  unfold edgeRates
+  split_ifs with h
+  · exact (G.rate_pos _ h).le
+  · exact le_rfl
+
+/-- The rate matrix is positive exactly on the edges. -/
+theorem edgeRates_pos_iff (G : CheckingGraph V) {i j : V} :
+    0 < edgeRates G i j ↔ (i, j) ∈ G.edges := by
+  unfold edgeRates
+  split_ifs with h
+  · exact ⟨fun _ ↦ h, fun _ ↦ G.rate_pos _ h⟩
+  · exact ⟨fun h' ↦ absurd h' (lt_irrefl 0), fun h' ↦ absurd h' h⟩
+
+/-- `N⁺_G(A)` at the rate matrix: the checkers of the targets in `A` along the edges. -/
+theorem mem_outNbhd_edgeRates (G : CheckingGraph V) {A : Finset V} {j : V} :
+    j ∈ outNbhd (edgeRates G) A ↔ ∃ i ∈ A, (i, j) ∈ G.edges := by
+  simp only [mem_outNbhd, edgeRates_pos_iff]
+
+/-- A rate-weighted double sum over the rate matrix is the sum over the edges. -/
+theorem sum_edgeRates_mul (G : CheckingGraph V) (c : V → V → ℝ) :
+    ∑ i, ∑ j, edgeRates G i j * c i j = ∑ e ∈ G.edges, G.rate e * c e.1 e.2 := by
+  rw [← Fintype.sum_ite_mem G.edges, ← univ_product_univ, sum_product]
+  refine sum_congr rfl fun i _ ↦ sum_congr rfl fun j _ ↦ ?_
+  unfold edgeRates
+  split_ifs <;> simp
+
+/-- The total rate of the rate matrix is the graph's total rate `R`. -/
+theorem totalRate_edgeRates (G : CheckingGraph V) : totalRate (edgeRates G) = G.totalRate := by
+  have h := sum_edgeRates_mul G fun _ _ ↦ 1
+  simp only [mul_one] at h
+  exact h
+
+omit [Fintype V] in
+/-- **The ordered child of this module is `CompatibilityNeutrality`'s**, spec (4.1). -/
+theorem exchange_eq_orderedChild (i j : V) (x y : V → Bool) :
+    exchange i j x y = orderedChild i j x y := by
+  funext k
+  by_cases h : x j = y j
+  · by_cases hk : k = i
+    · subst hk
+      rw [exchange_of_eq h, Function.update_self]
+      simp [orderedChild, h]
+    · rw [exchange_apply_of_ne x y hk]
+      simp [orderedChild, hk]
+  · rw [exchange_of_ne h]
+    simp [orderedChild, h]
+
+/-- **The event kernel of this module is `CompatibilityNeutrality`'s `K_ij`**, spec (4.2). -/
+theorem eventKernel_eq_exchangeKernel (i j : V) (x y z : V → Bool) :
+    eventKernel i j x y z = exchangeKernel i j x y z := by
+  simp only [eventKernel, exchangeKernel, halfMix, exchange_eq_orderedChild]
+  split_ifs <;> norm_num
+
+/-- Unbiased copying of this module is `CompatibilityNeutrality`'s `halfMix`. -/
+theorem copyKernel_eq_halfMix (x y z : V → Bool) : copyKernel x y z = halfMix x y z := by
+  simp only [copyKernel, halfMix]
+  split_ifs <;> norm_num
+
+/-- **The checking kernel of this module is `CompatibilityNeutrality`'s `K_G`**, spec (4.3), at
+the rate matrix of the graph. -/
+theorem checkKernel_edgeRates (G : CheckingGraph V) :
+    checkKernel (edgeRates G) = compatibilityKernel G := by
+  funext x y z
+  unfold checkKernel compatibilityKernel
+  rw [totalRate_edgeRates]
+  by_cases h : G.edges = ∅
+  · have hR : G.totalRate = 0 := by rw [CheckingGraph.totalRate, h, sum_empty]
+    rw [if_pos hR, if_pos h, copyKernel_eq_halfMix]
+  · have hR : G.totalRate ≠ 0 := (G.totalRate_pos (nonempty_iff_ne_empty.mpr h)).ne'
+    rw [if_neg hR, if_neg h, sum_edgeRates_mul G fun i j ↦ eventKernel i j x y z]
+    simp only [eventKernel_eq_exchangeKernel]
+
+/-- **Spec (5.2) for `compatibilityKernel`.** For `|A| ≥ 2`, one hereditary refinement step of
+`K_G` turns `P_{π_A}` into `P_{π_{A ∪ N⁺_G(A)}}`. -/
+theorem refinementStep_compatibilityKernel_agreeOn (G : CheckingGraph V) {A : Finset V}
+    (hA : 2 ≤ A.card) :
+    refinementStep (compatibilityKernel G) (agreeOn A) =
+      agreeOn (A ∪ outNbhd (edgeRates G) A) := by
+  rw [← checkKernel_edgeRates]
+  exact refinementStep_agreeOn (edgeRates_nonneg G) hA
+
+/-- **Spec (5.1) for `compatibilityKernel`.** For `|A| ≥ 2`, every refinement of `P_{π_A}` from
+the `|V|`-th on is `P_{π_{Reach_G(A)}}`. -/
+theorem iterate_refinementStep_compatibilityKernel_eq_reach (G : CheckingGraph V)
+    {A : Finset V} (hA : 2 ≤ A.card) {n : ℕ} (hn : Fintype.card V ≤ n) :
+    (refinementStep (compatibilityKernel G))^[n] (agreeOn A) =
+      agreeOn (directedReach (edgeRates G) A) := by
+  rw [← checkKernel_edgeRates]
+  exact iterate_refinementStep_agreeOn_eq_reach (edgeRates_nonneg G) hA hn
 
 end
 
