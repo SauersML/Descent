@@ -32,7 +32,8 @@ A decision raises the weighted count `weightedCount w` by at most `w i + 2 w j`
 (`weightedCount_coalesceSupports_le`). With `Σ_j r i j ≤ D` and `w j ≤ κ w i` on every edge of
 positive rate the generator obeys `L Z^{(w)} ≤ D (1 + 2κ) Z^{(w)}`
 (`supportGenerator_weightedCount_le`); the plain count gives `L Z ≤ 3 D Z`
-(`supportGenerator_supportSize_le`), and the decision rate is at most `D Z` (`supportDecisionRate_le`).
+(`supportGenerator_supportSize_le`), and the decision rate is at most `D Z`
+(`supportDecisionRate_le`).
 
 Grönwall's inequality along a right derivative is `le_mul_exp_of_hasDerivWithinAt`. Through it,
 `integral_le_mul_exp_of_supportGenerator_le` turns a pointwise bound `L_anc F ≤ K F` into
@@ -513,7 +514,8 @@ theorem integral_branchings_le [MeasurableSingletonClass (Multiset (Finset V))]
     intervalIntegral.integral_mono_on hT hrate ((hcont.intervalIntegrable_of_Icc hT).const_mul D)
       fun t ht ↦ by
         rw [← integral_const_mul]
-        exact integral_mono (hintR t ht) ((hint t ht).const_mul _) fun s ↦ supportDecisionRate_le hD s
+        exact integral_mono (hintR t ht) ((hint t ht).const_mul _)
+          fun s ↦ supportDecisionRate_le hD s
   refine le_div_three_mul_exp_sub_one hD0 hT hcont
     (integral_supportSize_le hr hD hc hμ0 hint hintL hcont hdynkin) ?_
   rw [hcomp, ← intervalIntegral.integral_const_mul]
