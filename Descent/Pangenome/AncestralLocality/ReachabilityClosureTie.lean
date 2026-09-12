@@ -66,17 +66,8 @@ theorem block_eq_filter (P : Setoid H) (z : H) : block P z = univ.filter fun w �
 (3.1) is `HereditaryClosure`'s `refinement`, for every kernel and every partition. -/
 theorem refinementStep_eq_refinement (K : H → H → H → ℝ) (P : Setoid H) :
     refinementStep K P = refinement K P := by
-  have hmass : ∀ x y z, ∑ w ∈ univ.filter (fun w ↦ P.r w z), K x y w = blockMass K P x y z := by
-    intro x y z
-    rw [blockMass, kernelMass, block_eq_filter]
   refine Setoid.ext fun x x' ↦ ?_
   rw [refinement_rel_iff]
-  constructor
-  · intro h
-    obtain ⟨hP, hsum⟩ := refinementStep_r_iff.mp h
-    exact ⟨hP, fun y z ↦ by rw [← hmass, ← hmass]; exact hsum y z⟩
-  · rintro ⟨hP, hsum⟩
-    exact refinementStep_r_iff.mpr ⟨hP, fun y z ↦ by rw [hmass, hmass]; exact hsum y z⟩
 
 /-- The iterates of the two refinement steps agree. -/
 theorem iterate_refinementStep_eq_iterate_refinement (K : H → H → H → ℝ) (P : Setoid H)
