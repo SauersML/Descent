@@ -18,16 +18,44 @@ that the graph's report is connected at scaled time `U` converges to `Pr(T_p ≤
 `U ≥ 0`.  Convergence in law is the statement about the laws themselves: the laws of the scaled
 connection times converge to the law of `T_p` in the weak topology on probability measures on `ℝ`.
 
-This file proves the criterion that turns the first into the second: distribution functions that
-converge at every point give convergence in law (`tendsto_probabilityMeasure_of_tendsto_cdf`).  The
-half-open intervals form a π-system containing arbitrarily small neighborhoods of every point, and
-the measure of `(a, b]` is the increment of the distribution function, so Mathlib's π-system form of
-the portmanteau theorem applies.
+This file builds both laws and proves that convergence.
+
+## The steps
+
+Distribution functions that converge at every point give convergence in law
+(`tendsto_probabilityMeasure_of_tendsto_cdf`): the half-open intervals form a π-system containing
+arbitrarily small neighborhoods of every point, the measure of `(a, b]` is the increment of the
+distribution function, and Mathlib's π-system form of the portmanteau theorem applies.
+
+The two distribution functions are Poisson mixtures `Σ_m Pr(N_u = m) a_m` of the probabilities
+`a_m` that a skeleton has connected by step `m`: the report's skeleton for the prelimit laws, and
+the skeleton of `Z_p` on the labels for `T_p`
+(`connectionProbability_eq_poissonMixture`).  A mixture of a nondecreasing sequence grows with
+the mean, because Poisson laws add; it is continuous in the mean, by the M-test; and it tends to one
+when the sequence does.  The report connects eventually, because each Kingman step lowers the
+expected excess of blocks by at least `1/n²` of itself; `T_p` is finite once every `p_i > 0`,
+because every partition other than the top then has a positive crossing rate.
 
 ## Main results
 
 - `tendsto_probabilityMeasure_of_tendsto_cdf`: convergence of the distribution functions at every
   point gives convergence in law.
+- `monotone_poissonMixture`, `continuous_poissonSeries`, `tendsto_poissonMixture_atTop`: the three
+  properties of Poisson mixtures.
+- `tendsto_sum_kingmanLaw_mul_top`: the uniformized report connects eventually.
+- `randomGraphConnectionLaw`, `cdf_randomGraphConnectionLaw`: the law of `T_p`, with the
+  random-graph connection probability as its distribution function.
+- `reportConnectionLaw`, `cdf_reportConnectionLaw`: the law of the scaled connection time of the
+  uniformized report.
+- `tendsto_reportConnectionLaw`: **(F3) in law**.
+
+## Scope
+
+As in `Descent.Pangenome.GraphCoalescent.MultiplicativeCoupling`, time is the rate-one
+uniformization in scaled time, and the prelimit law is that of the uniformized construction.  The
+law of `T_p` is the probability measure of its distribution function, the connection probability
+of the finite random graph of edges rung by time `u`; its construction as the image of independent
+exponential edge clocks is not formalized.
 
 ## Empirical status
 
