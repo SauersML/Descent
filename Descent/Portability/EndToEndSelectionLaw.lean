@@ -51,6 +51,20 @@ source and target two times of one population. Here source and target are demes 
 history of epochs, splits and pulses, fitness may differ between demes, and the bound is additive
 over epochs.
 
+Nonclosure. Under selection the budget-4 moments do not determine their own future, so no finite
+matrix law replaces the neutral one. One deme at one biallelic locus is enough. The allele
+frequencies `{0, 4, 8, 16, 17}/18` and `{1, 2, 10, 14, 18}/18` have equal power sums through the
+fourth power and different fifth power sums (`sum_frequencies_pow_eq`,
+`sum_frequencies_pow_five_ne`). So their uniform mixtures (`frequencyMixture`) agree on every
+budget-4 configuration moment (`configurationMoment_frequencyLaw_sum_eq`,
+`frequencyMixture_moments_eq`). The selection term of four carriers of one allele is
+`4 (s(true) - s(false)) q⁴ (1 - q)` (`eval_selectionGenerator_fourCarriers`), of degree five, and
+the two mixtures give it different expectations (`frequencyMixture_selection_ne`). Hence no
+coefficient vector over the budget-4 configurations reproduces it
+(`not_exists_budgetFour_selectionClosure`), and two selected families started from the mixtures
+agree on no initial time interval (`not_budgetFour_moments_eq_of_selection`). Neutral families
+started from the same mixtures agree for all time (`budgetFour_moments_eq_of_neutral`).
+
 Scope. Selection is haploid at one locus, with one fitness table for the whole history. The
 constant carries the coefficient masses of the metric polynomials, not a sup norm over sampled
 genomes. The forward moment equation with selection is a hypothesis on the families; the selected
@@ -464,6 +478,327 @@ theorem abs_selectedPortability_sub_neutral_le (ℓ₀ : Locus) (hap₀ : FullHa
   refine hcross.trans ?_
   rw [one_pow, mul_one]
   exact mul_le_mul_of_nonneg_left hmoments (by positivity)
+
+/-! ## Why finitely many moments give no exact law under selection -/
+
+section Nonclosure
+
+open Filter Topology
+
+/-- A sum over the haplotypes of one biallelic locus is a sum over its two alleles. -/
+theorem sum_unitHaplotype (g : FullHaplotype Unit (fun _ : Unit ↦ Bool) → ℝ) :
+    ∑ hap, g hap = g (fun _ ↦ true) + g (fun _ ↦ false) :=
+  (Fintype.sum_equiv (Equiv.funUnique Unit Bool) g (fun b ↦ g fun _ ↦ b)
+    fun hap ↦ congrArg g (funext fun _ ↦ rfl)).trans (Fintype.sum_bool _)
+
+/-- The law of one deme at one biallelic locus carrying allele `true` at frequency `q`. -/
+def frequencyLaw (q : ℝ) (hq : 0 ≤ q ∧ q ≤ 1) :
+    Unit → FiniteReportLaw (FullHaplotype Unit fun _ : Unit ↦ Bool) :=
+  fun _ ↦
+    { mass := fun hap ↦ if hap () then q else 1 - q
+      mass_nonneg := fun hap ↦ by
+        split_ifs
+        · exact hq.1
+        · linarith [hq.2]
+      mass_sum := by
+        rw [sum_unitHaplotype]
+        simp }
+
+/-- **A carrier of the biallelic locus counts `q` or `1 - q`**, by the allele it retains. -/
+theorem marginalFrequency_frequencyLaw (q : ℝ) (hq : 0 ≤ q ∧ q ≤ 1)
+    (τ : PartialType Unit Unit fun _ : Unit ↦ Bool) :
+    marginalFrequency (frequencyLaw q hq) τ = if τ.allele () = some true then q else 1 - q := by
+  obtain ⟨u, hu⟩ := τ.retained
+  obtain ⟨b, hb⟩ := Option.isSome_iff_exists.mp hu
+  have hagree : ∀ c : Bool, Agrees τ (fun _ ↦ c) ↔ b = c := by
+    intro c
+    constructor
+    · intro h
+      rcases h u with h0 | h0
+      · rw [hb] at h0
+        exact absurd h0 (by simp)
+      · rw [hb] at h0
+        exact Option.some.inj h0
+    · rintro rfl v
+      exact Or.inr (by cases u; cases v; exact hb)
+  rw [marginalFrequency, Finset.sum_filter, sum_unitHaplotype]
+  cases u
+  cases b <;> simp [hagree, hb, frequencyLaw]
+
+/-- The allele frequencies `0, 4/18, 8/18, 16/18, 17/18`. -/
+def firstFrequencies : Fin 5 → ℝ :=
+  ![0, 4 / 18, 8 / 18, 16 / 18, 17 / 18]
+
+/-- The allele frequencies `1/18, 2/18, 10/18, 14/18, 1`. Their power sums agree with those of
+`firstFrequencies` through the fourth power and differ at the fifth, as the Prouhet–Tarry–Escott
+sets `{0, 4, 8, 16, 17}` and `{1, 2, 10, 14, 18}` do. -/
+def secondFrequencies : Fin 5 → ℝ :=
+  ![1 / 18, 2 / 18, 10 / 18, 14 / 18, 1]
+
+/-- The first frequencies lie in the unit interval. -/
+theorem firstFrequencies_mem (k : Fin 5) : 0 ≤ firstFrequencies k ∧ firstFrequencies k ≤ 1 := by
+  fin_cases k <;> norm_num [firstFrequencies]
+
+/-- The second frequencies lie in the unit interval. -/
+theorem secondFrequencies_mem (k : Fin 5) :
+    0 ≤ secondFrequencies k ∧ secondFrequencies k ≤ 1 := by
+  fin_cases k <;> norm_num [secondFrequencies]
+
+/-- The two sets of frequencies have equal power sums through the fourth power. -/
+theorem sum_frequencies_pow_eq {m : ℕ} (hm : m ≤ 4) :
+    ∑ k, firstFrequencies k ^ m = ∑ k, secondFrequencies k ^ m := by
+  interval_cases m <;> norm_num [Fin.sum_univ_five, firstFrequencies, secondFrequencies]
+
+/-- The two sets of frequencies have different fifth power sums. -/
+theorem sum_frequencies_pow_five_ne :
+    ∑ k, firstFrequencies k ^ 5 ≠ ∑ k, secondFrequencies k ^ 5 := by
+  norm_num [Fin.sum_univ_five, firstFrequencies, secondFrequencies]
+
+/-- The uniform mixture of the laws at five frequencies, as an expectation functional over
+per-deme laws: a random initial state. -/
+def frequencyMixture (q : Fin 5 → ℝ) (hq : ∀ k, 0 ≤ q k ∧ q k ≤ 1) :
+    ExpFunctional (Unit → FiniteReportLaw (FullHaplotype Unit fun _ : Unit ↦ Bool)) where
+  eval f := (∑ k, f (frequencyLaw (q k) (hq k))) / 5
+  add_eval f g := by simp only [Pi.add_apply, Finset.sum_add_distrib, add_div]
+  smul_eval c f := by simp only [Pi.smul_apply, smul_eq_mul, ← Finset.mul_sum, mul_div_assoc]
+  const_one := by norm_num
+  nonneg_eval f hf := div_nonneg (Finset.sum_nonneg fun k _ ↦ hf _) (by norm_num)
+
+/-- **Configuration moments of the biallelic locus see only powers of the frequency.** If two
+sets of five frequencies have equal power sums through the fourth power, then the sums of
+`H_ζ q^m` over them agree whenever `ζ` has `n` carriers and `n + m ≤ 4`. -/
+theorem configurationMoment_frequencyLaw_sum_eq (q₁ q₂ : Fin 5 → ℝ)
+    (hq₁ : ∀ k, 0 ≤ q₁ k ∧ q₁ k ≤ 1) (hq₂ : ∀ k, 0 ≤ q₂ k ∧ q₂ k ≤ 1)
+    (hpow : ∀ m ≤ 4, ∑ k, q₁ k ^ m = ∑ k, q₂ k ^ m) :
+    ∀ (ζ : Multiset (PartialType Unit Unit fun _ : Unit ↦ Bool)) (m : ℕ),
+      Multiset.card ζ + m ≤ 4 →
+      ∑ k, configurationMoment (frequencyLaw (q₁ k) (hq₁ k)) ζ * q₁ k ^ m
+        = ∑ k, configurationMoment (frequencyLaw (q₂ k) (hq₂ k)) ζ * q₂ k ^ m := by
+  intro ζ
+  induction ζ using Multiset.induction_on with
+  | empty =>
+    intro m hm
+    simpa [configurationMoment] using hpow m (by simpa using hm)
+  | cons τ ζ ih =>
+    intro m hm
+    rw [Multiset.card_cons] at hm
+    simp only [configurationMoment_cons, marginalFrequency_frequencyLaw]
+    split_ifs
+    · have hshift : ∀ (q H : Fin 5 → ℝ),
+          ∑ k, q k * H k * q k ^ m = ∑ k, H k * q k ^ (m + 1) :=
+        fun q H ↦ Finset.sum_congr rfl fun k _ ↦ by ring
+      rw [hshift, hshift]
+      exact ih (m + 1) (by omega)
+    · have hsplit : ∀ (q H : Fin 5 → ℝ),
+          ∑ k, (1 - q k) * H k * q k ^ m = ∑ k, H k * q k ^ m - ∑ k, H k * q k ^ (m + 1) := by
+        intro q H
+        rw [← Finset.sum_sub_distrib]
+        exact Finset.sum_congr rfl fun k _ ↦ by ring
+      rw [hsplit, hsplit, ih m (by omega), ih (m + 1) (by omega)]
+
+/-- **The two mixtures agree through budget four**: every budget-4 configuration moment has the
+same expectation under both. -/
+theorem frequencyMixture_moments_eq
+    (ξ : BudgetConfiguration Unit Unit (fun _ : Unit ↦ Bool) (fun _ ↦ 4)) :
+    (frequencyMixture firstFrequencies firstFrequencies_mem fun law ↦
+        configurationMoment law ξ.1)
+      = frequencyMixture secondFrequencies secondFrequencies_mem fun law ↦
+        configurationMoment law ξ.1 := by
+  have hcard : Multiset.card ξ.1 + 0 ≤ 4 := by
+    simpa using card_le_capacity_total (fun _ : Unit ↦ 4) ξ.1 ξ.2
+  have h := configurationMoment_frequencyLaw_sum_eq firstFrequencies secondFrequencies
+    firstFrequencies_mem secondFrequencies_mem (fun m hm ↦ sum_frequencies_pow_eq hm) ξ.1 0 hcard
+  simp only [pow_zero, mul_one] at h
+  show (∑ k, configurationMoment (frequencyLaw (firstFrequencies k) (firstFrequencies_mem k))
+      ξ.1) / 5
+    = (∑ k, configurationMoment (frequencyLaw (secondFrequencies k) (secondFrequencies_mem k))
+      ξ.1) / 5
+  rw [h]
+
+/-- Four copies of the one-locus carrier of allele `true`. -/
+def fourCarriers : Multiset (PartialType Unit Unit fun _ : Unit ↦ Bool) :=
+  Multiset.replicate 4 (singleLocusType () () true)
+
+/-- The four carriers respect the budget of four copies. -/
+theorem withinBudget_fourCarriers : WithinBudget (fun _ : Unit ↦ 4) fourCarriers :=
+  fun _ ↦ (Multiset.countP_le_card _ _).trans (by simp [fourCarriers])
+
+/-- The four carriers as a budget-4 configuration: the fourth power of the allele frequency. -/
+def fourCarrierConfiguration : BudgetConfiguration Unit Unit (fun _ : Unit ↦ Bool) (fun _ ↦ 4) :=
+  ⟨fourCarriers, withinBudget_fourCarriers⟩
+
+/-- **The selection term of four carriers** at frequency `q` is `4 (s(true) - s(false)) q⁴ (1 - q)`:
+a polynomial of degree five in the frequency. -/
+theorem eval_selectionGenerator_fourCarriers (model : SelectionModel Unit Unit fun _ : Unit ↦ Bool)
+    (q : ℝ) (hq : 0 ≤ q ∧ q ≤ 1) :
+    eval (lawPoint (frequencyLaw q hq)) (selectionGenerator model (momentPolynomial fourCarriers))
+      = 4 * (model.fitness () true - model.fitness () false) * (q ^ 4 * (1 - q)) := by
+  have hlaw : ∀ (i : Unit) (hap : FullHaplotype Unit fun _ : Unit ↦ Bool),
+      lawPoint (frequencyLaw q hq) (i, hap) = if hap () then q else 1 - q := fun _ _ ↦ rfl
+  have hdeme : (singleLocusType () () true : PartialType Unit Unit fun _ : Unit ↦ Bool).deme = () :=
+    rfl
+  have hallele :
+      (singleLocusType () () true : PartialType Unit Unit fun _ : Unit ↦ Bool).allele ()
+        = some true := by
+    simp [singleLocusType]
+  have hmean : ∀ i : Unit, eval (lawPoint (frequencyLaw q hq)) (meanFitnessPolynomial model i)
+      = q * model.fitness () true + (1 - q) * model.fitness () false := by
+    intro i
+    rw [eval_meanFitnessPolynomial, sum_unitHaplotype]
+    cases i
+    simp [hlaw]
+  have hcarrier : eval (lawPoint (frequencyLaw q hq))
+      (selectionGenerator model (marginalPolynomial (singleLocusType () () true)))
+      = q * (1 - q) * (model.fitness () true - model.fitness () false) := by
+    rw [eval_selectionGenerator_marginal, Finset.sum_filter, sum_unitHaplotype, hmean]
+    simp [satisfies_singleLocusType_iff, hlaw, hdeme]
+    ring
+  have hrest : eval (lawPoint (frequencyLaw q hq))
+      (momentPolynomial (Multiset.replicate 3 (singleLocusType () () true))) = q ^ 3 := by
+    rw [eval_momentPolynomial]
+    simp [configurationMoment, Multiset.map_replicate, Multiset.prod_replicate,
+      marginalFrequency_frequencyLaw, hallele]
+  rw [eval_selectionGenerator_momentPolynomial, fourCarriers, Multiset.map_replicate,
+    Multiset.sum_replicate, Multiset.replicate_succ, Multiset.erase_cons_head, hcarrier, hrest]
+  simp only [nsmul_eq_mul, Nat.cast_ofNat]
+  ring
+
+/-- **The two mixtures differ in their expected selection term** of four carriers whenever the
+two alleles differ in fitness: the term reads the fifth power sum. -/
+theorem frequencyMixture_selection_ne (model : SelectionModel Unit Unit fun _ : Unit ↦ Bool)
+    (hfit : model.fitness () true ≠ model.fitness () false) :
+    (frequencyMixture firstFrequencies firstFrequencies_mem fun law ↦
+        eval (lawPoint law) (selectionGenerator model (momentPolynomial fourCarriers)))
+      ≠ frequencyMixture secondFrequencies secondFrequencies_mem fun law ↦
+        eval (lawPoint law) (selectionGenerator model (momentPolynomial fourCarriers)) := by
+  show (∑ k, eval (lawPoint (frequencyLaw (firstFrequencies k) (firstFrequencies_mem k)))
+      (selectionGenerator model (momentPolynomial fourCarriers))) / 5
+    ≠ (∑ k, eval (lawPoint (frequencyLaw (secondFrequencies k) (secondFrequencies_mem k)))
+      (selectionGenerator model (momentPolynomial fourCarriers))) / 5
+  simp only [eval_selectionGenerator_fourCarriers]
+  intro h
+  have hsum : ∀ q : Fin 5 → ℝ,
+      ∑ k, 4 * (model.fitness () true - model.fitness () false) * (q k ^ 4 * (1 - q k))
+        = 4 * (model.fitness () true - model.fitness () false) * ∑ k, q k ^ 4
+          - 4 * (model.fitness () true - model.fitness () false) * ∑ k, q k ^ 5 := by
+    intro q
+    rw [Finset.mul_sum, Finset.mul_sum, ← Finset.sum_sub_distrib]
+    exact Finset.sum_congr rfl fun k _ ↦ by ring
+  rw [hsum, hsum, sum_frequencies_pow_eq (m := 4) le_rfl,
+    div_left_inj' (by norm_num : (5 : ℝ) ≠ 0), sub_right_inj] at h
+  exact sum_frequencies_pow_five_ne
+    (mul_left_cancel₀ (mul_ne_zero four_ne_zero (sub_ne_zero.mpr hfit)) h)
+
+/-- **The selection term closes on no budget-4 table.** For one deme at one biallelic locus with
+unequal fitnesses, no coefficient vector over the budget-4 configurations reproduces the selection
+generator of four carriers at every per-deme law. -/
+theorem not_exists_budgetFour_selectionClosure
+    (model : SelectionModel Unit Unit fun _ : Unit ↦ Bool)
+    (hfit : model.fitness () true ≠ model.fitness () false) :
+    ¬ ∃ c : BudgetConfiguration Unit Unit (fun _ : Unit ↦ Bool) (fun _ ↦ 4) → ℝ,
+      ∀ law : Unit → FiniteReportLaw (FullHaplotype Unit fun _ : Unit ↦ Bool),
+        eval (lawPoint law) (selectionGenerator model (momentPolynomial fourCarriers))
+          = c ⬝ᵥ fun η ↦ configurationMoment law η.1 := by
+  rintro ⟨c, hc⟩
+  have hlinear :
+      ∀ E : ExpFunctional (Unit → FiniteReportLaw (FullHaplotype Unit fun _ : Unit ↦ Bool)),
+        (E fun law ↦ eval (lawPoint law) (selectionGenerator model (momentPolynomial fourCarriers)))
+          = c ⬝ᵥ fun η ↦ E fun law ↦ configurationMoment law η.1 := by
+    intro E
+    have hpoint : (fun law ↦
+        eval (lawPoint law) (selectionGenerator model (momentPolynomial fourCarriers)))
+        = ∑ η, c η • fun law ↦ configurationMoment law η.1 := by
+      funext law
+      rw [hc law, Finset.sum_apply]
+      simp only [dotProduct, Pi.smul_apply, smul_eq_mul]
+    rw [hpoint, ExpFunctional.eval_sum]
+    simp only [ExpFunctional.smul_eval, dotProduct]
+  apply frequencyMixture_selection_ne model hfit
+  rw [hlinear, hlinear]
+  congr 1
+  funext η
+  exact frequencyMixture_moments_eq η
+
+/-- Families started from the two mixtures have equal budget-4 moments at time zero. -/
+theorem expectedMomentVector_zero_eq_of_mixtures
+    (first second :
+      ℝ → ExpFunctional (Unit → FiniteReportLaw (FullHaplotype Unit fun _ : Unit ↦ Bool)))
+    (hfirst0 : first 0 = frequencyMixture firstFrequencies firstFrequencies_mem)
+    (hsecond0 : second 0 = frequencyMixture secondFrequencies secondFrequencies_mem) :
+    expectedMomentVector (fun _ ↦ 4) first 0 = expectedMomentVector (fun _ ↦ 4) second 0 := by
+  funext ξ
+  show (first 0 fun law ↦ configurationMoment law ξ.1)
+    = second 0 fun law ↦ configurationMoment law ξ.1
+  rw [hfirst0, hsecond0]
+  exact frequencyMixture_moments_eq ξ
+
+/-- **Finitely many moments give no exact law under selection.** For one deme at one biallelic
+locus with unequal fitnesses and any neutral rates, two expectation families started from the two
+mixtures agree on every budget-4 moment at time zero. If both obey the forward moment equation with
+selection for the four carriers at time zero, their budget-4 moments agree on no interval
+`[0, ε)`: the budget-4 moments at later times are not a function of those at time zero.
+
+Assumes: `first` and `second` have right derivatives at time zero given by the expected generator
+with selection. -/
+theorem not_budgetFour_moments_eq_of_selection
+    (rates : NeutralRates Unit Unit fun _ : Unit ↦ Bool)
+    (model : SelectionModel Unit Unit fun _ : Unit ↦ Bool)
+    (hfit : model.fitness () true ≠ model.fitness () false)
+    (first second :
+      ℝ → ExpFunctional (Unit → FiniteReportLaw (FullHaplotype Unit fun _ : Unit ↦ Bool)))
+    (hfirst0 : first 0 = frequencyMixture firstFrequencies firstFrequencies_mem)
+    (hsecond0 : second 0 = frequencyMixture secondFrequencies secondFrequencies_mem)
+    (hfirst : HasDerivWithinAt
+      (fun s ↦ expectedMomentVector (fun _ ↦ 4) first s fourCarrierConfiguration)
+      (first 0 fun law ↦ eval (lawPoint law)
+        (selectedGenerator rates model (momentPolynomial fourCarrierConfiguration.1)))
+      (Set.Ici 0) 0)
+    (hsecond : HasDerivWithinAt
+      (fun s ↦ expectedMomentVector (fun _ ↦ 4) second s fourCarrierConfiguration)
+      (second 0 fun law ↦ eval (lawPoint law)
+        (selectedGenerator rates model (momentPolynomial fourCarrierConfiguration.1)))
+      (Set.Ici 0) 0) :
+    ¬ ∃ ε > 0, ∀ t ∈ Set.Ico (0 : ℝ) ε,
+      expectedMomentVector (fun _ ↦ 4) first t = expectedMomentVector (fun _ ↦ 4) second t := by
+  rintro ⟨ε, hε, hagree⟩
+  have heq : (fun s ↦ expectedMomentVector (fun _ ↦ 4) first s fourCarrierConfiguration)
+      =ᶠ[𝓝[≥] 0] fun s ↦ expectedMomentVector (fun _ ↦ 4) second s fourCarrierConfiguration :=
+    Filter.eventually_of_mem (Ico_mem_nhdsGE hε) fun t ht ↦ congrFun (hagree t ht) _
+  have hderiv := (uniqueDiffWithinAt_Ici 0).eq_deriv _ hfirst
+    (hsecond.congr_of_eventuallyEq heq (congrFun (hagree 0 ⟨le_rfl, hε⟩) _))
+  rw [expectedSelectedGenerator_eq rates model (fun _ ↦ 4) first 0 fourCarrierConfiguration,
+    expectedSelectedGenerator_eq rates model (fun _ ↦ 4) second 0 fourCarrierConfiguration,
+    expectedMomentVector_zero_eq_of_mixtures first second hfirst0 hsecond0, add_right_inj]
+    at hderiv
+  apply frequencyMixture_selection_ne model hfit
+  rw [← hfirst0, ← hsecond0]
+  exact hderiv
+
+/-- **Under neutrality the two mixtures give equal budget-4 moments for all time**: the neutral
+forward moment equation closes on budget four, so the moments are `e^{tQ}` of the equal initial
+moments. -/
+theorem budgetFour_moments_eq_of_neutral (rates : NeutralRates Unit Unit fun _ : Unit ↦ Bool)
+    (first second :
+      ℝ → ExpFunctional (Unit → FiniteReportLaw (FullHaplotype Unit fun _ : Unit ↦ Bool)))
+    (hfirst0 : first 0 = frequencyMixture firstFrequencies firstFrequencies_mem)
+    (hsecond0 : second 0 = frequencyMixture secondFrequencies secondFrequencies_mem)
+    (hfirst : ∀ ξ : BudgetConfiguration Unit Unit (fun _ : Unit ↦ Bool) (fun _ ↦ 4),
+      ∀ t ∈ Set.Ici (0 : ℝ),
+        HasDerivWithinAt (fun s ↦ expectedMomentVector (fun _ ↦ 4) first s ξ)
+          (first t fun law ↦ eval (lawPoint law) (neutralGenerator rates (momentPolynomial ξ.1)))
+          (Set.Ici 0) t)
+    (hsecond : ∀ ξ : BudgetConfiguration Unit Unit (fun _ : Unit ↦ Bool) (fun _ ↦ 4),
+      ∀ t ∈ Set.Ici (0 : ℝ),
+        HasDerivWithinAt (fun s ↦ expectedMomentVector (fun _ ↦ 4) second s ξ)
+          (second t fun law ↦ eval (lawPoint law) (neutralGenerator rates (momentPolynomial ξ.1)))
+          (Set.Ici 0) t)
+    {t : ℝ} (ht : 0 ≤ t) :
+    expectedMomentVector (fun _ ↦ 4) first t = expectedMomentVector (fun _ ↦ 4) second t := by
+  rw [expectedMomentVector_eq_matrixExponential rates (fun _ ↦ 4) first hfirst t ht,
+    expectedMomentVector_eq_matrixExponential rates (fun _ ↦ 4) second hsecond t ht,
+    expectedMomentVector_zero_eq_of_mixtures first second hfirst0 hsecond0]
+
+end Nonclosure
 
 end
 
