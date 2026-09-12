@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.GraphCoalescent.FiberSizeIdentifiability
+import Descent.Pangenome.GraphCoalescent.FiberSizeSymmetricRecovery
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program
@@ -22,6 +23,13 @@ symmetric polynomials of the four sizes and `n = e_1`:
 The second coefficient is affine in `(e_2, e_3)`: given `n` and `e_4`, it fixes the single linear
 form `(2n² - 15n + 29) e_2 + (2n - 9) e_3`, where width three fixed `e_2` itself.
 
+- `fiberSizes_eq_of_cumulantOfSizes_eq_four_of_shared`: **identifiability when a fiber size is
+  shared**. Two profiles of four fibers on the same panel of `n ≥ 5` individuals, with one common
+  fiber size `t` and equal cumulants, are the same multiset. Equal totals and products fix the sum
+  `s` and the product `p` of the other three sizes; the second coefficient, read through `t`
+  (`quadSecondShared`), changes with their pairwise sum `q` at the rate
+  `-4 p t (2n² - 15n + 29 + (2n - 9) t)`, which never vanishes (`quadSecond_slope_pos`).
+
 ## The mechanism
 
 The merge recursion one degree past the top (`coeff_card_deficitCumulant`) sums a hidden merger in
@@ -32,8 +40,13 @@ coefficient of the fused three fibers (`coeff_three_fused`, from
 
 ## Scope
 
-Only the two top coefficients at width four are computed. Whether the cumulant determines the
-multiset of fiber sizes at width four is open, and nothing here asserts either answer.
+At width four only profiles sharing a fiber size are identified. Whether the cumulant determines
+the multiset of fiber sizes at width four in general is open, and nothing here asserts either
+answer.
+
+Remark, not proved here: the third coefficient is quadratic in `(e_2, e_3)`, so with the linear
+form fixed by the second coefficient the three top coefficients confine `(e_2, e_3)` to a line
+meeting a conic.
 
 ## Empirical status
 
@@ -193,6 +206,114 @@ theorem coeff_four_deficitCumulant_quad {x y z t : ι} (hxy : x ≠ y) (hxz : x 
     (1 / 4 : ℚ) * ((c z : ℚ) * c x) * Kzx + (1 / 4 : ℚ) * ((c z : ℚ) * c y) * Kzy +
     (1 / 4 : ℚ) * ((c z : ℚ) * c t) * Kzt + (1 / 4 : ℚ) * ((c t : ℚ) * c x) * Ktx +
     (1 / 4 : ℚ) * ((c t : ℚ) * c y) * Kty + (1 / 4 : ℚ) * ((c t : ℚ) * c z) * Ktz
+
+/-! ### A shared fiber size -/
+
+/-- **The second coefficient of four fibers, read through one size**: the other three sizes enter
+through their sum `s`, pairwise sum `q` and product `p`, and the fourth size is `t`.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  A polynomial in four rational numbers. -/
+def quadSecondShared (s q p t : ℚ) : ℚ :=
+  2 * (p * t) * (4 * (s + t) ^ 4 - 40 * (s + t) ^ 3 + 149 * (s + t) ^ 2 - 257 * (s + t) + 192 -
+    2 * (2 * (s + t) ^ 2 - 15 * (s + t) + 29) * (q + s * t) -
+    2 * (2 * (s + t) - 9) * (p + q * t) - 8 * (p * t))
+
+theorem quadSecond_eq_quadSecondShared (a b d t : ℚ) :
+    quadSecond a b d t = quadSecondShared (a + b + d) (a * b + a * d + b * d) (a * b * d) t := by
+  unfold quadSecond quadSecondShared
+  ring
+
+/-- The slope `2m² - 15m + 29` of the second coefficient in `e_2` is positive. -/
+theorem quadSecond_slope_pos (m : ℚ) : 0 < 2 * m ^ 2 - 15 * m + 29 := by
+  have h : 2 * m ^ 2 - 15 * m + 29 = 2 * (m - 15 / 4) ^ 2 + 7 / 8 := by ring
+  rw [h]
+  positivity
+
+/-- **Width four: identifiability when a fiber size is shared.** Two profiles of four fibers on the
+same panel of at least five individuals, with one common fiber size and one connectivity
+cumulant, are the same multiset of sizes.
+
+Assumes: four distinct labels on each side, positive sizes, equal totals of at least five, a common
+size `c t = c' t'`, and equal cumulants. -/
+theorem fiberSizes_eq_of_cumulantOfSizes_eq_four_of_shared {κ : Type*} [DecidableEq κ]
+    {x y z t : ι} (hxy : x ≠ y) (hxz : x ≠ z) (hxt : x ≠ t) (hyz : y ≠ z) (hyt : y ≠ t)
+    (hzt : z ≠ t) {x' y' z' t' : κ} (hxy' : x' ≠ y') (hxz' : x' ≠ z') (hxt' : x' ≠ t')
+    (hyz' : y' ≠ z') (hyt' : y' ≠ t') (hzt' : z' ≠ t') {c : ι → ℕ} {c' : κ → ℕ}
+    (hc : ∀ i ∈ ({x, y, z, t} : Finset ι), 1 ≤ c i)
+    (hc' : ∀ i ∈ ({x', y', z', t'} : Finset κ), 1 ≤ c' i)
+    (hn : c x + c y + c z + c t = c' x' + c' y' + c' z' + c' t')
+    (hn5 : 5 ≤ c x + c y + c z + c t) (hshared : c t = c' t')
+    (hC : cumulantOfSizes {x, y, z, t} c = cumulantOfSizes {x', y', z', t'} c') :
+    ({c t, c x, c y, c z} : Multiset ℕ) = {c' t', c' x', c' y', c' z'} := by
+  have hx : x ∉ ({y, z, t} : Finset ι) := by simp [hxy, hxz, hxt]
+  have hy : y ∉ ({z, t} : Finset ι) := by simp [hyz, hyt]
+  have hx' : x' ∉ ({y', z', t'} : Finset κ) := by simp [hxy', hxz', hxt']
+  have hy' : y' ∉ ({z', t'} : Finset κ) := by simp [hyz', hyt']
+  have hcard : #({x, y, z, t} : Finset ι) = 4 := by
+    rw [card_insert_of_notMem hx, card_insert_of_notMem hy, card_pair hzt]
+  have hcard' : #({x', y', z', t'} : Finset κ) = 4 := by
+    rw [card_insert_of_notMem hx', card_insert_of_notMem hy', card_pair hzt']
+  have hsum : ∑ i ∈ ({x, y, z, t} : Finset ι), c i = c x + c y + c z + c t := by
+    rw [sum_insert hx, sum_insert hy, sum_pair hzt]
+    ring
+  have hsum' : ∑ i ∈ ({x', y', z', t'} : Finset κ), c' i = c' x' + c' y' + c' z' + c' t' := by
+    rw [sum_insert hx', sum_insert hy', sum_pair hzt']
+    ring
+  have hprod := prod_eq_of_cumulantOfSizes_eq hc hc' (hcard.trans hcard'.symm) (by omega)
+    (by rw [hsum, hsum', hn]) hC
+  have hp4 : c x * c y * c z * c t = c' x' * c' y' * c' z' * c' t' := by
+    simpa only [prod_insert hx, prod_insert hy, prod_pair hzt, prod_insert hx', prod_insert hy',
+      prod_pair hzt', mul_assoc] using hprod
+  have hct : 0 < c t := hc t (by simp)
+  have hs : c x + c y + c z = c' x' + c' y' + c' z' := by omega
+  have hp : c x * c y * c z = c' x' * c' y' * c' z' := by
+    rw [← hshared] at hp4
+    exact Nat.eq_of_mul_eq_mul_right hct hp4
+  have h1 := map_cumulantOfSizes _ c hc
+  have h2 := map_cumulantOfSizes _ c' hc'
+  rw [hC, h2, hsum, hsum', ← hn] at h1
+  have h3 := congrArg (fun p ↦ p.coeff (c x + c y + c z + c t - 4)) h1
+  simp only [coeff_reflect,
+    revAt_le (show c x + c y + c z + c t - 4 ≤ c x + c y + c z + c t by omega),
+    show c x + c y + c z + c t - (c x + c y + c z + c t - 4) = 4 by omega] at h3
+  rw [coeff_four_deficitCumulant_quad hxy' hxz' hxt' hyz' hyt' hzt' c' hc',
+    coeff_four_deficitCumulant_quad hxy hxz hxt hyz hyt hzt c hc, quadSecond_eq_quadSecondShared,
+    quadSecond_eq_quadSecondShared] at h3
+  have hsQ : ((c' x' : ℚ) + c' y' + c' z') = (c x : ℚ) + c y + c z := by exact_mod_cast hs.symm
+  have hpQ : ((c' x' : ℚ) * c' y' * c' z') = (c x : ℚ) * c y * c z := by exact_mod_cast hp.symm
+  have htQ : (c' t' : ℚ) = c t := by exact_mod_cast hshared.symm
+  rw [hsQ, hpQ, htQ] at h3
+  have hkey : (4 * ((c x : ℚ) * c y * c z) * (c t : ℚ) *
+      (2 * ((c x : ℚ) + c y + c z + c t) ^ 2 - 15 * ((c x : ℚ) + c y + c z + c t) + 29 +
+        (2 * ((c x : ℚ) + c y + c z + c t) - 9) * c t)) *
+      (((c x : ℚ) * c y + c x * c z + c y * c z) -
+        ((c' x' : ℚ) * c' y' + c' x' * c' z' + c' y' * c' z')) = 0 := by
+    unfold quadSecondShared at h3
+    linear_combination h3
+  have hn5Q : (5 : ℚ) ≤ (c x : ℚ) + c y + c z + c t := by exact_mod_cast hn5
+  have hcx : (1 : ℚ) ≤ c x := by exact_mod_cast hc x (by simp)
+  have hcy : (1 : ℚ) ≤ c y := by exact_mod_cast hc y (by simp)
+  have hcz : (1 : ℚ) ≤ c z := by exact_mod_cast hc z (by simp)
+  have hctQ : (1 : ℚ) ≤ c t := by exact_mod_cast hct
+  have hα := quadSecond_slope_pos ((c x : ℚ) + c y + c z + c t)
+  have hβ : (0 : ℚ) ≤ (2 * ((c x : ℚ) + c y + c z + c t) - 9) * c t :=
+    mul_nonneg (by linarith) (by linarith)
+  have hp0 : (0 : ℚ) < (c x : ℚ) * c y * c z :=
+    mul_pos (mul_pos (by linarith) (by linarith)) (by linarith)
+  have hfactor : (0 : ℚ) < 4 * ((c x : ℚ) * c y * c z) * (c t : ℚ) *
+      (2 * ((c x : ℚ) + c y + c z + c t) ^ 2 - 15 * ((c x : ℚ) + c y + c z + c t) + 29 +
+        (2 * ((c x : ℚ) + c y + c z + c t) - 9) * c t) :=
+    mul_pos (mul_pos (mul_pos (by norm_num) hp0) (by linarith)) (by linarith)
+  have hq : c x * c y + c x * c z + c y * c z = c' x' * c' y' + c' x' * c' z' + c' y' * c' z' := by
+    rcases mul_eq_zero.mp hkey with hzero | hzero
+    · exact absurd hzero hfactor.ne'
+    · exact_mod_cast sub_eq_zero.mp hzero
+  have e1 : c x * c y + c y * c z + c z * c x = c x * c y + c x * c z + c y * c z := by ring
+  have e2 : c' x' * c' y' + c' y' * c' z' + c' z' * c' x' =
+      c' x' * c' y' + c' x' * c' z' + c' y' * c' z' := by ring
+  have htriple := FiberSizeSymmetricRecovery.values_eq_of_esymm_eq hs
+    (by rw [e1, e2]; exact hq) hp
+  rw [htriple, hshared]
 
 end
 

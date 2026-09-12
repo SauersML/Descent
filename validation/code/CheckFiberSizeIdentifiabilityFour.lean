@@ -13,3 +13,9 @@ import Descent.Pangenome.GraphCoalescent.FiberSizeIdentifiabilityFour
   Descent.Pangenome.GraphCoalescent.coeff_three_fused
 #print axioms
   Descent.Pangenome.GraphCoalescent.coeff_four_deficitCumulant_quad
+#print axioms
+  Descent.Pangenome.GraphCoalescent.quadSecond_eq_quadSecondShared
+#print axioms
+  Descent.Pangenome.GraphCoalescent.quadSecond_slope_pos
+#print axioms
+  Descent.Pangenome.GraphCoalescent.fiberSizes_eq_of_cumulantOfSizes_eq_four_of_shared
