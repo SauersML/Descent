@@ -9,6 +9,7 @@ import Descent.Pangenome.GraphCoalescent.ConnectivityCumulantDegree
 import Descent.Pangenome.GraphCoalescent.Conservation
 import Descent.Pangenome.GraphCoalescent.Deficit
 import Descent.Pangenome.GraphCoalescent.EstimatorSign
+import Descent.Pangenome.GraphCoalescent.FirstConnectionLaw
 import Descent.Pangenome.GraphCoalescent.HiddenClockExample
 import Descent.Pangenome.GraphCoalescent.HiddenLoadFiltering
 import Descent.Pangenome.GraphCoalescent.HiddenLoads
