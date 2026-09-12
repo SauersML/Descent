@@ -746,6 +746,76 @@ theorem crossHeterozygosityPortabilityRatio_eq (rates : ManyDemeLDRates D)
     ancestralSquaredCorrelation, crossHeterozygosityDecay, hratio]
   field_simp
 
+/-- **The cross-heterozygosity decay decreases with the split time.**
+
+Assumes: positive drift and linkage rate, and nonnegative ancestral ratios. -/
+theorem crossHeterozygosityDecay_antitoneOn_duration {coalescence rate contrast linkage : ℝ}
+    (hc : 0 < coalescence) (hrate : 0 < rate) (hcontrast : 0 ≤ contrast)
+    (hlinkage : 0 ≤ linkage) :
+    AntitoneOn (crossHeterozygosityDecay coalescence rate contrast linkage) (Set.Ici 0) := by
+  intro s hs t ht hst
+  have hs0 : 0 ≤ s := hs
+  have hEt : Real.exp (-rate * t) ≤ Real.exp (-rate * s) := Real.exp_le_exp.mpr (by nlinarith)
+  have hEs : Real.exp (-rate * s) ≤ 1 := Real.exp_le_one_iff.mpr (by nlinarith)
+  have hEt0 := Real.exp_pos (-rate * t)
+  have hEs0 := Real.exp_pos (-rate * s)
+  have h1 : 1 - Real.exp (-rate * s) ≤ 1 - Real.exp (-rate * t) := by linarith
+  have h1s : 0 ≤ 1 - Real.exp (-rate * s) := by linarith
+  have hA : 0 ≤ coalescence / (2 * rate) * contrast :=
+    mul_nonneg (div_nonneg hc.le (by linarith)) hcontrast
+  have hB : 0 ≤ (coalescence / rate) ^ 2 * linkage := mul_nonneg (sq_nonneg _) hlinkage
+  have hsq : Real.exp (-rate * t) ^ 2 ≤ Real.exp (-rate * s) ^ 2 := by
+    rw [sq, sq]
+    exact mul_le_mul hEt hEt hEt0.le hEs0.le
+  have hden : 0 < 1 + coalescence / (2 * rate) * contrast * (1 - Real.exp (-rate * s))
+      + (coalescence / rate) ^ 2 * linkage * (1 - Real.exp (-rate * s)) ^ 2 := by
+    have := mul_nonneg hA h1s
+    have := mul_nonneg hB (sq_nonneg (1 - Real.exp (-rate * s)))
+    linarith
+  have hle : 1 + coalescence / (2 * rate) * contrast * (1 - Real.exp (-rate * s))
+        + (coalescence / rate) ^ 2 * linkage * (1 - Real.exp (-rate * s)) ^ 2
+      ≤ 1 + coalescence / (2 * rate) * contrast * (1 - Real.exp (-rate * t))
+        + (coalescence / rate) ^ 2 * linkage * (1 - Real.exp (-rate * t)) ^ 2 := by
+    have := mul_le_mul_of_nonneg_left h1 hA
+    have hsq1 : (1 - Real.exp (-rate * s)) ^ 2 ≤ (1 - Real.exp (-rate * t)) ^ 2 := by
+      rw [sq, sq]
+      exact mul_le_mul h1 h1 h1s (h1s.trans h1)
+    have := mul_le_mul_of_nonneg_left hsq1 hB
+    linarith
+  exact div_le_div₀ (sq_nonneg _) hsq hden hle
+
+/-- **Portability through the cross heterozygosity is lost as the split time grows.**
+
+Assumes: positive drift and linkage rate, and nonnegative ancestral ratios. -/
+theorem tendsto_crossHeterozygosityDecay_atTop {coalescence rate contrast linkage : ℝ}
+    (hc : 0 < coalescence) (hrate : 0 < rate) (hcontrast : 0 ≤ contrast)
+    (hlinkage : 0 ≤ linkage) :
+    Filter.Tendsto (crossHeterozygosityDecay coalescence rate contrast linkage) Filter.atTop
+      (nhds 0) := by
+  have hE : Filter.Tendsto (fun t : ℝ ↦ Real.exp (-rate * t)) Filter.atTop (nhds 0) :=
+    (Real.tendsto_exp_neg_atTop_nhds_zero.comp
+      (Filter.tendsto_id.const_mul_atTop hrate)).congr fun t ↦ by simp [neg_mul]
+  have hA : 0 ≤ coalescence / (2 * rate) * contrast :=
+    mul_nonneg (div_nonneg hc.le (by linarith)) hcontrast
+  have hB : 0 ≤ (coalescence / rate) ^ 2 * linkage := mul_nonneg (sq_nonneg _) hlinkage
+  have hden : Filter.Tendsto (fun t : ℝ ↦ 1 + coalescence / (2 * rate) * contrast
+        * (1 - Real.exp (-rate * t))
+      + (coalescence / rate) ^ 2 * linkage * (1 - Real.exp (-rate * t)) ^ 2) Filter.atTop
+      (nhds (1 + coalescence / (2 * rate) * contrast * (1 - 0)
+        + (coalescence / rate) ^ 2 * linkage * (1 - 0) ^ 2)) :=
+    (tendsto_const_nhds.add (tendsto_const_nhds.mul (tendsto_const_nhds.sub hE))).add
+      (tendsto_const_nhds.mul ((tendsto_const_nhds.sub hE).pow 2))
+  have hpos : 1 + coalescence / (2 * rate) * contrast * (1 - 0)
+      + (coalescence / rate) ^ 2 * linkage * (1 - 0) ^ 2 ≠ 0 := by
+    have : 0 < 1 + coalescence / (2 * rate) * contrast * (1 - 0)
+        + (coalescence / rate) ^ 2 * linkage * (1 - 0) ^ 2 := by
+      norm_num
+      linarith
+    exact this.ne'
+  have h := (hE.pow 2).div hden hpos
+  rw [zero_pow two_ne_zero, zero_div] at h
+  exact h
+
 end
 
 end Descent.Portability.TwoLocusPortabilityDecay
