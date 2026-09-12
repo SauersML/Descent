@@ -50,10 +50,10 @@ independent complexity bounds and a quantitative light cone.
   weighted support count by at most `w i + 2 w j` (`weightedCount_branchSupports_le`) and a
   coalescence does not raise it (`weightedCount_coalesceSupports_le`); with `Σ_j r i j ≤ D` and
   `w j ≤ κ w i` on every edge of positive rate the ancestral generator obeys
-  `L Z^{(w)} ≤ D (1 + 2κ) Z^{(w)}` (`supportGenerator_weightedCount_le`), the plain count
-  `L Z ≤ 3 D Z` (`supportGenerator_supportSize_le`), and the decision rate is at most `D Z`
-  (`decisionRate_le`). (8.2) and (8.3) hold for marginal laws of the tagged support state that
-  satisfy Dynkin's formula for the support generator (`integral_supportSize_le`,
+  `L Z^{(w)} ≤ D (1 + 2κ) Z^{(w)}` (`supportGenerator_weightedCount_le`) and the plain count
+  `L Z ≤ 3 D Z` (`supportGenerator_supportSize_le`). (8.2) and (8.3) hold for marginal laws of
+  the tagged support state that satisfy Dynkin's formula for the support generator
+  (`integral_supportSize_le`,
   `integral_branchings_le`, through the Grönwall step `le_mul_exp_of_hasDerivWithinAt`), and (9.1)
   and (9.2) follow by Markov's inequality on the light-cone weight
   (`measureReal_escapeSet_le_exp`, `exp_div_pow_eq_of_radius`), with no escape when `DT = 0`
@@ -63,9 +63,9 @@ independent complexity bounds and a quantitative light cone.
   approximation bound converge on every continuous observable (`cauchySeq_operator`), and the
   limit is a Feller semigroup: contraction, positivity, the constant, the semigroup law and strong
   continuity (`norm_limitValue_le`, `limitValue_nonneg`, `limitValue_one`, `limitValue_add`,
-  `tendsto_limitValue_zero`). Two Feller semigroups agreeing on a separating subalgebra agree
-  (`operator_eq_of_eqOn`), so the limit is independent of the exhaustion
-  (`limitSemigroup_eq_of_tendsto`).
+  `tendsto_limitValue_zero`), at every time (`FellerSemigroup.continuous_operator`). Two Feller
+  semigroups agreeing on a separating subalgebra agree (`operator_eq_of_eqOn`), so the limit is
+  independent of the exhaustion (`limitSemigroup_eq_of_tendsto`).
 * Corollary 8.1, the light cone as a coupling: `LocalityCoupling`. Two sample laws obtained by
   evaluating one circuit on inputs that coincide off an escape event are within total variation
   the probability of escape (`totalVariation_mixtureLaw_le`); for a circuit reading only inspected

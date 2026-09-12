@@ -257,8 +257,10 @@ carry the neutral generator on configuration moments (`exists_neutralMarkovKerne
 limit holds: the microscopic kernel powers along `N` steps of size `t/N` converge uniformly to the
 neutral semigroup on every continuous observable, and its Riesz kernels are Markov and compose
 (`NeutralMicroscopicEulerLimit.tendstoUniformly_neutralSemigroupExtension`,
-`neutralMarkovKernel_add`). The floor form `K_h^{⌊t/h⌋} f → T_t f` holds as well and discharges
-the hypothesis of `PolynomialFellerExtension.markov_of_euler_tendstoUniformly`
+`neutralMarkovKernel_add`), and (19) holds for them
+(`NeutralMicroscopicEulerLimit.hasDerivWithinAt_integral_neutralMarkovKernel`). The floor form
+`K_h^{⌊t/h⌋} f → T_t f` holds as well and discharges the hypothesis of
+`PolynomialFellerExtension.markov_of_euler_tendstoUniformly`
 (`NeutralMicroscopicFloorLimit.neutralPolynomialSemigroup_markov_of_euler`). Under those kernels,
 one process for every budget, the configuration
 moments of (20) and the panel reports of (22) hold:

@@ -7,6 +7,8 @@ import Descent.Pangenome.GraphCoalescent.ConnectionClockStochasticOrder
 import Descent.Pangenome.GraphCoalescent.ConnectivityClockTable
 import Descent.Pangenome.GraphCoalescent.LeadingCoefficientCorollaries
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionClock
+import Descent.Pangenome.GraphCoalescent.ReportedConnectionExamples
+import Descent.Pangenome.GraphCoalescent.ReportedConnectionFirstStep
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionTies
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulant
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulantDegree
@@ -114,13 +116,15 @@ inside it.
   `∏_C A_|C|(z)` (`sum_le_eq_prod_lahPolynomial`); (D3) is
   `connectivityCumulant_eq_sum_connected`, with nonnegative integer coefficients
   (`coeff_connectivityCumulant_nonneg`) depending only on the fiber sizes
-  (`connectivityCumulant_eq_cumulantOfSizes`), of degree at most `n - w + 1`
+  (`connectivityCumulant_eq_cumulantOfSizes`) and unchanged under relabeling the fibers
+  (`cumulantOfSizes_eq_of_equiv`), of degree at most `n - w + 1`
   (`ConnectivityCumulantDegree.natDegree_connectivityCumulant_le`). In the corpus vocabulary of
   coalescent states, with `graphKer` and `observed`:
   `ConnectivityCumulantCorpus.connectivityCumulant_graphKer_eq_sum_observed`,
   `natDegree_connectivityCumulant_graphKer_le`. Mathlib's incidence-algebra Möbius function of the
   partition lattice is `(-1)^(|σ|-1) (|σ|-1)!` at every order
-  (`PartitionLatticeMobius.mu_finpartition_top`).
+  (`PartitionLatticeMobius.mu_finpartition_top`), and at order three it gives every coefficient of
+  the corpus triple gluing residual (`tripleGluingResidual_eq_mu_sum`).
 * Theorem D, (D4), the ranked history law: `RankedHistoryLaw`. The law of the jump chain after
   `n - k` jumps is `a_{n,k} ∏_B |B|!` (`rankedHistoryLaw`, `blockLaw_toReal_eq_absoluteProb`),
   through the weighted cover count `2 Σ_{ξ ≺ η} w(ξ) = (n - |η|) w(η)`
@@ -141,7 +145,11 @@ inside it.
   (D6) agree, and the mean of the trajectory clock is the mean of the first-step law
   (`ReportedConnectionTies.connectedProb_eq_reportConnectedProbability`,
   `stoppingProb_eq_firstConnectionProbability`,
-  `connectionTime_mean_eq_lintegral_connectionTimeLaw`).
+  `connectionTime_mean_eq_lintegral_connectionTimeLaw`). The means `2/3, 1/2, 7/18, 17/18, 92/225`
+  hold for the connection time of concrete interfaces, and `(1,3)` and `(2,2)` differ
+  (`ReportedConnectionExamples.connectionTime_mean_oneTwo`,
+  `connectionTime_mean_oneThree_ne_twoTwo`); the path-law mean equals the backward-equation mean
+  (`ReportedConnectionFirstStep.connectionTime_mean_eq_meanConnectionTime`).
 * Theorem D, the exact table of §6: `ConnectivityClockTable`. The cumulants
   `6z + 4z²`, `24z + 30z² + 6z³`, `24z + 32z² + 8z³`, `24z + 20z²`,
   `720z + 1656z² + 928z³ + 144z⁴` and the means `2/3, 1/2, 7/18, 17/18, 92/225` of the fiber sizes
@@ -221,7 +229,8 @@ Rosenblatt's form determines every visible rate and the hidden state
 a strong lumping determines the unordered pair of loads through their sum and product
 (`LumpingUnorderedPair.unorderedPair_eq_of_lumping`), and the survival function as a semigroup is
 not formalized. The table rows of §6 compute the cumulants from `cumulantOfSizes`
-and evaluate transcriptions of (D4)-(D6) and (D8) at the tabulated fiber sizes. In the
+and `Coalescent.jumpCoeff`, and evaluate transcriptions of (D5), (D6) and (D8) at the tabulated
+fiber sizes. In the
 Λ-coalescent closure the dependence of a merger's lumped outcome on its profile alone is a
 hypothesis on the outcome map. The
 connection clock of Theorem C is defined as the first-step solution of the backward equation, and
