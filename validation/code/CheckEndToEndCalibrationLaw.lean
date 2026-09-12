@@ -1,0 +1,30 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.EndToEndCalibrationLaw
+
+/-! Axiom audit of EndToEndCalibrationLaw. -/
+
+open Descent.Portability.EndToEndCalibrationLaw
+
+#print axioms integral_expectation_historyEventKernel
+#print axioms integral_covariance_historyEventKernel
+#print axioms integral_variance_historyEventKernel
+#print axioms integral_expectation_rateHistoryKernel
+#print axioms integral_covariance_rateHistoryKernel
+#print axioms integral_variance_rateHistoryKernel
+#print axioms expectedCalibrationPortability_eq_cross
+#print axioms expectedCalibrationPortability_eq_portabilityRatio
+#print axioms expectedCalibrationSlope_eq_weighted
+#print axioms expectedCalibrationIntercept_eq_weighted
+#print axioms expectedCalibrationSlope_historyEventKernel
+#print axioms expectedCalibrationPortability_historyEventKernel
+#print axioms expectedCalibrationIntercept_historyEventKernel
+#print axioms expectedCalibrationSlope_rateHistoryKernel
+#print axioms expectedCalibrationPortability_rateHistoryKernel
+#print axioms expectedCalibrationIntercept_rateHistoryKernel
+#print axioms expectedCalibrationSlope_eq_of_moments_eq
+#print axioms expectedCalibrationPortability_eq_of_moments_eq
+#print axioms expectedCalibrationIntercept_eq_of_moments_eq
+#print axioms abs_momentCalibrationPortability_rateHistory_sub_le
+#print axioms abs_expectedCalibrationPortability_rateHistory_sub_le
