@@ -75,6 +75,7 @@ import Descent.Pangenome.GraphCoalescent.FiberSizeSymmetricRecovery
 import Descent.Pangenome.GraphCoalescent.ConnectionLawIdentifiability
 import Descent.Pangenome.GraphCoalescent.HiddenClockCorrection
 import Descent.Pangenome.GraphCoalescent.FiberSizeMultisetRecovery
+import Descent.Pangenome.GraphCoalescent.PanelSizeIdentifiability
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program
@@ -118,7 +119,8 @@ coalescent read off the graph -- is not a Markov chain at all.
 
 3. `Reduction` -- the repair.  The obstruction lives entirely below `graphKer s`.  On the
    up-set at or above it the report is the identity, the stratum is closed under coalescence,
-   and the transition counts are `Descent.Coalescent.StateSpace.card_covers` unchanged -- so
+   and the transition counts are `Descent.Coalescent.StateSpace.card_covers_eq_deathRate`
+   unchanged -- so
    Kingman's ladder `d_k = k(k-1)/2` applies verbatim.  Nothing is postulated and nothing is
    weakened; what changes is the entrance point, which is `w` and not `n`.
 
