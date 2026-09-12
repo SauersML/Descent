@@ -79,8 +79,8 @@ theorem coeff_one_deficitCumulant_singleton (x : ι) (c : ι → ℕ) (hx : 1 �
     rw [mem_singleton.mp hi]
     exact hx
   have h := congrArg (fun p ↦ p.coeff 0) (derivative_deficitCumulant {x} c hc)
-  simp only [coeff_derivative, finset_sum_coeff, coeff_add, coeff_C_mul, sum_singleton,
-    erase_singleton, sum_empty, add_zero, Nat.cast_zero, zero_add, mul_one] at h
+  simp only [coeff_derivative, coeff_C_mul, sum_singleton, erase_singleton, sum_empty, add_zero,
+    Nat.cast_zero, zero_add, mul_one] at h
   rw [h]
   by_cases hx1 : c x = 1
   · simp [hx1]
@@ -201,7 +201,6 @@ theorem coeff_two_deficitCumulant_card_two {T : Finset ι} (hT : #T = 2) (c : ι
   obtain ⟨x, y, hxy, rfl⟩ := card_eq_two.mp hT
   rw [coeff_two_deficitCumulant_pair hxy c (hc x (mem_insert_self x {y}))
     (hc y (mem_insert_of_mem (mem_singleton_self y))), prod_pair hxy, sum_pair hxy, sum_pair hxy]
-  ring
 
 /-! ### Three fibers -/
 
