@@ -10,6 +10,7 @@ import Descent.Portability.PortabilityMinimaxLowerBound
 import Descent.Portability.EndToEndPortabilityLaw
 import Descent.Pangenome.GraphCoalescent.CompressionLoadAchievability
 import Descent.Pangenome.AncestralLocality.SelectionClosure
+import Descent.Portability.PortabilityTwoHistoryInstance
 
 namespace Descent.Program
 
@@ -62,7 +63,11 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   from `n` source replicas to worst-case error at least `(|τ_P - τ_Q|/2) (1 - TV(P, Q))^n`
   (`lowerBound_cohortLaw_pow`), and at least `(|τ_P - τ_Q|/2) max {0, 1 - n TV(P, Q)}`
   (`lowerBound_cohortLaw_totalVariation`); for admixed source cohorts of NOTE1 §6 the bound is
-  explicit (`sourceCohort_lowerBound`, `logTwo_sourceCohort_lowerBound`).
+  explicit (`sourceCohort_lowerBound`, `logTwo_sourceCohort_lowerBound`). On the NOTE2 §9 reference
+  model the early and late migration histories give one source law and different targets, so half
+  the target gap is the exact minimax risk for any number of source replicas
+  (`PortabilityTwoHistoryInstance.isLeast_worstRisk`), with explicit floors for the target squared
+  correlation and the portability ratio (`minimax_floor_r2`, `minimax_floor_r2Portability`).
 * The locality transition on inhomogeneous checking graphs: `InhomogeneousLocalityTransition`.
   For independent edges dominated by a rank-one kernel with weights `w`, the expected hereditary
   closure of `A` is at most `|A| + (Σ_{r∈A} w_r)/(1 - ν)` with `ν = Σ w² / Σ w < 1`, for every
