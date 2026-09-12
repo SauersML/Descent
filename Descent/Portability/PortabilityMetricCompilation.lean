@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.ReplicaMetricInstances
 import Descent.Portability.PortabilityRatioQueries
 import Descent.Portability.RealizationBody
+import Mathlib.Data.Matrix.Mul
 
 assert_below Descent.Decision Descent.Program
 
@@ -59,6 +60,19 @@ point of the body, since the cube is convex and the readout is linear
 (`readout_mem_cube_of_mem_realizationBody`). So `Φ ∘ readout` is Lipschitz on the body with the
 constants above times `5 a` (`abs_compiledSquaredCorrelation_readout_sub_le`,
 `abs_compiledSlope_readout_sub_le`).
+
+## The cross ratio of the end-to-end law
+
+`EndToEndPortabilityLaw` writes the portability ratio on propagated moments `v` as
+`(a·v)(b·v) / ((c·v)(d·v))`, where `a`, `b`, `c`, `d` are the coefficient vectors of the target
+numerator, the source denominator, the target denominator and the source numerator. It is
+`PortabilityRatioQueries.portabilityRatio` of these four accumulators, with a positive
+denominator, where the source numerator and both denominators are positive
+(`crossRatio_eq_portabilityRatio`). For a feature map bounded by `B` coordinatewise, every point
+of its realization body is bounded by `B` (`abs_apply_le_of_mem_realizationBody`), so
+`|c·v| ≤ ‖c‖₁ B` and `|c·v - c·v'| ≤ ‖c‖₁ ‖v - v'‖` (`abs_dotProduct_le`,
+`abs_dotProduct_sub_le`). Where `c·v` and `d·v` are at least `δ > 0`, the ratio is Lipschitz in
+the sup distance with constant `4 B³ ‖a‖₁ ‖b‖₁ ‖c‖₁ ‖d‖₁ / δ⁴` (`abs_crossRatio_sub_le`).
 
 Scope. The coordinates enter as a readout of the moment vector, so this module does not fix the
 configuration indexing of the moment side. The constants are the ones this proof yields, not
@@ -343,7 +357,8 @@ theorem abs_scoreVariance_sub_le (hm : ∀ c, 0 ≤ m c ∧ m c ≤ 1)
   rw [hid, momentDistance_eq]
   linarith [mul_le_mul_of_nonneg_left h0 (abs_nonneg (m 0 - m' 0)),
     mul_le_mul_of_nonneg_right h0' (abs_nonneg (m 0 - m' 0)), abs_nonneg (m 1 - m' 1),
-    abs_nonneg (m 3 - m' 3), abs_nonneg (m 4 - m' 4), abs_nonneg (m 0 - m' 0)]
+    abs_nonneg (m 3 - m' 3), abs_nonneg (m 4 - m' 4), abs_nonneg (m 0 - m' 0),
+    abs_nonneg (m 2 - m' 2)]
 
 /-- On the unit cube the compiled outcome variance is `2`-Lipschitz. -/
 theorem abs_outcomeVariance_sub_le (hm : ∀ c, 0 ≤ m c ∧ m c ≤ 1)
@@ -360,7 +375,8 @@ theorem abs_outcomeVariance_sub_le (hm : ∀ c, 0 ≤ m c ∧ m c ≤ 1)
   rw [hid, momentDistance_eq]
   linarith [mul_le_mul_of_nonneg_left h1 (abs_nonneg (m 1 - m' 1)),
     mul_le_mul_of_nonneg_right h1' (abs_nonneg (m 1 - m' 1)), abs_nonneg (m 0 - m' 0),
-    abs_nonneg (m 2 - m' 2), abs_nonneg (m 3 - m' 3), abs_nonneg (m 1 - m' 1)]
+    abs_nonneg (m 2 - m' 2), abs_nonneg (m 3 - m' 3), abs_nonneg (m 1 - m' 1),
+    abs_nonneg (m 4 - m' 4)]
 
 /-- On the unit cube the compiled covariance is `1`-Lipschitz. -/
 theorem abs_scoreOutcomeCovariance_sub_le (hm : ∀ c, 0 ≤ m c ∧ m c ≤ 1)
@@ -584,6 +600,144 @@ theorem abs_compiledSlope_readout_sub_le {X ι : Type*} [Fintype ι] (φ : X →
     (readout_mem_cube_of_mem_realizationBody φ A hφ hv)
     (readout_mem_cube_of_mem_realizationBody φ A hφ hv') hs hs').trans ?_
   exact mul_le_mul_of_nonneg_left (momentDistance_readout_le A hA v v') (by positivity)
+
+/-! ## The cross ratio of the end-to-end law -/
+
+section CrossRatio
+
+variable {X ι : Type*} [Fintype ι]
+
+/-- A dot product is at most the `ℓ¹` norm of the coefficients times a coordinatewise bound on
+the vector. -/
+theorem abs_dotProduct_le (c v : ι → ℝ) {B : ℝ} (hv : ∀ i, |v i| ≤ B) :
+    |c ⬝ᵥ v| ≤ (∑ i, |c i|) * B := by
+  unfold dotProduct
+  calc |∑ i, c i * v i| ≤ ∑ i, |c i * v i| := Finset.abs_sum_le_sum_abs _ _
+    _ ≤ ∑ i, |c i| * B := Finset.sum_le_sum fun i _ ↦ by
+        rw [abs_mul]
+        exact mul_le_mul_of_nonneg_left (hv i) (abs_nonneg _)
+    _ = (∑ i, |c i|) * B := by rw [Finset.sum_mul]
+
+/-- A dot product moves by at most the `ℓ¹` norm of the coefficients times the sup distance. -/
+theorem abs_dotProduct_sub_le (c v v' : ι → ℝ) :
+    |c ⬝ᵥ v - c ⬝ᵥ v'| ≤ (∑ i, |c i|) * ‖v - v'‖ := by
+  rw [← dotProduct_sub]
+  refine abs_dotProduct_le c (v - v') fun i ↦ ?_
+  have h := norm_le_pi_norm (v - v') i
+  rwa [Real.norm_eq_abs] at h
+
+/-- The vectors bounded by `B` coordinatewise form a convex set. -/
+theorem convex_box (B : ℝ) : Convex ℝ {v : ι → ℝ | ∀ i, |v i| ≤ B} := by
+  intro x hx y hy a b ha hb hab
+  have hx' : ∀ i, |x i| ≤ B := hx
+  have hy' : ∀ i, |y i| ≤ B := hy
+  show ∀ i, |(a • x + b • y) i| ≤ B
+  intro i
+  simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
+  calc |a * x i + b * y i| ≤ |a * x i| + |b * y i| := abs_add_le _ _
+    _ = a * |x i| + b * |y i| := by rw [abs_mul, abs_mul, abs_of_nonneg ha, abs_of_nonneg hb]
+    _ ≤ a * B + b * B :=
+        add_le_add (mul_le_mul_of_nonneg_left (hx' i) ha) (mul_le_mul_of_nonneg_left (hy' i) hb)
+    _ = B := by rw [← add_mul, hab, one_mul]
+
+/-- **The realization body inherits the feature bound.** If every feature is bounded by `B`
+coordinatewise, so is every point of the realization body. -/
+theorem abs_apply_le_of_mem_realizationBody (φ : X → ι → ℝ) {B : ℝ} (hφ : ∀ x i, |φ x i| ≤ B)
+    {v : ι → ℝ} (hv : v ∈ RealizationBody.realizationBody φ) : ∀ i, |v i| ≤ B :=
+  convexHull_min (by rintro _ ⟨x, rfl⟩; exact hφ x) (convex_box B) hv
+
+/-- **Definedness of the end-to-end ratio.** `(a·v)(b·v) / ((c·v)(d·v))` is
+`PortabilityRatioQueries.portabilityRatio` of the source numerator `d·v`, the source denominator
+`b·v`, the target numerator `a·v` and the target denominator `c·v`, and its denominator is
+positive, wherever `b·v`, `c·v` and `d·v` are positive. -/
+theorem crossRatio_eq_portabilityRatio (a b c d v : ι → ℝ) (hb : 0 < b ⬝ᵥ v)
+    (hc : 0 < c ⬝ᵥ v) (hd : 0 < d ⬝ᵥ v) :
+    (a ⬝ᵥ v) * (b ⬝ᵥ v) / ((c ⬝ᵥ v) * (d ⬝ᵥ v)) =
+        PortabilityRatioQueries.portabilityRatio (fun _ : Unit ↦ d ⬝ᵥ v) (fun _ ↦ b ⬝ᵥ v)
+          (fun _ ↦ a ⬝ᵥ v) (fun _ ↦ c ⬝ᵥ v) () ∧
+      0 < (c ⬝ᵥ v) * (d ⬝ᵥ v) := by
+  refine ⟨?_, mul_pos hc hd⟩
+  rw [PortabilityRatioQueries.portabilityRatio_eq_cross (fun _ : Unit ↦ d ⬝ᵥ v) (fun _ ↦ b ⬝ᵥ v)
+    (fun _ ↦ a ⬝ᵥ v) (fun _ ↦ c ⬝ᵥ v) () hb hc hd]
+
+/-- **The end-to-end ratio is Lipschitz on the realization body.** For a feature map bounded by
+`B` coordinatewise and moment vectors `v`, `v'` in its realization body at which `c·v` and `d·v`
+are at least `δ > 0`, the ratio `(a·v)(b·v) / ((c·v)(d·v))` moves by at most
+`4 B³ ‖a‖₁ ‖b‖₁ ‖c‖₁ ‖d‖₁ / δ⁴` times the sup distance `‖v - v'‖`. -/
+theorem abs_crossRatio_sub_le (φ : X → ι → ℝ) {B δ : ℝ} (hδ : 0 < δ) (hφ : ∀ x i, |φ x i| ≤ B)
+    (a b c d : ι → ℝ) {v v' : ι → ℝ} (hv : v ∈ RealizationBody.realizationBody φ)
+    (hv' : v' ∈ RealizationBody.realizationBody φ) (hc : δ ≤ c ⬝ᵥ v) (hd : δ ≤ d ⬝ᵥ v)
+    (hc' : δ ≤ c ⬝ᵥ v') (hd' : δ ≤ d ⬝ᵥ v') :
+    |(a ⬝ᵥ v) * (b ⬝ᵥ v) / ((c ⬝ᵥ v) * (d ⬝ᵥ v))
+        - (a ⬝ᵥ v') * (b ⬝ᵥ v') / ((c ⬝ᵥ v') * (d ⬝ᵥ v'))|
+      ≤ 4 * B ^ 3 * (∑ i, |a i|) * (∑ i, |b i|) * (∑ i, |c i|) * (∑ i, |d i|) / δ ^ 4
+          * ‖v - v'‖ := by
+  have hbox := abs_apply_le_of_mem_realizationBody φ hφ hv
+  have hbox' := abs_apply_le_of_mem_realizationBody φ hφ hv'
+  have hA' := abs_dotProduct_le a v' hbox'
+  have hBv := abs_dotProduct_le b v hbox
+  have hBv' := abs_dotProduct_le b v' hbox'
+  have hC' := abs_dotProduct_le c v' hbox'
+  have hDv := abs_dotProduct_le d v hbox
+  have hD' := abs_dotProduct_le d v' hbox'
+  have hdA := abs_dotProduct_sub_le a v v'
+  have hdB := abs_dotProduct_sub_le b v v'
+  have hdC := abs_dotProduct_sub_le c v v'
+  have hdD := abs_dotProduct_sub_le d v v'
+  have hδ2 : 0 < δ ^ 2 := by positivity
+  have hden : δ ^ 2 ≤ (c ⬝ᵥ v) * (d ⬝ᵥ v) := by
+    nlinarith [mul_le_mul hc hd hδ.le (hδ.le.trans hc)]
+  have hden' : δ ^ 2 ≤ (c ⬝ᵥ v') * (d ⬝ᵥ v') := by
+    nlinarith [mul_le_mul hc' hd' hδ.le (hδ.le.trans hc')]
+  have hK : (c ⬝ᵥ v') * (d ⬝ᵥ v') ≤ ((∑ i, |c i|) * B) * ((∑ i, |d i|) * B) := by
+    calc (c ⬝ᵥ v') * (d ⬝ᵥ v') ≤ |(c ⬝ᵥ v') * (d ⬝ᵥ v')| := le_abs_self _
+      _ = |c ⬝ᵥ v'| * |d ⬝ᵥ v'| := abs_mul _ _
+      _ ≤ ((∑ i, |c i|) * B) * ((∑ i, |d i|) * B) :=
+          mul_le_mul hC' hD' (abs_nonneg _) ((abs_nonneg _).trans hC')
+  have hL : |(a ⬝ᵥ v') * (b ⬝ᵥ v')| ≤ ((∑ i, |a i|) * B) * ((∑ i, |b i|) * B) := by
+    rw [abs_mul]
+    exact mul_le_mul hA' hBv' (abs_nonneg _) ((abs_nonneg _).trans hA')
+  have hq := abs_div_sub_div_le ((a ⬝ᵥ v) * (b ⬝ᵥ v)) ((a ⬝ᵥ v') * (b ⬝ᵥ v')) hδ2 hden hden'
+    hK hL
+  have hnum : |(a ⬝ᵥ v) * (b ⬝ᵥ v) - (a ⬝ᵥ v') * (b ⬝ᵥ v')|
+      ≤ 2 * B * (∑ i, |a i|) * (∑ i, |b i|) * ‖v - v'‖ := by
+    have h := abs_mul_sub_mul_le_split (a ⬝ᵥ v) (a ⬝ᵥ v') (b ⬝ᵥ v) (b ⬝ᵥ v')
+    have h1 : |a ⬝ᵥ v - a ⬝ᵥ v'| * |b ⬝ᵥ v|
+        ≤ ((∑ i, |a i|) * ‖v - v'‖) * ((∑ i, |b i|) * B) :=
+      mul_le_mul hdA hBv (abs_nonneg _) (by positivity)
+    have h2 : |a ⬝ᵥ v'| * |b ⬝ᵥ v - b ⬝ᵥ v'|
+        ≤ ((∑ i, |a i|) * B) * ((∑ i, |b i|) * ‖v - v'‖) :=
+      mul_le_mul hA' hdB (abs_nonneg _) ((abs_nonneg _).trans hA')
+    linarith
+  have hdenom : |(c ⬝ᵥ v) * (d ⬝ᵥ v) - (c ⬝ᵥ v') * (d ⬝ᵥ v')|
+      ≤ 2 * B * (∑ i, |c i|) * (∑ i, |d i|) * ‖v - v'‖ := by
+    have h := abs_mul_sub_mul_le_split (c ⬝ᵥ v) (c ⬝ᵥ v') (d ⬝ᵥ v) (d ⬝ᵥ v')
+    have h1 : |c ⬝ᵥ v - c ⬝ᵥ v'| * |d ⬝ᵥ v|
+        ≤ ((∑ i, |c i|) * ‖v - v'‖) * ((∑ i, |d i|) * B) :=
+      mul_le_mul hdC hDv (abs_nonneg _) (by positivity)
+    have h2 : |c ⬝ᵥ v'| * |d ⬝ᵥ v - d ⬝ᵥ v'|
+        ≤ ((∑ i, |c i|) * B) * ((∑ i, |d i|) * ‖v - v'‖) :=
+      mul_le_mul hC' hdD (abs_nonneg _) ((abs_nonneg _).trans hC')
+    linarith
+  have hK0 : 0 ≤ ((∑ i, |c i|) * B) * ((∑ i, |d i|) * B) := by linarith
+  have hL0 : 0 ≤ ((∑ i, |a i|) * B) * ((∑ i, |b i|) * B) := (abs_nonneg _).trans hL
+  refine hq.trans ?_
+  rw [show (δ ^ 2) ^ 2 = δ ^ 4 by ring]
+  calc (((∑ i, |c i|) * B) * ((∑ i, |d i|) * B)
+          * |(a ⬝ᵥ v) * (b ⬝ᵥ v) - (a ⬝ᵥ v') * (b ⬝ᵥ v')|
+        + ((∑ i, |a i|) * B) * ((∑ i, |b i|) * B)
+          * |(c ⬝ᵥ v) * (d ⬝ᵥ v) - (c ⬝ᵥ v') * (d ⬝ᵥ v')|) / δ ^ 4
+      ≤ (((∑ i, |c i|) * B) * ((∑ i, |d i|) * B)
+          * (2 * B * (∑ i, |a i|) * (∑ i, |b i|) * ‖v - v'‖)
+        + ((∑ i, |a i|) * B) * ((∑ i, |b i|) * B)
+          * (2 * B * (∑ i, |c i|) * (∑ i, |d i|) * ‖v - v'‖)) / δ ^ 4 :=
+        div_le_div_of_nonneg_right
+          (add_le_add (mul_le_mul_of_nonneg_left hnum hK0) (mul_le_mul_of_nonneg_left hdenom hL0))
+          (by positivity)
+    _ = 4 * B ^ 3 * (∑ i, |a i|) * (∑ i, |b i|) * (∑ i, |c i|) * (∑ i, |d i|) / δ ^ 4
+          * ‖v - v'‖ := by ring
+
+end CrossRatio
 
 end
 

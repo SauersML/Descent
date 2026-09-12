@@ -40,3 +40,9 @@ open Descent.Portability.PortabilityMetricCompilation
 #print axioms readout_mem_cube_of_mem_realizationBody
 #print axioms abs_compiledSquaredCorrelation_readout_sub_le
 #print axioms abs_compiledSlope_readout_sub_le
+#print axioms abs_dotProduct_le
+#print axioms abs_dotProduct_sub_le
+#print axioms convex_box
+#print axioms abs_apply_le_of_mem_realizationBody
+#print axioms crossRatio_eq_portabilityRatio
+#print axioms abs_crossRatio_sub_le
