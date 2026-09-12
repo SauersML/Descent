@@ -45,11 +45,14 @@ Möbius inversion is then an exchange of the two sums.
 cumulant has nonnegative integer coefficients. `connectivityCumulant_eq_cumulantOfSizes` shows it
 depends on the interface only through its fiber sizes: it is `cumulantOfSizes q.parts card`,
 (D2) written over partitions of the fiber set with `c(C) = Σ_{i ∈ C} c_i`.
-`cumulantOfSizes_eq_of_equiv` is the multiset form of that dependence: an equivalence of fiber
+`cumulantOfSizes_eq_of_equiv` is the equivalence form of that dependence: an equivalence of fiber
 sets carrying the sizes of one to the sizes of the other leaves the cumulant unchanged. The
 transport is `mapPartition` along an embedding, with inverse `comapPartition`, and
 `connectivityCumulant_eq_of_equiv` states it for two interfaces on possibly different sets of
 individuals whose fibers correspond one to one with equal sizes.
+`connectivityCumulant_eq_of_map_card_eq` is the literal form: interfaces whose fiber sizes form
+the same multiset have the same cumulant, through the size-preserving equivalence that
+`exists_equiv_sizes_of_map_val_eq` assembles size by size.
 
 The degree bound `n - w + 1` is `ConnectivityCumulantDegree`, the corpus form of (D3) over
 `Coalescent.ER n` with `observed` and `graphKer` is `ConnectivityCumulantCorpus`, and the
@@ -687,6 +690,49 @@ theorem connectivityCumulant_eq_of_equiv {s : Finset ι} {s' : Finset κ} (q : F
     connectivityCumulant q = connectivityCumulant q' := by
   rw [connectivityCumulant_eq_cumulantOfSizes, connectivityCumulant_eq_cumulantOfSizes]
   exact cumulantOfSizes_eq_of_equiv (c := fun t ↦ #t) (c' := fun t ↦ #t) e he
+
+omit [DecidableEq ι] in
+/-- The fibers of `T` of size `n` are as many as the copies of `n` in the size multiset. -/
+theorem card_subtype_size_eq_count (T : Finset ι) (c : ι → ℕ) (n : ℕ) :
+    Fintype.card {i : T // c i = n} = Multiset.count n (T.val.map c) := by
+  have he : {i : T // c i = n} ≃ ↥(T.filter fun a ↦ c a = n) :=
+    (Equiv.subtypeSubtypeEquivSubtypeInter (· ∈ T) fun a ↦ c a = n).trans
+      (Equiv.subtypeEquivRight fun a ↦ mem_filter.symm)
+  rw [Fintype.card_congr he, Fintype.card_coe, Multiset.count_map]
+  exact congrArg Multiset.card (Multiset.filter_congr fun a _ ↦ eq_comm)
+
+omit [DecidableEq ι] [DecidableEq κ] in
+/-- **Equal multisets of sizes give a size-preserving equivalence.** When the fibers `T` with
+sizes `c` and the fibers `T'` with sizes `c'` carry the same multiset of sizes, the fibers of
+each size are equinumerous, and matching them size by size gives an equivalence `T ≃ T'` that
+keeps every size. -/
+theorem exists_equiv_sizes_of_map_val_eq {T : Finset ι} {T' : Finset κ} {c : ι → ℕ}
+    {c' : κ → ℕ} (h : T.val.map c = T'.val.map c') :
+    ∃ e : T ≃ T', ∀ i : T, c' (e i) = c i := by
+  have hcard : ∀ n, Fintype.card {i : T // c i = n} = Fintype.card {j : T' // c' j = n} :=
+    fun n ↦ by rw [card_subtype_size_eq_count, card_subtype_size_eq_count, h]
+  let F : ∀ n : ℕ, {i : T // c i = n} ≃ {j : T' // c' j = n} :=
+    fun n ↦ Fintype.equivOfCardEq (hcard n)
+  refine ⟨(Equiv.sigmaFiberEquiv fun i : T ↦ c i).symm.trans
+    ((Equiv.sigmaCongrRight F).trans (Equiv.sigmaFiberEquiv fun j : T' ↦ c' j)), fun i ↦ ?_⟩
+  exact (F (c i) ⟨i, rfl⟩).2
+
+/-- **NOTE Theorem D: fibers with one multiset of sizes have one cumulant.** -/
+theorem cumulantOfSizes_eq_of_map_val_eq {T : Finset ι} {T' : Finset κ} {c : ι → ℕ}
+    {c' : κ → ℕ} (h : T.val.map c = T'.val.map c') :
+    cumulantOfSizes T c = cumulantOfSizes T' c' := by
+  obtain ⟨e, he⟩ := exists_equiv_sizes_of_map_val_eq h
+  exact cumulantOfSizes_eq_of_equiv e he
+
+/-- **NOTE Theorem D: the cumulant depends only on the multiset of fiber sizes.** Two
+interfaces, possibly on different sets of individuals, whose fiber sizes form the same multiset
+have the same cumulant. -/
+theorem connectivityCumulant_eq_of_map_card_eq {s : Finset ι} {s' : Finset κ}
+    (q : Finpartition s) (q' : Finpartition s')
+    (h : q.parts.val.map Finset.card = q'.parts.val.map Finset.card) :
+    connectivityCumulant q = connectivityCumulant q' := by
+  rw [connectivityCumulant_eq_cumulantOfSizes, connectivityCumulant_eq_cumulantOfSizes]
+  exact cumulantOfSizes_eq_of_map_val_eq h
 
 end Relabeling
 

@@ -41,3 +41,7 @@ open Descent.Pangenome.GraphCoalescent
 #print axioms cumulantOfSizes_attach
 #print axioms cumulantOfSizes_eq_of_equiv
 #print axioms connectivityCumulant_eq_of_equiv
+#print axioms card_subtype_size_eq_count
+#print axioms exists_equiv_sizes_of_map_val_eq
+#print axioms cumulantOfSizes_eq_of_map_val_eq
+#print axioms connectivityCumulant_eq_of_map_card_eq
