@@ -7,6 +7,7 @@ import Descent.Program.ExactPortabilityLaws
 import Descent.Program.Consequences
 import Descent.Program.OpenQuestions
 import Descent.Program.PangenomeHiddenClock
+import Descent.Program.AncestralLocality
 
 /-!
 # `Descent.Program` -- the layer head
