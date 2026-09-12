@@ -239,6 +239,7 @@ theorem exchange_of_eq {i j : V} {x y : V → Bool} (h : x j = y j) :
 theorem exchange_of_ne {i j : V} {x y : V → Bool} (h : x j ≠ y j) : exchange i j x y = x :=
   if_neg h
 
+omit [Fintype V] in
 /-- Off its target an event copies the first parent. -/
 theorem exchange_apply_of_ne {i j k : V} (x y : V → Bool) (hk : k ≠ i) :
     exchange i j x y k = x k := by
@@ -354,10 +355,14 @@ theorem sum_checkKernel_congr {r : V → V → ℝ} {A : Finset V} {s : Finset (
 def partner (A : Finset V) (x : V → Bool) : V → Bool :=
   fun l ↦ if l ∈ A then !x l else x l
 
+omit [Fintype V] in
+/-- On `A` the partner flips `x`. -/
 theorem partner_of_mem {A : Finset V} {x : V → Bool} {l : V} (hl : l ∈ A) :
     partner A x l = !x l :=
   if_pos hl
 
+omit [Fintype V] in
+/-- Off `A` the partner copies `x`. -/
 theorem partner_of_not_mem {A : Finset V} {x : V → Bool} {l : V} (hl : l ∉ A) :
     partner A x l = x l :=
   if_neg hl
@@ -418,7 +423,7 @@ theorem sum_eventKernel_mixedBlocks {A : Finset V} (hA : 2 ≤ A.card) {x x' : V
         if_neg (not_mem_mixedBlocks_of_agree hx'A),
         if_neg (not_mem_mixedBlocks_of_disagree hpartner), if_neg hc]
       norm_num
-    · obtain ⟨l, hl, hli⟩ := exists_mem_ne (by omega) i
+    · obtain ⟨l, hl, hli⟩ := exists_mem_ne (show 1 < A.card by omega) i
       by_cases hx : x' j = x j
       · have heq : x' j = partner A x j := by rw [partner_of_not_mem hj, hx]
         have hmem₁ : Function.update x' i (partner A x i) ∈ mixedBlocks A x := by
@@ -547,8 +552,8 @@ theorem refinementStep_agreeOn {r : V → V → ℝ} (hr : ∀ i j, 0 ≤ r i j)
       (fun i hi j hij ↦ hxx' j (mem_union_right _ (mem_outNbhd.mpr
         ⟨i, hi, lt_of_le_of_ne (hr i j) (Ne.symm hij)⟩))) y
     rw [mem_filter, mem_filter, agreeOn_r_iff, agreeOn_r_iff]
-    exact and_congr_right' ⟨fun hw l hl ↦ (h l hl).symm.trans (hw l hl),
-      fun hw l hl ↦ (h l hl).trans (hw l hl)⟩
+    exact ⟨fun hw ↦ ⟨mem_univ w', fun l hl ↦ (h l hl).symm.trans (hw.2 l hl)⟩,
+      fun hw ↦ ⟨mem_univ w, fun l hl ↦ (h l hl).trans (hw.2 l hl)⟩⟩
 
 /-- **The empty observation is autonomous**: with nothing observed, one refinement step changes
 nothing. -/
