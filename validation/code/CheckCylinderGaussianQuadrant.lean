@@ -27,6 +27,11 @@ open Descent.Portability.CylinderGaussianQuadrant
 #print axioms quadrantIndicator_le_one
 #print axioms quadrantLower
 #print axioms quadrantUpper
+#print axioms cast_add_slack
+#print axioms cast_quarter
+#print axioms slack_lt_one_iff
+#print axioms slack_lt_quarter_iff
+#print axioms quarter_le_iff
 #print axioms quadrantEvaluator
 #print axioms integral_quadrantIndicator
 #print axioms quadrant_certificate

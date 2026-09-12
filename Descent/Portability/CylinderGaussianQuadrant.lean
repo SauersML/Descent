@@ -227,8 +227,11 @@ theorem quadrantIndicator_eq (stream : ℕ → Bool) :
     quadrantIndicator stream =
       if (0 < radialDraw stream ∧ radialDraw stream < 1) ∧
           (0 < angularDraw stream ∧ angularDraw stream < 1 / 4) then 1 else 0 := by
-  have hiff := boxMuller_mem_quadrant_iff (radialDraw_mem_unitInterval stream)
-    (angularDraw_mem_unitInterval stream)
+  have hiff : (0 < (gaussianPair stream).1 ∧ 0 < (gaussianPair stream).2) ↔
+      (0 < radialDraw stream ∧ radialDraw stream < 1) ∧
+        (0 < angularDraw stream ∧ angularDraw stream < 1 / 4) :=
+    boxMuller_mem_quadrant_iff (radialDraw_mem_unitInterval stream)
+      (angularDraw_mem_unitInterval stream)
   unfold quadrantIndicator
   by_cases hmember : (0 < radialDraw stream ∧ radialDraw stream < 1) ∧
       (0 < angularDraw stream ∧ angularDraw stream < 1 / 4)
@@ -281,6 +284,36 @@ the angular digits are at least `1/4`, and one otherwise. -/
 def quadrantUpper (stage : ℕ) (word : List Bool) : ℚ :=
   if 1 / 4 ≤ interlacedDraw 1 stage word then 0 else 1
 
+/-- The real cast of digits plus the slack of a stage. -/
+theorem cast_add_slack (q : ℚ) (stage : ℕ) :
+    ((q + (1 / 2) ^ stage : ℚ) : ℝ) = (q : ℝ) + (1 / 2 : ℝ) ^ stage := by
+  norm_num
+
+/-- The real cast of one quarter. -/
+theorem cast_quarter : ((1 / 4 : ℚ) : ℝ) = 1 / 4 := by
+  norm_num
+
+/-- Digits plus slack stay below one in the reals exactly when they do in the rationals. -/
+theorem slack_lt_one_iff (q : ℚ) (stage : ℕ) :
+    (q : ℝ) + (1 / 2 : ℝ) ^ stage < 1 ↔ q + (1 / 2) ^ stage < 1 := by
+  have hiff : ((q + (1 / 2) ^ stage : ℚ) : ℝ) < ((1 : ℚ) : ℝ) ↔ q + (1 / 2) ^ stage < 1 :=
+    Rat.cast_lt
+  rwa [cast_add_slack, Rat.cast_one] at hiff
+
+/-- Digits plus slack stay below one quarter in the reals exactly when they do in the
+rationals. -/
+theorem slack_lt_quarter_iff (q : ℚ) (stage : ℕ) :
+    (q : ℝ) + (1 / 2 : ℝ) ^ stage < 1 / 4 ↔ q + (1 / 2) ^ stage < 1 / 4 := by
+  have hiff : ((q + (1 / 2) ^ stage : ℚ) : ℝ) < ((1 / 4 : ℚ) : ℝ) ↔
+      q + (1 / 2) ^ stage < 1 / 4 :=
+    Rat.cast_lt
+  rwa [cast_add_slack, cast_quarter] at hiff
+
+/-- Digits reach one quarter in the reals exactly when they do in the rationals. -/
+theorem quarter_le_iff (q : ℚ) : (1 / 4 : ℝ) ≤ q ↔ 1 / 4 ≤ q := by
+  have hiff : ((1 / 4 : ℚ) : ℝ) ≤ (q : ℝ) ↔ 1 / 4 ≤ q := Rat.cast_le
+  rwa [cast_quarter] at hiff
+
 /-- NOTE2 Theorem 5 for an angular integrand of the Box–Muller pair: the cylinder evaluator of the
 quadrant indicator at even depths, with exact rational values read from the radial and angular
 digits of a word. -/
@@ -299,11 +332,11 @@ def quadrantEvaluator : CylinderEvaluator quadrantIndicator where
     split_ifs with hcondition
     · obtain ⟨⟨hradialPos, hradialSlack⟩, ⟨hangularPos, hangularSlack⟩⟩ := hcondition
       have hradialPos' : (0 : ℝ) < interlacedDraw 0 stage word := by exact_mod_cast hradialPos
-      have hradialSlack' : (interlacedDraw 0 stage word : ℝ) + (1 / 2 : ℝ) ^ stage < 1 := by
-        exact_mod_cast hradialSlack
+      have hradialSlack' : (interlacedDraw 0 stage word : ℝ) + (1 / 2 : ℝ) ^ stage < 1 :=
+        (slack_lt_one_iff _ stage).mpr hradialSlack
       have hangularPos' : (0 : ℝ) < interlacedDraw 1 stage word := by exact_mod_cast hangularPos
-      have hangularSlack' : (interlacedDraw 1 stage word : ℝ) + (1 / 2 : ℝ) ^ stage < 1 / 4 := by
-        exact_mod_cast hangularSlack
+      have hangularSlack' : (interlacedDraw 1 stage word : ℝ) + (1 / 2 : ℝ) ^ stage < 1 / 4 :=
+        (slack_lt_quarter_iff _ stage).mpr hangularSlack
       have hmember : (0 < radialDraw stream ∧ radialDraw stream < 1) ∧
           (0 < angularDraw stream ∧ angularDraw stream < 1 / 4) := by
         unfold radialDraw angularDraw
@@ -317,8 +350,8 @@ def quadrantEvaluator : CylinderEvaluator quadrantIndicator where
     show quadrantIndicator stream ≤ ((quadrantUpper stage word : ℚ) : ℝ)
     unfold quadrantUpper
     split_ifs with hcondition
-    · have hcondition' : (1 / 4 : ℝ) ≤ interlacedDraw 1 stage word := by
-        exact_mod_cast hcondition
+    · have hcondition' : (1 / 4 : ℝ) ≤ interlacedDraw 1 stage word :=
+        (quarter_le_iff _).mpr hcondition
       have hnotMember : ¬((0 < radialDraw stream ∧ radialDraw stream < 1) ∧
           (0 < angularDraw stream ∧ angularDraw stream < 1 / 4)) := by
         rintro ⟨_, _, hbelow⟩
@@ -376,14 +409,16 @@ def quadrantEvaluator : CylinderEvaluator quadrantIndicator where
         unfold quadrantLower
         split_ifs with hcondition
         · rfl
-        · exact (hcondition ⟨⟨by exact_mod_cast hradialPos, by exact_mod_cast hradialSlack⟩,
-            ⟨by exact_mod_cast hangularPos, by exact_mod_cast hangularSlack⟩⟩).elim
+        · exact (hcondition
+            ⟨⟨by exact_mod_cast hradialPos, (slack_lt_one_iff _ stage).mp hradialSlack⟩,
+              ⟨by exact_mod_cast hangularPos,
+                (slack_lt_quarter_iff _ stage).mp hangularSlack⟩⟩).elim
       have hupper : quadrantUpper stage (prefixOf stream (2 * stage)) = 1 := by
         unfold quadrantUpper
         split_ifs with hcondition
         · have hcondition' :
-              (1 / 4 : ℝ) ≤ interlacedDraw 1 stage (prefixOf stream (2 * stage)) := by
-            exact_mod_cast hcondition
+              (1 / 4 : ℝ) ≤ interlacedDraw 1 stage (prefixOf stream (2 * stage)) :=
+            (quarter_le_iff _).mpr hcondition
           exfalso
           linarith
         · rfl
@@ -398,14 +433,14 @@ def quadrantEvaluator : CylinderEvaluator quadrantIndicator where
         unfold quadrantUpper
         split_ifs with hcondition
         · rfl
-        · exact (hcondition (by exact_mod_cast hangularLarge.le)).elim
+        · exact (hcondition ((quarter_le_iff _).mp hangularLarge.le)).elim
       have hlower : quadrantLower stage (prefixOf stream (2 * stage)) = 0 := by
         unfold quadrantLower
         split_ifs with hcondition
         · obtain ⟨_, _, hslack⟩ := hcondition
           have hslack' : (interlacedDraw 1 stage (prefixOf stream (2 * stage)) : ℝ) +
-              (1 / 2 : ℝ) ^ stage < 1 / 4 := by
-            exact_mod_cast hslack
+              (1 / 2 : ℝ) ^ stage < 1 / 4 :=
+            (slack_lt_quarter_iff _ stage).mpr hslack
           have hpositive : (0 : ℝ) < (1 / 2) ^ stage := by positivity
           exfalso
           linarith
