@@ -108,6 +108,12 @@ def NonnegativeLDRates.ofRates (rates : ManyDemeLDRates D) : NonnegativeLDRates 
   mutation_nonneg := rates.mutation_nonneg
   recombination_nonneg := rates.recombination_nonneg
 
+/-- A corpus rate law read as a nonnegative rate law has the corpus rate coordinates
+`RateGeneratorLipschitz.rateCoordinates`. -/
+theorem NonnegativeLDRates.coordinates_ofRates (rates : ManyDemeLDRates D) :
+    (NonnegativeLDRates.ofRates rates).coordinates = rateCoordinates rates :=
+  rfl
+
 /-- The corpus rate law obtained by raising every coalescence rate by a positive amount. -/
 def NonnegativeLDRates.perturb (rates : NonnegativeLDRates D) (amount : ℝ) (hamount : 0 < amount) :
     ManyDemeLDRates D where

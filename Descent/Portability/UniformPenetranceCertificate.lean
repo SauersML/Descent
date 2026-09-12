@@ -474,6 +474,12 @@ theorem metricEvaluator_certificate (metric : ℚ → ℚ) (curve : ℝ → ℝ)
 def squaredCorrelationFormula {K : Type*} [Field K] (θ : K) : K :=
   θ / (2 - θ)
 
+/-- At a real penetrance the squared-correlation formula is the corpus report
+`ThetaFamilyNonclosure.thetaReport` of NOTE2 (13). -/
+theorem squaredCorrelationFormula_eq_thetaReport (θ : ℝ) :
+    squaredCorrelationFormula θ = ThetaFamilyNonclosure.thetaReport θ :=
+  rfl
+
 /-- NOTE2 §9.1: the population area under the curve as a function of the penetrance. -/
 def aucFormula {K : Type*} [Field K] (θ : K) : K :=
   (3 - θ) / (2 * (2 - θ))
@@ -538,7 +544,10 @@ def squaredCorrelationEvaluator :
     cast_squaredCorrelationFormula squaredCorrelationFormula_increase
 
 /-- NOTE2 Theorem 5 on §9.1: the hypothesis-free cylinder evaluator of the population area
-under the curve at the uniform draw. -/
+under the curve at the uniform draw.
+
+Regime: the §9.1 architecture, whose case prevalence at each penetrance draw is carried by
+`aucFormula` itself. -/
 def aucEvaluator : CylinderEvaluator fun stream ↦ aucFormula (uniformDraw stream) :=
   metricEvaluator aucFormula aucFormula (1 / 2) cast_aucFormula aucFormula_increase
 
