@@ -35,3 +35,15 @@ import Descent.Pangenome.GraphCoalescent.FiberSizeIdentifiability
   Descent.Pangenome.GraphCoalescent.prod_eq_of_cumulantOfSizes_eq
 #print axioms
   Descent.Pangenome.GraphCoalescent.esymm_eq_of_cumulantOfSizes_eq_three
+#print axioms
+  Descent.Pangenome.GraphCoalescent.cumulantOfSizes_six_six_one_ne_nine_two_two
+#print axioms
+  Descent.Pangenome.GraphCoalescent.coeff_succ_deficitCumulant
+#print axioms
+  Descent.Pangenome.GraphCoalescent.fiberSizes_map_pos
+#print axioms
+  Descent.Pangenome.GraphCoalescent.coeff_deficitCumulant_map
+#print axioms
+  Descent.Pangenome.GraphCoalescent.deficitCumulant_map
+#print axioms
+  Descent.Pangenome.GraphCoalescent.cumulantOfSizes_map

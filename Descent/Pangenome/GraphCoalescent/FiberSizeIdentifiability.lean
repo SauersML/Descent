@@ -31,30 +31,36 @@ Write `K_c(u) = u^n C_c(1/u)` for the reversed cumulant (`deficitCumulant`), so 
   elementary symmetric polynomials of `c` (`coeff_two_deficitCumulant_card_three`,
   `coeff_three_deficitCumulant_card_three`, `coeff_three_deficitCumulant_triple`). For `n ≥ 4`
   the second coefficient is affine in `e_2` with nonzero slope, so `C_c` determines `e_2` and
-  `e_3`; with the common sum `e_1 = n`, the multiset of fiber sizes is determined
-  (`esymm_eq_of_cumulantOfSizes_eq_three`).
+  `e_3`, which with the common sum `e_1 = n` determine the multiset of fiber sizes by Vieta's
+  formulas (`esymm_eq_of_cumulantOfSizes_eq_three`).
+- **Symmetric structure.** Every coefficient obeys the merge recursion
+  (`coeff_succ_deficitCumulant`), and the cumulant is invariant under relabeling the fibers by any
+  injection (`coeff_deficitCumulant_map`, `cumulantOfSizes_map`).
+- **A decided separation.** `(6, 6, 1)` and `(9, 2, 2)` on `n = 13` have the same product and
+  different cumulants (`cumulantOfSizes_six_six_one_ne_nine_two_two`).
 
 ## Why it matters
 
-A study sees the graph and its connection clock, not the fibers. The theorem says that at width
-three the clock is a complete invariant of the hidden sizes: no two different fiber profiles on
-the same panel produce the same report law. It is not a consequence of the leading coefficient
-alone: `(6, 6, 1)` and `(9, 2, 2)` on `n = 13` have the same product and are separated only by
-`e_2`.
+A study sees the graph and its connection clock, not the fibers. At width three, on a panel of at
+least four individuals, the cumulant is a complete invariant of the hidden fiber sizes. The leading
+coefficient alone does not suffice: the decided separation above has equal products.
 
 ## The mechanism
 
-`[u^d] K_c · d!` counts, with rates, the sequences of `d` mergers from the loads `c` to one
-component: a hidden merger inside fiber `i` at rate `c_i (c_i - 1)` and a visible merger of `i` and
-`j` at rate `c_i c_j`, fusing them into the load `c_i + c_j - 1`. This is
-`LeadingCoefficient.derivative_deficitCumulant`, read one degree above the top
-(`coeff_card_deficitCumulant`).
+`[u^{d+1}] K_c · (d + 1)` sums, with rates, over the first merger from the loads `c`: a hidden
+merger inside fiber `i` at rate `c_i (c_i - 1)` keeps the fibers, and a visible merger of `i` and
+`j` at rate `c_i c_j` fuses them into the load `c_i + c_j - 1`; each is followed by `[u^d]` of the
+cumulant of the sizes after the merger. This is `LeadingCoefficient.derivative_deficitCumulant`
+read coefficient by coefficient (`coeff_succ_deficitCumulant`), and one degree above the top it is
+`coeff_card_deficitCumulant`. So `[u^d] K_c · d!` is the rate-weighted count of the sequences of
+`d` mergers to one component.
 
 ## Scope
 
-Identifiability of the multiset is proved for `w ≤ 3`; for general `w` only the product is proved
-here. The second coefficient at general width mixes the power sums `p_2, …, p_w` of the excesses
-`c_i - 1`, and no counterexample is known.
+Beyond the product, only widths `w ≤ 3` are claimed. At width three the module proves that the
+cumulant determines `e_2` and `e_3`; the passage to the multiset by Vieta's formulas is not
+restated here. Whether the cumulant determines the multiset of fiber sizes at width four or more is
+open, and nothing here asserts either answer.
 
 ## Empirical status
 
@@ -417,6 +423,111 @@ theorem esymm_eq_of_cumulantOfSizes_eq_three {κ : Type*} [DecidableEq κ] {x y 
   rcases mul_eq_zero.mp hkey with hzero | hzero
   · exact absurd hzero (mul_pos (mul_pos (by norm_num) hpos) hn3).ne'
   · exact_mod_cast sub_eq_zero.mp hzero
+
+/-- **A decided separation.** The fiber sizes `(6, 6, 1)` and `(9, 2, 2)` on `n = 13` have the same
+product `36`, so the top coefficient does not separate them; their cumulants differ, because their
+sums of pairwise products are `48` and `40`. -/
+theorem cumulantOfSizes_six_six_one_ne_nine_two_two :
+    cumulantOfSizes ({0, 1, 2} : Finset (Fin 3)) (fun i ↦ if i = 2 then 1 else 6) ≠
+      cumulantOfSizes ({0, 1, 2} : Finset (Fin 3)) (fun i ↦ if i = 0 then 9 else 2) := by
+  intro h
+  have he := (esymm_eq_of_cumulantOfSizes_eq_three (by decide) (by decide) (by decide)
+    (by decide) (by decide) (by decide) (by decide) (by decide) (by decide) (by decide) h).2
+  exact absurd he (by decide)
+
+/-! ### The symmetric structure -/
+
+/-- **The merge recursion at every degree.** `(d + 1) [u^{d+1}] K_c` sums a hidden merger inside
+fiber `i` at rate `c_i (c_i - 1)` and a visible merger of `i` and `j` at rate `c_i c_j`, each
+followed by `[u^d]` of the cumulant of the sizes after the merger.
+
+Assumes: every fiber size is positive. -/
+theorem coeff_succ_deficitCumulant (T : Finset ι) (c : ι → ℕ) (hc : ∀ i ∈ T, 1 ≤ c i) (d : ℕ) :
+    (deficitCumulant T c).coeff (d + 1) * ((d : ℚ) + 1) =
+      ∑ i ∈ T, (c i : ℚ) * ((c i : ℚ) - 1) *
+          (deficitCumulant T (Function.update c i (c i - 1))).coeff d +
+        ∑ i ∈ T, ∑ j ∈ T.erase i, (c i : ℚ) * (c j : ℚ) *
+          (deficitCumulant (T.erase j) (Function.update c i (c i + c j - 1))).coeff d := by
+  have h := congrArg (fun p ↦ p.coeff d) (derivative_deficitCumulant T c hc)
+  simp only [coeff_derivative, finset_sum_coeff, coeff_add, coeff_C_mul] at h
+  exact h
+
+/-- Sizes transported along an embedding stay positive. -/
+theorem fiberSizes_map_pos {κ : Type*} (e : ι ↪ κ) {T : Finset ι} {c : ι → ℕ} {c' : κ → ℕ}
+    (hc : ∀ i ∈ T, 1 ≤ c i) (hcc' : ∀ i ∈ T, c' (e i) = c i) : ∀ k ∈ T.map e, 1 ≤ c' k := by
+  intro k hk
+  obtain ⟨i, hi, rfl⟩ := mem_map.mp hk
+  rw [hcc' i hi]
+  exact hc i hi
+
+/-- **Relabeling the fibers does not change the cumulant**, coefficient by coefficient: by
+induction along the merge recursion.
+
+Assumes: the fiber set is nonempty, every size is positive, and the relabeled sizes agree with the
+original ones. -/
+theorem coeff_deficitCumulant_map {κ : Type*} [DecidableEq κ] (e : ι ↪ κ) :
+    ∀ (d : ℕ) (T : Finset ι) (c : ι → ℕ) (c' : κ → ℕ), T.Nonempty → (∀ i ∈ T, 1 ≤ c i) →
+      (∀ i ∈ T, c' (e i) = c i) →
+        (deficitCumulant (T.map e) c').coeff d = (deficitCumulant T c).coeff d
+  | 0, T, c, c', hT, hc, hcc' => by
+      rw [coeff_zero_deficitCumulant _ _ hT.map (fiberSizes_map_pos e hc hcc'),
+        coeff_zero_deficitCumulant _ _ hT hc, card_map]
+  | d + 1, T, c, c', hT, hc, hcc' => by
+      have h1 := coeff_succ_deficitCumulant (T.map e) c' (fiberSizes_map_pos e hc hcc') d
+      have h2 := coeff_succ_deficitCumulant T c hc d
+      have hd : ((d : ℚ) + 1) ≠ 0 := by positivity
+      refine mul_right_cancel₀ hd (h1.trans (Eq.trans ?_ h2.symm))
+      rw [sum_map, sum_map]
+      congr 1
+      · refine sum_congr rfl fun i hi ↦ ?_
+        rw [hcc' i hi]
+        by_cases hci : c i = 1
+        · simp [hci]
+        · have hmove : ∀ k ∈ T, Function.update c' (e i) (c i - 1) (e k) =
+              Function.update c i (c i - 1) k := by
+            intro k hk
+            by_cases hki : k = i
+            · rw [hki, Function.update_self, Function.update_self]
+            · rw [Function.update_of_ne (e.injective.ne hki), Function.update_of_ne hki,
+                hcc' k hk]
+          rw [coeff_deficitCumulant_map e d T (Function.update c i (c i - 1))
+            (Function.update c' (e i) (c i - 1)) hT (update_pred_pos hc hi hci) hmove]
+      · refine sum_congr rfl fun i hi ↦ ?_
+        rw [← map_erase, sum_map]
+        refine sum_congr rfl fun j hj ↦ ?_
+        have hjT : j ∈ T := mem_of_mem_erase hj
+        have hmove : ∀ k ∈ T.erase j, Function.update c' (e i) (c i + c j - 1) (e k) =
+            Function.update c i (c i + c j - 1) k := by
+          intro k hk
+          by_cases hki : k = i
+          · rw [hki, Function.update_self, Function.update_self]
+          · rw [Function.update_of_ne (e.injective.ne hki), Function.update_of_ne hki,
+              hcc' k (mem_of_mem_erase hk)]
+        rw [hcc' i hi, hcc' j hjT, ← map_erase,
+          coeff_deficitCumulant_map e d (T.erase j) (Function.update c i (c i + c j - 1))
+            (Function.update c' (e i) (c i + c j - 1))
+            ⟨i, mem_erase.mpr ⟨(ne_of_mem_erase hj).symm, hi⟩⟩ (update_fuse_pos hc hi hjT) hmove]
+
+/-- Relabeling the fibers does not change the reversed cumulant.
+
+Assumes: the fiber set is nonempty, every size is positive, and the relabeled sizes agree with the
+original ones. -/
+theorem deficitCumulant_map {κ : Type*} [DecidableEq κ] (e : ι ↪ κ) {T : Finset ι} {c : ι → ℕ}
+    {c' : κ → ℕ} (hT : T.Nonempty) (hc : ∀ i ∈ T, 1 ≤ c i) (hcc' : ∀ i ∈ T, c' (e i) = c i) :
+    deficitCumulant (T.map e) c' = deficitCumulant T c :=
+  Polynomial.ext fun d ↦ coeff_deficitCumulant_map e d T c c' hT hc hcc'
+
+/-- **The symmetric structure.** The connectivity cumulant of the fiber sizes is invariant under
+relabeling the fibers by any injection: it is a symmetric function of the sizes.
+
+Assumes: the fiber set is nonempty, every size is positive, and the relabeled sizes agree with the
+original ones. -/
+theorem cumulantOfSizes_map {κ : Type*} [DecidableEq κ] (e : ι ↪ κ) {T : Finset ι} {c : ι → ℕ}
+    {c' : κ → ℕ} (hT : T.Nonempty) (hc : ∀ i ∈ T, 1 ≤ c i) (hcc' : ∀ i ∈ T, c' (e i) = c i) :
+    cumulantOfSizes (T.map e) c' = cumulantOfSizes T c := by
+  refine Polynomial.map_injective (f := Int.castRingHom ℚ) Int.cast_injective ?_
+  rw [map_cumulantOfSizes _ _ (fiberSizes_map_pos e hc hcc'), map_cumulantOfSizes _ _ hc, sum_map,
+    sum_congr rfl hcc', deficitCumulant_map e hT hc hcc']
 
 end
 
