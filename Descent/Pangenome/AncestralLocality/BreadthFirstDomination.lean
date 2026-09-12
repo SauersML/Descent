@@ -117,7 +117,16 @@ theorem subsetExpect_insert {α : Type*} [DecidableEq α] {T : Finset α} {a : �
     have hle : E.card ≤ T.card := card_le_card (mem_powerset.mp hE)
     rw [card_insert_of_notMem ha, show T.card + 1 - E.card = T.card - E.card + 1 by omega]
     ring
-  conv_lhs => rw [subsetExpect, sum_powerset_insert ha]
+  have hinj : Set.InjOn (insert a) (T.powerset : Set (Finset α)) := fun E₁ h₁ E₂ h₂ heq ↦ by
+    have ha₁ : a ∉ E₁ := fun h ↦ ha (mem_powerset.mp h₁ h)
+    have ha₂ : a ∉ E₂ := fun h ↦ ha (mem_powerset.mp h₂ h)
+    rw [← erase_insert ha₁, ← erase_insert ha₂, heq]
+  have hdisj : Disjoint T.powerset (T.powerset.image (insert a)) := by
+    rw [disjoint_left]
+    intro E hE hE'
+    obtain ⟨E', -, rfl⟩ := mem_image.mp hE'
+    exact ha (mem_powerset.mp hE (mem_insert_self a E'))
+  conv_lhs => rw [subsetExpect, powerset_insert, sum_union hdisj, sum_image hinj]
   rw [h1, h2, add_comm]
 
 /-- **Conditioning on part of the ground set.** For `S ⊆ T`, a random subset of `T` is a random
@@ -377,11 +386,11 @@ theorem layer_congr {m : ℕ} {E E' : Finset (Sym2 (Fin m))} (g : ℕ) :
     rw [layer_succ, layer_succ, nextLayer_congr fun r hr u hu ↦ h r (hRU hr) u (mem_sdiff.mp hu).1]
     exact ih (nextLayer_subset _ _ _) fun a ha b hb ↦ h a (mem_sdiff.mp ha).1 b (mem_sdiff.mp hb).1
 
-/-- **One breadth-first step, conditioned on the explored edges.** For `R ⊆ U` and a quantity
+/-- **One breadth-first step, conditioned on the explored edges.** For a quantity
 `F S E` that sees `E` only through the edges inside `U \ R` whenever `S ⊆ U \ R`, the expectation
 of `F (nextLayer E R U) E` averages, over the explored edges `E₁`, the expectation of `F S` at the
 layer `S` that `E₁` produces. -/
-theorem graphExpect_nextLayer {m : ℕ} (p : ℝ) {R U : Finset (Fin m)} (hRU : R ⊆ U)
+theorem graphExpect_nextLayer {m : ℕ} (p : ℝ) {R U : Finset (Fin m)}
     (F : Finset (Fin m) → Finset (Sym2 (Fin m)) → ℝ)
     (hF : ∀ S ⊆ U \ R, ∀ E E',
       (∀ a ∈ U \ R, ∀ b ∈ U \ R, (s(a, b) ∈ E ↔ s(a, b) ∈ E')) → F S E = F S E') :
@@ -474,7 +483,7 @@ theorem gwExtinct_pow_le_graphProb_layer_eq_empty {m : ℕ} {p : ℝ} (hp0 : 0 �
     have hstep : graphProb m p (fun E ↦ layer E R U (g + 1) = ∅) =
         subsetExpect (crossEdges R U) p (fun E₁ ↦
           graphProb m p (fun E ↦ layer E (nextLayer E₁ R U) (U \ R) g = ∅)) :=
-      graphExpect_nextLayer p hRU (fun S E ↦ if layer E S (U \ R) g = ∅ then 1 else 0)
+      graphExpect_nextLayer p (fun S E ↦ if layer E S (U \ R) g = ∅ then 1 else 0)
         fun S hS E E' h ↦ by simp only [layer_congr g hS h]
     rw [hstep, gwExtinct_succ, ← pow_mul]
     calc (1 - p * (1 - gwExtinct m p g)) ^ (m * R.card)
@@ -505,8 +514,8 @@ theorem graphExpect_card_layer_le {m : ℕ} {p : ℝ} (hp0 : 0 ≤ p) (hp1 : p �
     have hstep : graphExpect m p (fun E ↦ ((layer E R U (g + 1)).card : ℝ)) =
         subsetExpect (crossEdges R U) p (fun E₁ ↦
           graphExpect m p (fun E ↦ ((layer E (nextLayer E₁ R U) (U \ R) g).card : ℝ))) :=
-      graphExpect_nextLayer p hRU (fun S E ↦ ((layer E S (U \ R) g).card : ℝ))
-        fun S hS E E' h ↦ by rw [layer_congr g hS h]
+      graphExpect_nextLayer p (fun S E ↦ ((layer E S (U \ R) g).card : ℝ))
+        fun S hS E E' h ↦ by simp only [layer_congr g hS h]
     have hpm : 0 ≤ (p * m) ^ g := pow_nonneg (mul_nonneg hp0 (Nat.cast_nonneg m)) g
     rw [hstep]
     calc _ ≤ subsetExpect (crossEdges R U) p
