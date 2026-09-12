@@ -15,3 +15,4 @@ open Descent.Pangenome.AncestralLocality
 #print axioms hasDerivAt_dualSemigroup_apply
 #print axioms samplingObservable_dualSemigroup_zero
 #print axioms hasDerivAt_samplingObservable_dualSemigroup
+#print axioms moments_eq_dualSemigroup

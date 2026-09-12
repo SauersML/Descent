@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.AncestralLocality.SamplingDuality
 import Mathlib.Analysis.Calculus.Deriv.Comp
+import Mathlib.Analysis.Calculus.MeanValue
 import Mathlib.Analysis.SpecialFunctions.Exponential
 import Mathlib.Topology.Algebra.Module.FiniteDimension
 
@@ -10,7 +11,7 @@ assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Condition
 assert_below Descent.Portability Descent.Decision Descent.Program
 
 /-!
-# The coalescent dual semigroup: the backward equation without decisions
+# The coalescent dual semigroup: the sampling duality (7.5) without decisions
 
 Without decisions (`r = 0`) the forward generator (7.1) of the research note "Ancestral locality"
 is the resampling generator of the neutral multi-type Wright-Fisher diffusion, and the backward
@@ -26,31 +27,38 @@ generator: on a vector of total mass one, `H_{L_c f}(p) = resamplingGenerator c 
 (`samplingFunctional_coalescenceOperator`), which is Theorem 6 for `r = 0` as an operator
 identity. Along the semigroup this is the backward equation: `t ↦ H_{S_t f}(p)` has derivative
 `resamplingGenerator c H_{S_t f} (p)` (`hasDerivAt_samplingObservable_dualSemigroup`), with
-`H_{S_0 f}(p) = H_f(p)` (`samplingObservable_dualSemigroup_zero`). So `u(t, p) = H_{S_t f}(p)`,
-the right-hand side `E_f[H_{f_t}(p)]` of the note's (7.5), solves `∂_t u = L u` on the simplex.
+`H_{S_0 f}(p) = H_f(p)` (`samplingObservable_dualSemigroup_zero`).
+
+The duality (7.5) itself is a uniqueness statement. Take any family of linear moment functionals
+`m_t` on observations of arity `n` whose moments obey the moment equation
+`d/dt m_t(f) = m_t(L_c f)`. Then `m_t(f) = m_0(S_t f)` at every time `t ≥ 0`
+(`moments_eq_dualSemigroup`). For the population process started at `p` and
+`m_t(f) = E_p[H_f(P_t)]`, the moment equation is the forward equation of the diffusion read through
+`samplingFunctional_coalescenceOperator`, and the conclusion is
+`E_p[H_f(P_t)] = H_{S_t f}(p) = E_f[H_{f_t}(p)]`.
 
 Scope. Only the pure-resampling case `r = 0` is treated. Decision branching raises the arity, the
 span of sampling observables of bounded arity is not closed under it, and no finite-dimensional
-exponential exists for the full circuit. The forward diffusion on `P(H)` is not constructed, so
-the identification of `H_{S_t f}(p)` with `E_p[H_f(P_t)]`, which needs uniqueness for the forward
-equation, is not proved.
+exponential exists for the full circuit. The forward diffusion on `P(H)` is not constructed: the
+moment equation is a hypothesis on the moment family, not derived from a process, and the
+backward jump process whose law `S_t` is appears only through its generator.
 
 ## Empirical status
 
 None. The bodies here are linear operators and their exponentials over a supplied state space,
-rate and vector, so no measurement can bear on them.
+rate, vector and moment family, so no measurement can bear on them.
 -/
 
 namespace Descent.Pangenome.AncestralLocality
 
 open Finset
 
-variable {H : Type*} [Fintype H] [DecidableEq H] {n : ℕ}
+variable {H : Type*} {n : ℕ}
 
 /-! ### The coalescence generator as an operator -/
 
 /-- **The sampling functional** `f ↦ H_f(p)` at a vector `p`. -/
-def samplingFunctional (p : H → ℝ) : ((Fin n → H) → ℝ) →ₗ[ℝ] ℝ where
+def samplingFunctional [Fintype H] (p : H → ℝ) : ((Fin n → H) → ℝ) →ₗ[ℝ] ℝ where
   toFun f := samplingObservable f p
   map_add' f g := by
     simp only [samplingObservable, Pi.add_apply, add_mul, sum_add_distrib]
@@ -59,7 +67,7 @@ def samplingFunctional (p : H → ℝ) : ((Fin n → H) → ℝ) →ₗ[ℝ] ℝ
       mul_assoc]
 
 /-- The sampling functional is the sampling observable. -/
-theorem samplingFunctional_apply (p : H → ℝ) (f : (Fin n → H) → ℝ) :
+theorem samplingFunctional_apply [Fintype H] (p : H → ℝ) (f : (Fin n → H) → ℝ) :
     samplingFunctional p f = samplingObservable f p :=
   rfl
 
@@ -84,8 +92,8 @@ theorem coalescenceOperator_apply (c : ℝ) (f : (Fin n → H) → ℝ) :
 /-- **Theorem 6 without decisions, as an operator identity.** On a vector of total mass one the
 sampling functional turns the coalescence generator into the resampling generator (7.1):
 `H_{L_c f}(p) = resamplingGenerator c H_f (p)`. -/
-theorem samplingFunctional_coalescenceOperator (c : ℝ) (f : (Fin n → H) → ℝ) {p : H → ℝ}
-    (hp : ∑ h, p h = 1) :
+theorem samplingFunctional_coalescenceOperator [Fintype H] [DecidableEq H] (c : ℝ)
+    (f : (Fin n → H) → ℝ) {p : H → ℝ} (hp : ∑ h, p h = 1) :
     samplingFunctional p (coalescenceOperator c f) =
       resamplingGenerator c (samplingObservable f) p := by
   rw [resamplingGenerator_samplingObservable c f hp, coalescenceOperator_apply]
@@ -95,15 +103,16 @@ theorem samplingFunctional_coalescenceOperator (c : ℝ) (f : (Fin n → H) → 
 
 /-- **The dual semigroup `S_t = e^{t L_c}`** of the coalescence generator, on the
 finite-dimensional space of observations of arity `n`. -/
-noncomputable def dualSemigroup (c t : ℝ) : ((Fin n → H) → ℝ) →L[ℝ] ((Fin n → H) → ℝ) :=
+noncomputable def dualSemigroup [Fintype H] (c t : ℝ) :
+    ((Fin n → H) → ℝ) →L[ℝ] ((Fin n → H) → ℝ) :=
   NormedSpace.exp ℝ (t • LinearMap.toContinuousLinearMap (coalescenceOperator c))
 
 /-- The semigroup starts at the identity. -/
-theorem dualSemigroup_zero (c : ℝ) : dualSemigroup (H := H) (n := n) c 0 = 1 := by
+theorem dualSemigroup_zero [Fintype H] (c : ℝ) : dualSemigroup (H := H) (n := n) c 0 = 1 := by
   rw [dualSemigroup, zero_smul, NormedSpace.exp_zero]
 
 /-- **The semigroup law** `S_{s+t} = S_s S_t`. -/
-theorem dualSemigroup_add (c s t : ℝ) :
+theorem dualSemigroup_add [Fintype H] (c s t : ℝ) :
     dualSemigroup (H := H) (n := n) c (s + t) = dualSemigroup c s * dualSemigroup c t := by
   have hcomm : Commute
       (s • LinearMap.toContinuousLinearMap (coalescenceOperator (H := H) (n := n) c))
@@ -114,7 +123,7 @@ theorem dualSemigroup_add (c s t : ℝ) :
 
 /-- **The semigroup moves an observation along the coalescence generator**,
 `d/dt S_t f = L_c S_t f`. -/
-theorem hasDerivAt_dualSemigroup_apply (c t : ℝ) (f : (Fin n → H) → ℝ) :
+theorem hasDerivAt_dualSemigroup_apply [Fintype H] (c t : ℝ) (f : (Fin n → H) → ℝ) :
     HasDerivAt (fun s ↦ dualSemigroup c s f) (coalescenceOperator c (dualSemigroup c t f)) t := by
   have h := (hasDerivAt_exp_smul_const' (LinearMap.toContinuousLinearMap
     (coalescenceOperator (H := H) (n := n) c)) t).clm_apply (hasDerivAt_const (x := t) (c := f))
@@ -122,20 +131,75 @@ theorem hasDerivAt_dualSemigroup_apply (c t : ℝ) (f : (Fin n → H) → ℝ) :
   exact h
 
 /-- The dual semigroup at time zero leaves every sampling observable unchanged. -/
-theorem samplingObservable_dualSemigroup_zero (c : ℝ) (f : (Fin n → H) → ℝ) (p : H → ℝ) :
-    samplingObservable (dualSemigroup c 0 f) p = samplingObservable f p := by
+theorem samplingObservable_dualSemigroup_zero [Fintype H] (c : ℝ) (f : (Fin n → H) → ℝ)
+    (p : H → ℝ) : samplingObservable (dualSemigroup c 0 f) p = samplingObservable f p := by
   rw [dualSemigroup_zero, ContinuousLinearMap.one_apply]
 
-/-- **The backward equation (7.5) without decisions.** On a vector of total mass one,
+/-- **The backward equation without decisions.** On a vector of total mass one,
 `t ↦ H_{S_t f}(p)` has derivative `resamplingGenerator c H_{S_t f} (p)`: the dual semigroup solves
 the backward equation of the neutral multi-type diffusion, observable by observable. -/
-theorem hasDerivAt_samplingObservable_dualSemigroup (c t : ℝ) (f : (Fin n → H) → ℝ)
-    {p : H → ℝ} (hp : ∑ h, p h = 1) :
+theorem hasDerivAt_samplingObservable_dualSemigroup [Fintype H] [DecidableEq H] (c t : ℝ)
+    (f : (Fin n → H) → ℝ) {p : H → ℝ} (hp : ∑ h, p h = 1) :
     HasDerivAt (fun s ↦ samplingObservable (dualSemigroup c s f) p)
       (resamplingGenerator c (samplingObservable (dualSemigroup c t f)) p) t := by
   rw [← samplingFunctional_coalescenceOperator c _ hp]
   exact HasFDerivAt.comp_hasDerivAt
     (hl := (LinearMap.toContinuousLinearMap (samplingFunctional (n := n) p)).hasFDerivAt)
     (hf := hasDerivAt_dualSemigroup_apply c t f)
+
+/-! ### The duality (7.5) without decisions -/
+
+/-- **The moment form of (7.5) without decisions.** Let `m_t` be linear moment functionals on
+observations of arity `n` whose moments obey the moment equation of the coalescence generator,
+`d/dt m_t(f) = m_t(L_c f)`. Then `m_t(f) = m_0(S_t f)` at every time `t ≥ 0`: the moments are the
+dual semigroup read at the initial moments. The proof differentiates `u ↦ m_u(S_{t-u} f)`, whose
+two contributions cancel, and applies the mean value theorem. -/
+theorem moments_eq_dualSemigroup [Fintype H] [DecidableEq H] (c : ℝ)
+    (m : ℝ → ((Fin n → H) → ℝ) →ₗ[ℝ] ℝ)
+    (hm : ∀ s f, HasDerivAt (fun u ↦ m u f) (m s (coalescenceOperator c f)) s)
+    {t : ℝ} (ht : 0 ≤ t) (f : (Fin n → H) → ℝ) :
+    m t f = m 0 (dualSemigroup c t f) := by
+  have hdecomp : ∀ (u : ℝ) (x : (Fin n → H) → ℝ),
+      m u x = ∑ w, x w * m u (fun j ↦ if w = j then 1 else 0) := fun u x ↦ by
+    conv_lhs => rw [pi_eq_sum_univ x]
+    simp only [map_sum, map_smul, smul_eq_mul]
+  have hgenerator : ∀ (s : ℝ) (x : (Fin n → H) → ℝ),
+      ∑ w, x w * m s (coalescenceOperator c (fun j ↦ if w = j then 1 else 0)) =
+        m s (coalescenceOperator c x) := fun s x ↦ by
+    conv_rhs => rw [pi_eq_sum_univ x]
+    simp only [map_sum, map_smul, smul_eq_mul]
+  have hflat : ∀ s, HasDerivAt (fun u ↦ m u (dualSemigroup c (t - u) f)) 0 s := by
+    intro s
+    have hv : HasDerivAt (fun u ↦ dualSemigroup c (t - u) f)
+        ((-1 : ℝ) • coalescenceOperator c (dualSemigroup c (t - s) f)) s :=
+      HasDerivAt.scomp (hg := hasDerivAt_dualSemigroup_apply c (t - s) f)
+        (hh := (hasDerivAt_id (x := s)).const_sub t)
+    have hsum : HasDerivAt
+        (fun u ↦ ∑ w, dualSemigroup c (t - u) f w * m u (fun j ↦ if w = j then 1 else 0))
+        (∑ w, (((-1 : ℝ) • coalescenceOperator c (dualSemigroup c (t - s) f)) w *
+            m s (fun j ↦ if w = j then 1 else 0) +
+          dualSemigroup c (t - s) f w *
+            m s (coalescenceOperator c (fun j ↦ if w = j then 1 else 0)))) s :=
+      HasDerivAt.fun_sum fun w _ ↦ (HasFDerivAt.comp_hasDerivAt
+        (hl := (ContinuousLinearMap.proj (R := ℝ) (φ := fun _ : Fin n → H ↦ ℝ) w).hasFDerivAt)
+        (hf := hv)).mul (hm s _)
+    have hvalue : ∑ w, (((-1 : ℝ) • coalescenceOperator c (dualSemigroup c (t - s) f)) w *
+            m s (fun j ↦ if w = j then 1 else 0) +
+          dualSemigroup c (t - s) f w *
+            m s (coalescenceOperator c (fun j ↦ if w = j then 1 else 0))) = 0 := by
+      rw [sum_add_distrib, ← hdecomp, hgenerator, map_smul, smul_eq_mul]
+      ring
+    rw [hvalue] at hsum
+    exact hsum.congr_of_eventuallyEq (Filter.Eventually.of_forall fun u ↦ hdecomp u _)
+  have hconst : m t (dualSemigroup c (t - t) f) = m 0 (dualSemigroup c (t - 0) f) := by
+    rcases ht.eq_or_lt with h0 | hpos
+    · rw [← h0]
+    · exact constant_of_derivWithin_zero
+        (fun s _ ↦ (hflat s).differentiableAt.differentiableWithinAt)
+        (fun s hs ↦ (hflat s).hasDerivWithinAt.derivWithin
+          (uniqueDiffOn_Icc hpos s (Set.Ico_subset_Icc_self hs)))
+        t (Set.right_mem_Icc.mpr hpos.le)
+  rw [sub_self, sub_zero, dualSemigroup_zero, ContinuousLinearMap.one_apply] at hconst
+  exact hconst
 
 end Descent.Pangenome.AncestralLocality
