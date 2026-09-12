@@ -13,6 +13,8 @@ import Descent.Pangenome.GraphCoalescent.HiddenLoadFiltering
 import Descent.Pangenome.GraphCoalescent.HiddenLoads
 import Descent.Pangenome.GraphCoalescent.HiddenLumpability
 import Descent.Pangenome.GraphCoalescent.LahWeights
+import Descent.Pangenome.GraphCoalescent.LeadingCoefficient
+import Descent.Pangenome.GraphCoalescent.LumpingVisibleRates
 import Descent.Pangenome.GraphCoalescent.MinimalRefinement
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceClosure
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceLoads
@@ -146,6 +148,11 @@ inside it.
   For the load chain the killed generator carries the internal rates `C(L_C, 2)` and `-C(K, 2)`
   (`killedGenerator_mulVec_loadGenerator`), and a visible merger transfers mass with weight
   `L_C L_D` (`transferMatrix_mulVec_loadGenerator`).
+* Theorem E, (E1): `LeadingCoefficient`. For `w ≥ 2` positive fiber sizes,
+  `[z^{n - w + 1}] C_c(z) = 2 (∏_i c_i) (2n - w)! / (2n - 2w + 2)!` (`coeff_cumulantOfSizes`, at an
+  interface `coeff_connectivityCumulant_top`), through the derivative identity of the reflected
+  cumulant and the recursion `(w - 1) L_w(c) = Σ_{i ≠ j} c_i c_j L_{w - 1}(c^{(ij)})`
+  (`coeff_deficitCumulant_recursion`).
 * Theorem E, the extremal statement: `BalancedFiberExtremum`. Among positive fiber sizes of a
   fixed total the product is maximal exactly on balanced profiles
   (`prod_maximal_iff_isBalancedFibers`), read at the loads of an interface in
@@ -155,9 +162,11 @@ Scope. Theorem A is proved as cover counts with Kingman's unit rate per cover: t
 continuous-time chain, the survival function of (A4) and the probabilistic statement of strong
 lumpability are not constructed, and the mean `2/3` of (A4) is the first-step arithmetic of the
 counted rates. Theorem B is proved as the algebra of the visible rates and of the survival
-derivatives through the killed generator. The step from a strong lumping for every initial
-labeled state to these rates, which is Rosenblatt's criterion applied to the chain of Theorem A,
-and the survival function as a semigroup are not formalized. The table rows of §6 evaluate
+derivatives through the killed generator. With at least three components a strong lumping in
+Rosenblatt's form determines every visible rate and the hidden state
+(`LumpingVisibleRates.visibleRate_eq_of_lumping`, `hiddenState_eq_of_lumping`); at two components
+the second survival derivative is not derived from lumpability, and the survival function as a
+semigroup is not formalized. The table rows of §6 evaluate
 transcriptions of (D2), (D4)-(D6) and (D8) at the tabulated fiber sizes, with the Möbius
 coefficients written out for two and three fibers. The
 connection clock of Theorem C is defined as the first-step solution of the backward equation, and
@@ -166,7 +175,8 @@ continuous-time chain is not formalized, and (C2) is proved in Laplace-transform
 does not imply the stochastic order of the quantile coupling. (D4) is proved by Kingman's backward
 recursion, without enumerating ranked histories. §9 is proved for a finite hidden jump process
 given by its generator, with the load chain's generator `loadGenerator` written from the rates of
-Theorem A. The stopping law (D5)-(D9), (E1)-(E2), (F2) and (F3) are not yet proof-checked. Of
+Theorem A. (E1) is proved from the Möbius sum rather than the ranked-history law. The stopping law
+(D5)-(D9), (E2), (F2) and (F3) are not yet proof-checked. Of
 (F1), the construction of the coupled report and
 multiplicative-coalescent skeletons, the path-level coupling inequality and the identification
 with path measures on càdlàg paths are not formalized. (F4) is proved for the finite random graph
