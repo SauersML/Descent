@@ -11,6 +11,7 @@ open Descent.Portability.AncestralForwardGenerator
   Descent.Portability.AncestralForwardGenerator.tendsto_descFactorial_div_pow_expansion
 #print axioms Descent.Portability.AncestralForwardGenerator.eval_pderiv_X_eq_ite
 #print axioms Descent.Portability.AncestralForwardGenerator.eval_monomialPolynomial_eq_prod
+#print axioms Descent.Portability.AncestralForwardGenerator.sum_mul_eval_pderiv_mul_X
 #print axioms Descent.Portability.AncestralForwardGenerator.tendsto_mul_eval_line_sub
 #print axioms Descent.Portability.AncestralForwardGenerator.forwardDrift
 #print axioms Descent.Portability.AncestralForwardGenerator.forwardGenerator

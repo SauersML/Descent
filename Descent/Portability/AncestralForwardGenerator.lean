@@ -95,14 +95,15 @@ theorem tendsto_descFactorial_div_pow_expansion (k : ℕ) :
       filter_upwards [eventually_ne_atTop 0] with N hN
       have hNr : (N : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hN
       rw [cast_descFactorial_succ, pow_succ]
-      field_simp <;> ring
+      field_simp
     have hscaled : ∀ᶠ N : ℕ in atTop, (N : ℝ) * ((N.descFactorial k : ℝ) / (N : ℝ) ^ k - 1)
           - (k : ℝ) * ((N.descFactorial k : ℝ) / (N : ℝ) ^ k)
         = (N : ℝ) * ((N.descFactorial (k + 1) : ℝ) / (N : ℝ) ^ (k + 1) - 1) := by
       filter_upwards [hratio, eventually_ne_atTop 0] with N hN hN0
       have hNr : (N : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr hN0
       rw [← hN]
-      field_simp <;> ring
+      field_simp
+      ring
     refine ⟨?_, ?_⟩
     · have h := ih.1.mul hone
       rw [one_mul] at h
@@ -121,6 +122,7 @@ section Line
 
 variable {H : Type*} [Fintype H] [DecidableEq H]
 
+omit [Fintype H] in
 /-- A first partial derivative of a coordinate, evaluated, is the indicator of that
 coordinate. -/
 theorem eval_pderiv_X_eq_ite (p : H → ℝ) (z n : H) :
@@ -129,12 +131,26 @@ theorem eval_pderiv_X_eq_ite (p : H → ℝ) (z n : H) :
   · rw [hz, pderiv_X_self, map_one, if_pos rfl]
   · rw [pderiv_X_of_ne (Ne.symm hz), map_zero, if_neg hz]
 
+omit [DecidableEq H] in
 /-- A monomial evaluates to the product of the coordinate powers. -/
 theorem eval_monomialPolynomial_eq_prod (x : H → ℝ) (b : H → ℕ) :
     eval x (monomialPolynomial b) = ∏ a, x a ^ b a := by
   simp only [monomialPolynomial, eval_monomial, one_mul]
   rw [Finsupp.prod_fintype _ _ fun i ↦ pow_zero (x i)]
   simp only [Finsupp.coe_equivFunOnFinite_symm]
+
+/-- **The product rule on a coordinate.**  The first partial derivatives of `F · X_n`, paired with
+a direction `D`, split as `Σ_z D_z ∂_z(F X_n)(p) = (Σ_z D_z ∂_z F(p)) p_n + F(p) D_n`. -/
+theorem sum_mul_eval_pderiv_mul_X (p D : H → ℝ) (F : MvPolynomial H ℝ) (n : H) :
+    ∑ z, D z * eval p (pderiv z (F * X n))
+      = (∑ z, D z * eval p (pderiv z F)) * p n + eval p F * D n := by
+  have hterm : ∀ z, D z * eval p (pderiv z (F * X n))
+      = D z * eval p (pderiv z F) * p n + eval p F * (if z = n then D z else 0) := by
+    intro z
+    rw [pderiv_mul, map_add, map_mul, map_mul, eval_X, eval_pderiv_X_eq_ite]
+    split_ifs <;> ring
+  rw [Finset.sum_congr rfl fun z _ ↦ hterm z, Finset.sum_add_distrib, ← Finset.sum_mul,
+    ← Finset.mul_sum, Finset.sum_ite_eq', if_pos (Finset.mem_univ n)]
 
 /-- **The drift is the derivative along the line.**  For every polynomial `F`, moving the point
 `p` by `D / N` changes `F` by `(1/N) Σ_z D_z ∂_z F(p)` to first order:
@@ -157,15 +173,6 @@ theorem tendsto_mul_eval_line_sub (p D : H → ℝ) (F : MvPolynomial H ℝ) :
       refine tendsto_const_nhds.congr' ?_
       filter_upwards [eventually_ne_atTop 0] with N hN
       rw [mul_inv_cancel₀ (Nat.cast_ne_zero.mpr hN), one_mul]
-    have hterm : ∀ z, D z * eval p (pderiv z (F * X n))
-        = D z * eval p (pderiv z F) * p n + eval p F * (if z = n then D z else 0) := by
-      intro z
-      rw [pderiv_mul, map_add, map_mul, map_mul, eval_X, eval_pderiv_X_eq_ite]
-      split_ifs <;> ring
-    have hvalue : ∑ z, D z * eval p (pderiv z (F * X n))
-        = (∑ z, D z * eval p (pderiv z F)) * p n + eval p F * D n := by
-      rw [Finset.sum_congr rfl fun z _ ↦ hterm z, Finset.sum_add_distrib, ← Finset.sum_mul,
-        ← Finset.mul_sum, Finset.sum_ite_eq', if_pos (Finset.mem_univ n)]
     have hfun : (fun N : ℕ ↦ (N : ℝ) * (eval (fun z ↦ p z + (N : ℝ)⁻¹ * D z) (F * X n)
           - eval p (F * X n)))
         = fun N : ℕ ↦ (N : ℝ) * (eval (fun z ↦ p z + (N : ℝ)⁻¹ * D z) F - eval p F)
@@ -173,7 +180,7 @@ theorem tendsto_mul_eval_line_sub (p D : H → ℝ) (F : MvPolynomial H ℝ) :
       funext N
       simp only [map_mul, eval_X]
       ring
-    rw [hfun, hvalue]
+    rw [hfun, sum_mul_eval_pderiv_mul_X]
     exact (hF.mul hline).add (hunit.const_mul (eval p F))
 
 end Line
