@@ -1,7 +1,9 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Pangenome.AncestralLocality.AncestralDecision
 import Descent.Pangenome.AncestralLocality.ClosureReachability
+import Descent.Pangenome.AncestralLocality.LightConeApproximationBound
 import Descent.Pangenome.AncestralLocality.CoalescentDualSemigroup
 import Descent.Pangenome.AncestralLocality.HeredityKernel
 import Descent.Pangenome.AncestralLocality.HereditaryClosure
@@ -46,7 +48,8 @@ independent complexity bounds and a quantitative light cone.
 ## Theorems
 
 * Theorem 1, the minimal hereditary context: `HereditaryClosure`, on the kernels and observations
-  of `HeredityKernel`, with hereditary autonomy (2.2) in its block form
+  of `HeredityKernel`: the reproduction operator (2.1) maps the simplex to itself
+  (`reproduce_mem_stdSimplex`), and hereditary autonomy (2.2) has a block form
   (`hereditarilyAutonomous_iff`). The refinement `Φ_K` of (3.1) (`refinement_rel_iff`) reaches a
   fixed point within `|H| - |P|` steps (3.2) (`hereditaryClosure_eq_iterate`), and `P_*` is the
   greatest autonomous partition below `P` (`isGreatest_hereditaryClosure`). For an observation
@@ -63,7 +66,8 @@ independent complexity bounds and a quantitative light cone.
   is a heredity kernel (`isHeredityKernel_compatibilityKernel`), a single feature is autonomous
   (`hereditarilyAutonomous_feature`), and the witness observation `(a, b)` is not
   (`witness_not_hereditarilyAutonomous`).
-* Theorem 3, every feature is exactly neutral: `CompatibilityNeutrality`. (4.4) for every
+* Theorem 3, every feature is exactly neutral: `CompatibilityNeutrality`. With the ordered child
+  (4.1), its exchange kernel (4.2) and the compatibility kernel `K_G` (4.3), (4.4) holds for every
   checking graph (`compatibilityKernel_marginal`) and its population form `(R_{K_G}(p))_k = p_k`
   (`featureMass_reproduce_compatibilityKernel`). §4.1: the finite-population kernel `Q_N` (4.5)
   keeps every allele law and is a probability vector for `R ≤ N`, and the offspring count at a
@@ -72,13 +76,14 @@ independent complexity bounds and a quantitative light cone.
   predicts both and the observation `(a, b)` is not autonomous
   (`witness_no_observed_transition_law`, `witness_not_autonomous`).
 * Theorem 4, closure is reachability: `ClosureReachability`. For `|A| ≥ 2` one refinement step
-  turns `P_{π_A}` into `P_{π_{A ∪ N⁺(A)}}` (`refinementStep_agreeOn`), with the difference formula
-  (5.3) (`sum_checkKernel_mixedBlocks_sub`, `mixedBlocks_sub_pos`); iterating, the closure is the
-  observation on `Reach_G(A)` (`iterate_refinementStep_agreeOn_eq_reach`), and an observation of
-  at most one feature is its own closure (`iterate_refinementStep_agreeOn_of_card_le_one`). On a
-  connected graph, the path graph included, every query of two or more features has full-genome
-  closure (`iterate_refinementStep_eq_univ_of_connected`, `iterate_refinementStep_eq_univ_path`)
-  and the pair observation is not autonomous (`not_autonomous_pair_path`).
+  turns `P_{π_A}` into `P_{π_{A ∪ N⁺(A)}}`, (5.2) (`refinementStep_agreeOn`), with the difference
+  formula (5.3) (`sum_checkKernel_mixedBlocks_sub`, `mixedBlocks_sub_pos`); iterating gives (5.1),
+  the closure is the observation on `Reach_G(A)` (`iterate_refinementStep_agreeOn_eq_reach`), and
+  an observation of at most one feature is its own closure
+  (`iterate_refinementStep_agreeOn_of_card_le_one`). §5.1 (5.4): on a connected graph, the path
+  graph included, every query of two or more features has full-genome closure
+  (`iterate_refinementStep_eq_univ_of_connected`, `iterate_refinementStep_eq_univ_path`), and the
+  pair observation is not autonomous (`not_autonomous_pair_path`).
 * §3.2, autonomous observations are not closed under joins: `JointNonautonomy`. On the
   eight-state witness both single features are autonomous and their joint observation is not
   (`autonomous_features_joint_not_autonomous`).
@@ -111,7 +116,16 @@ independent complexity bounds and a quantitative light cone.
   the backward equation (`hasDerivAt_samplingObservable_dualSemigroup`), and every moment family
   obeying the moment equation is `m_t(f) = m_0(S_t f)` (`moments_eq_dualSemigroup`), the
   uniqueness form of (7.5).
-* Theorems 7 and 8, the support drift: `LocalityBounds`. A decision along `i → j` raises the
+* §7, ancestral decisions: `AncestralDecision`. The sampling observable (7.2), the coalescence
+  substitution (`samplingObservable_coalesceArguments`), decision branching (7.3)
+  (`samplingObservable_decisionBranch`) and the sampling identity (7.4) (`sampling_identity`,
+  `sampling_identity_exchangeKernel`). The support tags (7.6): an omitted decision leaves the
+  observable unchanged (`samplingObservable_decisionBranch_of_not_mem`), the updated observable is
+  determined by the updated tags (`tagDetermined_decisionBranch`,
+  `tagDetermined_coalesceArguments`), the support count rises by at most three at a decision and
+  not at a coalescence (`tagCount_decisionTags_le`, `tagCount_coalesceTags_le`), and the decisions
+  that are not omitted have total rate at most `D Z` (`decisionRate_le`).
+* Theorems 7 and 8, the support drift (8.1): `LocalityBounds`. A decision along `i → j` raises the
   weighted support count by at most `w i + 2 w j` (`weightedCount_branchSupports_le`) and a
   coalescence does not raise it (`weightedCount_coalesceSupports_le`); with `Σ_j r i j ≤ D` and
   `w j ≤ κ w i` on every edge of positive rate the ancestral generator obeys
@@ -161,8 +175,10 @@ its support, conditional on the Erdős-Rényi giant component theorem as the nam
 jump process are not constructed. Theorem 1 defines `P_*` as the `|H|`-th iterate of `Φ_K`, which
 is the first fixed point, and Theorem 2 uses only the symmetry of the kernel. Theorem 4 uses its
 own refinement step rather than the refinement of Theorem 1.
-Of Theorem 9, the finite-genome semigroups and the light-cone bound are hypotheses
-(`LightConeApproximation`).
+Of Theorem 9, the finite-genome semigroups are data, and the light-cone approximation is
+discharged (`LightConeApproximationBound.norm_operator_sub_le_lightConeEscape`) from three
+hypotheses: the sampling duality at every exhaustion index, agreement of the evaluations until
+escape, and Dynkin's formula for the marginal laws of the circuit.
 -/
 
 end Descent.Program
