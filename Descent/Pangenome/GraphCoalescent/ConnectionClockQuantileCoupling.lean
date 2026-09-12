@@ -157,7 +157,7 @@ theorem map_quantileTransform (μ : Measure ℝ≥0) [IsProbabilityMeasure μ] :
     rw [hIoc, Real.volume_Ioc, sub_zero, ENNReal.ofReal_toReal hfin]
   · have hIoo : Ioo (0 : ℝ) 1 ∩ Iic (μ (Iic x)).toReal = Ioo 0 1 := by
       rw [heq]
-      exact inter_eq_left.mpr Ioo_subset_Iic_self
+      exact inter_eq_left.mpr (Ioo_subset_Iio_self.trans Iio_subset_Iic_self)
     have hone : μ (Iic x) = 1 := by
       rw [← ENNReal.ofReal_toReal hfin, heq, ENNReal.ofReal_one]
     rw [hIoo, Real.volume_Ioo, sub_zero, ENNReal.ofReal_one, hone]
