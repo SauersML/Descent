@@ -101,13 +101,17 @@ probability one: `F_1 = 1`. -/
 theorem reportConnectedProbability_one {n : ℕ} [NeZero n] (s : Fin n → Fin n) :
     reportConnectedProbability s 1 = 1 := by
   have hmass : ∑ π : ER n, (blockLaw n (n - 1) π).toReal = 1 := by
-    rw [← ENNReal.toReal_sum fun π _ ↦ PMF.apply_ne_top _ _, ← tsum_fintype, PMF.tsum_coe,
+    have htsum := PMF.tsum_coe (blockLaw n (n - 1))
+    rw [tsum_fintype] at htsum
+    rw [← ENNReal.toReal_sum fun π _ ↦ PMF.apply_ne_top (blockLaw n (n - 1)) π, htsum,
       ENNReal.toReal_one]
   rw [← hmass]
   unfold reportConnectedProbability
   refine sum_congr rfl fun π _ ↦ ?_
   by_cases hmem : π ∈ (blockLaw n (n - 1)).support
-  · have hblocks := blocks_of_mem_support_blockLaw (by have := NeZero.pos n; omega) hmem
+  · have hpos := NeZero.pos n
+    have hlt : n - 1 < n := by omega
+    have hblocks : blocks π + (n - 1) = n := blocks_of_mem_support_blockLaw hlt hmem
     have htop : π = ⊤ := (blocks_eq_one_iff π).mp (by omega)
     have hreport : observed s π = ⊤ := by
       rw [htop]
@@ -184,7 +188,9 @@ theorem firstConnectionProbability_eq_sub {n : ℕ} (s : Fin n → Fin n) {b : �
     exact sum_congr rfl fun ξ _ ↦ ENNReal.toReal_mul
   have hjumpMass : ∀ ξ : ER n, ∑ η : ER n, (jumpLaw ξ η).toReal = 1 := by
     intro ξ
-    rw [← ENNReal.toReal_sum fun η _ ↦ PMF.apply_ne_top _ _, ← tsum_fintype, PMF.tsum_coe,
+    have htsum := PMF.tsum_coe (jumpLaw ξ)
+    rw [tsum_fintype] at htsum
+    rw [← ENNReal.toReal_sum fun η _ ↦ PMF.apply_ne_top (jumpLaw ξ) η, htsum,
       ENNReal.toReal_one]
   have hterm : ∀ ξ η : ER n,
       (blockLaw n (n - (b + 1)) ξ).toReal * (jumpLaw ξ η).toReal *

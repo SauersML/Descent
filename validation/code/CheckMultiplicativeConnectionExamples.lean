@@ -7,6 +7,7 @@ import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionExamples
 
 open Descent.Pangenome.GraphCoalescent
 
+#print axioms topMobius_eq_mobiusCoefficient
 #print axioms componentPartition_two_eq_top_iff
 #print axioms connectionProbability_two
 #print axioms isolatePartition_rel

@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionLaw
+import Descent.Pangenome.GraphCoalescent.ConnectivityCumulant
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program
@@ -49,6 +50,11 @@ open Coalescent Finset
 open scoped Classical
 
 noncomputable section
+
+/-- The top Möbius coefficient of `MultiplicativeConnectionLaw` is the Möbius coefficient of
+`ConnectivityCumulant`: both read `μ(σ, ⊤) = (−1)^(|σ|−1) (|σ|−1)!` off the block count, the
+first on the coalescent states of the corpus and the second on finite partitions. -/
+theorem topMobius_eq_mobiusCoefficient (k : ℕ) : topMobius k = mobiusCoefficient k := rfl
 
 /-- The complete graph on two fibers has exactly one edge. -/
 instance uniqueFiberPairTwo : Unique (FiberPair 2) where
