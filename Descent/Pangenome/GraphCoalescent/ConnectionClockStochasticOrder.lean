@@ -28,10 +28,10 @@ pangenome report connects and proves the Laplace-transform order implied by (C2)
   are `e^{-dc}` and `1 - e^{-dc}` (`holdMeasure_Ioi`, `holdMeasure_Iic`,
   `survivalAt_holdDuration`); two holding durations in sequence survive as
   `survivalAt_holdDuration_conv` says.
-* **The thinning identity** `Exp(d_r) = p Exp(d_K) + (1 - p) Exp(d_K) ∗ Exp(d_r)` with `p = d_r/d_K`,
-  `d_r < d_K` (`holdDuration_thinning`): a slow clock is a fast clock that rings through with
-  probability `p`. Applied to `T_r = Exp(d_r) ∗ T_{r-1}` it thins Kingman's transit time at the
-  faster rate of the labeled chain (`survivalAt_kingmanTransitLaw_thinning`).
+* **The thinning identity** `Exp(d_r) = p Exp(d_K) + (1 - p) Exp(d_K) ∗ Exp(d_r)` with
+  `p = d_r/d_K`, `d_r < d_K` (`holdDuration_thinning`): a slow clock is a fast clock that rings
+  through with probability `p`. Applied to `T_r = Exp(d_r) ∗ T_{r-1}` it thins Kingman's transit
+  time at the faster rate of the labeled chain (`survivalAt_kingmanTransitLaw_thinning`).
 * **(C2)**, `survivalAt_connectionTimeLaw_le`: from every labeled state `ξ`,
   `P(τ_q > c) ≤ P(T_r > c)` for all `c`, with `r` the report width. By induction along covers: one
   holding step at rate `d_K`, then at least `C(r, 2)` of the `C(K, 2)` covers are visible
