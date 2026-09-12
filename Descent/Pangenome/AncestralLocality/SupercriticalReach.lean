@@ -158,15 +158,17 @@ theorem indicator_not_giantEvent_zero_le {m : ℕ} (hm : 0 < m) {ε : ℝ} (hε 
       (∑ u, ((reach G {u}).card : ℝ)) / (ε * m) ^ 2 := by
   have hm' : (0 : ℝ) < m := Nat.cast_pos.mpr hm
   have hc : 0 < (ε * m) ^ 2 := pow_pos (mul_pos hε hm') 2
-  split_ifs with hG
-  · have hw : ∃ w, ε * m < ((reach G {w}).card : ℝ) := by
+  by_cases hG : GiantEvent 0 ε G
+  · rw [if_neg (not_not.mpr hG)]
+    exact div_nonneg (sum_nonneg fun _ _ ↦ Nat.cast_nonneg _) hc.le
+  · rw [if_pos hG]
+    have hw : ∃ w, ε * m < ((reach G {w}).card : ℝ) := by
       by_contra hall
       push_neg at hall
       exact hG (giantEvent_zero_of_forall_card_le hm hall)
     obtain ⟨w, hw⟩ := hw
     rw [one_le_div hc]
     exact (pow_le_pow_left₀ (mul_pos hε hm').le hw.le 2).trans (sq_card_reach_le_sum G w)
-  · exact div_nonneg (sum_nonneg fun _ _ ↦ Nat.cast_nonneg _) hc.le
 
 /-- **The subcritical giant-component bound.** For `0 ≤ α < 1` and `m ≥ 1` the event with
 `s = 0` fails with probability at most `1 / ((1 - α) ε^2 m)`. -/
@@ -192,7 +194,7 @@ theorem graphProb_not_giantEvent_zero_le {α ε : ℝ} (hα0 : 0 ≤ α) (hα1 :
           (sum_le_sum fun u _ ↦ graphExpect_card_reach_singleton_le hα0 hα1 u) hc.le
     _ = 1 / ((1 - α) * ε ^ 2) / m := by
         rw [sum_const, card_univ, Fintype.card_fin, nsmul_eq_mul]
-        field_simp <;> ring
+        field_simp
 
 /-- **The subcritical half of the giant component law**, derived from (6.1): for `0 ≤ α < 1`,
 with probability tending to one every component of `G(m, α / m)` has at most `ε m` features. -/
