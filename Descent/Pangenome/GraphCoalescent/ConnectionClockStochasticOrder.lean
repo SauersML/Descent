@@ -345,9 +345,9 @@ theorem holdDuration_thinning {dK dr : ℝ} (hr : 0 < dr) (hK : dr < dK) :
       ring
     have hi1 : dK * dK⁻¹ = 1 := mul_inv_cancel₀ hdK.ne'
     have hi2 : (dK - dr) * (dK - dr)⁻¹ = 1 := mul_inv_cancel₀ hgap.ne'
-    linear_combination (-1 : ℝ) * hexp
-      + Real.exp (-(dr * a)) * (1 - Real.exp (-((dK - dr) * a))) * hi2
-      - Real.exp (-(dr * a)) * (1 - Real.exp (-((dK - dr) * a))) * dr * (dK - dr)⁻¹ * hi1
+    linear_combination hexp
+      - Real.exp (-(dr * a)) * (1 - Real.exp (-((dK - dr) * a))) * hi2
+      + Real.exp (-(dr * a)) * (1 - Real.exp (-((dK - dr) * a))) * dr * (dK - dr)⁻¹ * hi1
   have hmass : (ENNReal.ofReal (dr / dK) • holdDuration dK
       + ENNReal.ofReal (1 - dr / dK) • (holdDuration dK ∗ holdDuration dr)) Set.univ = 1 := by
     rw [Measure.add_apply, Measure.smul_apply, Measure.smul_apply, measure_univ, measure_univ,
@@ -391,7 +391,134 @@ theorem survivalAt_kingmanTransitLaw_thinning {K m : ℕ} (hmK : m + 2 ≤ K) (c
   · rw [hT, ← Measure.conv_assoc, ← Measure.conv_smul_left, ← Measure.conv_smul_left,
       ← Measure.add_conv, ← holdDuration_thinning hr hlt]
   · rw [heq, div_self hdK.ne', sub_self, ENNReal.ofReal_one, ENNReal.ofReal_zero, one_smul,
-      zero_smul, add_zero, hT]
+      zero_smul, add_zero, hT, heq]
+
+/-! ### The stochastic domination -/
+
+/-- The pair count, as an extended real, is Kingman's death rate. -/
+theorem choose_two_eq_ofReal_deathRate (k : ℕ) :
+    ((k.choose 2 : ℕ) : ℝ≥0∞) = ENNReal.ofReal (deathRate k) := by
+  have h := card_covers_eq_deathRate (Delta k)
+  rw [card_covers, blocks_bot] at h
+  rw [← h, ENNReal.ofReal_natCast]
+
+/-- The visible weight of the thinning, as a ratio of pair counts. -/
+theorem choose_two_mul_inv_choose_two {m K : ℕ} (hmK : m + 2 ≤ K) :
+    (((m + 2).choose 2 : ℕ) : ℝ≥0∞) * ((K.choose 2 : ℕ) : ℝ≥0∞)⁻¹
+      = ENNReal.ofReal (deathRate (m + 2) / deathRate K) := by
+  rw [choose_two_eq_ofReal_deathRate, choose_two_eq_ofReal_deathRate,
+    ENNReal.ofReal_div_of_pos (deathRate_pos (show 2 ≤ K by omega)), div_eq_mul_inv]
+
+/-- The invisible weight of the thinning, as a ratio of pair counts. -/
+theorem choose_two_sub_mul_inv_choose_two {m K : ℕ} (hmK : m + 2 ≤ K) :
+    ((K.choose 2 - (m + 2).choose 2 : ℕ) : ℝ≥0∞) * ((K.choose 2 : ℕ) : ℝ≥0∞)⁻¹
+      = ENNReal.ofReal (1 - deathRate (m + 2) / deathRate K) := by
+  have hdK := deathRate_pos (show 2 ≤ K by omega)
+  have hM0 : ((K.choose 2 : ℕ) : ℝ≥0∞) ≠ 0 := by
+    rw [choose_two_eq_ofReal_deathRate]
+    exact ENNReal.ofReal_pos.mpr hdK |>.ne'
+  have hMt : ((K.choose 2 : ℕ) : ℝ≥0∞) ≠ ⊤ := ENNReal.natCast_ne_top _
+  rw [ENNReal.natCast_sub, ENNReal.sub_mul fun _ _ ↦ ENNReal.inv_ne_top.mpr hM0,
+    ENNReal.mul_inv_cancel hM0 hMt, choose_two_mul_inv_choose_two hmK,
+    ENNReal.ofReal_sub 1 (div_nonneg (deathRate_add_two_pos m).le hdK.le), ENNReal.ofReal_one]
+
+/-- **The covers of a state average the Kingman survivals below the thinning weights.** The
+visible covers take the report to `r - 1` components and the invisible ones keep `r`; there are
+at least `C(r, 2)` visible covers, and `T_{r-1}` survives no longer than `T_r`. -/
+theorem sum_survivalAt_kingmanTransitLaw_le {n m : ℕ} (s : Fin n → Fin n) {ξ : ER n}
+    (hr : blocks (observed s ξ) = m + 2) (c : ℝ) :
+    ∑ η : {η : ER n // Covers ξ η}, survivalAt (kingmanTransitLaw (blocks (observed s η.1))) c
+      ≤ (((m + 2).choose 2 : ℕ) : ℝ≥0∞) * survivalAt (kingmanTransitLaw (m + 1)) c
+        + (((blocks ξ).choose 2 - (m + 2).choose 2 : ℕ) : ℝ≥0∞)
+          * survivalAt (kingmanTransitLaw (m + 2)) c := by
+  have hterm : ∀ η : {η : ER n // Covers ξ η},
+      survivalAt (kingmanTransitLaw (blocks (observed s η.1))) c
+        = if Covers (observed s ξ) (observed s η.1)
+          then survivalAt (kingmanTransitLaw (m + 1)) c
+          else survivalAt (kingmanTransitLaw (m + 2)) c := by
+    intro η
+    by_cases hvis : Covers (observed s ξ) (observed s η.1)
+    · rw [if_pos hvis, show blocks (observed s η.1) = m + 1 by have := hvis.2; omega]
+    · rw [if_neg hvis]
+      rcases observed_eq_or_covers s η.2 with heq | hcov
+      · rw [heq, hr]
+      · exact absurd hcov hvis
+  have hsplit := filter_card_add_filter_neg_card_eq_card
+    (s := (univ : Finset {η : ER n // Covers ξ η}))
+    fun η : {η : ER n // Covers ξ η} ↦ Covers (observed s ξ) (observed s η.1)
+  rw [card_univ, card_covers_fintype] at hsplit
+  have hlow : (m + 2).choose 2 ≤ visibleIntensity s ξ := by
+    have h := choose_two_le_visibleIntensity s ξ
+    rwa [hr] at h
+  have hS := survivalAt_kingmanTransitLaw_le_succ (m + 1) c
+  obtain ⟨e, he⟩ := Nat.exists_eq_add_of_le hlow
+  have hvisCard : (univ.filter fun η : {η : ER n // Covers ξ η} ↦
+      Covers (observed s ξ) (observed s η.1)).card = (m + 2).choose 2 + e := he
+  have hinvCard : (univ.filter fun η : {η : ER n // Covers ξ η} ↦
+      ¬ Covers (observed s ξ) (observed s η.1)).card + e
+        = (blocks ξ).choose 2 - (m + 2).choose 2 := by
+    omega
+  rw [sum_congr rfl fun η _ ↦ hterm η, sum_ite, sum_const, sum_const, nsmul_eq_mul, nsmul_eq_mul,
+    hvisCard, ← hinvCard, Nat.cast_add, Nat.cast_add, add_mul, add_mul]
+  calc (((m + 2).choose 2 : ℕ) : ℝ≥0∞) * survivalAt (kingmanTransitLaw (m + 1)) c
+        + (e : ℝ≥0∞) * survivalAt (kingmanTransitLaw (m + 1)) c
+        + (((univ.filter fun η : {η : ER n // Covers ξ η} ↦
+            ¬ Covers (observed s ξ) (observed s η.1)).card : ℕ) : ℝ≥0∞)
+          * survivalAt (kingmanTransitLaw (m + 2)) c
+      ≤ (((m + 2).choose 2 : ℕ) : ℝ≥0∞) * survivalAt (kingmanTransitLaw (m + 1)) c
+        + (e : ℝ≥0∞) * survivalAt (kingmanTransitLaw (m + 2)) c
+        + (((univ.filter fun η : {η : ER n // Covers ξ η} ↦
+            ¬ Covers (observed s ξ) (observed s η.1)).card : ℕ) : ℝ≥0∞)
+          * survivalAt (kingmanTransitLaw (m + 2)) c := by
+        gcongr
+    _ = _ := by ring
+
+/-- **(C2), the stochastic order.** From any labeled state the report connects no later, in the
+stochastic order, than Kingman's transit time at the report width:
+`P(τ_q > c) ≤ P(T_r > c)` for every threshold `c`. -/
+theorem survivalAt_connectionTimeLaw_le {n : ℕ} (s : Fin n → Fin n) (ξ : ER n) :
+    ∀ c : ℝ, survivalAt (connectionTimeLaw s ξ) c
+      ≤ survivalAt (kingmanTransitLaw (blocks (observed s ξ))) c := by
+  induction ξ using covers_induction with
+  | step ξ ih =>
+    intro c
+    rw [connectionTimeLaw_eq]
+    by_cases hr : blocks (observed s ξ) ≤ 1
+    · rw [dif_pos hr]
+      have hT : kingmanTransitLaw (blocks (observed s ξ)) = Measure.dirac 0 := by
+        rcases Nat.le_one_iff_eq_zero_or_eq_one.mp hr with h | h <;> rw [h] <;> rfl
+      rw [hT]
+    · rw [dif_neg hr]
+      obtain ⟨m, hm⟩ : ∃ m, blocks (observed s ξ) = m + 2 := ⟨blocks (observed s ξ) - 2, by omega⟩
+      have hk := two_le_blocks_of_not_le_one s hr
+      have hmK : m + 2 ≤ blocks ξ := hm ▸ blocks_antitone (le_observed s ξ)
+      haveI := measurableSingletonClass_ER n
+      haveI := isProbabilityMeasure_bind_jumpStep ξ hk (fun η ↦ connectionTimeLaw s η.1)
+        fun η ↦ connectionTimeLaw_isProbabilityMeasure s η.1
+      rw [survivalAt_conv, hm, ← survivalAt_kingmanTransitLaw_thinning hmK c]
+      refine lintegral_mono fun x ↦ ?_
+      rw [survivalAt_bind_jumpStep, ← choose_two_mul_inv_choose_two hmK,
+        ← choose_two_sub_mul_inv_choose_two hmK, mul_assoc, mul_assoc, mul_comm _ (_ : ℝ≥0∞)⁻¹,
+        mul_comm (((blocks ξ).choose 2 - (m + 2).choose 2 : ℕ) : ℝ≥0∞)
+          ((((blocks ξ).choose 2 : ℕ) : ℝ≥0∞)⁻¹), ← mul_add]
+      calc (∑ η : {η : ER n // Covers ξ η}, survivalAt (connectionTimeLaw s η.1) (c - x))
+            * ((((blocks ξ).choose 2 : ℕ) : ℝ≥0∞))⁻¹
+          ≤ (∑ η : {η : ER n // Covers ξ η},
+              survivalAt (kingmanTransitLaw (blocks (observed s η.1))) (c - x))
+            * ((((blocks ξ).choose 2 : ℕ) : ℝ≥0∞))⁻¹ :=
+            mul_le_mul_right' (sum_le_sum fun η _ ↦ ih η.1 η.2 (c - x)) _
+        _ ≤ _ := by
+            rw [mul_comm]
+            exact mul_le_mul_left' (sum_survivalAt_kingmanTransitLaw_le s hm (c - x)) _
+
+/-- **(C2) at the panel**: `P(τ_q > c) ≤ P(T_w > c)`, the report of the panel's coalescent connects
+no later, in the stochastic order, than the Kingman `w`-coalescent of
+`Descent.Pangenome.GraphCoalescent.Reduction` reaches its root. -/
+theorem survivalAt_connectionTimeLaw_bot_le {n : ℕ} (s : Fin n → Fin n) (c : ℝ) :
+    survivalAt (connectionTimeLaw s ⊥) c ≤ survivalAt (kingmanTransitLaw (Linkage.width s)) c := by
+  have h := survivalAt_connectionTimeLaw_le s ⊥ c
+  rw [observed_bot, blocks_graphKer] at h
+  exact h
 
 end
 

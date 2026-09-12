@@ -27,3 +27,9 @@ open Descent.Pangenome.GraphCoalescent
 #print axioms deathRate_le_deathRate
 #print axioms holdDuration_thinning
 #print axioms survivalAt_kingmanTransitLaw_thinning
+#print axioms choose_two_eq_ofReal_deathRate
+#print axioms choose_two_mul_inv_choose_two
+#print axioms choose_two_sub_mul_inv_choose_two
+#print axioms sum_survivalAt_kingmanTransitLaw_le
+#print axioms survivalAt_connectionTimeLaw_le
+#print axioms survivalAt_connectionTimeLaw_bot_le
