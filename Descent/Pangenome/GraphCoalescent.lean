@@ -82,6 +82,7 @@ import Descent.Pangenome.GraphCoalescent.ReportInhomogeneousMarkov
 import Descent.Pangenome.GraphCoalescent.KilledSurvivalMean
 import Descent.Pangenome.GraphCoalescent.HiddenLoadContinuousTime
 import Descent.Pangenome.GraphCoalescent.PanelSizeTopCoefficient
+import Descent.Pangenome.GraphCoalescent.FiniteJumpProcess
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program

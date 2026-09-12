@@ -16,6 +16,7 @@ import Descent.Pangenome.GraphCoalescent.ShortTimeConnectionLaw
 import Descent.Pangenome.GraphCoalescent.TwoComponentSurvival
 import Descent.Pangenome.GraphCoalescent.KilledSurvivalMean
 import Descent.Pangenome.GraphCoalescent.HiddenLoadContinuousTime
+import Descent.Pangenome.GraphCoalescent.FiniteJumpProcess
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulant
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulantDegree
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulantCorpus
@@ -327,8 +328,11 @@ counting ranked merger histories, which gives (D5) and (E1) the same way
 `sum_rankedHistoryCount_mul_prod_eq_leadingCoefficient`). §9 is proved for a finite hidden jump
 process given by its generator, with the load chain's generator `loadGenerator` written from the
 rates of Theorem A. (E2) is proved
-for the weight of the connected reports in the matrix exponential of Kingman's generator; the
-continuous-time chain as a process is not constructed. The first-step law of the connection time
+for the weight of the connected reports in the matrix exponential of Kingman's generator. A
+finite continuous-time jump chain is constructed as a path measure; for any finite generator
+its marginals are the matrix exponential (`FiniteJumpProcess.stateProb_canonical_eq`), it does
+not explode (`pathMeasure_stateAt_none`), and it obeys Chapman-Kolmogorov (`stateProb_add`).
+The first-step law of the connection time
 is the law of the trajectory clock and of the first hitting time of `⊤`
 (`ConnectionClockHittingLaw.map_connectionTime_eq_connectionTimeLaw`,
 `map_reportHittingTime_eq_connectionTimeLaw`), so the spectral statement of §6 and (C2) hold for

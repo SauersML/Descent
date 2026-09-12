@@ -37,6 +37,7 @@ import Descent.Pangenome.GraphTransitVariance
 import Descent.Portability.PortabilityMinimaxRate
 import Descent.Portability.HistoryExactLocality
 import Descent.Pangenome.GraphSiteFrequencySpectrum
+import Descent.Portability.PolygenicPortabilityDecay
 
 namespace Descent.Program
 
@@ -102,6 +103,17 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   (`tendsto_portabilityDecay_atTop`) and is identically one without recombination
   (`portabilityDecay_zero_rate`); the cross-heterozygosity form has its own exact decay law
   (`crossHeterozygosityPortabilityRatio_eq`).
+* The polygenic law of portability decay: `PolygenicPortabilityDecay`. For a score over several
+  tag–causal pairs on the same moment system, the cross-population ratio is the signal-weighted
+  sum of the per-pair decays with drift cancelling (`scorePortabilityRatio_eq`); it decreases in
+  the split time and in every recombination rate (`scorePortabilityRatio_antitone_duration`,
+  `scorePortabilityRatio_antitone_recombination`) and tends to the signal share at zero
+  recombination, the floor set by causal coverage (`tendsto_scorePortabilityRatio_atTop`,
+  `coverageFloor_eq_rateShare`). The curve determines that share at every recombination rate
+  (`rateShare_pairShare_eq_of_scorePortabilityRatio_eq`). Correlated pairs add a survivor term
+  (`crossScorePortabilityRatio_eq_diagonal_add`) that vanishes for uncorrelated ancestral LD
+  (`crossScorePortabilityRatio_eq_of_uncorrelated`), and sign-cancelling pairs make the ratio
+  rise (`not_antitoneOn_cancellingDecay`).
 * What a portability curve identifies: `PortabilityCurveIdentifiability`. With a random split
   time, the split-law average of each history's ratio is the Laplace curve `E[e^{-rT}]` for any
   drift (`meanSplitPortabilityRatio_eq`), and its values at `k r₀` determine the split-time law

@@ -727,6 +727,7 @@ import Descent.Portability.TwoLocusPortabilityDecay
 import Descent.Portability.PortabilityCurveIdentifiability
 import Descent.Portability.PortabilitySizeBlindness
 import Descent.Portability.SelectionPortabilityBound
+import Descent.Portability.PolygenicPortabilityDecay
 import Descent.Portability.PortabilityMinimaxRate
 import Descent.Portability.HistoryExactLocality
 
