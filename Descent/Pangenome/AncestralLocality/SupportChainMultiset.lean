@@ -201,7 +201,7 @@ theorem slotsVacant_supportChainStart (A : Finset V) (n M : ℕ) :
   have hle : n ≤ (c : ℕ) := by simpa [supportChainStart] using hc
   obtain ⟨d, rfl⟩ : ∃ d : Fin M, c = Fin.natAdd n d :=
     ⟨⟨(c : ℕ) - n, by have := c.isLt; omega⟩,
-      Fin.ext (by simp only [Fin.coe_natAdd, Fin.val_mk]; omega)⟩
+      Fin.ext (by simp only [Fin.coe_natAdd]; omega)⟩
   simp [supportChainStart]
 
 /-- An occupied slot of a state with empty unused slots lies before `n + k`. -/
@@ -263,7 +263,6 @@ theorem slotsVacant_supportChainBranch {x : SupportChainState V n M} (hx : Slots
   split_ifs with h
   · intro c hc
     dsimp only at hc ⊢
-    simp only [Fin.val_mk] at hc
     have hcp : c ≠ ⟨n + (x.2 : ℕ), by omega⟩ := fun heq ↦ by
       have hv := congrArg Fin.val heq
       simp only [Fin.val_mk] at hv
@@ -389,7 +388,8 @@ theorem supportChainRate_eq_zero_of_not_slotsVacant {r : V → V → ℝ} {c : �
   have hbranch : ∑ a, ∑ i ∈ x.1 a, ∑ j, (if supportChainBranch x a i j = y then r i j else 0) =
       0 :=
     Finset.sum_eq_zero fun a _ ↦ Finset.sum_eq_zero fun i hi ↦ Finset.sum_eq_zero fun j _ ↦
-      if_neg fun heq ↦ hy (heq ▸ slotsVacant_supportChainBranch hx hi j)
+      if_neg fun (heq : supportChainBranch x a i j = y) ↦
+        hy (heq ▸ slotsVacant_supportChainBranch hx hi j)
   have hcoal : ∑ a, ∑ b, (if (coalesceTags a b x.1, x.2) = y then
       (if a < b ∧ (x.1 a).Nonempty ∧ (x.1 b).Nonempty then c else 0) else 0) = 0 := by
     refine Finset.sum_eq_zero fun a _ ↦ Finset.sum_eq_zero fun b _ ↦ ?_
