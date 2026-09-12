@@ -27,12 +27,13 @@ concentration of `Descent.Pangenome.AncestralLocality.SupercriticalConcentration
 **Few features outside it.** The uniform upper bound of
 `Descent.Pangenome.AncestralLocality.SupercriticalUpperBound` gives
 `E#{w : ε'' m ≤ |C(w)|} ≤ (s + ε₁) m`. On the event that a component has `(s - ε₁) m` features,
-that count is at least `(s - ε₁) m` (`card_large_ge_of_mem`). Markov's inequality on the excess then
-bounds the chance that it exceeds `(s + ε) m` by `2 ε₁/(ε + ε₁)` plus a multiple of the chance of the
-complement (`tendsto_graphProb_card_large_le`).
+that count is at least `(s - ε₁) m` (`card_large_ge_of_mem`). Markov's inequality on the excess
+then bounds the chance that it exceeds `(s + ε) m` by `2 ε₁/(ε + ε₁)` plus a multiple of the
+chance of the complement (`tendsto_graphProb_card_large_le`).
 
-**The event.** If some component has at least `(s - ε₁) m` features and at most `(s + ε') m` features
-lie in components of at least `ε'' m` features, then `GiantEvent s ε` holds when `ε' + ε₁ ≤ ε`,
+**The event.** If some component has at least `(s - ε₁) m` features and at most `(s + ε') m`
+features lie in components of at least `ε'' m` features, then `GiantEvent s ε` holds when
+`ε' + ε₁ ≤ ε`,
 `ε'' ≤ ε` and `ε'' ≤ s - ε₁` (`giantEvent_of_exists_of_card_le`). A second component of at least
 `ε'' m` features would have to fit into `(ε' + ε₁) m` features. Both events hold with probability
 tending to one, and `graphProb_add_sub_one_le_and` combines them.
