@@ -163,6 +163,7 @@ def windowMarginalVector (φ : G' → G) (y : FrequencyState Unit Unit (fun _ �
     FrequencyVariable Unit Unit (fun _ ↦ G) → ℝ :=
   fun v ↦ pushVector (windowTypeMap φ) (windowFrequency G' y) v.2
 
+omit [DecidableEq G'] in
 /-- The window marginal frequencies form a state. -/
 theorem windowMarginalVector_mem (φ : G' → G) (y : FrequencyState Unit Unit (fun _ ↦ G')) :
     windowMarginalVector φ y ∈ frequencySimplex Unit Unit (fun _ ↦ G) := by
@@ -234,14 +235,31 @@ theorem windowSamplingPolynomial_mul_X {n : ℕ}
   have hterm : ∀ (w : Fin n → FullHaplotype Unit (fun _ ↦ G)) (y : FullHaplotype Unit (fun _ ↦ G)),
       C (snocObservation f h (Fin.snoc w y))
           * ∏ a, X ((), (Fin.snoc w y : Fin (n + 1) → FullHaplotype Unit (fun _ ↦ G)) a)
-        = if y = h then C (f w) * ∏ a, X ((), w a) * X ((), h) else 0 := by
+        = if y = h then C (f w) * (∏ a, X ((), w a)) * X ((), h) else 0 := by
     intro w y
     rw [Fin.prod_univ_castSucc]
     simp only [snocObservation, Fin.init_snoc, Fin.snoc_last, Fin.snoc_castSucc]
     split_ifs with hy
     · rw [hy, mul_one, mul_assoc]
     · rw [mul_zero, map_zero, zero_mul]
-  rw [windowSamplingPolynomial, windowSamplingPolynomial, Finset.sum_mul, sum_tuple_snoc]
+  have hsnoc : ∑ u : Fin (n + 1) → FullHaplotype Unit (fun _ ↦ G),
+        C (snocObservation f h u) * ∏ a, X ((), u a)
+      = ∑ w : Fin n → FullHaplotype Unit (fun _ ↦ G), ∑ y : FullHaplotype Unit (fun _ ↦ G),
+          C (snocObservation f h (Fin.snoc w y))
+            * ∏ a, X ((), (Fin.snoc w y : Fin (n + 1) → FullHaplotype Unit (fun _ ↦ G)) a) := by
+    calc ∑ u : Fin (n + 1) → FullHaplotype Unit (fun _ ↦ G),
+          C (snocObservation f h u) * ∏ a, X ((), u a)
+        = ∑ x : FullHaplotype Unit (fun _ ↦ G) × (Fin n → FullHaplotype Unit (fun _ ↦ G)),
+            C (snocObservation f h (Fin.snoc x.2 x.1))
+              * ∏ a, X ((), (Fin.snoc x.2 x.1 : Fin (n + 1) → FullHaplotype Unit (fun _ ↦ G)) a) :=
+          (Fintype.sum_equiv (Fin.snocEquiv fun _ ↦ FullHaplotype Unit (fun _ ↦ G)) _ _
+            fun _ ↦ rfl).symm
+      _ = ∑ y : FullHaplotype Unit (fun _ ↦ G), ∑ w : Fin n → FullHaplotype Unit (fun _ ↦ G),
+            C (snocObservation f h (Fin.snoc w y))
+              * ∏ a, X ((), (Fin.snoc w y : Fin (n + 1) → FullHaplotype Unit (fun _ ↦ G)) a) :=
+          Fintype.sum_prod_type _
+      _ = _ := Finset.sum_comm
+  rw [windowSamplingPolynomial, windowSamplingPolynomial, Finset.sum_mul, hsnoc]
   refine Finset.sum_congr rfl fun w _ ↦ ?_
   rw [Finset.sum_congr rfl fun y _ ↦ hterm w y, Finset.sum_ite_eq', if_pos (Finset.mem_univ h)]
 
@@ -266,7 +284,8 @@ theorem mem_samplingSpan (q : FrequencyPolynomial Unit Unit (fun _ ↦ G)) :
     · rintro r ⟨n, f, rfl⟩
       exact Submodule.subset_span ⟨n + 1, snocObservation f h,
         (windowSamplingPolynomial_mul_X f h).symm⟩
-    · rw [zero_mul]
+    · change (0 : FrequencyPolynomial Unit Unit (fun _ ↦ G)) * X ((), h) ∈ samplingSpan G
+      rw [zero_mul]
       exact Submodule.zero_mem _
     · intro r s _ _ hr hs
       rw [add_mul]
@@ -296,6 +315,7 @@ theorem windowSemigroup_comp_windowMarginal (φ : G' → G)
       exact windowSemigroup_comp_windowMarginal_samplingPolynomial φ hap₀ hap₀' t f
     · have hzero : polynomialFunction (0 : FrequencyPolynomial Unit Unit (fun _ ↦ G)) = 0 :=
         ContinuousMap.ext fun x ↦ by simp [polynomialFunction_apply]
+      beta_reduce
       rw [hzero, ContinuousMap.zero_comp, map_zero, map_zero, ContinuousMap.zero_comp]
     · intro r s _ _ hr hs
       rw [polynomialFunction_add, ContinuousMap.add_comp, map_add, map_add, hr, hs,
