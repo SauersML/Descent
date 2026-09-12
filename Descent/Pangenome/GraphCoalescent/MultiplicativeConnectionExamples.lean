@@ -71,7 +71,8 @@ theorem componentPartition_two_eq_top_iff (G : FiberPair 2 → Bool) :
       exact absurd he habsent
     rw [htop] at hle
     have hbot : (⊥ : ER 2) 0 1 := hle trivial
-    exact absurd (hbot : (0 : Fin 2) = 1) (by decide)
+    have hzeroOne : (0 : Fin 2) = 1 := hbot
+    exact absurd hzeroOne (by decide)
   · intro hpresent
     rw [Setoid.eq_top_iff]
     have hadj : configAdjacent G 0 1 := ⟨default, hpresent, Or.inl ⟨rfl, rfl⟩⟩
@@ -268,14 +269,14 @@ theorem crossingRate_isolatePartition_equal (i : Fin 3) :
     crossingRate (fun _ : Fin 3 ↦ (1 / 3 : ℝ)) (isolatePartition i) = 2 / 9 := by
   rw [crossingRate, sum_fiberPair_three]
   simp only [isolatePartition_rel, pairRate]
-  fin_cases i <;> norm_num
+  fin_cases i <;> simp (config := { decide := true }) <;> norm_num
 
 /-- At equal masses the bottom partition is crossed by all three edges of rate `1/9`. -/
 theorem crossingRate_bot_equal :
     crossingRate (fun _ : Fin 3 ↦ (1 / 3 : ℝ)) ⊥ = 1 / 3 := by
   rw [crossingRate, sum_fiberPair_three]
   simp only [Setoid.bot_def, pairRate]
-  norm_num
+  simp (config := { decide := true }) <;> norm_num
 
 /-- **Three equal fibers.** With `p = (1/3, 1/3, 1/3)` the connection time has survival
 `Pr(T_p > u) = 3 e^(−2u/9) − 2 e^(−u/3)`. -/
