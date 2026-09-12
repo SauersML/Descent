@@ -479,7 +479,7 @@ theorem hasDerivAt_dysonTerm_succ (k : ℕ) (t : ℝ) :
     HasDerivAt (dysonTerm c r T f (k + 1))
       (coalescenceGain c (dysonTerm c r T f (k + 1) t) -
           dualExitRate c r (n + k + 1) • dysonTerm c r T f (k + 1) t +
-        (branchingGain r T (dysonTerm c r T f k t) : (Fin (n + (k + 1)) → H) → ℝ)) t := by
+        @id ((Fin (n + (k + 1)) → H) → ℝ) (branchingGain r T (dysonTerm c r T f k t))) t := by
   have hk := continuous_dysonTerm c r T f k
   have h := HasDerivAt.clm_apply (hasDerivAt_killedSemigroup c r (n + k + 1) t)
     (hasDerivAt_integral_from_zero (continuous_branchIntegrand c r T hk) t)
@@ -490,7 +490,7 @@ theorem hasDerivAt_dysonTerm_succ (k : ℕ) (t : ℝ) :
     ← ContinuousLinearMap.mul_apply (killedSemigroup c r (n + k + 1) t), ← killedSemigroup_add,
     add_neg_cancel, killedSemigroup_zero, ContinuousLinearMap.one_apply]
   simp only [killedSemigroup, ContinuousLinearMap.add_apply, ContinuousLinearMap.smul_apply,
-    ContinuousLinearMap.mul_apply, LinearMap.coe_toContinuousLinearMap', map_smul]
+    ContinuousLinearMap.mul_apply, LinearMap.coe_toContinuousLinearMap', map_smul, id_eq]
   module
 
 /-- **The Yule weights majorize the Dyson components**: for `c ≥ 0`, nonnegative rates and
