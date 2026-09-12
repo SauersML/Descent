@@ -111,7 +111,8 @@ theorem bind_jumpStep_eq_sum {n : ℕ} (ξ : ER n) (hk : 2 ≤ blocks ξ) (μ : 
 theorem connectionTimeLaw_of_ne_top {n : ℕ} (hn : 0 < n) (s : Fin n → Fin n) {ξ : ER n}
     (hξ : observed s ξ ≠ ⊤) :
     connectionTimeLaw s ξ
-      = holdDuration (deathRate (blocks ξ)) ∗ (∑ η : ER n, jumpLaw ξ η • connectionTimeLaw s η) := by
+      = holdDuration (deathRate (blocks ξ))
+        ∗ (∑ η : ER n, jumpLaw ξ η • connectionTimeLaw s η) := by
   have hr : ¬ blocks (observed s ξ) ≤ 1 := fun h ↦ hξ ((blocks_observed_le_one_iff hn s ξ).mp h)
   rw [connectionTimeLaw_eq, dif_neg hr,
     bind_jumpStep_eq_sum ξ (two_le_blocks_of_not_le_one s hr) (connectionTimeLaw s)]
@@ -410,8 +411,8 @@ theorem unconnectedMix_succ {n : ℕ} (s : Fin n → Fin n) {j : ℕ} (hj : j + 
       * (if observed s ξ ≠ ⊤ ∧ observed s η = ⊤ then 1 else 0) = firstConnectionMass s j := by
     rw [firstConnectionMass, sum_comm]
   unfold unconnectedMix
-  rw [sum_congr rfl fun ξ _ ↦ hrow ξ, ← conv_finset_sum univ (holdDuration (deathRate (n - j))) _ hX,
-    hswap, sum_congr rfl fun η _ ↦ hcol η, sum_add_distrib, ← Finset.sum_smul, hmass]
+  rw [sum_congr rfl fun ξ _ ↦ hrow ξ,
+    ← conv_finset_sum univ (holdDuration (deathRate (n - j))) _ hX, hswap, sum_congr rfl fun η _ ↦ hcol η, sum_add_distrib, ← Finset.sum_smul, hmass]
 
 /-- **The level-by-level unrolling from `⊥`.** After `j` jumps, the first-step law from `⊥` is the
 first-connection mixture over the levels passed, plus the descent to level `n - j` followed by the
