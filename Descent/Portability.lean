@@ -722,6 +722,8 @@ import Descent.Portability.PortabilityMetricCompilation
 import Descent.Portability.PortabilityExactLocality
 import Descent.Portability.PortabilityIdentification
 import Descent.Portability.EndToEndCorrelationSeries
+import Descent.Portability.EndToEndPortabilityRateLipschitz
+import Descent.Portability.TwoLocusPortabilityDecay
 
 assert_below Descent.Program
 

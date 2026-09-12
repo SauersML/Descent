@@ -16,6 +16,8 @@ import Descent.Portability.PortabilityMetricCompilation
 import Descent.Portability.PortabilityExactLocality
 import Descent.Portability.PortabilityIdentification
 import Descent.Portability.EndToEndCorrelationSeries
+import Descent.Portability.EndToEndPortabilityRateLipschitz
+import Descent.Portability.TwoLocusPortabilityDecay
 import Descent.Pangenome.GraphCoalescent.ReportNonMarkovFromSingletons
 import Descent.Pangenome.GraphCoalescent.FiberSizeIdentifiability
 import Descent.Pangenome.GraphCoalescent.FiberSizeSymmetricRecovery
@@ -67,7 +69,10 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   `(∫₀ᵀ ‖Q₁ - Q₂‖) e^{∫‖Q₁‖} e^{∫‖Q₂‖}`
   (`EndToEndPortabilityLipschitz.norm_rateHistoryDualPropagator_sub_le`), and so does expected
   portability, up to `1/δ⁴` where the denominators stay above `δ`
-  (`abs_expectedPortability_sub_le`). The metric side is explicit: the squared correlation, the
+  (`abs_expectedPortability_sub_le`); composed with the analysis of the metric, expected
+  portability is Lipschitz in the rate history on the realization body with an explicit constant
+  (`EndToEndPortabilityRateLipschitz.abs_expectedPortability_rateHistory_sub_le`). The metric
+  side is explicit: the squared correlation, the
   calibration slope and the portability ratio are rational functions of five second moments, with
   explicit Lipschitz constants on the realization body
   (`PortabilityMetricCompilation.squaredCorrelation_eq_compiled`,
@@ -76,6 +81,15 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   `Σ_k c_k ⬝ (U · H_{4(k+1)}(x₀))` (`EndToEndCorrelationSeries.expectedSquaredCorrelation_eq_tsum`,
   `expectedSquaredCorrelation_historyEventKernel`), so it too depends on the history only through
   propagated moments (`expectedSquaredCorrelation_eq_of_moments_eq`).
+* The closed-form decay of portability through linkage: `TwoLocusPortabilityDecay`. On the NOTE1
+  low-order moment system, for a source and a target split `T` ago with drift and recombination,
+  the cross-population expected squared correlation of a tag-locus score relative to its value at
+  the split is `e^{-2rT}`, with drift cancelling exactly (`crossSquaredCorrelation_eq`,
+  `splitPortabilityRatio_eq`); it decreases in `T` and in the recombination rate
+  (`portabilityDecay_antitone_duration`, `portabilityDecay_antitone_rate`), tends to zero
+  (`tendsto_portabilityDecay_atTop`) and is identically one without recombination
+  (`portabilityDecay_zero_rate`); the cross-heterozygosity form has its own exact decay law
+  (`crossHeterozygosityPortabilityRatio_eq`).
 * Neutral portability is exactly local: `PortabilityExactLocality`. No dual transition adds a locus,
   so configurations on loci within `A` are invariant (`dualTransitions_lociWithin`), and two
   neutral models that agree on the rates of `A` give the same expected moments on `A` at every time
