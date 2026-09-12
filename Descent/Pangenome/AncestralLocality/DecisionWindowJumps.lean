@@ -102,9 +102,8 @@ theorem windowPolynomialAlgebra_separatesPoints :
 /-- **A sampling observable as a continuous function of the law.** -/
 def samplingFunction {n : ℕ} (f : (Fin n → H) → ℝ) : C(SimplexLaw H, ℝ) where
   toFun p := samplingObservable f p.1
-  continuous_toFun := by
-    unfold samplingObservable
-    fun_prop
+  continuous_toFun := continuous_finset_sum _ fun w _ ↦ continuous_const.mul
+    (continuous_finset_prod _ fun a _ ↦ (continuous_apply (w a)).comp continuous_subtype_val)
 
 /-- A sampling function at a law. -/
 theorem samplingFunction_apply {n : ℕ} (f : (Fin n → H) → ℝ) (p : SimplexLaw H) :
@@ -189,11 +188,12 @@ theorem samplingCLM_apply {n : ℕ} (f : (Fin n → H) → ℝ) :
 theorem exists_samplingFunction_eq {F : C(SimplexLaw H, ℝ)} (hF : F ∈ windowPolynomialAlgebra H) :
     ∃ (n : ℕ) (f : (Fin n → H) → ℝ), samplingFunction f = F := by
   obtain ⟨P, rfl⟩ := (AlgHom.mem_range _).mp hF
+  clear hF
   induction P using MvPolynomial.induction_on with
   | C a =>
     refine ⟨0, fun _ ↦ a, ContinuousMap.ext fun p ↦ ?_⟩
     simp [samplingFunction_apply, samplingObservable, MvPolynomial.aeval_C,
-      ContinuousMap.algebraMap_apply]
+      Algebra.algebraMap_eq_smul_one]
   | add P Q hP hQ =>
     obtain ⟨n, f, hf⟩ := hP
     obtain ⟨m, g, hg⟩ := hQ
@@ -279,8 +279,9 @@ def decisionLaw {ε : ℝ} (hε0 : 0 ≤ ε) (hε1 : ε ≤ 1) (T : H → H → 
     refine Continuous.subtype_mk ?_ _
     refine (continuous_const.smul ?_).add (continuous_const.smul continuous_subtype_val)
     refine continuous_pi fun z ↦ ?_
-    unfold reproduce
-    fun_prop
+    exact continuous_finset_sum _ fun x _ ↦ continuous_finset_sum _ fun y _ ↦
+      (((continuous_apply x).comp continuous_subtype_val).mul
+        ((continuous_apply y).comp continuous_subtype_val)).mul continuous_const
 
 /-- The law after a decision jump. -/
 theorem decisionLaw_coe {ε : ℝ} (hε0 : 0 ≤ ε) (hε1 : ε ≤ 1) (T : H → H → H) (p : SimplexLaw H) :
@@ -380,7 +381,6 @@ theorem abs_jumpGenerator_sub_le {c : ℝ} (hc : 0 ≤ c) {r : E → ℝ} (hr : 
       rw [sum_mul, ← sum_sub_distrib, ← sum_sub_distrib]
       exact sum_congr rfl fun e _ ↦ by
         field_simp
-        ring
     rw [hx, he]
     field_simp
     ring
@@ -408,10 +408,8 @@ theorem abs_jumpGenerator_sub_le {c : ℝ} (hc : 0 ≤ c) {r : E → ℝ} (hr : 
         rw [mul_sum]
         congr 1
         · field_simp
-          ring
         · exact sum_congr rfl fun e _ ↦ by
             field_simp
-            ring
     _ ≤ 4 * (c + ∑ e, r e) * ε * (n : ℝ) ^ 3 * ‖f‖ := by
         have hR : 0 ≤ ∑ e, r e := sum_nonneg fun e _ ↦ hr e
         have hterm := mul_le_mul_of_nonneg_left hn
