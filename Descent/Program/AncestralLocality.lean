@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Pangenome.AncestralLocality.AncestralDecision
 import Descent.Pangenome.AncestralLocality.ClosureReachability
 import Descent.Pangenome.AncestralLocality.LightConeApproximationBound
+import Descent.Pangenome.AncestralLocality.ReachabilityClosureTie
 import Descent.Pangenome.AncestralLocality.CoalescentDualSemigroup
 import Descent.Pangenome.AncestralLocality.HeredityKernel
 import Descent.Pangenome.AncestralLocality.HereditaryClosure
@@ -83,7 +84,11 @@ independent complexity bounds and a quantitative light cone.
   (`iterate_refinementStep_agreeOn_of_card_le_one`). §5.1 (5.4): on a connected graph, the path
   graph included, every query of two or more features has full-genome closure
   (`iterate_refinementStep_eq_univ_of_connected`, `iterate_refinementStep_eq_univ_path`), and the
-  pair observation is not autonomous (`not_autonomous_pair_path`).
+  pair observation is not autonomous (`not_autonomous_pair_path`). In the vocabulary of Theorem 1,
+  `ReachabilityClosureTie`: the two refinement steps are one setoid
+  (`refinementStep_eq_refinement`), the closure of `π_A` for `|A| ≥ 2` is `π_{Reach_G(A)}`
+  (`hereditaryClosure_ker_observeOn`), and `agreeOn (directedReach r A)` is the greatest
+  autonomous partition refining `agreeOn A` (`isGreatest_agreeOn_directedReach`).
 * §3.2, autonomous observations are not closed under joins: `JointNonautonomy`. On the
   eight-state witness both single features are autonomous and their joint observation is not
   (`autonomous_features_joint_not_autonomous`).
@@ -173,8 +178,8 @@ its support, conditional on the Erdős-Rényi giant component theorem as the nam
 `(1 - s)^k`. Theorem 6 is proved at generator level, and for `r = 0` as the uniqueness form of
 (7.5) with the moment equation as a hypothesis; the forward diffusion on `P(H)` and the backward
 jump process are not constructed. Theorem 1 defines `P_*` as the `|H|`-th iterate of `Φ_K`, which
-is the first fixed point, and Theorem 2 uses only the symmetry of the kernel. Theorem 4 uses its
-own refinement step rather than the refinement of Theorem 1.
+is the first fixed point, and Theorem 2 uses only the symmetry of the kernel. Theorem 4 and its
+restatement through the closure of Theorem 1 take nonnegative rates.
 Of Theorem 9, the finite-genome semigroups are data, and the light-cone approximation is
 discharged (`LightConeApproximationBound.norm_operator_sub_le_lightConeEscape`) from three
 hypotheses: the sampling duality at every exhaustion index, agreement of the evaluations until
