@@ -77,7 +77,7 @@ theorem sum_yuleDeriv (n : ℕ) (R : ℝ) (K : ℕ) (t : ℝ) :
   induction K with
   | zero =>
     have hder : yuleDeriv n R 0 t = -((n : ℝ) * R) * yuleWeight n R 0 t := rfl
-    simp only [sum_range_one, hder, Nat.cast_zero, add_zero]
+    rw [sum_range_succ, sum_range_zero, zero_add, hder, Nat.cast_zero, add_zero]
   | succ K ih =>
     have hder : yuleDeriv n R (K + 1) t =
         -(((n : ℝ) + K + 1) * R) * yuleWeight n R (K + 1) t +
@@ -136,6 +136,7 @@ section Window
 
 variable {H : Type*} [Fintype H] [DecidableEq H] {E : Type*} [Fintype E]
 
+omit [Fintype H] [DecidableEq H] in
 /-- **Branching at rate zero does nothing.** -/
 theorem branchingGain_zero_rates (T : E → H → H → H) {m : ℕ} (g : (Fin m → H) → ℝ) :
     branchingGain (0 : E → ℝ) T g = 0 := by
@@ -164,6 +165,7 @@ theorem dualSeries_zero_rates (c : ℝ) (T : E → H → H → H) {n : ℕ} (f :
 
 /-! ## The unbranched components -/
 
+omit [DecidableEq H] in
 /-- **Selection kills the unbranched component at the branching rate**:
 `e^{t(P - λ^r_m)} g = e^{-mRt} e^{t(P - λ^0_m)} g`. -/
 theorem killedSemigroup_eq_smul_zero_rates (c : ℝ) (r : E → ℝ) (m : ℕ) (t : ℝ)
@@ -178,6 +180,7 @@ theorem killedSemigroup_eq_smul_zero_rates (c : ℝ) (r : E → ℝ) (m : ℕ) (
     ring
   simp only [killedSemigroup, ContinuousLinearMap.smul_apply, smul_smul, hexp]
 
+omit [DecidableEq H] in
 /-- The neutral unbranched component contracts: `‖e^{t(P - λ^0_m)} g‖ ≤ ‖g‖` for `t ≥ 0`. -/
 theorem norm_killedSemigroup_zero_rates_le {c : ℝ} (hc : 0 ≤ c) {m : ℕ} {t : ℝ} (ht : 0 ≤ t)
     (g : (Fin m → H) → ℝ) : ‖killedSemigroup c (0 : E → ℝ) m t g‖ ≤ ‖g‖ := by
@@ -185,6 +188,7 @@ theorem norm_killedSemigroup_zero_rates_le {c : ℝ} (hc : 0 ≤ c) {m : ℕ} {t
   simpa only [Pi.zero_apply, sum_const_zero, mul_zero, zero_mul, neg_zero, Real.exp_zero,
     one_mul] using h
 
+omit [DecidableEq H] in
 /-- **The unbranched components with and without selection** differ by at most
 `(1 - e^{-mRt}) ‖g‖` for `t ≥ 0`. -/
 theorem norm_killedSemigroup_sub_zero_rates_le {c : ℝ} (hc : 0 ≤ c) {r : E → ℝ}
