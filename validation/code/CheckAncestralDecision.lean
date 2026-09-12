@@ -7,14 +7,16 @@ import Descent.Pangenome.AncestralLocality.AncestralDecision
 
 open Descent.Pangenome.AncestralLocality
 
+#print axioms ruleKernel_orderedChild
 #print axioms sampling_identity
+#print axioms sampling_identity_exchangeKernel
 #print axioms sum_tuple_snoc
 #print axioms samplingObservable_decisionBranch
 #print axioms sum_filter_update
 #print axioms samplingObservable_coalesceArguments
 #print axioms samplingObservable_coalesceArguments_comm
 #print axioms samplingObservable_decisionBranch_of_agree
-#print axioms checkedTransfer_of_ne
+#print axioms orderedChild_of_ne
 #print axioms tagDetermined_restrict
 #print axioms coalesceTags_apply
 #print axioms decisionTags_castSucc

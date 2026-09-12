@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.FiniteGenomeAncestry
+import Descent.Pangenome.AncestralLocality.CompatibilityNeutrality
 import Mathlib.Algebra.BigOperators.Fin
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
@@ -25,11 +26,13 @@ substitutions.
   parent out (`samplingObservable_decisionBranch`), and when `f` cannot see what the rule changes
   the event is invisible (`samplingObservable_decisionBranch_of_agree`).
 
-The sampling identity (7.4) says that an ordered rule and its exchange kernel
-`K_T(x,y) = ½δ_{T(x,y)} + ½δ_{T(y,x)}` (`exchangeKernel`, the note's (4.2)) have the same
-expectations against `p ⊗ p` (`sampling_identity`).
+The sampling identity (7.4) says that an ordered rule `T` and its exchange kernel
+`K_T(x,y) = ½δ_{T(x,y)} + ½δ_{T(y,x)}` (`ruleKernel T`, the note's (4.2)) have the same
+expectations against `p ⊗ p` (`sampling_identity`); for the ordered child `orderedChild i j` the
+rule kernel is the exchange kernel `exchangeKernel i j` (`ruleKernel_orderedChild`,
+`sampling_identity_exchangeKernel`).
 
-For the checking rule (4.1), `checkedTransfer i j` ("copy coordinate `i` from the second parent
+For the ordered child (4.1), `orderedChild i j` ("copy coordinate `i` from the second parent
 when the parents agree at `j`"), §7.3 attaches a support tag `A_a ⊆ V` to every argument.
 `TagDetermined f A` says `f` reads argument `a` only at the coordinates `A a`; observing a set `A`
 of coordinates in every sampled genome is such a state (`tagDetermined_restrict`). The updates
@@ -52,9 +55,9 @@ every target sum to at most `D` (`decisionRate_le`). On a genome of `L` coordina
 a set of ancestral material in the sense of `Descent.Coalescent.FiniteGenomeAncestry`, of size `Z`
 (`card_tagMaterial`).
 
-Scope. The note's neutral-model module is not on main when this file is written, so the checked
-transfer (4.1) and the exchange kernel (4.2) are defined here from the note. A coalesced
-observable keeps its arity and leaves argument `a` unread, so it agrees with the note's
+Scope. The ordered child (4.1), the equal mixture `halfMix` and the exchange kernel (4.2) are those
+of `Descent.Pangenome.AncestralLocality.CompatibilityNeutrality`. A coalesced observable keeps its
+arity and leaves argument `a` unread, so it agrees with the note's
 `(n - 1)`-argument observable on vectors of total mass one only. The forward generator (7.1), the
 generator identity of Theorem 6, the backward jump process, its nonexplosion and the semigroup
 form (7.5) are not in this file.
@@ -90,31 +93,36 @@ def decisionBranch (T : H → H → H) (a : Fin n) (f : (Fin n → H) → ℝ) :
     (Fin (n + 1) → H) → ℝ :=
   fun u ↦ f (Function.update (Fin.init u) a (T (u a.castSucc) (u (Fin.last n))))
 
-/-- **The exchange kernel (4.2)** of an ordered rule: the child is `T(x, y)` or `T(y, x)`, each
-with probability one half. -/
-noncomputable def exchangeKernel [DecidableEq H] (T : H → H → H) (x y z : H) : ℝ :=
-  ((if T x y = z then 1 else 0) + (if T y x = z then 1 else 0)) / 2
+/-- **The exchange kernel of an ordered rule (4.2)**, `K_T(x,y) = ½δ_{T(x,y)} + ½δ_{T(y,x)}`: the
+child is `T(x, y)` or `T(y, x)`, each with probability one half. -/
+noncomputable def ruleKernel [DecidableEq H] (T : H → H → H) (x y : H) : H → ℝ :=
+  halfMix (T x y) (T y x)
+
+/-- **The rule kernel of the ordered child is the exchange kernel `K_ij`.** -/
+theorem ruleKernel_orderedChild {V : Type*} [Fintype V] [DecidableEq V] (i j : V) :
+    ruleKernel (orderedChild i j) = exchangeKernel i j :=
+  rfl
 
 /-- **The sampling identity (7.4).** Against `p ⊗ p` an ordered rule and its exchange kernel give
 the same expectation of every function of the child, `∬ ∑_z K_T(x,y;z) φ(z) = ∬ φ(T(x,y))`: the
 two orders of the parents are exchangeable under the product law, and exchanging them is all the
 symmetrization does. -/
 theorem sampling_identity [Fintype H] [DecidableEq H] (T : H → H → H) (p φ : H → ℝ) :
-    ∑ x, ∑ y, p x * p y * ∑ z, exchangeKernel T x y z * φ z =
+    ∑ x, ∑ y, p x * p y * ∑ z, ruleKernel T x y z * φ z =
       ∑ x, ∑ y, p x * p y * φ (T x y) := by
-  have hkernel : ∀ x y, ∑ z, exchangeKernel T x y z * φ z = (φ (T x y) + φ (T y x)) / 2 := by
+  have hkernel : ∀ x y, ∑ z, ruleKernel T x y z * φ z = (φ (T x y) + φ (T y x)) / 2 := by
     intro x y
-    have hterm : ∀ z, exchangeKernel T x y z * φ z =
+    have hterm : ∀ z, ruleKernel T x y z * φ z =
         ((if T x y = z then φ z else 0) + (if T y x = z then φ z else 0)) / 2 := by
       intro z
-      simp only [exchangeKernel]
+      simp only [ruleKernel, halfMix]
       split_ifs <;> ring
     simp only [hterm, ← sum_div, sum_add_distrib, sum_ite_eq, mem_univ, if_true]
   have hswap : ∑ x, ∑ y, p x * p y * φ (T y x) = ∑ x, ∑ y, p x * p y * φ (T x y) := by
     rw [sum_comm]
     refine sum_congr rfl fun x _ ↦ sum_congr rfl fun y _ ↦ ?_
     ring
-  have hsplit : ∑ x, ∑ y, p x * p y * ∑ z, exchangeKernel T x y z * φ z =
+  have hsplit : ∑ x, ∑ y, p x * p y * ∑ z, ruleKernel T x y z * φ z =
       (∑ x, ∑ y, p x * p y * φ (T x y) + ∑ x, ∑ y, p x * p y * φ (T y x)) / 2 := by
     rw [← sum_add_distrib, sum_div]
     refine sum_congr rfl fun x _ ↦ ?_
@@ -124,6 +132,14 @@ theorem sampling_identity [Fintype H] [DecidableEq H] (T : H → H → H) (p φ 
     ring
   rw [hsplit, hswap]
   ring
+
+/-- **The sampling identity for the checked exchange (7.4)**: against `p ⊗ p` the exchange kernel
+`K_ij` of (4.2) has the expectations of the ordered child `T_ij`. -/
+theorem sampling_identity_exchangeKernel {V : Type*} [Fintype V] [DecidableEq V] (i j : V)
+    (p φ : (V → Bool) → ℝ) :
+    ∑ x, ∑ y, p x * p y * ∑ z, exchangeKernel i j x y z * φ z =
+      ∑ x, ∑ y, p x * p y * φ (orderedChild i j x y) :=
+  sampling_identity (orderedChild i j) p φ
 
 /-- Summing over `n + 1` genomes is summing over the first `n` and then over the last. -/
 theorem sum_tuple_snoc [Fintype H] (F : (Fin (n + 1) → H) → ℝ) :
@@ -232,14 +248,9 @@ theorem samplingObservable_decisionBranch_of_agree [Fintype H] (T : H → H → 
 
 variable {V : Type*}
 
-/-- **The checked transfer (4.1).** The child is the first parent, except that coordinate `i` is
-copied from the second parent when the two parents agree at the checker `j`. -/
-def checkedTransfer [DecidableEq V] (i j : V) (x y : V → Bool) : V → Bool :=
-  fun k ↦ if k = i ∧ x j = y j then y i else x k
-
-/-- The checked transfer changes nothing away from its target. -/
-theorem checkedTransfer_of_ne [DecidableEq V] {i k : V} (j : V) (hk : k ≠ i) (x y : V → Bool) :
-    checkedTransfer i j x y k = x k :=
+/-- The ordered child changes nothing away from its target. -/
+theorem orderedChild_of_ne [DecidableEq V] {i k : V} (j : V) (hk : k ≠ i) (x y : V → Bool) :
+    orderedChild i j x y k = x k :=
   if_neg fun h ↦ hk h.1
 
 /-- **The support-tag condition (§7.3).** `f` reads argument `a` only at the coordinates `A a`:
@@ -313,7 +324,7 @@ nowhere otherwise.
 Assumes: `TagDetermined f A`. -/
 theorem tagDetermined_decisionBranch [DecidableEq V] (i j : V) (a : Fin n)
     {f : (Fin n → V → Bool) → ℝ} {A : Fin n → Finset V} (hf : TagDetermined f A) :
-    TagDetermined (decisionBranch (checkedTransfer i j) a f) (decisionTags i j a A) := by
+    TagDetermined (decisionBranch (orderedChild i j) a f) (decisionTags i j a A) := by
   intro u u' hu
   refine hf _ _ fun c v hv ↦ ?_
   by_cases hca : c = a
@@ -324,11 +335,11 @@ theorem tagDetermined_decisionBranch [DecidableEq V] (i j : V) (a : Fin n)
         hu a.castSucc k (by simpa [decisionTags_castSucc, hi] using hk)
       have hdonor : ∀ k ∈ ({i, j} : Finset V), u (Fin.last n) k = u' (Fin.last n) k :=
         fun k hk ↦ hu (Fin.last n) k (by simpa [decisionTags_last, hi] using hk)
-      simp only [checkedTransfer]
+      simp only [orderedChild]
       rw [hparent j (mem_insert_self j _), hdonor j (by simp), hdonor i (by simp),
         hparent v (mem_insert_of_mem hv)]
     · have hvi : v ≠ i := fun h ↦ hi (by rw [← h]; exact hv)
-      simp only [checkedTransfer, hvi, false_and, if_false]
+      simp only [orderedChild, hvi, false_and, if_false]
       exact hu a.castSucc v (by simpa [decisionTags_castSucc, hi] using hv)
   · rw [Function.update_of_ne hca, Function.update_of_ne hca]
     exact hu c.castSucc v (by simpa [decisionTags_castSucc, hca] using hv)
@@ -341,13 +352,13 @@ Assumes: `TagDetermined f A`. -/
 theorem samplingObservable_decisionBranch_of_not_mem [Fintype V] [DecidableEq V] {i : V} (j : V)
     {a : Fin n} {f : (Fin n → V → Bool) → ℝ} {A : Fin n → Finset V} (hf : TagDetermined f A)
     (hi : i ∉ A a) {p : (V → Bool) → ℝ} (hp : ∑ h, p h = 1) :
-    samplingObservable (decisionBranch (checkedTransfer i j) a f) p =
+    samplingObservable (decisionBranch (orderedChild i j) a f) p =
       samplingObservable f p := by
   refine samplingObservable_decisionBranch_of_agree _ (fun w y ↦ hf _ _ fun c v hv ↦ ?_) hp
   by_cases hca : c = a
   · rw [hca, Function.update_self]
     rw [hca] at hv
-    exact checkedTransfer_of_ne j (fun h ↦ hi (by rw [← h]; exact hv)) _ _
+    exact orderedChild_of_ne j (fun h ↦ hi (by rw [← h]; exact hv)) _ _
   · rw [Function.update_of_ne hca]
 
 /-! ### Support counts and weights -/
