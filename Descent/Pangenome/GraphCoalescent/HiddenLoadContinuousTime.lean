@@ -346,9 +346,9 @@ theorem kingmanClock_descentTime_succ_le (n k : ℕ) (hk : 1 ≤ k) (hkn : k + 1
     kingmanClock {ω | descentTime n (clockHold ω) (k + 1) ≤ t}
       = levelProb n (k + 1) t + kingmanClock {ω | descentTime n (clockHold ω) k ≤ t} := by
   have hnull : kingmanClock {ω : ℕ → ℝ | ¬ ∀ j, 0 ≤ ω j} = 0 := ae_iff.mp ae_nonneg_kingmanClock
-  have hae : {ω : ℕ → ℝ | descentTime n (clockHold ω) (k + 1) ≤ t}
-      =ᵐ[kingmanClock] {ω | blockCountAt n (clockHold ω) t = k + 1}
-        ∪ {ω | descentTime n (clockHold ω) k ≤ t} := by
+  have hae : ({ω : ℕ → ℝ | descentTime n (clockHold ω) (k + 1) ≤ t} : Set (ℕ → ℝ))
+      =ᵐ[kingmanClock] ({ω | blockCountAt n (clockHold ω) t = k + 1}
+        ∪ {ω | descentTime n (clockHold ω) k ≤ t} : Set (ℕ → ℝ)) := by
     filter_upwards [ae_nonneg_kingmanClock] with ω hω
     have hsucc := descentTime_clockHold_succ n k hk (by omega) ω
     have hstep : 0 ≤ ω (k - 1) := hω (k - 1)
@@ -376,12 +376,12 @@ theorem kingmanClock_descentTime_succ_le (n k : ℕ) (hk : 1 ≤ k) (hkn : k + 1
     have h1' : blockCountAt n (clockHold ω) t = k + 1 := h1
     have h2' : descentTime n (clockHold ω) k ≤ t := h2
     intro hpos
-    have := blockCountAt_le_of_descentTime_le n (fun j ↦ hpos (j - 2)) hk (by omega) h2'
+    have hpos' : ∀ j, 0 ≤ clockHold ω j := fun j ↦ hpos (j - 2)
+    have := blockCountAt_le_of_descentTime_le n hpos' hk (by omega) h2'
     omega
-  rw [measure_congr hae, measure_union₀
+  rw [levelProb, measure_congr hae, measure_union₀
     (measurableSet_le (measurable_descentTime_clockHold n k) measurable_const).nullMeasurableSet
     hdisj]
-  rfl
 
 /-- The rate-weighted time the path spends at level `k` during `[0, t]`. -/
 def levelTime (n k : ℕ) (t : ℝ) : ℝ≥0∞ :=
@@ -538,13 +538,16 @@ for every labeled state carrying it. -/
 theorem sum_hiddenRate {n : ℕ} (s : Fin n → Fin n) (ξ : ER n) :
     ∑ Y ∈ reachableHidden s, hiddenRate s (hiddenState s ξ) Y
       = ENNReal.ofReal (deathRate (blocks ξ)) := by
+  have hsum : ∑' Y, hiddenKernel s (hiddenState s ξ) Y
+      = ∑ Y ∈ reachableHidden s, hiddenKernel s (hiddenState s ξ) Y := by
+    refine tsum_eq_sum fun Y hY ↦ (PMF.apply_eq_zero_iff _ _).mpr fun hmem ↦ hY ?_
+    rw [hiddenKernel_hiddenState] at hmem
+    have hmem' : Y ∈ ((jumpLaw ξ).map (hiddenState s)).support := hmem
+    rw [PMF.support_map] at hmem'
+    obtain ⟨η, -, rfl⟩ := hmem'
+    exact Finset.mem_image_of_mem _ (Finset.mem_univ η)
   simp only [hiddenRate, hiddenBlockCount_hiddenState]
-  rw [← Finset.mul_sum, ← tsum_eq_sum, PMF.tsum_coe, mul_one]
-  intro Y hY
-  refine (PMF.apply_eq_zero_iff _ _).mpr fun hmem ↦ hY ?_
-  rw [hiddenKernel_hiddenState] at hmem
-  obtain ⟨η, -, rfl⟩ := PMF.mem_support_map_iff.mp hmem
-  exact Finset.mem_image_of_mem _ (Finset.mem_univ η)
+  rw [← Finset.mul_sum, ← hsum, PMF.tsum_coe, mul_one]
 
 /-- On the support of the hidden law after `n - k` jumps the block count is `k`, so the death
 rate there is `d_k`. -/
@@ -554,7 +557,10 @@ theorem ofReal_deathRate_mul_hiddenHeadLaw {n k : ℕ} (s : Fin n → Fin n) (hk
       = ENNReal.ofReal (deathRate k) * hiddenHeadLaw s (n - k) y := by
   by_cases hy : hiddenHeadLaw s (n - k) y = 0
   · rw [hy, mul_zero, mul_zero]
-  · obtain ⟨ξ, hξ, rfl⟩ := PMF.mem_support_map_iff.mp ((PMF.mem_support_iff _ _).mpr hy)
+  · have hmem : y ∈ ((blockLaw n (n - k)).map (hiddenState s)).support :=
+      (PMF.mem_support_iff _ _).mpr hy
+    rw [PMF.support_map] at hmem
+    obtain ⟨ξ, hξ, rfl⟩ := hmem
     have hblocks := blocks_of_mem_support_blockLaw (by omega : n - k < n) hξ
     rw [hiddenBlockCount_hiddenState, show blocks ξ = k by omega]
 
