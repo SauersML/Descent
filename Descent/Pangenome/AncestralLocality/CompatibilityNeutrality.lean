@@ -1,7 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Pangenome.AncestralLocality.HeredityKernel
+import Descent.Layer
 import Mathlib.Data.Fin.VecNotation
 import Mathlib.Data.Fintype.BigOperators
 import Mathlib.Data.Fintype.Powerset
@@ -49,18 +49,15 @@ the same observed law (`witness_pushforward_eq`). Yet (5.5) holds, `witness_drif
 both next generations (`witness_no_observed_transition_law`). No kernel on `(a, b)` states
 satisfies the autonomy equation (2.2) either (`witness_not_autonomous`).
 
-**The heredity-kernel layer.** The population map `reproduce` (2.1) and the pushforward
-`pushforward` are those of `HeredityKernel`. The model is tied to that layer: `halfMix` is its
-two-point mixture (`halfMix_eq_pairMidpoint`), `exchangeKernel i j` is its two-child kernel of
-`orderedChild i j` (`exchangeKernel_eq_childKernel`), and every compatibility kernel is a
-heredity kernel (`isHeredityKernel_compatibilityKernel`).
-
-Scope. Kernels are functions `H → H → H → ℝ`; Theorem 3 and its population form need total mass
-one and no nonnegativity. The binomial law is stated for one generation given `p`, as the
-product-law mass of each count. The Markov chain of frequencies over many generations, its
-diffusion limit and the Kingman limit are not constructed. (5.5) is stated as the note's checker,
-the one-step difference `R_K(p)[ab] - p[ab]`, which is the drift of the unit-rate generator (7.1)
-at time zero; the time derivative itself is not formalized.
+Scope. The population map `reproduce` (2.1) and the pushforward `pushforward` are local
+stand-ins for the heredity-kernel layer of spec §2; they are to be swapped for that layer's
+versions once it is on main. Kernels are plain functions `H → H → H → ℝ`, not bundled stochastic
+kernels, and nonnegativity and total mass are proved where they are used. The binomial law is
+stated for one generation given `p`, as the product-law mass of each count. The Markov chain of
+frequencies over many generations, its diffusion limit and the Kingman limit are not
+constructed. (5.5) is stated as the note's checker, the one-step difference
+`R_K(p)[ab] - p[ab]`, which is the drift of the unit-rate generator (7.1) at time zero; the time
+derivative itself is not formalized.
 
 ## Empirical status
 
@@ -81,6 +78,11 @@ noncomputable section
 section Population
 
 variable {H : Type*} [Fintype H]
+
+/-- **The population map (2.1)**, `R_K(p)(z) = ∑_{x,y} p_x p_y K(x,y;z)`: two parents drawn
+independently from `p`, and one offspring drawn from the kernel `K`. -/
+def reproduce (K : H → H → H → ℝ) (p : H → ℝ) (z : H) : ℝ :=
+  ∑ x, ∑ y, p x * p y * K x y z
 
 /-- The mass the population map gives a set of states is the parental average of the kernel's
 mass on that set. -/
@@ -103,6 +105,10 @@ theorem sum_reproduce (K : H → H → H → ℝ) (p : H → ℝ) (hK : ∀ x y,
 theorem reproduce_nonneg (K : H → H → H → ℝ) (hK : ∀ x y z, 0 ≤ K x y z) (p : H → ℝ)
     (hp : ∀ z, 0 ≤ p z) (z : H) : 0 ≤ reproduce K p z :=
   sum_nonneg fun x _ ↦ sum_nonneg fun y _ ↦ mul_nonneg (mul_nonneg (hp x) (hp y)) (hK x y z)
+
+/-- The pushforward `obs_# p` of a mass function along an observation `obs`. -/
+def pushforward {O : Type*} [DecidableEq O] (obs : H → O) (p : H → ℝ) (o : O) : ℝ :=
+  ∑ z ∈ univ.filter (fun z ↦ obs z = o), p z
 
 /-- **The count law of an i.i.d. sample.** Under the product law `∏_i q(z_i)` of `N` independent
 draws from a mass function `q` of total mass one, the number of draws landing in the event `P`
@@ -203,11 +209,6 @@ theorem sum_halfMix (u v : H) : ∑ z, halfMix u v z = 1 := by
   rw [h]
   norm_num
 
-/-- The equal mixture is the heredity-kernel layer's two-point mixture `pairMidpoint`. -/
-theorem halfMix_eq_pairMidpoint (u v z : H) : halfMix u v z = pairMidpoint u v z := by
-  unfold halfMix pairMidpoint pointMass
-  ring
-
 /-- **The population map at a two-point population**: `R_K(½δ_u + ½δ_v)` is the average of the
 four ordered parental pairs. -/
 theorem reproduce_halfMix (K : H → H → H → ℝ) (u v z : H) :
@@ -300,20 +301,6 @@ variable [Fintype V]
 def exchangeKernel (i j : V) (x y : V → Bool) : (V → Bool) → ℝ :=
   halfMix (orderedChild i j x y) (orderedChild i j y x)
 
-/-- The exchange kernel is the heredity-kernel layer's two-child kernel of the ordered child. -/
-theorem exchangeKernel_eq_childKernel (i j : V) (x y z : V → Bool) :
-    exchangeKernel i j x y z = childKernel (orderedChild i j) x y z := by
-  unfold exchangeKernel halfMix childKernel
-  split_ifs <;> norm_num
-
-/-- Every exchange kernel is a heredity kernel. -/
-theorem isHeredityKernel_exchangeKernel (i j : V) : IsHeredityKernel (exchangeKernel i j) := by
-  have e : exchangeKernel i j = childKernel (orderedChild i j) := by
-    funext x y z
-    exact exchangeKernel_eq_childKernel i j x y z
-  rw [e]
-  exact isHeredityKernel_childKernel _
-
 /-- The allele law `p{z : z_k = a}` of a mass function at the feature `k`; `featureMass p k true`
 is the note's `p_k`. -/
 def featureMass (p : (V → Bool) → ℝ) (k : V) (a : Bool) : ℝ :=
@@ -355,34 +342,6 @@ theorem compatibilityKernel_singleEdge (i j : V) (x y z : V → Bool) :
     compatibilityKernel (singleEdge i j) x y z = exchangeKernel i j x y z := by
   rw [compatibilityKernel_of_ne_empty _ (singleton_ne_empty _)]
   simp [singleEdge, CheckingGraph.totalRate]
-
-/-- **The compatibility kernel is a heredity kernel** (§2): its rows are probability vectors and
-it does not see the order of the parents. -/
-theorem isHeredityKernel_compatibilityKernel (G : CheckingGraph V) :
-    IsHeredityKernel (compatibilityKernel G) where
-  nonneg x y z := by
-    by_cases h : G.edges = ∅
-    · rw [compatibilityKernel_of_eq_empty G h]
-      exact halfMix_nonneg x y z
-    · rw [compatibilityKernel_of_ne_empty G h]
-      exact div_nonneg (sum_nonneg fun e he ↦ mul_nonneg (G.rate_pos e he).le
-        ((isHeredityKernel_exchangeKernel e.1 e.2).nonneg x y z))
-        (G.totalRate_pos (nonempty_iff_ne_empty.mpr h)).le
-  sum_eq_one x y := by
-    by_cases h : G.edges = ∅
-    · simp only [compatibilityKernel_of_eq_empty G h]
-      exact sum_halfMix x y
-    · have hR : G.totalRate ≠ 0 := (G.totalRate_pos (nonempty_iff_ne_empty.mpr h)).ne'
-      simp only [compatibilityKernel_of_ne_empty G h]
-      rw [← sum_div, sum_comm]
-      simp only [← mul_sum, (isHeredityKernel_exchangeKernel _ _).sum_eq_one, mul_one]
-      exact div_self hR
-  symm x y z := by
-    by_cases h : G.edges = ∅
-    · simp only [compatibilityKernel_of_eq_empty G h, halfMix]
-      ring
-    · simp only [compatibilityKernel_of_ne_empty G h,
-        (isHeredityKernel_exchangeKernel _ _).symm x y z]
 
 /-- **Theorem 3 (4.4): every feature is exactly neutral.** For every checking graph, feature `k`,
 allele `a` and parental pair, `K_G(x,y; {z : z_k = a}) = ½·1{x_k = a} + ½·1{y_k = a}`. -/
@@ -555,12 +514,12 @@ theorem witness_pushforward_eq :
     pushforward observeAB witnessP = pushforward observeAB witnessQ := by
   funext o
   have hobs : observeAB ![true, true, false] = observeAB ![true, true, true] := rfl
-  simp only [pushforward, fiber, witnessP, witnessQ, sum_filter_halfMix, hobs]
+  simp only [pushforward, witnessP, witnessQ, sum_filter_halfMix, hobs]
 
 /-- The observed mass at `(1, 1)` is the mean of the observed product. -/
 theorem pushforward_observeAB_true_true (f : (Fin 3 → Bool) → ℝ) :
     pushforward observeAB f (true, true) = ∑ z, f z * observedProduct z := by
-  rw [pushforward, fiber, sum_filter]
+  rw [pushforward, sum_filter]
   refine sum_congr rfl fun z _ ↦ ?_
   simp [observeAB, observedProduct]
 
