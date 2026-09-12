@@ -440,8 +440,8 @@ zero.
 Empirical status: NOT AN EMPIRICAL CLAIM.  A ratio of integrals of moment coordinates. -/
 def pooledSplitPortabilityRatio (rates : ManyDemeLDRates D) (parent child : Fin D)
     (ancestral : AffineLowOrderLDCoordinate D → ℝ) (splitLaw : Measure ℝ) : ℝ :=
-  (∫ duration, splitHistoryState rates parent child (le_max_right duration 0) ancestral
-        (some (.DD parent child)) ∂splitLaw
+  ((∫ duration, splitHistoryState rates parent child (le_max_right duration 0) ancestral
+        (some (.DD parent child)) ∂splitLaw)
       / ∫ duration, splitHistoryState rates parent child (le_max_right duration 0) ancestral
         (some (.pi2 parent parent child child)) ∂splitLaw)
     / ancestralSquaredCorrelation ancestral parent
