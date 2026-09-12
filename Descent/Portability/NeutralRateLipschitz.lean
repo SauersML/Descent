@@ -61,6 +61,7 @@ def addNeutralRates (first second : NeutralRates Deme Locus Allele) :
   recombination_nonneg selector :=
     add_nonneg (first.recombination_nonneg selector) (second.recombination_nonneg selector)
   mutation_nonneg ℓ a b := add_nonneg (first.mutation_nonneg ℓ a b) (second.mutation_nonneg ℓ a b)
+  mutation_symm ℓ a b := by rw [first.mutation_symm ℓ a b, second.mutation_symm ℓ a b]
 
 /-- A neutral rate law multiplied by a nonnegative factor: every process `factor` times as fast. -/
 def scaleNeutralRates (factor : ℝ) (hfactor : 0 ≤ factor) (rates : NeutralRates Deme Locus Allele) :
@@ -73,6 +74,7 @@ def scaleNeutralRates (factor : ℝ) (hfactor : 0 ≤ factor) (rates : NeutralRa
   migration_nonneg i j := mul_nonneg hfactor (rates.migration_nonneg i j)
   recombination_nonneg selector := mul_nonneg hfactor (rates.recombination_nonneg selector)
   mutation_nonneg ℓ a b := mul_nonneg hfactor (rates.mutation_nonneg ℓ a b)
+  mutation_symm ℓ a b := by rw [rates.mutation_symm ℓ a b]
 
 /-! ## Weighted sums of multisets -/
 
@@ -95,6 +97,11 @@ theorem sum_map_bind_eq_mul {α β : Type*} (m : Multiset α) (F G : α → Mult
 /-- An `if` with a zero branch splits over a sum in the other branch. -/
 theorem ite_add_zero_eq (c : Prop) [Decidable c] (a b : ℝ) :
     (if c then a + b else 0) = (if c then a else 0) + (if c then b else 0) := by
+  split_ifs <;> simp
+
+/-- A factor inside the nonzero branch of an `if` with a zero branch comes out of the `if`. -/
+theorem ite_mul_zero_eq (c : Prop) [Decidable c] (factor a : ℝ) :
+    (if c then factor * a else 0) = factor * (if c then a else 0) := by
   split_ifs <;> simp
 
 variable [Fintype Deme] [DecidableEq Deme] [Fintype Locus] [DecidableEq Locus]
@@ -256,8 +263,8 @@ theorem sum_map_dualTransitions_scale (factor : ℝ) (hfactor : 0 ≤ factor)
       (if τ.deme = σ.deme then rates.coalescence τ.deme / 2 else 0,
         if Compatible τ σ then some (coalesce τ σ ::ₘ (ξ.erase τ).erase σ) else none))
     (fun t ↦ t.1 * weight t.2) factor fun τ _ ↦ by
-      simp only [Multiset.map_map, Function.comp_def, scaleNeutralRates, mul_div_assoc, mul_ite,
-        mul_zero, mul_assoc, Multiset.sum_map_mul_left]
+      simp only [Multiset.map_map, Function.comp_def, scaleNeutralRates, mul_div_assoc,
+        ite_mul_zero_eq, mul_assoc, Multiset.sum_map_mul_left]
   rw [hcarrier, hcoalescence]
   ring
 
