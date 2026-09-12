@@ -7,6 +7,7 @@ import Descent.Portability.NonnegativeCoalescenceRealization
 
 open Descent.Portability.NonnegativeCoalescenceRealization
 
+#print axioms NonnegativeLDRates.coordinates_ofRates
 #print axioms ofRates_ne_coalescenceFreeRates
 #print axioms generator_ofRates
 #print axioms generator_perturb

@@ -26,6 +26,7 @@ open Descent.Portability.UniformPenetranceCertificate
 #print axioms riemannSums_gap
 #print axioms tendsto_riemannSums
 #print axioms metricEvaluator_certificate
+#print axioms squaredCorrelationFormula_eq_thetaReport
 #print axioms cast_squaredCorrelationFormula
 #print axioms cast_aucFormula
 #print axioms squaredCorrelationFormula_increase

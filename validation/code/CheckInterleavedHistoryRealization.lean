@@ -18,5 +18,6 @@ open Descent.Portability.InterleavedHistoryRealization
 #print axioms InterleavedSegment.apply_segment
 #print axioms InterleavedSegment.preserves_locusExchangeable_realization
 #print axioms propagateInterleaved
+#print axioms propagateInterleaved_map_segment
 #print axioms propagateInterleaved_preserves_locusExchangeable_realization
 #print axioms propagateInterleaved_dd_quadraticForm_nonneg
