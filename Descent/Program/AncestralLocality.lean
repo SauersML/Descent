@@ -18,6 +18,8 @@ import Descent.Pangenome.AncestralLocality.SupercriticalUpperBound
 import Descent.Pangenome.AncestralLocality.FeatureKingmanLimitLineages
 import Descent.Pangenome.AncestralLocality.SupercriticalSprinkling
 import Descent.Pangenome.AncestralLocality.InfiniteGenomeRate
+import Descent.Pangenome.AncestralLocality.SupercriticalSecondMoment
+import Descent.Portability.ResamplingInfiniteGenome
 import Descent.Portability.ResamplingWindowSemigroup
 import Descent.Portability.ResamplingWindowConsistency
 import Descent.Pangenome.AncestralLocality.CoalescentDualSemigroup
@@ -137,7 +139,9 @@ independent complexity bounds and a quantitative light cone.
   half holds outright: for queries of at most `k` features
   `limsup_m P(|Reach(A)| ≥ εm) ≤ 1 - (1 - s)^k`
   (`SupercriticalUpperBound.limsup_graphProb_card_reach_ge_le`), and sprinkling merges the large
-  components (`SupercriticalSprinkling.tendsto_graphProb_exists_card_reach_ge`).
+  components (`SupercriticalSprinkling.tendsto_graphProb_exists_card_reach_ge`), given that the
+  number of features in large components concentrates, whose second moment is bounded
+  (`SupercriticalSecondMoment.graphExpect_largeCount_sq_le`).
 * §4.1 and §7.1, the diffusion generator: `AncestralForwardGenerator`. For `c = 1` the
   finite-population chain (4.5) on the `N`-generation scale has generator (7.1) on polynomial
   observables (`tendsto_nextGenerationMean`), and on the eight-state witness the derivatives of
@@ -209,7 +213,9 @@ independent complexity bounds and a quantitative light cone.
   (`ResamplingWindowConsistency.windowSemigroup_comp_windowMarginal`), and every cylinder sampling
   polynomial reads a finite window (`CylinderWindowProjection.exists_windowPullback`), where a
   consistent contracting family of window operators extends to a contraction of `C(P(H))`
-  (`norm_extendedOperator_le`). With a rate: along balls of radius `ℓ_m`,
+  (`norm_extendedOperator_le`); the glued semigroup is Theorem 9 without decisions, with no
+  hypothesis (`ResamplingInfiniteGenome.infiniteGenomeSemigroup_resampling`). With a rate: along
+  balls of radius `ℓ_m`,
   `‖T^m_t f - T_t f‖ ≤ 2‖f‖ min {1, n|A| e^{DT} (2eDT/ℓ_m)^{ℓ_m}}`
   (`InfiniteGenomeRate.norm_operator_sub_infiniteGenomeSemigroup_le`), given the sampling duality
   and agreement until escape.

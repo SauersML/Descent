@@ -3,6 +3,10 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.AncestralLocality.InfiniteGenomeRate
 import Descent.Pangenome.GraphCoalescent.CompressionHiddenStateCount
+import Descent.Pangenome.GraphCoalescent.MarkovCompressions
+import Descent.Pangenome.AncestralLocality.InhomogeneousLocalityTransition
+import Descent.Pangenome.AncestralLocality.SelectionDecisions
+import Descent.Portability.PortabilityMinimaxLowerBound
 
 namespace Descent.Program
 
@@ -27,10 +31,37 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   injective (`coarsestStateCount_eq_reportStateCount_of_injective`), and strictly more once two
   individuals share a graph state on an interface of width at least two
   (`reportStateCount_lt_coarsestStateCount`).
+* Which compressions keep ancestry Markov: `MarkovCompressions`. The report of an interface of
+  width `w` on `n` individuals is a strong lumping of Kingman's coalescent exactly when `w = n` or
+  `w ≤ 1` (`isReportLumping_iff`), and the corpus criterion that also counts covers into a state's
+  own report holds exactly for injective interfaces (`observablyMarkov_iff_injective`); every
+  report component carries at most `|C| - w_C + 1` hidden lineages
+  (`hiddenLoad_add_componentWidth_le`).
+* What source data cannot tell you about the target: `PortabilityMinimaxLowerBound`. Two
+  histories with source report laws `P`, `Q` and target values `τ_P`, `τ_Q` force every estimator
+  from `n` source replicas to worst-case error at least `(|τ_P - τ_Q|/2) (1 - TV(P, Q))^n`
+  (`lowerBound_cohortLaw_pow`), and at least `(|τ_P - τ_Q|/2) max {0, 1 - n TV(P, Q)}`
+  (`lowerBound_cohortLaw_totalVariation`); for admixed source cohorts of NOTE1 §6 the bound is
+  explicit (`sourceCohort_lowerBound`, `logTwo_sourceCohort_lowerBound`).
+* The locality transition on inhomogeneous checking graphs: `InhomogeneousLocalityTransition`.
+  For independent edges dominated by a rank-one kernel with weights `w`, the expected hereditary
+  closure of `A` is at most `|A| + (Σ_{r∈A} w_r)/(1 - ν)` with `ν = Σ w² / Σ w < 1`, for every
+  genome size (`productExpect_card_reach_le_of_lt_one`, `productExpect_card_directedReach_le`),
+  including Chung-Lu graphs (`chungLu_card_reach_le_of_lt_one`).
+* Selection as ancestral decisions: `SelectionDecisions`. Selection at rate `σ` is a kernel event
+  with the classical drift `p_z (s(z) - s̄(p))` (`selectionGenerator_eq_drift`); the generator
+  identity of Theorem 6 holds for every kernel event, and for selection it is the ancestral
+  selection graph (`kernelDriftTerm_samplingObservable`, `selectionGenerator_samplingObservable`);
+  one uniqueness theorem covers every linear branching gain (`moments_eq_of_branchingEquation`),
+  and the support drift under decisions and selection is at most `(3D + σ(1 + |S|)) Z`
+  (`supportDrift_le`).
 
 Scope. The rate takes the sampling duality through the truncated circuit law, and agreement of the
 finite models until escape, as hypotheses. The state counts compare numbers of values of the two
-statistics; the exact count as a function of the fiber sizes is not yet proved.
+statistics; the exact count as a function of the fiber sizes is not yet proved. The minimax bound is
+a two-point bound over finite report laws. The inhomogeneous transition covers the subcritical
+side only. Selection takes fitness values in `[0, σ]`, and its Theorem 7-8 part is stated at
+generator level.
 -/
 
 end Descent.Program

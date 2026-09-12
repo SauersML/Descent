@@ -712,6 +712,9 @@ import Descent.Portability.NeutralIntegrableRateRealization
 import Descent.Portability.CaratheodoryFundamentalMatrix
 import Descent.Portability.CaratheodoryPicardSeries
 import Descent.Portability.NeutralCaratheodoryRealization
+import Descent.Portability.MigrationMutationOperators
+import Descent.Portability.ResamplingInfiniteGenome
+import Descent.Portability.PortabilityMinimaxLowerBound
 
 assert_below Descent.Program
 

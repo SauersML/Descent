@@ -142,6 +142,7 @@ import Descent.Portability.NeutralIntegrableRateRealization
 import Descent.Portability.CaratheodoryFundamentalMatrix
 import Descent.Portability.CaratheodoryPicardSeries
 import Descent.Portability.NeutralCaratheodoryRealization
+import Descent.Portability.MigrationMutationOperators
 
 namespace Descent.Program
 
@@ -259,7 +260,9 @@ Equation (10) is proved for every polynomial of total degree at most four, with 
 `71 · coefficientMass / N²`. The drift
 operator (7) is stated literally on polynomials in `p`, `q`, `D`, with its two displayed
 identities, and its sum against the coalescence rates is the drift row of the enlarged generator
-on every stored coordinate: `DriftOperatorCoordinates`.
+on every stored coordinate: `DriftOperatorCoordinates`. Migration (8) and mutation (9) are stated
+literally the same way, with their displayed coefficients
+(`MigrationMutationOperators.migrationOperator_X_linkage`, `mutationOperator_X_two`).
 The epoch form of Theorem 2 is proved through the note's multinomial sample of size `⌈1/(c h)⌉`
 in `MultinomialMicroscopicApproximation`, whose microscopic kernels change branch type with the
 step size, for every deme count with at least one deme. The history forms of epochs, splits and
