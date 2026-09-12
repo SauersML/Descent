@@ -10,6 +10,7 @@ open Descent.Pangenome.AncestralLocality
 #print axioms kernelMass_symm
 #print axioms reproduce_mem_stdSimplex
 #print axioms mem_fiber_iff
+#print axioms pushforward_eq_sum_fiber
 #print axioms mem_block_iff
 #print axioms block_ker
 #print axioms blockMass_symm

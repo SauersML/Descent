@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Layer
+import Descent.Pangenome.AncestralLocality.CompatibilityNeutrality
 import Mathlib.Algebra.BigOperators.Ring.Finset
 import Mathlib.Analysis.Convex.StdSimplex
 import Mathlib.Data.Setoid.Basic
@@ -18,13 +19,15 @@ The finite object of `ANCESTRAL_LOCALITY.md` §2. A finite set `H` of genome sta
 two-parent inheritance kernel `K : H → H → H → ℝ`: `K x y z` is the probability that the child
 of parents `x` and `y` is in state `z`. `IsHeredityKernel K` says that every row is a
 probability vector and that the kernel does not see the order of the parents. The mass
-`kernelMass K x y B` of a finite set `B` is the note's `K(x,y;B)`, and `reproduce K p` is the
-reproduction operator `R_K(p)(z) = Σ_{x,y} p_x p_y K(x,y;z)` of (2.1), which maps
-`stdSimplex ℝ H` to itself (`reproduce_mem_stdSimplex`).
+`kernelMass K x y B` of a finite set `B` is the note's `K(x,y;B)`. The reproduction operator
+`reproduce K p`, `R_K(p)(z) = Σ_{x,y} p_x p_y K(x,y;z)` of (2.1), and the pushforward
+`pushforward π p` along an observation are the ones `CompatibilityNeutrality` declares;
+`reproduce_mem_stdSimplex` shows that `R_K` maps `stdSimplex ℝ H` to itself.
 
 An observation is a map `π : H → O`. Its fibers `fiber π o` are the blocks of the partition
-`P_π`, which is Mathlib's `Setoid.ker π` (`block_ker`). The observation is hereditarily
-autonomous, (2.2), when some `K̄` on `O` reproduces every fiber mass from the observed parents:
+`P_π`, which is Mathlib's `Setoid.ker π` (`block_ker`), and `pushforward_eq_sum_fiber` reads the
+pushforward as a sum over fibers. The observation is hereditarily autonomous, (2.2), when some
+`K̄` on `O` reproduces every fiber mass from the observed parents:
 `HereditarilyAutonomous K π` asks for `K(x,y;π⁻¹(o)) = K̄(πx,πy;o)` at all parental states. The
 same property for a setoid is `IsAutonomous K P`: the mass `blockMass K P x y w` of every block
 is unchanged when either parent is replaced by a `P`-equivalent state.
@@ -37,9 +40,8 @@ The two-child kernels `childKernel T`, half the mass on `T x y` and half on `T y
 shape (4.2) of the note's exchange kernels; `isHeredityKernel_childKernel` shows that every one
 is a heredity kernel, and `childKernel (fun x _ ↦ x)` is unbiased parental copying.
 
-For the operational reading of autonomy the module carries the pushforward `pushforward π p` of
-a vector along an observation, the point masses `pointMass x` and the two-point mixtures
-`pairMidpoint x y`, with their observed images (`pushforward_pointMass`,
+For the operational reading of autonomy the module carries the point masses `pointMass x` and
+the two-point mixtures `pairMidpoint x y`, with their observed images (`pushforward_pointMass`,
 `pushforward_pairMidpoint`). `pushforward_reproduce` says that the observed next generation is
 the `p ⊗ p` average of the fiber masses, and `sum_sum_mul_comp_eq_sum_sum_pushforward` that an
 average of a function of the observed parents depends on `p` only through `π_# p`.
@@ -84,11 +86,6 @@ theorem kernelMass_symm {K : H → H → H → ℝ} (hK : IsHeredityKernel K) (x
     (B : Finset H) : kernelMass K x y B = kernelMass K y x B :=
   Finset.sum_congr rfl fun z _ ↦ hK.symm x y z
 
-/-- **The reproduction operator** (2.1), `R_K(p)(z) = Σ_{x,y} p_x p_y K(x,y;z)`: the state
-distribution of a child whose two parents are drawn independently from `p`. -/
-def reproduce (K : H → H → H → ℝ) (p : H → ℝ) (z : H) : ℝ :=
-  ∑ x, ∑ y, p x * p y * K x y z
-
 /-- The reproduction operator maps probability vectors to probability vectors.
 Assumes: `IsHeredityKernel K`. -/
 theorem reproduce_mem_stdSimplex {K : H → H → H → ℝ} (hK : IsHeredityKernel K) {p : H → ℝ}
@@ -112,6 +109,12 @@ def fiber {O : Type*} [DecidableEq O] (π : H → O) (o : O) : Finset H :=
 theorem mem_fiber_iff {O : Type*} [DecidableEq O] (π : H → O) (o : O) (z : H) :
     z ∈ fiber π o ↔ π z = o := by
   simp [fiber]
+
+/-- The pushforward of `CompatibilityNeutrality` sums a vector over the fibers of the
+observation. -/
+theorem pushforward_eq_sum_fiber {O : Type*} [DecidableEq O] (π : H → O) (p : H → ℝ) (o : O) :
+    pushforward π p o = ∑ z ∈ fiber π o, p z :=
+  rfl
 
 open Classical in
 /-- The block `{z | P z w}` of the state `w` in a partition `P`, as a finite set of states. -/
@@ -233,16 +236,12 @@ theorem isHeredityKernel_childKernel [DecidableEq H] (T : H → H → H) :
 
 /-! ### Pushforwards, point masses and the observed next generation -/
 
-/-- The pushforward `π_# p` of a vector along an observation. -/
-def pushforward {O : Type*} [DecidableEq O] (π : H → O) (p : H → ℝ) (o : O) : ℝ :=
-  ∑ z ∈ fiber π o, p z
-
 /-- **The observed next generation.** `π_# R_K(p)` is the `p ⊗ p` average of the fiber
 masses. -/
 theorem pushforward_reproduce {O : Type*} [DecidableEq O] (K : H → H → H → ℝ) (π : H → O)
     (p : H → ℝ) (o : O) :
     pushforward π (reproduce K p) o = ∑ x, ∑ y, p x * p y * kernelMass K x y (fiber π o) := by
-  simp only [pushforward, reproduce, kernelMass, Finset.mul_sum]
+  simp only [pushforward_eq_sum_fiber, reproduce, kernelMass, Finset.mul_sum]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun x _ ↦ Finset.sum_comm
 
@@ -251,7 +250,7 @@ theorem sum_mul_comp_eq_sum_pushforward {O : Type*} [Fintype O] [DecidableEq O] 
     (p : H → ℝ) (f : O → ℝ) : ∑ x, p x * f (π x) = ∑ a, pushforward π p a * f a := by
   rw [← Finset.sum_fiberwise Finset.univ π]
   refine Finset.sum_congr rfl fun a _ ↦ ?_
-  rw [pushforward, Finset.sum_mul]
+  rw [pushforward_eq_sum_fiber, Finset.sum_mul]
   exact Finset.sum_congr rfl fun x hx ↦ by rw [(mem_fiber_iff π a x).mp hx]
 
 /-- **Averages over observed parents depend only on `π_# p`.** -/
@@ -330,7 +329,7 @@ theorem sum_sum_pairMidpoint (x y : H) (g : H → H → ℝ) :
 theorem pushforward_pointMass {O : Type*} [DecidableEq O] (π : H → O) (x : H) :
     pushforward π (pointMass x) = pointMass (π x) := by
   funext o
-  simp only [pushforward, pointMass, Finset.sum_ite_eq, mem_fiber_iff]
+  simp only [pushforward_eq_sum_fiber, pointMass, Finset.sum_ite_eq, mem_fiber_iff]
 
 /-- The observed image of `½δ_x + ½δ_y` is `½δ_{πx} + ½δ_{πy}`. -/
 theorem pushforward_pairMidpoint {O : Type*} [DecidableEq O] (π : H → O) (x y : H) :
@@ -338,8 +337,9 @@ theorem pushforward_pairMidpoint {O : Type*} [DecidableEq O] (π : H → O) (x y
   funext o
   have hx := congrFun (pushforward_pointMass π x) o
   have hy := congrFun (pushforward_pointMass π y) o
-  simp only [pushforward] at hx hy
-  simp only [pushforward, pairMidpoint, ← Finset.mul_sum, Finset.sum_add_distrib, hx, hy]
+  simp only [pushforward_eq_sum_fiber] at hx hy
+  simp only [pushforward_eq_sum_fiber, pairMidpoint, ← Finset.mul_sum, Finset.sum_add_distrib,
+    hx, hy]
 
 end PointMass
 
