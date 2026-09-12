@@ -87,6 +87,7 @@ theorem hasDerivAt_exp_neg_mul (a t : ℝ) :
     HasDerivAt (fun u ↦ Real.exp (-(a * u))) (-a * Real.exp (-(a * t))) t := by
   have h := ((hasDerivAt_id' (x := t)).const_mul a).neg.exp
   convert h using 1
+  simp only [Pi.neg_apply, mul_one]
   ring
 
 /-! ## Yule weights -/
@@ -174,7 +175,7 @@ theorem hasDerivAt_yuleWeight_succ (k : ℕ) (t : ℝ) :
     (Filter.Eventually.of_forall fun u ↦ yuleWeight_succ_eq_mul (n := n) (R := R) k u)
   refine hfun.congr_deriv ?_
   rw [yuleWeight_succ_eq_mul]
-  linear_combination (-(((n : ℝ) + k) * R * yuleWeight n R k t)) * hone
+  linear_combination (((n : ℝ) + k) * R * yuleWeight n R k t) * hone
 
 /-- The derivative of a Yule weight, case by case. -/
 def yuleDeriv (n : ℕ) (R : ℝ) : ℕ → ℝ → ℝ
@@ -244,7 +245,7 @@ theorem sum_yuleMoment_mul_yuleDeriv_le (hR : 0 ≤ R) {t : ℝ} (ht : 0 ≤ t) 
           ((n : ℝ) + K) * R * yuleWeight n R K t := rfl
     rw [hder]
     have hstep := mul_le_mul_of_nonneg_right (mul_sub_yuleMoment_le n K)
-      (mul_nonneg hR (yuleWeight_nonneg hR K ht))
+      (mul_nonneg hR (yuleWeight_nonneg (n := n) hR K ht))
     push_cast
     nlinarith [ih, hstep]
 
@@ -273,9 +274,9 @@ theorem sum_yuleMoment_mul_le (hR : 0 ≤ R) (K : ℕ) {t : ℝ} (ht : 0 ≤ t) 
     rw [interior_Ici] at hu
     rw [(hP u).deriv]
     have hu0 : 0 ≤ u := le_of_lt hu
-    have hbound := sum_yuleMoment_mul_yuleDeriv_le hR hu0 K
+    have hbound := sum_yuleMoment_mul_yuleDeriv_le (n := n) hR hu0 K
     have hlastw := mul_nonneg (zero_le_one.trans (one_le_yuleMoment n K))
-      (yuleWeight_nonneg hR K hu0)
+      (yuleWeight_nonneg (n := n) hR K hu0)
     have htail : 0 ≤ ((n : ℝ) + K) * R * (yuleMoment n K * yuleWeight n R K u) :=
       mul_nonneg (mul_nonneg (by positivity) hR) hlastw
     have hlast : ∑ k ∈ range K, yuleMoment n k * yuleWeight n R k u ≤
@@ -304,11 +305,11 @@ theorem sum_yuleMoment_mul_le (hR : 0 ≤ R) (K : ℕ) {t : ℝ} (ht : 0 ≤ t) 
 /-- **One cubic moment term** is bounded by the whole moment. -/
 theorem yuleMoment_mul_yuleWeight_le (hR : 0 ≤ R) (k : ℕ) {t : ℝ} (ht : 0 ≤ t) :
     yuleMoment n k * yuleWeight n R k t ≤ yuleMoment n 0 * Real.exp (3 * R * t) := by
-  refine le_trans ?_ (sum_yuleMoment_mul_le hR k ht)
+  refine le_trans ?_ (sum_yuleMoment_mul_le (n := n) hR k ht)
   rw [sum_range_succ]
   have hrest : 0 ≤ ∑ j ∈ range k, yuleMoment n j * yuleWeight n R j t :=
     sum_nonneg fun j _ ↦ mul_nonneg (zero_le_one.trans (one_le_yuleMoment n j))
-      (yuleWeight_nonneg hR j ht)
+      (yuleWeight_nonneg (n := n) hR j ht)
   linarith
 
 end Yule
@@ -351,9 +352,12 @@ theorem killedSemigroup_zero (c : ℝ) (r : E → ℝ) (m : ℕ) :
 theorem killedSemigroup_add (c : ℝ) (r : E → ℝ) (m : ℕ) (s t : ℝ) :
     killedSemigroup (H := H) c r m (s + t) =
       killedSemigroup c r m s * killedSemigroup c r m t := by
-  rw [killedSemigroup, killedSemigroup, killedSemigroup, gainSemigroup_add, smul_mul_smul_comm,
-    ← Real.exp_add]
-  congr 2
+  ext g : 1
+  simp only [killedSemigroup, ContinuousLinearMap.smul_apply, ContinuousLinearMap.mul_apply,
+    map_smul, smul_smul, gainSemigroup_add]
+  congr 1
+  rw [← Real.exp_add]
+  congr 1
   ring
 
 /-- The killed semigroup is continuous in time in the operator norm. -/
@@ -475,9 +479,9 @@ theorem hasDerivAt_dysonTerm_succ (k : ℕ) (t : ℝ) :
     HasDerivAt (dysonTerm c r T f (k + 1))
       (coalescenceGain c (dysonTerm c r T f (k + 1) t) -
           dualExitRate c r (n + k + 1) • dysonTerm c r T f (k + 1) t +
-        branchingGain r T (dysonTerm c r T f k t)) t := by
+        (branchingGain r T (dysonTerm c r T f k t) : (Fin (n + (k + 1)) → H) → ℝ)) t := by
   have hk := continuous_dysonTerm c r T f k
-  have h := (hasDerivAt_killedSemigroup c r (n + k + 1) t).clm_apply
+  have h := HasDerivAt.clm_apply (hasDerivAt_killedSemigroup c r (n + k + 1) t)
     (hasDerivAt_integral_from_zero (continuous_branchIntegrand c r T hk) t)
   have hfun := h.congr_of_eventuallyEq
     (Filter.Eventually.of_forall fun u ↦ dysonTerm_succ_eq_mul c r T f k hk u)
