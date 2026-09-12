@@ -1,7 +1,9 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Pangenome.GraphCoalescent.ConnectionClockPathDynkin
 import Descent.Pangenome.GraphCoalescent.BalancedFiberExtremum
+import Descent.Pangenome.GraphCoalescent.ConnectionClockHittingLaw
 import Descent.Pangenome.GraphCoalescent.ConnectionClockHittingTime
 import Descent.Pangenome.GraphCoalescent.ConnectionClockPathLaw
 import Descent.Pangenome.GraphCoalescent.ConnectionClockStochasticOrder
