@@ -126,6 +126,7 @@ import Descent.Portability.NeutralFellerProperty
 import Descent.Portability.NeutralFellerContinuity
 import Descent.Portability.NeutralRateHistoryRealization
 import Descent.Portability.NeutralRateHistoryKernel
+import Descent.Portability.MixingLawReplicaBias
 import Descent.Portability.ReferenceExperimentCohortRows
 import Descent.Portability.CylinderGaussianQuadrant
 import Descent.Portability.CylinderComputableCertificate
@@ -332,10 +333,12 @@ from a deme count.
   different comparison queries: `PortabilityRemainsJoint`. §6.3 example: `UnboundedSlopeExample`.
   §6.4 equation (30): `LogLossSeriesCertificate`.
 * §7.1 equation (31): `EmpiricalLawLipschitzBound`; the modulus-of-continuity extension to every
-  continuous functional: `EmpiricalLawContinuityBound`. §7.2, interval evaluators without nesting
-  and Kraft's inequality for prefix enumerations: `IntervalEvaluatorCertificate`; Theorem 5 on
-  genuine fair-bit cylinders, with nested certificates and a bracket of the shape of (18) at every
-  stage: `CylinderIntervalCertificate`; the executed uniform draw:
+  continuous functional: `EmpiricalLawContinuityBound`; under an arbitrary mixing law, for
+  functionals Lipschitz only on the simplex:
+  `MixingLawReplicaBias.abs_integral_replicaExpectation_sub_le`. §7.2, interval evaluators
+  without nesting and Kraft's inequality for prefix enumerations: `IntervalEvaluatorCertificate`;
+  Theorem 5 on genuine fair-bit cylinders, with nested certificates and a bracket of the shape of
+  (18) at every stage: `CylinderIntervalCertificate`; the executed uniform draw:
   `CylinderUniformDraw`; the executed exponential draw `-log U`, with certificates converging to
   `E min(X, 1) = 1 - 1/e`: `CylinderExponentialDraw`; the Box-Muller pair on the even and odd
   bits, with radial certificates converging to `E min(Z₁² + Z₂², 2) = 2(1 - 1/e)`:
@@ -364,9 +367,8 @@ from a deme count.
 Scope. Theorem 2's graph is presented through the sign cells of the experiment's supplied
 polynomial guards, with regularity on each cell as a hypothesis; Mathlib's semialgebraic sets and
 real quantifier elimination, which the note uses to eliminate parameters from (8), are not
-available at this pin. The mixing
-law of (31) ranges over finitely many contexts, and its Lipschitz class is taken on all of the
-coordinate space. Equations (20), (28) and (29) take the pointwise bounds `0 ≤ D ≤ 1`, as the corpus
+available at this pin. Equations
+(20), (28) and (29) take the pointwise bounds `0 ≤ D ≤ 1`, as the corpus
 certificates do. Theorem 1 makes no complexity claim and covers no infinite branch set. Of §9,
 the other population target table rows, the 3960 shared-context count and the full-square range
 table are not yet proof-checked; the size-three cohort rows are proved in

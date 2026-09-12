@@ -7,6 +7,7 @@ import Descent.Pangenome.AncestralLocality.LightConeApproximationBound
 import Descent.Pangenome.AncestralLocality.ReachabilityClosureTie
 import Descent.Pangenome.AncestralLocality.OneAlleleDuality
 import Descent.Pangenome.AncestralLocality.SupportChainDynkin
+import Descent.Pangenome.AncestralLocality.FeatureKingmanLimit
 import Descent.Pangenome.AncestralLocality.CoalescentDualSemigroup
 import Descent.Pangenome.AncestralLocality.HeredityKernel
 import Descent.Pangenome.AncestralLocality.HereditaryClosure
@@ -72,7 +73,10 @@ independent complexity bounds and a quantitative light cone.
 * Theorem 3, every feature is exactly neutral: `CompatibilityNeutrality`. With the ordered child
   (4.1), its exchange kernel (4.2) and the compatibility kernel `K_G` (4.3), (4.4) holds for every
   checking graph (`compatibilityKernel_marginal`) and its population form `(R_{K_G}(p))_k = p_k`
-  (`featureMass_reproduce_compatibilityKernel`). §4.1: the finite-population kernel `Q_N` (4.5)
+  (`featureMass_reproduce_compatibilityKernel`). Two sampled lineages at one feature share a
+  source with probability `1/N` per generation, so `P(T_N > m) = (1 - 1/N)^m` and
+  `P(T_N > ⌊tN⌋) → e^{-t}` (`FeatureKingmanLimit.featurePairSurvival_eq`,
+  `tendsto_featurePairSurvival`). §4.1: the finite-population kernel `Q_N` (4.5)
   keeps every allele law and is a probability vector for `R ≤ N`, and the offspring count at a
   feature is `Binomial(N, p_k)` (4.6) (`offspringCount_eq_binomial`). §5.2: the eight-state witness
   has one observed law and drifts `-1/4` and `0` (`witness_drift`), so no observed transition law
@@ -176,7 +180,8 @@ independent complexity bounds and a quantitative light cone.
   `20 e³ ∈ [401.7, 401.72]` (`twenty_mul_exp_three_mem_Icc`) and
   `20 e (2e/20)^20 ≤ 2.64 × 10⁻¹⁰` (`escapeBound_twenty_le`).
 
-Scope. The single-feature Kingman limit behind Theorem 3 is classical and is not re-proved.
+Scope. Of the single-feature Kingman limit behind Theorem 3 only the pair of lineages is proved,
+as convergence of the distribution function.
 Theorems 7 and 8 take Dynkin's formula for the support generator along the marginal laws, and
 for (8.3) the compensator formula, as hypotheses, together with integrability and continuity; the
 path law of the backward circuit is not constructed. For the circuit truncated after `M` decisions

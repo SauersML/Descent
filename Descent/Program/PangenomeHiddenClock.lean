@@ -48,6 +48,8 @@ import Descent.Pangenome.GraphCoalescent.ConnectionClockHittingTime
 import Descent.Pangenome.GraphCoalescent.ConnectionClockHittingLaw
 import Descent.Pangenome.GraphCoalescent.ConnectionClockPathDynkin
 import Descent.Pangenome.GraphCoalescent.ConnectionClockLowerBound
+import Descent.Pangenome.GraphCoalescent.LambdaLoadOutcome
+import Descent.Pangenome.GraphCoalescent.EdgeClockConnectionLaw
 import Descent.Pangenome.GraphCoalescent.MinimalHistoryLumping
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionSpectrum
 import Descent.Pangenome.GraphCoalescent.ScaledConnectionLimit
@@ -242,7 +244,10 @@ inside it.
   is `lumpedLambdaRate` of the loads (`sum_mergerRates_eq_lumpedLambdaRate`), so two
   configurations with the same loads offer the same total rate into every target
   (`sum_mergerRates_eq_of_cellLoad_eq`), and the joined load is `Σ L_C - b + 1`
-  (`card_touchedBlocks_after_merger`).
+  (`card_touchedBlocks_after_merger`). A multiple merger leaves a lumped state that depends only on
+  the per-cell draw counts (`LambdaLoadOutcome.multiState_mergeSet_eq_of_profile`), so the outcome
+  map is built from the mergers themselves and the rate into each lumped state is
+  `lumpedLambdaRate` with no hypothesis (`sum_blockMergerRates_eq_lumpedLambdaRate`).
 * §9, exact filtering and likelihood: `HiddenLoadFiltering`. For a finite hidden jump process
   watched through a report map, the killed propagator solves `P' = P Q_R`
   (`hasDerivAt_killedPropagator`), carries no mass out of the report
@@ -288,9 +293,7 @@ a strong lumping determines the unordered pair of loads through their sum and pr
 the matrix semigroup of the killed load chain (`TwoComponentSurvival.survival_eq_iff`). The table
 rows of §6 compute the cumulants from `cumulantOfSizes`
 and `Coalescent.jumpCoeff`, and evaluate transcriptions of (D5) and (D6) at the tabulated fiber
-sizes, which `FirstConnectionLaw` proves equal to the law. In the
-Λ-coalescent closure the dependence of a merger's lumped outcome on its profile alone is a
-hypothesis on the outcome map. The
+sizes, which `FirstConnectionLaw` proves equal to the law. The
 connection clock of Theorem C is defined as the first-step solution of the backward equation, and
 (C3) is Dynkin's identity for that equation, and it holds as a path identity on the
 trajectory-and-clock law, for the connection time and for the first hitting time of `⊤`
@@ -320,8 +323,9 @@ skeleton paths mixed over a rate-one Poisson clock, and (F3) as convergence of t
 probability of the uniformized report to `Pr(T_p ≤ U)` along panels whose fiber proportions
 converge (`MultiplicativeConnectionConvergence.tendsto_reportConnectionProbability`); the
 identification with path measures on càdlàg paths is not formalized. The law of `T_p` in (F3) is
-the probability measure of its distribution function, not yet the image of independent
-exponential edge clocks. (F4) is proved for the
+the image of independent exponential edge clocks, with distribution function the connection
+probability (`EdgeClockConnectionLaw.cdf_map_edgeConnectionTime`,
+`map_edgeConnectionTime_edgeClockLaw`). (F4) is proved for the
 finite random graph of edges rung by time `u`, entering the clocks through their distribution
 functions.
 -/
