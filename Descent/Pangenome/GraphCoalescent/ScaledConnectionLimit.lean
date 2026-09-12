@@ -34,14 +34,20 @@ and (F2).
 - `abs_poissonMixture_report_sub_spread_le`: **(F2) for every path functional**.  For masses `p`
   on the fibers and any functional of the skeleton path with values in `[0, 1]`, the graph's
   report and `Z_p` differ by at most `min {1, U²/(4n) + U ‖p^(n) - p‖₁}`.
+- `sum_filter_le_massStep`, `sum_filter_le_massLaw`, `hasSum_poissonPMFReal_mul_massTop`: `Z`
+  with any masses leaves the partitions below `σ` at the constant rate `κ_σ`, so it is
+  connected at scaled time `U` with the Möbius probability.
+- `sum_topMobius_graphKer_spread_eq_connectionProbability`: with the masses `p` spread over the
+  fibers of a labelling, that Möbius sum is `Pr(T_p ≤ U)`.
+- `abs_reportConnectionProbability_sub_le_min`: **(F3) with the rate of
+  (F2)**, `|Pr(n² τ_q ≤ U) - Pr(T_p ≤ U)| ≤ min {1, U²/(4n) + U ‖p^(n) - p‖₁}`.
 
 ## Scope
 
-Time is the rate-one uniformization in scaled time of `MultiplicativeCoupling`.  Monotonicity of
-`u ↦ Pr(T_p ≤ u)` is not proved here.  The identification of the Poisson-mixed connection
-probability of `Z_p` with masses `p` with `Pr(T_p ≤ U)` is proved in
-`MultiplicativeConnectionConvergence` only at the empirical masses `p^(n)`, so the rate
-`U ‖p^(n) - p‖₁` is stated here for path functionals and not yet for `Pr(T_p ≤ U)` itself.
+Time is the rate-one uniformization in scaled time of `MultiplicativeCoupling`, and
+`n² τ_q ≤ U` is read as the event that the uniformized report is connected at scaled time `U`.
+Monotonicity of `u ↦ Pr(T_p ≤ u)` is not proved here.  The fibers are the classes of a
+surjective labelling, through `MultiplicativeConnectionConvergence.labelInterface`.
 
 ## Empirical status
 
@@ -473,6 +479,197 @@ theorem hasSum_poissonPMFReal_mul_massTop {n : ℕ} [NeZero n] (s : Fin n → Fi
     ring
   · simp only [if_neg hq, mul_zero]
     exact hasSum_zero
+
+/-! ### Masses on the fiber labels -/
+
+/-- **The fiber label of a component of a labelling's interface.**
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  A quotient map. -/
+def fiberLabel {n w : ℕ} (label : Fin n → Fin w) (hsurj : Function.Surjective label) :
+    Quotient (graphKer (labelInterface label hsurj)) → Fin w :=
+  Quotient.lift label fun _ _ h ↦ Function.injective_surjInv hsurj (graphKer_rel_iff.mp h)
+
+/-- Two individuals share a component of a labelling's interface exactly when they share a
+label. -/
+theorem mk_graphKer_labelInterface_eq_iff {n w : ℕ} (label : Fin n → Fin w)
+    (hsurj : Function.Surjective label) (x y : Fin n) :
+    Quotient.mk (graphKer (labelInterface label hsurj)) x
+        = Quotient.mk (graphKer (labelInterface label hsurj)) y ↔ label x = label y :=
+  ⟨fun h ↦ Function.injective_surjInv hsurj (graphKer_rel_iff.mp (Quotient.exact h)),
+    fun h ↦ Quotient.sound (graphKer_rel_iff.mpr (congrArg (Function.surjInv hsurj) h))⟩
+
+/-- The components of a labelling's interface are its labels. -/
+theorem fiberLabel_bijective {n w : ℕ} (label : Fin n → Fin w)
+    (hsurj : Function.Surjective label) : Function.Bijective (fiberLabel label hsurj) := by
+  constructor
+  · intro F G
+    refine Quotient.inductionOn₂ F G fun x y h ↦ ?_
+    exact (mk_graphKer_labelInterface_eq_iff label hsurj x y).mpr h
+  · intro i
+    exact ⟨Quotient.mk _ (Function.surjInv hsurj i), Function.surjInv_eq hsurj i⟩
+
+/-- The size of a component of a labelling's interface is the count of its label. -/
+theorem fiberSize_labelInterface {n w : ℕ} (label : Fin n → Fin w)
+    (hsurj : Function.Surjective label) (F : Quotient (graphKer (labelInterface label hsurj))) :
+    fiberSize (labelInterface label hsurj) F
+      = (univ.filter fun x ↦ label x = fiberLabel label hsurj F).card := by
+  refine Quotient.inductionOn F fun y ↦ ?_
+  unfold fiberSize
+  congr 1
+  exact Finset.filter_congr fun x _ ↦ mk_graphKer_labelInterface_eq_iff label hsurj x y
+
+/-- **Spread masses have the label marginal `p`**: a sum over the individuals, carrying the
+masses `p` spread over their fibers, of a function of their label is a sum over the labels
+weighted by `p`. -/
+theorem sum_spreadMass_mul_comp {n w : ℕ} (label : Fin n → Fin w)
+    (hsurj : Function.Surjective label) (p : Fin w → ℝ) (H : Fin w → ℝ) :
+    ∑ x, spreadMass (labelInterface label hsurj) (fun F ↦ p (fiberLabel label hsurj F)) x
+        * H (label x) = ∑ i, p i * H i := by
+  rw [← Finset.sum_fiberwise univ label fun x ↦ spreadMass (labelInterface label hsurj)
+    (fun F ↦ p (fiberLabel label hsurj F)) x * H (label x)]
+  refine Finset.sum_congr rfl fun i _ ↦ ?_
+  have hpos : (0 : ℝ) < (univ.filter fun x ↦ label x = i).card := by
+    obtain ⟨x, hx⟩ := hsurj i
+    exact_mod_cast Finset.card_pos.mpr ⟨x, Finset.mem_filter.mpr ⟨Finset.mem_univ _, hx⟩⟩
+  calc ∑ x ∈ univ.filter (fun x ↦ label x = i), spreadMass (labelInterface label hsurj)
+        (fun F ↦ p (fiberLabel label hsurj F)) x * H (label x)
+      = ∑ x ∈ univ.filter (fun x ↦ label x = i),
+          p i / (univ.filter fun x ↦ label x = i).card * H i := by
+        refine Finset.sum_congr rfl fun x hx ↦ ?_
+        have hxi := (Finset.mem_filter.mp hx).2
+        show p (fiberLabel label hsurj (Quotient.mk _ x))
+            / (fiberSize (labelInterface label hsurj) (Quotient.mk _ x) : ℝ) * H (label x) = _
+        rw [fiberSize_labelInterface label hsurj]
+        show p (label x) / ((univ.filter fun y ↦ label y = label x).card : ℝ) * H (label x) = _
+        rw [hxi]
+    _ = p i * H i := by
+        rw [Finset.sum_const, nsmul_eq_mul, ← mul_assoc, mul_comm _ (p i / _),
+          div_mul_cancel₀ _ hpos.ne']
+
+/-- **The crossing mass of a pulled-back partition is the crossing rate of the label
+marginal**: if individual masses have label marginal `p`, the pair sum of the block masses of
+`comap label τ` is `κ_τ` at `p`. -/
+theorem pairProductSum_blockMass_comap_of_marginal {n w : ℕ} {label : Fin n → Fin w}
+    {mass : Fin n → ℝ} {p : Fin w → ℝ}
+    (hmarg : ∀ H : Fin w → ℝ, ∑ x, mass x * H (label x) = ∑ i, p i * H i) (τ : ER w) :
+    pairProductSum (blockMass mass (Setoid.comap label τ)) = crossingRate p τ := by
+  have hinner : ∀ x, ∑ y, (if (Setoid.comap label τ).r x y then 0 else mass x * mass y)
+      = mass x * ∑ j, p j * (if τ.r (label x) j then 0 else 1) := by
+    intro x
+    rw [← hmarg fun j ↦ if τ.r (label x) j then 0 else 1, Finset.mul_sum]
+    refine Finset.sum_congr rfl fun y _ ↦ ?_
+    show (if τ.r (label x) (label y) then 0 else mass x * mass y)
+      = mass x * (mass y * if τ.r (label x) (label y) then 0 else 1)
+    split_ifs <;> ring
+  have hsum : ∑ x, ∑ y, (if (Setoid.comap label τ).r x y then 0 else mass x * mass y)
+      = ∑ i, ∑ j, if τ.r i j then 0 else p i * p j := by
+    simp only [hinner]
+    rw [hmarg fun i ↦ ∑ j, p j * (if τ.r i j then 0 else 1)]
+    refine Finset.sum_congr rfl fun i _ ↦ ?_
+    rw [Finset.mul_sum]
+    exact Finset.sum_congr rfl fun j _ ↦ by split_ifs <;> ring
+  have h := (two_mul_pairProductSum_blockMass mass (Setoid.comap label τ)).trans
+    (hsum.trans (two_mul_crossingRate p τ).symm)
+  linarith
+
+/-- **The Möbius sum of `Z` with spread masses is (F4) at the fiber masses**: above a
+labelling's interface, `Σ_{σ ≥ q} (-1)^{|σ|-1} (|σ|-1)! e^{-U κ_σ} = Pr(T_p ≤ U)`. -/
+theorem sum_topMobius_graphKer_spread_eq_connectionProbability {n w : ℕ} [NeZero w]
+    (label : Fin n → Fin w) (hsurj : Function.Surjective label) (p : Fin w → ℝ) (U : NNReal) :
+    ∑ σ : ER n, (topMobius (blocks σ) : ℝ)
+        * (if graphKer (labelInterface label hsurj) ≤ σ then Real.exp (-((U : ℝ)
+            * pairProductSum (blockMass (spreadMass (labelInterface label hsurj)
+              fun F ↦ p (fiberLabel label hsurj F)) σ))) else 0)
+      = connectionProbability p U := by
+  have hq : ∀ σ : ER n, graphKer (labelInterface label hsurj) ≤ σ ↔ Setoid.ker label ≤ σ :=
+    fun σ ↦ by rw [graphKer_labelInterface]
+  have hleft : ∑ σ : ER n, (topMobius (blocks σ) : ℝ)
+        * (if graphKer (labelInterface label hsurj) ≤ σ then Real.exp (-((U : ℝ)
+            * pairProductSum (blockMass (spreadMass (labelInterface label hsurj)
+              fun F ↦ p (fiberLabel label hsurj F)) σ))) else 0)
+      = ∑ σ ∈ univ.filter (Setoid.ker label ≤ ·), (topMobius (blocks σ) : ℝ)
+          * Real.exp (-((U : ℝ) * pairProductSum (blockMass (spreadMass
+            (labelInterface label hsurj) fun F ↦ p (fiberLabel label hsurj F)) σ))) := by
+    rw [Finset.sum_filter]
+    refine Finset.sum_congr rfl fun σ _ ↦ ?_
+    by_cases h : Setoid.ker label ≤ σ
+    · rw [if_pos ((hq σ).mpr h), if_pos h]
+    · rw [if_neg fun h' ↦ h ((hq σ).mp h'), if_neg h, mul_zero]
+  rw [hleft, connectionProbability_eq_mobius_sum]
+  symm
+  refine Finset.sum_nbij (fun τ ↦ Setoid.comap label τ) (fun τ _ ↦ ?_) ?_ ?_ fun τ _ ↦ ?_
+  · exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, ker_le_comap label τ⟩
+  · exact (comap_label_injective hsurj).injOn
+  · intro σ hσ
+    have hle := (Finset.mem_filter.mp (Finset.mem_coe.mp hσ)).2
+    exact ⟨Setoid.mapOfSurjective σ label hle hsurj, Finset.mem_coe.mpr (Finset.mem_univ _),
+      comap_mapOfSurjective_label hsurj hle⟩
+  · rw [blocks_comap_label hsurj τ,
+      pairProductSum_blockMass_comap_of_marginal (sum_spreadMass_mul_comp label hsurj p) τ]
+
+/-! ### (F3) with the rate of (F2) -/
+
+/-- The report's skeleton path is connected at its last step with the probability that the
+report of the Kingman law is connected. -/
+theorem sum_reportPathLaw_mul_last_top {n : ℕ} (s : Fin n → Fin n) (m : ℕ) :
+    ∑ y, reportPathLaw s m y * (if y (Fin.last m) = ⊤ then 1 else 0)
+      = ∑ ξ, kingmanLaw n m ξ * (if observed s ξ = ⊤ then 1 else 0) := by
+  calc ∑ y, reportPathLaw s m y * (if y (Fin.last m) = ⊤ then 1 else 0)
+      = ∑ y, ∑ ω ∈ univ.filter (fun ω : Fin (m + 1) → ER n ↦ (fun k ↦ observed s (ω k)) = y),
+          skeletonPathWeight (kingmanStep n) (fun ξ ↦ if ξ = ⊥ then 1 else 0) m ω
+            * (if observed s (ω (Fin.last m)) = ⊤ then 1 else 0) := by
+        refine Finset.sum_congr rfl fun y _ ↦ ?_
+        rw [reportPathLaw, Finset.sum_mul]
+        refine Finset.sum_congr rfl fun ω hω ↦ ?_
+        obtain rfl := (Finset.mem_filter.mp hω).2
+        rfl
+    _ = ∑ ω : Fin (m + 1) → ER n,
+          skeletonPathWeight (kingmanStep n) (fun ξ ↦ if ξ = ⊥ then 1 else 0) m ω
+            * (if observed s (ω (Fin.last m)) = ⊤ then 1 else 0) :=
+        Finset.sum_fiberwise univ (fun ω : Fin (m + 1) → ER n ↦ fun k ↦ observed s (ω k)) _
+    _ = ∑ ξ, kingmanLaw n m ξ * (if observed s ξ = ⊤ then 1 else 0) :=
+        sum_skeletonPathWeight_mul _ _ m fun ξ ↦ if observed s ξ = ⊤ then 1 else 0
+
+/-- The skeleton path of `Z` is connected at its last step with the probability that its law is
+connected. -/
+theorem sum_massPathLaw_mul_last_top {n : ℕ} (s : Fin n → Fin n) (mass : Fin n → ℝ) (m : ℕ) :
+    ∑ y, massPathLaw s mass m y * (if y (Fin.last m) = ⊤ then 1 else 0)
+      = ∑ ζ, massLaw s mass m ζ * (if ζ = ⊤ then 1 else 0) :=
+  sum_skeletonPathWeight_mul _ _ m fun ζ ↦ if ζ = ⊤ then 1 else 0
+
+/-- **(F3) with the rate of (F2).**  For a labelling of `n` individuals by `w` fibers and a mass
+vector `p` on the fibers, nonnegative with total at most one, the probability that the graph's
+report is connected at scaled time `U` is within `min {1, U²/(4n) + U ‖p^(n) - p‖₁}` of
+`Pr(T_p ≤ U)`, where `p^(n)` are the fiber proportions.
+
+Assumes: `0 < n`, the labelling is surjective, and `p` is nonnegative with total at most
+one. -/
+theorem abs_reportConnectionProbability_sub_le_min {n w : ℕ} [NeZero w]
+    (hn : 0 < n) (label : Fin n → Fin w) (hsurj : Function.Surjective label) {p : Fin w → ℝ}
+    (hp : ∀ i, 0 ≤ p i) (hptotal : ∑ i, p i ≤ 1) (U : NNReal) :
+    |reportConnectionProbability (labelInterface label hsurj) U - connectionProbability p U|
+      ≤ min 1 ((U : ℝ) ^ 2 / (4 * n) + U * ∑ i, |fiberProportion label i - p i|) := by
+  haveI : NeZero n := ⟨hn.ne'⟩
+  have hbij := fiberLabel_bijective label hsurj
+  have hP : ∀ F, 0 ≤ p (fiberLabel label hsurj F) := fun F ↦ hp _
+  have hPtotal : ∑ F, p (fiberLabel label hsurj F) ≤ 1 := (hbij.sum_comp p).trans_le hptotal
+  have h := abs_poissonMixture_report_sub_spread_le hn (labelInterface label hsurj)
+    (p := fun F ↦ p (fiberLabel label hsurj F)) hP hPtotal U
+    (fun m y ↦ if y (Fin.last m) = ⊤ then 1 else 0) fun m y ↦ by split_ifs <;> norm_num
+  simp only [sum_reportPathLaw_mul_last_top, sum_massPathLaw_mul_last_top] at h
+  have hZ : poissonMixture U (fun m ↦ ∑ ζ, massLaw (labelInterface label hsurj)
+      (spreadMass (labelInterface label hsurj) fun F ↦ p (fiberLabel label hsurj F)) m ζ
+        * (if ζ = ⊤ then 1 else 0)) = connectionProbability p U := by
+    rw [← sum_topMobius_graphKer_spread_eq_connectionProbability label hsurj p U]
+    exact (hasSum_poissonPMFReal_mul_massTop _ _ U).tsum_eq
+  have hfib : ∑ F, |(fiberSize (labelInterface label hsurj) F : ℝ) / n
+      - p (fiberLabel label hsurj F)| = ∑ i, |fiberProportion label i - p i| := by
+    rw [← hbij.sum_comp fun i ↦ |fiberProportion label i - p i|]
+    refine Finset.sum_congr rfl fun F _ ↦ ?_
+    exact congrArg (fun c : ℕ ↦ |(c : ℝ) / n - p (fiberLabel label hsurj F)|)
+      (fiberSize_labelInterface label hsurj F)
+  rw [hZ, hfib] at h
+  exact h
 
 end
 

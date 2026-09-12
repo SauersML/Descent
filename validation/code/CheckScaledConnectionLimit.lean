@@ -44,3 +44,21 @@ functionals. -/
   Descent.Pangenome.GraphCoalescent.sum_massLaw_mul_top
 #print axioms
   Descent.Pangenome.GraphCoalescent.hasSum_poissonPMFReal_mul_massTop
+#print axioms
+  Descent.Pangenome.GraphCoalescent.mk_graphKer_labelInterface_eq_iff
+#print axioms
+  Descent.Pangenome.GraphCoalescent.fiberLabel_bijective
+#print axioms
+  Descent.Pangenome.GraphCoalescent.fiberSize_labelInterface
+#print axioms
+  Descent.Pangenome.GraphCoalescent.sum_spreadMass_mul_comp
+#print axioms
+  Descent.Pangenome.GraphCoalescent.pairProductSum_blockMass_comap_of_marginal
+#print axioms
+  Descent.Pangenome.GraphCoalescent.sum_topMobius_graphKer_spread_eq_connectionProbability
+#print axioms
+  Descent.Pangenome.GraphCoalescent.sum_reportPathLaw_mul_last_top
+#print axioms
+  Descent.Pangenome.GraphCoalescent.sum_massPathLaw_mul_last_top
+#print axioms
+  Descent.Pangenome.GraphCoalescent.abs_reportConnectionProbability_sub_le_min
