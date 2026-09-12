@@ -42,6 +42,13 @@ observables are equal (`measure_eq_of_samplingMonomial_eq`), because the cylinde
 generating the product σ-algebra, so the algebra separates points
 (`samplingAlgebra_separatesPoints`).
 
+Density. The sampling algebra contains the constants (`algebraMap_mem_samplingAlgebra`) and
+separates the points of the compact space `P(H)`, so Stone–Weierstrass makes its closure all of
+`C(P(H))` (`samplingAlgebra_topologicalClosure_eq_top`): every continuous function of a genome law
+is a uniform limit of cylinder sampling polynomials (`exists_samplingAlgebra_near`). This is the
+uniqueness step of Theorem 9: two continuous maps on `C(P(H))` into a Hausdorff space that agree
+on the sampling polynomials agree (`eq_of_eqOn_samplingAlgebra`).
+
 Scope. The sampling polynomials of `n > 1` genomes are reached through the generated algebra, not
 defined as integrals against product measures. Nothing about the dynamics is stated here.
 
@@ -79,12 +86,14 @@ def positiveNormalizedFunctionals : Set (C(H, ℝ) → ℝ) :=
   {Λ | (∀ g h, Λ (g + h) = Λ g + Λ h) ∧ (∀ (c : ℝ) g, Λ (c • g) = c * Λ g) ∧
     (∀ g, 0 ≤ g → 0 ≤ Λ g) ∧ Λ 1 = 1}
 
+omit [T2Space H] in
 /-- Every continuous observable is integrable against a probability measure on a compact
 space. -/
 theorem integrable_observable (μ : ProbabilityMeasure H) (g : C(H, ℝ)) :
     Integrable (fun x ↦ g x) (μ : Measure H) :=
   (BoundedContinuousFunction.mkOfCompact g).integrable (μ := (μ : Measure H))
 
+omit [T2Space H] in
 /-- The integral map is continuous in the topology of weak convergence. -/
 theorem continuous_integralMap : Continuous (integralMap H) :=
   continuous_pi fun g ↦ ProbabilityMeasure.continuous_integral_boundedContinuousFunction
@@ -96,7 +105,9 @@ theorem isInducing_integralMap : IsInducing (integralMap H) := by
   refine isInducing_iff_nhds.mpr fun μ ↦ le_antisymm
     ((continuous_integralMap H).tendsto μ).le_comap ?_
   refine tendsto_id'.mp (ProbabilityMeasure.tendsto_iff_forall_integral_tendsto.mpr fun f ↦ ?_)
-  exact ((continuous_apply f.toContinuousMap).tendsto _).comp tendsto_comap
+  have hcoordinate : Continuous fun Λ : C(H, ℝ) → ℝ ↦ Λ f.toContinuousMap :=
+    continuous_apply f.toContinuousMap
+  exact (hcoordinate.tendsto _).comp tendsto_comap
 
 /-- The integrals against a probability measure form a positive normalized functional. -/
 theorem integralMap_mem (μ : ProbabilityMeasure H) :
@@ -125,7 +136,8 @@ theorem exists_probabilityMeasure_of_mem {Λ : C(H, ℝ) → ℝ}
     fun f hf ↦ hpos f.toContinuousMap (ContinuousMap.le_def.mpr fun y ↦
       CompactlySupportedContinuousMap.le_def.mp hf y)
   have hintegral : ∀ g : C(H, ℝ), ∫ x, g x ∂(RealRMK.rieszMeasure functional) = Λ g :=
-    fun g ↦ RealRMK.integral_rieszMeasure functional (ContinuousMap.liftCompactlySupported g)
+    fun g ↦ RealRMK.integral_rieszMeasure functional
+      (CompactlySupportedContinuousMap.ContinuousMap.liftCompactlySupported g)
   have hprobability : IsProbabilityMeasure (RealRMK.rieszMeasure functional) := by
     have hmass := hintegral 1
     simp only [hone, ContinuousMap.one_apply, integral_const, smul_eq_mul, mul_one] at hmass
@@ -142,8 +154,10 @@ reads finitely many coordinates continuously. -/
 theorem isClosed_positiveNormalizedFunctionals : IsClosed (positiveNormalizedFunctionals H) := by
   have hadd : IsClosed {Λ : C(H, ℝ) → ℝ | ∀ g h, Λ (g + h) = Λ g + Λ h} := by
     simp only [Set.setOf_forall]
-    exact isClosed_iInter fun g ↦ isClosed_iInter fun h ↦
-      isClosed_eq (continuous_apply _) ((continuous_apply _).add (continuous_apply _))
+    refine isClosed_iInter fun g ↦ isClosed_iInter fun h ↦ ?_
+    have hsum : Continuous fun Λ : C(H, ℝ) → ℝ ↦ Λ g + Λ h :=
+      (continuous_apply g).add (continuous_apply h)
+    exact isClosed_eq (continuous_apply (g + h)) hsum
   have hsmul : IsClosed {Λ : C(H, ℝ) → ℝ | ∀ (c : ℝ) g, Λ (c • g) = c * Λ g} := by
     simp only [Set.setOf_forall]
     exact isClosed_iInter fun c ↦ isClosed_iInter fun g ↦
@@ -156,6 +170,7 @@ theorem isClosed_positiveNormalizedFunctionals : IsClosed (positiveNormalizedFun
     isClosed_eq (continuous_apply _) continuous_const
   exact hadd.inter (hsmul.inter (hpos.inter hone))
 
+omit [T2Space H] [BorelSpace H] in
 /-- The integral of a continuous observable against a probability measure is at most its sup
 norm. -/
 theorem abs_integralMap_le (μ : ProbabilityMeasure H) (g : C(H, ℝ)) :
@@ -217,6 +232,7 @@ theorem measure_eq_of_samplingMonomial_eq {μ ν : ProbabilityMeasure (V → Boo
     (h : ∀ features readout,
       samplingMonomial features readout μ = samplingMonomial features readout ν) :
     μ = ν := by
+  haveI : IsProbabilityMeasure (μ.1 : Measure (V → Bool)) := μ.2
   refine Subtype.ext (ext_of_generate_finite (measurableCylinders fun _ : V ↦ Bool)
     generateFrom_measurableCylinders.symm isPiSystem_measurableCylinders (fun C hC ↦ ?_) ?_)
   · obtain ⟨features, S, hS, rfl⟩ := (mem_measurableCylinders C).mp hC
@@ -244,6 +260,54 @@ theorem samplingAlgebra_separatesPoints : (samplingAlgebra V).SeparatesPoints :=
     hdiff⟩
 
 end Sampling
+
+/-! ## Density of the sampling algebra -/
+
+section Density
+
+variable {V : Type*} [Countable V]
+
+/-- The constants are cylinder sampling polynomials. -/
+theorem algebraMap_mem_samplingAlgebra (c : ℝ) :
+    algebraMap ℝ C(ProbabilityMeasure (V → Bool), ℝ) c ∈ samplingAlgebra V :=
+  (samplingAlgebra V).algebraMap_mem c
+
+/-- Every linear sampling observable of a cylinder readout is a cylinder sampling polynomial. -/
+theorem samplingMonomial_mem_samplingAlgebra (features : Finset V)
+    (readout : (features → Bool) → ℝ) :
+    samplingMonomial features readout ∈ samplingAlgebra V :=
+  Algebra.subset_adjoin ⟨⟨features, readout⟩, rfl⟩
+
+/-- **The cylinder sampling polynomials are dense in `C(P(H))`.** By Stone–Weierstrass: the genome
+laws form a compact space, and the sampling algebra contains the constants and separates them. -/
+theorem samplingAlgebra_topologicalClosure_eq_top :
+    (samplingAlgebra V).topologicalClosure = ⊤ :=
+  ContinuousMap.subalgebra_topologicalClosure_eq_top_of_separatesPoints (samplingAlgebra V)
+    samplingAlgebra_separatesPoints
+
+/-- Every continuous function of a genome law is uniformly approximated, to any accuracy, by a
+cylinder sampling polynomial. -/
+theorem exists_samplingAlgebra_near (f : C(ProbabilityMeasure (V → Bool), ℝ)) {ε : ℝ}
+    (hε : 0 < ε) : ∃ g ∈ samplingAlgebra V, ‖g - f‖ < ε := by
+  obtain ⟨g, hg⟩ := ContinuousMap.exists_mem_subalgebra_near_continuousMap_of_separatesPoints
+    (samplingAlgebra V) samplingAlgebra_separatesPoints f ε hε
+  exact ⟨g, g.2, hg⟩
+
+/-- **Uniqueness through the sampling algebra.** Two continuous maps on `C(P(H))` into a Hausdorff
+space that agree on the cylinder sampling polynomials agree everywhere. -/
+theorem eq_of_eqOn_samplingAlgebra {E : Type*} [TopologicalSpace E] [T2Space E]
+    {first second : C(ProbabilityMeasure (V → Bool), ℝ) → E} (hfirst : Continuous first)
+    (hsecond : Continuous second) (hagree : ∀ g ∈ samplingAlgebra V, first g = second g) :
+    first = second := by
+  have hdense : Dense (samplingAlgebra V : Set C(ProbabilityMeasure (V → Bool), ℝ)) := by
+    intro f
+    have hmember : f ∈ (samplingAlgebra V).topologicalClosure := by
+      rw [samplingAlgebra_topologicalClosure_eq_top]
+      exact Algebra.mem_top
+    exact hmember
+  exact hfirst.ext_on hdense hsecond hagree
+
+end Density
 
 end
 
