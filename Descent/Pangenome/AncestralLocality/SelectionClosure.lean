@@ -166,9 +166,9 @@ def SelectionAutonomous {O : Type*} [DecidableEq O] (K : H → H → H → ℝ) 
 /-- **Selection on an observed feature.** For a symmetric kernel and a positive fitness that is a
 function of the observation, selection-autonomy is hereditary autonomy.
 Assumes: `∀ x y z, K x y z = K y x z`. -/
-theorem selectionAutonomous_iff_of_factor {O : Type*} [Fintype O] [DecidableEq O]
-    {K : H → H → H → ℝ} (hK : ∀ x y z, K x y z = K y x z) {s : H → ℝ} (hs : ∀ x, 0 < s x)
-    {π : H → O} {sbar : O → ℝ} (hsbar : ∀ x, s x = sbar (π x)) :
+theorem selectionAutonomous_iff_of_factor [DecidableEq H] {O : Type*} [Fintype O]
+    [DecidableEq O] {K : H → H → H → ℝ} (hK : ∀ x y z, K x y z = K y x z) {s : H → ℝ}
+    (hs : ∀ x, 0 < s x) {π : H → O} {sbar : O → ℝ} (hsbar : ∀ x, s x = sbar (π x)) :
     SelectionAutonomous K s π ↔ HereditarilyAutonomous K π := by
   rw [hereditarilyAutonomous_iff_pushforward_reproduce_determined K hK π]
   have hinv : ∀ x, (s x)⁻¹ = (sbar (π x))⁻¹ := fun x ↦ by rw [hsbar]
