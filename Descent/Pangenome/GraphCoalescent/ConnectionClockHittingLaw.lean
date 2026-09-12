@@ -226,11 +226,9 @@ theorem map_sum_kingmanClock {b : ℕ} (hb : 1 ≤ b) {K : ℕ} (hbK : b ≤ K) 
 
 /-! ### The path law as a mixture over the stopping level -/
 
-/-- **The path law of the connection time mixes the level-transit laws over the stopping
-level**: `P(τ_q ∈ ·) = ∑_{b=1}^{n} p_b · levelTransitLaw b n`. -/
-theorem map_connectionTime_eq_sum {n : ℕ} (hn : 2 ≤ n) (s : Fin n → Fin n) :
-    (trajectoryClockLaw n).map (fun p ↦ Real.toNNReal (connectionTime s p))
-      = ∑ b ∈ Icc 1 n, stoppingLaw s b • levelTransitLaw b n := by
+/-- The connection time, as a duration, is a measurable function of the path. -/
+theorem measurable_toNNReal_connectionTime {n : ℕ} (s : Fin n → Fin n) :
+    Measurable fun p : List (ER n) × (ℕ → ℝ) ↦ Real.toNNReal (connectionTime s p) := by
   have hsum : ∀ b : ℕ, Measurable fun ω : ℕ → ℝ ↦
       Real.toNNReal (∑ j ∈ Ico (b - 1) (n - 1), ω j) := fun b ↦
     measurable_real_toNNReal.comp (Finset.measurable_sum _ fun j _ ↦ measurable_pi_apply j)
@@ -239,16 +237,35 @@ theorem map_connectionTime_eq_sum {n : ℕ} (hn : 2 ≤ n) (s : Fin n → Fin n)
     measurable_from_prod_countable_left fun l ↦ hsum (stoppingLevel s l)
   -- composed without an expected type: propagating `Measurable (toNNReal ∘ connectionTime s)`
   -- into `?g ∘ ?f` splits it at `toNNReal` and times out
-  have hmeas : Measurable fun p : List (ER n) × (ℕ → ℝ) ↦ Real.toNNReal (connectionTime s p) := by
-    have h := hswap.comp measurable_swap
-    exact h
+  have h := hswap.comp measurable_swap
+  exact h
+
+/-- **One level of the mixture**: integrating against `levelTransitLaw b n` is integrating the
+block of clock coordinates it collects. -/
+theorem lintegral_levelTransitLaw {b n : ℕ} (hb : 1 ≤ b) (hbn : b ≤ n) {g : ℝ≥0 → ℝ≥0∞}
+    (hg : Measurable g) :
+    ∫⁻ x, g x ∂(levelTransitLaw b n)
+      = ∫⁻ ω, g (Real.toNNReal (∑ j ∈ Ico (b - 1) (n - 1), ω j)) ∂kingmanClock := by
+  have hmeas : Measurable fun ω : ℕ → ℝ ↦ Real.toNNReal (∑ j ∈ Ico (b - 1) (n - 1), ω j) :=
+    measurable_real_toNNReal.comp (Finset.measurable_sum _ fun j _ ↦ measurable_pi_apply j)
+  rw [← map_sum_kingmanClock hb hbn, lintegral_map hg hmeas]
+
+/-- **The path law of the connection time mixes the level-transit laws over the stopping
+level**: `P(τ_q ∈ ·) = ∑_{b=1}^{n} p_b · levelTransitLaw b n`. -/
+theorem map_connectionTime_eq_sum {n : ℕ} (hn : 2 ≤ n) (s : Fin n → Fin n) :
+    (trajectoryClockLaw n).map (fun p ↦ Real.toNNReal (connectionTime s p))
+      = ∑ b ∈ Icc 1 n, stoppingLaw s b • levelTransitLaw b n := by
   refine Measure.ext_of_lintegral _ fun g hg ↦ ?_
-  rw [lintegral_map hg hmeas, lintegral_finset_sum_measure]
-  refine (lintegral_trajectoryClockLaw hn s
-    (fun b ω ↦ g (Real.toNNReal (∑ j ∈ Ico (b - 1) (n - 1), ω j)))
-    fun b ↦ hg.comp (hsum b)).trans (sum_congr rfl fun b hb ↦ ?_)
-  have hb' := mem_Icc.mp hb
-  rw [lintegral_smul_measure, ← map_sum_kingmanClock hb'.1 hb'.2, lintegral_map hg (hsum b),
+  have hF : ∀ b : ℕ, Measurable fun ω : ℕ → ℝ ↦
+      g (Real.toNNReal (∑ j ∈ Ico (b - 1) (n - 1), ω j)) := fun b ↦
+    hg.comp (measurable_real_toNNReal.comp
+      (Finset.measurable_sum _ fun j _ ↦ measurable_pi_apply j))
+  have hmix := lintegral_trajectoryClockLaw hn s
+    (fun b ω ↦ g (Real.toNNReal (∑ j ∈ Ico (b - 1) (n - 1), ω j))) hF
+  rw [lintegral_map hg (measurable_toNNReal_connectionTime s), lintegral_finset_sum_measure]
+  simp only [connectionTime]
+  refine hmix.trans (sum_congr rfl fun b hb ↦ ?_)
+  rw [lintegral_smul_measure, lintegral_levelTransitLaw (mem_Icc.mp hb).1 (mem_Icc.mp hb).2 hg,
     smul_eq_mul]
 
 /-! ### The first-step law as the same mixture -/
