@@ -64,20 +64,25 @@ theorem hiddenJumpLaw_apply {n : ℕ} (s : Fin n → Fin n) {ξ : ER n} (hk : 2 
     hiddenJumpLaw s ξ v =
       (Nat.card {η : ER n // Covers ξ η ∧ hiddenState s η = v} : ENNReal) *
         (((blocks ξ).choose 2 : ℕ) : ENNReal)⁻¹ := by
-  have hjump : ∀ a : ER n, (if v = hiddenState s a then jumpLaw ξ a else 0) =
-      if Covers ξ a ∧ hiddenState s a = v then (((blocks ξ).choose 2 : ℕ) : ENNReal)⁻¹
-      else 0 := by
-    intro a
-    by_cases hcov : Covers ξ a
-    · by_cases hv : hiddenState s a = v
-      · rw [if_pos hv.symm, if_pos ⟨hcov, hv⟩, jumpLaw_apply_cover hk hcov]
-      · rw [if_neg (fun h ↦ hv h.symm), if_neg (fun h ↦ hv h.2)]
-    · have hzero : jumpLaw ξ a = 0 :=
-        (PMF.apply_eq_zero_iff _ _).mpr fun hmem ↦ hcov ((mem_support_jumpLaw hk).mp hmem)
-      rw [hzero, if_neg (fun h ↦ hcov h.1), ite_self]
-  rw [hiddenJumpLaw, PMF.map_apply, tsum_fintype, Finset.sum_congr rfl fun a _ ↦ hjump a,
-    ← Finset.sum_filter, Finset.sum_const, nsmul_eq_mul, Nat.card_eq_fintype_card,
-    Fintype.card_subtype]
+  have hcount : (Nat.card {η : ER n // Covers ξ η ∧ hiddenState s η = v} : ENNReal) *
+      (((blocks ξ).choose 2 : ℕ) : ENNReal)⁻¹ =
+        ∑ a : ER n, if Covers ξ a ∧ hiddenState s a = v then
+          (((blocks ξ).choose 2 : ℕ) : ENNReal)⁻¹ else 0 := by
+    rw [Finset.sum_ite, Finset.sum_const_zero, add_zero, Finset.sum_const, nsmul_eq_mul,
+      Nat.card_eq_fintype_card, Fintype.card_subtype]
+  rw [hiddenJumpLaw, PMF.map_apply, tsum_fintype, hcount]
+  refine Finset.sum_congr rfl fun a _ ↦ ?_
+  by_cases hcov : Covers ξ a
+  · by_cases hv : hiddenState s a = v
+    · rw [if_pos (show v = hiddenState s a from hv.symm),
+        if_pos (show Covers ξ a ∧ hiddenState s a = v from ⟨hcov, hv⟩),
+        jumpLaw_apply_cover hk hcov]
+    · rw [if_neg (show ¬ v = hiddenState s a from fun h ↦ hv h.symm),
+        if_neg (show ¬ (Covers ξ a ∧ hiddenState s a = v) from fun h ↦ hv h.2)]
+  · have hzero : jumpLaw ξ a = 0 :=
+      (PMF.apply_eq_zero_iff _ _).mpr fun hmem ↦ hcov ((mem_support_jumpLaw hk).mp hmem)
+    rw [hzero, ite_self,
+      if_neg (show ¬ (Covers ξ a ∧ hiddenState s a = v) from fun h ↦ hcov h.1)]
 
 /-- An absorbed labeled state keeps its hidden state. -/
 theorem hiddenJumpLaw_of_absorbed {n : ℕ} (s : Fin n → Fin n) {ξ : ER n} (hk : blocks ξ < 2) :
