@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.AncestralLocality.InfiniteGenomeLimit
 import Mathlib.Analysis.SpecialFunctions.Exponential
+import Mathlib.Analysis.Normed.Operator.NormedSpace
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program
@@ -25,12 +26,12 @@ series of operators whose terms keep `g ≥ 0` nonnegative has a positive sum
 generator `G` with `G 1 = 0` has `exp(tG) 1 = 1` (`exp_apply_one`).
 
 The jump semigroup. `jumpOperator J rate t = exp(t (J - rate))`. Since `rate` is a scalar,
-`exp(t (J - rate)) = exp(tJ) e^{-t rate}`, so the operator is positive at nonnegative times
-(`jumpOperator_nonneg`); it fixes the constants (`jumpOperator_one`), and positivity with the unit
-gives the contraction (`norm_jumpOperator_apply_le`). The exponential law gives the identity at
-time zero and the semigroup law (`jumpOperator_zero`, `jumpOperator_add`), the derivative in time
-is the generator (`hasDerivAt_jumpOperator`), and the family is norm continuous in time
-(`continuous_jumpOperator`). `jumpSemigroup` packages it as an
+`exp(t (J - rate)) = exp(tJ) e^{-t rate}` (`jumpOperator_eq_mul`), so the operator is positive at
+nonnegative times (`jumpOperator_nonneg`); it fixes the constants (`jumpOperator_one`), and
+positivity with the unit gives the contraction (`norm_jumpOperator_apply_le`). The exponential law
+gives the identity at time zero and the semigroup law (`jumpOperator_zero`, `jumpOperator_add`),
+the derivative in time is the generator (`hasDerivAt_jumpOperator`), and the family is norm
+continuous in time (`continuous_jumpOperator`). `jumpSemigroup` packages it as an
 `InfiniteGenomeLimit.FellerSemigroup`, with operators `jumpOperator` (`jumpSemigroup_operator`).
 
 Scope. Only bounded generators `J - rate` with `J` positive and `J 1 = rate • 1` are treated. The
@@ -53,6 +54,28 @@ open scoped NNReal
 noncomputable section
 
 variable {X : Type*} [TopologicalSpace X] [CompactSpace X]
+
+/-- The bounded operators on the continuous observables form a normed ring. -/
+local instance instNormedRingOperator : NormedRing (C(X, ℝ) →L[ℝ] C(X, ℝ)) :=
+  ContinuousLinearMap.toNormedRing
+
+/-- The bounded operators on the continuous observables form a normed algebra. -/
+local instance instNormedAlgebraOperator : NormedAlgebra ℝ (C(X, ℝ) →L[ℝ] C(X, ℝ)) :=
+  ContinuousLinearMap.toNormedAlgebra
+
+/-- The bounded operators on the continuous observables form a topological ring. -/
+local instance instIsTopologicalRingOperator : IsTopologicalRing (C(X, ℝ) →L[ℝ] C(X, ℝ)) :=
+  NonUnitalSeminormedRing.toIsTopologicalRing
+
+/-- Scalars commute with composition of operators. -/
+local instance instSMulCommClassOperator :
+    SMulCommClass ℝ (C(X, ℝ) →L[ℝ] C(X, ℝ)) (C(X, ℝ) →L[ℝ] C(X, ℝ)) :=
+  Algebra.to_smulCommClass
+
+/-- Scalars associate with composition of operators. -/
+local instance instIsScalarTowerOperator :
+    IsScalarTower ℝ (C(X, ℝ) →L[ℝ] C(X, ℝ)) (C(X, ℝ) →L[ℝ] C(X, ℝ)) :=
+  IsScalarTower.right
 
 /-! ## Positive operators -/
 
@@ -118,13 +141,15 @@ theorem nonneg_apply_of_hasSum {f : ℕ → C(X, ℝ) →L[ℝ] C(X, ℝ)} {A : 
 `t^k J^k / k!` of its series is. -/
 theorem exp_apply_nonneg {J : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hpos : ∀ g, 0 ≤ g → 0 ≤ J g) {t : ℝ}
     (ht : 0 ≤ t) {g : C(X, ℝ)} (hg : 0 ≤ g) : 0 ≤ NormedSpace.exp ℝ (t • J) g := by
-  refine nonneg_apply_of_hasSum (NormedSpace.exp_series_hasSum_exp' (𝕂 := ℝ) (t • J))
-    fun k ↦ ContinuousMap.le_def.mpr fun x ↦ ?_
-  have hterm := ContinuousMap.le_def.mp (pow_apply_nonneg hpos k hg) x
-  dsimp only
-  rw [ContinuousMap.zero_apply] at hterm ⊢
-  rw [smul_pow, smul_smul, ContinuousLinearMap.smul_apply, ContinuousMap.smul_apply, smul_eq_mul]
-  exact mul_nonneg (mul_nonneg (inv_nonneg.mpr (Nat.cast_nonneg _)) (pow_nonneg ht k)) hterm
+  have hterm : ∀ k : ℕ, 0 ≤ ((k.factorial : ℝ)⁻¹ • (t • J) ^ k) g := by
+    intro k
+    rw [smul_pow, smul_smul, ContinuousLinearMap.smul_apply]
+    refine ContinuousMap.le_def.mpr fun x ↦ ?_
+    have hx := ContinuousMap.le_def.mp (pow_apply_nonneg hpos k hg) x
+    rw [ContinuousMap.zero_apply] at hx ⊢
+    rw [ContinuousMap.smul_apply, smul_eq_mul]
+    exact mul_nonneg (mul_nonneg (inv_nonneg.mpr (Nat.cast_nonneg _)) (pow_nonneg ht k)) hx
+  exact nonneg_apply_of_hasSum (NormedSpace.exp_series_hasSum_exp' (𝕂 := ℝ) (t • J)) hterm
 
 /-- **A generator killing the constants fixes them.** If `G 1 = 0`, then `exp(tG) 1 = 1`: only
 the zeroth term of the series survives. -/
@@ -185,8 +210,11 @@ theorem jumpOperator_nonneg {J : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hpos : ∀ g, 0
     rw [ContinuousMap.zero_apply] at hx ⊢
     rw [ContinuousMap.smul_apply, smul_eq_mul]
     exact mul_nonneg (Real.exp_pos _).le hx
-  rw [jumpOperator_eq_mul, ContinuousLinearMap.mul_apply, Algebra.algebraMap_eq_smul_one,
-    ContinuousLinearMap.smul_apply, ContinuousLinearMap.one_apply]
+  have hsplit : jumpOperator J rate t g =
+      NormedSpace.exp ℝ (t • J) (Real.exp (-(t * rate)) • g) := by
+    rw [jumpOperator_eq_mul, ContinuousLinearMap.mul_apply, Algebra.algebraMap_eq_smul_one,
+      ContinuousLinearMap.smul_apply, ContinuousLinearMap.one_apply]
+  rw [hsplit]
   exact exp_apply_nonneg hpos ht hscale
 
 /-- **The jump operators contract the sup norm** at nonnegative times: they are positive and fix
@@ -203,9 +231,9 @@ theorem norm_jumpOperator_apply_le {J : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hpos : �
 
 /-- At time zero the jump operator is the identity. -/
 theorem jumpOperator_zero (J : C(X, ℝ) →L[ℝ] C(X, ℝ)) (rate : ℝ) :
-    jumpOperator J rate 0 = ContinuousLinearMap.id ℝ C(X, ℝ) := by
-  rw [jumpOperator, zero_smul, NormedSpace.exp_zero]
-  rfl
+    jumpOperator J rate 0 = ContinuousLinearMap.id ℝ C(X, ℝ) :=
+  calc jumpOperator J rate 0 = 1 := by rw [jumpOperator, zero_smul, NormedSpace.exp_zero]
+    _ = ContinuousLinearMap.id ℝ C(X, ℝ) := rfl
 
 /-- **The semigroup law** of the jump operators, at all real times. -/
 theorem jumpOperator_add (J : C(X, ℝ) →L[ℝ] C(X, ℝ)) (rate s t : ℝ) :
@@ -215,11 +243,12 @@ theorem jumpOperator_add (J : C(X, ℝ) →L[ℝ] C(X, ℝ)) (rate s t : ℝ) :
     rw [smul_mul_smul_comm, smul_mul_smul_comm, mul_comm s t]
   rw [jumpOperator, jumpOperator, jumpOperator, add_smul, NormedSpace.exp_add_of_commute hcomm]
 
-/-- **The derivative in time is the generator**, `d/dt exp(t (J - rate)) = (J - rate) exp(t (J -
-rate))`. -/
+/-- **The derivative in time is the generator**,
+`d/dt exp(t (J - rate)) = (J - rate) exp(t (J - rate))`. -/
 theorem hasDerivAt_jumpOperator (J : C(X, ℝ) →L[ℝ] C(X, ℝ)) (rate t : ℝ) :
-    HasDerivAt (jumpOperator J rate) ((J - rate • 1) * jumpOperator J rate t) t :=
-  hasDerivAt_exp_smul_const' (J - rate • 1) t
+    HasDerivAt (jumpOperator J rate) ((J - rate • 1) * jumpOperator J rate t) t := by
+  unfold jumpOperator
+  exact hasDerivAt_exp_smul_const' (J - rate • 1) t
 
 /-- The jump operators are continuous in time in the operator norm. -/
 theorem continuous_jumpOperator (J : C(X, ℝ) →L[ℝ] C(X, ℝ)) (rate : ℝ) :
@@ -238,8 +267,8 @@ def jumpSemigroup (J : C(X, ℝ) →L[ℝ] C(X, ℝ)) (rate : ℝ) (hpos : ∀ g
     rw [NNReal.coe_zero]
     exact jumpOperator_zero J rate
   operator_add s t := by
-    rw [NNReal.coe_add, jumpOperator_add]
-    rfl
+    rw [NNReal.coe_add]
+    exact jumpOperator_add J rate s t
   tendsto_operator_zero g := by
     have hcont : Continuous fun t : ℝ≥0 ↦ jumpOperator J rate t g :=
       ((ContinuousLinearMap.apply ℝ C(X, ℝ) g).continuous.comp
