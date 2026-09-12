@@ -217,7 +217,7 @@ theorem lineDeriv_windowEval (q : FrequencyPolynomial Unit Unit (fun _ ↦ G))
       = fun t : ℝ ↦ eval ((fun v : FrequencyVariable Unit Unit (fun _ ↦ G) ↦ p v.2)
           + t • (Pi.single ((), y) (1 : ℝ) : FrequencyVariable Unit Unit (fun _ ↦ G) → ℝ)) q := by
     funext t
-    congr 1
+    refine congrArg (fun z : FrequencyVariable Unit Unit (fun _ ↦ G) → ℝ ↦ eval z q) ?_
     funext v
     rcases v with ⟨⟨⟩, h⟩
     simp [Pi.single_apply]
@@ -272,9 +272,9 @@ theorem resamplingGenerator_windowEval (q : FrequencyPolynomial Unit Unit (fun _
   have hcoalescence : ∀ i : Unit, (resamplingRates G).coalescence i = 1 := fun _ ↦ rfl
   rw [resamplingGenerator]
   simp only [secondPartial_windowEval, hterm, Finset.sum_sub_distrib, Finset.sum_ite_eq,
-    Finset.mem_univ, if_true, neutralGenerator, hdrift, map_zero, zero_mul, Finset.sum_const_zero,
+    Finset.mem_univ, if_true, neutralGenerator, hdrift, zero_mul, Finset.sum_const_zero,
     zero_add, Finset.univ_unique, PUnit.default_eq_unit, Finset.sum_singleton, demeSecondOrder,
-    map_add, map_sub, map_sum, map_mul, eval_C, eval_X, hcoalescence]
+    map_sub, map_sum, map_mul, eval_C, eval_X, hcoalescence]
 
 /-- **On sampling observables the window semigroup is the coalescent dual.**  For every
 observation `f` of arity `n`, `T_t H_f (y) = H_{S_t f}(p(y))`, with `S_t = e^{t L_c}` the dual
@@ -288,7 +288,8 @@ theorem windowSemigroup_samplingPolynomial (hap₀ : FullHaplotype Unit (fun _ �
         (polynomialFunction (windowSamplingPolynomial G f)) y
       = momentFunctional (resamplingRates G) () t y (windowSamplingPolynomial G f) :=
     (congrArg (fun F : C(FrequencyState Unit Unit (fun _ ↦ G), ℝ) ↦ F y)
-      (denseExtension_coe _ dense_polynomialSubspace _ _
+      (denseExtension_coe _ dense_polynomialSubspace _
+        (norm_neutralPolynomialSemigroup_le (resamplingRates G) () hap₀ t)
         ⟨polynomialFunction (windowSamplingPolynomial G f), polynomialFunction_mem _⟩)).trans
       ((neutralPolynomialSemigroup_apply _ _ _ t _ y).trans
         (momentFunctional_congr _ _ hap₀ t y _ _ (polynomialFunction_representative _)))

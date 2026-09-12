@@ -1,0 +1,29 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.ResamplingWindowConsistency
+
+/-! Axiom audit of ResamplingWindowConsistency. -/
+
+open Descent.Portability.ResamplingWindowConsistency
+
+#print axioms Descent.Portability.ResamplingWindowConsistency.relabelObservation
+#print axioms Descent.Portability.ResamplingWindowConsistency.relabelObservation_apply
+#print axioms Descent.Portability.ResamplingWindowConsistency.coalescenceOperator_relabel
+#print axioms Descent.Portability.ResamplingWindowConsistency.pushVector
+#print axioms Descent.Portability.ResamplingWindowConsistency.samplingObservable_relabel
+#print axioms
+  Descent.Portability.ResamplingWindowConsistency.samplingObservable_dualSemigroup_relabel
+#print axioms Descent.Portability.ResamplingWindowConsistency.windowTypeMap
+#print axioms Descent.Portability.ResamplingWindowConsistency.windowMarginalVector
+#print axioms Descent.Portability.ResamplingWindowConsistency.windowMarginalVector_mem
+#print axioms Descent.Portability.ResamplingWindowConsistency.windowMarginal
+#print axioms Descent.Portability.ResamplingWindowConsistency.windowFrequency_windowMarginal
+#print axioms
+  Descent.Portability.ResamplingWindowConsistency.polynomialFunction_comp_windowMarginal
+#print axioms windowSemigroup_comp_windowMarginal_samplingPolynomial
+#print axioms Descent.Portability.ResamplingWindowConsistency.snocObservation
+#print axioms Descent.Portability.ResamplingWindowConsistency.windowSamplingPolynomial_mul_X
+#print axioms Descent.Portability.ResamplingWindowConsistency.samplingSpan
+#print axioms Descent.Portability.ResamplingWindowConsistency.mem_samplingSpan
+#print axioms Descent.Portability.ResamplingWindowConsistency.windowSemigroup_comp_windowMarginal
