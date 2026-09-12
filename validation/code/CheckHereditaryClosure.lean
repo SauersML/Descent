@@ -15,6 +15,8 @@ open Descent.Pangenome.AncestralLocality
 #print axioms refinement_rel_iff
 #print axioms refinement_le
 #print axioms refinement_eq_self_iff
+#print axioms refinement_eq_refinementStep
+#print axioms hereditarilyAutonomous_iff_autonomous
 #print axioms isAutonomous_of_refinement_eq
 #print axioms sum_block_eq_of_le
 #print axioms le_refinement_of_isAutonomous

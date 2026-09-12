@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.StateSpace
+import Descent.Pangenome.AncestralLocality.ClosureReachability
 import Descent.Pangenome.AncestralLocality.HeredityKernel
 import Mathlib.SetTheory.Cardinal.Finite
 
@@ -176,6 +177,18 @@ theorem refinement_eq_self_iff (K : H → H → H → ℝ) (P : Setoid H) :
   · intro h
     exact le_antisymm (refinement_le K P) fun x x' hx ↦
       (refinement_rel_iff K P x x').mpr ⟨hx, h hx⟩
+
+/-- **One transcription of (3.1).** `Φ_K` here is the refinement step `refinementStep` of
+`ClosureReachability`, whose one-step identity (5.2) is therefore a statement about `Φ_K`. -/
+theorem refinement_eq_refinementStep (K : H → H → H → ℝ) (P : Setoid H) :
+    refinement K P = refinementStep K P :=
+  Setoid.ext fun _ _ ↦ Iff.rfl
+
+/-- **One transcription of (2.2).** Hereditary autonomy here is `Autonomous` of
+`ClosureReachability`. -/
+theorem hereditarilyAutonomous_iff_autonomous {O : Type*} [DecidableEq O] (K : H → H → H → ℝ)
+    (π : H → O) : HereditarilyAutonomous K π ↔ Autonomous K π :=
+  Iff.rfl
 
 /-- **Autonomy at a fixed point.** If `Φ_K` fixes `P`, block masses are invariant in the first
 parent, and symmetry of the kernel gives the second. Assumes: `IsHeredityKernel K`. -/
