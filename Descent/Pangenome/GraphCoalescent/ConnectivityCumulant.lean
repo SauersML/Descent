@@ -45,6 +45,11 @@ Möbius inversion is then an exchange of the two sums.
 cumulant has nonnegative integer coefficients. `connectivityCumulant_eq_cumulantOfSizes` shows it
 depends on the interface only through its fiber sizes: it is `cumulantOfSizes q.parts card`,
 (D2) written over partitions of the fiber set with `c(C) = Σ_{i ∈ C} c_i`.
+`cumulantOfSizes_eq_of_equiv` is the multiset form of that dependence: an equivalence of fiber
+sets carrying the sizes of one to the sizes of the other leaves the cumulant unchanged. The
+transport is `mapPartition` along an embedding, with inverse `comapPartition`, and
+`connectivityCumulant_eq_of_equiv` states it for two interfaces on possibly different sets of
+individuals whose fibers correspond one to one with equal sizes.
 
 The degree bound `n - w + 1` is `ConnectivityCumulantDegree`, the corpus form of (D3) over
 `Coalescent.ER n` with `observed` and `graphKer` is `ConnectivityCumulantCorpus`, and the
@@ -536,6 +541,154 @@ theorem connectivityCumulant_eq_cumulantOfSizes {s : Finset α} (q : Finpartitio
   refine prod_congr rfl fun U hU ↦ ?_
   rw [card_biUnion (fun t ht t' ht' hne ↦ q.disjoint (ρ.subset hU ht) (ρ.subset hU ht') hne)]
   rfl
+
+/-! ## Relabeling the fibers -/
+
+section Relabeling
+
+variable {ι κ : Type*} [DecidableEq ι] [DecidableEq κ]
+
+/-- A partition of `T` carried along an embedding `e`: each part `U` becomes `U.map e`. -/
+def mapPartition (e : ι ↪ κ) {T : Finset ι} (P : Finpartition T) : Finpartition (T.map e) :=
+  Finpartition.ofExistsUnique (P.parts.image fun U ↦ U.map e)
+    (by
+      intro p hp
+      obtain ⟨U, hU, rfl⟩ := mem_image.mp hp
+      exact map_subset_map.mpr (P.subset hU))
+    (by
+      intro y hy
+      obtain ⟨x, hx, rfl⟩ := mem_map.mp hy
+      obtain ⟨U, ⟨hU, hxU⟩, hUuniq⟩ := P.existsUnique_mem hx
+      refine ⟨U.map e, ⟨mem_image_of_mem _ hU, mem_map_of_mem e hxU⟩, ?_⟩
+      rintro p ⟨hp, hxp⟩
+      obtain ⟨U', hU', rfl⟩ := mem_image.mp hp
+      rw [hUuniq U' ⟨hU', (mem_map' e).mp hxp⟩])
+    (by
+      intro hempty
+      obtain ⟨U, hU, hUempty⟩ := mem_image.mp hempty
+      rw [map_eq_empty] at hUempty
+      rw [hUempty] at hU
+      exact P.empty_notMem_parts hU)
+
+/-- A partition of `T.map e` read back on `T`: each part `V` becomes the elements of `T` that `e`
+sends into `V`. -/
+def comapPartition (e : ι ↪ κ) {T : Finset ι} (Q : Finpartition (T.map e)) : Finpartition T :=
+  Finpartition.ofExistsUnique (Q.parts.image fun V ↦ T.filter fun x ↦ e x ∈ V)
+    (by
+      intro p hp
+      obtain ⟨V, -, rfl⟩ := mem_image.mp hp
+      exact filter_subset _ _)
+    (by
+      intro x hx
+      obtain ⟨V, ⟨hV, hxV⟩, hVuniq⟩ := Q.existsUnique_mem (mem_map_of_mem e hx)
+      refine ⟨T.filter fun x ↦ e x ∈ V, ⟨mem_image_of_mem _ hV, mem_filter.mpr ⟨hx, hxV⟩⟩, ?_⟩
+      rintro p ⟨hp, hxp⟩
+      obtain ⟨V', hV', rfl⟩ := mem_image.mp hp
+      rw [hVuniq V' ⟨hV', (mem_filter.mp hxp).2⟩])
+    (by
+      intro hempty
+      obtain ⟨V, hV, hVempty⟩ := mem_image.mp hempty
+      obtain ⟨y, hy⟩ := Q.nonempty_of_mem_parts hV
+      obtain ⟨x, hx, rfl⟩ := mem_map.mp (Q.subset hV hy)
+      have hmem : x ∈ T.filter fun x ↦ e x ∈ V := mem_filter.mpr ⟨hx, hy⟩
+      rw [hVempty] at hmem
+      exact notMem_empty x hmem)
+
+/-- Carrying a partition along `e` and reading it back returns the partition. -/
+theorem comapPartition_mapPartition (e : ι ↪ κ) {T : Finset ι} (P : Finpartition T) :
+    comapPartition e (mapPartition e P) = P := by
+  have hself : ∀ U ∈ P.parts, T.filter (fun x ↦ e x ∈ U.map e) = U := by
+    intro U hU
+    ext x
+    rw [mem_filter, mem_map' e]
+    exact ⟨fun h ↦ h.2, fun h ↦ ⟨P.subset hU h, h⟩⟩
+  ext U
+  show U ∈ (P.parts.image fun U ↦ U.map e).image (fun V ↦ T.filter fun x ↦ e x ∈ V)
+    ↔ U ∈ P.parts
+  rw [image_image]
+  constructor
+  · intro h
+    obtain ⟨V, hV, rfl⟩ := mem_image.mp h
+    show T.filter (fun x ↦ e x ∈ V.map e) ∈ P.parts
+    rw [hself V hV]
+    exact hV
+  · intro hU
+    exact mem_image.mpr ⟨U, hU, hself U hU⟩
+
+/-- Reading a partition of `T.map e` back on `T` and carrying it along `e` returns it. -/
+theorem mapPartition_comapPartition (e : ι ↪ κ) {T : Finset ι} (Q : Finpartition (T.map e)) :
+    mapPartition e (comapPartition e Q) = Q := by
+  have hself : ∀ V ∈ Q.parts, (T.filter fun x ↦ e x ∈ V).map e = V := by
+    intro V hV
+    ext y
+    rw [mem_map]
+    constructor
+    · rintro ⟨x, hx, rfl⟩
+      exact (mem_filter.mp hx).2
+    · intro hy
+      obtain ⟨x, hx, rfl⟩ := mem_map.mp (Q.subset hV hy)
+      exact ⟨x, mem_filter.mpr ⟨hx, hy⟩, rfl⟩
+  ext V
+  show V ∈ (Q.parts.image fun V ↦ T.filter fun x ↦ e x ∈ V).image (fun U ↦ U.map e)
+    ↔ V ∈ Q.parts
+  rw [image_image]
+  constructor
+  · intro h
+    obtain ⟨W, hW, rfl⟩ := mem_image.mp h
+    show (T.filter fun x ↦ e x ∈ W).map e ∈ Q.parts
+    rw [hself W hW]
+    exact hW
+  · intro hV
+    exact mem_image.mpr ⟨V, hV, hself V hV⟩
+
+/-- **Relabeling along an embedding.** Carrying the fibers along an embedding and reading their
+sizes back through it leaves the cumulant unchanged. -/
+theorem cumulantOfSizes_map (e : ι ↪ κ) (T : Finset ι) (c : κ → ℕ) :
+    cumulantOfSizes (T.map e) c = cumulantOfSizes T (fun i ↦ c (e i)) := by
+  unfold cumulantOfSizes
+  symm
+  refine sum_nbij' (mapPartition e) (comapPartition e) (fun _ _ ↦ mem_univ _)
+    (fun _ _ ↦ mem_univ _) (fun P _ ↦ comapPartition_mapPartition e P)
+    (fun Q _ ↦ mapPartition_comapPartition e Q) fun P _ ↦ ?_
+  have hinj : Set.InjOn (fun U : Finset ι ↦ U.map e) P.parts := by
+    intro U _ V _ h
+    exact map_injective e h
+  rw [show (mapPartition e P).parts = P.parts.image fun U ↦ U.map e from rfl,
+    card_image_of_injOn hinj, prod_image hinj]
+  simp only [sum_map]
+
+/-- The cumulant of a fiber set is the cumulant of its attached copy. -/
+theorem cumulantOfSizes_attach (T : Finset ι) (c : ι → ℕ) :
+    cumulantOfSizes T c = cumulantOfSizes T.attach (fun i ↦ c i) := by
+  conv_lhs => rw [← attach_map_val (s := T)]
+  exact cumulantOfSizes_map (Function.Embedding.subtype _) T.attach c
+
+/-- **NOTE Theorem D: the cumulant sees the fiber sizes only as a multiset.** An equivalence
+between two fiber sets that carries the sizes of one to the sizes of the other leaves the
+cumulant unchanged. -/
+theorem cumulantOfSizes_eq_of_equiv {T : Finset ι} {T' : Finset κ} (e : T ≃ T') {c : ι → ℕ}
+    {c' : κ → ℕ} (hc : ∀ i : T, c' (e i) = c i) :
+    cumulantOfSizes T c = cumulantOfSizes T' c' := by
+  have hmap : T.attach.map e.toEmbedding = T'.attach := by
+    ext y
+    simp only [mem_map, mem_attach, true_and, iff_true]
+    exact ⟨e.symm y, e.apply_symm_apply y⟩
+  rw [cumulantOfSizes_attach T c, cumulantOfSizes_attach T' c', ← hmap, cumulantOfSizes_map]
+  congr 1
+  funext i
+  exact (hc i).symm
+
+/-- **NOTE Theorem D: the fiber-size multiset of an interface.** Two interfaces, possibly on
+different sets of individuals, whose fibers correspond one to one with equal sizes have the same
+cumulant. -/
+theorem connectivityCumulant_eq_of_equiv {s : Finset ι} {s' : Finset κ} (q : Finpartition s)
+    (q' : Finpartition s') (e : q.parts ≃ q'.parts)
+    (he : ∀ t : q.parts, #(e t : Finset κ) = #(t : Finset ι)) :
+    connectivityCumulant q = connectivityCumulant q' := by
+  rw [connectivityCumulant_eq_cumulantOfSizes, connectivityCumulant_eq_cumulantOfSizes]
+  exact cumulantOfSizes_eq_of_equiv (c := fun t ↦ #t) (c' := fun t ↦ #t) e he
+
+end Relabeling
 
 end
 

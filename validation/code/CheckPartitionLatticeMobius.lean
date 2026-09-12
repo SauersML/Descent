@@ -9,6 +9,8 @@ open Descent.Pangenome.GraphCoalescent
 
 #print axioms instLocallyFiniteOrderFinpartition
 #print axioms mu_finpartition_top
+#print axioms mu_finpartition_bot_top_of_card_eq_three
+#print axioms tripleGluingResidual_eq_mu_sum
 #print axioms card_filter_card_parts_eq_stirlingSecond
 #print axioms sum_stirlingSecond_mul_mobiusCoefficient
 #print axioms topMobius_eq_mobiusCoefficient

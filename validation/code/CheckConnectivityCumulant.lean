@@ -33,3 +33,11 @@ open Descent.Pangenome.GraphCoalescent
 #print axioms connectivityCumulant_eq_map_nat
 #print axioms coeff_connectivityCumulant_nonneg
 #print axioms connectivityCumulant_eq_cumulantOfSizes
+#print axioms mapPartition
+#print axioms comapPartition
+#print axioms comapPartition_mapPartition
+#print axioms mapPartition_comapPartition
+#print axioms cumulantOfSizes_map
+#print axioms cumulantOfSizes_attach
+#print axioms cumulantOfSizes_eq_of_equiv
+#print axioms connectivityCumulant_eq_of_equiv

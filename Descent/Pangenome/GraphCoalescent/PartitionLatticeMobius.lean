@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulantDegree
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionLaw
+import Descent.Pangenome.TripleGluing
 import Mathlib.Combinatorics.Enumerative.IncidenceAlgebra
 import Mathlib.Combinatorics.Enumerative.Stirling
 
@@ -14,7 +15,7 @@ assert_below Descent.Portability Descent.Decision Descent.Program
 
 Theorem D of the pangenome hidden-clock note uses the partition-lattice Möbius coefficient
 `μ(σ, ⊤) = (-1)^{|σ|-1} (|σ|-1)!`. `Descent.Pangenome.TripleGluing` has that coefficient at order
-three and names arbitrary order as unproved. `ConnectivityCumulant` proves that
+three, as the `2` on the all-singleton product. `ConnectivityCumulant` proves that
 `mobiusCoefficient` obeys the defining recursion of `μ(·, ⊤)` on every upper interval. This
 module identifies it with the Möbius function of Mathlib's incidence algebra, and records the
 Stirling-number route to the same value.
@@ -24,6 +25,10 @@ finite order that `IncidenceAlgebra.mu` needs. `mu_finpartition_top` is the arbi
 statement: on a nonempty set, `IncidenceAlgebra.mu ℤ σ ⊤ = (-1)^{|σ|-1} (|σ|-1)!`. The proof is
 downward well-founded induction on the finite lattice, through Mathlib's
 `mu_eq_neg_sum_Ioc_of_ne` and `ConnectivityCumulant.sum_mobiusCoefficient_upper`.
+
+`mu_finpartition_bot_top_of_card_eq_three` is the order-three value `μ(⊥, ⊤) = 2`, and
+`tripleGluingResidual_eq_mu_sum` writes `HaplotypeGluing.tripleGluingResidual` as the Möbius sum
+over the partitions of a three-element set, every coefficient read off `IncidenceAlgebra.mu`.
 
 `card_filter_card_parts_eq_stirlingSecond` shows that the partitions of `t` into `j` parts number
 `S(|t|, j)`, through the insertion bijection of `LahWeights` with weight one.
@@ -83,6 +88,35 @@ theorem mu_finpartition_top (hs : s.Nonempty) (σ : Finpartition s) :
     rw [hfilter, sum_insert fun h ↦ lt_irrefl σ (mem_Ioc.mp h).1] at hsum
     rw [sum_congr rfl fun x hx ↦ ih x (mem_Ioc.mp hx).1]
     linarith
+
+/-- **The order-three coefficient.** On a three-element set the all-singleton partition has
+Möbius value `μ(⊥, ⊤) = 2`, the coefficient `HaplotypeGluing.tripleGluingResidual` puts on the
+all-singleton product. -/
+theorem mu_finpartition_bot_top_of_card_eq_three (ht : #s = 3) :
+    IncidenceAlgebra.mu ℤ (⊥ : Finpartition s) ⊤ = 2 := by
+  rw [mu_finpartition_top (card_pos.mp (by omega)) ⊥, Finpartition.card_bot, ht]
+  decide
+
+/-- **NOTE (D3) at order three, against `TripleGluing`.** `HaplotypeGluing.tripleGluingResidual`
+is the Möbius sum over the partitions of a three-element set, every coefficient a value of
+Mathlib's incidence-algebra Möbius function: `μ(⊤, ⊤)` on the joint mass, `μ(σ, ⊤)` for a
+two-part partition `σ` on each pair-times-singleton product, and `μ(⊥, ⊤)` on the all-singleton
+product. -/
+theorem tripleGluingResidual_eq_mu_sum (ht : #s = 3) (σ : Finpartition s) (hσ : #σ.parts = 2)
+    (triple pairAB pairAC pairBC singleA singleB singleC : ℝ) :
+    HaplotypeGluing.tripleGluingResidual triple pairAB pairAC pairBC singleA singleB singleC
+      = (IncidenceAlgebra.mu ℤ (⊤ : Finpartition s) ⊤ : ℝ) * triple
+        + (IncidenceAlgebra.mu ℤ σ ⊤ : ℝ)
+          * (singleA * pairBC + singleB * pairAC + singleC * pairAB)
+        + (IncidenceAlgebra.mu ℤ (⊥ : Finpartition s) ⊤ : ℝ)
+          * (singleA * singleB * singleC) := by
+  have hs : s.Nonempty := card_pos.mp (by omega)
+  have h2 : mobiusCoefficient 2 = -1 := by decide
+  rw [mu_finpartition_top hs ⊤, (card_parts_eq_one_iff ⊤ hs).mpr rfl, mobiusCoefficient_one,
+    mu_finpartition_top hs σ, hσ, h2, mu_finpartition_bot_top_of_card_eq_three ht]
+  unfold HaplotypeGluing.tripleGluingResidual
+  push_cast
+  ring
 
 /-- **Stirling numbers count set partitions.** The partitions of `t` into `j` parts number
 `S(|t|, j)`. -/
