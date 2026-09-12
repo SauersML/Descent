@@ -22,32 +22,38 @@ coefficient.
   `1 - ∑_k σ_k t/(t + d_k) = ∑_b p_b ∏_{k=b+1}^{n} d_k/(d_k + t)` gives a polynomial identity in
   `t`, and at `t = -d_n` only the top coefficient survives on the left:
   `σ_n d_n ∏_{j<n} (d_j - d_n) = ∑_{b<n} p_b ∏_{k=b+1}^{n} d_k ∏_{k≤b} (d_k - d_n)`.
-- `spectralCoeff_bot_self_eq`: the residue formula `σ_n = ∑_{b<n} p_b ∏_{k=b+1}^{n-1} d_k/(d_k - d_n)`.
+- `spectralCoeff_bot_self_eq`: the residue formula
+  `σ_n = ∑_{b<n} p_b ∏_{k=b+1}^{n-1} d_k/(d_k - d_n)`.
 
 ## The finite-difference form
 
 - `ladderResidue_mul_choose`: the ladder residue is a signed product of binomials,
   `C(2n-2, n-1) ∏_{k=b+1}^{n-1} d_k/(d_k - d_n) = (-1)^{n-1-b} C(n-2, b-1) C(n+b-1, n-1)`.
+  The proof is a downward induction on `b`. Taking the factor `k = b + 1` off the product
+  multiplies by `d_{b+1}/(d_{b+1} - d_n) = -(b+1)b/((n-1-b)(n+b))`, and two Pascal identities
+  turn that into the ratio of the binomials (`ladderResidue_mul_choose_aux`).
 - `spectralCoeff_bot_self_mul_choose`: so
   `σ_n C(2n-2, n-1) = ∑_{b=1}^{n-1} (-1)^{n-1-b} C(n-2, b-1) g(b)` with `g(b) = p_b C(n+b-1, n-1)`,
   and `spectralCoeff_bot_self_mul_choose_eq_fwdDiff` writes the sum as Mathlib's iterated forward
   difference `Δ^{n-2} g (1)`.
 
-## Two families with a nonzero top coefficient
+## The injective interface
 
-- The injective interface: `B = 1` surely (`stoppingProb_of_injective`), so
-  `σ_n = ∏_{k=2}^{n-1} d_k/(d_k - d_n)` (`spectralCoeff_bot_self_of_injective`), a product of
-  nonzero factors, and `σ_n C(2n-2, n-1) = (-1)^n n`, that is `σ_n = (-1)^n / C_{n-1}` with
-  `C_{n-1}` the Catalan number (`spectralCoeff_bot_self_mul_choose_of_injective`).
-- Fibers of sizes `1` and `n - 1`: the cumulant is `A_n - z A_{n-1}`
-  (`connectivityCumulant_graphKer_of_one_rest`), so `F_k = 1 - d_k/d_n` and `p_b = b/d_n`
-  (`stoppingProb_of_one_rest`). The finite difference is `Δ^{n-2}` of `n C(n+x, n)/d_n`, which is
-  `n C(n, 2)/d_n = n` by `fwdDiff_iter_choose`, so `σ_n C(2n-2, n-1) = n` and
-  `σ_n = 1/C_{n-1}` (`spectralCoeff_bot_self_mul_choose_of_one_rest`).
-- `panelSize_eq_of_survivalAt_eq_of_injective`, `panelSize_eq_of_survivalAt_eq_of_one_rest`: in
-  each family, and across the two, the survival function of the clock determines `n`.
+- `stoppingProb_of_injective`: an injective interface connects only at the root, `B = 1` surely.
+- `spectralCoeff_bot_self_of_injective`: so `σ_n = ∏_{k=2}^{n-1} d_k/(d_k - d_n)`, a product of
+  nonzero factors (`spectralCoeff_bot_self_ne_zero_of_injective`).
+- `spectralCoeff_bot_self_mul_choose_of_injective`: the ladder residue at `b = 1` gives
+  `σ_n C(2n-2, n-1) = (-1)^n n`, that is `σ_n = (-1)^n / C_{n-1}` with `C_{n-1}` the Catalan
+  number.
+- `panelSize_eq_of_survivalAt_eq_of_injective`: the survival function of the clock of an
+  injective interface determines `n`.
 
 ## Scope
+
+Not formalized: the family with fibers of sizes `1` and `n - 1`. By hand, the cumulant is
+`A_n - z A_{n-1}`, so `F_k = 1 - d_k/d_n` and `p_b = b/d_n`. The finite difference of
+`spectralCoeff_bot_self_mul_choose_eq_fwdDiff` is then `Δ^{n-2}` of `n C(n+x, n)/d_n` at `x = 0`,
+which is `n C(n, 2)/d_n = n`, so `σ_n = 1/C_{n-1}` and that family would name `n` as well.
 
 Open: whether `(-1)^w σ_n > 0` for every interface of width `w ≥ 2`, which would make `n`
 identified from the law exactly when `w ≥ 2` (width one is the collision of
@@ -67,13 +73,14 @@ set_option relaxedAutoImplicit false
 
 namespace Descent.Pangenome.GraphCoalescent.PanelSizeTopCoefficient
 
-open Coalescent Finset MeasureTheory
+open Coalescent Finset MeasureTheory fwdDiff
 open scoped Classical ENNReal NNReal
 
 /-! ### The residue formula -/
 
 /-- **The residue formula, multiplied out.** For `n ≥ 2`,
-`σ_n d_n ∏_{j=2}^{n-1} (d_j - d_n) = ∑_{b=1}^{n-1} p_b ∏_{k=b+1}^{n} d_k ∏_{k=2}^{b} (d_k - d_n)`. -/
+`σ_n d_n ∏_{j=2}^{n-1} (d_j - d_n)`
+`= ∑_{b=1}^{n-1} p_b ∏_{k=b+1}^{n} d_k ∏_{k=2}^{b} (d_k - d_n)`. -/
 theorem spectralCoeff_bot_self_mul_eq {n : ℕ} (hn : 2 ≤ n) (s : Fin n → Fin n) :
     spectralCoeff s ⊥ n * (deathRate n * ∏ j ∈ Ioc 1 (n - 1), (deathRate j - deathRate n))
       = ∑ b ∈ Ico 1 n, stoppingProb s b * (∏ k ∈ Ioc b n, deathRate k)
@@ -228,6 +235,99 @@ theorem spectralCoeff_bot_self_eq {n : ℕ} (hn : 2 ≤ n) (s : Fin n → Fin n)
   field_simp
   ring
 
+/-! ### The finite-difference form -/
+
+/-- The ladder residue by downward induction on its lower index. With `N = a + m + 2` fixed,
+`C(2N-2, N-1) ∏_{k=a+2}^{N-1} d_k/(d_k - d_N) = (-1)^m C(N-2, a) C(N+a, N-1)`. -/
+theorem ladderResidue_mul_choose_aux (m : ℕ) : ∀ a N : ℕ, N = a + m + 2 →
+    ((2 * N - 2).choose (N - 1) : ℝ)
+        * ∏ k ∈ Ioc (a + 1) (N - 1), deathRate k / (deathRate k - deathRate N)
+      = (-1) ^ m * ((N - 2).choose a : ℝ) * ((N + a).choose (N - 1) : ℝ) := by
+  induction m with
+  | zero =>
+    intro a N hN
+    rw [show 2 * N - 2 = N + a by omega, show N - 1 = a + 1 by omega, show N - 2 = a by omega]
+    simp
+  | succ m ih =>
+    intro a N hN
+    have hsplit : ∏ k ∈ Ioc (a + 1) (N - 1), deathRate k / (deathRate k - deathRate N)
+        = deathRate (a + 1 + 1) / (deathRate (a + 1 + 1) - deathRate N)
+          * ∏ k ∈ Ioc (a + 1 + 1) (N - 1), deathRate k / (deathRate k - deathRate N) := by
+      have hcons := prod_Ioc_consecutive (fun k ↦ deathRate k / (deathRate k - deathRate N))
+        (show a + 1 ≤ a + 1 + 1 by omega) (show a + 1 + 1 ≤ N - 1 by omega)
+      rw [Nat.Ioc_succ_singleton, prod_singleton] at hcons
+      exact hcons.symm
+    have hih := ih (a + 1) N (by omega)
+    have h1 : (N - 2).choose (a + 1) * (a + 1) = (N - 2).choose a * (m + 1) := by
+      have h := Nat.choose_succ_right_eq (N - 2) a
+      rwa [show N - 2 - a = m + 1 by omega] at h
+    have h2 : (N + a).choose (N - 1) * (N + (a + 1))
+        = (N + (a + 1)).choose (N - 1) * (a + 2) := by
+      have h := Nat.choose_mul_succ_eq (N + a) (N - 1)
+      rwa [show N + a + 1 - (N - 1) = a + 2 by omega, show N + a + 1 = N + (a + 1) by omega] at h
+    have h1r : ((N - 2).choose (a + 1) : ℝ) * ((a : ℝ) + 1)
+        = ((N - 2).choose a : ℝ) * ((m : ℝ) + 1) := by
+      exact_mod_cast h1
+    have h2r : ((N + a).choose (N - 1) : ℝ) * ((N : ℝ) + ((a : ℝ) + 1))
+        = ((N + (a + 1)).choose (N - 1) : ℝ) * ((a : ℝ) + 2) := by
+      exact_mod_cast h2
+    have hNr : (N : ℝ) = (a : ℝ) + (m : ℝ) + 3 := by
+      rw [hN]
+      push_cast
+      ring
+    have hD : deathRate (a + 1 + 1) - deathRate N ≠ 0 :=
+      sub_ne_zero.mpr (deathRate_lt_deathRate (by omega) (by omega)).ne
+    have hE : ((m : ℝ) + 1) * ((N : ℝ) + ((a : ℝ) + 1)) ≠ 0 := by positivity
+    have hF : deathRate (a + 1 + 1) / (deathRate (a + 1 + 1) - deathRate N)
+        = -(((a : ℝ) + 2) * ((a : ℝ) + 1)) / (((m : ℝ) + 1) * ((N : ℝ) + ((a : ℝ) + 1))) := by
+      rw [div_eq_div_iff hD hE]
+      unfold deathRate Descent.Core.pairCount
+      rw [hNr]
+      push_cast
+      ring
+    rw [hsplit, mul_left_comm ((2 * N - 2).choose (N - 1) : ℝ), hih, hF, div_mul_eq_mul_div,
+      div_eq_iff hE]
+    linear_combination
+      (-((-1 : ℝ) ^ m) * ((a : ℝ) + 2) * ((N + (a + 1)).choose (N - 1) : ℝ)) * h1r
+        + ((-1 : ℝ) ^ m * ((N - 2).choose a : ℝ) * ((m : ℝ) + 1)) * h2r
+
+/-- **The ladder residue as signed binomials.** For `1 ≤ b < n`,
+`C(2n-2, n-1) ∏_{k=b+1}^{n-1} d_k/(d_k - d_n) = (-1)^{n-1-b} C(n-2, b-1) C(n+b-1, n-1)`. -/
+theorem ladderResidue_mul_choose {n b : ℕ} (hb : 1 ≤ b) (hbn : b < n) :
+    ((2 * n - 2).choose (n - 1) : ℝ)
+        * ∏ k ∈ Ioc b (n - 1), deathRate k / (deathRate k - deathRate n)
+      = (-1) ^ (n - 1 - b) * ((n - 2).choose (b - 1) : ℝ)
+          * ((n + b - 1).choose (n - 1) : ℝ) := by
+  obtain ⟨a, rfl⟩ : ∃ a, b = a + 1 := ⟨b - 1, by omega⟩
+  rw [show a + 1 - 1 = a by omega, show n + (a + 1) - 1 = n + a by omega]
+  exact ladderResidue_mul_choose_aux (n - 1 - (a + 1)) a n (by omega)
+
+/-- **The top coefficient against the central binomial.** For `n ≥ 2`,
+`σ_n C(2n-2, n-1) = ∑_{b=1}^{n-1} (-1)^{n-1-b} C(n-2, b-1) p_b C(n+b-1, n-1)`. -/
+theorem spectralCoeff_bot_self_mul_choose {n : ℕ} (hn : 2 ≤ n) (s : Fin n → Fin n) :
+    spectralCoeff s ⊥ n * ((2 * n - 2).choose (n - 1) : ℝ)
+      = ∑ b ∈ Ico 1 n, (-1) ^ (n - 1 - b) * ((n - 2).choose (b - 1) : ℝ)
+          * (stoppingProb s b * ((n + b - 1).choose (n - 1) : ℝ)) := by
+  rw [mul_comm (spectralCoeff s ⊥ n), spectralCoeff_bot_self_eq hn s, mul_sum]
+  refine sum_congr rfl fun b hb ↦ ?_
+  obtain ⟨hb1, hbn⟩ := mem_Ico.mp hb
+  rw [mul_left_comm ((2 * n - 2).choose (n - 1) : ℝ), ladderResidue_mul_choose hb1 hbn]
+  ring
+
+/-- **The finite-difference form.** For `n ≥ 2`, `σ_n C(2n-2, n-1) = Δ^{n-2} g (1)`, where
+`g(b) = p_b C(n+b-1, n-1)` and `Δ` is the unit forward difference on `ℕ`. -/
+theorem spectralCoeff_bot_self_mul_choose_eq_fwdDiff {n : ℕ} (hn : 2 ≤ n) (s : Fin n → Fin n) :
+    spectralCoeff s ⊥ n * ((2 * n - 2).choose (n - 1) : ℝ)
+      = Δ_[1]^[n - 2] (fun b : ℕ ↦ stoppingProb s b * ((n + b - 1).choose (n - 1) : ℝ)) 1 := by
+  rw [spectralCoeff_bot_self_mul_choose hn s, fwdDiff_iter_eq_sum_shift, sum_Ico_eq_sum_range,
+    show n - 2 + 1 = n - 1 by omega]
+  refine sum_congr rfl fun k hk ↦ ?_
+  have hk' := mem_range.mp hk
+  simp only [zsmul_eq_mul, smul_eq_mul, mul_one]
+  rw [show n - 1 - (1 + k) = n - 2 - k by omega, show 1 + k - 1 = k by omega]
+  push_cast
+  ring
+
 /-! ### The injective interface -/
 
 /-- **An injective interface connects only at the root**: `B = 1` surely. -/
@@ -277,6 +377,21 @@ theorem spectralCoeff_bot_self_ne_zero_of_injective {n : ℕ} (hn : 2 ≤ n) {s 
     omega
   · exact sub_ne_zero.mpr (deathRate_lt_deathRate (by have := (mem_Ioc.mp hk).1; omega)
       (by have := (mem_Ioc.mp hk).2; omega)).ne
+
+/-- **The injective interface: `σ_n = (-1)^n / C_{n-1}`.** For `n ≥ 2`,
+`σ_n C(2n-2, n-1) = (-1)^n n`, and `C(2n-2, n-1)/n` is the Catalan number `C_{n-1}`. -/
+theorem spectralCoeff_bot_self_mul_choose_of_injective {n : ℕ} (hn : 2 ≤ n) {s : Fin n → Fin n}
+    (hs : Function.Injective s) :
+    spectralCoeff s ⊥ n * ((2 * n - 2).choose (n - 1) : ℝ) = (-1) ^ n * n := by
+  rw [mul_comm (spectralCoeff s ⊥ n), spectralCoeff_bot_self_of_injective hn hs,
+    ladderResidue_mul_choose (n := n) le_rfl (by omega)]
+  obtain ⟨j, rfl⟩ : ∃ j, n = j + 2 := ⟨n - 2, by omega⟩
+  have hc : (j + 2 + 1 - 1).choose (j + 2 - 1) = j + 2 := by
+    rw [show j + 2 + 1 - 1 = j + 1 + 1 by omega, show j + 2 - 1 = j + 1 by omega]
+    exact Nat.choose_succ_self_right (j + 1)
+  rw [hc, show j + 2 - 1 - 1 = j by omega, show (1 : ℕ) - 1 = 0 from rfl, Nat.choose_zero_right]
+  push_cast
+  ring
 
 /-- **The clock of injective interfaces names the panel size.** -/
 theorem panelSize_eq_of_survivalAt_eq_of_injective {n n' : ℕ} (hn : 2 ≤ n) (hn' : 2 ≤ n')
