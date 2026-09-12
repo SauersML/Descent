@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionConvergence
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionPerturbation
+import Descent.Pangenome.GraphCoalescent.ScaledConnectionLimit
 import Mathlib.Analysis.Normed.Group.FunctionSeries
 import Mathlib.MeasureTheory.Measure.Portmanteau
 import Mathlib.Probability.CDF
@@ -532,87 +533,42 @@ theorem monotone_connectionTimeCDF {w : ℕ} [NeZero w] {p : Fin w → ℝ} (hp0
       exact monotone_poissonMixture (fun m ↦ (hunit m).1) (fun m ↦ (hunit m).2) hmono
         (Real.toNNReal_le_toNNReal huv)
 
-theorem continuous_connectionProbability_in_time {w : ℕ} [NeZero w] (p : Fin w → ℝ) :
-    Continuous fun u : ℝ ↦ connectionProbability p u := by
-  simp only [connectionProbability_eq_mobius_sum]
-  exact continuous_finset_sum _ fun σ _ ↦ continuous_const.mul
-    (Real.continuous_exp.comp ((continuous_id.mul continuous_const).neg))
-
-theorem connectionTimeCDF_rightContinuous {w : ℕ} [NeZero w] (p : Fin w → ℝ) (x : ℝ) :
-    ContinuousWithinAt (connectionTimeCDF p) (Ici x) x := by
+/-- A function set to zero at negative times, and continuous on the nonnegative times, is
+continuous from the right everywhere. -/
+theorem continuousWithinAt_ite_neg {f : ℝ → ℝ} (hf : ContinuousOn f (Ici 0)) (x : ℝ) :
+    ContinuousWithinAt (fun u : ℝ ↦ if u < 0 then 0 else f u) (Ici x) x := by
   by_cases hx : x < 0
-  · have hev : connectionTimeCDF p =ᶠ[𝓝 x] fun _ ↦ 0 := by
+  · have hev : (fun u : ℝ ↦ if u < 0 then 0 else f u) =ᶠ[𝓝 x] fun _ ↦ 0 := by
       filter_upwards [Iio_mem_nhds hx] with y hy
       exact if_pos hy
     exact (continuousAt_const.congr hev.symm).continuousWithinAt
   · have hx' : 0 ≤ x := not_lt.mp hx
-    refine ((continuous_connectionProbability_in_time p).continuousAt.continuousWithinAt).congr
-      (fun y hy ↦ ?_) ?_
+    refine ((hf x hx').mono (Ici_subset_Ici.mpr hx')).congr (fun y hy ↦ ?_) ?_
     · exact if_neg (not_lt.mpr (hx'.trans hy))
     · exact if_neg hx
 
-theorem tendsto_connectionTimeCDF_atBot {w : ℕ} (p : Fin w → ℝ) :
-    Tendsto (connectionTimeCDF p) atBot (𝓝 0) :=
+/-- A function set to zero at negative times tends to zero at `-∞`. -/
+theorem tendsto_ite_neg_atBot (f : ℝ → ℝ) :
+    Tendsto (fun u : ℝ ↦ if u < 0 then 0 else f u) atBot (𝓝 0) :=
   tendsto_const_nhds.congr' (by
     filter_upwards [eventually_lt_atBot 0] with y hy
     exact (if_pos hy).symm)
 
-/-- With every fiber of positive mass, a partition other than the top has a positive crossing
-rate. -/
-theorem crossingRate_pos_of_ne_top {w : ℕ} {p : Fin w → ℝ} (hp : ∀ i, 0 < p i) {σ : ER w}
-    (hσ : σ ≠ ⊤) : 0 < crossingRate p σ := by
-  obtain ⟨i, j, hij⟩ : ∃ i j, ¬ σ.r i j := by
-    by_contra hall
-    push_neg at hall
-    exact hσ (Setoid.ext fun a b ↦ ⟨fun _ ↦ trivial, fun _ ↦ hall a b⟩)
-  have hne : i ≠ j := fun h ↦ hij (by subst h; exact σ.iseqv.refl _)
-  have hnonneg : ∀ e ∈ (Finset.univ : Finset (FiberPair w)),
-      0 ≤ (if σ e.1.1 e.1.2 then (0 : ℝ) else pairRate p e) := fun e _ ↦ by
-    split_ifs
-    · exact le_rfl
-    · exact (mul_pos (hp _) (hp _)).le
-  unfold crossingRate
-  rcases lt_or_gt_of_ne hne with hlt | hlt
-  · refine Finset.sum_pos' hnonneg ⟨⟨(i, j), hlt⟩, Finset.mem_univ _, ?_⟩
-    show 0 < (if σ i j then (0 : ℝ) else pairRate p ⟨(i, j), hlt⟩)
-    rw [if_neg hij]
-    exact mul_pos (hp i) (hp j)
-  · refine Finset.sum_pos' hnonneg ⟨⟨(j, i), hlt⟩, Finset.mem_univ _, ?_⟩
-    show 0 < (if σ j i then (0 : ℝ) else pairRate p ⟨(j, i), hlt⟩)
-    rw [if_neg fun h ↦ hij (σ.iseqv.symm h)]
-    exact mul_pos (hp j) (hp i)
+theorem connectionTimeCDF_rightContinuous {w : ℕ} [NeZero w] (p : Fin w → ℝ) (x : ℝ) :
+    ContinuousWithinAt (connectionTimeCDF p) (Ici x) x :=
+  continuousWithinAt_ite_neg (continuous_connectionProbability_time p).continuousOn x
 
+theorem tendsto_connectionTimeCDF_atBot {w : ℕ} (p : Fin w → ℝ) :
+    Tendsto (connectionTimeCDF p) atBot (𝓝 0) :=
+  tendsto_ite_neg_atBot fun u ↦ connectionProbability p u
+
+/-- The distribution function of `T_p` tends to one: `T_p` is finite once every `p_i > 0`
+(`ScaledConnectionLimit.tendsto_connectionProbability_atTop`). -/
 theorem tendsto_connectionTimeCDF_atTop {w : ℕ} [NeZero w] {p : Fin w → ℝ}
     (hp : ∀ i, 0 < p i) : Tendsto (connectionTimeCDF p) atTop (𝓝 1) := by
-  have hterm : ∀ σ : ER w, Tendsto (fun u : ℝ ↦
-      (topMobius (blocks σ) : ℝ) * Real.exp (-(u * crossingRate p σ))) atTop
-      (𝓝 (if σ = ⊤ then 1 else 0)) := by
-    intro σ
-    by_cases htop : σ = ⊤
-    · rw [if_pos htop]
-      have hκ : crossingRate p σ = 0 := by
-        rw [htop]
-        unfold crossingRate
-        exact Finset.sum_eq_zero fun e _ ↦ if_pos trivial
-      have hμ : (topMobius (blocks σ) : ℝ) = 1 := by
-        have hb : blocks σ = 1 := by
-          rw [htop]
-          exact blocks_top w
-        rw [hb]
-        norm_num [topMobius]
-      simp only [hκ, mul_zero, neg_zero, Real.exp_zero, mul_one, hμ]
-      exact tendsto_const_nhds
-    · rw [if_neg htop]
-      have h := (Real.tendsto_exp_neg_atTop_nhds_zero.comp
-        (tendsto_id.atTop_mul_const (crossingRate_pos_of_ne_top hp htop))).const_mul
-        (topMobius (blocks σ) : ℝ)
-      simpa using h
-  have hsum := tendsto_finset_sum (Finset.univ : Finset (ER w)) fun σ _ ↦ hterm σ
-  rw [Finset.sum_ite_eq'] at hsum
-  simp only [Finset.mem_univ, if_true] at hsum
-  refine hsum.congr' ?_
+  refine (tendsto_connectionProbability_atTop hp).congr' ?_
   filter_upwards [eventually_ge_atTop 0] with u hu
-  rw [connectionTimeCDF, if_neg (not_lt.mpr hu), connectionProbability_eq_mobius_sum]
+  exact (if_neg (not_lt.mpr hu)).symm
 
 /-- **The distribution function of `T_p`, as a Stieltjes function.**
 
@@ -678,23 +634,13 @@ theorem reportConnectionCDF_rightContinuous {n : ℕ} (s : Fin n → Fin n) (x :
   have hunit := sum_kingmanLaw_mul_top_mem_unit s
   have habs : ∀ m, |∑ ξ, kingmanLaw n m ξ * (if observed s ξ = ⊤ then 1 else 0)| ≤ 1 :=
     fun m ↦ abs_le.mpr ⟨by linarith [(hunit m).1], (hunit m).2⟩
-  by_cases hx : x < 0
-  · have hev : reportConnectionCDF s =ᶠ[𝓝 x] fun _ ↦ 0 := by
-      filter_upwards [Iio_mem_nhds hx] with y hy
-      exact if_pos hy
-    exact (continuousAt_const.congr hev.symm).continuousWithinAt
-  · have hx' : 0 ≤ x := not_lt.mp hx
-    refine ((continuous_poissonSeries habs).continuousAt.continuousWithinAt).congr
-      (fun y hy ↦ ?_) ?_
-    · rw [reportConnectionCDF, if_neg (not_lt.mpr (hx'.trans hy)), reportConnectionProbability,
-        poissonMixture_toNNReal (hx'.trans hy)]
-    · rw [reportConnectionCDF, if_neg hx, reportConnectionProbability, poissonMixture_toNNReal hx']
+  refine continuousWithinAt_ite_neg ?_ x
+  refine (continuous_poissonSeries habs).continuousOn.congr fun y hy ↦ ?_
+  rw [reportConnectionProbability, poissonMixture_toNNReal hy]
 
 theorem tendsto_reportConnectionCDF_atBot {n : ℕ} (s : Fin n → Fin n) :
     Tendsto (reportConnectionCDF s) atBot (𝓝 0) :=
-  tendsto_const_nhds.congr' (by
-    filter_upwards [eventually_lt_atBot 0] with y hy
-    exact (if_pos hy).symm)
+  tendsto_ite_neg_atBot fun u ↦ reportConnectionProbability s u.toNNReal
 
 theorem tendsto_reportConnectionCDF_atTop {n : ℕ} (s : Fin n → Fin n) :
     Tendsto (reportConnectionCDF s) atTop (𝓝 1) := by

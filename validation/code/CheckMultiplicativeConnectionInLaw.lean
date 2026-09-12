@@ -34,7 +34,9 @@ import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionInLaw
 #print axioms
   Descent.Pangenome.GraphCoalescent.monotone_connectionTimeCDF
 #print axioms
-  Descent.Pangenome.GraphCoalescent.crossingRate_pos_of_ne_top
+  Descent.Pangenome.GraphCoalescent.continuousWithinAt_ite_neg
+#print axioms
+  Descent.Pangenome.GraphCoalescent.tendsto_ite_neg_atBot
 #print axioms
   Descent.Pangenome.GraphCoalescent.tendsto_connectionTimeCDF_atTop
 #print axioms
