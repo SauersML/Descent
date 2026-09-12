@@ -10,6 +10,9 @@ open Descent.Pangenome.GraphCoalescent.ShortTimeConnectionLaw
 #print axioms abs_pow_apply_le
 #print axioms summable_pow_apply
 #print axioms exp_smul_apply
+#print axioms summable_series
+#print axioms tsum_sub_leading_eq
+#print axioms norm_tsum_tail_le
 #print axioms tsum_sub_leading_isBigO
 #print axioms exp_smul_apply_sub_isBigO
 #print axioms pow_apply_eq_zero_of_level
@@ -23,6 +26,7 @@ open Descent.Pangenome.GraphCoalescent.ShortTimeConnectionLaw
 #print axioms kingmanMatrix_step
 #print axioms descentMatrix_kingmanMatrix_apply
 #print axioms connectedStates
+#print axioms mem_connectedStates
 #print axioms reportConnectedProbability
 #print axioms minimalHistoryCount
 #print axioms reportConnectedProbability_sub_isBigO

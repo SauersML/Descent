@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Coalescent.Kernel
 import Descent.Pangenome.GraphCoalescent.VisibleIntensityClock
 import Mathlib.Analysis.Normed.Algebra.MatrixExponential
 import Mathlib.Analysis.SpecificLimits.Normed
@@ -26,9 +27,12 @@ finite chain and then for Kingman's coalescent seen through an interface.
 
 For a matrix `Q` on a finite state space, `exp_smul_apply` writes the entries of `e^{tQ}` as the
 series `Σ_k t^k (Q^k)_{xa} / k!`, and `abs_pow_apply_le` bounds `(Q^k)_{xa}` by `S^k` with `S` the
-sum of the absolute entries of `Q`. A power series with such coefficients, vanishing below order
-`m`, is its `m`-th term plus `O(t^{m+1})` (`tsum_sub_leading_isBigO`), so
-`exp_smul_apply_sub_isBigO` expands an entry of `e^{tQ}` from its first nonzero power.
+sum of the absolute entries of `Q`. A power series with coefficients bounded by `C S^k` converges
+(`summable_series`); when its coefficients vanish below order `m`, less its `m`-th term it is its
+tail (`tsum_sub_leading_eq`), which is at most a constant times `|t|^{m+1}` for `|t| ≤ 1`
+(`norm_tsum_tail_le`). So the series is its `m`-th term plus `O(t^{m+1})`
+(`tsum_sub_leading_isBigO`), and `exp_smul_apply_sub_isBigO` expands an entry of `e^{tQ}` from its
+first nonzero power.
 
 A level function lowered by at most one along every nonzero rate forces the vanishing: `Q^k`
 cannot join two states whose levels differ by more than `k` (`pow_apply_eq_zero_of_level`). At
@@ -49,7 +53,9 @@ components (`descentMatrix_kingmanMatrix_apply`), so the minimal histories are t
 `w - 1` visible covers from the singletons, and `minimalHistoryCount s` counts those that end
 connected. `reportConnectedProbability_sub_isBigO` is (E2) with that count as the constant:
 
-  `reportConnectedProbability s t = minimalHistoryCount s t^{w-1}/(w-1)! + O(t^w)`, `w = width s`.
+  `reportConnectedProbability s t = minimalHistoryCount s t^{w-1}/(w-1)! + O(t^w)`,
+
+with `w = width s`.
 
 ## What is narrower than the note
 
@@ -138,45 +144,66 @@ theorem exp_smul_apply {State : Type*} [Fintype State] [DecidableEq State]
     rw [NormedSpace.exp_eq_tsum]
   rw [hexp, hmatrix.tsum_eq, Matrix.of_apply]
 
-/-- **A power series is its first term plus the next order.** If the coefficients are bounded by
-`C S^k` and vanish below order `m`, then `Σ_k t^k c_k / k! = t^m c_m / m! + O(t^{m+1})` at `0`. -/
-theorem tsum_sub_leading_isBigO (c : ℕ → ℝ) {C S : ℝ} (hC : 0 ≤ C) (hS : 0 ≤ S)
-    (hbound : ∀ k, |c k| ≤ C * S ^ k) {m : ℕ} (hvanish : ∀ k < m, c k = 0) :
-    (fun t : ℝ ↦ (∑' k : ℕ, t ^ k / k ! * c k) - t ^ m / m ! * c m) =O[𝓝 0]
-      fun t : ℝ ↦ t ^ (m + 1) := by
-  have hsummable : ∀ t : ℝ, Summable fun k : ℕ ↦ t ^ k / k ! * c k := by
-    intro t
-    refine Summable.of_norm_bounded
-      ((Real.summable_pow_div_factorial (|t| * S)).mul_left C) fun k ↦ ?_
-    rw [Real.norm_eq_abs, abs_mul, abs_div, abs_pow, Nat.abs_cast]
-    calc |t| ^ k / k ! * |c k| ≤ |t| ^ k / k ! * (C * S ^ k) :=
-          mul_le_mul_of_nonneg_left (hbound k) (by positivity)
-      _ = C * ((|t| * S) ^ k / k !) := by ring
+/-! ### A power series from its first term -/
+
+/-- A power series with coefficients bounded by `C S^k` converges at every `t`. -/
+theorem summable_series (c : ℕ → ℝ) {C S : ℝ} (hbound : ∀ k, |c k| ≤ C * S ^ k) (t : ℝ) :
+    Summable fun k : ℕ ↦ t ^ k / k ! * c k := by
+  refine Summable.of_norm_bounded
+    ((Real.summable_pow_div_factorial (|t| * S)).mul_left C) fun k ↦ ?_
+  rw [Real.norm_eq_abs, abs_mul, abs_div, abs_pow, Nat.abs_cast]
+  calc |t| ^ k / k ! * |c k| ≤ |t| ^ k / k ! * (C * S ^ k) :=
+        mul_le_mul_of_nonneg_left (hbound k) (by positivity)
+    _ = C * ((|t| * S) ^ k / k !) := by ring
+
+/-- **The series less its first term is its tail**, when the coefficients below order `m`
+vanish. -/
+theorem tsum_sub_leading_eq (c : ℕ → ℝ) {C S : ℝ} (hbound : ∀ k, |c k| ≤ C * S ^ k) {m : ℕ}
+    (hvanish : ∀ k < m, c k = 0) (t : ℝ) :
+    (∑' k : ℕ, t ^ k / k ! * c k) - t ^ m / m ! * c m =
+      ∑' i : ℕ, t ^ (i + (m + 1)) / (i + (m + 1))! * c (i + (m + 1)) := by
+  have hzero : ∑ i ∈ Finset.range m, t ^ i / i ! * c i = 0 :=
+    Finset.sum_eq_zero fun i hi ↦ by rw [hvanish i (Finset.mem_range.mp hi), mul_zero]
+  have hsplit := (summable_series c hbound t).sum_add_tsum_nat_add (m + 1)
+  rw [Finset.sum_range_succ, hzero, zero_add] at hsplit
+  rw [← hsplit]
+  ring
+
+/-- **The tail is of the next order.** For `|t| ≤ 1` the tail of the series past order `m` is at
+most `C |t|^{m+1} Σ_i S^{i+m+1}/(i+m+1)!`. -/
+theorem norm_tsum_tail_le (c : ℕ → ℝ) {C S : ℝ} (hbound : ∀ k, |c k| ≤ C * S ^ k) (m : ℕ)
+    {t : ℝ} (ht : |t| ≤ 1) :
+    ‖∑' i : ℕ, t ^ (i + (m + 1)) / (i + (m + 1))! * c (i + (m + 1))‖ ≤
+      C * |t| ^ (m + 1) * ∑' i : ℕ, S ^ (i + (m + 1)) / (i + (m + 1))! := by
   have htail : Summable fun i : ℕ ↦ S ^ (i + (m + 1)) / (i + (m + 1))! :=
-    (summable_nat_add_iff (m + 1)).mpr (Real.summable_pow_div_factorial S)
-  have hcancel : ∀ u v : ℝ, u + v - u = v := fun u v ↦ by ring
-  refine IsBigO.of_bound (C * ∑' i : ℕ, S ^ (i + (m + 1)) / (i + (m + 1))!) ?_
-  filter_upwards [Metric.ball_mem_nhds (0 : ℝ) one_pos] with t ht
-  rw [Metric.mem_ball, Real.dist_eq, sub_zero] at ht
-  have hrange : ∑ i ∈ Finset.range (m + 1), t ^ i / i ! * c i = t ^ m / m ! * c m := by
-    rw [Finset.sum_range_succ, Finset.sum_eq_zero fun i hi ↦ by
-      rw [hvanish i (Finset.mem_range.mp hi), mul_zero], zero_add]
+    (summable_nat_add_iff (f := fun k : ℕ ↦ S ^ k / k !) (m + 1)).mpr
+      (Real.summable_pow_div_factorial S)
   have hnorm : ∀ i : ℕ, ‖t ^ (i + (m + 1)) / (i + (m + 1))! * c (i + (m + 1))‖ ≤
       C * |t| ^ (m + 1) * (S ^ (i + (m + 1)) / (i + (m + 1))!) := by
     intro i
     rw [Real.norm_eq_abs, abs_mul, abs_div, abs_pow, Nat.abs_cast]
     have hpow : |t| ^ (i + (m + 1)) ≤ |t| ^ (m + 1) :=
-      pow_le_pow_of_le_one (abs_nonneg t) ht.le (by omega)
+      pow_le_pow_of_le_one (abs_nonneg t) ht (by omega)
     calc |t| ^ (i + (m + 1)) / (i + (m + 1))! * |c (i + (m + 1))|
         ≤ |t| ^ (m + 1) / (i + (m + 1))! * (C * S ^ (i + (m + 1))) :=
           mul_le_mul (div_le_div_of_nonneg_right hpow (by positivity)) (hbound _)
             (abs_nonneg _) (by positivity)
       _ = C * |t| ^ (m + 1) * (S ^ (i + (m + 1)) / (i + (m + 1))!) := by ring
-  show ‖(∑' k : ℕ, t ^ k / k ! * c k) - t ^ m / m ! * c m‖ ≤ _ * ‖t ^ (m + 1)‖
-  rw [← (hsummable t).sum_add_tsum_nat_add (m + 1), hrange, hcancel, norm_pow,
-    Real.norm_eq_abs t]
-  exact (tsum_of_norm_bounded (htail.hasSum.mul_left (C * |t| ^ (m + 1))) hnorm).trans_eq
-    (by ring)
+  exact tsum_of_norm_bounded (htail.hasSum.mul_left (C * |t| ^ (m + 1))) hnorm
+
+/-- **A power series is its first term plus the next order.** If the coefficients are bounded by
+`C S^k` and vanish below order `m`, then `Σ_k t^k c_k / k! = t^m c_m / m! + O(t^{m+1})` at `0`. -/
+theorem tsum_sub_leading_isBigO (c : ℕ → ℝ) {C S : ℝ} (hbound : ∀ k, |c k| ≤ C * S ^ k) {m : ℕ}
+    (hvanish : ∀ k < m, c k = 0) :
+    (fun t : ℝ ↦ (∑' k : ℕ, t ^ k / k ! * c k) - t ^ m / m ! * c m) =O[𝓝 0]
+      fun t : ℝ ↦ t ^ (m + 1) := by
+  refine IsBigO.of_bound (C * ∑' i : ℕ, S ^ (i + (m + 1)) / (i + (m + 1))!) ?_
+  filter_upwards [Metric.ball_mem_nhds (0 : ℝ) one_pos] with t ht
+  rw [Metric.mem_ball, Real.dist_eq, sub_zero] at ht
+  have htail := norm_tsum_tail_le c hbound m ht.le
+  rw [← tsum_sub_leading_eq c hbound hvanish t] at htail
+  rw [norm_pow, Real.norm_eq_abs t]
+  exact htail.trans_eq (by ring)
 
 /-- **An entry of `e^{tQ}` from its first nonzero power.** If `(Q^k)_{xa} = 0` below order `m`,
 then `(e^{tQ})_{xa} = t^m (Q^m)_{xa} / m! + O(t^{m+1})` at `0`. -/
@@ -188,8 +215,7 @@ theorem exp_smul_apply_sub_isBigO {State : Type*} [Fintype State] [DecidableEq S
       fun t : ℝ ↦ (∑' k : ℕ, t ^ k / k ! * (Q ^ k) x a) - t ^ m / m ! * (Q ^ m) x a :=
     funext fun t ↦ by rw [exp_smul_apply]
   rw [hfun]
-  exact tsum_sub_leading_isBigO (fun k ↦ (Q ^ k) x a) zero_le_one
-    (Finset.sum_nonneg fun y _ ↦ Finset.sum_nonneg fun z _ ↦ abs_nonneg (Q y z))
+  exact tsum_sub_leading_isBigO (fun k ↦ (Q ^ k) x a) (C := 1) (S := ∑ y, ∑ z, |Q y z|)
     (fun k ↦ by rw [one_mul]; exact abs_pow_apply_le Q k x a) hvanish
 
 /-! ### Levels and minimal histories -/
@@ -354,6 +380,12 @@ theorem descentMatrix_kingmanMatrix_apply {n : ℕ} (s : Fin n → Fin n) (ξ η
 def connectedStates {n : ℕ} (s : Fin n → Fin n) : Finset (ER n) :=
   Finset.univ.filter fun η ↦ blocks (observed s η) ≤ 1
 
+/-- A coalescent state is connected when its report has at most one component. -/
+theorem mem_connectedStates {n : ℕ} (s : Fin n → Fin n) (η : ER n) :
+    η ∈ connectedStates s ↔ blocks (observed s η) ≤ 1 := by
+  rw [connectedStates, Finset.mem_filter]
+  exact and_iff_right (Finset.mem_univ η)
+
 /-- **The probability that the report is connected at time `t`**, started at the singletons: the
 weight of the connected reports in the first row of `e^{tQ}` for Kingman's generator `Q`. -/
 def reportConnectedProbability {n : ℕ} (s : Fin n → Fin n) (t : ℝ) : ℝ :=
@@ -377,7 +409,7 @@ theorem reportConnectedProbability_sub_isBigO {n : ℕ} (s : Fin n → Fin n)
     rw [observed_bot, blocks_graphKer, Nat.sub_add_cancel hwidth]
   have h := targetProbability_sub_isBigO (kingmanMatrix n) (fun ζ ↦ blocks (observed s ζ))
     (kingmanMatrix_step s) ⊥ (connectedStates s) hlevel
-    fun η hη ↦ (Finset.mem_filter.mp hη).2
+    fun η hη ↦ (mem_connectedStates s η).mp hη
   rw [Nat.sub_add_cancel hwidth] at h
   exact h
 
