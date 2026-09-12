@@ -98,12 +98,11 @@ theorem chainLaw_succ_apply (k : ℕ) (x y : ER n) (H : List (ER n)) :
     | x' :: rest =>
       show chainLaw n k (x' :: rest) *
         ((jumpLaw x').map fun y' ↦ y' :: x' :: rest) (y :: x :: H) = 0
-      have hzero : ∀ y', (if y :: x :: H = y' :: x' :: rest then jumpLaw x' y' else 0) = 0 := by
-        intro y'
-        rw [if_neg]
-        intro h
-        exact hl (List.cons.inj h).2.symm
-      rw [PMF.map_apply, ENNReal.tsum_eq_zero.mpr hzero, mul_zero]
+      rw [PMF.map_apply]
+      refine mul_eq_zero_of_right _ (ENNReal.tsum_eq_zero.mpr fun y' ↦ ?_)
+      rw [if_neg]
+      intro h
+      exact hl (List.cons.inj h).2.symm
 
 /-- **The law of the report history** after `k` jumps from the singletons, newest report
 first. -/
@@ -112,8 +111,7 @@ def reportLaw (s : Fin n → Fin n) (k : ℕ) : PMF (List (ER n)) :=
 
 /-- Before any jump the report history is the report of `Δ`. -/
 theorem reportLaw_zero (s : Fin n → Fin n) : reportLaw s 0 = PMF.pure [observed s ⊥] := by
-  rw [reportLaw, chainLaw, PMF.map_pure]
-  rfl
+  rw [reportLaw, chainLaw, PMF.pure_map, List.map_cons, List.map_nil]
 
 /-- **The report sequence is a Markov chain from the singletons**: some transition function on
 reports gives the probability of every report history step by step. -/
@@ -160,12 +158,13 @@ theorem reportLaw_one_ne_zero {s : Fin n → Fin n} {a b : Fin n} (hab : a ≠ b
   rw [← PMF.mem_support_iff, reportLaw, PMF.mem_support_map_iff]
   refine ⟨[merge ⊥ (Quotient.mk ⊥ a) (Quotient.mk ⊥ b), ⊥], ?_, ?_⟩
   · rw [chainLaw, chainLaw, PMF.mem_support_bind_iff]
-    refine ⟨[Delta n], PMF.mem_support_pure_iff.mpr rfl, ?_⟩
-    show [merge ⊥ (Quotient.mk ⊥ a) (Quotient.mk ⊥ b), ⊥] ∈
-      ((jumpLaw (Delta n)).map fun y ↦ y :: [Delta n]).support
-    rw [PMF.mem_support_map_iff]
-    exact ⟨merge ⊥ (Quotient.mk ⊥ a) (Quotient.mk ⊥ b),
-      (mem_support_jumpLaw hblocks).mpr (merge_covers ⊥ hAB), rfl⟩
+    refine ⟨[Delta n], ?_, ?_⟩
+    · rw [PMF.mem_support_pure_iff]
+    · show [merge ⊥ (Quotient.mk ⊥ a) (Quotient.mk ⊥ b), ⊥] ∈
+        ((jumpLaw (Delta n)).map fun y ↦ y :: [Delta n]).support
+      rw [PMF.mem_support_map_iff]
+      exact ⟨merge ⊥ (Quotient.mk ⊥ a) (Quotient.mk ⊥ b),
+        (mem_support_jumpLaw hblocks).mpr (merge_covers ⊥ hAB), rfl⟩
   · rw [List.map_cons, List.map_cons, List.map_nil, observed_merge_of_rel hAB hrel]
 
 /-- **Too many jumps to stay.** After `k` jumps with `n - k < w`, the chain has fewer blocks than
@@ -249,7 +248,6 @@ theorem example_reportLaw_one :
     norm_num
   have hchain : chainLaw 3 1 = (jumpLaw (Delta 3)).map fun y ↦ [y, Delta 3] := by
     rw [chainLaw, chainLaw, PMF.pure_bind]
-    rfl
   rw [reportLaw, hchain, PMF.map_comp, PMF.map_apply,
     tsum_eq_single (merge ⊥ (Quotient.mk ⊥ 0) (Quotient.mk ⊥ 1))]
   · have hcond : [observed exampleInterface ⊥, observed exampleInterface ⊥] =
@@ -260,8 +258,7 @@ theorem example_reportLaw_one :
     have hchoose : Nat.choose 3 2 = 3 := by
       decide
     rw [if_pos hcond, jumpLaw_apply_cover hblocks (merge_covers ⊥ example_ne_zero_one)]
-    rw [blocks_bot, hchoose]
-    norm_num
+    norm_num [blocks_bot, hchoose]
   · intro y hy
     split_ifs with hcond
     · rw [PMF.apply_eq_zero_iff, mem_support_jumpLaw hblocks]
@@ -291,7 +288,7 @@ theorem example_stay_given_two :
         [observed exampleInterface ⊥, observed exampleInterface ⊥, observed exampleInterface ⊥] /
       reportLaw exampleInterface 1 [observed exampleInterface ⊥, observed exampleInterface ⊥] =
       0 := by
-  rw [example_reportLaw_two, zero_div]
+  rw [example_reportLaw_two, ENNReal.zero_div]
 
 /-- **The smallest instance is not Markov.** The example's report sequence from the singletons
 has no transition function. -/
