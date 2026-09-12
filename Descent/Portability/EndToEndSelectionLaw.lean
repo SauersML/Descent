@@ -433,7 +433,8 @@ theorem abs_selectedPortability_sub_neutral_le (ℓ₀ : Locus) (hap₀ : FullHa
     intro η
     show |family events.length 0 fun law ↦ configurationMoment law η.1| ≤ 1
     have h0 := (family events.length 0).eval_mono (f := fun _ ↦ (0 : ℝ))
-      (g := fun law ↦ configurationMoment law η.1) fun law ↦ configurationMoment_nonneg law η.1
+      (g := fun law ↦ configurationMoment law η.1) fun law ↦
+        PartialHaplotypeCarrier.configurationMoment_nonneg law η.1
     have h1 := (family events.length 0).eval_mono (f := fun law ↦ configurationMoment law η.1)
       (g := fun _ ↦ (1 : ℝ)) fun law ↦ configurationMoment_le_one law η.1
     simp only [ExpFunctional.eval_const] at h0 h1
@@ -445,8 +446,8 @@ theorem abs_selectedPortability_sub_neutral_le (ℓ₀ : Locus) (hap₀ : FullHa
       refine (pi_norm_le_iff_of_nonneg zero_le_one).mpr fun ζ ↦ ?_
       show ‖eval x0.1 (momentPolynomial ζ.1)‖ ≤ 1
       rw [Real.norm_eq_abs, ← lawPoint_stateLaw x0, eval_momentPolynomial]
-      exact abs_le.mpr ⟨by linarith [configurationMoment_nonneg (stateLaw x0) ζ.1],
-        configurationMoment_le_one _ _⟩
+      have hnonneg := PartialHaplotypeCarrier.configurationMoment_nonneg (stateLaw x0) ζ.1
+      exact abs_le.mpr ⟨by linarith, configurationMoment_le_one _ _⟩
     have h := (norm_le_pi_norm _ η).trans ((norm_mulVec_le_of_substochastic
       (historyEventPropagator_substochastic (fun _ ↦ 4) events) _).trans hfeature)
     rwa [Real.norm_eq_abs] at h
