@@ -1,0 +1,38 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.EndToEndGWASThresholdLaw
+
+/-! Axiom audit of EndToEndGWASThresholdLaw. -/
+
+open Descent.Portability.EndToEndGWASThresholdLaw
+
+#print axioms trainedAccuracy_eq_learnedAccuracy
+#print axioms learnedNumerator_eq
+#print axioms learnedDenominator_eq
+#print axioms learnedAccuracy_unique
+#print axioms covarianceThresholdWeights_eq_thresholdWeights
+#print axioms covarianceThresholdWeights_of_nonpos
+#print axioms thresholdedAccuracy_of_nonpos
+#print axioms covariance_monotone_nonneg
+#print axioms expectation_mul_le_expectation_upperTail
+#print axioms abs_expectation_le_expectation_abs
+#print axioms abs_marginalWeights_mul_le_expectation_abs
+#print axioms abs_marginalWeights_le_conditional
+#print axioms expectation_cohortLaw_two_eq_sum
+#print axioms curseWitness_marginalWeights
+#print axioms curseWitness_populationThresholdWeights
+#print axioms curseWitness_selection
+#print axioms curseWitness_secondMoment
+#print axioms curseWitness_accuracy
+#print axioms polynomialFunction_learnedPolynomial
+#print axioms totalDegree_learnedPolynomial_le
+#print axioms learnedNumerator_stateLaw
+#print axioms learnedDenominator_stateLaw
+#print axioms integral_learnedNumerator_historyEventKernel
+#print axioms integral_learnedDenominator_historyEventKernel
+#print axioms integral_learnedNumerator_rateHistoryKernel
+#print axioms integral_learnedDenominator_rateHistoryKernel
+#print axioms expectedLearnedAccuracy_historyEventKernel
+#print axioms expectedLearnedAccuracy_rateHistoryKernel
+#print axioms expectedLearnedAccuracy_eq_of_moments_eq
