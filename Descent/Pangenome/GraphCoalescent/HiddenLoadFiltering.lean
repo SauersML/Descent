@@ -240,6 +240,7 @@ theorem killedPropagator_apply_eq_firstJump (G : Matrix S S ℝ) (obs : S → ρ
     hstart] at hfundamental
   split_ifs at hfundamental ⊢ <;> linarith
 
+omit [DecidableEq S] in
 /-- The transfer matrix acting on a test function from a hidden state showing `R`: the generator
 acting on the test function cut down to the hidden states showing `R'`. Assumes: a hidden state
 showing `R`. -/
@@ -314,6 +315,7 @@ theorem choose_two_sum_sub_sum_choose_two {ι : Type*} [Fintype ι] [DecidableEq
   rw [hchoose, Nat.cast_choose_two, Nat.cast_sum]
   linear_combination hsquare / 2
 
+omit [Fintype α] in
 /-- The load of a component after an invisible merger in `C`. -/
 theorem load_internalMerger (x : LoadState α n) (C E : Finset α) :
     load (internalMerger x C) E = if E = C then load x C - 1 else load x E := by
@@ -321,6 +323,7 @@ theorem load_internalMerger (x : LoadState α n) (C E : Finset α) :
   rw [Function.update_apply]
   split_ifs <;> rfl
 
+omit [Fintype α] in
 /-- The load of a component after a visible merger of `pair`. -/
 theorem load_visibleMerger (x : LoadState α n) (pair : Finset (Finset α)) (E : Finset α) :
     load (visibleMerger x pair) E =
@@ -463,7 +466,7 @@ theorem hasDerivAt_posteriorMass_loadGenerator (R : Finset (Finset α))
       (∑ y, ∑ source, posterior source *
         (killedPropagator (loadGenerator α n) loadReport R t *
           killedGenerator (loadGenerator α n) loadReport R) source y) t :=
-    HasDerivAt.sum fun y _ ↦ HasDerivAt.sum fun source _ ↦
+    HasDerivAt.fun_sum fun y _ ↦ HasDerivAt.fun_sum fun source _ ↦
       (hasDerivAt_killedPropagator_apply (loadGenerator α n) loadReport R source y t).const_mul
         (posterior source)
   have hsupport : ∀ z, loadReport z ≠ R →
