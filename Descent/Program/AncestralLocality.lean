@@ -8,6 +8,11 @@ import Descent.Pangenome.AncestralLocality.ReachabilityClosureTie
 import Descent.Pangenome.AncestralLocality.OneAlleleDuality
 import Descent.Pangenome.AncestralLocality.SupportChainDynkin
 import Descent.Pangenome.AncestralLocality.FeatureKingmanLimit
+import Descent.Pangenome.AncestralLocality.AnnotatedKernel
+import Descent.Pangenome.AncestralLocality.DecisionDualMoments
+import Descent.Pangenome.AncestralLocality.CylinderWindowProjection
+import Descent.Portability.ResamplingWindowSemigroup
+import Descent.Portability.ResamplingWindowConsistency
 import Descent.Pangenome.AncestralLocality.CoalescentDualSemigroup
 import Descent.Pangenome.AncestralLocality.HeredityKernel
 import Descent.Pangenome.AncestralLocality.HereditaryClosure
@@ -62,6 +67,10 @@ independent complexity bounds and a quantitative light cone.
   (`ker_le_hereditaryClosure_of_hereditarilyAutonomous`). §3.1: relabeling the states transports
   the closure (`hereditaryClosure_transportKernel`). §3.2 in the vocabulary of kernels:
   `exists_autonomous_pair_not_autonomous_join`.
+* §2.2, the remark on ancestry: `AnnotatedKernel`. The state marginal of an annotated kernel with
+  correspondence witnesses is a heredity kernel (`isHeredityKernel_stateMarginal`), and two
+  annotated kernels with one state marginal, hence one hereditary closure, can have different
+  witness laws (`performed_visible_same_closure_different_witnessLaw`).
 * Theorem 2, the operational characterization: `OperationalAutonomy`. For a kernel that does not
   see the order of the parents, `π` is hereditarily autonomous exactly when `π_# R_K(p)` depends
   only on `π_# p` (`hereditarilyAutonomous_iff_pushforward_reproduce_determined`); when autonomy
@@ -127,7 +136,11 @@ independent complexity bounds and a quantitative light cone.
   the backward equation (`hasDerivAt_samplingObservable_dualSemigroup`), and every moment family
   obeying the moment equation is `m_t(f) = m_0(S_t f)` (`moments_eq_dualSemigroup`), the
   uniqueness form of (7.5). At one allele the resampling generator on `x^n` is `c` times the corpus
-  diffusion generator on powers (`OneAlleleDuality.resamplingGenerator_allCarriers`).
+  diffusion generator on powers (`OneAlleleDuality.resamplingGenerator_allCarriers`). With
+  decisions, two moment families bounded by the sup norm that obey the moment equation of the
+  backward circuit and agree at time zero agree at every time
+  (`DecisionDualMoments.moments_eq_of_momentEquation`), through Duhamel's formula along the
+  coalescence gain (`hasDerivAt_duhamel`).
 * §7, ancestral decisions: `AncestralDecision`. The sampling observable (7.2), the coalescence
   substitution (`samplingObservable_coalesceArguments`), decision branching (7.3)
   (`samplingObservable_decisionBranch`) and the sampling identity (7.4) (`sampling_identity`,
@@ -169,7 +182,14 @@ independent complexity bounds and a quantitative light cone.
   `InfiniteGenomeLimit.infiniteGenomeSemigroup`: the finite-genome operators converge to it on
   every observable (`tendsto_infiniteGenomeSemigroup`), it is determined by the cylinder sampling
   polynomials (`operator_eq_infiniteGenomeSemigroup`), and it does not depend on the exhaustion
-  (`infiniteGenomeSemigroup_eq_of_tendsto`).
+  (`infiniteGenomeSemigroup_eq_of_tendsto`). Without decisions, on a finite window the pure
+  resampling semigroup acts on sampling polynomials as the coalescent dual
+  (`ResamplingWindowSemigroup.windowSemigroup_samplingPolynomial`), larger windows read through the
+  marginal run the smaller window's semigroup
+  (`ResamplingWindowConsistency.windowSemigroup_comp_windowMarginal`), and every cylinder sampling
+  polynomial reads a finite window (`CylinderWindowProjection.exists_windowPullback`), where a
+  consistent contracting family of window operators extends to a contraction of `C(P(H))`
+  (`norm_extendedOperator_le`).
 * Corollary 8.1, the light cone as a coupling: `LocalityCoupling`. Two sample laws obtained by
   evaluating one circuit on inputs that coincide off an escape event are within total variation
   the probability of escape (`totalVariation_mixtureLaw_le`); for a circuit reading only inspected
@@ -193,10 +213,11 @@ space; with the explicit escape bounds of Theorem 8 for the marginal laws of the
 proved for
 its support, conditional on the Erdős-Rényi giant component theorem as the named hypothesis
 `GiantComponentLaw` (proved only for `0 ≤ α < 1`), and so are its weights `1 - (1 - s)^k` and
-`(1 - s)^k`. Theorem 6 is proved at generator level, and for `r = 0` as the uniqueness form of
-(7.5) with the moment equation as a hypothesis; the forward diffusion on `P(H)` and the backward
-jump process are not constructed. Theorem 1 defines `P_*` as the `|H|`-th iterate of `Φ_K`, which
-is the first fixed point, and Theorem 2 uses only the symmetry of the kernel. Theorem 4 and its
+`(1 - s)^k`. Theorem 6 is proved at generator level, and as the uniqueness form of (7.5), for
+`r = 0` and with decisions, with the moment equation as a hypothesis; the forward diffusion on
+`P(H)` and the backward jump process are not constructed. Theorem 1 defines `P_*` as the
+`|H|`-th iterate of `Φ_K`, which is the first fixed point, and Theorem 2 uses only the symmetry of
+the kernel. Theorem 4 and its
 restatement through the closure of Theorem 1 take nonnegative rates.
 Of Theorem 9, the finite-genome semigroups are data, and the light-cone approximation is
 discharged (`LightConeApproximationBound.norm_operator_sub_le_lightConeEscape`) from three
