@@ -92,7 +92,7 @@ def decisionBranch (T : H → H → H) (a : Fin n) (f : (Fin n → H) → ℝ) :
 
 /-- **The exchange kernel (4.2)** of an ordered rule: the child is `T(x, y)` or `T(y, x)`, each
 with probability one half. -/
-def exchangeKernel [DecidableEq H] (T : H → H → H) (x y z : H) : ℝ :=
+noncomputable def exchangeKernel [DecidableEq H] (T : H → H → H) (x y z : H) : ℝ :=
   ((if T x y = z then 1 else 0) + (if T y x = z then 1 else 0)) / 2
 
 /-- **The sampling identity (7.4).** Against `p ⊗ p` an ordered rule and its exchange kernel give
@@ -178,11 +178,11 @@ theorem samplingObservable_coalesceArguments [Fintype H] [DecidableEq H] {a b : 
       f (Function.update w a (w b)) * ∏ c ∈ univ.erase a, p (w c) =
         ∑ w ∈ univ.filter (fun w ↦ w a = w b), f w * ∏ c ∈ univ.erase a, p (w c) := by
     intro h
-    refine Eq.trans ?_ (sum_filter_update a (fun w ↦ w b)
+    have key := sum_filter_update a (fun w : Fin n → H ↦ w b)
       (fun w h' ↦ Function.update_of_ne hab.symm h' w) h
-      fun w ↦ f w * ∏ c ∈ univ.erase a, p (w c)).symm
-    refine sum_congr rfl fun w _ ↦ ?_
-    simp only [hrest]
+      (fun w : Fin n → H ↦ f w * ∏ c ∈ univ.erase a, p (w c))
+    simp only [hrest] at key
+    exact key.symm
   calc samplingObservable (coalesceArguments a b f) p
       = ∑ w, ∑ h, if w a = h then
           p h * (f (Function.update w a (w b)) * ∏ c ∈ univ.erase a, p (w c)) else 0 := by
@@ -250,7 +250,7 @@ def TagDetermined (f : (Fin n → V → Bool) → ℝ) (A : Fin n → Finset V) 
 /-- **The initial tag state.** Observing the coordinates `A` of every sampled genome reads each
 argument only at `A`, so every argument starts with the tag `A`, as in the note's `Z_0 = n|A|`. -/
 theorem tagDetermined_restrict (A : Finset V) (g : (Fin n → A → Bool) → ℝ) :
-    TagDetermined (fun w ↦ g fun c v ↦ w c v) fun _ ↦ A := by
+    TagDetermined (fun w : Fin n → V → Bool ↦ g fun c v ↦ w c v) fun _ ↦ A := by
   intro w w' hw
   exact congrArg g (funext fun c ↦ funext fun v ↦ hw c v.1 v.2)
 
@@ -454,7 +454,7 @@ theorem tagWeight_coalesceTags_le [DecidableEq V] {w : V → ℝ} (hw : ∀ v, 0
       if c = a then ∑ v ∈ A a, w v else 0)) = tagWeight w A := by
     rw [sum_add_distrib, sum_sub_distrib, sum_ite_eq', sum_ite_eq', if_pos (mem_univ b),
       if_pos (mem_univ a), sub_self, add_zero, tagWeight]
-  linarith [sum_le_sum fun c (_ : c ∈ univ) ↦ hcoord c]
+  exact (sum_le_sum fun c _ ↦ hcoord c).trans_eq hsum
 
 /-- **One decision adds at most three coordinate occurrences** (the note's §8). -/
 theorem tagCount_decisionTags_le [DecidableEq V] (i j : V) (a : Fin n) (A : Fin n → Finset V) :
