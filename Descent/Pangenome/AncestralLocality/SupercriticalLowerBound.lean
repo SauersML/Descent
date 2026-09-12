@@ -21,9 +21,10 @@ expected number of features in components of at least `K` features is at least `
 ones. A step explores the least active feature `a`. Its new neighbours `newNeighbors E D a`, the
 undiscovered features joined to `a`, become discovered and active, and `a` stops being active.
 `exploreDies E K t D A` says the exploration runs out of active features within `t` steps while
-fewer than `K` features are discovered. If the component of `v` has fewer than `K` features, the
-exploration from `v` dies (`exploreDies_of_card_reach_lt`), because everything it discovers lies in
-that component.
+fewer than `K` features are discovered. If a set closed under the edges has fewer than `K`
+features, the exploration from inside it dies (`exploreDies_of_closed`). In particular the
+exploration from `v` dies when the component of `v` has fewer than `K` features
+(`exploreDies_of_card_reach_lt`, through `reach_singleton_closed`).
 
 **The supermartingale.** A step reads only the pairs from `a` to the undiscovered features
 (`neighborEdges`), and the later steps read only pairs avoiding the explored features
@@ -37,7 +38,9 @@ number of steps. From one feature, `P(|Reach(v)| < K) ≤ q` (`graphProb_card_re
 **The constant.** Below the giant fraction the survival map lies above the diagonal:
 `e^{-α s'} < 1 - s'` for `0 < s' < s`. Since `1 - x ≤ e^{-x}`,
 `(1 - α s'/m)^(m - K) ≤ e^{-α s'} e^{α s' K / m}`, which is eventually at most `1 - s'`
-(`eventually_one_sub_pow_le`). Taking `q = 1 - s'` with `s' = s - ε` gives the lower bound.
+(`eventually_one_sub_pow_le`). Taking `q = 1 - s'` with `s' = s - ε` gives the lower bound. The
+same bound holds for every `K ≤ κ₀ m` with some `κ₀ > 0` (`exists_one_sub_pow_le`), so the
+threshold may grow linearly in `m` (`exists_forall_graphProb_card_reach_ge`).
 
 Scope. Only the expectation form of the lower half is proved. It does not say that one component of
 size near `s m` exists with probability tending to one. That needs concentration of the number of
@@ -230,12 +233,22 @@ theorem exploreDies_congr {m K : ℕ} {E E' : Finset (Sym2 (Fin m))} (t : ℕ) :
       exact h x y (hX x hx) (hX y hy)
     · rw [not_nonempty_iff_eq_empty.mp hA, exploreDies_succ_empty, exploreDies_succ_empty]
 
-/-- **A small component makes the exploration die.** If the component of `v` has fewer than `K`
-features, the exploration from any discovered set inside it dies within as many steps as there are
-features not yet explored. -/
-theorem exploreDies_of_card_reach_lt {m K : ℕ} {E : Finset (Sym2 (Fin m))} {v : Fin m}
-    (hK : (reach (edgeGraph E) {v}).card < K) (n : ℕ) :
-    ∀ {D A : Finset (Fin m)}, A ⊆ D → D ⊆ reach (edgeGraph E) {v} →
+/-- A component is closed under the edges. -/
+theorem reach_singleton_closed {m : ℕ} (E : Finset (Sym2 (Fin m))) (v : Fin m) :
+    ∀ x ∈ reach (edgeGraph E) {v}, ∀ y, s(x, y) ∈ E → y ∈ reach (edgeGraph E) {v} := by
+  intro x hx y hxy
+  by_cases h : x = y
+  · exact h ▸ hx
+  · obtain ⟨b, hb, hbx⟩ := (mem_reach_iff _ _ _).mp hx
+    exact (mem_reach_iff _ _ _).mpr
+      ⟨b, hb, hbx.trans ((edgeGraph_adj_iff E x y).mpr ⟨hxy, h⟩).reachable⟩
+
+/-- **A small closed set makes the exploration die.** If `C` is closed under the edges of `E` and
+has fewer than `K` features, the exploration from any discovered set inside `C` dies within as
+many steps as there are features not yet explored. -/
+theorem exploreDies_of_closed {m K : ℕ} {E : Finset (Sym2 (Fin m))} {C : Finset (Fin m)}
+    (hC : ∀ x ∈ C, ∀ y, s(x, y) ∈ E → y ∈ C) (hK : C.card < K) (n : ℕ) :
+    ∀ {D A : Finset (Fin m)}, A ⊆ D → D ⊆ C →
       (univ \ (D \ A)).card ≤ n → exploreDies E K n D A := by
   induction n with
   | zero =>
@@ -254,11 +267,7 @@ theorem exploreDies_of_card_reach_lt {m K : ℕ} {E : Finset (Sym2 (Fin m))} {v 
       rw [exploreDies_succ_of_nonempty E K n hA]
       refine ⟨hDK, ih (union_subset_union ((erase_subset _ _).trans hAD) Subset.rfl) ?_ ?_⟩
       · refine union_subset hDC fun u hu ↦ ?_
-        obtain ⟨huD, hau⟩ := mem_newNeighbors_iff.mp hu
-        have hadj : (edgeGraph E).Adj (A.min' hA) u :=
-          (edgeGraph_adj_iff E _ _).mpr ⟨hau, fun h ↦ huD (h ▸ haD)⟩
-        obtain ⟨b, hb, hbv⟩ := (mem_reach_iff _ _ _).mp (hDC haD)
-        exact (mem_reach_iff _ _ _).mpr ⟨b, hb, hbv.trans hadj.reachable⟩
+        exact hC _ (hDC haD) u (mem_newNeighbors_iff.mp hu).2
       · have hX : ∀ z ∈ D \ A, z ∈ (D ∪ newNeighbors E D (A.min' hA)) \
             (A.erase (A.min' hA) ∪ newNeighbors E D (A.min' hA)) := by
           intro z hz
@@ -286,6 +295,15 @@ theorem exploreDies_of_card_reach_lt {m K : ℕ} {E : Finset (Sym2 (Fin m))} {v 
           _ ≤ n := by omega
     · rw [not_nonempty_iff_eq_empty.mp hA, exploreDies_succ_empty]
       exact hDK
+
+/-- **A small component makes the exploration die.** If the component of `v` has fewer than `K`
+features, the exploration from any discovered set inside it dies within as many steps as there are
+features not yet explored. -/
+theorem exploreDies_of_card_reach_lt {m K : ℕ} {E : Finset (Sym2 (Fin m))} {v : Fin m}
+    (hK : (reach (edgeGraph E) {v}).card < K) (n : ℕ) :
+    ∀ {D A : Finset (Fin m)}, A ⊆ D → D ⊆ reach (edgeGraph E) {v} →
+      (univ \ (D \ A)).card ≤ n → exploreDies E K n D A :=
+  exploreDies_of_closed (reach_singleton_closed E v) hK n
 
 /-! ### The supermartingale -/
 
@@ -442,6 +460,90 @@ theorem eventually_one_sub_pow_le {α s' : ℝ} (hα : 1 < α) (hs'0 : 0 < s')
         pow_le_pow_left₀ hx0 hx1 _
     _ = Real.exp (-(α * s')) * Real.exp (α * s' * K / m) := hexp
     _ ≤ 1 - s' := h5.le
+
+/-- **The bound survives a linear number of discovered features.** For `α > 1` and
+`0 < s' < s = giantFraction α` there is `κ₀ > 0` such that `(1 - α s'/m)^(m - K) ≤ 1 - s'` for
+every `m ≥ α` and every `K ≤ κ₀ m`. -/
+theorem exists_one_sub_pow_le {α s' : ℝ} (hα : 1 < α) (hs'0 : 0 < s')
+    (hs' : s' < giantFraction α) :
+    ∃ κ₀ : ℝ, 0 < κ₀ ∧ ∀ m K : ℕ, α ≤ m → (K : ℝ) ≤ κ₀ * m →
+      (1 - α / m * (1 - (1 - s'))) ^ (m - K) ≤ 1 - s' := by
+  have hα0 : 0 < α := by linarith
+  have hs'1 : s' < 1 := hs'.trans (giantFraction_mem_Ioo hα).2
+  have hlt : Real.exp (-(α * s')) < 1 - s' := by
+    have h := lt_survivalMap_of_lt hα0 hs'0 hs' (survivalMap_giantFraction α).ge
+    unfold survivalMap at h
+    linarith
+  have hαs' : 0 < α * s' := mul_pos hα0 hs'0
+  have hαs'ne : α * s' ≠ 0 := hαs'.ne'
+  have hr0 : 0 < (1 - s') / Real.exp (-(α * s')) := div_pos (by linarith) (Real.exp_pos _)
+  have hr1 : 1 < (1 - s') / Real.exp (-(α * s')) := by
+    rw [one_lt_div (Real.exp_pos _)]
+    exact hlt
+  have hlogr : Real.log ((1 - s') / Real.exp (-(α * s'))) < α * s' := by
+    rw [Real.log_div (by linarith : (0 : ℝ) < 1 - s').ne' (Real.exp_pos _).ne', Real.log_exp]
+    have := Real.log_neg (by linarith : (0 : ℝ) < 1 - s') (by linarith)
+    linarith
+  refine ⟨Real.log ((1 - s') / Real.exp (-(α * s'))) / (α * s'),
+    div_pos (Real.log_pos hr1) hαs', fun m K hm hK ↦ ?_⟩
+  have hm0 : (0 : ℝ) < m := hα0.trans_le hm
+  have hm' : (m : ℝ) ≠ 0 := hm0.ne'
+  have hκ1 : Real.log ((1 - s') / Real.exp (-(α * s'))) / (α * s') < 1 :=
+    (div_lt_one hαs').mpr hlogr
+  have hKm : K ≤ m := by
+    have h1 : (K : ℝ) < m := by nlinarith
+    exact_mod_cast h1.le
+  have hKlog : α * s' * K / m ≤ Real.log ((1 - s') / Real.exp (-(α * s'))) := by
+    rw [div_le_iff₀ hm0]
+    calc α * s' * K ≤ α * s' * (Real.log ((1 - s') / Real.exp (-(α * s'))) / (α * s') * m) :=
+          mul_le_mul_of_nonneg_left hK hαs'.le
+      _ = Real.log ((1 - s') / Real.exp (-(α * s'))) / (α * s') * (α * s') * m := by ring
+      _ = Real.log ((1 - s') / Real.exp (-(α * s'))) * m := by
+          rw [div_mul_cancel₀ _ hαs'ne]
+  have hx0 : 0 ≤ 1 - α * s' / m := by
+    rw [sub_nonneg, div_le_one hm0]
+    nlinarith
+  have hx1 : 1 - α * s' / m ≤ Real.exp (-(α * s' / m)) := by
+    linarith [Real.add_one_le_exp (-(α * s' / m))]
+  have hx : 1 - α / m * (1 - (1 - s')) = 1 - α * s' / m := by ring
+  rw [hx]
+  calc (1 - α * s' / m) ^ (m - K) ≤ Real.exp (-(α * s' / m)) ^ (m - K) :=
+        pow_le_pow_left₀ hx0 hx1 _
+    _ = Real.exp (-(α * s') + α * s' * K / m) := by
+        rw [← Real.exp_nat_mul, Nat.cast_sub hKm]
+        congr 1
+        field_simp
+        ring
+    _ ≤ Real.exp (-(α * s') + Real.log ((1 - s') / Real.exp (-(α * s')))) :=
+        Real.exp_le_exp.mpr (by linarith)
+    _ = 1 - s' := by
+        rw [Real.exp_add, Real.exp_log hr0, ← mul_div_assoc,
+          mul_div_cancel_left₀ _ (Real.exp_pos _).ne']
+
+/-- **The lower bound with a linear threshold.** For `α > 1` and `η > 0` there is `κ₀ > 0` such
+that for every `m ≥ α`, every `K ≤ κ₀ m` and every feature `v`, the component of `v` in
+`G(m, α/m)` has at least `K` features with probability at least `s - η`. -/
+theorem exists_forall_graphProb_card_reach_ge {α η : ℝ} (hα : 1 < α) (hη : 0 < η) :
+    ∃ κ₀ : ℝ, 0 < κ₀ ∧ ∀ m K : ℕ, α ≤ m → (K : ℝ) ≤ κ₀ * m → ∀ v : Fin m,
+      giantFraction α - η ≤ graphProb m (α / m) (fun E ↦ K ≤ (reach (edgeGraph E) {v}).card) := by
+  have hα0 : 0 < α := by linarith
+  obtain ⟨hs0, hs1⟩ := giantFraction_mem_Ioo hα
+  obtain ⟨s', hs'0, hs's, hs'η⟩ : ∃ s' : ℝ, 0 < s' ∧ s' < giantFraction α ∧
+      giantFraction α - η ≤ s' :=
+    ⟨max (giantFraction α - η) (giantFraction α / 2), lt_max_of_lt_right (by linarith),
+      max_lt (by linarith) (by linarith), le_max_left _ _⟩
+  obtain ⟨κ₀, hκ₀, hbound⟩ := exists_one_sub_pow_le hα hs'0 hs's
+  refine ⟨κ₀, hκ₀, fun m K hm hK v ↦ ?_⟩
+  have hm0 : (0 : ℝ) < m := hα0.trans_le hm
+  have hp0 : 0 ≤ α / m := div_nonneg hα0.le hm0.le
+  have hp1 : α / m ≤ 1 := (div_le_one hm0).mpr hm
+  have hlt := graphProb_card_reach_lt_le hp0 hp1 (q := 1 - s') (by linarith) (by linarith)
+    (hbound m K hm hK) v
+  have hadd := graphProb_add_not m (α / m) (fun E ↦ K ≤ (reach (edgeGraph E) {v}).card)
+  have hnot : graphProb m (α / m) (fun E ↦ ¬K ≤ (reach (edgeGraph E) {v}).card) ≤
+      graphProb m (α / m) (fun E ↦ (reach (edgeGraph E) {v}).card < K) :=
+    graphProb_mono hp0 hp1 fun _ h ↦ not_le.mp h
+  linarith
 
 /-- **The supercritical lower bound for one feature.** For `α > 1`, every `K` and `ε > 0`,
 eventually every feature of `G(m, α/m)` lies in a component of at least `K` features with
