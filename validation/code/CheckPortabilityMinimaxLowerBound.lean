@@ -1,0 +1,32 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.PortabilityMinimaxLowerBound
+
+/-! Axiom audit of the two-point minimax lower bound for portability from source replicas. -/
+
+open Descent.Portability.PortabilityMinimaxLowerBound
+
+#print axioms Descent.Portability.PortabilityMinimaxLowerBound.lawOverlap_eq_one_sub_totalVariation
+#print axioms Descent.Portability.PortabilityMinimaxLowerBound.abs_sub_div_two_mul_lawOverlap_le
+#print axioms
+  Descent.Portability.PortabilityMinimaxLowerBound.pow_lawOverlap_le_lawOverlap_cohortLaw
+#print axioms
+  Descent.Portability.PortabilityMinimaxLowerBound.totalVariation_cohortLaw_le_one_sub_pow
+#print axioms
+  Descent.Portability.PortabilityMinimaxLowerBound.one_sub_mul_le_pow_one_sub_totalVariation
+#print axioms Descent.Portability.PortabilityMinimaxLowerBound.lowerBound_cohortLaw_pow
+#print axioms Descent.Portability.PortabilityMinimaxLowerBound.lowerBound_cohortLaw_totalVariation
+#print axioms
+  Descent.Portability.PortabilityMinimaxLowerBound.hellingerAffinity_sq_le_two_mul_lawOverlap
+#print axioms Descent.Portability.PortabilityMinimaxLowerBound.hellingerAffinity_cohortLaw
+#print axioms
+  Descent.Portability.PortabilityMinimaxLowerBound.lowerBound_cohortLaw_hellingerAffinity
+#print axioms Descent.Portability.PortabilityMinimaxLowerBound.totalVariation_mixtureReportLaw
+#print axioms Descent.Portability.PortabilityMinimaxLowerBound.totalVariation_chronologyLaw
+#print axioms Descent.Portability.PortabilityMinimaxLowerBound.threeBlockRecordLaw_mass
+#print axioms
+  Descent.Portability.PortabilityMinimaxLowerBound.squaredCorrelation_threeBlockRecordLaw
+#print axioms Descent.Portability.PortabilityMinimaxLowerBound.totalVariation_sourceCohortLaw
+#print axioms Descent.Portability.PortabilityMinimaxLowerBound.sourceCohort_lowerBound
+#print axioms Descent.Portability.PortabilityMinimaxLowerBound.logTwo_sourceCohort_lowerBound
