@@ -28,8 +28,12 @@ import Descent.Pangenome.GraphCoalescent.MultiInterfaceClosure
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceGenerator
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceLoads
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceOutcome
+import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionConvergence
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionLaw
+import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionLimit
+import Descent.Pangenome.GraphCoalescent.MultiplicativeCoupling
 import Descent.Pangenome.GraphCoalescent.MultiplicativeObservation
+import Descent.Pangenome.GraphCoalescent.MultiplicativePerturbation
 import Descent.Pangenome.GraphCoalescent.Observation
 import Descent.Pangenome.GraphCoalescent.PartitionLatticeMobius
 import Descent.Pangenome.GraphCoalescent.Pinned
@@ -39,6 +43,7 @@ import Descent.Pangenome.GraphCoalescent.ReportedConnectionClock
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionExamples
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionFirstStep
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionTies
+import Descent.Pangenome.GraphCoalescent.ShortTimeConnectionLaw
 import Descent.Pangenome.GraphCoalescent.Visibility
 import Descent.Pangenome.GraphCoalescent.VisibleIntensityClock
 import Descent.Pangenome.GraphCoalescent.WidthProfile
