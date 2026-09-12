@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Pangenome.GraphCoalescent.BalancedFiberExtremum
 import Descent.Pangenome.GraphCoalescent.ConnectionClockPathLaw
 import Descent.Pangenome.GraphCoalescent.ConnectionClockStochasticOrder
+import Descent.Pangenome.GraphCoalescent.ConnectionClockQuantileCoupling
 import Descent.Pangenome.GraphCoalescent.CoarsestRefinement
 import Descent.Pangenome.GraphCoalescent.ConnectivityClockTable
 import Descent.Pangenome.GraphCoalescent.LeadingCoefficientCorollaries
@@ -306,7 +307,9 @@ trajectory-and-clock law, for the connection time and for the first hitting time
 (`ConnectionClockPathDynkin.clockDynkin_path`, `clockDynkin_reportHittingTime`). (C2) is proved
 as the survival-function inequality
 `P(τ_q > c) ≤ P(T_w > c)` for that law (`ConnectionClockStochasticOrder.holdDuration_thinning`,
-`survivalAt_connectionTimeLaw_bot_le`); no quantile coupling is constructed. The lower bound of
+`survivalAt_connectionTimeLaw_bot_le`), and it is realized pointwise by a quantile coupling
+(`ConnectionClockQuantileCoupling.connectionTimeLaw_quantileCoupling`,
+`exists_coupling_connectionTime_le_transitTime`). The lower bound of
 (C4) holds pathwise: the phases above `n - w + 1` sum to at most the connection time, so
 `Σ_{k=n-w+2}^n Exp(d_k) ≤_st τ_q` (`ConnectionClockLowerBound.sum_top_levels_le_connectionTime`,
 `kingmanClock_sum_top_levels_lt_le`). (D4) is proved by Kingman's backward recursion and also by

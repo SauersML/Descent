@@ -48,6 +48,7 @@ import Descent.Pangenome.AncestralLocality.DecisionWindowJumps
 import Descent.Pangenome.AncestralLocality.DecisionWindowSemigroup
 import Descent.Pangenome.AncestralLocality.JumpFellerSemigroup
 import Descent.Pangenome.AncestralLocality.DecisionDysonDual
+import Descent.Pangenome.AncestralLocality.SupercriticalUnconditional
 
 namespace Descent.Program
 
@@ -146,7 +147,12 @@ independent complexity bounds and a quantitative light cone.
   (`SupercriticalUpperBound.limsup_graphProb_card_reach_ge_le`), and sprinkling merges the large
   components (`SupercriticalSprinkling.tendsto_graphProb_exists_card_reach_ge`), given that the
   number of features in large components concentrates, whose second moment is bounded
-  (`SupercriticalSecondMoment.graphExpect_largeCount_sq_le`).
+  (`SupercriticalSecondMoment.graphExpect_largeCount_sq_le`). The giant fraction is continuous
+  above `1` (`SupercriticalUnconditional.continuousAt_giantFraction`), and under the giant
+  component theorem at every rate above `1`, one named hypothesis
+  (`SupercriticalGiantComponentLaw`), the weights of (6.2) hold at every such rate
+  (`tendsto_graphProb_reach_small_of_supercritical`,
+  `tendsto_graphProb_reach_giant_of_supercritical`).
 * §4.1 and §7.1, the diffusion generator: `AncestralForwardGenerator`. For `c = 1` the
   finite-population chain (4.5) on the `N`-generation scale has generator (7.1) on polynomial
   observables (`tendsto_nextGenerationMean`), and on the eight-state witness the derivatives of

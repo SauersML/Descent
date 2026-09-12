@@ -76,6 +76,8 @@ import Descent.Pangenome.GraphCoalescent.ConnectionLawIdentifiability
 import Descent.Pangenome.GraphCoalescent.HiddenClockCorrection
 import Descent.Pangenome.GraphCoalescent.FiberSizeMultisetRecovery
 import Descent.Pangenome.GraphCoalescent.PanelSizeIdentifiability
+import Descent.Pangenome.GraphCoalescent.FiberSizeIdentifiabilityFour
+import Descent.Pangenome.GraphCoalescent.ConnectionClockQuantileCoupling
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program

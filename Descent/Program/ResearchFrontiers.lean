@@ -26,6 +26,7 @@ import Descent.Pangenome.GraphCoalescent.HiddenClockCorrection
 import Descent.Pangenome.GraphCoalescent.FiberSizeMultisetRecovery
 import Descent.Pangenome.AncestralLocality.SelectionLightCone
 import Descent.Pangenome.GraphCoalescent.PanelSizeIdentifiability
+import Descent.Pangenome.GraphCoalescent.FiberSizeIdentifiabilityFour
 
 namespace Descent.Program
 
@@ -108,7 +109,10 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   at width two (`coeff_one_deficitCumulant_card_two`, `coeff_two_deficitCumulant_card_two`), and
   the elementary symmetric polynomials of the sizes, so the multiset itself, at width three
   (`esymm_eq_of_cumulantOfSizes_eq_three`), which determine the multiset of sizes by Vieta
-  (`FiberSizeSymmetricRecovery.multiset_nat_eq_of_esymm_eq`); widths four and more are open. The
+  (`FiberSizeSymmetricRecovery.multiset_nat_eq_of_esymm_eq`). At width four the next coefficient
+  fixes the multiset when two profiles on a panel of at least five share a fiber size
+  (`FiberSizeIdentifiabilityFour.fiberSizes_eq_of_cumulantOfSizes_eq_four_of_shared`); the
+  general width-four case and widths five and more are open. The
   law of the reported connection time carries exactly the information of the cumulant, each
   determining the other
   (`ConnectionLawIdentifiability.map_connectionTime_eq_iff_connectivityCumulant_eq`,
