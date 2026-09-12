@@ -46,17 +46,17 @@ term must vanish on it, and an expression that did not would be measuring a pair
 `tripleGluingResidual_swap_first_two` records that the residual does not privilege an
 ordering of the loci.
 
-## Arbitrary order: named, not claimed
+## Arbitrary order: the weight is proved, the residual is not defined
 
 The general statement is that the order-`k` residual is the Möbius sum over the partition
 lattice of a `k`-element set, with weight `(-1) ^ (|π| - 1) * (|π| - 1)!` on a partition into
 `|π|` blocks — the `2` above being that weight at `k = 3`, where the all-singleton partition
-has three blocks. This file does not prove that, and does not assert that the tools are
-missing: Mathlib carries both `Mathlib.Combinatorics.Enumerative.IncidenceAlgebra` and
-`Mathlib.Order.Partition.Finpartition`, so the general case is a question of whether that
-Möbius function has been evaluated on the partition lattice in a usable form, which has not
-been checked here. What is claimed is only what is proved: the degree-three case, in two
-forms, with its degeneracies.
+has three blocks. The weight is proved at every order: `mu_finpartition_top` in
+`Descent.Pangenome.GraphCoalescent.PartitionLatticeMobius` evaluates Mathlib's
+`IncidenceAlgebra.mu` on the partition lattice, and `tripleGluingResidual_eq_mu_sum` there reads
+every coefficient of `tripleGluingResidual` off it. The order-`k` residual itself is not defined
+for `k ≥ 4`. What is claimed here is only what is proved: the degree-three case, in two forms,
+with its degeneracies.
 -/
 
 /-- **The third-order gluing residual, in closed form.** The joint mass of three loci, less
