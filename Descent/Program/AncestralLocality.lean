@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Pangenome.AncestralLocality.CompatibilityNeutrality
 import Descent.Pangenome.AncestralLocality.LocalityBounds
 import Descent.Pangenome.AncestralLocality.LocalityCoupling
+import Descent.Pangenome.AncestralLocality.LocalityTransition
 
 namespace Descent.Program
 
@@ -34,6 +35,12 @@ independent complexity bounds and a quantitative light cone.
   has one observed law and drifts `-1/4` and `0` (`witness_drift`), so no observed transition law
   predicts both and the observation `(a, b)` is not autonomous
   (`witness_no_observed_transition_law`, `witness_not_autonomous`).
+* Theorem 5, the locality transition: `LocalityTransition`. For `G(m, α/m)` as a finite law on
+  edge sets, the expected reach of `A` satisfies `E|Reach(A)| ≤ |A|/(1 - α)` for `0 ≤ α < 1` and
+  every genome size (`graphExpect_card_reach_le`), through the count of present simple paths
+  (`card_reach_singleton_le_sum`, `graphExpect_card_presentPaths`). §6.1: the rates `β / deg(i)`
+  are positive exactly on present edges. For `α > 1` the survival equation `s = 1 - e^{-αs}` has a
+  unique root in `(0, 1)` (`existsUnique_survival_root`, `giantFraction_mem_Ioo`).
 * Theorems 7 and 8, the support drift: `LocalityBounds`. A decision along `i → j` raises the
   weighted support count by at most `w i + 2 w j` (`weightedCount_branchSupports_le`) and a
   coalescence does not raise it (`weightedCount_coalesceSupports_le`); with `Σ_j r i j ≤ D` and
@@ -57,7 +64,7 @@ expectation bounds (8.2), (8.3) and the escape bounds (9.1), (9.2) through Grön
 inequality are not yet proof-checked. Corollary 8.1 is stated on a common finite probability
 space, with the escape probability as a parameter. Theorems 1 and 2 (hereditary closure and its
 operational characterization), Theorem 4 (closure is reachability),
-Theorem 5 (the locality transition), Theorem 6 (sampling duality) and Theorem 9 (the
+the supercritical limit (6.2) of Theorem 5, Theorem 6 (sampling duality) and Theorem 9 (the
 infinite-genome semigroup) are not yet proof-checked.
 -/
 
