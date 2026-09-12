@@ -33,6 +33,7 @@ import Descent.Pangenome.GraphCoalescent.MultiInterfaceGenerator
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceLoads
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceOutcome
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionConvergence
+import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionInLaw
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionLaw
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionLimit
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionPerturbation
@@ -48,6 +49,7 @@ import Descent.Pangenome.GraphCoalescent.Reduction
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionClock
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionExamples
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionFirstStep
+import Descent.Pangenome.GraphCoalescent.ReportedConnectionLadder
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionSpectrum
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionTies
 import Descent.Pangenome.GraphCoalescent.ShortTimeConnectionLaw
