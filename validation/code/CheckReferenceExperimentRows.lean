@@ -1,0 +1,41 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.ReferenceExperimentRows
+
+/-! Axiom audit of ReferenceExperimentRows. -/
+
+open Descent.Portability.ReferenceExperimentRows
+
+#print axioms early_target_auc_definedProbability
+#print axioms early_target_auc_weightedNumerator
+#print axioms early_target_slope_definedProbability
+#print axioms early_target_slope_weightedNumerator
+#print axioms early_target_brier_expectation
+#print axioms early_target_ece_expectation
+#print axioms early_target_repairedBrier_expectation
+#print axioms early_r2Portability_definedProbability
+#print axioms early_r2Portability_weightedNumerator
+#print axioms early_cohort_r2_definedProbability
+#print axioms early_cohort_r2_weightedNumerator
+#print axioms late_target_r2_definedProbability
+#print axioms late_target_r2_weightedNumerator
+#print axioms late_target_auc_definedProbability
+#print axioms late_target_auc_weightedNumerator
+#print axioms late_target_slope_definedProbability
+#print axioms late_target_slope_weightedNumerator
+#print axioms late_target_brier_expectation
+#print axioms late_target_ece_expectation
+#print axioms late_target_repairedBrier_expectation
+#print axioms late_r2Portability_definedProbability
+#print axioms late_r2Portability_weightedNumerator
+#print axioms late_cohort_r2_definedProbability
+#print axioms late_cohort_r2_weightedNumerator
+#print axioms early_target_r2_givenDefined
+#print axioms early_target_slope_givenDefined
+#print axioms early_r2Portability_givenDefined
+#print axioms early_cohort_r2_givenDefined
+#print axioms late_target_r2_givenDefined
+#print axioms late_target_slope_givenDefined
+#print axioms late_r2Portability_givenDefined
+#print axioms late_cohort_r2_givenDefined
