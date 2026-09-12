@@ -313,7 +313,7 @@ clock coordinates `B - 1, …, n - 2`. -/
 noncomputable def connectionTime {n : ℕ} (s : Fin n → Fin n) (p : List (ER n) × (ℕ → ℝ)) : ℝ :=
   ∑ j ∈ Ico (stoppingLevel s p.1 - 1) (n - 1), p.2 j
 
-theorem Ico_succ_eq_Ioc (b n : ℕ) : Ico (b + 1) (n + 1) = Ioc b n := by
+theorem ico_succ_eq_ioc (b n : ℕ) : Ico (b + 1) (n + 1) = Ioc b n := by
   ext x
   simp only [mem_Ico, mem_Ioc]
   omega
@@ -322,12 +322,12 @@ theorem Ico_succ_eq_Ioc (b n : ℕ) : Ico (b + 1) (n + 1) = Ioc b n := by
 theorem sum_Ico_pred {M : Type*} [AddCommMonoid M] (f : ℕ → M) {b n : ℕ} (hb : 1 ≤ b)
     (hn : 1 ≤ n) : ∑ j ∈ Ico (b - 1) (n - 1), f (j + 2) = ∑ k ∈ Ioc b n, f k := by
   rw [sum_Ico_add', show b - 1 + 2 = b + 1 by omega, show n - 1 + 2 = n + 1 by omega,
-    Ico_succ_eq_Ioc]
+    ico_succ_eq_ioc]
 
 theorem prod_Ico_pred {M : Type*} [CommMonoid M] (f : ℕ → M) {b n : ℕ} (hb : 1 ≤ b)
     (hn : 1 ≤ n) : ∏ j ∈ Ico (b - 1) (n - 1), f (j + 2) = ∏ k ∈ Ioc b n, f k := by
   rw [prod_Ico_add', show b - 1 + 2 = b + 1 by omega, show n - 1 + 2 = n + 1 by omega,
-    Ico_succ_eq_Ioc]
+    ico_succ_eq_ioc]
 
 /-- **Conditional on the stopping level, the connection time is a sum of holding times.**  On a
 path with `B = b`, `τ_q = ∑_{k=b+1}^{n} H_k`, `H_k` being clock coordinate `k - 2`. -/

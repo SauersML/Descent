@@ -25,7 +25,7 @@ import Descent.Pangenome.GraphCoalescent.ReportedConnectionClock
 #print axioms Descent.Pangenome.GraphCoalescent.stoppingProb_self
 #print axioms Descent.Pangenome.GraphCoalescent.kingmanClock_isProbabilityMeasure
 #print axioms Descent.Pangenome.GraphCoalescent.trajectoryClockLaw_prod
-#print axioms Descent.Pangenome.GraphCoalescent.Ico_succ_eq_Ioc
+#print axioms Descent.Pangenome.GraphCoalescent.ico_succ_eq_ioc
 #print axioms Descent.Pangenome.GraphCoalescent.sum_Ico_pred
 #print axioms Descent.Pangenome.GraphCoalescent.prod_Ico_pred
 #print axioms Descent.Pangenome.GraphCoalescent.connectionTime_of_stoppingLevel
