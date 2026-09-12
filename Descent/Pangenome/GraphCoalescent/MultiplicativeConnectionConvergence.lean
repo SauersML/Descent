@@ -99,7 +99,6 @@ theorem ker_le_comap {n w : ℕ} (label : Fin n → Fin w) (τ : ER w) :
   have hl : label x = label y := hxy
   show τ.r (label x) (label y)
   rw [hl]
-  exact τ.iseqv.refl _
 
 /-- Pulling back along a surjective labelling forgets nothing. -/
 theorem comap_label_injective {n w : ℕ} {label : Fin n → Fin w}
@@ -137,7 +136,8 @@ theorem blocks_comap_label {n w : ℕ} {label : Fin n → Fin w}
       obtain ⟨x, rfl⟩ := quotient_mk_surjective _ q₁
       obtain ⟨y, rfl⟩ := quotient_mk_surjective _ q₂
       have hq' : Quotient.mk τ (label x) = Quotient.mk τ (label y) := hq
-      exact Quotient.sound (Quotient.exact hq')
+      have hr : τ.r (label x) (label y) := Quotient.exact hq'
+      exact Quotient.sound hr
     · intro q
       obtain ⟨i, rfl⟩ := quotient_mk_surjective τ q
       obtain ⟨x, rfl⟩ := hsurj i
@@ -198,7 +198,8 @@ theorem two_mul_crossingRate {w : ℕ} (p : Fin w → ℝ) (τ : ER w) :
   have hcr : crossingRate p τ
       = ∑ x ∈ univ.filter (fun x : Fin w × Fin w ↦ x.1 < x.2), g x.1 x.2 := by
     show ∑ e : FiberPair w, g e.1.1 e.1.2 = _
-    exact (Finset.sum_subtype _ (fun x ↦ by simp) fun x ↦ g x.1 x.2).symm
+    exact (Finset.sum_subtype _ (fun x : Fin w × Fin w ↦ by simp)
+      fun x : Fin w × Fin w ↦ g x.1 x.2).symm
   have hprod : ∑ i, ∑ j, g i j = ∑ x : Fin w × Fin w, g x.1 x.2 := by
     rw [← Finset.univ_product_univ]
     exact (Finset.sum_product' _ _ g).symm
@@ -321,7 +322,9 @@ theorem tendsto_reportConnectionProbability {w : ℕ} [NeZero w] {N : ℕ → �
       (hsurj k) U
   have hzero : Tendsto (fun k ↦ (U : ℝ) ^ 2 / 4 / (N k : ℝ)) atTop (𝓝 0) :=
     (tendsto_const_div_atTop_nhds_zero_nat ((U : ℝ) ^ 2 / 4)).comp hN
-  refine (hlim.add (squeeze_zero_norm hbound hzero)).congr fun k ↦ ?_
+  have hsum := hlim.add (squeeze_zero_norm hbound hzero)
+  rw [add_zero] at hsum
+  refine hsum.congr fun k ↦ ?_
   simp only [Function.comp_apply]
   ring
 
