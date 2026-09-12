@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulantDegree
+import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionLaw
 import Mathlib.Combinatorics.Enumerative.IncidenceAlgebra
 import Mathlib.Combinatorics.Enumerative.Stirling
 
@@ -29,6 +30,8 @@ downward well-founded induction on the finite lattice, through Mathlib's
 `sum_stirlingSecond_mul_mobiusCoefficient` is the Stirling identity
 `Σ_j S(k, j) (-1)^{j-1} (j-1)! = [k = 1]`. `sum_mobiusCoefficient_eq_sum_stirlingSecond` regroups
 the Möbius sum over all partitions by the number of parts, so that sum is the Stirling sum.
+`topMobius_eq_mobiusCoefficient` records that `MultiplicativeConnectionLaw.topMobius`, the
+coefficient of the multiplicative-coalescent law (F4), is the same quantity.
 
 ## Empirical status
 
@@ -162,6 +165,10 @@ theorem sum_stirlingSecond_mul_mobiusCoefficient (k : ℕ) :
   cases k with
   | zero => simp
   | succ k => simp [Nat.stirlingSecond]
+
+/-- The Möbius coefficient of `MultiplicativeConnectionLaw`, which enters the law (F4) of the
+multiplicative coalescent, is `mobiusCoefficient`: the two developments name one quantity. -/
+theorem topMobius_eq_mobiusCoefficient : topMobius = mobiusCoefficient := rfl
 
 /-- Grouping the partitions of `t` by their number of parts turns the Möbius sum of
 `ConnectivityCumulant.sum_mobiusCoefficient_finpartition` into the Stirling sum. -/

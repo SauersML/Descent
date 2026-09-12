@@ -11,9 +11,9 @@ open Descent.Pangenome.GraphCoalescent
 #print axioms ker_part_ofSetoid
 #print axioms ofSetoid_ker_part
 #print axioms statePartitionEquiv
-#print axioms instFintypeER
 #print axioms ofSetoid_le_ofSetoid_iff
 #print axioms ofSetoid_top
 #print axioms observed_eq_top_iff_reportConnected
 #print axioms connectivityCumulant_graphKer_eq_sum_observed
 #print axioms natDegree_connectivityCumulant_graphKer_le
+#print axioms coeff_connectivityCumulant_graphKer

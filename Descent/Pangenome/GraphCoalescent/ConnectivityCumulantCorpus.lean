@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Coalescent.Kernel
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulantDegree
 import Descent.Pangenome.GraphCoalescent.Observation
 
@@ -21,11 +22,14 @@ sample. A state goes to its partition into classes, `Finpartition.ofSetoid`, and
 goes to the kernel of its part map. `ofSetoid_le_ofSetoid_iff` shows the bijection preserves
 the refinement order, and `ofSetoid_top` that it preserves the top state.
 `observed_eq_top_iff_reportConnected` identifies the report being connected, `observed s π = ⊤`,
-with `ReportConnected`. `instFintypeER` makes the states a finite type through the bijection.
+with `ReportConnected`. Sums over states use the corpus finiteness instance
+`Coalescent.instFintypeER`.
 
 `connectivityCumulant_graphKer_eq_sum_observed` is (D3) in the note's own form:
 `C_q(z) = Σ_{π : q ⊔ π = ⊤} (∏_{B ∈ π} |B|!) z^{|π|}`, with `q = graphKer s`, the sum over
 coalescent states with a connected report, and `|π| = Coalescent.blocks π`.
+`coeff_connectivityCumulant_graphKer` is (D3) one coefficient at a time: `[z^k] C_q` is the
+weighted count of the `k`-block states with a connected report.
 `natDegree_connectivityCumulant_graphKer_le` is the degree bound `n - w + 1`, with
 `w = Linkage.width s` through `blocks_graphKer`.
 
@@ -103,10 +107,6 @@ def statePartitionEquiv : Coalescent.ER n ≃ Finpartition (univ : Finset (Fin n
   left_inv ξ := ker_part_ofSetoid ξ
   right_inv P := ofSetoid_ker_part P
 
-/-- The coalescent states on `n` individuals form a finite type. -/
-instance instFintypeER : Fintype (Coalescent.ER n) :=
-  Fintype.ofEquiv _ statePartitionEquiv.symm
-
 /-- The bijection preserves the refinement order in both directions. -/
 theorem ofSetoid_le_ofSetoid_iff (ξ η : Coalescent.ER n) :
     Finpartition.ofSetoid ξ ≤ Finpartition.ofSetoid η ↔ ξ ≤ η := by
@@ -176,6 +176,25 @@ theorem natDegree_connectivityCumulant_graphKer_le (s : Fin n → Fin n) (hn : 0
   have h := natDegree_connectivityCumulant_le (Finpartition.ofSetoid (graphKer s))
     (univ_nonempty_iff.mpr ⟨⟨0, hn⟩⟩)
   rwa [card_parts_ofSetoid, blocks_graphKer, card_univ, Fintype.card_fin] at h
+
+/-- **NOTE (D3) at `z^k`, in the corpus vocabulary.** The coefficient of `z^k` in the cumulant of
+`graphKer s` is the sum of `∏_{B ∈ π} |B|!` over the coalescent states `π` with `k` blocks whose
+report `observed s π` is `⊤`. -/
+theorem coeff_connectivityCumulant_graphKer (s : Fin n → Fin n) (hn : 0 < n) (k : ℕ) :
+    (connectivityCumulant (Finpartition.ofSetoid (graphKer s))).coeff k
+      = ((∑ π ∈ univ.filter
+          (fun π : Coalescent.ER n ↦ Coalescent.blocks π = k ∧ observed s π = ⊤),
+          blockWeight (Finpartition.ofSetoid π) : ℕ) : ℤ) := by
+  rw [connectivityCumulant_graphKer_eq_sum_observed s hn, Polynomial.finset_sum_coeff,
+    Nat.cast_sum]
+  simp only [Polynomial.coeff_C_mul, Polynomial.coeff_X_pow, mul_ite, mul_one, mul_zero]
+  rw [sum_filter, sum_filter]
+  refine sum_congr rfl fun π _ ↦ ?_
+  by_cases h1 : observed s π = ⊤
+  · by_cases h2 : Coalescent.blocks π = k
+    · simp [h1, h2]
+    · simp [h1, h2, Ne.symm h2]
+  · simp [h1]
 
 end
 
