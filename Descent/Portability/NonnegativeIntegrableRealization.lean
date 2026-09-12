@@ -245,7 +245,8 @@ theorem nonnegativeIntegrablePropagator_preserves_locusExchangeable_realization 
 
 /-- The propagated state lies in the stored realization body. -/
 theorem nonnegativeIntegrablePropagator_mulVec_mem_realizationBody :
-    (propagator T).mulVec state ∈ RealizationBody.realizationBody (lowOrderLDFeature D) := by
+    (propagator T).mulVec state ∈
+      RealizationBody.realizationBody (RealizationBody.lowOrderLDFeature D) := by
   obtain ⟨propagated⟩ := nonnegativeIntegrablePropagator_preserves_locusExchangeable_realization
     hT hintegrable hcontinuous hequation realization
   exact KernelRealizationPreservation.lowOrderLDState_mem_realizationBody_of_realization
