@@ -27,6 +27,28 @@ clock coordinates disjoint from the holding time at `k + 1`, so the two are inde
 (`lintegral_rate_mul_measure_between`), which gives the integrated forward equation of the death
 process: the probability of having descended to `k` by time `t` is the integral of the rate
 `d_{k+1}` times the probability of sitting at level `k + 1` (`kingmanClock_descentTime_le`).
+With `levelTime`, the rate-weighted time spent at a level, the level probabilities balance: the
+probability of sitting at `k` plus the time spent at `k` is the initial mass at `k` plus the time
+spent at `k + 1` (`levelProb_balance`), and the path starts at level `n` (`levelProb_zero`).
+
+## The hidden-load process
+
+`hiddenLoadAt s p t` is the hidden state of the path at time `t`. Because the trajectory and the
+clock are independent, its law factors over the level:
+`P(X_t = y) = Σ_k P(D(n, t) = k) μ_{n-k}(y)`, where `μ_j` is the hidden law after `j` jumps
+(`trajectoryClockLaw_hiddenLoadAt`). The lumped rates `hiddenRate s x y = d_{K(x)} q(x, y)`, with
+`q` the hidden jump kernel, are (A1) `C(l, 2)` into an invisible target and (A2) `ab` into a
+visible one (`hiddenRate_invisibleTarget`, `hiddenRate_visibleTarget`). By (A3) they add up to
+`C(K, 2)`, the same for every labeled state with that hidden state (`sum_hiddenRate`). The balance
+of the levels, combined with the propagation of the hidden law by the hidden kernel
+(`sum_hiddenHeadLaw_mul_hiddenKernel`), gives the forward equation of the one-dimensional
+marginals in integrated gain-loss form (`hiddenLoadLaw_forward`):
+`P(X_t = y) + ∫_0^t C(K(y), 2) P(X_u = y) du = P(X_0 = y) + ∫_0^t Σ_x P(X_u = x) r(x, y) du`,
+where `r = hiddenRate`.
+
+Scope. The forward equation is for the one-dimensional marginals of the law started at the
+singletons. The transition function is not identified with the matrix exponential of the lumped
+generator, and the Markov property of the process at fixed times is not proved.
 
 ## Empirical status
 
@@ -361,29 +383,31 @@ theorem kingmanClock_descentTime_succ_le (n k : ℕ) (hk : 1 ≤ k) (hkn : k + 1
     hdisj]
   rfl
 
+/-- The rate-weighted time the path spends at level `k` during `[0, t]`. -/
+def levelTime (n k : ℕ) (t : ℝ) : ℝ≥0∞ :=
+  ∫⁻ u in Set.Icc 0 t, ENNReal.ofReal (deathRate k) * levelProb n k u
+
+/-- A single lineage has death rate zero, so no rate-weighted time accrues at level `1`. -/
+theorem levelTime_one (n : ℕ) (t : ℝ) : levelTime n 1 t = 0 := by
+  simp [levelTime, deathRate_one]
+
 /-- **The balance of the level probabilities.** For `1 ≤ k ≤ n` and `t ≥ 0`, the probability of
 sitting at level `k` plus the rate-weighted time spent at `k` is the initial mass at `k` plus the
 rate-weighted time spent at `k + 1`. -/
 theorem levelProb_balance {n k : ℕ} (hn : 2 ≤ n) (hk : 1 ≤ k) (hkn : k ≤ n) {t : ℝ}
     (ht : 0 ≤ t) :
-    levelProb n k t + ∫⁻ u in Set.Icc 0 t, ENNReal.ofReal (deathRate k) * levelProb n k u
-      = (if k = n then 1 else 0)
-        + if k < n then
-            ∫⁻ u in Set.Icc 0 t, ENNReal.ofReal (deathRate (k + 1)) * levelProb n (k + 1) u
-          else 0 := by
+    levelProb n k t + levelTime n k t
+      = (if k = n then 1 else 0) + if k < n then levelTime n (k + 1) t else 0 := by
   rcases Nat.lt_or_ge k n with hlt | hge
   · rw [if_neg hlt.ne, if_pos hlt, zero_add]
     rcases Nat.eq_or_lt_of_le hk with h1 | h1
-    · rw [← h1, deathRate_one, ENNReal.ofReal_zero]
-      simp only [zero_mul, lintegral_zero, add_zero]
-      rw [← kingmanClock_descentTime_one_le n (by omega) t]
+    · rw [← h1, levelTime_one, add_zero, ← kingmanClock_descentTime_one_le n (by omega) t]
       exact kingmanClock_descentTime_le n 1 le_rfl (by omega) t
     · obtain ⟨j, rfl⟩ : ∃ j, k = j + 1 := ⟨k - 1, by omega⟩
       have hj1 := kingmanClock_descentTime_le n j (by omega) (by omega) t
       have hj2 := kingmanClock_descentTime_le n (j + 1) (by omega) hlt t
       have hj3 := kingmanClock_descentTime_succ_le n j (by omega) (by omega) t
-      calc levelProb n (j + 1) t
-            + ∫⁻ u in Set.Icc 0 t, ENNReal.ofReal (deathRate (j + 1)) * levelProb n (j + 1) u
+      calc levelProb n (j + 1) t + levelTime n (j + 1) t
           = levelProb n (j + 1) t + kingmanClock {ω | descentTime n (clockHold ω) j ≤ t} := by
             rw [hj1]
             rfl
@@ -401,7 +425,7 @@ theorem levelProb_balance {n k : ℕ} (hn : 2 ≤ n) (hk : 1 ≤ k) (hkn : k ≤
     have hj3 := kingmanClock_descentTime_succ_le n j (by omega) (by omega) t
     have hj1 := kingmanClock_descentTime_le n j (by omega) (by omega) t
     rw [← hj] at hj3 hj1
-    calc levelProb n n t + ∫⁻ u in Set.Icc 0 t, ENNReal.ofReal (deathRate n) * levelProb n n u
+    calc levelProb n n t + levelTime n n t
         = levelProb n n t + kingmanClock {ω | descentTime n (clockHold ω) j ≤ t} := by
           rw [hj1]
           rfl
@@ -550,6 +574,196 @@ theorem sum_hiddenHeadLaw_mul_hiddenKernel {n : ℕ} (s : Fin n → Fin n) (j : 
     obtain ⟨ξ, -, rfl⟩ := PMF.mem_support_map_iff.mp hmem
     exact Finset.mem_image_of_mem _ (Finset.mem_univ ξ)
   rw [hzero, zero_mul]
+
+/-! ### The forward equation -/
+
+/-- The level probabilities are measurable in time: at level `1` a distribution function, above
+it a difference of two. -/
+theorem measurable_levelProb {n k : ℕ} (hk : 1 ≤ k) (hkn : k ≤ n) :
+    Measurable fun u : ℝ ↦ levelProb n k u := by
+  have hmono : ∀ j : ℕ,
+      Measurable fun u : ℝ ↦ kingmanClock {ω | descentTime n (clockHold ω) j ≤ u} :=
+    fun j ↦ Monotone.measurable fun u u' huu' ↦ measure_mono fun ω hω ↦ le_trans hω huu'
+  rcases Nat.eq_or_lt_of_le hk with h1 | h1
+  · subst h1
+    have hfun : (fun u : ℝ ↦ levelProb n 1 u)
+        = fun u ↦ kingmanClock {ω | descentTime n (clockHold ω) 1 ≤ u} :=
+      funext fun u ↦ (kingmanClock_descentTime_one_le n hkn u).symm
+    rw [hfun]
+    exact hmono 1
+  · obtain ⟨j, rfl⟩ : ∃ j, k = j + 1 := ⟨k - 1, by omega⟩
+    have hfun : (fun u : ℝ ↦ levelProb n (j + 1) u)
+        = fun u ↦ kingmanClock {ω | descentTime n (clockHold ω) (j + 1) ≤ u}
+            - kingmanClock {ω | descentTime n (clockHold ω) j ≤ u} :=
+      funext fun u ↦ ENNReal.eq_sub_of_add_eq (measure_ne_top _ _)
+        (kingmanClock_descentTime_succ_le n j (by omega) hkn u).symm
+    rw [hfun]
+    exact (hmono (j + 1)).sub (hmono j)
+
+/-- The path starts at level `n`. -/
+theorem levelProb_zero {n k : ℕ} (hn : 2 ≤ n) (hk : 1 ≤ k) (hkn : k ≤ n) :
+    levelProb n k 0 = if k = n then 1 else 0 := by
+  have hnull : ∀ j, levelTime n j 0 = 0 := fun j ↦
+    setLIntegral_measure_zero _ _ (by simp)
+  have h := levelProb_balance hn hk hkn (le_refl (0 : ℝ))
+  rw [hnull, hnull, add_zero, ite_self, add_zero] at h
+  exact h
+
+/-- **The gain into a hidden state, over the level.** The lumped rates into `y`, averaged against
+the law of the hidden-load process at time `u ≥ 0`, are `Σ_k d_k P(D(n, u) = k) μ_{n-k+1}(y)`. -/
+theorem sum_hiddenLoadLaw_mul_hiddenRate {n : ℕ} (hn : 1 ≤ n) (s : Fin n → Fin n) {u : ℝ}
+    (hu : 0 ≤ u) (y : ER n × (Fin n → ℕ)) :
+    ∑ x ∈ reachableHidden s,
+        trajectoryClockLaw n {p | hiddenLoadAt s p u = x} * hiddenRate s x y
+      = ∑ k ∈ Finset.Icc 1 n,
+          ENNReal.ofReal (deathRate k) * levelProb n k u * hiddenHeadLaw s (n - k + 1) y := by
+  simp only [trajectoryClockLaw_hiddenLoadAt hn s hu, Finset.sum_mul]
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun k hk ↦ ?_
+  have hk' := Finset.mem_Icc.mp hk
+  have hpt : ∀ x, hiddenHeadLaw s (n - k) x * levelProb n k u * hiddenRate s x y
+      = ENNReal.ofReal (deathRate k) * levelProb n k u
+          * (hiddenHeadLaw s (n - k) x * hiddenKernel s x y) := by
+    intro x
+    calc hiddenHeadLaw s (n - k) x * levelProb n k u * hiddenRate s x y
+        = ENNReal.ofReal (deathRate (hiddenBlockCount x)) * hiddenHeadLaw s (n - k) x
+            * levelProb n k u * hiddenKernel s x y := by
+          rw [hiddenRate]
+          ring
+      _ = ENNReal.ofReal (deathRate k) * hiddenHeadLaw s (n - k) x
+            * levelProb n k u * hiddenKernel s x y := by
+          rw [ofReal_deathRate_mul_hiddenHeadLaw s hk'.1 hk'.2]
+      _ = ENNReal.ofReal (deathRate k) * levelProb n k u
+            * (hiddenHeadLaw s (n - k) x * hiddenKernel s x y) := by
+          ring
+  simp only [hpt]
+  rw [← Finset.mul_sum, sum_hiddenHeadLaw_mul_hiddenKernel]
+
+/-- **Theorem A in continuous time: the forward equation of the hidden-load process.** On the
+trajectory-and-clock law, for every hidden state `y` and every time `t ≥ 0`,
+`P(X_t = y) + ∫_0^t d_{K(y)} P(X_u = y) du = P(X_0 = y) + ∫_0^t Σ_x P(X_u = x) q(x, y) du`,
+where `q = hiddenRate` has the rates of (A1) and (A2) (`hiddenRate_invisibleTarget`,
+`hiddenRate_visibleTarget`) and `d_{K(y)} = C(K(y), 2)` is their total out of `y`
+(`sum_hiddenRate`). -/
+theorem hiddenLoadLaw_forward {n : ℕ} (hn : 2 ≤ n) (s : Fin n → Fin n) {t : ℝ} (ht : 0 ≤ t)
+    (y : ER n × (Fin n → ℕ)) :
+    trajectoryClockLaw n {p | hiddenLoadAt s p t = y}
+        + ∫⁻ u in Set.Icc 0 t, ENNReal.ofReal (deathRate (hiddenBlockCount y))
+            * trajectoryClockLaw n {p | hiddenLoadAt s p u = y}
+      = trajectoryClockLaw n {p | hiddenLoadAt s p 0 = y}
+        + ∫⁻ u in Set.Icc 0 t, ∑ x ∈ reachableHidden s,
+            trajectoryClockLaw n {p | hiddenLoadAt s p u = x} * hiddenRate s x y := by
+  have hn1 : 1 ≤ n := by omega
+  have hmeas : ∀ k ∈ Finset.Icc 1 n, ∀ c : ℝ≥0∞,
+      Measurable fun u ↦ ENNReal.ofReal (deathRate k) * levelProb n k u * c := fun k hk c ↦
+    ((measurable_levelProb (Finset.mem_Icc.mp hk).1 (Finset.mem_Icc.mp hk).2).const_mul _).mul_const
+      c
+  have hlevel : ∀ k ∈ Finset.Icc 1 n, ∀ c : ℝ≥0∞,
+      ∫⁻ u in Set.Icc 0 t, ENNReal.ofReal (deathRate k) * levelProb n k u * c
+        = levelTime n k t * c := fun k hk c ↦
+    lintegral_mul_const _
+      ((measurable_levelProb (Finset.mem_Icc.mp hk).1 (Finset.mem_Icc.mp hk).2).const_mul _)
+  have hloss_pt : ∀ u ∈ Set.Icc (0 : ℝ) t,
+      ENNReal.ofReal (deathRate (hiddenBlockCount y))
+          * trajectoryClockLaw n {p | hiddenLoadAt s p u = y}
+        = ∑ k ∈ Finset.Icc 1 n,
+            ENNReal.ofReal (deathRate k) * levelProb n k u * hiddenHeadLaw s (n - k) y := by
+    intro u hu
+    rw [trajectoryClockLaw_hiddenLoadAt hn1 s hu.1 y, Finset.mul_sum]
+    refine Finset.sum_congr rfl fun k hk ↦ ?_
+    have hk' := Finset.mem_Icc.mp hk
+    calc ENNReal.ofReal (deathRate (hiddenBlockCount y))
+          * (hiddenHeadLaw s (n - k) y * levelProb n k u)
+        = ENNReal.ofReal (deathRate (hiddenBlockCount y)) * hiddenHeadLaw s (n - k) y
+            * levelProb n k u := by ring
+      _ = ENNReal.ofReal (deathRate k) * hiddenHeadLaw s (n - k) y * levelProb n k u := by
+          rw [ofReal_deathRate_mul_hiddenHeadLaw s hk'.1 hk'.2]
+      _ = ENNReal.ofReal (deathRate k) * levelProb n k u * hiddenHeadLaw s (n - k) y := by ring
+  have hloss : ∫⁻ u in Set.Icc 0 t, ENNReal.ofReal (deathRate (hiddenBlockCount y))
+        * trajectoryClockLaw n {p | hiddenLoadAt s p u = y}
+      = ∑ k ∈ Finset.Icc 1 n, levelTime n k t * hiddenHeadLaw s (n - k) y := by
+    rw [setLIntegral_congr_fun measurableSet_Icc hloss_pt,
+      lintegral_finset_sum (f := fun k u ↦
+        ENNReal.ofReal (deathRate k) * levelProb n k u * hiddenHeadLaw s (n - k) y) _
+        fun k hk ↦ hmeas k hk _]
+    exact Finset.sum_congr rfl fun k hk ↦ hlevel k hk _
+  have hgain : ∫⁻ u in Set.Icc 0 t, ∑ x ∈ reachableHidden s,
+        trajectoryClockLaw n {p | hiddenLoadAt s p u = x} * hiddenRate s x y
+      = ∑ k ∈ Finset.Icc 1 n, levelTime n k t * hiddenHeadLaw s (n - k + 1) y := by
+    rw [setLIntegral_congr_fun measurableSet_Icc
+        fun u hu ↦ sum_hiddenLoadLaw_mul_hiddenRate hn1 s hu.1 y,
+      lintegral_finset_sum (f := fun k u ↦
+        ENNReal.ofReal (deathRate k) * levelProb n k u * hiddenHeadLaw s (n - k + 1) y) _
+        fun k hk ↦ hmeas k hk _]
+    exact Finset.sum_congr rfl fun k hk ↦ hlevel k hk _
+  have hstep : ∀ k ∈ Finset.Icc 1 n,
+      hiddenHeadLaw s (n - k) y * levelProb n k t + levelTime n k t * hiddenHeadLaw s (n - k) y
+        = hiddenHeadLaw s (n - k) y * levelProb n k 0
+          + hiddenHeadLaw s (n - k) y * (if k < n then levelTime n (k + 1) t else 0) := by
+    intro k hk
+    have hk' := Finset.mem_Icc.mp hk
+    calc hiddenHeadLaw s (n - k) y * levelProb n k t + levelTime n k t * hiddenHeadLaw s (n - k) y
+        = hiddenHeadLaw s (n - k) y * (levelProb n k t + levelTime n k t) := by ring
+      _ = hiddenHeadLaw s (n - k) y
+            * ((if k = n then 1 else 0) + if k < n then levelTime n (k + 1) t else 0) := by
+          rw [levelProb_balance hn hk'.1 hk'.2 ht]
+      _ = hiddenHeadLaw s (n - k) y * levelProb n k 0
+            + hiddenHeadLaw s (n - k) y * (if k < n then levelTime n (k + 1) t else 0) := by
+          rw [levelProb_zero hn hk'.1 hk'.2, mul_add]
+  have hreindex : ∑ k ∈ Finset.Icc 1 n,
+        hiddenHeadLaw s (n - k) y * (if k < n then levelTime n (k + 1) t else 0)
+      = ∑ k ∈ Finset.Icc 1 n, levelTime n k t * hiddenHeadLaw s (n - k + 1) y := by
+    calc ∑ k ∈ Finset.Icc 1 n,
+          hiddenHeadLaw s (n - k) y * (if k < n then levelTime n (k + 1) t else 0)
+        = ∑ k ∈ Finset.Icc 1 (n - 1), hiddenHeadLaw s (n - k) y * levelTime n (k + 1) t := by
+          symm
+          refine (Finset.sum_congr rfl fun k hk ↦ ?_).trans
+            (Finset.sum_subset ?_ fun k hk hnot ↦ ?_)
+          · rw [Finset.mem_Icc] at hk
+            rw [if_pos (show k < n by omega)]
+          · intro k hk
+            simp only [Finset.mem_Icc] at hk ⊢
+            omega
+          · simp only [Finset.mem_Icc] at hk hnot
+            rw [if_neg (show ¬ k < n by omega), mul_zero]
+      _ = ∑ k ∈ Finset.Icc 2 n, levelTime n k t * hiddenHeadLaw s (n - k + 1) y := by
+          refine Finset.sum_nbij' (· + 1) (· - 1) ?_ ?_ ?_ ?_ ?_
+          · intro k hk
+            simp only [Finset.mem_Icc] at hk ⊢
+            omega
+          · intro k hk
+            simp only [Finset.mem_Icc] at hk ⊢
+            omega
+          · intro k _
+            simp
+          · intro k hk
+            simp only [Finset.mem_Icc] at hk
+            show k - 1 + 1 = k
+            omega
+          · intro k hk
+            simp only [Finset.mem_Icc] at hk
+            show hiddenHeadLaw s (n - k) y * levelTime n (k + 1) t
+              = levelTime n (k + 1) t * hiddenHeadLaw s (n - (k + 1) + 1) y
+            rw [show n - (k + 1) + 1 = n - k by omega, mul_comm]
+      _ = ∑ k ∈ Finset.Icc 1 n, levelTime n k t * hiddenHeadLaw s (n - k + 1) y := by
+          refine Finset.sum_subset ?_ fun k hk hnot ↦ ?_
+          · intro k hk
+            simp only [Finset.mem_Icc] at hk ⊢
+            omega
+          · simp only [Finset.mem_Icc] at hk hnot
+            obtain rfl : k = 1 := by omega
+            rw [levelTime_one, zero_mul]
+  rw [trajectoryClockLaw_hiddenLoadAt hn1 s ht y, trajectoryClockLaw_hiddenLoadAt hn1 s le_rfl y,
+    hloss, hgain]
+  calc ∑ k ∈ Finset.Icc 1 n, hiddenHeadLaw s (n - k) y * levelProb n k t
+        + ∑ k ∈ Finset.Icc 1 n, levelTime n k t * hiddenHeadLaw s (n - k) y
+      = ∑ k ∈ Finset.Icc 1 n, (hiddenHeadLaw s (n - k) y * levelProb n k 0
+          + hiddenHeadLaw s (n - k) y * (if k < n then levelTime n (k + 1) t else 0)) := by
+        rw [← Finset.sum_add_distrib]
+        exact Finset.sum_congr rfl hstep
+    _ = ∑ k ∈ Finset.Icc 1 n, hiddenHeadLaw s (n - k) y * levelProb n k 0
+          + ∑ k ∈ Finset.Icc 1 n, levelTime n k t * hiddenHeadLaw s (n - k + 1) y := by
+        rw [Finset.sum_add_distrib, hreindex]
 
 end
 
