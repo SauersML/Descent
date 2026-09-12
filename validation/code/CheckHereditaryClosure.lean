@@ -15,8 +15,6 @@ open Descent.Pangenome.AncestralLocality
 #print axioms refinement_rel_iff
 #print axioms refinement_le
 #print axioms refinement_eq_self_iff
-#print axioms refinement_eq_refinementStep
-#print axioms hereditarilyAutonomous_iff_autonomous
 #print axioms isAutonomous_of_refinement_eq
 #print axioms sum_block_eq_of_le
 #print axioms le_refinement_of_isAutonomous
@@ -31,8 +29,6 @@ open Descent.Pangenome.AncestralLocality
 #print axioms isGreatest_hereditaryClosure
 #print axioms hereditarilyAutonomous_closureMap
 #print axioms ker_le_hereditaryClosure_of_hereditarilyAutonomous
-#print axioms hereditarilyAutonomous_iff_pushforward_reproduce
-#print axioms exists_pushforward_eq_reproduce_ne_of_not_autonomous
 #print axioms isHeredityKernel_transportKernel
 #print axioms blockMass_transportKernel
 #print axioms refinement_transportKernel

@@ -2,7 +2,6 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Coalescent.StateSpace
-import Descent.Pangenome.AncestralLocality.ClosureReachability
 import Descent.Pangenome.AncestralLocality.HeredityKernel
 import Mathlib.SetTheory.Cardinal.Finite
 
@@ -14,16 +13,12 @@ assert_below Descent.Portability Descent.Decision Descent.Program
 
 `ANCESTRAL_LOCALITY.md` §3. An observation of genome states need not predict how it reproduces:
 the observed offspring law can depend on unobserved parental information. This module computes
-the least information that must be added, and characterizes autonomy operationally.
+the least information that must be added.
 
 **The refinement (3.1).** `refinement K P` is the note's `Φ_K(P)`: two states stay together when
 they are together in `P` and give every block of `P` the same mass against every partner
 (`refinement_rel_iff`). It only refines (`refinement_le`), and its fixed points are exactly the
 partitions whose block masses are invariant in the first parent (`refinement_eq_self_iff`).
-It is the refinement step `refinementStep` of `ClosureReachability`
-(`refinement_eq_refinementStep`), and `HereditarilyAutonomous` is that module's `Autonomous`
-(`hereditarilyAutonomous_iff_autonomous`), so the reachability theorems there are statements
-about the closure here.
 
 **The iteration (3.2).** A strict refinement of a partition of a finite set adds a block
 (`card_quotient_lt_of_lt`) and no partition has more than `|H|` blocks (`card_quotient_le`), so a
@@ -44,14 +39,6 @@ below each iterate (`le_refinement_of_isAutonomous`). Together, `isGreatest_here
 every hereditarily autonomous observation determining `π` determines it
 (`ker_le_hereditaryClosure_of_hereditarilyAutonomous`).
 
-**Theorem 2 (operational characterization).** `hereditarilyAutonomous_iff_pushforward_reproduce`:
-for a heredity kernel, `π` is hereditarily autonomous iff `π_# R_K(p)` depends only on `π_# p`
-for every probability vector `p`. The converse direction polarizes with `δ_x`, which fixes
-`K(x,x;B)` as a function of `πx`, and with `½δ_x + ½δ_y`, whose offspring law is
-`¼K(x,x;B) + ½K(x,y;B) + ¼K(y,y;B)`. Its contrapositive is
-`exists_pushforward_eq_reproduce_ne_of_not_autonomous`: failure of autonomy yields two
-populations with the same observed law and different observed offspring laws.
-
 **§3.1 Representation invariance.** A relabeling `g : H ≃ H'` transports the kernel
 (`transportKernel`, a heredity kernel by `isHeredityKernel_transportKernel`), every refinement
 step (`refinement_transportKernel`), autonomy (`isAutonomous_transportKernel_iff`) and the
@@ -65,11 +52,14 @@ lets a child take the other parent's `a` only when the parents agree at `h`. Its
 (`not_hereditarilyAutonomous_observeAB`); `exists_autonomous_pair_not_autonomous_join` packages
 the three.
 
+Theorem 2, the operational characterization of autonomy, is proved in `OperationalAutonomy`, and
+`ReachabilityClosureTie` identifies the refinement here with the refinement step of
+`ClosureReachability`.
+
 Scope. The closure is defined as the `|H|`-th iterate; the note's `P_*` is the first fixed point,
 and the two agree by `hereditaryClosure_eq_iterate`. The §3.2 example uses the one-rule kernel of
 the note's §5.2 witness on three binary features; no general statement about joins beyond this
-counterexample is claimed. Theorem 2 is stated for real probability vectors on a finite state
-set, and the populations in its converse are explicit mixtures of at most two point masses.
+counterexample is claimed.
 
 ## Empirical status
 
@@ -182,18 +172,6 @@ theorem refinement_eq_self_iff (K : H → H → H → ℝ) (P : Setoid H) :
   · intro h
     exact le_antisymm (refinement_le K P) fun x x' hx ↦
       (refinement_rel_iff K P x x').mpr ⟨hx, h hx⟩
-
-/-- **One transcription of (3.1).** `Φ_K` here is the refinement step `refinementStep` of
-`ClosureReachability`, whose one-step identity (5.2) is therefore a statement about `Φ_K`. -/
-theorem refinement_eq_refinementStep (K : H → H → H → ℝ) (P : Setoid H) :
-    refinement K P = refinementStep K P :=
-  Setoid.ext fun _ _ ↦ Iff.rfl
-
-/-- **One transcription of (2.2).** Hereditary autonomy here is `Autonomous` of
-`ClosureReachability`. -/
-theorem hereditarilyAutonomous_iff_autonomous {O : Type*} [DecidableEq O] (K : H → H → H → ℝ)
-    (π : H → O) : HereditarilyAutonomous K π ↔ Autonomous K π :=
-  Iff.rfl
 
 /-- **Autonomy at a fixed point.** If `Φ_K` fixes `P`, block masses are invariant in the first
 parent, and symmetry of the kernel gives the second. Assumes: `IsHeredityKernel K`. -/
@@ -332,57 +310,6 @@ theorem ker_le_hereditaryClosure_of_hereditarilyAutonomous {O O' : Type*} [Decid
     {K : H → H → H → ℝ} {π : H → O} {σ : H → O'} (hσ : HereditarilyAutonomous K σ)
     (hσπ : Setoid.ker σ ≤ Setoid.ker π) : Setoid.ker σ ≤ hereditaryClosure K (Setoid.ker π) :=
   le_hereditaryClosure_of_isAutonomous ((hereditarilyAutonomous_iff K σ).mp hσ) hσπ
-
-/-! ### Theorem 2 -/
-
-/-- **Theorem 2 (operational characterization).** For a heredity kernel, `π` is hereditarily
-autonomous iff the observed next generation `π_# R_K(p)` depends on the population `p` only
-through its observed law `π_# p`. The converse polarizes with `δ_x` and `½δ_x + ½δ_y`.
-Assumes: `IsHeredityKernel K`. -/
-theorem hereditarilyAutonomous_iff_pushforward_reproduce {O : Type*} [Fintype O]
-    [DecidableEq O] [DecidableEq H] {K : H → H → H → ℝ} (hK : IsHeredityKernel K) (π : H → O) :
-    HereditarilyAutonomous K π ↔
-      ∀ p ∈ stdSimplex ℝ H, ∀ q ∈ stdSimplex ℝ H, pushforward π p = pushforward π q →
-        pushforward π (reproduce K p) = pushforward π (reproduce K q) := by
-  constructor
-  · rintro ⟨Kbar, hKbar⟩ p _ q _ hpq
-    funext o
-    simp only [pushforward_reproduce, hKbar]
-    rw [sum_sum_mul_comp_eq_sum_sum_pushforward π p fun a b ↦ Kbar a b o,
-      sum_sum_mul_comp_eq_sum_sum_pushforward π q fun a b ↦ Kbar a b o, hpq]
-  · intro hR
-    have hdiag : ∀ ⦃x x' : H⦄, π x = π x' → ∀ o,
-        kernelMass K x x (fiber π o) = kernelMass K x' x' (fiber π o) := by
-      intro x x' hx o
-      have h := congrFun (hR (pointMass x) (pointMass_mem_stdSimplex x) (pointMass x')
-        (pointMass_mem_stdSimplex x')
-        (by rw [pushforward_pointMass, pushforward_pointMass, hx])) o
-      rwa [pushforward_reproduce, pushforward_reproduce, sum_sum_pointMass,
-        sum_sum_pointMass] at h
-    rw [hereditarilyAutonomous_iff]
-    intro x x' y y' hx hy w
-    have hx' : π x = π x' := Setoid.ker_def.mp hx
-    have hy' : π y = π y' := Setoid.ker_def.mp hy
-    have h := congrFun (hR (pairMidpoint x y) (pairMidpoint_mem_stdSimplex x y)
-      (pairMidpoint x' y') (pairMidpoint_mem_stdSimplex x' y')
-      (by rw [pushforward_pairMidpoint, pushforward_pairMidpoint, hx', hy'])) (π w)
-    rw [pushforward_reproduce, pushforward_reproduce, sum_sum_pairMidpoint,
-      sum_sum_pairMidpoint, hdiag hx' (π w), hdiag hy' (π w), kernelMass_symm hK y x,
-      kernelMass_symm hK y' x'] at h
-    simp only [blockMass, block_ker]
-    linarith
-
-/-- **Failure of autonomy is observable.** If `π` is not hereditarily autonomous, two
-populations with the same observed law have different observed offspring laws.
-Assumes: `IsHeredityKernel K`. -/
-theorem exists_pushforward_eq_reproduce_ne_of_not_autonomous {O : Type*} [Fintype O]
-    [DecidableEq O] [DecidableEq H] {K : H → H → H → ℝ} (hK : IsHeredityKernel K) {π : H → O}
-    (h : ¬ HereditarilyAutonomous K π) :
-    ∃ p ∈ stdSimplex ℝ H, ∃ q ∈ stdSimplex ℝ H, pushforward π p = pushforward π q ∧
-      pushforward π (reproduce K p) ≠ pushforward π (reproduce K q) := by
-  rw [hereditarilyAutonomous_iff_pushforward_reproduce hK π] at h
-  push_neg at h
-  exact h
 
 /-! ### Representation invariance (§3.1) -/
 
