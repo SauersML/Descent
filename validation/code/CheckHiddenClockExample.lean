@@ -11,6 +11,8 @@ open Descent.Pangenome.GraphCoalescent
 #print axioms exp_apply_fin_two
 #print axioms exampleEigenvectors_inv
 #print axioms isUnit_exampleEigenvectors
+#print axioms smul_exampleGenerator
+#print axioms diagonal_fin_two
 #print axioms smul_exampleGenerator_eq_conj
 #print axioms exp_smul_exampleGenerator
 #print axioms exampleSurvival_eq

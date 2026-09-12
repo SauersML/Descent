@@ -106,27 +106,39 @@ theorem isUnit_exampleEigenvectors : IsUnit exampleEigenvectors := by
   rw [Matrix.isUnit_iff_isUnit_det, exampleEigenvectors, Matrix.det_fin_two_of]
   exact isUnit_iff_ne_zero.mpr (by norm_num)
 
+/-- `t Q`, written out. -/
+theorem smul_exampleGenerator (t : ℝ) : t • exampleGenerator = !![-3 * t, t; 0, -t] := by
+  ext i j
+  fin_cases i <;> fin_cases j <;> simp [exampleGenerator] <;> ring
+
+/-- A diagonal matrix with two entries, written out. -/
+theorem diagonal_fin_two (a b : ℝ) : Matrix.diagonal ![a, b] = !![a, 0; 0, b] := by
+  ext i j
+  fin_cases i <;> fin_cases j <;> first | rfl | simp [Matrix.diagonal_apply]
+
 /-- `t Q` is diagonalized by its eigenvectors. -/
 theorem smul_exampleGenerator_eq_conj (t : ℝ) :
     t • exampleGenerator =
       exampleEigenvectors * Matrix.diagonal ![-3 * t, -t] * exampleEigenvectors⁻¹ := by
-  rw [exampleEigenvectors_inv]
+  rw [exampleEigenvectors_inv, diagonal_fin_two, smul_exampleGenerator, exampleEigenvectors,
+    Matrix.mul_fin_two, Matrix.mul_fin_two]
   ext i j
-  fin_cases i <;> fin_cases j <;>
-    norm_num [exampleGenerator, exampleEigenvectors, Matrix.mul_apply, Fin.sum_univ_two,
-      Matrix.diagonal_apply] <;> ring
+  fin_cases i <;> fin_cases j <;> simp <;> ring
 
 /-- **The matrix exponential of the killed generator**:
 `e^{tQ} = [[e^{-3t}, (e^{-t} - e^{-3t})/2], [0, e^{-t}]]`. -/
 theorem exp_smul_exampleGenerator (t : ℝ) :
     NormedSpace.exp ℝ (t • exampleGenerator) =
       !![Real.exp (-3 * t), (Real.exp (-t) - Real.exp (-3 * t)) / 2; 0, Real.exp (-t)] := by
+  have hexp : NormedSpace.exp ℝ (![-3 * t, -t] : Fin 2 → ℝ) =
+      ![Real.exp (-3 * t), Real.exp (-t)] := by
+    funext i
+    fin_cases i <;> simp [exp_apply_fin_two]
   rw [smul_exampleGenerator_eq_conj, Matrix.exp_conj ℝ _ _ isUnit_exampleEigenvectors,
-    Matrix.exp_diagonal ℝ, exampleEigenvectors_inv]
+    Matrix.exp_diagonal ℝ, hexp, diagonal_fin_two, exampleEigenvectors_inv, exampleEigenvectors,
+    Matrix.mul_fin_two, Matrix.mul_fin_two]
   ext i j
-  fin_cases i <;> fin_cases j <;>
-    norm_num [exampleEigenvectors, Matrix.mul_apply, Fin.sum_univ_two, Matrix.diagonal_apply,
-      exp_apply_fin_two] <;> ring
+  fin_cases i <;> fin_cases j <;> simp <;> ring
 
 /-! ### The survival function and its integral -/
 
@@ -139,7 +151,7 @@ def exampleSurvival (t : ℝ) : ℝ :=
 theorem exampleSurvival_eq (t : ℝ) :
     exampleSurvival t = Real.exp (-3 * t) / 2 + Real.exp (-t) / 2 := by
   rw [exampleSurvival, exp_smul_exampleGenerator, Fin.sum_univ_two]
-  simp only [Matrix.of_apply, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
+  simp only [Matrix.of_apply, Matrix.cons_val_zero, Matrix.cons_val_one]
   ring
 
 /-- **Spec (A4), the mean connection time**: `∫₀^∞ S(t) dt = 2/3`. -/
