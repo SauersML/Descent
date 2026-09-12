@@ -755,6 +755,7 @@ theorem refinementStep_agreeOn_reach {r : V → V → ℝ} (hr : ∀ i j, 0 ≤ 
 
 /-! ### §5.1: connected graphs, the path, and joins -/
 
+omit [DecidableEq V] in
 /-- Observing every feature separates every pair of genomes. -/
 theorem agreeOn_univ_r_iff {x x' : V → Bool} : (agreeOn (univ : Finset V)).r x x' ↔ x = x' :=
   ⟨fun h ↦ funext fun l ↦ agreeOn_r_iff.mp h l (mem_univ l),
