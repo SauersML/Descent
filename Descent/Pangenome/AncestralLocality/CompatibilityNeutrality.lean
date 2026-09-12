@@ -462,10 +462,8 @@ end Model
 theorem binomial_toReal (ρ : ℝ≥0) (hρ : ρ ≤ 1) (N : ℕ) (c : Fin (N + 1)) :
     (PMF.binomial ρ hρ N c).toReal =
       N.choose c * (ρ : ℝ) ^ (c : ℕ) * (1 - (ρ : ℝ)) ^ (N - c) := by
-  have hc : ((Fin.last N - c : Fin (N + 1)) : ℕ) = N - c := by
-    rw [Fin.coe_sub_iff_le.mpr (Fin.le_last c), Fin.val_last]
   simp only [PMF.binomial, PMF.ofFintype_apply, ENNReal.coe_toReal, NNReal.coe_mul,
-    NNReal.coe_pow, NNReal.coe_sub hρ, NNReal.coe_one, NNReal.coe_natCast, hc]
+    NNReal.coe_pow, NNReal.coe_sub hρ, NNReal.coe_one, NNReal.coe_natCast, Fin.val_last]
   ring
 
 section Binomial
@@ -533,6 +531,14 @@ theorem witness_observed :
     simp only [witnessP, witnessQ, sum_halfMix_mul] <;>
     norm_num [observedProduct, Matrix.cons_val]
 
+/-- The checker coordinate `h` of the three witness genomes: `0` in `000` and `110`, `1` in
+`111`. -/
+theorem witness_checker_values :
+    (![false, false, false] : Fin 3 → Bool) 2 = false ∧
+      (![true, true, false] : Fin 3 → Bool) 2 = false ∧
+        (![true, true, true] : Fin 3 → Bool) 2 = true :=
+  ⟨rfl, rfl, rfl⟩
+
 /-- After one generation, `E[ab]` is `1/4` from `p` and `1/2` from `q`. -/
 theorem witness_expected :
     ∑ z, reproduce (compatibilityKernel witnessGraph) witnessP z * observedProduct z = 1 / 4 ∧
@@ -541,7 +547,8 @@ theorem witness_expected :
   constructor <;>
     simp only [witnessP, witnessQ, witnessGraph, sum_reproduce_halfMix_mul,
       compatibilityKernel_singleEdge, exchangeKernel, sum_halfMix_mul] <;>
-    norm_num [observedProduct, orderedChild, Matrix.cons_val]
+    norm_num [observedProduct, orderedChild, witness_checker_values.1,
+      witness_checker_values.2.1, witness_checker_values.2.2]
 
 /-- **The drifts (5.5)**: at unit event rate, `R_K(p)[ab] - p[ab] = -1/4` and
 `R_K(q)[ab] - q[ab] = 0`, although `p` and `q` have the same observed law. -/
@@ -579,7 +586,8 @@ theorem witness_not_autonomous :
     (hK ![false, false, false] ![true, true, true] (true, true)).symm
   simp only [witnessGraph, compatibilityKernel_singleEdge, exchangeKernel,
     sum_filter_halfMix] at h
-  norm_num [observeAB, orderedChild, Matrix.cons_val] at h
+  norm_num [observeAB, orderedChild, witness_checker_values.1, witness_checker_values.2.1,
+    witness_checker_values.2.2] at h
 
 end Witness
 

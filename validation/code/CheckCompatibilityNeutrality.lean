@@ -38,6 +38,7 @@ open Descent.Pangenome.AncestralLocality
 #print axioms witness_pushforward_eq
 #print axioms pushforward_observeAB_true_true
 #print axioms witness_observed
+#print axioms witness_checker_values
 #print axioms witness_expected
 #print axioms witness_drift
 #print axioms witness_no_observed_transition_law
