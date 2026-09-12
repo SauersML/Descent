@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Pangenome.AncestralLocality.LocalityBounds
 import Descent.Pangenome.AncestralLocality.LocalityCoupling
 
 namespace Descent.Program
@@ -24,6 +25,13 @@ independent complexity bounds and a quantitative light cone.
 
 ## Theorems
 
+* Theorems 7 and 8, the support drift: `LocalityBounds`. A decision along `i → j` raises the
+  weighted support count by at most `w i + 2 w j` (`weightedCount_branchSupports_le`) and a
+  coalescence does not raise it (`weightedCount_coalesceSupports_le`); with `Σ_j r i j ≤ D` and
+  `w j ≤ κ w i` on every edge of positive rate the ancestral generator obeys
+  `L Z^{(w)} ≤ D (1 + 2κ) Z^{(w)}` (`supportGenerator_weightedCount_le`), the plain count
+  `L Z ≤ 3 D Z` (`supportGenerator_supportSize_le`), and the decision rate is at most `D Z`
+  (`decisionRate_le`).
 * Corollary 8.1, the light cone as a coupling: `LocalityCoupling`. Two sample laws obtained by
   evaluating one circuit on inputs that coincide off an escape event are within total variation
   the probability of escape (`totalVariation_mixtureLaw_le`); for a circuit reading only inspected
@@ -34,12 +42,13 @@ independent complexity bounds and a quantitative light cone.
   `20 e³ ∈ [401.7, 401.72]` (`twenty_mul_exp_three_mem_Icc`) and
   `20 e (2e/20)^20 ≤ 2.64 × 10⁻¹⁰` (`escapeBound_twenty_le`).
 
-Scope. Corollary 8.1 is stated on a common finite probability space, with the escape probability
-as a parameter until the escape bound of Theorem 8 is proof-checked. Theorems 1 and 2 (hereditary
-closure and its operational characterization), Theorem 3 (neutrality), Theorem 4 (closure is
-reachability), Theorem 5 (the locality transition), Theorem 6 (sampling duality), Theorems 7 and 8
-(support and escape bounds) and Theorem 9 (the infinite-genome semigroup) are not yet
-proof-checked.
+Scope. Theorems 7 and 8 are proved as generator inequalities on the tagged support state; the
+expectation bounds (8.2), (8.3) and the escape bounds (9.1), (9.2) through Grönwall and Markov's
+inequality are not yet proof-checked. Corollary 8.1 is stated on a common finite probability
+space, with the escape probability as a parameter. Theorems 1 and 2 (hereditary closure and its
+operational characterization), Theorem 3 (neutrality), Theorem 4 (closure is reachability),
+Theorem 5 (the locality transition), Theorem 6 (sampling duality) and Theorem 9 (the
+infinite-genome semigroup) are not yet proof-checked.
 -/
 
 end Descent.Program
