@@ -816,6 +816,134 @@ theorem tendsto_crossHeterozygosityDecay_atTop {coalescence rate contrast linkag
   rw [zero_pow two_ne_zero, zero_div] at h
   exact h
 
+/-- The secant slope `(e^x - 1)/x` of the exponential from `0` increases: for `0 < x ≤ y`,
+`(e^x - 1) y ≤ (e^y - 1) x`.
+
+Assumes: `0 < x ≤ y`. -/
+theorem exp_sub_one_mul_le {x y : ℝ} (hx : 0 < x) (hxy : x ≤ y) :
+    (Real.exp x - 1) * y ≤ (Real.exp y - 1) * x := by
+  have hy : 0 < y := hx.trans_le hxy
+  have h := convexOn_exp.secant_mono (a := 0) (Set.mem_univ 0) (Set.mem_univ x)
+    (Set.mem_univ y) hx.ne' hy.ne' hxy
+  simp only [Real.exp_zero, sub_zero] at h
+  rwa [div_le_div_iff₀ hx hy] at h
+
+/-- The ratio `(1 - e^{-x})/x` decreases: for `0 < x ≤ y`, `x (1 - e^{-y}) ≤ y (1 - e^{-x})`.
+
+Assumes: `0 < x ≤ y`. -/
+theorem mul_one_sub_exp_neg_le {x y : ℝ} (hx : 0 < x) (hxy : x ≤ y) :
+    x * (1 - Real.exp (-y)) ≤ y * (1 - Real.exp (-x)) := by
+  have hy : 0 < y := hx.trans_le hxy
+  have hconv : ConvexOn ℝ Set.univ fun z : ℝ ↦ Real.exp (-z) := by
+    have h := convexOn_exp.comp_linearMap (-LinearMap.id : ℝ →ₗ[ℝ] ℝ)
+    simpa [Function.comp_def] using h
+  have h := hconv.secant_mono (a := 0) (Set.mem_univ 0) (Set.mem_univ x) (Set.mem_univ y)
+    hx.ne' hy.ne' hxy
+  simp only [neg_zero, Real.exp_zero, sub_zero] at h
+  rw [div_le_div_iff₀ hx hy] at h
+  linarith
+
+/-- **The cross-heterozygosity decay decreases with the linkage rate.**  At fixed drift `c` a
+larger recombination rate raises `β = c + r` and lowers the decay.
+
+Assumes: positive drift, nonnegative ancestral ratios, and `0 ≤ duration`. -/
+theorem crossHeterozygosityDecay_antitoneOn_rate {coalescence contrast linkage duration : ℝ}
+    (hc : 0 < coalescence) (hcontrast : 0 ≤ contrast) (hlinkage : 0 ≤ linkage)
+    (hduration : 0 ≤ duration) :
+    AntitoneOn (fun rate ↦ crossHeterozygosityDecay coalescence rate contrast linkage duration)
+      (Set.Ioi 0) := by
+  intro u hu v hv huv
+  have hu0 : 0 < u := hu
+  have hv0 : 0 < v := hv
+  show crossHeterozygosityDecay coalescence v contrast linkage duration
+    ≤ crossHeterozygosityDecay coalescence u contrast linkage duration
+  rcases hduration.eq_or_lt with hT | hT
+  · subst hT
+    simp [crossHeterozygosityDecay]
+  have hform : ∀ w : ℝ, 0 < w → 0 < 1 - Real.exp (-w * duration) →
+      crossHeterozygosityDecay coalescence w contrast linkage duration
+        = (w * Real.exp (-w * duration) / (1 - Real.exp (-w * duration))) ^ 2
+          / ((w / (1 - Real.exp (-w * duration))) ^ 2
+            + coalescence * contrast / 2 * (w / (1 - Real.exp (-w * duration)))
+            + coalescence ^ 2 * linkage) := by
+    intro w hw h1w
+    have hwne := hw.ne'
+    have h1wne := h1w.ne'
+    have hm : (w / (1 - Real.exp (-w * duration))) ^ 2 ≠ 0 :=
+      pow_ne_zero 2 (div_pos hw h1w).ne'
+    rw [crossHeterozygosityDecay, ← mul_div_mul_left (Real.exp (-w * duration) ^ 2)
+      (1 + coalescence / (2 * w) * contrast * (1 - Real.exp (-w * duration))
+        + (coalescence / w) ^ 2 * linkage * (1 - Real.exp (-w * duration)) ^ 2) hm]
+    congr 1
+    · ring
+    · field_simp <;> ring
+  have hEu := Real.exp_pos (-u * duration)
+  have hEv := Real.exp_pos (-v * duration)
+  have h1u : 0 < 1 - Real.exp (-u * duration) := by
+    have : Real.exp (-u * duration) < 1 := by
+      rw [← Real.exp_zero]
+      exact Real.exp_lt_exp.mpr (by nlinarith)
+    linarith
+  have h1v : 0 < 1 - Real.exp (-v * duration) := by
+    have : Real.exp (-v * duration) < 1 := by
+      rw [← Real.exp_zero]
+      exact Real.exp_lt_exp.mpr (by nlinarith)
+    linarith
+  have hxy : u * duration ≤ v * duration := mul_le_mul_of_nonneg_right huv hT.le
+  have hsecant := exp_sub_one_mul_le (mul_pos hu0 hT) hxy
+  have hsecant' := mul_one_sub_exp_neg_le (mul_pos hu0 hT) hxy
+  rw [← neg_mul, ← neg_mul] at hsecant'
+  have hexu : Real.exp (u * duration) * Real.exp (-u * duration) = 1 := by
+    simp [← Real.exp_add]
+  have hexv : Real.exp (v * duration) * Real.exp (-v * duration) = 1 := by
+    simp [← Real.exp_add]
+  have hq : u / (1 - Real.exp (-u * duration)) ≤ v / (1 - Real.exp (-v * duration)) := by
+    rw [div_le_div_iff₀ h1u h1v]
+    refine le_of_mul_le_mul_left ?_ hT
+    linarith
+  have hk : v * Real.exp (-v * duration) / (1 - Real.exp (-v * duration))
+      ≤ u * Real.exp (-u * duration) / (1 - Real.exp (-u * duration)) := by
+    rw [div_le_div_iff₀ h1v h1u]
+    refine le_of_mul_le_mul_left ?_ hT
+    have hscaled := mul_le_mul_of_nonneg_right hsecant (mul_pos hEu hEv).le
+    have h3 : Real.exp (u * duration) * Real.exp (-u * duration)
+        * (v * duration * Real.exp (-v * duration)) = v * duration * Real.exp (-v * duration) := by
+      rw [hexu, one_mul]
+    have h4 : Real.exp (v * duration) * Real.exp (-v * duration)
+        * (u * duration * Real.exp (-u * duration)) = u * duration * Real.exp (-u * duration) := by
+      rw [hexv, one_mul]
+    linarith
+  have hkv : 0 ≤ v * Real.exp (-v * duration) / (1 - Real.exp (-v * duration)) :=
+    div_nonneg (mul_nonneg hv0.le hEv.le) h1v.le
+  have hqu : 0 < u / (1 - Real.exp (-u * duration)) := div_pos hu0 h1u
+  have hksq : (v * Real.exp (-v * duration) / (1 - Real.exp (-v * duration))) ^ 2
+      ≤ (u * Real.exp (-u * duration) / (1 - Real.exp (-u * duration))) ^ 2 := by
+    rw [sq, sq]
+    exact mul_le_mul hk hk hkv (hkv.trans hk)
+  have hA : 0 ≤ coalescence * contrast / 2 :=
+    div_nonneg (mul_nonneg hc.le hcontrast) zero_le_two
+  have hB : 0 ≤ coalescence ^ 2 * linkage := mul_nonneg (sq_nonneg _) hlinkage
+  have hDu : 0 < (u / (1 - Real.exp (-u * duration))) ^ 2
+      + coalescence * contrast / 2 * (u / (1 - Real.exp (-u * duration)))
+      + coalescence ^ 2 * linkage := by
+    have := pow_pos hqu 2
+    have := mul_nonneg hA hqu.le
+    linarith
+  have hDle : (u / (1 - Real.exp (-u * duration))) ^ 2
+        + coalescence * contrast / 2 * (u / (1 - Real.exp (-u * duration)))
+        + coalescence ^ 2 * linkage
+      ≤ (v / (1 - Real.exp (-v * duration))) ^ 2
+        + coalescence * contrast / 2 * (v / (1 - Real.exp (-v * duration)))
+        + coalescence ^ 2 * linkage := by
+    have hsq : (u / (1 - Real.exp (-u * duration))) ^ 2
+        ≤ (v / (1 - Real.exp (-v * duration))) ^ 2 := by
+      rw [sq, sq]
+      exact mul_le_mul hq hq hqu.le (hqu.le.trans hq)
+    have := mul_le_mul_of_nonneg_left hq hA
+    linarith
+  rw [hform u hu0 h1u, hform v hv0 h1v]
+  exact div_le_div₀ (sq_nonneg _) hksq hDu hDle
+
 end
 
 end Descent.Portability.TwoLocusPortabilityDecay
