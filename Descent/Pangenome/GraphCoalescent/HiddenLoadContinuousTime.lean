@@ -83,7 +83,7 @@ theorem measurable_sojourn_indicator {α : Type*} [MeasurableSpace α] {X Y U : 
 /-- **A holding time against a window.** For `x ≥ 0`, the expected rate-weighted time that a
 sojourn `[x, x + H)` of rate `d` spends in `[0, t]` is `P(x + H ≤ t)`. -/
 theorem lintegral_holdMeasure_window {d x t : ℝ} (hd : 0 < d) (hx : 0 ≤ x) :
-    ∫⁻ h, ∫⁻ u in Set.Icc 0 t, (Set.Ico x (x + h)).indicator (fun _ ↦ ENNReal.ofReal d) u
+    ∫⁻ h, (∫⁻ u in Set.Icc 0 t, (Set.Ico x (x + h)).indicator (fun _ ↦ ENNReal.ofReal d) u)
         ∂(holdMeasure d)
       = holdMeasure d (Set.Iic (t - x)) := by
   haveI := holdMeasure_isProbabilityMeasure hd
@@ -104,8 +104,8 @@ theorem lintegral_holdMeasure_window {d x t : ℝ} (hd : 0 < d) (hx : 0 ≤ x) :
       rw [hfun, lintegral_indicator_const measurableSet_Ioi,
         holdMeasure_Ioi hd (sub_nonneg.mpr hxu), ← ENNReal.ofReal_mul hd.le,
         Set.indicator_of_mem (Set.mem_Ici.mpr hxu)]
-    · simp [Set.indicator_apply, hxu]
-  simp only [hinner]
+    · simp [hxu]
+  refine (lintegral_congr hinner).trans ?_
   rw [lintegral_indicator measurableSet_Ici, Measure.restrict_restrict measurableSet_Ici]
   have hset : Set.Ici x ∩ Set.Icc 0 t = Set.Icc x t := by
     ext u
@@ -163,19 +163,19 @@ theorem lintegral_rate_mul_measure_between {Ω : Type*} [MeasurableSpace Ω] {μ
   simp only [hcomp]
   calc ∫⁻ u in Set.Icc 0 t, ∫⁻ ω,
         (Set.Ico (D ω) (D ω + H ω)).indicator (fun _ ↦ ENNReal.ofReal d) u ∂μ
-      = ∫⁻ ω, ∫⁻ u in Set.Icc 0 t,
-          (Set.Ico (D ω) (D ω + H ω)).indicator (fun _ ↦ ENNReal.ofReal d) u ∂μ :=
+      = ∫⁻ ω, (∫⁻ u in Set.Icc 0 t,
+          (Set.Ico (D ω) (D ω + H ω)).indicator (fun _ ↦ ENNReal.ofReal d) u) ∂μ :=
         lintegral_lintegral_swap
           (f := fun (u : ℝ) (ω : Ω) ↦
             (Set.Ico (D ω) (D ω + H ω)).indicator (fun _ ↦ ENNReal.ofReal d) u)
           (measurable_sojourn_indicator (hDm.comp measurable_snd) (hHm.comp measurable_snd)
             measurable_fst _).aemeasurable
-    _ = ∫⁻ p, ∫⁻ u in Set.Icc 0 t,
-          (Set.Ico p.1 (p.1 + p.2)).indicator (fun _ ↦ ENNReal.ofReal d) u
+    _ = ∫⁻ p, (∫⁻ u in Set.Icc 0 t,
+          (Set.Ico p.1 (p.1 + p.2)).indicator (fun _ ↦ ENNReal.ofReal d) u)
           ∂(μ.map fun ω ↦ (D ω, H ω)) := (lintegral_map hW hpair).symm
-    _ = ∫⁻ x, ∫⁻ h, ∫⁻ u in Set.Icc 0 t,
-          (Set.Ico x (x + h)).indicator (fun _ ↦ ENNReal.ofReal d) u
-          ∂(holdMeasure d) ∂(μ.map D) := by
+    _ = ∫⁻ x, (∫⁻ h, (∫⁻ u in Set.Icc 0 t,
+          (Set.Ico x (x + h)).indicator (fun _ ↦ ENNReal.ofReal d) u)
+          ∂(holdMeasure d)) ∂(μ.map D) := by
         rw [hjoint]
         exact lintegral_prod _ hW.aemeasurable
     _ = ∫⁻ x, holdMeasure d (Set.Iic (t - x)) ∂(μ.map D) := by
@@ -194,7 +194,7 @@ theorem descentTime_clockHold_eq_sum (n k : ℕ) (hkn : k + 1 ≤ n) (ω : ℕ �
   rfl
 
 /-- The descent to `k` is the descent to `k + 1` followed by the holding time at `k + 1`. -/
-theorem descentTime_clockHold_succ (n k : ℕ) (hk : 1 ≤ k) (hkn : k < n) (ω : ℕ → ℝ) :
+theorem descentTime_clockHold_succ (n k : ℕ) (_hk : 1 ≤ k) (hkn : k < n) (ω : ℕ → ℝ) :
     descentTime n (clockHold ω) k = descentTime n (clockHold ω) (k + 1) + ω (k - 1) := by
   unfold descentTime
   rw [Finset.sum_eq_sum_Ico_succ_bot (by omega : k + 1 < n + 1)]
