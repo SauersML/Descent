@@ -213,7 +213,8 @@ theorem lociWithin_relabelCarriers {A : Finset Locus}
     (choice : Fin ξ.toList.length → Deme) : LociWithin A (relabelCarriers ξ.toList choice) := by
   intro τ hτ
   obtain ⟨k, _, rfl⟩ := Multiset.mem_map.mp hτ
-  exact hξ _ (Multiset.mem_toList.mp (List.get_mem _ k))
+  intro ℓ hℓ
+  exact hξ (ξ.toList.get k) (Multiset.mem_toList.mp (List.get_mem ξ.toList k)) ℓ hℓ
 
 /-- **A pulse acts locally.** -/
 theorem rowsLocal_pulseKernel (pulse : PulseMatrix Deme) (capacity : Locus → ℕ)
@@ -381,6 +382,12 @@ theorem localMomentSpan_mono {A : Finset Locus} {j k : ℕ} (hjk : j ≤ k) :
     localMomentSpan (Deme := Deme) (Allele := Allele) A j ≤ localMomentSpan A k :=
   Submodule.span_mono fun _ ⟨ξ, hξ, hcard, hp⟩ ↦ ⟨ξ, hξ, hcard.trans hjk, hp⟩
 
+/-- A polynomial local of at most `j` carriers is local of at most `k ≥ j` carriers. -/
+theorem mem_localMomentSpan_of_le {A : Finset Locus} {j k : ℕ} (hjk : j ≤ k)
+    {p : FrequencyPolynomial Deme Locus Allele} (hp : p ∈ localMomentSpan A j) :
+    p ∈ localMomentSpan A k :=
+  localMomentSpan_mono hjk hp
+
 /-- **Products of local moment polynomials are local.** -/
 theorem mul_mem_localMomentSpan {A : Finset Locus} {j k : ℕ}
     {p q : FrequencyPolynomial Deme Locus Allele} (hp : p ∈ localMomentSpan A j)
@@ -392,6 +399,13 @@ theorem mul_mem_localMomentSpan {A : Finset Locus} {j k : ℕ}
   rintro _ ⟨_, ⟨ξ, hξ, hcard, rfl⟩, _, ⟨ζ, hζ, hcard', rfl⟩, rfl⟩
   exact ⟨ξ + ζ, lociWithin_add.mpr ⟨hξ, hζ⟩, by rw [Multiset.card_add]; omega,
     momentPolynomial_add ξ ζ⟩
+
+/-- Products of local moment polynomials are local of every number of carriers above the sum. -/
+theorem mul_mem_localMomentSpan_of_le {A : Finset Locus} {j k n : ℕ} (hn : j + k ≤ n)
+    {p q : FrequencyPolynomial Deme Locus Allele} (hp : p ∈ localMomentSpan A j)
+    (hq : q ∈ localMomentSpan A k) : p * q ∈ localMomentSpan A n := by
+  have h := mul_mem_localMomentSpan hp hq
+  exact mem_localMomentSpan_of_le hn h
 
 /-- The carrier that records the alleles of a full haplotype at the loci of `A`, in one deme. -/
 def localType (deme : Deme) {A : Finset Locus} (hA : A.Nonempty)
@@ -479,11 +493,12 @@ theorem covariance_mem_localMomentSpan (deme : Deme) {A : Finset Locus} (hA : A.
   have hfg : ReadsLoci A fun hap ↦ f hap * g hap := fun h h' hh ↦ by
     show f h * g h = f h' * g h'
     rw [hf h h' hh, hg h h' hh]
+  have hproduct := mem_localMomentSpan_of_le (k := 2) (by norm_num)
+    (expectation_mem_localMomentSpan deme hA hfg)
+  have hsplit := mul_mem_localMomentSpan_of_le (n := 2) (by norm_num)
+    (expectation_mem_localMomentSpan deme hA hf) (expectation_mem_localMomentSpan deme hA hg)
   rw [covariancePolynomial, map_sub, map_mul]
-  exact (localMomentSpan A 2).sub_mem
-    (localMomentSpan_mono (by norm_num) (expectation_mem_localMomentSpan deme hA hfg))
-    (mul_mem_localMomentSpan (expectation_mem_localMomentSpan deme hA hf)
-      (expectation_mem_localMomentSpan deme hA hg))
+  exact (localMomentSpan A 2).sub_mem hproduct hsplit
 
 /-- **The correlation numerator of a score and outcome that read only `A` is local**, of at most
 four carriers over `A`. -/
@@ -492,9 +507,10 @@ theorem numeratorPolynomial_mem_localMomentSpan (deme : Deme) {A : Finset Locus}
     (hS : ReadsLoci A score) (hY : ReadsLoci A outcome) :
     numeratorPolynomial deme score outcome ∈ localMomentSpan A 4 := by
   have hcov := covariance_mem_localMomentSpan deme hA hS hY
-  rw [numeratorPolynomial, demePolynomial, correlationNumeratorPolynomial, map_mul, rename_C,
-    map_pow, pow_two, MvPolynomial.C_mul']
-  exact (localMomentSpan A 4).smul_mem 16 (mul_mem_localMomentSpan hcov hcov)
+  have hproduct := mul_mem_localMomentSpan_of_le (n := 4) (by norm_num) hcov hcov
+  rw [numeratorPolynomial, demePolynomial, correlationNumeratorPolynomial, pow_two, map_mul,
+    rename_C, map_mul, MvPolynomial.C_mul']
+  exact (localMomentSpan A 4).smul_mem 16 hproduct
 
 /-- **The correlation denominator of a score and outcome that read only `A` is local**, of at most
 four carriers over `A`. -/
@@ -502,11 +518,11 @@ theorem denominatorPolynomial_mem_localMomentSpan (deme : Deme) {A : Finset Locu
     (hA : A.Nonempty) {score outcome : FullHaplotype Locus Allele → ℝ}
     (hS : ReadsLoci A score) (hY : ReadsLoci A outcome) :
     denominatorPolynomial deme score outcome ∈ localMomentSpan A 4 := by
+  have hproduct := mul_mem_localMomentSpan_of_le (n := 4) (by norm_num)
+    (covariance_mem_localMomentSpan deme hA hS hS) (covariance_mem_localMomentSpan deme hA hY hY)
   rw [denominatorPolynomial, demePolynomial, correlationDenominatorPolynomial, map_mul, rename_C,
     map_mul, MvPolynomial.C_mul']
-  exact (localMomentSpan A 4).smul_mem 16
-    (mul_mem_localMomentSpan (covariance_mem_localMomentSpan deme hA hS hS)
-      (covariance_mem_localMomentSpan deme hA hY hY))
+  exact (localMomentSpan A 4).smul_mem 16 hproduct
 
 /-- **Measures with equal local moments integrate local polynomials equally.**
 
@@ -565,7 +581,8 @@ theorem expectedPortability_eq_of_agreeOn (ℓ₀ : Locus) (hap₀ : FullHaploty
           ∫ y, polynomialFunction (momentPolynomial ξ) y
             ∂(historyEventKernel ℓ₀ hap₀ second x₂) := by
     intro ξ hξ hcard
-    have hbudget : WithinBudget (fun _ ↦ 4) ξ := fun _ ↦ (Multiset.countP_le_card ξ).trans hcard
+    have hbudget : WithinBudget (fun _ ↦ 4) ξ :=
+      fun _ ↦ (Multiset.countP_le_card _ ξ).trans hcard
     exact integral_momentPolynomial_historyEventKernel_eq_of_agreeOn ℓ₀ hap₀ (fun _ ↦ 4) A h hx
       (ξ := ⟨ξ, hbudget⟩) hξ
   have hpoly : ∀ p ∈ localMomentSpan A 4,
