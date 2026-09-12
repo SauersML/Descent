@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionConvergence
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionPerturbation
+import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionInLaw
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program
@@ -24,13 +25,13 @@ and (F2).
 
 - `crossingRate_eq_pairProductSum`: `κ_σ = Σ_{C<D} p(C) p(D)`, the note's two readings of the
   crossing rate, for any masses.
-- `continuous_connectionProbability_time`: `u ↦ Pr(T_p ≤ u)` is continuous.
 - `connectionProbability_mem_Icc`: it is a probability at nonnegative times and masses.
 - `connectionProbability_zero`: with two fibers or more nothing is connected at time zero.
 - `monotoneOn_connectionProbability`: it does not decrease in time, by superposing independent
   edge configurations (`sum_configMass_add_mul`).
 - `tendsto_connectionProbability_atTop`: when every `p_i > 0`, `Pr(T_p ≤ u) → 1`, so `T_p` is
-  finite.  `crossingRate_top` and `crossingRate_pos` are the two cases of the Möbius sum.
+  finite; `crossingRate_top` and `MultiplicativeConnectionInLaw.crossingRate_pos_of_ne_top`
+  are the two cases of the Möbius sum.
 - `abs_sum_mul_sub_sum_mul_le`, `abs_poissonMixture_sub_le`: a total variation bound bounds the
   difference of every functional with values in `[0, 1]`, also after Poisson mixing.
 - `abs_poissonMixture_report_sub_spread_le`: **(F2) for every path functional**.  For masses `p`
@@ -75,13 +76,6 @@ theorem crossingRate_eq_pairProductSum {w : ℕ} (p : Fin w → ℝ) (σ : ER w)
 
 /-! ### The limit law -/
 
-/-- `Pr(T_p ≤ u)` is continuous in the time `u`. -/
-theorem continuous_connectionProbability_time {w : ℕ} [NeZero w] (p : Fin w → ℝ) :
-    Continuous fun u ↦ connectionProbability p u := by
-  simp only [connectionProbability_eq_mobius_sum]
-  exact continuous_finset_sum _ fun σ _ ↦ continuous_const.mul
-    (Real.continuous_exp.comp ((continuous_id.mul continuous_const).neg))
-
 /-- The top partition is crossed by no edge. -/
 theorem crossingRate_top {w : ℕ} (p : Fin w → ℝ) : crossingRate p ⊤ = 0 :=
   Finset.sum_eq_zero fun _ _ ↦ if_pos trivial
@@ -122,30 +116,6 @@ theorem connectionProbability_zero {w : ℕ} [NeZero w] (hw : 2 ≤ w) (p : Fin 
   simp only [zero_mul, neg_zero, Real.exp_zero, mul_one]
   exact_mod_cast h
 
-/-- A partition other than the top is crossed at a positive rate when every fiber has positive
-mass. -/
-theorem crossingRate_pos {w : ℕ} {p : Fin w → ℝ} (hp : ∀ i, 0 < p i) {σ : ER w} (hσ : σ ≠ ⊤) :
-    0 < crossingRate p σ := by
-  obtain ⟨i, j, hij⟩ : ∃ i j, ¬ σ i j := by
-    by_contra h
-    push_neg at h
-    exact hσ (Setoid.ext fun i j ↦ ⟨fun _ ↦ trivial, fun _ ↦ h i j⟩)
-  have hne : i ≠ j := fun h ↦ hij (by rw [h])
-  have hnonneg : ∀ e ∈ (univ : Finset (FiberPair w)),
-      0 ≤ if σ e.1.1 e.1.2 then 0 else pairRate p e := fun e _ ↦ by
-    split_ifs
-    · exact le_rfl
-    · exact mul_nonneg (hp _).le (hp _).le
-  rcases lt_or_gt_of_ne hne with h | h
-  · refine lt_of_lt_of_le ?_ (Finset.single_le_sum hnonneg (Finset.mem_univ ⟨(i, j), h⟩))
-    show 0 < if σ i j then 0 else p i * p j
-    rw [if_neg hij]
-    exact mul_pos (hp i) (hp j)
-  · refine lt_of_lt_of_le ?_ (Finset.single_le_sum hnonneg (Finset.mem_univ ⟨(j, i), h⟩))
-    show 0 < if σ j i then 0 else p j * p i
-    rw [if_neg fun h' ↦ hij (σ.iseqv.symm h')]
-    exact mul_pos (hp j) (hp i)
-
 /-- **When every fiber has positive mass, `T_p` is finite**: `Pr(T_p ≤ u) → 1` as `u → ∞`. -/
 theorem tendsto_connectionProbability_atTop {w : ℕ} [NeZero w] {p : Fin w → ℝ}
     (hp : ∀ i, 0 < p i) : Tendsto (fun u ↦ connectionProbability p u) atTop (𝓝 1) := by
@@ -162,7 +132,7 @@ theorem tendsto_connectionProbability_atTop {w : ℕ} [NeZero w] {p : Fin w → 
       exact tendsto_const_nhds
     · rw [if_neg hσ]
       have h := (Real.tendsto_exp_neg_atTop_nhds_zero.comp
-        (tendsto_id.atTop_mul_const (crossingRate_pos hp hσ))).const_mul
+        (tendsto_id.atTop_mul_const (crossingRate_pos_of_ne_top hp hσ))).const_mul
           (topMobius (blocks σ) : ℝ)
       rw [mul_zero] at h
       exact h

@@ -9,15 +9,11 @@ functionals. -/
 #print axioms
   Descent.Pangenome.GraphCoalescent.crossingRate_eq_pairProductSum
 #print axioms
-  Descent.Pangenome.GraphCoalescent.continuous_connectionProbability_time
-#print axioms
   Descent.Pangenome.GraphCoalescent.crossingRate_top
 #print axioms
   Descent.Pangenome.GraphCoalescent.connectionProbability_mem_Icc
 #print axioms
   Descent.Pangenome.GraphCoalescent.connectionProbability_zero
-#print axioms
-  Descent.Pangenome.GraphCoalescent.crossingRate_pos
 #print axioms
   Descent.Pangenome.GraphCoalescent.tendsto_connectionProbability_atTop
 #print axioms
