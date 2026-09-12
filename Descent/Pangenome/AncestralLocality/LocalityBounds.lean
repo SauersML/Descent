@@ -350,6 +350,231 @@ theorem coalesceSupports_mem_escapeSet {r : V → V → ℝ} {A : Finset V} {ℓ
 
 end Supports
 
+/-! ### Grönwall's inequality along a right derivative -/
+
+/-- **Grönwall's inequality for a right derivative.** A function continuous on `[0, T]` whose
+right derivative `m'` satisfies `m' t ≤ K m t` on `[0, T)` is at most `C e^{K t}` there, for any
+`C ≥ m 0`. -/
+theorem le_mul_exp_of_hasDerivWithinAt {m m' : ℝ → ℝ} {K T C : ℝ}
+    (hcont : ContinuousOn m (Set.Icc 0 T))
+    (hderiv : ∀ t ∈ Set.Ico 0 T, HasDerivWithinAt m (m' t) (Set.Ici t) t)
+    (hdrift : ∀ t ∈ Set.Ico 0 T, m' t ≤ K * m t) (hinit : m 0 ≤ C) :
+    ∀ t ∈ Set.Icc 0 T, m t ≤ C * Real.exp (K * t) := by
+  intro t ht
+  have h := le_gronwallBound_of_liminf_deriv_right_le (K := K) (ε := 0) hcont
+    (fun x hx _r hr ↦ (hderiv x hx).liminf_right_slope_le hr) hinit
+    (fun x hx ↦ by rw [add_zero]; exact hdrift x hx) t ht
+  rwa [gronwallBound_ε0, sub_zero] at h
+
+/-- **The integrated exponential bound.** If `m t ≤ C e^{3 D t}` on `[0, T]` and
+`b ≤ D ∫_0^T m`, then `b ≤ (C / 3) (e^{3 D T} - 1)`. -/
+theorem le_div_three_mul_exp_sub_one {m : ℝ → ℝ} {b C D T : ℝ} (hD : 0 ≤ D) (hT : 0 ≤ T)
+    (hcont : ContinuousOn m (Set.Icc 0 T))
+    (hm : ∀ t ∈ Set.Icc 0 T, m t ≤ C * Real.exp (3 * D * t))
+    (hb : b ≤ D * ∫ t in (0 : ℝ)..T, m t) : b ≤ C / 3 * (Real.exp (3 * D * T) - 1) := by
+  have hderiv : ∀ t ∈ Set.uIcc (0 : ℝ) T,
+      HasDerivAt (fun t ↦ C / 3 * (Real.exp (3 * D * t) - 1)) (D * (C * Real.exp (3 * D * t)))
+        t := fun t _ ↦
+    ((((hasDerivAt_id' (x := t)).const_mul (3 * D)).exp.sub_const 1).const_mul
+      (C / 3)).congr_deriv (by ring)
+  have hprimitive : ∫ t in (0 : ℝ)..T, D * (C * Real.exp (3 * D * t)) =
+      C / 3 * (Real.exp (3 * D * T) - 1) := by
+    rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv
+      (Continuous.intervalIntegrable (by fun_prop) 0 T)]
+    simp
+  have hmono : ∫ t in (0 : ℝ)..T, m t ≤ ∫ t in (0 : ℝ)..T, C * Real.exp (3 * D * t) :=
+    intervalIntegral.integral_mono_on hT (hcont.intervalIntegrable_of_Icc hT)
+      (Continuous.intervalIntegrable (by fun_prop) 0 T) hm
+  calc b ≤ D * ∫ t in (0 : ℝ)..T, m t := hb
+    _ ≤ D * ∫ t in (0 : ℝ)..T, C * Real.exp (3 * D * t) := mul_le_mul_of_nonneg_left hmono hD
+    _ = ∫ t in (0 : ℝ)..T, D * (C * Real.exp (3 * D * t)) :=
+      (intervalIntegral.integral_const_mul _ _).symm
+    _ = C / 3 * (Real.exp (3 * D * T) - 1) := hprimitive
+
+/-! ### Theorems 7 and 8 along marginal laws of the circuit -/
+
+section Marginals
+
+variable {V : Type*} [DecidableEq V] [Fintype V] [MeasurableSpace (Multiset (Finset V))]
+
+/-- **Expected growth from a pointwise generator bound.** If `L_anc F ≤ K F` at every state and
+the marginal laws `μ t` of the circuit start at `s₀` with `F s₀ ≤ C`, then
+`∫ F dμ_t ≤ C e^{K t}` on `[0, T]`.
+
+Assumes: Dynkin's formula for `F` along `μ` (`hdynkin`: the right derivative of `∫ F dμ_t` is
+`∫ L_anc F dμ_t`), with `F` and `L_anc F` integrable and `∫ F dμ_t` continuous on `[0, T]`. -/
+theorem integral_le_mul_exp_of_supportGenerator_le [MeasurableSingletonClass (Multiset (Finset V))]
+    {r : V → V → ℝ} {c K T C : ℝ} {F : Multiset (Finset V) → ℝ}
+    (hLF : ∀ s, supportGenerator r c F s ≤ K * F s)
+    {μ : ℝ → Measure (Multiset (Finset V))} {s₀ : Multiset (Finset V)}
+    (hμ0 : μ 0 = Measure.dirac s₀) (hF0 : F s₀ ≤ C)
+    (hint : ∀ t ∈ Set.Icc 0 T, Integrable F (μ t))
+    (hintL : ∀ t ∈ Set.Icc 0 T, Integrable (supportGenerator r c F) (μ t))
+    (hcont : ContinuousOn (fun t ↦ ∫ s, F s ∂μ t) (Set.Icc 0 T))
+    (hdynkin : ∀ t ∈ Set.Ico 0 T, HasDerivWithinAt (fun t ↦ ∫ s, F s ∂μ t)
+      (∫ s, supportGenerator r c F s ∂μ t) (Set.Ici t) t) :
+    ∀ t ∈ Set.Icc 0 T, ∫ s, F s ∂μ t ≤ C * Real.exp (K * t) := by
+  refine le_mul_exp_of_hasDerivWithinAt hcont hdynkin (fun t ht ↦ ?_) ?_
+  · have ht' := Set.Ico_subset_Icc_self ht
+    show ∫ s, supportGenerator r c F s ∂μ t ≤ K * ∫ s, F s ∂μ t
+    rw [← integral_const_mul]
+    exact integral_mono (hintL t ht') ((hint t ht').const_mul _) fun s ↦ hLF s
+  · show ∫ s, F s ∂μ 0 ≤ C
+    rwa [hμ0, integral_dirac]
+
+/-- **Theorem 7, (8.2): `E Z_t ≤ n |A| e^{3 D t}`** on `[0, T]`, for the circuit started from `n`
+arguments carrying `A`.
+
+Assumes: the conditions of `integral_le_mul_exp_of_supportGenerator_le` for `F = Z`. -/
+theorem integral_supportSize_le [MeasurableSingletonClass (Multiset (Finset V))]
+    {r : V → V → ℝ} {c D T : ℝ} {n : ℕ} {A : Finset V}
+    (hr : ∀ i j, 0 ≤ r i j) (hD : ∀ i, ∑ j, r i j ≤ D) (hc : 0 ≤ c)
+    {μ : ℝ → Measure (Multiset (Finset V))} (hμ0 : μ 0 = Measure.dirac (Multiset.replicate n A))
+    (hint : ∀ t ∈ Set.Icc 0 T, Integrable supportSize (μ t))
+    (hintL : ∀ t ∈ Set.Icc 0 T, Integrable (supportGenerator r c supportSize) (μ t))
+    (hcont : ContinuousOn (fun t ↦ ∫ s, supportSize s ∂μ t) (Set.Icc 0 T))
+    (hdynkin : ∀ t ∈ Set.Ico 0 T, HasDerivWithinAt (fun t ↦ ∫ s, supportSize s ∂μ t)
+      (∫ s, supportGenerator r c supportSize s ∂μ t) (Set.Ici t) t) :
+    ∀ t ∈ Set.Icc 0 T, ∫ s, supportSize s ∂μ t ≤ n * A.card * Real.exp (3 * D * t) :=
+  integral_le_mul_exp_of_supportGenerator_le (supportGenerator_supportSize_le hr hD hc) hμ0
+    (supportSize_replicate A n).le hint hintL hcont hdynkin
+
+/-- **Theorem 7, (8.3): `E B_T ≤ (n |A| / 3) (e^{3 D T} - 1)`** for the expected number `b` of
+decision branchings by time `T`.
+
+Assumes: the compensator formula `b = ∫_0^T ∫ decisionRate dμ_t dt` (`hcomp`), the decision
+rate integrable, and the conditions of `integral_supportSize_le`. -/
+theorem integral_branchings_le [MeasurableSingletonClass (Multiset (Finset V))]
+    {r : V → V → ℝ} {c D T b : ℝ} {n : ℕ} {A : Finset V}
+    (hr : ∀ i j, 0 ≤ r i j) (hD : ∀ i, ∑ j, r i j ≤ D) (hD0 : 0 ≤ D) (hc : 0 ≤ c) (hT : 0 ≤ T)
+    {μ : ℝ → Measure (Multiset (Finset V))} (hμ0 : μ 0 = Measure.dirac (Multiset.replicate n A))
+    (hint : ∀ t ∈ Set.Icc 0 T, Integrable supportSize (μ t))
+    (hintL : ∀ t ∈ Set.Icc 0 T, Integrable (supportGenerator r c supportSize) (μ t))
+    (hintR : ∀ t ∈ Set.Icc 0 T, Integrable (decisionRate r) (μ t))
+    (hcont : ContinuousOn (fun t ↦ ∫ s, supportSize s ∂μ t) (Set.Icc 0 T))
+    (hdynkin : ∀ t ∈ Set.Ico 0 T, HasDerivWithinAt (fun t ↦ ∫ s, supportSize s ∂μ t)
+      (∫ s, supportGenerator r c supportSize s ∂μ t) (Set.Ici t) t)
+    (hrate : IntervalIntegrable (fun t ↦ ∫ s, decisionRate r s ∂μ t) volume 0 T)
+    (hcomp : b = ∫ t in (0 : ℝ)..T, ∫ s, decisionRate r s ∂μ t) :
+    b ≤ n * A.card / 3 * (Real.exp (3 * D * T) - 1) := by
+  have hstep : ∫ t in (0 : ℝ)..T, ∫ s, decisionRate r s ∂μ t ≤
+      ∫ t in (0 : ℝ)..T, D * ∫ s, supportSize s ∂μ t :=
+    intervalIntegral.integral_mono_on hT hrate ((hcont.intervalIntegrable_of_Icc hT).const_mul D)
+      fun t ht ↦ by
+        rw [← integral_const_mul]
+        exact integral_mono (hintR t ht) ((hint t ht).const_mul _) fun s ↦ decisionRate_le hD s
+  refine le_div_three_mul_exp_sub_one hD0 hT hcont
+    (integral_supportSize_le hr hD hc hμ0 hint hintL hcont hdynkin) ?_
+  rw [hcomp, ← intervalIntegral.integral_const_mul]
+  exact hstep
+
+/-- **Theorem 8, the expected light-cone count `E Z^{(a)}_t ≤ n |A| e^{D (1 + 2a) t}`** on
+`[0, T]`, for `a ≥ 1`.
+
+Assumes: the conditions of `integral_le_mul_exp_of_supportGenerator_le` for `F = Z^{(a)}`. -/
+theorem integral_lightWeight_le [MeasurableSingletonClass (Multiset (Finset V))]
+    {r : V → V → ℝ} {c D T a : ℝ} {n ℓ : ℕ} {A : Finset V}
+    (hr : ∀ i j, 0 ≤ r i j) (hD : ∀ i, ∑ j, r i j ≤ D) (hc : 0 ≤ c) (ha : 1 ≤ a)
+    {μ : ℝ → Measure (Multiset (Finset V))} (hμ0 : μ 0 = Measure.dirac (Multiset.replicate n A))
+    (hint : ∀ t ∈ Set.Icc 0 T, Integrable (weightedCount (lightWeight r A ℓ a)) (μ t))
+    (hintL : ∀ t ∈ Set.Icc 0 T,
+      Integrable (supportGenerator r c (weightedCount (lightWeight r A ℓ a))) (μ t))
+    (hcont : ContinuousOn (fun t ↦ ∫ s, weightedCount (lightWeight r A ℓ a) s ∂μ t)
+      (Set.Icc 0 T))
+    (hdynkin : ∀ t ∈ Set.Ico 0 T,
+      HasDerivWithinAt (fun t ↦ ∫ s, weightedCount (lightWeight r A ℓ a) s ∂μ t)
+        (∫ s, supportGenerator r c (weightedCount (lightWeight r A ℓ a)) s ∂μ t) (Set.Ici t) t) :
+    ∀ t ∈ Set.Icc 0 T, ∫ s, weightedCount (lightWeight r A ℓ a) s ∂μ t ≤
+      n * A.card * Real.exp (D * (1 + 2 * a) * t) :=
+  integral_le_mul_exp_of_supportGenerator_le (supportGenerator_lightWeight_le hr hD hc ha) hμ0
+    (weightedCount_replicate_lightWeight r A ℓ a n).le hint hintL hcont hdynkin
+
+/-- **Markov's inequality for escape.** For a law `ν` of the circuit and `a ≥ 1`, the escape
+probability is at most `min {1, C / a^ℓ}` whenever `E_ν Z^{(a)} ≤ C`. -/
+theorem measureReal_escapeSet_le {r : V → V → ℝ} {A : Finset V} {ℓ : ℕ} {a C : ℝ} (ha : 1 ≤ a)
+    (ν : Measure (Multiset (Finset V))) [IsProbabilityMeasure ν]
+    (hint : Integrable (weightedCount (lightWeight r A ℓ a)) ν)
+    (hmean : ∫ s, weightedCount (lightWeight r A ℓ a) s ∂ν ≤ C) :
+    ν.real (escapeSet r A ℓ) ≤ min 1 (C / a ^ ℓ) := by
+  have hpos : 0 < a ^ ℓ := pow_pos (by linarith) ℓ
+  have hmarkov := mul_meas_ge_le_integral_of_nonneg
+    (ae_of_all _ fun s ↦ weightedCount_nonneg (lightWeight_nonneg (by linarith)) s) hint (a ^ ℓ)
+  have hsub : ν.real (escapeSet r A ℓ) ≤
+      ν.real {s | a ^ ℓ ≤ weightedCount (lightWeight r A ℓ a) s} :=
+    measureReal_mono fun s hs ↦ pow_le_weightedCount_of_mem_escapeSet (by linarith) hs
+  refine le_min measureReal_le_one ?_
+  rw [le_div_iff₀ hpos]
+  nlinarith
+
+/-- **Theorem 8, (9.1): `Pr(E_{ℓ,T}) ≤ min {1, n |A| e^{D (1 + 2a) T} / a^ℓ}`** for `a ≥ 1`.
+
+Assumes: the conditions of `integral_lightWeight_le`, with every `μ t` a probability law. -/
+theorem measureReal_escapeSet_le_exp [MeasurableSingletonClass (Multiset (Finset V))]
+    {r : V → V → ℝ} {c D T a : ℝ} {n ℓ : ℕ} {A : Finset V}
+    (hr : ∀ i j, 0 ≤ r i j) (hD : ∀ i, ∑ j, r i j ≤ D) (hc : 0 ≤ c) (ha : 1 ≤ a) (hT : 0 ≤ T)
+    {μ : ℝ → Measure (Multiset (Finset V))} [∀ t, IsProbabilityMeasure (μ t)]
+    (hμ0 : μ 0 = Measure.dirac (Multiset.replicate n A))
+    (hint : ∀ t ∈ Set.Icc 0 T, Integrable (weightedCount (lightWeight r A ℓ a)) (μ t))
+    (hintL : ∀ t ∈ Set.Icc 0 T,
+      Integrable (supportGenerator r c (weightedCount (lightWeight r A ℓ a))) (μ t))
+    (hcont : ContinuousOn (fun t ↦ ∫ s, weightedCount (lightWeight r A ℓ a) s ∂μ t)
+      (Set.Icc 0 T))
+    (hdynkin : ∀ t ∈ Set.Ico 0 T,
+      HasDerivWithinAt (fun t ↦ ∫ s, weightedCount (lightWeight r A ℓ a) s ∂μ t)
+        (∫ s, supportGenerator r c (weightedCount (lightWeight r A ℓ a)) s ∂μ t) (Set.Ici t) t) :
+    (μ T).real (escapeSet r A ℓ) ≤
+      min 1 (n * A.card * Real.exp (D * (1 + 2 * a) * T) / a ^ ℓ) :=
+  measureReal_escapeSet_le ha (μ T) (hint T ⟨hT, le_rfl⟩)
+    (integral_lightWeight_le hr hD hc ha hμ0 hint hintL hcont hdynkin T ⟨hT, le_rfl⟩)
+
+end Marginals
+
+/-! ### The radius choice (9.2) and the case `D T = 0` -/
+
+/-- **The choice `a = ℓ / (2 D T)` in (9.1) gives (9.2)**:
+`N e^{D (1 + 2a) T} / a^ℓ = N e^{D T} (2 e D T / ℓ)^ℓ`. -/
+theorem exp_div_pow_eq_of_radius {D T N : ℝ} {ℓ : ℕ} (hDT : D * T ≠ 0) :
+    N * Real.exp (D * (1 + 2 * (ℓ / (2 * D * T))) * T) / (ℓ / (2 * D * T)) ^ ℓ =
+      N * Real.exp (D * T) * (2 * Real.exp 1 * D * T / ℓ) ^ ℓ := by
+  have hne : 2 * D * T ≠ 0 :=
+    mul_ne_zero (mul_ne_zero two_ne_zero (left_ne_zero_of_mul hDT)) (right_ne_zero_of_mul hDT)
+  have hexp : D * (1 + 2 * (ℓ / (2 * D * T))) * T = D * T + ℓ := by
+    linear_combination div_mul_cancel₀ (ℓ : ℝ) hne
+  have hpow : Real.exp ℓ = Real.exp 1 ^ ℓ := by rw [← Real.exp_nat_mul, mul_one]
+  have hbase : 2 * Real.exp 1 * D * T / ℓ = Real.exp 1 / (ℓ / (2 * D * T)) := by
+    rw [div_div_eq_mul_div]
+    ring
+  rw [hexp, Real.exp_add, hpow, hbase, div_pow (Real.exp 1)]
+  ring
+
+/-- A number bounded by `N / a^ℓ` for every `a > 1`, with `ℓ ≥ 1`, is not positive. -/
+theorem eq_zero_of_forall_le_div_pow {x N : ℝ} {ℓ : ℕ} (hℓ : 1 ≤ ℓ) (hx : 0 ≤ x)
+    (h : ∀ a : ℝ, 1 < a → x ≤ N / a ^ ℓ) : x = 0 := by
+  by_contra hne
+  have hxpos : 0 < x := lt_of_le_of_ne hx (Ne.symm hne)
+  have hN : 0 ≤ N := by
+    by_contra hN
+    have hneg : N / 2 ^ ℓ < 0 := div_neg_of_neg_of_pos (not_le.mp hN) (by positivity)
+    linarith [h 2 one_lt_two]
+  have ha : 1 < N / x + 2 := by linarith [div_nonneg hN hx]
+  have hpow : N / x + 2 ≤ (N / x + 2) ^ ℓ := le_self_pow₀ ha.le (by omega)
+  have hle : N / (N / x + 2) ^ ℓ ≤ N / (N / x + 2) :=
+    div_le_div_of_nonneg_left hN (by linarith) hpow
+  have hlt : N / (N / x + 2) < x := by
+    rw [div_lt_iff₀ (by linarith)]
+    nlinarith [div_mul_cancel₀ N hxpos.ne']
+  linarith [h _ ha]
+
+/-- **When `D T = 0` the escape probability is zero.** A probability obeying the bound (9.1) for
+every `a > 1` vanishes at every radius `ℓ ≥ 1`. -/
+theorem eq_zero_of_forall_escape_bound {x N D T : ℝ} {ℓ : ℕ} (hDT : D * T = 0) (hℓ : 1 ≤ ℓ)
+    (hx : 0 ≤ x) (h : ∀ a : ℝ, 1 < a → x ≤ min 1 (N * Real.exp (D * (1 + 2 * a) * T) / a ^ ℓ)) :
+    x = 0 :=
+  eq_zero_of_forall_le_div_pow hℓ hx fun a ha ↦ by
+    have hzero : D * (1 + 2 * a) * T = 0 := by linear_combination (1 + 2 * a) * hDT
+    have hb := (h a ha).trans (min_le_right _ _)
+    rwa [hzero, Real.exp_zero, mul_one] at hb
+
 end
 
 end Descent.Pangenome.AncestralLocality
