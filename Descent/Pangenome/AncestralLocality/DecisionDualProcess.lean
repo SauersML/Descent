@@ -72,7 +72,16 @@ convergence carries its integrated form to the limit (`decisionDual_sub_eq_integ
 through the backward generator of `SamplingDuality` (`decisionDual_holdingGenerator_add`), this is
 the moment equation of Theorem 6, `D_t f - H_f(p) = ∫_0^t (c ∑_{a<b} (D_s(C_ab f) - D_s f) +
 ∑_e r_e ∑_a (D_s(B_{a,e} f) - D_s f)) ds` for `t ≥ 0` (`decisionDual_moment_equation`), with its
-derivative form for `t > 0` (`hasDerivAt_decisionDual_moment_equation`).
+derivative form for `t > 0` (`hasDerivAt_decisionDual_moment_equation`) and as a right derivative
+within `[t, ∞)` at every `t ≥ 0` (`hasDerivWithinAt_decisionDual_moment_equation`), the dual
+expectation being continuous on `[0, ∞)` (`continuousOn_decisionDual_Ici`).
+
+`decisionDualMap c r T p t k` reads the dual expectation through the indicators of the tuples, so
+it is a linear functional on the observations of arity `k` at every time: a moment family in the
+sense of `DecisionDualMoments`. At `t ≥ 0` it is the dual expectation (`decisionDualMap_apply`),
+bounded by the sup norm (`abs_decisionDualMap_le`). It starts at the sampling functional
+(`decisionDualMap_zero_time`) and obeys the moment equation, with the backward generator read
+through the family itself, as a right derivative (`hasDerivWithinAt_decisionDualMap`).
 
 Scope. The state space and the event set are finite, `c ≥ 0`, `r ≥ 0`, and the bounds hold at a
 probability vector `p`. No path space is constructed: the circuit is represented by its expansion
