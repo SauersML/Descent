@@ -166,7 +166,8 @@ def resamplingRates : NeutralRates Unit Unit (fun _ ↦ G) where
 /-- **The window semigroup**: the neutral Feller semigroup of the resampling rates on the simplex
 of the genome types `G`. -/
 def windowSemigroup (hap₀ : FullHaplotype Unit (fun _ ↦ G)) :
-    InfiniteGenomeLimit.FellerSemigroup (FrequencyState Unit Unit (fun _ ↦ G)) :=
+    Descent.Pangenome.AncestralLocality.InfiniteGenomeLimit.FellerSemigroup
+      (FrequencyState Unit Unit (fun _ ↦ G)) :=
   NeutralFellerProperty.neutralFellerSemigroup (resamplingRates G) () hap₀
 
 /-- The frequency vector of a window state over the genome types. -/
@@ -174,6 +175,7 @@ def windowFrequency (y : FrequencyState Unit Unit (fun _ ↦ G)) :
     FullHaplotype Unit (fun _ ↦ G) → ℝ :=
   fun h ↦ y.1 ((), h)
 
+omit [DecidableEq G] in
 /-- The window frequencies of a state have total mass one. -/
 theorem sum_windowFrequency (y : FrequencyState Unit Unit (fun _ ↦ G)) :
     ∑ h, windowFrequency G y h = 1 :=
@@ -184,6 +186,7 @@ def windowSamplingPolynomial {n : ℕ} (f : (Fin n → FullHaplotype Unit (fun _
     FrequencyPolynomial Unit Unit (fun _ ↦ G) :=
   ∑ w, C (f w) * ∏ a, X ((), w a)
 
+omit [DecidableEq G] in
 /-- The sampling polynomial, read at the frequencies `p`, is the sampling observable. -/
 theorem eval_lift_windowSamplingPolynomial {n : ℕ}
     (f : (Fin n → FullHaplotype Unit (fun _ ↦ G)) → ℝ) (p : FullHaplotype Unit (fun _ ↦ G) → ℝ) :
@@ -209,17 +212,18 @@ theorem lineDeriv_windowEval (q : FrequencyPolynomial Unit Unit (fun _ ↦ G))
     lineDeriv ℝ (fun p' : FullHaplotype Unit (fun _ ↦ G) → ℝ ↦
         eval (fun v : FrequencyVariable Unit Unit (fun _ ↦ G) ↦ p' v.2) q) p (Pi.single y 1)
       = eval (fun v : FrequencyVariable Unit Unit (fun _ ↦ G) ↦ p v.2) (pderiv ((), y) q) := by
-  have hline : (fun t : ℝ ↦
-        eval (fun v : FrequencyVariable Unit Unit (fun _ ↦ G) ↦ (p + t • Pi.single y 1) v.2) q)
+  have hline : (fun t : ℝ ↦ eval (fun v : FrequencyVariable Unit Unit (fun _ ↦ G) ↦
+        (p + t • (Pi.single y (1 : ℝ) : FullHaplotype Unit (fun _ ↦ G) → ℝ)) v.2) q)
       = fun t : ℝ ↦ eval ((fun v : FrequencyVariable Unit Unit (fun _ ↦ G) ↦ p v.2)
-          + t • Pi.single ((), y) 1) q := by
+          + t • (Pi.single ((), y) (1 : ℝ) : FrequencyVariable Unit Unit (fun _ ↦ G) → ℝ)) q := by
     funext t
     congr 1
     funext v
     rcases v with ⟨⟨⟩, h⟩
     simp [Pi.single_apply]
   have h := AncestralSamplingLimit.hasDerivAt_eval_line
-    (fun v : FrequencyVariable Unit Unit (fun _ ↦ G) ↦ p v.2) (Pi.single ((), y) 1) q
+    (fun v : FrequencyVariable Unit Unit (fun _ ↦ G) ↦ p v.2)
+    (Pi.single ((), y) (1 : ℝ) : FrequencyVariable Unit Unit (fun _ ↦ G) → ℝ) q
   rw [← hline] at h
   rw [lineDeriv, h.deriv]
   simp [Pi.single_apply]
@@ -265,11 +269,12 @@ theorem resamplingGenerator_windowEval (q : FrequencyPolynomial Unit Unit (fun _
     · rw [hxy]
       ring
     · ring
+  have hcoalescence : ∀ i : Unit, (resamplingRates G).coalescence i = 1 := fun _ ↦ rfl
   rw [resamplingGenerator]
   simp only [secondPartial_windowEval, hterm, Finset.sum_sub_distrib, Finset.sum_ite_eq,
-    Finset.mem_univ, if_true, neutralGenerator, hdrift, zero_mul, Finset.sum_const_zero, zero_add,
-    Finset.univ_unique, Finset.sum_singleton, demeSecondOrder, map_add, map_sub, map_sum, map_mul,
-    eval_C, eval_X, resamplingRates]
+    Finset.mem_univ, if_true, neutralGenerator, hdrift, map_zero, zero_mul, Finset.sum_const_zero,
+    zero_add, Finset.univ_unique, PUnit.default_eq_unit, Finset.sum_singleton, demeSecondOrder,
+    map_add, map_sub, map_sum, map_mul, eval_C, eval_X, hcoalescence]
 
 /-- **On sampling observables the window semigroup is the coalescent dual.**  For every
 observation `f` of arity `n`, `T_t H_f (y) = H_{S_t f}(p(y))`, with `S_t = e^{t L_c}` the dual
