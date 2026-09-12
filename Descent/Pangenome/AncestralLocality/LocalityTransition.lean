@@ -129,7 +129,9 @@ theorem graphExpect_indicator_subset {m : ℕ} (p : ℝ) {S : Finset (Sym2 (Fin 
       rw [if_neg fun heS ↦ (mem_sdiff.mp he).2 (h heS)]
     · rw [if_neg h, mul_zero]
       obtain ⟨e, heS, heE⟩ := not_subset.mp h
-      rw [prod_eq_zero (mem_sdiff.mpr ⟨hS heS, heE⟩) (if_pos heS), mul_zero]
+      have hzero : ∏ e ∈ potentialEdges m \ E, (if e ∈ S then (0 : ℝ) else 1 - p) = 0 :=
+        Finset.prod_eq_zero (mem_sdiff.mpr ⟨hS heS, heE⟩) (if_pos heS)
+      rw [hzero, mul_zero]
   calc graphExpect m p (fun E ↦ if S ⊆ E then 1 else 0)
       = ∑ E ∈ (potentialEdges m).powerset,
           (∏ _e ∈ E, p) * ∏ e ∈ potentialEdges m \ E, (if e ∈ S then 0 else 1 - p) :=
