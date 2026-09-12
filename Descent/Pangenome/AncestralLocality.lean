@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Pangenome.AncestralLocality.CylinderSamplingAlgebra
 import Descent.Pangenome.AncestralLocality.CompatibilityNeutrality
 import Descent.Pangenome.AncestralLocality.InfiniteGenomeLimit
+import Descent.Pangenome.AncestralLocality.JointNonautonomy
 import Descent.Pangenome.AncestralLocality.LocalityBounds
 import Descent.Pangenome.AncestralLocality.LocalityTransition
 import Descent.Pangenome.AncestralLocality.SupercriticalReach
@@ -46,6 +47,10 @@ on the bytes on main.
    marginal laws satisfying the Dynkin formula these give (8.2), (8.3) and the escape bound
    (9.1), with the radius identity behind (9.2); outcomes equal off an event are within its
    probability in total variation.
+
+5. `JointNonautonomy` -- §3.2: two observations can each be autonomous while their joint
+   observation is not. Under the witness rule of §5.2 the features `a` and `b` each have the
+   neutral observed kernel of Theorem 3, and their joint observation `(a, b)` has no kernel.
 
 This file contains no declarations.
 -/
