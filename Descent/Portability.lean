@@ -5,7 +5,6 @@ import Descent.Portability.PartialHaplotypeHistoryRealization
 import Descent.Portability.NeutralBernsteinPositivity
 import Descent.Portability.PartialHaplotypeRealizedPanel
 import Descent.Portability.NeutralPolynomialPositivity
-import Descent.Portability.NeutralPolynomialSemigroup
 import Descent.Portability.PartialHaplotypeMicroscopicApproximation
 import Descent.Portability.NeutralMomentSemigroup
 import Descent.Portability.OrderedSampleCohortLaw
