@@ -17,6 +17,7 @@ open Descent.Pangenome.GraphCoalescent.ConnectionLawIdentifiability
 #print axioms connectivityCumulant_eq_of_connectedProb_eq
 #print axioms connectedProb_eq_of_connectivityCumulant_eq
 #print axioms laplace_eq_iff_connectivityCumulant_eq
+#print axioms measurable_stoppingLevel_clock
 #print axioms measurable_connectionTime
 #print axioms map_connectionTime_apply
 #print axioms map_connectionTime_eq_iff_connectivityCumulant_eq

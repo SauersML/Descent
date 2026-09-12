@@ -333,14 +333,23 @@ theorem laplace_eq_iff_connectivityCumulant_eq {n : ℕ} (hn : 2 ≤ n) (s s' : 
     exact laplace_eq_of_stoppingProb_eq hn
       (stoppingProb_eq_of_connectedProb_eq hn (connectedProb_eq_of_connectivityCumulant_eq h)) hθ
 
+/-- A real functional of the path that sees the trajectory only through `B` is measurable. -/
+theorem measurable_stoppingLevel_clock {n : ℕ} (s : Fin n → Fin n) (F : ℕ → (ℕ → ℝ) → ℝ)
+    (hF : ∀ b, Measurable (F b)) :
+    Measurable fun p : List (ER n) × (ℕ → ℝ) ↦ F (stoppingLevel s p.1) p.2 := by
+  have hswap : Measurable fun q : (ℕ → ℝ) × List (ER n) ↦ F (stoppingLevel s q.2) q.1 :=
+    measurable_from_prod_countable_left fun l ↦ hF (stoppingLevel s l)
+  exact hswap.comp measurable_swap
+
 /-- The reported connection time is a measurable function of the path. -/
 theorem measurable_connectionTime {n : ℕ} (s : Fin n → Fin n) : Measurable (connectionTime s) := by
-  have hswap : Measurable fun q : (ℕ → ℝ) × List (ER n) ↦
-      ∑ j ∈ Ico (stoppingLevel s q.2 - 1) (n - 1), q.1 j :=
-    measurable_from_prod_countable_left fun l ↦
-      show Measurable fun x : ℕ → ℝ ↦ ∑ j ∈ Ico (stoppingLevel s l - 1) (n - 1), x j from
-        Finset.measurable_sum _ fun j _ ↦ measurable_pi_apply j
-  exact hswap.comp measurable_swap
+  have hfun : connectionTime s
+      = fun p : List (ER n) × (ℕ → ℝ) ↦
+          (fun (b : ℕ) (ω : ℕ → ℝ) ↦ ∑ j ∈ Ico (b - 1) (n - 1), ω j) (stoppingLevel s p.1) p.2 :=
+    funext fun _ ↦ rfl
+  rw [hfun]
+  exact measurable_stoppingLevel_clock s (fun (b : ℕ) (ω : ℕ → ℝ) ↦ ∑ j ∈ Ico (b - 1) (n - 1), ω j)
+    fun b ↦ Finset.measurable_sum _ fun j _ ↦ measurable_pi_apply j
 
 /-- **The law of `τ_q` is the mixture over `B` of the Kingman ladder laws**: a measurable set of
 times has probability `∑_b p_b P(∑_{k=b+1}^{n} H_k ∈ A)`. -/
