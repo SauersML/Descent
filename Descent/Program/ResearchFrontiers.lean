@@ -21,6 +21,7 @@ import Descent.Pangenome.GraphCoalescent.FiberSizeIdentifiability
 import Descent.Pangenome.GraphCoalescent.FiberSizeSymmetricRecovery
 import Descent.Pangenome.GraphCoalescent.ConnectionLawIdentifiability
 import Descent.Pangenome.GraphCoalescent.HiddenClockCorrection
+import Descent.Pangenome.GraphCoalescent.FiberSizeMultisetRecovery
 import Descent.Pangenome.AncestralLocality.SelectionLightCone
 
 namespace Descent.Program
@@ -96,7 +97,9 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   law of the reported connection time carries exactly the information of the cumulant, each
   determining the other
   (`ConnectionLawIdentifiability.map_connectionTime_eq_iff_connectivityCumulant_eq`,
-  `survivalAt_eq_iff_connectivityCumulant_eq`).
+  `survivalAt_eq_iff_connectivityCumulant_eq`). Composed, for interfaces of width at most three the
+  law of the reported connection time determines the multiset of fiber sizes itself
+  (`FiberSizeMultisetRecovery.fiberSizes_graphKer_eq_of_map_connectionTime_eq`).
 * Correcting the apparent coalescence clock: `HiddenClockCorrection`. The panel's time to common
   ancestry is the connection time plus a residual time on every path
   (`panelTime_eq_connectionTime_add_residualTime`); the hidden load at connection satisfies
