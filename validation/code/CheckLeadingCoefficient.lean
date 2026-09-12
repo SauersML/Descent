@@ -41,6 +41,14 @@ open Descent.Pangenome.GraphCoalescent
 #print axioms coeff_deficitCumulant_top
 #print axioms coeff_cumulantOfSizes
 #print axioms coeff_connectivityCumulant_top
+#print axioms historyWeight_zero
+#print axioms historyWeight_succ
+#print axioms historyFactor_succ
+#print axioms historyFactor_eq
+#print axioms historyWeight_eq_coeff
+#print axioms historyWeight_eq_coeff_cumulantOfSizes
+#print axioms historyWeight_eq_prod_historyFactor
+#print axioms leadingCoefficient_le_of_isBalancedFibers
 
 theorem factorial_four : Nat.factorial 4 = 24 := rfl
 theorem factorial_six : Nat.factorial 6 = 720 := rfl

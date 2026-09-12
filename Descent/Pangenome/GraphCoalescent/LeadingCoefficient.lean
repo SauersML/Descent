@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Pangenome.GraphCoalescent.BalancedFiberExtremum
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulant
 import Mathlib.Algebra.Polynomial.Derivative
 import Mathlib.Algebra.Polynomial.Reverse
@@ -52,9 +53,17 @@ so that `C_c(z) = z^n K_c(1/z)` (`map_cumulantOfSizes`) and (E1) is the coeffici
    `sum_pairs_leadingCoefficient` shows that (E1) solves the recursion from `L_1 = 1`
    (`coeff_deficitCumulant_top`).
 
+The history sum. `historyWeight` is the note's `H_w(c)`, defined by its merger recursion
+(`historyWeight_succ`), and `historyFactor` is `g_w(n)` (`historyFactor_succ`).
+`historyWeight_eq_coeff_cumulantOfSizes` is
+`H_w(c) = ((w − 1)! / 2^{w − 1}) [z^{n − w + 1}] C_c(z)`, `historyFactor_eq` is the closed form
+of `g_w`, and `historyWeight_eq_prod_historyFactor` is `H_w(c) = (∏_i c_i) g_w(n)`.
+`leadingCoefficient_le_of_isBalancedFibers` is the extremal statement of §7: balanced fiber
+sizes give the largest leading coefficient.
+
 Scope. Not formalized here: the short-time law (E2), `Pr(τ_q ≤ t) = H_w(c) t^{w-1}/(w-1)! +
-O(t^w)`, which needs the stopping law (D4)-(D5); the history sum `H_w(c)` of the note is not
-defined, only the recursion it obeys. The table rows `(1,2)`, `(1,3)`, `(2,2)` and `(2,2,2)` are
+O(t^w)`, which needs the stopping law (D4)-(D5).
+The table rows `(1,2)`, `(1,3)`, `(2,2)` and `(2,2,2)` are
 checked against (E1) in `validation/code/CheckLeadingCoefficient.lean`.
 
 ## Empirical status
@@ -688,6 +697,131 @@ theorem coeff_connectivityCumulant_top {α : Type*} [DecidableEq α] {s : Finset
   rw [connectivityCumulant_eq_cumulantOfSizes, ← q.sum_card_parts]
   exact coeff_cumulantOfSizes q.parts (fun t ↦ #t) hq fun t ht ↦
     card_pos.mpr (q.nonempty_of_mem_parts ht)
+
+/-! ## The history sum and its factor -/
+
+/-- **NOTE §7, the history sum `H_w(c)`.** The sum over minimal connecting histories of the
+products of visible merger rates. A history with no merger left has weight one; a visible merger
+of fibers `i ≠ j` has rate `c_i c_j` and fuses them into one fiber of size `c_i + c_j − 1`, so
+`H_w(c) = ∑_{i < j} c_i c_j H_{w − 1}(c^{(ij)})`. The sum runs over ordered pairs with the factor
+`1 / 2`, and the first argument counts the mergers left. -/
+def historyWeight : ℕ → Finset ι → (ι → ℕ) → ℚ
+  | 0, _, _ => 1
+  | w + 1, T, c => 1 / 2 * ∑ i ∈ T, ∑ j ∈ T.erase i,
+      (c i : ℚ) * (c j : ℚ) * historyWeight w (T.erase j) (Function.update c i (c i + c j - 1))
+
+/-- **NOTE §7, the factor `g_w(n)`.** `g_2(n) = 1` and
+`g_w(n) = (w − 1)(n − w / 2) g_{w − 1}(n − 1)` for `w ≥ 3`; the values at `w < 2` are not used. -/
+def historyFactor : ℕ → ℕ → ℚ
+  | 0, _ => 1
+  | 1, _ => 1
+  | 2, _ => 1
+  | w + 3, n => ((w : ℚ) + 2) * ((n : ℚ) - ((w : ℚ) + 3) / 2) * historyFactor (w + 2) (n - 1)
+
+/-- A history with no merger left has weight one. -/
+theorem historyWeight_zero (T : Finset ι) (c : ι → ℕ) : historyWeight 0 T c = 1 := rfl
+
+/-- **The history recursion.** `H(c) = (1 / 2) ∑_{i ≠ j} c_i c_j H(c^{(ij)})`. -/
+theorem historyWeight_succ (w : ℕ) (T : Finset ι) (c : ι → ℕ) :
+    historyWeight (w + 1) T c = 1 / 2 * ∑ i ∈ T, ∑ j ∈ T.erase i,
+      (c i : ℚ) * (c j : ℚ) * historyWeight w (T.erase j) (Function.update c i (c i + c j - 1)) :=
+  rfl
+
+/-- **The factor recursion.** `g_w(n) = (w − 1)(n − w / 2) g_{w − 1}(n − 1)` for `w ≥ 3`. -/
+theorem historyFactor_succ {w : ℕ} (hw : 3 ≤ w) (n : ℕ) :
+    historyFactor w n =
+      ((w : ℚ) - 1) * ((n : ℚ) - (w : ℚ) / 2) * historyFactor (w - 1) (n - 1) := by
+  obtain ⟨k, rfl⟩ : ∃ k, w = k + 3 := ⟨w - 3, by omega⟩
+  rw [show k + 3 - 1 = k + 2 by omega]
+  simp only [historyFactor]
+  push_cast
+  ring
+
+/-- **NOTE §7, the closed form of `g_w`.**
+`g_w(n) = ((w − 1)! / 2^{w − 2}) (2n − w)! / (2n − 2w + 2)!` for `2 ≤ w ≤ n`. -/
+theorem historyFactor_eq : ∀ (w n : ℕ), 2 ≤ w → w ≤ n →
+    historyFactor w n = ((w - 1).factorial : ℚ) / 2 ^ (w - 2) *
+      (((2 * n - w).factorial : ℚ) / ((2 * n - 2 * w + 2).factorial : ℚ))
+  | 0, _, hw, _ => absurd hw (by norm_num)
+  | 1, _, hw, _ => absurd hw (by norm_num)
+  | 2, n, _, hn => by
+      rw [show 2 * n - 2 * 2 + 2 = 2 * n - 2 by omega, div_self (by positivity)]
+      simp [historyFactor]
+  | w + 3, n, _, hn => by
+      simp only [historyFactor]
+      rw [historyFactor_eq (w + 2) (n - 1) (by omega) (by omega),
+        show 2 * (n - 1) - (w + 2) = 2 * n - (w + 3) - 1 by omega,
+        show 2 * (n - 1) - 2 * (w + 2) + 2 = 2 * n - 2 * (w + 3) + 2 by omega,
+        show w + 3 - 1 = w + 1 + 1 by omega, show w + 3 - 2 = w + 1 by omega,
+        show w + 2 - 1 = w + 1 by omega, show w + 2 - 2 = w by omega,
+        ← Nat.mul_factorial_pred (show 2 * n - (w + 3) ≠ 0 by omega), Nat.factorial_succ (w + 1)]
+      push_cast [Nat.cast_sub (show w + 3 ≤ 2 * n by omega)]
+      ring
+
+/-- **The history sum is the top coefficient, rescaled.** On `w + 1` fibers of positive size,
+`H(c) = (w! / 2^w) [u^w] K_c`, by induction through `coeff_deficitCumulant_recursion`. -/
+theorem historyWeight_eq_coeff : ∀ (w : ℕ) (T : Finset ι) (c : ι → ℕ), #T = w + 1 →
+    (∀ i ∈ T, 1 ≤ c i) →
+      historyWeight w T c = (w.factorial : ℚ) / 2 ^ w * (deficitCumulant T c).coeff (#T - 1)
+  | 0, T, c, hT, hc => by
+      rw [show #T - 1 = 0 by omega,
+        coeff_zero_deficitCumulant T c (card_pos.mp (by omega)) hc, if_pos (show #T = 1 by omega)]
+      simp [historyWeight]
+  | w + 1, T, c, hT, hc => by
+      have htwo : 2 ≤ #T := by omega
+      have hrecursion := coeff_deficitCumulant_recursion T c hc htwo
+      have hsum : ∑ i ∈ T, ∑ j ∈ T.erase i, (c i : ℚ) * (c j : ℚ) *
+          historyWeight w (T.erase j) (Function.update c i (c i + c j - 1)) =
+            (w.factorial : ℚ) / 2 ^ w * ∑ i ∈ T, ∑ j ∈ T.erase i, (c i : ℚ) * (c j : ℚ) *
+              (deficitCumulant (T.erase j)
+                (Function.update c i (c i + c j - 1))).coeff (#T - 2) := by
+        rw [mul_sum]
+        refine sum_congr rfl fun i hi ↦ ?_
+        rw [mul_sum]
+        refine sum_congr rfl fun j hj ↦ ?_
+        have hjT : j ∈ T := mem_of_mem_erase hj
+        have hcard : #(T.erase j) = w + 1 := by
+          rw [card_erase_of_mem hjT]
+          omega
+        rw [historyWeight_eq_coeff w (T.erase j) _ hcard (update_fuse_pos hc hi hjT),
+          show #(T.erase j) - 1 = #T - 2 by rw [hcard]; omega]
+        ring
+      rw [historyWeight_succ, hsum, ← hrecursion, hT]
+      push_cast [Nat.factorial_succ, pow_succ]
+      ring
+
+/-- **NOTE §7.** `H_w(c) = ((w − 1)! / 2^{w − 1}) [z^{n − w + 1}] C_c(z)` for `w ≥ 2` fibers of
+positive size. -/
+theorem historyWeight_eq_coeff_cumulantOfSizes (T : Finset ι) (c : ι → ℕ) (hT : 2 ≤ #T)
+    (hc : ∀ i ∈ T, 1 ≤ c i) :
+    historyWeight (#T - 1) T c = ((#T - 1).factorial : ℚ) / 2 ^ (#T - 1) *
+      ((cumulantOfSizes T c).coeff (∑ i ∈ T, c i - #T + 1) : ℚ) := by
+  rw [coeff_cumulantOfSizes T c hT hc, historyWeight_eq_coeff (#T - 1) T c (by omega) hc,
+    coeff_deficitCumulant_top (#T - 1) T c (by omega) hc]
+
+/-- **NOTE §7.** `H_w(c) = (∏_i c_i) g_w(n)` for `w ≥ 2` fibers of positive size. -/
+theorem historyWeight_eq_prod_historyFactor (T : Finset ι) (c : ι → ℕ) (hT : 2 ≤ #T)
+    (hc : ∀ i ∈ T, 1 ≤ c i) :
+    historyWeight (#T - 1) T c = (∏ i ∈ T, (c i : ℚ)) * historyFactor #T (∑ i ∈ T, c i) := by
+  rw [historyWeight_eq_coeff (#T - 1) T c (by omega) hc,
+    coeff_deficitCumulant_top (#T - 1) T c (by omega) hc,
+    historyFactor_eq #T _ hT (card_le_sum_sizes hc)]
+  unfold leadingCoefficient
+  rw [show #T - 1 = #T - 2 + 1 by omega, pow_succ]
+  ring
+
+/-- **NOTE §7, the extremal statement.** At a fixed total size and a fixed number of fibers,
+balanced fiber sizes give the largest leading coefficient: the factorial factor is fixed and the
+product of the sizes is largest, by `BalancedFiberExtremum`. -/
+theorem leadingCoefficient_le_of_isBalancedFibers {κ : Type*} [Fintype κ] [DecidableEq κ]
+    (c m : κ → ℕ) (k0 : κ) (hc : ∀ k, 1 ≤ c k) (hm : ∀ k, 1 ≤ m k) (hbal : IsBalancedFibers m)
+    (hsum : ∑ k, c k = ∑ k, m k) :
+    leadingCoefficient (Finset.univ : Finset κ) c ≤ leadingCoefficient Finset.univ m := by
+  have hprod : (∏ k, (c k : ℚ)) ≤ ∏ k, (m k : ℚ) := by
+    exact_mod_cast prod_le_prod_of_isBalancedFibers c m k0 hc hm hbal hsum
+  unfold leadingCoefficient
+  rw [hsum]
+  gcongr
 
 end
 
