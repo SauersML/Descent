@@ -252,10 +252,10 @@ theorem tendsto_graphProb_card_large_le {α ε ε'' : ℝ} (hα : 1 < α) (hε :
           not_not.mpr ⟨v, hv⟩
         simp only [if_neg hnA, mul_zero, add_zero]
         split_ifs with hbig
+        · exact div_nonneg (by linarith) hdm.le
         · rw [le_div_iff₀ hdm, one_mul]
           push_neg at hbig
           linarith
-        · exact div_nonneg (by linarith) hdm.le
       · rw [if_pos hAE, mul_one]
         have h1 : -(giantFraction α / (ε + ε₁)) ≤
             (((univ.filter fun w ↦ ε'' * m ≤ ((reach (edgeGraph E) {w}).card : ℝ)).card : ℝ) -
