@@ -624,15 +624,8 @@ def compositionRowBound {D : ℕ} (rates : ManyDemeLDRates D) : ℝ :=
 /-- Every row of every physical stage matrix has absolute sum at most `compositionRowBound`. -/
 theorem physicalGenerator_row_le {D : ℕ} (rates : ManyDemeLDRates D) (stage : PhysicalStage D)
     (row : AffineEnlargedCoordinate D) :
-    ∑ column, |physicalGenerator rates stage row column| ≤ compositionRowBound rates := by
-  have hrow : ∑ column, |physicalGenerator rates stage row column| ≤
-      ∑ other, ∑ column, |physicalGenerator rates stage other column| :=
-    Finset.single_le_sum (f := fun other ↦ ∑ column, |physicalGenerator rates stage other column|)
-      (fun other _ ↦ Finset.sum_nonneg fun column _ ↦ abs_nonneg _) (Finset.mem_univ row)
-  exact hrow.trans (Finset.single_le_sum
-    (f := fun other ↦ ∑ row, ∑ column, |physicalGenerator rates other row column|)
-    (fun other _ ↦ Finset.sum_nonneg fun row _ ↦ Finset.sum_nonneg fun column _ ↦ abs_nonneg _)
-    (Finset.mem_univ stage))
+    ∑ column, |physicalGenerator rates stage row column| ≤ compositionRowBound rates :=
+  stageRow_le_totalMass (physicalGenerator rates) stage row
 
 /-- The slack of one physical stage over all enlarged coordinates. -/
 def compositionStageSlack {D : ℕ} (rates : ManyDemeLDRates D) (stage : PhysicalStage D)
@@ -678,16 +671,9 @@ def compositionMicroscopicApproximation {D : ℕ} (rates : ManyDemeLDRates D) :
     (fun k row ↦ physicalGenerator_row_le rates ((stageOrder D).symm k) row)
     (fun k step ↦ compositionStageSlack rates ((stageOrder D).symm k) step)
     (fun k step ↦ Finset.sum_nonneg fun coordinate _ ↦ abs_nonneg _)
-    (fun k ↦ by
-      have hterms : Filter.Tendsto
-          (fun step ↦ ∑ coordinate : AffineEnlargedCoordinate D,
-            |physicalStageSlack rates coordinate ((stageOrder D).symm k) step|)
-          (nhds 0) (nhds (∑ _coordinate : AffineEnlargedCoordinate D, |(0 : ℝ)|)) :=
-        tendsto_finset_sum _ fun coordinate _ ↦
-          (continuous_abs.tendsto 0).comp
-            (physicalStageSlack_tendsto rates coordinate ((stageOrder D).symm k))
-      simp only [abs_zero, Finset.sum_const_zero] at hterms
-      exact hterms.mono_left nhdsWithin_le_nhds)
+    (fun k ↦ sum_abs_slack_tendsto
+      (fun coordinate step ↦ physicalStageSlack rates coordinate ((stageOrder D).symm k) step)
+      fun coordinate ↦ physicalStageSlack_tendsto rates coordinate ((stageOrder D).symm k))
     (fun k step hstep state coordinate ↦ by
       have hbase := physicalStageKernel_expansion rates ((stageOrder D).symm k) coordinate step
         hstep state

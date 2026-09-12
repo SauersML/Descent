@@ -30,7 +30,9 @@ branches are those atoms with those weights.  It is a genuine probability kernel
 space, and it moves every feature coordinate exactly as the original kernel does
 (`paddedKernel_apply_feature`).  It does not keep the original action on observables outside
 the feature family; the fields of `MicroscopicApproximation` read a kernel only through its
-action on the features.
+action on the features.  `paddedComposedApproximation` packages any composed step whose stage
+branch types change with the step size, given a matrix expansion for every stage, as such a
+padded approximation.
 
 The approximation.  `multinomialPhysicalKernel_expansion` is the per-stage estimate.  The
 resampling stages go through `MultinomialJetCertificate.apply_multinomialDriftStage_enlarged`,
@@ -123,6 +125,77 @@ theorem paddedKernel_apply_feature {ι B X : Type*} [Fintype ι] [Fintype B]
   rw [featureVector_apply] at hcoordinate
   exact hcoordinate
 
+/-! ## A padded composed approximation -/
+
+/-- The kernel of a padded composed approximation at step `step`: at a positive step the
+composition of the stages at that step, padded to `Fintype.card ι` atoms, and otherwise the
+padded kernel that does not move. -/
+def paddedComposedKernel {ι X : Type*} [Fintype ι] (feature : X → ι → ℝ) (constant : ι)
+    (hconstant : ∀ x, feature x constant = 1) (stageCount : ℕ)
+    (Branch : ℝ → Fin stageCount → Type) [∀ step k, Fintype (Branch step k)]
+    (stages : ∀ step : ℝ, 0 < step → (k : Fin stageCount) → FiniteMixtureKernel (Branch step k) X)
+    (step : ℝ) : FiniteMixtureKernel (Fin (Fintype.card ι)) X :=
+  if hstep : 0 < step then
+    paddedKernel feature constant hconstant
+      (composeDependentStages stageCount (Branch step) (stages step hstep))
+  else
+    paddedKernel feature constant hconstant (FiniteMixtureKernel.deterministic id)
+
+/-- **At a positive step the padded composed kernel moves every feature coordinate exactly as
+the composition of the stages does.** -/
+theorem paddedComposedKernel_apply_feature {ι X : Type*} [Fintype ι] (feature : X → ι → ℝ)
+    (constant : ι) (hconstant : ∀ x, feature x constant = 1) (stageCount : ℕ)
+    (Branch : ℝ → Fin stageCount → Type) [∀ step k, Fintype (Branch step k)]
+    (stages : ∀ step : ℝ, 0 < step → (k : Fin stageCount) → FiniteMixtureKernel (Branch step k) X)
+    {step : ℝ} (hstep : 0 < step) (x : X) (i : ι) :
+    (paddedComposedKernel feature constant hconstant stageCount Branch stages step).apply
+        (fun y ↦ feature y i) x =
+      (composeDependentStages stageCount (Branch step) (stages step hstep)).apply
+        (fun y ↦ feature y i) x := by
+  rw [paddedComposedKernel, dif_pos hstep]
+  exact paddedKernel_apply_feature feature constant hconstant _ x i
+
+/-- **A composed step with step-dependent branch types, padded, is a microscopic
+approximation.**  Stages indexed by `Fin stageCount`, whose branch types may change with the
+step size, each advancing the features by `step` times its own matrix up to `step` times a
+slack that vanishes with the step size, give a `MicroscopicApproximation` with branch type
+`Fin (Fintype.card ι)` of any target generator that agrees with the summed stage matrices on
+every feature vector, whenever one feature coordinate is identically one.  At a positive step
+the kernel moves the features as the composed stages do (`paddedComposedKernel_apply_feature`),
+and the error is the absolute value of `compositeSlack`. -/
+def paddedComposedApproximation {ι X : Type*} [Fintype ι] (feature : X → ι → ℝ) (constant : ι)
+    (hconstant : ∀ x, feature x constant = 1) (bound : ℝ) (hboundNonneg : 0 ≤ bound)
+    (hbound : ∀ x i, |feature x i| ≤ bound) (stageCount : ℕ)
+    (Branch : ℝ → Fin stageCount → Type) [∀ step k, Fintype (Branch step k)]
+    (stages : ∀ step : ℝ, 0 < step → (k : Fin stageCount) → FiniteMixtureKernel (Branch step k) X)
+    (generator : Fin stageCount → Matrix ι ι ℝ) (rowBound : ℝ) (hrowNonneg : 0 ≤ rowBound)
+    (hrow : ∀ k i, ∑ d, |generator k i d| ≤ rowBound) (slack : Fin stageCount → ℝ → ℝ)
+    (hslackNonneg : ∀ k step, 0 ≤ slack k step)
+    (hslackTendsto : ∀ k, Filter.Tendsto (slack k) (nhdsWithin 0 (Set.Ioi 0)) (nhds 0))
+    (hstages : ∀ (step : ℝ) (hstep : 0 < step) k x i,
+      |(stages step hstep k).apply (fun y ↦ feature y i) x - feature x i -
+        step * (generator k).mulVec (feature x) i| ≤ step * slack k step)
+    (target : Matrix ι ι ℝ)
+    (htarget : ∀ x i, (∑ k, generator k).mulVec (feature x) i = target.mulVec (feature x) i) :
+    MicroscopicApproximation (B := Fin (Fintype.card ι)) feature target where
+  kernel := paddedComposedKernel feature constant hconstant stageCount Branch stages
+  error step := |compositeSlack stageCount rowBound bound step (∑ k, slack k step)|
+  error_nonneg _ := abs_nonneg _
+  error_tendsto := by
+    have hsum : Filter.Tendsto (fun step ↦ ∑ k, slack k step) (nhdsWithin 0 (Set.Ioi 0))
+        (nhds 0) := by
+      simpa using tendsto_finset_sum Finset.univ fun k _ ↦ hslackTendsto k
+    exact abs_compositeSlack_tendsto stageCount rowBound bound
+      (fun step ↦ ∑ k, slack k step) hsum
+  expansion step hstep x i := by
+    rw [paddedComposedKernel_apply_feature feature constant hconstant stageCount Branch stages
+      hstep x i]
+    have hbase := composeDependentStages_expansion feature bound hboundNonneg hbound rowBound
+      hrowNonneg step hstep.le stageCount (Branch step) (stages step hstep) generator
+      (fun k ↦ slack k step) hrow (fun k ↦ hslackNonneg k step) (hstages step hstep) x i
+    rw [htarget x i] at hbase
+    exact hbase.trans (mul_le_mul_of_nonneg_left (le_abs_self _) hstep.le)
+
 /-! ## The physical stages with multinomial resampling -/
 
 /-- The branch type of each physical stage at step `step`: a census of
@@ -213,6 +286,16 @@ def multinomialCompositionStageSlack {D : ℕ} (rates : ManyDemeLDRates D)
   ∑ coordinate : AffineEnlargedCoordinate D,
     |multinomialPhysicalSlack rates coordinate stage step|
 
+/-- The slack of each physical stage over all enlarged coordinates vanishes with the step
+size. -/
+theorem multinomialCompositionStageSlack_tendsto {D : ℕ} (rates : ManyDemeLDRates D)
+    (stage : PhysicalStage D) :
+    Filter.Tendsto (multinomialCompositionStageSlack rates stage) (nhdsWithin 0 (Set.Ioi 0))
+      (nhds 0) :=
+  sum_abs_slack_tendsto
+    (fun coordinate step ↦ multinomialPhysicalSlack rates coordinate stage step)
+    fun coordinate ↦ multinomialPhysicalSlack_tendsto rates coordinate stage
+
 /-- **Each physical stage with multinomial resampling acts on the features through its own
 matrix.**  One stage advances every enlarged coordinate by `step` times the stage matrix
 `physicalGenerator` applied to the feature vector, up to `step` times its slack over all
@@ -246,32 +329,6 @@ def multinomialComposite {D : ℕ} (rates : ManyDemeLDRates D) (step : ℝ) (hst
     (fun k ↦ multinomialPhysicalBranch rates step ((stageOrder D).symm k))
     fun k ↦ multinomialPhysicalKernel rates step hstep ((stageOrder D).symm k)
 
-/-- The kernel of the composed approximation at step `step`: at a positive step the composed
-step padded to `Fintype.card (AffineEnlargedCoordinate D)` atoms, and otherwise the padded
-kernel that does not move. -/
-def multinomialCompositionKernel {D : ℕ} (rates : ManyDemeLDRates D) (step : ℝ) :
-    FiniteMixtureKernel (Fin (Fintype.card (AffineEnlargedCoordinate D)))
-      (DemeHaplotypeState D) :=
-  if hstep : 0 < step then
-    paddedKernel (enlargedLowOrderLDFeature (D := D)) none (fun _ ↦ rfl)
-      (multinomialComposite rates step hstep)
-  else
-    paddedKernel (enlargedLowOrderLDFeature (D := D)) none (fun _ ↦ rfl)
-      (FiniteMixtureKernel.deterministic id)
-
-/-- **The approximation's kernel moves the features exactly as the literal composed step.**  At
-every positive step, every enlarged coordinate is moved by the kernel as by the composition of
-the physical stages with multinomial resampling. -/
-theorem multinomialCompositionKernel_apply_feature {D : ℕ} (rates : ManyDemeLDRates D)
-    {step : ℝ} (hstep : 0 < step) (state : DemeHaplotypeState D)
-    (coordinate : AffineEnlargedCoordinate D) :
-    (multinomialCompositionKernel rates step).apply
-        (fun y ↦ enlargedLowOrderLDFeature y coordinate) state =
-      (multinomialComposite rates step hstep).apply
-        (fun y ↦ enlargedLowOrderLDFeature y coordinate) state := by
-  rw [multinomialCompositionKernel, dif_pos hstep]
-  exact paddedKernel_apply_feature _ _ _ _ state coordinate
-
 /-- **NOTE1 equation (11) for the composed step with multinomial resampling, with nothing
 assumed.**  The step that runs every physical stage of NOTE1 section 2.3 in a fixed order at
 step `h`, with resampling drawing `⌈1/(c_i h)⌉` chromosomes in deme `i`, advances every enlarged
@@ -281,54 +338,39 @@ a fixed number of atoms, which moves the features exactly as the step does
 (`multinomialCompositionKernel_apply_feature`). -/
 def multinomialCompositionApproximation {D : ℕ} (rates : ManyDemeLDRates D) :
     MicroscopicApproximation (B := Fin (Fintype.card (AffineEnlargedCoordinate D)))
-      (enlargedLowOrderLDFeature (D := D)) (enlargedLowOrderLDGenerator rates) where
-  kernel := multinomialCompositionKernel rates
-  error step := |compositeSlack (Fintype.card (PhysicalStage D)) (compositionRowBound rates)
-    (compositionFeatureBound D) step
-    (∑ k, multinomialCompositionStageSlack rates ((stageOrder D).symm k) step)|
-  error_nonneg _ := abs_nonneg _
-  error_tendsto := by
-    have hterms : ∀ k, Filter.Tendsto
-        (fun step ↦ ∑ coordinate : AffineEnlargedCoordinate D,
-          |multinomialPhysicalSlack rates coordinate ((stageOrder D).symm k) step|)
-        (nhds 0) (nhds 0) := by
-      intro k
-      have hsum : Filter.Tendsto
-          (fun step ↦ ∑ coordinate : AffineEnlargedCoordinate D,
-            |multinomialPhysicalSlack rates coordinate ((stageOrder D).symm k) step|)
-          (nhds 0) (nhds (∑ _coordinate : AffineEnlargedCoordinate D, |(0 : ℝ)|)) :=
-        tendsto_finset_sum _ fun coordinate _ ↦ (continuous_abs.tendsto 0).comp
-          (multinomialPhysicalSlack_tendsto rates coordinate ((stageOrder D).symm k))
-      simp only [abs_zero, Finset.sum_const_zero] at hsum
-      exact hsum
-    have htotal : Filter.Tendsto
-        (fun step ↦ ∑ k, multinomialCompositionStageSlack rates ((stageOrder D).symm k) step)
-        (nhdsWithin 0 (Set.Ioi 0)) (nhds 0) := by
-      have hlimit := tendsto_finset_sum Finset.univ fun k _ ↦ hterms k
-      simp only [Finset.sum_const_zero] at hlimit
-      exact hlimit.mono_left nhdsWithin_le_nhds
-    exact abs_compositeSlack_tendsto (Fintype.card (PhysicalStage D)) (compositionRowBound rates)
-      (compositionFeatureBound D)
-      (fun step ↦ ∑ k, multinomialCompositionStageSlack rates ((stageOrder D).symm k) step) htotal
-  expansion step hstep state coordinate := by
-    rw [multinomialCompositionKernel_apply_feature rates hstep state coordinate]
-    have hbase := composeDependentStages_expansion (enlargedLowOrderLDFeature (D := D))
-      (compositionFeatureBound D) (compositionFeatureBound_nonneg D) abs_enlargedFeature_le
-      (compositionRowBound rates)
-      (Finset.sum_nonneg fun stage _ ↦ Finset.sum_nonneg fun row _ ↦
-        Finset.sum_nonneg fun column _ ↦ abs_nonneg _)
-      step hstep.le (Fintype.card (PhysicalStage D))
-      (fun k ↦ multinomialPhysicalBranch rates step ((stageOrder D).symm k))
-      (fun k ↦ multinomialPhysicalKernel rates step hstep ((stageOrder D).symm k))
-      (fun k ↦ physicalGenerator rates ((stageOrder D).symm k))
-      (fun k ↦ multinomialCompositionStageSlack rates ((stageOrder D).symm k) step)
-      (fun k row ↦ physicalGenerator_row_le rates ((stageOrder D).symm k) row)
-      (fun k ↦ Finset.sum_nonneg fun other _ ↦ abs_nonneg _)
-      (fun k point other ↦ multinomialPhysicalKernel_mulVec_expansion rates step hstep
-        ((stageOrder D).symm k) point other)
-      state coordinate
-    rw [sum_physicalGenerator_mulVec rates state coordinate] at hbase
-    exact hbase.trans (mul_le_mul_of_nonneg_left (le_abs_self _) hstep.le)
+      (enlargedLowOrderLDFeature (D := D)) (enlargedLowOrderLDGenerator rates) :=
+  paddedComposedApproximation (enlargedLowOrderLDFeature (D := D)) none (fun _ ↦ rfl)
+    (compositionFeatureBound D) (compositionFeatureBound_nonneg D) abs_enlargedFeature_le
+    (Fintype.card (PhysicalStage D))
+    (fun step k ↦ multinomialPhysicalBranch rates step ((stageOrder D).symm k))
+    (fun step hstep k ↦ multinomialPhysicalKernel rates step hstep ((stageOrder D).symm k))
+    (fun k ↦ physicalGenerator rates ((stageOrder D).symm k)) (compositionRowBound rates)
+    (Finset.sum_nonneg fun stage _ ↦ Finset.sum_nonneg fun row _ ↦
+      Finset.sum_nonneg fun column _ ↦ abs_nonneg _)
+    (fun k row ↦ physicalGenerator_row_le rates ((stageOrder D).symm k) row)
+    (fun k step ↦ multinomialCompositionStageSlack rates ((stageOrder D).symm k) step)
+    (fun k step ↦ Finset.sum_nonneg fun other _ ↦ abs_nonneg _)
+    (fun k ↦ multinomialCompositionStageSlack_tendsto rates ((stageOrder D).symm k))
+    (fun step hstep k point other ↦ multinomialPhysicalKernel_mulVec_expansion rates step hstep
+      ((stageOrder D).symm k) point other)
+    (enlargedLowOrderLDGenerator rates)
+    (fun state coordinate ↦ sum_physicalGenerator_mulVec rates state coordinate)
+
+/-- **The approximation's kernel moves the features exactly as the literal composed step.**  At
+every positive step, every enlarged coordinate is moved by the kernel as by the composition of
+the physical stages with multinomial resampling. -/
+theorem multinomialCompositionKernel_apply_feature {D : ℕ} (rates : ManyDemeLDRates D)
+    {step : ℝ} (hstep : 0 < step) (state : DemeHaplotypeState D)
+    (coordinate : AffineEnlargedCoordinate D) :
+    ((multinomialCompositionApproximation rates).kernel step).apply
+        (fun y ↦ enlargedLowOrderLDFeature y coordinate) state =
+      (multinomialComposite rates step hstep).apply
+        (fun y ↦ enlargedLowOrderLDFeature y coordinate) state :=
+  paddedComposedKernel_apply_feature (enlargedLowOrderLDFeature (D := D)) none (fun _ ↦ rfl)
+    (Fintype.card (PhysicalStage D))
+    (fun step k ↦ multinomialPhysicalBranch rates step ((stageOrder D).symm k))
+    (fun step hstep k ↦ multinomialPhysicalKernel rates step hstep ((stageOrder D).symm k))
+    hstep state coordinate
 
 end
 

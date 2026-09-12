@@ -195,6 +195,33 @@ theorem abs_mulVec_le {ι : Type*} [Fintype ι] (generator : Matrix ι ι ℝ) (
     _ = (∑ d, |generator i d|) * bound := by rw [Finset.sum_mul]
     _ ≤ row * bound := mul_le_mul_of_nonneg_right (hrow i) hboundNonneg
 
+/-- The absolute row sum of one stage matrix is at most the total absolute mass of all the stage
+matrices. -/
+theorem stageRow_le_totalMass {S ι : Type*} [Fintype S] [Fintype ι]
+    (generator : S → Matrix ι ι ℝ) (stage : S) (row : ι) :
+    ∑ column, |generator stage row column| ≤
+      ∑ other, ∑ index, ∑ column, |generator other index column| := by
+  have hrow : ∑ column, |generator stage row column| ≤
+      ∑ index, ∑ column, |generator stage index column| :=
+    Finset.single_le_sum (f := fun index ↦ ∑ column, |generator stage index column|)
+      (fun index _ ↦ Finset.sum_nonneg fun column _ ↦ abs_nonneg _) (Finset.mem_univ row)
+  exact hrow.trans (Finset.single_le_sum
+    (f := fun other ↦ ∑ index, ∑ column, |generator other index column|)
+    (fun other _ ↦ Finset.sum_nonneg fun index _ ↦ Finset.sum_nonneg fun column _ ↦
+      abs_nonneg _)
+    (Finset.mem_univ stage))
+
+/-- A finite sum of absolute stage slacks, each vanishing at zero, vanishes along positive step
+sizes. -/
+theorem sum_abs_slack_tendsto {ι : Type*} [Fintype ι] (slack : ι → ℝ → ℝ)
+    (hslack : ∀ i, Filter.Tendsto (slack i) (nhds 0) (nhds 0)) :
+    Filter.Tendsto (fun step ↦ ∑ i, |slack i step|) (nhdsWithin 0 (Set.Ioi 0)) (nhds 0) := by
+  have hsum : Filter.Tendsto (fun step ↦ ∑ i, |slack i step|) (nhds 0)
+      (nhds (∑ _i : ι, |(0 : ℝ)|)) :=
+    tendsto_finset_sum _ fun i _ ↦ (continuous_abs.tendsto 0).comp (hslack i)
+  simp only [abs_zero, Finset.sum_const_zero] at hsum
+  exact hsum.mono_left nhdsWithin_le_nhds
+
 /-- **Two stages in sequence.**  If each stage advances every feature by `step` times its own
 matrix applied to the features, up to `step` times its slack, then the composed step advances
 every feature by `step` times the SUM of the two matrices, up to `step` times the two slacks

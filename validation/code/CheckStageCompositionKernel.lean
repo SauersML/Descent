@@ -16,6 +16,8 @@ open Descent.Portability.StageCompositionKernel
 #print axioms apply_composeStages_succ
 #print axioms apply_linearCombination
 #print axioms abs_mulVec_le
+#print axioms stageRow_le_totalMass
+#print axioms sum_abs_slack_tendsto
 #print axioms compose_expansion
 #print axioms abs_compositeSlack_tendsto
 #print axioms composeDependentStages_expansion
