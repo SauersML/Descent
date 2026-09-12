@@ -1,0 +1,49 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.EndToEndDiploidLaw
+
+/-! Axiom audit of EndToEndDiploidLaw. -/
+
+#print axioms Descent.Portability.EndToEndDiploidLaw.inbredMating
+#print axioms Descent.Portability.EndToEndDiploidLaw.expectation_independentMating
+#print axioms Descent.Portability.EndToEndDiploidLaw.expectation_inbredMating
+#print axioms Descent.Portability.EndToEndDiploidLaw.inbredMating_zero
+#print axioms Descent.Portability.EndToEndDiploidLaw.expectation_inbredMating_gametes
+#print axioms Descent.Portability.EndToEndDiploidLaw.expectation_inbredMating_cross
+#print axioms Descent.Portability.EndToEndDiploidLaw.covariance_inbredMating_gametes
+#print axioms Descent.Portability.EndToEndDiploidLaw.diploidSum
+#print axioms Descent.Portability.EndToEndDiploidLaw.diploidProduct
+#print axioms Descent.Portability.EndToEndDiploidLaw.diploidSum_eq_linearScore
+#print axioms Descent.Portability.EndToEndDiploidLaw.covariance_diploidSum_left
+#print axioms Descent.Portability.EndToEndDiploidLaw.expectation_inbredMating_diploidSum
+#print axioms Descent.Portability.EndToEndDiploidLaw.covariance_inbredMating_diploidSum
+#print axioms Descent.Portability.EndToEndDiploidLaw.variance_inbredMating_diploidSum
+#print axioms Descent.Portability.EndToEndDiploidLaw.correlationNumerator_inbredMating_diploidSum
+#print axioms
+  Descent.Portability.EndToEndDiploidLaw.correlationDenominator_inbredMating_diploidSum
+#print axioms Descent.Portability.EndToEndDiploidLaw.squaredCorrelation_inbredMating_diploidSum
+#print axioms Descent.Portability.EndToEndDiploidLaw.covariance_independentMating_diploidSum
+#print axioms Descent.Portability.EndToEndDiploidLaw.variance_independentMating_diploidSum
+#print axioms
+  Descent.Portability.EndToEndDiploidLaw.squaredCorrelation_independentMating_diploidSum
+#print axioms Descent.Portability.EndToEndDiploidLaw.expectation_fairSwitch
+#print axioms Descent.Portability.EndToEndDiploidLaw.squaredCorrelation_fairSwitch_alleleValue
+#print axioms
+  Descent.Portability.EndToEndDiploidLaw.squaredCorrelation_inbredMating_diploidProduct
+#print axioms Descent.Portability.EndToEndDiploidLaw.diploidProduct_breaks_ploidy_transfer
+#print axioms Descent.Portability.EndToEndDiploidLaw.stateGenotypeLaw
+#print axioms Descent.Portability.EndToEndDiploidLaw.expectedDiploidPortability
+#print axioms Descent.Portability.EndToEndDiploidLaw.expectedDiploidPortability_diploidSum
+#print axioms
+  Descent.Portability.EndToEndDiploidLaw.integral_diploidNumerator_historyEventKernel
+#print axioms
+  Descent.Portability.EndToEndDiploidLaw.integral_diploidDenominator_historyEventKernel
+#print axioms
+  Descent.Portability.EndToEndDiploidLaw.expectedDiploidPortability_historyEventKernel
+#print axioms
+  Descent.Portability.EndToEndDiploidLaw.expectedDiploidPortability_rateHistoryKernel
+#print axioms
+  Descent.Portability.EndToEndDiploidLaw.expectedDiploidPortability_eq_of_moments_eq
+#print axioms
+  Descent.Portability.EndToEndDiploidLaw.integral_squaredCorrelation_stateGenotypeLaw

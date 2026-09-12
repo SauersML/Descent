@@ -67,8 +67,8 @@ haplotype law, so there are no sex-specific frequencies.  Identity by descent is
 by every locus of the haplotype, with a coefficient in the unit interval supplied per deme rather
 than derived from the history.  Score and outcome are the same haploid functions summed over the
 two gametes.  Locus-dependent inbreeding coefficients, heterozygote excess, assortative mating, and
-outcomes carrying variance not given by the genotype are not covered.  Non-additive diploid
-observables along a history are carried at budget eight by `EndToEndDiploidHistoryLaw`.
+outcomes carrying variance not given by the genotype are not covered.  Along a history only
+additive score and outcome are carried; the dominance witness is one law at one site.
 
 ## Empirical status
 
@@ -240,11 +240,11 @@ theorem covariance_inbredMating_diploidSum (law : FiniteReportLaw H) (F : ℝ) (
   obtain ⟨hsame1, hsame2, hcross⟩ := covariance_inbredMating_gametes law F hF0 hF1 outcome score
   obtain ⟨-, -, hcross'⟩ := covariance_inbredMating_gametes law F hF0 hF1 score outcome
   rw [covariance_diploidSum_left,
-    TrainingNoiseAccuracy.covariance_symmetric _ (fun pair ↦ score pair.1),
+    TrainingNoiseAccuracy.covariance_symmetric _ (fun pair : H × H ↦ score pair.1),
     covariance_diploidSum_left,
-    TrainingNoiseAccuracy.covariance_symmetric _ (fun pair ↦ score pair.2),
+    TrainingNoiseAccuracy.covariance_symmetric _ (fun pair : H × H ↦ score pair.2),
     covariance_diploidSum_left, hsame1, hsame2, hcross,
-    TrainingNoiseAccuracy.covariance_symmetric _ (fun pair ↦ outcome pair.2), hcross',
+    TrainingNoiseAccuracy.covariance_symmetric _ (fun pair : H × H ↦ outcome pair.2), hcross',
     TrainingNoiseAccuracy.covariance_symmetric law outcome]
   ring
 
@@ -389,7 +389,7 @@ theorem squaredCorrelation_inbredMating_diploidProduct (F : ℝ) (hF0 : 0 ≤ F)
   have houtcomePos : 0 < (1 + F) * (3 - F) / 16 :=
     div_pos (mul_pos (by linarith) (by linarith)) (by norm_num)
   rw [FiniteReportLaw.squaredCorrelation, hscore, houtcome, hcovariance,
-    if_pos ⟨hscorePos, houtcomePos⟩]
+    if_pos (And.intro hscorePos houtcomePos)]
   congr 1
   rw [div_eq_div_iff (mul_pos hscorePos houtcomePos).ne' (by linarith : (0 : ℝ) < 3 - F).ne']
   ring
