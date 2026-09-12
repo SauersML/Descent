@@ -398,6 +398,240 @@ theorem dysonMoment_succ_eq_integral [Fintype H] [DecidableEq H] [Fintype E] (c 
     holdingSemigroup_neg_apply_apply] at hlin
   exact hlin.symm
 
+/-! ### The Yule weights: the number of decisions -/
+
+/-- **The Yule weights.** `yuleWeight R k n t` is the probability that a Yule process in which
+each of `n` arguments branches at rate `R` has exactly `k` births by time `t`, written through the
+time `t - u` of the first birth, after which `n + 1` arguments run for the time `u`. -/
+def yuleWeight (R : ℝ) : ℕ → ℕ → ℝ → ℝ
+  | 0, n, t => Real.exp (-(n * R * t))
+  | k + 1, n, t => Real.exp (-(n * R * t)) *
+      ∫ u in (0 : ℝ)..t, n * R * Real.exp (n * R * u) * yuleWeight R k (n + 1) u
+
+/-- The Yule weight of a run with a birth, through the time of the first birth. -/
+theorem yuleWeight_succ (R : ℝ) (k n : ℕ) (t : ℝ) :
+    yuleWeight R (k + 1) n t = Real.exp (-(n * R * t)) *
+      ∫ u in (0 : ℝ)..t, n * R * Real.exp (n * R * u) * yuleWeight R k (n + 1) u :=
+  rfl
+
+/-- The Yule weights are continuous in time. -/
+theorem continuous_yuleWeight (R : ℝ) (k : ℕ) : ∀ n, Continuous (yuleWeight R k n) := by
+  induction k with
+  | zero =>
+    intro n
+    show Continuous fun t ↦ Real.exp (-(n * R * t))
+    fun_prop
+  | succ k ih =>
+    intro n
+    have hint : Continuous fun u ↦ n * R * Real.exp (n * R * u) * yuleWeight R k (n + 1) u :=
+      (by fun_prop : Continuous fun u : ℝ ↦ (n : ℝ) * R * Real.exp (n * R * u)).mul (ih (n + 1))
+    exact (by fun_prop : Continuous fun t : ℝ ↦ Real.exp (-(n * R * t))).mul
+      (intervalIntegral.continuous_primitive (fun a b ↦ hint.intervalIntegrable a b) 0)
+
+/-- The Yule weights are nonnegative at nonnegative times. -/
+theorem yuleWeight_nonneg {R : ℝ} (hR : 0 ≤ R) (k : ℕ) :
+    ∀ (n : ℕ) {t : ℝ}, 0 ≤ t → 0 ≤ yuleWeight R k n t := by
+  induction k with
+  | zero =>
+    intro n t _
+    exact (Real.exp_pos _).le
+  | succ k ih =>
+    intro n t ht
+    rw [yuleWeight_succ]
+    refine mul_nonneg (Real.exp_pos _).le (intervalIntegral.integral_nonneg ht fun u hu ↦ ?_)
+    exact mul_nonneg (mul_nonneg (mul_nonneg (Nat.cast_nonneg n) hR) (Real.exp_pos _).le)
+      (ih (n + 1) hu.1)
+
+/-- `∫_0^t a e^{a u} du = e^{a t} - 1`. -/
+theorem integral_mul_exp_mul (a t : ℝ) :
+    ∫ u in (0 : ℝ)..t, a * Real.exp (a * u) = Real.exp (a * t) - 1 := by
+  have hderiv : ∀ u ∈ Set.uIcc (0 : ℝ) t,
+      HasDerivAt (fun u ↦ Real.exp (a * u)) (a * Real.exp (a * u)) u := fun u _ ↦
+    ((hasDerivAt_id' (x := u)).const_mul a).exp.congr_deriv (by ring)
+  rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv
+    ((by fun_prop : Continuous fun u : ℝ ↦ a * Real.exp (a * u)).intervalIntegrable 0 t),
+    mul_zero, Real.exp_zero]
+
+/-- **The first-birth decomposition of the Yule weights**,
+`∑_{k ≤ M} w_k^{(n)}(t) = e^{-nRt} (1 + ∫_0^t n R e^{nRu} ∑_{k<M} w_k^{(n+1)}(u) du)`. -/
+theorem sum_range_succ_yuleWeight (R : ℝ) (M n : ℕ) (t : ℝ) :
+    ∑ k ∈ range (M + 1), yuleWeight R k n t = Real.exp (-(n * R * t)) *
+      (1 + ∫ u in (0 : ℝ)..t,
+        n * R * Real.exp (n * R * u) * ∑ k ∈ range M, yuleWeight R k (n + 1) u) := by
+  have hint : ∀ k ∈ range M, IntervalIntegrable
+      (fun u ↦ n * R * Real.exp (n * R * u) * yuleWeight R k (n + 1) u) volume 0 t :=
+    fun k _ ↦ ((by fun_prop : Continuous fun u : ℝ ↦ (n : ℝ) * R * Real.exp (n * R * u)).mul
+      (continuous_yuleWeight R k (n + 1))).intervalIntegrable 0 t
+  rw [sum_range_succ']
+  simp only [mul_sum]
+  rw [intervalIntegral.integral_finset_sum hint, mul_add, mul_one, mul_sum, add_comm]
+  rfl
+
+/-- **The Yule weights have mass at most one.** -/
+theorem sum_range_yuleWeight_le_one {R : ℝ} (hR : 0 ≤ R) (M : ℕ) :
+    ∀ (n : ℕ) {t : ℝ}, 0 ≤ t → ∑ k ∈ range M, yuleWeight R k n t ≤ 1 := by
+  induction M with
+  | zero =>
+    intro n t _
+    simp
+  | succ M ih =>
+    intro n t ht
+    rw [sum_range_succ_yuleWeight]
+    have hrate : 0 ≤ (n : ℝ) * R := mul_nonneg (Nat.cast_nonneg n) hR
+    have hcont : Continuous fun u : ℝ ↦ (n : ℝ) * R * Real.exp (n * R * u) := by fun_prop
+    have hmono : ∫ u in (0 : ℝ)..t,
+        n * R * Real.exp (n * R * u) * ∑ k ∈ range M, yuleWeight R k (n + 1) u ≤
+          ∫ u in (0 : ℝ)..t, n * R * Real.exp (n * R * u) := by
+      refine intervalIntegral.integral_mono_on ht
+        ((hcont.mul (continuous_finset_sum _ fun k _ ↦ continuous_yuleWeight R k (n + 1)))
+          |>.intervalIntegrable 0 t) (hcont.intervalIntegrable 0 t) fun u hu ↦ ?_
+      exact mul_le_of_le_one_right (mul_nonneg hrate (Real.exp_pos _).le) (ih (n + 1) hu.1)
+    rw [integral_mul_exp_mul] at hmono
+    calc Real.exp (-(n * R * t)) * (1 + ∫ u in (0 : ℝ)..t,
+          n * R * Real.exp (n * R * u) * ∑ k ∈ range M, yuleWeight R k (n + 1) u)
+        ≤ Real.exp (-(n * R * t)) * (1 + (Real.exp (n * R * t) - 1)) :=
+          mul_le_mul_of_nonneg_left (by linarith) (Real.exp_pos _).le
+      _ = 1 := by
+          rw [show (1 : ℝ) + (Real.exp (n * R * t) - 1) = Real.exp (n * R * t) by ring,
+            ← Real.exp_add, neg_add_cancel, Real.exp_zero]
+
+/-- **The quantitative tail of the number of decisions**:
+`(n + M) (1 - ∑_{k<M} w_k^{(n)}(t)) ≤ n e^{Rt}`, so the probability of at least `M` births by
+time `t` is at most `n e^{Rt} / (n + M)`. -/
+theorem mul_one_sub_sum_range_yuleWeight_le {R : ℝ} (hR : 0 ≤ R) (M : ℕ) :
+    ∀ (n : ℕ) {t : ℝ}, 0 ≤ t →
+      (n + M) * (1 - ∑ k ∈ range M, yuleWeight R k n t) ≤ n * Real.exp (R * t) := by
+  induction M with
+  | zero =>
+    intro n t ht
+    simp only [Nat.cast_zero, add_zero, range_zero, sum_empty, sub_zero, mul_one]
+    exact le_mul_of_one_le_right (Nat.cast_nonneg n) (Real.one_le_exp (mul_nonneg hR ht))
+  | succ M ih =>
+    intro n t ht
+    have hrate : 0 ≤ (n : ℝ) * R := mul_nonneg (Nat.cast_nonneg n) hR
+    have hcont : Continuous fun u : ℝ ↦ (n : ℝ) * R * Real.exp (n * R * u) := by fun_prop
+    have hsum : Continuous fun u ↦ ∑ k ∈ range M, yuleWeight R k (n + 1) u :=
+      continuous_finset_sum _ fun k _ ↦ continuous_yuleWeight R k (n + 1)
+    set J := ∫ u in (0 : ℝ)..t,
+      n * R * Real.exp (n * R * u) * (1 - ∑ k ∈ range M, yuleWeight R k (n + 1) u) with hJdef
+    have hone : Real.exp (-(n * R * t)) * Real.exp (n * R * t) = 1 := by
+      rw [← Real.exp_add, neg_add_cancel, Real.exp_zero]
+    have hdeficit : 1 - ∑ k ∈ range (M + 1), yuleWeight R k n t = Real.exp (-(n * R * t)) * J := by
+      rw [sum_range_succ_yuleWeight, hJdef]
+      simp only [mul_sub, mul_one]
+      rw [intervalIntegral.integral_sub (hcont.intervalIntegrable 0 t)
+        ((hcont.mul hsum).intervalIntegrable 0 t), integral_mul_exp_mul]
+      linear_combination -hone
+    have hJ : ((n : ℝ) + ((M + 1 : ℕ) : ℝ)) * J ≤ n * (Real.exp (((n : ℝ) + 1) * R * t) - 1) := by
+      rw [hJdef, ← intervalIntegral.integral_const_mul, ← integral_mul_exp_mul,
+        ← intervalIntegral.integral_const_mul]
+      refine intervalIntegral.integral_mono_on ht
+        ((continuous_const.mul (hcont.mul (continuous_const.sub hsum))).intervalIntegrable 0 t)
+        ((continuous_const.mul (by fun_prop :
+          Continuous fun u : ℝ ↦ ((n : ℝ) + 1) * R * Real.exp (((n : ℝ) + 1) * R * u)))
+          |>.intervalIntegrable 0 t) fun u hu ↦ ?_
+      have h := ih (n + 1) hu.1
+      push_cast at h
+      calc ((n : ℝ) + ((M + 1 : ℕ) : ℝ)) * (n * R * Real.exp (n * R * u) *
+            (1 - ∑ k ∈ range M, yuleWeight R k (n + 1) u))
+          = n * R * Real.exp (n * R * u) *
+              (((n : ℝ) + 1 + M) * (1 - ∑ k ∈ range M, yuleWeight R k (n + 1) u)) := by
+            push_cast
+            ring
+        _ ≤ n * R * Real.exp (n * R * u) * (((n : ℝ) + 1) * Real.exp (R * u)) :=
+            mul_le_mul_of_nonneg_left h (mul_nonneg hrate (Real.exp_pos _).le)
+        _ = n * (((n : ℝ) + 1) * R * Real.exp (((n : ℝ) + 1) * R * u)) := by
+            rw [show ((n : ℝ) + 1) * R * u = n * R * u + R * u by ring, Real.exp_add]
+            ring
+    have h1 : Real.exp (-(n * R * t)) * Real.exp (((n : ℝ) + 1) * R * t) = Real.exp (R * t) := by
+      rw [← Real.exp_add]
+      congr 1
+      ring
+    rw [hdeficit]
+    calc ((n : ℝ) + ((M + 1 : ℕ) : ℝ)) * (Real.exp (-(n * R * t)) * J)
+        = Real.exp (-(n * R * t)) * (((n : ℝ) + ((M + 1 : ℕ) : ℝ)) * J) := by ring
+      _ ≤ Real.exp (-(n * R * t)) * (n * (Real.exp (((n : ℝ) + 1) * R * t) - 1)) :=
+          mul_le_mul_of_nonneg_left hJ (Real.exp_pos _).le
+      _ = n * (Real.exp (-(n * R * t)) * Real.exp (((n : ℝ) + 1) * R * t)) -
+            Real.exp (-(n * R * t)) * n := by ring
+      _ = n * Real.exp (R * t) - Real.exp (-(n * R * t)) * n := by rw [h1]
+      _ ≤ n * Real.exp (R * t) :=
+          sub_le_self _ (mul_nonneg (Real.exp_pos _).le (Nat.cast_nonneg n))
+
+/-- The Yule weights at a nonnegative time are summable. -/
+theorem summable_yuleWeight {R : ℝ} (hR : 0 ≤ R) (n : ℕ) {t : ℝ} (ht : 0 ≤ t) :
+    Summable fun k ↦ yuleWeight R k n t :=
+  summable_of_sum_range_le (fun k ↦ yuleWeight_nonneg hR k n ht) fun M ↦
+    sum_range_yuleWeight_le_one hR M n ht
+
+/-- **The circuit does not explode**: the Yule weights sum to one at every time `t ≥ 0`, so the
+linear birth rate leaves no mass at infinitely many decisions. -/
+theorem tsum_yuleWeight_eq_one {R : ℝ} (hR : 0 ≤ R) (n : ℕ) {t : ℝ} (ht : 0 ≤ t) :
+    ∑' k, yuleWeight R k n t = 1 := by
+  refine tendsto_nhds_unique (summable_yuleWeight hR n ht).hasSum.tendsto_sum_nat ?_
+  have hlow : Tendsto (fun M : ℕ ↦ 1 - n * Real.exp (R * t) / M) atTop (𝓝 1) := by
+    simpa only [sub_zero] using
+      (tendsto_const_div_atTop_nhds_zero_nat (n * Real.exp (R * t))).const_sub 1
+  refine tendsto_of_tendsto_of_tendsto_of_le_of_le' hlow tendsto_const_nhds ?_
+    (Eventually.of_forall fun M ↦ sum_range_yuleWeight_le_one hR M n ht)
+  filter_upwards [eventually_gt_atTop 0] with M hM
+  have hM' : (0 : ℝ) < M := Nat.cast_pos.mpr hM
+  have h := mul_one_sub_sum_range_yuleWeight_le hR M n ht
+  have hle := sum_range_yuleWeight_le_one hR M n ht
+  rw [sub_le_comm, le_div_iff₀ hM']
+  nlinarith [mul_nonneg (Nat.cast_nonneg (α := ℝ) n) (sub_nonneg.mpr hle)]
+
+/-- **A Dyson term is at most its Yule weight.** For `c ≥ 0`, `r ≥ 0`, a probability vector `p`
+and `t ≥ 0`, `|d_k(t, f)| ≤ yuleWeight R k n t ‖f‖` with `R = ∑_e r_e`. -/
+theorem abs_dysonMoment_le [Fintype H] [DecidableEq H] [Fintype E] {c : ℝ} {r : E → ℝ}
+    (hc : 0 ≤ c) (hr : ∀ e, 0 ≤ r e) (T : E → H → H → H) {p : H → ℝ} (hp0 : ∀ h, 0 ≤ p h)
+    (hp : ∑ h, p h = 1) (k : ℕ) :
+    ∀ (n : ℕ) {t : ℝ}, 0 ≤ t → ∀ f : (Fin n → H) → ℝ,
+      |dysonMoment c r T p k n t f| ≤ yuleWeight (∑ e, r e) k n t * ‖f‖ := by
+  have hR : 0 ≤ ∑ e, r e := sum_nonneg fun e _ ↦ hr e
+  induction k with
+  | zero =>
+    intro n t ht f
+    rw [dysonMoment_zero_apply]
+    exact (abs_samplingObservable_le _ hp0 hp).trans (norm_holdingSemigroup_apply_le hc n ht f)
+  | succ k ih =>
+    intro n t ht f
+    rw [dysonMoment_succ_eq_integral c r T p (continuous_dysonMoment_apply c r T p k) n t f,
+      yuleWeight_succ]
+    have hcont : Continuous fun u : ℝ ↦ (n : ℝ) * (∑ e, r e) *
+        Real.exp (n * (∑ e, r e) * u) * yuleWeight (∑ e, r e) k (n + 1) u :=
+      (by fun_prop : Continuous fun u : ℝ ↦ (n : ℝ) * (∑ e, r e) *
+        Real.exp (n * (∑ e, r e) * u)).mul (continuous_yuleWeight _ k (n + 1))
+    calc |∫ u in (0 : ℝ)..t, dysonMoment c r T p k (n + 1) u
+          (decisionSubstitution r T n (holdingSemigroup c r n (t - u) f))|
+        ≤ ∫ u in (0 : ℝ)..t, (Real.exp (-(n * (∑ e, r e) * t)) * ‖f‖) * ((n : ℝ) *
+            (∑ e, r e) * Real.exp (n * (∑ e, r e) * u) * yuleWeight (∑ e, r e) k (n + 1) u) := by
+          refine intervalIntegral.norm_integral_le_of_norm_le ht (ae_of_all _ fun u hu ↦ ?_)
+            ((continuous_const.mul hcont).intervalIntegrable 0 t)
+          rw [Real.norm_eq_abs]
+          have hu0 : 0 ≤ u := hu.1.le
+          have htu : 0 ≤ t - u := sub_nonneg.mpr hu.2
+          calc |dysonMoment c r T p k (n + 1) u
+                (decisionSubstitution r T n (holdingSemigroup c r n (t - u) f))|
+              ≤ yuleWeight (∑ e, r e) k (n + 1) u *
+                  ‖decisionSubstitution r T n (holdingSemigroup c r n (t - u) f)‖ :=
+                ih (n + 1) hu0 _
+            _ ≤ yuleWeight (∑ e, r e) k (n + 1) u * ((n : ℝ) * (∑ e, r e) *
+                  (Real.exp (-(n * (∑ e, r e) * (t - u))) * ‖f‖)) := by
+                refine mul_le_mul_of_nonneg_left ?_ (yuleWeight_nonneg hR k (n + 1) hu0)
+                exact (norm_decisionSubstitution_le hr T _).trans
+                  (mul_le_mul_of_nonneg_left (norm_holdingSemigroup_apply_le hc n htu f)
+                    (mul_nonneg (Nat.cast_nonneg n) hR))
+            _ = (Real.exp (-(n * (∑ e, r e) * t)) * ‖f‖) * ((n : ℝ) * (∑ e, r e) *
+                  Real.exp (n * (∑ e, r e) * u) * yuleWeight (∑ e, r e) k (n + 1) u) := by
+                rw [show -((n : ℝ) * (∑ e, r e) * (t - u)) =
+                  -(n * (∑ e, r e) * t) + n * (∑ e, r e) * u by ring, Real.exp_add]
+                ring
+      _ = Real.exp (-(n * (∑ e, r e) * t)) * (∫ u in (0 : ℝ)..t, (n : ℝ) * (∑ e, r e) *
+            Real.exp (n * (∑ e, r e) * u) * yuleWeight (∑ e, r e) k (n + 1) u) * ‖f‖ := by
+          rw [intervalIntegral.integral_const_mul]
+          ring
+
 end
 
 end Descent.Pangenome.AncestralLocality
