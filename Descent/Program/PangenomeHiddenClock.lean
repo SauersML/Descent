@@ -48,6 +48,8 @@ import Descent.Pangenome.GraphCoalescent.ConnectionClockHittingTime
 import Descent.Pangenome.GraphCoalescent.MinimalHistoryLumping
 import Descent.Pangenome.GraphCoalescent.ReportedConnectionSpectrum
 import Descent.Pangenome.GraphCoalescent.ScaledConnectionLimit
+import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionInLaw
+import Descent.Pangenome.GraphCoalescent.ReportedConnectionLadder
 
 namespace Descent.Program
 
@@ -159,6 +161,13 @@ inside it.
   (`ReportedConnectionExamples.connectionTime_mean_oneTwo`,
   `connectionTime_mean_oneThree_ne_twoTwo`); the path-law mean equals the backward-equation mean
   (`ReportedConnectionFirstStep.connectionTime_mean_eq_meanConnectionTime`).
+* Theorem D, the Kingman ladder: `ReportedConnectionLadder`. The conditional sums over the
+  phases above the stopping level are corpus transit quantities: the mean is `E(T_n) - E(T_b)`
+  (`sum_Ioc_one_div_deathRate_eq_meanTransitTime_sub`), the variance is `Var(T_n) - Var(T_b)`
+  (`sum_sq_one_div_deathRate_Ioc`) and the transform is `L_n(θ)/L_b(θ)`
+  (`prod_Ioc_eq_kingmanLaplace_div`), so (D7)-(D9) read through them
+  (`connectionTime_laplace_eq_kingmanLaplace`, `connectionTime_mean_eq_meanTransitTime`,
+  `connectionTime_secondMoment_eq_varTransitTime`).
 * §6, the spectral remark: `ReportedConnectionSpectrum`. From `⊥`, for `c ≥ 0`, the survival
   function of the first-step connection law is `∑_{k=2}^{n} a_k e^{-d_k c}` with `d_k = C(k, 2)`
   and coefficients given by a recursion along covers (`survivalAt_connectionTimeLaw_bot`,
@@ -196,7 +205,16 @@ inside it.
   (`tendsto_connectionProbability_atTop`), so `T_p` is finite; the crossing rate is the pair sum
   `κ_σ = Σ_{C<D} p(C) p(D)` (`crossingRate_eq_pairProductSum`). (F2) holds for every path
   functional with values in `[0, 1]`, within `min {1, U²/(4n) + U ‖p^(n) - p‖₁}`
-  (`abs_poissonMixture_report_sub_spread_le`).
+  (`abs_poissonMixture_report_sub_spread_le`). With the rate of (F2), the scaled connection
+  probability is within `min {1, U²/(4n) + U ‖p^(n) - p‖₁}` of `Pr(T_p ≤ U)` on the fiber labels
+  (`abs_reportConnectionProbability_sub_le_min`).
+* Theorem F, (F3) in law: `MultiplicativeConnectionInLaw`. `Pr(T_p ≤ u)` is a Poisson mixture of
+  the skeleton connection probabilities (`connectionProbability_eq_poissonMixture`), so it is a
+  distribution function (`monotone_connectionTimeCDF`, `tendsto_connectionTimeCDF_atTop`), and
+  pointwise convergence of distribution functions gives convergence in law
+  (`tendsto_probabilityMeasure_of_tendsto_cdf`). Along panels whose fiber proportions converge
+  to `p` with every `p_i > 0`, the laws of the scaled connection time converge weakly to the law
+  of `T_p` (`tendsto_reportConnectionLaw`).
 * Theorem B as one statistic: `CoarsestRefinement`. The report with every load (three or more
   components), with the sum and product of the loads (two), or alone (one) is a strong lumping
   that determines the report (`coarsestState_determines_report_and_lumps`,
@@ -286,7 +304,9 @@ time the report of the coalescent path reaches `⊤`
 skeleton paths mixed over a rate-one Poisson clock, and (F3) as convergence of the connection
 probability of the uniformized report to `Pr(T_p ≤ U)` along panels whose fiber proportions
 converge (`MultiplicativeConnectionConvergence.tendsto_reportConnectionProbability`); the
-identification with path measures on càdlàg paths is not formalized. (F4) is proved for the
+identification with path measures on càdlàg paths is not formalized. The law of `T_p` in (F3) is
+the probability measure of its distribution function, not yet the image of independent
+exponential edge clocks. (F4) is proved for the
 finite random graph of edges rung by time `u`, entering the clocks through their distribution
 functions.
 -/
