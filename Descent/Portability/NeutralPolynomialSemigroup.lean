@@ -240,7 +240,8 @@ theorem momentFunctional_eq_zero_of_vanishing (rates : NeutralRates Deme Locus A
   have hwithin : ∀ β ∈ p.support, WithinBudget
       (fun _ ↦ ∑ β ∈ p.support, Multiset.card (monomialConfiguration ℓ₀ β))
       (monomialConfiguration ℓ₀ β) := fun β hβ _ ↦
-    (Multiset.countP_le_card _ _).trans (Finset.single_le_sum (fun _ _ ↦ Nat.zero_le _) hβ)
+    (Multiset.countP_le_card _ _).trans (Finset.single_le_sum
+      (f := fun β ↦ Multiset.card (monomialConfiguration ℓ₀ β)) (fun _ _ ↦ Nat.zero_le _) hβ)
   have hmem : (fun η : BudgetConfiguration Deme Locus Allele
         (fun _ ↦ ∑ β ∈ p.support, Multiset.card (monomialConfiguration ℓ₀ β)) ↦
           ∑ β ∈ p.support, if monomialConfiguration ℓ₀ β = η.1 then coeff β p else 0)
@@ -276,7 +277,8 @@ theorem momentFunctional_momentPolynomial (rates : NeutralRates Deme Locus Allel
         Multiset.card (monomialConfiguration ℓ₀ β))
       (monomialConfiguration ℓ₀ β) := fun β hβ ℓ ↦
     (Multiset.countP_le_card _ _).trans
-      ((Finset.single_le_sum (fun _ _ ↦ Nat.zero_le _) hβ).trans (Nat.le_add_left _ _))
+      ((Finset.single_le_sum (f := fun β ↦ Multiset.card (monomialConfiguration ℓ₀ β))
+        (fun _ _ ↦ Nat.zero_le _) hβ).trans (Nat.le_add_left _ _))
   have hmem : (fun ζ : BudgetConfiguration Deme Locus Allele
         (fun ℓ ↦ capacity ℓ + ∑ β ∈ (momentPolynomial η.1).support,
           Multiset.card (monomialConfiguration ℓ₀ β)) ↦
