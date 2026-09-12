@@ -30,8 +30,7 @@ and (F2).
 - `monotoneOn_connectionProbability`: it does not decrease in time, by superposing independent
   edge configurations (`sum_configMass_add_mul`).
 - `tendsto_connectionProbability_atTop`: when every `p_i > 0`, `Pr(T_p ≤ u) → 1`, so `T_p` is
-  finite; `crossingRate_top` and `MultiplicativeConnectionInLaw.crossingRate_pos_of_ne_top`
-  are the two cases of the Möbius sum.
+  finite, read off `MultiplicativeConnectionInLaw.tendsto_connectionTimeCDF_atTop`.
 - `abs_sum_mul_sub_sum_mul_le`, `abs_poissonMixture_sub_le`: a total variation bound bounds the
   difference of every functional with values in `[0, 1]`, also after Poisson mixing.
 - `abs_poissonMixture_report_sub_spread_le`: **(F2) for every path functional**.  For masses `p`
@@ -116,30 +115,13 @@ theorem connectionProbability_zero {w : ℕ} [NeZero w] (hw : 2 ≤ w) (p : Fin 
   simp only [zero_mul, neg_zero, Real.exp_zero, mul_one]
   exact_mod_cast h
 
-/-- **When every fiber has positive mass, `T_p` is finite**: `Pr(T_p ≤ u) → 1` as `u → ∞`. -/
+/-- **When every fiber has positive mass, `T_p` is finite**: `Pr(T_p ≤ u) → 1` as `u → ∞`.
+`MultiplicativeConnectionInLaw.tendsto_connectionTimeCDF_atTop`, read at nonnegative times. -/
 theorem tendsto_connectionProbability_atTop {w : ℕ} [NeZero w] {p : Fin w → ℝ}
     (hp : ∀ i, 0 < p i) : Tendsto (fun u ↦ connectionProbability p u) atTop (𝓝 1) := by
-  have hterm : ∀ σ : ER w, Tendsto
-      (fun u ↦ (topMobius (blocks σ) : ℝ) * Real.exp (-(u * crossingRate p σ))) atTop
-      (𝓝 (if σ = ⊤ then 1 else 0)) := by
-    intro σ
-    by_cases hσ : σ = ⊤
-    · subst hσ
-      have hmob : (topMobius (blocks (⊤ : ER w)) : ℝ) = 1 := by
-        rw [blocks_top]
-        norm_num [topMobius]
-      simp only [crossingRate_top, hmob, mul_zero, neg_zero, Real.exp_zero, mul_one, if_true]
-      exact tendsto_const_nhds
-    · rw [if_neg hσ]
-      have h := (Real.tendsto_exp_neg_atTop_nhds_zero.comp
-        (tendsto_id.atTop_mul_const (crossingRate_pos_of_ne_top hp hσ))).const_mul
-          (topMobius (blocks σ) : ℝ)
-      rw [mul_zero] at h
-      exact h
-  have hsum := tendsto_finset_sum (univ : Finset (ER w)) fun σ _ ↦ hterm σ
-  simp only [Finset.sum_ite_eq', Finset.mem_univ, if_true] at hsum
-  refine hsum.congr fun u ↦ ?_
-  rw [connectionProbability_eq_mobius_sum]
+  refine (tendsto_connectionTimeCDF_atTop hp).congr' ?_
+  filter_upwards [eventually_ge_atTop 0] with u hu
+  rw [connectionTimeCDF, if_neg (not_lt.mpr hu)]
 
 /-! ### Path functionals under a total variation bound -/
 
@@ -554,7 +536,9 @@ theorem connectionProbability_le_add {w : ℕ} {p : Fin w → ℝ} (hp : ∀ i, 
         · rw [if_neg hG]
           split_ifs <;> norm_num
 
-/-- **The limit distribution function is monotone** on nonnegative times. -/
+/-- **The limit distribution function is monotone** on nonnegative times.  Weaker in hypotheses
+than `MultiplicativeConnectionInLaw.monotone_connectionTimeCDF`: only `p ≥ 0` is assumed, with no
+bound on `∑ p_i`. -/
 theorem monotoneOn_connectionProbability {w : ℕ} {p : Fin w → ℝ} (hp : ∀ i, 0 ≤ p i) :
     MonotoneOn (fun u ↦ connectionProbability p u) (Set.Ici 0) := by
   intro u hu v _ huv
