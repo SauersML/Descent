@@ -1,6 +1,11 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.NeutralRateHistoryRealization
+import Descent.Portability.ReferenceExperimentCohortRows
+import Descent.Portability.AncestralForwardGenerator
+import Descent.Portability.AncestralSamplingLimit
+import Descent.Portability.NeutralFellerProperty
 import Descent.Portability.NeutralPulseHistoryKernel
 import Descent.Portability.PartialHaplotypeEventHistoryRealization
 import Descent.Portability.NeutralHistoryKernel
