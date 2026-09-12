@@ -27,6 +27,8 @@ and (F2).
 - `continuous_connectionProbability_time`: `u ↦ Pr(T_p ≤ u)` is continuous.
 - `connectionProbability_mem_Icc`: it is a probability at nonnegative times and masses.
 - `connectionProbability_zero`: with two fibers or more nothing is connected at time zero.
+- `monotoneOn_connectionProbability`: it does not decrease in time, by superposing independent
+  edge configurations (`sum_configMass_add_mul`).
 - `tendsto_connectionProbability_atTop`: when every `p_i > 0`, `Pr(T_p ≤ u) → 1`, so `T_p` is
   finite.  `crossingRate_top` and `crossingRate_pos` are the two cases of the Möbius sum.
 - `abs_sum_mul_sub_sum_mul_le`, `abs_poissonMixture_sub_le`: a total variation bound bounds the
@@ -44,8 +46,8 @@ and (F2).
 
 Time is the rate-one uniformization in scaled time of `MultiplicativeCoupling`, and
 `n² τ_q ≤ U` is read as the event that the uniformized report is connected at scaled time `U`.
-Monotonicity of `u ↦ Pr(T_p ≤ u)` is not proved here.  The fibers are the classes of a
-surjective labelling, through `MultiplicativeConnectionConvergence.labelInterface`.
+The fibers are the classes of a surjective labelling, through
+`MultiplicativeConnectionConvergence.labelInterface`.
 
 ## Empirical status
 
@@ -440,6 +442,155 @@ theorem abs_reportConnectionProbability_sub_le_min {n w : ℕ} [NeZero w]
     exact congrArg (fun c : ℕ ↦ |(c : ℝ) / n - p (fiberLabel label hsurj F)|)
       (fiberSize_labelInterface label hsurj F)
   rw [hZ, hfib] at h
+  exact h
+
+/-! ### Monotonicity in time, by superposition -/
+
+/-- **The probability of one edge's state at time `v`**: present with probability
+`1 - e^{-v p_i p_j}`, absent with the rest.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  A Bernoulli mass function. -/
+def edgeMass {w : ℕ} (p : Fin w → ℝ) (v : ℝ) (e : FiberPair w) (b : Bool) : ℝ :=
+  if b then 1 - Real.exp (-(v * pairRate p e)) else Real.exp (-(v * pairRate p e))
+
+/-- A configuration's mass is the product of its edges' masses. -/
+theorem configMass_eq_prod_edgeMass {w : ℕ} (p : Fin w → ℝ) (v : ℝ) (G : FiberPair w → Bool) :
+    configMass p v G = ∏ e, edgeMass p v e (G e) :=
+  rfl
+
+/-- The masses of all configurations add up to one. -/
+theorem sum_configMass {w : ℕ} (p : Fin w → ℝ) (u : ℝ) : ∑ G, configMass p u G = 1 := by
+  have h := sum_configMass_componentPartition_le p u ⊤
+  rw [crossingRate_top, mul_zero, neg_zero, Real.exp_zero] at h
+  simp only [le_top, if_true, mul_one] at h
+  exact h
+
+/-- A configuration's mass is nonnegative at nonnegative times and masses. -/
+theorem configMass_nonneg {w : ℕ} {p : Fin w → ℝ} (hp : ∀ i, 0 ≤ p i) {u : ℝ} (hu : 0 ≤ u)
+    (G : FiberPair w → Bool) : 0 ≤ configMass p u G :=
+  Finset.prod_nonneg fun e _ ↦ by
+    have hrate : 0 ≤ u * pairRate p e := mul_nonneg hu (mul_nonneg (hp _) (hp _))
+    have hexp : Real.exp (-(u * pairRate p e)) ≤ 1 := by
+      rw [← Real.exp_zero]
+      exact Real.exp_le_exp.mpr (by linarith)
+    split_ifs
+    · linarith
+    · exact (Real.exp_pos _).le
+
+/-- **Superposition**: the configuration at time `u + t` is the union of independent
+configurations at times `u` and `t`, because `e^{-(u+t) r} = e^{-u r} e^{-t r}`. -/
+theorem sum_configMass_add_mul {w : ℕ} (p : Fin w → ℝ) (u t : ℝ)
+    (f : (FiberPair w → Bool) → ℝ) :
+    ∑ K, configMass p (u + t) K * f K
+      = ∑ G, ∑ H, configMass p u G * configMass p t H * f (fun e ↦ G e || H e) := by
+  have hind : ∀ G H K : FiberPair w → Bool,
+      (if (fun e ↦ G e || H e) = K then (1 : ℝ) else 0)
+        = ∏ e, if (G e || H e) = K e then (1 : ℝ) else 0 := by
+    intro G H K
+    by_cases hK : (fun e ↦ G e || H e) = K
+    · rw [if_pos hK]
+      symm
+      exact Finset.prod_eq_one fun e _ ↦ if_pos (congrFun hK e)
+    · rw [if_neg hK]
+      symm
+      obtain ⟨e, he⟩ : ∃ e, (G e || H e) ≠ K e := by
+        by_contra hall
+        push_neg at hall
+        exact hK (funext hall)
+      exact Finset.prod_eq_zero (Finset.mem_univ e) (if_neg he)
+  have hedge : ∀ (e : FiberPair w) (c : Bool),
+      ∑ a, ∑ b, edgeMass p u e a * (edgeMass p t e b * if (a || b) = c then (1 : ℝ) else 0)
+        = edgeMass p (u + t) e c := by
+    intro e c
+    have hexp : Real.exp (-((u + t) * pairRate p e))
+        = Real.exp (-(u * pairRate p e)) * Real.exp (-(t * pairRate p e)) := by
+      rw [← Real.exp_add]
+      congr 1
+      ring
+    simp only [Fintype.sum_bool, edgeMass, hexp]
+    cases c <;> simp <;> ring
+  have hinner : ∀ K : FiberPair w → Bool,
+      ∑ G, ∑ H, configMass p u G * configMass p t H
+          * (if (fun e ↦ G e || H e) = K then (1 : ℝ) else 0)
+        = configMass p (u + t) K := by
+    intro K
+    calc ∑ G, ∑ H, configMass p u G * configMass p t H
+          * (if (fun e ↦ G e || H e) = K then (1 : ℝ) else 0)
+        = ∑ G, ∑ H, ∏ e, edgeMass p u e (G e)
+            * (edgeMass p t e (H e) * if (G e || H e) = K e then (1 : ℝ) else 0) := by
+          refine Finset.sum_congr rfl fun G _ ↦ Finset.sum_congr rfl fun H _ ↦ ?_
+          rw [hind G H K, configMass_eq_prod_edgeMass, configMass_eq_prod_edgeMass, mul_assoc,
+            ← Finset.prod_mul_distrib, ← Finset.prod_mul_distrib]
+      _ = ∑ G, ∏ e, ∑ b, edgeMass p u e (G e)
+            * (edgeMass p t e b * if (G e || b) = K e then (1 : ℝ) else 0) := by
+          refine Finset.sum_congr rfl fun G _ ↦ ?_
+          have hexpand := Finset.prod_univ_sum (fun _ : FiberPair w ↦ (univ : Finset Bool))
+            fun e b ↦ edgeMass p u e (G e)
+              * (edgeMass p t e b * if (G e || b) = K e then (1 : ℝ) else 0)
+          rw [Fintype.piFinset_univ] at hexpand
+          exact hexpand.symm
+      _ = ∏ e, ∑ a, ∑ b, edgeMass p u e a
+            * (edgeMass p t e b * if (a || b) = K e then (1 : ℝ) else 0) := by
+          have hexpand := Finset.prod_univ_sum (fun _ : FiberPair w ↦ (univ : Finset Bool))
+            fun e a ↦ ∑ b, edgeMass p u e a
+              * (edgeMass p t e b * if (a || b) = K e then (1 : ℝ) else 0)
+          rw [Fintype.piFinset_univ] at hexpand
+          exact hexpand.symm
+      _ = configMass p (u + t) K := by
+          rw [configMass_eq_prod_edgeMass]
+          exact Finset.prod_congr rfl fun e _ ↦ hedge e (K e)
+  calc ∑ K, configMass p (u + t) K * f K
+      = ∑ K, (∑ G, ∑ H, configMass p u G * configMass p t H
+          * (if (fun e ↦ G e || H e) = K then (1 : ℝ) else 0)) * f K := by
+        simp only [hinner]
+    _ = ∑ G, ∑ H, ∑ K, configMass p u G * configMass p t H
+          * (if (fun e ↦ G e || H e) = K then (1 : ℝ) else 0) * f K := by
+        simp only [Finset.sum_mul]
+        rw [Finset.sum_comm]
+        exact Finset.sum_congr rfl fun G _ ↦ Finset.sum_comm
+    _ = ∑ G, ∑ H, configMass p u G * configMass p t H * f (fun e ↦ G e || H e) := by
+        refine Finset.sum_congr rfl fun G _ ↦ Finset.sum_congr rfl fun H _ ↦ ?_
+        simp only [mul_ite, mul_one, mul_zero, ite_mul, zero_mul, Finset.sum_ite_eq,
+          Finset.mem_univ, if_true]
+
+/-- Adding edges can only merge components. -/
+theorem componentPartition_mono {w : ℕ} {G H : FiberPair w → Bool}
+    (hGH : ∀ e, G e = true → H e = true) : componentPartition G ≤ componentPartition H :=
+  (componentPartition_le_iff G (componentPartition H)).mpr fun e he ↦
+    (componentPartition_le_iff H (componentPartition H)).mp le_rfl e (hGH e he)
+
+/-- **`Pr(T_p ≤ u)` does not decrease in time**: the configuration at `u + t` contains an
+independent copy of the configuration at `u`, and connection is preserved by adding edges. -/
+theorem connectionProbability_le_add {w : ℕ} {p : Fin w → ℝ} (hp : ∀ i, 0 ≤ p i) {u t : ℝ}
+    (hu : 0 ≤ u) (ht : 0 ≤ t) :
+    connectionProbability p u ≤ connectionProbability p (u + t) := by
+  unfold connectionProbability
+  rw [sum_configMass_add_mul p u t]
+  calc ∑ G, configMass p u G * (if componentPartition G = ⊤ then (1 : ℝ) else 0)
+      = ∑ G, ∑ H, configMass p u G * configMass p t H
+          * (if componentPartition G = ⊤ then (1 : ℝ) else 0) := by
+        refine Finset.sum_congr rfl fun G _ ↦ ?_
+        rw [← Finset.sum_mul, ← Finset.mul_sum, sum_configMass, mul_one]
+    _ ≤ ∑ G, ∑ H, configMass p u G * configMass p t H
+          * (if componentPartition (fun e ↦ G e || H e) = ⊤ then (1 : ℝ) else 0) := by
+        refine Finset.sum_le_sum fun G _ ↦ Finset.sum_le_sum fun H _ ↦ ?_
+        refine mul_le_mul_of_nonneg_left ?_
+          (mul_nonneg (configMass_nonneg hp hu G) (configMass_nonneg hp ht H))
+        by_cases hG : componentPartition G = ⊤
+        · have hle := componentPartition_mono (G := G) (H := fun e ↦ G e || H e)
+            fun e he ↦ by simp [he]
+          rw [hG] at hle
+          rw [if_pos hG, if_pos (top_unique hle)]
+        · rw [if_neg hG]
+          split_ifs <;> norm_num
+
+/-- **The limit distribution function is monotone** on nonnegative times. -/
+theorem monotoneOn_connectionProbability {w : ℕ} {p : Fin w → ℝ} (hp : ∀ i, 0 ≤ p i) :
+    MonotoneOn (fun u ↦ connectionProbability p u) (Set.Ici 0) := by
+  intro u hu v _ huv
+  have h := connectionProbability_le_add hp hu (sub_nonneg.mpr huv)
+  have hv : u + (v - u) = v := by ring
+  rw [hv] at h
   exact h
 
 end

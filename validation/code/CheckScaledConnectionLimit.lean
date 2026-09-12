@@ -46,3 +46,17 @@ functionals. -/
   Descent.Pangenome.GraphCoalescent.sum_massPathLaw_mul_last_top
 #print axioms
   Descent.Pangenome.GraphCoalescent.abs_reportConnectionProbability_sub_le_min
+#print axioms
+  Descent.Pangenome.GraphCoalescent.configMass_eq_prod_edgeMass
+#print axioms
+  Descent.Pangenome.GraphCoalescent.sum_configMass
+#print axioms
+  Descent.Pangenome.GraphCoalescent.configMass_nonneg
+#print axioms
+  Descent.Pangenome.GraphCoalescent.sum_configMass_add_mul
+#print axioms
+  Descent.Pangenome.GraphCoalescent.componentPartition_mono
+#print axioms
+  Descent.Pangenome.GraphCoalescent.connectionProbability_le_add
+#print axioms
+  Descent.Pangenome.GraphCoalescent.monotoneOn_connectionProbability
