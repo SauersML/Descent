@@ -341,35 +341,39 @@ index `1` is the target. -/
 def sourceTargetFamily (source target : Ω → ℝ) : Fin 2 → Ω → ℝ := ![source, target]
 
 omit [MeasurableSpace Ω] in
-/-- The two-metric family of nonnegative functionals is nonnegative. -/
-theorem sourceTargetFamily_nonneg (source target : Ω → ℝ) (hsource : ∀ ω, 0 ≤ source ω)
-    (htarget : ∀ ω, 0 ≤ target ω) :
-    ∀ index ω, 0 ≤ sourceTargetFamily source target index ω := by
+/-- A pointwise relation between two source functionals and between two target functionals holds
+between the two-metric families at every index. -/
+theorem sourceTargetFamily_rel (r : ℝ → ℝ → Prop) (source target source' target' : Ω → ℝ)
+    (hsource : ∀ ω, r (source ω) (source' ω)) (htarget : ∀ ω, r (target ω) (target' ω)) :
+    ∀ index ω, r (sourceTargetFamily source target index ω)
+      (sourceTargetFamily source' target' index ω) := by
   intro index ω
   fin_cases index
   · exact hsource ω
   · exact htarget ω
 
 omit [MeasurableSpace Ω] in
+/-- The two-metric family of nonnegative functionals is nonnegative. -/
+theorem sourceTargetFamily_nonneg (source target : Ω → ℝ) (hsource : ∀ ω, 0 ≤ source ω)
+    (htarget : ∀ ω, 0 ≤ target ω) :
+    ∀ index ω, 0 ≤ sourceTargetFamily source target index ω :=
+  sourceTargetFamily_rel (fun value _ ↦ 0 ≤ value) source target source target hsource htarget
+
+omit [MeasurableSpace Ω] in
 /-- Numerators dominated by their denominators give a dominated two-metric family. -/
 theorem sourceTargetFamily_le (sourceNum sourceDen targetNum targetDen : Ω → ℝ)
     (hsourceLe : ∀ ω, sourceNum ω ≤ sourceDen ω) (htargetLe : ∀ ω, targetNum ω ≤ targetDen ω) :
     ∀ index ω, sourceTargetFamily sourceNum targetNum index ω ≤
-      sourceTargetFamily sourceDen targetDen index ω := by
-  intro index ω
-  fin_cases index
-  · exact hsourceLe ω
-  · exact htargetLe ω
+      sourceTargetFamily sourceDen targetDen index ω :=
+  sourceTargetFamily_rel (· ≤ ·) sourceNum targetNum sourceDen targetDen hsourceLe htargetLe
 
 omit [MeasurableSpace Ω] in
 /-- Denominators below one give a two-metric family below one. -/
 theorem sourceTargetFamily_le_one (sourceDen targetDen : Ω → ℝ)
     (hsourceDen : ∀ ω, sourceDen ω ≤ 1) (htargetDen : ∀ ω, targetDen ω ≤ 1) :
-    ∀ index ω, sourceTargetFamily sourceDen targetDen index ω ≤ 1 := by
-  intro index ω
-  fin_cases index
-  · exact hsourceDen ω
-  · exact htargetDen ω
+    ∀ index ω, sourceTargetFamily sourceDen targetDen index ω ≤ 1 :=
+  sourceTargetFamily_rel (fun value _ ↦ value ≤ 1) sourceDen targetDen sourceDen targetDen
+    hsourceDen htargetDen
 
 /-- Measurable source and target functionals give a measurable two-metric family. -/
 theorem measurable_sourceTargetFamily (source target : Ω → ℝ) (hsource : Measurable source)

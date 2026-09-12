@@ -20,6 +20,7 @@ open Descent.Portability.PortabilityMeasureQueries
 #print axioms ratioMean_eq_tsum
 #print axioms tsum_gatedTerm_eq_top
 #print axioms lintegral_ungated_eq_top
+#print axioms sourceTargetFamily_rel
 #print axioms sourceTargetFamily_nonneg
 #print axioms sourceTargetFamily_le
 #print axioms sourceTargetFamily_le_one
