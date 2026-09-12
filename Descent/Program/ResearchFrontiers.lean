@@ -27,6 +27,7 @@ import Descent.Pangenome.GraphCoalescent.FiberSizeMultisetRecovery
 import Descent.Pangenome.AncestralLocality.SelectionLightCone
 import Descent.Pangenome.GraphCoalescent.PanelSizeIdentifiability
 import Descent.Pangenome.GraphCoalescent.FiberSizeIdentifiabilityFour
+import Descent.Pangenome.GraphCoalescent.ReportInhomogeneousMarkov
 
 namespace Descent.Program
 
@@ -102,7 +103,11 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   of the report history of Kingman's jump chain from the singletons (`not_isReportMarkovFromBot`),
   while an injective interface gives a Markov report (`isReportMarkovFromBot_of_injective`); on
   three haplotypes the report stays put with probability `1/3` after one step and `0` after two
-  (`example_stay_given_one`, `example_stay_given_two`).
+  (`example_stay_given_one`, `example_stay_given_two`). A transition law that may depend on the
+  jump count does exist when at most one graph state holds two or more haplotypes
+  (`ReportInhomogeneousMarkov.isReportInhomogeneousMarkov_of_atMostOneHeavy`) and at width two
+  (`isReportInhomogeneousMarkov_of_width_eq_two`), the three-haplotype example included
+  (`example_isReportInhomogeneousMarkov`); for those interfaces only time homogeneity fails.
 * What a compressed pangenome reveals about its hidden fiber sizes: `FiberSizeIdentifiability`.
   The connectivity cumulant, and hence the law of the reported connection time, determines the
   product of the fiber sizes at every width (`prod_eq_of_cumulantOfSizes_eq`), the unordered pair
