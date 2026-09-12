@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.AncestralLocality.DecisionWindowSemigroup
+import Descent.Pangenome.AncestralLocality.OneAlleleDuality
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program
@@ -23,6 +24,17 @@ genome types and in the coalescence rate. For event rates at most `σ` the bound
 selective rate at most `σ` it reads `t σ (2n) ‖f‖`
 (`norm_decisionWindowSemigroup_sub_neutral_le_of_sum_le`). The number of events enters only
 through `R`: an event duplicated `m` times acts as one event at `m` times the rate.
+
+Sharpness. The factor `n R` cannot be removed. On sampling functions the events change the
+generator by `H_{G f} - n R H_f` (`backwardFunction_sub_zero_rates`). On one biallelic coordinate,
+take `m` events at rate `σ > 0` whose rule always gives the non-carrier genome (`falseRule`) and
+the observation `allCarriers n` of `OneAlleleDuality` that all `n` sampled genomes carry the allele.
+Branching kills the observation (`branchingGain_falseRule`), and at the law fixed at the carrier
+genome (`trueLaw`) the change of the generator is `-n m σ` (`backwardFunction_falseRule_sub_apply`).
+So a bound `‖T^r_t H_f - T^0_t H_f‖ ≤ t σ C ‖f‖` at every `t ∈ [0, 1]` forces `n m ≤ C`
+(`mul_card_le_of_norm_sub_neutral_le`). No constant independent of the arity or of the number of
+events holds when `σ` bounds each event rate, and `2 n |E|` is within a factor two of the best
+constant.
 
 The dual route. Both semigroups are dual series on sampling functions
 (`decisionWindowSemigroup_samplingFunction`). At rate zero nothing branches
@@ -320,7 +332,116 @@ theorem norm_decisionWindowSemigroup_sub_neutral_le_card {c σ : ℝ} (hc : 0 �
   refine (norm_decisionWindowSemigroup_sub_neutral_le_of_sum_le hc hr hRσ T t f).trans_eq ?_
   ring
 
+/-- **The events change the generator on sampling functions by `H_{G f} - n R H_f`**: the branching
+gain, less the branching part `n R` of the exit rate. -/
+theorem backwardFunction_sub_zero_rates (c : ℝ) (r : E → ℝ) (T : E → H → H → H) {n : ℕ}
+    (f : (Fin n → H) → ℝ) :
+    backwardFunction c r T f - backwardFunction c (0 : E → ℝ) T f =
+      samplingFunction (branchingGain r T f) - ((n : ℝ) * ∑ e, r e) • samplingFunction f := by
+  have hlin : ∀ a : ℝ, samplingFunction (coalescenceGain c f - a • f) =
+      samplingFunction (coalescenceGain c f) - a • samplingFunction f := fun a ↦ by
+    simp only [← samplingCLM_apply, map_sub, map_smul]
+  have hrate : dualExitRate c r n = dualExitRate c (0 : E → ℝ) n + (n : ℝ) * ∑ e, r e := by
+    simp only [dualExitRate, Pi.zero_apply, sum_const_zero, mul_zero, add_zero]
+  rw [backwardFunction, backwardFunction, hlin, hlin, branchingGain_zero_rates,
+    samplingFunction_zero, hrate, add_smul]
+  abel
+
 end Window
+
+/-! ## The constant is sharp -/
+
+section Sharpness
+
+/-- **The rule that always gives the child the non-carrier genome.** -/
+def falseRule (E : Type*) : E → Bool → Bool → Bool :=
+  fun _ _ _ ↦ false
+
+/-- **The law fixed at the carrier genome.** -/
+def trueLaw : SimplexLaw Bool :=
+  ⟨fun b ↦ if b = true then 1 else 0, fun b ↦ by cases b <;> simp, by simp [Fintype.sum_bool]⟩
+
+/-- The all-carriers observation has sup norm one. -/
+theorem norm_allCarriers (n : ℕ) : ‖allCarriers n‖ = 1 := by
+  refine le_antisymm ((pi_norm_le_iff_of_nonneg zero_le_one).mpr fun w ↦ ?_) ?_
+  · rw [allCarriers, Fintype.prod_boole, Real.norm_eq_abs]
+    split_ifs <;> norm_num
+  · have h := norm_le_pi_norm (allCarriers n) (fun _ ↦ true)
+    simpa [allCarriers] using h
+
+/-- **Branching into the non-carrier genome kills every carrier observation.** -/
+theorem branchingGain_falseRule (n m : ℕ) (σ : ℝ) :
+    branchingGain (fun _ : Fin m ↦ σ) (falseRule (Fin m)) (allCarriers n) = 0 := by
+  have hbranch : ∀ (e : Fin m) (a : Fin n),
+      decisionBranch (falseRule (Fin m) e) a (allCarriers n) = 0 := fun e a ↦ by
+    funext u
+    show allCarriers n (Function.update (Fin.init u) a
+      (falseRule (Fin m) e (u a.castSucc) (u (Fin.last n)))) = 0
+    rw [allCarriers]
+    exact Finset.prod_eq_zero (Finset.mem_univ a) (by simp [falseRule])
+  show ∑ e, (fun _ : Fin m ↦ σ) e •
+    ∑ a, decisionBranch (falseRule (Fin m) e) a (allCarriers n) = 0
+  simp only [hbranch, sum_const_zero, smul_zero]
+
+/-- At the law fixed at the carrier genome every all-carriers observable is one. -/
+theorem samplingFunction_allCarriers_trueLaw (n : ℕ) :
+    samplingFunction (allCarriers n) trueLaw = 1 := by
+  rw [samplingFunction_apply, samplingObservable_allCarriers]
+  simp [trueLaw]
+
+/-- **At the law fixed at the carrier genome the events change the generator by `-n m σ`.** -/
+theorem backwardFunction_falseRule_sub_apply (c : ℝ) (n m : ℕ) (σ : ℝ) :
+    (backwardFunction c (fun _ : Fin m ↦ σ) (falseRule (Fin m)) (allCarriers n) -
+        backwardFunction c (0 : Fin m → ℝ) (falseRule (Fin m)) (allCarriers n)) trueLaw =
+      -((n : ℝ) * (m * σ)) := by
+  rw [backwardFunction_sub_zero_rates, branchingGain_falseRule, samplingFunction_zero, zero_sub,
+    ContinuousMap.neg_apply, ContinuousMap.smul_apply, samplingFunction_allCarriers_trueLaw,
+    smul_eq_mul, mul_one, sum_const, card_univ, Fintype.card_fin, nsmul_eq_mul]
+
+/-- **The constant `2 n |E|` is sharp up to a factor two.** On one biallelic coordinate with `m`
+events at rate `σ > 0` whose rule always gives the non-carrier genome, and the observation that all
+`n` sampled genomes carry the allele, a bound `‖T^r_t H_f - T^0_t H_f‖ ≤ t σ C ‖f‖` at every time
+`t ∈ [0, 1]` forces `n m ≤ C`: the slopes at time zero differ by `n m σ` at the law fixed at the
+carrier genome. -/
+theorem mul_card_le_of_norm_sub_neutral_le {c : ℝ} (hc : 0 ≤ c) (n m : ℕ) {σ C : ℝ}
+    (hσ : 0 < σ)
+    (hbound : ∀ t : ℝ≥0, t ≤ 1 →
+      ‖(decisionWindowSemigroup hc (r := fun _ : Fin m ↦ σ) (fun _ ↦ hσ.le)
+            (falseRule (Fin m))).operator t (samplingFunction (allCarriers n)) -
+          (neutralWindowSemigroup hc (falseRule (Fin m))).operator t
+            (samplingFunction (allCarriers n))‖ ≤ (t : ℝ) * σ * C * ‖allCarriers n‖) :
+    (n : ℝ) * m ≤ C := by
+  have hslope := ((tendsto_decisionWindowSemigroup_slope hc (r := fun _ : Fin m ↦ σ)
+    (fun _ ↦ hσ.le) (falseRule (Fin m)) (allCarriers n)).sub
+      (tendsto_decisionWindowSemigroup_slope hc (r := (0 : Fin m → ℝ)) (fun _ ↦ le_rfl)
+        (falseRule (Fin m)) (allCarriers n))).norm
+  have hle : ‖backwardFunction c (fun _ : Fin m ↦ σ) (falseRule (Fin m)) (allCarriers n) -
+      backwardFunction c (0 : Fin m → ℝ) (falseRule (Fin m)) (allCarriers n)‖ ≤ σ * C := by
+    refine le_of_tendsto hslope ?_
+    filter_upwards [self_mem_nhdsWithin,
+      eventually_nhdsWithin_of_eventually_nhds (eventually_lt_nhds zero_lt_one)] with t ht0 ht1
+    have htpos : 0 < t := ht0
+    have hcoe : (t.toNNReal : ℝ) = t := Real.coe_toNNReal t htpos.le
+    have hb := hbound t.toNNReal (by
+      rw [← NNReal.coe_le_coe, hcoe, NNReal.coe_one]
+      exact ht1.le)
+    rw [hcoe, norm_allCarriers, mul_one] at hb
+    rw [← smul_sub, sub_sub_sub_cancel_right, norm_smul, Real.norm_eq_abs,
+      abs_of_pos (inv_pos.mpr htpos), inv_mul_le_iff₀ htpos]
+    calc _ ≤ _ := hb
+      _ = t * (σ * C) := by ring
+  have hpoint := ContinuousMap.norm_coe_le_norm
+    (backwardFunction c (fun _ : Fin m ↦ σ) (falseRule (Fin m)) (allCarriers n) -
+      backwardFunction c (0 : Fin m → ℝ) (falseRule (Fin m)) (allCarriers n)) trueLaw
+  rw [backwardFunction_falseRule_sub_apply, norm_neg, Real.norm_eq_abs,
+    abs_of_nonneg (mul_nonneg (Nat.cast_nonneg n) (mul_nonneg (Nat.cast_nonneg m) hσ.le))]
+    at hpoint
+  have h := hpoint.trans hle
+  by_contra hlt
+  push_neg at hlt
+  nlinarith
+
+end Sharpness
 
 end
 
