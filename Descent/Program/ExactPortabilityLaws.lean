@@ -123,6 +123,7 @@ import Descent.Portability.PartialHaplotypeEventHistoryRealization
 import Descent.Portability.NeutralPulseHistoryKernel
 import Descent.Portability.NeutralDemeRelabelKernel
 import Descent.Portability.NeutralFellerProperty
+import Descent.Portability.NeutralFellerContinuity
 import Descent.Portability.NeutralRateHistoryRealization
 import Descent.Portability.ReferenceExperimentCohortRows
 import Descent.Portability.CylinderGaussianQuadrant
@@ -285,7 +286,11 @@ neutral semigroup on every continuous observable, and its Riesz kernels are Mark
 (`NeutralMicroscopicEulerLimit.hasDerivWithinAt_integral_neutralMarkovKernel`). The floor form
 `K_h^{⌊t/h⌋} f → T_t f` holds as well and discharges the hypothesis of
 `PolynomialFellerExtension.markov_of_euler_tendstoUniformly`
-(`NeutralMicroscopicFloorLimit.neutralPolynomialSemigroup_markov_of_euler`). Under those kernels,
+(`NeutralMicroscopicFloorLimit.neutralPolynomialSemigroup_markov_of_euler`), and the kernel
+integrals converge uniformly along it (`tendstoUniformly_integral_neutralMarkovKernel_floor`).
+Continuity at `t = 0` holds on each polynomial space and then on every continuous observable
+(`NeutralFellerContinuity.tendsto_neutralSemigroupExtension_zero`,
+`tendstoUniformly_integral_neutralMarkovKernel_zero`). Under those kernels,
 one process for every budget, the configuration
 moments of (20) and the panel reports of (22) hold:
 `NeutralKernelPanelLikelihood.integral_panelReport_neutralMarkovKernel`. The kernels

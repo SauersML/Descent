@@ -153,7 +153,11 @@ independent complexity bounds and a quantitative light cone.
   the genome laws form a compact space (`CylinderSamplingAlgebra.compactSpace_probabilityMeasure`)
   on which the cylinder sampling algebra is dense (`samplingAlgebra_topologicalClosure_eq_top`),
   and every sampling polynomial of several genomes lies in it
-  (`CylinderSamplingPolynomials.samplingPolynomial_mem_samplingAlgebra`).
+  (`CylinderSamplingPolynomials.samplingPolynomial_mem_samplingAlgebra`). There the limit is
+  `InfiniteGenomeLimit.infiniteGenomeSemigroup`: the finite-genome operators converge to it on
+  every observable (`tendsto_infiniteGenomeSemigroup`), it is determined by the cylinder sampling
+  polynomials (`operator_eq_infiniteGenomeSemigroup`), and it does not depend on the exhaustion
+  (`infiniteGenomeSemigroup_eq_of_tendsto`).
 * Corollary 8.1, the light cone as a coupling: `LocalityCoupling`. Two sample laws obtained by
   evaluating one circuit on inputs that coincide off an escape event are within total variation
   the probability of escape (`totalVariation_mixtureLaw_le`); for a circuit reading only inspected
