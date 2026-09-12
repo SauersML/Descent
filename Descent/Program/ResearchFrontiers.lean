@@ -44,6 +44,9 @@ import Descent.Portability.EndToEndDiploidHistoryLaw
 import Descent.Portability.MigrationPortabilityFactor
 import Descent.Portability.EndToEndGWASTrainingLaw
 import Descent.Portability.EndToEndGWASTrainingHistory
+import Descent.Portability.EndToEndSensitivityLaw
+import Descent.Portability.EndToEndSensitivityMetrics
+import Descent.Portability.EndToEndSensitivityArchitecture
 
 namespace Descent.Program
 
@@ -125,6 +128,17 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   budget-8 propagated moments and `n`
   (`EndToEndGWASTrainingHistory.expectedTrainedAccuracy_historyEventKernel`,
   `expectedTrainedAccuracy_eq_of_moments_eq`).
+  How accuracy moves with the inputs is exact as well. A differentiable dual generator gives the
+  Duhamel derivative of each epoch propagator
+  (`EndToEndSensitivityLaw.hasDerivAt_matrixExponential_of_hasDerivAt`), and a history's
+  derivative is the sum over stages of forward law, event derivative and backward value
+  (`hasDerivAt_dotProduct_historyEventPropagator`). The squared-correlation, calibration and
+  AUC portabilities then have explicit derivatives, and portability decreases exactly when the
+  target's relative sensitivity is below the source's
+  (`EndToEndSensitivityMetrics.hasDerivAt_expectedPortability_historyEventKernel`,
+  `crossRatioDerivative_neg_iff_of_pos`). Portability strictly decreases in the target
+  environment variance
+  (`EndToEndSensitivityArchitecture.portability_environmentVariance_derivative_neg`).
 * The closed-form decay of portability through linkage: `TwoLocusPortabilityDecay`. On the NOTE1
   low-order moment system, for a source and a target split `T` ago with drift and recombination,
   the cross-population expected squared correlation of a tag-locus score relative to its value at

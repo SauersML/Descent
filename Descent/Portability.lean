@@ -734,6 +734,10 @@ import Descent.Portability.EndToEndDiploidHistoryLaw
 import Descent.Portability.MigrationPortabilityFactor
 import Descent.Portability.EndToEndGWASTrainingLaw
 import Descent.Portability.EndToEndGWASTrainingHistory
+import Descent.Portability.EndToEndCalibrationLaw
+import Descent.Portability.EndToEndSensitivityLaw
+import Descent.Portability.EndToEndSensitivityMetrics
+import Descent.Portability.EndToEndSensitivityArchitecture
 import Descent.Portability.PortabilityMinimaxRate
 import Descent.Portability.HistoryExactLocality
 
