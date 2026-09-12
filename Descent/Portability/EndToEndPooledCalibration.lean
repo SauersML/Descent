@@ -453,25 +453,11 @@ theorem abs_compiledSlope_pooledLaw_rateHistory_sub_le
 
 /-! ## Deployment metrics of one population -/
 
-/-- The expectation of a sum of observables is the sum of their expectations. -/
-theorem expectation_add_observable {Ω : Type*} [Fintype Ω] (p : FiniteReportLaw Ω)
-    (f g : Ω → ℝ) : p.expectation (f + g) = p.expectation f + p.expectation g := by
-  simp only [FiniteReportLaw.expectation, Pi.add_apply, mul_add, Finset.sum_add_distrib]
-
-/-- The expectation of a scaled observable is the scaled expectation. -/
-theorem expectation_smul_observable {Ω : Type*} [Fintype Ω] (p : FiniteReportLaw Ω) (c : ℝ)
-    (f : Ω → ℝ) : p.expectation (c • f) = c * p.expectation f := by
-  simp only [FiniteReportLaw.expectation, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
-  exact Finset.sum_congr rfl fun ω _ ↦ by ring
-
-/-- The expectation functional of a finite law, as a positive normalised linear functional. -/
+/-- The expectation functional of a finite law: the master theorem's `weightedExp` of its
+masses. -/
 def lawExpectation {Ω : Type*} [Fintype Ω] (p : FiniteReportLaw Ω) :
-    Foundations.ExpFunctional Ω where
-  eval f := p.expectation f
-  add_eval f g := expectation_add_observable p f g
-  smul_eval c f := expectation_smul_observable p c f
-  const_one := expectation_one_observable p
-  nonneg_eval f hf := Finset.sum_nonneg fun ω _ ↦ mul_nonneg (p.mass_nonneg ω) (hf ω)
+    Foundations.ExpFunctional Ω :=
+  weightedExp p.mass p.mass_nonneg p.mass_sum
 
 /-- The score variance times the corpus residual variance `V_Y (1 - C² / (V_S V_Y))` is
 `(D - N) / 16`, with `N` and `D` the correlation accumulators of NOTE2 (21). -/
