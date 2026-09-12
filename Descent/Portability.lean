@@ -728,6 +728,8 @@ import Descent.Portability.PortabilityCurveIdentifiability
 import Descent.Portability.PortabilitySizeBlindness
 import Descent.Portability.SelectionPortabilityBound
 import Descent.Portability.PolygenicPortabilityDecay
+import Descent.Portability.EndToEndDiscriminationLaw
+import Descent.Portability.EndToEndDiploidLaw
 import Descent.Portability.PortabilityMinimaxRate
 import Descent.Portability.HistoryExactLocality
 

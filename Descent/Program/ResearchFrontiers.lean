@@ -38,6 +38,8 @@ import Descent.Portability.PortabilityMinimaxRate
 import Descent.Portability.HistoryExactLocality
 import Descent.Pangenome.GraphSiteFrequencySpectrum
 import Descent.Portability.PolygenicPortabilityDecay
+import Descent.Portability.EndToEndDiscriminationLaw
+import Descent.Portability.EndToEndDiploidLaw
 
 namespace Descent.Program
 
@@ -94,6 +96,16 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   `Σ_k c_k ⬝ (U · H_{4(k+1)}(x₀))` (`EndToEndCorrelationSeries.expectedSquaredCorrelation_eq_tsum`,
   `expectedSquaredCorrelation_historyEventKernel`), so it too depends on the history only through
   propagated moments (`expectedSquaredCorrelation_eq_of_moments_eq`).
+  The binary AUC goes through the same kernels. Its numerator and denominator have degree two,
+  so AUC portability is a rational function of the budget-2 propagated moments
+  (`EndToEndDiscriminationLaw.expectedAUCPortability_historyEventKernel`,
+  `expectedAUCPortability_eq_of_moments_eq`), and the expected AUC is a series in propagated
+  moments (`expectedAUC_historyEventKernel`). Diploid scores port exactly as haploid ones: for
+  additive lifts and any within-deme inbreeding `F`, the correlation numerator and denominator
+  both scale by `4 (1 + F)²`, so the squared correlation and expected portability are unchanged
+  along any history (`EndToEndDiploidLaw.squaredCorrelation_inbredMating_diploidSum`,
+  `expectedDiploidPortability_historyEventKernel`); a dominance observable breaks the transfer
+  (`diploidProduct_breaks_ploidy_transfer`).
 * The closed-form decay of portability through linkage: `TwoLocusPortabilityDecay`. On the NOTE1
   low-order moment system, for a source and a target split `T` ago with drift and recombination,
   the cross-population expected squared correlation of a tag-locus score relative to its value at
