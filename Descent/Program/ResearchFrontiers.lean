@@ -49,6 +49,8 @@ import Descent.Portability.EndToEndSensitivityMetrics
 import Descent.Portability.EndToEndSensitivityArchitecture
 import Descent.Portability.EndToEndAscertainedLaw
 import Descent.Portability.EndToEndSensitivityRates
+import Descent.Portability.SelectionHistoryMoments
+import Descent.Portability.EndToEndSelectionLaw
 
 namespace Descent.Program
 
@@ -154,6 +156,15 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   `ascertainedPortability_eq_conditionalOnPassing`). When the target is uncorrelated with
   passing, ascertainment lowers portability exactly when passing raises source accuracy
   (`ascertainedPortability_lt_expectedPortability_iff`).
+  Under selection the law survives as an error bar. With haploid fitness bounded by `σ`, the
+  selected moments along any history of epochs, splits and pulses stay within `BσT` of the
+  neutral propagation
+  (`SelectionHistoryMoments.norm_expectedMomentVector_sub_propagator_le`,
+  `EndToEndSelectionLaw.norm_selectedHistory_sub_propagator_le`), and portability moves by
+  at most `4‖a‖₁‖b‖₁‖c‖₁‖d‖₁/δ⁴ · 4|L|σT` (`abs_selectedPortability_sub_neutral_le`). No
+  finite-budget law exists: frequency mixtures agreeing on every budget-4 moment have
+  different expected selection terms (`frequencyMixture_moments_eq`,
+  `frequencyMixture_selection_ne`, `not_exists_budgetFour_selectionClosure`).
 * The closed-form decay of portability through linkage: `TwoLocusPortabilityDecay`. On the NOTE1
   low-order moment system, for a source and a target split `T` ago with drift and recombination,
   the cross-population expected squared correlation of a tag-locus score relative to its value at

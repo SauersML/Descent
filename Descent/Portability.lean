@@ -740,6 +740,8 @@ import Descent.Portability.EndToEndSensitivityMetrics
 import Descent.Portability.EndToEndSensitivityArchitecture
 import Descent.Portability.EndToEndAscertainedLaw
 import Descent.Portability.EndToEndSensitivityRates
+import Descent.Portability.SelectionHistoryMoments
+import Descent.Portability.EndToEndSelectionLaw
 import Descent.Portability.PortabilityMinimaxRate
 import Descent.Portability.HistoryExactLocality
 
