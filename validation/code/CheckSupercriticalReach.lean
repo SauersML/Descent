@@ -20,5 +20,7 @@ open Descent.Pangenome.AncestralLocality
 #print axioms graphProb_not_giantEvent_zero_le
 #print axioms giantComponentLaw_of_lt_one
 #print axioms giantComponentLaw_half
+#print axioms card_reach_le_of_forall_not_mem
+#print axioms abs_card_reach_div_sub_le_of_mem
 #print axioms giantEvent_card_reach_dichotomy
 #print axioms tendsto_graphProb_reach_near_zero_or_giant

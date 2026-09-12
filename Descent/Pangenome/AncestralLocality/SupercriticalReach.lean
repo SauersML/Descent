@@ -32,8 +32,9 @@ event fails with probability at most `1/((1 - α) ε^2 m)` (`graphProb_not_giant
 
 **The support of the limit law (6.2).** On `GiantEvent s ε` the reach of a query `A` is either at
 most `|A| ε m` or within `(|A| + 1) ε` of `s m` (`giantEvent_card_reach_dichotomy`). A query that
-touches the giant component contains it and adds at most `ε m` features per root; a query that
-misses it is a union of `|A|` small components. Assuming the law, for queries of at most `k`
+touches the giant component contains it and adds at most `ε m` features per root
+(`abs_card_reach_div_sub_le_of_mem`); a query that misses it is a union of `|A|` small components
+(`card_reach_le_of_forall_not_mem`). Assuming the law, for queries of at most `k`
 features the reach fraction `|C_m(A)|/m` is, with probability tending to one, within `ε` of `0`
 or of `giantFraction α` (`tendsto_graphProb_reach_near_zero_or_giant`).
 
@@ -221,6 +222,66 @@ theorem giantComponentLaw_half : GiantComponentLaw (1 / 2) :=
 
 /-! ### The support of the limit law (6.2) -/
 
+/-- **A query that misses the giant component is small.** If every feature outside `C(v)` lies in
+a component of at most `ε m` features and no root of `A` lies in `C(v)`, then
+`|Reach(A)| ≤ |A| ε m`. -/
+theorem card_reach_le_of_forall_not_mem {m : ℕ} {G : SimpleGraph (Fin m)} {ε : ℝ} {v : Fin m}
+    (A : Finset (Fin m)) (hsmall : ∀ w, w ∉ reach G {v} → ((reach G {w}).card : ℝ) ≤ ε * m)
+    (hmiss : ∀ a ∈ A, a ∉ reach G {v}) : ((reach G A).card : ℝ) ≤ A.card * (ε * m) :=
+  calc ((reach G A).card : ℝ) ≤ ∑ a ∈ A, ((reach G {a}).card : ℝ) := by
+        exact_mod_cast card_reach_le_sum G A
+    _ ≤ ∑ _a ∈ A, ε * m := sum_le_sum fun a ha ↦ hsmall a (hmiss a ha)
+    _ = A.card * (ε * m) := by rw [sum_const, nsmul_eq_mul]
+
+/-- **A query that touches the giant component is giant.** If `|C(v)|/m` is within `ε` of `s`,
+every feature outside `C(v)` lies in a component of at most `ε m` features, and some root of `A`
+lies in `C(v)`, then `|Reach(A)|/m` is within `(|A| + 1) ε` of `s`. -/
+theorem abs_card_reach_div_sub_le_of_mem {m : ℕ} {G : SimpleGraph (Fin m)} {s ε : ℝ}
+    {v : Fin m} (A : Finset (Fin m)) (hv : |((reach G {v}).card : ℝ) / m - s| ≤ ε)
+    (hsmall : ∀ w, w ∉ reach G {v} → ((reach G {w}).card : ℝ) ≤ ε * m) {a : Fin m}
+    (haA : a ∈ A) (haB : a ∈ reach G {v}) :
+    |((reach G A).card : ℝ) / m - s| ≤ (A.card + 1) * ε := by
+  have hm : (0 : ℝ) < m := Nat.cast_pos.mpr v.pos
+  have hε : 0 ≤ ε := (abs_nonneg _).trans hv
+  have hlow : reach G {v} ⊆ reach G A := by
+    rw [← reach_singleton_eq_of_mem haB]
+    exact reach_mono G (singleton_subset_iff.mpr haA)
+  have hup : reach G A ⊆
+      reach G {v} ∪ (A.filter fun b ↦ b ∉ reach G {v}).biUnion fun b ↦ reach G {b} := by
+    intro w hw
+    obtain ⟨b, hbA, hbw⟩ := (mem_reach_iff G A w).mp hw
+    have hwb : w ∈ reach G {b} :=
+      (mem_reach_iff G {b} w).mpr ⟨b, mem_singleton_self b, hbw⟩
+    by_cases hb : b ∈ reach G {v}
+    · exact mem_union_left _ (reach_singleton_eq_of_mem hb ▸ hwb)
+    · exact mem_union_right _ (mem_biUnion.mpr ⟨b, mem_filter.mpr ⟨hbA, hb⟩, hwb⟩)
+  have hsum : (∑ b ∈ A.filter fun b ↦ b ∉ reach G {v}, ((reach G {b}).card : ℝ)) ≤
+      A.card * (ε * m) := by
+    calc _ ≤ ∑ _b ∈ A.filter fun b ↦ b ∉ reach G {v}, ε * m :=
+          sum_le_sum fun b hb ↦ hsmall b (mem_filter.mp hb).2
+      _ = (A.filter fun b ↦ b ∉ reach G {v}).card * (ε * m) := by
+          rw [sum_const, nsmul_eq_mul]
+      _ ≤ A.card * (ε * m) :=
+          mul_le_mul_of_nonneg_right (by exact_mod_cast card_filter_le _ _)
+            (mul_nonneg hε hm.le)
+  have hcard : ((reach G A).card : ℝ) ≤ (reach G {v}).card +
+      ∑ b ∈ A.filter fun b ↦ b ∉ reach G {v}, ((reach G {b}).card : ℝ) := by
+    have h1 := (card_le_card hup).trans (card_union_le _ _)
+    have h2 := card_biUnion_le (s := A.filter fun b ↦ b ∉ reach G {v})
+      (t := fun b ↦ reach G {b})
+    exact_mod_cast h1.trans (Nat.add_le_add_left h2 _)
+  have hcard_low : ((reach G {v}).card : ℝ) ≤ (reach G A).card := by
+    exact_mod_cast card_le_card hlow
+  obtain ⟨hB1, hB2⟩ := abs_le.mp hv
+  have hdiv_low : ((reach G {v}).card : ℝ) / m ≤ (reach G A).card / m :=
+    div_le_div_of_nonneg_right hcard_low hm.le
+  have hdiv_up : ((reach G A).card : ℝ) / m ≤ (reach G {v}).card / m + A.card * ε := by
+    rw [div_le_iff₀ hm, add_mul, div_mul_cancel₀ _ hm.ne']
+    linarith
+  have hkε : 0 ≤ (A.card : ℝ) * ε := mul_nonneg (Nat.cast_nonneg _) hε
+  rw [abs_le]
+  constructor <;> linarith
+
 /-- **The deterministic core of (6.2).** On the giant-component event at scale `ε` the reach of a
 query `A` is either at most `|A| ε m` or within `(|A| + 1) ε` of `s m`. -/
 theorem giantEvent_card_reach_dichotomy {m : ℕ} {G : SimpleGraph (Fin m)} {s ε : ℝ}
@@ -228,55 +289,11 @@ theorem giantEvent_card_reach_dichotomy {m : ℕ} {G : SimpleGraph (Fin m)} {s �
     ((reach G A).card : ℝ) ≤ A.card * (ε * m) ∨
       |((reach G A).card : ℝ) / m - s| ≤ (A.card + 1) * ε := by
   obtain ⟨v, hv, hsmall⟩ := h
-  have hm : (0 : ℝ) < m := Nat.cast_pos.mpr v.pos
-  have hε : 0 ≤ ε := (abs_nonneg _).trans hv
   by_cases hhit : ∃ a ∈ A, a ∈ reach G {v}
-  · right
-    obtain ⟨a, haA, haB⟩ := hhit
-    have hlow : reach G {v} ⊆ reach G A := by
-      rw [← reach_singleton_eq_of_mem haB]
-      exact reach_mono G (singleton_subset_iff.mpr haA)
-    have hup : reach G A ⊆
-        reach G {v} ∪ (A.filter fun b ↦ b ∉ reach G {v}).biUnion fun b ↦ reach G {b} := by
-      intro w hw
-      obtain ⟨b, hbA, hbw⟩ := (mem_reach_iff G A w).mp hw
-      have hwb : w ∈ reach G {b} :=
-        (mem_reach_iff G {b} w).mpr ⟨b, mem_singleton_self b, hbw⟩
-      by_cases hb : b ∈ reach G {v}
-      · exact mem_union_left _ (reach_singleton_eq_of_mem hb ▸ hwb)
-      · exact mem_union_right _ (mem_biUnion.mpr ⟨b, mem_filter.mpr ⟨hbA, hb⟩, hwb⟩)
-    have hsum : (∑ b ∈ A.filter fun b ↦ b ∉ reach G {v}, ((reach G {b}).card : ℝ)) ≤
-        A.card * (ε * m) := by
-      calc _ ≤ ∑ _b ∈ A.filter fun b ↦ b ∉ reach G {v}, ε * m :=
-            sum_le_sum fun b hb ↦ hsmall b (mem_filter.mp hb).2
-        _ = (A.filter fun b ↦ b ∉ reach G {v}).card * (ε * m) := by
-            rw [sum_const, nsmul_eq_mul]
-        _ ≤ A.card * (ε * m) :=
-            mul_le_mul_of_nonneg_right (by exact_mod_cast card_filter_le _ _)
-              (mul_nonneg hε hm.le)
-    have hcard : ((reach G A).card : ℝ) ≤ (reach G {v}).card +
-        ∑ b ∈ A.filter fun b ↦ b ∉ reach G {v}, ((reach G {b}).card : ℝ) := by
-      have h1 := (card_le_card hup).trans (card_union_le _ _)
-      have h2 := card_biUnion_le (s := A.filter fun b ↦ b ∉ reach G {v})
-        (t := fun b ↦ reach G {b})
-      exact_mod_cast h1.trans (Nat.add_le_add_left h2 _)
-    have hcard_low : ((reach G {v}).card : ℝ) ≤ (reach G A).card := by
-      exact_mod_cast card_le_card hlow
-    obtain ⟨hB1, hB2⟩ := abs_le.mp hv
-    have hdiv_low : ((reach G {v}).card : ℝ) / m ≤ (reach G A).card / m :=
-      div_le_div_of_nonneg_right hcard_low hm.le
-    have hdiv_up : ((reach G A).card : ℝ) / m ≤ (reach G {v}).card / m + A.card * ε := by
-      rw [div_le_iff₀ hm, add_mul, div_mul_cancel₀ _ hm.ne']
-      linarith
-    have hkε : 0 ≤ (A.card : ℝ) * ε := mul_nonneg (Nat.cast_nonneg _) hε
-    rw [abs_le]
-    constructor <;> linarith
-  · left
-    push_neg at hhit
-    calc ((reach G A).card : ℝ) ≤ ∑ a ∈ A, ((reach G {a}).card : ℝ) := by
-          exact_mod_cast card_reach_le_sum G A
-      _ ≤ ∑ _a ∈ A, ε * m := sum_le_sum fun a ha ↦ hsmall a (hhit a ha)
-      _ = A.card * (ε * m) := by rw [sum_const, nsmul_eq_mul]
+  · obtain ⟨a, haA, haB⟩ := hhit
+    exact Or.inr (abs_card_reach_div_sub_le_of_mem A hv hsmall haA haB)
+  · push_neg at hhit
+    exact Or.inl (card_reach_le_of_forall_not_mem A hsmall hhit)
 
 /-- **Theorem 5, supercritical: the support of the limit law (6.2).**
 Assumes: `GiantComponentLaw α`.
