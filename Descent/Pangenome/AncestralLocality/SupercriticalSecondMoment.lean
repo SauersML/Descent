@@ -204,6 +204,7 @@ theorem graphExpect_mul_of_local {m : ℕ} (p : ℝ) (S : Finset (Fin m))
   beta_reduce
   rw [mul_comm (f E₁), ← subsetExpect_mul_const]
   refine sum_congr rfl fun E₂ hE₂ ↦ ?_
+  beta_reduce
   rw [hf' E₁ (mem_powerset.mp hE₁) E₂ (mem_powerset.mp hE₂),
     hg' E₁ (mem_powerset.mp hE₁) E₂ (mem_powerset.mp hE₂), mul_comm (f E₁)]
 
