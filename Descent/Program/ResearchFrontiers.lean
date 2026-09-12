@@ -16,6 +16,7 @@ import Descent.Portability.PortabilityMetricCompilation
 import Descent.Portability.PortabilityLightCone
 import Descent.Portability.EndToEndCorrelationSeries
 import Descent.Pangenome.GraphCoalescent.ReportNonMarkovFromSingletons
+import Descent.Pangenome.GraphCoalescent.FiberSizeIdentifiability
 
 namespace Descent.Program
 
@@ -80,6 +81,12 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   while an injective interface gives a Markov report (`isReportMarkovFromBot_of_injective`); on
   three haplotypes the report stays put with probability `1/3` after one step and `0` after two
   (`example_stay_given_one`, `example_stay_given_two`).
+* What a compressed pangenome reveals about its hidden fiber sizes: `FiberSizeIdentifiability`.
+  The connectivity cumulant, and hence the law of the reported connection time, determines the
+  product of the fiber sizes at every width (`prod_eq_of_cumulantOfSizes_eq`), the unordered pair
+  at width two (`coeff_one_deficitCumulant_card_two`, `coeff_two_deficitCumulant_card_two`), and
+  the elementary symmetric polynomials of the sizes, so the multiset itself, at width three
+  (`esymm_eq_of_cumulantOfSizes_eq_three`); widths four and more are open.
 * Selection and hereditary closure: `SelectionClosure`. Selection size-biases the parents
   (`selectedReproduce_eq`); the closure predicting the selected next generation is the closure of
   the observation joined with fitness, the greatest autonomous partition below the observation on
