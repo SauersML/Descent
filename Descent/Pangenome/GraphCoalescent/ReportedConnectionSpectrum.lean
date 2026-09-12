@@ -36,8 +36,8 @@ average of the covers' coefficients,
   `spectralCoeff s ξ K = 1 - ∑_{k=2}^{K-1} d_K/(d_K - d_k) · coverAverage s ξ k`
   (`spectralCoeff_eq`).
 
-`survivalAt_connectionTimeLaw_toReal` proves `P(τ_q > c) = ∑_{k=2}^{K} spectralCoeff s ξ k e^{-d_k c}`
-from `ξ`, for `c ≥ 0`.  `survivalAt_connectionTimeLaw_bot` is the note's statement from `⊥`, over
+`survivalAt_connectionTimeLaw_toReal` proves
+`P(τ_q > c) = ∑_{k=2}^{K} spectralCoeff s ξ k e^{-d_k c}` from `ξ`, for `c ≥ 0`.  `survivalAt_connectionTimeLaw_bot` is the note's statement from `⊥`, over
 `k = 2, …, n`.  The rates are distinct because the death rates increase strictly
 (`deathRate_lt_deathRate`), and that is what the convolution step needs.
 
