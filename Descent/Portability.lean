@@ -5,6 +5,7 @@ import Descent.Portability.NeutralRateHistoryRealization
 import Descent.Portability.ReferenceExperimentCohortRows
 import Descent.Portability.AncestralForwardGenerator
 import Descent.Portability.AncestralSamplingLimit
+import Descent.Portability.AncestralWitnessDrift
 import Descent.Portability.NeutralFellerProperty
 import Descent.Portability.NeutralPulseHistoryKernel
 import Descent.Portability.PartialHaplotypeEventHistoryRealization
