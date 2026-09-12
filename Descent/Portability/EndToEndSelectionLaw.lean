@@ -547,12 +547,12 @@ theorem secondFrequencies_mem (k : Fin 5) :
 /-- The two sets of frequencies have equal power sums through the fourth power. -/
 theorem sum_frequencies_pow_eq {m : ℕ} (hm : m ≤ 4) :
     ∑ k, firstFrequencies k ^ m = ∑ k, secondFrequencies k ^ m := by
-  interval_cases m <;> norm_num [Fin.sum_univ_five, firstFrequencies, secondFrequencies]
+  interval_cases m <;> norm_num [Fin.sum_univ_succ, firstFrequencies, secondFrequencies]
 
 /-- The two sets of frequencies have different fifth power sums. -/
 theorem sum_frequencies_pow_five_ne :
     ∑ k, firstFrequencies k ^ 5 ≠ ∑ k, secondFrequencies k ^ 5 := by
-  norm_num [Fin.sum_univ_five, firstFrequencies, secondFrequencies]
+  norm_num [Fin.sum_univ_succ, firstFrequencies, secondFrequencies]
 
 /-- The uniform mixture of the laws at five frequencies, as an expectation functional over
 per-deme laws: a random initial state. -/
@@ -656,8 +656,8 @@ theorem eval_selectionGenerator_fourCarriers (model : SelectionModel Unit Unit f
   have hrest : eval (lawPoint (frequencyLaw q hq))
       (momentPolynomial (Multiset.replicate 3 (singleLocusType () () true))) = q ^ 3 := by
     rw [eval_momentPolynomial]
-    simp [configurationMoment, Multiset.map_replicate, Multiset.prod_replicate,
-      marginalFrequency_frequencyLaw, hallele]
+    simp [configurationMoment, Multiset.prod_replicate, marginalFrequency_frequencyLaw, hallele]
+    ring
   rw [eval_selectionGenerator_momentPolynomial, fourCarriers, Multiset.map_replicate,
     Multiset.sum_replicate, Multiset.replicate_succ, Multiset.erase_cons_head, hcarrier, hrest]
   simp only [nsmul_eq_mul, Nat.cast_ofNat]
