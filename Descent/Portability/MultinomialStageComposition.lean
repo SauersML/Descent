@@ -345,11 +345,11 @@ def multinomialCompositionApproximation {D : ℕ} (rates : ManyDemeLDRates D) :
     (fun step k ↦ multinomialPhysicalBranch rates step ((stageOrder D).symm k))
     (fun step hstep k ↦ multinomialPhysicalKernel rates step hstep ((stageOrder D).symm k))
     (fun k ↦ physicalGenerator rates ((stageOrder D).symm k)) (compositionRowBound rates)
-    (Finset.sum_nonneg fun stage _ ↦ Finset.sum_nonneg fun row _ ↦
-      Finset.sum_nonneg fun column _ ↦ abs_nonneg _)
+    (Finset.sum_nonneg fun _ _ ↦ Finset.sum_nonneg fun _ _ ↦
+      Finset.sum_nonneg fun _ _ ↦ abs_nonneg _)
     (fun k row ↦ physicalGenerator_row_le rates ((stageOrder D).symm k) row)
     (fun k step ↦ multinomialCompositionStageSlack rates ((stageOrder D).symm k) step)
-    (fun k step ↦ Finset.sum_nonneg fun other _ ↦ abs_nonneg _)
+    (fun _ _ ↦ Finset.sum_nonneg fun _ _ ↦ abs_nonneg _)
     (fun k ↦ multinomialCompositionStageSlack_tendsto rates ((stageOrder D).symm k))
     (fun step hstep k point other ↦ multinomialPhysicalKernel_mulVec_expansion rates step hstep
       ((stageOrder D).symm k) point other)

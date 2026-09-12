@@ -416,11 +416,11 @@ def nonnegativeMicroscopicApproximation (rates : NonnegativeLDRates D) :
     (fun step k ↦ nonnegativePhysicalBranch rates step ((stageOrder D).symm k))
     (fun step hstep k ↦ nonnegativePhysicalKernel rates step hstep ((stageOrder D).symm k))
     (fun k ↦ nonnegativeGenerator rates ((stageOrder D).symm k)) (nonnegativeRowBound rates)
-    (Finset.sum_nonneg fun stage _ ↦ Finset.sum_nonneg fun row _ ↦
-      Finset.sum_nonneg fun column _ ↦ abs_nonneg _)
+    (Finset.sum_nonneg fun _ _ ↦ Finset.sum_nonneg fun _ _ ↦
+      Finset.sum_nonneg fun _ _ ↦ abs_nonneg _)
     (fun k row ↦ stageRow_le_totalMass (nonnegativeGenerator rates) ((stageOrder D).symm k) row)
     (fun k step ↦ nonnegativeCompositionStageSlack rates ((stageOrder D).symm k) step)
-    (fun k step ↦ Finset.sum_nonneg fun other _ ↦ abs_nonneg _)
+    (fun _ _ ↦ Finset.sum_nonneg fun _ _ ↦ abs_nonneg _)
     (fun k ↦ sum_abs_slack_tendsto
       (fun coordinate step ↦
         nonnegativePhysicalSlack rates coordinate ((stageOrder D).symm k) step)
