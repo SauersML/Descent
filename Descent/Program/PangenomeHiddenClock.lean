@@ -22,7 +22,6 @@ import Descent.Pangenome.GraphCoalescent.MultiInterfaceLoads
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceOutcome
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionExamples
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionLaw
-import Descent.Pangenome.GraphCoalescent.MultiplicativeCoupling
 import Descent.Pangenome.GraphCoalescent.MultiplicativeObservation
 import Descent.Pangenome.GraphCoalescent.PartitionLatticeMobius
 import Descent.Pangenome.GraphCoalescent.RankedHistoryLaw
@@ -120,10 +119,7 @@ inside it.
   (`deathRate_div_sq_le_half`); a finite coupled chain with separation hazard at most `J/n` and
   deficit drift at most `1/2` per step separates by step `m` with probability at most
   `m(m - 1)/(4n)` (`separationMass_le`), which at the rings of a rate-one Poisson clock becomes
-  `min {1, U²/(4n)}` (`poissonMixture_le_min`). For the coupled chain of the report and `Z_p`
-  this is the path total-variation bound (F1):
-  `MultiplicativeCoupling.report_multiplicative_poissonTotalVariation_le`, and at `m` jumps
-  `report_multiplicative_pathTotalVariation_le`.
+  `min {1, U²/(4n)}` (`poissonMixture_le_min`).
 * Theorem F, (F4): `MultiplicativeConnectionLaw`. The arbitrary-order Möbius identity of the
   partition lattice, `Σ_{σ ≥ τ} (-1)^(|σ|-1) (|σ|-1)! = [τ = ⊤]` (`sum_topMobius_blocks_ge`),
   and the probability that the edges rung by time `u` connect the fibers is
@@ -189,9 +185,9 @@ does not imply the stochastic order of the quantile coupling. (D4) is proved by 
 recursion, without enumerating ranked histories. §9 is proved for a finite hidden jump process
 given by its generator, with the load chain's generator `loadGenerator` written from the rates of
 Theorem A. (E1) is proved from the Möbius sum rather than the ranked-history law. The stopping law
-(D5)-(D9), (E2), (F2) and (F3) are not yet proof-checked. (F1) is proved between the laws of
-the uniformized skeleton paths, mixed over a rate-one Poisson clock; their identification with
-path measures on càdlàg paths is not formalized. (F4) is proved for the finite random graph
+(D5)-(D9), (E2), (F2) and (F3) are not yet proof-checked. Of (F1), the coupled skeleton chain,
+the path-level coupling inequality and the identification with path measures on càdlàg paths are
+not yet recorded here. (F4) is proved for the finite random graph
 of edges rung by time `u`, entering the clocks through their distribution functions.
 -/
 
