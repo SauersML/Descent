@@ -198,7 +198,7 @@ theorem lintegral_block_mul_total {m k : ℕ} (hmk : m ≤ k) :
       (sum_nonneg fun j _ ↦ one_div_deathRate_nonneg j)
   have h2 : 0 ≤ (∑ j ∈ Ico m k, 1 / deathRate (j + 2)) ^ 2
       + ∑ j ∈ Ico m k, (1 / deathRate (j + 2)) ^ 2 :=
-    add_nonneg (sq_nonneg _) (sum_nonneg fun j _ ↦ sq_nonneg _)
+    add_nonneg (sq_nonneg _) (sum_nonneg fun _ _ ↦ sq_nonneg _)
   rw [lintegral_congr_ae hae,
     lintegral_add_left ((measurable_sum_coords _).mul (measurable_sum_coords _)).ennreal_ofReal,
     lintegral_mul_sum_kingmanClock (Ico_disjoint_Ico_consecutive 0 m k).symm,
@@ -221,7 +221,7 @@ theorem cross_value_nonneg {b n : ℕ} (hb : 1 ≤ b) (hbn : b ≤ n) :
     0 ≤ (2 / (b : ℝ) - 2 / n) * (2 - 2 / (n : ℝ)) + (varTransitTime n - varTransitTime b) := by
   rw [← sum_Ico_pred_one_div_deathRate hb hbn, ← sum_Ico_pred_sq_one_div_deathRate hbn]
   exact add_nonneg (mul_nonneg (sum_nonneg fun k _ ↦ one_div_deathRate_nonneg k)
-    (two_sub_two_div_nonneg (show 1 ≤ n by omega))) (sum_nonneg fun k _ ↦ sq_nonneg _)
+    (two_sub_two_div_nonneg (show 1 ≤ n by omega))) (sum_nonneg fun _ _ ↦ sq_nonneg _)
 
 /-! ### Mixing over the stopping level -/
 
@@ -235,7 +235,9 @@ theorem lintegral_stoppingMix {n : ℕ} (hn : 2 ≤ n) (s : Fin n → Fin n)
       = ENNReal.ofReal (∑ b ∈ Icc 1 n, stoppingProb s b * g b) := by
   refine (lintegral_trajectoryClockLaw hn s (fun b ω ↦ ENNReal.ofReal (G b ω))
     fun b ↦ (hG b).ennreal_ofReal).trans ?_
-  rw [ENNReal.ofReal_sum_of_nonneg fun b hb ↦ mul_nonneg ENNReal.toReal_nonneg (hg b hb)]
+  have hterm : ∀ b ∈ Icc 1 n, 0 ≤ stoppingProb s b * g b := fun b hb ↦
+    mul_nonneg ENNReal.toReal_nonneg (hg b hb)
+  rw [ENNReal.ofReal_sum_of_nonneg hterm]
   refine sum_congr rfl fun b hb ↦ ?_
   rw [hGg b hb, stoppingProb, ENNReal.ofReal_mul ENNReal.toReal_nonneg,
     ENNReal.ofReal_toReal (PMF.apply_ne_top _ _)]
@@ -258,7 +260,7 @@ theorem lintegral_sq_panelTime {n : ℕ} (hn : 2 ≤ n) (s : Fin n → Fin n) :
   have h := lintegral_stoppingMix hn s (fun _ ω ↦ (∑ j ∈ Ico 0 (n - 1), ω j) ^ 2)
     (fun _ ↦ (measurable_sum_coords _).pow_const 2)
     (fun _ ↦ (2 - 2 / (n : ℝ)) ^ 2 + varTransitTime n)
-    (fun _ _ ↦ add_nonneg (sq_nonneg _) (sum_nonneg fun k _ ↦ sq_nonneg _))
+    (fun _ _ ↦ add_nonneg (sq_nonneg _) (sum_nonneg fun _ _ ↦ sq_nonneg _))
     (fun _ _ ↦ lintegral_sq_sum_Ico_zero (show 1 ≤ n by omega))
   rw [← sum_mul, sum_stoppingProb hn s, one_mul] at h
   exact h
@@ -280,7 +282,7 @@ theorem lintegral_sq_residualTime {n : ℕ} (hn : 2 ≤ n) (s : Fin n → Fin n)
   lintegral_stoppingMix hn s (fun b ω ↦ (∑ j ∈ Ico 0 (b - 1), ω j) ^ 2)
     (fun _ ↦ (measurable_sum_coords _).pow_const 2)
     (fun b ↦ (2 - 2 / (b : ℝ)) ^ 2 + varTransitTime b)
-    (fun _ _ ↦ add_nonneg (sq_nonneg _) (sum_nonneg fun k _ ↦ sq_nonneg _))
+    (fun _ _ ↦ add_nonneg (sq_nonneg _) (sum_nonneg fun _ _ ↦ sq_nonneg _))
     (fun _ hb ↦ lintegral_sq_sum_Ico_zero (mem_Icc.mp hb).1)
 
 /-- **The inverse hidden load at connection**: `E[1/B] = Σ_b p_b/b`. -/
@@ -395,7 +397,7 @@ theorem two_mul_div_le_mean_stoppingLevel {n : ℕ} (hn : 2 ≤ n) (s : Fin n �
       + 2 = 2 * n * ∑ b ∈ Icc 1 n, stoppingProb s b * (1 / (b : ℝ)) := by
     have hτ' : (∫⁻ p, ENNReal.ofReal (connectionTime s p) ∂(trajectoryClockLaw n)).toReal
         = 2 * (∑ b ∈ Icc 1 n, stoppingProb s b * (1 / (b : ℝ))) - 2 / n := by
-      linarith
+      linear_combination (-2 : ℝ) * hτ
     rw [hτ', mul_sub, mul_div_assoc', mul_div_cancel_left₀ (2 : ℝ) hnR.ne']
     ring
   have hB : 0 ≤ ∑ b ∈ Icc 1 n, stoppingProb s b * (b : ℝ) :=
@@ -481,7 +483,7 @@ theorem variance_residualTime_eq {n : ℕ} (hn : 2 ≤ n) (s : Fin n → Fin n) 
   have hR2 : 0 ≤ ∑ b ∈ Icc 1 n,
       stoppingProb s b * ((2 - 2 / (b : ℝ)) ^ 2 + varTransitTime b) :=
     sum_nonneg fun b _ ↦ mul_nonneg ENNReal.toReal_nonneg
-      (add_nonneg (sq_nonneg _) (sum_nonneg fun k _ ↦ sq_nonneg _))
+      (add_nonneg (sq_nonneg _) (sum_nonneg fun _ _ ↦ sq_nonneg _))
   rw [lintegral_sq_residualTime hn s, lintegral_residualTime hn s, ENNReal.toReal_ofReal hR2,
     ENNReal.toReal_ofReal hR]
   have e1 : ∑ b ∈ Icc 1 n, stoppingProb s b * ((2 - 2 / (b : ℝ)) ^ 2 + varTransitTime b)
