@@ -122,7 +122,7 @@ theorem sum_samplingObservable_dysonDeriv (c : ℝ) (r : E → ℝ) (T : E → H
     rw [h0]
     ring
   | succ K ih =>
-    rw [sum_range_succ, ih, sum_range_succ]
+    rw [sum_range_succ, ih, sum_range_succ _ (K + 1)]
     have hd : samplingObservable (dysonDeriv c r T f (K + 1) u) p =
         samplingObservable (coalescenceGain c (dysonTerm c r T f (K + 1) u) -
           dualExitRate c r (n + (K + 1)) • dysonTerm c r T f (K + 1) u) p +
@@ -147,8 +147,10 @@ def partialDualDeriv (c : ℝ) (r : E → ℝ) (T : E → H → H → H) {n : �
 theorem hasDerivAt_partialDual (c : ℝ) (r : E → ℝ) (T : E → H → H → H) {n : ℕ}
     (f : (Fin n → H) → ℝ) (K : ℕ) (t : ℝ) :
     HasDerivAt (partialDual c r T f K) (partialDualDeriv c r T f K t) t :=
-  HasDerivAt.fun_sum fun k _ ↦
-    (samplingCLM (n + k)).hasFDerivAt.comp_hasDerivAt t (hasDerivAt_dysonTerm c r T f k t)
+  HasDerivAt.fun_sum fun k _ ↦ by
+    have h := (samplingCLM (H := H) (n + k)).hasFDerivAt.comp_hasDerivAt t
+      (hasDerivAt_dysonTerm c r T f k t)
+    exact h
 
 /-- At time zero the partial dual series is the sampling function of the observation. -/
 theorem partialDual_zero (c : ℝ) (r : E → ℝ) (T : E → H → H → H) {n : ℕ}
@@ -168,19 +170,21 @@ theorem summable_dualTerm {c : ℝ} (hc : 0 ≤ c) {r : E → ℝ} (hr : ∀ e, 
     (T : E → H → H → H) {n : ℕ} (f : (Fin n → H) → ℝ) {t : ℝ} (ht : 0 ≤ t) :
     Summable fun k ↦ samplingFunction (dysonTerm c r T f k t) := by
   have hR : 0 ≤ ∑ e, r e := sum_nonneg fun e _ ↦ hr e
-  refine Summable.of_norm (summable_of_sum_range_le (fun k ↦ norm_nonneg _) fun K ↦ ?_)
+  refine Summable.of_norm (summable_of_sum_range_le
+    (c := yuleMoment n 0 * Real.exp (3 * (∑ e, r e) * t) * ‖f‖) (fun k ↦ norm_nonneg _)
+      fun K ↦ ?_)
   calc ∑ k ∈ range K, ‖samplingFunction (dysonTerm c r T f k t)‖
       ≤ ∑ k ∈ range (K + 1), ‖samplingFunction (dysonTerm c r T f k t)‖ :=
         sum_le_sum_of_subset_of_nonneg (range_subset.mpr (Nat.le_succ K))
           fun _ _ _ ↦ norm_nonneg _
     _ ≤ ∑ k ∈ range (K + 1), yuleMoment n k * yuleWeight n (∑ e, r e) k t * ‖f‖ :=
         sum_le_sum fun k _ ↦ (norm_samplingFunction_dysonTerm_le hc hr T f k ht).trans
-          (mul_le_mul_of_nonneg_right (le_mul_of_one_le_left (yuleWeight_nonneg hR k ht)
+          (mul_le_mul_of_nonneg_right (le_mul_of_one_le_left (yuleWeight_nonneg (n := n) hR k ht)
             (one_le_yuleMoment n k)) (norm_nonneg f))
     _ = (∑ k ∈ range (K + 1), yuleMoment n k * yuleWeight n (∑ e, r e) k t) * ‖f‖ := by
         rw [sum_mul]
     _ ≤ yuleMoment n 0 * Real.exp (3 * (∑ e, r e) * t) * ‖f‖ :=
-        mul_le_mul_of_nonneg_right (sum_yuleMoment_mul_le hR K ht) (norm_nonneg f)
+        mul_le_mul_of_nonneg_right (sum_yuleMoment_mul_le (n := n) hR K ht) (norm_nonneg f)
 
 /-- **The dual series** `∑_k H_{u_k(t)}` of an observation. -/
 def dualSeries (c : ℝ) (r : E → ℝ) (T : E → H → H → H) {n : ℕ} (f : (Fin n → H) → ℝ) (t : ℝ) :
@@ -267,7 +271,6 @@ theorem norm_jumpOperator_sub_partialDual_le {c : ℝ} (hc : 0 ≤ c) {r : E →
             have hcube : ((n + k : ℕ) : ℝ) ^ 3 ≤ yuleMoment n k := by
               push_cast
               exact pow_three_le_yuleMoment n k
-            have hy := yuleWeight_nonneg hR k hu0
             have hconst : 0 ≤ 4 * (c + ∑ e, r e) * ε :=
               mul_nonneg (mul_nonneg (by norm_num) (add_nonneg hc hR)) hε0.le
             calc 4 * (c + ∑ e, r e) * ε * ((n + k : ℕ) : ℝ) ^ 3 *
@@ -286,7 +289,7 @@ theorem norm_jumpOperator_sub_partialDual_le {c : ℝ} (hc : 0 ≤ c) {r : E →
               (yuleMoment n 0 * Real.exp (3 * (∑ e, r e) * T₀) * ‖f‖) := by
             refine mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_right ?_ (norm_nonneg f))
               (mul_nonneg (mul_nonneg (by norm_num) (add_nonneg hc hR)) hε0.le)
-            exact (sum_yuleMoment_mul_le hR K hu0).trans (mul_le_mul_of_nonneg_left hexp
+            exact (sum_yuleMoment_mul_le (n := n) hR K hu0).trans (mul_le_mul_of_nonneg_left hexp
               (zero_le_one.trans (one_le_yuleMoment n 0)))
     have hsecond : |samplingObservable (branchingGain r T (dysonTerm c r T f K (t - s))) p.1| ≤
         (∑ e, r e) * (1 / ((K : ℝ) + 1)) *
@@ -294,8 +297,8 @@ theorem norm_jumpOperator_sub_partialDual_le {c : ℝ} (hc : 0 ≤ c) {r : E →
       refine (abs_samplingObservable_le _ p.2).trans ?_
       refine (norm_branchingGain_le hr T _).trans ?_
       have hK := norm_dysonTerm_le hc hr T f K hu0
-      have hy := yuleWeight_nonneg hR K hu0
-      have hmoment := yuleMoment_mul_yuleWeight_le hR K hu0
+      have hy := yuleWeight_nonneg (n := n) hR K hu0
+      have hmoment := yuleMoment_mul_yuleWeight_le (n := n) hR K hu0
       have harity : ((n + K : ℕ) : ℝ) * ((K : ℝ) + 1) ≤ yuleMoment n K := by
         unfold yuleMoment
         push_cast
@@ -397,6 +400,7 @@ theorem norm_decisionApproximations_sub_le {c : ℝ} (hc : 0 ≤ c) {r : E → �
     (mul_nonneg (mul_nonneg (zero_le_one.trans (one_le_yuleMoment n 0)) (Real.exp_pos _).le)
       (norm_nonneg f))
 
+open scoped Classical in
 /-- **The uniform approximation bound** of the jump approximations on the polynomials in the
 frequencies: later approximations stay within `2 ‖F‖` times an escape term that vanishes with the
 step. -/
@@ -426,10 +430,10 @@ def decisionLightConeApproximation {c : ℝ} (hc : 0 ≤ c) {r : E → ℝ} (hr 
     have hfF : samplingFunction f = F := Classical.choose_spec (Classical.choose_spec h)
     by_cases hF0 : ‖F‖ = 0
     · have hzero : F = 0 := norm_eq_zero.mp hF0
-      rw [hzero, map_zero, map_zero, sub_zero, norm_zero, hF0]
+      rw [hzero]
       simp
-    · have hpos : 0 < 2 * ‖F‖ := by positivity
-      rw [mul_div_cancel₀ _ hpos.ne', ← hfF]
+    · have hpos : 0 < 2 * ‖F‖ := mul_pos two_pos ((norm_nonneg F).lt_of_ne (Ne.symm hF0))
+      rw [← mul_div_assoc, mul_div_cancel_left₀ _ hpos.ne', ← hfF]
       have h1 := norm_decisionApproximations_sub_le hc hr T m f htT
       have h2 := norm_decisionApproximations_sub_le hc hr T m' f htT
       have hstep := stepSize_antitone hmm'
@@ -449,7 +453,10 @@ def decisionLightConeApproximation {c : ℝ} (hc : 0 ≤ c) {r : E → ℝ} (hr 
           ≤ ‖(decisionApproximations hc hr T m).operator t (samplingFunction f) -
               dualSeries c r T f t‖ +
             ‖(decisionApproximations hc hr T m').operator t (samplingFunction f) -
-              dualSeries c r T f t‖ := norm_sub_le_norm_sub_add_norm_sub _ _ _
+              dualSeries c r T f t‖ := by
+            rw [norm_sub_rev ((decisionApproximations hc hr T m').operator t
+              (samplingFunction f))]
+            exact norm_sub_le_norm_sub_add_norm_sub _ _ _
         _ ≤ 8 * (c + ∑ e, r e) * stepSize m *
               (yuleMoment n 0 * Real.exp (3 * (∑ e, r e) * T₀) * ‖f‖) * T₀ := by
             linarith
@@ -503,7 +510,7 @@ theorem norm_jumpGenerator_sub_backwardFunction_le {c : ℝ} (hc : 0 ≤ c) {r :
     (by norm_num) (add_nonneg hc (sum_nonneg fun e _ ↦ hr e))) hε0.le) (by positivity))
       (norm_nonneg f))).mpr fun p ↦ ?_
   rw [ContinuousMap.sub_apply, Real.norm_eq_abs, backwardFunction_apply,
-    ← forwardGenerator_samplingObservable c r T f p.2.2]
+    forwardGenerator_samplingObservable c r T f p.2.2]
   exact abs_jumpGenerator_sub_le hc hr T hε0 hε1 f p
 
 /-- **The generator of the forward semigroup on sampling functions is (7.1).** Uniformly on the
@@ -520,8 +527,9 @@ theorem tendsto_decisionWindowSemigroup_slope {c : ℝ} (hc : 0 ≤ c) {r : E �
   refine Metric.tendsto_nhds.mpr fun δ hδ ↦ ?_
   have hstep : Tendsto (fun m : ℕ ↦ 4 * (c + R) * stepSize m * (X + (n : ℝ) ^ 3 * ‖f‖)) atTop
       (𝓝 0) := by
-    have h := ((tendsto_one_div_add_atTop_nhds_zero_nat (𝕜 := ℝ)).const_mul
-      (4 * (c + R))).mul_const (X + (n : ℝ) ^ 3 * ‖f‖)
+    have hone : Tendsto (fun m : ℕ ↦ 1 / ((m : ℝ) + 1)) atTop (𝓝 0) :=
+      tendsto_one_div_add_atTop_nhds_zero_nat
+    have h := (hone.const_mul (4 * (c + R))).mul_const (X + (n : ℝ) ^ 3 * ‖f‖)
     simpa [stepSize] using h
   obtain ⟨m, hm⟩ := (hstep.eventually (gt_mem_nhds (by positivity : 0 < δ / 2))).exists
   set J := jumpGenerator c r T (stepSize_pos m).le (stepSize_le_one m) with hJ
