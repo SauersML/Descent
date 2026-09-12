@@ -265,7 +265,7 @@ theorem norm_holdingSemigroup_apply_le [Fintype H] [Fintype E] {c : ℝ} {r : E 
     rw [norm_smul, norm_smul, Real.norm_eq_abs, Real.norm_eq_abs, abs_of_nonneg ht,
       abs_of_nonneg hc]
     exact mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left hP hc) ht
-  calc ‖holdingSemigroup c r n t f‖ ≤ ‖holdingSemigroup c r n t‖ * ‖f‖ :=
+  calc ‖holdingSemigroup c r n t f‖ ≤ ‖holdingSemigroup (H := H) c r n t‖ * ‖f‖ :=
         (holdingSemigroup c r n t).le_opNorm f
     _ ≤ Real.exp (-(n * (∑ e, r e) * t)) * ‖f‖ := by
         refine mul_le_mul_of_nonneg_right ?_ (norm_nonneg f)
