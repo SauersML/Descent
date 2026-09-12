@@ -47,6 +47,7 @@ import Descent.Portability.EndToEndGWASTrainingHistory
 import Descent.Portability.EndToEndSensitivityLaw
 import Descent.Portability.EndToEndSensitivityMetrics
 import Descent.Portability.EndToEndSensitivityArchitecture
+import Descent.Portability.EndToEndAscertainedLaw
 
 namespace Descent.Program
 
@@ -139,6 +140,14 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   `crossRatioDerivative_neg_iff_of_pos`). Portability strictly decreases in the target
   environment variance
   (`EndToEndSensitivityArchitecture.portability_environmentVariance_derivative_neg`).
+  Ascertained scores follow the same law. A panel rule that keeps a tag passes with probability
+  a polynomial of degree at most `n` in the deme frequencies
+  (`EndToEndAscertainedLaw.totalDegree_acceptancePolynomial_le`), so the portability of the
+  ascertained score, conditional on passing, is a rational function of the budget-`(n + 4)`
+  propagated moments (`ascertainedPortability_historyEventKernel`,
+  `ascertainedPortability_eq_conditionalOnPassing`). When the target is uncorrelated with
+  passing, ascertainment lowers portability exactly when passing raises source accuracy
+  (`ascertainedPortability_lt_expectedPortability_iff`).
 * The closed-form decay of portability through linkage: `TwoLocusPortabilityDecay`. On the NOTE1
   low-order moment system, for a source and a target split `T` ago with drift and recombination,
   the cross-population expected squared correlation of a tag-locus score relative to its value at
