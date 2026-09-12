@@ -293,7 +293,7 @@ theorem exploreDies_of_card_reach_lt {m K : ℕ} {E : Finset (Sym2 (Fin m))} {v 
 theorem graphProb_of_forall_not {m : ℕ} (p : ℝ) {P : Finset (Sym2 (Fin m)) → Prop}
     [DecidablePred P] (h : ∀ E, ¬P E) : graphProb m p P = 0 := by
   rw [← graphExpect_const (m := m) p (0 : ℝ), graphProb]
-  exact sum_congr rfl fun E _ ↦ by rw [if_neg (h E)]
+  exact sum_congr rfl fun E _ ↦ by simp only [if_neg (h E)]
 
 /-- **The exploration is a supermartingale in `q^|A|`.** If `0 ≤ q ≤ 1` and
 `(1 - p (1 - q))^(m - K) ≤ q`, the exploration from an active set `A ⊆ D` dies within `t` steps,
