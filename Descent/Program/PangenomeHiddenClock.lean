@@ -1,12 +1,14 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Pangenome.GraphCoalescent.ConnectivityClockTable
 import Descent.Pangenome.GraphCoalescent.Conservation
 import Descent.Pangenome.GraphCoalescent.HiddenLoads
 import Descent.Pangenome.GraphCoalescent.HiddenLumpability
 import Descent.Pangenome.GraphCoalescent.LahWeights
 import Descent.Pangenome.GraphCoalescent.MinimalRefinement
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceClosure
+import Descent.Pangenome.GraphCoalescent.MultiInterfaceOutcome
 
 namespace Descent.Program
 
@@ -60,11 +62,18 @@ inside it.
   `sum_blockWeight_card_eq_lahNumber`, `sum_blockWeight_X_pow_eq_lahPolynomial`. The parts of a
   coalescent state read as a finite partition are its `Coalescent.blocks`:
   `card_parts_ofSetoid`.
+* Theorem D, the exact table of §6: `ConnectivityClockTable`. The cumulants
+  `6z + 4z²`, `24z + 30z² + 6z³`, `24z + 32z² + 8z³`, `24z + 20z²`,
+  `720z + 1656z² + 928z³ + 144z⁴` and the means `2/3, 1/2, 7/18, 17/18, 92/225` of the fiber sizes
+  `(1,2), (1,3), (2,2), (1,1,2), (2,2,2)`, and the different means of `(1,3)` and `(2,2)`:
+  `meanConnectionTime_one_three_ne_two_two`.
 * §10, several interfaces sharing one genealogy: `MultiInterfaceClosure`. The common refinement
   of the reports determines every report (`observed_commonRefinement`), and two labeled
   configurations with the same hidden load in every cell of the common refinement offer equally
   many mergers into every lumped target: `card_mergers_eq_of_cellLoad_eq`, and with the corpus
-  setoids `card_blockMergers_eq`.
+  setoids `card_blockMergers_eq`. Two coalescent states with the same reports, merging pairs in
+  the same cells, have the same reports and common refinement afterwards:
+  `MultiInterfaceOutcome.observed_merge_eq_of_cells`, `commonRefinement_merge_eq_of_cells`.
 
 Scope. Theorem A is proved as cover counts with Kingman's unit rate per cover: the
 continuous-time chain, the survival function of (A4) and the probabilistic statement of strong
@@ -72,11 +81,14 @@ lumpability are not constructed, and the mean `2/3` of (A4) is the first-step ar
 counted rates. Theorem B is proved as the algebra of the visible rates and of the survival
 derivatives through the killed generator. The step from a strong lumping for every initial
 labeled state to these rates, which is Rosenblatt's criterion applied to the chain of Theorem A,
-and the survival function as a semigroup are not formalized. In §10 the dependence of a merger's
-outcome on the two merging cells alone is a hypothesis on the outcome map. Theorem C (the
+and the survival function as a semigroup are not formalized. The table rows of §6 evaluate
+transcriptions of (D2), (D4)-(D6) and (D8) at the tabulated fiber sizes, with the Möbius
+coefficients written out for two and three fibers. In §10 the reports after a merger are proved
+to depend on the two merging cells alone; that the cell loads after a merger aggregate the old
+loads and drop by one for the merged pair remains a hypothesis on the outcome map. Theorem C (the
 domination (C2), the Dynkin identity (C3) and the bounds (C4)), Theorem D (the connectivity
-cumulant (D2)-(D3), the stopping law (D4)-(D9) and the exact table), Theorem E, Theorem F, the
-filter of §9 and the Λ-coalescent extension of §10 are not yet proof-checked.
+cumulant (D2)-(D3) and the stopping law (D4)-(D9)), Theorem E, Theorem F, the filter of §9 and
+the Λ-coalescent extension of §10 are not yet proof-checked.
 -/
 
 end Descent.Program

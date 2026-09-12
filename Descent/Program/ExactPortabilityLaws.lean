@@ -108,6 +108,7 @@ import Descent.Portability.PortabilityRemainsJoint
 import Descent.Portability.DriftOperatorCoordinates
 import Descent.Portability.ChronologyIntegralEquation
 import Descent.Portability.NonnegativeCoalescenceRealization
+import Descent.Portability.NeutralPolynomialSemigroup
 
 namespace Descent.Program
 
@@ -223,13 +224,14 @@ rate histories with integrable rate coordinates; the propagator is characterized
 equation. Theorem 2 covers histories of rate epochs, splits and admixture pulses; the pipeline
 compiler emits nothing else. Of §4.2, mutation is symmetric, and (20) takes the forward moment
 equation of the expectation family as a hypothesis that no module yet discharges. The §4.2a
-modules assume the polynomial semigroup, its positivity and its Euler limit;
-`NeutralFellerGenerator` identifies its generator but does not construct the semigroup from the
-neutral two-locus kernels; their kernels are Markov kernels on pseudo-metrizable
-compact spaces, which include the haplotype-frequency simplex. In §6 the attainable metric curve
-of NOTE1 Theorem 5 is proved exactly for lists of discrete events, and for chronologies with
-continuous nonnegative rates at a positive horizon with a positive migration total:
-`AttainableChronologyCurve.attainable_metric_curve_continuous`.
+polynomial semigroup is constructed from the dual matrix exponential, with its unit, semigroup
+law and dual representation, which discharges the dual, unit and semigroup hypotheses of
+`NeutralFellerGenerator.exists_markovKernel_neutralGenerator`: `NeutralPolynomialSemigroup`. Its
+positivity on nonnegative observables and its Euler limit remain hypotheses there; their kernels
+are Markov kernels on pseudo-metrizable compact spaces, which include the haplotype-frequency
+simplex. In §6 the attainable metric curve of NOTE1 Theorem 5 is proved exactly for lists of
+discrete events, and for chronologies with continuous nonnegative rates at a positive horizon
+with a positive migration total: `AttainableChronologyCurve.attainable_metric_curve_continuous`.
 
 Guard witnesses: `LowOrderLDWitnesses` inhabits the corpus rate, epoch and history structures
 from data alone, and `PipelineWitnesses` inhabits the pipeline structures of `EndToEndScoreLaw`
