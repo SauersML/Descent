@@ -201,6 +201,7 @@ theorem graphExpect_mul_of_local {m : ℕ} (p : ℝ) (S : Finset (Fin m))
     subsetExpect_eq_of_local p hT hf', ← subsetExpect_mul_const]
   refine sum_congr rfl fun E₁ hE₁ ↦ ?_
   congr 1
+  beta_reduce
   rw [mul_comm (f E₁), ← subsetExpect_mul_const]
   refine sum_congr rfl fun E₂ hE₂ ↦ ?_
   rw [hf' E₁ (mem_powerset.mp hE₁) E₂ (mem_powerset.mp hE₂),
@@ -298,7 +299,7 @@ theorem graphProb_small_not_mem_large_ge {m K : ℕ} {p q : ℝ} (hp0 : 0 ≤ p)
           ¬exploreDies E (S.card + K) m (S ∪ {w}) {w} then (1 : ℝ) else 0) =
             graphProb m p (fun E ↦ ¬exploreDies E (S.card + K) m (S ∪ {w}) {w}) := by
         rw [graphProb]
-        exact sum_congr rfl fun E _ ↦ by simp only [hc, true_and]
+        exact sum_congr rfl fun E _ ↦ by simp only [hc.1, hc.2, not_false_eq_true, true_and]
       have hconst : graphExpect m p (fun E ↦ (if reach (edgeGraph E) {u} = S then (1 : ℝ) else 0) *
           (if S.card < K ∧ w ∉ S then (1 : ℝ) else 0)) =
             graphExpect m p (fun E ↦ if reach (edgeGraph E) {u} = S then (1 : ℝ) else 0) := by
@@ -320,7 +321,9 @@ theorem graphProb_small_not_mem_large_ge {m K : ℕ} {p q : ℝ} (hp0 : 0 ≤ p)
           (if S.card < K ∧ w ∉ S ∧ ¬exploreDies E (S.card + K) m (S ∪ {w}) {w}
             then (1 : ℝ) else 0)) = fun _ ↦ 0 := by
         funext E
-        rw [if_neg fun h ↦ hc ⟨h.1, h.2.1⟩, mul_zero]
+        have hn : ¬(S.card < K ∧ w ∉ S ∧ ¬exploreDies E (S.card + K) m (S ∪ {w}) {w}) :=
+          fun h ↦ hc ⟨h.1, h.2.1⟩
+        simp only [if_neg hn, mul_zero]
       rw [h1, h2, graphExpect_const, mul_zero]
   have hL := graphExpect_comp_reach_singleton p u
     (fun S _ ↦ if S.card < K ∧ w ∉ S then (1 : ℝ) else 0)
@@ -333,8 +336,6 @@ theorem graphProb_small_not_mem_large_ge {m K : ℕ} {p q : ℝ} (hp0 : 0 ≤ p)
       = (1 - q) * graphExpect m p (fun E ↦ if (reach (edgeGraph E) {u}).card < K ∧
           w ∉ reach (edgeGraph E) {u} then (1 : ℝ) else 0) := by
         rw [graphProb]
-        congr 1
-        exact sum_congr rfl fun E _ ↦ by simp only []
     _ = ∑ S : Finset (Fin m), (1 - q) * graphExpect m p
           (fun E ↦ (if reach (edgeGraph E) {u} = S then (1 : ℝ) else 0) *
             (if S.card < K ∧ w ∉ S then (1 : ℝ) else 0)) := by
@@ -486,7 +487,6 @@ theorem graphExpect_largeCount_sq_le {m K : ℕ} {p q : ℝ} (hp0 : 0 ≤ p) (hp
             (fun E ↦ (reach (edgeGraph E) {u}).card < K) - m * K) := by
         simp only [sum_sub_distrib, sum_const, card_univ, Fintype.card_fin, nsmul_eq_mul,
           ← mul_sum]
-        ring
     _ = m * graphExpect m p (fun E ↦ largeCount E K) -
           (1 - q) * (m * (m - graphExpect m p (fun E ↦ largeCount E K)) - m * K) := by
         rw [hsmall]
