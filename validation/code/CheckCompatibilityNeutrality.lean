@@ -15,12 +15,16 @@ open Descent.Pangenome.AncestralLocality
 #print axioms sum_halfMix_mul
 #print axioms sum_filter_halfMix
 #print axioms sum_halfMix
+#print axioms halfMix_eq_pairMidpoint
 #print axioms reproduce_halfMix
 #print axioms sum_reproduce_halfMix_mul
 #print axioms CheckingGraph.totalRate_pos
 #print axioms orderedChild_indicator_add
 #print axioms featureMass_eq_pushforward
+#print axioms exchangeKernel_eq_childKernel
+#print axioms isHeredityKernel_exchangeKernel
 #print axioms exchangeKernel_marginal
+#print axioms isHeredityKernel_compatibilityKernel
 #print axioms compatibilityKernel_of_eq_empty
 #print axioms compatibilityKernel_of_ne_empty
 #print axioms compatibilityKernel_singleEdge
