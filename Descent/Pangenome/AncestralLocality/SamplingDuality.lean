@@ -137,11 +137,11 @@ differentiated, one in the direction `y` and the other in the direction `x`. -/
 theorem secondPartial_samplingObservable [Fintype H] [DecidableEq H] (f : (Fin n → H) → ℝ)
     (p : H → ℝ) (x y : H) :
     secondPartial (samplingObservable f) p x y =
-      ∑ w, f w * ∑ a, Pi.single y (1 : ℝ) (w a) *
-        ∑ b ∈ univ.erase a, Pi.single x (1 : ℝ) (w b) *
+      ∑ w, f w * ∑ a, (Pi.single y 1 : H → ℝ) (w a) *
+        ∑ b ∈ univ.erase a, (Pi.single x 1 : H → ℝ) (w b) *
           ∏ c ∈ (univ.erase a).erase b, p (w c) := by
   have hfun : (fun q ↦ lineDeriv ℝ (samplingObservable f) q (Pi.single y 1)) =
-      fun q ↦ ∑ w, f w * ∑ a, Pi.single y (1 : ℝ) (w a) * ∏ c ∈ univ.erase a, q (w c) :=
+      fun q ↦ ∑ w, f w * ∑ a, (Pi.single y 1 : H → ℝ) (w a) * ∏ c ∈ univ.erase a, q (w c) :=
     funext fun q ↦ lineDeriv_samplingObservable f q _
   rw [secondPartial, hfun]
   refine HasDerivAt.deriv ?_
@@ -199,11 +199,11 @@ theorem resamplingGenerator_samplingObservable [Fintype H] [DecidableEq H] (c : 
       c * ∑ b, ∑ a ∈ Iio b,
         (samplingObservable (coalesceArguments a b f) p - samplingObservable f p) := by
   have hcollapse : ∀ (u v : H) (K : ℝ), ∑ x, ∑ y, p x * ((if x = y then 1 else 0) - p y) *
-      (Pi.single y (1 : ℝ) u * (Pi.single x (1 : ℝ) v * K)) =
+      ((Pi.single y 1 : H → ℝ) u * ((Pi.single x 1 : H → ℝ) v * K)) =
         p v * ((if v = u then 1 else 0) - p u) * K := by
     intro u v K
     have hpt : ∀ x y, p x * ((if x = y then 1 else 0) - p y) *
-        (Pi.single y (1 : ℝ) u * (Pi.single x (1 : ℝ) v * K)) =
+        ((Pi.single y 1 : H → ℝ) u * ((Pi.single x 1 : H → ℝ) v * K)) =
           if u = y then (if v = x then p x * ((if x = y then 1 else 0) - p y) * K else 0)
           else 0 := by
       intro x y
@@ -211,8 +211,8 @@ theorem resamplingGenerator_samplingObservable [Fintype H] [DecidableEq H] (c : 
       split_ifs <;> ring
     simp only [hpt, sum_ite_eq, mem_univ, if_true]
   have hexpand : ∀ x y, secondPartial (samplingObservable f) p x y =
-      ∑ w, ∑ a, ∑ b ∈ univ.erase a, Pi.single y (1 : ℝ) (w a) *
-        (Pi.single x (1 : ℝ) (w b) * (f w * ∏ c ∈ (univ.erase a).erase b, p (w c))) := by
+      ∑ w, ∑ a, ∑ b ∈ univ.erase a, (Pi.single y 1 : H → ℝ) (w a) *
+        ((Pi.single x 1 : H → ℝ) (w b) * (f w * ∏ c ∈ (univ.erase a).erase b, p (w c))) := by
     intro x y
     rw [secondPartial_samplingObservable]
     refine sum_congr rfl fun w _ ↦ ?_
@@ -337,7 +337,7 @@ theorem driftTerm_samplingObservable [Fintype H] [DecidableEq H] (T : H → H �
     ∑ z, (reproduce (ruleKernel T) p z - p z) * firstPartial (samplingObservable f) p z =
       ∑ a, (samplingObservable (decisionBranch T a f) p - samplingObservable f p) := by
   have hfirst : ∀ z, firstPartial (samplingObservable f) p z =
-      ∑ w, ∑ a, Pi.single z (1 : ℝ) (w a) * (f w * ∏ c ∈ univ.erase a, p (w c)) := by
+      ∑ w, ∑ a, (Pi.single z 1 : H → ℝ) (w a) * (f w * ∏ c ∈ univ.erase a, p (w c)) := by
     intro z
     rw [firstPartial, lineDeriv_samplingObservable]
     refine sum_congr rfl fun w _ ↦ ?_
@@ -345,14 +345,14 @@ theorem driftTerm_samplingObservable [Fintype H] [DecidableEq H] (T : H → H �
     refine sum_congr rfl fun a _ ↦ ?_
     ring
   have hcollapse : ∀ (u : H) (K : ℝ),
-      ∑ z, (reproduce (ruleKernel T) p z - p z) * (Pi.single z (1 : ℝ) u * K) =
+      ∑ z, (reproduce (ruleKernel T) p z - p z) * ((Pi.single z 1 : H → ℝ) u * K) =
         (reproduce (ruleKernel T) p u - p u) * K := by
     intro u K
     simp only [Pi.single_apply, ite_mul, one_mul, zero_mul, mul_ite, mul_zero, sum_ite_eq,
       mem_univ, if_true]
   calc ∑ z, (reproduce (ruleKernel T) p z - p z) * firstPartial (samplingObservable f) p z
       = ∑ w, ∑ a, ∑ z, (reproduce (ruleKernel T) p z - p z) *
-          (Pi.single z (1 : ℝ) (w a) * (f w * ∏ c ∈ univ.erase a, p (w c))) := by
+          ((Pi.single z 1 : H → ℝ) (w a) * (f w * ∏ c ∈ univ.erase a, p (w c))) := by
         simp only [hfirst, mul_sum]
         exact (sum_sum_sum_comm univ _).symm
     _ = ∑ w, ∑ a, (reproduce (ruleKernel T) p (w a) - p (w a)) *
