@@ -31,7 +31,7 @@ The transition function.  Evaluation is jointly continuous on `C(X, ℝ) × X`, 
 `(t, x) ↦ ∫ g dK_t(x, ·)` is jointly continuous (`continuous_integral_neutralMarkovKernel_prod`).
 For each fixed time the kernel has the Feller property: `x ↦ ∫ g dK_t(x, ·)` is continuous
 (`continuous_integral_neutralMarkovKernel`), and `x ↦ K_t(x, ·)` is continuous into the
-probability measures with the weak topology (`continuous_neutralMarkovKernel`), by
+probability measures with the weak topology (`continuous_neutralKernelProbability`), by
 `FellerKernelRepresentation.continuous_kernelProbability`.
 
 Scope.  The neutral rates are constant in time.
@@ -51,7 +51,7 @@ open MeasureTheory ProbabilityTheory Filter Topology Descent.Coalescent PartialH
   PartialHaplotypeDualGenerator NeutralFellerGenerator NeutralPolynomialSemigroup
   PolynomialFellerExtension FellerKernelRepresentation NeutralMicroscopicEulerLimit
   NeutralFellerContinuity Descent.Pangenome.AncestralLocality.InfiniteGenomeLimit
-open scoped NNReal
+open scoped NNReal Matrix.Norms.Operator
 
 noncomputable section
 
@@ -119,7 +119,7 @@ theorem continuous_integral_neutralMarkovKernel_prod (rates : NeutralRates Deme 
       = fun q ↦ neutralSemigroupExtension rates ℓ₀ hap₀ q.1 g q.2 :=
     funext fun q ↦ integral_neutralMarkovKernel rates ℓ₀ hap₀ q.1 q.2 g
   rw [hfun]
-  exact ContinuousMap.continuous_eval.comp
+  exact continuous_eval.comp
     ((continuous_neutralSemigroupExtension rates ℓ₀ hap₀ g).prodMap continuous_id)
 
 /-- **The Feller property.**  At every time the neutral kernel carries continuous observables to
@@ -134,17 +134,29 @@ theorem continuous_integral_neutralMarkovKernel (rates : NeutralRates Deme Locus
   rw [hfun]
   exact (neutralSemigroupExtension rates ℓ₀ hap₀ t g).continuous
 
-/-- **Weak continuity in the state.**  At every time `x ↦ K_t(x, ·)` is continuous into the
-probability measures on the frequency simplex with the topology of weak convergence. -/
-theorem continuous_neutralMarkovKernel (rates : NeutralRates Deme Locus Allele) (ℓ₀ : Locus)
+/-- The neutral kernel at time `t` as a map into the probability measures on the frequency
+simplex. -/
+def neutralKernelProbability (rates : NeutralRates Deme Locus Allele) (ℓ₀ : Locus)
     (hap₀ : FullHaplotype Locus Allele) (t : ℝ≥0) :
-    Continuous fun x : FrequencyState Deme Locus Allele ↦
-      (⟨neutralMarkovKernel rates ℓ₀ hap₀ t x,
-        (isMarkovKernel_neutralMarkovKernel rates ℓ₀ hap₀ t).isProbabilityMeasure x⟩ :
-          ProbabilityMeasure (FrequencyState Deme Locus Allele)) :=
-  continuous_kernelProbability (neutralSemigroupExtension rates ℓ₀ hap₀ t)
+    FrequencyState Deme Locus Allele → ProbabilityMeasure (FrequencyState Deme Locus Allele) :=
+  kernelProbability (neutralSemigroupExtension rates ℓ₀ hap₀ t)
     (neutralSemigroupExtension_nonneg rates ℓ₀ hap₀ t)
     (neutralSemigroupExtension_one rates ℓ₀ hap₀ t)
+
+/-- The probability measure of the neutral kernel at a state is the neutral Markov kernel
+there. -/
+theorem coe_neutralKernelProbability (rates : NeutralRates Deme Locus Allele) (ℓ₀ : Locus)
+    (hap₀ : FullHaplotype Locus Allele) (t : ℝ≥0) (x : FrequencyState Deme Locus Allele) :
+    (neutralKernelProbability rates ℓ₀ hap₀ t x : Measure (FrequencyState Deme Locus Allele))
+      = neutralMarkovKernel rates ℓ₀ hap₀ t x :=
+  rfl
+
+/-- **Weak continuity in the state.**  At every time `x ↦ K_t(x, ·)` is continuous into the
+probability measures on the frequency simplex with the topology of weak convergence. -/
+theorem continuous_neutralKernelProbability (rates : NeutralRates Deme Locus Allele)
+    (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele) (t : ℝ≥0) :
+    Continuous (neutralKernelProbability rates ℓ₀ hap₀ t) :=
+  continuous_kernelProbability _ _ _
 
 end
 

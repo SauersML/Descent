@@ -15,4 +15,6 @@ open Descent.Portability.NeutralFellerProperty
 #print axioms
   Descent.Portability.NeutralFellerProperty.continuous_integral_neutralMarkovKernel_prod
 #print axioms Descent.Portability.NeutralFellerProperty.continuous_integral_neutralMarkovKernel
-#print axioms Descent.Portability.NeutralFellerProperty.continuous_neutralMarkovKernel
+#print axioms Descent.Portability.NeutralFellerProperty.neutralKernelProbability
+#print axioms Descent.Portability.NeutralFellerProperty.coe_neutralKernelProbability
+#print axioms Descent.Portability.NeutralFellerProperty.continuous_neutralKernelProbability
