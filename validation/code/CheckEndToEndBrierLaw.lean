@@ -1,0 +1,45 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.EndToEndBrierLaw
+
+/-! Axiom audit of EndToEndBrierLaw. -/
+
+open Descent.Portability.EndToEndBrierLaw
+
+#print axioms pushforwardMass_eq_expectation
+#print axioms cellPolynomial
+#print axioms eval_cellPolynomial
+#print axioms totalDegree_cellPolynomial_le
+#print axioms totalDegree_groupCells_le
+#print axioms brierTermPolynomial
+#print axioms eval_brierTermPolynomial
+#print axioms totalDegree_brierTermPolynomial_le
+#print axioms residualPolynomial
+#print axioms eval_residualPolynomial
+#print axioms totalDegree_residualPolynomial_le
+#print axioms totalDegree_residualPolynomial_sq_le
+#print axioms meanAbs_le_sqrt_meanSquare
+#print axioms integrable_continuousObservable
+#print axioms continuous_pushforwardMass
+#print axioms measurable_squaredCaseMass
+#print axioms measurable_scoreGroupMass
+#print axioms expectedRepairedBrier
+#print axioms conditionalRepairedBrier_pushforward_stateLaw
+#print axioms integrable_caseProbability
+#print axioms integrable_brierRatio
+#print axioms expectedRepairedBrier_eq_tsum
+#print axioms expectedRepairedBrier_eq_dotProduct
+#print axioms expectedRepairedBrier_historyEventKernel
+#print axioms expectedRepairedBrier_rateHistoryKernel
+#print axioms expectedRepairedBrier_le_integral_recalibration
+#print axioms expectedRepairedBrier_le_dotProduct
+#print axioms expectedRepairedBrier_historyEventKernel_le
+#print axioms expectedCalibrationError
+#print axioms continuous_calibrationResidual
+#print axioms expectedCalibrationError_eq_sum
+#print axioms sum_abs_integral_calibrationResidual_le
+#print axioms expectedCalibrationError_le_sum_sqrt
+#print axioms expectedCalibrationError_bounds_dotProduct
+#print axioms expectedCalibrationError_bounds_historyEventKernel
+#print axioms expectedCalibrationError_bounds_rateHistoryKernel
