@@ -57,7 +57,8 @@ the Möbius function of Mathlib's incidence algebra on the partition lattice is
 `μ(σ, ⊤) = (-1)^{|σ|-1} (|σ|-1)!`. -/
 theorem mu_finpartition_top (hs : s.Nonempty) (σ : Finpartition s) :
     IncidenceAlgebra.mu ℤ σ ⊤ = mobiusCoefficient #σ.parts := by
-  refine WellFoundedGT.induction σ ?_
+  refine WellFoundedGT.induction
+    (C := fun σ : Finpartition s ↦ IncidenceAlgebra.mu ℤ σ ⊤ = mobiusCoefficient #σ.parts) σ ?_
   intro σ ih
   by_cases htop : σ = ⊤
   · rw [htop, IncidenceAlgebra.mu_apply, if_pos rfl, (card_parts_eq_one_iff ⊤ hs).mpr rfl,
@@ -91,7 +92,7 @@ theorem card_filter_card_parts_eq_stirlingSecond (t : Finset α) (j : ℕ) :
       (fun P _ hne ↦ absurd (finpartition_empty_eq_bot P) hne) (fun h ↦ absurd (mem_univ _) h)]
     cases j with
     | zero => simp
-    | succ j => simp [Nat.stirlingSecond]
+    | succ j => simp
   | insert a t ha ih =>
     rw [sum_finpartition_insert ha, card_insert_of_notMem ha]
     have hstep : ∀ P : Finpartition t,
