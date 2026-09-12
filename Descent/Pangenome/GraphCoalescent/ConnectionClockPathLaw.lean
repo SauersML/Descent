@@ -289,6 +289,8 @@ theorem lintegral_exp_connectionTimeLaw {n : ℕ} (s : Fin n → Fin n) {t : ℝ
       have hdt : 0 < deathRate (blocks ξ) + t := by linarith
       haveI := measurableSingletonClass_ER n
       haveI := holdDuration_isProbabilityMeasure hd
+      haveI := isProbabilityMeasure_bind_jumpStep ξ hk (fun η ↦ connectionTimeLaw s η.1)
+        fun η ↦ connectionTimeLaw_isProbabilityMeasure s η.1
       have hnn : ∀ η : {η : ER n // Covers ξ η}, 0 ≤ connectionValue s t 1 0 η.1 := fun η ↦
         connectionValue_nonneg s ht (b := 1) (g := 0) (fun _ _ ↦ zero_le_one)
           (fun _ _ ↦ le_refl (0 : ℝ)) η.1
