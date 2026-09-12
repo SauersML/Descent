@@ -18,7 +18,11 @@ open Descent.Portability.NeutralRateHistoryKernel
 #print axioms cauchySeq_sampledOperator
 #print axioms rateHistoryOperatorValue
 #print axioms tendsto_rateHistoryOperatorValue
+#print axioms rateHistoryOperatorValue_add
+#print axioms rateHistoryOperatorValue_smul
+#print axioms norm_rateHistoryOperatorValue_le
 #print axioms rateHistoryOperator
+#print axioms rateHistoryOperator_apply
 #print axioms tendsto_rateHistoryOperator
 #print axioms tendsto_sampledOperator_apply
 #print axioms rateHistoryOperator_nonneg

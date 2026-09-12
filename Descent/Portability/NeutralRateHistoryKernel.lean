@@ -223,13 +223,23 @@ theorem cauchySeq_sampledOperator {rates : ℝ → NeutralRates Deme Locus Allel
     refine ⟨N, fun m hm n hn ↦ ?_⟩
     have hmn := hN m hm n hn
     rw [dist_eq_norm] at hmn ⊢
-    refine lt_of_le_of_lt ((ContinuousMap.norm_le _ (mul_nonneg hB (norm_nonneg _))).mpr
-      fun x ↦ ?_) ?_
-    · rw [ContinuousMap.sub_apply, Real.norm_eq_abs, sampledOperator_polynomial,
+    have hbound : ‖sampledOperator rates ℓ₀ hap₀ T m (f : C(FrequencyState Deme Locus Allele, ℝ))
+          - sampledOperator rates ℓ₀ hap₀ T n (f : C(FrequencyState Deme Locus Allele, ℝ))‖
+        ≤ (∑ η, |supportCoefficients ℓ₀ (representative f) η|)
+          * featureBound (rates 0) (supportBudget ℓ₀ (representative f))
+          * ‖historyPropagator (supportBudget ℓ₀ (representative f))
+              ((sampledEpochs rates T (T / m).toNNReal m).map
+                fun epoch ↦ (epoch.1, (epoch.2 : ℝ)))
+            - historyPropagator (supportBudget ℓ₀ (representative f))
+              ((sampledEpochs rates T (T / n).toNNReal n).map
+                fun epoch ↦ (epoch.1, (epoch.2 : ℝ)))‖ := by
+      refine (ContinuousMap.norm_le _ (mul_nonneg hB (norm_nonneg _))).mpr fun x ↦ ?_
+      rw [ContinuousMap.sub_apply, Real.norm_eq_abs, sampledOperator_polynomial,
         sampledOperator_polynomial]
       refine (abs_dotProduct_mulVec_sub_le (rates 0) _ _ _ _ x).trans_eq ?_
       ring
-    · calc (∑ η, |supportCoefficients ℓ₀ (representative f) η|)
+    refine hbound.trans_lt ?_
+    calc (∑ η, |supportCoefficients ℓ₀ (representative f) η|)
             * featureBound (rates 0) (supportBudget ℓ₀ (representative f))
             * ‖historyPropagator (supportBudget ℓ₀ (representative f))
                 ((sampledEpochs rates T (T / m).toNNReal m).map
@@ -286,6 +296,47 @@ theorem tendsto_rateHistoryOperatorValue {rates : ℝ → NeutralRates Deme Locu
       (𝓝 (rateHistoryOperatorValue rates ℓ₀ hap₀ T g)) :=
   (cauchySeq_sampledOperator hT hcontinuous ℓ₀ hap₀ g).tendsto_limUnder
 
+/-- The limit value is additive in the observable. -/
+theorem rateHistoryOperatorValue_add {rates : ℝ → NeutralRates Deme Locus Allele} {T : ℝ}
+    (hT : 0 ≤ T)
+    (hcontinuous : ∀ capacity : Locus → ℕ,
+      ContinuousOn (fun t ↦ dualGenerator (rates t) capacity) (Set.Icc 0 T))
+    (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele)
+    (g h : C(FrequencyState Deme Locus Allele, ℝ)) :
+    rateHistoryOperatorValue rates ℓ₀ hap₀ T (g + h)
+      = rateHistoryOperatorValue rates ℓ₀ hap₀ T g
+        + rateHistoryOperatorValue rates ℓ₀ hap₀ T h := by
+  have hsum := (tendsto_rateHistoryOperatorValue hT hcontinuous ℓ₀ hap₀ g).add
+    (tendsto_rateHistoryOperatorValue hT hcontinuous ℓ₀ hap₀ h)
+  exact tendsto_nhds_unique (tendsto_rateHistoryOperatorValue hT hcontinuous ℓ₀ hap₀ (g + h))
+    (hsum.congr fun n ↦ (map_add (sampledOperator rates ℓ₀ hap₀ T n) g h).symm)
+
+/-- The limit value commutes with scaling the observable. -/
+theorem rateHistoryOperatorValue_smul {rates : ℝ → NeutralRates Deme Locus Allele} {T : ℝ}
+    (hT : 0 ≤ T)
+    (hcontinuous : ∀ capacity : Locus → ℕ,
+      ContinuousOn (fun t ↦ dualGenerator (rates t) capacity) (Set.Icc 0 T))
+    (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele) (a : ℝ)
+    (g : C(FrequencyState Deme Locus Allele, ℝ)) :
+    rateHistoryOperatorValue rates ℓ₀ hap₀ T (a • g)
+      = a • rateHistoryOperatorValue rates ℓ₀ hap₀ T g := by
+  have hscaled := (tendsto_rateHistoryOperatorValue hT hcontinuous ℓ₀ hap₀ g).const_smul a
+  exact tendsto_nhds_unique (tendsto_rateHistoryOperatorValue hT hcontinuous ℓ₀ hap₀ (a • g))
+    (hscaled.congr fun n ↦ (map_smul (sampledOperator rates ℓ₀ hap₀ T n) a g).symm)
+
+/-- The limit value contracts sup norms. -/
+theorem norm_rateHistoryOperatorValue_le {rates : ℝ → NeutralRates Deme Locus Allele} {T : ℝ}
+    (hT : 0 ≤ T)
+    (hcontinuous : ∀ capacity : Locus → ℕ,
+      ContinuousOn (fun t ↦ dualGenerator (rates t) capacity) (Set.Icc 0 T))
+    (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele)
+    (g : C(FrequencyState Deme Locus Allele, ℝ)) :
+    ‖rateHistoryOperatorValue rates ℓ₀ hap₀ T g‖ ≤ ‖g‖ := by
+  have hnorm := (continuous_norm.tendsto _).comp
+    (tendsto_rateHistoryOperatorValue hT hcontinuous ℓ₀ hap₀ g)
+  exact le_of_tendsto hnorm
+    (Eventually.of_forall fun n ↦ norm_historyOperator_apply_le ℓ₀ hap₀ _ g)
+
 /-- **The operator of a rate history** on continuous observables: the limit of the sampled
 operators. -/
 def rateHistoryOperator (rates : ℝ → NeutralRates Deme Locus Allele) (ℓ₀ : Locus)
@@ -295,20 +346,21 @@ def rateHistoryOperator (rates : ℝ → NeutralRates Deme Locus Allele) (ℓ₀
     C(FrequencyState Deme Locus Allele, ℝ) →L[ℝ] C(FrequencyState Deme Locus Allele, ℝ) :=
   LinearMap.mkContinuous
     { toFun := rateHistoryOperatorValue rates ℓ₀ hap₀ T
-      map_add' := fun g h ↦ tendsto_nhds_unique
-        (tendsto_rateHistoryOperatorValue hT hcontinuous ℓ₀ hap₀ (g + h))
-        (by simpa only [map_add] using
-          (tendsto_rateHistoryOperatorValue hT hcontinuous ℓ₀ hap₀ g).add
-            (tendsto_rateHistoryOperatorValue hT hcontinuous ℓ₀ hap₀ h))
-      map_smul' := fun a g ↦ tendsto_nhds_unique
-        (tendsto_rateHistoryOperatorValue hT hcontinuous ℓ₀ hap₀ (a • g))
-        (by simpa only [map_smul, RingHom.id_apply] using
-          (tendsto_rateHistoryOperatorValue hT hcontinuous ℓ₀ hap₀ g).const_smul a) }
+      map_add' := rateHistoryOperatorValue_add hT hcontinuous ℓ₀ hap₀
+      map_smul' := rateHistoryOperatorValue_smul hT hcontinuous ℓ₀ hap₀ }
     1 fun g ↦ by
       rw [one_mul]
-      exact le_of_tendsto ((continuous_norm.tendsto _).comp
-        (tendsto_rateHistoryOperatorValue hT hcontinuous ℓ₀ hap₀ g))
-        (Eventually.of_forall fun n ↦ norm_historyOperator_apply_le ℓ₀ hap₀ _ g)
+      exact norm_rateHistoryOperatorValue_le hT hcontinuous ℓ₀ hap₀ g
+
+/-- The operator of a rate history is the limit value. -/
+theorem rateHistoryOperator_apply (rates : ℝ → NeutralRates Deme Locus Allele) (ℓ₀ : Locus)
+    (hap₀ : FullHaplotype Locus Allele) {T : ℝ} (hT : 0 ≤ T)
+    (hcontinuous : ∀ capacity : Locus → ℕ,
+      ContinuousOn (fun t ↦ dualGenerator (rates t) capacity) (Set.Icc 0 T))
+    (g : C(FrequencyState Deme Locus Allele, ℝ)) :
+    rateHistoryOperator rates ℓ₀ hap₀ hT hcontinuous g
+      = rateHistoryOperatorValue rates ℓ₀ hap₀ T g :=
+  rfl
 
 /-- The sampled operators converge to the operator of the rate history in sup norm. -/
 theorem tendsto_rateHistoryOperator {rates : ℝ → NeutralRates Deme Locus Allele} {T : ℝ}
@@ -318,8 +370,9 @@ theorem tendsto_rateHistoryOperator {rates : ℝ → NeutralRates Deme Locus All
     (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele)
     (g : C(FrequencyState Deme Locus Allele, ℝ)) :
     Tendsto (fun n : ℕ ↦ sampledOperator rates ℓ₀ hap₀ T n g) atTop
-      (𝓝 (rateHistoryOperator rates ℓ₀ hap₀ hT hcontinuous g)) :=
-  tendsto_rateHistoryOperatorValue hT hcontinuous ℓ₀ hap₀ g
+      (𝓝 (rateHistoryOperator rates ℓ₀ hap₀ hT hcontinuous g)) := by
+  rw [rateHistoryOperator_apply]
+  exact tendsto_rateHistoryOperatorValue hT hcontinuous ℓ₀ hap₀ g
 
 /-- The sampled operators converge to the operator of the rate history at every state. -/
 theorem tendsto_sampledOperator_apply {rates : ℝ → NeutralRates Deme Locus Allele} {T : ℝ}
