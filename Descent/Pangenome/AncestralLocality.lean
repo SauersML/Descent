@@ -1,9 +1,11 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Pangenome.AncestralLocality.CylinderSamplingAlgebra
 import Descent.Pangenome.AncestralLocality.CompatibilityNeutrality
 import Descent.Pangenome.AncestralLocality.InfiniteGenomeLimit
 import Descent.Pangenome.AncestralLocality.LocalityTransition
+import Descent.Pangenome.AncestralLocality.SupercriticalReach
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program
@@ -25,6 +27,11 @@ on the bytes on main.
    the simple-path bound (6.1) `E|Reach(A)| ≤ |A|/(1 - α)` for `0 ≤ α < 1`, the degree-normalized
    rates with `sup_i Σ_j r_ij ≤ β` for every graph, and the unique root `giantFraction α` in
    `(0, 1)` of `s = 1 - e^{-α s}` for `α > 1`.
+
+3. `SupercriticalReach` -- (6.2) conditional on the Erdős–Rényi theorem: probabilities under
+   `G(m, p)`, the tie-free giant-component event, `GiantComponentLaw` carrying the classical
+   theorem with its subcritical half proved from (6.1) (witness `giantComponentLaw_half`), and the
+   support of the limit law: the reach fraction concentrates near `0` or near `giantFraction α`.
 
 3. `InfiniteGenomeLimit` -- the operator half of Theorem 9 on any compact space with a separating
    subalgebra: Feller semigroups along an exhaustion that obey the light-cone approximation bound
