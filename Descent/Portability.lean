@@ -1,6 +1,8 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Portability.NeutralHistoryKernel
+import Descent.Portability.NeutralMarkovKernelUniqueness
 import Descent.Portability.NeutralFellerContinuity
 import Descent.Portability.NeutralMicroscopicFloorLimit
 import Descent.Portability.CylinderComputableCertificate
