@@ -7,13 +7,13 @@ import Descent.Portability.MultinomialMomentExpansion
 assert_below Descent.Decision Descent.Program
 
 /-!
-# Positivity of the neutral polynomial semigroup, and the complete neutral Markov semigroup
+# Positivity from monomial moments on the product of simplices
 
-This module proves the positivity step of NOTE1 §4.2a and assembles the complete neutral Markov
-semigroup with no hypotheses left. Substochasticity of the dual semigroup only makes the moment
-functional nonnegative on monomials; a polynomial that is nonnegative on the frequency states can
-have negative coefficients. The step from monomials to all nonnegative polynomial observables is
-a Bernstein argument on the product of simplices.
+This module proves a Bernstein positivity theorem on the product of per-deme simplices, an
+analytic route to the positivity step of NOTE1 §4.2a. Substochasticity of the dual semigroup only
+makes the moment functional nonnegative on monomials; a polynomial that is nonnegative on the
+frequency states can have negative coefficients. The step from monomials to all nonnegative
+polynomial observables is a Bernstein argument on the product of simplices.
 
 Bernstein polynomials. `bernsteinPolynomial N p` weights the monomial `x^z` of every census `z` of
 `N` draws per deme by the multinomial coefficients and by the value of `p` at the census
@@ -32,19 +32,14 @@ Hence the functional of the Bernstein moment of `x^α` tends to the functional o
 Positivity. `nonneg_of_monomial_nonneg`: a linear functional on frequency polynomials that
 vanishes on the polynomials vanishing on all states and is nonnegative on every monomial is
 nonnegative on every polynomial that is nonnegative on the states, because it is the limit of its
-values on Bernstein polynomials. Applied to the moment functional of the dual chain
-(`NeutralPolynomialSemigroup.momentFunctional_eq_zero_of_vanishing`,
-`momentFunctional_monomial_nonneg`) this gives `neutralPolynomialSemigroup_nonneg`.
+values on Bernstein polynomials. The moment functional of the dual chain satisfies both
+hypotheses (`NeutralPolynomialSemigroup.momentFunctional_eq_zero_of_vanishing`,
+`momentFunctional_monomial_nonneg`), so this is an analytic route to the positivity of the
+neutral polynomial semigroup that uses no microscopic kernel.
 
-The complete neutral semigroup. `exists_neutralMarkovKernel_semigroup` discharges every hypothesis
-of `NeutralFellerGenerator.exists_markovKernel_neutralGenerator` with the constructed polynomial
-semigroup: for neutral rates, a locus and a haplotype, there are Markov kernels on the
-frequency states that represent the polynomial semigroup, compose by `K_{s+t} = K_t ∘ₖ K_s`, and
-have the neutral diffusion generator `neutralGenerator` on every budget-respecting configuration
-moment, `d/dt ∫ H_ξ dK_t(x, ·) = ∫ (neutralGenerator H_ξ) dK_t(x, ·)`.
-
-Scope. Rates are constant in time and mutation is symmetric, as in `PartialHaplotypeDualGenerator`.
-The generator is identified on configuration moments; its closure on `C(X)` is not described.
+Scope. The positivity of the neutral polynomial semigroup and the complete neutral Markov kernels
+are stated and proved in `NeutralPolynomialPositivity`, through the realization body of the
+physical kernels; they are not restated here.
 
 ## Empirical status
 
@@ -364,46 +359,6 @@ theorem nonneg_of_monomial_nonneg (Λ : FrequencyPolynomial Deme Locus Allele �
     rw [hp_sum]
     exact tendsto_finset_sum _ fun β _ ↦ (tendsto_map_bernsteinMoment Λ β).const_mul _
   exact ge_of_tendsto hlim (eventually_atTop.mpr ⟨1, hnonneg⟩)
-
-/-- **The neutral polynomial semigroup is positive.** It maps nonnegative polynomial observables
-to nonnegative polynomial observables. -/
-theorem neutralPolynomialSemigroup_nonneg (rates : NeutralRates Deme Locus Allele) (ℓ₀ : Locus)
-    (hap₀ : FullHaplotype Locus Allele) (t : ℝ≥0) (f : PolynomialSubspace Deme Locus Allele)
-    (hf : 0 ≤ (f : C(FrequencyState Deme Locus Allele, ℝ))) :
-    0 ≤ (neutralPolynomialSemigroup rates ℓ₀ hap₀ t f
-      : C(FrequencyState Deme Locus Allele, ℝ)) := by
-  refine ContinuousMap.le_def.mpr fun x ↦ ?_
-  rw [ContinuousMap.zero_apply, neutralPolynomialSemigroup_apply]
-  refine nonneg_of_monomial_nonneg (momentFunctional rates ℓ₀ t x)
-    (momentFunctional_eq_zero_of_vanishing rates ℓ₀ hap₀ t x)
-    (momentFunctional_monomial_nonneg rates ℓ₀ t (NNReal.coe_nonneg t) x) _ fun y ↦ ?_
-  have hy := ContinuousMap.le_def.mp hf y
-  rw [ContinuousMap.zero_apply, ← polynomialFunction_representative f] at hy
-  exact hy
-
-/-- **NOTE1 §4.2a, the complete neutral Markov semigroup.** For neutral rates, a locus and a
-haplotype, there are Markov kernels on the frequency states that represent the neutral polynomial
-semigroup, compose by `K_{s+t} = K_t ∘ₖ K_s`, and have the neutral diffusion generator on every
-budget-respecting configuration moment. No hypothesis is assumed. -/
-theorem exists_neutralMarkovKernel_semigroup (rates : NeutralRates Deme Locus Allele)
-    (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele) (capacity : Locus → ℕ) :
-    ∃ K : ℝ≥0 → Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele),
-      (∀ t, IsMarkovKernel (K t)) ∧
-      (∀ t x (f : PolynomialSubspace Deme Locus Allele),
-        ∫ y, (f : C(FrequencyState Deme Locus Allele, ℝ)) y ∂(K t x)
-          = (neutralPolynomialSemigroup rates ℓ₀ hap₀ t f
-              : C(FrequencyState Deme Locus Allele, ℝ)) x) ∧
-      (∀ s t, K (s + t) = K t ∘ₖ K s) ∧
-      ∀ t x (ξ : BudgetConfiguration Deme Locus Allele capacity),
-        HasDerivWithinAt
-          (fun s : ℝ ↦ ∫ y, polynomialFunction (momentPolynomial ξ.1) y ∂(K s.toNNReal x))
-          (∫ y, polynomialFunction (neutralGenerator rates (momentPolynomial ξ.1)) y ∂(K t x))
-          (Set.Ici 0) t :=
-  exists_markovKernel_neutralGenerator rates capacity (neutralPolynomialSemigroup rates ℓ₀ hap₀)
-    (neutralPolynomialSemigroup_one rates ℓ₀ hap₀)
-    (neutralPolynomialSemigroup_nonneg rates ℓ₀ hap₀)
-    (neutralPolynomialSemigroup_add rates ℓ₀ hap₀)
-    (neutralPolynomialSemigroup_momentPolynomial rates ℓ₀ hap₀ capacity)
 
 end
 

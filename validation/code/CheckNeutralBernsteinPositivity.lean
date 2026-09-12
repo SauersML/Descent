@@ -23,5 +23,3 @@ open Descent.Portability.NeutralBernsteinPositivity
 #print axioms Descent.Portability.NeutralBernsteinPositivity.tendsto_bernsteinCoefficient
 #print axioms Descent.Portability.NeutralBernsteinPositivity.tendsto_map_bernsteinMoment
 #print axioms Descent.Portability.NeutralBernsteinPositivity.nonneg_of_monomial_nonneg
-#print axioms Descent.Portability.NeutralBernsteinPositivity.neutralPolynomialSemigroup_nonneg
-#print axioms Descent.Portability.NeutralBernsteinPositivity.exists_neutralMarkovKernel_semigroup
