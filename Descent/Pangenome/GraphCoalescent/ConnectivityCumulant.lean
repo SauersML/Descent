@@ -322,7 +322,9 @@ theorem le_commonCoarsening_iff (q π σ : Finpartition s) :
   · intro h
     exact ⟨hmem.1.trans h, hmem.2.trans h⟩
   · intro h
-    exact inf'_le id (mem_filter.mpr ⟨mem_univ _, h⟩)
+    have hσ : σ ∈ univ.filter (fun σ : Finpartition s ↦ q ≤ σ ∧ π ≤ σ) :=
+      mem_filter.mpr ⟨mem_univ σ, h⟩
+    exact inf'_le id hσ
 
 /-- `q ⊔ π = ⊤` in the sense of `ReportConnected` is the finest common coarsening being `⊤`. -/
 theorem reportConnected_iff (q π : Finpartition s) :
@@ -448,7 +450,7 @@ theorem sum_le_eq_prod_lahPolynomial (R : Type*) [CommSemiring R] (σ : Finparti
   rw [prod_congr rfl hD1, prod_sum σ.parts (fun u ↦ (univ : Finset (Finpartition u)))
     (fun u P ↦ C (blockWeight P : R) * X ^ #P.parts)]
   refine sum_nbij'
-    (fun π ↦ if h : π ≤ σ then (fun u hu ↦ restrictToPart h hu) else (fun u _ ↦ ⊥))
+    (fun π ↦ if h : π ≤ σ then (fun u hu ↦ restrictToPart h hu) else (fun _ _ ↦ ⊥))
     (fun fam ↦ σ.bind fam) ?_ ?_ ?_ ?_ ?_
   · intro π _
     exact mem_pi.mpr fun u _ ↦ mem_univ _
@@ -488,7 +490,7 @@ theorem connectivityCumulant_eq_sum_connected (q : Finpartition s) (hs : s.Nonem
     (by intro σ π; simp only [mem_filter, mem_univ, true_and, and_true])]
   rw [sum_filter]
   refine sum_congr rfl fun π _ ↦ ?_
-  rw [← sum_mul, ← map_sum Polynomial.C (fun σ ↦ mobiusCoefficient #σ.parts),
+  rw [← sum_mul, ← map_sum Polynomial.C (fun σ : Finpartition s ↦ mobiusCoefficient #σ.parts),
     sum_mobiusCoefficient_common q π hs]
   split_ifs <;> simp
 
