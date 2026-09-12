@@ -32,3 +32,5 @@ open Descent.Portability.AncestralForwardGenerator
 #print axioms Descent.Portability.AncestralForwardGenerator.tendsto_nextGenerationMean_X
 #print axioms
   Descent.Portability.AncestralForwardGenerator.tendsto_nextGenerationMean_covariance
+#print axioms
+  Descent.Portability.AncestralForwardGenerator.tendsto_nextGenerationMean_centeredCube

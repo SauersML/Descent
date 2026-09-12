@@ -46,6 +46,7 @@ terms at least two degrees down vanish on the `N`-generation scale, for a fixed 
 The two moments.  The first moment has the drift as its limit, `N E[P'_z - p_z] → D_z`
 (`tendsto_nextGenerationMean_X`), and the centered second moment has the covariance as its limit,
 `N E[(P'_x - p_x)(P'_y - p_y)] → p_x (1{x=y} - p_y)` (`tendsto_nextGenerationMean_covariance`).
+Every centered moment of order three has limit zero (`tendsto_nextGenerationMean_centeredCube`).
 
 Scope.  The resampling rate is `c = 1` and the genome space is `{0,1}^V` for a finite `V`.  The
 statement is the one-generation expansion at a fixed population `p`; the convergence of the chain
@@ -464,6 +465,27 @@ theorem tendsto_nextGenerationMean_covariance (G : CheckingGraph V)
     rw [forwardGenerator_one, hresampling]
     simp only [hdrift, mul_zero, Finset.sum_const_zero, add_zero]
   have h := tendsto_nextGenerationMean G p ((X x - C (p.mass x)) * (X y - C (p.mass y)))
+  rw [heval, hvalue] at h
+  simpa only [sub_zero] using h
+
+/-- **The higher moments vanish.**  `N E[(P'_x - p_x)(P'_y - p_y)(P'_w - p_w)] → 0`: on the
+`N`-generation scale every centered moment of order three has limit zero, because (7.1) is a
+second-order operator and every first and second partial derivative of a product of three
+centered coordinates vanishes at `p`. -/
+theorem tendsto_nextGenerationMean_centeredCube (G : CheckingGraph V)
+    (p : FiniteReportLaw (V → Bool)) (x y w : V → Bool) :
+    Tendsto (fun N : ℕ ↦ (N : ℝ) * nextGenerationMean G N p.mass
+        ((X x - C (p.mass x)) * (X y - C (p.mass y)) * (X w - C (p.mass w)))) atTop (𝓝 0) := by
+  have heval : eval p.mass
+      ((X x - C (p.mass x)) * (X y - C (p.mass y)) * (X w - C (p.mass w))) = 0 := by
+    simp only [map_mul, map_sub, eval_X, eval_C, sub_self, mul_zero]
+  have hvalue : forwardGenerator G 1 p.mass
+      ((X x - C (p.mass x)) * (X y - C (p.mass y)) * (X w - C (p.mass w))) = 0 := by
+    rw [forwardGenerator_one, resamplingOperator_mul]
+    simp only [pderiv_mul, map_add, map_mul, map_sub, eval_X, eval_C, sub_self, mul_zero,
+      zero_mul, add_zero, zero_add, zero_div, Finset.sum_const_zero]
+  have h := tendsto_nextGenerationMean G p
+    ((X x - C (p.mass x)) * (X y - C (p.mass y)) * (X w - C (p.mass w)))
   rw [heval, hvalue] at h
   simpa only [sub_zero] using h
 
