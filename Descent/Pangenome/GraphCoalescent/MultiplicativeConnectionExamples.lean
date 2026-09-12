@@ -276,7 +276,8 @@ theorem crossingRate_bot_equal :
     crossingRate (fun _ : Fin 3 ↦ (1 / 3 : ℝ)) ⊥ = 1 / 3 := by
   rw [crossingRate, sum_fiberPair_three]
   simp only [Setoid.bot_def, pairRate]
-  simp (config := { decide := true }) <;> norm_num
+  simp (config := { decide := true })
+  norm_num
 
 /-- **Three equal fibers.** With `p = (1/3, 1/3, 1/3)` the connection time has survival
 `Pr(T_p > u) = 3 e^(−2u/9) − 2 e^(−u/3)`. -/
