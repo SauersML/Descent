@@ -100,8 +100,8 @@ observable `f` of the subalgebra an observation set and a number of sampled argu
 sampling duality `hduality` of the operators `S m` through bounded integrable evaluations of the
 circuit state against its marginal laws `law f p t`; agreement `hagree` of the evaluations of
 `S m` and every later `S m'` on every state that has not escaped the ball of radius `radius m`;
-and the hypotheses of `measureReal_escapeSet_le_exp` for the marginal laws at every time. Then later members of the
-exhaustion stay within `2 ‖f‖` times the escape bound (9.1) at the horizon. -/
+and the hypotheses of `measureReal_escapeSet_le_exp` for the marginal laws at every time. Then
+later members of the exhaustion stay within `2 ‖f‖` times the escape bound (9.1) at the horizon. -/
 theorem norm_operator_sub_le_lightConeEscape {X V : Type*} [TopologicalSpace X] [CompactSpace X]
     [DecidableEq V] [Fintype V] [MeasurableSpace (Multiset (Finset V))]
     [MeasurableSingletonClass (Multiset (Finset V))] {S : ℕ → FellerSemigroup X}
