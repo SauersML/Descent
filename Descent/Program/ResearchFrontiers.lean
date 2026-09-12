@@ -48,6 +48,7 @@ import Descent.Portability.EndToEndSensitivityLaw
 import Descent.Portability.EndToEndSensitivityMetrics
 import Descent.Portability.EndToEndSensitivityArchitecture
 import Descent.Portability.EndToEndAscertainedLaw
+import Descent.Portability.EndToEndSensitivityRates
 
 namespace Descent.Program
 
@@ -140,6 +141,11 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   `crossRatioDerivative_neg_iff_of_pos`). Portability strictly decreases in the target
   environment variance
   (`EndToEndSensitivityArchitecture.portability_environmentVariance_derivative_neg`).
+  The generator's entries are linear in the rates, so along any segment of rate laws these
+  derivatives hold with no differentiability hypothesis
+  (`EndToEndSensitivityRates.hasDerivAt_dualGenerator_rateSegment`,
+  `hasDerivAt_expectedPortability_segmentHistory`,
+  `hasDerivAt_expectedCalibrationPortability_segmentHistory`).
   Ascertained scores follow the same law. A panel rule that keeps a tag passes with probability
   a polynomial of degree at most `n` in the deme frequencies
   (`EndToEndAscertainedLaw.totalDegree_acceptancePolynomial_le`), so the portability of the
