@@ -39,7 +39,8 @@ applies to it: at the end of the history its expected moments are the chronologi
 the epoch dual propagators applied to the initial moments (`expectedMomentVector_history_realized`).
 
 Scope.  The history is a list of constant-rate epochs with nonnegative durations; splits and
-admixture pulses are not composed here.  The realized family matches the history on the
+admixture pulses are composed with them in `PartialHaplotypeEventHistoryRealization`, through the
+epoch form of `forwardOnHistory_of_moments`.  The realized family matches the history on the
 budget-respecting moments of one fixed budget; it is not shown to be the marginal law of one
 process across budgets.
 
@@ -251,20 +252,28 @@ theorem expectedMomentVector_historyRealizedExpectation (capacity : Locus → �
   rfl
 
 /-- **The forward moment equation along a history, from the moments.**  Any expectation family
-whose expected moment vector follows `historyMoments` from `start` on satisfies the forward
-moment equation of NOTE1 (20) on every epoch of the history. -/
+whose expected moment vector follows `historyMoments` on the time span of the history from
+`start` satisfies the forward moment equation of NOTE1 (20) on every epoch of the history. -/
 theorem forwardOnHistory_of_moments (capacity : Locus → ℕ)
     (expectationAt : ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele))) :
     ∀ (epochs : List (NeutralRates Deme Locus Allele × ℝ)) (start : ℝ)
       (v : BudgetConfiguration Deme Locus Allele capacity → ℝ),
       (∀ epoch ∈ epochs, 0 ≤ epoch.2) →
-      (∀ t, start ≤ t → expectedMomentVector capacity expectationAt t =
-        historyMoments capacity epochs v (t - start)) →
+      (∀ t ∈ Set.Icc start (start + (epochs.map Prod.snd).sum),
+        expectedMomentVector capacity expectationAt t =
+          historyMoments capacity epochs v (t - start)) →
       ForwardOnHistory capacity expectationAt epochs start
   | [], _, _, _, _ => trivial
   | epoch :: rest, start, v, hdurations, hmoments => by
     have hrest : ∀ other ∈ rest, 0 ≤ other.2 :=
       fun other hother ↦ hdurations other (List.mem_cons.mpr (Or.inr hother))
+    have hrestSum : 0 ≤ (rest.map Prod.snd).sum :=
+      List.sum_nonneg fun x hx ↦ by
+        obtain ⟨other, hother, rfl⟩ := List.mem_map.mp hx
+        exact hrest other hother
+    have htotal : start + ((epoch :: rest).map Prod.snd).sum
+        = start + epoch.2 + (rest.map Prod.snd).sum := by
+      rw [List.map_cons, List.sum_cons, add_assoc]
     have horbit : ∀ s : ℝ, HasDerivAt
         (fun r ↦ (matrixExponential (dualGenerator epoch.1 capacity) (r - start)).mulVec v)
         ((dualGenerator epoch.1 capacity).mulVec
@@ -279,7 +288,7 @@ theorem forwardOnHistory_of_moments (capacity : Locus → ℕ)
         expectedMomentVector capacity expectationAt t =
           (matrixExponential (dualGenerator epoch.1 capacity) (t - start)).mulVec v := by
       intro t ht
-      rw [hmoments t ht.1]
+      rw [hmoments t ⟨ht.1, by linarith [ht.2]⟩]
       simp only [historyMoments]
       split_ifs with hlt
       · rw [max_eq_left (sub_nonneg.mpr ht.1)]
@@ -300,11 +309,11 @@ theorem forwardOnHistory_of_moments (capacity : Locus → ℕ)
     · refine forwardOnHistory_of_moments capacity expectationAt rest (start + epoch.2)
         ((matrixExponential (dualGenerator epoch.1 capacity) epoch.2).mulVec v) hrest ?_
       intro t ht
-      have hstart : start ≤ t := by linarith [ht, hdurations epoch (List.mem_cons.mpr
+      have hstart : start ≤ t := by linarith [ht.1, hdurations epoch (List.mem_cons.mpr
         (Or.inl rfl))]
-      rw [hmoments t hstart]
+      rw [hmoments t ⟨hstart, ht.2.trans htotal.symm.le⟩]
       simp only [historyMoments]
-      rw [if_neg (not_lt.mpr (by linarith)), sub_sub]
+      rw [if_neg (not_lt.mpr (by linarith [ht.1])), sub_sub]
 
 /-- **The realized family satisfies the forward moment equation on every epoch**, with no
 hypothesis. -/
