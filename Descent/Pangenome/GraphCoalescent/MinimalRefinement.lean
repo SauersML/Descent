@@ -45,11 +45,15 @@ determines the report-visible merger rates (with at least three components) or t
 survival derivatives (with two components) refines the load assignment, respectively the unordered
 pair.
 
-Not formalized here: the step from "a strong lumping of the labeled Kingman chain for every initial
-labeled state that determines the report" to "determines the report-visible merger rates and the
-survival derivatives", which is Rosenblatt's criterion applied to the chain of Theorem A and waits
-for that chain's module; and the survival function as a semigroup, which is represented here by its
-first two derivatives through the killed generator.
+The step from "a strong lumping of the labeled Kingman chain for every initial labeled state that
+determines the report" to "determines the report-visible merger rates and the survival
+derivatives" is Rosenblatt's criterion applied to the chain of Theorem A. It is proved for strong
+lumpability counted over covers in `LumpingVisibleRates` (the visible rates, and the loads with at
+least three components) and `LumpingUnorderedPair` (the survival derivatives and the unordered pair
+with two components).
+
+Not formalized here: the survival function as a semigroup, which is represented here by its first
+two derivatives through the killed generator.
 
 ## Empirical status
 
