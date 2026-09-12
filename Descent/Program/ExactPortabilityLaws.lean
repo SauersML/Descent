@@ -113,6 +113,12 @@ import Descent.Portability.NonnegativeIntegrableRealization
 import Descent.Portability.PartialHaplotypeMicroscopicApproximation
 import Descent.Portability.PartialHaplotypeRealizedPanel
 import Descent.Portability.NeutralPolynomialPositivity
+import Descent.Portability.NeutralBernsteinPositivity
+import Descent.Portability.MultinomialHistoryRealization
+import Descent.Portability.PartialHaplotypeHistoryRealization
+import Descent.Portability.NonnegativeMicroscopicApproximation
+import Descent.Portability.CylinderUniformLaw
+import Descent.Portability.CylinderBoxMullerLaw
 
 namespace Descent.Program
 
@@ -215,27 +221,31 @@ identities, and its sum against the coalescence rates is the drift row of the en
 on every stored coordinate: `DriftOperatorCoordinates`.
 The epoch form of Theorem 2 is proved through the note's multinomial sample of size `⌈1/(c h)⌉`
 in `MultinomialMicroscopicApproximation`, whose microscopic kernels change branch type with the
-step size, for every deme count with at least one deme. The history forms compose the same epoch
-statement as proved in `TwoLocusMicroscopicApproximation` through a single-draw stage with
-`N = ⌈(c h)^(-1/2)⌉`. The note's literal composition of physical stages, with simultaneous
-migration and multinomial resampling, is a microscopic approximation with a padded fixed branch
-type in `MultinomialStageComposition`. The corpus rate laws have strictly positive coalescence,
-where the note allows `c_i ≥ 0`; Theorem 2 and Corollary 2.1 extend to nonnegative coalescence
-for histories of constant-rate epochs and splits, through the limit of perturbed corpus epochs:
+step size, for every deme count with at least one deme. The history forms of epochs, splits and
+pulses go through the same multinomial sample: `MultinomialHistoryRealization`. The single-draw
+route with `N = ⌈(c h)^(-1/2)⌉` remains in `TwoLocusMicroscopicApproximation`. The note's
+literal composition of physical stages, with simultaneous migration and multinomial resampling,
+is a microscopic approximation with a padded fixed branch type in `MultinomialStageComposition`.
+The corpus rate laws have strictly positive coalescence, where the note allows `c_i ≥ 0`;
+Theorem 2 and Corollary 2.1 extend to nonnegative coalescence for histories of constant-rate
+epochs and splits, through the limit of perturbed corpus epochs:
 `NonnegativeCoalescenceRealization`, and for rate histories with integrable rate coordinates:
-`NonnegativeIntegrableRealization`. No microscopic kernel at `c_i = 0` is constructed. §2.4 is
-proved for
-rate histories with integrable rate coordinates; the propagator is characterized by the integral
-equation. Theorem 2 covers histories of rate epochs, splits and admixture pulses; the pipeline
-compiler emits nothing else. Of §4.2, mutation is symmetric. The forward moment
+`NonnegativeIntegrableRealization`. The microscopic kernel with the sampling stage omitted at
+`c_i = 0` gives the epoch form directly: `NonnegativeMicroscopicApproximation`. §2.4 is proved
+for rate histories with integrable rate coordinates; the propagator is characterized by the
+integral equation. Theorem 2 covers histories of rate epochs, splits and admixture pulses;
+the pipeline compiler emits nothing else. Of §4.2, mutation is symmetric. The forward moment
 equation that (20) takes as a hypothesis is discharged for every neutral model by the realized
 expectation family of the neutral microscopic approximation:
 `PartialHaplotypeMicroscopicApproximation.realizedExpectation_forward`. That family matches the
 diffusion on the moments of one fixed budget and is not shown to be the marginal law of a single
 process across budgets; the exact panel reports follow with no hypothesis:
-`PartialHaplotypeRealizedPanel`. The §4.2a polynomial semigroup is constructed from the dual
+`PartialHaplotypeRealizedPanel`. Along a history of constant-rate epochs the realized moments
+compose in chronological order (`PartialHaplotypeHistoryRealization.exists_historyLaw`); splits
+and pulses are not composed there. The §4.2a polynomial semigroup is constructed from the dual
 matrix exponential, with its unit, semigroup law and dual representation
-(`NeutralPolynomialSemigroup`), and is positive (`NeutralPolynomialPositivity`), so every
+(`NeutralPolynomialSemigroup`), and is positive (`NeutralPolynomialPositivity`, and by a Bernstein
+argument `NeutralBernsteinPositivity.nonneg_of_monomial_nonneg`), so every
 hypothesis of `NeutralFellerGenerator.exists_markovKernel_neutralGenerator` is proved: neutral
 Markov kernels exist for every neutral model, represent the polynomial semigroup, compose, and
 carry the neutral generator on configuration moments (`exists_neutralMarkovKernel`). The Euler
@@ -280,7 +290,11 @@ from a deme count.
   `CylinderUniformDraw`; the executed exponential draw `-log U`, with certificates converging to
   `E min(X, 1) = 1 - 1/e`: `CylinderExponentialDraw`; the Box-Muller pair on the even and odd
   bits, with radial certificates converging to `E min(Z₁² + Z₂², 2) = 2(1 - 1/e)`:
-  `CylinderGaussianDraw`; threshold comparisons with unresolved boundary mass and coordinate
+  `CylinderGaussianDraw`; the laws of the draws: the uniform draw is Lebesgue measure on `(0, 1)`
+  and the exponential draw is `expMeasure 1` (`CylinderUniformLaw.map_uniformDraw`,
+  `map_exponentialDraw`), and the Box-Muller pair has the standard bivariate Gaussian law with
+  independent coordinates (`CylinderBoxMullerLaw.map_gaussianPair`, `indepFun_gaussianPair`);
+  threshold comparisons with unresolved boundary mass and coordinate
   rounding: `CylinderThresholdCertificate`; equation (32), the report law of an almost surely
   terminating random-bit program: `CylinderHaltingLaw`.
 * §8 equations (33)-(35): `FrontierCompletionRegion`, with (35) in `SublawReportCertificate`;
@@ -311,9 +325,9 @@ not yet proof-checked.
 finite measure, a common bound and pointwise vanishing widths;
 `CylinderIntervalCertificate` needs only almost sure vanishing widths on fair-bit streams but
 does not show that its rational values are computed by an algorithm. (32) takes almost sure
-termination of the program as a hypothesis; it is not decided. The exponential and Gaussian draws
-are executed for integrands of `min(X, 1)` and of the radius only; the laws of the draws as
-measures, the Box-Muller theorem and integrands depending on the angle are not formalized.
+termination of the program as a hypothesis; it is not decided. The exponential and Gaussian
+certificates are executed for integrands of `min(X, 1)` and of the radius; the laws of the draws
+and the Box-Muller theorem are proved as measure identities.
 Equations (33) and (34) are
 proved for finitely many cells and coordinates, with the whole region attained by completions.
 -/

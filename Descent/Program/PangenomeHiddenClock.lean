@@ -4,7 +4,11 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Pangenome.GraphCoalescent.BalancedFiberExtremum
 import Descent.Pangenome.GraphCoalescent.ConnectivityClockTable
 import Descent.Pangenome.GraphCoalescent.ConnectivityCumulant
+import Descent.Pangenome.GraphCoalescent.ConnectivityCumulantDegree
+import Descent.Pangenome.GraphCoalescent.ConnectivityCumulantCorpus
 import Descent.Pangenome.GraphCoalescent.Conservation
+import Descent.Pangenome.GraphCoalescent.LambdaLoadClosure
+import Descent.Pangenome.GraphCoalescent.MultiInterfaceGenerator
 import Descent.Pangenome.GraphCoalescent.HiddenLoadFiltering
 import Descent.Pangenome.GraphCoalescent.HiddenLoads
 import Descent.Pangenome.GraphCoalescent.HiddenLumpability
@@ -13,6 +17,7 @@ import Descent.Pangenome.GraphCoalescent.MinimalRefinement
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceClosure
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceLoads
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceOutcome
+import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionExamples
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionLaw
 import Descent.Pangenome.GraphCoalescent.MultiplicativeObservation
 import Descent.Pangenome.GraphCoalescent.RankedHistoryLaw
@@ -85,7 +90,11 @@ inside it.
   `∏_C A_|C|(z)` (`sum_le_eq_prod_lahPolynomial`); (D3) is
   `connectivityCumulant_eq_sum_connected`, with nonnegative integer coefficients
   (`coeff_connectivityCumulant_nonneg`) depending only on the fiber sizes
-  (`connectivityCumulant_eq_cumulantOfSizes`).
+  (`connectivityCumulant_eq_cumulantOfSizes`), of degree at most `n - w + 1`
+  (`ConnectivityCumulantDegree.natDegree_connectivityCumulant_le`). In the corpus vocabulary of
+  coalescent states, with `graphKer` and `observed`:
+  `ConnectivityCumulantCorpus.connectivityCumulant_graphKer_eq_sum_observed`,
+  `natDegree_connectivityCumulant_graphKer_le`.
 * Theorem D, (D4), the ranked history law: `RankedHistoryLaw`. The law of the jump chain after
   `n - k` jumps is `a_{n,k} ∏_B |B|!` (`rankedHistoryLaw`, `blockLaw_toReal_eq_absoluteProb`),
   through the weighted cover count `2 Σ_{ξ ≺ η} w(ξ) = (n - |η|) w(η)`
@@ -105,7 +114,10 @@ inside it.
 * Theorem F, (F4): `MultiplicativeConnectionLaw`. The arbitrary-order Möbius identity of the
   partition lattice, `Σ_{σ ≥ τ} (-1)^(|σ|-1) (|σ|-1)! = [τ = ⊤]` (`sum_topMobius_blocks_ge`),
   and the probability that the edges rung by time `u` connect the fibers is
-  `Σ_σ (-1)^(|σ|-1) (|σ|-1)! e^(-u κ_σ)` (`connectionProbability_eq_mobius_sum`).
+  `Σ_σ (-1)^(|σ|-1) (|σ|-1)! e^(-u κ_σ)` (`connectionProbability_eq_mobius_sum`). Two fibers give
+  `1 - e^(-u p₀ p₁)` (`connectionProbability_two`), and three equal fibers give
+  `Pr(T_p > u) = 3 e^(-2u/9) - 2 e^(-u/3)` (`connectionSurvival_three_equal`):
+  `MultiplicativeConnectionExamples`.
 * §10, several interfaces sharing one genealogy: `MultiInterfaceClosure`. The common refinement
   of the reports determines every report (`observed_commonRefinement`), and two labeled
   configurations with the same hidden load in every cell of the common refinement offer equally
@@ -116,7 +128,15 @@ inside it.
   the cell loads the closure holds with nothing assumed on how a merger acts: two coalescent
   states with the same lumped state offer equally many mergers into every lumped state,
   `MultiInterfaceLoads.card_blockMergers_eq_of_multiState_eq`, through
-  `multiState_merge_eq_of_cells`.
+  `multiState_merge_eq_of_cells`; the outcome map is built from the mergers themselves in
+  `MultiInterfaceGenerator.card_blockMergers_eq_lumpedMergerCount`.
+* §10, the Λ-coalescent closure: `LambdaLoadClosure`. The sets of true blocks with a prescribed
+  profile number `∏_C C(L_C, h_C)` (`card_subsets_with_profile`), and the profiles of size `b`
+  account for `C(K, b)` (`sum_prod_choose_eq_choose`); the total labeled rate into a lumped target
+  is `lumpedLambdaRate` of the loads (`sum_mergerRates_eq_lumpedLambdaRate`), so two
+  configurations with the same loads offer the same total rate into every target
+  (`sum_mergerRates_eq_of_cellLoad_eq`), and the joined load is `Σ L_C - b + 1`
+  (`card_touchedBlocks_after_merger`).
 * §9, exact filtering and likelihood: `HiddenLoadFiltering`. For a finite hidden jump process
   watched through a report map, the killed propagator solves `P' = P Q_R`
   (`hasDerivAt_killedPropagator`), carries no mass out of the report
@@ -143,17 +163,14 @@ coefficients written out for two and three fibers. The
 connection clock of Theorem C is defined as the first-step solution of the backward equation, and
 (C3) is Dynkin's identity for that equation; its identification with the path expectation of the
 continuous-time chain is not formalized, and (C2) is proved in Laplace-transform order, which
-does not imply the stochastic order of the quantile coupling. (D3) is proved over Mathlib
-`Finpartition`s, not in the corpus form over `Coalescent.ER n` with `observed` and `graphKer`,
-and its degree bound `n - w + 1` is not formalized; (D4) is proved by Kingman's backward
+does not imply the stochastic order of the quantile coupling. (D4) is proved by Kingman's backward
 recursion, without enumerating ranked histories. §9 is proved for a finite hidden jump process
 given by its generator, with the load chain's generator `loadGenerator` written from the rates of
-Theorem A. The stopping law (D5)-(D9), (E1)-(E2), (F2), (F3) and the Λ-coalescent extension of
-§10 are not yet proof-checked. Of (F1), the construction of the coupled report and
+Theorem A. The stopping law (D5)-(D9), (E1)-(E2), (F2) and (F3) are not yet proof-checked. Of
+(F1), the construction of the coupled report and
 multiplicative-coalescent skeletons, the path-level coupling inequality and the identification
 with path measures on càdlàg paths are not formalized. (F4) is proved for the finite random graph
-of edges rung by time `u`, entering the clocks through their distribution functions; its
-two-fiber and three-equal-fiber evaluations are not yet proof-checked.
+of edges rung by time `u`, entering the clocks through their distribution functions.
 -/
 
 end Descent.Program
