@@ -18,6 +18,8 @@ import Descent.Portability.PortabilityIdentification
 import Descent.Portability.EndToEndCorrelationSeries
 import Descent.Pangenome.GraphCoalescent.ReportNonMarkovFromSingletons
 import Descent.Pangenome.GraphCoalescent.FiberSizeIdentifiability
+import Descent.Pangenome.GraphCoalescent.FiberSizeSymmetricRecovery
+import Descent.Pangenome.AncestralLocality.SelectionLightCone
 
 namespace Descent.Program
 
@@ -87,7 +89,8 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   product of the fiber sizes at every width (`prod_eq_of_cumulantOfSizes_eq`), the unordered pair
   at width two (`coeff_one_deficitCumulant_card_two`, `coeff_two_deficitCumulant_card_two`), and
   the elementary symmetric polynomials of the sizes, so the multiset itself, at width three
-  (`esymm_eq_of_cumulantOfSizes_eq_three`); widths four and more are open.
+  (`esymm_eq_of_cumulantOfSizes_eq_three`), which determine the multiset of sizes by Vieta
+  (`FiberSizeSymmetricRecovery.multiset_nat_eq_of_esymm_eq`); widths four and more are open.
 * Selection and hereditary closure: `SelectionClosure`. Selection size-biases the parents
   (`selectedReproduce_eq`); the closure predicting the selected next generation is the closure of
   the observation joined with fitness, the greatest autonomous partition below the observation on
@@ -125,7 +128,10 @@ state. Every module listed was checked on the pinned toolchain with axioms limit
   selection graph (`kernelDriftTerm_samplingObservable`, `selectionGenerator_samplingObservable`);
   one uniqueness theorem covers every linear branching gain (`moments_eq_of_branchingEquation`),
   and the support drift under decisions and selection is at most `(3D + σ(1 + |S|)) Z`
-  (`supportDrift_le`).
+  (`supportDrift_le`). For the support chain truncated after `M` decisions and selections, the
+  expectation bounds (8.2), (8.3), (9.1) and (9.2) hold under selection with constants independent
+  of `M` (`SelectionLightCone.sum_selectionChainLaw_mul_tagCount_le`,
+  `sum_selectionChainLaw_escape_le_radius`).
 
 Scope. The rate takes the sampling duality through the truncated circuit law, and agreement of the
 finite models until escape, as hypotheses. The state counts compare numbers of values of the two

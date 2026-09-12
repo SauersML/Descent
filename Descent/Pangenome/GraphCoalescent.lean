@@ -71,6 +71,7 @@ import Descent.Pangenome.GraphCoalescent.MarkovCompressions
 import Descent.Pangenome.GraphCoalescent.CompressionLoadAchievability
 import Descent.Pangenome.GraphCoalescent.ReportNonMarkovFromSingletons
 import Descent.Pangenome.GraphCoalescent.FiberSizeIdentifiability
+import Descent.Pangenome.GraphCoalescent.FiberSizeSymmetricRecovery
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program
