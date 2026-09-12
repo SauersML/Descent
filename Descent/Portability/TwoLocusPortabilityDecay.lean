@@ -580,6 +580,172 @@ theorem tendsto_portabilityDecay_atTop {rate : ℝ} (hrate : 0 < rate) :
 theorem portabilityDecay_zero_rate (duration : ℝ) : portabilityDecay 0 duration = 1 := by
   simp [portabilityDecay]
 
+/-! ## The cross-heterozygosity portability law -/
+
+/-- **The closed-form cross-heterozygosity decay.**  At drift `c`, linkage rate `β = c + r`,
+ancestral ratios `contrast = Dz₀/pi2₀` and `linkage = DD₀/pi2₀`, and split time `T`, with
+`E = e^{-βT}`, the value `E² / (1 + (c/(2β)) contrast (1 - E) + (c/β)² linkage (1 - E)²)`.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  A rational expression in a real exponential. -/
+def crossHeterozygosityDecay (coalescence rate contrast linkage duration : ℝ) : ℝ :=
+  Real.exp (-rate * duration) ^ 2
+    / (1 + coalescence / (2 * rate) * contrast * (1 - Real.exp (-rate * duration))
+      + (coalescence / rate) ^ 2 * linkage * (1 - Real.exp (-rate * duration)) ^ 2)
+
+/-- **The cross-heterozygosity expected squared correlation of the split history**,
+`E[D_S D_T] / pi2(S, T, S, T)` as a ratio of expectations.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  A ratio of two moment coordinates. -/
+def crossHeterozygositySquaredCorrelation (rates : ManyDemeLDRates D) (parent child : Fin D)
+    {duration : ℝ} (hduration : 0 ≤ duration) (ancestral : AffineLowOrderLDCoordinate D → ℝ) :
+    ℝ :=
+  splitHistoryState rates parent child hduration ancestral (some (.DD parent child))
+    / splitHistoryState rates parent child hduration ancestral
+        (some (.pi2 parent child parent child))
+
+/-- **The cross-heterozygosity portability ratio** `σ̃²_{S→T}(T) / σ²_D(0)`.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  A ratio of two ratios of moment coordinates. -/
+def crossHeterozygosityPortabilityRatio (rates : ManyDemeLDRates D) (parent child : Fin D)
+    {duration : ℝ} (hduration : 0 ≤ duration) (ancestral : AffineLowOrderLDCoordinate D → ℝ) :
+    ℝ :=
+  crossHeterozygositySquaredCorrelation rates parent child hduration ancestral
+    / ancestralSquaredCorrelation ancestral parent
+
+/-- **At equal rates the cross-population linkage covariance is `E² DD₀`**, `E = e^{-βT}`.
+
+Assumes: no migration, no mutation, `parent ≠ child`, and equal drift and recombination rates. -/
+theorem splitHistoryState_DD_symmetric (rates : ManyDemeLDRates D)
+    (hmigration : ∀ source target, rates.migration source target = 0)
+    (hmutation : ∀ deme, rates.mutation deme = 0) {parent child : Fin D}
+    (hne : parent ≠ child) (hcoal : rates.coalescence child = rates.coalescence parent)
+    (hrec : rates.recombination child = rates.recombination parent) {duration : ℝ}
+    (hduration : 0 ≤ duration) (ancestral : AffineLowOrderLDCoordinate D → ℝ) :
+    splitHistoryState rates parent child hduration ancestral (some (.DD parent child))
+      = Real.exp (-linkageRate rates parent * duration) ^ 2
+        * ancestral (some (.DD parent parent)) := by
+  rw [splitHistoryState_DD rates hmigration hmutation hne, hcoal, hrec, sq, ← Real.exp_add]
+  congr 2
+  unfold linkageRate
+  ring
+
+/-- **At equal rates the mixed heterozygosity has a closed form**:
+`pi2(S, T, S, T)(T) = pi2₀ + (c/(2β)) Dz₀ (1 - E) + (c/β)² DD₀ (1 - E)²`, `E = e^{-βT}`.
+
+Assumes: no migration, no mutation, `parent ≠ child`, and equal drift and recombination rates. -/
+theorem splitHistoryState_pi2Cross_symmetric (rates : ManyDemeLDRates D)
+    (hmigration : ∀ source target, rates.migration source target = 0)
+    (hmutation : ∀ deme, rates.mutation deme = 0) {parent child : Fin D}
+    (hne : parent ≠ child) (hcoal : rates.coalescence child = rates.coalescence parent)
+    (hrec : rates.recombination child = rates.recombination parent) {duration : ℝ}
+    (hduration : 0 ≤ duration) (ancestral : AffineLowOrderLDCoordinate D → ℝ) :
+    splitHistoryState rates parent child hduration ancestral
+        (some (.pi2 parent child parent child))
+      = ancestral (some (.pi2 parent parent parent parent))
+        + rates.coalescence parent / (2 * linkageRate rates parent)
+          * ancestral (some (.Dz parent parent parent))
+          * (1 - Real.exp (-linkageRate rates parent * duration))
+        + (rates.coalescence parent / linkageRate rates parent) ^ 2
+          * ancestral (some (.DD parent parent))
+          * (1 - Real.exp (-linkageRate rates parent * duration)) ^ 2 := by
+  have hne' : child ≠ parent := Ne.symm hne
+  have hβ : linkageRate rates child = linkageRate rates parent := by
+    unfold linkageRate
+    rw [hcoal, hrec]
+  have ha := splitHistoryState_DD_symmetric rates hmigration hmutation hne hcoal hrec hduration
+    ancestral
+  have ha' : (matrixExponential (augmentedLowOrderLDGenerator rates) duration).mulVec
+        ((lowOrderLDSplitTransform parent child).mulVec ancestral) (some (.DD child parent))
+      = Real.exp (-linkageRate rates parent * duration) ^ 2
+        * ancestral (some (.DD parent parent)) := by
+    rw [matrixExponential_mulVec_apply_of_row_eq _ duration _ _ _
+      (augmentedLowOrderLDGenerator_DD_row rates hmigration hmutation hne'),
+      (splitTransform_block hne ancestral).1, hcoal, hrec, mul_comm duration, sq,
+      ← Real.exp_add]
+    congr 2
+    unfold linkageRate
+    ring
+  have hb := matrixExponential_Dz_combination rates hmigration hmutation hne duration
+    ((lowOrderLDSplitTransform parent child).mulVec ancestral)
+  have hb' := matrixExponential_Dz_combination rates hmigration hmutation hne' duration
+    ((lowOrderLDSplitTransform parent child).mulVec ancestral)
+  have hπ := matrixExponential_pi2Cross_combination rates hmigration hmutation hne duration
+    ((lowOrderLDSplitTransform parent child).mulVec ancestral)
+  obtain ⟨h0DD, h0Dz, h0Dz', h0pi2⟩ := splitTransform_block hne ancestral
+  rw [splitHistoryState_eq] at ha ⊢
+  rw [h0Dz, splitTransform_DD hne, hcoal, hβ] at hb
+  rw [h0Dz', h0DD, hβ] at hb'
+  rw [h0pi2, h0Dz, h0Dz', splitTransform_DD hne, h0DD, hcoal, hβ] at hπ
+  linear_combination hπ
+    - rates.coalescence parent / (4 * linkageRate rates parent) * hb
+    - rates.coalescence parent / (4 * linkageRate rates parent) * hb'
+    + (rates.coalescence parent / (4 * linkageRate rates parent)
+        * (4 * rates.coalescence parent / linkageRate rates parent)
+      - rates.coalescence parent * rates.coalescence parent
+        / (linkageRate rates parent * (linkageRate rates parent + linkageRate rates parent)))
+      * ha
+    + (rates.coalescence parent / (4 * linkageRate rates parent)
+        * (4 * rates.coalescence parent / linkageRate rates parent)
+      - rates.coalescence parent * rates.coalescence parent
+        / (linkageRate rates parent * (linkageRate rates parent + linkageRate rates parent)))
+      * ha'
+
+/-- **F9, the cross-heterozygosity portability law.**  At equal rates, the target-to-source
+ratio of `E[D_S D_T] / pi2(S, T, S, T)` is `crossHeterozygosityDecay c β (Dz₀/pi2₀) (DD₀/pi2₀) T`.
+
+Assumes: no migration, no mutation, `parent ≠ child`, equal drift and recombination rates,
+positive ancestral `pi2` and `DD`, and nonnegative ancestral `Dz`. -/
+theorem crossHeterozygosityPortabilityRatio_eq (rates : ManyDemeLDRates D)
+    (hmigration : ∀ source target, rates.migration source target = 0)
+    (hmutation : ∀ deme, rates.mutation deme = 0) {parent child : Fin D}
+    (hne : parent ≠ child) (hcoal : rates.coalescence child = rates.coalescence parent)
+    (hrec : rates.recombination child = rates.recombination parent) {duration : ℝ}
+    (hduration : 0 ≤ duration) (ancestral : AffineLowOrderLDCoordinate D → ℝ)
+    (hpi2 : 0 < ancestral (some (.pi2 parent parent parent parent)))
+    (hDD : 0 < ancestral (some (.DD parent parent)))
+    (hDz : 0 ≤ ancestral (some (.Dz parent parent parent))) :
+    crossHeterozygosityPortabilityRatio rates parent child hduration ancestral
+      = crossHeterozygosityDecay (rates.coalescence parent) (linkageRate rates parent)
+          (ancestral (some (.Dz parent parent parent))
+            / ancestral (some (.pi2 parent parent parent parent)))
+          (ancestral (some (.DD parent parent))
+            / ancestral (some (.pi2 parent parent parent parent))) duration := by
+  have hβ := linkageRate_pos rates parent
+  have hc := rates.coalescence_pos parent
+  have hE : 0 ≤ 1 - Real.exp (-linkageRate rates parent * duration) := by
+    rw [sub_nonneg, Real.exp_le_one_iff]
+    nlinarith
+  have hden : 0 < ancestral (some (.pi2 parent parent parent parent))
+      + rates.coalescence parent / (2 * linkageRate rates parent)
+        * ancestral (some (.Dz parent parent parent))
+        * (1 - Real.exp (-linkageRate rates parent * duration))
+      + (rates.coalescence parent / linkageRate rates parent) ^ 2
+        * ancestral (some (.DD parent parent))
+        * (1 - Real.exp (-linkageRate rates parent * duration)) ^ 2 := by
+    positivity
+  have hratio : 1 + rates.coalescence parent / (2 * linkageRate rates parent)
+          * (ancestral (some (.Dz parent parent parent))
+            / ancestral (some (.pi2 parent parent parent parent)))
+          * (1 - Real.exp (-linkageRate rates parent * duration))
+        + (rates.coalescence parent / linkageRate rates parent) ^ 2
+          * (ancestral (some (.DD parent parent))
+            / ancestral (some (.pi2 parent parent parent parent)))
+          * (1 - Real.exp (-linkageRate rates parent * duration)) ^ 2
+      = (ancestral (some (.pi2 parent parent parent parent))
+          + rates.coalescence parent / (2 * linkageRate rates parent)
+            * ancestral (some (.Dz parent parent parent))
+            * (1 - Real.exp (-linkageRate rates parent * duration))
+          + (rates.coalescence parent / linkageRate rates parent) ^ 2
+            * ancestral (some (.DD parent parent))
+            * (1 - Real.exp (-linkageRate rates parent * duration)) ^ 2)
+        / ancestral (some (.pi2 parent parent parent parent)) := by
+    field_simp
+  rw [crossHeterozygosityPortabilityRatio, crossHeterozygositySquaredCorrelation,
+    splitHistoryState_DD_symmetric rates hmigration hmutation hne hcoal hrec,
+    splitHistoryState_pi2Cross_symmetric rates hmigration hmutation hne hcoal hrec,
+    ancestralSquaredCorrelation, crossHeterozygosityDecay, hratio]
+  field_simp
+
 end
 
 end Descent.Portability.TwoLocusPortabilityDecay
