@@ -2,7 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionConvergence
-import Descent.Pangenome.GraphCoalescent.MultiplicativePerturbation
+import Descent.Pangenome.GraphCoalescent.MultiplicativeConnectionPerturbation
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program
@@ -34,11 +34,9 @@ and (F2).
 - `abs_poissonMixture_report_sub_spread_le`: **(F2) for every path functional**.  For masses `p`
   on the fibers and any functional of the skeleton path with values in `[0, 1]`, the graph's
   report and `Z_p` differ by at most `min {1, U²/(4n) + U ‖p^(n) - p‖₁}`.
-- `sum_filter_le_massStep`, `sum_filter_le_massLaw`, `hasSum_poissonPMFReal_mul_massTop`: `Z`
-  with any masses leaves the partitions below `σ` at the constant rate `κ_σ`, so it is
-  connected at scaled time `U` with the Möbius probability.
 - `sum_topMobius_graphKer_spread_eq_connectionProbability`: with the masses `p` spread over the
-  fibers of a labelling, that Möbius sum is `Pr(T_p ≤ U)`.
+  fibers of a labelling, the Möbius sum of `MultiplicativeConnectionPerturbation`'s
+  `hasSum_poissonPMFReal_mul_massTop` is `Pr(T_p ≤ U)`.
 - `abs_reportConnectionProbability_sub_le_min`: **(F3) with the rate of
   (F2)**, `|Pr(n² τ_q ≤ U) - Pr(T_p ≤ U)| ≤ min {1, U²/(4n) + U ‖p^(n) - p‖₁}`.
 
@@ -66,33 +64,11 @@ noncomputable section
 
 /-! ### The crossing rate as a pair sum -/
 
-/-- Twice the pair sum of the block masses is the mass of the ordered pairs in different
-blocks. -/
-theorem two_mul_pairProductSum_blockMass {w : ℕ} (p : Fin w → ℝ) (σ : ER w) :
-    2 * pairProductSum (blockMass p σ) = ∑ i, ∑ j, if σ.r i j then 0 else p i * p j := by
-  have hsq : ∀ C : Quotient σ, blockMass p σ C ^ 2
-      = ∑ i ∈ univ.filter (fun i ↦ Quotient.mk σ i = C),
-          ∑ j, if σ.r i j then p i * p j else 0 := by
-    intro C
-    rw [sq, blockMass, Finset.sum_mul_sum]
-    refine Finset.sum_congr rfl fun i hi ↦ ?_
-    rw [← Finset.sum_filter]
-    refine Finset.sum_congr (Finset.filter_congr fun j _ ↦ ?_) fun j _ ↦ rfl
-    rw [← (Finset.mem_filter.mp hi).2]
-    exact ⟨fun h ↦ σ.iseqv.symm (Quotient.exact h), fun h ↦ Quotient.sound (σ.iseqv.symm h)⟩
-  rw [two_mul_pairProductSum, sum_blockMass]
-  simp only [hsq]
-  rw [Finset.sum_fiberwise univ (Quotient.mk σ) fun i ↦ ∑ j, if σ.r i j then p i * p j else 0,
-    sq, Finset.sum_mul_sum, ← Finset.sum_sub_distrib]
-  refine Finset.sum_congr rfl fun i _ ↦ ?_
-  rw [← Finset.sum_sub_distrib]
-  exact Finset.sum_congr rfl fun j _ ↦ by split_ifs <;> ring
-
 /-- **`κ_σ = Σ_{C<D} p(C) p(D)`**: the total rate of the edges crossing `σ` is the pair sum of
 the masses of its blocks. -/
 theorem crossingRate_eq_pairProductSum {w : ℕ} (p : Fin w → ℝ) (σ : ER w) :
     crossingRate p σ = pairProductSum (blockMass p σ) := by
-  have h := (two_mul_crossingRate p σ).trans (two_mul_pairProductSum_blockMass p σ).symm
+  have h := (two_mul_crossingRate p σ).trans (two_mul_pairProductSum_blockMass_crossing p σ).symm
   linarith
 
 /-! ### The limit law -/
@@ -275,211 +251,6 @@ theorem abs_poissonMixture_report_sub_spread_le {n : ℕ} (hn : 0 < n) (s : Fin 
       report_mass_pathTotalVariation_le_one s hmass htotal m⟩
   · exact (sum_reportPathLaw s m).trans (sum_massPathLaw s _ m).symm
 
-/-! ### `Z` with any masses, below a partition -/
-
-/-- Two masses of components, expanded over their individuals and weighted by whether the two
-individuals lie in different blocks of `σ`. -/
-theorem ite_blockMap_mul_blockMass_eq {n : ℕ} (mass : Fin n → ℝ) {ζ σ : ER n} (h : ζ ≤ σ)
-    (C D : Quotient ζ) :
-    (if blockMap h C = blockMap h D then 0 else blockMass mass ζ C * blockMass mass ζ D)
-      = ∑ x ∈ univ.filter (fun x ↦ Quotient.mk ζ x = C),
-          ∑ y ∈ univ.filter (fun y ↦ Quotient.mk ζ y = D),
-            (if σ.r x y then 0 else mass x * mass y) := by
-  unfold blockMass
-  rw [Finset.sum_mul_sum]
-  by_cases hφ : blockMap h C = blockMap h D
-  · rw [if_pos hφ]
-    symm
-    refine Finset.sum_eq_zero fun x hx ↦ Finset.sum_eq_zero fun y hy ↦ if_pos ?_
-    have e1 : Quotient.mk σ x = blockMap h C := by
-      rw [← (Finset.mem_filter.mp hx).2]
-      rfl
-    have e2 : Quotient.mk σ y = blockMap h D := by
-      rw [← (Finset.mem_filter.mp hy).2]
-      rfl
-    exact Quotient.exact (e1.trans (hφ.trans e2.symm))
-  · rw [if_neg hφ]
-    refine Finset.sum_congr rfl fun x hx ↦ Finset.sum_congr rfl fun y hy ↦ (if_neg ?_).symm
-    intro hr
-    apply hφ
-    rw [← (Finset.mem_filter.mp hx).2, ← (Finset.mem_filter.mp hy).2]
-    exact Quotient.sound hr
-
-/-- **The merges of `Z` that leave the partitions below `σ` carry the crossing mass of `σ`**,
-for any masses and whatever the state `ζ ≤ σ` they start from. -/
-theorem two_mul_sum_crossing_eq_mass {n : ℕ} (mass : Fin n → ℝ) {ζ σ : ER n} (h : ζ ≤ σ) :
-    2 * ∑ t ∈ (univ : Finset (Quotient ζ)).powersetCard 2,
-        (if mergePair ζ t ≤ σ then 0 else ∏ C ∈ t, blockMass mass ζ C)
-      = ∑ x, ∑ y, if σ.r x y then 0 else mass x * mass y := by
-  calc 2 * ∑ t ∈ (univ : Finset (Quotient ζ)).powersetCard 2,
-        (if mergePair ζ t ≤ σ then 0 else ∏ C ∈ t, blockMass mass ζ C)
-      = ∑ C, ∑ D, if C ≠ D then (if mergePair ζ {C, D} ≤ σ then 0
-          else ∏ E ∈ ({C, D} : Finset (Quotient ζ)), blockMass mass ζ E) else 0 :=
-        two_mul_sum_powersetCard_two_eq _
-    _ = ∑ C, ∑ D, if blockMap h C = blockMap h D then 0
-          else blockMass mass ζ C * blockMass mass ζ D := by
-        refine Finset.sum_congr rfl fun C _ ↦ Finset.sum_congr rfl fun D _ ↦ ?_
-        by_cases hCD : C = D
-        · rw [if_neg (not_not.mpr hCD), if_pos (congrArg (blockMap h) hCD)]
-        · rw [if_pos hCD, mergePair_pair ζ hCD, Finset.prod_pair hCD]
-          by_cases hφ : blockMap h C = blockMap h D
-          · rw [if_pos ((merge_le_iff_blockMap_eq h hCD).mpr hφ), if_pos hφ]
-          · rw [if_neg fun hle ↦ hφ ((merge_le_iff_blockMap_eq h hCD).mp hle), if_neg hφ]
-    _ = ∑ C, ∑ D, ∑ x ∈ univ.filter (fun x ↦ Quotient.mk ζ x = C),
-          ∑ y ∈ univ.filter (fun y ↦ Quotient.mk ζ y = D),
-            (if σ.r x y then 0 else mass x * mass y) :=
-        Finset.sum_congr rfl fun C _ ↦ Finset.sum_congr rfl fun D _ ↦
-          ite_blockMap_mul_blockMass_eq mass h C D
-    _ = ∑ x, ∑ y, if σ.r x y then 0 else mass x * mass y := by
-        have hinner : ∀ C : Quotient ζ, ∑ D, ∑ x ∈ univ.filter (fun x ↦ Quotient.mk ζ x = C),
-            ∑ y ∈ univ.filter (fun y ↦ Quotient.mk ζ y = D),
-              (if σ.r x y then 0 else mass x * mass y)
-            = ∑ x ∈ univ.filter (fun x ↦ Quotient.mk ζ x = C),
-                ∑ y, (if σ.r x y then 0 else mass x * mass y) := by
-          intro C
-          rw [Finset.sum_comm]
-          exact Finset.sum_congr rfl fun x _ ↦ Finset.sum_fiberwise univ (Quotient.mk ζ)
-            fun y ↦ if σ.r x y then 0 else mass x * mass y
-        rw [Finset.sum_congr rfl fun C _ ↦ hinner C]
-        exact Finset.sum_fiberwise univ (Quotient.mk ζ)
-          fun x ↦ ∑ y, if σ.r x y then 0 else mass x * mass y
-
-/-- **`Z` with masses `mass` leaves the partitions below `σ` at the constant rate `κ_σ`**: from
-any `ζ ≤ σ` it stays below `σ` with probability `1 - Σ_{B<B'} p(B) p(B')` over the blocks of
-`σ`. -/
-theorem sum_filter_le_massStep {n : ℕ} (mass : Fin n → ℝ) {ζ σ : ER n} (h : ζ ≤ σ) :
-    ∑ ζ' ∈ univ.filter (· ≤ σ), massStep mass ζ ζ'
-      = 1 - pairProductSum (blockMass mass σ) := by
-  have hA : ∑ ζ' ∈ univ.filter (· ≤ σ), ∑ t ∈ (univ.powersetCard 2).filter
-        (fun t ↦ mergePair ζ t = ζ'), ∏ C ∈ t, blockMass mass ζ C
-      = ∑ t ∈ (univ : Finset (Quotient ζ)).powersetCard 2,
-          if mergePair ζ t ≤ σ then ∏ C ∈ t, blockMass mass ζ C else 0 := by
-    rw [Finset.sum_filter]
-    have hpoint : ∀ ζ' : ER n, (if ζ' ≤ σ then ∑ t ∈ (univ.powersetCard 2).filter
-        (fun t ↦ mergePair ζ t = ζ'), ∏ C ∈ t, blockMass mass ζ C else 0)
-        = ∑ t ∈ (univ.powersetCard 2).filter (fun t ↦ mergePair ζ t = ζ'),
-            if mergePair ζ t ≤ σ then ∏ C ∈ t, blockMass mass ζ C else 0 := by
-      intro ζ'
-      by_cases hle : ζ' ≤ σ
-      · rw [if_pos hle]
-        exact Finset.sum_congr rfl fun t ht ↦ by rw [(Finset.mem_filter.mp ht).2, if_pos hle]
-      · rw [if_neg hle]
-        exact (Finset.sum_eq_zero fun t ht ↦ by
-          rw [(Finset.mem_filter.mp ht).2, if_neg hle]).symm
-    rw [Finset.sum_congr rfl fun ζ' _ ↦ hpoint ζ']
-    exact Finset.sum_fiberwise _ (mergePair ζ) _
-  have hsplit : ∑ t ∈ (univ : Finset (Quotient ζ)).powersetCard 2,
-        (if mergePair ζ t ≤ σ then ∏ C ∈ t, blockMass mass ζ C else 0)
-      + ∑ t ∈ (univ : Finset (Quotient ζ)).powersetCard 2,
-        (if mergePair ζ t ≤ σ then 0 else ∏ C ∈ t, blockMass mass ζ C)
-      = pairProductSum (blockMass mass ζ) := by
-    rw [← Finset.sum_add_distrib, pairProductSum]
-    exact Finset.sum_congr rfl fun t _ ↦ by split_ifs <;> simp
-  have hcross := two_mul_sum_crossing_eq_mass mass h
-  rw [← two_mul_pairProductSum_blockMass mass σ] at hcross
-  have hhold : ∑ ζ' ∈ univ.filter (· ≤ σ),
-      (if ζ' = ζ then 1 - pairProductSum (blockMass mass ζ) else 0)
-      = 1 - pairProductSum (blockMass mass ζ) := by
-    rw [Finset.sum_ite_eq']
-    have hmem : ζ ∈ univ.filter (· ≤ σ) := Finset.mem_filter.mpr ⟨Finset.mem_univ _, h⟩
-    exact if_pos hmem
-  simp only [massStep]
-  rw [Finset.sum_add_distrib, hA, hhold]
-  linarith
-
-/-- From a state not below `σ`, `Z` never reaches a state below `σ`. -/
-theorem sum_filter_le_massStep_of_not_le {n : ℕ} (mass : Fin n → ℝ) {ζ σ : ER n}
-    (h : ¬ ζ ≤ σ) : ∑ ζ' ∈ univ.filter (· ≤ σ), massStep mass ζ ζ' = 0 := by
-  refine Finset.sum_eq_zero fun ζ' hζ' ↦ ?_
-  have hle := (Finset.mem_filter.mp hζ').2
-  unfold massStep
-  rw [Finset.sum_eq_zero fun t ht ↦ absurd
-    (((Finset.mem_filter.mp ht).2 ▸ le_mergePair ζ t).trans hle) h, zero_add]
-  exact if_neg fun (heq : ζ' = ζ) ↦ h (heq ▸ hle)
-
-/-- **The uniformized law of `Z` with masses `mass` after `m` steps from the interface.**
-
-Empirical status: NOT AN EMPIRICAL CLAIM.  A power of a finite kernel applied to a point mass. -/
-def massLaw {n : ℕ} (s : Fin n → Fin n) (mass : Fin n → ℝ) (m : ℕ) : ER n → ℝ :=
-  skeletonLaw (massStep mass) (fun ζ ↦ if ζ = graphKer s then 1 else 0) m
-
-/-- **`Z` is below `σ` after `m` steps with probability `(1 - κ_σ)^m`**, when the interface is
-below `σ`, and never otherwise. -/
-theorem sum_filter_le_massLaw {n : ℕ} (s : Fin n → Fin n) (mass : Fin n → ℝ) (σ : ER n)
-    (m : ℕ) :
-    ∑ ζ ∈ univ.filter (· ≤ σ), massLaw s mass m ζ
-      = if graphKer s ≤ σ then (1 - pairProductSum (blockMass mass σ)) ^ m else 0 := by
-  induction m with
-  | zero =>
-    simp only [massLaw, skeletonLaw, pow_zero]
-    rw [Finset.sum_ite_eq']
-    by_cases hq : graphKer s ≤ σ
-    · have hmem : graphKer s ∈ univ.filter (· ≤ σ) :=
-        Finset.mem_filter.mpr ⟨Finset.mem_univ _, hq⟩
-      rw [if_pos hmem, if_pos hq]
-    · have hmem : graphKer s ∉ univ.filter (· ≤ σ) := fun hmem ↦
-        hq (Finset.mem_filter.mp hmem).2
-      rw [if_neg hmem, if_neg hq]
-  | succ m ih =>
-    have h1 := sum_skeletonLaw_succ (massStep mass)
-      (fun ζ ↦ if ζ = graphKer s then 1 else 0) m (univ.filter (· ≤ σ)) fun _ ↦ 1
-    simp only [mul_one] at h1
-    have hpoint : ∀ ζ : ER n, massLaw s mass m ζ
-        * ∑ ζ' ∈ univ.filter (· ≤ σ), massStep mass ζ ζ'
-        = (if ζ ≤ σ then massLaw s mass m ζ else 0)
-          * (1 - pairProductSum (blockMass mass σ)) := by
-      intro ζ
-      by_cases hζ : ζ ≤ σ
-      · rw [if_pos hζ, sum_filter_le_massStep mass hζ]
-      · rw [if_neg hζ, sum_filter_le_massStep_of_not_le mass hζ, mul_zero, zero_mul]
-    have hstep : ∑ ζ ∈ univ.filter (· ≤ σ), massLaw s mass (m + 1) ζ
-        = ∑ ζ, massLaw s mass m ζ
-          * ∑ ζ' ∈ univ.filter (· ≤ σ), massStep mass ζ ζ' := h1
-    rw [hstep, Finset.sum_congr rfl fun ζ _ ↦ hpoint ζ, ← Finset.sum_mul, ← Finset.sum_filter,
-      ih]
-    split_ifs <;> ring
-
-/-- **The connection probability of `Z` after `m` steps**, as a Möbius sum over the partitions
-above the interface. -/
-theorem sum_massLaw_mul_top {n : ℕ} [NeZero n] (s : Fin n → Fin n) (mass : Fin n → ℝ)
-    (m : ℕ) :
-    ∑ ζ, massLaw s mass m ζ * (if ζ = ⊤ then 1 else 0)
-      = ∑ σ, (topMobius (blocks σ) : ℝ)
-          * (if graphKer s ≤ σ then (1 - pairProductSum (blockMass mass σ)) ^ m else 0) := by
-  calc ∑ ζ, massLaw s mass m ζ * (if ζ = ⊤ then 1 else 0)
-      = ∑ ζ, massLaw s mass m ζ
-          * ∑ σ : ER n, (topMobius (blocks σ) : ℝ) * (if ζ ≤ σ then 1 else 0) := by
-        simp only [sum_topMobius_ite_le]
-    _ = ∑ σ : ER n, (topMobius (blocks σ) : ℝ)
-          * ∑ ζ ∈ univ.filter (· ≤ σ), massLaw s mass m ζ := by
-        simp only [Finset.mul_sum, Finset.sum_filter]
-        rw [Finset.sum_comm]
-        exact Finset.sum_congr rfl fun σ _ ↦ Finset.sum_congr rfl fun ζ _ ↦ by
-          split_ifs <;> ring
-    _ = _ := by
-        simp only [sum_filter_le_massLaw]
-
-/-- **`Z` with masses `mass` is connected at scaled time `U` with the Möbius probability**
-`Σ_{σ ≥ q} (-1)^{|σ|-1} (|σ|-1)! e^{-U κ_σ}`, `κ_σ` the pair sum of the block masses. -/
-theorem hasSum_poissonPMFReal_mul_massTop {n : ℕ} [NeZero n] (s : Fin n → Fin n)
-    (mass : Fin n → ℝ) (U : NNReal) :
-    HasSum (fun m ↦ poissonPMFReal U m * ∑ ζ, massLaw s mass m ζ * (if ζ = ⊤ then 1 else 0))
-      (∑ σ, (topMobius (blocks σ) : ℝ)
-        * (if graphKer s ≤ σ then Real.exp (-((U : ℝ) * pairProductSum (blockMass mass σ)))
-          else 0)) := by
-  simp only [sum_massLaw_mul_top, Finset.mul_sum]
-  refine hasSum_sum fun σ _ ↦ ?_
-  by_cases hq : graphKer s ≤ σ
-  · simp only [if_pos hq]
-    have h := (hasSum_poissonPMFReal_mul_pow U
-      (1 - pairProductSum (blockMass mass σ))).mul_left (topMobius (blocks σ) : ℝ)
-    rw [sub_sub_cancel] at h
-    convert h using 1
-    funext m
-    ring
-  · simp only [if_neg hq, mul_zero]
-    exact hasSum_zero
-
 /-! ### Masses on the fiber labels -/
 
 /-- **The fiber label of a component of a labelling's interface.**
@@ -568,7 +339,7 @@ theorem pairProductSum_blockMass_comap_of_marginal {n w : ℕ} {label : Fin n �
     refine Finset.sum_congr rfl fun i _ ↦ ?_
     rw [Finset.mul_sum]
     exact Finset.sum_congr rfl fun j _ ↦ by split_ifs <;> ring
-  have h := (two_mul_pairProductSum_blockMass mass (Setoid.comap label τ)).trans
+  have h := (two_mul_pairProductSum_blockMass_crossing mass (Setoid.comap label τ)).trans
     (hsum.trans (two_mul_crossingRate p τ).symm)
   linarith
 
@@ -655,7 +426,7 @@ theorem abs_reportConnectionProbability_sub_le_min {n w : ℕ} [NeZero w]
   have hPtotal : ∑ F, p (fiberLabel label hsurj F) ≤ 1 := (hbij.sum_comp p).trans_le hptotal
   have h := abs_poissonMixture_report_sub_spread_le hn (labelInterface label hsurj)
     (p := fun F ↦ p (fiberLabel label hsurj F)) hP hPtotal U
-    (fun m y ↦ if y (Fin.last m) = ⊤ then 1 else 0) fun m y ↦ by split_ifs <;> norm_num
+    (fun m y ↦ if y (Fin.last m) = ⊤ then 1 else 0) fun m y ↦ by dsimp only; split_ifs <;> norm_num
   simp only [sum_reportPathLaw_mul_last_top, sum_massPathLaw_mul_last_top] at h
   have hZ : poissonMixture U (fun m ↦ ∑ ζ, massLaw (labelInterface label hsurj)
       (spreadMass (labelInterface label hsurj) fun F ↦ p (fiberLabel label hsurj F)) m ζ
