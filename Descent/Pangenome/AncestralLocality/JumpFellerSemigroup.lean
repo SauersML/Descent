@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Pangenome.AncestralLocality.InfiniteGenomeLimit
 import Mathlib.Analysis.SpecialFunctions.Exponential
 import Mathlib.Analysis.Normed.Operator.NormedSpace
+import Mathlib.Analysis.Calculus.MeanValue
+import Mathlib.Analysis.Calculus.Deriv.MeanValue
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program
@@ -157,7 +159,7 @@ theorem exp_apply_one {G : C(X, ℝ) →L[ℝ] C(X, ℝ)} (hG : G 1 = 0) (t : �
     NormedSpace.exp ℝ (t • G) 1 = 1 := by
   have hderiv : ∀ s : ℝ, HasDerivAt (fun u : ℝ ↦ NormedSpace.exp ℝ (u • G) 1) 0 s := by
     intro s
-    have h := (hasDerivAt_exp_smul_const G s).clm_apply
+    have h := HasDerivAt.clm_apply (hasDerivAt_exp_smul_const G s)
       (hasDerivAt_const (x := s) (c := (1 : C(X, ℝ))))
     rwa [ContinuousLinearMap.map_zero, add_zero, ContinuousLinearMap.mul_apply, hG,
       map_zero] at h
