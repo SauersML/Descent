@@ -184,7 +184,7 @@ def agreeOn (A : Finset V) : Setoid (V → Bool) where
   iseqv := ⟨fun _ _ _ ↦ rfl, fun h l hl ↦ (h l hl).symm,
     fun h₁ h₂ l hl ↦ (h₁ l hl).trans (h₂ l hl)⟩
 
-omit [Fintype V] in
+omit [Fintype V] [DecidableEq V] in
 /-- `π_A`-equivalence, unfolded. -/
 theorem agreeOn_r_iff {A : Finset V} {x x' : V → Bool} :
     (agreeOn A).r x x' ↔ ∀ l ∈ A, x l = x' l :=
@@ -266,6 +266,7 @@ theorem exchange_apply_of_ne {i j k : V} (x y : V → Bool) (hk : k ≠ i) :
   · exact Function.update_of_ne hk _ _
   · rfl
 
+omit [Fintype V] in
 /-- **An exchange preserves the unordered pair of parental values at every coordinate.** -/
 theorem exchange_apply_pair (i j k : V) (x y : V → Bool) :
     (exchange i j x y k = x k ∧ exchange i j y x k = y k) ∨
@@ -646,10 +647,12 @@ theorem iterate_grow_mono (r : V → V → ℝ) (A : Finset V) {m n : ℕ} (h : 
 theorem subset_iterate_grow (r : V → V → ℝ) (A : Finset V) (n : ℕ) : A ⊆ (grow r)^[n] A :=
   iterate_grow_mono r A (Nat.zero_le n)
 
+omit [DecidableEq V] in
 /-- `A` lies in its reach. -/
 theorem subset_directedReach (r : V → V → ℝ) (A : Finset V) : A ⊆ directedReach r A :=
   fun a ha ↦ mem_directedReach.mpr ⟨a, ha, Relation.ReflTransGen.refl⟩
 
+omit [DecidableEq V] in
 /-- The reach is closed under taking checkers. -/
 theorem outNbhd_reach_subset (r : V → V → ℝ) (A : Finset V) :
     outNbhd r (directedReach r A) ⊆ directedReach r A := by
@@ -757,6 +760,7 @@ theorem agreeOn_univ_r_iff {x x' : V → Bool} : (agreeOn (univ : Finset V)).r x
   ⟨fun h ↦ funext fun l ↦ agreeOn_r_iff.mp h l (mem_univ l),
     fun h ↦ agreeOn_r_iff.mpr fun l _ ↦ congrFun h l⟩
 
+omit [DecidableEq V] in
 /-- On a connected undirected graph whose edges carry positive rates in both orientations,
 every nonempty set of features reaches the whole genome. -/
 theorem reach_eq_univ_of_connected {G : SimpleGraph V} (hG : G.Connected) {r : V → V → ℝ}
@@ -847,6 +851,7 @@ edges. -/
 def edgeRates (G : CheckingGraph V) (i j : V) : ℝ :=
   if (i, j) ∈ G.edges then G.rate (i, j) else 0
 
+omit [Fintype V] in
 /-- The rate matrix of a checking graph is nonnegative. -/
 theorem edgeRates_nonneg (G : CheckingGraph V) (i j : V) : 0 ≤ edgeRates G i j := by
   unfold edgeRates
@@ -854,6 +859,7 @@ theorem edgeRates_nonneg (G : CheckingGraph V) (i j : V) : 0 ≤ edgeRates G i j
   · exact (G.rate_pos _ h).le
   · exact le_rfl
 
+omit [Fintype V] in
 /-- The rate matrix is positive exactly on the edges. -/
 theorem edgeRates_pos_iff (G : CheckingGraph V) {i j : V} :
     0 < edgeRates G i j ↔ (i, j) ∈ G.edges := by
@@ -902,6 +908,7 @@ theorem eventKernel_eq_exchangeKernel (i j : V) (x y z : V → Bool) :
   simp only [eventKernel, exchangeKernel, halfMix, exchange_eq_orderedChild]
   split_ifs <;> norm_num
 
+omit [DecidableEq V] in
 /-- Unbiased copying of this module is `CompatibilityNeutrality`'s `halfMix`. -/
 theorem copyKernel_eq_halfMix (x y z : V → Bool) : copyKernel x y z = halfMix x y z := by
   simp only [copyKernel, halfMix]
