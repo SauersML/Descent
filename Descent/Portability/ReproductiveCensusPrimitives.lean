@@ -127,8 +127,7 @@ theorem censusSelection_eq_none_iff (census : I → ℕ) (fitness : I → ℝ)
     Finset.sum_nonneg fun g _ ↦ mul_nonneg (Nat.cast_nonneg _) (hfitness g)
   unfold censusSelection
   split_ifs with htotal
-  · exact ⟨fun hnone ↦ absurd hnone (Option.some_ne_none _),
-      fun hzero ↦ absurd hzero htotal.ne'⟩
+  · exact ⟨fun hnone ↦ absurd hnone (by simp), fun hzero ↦ absurd hzero htotal.ne'⟩
   · exact ⟨fun _ ↦ le_antisymm (not_lt.mp htotal) hnonneg, fun _ ↦ rfl⟩
 
 /-- With every individual counted once and strictly positive fitness, census-weighted selection
