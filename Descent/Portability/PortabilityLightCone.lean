@@ -222,24 +222,23 @@ theorem localRestriction_mul_dualGenerator (rates : NeutralRates Deme Locus Alle
     localRestriction capacity A * dualGenerator rates capacity =
       localGenerator rates capacity A * localRestriction capacity A := by
   ext s η
-  have hleft : (localRestriction capacity A * dualGenerator rates capacity) s η =
+  rw [Matrix.mul_apply, Matrix.mul_apply]
+  have hleft : ∑ ξ, localRestriction capacity A s ξ * dualGenerator rates capacity ξ η =
       dualGenerator rates capacity s.1 η := by
-    simp [Matrix.mul_apply, localRestriction]
-  have hright : (localGenerator rates capacity A * localRestriction capacity A) s η =
-      if LociWithin A η.1 then dualGenerator rates capacity s.1 η else 0 := by
-    simp only [Matrix.mul_apply, localGenerator, localRestriction, mul_ite, mul_one, mul_zero]
-    split_ifs with hη
-    · rw [Finset.sum_eq_single ⟨η, hη⟩]
-      · simp
-      · intro s' _ hs'
-        exact if_neg fun heq ↦ hs' (Subtype.ext heq.symm)
-      · intro h
-        exact absurd (Finset.mem_univ _) h
-    · exact Finset.sum_eq_zero fun s' _ ↦ if_neg fun heq ↦ hη (heq ▸ s'.2)
-  rw [hleft, hright]
-  split_ifs with hη
-  · rfl
-  · exact dualGenerator_eq_zero_of_not_lociWithin rates capacity s.2 hη
+    simp [localRestriction]
+  rw [hleft]
+  by_cases hη : LociWithin A η.1
+  · rw [Finset.sum_eq_single ⟨η, hη⟩]
+    · simp [localGenerator, localRestriction]
+    · intro s' _ hs'
+      simp only [localRestriction]
+      rw [if_neg fun heq ↦ hs' (Subtype.ext heq.symm), mul_zero]
+    · intro h
+      exact absurd (Finset.mem_univ _) h
+  · rw [dualGenerator_eq_zero_of_not_lociWithin rates capacity s.2 hη]
+    exact (Finset.sum_eq_zero fun s' _ ↦ by
+      simp only [localRestriction]
+      rw [if_neg fun heq ↦ hη (heq ▸ s'.2), mul_zero]).symm
 
 /-- **The restriction intertwines the propagators.** -/
 theorem localRestriction_mul_matrixExponential (rates : NeutralRates Deme Locus Allele)
