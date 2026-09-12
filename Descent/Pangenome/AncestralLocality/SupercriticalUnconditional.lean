@@ -2,38 +2,38 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Pangenome.AncestralLocality.SupercriticalBranches
-import Descent.Pangenome.AncestralLocality.SupercriticalGiantLaw
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
 assert_below Descent.Portability Descent.Decision Descent.Program
 
 /-!
-# The supercritical transition without hypotheses
+# The supercritical transition: continuity of the giant fraction and (6.2) at every rate
 
-`Descent.Pangenome.AncestralLocality.SupercriticalGiantLaw` proves the Erdős–Rényi giant component
-theorem `GiantComponentLaw α` for every `α > 1` (`giantComponentLaw_of_one_lt`). This file records
-two consequences.
+`Descent.Pangenome.AncestralLocality.LocalityTransition` defines the giant fraction
+`giantFraction α`, the root in `(0, 1)` of `s = 1 - e^{-α s}` for `α > 1`.
+`Descent.Pangenome.AncestralLocality.SupercriticalBranches` proves the weights of the note's (6.2)
+assuming the giant component theorem `GiantComponentLaw α`. This file adds two results.
 
 ## Continuity of the giant fraction
 
-`SupercriticalConcentration.exists_lt_giantFraction_of_lt` gives the giant fraction from the left.
-Here it is continuous above `1` (`continuousAt_giantFraction`). The survival map `s ↦ 1 - e^{-α s}`
-lies above the diagonal exactly below the giant fraction, and below it above
-(`lt_survivalMap_of_lt_giantFraction`, `survivalMap_lt_of_giantFraction_lt`, with the converses
-`SupercriticalConcentration.lt_giantFraction_of_lt_survivalMap` and
-`giantFraction_lt_of_survivalMap_lt`). The survival map is continuous in `α`, so at a point `a`
-below `giantFraction α` it stays above the diagonal for rates near `α`. So `a` stays below their
-giant fraction, and similarly from above.
+Below the giant fraction the survival map `s ↦ 1 - e^{-α s}` lies above the diagonal
+(`lt_survivalMap_of_lt_giantFraction`); above it, it lies below
+(`survivalMap_lt_of_giantFraction_lt`). Conversely, a positive point where the map lies below the
+diagonal is above the giant fraction (`giantFraction_lt_of_survivalMap_lt`). The survival map is
+continuous in `α`, so a point strictly above or below the diagonal at `α` stays so at nearby rates,
+and so does its comparison with their giant fraction. Hence the giant fraction is continuous above
+`1` (`continuousAt_giantFraction`).
 
-## The limit law (6.2) for every `α > 1`
+## The limit law (6.2) at every rate above `1`
 
-`SupercriticalBranches` proves the weights of (6.2) assuming `GiantComponentLaw α`. With
-`giantComponentLaw_of_one_lt` they hold outright. For queries of eventually `k` features, the reach
-fraction is small with probability tending to `(1 - s)^k`
-(`tendsto_graphProb_reach_small_of_one_lt`), and within `ε` of `s` with probability tending to
-`1 - (1 - s)^k` (`tendsto_graphProb_reach_giant_of_one_lt`).
+`SupercriticalGiantComponentLaw` is the giant component theorem at every rate above `1`. Assuming
+it, take queries of eventually `k` features. The reach fraction is small with probability tending
+to `(1 - s)^k` (`tendsto_graphProb_reach_small_of_supercritical`). It is within `ε` of `s` with
+probability tending to `1 - (1 - s)^k` (`tendsto_graphProb_reach_giant_of_supercritical`).
 
-Scope. The continuity is pointwise above `1`; the behaviour at `α = 1` is not studied.
+Scope. `SupercriticalGiantComponentLaw` is a hypothesis here. The Erdős–Rényi theorem for `α > 1`
+is being proved in a sibling module, which will discharge the hypothesis once it is checked. The
+continuity is pointwise above `1`, and the behaviour at `α = 1` is not studied.
 
 ## Empirical status
 
@@ -92,7 +92,12 @@ theorem continuousAt_giantFraction {α : ℝ} (hα : 1 < α) : ContinuousAt gian
     · push_neg at ha0
       have h1 : a < survivalMap α a := lt_survivalMap_of_lt_giantFraction hα ha0 ha
       filter_upwards [hev, (tendsto_order.1 ((hcont a).tendsto α)).1 a h1] with β hβ h
-      exact lt_giantFraction_of_lt_survivalMap hβ h
+      by_contra hle
+      push_neg at hle
+      rcases hle.lt_or_eq with hlt | heq
+      · exact lt_asymm h (survivalMap_lt_of_giantFraction_lt hβ hlt)
+      · rw [← heq, survivalMap_giantFraction] at h
+        exact lt_irrefl _ h
   · by_cases hb1 : 1 ≤ b
     · filter_upwards [hev] with β hβ
       exact (giantFraction_mem_Ioo hβ).2.trans_le hb1
@@ -101,28 +106,32 @@ theorem continuousAt_giantFraction {α : ℝ} (hα : 1 < α) : ContinuousAt gian
       filter_upwards [hev, (tendsto_order.1 ((hcont b).tendsto α)).2 b h1] with β hβ h
       exact giantFraction_lt_of_survivalMap_lt hβ hb0 h
 
-/-! ### The limit law (6.2) for every `α > 1` -/
+/-! ### The limit law (6.2) at every rate above `1` -/
 
-/-- **(6.2), the small branch, for every `α > 1`.** For queries of eventually `k` features and
-`0 < ε < s`, the reach fraction is at most `ε` with probability tending to `(1 - s)^k`. -/
-theorem tendsto_graphProb_reach_small_of_one_lt {α : ℝ} (hα : 1 < α) {k : ℕ}
-    (A : ∀ m : ℕ, Finset (Fin m)) (hA : ∀ᶠ m in atTop, (A m).card = k) {ε : ℝ} (hε : 0 < ε)
-    (hεs : ε < giantFraction α) :
+/-- **The giant component theorem at every rate above `1`**, the hypothesis of this section. -/
+def SupercriticalGiantComponentLaw : Prop :=
+  ∀ α : ℝ, 1 < α → GiantComponentLaw α
+
+/-- **(6.2), the small branch, at every rate above `1`.** For queries of eventually `k` features
+and `0 < ε < s`, the reach fraction is at most `ε` with probability tending to `(1 - s)^k`. -/
+theorem tendsto_graphProb_reach_small_of_supercritical (hG : SupercriticalGiantComponentLaw)
+    {α : ℝ} (hα : 1 < α) {k : ℕ} (A : ∀ m : ℕ, Finset (Fin m))
+    (hA : ∀ᶠ m in atTop, (A m).card = k) {ε : ℝ} (hε : 0 < ε) (hεs : ε < giantFraction α) :
     Tendsto (fun m : ℕ ↦ graphProb m (α / m) fun E ↦
       ((reach (edgeGraph E) (A m)).card : ℝ) / m ≤ ε) atTop
         (𝓝 ((1 - giantFraction α) ^ k)) :=
-  tendsto_graphProb_reach_small (giantComponentLaw_of_one_lt hα) hα A hA hε hεs
+  tendsto_graphProb_reach_small (hG α hα) hα A hA hε hεs
 
-/-- **(6.2), the giant branch, for every `α > 1`.** For queries of eventually `k` features and
-`0 < 2ε < s`, the reach fraction is within `ε` of `s` with probability tending to
+/-- **(6.2), the giant branch, at every rate above `1`.** For queries of eventually `k` features
+and `0 < 2ε < s`, the reach fraction is within `ε` of `s` with probability tending to
 `1 - (1 - s)^k`. -/
-theorem tendsto_graphProb_reach_giant_of_one_lt {α : ℝ} (hα : 1 < α) {k : ℕ}
-    (A : ∀ m : ℕ, Finset (Fin m)) (hA : ∀ᶠ m in atTop, (A m).card = k) {ε : ℝ} (hε : 0 < ε)
-    (hεs : 2 * ε < giantFraction α) :
+theorem tendsto_graphProb_reach_giant_of_supercritical (hG : SupercriticalGiantComponentLaw)
+    {α : ℝ} (hα : 1 < α) {k : ℕ} (A : ∀ m : ℕ, Finset (Fin m))
+    (hA : ∀ᶠ m in atTop, (A m).card = k) {ε : ℝ} (hε : 0 < ε) (hεs : 2 * ε < giantFraction α) :
     Tendsto (fun m : ℕ ↦ graphProb m (α / m) fun E ↦
       |((reach (edgeGraph E) (A m)).card : ℝ) / m - giantFraction α| ≤ ε) atTop
         (𝓝 (1 - (1 - giantFraction α) ^ k)) :=
-  tendsto_graphProb_reach_giant (giantComponentLaw_of_one_lt hα) hα A hA hε hεs
+  tendsto_graphProb_reach_giant (hG α hα) hα A hA hε hεs
 
 end
 
