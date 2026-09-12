@@ -90,6 +90,7 @@ theorem two_pow_mul_rankedHistoryCount {n : ℕ} :
     have heq : Delta n = η := eq_of_le_of_blocks_eq bot_le (by rw [blocks_bot]; omega)
     subst heq
     rw [rankedHistoryCount, if_pos rfl, rankWeight_bot]
+    simp
   | succ m ih =>
     intro hm η hη
     have hterm : ∀ ξ : ER n,
@@ -141,7 +142,6 @@ theorem blockLaw_toReal_eq_rankedHistoryCount {n : ℕ} :
     · rw [jumpLaw_toReal (by omega) η]
       split_ifs
       · rw [show blocks ξ = n - m by omega]
-        push_cast
         ring
       · simp
     · rw [rankedHistoryCount_eq_zero_of_blocks_ne m (by omega) ξ hξ]
