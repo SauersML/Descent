@@ -372,8 +372,8 @@ theorem crossPolygenicDecay_antitone_duration {share rate : P → P → ℝ}
     Antitone (crossPolygenicDecay share rate) := by
   intro earlier later hlater
   rw [crossPolygenicDecay_eq_polygenicDecay, crossPolygenicDecay_eq_polygenicDecay]
-  exact polygenicDecay_antitone_duration (fun pairs ↦ hshare pairs.1 pairs.2)
-    (fun pairs ↦ hrate pairs.1 pairs.2) hlater
+  exact polygenicDecay_antitone_duration (fun (pairs : P × P) ↦ hshare pairs.1 pairs.2)
+    (fun (pairs : P × P) ↦ hrate pairs.1 pairs.2) hlater
 
 /-- **The weighted decay over ordered pairs tends to its coverage floor.**
 
