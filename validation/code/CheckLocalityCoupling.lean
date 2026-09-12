@@ -10,6 +10,7 @@ open Descent.Pangenome.AncestralLocality
 #print axioms Descent.Pangenome.AncestralLocality.totalVariation_mixtureLaw_le
 #print axioms Descent.Pangenome.AncestralLocality.totalVariation_pointLaw_le
 #print axioms Descent.Pangenome.AncestralLocality.totalVariation_local_le
+#print axioms Descent.Pangenome.AncestralLocality.abs_sum_mul_mixtureLaw_sub_le
 #print axioms Descent.Pangenome.AncestralLocality.checksOutside_witness
 #print axioms Descent.Pangenome.AncestralLocality.noOutsideCheck_witness
 #print axioms Descent.Pangenome.AncestralLocality.getD_subset_of_forall

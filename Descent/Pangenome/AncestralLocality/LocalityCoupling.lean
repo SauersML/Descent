@@ -24,7 +24,9 @@ laws are within total variation (`totalVariation`) the probability of that event
 (`totalVariation_mixtureLaw_le`); for deterministic outputs this is the coupling inequality
 (`totalVariation_pointLaw_le`). A circuit whose evaluation depends only on the coordinates it has
 inspected, run on inputs that agree on a ball, gives the bound with the escape event that some
-inspected coordinate lies outside the ball (`totalVariation_local_le`), which is (9.3).
+inspected coordinate lies outside the ball (`totalVariation_local_le`), which is (9.3). For a test
+function bounded by `B` the two expectations differ by at most `2 B Pr(escape)`
+(`abs_sum_mul_mixtureLaw_sub_le`), the error term of the §10 approximation.
 
 The truncation form is stated for the support-tag circuit of (7.6). A decision along `i → j` on an
 argument whose support contains `i` adds `j` to that support and a parent with support `{i, j}`,
@@ -151,6 +153,40 @@ theorem totalVariation_local_le {V X : Type*} [DecidableEq V] (weight : Ω → �
     (fun ω ↦ htotal ω p) (fun ω ↦ htotal ω q) (fun ω ↦ ¬ inspected ω ⊆ ball)
     fun ω hω ↦ hlocal ω p q fun v hv ↦ hball v (not_not.mp hω hv)
 
+/-- Spec §10, the error term of the approximation, for expectations of a bounded test function.
+Assumes: the hypotheses of `totalVariation_mixtureLaw_le`, and a test function on samples bounded
+in absolute value by `bound ≥ 0`. The expectations under the two sample laws differ by at most
+`2 · bound · Pr(escape)`. -/
+theorem abs_sum_mul_mixtureLaw_sub_le (weight : Ω → ℝ) (hweight : ∀ ω, 0 ≤ weight ω)
+    (evaluationP evaluationQ : Ω → S → ℝ) (hnonnegP : ∀ ω s, 0 ≤ evaluationP ω s)
+    (hnonnegQ : ∀ ω s, 0 ≤ evaluationQ ω s) (htotalP : ∀ ω, ∑ s, evaluationP ω s = 1)
+    (htotalQ : ∀ ω, ∑ s, evaluationQ ω s = 1) (escape : Ω → Prop) [DecidablePred escape]
+    (hagree : ∀ ω, ¬ escape ω → evaluationP ω = evaluationQ ω) (test : S → ℝ) (bound : ℝ)
+    (hbound : 0 ≤ bound) (htest : ∀ s, |test s| ≤ bound) :
+    |∑ s, test s * mixtureLaw weight evaluationP s -
+        ∑ s, test s * mixtureLaw weight evaluationQ s| ≤
+      2 * bound * ∑ ω ∈ univ.filter escape, weight ω := by
+  have hvariation := totalVariation_mixtureLaw_le weight hweight evaluationP evaluationQ hnonnegP
+    hnonnegQ htotalP htotalQ escape hagree
+  calc |∑ s, test s * mixtureLaw weight evaluationP s -
+        ∑ s, test s * mixtureLaw weight evaluationQ s|
+      = |∑ s, test s * (mixtureLaw weight evaluationP s - mixtureLaw weight evaluationQ s)| := by
+        rw [← Finset.sum_sub_distrib]
+        simp only [mul_sub]
+    _ ≤ ∑ s, |test s * (mixtureLaw weight evaluationP s - mixtureLaw weight evaluationQ s)| :=
+        Finset.abs_sum_le_sum_abs _ _
+    _ ≤ ∑ s, bound * |mixtureLaw weight evaluationP s - mixtureLaw weight evaluationQ s| :=
+        Finset.sum_le_sum fun s _ ↦ by
+          rw [abs_mul]
+          exact mul_le_mul_of_nonneg_right (htest s) (abs_nonneg _)
+    _ = bound * (2 * totalVariation (mixtureLaw weight evaluationP)
+          (mixtureLaw weight evaluationQ)) := by
+        rw [← Finset.mul_sum, totalVariation]
+        ring
+    _ ≤ bound * (2 * ∑ ω ∈ univ.filter escape, weight ω) :=
+        mul_le_mul_of_nonneg_left (by linarith [hvariation]) hbound
+    _ = 2 * bound * ∑ ω ∈ univ.filter escape, weight ω := by ring
+
 end Coupling
 
 /-! ### The truncation form -/
@@ -229,6 +265,7 @@ theorem noOutsideCheck_witness :
     NoOutsideCheck ({0, 1} : Finset ℕ) ⟨[{0}], []⟩ [CircuitEvent.decision 0 0 1] := by
   simp [NoOutsideCheck, ChecksOutside]
 
+omit [DecidableEq V] in
 /-- The support of any argument index lies in `ball` when every listed support does, since an
 index past the end reads the empty support. Assumes: every listed support lies in `ball`. -/
 theorem getD_subset_of_forall {ball : Finset V} {supports : List (Finset V)}
