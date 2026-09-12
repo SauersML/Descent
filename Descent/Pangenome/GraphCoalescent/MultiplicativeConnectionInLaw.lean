@@ -418,9 +418,13 @@ crossing rate, so it tends to one. -/
 /-- `Z` only coarsens, pointwise. -/
 theorem massStep_eq_zero_of_not_le {n : ℕ} (mass : Fin n → ℝ) {ζ ζ' : ER n} (h : ¬ ζ ≤ ζ') :
     massStep mass ζ ζ' = 0 := by
+  have hsum : ∑ t ∈ (Finset.univ.powersetCard 2).filter (fun t ↦ mergePair ζ t = ζ'),
+      ∏ C ∈ t, blockMass mass ζ C = 0 := by
+    refine Finset.sum_eq_zero fun t ht ↦ absurd ?_ h
+    have heq : mergePair ζ t = ζ' := (Finset.mem_filter.mp ht).2
+    exact heq ▸ le_mergePair ζ t
   unfold massStep
-  rw [Finset.sum_eq_zero fun t ht ↦ absurd
-    ((Finset.mem_filter.mp ht).2 ▸ le_mergePair ζ t) h, zero_add]
+  rw [hsum, zero_add]
   exact if_neg fun (heq : ζ' = ζ) ↦ h (le_of_eq heq.symm)
 
 theorem sum_massLaw {n : ℕ} (s : Fin n → Fin n) (mass : Fin n → ℝ) (m : ℕ) :
@@ -533,7 +537,7 @@ theorem crossingRate_pos_of_ne_top {w : ℕ} {p : Fin w → ℝ} (hp : ∀ i, 0 
     by_contra hall
     push_neg at hall
     exact hσ (Setoid.ext fun a b ↦ ⟨fun _ ↦ trivial, fun _ ↦ hall a b⟩)
-  have hne : i ≠ j := fun h ↦ hij (by rw [← h]; exact σ.iseqv.refl i)
+  have hne : i ≠ j := fun h ↦ hij (by subst h; exact σ.iseqv.refl _)
   have hnonneg : ∀ e ∈ (Finset.univ : Finset (FiberPair w)),
       0 ≤ (if σ e.1.1 e.1.2 then (0 : ℝ) else pairRate p e) := fun e _ ↦ by
     split_ifs
@@ -581,7 +585,6 @@ theorem tendsto_connectionTimeCDF_atTop {w : ℕ} [NeZero w] {p : Fin w → ℝ}
   refine hsum.congr' ?_
   filter_upwards [eventually_ge_atTop 0] with u hu
   rw [connectionTimeCDF, if_neg (not_lt.mpr hu), connectionProbability_eq_mobius_sum]
-  exact Finset.sum_congr rfl fun _ _ ↦ rfl
 
 /-- **The distribution function of `T_p`, as a Stieltjes function.**
 
