@@ -9,6 +9,7 @@ import Descent.Pangenome.GraphCoalescent.LahWeights
 import Descent.Pangenome.GraphCoalescent.MinimalRefinement
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceClosure
 import Descent.Pangenome.GraphCoalescent.MultiInterfaceOutcome
+import Descent.Pangenome.GraphCoalescent.VisibleIntensityClock
 
 namespace Descent.Program
 
@@ -49,6 +50,15 @@ inside it.
   chain of covers from the singletons to the root exactly `n - w` steps are silent and `w - 1`
   are visible (`card_silentSteps_visibleSteps`); a finer interface merge connects its report no
   later, on every path (`connectedTimes_subset`).
+* Theorem C, (C2)-(C4): `VisibleIntensityClock`. The visible intensity dominates the death rate
+  of the report width, `λ_vis ≥ d_r` (`deathRate_le_visibleIntensity`), and Kingman's generator
+  sends `2 - 2/r` to `-λ_vis/d_r` (`kingmanGenerator_meanTransitTime_observed`). (C3) in
+  first-step form: `meanTransitTime_sub_meanConnectionTime`. (C4):
+  `2/(n - w + 1) - 2/n ≤ E τ_q ≤ 2 - 2/w`, strict above when `n > w ≥ 2`,
+  `two_div_sub_two_div_le_meanConnectionTime_bot`, `meanConnectionTime_bot_le_two_sub`,
+  `meanConnectionTime_bot_lt`; started at `q` the clock is Kingman's `2 - 2/w`,
+  `meanConnectionTime_graphKer`. (C2) in Laplace-transform order:
+  `kingmanLaplace_le_connectionLaplace`.
 * Theorem B, the coarsest predictive Markov refinement: `MinimalRefinement`. (B1) with three or
   more components the visible merger rates `ρ_CD = L_C L_D` determine every load:
   `load_sq_eq_visibleRates`, `load_eq_of_visibleRates_eq`, `visibleRates_eq_iff`. (B2) with two
@@ -85,8 +95,11 @@ and the survival function as a semigroup are not formalized. The table rows of �
 transcriptions of (D2), (D4)-(D6) and (D8) at the tabulated fiber sizes, with the Möbius
 coefficients written out for two and three fibers. In §10 the reports after a merger are proved
 to depend on the two merging cells alone; that the cell loads after a merger aggregate the old
-loads and drop by one for the merged pair remains a hypothesis on the outcome map. Theorem C (the
-domination (C2), the Dynkin identity (C3) and the bounds (C4)), Theorem D (the connectivity
+loads and drop by one for the merged pair remains a hypothesis on the outcome map. The
+connection clock of Theorem C is defined as the first-step solution of the backward equation, and
+(C3) is Dynkin's identity for that equation; its identification with the path expectation of the
+continuous-time chain is not formalized, and (C2) is proved in Laplace-transform order, which
+does not imply the stochastic order of the quantile coupling. Theorem D (the connectivity
 cumulant (D2)-(D3) and the stopping law (D4)-(D9)), Theorem E, Theorem F, the filter of §9 and
 the Λ-coalescent extension of §10 are not yet proof-checked.
 -/

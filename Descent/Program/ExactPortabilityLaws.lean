@@ -109,6 +109,7 @@ import Descent.Portability.DriftOperatorCoordinates
 import Descent.Portability.ChronologyIntegralEquation
 import Descent.Portability.NonnegativeCoalescenceRealization
 import Descent.Portability.NeutralPolynomialSemigroup
+import Descent.Portability.NonnegativeIntegrableRealization
 
 namespace Descent.Program
 
@@ -218,8 +219,9 @@ migration and multinomial resampling, is a microscopic approximation with a padd
 type in `MultinomialStageComposition`. The corpus rate laws have strictly positive coalescence,
 where the note allows `c_i ≥ 0`; Theorem 2 and Corollary 2.1 extend to nonnegative coalescence
 for histories of constant-rate epochs and splits, through the limit of perturbed corpus epochs:
-`NonnegativeCoalescenceRealization`. No microscopic kernel at `c_i = 0` is constructed, and
-time-varying rates with vanishing coalescence are not treated. §2.4 is proved for
+`NonnegativeCoalescenceRealization`, and for rate histories with integrable rate coordinates:
+`NonnegativeIntegrableRealization`. No microscopic kernel at `c_i = 0` is constructed. §2.4 is
+proved for
 rate histories with integrable rate coordinates; the propagator is characterized by the integral
 equation. Theorem 2 covers histories of rate epochs, splits and admixture pulses; the pipeline
 compiler emits nothing else. Of §4.2, mutation is symmetric, and (20) takes the forward moment
