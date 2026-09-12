@@ -253,17 +253,15 @@ theorem sum_blockLaw_connectionValue {n : ℕ} (s : Fin n → Fin n) (g : ER n �
   induction k, hk using Nat.le_induction with
   | base =>
     intro hn
+    haveI : NeZero n := ⟨by omega⟩
     rw [Ioc_self, sum_empty]
     refine sum_eq_zero fun ξ _ ↦ ?_
-    by_cases hb : blocks ξ = 1
-    · have htop : observed s ξ = ⊤ := by
-        haveI : NeZero n := ⟨by omega⟩
-        rw [(blocks_eq_one_iff ξ).mp hb]
-        exact top_sup_eq _
-      rw [connectionValue_zero_eq,
-        if_pos ((blocks_observed_le_one_iff (by omega) s ξ).mpr htop), mul_zero]
-    · rw [blockLaw_toReal (n - 1) (by omega) ξ,
-        if_neg (show ¬ blocks ξ = n - (n - 1) by omega), zero_mul]
+    rcases eq_or_ne (blocks ξ) 1 with hb | hb
+    · have hc : observed s ξ = ⊤ := by rw [(blocks_eq_one_iff ξ).mp hb, observed, top_sup_eq]
+      rw [connectionValue_zero_eq, if_pos ((blocks_observed_le_one_iff (by omega) s ξ).mpr hc),
+        mul_zero]
+    · have hne : ¬ blocks ξ = n - (n - 1) := by omega
+      rw [blockLaw_toReal (n - 1) (by omega) ξ, if_neg hne, zero_mul]
   | succ k hk ih =>
     intro hkn
     rw [sum_blockLaw_connectionValue_succ s g (show n - (k + 1) + 1 < n by omega),
@@ -276,15 +274,17 @@ theorem connectionValue_bot_eq_sum {n : ℕ} (hn : 2 ≤ n) (s : Fin n → Fin n
     connectionValue s 0 0 g ⊥
       = ∑ k ∈ Ioc 1 n,
           (∑ ξ : ER n, (blockLaw n (n - k) ξ).toReal * unconnectedRate s g ξ) / deathRate k := by
-  have h := sum_blockLaw_connectionValue s g n (by omega) le_rfl
   have hlaw : blockLaw n (n - n) = PMF.pure (Delta n) := by
     rw [Nat.sub_self, blockLaw_eq_map, chainLaw, PMF.pure_map]
     rfl
-  rw [hlaw, sum_eq_single (Delta n)
-    (fun ξ _ hξ ↦ by rw [PMF.pure_apply, if_neg hξ, ENNReal.toReal_zero, zero_mul])
-    (fun hmem ↦ absurd (mem_univ _) hmem), PMF.pure_apply, if_pos rfl, ENNReal.toReal_one,
-    one_mul] at h
-  exact h
+  have hhead : ∀ ξ : ER n, (blockLaw n (n - n) ξ).toReal * connectionValue s 0 0 g ξ
+      = if ξ = Delta n then connectionValue s 0 0 g ξ else 0 := by
+    intro ξ
+    rw [hlaw, PMF.pure_apply]
+    split_ifs <;> simp
+  rw [← sum_blockLaw_connectionValue s g n (by omega) le_rfl, sum_congr rfl fun ξ _ ↦ hhead ξ,
+    sum_ite_eq']
+  exact (if_pos (mem_univ _)).symm
 
 /-! ### The expectation of the path integral -/
 
