@@ -1,7 +1,10 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Descent.Portability.ReferenceExperimentRows
+import Descent.Portability.ReferenceExperimentEarlyMomentCorners
+import Descent.Portability.ReferenceExperimentEarlyLossCorners
+import Descent.Portability.ReferenceExperimentLateMomentCorners
+import Descent.Portability.ReferenceExperimentLateLossCorners
 
 assert_below Descent.Decision Descent.Program
 
@@ -18,7 +21,9 @@ A history report is the context-mass average of its four corner accumulators, an
 reference probabilities `(3/5, 2/3)` the corpus mixed numerator of those accumulators is exactly
 the history report (`early_mixtureNumerator_reference`, `late_mixtureNumerator_reference`). The
 corner accumulators of the weighted numerators and definedness masses are the corner
-certificates of `ReferenceExperimentRows`, so nothing here runs a kernel computation. The corpus
+certificates of `ReferenceExperimentEarlyMomentCorners`, `ReferenceExperimentEarlyLossCorners`,
+`ReferenceExperimentLateMomentCorners` and `ReferenceExperimentLateLossCorners`, so nothing here
+runs a kernel computation. The corpus
 theorem `conditionalMean_eq_corner_combination` makes the reported conditional mean on the square
 a convex combination of the four corner ratios with weights `π_ae d_ae`, so `le_conditionalMean`
 and `conditionalMean_le` bound it by the least and the greatest corner ratio, and
@@ -40,7 +45,7 @@ set_option relaxedAutoImplicit false
 namespace Descent.Portability.ReferenceExperimentRegion
 
 open RationalReportClosure ReferenceExperimentLaw ReferenceExperimentTable
-  ReferenceExperimentRows ReferenceExperimentCorners ReferenceExperimentEarlyMomentCorners
+  ReferenceExperimentCorners ReferenceExperimentEarlyMomentCorners
   ReferenceExperimentEarlyLossCorners ReferenceExperimentLateMomentCorners
   ReferenceExperimentLateLossCorners
 
