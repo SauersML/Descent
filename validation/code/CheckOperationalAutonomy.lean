@@ -14,3 +14,11 @@ open Descent.Pangenome.AncestralLocality
 #print axioms kernelMass_fiber_eq_of_pushforward_determined
 #print axioms hereditarilyAutonomous_iff_pushforward_reproduce_determined
 #print axioms exists_pushforward_eq_reproduce_ne_of_not_hereditarilyAutonomous
+#print axioms halfMix_eq_pairMidpoint
+#print axioms exchangeKernel_eq_childKernel
+#print axioms isHeredityKernel_exchangeKernel
+#print axioms isHeredityKernel_compatibilityKernel
+#print axioms compatibilityKernel_hereditarilyAutonomous_iff
+#print axioms hereditarilyAutonomous_feature
+#print axioms witness_not_hereditarilyAutonomous
+#print axioms witness_pushforward_eq_reproduce_ne

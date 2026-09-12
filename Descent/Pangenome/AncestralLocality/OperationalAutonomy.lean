@@ -1,6 +1,7 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
+import Descent.Pangenome.AncestralLocality.CompatibilityNeutrality
 import Descent.Pangenome.AncestralLocality.HeredityKernel
 
 assert_below Descent.PopGen Descent.Spectral Descent.Blindness Descent.Conditionals
@@ -11,8 +12,9 @@ assert_below Descent.Portability Descent.Decision Descent.Program
 
 The spec is `ANCESTRAL_LOCALITY.md` §3, Theorem 2 of the research note "Ancestral locality" of
 11 September 2026. Kernels `K : H → H → H → ℝ` on a finite state set, observations `π : H → O`,
-the population map `reproduce`, the pushforward `pushforward` and hereditary autonomy
-`HereditarilyAutonomous` (2.2) are those of `HeredityKernel`.
+hereditary autonomy `HereditarilyAutonomous` (2.2), point masses and two-point mixtures are those
+of `HeredityKernel`. The population map `reproduce` and the pushforward `pushforward` are those of
+`CompatibilityNeutrality`.
 
 **Theorem 2.** `hereditarilyAutonomous_iff_pushforward_reproduce_determined`: for a kernel that
 does not see the order of the parents, these are equivalent.
@@ -35,10 +37,19 @@ autonomy.
 fails, some two probability vectors have the same observed marginal and different next-generation
 observed laws.
 
-Scope. Symmetry is assumed as `∀ x y z, K x y z = K y x z`, and nothing else of a heredity kernel
-is used: the rows of `K` need not be probability vectors. Probability vectors are the points of
-`stdSimplex ℝ H`. The observation need not be surjective. The eight-state witness of §5.2, a
-concrete instance of the consequence, is not restated here.
+**The compatibility model.** Every compatibility kernel is a heredity kernel
+(`isHeredityKernel_compatibilityKernel`): the exchange kernel is the two-child kernel of the
+ordered child (`exchangeKernel_eq_childKernel`), and the equal mixture is the two-point mixture
+(`halfMix_eq_pairMidpoint`). So Theorem 2 applies to `K_G`
+(`compatibilityKernel_hereditarilyAutonomous_iff`). By Theorem 3 one feature is autonomous, with
+unbiased copying of alleles as its observed kernel (`hereditarilyAutonomous_feature`). The
+eight-state witness of §5.2 is an instance of the consequence
+(`witness_pushforward_eq_reproduce_ne`), and through the forward direction of Theorem 2 its
+observation `(a, b)` is not autonomous (`witness_not_hereditarilyAutonomous`).
+
+Scope. Theorem 2 assumes symmetry as `∀ x y z, K x y z = K y x z` and uses nothing else of a
+heredity kernel: the rows of `K` need not be probability vectors. Probability vectors are the
+points of `stdSimplex ℝ H`. The observation need not be surjective.
 
 ## Empirical status
 
@@ -146,6 +157,106 @@ theorem exists_pushforward_eq_reproduce_ne_of_not_hereditarilyAutonomous [Fintyp
   by_contra hne
   push_neg at hne
   exact h ((hereditarilyAutonomous_iff_pushforward_reproduce_determined K hK π).mpr hne)
+
+omit [Fintype H] in
+/-- The equal mixture of `CompatibilityNeutrality` is the two-point mixture `pairMidpoint`. -/
+theorem halfMix_eq_pairMidpoint (u v z : H) : halfMix u v z = pairMidpoint u v z := by
+  unfold halfMix pairMidpoint pointMass
+  ring
+
+/-! ### The compatibility model -/
+
+section Model
+
+open Finset
+
+variable {V : Type*} [DecidableEq V] [Fintype V]
+
+/-- The exchange kernel is the two-child kernel `childKernel` of the ordered child. -/
+theorem exchangeKernel_eq_childKernel (i j : V) (x y z : V → Bool) :
+    exchangeKernel i j x y z = childKernel (orderedChild i j) x y z := by
+  unfold exchangeKernel halfMix childKernel
+  split_ifs <;> norm_num
+
+/-- Every exchange kernel is a heredity kernel. -/
+theorem isHeredityKernel_exchangeKernel (i j : V) : IsHeredityKernel (exchangeKernel i j) := by
+  have e : exchangeKernel i j = childKernel (orderedChild i j) := by
+    funext x y z
+    exact exchangeKernel_eq_childKernel i j x y z
+  rw [e]
+  exact isHeredityKernel_childKernel _
+
+/-- **The compatibility kernel is a heredity kernel** (§2): its rows are probability vectors and
+it does not see the order of the parents. -/
+theorem isHeredityKernel_compatibilityKernel (G : CheckingGraph V) :
+    IsHeredityKernel (compatibilityKernel G) where
+  nonneg x y z := by
+    by_cases h : G.edges = ∅
+    · rw [compatibilityKernel_of_eq_empty G h]
+      exact halfMix_nonneg x y z
+    · rw [compatibilityKernel_of_ne_empty G h]
+      exact div_nonneg (sum_nonneg fun e he ↦ mul_nonneg (G.rate_pos e he).le
+        ((isHeredityKernel_exchangeKernel e.1 e.2).nonneg x y z))
+        (G.totalRate_pos (nonempty_iff_ne_empty.mpr h)).le
+  sum_eq_one x y := by
+    by_cases h : G.edges = ∅
+    · simp only [compatibilityKernel_of_eq_empty G h]
+      exact sum_halfMix x y
+    · have hR : G.totalRate ≠ 0 := (G.totalRate_pos (nonempty_iff_ne_empty.mpr h)).ne'
+      simp only [compatibilityKernel_of_ne_empty G h]
+      rw [← sum_div, sum_comm]
+      simp only [← mul_sum, (isHeredityKernel_exchangeKernel _ _).sum_eq_one, mul_one]
+      exact div_self hR
+  symm x y z := by
+    by_cases h : G.edges = ∅
+    · simp only [compatibilityKernel_of_eq_empty G h, halfMix]
+      ring
+    · simp only [compatibilityKernel_of_ne_empty G h,
+        (isHeredityKernel_exchangeKernel _ _).symm x y z]
+
+/-- **Theorem 2 for the compatibility model**: an observation of genomes is hereditarily
+autonomous for `K_G` exactly when its law predicts the law of the next generation. -/
+theorem compatibilityKernel_hereditarilyAutonomous_iff [Fintype O] (G : CheckingGraph V)
+    (π : (V → Bool) → O) :
+    HereditarilyAutonomous (compatibilityKernel G) π ↔
+      ∀ p ∈ stdSimplex ℝ (V → Bool), ∀ q ∈ stdSimplex ℝ (V → Bool),
+        pushforward π p = pushforward π q →
+          pushforward π (reproduce (compatibilityKernel G) p) =
+            pushforward π (reproduce (compatibilityKernel G) q) :=
+  hereditarilyAutonomous_iff_pushforward_reproduce_determined _
+    (isHeredityKernel_compatibilityKernel G).symm π
+
+/-- **One feature is autonomous** (from Theorem 3): observing a single feature is hereditarily
+autonomous for every compatibility kernel, with unbiased copying `halfMix` of alleles as the
+observed kernel. -/
+theorem hereditarilyAutonomous_feature (G : CheckingGraph V) (k : V) :
+    HereditarilyAutonomous (compatibilityKernel G) (fun z : V → Bool ↦ z k) :=
+  ⟨halfMix, fun x y o ↦ compatibilityKernel_marginal G k o x y⟩
+
+end Model
+
+/-! ### The eight-state witness (§5.2) -/
+
+/-- **The eight-state witness through Theorem 2.** The observation `(a, b)` is not hereditarily
+autonomous for the witness rule: a kernel `K̄` would make `R_K̄` a transition law on observed laws
+(`pushforward_reproduce_of_kernelMass_fiber_eq`), which `witness_no_observed_transition_law`
+excludes. -/
+theorem witness_not_hereditarilyAutonomous :
+    ¬ HereditarilyAutonomous (compatibilityKernel witnessGraph) observeAB := by
+  rintro ⟨Kbar, hKbar⟩
+  exact witness_no_observed_transition_law ⟨reproduce Kbar,
+    (pushforward_reproduce_of_kernelMass_fiber_eq _ _ Kbar hKbar witnessP).symm,
+    (pushforward_reproduce_of_kernelMass_fiber_eq _ _ Kbar hKbar witnessQ).symm⟩
+
+/-- **The witness is an instance of the consequence of Theorem 2**: the two witness populations
+have the same observed law and next generations with different observed laws. -/
+theorem witness_pushforward_eq_reproduce_ne :
+    pushforward observeAB witnessP = pushforward observeAB witnessQ ∧
+      pushforward observeAB (reproduce (compatibilityKernel witnessGraph) witnessP) ≠
+        pushforward observeAB (reproduce (compatibilityKernel witnessGraph) witnessQ) :=
+  ⟨witness_pushforward_eq, fun h ↦ witness_no_observed_transition_law
+    ⟨fun _ ↦ pushforward observeAB (reproduce (compatibilityKernel witnessGraph) witnessP),
+      rfl, h⟩⟩
 
 end
 
