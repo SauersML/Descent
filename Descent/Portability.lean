@@ -44,6 +44,7 @@ import Descent.Portability.PortabilityRemainsJoint
 import Descent.Portability.PartialHaplotypeLinearFlow
 import Descent.Portability.MixingLawReplicaBias
 import Descent.Portability.MultinomialRemainderConstant
+import Descent.Portability.MultinomialRemainderEveryDegree
 import Descent.Portability.PartialHaplotypePanelLikelihood
 import Descent.Portability.PartialHaplotypePulseKernel
 import Descent.Portability.PortabilityMeasureQueries
