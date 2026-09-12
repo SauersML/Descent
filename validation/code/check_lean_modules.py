@@ -44,7 +44,7 @@ def compile_remote(args):
             directory = project
             source = project / (module.replace(".", "/") + ".lean")
             output = source.with_suffix(".olean")
-        elif module.startswith("Mathlib."):
+        elif module == "Mathlib" or module.startswith("Mathlib."):
             directory = mathlib
             source = mathlib / (module.replace(".", "/") + ".lean")
             output = mathlib / ".lake/build/lib/lean" / (module.replace(".", "/") + ".olean")
