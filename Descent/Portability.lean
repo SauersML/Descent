@@ -363,6 +363,7 @@ import Descent.Portability.EndToEndLDAdjustedTraining
 import Descent.Portability.PortabilityMomentLadderSharpnessFour
 import Descent.Portability.EndToEndCalibrationErrorNonclosureAll
 import Descent.Portability.EndToEndAncestryProportions
+import Descent.Portability.CalibrationPortabilityMigration
 
 import Descent.Portability.ProbitTrainingLaw
 import Descent.Portability.ScoreMomentLaw
