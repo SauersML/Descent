@@ -1,0 +1,82 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.EndToEndGWASCalibrationLaw
+
+/-! Axiom audit of EndToEndGWASCalibrationLaw. -/
+
+open Descent.Portability.EndToEndGWASCalibrationLaw
+
+#print axioms tagCovariance
+#print axioms interceptMatrix
+#print axioms trainedCovariance
+#print axioms trainedVariance
+#print axioms trainedInterceptAccumulator
+#print axioms trainedCalibrationSlope
+#print axioms trainedCalibrationIntercept
+#print axioms populationCalibrationSlope
+#print axioms populationCalibrationIntercept
+#print axioms excessForm
+#print axioms pairingForm
+#print axioms populationCalibrationSlope_eq_getD
+#print axioms variance_linearScore_eq
+#print axioms interceptAccumulator_linearScore_eq
+#print axioms trainedCovariance_eq
+#print axioms trainedVariance_eq
+#print axioms trainedInterceptAccumulator_eq
+#print axioms sum_tagCovariance_mul_nonneg
+#print axioms excessForm_nonneg
+#print axioms pairingForm_nonneg
+#print axioms pairingForm_eq
+#print axioms variance_le_pairingForm
+#print axioms attenuationFactor
+#print axioms attenuationFactor_nonneg
+#print axioms attenuationFactor_le_one
+#print axioms attenuationFactor_monotone
+#print axioms tendsto_attenuationFactor
+#print axioms div_samplingForm_eq_mul_attenuationFactor
+#print axioms trainedCalibrationSlope_eq_mul_attenuationFactor
+#print axioms trainedCalibrationSlope_le_populationCalibrationSlope
+#print axioms trainedCalibrationSlope_monotone
+#print axioms tendsto_trainedCalibrationSlope
+#print axioms trainedCalibrationSlope_lt_populationCalibrationSlope
+#print axioms tendsto_trainedVariance
+#print axioms tendsto_trainedInterceptAccumulator
+#print axioms tendsto_trainedCalibrationIntercept
+#print axioms tagCovariancePolynomial
+#print axioms interceptMatrixPolynomial
+#print axioms eval_tagCovariancePolynomial
+#print axioms eval_interceptMatrixPolynomial
+#print axioms totalDegree_tagCovariancePolynomial_le
+#print axioms totalDegree_interceptMatrixPolynomial_le
+#print axioms trainedCovariancePolynomial
+#print axioms polynomialFunction_trainedCovariancePolynomial
+#print axioms totalDegree_trainedCovariancePolynomial_le
+#print axioms totalDegree_trainedPolynomial_le_add
+#print axioms polynomialFunction_populationVariance
+#print axioms polynomialFunction_excessForm
+#print axioms polynomialFunction_pairingForm
+#print axioms polynomialFunction_populationInterceptAccumulator
+#print axioms trainedCovariance_stateLaw
+#print axioms trainedVariance_stateLaw
+#print axioms trainedInterceptAccumulator_stateLaw
+#print axioms expectedTrainedCalibrationSlope
+#print axioms expectedTrainedCalibrationIntercept
+#print axioms momentTrainedCalibrationSlope
+#print axioms momentTrainedCalibrationIntercept
+#print axioms integral_trainedCovariance_eq
+#print axioms integral_trainedVariance_eq
+#print axioms integral_trainedInterceptAccumulator_eq
+#print axioms expectedTrainedCalibrationSlope_eq_momentTrainedCalibrationSlope
+#print axioms expectedTrainedCalibrationIntercept_eq_momentTrainedCalibrationIntercept
+#print axioms expectedTrainedCalibrationSlope_eq_mul_attenuationFactor
+#print axioms expectedTrainedCalibrationSlope_monotone
+#print axioms expectedTrainedCalibrationSlope_historyEventKernel
+#print axioms expectedTrainedCalibrationIntercept_historyEventKernel
+#print axioms expectedTrainedCalibrationSlope_eq_of_moments_eq
+#print axioms expectedTrainedCalibrationIntercept_eq_of_moments_eq
+#print axioms expectedTrainedCalibrationSlope_historyEventKernel_monotone
+#print axioms expectedTrainedCalibrationSlope_rateHistoryKernel
+#print axioms expectedTrainedCalibrationIntercept_rateHistoryKernel
+#print axioms calibrationWitnessGenotype
+#print axioms calibrationWitness

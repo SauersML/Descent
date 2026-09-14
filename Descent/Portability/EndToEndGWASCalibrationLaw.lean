@@ -1152,6 +1152,47 @@ theorem expectedTrainedCalibrationIntercept_rateHistoryKernel
 
 end Histories
 
+/-! ## A one-tag witness -/
+
+/-- The witness tag: the first biallelic contrast `rad1` of the master theorem, the only tag of a
+one-tag score. -/
+def calibrationWitnessGenotype (haplotype : Fin 4) (_ : Unit) : ℝ :=
+  rad1 haplotype
+
+/-- **The witness.**  Train on the uniform law of two biallelic loci and deploy in the same law,
+with the one tag `rad1` and the outcome `rad1`.  For every cohort size the trained accuracy equals
+the population accuracy, and the trained calibration slope lies strictly below the population
+slope: finite training leaves the accuracy of a one-tag score unchanged and attenuates its
+calibration.  The target is the training deme itself, so the attenuation is not an effect of
+transfer. -/
+theorem calibrationWitness {size : ℕ} (hsize : 2 ≤ size) :
+    trainedAccuracy (SamplingDesignLaw.uniform (Fin 4)) (SamplingDesignLaw.uniform (Fin 4)) size
+        calibrationWitnessGenotype rad1
+      = correlationNumerator (SamplingDesignLaw.uniform (Fin 4))
+          (linearScore calibrationWitnessGenotype
+            (marginalWeights (SamplingDesignLaw.uniform (Fin 4)) calibrationWitnessGenotype rad1))
+          rad1
+        / correlationDenominator (SamplingDesignLaw.uniform (Fin 4))
+          (linearScore calibrationWitnessGenotype
+            (marginalWeights (SamplingDesignLaw.uniform (Fin 4)) calibrationWitnessGenotype rad1))
+          rad1
+      ∧ trainedCalibrationSlope (SamplingDesignLaw.uniform (Fin 4))
+          (SamplingDesignLaw.uniform (Fin 4)) size calibrationWitnessGenotype rad1
+        < populationCalibrationSlope (SamplingDesignLaw.uniform (Fin 4))
+          (SamplingDesignLaw.uniform (Fin 4)) calibrationWitnessGenotype rad1 := by
+  have hweight : marginalWeights (SamplingDesignLaw.uniform (Fin 4)) calibrationWitnessGenotype
+      rad1 default = 1 := by
+    simp [marginalWeights, FiniteReportLaw.covariance_eq_rawMoments, FiniteReportLaw.expectation,
+      Fin.sum_univ_four, SamplingDesignLaw.uniform, calibrationWitnessGenotype, rad1] <;> norm_num
+  refine ⟨trainedAccuracy_unique _ _ hsize _ _ (by rw [hweight]; norm_num),
+    trainedCalibrationSlope_lt_populationCalibrationSlope _ _ hsize _ _ ?_⟩
+  rw [covariance_linearScore, Fintype.sum_unique]
+  change 0 < marginalWeights (SamplingDesignLaw.uniform (Fin 4)) calibrationWitnessGenotype rad1
+      default
+    * marginalWeights (SamplingDesignLaw.uniform (Fin 4)) calibrationWitnessGenotype rad1 default
+  rw [hweight]
+  norm_num
+
 end
 
 end Descent.Portability.EndToEndGWASCalibrationLaw
