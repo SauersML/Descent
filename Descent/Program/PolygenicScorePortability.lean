@@ -52,6 +52,12 @@ import Descent.Portability.EndToEndAdmixedGenotypes
 import Descent.Portability.CalibrationPortabilityDecay
 import Descent.Portability.AdmixturePortabilityDecay
 import Descent.Portability.PortabilityMomentLadderDispersion
+import Descent.Portability.EndToEndReclassificationLaw
+import Descent.Portability.EndToEndTemporalPortability
+import Descent.Portability.EndToEndDiploidDecision
+import Descent.Portability.EndToEndMultiAncestryGWAS
+import Descent.Portability.SelectionHistoryVaryingFitness
+import Descent.Portability.EndToEndLDAdjustedTraining
 import Descent.Portability.SelectionMetricsFirstOrder
 import Descent.Portability.PortabilityMomentLadderDecision
 import Descent.Portability.PortabilityMomentLadderEight
@@ -245,6 +251,14 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   `expectedPositiveQuotient_truncation`, `integral_recallRate_precision_truncation`,
   `expectedPositiveQuotient_truncation_historyEventKernel`,
   `tendsto_certificate_zero_of_ae_pos`).
+* **Reclassification.**  Comparing an old rule with a new one reads the joint table of the two
+  calls, whose cells are linear in the haplotype frequencies
+  (`EndToEndReclassificationLaw.expectedJointTable_eq_dotProduct`).  The NRI of the expected joint
+  table is the gain in Youden's J of the marginal tables (`tableNRI_expectedJointTable`), degree
+  one fixes the joint table, NRI, IDI and the portability of every function of the joint table
+  under any process law (`reclassificationReport_eq_of_polynomialsAgreeAt_one`,
+  `reclassificationReport_historyEvent_eq_rateHistory`), and porting each rule's sensitivity does
+  not port the NRI (`nriShift_witness`).
 * **Stability.**  Propagators of two rate paths differ by at most
   `(∫‖Q₁ − Q₂‖) e^{∫‖Q₁‖} e^{∫‖Q₂‖}`
   (`EndToEndPortabilityLipschitz.norm_rateHistoryDualPropagator_sub_le`).  Expected portability,
@@ -254,6 +268,15 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   `EndToEndCalibrationLaw.abs_expectedCalibrationPortability_rateHistory_sub_le`,
   `EndToEndPooledCalibration.abs_compiledSlope_pooledLaw_rateHistory_sub_le`), through the
   compiled metric bounds (`PortabilityMetricCompilation.abs_crossRatio_sub_le`).
+* **Through time.**  A score calibrated on the present state of a deme and applied to the same
+  deme after a history has temporal portability whose numerator reads the propagated moments and
+  whose denominator reads the present ones: budget 2 for covariance and calibration, budget 4 for
+  accuracy, along event and rate histories
+  (`EndToEndTemporalPortability.temporalCalibrationPortability_historyEventKernel`,
+  `temporalAccuracyPortability_historyEventKernel`,
+  `temporalCalibrationPortability_rateHistoryKernel`).  Two histories with equal propagated
+  budget-2 moments from the present state give equal temporal covariance and calibration
+  portability (`temporalPortability_eq_of_momentsAgreeAt_two`).
 * **The moment ladder.**  What a demography contributes to all of this is one statistic.
   * Agreement of two histories on the propagated budget-4 moments fixes the whole report: pooled
     laws, slopes, intercepts, and calibration, squared-correlation and AUC portability
@@ -346,6 +369,13 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   and the calibration slope of an admixture cohort, with its between-group covariance term, is
   rational in the budget-2 moments (`covariance_cohortMating_diploidSum`,
   `expectedCohortCalibrationSlope_historyEventKernel`).
+* Threshold rules on genotypes read the second rung.  Every entry of the diploid decision report
+  is the expectation of one genotype observable, a frequency polynomial of degree at most two, so
+  agreement up to degree two fixes the whole report under any process law, event and rate
+  histories included (`EndToEndDiploidDecision.diploidDecisionReport_eq_of_polynomialsAgreeAt_two`,
+  `diploidDecisionReport_historyEvent_eq_rateHistory`); under full autozygosity it is the haploid
+  report of the diagonal and degree one suffices
+  (`diploidDecisionReport_inbreeding_one_eq_of_polynomialsAgreeAt_one`).
 
 ## 4. The score: training and ascertainment
 
@@ -425,6 +455,22 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   * A founder event realizes the loss
     (`EndToEndAscertainedWitness.ascertainedPortability_founderWitnessKernel_lt`), and on a shared
     draw independent panels do not multiply (`founderWitnessLaw_sharedDraw_ne_prod`).
+* **Training on several demes.**  A GWAS on a cohort pooled over demes estimates the pooled
+  covariance, the share-weighted deme covariances plus a between-deme stratification term, so its
+  per-locus effect is a ratio of mixed moments and not the mixture of the deme effects; with zero
+  effect in each of two demes the pooled effect can be one half
+  (`EndToEndMultiAncestryGWAS.marginalEffect_mixtureLaw`, `stratificationWitness`).  Deployed in a
+  target deme, the pooled-trained score's expected accuracy is rational in the budget-8 moments
+  (`expectedPooledAccuracy_historyEventKernel`), and its calibration slope tends to the target
+  covariance of the pooled population score over its variance as the cohort grows
+  (`tendsto_pooledTrainedCalibrationSlope`).
+* **LD-adjusted training with a reference panel.**  Weights `(Σ_R + λI)⁻¹ b_S`, marginal effects
+  from the source adjusted by the covariance of a reference deme, give a target `R²` that is a
+  ratio of polynomials in the budget-2 moments of the panel, source and target demes
+  (`EndToEndLDAdjustedTraining.r2_adjustedWeights_eq_adjugate`,
+  `adjustedReport_historyEventKernel`, `adjustedReport_eq_of_moments_eq`).  A matched panel
+  recovers the population ridge weights (`adjustedWeights_self`), and a panel with half the source
+  LD lowers the target `R²` from `32/67` to `6/13` (`r2_mismatchedPanel_lt_matched`).
 
 ## 5. Closed-form decay
 
@@ -574,6 +620,11 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   of the per-locus terms (`portabilityFirstOrder_additiveHistoryCorrection`,
   `abs_additivePortability_sub_firstOrder_le`), and selection raises portability to first order
   whenever every locus raises it (`additivePortabilityFirstOrder_pos_of_forall`).
+* Selection that changes between epochs is charged epoch by epoch.  With a fitness table per event
+  bounded by `σ_k`, the selected moments end within `B Σ_k σ_k d_k` of the neutral propagation,
+  at most the one-table bound, and portability moves by an explicit multiple of the time-weighted
+  total selection (`SelectionHistoryVaryingFitness.norm_varyingHistory_sub_propagator_le`,
+  `weightedSelection_le`, `abs_varyingPortability_sub_neutral_le`).
 
 ## 8. What data can tell: identification and its limits
 
@@ -599,8 +650,8 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
 
 Scope.
 * Selection laws take the forward moment equation with selection as a hypothesis on the moment
-  families: the selected diffusion is not constructed, one fitness table covers the whole
-  history, and fitness is haploid at one locus.
+  families: the selected diffusion is not constructed, fitness is haploid, and the first-order
+  law with a fitness table per epoch is not stated.
 * The expectation of each population's calibration slope is not a rational function of finitely
   many moments and is not stated.  The expected calibration error is not fixed at degree three;
   whether some finite degree fixes it is open.
@@ -610,8 +661,11 @@ Scope.
   constants.
 * The rate-history kernels need continuous dual generators.  Integrable rate histories are
   realized (`NeutralIntegrableRateRealization`) but not carried to metric kernels.
-* Inbreeding `F < 0`, locus-dependent `F`, sex-specific frequencies and assortative mating are not
-  covered.  Training is the marginal GWAS or population ridge, with no LD adjustment.
+* Inbreeding `F < 0`, locus-dependent `F` and assortative mating are not covered.  Sex-specific
+  gamete frequencies are covered only as two demes of the history
+  (`EndToEndAdmixedGenotypes`).  Training is the marginal GWAS, the population ridge or
+  population-level panel-adjusted weights; LD adjustment estimated from a finite panel is not
+  covered.
 * The minimax bounds are two-point bounds over finite report laws.
 -/
 
