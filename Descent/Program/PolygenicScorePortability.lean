@@ -49,6 +49,9 @@ import Descent.Portability.PolygenicSelectionHistory
 import Descent.Portability.EndToEndSensitivityDecision
 import Descent.Portability.EndToEndCalibrationErrorNonclosure
 import Descent.Portability.EndToEndAdmixedGenotypes
+import Descent.Portability.CalibrationPortabilityDecay
+import Descent.Portability.AdmixturePortabilityDecay
+import Descent.Portability.PortabilityMomentLadderDispersion
 import Descent.Portability.SelectionMetricsFirstOrder
 import Descent.Portability.PortabilityMomentLadderDecision
 import Descent.Portability.PortabilityMomentLadderEight
@@ -300,6 +303,15 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
     (`PortabilityMomentLadderDeployment.expectedDemeMoments_eq_of_polynomialsAgreeAt_two`,
     `transferReport_eq_of_polynomialsAgreeAt_two`, `transferReport_historyEvent_eq_rateHistory`,
     `reports_eq_of_polynomialsAgreeAt_four`).
+  * Dispersion climbs twice as fast.  Agreement up to degree `2d` fixes the variance across
+    replicate populations of every polynomial of half that degree, so degree two fixes the
+    replicate variance of every confusion cell, prevalence, called fraction and net benefit,
+    with Chebyshev bounds on their deviations, and degree four that of every deme covariance
+    (`PortabilityMomentLadderDispersion.decisionDispersion_eq_of_polynomialsAgreeAt_two`,
+    `variance_polynomialFunction_eq_of_polynomialsAgreeAt_two_mul`,
+    `confusionDeviation_le_of_polynomialsAgreeAt_two`,
+    `covarianceDispersion_eq_of_polynomialsAgreeAt_four`,
+    `decisionDispersion_historyEvent_eq_rateHistory`).
 
 ## 3. The individual: ploidy
 
@@ -447,6 +459,21 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   (`MigrationPortabilityRemainder.abs_splitPortabilityRatio_withSymmetricMigration_sub_le`,
   `exists_portabilityDecay_lt_splitPortabilityRatio`, `firstOrderMigrationFactor_nonneg_of_raises`,
   `exists_portabilityDecay_lt_splitPortabilityRatio_zeroRecombination`).
+* **Calibration decays at half the rate.**  For a score trained in the source, squared-correlation
+  portability is the square of calibration-slope portability
+  (`CalibrationPortabilityDecay.squaredCorrelationPortability_eq_calibrationPortability_sq`).
+  Along divergence time the slope ratio is the polygenic decay and the squared correlation its
+  square, `e^{-xT}` against `e^{-2xT}` at one rate (`calibrationPortability_decay`,
+  `portabilityDecay_sq`), so `0 < R² < slope < 1` for `T > 0`
+  (`squaredCorrelationPortability_decay_lt`); at equal rates the two-locus split ratio is the
+  square of a calibration portability (`calibrationPortability_sq_eq_splitPortabilityRatio`).
+* **Admixture pulses.**  Right after a pulse of fraction `α` from the source, the cross-population
+  linkage covariance is `α E[D_S²] + (1 − α) E[D_S D_T] + α (1 − α) Λ`, with `Λ` the joint
+  differentiation at the two loci, and the heterozygosity product mixes bilinearly
+  (`AdmixturePortabilityDecay.pulseState_DD_cross`, `pulseState_pi2_cross`,
+  `pulseSquaredCorrelation_eq`).  The squared correlation then decays by `e^{-rT}` with
+  `r = (ρ_S + ρ_T)/2`, drift cancelling as after a split
+  (`pulseHistorySquaredCorrelation_eq`).
 
 ## 6. Response: how accuracy moves with every input
 
