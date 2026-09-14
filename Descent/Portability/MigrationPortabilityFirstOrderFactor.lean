@@ -336,3 +336,115 @@ theorem duhamelDerivative_mulVec_pi2 (rates : ManyDemeLDRates D)
     (augmentedLowOrderLDGenerator_pi2_row _ (withSymmetricMigration_zero_migration rates hne)
       hmutation hne)
     (migrationDirection_mulVec_pi2 rates hmutation hne)
+
+/-! ## The elementary parts of the linkage stencil -/
+
+/-- **The cross-population linkage covariance without migration** decays from `DD₀` at
+`λ_D = c_S + c_T + (ρ_S + ρ_T)/2`.
+
+Assumes: no mutation and `parent ≠ child`. -/
+theorem noMigrationHistory_DD_cross (rates : ManyDemeLDRates D)
+    (hmutation : ∀ deme, rates.mutation deme = 0) {parent child : Fin D} (hne : parent ≠ child)
+    (ancestral : AffineLowOrderLDCoordinate D → ℝ) (time : ℝ) :
+    migrationHistory rates hne 0 le_rfl ancestral time (some (.DD parent child))
+      = Real.exp (-crossLinkageDecayRate rates parent child * time)
+        * ancestral (some (.DD parent parent)) := by
+  rw [migrationHistory_DD rates hmutation hne le_rfl, zero_mul, add_zero]
+
+/-- **A fed linkage contrast.**  Without migration or mutation, along any trajectory
+`Dz(i, j, j)(t) = e^{-β_i t} (Dz(i, j, j)(0) + α DD(i, j)(0)) - α e^{-λ t} DD(i, j)(0)`, with
+`α = 4 c_j / β_j`, `β_i = c_i + ρ_i/2` and `λ = c_i + c_j + (ρ_i + ρ_j)/2`.
+
+Assumes: no migration, no mutation, and `first ≠ second`. -/
+theorem matrixExponential_mulVec_Dz_fed (rates : ManyDemeLDRates D)
+    (hmigration : ∀ source target, rates.migration source target = 0)
+    (hmutation : ∀ deme, rates.mutation deme = 0) {first second : Fin D} (hne : first ≠ second)
+    (time : ℝ) (state : AffineLowOrderLDCoordinate D → ℝ) :
+    (matrixExponential (augmentedLowOrderLDGenerator rates) time).mulVec state
+        (some (.Dz first second second))
+      = Real.exp (-linkageRate rates first * time)
+          * (state (some (.Dz first second second))
+            + 4 * rates.coalescence second / linkageRate rates second
+              * state (some (.DD first second)))
+        - 4 * rates.coalescence second / linkageRate rates second
+          * Real.exp (-(rates.coalescence first + rates.coalescence second
+              + (rates.recombination first + rates.recombination second) / 2) * time)
+          * state (some (.DD first second)) := by
+  have hcombination := matrixExponential_Dz_combination rates hmigration hmutation hne time state
+  rw [matrixExponential_mulVec_apply_of_row_eq _ time _ _ _
+    (augmentedLowOrderLDGenerator_DD_row rates hmigration hmutation hne), mul_comm time]
+    at hcombination
+  linear_combination hcombination
+
+/-- **The child's fed contrast `Dz(T, S, S)` without migration.**
+
+Assumes: no mutation and `parent ≠ child`. -/
+theorem noMigrationHistory_Dz_childFed (rates : ManyDemeLDRates D)
+    (hmutation : ∀ deme, rates.mutation deme = 0) {parent child : Fin D} (hne : parent ≠ child)
+    (ancestral : AffineLowOrderLDCoordinate D → ℝ) (time : ℝ) :
+    migrationHistory rates hne 0 le_rfl ancestral time (some (.Dz child parent parent))
+      = Real.exp (-linkageRate rates child * time)
+          * (ancestral (some (.Dz parent parent parent))
+            + 4 * rates.coalescence parent / linkageRate rates parent
+              * ancestral (some (.DD parent parent)))
+        - 4 * rates.coalescence parent / linkageRate rates parent
+          * Real.exp (-(rates.coalescence child + rates.coalescence parent
+              + (rates.recombination child + rates.recombination parent) / 2) * time)
+          * ancestral (some (.DD parent parent)) := by
+  have h := matrixExponential_mulVec_Dz_fed _ (withSymmetricMigration_zero_migration rates hne)
+    hmutation (Ne.symm hne) time ((lowOrderLDSplitTransform parent child).mulVec ancestral)
+  rw [(splitTransform_block hne ancestral).2.2.1, (splitTransform_block hne ancestral).1] at h
+  exact h
+
+/-- **The parent's fed contrast `Dz(S, T, T)` without migration.**
+
+Assumes: no mutation and `parent ≠ child`. -/
+theorem noMigrationHistory_Dz_parentFed (rates : ManyDemeLDRates D)
+    (hmutation : ∀ deme, rates.mutation deme = 0) {parent child : Fin D} (hne : parent ≠ child)
+    (ancestral : AffineLowOrderLDCoordinate D → ℝ) (time : ℝ) :
+    migrationHistory rates hne 0 le_rfl ancestral time (some (.Dz parent child child))
+      = Real.exp (-linkageRate rates parent * time)
+          * (ancestral (some (.Dz parent parent parent))
+            + 4 * rates.coalescence child / linkageRate rates child
+              * ancestral (some (.DD parent parent)))
+        - 4 * rates.coalescence child / linkageRate rates child
+          * Real.exp (-(rates.coalescence parent + rates.coalescence child
+              + (rates.recombination parent + rates.recombination child) / 2) * time)
+          * ancestral (some (.DD parent parent)) := by
+  have h := matrixExponential_mulVec_Dz_fed _ (withSymmetricMigration_zero_migration rates hne)
+    hmutation hne time ((lowOrderLDSplitTransform parent child).mulVec ancestral)
+  rw [(splitTransform_block hne ancestral).2.1, splitTransform_DD hne] at h
+  exact h
+
+/-- **The four diagonal contrasts without migration.**  `Dz(T, S, T)`, `Dz(T, T, S)`,
+`Dz(S, T, S)` and `Dz(S, S, T)` decay from `Dz₀` at `3 c_i + ρ_i/2`, `i` their first index.
+
+Assumes: no mutation and `parent ≠ child`. -/
+theorem noMigrationHistory_Dz_diagonal (rates : ManyDemeLDRates D)
+    (hmutation : ∀ deme, rates.mutation deme = 0) {parent child : Fin D} (hne : parent ≠ child)
+    (ancestral : AffineLowOrderLDCoordinate D → ℝ) (time : ℝ) :
+    migrationHistory rates hne 0 le_rfl ancestral time (some (.Dz child parent child))
+        = Real.exp (-(3 * rates.coalescence child + rates.recombination child / 2) * time)
+          * ancestral (some (.Dz parent parent parent)) ∧
+      migrationHistory rates hne 0 le_rfl ancestral time (some (.Dz child child parent))
+        = Real.exp (-(3 * rates.coalescence child + rates.recombination child / 2) * time)
+          * ancestral (some (.Dz parent parent parent)) ∧
+      migrationHistory rates hne 0 le_rfl ancestral time (some (.Dz parent child parent))
+        = Real.exp (-(3 * rates.coalescence parent + rates.recombination parent / 2) * time)
+          * ancestral (some (.Dz parent parent parent)) ∧
+      migrationHistory rates hne 0 le_rfl ancestral time (some (.Dz parent parent child))
+        = Real.exp (-(3 * rates.coalescence parent + rates.recombination parent / 2) * time)
+          * ancestral (some (.Dz parent parent parent)) := by
+  have hmigration := withSymmetricMigration_zero_migration rates hne
+  refine ⟨?_, ?_, ?_, ?_⟩ <;> rw [migrationHistory] <;>
+    first
+    | rw [matrixExponential_mulVec_apply_of_diagonal_row _ time _
+        (augmentedLowOrderLDGenerator_Dz_mixed_row _ hmigration hmutation (Ne.symm hne))]
+    | rw [matrixExponential_mulVec_apply_of_diagonal_row _ time _
+        (augmentedLowOrderLDGenerator_Dz_leading_row _ hmigration hmutation (Ne.symm hne))]
+    | rw [matrixExponential_mulVec_apply_of_diagonal_row _ time _
+        (augmentedLowOrderLDGenerator_Dz_mixed_row _ hmigration hmutation hne)]
+    | rw [matrixExponential_mulVec_apply_of_diagonal_row _ time _
+        (augmentedLowOrderLDGenerator_Dz_leading_row _ hmigration hmutation hne)]
+  all_goals simp [lowOrderLDSplitTransform_mulVec, LowOrderLDCoordinate.mergeSplit, hne,
+    withSymmetricMigration]
