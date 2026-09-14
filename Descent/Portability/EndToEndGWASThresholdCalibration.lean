@@ -463,6 +463,372 @@ theorem curseWitness_calibration :
     exact div_pos hcovariance (hpopulationVariance.trans_le
       (le_samplingForm (excessForm_nonneg _ _ _ _) (pairingForm_nonneg _ _ _ _) (le_refl 2)))
 
+/-! ## Learned calibration along a demographic history -/
+
+section History
+
+variable {Deme Locus : Type*} {Allele : Locus → Type*}
+variable [Fintype Deme] [DecidableEq Deme] [Fintype Locus] [DecidableEq Locus]
+  [∀ ℓ, Fintype (Allele ℓ)] [∀ ℓ, DecidableEq (Allele ℓ)]
+variable {J : Type*} [Fintype J]
+
+/-- **The learned covariance polynomial** `∑_j C_t(X_j, Y) E l_j`: the target marginal effects read
+against the acceptance polynomials of the learned weights over a panel of `size` draws from the
+source deme. -/
+def learnedCovariancePolynomial (source target : Deme) (size : ℕ)
+    (learn : (Fin size → FullHaplotype Locus Allele) → J → ℝ)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    FrequencyPolynomial Deme Locus Allele :=
+  ∑ marker, demePolynomial target
+      (covariancePolynomial (fun individual ↦ genotype individual marker) outcome)
+    * acceptancePolynomial (fun _ : Fin size ↦ source) fun sample ↦ learn sample marker
+
+/-- At a state, the learned covariance polynomial is the expected target covariance of the learned
+score, the cohort drawn in the source deme. -/
+theorem polynomialFunction_learnedCovariancePolynomial (source target : Deme) (size : ℕ)
+    (learn : (Fin size → FullHaplotype Locus Allele) → J → ℝ)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ)
+    (y : FrequencyState Deme Locus Allele) :
+    polynomialFunction (learnedCovariancePolynomial source target size learn genotype outcome) y
+      = learnedCovariance (stateLaw y source) (stateLaw y target) size learn genotype outcome := by
+  rw [learnedCovariance_eq, polynomialFunction_apply, learnedCovariancePolynomial]
+  simp only [map_sum, map_mul]
+  refine Finset.sum_congr rfl fun marker _ ↦ ?_
+  rw [eval_demePolynomial, eval_covariancePolynomial, ← polynomialFunction_apply,
+    polynomialFunction_acceptancePolynomial]
+  rfl
+
+/-- **The learned covariance polynomial has total degree at most `2 + size`.** -/
+theorem totalDegree_learnedCovariancePolynomial_le (source target : Deme) (size : ℕ)
+    (learn : (Fin size → FullHaplotype Locus Allele) → J → ℝ)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    (learnedCovariancePolynomial source target size learn genotype outcome).totalDegree
+      ≤ 2 + size := by
+  refine (totalDegree_finset_sum _ _).trans (Finset.sup_le fun marker _ ↦ ?_)
+  exact (totalDegree_mul _ _).trans (add_le_add
+    ((totalDegree_rename_le _ _).trans (totalDegree_covariancePolynomial_le _ outcome))
+    ((totalDegree_acceptancePolynomial_le _ _).trans_eq (Fintype.card_fin size)))
+
+/-- **A learned polynomial has total degree at most the target degree plus the cohort size.**  The
+double sum is read as one sum over pairs of tags. -/
+theorem totalDegree_learnedPolynomial_le_add (source target : Deme) (size : ℕ)
+    (learn : (Fin size → FullHaplotype Locus Allele) → J → ℝ)
+    (targetMatrix : J → J → MvPolynomial (FullHaplotype Locus Allele) ℝ) {b : ℕ}
+    (htarget : ∀ i j, (targetMatrix i j).totalDegree ≤ b) :
+    (learnedPolynomial source target size learn targetMatrix).totalDegree ≤ b + size := by
+  rw [learnedPolynomial, ← Fintype.sum_prod_type']
+  refine (totalDegree_finset_sum _ _).trans (Finset.sup_le fun pair _ ↦ ?_)
+  exact (totalDegree_mul _ _).trans (add_le_add
+    ((totalDegree_rename_le _ _).trans (htarget pair.1 pair.2))
+    ((totalDegree_acceptancePolynomial_le _ _).trans_eq (Fintype.card_fin size)))
+
+/-- At a state, the expected target variance of a learned score is the learned polynomial of the
+tag covariance. -/
+theorem learnedVariance_stateLaw (source target : Deme) (size : ℕ)
+    (learn : (Fin size → FullHaplotype Locus Allele) → J → ℝ)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (y : FrequencyState Deme Locus Allele) :
+    learnedVariance (stateLaw y source) (stateLaw y target) size learn genotype
+      = polynomialFunction (learnedPolynomial source target size learn
+          (tagCovariancePolynomial genotype)) y := by
+  rw [learnedVariance_eq, polynomialFunction_learnedPolynomial]
+  simp only [eval_tagCovariancePolynomial]
+
+/-- At a state, the expected intercept accumulator of a learned score is the learned polynomial of
+the intercept matrix. -/
+theorem learnedInterceptAccumulator_stateLaw (source target : Deme) (size : ℕ)
+    (learn : (Fin size → FullHaplotype Locus Allele) → J → ℝ)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ)
+    (y : FrequencyState Deme Locus Allele) :
+    learnedInterceptAccumulator (stateLaw y source) (stateLaw y target) size learn genotype outcome
+      = polynomialFunction (learnedPolynomial source target size learn
+          (interceptMatrixPolynomial genotype outcome)) y := by
+  rw [learnedInterceptAccumulator_eq, polynomialFunction_learnedPolynomial]
+  simp only [eval_interceptMatrixPolynomial]
+
+/-- **The expected learned covariance along a history** is a pairing with the propagated moments
+at every budget `n ≥ size + 2`. -/
+theorem integral_learnedCovariance_historyEventKernel (ℓ₀ : Locus)
+    (hap₀ : FullHaplotype Locus Allele)
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (x0 : FrequencyState Deme Locus Allele) (source target : Deme) (size : ℕ) {n : ℕ}
+    (hn : size + 2 ≤ n) (learn : (Fin size → FullHaplotype Locus Allele) → J → ℝ)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    ∫ y, learnedCovariance (stateLaw y source) (stateLaw y target) size learn genotype outcome
+        ∂(historyEventKernel ℓ₀ hap₀ events x0)
+      = budgetCoefficients ℓ₀ (fun _ ↦ n)
+          (learnedCovariancePolynomial source target size learn genotype outcome)
+        ⬝ᵥ (historyEventPropagator (fun _ ↦ n) events *ᵥ budgetMomentFeature (fun _ ↦ n) x0) :=
+  integral_historyEventKernel_of_totalDegree_le ℓ₀ hap₀ events x0 _
+    ((totalDegree_learnedCovariancePolynomial_le source target size learn genotype outcome).trans
+      (by omega)) _
+    (polynomialFunction_learnedCovariancePolynomial source target size learn genotype outcome)
+
+/-- **The expected learned variance along a history** is a pairing with the propagated moments at
+every budget `n ≥ size + 2`. -/
+theorem integral_learnedVariance_historyEventKernel (ℓ₀ : Locus)
+    (hap₀ : FullHaplotype Locus Allele)
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (x0 : FrequencyState Deme Locus Allele) (source target : Deme) (size : ℕ) {n : ℕ}
+    (hn : size + 2 ≤ n) (learn : (Fin size → FullHaplotype Locus Allele) → J → ℝ)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) :
+    ∫ y, learnedVariance (stateLaw y source) (stateLaw y target) size learn genotype
+        ∂(historyEventKernel ℓ₀ hap₀ events x0)
+      = budgetCoefficients ℓ₀ (fun _ ↦ n)
+          (learnedPolynomial source target size learn (tagCovariancePolynomial genotype))
+        ⬝ᵥ (historyEventPropagator (fun _ ↦ n) events *ᵥ budgetMomentFeature (fun _ ↦ n) x0) :=
+  integral_historyEventKernel_of_totalDegree_le ℓ₀ hap₀ events x0 _
+    ((totalDegree_learnedPolynomial_le_add source target size learn _
+      (totalDegree_tagCovariancePolynomial_le genotype)).trans (by omega)) _
+    fun y ↦ (learnedVariance_stateLaw source target size learn genotype y).symm
+
+/-- **The expected learned intercept accumulator along a history** is a pairing with the propagated
+moments at every budget `n ≥ size + 3`. -/
+theorem integral_learnedInterceptAccumulator_historyEventKernel (ℓ₀ : Locus)
+    (hap₀ : FullHaplotype Locus Allele)
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (x0 : FrequencyState Deme Locus Allele) (source target : Deme) (size : ℕ) {n : ℕ}
+    (hn : size + 3 ≤ n) (learn : (Fin size → FullHaplotype Locus Allele) → J → ℝ)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    ∫ y, learnedInterceptAccumulator (stateLaw y source) (stateLaw y target) size learn genotype
+        outcome ∂(historyEventKernel ℓ₀ hap₀ events x0)
+      = budgetCoefficients ℓ₀ (fun _ ↦ n)
+          (learnedPolynomial source target size learn (interceptMatrixPolynomial genotype outcome))
+        ⬝ᵥ (historyEventPropagator (fun _ ↦ n) events *ᵥ budgetMomentFeature (fun _ ↦ n) x0) :=
+  integral_historyEventKernel_of_totalDegree_le ℓ₀ hap₀ events x0 _
+    ((totalDegree_learnedPolynomial_le_add source target size learn _
+      (totalDegree_interceptMatrixPolynomial_le genotype outcome)).trans (by omega)) _
+    fun y ↦ (learnedInterceptAccumulator_stateLaw source target size learn genotype outcome y).symm
+
+/-- **The expected learned covariance along a rate history**, at every budget `n ≥ size + 2`. -/
+theorem integral_learnedCovariance_rateHistoryKernel
+    {rates : ℝ → NeutralRates Deme Locus Allele} {T : ℝ} (hT : 0 ≤ T)
+    (hcontinuous : ∀ capacity : Locus → ℕ,
+      ContinuousOn (fun t ↦ dualGenerator (rates t) capacity) (Set.Icc 0 T))
+    (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele) (x0 : FrequencyState Deme Locus Allele)
+    (source target : Deme) (size : ℕ) {n : ℕ} (hn : size + 2 ≤ n)
+    (learn : (Fin size → FullHaplotype Locus Allele) → J → ℝ)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    ∫ y, learnedCovariance (stateLaw y source) (stateLaw y target) size learn genotype outcome
+        ∂(rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous x0)
+      = budgetCoefficients ℓ₀ (fun _ ↦ n)
+          (learnedCovariancePolynomial source target size learn genotype outcome)
+        ⬝ᵥ (rateHistoryDualPropagator rates (fun _ ↦ n) T *ᵥ budgetMomentFeature (fun _ ↦ n) x0) :=
+  integral_rateHistoryKernel_of_totalDegree_le hT hcontinuous ℓ₀ hap₀ x0 _
+    ((totalDegree_learnedCovariancePolynomial_le source target size learn genotype outcome).trans
+      (by omega)) _
+    (polynomialFunction_learnedCovariancePolynomial source target size learn genotype outcome)
+
+/-- **The expected learned variance along a rate history**, at every budget `n ≥ size + 2`. -/
+theorem integral_learnedVariance_rateHistoryKernel
+    {rates : ℝ → NeutralRates Deme Locus Allele} {T : ℝ} (hT : 0 ≤ T)
+    (hcontinuous : ∀ capacity : Locus → ℕ,
+      ContinuousOn (fun t ↦ dualGenerator (rates t) capacity) (Set.Icc 0 T))
+    (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele) (x0 : FrequencyState Deme Locus Allele)
+    (source target : Deme) (size : ℕ) {n : ℕ} (hn : size + 2 ≤ n)
+    (learn : (Fin size → FullHaplotype Locus Allele) → J → ℝ)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) :
+    ∫ y, learnedVariance (stateLaw y source) (stateLaw y target) size learn genotype
+        ∂(rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous x0)
+      = budgetCoefficients ℓ₀ (fun _ ↦ n)
+          (learnedPolynomial source target size learn (tagCovariancePolynomial genotype))
+        ⬝ᵥ (rateHistoryDualPropagator rates (fun _ ↦ n) T *ᵥ budgetMomentFeature (fun _ ↦ n) x0) :=
+  integral_rateHistoryKernel_of_totalDegree_le hT hcontinuous ℓ₀ hap₀ x0 _
+    ((totalDegree_learnedPolynomial_le_add source target size learn _
+      (totalDegree_tagCovariancePolynomial_le genotype)).trans (by omega)) _
+    fun y ↦ (learnedVariance_stateLaw source target size learn genotype y).symm
+
+/-- **The expected learned intercept accumulator along a rate history**, at every budget
+`n ≥ size + 3`. -/
+theorem integral_learnedInterceptAccumulator_rateHistoryKernel
+    {rates : ℝ → NeutralRates Deme Locus Allele} {T : ℝ} (hT : 0 ≤ T)
+    (hcontinuous : ∀ capacity : Locus → ℕ,
+      ContinuousOn (fun t ↦ dualGenerator (rates t) capacity) (Set.Icc 0 T))
+    (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele) (x0 : FrequencyState Deme Locus Allele)
+    (source target : Deme) (size : ℕ) {n : ℕ} (hn : size + 3 ≤ n)
+    (learn : (Fin size → FullHaplotype Locus Allele) → J → ℝ)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    ∫ y, learnedInterceptAccumulator (stateLaw y source) (stateLaw y target) size learn genotype
+        outcome ∂(rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous x0)
+      = budgetCoefficients ℓ₀ (fun _ ↦ n)
+          (learnedPolynomial source target size learn (interceptMatrixPolynomial genotype outcome))
+        ⬝ᵥ (rateHistoryDualPropagator rates (fun _ ↦ n) T *ᵥ budgetMomentFeature (fun _ ↦ n) x0) :=
+  integral_rateHistoryKernel_of_totalDegree_le hT hcontinuous ℓ₀ hap₀ x0 _
+    ((totalDegree_learnedPolynomial_le_add source target size learn _
+      (totalDegree_interceptMatrixPolynomial_le genotype outcome)).trans (by omega)) _
+    fun y ↦ (learnedInterceptAccumulator_stateLaw source target size learn genotype outcome y).symm
+
+/-- **The learned calibration slope of expectations under a kernel**: the expected target
+covariance of the learned score over its expected target variance, over the populations of the
+kernel and the training cohort drawn in the source deme of each.  NOTE2 §6.2 query: a ratio of
+expectations. -/
+def expectedLearnedCalibrationSlope
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    (x0 : FrequencyState Deme Locus Allele) (source target : Deme) (size : ℕ)
+    (learn : (Fin size → FullHaplotype Locus Allele) → J → ℝ)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    ℝ :=
+  (∫ y, learnedCovariance (stateLaw y source) (stateLaw y target) size learn genotype outcome
+      ∂(κ x0))
+    / ∫ y, learnedVariance (stateLaw y source) (stateLaw y target) size learn genotype ∂(κ x0)
+
+/-- **The learned calibration intercept of expectations under a kernel.**  NOTE2 §6.2 query: a
+ratio of expectations. -/
+def expectedLearnedCalibrationIntercept
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    (x0 : FrequencyState Deme Locus Allele) (source target : Deme) (size : ℕ)
+    (learn : (Fin size → FullHaplotype Locus Allele) → J → ℝ)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    ℝ :=
+  (∫ y, learnedInterceptAccumulator (stateLaw y source) (stateLaw y target) size learn genotype
+      outcome ∂(κ x0))
+    / ∫ y, learnedVariance (stateLaw y source) (stateLaw y target) size learn genotype ∂(κ x0)
+
+/-- **The rational learned calibration slope** of a budget-`(size + 2)` moment vector. -/
+def momentLearnedCalibrationSlope (ℓ₀ : Locus) (source target : Deme) (size : ℕ)
+    (learn : (Fin size → FullHaplotype Locus Allele) → J → ℝ)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ)
+    (v : BudgetConfiguration Deme Locus Allele (fun _ ↦ size + 2) → ℝ) : ℝ :=
+  (budgetCoefficients ℓ₀ (fun _ ↦ size + 2)
+      (learnedCovariancePolynomial source target size learn genotype outcome) ⬝ᵥ v)
+    / (budgetCoefficients ℓ₀ (fun _ ↦ size + 2)
+      (learnedPolynomial source target size learn (tagCovariancePolynomial genotype)) ⬝ᵥ v)
+
+/-- **The rational learned calibration intercept** of a budget-`(size + 3)` moment vector. -/
+def momentLearnedCalibrationIntercept (ℓ₀ : Locus) (source target : Deme) (size : ℕ)
+    (learn : (Fin size → FullHaplotype Locus Allele) → J → ℝ)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ)
+    (v : BudgetConfiguration Deme Locus Allele (fun _ ↦ size + 3) → ℝ) : ℝ :=
+  (budgetCoefficients ℓ₀ (fun _ ↦ size + 3)
+      (learnedPolynomial source target size learn
+        (interceptMatrixPolynomial genotype outcome)) ⬝ᵥ v)
+    / (budgetCoefficients ℓ₀ (fun _ ↦ size + 3)
+      (learnedPolynomial source target size learn (tagCovariancePolynomial genotype)) ⬝ᵥ v)
+
+/-- **The calibration law of learned and thresholded scores along a history of epochs, splits and
+pulses.**  The slope of expectations of a score learned on a cohort of `size` haplotypes of the
+source deme, the covariance-thresholded GWAS included, is the rational function
+`momentLearnedCalibrationSlope` of the chronological propagator applied to the budget-`(size + 2)`
+moments of the initial state. -/
+theorem expectedLearnedCalibrationSlope_historyEventKernel (ℓ₀ : Locus)
+    (hap₀ : FullHaplotype Locus Allele)
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (x0 : FrequencyState Deme Locus Allele) (source target : Deme) (size : ℕ)
+    (learn : (Fin size → FullHaplotype Locus Allele) → J → ℝ)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    expectedLearnedCalibrationSlope (historyEventKernel ℓ₀ hap₀ events) x0 source target size learn
+        genotype outcome
+      = momentLearnedCalibrationSlope ℓ₀ source target size learn genotype outcome
+          (historyEventPropagator (fun _ ↦ size + 2) events
+            *ᵥ budgetMomentFeature (fun _ ↦ size + 2) x0) := by
+  rw [expectedLearnedCalibrationSlope,
+    integral_learnedCovariance_historyEventKernel ℓ₀ hap₀ events x0 source target size le_rfl,
+    integral_learnedVariance_historyEventKernel ℓ₀ hap₀ events x0 source target size le_rfl]
+  rfl
+
+/-- **The intercept law of learned and thresholded scores along a history**: a rational function
+of the propagated budget-`(size + 3)` moments. -/
+theorem expectedLearnedCalibrationIntercept_historyEventKernel (ℓ₀ : Locus)
+    (hap₀ : FullHaplotype Locus Allele)
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (x0 : FrequencyState Deme Locus Allele) (source target : Deme) (size : ℕ)
+    (learn : (Fin size → FullHaplotype Locus Allele) → J → ℝ)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    expectedLearnedCalibrationIntercept (historyEventKernel ℓ₀ hap₀ events) x0 source target size
+        learn genotype outcome
+      = momentLearnedCalibrationIntercept ℓ₀ source target size learn genotype outcome
+          (historyEventPropagator (fun _ ↦ size + 3) events
+            *ᵥ budgetMomentFeature (fun _ ↦ size + 3) x0) := by
+  rw [expectedLearnedCalibrationIntercept,
+    integral_learnedInterceptAccumulator_historyEventKernel ℓ₀ hap₀ events x0 source target size
+      le_rfl,
+    integral_learnedVariance_historyEventKernel ℓ₀ hap₀ events x0 source target size
+      (n := size + 3) (by omega)]
+  rfl
+
+/-- **The calibration law of learned and thresholded scores along a rate history**: a rational
+function of the propagated budget-`(size + 2)` moments. -/
+theorem expectedLearnedCalibrationSlope_rateHistoryKernel
+    {rates : ℝ → NeutralRates Deme Locus Allele} {T : ℝ} (hT : 0 ≤ T)
+    (hcontinuous : ∀ capacity : Locus → ℕ,
+      ContinuousOn (fun t ↦ dualGenerator (rates t) capacity) (Set.Icc 0 T))
+    (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele) (x0 : FrequencyState Deme Locus Allele)
+    (source target : Deme) (size : ℕ) (learn : (Fin size → FullHaplotype Locus Allele) → J → ℝ)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    expectedLearnedCalibrationSlope (rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous) x0 source
+        target size learn genotype outcome
+      = momentLearnedCalibrationSlope ℓ₀ source target size learn genotype outcome
+          (rateHistoryDualPropagator rates (fun _ ↦ size + 2) T
+            *ᵥ budgetMomentFeature (fun _ ↦ size + 2) x0) := by
+  rw [expectedLearnedCalibrationSlope,
+    integral_learnedCovariance_rateHistoryKernel hT hcontinuous ℓ₀ hap₀ x0 source target size
+      le_rfl,
+    integral_learnedVariance_rateHistoryKernel hT hcontinuous ℓ₀ hap₀ x0 source target size
+      le_rfl]
+  rfl
+
+/-- **The intercept law of learned and thresholded scores along a rate history**: a rational
+function of the propagated budget-`(size + 3)` moments. -/
+theorem expectedLearnedCalibrationIntercept_rateHistoryKernel
+    {rates : ℝ → NeutralRates Deme Locus Allele} {T : ℝ} (hT : 0 ≤ T)
+    (hcontinuous : ∀ capacity : Locus → ℕ,
+      ContinuousOn (fun t ↦ dualGenerator (rates t) capacity) (Set.Icc 0 T))
+    (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele) (x0 : FrequencyState Deme Locus Allele)
+    (source target : Deme) (size : ℕ) (learn : (Fin size → FullHaplotype Locus Allele) → J → ℝ)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    expectedLearnedCalibrationIntercept (rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous) x0 source
+        target size learn genotype outcome
+      = momentLearnedCalibrationIntercept ℓ₀ source target size learn genotype outcome
+          (rateHistoryDualPropagator rates (fun _ ↦ size + 3) T
+            *ᵥ budgetMomentFeature (fun _ ↦ size + 3) x0) := by
+  rw [expectedLearnedCalibrationIntercept,
+    integral_learnedInterceptAccumulator_rateHistoryKernel hT hcontinuous ℓ₀ hap₀ x0 source target
+      size le_rfl,
+    integral_learnedVariance_rateHistoryKernel hT hcontinuous ℓ₀ hap₀ x0 source target size
+      (n := size + 3) (by omega)]
+  rfl
+
+/-- **Learned calibration sees the history only through finitely many moments.**  Two histories,
+from two initial states, whose propagated budget-`(size + 2)` moments agree give equal learned
+calibration slope of expectations for every learner on cohorts of that size, thresholded GWAS
+scores included, and every tag set, outcome, source and target. -/
+theorem expectedLearnedCalibrationSlope_eq_of_moments_eq (ℓ₀ : Locus)
+    (hap₀ : FullHaplotype Locus Allele)
+    {first second : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme)}
+    {x₁ x₂ : FrequencyState Deme Locus Allele} {size : ℕ}
+    (hmoments : historyEventPropagator (fun _ ↦ size + 2) first
+        *ᵥ budgetMomentFeature (fun _ ↦ size + 2) x₁
+      = historyEventPropagator (fun _ ↦ size + 2) second
+        *ᵥ budgetMomentFeature (fun _ ↦ size + 2) x₂)
+    (source target : Deme) (learn : (Fin size → FullHaplotype Locus Allele) → J → ℝ)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    expectedLearnedCalibrationSlope (historyEventKernel ℓ₀ hap₀ first) x₁ source target size learn
+        genotype outcome
+      = expectedLearnedCalibrationSlope (historyEventKernel ℓ₀ hap₀ second) x₂ source target size
+          learn genotype outcome := by
+  rw [expectedLearnedCalibrationSlope_historyEventKernel,
+    expectedLearnedCalibrationSlope_historyEventKernel, hmoments]
+
+/-- **The learned intercept sees the history only through finitely many moments**: the propagated
+budget-`(size + 3)` moments. -/
+theorem expectedLearnedCalibrationIntercept_eq_of_moments_eq (ℓ₀ : Locus)
+    (hap₀ : FullHaplotype Locus Allele)
+    {first second : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme)}
+    {x₁ x₂ : FrequencyState Deme Locus Allele} {size : ℕ}
+    (hmoments : historyEventPropagator (fun _ ↦ size + 3) first
+        *ᵥ budgetMomentFeature (fun _ ↦ size + 3) x₁
+      = historyEventPropagator (fun _ ↦ size + 3) second
+        *ᵥ budgetMomentFeature (fun _ ↦ size + 3) x₂)
+    (source target : Deme) (learn : (Fin size → FullHaplotype Locus Allele) → J → ℝ)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    expectedLearnedCalibrationIntercept (historyEventKernel ℓ₀ hap₀ first) x₁ source target size
+        learn genotype outcome
+      = expectedLearnedCalibrationIntercept (historyEventKernel ℓ₀ hap₀ second) x₂ source target
+          size learn genotype outcome := by
+  rw [expectedLearnedCalibrationIntercept_historyEventKernel,
+    expectedLearnedCalibrationIntercept_historyEventKernel, hmoments]
+
+end History
+
 end
 
 end Descent.Portability.EndToEndGWASThresholdCalibration

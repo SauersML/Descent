@@ -1,0 +1,55 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.EndToEndGWASThresholdCalibration
+
+/-! Axiom audit of EndToEndGWASThresholdCalibration. -/
+
+open Descent.Portability.EndToEndGWASThresholdCalibration
+
+#print axioms learnedCovariance
+#print axioms learnedVariance
+#print axioms learnedInterceptAccumulator
+#print axioms learnedCalibrationSlope
+#print axioms learnedCalibrationIntercept
+#print axioms meanLearnedWeights
+#print axioms learnedWeightCovariance
+#print axioms learnedNoiseForm
+#print axioms learnedCovariance_eq
+#print axioms learnedVariance_eq
+#print axioms learnedInterceptAccumulator_eq
+#print axioms trainedCalibrationSlope_eq_learnedCalibrationSlope
+#print axioms learnedCovariance_eq_mean
+#print axioms learnedVariance_eq_add
+#print axioms learnedNoiseForm_nonneg
+#print axioms learnedRatio_eq_mul_attenuation
+#print axioms learnedCalibrationSlope_eq_mul
+#print axioms abs_learnedCalibrationSlope_le
+#print axioms abs_marginalWeights_mul_abs_expectation_le
+#print axioms abs_div_mul_le_of_curse
+#print axioms learnedCovariance_unique
+#print axioms learnedVariance_unique
+#print axioms abs_learnedCalibrationSlope_threshold_le
+#print axioms curseWitness_calibration
+#print axioms learnedCovariancePolynomial
+#print axioms polynomialFunction_learnedCovariancePolynomial
+#print axioms totalDegree_learnedCovariancePolynomial_le
+#print axioms totalDegree_learnedPolynomial_le_add
+#print axioms learnedVariance_stateLaw
+#print axioms learnedInterceptAccumulator_stateLaw
+#print axioms integral_learnedCovariance_historyEventKernel
+#print axioms integral_learnedVariance_historyEventKernel
+#print axioms integral_learnedInterceptAccumulator_historyEventKernel
+#print axioms integral_learnedCovariance_rateHistoryKernel
+#print axioms integral_learnedVariance_rateHistoryKernel
+#print axioms integral_learnedInterceptAccumulator_rateHistoryKernel
+#print axioms expectedLearnedCalibrationSlope
+#print axioms expectedLearnedCalibrationIntercept
+#print axioms momentLearnedCalibrationSlope
+#print axioms momentLearnedCalibrationIntercept
+#print axioms expectedLearnedCalibrationSlope_historyEventKernel
+#print axioms expectedLearnedCalibrationIntercept_historyEventKernel
+#print axioms expectedLearnedCalibrationSlope_rateHistoryKernel
+#print axioms expectedLearnedCalibrationIntercept_rateHistoryKernel
+#print axioms expectedLearnedCalibrationSlope_eq_of_moments_eq
+#print axioms expectedLearnedCalibrationIntercept_eq_of_moments_eq
