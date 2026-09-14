@@ -1,0 +1,43 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.EndToEndPenetranceLaw
+
+/-! Axiom audit of EndToEndPenetranceLaw. -/
+
+open Descent.Portability.EndToEndPenetranceLaw
+
+#print axioms penetranceCellWeight
+#print axioms penetranceNetBenefitWeight
+#print axioms penetranceBrierWeight
+#print axioms penetranceConfusion
+#print axioms penetranceNetBenefit
+#print axioms penetranceBrier
+#print axioms penetrancePairMass
+#print axioms penetranceAUCNumerator
+#print axioms penetranceAUCDenominator
+#print axioms sum_penetranceConfusion
+#print axioms penetranceConfusion_nonneg
+#print axioms penetranceNetBenefit_eq_confusion
+#print axioms penetranceBrier_eq_add
+#print axioms expectation_pair_product
+#print axioms penetranceAUCDenominator_eq
+#print axioms penetranceConfusion_indicator
+#print axioms penetranceBrier_indicator
+#print axioms penetranceAUCNumerator_indicator
+#print axioms penetranceAUCDenominator_indicator
+#print axioms expectedPenetranceConfusion
+#print axioms expectedPenetranceAUCPortability
+#print axioms PenetranceReport
+#print axioms penetranceReport
+#print axioms expectedPenetranceConfusion_indicator
+#print axioms expectedPenetranceConfusion_eq_expectedConfusion
+#print axioms expectedPenetranceAUCPortability_indicator
+#print axioms integral_expectation_eq_of_polynomialsAgreeAt_one
+#print axioms integral_penetrancePairMass_eq_of_polynomialsAgreeAt_two
+#print axioms integral_penetranceAUC_eq_of_polynomialsAgreeAt_two
+#print axioms penetranceReport_eq_of_polynomialsAgreeAt_one
+#print axioms expectedPenetranceAUCPortability_eq_of_polynomialsAgreeAt_two
+#print axioms penetranceReport_and_aucPortability_eq_of_polynomialsAgreeAt_two
+#print axioms penetranceReport_historyEvent_eq_rateHistory
+#print axioms penetranceReport_and_aucPortability_historyEvent_eq_rateHistory
