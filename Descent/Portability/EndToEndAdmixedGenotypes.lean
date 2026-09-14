@@ -20,6 +20,11 @@ carries its own deme's law (`expectation_admixedMating_gametes`), and a product 
 the two gametes has the product of the two deme means (`expectation_admixedMating_cross`).  A deme
 crossed with itself is random union of gametes (`expectation_admixedMating_self`).
 
+Two gamete pools.  Every lemma on the F1 gamete pair is stated for any two haplotype laws: deme `a`
+and deme `b`, or the maternal and paternal gamete pools.  So the module also covers sex-specific
+gamete frequencies, and when the two pools are carried as two demes of the history, every result
+along a history below applies to them.
+
 F1 moments.  Take the additive lifts `S(h₁) + S(h₂)` and `Y(h₁) + Y(h₂)`.
 * The mean is `μ_a + μ_b` (`expectation_admixedMating_diploidSum`).
 * The product moment is the two within-deme product moments plus the cross-deme products
@@ -105,7 +110,8 @@ section Genotypes
 variable {H : Type*} [Fintype H] [DecidableEq H]
 
 /-- **The gamete pair of an F1 individual.**  One gamete is drawn from the law of the first
-parental deme and, independently, the other from the law of the second. -/
+parental deme and, independently, the other from the law of the second.  The two laws are any two
+haplotype laws, for instance the maternal and paternal gamete pools. -/
 def admixedMating (first second : FiniteReportLaw H) : FiniteReportLaw (H × H) :=
   first.joint fun _ ↦ second
 
