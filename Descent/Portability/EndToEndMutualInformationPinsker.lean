@@ -168,7 +168,8 @@ theorem padeGap_nonneg (t : ℝ) (ht : 0 ≤ t) : 0 ≤ padeGap t := by
         rw [interior_Ici] at hs
         rw [hderiv s (zero_lt_one.trans hs)]
         have hsign := logFactor_sign s (zero_lt_one.trans hs)
-        have habove : 0 < s - 1 := by linarith [hs]
+        have hs' : 1 < s := hs
+        have habove : 0 < s - 1 := by linarith [hs']
         by_contra hnegative
         have hfactor : logFactor s < 0 := by linarith
         have hproduct := mul_neg_of_pos_of_neg habove hfactor
@@ -251,7 +252,7 @@ theorem pinsker_finite {Report : Type*} [Fintype Report] (p q : FiniteReportLaw 
   have hleft : 0 ≤ Real.sqrt 3 * ∑ report, |p.mass report - q.mass report| :=
     mul_nonneg (Real.sqrt_nonneg _) (Finset.sum_nonneg fun report _ ↦ abs_nonneg _)
   have hsquare := mul_self_le_mul_self hleft hsum
-  have hthree : Real.sqrt 3 * ∑ report, |p.mass report - q.mass report|
+  have hthree : (Real.sqrt 3 * ∑ report, |p.mass report - q.mass report|)
       * (Real.sqrt 3 * ∑ report, |p.mass report - q.mass report|)
       = 3 * (∑ report, |p.mass report - q.mass report|) ^ 2 := by
     rw [mul_mul_mul_comm, Real.mul_self_sqrt (by norm_num : (0 : ℝ) ≤ 3), sq]
