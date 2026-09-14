@@ -751,6 +751,11 @@ import Descent.Portability.SelectionMomentExpansion
 import Descent.Portability.SelectionMomentUniqueness
 import Descent.Portability.PortabilityMomentLadder
 import Descent.Portability.PortabilityMomentLadderSharpness
+import Descent.Portability.EndToEndDeploymentLaw
+import Descent.Portability.FundamentalMatrixParameterDerivative
+import Descent.Portability.EndToEndSensitivityRatePath
+import Descent.Portability.EndToEndSensitivitySeries
+import Descent.Portability.MigrationPortabilityFirstOrder
 
 assert_below Descent.Program
 
