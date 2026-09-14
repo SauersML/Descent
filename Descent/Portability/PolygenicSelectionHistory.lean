@@ -614,6 +614,173 @@ theorem norm_additiveHistory_sub_firstOrder_le (table : ∀ ℓ, Deme → Allele
     rw [hlength, historyEventPropagator, eventPropagator, ← Matrix.mulVec_mulVec, epochDuration]
     simpa only [additiveHistoryCorrection, historyCorrection] using h
 
+/-! ## Portability -/
+
+/-- **The first-order portability correction is linear in the direction**: for a sum of directions
+it is the sum of the corrections. -/
+theorem portabilityFirstOrder_sum {K : Type*} [DecidableEq K] (s : Finset K) (ℓ₀ : Locus)
+    (source target : Deme) (score outcome : FullHaplotype Locus Allele → ℝ)
+    (m₀ : BudgetConfiguration Deme Locus Allele (fun _ ↦ 4) → ℝ)
+    (m₁ : K → BudgetConfiguration Deme Locus Allele (fun _ ↦ 4) → ℝ) :
+    portabilityFirstOrder ℓ₀ source target score outcome m₀ (∑ j ∈ s, m₁ j)
+      = ∑ j ∈ s, portabilityFirstOrder ℓ₀ source target score outcome m₀ (m₁ j) := by
+  simp only [portabilityFirstOrder, dotProduct_sum]
+  exact crossRatioDerivative_sum s _ _ _ _ _ _ _ _
+
+/-- **Portability moves by the sum of the per-locus first-order terms**: the first-order
+portability correction in the direction of the additive history correction is the sum over loci of
+the corrections in the one-locus directions. -/
+theorem portabilityFirstOrder_additiveHistoryCorrection (ℓ₀ : Locus)
+    (table : ∀ ℓ, Deme → Allele ℓ → ℝ)
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (source target : Deme) (score outcome : FullHaplotype Locus Allele → ℝ)
+    (m₀ : BudgetConfiguration Deme Locus Allele (fun _ ↦ 4) → ℝ)
+    (w : ∀ ℓ, BudgetConfiguration Deme Locus Allele
+      (bumpCapacity (locusModel table ℓ) (fun _ ↦ 4)) → ℝ) :
+    portabilityFirstOrder ℓ₀ source target score outcome m₀
+        (additiveHistoryCorrection table (fun _ ↦ 4) events w)
+      = ∑ ℓ, portabilityFirstOrder ℓ₀ source target score outcome m₀
+          (historyCorrection (locusModel table ℓ) (fun _ ↦ 4) events (w ℓ)) :=
+  portabilityFirstOrder_sum Finset.univ ℓ₀ source target score outcome m₀ _
+
+/-- **Portability under additive selection to first order.** Along a history selected with
+additive fitness, the table of locus `ℓ` in `[0, σ_ℓ]` with masses at most `S_ℓ`, where the target
+denominator and the source numerator are at least `δ > 0` under the selected family and at the
+neutral end moments `m₀`, the portability of expected accuracies of the selected history is its
+value at `m₀` plus the first-order correction in the direction of the additive history correction,
+up to `crossRatioRemainder α β γ κ e₀ e₁ e₂ δ`. Here `α, β, γ, κ` are the coefficient masses of the
+target numerator, source denominator, target denominator and source numerator,
+`e₀ = B (Σ_ℓ σ_ℓ) T`, `e₁ = 2 B (Σ_ℓ S_ℓ) T`, `e₂ = B (B + 1) (Σ_ℓ S_ℓ) (Σ_ℓ σ_ℓ) T²` and
+`B = 4 |L|`, so the remainder is quadratic in the fitness scale.
+
+Assumes: `AdditiveSelectedOnHistory table (fun _ ↦ 4) family events 0` and, for every locus `ℓ`,
+`AdditiveSelectedOnHistory table (bumpCapacity (locusModel table ℓ) (fun _ ↦ 4)) family events 0`.
+-/
+theorem abs_additivePortability_sub_firstOrder_le (ℓ₀ : Locus)
+    (table : ∀ ℓ, Deme → Allele ℓ → ℝ) {σ S : Locus → ℝ} (hσ : ∀ ℓ, 0 ≤ σ ℓ)
+    (hS0 : ∀ ℓ, 0 ≤ S ℓ) (hfit : ∀ ℓ i b, 0 ≤ table ℓ i b ∧ table ℓ i b ≤ σ ℓ)
+    (hS : ∀ ℓ i, ∑ b, |table ℓ i b| ≤ S ℓ)
+    (family : ℕ → ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele)))
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (hhistory : AdditiveSelectedOnHistory table (fun _ ↦ 4) family events 0)
+    (hhistory' : ∀ ℓ, AdditiveSelectedOnHistory table
+      (bumpCapacity (locusModel table ℓ) (fun _ ↦ 4)) family events 0)
+    (source target : Deme) (score outcome : FullHaplotype Locus Allele → ℝ) {δ : ℝ}
+    (hδ : 0 < δ)
+    (htarget : δ ≤ family events.length 0 fun law ↦
+      correlationDenominator (law target) score outcome)
+    (hsource : δ ≤ family events.length 0 fun law ↦
+      correlationNumerator (law source) score outcome)
+    (htarget₀ : δ ≤ budgetCoefficients ℓ₀ (fun _ ↦ 4) (denominatorPolynomial target score outcome)
+      ⬝ᵥ neutralEndMoments (fun _ ↦ 4) family events)
+    (hsource₀ : δ ≤ budgetCoefficients ℓ₀ (fun _ ↦ 4) (numeratorPolynomial source score outcome)
+      ⬝ᵥ neutralEndMoments (fun _ ↦ 4) family events) :
+    |selectedPortability family events.length source target score outcome
+        - momentPortability ℓ₀ source target score outcome
+          (neutralEndMoments (fun _ ↦ 4) family events)
+        - portabilityFirstOrder ℓ₀ source target score outcome
+          (neutralEndMoments (fun _ ↦ 4) family events)
+          (additiveHistoryCorrection table (fun _ ↦ 4) events (fun ℓ ↦
+            expectedMomentVector (bumpCapacity (locusModel table ℓ) (fun _ ↦ 4)) (family 0) 0))|
+      ≤ crossRatioRemainder (coefficientMass ℓ₀ (numeratorPolynomial target score outcome))
+          (coefficientMass ℓ₀ (denominatorPolynomial source score outcome))
+          (coefficientMass ℓ₀ (denominatorPolynomial target score outcome))
+          (coefficientMass ℓ₀ (numeratorPolynomial source score outcome))
+          (4 * Fintype.card Locus * (∑ ℓ, σ ℓ) * epochDuration events)
+          (2 * (4 * Fintype.card Locus) * (∑ ℓ, S ℓ) * epochDuration events)
+          (4 * Fintype.card Locus * (4 * Fintype.card Locus + 1) * (∑ ℓ, S ℓ) * (∑ ℓ, σ ℓ)
+            * epochDuration events ^ 2) δ := by
+  have hV := norm_expectedMomentVector_le_one (fun _ ↦ 4) (family events.length) 0
+  have hm₀ : ‖neutralEndMoments (fun _ ↦ 4) family events‖ ≤ 1 :=
+    (norm_mulVec_le_of_substochastic (historyEventPropagator_substochastic (fun _ ↦ 4) events)
+      (expectedMomentVector (fun _ ↦ 4) (family 0) 0)).trans
+        (norm_expectedMomentVector_le_one (fun _ ↦ 4) (family 0) 0)
+  have h₀ := norm_additiveHistory_sub_propagator_le table hσ hfit (fun _ ↦ 4) family events 0
+    hhistory
+  rw [zero_add, sum_four_capacity] at h₀
+  have h₁ : ‖(1 : ℝ) • additiveHistoryCorrection table (fun _ ↦ 4) events (fun ℓ ↦
+      expectedMomentVector (bumpCapacity (locusModel table ℓ) (fun _ ↦ 4)) (family 0) 0)‖
+      ≤ 2 * (4 * Fintype.card Locus) * (∑ ℓ, S ℓ) * epochDuration events := by
+    rw [one_smul, additiveHistoryCorrection, Finset.mul_sum, Finset.sum_mul]
+    refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun ℓ _ ↦ ?_)
+    have h := norm_historyCorrection_le (locusModel table ℓ) (hS0 ℓ) (hS ℓ) (fun _ ↦ 4) events
+      (expectedMomentVector (bumpCapacity (locusModel table ℓ) (fun _ ↦ 4)) (family 0) 0)
+    rw [sum_four_capacity] at h
+    exact h.trans (mul_le_of_le_one_right
+      (mul_nonneg (mul_nonneg (by positivity) (hS0 ℓ)) (epochDuration_nonneg events))
+      (norm_expectedMomentVector_le_one _ (family 0) 0))
+  have h₂ : ‖expectedMomentVector (fun _ ↦ 4) (family events.length) 0
+      - neutralEndMoments (fun _ ↦ 4) family events
+      - (1 : ℝ) • additiveHistoryCorrection table (fun _ ↦ 4) events (fun ℓ ↦
+        expectedMomentVector (bumpCapacity (locusModel table ℓ) (fun _ ↦ 4)) (family 0) 0)‖
+      ≤ 4 * Fintype.card Locus * (4 * Fintype.card Locus + 1) * (∑ ℓ, S ℓ) * (∑ ℓ, σ ℓ)
+        * epochDuration events ^ 2 := by
+    have h := norm_additiveHistory_sub_firstOrder_le table hσ hS0 hfit hS (fun _ ↦ 4) family
+      events 0 hhistory hhistory'
+    rw [zero_add, sum_four_capacity] at h
+    rw [one_smul]
+    exact h
+  have hC : δ ≤ budgetCoefficients ℓ₀ (fun _ ↦ 4) (denominatorPolynomial target score outcome)
+      ⬝ᵥ expectedMomentVector (fun _ ↦ 4) (family events.length) 0 := by
+    rw [expectation_correlationDenominator ℓ₀] at htarget
+    exact htarget
+  have hD : δ ≤ budgetCoefficients ℓ₀ (fun _ ↦ 4) (numeratorPolynomial source score outcome)
+      ⬝ᵥ expectedMomentVector (fun _ ↦ 4) (family events.length) 0 := by
+    rw [expectation_correlationNumerator ℓ₀] at hsource
+    exact hsource
+  have hcross := abs_crossRatio_dotProduct_sub_firstOrder_le
+    (budgetCoefficients ℓ₀ (fun _ ↦ 4) (numeratorPolynomial target score outcome))
+    (budgetCoefficients ℓ₀ (fun _ ↦ 4) (denominatorPolynomial source score outcome)) _ _ hδ hV
+    hm₀ h₀ h₁ h₂ hC hD htarget₀ hsource₀
+  rw [one_mul] at hcross
+  rw [selectedPortability_eq_momentPortability ℓ₀]
+  exact hcross
+
+/-- **Selection raises portability to first order exactly when the target gains more.** For
+per-locus first-order directions `m₁ ℓ` and positive target and source accuracy components at
+`m₀`, the sum of the per-locus first-order portability terms is positive exactly when the relative
+first-order change of the target accuracy in the summed direction exceeds that of the source
+accuracy. -/
+theorem additivePortabilityFirstOrder_pos_iff (ℓ₀ : Locus) (source target : Deme)
+    (score outcome : FullHaplotype Locus Allele → ℝ)
+    (m₀ : BudgetConfiguration Deme Locus Allele (fun _ ↦ 4) → ℝ)
+    (m₁ : Locus → BudgetConfiguration Deme Locus Allele (fun _ ↦ 4) → ℝ)
+    (hNt : 0 < budgetCoefficients ℓ₀ (fun _ ↦ 4) (numeratorPolynomial target score outcome) ⬝ᵥ m₀)
+    (hDs : 0 < budgetCoefficients ℓ₀ (fun _ ↦ 4) (denominatorPolynomial source score outcome)
+      ⬝ᵥ m₀)
+    (hDt : 0 < budgetCoefficients ℓ₀ (fun _ ↦ 4) (denominatorPolynomial target score outcome)
+      ⬝ᵥ m₀)
+    (hNs : 0 < budgetCoefficients ℓ₀ (fun _ ↦ 4) (numeratorPolynomial source score outcome)
+      ⬝ᵥ m₀) :
+    0 < ∑ ℓ, portabilityFirstOrder ℓ₀ source target score outcome m₀ (m₁ ℓ)
+      ↔ budgetCoefficients ℓ₀ (fun _ ↦ 4) (numeratorPolynomial source score outcome)
+              ⬝ᵥ (∑ ℓ, m₁ ℓ)
+            / budgetCoefficients ℓ₀ (fun _ ↦ 4) (numeratorPolynomial source score outcome) ⬝ᵥ m₀
+          - budgetCoefficients ℓ₀ (fun _ ↦ 4) (denominatorPolynomial source score outcome)
+              ⬝ᵥ (∑ ℓ, m₁ ℓ)
+            / budgetCoefficients ℓ₀ (fun _ ↦ 4) (denominatorPolynomial source score outcome) ⬝ᵥ m₀
+        < budgetCoefficients ℓ₀ (fun _ ↦ 4) (numeratorPolynomial target score outcome)
+              ⬝ᵥ (∑ ℓ, m₁ ℓ)
+            / budgetCoefficients ℓ₀ (fun _ ↦ 4) (numeratorPolynomial target score outcome) ⬝ᵥ m₀
+          - budgetCoefficients ℓ₀ (fun _ ↦ 4) (denominatorPolynomial target score outcome)
+              ⬝ᵥ (∑ ℓ, m₁ ℓ)
+            / budgetCoefficients ℓ₀ (fun _ ↦ 4) (denominatorPolynomial target score outcome)
+              ⬝ᵥ m₀ := by
+  rw [← portabilityFirstOrder_sum]
+  exact portabilityFirstOrder_pos_iff ℓ₀ source target score outcome m₀ _ hNt hDs hDt hNs
+
+/-- **Selection raises portability to first order whenever every locus raises it**: if every
+per-locus first-order portability term is positive, so is the first-order correction in the summed
+direction. -/
+theorem additivePortabilityFirstOrder_pos_of_forall (ℓ₀ : Locus) (source target : Deme)
+    (score outcome : FullHaplotype Locus Allele → ℝ)
+    (m₀ : BudgetConfiguration Deme Locus Allele (fun _ ↦ 4) → ℝ)
+    (m₁ : Locus → BudgetConfiguration Deme Locus Allele (fun _ ↦ 4) → ℝ)
+    (hpositive : ∀ ℓ, 0 < portabilityFirstOrder ℓ₀ source target score outcome m₀ (m₁ ℓ)) :
+    0 < portabilityFirstOrder ℓ₀ source target score outcome m₀ (∑ ℓ, m₁ ℓ) := by
+  rw [portabilityFirstOrder_sum]
+  exact Finset.sum_pos (fun ℓ _ ↦ hpositive ℓ) ⟨ℓ₀, Finset.mem_univ ℓ₀⟩
+
 end
 
 end Descent.Portability.PolygenicSelectionHistory
