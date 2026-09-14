@@ -1,0 +1,35 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.MigrationPortabilityRemainder
+
+/-! Axiom audit of MigrationPortabilityRemainder. -/
+
+open Descent.Portability.MigrationPortabilityRemainder
+
+#print axioms norm_matrixExponential_add_smul_sub_le
+#print axioms norm_affineMigrationHistory_sub_le
+#print axioms abs_linkageMigrationStencil_sub_le
+#print axioms abs_heterozygosityMigrationStencil_sub_le
+#print axioms abs_integral_exp_mul_sub_le
+#print axioms abs_exp_mul_add_sub_le
+#print axioms linkageValue
+#print axioms heterozygosityValue
+#print axioms linkageSlope
+#print axioms heterozygositySlope
+#print axioms migrationRemainderConstant
+#print axioms migrationRemainderConstant_nonneg
+#print axioms abs_migrationHistory_DD_sub_le
+#print axioms abs_migrationHistory_pi2_sub_le
+#print axioms abs_div_sub_div_sub_mul_le
+#print axioms sub_div_sub_mul_div
+#print axioms abs_div_le_div_mul
+#print axioms linkageValue_div_heterozygosityValue
+#print axioms slopes_div_eq_firstOrderMigrationFactor
+#print axioms migrationRatioRemainderConstant
+#print axioms abs_splitPortabilityRatio_withSymmetricMigration_sub_le
+#print axioms exists_abs_splitPortabilityRatio_sub_lt
+#print axioms exists_portabilityDecay_lt_splitPortabilityRatio
+#print axioms exists_splitPortabilityRatio_lt_portabilityDecay
+#print axioms firstOrderMigrationFactor_nonneg_of_raises
+#print axioms exists_portabilityDecay_lt_splitPortabilityRatio_zeroRecombination
