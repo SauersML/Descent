@@ -19,6 +19,9 @@ import Descent.Portability.EndToEndCalibrationLaw
 import Descent.Portability.EndToEndPooledCalibration
 import Descent.Portability.EndToEndDiscriminationLaw
 import Descent.Portability.EndToEndBrierLaw
+import Descent.Portability.EndToEndLogLossLaw
+import Descent.Portability.EndToEndDiploidGWASTraining
+import Descent.Portability.EndToEndSensitivityRatePathMetrics
 import Descent.Portability.EndToEndDeploymentLaw
 import Descent.Portability.PortabilityMomentLadder
 import Descent.Portability.PortabilityMomentLadderSharpness
@@ -164,6 +167,20 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   (`EndToEndBrierLaw.expectedRepairedBrier_historyEventKernel`,
   `expectedRepairedBrier_historyEventKernel_le`,
   `expectedCalibrationError_bounds_historyEventKernel`).
+* **Log loss, entropy and mutual information.**  The log loss of the forecast repaired to each
+  score group's realized rate is the conditional entropy of the outcome given the score
+  (`EndToEndLogLossLaw.expectation_neg_log_repairedGroupForecast`,
+  `conditionalEntropy_eq_repairedLogLoss`).  The entropy function is the division-free series
+  `η(x) = Σ_k x (1 − x)^{k+1}/(k + 1)` with tail at most `(1 − x)^{K+1}/(K + 1)`
+  (`negMulLog_hasSum`, `negMulLog_truncation_mem`), so the expected entropy, conditional entropy
+  and mutual information along any history are series of propagated-moment dot products with
+  explicit truncation certificates (`expectedEntropy_eq_tsum_dotProduct`,
+  `expectedConditionalEntropy_eq_tsum_dotProduct`, `expectedMutualInformation_eq_tsum_dotProduct`).
+  The log loss of any fixed forecast is exact at budget 1, never below the conditional entropy,
+  and infinite exactly when a ruled-out outcome has positive mass
+  (`expectedForecastLogLoss_eq_dotProduct`, `conditionalEntropy_le_forecastLogLoss`,
+  `expectedLogLoss_groupForecast_eq_top`).  Pseudo-`R²` and its portability are ratios of these
+  series (`pseudoRSquaredPortability_eq_tsum_dotProduct`).
 * **Stability.**  Propagators of two rate paths differ by at most
   `(∫‖Q₁ − Q₂‖) e^{∫‖Q₁‖} e^{∫‖Q₂‖}`
   (`EndToEndPortabilityLipschitz.norm_rateHistoryDualPropagator_sub_le`).  Expected portability,
@@ -215,7 +232,9 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
 * With dominance the law holds at budget 8, along event and rate histories
   (`EndToEndDiploidHistoryLaw.expectedDiploidPortability_historyEventKernel_budgetEight`,
   `expectedDiploidPortability_rateHistoryKernel_budgetEight`).  For additive scores it agrees with
-  the haploid budget-4 function (`diploidMomentPortability_diploidSum_historyEventKernel`).
+  the haploid budget-4 function, along event histories and along rate histories
+  (`diploidMomentPortability_diploidSum_historyEventKernel`,
+  `EndToEndDiploidGWASTraining.diploidMomentPortability_diploidSum_rateHistoryKernel`).
 
 ## 4. The score: training and ascertainment
 
@@ -239,6 +258,15 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
     `trainingWitness_accuracy`).
   * Along any history it is rational in the budget-8 moments and `n`
     (`EndToEndGWASTrainingHistory.expectedTrainedAccuracy_historyEventKernel`).
+  * Trained on diploid individuals, the gamete-pair masses have degree two in the haplotype
+    frequencies, so the trained numerator and denominator are polynomials of total degree at most
+    sixteen in the two demes, and the expected diploid trained accuracy is rational in the
+    propagated budget-16 moments and `n`, along event and rate histories
+    (`EndToEndDiploidGWASTraining.trainedNumerator_stateGenotypeLaw`,
+    `totalDegree_diploidTrainedPolynomial_le`, `expectedDiploidTrainedAccuracy_eq_moment`,
+    `expectedDiploidTrainedAccuracy_historyEventKernel`,
+    `expectedDiploidTrainedAccuracy_rateHistoryKernel`,
+    `expectedDiploidTrainedAccuracy_eq_of_moments_eq`).
 * **Thresholding on the training cohort, and the winner's curse.**
   * Any statistic of the training cohort is a learner, and its expected accuracy reads the
     second-moment matrix of the learned weights against the target matrices
@@ -316,7 +344,14 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   `∫₀ᵀ U(T, s) Δ(s) U(s, 0) ds` (`TwoTimeRatePropagator.twoTimePropagator_self`,
   `twoTimePropagator_mul`, `hasDerivWithinAt_twoTimePropagator_left`,
   `hasDerivWithinAt_twoTimePropagator_right`, `hasDerivAt_twoTimePropagator_affinePath`,
-  `ratePathSensitivity_eq_integral`).  The expected squared correlation is
+  `ratePathSensitivity_eq_integral`).  Calibration and AUC move the same way along a rate path:
+  the calibration slope, calibration portability, intercept and AUC portability of expectations
+  have exact derivatives in Duhamel form, and calibration or AUC portability decreases exactly
+  when the target's relative sensitivity is below the source's
+  (`EndToEndSensitivityRatePathMetrics.hasDerivAt_expectedCalibrationPortability_rateSegment`,
+  `hasDerivAt_expectedAUCPortability_rateSegment`, `ratePathSensitivity_eq_duhamelSensitivity`,
+  `deriv_expectedCalibrationPortability_rateSegment_neg_iff`,
+  `deriv_expectedAUCPortability_rateSegment_neg_iff`).  The expected squared correlation is
   differentiated termwise along segment histories
   (`EndToEndSensitivitySeries.summable_integral_seriesTerm`,
   `hasDerivAt_expectedSquaredCorrelation_segmentHistory`).
