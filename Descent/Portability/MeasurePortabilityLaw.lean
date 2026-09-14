@@ -41,7 +41,7 @@ omit [IsProbabilityMeasure μ] in
 theorem linearScore_memLp (weights : J → ℝ) (genotype : J → Ω → ℝ)
     (hgenotype : ∀ marker, MemLp (genotype marker) 2 μ) :
     MemLp (linearScore weights genotype) 2 μ := by
-  exact memLp_finsetSum Finset.univ
+  exact memLp_finset_sum Finset.univ
     (fun marker _ ↦ (hgenotype marker).const_mul (weights marker))
 
 /-- The numerator's unsquared covariance is an exact weighted sum under the joint law. -/
@@ -53,7 +53,7 @@ theorem covariance_linearScore (weights : J → ℝ) (genotype : J → Ω → �
   unfold linearScore
   rw [covariance_fun_sum_left
     (fun marker ↦ (hgenotype marker).const_mul (weights marker)) hphenotype]
-  simp only [covariance_const_mul_left]
+  simp only [covariance_mul_left]
 
 /-- Every pairwise linkage covariance contributes to score variance; no diagonal or
 independence approximation is made. -/
@@ -64,7 +64,7 @@ theorem variance_linearScore (weights : J → ℝ) (genotype : J → Ω → ℝ)
         weights first * weights second * covariance (genotype first) (genotype second) μ := by
   unfold linearScore
   rw [variance_fun_sum (fun marker ↦ (hgenotype marker).const_mul (weights marker))]
-  simp only [covariance_const_mul_left, covariance_const_mul_right, mul_assoc, mul_left_comm]
+  simp only [covariance_mul_left, covariance_mul_right, mul_assoc, mul_left_comm]
 
 /-- Squared correlation on its square-integrable, nondegenerate variance domain. Variables
 without finite second moments are rejected by the definition itself. -/
