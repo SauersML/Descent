@@ -1,0 +1,52 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.CalibrationPortabilityDecay
+
+/-! Axiom audit of CalibrationPortabilityDecay. -/
+
+open Descent.Portability.CalibrationPortabilityDecay
+
+#print axioms trainedWeight
+#print axioms trainedScoreVariance
+#print axioms predictiveCovariance
+#print axioms outcomeVariance
+#print axioms calibrationSlope
+#print axioms squaredCorrelation
+#print axioms calibrationPortability
+#print axioms squaredCorrelationPortability
+#print axioms predictiveCovariance_source
+#print axioms calibrationSlope_source
+#print axioms calibrationPortability_eq
+#print axioms squaredCorrelationPortability_eq_calibrationPortability_sq
+#print axioms squaredCorrelationPortability_eq_calibrationPortability_iff
+#print axioms trainedShare
+#print axioms trainedShare_nonneg
+#print axioms sum_trainedShare
+#print axioms trainedScoreVariance_pos
+#print axioms trainedShare_pos
+#print axioms outcomeVariance_pos
+#print axioms calibrationSlope_retained
+#print axioms calibrationPortability_decay
+#print axioms squaredCorrelationPortability_decay
+#print axioms calibrationPortability_decay_zero
+#print axioms portabilityDecay_sq
+#print axioms calibrationPortability_commonRate
+#print axioms squaredCorrelationPortability_commonRate
+#print axioms polygenicDecay_nonneg
+#print axioms polygenicDecay_pos
+#print axioms polygenicDecay_le_one
+#print axioms polygenicDecay_lt_one
+#print axioms tendsto_calibrationPortability_decay
+#print axioms tendsto_squaredCorrelationPortability_decay
+#print axioms calibrationPortability_decay_antitone
+#print axioms squaredCorrelationPortability_decay_antitone
+#print axioms squaredCorrelationPortability_decay_le
+#print axioms squaredCorrelationPortability_decay_lt
+#print axioms sq_weightedMean_le_weightedMean_sq
+#print axioms squaredCorrelationPortability_decay_le_polygenicDecay
+#print axioms splitPortabilityRatio_eq_mul_portabilityDecay
+#print axioms splitPortabilityRatio_eq_sq_portabilityDecay
+#print axioms splitPortabilityRatio_eq_squaredCorrelationPortability
+#print axioms calibrationPortability_sq_eq_splitPortabilityRatio
+#print axioms splitPortabilityRatio_lt_calibrationPortability
