@@ -1,0 +1,30 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.EndToEndSensitivityRatePathMetrics
+
+/-! Axiom audit of EndToEndSensitivityRatePathMetrics. -/
+
+open Descent.Portability.EndToEndSensitivityRatePathMetrics
+
+#print axioms integral_interceptNumerator_rateHistoryKernel
+#print axioms integral_aucNumerator_rateHistoryKernel
+#print axioms integral_aucDenominator_rateHistoryKernel
+#print axioms segmentKernel
+#print axioms hasDerivAt_integral_covariance_rateSegment
+#print axioms hasDerivAt_integral_variance_rateSegment
+#print axioms hasDerivAt_integral_interceptNumerator_rateSegment
+#print axioms hasDerivAt_integral_aucNumerator_rateSegment
+#print axioms hasDerivAt_integral_aucDenominator_rateSegment
+#print axioms hasDerivAt_expectedCalibrationSlope_rateSegment
+#print axioms hasDerivAt_expectedCalibrationPortability_rateSegment
+#print axioms hasDerivAt_expectedCalibrationIntercept_rateSegment
+#print axioms hasDerivAt_expectedAUCPortability_rateSegment
+#print axioms duhamelSensitivity
+#print axioms ratePathSensitivity_eq_duhamelSensitivity
+#print axioms hasDerivAt_expectedCalibrationSlope_rateSegment_duhamel
+#print axioms hasDerivAt_expectedCalibrationPortability_rateSegment_duhamel
+#print axioms hasDerivAt_expectedCalibrationIntercept_rateSegment_duhamel
+#print axioms hasDerivAt_expectedAUCPortability_rateSegment_duhamel
+#print axioms deriv_expectedCalibrationPortability_rateSegment_neg_iff
+#print axioms deriv_expectedAUCPortability_rateSegment_neg_iff
