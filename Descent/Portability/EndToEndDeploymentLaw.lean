@@ -296,8 +296,9 @@ def pooledTrainedWeights {Deme : Type*} [Fintype Deme] (share : Deme → ℝ)
 /-- A unit share at one deme picks that deme's term out of a share-weighted sum. -/
 theorem sum_single_smul {Deme V : Type*} [Fintype Deme] [DecidableEq Deme] [AddCommMonoid V]
     [Module ℝ V] (training : Deme) (f : Deme → V) :
-    ∑ j, Pi.single training (1 : ℝ) j • f j = f training := by
-  have hzero : ∀ j ∈ Finset.univ, j ≠ training → Pi.single training (1 : ℝ) j • f j = 0 :=
+    ∑ j, (Pi.single training (1 : ℝ) : Deme → ℝ) j • f j = f training := by
+  have hzero : ∀ j ∈ Finset.univ, j ≠ training →
+      (Pi.single training (1 : ℝ) : Deme → ℝ) j • f j = 0 :=
     fun j _ hj ↦ by rw [Pi.single_eq_of_ne hj, zero_smul]
   rw [Finset.sum_eq_single training hzero (fun hmem ↦ absurd (Finset.mem_univ training) hmem),
     Pi.single_eq_same, one_smul]
@@ -308,8 +309,7 @@ theorem pooledTrainedWeights_single {Deme : Type*} [Fintype Deme] [DecidableEq D
     (penalty : ℝ) :
     pooledTrainedWeights (Pi.single training 1) m a penalty
       = trainedWeights (m training) (a training) penalty := by
-  rw [pooledTrainedWeights, sum_single_smul, sum_single_smul]
-  rfl
+  rw [pooledTrainedWeights, sum_single_smul, sum_single_smul, trainedWeights]
 
 /-- **Ridge training in its own deme**: the score's covariance with the training outcome exceeds its
 variance by the penalty times the squared weight norm. -/
