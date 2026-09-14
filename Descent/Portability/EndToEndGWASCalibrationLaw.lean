@@ -343,6 +343,196 @@ theorem variance_le_pairingForm (source target : FiniteReportLaw Ω) (genotype :
 
 end Finite
 
+/-! ## The attenuation factor -/
+
+/-- **The attenuation factor** `α / (α + β / n + γ / (n (n − 1)))`: the population term of a
+sampling form over the form. -/
+def attenuationFactor (population excess pairing : ℝ) (size : ℕ) : ℝ :=
+  population / samplingForm population excess pairing size
+
+/-- The attenuation factor is nonnegative. -/
+theorem attenuationFactor_nonneg {α β γ : ℝ} (hα : 0 ≤ α) (hβ : 0 ≤ β) (hγ : 0 ≤ γ) {size : ℕ}
+    (hsize : 2 ≤ size) : 0 ≤ attenuationFactor α β γ size :=
+  div_nonneg hα (hα.trans (le_samplingForm hβ hγ hsize))
+
+/-- **The attenuation factor is at most one.** -/
+theorem attenuationFactor_le_one {α β γ : ℝ} (hα : 0 ≤ α) (hβ : 0 ≤ β) (hγ : 0 ≤ γ) {size : ℕ}
+    (hsize : 2 ≤ size) : attenuationFactor α β γ size ≤ 1 := by
+  rcases hα.eq_or_lt with hzero | hpositive
+  · subst hzero
+    rw [attenuationFactor, zero_div]
+    exact zero_le_one
+  · exact (div_le_one (hpositive.trans_le (le_samplingForm hβ hγ hsize))).mpr
+      (le_samplingForm hβ hγ hsize)
+
+/-- **The attenuation factor rises with the cohort size.** -/
+theorem attenuationFactor_monotone {α β γ : ℝ} (hα : 0 ≤ α) (hβ : 0 ≤ β) (hγ : 0 ≤ γ)
+    {small large : ℕ} (hsmall : 2 ≤ small) (hle : small ≤ large) :
+    attenuationFactor α β γ small ≤ attenuationFactor α β γ large := by
+  rcases hα.eq_or_lt with hzero | hpositive
+  · subst hzero
+    simp only [attenuationFactor, zero_div, le_refl]
+  · exact div_le_div_of_nonneg_left hα
+      (hpositive.trans_le (le_samplingForm hβ hγ (hsmall.trans hle)))
+      (samplingForm_antitone hβ hγ hsmall hle)
+
+/-- **The attenuation factor tends to one** as the cohort grows, whenever the population term is
+nonzero. -/
+theorem tendsto_attenuationFactor {α : ℝ} (hα : α ≠ 0) (β γ : ℝ) :
+    Tendsto (fun size : ℕ ↦ attenuationFactor α β γ size) atTop (𝓝 1) := by
+  have hlimit := (tendsto_const_nhds (x := α)).div (tendsto_samplingForm α β γ) hα
+  rw [div_self hα] at hlimit
+  exact hlimit
+
+/-- **A ratio over a sampling form is the ratio over its population term times the attenuation
+factor**, whenever the population term is nonzero. -/
+theorem div_samplingForm_eq_mul_attenuationFactor (c : ℝ) {α : ℝ} (hα : α ≠ 0) (β γ : ℝ)
+    (size : ℕ) :
+    c / samplingForm α β γ size = c / α * attenuationFactor α β γ size := by
+  rw [attenuationFactor, div_mul_div_comm, mul_comm c α, mul_div_mul_left c _ hα]
+
+/-! ## The attenuation law of the trained slope -/
+
+section Attenuation
+
+variable {Ω : Type*} [Fintype Ω] {J : Type*} [Fintype J]
+
+/-- **The exact attenuation law.**  The trained calibration slope is the population slope
+`C_t(S_w, Y) / α` times the attenuation factor `α / (α + β / n + γ / (n (n − 1)))`, with
+`α = V_t(S_w)` and the excess and pairing forms `β`, `γ`.  There is no side condition: where
+`α = 0` Cauchy–Schwarz forces the covariance to vanish and both sides are zero. -/
+theorem trainedCalibrationSlope_eq_mul_attenuationFactor (source target : FiniteReportLaw Ω)
+    {size : ℕ} (hsize : 2 ≤ size) (genotype : Ω → J → ℝ) (outcome : Ω → ℝ) :
+    trainedCalibrationSlope source target size genotype outcome
+      = populationCalibrationSlope source target genotype outcome
+        * attenuationFactor
+            (target.variance (linearScore genotype (marginalWeights source genotype outcome)))
+            (excessForm source target genotype outcome) (pairingForm source target genotype outcome)
+            size := by
+  rw [trainedCalibrationSlope, trainedCovariance_eq source target hsize,
+    trainedVariance_eq source target hsize, populationCalibrationSlope]
+  by_cases hzero :
+      target.variance (linearScore genotype (marginalWeights source genotype outcome)) = 0
+  · have hsquare := target.covariance_sq_le_variance_mul
+      (linearScore genotype (marginalWeights source genotype outcome)) outcome
+    rw [hzero, zero_mul] at hsquare
+    have hcovariance : target.covariance
+        (linearScore genotype (marginalWeights source genotype outcome)) outcome = 0 :=
+      (pow_eq_zero_iff two_ne_zero).mp (le_antisymm hsquare (sq_nonneg _))
+    rw [hcovariance, zero_div, zero_div, zero_mul]
+  · exact div_samplingForm_eq_mul_attenuationFactor _ hzero _ _ _
+
+/-- **Finite training never amplifies a nonnegative slope.** -/
+theorem trainedCalibrationSlope_le_populationCalibrationSlope (source target : FiniteReportLaw Ω)
+    {size : ℕ} (hsize : 2 ≤ size) (genotype : Ω → J → ℝ) (outcome : Ω → ℝ)
+    (hslope : 0 ≤ populationCalibrationSlope source target genotype outcome) :
+    trainedCalibrationSlope source target size genotype outcome
+      ≤ populationCalibrationSlope source target genotype outcome := by
+  rw [trainedCalibrationSlope_eq_mul_attenuationFactor source target hsize]
+  exact mul_le_of_le_one_right hslope (attenuationFactor_le_one (target.variance_nonneg _)
+    (excessForm_nonneg source target genotype outcome)
+    (pairingForm_nonneg source target genotype outcome) hsize)
+
+/-- **The trained slope rises with the cohort size** when the population slope is nonnegative.
+Accuracy has no such monotonicity (`populationAccuracy_lt_trainedAccuracy`). -/
+theorem trainedCalibrationSlope_monotone (source target : FiniteReportLaw Ω) {small large : ℕ}
+    (hsmall : 2 ≤ small) (hle : small ≤ large) (genotype : Ω → J → ℝ) (outcome : Ω → ℝ)
+    (hslope : 0 ≤ populationCalibrationSlope source target genotype outcome) :
+    trainedCalibrationSlope source target small genotype outcome
+      ≤ trainedCalibrationSlope source target large genotype outcome := by
+  rw [trainedCalibrationSlope_eq_mul_attenuationFactor source target hsmall,
+    trainedCalibrationSlope_eq_mul_attenuationFactor source target (hsmall.trans hle)]
+  exact mul_le_mul_of_nonneg_left (attenuationFactor_monotone (target.variance_nonneg _)
+    (excessForm_nonneg source target genotype outcome)
+    (pairingForm_nonneg source target genotype outcome) hsmall hle) hslope
+
+/-- **The trained slope tends to the population slope** as the cohort grows, with no side
+condition. -/
+theorem tendsto_trainedCalibrationSlope (source target : FiniteReportLaw Ω)
+    (genotype : Ω → J → ℝ) (outcome : Ω → ℝ) :
+    Tendsto (fun size : ℕ ↦ trainedCalibrationSlope source target size genotype outcome) atTop
+      (𝓝 (populationCalibrationSlope source target genotype outcome)) := by
+  have hproduct : Tendsto (fun size : ℕ ↦ populationCalibrationSlope source target genotype outcome
+      * attenuationFactor
+          (target.variance (linearScore genotype (marginalWeights source genotype outcome)))
+          (excessForm source target genotype outcome) (pairingForm source target genotype outcome)
+          size) atTop (𝓝 (populationCalibrationSlope source target genotype outcome)) := by
+    by_cases hzero :
+        target.variance (linearScore genotype (marginalWeights source genotype outcome)) = 0
+    · have hslope : populationCalibrationSlope source target genotype outcome = 0 := by
+        rw [populationCalibrationSlope, hzero, div_zero]
+      simp only [hslope, zero_mul]
+      exact tendsto_const_nhds
+    · simpa only [mul_one] using (tendsto_const_nhds
+        (x := populationCalibrationSlope source target genotype outcome)).mul
+          (tendsto_attenuationFactor hzero (excessForm source target genotype outcome)
+            (pairingForm source target genotype outcome))
+  exact hproduct.congr' ((eventually_ge_atTop 2).mono fun _ hsize ↦
+    (trainedCalibrationSlope_eq_mul_attenuationFactor source target hsize genotype outcome).symm)
+
+/-- **Finite training strictly attenuates a positive slope.**  If the population marginal score
+has positive target covariance with the outcome, its target variance is positive by
+Cauchy–Schwarz and the pairing form is at least that variance, so at every finite `n` the trained
+slope lies strictly below the population slope. -/
+theorem trainedCalibrationSlope_lt_populationCalibrationSlope (source target : FiniteReportLaw Ω)
+    {size : ℕ} (hsize : 2 ≤ size) (genotype : Ω → J → ℝ) (outcome : Ω → ℝ)
+    (hcovariance : 0 < target.covariance
+      (linearScore genotype (marginalWeights source genotype outcome)) outcome) :
+    trainedCalibrationSlope source target size genotype outcome
+      < populationCalibrationSlope source target genotype outcome := by
+  have hN : (2 : ℝ) ≤ size := by exact_mod_cast hsize
+  have hvariance : 0 < target.variance
+      (linearScore genotype (marginalWeights source genotype outcome)) := by
+    refine (target.variance_nonneg _).lt_of_ne fun hzero ↦ ?_
+    have hsquare := target.covariance_sq_le_variance_mul
+      (linearScore genotype (marginalWeights source genotype outcome)) outcome
+    rw [← hzero, zero_mul] at hsquare
+    have hpositive := pow_pos hcovariance 2
+    linarith
+  have hpairing := hvariance.trans_le (variance_le_pairingForm source target genotype outcome)
+  have hexcess : 0 ≤ excessForm source target genotype outcome / size :=
+    div_nonneg (excessForm_nonneg source target genotype outcome) (by linarith)
+  have hnoise : 0 < pairingForm source target genotype outcome / (size * (size - 1)) :=
+    div_pos hpairing (mul_pos (by linarith) (by linarith))
+  rw [trainedCalibrationSlope, trainedCovariance_eq source target hsize,
+    trainedVariance_eq source target hsize, populationCalibrationSlope, samplingForm]
+  exact div_lt_div_of_pos_left hcovariance hvariance (by linarith)
+
+/-- The expected target score variance tends to the target variance of the population marginal
+score. -/
+theorem tendsto_trainedVariance (source target : FiniteReportLaw Ω) (genotype : Ω → J → ℝ)
+    (outcome : Ω → ℝ) :
+    Tendsto (fun size : ℕ ↦ trainedVariance source target size genotype outcome) atTop
+      (𝓝 (target.variance (linearScore genotype (marginalWeights source genotype outcome)))) :=
+  (tendsto_samplingForm _ _ _).congr' ((eventually_ge_atTop 2).mono fun _ hsize ↦
+    (trainedVariance_eq source target hsize genotype outcome).symm)
+
+/-- The expected intercept accumulator tends to the intercept accumulator of the population
+marginal score. -/
+theorem tendsto_trainedInterceptAccumulator (source target : FiniteReportLaw Ω)
+    (genotype : Ω → J → ℝ) (outcome : Ω → ℝ) :
+    Tendsto (fun size : ℕ ↦ trainedInterceptAccumulator source target size genotype outcome)
+      atTop (𝓝 (target.expectation outcome
+          * target.variance (linearScore genotype (marginalWeights source genotype outcome))
+        - target.covariance (linearScore genotype (marginalWeights source genotype outcome))
+            outcome
+          * target.expectation (linearScore genotype (marginalWeights source genotype outcome)))) :=
+  (tendsto_samplingForm _ _ _).congr' ((eventually_ge_atTop 2).mono fun _ hsize ↦
+    (trainedInterceptAccumulator_eq source target hsize genotype outcome).symm)
+
+/-- **The trained intercept tends to the population intercept** as the cohort grows, wherever the
+population marginal score varies in the target. -/
+theorem tendsto_trainedCalibrationIntercept (source target : FiniteReportLaw Ω)
+    (genotype : Ω → J → ℝ) (outcome : Ω → ℝ)
+    (hvariance :
+      target.variance (linearScore genotype (marginalWeights source genotype outcome)) ≠ 0) :
+    Tendsto (fun size : ℕ ↦ trainedCalibrationIntercept source target size genotype outcome)
+      atTop (𝓝 (populationCalibrationIntercept source target genotype outcome)) :=
+  (tendsto_trainedInterceptAccumulator source target genotype outcome).div
+    (tendsto_trainedVariance source target genotype outcome) hvariance
+
+end Attenuation
+
 end
 
 end Descent.Portability.EndToEndGWASCalibrationLaw
