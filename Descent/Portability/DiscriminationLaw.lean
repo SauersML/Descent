@@ -1286,7 +1286,7 @@ theorem FinitePipelineKernel.metricDefinedMass_integrable
     (coordinate : PipelineQuantity D) :
     Integrable (fun sample ↦ kernel.predictionKernel.metricDefinedMassAt input sample coordinate)
       (kernel.predictionKernel.scoreKernel.drawLaw input) := by
-  have h := integrable_finsetSum Finset.univ
+  have h := integrable_finset_sum Finset.univ
     (fun outcome _ ↦ kernel.definedOutcome_integrable input coordinate outcome)
   simpa only [← kernel.predictionKernel.outcomeLawAt_definedMass,
     FiniteReportLaw.definedMass, FiniteReportLaw.expectation] using h
@@ -1297,7 +1297,7 @@ theorem FinitePipelineKernel.weightedMetric_integrable
     (coordinate : PipelineQuantity D) :
     Integrable (fun sample ↦ kernel.predictionKernel.weightedMetricAt input sample coordinate)
       (kernel.predictionKernel.scoreKernel.drawLaw input) := by
-  have h := integrable_finsetSum Finset.univ
+  have h := integrable_finset_sum Finset.univ
     (fun outcome _ ↦ kernel.weightedOutcome_integrable input coordinate outcome)
   simpa only [← kernel.predictionKernel.outcomeLawAt_weightedMetric,
     FiniteReportLaw.weightedDefinedMetric, FiniteReportLaw.expectation] using h
