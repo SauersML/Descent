@@ -744,6 +744,11 @@ import Descent.Portability.SelectionHistoryMoments
 import Descent.Portability.EndToEndSelectionLaw
 import Descent.Portability.PortabilityMinimaxRate
 import Descent.Portability.HistoryExactLocality
+import Descent.Portability.EndToEndBrierLaw
+import Descent.Portability.EndToEndPooledCalibration
+import Descent.Portability.EndToEndAscertainedWitness
+import Descent.Portability.SelectionMomentExpansion
+import Descent.Portability.SelectionMomentUniqueness
 
 assert_below Descent.Program
 
