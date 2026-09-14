@@ -161,6 +161,12 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
     (`portabilityReport_and_training_eq_of_momentsAgreeAt_eight`).
   * Every budget fixes the expected per-population metrics
     (`expectedMetrics_eq_of_momentsAgreeAt_all`).
+  * None of this is special to histories of epochs.  Any two process laws with dual moments that
+    agree on degree-four polynomial expectations have one report
+    (`polynomialsAgreeAt_of_hasDualMoments`, `portabilityReport_eq_of_polynomialsAgreeAt_four`).
+    An event history and a continuous rate history with equal propagated budget-4 moments are
+    therefore indistinguishable by every metric of the report
+    (`portabilityReport_historyEvent_eq_rateHistory`).
 
 ## 3. The individual: ploidy
 
