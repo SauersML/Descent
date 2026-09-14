@@ -770,6 +770,7 @@ import Descent.Portability.MigrationPortabilityFirstOrderFactor
 import Descent.Portability.PortabilityMomentLadderEntropy
 import Descent.Portability.SelectionMetricsFirstOrder
 import Descent.Portability.PortabilityMomentLadderDecision
+import Descent.Portability.PortabilityMomentLadderEight
 
 assert_below Descent.Program
 
