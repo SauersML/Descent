@@ -19,7 +19,9 @@ import Descent.Portability.EndToEndCalibrationLaw
 import Descent.Portability.EndToEndPooledCalibration
 import Descent.Portability.EndToEndDiscriminationLaw
 import Descent.Portability.EndToEndBrierLaw
+import Descent.Portability.EndToEndDeploymentLaw
 import Descent.Portability.PortabilityMomentLadder
+import Descent.Portability.PortabilityMomentLadderSharpness
 import Descent.Portability.EndToEndDiploidLaw
 import Descent.Portability.EndToEndDiploidHistoryLaw
 import Descent.Portability.EndToEndGWASTrainingLaw
@@ -29,10 +31,14 @@ import Descent.Portability.EndToEndAscertainedWitness
 import Descent.Portability.TwoLocusPortabilityDecay
 import Descent.Portability.PolygenicPortabilityDecay
 import Descent.Portability.MigrationPortabilityFactor
+import Descent.Portability.MigrationPortabilityFirstOrder
 import Descent.Portability.EndToEndSensitivityLaw
 import Descent.Portability.EndToEndSensitivityMetrics
 import Descent.Portability.EndToEndSensitivityArchitecture
 import Descent.Portability.EndToEndSensitivityRates
+import Descent.Portability.FundamentalMatrixParameterDerivative
+import Descent.Portability.EndToEndSensitivityRatePath
+import Descent.Portability.EndToEndSensitivitySeries
 import Descent.Portability.SelectionHistoryMoments
 import Descent.Portability.EndToEndSelectionLaw
 import Descent.Portability.SelectionMomentExpansion
@@ -110,6 +116,15 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
     form (`deployedMse_excess`).
   * Nothing beyond second moments is covered: two deployments equal in every second-moment metric
     refer different numbers above a cut-off (`statistic_does_not_determine_exceedance`).
+* **The accuracy calculator.**  Under any history the expected deployment moments of each deme,
+  the tag, tag–causal and causal covariances and means, are the deployment moments of the
+  propagated budget-2 moments (`EndToEndDeploymentLaw.expectedDemeMoments_historyEventKernel`,
+  `expectedDemeMoments_rateHistoryKernel`).  So weights trained in a source deme and deployed in a
+  target deme have a deployed `R²`, slope, intercept and error computed from `U · H₂(x₀)`
+  (`transferReport_historyEventKernel`, `transferReport_eq_of_moments_eq`).  The score–outcome
+  covariance moves through a tagging, an architecture and an environment channel, and the score
+  variance only through tagging (`predictiveCovariance_sub_channels`, `scoreVariance_sub_channel`,
+  `outcomeVariance_sub_channels`).
 * **Squared correlation.**  Along any history the expected correlation numerator and denominator
   are coefficient vectors dotted with the propagated budget-4 moments, so expected portability is
   an explicit rational function of `U · H₄(x₀)`
@@ -187,6 +202,14 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
 
 ## 4. The score: training and ascertainment
 
+* **Population ridge training.**  In its own deme a ridge score has covariance with the outcome
+  equal to its variance plus the penalty times the squared weight norm, so its calibration slope is
+  `1 + λ ‖w‖² / Var S`, at least one for a nonnegative penalty and exactly one for least squares,
+  where `R² = Var S / Var Y`
+  (`EndToEndDeploymentLaw.predictiveCovariance_trainedWeights`, `calibrationSlope_trainedWeights`,
+  `one_le_calibrationSlope_trainedWeights`, `calibrationSlope_trainedWeights_zero`,
+  `r2_trainedWeights_zero`).  Pooled training at a unit share is training in that deme
+  (`pooledTrainedWeights_single`).
 * **A finite-sample GWAS.**
   * Marginal weights from `n` source individuals have second moments
     `w_i w_j + E_ij/n + P_ij/(n(n − 1))`
@@ -226,7 +249,11 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   (`splitLDRetention_eq`).
 * **Migration.**  Under symmetric migration `m` the split ratio is
   `(e^{-ρ̄T} + m·A_D)/(1 + m·A_π)`
-  (`MigrationPortabilityFactor.splitPortabilityRatio_withSymmetricMigration`).
+  (`MigrationPortabilityFactor.splitPortabilityRatio_withSymmetricMigration`).  Read on the history
+  without migration, the heterozygosity stencil is an explicit combination of exponentials, and
+  it is nonnegative, so to first order migration raises the heterozygosity denominator
+  (`MigrationPortabilityFirstOrder.heterozygosityMigrationStencil_noMigration`,
+  `heterozygosityMigrationStencil_noMigration_nonneg`).
 
 ## 6. Response: how accuracy moves with every input
 
@@ -245,6 +272,15 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   (`EndToEndSensitivityRates.hasDerivAt_dualGenerator_rateSegment`,
   `hasDerivAt_expectedPortability_segmentHistory`,
   `hasDerivAt_expectedCalibrationPortability_segmentHistory`).
+* A whole time-varying rate history moves the same way.  Along a segment of two rate histories the
+  fundamental matrix has the lower-left block of a doubled generator path as its derivative
+  (`FundamentalMatrixParameterDerivative.hasDerivAt_fundamentalMatrix_affinePath`), so the
+  propagator and expected portability of the rate history have exact derivatives
+  (`EndToEndSensitivityRatePath.hasDerivAt_rateHistoryDualPropagator_segment`,
+  `hasDerivAt_expectedPortability_rateSegment`).  The expected squared correlation is
+  differentiated termwise along segment histories
+  (`EndToEndSensitivitySeries.summable_integral_seriesTerm`,
+  `hasDerivAt_expectedSquaredCorrelation_segmentHistory`).
 
 ## 7. Selection
 
@@ -292,6 +328,8 @@ Scope.
 * The expectation of each population's calibration slope is not a rational function of finitely
   many moments and is not stated.  Whether the expected calibration error is finite-moment is
   open.
+* The termwise derivative of the expected squared correlation takes a summable bound on the term
+  sensitivities as a hypothesis.
 * Environment enters through its moments per deme, supplied as model inputs, not measured
   constants.
 * The rate-history kernels need continuous dual generators.  Integrable rate histories are
