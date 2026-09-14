@@ -540,6 +540,18 @@ def withinDemeReadout (rates : ManyDemeLDRates D) (deme parent : Fin D)
   (matrixExponential (withinDemeBlock rates deme) time).mulVec
     fun other ↦ ancestral (withinDemeCoordinate parent other)
 
+/-- Right after the split, the within-deme coordinates of either deme are the parent's.
+
+Assumes: `parent ≠ child`, and `deme` is the parent or the child. -/
+theorem splitTransform_withinDemeCoordinate {parent child : Fin D} (hne : parent ≠ child)
+    (ancestral : AffineLowOrderLDCoordinate D → ℝ) {deme : Fin D}
+    (hdeme : deme = parent ∨ deme = child) (index : Fin 3) :
+    (lowOrderLDSplitTransform parent child).mulVec ancestral (withinDemeCoordinate deme index)
+      = ancestral (withinDemeCoordinate parent index) := by
+  rcases hdeme with rfl | rfl <;> fin_cases index <;>
+    simp [withinDemeCoordinate, lowOrderLDSplitTransform_mulVec,
+      LowOrderLDCoordinate.mergeSplit, hne]
+
 /-- **The within-deme coordinates of the split history without migration**: in either deme they
 are the within-deme readout of the parent's ancestral coordinates.
 
@@ -552,11 +564,8 @@ theorem noMigrationHistory_withinDemeCoordinate (rates : ManyDemeLDRates D)
       = withinDemeReadout rates deme parent ancestral time index := by
   have hinitial : (fun other ↦ (lowOrderLDSplitTransform parent child).mulVec ancestral
         (withinDemeCoordinate deme other))
-      = fun other ↦ ancestral (withinDemeCoordinate parent other) := by
-    funext other
-    rcases hdeme with rfl | rfl <;> fin_cases other <;>
-      simp [withinDemeCoordinate, lowOrderLDSplitTransform_mulVec,
-        LowOrderLDCoordinate.mergeSplit, hne]
+      = fun other ↦ ancestral (withinDemeCoordinate parent other) :=
+    funext fun other ↦ splitTransform_withinDemeCoordinate hne ancestral hdeme other
   have h := matrixExponential_mulVec_withinDemeCoordinate _
     (withSymmetricMigration_zero_migration rates hne) hmutation deme time
     ((lowOrderLDSplitTransform parent child).mulVec ancestral) index
