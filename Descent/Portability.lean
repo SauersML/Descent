@@ -772,6 +772,8 @@ import Descent.Portability.SelectionMetricsFirstOrder
 import Descent.Portability.PortabilityMomentLadderDecision
 import Descent.Portability.PortabilityMomentLadderEight
 import Descent.Portability.EndToEndLogLossBounds
+import Descent.Portability.EndToEndMutualInformationPinsker
+import Descent.Portability.PortabilityMomentLadderBrier
 
 assert_below Descent.Program
 
