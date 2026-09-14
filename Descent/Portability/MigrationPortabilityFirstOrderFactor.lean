@@ -271,8 +271,7 @@ theorem hasDerivAt_affineMigrationHistory (rates : ManyDemeLDRates D) {parent ch
       (hasDerivAt_affineGenerator_apply rates hne 0) time coordinate column).mul_const
       ((lowOrderLDSplitTransform parent child).mulVec ancestral column)
   have hsum := HasDerivAt.fun_sum (u := Finset.univ) fun column _ ↦ hentry column
-  rw [zero_smul, add_zero] at hsum
-  exact hsum
+  simpa only [zero_smul, add_zero] using hsum
 
 /-! ## Duhamel readouts in the diagonal rows -/
 
