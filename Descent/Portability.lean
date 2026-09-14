@@ -756,6 +756,7 @@ import Descent.Portability.FundamentalMatrixParameterDerivative
 import Descent.Portability.EndToEndSensitivityRatePath
 import Descent.Portability.EndToEndSensitivitySeries
 import Descent.Portability.MigrationPortabilityFirstOrder
+import Descent.Portability.PortabilityMomentLadderDeployment
 
 assert_below Descent.Program
 
