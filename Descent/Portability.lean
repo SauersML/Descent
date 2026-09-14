@@ -361,6 +361,7 @@ import Descent.Portability.SelectionHistoryVaryingFitness
 import Descent.Portability.EndToEndReclassificationLaw
 import Descent.Portability.EndToEndLDAdjustedTraining
 import Descent.Portability.PortabilityMomentLadderSharpnessFour
+import Descent.Portability.EndToEndCalibrationErrorNonclosureAll
 
 import Descent.Portability.ProbitTrainingLaw
 import Descent.Portability.ScoreMomentLaw
