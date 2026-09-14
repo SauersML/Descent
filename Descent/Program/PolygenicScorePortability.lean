@@ -167,6 +167,11 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
     An event history and a continuous rate history with equal propagated budget-4 moments are
     therefore indistinguishable by every metric of the report
     (`portabilityReport_historyEvent_eq_rateHistory`).
+  * The first rung is sharp.  A founder event that fixes the source deme on one sampled
+    haplotype keeps every expected frequency, so every metric of the pooled law, but moves the
+    calibration slope of a varying score from one to zero
+    (`PortabilityMomentLadderSharpness.integral_mass_founderEventLaw`,
+    `expectedFrequencies_eq_and_calibrationSlope_ne`).
 
 ## 3. The individual: ploidy
 
