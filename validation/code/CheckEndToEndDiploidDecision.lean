@@ -1,0 +1,22 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.EndToEndDiploidDecision
+
+/-! Axiom audit of EndToEndDiploidDecision. -/
+
+open Descent.Portability.EndToEndDiploidDecision
+
+#print axioms calledMass_add_calledMass_pushforward
+#print axioms ruleNetBenefit_pushforward
+#print axioms pushforward_inbredMating_one
+#print axioms pushforward_confusionReport_inbredMating_one
+#print axioms expectedDiploidConfusion
+#print axioms diploidDecisionReport
+#print axioms polynomialFunction_genotypeExpectationPolynomial
+#print axioms integral_genotypeExpectation_eq_of_polynomialsAgreeAt_two
+#print axioms diploidDecisionReport_eq_of_polynomialsAgreeAt_two
+#print axioms decisionReport_and_diploidDecisionReport_eq_of_polynomialsAgreeAt_two
+#print axioms diploidDecisionReport_historyEvent_eq_rateHistory
+#print axioms diploidDecisionReport_inbreeding_one
+#print axioms diploidDecisionReport_inbreeding_one_eq_of_polynomialsAgreeAt_one
