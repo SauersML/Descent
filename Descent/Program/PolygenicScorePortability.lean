@@ -68,6 +68,7 @@ import Descent.Portability.EndToEndIntegrableRateHistory
 import Descent.Portability.EndToEndSensitivitySeriesBound
 import Descent.Portability.AdmixturePulseComposition
 import Descent.Portability.EndToEndPenetranceLaw
+import Descent.Portability.PortabilityMomentLadderDecisionSharpness
 import Descent.Portability.SelectionMetricsFirstOrder
 import Descent.Portability.PortabilityMomentLadderDecision
 import Descent.Portability.PortabilityMomentLadderEight
@@ -348,6 +349,12 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
     calibration slope of a varying score from one to zero
     (`PortabilityMomentLadderSharpness.integral_mass_founderEventLaw`,
     `expectedFrequencies_eq_and_calibrationSlope_ne`).
+  * Expected recall and precision are off the first rung.  The same founder events give equal
+    expected frequencies and different expected per-population recall and precision: without the
+    event the expected quotient is the state's own quotient, after fixation its true-positive mass
+    (`PortabilityMomentLadderDecisionSharpness.expectedPositiveQuotient_founderEventLaw_ne`,
+    `expectedFrequencies_eq_and_expectedRecall_ne`,
+    `expectedFrequencies_eq_and_expectedPrecision_ne`).
   * Rung four is sharp.  Two process laws on a three-allele locus agree on every frequency
     polynomial of degree at most three, and squared-correlation portability is `27/35` under one
     and `1` under the other, so no function of the degree-three moments fixes the report
