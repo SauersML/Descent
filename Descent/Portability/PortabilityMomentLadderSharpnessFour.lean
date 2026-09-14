@@ -56,10 +56,21 @@ every binary endpoint (`portabilityReport_ne`).  Agreement up to degree three do
 report (`not_forall_portabilityReport_eq_of_polynomialsAgreeAt_three`): no function of the degree-3
 moments determines the report, and rung four of the ladder is sharp.
 
+A second query.  The same witness separates the expectation of the per-population calibration
+slope, the expectation-of-a-ratio query of NOTE2 §6.2 that `EndToEndPooledCalibration` leaves
+unstated.  The corpus slope `FiniteReportLaw.calibrationSlope`, read as zero where the score does
+not vary, is the covariance over the variance (`getD_calibrationSlope_eq_div`,
+`calibrationSlope_alleles`, `stronglyMeasurable_calibrationSlope`).  In the target deme it is
+`-(1 - q)/(2 - q)` for `q > 0` and zero at `q = 0`, where allele `0` is absent
+(`calibrationSlope_target`).  Its expectations are `-11/35` and `-1/4`
+(`integral_calibrationSlope_firstKernel`, `integral_calibrationSlope_secondKernel`), so degree three
+does not fix it either (`polynomialsAgreeAt_three_and_expectedPerPopulationSlope_ne`).
+
 Scope.  The two process laws are constant kernels of finite laws on the state, not histories of
 epochs, splits and pulses, and the witness has one locus with three alleles.  Whether two event
 histories separate rung three from rung four is not settled here, and nor is the separation of
-rungs two and three for the calibration intercepts.
+rungs two and three for the calibration intercepts.  Whether any finite degree fixes the expected
+per-population slope is not settled either.
 
 ## Empirical status
 
@@ -90,7 +101,7 @@ abbrev WitnessState : Type := FrequencyState Bool Unit fun _ : Unit ↦ Fin 3
 theorem sum_triallelicHaplotype (g : TriallelicHaplotype → ℝ) :
     ∑ hap, g hap = g (fun _ ↦ 0) + g (fun _ ↦ 1) + g (fun _ ↦ 2) :=
   (Fintype.sum_equiv (Equiv.funUnique Unit (Fin 3)) g (fun a ↦ g fun _ ↦ a)
-    fun hap ↦ congrArg g (funext fun _ ↦ rfl)).trans (Fin.sum_univ_three _)
+    fun _ ↦ congrArg g (funext fun _ ↦ rfl)).trans (Fin.sum_univ_three _)
 
 /-- The slope in the parameter of the frequency of each allele: `1/2, -1/2, 0` in the target deme
 and `0` in the source deme. -/
@@ -230,6 +241,53 @@ theorem continuous_correlationDenominator (deme : Bool) :
     (polynomialFunction _).continuous
   simpa only [polynomialFunction_denominatorPolynomial] using h
 
+/-! ## The per-population calibration slope -/
+
+/-- The corpus per-population calibration slope, read as zero where the score does not vary, is
+the covariance over the variance. -/
+theorem getD_calibrationSlope_eq_div (law : FiniteReportLaw TriallelicHaplotype)
+    (score outcome : TriallelicHaplotype → ℝ) :
+    (law.calibrationSlope score outcome).getD 0
+      = law.covariance score outcome / law.variance score := by
+  unfold FiniteReportLaw.calibrationSlope
+  split_ifs with hpositive
+  · simp
+  · simp [le_antisymm (not_lt.mp hpositive) (FiniteReportLaw.variance_nonneg law score)]
+
+/-- **The per-population calibration slope of the two allele indicators** is
+`-p₀ p₁ / (p₀ - p₀²)`, read as zero where allele `0` is absent or fixed. -/
+theorem calibrationSlope_alleles (law : FiniteReportLaw TriallelicHaplotype) :
+    (law.calibrationSlope alleleScore alleleOutcome).getD 0
+      = -(law.mass (fun _ ↦ 0) * law.mass (fun _ ↦ 1))
+        / (law.mass (fun _ ↦ 0) - law.mass (fun _ ↦ 0) ^ 2) := by
+  obtain ⟨hscore, houtcome, hscoreSquare, -, hmixed⟩ := expectations_alleles law
+  rw [getD_calibrationSlope_eq_div, FiniteReportLaw.covariance_eq_rawMoments,
+    FiniteReportLaw.variance_eq_rawMoments, hmixed, hscoreSquare, hscore, houtcome, zero_sub]
+
+/-- **The target calibration slope at parameter `q`**: covariance `-q (1 - q)/4` over variance
+`q (2 - q)/4`, so `-(1 - q)/(2 - q)` for `q > 0` and zero at `q = 0`. -/
+theorem calibrationSlope_target (q : ℝ) (hq : 0 ≤ q ∧ q ≤ 1) :
+    ((stateLaw (lineState q hq) true).calibrationSlope alleleScore alleleOutcome).getD 0
+      = -(q / 2 * ((1 - q) / 2)) / (q / 2 - (q / 2) ^ 2) := by
+  obtain ⟨hzero, hone, -, -⟩ := mass_lineLaw q hq
+  rw [stateLaw_lineState, calibrationSlope_alleles, hzero, hone]
+
+/-- The per-population calibration slope of a deme, read as zero where the score does not vary,
+is a strongly measurable observable of the state. -/
+theorem stronglyMeasurable_calibrationSlope (deme : Bool) :
+    StronglyMeasurable fun y : WitnessState ↦
+      ((stateLaw y deme).calibrationSlope alleleScore alleleOutcome).getD 0 := by
+  have hcovariance : Continuous fun y : WitnessState ↦ polynomialFunction
+      (EndToEndCalibrationLaw.demeCovariancePolynomial deme alleleScore alleleOutcome) y :=
+    (polynomialFunction _).continuous
+  have hvariance : Continuous fun y : WitnessState ↦ polynomialFunction
+      (EndToEndCalibrationLaw.demeCovariancePolynomial deme alleleScore alleleScore) y :=
+    (polynomialFunction _).continuous
+  simp only [EndToEndCalibrationLaw.polynomialFunction_demeCovariancePolynomial]
+    at hcovariance hvariance
+  simp only [getD_calibrationSlope_eq_div, FiniteReportLaw.variance]
+  exact (hcovariance.measurable.div hvariance.measurable).stronglyMeasurable
+
 /-! ## Two laws of the parameter -/
 
 /-- The state at parameter `1/4`. -/
@@ -258,29 +316,29 @@ def secondLaw : Measure WitnessState :=
     + ENNReal.ofReal (3 / 4) • Measure.dirac halfState
     + ENNReal.ofReal (1 / 8) • Measure.dirac oneState
 
-/-- A continuous observable integrates against a weighted point mass to the weighted value. -/
+/-- A strongly measurable observable integrates against a weighted point mass to the weighted
+value. -/
 theorem integral_weightedDirac (w : ℝ) (hw : 0 ≤ w) (s : WitnessState) {f : WitnessState → ℝ}
-    (hf : Continuous f) : ∫ y, f y ∂(ENNReal.ofReal w • Measure.dirac s) = w * f s := by
-  rw [integral_smul_measure, integral_dirac' _ _ hf.stronglyMeasurable, ENNReal.toReal_ofReal hw,
-    smul_eq_mul]
+    (hf : StronglyMeasurable f) : ∫ y, f y ∂(ENNReal.ofReal w • Measure.dirac s) = w * f s := by
+  rw [integral_smul_measure, integral_dirac' _ _ hf, ENNReal.toReal_ofReal hw, smul_eq_mul]
 
-/-- A continuous observable is integrable against a weighted point mass. -/
+/-- A strongly measurable observable is integrable against a weighted point mass. -/
 theorem integrable_weightedDirac (w : ℝ) (s : WitnessState) {f : WitnessState → ℝ}
-    (hf : Continuous f) : Integrable f (ENNReal.ofReal w • Measure.dirac s) :=
-  (integrable_dirac' hf.stronglyMeasurable (by simp)).smul_measure ENNReal.ofReal_ne_top
+    (hf : StronglyMeasurable f) : Integrable f (ENNReal.ofReal w • Measure.dirac s) :=
+  (integrable_dirac' hf (by simp)).smul_measure ENNReal.ofReal_ne_top
 
-/-- A continuous observable integrates against the first law to its average at the parameters
-`1/4` and `3/4`. -/
-theorem integral_firstLaw {f : WitnessState → ℝ} (hf : Continuous f) :
+/-- A strongly measurable observable integrates against the first law to its average at the
+parameters `1/4` and `3/4`. -/
+theorem integral_firstLaw {f : WitnessState → ℝ} (hf : StronglyMeasurable f) :
     ∫ y, f y ∂firstLaw = 1 / 2 * f quarterState + 1 / 2 * f threeQuarterState := by
   rw [firstLaw,
     integral_add_measure (integrable_weightedDirac _ _ hf) (integrable_weightedDirac _ _ hf),
     integral_weightedDirac (1 / 2) (by norm_num) quarterState hf,
     integral_weightedDirac (1 / 2) (by norm_num) threeQuarterState hf]
 
-/-- A continuous observable integrates against the second law to its weighted values at the
-parameters `0`, `1/2` and `1`. -/
-theorem integral_secondLaw {f : WitnessState → ℝ} (hf : Continuous f) :
+/-- A strongly measurable observable integrates against the second law to its weighted values at
+the parameters `0`, `1/2` and `1`. -/
+theorem integral_secondLaw {f : WitnessState → ℝ} (hf : StronglyMeasurable f) :
     ∫ y, f y ∂secondLaw = 1 / 8 * f zeroState + 3 / 4 * f halfState + 1 / 8 * f oneState := by
   rw [secondLaw, integral_add_measure
       ((integrable_weightedDirac _ _ hf).add_measure (integrable_weightedDirac _ _ hf))
@@ -369,7 +427,8 @@ theorem polynomialsAgreeAt_three (x₁ x₂ : WitnessState) :
   have hcontinuous : Continuous fun y : WitnessState ↦ polynomialFunction p y :=
     (polynomialFunction p).continuous
   rw [firstKernel, secondKernel, Kernel.const_apply, Kernel.const_apply,
-    integral_firstLaw hcontinuous, integral_secondLaw hcontinuous]
+    integral_firstLaw hcontinuous.stronglyMeasurable,
+    integral_secondLaw hcontinuous.stronglyMeasurable]
   simp only [quarterState, threeQuarterState, zeroState, halfState, oneState,
     polynomialFunction_lineState, Polynomial.eval_eq_sum_range' hdegree, Finset.sum_range_succ,
     Finset.sum_range_zero]
@@ -389,10 +448,10 @@ theorem integrals_firstKernel (x : WitnessState) :
       ∧ ∫ y, correlationDenominator (stateLaw y false) alleleScore alleleOutcome ∂(firstKernel x)
         = 9 / 16 := by
   simp only [firstKernel, Kernel.const_apply]
-  rw [integral_firstLaw (continuous_correlationNumerator true),
-    integral_firstLaw (continuous_correlationDenominator true),
-    integral_firstLaw (continuous_correlationNumerator false),
-    integral_firstLaw (continuous_correlationDenominator false)]
+  rw [integral_firstLaw (continuous_correlationNumerator true).stronglyMeasurable,
+    integral_firstLaw (continuous_correlationDenominator true).stronglyMeasurable,
+    integral_firstLaw (continuous_correlationNumerator false).stronglyMeasurable,
+    integral_firstLaw (continuous_correlationDenominator false).stronglyMeasurable]
   simp only [quarterState, threeQuarterState, correlationNumerator_target,
     correlationDenominator_target, correlationNumerator_source, correlationDenominator_source]
   norm_num
@@ -409,10 +468,10 @@ theorem integrals_secondKernel (x : WitnessState) :
       ∧ ∫ y, correlationDenominator (stateLaw y false) alleleScore alleleOutcome ∂(secondKernel x)
         = 9 / 16 := by
   simp only [secondKernel, Kernel.const_apply]
-  rw [integral_secondLaw (continuous_correlationNumerator true),
-    integral_secondLaw (continuous_correlationDenominator true),
-    integral_secondLaw (continuous_correlationNumerator false),
-    integral_secondLaw (continuous_correlationDenominator false)]
+  rw [integral_secondLaw (continuous_correlationNumerator true).stronglyMeasurable,
+    integral_secondLaw (continuous_correlationDenominator true).stronglyMeasurable,
+    integral_secondLaw (continuous_correlationNumerator false).stronglyMeasurable,
+    integral_secondLaw (continuous_correlationDenominator false).stronglyMeasurable]
   simp only [zeroState, halfState, oneState, correlationNumerator_target,
     correlationDenominator_target, correlationNumerator_source, correlationDenominator_source]
   norm_num
@@ -467,6 +526,43 @@ theorem not_forall_portabilityReport_eq_of_polynomialsAgreeAt_three :
   portabilityReport_ne halfState halfState (fun _ ↦ true)
     (h firstKernel secondKernel halfState halfState (polynomialsAgreeAt_three halfState halfState)
       false true alleleScore alleleOutcome fun _ ↦ true)
+
+/-! ## The expected per-population calibration slope -/
+
+/-- **The expected per-population calibration slope under the first law is `-11/35`**: the target
+slopes at the parameters `1/4` and `3/4` are `-3/7` and `-1/5`. -/
+theorem integral_calibrationSlope_firstKernel (x : WitnessState) :
+    ∫ y, ((stateLaw y true).calibrationSlope alleleScore alleleOutcome).getD 0 ∂(firstKernel x)
+      = -11 / 35 := by
+  simp only [firstKernel, Kernel.const_apply]
+  rw [integral_firstLaw (stronglyMeasurable_calibrationSlope true)]
+  simp only [quarterState, threeQuarterState, calibrationSlope_target]
+  norm_num
+
+/-- **The expected per-population calibration slope under the second law is `-1/4`**: the target
+slopes at the parameters `0`, `1/2` and `1` are `0`, `-1/3` and `0`; at `0` the score does not
+vary and the slope is read as zero. -/
+theorem integral_calibrationSlope_secondKernel (x : WitnessState) :
+    ∫ y, ((stateLaw y true).calibrationSlope alleleScore alleleOutcome).getD 0 ∂(secondKernel x)
+      = -1 / 4 := by
+  simp only [secondKernel, Kernel.const_apply]
+  rw [integral_secondLaw (stronglyMeasurable_calibrationSlope true)]
+  simp only [zeroState, halfState, oneState, calibrationSlope_target]
+  norm_num
+
+/-- **Degree three does not fix the expected per-population calibration slope.**  The two Markov
+kernels agree, from any initial states, on every frequency polynomial of total degree at most
+three, and the expectations of the target calibration slope of the score against the outcome,
+read as zero where the score does not vary, are `-11/35` and `-1/4`. -/
+theorem polynomialsAgreeAt_three_and_expectedPerPopulationSlope_ne (x₁ x₂ : WitnessState) :
+    PolynomialsAgreeAt 3 firstKernel secondKernel x₁ x₂
+      ∧ ∫ y, ((stateLaw y true).calibrationSlope alleleScore alleleOutcome).getD 0
+          ∂(firstKernel x₁)
+        ≠ ∫ y, ((stateLaw y true).calibrationSlope alleleScore alleleOutcome).getD 0
+          ∂(secondKernel x₂) := by
+  refine ⟨polynomialsAgreeAt_three x₁ x₂, ?_⟩
+  rw [integral_calibrationSlope_firstKernel, integral_calibrationSlope_secondKernel]
+  norm_num
 
 end
 

@@ -19,6 +19,10 @@ open Descent.Portability.PortabilityMomentLadderSharpnessFour
 #print axioms correlationDenominator_target
 #print axioms correlationNumerator_source
 #print axioms correlationDenominator_source
+#print axioms getD_calibrationSlope_eq_div
+#print axioms calibrationSlope_alleles
+#print axioms calibrationSlope_target
+#print axioms stronglyMeasurable_calibrationSlope
 #print axioms integral_firstLaw
 #print axioms integral_secondLaw
 #print axioms polynomialFunction_lineState
@@ -31,3 +35,6 @@ open Descent.Portability.PortabilityMomentLadderSharpnessFour
 #print axioms polynomialsAgreeAt_three_and_expectedPortability_ne
 #print axioms portabilityReport_ne
 #print axioms not_forall_portabilityReport_eq_of_polynomialsAgreeAt_three
+#print axioms integral_calibrationSlope_firstKernel
+#print axioms integral_calibrationSlope_secondKernel
+#print axioms polynomialsAgreeAt_three_and_expectedPerPopulationSlope_ne
