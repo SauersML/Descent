@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Descent.Portability.EndToEndSensitivityRatePathMetrics
 import Descent.Portability.EndToEndLogLossLaw
 import Descent.Portability.EndToEndDecisionLaw
+import Mathlib.Analysis.Calculus.SmoothSeries
 
 assert_below Descent.Decision Descent.Program
 
@@ -283,13 +284,38 @@ theorem hasDerivAt_expectedEntropy_segmentHistory (ℓ₀ : Locus)
           (budgetCoefficients ℓ₀ (fun _ ↦ k + 2)
             (demePolynomial deme (entropyTermPolynomial report k)))
           (budgetMomentFeature (fun _ ↦ k + 2) x0)
-        / ((k : ℝ) + 1)) θ₀ :=
-  hasDerivAt_of_hasSum_dotProduct_segmentHistory hθ₀ history x0
-    (fun k ↦ budgetCoefficients ℓ₀ (fun _ ↦ k + 2)
-      (demePolynomial deme (entropyTermPolynomial report k)))
-    (fun θ ↦ hasSum_expectedEntropy_historyEventKernel ℓ₀ hap₀
-      ((history.map segmentEvent).map fun event ↦ event θ) x0 deme report)
-    hsummable hbound
+        / ((k : ℝ) + 1)) θ₀ := by
+  have hderiv : ∀ (k : ℕ) (θ : ℝ), θ ∈ Set.Ioo (0 : ℝ) 1 →
+      HasDerivAt (fun θ' ↦ (budgetCoefficients ℓ₀ (fun _ ↦ k + 2)
+          (demePolynomial deme (entropyTermPolynomial report k))
+        ⬝ᵥ (historyEventPropagator (fun _ ↦ k + 2)
+            ((history.map segmentEvent).map fun event ↦ event θ')
+          *ᵥ budgetMomentFeature (fun _ ↦ k + 2) x0)) / ((k : ℝ) + 1))
+        (historySensitivity (fun _ ↦ k + 2) θ (history.map segmentEvent)
+            (familyDerivative (fun _ ↦ k + 2) θ)
+            (budgetCoefficients ℓ₀ (fun _ ↦ k + 2)
+              (demePolynomial deme (entropyTermPolynomial report k)))
+            (budgetMomentFeature (fun _ ↦ k + 2) x0)
+          / ((k : ℝ) + 1)) θ := fun k θ hθ ↦
+    (hasDerivAt_dotProduct_segmentHistory (fun _ ↦ k + 2) hθ history
+      (budgetCoefficients ℓ₀ (fun _ ↦ k + 2)
+        (demePolynomial deme (entropyTermPolynomial report k)))
+      (budgetMomentFeature (fun _ ↦ k + 2) x0)).div_const ((k : ℝ) + 1)
+  have hnorm : ∀ (k : ℕ) (θ : ℝ), θ ∈ Set.Ioo (0 : ℝ) 1 →
+      ‖historySensitivity (fun _ ↦ k + 2) θ (history.map segmentEvent)
+          (familyDerivative (fun _ ↦ k + 2) θ)
+          (budgetCoefficients ℓ₀ (fun _ ↦ k + 2)
+            (demePolynomial deme (entropyTermPolynomial report k)))
+          (budgetMomentFeature (fun _ ↦ k + 2) x0)
+        / ((k : ℝ) + 1)‖ ≤ bound k := fun k θ hθ ↦ by
+    rw [Real.norm_eq_abs]
+    exact hbound k θ hθ
+  have hF := fun θ : ℝ ↦ hasSum_expectedEntropy_historyEventKernel ℓ₀ hap₀
+    ((history.map segmentEvent).map fun event ↦ event θ) x0 deme report
+  have hseries := hasDerivAt_tsum_of_isPreconnected hsummable
+    (isOpen_Ioo : IsOpen (Set.Ioo (0 : ℝ) 1)) isPreconnected_Ioo hderiv hnorm hθ₀ (hF θ₀).summable
+    hθ₀
+  exact hseries.congr_of_eventuallyEq (Filter.Eventually.of_forall fun θ ↦ (hF θ).tsum_eq.symm)
 
 /-- **The sensitivity of the expected entropy along a segment of rate histories.**  If the
 pairings of the entropy terms with the sensitivity matrices are bounded on `(0, 1)` by a summable
@@ -471,13 +497,38 @@ theorem hasDerivAt_expectedConditionalEntropy_segmentHistory (ℓ₀ : Locus)
           (budgetCoefficients ℓ₀ (fun _ ↦ k + 2)
             (demePolynomial deme (conditionalEntropyTermPolynomial report k)))
           (budgetMomentFeature (fun _ ↦ k + 2) x0)
-        / ((k : ℝ) + 1)) θ₀ :=
-  hasDerivAt_of_hasSum_dotProduct_segmentHistory hθ₀ history x0
-    (fun k ↦ budgetCoefficients ℓ₀ (fun _ ↦ k + 2)
-      (demePolynomial deme (conditionalEntropyTermPolynomial report k)))
-    (fun θ ↦ hasSum_expectedConditionalEntropy_historyEventKernel ℓ₀ hap₀
-      ((history.map segmentEvent).map fun event ↦ event θ) x0 deme report)
-    hsummable hbound
+        / ((k : ℝ) + 1)) θ₀ := by
+  have hderiv : ∀ (k : ℕ) (θ : ℝ), θ ∈ Set.Ioo (0 : ℝ) 1 →
+      HasDerivAt (fun θ' ↦ (budgetCoefficients ℓ₀ (fun _ ↦ k + 2)
+          (demePolynomial deme (conditionalEntropyTermPolynomial report k))
+        ⬝ᵥ (historyEventPropagator (fun _ ↦ k + 2)
+            ((history.map segmentEvent).map fun event ↦ event θ')
+          *ᵥ budgetMomentFeature (fun _ ↦ k + 2) x0)) / ((k : ℝ) + 1))
+        (historySensitivity (fun _ ↦ k + 2) θ (history.map segmentEvent)
+            (familyDerivative (fun _ ↦ k + 2) θ)
+            (budgetCoefficients ℓ₀ (fun _ ↦ k + 2)
+              (demePolynomial deme (conditionalEntropyTermPolynomial report k)))
+            (budgetMomentFeature (fun _ ↦ k + 2) x0)
+          / ((k : ℝ) + 1)) θ := fun k θ hθ ↦
+    (hasDerivAt_dotProduct_segmentHistory (fun _ ↦ k + 2) hθ history
+      (budgetCoefficients ℓ₀ (fun _ ↦ k + 2)
+        (demePolynomial deme (conditionalEntropyTermPolynomial report k)))
+      (budgetMomentFeature (fun _ ↦ k + 2) x0)).div_const ((k : ℝ) + 1)
+  have hnorm : ∀ (k : ℕ) (θ : ℝ), θ ∈ Set.Ioo (0 : ℝ) 1 →
+      ‖historySensitivity (fun _ ↦ k + 2) θ (history.map segmentEvent)
+          (familyDerivative (fun _ ↦ k + 2) θ)
+          (budgetCoefficients ℓ₀ (fun _ ↦ k + 2)
+            (demePolynomial deme (conditionalEntropyTermPolynomial report k)))
+          (budgetMomentFeature (fun _ ↦ k + 2) x0)
+        / ((k : ℝ) + 1)‖ ≤ bound k := fun k θ hθ ↦ by
+    rw [Real.norm_eq_abs]
+    exact hbound k θ hθ
+  have hF := fun θ : ℝ ↦ hasSum_expectedConditionalEntropy_historyEventKernel ℓ₀ hap₀
+    ((history.map segmentEvent).map fun event ↦ event θ) x0 deme report
+  have hseries := hasDerivAt_tsum_of_isPreconnected hsummable
+    (isOpen_Ioo : IsOpen (Set.Ioo (0 : ℝ) 1)) isPreconnected_Ioo hderiv hnorm hθ₀ (hF θ₀).summable
+    hθ₀
+  exact hseries.congr_of_eventuallyEq (Filter.Eventually.of_forall fun θ ↦ (hF θ).tsum_eq.symm)
 
 /-- **The sensitivity of the expected repaired log loss along a segment of rate histories**, under
 a summable bound on the pairings of the conditional entropy terms with the sensitivity
@@ -534,13 +585,38 @@ theorem hasDerivAt_expectedMutualInformation_segmentHistory (ℓ₀ : Locus)
           (budgetCoefficients ℓ₀ (fun _ ↦ k + 2)
             (demePolynomial deme (mutualInformationTermPolynomial report k)))
           (budgetMomentFeature (fun _ ↦ k + 2) x0)
-        / ((k : ℝ) + 1)) θ₀ :=
-  hasDerivAt_of_hasSum_dotProduct_segmentHistory hθ₀ history x0
-    (fun k ↦ budgetCoefficients ℓ₀ (fun _ ↦ k + 2)
-      (demePolynomial deme (mutualInformationTermPolynomial report k)))
-    (fun θ ↦ hasSum_expectedMutualInformation_historyEventKernel ℓ₀ hap₀
-      ((history.map segmentEvent).map fun event ↦ event θ) x0 deme report)
-    hsummable hbound
+        / ((k : ℝ) + 1)) θ₀ := by
+  have hderiv : ∀ (k : ℕ) (θ : ℝ), θ ∈ Set.Ioo (0 : ℝ) 1 →
+      HasDerivAt (fun θ' ↦ (budgetCoefficients ℓ₀ (fun _ ↦ k + 2)
+          (demePolynomial deme (mutualInformationTermPolynomial report k))
+        ⬝ᵥ (historyEventPropagator (fun _ ↦ k + 2)
+            ((history.map segmentEvent).map fun event ↦ event θ')
+          *ᵥ budgetMomentFeature (fun _ ↦ k + 2) x0)) / ((k : ℝ) + 1))
+        (historySensitivity (fun _ ↦ k + 2) θ (history.map segmentEvent)
+            (familyDerivative (fun _ ↦ k + 2) θ)
+            (budgetCoefficients ℓ₀ (fun _ ↦ k + 2)
+              (demePolynomial deme (mutualInformationTermPolynomial report k)))
+            (budgetMomentFeature (fun _ ↦ k + 2) x0)
+          / ((k : ℝ) + 1)) θ := fun k θ hθ ↦
+    (hasDerivAt_dotProduct_segmentHistory (fun _ ↦ k + 2) hθ history
+      (budgetCoefficients ℓ₀ (fun _ ↦ k + 2)
+        (demePolynomial deme (mutualInformationTermPolynomial report k)))
+      (budgetMomentFeature (fun _ ↦ k + 2) x0)).div_const ((k : ℝ) + 1)
+  have hnorm : ∀ (k : ℕ) (θ : ℝ), θ ∈ Set.Ioo (0 : ℝ) 1 →
+      ‖historySensitivity (fun _ ↦ k + 2) θ (history.map segmentEvent)
+          (familyDerivative (fun _ ↦ k + 2) θ)
+          (budgetCoefficients ℓ₀ (fun _ ↦ k + 2)
+            (demePolynomial deme (mutualInformationTermPolynomial report k)))
+          (budgetMomentFeature (fun _ ↦ k + 2) x0)
+        / ((k : ℝ) + 1)‖ ≤ bound k := fun k θ hθ ↦ by
+    rw [Real.norm_eq_abs]
+    exact hbound k θ hθ
+  have hF := fun θ : ℝ ↦ hasSum_expectedMutualInformation_historyEventKernel ℓ₀ hap₀
+    ((history.map segmentEvent).map fun event ↦ event θ) x0 deme report
+  have hseries := hasDerivAt_tsum_of_isPreconnected hsummable
+    (isOpen_Ioo : IsOpen (Set.Ioo (0 : ℝ) 1)) isPreconnected_Ioo hderiv hnorm hθ₀ (hF θ₀).summable
+    hθ₀
+  exact hseries.congr_of_eventuallyEq (Filter.Eventually.of_forall fun θ ↦ (hF θ).tsum_eq.symm)
 
 /-- **The sensitivity of the expected mutual information along a segment of rate histories**, under
 a summable bound on the pairings of the mutual information terms with the sensitivity
