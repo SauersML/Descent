@@ -78,10 +78,10 @@ theorem norm_matrixExponential_add_smul_sub_le {ι : Type*} [Fintype ι] [Decida
   rw [add_sub_cancel_left] at hduhamel
   have hnorm : ‖NormedSpace.exp ℝ (time • (A + m • B)) - NormedSpace.exp ℝ (time • A)‖
       ≤ time * (|m| * ‖B‖) * Real.exp (time * ‖A + m • B‖) * Real.exp (time * ‖A‖) := by
-    rw [hduhamel]
-    refine (intervalIntegral.norm_integral_le_of_norm_le_const
-      (C := Real.exp (time * ‖A + m • B‖) * (|m| * ‖B‖) * Real.exp (time * ‖A‖))
-      fun s hs ↦ ?_).trans_eq ?_
+    refine (le_of_eq (congrArg norm hduhamel)).trans
+      ((intervalIntegral.norm_integral_le_of_norm_le_const
+        (C := Real.exp (time * ‖A + m • B‖) * (|m| * ‖B‖) * Real.exp (time * ‖A‖))
+        fun s hs ↦ ?_).trans_eq ?_)
     · rw [Set.uIoc_of_le htime] at hs
       have hleft : ‖NormedSpace.exp ℝ (s • (A + m • B))‖ ≤ Real.exp (time * ‖A + m • B‖) := by
         refine (LinearFundamentalMatrix.norm_exp_matrix_le _).trans (Real.exp_le_exp.mpr ?_)
@@ -92,11 +92,8 @@ theorem norm_matrixExponential_add_smul_sub_le {ι : Type*} [Fintype ι] [Decida
         rw [norm_smul, Real.norm_eq_abs, abs_of_nonneg (sub_nonneg.mpr hs.2)]
         exact mul_le_mul_of_nonneg_right (by linarith [hs.1]) (norm_nonneg _)
       have hmiddle : ‖m • B‖ = |m| * ‖B‖ := by rw [norm_smul, Real.norm_eq_abs]
-      refine (norm_mul_le _ _).trans ((mul_le_mul_of_nonneg_right (norm_mul_le _ _)
-        (norm_nonneg _)).trans ?_)
-      rw [hmiddle]
-      exact mul_le_mul (mul_le_mul_of_nonneg_right hleft (by positivity)) hright (norm_nonneg _)
-        (by positivity)
+      exact norm_mul₃_le.trans (mul_le_mul (mul_le_mul hleft hmiddle.le (norm_nonneg _)
+        (Real.exp_pos _).le) hright (norm_nonneg _) (by positivity))
     · rw [sub_zero, abs_of_nonneg htime]
       ring
   rw [matrixExponential_eq_normedSpace_exp, matrixExponential_eq_normedSpace_exp]
