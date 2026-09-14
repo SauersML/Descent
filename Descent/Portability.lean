@@ -750,6 +750,7 @@ import Descent.Portability.EndToEndAscertainedWitness
 import Descent.Portability.SelectionMomentExpansion
 import Descent.Portability.SelectionMomentUniqueness
 import Descent.Portability.PortabilityMomentLadder
+import Descent.Portability.PortabilityMomentLadderSharpness
 
 assert_below Descent.Program
 
