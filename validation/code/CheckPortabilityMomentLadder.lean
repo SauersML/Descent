@@ -15,3 +15,10 @@ open Descent.Portability.PortabilityMomentLadder
 #print axioms portabilityReport_eq_of_momentsAgreeAt_four
 #print axioms portabilityReport_and_training_eq_of_momentsAgreeAt_eight
 #print axioms expectedMetrics_eq_of_momentsAgreeAt_all
+#print axioms PolynomialsAgreeAt
+#print axioms polynomialsAgreeAt_refl
+#print axioms PolynomialsAgreeAt.mono
+#print axioms polynomialsAgreeAt_of_hasDualMoments
+#print axioms MomentsAgreeAt.polynomialsAgreeAt
+#print axioms portabilityReport_eq_of_polynomialsAgreeAt_four
+#print axioms portabilityReport_historyEvent_eq_rateHistory
