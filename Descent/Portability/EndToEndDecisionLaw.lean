@@ -758,6 +758,229 @@ theorem expectedAUCPortability_and_expectedMetricPortability_eq_of_moments_eq (�
     expectedMetricPortability_eq_of_moments_eq ℓ₀ hap₀ (by norm_num) hmoments source target report
       called metric⟩
 
+/-! ## Expected sensitivity and predictive value -/
+
+/-- **Expected positive quotient**: the expectation of `TP / (TP + c)` for a cell `c` of the
+confusion report law of a rule in a deme, read by Lean as zero where the denominator vanishes,
+under a kernel started at `x₀`. -/
+def expectedPositiveQuotient
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool)
+    (other : Bool × Bool) : ℝ :=
+  ∫ y, ((stateLaw y deme).pushforward (confusionReport report called)).mass (true, true)
+      / (((stateLaw y deme).pushforward (confusionReport report called)).mass (true, true)
+        + ((stateLaw y deme).pushforward (confusionReport report called)).mass other) ∂(κ x0)
+
+/-- **The expected recall and precision are positive quotients.**  The expected corpus recall
+`E[TP / (TP + FN)]` of a rule in a deme is the positive quotient of the false negative cell, and
+the expected corpus precision `E[TP / (TP + FP)]` is that of the false positive cell. -/
+theorem integral_recallRate_precision
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool) :
+    ∫ y, (ruleConfusion ((stateLaw y deme).pushforward report) called).recallRate ∂(κ x0)
+        = expectedPositiveQuotient κ x0 deme report called (false, true)
+      ∧ ∫ y, (ruleConfusion ((stateLaw y deme).pushforward report) called).precision ∂(κ x0)
+        = expectedPositiveQuotient κ x0 deme report called (true, false) := by
+  refine ⟨?_, ?_⟩ <;>
+    simp only [expectedPositiveQuotient, Foundations.ConfusionMatrix.recallRate,
+      Foundations.ConfusionMatrix.precision, ruleConfusion, calledMass_pushforward,
+      clearedMass_pushforward]
+
+/-- **NOTE 2 (15) for the positive quotients under a Markov kernel.**  For every cell `c` other
+than the true positives, the expected positive quotient `E[TP / (TP + c)]` is the series over `k`
+of the expectations of the positive term polynomials `TP (1 - (TP + c))ᵏ`.  No hypothesis on the
+rule is needed: `0 ≤ TP ≤ TP + c ≤ 1` holds for every rule. -/
+theorem expectedPositiveQuotient_eq_tsum
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    [IsMarkovKernel κ] (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool)
+    (other : Bool × Bool) (hother : (true, true) ≠ other) :
+    expectedPositiveQuotient κ x0 deme report called other
+      = ∑' k : ℕ, ∫ y, eval (stateLaw y deme).mass (positiveTermPolynomial report called other k)
+          ∂(κ x0) := by
+  simp only [expectedPositiveQuotient, eval_positiveTermPolynomial]
+  exact integral_boundedQuotient_eq_tsum (κ x0) _ _
+    (continuous_pushforwardMass deme (confusionReport report called) (true, true)).measurable
+    ((continuous_pushforwardMass deme (confusionReport report called) (true, true)).add
+      (continuous_pushforwardMass deme (confusionReport report called) other)).measurable
+    (fun _ ↦ FiniteReportLaw.mass_nonneg _ _)
+    (fun _ ↦ le_add_of_nonneg_right (FiniteReportLaw.mass_nonneg _ _))
+    (fun _ ↦ cellMass_add_le_one _ hother)
+
+/-- **The expected positive quotients through the propagated moments.**  For every cell `c` other
+than the true positives, the expected positive quotient is the series over `k` of the coefficient
+vectors of `TP (1 - (TP + c))ᵏ` dotted with the budget-`(k + 1)` propagated moments.
+
+Assumes: `∀ n, HasDualMoments κ n (M n)`. -/
+theorem expectedPositiveQuotient_eq_tsum_dotProduct (ℓ₀ : Locus)
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    [IsMarkovKernel κ] (M : ∀ n : ℕ, BudgetMatrix Deme Locus Allele n)
+    (hmoment : ∀ n : ℕ, HasDualMoments κ n (M n)) (x0 : FrequencyState Deme Locus Allele)
+    (deme : Deme) (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool)
+    (other : Bool × Bool) (hother : (true, true) ≠ other) :
+    expectedPositiveQuotient κ x0 deme report called other
+      = ∑' k : ℕ, budgetCoefficients ℓ₀ (fun _ ↦ k + 1)
+          (demePolynomial deme (positiveTermPolynomial report called other k))
+        ⬝ᵥ (M (k + 1) *ᵥ budgetMomentFeature (fun _ ↦ k + 1) x0) := by
+  rw [expectedPositiveQuotient_eq_tsum κ x0 deme report called other hother]
+  exact tsum_congr fun k ↦ integral_eval_stateLaw_eq_dotProduct ℓ₀ (k + 1) κ (M (k + 1))
+    (hmoment (k + 1)) deme _ (totalDegree_positiveTermPolynomial_le report called other k) x0
+
+/-- **The expected positive quotients along a history of epochs, splits and pulses.** -/
+theorem expectedPositiveQuotient_historyEventKernel (ℓ₀ : Locus)
+    (hap₀ : FullHaplotype Locus Allele)
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool)
+    (other : Bool × Bool) (hother : (true, true) ≠ other) :
+    expectedPositiveQuotient (historyEventKernel ℓ₀ hap₀ events) x0 deme report called other
+      = ∑' k : ℕ, budgetCoefficients ℓ₀ (fun _ ↦ k + 1)
+          (demePolynomial deme (positiveTermPolynomial report called other k))
+        ⬝ᵥ (historyEventPropagator (fun _ ↦ k + 1) events
+          *ᵥ budgetMomentFeature (fun _ ↦ k + 1) x0) := by
+  haveI := isMarkovKernel_historyEventKernel ℓ₀ hap₀ events
+  exact expectedPositiveQuotient_eq_tsum_dotProduct ℓ₀ (historyEventKernel ℓ₀ hap₀ events)
+    (fun n ↦ historyEventPropagator (fun _ ↦ n) events)
+    (hasDualMoments_historyEventKernel ℓ₀ hap₀ events) x0 deme report called other hother
+
+/-- **The expected positive quotients along a time-varying rate history.** -/
+theorem expectedPositiveQuotient_rateHistoryKernel {rates : ℝ → NeutralRates Deme Locus Allele}
+    {T : ℝ} (hT : 0 ≤ T) (hcontinuous : ∀ capacity : Locus → ℕ,
+      ContinuousOn (fun t ↦ dualGenerator (rates t) capacity) (Set.Icc 0 T))
+    (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele) (x0 : FrequencyState Deme Locus Allele)
+    (deme : Deme) (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool)
+    (other : Bool × Bool) (hother : (true, true) ≠ other) :
+    expectedPositiveQuotient (rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous) x0 deme
+        report called other
+      = ∑' k : ℕ, budgetCoefficients ℓ₀ (fun _ ↦ k + 1)
+          (demePolynomial deme (positiveTermPolynomial report called other k))
+        ⬝ᵥ (rateHistoryDualPropagator rates (fun _ ↦ k + 1) T
+          *ᵥ budgetMomentFeature (fun _ ↦ k + 1) x0) := by
+  haveI := isMarkovKernel_rateHistoryKernel hT hcontinuous ℓ₀ hap₀
+  exact expectedPositiveQuotient_eq_tsum_dotProduct ℓ₀
+    (rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous)
+    (fun n ↦ rateHistoryDualPropagator rates (fun _ ↦ n) T)
+    (hasDualMoments_rateHistoryKernel hT hcontinuous ℓ₀ hap₀) x0 deme report called other hother
+
+/-- **The expected recall and precision along a history of epochs, splits and pulses.**  The
+expected per-population sensitivity `E[TP / (TP + FN)]` and positive predictive value
+`E[TP / (TP + FP)]` of a rule in a deme are series over `k` of budget-`(k + 1)` dot products. -/
+theorem integral_recallRate_precision_historyEventKernel (ℓ₀ : Locus)
+    (hap₀ : FullHaplotype Locus Allele)
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool) :
+    ∫ y, (ruleConfusion ((stateLaw y deme).pushforward report) called).recallRate
+        ∂(historyEventKernel ℓ₀ hap₀ events x0)
+        = ∑' k : ℕ, budgetCoefficients ℓ₀ (fun _ ↦ k + 1)
+            (demePolynomial deme (positiveTermPolynomial report called (false, true) k))
+          ⬝ᵥ (historyEventPropagator (fun _ ↦ k + 1) events
+            *ᵥ budgetMomentFeature (fun _ ↦ k + 1) x0)
+      ∧ ∫ y, (ruleConfusion ((stateLaw y deme).pushforward report) called).precision
+          ∂(historyEventKernel ℓ₀ hap₀ events x0)
+        = ∑' k : ℕ, budgetCoefficients ℓ₀ (fun _ ↦ k + 1)
+            (demePolynomial deme (positiveTermPolynomial report called (true, false) k))
+          ⬝ᵥ (historyEventPropagator (fun _ ↦ k + 1) events
+            *ᵥ budgetMomentFeature (fun _ ↦ k + 1) x0) := by
+  obtain ⟨hrecall, hprecision⟩ :=
+    integral_recallRate_precision (historyEventKernel ℓ₀ hap₀ events) x0 deme report called
+  rw [hrecall, hprecision]
+  exact ⟨expectedPositiveQuotient_historyEventKernel ℓ₀ hap₀ events x0 deme report called _
+      (by decide),
+    expectedPositiveQuotient_historyEventKernel ℓ₀ hap₀ events x0 deme report called _
+      (by decide)⟩
+
+/-- **The expected recall and precision see the history only through propagated moments.**  Two
+histories of epochs, splits and pulses, from two initial states, whose propagated moments agree at
+every budget `k + 1` have equal expected recall and equal expected precision for every rule. -/
+theorem integral_recallRate_precision_eq_of_moments_eq (ℓ₀ : Locus)
+    (hap₀ : FullHaplotype Locus Allele)
+    {first second : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme)}
+    {x₁ x₂ : FrequencyState Deme Locus Allele}
+    (hmoments : ∀ k : ℕ, historyEventPropagator (fun _ ↦ k + 1) first
+        *ᵥ budgetMomentFeature (fun _ ↦ k + 1) x₁
+      = historyEventPropagator (fun _ ↦ k + 1) second
+        *ᵥ budgetMomentFeature (fun _ ↦ k + 1) x₂)
+    (deme : Deme) (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool) :
+    ∫ y, (ruleConfusion ((stateLaw y deme).pushforward report) called).recallRate
+        ∂(historyEventKernel ℓ₀ hap₀ first x₁)
+        = ∫ y, (ruleConfusion ((stateLaw y deme).pushforward report) called).recallRate
+          ∂(historyEventKernel ℓ₀ hap₀ second x₂)
+      ∧ ∫ y, (ruleConfusion ((stateLaw y deme).pushforward report) called).precision
+          ∂(historyEventKernel ℓ₀ hap₀ first x₁)
+        = ∫ y, (ruleConfusion ((stateLaw y deme).pushforward report) called).precision
+          ∂(historyEventKernel ℓ₀ hap₀ second x₂) := by
+  obtain ⟨hrecall₁, hprecision₁⟩ :=
+    integral_recallRate_precision_historyEventKernel ℓ₀ hap₀ first x₁ deme report called
+  obtain ⟨hrecall₂, hprecision₂⟩ :=
+    integral_recallRate_precision_historyEventKernel ℓ₀ hap₀ second x₂ deme report called
+  rw [hrecall₁, hrecall₂, hprecision₁, hprecision₂]
+  exact ⟨tsum_congr fun k ↦ by rw [hmoments k], tsum_congr fun k ↦ by rw [hmoments k]⟩
+
+/-! ## Prevalence shift: rates port, predictive value does not -/
+
+/-- **Precision ports exactly when prevalence ports.**  Two confusion matrices with equal recall,
+positive, and equal false positive rate, positive, have equal precision if and only if they have
+equal prevalence: precision is `π r / (π r + (1 - π) f)` at prevalence `π`, recall `r` and false
+positive rate `f`. -/
+theorem precision_eq_iff_prevalence_eq (first second : Foundations.ConfusionMatrix)
+    (hrecall : first.recallRate = second.recallRate) (hfpr : first.fpr = second.fpr)
+    (hrecallPos : 0 < second.recallRate) (hfprPos : 0 < second.fpr) :
+    first.precision = second.precision ↔ first.prevalence = second.prevalence := by
+  have hden : ∀ matrix : Foundations.ConfusionMatrix,
+      0 < matrix.prevalence * second.recallRate + (1 - matrix.prevalence) * second.fpr := by
+    intro matrix
+    have hlow : 0 ≤ matrix.prevalence := add_nonneg matrix.tp_nonneg matrix.fn_nonneg
+    have hhigh : matrix.prevalence ≤ 1 := (confusion_rate_bounds matrix).1.2
+    rcases le_total second.recallRate second.fpr with hle | hle
+    · nlinarith [mul_nonneg (sub_nonneg.mpr hhigh) (sub_nonneg.mpr hle)]
+    · nlinarith [mul_nonneg hlow (sub_nonneg.mpr hle)]
+  rw [Foundations.ConfusionMatrix.precision_eq_prevalence_recall_fpr first,
+    Foundations.ConfusionMatrix.precision_eq_prevalence_recall_fpr second, hrecall, hfpr,
+    div_eq_div_iff (hden first).ne' (hden second).ne']
+  constructor
+  · intro hcross
+    have hkey : second.recallRate * second.fpr * (first.prevalence - second.prevalence) = 0 := by
+      linear_combination hcross
+    exact sub_eq_zero.mp ((mul_eq_zero.mp hkey).resolve_left (mul_pos hrecallPos hfprPos).ne')
+  · intro hprevalence
+    rw [hprevalence]
+
+/-- The source report law of the prevalence-shift witness, on score groups `Bool` under the
+identity rule: prevalence one half, mass two fifths on each correct call and one tenth on each
+error. -/
+def witnessSourceLaw : FiniteReportLaw (Bool × Bool) where
+  mass := fun report ↦ if report.2 then (if report.1 then 2 / 5 else 1 / 10)
+    else (if report.1 then 1 / 10 else 2 / 5)
+  mass_nonneg := by intro report; split_ifs <;> norm_num
+  mass_sum := by norm_num [Fintype.sum_prod_type, Fintype.sum_bool]
+
+/-- The target report law of the prevalence-shift witness, on score groups `Bool` under the
+identity rule: prevalence one fifth, mass four twenty-fifths on true and on false positives,
+sixteen twenty-fifths on true negatives and one twenty-fifth on false negatives. -/
+def witnessTargetLaw : FiniteReportLaw (Bool × Bool) where
+  mass := fun report ↦ if report.2 then (if report.1 then 4 / 25 else 1 / 25)
+    else (if report.1 then 4 / 25 else 16 / 25)
+  mass_nonneg := by intro report; split_ifs <;> norm_num
+  mass_sum := by norm_num [Fintype.sum_prod_type, Fintype.sum_bool]
+
+/-- **A prevalence shift that ports sensitivity and specificity but not predictive value.**  Under
+the identity rule both witness laws have recall four fifths and false positive rate one fifth, so
+sensitivity and specificity port exactly.  The prevalence moves from one half to one fifth, and
+the precision falls from four fifths to one half. -/
+theorem prevalenceShift_witness :
+    (ruleConfusion witnessTargetLaw id).recallRate = (ruleConfusion witnessSourceLaw id).recallRate
+      ∧ (ruleConfusion witnessTargetLaw id).fpr = (ruleConfusion witnessSourceLaw id).fpr
+      ∧ (ruleConfusion witnessSourceLaw id).prevalence = 1 / 2
+      ∧ (ruleConfusion witnessTargetLaw id).prevalence = 1 / 5
+      ∧ (ruleConfusion witnessSourceLaw id).precision = 4 / 5
+      ∧ (ruleConfusion witnessTargetLaw id).precision = 1 / 2 := by
+  norm_num [Foundations.ConfusionMatrix.recallRate, Foundations.ConfusionMatrix.fpr,
+    Foundations.ConfusionMatrix.prevalence, Foundations.ConfusionMatrix.precision, ruleConfusion,
+    calledMass, clearedMass, witnessSourceLaw, witnessTargetLaw, Fintype.sum_bool]
+
 end
 
 end Descent.Portability.EndToEndDecisionLaw

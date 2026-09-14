@@ -1,0 +1,70 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.EndToEndDecisionLaw
+
+/-! Axiom audit of EndToEndDecisionLaw. -/
+
+open Descent.Portability.EndToEndDecisionLaw
+
+#print axioms confusionReport
+#print axioms clearedMass_eq_expectation
+#print axioms calledMass_pushforward
+#print axioms clearedMass_pushforward
+#print axioms ruleConfusion_pushforward
+#print axioms cellMass_add_le_one
+#print axioms positiveTermPolynomial
+#print axioms eval_positiveTermPolynomial
+#print axioms totalDegree_positiveTermPolynomial_le
+#print axioms ruleNetBenefit
+#print axioms netBenefitPolynomial
+#print axioms eval_netBenefitPolynomial
+#print axioms totalDegree_netBenefitPolynomial_le
+#print axioms calledMass_treatAll
+#print axioms ruleNetBenefit_treatNone
+#print axioms ruleNetBenefit_treatAll
+#print axioms tableSensitivity
+#print axioms tableSpecificity
+#print axioms tablePPV
+#print axioms tableNPV
+#print axioms tableF1
+#print axioms tableYouden
+#print axioms tableRelativeRisk
+#print axioms tableSensitivity_tablePPV_pushforward
+#print axioms integral_boundedQuotient_eq_tsum
+#print axioms expectedConfusion
+#print axioms momentConfusion
+#print axioms integrable_confusionMass
+#print axioms expectedConfusion_eq_momentConfusion
+#print axioms expectedConfusion_historyEventKernel
+#print axioms expectedConfusion_rateHistoryKernel
+#print axioms expectedConfusion_eq_of_moments_eq
+#print axioms expectedConfusion_historyEventKernel_eq_of_moments_eq
+#print axioms integral_ruleConfusion
+#print axioms integral_prevalence_calledFraction_eq_momentConfusion
+#print axioms expectedNetBenefit
+#print axioms integrable_ruleNetBenefit
+#print axioms expectedNetBenefit_eq_dotProduct
+#print axioms expectedNetBenefit_historyEventKernel
+#print axioms expectedNetBenefit_rateHistoryKernel
+#print axioms expectedNetBenefit_eq_expectedConfusion
+#print axioms expectedNetBenefit_treatNone_treatAll
+#print axioms expectedNetBenefit_sub_treatAll_eq_dotProduct
+#print axioms expectedMetricPortability
+#print axioms expectedMetricPortability_eq_momentConfusion
+#print axioms expectedMetricPortability_historyEventKernel
+#print axioms expectedMetricPortability_rateHistoryKernel
+#print axioms expectedMetricPortability_eq_of_moments_eq
+#print axioms expectedAUCPortability_and_expectedMetricPortability_eq_of_moments_eq
+#print axioms expectedPositiveQuotient
+#print axioms integral_recallRate_precision
+#print axioms expectedPositiveQuotient_eq_tsum
+#print axioms expectedPositiveQuotient_eq_tsum_dotProduct
+#print axioms expectedPositiveQuotient_historyEventKernel
+#print axioms expectedPositiveQuotient_rateHistoryKernel
+#print axioms integral_recallRate_precision_historyEventKernel
+#print axioms integral_recallRate_precision_eq_of_moments_eq
+#print axioms precision_eq_iff_prevalence_eq
+#print axioms witnessSourceLaw
+#print axioms witnessTargetLaw
+#print axioms prevalenceShift_witness
