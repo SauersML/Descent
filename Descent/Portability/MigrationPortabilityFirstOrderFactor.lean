@@ -559,7 +559,8 @@ theorem matrixExponential_mulVec_withinDemeCoordinate (rates : ManyDemeLDRates D
     ext other column
     simp only [Matrix.mul_apply, withinDemeProjection, sum_unitPointMass_left, Fin.sum_univ_three]
     fin_cases other <;>
-      simp [withinDemeCoordinate, withinDemeBlock, hrows.1, hrows.2.1, hrows.2.2] <;> ring
+      simp [withinDemeCoordinate, withinDemeBlock, hrows.1, hrows.2.1, hrows.2.2] <;>
+      split_ifs <;> ring
   have hread : ∀ vector : AffineLowOrderLDCoordinate D → ℝ,
       (withinDemeProjection deme).mulVec vector
         = fun other ↦ vector (withinDemeCoordinate deme other) :=
@@ -740,7 +741,7 @@ theorem hasDerivAt_affineMigrationPortabilityRatio (rates : ManyDemeLDRates D)
   rw [hvalueDD, hvaluepi2, firstOrderMigrationFactor, linkageMigrationShare,
     heterozygosityMigrationShare, ancestralSquaredCorrelation,
     exp_neg_crossLinkageDecayRate_mul]
-  first | (field_simp; ring) | field_simp
+  field_simp
 
 /-- At a nonnegative rate the affine ratio is the corpus portability ratio with migration. -/
 theorem splitPortabilityRatio_withSymmetricMigration_eq_affine (rates : ManyDemeLDRates D)
@@ -965,12 +966,14 @@ theorem integral_exp_add_exp_neg_add_const {a b p q r : ℝ} (ha : a ≠ 0) (hb 
     have hfast := ((hasDerivAt_id' (x := time)).const_mul (-b)).exp
     refine ((((hslow.const_mul p).div_const a).sub ((hfast.const_mul q).div_const b)).add
       ((hasDerivAt_id' (x := time)).const_mul r)).congr_deriv ?_
-    first | (field_simp; ring) | field_simp
+    field_simp
+    ring
   rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv
     ((by fun_prop : Continuous fun time : ℝ ↦
       p * Real.exp (a * time) + q * Real.exp (-b * time) + r).intervalIntegrable 0 duration)]
   simp only [mul_zero, Real.exp_zero]
-  first | (field_simp; ring) | field_simp
+  field_simp
+  ring
 
 /-- **The heterozygosity share without migration, at equal rates, in closed form.**  With
 `β = c + ρ/2` and `κ = c/(4c + ρ)`,
@@ -1116,7 +1119,7 @@ theorem firstOrderMigrationFactor_zeroRecombination (rates : ManyDemeLDRates D)
   have hc := (rates.coalescence_pos parent).ne'
   have hκ : fedWeight rates parent = 1 / 4 := by
     rw [fedWeight, hρ, add_zero]
-    first | (field_simp; ring) | field_simp
+    field_simp
   have hβ : linkageRate rates parent = rates.coalescence parent := by
     rw [linkageRate, hρ, zero_div, add_zero]
   have hneg : Real.exp (-(rates.coalescence parent * duration))
@@ -1126,7 +1129,8 @@ theorem firstOrderMigrationFactor_zeroRecombination (rates : ManyDemeLDRates D)
     linkageMigrationShare_noMigration_zeroRecombination rates hmutation hne hcoal hrec hρ,
     heterozygosityMigrationShare_noMigration rates hmutation hne hcoal hrec, hκ, hβ, hrec, hρ,
     add_zero, zero_div, portabilityDecay_zero_rate, Real.cosh_eq, hneg]
-  first | (field_simp; ring) | field_simp
+  field_simp
+  ring
 
 /-- **To first order, migration raises portability without recombination** when `DD₀ ≤ π₀` and
 `π₀ + Dz₀ ≥ 0`: the factor `φ₁(T)` is nonnegative at every split time.
