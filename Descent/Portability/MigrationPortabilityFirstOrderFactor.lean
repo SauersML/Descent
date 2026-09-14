@@ -448,3 +448,173 @@ theorem noMigrationHistory_Dz_diagonal (rates : ManyDemeLDRates D)
         (augmentedLowOrderLDGenerator_Dz_leading_row _ hmigration hmutation hne)]
   all_goals simp [lowOrderLDSplitTransform_mulVec, LowOrderLDCoordinate.mergeSplit, hne,
     withSymmetricMigration]
+
+/-! ## The within-deme block as a matrix-exponential readout -/
+
+/-- **The within-deme rows.**  Without migration or mutation the rows of `DD(i, i)`,
+`Dz(i, i, i)` and `pi2(i, i, i, i)` read only these three coordinates:
+`-(3 c + ρ) DD + c Dz + c pi2`, `4 c DD - (5 c + ρ/2) Dz` and `c Dz - 2 c pi2`.
+
+Assumes: no migration and no mutation. -/
+theorem augmentedLowOrderLDGenerator_withinDeme_rows (rates : ManyDemeLDRates D)
+    (hmigration : ∀ source target, rates.migration source target = 0)
+    (hmutation : ∀ deme, rates.mutation deme = 0) (deme : Fin D) :
+    (∀ column, augmentedLowOrderLDGenerator rates (some (.DD deme deme)) column
+      = -(3 * rates.coalescence deme + rates.recombination deme)
+          * (if some (.DD deme deme) = column then 1 else 0)
+        + rates.coalescence deme * (if some (.Dz deme deme deme) = column then 1 else 0)
+        + rates.coalescence deme
+          * (if some (.pi2 deme deme deme deme) = column then 1 else 0)) ∧
+      (∀ column, augmentedLowOrderLDGenerator rates (some (.Dz deme deme deme)) column
+        = 4 * rates.coalescence deme * (if some (.DD deme deme) = column then 1 else 0)
+          - (5 * rates.coalescence deme + rates.recombination deme / 2)
+            * (if some (.Dz deme deme deme) = column then 1 else 0)) ∧
+      (∀ column, augmentedLowOrderLDGenerator rates (some (.pi2 deme deme deme deme)) column
+        = rates.coalescence deme * (if some (.Dz deme deme deme) = column then 1 else 0)
+          - 2 * rates.coalescence deme
+            * (if some (.pi2 deme deme deme deme) = column then 1 else 0)) := by
+  refine ⟨fun column ↦ ?_, fun column ↦ ?_, fun column ↦ ?_⟩ <;> rcases column with _ | column <;>
+    first
+    | (simp [augmentedLowOrderLDGenerator, lowOrderLDMutationForcing]; done)
+    | (migration_row_entry; simp [hmigration, hmutation]; ring)
+
+/-- **The within-deme block** of one deme's moment generator on `(DD, Dz, pi2)`:
+`[[-(3c + ρ), c, c], [4c, -(5c + ρ/2), 0], [0, c, -2c]]`.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  A matrix of rates. -/
+def withinDemeBlock (rates : ManyDemeLDRates D) (deme : Fin D) : Matrix (Fin 3) (Fin 3) ℝ :=
+  !![-(3 * rates.coalescence deme + rates.recombination deme), rates.coalescence deme,
+      rates.coalescence deme;
+    4 * rates.coalescence deme, -(5 * rates.coalescence deme + rates.recombination deme / 2), 0;
+    0, rates.coalescence deme, -(2 * rates.coalescence deme)]
+
+/-- **The within-deme coordinates** `DD(i, i)`, `Dz(i, i, i)` and `pi2(i, i, i, i)` of one deme.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  Three coordinate labels. -/
+def withinDemeCoordinate (deme : Fin D) : Fin 3 → AffineLowOrderLDCoordinate D :=
+  ![some (.DD deme deme), some (.Dz deme deme deme), some (.pi2 deme deme deme deme)]
+
+/-- **The within-deme projection** onto the three within-deme coordinates of one deme.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  A coordinate selection matrix. -/
+def withinDemeProjection (deme : Fin D) : Matrix (Fin 3) (AffineLowOrderLDCoordinate D) ℝ :=
+  fun other column ↦ if withinDemeCoordinate deme other = column then 1 else 0
+
+/-- **The within-deme block is a matrix-exponential readout.**  Without migration or mutation the
+within-deme coordinates of one deme along any trajectory are `e^{tM}` applied to their initial
+values, with `M = withinDemeBlock`.
+
+Assumes: no migration and no mutation. -/
+theorem matrixExponential_mulVec_withinDemeCoordinate (rates : ManyDemeLDRates D)
+    (hmigration : ∀ source target, rates.migration source target = 0)
+    (hmutation : ∀ deme, rates.mutation deme = 0) (deme : Fin D) (time : ℝ)
+    (state : AffineLowOrderLDCoordinate D → ℝ) (index : Fin 3) :
+    (matrixExponential (augmentedLowOrderLDGenerator rates) time).mulVec state
+        (withinDemeCoordinate deme index)
+      = (matrixExponential (withinDemeBlock rates deme) time).mulVec
+          (fun other ↦ state (withinDemeCoordinate deme other)) index := by
+  have hrows := augmentedLowOrderLDGenerator_withinDeme_rows rates hmigration hmutation deme
+  have hgenerator : withinDemeProjection deme * augmentedLowOrderLDGenerator rates
+      = withinDemeBlock rates deme * withinDemeProjection deme := by
+    ext other column
+    simp only [Matrix.mul_apply, withinDemeProjection, sum_unitPointMass_left, Fin.sum_univ_three]
+    fin_cases other <;>
+      simp [withinDemeCoordinate, withinDemeBlock, hrows.1, hrows.2.1, hrows.2.2] <;> ring
+  have hread : ∀ vector : AffineLowOrderLDCoordinate D → ℝ,
+      (withinDemeProjection deme).mulVec vector
+        = fun other ↦ vector (withinDemeCoordinate deme other) :=
+    fun vector ↦ funext fun other ↦
+      sum_unitPointMass_left (withinDemeCoordinate deme other) vector
+  have hstate := congrArg (fun matrix ↦ matrix.mulVec state)
+    (matrixExponential_intertwines (withinDemeProjection deme)
+      (augmentedLowOrderLDGenerator rates) (withinDemeBlock rates deme) hgenerator time)
+  simp only [← Matrix.mulVec_mulVec, hread] at hstate
+  exact congrFun hstate index
+
+/-- **The within-deme readout** `e^{tM} (DD₀, Dz₀, π₀)`: the within-deme block of `deme` applied
+to the ancestral within-deme coordinates of `parent`.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  A matrix exponential applied to three coordinates. -/
+def withinDemeReadout (rates : ManyDemeLDRates D) (deme parent : Fin D)
+    (ancestral : AffineLowOrderLDCoordinate D → ℝ) (time : ℝ) : Fin 3 → ℝ :=
+  (matrixExponential (withinDemeBlock rates deme) time).mulVec
+    fun other ↦ ancestral (withinDemeCoordinate parent other)
+
+/-- **The within-deme coordinates of the split history without migration**: in either deme they
+are the within-deme readout of the parent's ancestral coordinates.
+
+Assumes: no mutation, `parent ≠ child`, and `deme` is the parent or the child. -/
+theorem noMigrationHistory_withinDemeCoordinate (rates : ManyDemeLDRates D)
+    (hmutation : ∀ deme, rates.mutation deme = 0) {parent child : Fin D} (hne : parent ≠ child)
+    (ancestral : AffineLowOrderLDCoordinate D → ℝ) (time : ℝ) {deme : Fin D}
+    (hdeme : deme = parent ∨ deme = child) (index : Fin 3) :
+    migrationHistory rates hne 0 le_rfl ancestral time (withinDemeCoordinate deme index)
+      = withinDemeReadout rates deme parent ancestral time index := by
+  have hinitial : (fun other ↦ (lowOrderLDSplitTransform parent child).mulVec ancestral
+        (withinDemeCoordinate deme other))
+      = fun other ↦ ancestral (withinDemeCoordinate parent other) := by
+    funext other
+    rcases hdeme with rfl | rfl <;> fin_cases other <;>
+      simp [withinDemeCoordinate, lowOrderLDSplitTransform_mulVec,
+        LowOrderLDCoordinate.mergeSplit, hne]
+  have h := matrixExponential_mulVec_withinDemeCoordinate _
+    (withSymmetricMigration_zero_migration rates hne) hmutation deme time
+    ((lowOrderLDSplitTransform parent child).mulVec ancestral) index
+  rw [hinitial] at h
+  exact h
+
+/-- **The linkage migration stencil on the history without migration, at equal rates.**  With
+`w = withinDemeReadout`, `β = c + ρ/2` and `α = 4c/β`,
+`μ_D(t) = 2 w_DD(t) + w_Dz(t)/2 + e^{-βt} (Dz₀ + α DD₀)/2 - (2 + α/2) e^{-(2c + ρ) t} DD₀
+- e^{-(3c + ρ/2) t} Dz₀`.
+
+Assumes: no mutation, `parent ≠ child`, and equal drift and recombination rates. -/
+theorem linkageMigrationStencil_noMigration (rates : ManyDemeLDRates D)
+    (hmutation : ∀ deme, rates.mutation deme = 0) {parent child : Fin D} (hne : parent ≠ child)
+    (hcoal : rates.coalescence child = rates.coalescence parent)
+    (hrec : rates.recombination child = rates.recombination parent)
+    (ancestral : AffineLowOrderLDCoordinate D → ℝ) (time : ℝ) :
+    linkageMigrationStencil parent child (migrationHistory rates hne 0 le_rfl ancestral time)
+      = 2 * withinDemeReadout rates parent parent ancestral time 0
+          + withinDemeReadout rates parent parent ancestral time 1 / 2
+        + Real.exp (-linkageRate rates parent * time)
+          * (ancestral (some (.Dz parent parent parent))
+            + 4 * rates.coalescence parent / linkageRate rates parent
+              * ancestral (some (.DD parent parent))) / 2
+        - (2 + 2 * rates.coalescence parent / linkageRate rates parent)
+          * Real.exp (-(2 * rates.coalescence parent + rates.recombination parent) * time)
+          * ancestral (some (.DD parent parent))
+        - Real.exp (-(3 * rates.coalescence parent + rates.recombination parent / 2) * time)
+          * ancestral (some (.Dz parent parent parent)) := by
+  have hβ : linkageRate rates child = linkageRate rates parent := by
+    rw [linkageRate, linkageRate, hcoal, hrec]
+  have hreadout : ∀ source (moment : ℝ),
+      withinDemeReadout rates child source ancestral moment
+        = withinDemeReadout rates parent source ancestral moment := by
+    intro source moment
+    rw [withinDemeReadout, withinDemeReadout, withinDemeBlock, withinDemeBlock, hcoal, hrec]
+  have hDDc : migrationHistory rates hne 0 le_rfl ancestral time (some (.DD child child))
+      = withinDemeReadout rates child parent ancestral time 0 :=
+    noMigrationHistory_withinDemeCoordinate rates hmutation hne ancestral time
+      (deme := child) (Or.inr rfl) 0
+  have hDDp : migrationHistory rates hne 0 le_rfl ancestral time (some (.DD parent parent))
+      = withinDemeReadout rates parent parent ancestral time 0 :=
+    noMigrationHistory_withinDemeCoordinate rates hmutation hne ancestral time
+      (deme := parent) (Or.inl rfl) 0
+  have hDzc : migrationHistory rates hne 0 le_rfl ancestral time (some (.Dz child child child))
+      = withinDemeReadout rates child parent ancestral time 1 :=
+    noMigrationHistory_withinDemeCoordinate rates hmutation hne ancestral time
+      (deme := child) (Or.inr rfl) 1
+  have hDzp : migrationHistory rates hne 0 le_rfl ancestral time
+        (some (.Dz parent parent parent))
+      = withinDemeReadout rates parent parent ancestral time 1 :=
+    noMigrationHistory_withinDemeCoordinate rates hmutation hne ancestral time
+      (deme := parent) (Or.inl rfl) 1
+  obtain ⟨hdiagonal₁, hdiagonal₂, hdiagonal₃, hdiagonal₄⟩ :=
+    noMigrationHistory_Dz_diagonal rates hmutation hne ancestral time
+  rw [linkageMigrationStencil, hDDc, hDDp, hDzc, hDzp, hdiagonal₁, hdiagonal₂, hdiagonal₃,
+    hdiagonal₄, noMigrationHistory_DD_cross rates hmutation hne,
+    noMigrationHistory_Dz_childFed rates hmutation hne,
+    noMigrationHistory_Dz_parentFed rates hmutation hne, hreadout, crossLinkageDecayRate, hcoal,
+    hrec, hβ]
+  ring_nf
