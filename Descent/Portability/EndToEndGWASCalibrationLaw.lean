@@ -533,6 +533,218 @@ theorem tendsto_trainedCalibrationIntercept (source target : FiniteReportLaw Ω)
 
 end Attenuation
 
+/-! ## Target matrices as polynomials -/
+
+section Polynomials
+
+variable {H : Type*} [Fintype H] {J : Type*}
+
+/-- The tag covariance matrix `C(X_i, X_j)`, as polynomials of degree two. -/
+def tagCovariancePolynomial (genotype : H → J → ℝ) (i j : J) : MvPolynomial H ℝ :=
+  covariancePolynomial (fun individual ↦ genotype individual i)
+    (fun individual ↦ genotype individual j)
+
+/-- The intercept matrix `μ(Y) C(X_i, X_j) − C(X_i, Y) μ(X_j)`, as polynomials of degree three. -/
+def interceptMatrixPolynomial (genotype : H → J → ℝ) (outcome : H → ℝ) (i j : J) :
+    MvPolynomial H ℝ :=
+  expectationPolynomial outcome * tagCovariancePolynomial genotype i j
+    - covariancePolynomial (fun individual ↦ genotype individual i) outcome
+      * expectationPolynomial fun individual ↦ genotype individual j
+
+/-- The tag covariance polynomial evaluates to the tag covariance. -/
+theorem eval_tagCovariancePolynomial (law : FiniteReportLaw H) (genotype : H → J → ℝ)
+    (i j : J) :
+    eval law.mass (tagCovariancePolynomial genotype i j) = tagCovariance law genotype i j :=
+  eval_covariancePolynomial law _ _
+
+/-- The intercept matrix polynomial evaluates to the intercept matrix. -/
+theorem eval_interceptMatrixPolynomial (law : FiniteReportLaw H) (genotype : H → J → ℝ)
+    (outcome : H → ℝ) (i j : J) :
+    eval law.mass (interceptMatrixPolynomial genotype outcome i j)
+      = interceptMatrix law genotype outcome i j := by
+  rw [interceptMatrixPolynomial, map_sub, map_mul, map_mul, eval_expectationPolynomial,
+    eval_tagCovariancePolynomial, eval_covariancePolynomial, eval_expectationPolynomial]
+  rfl
+
+/-- The tag covariance polynomial has total degree at most two. -/
+theorem totalDegree_tagCovariancePolynomial_le (genotype : H → J → ℝ) (i j : J) :
+    (tagCovariancePolynomial genotype i j).totalDegree ≤ 2 :=
+  totalDegree_covariancePolynomial_le _ _
+
+/-- The intercept matrix polynomial has total degree at most three. -/
+theorem totalDegree_interceptMatrixPolynomial_le (genotype : H → J → ℝ) (outcome : H → ℝ)
+    (i j : J) : (interceptMatrixPolynomial genotype outcome i j).totalDegree ≤ 3 := by
+  have hmean := totalDegree_expectationPolynomial_le outcome
+  have htag := totalDegree_tagCovariancePolynomial_le genotype i j
+  have hmarginal :=
+    totalDegree_covariancePolynomial_le (fun individual ↦ genotype individual i) outcome
+  have hmarker := totalDegree_expectationPolynomial_le fun individual ↦ genotype individual j
+  refine (totalDegree_sub _ _).trans (max_le ?_ ?_)
+  · exact (totalDegree_mul _ _).trans (by omega)
+  · exact (totalDegree_mul _ _).trans (by omega)
+
+end Polynomials
+
+/-! ## The calibration accumulators as frequency polynomials of two demes -/
+
+variable {Deme Locus : Type*} {Allele : Locus → Type*}
+variable [Fintype Deme] [DecidableEq Deme] [Fintype Locus] [DecidableEq Locus]
+  [∀ ℓ, Fintype (Allele ℓ)] [∀ ℓ, DecidableEq (Allele ℓ)]
+
+section Accumulators
+
+variable {J : Type*} [Fintype J]
+
+/-- **The trained covariance polynomial** `∑_j C_t(X_j, Y) C_s(X_j, Y)`: the target marginal
+effects read against the source ones, a frequency polynomial of the two demes. -/
+def trainedCovariancePolynomial (source target : Deme)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    FrequencyPolynomial Deme Locus Allele :=
+  ∑ marker, demePolynomial target
+      (covariancePolynomial (fun individual ↦ genotype individual marker) outcome)
+    * demePolynomial source
+      (covariancePolynomial (fun individual ↦ genotype individual marker) outcome)
+
+/-- At a state, the trained covariance polynomial is the target covariance of the population
+marginal score of the source deme with the outcome. -/
+theorem polynomialFunction_trainedCovariancePolynomial (source target : Deme)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ)
+    (y : FrequencyState Deme Locus Allele) :
+    polynomialFunction (trainedCovariancePolynomial source target genotype outcome) y
+      = (stateLaw y target).covariance
+          (linearScore genotype (marginalWeights (stateLaw y source) genotype outcome))
+          outcome := by
+  rw [covariance_linearScore]
+  simp only [polynomialFunction_apply, trainedCovariancePolynomial, map_sum, map_mul,
+    eval_demePolynomial, eval_covariancePolynomial]
+  exact Finset.sum_congr rfl fun marker _ ↦ mul_comm _ _
+
+/-- **The trained covariance polynomial has total degree at most four.** -/
+theorem totalDegree_trainedCovariancePolynomial_le (source target : Deme)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    (trainedCovariancePolynomial source target genotype outcome).totalDegree ≤ 4 := by
+  refine (totalDegree_finset_sum _ _).trans (Finset.sup_le fun marker _ ↦ ?_)
+  have hdegree : ∀ deme : Deme, (demePolynomial deme
+      (covariancePolynomial (fun individual ↦ genotype individual marker) outcome)).totalDegree
+      ≤ 2 :=
+    fun deme ↦ (totalDegree_rename_le _ _).trans (totalDegree_covariancePolynomial_le _ outcome)
+  have htarget := hdegree target
+  have hsource := hdegree source
+  exact (totalDegree_mul _ _).trans (by omega)
+
+/-- **A trained polynomial has total degree at most the sum of the degrees** of its target and
+source matrices.  The double sum is read as one sum over pairs of tags. -/
+theorem totalDegree_trainedPolynomial_le_add (source target : Deme)
+    (sourceMatrix targetMatrix : J → J → MvPolynomial (FullHaplotype Locus Allele) ℝ) {a b : ℕ}
+    (hsource : ∀ i j, (sourceMatrix i j).totalDegree ≤ a)
+    (htarget : ∀ i j, (targetMatrix i j).totalDegree ≤ b) :
+    (trainedPolynomial source target sourceMatrix targetMatrix).totalDegree ≤ b + a := by
+  rw [trainedPolynomial, ← Fintype.sum_prod_type']
+  refine (totalDegree_finset_sum _ _).trans (Finset.sup_le fun pair _ ↦ ?_)
+  exact (totalDegree_mul _ _).trans (add_le_add
+    ((totalDegree_rename_le _ _).trans (htarget pair.1 pair.2))
+    ((totalDegree_rename_le _ _).trans (hsource pair.1 pair.2)))
+
+/-- At a state, the product polynomial read against the tag covariance is the target variance of
+the population marginal score of the source deme. -/
+theorem polynomialFunction_populationVariance (source target : Deme)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ)
+    (y : FrequencyState Deme Locus Allele) :
+    polynomialFunction (trainedPolynomial source target (weightProductPolynomial genotype outcome)
+        (tagCovariancePolynomial genotype)) y
+      = (stateLaw y target).variance
+          (linearScore genotype (marginalWeights (stateLaw y source) genotype outcome)) := by
+  rw [variance_linearScore_eq]
+  simp only [polynomialFunction_trainedPolynomial, eval_weightProductPolynomial,
+    eval_tagCovariancePolynomial]
+
+/-- At a state, the excess polynomial read against the tag covariance is the excess form. -/
+theorem polynomialFunction_excessForm (source target : Deme)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ)
+    (y : FrequencyState Deme Locus Allele) :
+    polynomialFunction (trainedPolynomial source target (weightExcessPolynomial genotype outcome)
+        (tagCovariancePolynomial genotype)) y
+      = excessForm (stateLaw y source) (stateLaw y target) genotype outcome := by
+  simp only [polynomialFunction_trainedPolynomial, eval_weightExcessPolynomial,
+    eval_tagCovariancePolynomial, excessForm]
+
+/-- At a state, the pairing polynomial read against the tag covariance is the pairing form. -/
+theorem polynomialFunction_pairingForm (source target : Deme)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ)
+    (y : FrequencyState Deme Locus Allele) :
+    polynomialFunction (trainedPolynomial source target (weightPairingPolynomial genotype outcome)
+        (tagCovariancePolynomial genotype)) y
+      = pairingForm (stateLaw y source) (stateLaw y target) genotype outcome := by
+  simp only [polynomialFunction_trainedPolynomial, eval_weightPairingPolynomial,
+    eval_tagCovariancePolynomial, pairingForm]
+
+/-- At a state, the product polynomial read against the intercept matrix is the intercept
+accumulator of the population marginal score of the source deme. -/
+theorem polynomialFunction_populationInterceptAccumulator (source target : Deme)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ)
+    (y : FrequencyState Deme Locus Allele) :
+    polynomialFunction (trainedPolynomial source target (weightProductPolynomial genotype outcome)
+        (interceptMatrixPolynomial genotype outcome)) y
+      = (stateLaw y target).expectation outcome
+          * (stateLaw y target).variance
+            (linearScore genotype (marginalWeights (stateLaw y source) genotype outcome))
+        - (stateLaw y target).covariance
+            (linearScore genotype (marginalWeights (stateLaw y source) genotype outcome)) outcome
+          * (stateLaw y target).expectation
+            (linearScore genotype (marginalWeights (stateLaw y source) genotype outcome)) := by
+  rw [interceptAccumulator_linearScore_eq]
+  simp only [polynomialFunction_trainedPolynomial, eval_weightProductPolynomial,
+    eval_interceptMatrixPolynomial]
+
+/-- **At a state, the trained covariance is a polynomial observable** of total degree at most
+four. -/
+theorem trainedCovariance_stateLaw (source target : Deme) {size : ℕ} (hsize : 2 ≤ size)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ)
+    (y : FrequencyState Deme Locus Allele) :
+    trainedCovariance (stateLaw y source) (stateLaw y target) size genotype outcome
+      = polynomialFunction (trainedCovariancePolynomial source target genotype outcome) y := by
+  rw [trainedCovariance_eq _ _ hsize, polynomialFunction_trainedCovariancePolynomial]
+
+/-- **At a state, the trained variance is a sampling form of three polynomial observables** of
+total degree at most six. -/
+theorem trainedVariance_stateLaw (source target : Deme) {size : ℕ} (hsize : 2 ≤ size)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ)
+    (y : FrequencyState Deme Locus Allele) :
+    trainedVariance (stateLaw y source) (stateLaw y target) size genotype outcome
+      = samplingForm
+          (polynomialFunction (trainedPolynomial source target
+            (weightProductPolynomial genotype outcome) (tagCovariancePolynomial genotype)) y)
+          (polynomialFunction (trainedPolynomial source target
+            (weightExcessPolynomial genotype outcome) (tagCovariancePolynomial genotype)) y)
+          (polynomialFunction (trainedPolynomial source target
+            (weightPairingPolynomial genotype outcome) (tagCovariancePolynomial genotype)) y)
+          size := by
+  rw [trainedVariance_eq _ _ hsize, polynomialFunction_populationVariance,
+    polynomialFunction_excessForm, polynomialFunction_pairingForm]
+
+/-- **At a state, the trained intercept accumulator is a sampling form of three polynomial
+observables** of total degree at most seven. -/
+theorem trainedInterceptAccumulator_stateLaw (source target : Deme) {size : ℕ}
+    (hsize : 2 ≤ size) (genotype : FullHaplotype Locus Allele → J → ℝ)
+    (outcome : FullHaplotype Locus Allele → ℝ) (y : FrequencyState Deme Locus Allele) :
+    trainedInterceptAccumulator (stateLaw y source) (stateLaw y target) size genotype outcome
+      = samplingForm
+          (polynomialFunction (trainedPolynomial source target
+            (weightProductPolynomial genotype outcome)
+            (interceptMatrixPolynomial genotype outcome)) y)
+          (polynomialFunction (trainedPolynomial source target
+            (weightExcessPolynomial genotype outcome)
+            (interceptMatrixPolynomial genotype outcome)) y)
+          (polynomialFunction (trainedPolynomial source target
+            (weightPairingPolynomial genotype outcome)
+            (interceptMatrixPolynomial genotype outcome)) y)
+          size := by
+  rw [trainedInterceptAccumulator_eq _ _ hsize, polynomialFunction_populationInterceptAccumulator]
+  simp only [polynomialFunction_trainedPolynomial, eval_weightExcessPolynomial,
+    eval_weightPairingPolynomial, eval_interceptMatrixPolynomial]
+
+end Accumulators
+
 end
 
 end Descent.Portability.EndToEndGWASCalibrationLaw
