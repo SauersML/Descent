@@ -290,7 +290,6 @@ theorem abs_learnedCalibrationSlope_le (source target : FiniteReportLaw Ω) (siz
 
 /-! ## The winner's curse on calibration -/
 
-omit [Fintype J] in
 /-- **The second moment of a thresholded weight dominates the true effect times its mean.**  For
 every cohort size `n ≥ 2`, threshold `t` and tag, `|w_j| |E ŵ_t,j| ≤ E ŵ_t,j²`.  The nonnegative
 square `E(|ŵ_t,j| − |w_j| 1{sel})² = E ŵ_t,j² − 2 |w_j| E|ŵ_t,j| + w_j² P(sel)` combines with the
