@@ -20,6 +20,7 @@ import Descent.Portability.EndToEndPooledCalibration
 import Descent.Portability.EndToEndDiscriminationLaw
 import Descent.Portability.EndToEndBrierLaw
 import Descent.Portability.EndToEndLogLossLaw
+import Descent.Portability.EndToEndLogLossBounds
 import Descent.Portability.EndToEndDecisionLaw
 import Descent.Portability.EndToEndGWASCalibrationLaw
 import Descent.Portability.MigrationPortabilityFirstOrderFactor
@@ -187,7 +188,13 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   and infinite exactly when a ruled-out outcome has positive mass
   (`expectedForecastLogLoss_eq_dotProduct`, `conditionalEntropy_le_forecastLogLoss`,
   `expectedLogLoss_groupForecast_eq_top`).  Pseudo-`R²` and its portability are ratios of these
-  series (`pseudoRSquaredPortability_eq_tsum_dotProduct`).
+  series (`pseudoRSquaredPortability_eq_tsum_dotProduct`).  Mutual information is a sum of
+  divergence terms, between zero and the outcome entropy, and zero exactly when score and outcome
+  are independent, so pseudo-`R²` lies in `[0, 1]` in every population and in expectation along
+  any history (`EndToEndLogLossBounds.mutualInformation_eq_sum_divergenceTerm`,
+  `mutualInformation_nonneg`, `mutualInformation_le_outcomeEntropy`,
+  `mutualInformation_eq_zero_iff`, `expectedPseudoRSquared_mem`,
+  `expectedMutualInformation_eq_zero_iff`, `logLossBounds_historyEventKernel`).
 * **Clinical decision metrics.**  The confusion cells of any rule are linear in the haplotype
   frequencies, so along any history the expected confusion table is the table of the budget-1
   propagated moments (`EndToEndDecisionLaw.ruleConfusion_pushforward`,
