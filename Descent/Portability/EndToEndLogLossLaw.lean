@@ -341,7 +341,12 @@ theorem repairedGroupLoss_eq (a b : ℝ) (ha : 0 ≤ a) (hb : 0 ≤ b) :
     have hunit : a / (b + a) + b / (b + a) = 1 := by
       rw [← add_div, add_comm, div_self hq.ne']
     rw [hcomplement, hsplit a, hsplit b]
-    linear_combination (-Real.negMulLog (b + a)) * hunit
+    calc Real.negMulLog a - a / (b + a) * Real.negMulLog (b + a)
+          + (Real.negMulLog b - b / (b + a) * Real.negMulLog (b + a))
+        = Real.negMulLog a + Real.negMulLog b
+          - (a / (b + a) + b / (b + a)) * Real.negMulLog (b + a) := by ring
+      _ = Real.negMulLog a + Real.negMulLog b - Real.negMulLog (b + a) := by
+          rw [hunit, one_mul]
 
 /-- **The repaired log loss is the conditional entropy.**  The expected negative logarithm of the
 repaired forecast of the realized outcome is `Σ_s [η(a_s) + η(b_s) - η(q_s)]`. -/
@@ -372,37 +377,35 @@ theorem expectedLogLoss_eq_ofReal_of_pos {Outcome : Type*} [Fintype Outcome]
     (hle : ∀ outcome, forecast outcome ≤ 1) :
     LogLossSeriesCertificate.expectedLogLoss law forecast
       = ENNReal.ofReal (law.expectation fun outcome ↦ -Real.log (forecast outcome)) := by
-  set supported : Outcome → ℝ :=
-    fun outcome ↦ if 0 < law.mass outcome then forecast outcome else 1 with hsupported
   have hzero : ∀ outcome, ¬ 0 < law.mass outcome → law.mass outcome = 0 := fun outcome hnot ↦
     le_antisymm (not_lt.mp hnot) (law.mass_nonneg outcome)
   have hloss : LogLossSeriesCertificate.expectedLogLoss law forecast
-      = LogLossSeriesCertificate.expectedLogLoss law supported := by
+      = LogLossSeriesCertificate.expectedLogLoss law
+          (fun outcome ↦ if 0 < law.mass outcome then forecast outcome else 1) := by
     unfold LogLossSeriesCertificate.expectedLogLoss
     refine Finset.sum_congr rfl fun outcome _ ↦ ?_
     by_cases hmass : 0 < law.mass outcome
-    · simp only [hsupported, if_pos hmass]
+    · simp only [if_pos hmass]
     · simp only [hzero outcome hmass, ENNReal.ofReal_zero, zero_mul]
   have hreal : law.expectation (fun outcome ↦ -Real.log (forecast outcome))
-      = law.expectation (fun outcome ↦ -Real.log (supported outcome)) := by
+      = law.expectation (fun outcome ↦
+          -Real.log (if 0 < law.mass outcome then forecast outcome else 1)) := by
     unfold FiniteReportLaw.expectation
     refine Finset.sum_congr rfl fun outcome _ ↦ ?_
     by_cases hmass : 0 < law.mass outcome
-    · simp only [hsupported, if_pos hmass]
+    · simp only [if_pos hmass]
     · simp only [hzero outcome hmass, zero_mul]
   rw [hloss, hreal]
-  refine LogLossSeriesCertificate.expectedLogLoss_eq_ofReal law supported (fun outcome ↦ ?_)
+  refine LogLossSeriesCertificate.expectedLogLoss_eq_ofReal law _ (fun outcome ↦ ?_)
     (fun outcome ↦ ?_)
-  · by_cases hmass : 0 < law.mass outcome
-    · simp only [hsupported, if_pos hmass]
-      exact hpos outcome hmass
-    · simp only [hsupported, if_neg hmass]
-      exact one_pos
-  · by_cases hmass : 0 < law.mass outcome
-    · simp only [hsupported, if_pos hmass]
-      exact hle outcome
-    · simp only [hsupported, if_neg hmass]
-      exact le_refl 1
+  · show 0 < if 0 < law.mass outcome then forecast outcome else 1
+    split_ifs with hmass
+    · exact hpos outcome hmass
+    · exact one_pos
+  · show (if 0 < law.mass outcome then forecast outcome else 1) ≤ 1
+    split_ifs with hmass
+    · exact hle outcome
+    · exact le_refl 1
 
 /-- **The extended repaired log loss is the conditional entropy**: the corpus extended log loss
 `LogLossSeriesCertificate.expectedLogLoss` read at the repaired forecast is finite and equals
