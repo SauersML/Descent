@@ -774,6 +774,10 @@ import Descent.Portability.PortabilityMomentLadderEight
 import Descent.Portability.EndToEndLogLossBounds
 import Descent.Portability.EndToEndMutualInformationPinsker
 import Descent.Portability.PortabilityMomentLadderBrier
+import Descent.Portability.EndToEndGWASThresholdCalibration
+import Descent.Portability.EndToEndDecisionCertificates
+import Descent.Portability.EndToEndDiploidCalibration
+import Descent.Portability.MigrationPortabilityRemainder
 
 assert_below Descent.Program
 
