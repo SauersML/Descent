@@ -133,16 +133,26 @@ theorem hasDerivAt_expectedSquaredCorrelation_segmentHistory (ℓ₀ : Locus)
         (familyDerivative (fun _ ↦ 4 * (k + 1)) θ₀)
         (budgetCoefficients ℓ₀ (fun _ ↦ 4 * (k + 1)) (seriesTermPolynomial deme score outcome k))
         (budgetMomentFeature (fun _ ↦ 4 * (k + 1)) x0)) θ₀ := by
-  have hfun : (fun θ ↦ expectedSquaredCorrelation
-      (historyEventKernel ℓ₀ hap₀ ((history.map segmentEvent).map fun event ↦ event θ)) x0 deme
-      score outcome)
-      = fun θ ↦ ∑' k : ℕ, budgetCoefficients ℓ₀ (fun _ ↦ 4 * (k + 1))
+  have hderiv : ∀ (k : ℕ) (θ : ℝ), θ ∈ Set.Ioo (0 : ℝ) 1 →
+      HasDerivAt (fun θ' ↦ budgetCoefficients ℓ₀ (fun _ ↦ 4 * (k + 1))
           (seriesTermPolynomial deme score outcome k)
         ⬝ᵥ (historyEventPropagator (fun _ ↦ 4 * (k + 1))
-            ((history.map segmentEvent).map fun event ↦ event θ)
-          *ᵥ budgetMomentFeature (fun _ ↦ 4 * (k + 1)) x0) :=
-    funext fun θ ↦ expectedSquaredCorrelation_historyEventKernel ℓ₀ hap₀ _ x0 deme score outcome
-      hscore0 hscore1 houtcome0 houtcome1
+            ((history.map segmentEvent).map fun event ↦ event θ')
+          *ᵥ budgetMomentFeature (fun _ ↦ 4 * (k + 1)) x0))
+        (historySensitivity (fun _ ↦ 4 * (k + 1)) θ (history.map segmentEvent)
+          (familyDerivative (fun _ ↦ 4 * (k + 1)) θ)
+          (budgetCoefficients ℓ₀ (fun _ ↦ 4 * (k + 1)) (seriesTermPolynomial deme score outcome k))
+          (budgetMomentFeature (fun _ ↦ 4 * (k + 1)) x0)) θ := fun k θ hθ ↦
+    hasDerivAt_dotProduct_segmentHistory (fun _ ↦ 4 * (k + 1)) hθ history
+      (budgetCoefficients ℓ₀ (fun _ ↦ 4 * (k + 1)) (seriesTermPolynomial deme score outcome k))
+      (budgetMomentFeature (fun _ ↦ 4 * (k + 1)) x0)
+  have hnorm : ∀ (k : ℕ) (θ : ℝ), θ ∈ Set.Ioo (0 : ℝ) 1 →
+      ‖historySensitivity (fun _ ↦ 4 * (k + 1)) θ (history.map segmentEvent)
+        (familyDerivative (fun _ ↦ 4 * (k + 1)) θ)
+        (budgetCoefficients ℓ₀ (fun _ ↦ 4 * (k + 1)) (seriesTermPolynomial deme score outcome k))
+        (budgetMomentFeature (fun _ ↦ 4 * (k + 1)) x0)‖ ≤ bound k := fun k θ hθ ↦ by
+    rw [Real.norm_eq_abs]
+    exact hbound k θ hθ
   have hterms : Summable fun k : ℕ ↦ budgetCoefficients ℓ₀ (fun _ ↦ 4 * (k + 1))
         (seriesTermPolynomial deme score outcome k)
       ⬝ᵥ (historyEventPropagator (fun _ ↦ 4 * (k + 1))
@@ -150,16 +160,33 @@ theorem hasDerivAt_expectedSquaredCorrelation_segmentHistory (ℓ₀ : Locus)
         *ᵥ budgetMomentFeature (fun _ ↦ 4 * (k + 1)) x0) := by
     haveI := isMarkovKernel_historyEventKernel ℓ₀ hap₀
       ((history.map segmentEvent).map fun event ↦ event θ₀)
-    exact (summable_integral_seriesTerm
+    have hsum := summable_integral_seriesTerm
       (historyEventKernel ℓ₀ hap₀ ((history.map segmentEvent).map fun event ↦ event θ₀)) x0 deme
-      score outcome hscore0 hscore1 houtcome0 houtcome1).congr fun k ↦
-        integral_seriesTerm_historyEventKernel ℓ₀ hap₀ _ x0 deme score outcome k
-  rw [hfun]
-  exact hasDerivAt_tsum_of_isPreconnected hsummable isOpen_Ioo isPreconnected_Ioo
-    (fun k θ hθ ↦ hasDerivAt_dotProduct_segmentHistory (fun _ ↦ 4 * (k + 1)) hθ history _ _)
-    (fun k θ hθ ↦ by
-      rw [Real.norm_eq_abs]
-      exact hbound k θ hθ) hθ₀ hterms hθ₀
+      score outcome hscore0 hscore1 houtcome0 houtcome1
+    have hterm : ∀ k : ℕ, ∫ y, correlationNumerator (stateLaw y deme) score outcome
+          * (1 - correlationDenominator (stateLaw y deme) score outcome) ^ k
+          ∂(historyEventKernel ℓ₀ hap₀ ((history.map segmentEvent).map fun event ↦ event θ₀) x0)
+        = budgetCoefficients ℓ₀ (fun _ ↦ 4 * (k + 1)) (seriesTermPolynomial deme score outcome k)
+          ⬝ᵥ (historyEventPropagator (fun _ ↦ 4 * (k + 1))
+              ((history.map segmentEvent).map fun event ↦ event θ₀)
+            *ᵥ budgetMomentFeature (fun _ ↦ 4 * (k + 1)) x0) := fun k ↦
+      integral_seriesTerm_historyEventKernel ℓ₀ hap₀
+        ((history.map segmentEvent).map fun event ↦ event θ₀) x0 deme score outcome k
+    exact hsum.congr hterm
+  have hseries := hasDerivAt_tsum_of_isPreconnected hsummable
+    (isOpen_Ioo : IsOpen (Set.Ioo (0 : ℝ) 1)) isPreconnected_Ioo hderiv hnorm hθ₀ hterms hθ₀
+  have hfun : ∀ θ : ℝ, expectedSquaredCorrelation
+      (historyEventKernel ℓ₀ hap₀ ((history.map segmentEvent).map fun event ↦ event θ)) x0 deme
+      score outcome
+      = ∑' k : ℕ, budgetCoefficients ℓ₀ (fun _ ↦ 4 * (k + 1))
+          (seriesTermPolynomial deme score outcome k)
+        ⬝ᵥ (historyEventPropagator (fun _ ↦ 4 * (k + 1))
+            ((history.map segmentEvent).map fun event ↦ event θ)
+          *ᵥ budgetMomentFeature (fun _ ↦ 4 * (k + 1)) x0) := fun θ ↦
+    expectedSquaredCorrelation_historyEventKernel ℓ₀ hap₀
+      ((history.map segmentEvent).map fun event ↦ event θ) x0 deme score outcome hscore0 hscore1
+      houtcome0 houtcome1
+  exact hseries.congr_of_eventuallyEq (Filter.Eventually.of_forall hfun)
 
 end
 
