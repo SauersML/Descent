@@ -145,8 +145,9 @@ theorem lowOrderLDHomogeneousGenerator_withSymmetricMigration (rates : ManyDemeL
         = lowOrderLDRecurrentMutationDamping (withSymmetricMigration rates hne 0 le_rfl) moment
           coordinate :=
     rfl
-  rw [lowOrderLDHomogeneousGenerator, lowOrderLDHomogeneousGenerator, hdrift, hrecombination,
-    hcoupling, hdamping, lowOrderLDMigration_withSymmetricMigration rates hne hmigration,
+  simp only [lowOrderLDHomogeneousGenerator]
+  rw [hdrift, hrecombination, hcoupling, hdamping,
+    lowOrderLDMigration_withSymmetricMigration rates hne hmigration,
     lowOrderLDMigration_withSymmetricMigration rates hne (le_rfl : (0 : ℝ) ≤ 0)]
   ring
 
@@ -245,7 +246,7 @@ of `migrationDirection`. -/
 theorem hasDerivAt_affineGenerator_apply (rates : ManyDemeLDRates D) {parent child : Fin D}
     (hne : parent ≠ child) (θ₀ : ℝ) (row column : AffineLowOrderLDCoordinate D) :
     HasDerivAt
-      (fun θ ↦ (augmentedLowOrderLDGenerator (withSymmetricMigration rates hne 0 le_rfl)
+      (fun θ : ℝ ↦ (augmentedLowOrderLDGenerator (withSymmetricMigration rates hne 0 le_rfl)
         + θ • migrationDirection rates hne) row column)
       (migrationDirection rates hne row column) θ₀ := by
   simpa only [Matrix.add_apply, Matrix.smul_apply, smul_eq_mul, one_mul] using
@@ -636,12 +637,12 @@ theorem linkageMigrationStencil_noMigration (rates : ManyDemeLDRates D)
         - Real.exp (-(3 * rates.coalescence parent + rates.recombination parent / 2) * time)
           * ancestral (some (.Dz parent parent parent)) := by
   have hβ : linkageRate rates child = linkageRate rates parent := by
-    rw [linkageRate, linkageRate, hcoal, hrec]
+    simp only [linkageRate, hcoal, hrec]
   have hreadout : ∀ source (moment : ℝ),
       withinDemeReadout rates child source ancestral moment
         = withinDemeReadout rates parent source ancestral moment := by
     intro source moment
-    rw [withinDemeReadout, withinDemeReadout, withinDemeBlock, withinDemeBlock, hcoal, hrec]
+    simp only [withinDemeReadout, withinDemeBlock, hcoal, hrec]
   have hDDc : migrationHistory rates hne 0 le_rfl ancestral time (some (.DD child child))
       = withinDemeReadout rates child parent ancestral time 0 :=
     noMigrationHistory_withinDemeCoordinate rates hmutation hne ancestral time
