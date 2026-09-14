@@ -127,7 +127,10 @@ theorem integral_mass_founderEventLaw (source : Deme) (ε : ℝ) (hε0 : 0 ≤ �
     exact integral_mass_founderEventLaw_self source ε hε0 hε1 x hap
   · rw [integral_founderEventLaw source ε hε0 hε1 x (demePolynomial deme (X hap)) _
       (polynomialFunction_demePolynomial_X deme hap)]
-    simp only [stateLaw_resamplingMove_of_ne source _ ε hε0 hε1 x hdeme]
+    have hunchanged : ∀ g : FullHaplotype Locus Allele,
+        stateLaw (resamplingMove source g ε hε0 hε1 x) deme = stateLaw x deme :=
+      fun g ↦ stateLaw_resamplingMove_of_ne source g ε hε0 hε1 x hdeme
+    simp only [hunchanged]
     rw [← Finset.sum_mul, x.2.2 source, one_mul]
 
 /-! ## Budget two: the calibration slope separates -/
