@@ -768,6 +768,8 @@ import Descent.Portability.EndToEndGWASCalibrationLaw
 import Descent.Portability.EndToEndDecisionLaw
 import Descent.Portability.MigrationPortabilityFirstOrderFactor
 import Descent.Portability.PortabilityMomentLadderEntropy
+import Descent.Portability.SelectionMetricsFirstOrder
+import Descent.Portability.PortabilityMomentLadderDecision
 
 assert_below Descent.Program
 
