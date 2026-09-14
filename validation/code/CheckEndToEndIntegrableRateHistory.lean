@@ -1,0 +1,34 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.EndToEndIntegrableRateHistory
+
+/-! Axiom audit of EndToEndIntegrableRateHistory. -/
+
+open Descent.Portability.EndToEndIntegrableRateHistory
+
+namespace Descent.Portability.EndToEndIntegrableRateHistory
+
+#print axioms cauchySeq_of_dense
+#print axioms integrableRateDualPropagator_eq
+#print axioms approximatingRates_spec
+#print axioms continuousOn_dualGenerator_approximatingRates
+#print axioms tendsto_rateHistoryDualPropagator_approximatingRates
+#print axioms momentReadout_apply
+#print axioms approximatingOperator_polynomial
+#print axioms approximatingOperator_momentPolynomial
+#print axioms norm_approximatingOperator_apply_le
+#print axioms cauchySeq_approximatingOperator
+#print axioms tendsto_approximatingOperator
+#print axioms integrableRateHistoryOperator_apply
+#print axioms tendsto_approximatingOperator_apply
+#print axioms integrableRateHistoryOperator_nonneg
+#print axioms integrableRateHistoryOperator_one
+#print axioms isMarkovKernel_integrableRateHistoryKernel
+#print axioms integral_integrableRateHistoryKernel
+#print axioms integral_momentPolynomial_integrableRateHistoryKernel
+#print axioms hasDualMoments_integrableRateHistoryKernel
+#print axioms portabilityReport_historyEvent_eq_integrableRateHistory
+#print axioms expectedMetrics_historyEvent_eq_integrableRateHistory
+
+end Descent.Portability.EndToEndIntegrableRateHistory
