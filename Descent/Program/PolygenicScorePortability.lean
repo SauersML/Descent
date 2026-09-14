@@ -27,6 +27,9 @@ import Descent.Portability.EndToEndDiploidLaw
 import Descent.Portability.EndToEndDiploidHistoryLaw
 import Descent.Portability.EndToEndGWASTrainingLaw
 import Descent.Portability.EndToEndGWASTrainingHistory
+import Descent.Portability.EndToEndGWASThresholdLaw
+import Descent.Portability.TwoTimeRatePropagator
+import Descent.Portability.SelectionHistoryFirstOrder
 import Descent.Portability.EndToEndAscertainedLaw
 import Descent.Portability.EndToEndAscertainedWitness
 import Descent.Portability.TwoLocusPortabilityDecay
@@ -230,6 +233,22 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
     `trainingWitness_accuracy`).
   * Along any history it is rational in the budget-8 moments and `n`
     (`EndToEndGWASTrainingHistory.expectedTrainedAccuracy_historyEventKernel`).
+* **Thresholding on the training cohort, and the winner's curse.**
+  * Any statistic of the training cohort is a learner, and its expected accuracy reads the
+    second-moment matrix of the learned weights against the target matrices
+    (`EndToEndGWASThresholdLaw.learnedNumerator_eq`, `learnedDenominator_eq`).  Keeping a tag's
+    sample covariance only above a threshold is the corpus p-value stage read on the cohort's own
+    table (`covarianceThresholdWeights_eq_thresholdWeights`).
+  * Along any history the expected thresholded accuracy is rational in the budget-`(n + 4)`
+    moments: the cohort absorbs the source degree, only the target adds four
+    (`expectedLearnedAccuracy_historyEventKernel`, `expectedLearnedAccuracy_rateHistoryKernel`,
+    `expectedLearnedAccuracy_eq_of_moments_eq`).
+  * In magnitude the curse holds for every cohort size, threshold and tag: conditional on being
+    selected, the estimate is on average at least as large as the true effect
+    (`abs_marginalWeights_mul_le_expectation_abs`, `abs_marginalWeights_le_conditional`).  The
+    signed statement fails for two-sided selection, and on the same law the population
+    thresholded accuracy is zero while a cohort of two gives positive accuracy
+    (`curseWitness_marginalWeights`, `curseWitness_selection`, `curseWitness_accuracy`).
 * **Ascertainment.**
   * A panel rule passes with probability a polynomial of degree at most `n`
     (`EndToEndAscertainedLaw.totalDegree_acceptancePolynomial_le`), so ascertained portability
@@ -285,7 +304,13 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   (`FundamentalMatrixParameterDerivative.hasDerivAt_fundamentalMatrix_affinePath`), so the
   propagator and expected portability of the rate history have exact derivatives
   (`EndToEndSensitivityRatePath.hasDerivAt_rateHistoryDualPropagator_segment`,
-  `hasDerivAt_expectedPortability_rateSegment`).  The expected squared correlation is
+  `hasDerivAt_expectedPortability_rateSegment`).  The block form is the Duhamel integral: the
+  two-time propagator `U(t, s)` of a generator path is constructed, with `U(t, t) = 1`,
+  Chapman–Kolmogorov and both Kolmogorov equations, and the derivative of `U_θ(T, 0)` is
+  `∫₀ᵀ U(T, s) Δ(s) U(s, 0) ds` (`TwoTimeRatePropagator.twoTimePropagator_self`,
+  `twoTimePropagator_mul`, `hasDerivWithinAt_twoTimePropagator_left`,
+  `hasDerivWithinAt_twoTimePropagator_right`, `hasDerivAt_twoTimePropagator_affinePath`,
+  `ratePathSensitivity_eq_integral`).  The expected squared correlation is
   differentiated termwise along segment histories
   (`EndToEndSensitivitySeries.summable_integral_seriesTerm`,
   `hasDerivAt_expectedSquaredCorrelation_segmentHistory`).
@@ -306,6 +331,18 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
 * Bounded selected moment families are determined by their initial moments
   (`SelectionMomentUniqueness.moments_eq_of_selectedMomentEquation`,
   `expectedMoments_eq_of_selectedForward`).
+* Along a whole history the first-order law composes.  The selected moments equal the neutral
+  propagation plus a history correction, the rest-of-history propagator applied to each epoch's
+  correction, within `B S (B + 1) σ T²`
+  (`SelectionHistoryFirstOrder.norm_selectedHistory_sub_firstOrder_le`).  The correction is linear
+  in the fitness table and is the right derivative of the moments in the selection strength
+  (`historyCorrection_scaledModel`, `norm_scaledHistory_sub_firstOrder_le`,
+  `hasDerivWithinAt_selectedHistory_firstOrder`).  So portability under selection is the neutral
+  portability plus `σ` times an explicit first-order term, within an explicit `O(σ² T²)`
+  remainder, and selection raises portability to first order exactly when the target accuracy's
+  relative first-order change exceeds the source's
+  (`abs_selectedPortability_sub_firstOrder_le`, `hasDerivWithinAt_selectedPortability_firstOrder`,
+  `portabilityFirstOrder_pos_iff`).
 
 ## 8. What data can tell: identification and its limits
 
