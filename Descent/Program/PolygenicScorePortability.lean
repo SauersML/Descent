@@ -20,6 +20,9 @@ import Descent.Portability.EndToEndPooledCalibration
 import Descent.Portability.EndToEndDiscriminationLaw
 import Descent.Portability.EndToEndBrierLaw
 import Descent.Portability.EndToEndLogLossLaw
+import Descent.Portability.EndToEndDecisionLaw
+import Descent.Portability.EndToEndGWASCalibrationLaw
+import Descent.Portability.MigrationPortabilityFirstOrderFactor
 import Descent.Portability.EndToEndDiploidGWASTraining
 import Descent.Portability.EndToEndSensitivityRatePathMetrics
 import Descent.Portability.EndToEndDeploymentLaw
@@ -27,6 +30,7 @@ import Descent.Portability.PortabilityMomentLadder
 import Descent.Portability.PortabilityMomentLadderSharpness
 import Descent.Portability.PortabilityMomentLadderDeployment
 import Descent.Portability.PortabilityMomentLadderSeries
+import Descent.Portability.PortabilityMomentLadderEntropy
 import Descent.Portability.EndToEndDiploidLaw
 import Descent.Portability.EndToEndDiploidHistoryLaw
 import Descent.Portability.EndToEndGWASTrainingLaw
@@ -181,6 +185,22 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   (`expectedForecastLogLoss_eq_dotProduct`, `conditionalEntropy_le_forecastLogLoss`,
   `expectedLogLoss_groupForecast_eq_top`).  Pseudo-`R²` and its portability are ratios of these
   series (`pseudoRSquaredPortability_eq_tsum_dotProduct`).
+* **Clinical decision metrics.**  The confusion cells of any rule are linear in the haplotype
+  frequencies, so along any history the expected confusion table is the table of the budget-1
+  propagated moments (`EndToEndDecisionLaw.ruleConfusion_pushforward`,
+  `expectedConfusion_eq_momentConfusion`, `expectedConfusion_historyEventKernel`).  Net benefit is
+  exact at budget 1 and equals the net benefit of the expected table, and the comparison with
+  treating everyone is one dot product (`expectedNetBenefit_eq_dotProduct`,
+  `expectedNetBenefit_eq_expectedConfusion`, `expectedNetBenefit_sub_treatAll_eq_dotProduct`).
+  Sensitivity, specificity, PPV, NPV, F1, Youden's J and relative risk port as functions of the
+  budget-1 moments, and budget-2 agreement fixes them together with AUC portability
+  (`expectedMetricPortability_eq_momentConfusion`,
+  `expectedAUCPortability_and_expectedMetricPortability_eq_of_moments_eq`).  Expected
+  per-population recall and precision are series of propagated moments
+  (`expectedPositiveQuotient_eq_tsum_dotProduct`).  With equal recall and false positive rate,
+  precision ports exactly when prevalence ports, and an explicit prevalence shift from `1/2` to
+  `1/5` moves precision from `4/5` to `1/2` (`precision_eq_iff_prevalence_eq`,
+  `prevalenceShift_witness`).
 * **Stability.**  Propagators of two rate paths differ by at most
   `(∫‖Q₁ − Q₂‖) e^{∫‖Q₁‖} e^{∫‖Q₂‖}`
   (`EndToEndPortabilityLipschitz.norm_rateHistoryDualPropagator_sub_le`).  Expected portability,
@@ -202,7 +222,10 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
     rate history with equal moment sequences give every score the same expected squared
     correlation and expected AUC
     (`PortabilityMomentLadderSeries.expectedMetrics_eq_of_polynomialsAgreeAt_all`,
-    `expectedMetrics_historyEvent_eq_rateHistory`).
+    `expectedMetrics_historyEvent_eq_rateHistory`).  The same rung fixes the expected entropy,
+    conditional entropy and mutual information of every report map
+    (`PortabilityMomentLadderEntropy.expectedInformation_eq_of_polynomialsAgreeAt_all`,
+    `expectedInformation_historyEvent_eq_rateHistory`).
   * None of this is special to histories of epochs.  Any two process laws with dual moments that
     agree on degree-four polynomial expectations have one report
     (`polynomialsAgreeAt_of_hasDualMoments`, `portabilityReport_eq_of_polynomialsAgreeAt_four`).
@@ -267,6 +290,19 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
     `expectedDiploidTrainedAccuracy_historyEventKernel`,
     `expectedDiploidTrainedAccuracy_rateHistoryKernel`,
     `expectedDiploidTrainedAccuracy_eq_of_moments_eq`).
+* **Calibration of a GWAS-trained score.**  The trained score's expected target covariance with the
+  outcome carries no sampling term, while its expected variance is `α + β/n + γ/(n(n − 1))`, so
+  the calibration slope of expectations is the population slope times the exact attenuation factor
+  `α/(α + τ_n)`, which lies in `[0, 1]`, rises with `n` and tends to one
+  (`EndToEndGWASCalibrationLaw.trainedCovariance_eq`, `trainedVariance_eq`,
+  `trainedCalibrationSlope_eq_mul_attenuationFactor`, `tendsto_trainedCalibrationSlope`).  The
+  attenuation is strict at every finite `n` when the population covariance is positive
+  (`trainedCalibrationSlope_lt_populationCalibrationSlope`).  Unlike accuracy, calibration moves
+  monotonically with the cohort size (`trainedCalibrationSlope_monotone`), and a one-tag law keeps
+  accuracy fixed while strictly attenuating the slope (`calibrationWitness`).  Along any history
+  the trained slope is rational in the budget-6 moments and the intercept in the budget-7 moments
+  (`expectedTrainedCalibrationSlope_historyEventKernel`,
+  `expectedTrainedCalibrationIntercept_historyEventKernel`).
 * **Thresholding on the training cohort, and the winner's curse.**
   * Any statistic of the training cohort is a learner, and its expected accuracy reads the
     second-moment matrix of the learned weights against the target matrices
@@ -314,7 +350,13 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   without migration, the heterozygosity stencil is an explicit combination of exponentials, and
   it is nonnegative, so to first order migration raises the heterozygosity denominator
   (`MigrationPortabilityFirstOrder.heterozygosityMigrationStencil_noMigration`,
-  `heterozygosityMigrationStencil_noMigration_nonneg`).
+  `heterozygosityMigrationStencil_noMigration_nonneg`).  The generator is affine in `m`, so the
+  split ratio has an exact derivative at `m = 0`, one-sided on `m ≥ 0`, the first-order migration
+  factor `A_D − e^{-ρ̄T} A_π`; at zero recombination it is
+  `φ₁(T) = 2 (cosh cT − 1)(π₀ − DD₀)(π₀ + Dz₀)/(c·DD₀·π₀)`, nonnegative when `DD₀ ≤ π₀` and
+  `π₀ + Dz₀ ≥ 0`, so weak migration then raises portability to first order
+  (`MigrationPortabilityFirstOrderFactor.augmentedLowOrderLDGenerator_withSymmetricMigration`,
+  `hasDerivWithinAt_splitPortabilityRatio_withSymmetricMigration`).
 
 ## 6. Response: how accuracy moves with every input
 
