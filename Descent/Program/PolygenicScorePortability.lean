@@ -67,6 +67,7 @@ import Descent.Portability.DiploidSelectionHistory
 import Descent.Portability.EndToEndIntegrableRateHistory
 import Descent.Portability.EndToEndSensitivitySeriesBound
 import Descent.Portability.AdmixturePulseComposition
+import Descent.Portability.EndToEndPenetranceLaw
 import Descent.Portability.SelectionMetricsFirstOrder
 import Descent.Portability.PortabilityMomentLadderDecision
 import Descent.Portability.PortabilityMomentLadderEight
@@ -279,6 +280,14 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   `tablePPV_ascertainedTable`).  The cohort value ports whenever sensitivity and specificity port,
   and the population value ports exactly when the prevalence ports as well
   (`tablePPV_ascertainedTable_eq_of_rates_eq`, `tablePPV_eq_iff_tableCaseMass_eq`).
+* **Random outcomes.**  With a penetrance, a case probability per haplotype, the confusion cells,
+  prevalence, net benefit and Brier loss are single-haplotype averages and the AUC parts are
+  pair averages, so degree one fixes the penetrance report and degree two its AUC portability
+  under any process law (`EndToEndPenetranceLaw.penetranceReport_eq_of_polynomialsAgreeAt_one`,
+  `expectedPenetranceAUCPortability_eq_of_polynomialsAgreeAt_two`,
+  `penetranceReport_and_aucPortability_historyEvent_eq_rateHistory`).  Indicator penetrances give
+  back the deterministic laws (`expectedPenetranceConfusion_indicator`,
+  `expectedPenetranceAUCPortability_indicator`).
 * **Stability.**  Propagators of two rate paths differ by at most
   `(∫‖Q₁ − Q₂‖) e^{∫‖Q₁‖} e^{∫‖Q₂‖}`
   (`EndToEndPortabilityLipschitz.norm_rateHistoryDualPropagator_sub_le`).  Expected portability,
