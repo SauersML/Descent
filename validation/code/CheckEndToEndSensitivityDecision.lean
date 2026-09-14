@@ -1,0 +1,25 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.EndToEndSensitivityDecision
+
+/-! Axiom audit of EndToEndSensitivityDecision. -/
+
+open Descent.Portability.EndToEndSensitivityDecision
+
+#print axioms hasDerivAt_of_hasSum_dotProduct_segmentHistory
+#print axioms hasDerivAt_of_hasSum_dotProduct_rateSegment
+#print axioms hasSum_expectedEntropy_historyEventKernel
+#print axioms hasSum_expectedEntropy_rateHistoryKernel
+#print axioms hasDerivAt_expectedEntropy_segmentHistory
+#print axioms hasDerivAt_expectedEntropy_rateSegment
+#print axioms hasSum_expectedConditionalEntropy_historyEventKernel
+#print axioms hasSum_expectedConditionalEntropy_rateHistoryKernel
+#print axioms hasSum_expectedMutualInformation_historyEventKernel
+#print axioms hasSum_expectedMutualInformation_rateHistoryKernel
+#print axioms hasDerivAt_expectedConditionalEntropy_segmentHistory
+#print axioms hasDerivAt_expectedConditionalEntropy_rateSegment
+#print axioms hasDerivAt_expectedMutualInformation_segmentHistory
+#print axioms hasDerivAt_expectedMutualInformation_rateSegment
+#print axioms hasDerivAt_expectedForecastLogLoss_segmentHistory
+#print axioms hasDerivAt_expectedForecastLogLoss_rateSegment
