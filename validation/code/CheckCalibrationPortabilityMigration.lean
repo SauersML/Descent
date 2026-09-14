@@ -1,0 +1,29 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.CalibrationPortabilityMigration
+
+/-! Axiom audit of CalibrationPortabilityMigration. -/
+
+open Descent.Portability.CalibrationPortabilityMigration
+
+#print axioms calibrationPortability_commonRetention
+#print axioms squaredCorrelationPortability_commonRetention
+#print axioms squaredCorrelationPortability_sqrtRetention
+#print axioms sqrt_portabilityDecay
+#print axioms abs_sqrt_sub_sub_le
+#print axioms abs_sqrt_sub_sub_mul_le
+#print axioms calibrationMigrationRatio
+#print axioms calibrationPortability_migration
+#print axioms squaredCorrelationPortability_migration
+#print axioms calibrationMigrationRatio_zero
+#print axioms calibrationMigrationFactor
+#print axioms hasDerivWithinAt_calibrationMigrationRatio
+#print axioms calibrationMigrationFactor_div_eq_half
+#print axioms calibrationMigrationFactor_eq_half_of_recombination_eq_zero
+#print axioms calibrationMigrationFactor_zeroRecombination
+#print axioms calibrationMigrationFactor_nonneg_zeroRecombination
+#print axioms calibrationRemainderConstant
+#print axioms abs_calibrationMigrationRatio_sub_le
+#print axioms exists_calibrationDecay_lt_calibrationMigrationRatio
+#print axioms exists_calibrationMigrationRatio_lt_calibrationDecay
