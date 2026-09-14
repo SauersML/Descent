@@ -23,6 +23,7 @@ import Descent.Portability.EndToEndDeploymentLaw
 import Descent.Portability.PortabilityMomentLadder
 import Descent.Portability.PortabilityMomentLadderSharpness
 import Descent.Portability.PortabilityMomentLadderDeployment
+import Descent.Portability.PortabilityMomentLadderSeries
 import Descent.Portability.EndToEndDiploidLaw
 import Descent.Portability.EndToEndDiploidHistoryLaw
 import Descent.Portability.EndToEndGWASTrainingLaw
@@ -179,7 +180,12 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   * Budget 8 adds the joint ratio and GWAS-trained accuracy at every cohort size
     (`portabilityReport_and_training_eq_of_momentsAgreeAt_eight`).
   * Every budget fixes the expected per-population metrics
-    (`expectedMetrics_eq_of_momentsAgreeAt_all`).
+    (`expectedMetrics_eq_of_momentsAgreeAt_all`), and so does agreement on every polynomial
+    expectation under any process law, term by term through the series; an event history and a
+    rate history with equal moment sequences give every score the same expected squared
+    correlation and expected AUC
+    (`PortabilityMomentLadderSeries.expectedMetrics_eq_of_polynomialsAgreeAt_all`,
+    `expectedMetrics_historyEvent_eq_rateHistory`).
   * None of this is special to histories of epochs.  Any two process laws with dual moments that
     agree on degree-four polynomial expectations have one report
     (`polynomialsAgreeAt_of_hasDualMoments`, `portabilityReport_eq_of_polynomialsAgreeAt_four`).
