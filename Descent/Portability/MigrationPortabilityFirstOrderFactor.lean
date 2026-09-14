@@ -618,3 +618,111 @@ theorem linkageMigrationStencil_noMigration (rates : ManyDemeLDRates D)
     noMigrationHistory_Dz_parentFed rates hmutation hne, hreadout, crossLinkageDecayRate, hcoal,
     hrec, hβ]
   ring_nf
+
+/-! ## The first-order factor -/
+
+/-- **The first-order migration factor** `φ₁(T) = A_D⁰(T) - e^{-ρ̄T} A_π⁰(T)`: the linkage share
+without migration minus the portability decay times the heterozygosity share without migration.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  Two integrals along a corpus history. -/
+def firstOrderMigrationFactor (rates : ManyDemeLDRates D) {parent child : Fin D}
+    (hne : parent ≠ child) (ancestral : AffineLowOrderLDCoordinate D → ℝ) (duration : ℝ) : ℝ :=
+  linkageMigrationShare rates hne 0 le_rfl ancestral duration
+    - portabilityDecay ((rates.recombination parent + rates.recombination child) / 2) duration
+      * heterozygosityMigrationShare rates hne 0 le_rfl ancestral duration
+
+/-- **The portability ratio along the affine family of generators**, at every real rate `θ`.
+
+Empirical status: NOT AN EMPIRICAL CLAIM.  A ratio of moment coordinates of a history. -/
+def affineMigrationPortabilityRatio (rates : ManyDemeLDRates D) {parent child : Fin D}
+    (hne : parent ≠ child) (ancestral : AffineLowOrderLDCoordinate D → ℝ) (duration θ : ℝ) : ℝ :=
+  affineMigrationHistory rates hne ancestral θ duration (some (.DD parent child))
+    / affineMigrationHistory rates hne ancestral θ duration (some (.pi2 parent parent child child))
+    / ancestralSquaredCorrelation ancestral parent
+
+/-- The linkage decay factor is the heterozygosity decay factor times the portability decay. -/
+theorem exp_neg_crossLinkageDecayRate_mul (rates : ManyDemeLDRates D) (parent child : Fin D)
+    (duration : ℝ) :
+    Real.exp (-crossLinkageDecayRate rates parent child * duration)
+      = Real.exp (-crossHeterozygosityDecayRate rates parent child * duration)
+        * portabilityDecay ((rates.recombination parent + rates.recombination child) / 2)
+          duration := by
+  rw [portabilityDecay, ← Real.exp_add]
+  congr 1
+  unfold crossLinkageDecayRate crossHeterozygosityDecayRate
+  ring
+
+/-- **The portability ratio has derivative `φ₁` at `m = 0` along the affine family.**  The
+quotient rule on the two Duhamel derivatives, with the drift factor `e^{-(c_S + c_T) T}` common to
+both moments cancelled.
+
+Assumes: no mutation, `parent ≠ child`, a nonzero ancestral `E[D²]` and a nonzero ancestral
+heterozygosity product. -/
+theorem hasDerivAt_affineMigrationPortabilityRatio (rates : ManyDemeLDRates D)
+    (hmutation : ∀ deme, rates.mutation deme = 0) {parent child : Fin D} (hne : parent ≠ child)
+    (ancestral : AffineLowOrderLDCoordinate D → ℝ)
+    (hlinkage : ancestral (some (.DD parent parent)) ≠ 0)
+    (hheterozygosity : ancestral (some (.pi2 parent parent parent parent)) ≠ 0) (duration : ℝ) :
+    HasDerivAt (affineMigrationPortabilityRatio rates hne ancestral duration)
+      (firstOrderMigrationFactor rates hne ancestral duration) 0 := by
+  have hDD := (hasDerivAt_affineMigrationHistory rates hne ancestral duration
+    (some (.DD parent child))).congr_deriv
+    (duhamelDerivative_mulVec_DD rates hmutation hne ancestral duration)
+  have hpi2 := (hasDerivAt_affineMigrationHistory rates hne ancestral duration
+    (some (.pi2 parent parent child child))).congr_deriv
+    (duhamelDerivative_mulVec_pi2 rates hmutation hne ancestral duration)
+  have hvalueDD : affineMigrationHistory rates hne ancestral 0 duration (some (.DD parent child))
+      = Real.exp (-crossLinkageDecayRate rates parent child * duration)
+        * ancestral (some (.DD parent parent)) := by
+    rw [affineMigrationHistory_zero, noMigrationHistory_DD_cross rates hmutation hne]
+  have hvaluepi2 : affineMigrationHistory rates hne ancestral 0 duration
+        (some (.pi2 parent parent child child))
+      = Real.exp (-crossHeterozygosityDecayRate rates parent child * duration)
+        * ancestral (some (.pi2 parent parent parent parent)) := by
+    rw [affineMigrationHistory_zero, migrationHistory_pi2 rates hmutation hne le_rfl, zero_mul,
+      add_zero]
+  have hexp := (Real.exp_pos (-crossHeterozygosityDecayRate rates parent child * duration)).ne'
+  have hdenominator : affineMigrationHistory rates hne ancestral 0 duration
+      (some (.pi2 parent parent child child)) ≠ 0 := by
+    rw [hvaluepi2]
+    exact mul_ne_zero hexp hheterozygosity
+  refine ((hDD.fun_div hpi2 hdenominator).div_const
+    (ancestralSquaredCorrelation ancestral parent)).congr_deriv ?_
+  rw [hvalueDD, hvaluepi2, firstOrderMigrationFactor, linkageMigrationShare,
+    heterozygosityMigrationShare, ancestralSquaredCorrelation,
+    exp_neg_crossLinkageDecayRate_mul]
+  first | (field_simp; ring) | field_simp
+
+/-- At a nonnegative rate the affine ratio is the corpus portability ratio with migration. -/
+theorem splitPortabilityRatio_withSymmetricMigration_eq_affine (rates : ManyDemeLDRates D)
+    {parent child : Fin D} (hne : parent ≠ child) {migration : ℝ} (hmigration : 0 ≤ migration)
+    {duration : ℝ} (hduration : 0 ≤ duration) (ancestral : AffineLowOrderLDCoordinate D → ℝ) :
+    splitPortabilityRatio (withSymmetricMigration rates hne migration hmigration) parent child
+        hduration ancestral
+      = affineMigrationPortabilityRatio rates hne ancestral duration migration := by
+  rw [splitPortabilityRatio, crossSquaredCorrelation, splitHistoryState_withSymmetricMigration,
+    migrationHistory_eq_affineMigrationHistory rates hne hmigration,
+    affineMigrationPortabilityRatio]
+
+/-- **The first-order migration factor of the corpus portability ratio.**  On `m ≥ 0` the ratio
+`splitPortabilityRatio` with symmetric migration `m` has one-sided derivative
+`firstOrderMigrationFactor` at `m = 0`: `ratio_m = e^{-ρ̄T} + m φ₁(T) + o(m)`.  The rate enters as
+`max m 0`, so the function is defined at every real `m`.
+
+Assumes: no mutation, `parent ≠ child`, a nonzero ancestral `E[D²]` and a nonzero ancestral
+heterozygosity product. -/
+theorem hasDerivWithinAt_splitPortabilityRatio_withSymmetricMigration (rates : ManyDemeLDRates D)
+    (hmutation : ∀ deme, rates.mutation deme = 0) {parent child : Fin D} (hne : parent ≠ child)
+    {duration : ℝ} (hduration : 0 ≤ duration) (ancestral : AffineLowOrderLDCoordinate D → ℝ)
+    (hlinkage : ancestral (some (.DD parent parent)) ≠ 0)
+    (hheterozygosity : ancestral (some (.pi2 parent parent parent parent)) ≠ 0) :
+    HasDerivWithinAt
+      (fun migration ↦ splitPortabilityRatio
+        (withSymmetricMigration rates hne (max migration 0) (le_max_right migration 0)) parent
+        child hduration ancestral)
+      (firstOrderMigrationFactor rates hne ancestral duration) (Set.Ici 0) 0 := by
+  refine (hasDerivAt_affineMigrationPortabilityRatio rates hmutation hne ancestral hlinkage
+    hheterozygosity duration).hasDerivWithinAt.congr (fun migration hmigration ↦ ?_) ?_
+  · have hnonnegative : 0 ≤ migration := hmigration
+    rw [splitPortabilityRatio_withSymmetricMigration_eq_affine, max_eq_left hnonnegative]
+  · rw [splitPortabilityRatio_withSymmetricMigration_eq_affine, max_self]
