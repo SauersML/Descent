@@ -59,10 +59,11 @@ two moments, and the common drift factor cancels from the ratio (`exp_mul_div_ex
 
 ## Scope
 
-The pre-pulse state is any haplotype-realizable moment vector.  A split, then an epoch, then the
-pulse is not composed here, because preservation of haplotype realizability by the epoch
-semigroup is still an open corpus obligation.  Monotonicity in `α` is proved for the covariance,
-not for the squared-correlation ratio, whose heterozygosity denominator also moves with `α`.
+The pre-pulse state is any haplotype-realizable moment vector.  A split followed by an epoch
+supplies one, and the chronology split, epoch, pulse, epoch is composed in
+`Descent.Portability.AdmixturePulseComposition`.  Monotonicity in `α` is proved for the
+covariance, not for the squared-correlation ratio, whose heterozygosity denominator also moves
+with `α`.
 The mixed-heterozygosity readout `pi2(S, T, S, T)`, repeated pulses and continuous migration are
 not treated here.
 
