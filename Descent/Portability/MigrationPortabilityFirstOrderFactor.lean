@@ -12,7 +12,9 @@ assert_below Descent.Decision Descent.Program
 
 `MigrationPortabilityFactor` proves that with symmetric migration `m` between the two demes of a
 split the portability ratio is `(e^{-ρ̄T} + m A_D) / (1 + m A_π)`, with shares integrated along
-the with-migration history.  This module differentiates that ratio at `m = 0`.
+the with-migration history.  This module differentiates that ratio at `m = 0`, reads the linkage
+stencil on the history without migration, and evaluates the factor in closed form without
+recombination.
 
 ## Main results
 
@@ -29,6 +31,44 @@ the with-migration history.  This module differentiates that ratio at `m = 0`.
   derivative `firstOrderMigrationFactor = A_D⁰ - e^{-ρ̄T} A_π⁰` at `m = 0`, two-sided along the
   affine family of generators and one-sided for the corpus ratio on `m ≥ 0`.  So
   `ratio_m = e^{-ρ̄T} + m φ₁(T) + o(m)`.
+- The elementary parts of the linkage stencil without migration: `noMigrationHistory_DD_cross`,
+  the fed contrasts `noMigrationHistory_Dz_childFed` and `noMigrationHistory_Dz_parentFed`
+  (through `matrixExponential_mulVec_Dz_fed`), and `noMigrationHistory_Dz_diagonal`.
+- `matrixExponential_mulVec_withinDemeCoordinate`, `noMigrationHistory_withinDemeCoordinate`: the
+  within-deme coordinates `DD(i, i)`, `Dz(i, i, i)`, `pi2(i, i, i, i)` are the matrix exponential
+  of the 3×3 `withinDemeBlock` applied to the parent's ancestral values (`withinDemeReadout`).
+- `linkageMigrationStencil_noMigration`: at equal rates
+  `μ_D = 2 w_DD + w_Dz/2 + e^{-βt} (Dz₀ + α DD₀)/2 - (2 + α/2) e^{-(2c + ρ)t} DD₀
+  - e^{-(3c + ρ/2)t} Dz₀`, with `w` the within-deme readout, `β = c + ρ/2` and `α = 4c/β`.
+- `heterozygosityMigrationShare_noMigration`: `A_π⁰` in closed form at equal rates.
+- Without recombination, `matrixExponential_mulVec_withinDeme_slow` and
+  `matrixExponential_mulVec_withinDeme_fast` give the left eigenvectors `(2, 1, 2)` at `-c` and
+  `(1, 0, -1)` at `-3c` of the within-deme block.  Through them
+  `linkageMigrationStencil_noMigration_zeroRecombination` reads
+  `μ_D = e^{-ct} (3 DD₀ + Dz₀ + π₀) + e^{-3ct} (DD₀ - π₀ - Dz₀) - 4 e^{-2ct} DD₀`, and
+  `linkageMigrationShare_noMigration_zeroRecombination` gives `A_D⁰`.
+- `firstOrderMigrationFactor_zeroRecombination`:
+  `φ₁(T) = 2 (cosh cT - 1) (π₀ - DD₀) (π₀ + Dz₀) / (c DD₀ π₀)`.
+  `firstOrderMigrationFactor_nonneg_zeroRecombination`: `φ₁ ≥ 0` when `DD₀ ≤ π₀` and
+  `π₀ + Dz₀ ≥ 0`.
+
+## Significance
+
+The corpus law `e^{-ρ̄T}` holds without migration.  A little migration moves portability by
+`m φ₁(T)`, and `φ₁` has two parts.  Migration restores shared linkage, which raises the ratio
+through `A_D⁰`, and it restores shared heterozygosity, which lowers it through `A_π⁰`.  Without
+recombination the two parts combine into `2 (cosh cT - 1) (π₀ - DD₀) (π₀ + Dz₀) / (c DD₀ π₀)`.
+The terms linear in `T` cancel, and the factor grows with the split time.
+
+## Scope
+
+Two demes of the corpus rates exchange migrants symmetrically, no other pair exchanges any, and
+mutation is zero.  The derivative is taken at `m = 0`.  It does not say how large `m` may be
+before the first-order reading fails, and no `O(m²)` remainder bound is proved.  The closed forms
+assume equal drift and recombination in the two demes.  With recombination the linkage stencil is
+left as a matrix-exponential readout of the within-deme block, and only without recombination
+are the linkage share and the factor elementary.  The conditions `DD₀ ≤ π₀` and `π₀ + Dz₀ ≥ 0` of
+the sign theorem are hypotheses on the ancestral moments; nothing here derives them.
 
 ## Empirical status
 
@@ -772,7 +812,7 @@ theorem matrixExponential_mulVec_withinDeme_slow (rates : ManyDemeLDRates D)
 
 /-- **The fast within-deme combination.**  Without migration or mutation, and with `ρ_i = 0`,
 `DD(i, i) - pi2(i, i, i, i)` is multiplied by `e^{-3 c_i t}` along any trajectory.  It is the left
-eigenvector of the within-deme block at `-3 c_i`; the third eigenvalue is `-6 c_i`.
+eigenvector of the within-deme block at `-3 c_i`.
 
 Assumes: no migration, no mutation, and `ρ_i = 0`. -/
 theorem matrixExponential_mulVec_withinDeme_fast (rates : ManyDemeLDRates D)
@@ -904,3 +944,215 @@ theorem linkageMigrationStencil_noMigration_zeroRecombination (rates : ManyDemeL
   linear_combination (norm := ring_nf) hslowp / 4 + hslowc / 4 + hfastp / 2 + hfastc / 2
     - 2 * hcross + hfedc / 4 + hfedp / 4 - hdiagonal₁ / 4 - hdiagonal₂ / 4 - hdiagonal₃ / 4
     - hdiagonal₄ / 4
+
+/-! ## The shares and the factor in closed form -/
+
+/-- **An elementary exponential integral.**
+`∫_0^T (p e^{a s} + q e^{-b s} + r) ds = p (e^{aT} - 1)/a + q (1 - e^{-bT})/b + r T`.
+
+Assumes: `a ≠ 0` and `b ≠ 0`. -/
+theorem integral_exp_add_exp_neg_add_const {a b p q r : ℝ} (ha : a ≠ 0) (hb : b ≠ 0)
+    (duration : ℝ) :
+    ∫ time in (0 : ℝ)..duration, (p * Real.exp (a * time) + q * Real.exp (-b * time) + r)
+      = p * (Real.exp (a * duration) - 1) / a + q * (1 - Real.exp (-b * duration)) / b
+        + r * duration := by
+  have hderiv : ∀ time ∈ Set.uIcc (0 : ℝ) duration,
+      HasDerivAt
+        (fun time ↦ p * Real.exp (a * time) / a - q * Real.exp (-b * time) / b + r * time)
+        (p * Real.exp (a * time) + q * Real.exp (-b * time) + r) time := by
+    intro time _
+    have hslow := ((hasDerivAt_id' (x := time)).const_mul a).exp
+    have hfast := ((hasDerivAt_id' (x := time)).const_mul (-b)).exp
+    refine ((((hslow.const_mul p).div_const a).sub ((hfast.const_mul q).div_const b)).add
+      ((hasDerivAt_id' (x := time)).const_mul r)).congr_deriv ?_
+    first | (field_simp; ring) | field_simp
+  rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv
+    ((by fun_prop : Continuous fun time : ℝ ↦
+      p * Real.exp (a * time) + q * Real.exp (-b * time) + r).intervalIntegrable 0 duration)]
+  simp only [mul_zero, Real.exp_zero]
+  first | (field_simp; ring) | field_simp
+
+/-- **The heterozygosity share without migration, at equal rates, in closed form.**  With
+`β = c + ρ/2` and `κ = c/(4c + ρ)`,
+`A_π⁰(T) = (4 π₀ ((e^{cT} - 1)/c - T) + 4 κ Dz₀ ((e^{cT} - 1)/c - (1 - e^{-βT})/β)) / π₀`.
+
+Assumes: no mutation, `parent ≠ child`, and equal drift and recombination rates. -/
+theorem heterozygosityMigrationShare_noMigration (rates : ManyDemeLDRates D)
+    (hmutation : ∀ deme, rates.mutation deme = 0) {parent child : Fin D} (hne : parent ≠ child)
+    (hcoal : rates.coalescence child = rates.coalescence parent)
+    (hrec : rates.recombination child = rates.recombination parent)
+    (ancestral : AffineLowOrderLDCoordinate D → ℝ) (duration : ℝ) :
+    heterozygosityMigrationShare rates hne 0 le_rfl ancestral duration
+      = (4 * ancestral (some (.pi2 parent parent parent parent))
+            * ((Real.exp (rates.coalescence parent * duration) - 1) / rates.coalescence parent
+              - duration)
+          + 4 * fedWeight rates parent * ancestral (some (.Dz parent parent parent))
+            * ((Real.exp (rates.coalescence parent * duration) - 1) / rates.coalescence parent
+              - (1 - Real.exp (-linkageRate rates parent * duration)) / linkageRate rates parent))
+        / ancestral (some (.pi2 parent parent parent parent)) := by
+  have hintegrand : ∀ time : ℝ,
+      Real.exp (crossHeterozygosityDecayRate rates parent child * time)
+          * heterozygosityMigrationStencil parent child
+            (migrationHistory rates hne 0 le_rfl ancestral time)
+        = (4 * ancestral (some (.pi2 parent parent parent parent))
+            + 4 * fedWeight rates parent * ancestral (some (.Dz parent parent parent)))
+            * Real.exp (rates.coalescence parent * time)
+          + -(4 * fedWeight rates parent * ancestral (some (.Dz parent parent parent)))
+            * Real.exp (-linkageRate rates parent * time)
+          + -(4 * ancestral (some (.pi2 parent parent parent parent))) := by
+    intro time
+    have hfirst : Real.exp (crossHeterozygosityDecayRate rates parent child * time)
+          * Real.exp (-rates.coalescence parent * time)
+        = Real.exp (rates.coalescence parent * time) := by
+      rw [← Real.exp_add, crossHeterozygosityDecayRate, hcoal]
+      congr 1
+      ring
+    have hsecond : Real.exp (crossHeterozygosityDecayRate rates parent child * time)
+        * Real.exp (-(2 * rates.coalescence parent) * time) = 1 := by
+      rw [← Real.exp_add, ← Real.exp_zero, crossHeterozygosityDecayRate, hcoal]
+      congr 1
+      ring
+    have hthird : Real.exp (crossHeterozygosityDecayRate rates parent child * time)
+          * Real.exp (-(3 * rates.coalescence parent + rates.recombination parent / 2) * time)
+        = Real.exp (-linkageRate rates parent * time) := by
+      rw [← Real.exp_add, crossHeterozygosityDecayRate, hcoal, linkageRate]
+      congr 1
+      ring
+    rw [heterozygosityMigrationStencil_noMigration rates hmutation hne hcoal hrec]
+    linear_combination (4 * ancestral (some (.pi2 parent parent parent parent))
+        + 4 * fedWeight rates parent * ancestral (some (.Dz parent parent parent))) * hfirst
+      - 4 * ancestral (some (.pi2 parent parent parent parent)) * hsecond
+      - 4 * fedWeight rates parent * ancestral (some (.Dz parent parent parent)) * hthird
+  rw [heterozygosityMigrationShare, intervalIntegral.integral_congr fun time _ ↦ hintegrand time,
+    integral_exp_add_exp_neg_add_const (rates.coalescence_pos parent).ne'
+      (linkageRate_pos rates parent).ne']
+  ring
+
+/-- **The linkage share without migration and without recombination, in closed form.**
+`A_D⁰(T) = ((3 DD₀ + Dz₀ + π₀) (e^{cT} - 1)/c + (DD₀ - π₀ - Dz₀) (1 - e^{-cT})/c - 4 DD₀ T) / DD₀`.
+
+Assumes: no mutation, `parent ≠ child`, equal drift and recombination rates, and `ρ = 0`. -/
+theorem linkageMigrationShare_noMigration_zeroRecombination (rates : ManyDemeLDRates D)
+    (hmutation : ∀ deme, rates.mutation deme = 0) {parent child : Fin D} (hne : parent ≠ child)
+    (hcoal : rates.coalescence child = rates.coalescence parent)
+    (hrec : rates.recombination child = rates.recombination parent)
+    (hρ : rates.recombination parent = 0) (ancestral : AffineLowOrderLDCoordinate D → ℝ)
+    (duration : ℝ) :
+    linkageMigrationShare rates hne 0 le_rfl ancestral duration
+      = ((3 * ancestral (some (.DD parent parent)) + ancestral (some (.Dz parent parent parent))
+              + ancestral (some (.pi2 parent parent parent parent)))
+            * (Real.exp (rates.coalescence parent * duration) - 1) / rates.coalescence parent
+          + (ancestral (some (.DD parent parent))
+              - ancestral (some (.pi2 parent parent parent parent))
+              - ancestral (some (.Dz parent parent parent)))
+            * (1 - Real.exp (-rates.coalescence parent * duration)) / rates.coalescence parent
+          - 4 * ancestral (some (.DD parent parent)) * duration)
+        / ancestral (some (.DD parent parent)) := by
+  have hc := (rates.coalescence_pos parent).ne'
+  have hintegrand : ∀ time : ℝ,
+      Real.exp (crossLinkageDecayRate rates parent child * time)
+          * linkageMigrationStencil parent child
+            (migrationHistory rates hne 0 le_rfl ancestral time)
+        = (3 * ancestral (some (.DD parent parent)) + ancestral (some (.Dz parent parent parent))
+              + ancestral (some (.pi2 parent parent parent parent)))
+            * Real.exp (rates.coalescence parent * time)
+          + (ancestral (some (.DD parent parent))
+              - ancestral (some (.pi2 parent parent parent parent))
+              - ancestral (some (.Dz parent parent parent)))
+            * Real.exp (-rates.coalescence parent * time)
+          + -(4 * ancestral (some (.DD parent parent))) := by
+    intro time
+    have hfirst : Real.exp (crossLinkageDecayRate rates parent child * time)
+          * Real.exp (-rates.coalescence parent * time)
+        = Real.exp (rates.coalescence parent * time) := by
+      rw [← Real.exp_add, crossLinkageDecayRate, hcoal, hrec, hρ]
+      congr 1
+      ring
+    have hsecond : Real.exp (crossLinkageDecayRate rates parent child * time)
+          * Real.exp (-(3 * rates.coalescence parent) * time)
+        = Real.exp (-rates.coalescence parent * time) := by
+      rw [← Real.exp_add, crossLinkageDecayRate, hcoal, hrec, hρ]
+      congr 1
+      ring
+    have hthird : Real.exp (crossLinkageDecayRate rates parent child * time)
+        * Real.exp (-(2 * rates.coalescence parent) * time) = 1 := by
+      rw [← Real.exp_add, ← Real.exp_zero, crossLinkageDecayRate, hcoal, hrec, hρ]
+      congr 1
+      ring
+    rw [linkageMigrationStencil_noMigration_zeroRecombination rates hmutation hne hcoal hrec hρ]
+    linear_combination (3 * ancestral (some (.DD parent parent))
+          + ancestral (some (.Dz parent parent parent))
+          + ancestral (some (.pi2 parent parent parent parent))) * hfirst
+      + (ancestral (some (.DD parent parent))
+          - ancestral (some (.pi2 parent parent parent parent))
+          - ancestral (some (.Dz parent parent parent))) * hsecond
+      - 4 * ancestral (some (.DD parent parent)) * hthird
+  rw [linkageMigrationShare, hrec, hρ, add_zero, zero_div, portabilityDecay_zero_rate,
+    intervalIntegral.integral_congr fun time _ ↦ hintegrand time,
+    integral_exp_add_exp_neg_add_const hc hc]
+  ring
+
+/-- **The first-order migration factor without recombination.**  At equal drift `c` and `ρ = 0`,
+`φ₁(T) = 2 (cosh cT - 1) (π₀ - DD₀) (π₀ + Dz₀) / (c DD₀ π₀)`.  The terms linear in `T` of the two
+shares cancel.
+
+Assumes: no mutation, `parent ≠ child`, equal drift and recombination rates, `ρ = 0`, and nonzero
+ancestral `DD` and `pi2`. -/
+theorem firstOrderMigrationFactor_zeroRecombination (rates : ManyDemeLDRates D)
+    (hmutation : ∀ deme, rates.mutation deme = 0) {parent child : Fin D} (hne : parent ≠ child)
+    (hcoal : rates.coalescence child = rates.coalescence parent)
+    (hrec : rates.recombination child = rates.recombination parent)
+    (hρ : rates.recombination parent = 0) (ancestral : AffineLowOrderLDCoordinate D → ℝ)
+    (hlinkage : ancestral (some (.DD parent parent)) ≠ 0)
+    (hheterozygosity : ancestral (some (.pi2 parent parent parent parent)) ≠ 0) (duration : ℝ) :
+    firstOrderMigrationFactor rates hne ancestral duration
+      = 2 * (Real.cosh (rates.coalescence parent * duration) - 1)
+          * (ancestral (some (.pi2 parent parent parent parent))
+            - ancestral (some (.DD parent parent)))
+          * (ancestral (some (.pi2 parent parent parent parent))
+            + ancestral (some (.Dz parent parent parent)))
+        / (rates.coalescence parent * ancestral (some (.DD parent parent))
+          * ancestral (some (.pi2 parent parent parent parent))) := by
+  have hc := (rates.coalescence_pos parent).ne'
+  have hκ : fedWeight rates parent = 1 / 4 := by
+    rw [fedWeight, hρ, add_zero]
+    first | (field_simp; ring) | field_simp
+  have hβ : linkageRate rates parent = rates.coalescence parent := by
+    rw [linkageRate, hρ, zero_div, add_zero]
+  have hneg : Real.exp (-(rates.coalescence parent * duration))
+      = Real.exp (-rates.coalescence parent * duration) := by
+    rw [neg_mul]
+  rw [firstOrderMigrationFactor,
+    linkageMigrationShare_noMigration_zeroRecombination rates hmutation hne hcoal hrec hρ,
+    heterozygosityMigrationShare_noMigration rates hmutation hne hcoal hrec, hκ, hβ, hrec, hρ,
+    add_zero, zero_div, portabilityDecay_zero_rate, Real.cosh_eq, hneg]
+  first | (field_simp; ring) | field_simp
+
+/-- **To first order, migration raises portability without recombination** when `DD₀ ≤ π₀` and
+`π₀ + Dz₀ ≥ 0`: the factor `φ₁(T)` is nonnegative at every split time.
+
+Assumes: no mutation, `parent ≠ child`, equal drift and recombination rates, `ρ = 0`, positive
+ancestral `DD` and `pi2`, `DD₀ ≤ π₀`, and `0 ≤ π₀ + Dz₀`. -/
+theorem firstOrderMigrationFactor_nonneg_zeroRecombination (rates : ManyDemeLDRates D)
+    (hmutation : ∀ deme, rates.mutation deme = 0) {parent child : Fin D} (hne : parent ≠ child)
+    (hcoal : rates.coalescence child = rates.coalescence parent)
+    (hrec : rates.recombination child = rates.recombination parent)
+    (hρ : rates.recombination parent = 0) (ancestral : AffineLowOrderLDCoordinate D → ℝ)
+    (hlinkage : 0 < ancestral (some (.DD parent parent)))
+    (hheterozygosity : 0 < ancestral (some (.pi2 parent parent parent parent)))
+    (horder : ancestral (some (.DD parent parent))
+      ≤ ancestral (some (.pi2 parent parent parent parent)))
+    (hcontrast : 0 ≤ ancestral (some (.pi2 parent parent parent parent))
+      + ancestral (some (.Dz parent parent parent))) (duration : ℝ) :
+    0 ≤ firstOrderMigrationFactor rates hne ancestral duration := by
+  rw [firstOrderMigrationFactor_zeroRecombination rates hmutation hne hcoal hrec hρ ancestral
+    hlinkage.ne' hheterozygosity.ne']
+  have hcosh := Real.one_le_cosh (rates.coalescence parent * duration)
+  exact div_nonneg
+    (mul_nonneg (mul_nonneg (mul_nonneg zero_le_two (sub_nonneg.mpr hcosh))
+      (sub_nonneg.mpr horder)) hcontrast)
+    (mul_pos (mul_pos (rates.coalescence_pos parent) hlinkage) hheterozygosity).le
+
+end
+
+end Descent.Portability.MigrationPortabilityFirstOrderFactor

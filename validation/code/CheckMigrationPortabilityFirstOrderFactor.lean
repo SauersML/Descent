@@ -1,0 +1,57 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.MigrationPortabilityFirstOrderFactor
+
+/-! Axiom audit of MigrationPortabilityFirstOrderFactor. -/
+
+open Descent.Portability.MigrationPortabilityFirstOrderFactor
+
+#print axioms symmetricPairMigration_eq_mul
+#print axioms lowOrderLDMigration_withSymmetricMigration
+#print axioms lowOrderLDHomogeneousGenerator_withSymmetricMigration
+#print axioms migrationDirection
+#print axioms augmentedLowOrderLDGenerator_withSymmetricMigration
+#print axioms migrationDirection_mulVec_DD
+#print axioms migrationDirection_mulVec_pi2
+#print axioms affineMigrationHistory
+#print axioms migrationHistory_eq_affineMigrationHistory
+#print axioms affineMigrationHistory_zero
+#print axioms hasDerivAt_affineGenerator_apply
+#print axioms hasDerivAt_affineMigrationHistory
+#print axioms unitPointMass_dotProduct
+#print axioms unitPointMass_vecMul_matrixExponential_dotProduct
+#print axioms integral_exp_neg_mul_comp_sub
+#print axioms duhamelDerivative_mulVec_apply_of_diagonal_row
+#print axioms duhamelDerivative_mulVec_DD
+#print axioms duhamelDerivative_mulVec_pi2
+#print axioms noMigrationHistory_DD_cross
+#print axioms matrixExponential_mulVec_Dz_fed
+#print axioms noMigrationHistory_Dz_childFed
+#print axioms noMigrationHistory_Dz_parentFed
+#print axioms noMigrationHistory_Dz_diagonal
+#print axioms augmentedLowOrderLDGenerator_withinDeme_rows
+#print axioms withinDemeBlock
+#print axioms withinDemeCoordinate
+#print axioms withinDemeProjection
+#print axioms matrixExponential_mulVec_withinDemeCoordinate
+#print axioms withinDemeReadout
+#print axioms splitTransform_withinDemeCoordinate
+#print axioms noMigrationHistory_withinDemeCoordinate
+#print axioms linkageMigrationStencil_noMigration
+#print axioms firstOrderMigrationFactor
+#print axioms affineMigrationPortabilityRatio
+#print axioms exp_neg_crossLinkageDecayRate_mul
+#print axioms hasDerivAt_affineMigrationPortabilityRatio
+#print axioms splitPortabilityRatio_withSymmetricMigration_eq_affine
+#print axioms hasDerivWithinAt_splitPortabilityRatio_withSymmetricMigration
+#print axioms matrixExponential_mulVec_withinDeme_slow
+#print axioms matrixExponential_mulVec_withinDeme_fast
+#print axioms noMigrationHistory_withinDeme_slow
+#print axioms noMigrationHistory_withinDeme_fast
+#print axioms linkageMigrationStencil_noMigration_zeroRecombination
+#print axioms integral_exp_add_exp_neg_add_const
+#print axioms heterozygosityMigrationShare_noMigration
+#print axioms linkageMigrationShare_noMigration_zeroRecombination
+#print axioms firstOrderMigrationFactor_zeroRecombination
+#print axioms firstOrderMigrationFactor_nonneg_zeroRecombination
