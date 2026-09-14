@@ -69,6 +69,7 @@ import Descent.Portability.EndToEndSensitivitySeriesBound
 import Descent.Portability.AdmixturePulseComposition
 import Descent.Portability.EndToEndPenetranceLaw
 import Descent.Portability.PortabilityMomentLadderDecisionSharpness
+import Descent.Portability.PortabilityMomentLadderDecisionSharpnessOne
 import Descent.Portability.SelectionMetricsFirstOrder
 import Descent.Portability.PortabilityMomentLadderDecision
 import Descent.Portability.PortabilityMomentLadderEight
@@ -355,6 +356,11 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
     (`PortabilityMomentLadderDecisionSharpness.expectedPositiveQuotient_founderEventLaw_ne`,
     `expectedFrequencies_eq_and_expectedRecall_ne`,
     `expectedFrequencies_eq_and_expectedPrecision_ne`).
+    The two founder kernels agree on every frequency polynomial of degree at most one and so have
+    one decision report, yet their expected recall and precision differ
+    (`PortabilityMomentLadderDecisionSharpnessOne.polynomialsAgreeAt_one_founderEventLaw`,
+    `polynomialsAgreeAt_one_and_expectedRecall_ne`,
+    `polynomialsAgreeAt_one_and_expectedPrecision_ne`).
   * Rung four is sharp.  Two process laws on a three-allele locus agree on every frequency
     polynomial of degree at most three, and squared-correlation portability is `27/35` under one
     and `1` under the other, so no function of the degree-three moments fixes the report
