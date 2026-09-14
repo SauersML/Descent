@@ -1,0 +1,300 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.SelectionMetricsFirstOrder
+import Descent.Portability.SelectionMomentUniqueness
+
+assert_below Descent.Decision Descent.Program
+
+/-!
+# Polygenic selection along a history
+
+Every selection module of the corpus reads fitness at one locus
+(`SelectionHistoryMoments.SelectionModel`), but the fitness a polygenic trait imposes is spread
+over many loci. This module carries haploid additive selection, `s_i(h) = Σ_ℓ s_{i,ℓ}(h_ℓ)` with
+one bounded table per locus, along histories of epochs, splits and pulses.
+
+The generator. The additive drift of a haplotype frequency is `x_i[h] (s_i(h) - s̄_i)`, with `s̄_i`
+the corpus mean fitness of the additive fitness (`eval_additiveDrift`), and the additive selection
+generator is the derivation along it (`additiveSelectionGenerator`). Drift and generator are linear
+in the fitness table: the drift is the sum of the one-locus drifts (`additiveDrift_eq_sum`), and the
+generator is the sum of the one-locus generators `SelectionHistoryMoments.selectionGenerator` of
+the per-locus models (`locusModel`, `additiveSelectionGenerator_eq_sum`). So the forward moment
+equation with additive selection is `v_n' = Q_n v_n + Σ_ℓ B_{n,ℓ} v_{n + 1_ℓ}`, with one selection
+matrix per locus (`expectedAdditiveSelectedGenerator_eq`).
+
+Zero order. A vector started from the neutral propagation moves only by its forcing
+(`SelectionMomentUniqueness.norm_le_of_zeroStart`), and the forcing of locus `ℓ` costs `B σ_ℓ`
+(`SelectionHistoryMoments.abs_expectedSelection_le`). So one epoch moves the moments by at most
+`B (Σ_ℓ σ_ℓ) d` (`norm_expectedMomentVector_sub_propagator_le_additive`). Along a history selected
+with additive fitness (`AdditiveSelectedOnHistory`) the moments end within `B (Σ_ℓ σ_ℓ) T` of the
+neutral chronological propagation (`norm_additiveHistory_sub_propagator_le`).
+
+First order. Duhamel's formula with one forcing per locus (`norm_duhamel_firstOrder_sum_le`) gives
+one epoch as the neutral propagator plus the sum of the one-locus corrections
+`SelectionMomentExpansion.selectionCorrection`, within `B (B + 1) (Σ_ℓ S_ℓ) (Σ_ℓ σ_ℓ) d²`
+(`norm_expectedMomentVector_sub_firstOrder_le_additive`). A stage of a history with one linear
+correction per locus (`norm_sub_firstOrder_sum_step_le`) composes these: along a history the
+selected moments are the neutral propagation plus the sum over loci of the one-locus history
+corrections `SelectionHistoryFirstOrder.historyCorrection` (`additiveHistoryCorrection`), within
+`B (B + 1) (Σ_ℓ S_ℓ) (Σ_ℓ σ_ℓ) T²` (`norm_additiveHistory_sub_firstOrder_le`). For tables bounded by
+`σ` with masses at most `|A| σ`, this remainder is of order `σ² T²`.
+
+Portability. The cross-ratio derivative is linear in its direction (`crossRatioDerivative_add`,
+`crossRatioDerivative_sum`), so the first-order portability correction of the additive direction
+is the sum of the per-locus first-order terms (`portabilityFirstOrder_sum`,
+`portabilityFirstOrder_additiveHistoryCorrection`). Where the target denominator and the source
+numerator are at least `δ > 0`, the portability of expected accuracies of the selected history is
+its neutral value plus that sum, up to the explicit
+`SelectionHistoryFirstOrder.crossRatioRemainder`, quadratic in the fitness scale
+(`abs_additivePortability_sub_firstOrder_le`). Selection raises portability to first order exactly
+when the target's relative first-order change exceeds the source's
+(`additivePortabilityFirstOrder_pos_iff`), and in particular whenever every locus raises it
+(`additivePortabilityFirstOrder_pos_of_forall`).
+
+Scope. Selection is haploid and additive across loci; dominance and epistasis are not covered. The
+forward moment equation with additive selection is a hypothesis on the families, at the budget and
+at every budget with one more copy at one locus; the selected diffusion is not constructed.
+
+## Empirical status
+
+None. The bodies here are norm inequalities along matrix exponentials, finite sums of supplied
+fitness tables and rational functions of dot products, so no measurement can bear on them.
+-/
+
+set_option autoImplicit false
+set_option relaxedAutoImplicit false
+
+namespace Descent.Portability.PolygenicSelectionHistory
+
+open MvPolynomial Descent.Coalescent Descent.Foundations PartialHaplotypeCarrier
+  PartialHaplotypeDualGenerator PartialHaplotypeDualSemigroup SubstochasticGeneratorSemigroup
+  PartialHaplotypePulseKernel NeutralPulseHistoryKernel ReplicaMetricInstances
+  EndToEndPortabilityLaw SelectionHistoryMoments EndToEndSelectionLaw SelectionMomentExpansion
+  EndToEndSensitivityMetrics SelectionHistoryFirstOrder SelectionMomentUniqueness
+  SelectionMetricsFirstOrder
+open Descent.Pangenome.AncestralLocality.DecisionDysonDual (hasDerivAt_integral_from_zero
+  continuous_integral_from_zero)
+open scoped Matrix NNReal
+
+noncomputable section
+
+/-! ## Sums of forcings and of linear corrections -/
+
+/-- **One stage of the first-order expansion with one linear correction per locus.** Let `P` be
+substochastic and each `H_j` linear with cost at most `L_j`. If `V` is within `a` of
+`P v + Σ_j H_j x_j`, `v` is within `b` of `u + c` and each `x_j` is within `e_j` of `w_j`, then `V`
+is within `a + b + Σ_j L_j e_j` of `P u + (P c + Σ_j H_j w_j)`. -/
+theorem norm_sub_firstOrder_sum_step_le {ι K : Type*} [Fintype ι] [Fintype K] {κ : K → Type*}
+    [∀ j, Fintype (κ j)] {P : Matrix ι ι ℝ} (hP : SubstochasticMatrix P)
+    (H : ∀ j, (κ j → ℝ) → ι → ℝ) (hH : ∀ j x y, H j (x - y) = H j x - H j y) {L : K → ℝ}
+    (hL : ∀ j x, ‖H j x‖ ≤ L j * ‖x‖) (hL0 : ∀ j, 0 ≤ L j) {V v u c : ι → ℝ}
+    {x w : ∀ j, κ j → ℝ} {a b : ℝ} {e : K → ℝ} (hrest : ‖V - P *ᵥ v - ∑ j, H j (x j)‖ ≤ a)
+    (hstage : ‖v - u - c‖ ≤ b) (hlarger : ∀ j, ‖x j - w j‖ ≤ e j) :
+    ‖V - P *ᵥ u - (P *ᵥ c + ∑ j, H j (w j))‖ ≤ a + b + ∑ j, L j * e j := by
+  have hsplit : V - P *ᵥ u - (P *ᵥ c + ∑ j, H j (w j))
+      = (V - P *ᵥ v - ∑ j, H j (x j)) + P *ᵥ (v - u - c) + ∑ j, H j (x j - w j) := by
+    simp only [hH, Finset.sum_sub_distrib, Matrix.mulVec_sub]
+    abel
+  rw [hsplit]
+  refine (norm_add_le _ _).trans (add_le_add ((norm_add_le _ _).trans
+    (add_le_add hrest ((norm_mulVec_le_of_substochastic hP _).trans hstage))) ?_)
+  exact (norm_sum_le _ _).trans (Finset.sum_le_sum fun j _ ↦
+    (hL j _).trans (mul_le_mul_of_nonneg_left (hlarger j) (hL0 j)))
+
+/-- **Duhamel's formula to first order with one forcing per locus.** Let `Q` be a killing
+generator, and let `v` move on `[0, d]` with right derivative `Q v + Σ_j B_j w_j(t)`, where each
+`B_j` costs at most `β_j` in sup norm and `w_j(t)` stays within `c_j t` of `e^{tQ'_j} w_j(0)`. Then
+`‖v(d) - e^{dQ} v(0) - Σ_j ∫_0^d e^{(d-t)Q} B_j e^{tQ'_j} w_j(0) dt‖ ≤ (Σ_j β_j c_j) d² / 2`. -/
+theorem norm_duhamel_firstOrder_sum_le {ι K : Type*} [Fintype ι] [DecidableEq ι] [Fintype K]
+    {κ : K → Type*} [∀ j, Fintype (κ j)] [∀ j, DecidableEq (κ j)] {Q : Matrix ι ι ℝ}
+    (hQ : KillingGenerator Q) (Q' : ∀ j, Matrix (κ j) (κ j) ℝ) (B : ∀ j, Matrix ι (κ j) ℝ)
+    {β c : K → ℝ} (hβ : ∀ j, 0 ≤ β j) (hB : ∀ j x, ‖B j *ᵥ x‖ ≤ β j * ‖x‖)
+    {v : ℝ → ι → ℝ} {w : ∀ j, ℝ → κ j → ℝ} {d : ℝ} (hd : 0 ≤ d)
+    (hv : ContinuousOn v (Set.Icc 0 d))
+    (hderiv : ∀ t ∈ Set.Ico 0 d,
+      HasDerivWithinAt v (Q *ᵥ v t + ∑ j, B j *ᵥ w j t) (Set.Ici t) t)
+    (hw : ∀ j, ∀ t ∈ Set.Ico 0 d, ‖w j t - matrixExponential (Q' j) t *ᵥ w j 0‖ ≤ c j * t) :
+    ‖v d - matrixExponential Q d *ᵥ v 0
+        - ∑ j, ∫ t in (0 : ℝ)..d, matrixExponential Q (d - t)
+          *ᵥ (B j *ᵥ (matrixExponential (Q' j) t *ᵥ w j 0))‖
+      ≤ (∑ j, β j * c j) * (d * d) / 2 := by
+  have hcont : ∀ j, Continuous fun t ↦ matrixExponential Q (d - t)
+      *ᵥ (B j *ᵥ (matrixExponential (Q' j) t *ᵥ w j 0)) := by
+    intro j
+    have hexp : Continuous fun t ↦ matrixExponential (Q' j) t *ᵥ w j 0 :=
+      continuous_iff_continuousAt.mpr fun t ↦
+        (StationaryHaplotypeRealization.hasDerivAt_matrixExponential_mulVec (Q' j) (w j 0)
+          t).continuousAt
+    have hinner : Continuous fun t ↦ B j *ᵥ (matrixExponential (Q' j) t *ᵥ w j 0) :=
+      continuous_const.matrix_mulVec hexp
+    exact continuousOn_univ.mp (continuousOn_propagator_mulVec Q d hinner.continuousOn)
+  have hψ : ∀ t ∈ Set.Ico 0 d, HasDerivWithinAt
+      (fun u ↦ matrixExponential Q (d - u) *ᵥ v u
+        - ∑ j, (∫ s in (0 : ℝ)..u, matrixExponential Q (d - s)
+          *ᵥ (B j *ᵥ (matrixExponential (Q' j) s *ᵥ w j 0)))
+        - matrixExponential Q d *ᵥ v 0)
+      (∑ j, matrixExponential Q (d - t)
+        *ᵥ (B j *ᵥ (w j t - matrixExponential (Q' j) t *ᵥ w j 0)))
+      (Set.Ici t) t := by
+    intro t ht
+    have hprod := hasDerivWithinAt_propagator_mulVec Q d (hderiv t ht)
+    have hint := HasDerivWithinAt.fun_sum (u := Finset.univ) fun j (_ : j ∈ Finset.univ) ↦
+      (hasDerivAt_integral_from_zero (hcont j) t).hasDerivWithinAt (s := Set.Ici t)
+    have hcomm : matrixExponential Q (d - t) *ᵥ (Q *ᵥ v t)
+        = Q *ᵥ (matrixExponential Q (d - t) *ᵥ v t) := by
+      rw [Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, matrixExponential_mul_comm]
+    refine ((hprod.sub hint).sub (hasDerivWithinAt_const t (Set.Ici t)
+      (matrixExponential Q d *ᵥ v 0))).congr_deriv ?_
+    rw [Matrix.mulVec_add, hcomm, Matrix.mulVec_sum]
+    simp only [Matrix.mulVec_sub, Finset.sum_sub_distrib]
+    abel
+  have hbound : ∀ t ∈ Set.Ico 0 d,
+      ‖∑ j, matrixExponential Q (d - t)
+        *ᵥ (B j *ᵥ (w j t - matrixExponential (Q' j) t *ᵥ w j 0))‖
+        ≤ (∑ j, β j * c j) * t := by
+    intro t ht
+    have hpropagator := matrixExponential_substochastic Q hQ (d - t) (sub_nonneg.mpr ht.2.le)
+    rw [Finset.sum_mul]
+    refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun j _ ↦ ?_)
+    refine (norm_mulVec_le_of_substochastic hpropagator _).trans ((hB j _).trans ?_)
+    exact (mul_le_mul_of_nonneg_left (hw j t ht) (hβ j)).trans_eq (by ring)
+  have hboundary : ∀ x, HasDerivAt (fun u ↦ (∑ j, β j * c j) * (u * u) / 2)
+      ((∑ j, β j * c j) * x) x := fun x ↦
+    ((((hasDerivAt_id x).mul (hasDerivAt_id x)).const_mul (∑ j, β j * c j)).div_const
+      2).congr_deriv (by simp only [id_eq]; ring)
+  have hmain := image_norm_le_of_norm_deriv_right_le_deriv_boundary
+    (((continuousOn_propagator_mulVec Q d hv).sub
+      (continuous_finset_sum _ fun j _ ↦ continuous_integral_from_zero (hcont j)).continuousOn).sub
+      continuousOn_const) hψ (by simp) hboundary hbound (Set.right_mem_Icc.mpr hd)
+  have heq : v d - matrixExponential Q d *ᵥ v 0
+      - ∑ j, ∫ t in (0 : ℝ)..d, matrixExponential Q (d - t)
+        *ᵥ (B j *ᵥ (matrixExponential (Q' j) t *ᵥ w j 0))
+      = matrixExponential Q (d - d) *ᵥ v d
+        - ∑ j, (∫ s in (0 : ℝ)..d, matrixExponential Q (d - s)
+          *ᵥ (B j *ᵥ (matrixExponential (Q' j) s *ᵥ w j 0)))
+        - matrixExponential Q d *ᵥ v 0 := by
+    rw [sub_self, matrixExponential_zero, Matrix.one_mulVec]
+    abel
+  rw [heq]
+  exact hmain
+
+/-- **The cross-ratio derivative is additive in its direction.** -/
+theorem crossRatioDerivative_add (a b c d a₁ b₁ c₁ d₁ a₂ b₂ c₂ d₂ : ℝ) :
+    crossRatioDerivative a b c d (a₁ + a₂) (b₁ + b₂) (c₁ + c₂) (d₁ + d₂)
+      = crossRatioDerivative a b c d a₁ b₁ c₁ d₁ + crossRatioDerivative a b c d a₂ b₂ c₂ d₂ := by
+  simp only [crossRatioDerivative]
+  ring
+
+/-- **The cross-ratio derivative of a sum of directions is the sum of the derivatives.** -/
+theorem crossRatioDerivative_sum {K : Type*} [DecidableEq K] (s : Finset K) (a b c d : ℝ)
+    (a' b' c' d' : K → ℝ) :
+    crossRatioDerivative a b c d (∑ j ∈ s, a' j) (∑ j ∈ s, b' j) (∑ j ∈ s, c' j)
+        (∑ j ∈ s, d' j)
+      = ∑ j ∈ s, crossRatioDerivative a b c d (a' j) (b' j) (c' j) (d' j) := by
+  induction s using Finset.induction_on with
+  | empty => simp [crossRatioDerivative]
+  | @insert j s hj ih =>
+    rw [Finset.sum_insert hj, Finset.sum_insert hj, Finset.sum_insert hj, Finset.sum_insert hj,
+      Finset.sum_insert hj, crossRatioDerivative_add, ih]
+
+variable {Deme Locus : Type*} {Allele : Locus → Type*}
+variable [Fintype Deme] [DecidableEq Deme] [Fintype Locus] [DecidableEq Locus]
+  [∀ ℓ, Fintype (Allele ℓ)] [∀ ℓ, DecidableEq (Allele ℓ)]
+
+/-! ## Additive fitness and its generator -/
+
+/-- The one-locus selection model of locus `ℓ` in an additive fitness table. -/
+def locusModel (table : ∀ ℓ, Deme → Allele ℓ → ℝ) (ℓ : Locus) :
+    SelectionModel Deme Locus Allele where
+  locus := ℓ
+  fitness := table ℓ
+
+/-- **Additive haploid fitness**: a haplotype of deme `i` has fitness `Σ_ℓ s_{i,ℓ}(h_ℓ)`. -/
+def additiveFitness (table : ∀ ℓ, Deme → Allele ℓ → ℝ) (i : Deme)
+    (hap : FullHaplotype Locus Allele) : ℝ :=
+  ∑ ℓ, table ℓ i (hap ℓ)
+
+/-- The additive selective drift `x_i[h] (s_i(h) - s̄_i)` of one haplotype frequency, with `s̄_i`
+the sum of the per-locus mean fitness polynomials. -/
+def additiveDrift (table : ∀ ℓ, Deme → Allele ℓ → ℝ)
+    (coordinate : FrequencyVariable Deme Locus Allele) : FrequencyPolynomial Deme Locus Allele :=
+  X coordinate * (C (additiveFitness table coordinate.1 coordinate.2)
+    - ∑ ℓ, meanFitnessPolynomial (locusModel table ℓ) coordinate.1)
+
+/-- **At a frequency point the additive drift is the classical drift of the additive fitness**,
+`x_i[h] (s_i(h) - s̄_i)` with `s̄_i` the corpus mean fitness `AncestralLocality.meanFitness` of the
+additive fitness in the deme. -/
+theorem eval_additiveDrift (table : ∀ ℓ, Deme → Allele ℓ → ℝ)
+    (x : FrequencyVariable Deme Locus Allele → ℝ) (i : Deme) (hap : FullHaplotype Locus Allele) :
+    eval x (additiveDrift table (i, hap))
+      = x (i, hap) * (additiveFitness table i hap
+        - Descent.Pangenome.AncestralLocality.meanFitness (additiveFitness table i)
+          (fun g ↦ x (i, g))) := by
+  have hmean : ∑ ℓ, eval x (meanFitnessPolynomial (locusModel table ℓ) i)
+      = Descent.Pangenome.AncestralLocality.meanFitness (additiveFitness table i)
+          (fun g ↦ x (i, g)) := by
+    simp only [eval_meanFitnessPolynomial, locusModel, additiveFitness,
+      Descent.Pangenome.AncestralLocality.meanFitness, Finset.mul_sum]
+    exact Finset.sum_comm
+  simp only [additiveDrift, map_mul, map_sub, map_sum, eval_X, eval_C, hmean]
+
+/-- **The additive selection generator**: the derivation of frequency polynomials along the
+additive selective drift of every haplotype frequency. -/
+def additiveSelectionGenerator (table : ∀ ℓ, Deme → Allele ℓ → ℝ)
+    (f : FrequencyPolynomial Deme Locus Allele) : FrequencyPolynomial Deme Locus Allele :=
+  ∑ coordinate, additiveDrift table coordinate * pderiv coordinate f
+
+/-- **The additive drift is the sum of the one-locus drifts**: the drift is linear in the fitness
+table. -/
+theorem additiveDrift_eq_sum (table : ∀ ℓ, Deme → Allele ℓ → ℝ)
+    (coordinate : FrequencyVariable Deme Locus Allele) :
+    additiveDrift table coordinate = ∑ ℓ, selectiveDrift (locusModel table ℓ) coordinate := by
+  simp only [additiveDrift, selectiveDrift, additiveFitness, locusModel, map_sum,
+    ← Finset.sum_sub_distrib, Finset.mul_sum]
+
+/-- **The additive selection generator is the sum of the one-locus generators.** -/
+theorem additiveSelectionGenerator_eq_sum (table : ∀ ℓ, Deme → Allele ℓ → ℝ)
+    (f : FrequencyPolynomial Deme Locus Allele) :
+    additiveSelectionGenerator table f = ∑ ℓ, selectionGenerator (locusModel table ℓ) f := by
+  simp only [additiveSelectionGenerator, selectionGenerator, additiveDrift_eq_sum, Finset.sum_mul]
+  exact Finset.sum_comm
+
+/-- **The forward generator with additive selection**: the neutral generator plus the additive
+selection generator. -/
+def additiveSelectedGenerator (rates : NeutralRates Deme Locus Allele)
+    (table : ∀ ℓ, Deme → Allele ℓ → ℝ) (f : FrequencyPolynomial Deme Locus Allele) :
+    FrequencyPolynomial Deme Locus Allele :=
+  neutralGenerator rates f + additiveSelectionGenerator table f
+
+/-- **The forward moment equation with additive selection, in matrix form.** Under an expectation
+functional, the expected generator with additive selection of a budget-respecting configuration
+moment is the neutral dual generator on the expected moments plus, for every locus, its selection
+matrix on the expected moments of the budget with one more copy at that locus. -/
+theorem expectedAdditiveSelectedGenerator_eq (rates : NeutralRates Deme Locus Allele)
+    (table : ∀ ℓ, Deme → Allele ℓ → ℝ) (capacity : Locus → ℕ)
+    (expectationAt : ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele)))
+    (s : ℝ) (ξ : BudgetConfiguration Deme Locus Allele capacity) :
+    (expectationAt s fun law ↦
+        eval (lawPoint law) (additiveSelectedGenerator rates table (momentPolynomial ξ.1)))
+      = (dualGenerator rates capacity *ᵥ expectedMomentVector capacity expectationAt s
+        + ∑ ℓ, selectionMatrix (locusModel table ℓ) capacity
+          *ᵥ expectedMomentVector (bumpCapacity (locusModel table ℓ) capacity)
+            expectationAt s) ξ := by
+  have hsplit : (fun law : Deme → FiniteReportLaw (FullHaplotype Locus Allele) ↦
+        eval (lawPoint law) (additiveSelectedGenerator rates table (momentPolynomial ξ.1)))
+      = (fun law ↦ eval (lawPoint law) (neutralGenerator rates (momentPolynomial ξ.1)))
+        + ∑ ℓ, fun law ↦
+          eval (lawPoint law) (selectionGenerator (locusModel table ℓ) (momentPolynomial ξ.1)) := by
+    funext law
+    simp only [additiveSelectedGenerator, additiveSelectionGenerator_eq_sum, map_add, map_sum,
+      Pi.add_apply, Finset.sum_apply]
+  rw [hsplit, (expectationAt s).add_eval, ExpFunctional.eval_sum,
+    expectedGenerator_eq_mulVec rates capacity expectationAt s ξ, Pi.add_apply, Finset.sum_apply]
+  congr 1
+  exact Finset.sum_congr rfl fun ℓ _ ↦
+    congrFun (expectedSelection_eq_mulVec (locusModel table ℓ) capacity (expectationAt s)) ξ
+
+end
+
+end Descent.Portability.PolygenicSelectionHistory
