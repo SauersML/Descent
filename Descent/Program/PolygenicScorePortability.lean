@@ -38,6 +38,8 @@ import Descent.Portability.EndToEndGWASTrainingHistory
 import Descent.Portability.EndToEndGWASThresholdLaw
 import Descent.Portability.TwoTimeRatePropagator
 import Descent.Portability.SelectionHistoryFirstOrder
+import Descent.Portability.SelectionMetricsFirstOrder
+import Descent.Portability.PortabilityMomentLadderDecision
 import Descent.Portability.EndToEndAscertainedLaw
 import Descent.Portability.EndToEndAscertainedWitness
 import Descent.Portability.TwoLocusPortabilityDecay
@@ -226,6 +228,14 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
     conditional entropy and mutual information of every report map
     (`PortabilityMomentLadderEntropy.expectedInformation_eq_of_polynomialsAgreeAt_all`,
     `expectedInformation_historyEvent_eq_rateHistory`).
+  * Clinical decisions read the lowest rung.  Agreement up to degree one fixes the whole decision
+    report, every deme's expected confusion table, case probability, called fraction and net
+    benefit at every threshold, and the portability of every threshold metric; budget four fixes
+    it together with the portability report, and every degree fixes expected recall and precision
+    (`PortabilityMomentLadderDecision.decisionReport_eq_of_polynomialsAgreeAt_one`,
+    `portabilityReport_and_decisionReport_eq_of_polynomialsAgreeAt_four`,
+    `expectedRecallPrecision_eq_of_polynomialsAgreeAt_all`,
+    `decisionReport_historyEvent_eq_rateHistory`).
   * None of this is special to histories of epochs.  Any two process laws with dual moments that
     agree on degree-four polynomial expectations have one report
     (`polynomialsAgreeAt_of_hasDualMoments`, `portabilityReport_eq_of_polynomialsAgreeAt_four`).
@@ -426,6 +436,16 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   relative first-order change exceeds the source's
   (`abs_selectedPortability_sub_firstOrder_le`, `hasDerivWithinAt_selectedPortability_firstOrder`,
   `portabilityFirstOrder_pos_iff`).
+* The same first-order law holds for calibration and discrimination.  The calibration slope,
+  intercept and calibration portability of expectations, and AUC portability, each equal their
+  neutral values plus `σ` times an explicit correction within an `O(σ² T²)` remainder, each
+  correction is the right derivative in `σ` at zero, and selection raises calibration or AUC
+  portability to first order exactly when the target's relative change exceeds the source's
+  (`SelectionMetricsFirstOrder.abs_selectedCalibrationSlope_sub_firstOrder_le`,
+  `abs_selectedCalibrationPortability_sub_firstOrder_le`,
+  `abs_selectedAUCPortability_sub_firstOrder_le`,
+  `hasDerivWithinAt_selectedCalibrationPortability_firstOrder`,
+  `calibrationPortabilityFirstOrder_pos_iff`, `aucPortabilityFirstOrder_pos_iff`).
 
 ## 8. What data can tell: identification and its limits
 
