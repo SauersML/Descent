@@ -760,6 +760,7 @@ import Descent.Portability.PortabilityMomentLadderDeployment
 import Descent.Portability.EndToEndGWASThresholdLaw
 import Descent.Portability.TwoTimeRatePropagator
 import Descent.Portability.SelectionHistoryFirstOrder
+import Descent.Portability.PortabilityMomentLadderSeries
 
 assert_below Descent.Program
 
