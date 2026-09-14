@@ -353,6 +353,7 @@ import Descent.Portability.UniversalMetricIdentification
 import Descent.Portability.EndToEndAdmixedGenotypes
 import Descent.Portability.CalibrationPortabilityDecay
 import Descent.Portability.AdmixturePortabilityDecay
+import Descent.Portability.PortabilityMomentLadderDispersion
 
 import Descent.Portability.ProbitTrainingLaw
 import Descent.Portability.ScoreMomentLaw
