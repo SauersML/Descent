@@ -36,9 +36,9 @@ accuracies has the cross-ratio derivative of `EndToEndSensitivityMetrics`
 
 Scope.  The rate histories have continuous dual generators, as the kernel of
 `NeutralRateHistoryKernel` requires; integrable rate histories are not covered.  The derivative is
-stated in block form: the two-time propagator of the integral form `∫₀ᵀ U(T, s) Q' U(s) ds` is not
-constructed in the corpus.  The endpoints of the segment, where the clamp makes the derivative
-one-sided, are not stated.
+stated here in block form.  The integral form `∫₀ᵀ U(T, s) Q' U(s) ds` needs the two-time
+propagator, which `TwoTimeRatePropagator` constructs on top of this module.  The endpoints of the
+segment, where the clamp makes the derivative one-sided, are not stated.
 
 ## Empirical status
 

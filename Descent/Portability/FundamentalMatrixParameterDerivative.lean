@@ -39,8 +39,8 @@ in place of `A` (`hasDerivAt_fundamentalMatrix_affinePath`).  Paired with vector
 derivative `c · X v` (`hasDerivAt_dotProduct_mulVec_of_apply`).
 
 This is variation of constants in block form, computed by one finite linear system.  Classically
-the lower-left block is `∫₀ᵀ U(T, s) B(s) U(s, 0) ds`; the two-time propagator `U(T, s)` is not
-constructed in the corpus, so that integral form is not stated here.
+the lower-left block is `∫₀ᵀ U(T, s) B(s) U(s, 0) ds`.  That integral form needs the two-time
+propagator `U(T, s)`, which `TwoTimeRatePropagator` constructs on top of this module.
 
 Scope.  The generator paths are continuous and the parameter enters affinely, as it does along a
 segment of rate laws.  A general differentiable dependence on the parameter would need
