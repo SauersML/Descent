@@ -113,7 +113,7 @@ if __name__ == "__main__":
     parser.add_argument("--bundle")
     parser.add_argument("--msi")
     parser.add_argument("--node", default="acn112")
-    parser.add_argument("--cache", default="/tmp/descent-proof-20260910")
+    parser.add_argument("--cache", default="/scratch.global/sauer354/descent-proof-20260913")
     parser.add_argument("--shared", default="/projects/standard/hsiehph/sauer354/portability-lean-20260910")
     parsed = parser.parse_args()
     if parsed.remote:
