@@ -24,13 +24,78 @@ uniformly (`negMulLog_sub_partialSum_le_uniform`).  The entropy `Σ_r η(m_r)` o
 `0` and `|Report| / (K + 1)` (`reportEntropy_sub_truncation_mem`).  Pushing a law forward twice
 gives the entropy of the composite pushforward (`reportEntropy_pushforward_pushforward`).
 
+The repaired log loss.  For a score-outcome law with case mass `a_s`, control mass `b_s` and group
+mass `q_s = a_s + b_s`, the conditional entropy is `H(Y | S) = Σ_s [η(a_s) + η(b_s) - η(q_s)]`
+(`conditionalEntropy`), the joint entropy minus the score entropy
+(`pushforward_fst_mass`, `conditionalEntropy_eq_reportEntropy_sub`).  It is the log loss of the
+forecast repaired to each group's realized rate (`repairedGroupForecast`,
+`repairedGroupForecast_mem`, `repairedGroupLoss_eq`, `expectation_neg_log_repairedGroupForecast`),
+hence nonnegative (`conditionalEntropy_nonneg`) and equal to the corpus extended log loss read at
+that forecast (`expectedLogLoss_eq_ofReal_of_pos`, `expectedLogLoss_repairedGroupForecast`).  For a
+binary score it is the corpus `UniformPenetranceArchitecture.repairedLogLoss`
+(`repairedGroupForecast_eq_repairedForecast`, `conditionalEntropy_eq_repairedLogLoss`).  The mutual
+information is `I(S; Y) = H(Y) - H(Y | S)` (`mutualInformation`).
+
+Fixed forecasts.  The log loss of fixed group forecasts `v_s` (`groupForecast`, `forecastLogLoss`)
+is linear in the report law.  For `v_s ∈ (0, 1)` it is the finite corpus extended log loss
+(`expectedLogLoss_groupForecast`) and at least the conditional entropy, by Gibbs' inequality
+(`cellLoss_ge`, `conditionalEntropy_le_forecastLogLoss`).  A forecast `v_s = 0` against a group of
+positive case mass, or `v_s = 1` against a group of positive control mass, gives infinite loss
+(`expectedLogLoss_groupForecast_eq_top`).
+
+Through a kernel.  The order-`k` entropy term is a population polynomial of total degree at most
+`k + 2` (`entropyTermPolynomial`, `eval_entropyTermPolynomial`,
+`totalDegree_entropyTermPolynomial_le`, `conditionalEntropyTermPolynomial`,
+`mutualInformationTermPolynomial`, `totalDegree_conditionalEntropyTermPolynomial_le`,
+`totalDegree_mutualInformationTermPolynomial_le`).  Under every Markov kernel the truncation after
+`K` terms falls short of the expected entropy of a report law by between `0` and
+`|Report| / (K + 1)` (`expectedEntropy`, `continuous_reportEntropy`,
+`continuous_reportEntropyTerm`, `expectedEntropy_sub_truncation_mem`).  The terms are
+nonnegative, so this squeezes the partial sums and the expected entropy is the series of expected
+terms (`hasSum_expectedEntropy`).  The expected chain rule carries the series to the expected
+conditional entropy and mutual information (`expectedConditionalEntropy`,
+`expectedMutualInformation`, `continuous_conditionalEntropy`, `expectedConditionalEntropy_eq_sub`,
+`expectedMutualInformation_eq_sub`, `integral_eval_conditionalEntropyTermPolynomial`,
+`integral_eval_mutualInformationTermPolynomial`, `hasSum_expectedConditionalEntropy`,
+`hasSum_expectedMutualInformation`).  The truncation error lies between `-|Score| / (K + 1)` and
+`2 |Score| / (K + 1)` for the conditional entropy (`expectedConditionalEntropy_sub_truncation_mem`),
+and between `-2 |Score| / (K + 1)` and `(|Score| + 2) / (K + 1)` for the mutual information
+(`expectedMutualInformation_sub_truncation_mem`).  Through the propagated moments each quantity is
+a series of budget-`(k + 2)` dot products divided by `k + 1`
+(`tsum_integral_eval_eq_tsum_dotProduct`, `expectedEntropy_eq_tsum_dotProduct`,
+`expectedConditionalEntropy_eq_tsum_dotProduct`,
+`expectedMutualInformation_eq_tsum_dotProduct`), along a history of epochs, splits and pulses and
+along a rate history (`expectedEntropy_historyEventKernel`, `expectedEntropy_rateHistoryKernel`,
+`expectedConditionalEntropy_and_mutualInformation_historyEventKernel`,
+`expectedConditionalEntropy_and_mutualInformation_rateHistoryKernel`).  Two histories whose
+propagated moments agree at every budget `k + 2` have equal expected entropies
+(`expectedEntropy_eq_of_moments_eq`,
+`expectedConditionalEntropy_and_mutualInformation_eq_of_moments_eq`).  The expected log loss of
+fixed forecasts is exact at budget one (`expectedForecastLogLoss`, `continuous_forecastLogLoss`,
+`expectedForecastLogLoss_eq_dotProduct`) and bounds the expected conditional entropy from above
+(`expectedConditionalEntropy_le_expectedForecastLogLoss`).
+
+Pseudo-`R²`.  McFadden's pseudo-`R²`, `E I(S; Y) / E H(Y)` in ratio-of-expectations form
+(`expectedPseudoRSquared`), and its target-over-source portability (`pseudoRSquaredPortability`)
+are ratios of these series (`pseudoRSquaredPortability_eq_tsum_dotProduct`).  Equal propagated
+moments give equal portability (`pseudoRSquaredPortability_eq_of_moments_eq`).
+
+Significance.  The logarithmic metrics of a clinical risk score (the repaired log loss, the
+information the score carries about the outcome, and pseudo-`R²` portability) run from the
+demographic process law through convergent series of finite matrix computations.  Every truncation
+has an explicit division-free error bound, so no floor on the forecasts is needed.
+
 Scope.  Score groups form a finite alphabet and outcomes are binary; one chromosome is sampled per
-individual.
+individual.  The expected metrics average the population metrics over the process law, and
+pseudo-`R²` is taken in ratio-of-expectations form.  Whether finitely many propagated moments
+determine the expected entropies is not settled here: no pair of histories that agree at a finite
+budget and differ in expected entropy is constructed.
 
 ## Empirical status
 
-None.  The bodies here are a pointwise power series for the logarithm, its truncation error, and
-finite sums of masses, so no measurement can bear on them.
+None.  The bodies here are a pointwise power series for the logarithm, its division-free truncation
+error, elementary inequalities of the logarithm, and integrals of polynomials against Markov kernels
+whose moments are matrix computations of supplied rates, so no measurement can bear on them.
 -/
 
 set_option autoImplicit false
@@ -1146,8 +1211,8 @@ theorem pseudoRSquaredPortability_eq_tsum_dotProduct (ℓ₀ : Locus)
             ⬝ᵥ (M (order + 2) *ᵥ budgetMomentFeature (fun _ ↦ order + 2) x0)) / ((order : ℝ) + 1))
           / ∑' order : ℕ, (budgetCoefficients ℓ₀ (fun _ ↦ order + 2)
               (demePolynomial source (entropyTermPolynomial (fun hap ↦ (report hap).2) order))
-            ⬝ᵥ (M (order + 2) *ᵥ budgetMomentFeature (fun _ ↦ order + 2) x0)) / ((order : ℝ) + 1))
-      := by
+            ⬝ᵥ (M (order + 2) *ᵥ budgetMomentFeature (fun _ ↦ order + 2) x0))
+            / ((order : ℝ) + 1)) := by
   rw [pseudoRSquaredPortability, expectedPseudoRSquared, expectedPseudoRSquared,
     expectedMutualInformation_eq_tsum_dotProduct ℓ₀ κ M hmoment x0 target,
     expectedMutualInformation_eq_tsum_dotProduct ℓ₀ κ M hmoment x0 source,
