@@ -31,10 +31,48 @@ larger-budget moments entering the rest, carried by the correction of the rest a
 chronological propagator applied to the initial moments plus the correction of the history, up to
 `B S B' σ T²` in sup norm (`norm_selectedHistory_sub_firstOrder_le`).
 
+Linearity in the fitness table. Scaling every fitness by `σ` scales the selection terms
+(`selectionTerms_scaledModel`), the selection matrix (`selectionMatrix_scaledModel`) and so the
+correction of an epoch and of a history (`selectionCorrection_scaledModel`,
+`historyCorrection_scaledModel`) by `σ`. For the fitness table `σ s`, with `s` in `[0, 1]` and
+masses at most `S`, the selected moments are the neutral propagator on the initial moments plus
+`σ` times the correction of `s`, up to `B S B' σ² T²` (`norm_scaledHistory_sub_firstOrder_le`). A
+quadratic remainder gives a right derivative (`hasDerivWithinAt_of_norm_sub_le_sq`), so the
+correction of the history is the derivative of the selected moments in the selection strength at
+zero (`hasDerivWithinAt_selectedHistory_firstOrder`).
+
+Portability. The portability of expected accuracies is the cross ratio `N_t D_s / (D_t N_s)` of
+four dot products with the moments. With `N = A B` and `M = C D`, the exact identity
+`N/M - N₀/M₀ - σ P₁ = ((N - N₀ - σ N₁) M₀ - N₀ (M - M₀ - σ M₁)) / (M M₀) - σ P₁ (M - M₀) / M`
+(`crossRatio_sub_firstOrder_eq`), with `P₁` the quotient-rule derivative
+`EndToEndSensitivityMetrics.crossRatioDerivative`, puts every term at second order
+(`abs_mul_sub_firstOrder_le`, `abs_crossRatio_sub_firstOrder_le`). The factors read the moments
+through their coefficient vectors (`dotProduct_firstOrder_bounds`), expected moments lie in the
+unit box (`norm_expectedMomentVector_le_one`), the zero-order error is `B σ T`
+(`EndToEndSelectionLaw.norm_selectedHistory_sub_propagator_le`) and the correction costs `2 B S T`.
+So where the target denominator and the source numerator are at least `δ > 0`, the selected
+portability is `P(m₀) + σ P₁`, with `P₁ = portabilityFirstOrder` at the neutral moments `m₀` in the
+direction of the correction, up to the explicit `crossRatioRemainder`, of order `σ² T²`
+(`abs_selectedPortability_sub_firstOrder_le`); and `P₁` is the right derivative of the selected
+portability in `σ` at zero (`hasDerivWithinAt_selectedPortability_firstOrder`). With positive
+neutral accuracy components, `P₁ > 0` exactly when the relative first-order change
+`N_t₁/N_t - D_t₁/D_t` of the target accuracy exceeds that of the source accuracy
+(`crossRatioDerivative_pos_iff_of_pos`, `portabilityFirstOrder_pos_iff`).
+
+Significance. `SelectionMomentExpansion` stops at one epoch and `EndToEndSelectionLaw` at zero
+order. Here the first-order effect of weak selection on the moments and on portability, along any
+history of epochs, splits and pulses, is a linear functional of the fitness table built from
+neutral propagators and matrix-exponential integrals of the selection matrix, with an explicit
+remainder, and selection raises portability to first order exactly when it raises the target
+accuracy relatively more than the source accuracy.
+
 Scope. The forward moment equation with selection is a hypothesis on the families, at the budget
 and at the budget with one more copy at the selected locus, as in `SelectionHistoryMoments` and
 `EndToEndSelectionLaw`; the selected diffusion is not constructed. Selection is haploid at one
-locus, with one fitness table for the whole history.
+locus, with one fitness table for the whole history; the derivative and portability statements
+scale a table in `[0, 1]`. The portability remainder carries the coefficient masses of the metric
+polynomials and needs the lower bound `δ` under the selected families and at the neutral moments.
+The expected squared correlation `E[N/D]` itself is not expanded.
 
 ## Empirical status
 
@@ -49,8 +87,9 @@ namespace Descent.Portability.SelectionHistoryFirstOrder
 
 open MvPolynomial Descent.Coalescent Descent.Foundations PartialHaplotypeCarrier
   PartialHaplotypeDualGenerator PartialHaplotypeDualSemigroup SubstochasticGeneratorSemigroup
-  PartialHaplotypePulseKernel NeutralPulseHistoryKernel EndToEndPortabilityLaw
-  SelectionHistoryMoments EndToEndSelectionLaw SelectionMomentExpansion EndToEndSensitivityMetrics
+  PartialHaplotypePulseKernel NeutralPulseHistoryKernel ReplicaMetricInstances
+  EndToEndPortabilityLaw SelectionHistoryMoments EndToEndSelectionLaw SelectionMomentExpansion
+  EndToEndSensitivityMetrics
 open scoped Matrix NNReal
 
 noncomputable section
@@ -595,6 +634,271 @@ theorem abs_crossRatio_sub_firstOrder_le
       _ = 8 * α * β * γ ^ 2 * κ ^ 2 * (e₀ * e₁) / δ ^ 6 := by ring
   rw [crossRatio_sub_firstOrder_eq hCpos.ne' hDpos.ne' hC₀pos.ne' hD₀pos.ne']
   exact (abs_sub _ _).trans (add_le_add hT1 hT2)
+
+/-- **The sign criterion in relative changes.** For positive factors, a cross ratio `a b / (c d)`
+increases to first order exactly when the relative first-order change of `a / c` exceeds that of
+`d / b`. -/
+theorem crossRatioDerivative_pos_iff_of_pos {a b c d : ℝ} (a' b' c' d' : ℝ) (ha : 0 < a)
+    (hb : 0 < b) (hc : 0 < c) (hd : 0 < d) :
+    0 < crossRatioDerivative a b c d a' b' c' d' ↔ d' / d - b' / b < a' / a - c' / c := by
+  rw [crossRatioDerivative_eq_mul a' b' c' d' ha.ne' hb.ne' hc.ne' hd.ne',
+    mul_pos_iff_of_pos_left (by positivity)]
+  constructor <;> intro h <;> linarith
+
+/-! ## Portability to first order -/
+
+/-- A dot product is at most the coefficient mass times the sup norm of the vector. -/
+theorem abs_dotProduct_le_mass_mul_norm {ι : Type*} [Fintype ι] (c v : ι → ℝ) :
+    |c ⬝ᵥ v| ≤ (∑ i, |c i|) * ‖v‖ := by
+  simpa only [dotProduct_zero, sub_zero] using
+    PortabilityMetricCompilation.abs_dotProduct_sub_le c v 0
+
+/-- **One factor to first order.** For a coefficient vector `c` and moment vectors with
+`‖V‖, ‖m₀‖ ≤ 1`, `‖V - m₀‖ ≤ e₀`, `‖σ • m₁‖ ≤ e₁` and `‖V - m₀ - σ • m₁‖ ≤ e₂`, the dot products
+with `c` are bounded by the mass `‖c‖₁` in the form `abs_crossRatio_sub_firstOrder_le` reads. -/
+theorem dotProduct_firstOrder_bounds {ι : Type*} [Fintype ι] (c : ι → ℝ) {V m₀ m₁ : ι → ℝ}
+    {σ e₀ e₁ e₂ : ℝ} (hV : ‖V‖ ≤ 1) (hm₀ : ‖m₀‖ ≤ 1) (h₀ : ‖V - m₀‖ ≤ e₀)
+    (h₁ : ‖σ • m₁‖ ≤ e₁) (h₂ : ‖V - m₀ - σ • m₁‖ ≤ e₂) :
+    |c ⬝ᵥ V| ≤ ∑ i, |c i| ∧ |c ⬝ᵥ m₀| ≤ ∑ i, |c i|
+      ∧ |c ⬝ᵥ V - c ⬝ᵥ m₀| ≤ (∑ i, |c i|) * e₀ ∧ |σ * (c ⬝ᵥ m₁)| ≤ (∑ i, |c i|) * e₁
+      ∧ |c ⬝ᵥ V - c ⬝ᵥ m₀ - σ * (c ⬝ᵥ m₁)| ≤ (∑ i, |c i|) * e₂ := by
+  have hmass : 0 ≤ ∑ i, |c i| := Finset.sum_nonneg fun i _ ↦ abs_nonneg (c i)
+  have hbound : ∀ (v : ι → ℝ) (e : ℝ), ‖v‖ ≤ e → |c ⬝ᵥ v| ≤ (∑ i, |c i|) * e := fun v _ hv ↦
+    (abs_dotProduct_le_mass_mul_norm c v).trans (mul_le_mul_of_nonneg_left hv hmass)
+  have hsmul : σ * (c ⬝ᵥ m₁) = c ⬝ᵥ (σ • m₁) := by rw [dotProduct_smul, smul_eq_mul]
+  refine ⟨(hbound V 1 hV).trans_eq (mul_one _), (hbound m₀ 1 hm₀).trans_eq (mul_one _), ?_, ?_,
+    ?_⟩
+  · rw [← dotProduct_sub]
+    exact hbound _ _ h₀
+  · rw [hsmul]
+    exact hbound _ _ h₁
+  · rw [hsmul, ← dotProduct_sub, ← dotProduct_sub]
+    exact hbound _ _ h₂
+
+/-- Every expected configuration moment lies in `[0, 1]`, so an expected moment vector has sup norm
+at most one. -/
+theorem norm_expectedMomentVector_le_one (capacity : Locus → ℕ)
+    (expectationAt : ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele)))
+    (s : ℝ) : ‖expectedMomentVector capacity expectationAt s‖ ≤ 1 := by
+  refine (pi_norm_le_iff_of_nonneg zero_le_one).mpr fun ξ ↦ ?_
+  have hlow : 0 ≤ expectedMomentVector capacity expectationAt s ξ :=
+    (expectationAt s).nonneg_eval _ fun law ↦
+      PartialHaplotypeCarrier.configurationMoment_nonneg law ξ.1
+  have hhigh : expectedMomentVector capacity expectationAt s ξ ≤ 1 :=
+    ((expectationAt s).eval_mono fun law ↦ configurationMoment_le_one law ξ.1).trans_eq
+      ((expectationAt s).eval_const 1)
+  rw [Real.norm_eq_abs, abs_of_nonneg hlow]
+  exact hhigh
+
+/-- The coefficient mass `‖c‖₁` of a frequency polynomial over the budget-4 configurations. -/
+def coefficientMass (ℓ₀ : Locus) (p : FrequencyPolynomial Deme Locus Allele) : ℝ :=
+  ∑ i, |budgetCoefficients ℓ₀ (fun _ ↦ 4) p i|
+
+/-- The remainder of the cross ratio to first order,
+`2 α β γ κ (2 e₂ + e₀ e₁) / δ⁴ + 8 α β γ² κ² e₀ e₁ / δ⁶`. -/
+def crossRatioRemainder (α β γ κ e₀ e₁ e₂ δ : ℝ) : ℝ :=
+  2 * α * β * γ * κ * (2 * e₂ + e₀ * e₁) / δ ^ 4
+    + 8 * α * β * γ ^ 2 * κ ^ 2 * (e₀ * e₁) / δ ^ 6
+
+/-- **The first-order portability correction**: the cross-ratio derivative of the target
+numerator and source denominator over the target denominator and source numerator, at budget-4
+moments `m₀` in the direction `m₁`. -/
+def portabilityFirstOrder (ℓ₀ : Locus) (source target : Deme)
+    (score outcome : FullHaplotype Locus Allele → ℝ)
+    (m₀ m₁ : BudgetConfiguration Deme Locus Allele (fun _ ↦ 4) → ℝ) : ℝ :=
+  crossRatioDerivative
+    (budgetCoefficients ℓ₀ (fun _ ↦ 4) (numeratorPolynomial target score outcome) ⬝ᵥ m₀)
+    (budgetCoefficients ℓ₀ (fun _ ↦ 4) (denominatorPolynomial source score outcome) ⬝ᵥ m₀)
+    (budgetCoefficients ℓ₀ (fun _ ↦ 4) (denominatorPolynomial target score outcome) ⬝ᵥ m₀)
+    (budgetCoefficients ℓ₀ (fun _ ↦ 4) (numeratorPolynomial source score outcome) ⬝ᵥ m₀)
+    (budgetCoefficients ℓ₀ (fun _ ↦ 4) (numeratorPolynomial target score outcome) ⬝ᵥ m₁)
+    (budgetCoefficients ℓ₀ (fun _ ↦ 4) (denominatorPolynomial source score outcome) ⬝ᵥ m₁)
+    (budgetCoefficients ℓ₀ (fun _ ↦ 4) (denominatorPolynomial target score outcome) ⬝ᵥ m₁)
+    (budgetCoefficients ℓ₀ (fun _ ↦ 4) (numeratorPolynomial source score outcome) ⬝ᵥ m₁)
+
+/-- **Selection raises portability to first order exactly when the target gains more.** Where the
+target and source accuracy components are positive at `m₀`, the first-order portability correction
+is positive exactly when the relative first-order change `N_t₁/N_t - D_t₁/D_t` of the target
+accuracy exceeds the relative first-order change `N_s₁/N_s - D_s₁/D_s` of the source accuracy. -/
+theorem portabilityFirstOrder_pos_iff (ℓ₀ : Locus) (source target : Deme)
+    (score outcome : FullHaplotype Locus Allele → ℝ)
+    (m₀ m₁ : BudgetConfiguration Deme Locus Allele (fun _ ↦ 4) → ℝ)
+    (hNt : 0 < budgetCoefficients ℓ₀ (fun _ ↦ 4) (numeratorPolynomial target score outcome) ⬝ᵥ m₀)
+    (hDs : 0 < budgetCoefficients ℓ₀ (fun _ ↦ 4) (denominatorPolynomial source score outcome)
+      ⬝ᵥ m₀)
+    (hDt : 0 < budgetCoefficients ℓ₀ (fun _ ↦ 4) (denominatorPolynomial target score outcome)
+      ⬝ᵥ m₀)
+    (hNs : 0 < budgetCoefficients ℓ₀ (fun _ ↦ 4) (numeratorPolynomial source score outcome)
+      ⬝ᵥ m₀) :
+    0 < portabilityFirstOrder ℓ₀ source target score outcome m₀ m₁
+      ↔ budgetCoefficients ℓ₀ (fun _ ↦ 4) (numeratorPolynomial source score outcome) ⬝ᵥ m₁
+            / budgetCoefficients ℓ₀ (fun _ ↦ 4) (numeratorPolynomial source score outcome) ⬝ᵥ m₀
+          - budgetCoefficients ℓ₀ (fun _ ↦ 4) (denominatorPolynomial source score outcome) ⬝ᵥ m₁
+            / budgetCoefficients ℓ₀ (fun _ ↦ 4) (denominatorPolynomial source score outcome)
+              ⬝ᵥ m₀
+        < budgetCoefficients ℓ₀ (fun _ ↦ 4) (numeratorPolynomial target score outcome) ⬝ᵥ m₁
+            / budgetCoefficients ℓ₀ (fun _ ↦ 4) (numeratorPolynomial target score outcome) ⬝ᵥ m₀
+          - budgetCoefficients ℓ₀ (fun _ ↦ 4) (denominatorPolynomial target score outcome) ⬝ᵥ m₁
+            / budgetCoefficients ℓ₀ (fun _ ↦ 4) (denominatorPolynomial target score outcome)
+              ⬝ᵥ m₀ :=
+  crossRatioDerivative_pos_iff_of_pos _ _ _ _ hNt hDs hDt hNs
+
+/-- **Portability to first order in selection along a history.** For the fitness table `σ s`,
+with `s` in `[0, 1]` and masses `Σ_b |s_i(b)| ≤ S`, let `m₀` be the neutral chronological
+propagator applied to the initial budget-4 moments and `m₁` the first-order correction of the
+history of `s` at the initial moments of the larger budget. Where the target denominator and the
+source numerator are at least `δ > 0` under the selected family and at `m₀`, the portability of
+expected accuracies of the selected history is `P(m₀) + σ P₁`, with `P₁ = portabilityFirstOrder`,
+up to `crossRatioRemainder α β γ κ e₀ e₁ e₂ δ`. Here `α, β, γ, κ` are the coefficient masses of the
+target numerator, source denominator, target denominator and source numerator,
+`e₀ = B σ T`, `e₁ = 2 B S T σ`, `e₂ = B S (B + 1) σ² T²` and `B = 4 |L|`, so the remainder is of
+order `σ² T²`.
+
+Assumes: `SelectedOnHistory (scaledModel σ model) (fun _ ↦ 4) family events 0` and
+`SelectedOnHistory (scaledModel σ model) (bumpCapacity model (fun _ ↦ 4)) family events 0`. -/
+theorem abs_selectedPortability_sub_firstOrder_le (ℓ₀ : Locus)
+    (model : SelectionModel Deme Locus Allele) {σ S δ : ℝ} (hσ : 0 ≤ σ) (hS0 : 0 ≤ S)
+    (hfit : ∀ i b, 0 ≤ model.fitness i b ∧ model.fitness i b ≤ 1)
+    (hS : ∀ i, ∑ b, |model.fitness i b| ≤ S)
+    (family : ℕ → ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele)))
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (hhistory : SelectedOnHistory (scaledModel σ model) (fun _ ↦ 4) family events 0)
+    (hhistory' : SelectedOnHistory (scaledModel σ model) (bumpCapacity model (fun _ ↦ 4))
+      family events 0)
+    (source target : Deme) (score outcome : FullHaplotype Locus Allele → ℝ) (hδ : 0 < δ)
+    (htarget : δ ≤ family events.length 0 fun law ↦
+      correlationDenominator (law target) score outcome)
+    (hsource : δ ≤ family events.length 0 fun law ↦
+      correlationNumerator (law source) score outcome)
+    (htarget₀ : δ ≤ budgetCoefficients ℓ₀ (fun _ ↦ 4) (denominatorPolynomial target score outcome)
+      ⬝ᵥ (historyEventPropagator (fun _ ↦ 4) events
+        *ᵥ expectedMomentVector (fun _ ↦ 4) (family 0) 0))
+    (hsource₀ : δ ≤ budgetCoefficients ℓ₀ (fun _ ↦ 4) (numeratorPolynomial source score outcome)
+      ⬝ᵥ (historyEventPropagator (fun _ ↦ 4) events
+        *ᵥ expectedMomentVector (fun _ ↦ 4) (family 0) 0)) :
+    |selectedPortability family events.length source target score outcome
+        - momentPortability ℓ₀ source target score outcome
+          (historyEventPropagator (fun _ ↦ 4) events
+            *ᵥ expectedMomentVector (fun _ ↦ 4) (family 0) 0)
+        - σ * portabilityFirstOrder ℓ₀ source target score outcome
+          (historyEventPropagator (fun _ ↦ 4) events
+            *ᵥ expectedMomentVector (fun _ ↦ 4) (family 0) 0)
+          (historyCorrection model (fun _ ↦ 4) events
+            (expectedMomentVector (bumpCapacity model (fun _ ↦ 4)) (family 0) 0))|
+      ≤ crossRatioRemainder (coefficientMass ℓ₀ (numeratorPolynomial target score outcome))
+          (coefficientMass ℓ₀ (denominatorPolynomial source score outcome))
+          (coefficientMass ℓ₀ (denominatorPolynomial target score outcome))
+          (coefficientMass ℓ₀ (numeratorPolynomial source score outcome))
+          (4 * Fintype.card Locus * σ * epochDuration events)
+          (2 * (4 * Fintype.card Locus) * S * epochDuration events * σ)
+          (4 * Fintype.card Locus * S * (4 * Fintype.card Locus + 1) * σ ^ 2
+            * epochDuration events ^ 2) δ := by
+  have hfit' : ∀ i b, 0 ≤ (scaledModel σ model).fitness i b
+      ∧ (scaledModel σ model).fitness i b ≤ σ := fun i b ↦
+    ⟨mul_nonneg hσ (hfit i b).1, mul_le_of_le_one_right hσ (hfit i b).2⟩
+  have hV := norm_expectedMomentVector_le_one (fun _ ↦ 4) (family events.length) 0
+  have hm₀ := (norm_mulVec_le_of_substochastic
+    (historyEventPropagator_substochastic (fun _ ↦ 4) events)
+      (expectedMomentVector (fun _ ↦ 4) (family 0) 0)).trans
+        (norm_expectedMomentVector_le_one (fun _ ↦ 4) (family 0) 0)
+  have h₀ := norm_selectedHistory_sub_propagator_le (scaledModel σ model) hσ hfit' (fun _ ↦ 4)
+    family events 0 hhistory
+  rw [zero_add, sum_four_capacity] at h₀
+  have h₁ : ‖σ • historyCorrection model (fun _ ↦ 4) events
+      (expectedMomentVector (bumpCapacity model (fun _ ↦ 4)) (family 0) 0)‖
+      ≤ 2 * (4 * Fintype.card Locus) * S * epochDuration events * σ := by
+    have h := norm_historyCorrection_le model hS0 hS (fun _ ↦ 4) events
+      (expectedMomentVector (bumpCapacity model (fun _ ↦ 4)) (family 0) 0)
+    rw [sum_four_capacity] at h
+    rw [norm_smul, Real.norm_eq_abs, abs_of_nonneg hσ]
+    exact (mul_comm σ _).trans_le (mul_le_mul_of_nonneg_right (h.trans (mul_le_of_le_one_right
+      (mul_nonneg (by positivity) (epochDuration_nonneg events))
+      (norm_expectedMomentVector_le_one _ (family 0) 0))) hσ)
+  have h₂ := norm_scaledHistory_sub_firstOrder_le model hσ hS0 hfit hS (fun _ ↦ 4) family events
+    hhistory hhistory'
+  rw [sum_four_capacity] at h₂
+  have hC : δ ≤ budgetCoefficients ℓ₀ (fun _ ↦ 4) (denominatorPolynomial target score outcome)
+      ⬝ᵥ expectedMomentVector (fun _ ↦ 4) (family events.length) 0 := by
+    rw [expectation_correlationDenominator ℓ₀] at htarget
+    exact htarget
+  have hD : δ ≤ budgetCoefficients ℓ₀ (fun _ ↦ 4) (numeratorPolynomial source score outcome)
+      ⬝ᵥ expectedMomentVector (fun _ ↦ 4) (family events.length) 0 := by
+    rw [expectation_correlationNumerator ℓ₀] at hsource
+    exact hsource
+  obtain ⟨-, hA₀, -, hA₁, hρA⟩ := dotProduct_firstOrder_bounds
+    (budgetCoefficients ℓ₀ (fun _ ↦ 4) (numeratorPolynomial target score outcome))
+    hV hm₀ h₀ h₁ h₂
+  obtain ⟨hB, hB₀, hΔB, hB₁, hρB⟩ := dotProduct_firstOrder_bounds
+    (budgetCoefficients ℓ₀ (fun _ ↦ 4) (denominatorPolynomial source score outcome))
+    hV hm₀ h₀ h₁ h₂
+  obtain ⟨-, hC₀, hΔC, hC₁, hρC⟩ := dotProduct_firstOrder_bounds
+    (budgetCoefficients ℓ₀ (fun _ ↦ 4) (denominatorPolynomial target score outcome))
+    hV hm₀ h₀ h₁ h₂
+  obtain ⟨hDκ, hD₀, hΔD, hD₁, hρD⟩ := dotProduct_firstOrder_bounds
+    (budgetCoefficients ℓ₀ (fun _ ↦ 4) (numeratorPolynomial source score outcome))
+    hV hm₀ h₀ h₁ h₂
+  rw [selectedPortability_eq_momentPortability ℓ₀]
+  exact abs_crossRatio_sub_firstOrder_le hδ hC hD htarget₀ hsource₀ hB hDκ hA₀ hB₀ hC₀ hD₀ hΔB
+    hΔC hΔD hA₁ hB₁ hC₁ hD₁ hρA hρB hρC hρD
+
+/-- **The first-order portability correction is the derivative in selection strength.** Let
+`family σ` be selected along a history for the fitness table `σ s` at every `σ ≥ 0`, with `s` in
+`[0, 1]`, starting from the same moments `v₀` and `w₀` at both budgets, with target denominator
+and source numerator at least `δ > 0` under every `family σ` and at the neutral moments `m₀`. Then
+the portability of expected accuracies of the selected history has right derivative in `σ` at
+zero equal to `portabilityFirstOrder` at `m₀` in the direction of the correction of the history.
+
+Assumes: `SelectedOnHistory (scaledModel σ model) (fun _ ↦ 4) (family σ) events 0` and
+`SelectedOnHistory (scaledModel σ model) (bumpCapacity model (fun _ ↦ 4)) (family σ) events 0`
+for every `σ ≥ 0`. -/
+theorem hasDerivWithinAt_selectedPortability_firstOrder (ℓ₀ : Locus)
+    (model : SelectionModel Deme Locus Allele) {S δ : ℝ} (hS0 : 0 ≤ S)
+    (hfit : ∀ i b, 0 ≤ model.fitness i b ∧ model.fitness i b ≤ 1)
+    (hS : ∀ i, ∑ b, |model.fitness i b| ≤ S)
+    (family : ℝ → ℕ → ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele)))
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (hhistory : ∀ σ, 0 ≤ σ →
+      SelectedOnHistory (scaledModel σ model) (fun _ ↦ 4) (family σ) events 0)
+    (hhistory' : ∀ σ, 0 ≤ σ → SelectedOnHistory (scaledModel σ model)
+      (bumpCapacity model (fun _ ↦ 4)) (family σ) events 0)
+    (v₀ : BudgetConfiguration Deme Locus Allele (fun _ ↦ 4) → ℝ)
+    (w₀ : BudgetConfiguration Deme Locus Allele (bumpCapacity model (fun _ ↦ 4)) → ℝ)
+    (hinitial : ∀ σ, 0 ≤ σ → expectedMomentVector (fun _ ↦ 4) (family σ 0) 0 = v₀)
+    (hinitial' : ∀ σ, 0 ≤ σ →
+      expectedMomentVector (bumpCapacity model (fun _ ↦ 4)) (family σ 0) 0 = w₀)
+    (source target : Deme) (score outcome : FullHaplotype Locus Allele → ℝ) (hδ : 0 < δ)
+    (htarget : ∀ σ, 0 ≤ σ → δ ≤ family σ events.length 0 fun law ↦
+      correlationDenominator (law target) score outcome)
+    (hsource : ∀ σ, 0 ≤ σ → δ ≤ family σ events.length 0 fun law ↦
+      correlationNumerator (law source) score outcome)
+    (htarget₀ : δ ≤ budgetCoefficients ℓ₀ (fun _ ↦ 4) (denominatorPolynomial target score outcome)
+      ⬝ᵥ (historyEventPropagator (fun _ ↦ 4) events *ᵥ v₀))
+    (hsource₀ : δ ≤ budgetCoefficients ℓ₀ (fun _ ↦ 4) (numeratorPolynomial source score outcome)
+      ⬝ᵥ (historyEventPropagator (fun _ ↦ 4) events *ᵥ v₀)) :
+    HasDerivWithinAt
+      (fun σ ↦ selectedPortability (family σ) events.length source target score outcome)
+      (portabilityFirstOrder ℓ₀ source target score outcome
+        (historyEventPropagator (fun _ ↦ 4) events *ᵥ v₀)
+        (historyCorrection model (fun _ ↦ 4) events w₀)) (Set.Ici 0) 0 := by
+  refine hasDerivWithinAt_of_norm_sub_le_sq
+    (x₀ := momentPortability ℓ₀ source target score outcome
+      (historyEventPropagator (fun _ ↦ 4) events *ᵥ v₀))
+    (C := crossRatioRemainder (coefficientMass ℓ₀ (numeratorPolynomial target score outcome))
+      (coefficientMass ℓ₀ (denominatorPolynomial source score outcome))
+      (coefficientMass ℓ₀ (denominatorPolynomial target score outcome))
+      (coefficientMass ℓ₀ (numeratorPolynomial source score outcome))
+      (4 * Fintype.card Locus * epochDuration events)
+      (2 * (4 * Fintype.card Locus) * S * epochDuration events)
+      (4 * Fintype.card Locus * S * (4 * Fintype.card Locus + 1) * epochDuration events ^ 2) δ)
+    fun σ hσ ↦ ?_
+  have h := abs_selectedPortability_sub_firstOrder_le ℓ₀ model hσ hS0 hfit hS (family σ) events
+    (hhistory σ hσ) (hhistory' σ hσ) source target score outcome hδ (htarget σ hσ)
+    (hsource σ hσ) (by rw [hinitial σ hσ]; exact htarget₀) (by rw [hinitial σ hσ]; exact hsource₀)
+  rw [hinitial σ hσ, hinitial' σ hσ] at h
+  rw [Real.norm_eq_abs, smul_eq_mul]
+  refine h.trans_eq ?_
+  simp only [crossRatioRemainder]
+  ring
 
 end
 
