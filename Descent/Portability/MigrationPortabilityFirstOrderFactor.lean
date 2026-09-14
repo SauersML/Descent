@@ -735,3 +735,172 @@ theorem hasDerivWithinAt_splitPortabilityRatio_withSymmetricMigration (rates : M
   · have hnonnegative : 0 ≤ migration := hmigration
     rw [splitPortabilityRatio_withSymmetricMigration_eq_affine, max_eq_left hnonnegative]
   · rw [splitPortabilityRatio_withSymmetricMigration_eq_affine, max_self]
+
+/-! ## Without recombination -/
+
+/-- **The slow within-deme combination.**  Without migration or mutation, and with `ρ_i = 0`,
+`2 DD(i, i) + Dz(i, i, i) + 2 pi2(i, i, i, i)` is multiplied by `e^{-c_i t}` along any trajectory.
+It is the left eigenvector of the within-deme block at `-c_i`.
+
+Assumes: no migration, no mutation, and `ρ_i = 0`. -/
+theorem matrixExponential_mulVec_withinDeme_slow (rates : ManyDemeLDRates D)
+    (hmigration : ∀ source target, rates.migration source target = 0)
+    (hmutation : ∀ deme, rates.mutation deme = 0) {deme : Fin D}
+    (hρ : rates.recombination deme = 0) (time : ℝ) (state : AffineLowOrderLDCoordinate D → ℝ) :
+    2 * (matrixExponential (augmentedLowOrderLDGenerator rates) time).mulVec state
+          (some (.DD deme deme))
+        + (matrixExponential (augmentedLowOrderLDGenerator rates) time).mulVec state
+          (some (.Dz deme deme deme))
+        + 2 * (matrixExponential (augmentedLowOrderLDGenerator rates) time).mulVec state
+          (some (.pi2 deme deme deme deme))
+      = Real.exp (-rates.coalescence deme * time)
+        * (2 * state (some (.DD deme deme)) + state (some (.Dz deme deme deme))
+          + 2 * state (some (.pi2 deme deme deme deme))) := by
+  obtain ⟨hDD, hDz, hpi2⟩ :=
+    augmentedLowOrderLDGenerator_withinDeme_rows rates hmigration hmutation deme
+  have h := sum_mul_matrixExponential_mulVec_of_left_eigen (augmentedLowOrderLDGenerator rates)
+    (fun row ↦ 2 * (if some (LowOrderLDCoordinate.DD deme deme) = row then 1 else 0)
+      + 1 * (if some (LowOrderLDCoordinate.Dz deme deme deme) = row then 1 else 0)
+      + 2 * (if some (LowOrderLDCoordinate.pi2 deme deme deme deme) = row then 1 else 0))
+    (-rates.coalescence deme) time state (fun column ↦ by
+      simp only [add_mul, Finset.sum_add_distrib, sum_mul_pointMass_left, hDD, hDz, hpi2, hρ]
+      ring)
+  simp only [add_mul, Finset.sum_add_distrib, sum_mul_pointMass_left, one_mul,
+    sum_unitPointMass_left] at h
+  rw [mul_comm time] at h
+  linear_combination h
+
+/-- **The fast within-deme combination.**  Without migration or mutation, and with `ρ_i = 0`,
+`DD(i, i) - pi2(i, i, i, i)` is multiplied by `e^{-3 c_i t}` along any trajectory.  It is the left
+eigenvector of the within-deme block at `-3 c_i`; the third eigenvalue is `-6 c_i`.
+
+Assumes: no migration, no mutation, and `ρ_i = 0`. -/
+theorem matrixExponential_mulVec_withinDeme_fast (rates : ManyDemeLDRates D)
+    (hmigration : ∀ source target, rates.migration source target = 0)
+    (hmutation : ∀ deme, rates.mutation deme = 0) {deme : Fin D}
+    (hρ : rates.recombination deme = 0) (time : ℝ) (state : AffineLowOrderLDCoordinate D → ℝ) :
+    (matrixExponential (augmentedLowOrderLDGenerator rates) time).mulVec state
+          (some (.DD deme deme))
+        - (matrixExponential (augmentedLowOrderLDGenerator rates) time).mulVec state
+          (some (.pi2 deme deme deme deme))
+      = Real.exp (-(3 * rates.coalescence deme) * time)
+        * (state (some (.DD deme deme)) - state (some (.pi2 deme deme deme deme))) := by
+  obtain ⟨hDD, -, hpi2⟩ :=
+    augmentedLowOrderLDGenerator_withinDeme_rows rates hmigration hmutation deme
+  have h := sum_mul_matrixExponential_mulVec_of_left_eigen (augmentedLowOrderLDGenerator rates)
+    (fun row ↦ 1 * (if some (LowOrderLDCoordinate.DD deme deme) = row then 1 else 0)
+      + -1 * (if some (LowOrderLDCoordinate.pi2 deme deme deme deme) = row then 1 else 0))
+    (-(3 * rates.coalescence deme)) time state (fun column ↦ by
+      simp only [add_mul, Finset.sum_add_distrib, sum_mul_pointMass_left, hDD, hpi2, hρ]
+      ring)
+  simp only [add_mul, Finset.sum_add_distrib, sum_mul_pointMass_left, one_mul,
+    sum_unitPointMass_left] at h
+  rw [mul_comm time] at h
+  linear_combination h
+
+/-- **The slow combination of the split history without migration.**
+
+Assumes: no mutation, `parent ≠ child`, `deme` is the parent or the child, and `ρ = 0` in it. -/
+theorem noMigrationHistory_withinDeme_slow (rates : ManyDemeLDRates D)
+    (hmutation : ∀ deme, rates.mutation deme = 0) {parent child : Fin D} (hne : parent ≠ child)
+    (ancestral : AffineLowOrderLDCoordinate D → ℝ) (time : ℝ) {deme : Fin D}
+    (hdeme : deme = parent ∨ deme = child) (hρ : rates.recombination deme = 0) :
+    2 * migrationHistory rates hne 0 le_rfl ancestral time (some (.DD deme deme))
+        + migrationHistory rates hne 0 le_rfl ancestral time (some (.Dz deme deme deme))
+        + 2 * migrationHistory rates hne 0 le_rfl ancestral time (some (.pi2 deme deme deme deme))
+      = Real.exp (-rates.coalescence deme * time)
+        * (2 * ancestral (some (.DD parent parent)) + ancestral (some (.Dz parent parent parent))
+          + 2 * ancestral (some (.pi2 parent parent parent parent))) := by
+  have h := matrixExponential_mulVec_withinDeme_slow _
+    (withSymmetricMigration_zero_migration rates hne) hmutation (deme := deme) hρ time
+    ((lowOrderLDSplitTransform parent child).mulVec ancestral)
+  have hDD : (lowOrderLDSplitTransform parent child).mulVec ancestral (some (.DD deme deme))
+      = ancestral (some (.DD parent parent)) :=
+    splitTransform_withinDemeCoordinate hne ancestral hdeme 0
+  have hDz : (lowOrderLDSplitTransform parent child).mulVec ancestral (some (.Dz deme deme deme))
+      = ancestral (some (.Dz parent parent parent)) :=
+    splitTransform_withinDemeCoordinate hne ancestral hdeme 1
+  have hpi2 : (lowOrderLDSplitTransform parent child).mulVec ancestral
+        (some (.pi2 deme deme deme deme))
+      = ancestral (some (.pi2 parent parent parent parent)) :=
+    splitTransform_withinDemeCoordinate hne ancestral hdeme 2
+  rw [hDD, hDz, hpi2] at h
+  exact h
+
+/-- **The fast combination of the split history without migration.**
+
+Assumes: no mutation, `parent ≠ child`, `deme` is the parent or the child, and `ρ = 0` in it. -/
+theorem noMigrationHistory_withinDeme_fast (rates : ManyDemeLDRates D)
+    (hmutation : ∀ deme, rates.mutation deme = 0) {parent child : Fin D} (hne : parent ≠ child)
+    (ancestral : AffineLowOrderLDCoordinate D → ℝ) (time : ℝ) {deme : Fin D}
+    (hdeme : deme = parent ∨ deme = child) (hρ : rates.recombination deme = 0) :
+    migrationHistory rates hne 0 le_rfl ancestral time (some (.DD deme deme))
+        - migrationHistory rates hne 0 le_rfl ancestral time (some (.pi2 deme deme deme deme))
+      = Real.exp (-(3 * rates.coalescence deme) * time)
+        * (ancestral (some (.DD parent parent))
+          - ancestral (some (.pi2 parent parent parent parent))) := by
+  have h := matrixExponential_mulVec_withinDeme_fast _
+    (withSymmetricMigration_zero_migration rates hne) hmutation (deme := deme) hρ time
+    ((lowOrderLDSplitTransform parent child).mulVec ancestral)
+  have hDD : (lowOrderLDSplitTransform parent child).mulVec ancestral (some (.DD deme deme))
+      = ancestral (some (.DD parent parent)) :=
+    splitTransform_withinDemeCoordinate hne ancestral hdeme 0
+  have hpi2 : (lowOrderLDSplitTransform parent child).mulVec ancestral
+        (some (.pi2 deme deme deme deme))
+      = ancestral (some (.pi2 parent parent parent parent)) :=
+    splitTransform_withinDemeCoordinate hne ancestral hdeme 2
+  rw [hDD, hpi2] at h
+  exact h
+
+/-- **The linkage migration stencil without recombination, in closed form.**  At equal drift `c`
+and `ρ = 0` in both demes, on the history without migration,
+`μ_D(t) = e^{-ct} (3 DD₀ + Dz₀ + π₀) + e^{-3ct} (DD₀ - π₀ - Dz₀) - 4 e^{-2ct} DD₀`.
+
+Assumes: no mutation, `parent ≠ child`, equal drift and recombination rates, and `ρ = 0`. -/
+theorem linkageMigrationStencil_noMigration_zeroRecombination (rates : ManyDemeLDRates D)
+    (hmutation : ∀ deme, rates.mutation deme = 0) {parent child : Fin D} (hne : parent ≠ child)
+    (hcoal : rates.coalescence child = rates.coalescence parent)
+    (hrec : rates.recombination child = rates.recombination parent)
+    (hρ : rates.recombination parent = 0) (ancestral : AffineLowOrderLDCoordinate D → ℝ)
+    (time : ℝ) :
+    linkageMigrationStencil parent child (migrationHistory rates hne 0 le_rfl ancestral time)
+      = Real.exp (-rates.coalescence parent * time)
+          * (3 * ancestral (some (.DD parent parent)) + ancestral (some (.Dz parent parent parent))
+            + ancestral (some (.pi2 parent parent parent parent)))
+        + Real.exp (-(3 * rates.coalescence parent) * time)
+          * (ancestral (some (.DD parent parent))
+            - ancestral (some (.pi2 parent parent parent parent))
+            - ancestral (some (.Dz parent parent parent)))
+        - 4 * Real.exp (-(2 * rates.coalescence parent) * time)
+          * ancestral (some (.DD parent parent)) := by
+  have hc := (rates.coalescence_pos parent).ne'
+  have hρchild : rates.recombination child = 0 := hrec.trans hρ
+  have hβchild : linkageRate rates child = rates.coalescence parent := by
+    rw [linkageRate, hcoal, hρchild, zero_div, add_zero]
+  have hβparent : linkageRate rates parent = rates.coalescence parent := by
+    rw [linkageRate, hρ, zero_div, add_zero]
+  have hα : 4 * rates.coalescence parent / rates.coalescence parent = 4 := by
+    rw [mul_div_assoc, div_self hc, mul_one]
+  have hslowp := noMigrationHistory_withinDeme_slow rates hmutation hne ancestral time
+    (deme := parent) (Or.inl rfl) hρ
+  have hslowc := noMigrationHistory_withinDeme_slow rates hmutation hne ancestral time
+    (deme := child) (Or.inr rfl) hρchild
+  have hfastp := noMigrationHistory_withinDeme_fast rates hmutation hne ancestral time
+    (deme := parent) (Or.inl rfl) hρ
+  have hfastc := noMigrationHistory_withinDeme_fast rates hmutation hne ancestral time
+    (deme := child) (Or.inr rfl) hρchild
+  have hcross := noMigrationHistory_DD_cross rates hmutation hne ancestral time
+  have hfedc := noMigrationHistory_Dz_childFed rates hmutation hne ancestral time
+  have hfedp := noMigrationHistory_Dz_parentFed rates hmutation hne ancestral time
+  obtain ⟨hdiagonal₁, hdiagonal₂, hdiagonal₃, hdiagonal₄⟩ :=
+    noMigrationHistory_Dz_diagonal rates hmutation hne ancestral time
+  rw [hcoal] at hslowc hfastc
+  rw [crossLinkageDecayRate, hcoal, hrec, hρ] at hcross
+  rw [hβchild, hβparent, hα, hcoal, hrec, hρ] at hfedc
+  rw [hβparent, hcoal, hβchild, hα, hrec, hρ] at hfedp
+  rw [hcoal, hρchild] at hdiagonal₁ hdiagonal₂
+  rw [hρ] at hdiagonal₃ hdiagonal₄
+  rw [linkageMigrationStencil]
+  linear_combination (norm := ring_nf) hslowp / 4 + hslowc / 4 + hfastp / 2 + hfastc / 2
+    - 2 * hcross + hfedc / 4 + hfedp / 4 - hdiagonal₁ / 4 - hdiagonal₂ / 4 - hdiagonal₃ / 4
+    - hdiagonal₄ / 4
