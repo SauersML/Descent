@@ -40,6 +40,7 @@ import Descent.Portability.TwoTimeRatePropagator
 import Descent.Portability.SelectionHistoryFirstOrder
 import Descent.Portability.SelectionMetricsFirstOrder
 import Descent.Portability.PortabilityMomentLadderDecision
+import Descent.Portability.PortabilityMomentLadderEight
 import Descent.Portability.EndToEndAscertainedLaw
 import Descent.Portability.EndToEndAscertainedWitness
 import Descent.Portability.TwoLocusPortabilityDecay
@@ -217,7 +218,11 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
     laws, slopes, intercepts, and calibration, squared-correlation and AUC portability
     (`PortabilityMomentLadder.portabilityReport_eq_of_momentsAgreeAt_four`).
   * Budget 8 adds the joint ratio and GWAS-trained accuracy at every cohort size
-    (`portabilityReport_and_training_eq_of_momentsAgreeAt_eight`).
+    (`portabilityReport_and_training_eq_of_momentsAgreeAt_eight`).  Agreement up to degree eight
+    fixes the joint ratio under any process law, and an event history and a rate history with
+    equal budget-8 moments give every score the same report, joint ratio and trained accuracy
+    (`PortabilityMomentLadderEight.expectedJointPortability_eq_of_polynomialsAgreeAt_eight`,
+    `reports_historyEvent_eq_rateHistory_eight`).
   * Every budget fixes the expected per-population metrics
     (`expectedMetrics_eq_of_momentsAgreeAt_all`), and so does agreement on every polynomial
     expectation under any process law, term by term through the series; an event history and a
