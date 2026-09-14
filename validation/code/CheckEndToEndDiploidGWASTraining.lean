@@ -1,0 +1,24 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.EndToEndDiploidGWASTraining
+
+/-! Axiom audit of EndToEndDiploidGWASTraining. -/
+
+open Descent.Portability.EndToEndDiploidGWASTraining
+
+#print axioms totalDegree_bind₁_le
+#print axioms eval_pairMassPolynomial
+#print axioms totalDegree_pairMassPolynomial_le
+#print axioms eval_bind₁_pairMassPolynomial
+#print axioms polynomialFunction_diploidTrainedPolynomial
+#print axioms totalDegree_diploidTrainedPolynomial_le
+#print axioms trainedNumerator_stateGenotypeLaw
+#print axioms trainedDenominator_stateGenotypeLaw
+#print axioms integral_diploidTrainedNumerator_eq
+#print axioms integral_diploidTrainedDenominator_eq
+#print axioms expectedDiploidTrainedAccuracy_eq_moment
+#print axioms expectedDiploidTrainedAccuracy_historyEventKernel
+#print axioms expectedDiploidTrainedAccuracy_rateHistoryKernel
+#print axioms expectedDiploidTrainedAccuracy_eq_of_moments_eq
+#print axioms diploidMomentPortability_diploidSum_rateHistoryKernel
