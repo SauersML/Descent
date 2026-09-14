@@ -244,7 +244,9 @@ theorem penetranceConfusion_indicator (law : FiniteReportLaw State) (score : Sta
   simp only [penetranceConfusion, penetranceCellWeight, FiniteReportLaw.expectation,
     confusionReport]
   refine Finset.sum_congr rfl fun state _ ↦ congrArg (law.mass state * ·) ?_
-  cases called (score state) <;> cases outcome state <;> cases call <;> cases result <;> simp
+  rcases Bool.eq_false_or_eq_true (called (score state)) with hcall | hcall <;>
+    rcases Bool.eq_false_or_eq_true (outcome state) with houtcome | houtcome <;>
+    cases call <;> cases result <;> simp [hcall, houtcome]
 
 /-- **Deterministic outcomes: the penetrance Brier loss is the mean squared error.**  When the
 penetrance is the indicator of a binary outcome, the penetrance Brier loss of a forecast is the
@@ -344,6 +346,7 @@ def penetranceReport
     metric (expectedPenetranceConfusion κ x0 target score penetrance called)
       / metric (expectedPenetranceConfusion κ x0 source score penetrance called)
 
+omit [Fintype Deme] [DecidableEq Deme] [∀ ℓ, DecidableEq (Allele ℓ)] in
 /-- **Deterministic outcomes: the expected penetrance table is the expected confusion table.**
 Under every kernel, the expected penetrance confusion table of an indicator penetrance is the
 expected confusion table of the report `hap ↦ (s, b)`. -/
@@ -381,6 +384,7 @@ theorem expectedPenetranceConfusion_eq_expectedConfusion
         expectedPenetranceConfusion_indicator κ x0 deme score
           (fun hap ↦ decide (penetrance hap = 1)) called
 
+omit [Fintype Deme] [DecidableEq Deme] [∀ ℓ, DecidableEq (Allele ℓ)] in
 /-- **Deterministic outcomes: the penetrance AUC portability is the AUC portability.**  Under every
 kernel, the penetrance AUC portability of an indicator penetrance is the AUC portability of
 expectations of `EndToEndDiscriminationLaw` for that outcome. -/
