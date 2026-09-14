@@ -60,6 +60,12 @@ import Descent.Portability.SelectionHistoryVaryingFitness
 import Descent.Portability.EndToEndLDAdjustedTraining
 import Descent.Portability.PortabilityMomentLadderSharpnessFour
 import Descent.Portability.EndToEndCalibrationErrorNonclosureAll
+import Descent.Portability.EndToEndAncestryProportions
+import Descent.Portability.CalibrationPortabilityMigration
+import Descent.Portability.EndToEndAscertainedDecision
+import Descent.Portability.DiploidSelectionHistory
+import Descent.Portability.EndToEndIntegrableRateHistory
+import Descent.Portability.EndToEndSensitivitySeriesBound
 import Descent.Portability.SelectionMetricsFirstOrder
 import Descent.Portability.PortabilityMomentLadderDecision
 import Descent.Portability.PortabilityMomentLadderEight
@@ -265,6 +271,13 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   under any process law (`reclassificationReport_eq_of_polynomialsAgreeAt_one`,
   `reclassificationReport_historyEvent_eq_rateHistory`), and porting each rule's sensitivity does
   not port the NRI (`nriShift_witness`).
+* **Case-control cohorts.**  A cohort sampled at a design case fraction reweights the two columns
+  of the confusion table, so sensitivity, specificity and Youden's J are kept while the positive
+  predictive value is read at the case fraction instead of the prevalence
+  (`EndToEndAscertainedDecision.ascertainedConfusion_sensitivity_specificity`,
+  `tablePPV_ascertainedTable`).  The cohort value ports whenever sensitivity and specificity port,
+  and the population value ports exactly when the prevalence ports as well
+  (`tablePPV_ascertainedTable_eq_of_rates_eq`, `tablePPV_eq_iff_tableCaseMass_eq`).
 * **Stability.**  Propagators of two rate paths differ by at most
   `(∫‖Q₁ − Q₂‖) e^{∫‖Q₁‖} e^{∫‖Q₂‖}`
   (`EndToEndPortabilityLipschitz.norm_rateHistoryDualPropagator_sub_le`).  Expected portability,
@@ -330,6 +343,12 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
     and `1` under the other, so no function of the degree-three moments fixes the report
     (`PortabilityMomentLadderSharpnessFour.polynomialsAgreeAt_three_and_expectedPortability_ne`,
     `not_forall_portabilityReport_eq_of_polynomialsAgreeAt_three`).
+  * Integrable rate histories read the same ladder.  Continuous approximations in `L¹` converge,
+    and their limit operator has a Markov kernel whose moments are the propagator of the integral
+    equation (`EndToEndIntegrableRateHistory.isMarkovKernel_integrableRateHistoryKernel`,
+    `hasDualMoments_integrableRateHistoryKernel`), so an event history and an integrable rate
+    history with equal budget-4 moments have one portability report
+    (`portabilityReport_historyEvent_eq_integrableRateHistory`).
   * The calculator reads the same ladder.  Agreement up to degree two fixes the expected
     deployment moments of every deme, so every ridge-trained score has one deployed `R²`, slope,
     intercept and error under two process laws that agree there, an event history and a rate
@@ -380,6 +399,14 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   and the calibration slope of an admixture cohort, with its between-group covariance term, is
   rational in the budget-2 moments (`covariance_cohortMating_diploidSum`,
   `expectedCohortCalibrationSlope_historyEventKernel`).
+* Ancestry proportions may vary between individuals.  If each gamete of an individual comes from
+  the first deme with probability its ancestry proportion, drawn from an ancestry law, the cohort
+  covariance of additive lifts adds a between-deme term with coefficient
+  `2 E[θ(1 − θ)] + 4 Var θ`, gamete switching plus ancestry variation between individuals
+  (`EndToEndAncestryProportions.covariance_ancestryMating_diploidSum`).  Proportion one half
+  is not an F1 cross (`covariance_ancestryIndividual_half_sub_admixedMating`), and the cohort
+  calibration slope is rational in the budget-2 moments along event and rate histories
+  (`expectedAncestryCalibrationSlope_historyEventKernel`).
 * Threshold rules on genotypes read the second rung.  Every entry of the diploid decision report
   is the expectation of one genotype observable, a frequency polynomial of degree at most two, so
   agreement up to degree two fixes the whole report under any process law, event and rate
@@ -531,6 +558,12 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   `pulseSquaredCorrelation_eq`).  The squared correlation then decays by `e^{-rT}` with
   `r = (ρ_S + ρ_T)/2`, drift cancelling as after a split
   (`pulseHistorySquaredCorrelation_eq`).
+* **Calibration under migration.**  Under symmetric migration a score whose squared-correlation
+  portability is the two-locus ratio has calibration portability its square root; to first order
+  in the migration rate it moves at half the relative rate, within an explicit second-order
+  remainder (`CalibrationPortabilityMigration.calibrationPortability_migration`,
+  `hasDerivWithinAt_calibrationMigrationRatio`, `calibrationMigrationFactor_div_eq_half`,
+  `abs_calibrationMigrationRatio_sub_le`).
 
 ## 6. Response: how accuracy moves with every input
 
@@ -582,6 +615,14 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   `hasDerivAt_expectedForecastLogLoss_segmentHistory`).  Sensitivity, specificity or a
   predictive value ports worse exactly when the target ratio's relative sensitivity is below the
   source's (`deriv_expectedMetricPortability_cellRatio_segmentHistory_neg_iff`).
+* The summable-bound hypothesis of the termwise derivative is neither discharged nor refuted.  No
+  summable sequence bounds the series terms uniformly, because the geometric factor is not bounded
+  away from one near fixation, and a series with the same term structure differentiates termwise
+  while no bound of that shape exists
+  (`EndToEndSensitivitySeriesBound.not_summable_of_expansion_term_le`,
+  `witness_termwise_derivative_without_summable_bound`).  Every truncation has an exact derivative
+  with no hypothesis and lies within `E[(1 − D)^K]` of the expected squared correlation
+  (`hasDerivAt_truncatedSeries_segmentHistory`, `expectedSquaredCorrelation_truncation`).
 
 ## 7. Selection
 
@@ -636,6 +677,12 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   at most the one-table bound, and portability moves by an explicit multiple of the time-weighted
   total selection (`SelectionHistoryVaryingFitness.norm_varyingHistory_sub_propagator_le`,
   `weightedSelection_le`, `abs_varyingPortability_sub_neutral_le`).
+* Diploid viability selection with any dominance is carried along histories.  The marginal fitness
+  of an allele reads its partner's frequency, so the forcing reads two more copies at the selected
+  locus, and with additive genotype fitnesses it is the haploid generator
+  (`DiploidSelectionHistory.eval_diploidSelectionGenerator_marginal_branching`,
+  `eval_diploidSelectionGenerator_haploidDiploidModel`).  With genotype fitnesses in `[0, σ]` the
+  moments end within `B σ T` of the neutral propagation (`norm_diploidHistory_sub_propagator_le`).
 
 ## 8. What data can tell: identification and its limits
 
@@ -661,17 +708,18 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
 
 Scope.
 * Selection laws take the forward moment equation with selection as a hypothesis on the moment
-  families: the selected diffusion is not constructed, fitness is haploid, and the first-order
-  law with a fitness table per epoch is not stated.
+  families: the selected diffusion is not constructed, diploid selection is carried to zero order
+  only, and the first-order law with a fitness table per epoch is not stated.
 * The expectation of each population's calibration slope is not a rational function of finitely
   many moments and is not stated.  The nonclosure witnesses for the calibration error are constant
   kernels, not histories of epochs.
 * The termwise derivative of the expected squared correlation takes a summable bound on the term
-  sensitivities as a hypothesis.
+  sensitivities as a hypothesis, neither discharged nor refuted for the history kernels.
 * Environment enters through its moments per deme, supplied as model inputs, not measured
   constants.
-* The rate-history kernels need continuous dual generators.  Integrable rate histories are
-  realized (`NeutralIntegrableRateRealization`) but not carried to metric kernels.
+* Integrable rate histories have a Markov kernel from one choice of continuous approximations;
+  its independence of that choice and its agreement with the continuous-rate kernel are not
+  stated.
 * Inbreeding `F < 0`, locus-dependent `F` and assortative mating are not covered.  Sex-specific
   gamete frequencies are covered only as two demes of the history
   (`EndToEndAdmixedGenotypes`).  Training is the marginal GWAS, the population ridge or
