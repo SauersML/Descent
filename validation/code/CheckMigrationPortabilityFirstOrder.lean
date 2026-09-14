@@ -1,0 +1,28 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.MigrationPortabilityFirstOrder
+
+/-! Axiom audit of MigrationPortabilityFirstOrder. -/
+
+open Descent.Portability.MigrationPortabilityFirstOrder
+
+#print axioms sum_unitPointMass_left
+#print axioms matrixExponential_mulVec_apply_of_diagonal_row
+#print axioms matrixExponential_mulVec_apply_of_fed_row
+#print axioms augmentedLowOrderLDGenerator_Dz_mixed_row
+#print axioms augmentedLowOrderLDGenerator_Dz_leading_row
+#print axioms augmentedLowOrderLDGenerator_pi2_fed_row
+#print axioms augmentedLowOrderLDGenerator_pi2_fed_row_swap
+#print axioms augmentedLowOrderLDGenerator_pi2_leading_row
+#print axioms augmentedLowOrderLDGenerator_pi2_leading_row_swap
+#print axioms withSymmetricMigration_zero_migration
+#print axioms fedWeight
+#print axioms fedWeight_mul
+#print axioms noMigrationHistory_pi2_childFirst
+#print axioms noMigrationHistory_pi2_childSecond
+#print axioms noMigrationHistory_pi2_parentThird
+#print axioms noMigrationHistory_pi2_parentFourth
+#print axioms noMigrationHistory_pi2_cross
+#print axioms heterozygosityMigrationStencil_noMigration
+#print axioms heterozygosityMigrationStencil_noMigration_nonneg

@@ -32,6 +32,14 @@ are read on the no-migration history, and this module reads the heterozygosity s
   nonnegative when `π₀` and `Dz₀` are, so to first order migration raises the heterozygosity
   denominator of the portability ratio.
 
+## Significance
+
+To first order in `m` the heterozygosity product of the portability ratio gains
+`m ∫_0^T e^{(c_S + c_T) s} μ_π(s) ds`, with `μ_π` read on the history without migration.  This
+module gives that stencil in closed form, and it is nonnegative: a little migration raises the
+denominator of the ratio.  Whether portability rises or falls also depends on the linkage
+stencil, which is not read here.
+
 ## Scope
 
 Two demes, no mutation, and equal drift and recombination rates in the stencil theorems.  The
@@ -57,6 +65,11 @@ variable {D : ℕ}
 
 /-! ## Readouts of diagonal and fed rows -/
 
+/-- A unit point mass with the point on the left reads a vector at its point. -/
+theorem sum_unitPointMass_left {ι : Type*} [Fintype ι] [DecidableEq ι] (point : ι)
+    (vector : ι → ℝ) : ∑ row, (if point = row then 1 else 0) * vector row = vector point := by
+  simp [ite_mul, Finset.sum_ite_eq]
+
 /-- **A coordinate with a diagonal generator row decays exponentially.**
 
 Assumes: the row of `point` is `-decay` times its point mass. -/
@@ -67,7 +80,7 @@ theorem matrixExponential_mulVec_apply_of_diagonal_row {ι : Type*} [Fintype ι]
   have h := sum_mul_matrixExponential_mulVec_of_left_eigen A
     (fun row ↦ 1 * (if point = row then 1 else 0)) (-decay) time state
     (fun column ↦ by simp only [sum_mul_pointMass_left, hrow]; ring)
-  simp only [sum_mul_pointMass_left, one_mul] at h
+  simp only [one_mul, sum_unitPointMass_left] at h
   rw [h, mul_comm time]
 
 /-- **A coordinate fed by one diagonal coordinate is a difference of two exponentials.**  If the
@@ -90,7 +103,8 @@ theorem matrixExponential_mulVec_apply_of_fed_row {ι : Type*} [Fintype ι] [Dec
     (-rate) time state (fun column ↦ by
       simp only [add_mul, Finset.sum_add_distrib, sum_mul_pointMass_left, hpoint, hmixed]
       linear_combination (-(if mixed = column then (1 : ℝ) else 0)) * hα)
-  simp only [add_mul, Finset.sum_add_distrib, sum_mul_pointMass_left, one_mul] at hcombination
+  simp only [add_mul, Finset.sum_add_distrib, sum_mul_pointMass_left, one_mul,
+    sum_unitPointMass_left] at hcombination
   have hdiagonal := matrixExponential_mulVec_apply_of_diagonal_row A time state hmixed
   rw [mul_comm time] at hcombination
   linear_combination hcombination - α * hdiagonal
@@ -118,7 +132,8 @@ theorem augmentedLowOrderLDGenerator_Dz_mixed_row (rates : ManyDemeLDRates D)
   | none => simp [augmentedLowOrderLDGenerator, lowOrderLDMutationForcing]
   | some column =>
     migration_row_entry
-    simp [hmigration, hmutation, hne, Ne.symm hne] <;> ring
+    simp [hmigration, hmutation, hne, Ne.symm hne]
+    ring
 
 /-- **The leading `Dz(i, i, j)` row** is diagonal at `3 c_i + ρ_i/2`.
 
@@ -134,7 +149,8 @@ theorem augmentedLowOrderLDGenerator_Dz_leading_row (rates : ManyDemeLDRates D)
   | none => simp [augmentedLowOrderLDGenerator, lowOrderLDMutationForcing]
   | some column =>
     migration_row_entry
-    simp [hmigration, hmutation, hne, Ne.symm hne] <;> ring
+    simp [hmigration, hmutation, hne]
+    ring
 
 /-- **The one-index row of `pi2(i, j, i, i)`** is fed by `Dz(i, j, i)`.
 
@@ -151,7 +167,8 @@ theorem augmentedLowOrderLDGenerator_pi2_fed_row (rates : ManyDemeLDRates D)
   | none => simp [augmentedLowOrderLDGenerator, lowOrderLDMutationForcing]
   | some column =>
     migration_row_entry
-    simp [hmigration, hmutation, hne, Ne.symm hne] <;> ring
+    simp [hmigration, hmutation, hne, Ne.symm hne]
+    ring
 
 /-- **The one-index row of `pi2(j, i, i, i)`** is fed by `Dz(i, j, i)`.
 
@@ -168,7 +185,8 @@ theorem augmentedLowOrderLDGenerator_pi2_fed_row_swap (rates : ManyDemeLDRates D
   | none => simp [augmentedLowOrderLDGenerator, lowOrderLDMutationForcing]
   | some column =>
     migration_row_entry
-    simp [hmigration, hmutation, hne, Ne.symm hne] <;> ring
+    simp [hmigration, hmutation, Ne.symm hne]
+    ring
 
 /-- **The one-index row of `pi2(i, i, i, j)`** is fed by `Dz(i, i, j)`.
 
@@ -185,7 +203,8 @@ theorem augmentedLowOrderLDGenerator_pi2_leading_row (rates : ManyDemeLDRates D)
   | none => simp [augmentedLowOrderLDGenerator, lowOrderLDMutationForcing]
   | some column =>
     migration_row_entry
-    simp [hmigration, hmutation, hne, Ne.symm hne] <;> ring
+    simp [hmigration, hmutation, hne]
+    ring
 
 /-- **The one-index row of `pi2(i, i, j, i)`** is fed by `Dz(i, i, j)`.
 
@@ -202,7 +221,8 @@ theorem augmentedLowOrderLDGenerator_pi2_leading_row_swap (rates : ManyDemeLDRat
   | none => simp [augmentedLowOrderLDGenerator, lowOrderLDMutationForcing]
   | some column =>
     migration_row_entry
-    simp [hmigration, hmutation, hne, Ne.symm hne] <;> ring
+    simp [hmigration, hmutation, hne, Ne.symm hne]
+    ring
 
 /-! ## The heterozygosity coordinates on the no-migration history -/
 
