@@ -369,6 +369,7 @@ import Descent.Portability.DiploidSelectionHistory
 import Descent.Portability.EndToEndIntegrableRateHistory
 import Descent.Portability.EndToEndSensitivitySeriesBound
 import Descent.Portability.AdmixturePulseComposition
+import Descent.Portability.EndToEndPenetranceLaw
 
 import Descent.Portability.ProbitTrainingLaw
 import Descent.Portability.ScoreMomentLaw
