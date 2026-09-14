@@ -45,6 +45,7 @@ import Descent.Portability.EndToEndGWASTrainingHistory
 import Descent.Portability.EndToEndGWASThresholdLaw
 import Descent.Portability.TwoTimeRatePropagator
 import Descent.Portability.SelectionHistoryFirstOrder
+import Descent.Portability.PolygenicSelectionHistory
 import Descent.Portability.SelectionMetricsFirstOrder
 import Descent.Portability.PortabilityMomentLadderDecision
 import Descent.Portability.PortabilityMomentLadderEight
@@ -506,6 +507,16 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   `abs_selectedAUCPortability_sub_firstOrder_le`,
   `hasDerivWithinAt_selectedCalibrationPortability_firstOrder`,
   `calibrationPortabilityFirstOrder_pos_iff`, `aucPortabilityFirstOrder_pos_iff`).
+* Selection spread over many loci composes locus by locus.  With haploid additive fitness, one
+  bounded table per locus, the selection generator is the sum of the one-locus generators
+  (`PolygenicSelectionHistory.additiveSelectionGenerator_eq_sum`).  Along a history the moments
+  stay within an explicit multiple of `T` of the neutral propagation
+  (`norm_additiveHistory_sub_propagator_le`), and equal the neutral propagation plus the sum of
+  the one-locus history corrections within an explicit `O(σ² T²)` remainder
+  (`norm_additiveHistory_sub_firstOrder_le`).  The first-order portability correction is the sum
+  of the per-locus terms (`portabilityFirstOrder_additiveHistoryCorrection`,
+  `abs_additivePortability_sub_firstOrder_le`), and selection raises portability to first order
+  whenever every locus raises it (`additivePortabilityFirstOrder_pos_of_forall`).
 
 ## 8. What data can tell: identification and its limits
 
