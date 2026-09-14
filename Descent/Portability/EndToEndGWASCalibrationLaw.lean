@@ -745,6 +745,413 @@ theorem trainedInterceptAccumulator_stateLaw (source target : Deme) {size : ℕ}
 
 end Accumulators
 
+/-! ## Calibration of expectations under a kernel -/
+
+section Expected
+
+variable {J : Type*} [Fintype J]
+
+/-- **The trained calibration slope of expectations under a kernel**: the expected target
+covariance of the GWAS score with the outcome over its expected target variance, the expectations
+taken over the populations of the kernel and the training cohort drawn in the source deme of each.
+NOTE2 §6.2 query: a ratio of expectations. -/
+def expectedTrainedCalibrationSlope
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    (x0 : FrequencyState Deme Locus Allele) (source target : Deme) (size : ℕ)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    ℝ :=
+  (∫ y, trainedCovariance (stateLaw y source) (stateLaw y target) size genotype outcome ∂(κ x0))
+    / ∫ y, trainedVariance (stateLaw y source) (stateLaw y target) size genotype outcome ∂(κ x0)
+
+/-- **The trained calibration intercept of expectations under a kernel**: the expected intercept
+accumulator over the expected target score variance.  NOTE2 §6.2 query: a ratio of
+expectations. -/
+def expectedTrainedCalibrationIntercept
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    (x0 : FrequencyState Deme Locus Allele) (source target : Deme) (size : ℕ)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    ℝ :=
+  (∫ y, trainedInterceptAccumulator (stateLaw y source) (stateLaw y target) size genotype outcome
+      ∂(κ x0))
+    / ∫ y, trainedVariance (stateLaw y source) (stateLaw y target) size genotype outcome ∂(κ x0)
+
+/-- **The rational trained calibration slope** of a budget-`n` moment vector and a cohort size:
+a coefficient vector over a sampling form of coefficient vectors. -/
+def momentTrainedCalibrationSlope (ℓ₀ : Locus) (n : ℕ) (source target : Deme)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ)
+    (size : ℕ) (v : BudgetConfiguration Deme Locus Allele (fun _ ↦ n) → ℝ) : ℝ :=
+  (budgetCoefficients ℓ₀ (fun _ ↦ n) (trainedCovariancePolynomial source target genotype outcome)
+      ⬝ᵥ v)
+    / samplingForm
+      (budgetCoefficients ℓ₀ (fun _ ↦ n) (trainedPolynomial source target
+        (weightProductPolynomial genotype outcome) (tagCovariancePolynomial genotype)) ⬝ᵥ v)
+      (budgetCoefficients ℓ₀ (fun _ ↦ n) (trainedPolynomial source target
+        (weightExcessPolynomial genotype outcome) (tagCovariancePolynomial genotype)) ⬝ᵥ v)
+      (budgetCoefficients ℓ₀ (fun _ ↦ n) (trainedPolynomial source target
+        (weightPairingPolynomial genotype outcome) (tagCovariancePolynomial genotype)) ⬝ᵥ v) size
+
+/-- **The rational trained calibration intercept** of a budget-`n` moment vector and a cohort
+size: a ratio of two sampling forms of coefficient vectors. -/
+def momentTrainedCalibrationIntercept (ℓ₀ : Locus) (n : ℕ) (source target : Deme)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ)
+    (size : ℕ) (v : BudgetConfiguration Deme Locus Allele (fun _ ↦ n) → ℝ) : ℝ :=
+  samplingForm
+      (budgetCoefficients ℓ₀ (fun _ ↦ n) (trainedPolynomial source target
+        (weightProductPolynomial genotype outcome) (interceptMatrixPolynomial genotype outcome))
+        ⬝ᵥ v)
+      (budgetCoefficients ℓ₀ (fun _ ↦ n) (trainedPolynomial source target
+        (weightExcessPolynomial genotype outcome) (interceptMatrixPolynomial genotype outcome))
+        ⬝ᵥ v)
+      (budgetCoefficients ℓ₀ (fun _ ↦ n) (trainedPolynomial source target
+        (weightPairingPolynomial genotype outcome) (interceptMatrixPolynomial genotype outcome))
+        ⬝ᵥ v) size
+    / samplingForm
+      (budgetCoefficients ℓ₀ (fun _ ↦ n) (trainedPolynomial source target
+        (weightProductPolynomial genotype outcome) (tagCovariancePolynomial genotype)) ⬝ᵥ v)
+      (budgetCoefficients ℓ₀ (fun _ ↦ n) (trainedPolynomial source target
+        (weightExcessPolynomial genotype outcome) (tagCovariancePolynomial genotype)) ⬝ᵥ v)
+      (budgetCoefficients ℓ₀ (fun _ ↦ n) (trainedPolynomial source target
+        (weightPairingPolynomial genotype outcome) (tagCovariancePolynomial genotype)) ⬝ᵥ v) size
+
+end Expected
+
+section MomentKernel
+
+variable {J : Type*} [Fintype J] (ℓ₀ : Locus) {n : ℕ}
+  (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+  [IsMarkovKernel κ]
+  (M : Matrix (BudgetConfiguration Deme Locus Allele (fun _ ↦ n))
+    (BudgetConfiguration Deme Locus Allele (fun _ ↦ n)) ℝ)
+  (hmoment : ∀ (x : FrequencyState Deme Locus Allele)
+    (ξ : BudgetConfiguration Deme Locus Allele (fun _ ↦ n)),
+    ∫ y, polynomialFunction (momentPolynomial ξ.1) y ∂(κ x)
+      = (M *ᵥ budgetMomentFeature (fun _ ↦ n) x) ξ)
+
+include hmoment
+
+/-- **The expected trained covariance under a kernel with budget-`n` moments**, `n ≥ 4`, is a
+coefficient vector dotted with the propagated moments. -/
+theorem integral_trainedCovariance_eq (hn : 4 ≤ n) (x0 : FrequencyState Deme Locus Allele)
+    (source target : Deme) {size : ℕ} (hsize : 2 ≤ size)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    ∫ y, trainedCovariance (stateLaw y source) (stateLaw y target) size genotype outcome ∂(κ x0)
+      = budgetCoefficients ℓ₀ (fun _ ↦ n)
+          (trainedCovariancePolynomial source target genotype outcome)
+        ⬝ᵥ (M *ᵥ budgetMomentFeature (fun _ ↦ n) x0) :=
+  EndToEndCalibrationLaw.integral_eq_dotProduct_of_totalDegree_le ℓ₀ κ M hmoment _
+    ((totalDegree_trainedCovariancePolynomial_le source target genotype outcome).trans hn) _
+    (fun y ↦ (trainedCovariance_stateLaw source target hsize genotype outcome y).symm) x0
+
+/-- **The expected trained variance under a kernel with budget-`n` moments**, `n ≥ 6`, is a
+sampling form of coefficient vectors dotted with the propagated moments. -/
+theorem integral_trainedVariance_eq (hn : 6 ≤ n) (x0 : FrequencyState Deme Locus Allele)
+    (source target : Deme) {size : ℕ} (hsize : 2 ≤ size)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    ∫ y, trainedVariance (stateLaw y source) (stateLaw y target) size genotype outcome ∂(κ x0)
+      = samplingForm
+          (budgetCoefficients ℓ₀ (fun _ ↦ n) (trainedPolynomial source target
+              (weightProductPolynomial genotype outcome) (tagCovariancePolynomial genotype))
+            ⬝ᵥ (M *ᵥ budgetMomentFeature (fun _ ↦ n) x0))
+          (budgetCoefficients ℓ₀ (fun _ ↦ n) (trainedPolynomial source target
+              (weightExcessPolynomial genotype outcome) (tagCovariancePolynomial genotype))
+            ⬝ᵥ (M *ᵥ budgetMomentFeature (fun _ ↦ n) x0))
+          (budgetCoefficients ℓ₀ (fun _ ↦ n) (trainedPolynomial source target
+              (weightPairingPolynomial genotype outcome) (tagCovariancePolynomial genotype))
+            ⬝ᵥ (M *ᵥ budgetMomentFeature (fun _ ↦ n) x0)) size := by
+  simp only [trainedVariance_stateLaw source target hsize genotype outcome]
+  exact integral_samplingForm_polynomialFunction ℓ₀ κ M hmoment x0 size _ _ _
+    ((totalDegree_trainedPolynomial_le_add _ _ _ _
+      (totalDegree_weightProductPolynomial_le genotype outcome)
+      (totalDegree_tagCovariancePolynomial_le genotype)).trans hn)
+    ((totalDegree_trainedPolynomial_le_add _ _ _ _
+      (totalDegree_weightExcessPolynomial_le genotype outcome)
+      (totalDegree_tagCovariancePolynomial_le genotype)).trans hn)
+    ((totalDegree_trainedPolynomial_le_add _ _ _ _
+      (totalDegree_weightPairingPolynomial_le genotype outcome)
+      (totalDegree_tagCovariancePolynomial_le genotype)).trans hn)
+
+/-- **The expected trained intercept accumulator under a kernel with budget-`n` moments**,
+`n ≥ 7`, is a sampling form of coefficient vectors dotted with the propagated moments. -/
+theorem integral_trainedInterceptAccumulator_eq (hn : 7 ≤ n)
+    (x0 : FrequencyState Deme Locus Allele) (source target : Deme) {size : ℕ} (hsize : 2 ≤ size)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    ∫ y, trainedInterceptAccumulator (stateLaw y source) (stateLaw y target) size genotype outcome
+        ∂(κ x0)
+      = samplingForm
+          (budgetCoefficients ℓ₀ (fun _ ↦ n) (trainedPolynomial source target
+              (weightProductPolynomial genotype outcome)
+              (interceptMatrixPolynomial genotype outcome))
+            ⬝ᵥ (M *ᵥ budgetMomentFeature (fun _ ↦ n) x0))
+          (budgetCoefficients ℓ₀ (fun _ ↦ n) (trainedPolynomial source target
+              (weightExcessPolynomial genotype outcome)
+              (interceptMatrixPolynomial genotype outcome))
+            ⬝ᵥ (M *ᵥ budgetMomentFeature (fun _ ↦ n) x0))
+          (budgetCoefficients ℓ₀ (fun _ ↦ n) (trainedPolynomial source target
+              (weightPairingPolynomial genotype outcome)
+              (interceptMatrixPolynomial genotype outcome))
+            ⬝ᵥ (M *ᵥ budgetMomentFeature (fun _ ↦ n) x0)) size := by
+  simp only [trainedInterceptAccumulator_stateLaw source target hsize genotype outcome]
+  exact integral_samplingForm_polynomialFunction ℓ₀ κ M hmoment x0 size _ _ _
+    ((totalDegree_trainedPolynomial_le_add _ _ _ _
+      (totalDegree_weightProductPolynomial_le genotype outcome)
+      (totalDegree_interceptMatrixPolynomial_le genotype outcome)).trans hn)
+    ((totalDegree_trainedPolynomial_le_add _ _ _ _
+      (totalDegree_weightExcessPolynomial_le genotype outcome)
+      (totalDegree_interceptMatrixPolynomial_le genotype outcome)).trans hn)
+    ((totalDegree_trainedPolynomial_le_add _ _ _ _
+      (totalDegree_weightPairingPolynomial_le genotype outcome)
+      (totalDegree_interceptMatrixPolynomial_le genotype outcome)).trans hn)
+
+/-- **The trained slope under a kernel with budget-`n` moments**, `n ≥ 6`, is the rational
+trained slope of the propagated moments. -/
+theorem expectedTrainedCalibrationSlope_eq_momentTrainedCalibrationSlope (hn : 6 ≤ n)
+    (x0 : FrequencyState Deme Locus Allele) (source target : Deme) {size : ℕ} (hsize : 2 ≤ size)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    expectedTrainedCalibrationSlope κ x0 source target size genotype outcome
+      = momentTrainedCalibrationSlope ℓ₀ n source target genotype outcome size
+          (M *ᵥ budgetMomentFeature (fun _ ↦ n) x0) := by
+  rw [expectedTrainedCalibrationSlope,
+    integral_trainedCovariance_eq ℓ₀ κ M hmoment (by omega) x0 source target hsize,
+    integral_trainedVariance_eq ℓ₀ κ M hmoment hn x0 source target hsize]
+  rfl
+
+/-- **The trained intercept under a kernel with budget-`n` moments**, `n ≥ 7`, is the rational
+trained intercept of the propagated moments. -/
+theorem expectedTrainedCalibrationIntercept_eq_momentTrainedCalibrationIntercept (hn : 7 ≤ n)
+    (x0 : FrequencyState Deme Locus Allele) (source target : Deme) {size : ℕ} (hsize : 2 ≤ size)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    expectedTrainedCalibrationIntercept κ x0 source target size genotype outcome
+      = momentTrainedCalibrationIntercept ℓ₀ n source target genotype outcome size
+          (M *ᵥ budgetMomentFeature (fun _ ↦ n) x0) := by
+  rw [expectedTrainedCalibrationIntercept,
+    integral_trainedInterceptAccumulator_eq ℓ₀ κ M hmoment hn x0 source target hsize,
+    integral_trainedVariance_eq ℓ₀ κ M hmoment (by omega) x0 source target hsize]
+  rfl
+
+/-- **The attenuation law under a kernel.**  Under a kernel with budget-`n` moments, `n ≥ 6`, the
+trained slope of expectations is the population slope of expectations `E C_t(S_w, Y) / E V_t(S_w)`
+times the attenuation factor of the integrated population, excess and pairing forms, wherever the
+expected population variance is nonzero. -/
+theorem expectedTrainedCalibrationSlope_eq_mul_attenuationFactor (hn : 6 ≤ n)
+    (x0 : FrequencyState Deme Locus Allele) (source target : Deme) {size : ℕ} (hsize : 2 ≤ size)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ)
+    (hpopulation : ∫ y, (stateLaw y target).variance
+      (linearScore genotype (marginalWeights (stateLaw y source) genotype outcome)) ∂(κ x0) ≠ 0) :
+    expectedTrainedCalibrationSlope κ x0 source target size genotype outcome
+      = (∫ y, (stateLaw y target).covariance
+            (linearScore genotype (marginalWeights (stateLaw y source) genotype outcome)) outcome
+            ∂(κ x0))
+          / (∫ y, (stateLaw y target).variance
+            (linearScore genotype (marginalWeights (stateLaw y source) genotype outcome)) ∂(κ x0))
+        * attenuationFactor
+          (∫ y, (stateLaw y target).variance
+            (linearScore genotype (marginalWeights (stateLaw y source) genotype outcome)) ∂(κ x0))
+          (∫ y, excessForm (stateLaw y source) (stateLaw y target) genotype outcome ∂(κ x0))
+          (∫ y, pairingForm (stateLaw y source) (stateLaw y target) genotype outcome ∂(κ x0))
+          size := by
+  have hvariance := EndToEndCalibrationLaw.integral_eq_dotProduct_of_totalDegree_le ℓ₀ κ M
+    hmoment _ ((totalDegree_trainedPolynomial_le_add _ _ _ _
+      (totalDegree_weightProductPolynomial_le genotype outcome)
+      (totalDegree_tagCovariancePolynomial_le genotype)).trans hn) _
+    (polynomialFunction_populationVariance source target genotype outcome) x0
+  have hexcess := EndToEndCalibrationLaw.integral_eq_dotProduct_of_totalDegree_le ℓ₀ κ M
+    hmoment _ ((totalDegree_trainedPolynomial_le_add _ _ _ _
+      (totalDegree_weightExcessPolynomial_le genotype outcome)
+      (totalDegree_tagCovariancePolynomial_le genotype)).trans hn) _
+    (polynomialFunction_excessForm source target genotype outcome) x0
+  have hpairing := EndToEndCalibrationLaw.integral_eq_dotProduct_of_totalDegree_le ℓ₀ κ M
+    hmoment _ ((totalDegree_trainedPolynomial_le_add _ _ _ _
+      (totalDegree_weightPairingPolynomial_le genotype outcome)
+      (totalDegree_tagCovariancePolynomial_le genotype)).trans hn) _
+    (polynomialFunction_pairingForm source target genotype outcome) x0
+  have hcovariance : ∫ y, trainedCovariance (stateLaw y source) (stateLaw y target) size genotype
+        outcome ∂(κ x0)
+      = ∫ y, (stateLaw y target).covariance
+          (linearScore genotype (marginalWeights (stateLaw y source) genotype outcome)) outcome
+          ∂(κ x0) := by
+    simp only [trainedCovariance_eq _ _ hsize]
+  rw [hvariance] at hpopulation
+  rw [expectedTrainedCalibrationSlope, hcovariance,
+    integral_trainedVariance_eq ℓ₀ κ M hmoment hn x0 source target hsize, hvariance, hexcess,
+    hpairing]
+  exact div_samplingForm_eq_mul_attenuationFactor _ hpopulation _ _ _
+
+/-- **The trained slope of expectations rises with the cohort size** under a kernel with
+budget-`n` moments, `n ≥ 6`, when the expected population variance is positive and the expected
+population covariance is nonnegative. -/
+theorem expectedTrainedCalibrationSlope_monotone (hn : 6 ≤ n)
+    (x0 : FrequencyState Deme Locus Allele) (source target : Deme) {small large : ℕ}
+    (hsmall : 2 ≤ small) (hle : small ≤ large)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ)
+    (hpopulation : 0 < ∫ y, (stateLaw y target).variance
+      (linearScore genotype (marginalWeights (stateLaw y source) genotype outcome)) ∂(κ x0))
+    (hcovariance : 0 ≤ ∫ y, (stateLaw y target).covariance
+      (linearScore genotype (marginalWeights (stateLaw y source) genotype outcome)) outcome
+      ∂(κ x0)) :
+    expectedTrainedCalibrationSlope κ x0 source target small genotype outcome
+      ≤ expectedTrainedCalibrationSlope κ x0 source target large genotype outcome := by
+  rw [expectedTrainedCalibrationSlope_eq_mul_attenuationFactor ℓ₀ κ M hmoment hn x0 source target
+      hsmall genotype outcome hpopulation.ne',
+    expectedTrainedCalibrationSlope_eq_mul_attenuationFactor ℓ₀ κ M hmoment hn x0 source target
+      (hsmall.trans hle) genotype outcome hpopulation.ne']
+  exact mul_le_mul_of_nonneg_left (attenuationFactor_monotone hpopulation.le
+    (integral_nonneg fun y ↦
+      excessForm_nonneg (stateLaw y source) (stateLaw y target) genotype outcome)
+    (integral_nonneg fun y ↦
+      pairingForm_nonneg (stateLaw y source) (stateLaw y target) genotype outcome) hsmall hle)
+    (div_nonneg hcovariance hpopulation.le)
+
+end MomentKernel
+
+/-! ## The law along a history of epochs, splits and pulses -/
+
+section Histories
+
+variable {J : Type*} [Fintype J]
+
+/-- **The trained calibration slope along a history.**  The slope of expectations of a score
+trained by a GWAS on `n` haplotypes of the source deme and deployed in the target deme is the
+rational function `momentTrainedCalibrationSlope` of the chronological propagator applied to the
+budget-6 moments of the initial state, and of `n`. -/
+theorem expectedTrainedCalibrationSlope_historyEventKernel (ℓ₀ : Locus)
+    (hap₀ : FullHaplotype Locus Allele)
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (x0 : FrequencyState Deme Locus Allele) (source target : Deme) {size : ℕ} (hsize : 2 ≤ size)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    expectedTrainedCalibrationSlope (historyEventKernel ℓ₀ hap₀ events) x0 source target size
+        genotype outcome
+      = momentTrainedCalibrationSlope ℓ₀ 6 source target genotype outcome size
+          (historyEventPropagator (fun _ ↦ 6) events *ᵥ budgetMomentFeature (fun _ ↦ 6) x0) := by
+  haveI := isMarkovKernel_historyEventKernel ℓ₀ hap₀ events
+  exact expectedTrainedCalibrationSlope_eq_momentTrainedCalibrationSlope ℓ₀
+    (historyEventKernel ℓ₀ hap₀ events) (historyEventPropagator (fun _ ↦ 6) events)
+    (integral_momentPolynomial_historyEventKernel ℓ₀ hap₀ (fun _ ↦ 6) events) le_rfl x0 source
+    target hsize genotype outcome
+
+/-- **The trained calibration intercept along a history** is the rational function
+`momentTrainedCalibrationIntercept` of the propagated budget-7 moments and of `n`. -/
+theorem expectedTrainedCalibrationIntercept_historyEventKernel (ℓ₀ : Locus)
+    (hap₀ : FullHaplotype Locus Allele)
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (x0 : FrequencyState Deme Locus Allele) (source target : Deme) {size : ℕ} (hsize : 2 ≤ size)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    expectedTrainedCalibrationIntercept (historyEventKernel ℓ₀ hap₀ events) x0 source target size
+        genotype outcome
+      = momentTrainedCalibrationIntercept ℓ₀ 7 source target genotype outcome size
+          (historyEventPropagator (fun _ ↦ 7) events *ᵥ budgetMomentFeature (fun _ ↦ 7) x0) := by
+  haveI := isMarkovKernel_historyEventKernel ℓ₀ hap₀ events
+  exact expectedTrainedCalibrationIntercept_eq_momentTrainedCalibrationIntercept ℓ₀
+    (historyEventKernel ℓ₀ hap₀ events) (historyEventPropagator (fun _ ↦ 7) events)
+    (integral_momentPolynomial_historyEventKernel ℓ₀ hap₀ (fun _ ↦ 7) events) le_rfl x0 source
+    target hsize genotype outcome
+
+/-- **The trained slope sees the history only through finitely many moments.**  Two histories,
+from two initial states, whose propagated budget-6 moments agree give equal trained calibration
+slope of expectations for every cohort size, tag set, outcome, source and target. -/
+theorem expectedTrainedCalibrationSlope_eq_of_moments_eq (ℓ₀ : Locus)
+    (hap₀ : FullHaplotype Locus Allele)
+    {first second : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme)}
+    {x₁ x₂ : FrequencyState Deme Locus Allele}
+    (hmoments : historyEventPropagator (fun _ ↦ 6) first *ᵥ budgetMomentFeature (fun _ ↦ 6) x₁
+      = historyEventPropagator (fun _ ↦ 6) second *ᵥ budgetMomentFeature (fun _ ↦ 6) x₂)
+    (source target : Deme) {size : ℕ} (hsize : 2 ≤ size)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    expectedTrainedCalibrationSlope (historyEventKernel ℓ₀ hap₀ first) x₁ source target size
+        genotype outcome
+      = expectedTrainedCalibrationSlope (historyEventKernel ℓ₀ hap₀ second) x₂ source target size
+          genotype outcome := by
+  rw [expectedTrainedCalibrationSlope_historyEventKernel ℓ₀ hap₀ first x₁ source target hsize,
+    expectedTrainedCalibrationSlope_historyEventKernel ℓ₀ hap₀ second x₂ source target hsize,
+    hmoments]
+
+/-- **The trained intercept sees the history only through finitely many moments**: the propagated
+budget-7 moments. -/
+theorem expectedTrainedCalibrationIntercept_eq_of_moments_eq (ℓ₀ : Locus)
+    (hap₀ : FullHaplotype Locus Allele)
+    {first second : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme)}
+    {x₁ x₂ : FrequencyState Deme Locus Allele}
+    (hmoments : historyEventPropagator (fun _ ↦ 7) first *ᵥ budgetMomentFeature (fun _ ↦ 7) x₁
+      = historyEventPropagator (fun _ ↦ 7) second *ᵥ budgetMomentFeature (fun _ ↦ 7) x₂)
+    (source target : Deme) {size : ℕ} (hsize : 2 ≤ size)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    expectedTrainedCalibrationIntercept (historyEventKernel ℓ₀ hap₀ first) x₁ source target size
+        genotype outcome
+      = expectedTrainedCalibrationIntercept (historyEventKernel ℓ₀ hap₀ second) x₂ source target
+          size genotype outcome := by
+  rw [expectedTrainedCalibrationIntercept_historyEventKernel ℓ₀ hap₀ first x₁ source target hsize,
+    expectedTrainedCalibrationIntercept_historyEventKernel ℓ₀ hap₀ second x₂ source target hsize,
+    hmoments]
+
+/-- **Along a history the trained slope of expectations rises with the cohort size** when the
+expected target variance of the population marginal score is positive and its expected target
+covariance with the outcome is nonnegative. -/
+theorem expectedTrainedCalibrationSlope_historyEventKernel_monotone (ℓ₀ : Locus)
+    (hap₀ : FullHaplotype Locus Allele)
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (x0 : FrequencyState Deme Locus Allele) (source target : Deme) {small large : ℕ}
+    (hsmall : 2 ≤ small) (hle : small ≤ large)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ)
+    (hpopulation : 0 < ∫ y, (stateLaw y target).variance
+      (linearScore genotype (marginalWeights (stateLaw y source) genotype outcome))
+      ∂(historyEventKernel ℓ₀ hap₀ events x0))
+    (hcovariance : 0 ≤ ∫ y, (stateLaw y target).covariance
+      (linearScore genotype (marginalWeights (stateLaw y source) genotype outcome)) outcome
+      ∂(historyEventKernel ℓ₀ hap₀ events x0)) :
+    expectedTrainedCalibrationSlope (historyEventKernel ℓ₀ hap₀ events) x0 source target small
+        genotype outcome
+      ≤ expectedTrainedCalibrationSlope (historyEventKernel ℓ₀ hap₀ events) x0 source target
+          large genotype outcome := by
+  haveI := isMarkovKernel_historyEventKernel ℓ₀ hap₀ events
+  exact expectedTrainedCalibrationSlope_monotone ℓ₀ (historyEventKernel ℓ₀ hap₀ events)
+    (historyEventPropagator (fun _ ↦ 6) events)
+    (integral_momentPolynomial_historyEventKernel ℓ₀ hap₀ (fun _ ↦ 6) events) le_rfl x0 source
+    target hsmall hle genotype outcome hpopulation hcovariance
+
+/-! ## The law along a time-varying rate history -/
+
+/-- **The trained calibration slope along a rate history** is the rational function
+`momentTrainedCalibrationSlope` of the propagator of the rate history applied to the budget-6
+moments of the initial state, and of the cohort size. -/
+theorem expectedTrainedCalibrationSlope_rateHistoryKernel
+    {rates : ℝ → NeutralRates Deme Locus Allele} {T : ℝ} (hT : 0 ≤ T)
+    (hcontinuous : ∀ capacity : Locus → ℕ,
+      ContinuousOn (fun t ↦ dualGenerator (rates t) capacity) (Set.Icc 0 T))
+    (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele) (x0 : FrequencyState Deme Locus Allele)
+    (source target : Deme) {size : ℕ} (hsize : 2 ≤ size)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    expectedTrainedCalibrationSlope (rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous) x0 source
+        target size genotype outcome
+      = momentTrainedCalibrationSlope ℓ₀ 6 source target genotype outcome size
+          (rateHistoryDualPropagator rates (fun _ ↦ 6) T
+            *ᵥ budgetMomentFeature (fun _ ↦ 6) x0) := by
+  haveI := isMarkovKernel_rateHistoryKernel hT hcontinuous ℓ₀ hap₀
+  exact expectedTrainedCalibrationSlope_eq_momentTrainedCalibrationSlope ℓ₀
+    (rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous) (rateHistoryDualPropagator rates (fun _ ↦ 6) T)
+    (integral_momentPolynomial_rateHistoryKernel hT hcontinuous ℓ₀ hap₀ (fun _ ↦ 6)) le_rfl x0
+    source target hsize genotype outcome
+
+/-- **The trained calibration intercept along a rate history** is the rational function
+`momentTrainedCalibrationIntercept` of the propagated budget-7 moments and of the cohort size. -/
+theorem expectedTrainedCalibrationIntercept_rateHistoryKernel
+    {rates : ℝ → NeutralRates Deme Locus Allele} {T : ℝ} (hT : 0 ≤ T)
+    (hcontinuous : ∀ capacity : Locus → ℕ,
+      ContinuousOn (fun t ↦ dualGenerator (rates t) capacity) (Set.Icc 0 T))
+    (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele) (x0 : FrequencyState Deme Locus Allele)
+    (source target : Deme) {size : ℕ} (hsize : 2 ≤ size)
+    (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
+    expectedTrainedCalibrationIntercept (rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous) x0 source
+        target size genotype outcome
+      = momentTrainedCalibrationIntercept ℓ₀ 7 source target genotype outcome size
+          (rateHistoryDualPropagator rates (fun _ ↦ 7) T
+            *ᵥ budgetMomentFeature (fun _ ↦ 7) x0) := by
+  haveI := isMarkovKernel_rateHistoryKernel hT hcontinuous ℓ₀ hap₀
+  exact expectedTrainedCalibrationIntercept_eq_momentTrainedCalibrationIntercept ℓ₀
+    (rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous) (rateHistoryDualPropagator rates (fun _ ↦ 7) T)
+    (integral_momentPolynomial_rateHistoryKernel hT hcontinuous ℓ₀ hap₀ (fun _ ↦ 7)) le_rfl x0
+    source target hsize genotype outcome
+
+end Histories
+
 end
 
 end Descent.Portability.EndToEndGWASCalibrationLaw
