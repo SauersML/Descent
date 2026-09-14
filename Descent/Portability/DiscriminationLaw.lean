@@ -1317,7 +1317,8 @@ noncomputable def FinitePipelineKernel.outcomeKernel
 theorem FinitePipelineKernel.outcomeKernel_lawAt
     {Sample : Type*} [MeasurableSpace Sample] {D : ℕ}
     (kernel : FinitePipelineKernel Sample D) (input : VisiblePipelineInput D) (sample : Sample) :
-    (kernel.outcomeKernel input).lawAt sample = kernel.predictionKernel.outcomeLawAt input sample := by
+    (kernel.outcomeKernel input).lawAt sample
+      = kernel.predictionKernel.outcomeLawAt input sample := by
   apply FiniteReportLaw.ext
   intro outcome
   rfl
