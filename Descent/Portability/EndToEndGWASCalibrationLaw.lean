@@ -619,6 +619,7 @@ theorem polynomialFunction_trainedCovariancePolynomial (source target : Deme)
     eval_demePolynomial, eval_covariancePolynomial]
   exact Finset.sum_congr rfl fun marker _ ↦ mul_comm _ _
 
+omit [Fintype Deme] [DecidableEq Deme] [∀ ℓ, DecidableEq (Allele ℓ)] in
 /-- **The trained covariance polynomial has total degree at most four.** -/
 theorem totalDegree_trainedCovariancePolynomial_le (source target : Deme)
     (genotype : FullHaplotype Locus Allele → J → ℝ) (outcome : FullHaplotype Locus Allele → ℝ) :
@@ -632,6 +633,8 @@ theorem totalDegree_trainedCovariancePolynomial_le (source target : Deme)
   have hsource := hdegree source
   exact (totalDegree_mul _ _).trans (by omega)
 
+omit [Fintype Deme] [DecidableEq Deme] [Fintype Locus] [DecidableEq Locus]
+  [∀ ℓ, Fintype (Allele ℓ)] [∀ ℓ, DecidableEq (Allele ℓ)] in
 /-- **A trained polynomial has total degree at most the sum of the degrees** of its target and
 source matrices.  The double sum is read as one sum over pairs of tags. -/
 theorem totalDegree_trainedPolynomial_le_add (source target : Deme)
@@ -827,7 +830,7 @@ variable {J : Type*} [Fintype J] (ℓ₀ : Locus) {n : ℕ}
     ∫ y, polynomialFunction (momentPolynomial ξ.1) y ∂(κ x)
       = (M *ᵥ budgetMomentFeature (fun _ ↦ n) x) ξ)
 
-include hmoment
+include ℓ₀ hmoment
 
 /-- **The expected trained covariance under a kernel with budget-`n` moments**, `n ≥ 4`, is a
 coefficient vector dotted with the propagated moments. -/
@@ -1183,7 +1186,8 @@ theorem calibrationWitness {size : ℕ} (hsize : 2 ≤ size) :
   have hweight : marginalWeights (SamplingDesignLaw.uniform (Fin 4)) calibrationWitnessGenotype
       rad1 default = 1 := by
     simp [marginalWeights, FiniteReportLaw.covariance_eq_rawMoments, FiniteReportLaw.expectation,
-      Fin.sum_univ_four, SamplingDesignLaw.uniform, calibrationWitnessGenotype, rad1] <;> norm_num
+      Fin.sum_univ_four, SamplingDesignLaw.uniform, calibrationWitnessGenotype, rad1]
+    norm_num
   refine ⟨trainedAccuracy_unique _ _ hsize _ _ (by rw [hweight]; norm_num),
     trainedCalibrationSlope_lt_populationCalibrationSlope _ _ hsize _ _ ?_⟩
   rw [covariance_linearScore, Fintype.sum_unique]
