@@ -407,6 +407,62 @@ theorem norm_scaledHistory_sub_firstOrder_le (model : SelectionModel Deme Locus 
     _ ≤ _ := h
     _ = _ := by ring
 
+/-! ## The first-order term as a derivative -/
+
+/-- **A quadratic remainder gives the right derivative at zero.** If
+`‖f σ - x₀ - σ • f₁‖ ≤ C σ²` for every `σ ≥ 0`, then `f` has right derivative `f₁` at zero. -/
+theorem hasDerivWithinAt_of_norm_sub_le_sq {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+    {f : ℝ → E} {x₀ f₁ : E} {C : ℝ}
+    (hbound : ∀ σ, 0 ≤ σ → ‖f σ - x₀ - σ • f₁‖ ≤ C * σ ^ 2) :
+    HasDerivWithinAt f f₁ (Set.Ici 0) 0 := by
+  have h0 : f 0 = x₀ := by
+    have h := hbound 0 le_rfl
+    rw [zero_smul, sub_zero, zero_pow two_ne_zero, mul_zero] at h
+    exact sub_eq_zero.mp (norm_le_zero_iff.mp h)
+  have hbig : Asymptotics.IsBigO (nhdsWithin 0 (Set.Ici 0))
+      (fun σ : ℝ ↦ f σ - f 0 - (σ - 0) • f₁) fun σ ↦ σ ^ 2 := by
+    refine Asymptotics.IsBigO.of_bound C ?_
+    filter_upwards [self_mem_nhdsWithin] with σ hσ
+    rw [h0, sub_zero, Real.norm_eq_abs, abs_of_nonneg (sq_nonneg σ)]
+    exact hbound σ hσ
+  have hsmall : Asymptotics.IsLittleO (nhds (0 : ℝ)) (fun σ : ℝ ↦ σ ^ 2) fun σ ↦ σ :=
+    Asymptotics.isLittleO_pow_id (by norm_num)
+  rw [hasDerivWithinAt_iff_isLittleO]
+  simpa only [sub_zero] using hbig.trans_isLittleO (hsmall.mono nhdsWithin_le_nhds)
+
+/-- **The correction of the history is the derivative in selection strength.** Let `family σ` be
+selected along a history for the fitness table `σ s` at every `σ ≥ 0`, with `s` in `[0, 1]` and
+masses `Σ_b |s_i(b)| ≤ S`, starting from the same moments `v₀` and `w₀` at both budgets. Then the
+moments at the end of the history have right derivative in `σ` at zero equal to the first-order
+correction of the history of `s` at `w₀`.
+
+Assumes: `SelectedOnHistory (scaledModel σ model) capacity (family σ) events 0` and
+`SelectedOnHistory (scaledModel σ model) (bumpCapacity model capacity) (family σ) events 0` for
+every `σ ≥ 0`. -/
+theorem hasDerivWithinAt_selectedHistory_firstOrder (model : SelectionModel Deme Locus Allele)
+    {S : ℝ} (hS0 : 0 ≤ S) (hfit : ∀ i b, 0 ≤ model.fitness i b ∧ model.fitness i b ≤ 1)
+    (hS : ∀ i, ∑ b, |model.fitness i b| ≤ S) (capacity : Locus → ℕ)
+    (family : ℝ → ℕ → ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele)))
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (hhistory : ∀ σ, 0 ≤ σ →
+      SelectedOnHistory (scaledModel σ model) capacity (family σ) events 0)
+    (hhistory' : ∀ σ, 0 ≤ σ →
+      SelectedOnHistory (scaledModel σ model) (bumpCapacity model capacity) (family σ) events 0)
+    (v₀ : BudgetConfiguration Deme Locus Allele capacity → ℝ)
+    (w₀ : BudgetConfiguration Deme Locus Allele (bumpCapacity model capacity) → ℝ)
+    (hinitial : ∀ σ, 0 ≤ σ → expectedMomentVector capacity (family σ 0) 0 = v₀)
+    (hinitial' : ∀ σ, 0 ≤ σ →
+      expectedMomentVector (bumpCapacity model capacity) (family σ 0) 0 = w₀) :
+    HasDerivWithinAt (fun σ ↦ expectedMomentVector capacity (family σ events.length) 0)
+      (historyCorrection model capacity events w₀) (Set.Ici 0) 0 := by
+  refine hasDerivWithinAt_of_norm_sub_le_sq (x₀ := historyEventPropagator capacity events *ᵥ v₀)
+    (C := (∑ ℓ, capacity ℓ : ℕ) * S * ((∑ ℓ, capacity ℓ : ℕ) + 1) * epochDuration events ^ 2)
+    fun σ hσ ↦ ?_
+  have h := norm_scaledHistory_sub_firstOrder_le model hσ hS0 hfit hS capacity (family σ) events
+    (hhistory σ hσ) (hhistory' σ hσ)
+  rw [hinitial σ hσ, hinitial' σ hσ] at h
+  exact h.trans_eq (by ring)
+
 end
 
 end Descent.Portability.SelectionHistoryFirstOrder
