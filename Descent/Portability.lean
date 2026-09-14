@@ -761,6 +761,9 @@ import Descent.Portability.EndToEndGWASThresholdLaw
 import Descent.Portability.TwoTimeRatePropagator
 import Descent.Portability.SelectionHistoryFirstOrder
 import Descent.Portability.PortabilityMomentLadderSeries
+import Descent.Portability.EndToEndDiploidGWASTraining
+import Descent.Portability.EndToEndSensitivityRatePathMetrics
+import Descent.Portability.EndToEndLogLossLaw
 
 assert_below Descent.Program
 
