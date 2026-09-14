@@ -749,6 +749,7 @@ import Descent.Portability.EndToEndPooledCalibration
 import Descent.Portability.EndToEndAscertainedWitness
 import Descent.Portability.SelectionMomentExpansion
 import Descent.Portability.SelectionMomentUniqueness
+import Descent.Portability.PortabilityMomentLadder
 
 assert_below Descent.Program
 
