@@ -20,3 +20,4 @@ open Descent.Portability.EndToEndSensitivitySeriesBound
 #print axioms not_summable_of_witnessTermDerivative_le
 #print axioms witness_termwise_derivative_without_summable_bound
 #print axioms hasDerivAt_truncatedSeries_segmentHistory
+#print axioms expectedSquaredCorrelation_truncation

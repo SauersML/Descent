@@ -2,6 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Descent.Portability.EndToEndSensitivitySeries
+import Descent.Portability.EndToEndDecisionCertificates
 import Mathlib.Analysis.PSeries
 import Mathlib.Analysis.SpecificLimits.Normed
 
@@ -12,10 +13,10 @@ assert_below Descent.Decision Descent.Program
 
 `EndToEndSensitivitySeries` differentiates the expected squared correlation `Σₖ E[N (1 - D)ᵏ]`
 along a segment history termwise, under the hypothesis that one summable sequence bounds the term
-sensitivities at every parameter in `(0, 1)`.  This module shows that the pointwise geometric
-factor supplies no such bound, exhibits a series with the same term structure on which termwise
-differentiation holds while a hypothesis of that shape fails, and differentiates every truncation
-of the correlation series with no hypothesis.
+sensitivities at every parameter in `(0, 1)`.  This module neither discharges nor refutes that
+hypothesis for the history kernels.  It shows that two majorant shapes fail, exhibits a series with
+the same term structure on which termwise differentiation holds while a bound of that shape fails,
+and differentiates every truncation of the correlation series with no hypothesis.
 
 No summable majorant of the terms.  Over `0 ≤ N ≤ D ≤ 1` the `k`-th term `N (1 - D)ᵏ` is at least
 `1 / (4 (k + 1))` at `N = D = 1 / (2 (k + 1))`, by Bernoulli's inequality
@@ -39,20 +40,27 @@ vanishes, and a bound local to a neighbourhood of the parameter avoids it.
 
 The truncations.  For every `K`, the sum of the first `K` expected series terms along a segment
 history has as derivative the sum of their term sensitivities at every interior parameter, with no
-hypothesis (`hasDerivAt_truncatedSeries_segmentHistory`).
+hypothesis (`hasDerivAt_truncatedSeries_segmentHistory`).  Under every Markov kernel, in particular
+at every parameter of a segment history, that sum lies below the expected squared correlation by
+at most `E[(1 - D)ᴷ]` (`expectedSquaredCorrelation_truncation`), by the tail certificate
+`EndToEndDecisionCertificates.integral_quotient_truncation`.
 
-Scope.  The summable bound of `EndToEndSensitivitySeries` is not discharged here, in any regime.
-No bound on the term sensitivities through the law of the state near the states where `D` vanishes
-is proved.  The operator bound through the coefficient norm of `N (1 - D)ᵏ` and the generator norm
-at budget `4 (k + 1)` is not formalized, and neither is its growth in `k`.  The witness is a scalar
-series with the term structure of the expansion.  It is not realized as a demographic history, and
-the limits at `0` of the term sensitivities of a history are not computed.
+Scope.  The summable bound of `EndToEndSensitivitySeries` is neither discharged nor refuted for the
+history kernels.  The obstructions here concern majorant shapes: a bound uniform over
+`0 ≤ N ≤ D ≤ 1`, or over `(0, 1)` when the endpoint limits do not vanish.  They do not show that the
+expected-term sensitivities of any history kernel fail to be summable.  The pointwise route is
+closed because the fixation states, where `D = 0`, lie in the support of the state law along a
+history with drift, so `(1 - D)ᵏ` is not bounded away from one there.  No bound on the term
+sensitivities through the law of the state near those states is proved.  The operator bound
+through the coefficient norm of `N (1 - D)ᵏ` and the generator norm at budget `4 (k + 1)` is not
+formalized.  The witness is a scalar series and is not realized as a demographic history, and the
+limits at `0` of the term sensitivities of a history are not computed.
 
 ## Empirical status
 
 None.  The bodies here are Bernoulli's inequality, a comparison with the harmonic series,
-derivatives of polynomials in one variable and finite sums of propagator sensitivities, so no
-measurement can bear on them.
+derivatives of polynomials in one variable, finite sums of propagator sensitivities and a pointwise
+geometric tail integrated against a Markov kernel, so no measurement can bear on them.
 -/
 
 set_option autoImplicit false
@@ -94,12 +102,15 @@ theorem one_div_four_mul_succ_le_expansion_term (k : ℕ) :
   have hhalf : (1 : ℝ) / 2 ≤ (1 - 1 / (2 * ((k : ℝ) + 1))) ^ k := by
     rw [sub_eq_add_neg]
     linarith
-  calc 1 / (4 * ((k : ℝ) + 1)) = 1 / (2 * ((k : ℝ) + 1)) * (1 / 2) := by ring
+  calc 1 / (4 * ((k : ℝ) + 1)) = 1 / (2 * ((k : ℝ) + 1)) * (1 / 2) := by
+        generalize (k : ℝ) + 1 = c
+        ring
     _ ≤ 1 / (2 * ((k : ℝ) + 1)) * (1 - 1 / (2 * ((k : ℝ) + 1))) ^ k :=
         mul_le_mul_of_nonneg_left hhalf (by positivity)
 
 /-- **No summable majorant of the expansion terms.**  A sequence bounding the `k`-th term
-`N (1 - D)ᵏ` of the positive ratio expansion at every `0 ≤ N ≤ D ≤ 1` is not summable. -/
+`N (1 - D)ᵏ` of the positive ratio expansion at every `0 ≤ N ≤ D ≤ 1` is not summable.  This
+concerns that majorant shape, not the expected terms under a history kernel. -/
 theorem not_summable_of_expansion_term_le {bound : ℕ → ℝ}
     (hbound : ∀ (k : ℕ) (num den : ℝ), 0 ≤ num → num ≤ den → den ≤ 1 →
       num * (1 - den) ^ k ≤ bound k) :
@@ -114,7 +125,10 @@ theorem not_summable_of_expansion_term_le {bound : ℕ → ℝ}
       (hbound k (1 / (2 * ((k : ℝ) + 1))) (1 / (2 * ((k : ℝ) + 1))) (by positivity) le_rfl hden)
   have hquarter : Summable fun k : ℕ ↦ 1 / (4 * ((k : ℝ) + 1)) :=
     Summable.of_nonneg_of_le (fun k ↦ by positivity) hle hsummable
-  exact not_summable_one_div_succ ((hquarter.mul_left 4).congr fun k ↦ by ring)
+  refine not_summable_one_div_succ ((hquarter.mul_left 4).congr fun k ↦ ?_)
+  show 4 * (1 / (4 * ((k : ℝ) + 1))) = 1 / ((k : ℝ) + 1)
+  generalize (k : ℝ) + 1 = c
+  ring
 
 /-! ## The shape of the hypothesis -/
 
@@ -244,7 +258,8 @@ theorem not_summable_of_witnessTermDerivative_le {bound : ℕ → ℝ}
 /-- **The obstruction.**  The witness series `Σₖ θ (1 - θ)ᵏ` differentiates termwise at every
 interior parameter, yet no summable sequence bounds its term derivatives on `(0, 1)`, the shape of
 the bound that `EndToEndSensitivitySeries.hasDerivAt_expectedSquaredCorrelation_segmentHistory`
-takes as a hypothesis. -/
+takes as a hypothesis.  It neither discharges nor refutes that hypothesis for any history
+kernel. -/
 theorem witness_termwise_derivative_without_summable_bound :
     (∀ θ₀ ∈ Set.Ioo (0 : ℝ) 1, HasDerivAt (fun θ ↦ ∑' k : ℕ, witnessTerm k θ)
         (∑' k : ℕ, witnessTermDerivative k θ₀) θ₀)
@@ -287,6 +302,55 @@ theorem hasDerivAt_truncatedSeries_segmentHistory (ℓ₀ : Locus)
       (Filter.Eventually.of_forall fun θ ↦
         integral_seriesTerm_historyEventKernel ℓ₀ hap₀
           ((history.map segmentEvent).map fun event ↦ event θ) x0 deme score outcome k)
+
+/-- **The truncation error of the correlation series.**  Under every Markov kernel, for a score and
+an outcome in the unit interval, the expected squared correlation minus the sum of its first `K`
+expected series terms lies between zero and `E[(1 - D)ᴷ]`. -/
+theorem expectedSquaredCorrelation_truncation
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    [IsMarkovKernel κ] (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (score outcome : FullHaplotype Locus Allele → ℝ)
+    (hscore0 : ∀ hap, 0 ≤ score hap) (hscore1 : ∀ hap, score hap ≤ 1)
+    (houtcome0 : ∀ hap, 0 ≤ outcome hap) (houtcome1 : ∀ hap, outcome hap ≤ 1) (K : ℕ) :
+    0 ≤ expectedSquaredCorrelation κ x0 deme score outcome
+        - ∑ k ∈ Finset.range K, ∫ y, correlationNumerator (stateLaw y deme) score outcome
+          * (1 - correlationDenominator (stateLaw y deme) score outcome) ^ k ∂(κ x0)
+      ∧ expectedSquaredCorrelation κ x0 deme score outcome
+          - ∑ k ∈ Finset.range K, ∫ y, correlationNumerator (stateLaw y deme) score outcome
+            * (1 - correlationDenominator (stateLaw y deme) score outcome) ^ k ∂(κ x0)
+        ≤ ∫ y, (1 - correlationDenominator (stateLaw y deme) score outcome) ^ K ∂(κ x0) := by
+  have hbounds : ∀ y : FrequencyState Deme Locus Allele,
+      0 ≤ correlationNumerator (stateLaw y deme) score outcome
+        ∧ correlationNumerator (stateLaw y deme) score outcome
+          ≤ correlationDenominator (stateLaw y deme) score outcome
+        ∧ correlationDenominator (stateLaw y deme) score outcome ≤ 1 := fun y ↦
+    ⟨correlationNumerator_nonneg _ score outcome,
+      correlationNumerator_le_denominator _ score outcome,
+      correlationDenominator_le_one _ score outcome hscore0 hscore1 houtcome0 houtcome1⟩
+  have htruncation := EndToEndDecisionCertificates.integral_quotient_truncation (κ x0)
+    (fun y ↦ correlationNumerator (stateLaw y deme) score outcome)
+    (fun y ↦ correlationDenominator (stateLaw y deme) score outcome)
+    (measurable_correlationNumerator deme score outcome)
+    (measurable_correlationDenominator deme score outcome)
+    (fun y ↦ (hbounds y).1) (fun y ↦ (hbounds y).2.1) (fun y ↦ (hbounds y).2.2) K
+  have hvalue : expectedSquaredCorrelation κ x0 deme score outcome
+      = ∫ y, correlationNumerator (stateLaw y deme) score outcome
+        / correlationDenominator (stateLaw y deme) score outcome ∂(κ x0) := by
+    rw [expectedSquaredCorrelation]
+    refine integral_congr_ae (ae_of_all _ fun y ↦ ?_)
+    show ((stateLaw y deme).squaredCorrelation score outcome).getD 0
+      = correlationNumerator (stateLaw y deme) score outcome
+        / correlationDenominator (stateLaw y deme) score outcome
+    rw [getD_squaredCorrelation_stateLaw]
+    show (if 0 < correlationDenominator (stateLaw y deme) score outcome then
+        correlationNumerator (stateLaw y deme) score outcome
+          / correlationDenominator (stateLaw y deme) score outcome
+      else 0) = _
+    split_ifs with hpositive
+    · rfl
+    · rw [le_antisymm (not_lt.mp hpositive) ((hbounds y).1.trans (hbounds y).2.1), div_zero]
+  rw [hvalue, htruncation.1]
+  exact htruncation.2
 
 end Truncation
 
