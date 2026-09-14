@@ -23,6 +23,10 @@ import Descent.Portability.EndToEndLogLossLaw
 import Descent.Portability.EndToEndLogLossBounds
 import Descent.Portability.EndToEndMutualInformationPinsker
 import Descent.Portability.PortabilityMomentLadderBrier
+import Descent.Portability.EndToEndGWASThresholdCalibration
+import Descent.Portability.EndToEndDecisionCertificates
+import Descent.Portability.EndToEndDiploidCalibration
+import Descent.Portability.MigrationPortabilityRemainder
 import Descent.Portability.EndToEndDecisionLaw
 import Descent.Portability.EndToEndGWASCalibrationLaw
 import Descent.Portability.MigrationPortabilityFirstOrderFactor
@@ -221,7 +225,14 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   (`expectedPositiveQuotient_eq_tsum_dotProduct`).  With equal recall and false positive rate,
   precision ports exactly when prevalence ports, and an explicit prevalence shift from `1/2` to
   `1/5` moves precision from `4/5` to `1/2` (`precision_eq_iff_prevalence_eq`,
-  `prevalenceShift_witness`).
+  `prevalenceShift_witness`).  Every truncation of those series carries a division-free
+  certificate: under any Markov kernel the tail after `K` terms lies between zero and
+  `E[(1 − (TP + c))^K]`, itself one budget-`K` dot product, and the certificate tends to zero
+  where the denominator is positive almost surely
+  (`EndToEndDecisionCertificates.quotient_sub_partialSum_eq`,
+  `expectedPositiveQuotient_truncation`, `integral_recallRate_precision_truncation`,
+  `expectedPositiveQuotient_truncation_historyEventKernel`,
+  `tendsto_certificate_zero_of_ae_pos`).
 * **Stability.**  Propagators of two rate paths differ by at most
   `(∫‖Q₁ − Q₂‖) e^{∫‖Q₁‖} e^{∫‖Q₂‖}`
   (`EndToEndPortabilityLipschitz.norm_rateHistoryDualPropagator_sub_le`).  Expected portability,
@@ -294,6 +305,15 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   the haploid budget-4 function, along event histories and along rate histories
   (`diploidMomentPortability_diploidSum_historyEventKernel`,
   `EndToEndDiploidGWASTraining.diploidMomentPortability_diploidSum_rateHistoryKernel`).
+* Calibration transfers the same way.  For additive lifts at any inbreeding the calibration slope
+  and its portability equal the haploid ones and the intercept doubles, along event and rate
+  histories; any gamete-pair observables give a slope rational in the budget-4 moments and an
+  intercept in the budget-6 moments; and a recessive outcome breaks the transfer, with diploid
+  slope `1/2` against haploid slope `1`
+  (`EndToEndDiploidCalibration.expectedDiploidCalibrationSlope_diploidSum`,
+  `expectedDiploidCalibrationPortability_diploidSum`,
+  `expectedDiploidCalibrationIntercept_diploidSum`, `expectedDiploidCalibrationSlope_eq_moment`,
+  `diploidProduct_breaks_calibration_transfer`).
 
 ## 4. The score: training and ascertainment
 
@@ -355,6 +375,14 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
     signed statement fails for two-sided selection, and on the same law the population
     thresholded accuracy is zero while a cohort of two gives positive accuracy
     (`curseWitness_marginalWeights`, `curseWitness_selection`, `curseWitness_accuracy`).
+  * Calibration under thresholding has an exact law too.  Any learner's expected target covariance
+    reads its mean weights and its variance their second moments, so every learned slope is the
+    slope of its mean-weight score times a factor in `[0, 1]`
+    (`EndToEndGWASThresholdCalibration.learnedCovariance_eq`, `learnedVariance_eq`,
+    `learnedCalibrationSlope_eq_mul`, `abs_learnedCalibrationSlope_le`).  With one tag the curse
+    bounds the thresholded slope by the population slope at every threshold, and on the witness
+    law thresholding reverses the sign of the slope while the unthresholded slope stays positive
+    (`abs_learnedCalibrationSlope_threshold_le`, `curseWitness_calibration`).
 * **Ascertainment.**
   * A panel rule passes with probability a polynomial of degree at most `n`
     (`EndToEndAscertainedLaw.totalDegree_acceptancePolynomial_le`), so ascertained portability
@@ -392,7 +420,13 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   `φ₁(T) = 2 (cosh cT − 1)(π₀ − DD₀)(π₀ + Dz₀)/(c·DD₀·π₀)`, nonnegative when `DD₀ ≤ π₀` and
   `π₀ + Dz₀ ≥ 0`, so weak migration then raises portability to first order
   (`MigrationPortabilityFirstOrderFactor.augmentedLowOrderLDGenerator_withSymmetricMigration`,
-  `hasDerivWithinAt_splitPortabilityRatio_withSymmetricMigration`).
+  `hasDerivWithinAt_splitPortabilityRatio_withSymmetricMigration`).  The expansion is uniform: the
+  ratio differs from `e^{-ρ̄T} + m φ₁(T)` by at most an explicit `C m²`, so `φ₁ > 0` raises and
+  `φ₁ < 0` lowers portability for every small `m`, and at zero recombination with `DD₀ < π₀` and
+  `π₀ + Dz₀ > 0` small migration strictly raises portability
+  (`MigrationPortabilityRemainder.abs_splitPortabilityRatio_withSymmetricMigration_sub_le`,
+  `exists_portabilityDecay_lt_splitPortabilityRatio`, `firstOrderMigrationFactor_nonneg_of_raises`,
+  `exists_portabilityDecay_lt_splitPortabilityRatio_zeroRecombination`).
 
 ## 6. Response: how accuracy moves with every input
 
