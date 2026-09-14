@@ -9,6 +9,7 @@ import Descent.Program.OpenQuestions
 import Descent.Program.PangenomeHiddenClock
 import Descent.Program.AncestralLocality
 import Descent.Program.ResearchFrontiers
+import Descent.Program.PolygenicScorePortability
 
 /-!
 # `Descent.Program` -- the layer head
