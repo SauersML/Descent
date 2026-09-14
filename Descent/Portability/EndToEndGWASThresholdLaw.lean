@@ -249,7 +249,7 @@ theorem expectation_mul_le_expectation_upperTail (law : FiniteReportLaw Ω) (val
   have hmonotone : Monotone fun x : ℝ ↦ if t ≤ x then (1 : ℝ) else 0 := by
     intro a b hab
     show (if t ≤ a then (1 : ℝ) else 0) ≤ if t ≤ b then 1 else 0
-    split_ifs <;> first | norm_num | linarith
+    split_ifs <;> linarith
   have h := covariance_monotone_nonneg law value hmonotone
   rw [FiniteReportLaw.covariance_eq_rawMoments] at h
   linarith
@@ -293,9 +293,10 @@ theorem abs_marginalWeights_mul_le_expectation_abs (law : FiniteReportLaw Ω) {s
   have hprobability : 0 ≤ (cohortLaw law size).expectation (fun sample ↦
       if t ≤ |gwasWeights genotype outcome sample marker| then (1 : ℝ) else 0) :=
     ReplicaDomainCertificate.expectation_nonneg _ _ fun sample ↦ by split_ifs <;> norm_num
-  have hpoint : (fun sample ↦ |gwasWeights genotype outcome sample marker|
+  have hpoint : (fun sample : Fin size → Ω ↦ |gwasWeights genotype outcome sample marker|
       * if t ≤ |gwasWeights genotype outcome sample marker| then (1 : ℝ) else 0)
-      = fun sample ↦ |covarianceThresholdWeights t genotype outcome sample marker| := by
+      = fun sample : Fin size → Ω ↦
+          |covarianceThresholdWeights t genotype outcome sample marker| := by
     funext sample
     simp only [covarianceThresholdWeights]
     split_ifs <;> simp
