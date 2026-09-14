@@ -1,0 +1,34 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.EndToEndAscertainedDecision
+
+/-! Axiom audit of EndToEndAscertainedDecision. -/
+
+open Descent.Portability.EndToEndAscertainedDecision
+
+#print axioms ascertainedTable
+#print axioms tableCaseMass_ascertainedTable
+#print axioms tableSensitivity_tableSpecificity_ascertainedTable
+#print axioms tableYouden_ascertainedTable
+#print axioms tablePPV_eq_predictiveValueAt
+#print axioms tablePPV_ascertainedTable
+#print axioms predictiveValueAt_eq_shiftPredictiveValue
+#print axioms tablePPV_eq_shiftPredictiveValue
+#print axioms tablePPV_ascertainedTable_eq_shiftPredictiveValue
+#print axioms predictiveValueAt_eq_iff
+#print axioms tablePPV_ascertainedTable_eq_iff
+#print axioms tablePPV_ascertainedTable_eq_of_rates_eq
+#print axioms tablePPV_eq_iff_tableCaseMass_eq
+#print axioms ascertainedPrevalenceShift_witness
+#print axioms ascertainedConfusion
+#print axioms tableCaseMass_expectedConfusion
+#print axioms tableCaseMass_add_tableControlMass_expectedConfusion
+#print axioms ascertainedConfusion_sensitivity_specificity
+#print axioms tablePPV_expectedConfusion_ascertainedConfusion_shift
+#print axioms tablePPV_portability_of_rates_eq
+#print axioms AscertainedDecisionReport
+#print axioms ascertainedDecisionReport
+#print axioms ascertainedDecisionReport_eq_of_decisionReport_eq
+#print axioms ascertainedDecisionReport_eq_of_polynomialsAgreeAt_one
+#print axioms ascertainedDecisionReport_historyEvent_eq_rateHistory
