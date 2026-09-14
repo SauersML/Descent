@@ -1,0 +1,28 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.EndToEndAncestryProportions
+
+/-! Axiom audit of EndToEndAncestryProportions. -/
+
+open Descent.Portability.EndToEndAncestryProportions
+
+#print axioms expectation_proportionQuadratic
+#print axioms expectation_proportionAffine
+#print axioms expectation_ancestryGamete
+#print axioms covariance_ancestryGamete
+#print axioms expectation_ancestryIndividual_diploidSum
+#print axioms expectation_ancestryIndividual_diploidSum_mul
+#print axioms covariance_ancestryIndividual_diploidSum
+#print axioms covariance_ancestryIndividual_one
+#print axioms expectation_ancestryIndividual_half
+#print axioms covariance_ancestryIndividual_half_sub_admixedMating
+#print axioms expectation_ancestryMating
+#print axioms expectation_ancestryMating_diploidSum
+#print axioms covariance_ancestryMating_diploidSum
+#print axioms polynomialFunction_ancestryCovariancePolynomial
+#print axioms polynomialFunction_ancestryVariance
+#print axioms totalDegree_ancestryCovariancePolynomial_le
+#print axioms expectedAncestryCalibrationSlope_historyEventKernel
+#print axioms expectedAncestryCalibrationSlope_rateHistoryKernel
+#print axioms expectedAncestryCalibrationSlope_eq_of_ancestryMoments_eq
