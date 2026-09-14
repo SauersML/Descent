@@ -7,24 +7,20 @@ import Descent.Portability.PortabilityMomentLadderDecision
 assert_below Descent.Decision Descent.Program
 
 /-!
-# The decision rung is sharp: fixation keeps the decision report and moves expected recall
+# Expected recall is off the first rung: fixation keeps expected frequencies and moves recall
 
 `PortabilityMomentLadderDecision` proves that agreement up to degree one fixes the decision report
 of every rule (`decisionReport_eq_of_polynomialsAgreeAt_one`), and that agreement at every degree
-fixes the expected per-population recall and precision.  This module settles the first case that
-module leaves open: degree one fixes neither the expected recall nor the expected precision.
+fixes the expected per-population recall and precision.  This module separates the first rung from
+the ratios: two process laws with equal expected frequencies of every haplotype in every deme give
+different expected recall and different expected precision.
 
 The events.  `EndToEndAscertainedWitness.founderEventLaw` draws a founder `g` of deme `source`
 with its frequency and replaces a fraction `ε` of the deme by copies of `g`.  A strongly measurable
 observable integrates against it to the frequency-weighted sum of its values after the event
-(`integral_founderEventLaw_of_stronglyMeasurable`), and every frequency coordinate is a martingale
-(`sum_resamplingMove_coordinate`).
-
-Degree one.  A polynomial of total degree at most one is a constant plus a combination of
-frequency coordinates, so for every fraction its expectation after the event is its value before
-(`integral_founderEventLaw_of_totalDegree_le_one`).  So the events at fractions `0` and `1` agree
-up to degree one (`polynomialsAgreeAt_one_founderEventLaw`), and every rule on every report map has
-one decision report under both.
+(`integral_founderEventLaw_of_stronglyMeasurable`).  Every frequency coordinate is a martingale
+(`sum_resamplingMove_coordinate`), so the events at fractions `0` and `1` have equal expected
+frequencies (`PortabilityMomentLadderSharpness.integral_mass_founderEventLaw`).
 
 Recall and precision.  Write `TP` for the true-positive cell of the confusion report law in
 `source` and `c` for any other cell.  Without the event, the expected positive quotient
@@ -35,23 +31,26 @@ called case and zero otherwise (`positiveQuotient_resamplingMove_one`), and its 
 of the state (`expectedPositiveQuotient_founderEventLaw_one`).  The two differ whenever `0 < TP`
 and `TP + c < 1` (`expectedPositiveQuotient_founderEventLaw_ne`), because `TP / (TP + c) = TP`
 forces `TP + c = 1`.  The false-negative cell gives recall and the false-positive cell precision:
-two process laws with one decision report and different expected recall
-(`polynomialsAgreeAt_one_and_expectedRecall_ne`) or different expected precision
-(`polynomialsAgreeAt_one_and_expectedPrecision_ne`).
+two process laws with equal expected frequencies and different expected recall
+(`expectedFrequencies_eq_and_expectedRecall_ne`) or different expected precision
+(`expectedFrequencies_eq_and_expectedPrecision_ne`).
 
-Significance.  The expected confusion table, case probability, called fraction and net benefit
-cannot see fixation within a population; the expected per-population recall and precision can.  An
-expected ratio is not the ratio of expected cells, and it depends on how the cells vary between
-realizations of the process, which no polynomial of degree one measures.
+Significance.  The cells of the expected confusion table are expectations of functions linear in
+the frequencies, so they see only the expected frequencies.  The expected per-population recall and
+precision see more: an expected ratio is not the ratio of expected cells, and it depends on how the
+cells vary between realizations of the process.
 
-Scope.  The two laws are single resampling stages, not neutral epochs of `historyEventKernel`.
-Whether some finite degree above one fixes the expected recall or precision is not settled here.
+Scope.  The two laws are single resampling stages, not neutral epochs of `historyEventKernel`.  The
+separation proved here is the fallback form: equal expected frequencies of every haplotype in every
+deme.  That the two laws agree on every frequency polynomial of total degree at most one
+(`PortabilityMomentLadder.PolynomialsAgreeAt` at degree one), and so give one decision report, is
+not proved here.  Whether some finite degree fixes the expected recall or precision is not settled
+here.
 
 ## Empirical status
 
-None.  The bodies here are finite sums over the outcomes of one resampling stage, the monomial
-expansion of polynomials of degree at most one and rational arithmetic, so no measurement can bear
-on them.
+None.  The bodies here are finite sums over the outcomes of one resampling stage and rational
+arithmetic, so no measurement can bear on them.
 -/
 
 set_option autoImplicit false
@@ -62,8 +61,7 @@ namespace Descent.Portability.PortabilityMomentLadderDecisionSharpness
 open MeasureTheory ProbabilityTheory MvPolynomial PartialHaplotypeDualGenerator
   NeutralFellerGenerator PartialHaplotypeMicroscopicStages ReplicaMetricInstances
   EndToEndPortabilityLaw EndToEndBrierLaw EndToEndDecisionLaw EndToEndPooledCalibration
-  EndToEndAscertainedWitness PortabilityMomentLadder PortabilityMomentLadderSharpness
-  PortabilityMomentLadderDecision
+  EndToEndAscertainedWitness PortabilityMomentLadderSharpness
 
 noncomputable section
 
@@ -106,59 +104,6 @@ theorem sum_resamplingMove_coordinate (source : Deme) (ε : ℝ) (hε0 : 0 ≤ �
   rw [integral_founderEventLaw source ε hε0 hε1 x (demePolynomial v.1 (X v.2)) _
     (polynomialFunction_demePolynomial_X v.1 v.2)] at hintegral
   exact hintegral
-
-/-- **A founder event keeps the expectation of every polynomial of total degree at most one.**
-Such a polynomial is a constant plus a combination of frequency coordinates, and every coordinate
-is a martingale (`sum_resamplingMove_coordinate`).
-
-Assumes: total degree at most one. -/
-theorem integral_founderEventLaw_of_totalDegree_le_one (source : Deme) (ε : ℝ) (hε0 : 0 ≤ ε)
-    (hε1 : ε ≤ 1) (x : FrequencyState Deme Locus Allele)
-    (p : FrequencyPolynomial Deme Locus Allele) (hp : p.totalDegree ≤ 1) :
-    ∫ y, polynomialFunction p y ∂(founderEventLaw source ε hε0 hε1 x)
-      = polynomialFunction p x := by
-  have hmonomial : ∀ m ∈ p.support, ∑ g, x.1 (source, g)
-        * eval (resamplingMove source g ε hε0 hε1 x).1 (monomial m (coeff m p))
-      = eval x.1 (monomial m (coeff m p)) := by
-    intro m hm
-    rcases eq_or_ne m 0 with rfl | hm0
-    · simp only [eval_monomial, Finsupp.prod_zero_index, mul_one]
-      rw [← Finset.sum_mul, x.2.2 source, one_mul]
-    · have hdegree : Finsupp.degree m ≤ 1 := (le_totalDegree hm).trans hp
-      obtain ⟨v, hv⟩ := Finsupp.support_nonempty_iff.mpr hm0
-      have hv0 : m v ≠ 0 := Finsupp.mem_support_iff.mp hv
-      have hsplit := congrArg Finsupp.degree (Finsupp.single_add_erase v m)
-      rw [Finsupp.degree_add, Finsupp.degree_single] at hsplit
-      have hv1 : m v = 1 := by omega
-      have herase : m.erase v = 0 := (Finsupp.degree_eq_zero_iff _).mp (by omega)
-      have hsingle : m = Finsupp.single v 1 :=
-        (Finsupp.single_add_erase v m).symm.trans (by rw [hv1, herase, add_zero])
-      have hvalue : ∀ z : FrequencyVariable Deme Locus Allele → ℝ,
-          eval z (monomial m (coeff m p)) = coeff m p * z v := fun z ↦ by
-        rw [hsingle, eval_monomial, Finsupp.prod_single_index] <;> simp
-      simp only [hvalue]
-      rw [← sum_resamplingMove_coordinate source ε hε0 hε1 x v, Finset.mul_sum]
-      exact Finset.sum_congr rfl fun g _ ↦ by ring
-  have hexpand : ∀ z : FrequencyVariable Deme Locus Allele → ℝ,
-      eval z p = ∑ m ∈ p.support, eval z (monomial m (coeff m p)) := fun z ↦ by
-    conv_lhs => rw [MvPolynomial.as_sum p]
-    rw [map_sum]
-  rw [integral_founderEventLaw source ε hε0 hε1 x p _ fun _ ↦ rfl]
-  simp only [polynomialFunction_apply, hexpand, Finset.mul_sum]
-  rw [Finset.sum_comm]
-  exact Finset.sum_congr rfl hmonomial
-
-/-- **The founder events at fractions zero and one agree up to degree one.**  From any state, every
-frequency polynomial of total degree at most one has one expectation without the event and after
-complete fixation. -/
-theorem polynomialsAgreeAt_one_founderEventLaw (source : Deme)
-    (x₀ : FrequencyState Deme Locus Allele) :
-    PolynomialsAgreeAt 1 (Kernel.const _ (founderEventLaw source 0 le_rfl zero_le_one x₀))
-      (Kernel.const _ (founderEventLaw source 1 zero_le_one le_rfl x₀)) x₀ x₀ := by
-  intro p hp
-  rw [Kernel.const_apply, Kernel.const_apply,
-    integral_founderEventLaw_of_totalDegree_le_one source 0 le_rfl zero_le_one x₀ p hp,
-    integral_founderEventLaw_of_totalDegree_le_one source 1 zero_le_one le_rfl x₀ p hp]
 
 /-! ## Positive quotients at fractions zero and one -/
 
@@ -269,18 +214,16 @@ theorem expectedPositiveQuotient_founderEventLaw_ne (source : Deme)
   rw [div_eq_iff hsumPositive.ne'] at hequal
   exact hbelow.ne (mul_left_cancel₀ hpositive.ne' (hequal.symm.trans (mul_one _).symm))
 
-/-! ## Degree one fixes neither recall nor precision -/
+/-! ## Equal expected frequencies, different recall and precision -/
 
-/-- **Degree one does not fix the expected recall.**  From a state `x₀`, the founder events at
-fractions zero and one in deme `source` agree on every frequency polynomial of total degree at most
-one.  So every rule on every report map has one decision report under both
-(`PortabilityMomentLadderDecision.decisionReport_eq_of_polynomialsAgreeAt_one`).  Yet the expected
-per-population recall `E[TP / (TP + FN)]` in the source deme is `TP / (TP + FN)` of `x₀` under the
-first and `TP` of `x₀` under the second, and these differ.  The conditions hold whenever the source
-deme carries called cases and controls with positive frequency.
+/-- **Equal expected frequencies do not fix the expected recall.**  From a state `x₀`, the founder
+events at fractions zero and one in deme `source` give every haplotype in every deme one expected
+frequency.  Yet the expected per-population recall `E[TP / (TP + FN)]` in the source deme is
+`TP / (TP + FN)` of `x₀` under the first and `TP` of `x₀` under the second, and these differ.  The
+conditions hold whenever the source deme carries called cases and controls with positive frequency.
 
 Assumes: `0 < TP` and `TP + FN < 1` in the source deme at `x₀`. -/
-theorem polynomialsAgreeAt_one_and_expectedRecall_ne (source : Deme)
+theorem expectedFrequencies_eq_and_expectedRecall_ne (source : Deme)
     (x₀ : FrequencyState Deme Locus Allele) {Score : Type*} [Fintype Score]
     (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool)
     (hpositive :
@@ -288,34 +231,31 @@ theorem polynomialsAgreeAt_one_and_expectedRecall_ne (source : Deme)
     (hcases : ((stateLaw x₀ source).pushforward (confusionReport report called)).mass (true, true)
       + ((stateLaw x₀ source).pushforward (confusionReport report called)).mass (false, true)
         < 1) :
-    PolynomialsAgreeAt 1 (Kernel.const _ (founderEventLaw source 0 le_rfl zero_le_one x₀))
-        (Kernel.const _ (founderEventLaw source 1 zero_le_one le_rfl x₀)) x₀ x₀
-      ∧ decisionReport (Kernel.const _ (founderEventLaw source 0 le_rfl zero_le_one x₀)) x₀
-          report called
-        = decisionReport (Kernel.const _ (founderEventLaw source 1 zero_le_one le_rfl x₀)) x₀
-          report called
+    (∀ (deme : Deme) (hap : FullHaplotype Locus Allele),
+      ∫ y, (stateLaw y deme).mass hap ∂(founderEventLaw source 0 le_rfl zero_le_one x₀)
+        = ∫ y, (stateLaw y deme).mass hap ∂(founderEventLaw source 1 zero_le_one le_rfl x₀))
       ∧ ∫ y, (ruleConfusion ((stateLaw y source).pushforward report) called).recallRate
           ∂(Kernel.const (FrequencyState Deme Locus Allele)
             (founderEventLaw source 0 le_rfl zero_le_one x₀) x₀)
         ≠ ∫ y, (ruleConfusion ((stateLaw y source).pushforward report) called).recallRate
           ∂(Kernel.const (FrequencyState Deme Locus Allele)
             (founderEventLaw source 1 zero_le_one le_rfl x₀) x₀) := by
-  have hagree := polynomialsAgreeAt_one_founderEventLaw source x₀
-  refine ⟨hagree, decisionReport_eq_of_polynomialsAgreeAt_one hagree report called, ?_⟩
-  rw [(integral_recallRate_precision _ x₀ source report called).1,
-    (integral_recallRate_precision _ x₀ source report called).1]
-  exact expectedPositiveQuotient_founderEventLaw_ne source x₀ report called (false, true)
-    (by decide) hpositive hcases
+  refine ⟨fun deme hap ↦ ?_, ?_⟩
+  · rw [integral_mass_founderEventLaw, integral_mass_founderEventLaw]
+  · rw [(integral_recallRate_precision _ x₀ source report called).1,
+      (integral_recallRate_precision _ x₀ source report called).1]
+    exact expectedPositiveQuotient_founderEventLaw_ne source x₀ report called (false, true)
+      (by decide) hpositive hcases
 
-/-- **Degree one does not fix the expected precision.**  From a state `x₀`, the founder events at
-fractions zero and one in deme `source` agree on every frequency polynomial of total degree at most
-one and give every rule on every report map one decision report.  Yet the expected per-population
-precision `E[TP / (TP + FP)]` in the source deme is `TP / (TP + FP)` of `x₀` under the first and
-`TP` of `x₀` under the second, and these differ.  The conditions hold whenever the source deme
-carries called cases and uncalled haplotypes with positive frequency.
+/-- **Equal expected frequencies do not fix the expected precision.**  From a state `x₀`, the
+founder events at fractions zero and one in deme `source` give every haplotype in every deme one
+expected frequency.  Yet the expected per-population precision `E[TP / (TP + FP)]` in the source
+deme is `TP / (TP + FP)` of `x₀` under the first and `TP` of `x₀` under the second, and these
+differ.  The conditions hold whenever the source deme carries called cases and uncalled haplotypes
+with positive frequency.
 
 Assumes: `0 < TP` and `TP + FP < 1` in the source deme at `x₀`. -/
-theorem polynomialsAgreeAt_one_and_expectedPrecision_ne (source : Deme)
+theorem expectedFrequencies_eq_and_expectedPrecision_ne (source : Deme)
     (x₀ : FrequencyState Deme Locus Allele) {Score : Type*} [Fintype Score]
     (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool)
     (hpositive :
@@ -323,24 +263,21 @@ theorem polynomialsAgreeAt_one_and_expectedPrecision_ne (source : Deme)
     (hcalled : ((stateLaw x₀ source).pushforward (confusionReport report called)).mass (true, true)
       + ((stateLaw x₀ source).pushforward (confusionReport report called)).mass (true, false)
         < 1) :
-    PolynomialsAgreeAt 1 (Kernel.const _ (founderEventLaw source 0 le_rfl zero_le_one x₀))
-        (Kernel.const _ (founderEventLaw source 1 zero_le_one le_rfl x₀)) x₀ x₀
-      ∧ decisionReport (Kernel.const _ (founderEventLaw source 0 le_rfl zero_le_one x₀)) x₀
-          report called
-        = decisionReport (Kernel.const _ (founderEventLaw source 1 zero_le_one le_rfl x₀)) x₀
-          report called
+    (∀ (deme : Deme) (hap : FullHaplotype Locus Allele),
+      ∫ y, (stateLaw y deme).mass hap ∂(founderEventLaw source 0 le_rfl zero_le_one x₀)
+        = ∫ y, (stateLaw y deme).mass hap ∂(founderEventLaw source 1 zero_le_one le_rfl x₀))
       ∧ ∫ y, (ruleConfusion ((stateLaw y source).pushforward report) called).precision
           ∂(Kernel.const (FrequencyState Deme Locus Allele)
             (founderEventLaw source 0 le_rfl zero_le_one x₀) x₀)
         ≠ ∫ y, (ruleConfusion ((stateLaw y source).pushforward report) called).precision
           ∂(Kernel.const (FrequencyState Deme Locus Allele)
             (founderEventLaw source 1 zero_le_one le_rfl x₀) x₀) := by
-  have hagree := polynomialsAgreeAt_one_founderEventLaw source x₀
-  refine ⟨hagree, decisionReport_eq_of_polynomialsAgreeAt_one hagree report called, ?_⟩
-  rw [(integral_recallRate_precision _ x₀ source report called).2,
-    (integral_recallRate_precision _ x₀ source report called).2]
-  exact expectedPositiveQuotient_founderEventLaw_ne source x₀ report called (true, false)
-    (by decide) hpositive hcalled
+  refine ⟨fun deme hap ↦ ?_, ?_⟩
+  · rw [integral_mass_founderEventLaw, integral_mass_founderEventLaw]
+  · rw [(integral_recallRate_precision _ x₀ source report called).2,
+      (integral_recallRate_precision _ x₀ source report called).2]
+    exact expectedPositiveQuotient_founderEventLaw_ne source x₀ report called (true, false)
+      (by decide) hpositive hcalled
 
 end
 
