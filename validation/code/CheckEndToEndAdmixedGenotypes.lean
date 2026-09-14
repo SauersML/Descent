@@ -1,0 +1,44 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.EndToEndAdmixedGenotypes
+
+/-! Axiom audit of EndToEndAdmixedGenotypes. -/
+
+open Descent.Portability.EndToEndAdmixedGenotypes
+
+#print axioms expectation_admixedMating
+#print axioms expectation_admixedMating_self
+#print axioms expectation_admixedMating_gametes
+#print axioms expectation_admixedMating_cross
+#print axioms expectation_admixedMating_diploidSum
+#print axioms expectation_admixedMating_diploidSum_mul
+#print axioms covariance_admixedMating_diploidSum
+#print axioms variance_admixedMating_diploidSum
+#print axioms squaredCorrelation_admixedMating_diploidSum
+#print axioms calibrationSlope_admixedMating_diploidSum
+#print axioms expectation_cohortMating
+#print axioms covariance_cohortMating_diploidSum
+#print axioms polynomialFunction_admixedMeanPolynomial
+#print axioms polynomialFunction_admixedCovariancePolynomial
+#print axioms polynomialFunction_admixedNumeratorPolynomial
+#print axioms polynomialFunction_admixedDenominatorPolynomial
+#print axioms totalDegree_admixedMeanPolynomial_le
+#print axioms totalDegree_admixedCovariancePolynomial_le
+#print axioms totalDegree_admixedNumeratorPolynomial_le
+#print axioms totalDegree_admixedDenominatorPolynomial_le
+#print axioms integral_admixedMean_historyEventKernel
+#print axioms integral_admixedCovariance_historyEventKernel
+#print axioms integral_admixedVariance_historyEventKernel
+#print axioms integral_admixedNumerator_historyEventKernel
+#print axioms integral_admixedDenominator_historyEventKernel
+#print axioms expectedAdmixedPortability_eq_haploidSource
+#print axioms expectedAdmixedPortability_historyEventKernel
+#print axioms expectedAdmixedPortability_rateHistoryKernel
+#print axioms expectedAdmixedPortability_eq_of_moments_eq
+#print axioms expectedAdmixedCalibrationSlope_historyEventKernel
+#print axioms expectedAdmixedCalibrationPortability_historyEventKernel
+#print axioms polynomialFunction_cohortCovariancePolynomial
+#print axioms polynomialFunction_cohortVariance
+#print axioms totalDegree_cohortCovariancePolynomial_le
+#print axioms expectedCohortCalibrationSlope_historyEventKernel
