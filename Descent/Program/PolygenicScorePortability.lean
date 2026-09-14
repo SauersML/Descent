@@ -22,6 +22,7 @@ import Descent.Portability.EndToEndBrierLaw
 import Descent.Portability.EndToEndDeploymentLaw
 import Descent.Portability.PortabilityMomentLadder
 import Descent.Portability.PortabilityMomentLadderSharpness
+import Descent.Portability.PortabilityMomentLadderDeployment
 import Descent.Portability.EndToEndDiploidLaw
 import Descent.Portability.EndToEndDiploidHistoryLaw
 import Descent.Portability.EndToEndGWASTrainingLaw
@@ -187,6 +188,13 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
     calibration slope of a varying score from one to zero
     (`PortabilityMomentLadderSharpness.integral_mass_founderEventLaw`,
     `expectedFrequencies_eq_and_calibrationSlope_ne`).
+  * The calculator reads the same ladder.  Agreement up to degree two fixes the expected
+    deployment moments of every deme, so every ridge-trained score has one deployed `R²`, slope,
+    intercept and error under two process laws that agree there, an event history and a rate
+    history included, and one rung, budget four, fixes both reports
+    (`PortabilityMomentLadderDeployment.expectedDemeMoments_eq_of_polynomialsAgreeAt_two`,
+    `transferReport_eq_of_polynomialsAgreeAt_two`, `transferReport_historyEvent_eq_rateHistory`,
+    `reports_eq_of_polynomialsAgreeAt_four`).
 
 ## 3. The individual: ploidy
 
