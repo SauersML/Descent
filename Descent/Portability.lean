@@ -779,6 +779,8 @@ import Descent.Portability.EndToEndDecisionCertificates
 import Descent.Portability.EndToEndDiploidCalibration
 import Descent.Portability.MigrationPortabilityRemainder
 import Descent.Portability.PolygenicSelectionHistory
+import Descent.Portability.EndToEndSensitivityDecision
+import Descent.Portability.EndToEndCalibrationErrorNonclosure
 
 assert_below Descent.Program
 
