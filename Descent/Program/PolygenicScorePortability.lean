@@ -58,6 +58,8 @@ import Descent.Portability.EndToEndDiploidDecision
 import Descent.Portability.EndToEndMultiAncestryGWAS
 import Descent.Portability.SelectionHistoryVaryingFitness
 import Descent.Portability.EndToEndLDAdjustedTraining
+import Descent.Portability.PortabilityMomentLadderSharpnessFour
+import Descent.Portability.EndToEndCalibrationErrorNonclosureAll
 import Descent.Portability.SelectionMetricsFirstOrder
 import Descent.Portability.PortabilityMomentLadderDecision
 import Descent.Portability.PortabilityMomentLadderEight
@@ -199,6 +201,10 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   and `1/8`
   (`EndToEndCalibrationErrorNonclosure.polynomialsAgreeAt_three_and_expectedCalibrationError_ne`,
   `not_forall_expectedCalibrationError_eq_of_polynomialsAgreeAt_three`).
+  No finite degree does: for every `n` two process laws agree on every frequency polynomial of
+  degree at most `n` and give different expected calibration errors
+  (`EndToEndCalibrationErrorNonclosureAll.polynomialsAgreeAt_and_expectedCalibrationError_ne`,
+  `not_forall_expectedCalibrationError_eq_of_polynomialsAgreeAt`).
 * **Log loss, entropy and mutual information.**  The log loss of the forecast repaired to each
   score group's realized rate is the conditional entropy of the outcome given the score
   (`EndToEndLogLossLaw.expectation_neg_log_repairedGroupForecast`,
@@ -319,6 +325,11 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
     calibration slope of a varying score from one to zero
     (`PortabilityMomentLadderSharpness.integral_mass_founderEventLaw`,
     `expectedFrequencies_eq_and_calibrationSlope_ne`).
+  * Rung four is sharp.  Two process laws on a three-allele locus agree on every frequency
+    polynomial of degree at most three, and squared-correlation portability is `27/35` under one
+    and `1` under the other, so no function of the degree-three moments fixes the report
+    (`PortabilityMomentLadderSharpnessFour.polynomialsAgreeAt_three_and_expectedPortability_ne`,
+    `not_forall_portabilityReport_eq_of_polynomialsAgreeAt_three`).
   * The calculator reads the same ladder.  Agreement up to degree two fixes the expected
     deployment moments of every deme, so every ridge-trained score has one deployed `R²`, slope,
     intercept and error under two process laws that agree there, an event history and a rate
@@ -653,8 +664,8 @@ Scope.
   families: the selected diffusion is not constructed, fitness is haploid, and the first-order
   law with a fitness table per epoch is not stated.
 * The expectation of each population's calibration slope is not a rational function of finitely
-  many moments and is not stated.  The expected calibration error is not fixed at degree three;
-  whether some finite degree fixes it is open.
+  many moments and is not stated.  The nonclosure witnesses for the calibration error are constant
+  kernels, not histories of epochs.
 * The termwise derivative of the expected squared correlation takes a summable bound on the term
   sensitivities as a hypothesis.
 * Environment enters through its moments per deme, supplied as model inputs, not measured
