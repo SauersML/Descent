@@ -302,7 +302,8 @@ theorem norm_approximatingOperator_apply_le {rates : ℝ → NeutralRates Deme L
     (g : C(FrequencyState Deme Locus Allele, ℝ)) :
     ‖approximatingOperator rates ℓ₀ hap₀ hT hintegrable k g‖ ≤ ‖g‖ := by
   rw [approximatingOperator, rateHistoryOperator_apply]
-  exact norm_rateHistoryOperatorValue_le hT _ ℓ₀ hap₀ g
+  exact norm_rateHistoryOperatorValue_le hT
+    (continuousOn_dualGenerator_approximatingRates hT hintegrable k) ℓ₀ hap₀ g
 
 /-- **The approximating operators converge on every continuous observable.**  Their values form a
 Cauchy sequence in sup norm at every continuous observable.
