@@ -463,6 +463,139 @@ theorem hasDerivWithinAt_selectedHistory_firstOrder (model : SelectionModel Deme
   rw [hinitial σ hσ, hinitial' σ hσ] at h
   exact h.trans_eq (by ring)
 
+/-! ## The cross ratio to first order -/
+
+/-- `|a b| ≤ x y` from `|a| ≤ x` and `|b| ≤ y`. -/
+theorem abs_product_le {a b x y : ℝ} (ha : |a| ≤ x) (hb : |b| ≤ y) : |a * b| ≤ x * y := by
+  rw [abs_mul]
+  exact mul_le_mul ha hb (abs_nonneg _) ((abs_nonneg _).trans ha)
+
+/-- **A product to first order.** If `A` and `B` have first-order changes `σ A₁` and `σ B₁` with
+remainders at most `α e₂` and `β e₂`, `σ A₁` is at most `α e₁`, `B` moves by at most `β e₀`, and
+`|A₀| ≤ α`, `|B| ≤ β`, then `A B` has first-order change `σ (A₁ B₀ + A₀ B₁)` with remainder at
+most `α β (2 e₂ + e₀ e₁)`. -/
+theorem abs_mul_sub_firstOrder_le {A B A₀ B₀ A₁ B₁ σ α β e₀ e₁ e₂ : ℝ} (hB : |B| ≤ β)
+    (hA₀ : |A₀| ≤ α) (hΔB : |B - B₀| ≤ β * e₀) (hA₁ : |σ * A₁| ≤ α * e₁)
+    (hρA : |A - A₀ - σ * A₁| ≤ α * e₂) (hρB : |B - B₀ - σ * B₁| ≤ β * e₂) :
+    |A * B - A₀ * B₀ - σ * (A₁ * B₀ + A₀ * B₁)| ≤ α * β * (2 * e₂ + e₀ * e₁) := by
+  have hsplit : A * B - A₀ * B₀ - σ * (A₁ * B₀ + A₀ * B₁)
+      = (A - A₀ - σ * A₁) * B + σ * A₁ * (B - B₀) + A₀ * (B - B₀ - σ * B₁) := by ring
+  rw [hsplit]
+  calc _ ≤ |(A - A₀ - σ * A₁) * B + σ * A₁ * (B - B₀)| + |A₀ * (B - B₀ - σ * B₁)| :=
+        abs_add_le _ _
+    _ ≤ |(A - A₀ - σ * A₁) * B| + |σ * A₁ * (B - B₀)| + |A₀ * (B - B₀ - σ * B₁)| :=
+        add_le_add_right (abs_add_le _ _) _
+    _ ≤ α * e₂ * β + α * e₁ * (β * e₀) + α * (β * e₂) :=
+        add_le_add (add_le_add (abs_product_le hρA hB) (abs_product_le hA₁ hΔB))
+          (abs_product_le hA₀ hρB)
+    _ = α * β * (2 * e₂ + e₀ * e₁) := by ring
+
+/-- **The cross ratio to first order, exactly.** With `N = A B`, `M = C D` and `P₁` the
+cross-ratio derivative at `(A₀, B₀, C₀, D₀)` in the direction `(A₁, B₁, C₁, D₁)`,
+`N/M - N₀/M₀ - σ P₁ = ((N - N₀ - σ N₁) M₀ - N₀ (M - M₀ - σ M₁)) / (M M₀) - σ P₁ (M - M₀) / M`,
+where `N₁ = A₁ B₀ + A₀ B₁` and `M₁ = C₁ D₀ + C₀ D₁`. -/
+theorem crossRatio_sub_firstOrder_eq {A B C D A₀ B₀ C₀ D₀ A₁ B₁ C₁ D₁ σ : ℝ} (hC : C ≠ 0)
+    (hD : D ≠ 0) (hC₀ : C₀ ≠ 0) (hD₀ : D₀ ≠ 0) :
+    A * B / (C * D) - A₀ * B₀ / (C₀ * D₀) - σ * crossRatioDerivative A₀ B₀ C₀ D₀ A₁ B₁ C₁ D₁
+      = ((A * B - A₀ * B₀ - σ * (A₁ * B₀ + A₀ * B₁)) * (C₀ * D₀)
+          - A₀ * B₀ * (C * D - C₀ * D₀ - σ * (C₁ * D₀ + C₀ * D₁))) / (C * D * (C₀ * D₀))
+        - σ * crossRatioDerivative A₀ B₀ C₀ D₀ A₁ B₁ C₁ D₁ * (C * D - C₀ * D₀) / (C * D) := by
+  rw [crossRatioDerivative]
+  field_simp
+  ring
+
+/-- **The cross ratio to first order, with a remainder.** Let the factors `X ∈ {A, B, C, D}` of a
+cross ratio have masses `x ∈ {α, β, γ, κ}`: the neutral values and the selected `B` and `D` are at
+most their masses, the selected changes of `B, C, D` at most `x e₀`, the first-order changes
+`σ X₁` at most `x e₁`, and the remainders `X - X₀ - σ X₁` at most `x e₂`. Where
+`C, D, C₀, D₀ ≥ δ > 0`, the cross ratio has first-order change `σ P₁`, with `P₁` the cross-ratio
+derivative, and remainder at most
+`2 α β γ κ (2 e₂ + e₀ e₁) / δ⁴ + 8 α β γ² κ² e₀ e₁ / δ⁶`. -/
+theorem abs_crossRatio_sub_firstOrder_le
+    {A B C D A₀ B₀ C₀ D₀ A₁ B₁ C₁ D₁ σ α β γ κ e₀ e₁ e₂ δ : ℝ} (hδ : 0 < δ) (hC : δ ≤ C)
+    (hD : δ ≤ D) (hC₀ : δ ≤ C₀) (hD₀ : δ ≤ D₀) (hB : |B| ≤ β) (hDκ : |D| ≤ κ)
+    (hA₀ : |A₀| ≤ α) (hB₀ : |B₀| ≤ β) (hC₀γ : |C₀| ≤ γ) (hD₀κ : |D₀| ≤ κ)
+    (hΔB : |B - B₀| ≤ β * e₀) (hΔC : |C - C₀| ≤ γ * e₀) (hΔD : |D - D₀| ≤ κ * e₀)
+    (hA₁ : |σ * A₁| ≤ α * e₁) (hB₁ : |σ * B₁| ≤ β * e₁) (hC₁ : |σ * C₁| ≤ γ * e₁)
+    (hD₁ : |σ * D₁| ≤ κ * e₁) (hρA : |A - A₀ - σ * A₁| ≤ α * e₂)
+    (hρB : |B - B₀ - σ * B₁| ≤ β * e₂) (hρC : |C - C₀ - σ * C₁| ≤ γ * e₂)
+    (hρD : |D - D₀ - σ * D₁| ≤ κ * e₂) :
+    |A * B / (C * D) - A₀ * B₀ / (C₀ * D₀) - σ * crossRatioDerivative A₀ B₀ C₀ D₀ A₁ B₁ C₁ D₁|
+      ≤ 2 * α * β * γ * κ * (2 * e₂ + e₀ * e₁) / δ ^ 4
+        + 8 * α * β * γ ^ 2 * κ ^ 2 * (e₀ * e₁) / δ ^ 6 := by
+  have hCpos := hδ.trans_le hC
+  have hDpos := hδ.trans_le hD
+  have hC₀pos := hδ.trans_le hC₀
+  have hD₀pos := hδ.trans_le hD₀
+  have hMpos : 0 < C * D := mul_pos hCpos hDpos
+  have hM₀pos : 0 < C₀ * D₀ := mul_pos hC₀pos hD₀pos
+  have hM : δ ^ 2 ≤ C * D := (sq δ).trans_le (mul_le_mul hC hD hδ.le hCpos.le)
+  have hM₀ : δ ^ 2 ≤ C₀ * D₀ := (sq δ).trans_le (mul_le_mul hC₀ hD₀ hδ.le hC₀pos.le)
+  have hsquare : δ ^ 4 ≤ (C₀ * D₀) ^ 2 := by
+    calc δ ^ 4 = δ ^ 2 * δ ^ 2 := by ring
+      _ ≤ (C₀ * D₀) * (C₀ * D₀) := mul_le_mul hM₀ hM₀ (by positivity) hM₀pos.le
+      _ = (C₀ * D₀) ^ 2 := by ring
+  have hden : δ ^ 4 ≤ C * D * (C₀ * D₀) := by
+    calc δ ^ 4 = δ ^ 2 * δ ^ 2 := by ring
+      _ ≤ C * D * (C₀ * D₀) := mul_le_mul hM hM₀ (by positivity) hMpos.le
+  have hΔM : |C * D - C₀ * D₀| ≤ 2 * γ * κ * e₀ := by
+    have hsplit : C * D - C₀ * D₀ = (C - C₀) * D + C₀ * (D - D₀) := by ring
+    rw [hsplit]
+    calc _ ≤ |(C - C₀) * D| + |C₀ * (D - D₀)| := abs_add_le _ _
+      _ ≤ γ * e₀ * κ + γ * (κ * e₀) :=
+          add_le_add (abs_product_le hΔC hDκ) (abs_product_le hC₀γ hΔD)
+      _ = 2 * γ * κ * e₀ := by ring
+  have hP₁ : |σ * crossRatioDerivative A₀ B₀ C₀ D₀ A₁ B₁ C₁ D₁|
+      ≤ 4 * α * β * γ * κ * e₁ / δ ^ 4 := by
+    have hform : σ * crossRatioDerivative A₀ B₀ C₀ D₀ A₁ B₁ C₁ D₁
+        = ((σ * A₁ * B₀ + A₀ * (σ * B₁)) * (C₀ * D₀)
+          - A₀ * B₀ * (σ * C₁ * D₀ + C₀ * (σ * D₁))) / (C₀ * D₀) ^ 2 := by
+      rw [crossRatioDerivative]
+      ring
+    have hN₁ : |σ * A₁ * B₀ + A₀ * (σ * B₁)| ≤ α * e₁ * β + α * (β * e₁) :=
+      (abs_add_le _ _).trans (add_le_add (abs_product_le hA₁ hB₀) (abs_product_le hA₀ hB₁))
+    have hM₁ : |σ * C₁ * D₀ + C₀ * (σ * D₁)| ≤ γ * e₁ * κ + γ * (κ * e₁) :=
+      (abs_add_le _ _).trans (add_le_add (abs_product_le hC₁ hD₀κ) (abs_product_le hC₀γ hD₁))
+    have hnum : |(σ * A₁ * B₀ + A₀ * (σ * B₁)) * (C₀ * D₀)
+        - A₀ * B₀ * (σ * C₁ * D₀ + C₀ * (σ * D₁))| ≤ 4 * α * β * γ * κ * e₁ := by
+      calc _ ≤ |(σ * A₁ * B₀ + A₀ * (σ * B₁)) * (C₀ * D₀)|
+            + |A₀ * B₀ * (σ * C₁ * D₀ + C₀ * (σ * D₁))| := abs_sub _ _
+        _ ≤ (α * e₁ * β + α * (β * e₁)) * (γ * κ) + α * β * (γ * e₁ * κ + γ * (κ * e₁)) :=
+            add_le_add (abs_product_le hN₁ (abs_product_le hC₀γ hD₀κ))
+              (abs_product_le (abs_product_le hA₀ hB₀) hM₁)
+        _ = 4 * α * β * γ * κ * e₁ := by ring
+    rw [hform, abs_div, abs_of_pos (pow_pos hM₀pos 2),
+      div_le_div_iff₀ (pow_pos hM₀pos 2) (pow_pos hδ 4)]
+    exact mul_le_mul hnum hsquare (by positivity) ((abs_nonneg _).trans hnum)
+  have hT1 : |((A * B - A₀ * B₀ - σ * (A₁ * B₀ + A₀ * B₁)) * (C₀ * D₀)
+        - A₀ * B₀ * (C * D - C₀ * D₀ - σ * (C₁ * D₀ + C₀ * D₁))) / (C * D * (C₀ * D₀))|
+      ≤ 2 * α * β * γ * κ * (2 * e₂ + e₀ * e₁) / δ ^ 4 := by
+    have hnum : |(A * B - A₀ * B₀ - σ * (A₁ * B₀ + A₀ * B₁)) * (C₀ * D₀)
+        - A₀ * B₀ * (C * D - C₀ * D₀ - σ * (C₁ * D₀ + C₀ * D₁))|
+        ≤ 2 * α * β * γ * κ * (2 * e₂ + e₀ * e₁) := by
+      calc _ ≤ |(A * B - A₀ * B₀ - σ * (A₁ * B₀ + A₀ * B₁)) * (C₀ * D₀)|
+            + |A₀ * B₀ * (C * D - C₀ * D₀ - σ * (C₁ * D₀ + C₀ * D₁))| := abs_sub _ _
+        _ ≤ α * β * (2 * e₂ + e₀ * e₁) * (γ * κ) + α * β * (γ * κ * (2 * e₂ + e₀ * e₁)) :=
+            add_le_add
+              (abs_product_le (abs_mul_sub_firstOrder_le hB hA₀ hΔB hA₁ hρA hρB)
+                (abs_product_le hC₀γ hD₀κ))
+              (abs_product_le (abs_product_le hA₀ hB₀)
+                (abs_mul_sub_firstOrder_le hDκ hC₀γ hΔD hC₁ hρC hρD))
+        _ = 2 * α * β * γ * κ * (2 * e₂ + e₀ * e₁) := by ring
+    rw [abs_div, abs_of_pos (mul_pos hMpos hM₀pos),
+      div_le_div_iff₀ (mul_pos hMpos hM₀pos) (pow_pos hδ 4)]
+    exact mul_le_mul hnum hden (by positivity) ((abs_nonneg _).trans hnum)
+  have hT2 : |σ * crossRatioDerivative A₀ B₀ C₀ D₀ A₁ B₁ C₁ D₁ * (C * D - C₀ * D₀) / (C * D)|
+      ≤ 8 * α * β * γ ^ 2 * κ ^ 2 * (e₀ * e₁) / δ ^ 6 := by
+    have hprod := abs_product_le hP₁ hΔM
+    rw [abs_div, abs_of_pos hMpos]
+    calc _ ≤ 4 * α * β * γ * κ * e₁ / δ ^ 4 * (2 * γ * κ * e₀) / δ ^ 2 := by
+          rw [div_le_div_iff₀ hMpos (pow_pos hδ 2)]
+          exact mul_le_mul hprod hM (by positivity) ((abs_nonneg _).trans hprod)
+      _ = 8 * α * β * γ ^ 2 * κ ^ 2 * (e₀ * e₁) / δ ^ 6 := by ring
+  rw [crossRatio_sub_firstOrder_eq hCpos.ne' hDpos.ne' hC₀pos.ne' hD₀pos.ne']
+  exact (abs_sub _ _).trans (add_le_add hT1 hT2)
+
 end
 
 end Descent.Portability.SelectionHistoryFirstOrder
