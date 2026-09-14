@@ -51,7 +51,7 @@ The winner's curse.
 * An observable covaries nonnegatively with every monotone function of itself
   (`covariance_monotone_nonneg`), so selecting an upper tail raises the mean
   (`expectation_mul_le_expectation_upperTail`).
-* In magnitude the curse holds for every cohort size, threshold and tag:
+* In magnitude the curse holds for every cohort size `n ≥ 2`, threshold and tag:
   `|w_j| P(|ŵ_j| ≥ t) ≤ E|ŵ_j 1{|ŵ_j| ≥ t}|`.  Conditional on selection, the selected estimate is on
   average at least as large as the true effect (`abs_marginalWeights_mul_le_expectation_abs`,
   `abs_marginalWeights_le_conditional`).
