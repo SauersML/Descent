@@ -189,6 +189,520 @@ theorem reportEntropy_pushforward_pushforward {State Report' : Type*} [Fintype S
 
 end ReportEntropy
 
+/-! ## Conditional entropy and the repaired log loss -/
+
+section ScoreOutcome
+
+variable {Score : Type*} [Fintype Score]
+
+/-- **Conditional entropy of the outcome given the score**,
+`H(Y | S) = Σ_s [η(a_s) + η(b_s) - η(q_s)]` for the case mass `a_s`, the control mass `b_s` and the
+group mass `q_s = a_s + b_s`. -/
+def conditionalEntropy (law : FiniteReportLaw (Score × Bool)) : ℝ :=
+  ∑ group, (Real.negMulLog (law.mass (group, true)) + Real.negMulLog (law.mass (group, false))
+    - Real.negMulLog (scoreGroupMass law group))
+
+/-- **Mutual information of score and outcome**, `I(S; Y) = H(Y) - H(Y | S)`, where `H(Y)` is the
+entropy of the outcome marginal. -/
+def mutualInformation (law : FiniteReportLaw (Score × Bool)) : ℝ :=
+  reportEntropy (law.pushforward Prod.snd) - conditionalEntropy law
+
+/-- The score marginal of a score-outcome law puts the group mass `q_s` on each score group. -/
+theorem pushforward_fst_mass [DecidableEq Score] (law : FiniteReportLaw (Score × Bool))
+    (group : Score) : (law.pushforward Prod.fst).mass group = scoreGroupMass law group := by
+  rw [pushforwardMass_eq_expectation, FiniteReportLaw.expectation, Fintype.sum_prod_type,
+    Finset.sum_eq_single group]
+  · simp [Fintype.sum_bool, scoreGroupMass, add_comm]
+  · intro other _ hother
+    simp [hother]
+  · intro hnot
+    exact absurd (Finset.mem_univ group) hnot
+
+/-- **Chain rule.**  The conditional entropy is the joint entropy of score and outcome minus the
+entropy of the score marginal. -/
+theorem conditionalEntropy_eq_reportEntropy_sub [DecidableEq Score]
+    (law : FiniteReportLaw (Score × Bool)) :
+    conditionalEntropy law = reportEntropy law - reportEntropy (law.pushforward Prod.fst) := by
+  simp only [conditionalEntropy, reportEntropy, pushforward_fst_mass, Fintype.sum_prod_type,
+    Fintype.sum_bool, Finset.sum_sub_distrib, Finset.sum_add_distrib]
+
+/-- **The repaired forecast** of a finite score alphabet: each score group forecasts its own
+realized case rate `a_s / q_s` for a case and its complement for a control. -/
+def repairedGroupForecast (law : FiniteReportLaw (Score × Bool)) : Score × Bool → ℝ
+  | (group, true) => law.mass (group, true) / scoreGroupMass law group
+  | (group, false) => 1 - law.mass (group, true) / scoreGroupMass law group
+
+/-- Every repaired forecast lies in the unit interval. -/
+theorem repairedGroupForecast_mem (law : FiniteReportLaw (Score × Bool)) (cell : Score × Bool) :
+    0 ≤ repairedGroupForecast law cell ∧ repairedGroupForecast law cell ≤ 1 := by
+  have hrate : ∀ group : Score, 0 ≤ law.mass (group, true) / scoreGroupMass law group
+      ∧ law.mass (group, true) / scoreGroupMass law group ≤ 1 := fun group ↦
+    ⟨div_nonneg (law.mass_nonneg (group, true)) (scoreGroupMass_nonneg law group),
+      div_le_one_of_le₀ (caseMass_le_scoreGroupMass law group) (scoreGroupMass_nonneg law group)⟩
+  rcases cell with ⟨group, _ | _⟩
+  · show 0 ≤ 1 - law.mass (group, true) / scoreGroupMass law group
+      ∧ 1 - law.mass (group, true) / scoreGroupMass law group ≤ 1
+    exact ⟨sub_nonneg.mpr (hrate group).2, sub_le_self _ (hrate group).1⟩
+  · exact hrate group
+
+/-- **One score group's repaired log loss is its entropy contribution.**  For masses `a, b ≥ 0`
+with group mass `q = b + a`, `a (-log (a / q)) + b (-log (1 - a / q)) = η(a) + η(b) - η(q)`.  The
+proof splits `η(x) = η(q · (x / q))` by `Real.negMulLog_mul`. -/
+theorem repairedGroupLoss_eq (a b : ℝ) (ha : 0 ≤ a) (hb : 0 ≤ b) :
+    a * -Real.log (a / (b + a)) + b * -Real.log (1 - a / (b + a))
+      = Real.negMulLog a + Real.negMulLog b - Real.negMulLog (b + a) := by
+  rcases (add_nonneg hb ha).eq_or_lt with hq | hq
+  · have hazero : a = 0 := by linarith
+    have hbzero : b = 0 := by linarith
+    subst hazero hbzero
+    simp
+  · have hsplit : ∀ x : ℝ, x * -Real.log (x / (b + a))
+        = Real.negMulLog x - x / (b + a) * Real.negMulLog (b + a) := fun x ↦ by
+      have hmul := Real.negMulLog_mul (b + a) (x / (b + a))
+      rw [mul_div_cancel₀ x hq.ne'] at hmul
+      calc x * -Real.log (x / (b + a))
+          = -((b + a) * (x / (b + a))) * Real.log (x / (b + a)) := by
+            rw [mul_div_cancel₀ x hq.ne']
+            ring
+        _ = (b + a) * Real.negMulLog (x / (b + a)) := by
+            show _ = (b + a) * (-(x / (b + a)) * Real.log (x / (b + a)))
+            ring
+        _ = Real.negMulLog x - x / (b + a) * Real.negMulLog (b + a) := by
+            rw [hmul]
+            ring
+    have hcomplement : 1 - a / (b + a) = b / (b + a) := by
+      rw [eq_div_iff hq.ne', sub_mul, one_mul, div_mul_cancel₀ a hq.ne']
+      ring
+    have hunit : a / (b + a) + b / (b + a) = 1 := by
+      rw [← add_div, add_comm, div_self hq.ne']
+    rw [hcomplement, hsplit a, hsplit b]
+    linear_combination (-Real.negMulLog (b + a)) * hunit
+
+/-- **The repaired log loss is the conditional entropy.**  The expected negative logarithm of the
+repaired forecast of the realized outcome is `Σ_s [η(a_s) + η(b_s) - η(q_s)]`. -/
+theorem expectation_neg_log_repairedGroupForecast (law : FiniteReportLaw (Score × Bool)) :
+    law.expectation (fun cell ↦ -Real.log (repairedGroupForecast law cell))
+      = conditionalEntropy law := by
+  rw [FiniteReportLaw.expectation, Fintype.sum_prod_type, conditionalEntropy]
+  refine Finset.sum_congr rfl fun group _ ↦ ?_
+  rw [Fintype.sum_bool]
+  exact repairedGroupLoss_eq _ _ (law.mass_nonneg (group, true)) (law.mass_nonneg (group, false))
+
+/-- The conditional entropy is nonnegative. -/
+theorem conditionalEntropy_nonneg (law : FiniteReportLaw (Score × Bool)) :
+    0 ≤ conditionalEntropy law := by
+  rw [← expectation_neg_log_repairedGroupForecast, FiniteReportLaw.expectation]
+  exact Finset.sum_nonneg fun cell _ ↦ mul_nonneg (law.mass_nonneg cell)
+    (neg_nonneg.mpr (Real.log_nonpos (repairedGroupForecast_mem law cell).1
+      (repairedGroupForecast_mem law cell).2))
+
+/-- **The extended log loss is finite when every realized cell is forecast.**  If every outcome of
+positive mass gets a positive forecast and every forecast is at most one, the extended-valued
+expected log loss is the real expectation of `-log` of the forecast.  Outcomes of mass zero are
+reforecast to one, which changes neither side, and the corpus finite branch
+`LogLossSeriesCertificate.expectedLogLoss_eq_ofReal` applies. -/
+theorem expectedLogLoss_eq_ofReal_of_pos {Outcome : Type*} [Fintype Outcome]
+    (law : FiniteReportLaw Outcome) (forecast : Outcome → ℝ)
+    (hpos : ∀ outcome, 0 < law.mass outcome → 0 < forecast outcome)
+    (hle : ∀ outcome, forecast outcome ≤ 1) :
+    LogLossSeriesCertificate.expectedLogLoss law forecast
+      = ENNReal.ofReal (law.expectation fun outcome ↦ -Real.log (forecast outcome)) := by
+  set supported : Outcome → ℝ :=
+    fun outcome ↦ if 0 < law.mass outcome then forecast outcome else 1 with hsupported
+  have hzero : ∀ outcome, ¬ 0 < law.mass outcome → law.mass outcome = 0 := fun outcome hnot ↦
+    le_antisymm (not_lt.mp hnot) (law.mass_nonneg outcome)
+  have hloss : LogLossSeriesCertificate.expectedLogLoss law forecast
+      = LogLossSeriesCertificate.expectedLogLoss law supported := by
+    unfold LogLossSeriesCertificate.expectedLogLoss
+    refine Finset.sum_congr rfl fun outcome _ ↦ ?_
+    by_cases hmass : 0 < law.mass outcome
+    · simp only [hsupported, if_pos hmass]
+    · simp only [hzero outcome hmass, ENNReal.ofReal_zero, zero_mul]
+  have hreal : law.expectation (fun outcome ↦ -Real.log (forecast outcome))
+      = law.expectation (fun outcome ↦ -Real.log (supported outcome)) := by
+    unfold FiniteReportLaw.expectation
+    refine Finset.sum_congr rfl fun outcome _ ↦ ?_
+    by_cases hmass : 0 < law.mass outcome
+    · simp only [hsupported, if_pos hmass]
+    · simp only [hzero outcome hmass, zero_mul]
+  rw [hloss, hreal]
+  refine LogLossSeriesCertificate.expectedLogLoss_eq_ofReal law supported (fun outcome ↦ ?_)
+    (fun outcome ↦ ?_)
+  · by_cases hmass : 0 < law.mass outcome
+    · simp only [hsupported, if_pos hmass]
+      exact hpos outcome hmass
+    · simp only [hsupported, if_neg hmass]
+      exact one_pos
+  · by_cases hmass : 0 < law.mass outcome
+    · simp only [hsupported, if_pos hmass]
+      exact hle outcome
+    · simp only [hsupported, if_neg hmass]
+      exact le_refl 1
+
+/-- **The extended repaired log loss is the conditional entropy**: the corpus extended log loss
+`LogLossSeriesCertificate.expectedLogLoss` read at the repaired forecast is finite and equals
+`H(Y | S)`. -/
+theorem expectedLogLoss_repairedGroupForecast (law : FiniteReportLaw (Score × Bool)) :
+    LogLossSeriesCertificate.expectedLogLoss law (repairedGroupForecast law)
+      = ENNReal.ofReal (conditionalEntropy law) := by
+  rw [← expectation_neg_log_repairedGroupForecast]
+  refine expectedLogLoss_eq_ofReal_of_pos law _ (fun cell hmass ↦ ?_)
+    (fun cell ↦ (repairedGroupForecast_mem law cell).2)
+  rcases cell with ⟨group, _ | _⟩
+  · show 0 < 1 - law.mass (group, true) / scoreGroupMass law group
+    have hgroup : 0 < scoreGroupMass law group :=
+      lt_of_lt_of_le hmass (le_add_of_nonneg_right (law.mass_nonneg (group, true)))
+    rw [sub_pos, div_lt_one hgroup]
+    simp only [scoreGroupMass]
+    linarith
+  · show 0 < law.mass (group, true) / scoreGroupMass law group
+    exact div_pos hmass (lt_of_lt_of_le hmass (caseMass_le_scoreGroupMass law group))
+
+/-- For a binary score the repaired forecast is the corpus
+`UniformPenetranceArchitecture.repairedForecast`. -/
+theorem repairedGroupForecast_eq_repairedForecast (law : FiniteReportLaw (Bool × Bool)) :
+    repairedGroupForecast law = UniformPenetranceArchitecture.repairedForecast law := by
+  funext cell
+  rcases cell with ⟨group, _ | _⟩ <;> rfl
+
+/-- **For a binary score the conditional entropy is the corpus repaired log loss**
+`UniformPenetranceArchitecture.repairedLogLoss`, `Σ_s q_s h(a_s / q_s)` with `h` the binary
+entropy.  Both are the extended log loss of the repaired forecast. -/
+theorem conditionalEntropy_eq_repairedLogLoss (law : FiniteReportLaw (Bool × Bool)) :
+    conditionalEntropy law = UniformPenetranceArchitecture.repairedLogLoss law := by
+  have hextended := expectedLogLoss_repairedGroupForecast law
+  rw [repairedGroupForecast_eq_repairedForecast,
+    UniformPenetranceArchitecture.expectedLogLoss_repairedForecast] at hextended
+  refine ((ENNReal.ofReal_eq_ofReal_iff ?_ (conditionalEntropy_nonneg law)).mp hextended).symm
+  unfold UniformPenetranceArchitecture.repairedLogLoss
+  exact Finset.sum_nonneg fun group _ ↦ mul_nonneg (scoreGroupMass_nonneg law group)
+    (Real.binEntropy_nonneg (div_nonneg (law.mass_nonneg _) (scoreGroupMass_nonneg law group))
+      (div_le_one_of_le₀ (caseMass_le_scoreGroupMass law group) (scoreGroupMass_nonneg law group)))
+
+/-! ## Fixed forecasts and the Gibbs inequality -/
+
+/-- The forecast of the realized outcome by fixed group forecasts `v_s`: `v_s` for a case and
+`1 - v_s` for a control. -/
+def groupForecast (value : Score → ℝ) : Score × Bool → ℝ
+  | (group, true) => value group
+  | (group, false) => 1 - value group
+
+/-- **Log loss of fixed group forecasts**, `Σ_s [a_s (-log v_s) + b_s (-log (1 - v_s))]`, a linear
+functional of the report law. -/
+def forecastLogLoss (law : FiniteReportLaw (Score × Bool)) (value : Score → ℝ) : ℝ :=
+  law.expectation fun cell ↦ -Real.log (groupForecast value cell)
+
+/-- **Fixed forecasts strictly inside the unit interval have finite log loss**: the corpus
+extended log loss read at the group forecasts is `forecastLogLoss`. -/
+theorem expectedLogLoss_groupForecast (law : FiniteReportLaw (Score × Bool)) (value : Score → ℝ)
+    (hpos : ∀ group, 0 < value group) (hlt : ∀ group, value group < 1) :
+    LogLossSeriesCertificate.expectedLogLoss law (groupForecast value)
+      = ENNReal.ofReal (forecastLogLoss law value) := by
+  refine LogLossSeriesCertificate.expectedLogLoss_eq_ofReal law _ (fun cell ↦ ?_)
+    (fun cell ↦ ?_)
+  · rcases cell with ⟨group, _ | _⟩
+    · show 0 < 1 - value group
+      linarith [hlt group]
+    · exact hpos group
+  · rcases cell with ⟨group, _ | _⟩
+    · show 1 - value group ≤ 1
+      linarith [hpos group]
+    · exact (hlt group).le
+
+/-- **A certain forecast against a realized outcome gives infinite log loss.**  A group forecast
+`v_s = 0` on a group of positive case mass, or `v_s = 1` on a group of positive control mass, rules
+out a realized cell, and the corpus infinite branch
+`LogLossSeriesCertificate.expectedLogLoss_eq_top` applies.  Positive group mass alone is not
+enough: `v_s = 0` on a group of controls only is finite. -/
+theorem expectedLogLoss_groupForecast_eq_top (law : FiniteReportLaw (Score × Bool))
+    (value : Score → ℝ) (group : Score)
+    (hcertain : (value group = 0 ∧ 0 < law.mass (group, true))
+      ∨ (value group = 1 ∧ 0 < law.mass (group, false))) :
+    LogLossSeriesCertificate.expectedLogLoss law (groupForecast value) = ⊤ := by
+  rcases hcertain with ⟨hvalue, hmass⟩ | ⟨hvalue, hmass⟩
+  · refine LogLossSeriesCertificate.expectedLogLoss_eq_top law _ (group, true) hmass ?_
+    show ¬ 0 < value group
+    rw [hvalue]
+    exact lt_irrefl 0
+  · refine LogLossSeriesCertificate.expectedLogLoss_eq_top law _ (group, false) hmass ?_
+    show ¬ 0 < 1 - value group
+    rw [hvalue, sub_self]
+    exact lt_irrefl 0
+
+/-- **Gibbs inequality for one cell.**  For a mass `x ≥ 0`, a group mass `q > 0` and a forecast
+`w > 0`, `x (-log (x / q)) + x - q w ≤ x (-log w)`, from `log t ≤ t - 1` at `t = q w / x`. -/
+theorem cellLoss_ge (x q w : ℝ) (hx : 0 ≤ x) (hq : 0 < q) (hw : 0 < w) :
+    x * -Real.log (x / q) + x - q * w ≤ x * -Real.log w := by
+  rcases hx.eq_or_lt with hzero | hpos
+  · subst hzero
+    simp only [zero_mul, zero_add, zero_sub, neg_nonpos]
+    exact (mul_pos hq hw).le
+  · have hkey := mul_le_mul_of_nonneg_left
+      (Real.log_le_sub_one_of_pos (div_pos (mul_pos hq hw) hpos)) hpos.le
+    have hright : x * (q * w / x - 1) = q * w - x := by
+      rw [mul_sub, mul_one, mul_div_cancel₀ _ hpos.ne']
+    have hlog : Real.log (q * w / x) = Real.log q + Real.log w - Real.log x := by
+      rw [Real.log_div (mul_pos hq hw).ne' hpos.ne', Real.log_mul hq.ne' hw.ne']
+    rw [hright, hlog] at hkey
+    rw [Real.log_div hpos.ne' hq.ne']
+    linarith
+
+/-- **Gibbs inequality.**  The log loss of fixed group forecasts strictly inside the unit interval
+is at least the conditional entropy, the log loss of the repaired forecast. -/
+theorem conditionalEntropy_le_forecastLogLoss (law : FiniteReportLaw (Score × Bool))
+    (value : Score → ℝ) (hpos : ∀ group, 0 < value group) (hlt : ∀ group, value group < 1) :
+    conditionalEntropy law ≤ forecastLogLoss law value := by
+  rw [← expectation_neg_log_repairedGroupForecast, forecastLogLoss]
+  simp only [FiniteReportLaw.expectation, Fintype.sum_prod_type]
+  refine Finset.sum_le_sum fun group _ ↦ ?_
+  rw [Fintype.sum_bool, Fintype.sum_bool]
+  show law.mass (group, true) * -Real.log (law.mass (group, true) / scoreGroupMass law group)
+      + law.mass (group, false)
+        * -Real.log (1 - law.mass (group, true) / scoreGroupMass law group)
+    ≤ law.mass (group, true) * -Real.log (value group)
+      + law.mass (group, false) * -Real.log (1 - value group)
+  have hq : scoreGroupMass law group = law.mass (group, false) + law.mass (group, true) := rfl
+  have hcaseMass := law.mass_nonneg (group, true)
+  have hcontrolMass := law.mass_nonneg (group, false)
+  rcases (scoreGroupMass_nonneg law group).eq_or_lt with hzero | hgroup
+  · have hcase : law.mass (group, true) = 0 := by linarith
+    have hcontrol : law.mass (group, false) = 0 := by linarith
+    rw [hcase, hcontrol]
+    simp
+  · have hcomplement : 1 - law.mass (group, true) / scoreGroupMass law group
+        = law.mass (group, false) / scoreGroupMass law group := by
+      rw [eq_div_iff hgroup.ne', sub_mul, one_mul, div_mul_cancel₀ _ hgroup.ne', hq]
+      ring
+    rw [hcomplement]
+    have hcase := cellLoss_ge (law.mass (group, true)) (scoreGroupMass law group) (value group)
+      hcaseMass hgroup (hpos group)
+    have hcontrol := cellLoss_ge (law.mass (group, false)) (scoreGroupMass law group)
+      (1 - value group) hcontrolMass hgroup (by linarith [hlt group])
+    linarith
+
+end ScoreOutcome
+
+/-! ## Entropy terms as population polynomials -/
+
+section PopulationPolynomials
+
+variable {State : Type*} [Fintype State] {Report : Type*} [Fintype Report] [DecidableEq Report]
+
+/-- The order-`k` entropy term polynomial `Σ_r c_r (1 - c_r)ᵏ⁺¹` of a report map, with `c_r` the
+linear cell polynomial of report `r`. -/
+def entropyTermPolynomial (report : State → Report) (order : ℕ) : MvPolynomial State ℝ :=
+  ∑ selected, cellPolynomial report selected * (1 - cellPolynomial report selected) ^ (order + 1)
+
+/-- The entropy term polynomial evaluates to the entropy term of the pushforward law. -/
+theorem eval_entropyTermPolynomial (law : FiniteReportLaw State) (report : State → Report)
+    (order : ℕ) :
+    eval law.mass (entropyTermPolynomial report order)
+      = reportEntropyTerm (law.pushforward report) order := by
+  simp only [entropyTermPolynomial, reportEntropyTerm, map_sum, map_mul, map_pow, map_sub,
+    map_one, eval_cellPolynomial]
+
+/-- The order-`k` entropy term polynomial has total degree at most `k + 2`: a linear cell
+polynomial against `k + 1` powers of its complement. -/
+theorem totalDegree_entropyTermPolynomial_le (report : State → Report) (order : ℕ) :
+    (entropyTermPolynomial report order).totalDegree ≤ order + 2 := by
+  refine (totalDegree_finset_sum _ _).trans (Finset.sup_le fun selected _ ↦ ?_)
+  exact (totalDegree_expansionTerm_le _ _ 1 1 (order + 1) (totalDegree_cellPolynomial_le _ _)
+    (totalDegree_cellPolynomial_le _ _)).trans (by omega)
+
+end PopulationPolynomials
+
+variable {Deme Locus : Type*} {Allele : Locus → Type*}
+variable [Fintype Deme] [DecidableEq Deme] [Fintype Locus] [DecidableEq Locus]
+  [∀ ℓ, Fintype (Allele ℓ)] [∀ ℓ, DecidableEq (Allele ℓ)]
+
+/-! ## The entropy of a report law through a kernel -/
+
+section KernelEntropy
+
+variable {Report : Type*} [Fintype Report] [DecidableEq Report]
+
+/-- **Expected entropy** of the report law of a deme, averaged under a kernel started at `x₀`. -/
+def expectedEntropy
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (report : FullHaplotype Locus Allele → Report) : ℝ :=
+  ∫ y, reportEntropy ((stateLaw y deme).pushforward report) ∂(κ x0)
+
+/-- The entropy of the report law of a deme is a continuous observable of the frequency state. -/
+theorem continuous_reportEntropy (deme : Deme) (report : FullHaplotype Locus Allele → Report) :
+    Continuous fun y : FrequencyState Deme Locus Allele ↦
+      reportEntropy ((stateLaw y deme).pushforward report) := by
+  unfold reportEntropy
+  exact continuous_finset_sum _ fun selected _ ↦
+    Real.continuous_negMulLog.comp (continuous_pushforwardMass deme report selected)
+
+/-- An entropy term of the report law of a deme is a continuous observable of the frequency
+state. -/
+theorem continuous_reportEntropyTerm (deme : Deme) (report : FullHaplotype Locus Allele → Report)
+    (order : ℕ) :
+    Continuous fun y : FrequencyState Deme Locus Allele ↦
+      reportEntropyTerm ((stateLaw y deme).pushforward report) order := by
+  simpa only [eval_entropyTermPolynomial] using
+    continuous_eval_stateLaw deme (entropyTermPolynomial report order)
+
+/-- **The entropy truncation certificate under a kernel.**  Truncating the series after `terms`
+terms gives the expected entropy of a deme's report law from below, within
+`|Report| / (terms + 1)`. -/
+theorem expectedEntropy_sub_truncation_mem
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    [IsMarkovKernel κ] (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (report : FullHaplotype Locus Allele → Report) (terms : ℕ) :
+    0 ≤ expectedEntropy κ x0 deme report - ∑ order ∈ Finset.range terms,
+        (∫ y, reportEntropyTerm ((stateLaw y deme).pushforward report) order ∂(κ x0))
+          / ((order : ℝ) + 1)
+    ∧ expectedEntropy κ x0 deme report - ∑ order ∈ Finset.range terms,
+        (∫ y, reportEntropyTerm ((stateLaw y deme).pushforward report) order ∂(κ x0))
+          / ((order : ℝ) + 1)
+      ≤ (Fintype.card Report : ℝ) / ((terms : ℝ) + 1) := by
+  have hentropy := integrable_continuousObservable κ x0 (continuous_reportEntropy deme report)
+  have hterm : ∀ order : ℕ, Integrable (fun y ↦
+      reportEntropyTerm ((stateLaw y deme).pushforward report) order / ((order : ℝ) + 1))
+      (κ x0) := fun order ↦
+    integrable_continuousObservable κ x0
+      ((continuous_reportEntropyTerm deme report order).div_const _)
+  have hgap : Integrable (fun y ↦ reportEntropy ((stateLaw y deme).pushforward report)
+      - ∑ order ∈ Finset.range terms,
+        reportEntropyTerm ((stateLaw y deme).pushforward report) order / ((order : ℝ) + 1))
+      (κ x0) :=
+    hentropy.sub (integrable_finset_sum _ fun order _ ↦ hterm order)
+  have hinside : expectedEntropy κ x0 deme report - ∑ order ∈ Finset.range terms,
+        (∫ y, reportEntropyTerm ((stateLaw y deme).pushforward report) order ∂(κ x0))
+          / ((order : ℝ) + 1)
+      = ∫ y, (reportEntropy ((stateLaw y deme).pushforward report)
+        - ∑ order ∈ Finset.range terms,
+          reportEntropyTerm ((stateLaw y deme).pushforward report) order / ((order : ℝ) + 1))
+        ∂(κ x0) := by
+    rw [expectedEntropy, integral_sub hentropy (integrable_finset_sum _ fun order _ ↦ hterm order),
+      integral_finset_sum _ fun order _ ↦ hterm order]
+    simp only [integral_div]
+  rw [hinside]
+  refine ⟨integral_nonneg fun y ↦
+    (reportEntropy_sub_truncation_mem ((stateLaw y deme).pushforward report) terms).1, ?_⟩
+  calc ∫ y, (reportEntropy ((stateLaw y deme).pushforward report)
+        - ∑ order ∈ Finset.range terms,
+          reportEntropyTerm ((stateLaw y deme).pushforward report) order / ((order : ℝ) + 1))
+        ∂(κ x0)
+      ≤ ∫ _y, (Fintype.card Report : ℝ) / ((terms : ℝ) + 1) ∂(κ x0) :=
+        integral_mono hgap (integrable_const _) fun y ↦
+          (reportEntropy_sub_truncation_mem ((stateLaw y deme).pushforward report) terms).2
+    _ = (Fintype.card Report : ℝ) / ((terms : ℝ) + 1) := by
+        rw [integral_const, measureReal_univ_eq_one, one_smul]
+
+/-- **The expected entropy as a series.**  Under every Markov kernel the expected entropy of the
+report law of a deme is the series of the expected entropy terms divided by `k + 1`.  The terms
+are nonnegative and the truncation certificate squeezes the partial sums, so no interchange of
+integral and series is needed beyond finite sums. -/
+theorem hasSum_expectedEntropy
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    [IsMarkovKernel κ] (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (report : FullHaplotype Locus Allele → Report) :
+    HasSum (fun order : ℕ ↦
+        (∫ y, reportEntropyTerm ((stateLaw y deme).pushforward report) order ∂(κ x0))
+          / ((order : ℝ) + 1))
+      (expectedEntropy κ x0 deme report) := by
+  have hnonneg : ∀ order : ℕ, 0 ≤
+      (∫ y, reportEntropyTerm ((stateLaw y deme).pushforward report) order ∂(κ x0))
+        / ((order : ℝ) + 1) := fun order ↦
+    div_nonneg (integral_nonneg fun y ↦ reportEntropyTerm_nonneg _ order) (by positivity)
+  rw [hasSum_iff_tendsto_nat_of_nonneg hnonneg]
+  have hconst : Tendsto (fun _ : ℕ ↦ expectedEntropy κ x0 deme report) atTop
+      (𝓝 (expectedEntropy κ x0 deme report)) := tendsto_const_nhds
+  have hscaled : Tendsto (fun terms : ℕ ↦ (Fintype.card Report : ℝ) * (1 / ((terms : ℝ) + 1)))
+      atTop (𝓝 ((Fintype.card Report : ℝ) * 0)) :=
+    tendsto_one_div_add_atTop_nhds_zero_nat.const_mul _
+  have hlower := hconst.sub hscaled
+  simp only [mul_one_div, mul_zero, sub_zero] at hlower
+  refine tendsto_of_tendsto_of_tendsto_of_le_of_le hlower hconst (fun terms ↦ ?_) (fun terms ↦ ?_)
+  · have hupper := (expectedEntropy_sub_truncation_mem κ x0 deme report terms).2
+    have hgoal : expectedEntropy κ x0 deme report - (Fintype.card Report : ℝ) / ((terms : ℝ) + 1)
+        ≤ ∑ order ∈ Finset.range terms,
+          (∫ y, reportEntropyTerm ((stateLaw y deme).pushforward report) order ∂(κ x0))
+            / ((order : ℝ) + 1) := by
+      linarith
+    exact hgoal
+  · have hbelow := (expectedEntropy_sub_truncation_mem κ x0 deme report terms).1
+    have hgoal : ∑ order ∈ Finset.range terms,
+          (∫ y, reportEntropyTerm ((stateLaw y deme).pushforward report) order ∂(κ x0))
+            / ((order : ℝ) + 1)
+        ≤ expectedEntropy κ x0 deme report := by
+      linarith
+    exact hgoal
+
+/-- **The expected entropy through the propagated moments.**  The expected entropy of the report
+law of a deme is the series over `k` of the coefficient vectors of the order-`k` entropy term
+polynomial dotted with the budget-`(k + 2)` propagated moments, divided by `k + 1`.
+
+Assumes: `∀ n, HasDualMoments κ n (M n)`. -/
+theorem expectedEntropy_eq_tsum_dotProduct (ℓ₀ : Locus)
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    [IsMarkovKernel κ] (M : ∀ n : ℕ, BudgetMatrix Deme Locus Allele n)
+    (hmoment : ∀ n : ℕ, HasDualMoments κ n (M n)) (x0 : FrequencyState Deme Locus Allele)
+    (deme : Deme) (report : FullHaplotype Locus Allele → Report) :
+    expectedEntropy κ x0 deme report
+      = ∑' order : ℕ, (budgetCoefficients ℓ₀ (fun _ ↦ order + 2)
+          (demePolynomial deme (entropyTermPolynomial report order))
+        ⬝ᵥ (M (order + 2) *ᵥ budgetMomentFeature (fun _ ↦ order + 2) x0)) / ((order : ℝ) + 1) := by
+  rw [← (hasSum_expectedEntropy κ x0 deme report).tsum_eq]
+  refine tsum_congr fun order ↦ ?_
+  rw [← integral_eval_stateLaw_eq_dotProduct ℓ₀ (order + 2) κ (M (order + 2))
+    (hmoment (order + 2)) deme _ (totalDegree_entropyTermPolynomial_le report order) x0]
+  simp only [eval_entropyTermPolynomial]
+
+/-- **The expected entropy along a history of epochs, splits and pulses.** -/
+theorem expectedEntropy_historyEventKernel (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele)
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (report : FullHaplotype Locus Allele → Report) :
+    expectedEntropy (historyEventKernel ℓ₀ hap₀ events) x0 deme report
+      = ∑' order : ℕ, (budgetCoefficients ℓ₀ (fun _ ↦ order + 2)
+          (demePolynomial deme (entropyTermPolynomial report order))
+        ⬝ᵥ (historyEventPropagator (fun _ ↦ order + 2) events
+          *ᵥ budgetMomentFeature (fun _ ↦ order + 2) x0)) / ((order : ℝ) + 1) := by
+  haveI := isMarkovKernel_historyEventKernel ℓ₀ hap₀ events
+  exact expectedEntropy_eq_tsum_dotProduct ℓ₀ (historyEventKernel ℓ₀ hap₀ events)
+    (fun n ↦ historyEventPropagator (fun _ ↦ n) events)
+    (hasDualMoments_historyEventKernel ℓ₀ hap₀ events) x0 deme report
+
+/-- **The expected entropy along a time-varying rate history.** -/
+theorem expectedEntropy_rateHistoryKernel {rates : ℝ → NeutralRates Deme Locus Allele} {T : ℝ}
+    (hT : 0 ≤ T) (hcontinuous : ∀ capacity : Locus → ℕ,
+      ContinuousOn (fun t ↦ dualGenerator (rates t) capacity) (Set.Icc 0 T))
+    (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele) (x0 : FrequencyState Deme Locus Allele)
+    (deme : Deme) (report : FullHaplotype Locus Allele → Report) :
+    expectedEntropy (rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous) x0 deme report
+      = ∑' order : ℕ, (budgetCoefficients ℓ₀ (fun _ ↦ order + 2)
+          (demePolynomial deme (entropyTermPolynomial report order))
+        ⬝ᵥ (rateHistoryDualPropagator rates (fun _ ↦ order + 2) T
+          *ᵥ budgetMomentFeature (fun _ ↦ order + 2) x0)) / ((order : ℝ) + 1) := by
+  haveI := isMarkovKernel_rateHistoryKernel hT hcontinuous ℓ₀ hap₀
+  exact expectedEntropy_eq_tsum_dotProduct ℓ₀ (rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous)
+    (fun n ↦ rateHistoryDualPropagator rates (fun _ ↦ n) T)
+    (hasDualMoments_rateHistoryKernel hT hcontinuous ℓ₀ hap₀) x0 deme report
+
+/-- **The expected entropy sees a history only through its propagated moments.**  Two histories,
+from two initial states, whose propagated moments agree at every budget `k + 2` have equal
+expected entropy for every report map. -/
+theorem expectedEntropy_eq_of_moments_eq (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele)
+    {first second : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme)}
+    {x₁ x₂ : FrequencyState Deme Locus Allele}
+    (hmoments : ∀ order : ℕ,
+      historyEventPropagator (fun _ ↦ order + 2) first
+          *ᵥ budgetMomentFeature (fun _ ↦ order + 2) x₁
+        = historyEventPropagator (fun _ ↦ order + 2) second
+          *ᵥ budgetMomentFeature (fun _ ↦ order + 2) x₂)
+    (deme : Deme) (report : FullHaplotype Locus Allele → Report) :
+    expectedEntropy (historyEventKernel ℓ₀ hap₀ first) x₁ deme report
+      = expectedEntropy (historyEventKernel ℓ₀ hap₀ second) x₂ deme report := by
+  rw [expectedEntropy_historyEventKernel, expectedEntropy_historyEventKernel]
+  exact tsum_congr fun order ↦ by rw [hmoments order]
+
+end KernelEntropy
+
 end
 
 end Descent.Portability.EndToEndLogLossLaw
