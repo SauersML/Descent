@@ -54,7 +54,9 @@ table, a rational function of the budget-1 propagated moments, and so is its tar
 portability (`expectedMetricPortability`, `expectedMetricPortability_eq_momentConfusion`,
 `expectedMetricPortability_historyEventKernel`, `expectedMetricPortability_rateHistoryKernel`).
 Two histories agreeing at any budget `n ≥ 1` have equal portability of every such metric
-(`expectedMetricPortability_eq_of_moments_eq`, `decisionMetricPortabilities_eq_of_moments_eq`).
+(`expectedMetricPortability_eq_of_moments_eq`).  In particular the budget-2 agreement that fixes
+AUC portability already fixes the portability of every threshold metric
+(`expectedAUCPortability_and_expectedMetricPortability_eq_of_moments_eq`).
 
 Expected sensitivity and predictive value.  The expected per-population recall `E[TP / p]` and
 precision `E[TP / (TP + FP)]`, read by Lean as zero at a vanishing denominator, are expected
@@ -323,6 +325,438 @@ theorem integral_boundedQuotient_eq_tsum {Ω : Type*} [MeasurableSpace Ω] (μ :
       · rw [if_pos hpos]
   rw [hquotient]
   exact integral_ratioOnDefined_eq_tsum μ num den hnumMeasurable hdenMeasurable hnum hle hden
+
+variable {Deme Locus : Type*} {Allele : Locus → Type*}
+variable [Fintype Deme] [DecidableEq Deme] [Fintype Locus] [DecidableEq Locus]
+  [∀ ℓ, Fintype (Allele ℓ)] [∀ ℓ, DecidableEq (Allele ℓ)]
+variable {Score : Type*} [Fintype Score]
+
+/-! ## The expected confusion table -/
+
+/-- **Expected confusion table**: the expected mass of each cell of the confusion report law of a
+rule in a deme, under a kernel started at `x₀`. -/
+def expectedConfusion
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool)
+    (cell : Bool × Bool) : ℝ :=
+  ∫ y, ((stateLaw y deme).pushforward (confusionReport report called)).mass cell ∂(κ x0)
+
+/-- **The confusion table of a budget-1 moment vector**: the coefficient vector of every cell
+polynomial of the confusion report, copied into a deme, dotted with the vector. -/
+def momentConfusion (ℓ₀ : Locus) (deme : Deme)
+    (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool)
+    (v : BudgetConfiguration Deme Locus Allele (fun _ ↦ 1) → ℝ) (cell : Bool × Bool) : ℝ :=
+  budgetCoefficients ℓ₀ (fun _ ↦ 1)
+      (demePolynomial deme (cellPolynomial (confusionReport report called) cell)) ⬝ᵥ v
+
+/-- The mass of a cell of the confusion report law of a deme is integrable under every Markov
+kernel. -/
+theorem integrable_confusionMass
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    [IsMarkovKernel κ] (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool)
+    (cell : Bool × Bool) :
+    Integrable
+      (fun y ↦ ((stateLaw y deme).pushforward (confusionReport report called)).mass cell)
+      (κ x0) :=
+  integrable_continuousObservable κ x0
+    (continuous_pushforwardMass deme (confusionReport report called) cell)
+
+/-- **The confusion table through the budget-1 moments.**  Under a Markov kernel with budget-1
+dual moments along `M`, the expected confusion table of every rule in a deme is the moment
+confusion table of the propagated budget-1 moments.
+
+Assumes: `HasDualMoments κ 1 M`. -/
+theorem expectedConfusion_eq_momentConfusion (ℓ₀ : Locus)
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    [IsMarkovKernel κ] (M : BudgetMatrix Deme Locus Allele 1) (hmoment : HasDualMoments κ 1 M)
+    (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool) :
+    expectedConfusion κ x0 deme report called
+      = momentConfusion ℓ₀ deme report called (M *ᵥ budgetMomentFeature (fun _ ↦ 1) x0) := by
+  funext cell
+  simpa only [expectedConfusion, momentConfusion, eval_cellPolynomial] using
+    integral_eval_stateLaw_eq_dotProduct ℓ₀ 1 κ M hmoment deme
+      (cellPolynomial (confusionReport report called) cell) (totalDegree_cellPolynomial_le _ _) x0
+
+/-- **The confusion table along a history of epochs, splits and pulses.** -/
+theorem expectedConfusion_historyEventKernel (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele)
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool) :
+    expectedConfusion (historyEventKernel ℓ₀ hap₀ events) x0 deme report called
+      = momentConfusion ℓ₀ deme report called
+          (historyEventPropagator (fun _ ↦ 1) events *ᵥ budgetMomentFeature (fun _ ↦ 1) x0) := by
+  haveI := isMarkovKernel_historyEventKernel ℓ₀ hap₀ events
+  exact expectedConfusion_eq_momentConfusion ℓ₀ _ _
+    (hasDualMoments_historyEventKernel ℓ₀ hap₀ events 1) x0 deme report called
+
+/-- **The confusion table along a time-varying rate history.** -/
+theorem expectedConfusion_rateHistoryKernel {rates : ℝ → NeutralRates Deme Locus Allele} {T : ℝ}
+    (hT : 0 ≤ T) (hcontinuous : ∀ capacity : Locus → ℕ,
+      ContinuousOn (fun t ↦ dualGenerator (rates t) capacity) (Set.Icc 0 T))
+    (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele) (x0 : FrequencyState Deme Locus Allele)
+    (deme : Deme) (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool) :
+    expectedConfusion (rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous) x0 deme report called
+      = momentConfusion ℓ₀ deme report called
+          (rateHistoryDualPropagator rates (fun _ ↦ 1) T
+            *ᵥ budgetMomentFeature (fun _ ↦ 1) x0) := by
+  haveI := isMarkovKernel_rateHistoryKernel hT hcontinuous ℓ₀ hap₀
+  exact expectedConfusion_eq_momentConfusion ℓ₀ _ _
+    (hasDualMoments_rateHistoryKernel hT hcontinuous ℓ₀ hap₀ 1) x0 deme report called
+
+/-- **The confusion table sees a kernel only through its budget-1 moments.**  Two Markov kernels
+with budget-1 dual moments, from two initial states, whose propagated budget-1 moments agree have
+equal expected confusion tables for every rule, report map and deme.
+
+Assumes: `HasDualMoments κ₁ 1 M₁` and `HasDualMoments κ₂ 1 M₂`. -/
+theorem expectedConfusion_eq_of_moments_eq (ℓ₀ : Locus)
+    {κ₁ κ₂ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele)}
+    [IsMarkovKernel κ₁] [IsMarkovKernel κ₂] {M₁ M₂ : BudgetMatrix Deme Locus Allele 1}
+    (hmoment₁ : HasDualMoments κ₁ 1 M₁) (hmoment₂ : HasDualMoments κ₂ 1 M₂)
+    {x₁ x₂ : FrequencyState Deme Locus Allele}
+    (hmoments : M₁ *ᵥ budgetMomentFeature (fun _ ↦ 1) x₁
+      = M₂ *ᵥ budgetMomentFeature (fun _ ↦ 1) x₂)
+    (deme : Deme) (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool) :
+    expectedConfusion κ₁ x₁ deme report called = expectedConfusion κ₂ x₂ deme report called := by
+  rw [expectedConfusion_eq_momentConfusion ℓ₀ κ₁ M₁ hmoment₁,
+    expectedConfusion_eq_momentConfusion ℓ₀ κ₂ M₂ hmoment₂, hmoments]
+
+/-- **Agreement at any budget fixes the confusion table.**  Two histories of epochs, splits and
+pulses, from two initial states, whose propagated moments agree at a budget `n ≥ 1`, in particular
+at the AUC budget two or at the squared-correlation budget four, have equal expected confusion
+tables. -/
+theorem expectedConfusion_historyEventKernel_eq_of_moments_eq (ℓ₀ : Locus)
+    (hap₀ : FullHaplotype Locus Allele) {n : ℕ} (hn : 1 ≤ n)
+    {first second : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme)}
+    {x₁ x₂ : FrequencyState Deme Locus Allele}
+    (hmoments : historyEventPropagator (fun _ ↦ n) first *ᵥ budgetMomentFeature (fun _ ↦ n) x₁
+      = historyEventPropagator (fun _ ↦ n) second *ᵥ budgetMomentFeature (fun _ ↦ n) x₂)
+    (deme : Deme) (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool) :
+    expectedConfusion (historyEventKernel ℓ₀ hap₀ first) x₁ deme report called
+      = expectedConfusion (historyEventKernel ℓ₀ hap₀ second) x₂ deme report called := by
+  rw [expectedConfusion_historyEventKernel, expectedConfusion_historyEventKernel,
+    historyEventMoments_eq_of_le ℓ₀ hap₀ hn hmoments]
+
+/-- **The expected confusion table is the expected corpus confusion matrix.**  Its cells are the
+expected true positive, false positive, true negative and false negative masses of the rule on
+the report law of the deme. -/
+theorem integral_ruleConfusion
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool) :
+    ∫ y, (ruleConfusion ((stateLaw y deme).pushforward report) called).tp ∂(κ x0)
+        = expectedConfusion κ x0 deme report called (true, true)
+      ∧ ∫ y, (ruleConfusion ((stateLaw y deme).pushforward report) called).fp ∂(κ x0)
+        = expectedConfusion κ x0 deme report called (true, false)
+      ∧ ∫ y, (ruleConfusion ((stateLaw y deme).pushforward report) called).tn ∂(κ x0)
+        = expectedConfusion κ x0 deme report called (false, false)
+      ∧ ∫ y, (ruleConfusion ((stateLaw y deme).pushforward report) called).fn ∂(κ x0)
+        = expectedConfusion κ x0 deme report called (false, true) := by
+  refine ⟨?_, ?_, ?_, ?_⟩ <;>
+    simp only [expectedConfusion, ruleConfusion, calledMass_pushforward, clearedMass_pushforward]
+
+/-- **Prevalence and called fraction through the budget-1 moments.**  The expected prevalence of a
+deme, which is its expected case probability `E[TP + FN]` for every rule, and the expected called
+fraction `E[TP + FP]` of a rule are sums of two cells of the moment confusion table of the
+propagated budget-1 moments.
+
+Assumes: `HasDualMoments κ 1 M`. -/
+theorem integral_prevalence_calledFraction_eq_momentConfusion (ℓ₀ : Locus)
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    [IsMarkovKernel κ] (M : BudgetMatrix Deme Locus Allele 1) (hmoment : HasDualMoments κ 1 M)
+    (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool) :
+    ∫ y, ((stateLaw y deme).pushforward report).binaryCaseMass Prod.snd ∂(κ x0)
+        = momentConfusion ℓ₀ deme report called (M *ᵥ budgetMomentFeature (fun _ ↦ 1) x0)
+            (true, true)
+          + momentConfusion ℓ₀ deme report called (M *ᵥ budgetMomentFeature (fun _ ↦ 1) x0)
+            (false, true)
+      ∧ ∫ y, calledMass ((stateLaw y deme).pushforward report) called true
+          + calledMass ((stateLaw y deme).pushforward report) called false ∂(κ x0)
+        = momentConfusion ℓ₀ deme report called (M *ᵥ budgetMomentFeature (fun _ ↦ 1) x0)
+            (true, true)
+          + momentConfusion ℓ₀ deme report called (M *ᵥ budgetMomentFeature (fun _ ↦ 1) x0)
+            (true, false) := by
+  have hcase : ∀ y : FrequencyState Deme Locus Allele,
+      ((stateLaw y deme).pushforward report).binaryCaseMass Prod.snd
+        = ((stateLaw y deme).pushforward (confusionReport report called)).mass (true, true)
+          + ((stateLaw y deme).pushforward (confusionReport report called)).mass (false, true) :=
+    fun y ↦ by
+      rw [← prevalence_ruleConfusion _ called]
+      simp only [Foundations.ConfusionMatrix.prevalence, ruleConfusion, calledMass_pushforward,
+        clearedMass_pushforward]
+  rw [← expectedConfusion_eq_momentConfusion ℓ₀ κ M hmoment x0 deme report called]
+  simp only [hcase, calledMass_pushforward]
+  rw [integral_add (integrable_confusionMass κ x0 deme report called (true, true))
+      (integrable_confusionMass κ x0 deme report called (false, true)),
+    integral_add (integrable_confusionMass κ x0 deme report called (true, true))
+      (integrable_confusionMass κ x0 deme report called (true, false))]
+  exact ⟨rfl, rfl⟩
+
+/-! ## Net benefit -/
+
+/-- **Expected net benefit** of a rule in a deme at a threshold probability `t`, under a kernel
+started at `x₀`. -/
+def expectedNetBenefit
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool) (t : ℝ) : ℝ :=
+  ∫ y, ruleNetBenefit ((stateLaw y deme).pushforward report) called t ∂(κ x0)
+
+/-- The net benefit of a rule in the report law of a deme is integrable under every Markov
+kernel. -/
+theorem integrable_ruleNetBenefit
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    [IsMarkovKernel κ] (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool) (t : ℝ) :
+    Integrable (fun y ↦ ruleNetBenefit ((stateLaw y deme).pushforward report) called t)
+      (κ x0) := by
+  have hcontinuous : Continuous fun y : FrequencyState Deme Locus Allele ↦
+      ruleNetBenefit ((stateLaw y deme).pushforward report) called t := by
+    simpa only [eval_netBenefitPolynomial] using
+      continuous_eval_stateLaw deme (netBenefitPolynomial report called t)
+  exact integrable_continuousObservable κ x0 hcontinuous
+
+/-- **Net benefit is exact at budget one.**  Under a Markov kernel with budget-1 dual moments
+along `M`, the expected net benefit of a rule in a deme is the coefficient vector of the net
+benefit polynomial dotted with the budget-1 propagated moments.
+
+Assumes: `HasDualMoments κ 1 M`. -/
+theorem expectedNetBenefit_eq_dotProduct (ℓ₀ : Locus)
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    [IsMarkovKernel κ] (M : BudgetMatrix Deme Locus Allele 1) (hmoment : HasDualMoments κ 1 M)
+    (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool) (t : ℝ) :
+    expectedNetBenefit κ x0 deme report called t
+      = budgetCoefficients ℓ₀ (fun _ ↦ 1)
+          (demePolynomial deme (netBenefitPolynomial report called t))
+        ⬝ᵥ (M *ᵥ budgetMomentFeature (fun _ ↦ 1) x0) := by
+  simpa only [expectedNetBenefit, eval_netBenefitPolynomial] using
+    integral_eval_stateLaw_eq_dotProduct ℓ₀ 1 κ M hmoment deme _
+      (totalDegree_netBenefitPolynomial_le report called t) x0
+
+/-- **The expected net benefit along a history of epochs, splits and pulses.** -/
+theorem expectedNetBenefit_historyEventKernel (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele)
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool) (t : ℝ) :
+    expectedNetBenefit (historyEventKernel ℓ₀ hap₀ events) x0 deme report called t
+      = budgetCoefficients ℓ₀ (fun _ ↦ 1)
+          (demePolynomial deme (netBenefitPolynomial report called t))
+        ⬝ᵥ (historyEventPropagator (fun _ ↦ 1) events *ᵥ budgetMomentFeature (fun _ ↦ 1) x0) := by
+  haveI := isMarkovKernel_historyEventKernel ℓ₀ hap₀ events
+  exact expectedNetBenefit_eq_dotProduct ℓ₀ _ _
+    (hasDualMoments_historyEventKernel ℓ₀ hap₀ events 1) x0 deme report called t
+
+/-- **The expected net benefit along a time-varying rate history.** -/
+theorem expectedNetBenefit_rateHistoryKernel {rates : ℝ → NeutralRates Deme Locus Allele} {T : ℝ}
+    (hT : 0 ≤ T) (hcontinuous : ∀ capacity : Locus → ℕ,
+      ContinuousOn (fun t ↦ dualGenerator (rates t) capacity) (Set.Icc 0 T))
+    (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele) (x0 : FrequencyState Deme Locus Allele)
+    (deme : Deme) (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool)
+    (t : ℝ) :
+    expectedNetBenefit (rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous) x0 deme report called t
+      = budgetCoefficients ℓ₀ (fun _ ↦ 1)
+          (demePolynomial deme (netBenefitPolynomial report called t))
+        ⬝ᵥ (rateHistoryDualPropagator rates (fun _ ↦ 1) T
+          *ᵥ budgetMomentFeature (fun _ ↦ 1) x0) := by
+  haveI := isMarkovKernel_rateHistoryKernel hT hcontinuous ℓ₀ hap₀
+  exact expectedNetBenefit_eq_dotProduct ℓ₀ _ _
+    (hasDualMoments_rateHistoryKernel hT hcontinuous ℓ₀ hap₀ 1) x0 deme report called t
+
+/-- **Expectation and ratio-of-expectations net benefit coincide.**  Under every Markov kernel the
+expected net benefit of a rule is the net benefit `E TP - E FP · t / (1 - t)` of the expected
+confusion table. -/
+theorem expectedNetBenefit_eq_expectedConfusion
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    [IsMarkovKernel κ] (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool) (t : ℝ) :
+    expectedNetBenefit κ x0 deme report called t
+      = expectedConfusion κ x0 deme report called (true, true)
+        - expectedConfusion κ x0 deme report called (true, false) * (t / (1 - t)) := by
+  simp only [expectedNetBenefit, ruleNetBenefit, calledMass_pushforward]
+  rw [integral_sub (integrable_confusionMass κ x0 deme report called (true, true))
+      ((integrable_confusionMass κ x0 deme report called (true, false)).mul_const (t / (1 - t))),
+    integral_mul_const]
+  rfl
+
+/-- **The decision-curve baselines.**  Under every Markov kernel the expected net benefit of
+treating no one is zero, and that of treating everyone is `E p - (1 - E p) · t / (1 - t)`, a
+function of the expected case probability `E p` of the deme alone. -/
+theorem expectedNetBenefit_treatNone_treatAll
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    [IsMarkovKernel κ] (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (report : FullHaplotype Locus Allele → Score × Bool) (t : ℝ) :
+    expectedNetBenefit κ x0 deme report (fun _ ↦ false) t = 0
+      ∧ expectedNetBenefit κ x0 deme report (fun _ ↦ true) t
+        = (∫ y, ((stateLaw y deme).pushforward report).binaryCaseMass Prod.snd ∂(κ x0))
+          - (1 - ∫ y, ((stateLaw y deme).pushforward report).binaryCaseMass Prod.snd ∂(κ x0))
+            * (t / (1 - t)) := by
+  have hcontinuous : Continuous fun y : FrequencyState Deme Locus Allele ↦
+      ((stateLaw y deme).pushforward report).binaryCaseMass Prod.snd := by
+    simpa only [FiniteReportLaw.binaryCaseMass, FiniteReportLaw.expectation_pushforward,
+      eval_expectationPolynomial] using continuous_eval_stateLaw deme
+        (expectationPolynomial fun hap ↦ if (report hap).2 then 1 else 0)
+  have hcase := integrable_continuousObservable κ x0 hcontinuous
+  have hcomplement : Integrable (fun y ↦
+      (1 - ((stateLaw y deme).pushforward report).binaryCaseMass Prod.snd) * (t / (1 - t)))
+      (κ x0) :=
+    integrable_continuousObservable κ x0 ((continuous_const.sub hcontinuous).mul continuous_const)
+  refine ⟨by simp only [expectedNetBenefit, ruleNetBenefit_treatNone, integral_zero], ?_⟩
+  simp only [expectedNetBenefit, ruleNetBenefit_treatAll]
+  rw [integral_sub hcase hcomplement, integral_mul_const, integral_sub (integrable_const 1) hcase,
+    integral_const, measureReal_univ_eq_one, one_smul]
+
+/-- **Decision-curve comparisons are budget-1 computations.**  The expected net benefit of a rule
+minus that of treating everyone is the coefficient vector of the difference of the two net benefit
+polynomials dotted with the budget-1 propagated moments.  Against treating no one the comparison
+is `expectedNetBenefit_eq_dotProduct` itself, since that baseline is zero.
+
+Assumes: `HasDualMoments κ 1 M`. -/
+theorem expectedNetBenefit_sub_treatAll_eq_dotProduct (ℓ₀ : Locus)
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    [IsMarkovKernel κ] (M : BudgetMatrix Deme Locus Allele 1) (hmoment : HasDualMoments κ 1 M)
+    (x0 : FrequencyState Deme Locus Allele) (deme : Deme)
+    (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool) (t : ℝ) :
+    expectedNetBenefit κ x0 deme report called t
+        - expectedNetBenefit κ x0 deme report (fun _ ↦ true) t
+      = budgetCoefficients ℓ₀ (fun _ ↦ 1) (demePolynomial deme
+          (netBenefitPolynomial report called t - netBenefitPolynomial report (fun _ ↦ true) t))
+        ⬝ᵥ (M *ᵥ budgetMomentFeature (fun _ ↦ 1) x0) := by
+  have hdegree := (totalDegree_sub (netBenefitPolynomial report called t)
+    (netBenefitPolynomial report (fun _ ↦ true) t)).trans
+      (max_le (totalDegree_netBenefitPolynomial_le report called t)
+        (totalDegree_netBenefitPolynomial_le report (fun _ ↦ true) t))
+  rw [← integral_eval_stateLaw_eq_dotProduct ℓ₀ 1 κ M hmoment deme _ hdegree x0]
+  simp only [map_sub, eval_netBenefitPolynomial]
+  rw [integral_sub (integrable_ruleNetBenefit κ x0 deme report called t)
+    (integrable_ruleNetBenefit κ x0 deme report (fun _ ↦ true) t)]
+  rfl
+
+/-! ## Ratio metrics of the expected confusion table -/
+
+/-- **Metric portability of expectations**: the target-over-source ratio of a metric of the
+expected confusion tables of a rule, under a kernel started at `x₀`.  The metric is any function
+of a confusion table, in particular `tableSensitivity`, `tableSpecificity`, `tablePPV`,
+`tableNPV`, `tableF1`, `tableYouden` or `tableRelativeRisk`. -/
+def expectedMetricPortability
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    (x0 : FrequencyState Deme Locus Allele) (source target : Deme)
+    (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool)
+    (metric : (Bool × Bool → ℝ) → ℝ) : ℝ :=
+  metric (expectedConfusion κ x0 target report called)
+    / metric (expectedConfusion κ x0 source report called)
+
+/-- **Decision-metric portability through the budget-1 moments.**  Under a Markov kernel with
+budget-1 dual moments along `M`, the portability of every metric of the expected confusion table
+is the ratio of that metric at the target and the source moment confusion tables of the
+propagated budget-1 moments.  For sensitivity, specificity, the predictive values, F1, Youden's J
+and the relative risk of the called group it is a rational function of the propagated moments.
+
+Assumes: `HasDualMoments κ 1 M`. -/
+theorem expectedMetricPortability_eq_momentConfusion (ℓ₀ : Locus)
+    (κ : Kernel (FrequencyState Deme Locus Allele) (FrequencyState Deme Locus Allele))
+    [IsMarkovKernel κ] (M : BudgetMatrix Deme Locus Allele 1) (hmoment : HasDualMoments κ 1 M)
+    (x0 : FrequencyState Deme Locus Allele) (source target : Deme)
+    (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool)
+    (metric : (Bool × Bool → ℝ) → ℝ) :
+    expectedMetricPortability κ x0 source target report called metric
+      = metric (momentConfusion ℓ₀ target report called
+          (M *ᵥ budgetMomentFeature (fun _ ↦ 1) x0))
+        / metric (momentConfusion ℓ₀ source report called
+          (M *ᵥ budgetMomentFeature (fun _ ↦ 1) x0)) := by
+  rw [expectedMetricPortability,
+    expectedConfusion_eq_momentConfusion ℓ₀ κ M hmoment x0 target report called,
+    expectedConfusion_eq_momentConfusion ℓ₀ κ M hmoment x0 source report called]
+
+/-- **Decision-metric portability along a history of epochs, splits and pulses.** -/
+theorem expectedMetricPortability_historyEventKernel (ℓ₀ : Locus)
+    (hap₀ : FullHaplotype Locus Allele)
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (x0 : FrequencyState Deme Locus Allele) (source target : Deme)
+    (report : FullHaplotype Locus Allele → Score × Bool) (called : Score → Bool)
+    (metric : (Bool × Bool → ℝ) → ℝ) :
+    expectedMetricPortability (historyEventKernel ℓ₀ hap₀ events) x0 source target report called
+        metric
+      = metric (momentConfusion ℓ₀ target report called
+          (historyEventPropagator (fun _ ↦ 1) events
+            *ᵥ budgetMomentFeature (fun _ ↦ 1) x0))
+        / metric (momentConfusion ℓ₀ source report called
+          (historyEventPropagator (fun _ ↦ 1) events
+            *ᵥ budgetMomentFeature (fun _ ↦ 1) x0)) := by
+  haveI := isMarkovKernel_historyEventKernel ℓ₀ hap₀ events
+  exact expectedMetricPortability_eq_momentConfusion ℓ₀ _ _
+    (hasDualMoments_historyEventKernel ℓ₀ hap₀ events 1) x0 source target report called metric
+
+/-- **Decision-metric portability along a time-varying rate history.** -/
+theorem expectedMetricPortability_rateHistoryKernel
+    {rates : ℝ → NeutralRates Deme Locus Allele} {T : ℝ} (hT : 0 ≤ T)
+    (hcontinuous : ∀ capacity : Locus → ℕ,
+      ContinuousOn (fun t ↦ dualGenerator (rates t) capacity) (Set.Icc 0 T))
+    (ℓ₀ : Locus) (hap₀ : FullHaplotype Locus Allele) (x0 : FrequencyState Deme Locus Allele)
+    (source target : Deme) (report : FullHaplotype Locus Allele → Score × Bool)
+    (called : Score → Bool) (metric : (Bool × Bool → ℝ) → ℝ) :
+    expectedMetricPortability (rateHistoryKernel rates ℓ₀ hap₀ hT hcontinuous) x0 source target
+        report called metric
+      = metric (momentConfusion ℓ₀ target report called
+          (rateHistoryDualPropagator rates (fun _ ↦ 1) T
+            *ᵥ budgetMomentFeature (fun _ ↦ 1) x0))
+        / metric (momentConfusion ℓ₀ source report called
+          (rateHistoryDualPropagator rates (fun _ ↦ 1) T
+            *ᵥ budgetMomentFeature (fun _ ↦ 1) x0)) := by
+  haveI := isMarkovKernel_rateHistoryKernel hT hcontinuous ℓ₀ hap₀
+  exact expectedMetricPortability_eq_momentConfusion ℓ₀ _ _
+    (hasDualMoments_rateHistoryKernel hT hcontinuous ℓ₀ hap₀ 1) x0 source target report called
+      metric
+
+/-- **Decision-metric portability sees the history only through the budget-1 moments.**  Two
+histories of epochs, splits and pulses, from two initial states, whose propagated moments agree at
+a budget `n ≥ 1` have equal portability of every metric of the expected confusion table. -/
+theorem expectedMetricPortability_eq_of_moments_eq (ℓ₀ : Locus)
+    (hap₀ : FullHaplotype Locus Allele) {n : ℕ} (hn : 1 ≤ n)
+    {first second : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme)}
+    {x₁ x₂ : FrequencyState Deme Locus Allele}
+    (hmoments : historyEventPropagator (fun _ ↦ n) first *ᵥ budgetMomentFeature (fun _ ↦ n) x₁
+      = historyEventPropagator (fun _ ↦ n) second *ᵥ budgetMomentFeature (fun _ ↦ n) x₂)
+    (source target : Deme) (report : FullHaplotype Locus Allele → Score × Bool)
+    (called : Score → Bool) (metric : (Bool × Bool → ℝ) → ℝ) :
+    expectedMetricPortability (historyEventKernel ℓ₀ hap₀ first) x₁ source target report called
+        metric
+      = expectedMetricPortability (historyEventKernel ℓ₀ hap₀ second) x₂ source target report
+        called metric := by
+  rw [expectedMetricPortability, expectedMetricPortability,
+    expectedConfusion_historyEventKernel_eq_of_moments_eq ℓ₀ hap₀ hn hmoments target report
+      called,
+    expectedConfusion_historyEventKernel_eq_of_moments_eq ℓ₀ hap₀ hn hmoments source report
+      called]
+
+/-- **The AUC budget already fixes every threshold metric.**  Two histories of epochs, splits and
+pulses whose propagated budget-2 moments agree have equal AUC portability of the score
+`hap ↦ value s` against the outcome `b` of a report map `hap ↦ (s, b)`, and equal portability of
+every metric of the expected confusion table of every rule on the score groups.  No pair of
+histories agrees at the AUC budget and disagrees on sensitivity, specificity, the predictive
+values, F1, Youden's J or the relative risk of the called group. -/
+theorem expectedAUCPortability_and_expectedMetricPortability_eq_of_moments_eq (ℓ₀ : Locus)
+    (hap₀ : FullHaplotype Locus Allele)
+    {first second : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme)}
+    {x₁ x₂ : FrequencyState Deme Locus Allele}
+    (hmoments : historyEventPropagator (fun _ ↦ 2) first *ᵥ budgetMomentFeature (fun _ ↦ 2) x₁
+      = historyEventPropagator (fun _ ↦ 2) second *ᵥ budgetMomentFeature (fun _ ↦ 2) x₂)
+    (source target : Deme) (report : FullHaplotype Locus Allele → Score × Bool)
+    (value : Score → ℝ) (called : Score → Bool) (metric : (Bool × Bool → ℝ) → ℝ) :
+    expectedAUCPortability (historyEventKernel ℓ₀ hap₀ first) x₁ source target
+        (fun hap ↦ value (report hap).1) (fun hap ↦ (report hap).2)
+      = expectedAUCPortability (historyEventKernel ℓ₀ hap₀ second) x₂ source target
+        (fun hap ↦ value (report hap).1) (fun hap ↦ (report hap).2)
+    ∧ expectedMetricPortability (historyEventKernel ℓ₀ hap₀ first) x₁ source target report called
+        metric
+      = expectedMetricPortability (historyEventKernel ℓ₀ hap₀ second) x₂ source target report
+        called metric :=
+  ⟨expectedAUCPortability_eq_of_moments_eq ℓ₀ hap₀ hmoments source target _ _,
+    expectedMetricPortability_eq_of_moments_eq ℓ₀ hap₀ (by norm_num) hmoments source target report
+      called metric⟩
 
 end
 
