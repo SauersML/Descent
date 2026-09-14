@@ -354,6 +354,11 @@ import Descent.Portability.EndToEndAdmixedGenotypes
 import Descent.Portability.CalibrationPortabilityDecay
 import Descent.Portability.AdmixturePortabilityDecay
 import Descent.Portability.PortabilityMomentLadderDispersion
+import Descent.Portability.EndToEndTemporalPortability
+import Descent.Portability.EndToEndDiploidDecision
+import Descent.Portability.EndToEndMultiAncestryGWAS
+import Descent.Portability.SelectionHistoryVaryingFitness
+import Descent.Portability.EndToEndReclassificationLaw
 
 import Descent.Portability.ProbitTrainingLaw
 import Descent.Portability.ScoreMomentLaw
