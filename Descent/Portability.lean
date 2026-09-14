@@ -366,6 +366,7 @@ import Descent.Portability.EndToEndAncestryProportions
 import Descent.Portability.CalibrationPortabilityMigration
 import Descent.Portability.EndToEndAscertainedDecision
 import Descent.Portability.DiploidSelectionHistory
+import Descent.Portability.EndToEndIntegrableRateHistory
 
 import Descent.Portability.ProbitTrainingLaw
 import Descent.Portability.ScoreMomentLaw
