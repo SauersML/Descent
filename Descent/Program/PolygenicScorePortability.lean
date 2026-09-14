@@ -46,6 +46,8 @@ import Descent.Portability.EndToEndGWASThresholdLaw
 import Descent.Portability.TwoTimeRatePropagator
 import Descent.Portability.SelectionHistoryFirstOrder
 import Descent.Portability.PolygenicSelectionHistory
+import Descent.Portability.EndToEndSensitivityDecision
+import Descent.Portability.EndToEndCalibrationErrorNonclosure
 import Descent.Portability.SelectionMetricsFirstOrder
 import Descent.Portability.PortabilityMomentLadderDecision
 import Descent.Portability.PortabilityMomentLadderEight
@@ -182,6 +184,11 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   (`EndToEndBrierLaw.expectedRepairedBrier_historyEventKernel`,
   `expectedRepairedBrier_historyEventKernel_le`,
   `expectedCalibrationError_bounds_historyEventKernel`).
+  Agreement through degree three does not fix the calibration error: two process laws agree on
+  every frequency polynomial of degree at most three and give expected calibration errors `1/4`
+  and `1/8`
+  (`EndToEndCalibrationErrorNonclosure.polynomialsAgreeAt_three_and_expectedCalibrationError_ne`,
+  `not_forall_expectedCalibrationError_eq_of_polynomialsAgreeAt_three`).
 * **Log loss, entropy and mutual information.**  The log loss of the forecast repaired to each
   score group's realized rate is the conditional entropy of the outcome given the score
   (`EndToEndLogLossLaw.expectation_neg_log_repairedGroupForecast`,
@@ -468,6 +475,17 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   differentiated termwise along segment histories
   (`EndToEndSensitivitySeries.summable_integral_seriesTerm`,
   `hasDerivAt_expectedSquaredCorrelation_segmentHistory`).
+* The logarithmic and decision metrics move the same way.  The expected entropy, conditional
+  entropy and mutual information are series of propagated pairings, with termwise derivatives
+  wherever the term sensitivities have a summable bound
+  (`EndToEndSensitivityDecision.hasDerivAt_expectedMutualInformation_segmentHistory`,
+  `hasDerivAt_expectedConditionalEntropy_rateSegment`).  The expected confusion cells,
+  prevalence, called fraction, net benefit and log loss of fixed forecasts are budget-1 pairings
+  with exact derivatives and no hypothesis (`hasDerivAt_expectedConfusion_segmentHistory`,
+  `hasDerivAt_expectedNetBenefit_rateSegment`,
+  `hasDerivAt_expectedForecastLogLoss_segmentHistory`).  Sensitivity, specificity or a
+  predictive value ports worse exactly when the target ratio's relative sensitivity is below the
+  source's (`deriv_expectedMetricPortability_cellRatio_segmentHistory_neg_iff`).
 
 ## 7. Selection
 
@@ -545,8 +563,8 @@ Scope.
   families: the selected diffusion is not constructed, one fitness table covers the whole
   history, and fitness is haploid at one locus.
 * The expectation of each population's calibration slope is not a rational function of finitely
-  many moments and is not stated.  Whether the expected calibration error is finite-moment is
-  open.
+  many moments and is not stated.  The expected calibration error is not fixed at degree three;
+  whether some finite degree fixes it is open.
 * The termwise derivative of the expected squared correlation takes a summable bound on the term
   sensitivities as a hypothesis.
 * Environment enters through its moments per deme, supplied as model inputs, not measured
