@@ -1,0 +1,37 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.EndToEndTemporalPortability
+
+/-! Axiom audit of EndToEndTemporalPortability. -/
+
+open Descent.Portability.EndToEndTemporalPortability
+
+#print axioms temporalCovariancePortability
+#print axioms temporalCalibrationPortability
+#print axioms temporalAccuracyPortability
+#print axioms polynomialFunction_eq_dotProduct_budgetMomentFeature
+#print axioms presentCovariance_eq_dotProduct
+#print axioms presentCalibrationSlope_eq_momentCalibrationSlope
+#print axioms presentCorrelationNumerator_eq_dotProduct
+#print axioms presentCorrelationDenominator_eq_dotProduct
+#print axioms integral_covariance_historyEventKernel_nil
+#print axioms expectedCalibrationSlope_historyEventKernel_nil
+#print axioms temporalCalibrationPortability_eq_div_nil
+#print axioms temporalCovariancePortability_eq_dotProduct
+#print axioms temporalCalibrationPortability_eq_momentCalibrationSlope
+#print axioms temporalAccuracyPortability_eq_dotProduct
+#print axioms temporalCovariancePortability_historyEventKernel
+#print axioms temporalCalibrationPortability_historyEventKernel
+#print axioms temporalAccuracyPortability_historyEventKernel
+#print axioms temporalCovariancePortability_rateHistoryKernel
+#print axioms temporalCalibrationPortability_rateHistoryKernel
+#print axioms temporalAccuracyPortability_rateHistoryKernel
+#print axioms temporalPortability_eq_of_momentsAgreeAt_two
+#print axioms temporalPortability_eq_of_propagator_eq
+#print axioms temporalAccuracyPortability_eq_of_momentsAgreeAt_four
+#print axioms temporalCovariancePortability_eq_one_of_hasDualMoments_one
+#print axioms temporalCalibrationPortability_eq_one_of_hasDualMoments_one
+#print axioms temporalAccuracyPortability_eq_one_of_hasDualMoments_one
+#print axioms hasDualMoments_historyEventKernel_zeroEpoch
+#print axioms temporalPortability_zeroEpoch
