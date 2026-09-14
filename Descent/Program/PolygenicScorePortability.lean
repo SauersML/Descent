@@ -48,6 +48,7 @@ import Descent.Portability.SelectionHistoryFirstOrder
 import Descent.Portability.PolygenicSelectionHistory
 import Descent.Portability.EndToEndSensitivityDecision
 import Descent.Portability.EndToEndCalibrationErrorNonclosure
+import Descent.Portability.EndToEndAdmixedGenotypes
 import Descent.Portability.SelectionMetricsFirstOrder
 import Descent.Portability.PortabilityMomentLadderDecision
 import Descent.Portability.PortabilityMomentLadderEight
@@ -322,6 +323,17 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   `expectedDiploidCalibrationPortability_diploidSum`,
   `expectedDiploidCalibrationIntercept_diploidSum`, `expectedDiploidCalibrationSlope_eq_moment`,
   `diploidProduct_breaks_calibration_transfer`).
+* Admixed individuals keep the same budgets.  An F1 individual carries one gamete from each of two
+  demes; the covariance and variances of additive lifts are sums over the pair, so neither the
+  squared correlation nor the calibration slope is an average of the deme metrics
+  (`EndToEndAdmixedGenotypes.covariance_admixedMating_diploidSum`,
+  `squaredCorrelation_admixedMating_diploidSum`).  Portability from any diploid source to F1
+  crosses does not depend on the source inbreeding and is rational in the budget-4 moments along
+  event and rate histories (`expectedAdmixedPortability_eq_haploidSource`,
+  `expectedAdmixedPortability_historyEventKernel`, `expectedAdmixedPortability_rateHistoryKernel`),
+  and the calibration slope of an admixture cohort, with its between-group covariance term, is
+  rational in the budget-2 moments (`covariance_cohortMating_diploidSum`,
+  `expectedCohortCalibrationSlope_historyEventKernel`).
 
 ## 4. The score: training and ascertainment
 
