@@ -29,19 +29,22 @@ equal moments of degree at most three and mean absolute values `1/4` and `1/8`.
 Agreement through degree three.  At a biallelic state every configuration moment is
 `q^i (1 - q)^j`, with `i` carriers of the allele and `j` of the other
 (`configurationMoment_frequencyLaw`).  The two laws weight every such product with `i + j ≤ 3`
-equally, so their budget-3 moment vectors agree (`momentVector_mixtures_eq`).  Every frequency
-polynomial of total degree at most three is the corpus coefficient vector dotted with that moment
-vector (`eval_eq_budgetCoefficients_dotProduct`), so the two process laws agree on all of them
+equally (`frequencyProducts_mixtures_eq`), so their budget-3 moment vectors agree
+(`momentVector_mixtures_eq`).  Every frequency polynomial of total degree at most three is the
+corpus coefficient vector dotted with that moment vector
+(`eval_eq_budgetCoefficients_dotProduct`), so the two process laws agree on all of them
 (`polynomialsAgreeAt_three`).
 
 The separation.  The expected calibration errors are `1/4` and `1/8`
 (`expectedCalibrationError_firstKernel`, `expectedCalibrationError_secondKernel`), so two Markov
 kernels that agree on every frequency polynomial of degree at most three give different expected
 calibration error (`polynomialsAgreeAt_three_and_expectedCalibrationError_ne`): no function of the
-budget-3 moments determines it (`not_forall_expectedCalibrationError_eq_of_polynomialsAgreeAt_three`).
+budget-3 moments determines it
+(`not_forall_expectedCalibrationError_eq_of_polynomialsAgreeAt_three`).
 
 Contrast.  The repaired Brier loss is a convergent series of polynomial expectations, so agreement
-at every degree fixes it (`PortabilityMomentLadderBrier.expectedRepairedBrier_eq_of_polynomialsAgreeAt_all`).
+at every degree fixes it
+(`PortabilityMomentLadderBrier.expectedRepairedBrier_eq_of_polynomialsAgreeAt_all`).
 The calibration error is an absolute value of a linear residual, not a series of polynomials, and a
 finite rung of the moment ladder does not reach it.
 
@@ -126,13 +129,20 @@ theorem configurationMoment_frequencyLaw (q : ℝ) (hq : 0 ≤ q ∧ q ≤ 1)
     rw [configurationMoment_cons, marginalFrequency_frequencyLaw, ih]
     by_cases hcarrier : τ.allele () = some true
     · rw [if_pos hcarrier,
-        Multiset.countP_cons_of_pos (p := fun τ ↦ τ.allele () = some true) _ hcarrier,
-        Multiset.countP_cons_of_neg (p := fun τ ↦ ¬ τ.allele () = some true) _
-          (not_not.mpr hcarrier)]
+        Multiset.countP_cons_of_pos
+          (p := fun σ : PartialType Unit Unit (fun _ : Unit ↦ Bool) ↦ σ.allele () = some true) _
+          hcarrier,
+        Multiset.countP_cons_of_neg
+          (p := fun σ : PartialType Unit Unit (fun _ : Unit ↦ Bool) ↦ ¬ σ.allele () = some true)
+          _ (not_not.mpr hcarrier)]
       ring
     · rw [if_neg hcarrier,
-        Multiset.countP_cons_of_neg (p := fun τ ↦ τ.allele () = some true) _ hcarrier,
-        Multiset.countP_cons_of_pos (p := fun τ ↦ ¬ τ.allele () = some true) _ hcarrier]
+        Multiset.countP_cons_of_neg
+          (p := fun σ : PartialType Unit Unit (fun _ : Unit ↦ Bool) ↦ σ.allele () = some true) _
+          hcarrier,
+        Multiset.countP_cons_of_pos
+          (p := fun σ : PartialType Unit Unit (fun _ : Unit ↦ Bool) ↦ ¬ σ.allele () = some true)
+          _ hcarrier]
       ring
 
 /-! ## Two laws of the frequency -/
@@ -159,7 +169,8 @@ def firstLaw : Measure BiallelicState :=
 
 /-- The second law: frequency `0`, `1/2` or `1`, with probabilities `1/8`, `3/4`, `1/8`. -/
 def secondLaw : Measure BiallelicState :=
-  ENNReal.ofReal (1 / 8) • Measure.dirac zeroState + ENNReal.ofReal (3 / 4) • Measure.dirac halfState
+  ENNReal.ofReal (1 / 8) • Measure.dirac zeroState
+    + ENNReal.ofReal (3 / 4) • Measure.dirac halfState
     + ENNReal.ofReal (1 / 8) • Measure.dirac oneState
 
 /-- A continuous observable integrates against a weighted point mass to the weighted value. -/
@@ -176,7 +187,8 @@ theorem integrable_smul_dirac (w : ℝ) (s : BiallelicState) {f : BiallelicState
 /-- A continuous observable integrates against the first law to its average at `1/4` and `3/4`. -/
 theorem integral_firstLaw {f : BiallelicState → ℝ} (hf : Continuous f) :
     ∫ y, f y ∂firstLaw = 1 / 2 * f quarterState + 1 / 2 * f threeQuarterState := by
-  rw [firstLaw, integral_add_measure (integrable_smul_dirac _ _ hf) (integrable_smul_dirac _ _ hf),
+  rw [firstLaw,
+    integral_add_measure (integrable_smul_dirac _ _ hf) (integrable_smul_dirac _ _ hf),
     integral_smul_dirac (1 / 2) (by norm_num) _ hf, integral_smul_dirac (1 / 2) (by norm_num) _ hf]
 
 /-- A continuous observable integrates against the second law to its weighted values at `0`,
@@ -195,18 +207,16 @@ theorem integral_secondLaw {f : BiallelicState → ℝ} (hf : Continuous f) :
 /-- The first law is a probability measure. -/
 theorem firstLaw_isProbabilityMeasure : IsProbabilityMeasure firstLaw := by
   refine ⟨?_⟩
-  rw [firstLaw, Measure.add_apply, Measure.smul_apply, Measure.smul_apply, measure_univ,
-    measure_univ, smul_eq_mul, smul_eq_mul, mul_one, mul_one,
-    ← ENNReal.ofReal_add (show (0 : ℝ) ≤ 1 / 2 by norm_num) (show (0 : ℝ) ≤ 1 / 2 by norm_num)]
+  simp only [firstLaw, Measure.add_apply, Measure.smul_apply, measure_univ, smul_eq_mul, mul_one]
+  rw [← ENNReal.ofReal_add (show (0 : ℝ) ≤ 1 / 2 by norm_num)
+    (show (0 : ℝ) ≤ 1 / 2 by norm_num)]
   norm_num
 
 /-- The second law is a probability measure. -/
 theorem secondLaw_isProbabilityMeasure : IsProbabilityMeasure secondLaw := by
   refine ⟨?_⟩
-  rw [secondLaw, Measure.add_apply, Measure.add_apply, Measure.smul_apply, Measure.smul_apply,
-    Measure.smul_apply, measure_univ, measure_univ, measure_univ, smul_eq_mul, smul_eq_mul,
-    smul_eq_mul, mul_one, mul_one, mul_one,
-    ← ENNReal.ofReal_add (show (0 : ℝ) ≤ 1 / 8 by norm_num) (show (0 : ℝ) ≤ 3 / 4 by norm_num),
+  simp only [secondLaw, Measure.add_apply, Measure.smul_apply, measure_univ, smul_eq_mul, mul_one]
+  rw [← ENNReal.ofReal_add (show (0 : ℝ) ≤ 1 / 8 by norm_num) (show (0 : ℝ) ≤ 3 / 4 by norm_num),
     ← ENNReal.ofReal_add (show (0 : ℝ) ≤ 1 / 8 + 3 / 4 by norm_num)
       (show (0 : ℝ) ≤ 1 / 8 by norm_num)]
   norm_num
@@ -233,6 +243,15 @@ theorem isMarkovKernel_secondKernel : IsMarkovKernel secondKernel := by
 
 /-! ## Agreement through degree three -/
 
+/-- **The two laws weight every product `q^i (1 - q)^j` with `i + j ≤ 3` equally.** -/
+theorem frequencyProducts_mixtures_eq {i j : ℕ} (hij : i + j ≤ 3) :
+    1 / 2 * ((1 / 4 : ℝ) ^ i * (1 - 1 / 4) ^ j) + 1 / 2 * ((3 / 4 : ℝ) ^ i * (1 - 3 / 4) ^ j)
+      = 1 / 8 * ((0 : ℝ) ^ i * (1 - 0) ^ j) + 3 / 4 * ((1 / 2 : ℝ) ^ i * (1 - 1 / 2) ^ j)
+        + 1 / 8 * ((1 : ℝ) ^ i * (1 - 1) ^ j) := by
+  have hi : i ≤ 3 := by omega
+  have hj : j ≤ 3 := by omega
+  interval_cases i <;> interval_cases j <;> first | omega | norm_num
+
 /-- **The budget-3 moment vectors of the two laws agree**: both weight every `q^i (1 - q)^j` with
 `i + j ≤ 3` equally. -/
 theorem momentVector_mixtures_eq :
@@ -249,18 +268,13 @@ theorem momentVector_mixtures_eq :
   simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, momentVector, quarterState,
     threeQuarterState, zeroState, halfState, oneState, biallelicState, stateOfLaws,
     eval_momentPolynomial, configurationMoment_frequencyLaw]
-  generalize Multiset.countP (fun τ : PartialType Unit Unit (fun _ : Unit ↦ Bool) ↦
-    τ.allele () = some true) η.1 = i at hsplit ⊢
-  generalize Multiset.countP (fun τ : PartialType Unit Unit (fun _ : Unit ↦ Bool) ↦
-    ¬ τ.allele () = some true) η.1 = j at hsplit ⊢
-  have hi : i ≤ 3 := by omega
-  have hj : j ≤ 3 := by omega
-  interval_cases i <;> interval_cases j <;> first | omega | norm_num
+  exact frequencyProducts_mixtures_eq (by omega)
 
 /-- A frequency polynomial of total degree at most three evaluates at a biallelic state to the
 corpus coefficient vector dotted with the budget-3 moment vector. -/
-theorem eval_eq_budgetCoefficients_dotProduct (p : FrequencyPolynomial Unit Unit fun _ : Unit ↦ Bool)
-    (hp : p.totalDegree ≤ 3) (y : BiallelicState) :
+theorem eval_eq_budgetCoefficients_dotProduct
+    (p : FrequencyPolynomial Unit Unit fun _ : Unit ↦ Bool) (hp : p.totalDegree ≤ 3)
+    (y : BiallelicState) :
     eval y.1 p = budgetCoefficients () (fun _ ↦ 3) p ⬝ᵥ momentVector (fun _ ↦ 3) y :=
   eval_eq_dotProduct () (fun _ ↦ 3) p (withinBudget_of_totalDegree_le () p hp) y
 
@@ -270,11 +284,13 @@ theorem polynomialsAgreeAt_three (x₁ x₂ : BiallelicState) :
   intro p hp
   have hcontinuous : Continuous fun y : BiallelicState ↦ polynomialFunction p y :=
     (polynomialFunction p).continuous
+  have hmixture :=
+    congrArg (budgetCoefficients () (fun _ ↦ 3) p ⬝ᵥ ·) momentVector_mixtures_eq
+  simp only [dotProduct_add, dotProduct_smul, smul_eq_mul] at hmixture
   rw [firstKernel, secondKernel, Kernel.const_apply, Kernel.const_apply,
     integral_firstLaw hcontinuous, integral_secondLaw hcontinuous]
   simp only [polynomialFunction_apply, eval_eq_budgetCoefficients_dotProduct p hp]
-  simp only [← smul_eq_mul, ← dotProduct_smul, ← dotProduct_add]
-  rw [momentVector_mixtures_eq]
+  linarith
 
 /-! ## The separation -/
 

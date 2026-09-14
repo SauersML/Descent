@@ -25,6 +25,7 @@ open Descent.Portability.EndToEndCalibrationErrorNonclosure
 #print axioms secondKernel
 #print axioms isMarkovKernel_firstKernel
 #print axioms isMarkovKernel_secondKernel
+#print axioms frequencyProducts_mixtures_eq
 #print axioms momentVector_mixtures_eq
 #print axioms eval_eq_budgetCoefficients_dotProduct
 #print axioms polynomialsAgreeAt_three
