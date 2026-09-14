@@ -276,6 +276,137 @@ theorem norm_selectedHistory_sub_firstOrder_le (model : SelectionModel Deme Locu
       historyCorrection, epochDuration]
     exact h
 
+/-! ## Linearity in the fitness table -/
+
+/-- The selection model at the same locus with every fitness multiplied by `σ`. -/
+def scaledModel (σ : ℝ) (model : SelectionModel Deme Locus Allele) :
+    SelectionModel Deme Locus Allele where
+  locus := model.locus
+  fitness i b := σ * model.fitness i b
+
+/-- Scaling the fitness table scales the rate of every selection term and keeps its gained and
+lost configurations. -/
+theorem selectionTerms_scaledModel (σ : ℝ) (model : SelectionModel Deme Locus Allele)
+    (ξ : Multiset (PartialType Deme Locus Allele)) :
+    selectionTerms (scaledModel σ model) ξ
+      = (selectionTerms model ξ).map fun term ↦ (σ * term.1, term.2) := by
+  rw [selectionTerms, selectionTerms, Multiset.map_bind]
+  simp only [Multiset.map_map]
+  rfl
+
+/-- **The selection matrix is linear in the fitness table**: scaling every fitness by `σ` scales
+every entry by `σ`. -/
+theorem selectionMatrix_scaledModel (σ : ℝ) (model : SelectionModel Deme Locus Allele)
+    (capacity : Locus → ℕ) (ξ : BudgetConfiguration Deme Locus Allele capacity)
+    (η : BudgetConfiguration Deme Locus Allele (bumpCapacity (scaledModel σ model) capacity)) :
+    selectionMatrix (scaledModel σ model) capacity ξ η
+      = σ * selectionMatrix model capacity ξ η := by
+  simp only [selectionMatrix]
+  rw [selectionTerms_scaledModel, Multiset.map_map, ← Multiset.sum_map_mul_left]
+  refine congrArg Multiset.sum (Multiset.map_congr rfl fun term _ ↦ ?_)
+  simp only [Function.comp_apply]
+  ring
+
+/-- **The first-order correction of an epoch is linear in the fitness table.** -/
+theorem selectionCorrection_scaledModel (rates : NeutralRates Deme Locus Allele) (σ : ℝ)
+    (model : SelectionModel Deme Locus Allele) (capacity : Locus → ℕ)
+    (w : BudgetConfiguration Deme Locus Allele (bumpCapacity model capacity) → ℝ) (d : ℝ) :
+    selectionCorrection rates (scaledModel σ model) capacity w d
+      = σ • selectionCorrection rates model capacity w d := by
+  have hmatrix : ∀ x : BudgetConfiguration Deme Locus Allele (bumpCapacity model capacity) → ℝ,
+      selectionMatrix (scaledModel σ model) capacity *ᵥ x
+        = σ • (selectionMatrix model capacity *ᵥ x) := by
+    intro x
+    funext ξ
+    show ∑ η, selectionMatrix (scaledModel σ model) capacity ξ η * x η
+      = σ * ∑ η, selectionMatrix model capacity ξ η * x η
+    rw [Finset.mul_sum]
+    exact Finset.sum_congr rfl fun η _ ↦ by rw [selectionMatrix_scaledModel, mul_assoc]
+  rw [selectionCorrection, selectionCorrection, ← intervalIntegral.integral_smul]
+  congr 1
+  funext t
+  show matrixExponential (dualGenerator rates capacity) (d - t)
+      *ᵥ (selectionMatrix (scaledModel σ model) capacity
+        *ᵥ (matrixExponential (dualGenerator rates (bumpCapacity model capacity)) t *ᵥ w))
+    = σ • (matrixExponential (dualGenerator rates capacity) (d - t)
+      *ᵥ (selectionMatrix model capacity
+        *ᵥ (matrixExponential (dualGenerator rates (bumpCapacity model capacity)) t *ᵥ w)))
+  rw [hmatrix, Matrix.mulVec_smul]
+
+/-- **The first-order correction of a history is linear in the fitness table.** -/
+theorem historyCorrection_scaledModel (σ : ℝ) (model : SelectionModel Deme Locus Allele)
+    (capacity : Locus → ℕ) :
+    ∀ (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+      (w : BudgetConfiguration Deme Locus Allele (bumpCapacity model capacity) → ℝ),
+      historyCorrection (scaledModel σ model) capacity events w
+        = σ • historyCorrection model capacity events w
+  | [], _ => by simp only [historyCorrection, smul_zero]
+  | Sum.inl epoch :: rest, w => by
+    have hrest := historyCorrection_scaledModel σ model capacity rest
+      (matrixExponential (dualGenerator epoch.1 (bumpCapacity model capacity)) epoch.2 *ᵥ w)
+    have hstage := selectionCorrection_scaledModel epoch.1 σ model capacity w epoch.2
+    show historyEventPropagator capacity rest
+          *ᵥ selectionCorrection epoch.1 (scaledModel σ model) capacity w epoch.2
+        + historyCorrection (scaledModel σ model) capacity rest
+          (matrixExponential (dualGenerator epoch.1 (bumpCapacity model capacity)) epoch.2 *ᵥ w)
+      = σ • (historyEventPropagator capacity rest
+          *ᵥ selectionCorrection epoch.1 model capacity w epoch.2
+        + historyCorrection model capacity rest
+          (matrixExponential (dualGenerator epoch.1 (bumpCapacity model capacity)) epoch.2 *ᵥ w))
+    rw [hstage, hrest, Matrix.mulVec_smul, smul_add]
+  | Sum.inr pulse :: rest, w => by
+    show historyCorrection (scaledModel σ model) capacity rest
+        (pulseKernel pulse (bumpCapacity model capacity) *ᵥ w)
+      = σ • historyCorrection model capacity rest
+        (pulseKernel pulse (bumpCapacity model capacity) *ᵥ w)
+    exact historyCorrection_scaledModel σ model capacity rest _
+
+/-- **Selection strength to first order along a history.** For the fitness table `σ s`, with `s`
+in `[0, 1]` and masses `Σ_b |s_i(b)| ≤ S`, the selected moments at the end of a history equal the
+neutral chronological propagator applied to the initial moments plus `σ` times the correction of
+the history of `s`, up to `B S B' σ² T²` in sup norm.
+
+Assumes: `SelectedOnHistory (scaledModel σ model) capacity family events 0` and
+`SelectedOnHistory (scaledModel σ model) (bumpCapacity model capacity) family events 0`. -/
+theorem norm_scaledHistory_sub_firstOrder_le (model : SelectionModel Deme Locus Allele)
+    {σ S : ℝ} (hσ : 0 ≤ σ) (hS0 : 0 ≤ S)
+    (hfit : ∀ i b, 0 ≤ model.fitness i b ∧ model.fitness i b ≤ 1)
+    (hS : ∀ i, ∑ b, |model.fitness i b| ≤ S) (capacity : Locus → ℕ)
+    (family : ℕ → ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele)))
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (hhistory : SelectedOnHistory (scaledModel σ model) capacity family events 0)
+    (hhistory' : SelectedOnHistory (scaledModel σ model) (bumpCapacity model capacity) family
+      events 0) :
+    ‖expectedMomentVector capacity (family events.length) 0
+        - historyEventPropagator capacity events *ᵥ expectedMomentVector capacity (family 0) 0
+        - σ • historyCorrection model capacity events
+          (expectedMomentVector (bumpCapacity model capacity) (family 0) 0)‖
+      ≤ (∑ ℓ, capacity ℓ : ℕ) * S * ((∑ ℓ, capacity ℓ : ℕ) + 1) * σ ^ 2
+        * epochDuration events ^ 2 := by
+  have hfit' : ∀ i b, 0 ≤ (scaledModel σ model).fitness i b
+      ∧ (scaledModel σ model).fitness i b ≤ σ := fun i b ↦
+    ⟨mul_nonneg hσ (hfit i b).1, mul_le_of_le_one_right hσ (hfit i b).2⟩
+  have hS' : ∀ i, ∑ b, |(scaledModel σ model).fitness i b| ≤ σ * S := by
+    intro i
+    show ∑ b, |σ * model.fitness i b| ≤ σ * S
+    simp only [abs_mul, abs_of_nonneg hσ, ← Finset.mul_sum]
+    exact mul_le_mul_of_nonneg_left (hS i) hσ
+  have h := norm_selectedHistory_sub_firstOrder_le (scaledModel σ model) hσ (mul_nonneg hσ hS0)
+    hfit' hS' capacity family events 0 hhistory hhistory'
+  have hscale := historyCorrection_scaledModel σ model capacity events
+    (expectedMomentVector (bumpCapacity model capacity) (family 0) 0)
+  calc ‖expectedMomentVector capacity (family events.length) 0
+        - historyEventPropagator capacity events *ᵥ expectedMomentVector capacity (family 0) 0
+        - σ • historyCorrection model capacity events
+          (expectedMomentVector (bumpCapacity model capacity) (family 0) 0)‖
+      = ‖expectedMomentVector capacity (family (0 + events.length)) 0
+        - historyEventPropagator capacity events *ᵥ expectedMomentVector capacity (family 0) 0
+        - historyCorrection (scaledModel σ model) capacity events
+          (expectedMomentVector (bumpCapacity model capacity) (family 0) 0)‖ := by
+        rw [hscale, zero_add]
+    _ ≤ _ := h
+    _ = _ := by ring
+
 end
 
 end Descent.Portability.SelectionHistoryFirstOrder
