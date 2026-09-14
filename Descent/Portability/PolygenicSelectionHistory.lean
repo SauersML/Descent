@@ -295,6 +295,325 @@ theorem expectedAdditiveSelectedGenerator_eq (rates : NeutralRates Deme Locus Al
   exact Finset.sum_congr rfl fun ℓ _ ↦
     congrFun (expectedSelection_eq_mulVec (locusModel table ℓ) capacity (expectationAt s)) ξ
 
+/-! ## Zero order -/
+
+/-- **Additive selection moves the moments of one epoch by at most `B (Σ_ℓ σ_ℓ) d`.** Suppose the
+expected budget-respecting configuration moments of an expectation family are continuous on
+`[0, d]` and obey the forward moment equation with additive selection there, with the table of
+locus `ℓ` in `[0, σ_ℓ]`. Then the moments at `d` differ from the neutral epoch propagator applied
+to the initial moments by at most `B (Σ_ℓ σ_ℓ) d` in sup norm, with `B = Σ_ℓ n_ℓ`. -/
+theorem norm_expectedMomentVector_sub_propagator_le_additive
+    (rates : NeutralRates Deme Locus Allele) (table : ∀ ℓ, Deme → Allele ℓ → ℝ)
+    {σ : Locus → ℝ} (hσ : ∀ ℓ, 0 ≤ σ ℓ) (hfit : ∀ ℓ i b, 0 ≤ table ℓ i b ∧ table ℓ i b ≤ σ ℓ)
+    (capacity : Locus → ℕ)
+    (expectationAt : ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele)))
+    {d : ℝ} (hd : 0 ≤ d)
+    (hcont : ContinuousOn (expectedMomentVector capacity expectationAt) (Set.Icc 0 d))
+    (hforward : ∀ ξ : BudgetConfiguration Deme Locus Allele capacity, ∀ t ∈ Set.Ico 0 d,
+      HasDerivWithinAt (fun s ↦ expectedMomentVector capacity expectationAt s ξ)
+        (expectationAt t fun law ↦
+          eval (lawPoint law) (additiveSelectedGenerator rates table (momentPolynomial ξ.1)))
+        (Set.Ici t) t) :
+    ‖expectedMomentVector capacity expectationAt d
+        - matrixExponential (dualGenerator rates capacity) d
+          *ᵥ expectedMomentVector capacity expectationAt 0‖
+      ≤ (∑ ℓ, capacity ℓ : ℕ) * (∑ ℓ, σ ℓ) * d := by
+  have hexp : ∀ t, HasDerivAt
+      (fun u ↦ matrixExponential (dualGenerator rates capacity) u
+        *ᵥ expectedMomentVector capacity expectationAt 0)
+      (dualGenerator rates capacity *ᵥ (matrixExponential (dualGenerator rates capacity) t
+        *ᵥ expectedMomentVector capacity expectationAt 0)) t := fun t ↦
+    StationaryHaplotypeRealization.hasDerivAt_matrixExponential_mulVec _ _ t
+  have hderiv : ∀ t ∈ Set.Ico 0 d, HasDerivWithinAt
+      (fun u ↦ expectedMomentVector capacity expectationAt u
+        - matrixExponential (dualGenerator rates capacity) u
+          *ᵥ expectedMomentVector capacity expectationAt 0)
+      (dualGenerator rates capacity *ᵥ (expectedMomentVector capacity expectationAt t
+          - matrixExponential (dualGenerator rates capacity) t
+            *ᵥ expectedMomentVector capacity expectationAt 0)
+        + ∑ ℓ, selectionMatrix (locusModel table ℓ) capacity
+          *ᵥ expectedMomentVector (bumpCapacity (locusModel table ℓ) capacity) expectationAt t)
+      (Set.Ici t) t := by
+    intro t ht
+    have hv : HasDerivWithinAt (expectedMomentVector capacity expectationAt)
+        (dualGenerator rates capacity *ᵥ expectedMomentVector capacity expectationAt t
+          + ∑ ℓ, selectionMatrix (locusModel table ℓ) capacity
+            *ᵥ expectedMomentVector (bumpCapacity (locusModel table ℓ) capacity) expectationAt t)
+        (Set.Ici t) t :=
+      hasDerivWithinAt_pi.mpr fun ξ ↦ (hforward ξ t ht).congr_deriv
+        (expectedAdditiveSelectedGenerator_eq rates table capacity expectationAt t ξ)
+    refine (hv.sub (hexp t).hasDerivWithinAt).congr_deriv ?_
+    rw [Matrix.mulVec_sub]
+    abel
+  have hbound : ∀ t ∈ Set.Ico 0 d, ‖∑ ℓ, selectionMatrix (locusModel table ℓ) capacity
+      *ᵥ expectedMomentVector (bumpCapacity (locusModel table ℓ) capacity) expectationAt t‖
+        ≤ (∑ ℓ, capacity ℓ : ℕ) * ∑ ℓ, σ ℓ := by
+    intro t _
+    rw [Finset.mul_sum]
+    refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun ℓ _ ↦ ?_)
+    have hselection : selectionMatrix (locusModel table ℓ) capacity
+        *ᵥ expectedMomentVector (bumpCapacity (locusModel table ℓ) capacity) expectationAt t
+        = expectedSelection (locusModel table ℓ) capacity (expectationAt t) :=
+      (expectedSelection_eq_mulVec _ _ _).symm
+    rw [hselection]
+    refine (pi_norm_le_iff_of_nonneg (mul_nonneg (Nat.cast_nonneg _) (hσ ℓ))).mpr fun ξ ↦ ?_
+    rw [Real.norm_eq_abs]
+    exact abs_expectedSelection_le (locusModel table ℓ) (hσ ℓ) (hfit ℓ) capacity
+      (expectationAt t) ξ
+  have hG : ∀ x, HasDerivAt (fun u ↦ (∑ ℓ, capacity ℓ : ℕ) * (∑ ℓ, σ ℓ) * u)
+      ((∑ ℓ, capacity ℓ : ℕ) * ∑ ℓ, σ ℓ) x := fun x ↦
+    ((hasDerivAt_id x).const_mul ((∑ ℓ, capacity ℓ : ℕ) * ∑ ℓ, σ ℓ)).congr_deriv (mul_one _)
+  exact norm_le_of_zeroStart (killingGenerator_dualGenerator rates capacity) hd
+    (hcont.sub (continuous_iff_continuousAt.mpr fun t ↦ (hexp t).continuousAt).continuousOn)
+    hderiv (by simp only [matrixExponential_zero, Matrix.one_mulVec, sub_self]) (by simp) hG
+    hbound
+
+/-- **Additive selection along a history of epochs, splits and pulses.** `family k` is the
+expectation family over per-deme haplotype laws during the `k`-th event, on its own clock. During
+an epoch its expected budget-respecting configuration moments are continuous on `[0, d]` and obey
+the forward moment equation with additive selection at the epoch's neutral rates, and the next
+family starts from the moments at `d`. Across a split or a pulse the next family starts from the
+pulsed moments.
+
+Assumes: the families are the moment tables of a process with additive selection run through the
+events in chronological order. -/
+def AdditiveSelectedOnHistory (table : ∀ ℓ, Deme → Allele ℓ → ℝ) (capacity : Locus → ℕ)
+    (family : ℕ → ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele))) :
+    List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme) → ℕ → Prop
+  | [], _ => True
+  | Sum.inl epoch :: rest, k =>
+      (ContinuousOn (expectedMomentVector capacity (family k)) (Set.Icc 0 (epoch.2 : ℝ))
+        ∧ (∀ ξ : BudgetConfiguration Deme Locus Allele capacity, ∀ t ∈ Set.Ico 0 (epoch.2 : ℝ),
+          HasDerivWithinAt (fun s ↦ expectedMomentVector capacity (family k) s ξ)
+            (family k t fun law ↦
+              eval (lawPoint law) (additiveSelectedGenerator epoch.1 table (momentPolynomial ξ.1)))
+            (Set.Ici t) t)
+        ∧ expectedMomentVector capacity (family (k + 1)) 0
+          = expectedMomentVector capacity (family k) epoch.2)
+      ∧ AdditiveSelectedOnHistory table capacity family rest (k + 1)
+  | Sum.inr pulse :: rest, k =>
+      (∀ ξ : BudgetConfiguration Deme Locus Allele capacity,
+        expectedMomentVector capacity (family (k + 1)) 0 ξ
+          = family k 0 fun law ↦ configurationMoment (pulsedLaw pulse law) ξ.1)
+      ∧ AdditiveSelectedOnHistory table capacity family rest (k + 1)
+
+/-- The empty history carries no obligation, so `AdditiveSelectedOnHistory` is inhabited. -/
+theorem additiveSelectedOnHistory_nil (table : ∀ ℓ, Deme → Allele ℓ → ℝ) (capacity : Locus → ℕ)
+    (family : ℕ → ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele)))
+    (k : ℕ) : AdditiveSelectedOnHistory table capacity family [] k :=
+  trivial
+
+/-- **Additive selection moves the moments of a whole history by at most `B (Σ_ℓ σ_ℓ) T`.** Along
+a history of epochs, splits and pulses with total epoch duration `T`, families selected with
+additive fitness, the table of locus `ℓ` in `[0, σ_ℓ]`, end with expected budget-respecting
+configuration moments within `B (Σ_ℓ σ_ℓ) T` in sup norm of the neutral chronological propagator
+applied to their initial moments, with `B = Σ_ℓ n_ℓ`.
+
+Assumes: `AdditiveSelectedOnHistory table capacity family events k`. -/
+theorem norm_additiveHistory_sub_propagator_le (table : ∀ ℓ, Deme → Allele ℓ → ℝ)
+    {σ : Locus → ℝ} (hσ : ∀ ℓ, 0 ≤ σ ℓ) (hfit : ∀ ℓ i b, 0 ≤ table ℓ i b ∧ table ℓ i b ≤ σ ℓ)
+    (capacity : Locus → ℕ)
+    (family : ℕ → ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele))) :
+    ∀ (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme)) (k : ℕ),
+      AdditiveSelectedOnHistory table capacity family events k →
+      ‖expectedMomentVector capacity (family (k + events.length)) 0
+          - historyEventPropagator capacity events *ᵥ expectedMomentVector capacity (family k) 0‖
+        ≤ (∑ ℓ, capacity ℓ : ℕ) * (∑ ℓ, σ ℓ) * epochDuration events
+  | [], k, _ => by
+    simp [historyEventPropagator, epochDuration]
+  | Sum.inl epoch :: rest, k, hhistory => by
+    obtain ⟨⟨hcont, hforward, hnext⟩, hrest⟩ := hhistory
+    have hepoch := norm_expectedMomentVector_sub_propagator_le_additive epoch.1 table hσ hfit
+      capacity (family k) (NNReal.coe_nonneg epoch.2) hcont hforward
+    rw [← hnext] at hepoch
+    have hlength : k + (Sum.inl epoch :: rest).length = k + 1 + rest.length := by
+      rw [List.length_cons]
+      omega
+    rw [hlength, historyEventPropagator, eventPropagator, ← Matrix.mulVec_mulVec]
+    exact (norm_sub_mulVec_le (historyEventPropagator_substochastic capacity rest)
+      (norm_additiveHistory_sub_propagator_le table hσ hfit capacity family rest (k + 1) hrest)
+      hepoch).trans_eq (by simp only [epochDuration]; ring)
+  | Sum.inr pulse :: rest, k, hhistory => by
+    obtain ⟨hnext, hrest⟩ := hhistory
+    have hmoments : expectedMomentVector capacity (family (k + 1)) 0
+        = pulseKernel pulse capacity *ᵥ expectedMomentVector capacity (family k) 0 := by
+      funext ξ
+      rw [hnext ξ, pulseKernel_mulVec_expectedMoment]
+      rfl
+    have hlength : k + (Sum.inr pulse :: rest).length = k + 1 + rest.length := by
+      rw [List.length_cons]
+      omega
+    have h := norm_additiveHistory_sub_propagator_le table hσ hfit capacity family rest (k + 1)
+      hrest
+    rw [hmoments, ← hlength, Matrix.mulVec_mulVec] at h
+    simpa only [historyEventPropagator, eventPropagator, epochDuration] using h
+
+/-! ## First order -/
+
+/-- **The moments of an epoch to first order in additive selection.** Suppose the expected moments
+of the budget and of every budget with one more copy at one locus are continuous on `[0, d]` and
+obey the forward moment equation with additive selection there, with the table of locus `ℓ` in
+`[0, σ_ℓ]` and masses `Σ_b |s_{i,ℓ}(b)| ≤ S_ℓ`. Then the moments at `d` are the neutral propagator
+applied to the initial moments plus the sum over loci of the one-locus first-order corrections,
+up to `B (B + 1) (Σ_ℓ S_ℓ) (Σ_ℓ σ_ℓ) d²` in sup norm, with `B = Σ_ℓ n_ℓ`. -/
+theorem norm_expectedMomentVector_sub_firstOrder_le_additive
+    (rates : NeutralRates Deme Locus Allele) (table : ∀ ℓ, Deme → Allele ℓ → ℝ)
+    {σ S : Locus → ℝ} (hσ : ∀ ℓ, 0 ≤ σ ℓ) (hS0 : ∀ ℓ, 0 ≤ S ℓ)
+    (hfit : ∀ ℓ i b, 0 ≤ table ℓ i b ∧ table ℓ i b ≤ σ ℓ)
+    (hS : ∀ ℓ i, ∑ b, |table ℓ i b| ≤ S ℓ) (capacity : Locus → ℕ)
+    (expectationAt : ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele)))
+    {d : ℝ} (hd : 0 ≤ d)
+    (hcont : ContinuousOn (expectedMomentVector capacity expectationAt) (Set.Icc 0 d))
+    (hcont' : ∀ ℓ, ContinuousOn
+      (expectedMomentVector (bumpCapacity (locusModel table ℓ) capacity) expectationAt)
+      (Set.Icc 0 d))
+    (hforward : ∀ ξ : BudgetConfiguration Deme Locus Allele capacity, ∀ t ∈ Set.Ico 0 d,
+      HasDerivWithinAt (fun s ↦ expectedMomentVector capacity expectationAt s ξ)
+        (expectationAt t fun law ↦
+          eval (lawPoint law) (additiveSelectedGenerator rates table (momentPolynomial ξ.1)))
+        (Set.Ici t) t)
+    (hforward' : ∀ ℓ, ∀ ξ : BudgetConfiguration Deme Locus Allele
+        (bumpCapacity (locusModel table ℓ) capacity), ∀ t ∈ Set.Ico 0 d,
+      HasDerivWithinAt (fun s ↦
+          expectedMomentVector (bumpCapacity (locusModel table ℓ) capacity) expectationAt s ξ)
+        (expectationAt t fun law ↦
+          eval (lawPoint law) (additiveSelectedGenerator rates table (momentPolynomial ξ.1)))
+        (Set.Ici t) t) :
+    ‖expectedMomentVector capacity expectationAt d
+        - matrixExponential (dualGenerator rates capacity) d
+          *ᵥ expectedMomentVector capacity expectationAt 0
+        - ∑ ℓ, selectionCorrection rates (locusModel table ℓ) capacity
+          (expectedMomentVector (bumpCapacity (locusModel table ℓ) capacity) expectationAt 0) d‖
+      ≤ (∑ ℓ, capacity ℓ : ℕ) * ((∑ ℓ, capacity ℓ : ℕ) + 1) * (∑ ℓ, S ℓ) * (∑ ℓ, σ ℓ)
+        * d ^ 2 := by
+  have hderiv : ∀ t ∈ Set.Ico 0 d, HasDerivWithinAt (expectedMomentVector capacity expectationAt)
+      (dualGenerator rates capacity *ᵥ expectedMomentVector capacity expectationAt t
+        + ∑ ℓ, selectionMatrix (locusModel table ℓ) capacity
+          *ᵥ expectedMomentVector (bumpCapacity (locusModel table ℓ) capacity) expectationAt t)
+      (Set.Ici t) t := fun t ht ↦
+    hasDerivWithinAt_pi.mpr fun ξ ↦ (hforward ξ t ht).congr_deriv
+      (expectedAdditiveSelectedGenerator_eq rates table capacity expectationAt t ξ)
+  have hw : ∀ j, ∀ t ∈ Set.Ico 0 d,
+      ‖expectedMomentVector (bumpCapacity (locusModel table j) capacity) expectationAt t
+          - matrixExponential (dualGenerator rates (bumpCapacity (locusModel table j) capacity)) t
+            *ᵥ expectedMomentVector (bumpCapacity (locusModel table j) capacity) expectationAt 0‖
+        ≤ ((∑ ℓ, capacity ℓ : ℕ) + 1) * (∑ ℓ, σ ℓ) * t := by
+    intro j t ht
+    have h := norm_expectedMomentVector_sub_propagator_le_additive rates table hσ hfit
+      (bumpCapacity (locusModel table j) capacity) expectationAt ht.1
+      ((hcont' j).mono (Set.Icc_subset_Icc_right ht.2.le))
+      (fun ξ s hs ↦ hforward' j ξ s ⟨hs.1, hs.2.trans ht.2⟩)
+    rwa [sum_bumpCapacity, Nat.cast_add, Nat.cast_one] at h
+  have h := norm_duhamel_firstOrder_sum_le (killingGenerator_dualGenerator rates capacity)
+    (fun j ↦ dualGenerator rates (bumpCapacity (locusModel table j) capacity))
+    (fun j ↦ selectionMatrix (locusModel table j) capacity)
+    (β := fun j ↦ 2 * (∑ ℓ, capacity ℓ : ℕ) * S j)
+    (c := fun _ ↦ ((∑ ℓ, capacity ℓ : ℕ) + 1) * ∑ ℓ, σ ℓ)
+    (w := fun j t ↦ expectedMomentVector (bumpCapacity (locusModel table j) capacity)
+      expectationAt t)
+    (fun j ↦ mul_nonneg (mul_nonneg zero_le_two (Nat.cast_nonneg _)) (hS0 j))
+    (fun j ↦ norm_selectionMatrix_mulVec_le (locusModel table j) (hS0 j) (hS j) capacity)
+    hd hcont hderiv hw
+  refine h.trans_eq ?_
+  simp only [← Finset.sum_mul, ← Finset.mul_sum]
+  ring
+
+/-- Across a split or a pulse, the moments of the next family are the pulse kernel applied to the
+moments of the current one. -/
+theorem expectedMomentVector_pulse (pulse : PulseMatrix Deme) (capacity : Locus → ℕ)
+    (current next : ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele)))
+    (hnext : ∀ ξ : BudgetConfiguration Deme Locus Allele capacity,
+      expectedMomentVector capacity next 0 ξ
+        = current 0 fun law ↦ configurationMoment (pulsedLaw pulse law) ξ.1) :
+    expectedMomentVector capacity next 0
+      = pulseKernel pulse capacity *ᵥ expectedMomentVector capacity current 0 :=
+  funext fun ξ ↦ (hnext ξ).trans (pulseKernel_mulVec_expectedMoment pulse capacity (current 0) ξ)
+
+/-- **The first-order correction of a history under additive selection**: the sum over loci of the
+one-locus history corrections, at the moments of the budgets with one more copy at each locus. -/
+def additiveHistoryCorrection (table : ∀ ℓ, Deme → Allele ℓ → ℝ) (capacity : Locus → ℕ)
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (w : ∀ ℓ, BudgetConfiguration Deme Locus Allele (bumpCapacity (locusModel table ℓ) capacity)
+      → ℝ) :
+    BudgetConfiguration Deme Locus Allele capacity → ℝ :=
+  ∑ ℓ, historyCorrection (locusModel table ℓ) capacity events (w ℓ)
+
+/-- **The first-order law of a history under additive selection.** Along a history of epochs,
+splits and pulses with total epoch duration `T`, families selected with additive fitness, the table
+of locus `ℓ` in `[0, σ_ℓ]` with masses at most `S_ℓ`, obeying the forward moment equation at the
+budget and at every budget with one more copy at one locus, end with moments equal to the neutral
+chronological propagation of their initial moments plus the sum over loci of the one-locus history
+corrections, up to `B (B + 1) (Σ_ℓ S_ℓ) (Σ_ℓ σ_ℓ) T²` in sup norm, with `B = Σ_ℓ n_ℓ`.
+
+Assumes: `AdditiveSelectedOnHistory table capacity family events k` and, for every locus `ℓ`,
+`AdditiveSelectedOnHistory table (bumpCapacity (locusModel table ℓ) capacity) family events k`. -/
+theorem norm_additiveHistory_sub_firstOrder_le (table : ∀ ℓ, Deme → Allele ℓ → ℝ)
+    {σ S : Locus → ℝ} (hσ : ∀ ℓ, 0 ≤ σ ℓ) (hS0 : ∀ ℓ, 0 ≤ S ℓ)
+    (hfit : ∀ ℓ i b, 0 ≤ table ℓ i b ∧ table ℓ i b ≤ σ ℓ)
+    (hS : ∀ ℓ i, ∑ b, |table ℓ i b| ≤ S ℓ) (capacity : Locus → ℕ)
+    (family : ℕ → ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele))) :
+    ∀ (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme)) (k : ℕ),
+      AdditiveSelectedOnHistory table capacity family events k →
+      (∀ ℓ, AdditiveSelectedOnHistory table (bumpCapacity (locusModel table ℓ) capacity) family
+        events k) →
+      ‖expectedMomentVector capacity (family (k + events.length)) 0
+          - historyEventPropagator capacity events *ᵥ expectedMomentVector capacity (family k) 0
+          - additiveHistoryCorrection table capacity events (fun ℓ ↦
+            expectedMomentVector (bumpCapacity (locusModel table ℓ) capacity) (family k) 0)‖
+        ≤ (∑ ℓ, capacity ℓ : ℕ) * ((∑ ℓ, capacity ℓ : ℕ) + 1) * (∑ ℓ, S ℓ) * (∑ ℓ, σ ℓ)
+          * epochDuration events ^ 2
+  | [], k, _, _ => by
+    simp [historyEventPropagator, additiveHistoryCorrection, historyCorrection, epochDuration]
+  | Sum.inl epoch :: rest, k, hhistory, hhistory' => by
+    obtain ⟨⟨hcont, hforward, hnext⟩, hrest⟩ := hhistory
+    have hstage := norm_expectedMomentVector_sub_firstOrder_le_additive epoch.1 table hσ hS0 hfit
+      hS capacity (family k) (NNReal.coe_nonneg epoch.2) hcont (fun ℓ ↦ (hhistory' ℓ).1.1)
+      hforward (fun ℓ ↦ (hhistory' ℓ).1.2.1)
+    rw [← hnext] at hstage
+    have hlarger : ∀ j,
+        ‖expectedMomentVector (bumpCapacity (locusModel table j) capacity) (family (k + 1)) 0
+          - matrixExponential (dualGenerator epoch.1 (bumpCapacity (locusModel table j) capacity))
+              epoch.2
+            *ᵥ expectedMomentVector (bumpCapacity (locusModel table j) capacity) (family k) 0‖
+        ≤ ((∑ ℓ, capacity ℓ : ℕ) + 1) * (∑ ℓ, σ ℓ) * epoch.2 := by
+      intro j
+      have h := norm_expectedMomentVector_sub_propagator_le_additive epoch.1 table hσ hfit
+        (bumpCapacity (locusModel table j) capacity) (family k) (NNReal.coe_nonneg epoch.2)
+        (hhistory' j).1.1 (hhistory' j).1.2.1
+      rwa [← (hhistory' j).1.2.2, sum_bumpCapacity, Nat.cast_add, Nat.cast_one] at h
+    have hstep := norm_sub_firstOrder_sum_step_le
+      (historyEventPropagator_substochastic capacity rest)
+      (fun j ↦ historyCorrection (locusModel table j) capacity rest)
+      (fun j ↦ historyCorrection_sub (locusModel table j) capacity rest)
+      (fun j ↦ norm_historyCorrection_le (locusModel table j) (hS0 j) (hS j) capacity rest)
+      (fun j ↦ mul_nonneg (mul_nonneg (mul_nonneg zero_le_two (Nat.cast_nonneg _)) (hS0 j))
+        (epochDuration_nonneg rest))
+      (norm_additiveHistory_sub_firstOrder_le table hσ hS0 hfit hS capacity family rest (k + 1)
+        hrest fun j ↦ (hhistory' j).2)
+      hstage hlarger
+    have hlength : k + (Sum.inl epoch :: rest).length = k + 1 + rest.length := by
+      rw [List.length_cons]
+      omega
+    rw [hlength, historyEventPropagator, eventPropagator, ← Matrix.mulVec_mulVec, epochDuration]
+    simp only [additiveHistoryCorrection, historyCorrection, Finset.sum_add_distrib,
+      ← Matrix.mulVec_sum]
+    refine hstep.trans_eq ?_
+    simp only [← Finset.sum_mul, ← Finset.mul_sum]
+    ring
+  | Sum.inr pulse :: rest, k, hhistory, hhistory' => by
+    obtain ⟨hnext, hrest⟩ := hhistory
+    have h := norm_additiveHistory_sub_firstOrder_le table hσ hS0 hfit hS capacity family rest
+      (k + 1) hrest fun j ↦ (hhistory' j).2
+    have hpulse := fun j ↦ expectedMomentVector_pulse pulse
+      (bumpCapacity (locusModel table j) capacity) (family k) (family (k + 1)) (hhistory' j).1
+    rw [expectedMomentVector_pulse pulse capacity (family k) (family (k + 1)) hnext] at h
+    simp only [additiveHistoryCorrection, hpulse] at h
+    have hlength : k + (Sum.inr pulse :: rest).length = k + 1 + rest.length := by
+      rw [List.length_cons]
+      omega
+    rw [hlength, historyEventPropagator, eventPropagator, ← Matrix.mulVec_mulVec, epochDuration]
+    simpa only [additiveHistoryCorrection, historyCorrection] using h
+
 end
 
 end Descent.Portability.PolygenicSelectionHistory
