@@ -350,6 +350,7 @@ import Descent.Portability.TransferLearningPGS.ImportanceWeighting
 import Descent.Portability.TransferLearningPGS.PGSPortabilityDerivation
 import Descent.Portability.TransplantationStability
 import Descent.Portability.UniversalMetricIdentification
+import Descent.Portability.EndToEndAdmixedGenotypes
 
 import Descent.Portability.ProbitTrainingLaw
 import Descent.Portability.ScoreMomentLaw
