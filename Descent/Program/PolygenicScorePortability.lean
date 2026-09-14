@@ -21,6 +21,8 @@ import Descent.Portability.EndToEndDiscriminationLaw
 import Descent.Portability.EndToEndBrierLaw
 import Descent.Portability.EndToEndLogLossLaw
 import Descent.Portability.EndToEndLogLossBounds
+import Descent.Portability.EndToEndMutualInformationPinsker
+import Descent.Portability.PortabilityMomentLadderBrier
 import Descent.Portability.EndToEndDecisionLaw
 import Descent.Portability.EndToEndGWASCalibrationLaw
 import Descent.Portability.MigrationPortabilityFirstOrderFactor
@@ -194,7 +196,16 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   any history (`EndToEndLogLossBounds.mutualInformation_eq_sum_divergenceTerm`,
   `mutualInformation_nonneg`, `mutualInformation_le_outcomeEntropy`,
   `mutualInformation_eq_zero_iff`, `expectedPseudoRSquared_mem`,
-  `expectedMutualInformation_eq_zero_iff`, `logLossBounds_historyEventKernel`).
+  `expectedMutualInformation_eq_zero_iff`, `logLossBounds_historyEventKernel`).  Away from
+  independence the bound is quantitative: a Padé-type inequality for the divergence term and
+  Cauchy–Schwarz give Pinsker's inequality `I(S; Y) ≥ ½ (Σ |m − q_s p_b|)²`, derived in Lean with
+  no constant taken from outside, so pseudo-`R²` is at least the squared independence gap over
+  `2 H(Y)`, in every population and in expectation along any history
+  (`EndToEndMutualInformationPinsker.pinsker_finite`,
+  `half_sq_independenceGap_le_mutualInformation`, `two_mul_sq_totalVariation_le_mutualInformation`,
+  `sq_independenceGap_div_le_pseudoRSquared`,
+  `half_sq_integral_independenceGap_le_expectedMutualInformation`, `pinsker_historyEventKernel`,
+  `pinsker_rateHistoryKernel`).
 * **Clinical decision metrics.**  The confusion cells of any rule are linear in the haplotype
   frequencies, so along any history the expected confusion table is the table of the budget-1
   propagated moments (`EndToEndDecisionLaw.ruleConfusion_pushforward`,
@@ -239,7 +250,10 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
     `expectedMetrics_historyEvent_eq_rateHistory`).  The same rung fixes the expected entropy,
     conditional entropy and mutual information of every report map
     (`PortabilityMomentLadderEntropy.expectedInformation_eq_of_polynomialsAgreeAt_all`,
-    `expectedInformation_historyEvent_eq_rateHistory`).
+    `expectedInformation_historyEvent_eq_rateHistory`), and the expected repaired Brier loss of
+    every report map
+    (`PortabilityMomentLadderBrier.expectedRepairedBrier_eq_of_polynomialsAgreeAt_all`,
+    `expectedRepairedBrier_historyEvent_eq_rateHistory`).
   * Clinical decisions read the lowest rung.  Agreement up to degree one fixes the whole decision
     report, every deme's expected confusion table, case probability, called fraction and net
     benefit at every threshold, and the portability of every threshold metric; budget four fixes
