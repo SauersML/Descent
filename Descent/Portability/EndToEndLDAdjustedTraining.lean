@@ -39,6 +39,11 @@ variance, plus `λ ‖β‖²`, plus the panel channel `βᵀ (Σ_R − Σ_S) β
 `1 + (λ ‖β‖² + βᵀ (Σ_R − Σ_S) β) / Var S` (`calibrationSlope_adjustedWeights_source`).  A matched
 panel closes the channel, which leaves the corpus ridge law `1 + λ ‖β‖² / Var S`.
 
+A large penalty.  With a positive semidefinite panel the normal equations give
+`λ ‖β‖² ≤ βᵀ b_S`, hence `λ² ‖β‖² ≤ ‖b_S‖²`, so `Σ_R β` tends to zero and `λ β` tends to `b_S`
+as `λ → ∞`.  Whatever the panel, the adjusted score tends to the direction of the marginal score
+(`tendsto_penalty_smul_adjustedWeights`).
+
 A mismatched panel costs accuracy.  Take two tags that are the causal codings, with unit variances
 and covariance `1/2` in the source deme, a unit effect at the first coding and a unit residual
 variance.  Train with penalty one and deploy in the source deme.  The matched panel gives weights
@@ -52,8 +57,7 @@ Scope.  Training is at the population level: the moments are expected second mom
 is the ratio of expectations of NOTE2 §6.2, not the expectation of each population's metric.  The
 sampling noise of an estimated panel LD matrix and of estimated marginal effects is not stated.  The
 penalty matrix is `λ I`.  That a mismatched panel lowers accuracy is shown on one law only; no
-general inequality between matched and mismatched panels is claimed.  The limit of a large penalty
-is not stated.
+general inequality between matched and mismatched panels is claimed.
 
 ## Empirical status
 
@@ -265,6 +269,106 @@ theorem calibrationSlope_adjustedWeights_source (reference source : DemeMoments 
       / source.scoreVariance (adjustedWeights reference source sourceArch penalty) = _
   rw [predictiveCovariance_adjustedWeights_source reference source sourceArch penalty hunit,
     add_assoc, add_div (source.scoreVariance _), div_self hvariance]
+
+/-! ## A large penalty -/
+
+/-- **The penalised weight bound**: weights that read the normal equations of a positive
+semidefinite covariance and a positive penalty against a target, `wᵀ b = wᵀ Σ w + λ wᵀ w`, have
+`λ² ‖w‖² ≤ ‖b‖²`.  Summing `(λ w_i − b_i)² ≥ 0` gives `2 λ wᵀ b ≤ λ² ‖w‖² + ‖b‖²`, and
+`λ ‖w‖² ≤ wᵀ b`.
+
+Assumes: `∀ u, 0 ≤ dot u (covariance *ᵥ u)`, `0 < penalty` and
+`dot w target = dot w (covariance *ᵥ w) + penalty * dot w w`. -/
+theorem penalty_sq_mul_dot_le (covariance : Matrix J J ℝ)
+    (hcovariance : ∀ u : J → ℝ, 0 ≤ dot u (covariance *ᵥ u)) {penalty : ℝ}
+    (hpenalty : 0 < penalty) (target w : J → ℝ)
+    (hdot : dot w target = dot w (covariance *ᵥ w) + penalty * dot w w) :
+    penalty ^ 2 * dot w w ≤ dot target target := by
+  have hexpand : ∑ i, (penalty * w i - target i) ^ 2
+      = penalty ^ 2 * dot w w - 2 * penalty * dot w target + dot target target := by
+    simp only [dot, Descent.Core.innerSum, Finset.mul_sum, ← Finset.sum_sub_distrib,
+      ← Finset.sum_add_distrib]
+    exact Finset.sum_congr rfl fun i _ ↦ by ring
+  have hsquares : 0 ≤ ∑ i, (penalty * w i - target i) ^ 2 :=
+    Finset.sum_nonneg fun i _ ↦ sq_nonneg _
+  have hproduct : penalty * (penalty * dot w w) ≤ penalty * dot w target :=
+    mul_le_mul_of_nonneg_left (by linarith [hcovariance w]) hpenalty.le
+  linarith
+
+/-- **A coordinate bound from the penalised weight bound**: `λ² ‖w‖² ≤ B` puts every coordinate of
+`w` within `(1 + B) / λ` of zero.
+
+Assumes: `0 < penalty`, `0 ≤ B` and `penalty ^ 2 * dot w w ≤ B`. -/
+theorem abs_le_of_penalty_sq_mul_dot_le {penalty B : ℝ} (hpenalty : 0 < penalty) (hB : 0 ≤ B)
+    (w : J → ℝ) (hbound : penalty ^ 2 * dot w w ≤ B) (j : J) : |w j| ≤ (1 + B) / penalty := by
+  have hdot : dot w w = ∑ k, w k * w k := rfl
+  rw [hdot] at hbound
+  have hsingle : w j * w j ≤ ∑ k, w k * w k :=
+    Finset.single_le_sum (fun k _ ↦ mul_self_nonneg (w k)) (Finset.mem_univ j)
+  have hscaled : w j * w j * penalty ^ 2 ≤ (∑ k, w k * w k) * penalty ^ 2 :=
+    mul_le_mul_of_nonneg_right hsingle (sq_nonneg penalty)
+  have hgrow : B ≤ (1 + B) ^ 2 := by nlinarith
+  have hsq : (|w j| * penalty) ^ 2 ≤ (1 + B) ^ 2 := by
+    rw [mul_pow, sq_abs]
+    linarith
+  rw [le_div_iff₀ hpenalty]
+  exact (sq_le_sq₀ (mul_nonneg (abs_nonneg _) hpenalty.le) (by linarith)).mp hsq
+
+/-- **A large penalty recovers the marginal score.**  With a positive semidefinite panel
+covariance, `λ β` tends to the source marginal covariances `b_S` as the penalty grows.  Every
+adjusted weight is at most `(1 + ‖b_S‖²) / λ` in size, so `Σ_R β` tends to zero, and
+`λ β = b_S − Σ_R β`.  Whatever the panel, the adjusted score tends to the direction of the
+marginal score.
+
+Assumes: `∀ u, 0 ≤ dot u (reference.tagCovariance *ᵥ u)`. -/
+theorem tendsto_penalty_smul_adjustedWeights (reference source : DemeMoments J L)
+    (sourceArch : DemeArchitecture J L)
+    (hpanel : ∀ u : J → ℝ, 0 ≤ dot u (reference.tagCovariance *ᵥ u)) :
+    Filter.Tendsto
+      (fun penalty : ℝ ↦ penalty • adjustedWeights reference source sourceArch penalty)
+      Filter.atTop (nhds (source.tagOutcomeCovariance sourceArch)) := by
+  have hnonneg : 0 ≤ dot (source.tagOutcomeCovariance sourceArch)
+      (source.tagOutcomeCovariance sourceArch) :=
+    Finset.sum_nonneg fun k _ ↦ mul_self_nonneg _
+  have hcoordinate : ∀ j, Filter.Tendsto
+      (fun penalty : ℝ ↦ adjustedWeights reference source sourceArch penalty j) Filter.atTop
+      (nhds 0) := by
+    intro j
+    refine squeeze_zero_norm'
+      (a := fun penalty : ℝ ↦ (1 + dot (source.tagOutcomeCovariance sourceArch)
+        (source.tagOutcomeCovariance sourceArch)) / penalty)
+      ?_ (tendsto_const_nhds.div_atTop Filter.tendsto_id)
+    filter_upwards [Filter.eventually_gt_atTop 0] with penalty hpenalty
+    rw [Real.norm_eq_abs]
+    exact abs_le_of_penalty_sq_mul_dot_le hpenalty hnonneg _
+      (penalty_sq_mul_dot_le reference.tagCovariance hpanel hpenalty _ _
+        (dot_ridgeWeights_target reference.tagCovariance (source.tagOutcomeCovariance sourceArch)
+          penalty (isUnit_det_add_penalty reference.tagCovariance hpanel hpenalty))) j
+  have hpanelLimit : Filter.Tendsto
+      (fun penalty : ℝ ↦
+        reference.tagCovariance *ᵥ adjustedWeights reference source sourceArch penalty)
+      Filter.atTop (nhds 0) := by
+    refine tendsto_pi_nhds.mpr fun i ↦ ?_
+    have hsum := tendsto_finset_sum (Finset.univ : Finset J) fun j (_ : j ∈ Finset.univ) ↦
+      (hcoordinate j).const_mul (reference.tagCovariance i j)
+    simpa [Matrix.mulVec, dotProduct] using hsum
+  have hnormal : ∀ᶠ penalty in Filter.atTop,
+      source.tagOutcomeCovariance sourceArch
+          - reference.tagCovariance *ᵥ adjustedWeights reference source sourceArch penalty
+        = penalty • adjustedWeights reference source sourceArch penalty := by
+    filter_upwards [Filter.eventually_gt_atTop 0] with penalty hpenalty
+    have hequation : (reference.tagCovariance + penalty • (1 : Matrix J J ℝ))
+          *ᵥ adjustedWeights reference source sourceArch penalty
+        = source.tagOutcomeCovariance sourceArch :=
+      ridgeWeights_normal reference.tagCovariance (source.tagOutcomeCovariance sourceArch) penalty
+        (isUnit_det_add_penalty reference.tagCovariance hpanel hpenalty)
+    rw [Matrix.add_mulVec, Matrix.smul_mulVec, Matrix.one_mulVec] at hequation
+    rw [← hequation]
+    abel
+  have hlimit :=
+    (tendsto_const_nhds (x := source.tagOutcomeCovariance sourceArch)).sub hpanelLimit
+  rw [sub_zero] at hlimit
+  exact hlimit.congr' hnormal
 
 end Training
 

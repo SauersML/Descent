@@ -19,6 +19,9 @@ open Descent.Portability.EndToEndLDAdjustedTraining
 #print axioms r2_adjustedWeights_eq_adjugate
 #print axioms predictiveCovariance_adjustedWeights_source
 #print axioms calibrationSlope_adjustedWeights_source
+#print axioms penalty_sq_mul_dot_le
+#print axioms abs_le_of_penalty_sq_mul_dot_le
+#print axioms tendsto_penalty_smul_adjustedWeights
 #print axioms adjustedReport_historyEventKernel
 #print axioms adjustedReport_eq_of_moments_eq
 #print axioms witnessSource
