@@ -370,6 +370,7 @@ import Descent.Portability.EndToEndIntegrableRateHistory
 import Descent.Portability.EndToEndSensitivitySeriesBound
 import Descent.Portability.AdmixturePulseComposition
 import Descent.Portability.EndToEndPenetranceLaw
+import Descent.Portability.PortabilityMomentLadderDecisionSharpness
 
 import Descent.Portability.ProbitTrainingLaw
 import Descent.Portability.ScoreMomentLaw
