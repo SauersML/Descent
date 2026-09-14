@@ -416,6 +416,53 @@ theorem abs_learnedCalibrationSlope_threshold_le [Unique J] (source target : Fin
 
 end Learned
 
+/-! ## The winner's curse reverses a slope -/
+
+/-- **Thresholding on the training cohort can reverse the sign of the calibration slope.**  On the
+three-haplotype law of `curseWitness_selection`, trained and deployed in that law with a cohort of
+two at threshold one, the thresholded slope of expectations is negative.  The unthresholded GWAS
+slope is positive and strictly below the population slope, so thresholding pushes the slope below
+the attenuated slope and past zero. -/
+theorem curseWitness_calibration :
+    learnedCalibrationSlope curseWitnessLaw curseWitnessLaw 2
+        (covarianceThresholdWeights 1 curseWitnessGenotype curseWitnessOutcome)
+        curseWitnessGenotype curseWitnessOutcome < 0
+      ∧ 0 < trainedCalibrationSlope curseWitnessLaw curseWitnessLaw 2 curseWitnessGenotype
+          curseWitnessOutcome
+      ∧ trainedCalibrationSlope curseWitnessLaw curseWitnessLaw 2 curseWitnessGenotype
+          curseWitnessOutcome
+        < populationCalibrationSlope curseWitnessLaw curseWitnessLaw curseWitnessGenotype
+          curseWitnessOutcome := by
+  have hmarginal : 0 < marginalWeights curseWitnessLaw curseWitnessGenotype curseWitnessOutcome
+      default :=
+    (by norm_num : (0 : ℝ) < 600399 / 4000000).trans_eq curseWitness_marginalWeights.symm
+  have hvariance : 0 < tagCovariance curseWitnessLaw curseWitnessGenotype default default := by
+    simp [tagCovariance, FiniteReportLaw.covariance_eq_rawMoments, FiniteReportLaw.expectation,
+      Fin.sum_univ_three, curseWitnessLaw, curseWitnessGenotype] <;> norm_num
+  have hmean : (cohortLaw curseWitnessLaw 2).expectation (fun sample ↦
+      covarianceThresholdWeights 1 curseWitnessGenotype curseWitnessOutcome sample default) < 0 :=
+    curseWitness_selection.2
+  have hcovariance : 0 < curseWitnessLaw.covariance (linearScore curseWitnessGenotype
+      (marginalWeights curseWitnessLaw curseWitnessGenotype curseWitnessOutcome))
+      curseWitnessOutcome := by
+    rw [covariance_linearScore]
+    simp only [Fintype.sum_unique]
+    exact mul_pos hmarginal hmarginal
+  have hpopulationVariance : 0 < curseWitnessLaw.variance (linearScore curseWitnessGenotype
+      (marginalWeights curseWitnessLaw curseWitnessGenotype curseWitnessOutcome)) := by
+    rw [variance_linearScore_eq]
+    simp only [Fintype.sum_unique]
+    exact mul_pos hvariance (mul_pos hmarginal hmarginal)
+  refine ⟨?_, ?_, trainedCalibrationSlope_lt_populationCalibrationSlope _ _ (le_refl 2) _ _
+    hcovariance⟩
+  · rw [learnedCalibrationSlope, learnedCovariance_unique, learnedVariance_unique]
+    exact div_neg_of_neg_of_pos (mul_neg_of_pos_of_neg hmarginal hmean)
+      (mul_pos hvariance curseWitness_secondMoment)
+  · rw [trainedCalibrationSlope, trainedCovariance_eq _ _ (le_refl 2),
+      trainedVariance_eq _ _ (le_refl 2)]
+    exact div_pos hcovariance (hpopulationVariance.trans_le
+      (le_samplingForm (excessForm_nonneg _ _ _ _) (pairingForm_nonneg _ _ _ _) (le_refl 2)))
+
 end
 
 end Descent.Portability.EndToEndGWASThresholdCalibration
