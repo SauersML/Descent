@@ -771,6 +771,7 @@ import Descent.Portability.PortabilityMomentLadderEntropy
 import Descent.Portability.SelectionMetricsFirstOrder
 import Descent.Portability.PortabilityMomentLadderDecision
 import Descent.Portability.PortabilityMomentLadderEight
+import Descent.Portability.EndToEndLogLossBounds
 
 assert_below Descent.Program
 
