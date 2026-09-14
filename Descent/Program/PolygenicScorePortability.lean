@@ -66,6 +66,7 @@ import Descent.Portability.EndToEndAscertainedDecision
 import Descent.Portability.DiploidSelectionHistory
 import Descent.Portability.EndToEndIntegrableRateHistory
 import Descent.Portability.EndToEndSensitivitySeriesBound
+import Descent.Portability.AdmixturePulseComposition
 import Descent.Portability.SelectionMetricsFirstOrder
 import Descent.Portability.PortabilityMomentLadderDecision
 import Descent.Portability.PortabilityMomentLadderEight
@@ -343,6 +344,8 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
     and `1` under the other, so no function of the degree-three moments fixes the report
     (`PortabilityMomentLadderSharpnessFour.polynomialsAgreeAt_three_and_expectedPortability_ne`,
     `not_forall_portabilityReport_eq_of_polynomialsAgreeAt_three`).
+    The same witness separates the expected per-population calibration slope, `-11/35` against
+    `-1/4` (`polynomialsAgreeAt_three_and_expectedPerPopulationSlope_ne`).
   * Integrable rate histories read the same ladder.  Continuous approximations in `L¹` converge,
     and their limit operator has a Markov kernel whose moments are the propagator of the integral
     equation (`EndToEndIntegrableRateHistory.isMarkovKernel_integrableRateHistoryKernel`,
@@ -558,6 +561,12 @@ derived.  Where a law carries a hypothesis, the Scope section at the end names i
   `pulseSquaredCorrelation_eq`).  The squared correlation then decays by `e^{-rT}` with
   `r = (ρ_S + ρ_T)/2`, drift cancelling as after a split
   (`pulseHistorySquaredCorrelation_eq`).
+* **A split, an epoch, a pulse and an epoch.**  The pre-pulse state after a split and an epoch
+  stays locus-exchangeably realizable, so the whole chronology has a closed-form squared
+  correlation `e^{-r₂T₂} N / M`, with the ancestral cross moments decayed by `e^{-r₁T₁}` and mixed
+  by the pulse (`AdmixturePulseComposition.nonempty_splitHistoryState_realization`,
+  `chronologySquaredCorrelation_eq`); with no pulse the two epochs compose as the product of their
+  decay factors (`chronologyPortabilityRatio_zero`).
 * **Calibration under migration.**  Under symmetric migration a score whose squared-correlation
   portability is the two-locus ratio has calibration portability its square root; to first order
   in the migration rate it moves at half the relative rate, within an explicit second-order
@@ -710,9 +719,10 @@ Scope.
 * Selection laws take the forward moment equation with selection as a hypothesis on the moment
   families: the selected diffusion is not constructed, diploid selection is carried to zero order
   only, and the first-order law with a fitness table per epoch is not stated.
-* The expectation of each population's calibration slope is not a rational function of finitely
-  many moments and is not stated.  The nonclosure witnesses for the calibration error are constant
-  kernels, not histories of epochs.
+* The expected per-population calibration slope is not fixed at degree three
+  (`PortabilityMomentLadderSharpnessFour`); whether some finite degree fixes it is open.  The
+  nonclosure witnesses for the calibration slope and error are constant kernels, not histories of
+  epochs.
 * The termwise derivative of the expected squared correlation takes a summable bound on the term
   sensitivities as a hypothesis, neither discharged nor refuted for the history kernels.
 * Environment enters through its moments per deme, supplied as model inputs, not measured
