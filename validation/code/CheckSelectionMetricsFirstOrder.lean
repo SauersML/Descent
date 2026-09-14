@@ -1,0 +1,50 @@
+/-
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import Descent.Portability.SelectionMetricsFirstOrder
+
+/-! Axiom audit of SelectionMetricsFirstOrder. -/
+
+open Descent.Portability.SelectionMetricsFirstOrder
+
+#print axioms quotientDerivative
+#print axioms crossRatioDerivative_self
+#print axioms quotientDerivative_pos_iff_of_pos
+#print axioms abs_crossRatio_dotProduct_sub_firstOrder_le
+#print axioms abs_quotient_dotProduct_sub_firstOrder_le
+#print axioms eval_lawPoint_demePolynomial
+#print axioms expectation_demePolynomial_eq_dotProduct
+#print axioms expectation_covariance_eq_dotProduct
+#print axioms expectation_variance_eq_dotProduct
+#print axioms expectation_interceptNumerator_eq_dotProduct
+#print axioms expectation_aucNumerator_eq_dotProduct
+#print axioms expectation_aucDenominator_eq_dotProduct
+#print axioms selectedCalibrationSlope
+#print axioms selectedCalibrationIntercept
+#print axioms selectedCalibrationPortability
+#print axioms selectedAUCPortability
+#print axioms selectedCalibrationSlope_eq_momentCalibrationSlope
+#print axioms selectedCalibrationIntercept_eq_momentCalibrationIntercept
+#print axioms selectedCalibrationPortability_eq_momentCalibrationPortability
+#print axioms selectedAUCPortability_eq_momentAUCPortability
+#print axioms neutralEndMoments
+#print axioms firstOrderEndMoments
+#print axioms budgetMass
+#print axioms budgetMass_four
+#print axioms sum_const_capacity
+#print axioms selectedHistory_firstOrder_bounds
+#print axioms calibrationSlopeFirstOrder
+#print axioms calibrationInterceptFirstOrder
+#print axioms calibrationPortabilityFirstOrder
+#print axioms aucPortabilityFirstOrder
+#print axioms abs_selectedCalibrationSlope_sub_firstOrder_le
+#print axioms abs_selectedCalibrationIntercept_sub_firstOrder_le
+#print axioms abs_selectedCalibrationPortability_sub_firstOrder_le
+#print axioms abs_selectedAUCPortability_sub_firstOrder_le
+#print axioms calibrationSlopeFirstOrder_pos_iff
+#print axioms calibrationPortabilityFirstOrder_pos_iff
+#print axioms aucPortabilityFirstOrder_pos_iff
+#print axioms hasDerivWithinAt_selectedCalibrationSlope_firstOrder
+#print axioms hasDerivWithinAt_selectedCalibrationIntercept_firstOrder
+#print axioms hasDerivWithinAt_selectedCalibrationPortability_firstOrder
+#print axioms hasDerivWithinAt_selectedAUCPortability_firstOrder

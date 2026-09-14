@@ -415,6 +415,615 @@ theorem selectedHistory_firstOrder_bounds (model : SelectionModel Deme Locus All
   · exact (norm_scaledHistory_sub_firstOrder_le model hσ hS0 hfit hS capacity family events
       hhistory hhistory').trans_eq (by ring)
 
+/-! ## The first-order corrections of calibration and AUC portability -/
+
+/-- **The first-order correction of the calibration slope**: the quotient derivative of the
+expected covariance over the expected score variance of a deme, at budget-`n` moments `m₀` in the
+direction `m₁`. -/
+def calibrationSlopeFirstOrder (ℓ₀ : Locus) (n : ℕ) (deme : Deme)
+    (score outcome : FullHaplotype Locus Allele → ℝ)
+    (m₀ m₁ : BudgetConfiguration Deme Locus Allele (fun _ ↦ n) → ℝ) : ℝ :=
+  quotientDerivative
+    (budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme score outcome) ⬝ᵥ m₀)
+    (budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme score score) ⬝ᵥ m₀)
+    (budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme score outcome) ⬝ᵥ m₁)
+    (budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme score score) ⬝ᵥ m₁)
+
+/-- **The first-order correction of the calibration intercept**: the quotient derivative of the
+expected intercept accumulator over the expected score variance of a deme. -/
+def calibrationInterceptFirstOrder (ℓ₀ : Locus) (n : ℕ) (deme : Deme)
+    (score outcome : FullHaplotype Locus Allele → ℝ)
+    (m₀ m₁ : BudgetConfiguration Deme Locus Allele (fun _ ↦ n) → ℝ) : ℝ :=
+  quotientDerivative
+    (budgetCoefficients ℓ₀ (fun _ ↦ n) (interceptNumeratorPolynomial deme score outcome) ⬝ᵥ m₀)
+    (budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme score score) ⬝ᵥ m₀)
+    (budgetCoefficients ℓ₀ (fun _ ↦ n) (interceptNumeratorPolynomial deme score outcome) ⬝ᵥ m₁)
+    (budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme score score) ⬝ᵥ m₁)
+
+/-- **The first-order correction of calibration portability**: the cross-ratio derivative of the
+target covariance and source score variance over the target score variance and source
+covariance. -/
+def calibrationPortabilityFirstOrder (ℓ₀ : Locus) (n : ℕ) (source target : Deme)
+    (score outcome : FullHaplotype Locus Allele → ℝ)
+    (m₀ m₁ : BudgetConfiguration Deme Locus Allele (fun _ ↦ n) → ℝ) : ℝ :=
+  crossRatioDerivative
+    (budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial target score outcome) ⬝ᵥ m₀)
+    (budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial source score score) ⬝ᵥ m₀)
+    (budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial target score score) ⬝ᵥ m₀)
+    (budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial source score outcome) ⬝ᵥ m₀)
+    (budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial target score outcome) ⬝ᵥ m₁)
+    (budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial source score score) ⬝ᵥ m₁)
+    (budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial target score score) ⬝ᵥ m₁)
+    (budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial source score outcome) ⬝ᵥ m₁)
+
+/-- **The first-order correction of AUC portability**: the cross-ratio derivative of the target AUC
+numerator and source AUC denominator over the target AUC denominator and source AUC numerator, at
+budget-2 moments `m₀` in the direction `m₁`. -/
+def aucPortabilityFirstOrder (ℓ₀ : Locus) (source target : Deme)
+    (score : FullHaplotype Locus Allele → ℝ) (outcome : FullHaplotype Locus Allele → Bool)
+    (m₀ m₁ : BudgetConfiguration Deme Locus Allele (fun _ ↦ 2) → ℝ) : ℝ :=
+  crossRatioDerivative
+    (budgetCoefficients ℓ₀ (fun _ ↦ 2)
+      (demePolynomial target (aucNumeratorPolynomial score outcome)) ⬝ᵥ m₀)
+    (budgetCoefficients ℓ₀ (fun _ ↦ 2) (demePolynomial source (aucDenominatorPolynomial outcome))
+      ⬝ᵥ m₀)
+    (budgetCoefficients ℓ₀ (fun _ ↦ 2) (demePolynomial target (aucDenominatorPolynomial outcome))
+      ⬝ᵥ m₀)
+    (budgetCoefficients ℓ₀ (fun _ ↦ 2)
+      (demePolynomial source (aucNumeratorPolynomial score outcome)) ⬝ᵥ m₀)
+    (budgetCoefficients ℓ₀ (fun _ ↦ 2)
+      (demePolynomial target (aucNumeratorPolynomial score outcome)) ⬝ᵥ m₁)
+    (budgetCoefficients ℓ₀ (fun _ ↦ 2) (demePolynomial source (aucDenominatorPolynomial outcome))
+      ⬝ᵥ m₁)
+    (budgetCoefficients ℓ₀ (fun _ ↦ 2) (demePolynomial target (aucDenominatorPolynomial outcome))
+      ⬝ᵥ m₁)
+    (budgetCoefficients ℓ₀ (fun _ ↦ 2)
+      (demePolynomial source (aucNumeratorPolynomial score outcome)) ⬝ᵥ m₁)
+
+/-! ## The metric laws to first order -/
+
+/-- **The calibration slope of a selected history to first order.** For the fitness table `σ s`,
+with `s` in `[0, 1]` and masses at most `S`, at a budget `n ≥ 2`, where the expected score variance
+of the deme is at least `δ > 0` under the selected family and at the neutral end moments `m₀`, the
+selected calibration slope is the slope at `m₀` plus `σ` times `calibrationSlopeFirstOrder` in the
+first-order direction `m₁`, up to `crossRatioRemainder α γ γ γ e₀ e₁ e₂ δ`. Here `α` and `γ` are the
+budget masses of the covariance and variance polynomials, `e₀ = B T σ`, `e₁ = 2 B S T σ`,
+`e₂ = B S (B + 1) T² σ²` and `B = n |L|`.
+
+Assumes: `SelectedOnHistory (scaledModel σ model) (fun _ ↦ n) family events 0` and
+`SelectedOnHistory (scaledModel σ model) (bumpCapacity model (fun _ ↦ n)) family events 0`. -/
+theorem abs_selectedCalibrationSlope_sub_firstOrder_le (ℓ₀ : Locus) {n : ℕ} (hn : 2 ≤ n)
+    (model : SelectionModel Deme Locus Allele) {σ S δ : ℝ} (hσ : 0 ≤ σ) (hS0 : 0 ≤ S)
+    (hfit : ∀ i b, 0 ≤ model.fitness i b ∧ model.fitness i b ≤ 1)
+    (hS : ∀ i, ∑ b, |model.fitness i b| ≤ S)
+    (family : ℕ → ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele)))
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (hhistory : SelectedOnHistory (scaledModel σ model) (fun _ ↦ n) family events 0)
+    (hhistory' : SelectedOnHistory (scaledModel σ model) (bumpCapacity model (fun _ ↦ n))
+      family events 0)
+    (deme : Deme) (score outcome : FullHaplotype Locus Allele → ℝ) (hδ : 0 < δ)
+    (hvariance : δ ≤ family events.length 0 fun law ↦ (law deme).variance score)
+    (hvariance₀ : δ ≤ budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme score score)
+      ⬝ᵥ neutralEndMoments (fun _ ↦ n) family events) :
+    |selectedCalibrationSlope family events.length deme score outcome
+        - momentCalibrationSlope ℓ₀ n deme score outcome
+          (neutralEndMoments (fun _ ↦ n) family events)
+        - σ * calibrationSlopeFirstOrder ℓ₀ n deme score outcome
+          (neutralEndMoments (fun _ ↦ n) family events)
+          (firstOrderEndMoments model (fun _ ↦ n) family events)|
+      ≤ crossRatioRemainder (budgetMass ℓ₀ n (demeCovariancePolynomial deme score outcome))
+          (budgetMass ℓ₀ n (demeCovariancePolynomial deme score score))
+          (budgetMass ℓ₀ n (demeCovariancePolynomial deme score score))
+          (budgetMass ℓ₀ n (demeCovariancePolynomial deme score score))
+          (n * Fintype.card Locus * epochDuration events * σ)
+          (2 * (n * Fintype.card Locus) * S * epochDuration events * σ)
+          (n * Fintype.card Locus * S * (n * Fintype.card Locus + 1) * epochDuration events ^ 2
+            * σ ^ 2) δ := by
+  obtain ⟨hV, hm₀, h₀, h₁, h₂⟩ := selectedHistory_firstOrder_bounds model hσ hS0 hfit hS
+    (fun _ ↦ n) family events hhistory hhistory'
+  rw [sum_const_capacity] at h₀ h₁ h₂
+  have hc : δ ≤ budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme score score)
+      ⬝ᵥ expectedMomentVector (fun _ ↦ n) (family events.length) 0 := by
+    rw [expectation_variance_eq_dotProduct ℓ₀ hn] at hvariance
+    exact hvariance
+  rw [selectedCalibrationSlope_eq_momentCalibrationSlope ℓ₀ hn]
+  exact abs_quotient_dotProduct_sub_firstOrder_le
+    (budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme score outcome)) _ hδ hV hm₀
+    h₀ h₁ h₂ hc hvariance₀
+
+/-- **The calibration intercept of a selected history to first order.** Under the hypotheses of
+`abs_selectedCalibrationSlope_sub_firstOrder_le`, at a budget `n ≥ 3`, the selected calibration
+intercept is the intercept at the neutral end moments plus `σ` times
+`calibrationInterceptFirstOrder`, up to `crossRatioRemainder ι γ γ γ e₀ e₁ e₂ δ`, with `ι` the
+budget mass of the intercept polynomial.
+
+Assumes: `SelectedOnHistory (scaledModel σ model) (fun _ ↦ n) family events 0` and
+`SelectedOnHistory (scaledModel σ model) (bumpCapacity model (fun _ ↦ n)) family events 0`. -/
+theorem abs_selectedCalibrationIntercept_sub_firstOrder_le (ℓ₀ : Locus) {n : ℕ} (hn : 3 ≤ n)
+    (model : SelectionModel Deme Locus Allele) {σ S δ : ℝ} (hσ : 0 ≤ σ) (hS0 : 0 ≤ S)
+    (hfit : ∀ i b, 0 ≤ model.fitness i b ∧ model.fitness i b ≤ 1)
+    (hS : ∀ i, ∑ b, |model.fitness i b| ≤ S)
+    (family : ℕ → ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele)))
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (hhistory : SelectedOnHistory (scaledModel σ model) (fun _ ↦ n) family events 0)
+    (hhistory' : SelectedOnHistory (scaledModel σ model) (bumpCapacity model (fun _ ↦ n))
+      family events 0)
+    (deme : Deme) (score outcome : FullHaplotype Locus Allele → ℝ) (hδ : 0 < δ)
+    (hvariance : δ ≤ family events.length 0 fun law ↦ (law deme).variance score)
+    (hvariance₀ : δ ≤ budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme score score)
+      ⬝ᵥ neutralEndMoments (fun _ ↦ n) family events) :
+    |selectedCalibrationIntercept family events.length deme score outcome
+        - momentCalibrationIntercept ℓ₀ n deme score outcome
+          (neutralEndMoments (fun _ ↦ n) family events)
+        - σ * calibrationInterceptFirstOrder ℓ₀ n deme score outcome
+          (neutralEndMoments (fun _ ↦ n) family events)
+          (firstOrderEndMoments model (fun _ ↦ n) family events)|
+      ≤ crossRatioRemainder (budgetMass ℓ₀ n (interceptNumeratorPolynomial deme score outcome))
+          (budgetMass ℓ₀ n (demeCovariancePolynomial deme score score))
+          (budgetMass ℓ₀ n (demeCovariancePolynomial deme score score))
+          (budgetMass ℓ₀ n (demeCovariancePolynomial deme score score))
+          (n * Fintype.card Locus * epochDuration events * σ)
+          (2 * (n * Fintype.card Locus) * S * epochDuration events * σ)
+          (n * Fintype.card Locus * S * (n * Fintype.card Locus + 1) * epochDuration events ^ 2
+            * σ ^ 2) δ := by
+  obtain ⟨hV, hm₀, h₀, h₁, h₂⟩ := selectedHistory_firstOrder_bounds model hσ hS0 hfit hS
+    (fun _ ↦ n) family events hhistory hhistory'
+  rw [sum_const_capacity] at h₀ h₁ h₂
+  have hn2 : 2 ≤ n := by omega
+  have hc : δ ≤ budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme score score)
+      ⬝ᵥ expectedMomentVector (fun _ ↦ n) (family events.length) 0 := by
+    rw [expectation_variance_eq_dotProduct ℓ₀ hn2] at hvariance
+    exact hvariance
+  rw [selectedCalibrationIntercept_eq_momentCalibrationIntercept ℓ₀ hn]
+  exact abs_quotient_dotProduct_sub_firstOrder_le
+    (budgetCoefficients ℓ₀ (fun _ ↦ n) (interceptNumeratorPolynomial deme score outcome)) _ hδ hV
+    hm₀ h₀ h₁ h₂ hc hvariance₀
+
+/-- **Calibration portability of a selected history to first order.** For the fitness table `σ s`,
+at a budget `n ≥ 2`, where the target score variance and the source covariance are at least
+`δ > 0` under the selected family and at the neutral end moments, the selected calibration
+portability is its value at the neutral end moments plus `σ` times
+`calibrationPortabilityFirstOrder`, up to `crossRatioRemainder α β γ κ e₀ e₁ e₂ δ`, with
+`α, β, γ, κ` the budget masses of the target covariance, source variance, target variance and source
+covariance polynomials, and `e₀, e₁, e₂` as in `abs_selectedCalibrationSlope_sub_firstOrder_le`.
+
+Assumes: `SelectedOnHistory (scaledModel σ model) (fun _ ↦ n) family events 0` and
+`SelectedOnHistory (scaledModel σ model) (bumpCapacity model (fun _ ↦ n)) family events 0`. -/
+theorem abs_selectedCalibrationPortability_sub_firstOrder_le (ℓ₀ : Locus) {n : ℕ} (hn : 2 ≤ n)
+    (model : SelectionModel Deme Locus Allele) {σ S δ : ℝ} (hσ : 0 ≤ σ) (hS0 : 0 ≤ S)
+    (hfit : ∀ i b, 0 ≤ model.fitness i b ∧ model.fitness i b ≤ 1)
+    (hS : ∀ i, ∑ b, |model.fitness i b| ≤ S)
+    (family : ℕ → ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele)))
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (hhistory : SelectedOnHistory (scaledModel σ model) (fun _ ↦ n) family events 0)
+    (hhistory' : SelectedOnHistory (scaledModel σ model) (bumpCapacity model (fun _ ↦ n))
+      family events 0)
+    (source target : Deme) (score outcome : FullHaplotype Locus Allele → ℝ) (hδ : 0 < δ)
+    (htarget : δ ≤ family events.length 0 fun law ↦ (law target).variance score)
+    (hsource : δ ≤ family events.length 0 fun law ↦ (law source).covariance score outcome)
+    (htarget₀ : δ ≤ budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial target score score)
+      ⬝ᵥ neutralEndMoments (fun _ ↦ n) family events)
+    (hsource₀ : δ
+      ≤ budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial source score outcome)
+        ⬝ᵥ neutralEndMoments (fun _ ↦ n) family events) :
+    |selectedCalibrationPortability family events.length source target score outcome
+        - momentCalibrationPortability ℓ₀ n source target score outcome
+          (neutralEndMoments (fun _ ↦ n) family events)
+        - σ * calibrationPortabilityFirstOrder ℓ₀ n source target score outcome
+          (neutralEndMoments (fun _ ↦ n) family events)
+          (firstOrderEndMoments model (fun _ ↦ n) family events)|
+      ≤ crossRatioRemainder (budgetMass ℓ₀ n (demeCovariancePolynomial target score outcome))
+          (budgetMass ℓ₀ n (demeCovariancePolynomial source score score))
+          (budgetMass ℓ₀ n (demeCovariancePolynomial target score score))
+          (budgetMass ℓ₀ n (demeCovariancePolynomial source score outcome))
+          (n * Fintype.card Locus * epochDuration events * σ)
+          (2 * (n * Fintype.card Locus) * S * epochDuration events * σ)
+          (n * Fintype.card Locus * S * (n * Fintype.card Locus + 1) * epochDuration events ^ 2
+            * σ ^ 2) δ := by
+  obtain ⟨hV, hm₀, h₀, h₁, h₂⟩ := selectedHistory_firstOrder_bounds model hσ hS0 hfit hS
+    (fun _ ↦ n) family events hhistory hhistory'
+  rw [sum_const_capacity] at h₀ h₁ h₂
+  have hc : δ ≤ budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial target score score)
+      ⬝ᵥ expectedMomentVector (fun _ ↦ n) (family events.length) 0 := by
+    rw [expectation_variance_eq_dotProduct ℓ₀ hn] at htarget
+    exact htarget
+  have hd : δ ≤ budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial source score outcome)
+      ⬝ᵥ expectedMomentVector (fun _ ↦ n) (family events.length) 0 := by
+    rw [expectation_covariance_eq_dotProduct ℓ₀ hn] at hsource
+    exact hsource
+  rw [selectedCalibrationPortability_eq_momentCalibrationPortability ℓ₀ hn,
+    momentCalibrationPortability_eq_cross, momentCalibrationPortability_eq_cross]
+  exact abs_crossRatio_dotProduct_sub_firstOrder_le
+    (budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial target score outcome))
+    (budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial source score score)) _ _ hδ hV
+    hm₀ h₀ h₁ h₂ hc hd htarget₀ hsource₀
+
+/-- **AUC portability of a selected history to first order.** For the fitness table `σ s`, at budget
+two, where the target AUC denominator and the source AUC numerator are at least `δ > 0` under the
+selected family and at the neutral end moments, the selected AUC portability is its value at the
+neutral end moments plus `σ` times `aucPortabilityFirstOrder`, up to
+`crossRatioRemainder α β γ κ e₀ e₁ e₂ δ`, with `α, β, γ, κ` the budget masses of the target
+numerator, source denominator, target denominator and source numerator, `e₀ = 2 |L| T σ`,
+`e₁ = 4 |L| S T σ` and `e₂ = 2 |L| S (2 |L| + 1) T² σ²`.
+
+Assumes: `SelectedOnHistory (scaledModel σ model) (fun _ ↦ 2) family events 0` and
+`SelectedOnHistory (scaledModel σ model) (bumpCapacity model (fun _ ↦ 2)) family events 0`. -/
+theorem abs_selectedAUCPortability_sub_firstOrder_le (ℓ₀ : Locus)
+    (model : SelectionModel Deme Locus Allele) {σ S δ : ℝ} (hσ : 0 ≤ σ) (hS0 : 0 ≤ S)
+    (hfit : ∀ i b, 0 ≤ model.fitness i b ∧ model.fitness i b ≤ 1)
+    (hS : ∀ i, ∑ b, |model.fitness i b| ≤ S)
+    (family : ℕ → ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele)))
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (hhistory : SelectedOnHistory (scaledModel σ model) (fun _ ↦ 2) family events 0)
+    (hhistory' : SelectedOnHistory (scaledModel σ model) (bumpCapacity model (fun _ ↦ 2))
+      family events 0)
+    (source target : Deme) (score : FullHaplotype Locus Allele → ℝ)
+    (outcome : FullHaplotype Locus Allele → Bool) (hδ : 0 < δ)
+    (htarget : δ ≤ family events.length 0 fun law ↦ aucDenominator (law target) outcome)
+    (hsource : δ ≤ family events.length 0 fun law ↦ aucNumerator (law source) score outcome)
+    (htarget₀ : δ
+      ≤ budgetCoefficients ℓ₀ (fun _ ↦ 2) (demePolynomial target (aucDenominatorPolynomial outcome))
+        ⬝ᵥ neutralEndMoments (fun _ ↦ 2) family events)
+    (hsource₀ : δ
+      ≤ budgetCoefficients ℓ₀ (fun _ ↦ 2)
+          (demePolynomial source (aucNumeratorPolynomial score outcome))
+        ⬝ᵥ neutralEndMoments (fun _ ↦ 2) family events) :
+    |selectedAUCPortability family events.length source target score outcome
+        - momentAUCPortability ℓ₀ source target score outcome
+          (neutralEndMoments (fun _ ↦ 2) family events)
+        - σ * aucPortabilityFirstOrder ℓ₀ source target score outcome
+          (neutralEndMoments (fun _ ↦ 2) family events)
+          (firstOrderEndMoments model (fun _ ↦ 2) family events)|
+      ≤ crossRatioRemainder
+          (budgetMass ℓ₀ 2 (demePolynomial target (aucNumeratorPolynomial score outcome)))
+          (budgetMass ℓ₀ 2 (demePolynomial source (aucDenominatorPolynomial outcome)))
+          (budgetMass ℓ₀ 2 (demePolynomial target (aucDenominatorPolynomial outcome)))
+          (budgetMass ℓ₀ 2 (demePolynomial source (aucNumeratorPolynomial score outcome)))
+          (2 * Fintype.card Locus * epochDuration events * σ)
+          (2 * (2 * Fintype.card Locus) * S * epochDuration events * σ)
+          (2 * Fintype.card Locus * S * (2 * Fintype.card Locus + 1) * epochDuration events ^ 2
+            * σ ^ 2) δ := by
+  obtain ⟨hV, hm₀, h₀, h₁, h₂⟩ := selectedHistory_firstOrder_bounds model hσ hS0 hfit hS
+    (fun _ ↦ 2) family events hhistory hhistory'
+  rw [sum_const_capacity, Nat.cast_ofNat] at h₀ h₁ h₂
+  have hc : δ ≤ budgetCoefficients ℓ₀ (fun _ ↦ 2)
+      (demePolynomial target (aucDenominatorPolynomial outcome))
+      ⬝ᵥ expectedMomentVector (fun _ ↦ 2) (family events.length) 0 := by
+    rw [expectation_aucDenominator_eq_dotProduct ℓ₀] at htarget
+    exact htarget
+  have hd : δ ≤ budgetCoefficients ℓ₀ (fun _ ↦ 2)
+      (demePolynomial source (aucNumeratorPolynomial score outcome))
+      ⬝ᵥ expectedMomentVector (fun _ ↦ 2) (family events.length) 0 := by
+    rw [expectation_aucNumerator_eq_dotProduct ℓ₀] at hsource
+    exact hsource
+  rw [selectedAUCPortability_eq_momentAUCPortability ℓ₀]
+  exact abs_crossRatio_dotProduct_sub_firstOrder_le
+    (budgetCoefficients ℓ₀ (fun _ ↦ 2)
+      (demePolynomial target (aucNumeratorPolynomial score outcome)))
+    (budgetCoefficients ℓ₀ (fun _ ↦ 2) (demePolynomial source (aucDenominatorPolynomial outcome)))
+    _ _ hδ hV hm₀ h₀ h₁ h₂ hc hd htarget₀ hsource₀
+
+/-! ## Sign criteria -/
+
+/-- **Selection raises the calibration slope to first order exactly when the covariance gains
+more.** Where the expected covariance and score variance of the deme are positive at `m₀`, the
+first-order slope correction is positive exactly when the relative first-order change of the score
+variance is below that of the covariance. -/
+theorem calibrationSlopeFirstOrder_pos_iff (ℓ₀ : Locus) (n : ℕ) (deme : Deme)
+    (score outcome : FullHaplotype Locus Allele → ℝ)
+    (m₀ m₁ : BudgetConfiguration Deme Locus Allele (fun _ ↦ n) → ℝ)
+    (hcovariance : 0 < budgetCoefficients ℓ₀ (fun _ ↦ n)
+      (demeCovariancePolynomial deme score outcome) ⬝ᵥ m₀)
+    (hvariance : 0 < budgetCoefficients ℓ₀ (fun _ ↦ n)
+      (demeCovariancePolynomial deme score score) ⬝ᵥ m₀) :
+    0 < calibrationSlopeFirstOrder ℓ₀ n deme score outcome m₀ m₁
+      ↔ budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme score score) ⬝ᵥ m₁
+            / budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme score score) ⬝ᵥ m₀
+        < budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme score outcome) ⬝ᵥ m₁
+            / budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme score outcome)
+              ⬝ᵥ m₀ :=
+  quotientDerivative_pos_iff_of_pos _ _ hcovariance hvariance
+
+/-- **Selection raises calibration portability to first order exactly when the target slope gains
+more.** Where the four calibration accumulators are positive at `m₀`, the first-order correction is
+positive exactly when the relative first-order change `C_t₁/C_t - V_t₁/V_t` of the target slope
+exceeds the relative first-order change `C_s₁/C_s - V_s₁/V_s` of the source slope. -/
+theorem calibrationPortabilityFirstOrder_pos_iff (ℓ₀ : Locus) (n : ℕ) (source target : Deme)
+    (score outcome : FullHaplotype Locus Allele → ℝ)
+    (m₀ m₁ : BudgetConfiguration Deme Locus Allele (fun _ ↦ n) → ℝ)
+    (hCt : 0 < budgetCoefficients ℓ₀ (fun _ ↦ n)
+      (demeCovariancePolynomial target score outcome) ⬝ᵥ m₀)
+    (hVs : 0 < budgetCoefficients ℓ₀ (fun _ ↦ n)
+      (demeCovariancePolynomial source score score) ⬝ᵥ m₀)
+    (hVt : 0 < budgetCoefficients ℓ₀ (fun _ ↦ n)
+      (demeCovariancePolynomial target score score) ⬝ᵥ m₀)
+    (hCs : 0 < budgetCoefficients ℓ₀ (fun _ ↦ n)
+      (demeCovariancePolynomial source score outcome) ⬝ᵥ m₀) :
+    0 < calibrationPortabilityFirstOrder ℓ₀ n source target score outcome m₀ m₁
+      ↔ budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial source score outcome) ⬝ᵥ m₁
+            / budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial source score outcome)
+              ⬝ᵥ m₀
+          - budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial source score score) ⬝ᵥ m₁
+            / budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial source score score)
+              ⬝ᵥ m₀
+        < budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial target score outcome) ⬝ᵥ m₁
+            / budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial target score outcome)
+              ⬝ᵥ m₀
+          - budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial target score score) ⬝ᵥ m₁
+            / budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial target score score)
+              ⬝ᵥ m₀ :=
+  crossRatioDerivative_pos_iff_of_pos _ _ _ _ hCt hVs hVt hCs
+
+/-- **Selection raises AUC portability to first order exactly when the target gains more.** Where
+the four AUC components are positive at `m₀`, the first-order correction is positive exactly when
+the relative first-order change `N_t₁/N_t - D_t₁/D_t` of the target exceeds that of the source. -/
+theorem aucPortabilityFirstOrder_pos_iff (ℓ₀ : Locus) (source target : Deme)
+    (score : FullHaplotype Locus Allele → ℝ) (outcome : FullHaplotype Locus Allele → Bool)
+    (m₀ m₁ : BudgetConfiguration Deme Locus Allele (fun _ ↦ 2) → ℝ)
+    (hNt : 0 < budgetCoefficients ℓ₀ (fun _ ↦ 2)
+      (demePolynomial target (aucNumeratorPolynomial score outcome)) ⬝ᵥ m₀)
+    (hDs : 0 < budgetCoefficients ℓ₀ (fun _ ↦ 2)
+      (demePolynomial source (aucDenominatorPolynomial outcome)) ⬝ᵥ m₀)
+    (hDt : 0 < budgetCoefficients ℓ₀ (fun _ ↦ 2)
+      (demePolynomial target (aucDenominatorPolynomial outcome)) ⬝ᵥ m₀)
+    (hNs : 0 < budgetCoefficients ℓ₀ (fun _ ↦ 2)
+      (demePolynomial source (aucNumeratorPolynomial score outcome)) ⬝ᵥ m₀) :
+    0 < aucPortabilityFirstOrder ℓ₀ source target score outcome m₀ m₁
+      ↔ budgetCoefficients ℓ₀ (fun _ ↦ 2)
+              (demePolynomial source (aucNumeratorPolynomial score outcome)) ⬝ᵥ m₁
+            / budgetCoefficients ℓ₀ (fun _ ↦ 2)
+              (demePolynomial source (aucNumeratorPolynomial score outcome)) ⬝ᵥ m₀
+          - budgetCoefficients ℓ₀ (fun _ ↦ 2)
+              (demePolynomial source (aucDenominatorPolynomial outcome)) ⬝ᵥ m₁
+            / budgetCoefficients ℓ₀ (fun _ ↦ 2)
+              (demePolynomial source (aucDenominatorPolynomial outcome)) ⬝ᵥ m₀
+        < budgetCoefficients ℓ₀ (fun _ ↦ 2)
+              (demePolynomial target (aucNumeratorPolynomial score outcome)) ⬝ᵥ m₁
+            / budgetCoefficients ℓ₀ (fun _ ↦ 2)
+              (demePolynomial target (aucNumeratorPolynomial score outcome)) ⬝ᵥ m₀
+          - budgetCoefficients ℓ₀ (fun _ ↦ 2)
+              (demePolynomial target (aucDenominatorPolynomial outcome)) ⬝ᵥ m₁
+            / budgetCoefficients ℓ₀ (fun _ ↦ 2)
+              (demePolynomial target (aucDenominatorPolynomial outcome)) ⬝ᵥ m₀ :=
+  crossRatioDerivative_pos_iff_of_pos _ _ _ _ hNt hDs hDt hNs
+
+/-! ## The corrections as derivatives in selection strength -/
+
+/-- **A metric with a first-order remainder has its correction as right derivative.** If for every
+`σ ≥ 0` the value `f σ` is within `crossRatioRemainder α β γ κ (c₀ σ) (c₁ σ) (c₂ σ²) δ` of
+`x₀ + σ f₁`, then `f` has right derivative `f₁` at zero. -/
+theorem hasDerivWithinAt_of_crossRatioRemainder {f : ℝ → ℝ} {x₀ f₁ α β γ κ c₀ c₁ c₂ δ : ℝ}
+    (hbound : ∀ σ, 0 ≤ σ →
+      |f σ - x₀ - σ * f₁| ≤ crossRatioRemainder α β γ κ (c₀ * σ) (c₁ * σ) (c₂ * σ ^ 2) δ) :
+    HasDerivWithinAt f f₁ (Set.Ici 0) 0 := by
+  refine hasDerivWithinAt_of_norm_sub_le_sq (x₀ := x₀)
+    (C := crossRatioRemainder α β γ κ c₀ c₁ c₂ δ) fun σ hσ ↦ ?_
+  rw [Real.norm_eq_abs, smul_eq_mul]
+  refine (hbound σ hσ).trans_eq ?_
+  simp only [crossRatioRemainder]
+  ring
+
+/-- **The first-order slope correction is the derivative in selection strength.** Let `family σ`
+be selected along a history for the fitness table `σ s` at every `σ ≥ 0`, with `s` in `[0, 1]`,
+starting from the same moments `v₀` and `w₀` at both budgets, with expected score variance at least
+`δ > 0` under every `family σ` and at the neutral moments. Then the calibration slope of the
+selected history has right derivative in `σ` at zero equal to `calibrationSlopeFirstOrder` at the
+neutral end moments in the direction of the correction of the history.
+
+Assumes: `SelectedOnHistory (scaledModel σ model) (fun _ ↦ n) (family σ) events 0` and
+`SelectedOnHistory (scaledModel σ model) (bumpCapacity model (fun _ ↦ n)) (family σ) events 0`
+for every `σ ≥ 0`. -/
+theorem hasDerivWithinAt_selectedCalibrationSlope_firstOrder (ℓ₀ : Locus) {n : ℕ} (hn : 2 ≤ n)
+    (model : SelectionModel Deme Locus Allele) {S δ : ℝ} (hS0 : 0 ≤ S)
+    (hfit : ∀ i b, 0 ≤ model.fitness i b ∧ model.fitness i b ≤ 1)
+    (hS : ∀ i, ∑ b, |model.fitness i b| ≤ S)
+    (family : ℝ → ℕ → ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele)))
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (hhistory : ∀ σ, 0 ≤ σ →
+      SelectedOnHistory (scaledModel σ model) (fun _ ↦ n) (family σ) events 0)
+    (hhistory' : ∀ σ, 0 ≤ σ → SelectedOnHistory (scaledModel σ model)
+      (bumpCapacity model (fun _ ↦ n)) (family σ) events 0)
+    (v₀ : BudgetConfiguration Deme Locus Allele (fun _ ↦ n) → ℝ)
+    (w₀ : BudgetConfiguration Deme Locus Allele (bumpCapacity model (fun _ ↦ n)) → ℝ)
+    (hinitial : ∀ σ, 0 ≤ σ → expectedMomentVector (fun _ ↦ n) (family σ 0) 0 = v₀)
+    (hinitial' : ∀ σ, 0 ≤ σ →
+      expectedMomentVector (bumpCapacity model (fun _ ↦ n)) (family σ 0) 0 = w₀)
+    (deme : Deme) (score outcome : FullHaplotype Locus Allele → ℝ) (hδ : 0 < δ)
+    (hvariance : ∀ σ, 0 ≤ σ →
+      δ ≤ family σ events.length 0 fun law ↦ (law deme).variance score)
+    (hvariance₀ : δ ≤ budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme score score)
+      ⬝ᵥ (historyEventPropagator (fun _ ↦ n) events *ᵥ v₀)) :
+    HasDerivWithinAt
+      (fun σ ↦ selectedCalibrationSlope (family σ) events.length deme score outcome)
+      (calibrationSlopeFirstOrder ℓ₀ n deme score outcome
+        (historyEventPropagator (fun _ ↦ n) events *ᵥ v₀)
+        (historyCorrection model (fun _ ↦ n) events w₀)) (Set.Ici 0) 0 := by
+  refine hasDerivWithinAt_of_crossRatioRemainder
+    (x₀ := momentCalibrationSlope ℓ₀ n deme score outcome
+      (historyEventPropagator (fun _ ↦ n) events *ᵥ v₀))
+    (α := budgetMass ℓ₀ n (demeCovariancePolynomial deme score outcome))
+    (β := budgetMass ℓ₀ n (demeCovariancePolynomial deme score score))
+    (γ := budgetMass ℓ₀ n (demeCovariancePolynomial deme score score))
+    (κ := budgetMass ℓ₀ n (demeCovariancePolynomial deme score score))
+    (c₀ := n * Fintype.card Locus * epochDuration events)
+    (c₁ := 2 * (n * Fintype.card Locus) * S * epochDuration events)
+    (c₂ := n * Fintype.card Locus * S * (n * Fintype.card Locus + 1) * epochDuration events ^ 2)
+    (δ := δ) fun σ hσ ↦ ?_
+  have h := abs_selectedCalibrationSlope_sub_firstOrder_le ℓ₀ hn model hσ hS0 hfit hS (family σ)
+    events (hhistory σ hσ) (hhistory' σ hσ) deme score outcome hδ (hvariance σ hσ)
+    (by rw [neutralEndMoments, hinitial σ hσ]; exact hvariance₀)
+  rw [neutralEndMoments, firstOrderEndMoments, hinitial σ hσ, hinitial' σ hσ] at h
+  exact h
+
+/-- **The first-order intercept correction is the derivative in selection strength.** Under the
+hypotheses of `hasDerivWithinAt_selectedCalibrationSlope_firstOrder`, at a budget `n ≥ 3`, the
+calibration intercept of the selected history has right derivative in `σ` at zero equal to
+`calibrationInterceptFirstOrder` at the neutral end moments in the direction of the correction.
+
+Assumes: `SelectedOnHistory (scaledModel σ model) (fun _ ↦ n) (family σ) events 0` and
+`SelectedOnHistory (scaledModel σ model) (bumpCapacity model (fun _ ↦ n)) (family σ) events 0`
+for every `σ ≥ 0`. -/
+theorem hasDerivWithinAt_selectedCalibrationIntercept_firstOrder (ℓ₀ : Locus) {n : ℕ}
+    (hn : 3 ≤ n) (model : SelectionModel Deme Locus Allele) {S δ : ℝ} (hS0 : 0 ≤ S)
+    (hfit : ∀ i b, 0 ≤ model.fitness i b ∧ model.fitness i b ≤ 1)
+    (hS : ∀ i, ∑ b, |model.fitness i b| ≤ S)
+    (family : ℝ → ℕ → ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele)))
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (hhistory : ∀ σ, 0 ≤ σ →
+      SelectedOnHistory (scaledModel σ model) (fun _ ↦ n) (family σ) events 0)
+    (hhistory' : ∀ σ, 0 ≤ σ → SelectedOnHistory (scaledModel σ model)
+      (bumpCapacity model (fun _ ↦ n)) (family σ) events 0)
+    (v₀ : BudgetConfiguration Deme Locus Allele (fun _ ↦ n) → ℝ)
+    (w₀ : BudgetConfiguration Deme Locus Allele (bumpCapacity model (fun _ ↦ n)) → ℝ)
+    (hinitial : ∀ σ, 0 ≤ σ → expectedMomentVector (fun _ ↦ n) (family σ 0) 0 = v₀)
+    (hinitial' : ∀ σ, 0 ≤ σ →
+      expectedMomentVector (bumpCapacity model (fun _ ↦ n)) (family σ 0) 0 = w₀)
+    (deme : Deme) (score outcome : FullHaplotype Locus Allele → ℝ) (hδ : 0 < δ)
+    (hvariance : ∀ σ, 0 ≤ σ →
+      δ ≤ family σ events.length 0 fun law ↦ (law deme).variance score)
+    (hvariance₀ : δ ≤ budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial deme score score)
+      ⬝ᵥ (historyEventPropagator (fun _ ↦ n) events *ᵥ v₀)) :
+    HasDerivWithinAt
+      (fun σ ↦ selectedCalibrationIntercept (family σ) events.length deme score outcome)
+      (calibrationInterceptFirstOrder ℓ₀ n deme score outcome
+        (historyEventPropagator (fun _ ↦ n) events *ᵥ v₀)
+        (historyCorrection model (fun _ ↦ n) events w₀)) (Set.Ici 0) 0 := by
+  refine hasDerivWithinAt_of_crossRatioRemainder
+    (x₀ := momentCalibrationIntercept ℓ₀ n deme score outcome
+      (historyEventPropagator (fun _ ↦ n) events *ᵥ v₀))
+    (α := budgetMass ℓ₀ n (interceptNumeratorPolynomial deme score outcome))
+    (β := budgetMass ℓ₀ n (demeCovariancePolynomial deme score score))
+    (γ := budgetMass ℓ₀ n (demeCovariancePolynomial deme score score))
+    (κ := budgetMass ℓ₀ n (demeCovariancePolynomial deme score score))
+    (c₀ := n * Fintype.card Locus * epochDuration events)
+    (c₁ := 2 * (n * Fintype.card Locus) * S * epochDuration events)
+    (c₂ := n * Fintype.card Locus * S * (n * Fintype.card Locus + 1) * epochDuration events ^ 2)
+    (δ := δ) fun σ hσ ↦ ?_
+  have h := abs_selectedCalibrationIntercept_sub_firstOrder_le ℓ₀ hn model hσ hS0 hfit hS
+    (family σ) events (hhistory σ hσ) (hhistory' σ hσ) deme score outcome hδ (hvariance σ hσ)
+    (by rw [neutralEndMoments, hinitial σ hσ]; exact hvariance₀)
+  rw [neutralEndMoments, firstOrderEndMoments, hinitial σ hσ, hinitial' σ hσ] at h
+  exact h
+
+/-- **The first-order calibration portability correction is the derivative in selection
+strength.** Let `family σ` be selected along a history for the fitness table `σ s` at every
+`σ ≥ 0`, starting from the same moments `v₀` and `w₀`, with target score variance and source
+covariance at least `δ > 0` under every `family σ` and at the neutral moments. Then the calibration
+portability of the selected history has right derivative in `σ` at zero equal to
+`calibrationPortabilityFirstOrder` at the neutral end moments in the direction of the correction.
+
+Assumes: `SelectedOnHistory (scaledModel σ model) (fun _ ↦ n) (family σ) events 0` and
+`SelectedOnHistory (scaledModel σ model) (bumpCapacity model (fun _ ↦ n)) (family σ) events 0`
+for every `σ ≥ 0`. -/
+theorem hasDerivWithinAt_selectedCalibrationPortability_firstOrder (ℓ₀ : Locus) {n : ℕ}
+    (hn : 2 ≤ n) (model : SelectionModel Deme Locus Allele) {S δ : ℝ} (hS0 : 0 ≤ S)
+    (hfit : ∀ i b, 0 ≤ model.fitness i b ∧ model.fitness i b ≤ 1)
+    (hS : ∀ i, ∑ b, |model.fitness i b| ≤ S)
+    (family : ℝ → ℕ → ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele)))
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (hhistory : ∀ σ, 0 ≤ σ →
+      SelectedOnHistory (scaledModel σ model) (fun _ ↦ n) (family σ) events 0)
+    (hhistory' : ∀ σ, 0 ≤ σ → SelectedOnHistory (scaledModel σ model)
+      (bumpCapacity model (fun _ ↦ n)) (family σ) events 0)
+    (v₀ : BudgetConfiguration Deme Locus Allele (fun _ ↦ n) → ℝ)
+    (w₀ : BudgetConfiguration Deme Locus Allele (bumpCapacity model (fun _ ↦ n)) → ℝ)
+    (hinitial : ∀ σ, 0 ≤ σ → expectedMomentVector (fun _ ↦ n) (family σ 0) 0 = v₀)
+    (hinitial' : ∀ σ, 0 ≤ σ →
+      expectedMomentVector (bumpCapacity model (fun _ ↦ n)) (family σ 0) 0 = w₀)
+    (source target : Deme) (score outcome : FullHaplotype Locus Allele → ℝ) (hδ : 0 < δ)
+    (htarget : ∀ σ, 0 ≤ σ →
+      δ ≤ family σ events.length 0 fun law ↦ (law target).variance score)
+    (hsource : ∀ σ, 0 ≤ σ →
+      δ ≤ family σ events.length 0 fun law ↦ (law source).covariance score outcome)
+    (htarget₀ : δ ≤ budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial target score score)
+      ⬝ᵥ (historyEventPropagator (fun _ ↦ n) events *ᵥ v₀))
+    (hsource₀ : δ
+      ≤ budgetCoefficients ℓ₀ (fun _ ↦ n) (demeCovariancePolynomial source score outcome)
+        ⬝ᵥ (historyEventPropagator (fun _ ↦ n) events *ᵥ v₀)) :
+    HasDerivWithinAt
+      (fun σ ↦ selectedCalibrationPortability (family σ) events.length source target score outcome)
+      (calibrationPortabilityFirstOrder ℓ₀ n source target score outcome
+        (historyEventPropagator (fun _ ↦ n) events *ᵥ v₀)
+        (historyCorrection model (fun _ ↦ n) events w₀)) (Set.Ici 0) 0 := by
+  refine hasDerivWithinAt_of_crossRatioRemainder
+    (x₀ := momentCalibrationPortability ℓ₀ n source target score outcome
+      (historyEventPropagator (fun _ ↦ n) events *ᵥ v₀))
+    (α := budgetMass ℓ₀ n (demeCovariancePolynomial target score outcome))
+    (β := budgetMass ℓ₀ n (demeCovariancePolynomial source score score))
+    (γ := budgetMass ℓ₀ n (demeCovariancePolynomial target score score))
+    (κ := budgetMass ℓ₀ n (demeCovariancePolynomial source score outcome))
+    (c₀ := n * Fintype.card Locus * epochDuration events)
+    (c₁ := 2 * (n * Fintype.card Locus) * S * epochDuration events)
+    (c₂ := n * Fintype.card Locus * S * (n * Fintype.card Locus + 1) * epochDuration events ^ 2)
+    (δ := δ) fun σ hσ ↦ ?_
+  have h := abs_selectedCalibrationPortability_sub_firstOrder_le ℓ₀ hn model hσ hS0 hfit hS
+    (family σ) events (hhistory σ hσ) (hhistory' σ hσ) source target score outcome hδ
+    (htarget σ hσ) (hsource σ hσ) (by rw [neutralEndMoments, hinitial σ hσ]; exact htarget₀)
+    (by rw [neutralEndMoments, hinitial σ hσ]; exact hsource₀)
+  rw [neutralEndMoments, firstOrderEndMoments, hinitial σ hσ, hinitial' σ hσ] at h
+  exact h
+
+/-- **The first-order AUC portability correction is the derivative in selection strength.** Let
+`family σ` be selected along a history for the fitness table `σ s` at every `σ ≥ 0`, starting from
+the same budget-2 moments `v₀` and larger-budget moments `w₀`, with target AUC denominator and
+source AUC numerator at least `δ > 0` under every `family σ` and at the neutral moments. Then the
+AUC portability of the selected history has right derivative in `σ` at zero equal to
+`aucPortabilityFirstOrder` at the neutral end moments in the direction of the correction.
+
+Assumes: `SelectedOnHistory (scaledModel σ model) (fun _ ↦ 2) (family σ) events 0` and
+`SelectedOnHistory (scaledModel σ model) (bumpCapacity model (fun _ ↦ 2)) (family σ) events 0`
+for every `σ ≥ 0`. -/
+theorem hasDerivWithinAt_selectedAUCPortability_firstOrder (ℓ₀ : Locus)
+    (model : SelectionModel Deme Locus Allele) {S δ : ℝ} (hS0 : 0 ≤ S)
+    (hfit : ∀ i b, 0 ≤ model.fitness i b ∧ model.fitness i b ≤ 1)
+    (hS : ∀ i, ∑ b, |model.fitness i b| ≤ S)
+    (family : ℝ → ℕ → ℝ → ExpFunctional (Deme → FiniteReportLaw (FullHaplotype Locus Allele)))
+    (events : List ((NeutralRates Deme Locus Allele × ℝ≥0) ⊕ PulseMatrix Deme))
+    (hhistory : ∀ σ, 0 ≤ σ →
+      SelectedOnHistory (scaledModel σ model) (fun _ ↦ 2) (family σ) events 0)
+    (hhistory' : ∀ σ, 0 ≤ σ → SelectedOnHistory (scaledModel σ model)
+      (bumpCapacity model (fun _ ↦ 2)) (family σ) events 0)
+    (v₀ : BudgetConfiguration Deme Locus Allele (fun _ ↦ 2) → ℝ)
+    (w₀ : BudgetConfiguration Deme Locus Allele (bumpCapacity model (fun _ ↦ 2)) → ℝ)
+    (hinitial : ∀ σ, 0 ≤ σ → expectedMomentVector (fun _ ↦ 2) (family σ 0) 0 = v₀)
+    (hinitial' : ∀ σ, 0 ≤ σ →
+      expectedMomentVector (bumpCapacity model (fun _ ↦ 2)) (family σ 0) 0 = w₀)
+    (source target : Deme) (score : FullHaplotype Locus Allele → ℝ)
+    (outcome : FullHaplotype Locus Allele → Bool) (hδ : 0 < δ)
+    (htarget : ∀ σ, 0 ≤ σ →
+      δ ≤ family σ events.length 0 fun law ↦ aucDenominator (law target) outcome)
+    (hsource : ∀ σ, 0 ≤ σ →
+      δ ≤ family σ events.length 0 fun law ↦ aucNumerator (law source) score outcome)
+    (htarget₀ : δ
+      ≤ budgetCoefficients ℓ₀ (fun _ ↦ 2) (demePolynomial target (aucDenominatorPolynomial outcome))
+        ⬝ᵥ (historyEventPropagator (fun _ ↦ 2) events *ᵥ v₀))
+    (hsource₀ : δ
+      ≤ budgetCoefficients ℓ₀ (fun _ ↦ 2)
+          (demePolynomial source (aucNumeratorPolynomial score outcome))
+        ⬝ᵥ (historyEventPropagator (fun _ ↦ 2) events *ᵥ v₀)) :
+    HasDerivWithinAt
+      (fun σ ↦ selectedAUCPortability (family σ) events.length source target score outcome)
+      (aucPortabilityFirstOrder ℓ₀ source target score outcome
+        (historyEventPropagator (fun _ ↦ 2) events *ᵥ v₀)
+        (historyCorrection model (fun _ ↦ 2) events w₀)) (Set.Ici 0) 0 := by
+  refine hasDerivWithinAt_of_crossRatioRemainder
+    (x₀ := momentAUCPortability ℓ₀ source target score outcome
+      (historyEventPropagator (fun _ ↦ 2) events *ᵥ v₀))
+    (α := budgetMass ℓ₀ 2 (demePolynomial target (aucNumeratorPolynomial score outcome)))
+    (β := budgetMass ℓ₀ 2 (demePolynomial source (aucDenominatorPolynomial outcome)))
+    (γ := budgetMass ℓ₀ 2 (demePolynomial target (aucDenominatorPolynomial outcome)))
+    (κ := budgetMass ℓ₀ 2 (demePolynomial source (aucNumeratorPolynomial score outcome)))
+    (c₀ := 2 * Fintype.card Locus * epochDuration events)
+    (c₁ := 2 * (2 * Fintype.card Locus) * S * epochDuration events)
+    (c₂ := 2 * Fintype.card Locus * S * (2 * Fintype.card Locus + 1) * epochDuration events ^ 2)
+    (δ := δ) fun σ hσ ↦ ?_
+  have h := abs_selectedAUCPortability_sub_firstOrder_le ℓ₀ model hσ hS0 hfit hS (family σ)
+    events (hhistory σ hσ) (hhistory' σ hσ) source target score outcome hδ (htarget σ hσ)
+    (hsource σ hσ) (by rw [neutralEndMoments, hinitial σ hσ]; exact htarget₀)
+    (by rw [neutralEndMoments, hinitial σ hσ]; exact hsource₀)
+  rw [neutralEndMoments, firstOrderEndMoments, hinitial σ hσ, hinitial' σ hσ] at h
+  exact h
+
 end
 
 end Descent.Portability.SelectionMetricsFirstOrder
