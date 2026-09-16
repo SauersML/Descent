@@ -37,9 +37,6 @@ None. Every body is an instance of conditional-mean Pythagoras on a probability 
 nothing here names a cohort or a measurement.
 -/
 
-set_option autoImplicit false
-set_option relaxedAutoImplicit false
-
 namespace Descent.Portability.NestedInformationGain
 
 open MeasureTheory

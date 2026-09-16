@@ -46,9 +46,6 @@ status is a named quantity in a subsystem module asserting that this algebra com
 something measurable, and such names keep their own docstrings, regimes and ledger rows.
 -/
 
-set_option autoImplicit false
-set_option relaxedAutoImplicit false
-
 namespace Descent.Portability.ResidualGeneticRepair
 
 open Foundations TransportCoordinates

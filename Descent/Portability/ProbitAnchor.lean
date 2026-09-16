@@ -35,9 +35,6 @@ None. These are properties of the standard normal distribution function and of t
 specified model under a specified law.
 -/
 
-set_option autoImplicit false
-set_option relaxedAutoImplicit false
-
 namespace Descent.Portability.ProbitAnchor
 
 open Filter Topology MeasureTheory ProbabilityTheory MarginalAnchor Foundations

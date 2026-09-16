@@ -36,9 +36,6 @@ None. A Gaussian integral is an identity; whether a score's conditional law is G
 is a property of data this module does not see.
 -/
 
-set_option autoImplicit false
-set_option relaxedAutoImplicit false
-
 namespace Descent.Portability.GaussianAnchor
 
 open MeasureTheory ProbabilityTheory Foundations

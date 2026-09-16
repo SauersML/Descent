@@ -40,8 +40,8 @@ The link enters only through the hypotheses each theorem names -- continuity, st
 monotonicity, the two limits, a derivative `W` -- so the statements cover the logit
 link (instantiated below with Mathlib's `Real.sigmoid`, where `W` is the Bernoulli
 weight `σ(1 − σ)` and the cross-information is expected Fisher information) and the
-probit link alike; the corpus supplies the probit's hypotheses nowhere yet, so that
-instance is not stated.
+probit link alike; `ProbitAnchor` supplies the probit's four facts and states that
+instance, and `GaussianAnchor` gives its closed form under a Gaussian declared law.
 
 That last statement is the design's stronger separation: at the declared law, baseline
 and predictor shape are orthogonal in expected information, not merely separately
@@ -59,9 +59,6 @@ None. The anchor is a property of the specified model under the specified law.  
 does not assert that `π` is any population's prevalence, nor that observed outcomes are
 calibrated in any subgroup.
 -/
-
-set_option autoImplicit false
-set_option relaxedAutoImplicit false
 
 namespace Descent.Portability.MarginalAnchor
 
