@@ -218,6 +218,9 @@ import Descent.Portability.FiniteSphereNet
 import Descent.Portability.MarginalPathCoupling
 import Descent.Portability.MarginalTurnoverRegion
 import Descent.Portability.TransportCoordinates
+import Descent.Portability.ResidualGeneticRepair
+import Descent.Portability.NestedInformationGain
+import Descent.Portability.MarginalAnchor
 import Descent.Portability.TurnoverQuadraticVariation
 import Descent.Portability.DenominatorAwareRecovery
 import Descent.Portability.FixedBackgroundCurveRegion
