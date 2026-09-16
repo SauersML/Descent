@@ -15,6 +15,11 @@ import Descent.Portability.MarginalAnchor
 #print axioms Descent.Portability.MarginalAnchor.eq_anchor_of_anchoredMean_eq
 #print axioms Descent.Portability.MarginalAnchor.hasDerivAt_anchoredMean_path
 #print axioms Descent.Portability.MarginalAnchor.anchored_score_orthogonal
+#print axioms Descent.Portability.MarginalAnchor.sum_mass_weight_pos
 #print axioms Descent.Portability.MarginalAnchor.anchor_deriv_eq
 #print axioms Descent.Portability.MarginalAnchor.baseline_anchor_deriv
 #print axioms Descent.Portability.MarginalAnchor.crossInformation_baseline_shape_zero
+#print axioms Descent.Portability.MarginalAnchor.bernoulliWeight_pos
+#print axioms Descent.Portability.MarginalAnchor.exists_unique_anchor_logit
+#print axioms Descent.Portability.MarginalAnchor.anchor_deriv_eq_logit
+#print axioms Descent.Portability.MarginalAnchor.fisher_baseline_shape_zero
