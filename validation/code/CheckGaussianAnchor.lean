@@ -9,3 +9,6 @@ import Descent.Portability.GaussianAnchor
 #print axioms Descent.Portability.GaussianAnchor.gaussianAverage_probit_general
 #print axioms Descent.Portability.GaussianAnchor.gaussian_anchor_closed_form
 #print axioms Descent.Portability.GaussianAnchor.gaussian_anchor_unique
+#print axioms Descent.Portability.GaussianAnchor.drive_gaussianAverage
+#print axioms Descent.Portability.GaussianAnchor.drive_anchor_closed_form
+#print axioms Descent.Portability.GaussianAnchor.drive_anchor_unique

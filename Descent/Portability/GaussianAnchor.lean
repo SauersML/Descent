@@ -99,6 +99,46 @@ theorem gaussian_anchor_unique (q b m α : ℝ) (v : NNReal)
   rw [div_eq_iff hpos.ne'] at hratio
   linarith
 
+/-! ### Only the law of the drive matters -/
+
+/-- **Gaussian averaging through the drive.**  Under any declared law `ν` on any predictor
+space, if the genetic drive `g` is Gaussian with mean `m` and variance `s`, then
+`E_ν[Φ(α + g)] = Φ((α + m) / √(1 + s))`.  For a vector of scores `z` with drive `bᵀz`
+and Gaussian `z`, `m = bᵀμ` and `s = bᵀΣb`; nothing about the individual scores beyond
+the law of that one linear combination enters. -/
+theorem drive_gaussianAverage {X : Type*} [MeasurableSpace X] (ν : Measure X) (g : X → ℝ)
+    (hg : AEMeasurable g ν) (m : ℝ) (s : NNReal) (hlaw : ν.map g = gaussianReal m s)
+    (α : ℝ) :
+    ∫ x, Phi (α + g x) ∂ν = Phi ((α + m) / Real.sqrt (1 + (s : ℝ))) := by
+  have hcont : Continuous fun z : ℝ ↦ Phi (α + 1 * z) :=
+    continuous_Phi.comp (by fun_prop : Continuous fun z : ℝ ↦ α + 1 * z)
+  have h := gaussianAverage_probit_general α 1 m s
+  rw [← hlaw, integral_map hg hcont.aestronglyMeasurable] at h
+  simpa using h
+
+/-- **The closed-form anchor through the drive**: `q √(1 + s) − m` anchors a Gaussian drive
+of mean `m` and variance `s` at `Φ(q)`. -/
+theorem drive_anchor_closed_form {X : Type*} [MeasurableSpace X] (ν : Measure X) (g : X → ℝ)
+    (hg : AEMeasurable g ν) (m : ℝ) (s : NNReal) (hlaw : ν.map g = gaussianReal m s) (q : ℝ) :
+    ∫ x, Phi ((q * Real.sqrt (1 + (s : ℝ)) - m) + g x) ∂ν = Phi q := by
+  rw [drive_gaussianAverage ν g hg m s hlaw]
+  congr 1
+  have hpos : 0 < Real.sqrt (1 + (s : ℝ)) := Real.sqrt_pos.mpr (by positivity)
+  field_simp
+  ring
+
+/-- **And it is the only one.** -/
+theorem drive_anchor_unique {X : Type*} [MeasurableSpace X] (ν : Measure X) (g : X → ℝ)
+    (hg : AEMeasurable g ν) (m : ℝ) (s : NNReal) (hlaw : ν.map g = gaussianReal m s)
+    (q α : ℝ)
+    (hα : ∫ x, Phi (α + g x) ∂ν = Phi q) :
+    α = q * Real.sqrt (1 + (s : ℝ)) - m := by
+  rw [drive_gaussianAverage ν g hg m s hlaw] at hα
+  have hpos : 0 < Real.sqrt (1 + (s : ℝ)) := Real.sqrt_pos.mpr (by positivity)
+  have hratio : (α + m) / Real.sqrt (1 + (s : ℝ)) = q := strictMono_Phi.injective hα
+  rw [div_eq_iff hpos.ne'] at hratio
+  linarith
+
 end
 
 end Descent.Portability.GaussianAnchor
