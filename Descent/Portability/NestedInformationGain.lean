@@ -92,4 +92,14 @@ theorem approximation_excess_le {mG : MeasurableSpace Ω} (hG : mG ≤ m₀) (hY
   have hconst : (∫ _ω, ε ^ 2 ∂μ) = ε ^ 2 := by simp
   linarith
 
+/-- **Fitted risk decomposes exactly.**  Any square-integrable `G`-measurable fitted
+predictor `p̂` pays the oracle risk of `G` plus its own estimation error,
+`E[(Y − p̂)²] = E[(Y − E[Y ∣ G])²] + E[(p̂ − E[Y ∣ G])²]`: the realised benefit of
+richer information is its oracle gain less the extra estimation error it costs. -/
+theorem fitted_risk_decomposition {mG : MeasurableSpace Ω} (hG : mG ≤ m₀) (hY : MemLp Y 2 μ)
+    {g : Ω → ℝ} (hg : MemLp g 2 μ) (hgm : StronglyMeasurable[mG] g) :
+    (∫ ω, (Y ω - g ω) ^ 2 ∂μ) =
+      (∫ ω, (Y ω - μ[Y | mG] ω) ^ 2 ∂μ) + ∫ ω, (μ[Y | mG] ω - g ω) ^ 2 ∂μ :=
+  ReportConditionalRiskLaw.risk_pythagoras hG hY hg hgm
+
 end Descent.Portability.NestedInformationGain

@@ -9,3 +9,4 @@ import Descent.Portability.NestedInformationGain
 #print axioms Descent.Portability.NestedInformationGain.nested_information_gain_nonneg
 #print axioms Descent.Portability.NestedInformationGain.residual_feature_orthogonal
 #print axioms Descent.Portability.NestedInformationGain.approximation_excess_le
+#print axioms Descent.Portability.NestedInformationGain.fitted_risk_decomposition
