@@ -31,7 +31,7 @@ theorem first_bound (a x : ℝ) (ha : 1 / 2 ≤ a) :
     |logFirst a x| ≤ 1 + 2 * x ^ 2 := by
   obtain ⟨h₀, h₂⟩ := reciprocal_bounds a ha
   have hsq := pow_le_pow_left₀ h₀ h₂ 2
-  have hb := abs_add (-a⁻¹ / 2) (x ^ 2 * a⁻¹ ^ 2 / 2)
+  have hb := abs_add_le (-a⁻¹ / 2) (x ^ 2 * a⁻¹ ^ 2 / 2)
   simp only [logFirst]
   apply hb.trans
   rw [abs_div, abs_neg, abs_of_nonneg h₀, abs_of_nonneg (by positivity), abs_of_nonneg
@@ -57,7 +57,7 @@ theorem third_bound (a x : ℝ) (ha : 1 / 2 ≤ a) :
   have hc := pow_le_pow_left₀ h₀ h₂ 3
   have hq := pow_le_pow_left₀ h₀ h₂ 4
   unfold logThird
-  apply (abs_add _ _).trans
+  apply (abs_add_le _ _).trans
   rw [abs_neg, abs_of_nonneg (by positivity : 0 ≤ a⁻¹ ^ 3),
     abs_of_nonneg (by positivity : 0 ≤ 3 * x ^ 2 * a⁻¹ ^ 4)]
   nlinarith [mul_le_mul_of_nonneg_left hq (sq_nonneg x)]
